@@ -12,49 +12,56 @@ namespace GlobalTheory.Mem.GaussPhase
 
 variable {σ : Type} [Fintype σ] [DecidableEq σ]
 
-theorem differentiableAt_det (M : ℝ → Matrix σ σ ℂ) (t : ℝ)
-    (hM : ∀ i j, DifferentiableAt ℝ (fun s => M s i j) t) :
-    DifferentiableAt ℝ (fun s => (M s).det) t :=
+theorem differentiableAt_det
+    (M : ℝ → Matrix σ σ ℂ) (t : ℝ) (hM : ∀ i j, DifferentiableAt ℝ (fun s => M s i j) t)
+    : DifferentiableAt ℝ (fun s => (M s).det) t :=
   _root_.GlobalTheory.DifferentiableDet.differentiableAt_det M t hM
 
-theorem differentiableAt_inv_apply (M : ℝ → Matrix σ σ ℂ) (t : ℝ)
-    (hM : ∀ i j, DifferentiableAt ℝ (fun s => M s i j) t) (hne : (M t).det ≠ 0) (i j : σ) :
-    DifferentiableAt ℝ (fun s => (M s)⁻¹ i j) t := by
+theorem differentiableAt_inv_apply
+    (M : ℝ → Matrix σ σ ℂ) (t : ℝ)
+    (hM : ∀ i j, DifferentiableAt ℝ (fun s => M s i j) t) (hne : (M t).det ≠ 0)
+    (i j : σ)
+    : DifferentiableAt ℝ (fun s => (M s)⁻¹ i j) t := by
   have hadj : DifferentiableAt ℝ (fun s => (M s).adjugate i j) t := by
-    have := differentiableAt_det (fun s => (M s).updateRow j (Pi.single i 1)) t (by
-      intro a b
-      by_cases h : a = j
-      · simp only [updateRow_apply, h, ite_true]
-        exact differentiableAt_const _
-      · simp only [updateRow_apply, h, ite_false]
-        exact hM a b)
+    have :=
+      differentiableAt_det (fun s => (M s).updateRow j (Pi.single i 1)) t (by
+        intro a b
+        by_cases h : a = j
+        · simp only [updateRow_apply, h, ite_true]
+          exact differentiableAt_const _
+        · simp only [updateRow_apply, h, ite_false]
+          exact hM a b)
     simpa only [adjugate_apply] using this
   have := ((differentiableAt_det M t hM).fun_inv hne).mul hadj
   refine this.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ?_)
   simp [Matrix.inv_def, Ring.inverse_eq_inv']
 
 omit [DecidableEq σ] in
-theorem hasDerivAt_dot (x : σ → ℂ) {w : ℝ → σ → ℂ} {w' : σ → ℂ} {t : ℝ} (h : HasDerivAt w w' t) :
-    HasDerivAt (fun s => x ⬝ᵥ w s) (x ⬝ᵥ w') t := by
+theorem hasDerivAt_dot (x : σ → ℂ) {w : ℝ → σ → ℂ} {w' : σ → ℂ} {t : ℝ} (h : HasDerivAt w w' t)
+    : HasDerivAt (fun s => x ⬝ᵥ w s) (x ⬝ᵥ w') t := by
   simp only [dotProduct]
   exact HasDerivAt.fun_sum fun k _ => (hasDerivAt_pi.mp h k).const_mul _
 
 omit [DecidableEq σ] in
-theorem hasDerivAt_mulVec (S : Matrix σ σ ℂ) {w : ℝ → σ → ℂ} {w' : σ → ℂ} {t : ℝ}
-    (h : HasDerivAt w w' t) : HasDerivAt (fun s => S *ᵥ w s) (S *ᵥ w') t :=
+theorem hasDerivAt_mulVec
+    (S : Matrix σ σ ℂ) {w : ℝ → σ → ℂ} {w' : σ → ℂ} {t : ℝ} (h : HasDerivAt w w' t)
+    : HasDerivAt (fun s => S *ᵥ w s) (S *ᵥ w') t :=
   hasDerivAt_pi.mpr fun i => hasDerivAt_dot (S i) h
 
 omit [DecidableEq σ] in
-theorem dot_symm {S : Matrix σ σ ℂ} (hS : Sᵀ = S) (a b : σ → ℂ) :
-    (S *ᵥ a) ⬝ᵥ b = a ⬝ᵥ (S *ᵥ b) := by
+theorem dot_symm {S : Matrix σ σ ℂ} (hS : Sᵀ = S) (a b : σ → ℂ)
+    : (S *ᵥ a) ⬝ᵥ b = a ⬝ᵥ (S *ᵥ b) := by
   rw [dotProduct_mulVec, ← mulVec_transpose, hS]
 
-theorem hasDerivAt_phase (σ : Type) [Fintype σ] [DecidableEq σ] (S T : Matrix σ σ ℂ)
-    (x y : σ → ℂ) (t : ℝ) (hS : Sᵀ = S) (hT : Tᵀ = T)
-    (hu : IsUnit (1 - ((t : ℂ) ^ 2) • (T * S)).det) :
-    (let w : ℝ → σ → ℂ := fun s => (1 - ((s : ℂ) ^ 2) • (T * S))⁻¹ *ᵥ (y + (s : ℂ) • T *ᵥ x)
-    let u : ℝ → σ → ℂ := fun s => x + (s : ℂ) • S *ᵥ w s
-    HasDerivAt (fun s : ℝ => (s : ℂ) / 2 * (x ⬝ᵥ w s + y ⬝ᵥ u s)) (u t ⬝ᵥ w t) t) := by
+theorem hasDerivAt_phase
+    (σ : Type) [Fintype σ] [DecidableEq σ]
+    (S T : Matrix σ σ ℂ)
+    (x y : σ → ℂ)
+    (t : ℝ)
+    (hS : Sᵀ = S) (hT : Tᵀ = T) (hu : IsUnit (1 - ((t : ℂ) ^ 2) • (T * S)).det)
+    : (let w : ℝ → σ → ℂ := fun s => (1 - ((s : ℂ) ^ 2) • (T * S))⁻¹ *ᵥ (y + (s : ℂ) • T *ᵥ x)
+       let u : ℝ → σ → ℂ := fun s => x + (s : ℂ) • S *ᵥ w s
+       HasDerivAt (fun s : ℝ => (s : ℂ) / 2 * (x ⬝ᵥ w s + y ⬝ᵥ u s)) (u t ⬝ᵥ w t) t) := by
   intro w u
   have hof : HasDerivAt (fun s : ℝ => (s : ℂ)) 1 t := Complex.ofRealCLM.hasDerivAt
   set M : ℝ → Matrix σ σ ℂ := fun s => 1 - ((s : ℂ) ^ 2) • (T * S) with hMdef

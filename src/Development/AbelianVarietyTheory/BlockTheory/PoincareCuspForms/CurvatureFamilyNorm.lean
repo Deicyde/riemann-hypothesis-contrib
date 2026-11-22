@@ -7,7 +7,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates
 open scoped ContDiff
 
 noncomputable section
@@ -62,17 +64,24 @@ structure Weights (X : Data E r) where
   cRR : (g0 r : ℝ) * X.Ψ.card * (X.p0 : ℝ) ^ 3 * RR X ^ 2 * c ≤ 1
   b_cut : bb X < 3.8 * T - 2 * T
   b_onto : bb X ^ 2 * Crh X + bb X < 1.9 * ((nd X : ℝ) + 2) * T
-  gap_big : ∀ τ a b, IsGap X a b →
-    ((T : ℤ) + nd X + 2) * ((T : ℤ) + nd X + 2 + 2 * r) ≤ aK τ a - aK τ b + 2
+  gap_big
+    : ∀ τ a b,
+      IsGap X a b → ((T : ℤ) + nd X + 2) * ((T : ℤ) + nd X + 2 + 2 * r) ≤ aK τ a - aK τ b + 2
   plus_big : ∀ τ (a : Fin r), (a : ℕ) + 1 = r → 2 * (T : ℤ) ^ 2 ≤ aK τ a
-  minus_big : ∀ τ (a : Fin r), (a : ℕ) = 0 → 2 * (T : ℤ) ^ 2 ≤ -aK τ a
-  gap_div : ∀ τ a b, IsGap X a b →
-    aK τ a - aK τ b + 2 - ((T : ℤ) + nd X + 2) * (aW τ a - aW τ b) ∈ Set.Ico (0 : ℤ) (T + nd X + 2)
-  plus_div : ∀ τ (a : Fin r), (a : ℕ) + 1 = r →
-    aK τ a - ((T : ℤ) + nd X + 2) * aW τ a - ((nd X : ℤ) + 2) * (2 * hW) - 2 * r ∈
-      Set.Ico (0 : ℤ) (T + nd X + 2)
-  minus_div : ∀ τ (a : Fin r), (a : ℕ) = 0 →
-    -aK τ a - ((T : ℤ) + nd X + 2) * (-aW τ a) ∈ Set.Ico (0 : ℤ) (T + nd X + 2)
+  minus_big : ∀ τ (a : Fin r), (a : ℕ) = 0 → 2 * (T : ℤ) ^ 2 ≤ - aK τ a
+  gap_div
+    : ∀ τ a b,
+      IsGap X a b
+        → aK τ a - aK τ b + 2 - ((T : ℤ) + nd X + 2) * (aW τ a - aW τ b)
+          ∈ Set.Ico (0 : ℤ) (T + nd X + 2)
+  plus_div
+    : ∀ τ (a : Fin r),
+      (a : ℕ) + 1 = r
+        → aK τ a - ((T : ℤ) + nd X + 2) * aW τ a - ((nd X : ℤ) + 2) * (2 * hW) - 2 * r
+          ∈ Set.Ico (0 : ℤ) (T + nd X + 2)
+  minus_div
+    : ∀ τ (a : Fin r),
+      (a : ℕ) = 0 → - aK τ a - ((T : ℤ) + nd X + 2) * (- aW τ a) ∈ Set.Ico (0 : ℤ) (T + nd X + 2)
 
 namespace Weights
 
@@ -96,10 +105,12 @@ def t : ℝ := 1 + w.c1 / a1 X
 
 end Weights
 
-def lev (X : Data E r) (x0 : Frame X.Ψ r) (u : Frame X.Ψ r → ℝ) (z : V (nd X)) (ξ : Fin (nd X) → ℂ) : ℝ :=
+def lev (X : Data E r) (x0 : Frame X.Ψ r) (u : Frame X.Ψ r → ℝ) (z : V (nd X)) (ξ : Fin (nd X) → ℂ)
+    : ℝ :=
   (leviV (nd X) (fun y => ((u (cpt X x0 y) : ℝ) : ℂ)) z ξ).re
 
-def curv (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r) (z : V (nd X)) (ξ : Fin (nd X) → ℂ) : ℝ :=
+def curv (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r) (z : V (nd X)) (ξ : Fin (nd X) → ℂ)
+    : ℝ :=
   lev X x0 (phla X la) z ξ
 
 def curvDe (X : Data E r) (x0 : Frame X.Ψ r) (z : V (nd X)) (ξ : Fin (nd X) → ℂ) : ℝ :=
@@ -111,11 +122,11 @@ def omRh (X : Data E r) (x0 : Frame X.Ψ r) (z : V (nd X)) (ξ : Fin (nd X) → 
 def IsInv (X : Data E r) (u : Frame X.Ψ r → ℝ) : Prop :=
   (∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, u (rmul x b) = u x) ∧ ∀ γ ∈ X.Γ, ∀ x ∈ X.dom, u (lact γ x) = u x
 
-def famNorm (X : Data E r) (la : Wt X.Ψ r) {N : ℕ} (w : Fin N → Frame X.Ψ r → ℂ) (x : Frame X.Ψ r) : ℝ :=
+def famNorm (X : Data E r) (la : Wt X.Ψ r) {N : ℕ} (w : Fin N → Frame X.Ψ r → ℂ) (x : Frame X.Ψ r)
+    : ℝ :=
   Real.sqrt (∑ j, X.pnorm la (w j) x ^ 2)
 
 structure ThetaInputs (X : Data E r) extends Weights X where
-
   N : ℕ
   w : Fin N → Frame X.Ψ r → ℂ
   et : Frame X.Ψ r → ℂ
@@ -136,29 +147,46 @@ structure ThetaInputs (X : Data E r) extends Weights X where
   thp_ne : ∃ x ∈ X.dom, thp x ≠ 0
   phi_inv : IsInv X phi
   phi_nonneg : ∀ x ∈ X.dom, 0 ≤ phi x
-  phi_lower : ∀ x ∈ X.dom, X.la1 x < Real.sqrt X.Ψ.card * Real.exp (-mu) →
-    1 ≤ 4 * RR X * dp X ^ 2 * X.la1 x ^ 2 * phi x
+  phi_lower
+    : ∀ x ∈ X.dom,
+      X.la1 x < Real.sqrt X.Ψ.card * Real.exp (-mu) → 1 ≤ 4 * RR X * dp X ^ 2 * X.la1 x ^ 2 * phi x
   phi_upper : ∀ x ∈ X.dom, 2 * X.la1 x ^ 2 * phi x ≤ X.p0 * dp X ^ 2
   w_lower : ∃ C : ℝ, ∀ x ∈ X.dom, Real.exp (-(C + c * phi x)) ≤ famNorm X toWeights.L w x
   et_upper : ∃ C : ℝ, ∀ x ∈ X.dom, X.pnorm toWeights.wEt et x ≤ Real.exp (-(i * (phi x - C)))
   potential_smooth : ContDiffOn ℝ ∞ ps0 X.dom
   potential_invariant : IsInv X ps0
   potential_bounded : ∃ C : ℝ, ∀ x ∈ X.dom, ps0 x ≤ C
-  curvature_lower_bound : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ, -(r * curvDe X x0 z ξ) ≤ lev X x0 ps0 z ξ
-  potential_decay : ∃ A : ℝ, ∀ η : ℝ, 0 < η → ∃ C : ℝ, ∀ x ∈ X.dom, ∀ ξ, X.IsIso ξ →
-    (∀ τ, X.c τ * X.maj x τ (Data.emb τ.1 ξ) ≤ 1) →
-    ps0 x ≤ C + A * Real.log (1 + 1 / X.la1 x) - 8 * Real.pi * (1 - 2 * η) * a1 X * ⨅ τ, X.tt ξ x τ
+  curvature_lower_bound
+    : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ, -(r * curvDe X x0 z ξ) ≤ lev X x0 ps0 z ξ
+  potential_decay
+    : ∃ A : ℝ, ∀ η : ℝ,
+      0 < η
+        → ∃ C : ℝ, ∀ x ∈ X.dom, ∀ ξ,
+          X.IsIso ξ → (∀ τ, X.c τ * X.maj x τ (Data.emb τ.1 ξ) ≤ 1)
+            → ps0 x
+              ≤ C + A * Real.log (1 + 1 / X.la1 x)
+                - 8 * Real.pi * (1 - 2 * η) * a1 X * ⨅ τ, X.tt ξ x τ
   curv_L : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ, ξ ≠ 0 → 0 < curv X x0 toWeights.L z ξ
-  curv_G₁ : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ, ξ ≠ 0 →
-    curvDe X x0 z ξ < curv X x0 toWeights.L z ξ
-  margin_cut : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ,
-    curv X x0 toWeights.L z ξ + 3.8 * T * omRh X x0 z ξ ≤
-      curv X x0 ((2 : ℤ) • toWeights.L + toWeights.rem) z ξ
-  margin_twist : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ,
-    curv X x0 toWeights.L z ξ + (3.8 * T - 2 * T) * omRh X x0 z ξ ≤
-      curv X x0 ((2 : ℤ) • toWeights.L + toWeights.rem) z ξ - toWeights.t * r * curvDe X x0 z ξ
-  margin_onto : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ,
-    1.9 * ((nd X : ℝ) + 2) * T * omRh X x0 z ξ ≤ curv X x0 (toWeights.Fp - kapW X) z ξ
+  curv_G₁
+    : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ, ξ ≠ 0 → curvDe X x0 z ξ < curv X x0 toWeights.L z ξ
+  margin_cut
+    : ∀ x0,
+      IsOrth X x0
+        → ∀ z ∈ OmF X x0, ∀ ξ,
+          curv X x0 toWeights.L z ξ + 3.8 * T * omRh X x0 z ξ
+            ≤ curv X x0 ((2 : ℤ) • toWeights.L + toWeights.rem) z ξ
+  margin_twist
+    : ∀ x0,
+      IsOrth X x0
+        → ∀ z ∈ OmF X x0, ∀ ξ,
+          curv X x0 toWeights.L z ξ + (3.8 * T - 2 * T) * omRh X x0 z ξ
+            ≤ curv X x0 ((2 : ℤ) • toWeights.L + toWeights.rem) z ξ
+              - toWeights.t * r * curvDe X x0 z ξ
+  margin_onto
+    : ∀ x0,
+      IsOrth X x0
+        → ∀ z ∈ OmF X x0, ∀ ξ,
+          1.9 * ((nd X : ℝ) + 2) * T * omRh X x0 z ξ ≤ curv X x0 (toWeights.Fp - kapW X) z ξ
 
 end
 

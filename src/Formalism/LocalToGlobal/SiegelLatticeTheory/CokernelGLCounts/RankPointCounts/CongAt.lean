@@ -8,23 +8,29 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.ZsVolLat
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Matrix IsDedekindDomain
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Matrix
+  IsDedekindDomain
 open Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : Formalism.BasicNotions.D7}
 
-theorem cong_at {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hc : IsFixedConv Λ (Lat.gS D) F) (hc' : IsFixedConv Λ (Lat.gS D) F')
-    (hz' : F'.fl.z ∈ Λ) (hadm : ∀ b, ModG (VS D) Λ (Lat.gS D) (F'.fl.fvec b - F.fl.fvec b))
+theorem cong_at
+    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (hc : IsFixedConv Λ (Lat.gS D) F) (hc' : IsFixedConv Λ (Lat.gS D) F') (hz' : F'.fl.z ∈ Λ)
+    (hadm : ∀ b, ModG (VS D) Λ (Lat.gS D) (F'.fl.fvec b - F.fl.fvec b))
     (s : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hs : ∀ v ∈ Λ, s v ∈ Λ)
-    (uu uu' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) (huu : IsUpUni uu) (huu' : IsUpUni uu')
-    (hfr : ∀ b, s (F.fl.fvec b) = ∑ c, uu c b • F.fl.fvec c) (hfr' : ∀ b, s (F'.fl.fvec b) = ∑ c, uu' c b • F'.fl.fvec c)
+    (uu uu' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)
+    (huu : IsUpUni uu) (huu' : IsUpUni uu') (hfr : ∀ b, s (F.fl.fvec b) = ∑ c, uu c b • F.fl.fvec c)
+    (hfr' : ∀ b, s (F'.fl.fvec b) = ∑ c, uu' c b • F'.fl.fvec c)
     (P : HeightOneSpectrum (𝓞 D.host.E)) (hgP : ((Lat.gS D : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal)
-    (j i : Fin (D.R.rS + 1)) (hji : j < i) :
-    ∃ t : 𝓞 D.host.E, t ∉ P.asIdeal ∧ ∃ o : 𝓞 D.host.E,
-      (t : D.host.E) * (uu j i - uu' j i) = ((Lat.gS D : ℕ) : D.host.E) * o := by
+    (j i : Fin (D.R.rS + 1)) (hji : j < i)
+    : ∃ t : 𝓞 D.host.E,
+      t ∉ P.asIdeal
+        ∧ ∃ o : 𝓞 D.host.E,
+          (t : D.host.E) * (uu j i - uu' j i) = ((Lat.gS D : ℕ) : D.host.E) * o := by
   have hP := P.isPrime
   set g : 𝓞 D.host.E := ((Lat.gS D : ℕ) : 𝓞 D.host.E) with hg
   set M := Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Ideal.span {g} • Λ) with hM
@@ -50,10 +56,14 @@ theorem cong_at {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D
     obtain ⟨t2, ht2, htd⟩ := (mem_locP P.asIdeal _ _).1 (hd c)
     obtain ⟨l, hl, hlg⟩ := (hgs _).1 htd
     refine (mem_locP P.asIdeal _ _).2 ⟨t1 * t2, fun h => (hP.mem_or_mem h).elim ht1 ht2, ?_⟩
-    have e : (t1 * t2) • (uu' c i • (F'.fl.fvec c - F.fl.fvec c)) = o • (t2 • (F'.fl.fvec c - F.fl.fvec c)) := by
-      rw [← algebraMap_smul D.host.E (t1 * t2), ← algebraMap_smul D.host.E o, ← algebraMap_smul D.host.E t2, smul_smul,
-        smul_smul]
-      have ho' : algebraMap (𝓞 D.host.E) D.host.E t1 * uu' c i = algebraMap (𝓞 D.host.E) D.host.E o := ho
+    have e
+        : (t1 * t2) • (uu' c i • (F'.fl.fvec c - F.fl.fvec c))
+          = o • (t2 • (F'.fl.fvec c - F.fl.fvec c)) := by
+      rw [← algebraMap_smul D.host.E (t1 * t2), ← algebraMap_smul D.host.E o,
+        ← algebraMap_smul D.host.E t2, smul_smul, smul_smul]
+      have ho'
+          : algebraMap (𝓞 D.host.E) D.host.E t1 * uu' c i = algebraMap (𝓞 D.host.E) D.host.E o :=
+        ho
       rw [map_mul, mul_right_comm, ho']
     rw [e, ← hlg]
     exact (hgs _).2 ⟨o • l, Λ.smul_mem o hl, smul_comm g o l⟩
@@ -65,7 +75,9 @@ theorem cong_at {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D
       rw [(huu' _ _).2 rfl, (huu _ _).2 rfl, sub_self]
     · have hlt : i < Fin.last _ := lt_of_le_of_ne (Fin.le_last i) h
       rw [(huu' _ _).1 hlt, (huu _ _).1 hlt, sub_self]
-  have hw : ∑ a, y a • F.fl.e a = s (F'.fl.fvec i - F.fl.fvec i) - ∑ c, uu' c i • (F'.fl.fvec c - F.fl.fvec c) := by
+  have hw
+      : ∑ a, y a • F.fl.e a
+        = s (F'.fl.fvec i - F.fl.fvec i) - ∑ c, uu' c i • (F'.fl.fvec c - F.fl.fvec c) := by
     rw [map_sub, hfr i, hfr' i]
     simp only [smul_sub, Finset.sum_sub_distrib]
     have h2 : ∑ c, (uu' c i - uu c i) • F.fl.fvec c = ∑ a, y a • F.fl.e a := by
@@ -94,14 +106,19 @@ theorem cong_at {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D
     show l ∈ F.fl.X
     rw [hl_eq]
     exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
-  have hloc : l ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Submodule.span (𝓞 D.host.E) (Set.range F.fl.e)) := by
+  have hloc
+      : l ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+        (Submodule.span (𝓞 D.host.E) (Set.range F.fl.e)) := by
     rw [← conv_at F Λ hc P hgP]
     exact ⟨1, P.asIdeal.primeCompl.one_mem, by rw [one_smul]; exact hlX⟩
   obtain ⟨t', ht', ht'l⟩ := (mem_locP P.asIdeal _ _).1 hloc
-  have hv2 : t' • l = ∑ a, ((t' : D.host.E) * (((Lat.gS D : ℕ) : D.host.E)⁻¹ * ((t : D.host.E) * y a))) • F.fl.e a := by
-    rw [hl_eq, Finset.smul_sum]
-    refine Finset.sum_congr rfl fun a _ => ?_
-    rw [← algebraMap_smul D.host.E t', smul_smul]
+  have hv2
+      : t' • l
+        = ∑ a, ((t' : D.host.E) * (((Lat.gS D : ℕ) : D.host.E)⁻¹ * ((t : D.host.E) * y a))) • F.fl.e a :=
+    by
+      rw [hl_eq, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun a _ => ?_
+      rw [← algebraMap_smul D.host.E t', smul_smul]
   have hjr : (j : ℕ) < D.R.rS := lt_of_lt_of_le hji (Nat.lt_succ_iff.1 i.2)
   obtain ⟨o, ho⟩ := coef_spanO F.fl ht'l _ hv2 ⟨j, hjr⟩
   refine ⟨t' * t, fun h => (hP.mem_or_mem h).elim ht' ht, -o, ?_⟩

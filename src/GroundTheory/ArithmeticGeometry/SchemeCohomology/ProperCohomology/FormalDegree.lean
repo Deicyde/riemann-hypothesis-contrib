@@ -17,8 +17,11 @@ universe u
 
 noncomputable section
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] {F : X.Modules}
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  {F : X.Modules}
 
 omit [IsNoetherianRing A] in
 lemma algV_eq_toFunctions (V : X.Opens) (a : A) : algV X V a = toFunctions V a := rfl
@@ -83,8 +86,9 @@ lemma idealPowι_app_injective (n : ℕ) : Function.Injective ((idealPowι I F n
   kernel_ι_app_injective _ V
 
 def reesDeg (n : ℕ) : Γ(reesSheaf I F, reesPr I X ⁻¹ᵁ V) →+ Γ(idealPow I F n, V) where
-  toFun s := (Equiv.ofInjective _ (idealPowι_app_injective I n)).symm
-    ⟨reesCoef I hF hV n s, reesCoef_mem I hF hV n s⟩
+  toFun s :=
+    (Equiv.ofInjective _ (idealPowι_app_injective I n)).symm
+      ⟨reesCoef I hF hV n s, reesCoef_mem I hF hV n s⟩
   map_zero' := by
     apply idealPowι_app_injective I n
     refine (Equiv.apply_ofInjective_symm (idealPowι_app_injective (F := F) (V := V) I n) _).trans ?_
@@ -116,7 +120,6 @@ lemma lsingle_mem_reesSubmodule (n : ℕ) (g : Γ(idealPow I F n, V)) :
   · subst h
     exact (mem_range_idealPowι_iff I hV n _).1 ⟨g, rfl⟩
   · exact zero_mem _
-
 
 include hF hV in
 def reesInc (n : ℕ) : Γ(idealPow I F n, V) →+ Γ(reesSheaf I F, reesPr I X ⁻¹ᵁ V) :=

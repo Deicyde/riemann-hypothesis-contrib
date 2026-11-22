@@ -9,7 +9,8 @@ namespace KStar.TotallyRealRoots
 variable {l : ℕ} [Fact l.Prime]
 
 private theorem nb_red_eq_one {u : ℤ_[l]ˣ} : red l u = 1 ↔ (l : ℤ_[l]) ∣ (u : ℤ_[l]) - 1 := by
-  rw [← Units.val_eq_one, show ((red l u : (ZMod l)ˣ) : ZMod l) = PadicInt.toZMod (u : ℤ_[l]) from rfl,
+  rw [← Units.val_eq_one,
+    show ((red l u : (ZMod l)ˣ) : ZMod l) = PadicInt.toZMod (u : ℤ_[l]) from rfl,
     ← Ideal.mem_span_singleton, ← PadicInt.maximalIdeal_eq_span_p, ← PadicInt.ker_toZMod,
     RingHom.mem_ker, map_sub, map_one, sub_eq_zero]
 

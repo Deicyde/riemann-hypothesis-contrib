@@ -11,15 +11,18 @@ public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClas
 
 open NumberField Formalism.HC KStar.Tree
 
-private theorem wDvdQS_crt {N A B : ℕ} [NeZero N] (h : N = A * B) (hAB : A.Coprime B) (y : ℕ) (hy : y.Coprime B) :
-    ∃ u : (ZMod N)ˣ, (u : ZMod N).val ≡ 1 [MOD A] ∧ (u : ZMod N).val ≡ y [MOD B] := by
+private theorem wDvdQS_crt
+    {N A B : ℕ} [NeZero N] (h : N = A * B) (hAB : A.Coprime B) (y : ℕ) (hy : y.Coprime B)
+    : ∃ u : (ZMod N)ˣ, (u : ZMod N).val ≡ 1 [MOD A] ∧ (u : ZMod N).val ≡ y [MOD B] := by
   subst h
   obtain ⟨u, hu1, hu2⟩ := Formalism.HC.Der.exists_unit_crt hAB 1 y (Nat.coprime_one_left A) hy
   exact ⟨u, hu1, hu2⟩
 
-private theorem wDvdQS_not_dvd {φ : Frame} (H : HostRaw φ) (A p : ℕ) (hp : p.Prime) (h3 : 3 < p)
-    (hN : H.condN = A * p) (hA : A.Coprime p)
-    (hart : ∀ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1 [MOD A] → H.art u ^ 2 = 1) : ¬ p ∣ H.w := by
+private theorem wDvdQS_not_dvd
+    {φ : Frame} (H : HostRaw φ)
+    (A p : ℕ) (hp : p.Prime) (h3 : 3 < p) (hN : H.condN = A * p) (hA : A.Coprime p)
+    (hart : ∀ u : (ZMod H.condN)ˣ, (u : ZMod H.condN).val ≡ 1 [MOD A] → H.art u ^ 2 = 1)
+    : ¬ p ∣ H.w := by
   intro hdvd
   haveI : NeZero H.condN := ⟨by rw [hN]; exact mul_ne_zero (fun h0 => by simp [h0] at hA; exact hp.one_lt.ne' hA) hp.ne_zero⟩
   obtain ⟨ζ, hζ⟩ := H.exists_primitiveRoot_w
@@ -33,8 +36,10 @@ private theorem wDvdQS_not_dvd {φ : Frame} (H : HostRaw φ) (A p : ℕ) (hp : p
   have he := Formalism.HC.Der.emb_art H (u ^ 2) (ζ ^ (H.w / p))
   rw [ha, map_one, AlgEquiv.one_apply, Formalism.HC.Der.tauN_root] at he
   · have hmod : ((u ^ 2 : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ 1 [MOD p] := by
-      have he' : (Formalism.HC.Der.emb H (ζ ^ (H.w / p))) ^ ((u ^ 2 : (ZMod H.condN)ˣ) : ZMod H.condN).val
-          = (Formalism.HC.Der.emb H (ζ ^ (H.w / p))) ^ 1 := by
+      have he'
+          : (Formalism.HC.Der.emb H (ζ ^ (H.w / p)))
+              ^ ((u ^ 2 : (ZMod H.condN)ˣ) : ZMod H.condN).val
+            = (Formalism.HC.Der.emb H (ζ ^ (H.w / p))) ^ 1 := by
         rw [pow_one]; exact he.symm
       have := (hξ.isOfFinOrder hp.ne_zero).pow_eq_pow_iff_modEq.mp he'
       rwa [← hξ.eq_orderOf] at this
@@ -47,8 +52,8 @@ private theorem wDvdQS_not_dvd {φ : Frame} (H : HostRaw φ) (A p : ℕ) (hp : p
     omega
   · exact (hξ.pow_eq_one_iff_dvd _).mpr hpN
 
-theorem UpperTheory.Mu.wDvdQS :
-    ∀ (φ : Frame) (H : HostRaw φ), H.q ≠ 3 → H.w ∣ H.QS ∧ ¬ H.q ∣ H.w ∧ ¬ H.d ∣ H.w := by
+theorem UpperTheory.Mu.wDvdQS
+    : ∀ (φ : Frame) (H : HostRaw φ), H.q ≠ 3 → H.w ∣ H.QS ∧ ¬ H.q ∣ H.w ∧ ¬ H.d ∣ H.w := by
   intro φ H hq3
   have hq := H.hyp.1
   have hd := H.hyp.2.1
@@ -63,7 +68,8 @@ theorem UpperTheory.Mu.wDvdQS :
     rcases H.art_d u hu with h | h
     · rw [h, one_pow]
     · rw [h, sq]
-      exact Prod.ext (show ((1, -1) : Formalism.FrobeniusOrbits.G0) * (1, -1) = 1 by decide) (mul_one _)
+      exact Prod.ext (show ((1, -1) : Formalism.FrobeniusOrbits.G0) * (1, -1) = 1 by decide)
+        (mul_one _)
   refine ⟨?_, h1, h2⟩
   have h3 : H.w ∣ H.QS * H.q :=
     ((hd.coprime_iff_not_dvd.2 h2).symm).dvd_of_dvd_mul_right H.w_dvd_condN

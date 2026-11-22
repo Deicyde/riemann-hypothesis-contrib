@@ -8,13 +8,27 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.Cel
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan.VanishingInRationalCone
 
-theorem vanish_of_inRCone_of_genRank_le : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O), CMOrd O bar → ∀ (q : ℕ) (ψ lab : InvFun O), IsPolyFan bar q ψ → IsCarrierDim bar q ψ lab → ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X], Module.finrank O X ≤ q → Dominates bar X → ∀ (m : ℕ) (τ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ τ → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone τ β → (genRank τ : ℝ) ≤ lab.evalZ β → ∀ j y, β y y = 0 → τ j y y = 0 := by
+theorem vanish_of_inRCone_of_genRank_le
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
+      CMOrd O bar
+        → ∀ (q : ℕ) (ψ lab : InvFun O),
+          IsPolyFan bar q ψ → IsCarrierDim bar q ψ lab
+            → ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
+                [Module.Projective O X],
+              Module.finrank O X ≤ q → Dominates bar X
+                → ∀ (m : ℕ) (τ : Fin m → LinearMap.BilinForm ℤ X),
+                  IsCell bar ψ τ
+                    → ∀ β ∈ balForms bar X,
+                      (∀ y, 0 ≤ β y y) → InRCone τ β → (genRank τ : ℝ) ≤ lab.evalZ β
+                        → ∀ j y, β y y = 0 → τ j y y = 0 := by
   intro O _ _ _ _ bar hb q ψ lab hψ hlab X _ _ _ _ hX hdom m τ hτ β hβ hβp hβc hrk j y hy
   classical
   let P : Fin m → Prop := fun j => ∀ y, β y y = 0 → τ j y y = 0
@@ -41,7 +55,10 @@ theorem vanish_of_inRCone_of_genRank_le : ∀ (O : Type) [CommRing O] [IsDedekin
       · intro h0
         by_contra hk
         have h1 : τ k (w k) (w k) ≤ ∑ i, τ k (w i) (w i) :=
-          Finset.single_le_sum (f := fun i => τ k (w i) (w i)) (fun i _ => hτ.nonneg k (w i)) (Finset.mem_univ k)
+          Finset.single_le_sum
+            (f := fun i => τ k (w i) (w i))
+            (fun i _ => hτ.nonneg k (w i))
+            (Finset.mem_univ k)
         have h2 := hwpos k hk
         omega
       · intro hk
@@ -56,8 +73,10 @@ theorem vanish_of_inRCone_of_genRank_le : ∀ (O : Type) [CommRing O] [IsDedekin
       simpa [LinearMap.sum_apply] using this
     rw [hw0 i, Int.cast_zero] at e
     have h1 : c i * (τ i (w i) (w i) : ℝ) ≤ ∑ k, c k * (τ k (w i) (w i) : ℝ) :=
-      Finset.single_le_sum (f := fun k => c k * (τ k (w i) (w i) : ℝ))
-        (fun k _ => mul_nonneg (hc k) (by exact_mod_cast hτ.nonneg k (w i))) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun k => c k * (τ k (w i) (w i) : ℝ))
+        (fun k _ => mul_nonneg (hc k) (by exact_mod_cast hτ.nonneg k (w i)))
+        (Finset.mem_univ i)
     have h2 : (0 : ℝ) < τ i (w i) (w i) := by exact_mod_cast hwpos i hi
     rw [← e] at h1
     nlinarith [hc i]
@@ -75,16 +94,22 @@ theorem vanish_of_inRCone_of_genRank_le : ∀ (O : Type) [CommRing O] [IsDedekin
     refine (Finset.sum_subset (Finset.subset_univ T) fun i _ hi => ?_).symm
     rw [hc0 i (by simpa [T] using hi), zero_smul]
   have hl := hlab X hX β hβ hβp
-  have hle : sInf {k : ℕ | ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ ∧ InRCone γ β ∧
-      genRank γ = k} ≤ genRank (fun k => τ (s k)) := Nat.sInf_le ⟨_, _, hcell, hcone, rfl⟩
+  have hle
+      : sInf
+          {k : ℕ | ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ ∧ InRCone γ β ∧
+            genRank γ = k}
+        ≤ genRank (fun k => τ (s k)) :=
+    Nat.sInf_le ⟨_, _, hcell, hcone, rfl⟩
   have hrk' : genRank τ ≤ genRank (fun k => τ (s k)) := by
     rw [hl] at hrk
-    have h4 : ((genRank τ : ℕ) : ℝ) ≤ ((genRank (fun k => τ (s k)) : ℕ) : ℝ) := hrk.trans (Nat.cast_le.2 hle)
+    have h4 : ((genRank τ : ℕ) : ℝ) ≤ ((genRank (fun k => τ (s k)) : ℕ) : ℝ) :=
+      hrk.trans (Nat.cast_le.2 hle)
     exact_mod_cast h4
   haveI : Module.Finite ℤ (Submodule.span ℤ (Set.range τ)) := Module.Finite.span_of_finite ℤ (Set.finite_range τ)
   have hNL : Submodule.span ℤ (Set.range fun k => τ (s k)) ≤ Submodule.span ℤ (Set.range τ) :=
     Submodule.span_mono (Set.range_comp_subset_range s τ)
-  obtain ⟨n, hn, hnmem⟩ := exists_zsmul_mem_of_finrank_le_of_le hNL hrk' (Submodule.subset_span ⟨j, rfl⟩)
+  obtain ⟨n, hn, hnmem⟩ :=
+    exists_zsmul_mem_of_finrank_le_of_le hNL hrk' (Submodule.subset_span ⟨j, rfl⟩)
   have key : ∀ x ∈ Submodule.span ℤ (Set.range fun k => τ (s k)), x y y = 0 := fun x hx => by
     induction hx using Submodule.span_induction with
     | mem x hx =>

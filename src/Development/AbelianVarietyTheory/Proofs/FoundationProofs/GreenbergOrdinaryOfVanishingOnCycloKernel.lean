@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 noncomputable section
 
 namespace GlobalTheory.Ord2.GrOfKill
 
-theorem exists_unit_one_add (l : ℕ) [Fact l.Prime] : ∃ u : ℤ_[l]ˣ, (u : ℤ_[l]) = ((1 + l : ℕ) : ℤ_[l]) := by
+theorem exists_unit_one_add (l : ℕ) [Fact l.Prime]
+    : ∃ u : ℤ_[l]ˣ, (u : ℤ_[l]) = ((1 + l : ℕ) : ℤ_[l]) := by
   have hu : IsUnit (((1 + l : ℕ) : ℤ_[l])) := by
     push_cast
     rw [← sub_neg_eq_add]
@@ -21,7 +24,10 @@ theorem exists_unit_one_add (l : ℕ) [Fact l.Prime] : ∃ u : ℤ_[l]ˣ, (u : �
       PadicInt.irreducible_p.not_isUnit ((IsUnit.neg_iff _).1 h)
   exact ⟨hu.unit, rfl⟩
 
-theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ) (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l), Nf e S A W → ∀ y ∈ Z1 (Loc.colRep W), (∀ g ∈ N0g W, y g = 0) → Gr W A y := by
+theorem gr_of_vanish_on_trivial
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
+        (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
+      Nf e S A W → ∀ y ∈ Z1 (Loc.colRep W), (∀ g ∈ N0g W, y g = 0) → Gr W A y := by
   intro l _ Ω _ _ _ e S A W hW y hy hN
   set D := Dec (F := ℚ) A with hDdef
   have hup : ∀ s ∈ D, mat W s 1 0 = 0 := hW.upper
@@ -31,11 +37,14 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     intro s t ht; rw [hmul, Matrix.mul_apply, Fin.sum_univ_two, hup t ht]; ring
   have h11 : ∀ s t, s ∈ D → mat W (s * t) 1 1 = mat W s 1 1 * mat W t 1 1 := by
     intro s t hs; rw [hmul, Matrix.mul_apply, Fin.sum_univ_two, hup s hs]; ring
-  have h01 : ∀ s t, t ∈ D → mat W (s * t) 0 1 = mat W s 0 0 * mat W t 0 1 + mat W s 0 1 * mat W t 1 1 := by
+  have h01
+      : ∀ s t,
+        t ∈ D → mat W (s * t) 0 1 = mat W s 0 0 * mat W t 0 1 + mat W s 0 1 * mat W t 1 1 := by
     intro s t ht; rw [hmul, Matrix.mul_apply, Fin.sum_univ_two]
   have hcoc : ∀ s t, y (s * t) = y s + mat W s *ᵥ y t := fun s t => by
     have := hy.2 s t
-    rw [this]; rfl
+    rw [this]
+    rfl
   have hy1 : y 1 = 0 := by
     have := hcoc 1 1
     simpa [hone] using this
@@ -60,8 +69,11 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
       · simp [MonoidHom.mem_ker, map_mul, map_inv, hW']
     have e1 : v = u * (u⁻¹ * v) := by group
     rw [e1, hcoc, hN _ hn, Matrix.mulVec_zero, add_zero]
-  have hPmul : ∀ u v, P u → P v → P (u * v) ∧ mat W (u * v) 0 1 = mat W u 0 1 + mat W v 0 1 ∧
-      y (u * v) 1 = y u 1 + y v 1 := by
+  have hPmul
+      : ∀ u v,
+        P u → P v
+          → P (u * v) ∧ mat W (u * v) 0 1 = mat W u 0 1 + mat W v 0 1
+            ∧ y (u * v) 1 = y u 1 + y v 1 := by
     rintro u v ⟨huD, hu0, hu1, huc⟩ ⟨hvD, hv0, hv1, hvc⟩
     refine ⟨⟨D.mul_mem huD hvD, ?_, ?_, ?_⟩, ?_, ?_⟩
     · rw [h00 u v hvD, hu0, hv0, one_mul]
@@ -69,8 +81,10 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     · rw [map_mul, huc, hvc, one_mul]
     · rw [h01 u v hvD, hu0, hv1]; ring
     · rw [hb u v huD, hu1, one_mul]
-  have hPpow : ∀ u, P u → ∀ n : ℕ, P (u ^ n) ∧ mat W (u ^ n) 0 1 = n * mat W u 0 1 ∧
-      y (u ^ n) 1 = n * y u 1 := by
+  have hPpow
+      : ∀ u,
+        P u
+          → ∀ n : ℕ, P (u ^ n) ∧ mat W (u ^ n) 0 1 = n * mat W u 0 1 ∧ y (u ^ n) 1 = n * y u 1 := by
     intro u hu n
     induction n with
     | zero =>
@@ -87,8 +101,7 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     simpa using (hA _).2 hlv
   obtain ⟨u0, hu0⟩ := exists_unit_one_add l
   obtain ⟨t, htI, htu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hv u0
-  have heps : eps l t = ((1 + l : ℕ) : Qbar l) := by
-    simp [eps, cycBar, htu, hu0]
+  have heps : eps l t = ((1 + l : ℕ) : Qbar l) := by simp [eps, cycBar, htu, hu0]
   obtain ⟨m, hm1, hm⟩ := hW.wt
   have htD : t ∈ D := Ine_le_Dec A htI
   have hpow00 : ∀ s ∈ D, ∀ n : ℕ, mat W (s ^ n) 0 0 = mat W s 0 0 ^ n := by
@@ -105,8 +118,7 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     have h2 : dt W t ^ 2 = 1 := by
       have := congrArg (fun f => f t) hW.det2
       simpa using this
-    have hdT : dt W T = 1 := by
-      rw [hTdef, map_pow, pow_mul, h2, one_pow]
+    have hdT : dt W T = 1 := by rw [hTdef, map_pow, pow_mul, h2, one_pow]
     have h3 : ((dt W T : (Qbar l)ˣ) : Qbar l) = (mat W T).det := rfl
     rw [hdT, Units.val_one, Matrix.det_fin_two, hup T hTD] at h3
     linear_combination -h3
@@ -114,8 +126,7 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     intro k hk h
     have h' : Nq ^ k = 1 := by exact_mod_cast h
     have hl2 : 2 ≤ l := (Fact.out : l.Prime).two_le
-    have hpos : 2 * (e * m) ≠ 0 := by
-      have := hW.e_pos; positivity
+    have hpos : 2 * (e * m) ≠ 0 := by have := hW.e_pos; positivity
     have : 1 < Nq ^ k := by
       rw [hNq, ← pow_mul]
       exact Nat.one_lt_pow (by positivity) (by omega)
@@ -136,8 +147,11 @@ theorem gr_of_vanish_on_trivial : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Fiel
     rw [hTi, hy1] at this
     simpa using this.symm
 
-  have hPconj : ∀ u, P u → P (T * u * T⁻¹) ∧ mat W (T * u * T⁻¹) 0 1 = ((Nq * Nq : ℕ) : Qbar l) * mat W u 0 1 ∧
-      y (T * u * T⁻¹) 1 = mat W T 1 1 * y u 1 := by
+  have hPconj
+      : ∀ u,
+        P u
+          → P (T * u * T⁻¹) ∧ mat W (T * u * T⁻¹) 0 1 = ((Nq * Nq : ℕ) : Qbar l) * mat W u 0 1
+            ∧ y (T * u * T⁻¹) 1 = mat W T 1 1 * y u 1 := by
     rintro u ⟨huD, hu0', hu1, huc⟩
     have hTuD : T * u ∈ D := D.mul_mem hTD huD
     have hi00 : mat W T 0 0 * mat W T⁻¹ 0 0 = 1 := by

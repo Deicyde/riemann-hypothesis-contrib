@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 
 namespace GlobalTheory.RootEx.ProperTriple
 
@@ -69,15 +70,18 @@ private lemma recover_colE_vec_from_embX_product {k : Type} [Field k] {n : Type}
   change ((↑x⁻¹ : Matrix n n k) *ᵥ ((x : Matrix n n k) *ᵥ β)) r = β r
   rw [Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
 
-
 open MeasureTheory ValuativeRel Matrix in
-theorem _root_.GlobalTheory.RootEx.ProperTriple.proper_triple : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n] (c ρ : ℕ) (_ : 1 ≤ ρ)
-    (_ : ρ < c) (C : Set (GL (n ⊕ Fin c) k)) (_ : IsCompact C),
-    ∃ D : Set (GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1) × (n → k)), IsCompact D ∧
-      ∀ z : GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1) × (n → k),
-        _root_.GlobalTheory.RootEx.embX c z.1 * (z.2.1 : GL (n ⊕ Fin c) k) *
-          _root_.GlobalTheory.RootEx.colE c (ρ + 1) z.2.2 ∈ C → z ∈ D := by
+theorem _root_.GlobalTheory.RootEx.ProperTriple.proper_triple
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] [DecidableEq n] (c ρ : ℕ) (_ : 1 ≤ ρ) (_ : ρ < c)
+        (C : Set (GL (n ⊕ Fin c) k)) (_ : IsCompact C),
+      ∃ D : Set (GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1) × (n → k)),
+        IsCompact D
+          ∧ ∀ z : GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1) × (n → k),
+            _root_.GlobalTheory.RootEx.embX c z.1 * (z.2.1 : GL (n ⊕ Fin c) k)
+                  * _root_.GlobalTheory.RootEx.colE c (ρ + 1) z.2.2
+                ∈ C
+              → z ∈ D := by
   intro k _ _ _ _ n _ _ c ρ _ hρc C hC
   let F : GL (n ⊕ Fin c) k → (n → k) := fun g r =>
     ∑ s, (↑g⁻¹ : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) (Sum.inl r) (Sum.inl s) *
@@ -86,16 +90,25 @@ theorem _root_.GlobalTheory.RootEx.ProperTriple.proper_triple : ∀ (k : Type) [
     refine continuous_pi fun r => continuous_finsetSum _ fun s _ => ?_
     exact (Units.continuous_coe_inv.matrix_elem _ _).mul (Units.continuous_val.matrix_elem _ _)
   have hK : IsCompact (F '' C) := hC.image hF
-  have hC' : IsCompact ((fun q : GL (n ⊕ Fin c) k × (n → k) =>
-      q.1 * (_root_.GlobalTheory.RootEx.colE c (ρ + 1) q.2)⁻¹) '' (C ×ˢ (F '' C))) :=
-    (hC.prod hK).image (continuous_fst.mul
-      (_root_.GlobalTheory.RootEx.ExchangeSupport.continuous_colE.comp continuous_snd).inv)
-  obtain ⟨D₀, hD₀, hD₀C⟩ := _root_.GlobalTheory.QuotInt.compact_preimage
-    (_root_.GlobalTheory.RootEx.VolN.isClosed_N (k := k) (n := n) (c := c) (ρ + 1)) hC'
-  refine ⟨(fun q : (GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1)) × (n → k) =>
-    (q.1.1, q.1.2, q.2)) '' (D₀ ×ˢ (F '' C)), (hD₀.prod hK).image (by fun_prop), ?_⟩
+  have hC' : IsCompact
+      ((fun q : GL (n ⊕ Fin c) k × (n → k) =>
+          q.1 * (_root_.GlobalTheory.RootEx.colE c (ρ + 1) q.2)⁻¹)
+        '' (C ×ˢ (F '' C))) :=
+    (hC.prod hK).image
+      (continuous_fst.mul (_root_.GlobalTheory.RootEx.ExchangeSupport.continuous_colE.comp
+        continuous_snd).inv)
+  obtain ⟨D₀, hD₀, hD₀C⟩ :=
+    _root_.GlobalTheory.QuotInt.compact_preimage
+      (_root_.GlobalTheory.RootEx.VolN.isClosed_N (k := k) (n := n) (c := c) (ρ + 1)) hC'
+  refine ⟨
+    (fun q : (GL n k × _root_.GlobalTheory.RootEx.N k n c (ρ + 1)) × (n → k) => (q.1.1, q.1.2, q.2))
+      '' (D₀ ×ˢ (F '' C)),
+    (hD₀.prod hK).image (by fun_prop),
+    ?_
+  ⟩
   intro z hz
-  have hβ : z.2.2 ∈ F '' C := ⟨_, hz, funext (recover_colE_vec_from_embX_product hρc z.1 z.2.1 z.2.2)⟩
+  have hβ : z.2.2 ∈ F '' C :=
+    ⟨_, hz, funext (recover_colE_vec_from_embX_product hρc z.1 z.2.1 z.2.2)⟩
   have hz' : (z.1, z.2.1) ∈ D₀ := hD₀C _ ⟨(_, z.2.2), ⟨hz, hβ⟩, by simp⟩
   exact ⟨((z.1, z.2.1), z.2.2), ⟨hz', hβ⟩, rfl⟩
 

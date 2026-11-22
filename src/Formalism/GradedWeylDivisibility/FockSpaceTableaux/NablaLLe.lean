@@ -33,8 +33,10 @@ theorem nabla_weight_le : NablaLLe := by
     · simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hG2 ⊢
       intro l j hlj
       have e := hG2 l j hlj
-      have hc : ∀ p : MvPolynomial (Fin k × Fin n) R,
-          colAddGen K l j (map (algebraMap R K) p) = map (algebraMap R K) (colAddGen R l j p) := by
+      have hc
+          : ∀ p : MvPolynomial (Fin k × Fin n) R,
+            colAddGen K l j (map (algebraMap R K) p)
+              = map (algebraMap R K) (colAddGen R l j p) := by
         intro p
         induction p using MvPolynomial.induction_on
         · rename_i a
@@ -49,40 +51,48 @@ theorem nabla_weight_le : NablaLLe := by
       simp only [LinearMap.sub_apply, AlgHom.toLinearMap_apply] at e ⊢
       rw [hc, ← map_rename, ← map_sub, e, map_zero]
 
-  have hinv : ∀ (A : Matrix (Fin k) (Fin k) K) (P : MvPolynomial (Fin k × Fin n) K),
-      P ∈ dualWeyl K k n ν → rowAct K A P ∈ dualWeyl K k n ν := by
+  have hinv
+      : ∀ (A : Matrix (Fin k) (Fin k) K) (P : MvPolynomial (Fin k × Fin n) K),
+        P ∈ dualWeyl K k n ν → rowAct K A P ∈ dualWeyl K k n ν := by
     intro A P hP
     unfold dualWeyl at hP ⊢
     rw [Submodule.mem_inf] at hP ⊢
     obtain ⟨hP1, hP2⟩ := hP
     refine ⟨?_, ?_⟩
     · rw [mem_weightedHomogeneousSubmodule] at hP1 ⊢
-      have hXw : ∀ v : Fin k × Fin n,
-          IsWeightedHomogeneous (colW k n) (rowAct K A (X v)) (colW k n v) := by
+      have hXw
+          : ∀ v : Fin k × Fin n,
+            IsWeightedHomogeneous (colW k n) (rowAct K A (X v)) (colW k n v) := by
         intro v
         simp only [rowAct, aeval_X]
         apply IsWeightedHomogeneous.sum
         intro b _
-        have h := (isWeightedHomogeneous_C (colW k n) (A v.1 b)).mul
-          (isWeightedHomogeneous_X K (colW k n) (b, v.2))
+        have h :=
+          (isWeightedHomogeneous_C (colW k n) (A v.1 b)).mul
+            (isWeightedHomogeneous_X K (colW k n) (b, v.2))
         simpa [colW] using h
       set_option synthInstance.maxHeartbeats 100000 in
         rw [P.as_sum, map_sum]
       apply IsWeightedHomogeneous.sum
       intro d hd
-      rw [← hP1 (mem_support_iff.mp hd), monomial_eq, map_mul, map_finsuppProd, Finsupp.weight_apply]
+      rw [← hP1 (mem_support_iff.mp hd), monomial_eq, map_mul, map_finsuppProd,
+        Finsupp.weight_apply]
       simp only [map_pow]
-      have hC : rowAct K A (C (AddMonoidAlgebra.coeff P d) : MvPolynomial (Fin k × Fin n) K) = C (AddMonoidAlgebra.coeff P d) := by
+      have hC
+          : rowAct K A (C (AddMonoidAlgebra.coeff P d) : MvPolynomial (Fin k × Fin n) K)
+            = C (AddMonoidAlgebra.coeff P d) := by
         simp [rowAct]
       rw [hC]
-      have h := (isWeightedHomogeneous_C (colW k n) (AddMonoidAlgebra.coeff P d)).mul
-        (IsWeightedHomogeneous.prod d.support _ _ fun v _ => (hXw v).pow (d v))
+      have h :=
+        (isWeightedHomogeneous_C (colW k n) (AddMonoidAlgebra.coeff P d)).mul
+          (IsWeightedHomogeneous.prod d.support _ _ fun v _ => (hXw v).pow (d v))
       simpa [Finsupp.prod, Finsupp.sum] using h
     · simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hP2 ⊢
       intro l j hlj
       have e := hP2 l j hlj
       simp only [LinearMap.sub_apply, AlgHom.toLinearMap_apply] at e ⊢
-      let A' : MvPolynomial (Option (Fin k × Fin n)) K →ₐ[K] MvPolynomial (Option (Fin k × Fin n)) K :=
+      let A'
+          : MvPolynomial (Option (Fin k × Fin n)) K →ₐ[K] MvPolynomial (Option (Fin k × Fin n)) K :=
         aeval fun o => o.elim (X none) (fun v => ∑ b : Fin k, C (A v.1 b) * X (some (b, v.2)))
       have h1 : (colAddGen K l j).comp (rowAct K A) = A'.comp (colAddGen K (r := k) l j) := by
         apply MvPolynomial.algHom_ext
@@ -91,8 +101,9 @@ theorem nabla_weight_le : NablaLLe := by
         · simp [A', colAddGen, rowAct, hv, Finset.mul_sum, Finset.sum_add_distrib, mul_add,
             mul_left_comm]
         · simp [A', colAddGen, rowAct, hv]
-      have h2 : (rename (R := K) (some : Fin k × Fin n → Option (Fin k × Fin n))).comp (rowAct K A) =
-          A'.comp (rename some) := by
+      have h2
+          : (rename (R := K) (some : Fin k × Fin n → Option (Fin k × Fin n))).comp (rowAct K A)
+            = A'.comp (rename some) := by
         apply MvPolynomial.algHom_ext
         intro v
         simp [A', rowAct]

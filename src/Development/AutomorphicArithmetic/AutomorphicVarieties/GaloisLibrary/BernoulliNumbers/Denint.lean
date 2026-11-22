@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_denint :
-    ∀ (N k a : ℕ), 0 < N → ∃ z : ℤ, (den N k : ℚ) * bcoef N k a = z := by
+theorem UpperTheory.V.Bern.b_denint
+    : ∀ (N k a : ℕ), 0 < N → ∃ z : ℤ, (den N k : ℚ) * bcoef N k a = z := by
   intro N k a hN
   suffices h : (den N k : ℚ) * bcoef N k a ∈ (Int.castRingHom ℚ).range by
     obtain ⟨z, hz⟩ := h

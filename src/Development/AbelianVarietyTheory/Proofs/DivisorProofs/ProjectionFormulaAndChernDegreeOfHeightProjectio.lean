@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeEqCher
 
 namespace GlobalTheory.Published
 
-theorem arDegree_of_heightProjection : HeightProjection → ChernDegreeComplex → ArDegree :=
-  fun H H' => ⟨arBirational_of_arProj (GlobalTheory.T.arithInterProjectionFormula_of_heightProjectionFormula H), GlobalTheory.T.degreeEqChernFormIntegral_of_complex_case H'⟩
+theorem arDegree_of_heightProjection
+    : HeightProjection → ChernDegreeComplex → ArDegree := fun H H' => ⟨
+  arBirational_of_arProj (GlobalTheory.T.arithInterProjectionFormula_of_heightProjectionFormula H),
+  GlobalTheory.T.degreeEqChernFormIntegral_of_complex_case H'
+⟩
 
 end GlobalTheory.Published

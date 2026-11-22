@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NontrivialIs
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 
@@ -27,8 +29,10 @@ open GlobalTheory.CechPic
 
 namespace GlobalTheory.NefTens
 
-theorem isNef_tens : GlobalTheory.Published.ArCalc → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k)
-    (D : ℕ), IsArithVar p D → ∀ L M : HermLB p, L.IsNef D → M.IsNef D → (L.tens M).IsNef D := by
+theorem isNef_tens
+    : GlobalTheory.Published.ArCalc
+      → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+        IsArithVar p D → ∀ L M : HermLB p, L.IsNef D → M.IsNef D → (L.tens M).IsNef D := by
   intro HC k _ X _ p D hX L M NL NM
   have HE := HC.arExists
   have hex (L : HermLB p) : ∃ h, L.IsArithHeight h := (HE k X p D hX).1 L
@@ -36,7 +40,8 @@ theorem isNef_tens : GlobalTheory.Published.ArCalc → ∀ (k : Type) [CommRing 
   have hp : IsProjOver p := hX.isProjOver
   refine ⟨NL.semiPos.tens NM.semiPos, ?_, fun Z i _ _ _ hc hd => ?_⟩
   · intro Z i _ _ κ _ _ _ hd
-    rw [NefHodgeTateAt.topSelf_of_cls_eq_add hp (L.tens M).isLB L.isLB M.isLB (cls_tens L.isLB M.isLB _) Z i κ hd]
+    rw [NefHodgeTateAt.topSelf_of_cls_eq_add hp (L.tens M).isLB L.isLB M.isLB
+      (cls_tens L.isLB M.isLB _) Z i κ hd]
     exact add_nonneg (NL.vertical Z i κ hd) (NM.vertical Z i κ hd)
   · obtain ⟨h, H⟩ := hex L
     obtain ⟨h', H'⟩ := hex M

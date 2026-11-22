@@ -11,7 +11,8 @@ open scoped ContDiff
 
 namespace PositivityTheory.Rg.Sw.HSt
 
-open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.LVs PositivityTheory.Rg.Sw.AbsSt PositivityTheory.Rg.Sw.HSt.FL
+open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.LVs PositivityTheory.Rg.Sw.AbsSt
+  PositivityTheory.Rg.Sw.HSt.FL
 open PositivityTheory.Rg.Sw.LVs.II (cE)
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -33,11 +34,13 @@ theorem fzDer : FzDer := by
   · simp only [cE_eq_exp]
     exact hR
   · refine hRb.trans ?_
-    have e1 : rD (if b = true then dir1 Z else dir2 Z) (mR (p * k)) =
-        rD (if b = true then dir1 Z else dir2 Z) (mR k) := by
+    have e1
+        : rD (if b = true then dir1 Z else dir2 Z) (mR (p * k))
+          = rD (if b = true then dir1 Z else dir2 Z) (mR k) := by
       rw [mR_mul, rD_up]
-    have e2 : rA (if b = true then dir1 Z else dir2 Z) (mR (p * k)) =
-        rA (if b = true then dir1 Z else dir2 Z) (mR k) := by
+    have e2
+        : rA (if b = true then dir1 Z else dir2 Z) (mR (p * k))
+          = rA (if b = true then dir1 Z else dir2 Z) (mR k) := by
       rw [mR_mul, rA_up _ _ _ hp]
     have b1 : ‖rD (if b = true then dir1 Z else dir2 Z) (mR k)‖ ≤ max C1 0 :=
       (hC1 _ ⟨⟨k, hk⟩, rfl⟩).trans (le_max_left _ _)

@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 namespace NmSectionsFinite
 
@@ -18,26 +19,27 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ κ, Fintype (ι κ)] {Ω 
 
 noncomputable def expo (d : K → ℕ) : K →₀ ℕ := Finsupp.equivFunOnFinite.symm d
 
-@[simp] theorem coe_expo (d : K → ℕ) : ⇑(expo d) = d := Finsupp.coe_equivFunOnFinite_symm d
+@[simp]
+theorem coe_expo (d : K → ℕ) : ⇑(expo d) = d := Finsupp.coe_equivFunOnFinite_symm d
 
-theorem mapDomain_fst_apply (μ : (Σ κ, ι κ) →₀ ℕ) (κ : K) :
-    μ.mapDomain Sigma.fst κ = ∑ i, μ ⟨κ, i⟩ := by
+theorem mapDomain_fst_apply (μ : (Σ κ, ι κ) →₀ ℕ) (κ : K)
+    : μ.mapDomain Sigma.fst κ = ∑ i, μ ⟨κ, i⟩ := by
   classical
-  rw [Finsupp.mapDomain, Finsupp.sum_apply, Finsupp.sum_fintype _ _ (fun _ => by simp), Fintype.sum_sigma]
+  rw [Finsupp.mapDomain, Finsupp.sum_apply, Finsupp.sum_fintype _ _ (fun _ => by simp),
+    Fintype.sum_sigma]
   simp [Finsupp.single_apply]
 
-
 omit [Fintype K] [∀ κ, Fintype (ι κ)] in
-theorem mConeMap_monomial (y : (Σ κ, ι κ) → Ω) (μ : (Σ κ, ι κ) →₀ ℕ) (r : ℤ) :
-    mConeMap y (monomial μ r) = monomial (μ.mapDomain Sigma.fst) (aeval y (monomial μ r)) := by
+theorem mConeMap_monomial (y : (Σ κ, ι κ) → Ω) (μ : (Σ κ, ι κ) →₀ ℕ) (r : ℤ)
+    : mConeMap y (monomial μ r) = monomial (μ.mapDomain Sigma.fst) (aeval y (monomial μ r)) := by
   rw [mConeMap, aeval_monomial, aeval_monomial, monomial_eq,
     Finsupp.prod_mapDomain_index (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)]
   simp only [Finsupp.prod, mul_pow, Finset.prod_mul_distrib, map_mul, map_prod, map_pow,
     MvPolynomial.algebraMap_apply]
   ring
 
-theorem mConeMap_of_homog (y : (Σ κ, ι κ) → Ω) {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) :
-    mConeMap y g = monomial (expo d) (aeval y g) := by
+theorem mConeMap_of_homog (y : (Σ κ, ι κ) → Ω) {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d)
+    : mConeMap y g = monomial (expo d) (aeval y g) := by
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -56,7 +58,8 @@ def formRing (y : (Σ κ, ι κ) → Ω) : Subalgebra ℤ (MvPolynomial K Ω) wh
     intro F G hF hG m
     rw [coeff_mul]
     refine sum_mem fun x hx => ?_
-    have hm : ⇑x.1 + ⇑x.2 = ⇑m := by rw [← Finsupp.coe_add, (Finset.HasAntidiagonal.mem_antidiagonal.mp hx)]
+    have hm : ⇑x.1 + ⇑x.2 = ⇑m := by
+      rw [← Finsupp.coe_add, (Finset.HasAntidiagonal.mem_antidiagonal.mp hx)]
     rw [← hm]
     exact secM_mul_mem y (hF x.1) (hG x.2)
   add_mem' := by
@@ -81,7 +84,8 @@ theorem mConeMap_mem_formRing (y : (Σ κ, ι κ) → Ω) (f : MRing ι) : mCone
   | C n =>
     rw [← MvPolynomial.algebraMap_eq, AlgHom.commutes]
     exact Subalgebra.algebraMap_mem _ n
-  | add p q hp hq => rw [map_add]; exact add_mem hp hq
+  | add p q hp hq =>
+    rw [map_add]; exact add_mem hp hq
   | mul_X p q hp =>
     rw [map_mul]
     refine Subalgebra.mul_mem _ hp fun m => ?_
@@ -94,8 +98,8 @@ theorem mConeMap_mem_formRing (y : (Σ κ, ι κ) → Ω) (f : MRing ι) : mCone
       simp [Finsupp.single_apply, eq_comm]
     · simp
 
-theorem monomial_mem_range (y : (Σ κ, ι κ) → Ω) {d : K → ℕ} {v : Ω} (hv : v ∈ secM y d) :
-    monomial (expo d) v ∈ (mConeMap y).range := by
+theorem monomial_mem_range (y : (Σ κ, ι κ) → Ω) {d : K → ℕ} {v : Ω} (hv : v ∈ secM y d)
+    : monomial (expo d) v ∈ (mConeMap y).range := by
   change v ∈ Submodule.span ℤ _ at hv
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -126,7 +130,8 @@ theorem proof (h : KH.CondStatement) : NmSectionsFinite.Statement := by
     rw [Submodule.map_span, Submodule.span_le]
     rintro _ ⟨F, ⟨τ, -, s, hs, rfl⟩, rfl⟩
     rw [LinearMap.mulLeft_apply, monomial_mul]
-    have hdeg : expo (fun κ => k * a κ) + expo (fun κ => τ * a κ) = expo fun κ => (τ + k) * a κ := by
+    have hdeg
+        : expo (fun κ => k * a κ) + expo (fun κ => τ * a κ) = expo fun κ => (τ + k) * a κ := by
       ext κ; simp; ring
     rw [hdeg]
     obtain ⟨g, hg⟩ := monomial_mem_range y (hc τ s hs)
@@ -134,17 +139,26 @@ theorem proof (h : KH.CondStatement) : NmSectionsFinite.Statement := by
     exact ⟨⟨_, g, rfl⟩, by rw [Subalgebra.smul_def, smul_eq_mul, mul_one]; exact hg⟩
   have hfg : (Submodule.span R G).FG := by
     refine Submodule.fg_of_fg_map_injective _ hinj ?_
-    have := isNoetherian_of_fg_of_noetherian (Submodule.span R {(1 : MvPolynomial K Ω)})
-      (Submodule.fg_span_singleton 1)
+    have :=
+      isNoetherian_of_fg_of_noetherian (Submodule.span R {(1 : MvPolynomial K Ω)})
+        (Submodule.fg_span_singleton 1)
     exact isNoetherian_submodule.mp inferInstance _ hmap
   obtain ⟨t, htG, hspan⟩ := (Submodule.fg_span_iff_fg_span_finset_subset G).mp hfg
   choose d hd e he hte using fun j : t => htG j.2
-  refine ⟨t, inferInstance, d, e, max τ₂ (Finset.univ.sup d), fun j => ⟨hd j,
-    le_max_of_le_right (Finset.le_sup (Finset.mem_univ j)), he j⟩, ?_⟩
+  refine ⟨
+    t,
+    inferInstance,
+    d,
+    e,
+    max τ₂ (Finset.univ.sup d),
+    fun j => ⟨hd j, le_max_of_le_right (Finset.le_sup (Finset.mem_univ j)), he j⟩,
+    ?_
+  ⟩
   intro τ hτ s hs
   have hdτ : ∀ j, d j ≤ τ := fun j =>
     le_trans (le_max_of_le_right (Finset.le_sup (Finset.mem_univ j))) hτ
-  have hmem : monomial (expo fun κ => τ * a κ) s ∈ Submodule.span R (t : Set (MvPolynomial K Ω)) := by
+  have hmem
+      : monomial (expo fun κ => τ * a κ) s ∈ Submodule.span R (t : Set (MvPolynomial K Ω)) := by
     rw [← hspan]
     exact Submodule.subset_span ⟨τ, le_trans (le_max_left _ _) hτ, s, hs, rfl⟩
   obtain ⟨f, -, hf⟩ := Submodule.mem_span_finset.mp hmem
@@ -153,7 +167,11 @@ theorem proof (h : KH.CondStatement) : NmSectionsFinite.Statement := by
     obtain ⟨g, hg⟩ := (f F).2
     rw [← hg]
     exact mConeMap_mem_formRing y g
-  refine ⟨fun j => AddMonoidAlgebra.coeff ((f j : R) : MvPolynomial K Ω) (expo fun κ => (τ - d j) * a κ), fun j => ?_, ?_⟩
+  refine ⟨
+    fun j => AddMonoidAlgebra.coeff ((f j : R) : MvPolynomial K Ω) (expo fun κ => (τ - d j) * a κ),
+    fun j => ?_,
+    ?_
+  ⟩
   · simpa using hR j (expo fun κ => (τ - d j) * a κ)
   · have hc' := congrArg (AddMonoidAlgebra.coeff · (expo fun κ => τ * a κ)) hf
     rw [coeff_monomial, if_pos rfl] at hc'

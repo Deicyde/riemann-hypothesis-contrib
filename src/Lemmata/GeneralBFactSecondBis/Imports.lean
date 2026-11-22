@@ -8,11 +8,13 @@ public import Formalism.GaloisIrreducibility.NoSolvableTransitive
 
 namespace Bl.general_b_fact_second_bis
 
-theorem goal1 :
-  ∀ {g : Nat} [hg : Fact (Nat.Prime g)] (c : Formalism.CyclotomicNorms.Fbar g),
-  Eq.{1} (HPow.hPow.{0, 0, 0} c g) c →
-    Membership.mem.{0, 0}
-      (Set.range.{0, 1} (DFunLike.coe.{1, 1, 1} (Algebra.algebraMap.{0, 0} (ZMod g) (Formalism.CyclotomicNorms.Fbar g)))) c := by
+theorem goal1
+    : ∀ {g : Nat} [hg : Fact (Nat.Prime g)] (c : Formalism.CyclotomicNorms.Fbar g),
+      Eq.{1} (HPow.hPow.{0, 0, 0} c g) c
+        → Membership.mem.{0, 0}
+          (Set.range.{0, 1} (DFunLike.coe.{1, 1, 1} (Algebra.algebraMap.{0, 0} (ZMod g)
+            (Formalism.CyclotomicNorms.Fbar g))))
+          c := by
   intro g hg c hc
   classical
   have hp : 1 < g := hg.out.one_lt
@@ -46,8 +48,9 @@ theorem goal1 :
   have h1 := Finset.card_le_card hsub
   rw [Finset.card_insert_of_notMem hcS, hScard] at h1
   have h2 : f.roots.toFinset.card ≤ g :=
-    (Multiset.toFinset_card_le _).trans ((Polynomial.card_roots' f).trans
-      (Polynomial.natDegree_X_pow_sub_X (R := (Formalism.CyclotomicNorms.Fbar g)) hp).le)
+    (Multiset.toFinset_card_le _).trans
+      ((Polynomial.card_roots' f).trans
+        (Polynomial.natDegree_X_pow_sub_X (R := (Formalism.CyclotomicNorms.Fbar g)) hp).le)
   omega
 
 end Bl.general_b_fact_second_bis

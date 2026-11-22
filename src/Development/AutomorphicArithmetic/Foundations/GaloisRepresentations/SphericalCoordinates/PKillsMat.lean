@@ -4,13 +4,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.killsMat_of :
-    UpperTheory.Gal.W2.KillsMat := by
+theorem UpperTheory.Gal.W2.killsMat_of : UpperTheory.Gal.W2.KillsMat := by
   intro F _ _ O _ bar g ρ a D P₀ hP ga H hH q
   have hpow : ∀ (i : ℕ) (x : D.La), P₀ ((ga ^ i) x) = (H ^ i) *ᵥ P₀ x := by
     intro i
@@ -19,8 +20,9 @@ theorem UpperTheory.Gal.W2.killsMat_of :
     | succ n ih =>
       intro x
       rw [pow_succ, Module.End.mul_apply, ih, hH, Matrix.mulVec_mulVec, pow_succ]
-  have hsum : ∀ x, P₀ (q.sum fun i b => a b • (ga ^ i) x) =
-      (q.sum fun i b => ρ (a b) * H ^ i) *ᵥ P₀ x := by
+  have hsum
+      : ∀ x,
+        P₀ (q.sum fun i b => a b • (ga ^ i) x) = (q.sum fun i b => ρ (a b) * H ^ i) *ᵥ P₀ x := by
     intro x
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Polynomial.sum_def, map_sum, Matrix.sum_mulVec]

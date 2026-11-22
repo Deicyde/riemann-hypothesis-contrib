@@ -12,13 +12,12 @@ namespace GlobalTheory.SiegelNormalForm
 
 variable {g : ℕ}
 
-
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.form_pull (P Hm : Matrix (Fin g) (Fin g) ℂ)
-    (z w : Fin g → ℂ) :
-    (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (P *ᵥ w) = z ⬝ᵥ (Pᵀ * Hm * P.map star) *ᵥ star w := by
+theorem _root_.GlobalTheory.SiegelNormalForm.form_pull
+    (P Hm : Matrix (Fin g) (Fin g) ℂ) (z w : Fin g → ℂ)
+    : (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (P *ᵥ w) = z ⬝ᵥ (Pᵀ * Hm * P.map star) *ᵥ star w := by
   rw [star_mulVec, ← mulVec_transpose, conjTranspose, ← transpose_map, transpose_transpose,
     dotProduct_comm, dotProduct_mulVec, dotProduct_comm, ← mulVec_transpose, mulVec_mulVec,
     mulVec_mulVec, Matrix.mul_assoc]
@@ -26,29 +25,29 @@ theorem _root_.GlobalTheory.SiegelNormalForm.form_pull (P Hm : Matrix (Fin g) (F
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.form_single (Y : Matrix (Fin g) (Fin g) ℂ)
-    (i j : Fin g) :
-    (Pi.single i 1 : Fin g → ℂ) ⬝ᵥ Y *ᵥ star (Pi.single j 1 : Fin g → ℂ) = Y i j := by
+theorem _root_.GlobalTheory.SiegelNormalForm.form_single
+    (Y : Matrix (Fin g) (Fin g) ℂ) (i j : Fin g)
+    : (Pi.single i 1 : Fin g → ℂ) ⬝ᵥ Y *ᵥ star (Pi.single j 1 : Fin g → ℂ) = Y i j := by
   simp [Pi.star_single]
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.form_conj {Hm : Matrix (Fin g) (Fin g) ℂ}
-    (hH : Hm.IsHermitian) (z w : Fin g → ℂ) :
-    star (z ⬝ᵥ Hm *ᵥ star w) = w ⬝ᵥ Hm *ᵥ star z := by
+theorem _root_.GlobalTheory.SiegelNormalForm.form_conj
+    {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian) (z w : Fin g → ℂ)
+    : star (z ⬝ᵥ Hm *ᵥ star w) = w ⬝ᵥ Hm *ᵥ star z := by
   rw [← star_dotProduct_star, star_mulVec, star_star, hH.eq, dotProduct_mulVec]
-
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian (P Hm : Matrix (Fin g) (Fin g) ℂ)
+theorem _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian
+    (P Hm : Matrix (Fin g) (Fin g) ℂ)
     (f : Fin g → Fin g → ℂ)
     (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm *ᵥ (star z)).re)
     (Y : Matrix (Fin g) (Fin g) ℝ) (hY : Pᵀ * Hm * P.map star = Y.map (↑))
-    (hf : ∀ i j, ((P *ᵥ Pi.single i 1) ⬝ᵥ Hm *ᵥ star (f j)).im = if i = j then -1 else 0) :
-    IsUnit P := by
+    (hf : ∀ i j, ((P *ᵥ Pi.single i 1) ⬝ᵥ Hm *ᵥ star (f j)).im = if i = j then -1 else 0)
+    : IsUnit P := by
   by_contra hP
   have hdet : P.det = 0 := by
     rw [isUnit_iff_isUnit_det, isUnit_iff_ne_zero] at hP
@@ -57,8 +56,7 @@ theorem _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian (P Hm : Matrix
     have h1 : (Y.map ((↑) : ℝ → ℂ)).det = 0 := by
       rw [← hY, det_mul, det_mul, det_transpose, hdet]
       simp
-    have h2 : ((Y.det : ℝ) : ℂ) = (Y.map ((↑) : ℝ → ℂ)).det :=
-      RingHom.map_det Complex.ofRealHom Y
+    have h2 : ((Y.det : ℝ) : ℂ) = (Y.map ((↑) : ℝ → ℂ)).det := RingHom.map_det Complex.ofRealHom Y
     exact_mod_cast h2.trans h1
   obtain ⟨x, hx0, hx⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hYdet
   set xc : Fin g → ℂ := fun i => (x i : ℂ) with hxc
@@ -75,8 +73,7 @@ theorem _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian (P Hm : Matrix
     have := hpos _ hne
     rw [_root_.GlobalTheory.SiegelNormalForm.form_pull, hY, hstar, hYx] at this
     simp at this
-  have hsum : ∀ u : Fin g → ℂ,
-      (P *ᵥ xc) ⬝ᵥ u = ∑ i, xc i * ((P *ᵥ Pi.single i 1) ⬝ᵥ u) := by
+  have hsum : ∀ u : Fin g → ℂ, (P *ᵥ xc) ⬝ᵥ u = ∑ i, xc i * ((P *ᵥ Pi.single i 1) ⬝ᵥ u) := by
     intro u
     simp only [mulVec_single_one]
     simp only [mulVec, dotProduct, Finset.mul_sum, Finset.sum_mul, transpose_apply]
@@ -89,25 +86,26 @@ theorem _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian (P Hm : Matrix
   have h := congrArg Complex.im (hsum (Hm *ᵥ star (f j)))
   rw [hPx, zero_dotProduct, Complex.zero_im, Complex.im_sum] at h
   simp only [hxc, Complex.im_ofReal_mul, hf, mul_ite, mul_neg, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
+      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    at h
   simpa using h.symm
-
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations (Y : Matrix (Fin g) (Fin g) ℝ)
-    (hY : Y.PosDef) (τ : Matrix (Fin g) (Fin g) ℂ)
-    (h₁ : ∀ i j, ((Pi.single i 1 : Fin g → ℂ) ⬝ᵥ Y.map (↑) *ᵥ star (τ *ᵥ Pi.single j 1)).im =
-      if i = j then -1 else 0)
-    (h₂ : ∀ i j, ((τ *ᵥ Pi.single i 1) ⬝ᵥ Y.map (↑) *ᵥ star (τ *ᵥ Pi.single j 1)).im = 0) :
-    τ.IsSymm ∧ (τ.map Complex.im).PosDef ∧ Y * τ.map Complex.im = 1 := by
+theorem _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations
+    (Y : Matrix (Fin g) (Fin g) ℝ) (hY : Y.PosDef)
+    (τ : Matrix (Fin g) (Fin g) ℂ)
+    (h₁ : ∀ i j,
+      ((Pi.single i 1 : Fin g → ℂ) ⬝ᵥ Y.map (↑) *ᵥ star (τ *ᵥ Pi.single j 1)).im
+        = if i = j then -1 else 0)
+    (h₂ : ∀ i j, ((τ *ᵥ Pi.single i 1) ⬝ᵥ Y.map (↑) *ᵥ star (τ *ᵥ Pi.single j 1)).im = 0)
+    : τ.IsSymm ∧ (τ.map Complex.im).PosDef ∧ Y * τ.map Complex.im = 1 := by
   set B : Matrix (Fin g) (Fin g) ℝ := τ.map Complex.im with hBdef
   have e1 := h₁
   have e2 := h₂
   simp [mulVec, dotProduct, Complex.im_sum, Pi.single_apply] at e1 e2
-  have hsymY : ∀ i j, Y j i = Y i j := fun i j => by
-    simpa using hY.isHermitian.apply i j
+  have hsymY : ∀ i j, Y j i = Y i j := fun i j => by simpa using hY.isHermitian.apply i j
   have hrow : ∀ a i, ∑ x, Y a x * (τ x i).im = if a = i then 1 else 0 := by
     intro a i
     have := e1 a i
@@ -121,15 +119,17 @@ theorem _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations (Y : Matrix (Fi
     ext i j
     exact hsymY i j
   have hBt : Bᵀ = B := by
-    calc Bᵀ = Bᵀ * (Y * B) := by rw [hYB, Matrix.mul_one]
+    calc
+      Bᵀ
+        = Bᵀ * (Y * B) := by rw [hYB, Matrix.mul_one]
       _ = (Y * B)ᵀ * B := by rw [transpose_mul, hYt, Matrix.mul_assoc]
       _ = B := by rw [hYB, transpose_one, Matrix.one_mul]
   have hsecond : ∀ i j, ∑ x, (τ x i).im * ∑ y, Y x y * (τ y j).re = (τ i j).re := by
     intro i j
     simp_rw [Finset.mul_sum]
     rw [Finset.sum_comm]
-    have h : ∀ y, ∑ x, (τ x i).im * (Y x y * (τ y j).re) =
-        (if y = i then 1 else 0) * (τ y j).re := by
+    have h
+        : ∀ y, ∑ x, (τ x i).im * (Y x y * (τ y j).re) = (if y = i then 1 else 0) * (τ y j).re := by
       intro y
       rw [← hrow y i, Finset.sum_mul]
       refine Finset.sum_congr rfl fun x _ => ?_
@@ -140,7 +140,8 @@ theorem _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations (Y : Matrix (Fi
     intro i j
     have := e2 i j
     simp only [hrow, mul_ite, mul_one, mul_zero, Finset.sum_add_distrib, Finset.sum_neg_distrib,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, hsecond] at this
+        Finset.sum_ite_eq', Finset.mem_univ, if_true, hsecond]
+      at this
     linarith
   have him : ∀ i j, (τ j i).im = (τ i j).im := by
     intro i j
@@ -156,8 +157,9 @@ noncomputable def quad (Y : Matrix (Fin g) (Fin g) ℂ) (c z : Fin g → ℂ) : 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.quad_differentiable (Y : Matrix (Fin g) (Fin g) ℂ)
-    (c : Fin g → ℂ) : Differentiable ℂ (_root_.GlobalTheory.SiegelNormalForm.quad Y c) := by
+theorem _root_.GlobalTheory.SiegelNormalForm.quad_differentiable
+    (Y : Matrix (Fin g) (Fin g) ℂ) (c : Fin g → ℂ)
+    : Differentiable ℂ (_root_.GlobalTheory.SiegelNormalForm.quad Y c) := by
   unfold _root_.GlobalTheory.SiegelNormalForm.quad
   simp only [dotProduct, mulVec]
   fun_prop
@@ -165,20 +167,48 @@ theorem _root_.GlobalTheory.SiegelNormalForm.quad_differentiable (Y : Matrix (Fi
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.quad_add_sub {Y : Matrix (Fin g) (Fin g) ℂ} (hY : Y.IsSymm)
-    (c z w : Fin g → ℂ) :
-    _root_.GlobalTheory.SiegelNormalForm.quad Y c (z + w) - _root_.GlobalTheory.SiegelNormalForm.quad Y c z =
-      Real.pi * (z ⬝ᵥ Y *ᵥ w) + _root_.GlobalTheory.SiegelNormalForm.quad Y c w := by
+theorem _root_.GlobalTheory.SiegelNormalForm.quad_add_sub
+    {Y : Matrix (Fin g) (Fin g) ℂ} (hY : Y.IsSymm) (c z w : Fin g → ℂ)
+    : _root_.GlobalTheory.SiegelNormalForm.quad Y c (z + w)
+        - _root_.GlobalTheory.SiegelNormalForm.quad Y c z
+      = Real.pi * (z ⬝ᵥ Y *ᵥ w) + _root_.GlobalTheory.SiegelNormalForm.quad Y c w := by
   have hwz : w ⬝ᵥ Y *ᵥ z = z ⬝ᵥ Y *ᵥ w := by
     rw [dotProduct_mulVec, dotProduct_comm, ← mulVec_transpose, hY.eq]
-  simp only [_root_.GlobalTheory.SiegelNormalForm.quad, mulVec_add, dotProduct_add, add_dotProduct, hwz]
+  simp only [_root_.GlobalTheory.SiegelNormalForm.quad, mulVec_add, dotProduct_add, add_dotProduct,
+    hwz]
   ring
-
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ), Hm.IsHermitian → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re) → (∀ l, ‖χ l‖ = 1) → (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im) → Function.Bijective Ef → ∃ (φ : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)) (τ : Matrix (Fin g) (Fin g) ℂ) (Q : (Fin g → ℂ) → ℂ) (b : Fin g → ℂ), τ.IsSymm ∧ (τ.map Complex.im).PosDef ∧ (∀ z, φ z ∈ Λ ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ))) ∧ Differentiable ℂ Q ∧ Q 0 = 0 ∧ (∀ j, b j ≠ 0) ∧ (∀ (i : Fin g) (l : Λ) z, (l : Fin g → ℂ) = φ (Pi.single i 1) → (χ l * cexp (Real.pi * (φ z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))))) = cexp (Q (z + Pi.single i 1) - Q z)) ∧ (∀ (j : Fin g) (l : Λ) z, (l : Fin g → ℂ) = φ (τ.mulVec (Pi.single j 1)) → (χ l * cexp (Real.pi * (φ z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))))) = b j * cexp (-(2 * Real.pi * I) * z j) * cexp (Q (z + τ.mulVec (Pi.single j 1)) - Q z))) := by
+theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form
+    : (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+        → ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ),
+          Hm.IsHermitian → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re)
+            → (∀ l, ‖χ l‖ = 1)
+            → (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im)
+            → Function.Bijective Ef
+            → ∃ (φ : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)) (τ : Matrix (Fin g) (Fin g) ℂ)
+                (Q : (Fin g → ℂ) → ℂ) (b : Fin g → ℂ),
+              τ.IsSymm ∧ (τ.map Complex.im).PosDef
+                ∧ (∀ z,
+                  φ z ∈ Λ
+                    ↔ ∃ m n : Fin g → ℤ, z = (fun i => (m i : ℂ)) + τ.mulVec (fun i => (n i : ℂ)))
+                ∧ Differentiable ℂ Q ∧ Q 0 = 0 ∧ (∀ j, b j ≠ 0)
+                ∧ (∀ (i : Fin g) (l : Λ) z,
+                  (l : Fin g → ℂ) = φ (Pi.single i 1)
+                    → (χ l * cexp
+                        (Real.pi * (φ z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
+                          + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))
+                      = cexp (Q (z + Pi.single i 1) - Q z))
+                ∧ (∀ (j : Fin g) (l : Λ) z,
+                  (l : Fin g → ℂ) = φ (τ.mulVec (Pi.single j 1))
+                    → (χ l * cexp
+                        (Real.pi * (φ z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
+                          + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))
+                      = b j * cexp (-(2 * Real.pi * I) * z j)
+                        * cexp (Q (z + τ.mulVec (Pi.single j 1)) - Q z))) := by
   intro g Λ hdisc hspan Hm χ Ef hH hpos hχ hEf hbij
   haveI : IsZLattice ℝ Λ := ⟨hspan⟩
   have hrank : Module.finrank ℤ Λ = 2 * g := by
@@ -193,7 +223,9 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
     rw [hreal] at h
     have h' : Ef l l = 0 := by exact_mod_cast h
     simp [h']
-  obtain ⟨b, hb⟩ := _root_.GlobalTheory.exists_isSymplecticBasis_of_finrank halt (_root_.GlobalTheory.bijective_neg_bilinForm hbij) hrank
+  obtain ⟨b, hb⟩ :=
+    _root_.GlobalTheory.exists_isSymplecticBasis_of_finrank halt
+      (_root_.GlobalTheory.bijective_neg_bilinForm hbij) hrank
   have hEll : ∀ i j, Ef (b (Sum.inl i)) (b (Sum.inl j)) = 0 := fun i j => by
     simpa using hb.left_left i j
   have hErr : ∀ i j, Ef (b (Sum.inr i)) (b (Sum.inr j)) = 0 := fun i j => by
@@ -207,10 +239,12 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
       simp [h']
     · have h' : Ef (b (Sum.inl i)) (b (Sum.inr j)) = 0 := by omega
       simp [h']
-  obtain ⟨P, hPdef⟩ : ∃ P : Matrix (Fin g) (Fin g) ℂ,
-      P = Matrix.of fun k i => (b (Sum.inl i) : Fin g → ℂ) k := ⟨_, rfl⟩
-  obtain ⟨P', hP'def⟩ : ∃ P' : Matrix (Fin g) (Fin g) ℂ,
-      P' = Matrix.of fun k j => (b (Sum.inr j) : Fin g → ℂ) k := ⟨_, rfl⟩
+  obtain ⟨P, hPdef⟩
+      : ∃ P : Matrix (Fin g) (Fin g) ℂ, P = Matrix.of fun k i => (b (Sum.inl i) : Fin g → ℂ) k :=
+    ⟨_, rfl⟩
+  obtain ⟨P', hP'def⟩
+      : ∃ P' : Matrix (Fin g) (Fin g) ℂ, P' = Matrix.of fun k j => (b (Sum.inr j) : Fin g → ℂ) k :=
+    ⟨_, rfl⟩
   have hPcol : ∀ i, P *ᵥ Pi.single i 1 = (b (Sum.inl i) : Fin g → ℂ) := by
     intro i
     rw [mulVec_single_one]
@@ -221,13 +255,15 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
     rw [mulVec_single_one]
     ext k
     simp [hP'def]
-  have hMentry : ∀ i j, (Pᵀ * Hm * P.map star) i j =
-      (b (Sum.inl i) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inl j) : Fin g → ℂ) := by
+  have hMentry
+      : ∀ i j,
+        (Pᵀ * Hm * P.map star) i j
+          = (b (Sum.inl i) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inl j) : Fin g → ℂ) := by
     intro i j
     rw [← _root_.GlobalTheory.SiegelNormalForm.form_single (Pᵀ * Hm * P.map star) i j,
       ← _root_.GlobalTheory.SiegelNormalForm.form_pull, hPcol, hPcol]
-  obtain ⟨Y, hYdef⟩ : ∃ Y : Matrix (Fin g) (Fin g) ℝ,
-      Y = (Pᵀ * Hm * P.map star).map Complex.re := ⟨_, rfl⟩
+  obtain ⟨Y, hYdef⟩ : ∃ Y : Matrix (Fin g) (Fin g) ℝ, Y = (Pᵀ * Hm * P.map star).map Complex.re :=
+    ⟨_, rfl⟩
   have hMY : Pᵀ * Hm * P.map star = Y.map (↑) := by
     ext i j
     apply Complex.ext
@@ -235,12 +271,13 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
     · rw [map_apply, Complex.ofReal_im, hMentry, ← hEf, hEll]
       simp
   have hunit : IsUnit P := by
-    refine _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian P Hm (fun j => (b (Sum.inr j) : Fin g → ℂ))
-      hpos Y hMY fun i j => ?_
+    refine _root_.GlobalTheory.SiegelNormalForm.isUnit_of_lagrangian P Hm
+      (fun j => (b (Sum.inr j) : Fin g → ℂ))
+      hpos Y hMY
+      fun i j => ?_
     rw [hPcol, ← hEf, hElr]
   have hinj : Function.Injective P.mulVec := mulVec_injective_iff_isUnit.mpr hunit
-  have hrel : ∀ u v : Fin g → ℂ,
-      u ⬝ᵥ Y.map (↑) *ᵥ star v = (P *ᵥ u) ⬝ᵥ Hm *ᵥ star (P *ᵥ v) := by
+  have hrel : ∀ u v : Fin g → ℂ, u ⬝ᵥ Y.map (↑) *ᵥ star v = (P *ᵥ u) ⬝ᵥ Hm *ᵥ star (P *ᵥ v) := by
     intro u v
     rw [_root_.GlobalTheory.SiegelNormalForm.form_pull, hMY]
   have hYsymm : ∀ i j, Y j i = Y i j := by
@@ -270,15 +307,16 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
   have hτcol : ∀ j, P *ᵥ (τ *ᵥ Pi.single j 1) = (b (Sum.inr j) : Fin g → ℂ) := by
     intro j
     rw [mulVec_mulVec, hPτ, hP'col]
-  obtain ⟨hτsym, hτpos, hYB⟩ := _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations Y hYpos τ
-    (fun i j => by
-      rw [hrel, hPcol, hτcol, ← hEf, hElr])
-    (fun i j => by
-      rw [hrel, hτcol, hτcol, ← hEf, hErr]
-      simp)
+  obtain ⟨hτsym, hτpos, hYB⟩ :=
+    _root_.GlobalTheory.SiegelNormalForm.siegel_of_relations Y hYpos τ
+      (fun i j => by rw [hrel, hPcol, hτcol, ← hEf, hElr])
+      (fun i j => by
+        rw [hrel, hτcol, hτcol, ← hEf, hErr]
+        simp)
 
-  have hcols : ∀ (A : Matrix (Fin g) (Fin g) ℂ) (v : Fin g → ℂ),
-      A *ᵥ v = ∑ i, v i • (A *ᵥ Pi.single i 1) := by
+  have hcols
+      : ∀ (A : Matrix (Fin g) (Fin g) ℂ) (v : Fin g → ℂ),
+        A *ᵥ v = ∑ i, v i • (A *ᵥ Pi.single i 1) := by
     intro A v
     ext k
     simp [mulVec, dotProduct, Finset.sum_apply, mul_comm]
@@ -290,17 +328,22 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
   let Q : (Fin g → ℂ) → ℂ := _root_.GlobalTheory.SiegelNormalForm.quad (Y.map (↑)) c
   have hQ : ∀ z w, Q (z + w) - Q z = Real.pi * (z ⬝ᵥ Y.map (↑) *ᵥ w) + Q w := fun z w =>
     _root_.GlobalTheory.SiegelNormalForm.quad_add_sub hYsym' c z w
-  have hconj_col : ∀ j, (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ star (τ *ᵥ Pi.single j 1) =
-      (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ (τ *ᵥ Pi.single j 1) - (2 * I) • Pi.single j 1 := by
+  have hconj_col
+      : ∀ j,
+        (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ star (τ *ᵥ Pi.single j 1)
+          = (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ (τ *ᵥ Pi.single j 1)
+            - (2 * I) • Pi.single j 1 := by
     intro j
-    have hv : star (τ *ᵥ Pi.single j 1) =
-        τ *ᵥ Pi.single j 1 - (2 * I) • (fun x => ((τ x j).im : ℂ)) := by
+    have hv
+        : star (τ *ᵥ Pi.single j 1)
+          = τ *ᵥ Pi.single j 1 - (2 * I) • (fun x => ((τ x j).im : ℂ)) := by
       ext x
       simp only [mulVec_single_one, Pi.star_apply, transpose_apply, Pi.sub_apply, Pi.smul_apply,
         smul_eq_mul]
       apply Complex.ext <;> simp <;> ring
-    have hYim : (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ (fun x => ((τ x j).im : ℂ)) =
-        Pi.single j 1 := by
+    have hYim
+        : (Y.map (↑) : Matrix (Fin g) (Fin g) ℂ) *ᵥ (fun x => ((τ x j).im : ℂ))
+          = Pi.single j 1 := by
       ext k
       have h := congrFun (congrFun hYB k) j
       simp only [Matrix.mul_apply, map_apply, one_apply] at h
@@ -312,12 +355,23 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
       rw [h']
       split_ifs <;> simp
     rw [hv, mulVec_sub, mulVec_smul, hYim]
-  refine ⟨φ, τ, Q, fun j => χ (b (Sum.inr j)) * cexp (Real.pi / 2 *
-      ((b (Sum.inr j) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inr j) : Fin g → ℂ)) -
-      Q (τ *ᵥ Pi.single j 1)), hτsym, hτpos, fun z => ?_,
-    _root_.GlobalTheory.SiegelNormalForm.quad_differentiable _ _, by simp [Q, _root_.GlobalTheory.SiegelNormalForm.quad],
-    fun j => mul_ne_zero (hχne _) (Complex.exp_ne_zero _), fun i l z hl => ?_,
-    fun j l z hl => ?_⟩
+  refine ⟨
+    φ,
+    τ,
+    Q,
+    fun j =>
+      χ (b (Sum.inr j)) * cexp
+        (Real.pi / 2 * ((b (Sum.inr j) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inr j) : Fin g → ℂ))
+          - Q (τ *ᵥ Pi.single j 1)),
+    hτsym,
+    hτpos,
+    fun z => ?_,
+    _root_.GlobalTheory.SiegelNormalForm.quad_differentiable _ _,
+    by simp [Q, _root_.GlobalTheory.SiegelNormalForm.quad],
+    fun j => mul_ne_zero (hχne _) (Complex.exp_ne_zero _),
+    fun i l z hl => ?_,
+    fun j l z hl => ?_
+  ⟩
   · rw [hφ]
     constructor
     · intro hz
@@ -336,19 +390,21 @@ theorem _root_.GlobalTheory.SiegelNormalForm.exists_normal_form : (∀ (g : ℕ)
         exact Λ.smul_mem _ (b _).2
   · rw [hφ, hPcol] at hl
     obtain rfl : l = b (Sum.inl i) := Subtype.ext hl
-    have h1 : (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (b (Sum.inl i) : Fin g → ℂ) =
-        z ⬝ᵥ Y.map (↑) *ᵥ Pi.single i 1 := by
+    have h1
+        : (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (b (Sum.inl i) : Fin g → ℂ) = z ⬝ᵥ Y.map (↑) *ᵥ Pi.single i 1 := by
       rw [← hPcol, ← hrel, Pi.star_single, star_one]
-    have h2 : (b (Sum.inl i) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inl i) : Fin g → ℂ) =
-        Pi.single i 1 ⬝ᵥ Y.map (↑) *ᵥ Pi.single i 1 := by
+    have h2
+        : (b (Sum.inl i) : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (b (Sum.inl i) : Fin g → ℂ)
+          = Pi.single i 1 ⬝ᵥ Y.map (↑) *ᵥ Pi.single i 1 := by
       rw [← hPcol, ← hrel, Pi.star_single, star_one]
     rw [hφ, h1, h2, hQ]
     simp only [Q, _root_.GlobalTheory.SiegelNormalForm.quad, dotProduct_single, mul_one]
     rw [← add_assoc, Complex.exp_add _ (c i), Complex.exp_log (hχne _), mul_comm]
   · rw [hφ, hτcol] at hl
     obtain rfl : l = b (Sum.inr j) := Subtype.ext hl
-    have h1 : (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (b (Sum.inr j) : Fin g → ℂ) =
-        z ⬝ᵥ Y.map (↑) *ᵥ (τ *ᵥ Pi.single j 1) - 2 * I * z j := by
+    have h1
+        : (P *ᵥ z) ⬝ᵥ Hm *ᵥ star (b (Sum.inr j) : Fin g → ℂ)
+          = z ⬝ᵥ Y.map (↑) *ᵥ (τ *ᵥ Pi.single j 1) - 2 * I * z j := by
       rw [← hτcol, ← hrel, hconj_col, dotProduct_sub, dotProduct_smul, dotProduct_single,
         smul_eq_mul, mul_one]
     rw [hφ, h1, hQ]

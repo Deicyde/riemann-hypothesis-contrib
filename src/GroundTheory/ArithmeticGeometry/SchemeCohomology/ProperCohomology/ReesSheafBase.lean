@@ -23,13 +23,12 @@ lemma injective_app_of_mono {X : Scheme.{u}} {M N : X.Modules} (φ : M ⟶ N) [M
   have h := (NatTrans.mono_iff_mono_app _).1 this (op U)
   exact (AddCommGrpCat.mono_iff_injective _).1 h
 
-variable {A : Type u} [CommRing A] (I : Ideal A) {X : Scheme.{u}} [X.Over (Spec (.of A))]
-  (F : X.Modules)
+variable
+  {A : Type u} [CommRing A] (I : Ideal A) {X : Scheme.{u}} [X.Over (Spec (.of A))] (F : X.Modules)
 
 abbrev reesTarget : (reesScheme I X).Modules :=
   (Scheme.Modules.pushforward (reesPolyMap I X)).obj
-    ((Scheme.Modules.pullback (reesPolyMap I X)).obj
-      ((Scheme.Modules.pullback (reesPr I X)).obj F))
+    ((Scheme.Modules.pullback (reesPolyMap I X)).obj ((Scheme.Modules.pullback (reesPr I X)).obj F))
 
 abbrev reesUnit : (Scheme.Modules.pullback (reesPr I X)).obj F ⟶ reesTarget I F :=
   (Scheme.Modules.pullbackPushforwardAdjunction (reesPolyMap I X)).unit.app _

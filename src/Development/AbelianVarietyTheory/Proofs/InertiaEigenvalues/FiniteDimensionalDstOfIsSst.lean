@@ -6,14 +6,16 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Twis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.Pst GlobalTheory.PMon TensorProduct Module
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N GlobalTheory.Pst GlobalTheory.PMon TensorProduct Module
 open scoped Formalism.Per
 
 namespace GlobalTheory.Pst
 
-theorem finiteDimensional_Dst_of_isSst : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (V : Type)
-    [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V),
-    IsSst P ρ → FiniteDimensional ℚ_[l] ↥(Dst P ρ) := by
+theorem finiteDimensional_Dst_of_isSst
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (V : Type) [AddCommGroup V]
+        [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V),
+      IsSst P ρ → FiniteDimensional ℚ_[l] ↥(Dst P ρ) := by
   intro l _ P K V _ _ _ ρ h
   haveI : FiniteDimensional ℚ_[l] ↥(K0 K) := (P.PD K).finK₀
   by_cases hV : 0 < finrank ℚ_[l] V

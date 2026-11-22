@@ -10,10 +10,12 @@ noncomputable section
 namespace GlobalTheory.FockTensor
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 
-theorem exists_repr_on_finiteDimensional {V H : Type} [AddCommGroup V] [Module ℂ V]
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] (E : V →ₗ[ℂ] H) (hE : Function.Injective E)
-    (W : Submodule ℂ V) [FiniteDimensional ℂ W] (f : V →ₗ[ℂ] ℂ) :
-    ∃ a ∈ W, ∀ x ∈ W, inner ℂ (E a) (E x) = f x := by
+theorem exists_repr_on_finiteDimensional
+    {V H : Type} [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (E : V →ₗ[ℂ] H) (hE : Function.Injective E)
+    (W : Submodule ℂ V) [FiniteDimensional ℂ W]
+    (f : V →ₗ[ℂ] ℂ)
+    : ∃ a ∈ W, ∀ x ∈ W, inner ℂ (E a) (E x) = f x := by
   classical
   let e : W ≃ₗ[ℂ] W.map E := Submodule.equivMapOfInjective E hE W
   haveI : FiniteDimensional ℂ (W.map E) := LinearEquiv.finiteDimensional e
@@ -22,25 +24,30 @@ theorem exists_repr_on_finiteDimensional {V H : Type} [AddCommGroup V] [Module �
   let v : W.map E := (InnerProductSpace.toDual ℂ (W.map E)).symm (LinearMap.toContinuousLinearMap g)
   refine ⟨(e.symm v : V), (e.symm v).2, fun x hx => ?_⟩
   have h1 : E (e.symm v : V) = (v : H) := congrArg Subtype.val (e.apply_symm_apply v)
-  calc inner ℂ (E (e.symm v : V)) (E x) = inner ℂ v (e ⟨x, hx⟩) := by
-          rw [h1, Submodule.coe_inner]; rfl
+  calc
+    inner ℂ (E (e.symm v : V)) (E x)
+      = inner ℂ v (e ⟨x, hx⟩) := by rw [h1, Submodule.coe_inner]; rfl
     _ = g (e ⟨x, hx⟩) := InnerProductSpace.toDual_symm_apply
     _ = f x := by simp [g]
 
-theorem mem_hwSub_iff_eigen {p q : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (μ : Ix p q → ℚ) (v : V) :
-    v ∈ hwSub act μ ↔ (∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v) ∧
-      ∀ a b, posC a b → act (Eab a b) v = (0 : ℂ) • v := by
+theorem mem_hwSub_iff_eigen
+    {p q : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) (μ : Ix p q → ℚ) (v : V)
+    : v ∈ hwSub act μ
+      ↔ (∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v)
+        ∧ ∀ a b, posC a b → act (Eab a b) v = (0 : ℂ) • v := by
   simp only [hwSub, wtSub, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
     LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero, zero_smul]
 
-theorem norm_proportional_of_irreducible (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ)
+theorem norm_proportional_of_irreducible
+    (p q : ℕ) (M : GKMod p q) (Λ : Ix p q → ℚ)
     (H₁ H₂ : Type) [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [NormedAddCommGroup H₂]
-    [InnerProductSpace ℂ H₂] (E₁ : M.V →ₗ[ℂ] H₁) (E₂ : M.V →ₗ[ℂ] H₂) (hirr : IrrGK M)
-    (hΛ : Module.finrank ℂ ↥(hwSub M.act Λ) = 1) (hE : Function.Injective E₁)
+    [InnerProductSpace ℂ H₂]
+    (E₁ : M.V →ₗ[ℂ] H₁) (E₂ : M.V →ₗ[ℂ] H₂)
+    (hirr : IrrGK M) (hΛ : Module.finrank ℂ ↥(hwSub M.act Λ) = 1) (hE : Function.Injective E₁)
     (h₁ : ∀ Z x y, inner ℂ (E₁ (M.act Z x)) (E₁ y) = inner ℂ (E₁ x) (E₁ (M.act (adjZ Z) y)))
-    (h₂ : ∀ Z x y, inner ℂ (E₂ (M.act Z x)) (E₂ y) = inner ℂ (E₂ x) (E₂ (M.act (adjZ Z) y))) :
-    ∃ c : ℝ, ∀ y, ‖E₂ y‖ = c * ‖E₁ y‖ := by
+    (h₂ : ∀ Z x y, inner ℂ (E₂ (M.act Z x)) (E₂ y) = inner ℂ (E₂ x) (E₂ (M.act (adjZ Z) y)))
+    : ∃ c : ℝ, ∀ y, ‖E₂ y‖ = c * ‖E₁ y‖ := by
   classical
   obtain ⟨v₀s, hv₀s, hspan⟩ := finrank_eq_one_iff'.mp hΛ
   set v₀ : M.V := (v₀s : M.V) with hv₀def
@@ -56,9 +63,7 @@ theorem norm_proportional_of_irreducible (p q : ℕ) (M : GKMod p q) (Λ : Ix p 
     (innerₛₗ ℂ (E₂ x)).comp E₂ - (r : ℂ) • (innerₛₗ ℂ (E₁ x)).comp E₁
   have hψ : ∀ x y, ψ x y = inner ℂ (E₂ x) (E₂ y) - (r : ℂ) * inner ℂ (E₁ x) (E₁ y) := by
     intro x y
-    first
-      | rfl
-      | simp [ψ]
+    first | rfl | simp [ψ]
   have hψinv : ∀ Z x y, ψ (M.act Z x) y = ψ x (M.act (adjZ Z) y) := by
     intro Z x y
     rw [hψ, hψ, h₁, h₂]
@@ -105,13 +110,14 @@ theorem norm_proportional_of_irreducible (p q : ℕ) (M : GKMod p q) (Λ : Ix p 
       rw [mem_hwSub_iff_eigen]
       have hv₀hw := (mem_hwSub_iff_eigen M.act Λ v₀).mp v₀s.2
       refine ⟨fun c => ?_, fun c d hcd => ?_⟩
-      · have h := heig (Eab c c) (isKC_Eab (sameBlock_self c)) ((Λ c : ℚ) : ℝ)
-          (by rw [hv₀hw.1 c]; push_cast; rfl)
+      · have h :=
+          heig (Eab c c) (isKC_Eab (sameBlock_self c)) ((Λ c : ℚ) : ℝ)
+            (by rw [hv₀hw.1 c]; push_cast; rfl)
         rw [h]
         push_cast
         rfl
-      · have h := heig (Eab c d) (isKC_Eab (sameBlock_of_posC hcd)) 0
-          (by rw [hv₀hw.2 c d hcd]; simp)
+      · have h :=
+          heig (Eab c d) (isKC_Eab (sameBlock_of_posC hcd)) 0 (by rw [hv₀hw.2 c d hcd]; simp)
         rw [h]
         simp
     obtain ⟨t, ht⟩ := hspan ⟨a, hahw⟩
@@ -140,8 +146,9 @@ theorem norm_proportional_of_irreducible (p q : ℕ) (M : GKMod p q) (Λ : Ix p 
       rw [hmemN]
       intro x
       rw [hψconj, hkey, map_zero]
-    have hirr' : Nontrivial M.V ∧ ∀ N : Submodule ℂ M.V, (∀ Z, ∀ y ∈ N, M.act Z y ∈ N) →
-        N = ⊥ ∨ N = ⊤ := hirr
+    have hirr'
+        : Nontrivial M.V ∧ ∀ N : Submodule ℂ M.V, (∀ Z, ∀ y ∈ N, M.act Z y ∈ N) → N = ⊥ ∨ N = ⊤ :=
+      hirr
     rcases hirr'.2 N hstab with hN | hN
     · exact absurd (by rw [hN] at hv₀N; exact (Submodule.mem_bot ℂ).mp hv₀N) hv₀
     · intro x y

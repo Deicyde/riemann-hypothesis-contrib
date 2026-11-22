@@ -15,8 +15,8 @@ universe w' u
 
 variable {X : TopCat.{u}} {B : Opens X → Prop}
 
-noncomputable def injectiveSequence (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :
-    ShortComplex (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
+noncomputable def injectiveSequence (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})
+    : ShortComplex (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
   ShortComplex.mk (Injective.ι F) (cokernel.π (Injective.ι F)) (cokernel.condition _)
 
 lemma injectiveSequence_shortExact (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :
@@ -25,8 +25,8 @@ lemma injectiveSequence_shortExact (F : Sheaf (Opens.grothendieckTopology X) Add
     (ShortComplex.exact_of_g_is_cokernel _ (cokernelIsCokernel (Injective.ι F)))
     (inferInstanceAs (Mono (Injective.ι F))) coequalizer.π_epi
 
-instance (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :
-    Injective (injectiveSequence F).X₂ :=
+instance (F : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})
+    : Injective (injectiveSequence F).X₂ :=
   inferInstanceAs (Injective (Injective.under F))
 
 variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]

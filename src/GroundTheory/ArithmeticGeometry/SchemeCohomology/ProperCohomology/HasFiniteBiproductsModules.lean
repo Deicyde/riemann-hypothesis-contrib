@@ -48,13 +48,16 @@ lemma biproduct_app_eq_sum (U : X.Opens) (m : Γ(⨁ M, U)) :
   exact this Finset.univ
 
 theorem isQuasicoherent_biproduct [∀ i, (M i).IsQuasicoherent] : (⨁ M).IsQuasicoherent := by
-  refine isQuasicoherent_of_affineCover _ (fun V : X.affineOpens => (V : X.Opens)) (fun V => V.2)
+  refine isQuasicoherent_of_affineCover _
+    (fun V : X.affineOpens => (V : X.Opens))
+    (fun V => V.2)
     (iSup_affineOpens_eq_top X) ?_ ?_
   · intro V f m
-    have key : ∀ j, ∃ (e : ℕ) (m' : Γ(M j, (V : X.Opens))),
-        resF (M j) (X.basicOpen_le f) m' =
-          resO (X.basicOpen_le f) f ^ e • (biproduct.π M j).app _ m :=
-      fun j => qcoh_exists_res_eq (M j) V.2 f _
+    have key
+        : ∀ j, ∃ (e : ℕ) (m' : Γ(M j, (V : X.Opens))),
+          resF (M j) (X.basicOpen_le f) m'
+            = resO (X.basicOpen_le f) f ^ e • (biproduct.π M j).app _ m := fun j =>
+      qcoh_exists_res_eq (M j) V.2 f _
     choose e m' hm' using key
     refine ⟨∑ j, e j, ∑ j, (biproduct.ι M j).app _ (f ^ (∑ k, e k - e j) • m' j), ?_⟩
     set_option synthInstance.maxHeartbeats 100000 in
@@ -62,8 +65,8 @@ theorem isQuasicoherent_biproduct [∀ i, (M i).IsQuasicoherent] : (⨁ M).IsQua
     conv_rhs => rw [biproduct_app_eq_sum M _ m, Finset.smul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [resF_app, resF_smul, hm' j, smul_smul, map_pow, ← pow_add,
-      Nat.sub_add_cancel (Finset.single_le_sum (fun k _ => Nat.zero_le (e k))
-        (Finset.mem_univ j)), Scheme.Modules.Hom.app_smul]
+      Nat.sub_add_cancel (Finset.single_le_sum (fun k _ => Nat.zero_le (e k)) (Finset.mem_univ j)),
+      Scheme.Modules.Hom.app_smul]
   · intro V f m hm
     have key : ∀ j, ∃ e : ℕ, f ^ e • (biproduct.π M j).app _ m = 0 := fun j => by
       refine qcoh_exists_pow_smul_eq_zero (M j) V.2 f _ ?_
@@ -72,9 +75,10 @@ theorem isQuasicoherent_biproduct [∀ i, (M i).IsQuasicoherent] : (⨁ M).IsQua
     refine ⟨∑ j, e j, ?_⟩
     rw [biproduct_app_eq_sum M _ m, Finset.smul_sum]
     refine Finset.sum_eq_zero fun j _ => ?_
-    rw [← Scheme.Modules.Hom.app_smul, ← Nat.sub_add_cancel (Finset.single_le_sum
-      (fun k _ => Nat.zero_le (e k)) (Finset.mem_univ j)), pow_add, mul_smul, he j, smul_zero,
-      map_zero]
+    rw [← Scheme.Modules.Hom.app_smul,
+      ← Nat.sub_add_cancel
+        (Finset.single_le_sum (fun k _ => Nat.zero_le (e k)) (Finset.mem_univ j)),
+      pow_add, mul_smul, he j, smul_zero, map_zero]
 
 end Biproduct
 

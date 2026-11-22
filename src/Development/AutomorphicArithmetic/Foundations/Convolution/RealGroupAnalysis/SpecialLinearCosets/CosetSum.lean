@@ -5,22 +5,30 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.I.cosetSum :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] (U U' : Subgroup G), U' ≤ U → IsCompact (U : Set G) → IsOpen (U' : Set G) →
-      ∃ s : Finset G, s.Nonempty ∧ (∀ g ∈ s, g ∈ U) ∧ ∀ x, ind U x = ∑ g ∈ s, ind U' (x * g⁻¹) := by
+theorem UpperTheory.ConvolutionTheory.R2.I.cosetSum
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        (U U' : Subgroup G),
+      U' ≤ U → IsCompact (U : Set G) → IsOpen (U' : Set G)
+        → ∃ s : Finset G,
+          s.Nonempty ∧ (∀ g ∈ s, g ∈ U) ∧ ∀ x, ind U x = ∑ g ∈ s, ind U' (x * g⁻¹) := by
   intro G _ _ _ _ U U' hle hU hU'
   haveI : CompactSpace U := isCompact_iff_compactSpace.mp hU
-  have hopen : IsOpen ((U'.subgroupOf U : Subgroup U) : Set U) := hU'.preimage continuous_subtype_val
+  have hopen : IsOpen ((U'.subgroupOf U : Subgroup U) : Set U) :=
+    hU'.preimage continuous_subtype_val
   haveI : Finite (U ⧸ U'.subgroupOf U) := Subgroup.quotient_finite_of_isOpen _ hopen
   haveI : Finite (Quotient (QuotientGroup.rightRel (U'.subgroupOf U))) :=
     Finite.of_equiv _ (QuotientGroup.quotientRightRelEquivQuotientLeftRel (U'.subgroupOf U)).symm
   letI : Fintype (Quotient (QuotientGroup.rightRel (U'.subgroupOf U))) := Fintype.ofFinite _
   let mk : U → Quotient (QuotientGroup.rightRel (U'.subgroupOf U)) := fun u => Quotient.mk _ u
-  let r : Quotient (QuotientGroup.rightRel (U'.subgroupOf U)) → G := fun q => ((Quotient.out q : U) : G)
+  let r : Quotient (QuotientGroup.rightRel (U'.subgroupOf U)) → G := fun q =>
+    ((Quotient.out q : U) : G)
   have hrU : ∀ q, r q ∈ U := fun q => (Quotient.out q : U).2
   have hinj : Function.Injective r := by
     intro a b h
@@ -64,7 +72,8 @@ theorem UpperTheory.ConvolutionTheory.R2.I.cosetSum :
       rw [h1]
       symm
       refine Finset.sum_eq_zero fun q _ => ?_
-      have : x * (r q)⁻¹ ∉ U' := fun h => hx (by
-        have := U.mul_mem (hle h) (hrU q)
-        simpa using this)
+      have : x * (r q)⁻¹ ∉ U' := fun h =>
+        hx (by
+          have := U.mul_mem (hle h) (hrU q)
+          simpa using this)
       simp [ind, Set.indicator, this]

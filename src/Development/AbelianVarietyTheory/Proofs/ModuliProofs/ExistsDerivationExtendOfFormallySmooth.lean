@@ -9,18 +9,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
 namespace GlobalTheory.KS
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct ContDiff in
-theorem _root_.GlobalTheory.KS.exists_derivation_extend_of_formallySmooth :
-    ∀ (R B C : Type) [CommRing R] [CommRing B] [CommRing C] [Algebra R B] [Algebra.FormallySmooth R B] (φ : B →+* C) (D : R → C), (∀ a b, D (a + b) = D a + D b) → (∀ a b, D (a * b) = φ (algebraMap R B a) * D b + φ (algebraMap R B b) * D a) → ∃ d : B → C, (∀ a b, d (a + b) = d a + d b) ∧ (∀ a b, d (a * b) = φ a * d b + φ b * d a) ∧ ∀ r, d (algebraMap R B r) = D r := by
+theorem _root_.GlobalTheory.KS.exists_derivation_extend_of_formallySmooth
+    : ∀ (R B C : Type) [CommRing R] [CommRing B] [CommRing C] [Algebra R B]
+        [Algebra.FormallySmooth R B] (φ : B →+* C) (D : R → C),
+      (∀ a b, D (a + b) = D a + D b)
+        → (∀ a b, D (a * b) = φ (algebraMap R B a) * D b + φ (algebraMap R B b) * D a)
+        → ∃ d : B → C,
+          (∀ a b, d (a + b) = d a + d b) ∧ (∀ a b, d (a * b) = φ a * d b + φ b * d a)
+            ∧ ∀ r, d (algebraMap R B r) = D r := by
   intro R B C _ _ _ _ _ φ D hadd hmul
   have h0 : D 0 = 0 := by
     have := hadd 0 0
@@ -30,22 +38,22 @@ theorem _root_.GlobalTheory.KS.exists_derivation_extend_of_formallySmooth :
     have e : (1 : R) * 1 = 1 := mul_one 1
     rw [e, map_one, map_one, _root_.one_mul] at h11
     linear_combination -h11
-  let ψ : R →+* TrivSqZeroExt C C :=
-    { toFun := fun r => TrivSqZeroExt.inl (φ (algebraMap R B r)) + TrivSqZeroExt.inr (D r)
-      map_one' := by ext <;> simp [h1]
-      map_mul' := fun a b => by ext <;> simp [hmul] <;> ring
-      map_zero' := by ext <;> simp [h0]
-      map_add' := fun a b => by ext <;> simp [hadd] }
+  let ψ : R →+* TrivSqZeroExt C C := {
+    toFun := fun r => TrivSqZeroExt.inl (φ (algebraMap R B r)) + TrivSqZeroExt.inr (D r)
+    map_one' := by ext <;> simp [h1]
+    map_mul' := fun a b => by ext <;> simp [hmul] <;> ring
+    map_zero' := by ext <;> simp [h0]
+    map_add' := fun a b => by ext <;> simp [hadd]
+  }
   letI : Algebra R (TrivSqZeroExt C C) := ψ.toAlgebra
   letI : Algebra R C := (φ.comp (algebraMap R B)).toAlgebra
-  let g : TrivSqZeroExt C C →ₐ[R] C :=
-    { (TrivSqZeroExt.fstHom C C C).toRingHom with
-      commutes' := fun r => by
-        show (ψ r).fst = φ (algebraMap R B r)
-        simp [ψ] }
-  let f : B →ₐ[R] C :=
-    { φ with
-      commutes' := fun r => rfl }
+  let g : TrivSqZeroExt C C →ₐ[R] C := {
+    (TrivSqZeroExt.fstHom C C C).toRingHom with
+    commutes' := fun r => by
+      show (ψ r).fst = φ (algebraMap R B r)
+      simp [ψ]
+  }
+  let f : B →ₐ[R] C := { φ with commutes' := fun r => rfl }
   have hg : Function.Surjective g := fun c => ⟨TrivSqZeroExt.inl c, by simp [g]⟩
   have hker : IsNilpotent (RingHom.ker g) := by
     refine ⟨2, ?_⟩

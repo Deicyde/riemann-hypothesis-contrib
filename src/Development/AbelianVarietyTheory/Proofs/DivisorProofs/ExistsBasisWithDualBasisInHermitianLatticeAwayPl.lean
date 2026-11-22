@@ -13,12 +13,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix GlobalTheory.VacAny
 
 noncomputable section
 namespace GlobalTheory.HermLocDualBasis
-variable (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (v : Pl (F := F))
+variable
+  (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (v : Pl (F := F))
 
 abbrev locS : Submonoid (𝓞 E) := Algebra.algebraMapSubmonoid (𝓞 E) v.asIdeal.primeCompl
 
@@ -27,58 +30,66 @@ theorem locS_le : locS F E v ≤ nonZeroDivisors (𝓞 E) :=
 
 abbrev locR : Subalgebra (𝓞 E) E := Localization.subalgebra.ofField E (locS F E v) (locS_le F E v)
 
-instance : IsDedekindDomain (locR F E v) :=
-  IsLocalization.isDedekindDomain (𝓞 E) (locS_le F E v) _
+instance : IsDedekindDomain (locR F E v) := IsLocalization.isDedekindDomain (𝓞 E) (locS_le F E v) _
 
 instance : IsPrincipalIdealRing (locR F E v) :=
   IsDedekindDomain.isPrincipalIdealRing_localization_over_prime (𝓞 E) v.asIdeal v.ne_bot
 
 omit [NumberField F] in
-theorem form_smul_left (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (a : E) (x y : Fin n → E) :
-    form σ J (a • x) y = a * form σ J x y := by
+theorem form_smul_left
+    (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (a : E) (x y : Fin n → E)
+    : form σ J (a • x) y = a * form σ J x y := by
   simp [form, smul_dotProduct]
 
 omit [NumberField F] in
-theorem form_smul_right (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (a : E) (x y : Fin n → E) :
-    form σ J x (a • y) = σ a * form σ J x y := by
+theorem form_smul_right
+    (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (a : E) (x y : Fin n → E)
+    : form σ J x (a • y) = σ a * form σ J x y := by
   have : (fun i => σ ((a • y) i)) = σ a • (fun i => σ (y i)) := by ext i; simp
   simp only [form, this, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
 omit [NumberField F] in
-theorem form_sum_right (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (y : Fin n → E)
-    (c : Fin n → E) (b : Fin n → Fin n → E) :
-    form σ J y (∑ l, c l • b l) = ∑ l, σ (c l) * form σ J y (b l) := by
+theorem form_sum_right
+    (σ : E →ₐ[F] E)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (y : Fin n → E) (c : Fin n → E) (b : Fin n → Fin n → E)
+    : form σ J y (∑ l, c l • b l) = ∑ l, σ (c l) * form σ J y (b l) := by
   have : (fun i => σ ((∑ l, c l • b l) i)) = ∑ l, σ (c l) • (fun i => σ (b l i)) := by
     ext i; simp [Finset.sum_apply, map_sum]
-  simp only [form, this, Matrix.mulVec_sum, dotProduct_sum, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
+  simp only [form, this, Matrix.mulVec_sum, dotProduct_sum, Matrix.mulVec_smul, dotProduct_smul,
+    smul_eq_mul]
 
 omit [NumberField F] in
-theorem form_rows (σ : E →ₐ[F] E) {n : ℕ} (J P Q : Matrix (Fin n) (Fin n) E) (k l : Fin n) :
-    form σ J (P k) (Q l) = (P * J * (Q.map σ)ᵀ) k l := by
-  simp only [form, Matrix.mul_apply, dotProduct, Matrix.mulVec, Matrix.transpose_apply, Matrix.map_apply,
-    Finset.sum_mul, Finset.mul_sum]
+theorem form_rows (σ : E →ₐ[F] E) {n : ℕ} (J P Q : Matrix (Fin n) (Fin n) E) (k l : Fin n)
+    : form σ J (P k) (Q l) = (P * J * (Q.map σ)ᵀ) k l := by
+  simp only [form, Matrix.mul_apply, dotProduct, Matrix.mulVec, Matrix.transpose_apply,
+    Matrix.map_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   simp [mul_assoc]
 
-theorem exists_basis (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L) :
-    ∃ (t : 𝓞 F), t ∉ v.asIdeal ∧ ∃ b : Fin n → Fin n → E, LinearIndependent E b ∧ (∀ i, b i ∈ L) ∧
-      ∀ w ∈ L, (algebraMap (𝓞 F) (𝓞 E) t) • w ∈ Submodule.span (𝓞 E) (Set.range b) := by
+theorem exists_basis (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
+    : ∃ (t : 𝓞 F),
+      t ∉ v.asIdeal
+        ∧ ∃ b : Fin n → Fin n → E,
+          LinearIndependent E b ∧ (∀ i, b i ∈ L)
+            ∧ ∀ w ∈ L, (algebraMap (𝓞 F) (𝓞 E) t) • w ∈ Submodule.span (𝓞 E) (Set.range b) := by
   letI := hL
-  obtain ⟨s, b, hb, hbL, hs⟩ := GlobalTheory.PlaceInt.LocBasis.exists_basis_up_to (A := locR F E v) (locS F E v) L (Submodule.IsLattice.fg E L)
-    Submodule.IsFullLattice.span_eq_top
+  obtain ⟨s, b, hb, hbL, hs⟩ :=
+    GlobalTheory.PlaceInt.LocBasis.exists_basis_up_to (A := locR F E v) (locS F E v) L
+      (Submodule.IsLattice.fg E L) Submodule.IsFullLattice.span_eq_top
   obtain ⟨t, ht, hst⟩ := s.2
   exact ⟨t, ht, b, hb, hbL, fun w hw => by rw [hst]; exact hs w hw⟩
 
 end GlobalTheory.HermLocDualBasis
 
-
 open GlobalTheory.HermLocDualBasis in
-theorem GlobalTheory.HermLocDualBasis.exists_locDualBasis : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E)
-    (B : Base F E) {n r s : ℕ} (X : Spc F E n), X.IsHerm σ B r s → ∀ v : Pl (F := F),
-    ∃ f p : Fin n → Fin n → E, (∀ k, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • f k ∈ X.L) ∧
-      (∀ k, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • p k ∈ X.L) ∧
-      ∀ k l, form σ X.J (p k) (f l) = if k = l then 1 else 0 := by
+theorem GlobalTheory.HermLocDualBasis.exists_locDualBasis
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) {n r s : ℕ} (X : Spc F E n),
+      X.IsHerm σ B r s
+        → ∀ v : Pl (F := F), ∃ f p : Fin n → Fin n → E,
+          (∀ k, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • f k ∈ X.L)
+            ∧ (∀ k, ∃ t : 𝓞 F, t ∉ v.asIdeal ∧ algebraMap F E (t : F) • p k ∈ X.L)
+            ∧ ∀ k l, form σ X.J (p k) (f l) = if k = l then 1 else 0 := by
   intro F E _ _ _ _ _ σ B n r s X hX v
   obtain ⟨t, ht, b, hb, hbL, hspan⟩ := exists_basis F E v n X.L hX.lat
   let Bm : Matrix (Fin n) (Fin n) E := Matrix.of b
@@ -100,8 +111,13 @@ theorem GlobalTheory.HermLocDualBasis.exists_locDualBasis : ∀ (F E : Type) [Fi
       rw [e]
       exact Matrix.nonsing_inv_mul G hG
     rw [this, Matrix.one_apply]
-  refine ⟨b, fun k => P k, fun k => ⟨1, fun h => v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h), by simpa using hbL k⟩,
-    fun k => ⟨t, ht, ?_⟩, hdual⟩
+  refine ⟨
+    b,
+    fun k => P k,
+    fun k => ⟨1, fun h => v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h), by simpa using hbL k⟩,
+    fun k => ⟨t, ht, ?_⟩,
+    hdual
+  ⟩
   rw [hX.dual]
   intro x hx
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 E)).1 (hspan x hx)

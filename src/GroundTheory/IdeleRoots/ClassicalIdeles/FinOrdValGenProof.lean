@@ -17,8 +17,11 @@ namespace GroundTheory.BlockD
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem isOpen_ker_of_pow_eq_one {G : Type*} [Group G] [TopologicalSpace G] (χ : G →* ℂˣ)
-    (hχ : Continuous χ) {n : ℕ} (hn : 0 < n) (h : χ ^ n = 1) : IsOpen (χ.ker : Set G) := by
+theorem isOpen_ker_of_pow_eq_one
+    {G : Type*} [Group G] [TopologicalSpace G]
+    (χ : G →* ℂˣ) (hχ : Continuous χ)
+    {n : ℕ} (hn : 0 < n) (h : χ ^ n = 1)
+    : IsOpen (χ.ker : Set G) := by
   have hF : {z : ℂˣ | z ^ n = 1}.Finite := by
     refine ((Polynomial.nthRoots n (1 : ℂ)).toFinset.finite_toSet.preimage
       Units.val_injective.injOn).subset ?_

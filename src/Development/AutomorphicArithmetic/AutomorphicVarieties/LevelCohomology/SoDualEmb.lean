@@ -6,10 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-theorem UpperTheory.V.X.So.dualEmb :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O), a ≠ 0 → ∀ (r : ℕ) (M : Type) [AddCommGroup M] [Module O M] [Module (ZMod (l ^ r)) M], Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a})) → ∃ ι : ReciprocityTheory.Gal.TDual (ZMod (l ^ r)) M →+ QO l O, Function.Injective ι ∧ (∀ w, a • w = 0 ↔ w ∈ Set.range ι) ∧ ∀ (y : ℤ_[l]) (x : O) (φ φ' : ReciprocityTheory.Gal.TDual (ZMod (l ^ r)) M), (∀ m, φ' m = PadicInt.toZModPow r y * φ (x • m)) → ι φ' = (algebraMap ℤ_[l] O y * x) • ι φ := by
+theorem UpperTheory.V.X.So.dualEmb
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O),
+      a ≠ 0
+        → ∀ (r : ℕ) (M : Type) [AddCommGroup M] [Module O M] [Module (ZMod (l ^ r)) M],
+          Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a}))
+            → ∃ ι : ReciprocityTheory.Gal.TDual (ZMod (l ^ r)) M →+ QO l O,
+              Function.Injective ι ∧ (∀ w, a • w = 0 ↔ w ∈ Set.range ι)
+                ∧ ∀ (y : ℤ_[l]) (x : O) (φ φ' : ReciprocityTheory.Gal.TDual (ZMod (l ^ r)) M),
+                  (∀ m, φ' m = PadicInt.toZModPow r y * φ (x • m))
+                    → ι φ' = (algebraMap ℤ_[l] O y * x) • ι φ := by
   intro l _ O _ _ _ _ _ a ha r M _ _ _ hM
   haveI : NeZero (l ^ r) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   obtain ⟨φ₀, hker, hsurj⟩ := UpperTheory.V.X.So.dualGen l O a ha r M hM
@@ -24,15 +34,16 @@ theorem UpperTheory.V.X.So.dualEmb :
     intro s n
     rw [mul_smul, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul O, ← Nat.cast_smul_eq_nsmul (ZMod (l ^ r)),
       ZMod.natCast_self, zero_smul]
-  have scal : ∀ (y : ℤ_[l]) (n : M),
-      φ₀ (algebraMap ℤ_[l] O y • n) = PadicInt.toZModPow r y * φ₀ n := by
+  have scal
+      : ∀ (y : ℤ_[l]) (n : M), φ₀ (algebraMap ℤ_[l] O y • n) = PadicInt.toZModPow r y * φ₀ n := by
     intro y n
-    have hmem : y - ((PadicInt.toZModPow r y).val : ℤ_[l]) ∈ RingHom.ker (PadicInt.toZModPow (p := l) r) := by
+    have hmem
+        : y - ((PadicInt.toZModPow r y).val : ℤ_[l])
+          ∈ RingHom.ker (PadicInt.toZModPow (p := l) r) := by
       rw [RingHom.mem_ker, map_sub, map_natCast, ZMod.natCast_zmod_val, sub_self]
     rw [PadicInt.ker_toZModPow, Ideal.mem_span_singleton] at hmem
     obtain ⟨t, ht⟩ := hmem
-    have hy : y = ((PadicInt.toZModPow r y).val : ℤ_[l]) + (l : ℤ_[l]) ^ r * t := by
-      rw [← ht]; ring
+    have hy : y = ((PadicInt.toZModPow r y).val : ℤ_[l]) + (l : ℤ_[l]) ^ r * t := by rw [← ht]; ring
     conv_lhs => rw [hy]
     rw [map_add (f := _), map_mul, map_pow, map_natCast, map_natCast, add_smul, kill, add_zero,
       Nat.cast_smul_eq_nsmul O, map_nsmul, nsmul_eq_mul, ZMod.natCast_zmod_val]
@@ -84,6 +95,5 @@ theorem UpperTheory.V.X.So.dualEmb :
     have e2 := hc φ (x • m)
     rw [← e1]
     refine (h m).trans ((congrArg (fun z => PadicInt.toZModPow r y * z) e2).trans ?_)
-    rw [smul_smul,
-      show algebraMap ℤ_[l] O y * x * c φ = algebraMap ℤ_[l] O y * (c φ * x) by ring,
+    rw [smul_smul, show algebraMap ℤ_[l] O y * x * c φ = algebraMap ℤ_[l] O y * (c φ * x) by ring,
       mul_smul (algebraMap ℤ_[l] O y), scal]

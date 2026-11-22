@@ -9,8 +9,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.BC.til_co :
-    ∀ (O O' : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O'] [IsLocalHom (algebraMap O O')] [Module.Finite O O'] (R : Type) [CommRing R] [Algebra O R] [IsCO O R], ∃ _ : IsCO O' (Til O O' R), IsLocalHom (Til.ι O O' R) ∧ Til.s O O' R ∈ maximalIdeal (Til O O' R) := by
+theorem UpperTheory.V.Pa.BC.til_co
+    : ∀ (O O' : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O']
+        [IsLocalHom (algebraMap O O')] [Module.Finite O O'] (R : Type) [CommRing R] [Algebra O R]
+        [IsCO O R],
+      ∃ _ : IsCO O' (Til O O' R),
+        IsLocalHom (Til.ι O O' R) ∧ Til.s O O' R ∈ maximalIdeal (Til O O' R) := by
   intro O O' _ _ _ _ _ _ _ R _ _ _
   haveI hT := UpperTheory.V.CA.cl_bc O O' R
   let f : R →+* O' ⊗[O] R := (Algebra.TensorProduct.includeRight : R →ₐ[O] O' ⊗[O] R).toRingHom

@@ -11,26 +11,27 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem toLex_lt_of_eq_of_lt_at {N : ℕ} {a b : Fin N →₀ ℕ} (i : Fin N)
-    (h1 : ∀ i', i' < i → a i' = b i') (h2 : a i < b i) : toLex a < toLex b := by
+private theorem toLex_lt_of_eq_of_lt_at
+    {N : ℕ} {a b : Fin N →₀ ℕ} (i : Fin N) (h1 : ∀ i', i' < i → a i' = b i') (h2 : a i < b i)
+    : toLex a < toLex b := by
   exact Finsupp.lex_def.2 ⟨i, h1, h2⟩
 
-private theorem domCongr_cmIdx_apply_eq {r n : ℕ} (m : Fin r × Fin n →₀ ℕ)
-    (x : Fin r × Fin n) :
-    Finsupp.domCongr (cmIdx r n) m (cmIdx r n x) = m x := by
+private theorem domCongr_cmIdx_apply_eq {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (x : Fin r × Fin n)
+    : Finsupp.domCongr (cmIdx r n) m (cmIdx r n x) = m x := by
   simp [Finsupp.domCongr_apply, Finsupp.equivMapDomain_apply]
 
-private theorem toSyn_le_toSyn_degree_of_mem_support {σ R : Type*} [CommSemiring R] (M : MonomialOrder σ)
-    {f : MvPolynomial σ R} {d : σ →₀ ℕ} (hd : d ∈ f.support) :
-    M.toSyn d ≤ M.toSyn (M.degree f) := by
+private theorem toSyn_le_toSyn_degree_of_mem_support
+    {σ R : Type*} [CommSemiring R]
+    (M : MonomialOrder σ)
+    {f : MvPolynomial σ R} {d : σ →₀ ℕ} (hd : d ∈ f.support)
+    : M.toSyn d ≤ M.toSyn (M.degree f) := by
   exact M.le_degree hd
 
 theorem sliceLeading : PeelLead := by
   unfold PeelLead
   intro B _ _ r n l j hlj a0 ω g K hg hω hK htop
   have hlj' : l ≠ j := ne_of_lt hlj
-  have hd : (colLex r n).degree (peel l j a0 K g) ∈
-      (peel l j a0 K g).support :=
+  have hd : (colLex r n).degree (peel l j a0 K g) ∈ (peel l j a0 K g).support :=
     (colLex r n).degree_mem_support hK
   obtain ⟨m0, hm0, hm0K, hd_eq⟩ := lcplead_mem_support_peel a0 K hd
   have hm0_eq := lcplead_recon hlj' a0 hg hm0
@@ -51,8 +52,7 @@ theorem sliceLeading : PeelLead := by
         rcases lcplead_cmIdx_lt hi' with ht | ⟨ht, hb⟩
         · have htl : t ≠ l := ne_of_lt ht
           have htj : t ≠ j := ne_of_lt (lt_trans ht hlj)
-          rw [lcplead_hom_off hlj' hg hm b t htl htj,
-            lcplead_hom_off hlj' hg hm0 b t htl htj]
+          rw [lcplead_hom_off hlj' hg hm b t htl htj, lcplead_hom_off hlj' hg hm0 b t htl htj]
         · rw [ht]
           have h1 := lcplead_hom_row hlj' hg hm b
           have h2 := lcplead_hom_row hlj' hg hm0 b

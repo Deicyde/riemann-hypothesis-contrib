@@ -4,10 +4,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private def actM {A V J : Type} [CommRing A] [AddCommGroup V] [Module A V] (r t : A) (Y : J → V) :
-    A × (J → V) →+ A × (J → V) where
+private def actM {A V J : Type} [CommRing A] [AddCommGroup V] [Module A V] (r t : A) (Y : J → V)
+    : A × (J → V) →+ A × (J → V) where
   toFun u := (r * u.1, fun j => t • u.2 j + (r * u.1) • Y j)
   map_zero' := by ext <;> simp
   map_add' u v := by
@@ -16,15 +17,20 @@ private def actM {A V J : Type} [CommRing A] [AddCommGroup V] [Module A V] (r t 
     · simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, mul_add, smul_add, add_smul]
       abel
 
-private def mkRep {Γ M : Type} [Group Γ] [AddCommGroup M] (n : ℕ) [Module (ZMod n) M] (T : Γ → M →+ M) (h1 : ∀ u, T 1 u = u)
-    (hm : ∀ g h u, T (g * h) u = T g (T h u)) : Representation (ZMod n) Γ M where
+private def mkRep
+    {Γ M : Type} [Group Γ] [AddCommGroup M]
+    (n : ℕ) [Module (ZMod n) M]
+    (T : Γ → M →+ M) (h1 : ∀ u, T 1 u = u) (hm : ∀ g h u, T (g * h) u = T g (T h u))
+    : Representation (ZMod n) Γ M where
   toFun g := ((T g).toZModLinearMap n : Module.End (ZMod n) M)
   map_one' := LinearMap.ext h1
   map_mul' g h := LinearMap.ext (hm g h)
 
-private theorem continuous_of_right_invariant_on_nhds_one {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [TopologicalSpace X] (U : Set Γ) (hU : U ∈ nhds (1 : Γ)) (f : Γ → X)
-    (hf : ∀ g, ∀ h ∈ U, f (g * h) = f g) : Continuous f := by
+private theorem continuous_of_right_invariant_on_nhds_one
+    {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [TopologicalSpace X]
+    (U : Set Γ) (hU : U ∈ nhds (1 : Γ))
+    (f : Γ → X) (hf : ∀ g, ∀ h ∈ U, f (g * h) = f g)
+    : Continuous f := by
   refine continuous_iff_continuousAt.2 fun g => ?_
   have ht : Filter.Tendsto (fun x => g⁻¹ * x) (nhds g) (nhds 1) := by
     have := (continuous_const_mul g⁻¹).tendsto g
@@ -35,17 +41,26 @@ private theorem continuous_of_right_invariant_on_nhds_one {Γ X : Type*} [Group 
     simpa using this
   exact tendsto_const_nhds.congr' (hev.mono fun x hx => hx.symm)
 
-theorem UpperTheory.V.Ws.Gys.extRep :
-    ∀ {O Γ k : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [Field k] (Φ : Fr O Γ) (a : O →+* k) (l : ℕ) [Fact l.Prime] [CharP k l], (Set.range a).Finite → (∀ i, IsLocallyConstant fun g => a (Φ.χ i g)) → ∀ (w w' : ℤ × ℤ) (J : Type) [Finite J] (y : J → Γ → k), (∀ j, Φ.Coc a w' (y j)) →
-      ∃ (M : Type) (_ : AddCommGroup M) (_ : Module (ZMod (l ^ 1)) M) (_ : Finite M) (_ : TopologicalSpace M) (_ : DiscreteTopology M) (ρ : Representation (ZMod (l ^ 1)) Γ M)
-        (p : M →+ k) (q : J → M →+ k) (m0 : M), ContAction ρ ∧ (∀ g, (∀ i, a (Φ.χ i g) = 1) → (∀ j, y j g = 0) → ρ g = 1) ∧
-        (∀ g u, p (ρ g u) = a (Φ.rt w g) * p u) ∧ (∀ j g u, q j (ρ g u) = a (Φ.rt (w + w') g) * q j u + y j g * a (Φ.rt w g) * p u) ∧
-        m0 ≠ 0 ∧ ∀ u ∈ Submodule.span (ZMod (l ^ 1)) {m0}, u ≠ 0 → p u ≠ 0 := by
+theorem UpperTheory.V.Ws.Gys.extRep
+    : ∀ {O Γ k : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [Field k] (Φ : Fr O Γ) (a : O →+* k) (l : ℕ) [Fact l.Prime] [CharP k l],
+      (Set.range a).Finite → (∀ i, IsLocallyConstant fun g => a (Φ.χ i g))
+        → ∀ (w w' : ℤ × ℤ) (J : Type) [Finite J] (y : J → Γ → k),
+          (∀ j, Φ.Coc a w' (y j))
+            → ∃ (M : Type) (_ : AddCommGroup M) (_ : Module (ZMod (l ^ 1)) M) (_ : Finite M)
+                (_ : TopologicalSpace M) (_ : DiscreteTopology M)
+                (ρ : Representation (ZMod (l ^ 1)) Γ M) (p : M →+ k) (q : J → M →+ k) (m0 : M),
+              ContAction ρ ∧ (∀ g, (∀ i, a (Φ.χ i g) = 1) → (∀ j, y j g = 0) → ρ g = 1)
+                ∧ (∀ g u, p (ρ g u) = a (Φ.rt w g) * p u)
+                ∧ (∀ j g u, q j (ρ g u) = a (Φ.rt (w + w') g) * q j u + y j g * a (Φ.rt w g) * p u)
+                ∧ m0 ≠ 0 ∧ ∀ u ∈ Submodule.span (ZMod (l ^ 1)) {m0}, u ≠ 0 → p u ≠ 0 := by
   intro O Γ k _ _ _ _ _ _ Φ a l _ _ ha hχ w w' J _ y hy
   classical
   have hlp : (l ^ 1 : ℕ) = l := pow_one l
-  have hA : ∀ (v : ℤ × ℤ) g, a ↑(Φ.rt v g) =
-      (a ↑(Φ.χ 0 g) * (a ↑(Φ.χ 1 g))⁻¹) ^ v.1 * (a ↑(Φ.χ 0 g) * (a ↑(Φ.χ 2 g))⁻¹) ^ v.2 := by
+  have hA
+      : ∀ (v : ℤ × ℤ) g,
+        a ↑(Φ.rt v g)
+          = (a ↑(Φ.χ 0 g) * (a ↑(Φ.χ 1 g))⁻¹) ^ v.1 * (a ↑(Φ.χ 0 g) * (a ↑(Φ.χ 2 g))⁻¹) ^ v.2 := by
     intro v g
     have e : ∀ u : Oˣ, a ↑u = ((Units.map a.toMonoidHom u : kˣ) : k) := fun u => rfl
     rw [e, e, e, e]
@@ -143,12 +158,35 @@ theorem UpperTheory.V.Ws.Gys.extRep :
       show a ↑(Φ.rt (w + w') g) * (u.2 j : k) + (a ↑(Φ.rt w g) * (u.1 : k)) * y j g = u.2 j
       rw [hr, hr, hyg]
       ring
-  let p : (A × (J → V)) →+ k :=
-    { toFun := fun u => (u.1 : k), map_zero' := rfl, map_add' := fun _ _ => rfl }
-  let q : J → (A × (J → V)) →+ k := fun j =>
-    { toFun := fun u => (u.2 j : k), map_zero' := rfl, map_add' := fun _ _ => rfl }
+  let p : (A × (J → V)) →+ k := {
+    toFun := fun u => (u.1 : k)
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  let q : J → (A × (J → V)) →+ k := fun j => {
+    toFun := fun u => (u.2 j : k)
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let m0 : A × (J → V) := (1, 0)
-  refine ⟨A × (J → V), inferInstance, iM, inferInstance, ⊥, ⟨rfl⟩, ρ, p, q, m0, ?_, fun g hg hyg => LinearMap.ext (hker g hg hyg), ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    A × (J → V),
+    inferInstance,
+    iM,
+    inferInstance,
+    ⊥,
+    ⟨rfl⟩,
+    ρ,
+    p,
+    q,
+    m0,
+    ?_,
+    fun g hg hyg => LinearMap.ext (hker g hg hyg),
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · unfold ReciprocityTheory.Gal.ContAction
     rw [continuous_prod_of_discrete_right]
     intro m

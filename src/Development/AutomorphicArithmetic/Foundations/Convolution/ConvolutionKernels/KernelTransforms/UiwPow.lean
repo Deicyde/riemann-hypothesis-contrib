@@ -8,8 +8,10 @@ public import GroundTheory.AutomorphicForms.CuspidalAdmissible
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
 section Abstract
@@ -29,8 +31,8 @@ private abbrev Cs (J : Subgroup G) (x : G) : Set (G ⧸ J) :=
 
 variable {J B : Subgroup G} {L : Set G} {x y : G}
 
-private theorem rep (hF : Fac J B L) (hx : Dom J B L x) {k : G} (hk : k ∈ J) :
-    ∃ b ∈ J, b ∈ B ∧ (QuotientGroup.mk (k * x) : G ⧸ J) = QuotientGroup.mk (b * x) := by
+private theorem rep (hF : Fac J B L) (hx : Dom J B L x) {k : G} (hk : k ∈ J)
+    : ∃ b ∈ J, b ∈ B ∧ (QuotientGroup.mk (k * x) : G ⧸ J) = QuotientGroup.mk (b * x) := by
   obtain ⟨b, hb, hbB, z, hz, rfl⟩ := hF k hk
   refine ⟨b, hb, hbB, ?_⟩
   rw [QuotientGroup.eq]
@@ -38,20 +40,24 @@ private theorem rep (hF : Fac J B L) (hx : Dom J B L x) {k : G} (hk : k ∈ J) :
   convert this using 1
   group
 
-private theorem swap (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {l : G} (hl : l ∈ J) :
-    ∃ a ∈ J, ∃ c ∈ J, x * l * y = a * (x * y) * c := by
+private theorem swap (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {l : G} (hl : l ∈ J)
+    : ∃ a ∈ J, ∃ c ∈ J, x * l * y = a * (x * y) * c := by
   obtain ⟨b, hb, hbB, z, hz, rfl⟩ := hF l hl
   exact ⟨x * b * x⁻¹, hx.up b hb hbB, y⁻¹ * z * y, hy.low z hz, by group⟩
 
-private theorem out_mk (J : Subgroup G) (g : G) :
-    ∃ j ∈ J, (QuotientGroup.mk g : G ⧸ J).out = g * j := by
+private theorem out_mk (J : Subgroup G) (g : G)
+    : ∃ j ∈ J, (QuotientGroup.mk g : G ⧸ J).out = g * j := by
   refine ⟨g⁻¹ * (QuotientGroup.mk g : G ⧸ J).out, ?_, by group⟩
   exact QuotientGroup.eq.1 (QuotientGroup.out_eq' _).symm
 
-private theorem cos_key (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {c d : G ⧸ J}
-    (hc : c ∈ Cs J x) (hd : d ∈ Cs J y) :
-    ∃ b ∈ J, b ∈ B ∧ ∃ m ∈ J, m ∈ B ∧ c = QuotientGroup.mk (b * x) ∧
-      (QuotientGroup.mk (c.out * d.out) : G ⧸ J) = QuotientGroup.mk (b * x * (m * y)) := by
+private theorem cos_key
+    (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y)
+    {c d : G ⧸ J} (hc : c ∈ Cs J x) (hd : d ∈ Cs J y)
+    : ∃ b ∈ J,
+      b ∈ B
+        ∧ ∃ m ∈ J,
+          m ∈ B ∧ c = QuotientGroup.mk (b * x)
+            ∧ (QuotientGroup.mk (c.out * d.out) : G ⧸ J) = QuotientGroup.mk (b * x * (m * y)) := by
   obtain ⟨k, hk, rfl⟩ := hc
   obtain ⟨l, hl, rfl⟩ := hd
   obtain ⟨b, hb, hbB, e⟩ := rep hF hx hk
@@ -65,13 +71,15 @@ private theorem cos_key (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {
   convert this using 1
   group
 
-private theorem cos_inj (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {c c' d d' : G ⧸ J}
-    (hc : c ∈ Cs J x) (hc' : c' ∈ Cs J x) (hd : d ∈ Cs J y) (hd' : d' ∈ Cs J y)
-    (h : (QuotientGroup.mk (c.out * d.out) : G ⧸ J) = QuotientGroup.mk (c'.out * d'.out)) :
-    c = c' ∧ d = d' := by
+private theorem cos_inj
+    (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y)
+    {c c' d d' : G ⧸ J} (hc : c ∈ Cs J x) (hc' : c' ∈ Cs J x) (hd : d ∈ Cs J y) (hd' : d' ∈ Cs J y)
+    (h : (QuotientGroup.mk (c.out * d.out) : G ⧸ J) = QuotientGroup.mk (c'.out * d'.out))
+    : c = c' ∧ d = d' := by
   obtain ⟨b, hb, hbB, m, hm, hmB, ec, e⟩ := cos_key hF hx hy hc hd
   obtain ⟨b', hb', hbB', m', hm', hmB', ec', e'⟩ := cos_key hF hx hy hc' hd'
-  have h2 : (QuotientGroup.mk (b * x * (m * y)) : G ⧸ J) = QuotientGroup.mk (b' * x * (m' * y)) := by
+  have h2
+      : (QuotientGroup.mk (b * x * (m * y)) : G ⧸ J) = QuotientGroup.mk (b' * x * (m' * y)) := by
     rw [← e, ← e', h]
   have ht := QuotientGroup.eq.1 h2
   have htB : (b * x * (m * y))⁻¹ * (b' * x * (m' * y)) ∈ B :=
@@ -91,8 +99,8 @@ private theorem cos_inj (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) {
   rw [← QuotientGroup.out_eq' d, ← QuotientGroup.out_eq' d']
   exact QuotientGroup.eq.2 h4
 
-private theorem cos_rng (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) (g : G ⧸ J) :
-    (∃ c ∈ Cs J x, ∃ d ∈ Cs J y, g = QuotientGroup.mk (c.out * d.out)) ↔ g ∈ Cs J (x * y) := by
+private theorem cos_rng (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) (g : G ⧸ J)
+    : (∃ c ∈ Cs J x, ∃ d ∈ Cs J y, g = QuotientGroup.mk (c.out * d.out)) ↔ g ∈ Cs J (x * y) := by
   constructor
   · rintro ⟨c, ⟨k, hk, rfl⟩, d, ⟨l, hl, rfl⟩, rfl⟩
     obtain ⟨j, hj, ej⟩ := out_mk J (k * x)
@@ -101,7 +109,9 @@ private theorem cos_rng (hF : Fac J B L) (hx : Dom J B L x) (hy : Dom J B L y) (
     refine ⟨k * a, J.mul_mem hk ha, ?_⟩
     rw [ej, ei, QuotientGroup.eq]
     have hmul : k * x * j * (l * y * i) = k * a * (x * y) * (e * i) := by
-      calc k * x * j * (l * y * i) = k * (x * (j * l) * y) * i := by group
+      calc
+        k * x * j * (l * y * i)
+          = k * (x * (j * l) * y) * i := by group
         _ = k * a * (x * y) * (e * i) := by rw [hs]; group
     rw [hmul]
     have := J.inv_mem (J.mul_mem he hi)
@@ -121,20 +131,24 @@ section Conc
 
 open Parabolic Cartan Iwasawa GLnLocal ValuativeRel
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-private theorem conj_mem (c : Fin n → ℤ) {g : GL (Fin n) F} (hg : g ∈ iwahori F n)
-    (h : ∀ i j, i ≠ j → g i j ≠ 0 → c j ≤ c i) :
-    Cartan.diagPow F n c * g * (Cartan.diagPow F n c)⁻¹ ∈ iwahori F n := by
+private theorem conj_mem
+    (c : Fin n → ℤ)
+    {g : GL (Fin n) F} (hg : g ∈ iwahori F n) (h : ∀ i j, i ≠ j → g i j ≠ 0 → c j ≤ c i)
+    : Cartan.diagPow F n c * g * (Cartan.diagPow F n c)⁻¹ ∈ iwahori F n := by
   obtain ⟨h1, h2, h3⟩ := (mem_iwahori_iff F n).1 hg
-  have hle : ∀ i j, i ≠ j → g i j ≠ 0 →
-      valuation F ((uniformizer F : F) ^ (c i - c j) * g i j) ≤ valuation F (g i j) := by
+  have hle
+      : ∀ i j,
+        i ≠ j → g i j ≠ 0
+          → valuation F ((uniformizer F : F) ^ (c i - c j) * g i j) ≤ valuation F (g i j) := by
     intro i j e z
     obtain ⟨m, hm⟩ := Int.eq_ofNat_of_zero_le (sub_nonneg.mpr (h i j e z))
     rw [hm, zpow_natCast, map_mul, map_pow]
-    simpa using mul_le_mul' (pow_le_one' (valuation_uniformizer_lt_one F).le m)
-      (le_refl (valuation F (g i j)))
+    simpa using
+      mul_le_mul' (pow_le_one' (valuation_uniformizer_lt_one F).le m)
+        (le_refl (valuation F (g i j)))
   rw [mem_iwahori_iff F n]
   refine ⟨fun i j => ?_, fun i j hij => ?_, fun i => ?_⟩
   · rw [diagPow_conj_apply]
@@ -151,22 +165,29 @@ private theorem conj_mem (c : Fin n → ℤ) {g : GL (Fin n) F} (hg : g ∈ iwah
   · rw [diagPow_conj_apply]
     simp [h3]
 
-private noncomputable abbrev Lw (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] (n : ℕ) : Set (GL (Fin n) F) :=
+private noncomputable abbrev Lw
+    (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    (n : ℕ)
+    : Set (GL (Fin n) F) :=
   ((iwahori F n ⊓ oppositeUnipotentRadical F n (id : Fin n → Fin n) : Subgroup _) : Set _)
 
-private theorem iw_fac :
-    Fac (iwahori F n) (blockUpper F n (id : Fin n → Fin n)) (Lw F n) := by
+private theorem iw_fac : Fac (iwahori F n) (blockUpper F n (id : Fin n → Fin n)) (Lw F n) := by
   intro k hk
-  obtain ⟨x, hx, y, hy, z, hz, rfl⟩ := iwahori_iwahoriFactorization' (F := F) (n := n)
-    (β := (id : Fin n → Fin n)) monotone_id k hk
+  obtain ⟨x, hx, y, hy, z, hz, rfl⟩ :=
+    iwahori_iwahoriFactorization' (F := F) (n := n) (β := (id : Fin n → Fin n)) monotone_id k hk
   obtain ⟨hxI, hxN⟩ := Subgroup.mem_inf.1 hx
   obtain ⟨hyI, hyM⟩ := Subgroup.mem_inf.1 hy
-  exact ⟨x * y, Subgroup.mul_mem _ hxI hyI,
-    Subgroup.mul_mem _ (unipotentRadical_le_blockUpper hxN) (levi_le_blockUpper hyM), z, hz, rfl⟩
+  exact ⟨
+    x * y,
+    Subgroup.mul_mem _ hxI hyI,
+    Subgroup.mul_mem _ (unipotentRadical_le_blockUpper hxN) (levi_le_blockUpper hyM),
+    z,
+    hz,
+    rfl
+  ⟩
 
-private theorem iw_dom {ν : Fin n → ℤ} (hν : Antitone ν) :
-    Dom (iwahori F n) (blockUpper F n (id : Fin n → Fin n)) (Lw F n) (Cartan.diagPow F n ν) := by
+private theorem iw_dom {ν : Fin n → ℤ} (hν : Antitone ν)
+    : Dom (iwahori F n) (blockUpper F n (id : Fin n → Fin n)) (Lw F n) (Cartan.diagPow F n ν) := by
   refine ⟨levi_le_blockUpper (diagPow_mem_levi ν), fun b hb hbB => ?_, fun z hz => ?_⟩
   · refine conj_mem ν hb fun i j e nz => hν ?_
     by_contra hlt
@@ -183,19 +204,24 @@ end Conc
 
 section Op
 
-variable {K : Type} [Field K] [NumberField K] {n : ℕ} (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {n : ℕ} (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
   (w : Pl K)
 
-private theorem hop_mul (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
+private theorem hop_mul
+    (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
     (hO : IsOpen (J : Set (GL (Fin n) (w.adicCompletion K))))
     (hC : IsCompact (J : Set (GL (Fin n) (w.adicCompletion K))))
     (x y : GL (Fin n) (w.adicCompletion K))
-    (hinj : ∀ c c' d d' : GL (Fin n) (w.adicCompletion K) ⧸ J, c ∈ Cs J x → c' ∈ Cs J x → d ∈ Cs J y →
-      d' ∈ Cs J y → (QuotientGroup.mk (c.out * d.out) : GL (Fin n) (w.adicCompletion K) ⧸ J) =
-        QuotientGroup.mk (c'.out * d'.out) → c = c' ∧ d = d')
+    (hinj : ∀ c c' d d' : GL (Fin n) (w.adicCompletion K) ⧸ J,
+      c ∈ Cs J x → c' ∈ Cs J x → d ∈ Cs J y → d' ∈ Cs J y
+        → (QuotientGroup.mk (c.out * d.out) : GL (Fin n) (w.adicCompletion K) ⧸ J)
+          = QuotientGroup.mk (c'.out * d'.out)
+        → c = c' ∧ d = d')
     (hrng : ∀ g : GL (Fin n) (w.adicCompletion K) ⧸ J,
-      (∃ c ∈ Cs J x, ∃ d ∈ Cs J y, g = QuotientGroup.mk (c.out * d.out)) ↔ g ∈ Cs J (x * y)) :
-    Hop μ w J x ∘L Hop μ w J y = Hop μ w J (x * y) := by
+      (∃ c ∈ Cs J x, ∃ d ∈ Cs J y, g = QuotientGroup.mk (c.out * d.out)) ↔ g ∈ Cs J (x * y))
+    : Hop μ w J x ∘L Hop μ w J y = Hop μ w J (x * y) := by
   classical
   obtain ⟨fx, -, -, sx, -, -⟩ := UpperTheory.ConvolutionTheory.Tf.hopBasic K n μ w J x hO hC
   obtain ⟨fy, my, py, sy, -, -⟩ := UpperTheory.ConvolutionTheory.Tf.hopBasic K n μ w J y hO hC
@@ -206,12 +232,15 @@ private theorem hop_mul (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
   let : Fintype (Cs J y) := fy.fintype
   have rmul : ∀ g h, rhoL μ w (g * h) = rhoL μ w g ∘L rhoL μ w h := fun g h => by
     simp only [rhoL, map_mul, hmul]
-  have single : ∀ (z : GL (Fin n) (w.adicCompletion K)) (T : LL μ →L[ℂ] LL μ),
-      (∀ (ι : Type) [Fintype ι] (f : ι → GL (Fin n) (w.adicCompletion K)),
-        Function.Injective (fun i => (QuotientGroup.mk (f i) : GL (Fin n) (w.adicCompletion K) ⧸ J)) →
-        Set.range (fun i => (QuotientGroup.mk (f i) : GL (Fin n) (w.adicCompletion K) ⧸ J)) = Cs J z →
-        ∀ v ∈ fixL μ w J, T v = ∑ i, rhoL μ w (f i) v) →
-      ∀ [Fintype (Cs J z)], ∀ v ∈ fixL μ w J, T v = ∑ d : Cs J z, rhoL μ w d.1.out v := by
+  have single
+      : ∀ (z : GL (Fin n) (w.adicCompletion K)) (T : LL μ →L[ℂ] LL μ),
+        (∀ (ι : Type) [Fintype ι] (f : ι → GL (Fin n) (w.adicCompletion K)),
+            Function.Injective (fun i =>
+                (QuotientGroup.mk (f i) : GL (Fin n) (w.adicCompletion K) ⧸ J))
+              → Set.range (fun i => (QuotientGroup.mk (f i) : GL (Fin n) (w.adicCompletion K) ⧸ J))
+                = Cs J z
+              → ∀ v ∈ fixL μ w J, T v = ∑ i, rhoL μ w (f i) v)
+          → ∀ [Fintype (Cs J z)], ∀ v ∈ fixL μ w J, T v = ∑ d : Cs J z, rhoL μ w d.1.out v := by
     intro z T hT _ v hv
     refine hT (Cs J z) (fun d => d.1.out) (fun a b e => Subtype.ext ?_) ?_ v hv
     · simpa using e
@@ -226,8 +255,10 @@ private theorem hop_mul (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
     exact single y _ sy _ hu
   have e2 : Hop μ w J x (Hop μ w J y v) = ∑ c : Cs J x, rhoL μ w c.1.out (Hop μ w J y v) :=
     single x _ sx _ (my v)
-  have e3 : Hop μ w J (x * y) v = ∑ i : Cs J x × Cs J y,
-      rhoL μ w (i.1.1.out * i.2.1.out) (prj (fixL μ w J) v) := by
+  have e3
+      : Hop μ w J (x * y) v
+        = ∑ i : Cs J x × Cs J y,
+          rhoL μ w (i.1.1.out * i.2.1.out) (prj (fixL μ w J) v) := by
     have := congrArg (fun T : LL μ →L[ℂ] LL μ => T v) pxy
     simp only [ContinuousLinearMap.comp_apply] at this
     rw [← this]
@@ -249,8 +280,8 @@ private theorem hop_mul (J : Subgroup (GL (Fin n) (w.adicCompletion K)))
   refine Finset.sum_congr rfl fun d _ => ?_
   rw [rmul, ContinuousLinearMap.comp_apply]
 
-private theorem uiw_mul (a b : Fin n → ℤ) (ha : Antitone a) (hb : Antitone b) :
-    Uiw μ w a ∘L Uiw μ w b = Uiw μ w (a + b) := by
+private theorem uiw_mul (a b : Fin n → ℤ) (ha : Antitone a) (hb : Antitone b)
+    : Uiw μ w a ∘L Uiw μ w b = Uiw μ w (a + b) := by
   unfold Uiw
   rw [GroundTheory.Automorphic.Parabolic.diagPow_add]
   exact hop_mul μ w _ (GLnLocal.isOpen_iwahori _ n) (GLnLocal.isCompact_iwahori _ n) _ _
@@ -259,11 +290,16 @@ private theorem uiw_mul (a b : Fin n → ℤ) (ha : Antitone a) (hb : Antitone b
 
 end Op
 
-theorem UpperTheory.ConvolutionTheory.Tf.uiwPow :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (w : Pl K) (ν ν' : Fin n → ℤ), Antitone ν → Antitone ν' →
-      Uiw μ w ν ∘L Uiw μ w ν' = Uiw μ w (ν + ν') ∧ (∀ j : ℕ, 0 < j → Uiw μ w ν ^ j = Uiw μ w (j • ν)) ∧
-      IsOpen (GLnLocal.iwahori (w.adicCompletion K) n : Set (GL (Fin n) (w.adicCompletion K))) ∧ IsCompact (GLnLocal.iwahori (w.adicCompletion K) n : Set (GL (Fin n) (w.adicCompletion K))) ∧
-      ∃ C : ℝ, ∀ j : ℕ, ‖Uiw μ w ν ^ j‖ ≤ C ^ j := by
+theorem UpperTheory.ConvolutionTheory.Tf.uiwPow
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n)))
+        [μ.IsHaarMeasure] (w : Pl K) (ν ν' : Fin n → ℤ),
+      Antitone ν → Antitone ν'
+        → Uiw μ w ν ∘L Uiw μ w ν' = Uiw μ w (ν + ν')
+          ∧ (∀ j : ℕ, 0 < j → Uiw μ w ν ^ j = Uiw μ w (j • ν))
+          ∧ IsOpen (GLnLocal.iwahori (w.adicCompletion K) n : Set (GL (Fin n) (w.adicCompletion K)))
+          ∧ IsCompact
+            (GLnLocal.iwahori (w.adicCompletion K) n : Set (GL (Fin n) (w.adicCompletion K)))
+          ∧ ∃ C : ℝ, ∀ j : ℕ, ‖Uiw μ w ν ^ j‖ ≤ C ^ j := by
   intro K _ _ n μ _ w ν ν' hν hν'
   have hanti : ∀ j : ℕ, Antitone (j • ν) := by
     intro j
@@ -274,8 +310,14 @@ theorem UpperTheory.ConvolutionTheory.Tf.uiwPow :
     | succ j ih =>
       rw [succ_nsmul]
       exact ih.add hν
-  refine ⟨uiw_mul μ w ν ν' hν hν', fun j hj => ?_, GLnLocal.isOpen_iwahori _ n,
-    GLnLocal.isCompact_iwahori _ n, ‖Uiw μ w ν‖, fun j => ?_⟩
+  refine ⟨
+    uiw_mul μ w ν ν' hν hν',
+    fun j hj => ?_,
+    GLnLocal.isOpen_iwahori _ n,
+    GLnLocal.isCompact_iwahori _ n,
+    ‖Uiw μ w ν‖,
+    fun j => ?_
+  ⟩
   · induction j, hj using Nat.le_induction with
     | base => simp
     | succ j hj ih =>

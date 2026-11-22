@@ -7,17 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TemperedO
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
 
 namespace GlobalTheory.RowTie
 
 open GlobalTheory.WeilDeligne
 
-theorem tempered_of_rank_le_one (D : D7) (T : WDTie D.nd D.naut) (h1 : RankOneUnitary T)
-    (a : ℕ) (π : D.naut.CG a) (ha : a ≤ 1) (w : PlE D.host) : D.naut.tempered (D.naut.locG π w) := by
+theorem tempered_of_rank_le_one
+    (D : D7) (T : WDTie D.nd D.naut) (h1 : RankOneUnitary T)
+    (a : ℕ) (π : D.naut.CG a) (ha : a ≤ 1)
+    (w : PlE D.host)
+    : D.naut.tempered (D.naut.locG π w) := by
   rw [T.tempered]
   have hd : (T.e w (D.naut.locG π w)).lpDim = a := by rw [T.dim, D.naut.locG_dim]
-  refine GlobalTheory.T.tempered_of_lpDim_le_one_of_unit_eigenvalues _ _ _ _ _ _ (hd.le.trans ha) fun φ hφ α hα => ?_
+  refine GlobalTheory.T.tempered_of_lpDim_le_one_of_unit_eigenvalues _ _ _ _ _ _ (hd.le.trans ha)
+    fun φ hφ α hα => ?_
   rcases Nat.le_one_iff_eq_zero_or_eq_one.mp ha with rfl | rfl
   · have hc := WD.card_eig (T.e w (D.naut.locG π w)) φ
     rw [hd, Multiset.card_eq_zero] at hc
@@ -27,7 +32,12 @@ theorem tempered_of_rank_le_one (D : D7) (T : WDTie D.nd D.naut) (h1 : RankOneUn
     rw [WDTie.eig, WD.inePol_of_mem _ φ.2]
     exact hα
 
-theorem tempered_all_ranks : ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut), GlobalTheory.RowTie.RankOneUnitary T → (∀ (a : ℕ) (π : D.naut.CG a), 2 ≤ a → D.naut.csd π → D.naut.ralg π → ∀ w, D.naut.tempered (D.naut.locG π w)) → GlobalTheory.RowCopy.TempCSD D ∧ GlobalTheory.ThetaExh.Tempered D.nd D.naut := by
+theorem tempered_all_ranks
+    : ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut),
+      GlobalTheory.RowTie.RankOneUnitary T
+        → (∀ (a : ℕ) (π : D.naut.CG a),
+          2 ≤ a → D.naut.csd π → D.naut.ralg π → ∀ w, D.naut.tempered (D.naut.locG π w))
+        → GlobalTheory.RowCopy.TempCSD D ∧ GlobalTheory.ThetaExh.Tempered D.nd D.naut := by
   intro D T h1 h2
   have key : GlobalTheory.ThetaExh.Tempered D.nd D.naut := by
     intro a π hc hr w

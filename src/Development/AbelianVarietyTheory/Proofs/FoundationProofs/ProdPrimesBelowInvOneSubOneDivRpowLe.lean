@@ -8,8 +8,8 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem one_div_succ_rpow_one_add_le_telescope {s x : ℝ} (hs : 0 < s) (hx : 0 < x) :
-    1 / (x + 1) ^ (1 + s) ≤ (1 / x ^ s - 1 / (x + 1) ^ s) / s := by
+theorem one_div_succ_rpow_one_add_le_telescope {s x : ℝ} (hs : 0 < s) (hx : 0 < x)
+    : 1 / (x + 1) ^ (1 + s) ≤ (1 / x ^ s - 1 / (x + 1) ^ s) / s := by
   have hx1 : 0 < x + 1 := by linarith
   have hq : 0 < (x + 1) / x := div_pos hx1 hx
   have h1 : 1 - ((x + 1) / x)⁻¹ ≤ Real.log ((x + 1) / x) := Real.one_sub_inv_le_log_of_pos hq
@@ -33,9 +33,8 @@ theorem one_div_succ_rpow_one_add_le_telescope {s x : ℝ} (hs : 0 < s) (hx : 0 
   have h8 : (1 + s * (1 / (x + 1))) / B = 1 / B + 1 / ((x + 1) * B) * s := by field_simp
   linarith
 
-theorem sum_range_one_div_rpow_one_add_le {s : ℝ} (hs : 0 < s) (k : ℕ) :
-    ∑ n ∈ Finset.range (k + 2), 1 / (n : ℝ) ^ (1 + s)
-      ≤ 1 + (1 - 1 / ((k : ℝ) + 1) ^ s) / s := by
+theorem sum_range_one_div_rpow_one_add_le {s : ℝ} (hs : 0 < s) (k : ℕ)
+    : ∑ n ∈ Finset.range (k + 2), 1 / (n : ℝ) ^ (1 + s) ≤ 1 + (1 - 1 / ((k : ℝ) + 1) ^ s) / s := by
   induction k with
   | zero =>
     have : (1 + s) ≠ 0 := by linarith
@@ -46,36 +45,43 @@ theorem sum_range_one_div_rpow_one_add_le {s : ℝ} (hs : 0 < s) (k : ℕ) :
     have e : ((k + 2 : ℕ) : ℝ) = (k : ℝ) + 1 + 1 := by push_cast; ring
     have e' : ((k + 1 : ℕ) : ℝ) = (k : ℝ) + 1 := by push_cast; ring
     rw [e, e']
-    have : (1 - 1 / ((k : ℝ) + 1 + 1) ^ s) / s = (1 - 1 / ((k : ℝ) + 1) ^ s) / s
-        + (1 / ((k : ℝ) + 1) ^ s - 1 / ((k : ℝ) + 1 + 1) ^ s) / s := by ring
+    have : (1 - 1 / ((k : ℝ) + 1 + 1) ^ s) / s
+        = (1 - 1 / ((k : ℝ) + 1) ^ s) / s
+          + (1 / ((k : ℝ) + 1) ^ s - 1 / ((k : ℝ) + 1 + 1) ^ s) / s := by
+      ring
     linarith
 
-theorem tsum_one_div_rpow_one_add_le {s : ℝ} (hs : 0 < s) :
-    ∑' n : ℕ, 1 / (n : ℝ) ^ (1 + s) ≤ 1 + 1 / s := by
+theorem tsum_one_div_rpow_one_add_le {s : ℝ} (hs : 0 < s)
+    : ∑' n : ℕ, 1 / (n : ℝ) ^ (1 + s) ≤ 1 + 1 / s := by
   refine Real.tsum_le_of_sum_range_le (fun n => by positivity) fun k => ?_
-  calc ∑ n ∈ Finset.range k, 1 / (n : ℝ) ^ (1 + s)
-      ≤ ∑ n ∈ Finset.range (k + 2), 1 / (n : ℝ) ^ (1 + s) :=
-        Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_mono (by omega))
-          (fun n _ _ => by positivity)
+  calc
+    ∑ n ∈ Finset.range k, 1 / (n : ℝ) ^ (1 + s)
+        ≤ ∑ n ∈ Finset.range (k + 2), 1 / (n : ℝ) ^ (1 + s) :=
+      Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_mono (by omega))
+        (fun n _ _ => by positivity)
     _ ≤ 1 + (1 - 1 / ((k : ℝ) + 1) ^ s) / s := sum_range_one_div_rpow_one_add_le hs k
     _ ≤ 1 + 1 / s := by
-        have : 0 ≤ 1 / ((k : ℝ) + 1) ^ s := by positivity
-        gcongr
-        linarith
+      have : 0 ≤ 1 / ((k : ℝ) + 1) ^ s := by positivity
+      gcongr
+      linarith
 
-theorem prod_primesBelow_inv_one_sub_one_div_rpow_le :
-    ∀ (s : ℝ), 0 < s → ∀ N : ℕ, ∏ p ∈ N.primesBelow, (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹ ≤ 1 + 1 / s := by
+theorem prod_primesBelow_inv_one_sub_one_div_rpow_le
+    : ∀ (s : ℝ),
+      0 < s → ∀ N : ℕ, ∏ p ∈ N.primesBelow, (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹ ≤ 1 + 1 / s := by
   intro s hs N
   have hsum : Summable fun n : ℕ => 1 / (n : ℝ) ^ (1 + s) :=
     Real.summable_one_div_nat_rpow.2 (by linarith)
-  have hE := EulerProduct.prod_primesBelow_tsum_eq_tsum_smoothNumbers
-    (f := fun n : ℕ => 1 / (n : ℝ) ^ (1 + s)) (by simp)
-    (fun {m n} _ => by
-      simp only [Nat.cast_mul]
-      rw [Real.mul_rpow (Nat.cast_nonneg _) (Nat.cast_nonneg _), one_div_mul_one_div])
-    hsum.norm N
-  have hP : ∏ p ∈ N.primesBelow, (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹
-      = ∏ p ∈ N.primesBelow, ∑' e : ℕ, 1 / ((p ^ e : ℕ) : ℝ) ^ (1 + s) := by
+  have hE :=
+    EulerProduct.prod_primesBelow_tsum_eq_tsum_smoothNumbers
+      (f := fun n : ℕ => 1 / (n : ℝ) ^ (1 + s))
+      (by simp)
+      (fun {m n} _ => by
+        simp only [Nat.cast_mul]
+        rw [Real.mul_rpow (Nat.cast_nonneg _) (Nat.cast_nonneg _), one_div_mul_one_div])
+      hsum.norm N
+  have hP
+      : ∏ p ∈ N.primesBelow, (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹
+        = ∏ p ∈ N.primesBelow, ∑' e : ℕ, 1 / ((p ^ e : ℕ) : ℝ) ^ (1 + s) := by
     refine Finset.prod_congr rfl fun p hp => ?_
     have hp1 : (1 : ℝ) < p := by exact_mod_cast (Nat.prime_of_mem_primesBelow hp).one_lt
     have hp0 : (0 : ℝ) ≤ p := by linarith

@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -17,8 +20,11 @@ namespace GlobalTheory.FrobTeich
 
 variable {Ω : Type} [Field Ω]
 
-theorem eq_of_pow_eq_self_of_cong (A : ValuationSubring Ω) {N : ℕ} (hN : A.valuation (N : Ω) < 1)
-    {a b : Ω} (ha : a ^ N = a) (hb : b ^ N = b) (hab : A.valuation (a - b) < 1) : a = b := by
+theorem eq_of_pow_eq_self_of_cong
+    (A : ValuationSubring Ω)
+    {N : ℕ} (hN : A.valuation (N : Ω) < 1)
+    {a b : Ω} (ha : a ^ N = a) (hb : b ^ N = b) (hab : A.valuation (a - b) < 1)
+    : a = b := by
   rcases Nat.lt_or_ge N 2 with hN2 | hN2
   · interval_cases N
     · rw [pow_zero] at ha hb; rw [← ha, ← hb]
@@ -50,20 +56,24 @@ theorem eq_of_pow_eq_self_of_cong (A : ValuationSubring Ω) {N : ℕ} (hN : A.va
   rw [geom_sum₂_self] at hdiff
   have hNa : A.valuation ((N : Ω) * a ^ (N - 1)) < 1 := by
     rw [map_mul]
-    exact lt_of_le_of_lt (mul_le_of_le_one_right' (GlobalTheory.WeilDeligne.val_pow_le_one ha1 _)) hN
+    exact lt_of_le_of_lt (mul_le_of_le_one_right' (GlobalTheory.WeilDeligne.val_pow_le_one ha1 _))
+      hN
   have hS' : A.valuation S < 1 := by
     have e : S = (S - (N : Ω) * a ^ (N - 1)) + (N : Ω) * a ^ (N - 1) := by ring
-    rw [e]; exact Valuation.map_add_lt _ hdiff hNa
+    rw [e]
+    exact Valuation.map_add_lt _ hdiff hNa
   rw [hS1, map_one] at hS'
   exact lt_irrefl _ hS'
 
-
 open Polynomial in
-theorem exists_pow_eq_self_cong [IsAlgClosed Ω] (A : ValuationSubring Ω) {N : ℕ} (hN : 2 ≤ N)
-    {x : Ω} (hx : A.valuation (x ^ N - x) < 1) : ∃ ζ : Ω, ζ ^ N = ζ ∧ A.valuation (x - ζ) < 1 := by
+theorem exists_pow_eq_self_cong
+    [IsAlgClosed Ω]
+    (A : ValuationSubring Ω)
+    {N : ℕ} (hN : 2 ≤ N)
+    {x : Ω} (hx : A.valuation (x ^ N - x) < 1)
+    : ∃ ζ : Ω, ζ ^ N = ζ ∧ A.valuation (x - ζ) < 1 := by
   set P : Polynomial Ω := X ^ N - X with hP
-  have hdeg : P.natDegree = N := by
-    rw [hP, natDegree_sub_eq_left_of_natDegree_lt] <;> simp; omega
+  have hdeg : P.natDegree = N := by rw [hP, natDegree_sub_eq_left_of_natDegree_lt] <;> simp; omega
   have hmon : P.Monic := by
     rw [hP]; exact monic_X_pow_sub (by rw [degree_X]; exact_mod_cast (by omega : 1 < N))
   have hsplit : P = (P.roots.map fun a => X - C a).prod :=
@@ -92,8 +102,9 @@ theorem exists_pow_eq_self_cong [IsAlgClosed Ω] (A : ValuationSubring Ω) {N : 
 
 variable {E : Type} [Field E] [NumberField E] [Algebra E Ω]
 
-theorem exists_prime_pow_normV (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
-    (h : IsPlaceOver A w) : ∃ p f : ℕ, p.Prime ∧ 0 < f ∧ normV w = p ^ f ∧ A.valuation (p : Ω) < 1 := by
+theorem exists_prime_pow_normV
+    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+    : ∃ p f : ℕ, p.Prime ∧ 0 < f ∧ normV w = p ^ f ∧ A.valuation (p : Ω) < 1 := by
   haveI : w.asIdeal.IsMaximal := w.isMaximal
   letI : Field (𝓞 E ⧸ w.asIdeal) := Ideal.Quotient.field _
   haveI : Finite (𝓞 E ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ w.ne_bot
@@ -109,24 +120,31 @@ theorem exists_prime_pow_normV (A : ValuationSubring Ω) (w : HeightOneSpectrum 
   · have := (h _).mpr hpw
     simpa using this
 
-theorem exists_pow_char_pow_eq_self {k : Type} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    (P : Polynomial ℤ) (hP : P.map (Int.castRingHom k) ≠ 0) {y : k}
-    (hy : P.eval₂ (Int.castRingHom k) y = 0) : ∃ r : ℕ, 0 < r ∧ y ^ p ^ r = y := by
+theorem exists_pow_char_pow_eq_self
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (P : Polynomial ℤ) (hP : P.map (Int.castRingHom k) ≠ 0)
+    {y : k} (hy : P.eval₂ (Int.castRingHom k) y = 0)
+    : ∃ r : ℕ, 0 < r ∧ y ^ p ^ r = y := by
   have hroot : ∀ i : ℕ, y ^ p ^ i ∈ {z : k | (P.map (Int.castRingHom k)).IsRoot z} := by
     intro i
     show (P.map (Int.castRingHom k)).eval (y ^ p ^ i) = 0
     rw [Polynomial.eval_map, ← iterateFrobenius_def (R := k) p i,
       ← RingHom.ext_int ((iterateFrobenius k p i).comp (Int.castRingHom k)) (Int.castRingHom k),
       ← Polynomial.hom_eval₂, hy, map_zero]
-  obtain ⟨i, j, hij, heq⟩ := (Polynomial.finite_setOf_isRoot hP).exists_lt_map_eq_of_forall_mem hroot
+  obtain ⟨i, j, hij, heq⟩ :=
+    (Polynomial.finite_setOf_isRoot hP).exists_lt_map_eq_of_forall_mem hroot
   refine ⟨j - i, by omega, ?_⟩
   apply (iterateFrobenius k p i).injective
   rw [iterateFrobenius_def, iterateFrobenius_def, ← pow_mul, ← pow_add, Nat.sub_add_cancel hij.le]
   exact heq.symm
 
-theorem exists_pow_prime_pow_cong [CharZero Ω] (A : ValuationSubring Ω) {x : Ω}
-    (halg : IsAlgebraic ℤ x) (hx : A.valuation x ≤ 1) {p : ℕ} (hp : p.Prime)
-    (hpA : A.valuation (p : Ω) < 1) : ∃ r : ℕ, 0 < r ∧ A.valuation (x ^ p ^ r - x) < 1 := by
+theorem exists_pow_prime_pow_cong
+    [CharZero Ω]
+    (A : ValuationSubring Ω)
+    {x : Ω} (halg : IsAlgebraic ℤ x) (hx : A.valuation x ≤ 1)
+    {p : ℕ} (hp : p.Prime) (hpA : A.valuation (p : Ω) < 1)
+    : ∃ r : ℕ, 0 < r ∧ A.valuation (x ^ p ^ r - x) < 1 := by
   obtain ⟨P, hP0, hPx⟩ := halg
   set Q := P.primPart with hQ
   have hQprim : Q.IsPrimitive := P.isPrimitive_primPart
@@ -161,7 +179,8 @@ theorem exists_pow_prime_pow_cong [CharZero Ω] (A : ValuationSubring Ω) {x : �
     have e := Polynomial.hom_eval₂ Q (Int.castRingHom A) A.subtype y
     rw [RingHom.ext_int (A.subtype.comp (Int.castRingHom A)) (algebraMap ℤ Ω)] at e
     change A.subtype _ = A.subtype 0
-    rw [e, map_zero]; exact hQx
+    rw [e, map_zero]
+    exact hQx
   have hyk : Q.eval₂ (Int.castRingHom k) (IsLocalRing.residue A y) = 0 := by
     rw [← RingHom.ext_int ((IsLocalRing.residue A).comp (Int.castRingHom A)) (Int.castRingHom k),
       ← Polynomial.hom_eval₂, hyA, map_zero]
@@ -172,9 +191,11 @@ theorem exists_pow_prime_pow_cong [CharZero Ω] (A : ValuationSubring Ω) {x : �
   have := (A.valuation_lt_one_iff _).mp hmem
   simpa [hy_def] using this
 
-theorem exists_pow_normV_pow_cong [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
-    (h : IsPlaceOver A w) {x : Ω} (hx : A.valuation x ≤ 1) :
-    ∃ m : ℕ, 0 < m ∧ A.valuation (x ^ normV w ^ m - x) < 1 := by
+theorem exists_pow_normV_pow_cong
+    [IsAlgClosure E Ω]
+    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+    {x : Ω} (hx : A.valuation x ≤ 1)
+    : ∃ m : ℕ, 0 < m ∧ A.valuation (x ^ normV w ^ m - x) < 1 := by
   obtain ⟨p, f, hp, hf, hq, hpA⟩ := exists_prime_pow_normV A w h
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   haveI : Algebra.IsAlgebraic E Ω := IsAlgClosure.isAlgebraic
@@ -188,16 +209,24 @@ theorem exists_pow_normV_pow_cong [IsAlgClosure E Ω] (A : ValuationSubring Ω) 
     induction j with
     | zero => simp
     | succ j ih =>
-      have h1 := GlobalTheory.WeilDeligne.cong_pow (GlobalTheory.WeilDeligne.val_pow_le_one hx _) hx ih (p ^ r)
+      have h1 :=
+        GlobalTheory.WeilDeligne.cong_pow (GlobalTheory.WeilDeligne.val_pow_le_one hx _) hx ih
+          (p ^ r)
       rw [← pow_mul, ← pow_succ] at h1
       exact GlobalTheory.WeilDeligne.cong_trans h1 hxr
   have e : normV w ^ r = (p ^ r) ^ f := by rw [hq, ← pow_mul, ← pow_mul, mul_comm]
-  rw [e]; exact key f
+  rw [e]
+  exact key f
 
 end GlobalTheory.FrobTeich
 
 open GlobalTheory.FrobTeich in
-theorem GlobalTheory.FrobTeich.isFrob_iff_teichmuller : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (σ : G E Ω), IsFrob (F := E) A (normV w) σ ↔ σ ∈ Dec (F := E) A ∧ ∀ (ζ : Ω) (m : ℕ), 0 < m → ζ ^ normV w ^ m = ζ → σ ζ = ζ ^ normV w := by
+theorem GlobalTheory.FrobTeich.isFrob_iff_teichmuller
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (σ : G E Ω),
+      IsFrob (F := E) A (normV w) σ
+        ↔ σ ∈ Dec (F := E) A
+          ∧ ∀ (ζ : Ω) (m : ℕ), 0 < m → ζ ^ normV w ^ m = ζ → σ ζ = ζ ^ normV w := by
   intro E Ω _ _ _ _ _ A w h σ
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   obtain ⟨p, f, hp, hf, hq, hpA⟩ := exists_prime_pow_normV A w h
@@ -223,15 +252,13 @@ theorem GlobalTheory.FrobTeich.isFrob_iff_teichmuller : ∀ (E Ω : Type) [Field
   · rintro ⟨hD, hT⟩
     refine ⟨hD, fun x hx => ?_⟩
     obtain ⟨m, hm, hxm⟩ := exists_pow_normV_pow_cong A w h hx
-    obtain ⟨ζ, hζ, hxζ⟩ := exists_pow_eq_self_cong A
-      (le_trans hq2 (Nat.le_self_pow hm.ne' q)) hxm
+    obtain ⟨ζ, hζ, hxζ⟩ := exists_pow_eq_self_cong A (le_trans hq2 (Nat.le_self_pow hm.ne' q)) hxm
     have hσζ := hT ζ m hm hζ
     have hζ1 : A.valuation ζ ≤ 1 := by
       have e : ζ = x - (x - ζ) := by ring
       rw [e]
       exact le_trans (Valuation.map_sub _ _ _) (max_le hx hxζ.le)
-    have e : σ x - x ^ q = σ (x - ζ) + (ζ ^ q - x ^ q) := by
-      rw [map_sub, hσζ]; ring
+    have e : σ x - x ^ q = σ (x - ζ) + (ζ ^ q - x ^ q) := by rw [map_sub, hσζ]; ring
     rw [e]
     refine Valuation.map_add_lt _ ((valuation_apply_lt_one_iff hD _).mpr hxζ) ?_
     exact GlobalTheory.WeilDeligne.cong_pow hζ1 hx (GlobalTheory.WeilDeligne.cong_symm hxζ) q

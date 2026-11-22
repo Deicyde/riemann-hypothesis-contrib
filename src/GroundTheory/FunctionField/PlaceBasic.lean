@@ -22,22 +22,23 @@ theorem mem_ring_of_isIntegral (v : Place k K) {x : K} (hx : IsIntegral k x) : x
 theorem mem_ring_of_isAlgebraic (v : Place k K) {x : K} (hx : IsAlgebraic k x) : x ∈ v.ring :=
   v.mem_ring_of_isIntegral hx.isIntegral
 
-theorem valuation_eq_one_of_isAlgebraic (v : Place k K) {x : K} (hx : IsAlgebraic k x)
-    (hx0 : x ≠ 0) : v.ring.valuation x = 1 := by
+theorem valuation_eq_one_of_isAlgebraic (v : Place k K) {x : K} (hx : IsAlgebraic k x) (hx0 : x ≠ 0)
+    : v.ring.valuation x = 1 := by
   have h1 := (v.ring.valuation_le_one_iff x).2 (v.mem_ring_of_isAlgebraic hx)
-  have h2 := (v.ring.valuation_le_one_iff x⁻¹).2
-    (v.mem_ring_of_isAlgebraic (IsAlgebraic.inv_iff.2 hx))
+  have h2 :=
+    (v.ring.valuation_le_one_iff x⁻¹).2 (v.mem_ring_of_isAlgebraic (IsAlgebraic.inv_iff.2 hx))
   rw [map_inv₀, inv_le_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hx0))] at h2
   exact le_antisymm h1 h2
 
-theorem ord_eq_zero_of_isAlgebraic [IsFunctionField k K] (v : Place k K) {x : K}
-    (hx : IsAlgebraic k x) (hx0 : x ≠ 0) : v.ord x = 0 := by
+theorem ord_eq_zero_of_isAlgebraic
+    [IsFunctionField k K] (v : Place k K) {x : K} (hx : IsAlgebraic k x) (hx0 : x ≠ 0)
+    : v.ord x = 0 := by
   have h := v.valuation_eq_one_of_isAlgebraic hx hx0
   rw [← v.valuation_isEquiv.eq_one_iff_eq_one] at h
   rw [ord, h, WithZero.log_one, neg_zero]
 
-theorem exists_valuation_lt_one_of_transcendental {x : K} (hx : Transcendental k x) :
-    ∃ v : Place k K, v.ring.valuation x < 1 := by
+theorem exists_valuation_lt_one_of_transcendental {x : K} (hx : Transcendental k x)
+    : ∃ v : Place k K, v.ring.valuation x < 1 := by
   let A : Subring K := (Algebra.adjoin k {x}).toSubring
   have hxA : x ∈ A := Algebra.self_mem_adjoin_singleton k x
   let I : Ideal A := Ideal.span {⟨x, hxA⟩}
@@ -66,8 +67,8 @@ theorem exists_valuation_lt_one_of_transcendental {x : K} (hx : Transcendental k
   · intro c
     exact hAB (Subalgebra.algebraMap_mem (Algebra.adjoin k {x}) c)
 
-theorem exists_not_mem_of_transcendental {x : K} (hx : Transcendental k x) :
-    ∃ v : Place k K, x ∉ v.ring := by
+theorem exists_not_mem_of_transcendental {x : K} (hx : Transcendental k x)
+    : ∃ v : Place k K, x ∉ v.ring := by
   have hx' : Transcendental k x⁻¹ := fun h => hx (by simpa using IsAlgebraic.inv_iff.2 h)
   obtain ⟨v, hv⟩ := exists_valuation_lt_one_of_transcendental hx'
   refine ⟨v, fun hmem => ?_⟩

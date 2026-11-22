@@ -19,7 +19,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 @[expose] public section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory
-open Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.LocLanglands
+open Formalism.UG GlobalTheory.PRep GlobalTheory.LFun GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -27,17 +28,21 @@ noncomputable section
 
 namespace GlobalTheory.WhitTorus
 
-theorem eq_zero_of_not_antitone_int (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+theorem eq_zero_of_not_antitone_int
+    (E : Type) [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E))
+    (n : ℕ)
     (ψ : AddChar (w.adicCompletion E) ℂ)
     (hψ : ∀ x : w.adicCompletion E, (∀ y ∈ Ov E w, ψ (x * y) = 1) ↔ x ∈ Ov E w)
     (W : GL (Fin n) (w.adicCompletion E) → ℂ)
     (hWN : ∀ u ∈ unipB (w.adicCompletion E) (Fin n), ∀ g, W (u * g) = ψ (superDiag u) * W g)
     (hWK : ∀ g, ∀ k ∈ KGL w (n := n), W (g * k) = W g)
-    (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifV E w (ϖ : w.adicCompletion E)) (l : Fin n → ℤ) (hl : ¬ Antitone l)
+    (ϖ : (w.adicCompletion E)ˣ) (hϖ : IsUnifV E w (ϖ : w.adicCompletion E))
+    (l : Fin n → ℤ) (hl : ¬ Antitone l)
     (D : GL (Fin n) (w.adicCompletion E))
-    (hDv : (D : Matrix (Fin n) (Fin n) (w.adicCompletion E)) =
-      Matrix.diagonal fun a => ((ϖ ^ l a : (w.adicCompletion E)ˣ) : w.adicCompletion E)) :
-    W D = 0 := by
+    (hDv : (D : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+      = Matrix.diagonal fun a => ((ϖ ^ l a : (w.adicCompletion E)ˣ) : w.adicCompletion E))
+    : W D = 0 := by
   obtain ⟨i, j, hij, hlt⟩ : ∃ i j : Fin n, (j : ℕ) = i + 1 ∧ l i < l j := by
     by_contra h
     push_neg at h
@@ -64,25 +69,38 @@ theorem eq_zero_of_not_antitone_int (E : Type) [Field E] [NumberField E] (w : He
   set m : ℕ := (l j - l i).toNat with hm
   have hlj : l j = l i + (m : ℤ) := by omega
   have hm1 : 1 ≤ m := by omega
-  have hdj : ((ϖ ^ l j : (w.adicCompletion E)ˣ) : w.adicCompletion E) =
-      ((ϖ ^ l i : (w.adicCompletion E)ˣ) : w.adicCompletion E) * (ϖ : w.adicCompletion E) ^ m := by
+  have hdj
+      : ((ϖ ^ l j : (w.adicCompletion E)ˣ) : w.adicCompletion E)
+        = ((ϖ ^ l i : (w.adicCompletion E)ˣ) : w.adicCompletion E)
+          * (ϖ : w.adicCompletion E) ^ m := by
     rw [hlj, _root_.zpow_add, zpow_natCast, Units.val_mul, Units.val_pow_eq_pow_val]
   set c : w.adicCompletion E := (ϖ : w.adicCompletion E) ^ m * x with hc
   have hcO : c ∈ Ov E w := by
     have hϖO : (ϖ : w.adicCompletion E) ∈ Ov E w := mem_Ov_of_isUnifV hϖ
     have : c = (ϖ : w.adicCompletion E) ^ (m - 1) * y := by
-      rw [hc, hx, ← mul_assoc, show m = (m - 1) + 1 by omega, pow_succ, mul_assoc _ (ϖ : w.adicCompletion E),
-        mul_inv_cancel₀ hϖ0, mul_one, Nat.add_sub_cancel]
+      rw [hc, hx, ← mul_assoc, show m = (m - 1) + 1 by omega, pow_succ,
+        mul_assoc _ (ϖ : w.adicCompletion E), mul_inv_cancel₀ hϖ0, mul_one, Nat.add_sub_cancel]
     rw [this]
     exact Subring.mul_mem _ (Subring.pow_mem _ hϖO _) hy
-  let T : w.adicCompletion E → GL (Fin n) (w.adicCompletion E) := fun a =>
-    ⟨Matrix.transvection i j a, Matrix.transvection i j (-a),
-      by rw [Matrix.transvection_mul_transvection_same i j hne, add_neg_cancel, Matrix.transvection_zero],
-      by rw [Matrix.transvection_mul_transvection_same i j hne, neg_add_cancel, Matrix.transvection_zero]⟩
-  have hT : ∀ a, ((T a : GL (Fin n) (w.adicCompletion E)) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) =
-      Matrix.transvection i j a := fun a => rfl
-  have hentry : ∀ {R : Type} [CommRing R] (a : R) (p q : Fin n), Matrix.transvection i j a p q =
-      (if p = q then 1 else 0) + (if i = p ∧ j = q then a else 0) := by
+  let T : w.adicCompletion E → GL (Fin n) (w.adicCompletion E) := fun a => ⟨
+    Matrix.transvection i j a,
+    Matrix.transvection i j (-a),
+    by
+      rw [Matrix.transvection_mul_transvection_same i j hne, add_neg_cancel,
+        Matrix.transvection_zero],
+    by
+      rw [Matrix.transvection_mul_transvection_same i j hne, neg_add_cancel,
+        Matrix.transvection_zero]
+  ⟩
+  have hT
+      : ∀ a,
+        ((T a : GL (Fin n) (w.adicCompletion E)) : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+          = Matrix.transvection i j a := fun a =>
+    rfl
+  have hentry
+      : ∀ {R : Type} [CommRing R] (a : R) (p q : Fin n),
+        Matrix.transvection i j a p q
+          = (if p = q then 1 else 0) + (if i = p ∧ j = q then a else 0) := by
     intro R _ a p q
     simp [Matrix.transvection, Matrix.one_apply, Matrix.single_apply]
   have hu : T x ∈ unipB (w.adicCompletion E) (Fin n) := by
@@ -100,23 +118,35 @@ theorem eq_zero_of_not_antitone_int (E : Type) [Field E] [NumberField E] (w : He
       · rw [hT, hentry, if_neg hne, if_pos ⟨rfl, rfl⟩, zero_add]
       · intro b hb hbj
         have hb' := (Finset.mem_filter.1 hb).2
-        rw [hT, hentry, if_neg (fun h => by rw [← h] at hb'; omega), if_neg (fun h => hbj h.2.symm), add_zero]
+        rw [hT, hentry, if_neg (fun h => by rw [← h] at hb'; omega), if_neg (fun h => hbj h.2.symm),
+          add_zero]
       · intro hj
         exact absurd (Finset.mem_filter.2 ⟨Finset.mem_univ j, hij⟩) hj
     · intro a _ hai
       refine Finset.sum_eq_zero fun b hb => ?_
       have hb' := (Finset.mem_filter.1 hb).2
-      rw [hT, hentry, if_neg (fun h => by rw [← h] at hb'; omega), if_neg (fun h => hai h.1.symm), add_zero]
+      rw [hT, hentry, if_neg (fun h => by rw [← h] at hb'; omega), if_neg (fun h => hai h.1.symm),
+        add_zero]
     · intro h
       exact absurd (Finset.mem_univ i) h
   have hk : T c ∈ KGL w (n := n) := by
-    refine ⟨⟨Matrix.transvection i j ⟨c, hcO⟩, Matrix.transvection i j (-⟨c, hcO⟩),
-      by rw [Matrix.transvection_mul_transvection_same i j hne, add_neg_cancel, Matrix.transvection_zero],
-      by rw [Matrix.transvection_mul_transvection_same i j hne, neg_add_cancel, Matrix.transvection_zero]⟩, ?_⟩
+    refine ⟨
+      ⟨
+        Matrix.transvection i j ⟨c, hcO⟩,
+        Matrix.transvection i j (-⟨c, hcO⟩),
+        by
+          rw [Matrix.transvection_mul_transvection_same i j hne, add_neg_cancel,
+            Matrix.transvection_zero],
+        by
+          rw [Matrix.transvection_mul_transvection_same i j hne, neg_add_cancel,
+            Matrix.transvection_zero]
+      ⟩,
+      ?_
+    ⟩
     apply Units.ext
     ext p q
-    simp only [Formalism.UG.bc, Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe, RingHom.mapMatrix_apply,
-      Matrix.map_apply, hT]
+    simp only [Formalism.UG.bc, Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe,
+      RingHom.mapMatrix_apply, Matrix.map_apply, hT]
     rw [hentry, hentry]
     split_ifs <;> simp
   have hkey : D * T c = T x * D := by

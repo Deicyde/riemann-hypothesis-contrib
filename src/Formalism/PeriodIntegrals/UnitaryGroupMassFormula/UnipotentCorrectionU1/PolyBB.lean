@@ -11,7 +11,8 @@ noncomputable section
 
 namespace PI.UnitaryCorollaryDerivatives
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.U Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -108,14 +109,22 @@ lemma pb_clm (Λ : B.Mat k r →L[ℝ] ℂ) (hΛ : ∀ g, ‖Λ g‖ ≤ 1 * ‖
       exact mul_le_mul (pow_le_pow_right₀ hK1 hn) (pb_sup_le_gN g) (norm_nonneg _) (by positivity)
 
 def pbCo (a b : Fin (2 * r + k + 1)) : B.Mat k r →L[ℝ] ℂ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun g => g a b, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => by simp }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun g => g a b
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => by simp
+  }
 
 def pbCc (a b : Fin (2 * r + k + 1)) : B.Mat k r →L[ℝ] ℂ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun g => star (g a b), map_add' := fun _ _ => by simp, map_smul' := fun _ _ => by simp }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun g => star (g a b)
+    map_add' := fun _ _ => by simp
+    map_smul' := fun _ _ => by simp
+  }
 
-def pbVar (g : B.Mat k r) : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) → ℂ :=
+def pbVar (g : B.Mat k r)
+    : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1))
+      → ℂ :=
   Sum.elim (fun x => g x.1 x.2) (fun x => star (g x.1 x.2))
 
 lemma pb_var (i : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1))) :
@@ -191,7 +200,9 @@ theorem pb_poly {κ : ℕ} {P : B.Mat k r → ℂ} (hP : IsPolyDeg κ P) : PG (�
   rw [hfun]
   refine pb_sum q.support (fun d g => q.coeff d * ∏ i ∈ d.support, pbVar g i ^ d i) (fun d hd => ?_)
   have h1 : PG (∑ i ∈ d.support, ((d i : ℕ) : ℝ) * 1) (fun g => ∏ i ∈ d.support, pbVar g i ^ d i) :=
-    pb_prod d.support (fun i => ((d i : ℕ) : ℝ) * 1) (fun i g => pbVar g i ^ d i)
+    pb_prod d.support
+      (fun i => ((d i : ℕ) : ℝ) * 1)
+      (fun i g => pbVar g i ^ d i)
       (fun i _ => pb_pow (pb_var i) (d i))
   have h0 : PG 0 (fun _ : B.Mat k r => q.coeff d) := pb_const _
   have h2 := pb_mul h0 h1

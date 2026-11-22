@@ -16,8 +16,8 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 open scoped ContDiff
 
-theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitChart.Statement) :
-    ProjSmoothAlong.Statement := by
+theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitChart.Statement)
+    : ProjSmoothAlong.Statement := by
   intro II Ψ hΨ K hK ι hι Ω hΩ hQΩ E hE1 hE2 D M g hg z₀ hz₀
   set S := mcPts (mCoordIdeal D.y) with hS
   set x₀ := M.proj z₀ with hx₀
@@ -61,8 +61,7 @@ theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitC
     (LinearEquiv.ofInjectiveEndo (fderiv ℂ f u₀ : (Fin D.n → ℂ) →ₗ[ℂ] (Fin D.n → ℂ)) hDinj).toContinuousLinearEquiv
     with hLc
   have hFD : HasFDerivAt f (Lc : (Fin D.n → ℂ) →L[ℂ] (Fin D.n → ℂ)) u₀ := by
-    have hcoe : (Lc : (Fin D.n → ℂ) →L[ℂ] (Fin D.n → ℂ)) = fderiv ℂ f u₀ := by
-      ext v; rfl
+    have hcoe : (Lc : (Fin D.n → ℂ) →L[ℂ] (Fin D.n → ℂ)) = fderiv ℂ f u₀ := by ext v; rfl
     rw [hcoe]
     exact (hfa u₀ hu₀T').differentiableAt.hasFDerivAt
   have hcd : ContDiffAt ℂ ω f u₀ := (hfa u₀ hu₀T').contDiffAt
@@ -70,7 +69,8 @@ theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitC
   set linv := hcd.localInverse hFD hn with hlinv
   have hlinv_cd : ContDiffAt ℂ ω linv (f u₀) := hcd.to_localInverse hFD hn
   have hlinv₀ : linv (f u₀) = u₀ := hcd.localInverse_apply_image hFD hn
-  have hleft : ∀ᶠ u in 𝓝 u₀, linv (f u) = u := (hcd.hasStrictFDerivAt' hFD hn).eventually_left_inverse
+  have hleft : ∀ᶠ u in 𝓝 u₀, linv (f u) = u :=
+    (hcd.hasStrictFDerivAt' hFD hn).eventually_left_inverse
   have hfu₀ : f u₀ = κ z₀ := by simp only [hf, hσ₀, hκs₀]
 
   set Φ : ((Σ k, ι k) → ℂ) → (Fin D.n → ℂ) := fun z => linv (κ z) with hΦ
@@ -85,7 +85,9 @@ theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitC
     inter_mem hV₁ (hΦcd.continuousAt.preimage_mem_nhds (e.open_target.mem_nhds (hΦ₀ ▸ hu₀t)))
   have hgs : ContDiffOn ℝ ∞ (g ∘ e.symm) e.target := by
     have := hg j
-    simpa [ReciprocityTheory.AnForm.M.FinHolAtlas.Smooth, ReciprocityTheory.AnForm.M.FinHolAtlas.SmoothOn] using this
+    simpa [ReciprocityTheory.AnForm.M.FinHolAtlas.Smooth,
+        ReciprocityTheory.AnForm.M.FinHolAtlas.SmoothOn]
+      using this
   have hGV₂ : ContDiffOn ℝ ∞ (fun z => g (e.symm (Φ z))) V₂ :=
     hgs.comp (hΦV₁R.mono Set.inter_subset_left) (fun z hz => hz.2)
 
@@ -96,11 +98,17 @@ theorem ProjSmoothAlong.proof (hO : HoloInjDerivInj.Statement) (hL : LocalOrbitC
     hcont.tendsto ((e.open_source.inter hWo).mem_nhds ⟨hj, hxW⟩)
   have hev2 : ∀ᶠ w in 𝓝[S] z₀, linv (f (e (M.proj w))) = e (M.proj w) := htend.eventually hleft
   have hev3 : ∀ᶠ w in 𝓝[S] z₀, w ∈ N := nhdsWithin_le_nhds (hNo.mem_nhds hzN)
-  have hev : ∀ᶠ w in 𝓝[S] z₀, (M.proj w ∈ e.source ∩ W ∧ linv (f (e (M.proj w))) = e (M.proj w)) ∧ w ∈ N :=
+  have hev
+      : ∀ᶠ w in 𝓝[S] z₀, (M.proj w ∈ e.source ∩ W ∧ linv (f (e (M.proj w))) = e (M.proj w)) ∧ w ∈ N :=
     (hev1.and hev2).and hev3
   rw [eventually_nhdsWithin_iff] at hev
-  refine ⟨V₂ ∩ {w | w ∈ S → (M.proj w ∈ e.source ∩ W ∧ linv (f (e (M.proj w))) = e (M.proj w)) ∧ w ∈ N},
-    inter_mem hV₂n hev, fun z => g (e.symm (Φ z)), hGV₂.mono Set.inter_subset_left, ?_⟩
+  refine ⟨
+    V₂ ∩ {w | w ∈ S → (M.proj w ∈ e.source ∩ W ∧ linv (f (e (M.proj w))) = e (M.proj w)) ∧ w ∈ N},
+    inter_mem hV₂n hev,
+    fun z => g (e.symm (Φ z)),
+    hGV₂.mono Set.inter_subset_left,
+    ?_
+  ⟩
   rintro w ⟨⟨-, hw⟩, hwS⟩
   obtain ⟨⟨⟨hxe, hxW'⟩, hli⟩, hwN⟩ := hw hwS
   obtain ⟨hsS, hsp⟩ := hs (M.proj w) hxW'

@@ -9,9 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem count_step (l : ℕ) [hl : Fact l.Prime] (G : Type) [Group G] :
-    ∀ (h : ℕ) (S : Subgroup (G →* Multiplicative (ZMod l))), Finite S → Nat.card S ≤ l ^ h →
-      ∃ x : Fin h → G, ∀ f ∈ S, (∀ i, f (x i) = 1) → f = 1 := by
+private theorem count_step (l : ℕ) [hl : Fact l.Prime] (G : Type) [Group G]
+    : ∀ (h : ℕ) (S : Subgroup (G →* Multiplicative (ZMod l))),
+      Finite S → Nat.card S ≤ l ^ h → ∃ x : Fin h → G, ∀ f ∈ S, (∀ i, f (x i) = 1) → f = 1 := by
   intro h
   induction h with
   | zero =>
@@ -30,10 +30,11 @@ private theorem count_step (l : ℕ) [hl : Fact l.Prime] (G : Type) [Group G] :
       by_contra hc
       push_neg at hc
       exact hne (MonoidHom.ext hc)
-    let ev : S →* Multiplicative (ZMod l) :=
-      { toFun := fun f => (f : G →* Multiplicative (ZMod l)) g
-        map_one' := rfl
-        map_mul' := fun _ _ => rfl }
+    let ev : S →* Multiplicative (ZMod l) := {
+      toFun := fun f => (f : G →* Multiplicative (ZMod l)) g
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl
+    }
     have hrange : Nat.card ev.range = l := by
       have hdvd : Nat.card ev.range ∣ l := by
         have := Subgroup.card_subgroup_dvd_card ev.range
@@ -51,11 +52,12 @@ private theorem count_step (l : ℕ) [hl : Fact l.Prime] (G : Type) [Group G] :
       exact this
     let S' : Subgroup (G →* Multiplicative (ZMod l)) := ev.ker.map S.subtype
     have hS' : Nat.card S' = Nat.card ev.ker := Subgroup.card_map_of_injective S.subtype_injective
-    have hfin' : Finite S' := Nat.finite_of_card_ne_zero (by
-      rw [hS']
-      intro h0
-      have : Nat.card S = 0 := by rw [← hcardS, h0, zero_mul]
-      exact (Nat.card_pos (α := S)).ne' this)
+    have hfin' : Finite S' :=
+      Nat.finite_of_card_ne_zero (by
+        rw [hS']
+        intro h0
+        have : Nat.card S = 0 := by rw [← hcardS, h0, zero_mul]
+        exact (Nat.card_pos (α := S)).ne' this)
     have hle : Nat.card S' ≤ l ^ h := by
       rw [hS']
       have hlpos : 0 < l := hl.out.pos
@@ -69,14 +71,23 @@ private theorem count_step (l : ℕ) [hl : Fact l.Prime] (G : Type) [Group G] :
     have hmem : f ∈ S' := ⟨⟨f, hf⟩, hfg, rfl⟩
     exact hx' f hmem fun i => by simpa using hall i.succ
 
-theorem UpperTheory.V.AlgebraTools.topGen_of_hom :
-    ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G], IsProL l G →
-      (∀ s : Set G, (∀ f : G →* Multiplicative (ZMod l), IsOpen (f.ker : Set G) → (∀ g ∈ s, f g = 1) → f = 1) → TopGen s) ∧
-      (∀ h : ℕ, {f : G →* Multiplicative (ZMod l) | IsOpen (f.ker : Set G)}.Finite →
-        {f : G →* Multiplicative (ZMod l) | IsOpen (f.ker : Set G)}.ncard ≤ l ^ h → ∃ x : Fin h → G, TopGen (Set.range x)) := by
+theorem UpperTheory.V.AlgebraTools.topGen_of_hom
+    : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [CompactSpace G] [TotallyDisconnectedSpace G],
+      IsProL l G
+        → (∀ s : Set G,
+            (∀ f : G →* Multiplicative (ZMod l),
+                IsOpen (f.ker : Set G) → (∀ g ∈ s, f g = 1) → f = 1)
+              → TopGen s)
+          ∧ (∀ h : ℕ,
+            {f : G →* Multiplicative (ZMod l) | IsOpen (f.ker : Set G)}.Finite
+              → {f : G →* Multiplicative (ZMod l) | IsOpen (f.ker : Set G)}.ncard ≤ l ^ h
+              → ∃ x : Fin h → G, TopGen (Set.range x)) := by
   intro l _ G _ _ _ _ _ hpro
-  have partA : ∀ s : Set G, (∀ f : G →* Multiplicative (ZMod l), IsOpen (f.ker : Set G) →
-      (∀ g ∈ s, f g = 1) → f = 1) → TopGen s := by
+  have partA
+      : ∀ s : Set G,
+        (∀ f : G →* Multiplicative (ZMod l), IsOpen (f.ker : Set G) → (∀ g ∈ s, f g = 1) → f = 1)
+          → TopGen s := by
     intro s hs
     let H := (Subgroup.closure s).topologicalClosure
     have hHc : IsClosed (H : Set G) := Subgroup.isClosed_topologicalClosure _
@@ -87,10 +98,11 @@ theorem UpperTheory.V.AlgebraTools.topGen_of_hom :
     have hg' : g ∉ (H : Set G) := by
       rw [Subgroup.topologicalClosure_coe]
       exact hg
-    obtain ⟨N, hN⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
-      (U := (fun n => g * n) ⁻¹' (H : Set G)ᶜ)
-      (hHc.isOpen_compl.preimage (continuous_const_mul g))
-      (by simp only [Set.mem_preimage, Set.mem_compl_iff, mul_one]; exact hg')
+    obtain ⟨N, hN⟩ :=
+      ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
+        (U := (fun n => g * n) ⁻¹' (H : Set G)ᶜ)
+        (hHc.isOpen_compl.preimage (continuous_const_mul g))
+        (by simp only [Set.mem_preimage, Set.mem_compl_iff, mul_one]; exact hg')
     let Ns : Subgroup G := N.toOpenSubgroup
     haveI : Ns.Normal := N.isNormal'
     haveI : Finite (G ⧸ Ns) := Subgroup.quotient_finite_of_isOpen _ N.isOpen'
@@ -102,9 +114,10 @@ theorem UpperTheory.V.AlgebraTools.topGen_of_hom :
         refine Subgroup.isOpen_mono (H₁ := Ns) (fun x hx => ?_) N.isOpen'
         rw [MonoidHom.mem_ker]
         simp [F, (QuotientGroup.eq_one_iff x).mpr hx]
-      have hF : F = 1 := hs F hFo (fun x hx => by
-        have hxH : x ∈ H := Subgroup.le_topologicalClosure _ (Subgroup.subset_closure hx)
-        exact hf ⟨x, hxH, rfl⟩)
+      have hF : F = 1 :=
+        hs F hFo (fun x hx => by
+          have hxH : x ∈ H := Subgroup.le_topologicalClosure _ (Subgroup.subset_closure hx)
+          exact hf ⟨x, hxH, rfl⟩)
       ext q
       simpa [F] using DFunLike.congr_fun hF q
     have hgK : (QuotientGroup.mk' Ns g) ∈ K := by
@@ -119,26 +132,27 @@ theorem UpperTheory.V.AlgebraTools.topGen_of_hom :
     simp only [Set.mem_preimage, Set.mem_compl_iff, mul_inv_cancel_left] at hU
     exact hU hyH
   refine ⟨partA, fun h hfin hcard => ?_⟩
-  let S : Subgroup (G →* Multiplicative (ZMod l)) :=
-    { carrier := {f | IsOpen (f.ker : Set G)}
-      one_mem' := by
-        show IsOpen ((1 : G →* Multiplicative (ZMod l)).ker : Set G)
-        rw [MonoidHom.ker_one]
-        exact isOpen_univ
-      mul_mem' := fun {a b} ha hb => by
-        show IsOpen ((a * b).ker : Set G)
-        refine Subgroup.isOpen_mono (H₁ := a.ker ⊓ b.ker) (fun x hx => ?_) ?_
-        · rw [Subgroup.mem_inf, MonoidHom.mem_ker, MonoidHom.mem_ker] at hx
-          rw [MonoidHom.mem_ker, MonoidHom.mul_apply, hx.1, hx.2, one_mul]
-        · rw [Subgroup.coe_inf]
-          exact IsOpen.inter ha hb
-      inv_mem' := fun {a} ha => by
-        show IsOpen ((a⁻¹).ker : Set G)
-        have : (a⁻¹).ker = a.ker := by
-          ext x
-          simp [MonoidHom.mem_ker]
-        rw [this]
-        exact ha }
+  let S : Subgroup (G →* Multiplicative (ZMod l)) := {
+    carrier := {f | IsOpen (f.ker : Set G)}
+    one_mem' := by
+      show IsOpen ((1 : G →* Multiplicative (ZMod l)).ker : Set G)
+      rw [MonoidHom.ker_one]
+      exact isOpen_univ
+    mul_mem' := fun {a b} ha hb => by
+      show IsOpen ((a * b).ker : Set G)
+      refine Subgroup.isOpen_mono (H₁ := a.ker ⊓ b.ker) (fun x hx => ?_) ?_
+      · rw [Subgroup.mem_inf, MonoidHom.mem_ker, MonoidHom.mem_ker] at hx
+        rw [MonoidHom.mem_ker, MonoidHom.mul_apply, hx.1, hx.2, one_mul]
+      · rw [Subgroup.coe_inf]
+        exact IsOpen.inter ha hb
+    inv_mem' := fun {a} ha => by
+      show IsOpen ((a⁻¹).ker : Set G)
+      have : (a⁻¹).ker = a.ker := by
+        ext x
+        simp [MonoidHom.mem_ker]
+      rw [this]
+      exact ha
+  }
   haveI : Finite S := hfin.to_subtype
   have hle : Nat.card S ≤ l ^ h := by
     have : Nat.card S = {f : G →* Multiplicative (ZMod l) | IsOpen (f.ker : Set G)}.ncard :=

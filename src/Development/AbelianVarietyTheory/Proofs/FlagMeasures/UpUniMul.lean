@@ -11,8 +11,11 @@ universe u_1
 
 namespace GlobalTheory.UpperUnipotentProductFlagMeasures
 
-theorem upUni_mul {R : Type u_1} [CommRing R] {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R}
-    (h : Formalism.MainNotions.S.IsUpUni l) (h' : Formalism.MainNotions.S.IsUpUni l') : Formalism.MainNotions.S.IsUpUni (l * l') := by
+theorem upUni_mul
+    {R : Type u_1} [CommRing R]
+    {n : ℕ} {l l' : Matrix (Fin n) (Fin n) R}
+    (h : Formalism.MainNotions.S.IsUpUni l) (h' : Formalism.MainNotions.S.IsUpUni l')
+    : Formalism.MainNotions.S.IsUpUni (l * l') := by
   intro i j
   refine ⟨fun hji => ?_, fun hij => ?_⟩
   · rw [Matrix.mul_apply]

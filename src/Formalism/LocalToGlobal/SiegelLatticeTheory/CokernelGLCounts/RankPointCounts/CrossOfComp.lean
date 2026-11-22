@@ -8,7 +8,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open Matrix ValuativeRel
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.PCount
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Pf.PCount
   Formalism.L2.SG.LsDatumB
 
 namespace Formalism.L2.SG.Pf.Coef.SplitCoefficientComponents
@@ -19,10 +20,13 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem cross_of_comp {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+theorem cross_of_comp
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
     {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-    (M : Formalism.MainNotions.S.Loc.Model F E) (g : Formalism.MainNotions.S.Loc.SplitG M.L) {r : ℕ} {A A' : Matrix (Fin (r + 1)) (Fin (r + 1)) E}
-    (h1 : Cross (A.map (π1 M g)) (A'.map (π1 M g))) (h2 : Cross (A.map (π2 M g)) (A'.map (π2 M g))) : Cross A A' := by
+    (M : Formalism.MainNotions.S.Loc.Model F E) (g : Formalism.MainNotions.S.Loc.SplitG M.L)
+    {r : ℕ} {A A' : Matrix (Fin (r + 1)) (Fin (r + 1)) E}
+    (h1 : Cross (A.map (π1 M g)) (A'.map (π1 M g))) (h2 : Cross (A.map (π2 M g)) (A'.map (π2 M g)))
+    : Cross A A' := by
   unfold Cross at h1 h2 ⊢
   have d : ∀ (f : E →+* F) (B : Matrix (Fin (r + 1)) (Fin (r + 1)) E), (B.map f).det = f B.det :=
     fun f B => (RingHom.map_det f B).symm
@@ -30,24 +34,31 @@ theorem cross_of_comp {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   apply g.e.injective
   exact Prod.ext h1 h2
 
-theorem gaPlusTh_of (hLO : LiftOrb) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
-    (δ : ∀ p : PlF D, (D.s.atP p).Fp) (u u' : D.what₂.Word) : GaPlusTh M δ u u' := by
+theorem gaPlusTh_of
+    (hLO : LiftOrb) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
+    (δ : ∀ p : PlF D, (D.s.atP p).Fp) (u u' : D.what₂.Word)
+    : GaPlusTh M δ u u' := by
   intro hA hT hPH w w' Z Z' hk hZ hZ' p hne heq
   set c := cornerSh δ (D.mem u).A.T (D.mem u').A.T p w with hc
   have hc' : cornerSh δ (D.mem u).A.T (D.mem u').A.T p w' = c := (cornerSh_of_kind δ _ _ p hk).symm
   set Y := CntLocal.ZZP (M := M) δ u u' p Z + c • Ec (K := (D.s.atP p).Ep) D.R.rS with hY
   set Y' := CntLocal.ZZP (M := M) δ u u' p Z' + c • Ec (K := (D.s.atP p).Ep) D.R.rS with hY'
-  have hcm : ∀ cc : (D.s.atP p).Ep, (Matrix.of fun a b : Fin (D.R.rS + 1) =>
-      if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then cc else 0) = cc • Ec (K := (D.s.atP p).Ep) D.R.rS := by
-    intro cc; ext a b; simp only [Ec, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul]; split_ifs <;> simp
-  have eY : FCount.thZ M δ u u' w Z p = clsOf (M p) Y := by
-    unfold FCount.thZ thL; rw [hcm]
-  have eY' : FCount.thZ M δ u u' w' Z' p = clsOf (M p) Y' := by
-    unfold FCount.thZ thL; rw [hcm, hc']
+  have hcm
+      : ∀ cc : (D.s.atP p).Ep,
+        (Matrix.of fun a b : Fin (D.R.rS + 1) =>
+            if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then cc else 0)
+          = cc • Ec (K := (D.s.atP p).Ep) D.R.rS := by
+    intro cc
+    ext a b
+    simp only [Ec, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul]
+    split_ifs <;> simp
+  have eY : FCount.thZ M δ u u' w Z p = clsOf (M p) Y := by unfold FCount.thZ thL; rw [hcm]
+  have eY' : FCount.thZ M δ u u' w' Z' p = clsOf (M p) Y' := by unfold FCount.thZ thL; rw [hcm, hc']
   rw [eY] at hne heq
   rw [eY'] at heq
 
-  have hXc : Cross (ZhatLoc M δ p Z) (ZhatLoc M δ p Z') := cross_zhatLoc δ M p (cross_global hk hZ hZ')
+  have hXc : Cross (ZhatLoc M δ p Z) (ZhatLoc M δ p Z') :=
+    cross_zhatLoc δ M p (cross_global hk hZ hZ')
   have hZc : Cross (CntLocal.ZZP (M := M) δ u u' p Z) (CntLocal.ZZP (M := M) δ u u' p Z') := by
     unfold CntLocal.ZZP
     rcases hs : (M p).split with _ | g
@@ -71,8 +82,9 @@ theorem gaPlusTh_of (hLO : LiftOrb) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp
   have hmap : ZZ.Z.map (M p).R.subtype = Y := rfl
   have hmap' : ZZ'.Z.map (M p).R.subtype = Y' := rfl
   have hiso : Nonempty ((M p).Iso ZZ ZZ') := Quotient.exact (Option.some.inj heq)
-  have hκ : (ZZ.Z.map (M p).R.subtype)⁻¹ (Fin.last D.R.rS) (Fin.last D.R.rS) =
-      (ZZ'.Z.map (M p).R.subtype)⁻¹ (Fin.last D.R.rS) (Fin.last D.R.rS) := by
+  have hκ
+      : (ZZ.Z.map (M p).R.subtype)⁻¹ (Fin.last D.R.rS) (Fin.last D.R.rS)
+        = (ZZ'.Z.map (M p).R.subtype)⁻¹ (Fin.last D.R.rS) (Fin.last D.R.rS) := by
     rw [hmap, hmap']
     exact kappa_eq hZc c h1.2 h2.2
   obtain ⟨l, ρ, hlu, hρu, hle, hρl, hrel⟩ := hLO (M p) (hA p).1 D.R.rS ZZ ZZ' hiso hκ
@@ -82,12 +94,12 @@ theorem gaPlusTh_of (hLO : LiftOrb) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp
     intro i; simp only [hLdef, Matrix.map_apply, hle i]; split_ifs <;> simp
   have hP : ∀ j, P (Fin.last D.R.rS) j = if j = Fin.last D.R.rS then 1 else 0 := by
     intro j; simp only [hPdef, Matrix.map_apply, hρl j]; split_ifs <;> simp
-  have hYrel : Y' = L * Y * P := by
-    rw [← hmap, ← hmap', hrel, Matrix.map_mul, Matrix.map_mul]
+  have hYrel : Y' = L * Y * P := by rw [← hmap, ← hmap', hrel, Matrix.map_mul, Matrix.map_mul]
   have hZrel : CntLocal.ZZP (M := M) δ u u' p Z' = L * CntLocal.ZZP (M := M) δ u u' p Z * P := by
     have e := hYrel
     rw [hY, hY', Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Ec_eq_cornerM,
-      corner_sandwich L P hL hP 1] at e
+        corner_sandwich L P hL hP 1]
+      at e
     exact add_right_cancel e
   have hLR : ∀ i j, L i j ∈ (M p).R := fun i j => (l i j).2
   have hPR : ∀ i j, P i j ∈ (M p).R := fun i j => (ρ i j).2
@@ -110,7 +122,9 @@ theorem gaPlusTh_of (hLO : LiftOrb) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp
       exact e
     obtain ⟨yL, hyL, hLy⟩ := hLu
     obtain ⟨yP, hyP, hPy⟩ := hPu
-    exact gaCong_L δ M hA p hs _ _ Z Z' L P hL hP (fun i j => hRO ▸ hLR i j) (fun i j => hRO ▸ hPR i j)
+    exact gaCong_L δ M hA p hs _ _ Z Z' L P hL hP
+      (fun i j => hRO ▸ hLR i j)
+      (fun i j => hRO ▸ hPR i j)
       ⟨yL, hRO ▸ hyL, hLy⟩ ⟨yP, hRO ▸ hyP, hPy⟩ hX
   · exact gaCong_G δ M hA p g hs _ _ _ _ Z Z' L P hL hP hLR hPR hLu hPu hZrel
 

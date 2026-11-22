@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueFunct
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma resP_eq_zero {F V : Type} [Field F] [Algebra ℂ F] [AddCommGroup V] [Module ℂ V]
@@ -39,17 +40,19 @@ private lemma wd_one_apply {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Modu
     wd (fun _ : ι => (1 : Module.End ℂ E)) c t = ∑ i ∈ t, GlobalTheory.cubeSign t i • c (t.erase i) := by
   simp [wd, LinearMap.sum_apply]
 
-theorem UpperTheory.Gal.productCup_of_system.pInt_of :
-    WdUni → GoodZ → PInt := by
+theorem UpperTheory.Gal.productCup_of_system.pInt_of : WdUni → GoodZ → PInt := by
   intro hW _ F K _ _ _ _ _ _ d x hx τ _ ρ hρ a p t ht
-  simp only [UpperTheory.Gal.productCup_of_system.Sys.mix, GlobalTheory.WH.acx, GlobalTheory.PD.Cx.B, Submodule.mem_map,
-    Submodule.mem_pi] at ht
+  simp only [UpperTheory.Gal.productCup_of_system.Sys.mix, GlobalTheory.WH.acx,
+      GlobalTheory.PD.Cx.B, Submodule.mem_map, Submodule.mem_pi]
+    at ht
   obtain ⟨c, hc, rfl⟩ := ht
   have hU := fun I J : Finset (Fin (d + 1)) =>
     hW (Fin (d + 1)) (Fin (d + 1)) (F ⊗[ℂ] DR ℂ K) (fun _ => 1) c I J
-  have hcu : ∀ I J : Finset (Fin (d + 1)), c (uni I J) ≠ 0 →
-      I.Nonempty ∧ J.Nonempty ∧ I.card + J.card = d + p + 1 ∧
-        c (uni I J) ∈ (sysP K x a).M I J := by
+  have hcu
+      : ∀ I J : Finset (Fin (d + 1)),
+        c (uni I J) ≠ 0
+          → I.Nonempty ∧ J.Nonempty ∧ I.card + J.card = d + p + 1
+            ∧ c (uni I J) ∈ (sysP K x a).M I J := by
     intro I J h0
     have h := hc (uni I J) (Set.mem_univ _)
     obtain ⟨_, hl, hr, hcard, _⟩ := hU I J
@@ -61,14 +64,18 @@ theorem UpperTheory.Gal.productCup_of_system.pInt_of :
         omega
       · exact absurd ((Submodule.mem_bot ℂ).mp h) h0
     · exact absurd ((Submodule.mem_bot ℂ).mp h) h0
-  have hz : ∀ (i : Fin (d + 1)) (J : Finset (Fin (d + 1))),
-      resP (DR ℂ K) ρ (c (uni (Finset.univ.erase i) J)) = 0 := by
+  have hz
+      : ∀ (i : Fin (d + 1)) (J : Finset (Fin (d + 1))),
+        resP (DR ℂ K) ρ (c (uni (Finset.univ.erase i) J)) = 0 := by
     intro i J
     by_cases h0 : c (uni (Finset.univ.erase i) J) = 0
     · rw [h0, map_zero]
     obtain ⟨hI, _, _, hm⟩ := hcu _ _ h0
     exact resP_eq_zero ρ _ _
-      (fun f hf => GlobalTheory.T.residue_functional_vanishes_on_omega_forms ℂ F d (xv x) hx.pd ρ hρ i _ hI (by simp) f hf) hm
+      (fun f hf =>
+        GlobalTheory.T.residue_functional_vanishes_on_omega_forms ℂ F d (xv x) hx.pd ρ hρ i _ hI
+          (by simp) f hf)
+      hm
   refine ⟨fun L => ((-1 : ℤ) ^ (d + 1)) • resP (DR ℂ K) ρ (c (uni Finset.univ L)), ?_, ?_⟩
   · simp only [Lef.omCx, GlobalTheory.PD.cech, GlobalTheory.PD.cechC, Submodule.mem_pi]
     intro L _
@@ -80,10 +87,11 @@ theorem UpperTheory.Gal.productCup_of_system.pInt_of :
     rw [if_pos (show L.Nonempty ∧ (L.card : ℤ) = ↑p - 1 + 1 from ⟨hL, by omega⟩)]
     exact Submodule.smul_of_tower_mem _ _ (residueCharacteristic_mem ρ _ _ hm)
   · funext J
-    simp only [Lef.omCx, GlobalTheory.PD.cech, GlobalTheory.PD.deltaL, LinearMap.coe_mk, AddHom.coe_mk, GlobalTheory.DI.delta]
+    simp only [Lef.omCx, GlobalTheory.PD.cech, GlobalTheory.PD.deltaL, LinearMap.coe_mk,
+      AddHom.coe_mk, GlobalTheory.DI.delta]
     rw [(hU Finset.univ J).1]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [wd_one_apply, map_add (f := _), map_zsmul, map_sum, hz, smul_zero, Finset.sum_const_zero,
-      zero_add, Finset.card_univ, Fintype.card_fin, Finset.smul_sum]
+      simp only [wd_one_apply, map_add (f := _), map_zsmul, map_sum, hz, smul_zero,
+        Finset.sum_const_zero, zero_add, Finset.card_univ, Fintype.card_fin, Finset.smul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_comm]

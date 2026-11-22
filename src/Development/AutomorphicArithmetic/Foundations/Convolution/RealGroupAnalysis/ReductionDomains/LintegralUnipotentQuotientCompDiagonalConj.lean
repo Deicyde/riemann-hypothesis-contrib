@@ -14,12 +14,15 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.lintegral_unipotent_quotient_comp_diagonal_conj :
-    ∀ (F : Type) [Field F] [NumberField F] (M₀ : Meas F) (u : G1 F → ℝ≥0∞), Measurable u → (∀ b g, u (nU b * g) = u g) → ∀ t, (M.J0 M₀ fun g => u (cD t g)) = ENNReal.ofReal (ab t)⁻¹ * M.J0 M₀ u := by
+theorem UpperTheory.ConvolutionTheory.R2.M.lintegral_unipotent_quotient_comp_diagonal_conj
+    : ∀ (F : Type) [Field F] [NumberField F] (M₀ : Meas F) (u : G1 F → ℝ≥0∞),
+      Measurable u → (∀ b g, u (nU b * g) = u g)
+        → ∀ t, (M.J0 M₀ fun g => u (cD t g)) = ENNReal.ofReal (ab t)⁻¹ * M.J0 M₀ u := by
   intro F _ _ M₀ u hu hN t
   obtain ⟨β, hβ⟩ := M.wtEx F
   have h1 := M.wtOne F β hβ
-  have hcm : ∀ s : (A F)ˣ, Measurable (cD s : G1 F → G1 F) := fun s => (M.continuous_cD s).measurable
+  have hcm : ∀ s : (A F)ˣ, Measurable (cD s : G1 F → G1 F) := fun s =>
+    (M.continuous_cD s).measurable
   have hβ' : Measurable fun g => β (cD t⁻¹ g) := hβ.1.comp (hcm _)
   have hu' : Measurable fun g => u (cD t g) := hu.comp (hcm _)
   have hN' : ∀ b g, u (cD t (nU b * g)) = u (cD t g) := by
@@ -44,8 +47,7 @@ theorem UpperTheory.ConvolutionTheory.R2.M.lintegral_unipotent_quotient_comp_dia
     rfl
   have a1 := M.wtA F M₀ β (fun g => u (cD t g)) 1 hβ.1 h1 hu' hN'
   have a2 := M.wtA F M₀ (fun g => β (cD t⁻¹ g)) u _ hβ' hc hu hN
-  have a3 := (M.cdMeas F M₀ t).lintegral_comp
-    (f := fun h => u h * β (cD t⁻¹ h)) (hu.mul hβ')
+  have a3 := (M.cdMeas F M₀ t).lintegral_comp (f := fun h => u h * β (cD t⁻¹ h)) (hu.mul hβ')
   have e3 : ∀ g, β (cD t⁻¹ (cD t g)) = β g := by
     intro g
     rw [M.cD_cD, inv_mul_cancel, M.cD_one]

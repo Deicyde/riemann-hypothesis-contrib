@@ -8,33 +8,36 @@ namespace GroundTheory.Variant₂.N1
 
 open IsLocalRing
 
-theorem exists_eq_unit_mul_pow_adicCompletion {R : Type*} [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] {ϖ : R} (hϖ : Irreducible ϖ)
-    {x : AdicCompletion (maximalIdeal R) R} (hx : x ≠ 0) :
-    ∃ (n : ℕ) (u : (AdicCompletion (maximalIdeal R) R)ˣ),
+theorem exists_eq_unit_mul_pow_adicCompletion
+    {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    {ϖ : R} (hϖ : Irreducible ϖ)
+    {x : AdicCompletion (maximalIdeal R) R} (hx : x ≠ 0)
+    : ∃ (n : ℕ) (u : (AdicCompletion (maximalIdeal R) R)ˣ),
       x = ↑u * (algebraMap R (AdicCompletion (maximalIdeal R) R)) ϖ ^ n := by
-
-  have hM : maximalIdeal (AdicCompletion (maximalIdeal R) R) =
-      Ideal.span {algebraMap R (AdicCompletion (maximalIdeal R) R) ϖ} := by
-    have e := congrArg (Ideal.map (algebraMap R (AdicCompletion (maximalIdeal R) R)))
-      hϖ.maximalIdeal_eq
+  have hM
+      : maximalIdeal (AdicCompletion (maximalIdeal R) R)
+        = Ideal.span {algebraMap R (AdicCompletion (maximalIdeal R) R) ϖ} := by
+    have e :=
+      congrArg (Ideal.map (algebraMap R (AdicCompletion (maximalIdeal R) R))) hϖ.maximalIdeal_eq
     rw [AdicCompletion.maximalIdeal_eq_map, e, Ideal.map_span, Set.image_singleton]
-  have hMpow : ∀ k : ℕ, maximalIdeal (AdicCompletion (maximalIdeal R) R) ^ k =
-      Ideal.span {algebraMap R (AdicCompletion (maximalIdeal R) R) ϖ ^ k} := fun k => by
+  have hMpow
+      : ∀ k : ℕ,
+        maximalIdeal (AdicCompletion (maximalIdeal R) R) ^ k
+          = Ideal.span {algebraMap R (AdicCompletion (maximalIdeal R) R) ϖ ^ k} := fun k => by
     rw [hM, Ideal.span_singleton_pow]
 
   have hex : ∃ k : ℕ, x ∉ maximalIdeal (AdicCompletion (maximalIdeal R) R) ^ k := by
     by_contra h
     push Not at h
     apply hx
-    apply IsHausdorff.haus (IsAdicComplete.toIsHausdorff
-      (I := maximalIdeal (AdicCompletion (maximalIdeal R) R))
-      (M := AdicCompletion (maximalIdeal R) R)) x
+    apply IsHausdorff.haus
+      (IsAdicComplete.toIsHausdorff (I := maximalIdeal (AdicCompletion (maximalIdeal R) R))
+        (M := AdicCompletion (maximalIdeal R) R))
+      x
     intro k
     simpa only [← Ideal.one_eq_top, smul_eq_mul, mul_one, SModEq.zero] using h k
   classical
-  have hk : x ∉ maximalIdeal (AdicCompletion (maximalIdeal R) R) ^ Nat.find hex :=
-    Nat.find_spec hex
+  have hk : x ∉ maximalIdeal (AdicCompletion (maximalIdeal R) R) ^ Nat.find hex := Nat.find_spec hex
   have hk0 : Nat.find hex ≠ 0 := by
     intro h0
     apply hk

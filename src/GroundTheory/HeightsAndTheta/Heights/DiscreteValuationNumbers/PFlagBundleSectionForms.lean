@@ -25,11 +25,13 @@ theorem FlagBundleSectionForms.proof : FlagBundleSectionForms.Statement := by
   have hsc : segreVec y c ≠ 0 := Finset.prod_ne_zero_iff.2 fun k _ => hY k
   obtain ⟨ψ, hψint, hψlow, hψi⟩ := exists_flag_dual y B w b hfl c hsc i
   obtain ⟨u, hu, hψ⟩ := hφ.generate c hsc ψ hψint
-  have hstar : t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ =
-      ∑ l, algebraMap Ω Φ (u l * chartPow y c (-a)) *
-        projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩ := by
-    have h1 : ∑ j, truncCoord t ((i : ℕ) + 1) j * algebraMap Ω Φ (ψ (w j)) =
-        t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ := by
+  have hstar
+      : t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹
+        = ∑ l, algebraMap Ω Φ (u l * chartPow y c (-a)) *
+            projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩ := by
+    have h1
+        : ∑ j, truncCoord t ((i : ℕ) + 1) j * algebraMap Ω Φ (ψ (w j))
+          = t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ := by
       rw [Finset.sum_eq_single i]
       · simp [truncCoord, hψi]
       · intro j _ hji
@@ -42,33 +44,41 @@ theorem FlagBundleSectionForms.proof : FlagBundleSectionForms.Statement := by
       · simp
     rw [← h1, hψ]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [projCoord, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-      map_sum, map_mul, Finset.mul_sum]
+      simp only [projCoord, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, map_sum,
+        map_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => ?_
     simp only [chartPow, Pi.neg_apply]
     ring
-  obtain ⟨n, U, hUh, hUe⟩ : ∃ (n : ℕ) (U : Fin M → MRing (bundleIdx ι M) F),
-      (∀ l, IsMultiHomog (U l) (liftNat fun _ => n)) ∧
-      ∀ l, eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ (truncCoord t ((i : ℕ) + 1)))
-        (U l) = algebraMap Ω Φ (u l * segreVec y c ^ n) := by
+  obtain ⟨n, U, hUh, hUe⟩
+      : ∃ (n : ℕ) (U : Fin M → MRing (bundleIdx ι M) F),
+        (∀ l, IsMultiHomog (U l) (liftNat fun _ => n))
+          ∧ ∀ l,
+            eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+                (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) (U l)
+              = algebraMap Ω Φ (u l * segreVec y c ^ n) := by
     have h := fun l => chartRing_forms y w φ (truncCoord t ((i : ℕ) + 1)) c hsc (hu l)
     choose n U hU hUe using h
-    refine ⟨∑ l, n l, fun l => U l * chartMono M c (fun _ => ∑ l, n l - n l), fun l => ?_, fun l => ?_⟩
-    · have hle : n l ≤ ∑ l, n l := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ l)
-      have hd : liftNat (K := K) (fun _ => ∑ l, n l) =
-          liftNat (fun _ => n l) + liftNat (fun _ => ∑ l, n l - n l) := by
+    refine
+      ⟨∑ l, n l, fun l => U l * chartMono M c (fun _ => ∑ l, n l - n l), fun l => ?_, fun l => ?_⟩
+    · have hle : n l ≤ ∑ l, n l :=
+        Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ l)
+      have hd
+          : liftNat (K := K) (fun _ => ∑ l, n l)
+            = liftNat (fun _ => n l) + liftNat (fun _ => ∑ l, n l - n l) := by
         funext o; cases o <;> simp [liftNat]; omega
       rw [hd]
       exact (hU l).mul (chartMono_homog M c _)
-    · have hle : n l ≤ ∑ l, n l := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ l)
+    · have hle : n l ≤ ∑ l, n l :=
+        Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ l)
       rw [eval₂_mul, hUe, eval_chartMono, ← map_mul]
       congr 1
       rw [Finset.prod_pow, mul_assoc, ← segreVec, ← pow_add, Nat.add_sub_cancel' hle]
   let α : K → ℕ := fun k => (|a k| + |b i k| - a k).toNat
   let β : K → ℕ := fun k => (|a k| + |b i k| + n - b i k).toNat
-  have hid : segreVec y c ^ n * ∏ k, y ⟨k, c k⟩ ^ α k =
-      (∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i) * chartPow y c (-a) := by
+  have hid
+      : segreVec y c ^ n * ∏ k, y ⟨k, c k⟩ ^ α k
+        = (∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i) * chartPow y c (-a) := by
     rw [segreVec_pow, ← chartPow_natCast, ← chartPow_natCast, ← chartPow_add hY, ← chartPow_add hY,
       ← chartPow_add hY]
     congr 1
@@ -81,43 +91,62 @@ theorem FlagBundleSectionForms.proof : FlagBundleSectionForms.Statement := by
     omega
   let f : MRing (bundleIdx ι M) F := ∑ l, U l * chartMono M c α * X ⟨none, l⟩
   let g : MRing (bundleIdx ι M) F := chartMono M c β
-  have hg : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g
-      = algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ β k) := eval_chartMono y w φ _ c β
-  have hp : algebraMap Ω Φ (chartPow y c (b i)) ≠ 0 :=
-    (map_ne_zero _).2 (chartPow_ne_zero hY _)
-  have hf : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) f
-      = t i * eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
-        (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g := by
+  have hg
+      : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+          (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g
+        = algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ β k) :=
+    eval_chartMono y w φ _ c β
+  have hp : algebraMap Ω Φ (chartPow y c (b i)) ≠ 0 := (map_ne_zero _).2 (chartPow_ne_zero hY _)
+  have hf
+      : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+          (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) f
+        = t i * eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+          (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g := by
     rw [hg]
-    calc _ = ∑ l, algebraMap Ω Φ (u l * chartPow y c (-a)) *
-            projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩ *
-            algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
-          simp only [f, eval₂_sum, eval₂_mul, eval₂_X, hUe, eval_chartMono]
-          refine Finset.sum_congr rfl fun l _ => ?_
-          have hl : algebraMap Ω Φ (u l * segreVec y c ^ n) * algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ α k) =
-              algebraMap Ω Φ (u l * chartPow y c (-a)) *
-                algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
-            rw [← map_mul, ← map_mul]
-            congr 1
-            rw [mul_assoc, hid]
-            ring
-          rw [mul_comm _ (projCoord _ _ _ _ _), mul_assoc, hl]
+    calc
+      _ = ∑ l, algebraMap Ω Φ (u l * chartPow y c (-a)) *
+          projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩ *
+          algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
+        simp only [f, eval₂_sum, eval₂_mul, eval₂_X, hUe, eval_chartMono]
+        refine Finset.sum_congr rfl fun l _ => ?_
+        have hl
+            : algebraMap Ω Φ (u l * segreVec y c ^ n) * algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ α k)
+              = algebraMap Ω Φ (u l * chartPow y c (-a))
+                * algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
+          rw [← map_mul, ← map_mul]
+          congr 1
+          rw [mul_assoc, hid]
           ring
-      _ = t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ *
-            algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
-          rw [hstar, Finset.sum_mul]
+        rw [mul_comm _ (projCoord _ _ _ _ _), mul_assoc, hl]
+        ring
+      _ = t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹
+          * algebraMap Ω Φ ((∏ k, y ⟨k, c k⟩ ^ β k) * chartPow y c (b i)) := by
+        rw [hstar, Finset.sum_mul]
       _ = t i * algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ β k) := by
-          rw [map_inv₀, map_mul]
-          field_simp
-  have hg0 : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
-      (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g ≠ 0 := by
+        rw [map_inv₀, map_mul]
+        field_simp
+  have hg0
+      : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+          (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) g
+        ≠ 0 := by
     rw [hg]
     exact (map_ne_zero _).2 (Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hY k))
-  refine ⟨fun o => Option.elim o 1 (fun k => n + α k), liftNat β, f, g, ?_, chartMono_homog M c β, ?_,
-    fun hmem => ?_, fun hmem => ?_, hf⟩
+  refine ⟨
+    fun o => Option.elim o 1 (fun k => n + α k),
+    liftNat β,
+    f,
+    g,
+    ?_,
+    chartMono_homog M c β,
+    ?_,
+    fun hmem => ?_,
+    fun hmem => ?_,
+    hf
+  ⟩
   · refine IsWeightedHomogeneous.sum _ _ _ fun l _ => ?_
-    have h := ((hUh l).mul (chartMono_homog (F := F) M c α)).mul
-      (isWeightedHomogeneous_X F (blockWeight (bundleIdx ι M)) ⟨none, l⟩)
+    have h :=
+      ((hUh l).mul (chartMono_homog (F := F) M c α)).mul
+        (isWeightedHomogeneous_X F (blockWeight (bundleIdx ι M)) ⟨none, l⟩)
     convert h using 1
     funext o
     cases o <;> simp [liftNat, blockWeight, Pi.single_apply]

@@ -400,8 +400,9 @@ section Lin
 variable {K : Type*} [Field K] {N : ℕ}
 
 def repGL : GL (Fin N) K →* Module.End K (Fin N → K) :=
-  (MonoidHomClass.toMonoidHom (Matrix.toLinAlgEquiv' :
-    Matrix (Fin N) (Fin N) K ≃ₐ[K] Module.End K (Fin N → K))).comp (Units.coeHom _)
+  (MonoidHomClass.toMonoidHom
+      (Matrix.toLinAlgEquiv' : Matrix (Fin N) (Fin N) K ≃ₐ[K] Module.End K (Fin N → K))).comp
+    (Units.coeHom _)
 
 lemma repGL_eq (A : GL (Fin N) K) : repGL A = Matrix.toLin' (A : Matrix (Fin N) (Fin N) K) := rfl
 
@@ -443,8 +444,8 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
   set L : PP i → Fin N → Fbar ℓ := fun v j => ι v (primeToPart ℓ (r v j)) with hLdef
   have hptp0 : ∀ v j, primeToPart ℓ (r v j) ≠ 0 := by
     intro v j; unfold primeToPart; exact pow_ne_zero _ (hr0 v j)
-  have hptpc : ∀ v j, (orderOf (primeToPart ℓ (r v j))).Coprime ℓ :=
-    fun v j => primeToPart_coprime hℓp _ (hrfin v j)
+  have hptpc : ∀ v j, (orderOf (primeToPart ℓ (r v j))).Coprime ℓ := fun v j =>
+    primeToPart_coprime hℓp _ (hrfin v j)
   have hLinj : ∀ v, Function.Injective (L v) := by
     intro v j k h
     have h1 := hinj v _ _ (hptp0 v j) (hptp0 v k) (hptpc v j) (hptpc v k) h
@@ -454,26 +455,33 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
     show ι v (primeToPart ℓ (r v (σ v j))) = ι v (primeToPart ℓ (r v j)) ^ (g i)
     rw [hσ v j, primeToPart_pow, map_pow]
     exact orderOf_injective (frobenius (Fbar (g i)) (g i)).toMonoidHom (frobenius_inj _ _) (r v j)
-  have hroots : ∀ v, (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ)).charpoly.roots =
-      Finset.univ.val.map (L v) := by
+  have hroots
+      : ∀ v,
+        (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ)).charpoly.roots = Finset.univ.val.map (L v) := by
     intro v
-    have hcp : (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ)).charpoly =
-        ((Finset.univ.val.map (L v)).map fun a => X - C a).prod := by
+    have hcp
+        : (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ)).charpoly
+          = ((Finset.univ.val.map (L v)).map fun a => X - C a).prod := by
       rw [hchar v, ← hrf v, Multiset.map_map, Multiset.map_map]; rfl
     rw [hcp, roots_multiset_prod_X_sub_C]
 
   have hirr : IrredOn ρ ⊤ := by
     intro W hW
     refine Formalism.GaloisIrreducibility.irred (Fbar ℓ) (Fin N → Fbar ℓ) (PP i) (Finset (Fbar ℓ))
-      (fun v => repGL (ρ (τ v))) (fun v => glEquiv (ρ (φ v))) (fun _ => g i)
-      (fun _ S => S) (fun v => blocks (σ v) (L v)) ?_ ?_ ?_ ?_ W ?_ ?_
+      (fun v => repGL (ρ (τ v)))
+      (fun v => glEquiv (ρ (φ v)))
+      (fun _ => g i)
+      (fun _ S => S)
+      (fun v => blocks (σ v) (L v))
+      ?_ ?_ ?_ ?_ W ?_ ?_
     · intro v x
       show repGL (ρ (φ v)) (repGL (ρ (τ v)) x) = (repGL (ρ (τ v)) ^ g i) (repGL (ρ (φ v)) x)
       have heq : ρ (φ v) * ρ (τ v) = ρ (τ v) ^ g i * ρ (φ v) := by
         have h := hconj v
         rw [map_mul, map_mul, map_inv] at h
         rw [← h, inv_mul_cancel_right]
-      rw [← map_pow, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul repGL, ← map_mul repGL, heq]
+      rw [← map_pow, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul repGL,
+        ← map_mul repGL, heq]
     · intro v S hS; exact isOrbit_of_mem (hLσ v) hS
     · intro v
       show (LinearMap.charpoly (repGL (ρ (τ v)))).roots = _
@@ -487,13 +495,17 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
       exact ⟨Q, hQf, hQd.trans hAc⟩
     · intro v x hx
       show repGL (ρ (τ v)) x ∈ W
-      rw [repGL_apply]; exact hW _ (Subgroup.mem_top _) x hx
+      rw [repGL_apply]
+      exact hW _ (Subgroup.mem_top _) x hx
     · intro v x hx
       show glEquiv (ρ (φ v)) x ∈ W
-      rw [glEquiv_apply, repGL_apply]; exact hW _ (Subgroup.mem_top _) x hx
+      rw [glEquiv_apply, repGL_apply]
+      exact hW _ (Subgroup.mem_top _) x hx
 
-  have hpart3 : ∀ v j, ¬ (Matrix.charpoly (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ))).IsRoot
-      (ι v (primeToPart ℓ (algebraMap (ZMod (g i)) (Fbar (g i)) (χ i v j : ZMod (g i))))) := by
+  have hpart3
+      : ∀ v j,
+        ¬ (Matrix.charpoly (ρ (τ v) : Matrix (Fin N) (Fin N) (Fbar ℓ))).IsRoot
+          (ι v (primeToPart ℓ (algebraMap (ZMod (g i)) (Fbar (g i)) (χ i v j : ZMod (g i))))) := by
     intro v j hroot
     have hmem := (mem_roots (Matrix.charpoly_monic _).ne_zero).mpr hroot
     rw [hroots v] at hmem
@@ -501,14 +513,17 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
     have hc0 : algebraMap (ZMod (g i)) (Fbar (g i)) (χ i v j : ZMod (g i)) ≠ 0 :=
       (_root_.map_ne_zero _).mpr (χ i v j).ne_zero
     have hcfin : IsOfFinOrder (algebraMap (ZMod (g i)) (Fbar (g i)) (χ i v j : ZMod (g i))) :=
-      MonoidHom.isOfFinOrder ((algebraMap (ZMod (g i)) (Fbar (g i))).toMonoidHom.comp (Units.coeHom _))
+      MonoidHom.isOfFinOrder
+        ((algebraMap (ZMod (g i)) (Fbar (g i))).toMonoidHom.comp (Units.coeHom _))
         (isOfFinOrder_of_finite (χ i v j))
-    have h1 := hinj v _ _ (hptp0 v k) (by unfold primeToPart; exact pow_ne_zero _ hc0)
-      (hptpc v k) (primeToPart_coprime hℓp _ hcfin) hk
+    have h1 :=
+      hinj v _ _ (hptp0 v k) (by unfold primeToPart; exact pow_ne_zero _ hc0) (hptpc v k)
+        (primeToPart_coprime hℓp _ hcfin) hk
     exact hG4 ℓ hℓp hℓg v j _ (hmemr v k) h1
 
-  have hpart2 : ∀ (H : Subgroup G) [H.Normal], Finite (G ⧸ H) → Group.IsSolvable (G ⧸ H) →
-      (∀ v, τ v ∈ H) → IrredOn ρ H := by
+  have hpart2
+      : ∀ (H : Subgroup G) [H.Normal],
+        Finite (G ⧸ H) → Group.IsSolvable (G ⧸ H) → (∀ v, τ v ∈ H) → IrredOn ρ H := by
     intro H hHn hfin hsolv hτH W hW
     obtain ⟨v₀, q₀, hq₀i, hq₀f, hq₀p, hN2, hN3⟩ := hG6
     have hpc : q₀.natDegree ∈ (σ v₀).cycleType :=
@@ -516,8 +531,9 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
     have hN8 : 8 ≤ N := by
       have h2 := hq₀p.two_le
       have h5 : 5 ≤ q₀.natDegree := by
-        rcases (show q₀.natDegree = 2 ∨ q₀.natDegree = 3 ∨ q₀.natDegree = 4 ∨
-          5 ≤ q₀.natDegree by omega) with h | h | h | h
+        rcases (show q₀.natDegree = 2 ∨ q₀.natDegree = 3 ∨ q₀.natDegree = 4 ∨ 5 ≤ q₀.natDegree by
+            omega)
+          with h | h | h | h
         · omega
         · omega
         · exact absurd (h ▸ hq₀p) (by norm_num)
@@ -562,8 +578,8 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
       intro n j
       rw [map_pow, he]
       exact (hw j).pow_apply n
-    have hlfin : ∀ j, IsOfFinOrder (L v₀ j) :=
-      fun j => (ι v₀).isOfFinOrder (primeToPart_isOfFinOrder ℓ _ (hrfin v₀ j))
+    have hlfin : ∀ j, IsOfFinOrder (L v₀ j) := fun j =>
+      (ι v₀).isOfFinOrder (primeToPart_isOfFinOrder ℓ _ (hrfin v₀ j))
     have hMo : 0 < ∏ j, orderOf (L v₀ j) := Finset.prod_pos (fun j _ => (hlfin j).orderOf_pos)
     have hlM : ∀ j, L v₀ j ^ (∏ j, orderOf (L v₀ j)) = 1 := fun j =>
       orderOf_dvd_iff_pow_eq_one.mp (Finset.dvd_prod_of_mem _ (Finset.mem_univ j))
@@ -606,8 +622,8 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
       show e.repr (ρΓ (T ^ n) (e j)) j = _
       rw [hTpow]
       simp
-    refine hR ρ.range (Fbar ℓ) (Fin N → Fbar ℓ) ρΓ N H' I e χ' Φ (σ v₀)⁻¹ q₀.natDegree hN8
-      hfin' hsolv' ?_ ?_ ?_ ?_ hIiff ?_ hq₀p (by rw [Fintype.card_fin]; exact hN2) hN3
+    refine hR ρ.range (Fbar ℓ) (Fin N → Fbar ℓ) ρΓ N H' I e χ' Φ (σ v₀)⁻¹ q₀.natDegree hN8 hfin'
+      hsolv' ?_ ?_ ?_ ?_ hIiff ?_ hq₀p (by rw [Fintype.card_fin]; exact hN2) hN3
       (by rw [Equiv.Perm.cycleType_inv]; exact hpc) W ?_
     · exact (Subgroup.zpowers_le).mpr (Subgroup.mem_map_of_mem _ (hτH v₀))
     · intro W' hW'
@@ -626,11 +642,9 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
       rw [h1, h2]
       exact fun h => hjk (hLinj v₀ h)
     · intro j y hy
-      have hz : Φ⁻¹ * y * Φ ∈ I := by
-        rw [hIiff]; simpa [mul_assoc] using hy
+      have hz : Φ⁻¹ * y * Φ ∈ I := by rw [hIiff]; simpa [mul_assoc] using hy
       obtain ⟨n, hn⟩ := hInat _ hz
-      have hy' : y = T ^ (g i * n) := by
-        rw [pow_mul, ← hTΦ, conj_pow, hn]; group
+      have hy' : y = T ^ (g i * n) := by rw [pow_mul, ← hTΦ, conj_pow, hn]; group
       rw [← hn, hy', hχpow, hχpow, pow_mul, ← hLσ]
       simp
     · intro h hh x hx
@@ -641,5 +655,7 @@ theorem t1 (hR : Restriction) : IrreducibilityCriterion := by
 
 end Formalism.CyclotomicNorms.CycleTypeFiniteOrder
 
-theorem Formalism.CyclotomicNorms.irreducibility_of_restriction (hR : Formalism.CyclotomicNorms.Restriction) : Formalism.CyclotomicNorms.IrreducibilityCriterion :=
+theorem Formalism.CyclotomicNorms.irreducibility_of_restriction
+    (hR : Formalism.CyclotomicNorms.Restriction)
+    : Formalism.CyclotomicNorms.IrreducibilityCriterion :=
   Formalism.CyclotomicNorms.CycleTypeFiniteOrder.t1 hR

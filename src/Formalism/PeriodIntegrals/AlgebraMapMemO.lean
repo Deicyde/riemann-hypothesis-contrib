@@ -18,8 +18,9 @@ section Top
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem mem_O_of_quad (L : LocE F E) (z : E) (t n : 𝒪[F])
-    (h : z * z - algebraMap F E t * z + algebraMap F E n = 0) : z ∈ L.O := by
+theorem mem_O_of_quad
+    (L : LocE F E) (z : E) (t n : 𝒪[F]) (h : z * z - algebraMap F E t * z + algebraMap F E n = 0)
+    : z ∈ L.O := by
   rw [L.O_def]
   refine ⟨(X ^ 2 + (C (-t) * X + C n) : Polynomial 𝒪[F]), ?_, ?_⟩
   · monicity!
@@ -31,7 +32,8 @@ theorem mem_O_of_quad (L : LocE F E) (z : E) (t n : 𝒪[F])
 theorem algebraMap_mem_O (L : LocE F E) (a : 𝒪[F]) : algebraMap F E a ∈ L.O :=
   mem_O_of_quad L _ a 0 (by simp)
 
-theorem mem_OF_of_mem_O [Nontrivial E] (L : LocE F E) (a : F) (h : algebraMap F E a ∈ L.O) : a ∈ 𝒪[F] := by
+theorem mem_OF_of_mem_O [Nontrivial E] (L : LocE F E) (a : F) (h : algebraMap F E a ∈ L.O)
+    : a ∈ 𝒪[F] := by
   have hE : Function.Injective (algebraMap F E) := (algebraMap F E).injective
   rw [L.O_def] at h
   have hF : IsIntegral 𝒪[F] a := by
@@ -95,7 +97,8 @@ theorem nontrivial_E (L : LocE F E) : Nontrivial E := by
   rw [Module.finrank_zero_of_subsingleton] at h2
   omega
 
-theorem exists_theta : ∃ θ ∈ L.O, L.cj θ = -θ ∧ ∃ D : 𝒪[F], (D : F) ≠ 0 ∧ θ * θ = algebraMap F E D := by
+theorem exists_theta
+    : ∃ θ ∈ L.O, L.cj θ = -θ ∧ ∃ D : 𝒪[F], (D : F) ≠ 0 ∧ θ * θ = algebraMap F E D := by
   have hx : ∃ x : E, L.cj x ≠ x := by
     by_contra hex
     have hall : ∀ w : E, L.cj w = w := fun w => not_not.mp (not_exists.mp hex w)
@@ -143,9 +146,11 @@ section Top3
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem decomp (L : LocE F E) (θ : E) (hθc : L.cj θ = -θ) (D : F) (hD : θ * θ = algebraMap F E D) (x : E) :
-    ∃ t c : F, algebraMap F E t = x + L.cj x ∧ algebraMap F E c = (x - L.cj x) * θ ∧
-      algebraMap F E (2 * D) * x = algebraMap F E (D * t) + algebraMap F E c * θ := by
+theorem decomp
+    (L : LocE F E) (θ : E) (hθc : L.cj θ = -θ) (D : F) (hD : θ * θ = algebraMap F E D) (x : E)
+    : ∃ t c : F,
+      algebraMap F E t = x + L.cj x ∧ algebraMap F E c = (x - L.cj x) * θ
+        ∧ algebraMap F E (2 * D) * x = algebraMap F E (D * t) + algebraMap F E c * θ := by
   obtain ⟨t, ht⟩ := (L.cj_fix (x + L.cj x)).1 (by rw [map_add (f := _), L.cj_cj, add_comm])
   obtain ⟨c, hc⟩ := (L.cj_fix ((x - L.cj x) * θ)).1 (by rw [map_mul, map_sub, L.cj_cj, hθc]; ring)
   refine ⟨t, c, ht, hc, ?_⟩

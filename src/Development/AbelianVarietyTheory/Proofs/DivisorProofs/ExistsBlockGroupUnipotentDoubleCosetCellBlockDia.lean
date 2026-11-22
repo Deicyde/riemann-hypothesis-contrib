@@ -17,9 +17,9 @@ variable {F : Type} [NormedField F] {m : ℕ}
 
 open Matrix Topology in
 variable {F : Type} [NormedField F] {m : ℕ} in
-theorem _root_.GlobalTheory.JSW.Cut.Block.mir_inv (a : GL (Fin m) F) (y : Fin m → F) :
-    (_root_.GlobalTheory.JSW.KirFin.mir a y)⁻¹ =
-      _root_.GlobalTheory.JSW.KirFin.mir a⁻¹ (-((a⁻¹).val *ᵥ y)) := by
+theorem _root_.GlobalTheory.JSW.Cut.Block.mir_inv (a : GL (Fin m) F) (y : Fin m → F)
+    : (_root_.GlobalTheory.JSW.KirFin.mir a y)⁻¹
+      = _root_.GlobalTheory.JSW.KirFin.mir a⁻¹ (-((a⁻¹).val *ᵥ y)) := by
   apply inv_eq_of_mul_eq_one_right
   rw [_root_.GlobalTheory.JSW.KirFin.mir_mul]
   simp [mulVec_neg, mulVec_mulVec, ← _root_.GlobalTheory.JSW.KirFin.mir_one]
@@ -39,10 +39,20 @@ def blocks (U : Subgroup (GL (Fin (m + 1)) F)) : Subgroup (GL (Fin m) F) where
     rintro a ⟨y, hy⟩
     exact ⟨_, by rw [← mir_inv]; exact U.inv_mem hy⟩
 
-theorem exists_blocks_cell_cor_iff : ∀ {F : Type} [NormedField F] {m : ℕ} (U : Subgroup (GL (Fin (m + 2)) F)), IsCompact (U : Set (GL (Fin (m + 2)) F)) → IsOpen (U : Set (GL (Fin (m + 2)) F)) → ∃ B : Subgroup (GL (Fin (m + 1)) F), IsCompact (B : Set (GL (Fin (m + 1)) F)) ∧ IsOpen (B : Set (GL (Fin (m + 1)) F)) ∧ (∀ b, GlobalTheory.JSW.KirFin.cor b ∈ U → b ∈ B) ∧ ∀ h₀ h : GL (Fin (m + 1)) F, GlobalTheory.JSW.KirFin.cor h ∈ GlobalTheory.JSW.Cut.cell (GlobalTheory.JSW.KirFin.cor h₀) (U : Set (GL (Fin (m + 2)) F)) ↔ h ∈ GlobalTheory.JSW.Cut.cell h₀ (B : Set (GL (Fin (m + 1)) F)) := by
+theorem exists_blocks_cell_cor_iff
+    : ∀ {F : Type} [NormedField F] {m : ℕ} (U : Subgroup (GL (Fin (m + 2)) F)),
+      IsCompact (U : Set (GL (Fin (m + 2)) F)) → IsOpen (U : Set (GL (Fin (m + 2)) F))
+        → ∃ B : Subgroup (GL (Fin (m + 1)) F),
+          IsCompact (B : Set (GL (Fin (m + 1)) F)) ∧ IsOpen (B : Set (GL (Fin (m + 1)) F))
+            ∧ (∀ b, GlobalTheory.JSW.KirFin.cor b ∈ U → b ∈ B)
+            ∧ ∀ h₀ h : GL (Fin (m + 1)) F,
+              GlobalTheory.JSW.KirFin.cor h ∈ GlobalTheory.JSW.Cut.cell
+                  (GlobalTheory.JSW.KirFin.cor h₀) (U : Set (GL (Fin (m + 2)) F))
+                ↔ h ∈ GlobalTheory.JSW.Cut.cell h₀ (B : Set (GL (Fin (m + 1)) F)) := by
   intro F _ m U hUc hUo
   refine ⟨blocks U, isCompact_blocks hUc, ?_, fun b hb => ⟨0, hb⟩, fun h₀ h => ?_⟩
-  · exact Subgroup.isOpen_mono (H₁ := U.comap cor) (fun b hb => ⟨0, hb⟩) (hUo.preimage continuous_cor)
+  · exact
+      Subgroup.isOpen_mono (H₁ := U.comap cor) (fun b hb => ⟨0, hb⟩) (hUo.preimage continuous_cor)
   constructor
   · rintro ⟨n, hn, u, hu, e⟩
     obtain ⟨n', x, rfl⟩ := exists_mir (lr_of_mem hn)

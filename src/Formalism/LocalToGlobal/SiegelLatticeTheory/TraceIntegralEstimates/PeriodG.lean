@@ -16,26 +16,30 @@ noncomputable section
 
 namespace Formalism.L2.S.Pv.PeriodG
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.CayleySignature Formalism.L2.SG.BesselSplit
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+  Formalism.L2.SG.BesselSplit
 
 variable {k r : ℕ}
 
 section Period
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {Vp : Type} [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
 
 end Period
 
 section Period2
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {Vp : Type} [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
 
 end Period2
 
-theorem thrStar_le {n : ℕ} (ε : Fin n → Bool) :
-    ReciprocityTheory.ChartRestriction.DS.thrStar ε ≤ (n : ℝ) ^ 3 + 16 * (n : ℝ) ^ 2 + 16 * (n : ℝ) + 8 := by
+theorem thrStar_le {n : ℕ} (ε : Fin n → Bool)
+    : ReciprocityTheory.ChartRestriction.DS.thrStar ε
+      ≤ (n : ℝ) ^ 3 + 16 * (n : ℝ) ^ 2 + 16 * (n : ℝ) + 8 := by
   unfold ReciprocityTheory.ChartRestriction.DS.thrStar
   have hn : (0 : ℝ) ≤ n := n.cast_nonneg
   have hp : (ReciprocityTheory.ChartRestriction.DS.pOf ε : ℝ) ≤ n := by
@@ -49,22 +53,37 @@ theorem thrStar_le {n : ℕ} (ε : Fin n → Bool) :
       exact (Finset.card_le_univ _).trans (Fintype.card_fin n).le
     exact_mod_cast this
   have hq0 : (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ) ≤ n := by
-    have h0 : ReciprocityTheory.ChartRestriction.DS.S7.q0 ε ≤ ReciprocityTheory.ChartRestriction.DS.pOf ε := min_le_left _ _
-    have h0' : (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ) ≤ ReciprocityTheory.ChartRestriction.DS.pOf ε := by exact_mod_cast h0
+    have h0
+        : ReciprocityTheory.ChartRestriction.DS.S7.q0 ε
+          ≤ ReciprocityTheory.ChartRestriction.DS.pOf ε :=
+      min_le_left _ _
+    have h0'
+        : (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ)
+          ≤ ReciprocityTheory.ChartRestriction.DS.pOf ε := by
+      exact_mod_cast h0
     linarith
   have hq00 : (0 : ℝ) ≤ ReciprocityTheory.ChartRestriction.DS.S7.q0 ε := Nat.cast_nonneg _
   have hs : √(2 * (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ)) ≤ n + 1 := by
-    calc √(2 * (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ)) ≤ √(((n : ℝ) + 1) ^ 2) :=
-          Real.sqrt_le_sqrt (by nlinarith)
+    calc
+      √(2 * (ReciprocityTheory.ChartRestriction.DS.S7.q0 ε : ℝ))
+        ≤ √(((n : ℝ) + 1) ^ 2) := Real.sqrt_le_sqrt (by nlinarith)
       _ = n + 1 := Real.sqrt_sq (by linarith)
-  have hpq : (ReciprocityTheory.ChartRestriction.DS.pOf ε : ℝ) * ReciprocityTheory.ChartRestriction.DS.qOf ε ≤ n * n :=
+  have hpq
+      : (ReciprocityTheory.ChartRestriction.DS.pOf ε : ℝ)
+          * ReciprocityTheory.ChartRestriction.DS.qOf ε
+        ≤ n * n :=
     mul_le_mul hp hq (Nat.cast_nonneg _) hn
   apply max_le
   · nlinarith [mul_le_mul_of_nonneg_left hpq hn]
   · nlinarith [mul_le_mul_of_nonneg_left hq0 hn]
 
-theorem exponent_ok (k r : ℕ) {h : ℝ} (hok : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h) (ε : Fin (2 * r + k + 1) → Bool) :
-    ∃ m : ℕ, Formalism.FourierDecayAlt.ThreeDimData.AG k r < m ∧ ReciprocityTheory.ChartRestriction.DS.thrStar ε + m < h := by
+theorem exponent_ok
+    (k r : ℕ)
+    {h : ℝ} (hok : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h)
+    (ε : Fin (2 * r + k + 1) → Bool)
+    : ∃ m : ℕ,
+      Formalism.FourierDecayAlt.ThreeDimData.AG k r < m
+        ∧ ReciprocityTheory.ChartRestriction.DS.thrStar ε + m < h := by
   obtain ⟨hk, hh, -, -⟩ := hok
   refine ⟨⌊Formalism.FourierDecayAlt.ThreeDimData.AG k r⌋₊ + 1, ?_, ?_⟩
   · push_cast
@@ -74,7 +93,10 @@ theorem exponent_ok (k r : ℕ) {h : ℝ} (hok : Formalism.FourierDecayAlt.Three
     have hAG : (0 : ℝ) ≤ Formalism.FourierDecayAlt.ThreeDimData.AG k r := by
       rw [hAGv]
       positivity
-    have hfl : (⌊Formalism.FourierDecayAlt.ThreeDimData.AG k r⌋₊ : ℝ) ≤ Formalism.FourierDecayAlt.ThreeDimData.AG k r := Nat.floor_le hAG
+    have hfl
+        : (⌊Formalism.FourierDecayAlt.ThreeDimData.AG k r⌋₊ : ℝ)
+          ≤ Formalism.FourierDecayAlt.ThreeDimData.AG k r :=
+      Nat.floor_le hAG
     push_cast at hh h1 ⊢
     have hk' : (1 : ℝ) ≤ k := by exact_mod_cast hk
     have hr : (0 : ℝ) ≤ r := r.cast_nonneg

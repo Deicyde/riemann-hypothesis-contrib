@@ -13,9 +13,13 @@ open GlobalTheory.ConvSer
 
 namespace GlobalTheory.ConvSer
 
-theorem intg_nMul_of_intg (K : Type) [NormedField K] [IsUltrametricDist K] (F : FormalGroup K)
-    (hF : Intg F.toPowerSeries) (n : ℕ) : Intg (nMul F n) := by
-  obtain ⟨-, -, -, -, hX, -, hsub, -⟩ := GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
+theorem intg_nMul_of_intg
+    (K : Type) [NormedField K] [IsUltrametricDist K]
+    (F : FormalGroup K) (hF : Intg F.toPowerSeries)
+    (n : ℕ)
+    : Intg (nMul F n) := by
+  obtain ⟨-, -, -, -, hX, -, hsub, -⟩ :=
+    GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
   induction n with
   | zero =>
     rw [nMul_zero]
@@ -23,7 +27,8 @@ theorem intg_nMul_of_intg (K : Type) [NormedField K] [IsUltrametricDist K] (F : 
     simp
   | succ n ih =>
     rw [nMul_succ]
-    have hc : PowerSeries.constantCoeff (nMul F n) = 0 := ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 n).1
+    have hc : PowerSeries.constantCoeff (nMul F n) = 0 :=
+      ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 n).1
     refine (hsub (Fin 2) ![nMul F n, PowerSeries.X] F.toPowerSeries ?_ ?_).1 hF
     · intro j
       fin_cases j
@@ -34,25 +39,30 @@ theorem intg_nMul_of_intg (K : Type) [NormedField K] [IsUltrametricDist K] (F : 
       · exact hc
       · exact PowerSeries.constantCoeff_X
 
-theorem exists_torsion_tower (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    [IsAlgClosed K] [CharZero K] (p : ℕ) [Fact p.Prime] (F : FormalGroup K)
-    (hF : Intg F.toPowerSeries) (hp : ‖PowerSeries.coeff p (nMul F p)‖ = 1)
-    (hlt : ∀ k < p, ‖PowerSeries.coeff k (nMul F p)‖ < 1) :
-    ∃ t : ℕ → K, (∀ n, ‖t n‖ < 1) ∧ t 0 = 0 ∧ t 1 ≠ 0 ∧
-      ∀ n, ev1 (nMul F p) (t (n + 1)) = t n := by
+theorem exists_torsion_tower
+    (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [IsAlgClosed K] [CharZero K]
+    (p : ℕ) [Fact p.Prime]
+    (F : FormalGroup K) (hF : Intg F.toPowerSeries) (hp : ‖PowerSeries.coeff p (nMul F p)‖ = 1)
+    (hlt : ∀ k < p, ‖PowerSeries.coeff k (nMul F p)‖ < 1)
+    : ∃ t : ℕ → K,
+      (∀ n, ‖t n‖ < 1) ∧ t 0 = 0 ∧ t 1 ≠ 0 ∧ ∀ n, ev1 (nMul F p) (t (n + 1)) = t n := by
   classical
   have hpr : p.Prime := Fact.out
   have hI := intg_nMul_of_intg K F hF p
   set h := nMul F p with hh
-  obtain ⟨-, -, hpow, -, -, -, -, -, -, hiff⟩ := GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
-  have hev := fun (x : K) (hx : ‖x‖ < 1) => GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
+  obtain ⟨-, -, hpow, -, -, -, -, -, -, hiff⟩ :=
+    GlobalTheory.T.mvPowerSeries_integral_bounded_closure K Unit
+  have hev := fun (x : K) (hx : ‖x‖ < 1) =>
+    GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
   have hbdd : ∀ f : PowerSeries K, Intg f → Bdd f := fun f hf => (hpow f 0).2.2 hf
   have hcoef : ∀ n, ‖PowerSeries.coeff n h‖ ≤ 1 := (hiff h).1.1 hI
   have h0 : PowerSeries.coeff 0 h = 0 := by
     rw [PowerSeries.coeff_zero_eq_constantCoeff_apply]
     exact ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 p).1
-  have h0c : PowerSeries.constantCoeff h = 0 := ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 p).1
-  have h1 : PowerSeries.coeff 1 h = (p : K) := ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 p).2
+  have h0c : PowerSeries.constantCoeff h = 0 :=
+    ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 p).1
+  have h1 : PowerSeries.coeff 1 h = (p : K) :=
+    ((GlobalTheory.T.formalGroupNatMulSeries_properties K F).1 p).2
   have hp0 : (p : K) ≠ 0 := Nat.cast_ne_zero.mpr hpr.ne_zero
   have hz : ‖(0 : K)‖ < 1 := by simp
   obtain ⟨-, -, -, -, -, -, -, -, -, -, hzero⟩ := hev 0 hz
@@ -66,14 +76,17 @@ theorem exists_torsion_tower (K : Type) [NormedField K] [IsUltrametricDist K] [C
       · simp [h0c, hc.le]
       · rw [map_sub, PowerSeries.coeff_C, if_neg (Nat.succ_ne_zero n), sub_zero]
         exact hcoef _
-    obtain ⟨y, hy, hy0⟩ := GlobalTheory.T.exists_root_openDisc_of_weierstrassDegree K (h - PowerSeries.C c) p hpr.pos hIc (by
-        rw [map_sub, PowerSeries.coeff_C, if_neg hpr.ne_zero, sub_zero]
-        exact hp) (by
-        intro k hk
-        rcases k with _ | k
-        · simpa [h0, h0c] using hc
-        · rw [map_sub, PowerSeries.coeff_C, if_neg (Nat.succ_ne_zero k), sub_zero]
-          exact hlt _ hk)
+    obtain ⟨y, hy, hy0⟩ :=
+      GlobalTheory.T.exists_root_openDisc_of_weierstrassDegree K (h - PowerSeries.C c) p hpr.pos hIc
+        (by
+          rw [map_sub, PowerSeries.coeff_C, if_neg hpr.ne_zero, sub_zero]
+          exact hp)
+        (by
+          intro k hk
+          rcases k with _ | k
+          · simpa [h0, h0c] using hc
+          · rw [map_sub, PowerSeries.coeff_C, if_neg (Nat.succ_ne_zero k), sub_zero]
+            exact hlt _ hk)
     refine ⟨⟨y, hy⟩, ?_⟩
     obtain ⟨-, hops, hCe, -⟩ := hev y hy
     have hCI : Intg (PowerSeries.C c) := by
@@ -95,12 +108,15 @@ theorem exists_torsion_tower (K : Type) [NormedField K] [IsUltrametricDist K] [C
     rw [hg, PowerSeries.coeff_mk]
     exact hcoef _
   have hp1 : 0 < p - 1 := by have := hpr.two_le; omega
-  obtain ⟨x, hx, hx0⟩ := GlobalTheory.T.exists_root_openDisc_of_weierstrassDegree K g (p - 1) hp1 hgI (by
-      rw [hg, PowerSeries.coeff_mk, Nat.sub_add_cancel hpr.one_lt.le]
-      exact hp) (by
-      intro k hk
-      rw [hg, PowerSeries.coeff_mk]
-      exact hlt _ (by omega))
+  obtain ⟨x, hx, hx0⟩ :=
+    GlobalTheory.T.exists_root_openDisc_of_weierstrassDegree K g (p - 1) hp1 hgI
+      (by
+        rw [hg, PowerSeries.coeff_mk, Nat.sub_add_cancel hpr.one_lt.le]
+        exact hp)
+      (by
+        intro k hk
+        rw [hg, PowerSeries.coeff_mk]
+        exact hlt _ (by omega))
   have hxne : x ≠ 0 := by
     rintro rfl
     rw [hzero, hg, PowerSeries.coeff_mk, h1] at hx0

@@ -17,14 +17,15 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem LemmaA.proof (h1 : FlagIntegralTopDegree.Statement)
-    (h2 : FlagIntegralVandermondePos.Statement) (h3 : FlagDividedDifferencePoly.Statement)
-    (h4 : FlagAntisymDecomposition.Statement) (h5 : FlagVandermondeHomogeneous.Statement)
-    (h6 : FlagAntisymHomogeneous.Statement) (h7 : FlagQuotientHomogeneous.Statement)
-    (h8 : FlagRestrictHomogeneous.Statement) (h9 : FlagRestrictSymmetric.Statement)
-    (h10 : FlagRestrictDecomposition.Statement) (h11 : FlagPowerSumPreimage.Statement)
-    (h12 : FlagRestrictConstantCoeff.Statement) (h13 : FlagIntegralViaQuotient.Statement) :
-    LemmaA.Statement := by
+theorem LemmaA.proof
+    (h1 : FlagIntegralTopDegree.Statement) (h2 : FlagIntegralVandermondePos.Statement)
+    (h3 : FlagDividedDifferencePoly.Statement) (h4 : FlagAntisymDecomposition.Statement)
+    (h5 : FlagVandermondeHomogeneous.Statement) (h6 : FlagAntisymHomogeneous.Statement)
+    (h7 : FlagQuotientHomogeneous.Statement) (h8 : FlagRestrictHomogeneous.Statement)
+    (h9 : FlagRestrictSymmetric.Statement) (h10 : FlagRestrictDecomposition.Statement)
+    (h11 : FlagPowerSumPreimage.Statement) (h12 : FlagRestrictConstantCoeff.Statement)
+    (h13 : FlagIntegralViaQuotient.Statement)
+    : LemmaA.Statement := by
   intro f N
   refine ⟨flagIntegral f N (blockVandermonde f N) / (N.factorial : ℚ) ^ f, ?_, ?_, ?_⟩
   · exact div_ne_zero (h2 f N).ne' (pow_ne_zero _ (Nat.cast_ne_zero.mpr N.factorial_ne_zero))
@@ -46,8 +47,8 @@ theorem LemmaA.proof (h1 : FlagIntegralTopDegree.Statement)
     have hA := h6 f N (G * F) _ hGF
     rw [hanti] at hA
     exact h8 f N τ P k (h7 _ _ _ _ _ (Flag.blockVandermonde_ne_zero f N) (h5 f N) hA)
-  · obtain ⟨S, hS, hScoeff⟩ := h11 N (fun l => restrictToBlock f N τ (R l τ))
-      (fun l => h9 f N τ (R l τ) (hRsym l τ))
+  · obtain ⟨S, hS, hScoeff⟩ :=
+      h11 N (fun l => restrictToBlock f N τ (R l τ)) (fun l => h9 f N τ (R l τ) (hRsym l τ))
     refine ⟨S, ?_, ?_⟩
     · rw [hS, hPdef, h10]
     · rw [hScoeff k hk1 hkN, h12, h13 f N _ _ (hR k τ)]

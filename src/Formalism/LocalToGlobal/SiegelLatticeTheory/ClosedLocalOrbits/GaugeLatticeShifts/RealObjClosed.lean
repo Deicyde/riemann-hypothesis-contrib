@@ -14,7 +14,9 @@ open Formalism.BasicNotions Formalism.L2.SG.RealObj
 
 namespace Formalism.L2.SG.Pf
 
-theorem realObj_inNuX {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (sc : ℝ) : InNuX X u u' sc := by
+theorem realObj_inNuX
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (sc : ℝ)
+    : InNuX X u u' sc := by
   have hC : 0 ≤ DisintegrationConstant X u u' sc := by
     unfold DisintegrationConstant
     split_ifs with h

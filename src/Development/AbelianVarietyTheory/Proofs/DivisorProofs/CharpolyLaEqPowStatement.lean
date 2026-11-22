@@ -9,10 +9,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOf
 open NumberField
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.charpoly_la_eq_pow (p : ℕ) [Fact p.Prime]
-    (D : GlobalTheory.UPel.HT.Datum p) (c : 𝓞 D.F) :
-    haveI := D.freeLa
-    haveI := D.finLa
-    LinearMap.charpoly (DistribSMul.toLinearMap ℤ D.La (algebraMap (𝓞 D.F) D.O c)) =
-      (LinearMap.charpoly (LinearMap.mulLeft ℤ c)) ^ (D.m * D.n) :=
+theorem _root_.GlobalTheory.T.charpoly_la_eq_pow
+    (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (c : 𝓞 D.F)
+    : haveI := D.freeLa
+      haveI := D.finLa
+      LinearMap.charpoly (DistribSMul.toLinearMap ℤ D.La (algebraMap (𝓞 D.F) D.O c))
+        = (LinearMap.charpoly (LinearMap.mulLeft ℤ c)) ^ (D.m * D.n) :=
   GlobalTheory.UPel.HT.Datum.charpoly_La_eq_pow p D c

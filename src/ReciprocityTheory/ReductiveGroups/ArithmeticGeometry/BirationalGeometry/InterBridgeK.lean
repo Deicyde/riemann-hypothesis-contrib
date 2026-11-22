@@ -12,19 +12,22 @@ open Set Filter Topology Module
 
 variable {e : ℕ}
 
-theorem eventually_surjective_clm {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F]
-    [FiniteDimensional ℂ F] {Y : Type*} [TopologicalSpace Y] {A : Y → (Fin e → ℂ) →L[ℂ] F}
-    {y0 : Y} (hA : ContinuousAt A y0) (h0 : Function.Surjective (A y0)) :
-    ∀ᶠ y in 𝓝 y0, Function.Surjective (A y) := by
-  obtain ⟨Bl, hBl⟩ := (A y0 : (Fin e → ℂ) →ₗ[ℂ] F).exists_rightInverse_of_surjective
-    (LinearMap.range_eq_top.mpr h0)
+theorem eventually_surjective_clm
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ F]
+    {Y : Type*} [TopologicalSpace Y]
+    {A : Y → (Fin e → ℂ) →L[ℂ] F} {y0 : Y}
+    (hA : ContinuousAt A y0) (h0 : Function.Surjective (A y0))
+    : ∀ᶠ y in 𝓝 y0, Function.Surjective (A y) := by
+  obtain ⟨Bl, hBl⟩ :=
+    (A y0 : (Fin e → ℂ) →ₗ[ℂ] F).exists_rightInverse_of_surjective (LinearMap.range_eq_top.mpr h0)
   set B : F →L[ℂ] (Fin e → ℂ) := LinearMap.toContinuousLinearMap Bl
   have hB : (A y0).comp B = 1 := by
     ext1 v
     exact LinearMap.congr_fun hBl v
   have hc : ContinuousAt (fun y => (A y).comp B) y0 := hA.clm_comp continuousAt_const
   have hU : ∀ᶠ y in 𝓝 y0, IsUnit ((A y).comp B) :=
-    hc.eventually (Units.isOpen.mem_nhds (by show IsUnit ((A y0).comp B); rw [hB]; exact isUnit_one))
+    hc.eventually (Units.isOpen.mem_nhds (by
+      show IsUnit ((A y0).comp B); rw [hB]; exact isUnit_one))
   filter_upwards [hU] with y hy
   obtain ⟨S, hS⟩ := hy.exists_right_inv
   intro v
@@ -32,16 +35,20 @@ theorem eventually_surjective_clm {F : Type*} [NormedAddCommGroup F] [NormedSpac
   have := congrArg (fun T : F →L[ℂ] F => T v) hS
   simpa using this
 
-theorem exists_infinite_fibre {W : Set (Fin e → ℂ)} (hW : IsOpen W) (hne : W.Nonempty)
+theorem exists_infinite_fibre
+    {W : Set (Fin e → ℂ)} (hW : IsOpen W) (hne : W.Nonempty)
     {Q : (Fin e → ℂ) → (Fin e → ℂ)} (hQ : AnalyticOnNhd ℂ Q W)
-    (hdet : ∀ u ∈ W, LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) = 0) :
-    ∃ y, (W ∩ Q ⁻¹' {y}).Infinite := by
+    (hdet : ∀ u ∈ W, LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) = 0)
+    : ∃ y, (W ∩ Q ⁻¹' {y}).Infinite := by
   classical
   set rk : (Fin e → ℂ) → ℕ := fun u =>
     finrank ℂ (LinearMap.range (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))) with hrk
-  have hbdd : BddAbove (rk '' W) := ⟨e, by
-    rintro _ ⟨u, -, rfl⟩
-    exact (Submodule.finrank_le _).trans (le_of_eq (finrank_fin_fun ℂ))⟩
+  have hbdd : BddAbove (rk '' W) := ⟨
+    e,
+    by
+      rintro _ ⟨u, -, rfl⟩
+      exact (Submodule.finrank_le _).trans (le_of_eq (finrank_fin_fun ℂ))
+  ⟩
   have hmax : ∀ u ∈ W, rk u ≤ sSup (rk '' W) := fun u hu => le_csSup hbdd ⟨u, hu, rfl⟩
   obtain ⟨u0, hu0, hru0⟩ := Nat.sSup_mem (hne.image rk) hbdd
   generalize hrdef : sSup (rk '' W) = r at hru0 hmax
@@ -120,17 +127,22 @@ theorem exists_infinite_fibre {W : Set (Fin e → ℂ)} (hW : IsOpen W) (hne : W
   have hA : ContinuousAt (fun u => PL.comp (fderiv ℂ Q u)) u0 :=
     continuousAt_const.clm_comp hQa0.fderiv.continuousAt
   have hev_u : ∀ᶠ u in 𝓝 u0, u ∈ W ∧ Function.Surjective (PL.comp (fderiv ℂ Q u)) :=
-    (Filter.eventually_of_mem (hW.mem_nhds hu0) fun u hu => hu).and (eventually_surjective_clm hA hDf0)
-  have hev : ∀ᶠ p in 𝓝 (Φ u0), p ∈ H.target ∧ AnalyticAt ℂ H.symm p ∧ H.symm p ∈ W ∧
-      Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p))) := by
-    have h1 : ∀ᶠ p in 𝓝 (Φ u0), H.symm p ∈ W ∧
-        Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p))) :=
+    (Filter.eventually_of_mem (hW.mem_nhds hu0) fun u hu => hu).and
+      (eventually_surjective_clm hA hDf0)
+  have hev
+      : ∀ᶠ p in 𝓝 (Φ u0), p ∈ H.target ∧ AnalyticAt ℂ H.symm p ∧ H.symm p ∈ W ∧
+        Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p))) := by
+    have h1
+        : ∀ᶠ p in 𝓝 (Φ u0), H.symm p ∈ W ∧
+          Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p))) :=
       (H.continuousAt_symm hpt).eventually (by rw [hsym0]; exact hev_u)
     filter_upwards [H.open_target.mem_nhds hpt, hsa.eventually_analyticAt, h1] with p h2 h3 h4
     exact ⟨h2, h3, h4⟩
-  have hkey : ∀ p, p ∈ H.target → AnalyticAt ℂ H.symm p → H.symm p ∈ W →
-      Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p))) → ∀ κ : K0,
-      fderiv ℂ (Q ∘ H.symm) p (0, κ) = 0 := by
+  have hkey
+      : ∀ p,
+        p ∈ H.target → AnalyticAt ℂ H.symm p → H.symm p ∈ W
+          → Function.Surjective (PL.comp (fderiv ℂ Q (H.symm p)))
+          → ∀ κ : K0, fderiv ℂ (Q ∘ H.symm) p (0, κ) = 0 := by
     intro p hp han hW' hs κ
     have hcomp : HasFDerivAt (Φ ∘ H.symm)
         (((PL.comp (fderiv ℂ Q (H.symm p))).prod gL).comp (fderiv ℂ H.symm p)) p :=
@@ -139,29 +151,37 @@ theorem exists_infinite_fibre {W : Set (Fin e → ℂ)} (hW : IsOpen W) (hne : W
       refine (hasFDerivAt_id p).congr_of_eventuallyEq ?_
       filter_upwards [H.open_target.mem_nhds hp] with p' hp'
       show Φ (H.symm p') = p'
-      rw [← hHc]; exact H.right_inv hp'
+      rw [← hHc]
+      exact H.right_inv hp'
     have heq := hcomp.unique hid
     have hw := congrArg (fun T => T (0, κ)) heq
     simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.prod_apply,
-      ContinuousLinearMap.id_apply] at hw
+        ContinuousLinearMap.id_apply]
+      at hw
     have hw1 : PL (fderiv ℂ Q (H.symm p) (fderiv ℂ H.symm p (0, κ))) = 0 := congrArg Prod.fst hw
-    have hker : LinearMap.ker (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) =
-        LinearMap.ker ((PL.comp (fderiv ℂ Q (H.symm p))) : (Fin e → ℂ) →ₗ[ℂ] R0) := by
+    have hker
+        : LinearMap.ker (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+          = LinearMap.ker ((PL.comp (fderiv ℂ Q (H.symm p))) : (Fin e → ℂ) →ₗ[ℂ] R0) := by
       apply Submodule.eq_of_le_of_finrank_le
       · intro v hv
         rw [LinearMap.mem_ker] at hv ⊢
         show PL (fderiv ℂ Q (H.symm p) v) = 0
         rw [show (fderiv ℂ Q (H.symm p)) v = 0 from hv, map_zero]
-      · have h1 := LinearMap.finrank_range_add_finrank_ker
-          ((PL.comp (fderiv ℂ Q (H.symm p))) : (Fin e → ℂ) →ₗ[ℂ] R0)
-        have h2 := LinearMap.finrank_range_add_finrank_ker
-          (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+      · have h1 :=
+          LinearMap.finrank_range_add_finrank_ker
+            ((PL.comp (fderiv ℂ Q (H.symm p))) : (Fin e → ℂ) →ₗ[ℂ] R0)
+        have h2 :=
+          LinearMap.finrank_range_add_finrank_ker
+            (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
         rw [LinearMap.range_eq_top.mpr hs, finrank_top, hR0] at h1
-        have h3 : finrank ℂ (LinearMap.range (fderiv ℂ Q (H.symm p) :
-            (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))) ≤ r := hmax _ hW'
+        have h3
+            : finrank ℂ (LinearMap.range (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))
+              ≤ r :=
+          hmax _ hW'
         omega
-    have hwker : fderiv ℂ H.symm p (0, κ) ∈
-        LinearMap.ker (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) := by
+    have hwker
+        : fderiv ℂ H.symm p (0, κ)
+          ∈ LinearMap.ker (fderiv ℂ Q (H.symm p) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) := by
       rw [hker]; exact hw1
     rw [fderiv_comp p (hQ _ hW').differentiableAt han.differentiableAt]
     exact hwker
@@ -177,7 +197,9 @@ theorem exists_infinite_fibre {W : Set (Fin e → ℂ)} (hW : IsOpen W) (hne : W
     rwa [Metric.mem_ball, dist_zero_right] at hk
   have hιd : ∀ k, HasFDerivAt ι (ContinuousLinearMap.inr ℂ R0 K0) k := fun k =>
     (hasFDerivAt_const c0.1 k).prodMk ((hasFDerivAt_id k).const_add c0.2)
-  have hGd : ∀ k ∈ Metric.ball (0 : K0) ε, HasFDerivAt (fun k => Q (H.symm (ι k))) (0 : K0 →L[ℂ] (Fin e → ℂ)) k := by
+  have hGd
+      : ∀ k ∈ Metric.ball (0 : K0) ε,
+        HasFDerivAt (fun k => Q (H.symm (ι k))) (0 : K0 →L[ℂ] (Fin e → ℂ)) k := by
     intro k hk
     obtain ⟨hp, han, hW', hs⟩ := hball _ (hιball k hk)
     have hG : HasFDerivAt (Q ∘ H.symm) (fderiv ℂ (Q ∘ H.symm) (ι k)) (ι k) :=

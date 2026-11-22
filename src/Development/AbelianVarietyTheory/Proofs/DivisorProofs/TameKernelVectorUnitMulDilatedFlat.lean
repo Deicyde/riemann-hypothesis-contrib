@@ -40,9 +40,12 @@ set_option autoImplicit false
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
 open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
-open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies GlobalTheory.OnCmp
+open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies
+  GlobalTheory.OnCmp
 open scoped TensorProduct
 
 set_option synthInstance.maxHeartbeats 400000
@@ -52,24 +55,39 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BaseCmp
 
-
 open Classical in
-theorem kerDat_twoStep {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type}
-    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {F : Face D A} (hC : GlobalTheory.Hk3.Core R F)
-    {i : Fin D.R.m} {ξ : Formalism.L2.Host.HChar D.host.E} {χ : (AE D)ˣ →* Circle} {ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ}
-    {Q : Finset (Pl D.host.E)} {ω : WeilRep D i} {φ : WO (Vc D i) (Wc D i) → ℂ} (hK : KerDat R i ξ χ ξR Q ω φ)
-    (hQ : ∃ t, Q ⊆ R.Q t) {eg eQ : AE D} {fg : WO (Vc D i) (Wc D i) → ℂ} (hg : IsIdemSum eg R.Pg) (hq : IsIdemSum eQ Q)
-    (hfg : IsTypeVec R i eg fg) :
-    IsThetaAt R.ψ (symplO (Vc D i) (Wc D i)) (heisO R.ψ (Vc D i) (Wc D i)) (cA D eQ) (lattice₂ R i) 1 fg
-      (fun x => if IsHalf (cA D eQ) x ∧ IsIntM (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x) then
-        omegaQ Q (Wc D i).rank ξR (-1) (fun PP => redM PP (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x)) else 0) φ := by
+theorem kerDat_twoStep
+    {D : D7} {G : Type} [Group G] [Fintype G]
+    {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    {R : RealDat D A Ks} {F : Face D A} (hC : GlobalTheory.Hk3.Core R F)
+    {i : Fin D.R.m} {ξ : Formalism.L2.Host.HChar D.host.E} {χ : (AE D)ˣ →* Circle}
+    {ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ} {Q : Finset (Pl D.host.E)} {ω : WeilRep D i}
+    {φ : WO (Vc D i) (Wc D i) → ℂ} (hK : KerDat R i ξ χ ξR Q ω φ) (hQ : ∃ t, Q ⊆ R.Q t)
+    {eg eQ : AE D} {fg : WO (Vc D i) (Wc D i) → ℂ}
+    (hg : IsIdemSum eg R.Pg) (hq : IsIdemSum eQ Q) (hfg : IsTypeVec R i eg fg)
+    : IsThetaAt R.ψ (symplO (Vc D i) (Wc D i)) (heisO R.ψ (Vc D i) (Wc D i)) (cA D eQ)
+      (lattice₂ R i) 1 fg
+      (fun x =>
+        if IsHalf (cA D eQ) x ∧ IsIntM (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x) then
+          omegaQ Q (Wc D i).rank ξR (-1)
+            (fun PP => redM PP (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x))
+        else
+          0)
+      φ := by
   obtain ⟨⟨hψ, -⟩, e, he, hTe⟩ := hK.vec
-  have hSV := GlobalTheory.AdTh.RecPair.selfDual_of_coe (GlobalTheory.AdTh.RecPair.coe_eq_of_frame (hC.lev.βV i))
-  have hSW := GlobalTheory.AdTh.RecPair.selfDual_of_coe (GlobalTheory.AdTh.RecPair.coe_eq_of_frame (hC.lev.βW i))
+  have hSV :=
+    GlobalTheory.AdTh.RecPair.selfDual_of_coe (GlobalTheory.AdTh.RecPair.coe_eq_of_frame (hC.lev.βV
+      i))
+  have hSW :=
+    GlobalTheory.AdTh.RecPair.selfDual_of_coe (GlobalTheory.AdTh.RecPair.coe_eq_of_frame (hC.lev.βW
+      i))
   obtain ⟨t, ht⟩ := hQ
-  have hd : Disjoint R.Pg Q := Disjoint.mono_right ht (GlobalTheory.TwistPlaces.typePlaces_disjoint_twistPlaces R F hC t)
+  have hd : Disjoint R.Pg Q :=
+    Disjoint.mono_right ht (GlobalTheory.TwistPlaces.typePlaces_disjoint_twistPlaces R F hC t)
   have hsum : e = eg + eQ := by
-    rw [← GlobalTheory.ExportSeries.idem_eq he, ← GlobalTheory.ExportSeries.idem_eq hg, ← GlobalTheory.ExportSeries.idem_eq hq]
+    rw [← GlobalTheory.ExportSeries.idem_eq he, ← GlobalTheory.ExportSeries.idem_eq hg,
+      ← GlobalTheory.ExportSeries.idem_eq hq]
     exact Finset.sum_union hd
   subst hsum
   have heg := GlobalTheory.PlaceVec.idemSum_mul_self hg
@@ -83,17 +101,30 @@ theorem kerDat_twoStep {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type}
   have hcQ : cA D eQ * cA D eQ = cA D eQ := by rw [← map_mul, heQ]
   have hQg : cA D eQ * cA D eg = 0 := by rw [← map_mul, mul_comm, hgQ, map_zero]
   have hgQ' : cA D eg * cA D eQ = 0 := by rw [mul_comm, hQg]
-  have hΛ : ∀ a : AE D, a * a = a → ∀ u ∈ (latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) fun _ => True),
-      a • u ∈ (latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) fun _ => True) :=
-    fun a ha u hu => GlobalTheory.PlaceModelSum.idem_smul_latO ha hu
-  have hinfg : infPart D (cA D eg) = 0 := GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hg)
-  have hinfQ : infPart D (cA D eQ) = 0 := GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hq)
-  have hSBg := GlobalTheory.PlaceVec.isSBHalf_of_red (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSV) (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSW) hinfg (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i))
-    (GlobalTheory.PlaceVec.frMapAdj_add _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_up _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_down _ _ _ _)
-    R.Pg (fun y => omegaK R.Pg y) fun y y' h => GlobalTheory.PlaceVec.omegaK_congr R.Pg h
-  have hSBQ := GlobalTheory.PlaceVec.isSBHalf_of_red (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSV) (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSW) hinfQ (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i))
-    (GlobalTheory.PlaceVec.frMapAdj_add _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_up _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_down _ _ _ _)
-    Q (fun y => omegaQ Q (Wc D i).rank ξR (-1) y) fun y y' h => GlobalTheory.PlaceVec.omegaQ_congr _ _ _ _ h
+  have hΛ
+      : ∀ a : AE D,
+        a * a = a
+          → ∀ u ∈ (latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) fun _ => True),
+            a • u ∈ (latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) fun _ => True) := fun a ha u hu =>
+    GlobalTheory.PlaceModelSum.idem_smul_latO ha hu
+  have hinfg : infPart D (cA D eg) = 0 :=
+    GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hg)
+  have hinfQ : infPart D (cA D eQ) = 0 :=
+    GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hq)
+  have hSBg :=
+    GlobalTheory.PlaceVec.isSBHalf_of_red (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSV)
+      (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSW) hinfg
+      (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i)) (GlobalTheory.PlaceVec.frMapAdj_add _ _ _ _)
+      (GlobalTheory.PlaceVec.frMapAdj_up _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_down _ _ _ _) R.Pg
+      (fun y => omegaK R.Pg y)
+      fun y y' h => GlobalTheory.PlaceVec.omegaK_congr R.Pg h
+  have hSBQ :=
+    GlobalTheory.PlaceVec.isSBHalf_of_red (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSV)
+      (GlobalTheory.PlaceVec.selfDual_isFullLattice _ _ hSW) hinfQ
+      (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i)) (GlobalTheory.PlaceVec.frMapAdj_add _ _ _ _)
+      (GlobalTheory.PlaceVec.frMapAdj_up _ _ _ _) (GlobalTheory.PlaceVec.frMapAdj_down _ _ _ _) Q
+      (fun y => omegaQ Q (Wc D i).rank ξR (-1) y)
+      fun y y' h => GlobalTheory.PlaceVec.omegaQ_congr _ _ _ _ h
   obtain ⟨⟨Te, hTe1⟩, hTe2⟩ := hTe
   have hc : cA D (eg + eQ) = cA D eQ + cA D eg := by rw [map_add (f := _), add_comm]
   have hc' : cA D (eg + eQ) = cA D eg + cA D eQ := map_add _ _ _
@@ -110,12 +141,16 @@ end GlobalTheory.BaseCmp
 
 namespace GlobalTheory.BaseCmp
 
-
 open GlobalTheory.ChainOnto in
-theorem kerDat_xiR_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks]
-    [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.Hk3.Core R F → ∀ (i : Fin D.R.m) (ξ : Formalism.L2.Host.HChar D.host.E) (χ : (AE D)ˣ →* Circle)
-    (ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ) (Q : Finset (Pl D.host.E)) (ω : WeilRep D i) (φ : WO (Vc D i) (Wc D i) → ℂ),
-    KerDat R i ξ χ ξR Q ω φ → ∀ PP ∈ Q, ξR PP ≠ 1 := by
+theorem kerDat_xiR_ne
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
+        (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A),
+      GlobalTheory.Hk3.Core R F
+        → ∀ (i : Fin D.R.m) (ξ : Formalism.L2.Host.HChar D.host.E) (χ : (AE D)ˣ →* Circle)
+            (ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ) (Q : Finset (Pl D.host.E)) (ω : WeilRep D i)
+            (φ : WO (Vc D i) (Wc D i) → ℂ),
+          KerDat R i ξ χ ξR Q ω φ → ∀ PP ∈ Q, ξR PP ≠ 1 := by
   intro D G _ _ Pl0 T0 A Ks _ _ _ R F _ i ξ χ ξR Q ω φ hK
   intro PP hP h1
   refine (hK.ram PP).2 (Or.inl hP) fun x hx => ?_
@@ -123,12 +158,16 @@ theorem kerDat_xiR_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : 
   rw [h1] at hc
   have hU : IsOpen {z : PP.adicCompletion D.host.E | Valued.v (z - x) < 1} :=
     (GlobalTheory.ChainOnto.TameRes.isOpen_ltOne PP).preimage (continuous_sub_right _)
-  obtain ⟨k, hk⟩ := (HeightOneSpectrum.denseRange_algebraMap D.host.E PP).exists_mem_open hU ⟨x, by simp⟩
-  have hk' : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) < Valued.v (x : PP.adicCompletion D.host.E) := by
+  obtain ⟨k, hk⟩ :=
+    (HeightOneSpectrum.denseRange_algebraMap D.host.E PP).exists_mem_open hU ⟨x, by simp⟩
+  have hk'
+      : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x)
+        < Valued.v (x : PP.adicCompletion D.host.E) := by
     rw [hx]; exact hk
   have hv : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k) = 1 := by
     rw [Valuation.map_eq_of_sub_lt _ hk']; exact hx
-  have hv1 : PP.valuation D.host.E k = 1 := by rw [← GlobalTheory.ChainOnto.TameRes.val_alg]; exact hv
+  have hv1 : PP.valuation D.host.E k = 1 := by
+    rw [← GlobalTheory.ChainOnto.TameRes.val_alg]; exact hv
   have hk0 : k ≠ 0 := by
     rintro rfl
     simp at hv1
@@ -140,7 +179,9 @@ theorem kerDat_xiR_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : 
   have ha : a ∉ PP.asIdeal := fun hm =>
     absurd hav (ne_of_lt ((PP.valuation_lt_one_iff_mem (K := D.host.E) a).mpr hm))
   haveI : PP.asIdeal.IsMaximal := PP.isMaximal
-  have key : ∀ (b : 𝓞 D.host.E), b ∉ PP.asIdeal → ∀ y : D.host.Eˣ, (y : D.host.E) = b → ξ.locK PP y = 1 := by
+  have key
+      : ∀ (b : 𝓞 D.host.E),
+        b ∉ PP.asIdeal → ∀ y : D.host.Eˣ, (y : D.host.E) = b → ξ.locK PP y = 1 := by
     intro b hb y hy
     have hms : (Ideal.Quotient.mk PP.asIdeal b : kP PP) ≠ 0 := by
       rw [Ne, Ideal.Quotient.eq_zero_iff_mem]; exact hb
@@ -155,24 +196,32 @@ theorem kerDat_xiR_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : 
     have := congrArg (ξ.locK PP) hkk
     rwa [map_mul, key _ hs (Units.mk0 _ hs0) rfl, key _ ha (Units.mk0 _ ha0) rfl, mul_one] at this
   set y := Formalism.L2.Host.atFin PP (Units.mk0 k hk0) with hy
-  have hyv : (y : PP.adicCompletion D.host.E) = algebraMap D.host.E (PP.adicCompletion D.host.E) k := rfl
-  have ht := hK.tame PP (y * x⁻¹) (by
-    unfold Formalism.L2.Host.IsUnitAt at *
-    rw [Units.val_mul, Units.val_inv_eq_inv_val, map_mul, map_inv₀, hyv, hv, hx, inv_one, mul_one]) (by
-    have e : ((y * x⁻¹ : (PP.adicCompletion D.host.E)ˣ) : PP.adicCompletion D.host.E) - 1 =
-        (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) * (x : PP.adicCompletion D.host.E)⁻¹ := by
-      rw [Units.val_mul, Units.val_inv_eq_inv_val, hyv, sub_mul, mul_inv_cancel₀ x.ne_zero]
-    unfold Formalism.L2.Host.IsUnitAt at hx
-    rw [e, map_mul, map_inv₀, hx, inv_one, mul_one]
-    have hlt : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) < 1 := hk
-    generalize Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) = z at hlt
-    rcases eq_or_ne z 0 with rfl | hz
-    · exact zero_le'
-    · rw [← WithZero.exp_log hz] at hlt ⊢
-      rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at hlt
-      rw [WithZero.exp_le_exp]
-      push_cast
-      omega)
+  have hyv
+      : (y : PP.adicCompletion D.host.E) = algebraMap D.host.E (PP.adicCompletion D.host.E) k :=
+    rfl
+  have ht :=
+    hK.tame PP (y * x⁻¹)
+      (by
+        unfold Formalism.L2.Host.IsUnitAt at *
+        rw [Units.val_mul, Units.val_inv_eq_inv_val, map_mul, map_inv₀, hyv, hv, hx, inv_one,
+          mul_one])
+      (by
+        have e
+            : ((y * x⁻¹ : (PP.adicCompletion D.host.E)ˣ) : PP.adicCompletion D.host.E) - 1
+              = (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x)
+                * (x : PP.adicCompletion D.host.E)⁻¹ := by
+          rw [Units.val_mul, Units.val_inv_eq_inv_val, hyv, sub_mul, mul_inv_cancel₀ x.ne_zero]
+        unfold Formalism.L2.Host.IsUnitAt at hx
+        rw [e, map_mul, map_inv₀, hx, inv_one, mul_one]
+        have hlt : Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) < 1 := hk
+        generalize Valued.v (algebraMap D.host.E (PP.adicCompletion D.host.E) k - x) = z at hlt
+        rcases eq_or_ne z 0 with rfl | hz
+        · exact zero_le'
+        · rw [← WithZero.exp_log hz] at hlt ⊢
+          rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at hlt
+          rw [WithZero.exp_le_exp]
+          push_cast
+          omega)
   have hk2 : ξ.loc PP y = 1 := hk1
   rw [map_mul, hk2, one_mul, map_inv, inv_eq_one] at ht
   exact ht
@@ -181,27 +230,59 @@ end GlobalTheory.BaseCmp
 
 namespace GlobalTheory.BaseCmp
 
-
 open Classical in
-theorem liftKer_of_ne : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks]
-    [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.Hk3.Core R F →
-    QGuard R → ∀ (i : Fin D.R.m), VStd D i → ∀ (ξ : Formalism.L2.Host.HChar D.host.E) (χ : (AE D)ˣ →* Circle)
-    (ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ) (Q : Finset (Pl D.host.E)) (ω : WeilRep D i) (φ : WO (Vc D i) (Wc D i) → ℂ),
-    KerDat R i ξ χ ξR Q ω φ → (∃ t, Q ⊆ R.Q t) → ∀ N : ℕ, N ≠ 0 → (∀ PP ∈ Q, (N : 𝓞 D.host.E) ∈ PP.asIdeal) →
-    ∀ (eg eQ : AE D) (fg : WO (Vc D i) (Wc D i) → ℂ), IsIdemSum eg R.Pg → IsIdemSum eQ Q → IsTypeVec R i eg fg →
-    ∀ ϖ : 𝓞 D.host.E, ϖ ≠ 0 → (∀ PP ∈ Q, ϖ ∈ PP.asIdeal ∧ ϖ ∉ PP.asIdeal ^ 2) →
-      ∃ Gc : ℂ, UnitOff N Gc ∧ IsSBHalf eQ (lattice₂ R i) (fun x => Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x)) ∧
-        ∀ Tm, IsModel R i eQ fg Tm → φ = Tm (fun x => Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x)) := by
-  intro D G _ _ Pl0 T0 A Ks _ _ _ R F hC hG i hV ξ χ ξR Q ω φ hK hQ N hN hNQ eg eQ fg hg hq hfg ϖ hϖ0 hϖ
+theorem liftKer_of_ne
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
+        (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A),
+      GlobalTheory.Hk3.Core R F → QGuard R
+        → ∀ (i : Fin D.R.m),
+          VStd D i
+            → ∀ (ξ : Formalism.L2.Host.HChar D.host.E) (χ : (AE D)ˣ →* Circle)
+                (ξR : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ) (Q : Finset (Pl D.host.E))
+                (ω : WeilRep D i) (φ : WO (Vc D i) (Wc D i) → ℂ),
+              KerDat R i ξ χ ξR Q ω φ → (∃ t, Q ⊆ R.Q t)
+                → ∀ N : ℕ,
+                  N ≠ 0 → (∀ PP ∈ Q, (N : 𝓞 D.host.E) ∈ PP.asIdeal)
+                    → ∀ (eg eQ : AE D) (fg : WO (Vc D i) (Wc D i) → ℂ),
+                      IsIdemSum eg R.Pg → IsIdemSum eQ Q → IsTypeVec R i eg fg
+                        → ∀ ϖ : 𝓞 D.host.E,
+                          ϖ ≠ 0 → (∀ PP ∈ Q, ϖ ∈ PP.asIdeal ∧ ϖ ∉ PP.asIdeal ^ 2)
+                            → ∃ Gc : ℂ,
+                              UnitOff N Gc
+                                ∧ IsSBHalf eQ (lattice₂ R i)
+                                  (fun x => Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x))
+                                ∧ ∀ Tm,
+                                  IsModel R i eQ fg Tm
+                                    → φ
+                                      = Tm (fun x =>
+                                        Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x)) := by
+  intro D G _ _ Pl0 T0 A Ks _ _ _ R F hC hG i hV ξ χ ξR Q ω φ hK hQ N hN hNQ eg eQ fg hg hq hfg ϖ
+    hϖ0 hϖ
   have hθ := kerDat_twoStep hC hK hQ hg hq hfg
-  obtain ⟨Y, a, Gc, hU, hY, hΦ, hS⟩ := GlobalTheory.T.lift_datum_conjugate_half_finite_fourier_sum D G Pl0 T0 A Ks R F hC hG i hV ξR Q hQ
-    (kerDat_xiR_ne D G Pl0 T0 A Ks R F hC i ξ χ ξR Q ω φ hK) N hN hNQ eQ hq ϖ hϖ0 hϖ
-  refine ⟨Gc, hU, GlobalTheory.T.dilatedFlatDatum_isSBHalf_tameKernel D G Pl0 T0 A Ks R F hC hG i hV ξR Q hQ eQ hq ϖ hϖ0 hϖ Gc, fun Tm hTm => ?_⟩
-  have h1 := GlobalTheory.DatumFourier.thetaAt_eq_sum (fun q : Y => q.1) (fun q : Y => a q.1) hθ
-    (fun q => by rw [GlobalTheory.LatVac.cA_cA]; exact hY q.1 q.2)
-    (fun t => by rw [hΦ t]; congr 1; exact (Finset.sum_coe_sort Y fun y => a y * R.ψ (symplO (Vc D i) (Wc D i) t y)).symm)
-  have h2 : (fun x => Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x)) =
-      ∑ y ∈ Y, a y • fun t => halfInd eQ (lattice₂ R i) (t + y) := by
+  obtain ⟨Y, a, Gc, hU, hY, hΦ, hS⟩ :=
+    GlobalTheory.T.lift_datum_conjugate_half_finite_fourier_sum D G Pl0 T0 A Ks R F hC hG i hV ξR Q
+      hQ (kerDat_xiR_ne D G Pl0 T0 A Ks R F hC i ξ χ ξR Q ω φ hK) N hN hNQ eQ hq ϖ hϖ0 hϖ
+  refine ⟨
+    Gc,
+    hU,
+    GlobalTheory.T.dilatedFlatDatum_isSBHalf_tameKernel D G Pl0 T0 A Ks R F hC hG i hV ξR Q hQ eQ hq
+      ϖ hϖ0 hϖ Gc,
+    fun Tm hTm => ?_
+  ⟩
+  have h1 :=
+    GlobalTheory.DatumFourier.thetaAt_eq_sum
+      (fun q : Y => q.1)
+      (fun q : Y => a q.1)
+      hθ
+      (fun q => by rw [GlobalTheory.LatVac.cA_cA]; exact hY q.1 q.2)
+      (fun t => by
+        rw [hΦ t]
+        congr 1
+        exact (Finset.sum_coe_sort Y fun y => a y * R.ψ (symplO (Vc D i) (Wc D i) t y)).symm)
+  have h2
+      : (fun x => Gc * flatDat R i Q ξR eQ (dil i (ϖ : D.host.E) x))
+        = ∑ y ∈ Y, a y • fun t => halfInd eQ (lattice₂ R i) (t + y) := by
     funext t
     rw [← hS t, Finset.sum_apply]
     rfl

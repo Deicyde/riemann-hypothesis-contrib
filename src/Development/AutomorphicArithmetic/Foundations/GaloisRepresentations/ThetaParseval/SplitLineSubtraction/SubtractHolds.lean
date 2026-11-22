@@ -47,16 +47,22 @@ theorem clConj : ClConj := clConj_holds cpFacts_holds contLeft_holds pstOfDR
 
 theorem clSub : ClSub := clSub_holds frobSub sumDR_holds pstOfDR wDFacts_holds
 
-theorem clTw : ClTw := clTw_holds frobSub twLoc_holds twJumps_holds pstOfDR wDFacts_holds contLeft_holds
+theorem clTw : ClTw :=
+  clTw_holds frobSub twLoc_holds twJumps_holds pstOfDR wDFacts_holds contLeft_holds
 
 theorem peelAll : PeelAll :=
-  peelAll_holds (peelOne_holds dgFacts_holds cpFacts_holds eigTransfer_holds eigSum_holds splitLine_holds sSLeft_holds)
+  peelAll_holds
+    (peelOne_holds dgFacts_holds cpFacts_holds eigTransfer_holds eigSum_holds splitLine_holds
+      sSLeft_holds)
     contLeft_holds clConj clSub
 
 theorem charEx : CharEx :=
   charEx_holds PositivityTheory.Stage1.PM.heckeLAdicCharacter charFrob_holds
-    (charAbove_holds PositivityTheory.Stage1.PM.heckeLAdicCharacter HodgeLocalDeRhamField.HLdR.field_outright
-      (UpperTheory.Lit.CharWD.algebraicCharacterWD GlobalTheory.globalArtinReciprocity_holds HodgeLocalDeRhamField.HLdR.field_outright GlobalTheory.deRham_potentiallySemistable) pstOfDR
-      contLeft_holds) charInj_holds
+    (charAbove_holds PositivityTheory.Stage1.PM.heckeLAdicCharacter
+      HodgeLocalDeRhamField.HLdR.field_outright
+      (UpperTheory.Lit.CharWD.algebraicCharacterWD GlobalTheory.globalArtinReciprocity_holds
+        HodgeLocalDeRhamField.HLdR.field_outright GlobalTheory.deRham_potentiallySemistable)
+      pstOfDR contLeft_holds)
+    charInj_holds
 
 end UpperTheory.Gal.TP.Sub

@@ -12,9 +12,10 @@ universe u v
 namespace ReciprocityTheory.CA.RegGens
 
 open Pointwise in
-theorem exists_regular_generators_maxIdeal : ∀ (d : ℕ) (P : Type u) [CommRing P] [IsRegularLocalRing P],
-    ringKrullDim P = d →
-    ∃ rs : List P, rs.length = d ∧ IsRegular P rs ∧ Ideal.ofList rs = maximalIdeal P := by
+theorem exists_regular_generators_maxIdeal
+    : ∀ (d : ℕ) (P : Type u) [CommRing P] [IsRegularLocalRing P],
+      ringKrullDim P = d
+        → ∃ rs : List P, rs.length = d ∧ IsRegular P rs ∧ Ideal.ofList rs = maximalIdeal P := by
   intro d
   induction d with
   | zero =>
@@ -40,8 +41,7 @@ theorem exists_regular_generators_maxIdeal : ∀ (d : ℕ) (P : Type u) [CommRin
       push Not at hc
       exact hsq fun y hy => hc y hy
     set I : Ideal P := Ideal.span ({x} : Set P) with hI
-    have hreg : IsRegularLocalRing (P ⧸ I) :=
-      RegA.IsRegularLocalRing.quotient_span_singleton hx hx2
+    have hreg : IsRegularLocalRing (P ⧸ I) := RegA.IsRegularLocalRing.quotient_span_singleton hx hx2
     have hdim : ringKrullDim (P ⧸ I) = d := by
       have h1 := RegA.IsRegularLocalRing.ringKrullDim_quotient_span_singleton_add_one hx hx2
       have h2 := IsRegularLocalRing.spanFinrank_maximalIdeal (R := P ⧸ I)
@@ -72,10 +72,12 @@ theorem exists_regular_generators_maxIdeal : ∀ (d : ℕ) (P : Type u) [CommRin
         obtain ⟨b, rfl⟩ := Submodule.Quotient.mk_surjective _ y
         rfl
     · rw [Ideal.ofList_cons]
-      have h1 : Ideal.comap (Ideal.Quotient.mk I) (Ideal.map (Ideal.Quotient.mk I)
-          (Ideal.ofList (rs'.map lift))) = Ideal.ofList (rs'.map lift) ⊔ I := by
-        rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
-          Ideal.mk_ker]
+      have h1
+          : Ideal.comap (Ideal.Quotient.mk I)
+              (Ideal.map (Ideal.Quotient.mk I) (Ideal.ofList (rs'.map lift)))
+            = Ideal.ofList (rs'.map lift) ⊔ I := by
+        rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective,
+          ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
       rw [Ideal.map_ofList, hmap, hgen] at h1
       have h2 : Ideal.comap (Ideal.Quotient.mk I) (maximalIdeal (P ⧸ I)) = maximalIdeal P := by
         have : (Ideal.comap (Ideal.Quotient.mk I) (maximalIdeal (P ⧸ I))).IsMaximal :=
@@ -83,9 +85,9 @@ theorem exists_regular_generators_maxIdeal : ∀ (d : ℕ) (P : Type u) [CommRin
         exact IsLocalRing.eq_maximalIdeal this
       rw [← h2, h1, sup_comm]
 
-theorem exists_regular_gens (P : Type u) [CommRing P] [IsRegularLocalRing P] (d : ℕ)
-    (hd : ringKrullDim P = d) :
-    ∃ rs : List P, rs.length = d ∧ IsRegular P rs ∧ Ideal.ofList rs = maximalIdeal P :=
+theorem exists_regular_gens
+    (P : Type u) [CommRing P] [IsRegularLocalRing P] (d : ℕ) (hd : ringKrullDim P = d)
+    : ∃ rs : List P, rs.length = d ∧ IsRegular P rs ∧ Ideal.ofList rs = maximalIdeal P :=
   exists_regular_generators_maxIdeal d P hd
 
 end ReciprocityTheory.CA.RegGens

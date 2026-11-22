@@ -17,19 +17,25 @@ open Formalism.G (unitBall)
 open Formalism.DworkPowerSeriesWeights (jetPair)
 open WeierstrassCurveSeries
 
-theorem curveJetsUnram (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K]
-    (W : WeierstrassCurve K) (hc : CoeffIn (unitBall K) W) (h2 : ‖(2 : K)‖ = 1)
-    (s2 al albar : K) (t : ℤ) (ι : Type) [Fintype ι] (neg : ι → ι) (xP yP : ι → K)
+theorem curveJetsUnram
+    (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K]
+    (W : WeierstrassCurve K) (hc : CoeffIn (unitBall K) W)
+    (h2 : ‖(2 : K)‖ = 1)
+    (s2 al albar : K)
+    (t : ℤ)
+    (ι : Type) [Fintype ι]
+    (neg : ι → ι) (xP yP : ι → K)
     (hE : IsEndoCurve W neg xP yP al) (hx : ∀ P, ‖xP P‖ ≤ 1) (hy : ∀ P, ‖yP P‖ ≤ 1)
     (hNal : al * albar = (Fintype.card ι : K) + 1) (hal : ‖al‖ = 1) (ht : al + albar = (t : K))
     (hd : ‖al - albar‖ = 1) (hb : ‖(al ^ 2 - 1) * (W.b₂ / 12)‖ ≤ 1)
-    (hs : al * (al - albar) * s2 = ∑ P, (xP P + W.b₂ / 12)) :
-    ∀ i : ℕ, 1 ≤ i → ‖jet (logSer W) (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) i‖ ≤ 1 := by
+    (hs : al * (al - albar) * s2 = ∑ P, (xP P + W.b₂ / 12))
+    : ∀ i : ℕ, 1 ≤ i → ‖jet (logSer W) (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) i‖ ≤ 1 := by
   obtain ⟨hlp, hwp, hAx, hFG, -⟩ := curveFrame K (unitBall K) W hc
   have hPh : IsPh (wpReg W) s2 (logSer W) (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) :=
     (phOIsPh K (wpReg W) (logSer W) s2 hlp.1 hlp.2.1).2
-  have hFr : Frame (unitBall K) (logSer W) (expSer W)
-      (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) := ⟨hlp, hFG, hPh.1⟩
+  have hFr
+      : Frame (unitBall K) (logSer W) (expSer W) (Formalism.L2.Th1.B.phO s2 (wpReg W) (logSer W)) :=
+    ⟨hlp, hFG, hPh.1⟩
   have h2R : (2 : K)⁻¹ ∈ unitBall K := inv_mem_unitBall h2
   have hal0 : al ≠ 0 := by
     intro h

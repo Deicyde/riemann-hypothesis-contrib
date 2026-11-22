@@ -16,14 +16,16 @@ abbrev Euc (n : ℕ) : Type := EuclideanSpace ℂ (Fin n)
 
 def stdOLat (O : Type) [CommRing O] (φ : O →+* ℂ) (n : ℕ) : Rows.OLat O φ (Euc n) := by
   classical
-  exact
-    { gen := Finset.univ.image (fun i => EuclideanSpace.basisFun (Fin n) ℂ i)
-      span_top := by
-        rw [Finset.coe_image, Finset.coe_univ, Set.image_univ]
-        exact (EuclideanSpace.basisFun (Fin n) ℂ).toBasis.span_eq }
+  exact {
+    gen := Finset.univ.image (fun i => EuclideanSpace.basisFun (Fin n) ℂ i)
+    span_top := by
+      rw [Finset.coe_image, Finset.coe_univ, Set.image_univ]
+      exact (EuclideanSpace.basisFun (Fin n) ℂ).toBasis.span_eq
+  }
 
-theorem mem_stdOLat {O : Type} [CommRing O] {φ : O →+* ℂ} {n : ℕ} {x : Euc n}
-    (hx : x ∈ (stdOLat O φ n).gen) : ∃ i, EuclideanSpace.basisFun (Fin n) ℂ i = x := by
+theorem mem_stdOLat
+    {O : Type} [CommRing O] {φ : O →+* ℂ} {n : ℕ} {x : Euc n} (hx : x ∈ (stdOLat O φ n).gen)
+    : ∃ i, EuclideanSpace.basisFun (Fin n) ℂ i = x := by
   classical
   simpa [stdOLat] using hx
 
@@ -32,17 +34,17 @@ def coordEmb {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) : (Fin n → K) �
   map_add' x y := by ext i; simp
   map_smul' a x := by ext i; simp
 
-theorem coordEmb_single {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) (i : Fin n) :
-    coordEmb σ n (Pi.single i 1) = EuclideanSpace.basisFun (Fin n) ℂ i := by
+theorem coordEmb_single {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) (i : Fin n)
+    : coordEmb σ n (Pi.single i 1) = EuclideanSpace.basisFun (Fin n) ℂ i := by
   ext j
   by_cases h : j = i
   · subst h; simp [coordEmb]
   · simp [coordEmb, h]
 
-theorem coordEmb_basis {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) {ι : Type}
-    (b : Module.Basis ι K (Fin n → K)) :
-    LinearIndependent ℂ (fun i => coordEmb σ n (b i)) ∧
-      Submodule.span ℂ (Set.range (fun i => coordEmb σ n (b i))) = ⊤ := by
+theorem coordEmb_basis
+    {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) {ι : Type} (b : Module.Basis ι K (Fin n → K))
+    : LinearIndependent ℂ (fun i => coordEmb σ n (b i))
+      ∧ Submodule.span ℂ (Set.range (fun i => coordEmb σ n (b i))) = ⊤ := by
   classical
   letI : Fintype ι := FiniteDimensional.fintypeBasisIndex b
   have hs : ⊤ ≤ Submodule.span ℂ (Set.range (fun i => coordEmb σ n (b i))) := by
@@ -57,9 +59,10 @@ theorem coordEmb_basis {K : Type} [Field K] (σ : K →+* ℂ) (n : ℕ) {ι : T
   rw [← Module.finrank_eq_card_basis b]
   simp
 
-theorem exists_frame {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (c : InnerProductSpace.Core ℂ V) :
-    ∃ e : Euc (Module.finrank ℂ V) ≃ₗ[ℂ] V, ∀ x y, inner ℂ x y = c.inner (e x) (e y) := by
+theorem exists_frame
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (c : InnerProductSpace.Core ℂ V)
+    : ∃ e : Euc (Module.finrank ℂ V) ≃ₗ[ℂ] V, ∀ x y, inner ℂ x y = c.inner (e x) (e y) := by
   letI : NormedAddCommGroup V := c.toNormedAddCommGroup
   letI : InnerProductSpace ℂ V := InnerProductSpace.ofCore c.toCore
   refine ⟨(stdOrthonormalBasis ℂ V).repr.symm.toLinearEquiv, fun x y => ?_⟩
@@ -67,11 +70,12 @@ theorem exists_frame {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimension
 
 variable {B : Base} (C : Cols B)
 
-def ramCore (u : B.Word)
+def ramCore
+    (u : B.Word)
     (h1 : ∀ φ ∈ (C.mem u).A.Mram, ∀ ψ ∈ (C.mem u).A.Mram,
       (C.fm u).ipC 0 ψ φ = starRingEnd ℂ ((C.fm u).ipC 0 φ ψ))
-    (h2 : ∀ φ ∈ (C.mem u).A.Mram, φ ≠ 0 → 0 < ((C.fm u).ipC 0 φ φ).re) :
-    InnerProductSpace.Core ℂ (C.mem u).A.Mram where
+    (h2 : ∀ φ ∈ (C.mem u).A.Mram, φ ≠ 0 → 0 < ((C.fm u).ipC 0 φ φ).re)
+    : InnerProductSpace.Core ℂ (C.mem u).A.Mram where
   inner φ ψ := (C.fm u).ipC 0 φ.1 ψ.1
   conj_inner_symm φ ψ := (h1 ψ.1 ψ.2 φ.1 φ.2).symm
   re_inner_nonneg φ := by
@@ -100,12 +104,14 @@ theorem mram_fd (u : B.Word) : FiniteDimensional ℂ (C.mem u).A.Mram := by
 def eucCast {a b : ℕ} (h : a = b) : Euc a ≃ₗᵢ[ℂ] Euc b :=
   LinearIsometryEquiv.piLpCongrLeft 2 ℂ ℂ (finCongr h)
 
-
 open Classical in
-def model (n : C.Tup → ℕ) (D : ℕ)
-    (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] Euc (n C.mu0)) (eTw : ∀ u μ, (C.PTw u μ).Mt ≃ₗ[ℂ] Euc (n μ))
+def model
+    (n : C.Tup → ℕ)
+    (D : ℕ) (e0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] Euc (n C.mu0))
+    (eTw : ∀ u μ, (C.PTw u μ).Mt ≃ₗ[ℂ] Euc (n μ))
     (eM : ∀ u, Euc (C.mem u).A.du ≃ₗ[ℂ] (C.mem u).A.Mram)
-    (heM : ∀ u φ ψ, inner ℂ φ ψ = (C.fm u).ipC 0 (eM u φ).1 (eM u ψ).1) : RowsRest B C where
+    (heM : ∀ u φ ψ, inner ℂ φ ψ = (C.fm u).ipC 0 (eM u φ).1 (eM u ψ).1)
+    : RowsRest B C where
   muAt _ := C.mu0
   muAt_conj _ := rfl
   muTw _ := C.mu0
@@ -135,8 +141,10 @@ def model (n : C.Tup → ℕ) (D : ℕ)
   eOp_sa _ _ _ := rfl
   Mu u := Euc (C.mem u).A.du
   perCol u μ φ F :=
-    if h : μ = C.mu0 then (C.mem u).P.PtilCol (eM u φ).1 ((e0 u).symm (eucCast (congrArg n h) F))
-    else (C.PTw u μ).PtilCol (C.e0Tw u μ (eM u φ).1) ((eTw u μ).symm F)
+    if h : μ = C.mu0 then
+      (C.mem u).P.PtilCol (eM u φ).1 ((e0 u).symm (eucCast (congrArg n h) F))
+    else
+      (C.PTw u μ).PtilCol (C.e0Tw u μ (eM u φ).1) ((eTw u μ).symm F)
   Bu _ φ F := (∑ a, φ a) * ∑ b, F b
   ze _ _ := 1
   rowsRest_wordColumnUnit_baseTuple _ := rfl
@@ -170,10 +178,14 @@ def model (n : C.Tup → ℕ) (D : ℕ)
   perCol_base_eq_PtilCol u φ F := by
     rw [dite_eq_left rfl]
     rfl
-  Bu_linL _ F := ⟨fun φ ψ => by simp [Finset.sum_add_distrib, add_mul],
-    fun a φ => by simp [← Finset.mul_sum, mul_assoc]⟩
-  Bu_linR _ φ := ⟨fun F G => by simp [Finset.sum_add_distrib, mul_add],
-    fun a F => by simp [← Finset.mul_sum, mul_left_comm]⟩
+  Bu_linL _ F := ⟨
+    fun φ ψ => by simp [Finset.sum_add_distrib, add_mul],
+    fun a φ => by simp [← Finset.mul_sum, mul_assoc]
+  ⟩
+  Bu_linR _ φ := ⟨
+    fun F G => by simp [Finset.sum_add_distrib, mul_add],
+    fun a F => by simp [← Finset.mul_sum, mul_left_comm]
+  ⟩
   eMtTw := eTw
   perCol_tie u μ h φ F := dif_neg h
   eMu_isom := heM
@@ -182,14 +194,13 @@ end GlobalTheory.Mem.RowsModel
 
 namespace GlobalTheory.Mem
 
-
-theorem RowsModel.ipC_cols (B : Base) (u : B.Word)
-    (φ ψ : ((ColsModel.cols B).mem u).C.cls 0 → ((ColsModel.cols B).mem u).C.Y 0 → ℂ) :
-    ((ColsModel.cols B).fm u).ipC 0 φ ψ = ∑ c, starRingEnd ℂ (φ c ()) * ψ c () := by
+theorem RowsModel.ipC_cols
+    (B : Base) (u : B.Word)
+    (φ ψ : ((ColsModel.cols B).mem u).C.cls 0 → ((ColsModel.cols B).mem u).C.Y 0 → ℂ)
+    : ((ColsModel.cols B).fm u).ipC 0 φ ψ = ∑ c, starRingEnd ℂ (φ c ()) * ψ c () := by
   refine Finset.sum_congr rfl fun c _ => ?_
   show ((Nat.card PUnit : ℕ) : ℂ)⁻¹ * (starRingEnd ℂ (φ c ()) * ψ c ()) = _
   simp
-
 
 end GlobalTheory.Mem
 

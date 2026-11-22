@@ -19,8 +19,10 @@ theorem r1sExpLow_holds : ExpLowOrderTruncation := by
     intro k
     have e : F ^ (k + 1 + 1) = (F * F) * F ^ k := by ring
     rw [e]
-    exact kmul (a := 2 * m) (b := 0) (fun i j h => kmul hK hK i j (by omega))
-      (fun _ _ h => absurd h (Nat.not_lt_zero _)) i j (by omega)
+    exact kmul (a := 2 * m) (b := 0)
+      (fun i j h => kmul hK hK i j (by omega))
+      (fun _ _ h => absurd h (Nat.not_lt_zero _))
+      i j (by omega)
   show ∑ k ∈ Finset.range ((ee i j).degree + 1), coeff (ee i j) (F ^ k) / (k.factorial : C) = _
   rw [Finset.sum_range_succ']
   simp only [pow_zero, Nat.factorial_zero, Nat.cast_one, div_one]

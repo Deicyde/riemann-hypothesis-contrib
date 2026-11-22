@@ -10,8 +10,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -21,16 +23,18 @@ section General
 
 variable {C : Type*} [Category* C] [CartesianMonoidalCategory C]
 
-@[reducible] def retractGrpObj {G A : C} [GrpObj G] (i : A ⟶ G) (r : G ⟶ A) (hir : i ≫ r = 𝟙 A)
-    [he : IsMonHom (r ≫ i)] : GrpObj A :=
+@[reducible]
+def retractGrpObj
+    {G A : C} [GrpObj G] (i : A ⟶ G) (r : G ⟶ A) (hir : i ≫ r = 𝟙 A) [he : IsMonHom (r ≫ i)]
+    : GrpObj A :=
   haveI : Mono i := (SplitMono.mk r hir).mono
   have h1 : ∀ {T : C}, ((1 : T ⟶ G) ≫ r) ≫ i = 1 := fun {T} => by
     rw [Category.assoc, MonObj.one_comp]
   have h2 : ∀ {T : C} (a b : T ⟶ A), ((a ≫ i * b ≫ i) ≫ r) ≫ i = a ≫ i * b ≫ i := fun a b => by
     rw [Category.assoc, MonObj.mul_comp]; simp [reassoc_of% hir]
-  have h3 : (i⁻¹ ≫ r) ≫ i = i⁻¹ := by
-    rw [Category.assoc, GrpObj.inv_comp]; simp [reassoc_of% hir]
-  { one := (1 : 𝟙_ C ⟶ G) ≫ r
+  have h3 : (i⁻¹ ≫ r) ≫ i = i⁻¹ := by rw [Category.assoc, GrpObj.inv_comp]; simp [reassoc_of% hir]
+  {
+    one := (1 : 𝟙_ C ⟶ G) ≫ r
     mul := (fst A A ≫ i * snd A A ≫ i) ≫ r
     inv := i⁻¹ ≫ r
     one_mul := by
@@ -42,29 +46,33 @@ variable {C : Type*} [Category* C] [CartesianMonoidalCategory C]
         whiskerLeft_snd_assoc, h1]
       simp [rightUnitor_hom]
     mul_assoc := by
-      rw [← cancel_mono i, Category.assoc, h2, Category.assoc, Category.assoc, h2,
-        MonObj.comp_mul, whiskerRight_fst_assoc, whiskerRight_snd_assoc, h2,
-        MonObj.comp_mul (A ◁ _), whiskerLeft_fst_assoc, whiskerLeft_snd_assoc, h2]
+      rw [← cancel_mono i, Category.assoc, h2, Category.assoc, Category.assoc, h2, MonObj.comp_mul,
+        whiskerRight_fst_assoc, whiskerRight_snd_assoc, h2, MonObj.comp_mul (A ◁ _),
+        whiskerLeft_fst_assoc, whiskerLeft_snd_assoc, h2]
       simp [MonObj.comp_mul, _root_.mul_assoc]
     left_inv := by
-      rw [← cancel_mono i, Category.assoc, h2, MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc,
-        h3, Category.assoc, h1]
+      rw [← cancel_mono i, Category.assoc, h2, MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc, h3,
+        Category.assoc, h1]
       simp
     right_inv := by
-      rw [← cancel_mono i, Category.assoc, h2, MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc,
-        h3, Category.assoc, h1]
-      simp }
+      rw [← cancel_mono i, Category.assoc, h2, MonObj.comp_mul, lift_fst_assoc, lift_snd_assoc, h3,
+        Category.assoc, h1]
+      simp
+  }
 
-private theorem isMonHom_of_one_comp_of_mul_comp {M N : C} [MonObj M] [MonObj N] (f : M ⟶ N)
-    (h1 : (1 : 𝟙_ C ⟶ M) ≫ f = 1)
-    (h2 : (fst M M * snd M M) ≫ f = fst M M ≫ f * snd M M ≫ f) : IsMonHom f :=
-  { one_hom := by rw [MonObj.one_eq_one M, MonObj.one_eq_one N, h1]
-    mul_hom := by
-      rw [MonObj.mul_eq_mul M, MonObj.mul_eq_mul N, h2, MonObj.comp_mul, tensorHom_fst,
-        tensorHom_snd] }
+private theorem isMonHom_of_one_comp_of_mul_comp
+    {M N : C} [MonObj M] [MonObj N]
+    (f : M ⟶ N)
+    (h1 : (1 : 𝟙_ C ⟶ M) ≫ f = 1) (h2 : (fst M M * snd M M) ≫ f = fst M M ≫ f * snd M M ≫ f)
+    : IsMonHom f := {
+  one_hom := by rw [MonObj.one_eq_one M, MonObj.one_eq_one N, h1]
+  mul_hom := by
+    rw [MonObj.mul_eq_mul M, MonObj.mul_eq_mul N, h2, MonObj.comp_mul, tensorHom_fst, tensorHom_snd]
+}
 
-theorem exists_grpObj_retract {G A : C} [GrpObj G] (i : A ⟶ G) (r : G ⟶ A) (hir : i ≫ r = 𝟙 A)
-    [he : IsMonHom (r ≫ i)] : ∃ _ : GrpObj A, IsMonHom i ∧ IsMonHom r := by
+theorem exists_grpObj_retract
+    {G A : C} [GrpObj G] (i : A ⟶ G) (r : G ⟶ A) (hir : i ≫ r = 𝟙 A) [he : IsMonHom (r ≫ i)]
+    : ∃ _ : GrpObj A, IsMonHom i ∧ IsMonHom r := by
   let gA : GrpObj A := retractGrpObj i r hir
   have hm : ∀ {T : C} (a b : T ⟶ A), a * b = (a ≫ i * b ≫ i) ≫ r := by
     intro T a b
@@ -83,35 +91,42 @@ theorem exists_grpObj_retract {G A : C} [GrpObj G] (i : A ⟶ G) (r : G ⟶ A) (
       simp only [Category.assoc, reassoc_of% hir]
   · refine isMonHom_of_one_comp_of_mul_comp r ho.symm ?_
     rw [hm]
-    calc (fst G G * snd G G) ≫ r = ((fst G G * snd G G) ≫ (r ≫ i)) ≫ r := by
-          simp only [Category.assoc, hir, Category.comp_id]
+    calc
+      (fst G G * snd G G) ≫ r = ((fst G G * snd G G) ≫ (r ≫ i)) ≫ r := by
+        simp only [Category.assoc, hir, Category.comp_id]
       _ = _ := by rw [MonObj.mul_comp]; simp only [Category.assoc]
 
 variable [BraidedCategory C]
 
-theorem comp_prod {n : Type*} (s : Finset n) {T X G : C} [GrpObj G] [IsCommMonObj G]
-    (f : T ⟶ X) (g : n → (X ⟶ G)) : f ≫ ∏ u ∈ s, g u = ∏ u ∈ s, f ≫ g u := by
+theorem comp_prod
+    {n : Type*} (s : Finset n) {T X G : C} [GrpObj G] [IsCommMonObj G] (f : T ⟶ X) (g : n → (X ⟶ G))
+    : f ≫ ∏ u ∈ s, g u = ∏ u ∈ s, f ≫ g u := by
   classical
   induction s using Finset.induction_on with
   | empty => simp only [Finset.prod_empty, MonObj.comp_one]
   | insert a s ha ih => rw [Finset.prod_insert ha, Finset.prod_insert ha, MonObj.comp_mul, ih]
 
-theorem prod_comp {n : Type*} (s : Finset n) {T G H : C} [GrpObj G] [IsCommMonObj G]
-    [GrpObj H] [IsCommMonObj H] (g : n → (T ⟶ G)) (f : G ⟶ H) [IsMonHom f] :
-    (∏ u ∈ s, g u) ≫ f = ∏ u ∈ s, g u ≫ f := by
+theorem prod_comp
+    {n : Type*} (s : Finset n)
+    {T G H : C} [GrpObj G] [IsCommMonObj G] [GrpObj H] [IsCommMonObj H]
+    (g : n → (T ⟶ G))
+    (f : G ⟶ H) [IsMonHom f]
+    : (∏ u ∈ s, g u) ≫ f = ∏ u ∈ s, g u ≫ f := by
   classical
   induction s using Finset.induction_on with
   | empty => simp only [Finset.prod_empty, MonObj.one_comp]
   | insert a s ha ih => rw [Finset.prod_insert ha, Finset.prod_insert ha, MonObj.mul_comp, ih]
 
-theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (o : n)
-    (G : C) [GrpObj G] [IsCommMonObj G] (ρ : Matrix n n ℤ → (G ⟶ G))
-    (hρ : ∀ m, IsMonHom (ρ m)) (hmul : ∀ m m', ρ (m * m') = ρ m' ≫ ρ m)
-    (hadd : ∀ m m', ρ (m + m') = ρ m * ρ m') (hone : ρ 1 = 𝟙 G) :
-    ∃ (A : C) (_ : GrpObj A) (_ : IsCommMonObj A) (_ : Retract A G) (pr : n → (G ⟶ A)),
-      (∀ u, IsMonHom (pr u)) ∧
-      (∀ (T : C) (y : n → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u) ∧
-      ∀ m u, ρ m ≫ pr u = ∏ v, pr v ^ m u v := by
+theorem exists_power
+    [HasEqualizers C]
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (o : n)
+    (G : C) [GrpObj G] [IsCommMonObj G]
+    (ρ : Matrix n n ℤ → (G ⟶ G)) (hρ : ∀ m, IsMonHom (ρ m)) (hmul : ∀ m m', ρ (m * m') = ρ m' ≫ ρ m)
+    (hadd : ∀ m m', ρ (m + m') = ρ m * ρ m') (hone : ρ 1 = 𝟙 G)
+    : ∃ (A : C) (_ : GrpObj A) (_ : IsCommMonObj A) (_ : Retract A G) (pr : n → (G ⟶ A)),
+      (∀ u, IsMonHom (pr u)) ∧ (∀ (T : C) (y : n → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u)
+        ∧ ∀ m u, ρ m ≫ pr u = ∏ v, pr v ^ m u v := by
   have : ∀ m, IsMonHom (ρ m) := hρ
   have hc : ∀ a b : Matrix n n ℤ, ρ a ≫ ρ b = ρ (b * a) := fun a b => (hmul b a).symm
   have h0 : ρ 0 = 1 := by
@@ -133,13 +148,18 @@ theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (
       rw [add_smul, one_smul, hadd, ih, zpow_add_one]
     · intro j ih
       rw [sub_smul, one_smul, sub_eq_add_neg, hadd, ih, hneg, zpow_sub_one]
-  have hidem : ρ (Matrix.single o o 1) ≫ ρ (Matrix.single o o 1) =
-      ρ (Matrix.single o o 1) ≫ 𝟙 G := by
+  have hidem
+      : ρ (Matrix.single o o 1) ≫ ρ (Matrix.single o o 1) = ρ (Matrix.single o o 1) ≫ 𝟙 G := by
     rw [Category.comp_id, hc, Matrix.single_mul_single_same, _root_.mul_one]
-  obtain ⟨A, i, r, hir, hri⟩ : ∃ (A : C) (i : A ⟶ G) (r : G ⟶ A),
-      i ≫ r = 𝟙 A ∧ r ≫ i = ρ (Matrix.single o o 1) := by
-    refine ⟨equalizer (ρ (Matrix.single o o 1)) (𝟙 G), equalizer.ι _ _, equalizer.lift _ hidem,
-      ?_, equalizer.lift_ι _ _⟩
+  obtain ⟨A, i, r, hir, hri⟩
+      : ∃ (A : C) (i : A ⟶ G) (r : G ⟶ A), i ≫ r = 𝟙 A ∧ r ≫ i = ρ (Matrix.single o o 1) := by
+    refine ⟨
+      equalizer (ρ (Matrix.single o o 1)) (𝟙 G),
+      equalizer.ι _ _,
+      equalizer.lift _ hidem,
+      ?_,
+      equalizer.lift_ι _ _
+    ⟩
     apply equalizer.hom_ext
     rw [Category.assoc, equalizer.lift_ι, Category.id_comp]
     exact (equalizer.condition _ _).trans (Category.comp_id _)
@@ -147,11 +167,12 @@ theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (
   have : IsMonHom (r ≫ i) := by rw [hri]; infer_instance
   obtain ⟨gA, hi, hr⟩ := exists_grpObj_retract i r hir
   have hcA : IsCommMonObj A :=
-    (isCommMonObj_iff_isMulCommutative _).2 fun X => ⟨⟨fun a b => by
-      show a * b = b * a
-      rw [← cancel_mono i, MonObj.mul_comp, MonObj.mul_comp, mul_comm]⟩⟩
-  refine ⟨A, gA, hcA, ⟨i, r, hir⟩,
-    fun u => ρ (Matrix.single o u 1) ≫ r, fun u => inferInstance, ?_, ?_⟩
+    (isCommMonObj_iff_isMulCommutative _).2 fun X =>
+      ⟨⟨fun a b => by
+        show a * b = b * a
+        rw [← cancel_mono i, MonObj.mul_comp, MonObj.mul_comp, mul_comm]⟩⟩
+  refine
+    ⟨A, gA, hcA, ⟨i, r, hir⟩, fun u => ρ (Matrix.single o u 1) ≫ r, fun u => inferInstance, ?_, ?_⟩
   · intro T y
     refine ⟨∏ v, y v ≫ i ≫ ρ (Matrix.single v o 1), fun u => ?_, fun x hx => ?_⟩
     · dsimp only
@@ -163,8 +184,7 @@ theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (
         rw [h3, reassoc_of% hir, hir, Category.comp_id]
       · intro v _ hv
         have h3 : ρ (Matrix.single v o 1) ≫ ρ (Matrix.single o u 1) ≫ r = 1 := by
-          have h5 : Matrix.single o u (1 : ℤ) * Matrix.single v o 1 = 0 := by
-            simp [Ne.symm hv]
+          have h5 : Matrix.single o u (1 : ℤ) * Matrix.single v o 1 = 0 := by simp [Ne.symm hv]
           rw [← Category.assoc, hc, h5, h0, MonObj.one_comp]
         simp only [Category.assoc]
         rw [h3, MonObj.comp_one, MonObj.comp_one]
@@ -183,13 +203,15 @@ theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (
             split_ifs with h
             · exact absurd (h.1.symm.trans h.2) hab
             · rfl
-      calc x = x ≫ ρ 1 := by rw [hone, Category.comp_id]
+      calc
+        x = x ≫ ρ 1 := by rw [hone, Category.comp_id]
         _ = ∏ v, x ≫ ρ (Matrix.single v v 1) := by rw [h1, hsum, comp_prod]
         _ = _ := by
           refine Finset.prod_congr rfl fun v _ => ?_
           rw [← hx v]
-          have h4 : ρ (Matrix.single o v 1) ≫ r ≫ i ≫ ρ (Matrix.single v o 1) =
-              ρ (Matrix.single v v 1) := by
+          have h4
+              : ρ (Matrix.single o v 1) ≫ r ≫ i ≫ ρ (Matrix.single v o 1)
+                = ρ (Matrix.single v v 1) := by
             rw [reassoc_of% hri, hc, Matrix.single_mul_single_same, hc,
               Matrix.single_mul_single_same]
             simp only [_root_.mul_one]
@@ -209,7 +231,14 @@ theorem exists_power [HasEqualizers C] {n : Type*} [Fintype n] [DecidableEq n] (
 
 end General
 
-theorem abelianScheme_matrix_power : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (ρ : Matrix (Fin 8) (Fin 8) ℤ → (G ⟶ G)), IsAbelianScheme G → (∀ m, IsMonHom (ρ m)) → (∀ m m', ρ (m * m') = ρ m' ≫ ρ m) → (∀ m m', ρ (m + m') = ρ m * ρ m') → ρ 1 = 𝟙 G → ∃ (A : Over S) (_ : GrpObj A) (pr : Fin 8 → (G ⟶ A)), IsAbelianScheme A ∧ (∀ u, IsMonHom (pr u)) ∧ (∀ (T : Over S) (y : Fin 8 → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u) ∧ ∀ m u, ρ m ≫ pr u = (List.ofFn fun v => pr v ^ m u v).prod := by
+theorem abelianScheme_matrix_power
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (ρ : Matrix (Fin 8) (Fin 8) ℤ → (G ⟶ G)),
+      IsAbelianScheme G → (∀ m, IsMonHom (ρ m)) → (∀ m m', ρ (m * m') = ρ m' ≫ ρ m)
+        → (∀ m m', ρ (m + m') = ρ m * ρ m') → ρ 1 = 𝟙 G
+        → ∃ (A : Over S) (_ : GrpObj A) (pr : Fin 8 → (G ⟶ A)),
+          IsAbelianScheme A ∧ (∀ u, IsMonHom (pr u))
+            ∧ (∀ (T : Over S) (y : Fin 8 → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u)
+            ∧ ∀ m u, ρ m ≫ pr u = (List.ofFn fun v => pr v ^ m u v).prod := by
   intro S G _ ρ hab hρ hmul hadd hone
   obtain ⟨hcomm, hsmooth, hproper, hgeo⟩ := hab
   obtain ⟨A, gA, hcA, R, pr, hpr, huniv, hact⟩ := exists_power (0 : Fin 8) G ρ hρ hmul hadd hone

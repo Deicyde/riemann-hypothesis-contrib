@@ -19,33 +19,36 @@ def yOf {K : Type*} [Field K] (W : WeierstrassCurve K) : W.toAffine.Point → K
   | .zero => 0
   | .some _ y _ => y
 
-theorem eq_some_xOf_yOf {K : Type*} [Field K] (W : WeierstrassCurve K) {P : W.toAffine.Point}
-    (hP : P ≠ 0) : ∃ h : W.toAffine.Nonsingular (xOf W P) (yOf W P), P = .some _ _ h := by
+theorem eq_some_xOf_yOf
+    {K : Type*} [Field K] (W : WeierstrassCurve K) {P : W.toAffine.Point} (hP : P ≠ 0)
+    : ∃ h : W.toAffine.Nonsingular (xOf W P) (yOf W P), P = .some _ _ h := by
   cases P with
   | zero => exact absurd rfl hP
   | some x y h => exact ⟨h, rfl⟩
 
 variable (E E' : WeierstrassCurve F) [E.IsElliptic] [E'.IsElliptic]
 
-noncomputable def ratMapValue (Q : (E'.baseChange E.toAffine.FunctionField).toAffine.Point)
-    {L : Type u} [Field L] [Algebra F L] [DecidableEq L] {u v : L}
-    (h : (E.baseChange L).toAffine.Equation u v)
-    (hu : Transcendental F u) : (E'.baseChange L).toAffine.Point :=
+noncomputable def ratMapValue
+    (Q : (E'.baseChange E.toAffine.FunctionField).toAffine.Point)
+    {L : Type u} [Field L] [Algebra F L] [DecidableEq L]
+    {u v : L} (h : (E.baseChange L).toAffine.Equation u v) (hu : Transcendental F u)
+    : (E'.baseChange L).toAffine.Point :=
   Point.map (liftPoint E h hu) Q
 
 def RespectsAdd (Q : (E'.baseChange E.toAffine.FunctionField).toAffine.Point) : Prop :=
   ∀ (L : Type u) [Field L] [Algebra F L] [DecidableEq L] (u₁ v₁ u₂ v₂ u₃ v₃ : L)
-    (h₁ : (E.baseChange L).toAffine.Nonsingular u₁ v₁)
-    (h₂ : (E.baseChange L).toAffine.Nonsingular u₂ v₂)
-    (h₃ : (E.baseChange L).toAffine.Nonsingular u₃ v₃)
-    (t₁ : Transcendental F u₁) (t₂ : Transcendental F u₂) (t₃ : Transcendental F u₃),
-    Point.some u₁ v₁ h₁ + Point.some u₂ v₂ h₂ = Point.some u₃ v₃ h₃ →
-      ratMapValue E E' Q h₃.1 t₃ = ratMapValue E E' Q h₁.1 t₁ + ratMapValue E E' Q h₂.1 t₂
+      (h₁ : (E.baseChange L).toAffine.Nonsingular u₁ v₁)
+      (h₂ : (E.baseChange L).toAffine.Nonsingular u₂ v₂)
+      (h₃ : (E.baseChange L).toAffine.Nonsingular u₃ v₃) (t₁ : Transcendental F u₁)
+      (t₂ : Transcendental F u₂) (t₃ : Transcendental F u₃),
+    Point.some u₁ v₁ h₁ + Point.some u₂ v₂ h₂ = Point.some u₃ v₃ h₃
+      → ratMapValue E E' Q h₃.1 t₃ = ratMapValue E E' Q h₁.1 t₁ + ratMapValue E E' Q h₂.1 t₂
 
 def IsIsogeny (Q : (E'.baseChange E.toAffine.FunctionField).toAffine.Point) : Prop :=
   (∃ (x y : E.toAffine.FunctionField)
-    (h : (E'.baseChange E.toAffine.FunctionField).toAffine.Nonsingular x y),
-      Q = .some x y h ∧ Transcendental F x) ∧ RespectsAdd E E' Q
+        (h : (E'.baseChange E.toAffine.FunctionField).toAffine.Nonsingular x y),
+      Q = .some x y h ∧ Transcendental F x)
+    ∧ RespectsAdd E E' Q
 
 def Isogeny : Type u :=
   {Q : (E'.baseChange E.toAffine.FunctionField).toAffine.Point // IsIsogeny E E' Q}
@@ -79,11 +82,9 @@ theorem comap_genX : φ.comap (genX E') = φ.x := liftPoint_genX _ _ _
 omit [E.IsElliptic] [E'.IsElliptic] in
 theorem comap_genY : φ.comap (genY E') = φ.y := liftPoint_genY _ _ _
 
-noncomputable def degree : ℕ :=
-  Module.finrank φ.comap.fieldRange E.toAffine.FunctionField
+noncomputable def degree : ℕ := Module.finrank φ.comap.fieldRange E.toAffine.FunctionField
 
-def IsSeparable : Prop :=
-  Algebra.IsSeparable φ.comap.fieldRange E.toAffine.FunctionField
+def IsSeparable : Prop := Algebra.IsSeparable φ.comap.fieldRange E.toAffine.FunctionField
 
 end Isogeny
 
@@ -94,16 +95,17 @@ section Mul
 variable (E : WeierstrassCurve F) [E.IsElliptic]
 
 noncomputable def ratEmb : RatFunc F →ₐ[F] E.toAffine.FunctionField :=
-  RatFunc.liftAlgHom (aeval (genX E)) (nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _
-    (transcendental_iff_injective.mp (transcendental_genX E)))
+  RatFunc.liftAlgHom (aeval (genX E))
+    (nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _
+      (transcendental_iff_injective.mp (transcendental_genX E)))
 
 omit [E.IsElliptic] in
 theorem ratEmb_injective : Function.Injective (ratEmb E) :=
   RatFunc.liftAlgHom_injective _ (transcendental_iff_injective.mp (transcendental_genX E))
 
 omit [E.IsElliptic] in
-theorem ratEmb_div (p q : F[X]) :
-    ratEmb E (algebraMap _ _ p / algebraMap _ _ q) = aeval (genX E) p / aeval (genX E) q :=
+theorem ratEmb_div (p q : F[X])
+    : ratEmb E (algebraMap _ _ p / algebraMap _ _ q) = aeval (genX E) p / aeval (genX E) q :=
   RatFunc.liftAlgHom_apply_div _ _ p q
 
 omit [E.IsElliptic] in
@@ -112,8 +114,9 @@ theorem ratEmb_X : ratEmb E RatFunc.X = genX E := by
   rw [map_one, div_one, map_one, div_one, aeval_X, RatFunc.algebraMap_X] at this
   exact this
 
-theorem map_top_eq_fieldRange {K L : Type*} [Field K] [Field L] [Algebra F K] [Algebra F L]
-    (f : K →ₐ[F] L) : (⊤ : IntermediateField F K).map f = f.fieldRange := by
+theorem map_top_eq_fieldRange
+    {K L : Type*} [Field K] [Field L] [Algebra F K] [Algebra F L] (f : K →ₐ[F] L)
+    : (⊤ : IntermediateField F K).map f = f.fieldRange := by
   ext z
   simp only [IntermediateField.mem_map, IntermediateField.mem_top, true_and, AlgHom.mem_fieldRange]
 
@@ -126,12 +129,12 @@ theorem aeval_genX_ΨSq_ne_zero {n : ℤ} (hn : n ≠ 0) : aeval (genX E) (E.ΨS
   exact ΨSq_ne_zero_of_ne_zero E hn
 
 omit [E.IsElliptic] in
-private theorem baseChange_eval (p : F[X]) :
-    (p.map (algebraMap F E.toAffine.FunctionField)).eval (genX E) = aeval (genX E) p :=
+private theorem baseChange_eval (p : F[X])
+    : (p.map (algebraMap F E.toAffine.FunctionField)).eval (genX E) = aeval (genX E) p :=
   eval_map_algebraMap _ _
 
-theorem genericPoint_eq :
-    genericPoint E = .some (genX E) (genY E) (equation_iff_nonsingular.mp (equation_gen E)) :=
+theorem genericPoint_eq
+    : genericPoint E = .some (genX E) (genY E) (equation_iff_nonsingular.mp (equation_gen E)) :=
   rfl
 
 theorem zsmul_genericPoint_ne_zero {n : ℤ} (hn : n ≠ 0) : n • genericPoint E ≠ 0 := by
@@ -140,8 +143,8 @@ theorem zsmul_genericPoint_ne_zero {n : ℤ} (hn : n ≠ 0) : n • genericPoint
   rw [map_ΨSq, baseChange_eval]
   exact aeval_genX_ΨSq_ne_zero E hn
 
-theorem xOf_zsmul_genericPoint {n : ℤ} (hn : n ≠ 0) :
-    xOf _ (n • genericPoint E) = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) := by
+theorem xOf_zsmul_genericPoint {n : ℤ} (hn : n ≠ 0)
+    : xOf _ (n • genericPoint E) = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) := by
   rw [genericPoint_eq, xOf_zsmul]
   · show ((E.map (algebraMap F E.toAffine.FunctionField)).Φ n).eval (genX E) /
       ((E.map (algebraMap F E.toAffine.FunctionField)).ΨSq n).eval (genX E) = _
@@ -150,25 +153,24 @@ theorem xOf_zsmul_genericPoint {n : ℤ} (hn : n ≠ 0) :
     rw [map_ΨSq, baseChange_eval]
     exact aeval_genX_ΨSq_ne_zero E hn
 
-noncomputable def ratΦΨ (n : ℤ) : RatFunc F :=
-  algebraMap _ _ (E.Φ n) / algebraMap _ _ (E.ΨSq n)
+noncomputable def ratΦΨ (n : ℤ) : RatFunc F := algebraMap _ _ (E.Φ n) / algebraMap _ _ (E.ΨSq n)
 
 omit [E.IsElliptic] in
-theorem ratEmb_ratΦΨ (n : ℤ) :
-    ratEmb E (ratΦΨ E n) = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) :=
+theorem ratEmb_ratΦΨ (n : ℤ)
+    : ratEmb E (ratΦΨ E n) = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) :=
   ratEmb_div E _ _
 
-theorem max_natDegree_ratΦΨ {n : ℤ} (hn : n ≠ 0) :
-    max (ratΦΨ E n).num.natDegree (ratΦΨ E n).denom.natDegree = n.natAbs ^ 2 := by
+theorem max_natDegree_ratΦΨ {n : ℤ} (hn : n ≠ 0)
+    : max (ratΦΨ E n).num.natDegree (ratΦΨ E n).denom.natDegree = n.natAbs ^ 2 := by
   have hΨ0 : E.ΨSq n ≠ 0 := ΨSq_ne_zero_of_ne_zero E hn
   have hN : 0 < n.natAbs ^ 2 := by have := Int.natAbs_pos.mpr hn; positivity
   have hΦdeg := natDegree_Φ E n
   have hΦ0 : E.Φ n ≠ 0 := fun h => by rw [h, natDegree_zero] at hΦdeg; omega
   have hnum_dvd : (ratΦΨ E n).num ∣ E.Φ n := RatFunc.num_div_dvd _ hΨ0
   have hden_dvd : (ratΦΨ E n).denom ∣ E.ΨSq n := RatFunc.denom_div_dvd _ _
-  have hrf0 : ratΦΨ E n ≠ 0 := div_ne_zero
-    ((map_ne_zero_iff _ (IsFractionRing.injective F[X] (RatFunc F))).mpr hΦ0)
-    ((map_ne_zero_iff _ (IsFractionRing.injective F[X] (RatFunc F))).mpr hΨ0)
+  have hrf0 : ratΦΨ E n ≠ 0 :=
+    div_ne_zero ((map_ne_zero_iff _ (IsFractionRing.injective F[X] (RatFunc F))).mpr hΦ0)
+      ((map_ne_zero_iff _ (IsFractionRing.injective F[X] (RatFunc F))).mpr hΨ0)
   have hnum0 : (ratΦΨ E n).num ≠ 0 := by rwa [ne_eq, RatFunc.num_eq_zero_iff]
   have hcross : (ratΦΨ E n).num * E.ΨSq n = E.Φ n * (ratΦΨ E n).denom := by
     have h1 := RatFunc.num_div_denom (ratΦΨ E n)
@@ -179,8 +181,7 @@ theorem max_natDegree_ratΦΨ {n : ℤ} (hn : n ≠ 0) :
       (map_ne_zero_iff _ (IsFractionRing.injective F[X] (RatFunc F))).mpr hΨ0
     rw [div_eq_div_iff hb hd, ← map_mul, ← map_mul] at h1
     exact IsFractionRing.injective F[X] (RatFunc F) h1
-  have hΦ_dvd : E.Φ n ∣ (ratΦΨ E n).num :=
-    (isCoprime_Φ_ΨSq E n).dvd_of_dvd_mul_right ⟨_, hcross⟩
+  have hΦ_dvd : E.Φ n ∣ (ratΦΨ E n).num := (isCoprime_Φ_ΨSq E n).dvd_of_dvd_mul_right ⟨_, hcross⟩
   have hnum : (ratΦΨ E n).num.natDegree = n.natAbs ^ 2 :=
     le_antisymm (hΦdeg ▸ natDegree_le_of_dvd hnum_dvd hΦ0)
       (hΦdeg ▸ natDegree_le_of_dvd hΦ_dvd hnum0)
@@ -198,8 +199,9 @@ theorem transcendental_ratΦΨ {n : ℤ} (hn : n ≠ 0) : Transcendental F (rat�
   have : 0 < n.natAbs ^ 2 := by positivity
   omega
 
-noncomputable def mulIsogeny (n : ℤ) (hn : n ≠ 0) : Isogeny E E :=
-  ⟨n • genericPoint E, by
+noncomputable def mulIsogeny (n : ℤ) (hn : n ≠ 0) : Isogeny E E := ⟨
+  n • genericPoint E,
+  by
     obtain ⟨h, he⟩ := eq_some_xOf_yOf _ (zsmul_genericPoint_ne_zero E hn)
     refine ⟨⟨_, _, h, he, ?_⟩, ?_⟩
     · rw [xOf_zsmul_genericPoint E hn, ← ratEmb_ratΦΨ]
@@ -208,10 +210,11 @@ noncomputable def mulIsogeny (n : ℤ) (hn : n ≠ 0) : Isogeny E E :=
     · intro L _ _ _ u₁ v₁ u₂ v₂ u₃ v₃ h₁ h₂ h₃ t₁ t₂ t₃ hadd
       simp only [ratMapValue, map_zsmul]
       rw [map_liftPoint_genericPoint E h₁ t₁, map_liftPoint_genericPoint E h₂ t₂,
-        map_liftPoint_genericPoint E h₃ t₃, ← hadd, zsmul_add]⟩
+        map_liftPoint_genericPoint E h₃ t₃, ← hadd, zsmul_add]
+⟩
 
-theorem mulIsogeny_alt {n : ℤ} (hn : n ≠ 0) :
-    (mulIsogeny E n hn).x = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) :=
+theorem mulIsogeny_alt {n : ℤ} (hn : n ≠ 0)
+    : (mulIsogeny E n hn).x = aeval (genX E) (E.Φ n) / aeval (genX E) (E.ΨSq n) :=
   xOf_zsmul_genericPoint E hn
 
 end Mul
@@ -220,8 +223,8 @@ section Degree
 
 variable (E : WeierstrassCurve F) [E.IsElliptic]
 
-theorem finrank_adjoin_ratΦΨ {n : ℤ} (hn : n ≠ 0) :
-    Module.finrank (IntermediateField.adjoin F {ratΦΨ E n}) (RatFunc F) = n.natAbs ^ 2 := by
+theorem finrank_adjoin_ratΦΨ {n : ℤ} (hn : n ≠ 0)
+    : Module.finrank (IntermediateField.adjoin F {ratΦΨ E n}) (RatFunc F) = n.natAbs ^ 2 := by
   rw [RatFunc.finrank_eq_max_natDegree, max_natDegree_ratΦΨ E hn]
 
 theorem degree_mulIsogeny {n : ℤ} (hn : n ≠ 0) : (mulIsogeny E n hn).degree = n.natAbs ^ 2 := by
@@ -233,7 +236,8 @@ theorem degree_mulIsogeny {n : ℤ} (hn : n ≠ 0) : (mulIsogeny E n hn).degree 
   have hx : φ.x = ratEmb E (ratΦΨ E n) := by rw [ratEmb_ratΦΨ]; exact mulIsogeny_alt E hn
   have hxE1 : φ.x ∈ E1 := by
     have hE1 : E1 = (ratEmb E).fieldRange := (fieldRange_ratEmb E).symm
-    rw [hx, hE1]; exact ⟨_, rfl⟩
+    rw [hx, hE1]
+    exact ⟨_, rfl⟩
   have hxM : φ.x ∈ M := ⟨genX E, φ.comap_genX⟩
   have h01 : E0 ≤ E1 := adjoin_simple_le_iff.mpr hxE1
   have h0M : E0 ≤ M := adjoin_simple_le_iff.mpr hxM
@@ -241,14 +245,12 @@ theorem degree_mulIsogeny {n : ℤ} (hn : n ≠ 0) : (mulIsogeny E n hn).degree 
   have e1 : relfinrank E1 ⊤ = 2 := by rw [relfinrank_top_right, finrank_adjoin_genX]
 
   have e2 : relfinrank E0 M = 2 := by
-    have hE0 : E0 = E1.map α := by
-      rw [adjoin_map, Set.image_singleton, φ.comap_genX]
+    have hE0 : E0 = E1.map α := by rw [adjoin_map, Set.image_singleton, φ.comap_genX]
     have hM : M = (⊤ : IntermediateField F _).map α := (map_top_eq_fieldRange α).symm
     rw [hE0, hM, relfinrank_map_map, e1]
 
   have e3 : relfinrank E0 E1 = n.natAbs ^ 2 := by
-    have hE0 : E0 = (F⟮ratΦΨ E n⟯).map (ratEmb E) := by
-      rw [adjoin_map, Set.image_singleton, ← hx]
+    have hE0 : E0 = (F⟮ratΦΨ E n⟯).map (ratEmb E) := by rw [adjoin_map, Set.image_singleton, ← hx]
     have hE1 : E1 = (⊤ : IntermediateField F (RatFunc F)).map (ratEmb E) := by
       rw [map_top_eq_fieldRange, fieldRange_ratEmb]
     rw [hE0, hE1, relfinrank_map_map, relfinrank_top_right, finrank_adjoin_ratΦΨ E hn]
@@ -264,12 +266,14 @@ end Degree
 
 section Separable
 
-theorem isSeparable_of_quadratic {L K : Type*} [Field L] [Field K] [Algebra L K] {y : K} (b c : L)
-    (hy : y ^ 2 + algebraMap L K b * y - algebraMap L K c = 0)
-    (hD' : algebraMap L K b ^ 2 + 4 * algebraMap L K c ≠ 0) :
-    IsSeparable L y := by
-  have hD : b ^ 2 + 4 * c ≠ 0 := fun h => hD' (by
-    rw [← map_pow, ← map_ofNat (algebraMap L K) 4, ← map_mul, ← map_add (f := _), h, map_zero])
+theorem isSeparable_of_quadratic
+    {L K : Type*} [Field L] [Field K] [Algebra L K]
+    {y : K} (b c : L) (hy : y ^ 2 + algebraMap L K b * y - algebraMap L K c = 0)
+    (hD' : algebraMap L K b ^ 2 + 4 * algebraMap L K c ≠ 0)
+    : IsSeparable L y := by
+  have hD : b ^ 2 + 4 * c ≠ 0 := fun h =>
+    hD' (by
+      rw [← map_pow, ← map_ofNat (algebraMap L K) 4, ← map_mul, ← map_add (f := _), h, map_zero])
   have hq' : derivative (X ^ 2 + C b * X - C c : L[X]) = C 2 * X + C b := by
     simp only [derivative_sub, derivative_add, derivative_X_pow, derivative_C_mul_X, derivative_C]
     simp
@@ -278,10 +282,11 @@ theorem isSeparable_of_quadratic {L K : Type*} [Field L] [Field K] [Algebra L K]
     refine ⟨C (-4 * (b ^ 2 + 4 * c)⁻¹), C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b), ?_⟩
     have e : (C 2 * X + C b) ^ 2 - 4 * (X ^ 2 + C b * X - C c) = C (b ^ 2 + 4 * c) := by
       simp only [map_add (f := _), map_pow, map_mul, map_ofNat]; ring
-    calc C (-4 * (b ^ 2 + 4 * c)⁻¹) * (X ^ 2 + C b * X - C c) +
-          C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b) * (C 2 * X + C b)
-        = C (b ^ 2 + 4 * c)⁻¹ * ((C 2 * X + C b) ^ 2 - 4 * (X ^ 2 + C b * X - C c)) := by
-          simp only [map_mul, map_neg, map_ofNat]; ring
+    calc
+      C (-4 * (b ^ 2 + 4 * c)⁻¹) * (X ^ 2 + C b * X - C c)
+            + C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b) * (C 2 * X + C b)
+          = C (b ^ 2 + 4 * c)⁻¹ * ((C 2 * X + C b) ^ 2 - 4 * (X ^ 2 + C b * X - C c)) := by
+        simp only [map_mul, map_neg, map_ofNat]; ring
       _ = 1 := by rw [e, ← C_mul, inv_mul_cancel₀ hD, C_1]
   have hq : aeval y (X ^ 2 + C b * X - C c : L[X]) = 0 := by
     simp only [map_sub, map_add (f := _), map_mul, map_pow, aeval_X, aeval_C]
@@ -290,22 +295,29 @@ theorem isSeparable_of_quadratic {L K : Type*} [Field L] [Field K] [Algebra L K]
 
 variable (E : WeierstrassCurve F) [E.IsElliptic]
 
-theorem isSeparable_genY (L : IntermediateField F E.toAffine.FunctionField)
-    (hL : L ≤ F⟮genX E⟯) : IsSeparable (extendScalars hL) (genY E) := by
+theorem isSeparable_genY (L : IntermediateField F E.toAffine.FunctionField) (hL : L ≤ F⟮genX E⟯)
+    : IsSeparable (extendScalars hL) (genY E) := by
   have hg : genX E ∈ extendScalars hL := (mem_extendScalars hL).mpr (mem_adjoin_simple_self F _)
   have hcst : ∀ a : F, algebraMap F E.toAffine.FunctionField a ∈ extendScalars hL := fun a =>
     (mem_extendScalars hL).mpr (IntermediateField.algebraMap_mem _ a)
   refine isSeparable_of_quadratic
     (⟨algebraMap F _ E.a₁ * genX E + algebraMap F _ E.a₃, add_mem (mul_mem (hcst _) hg) (hcst _)⟩)
-    (⟨genX E ^ 3 + algebraMap F _ E.a₂ * genX E ^ 2 + algebraMap F _ E.a₄ * genX E +
-      algebraMap F _ E.a₆, add_mem (add_mem (add_mem (pow_mem hg 3)
-        (mul_mem (hcst _) (pow_mem hg 2))) (mul_mem (hcst _) hg)) (hcst _)⟩) ?_ ?_
+    (⟨
+      genX E ^ 3 + algebraMap F _ E.a₂ * genX E ^ 2 + algebraMap F _ E.a₄ * genX E
+        + algebraMap F _ E.a₆,
+      add_mem
+        (add_mem (add_mem (pow_mem hg 3) (mul_mem (hcst _) (pow_mem hg 2))) (mul_mem (hcst _) hg))
+        (hcst _)
+    ⟩)
+    ?_ ?_
   · have e := (equation_iff _ _).mp (equation_gen E)
     simp only [WeierstrassCurve.baseChange, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂,
-      WeierstrassCurve.map_a₃, WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆] at e
-    change genY E ^ 2 + (algebraMap F _ E.a₁ * genX E + algebraMap F _ E.a₃) * genY E -
-      (genX E ^ 3 + algebraMap F _ E.a₂ * genX E ^ 2 + algebraMap F _ E.a₄ * genX E +
-        algebraMap F _ E.a₆) = 0
+        WeierstrassCurve.map_a₃, WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
+      at e
+    change genY E ^ 2 + (algebraMap F _ E.a₁ * genX E + algebraMap F _ E.a₃) * genY E
+        - (genX E ^ 3 + algebraMap F _ E.a₂ * genX E ^ 2 + algebraMap F _ E.a₄ * genX E
+          + algebraMap F _ E.a₆)
+      = 0
     linear_combination e
   · intro h'
     simp only [IntermediateField.algebraMap_apply] at h'

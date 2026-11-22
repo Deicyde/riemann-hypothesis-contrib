@@ -97,8 +97,12 @@ lemma kfa_exp_conjTranspose {Y : Matrix (Fin n) (Fin n) ℂ} (hY : Yᴴ = -Y) (t
   rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hY, smul_neg]
   simp only [Complex.star_def, Complex.conj_ofReal]
 
-def kfaUnit (Y : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) : (Matrix (Fin n) (Fin n) ℂ)ˣ :=
-  ⟨NormedSpace.exp ((t : ℂ) • Y), NormedSpace.exp (-((t : ℂ) • Y)), kfa_exp_mul_neg _, kfa_exp_neg_mul _⟩
+def kfaUnit (Y : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) : (Matrix (Fin n) (Fin n) ℂ)ˣ := ⟨
+  NormedSpace.exp ((t : ℂ) • Y),
+  NormedSpace.exp (-((t : ℂ) • Y)),
+  kfa_exp_mul_neg _,
+  kfa_exp_neg_mul _
+⟩
 
 lemma kfa_mem_Kset (ε : Fin n → Bool) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) (t : ℝ) :
     NormedSpace.exp ((t : ℂ) • Y) ∈ Kset ε := by

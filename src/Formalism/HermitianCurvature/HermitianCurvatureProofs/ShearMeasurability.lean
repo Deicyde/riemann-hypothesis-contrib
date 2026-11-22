@@ -15,11 +15,11 @@ section Shear
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-def lvl (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (n : ℕ) (x : ι → ℂ) : ι → ℂ :=
-  fun q => if ρ q = n then F x q else x q
+def lvl (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (n : ℕ) (x : ι → ℂ) : ι → ℂ := fun q =>
+  if ρ q = n then F x q else x q
 
-def upto (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (n : ℕ) (x : ι → ℂ) : ι → ℂ :=
-  fun q => if ρ q < n then F x q else x q
+def upto (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (n : ℕ) (x : ι → ℂ) : ι → ℂ := fun q =>
+  if ρ q < n then F x q else x q
 
 def ShearCond (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) : Prop :=
   ∀ q (x y : ι → ℂ), (∀ p, ρ p < ρ q → x p = y p) → F x q - x q = F y q - y q
@@ -88,8 +88,8 @@ lemma lvl_mp {ρ : ι → ℕ} {F : (ι → ℂ) → ι → ℂ} (hFm : Measurab
   rw [heq]
   exact (he.symm e).comp (hT.comp he)
 
-theorem shear_mp (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (hFm : Measurable F) (hF : ShearCond ρ F) :
-    MeasurePreserving F volume volume := by
+theorem shear_mp (ρ : ι → ℕ) (F : (ι → ℂ) → ι → ℂ) (hFm : Measurable F) (hF : ShearCond ρ F)
+    : MeasurePreserving F volume volume := by
   classical
   have hN : ∀ q, ρ q < Finset.univ.sup ρ + 1 := fun q =>
     Nat.lt_succ_of_le (Finset.le_sup (Finset.mem_univ q))
@@ -120,12 +120,14 @@ variable {m : ℕ} (w : Equiv.Perm (Fin m))
 def gap (q : C2.Lidx m) : ℕ := q.1.1.val - q.1.2.val
 
 def splitEquiv : C2.Lidx m ≃ C2.LPidx w ⊕ C2.Lstidx w where
-  toFun q := if h : w.symm q.1.2 < w.symm q.1.1 then Sum.inl ⟨q.1, q.2, h⟩
-    else Sum.inr ⟨q.1, q.2, lt_of_le_of_ne (not_lt.mp h)
-      (fun e => (ne_of_lt q.2) (w.symm.injective e).symm)⟩
+  toFun q :=
+    if h : w.symm q.1.2 < w.symm q.1.1 then
+      Sum.inl ⟨q.1, q.2, h⟩
+    else
+      Sum.inr
+        ⟨q.1, q.2, lt_of_le_of_ne (not_lt.mp h) (fun e => (ne_of_lt q.2) (w.symm.injective e).symm)⟩
   invFun := Sum.elim (fun q => ⟨q.1, q.2.1⟩) (fun q => ⟨q.1, q.2.1⟩)
-  left_inv q := by
-    by_cases h : w.symm q.1.2 < w.symm q.1.1 <;> simp [h]
+  left_inv q := by by_cases h : w.symm q.1.2 < w.symm q.1.1 <;> simp [h]
   right_inv s := by
     rcases s with q | q
     · simp [q.2.2]

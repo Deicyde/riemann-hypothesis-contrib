@@ -9,14 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealLieSmoot
 
 noncomputable section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory Filter Topology
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  Filter Topology
 
 namespace GlobalTheory.AutGrowth
 
-theorem smoothing_growth_exponent : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
-    (ν : Measure (Lie E a)) [ν.IsAddHaarMeasure] (α : Lie E a → ℂ), IsTest (invSet E a) α →
-    ∀ (f : GA E a → ℂ) (C : ℝ) (N : ℕ), (∀ y, ‖f (infGL E a y)‖ ≤ C * height y ^ N) →
-    ∃ C' : ℝ, ∀ y, ‖smoothing ν α f (infGL E a y)‖ ≤ C' * height y ^ N := by
+theorem smoothing_growth_exponent
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (ν : Measure (Lie E a)) [ν.IsAddHaarMeasure] (α : Lie E a → ℂ),
+      IsTest (invSet E a) α
+        → ∀ (f : GA E a → ℂ) (C : ℝ) (N : ℕ),
+          (∀ y, ‖f (infGL E a y)‖ ≤ C * height y ^ N)
+            → ∃ C' : ℝ, ∀ y, ‖smoothing ν α f (infGL E a y)‖ ≤ C' * height y ^ N := by
   intro E _ _ _ a ν _ α hα f C N hC
   have C0 : 0 ≤ C := by
     have h1 := (norm_nonneg _).trans (hC 1)
@@ -55,8 +59,9 @@ theorem smoothing_growth_exponent : ∀ (E : Type) [Field E] [NumberField E] [_r
         have n1 := norm_nonneg (toL y.val)
         have n2 := norm_nonneg (toL (y⁻¹).val)
         have q1 : (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * M * ‖toL y.val‖ := by
-          calc (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
-                mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
+          calc
+            (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
+              mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
             _ = a * M * ‖toL y.val‖ := by ring
         have q2 : (a : ℝ) * (‖toL (u⁻¹).val‖ * ‖toL (y⁻¹).val‖) ≤ a * M * ‖toL (y⁻¹).val‖ := by
           rw [← mul_assoc]
@@ -65,8 +70,9 @@ theorem smoothing_growth_exponent : ∀ (E : Type) [Field E] [NumberField E] [_r
         unfold height
         rw [show toL (y * u).val = toL (y.val * u.val) from rfl, e2, hc]
         nlinarith
-      calc C * height (y * u) ^ N ≤ C * (c * height y) ^ N :=
-            mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by linarith [one_le_height (y * u)]) hh N) C0
+      calc
+        C * height (y * u) ^ N ≤ C * (c * height y) ^ N :=
+          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by linarith [one_le_height (y * u)]) hh N) C0
         _ = C * c ^ N * height y ^ N := by rw [mul_pow, mul_assoc]
     · rw [image_eq_zero_of_notMem_tsupport hx]
       simp

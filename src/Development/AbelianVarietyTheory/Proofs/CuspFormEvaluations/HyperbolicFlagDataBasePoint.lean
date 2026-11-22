@@ -43,8 +43,7 @@ theorem cc_ii : cc ii = -ii := by
   rw [emb_cc, map_neg]
   rcases emb_ii τ with h | h <;> simp [h]
 
-theorem exists_int_of_isIntegral {x : E4} (hx : IsIntegral ℤ x) :
-    ∃ m n : ℤ, x = m + n * ii := by
+theorem exists_int_of_isIntegral {x : E4} (hx : IsIntegral ℤ x) : ∃ m n : ℤ, x = m + n * ii := by
   have hcl := IsCyclotomicExtension.Rat.isIntegralClosure_adjoin_singleton ii_prim
   obtain ⟨⟨y, hy⟩, rfl⟩ := (hcl.isIntegral_iff).1 hx
   change ∃ m n : ℤ, y = m + n * ii
@@ -59,8 +58,8 @@ theorem exists_int_of_isIntegral {x : E4} (hx : IsIntegral ℤ x) :
   | mul a b _ _ ha hb =>
     obtain ⟨m, n, rfl⟩ := ha
     obtain ⟨m', n', rfl⟩ := hb
-    exact ⟨m * m' - n * n', m * n' + n * m', by
-      push_cast; linear_combination (n * n' : E4) * ii_mul_ii⟩
+    exact
+      ⟨m * m' - n * n', m * n' + n * m', by push_cast; linear_combination (n * n' : E4) * ii_mul_ii⟩
 
 theorem exists_rat (x : E4) : ∃ p q : ℚ, x = p + q * ii := by
   have halg : IsAlgebraic ℤ x :=
@@ -84,11 +83,14 @@ theorem finrank_eq : Module.finrank ℚ E4 = 2 := by
   decide
 
 theorem trace_eq (p q : ℚ) : Algebra.trace ℚ E4 (-(ii / 2) * (p + q * ii)) = q := by
-  have e : -(ii / 2) * ((p : E4) + q * ii) = algebraMap ℚ E4 (q / 2) + algebraMap ℚ E4 (-(p / 2)) * ii := by
+  have e
+      : -(ii / 2) * ((p : E4) + q * ii)
+        = algebraMap ℚ E4 (q / 2) + algebraMap ℚ E4 (-(p / 2)) * ii := by
     simp only [eq_ratCast]
     push_cast
     linear_combination (-(q : E4) / 2) * ii_mul_ii
-  rw [e, map_add (f := _), ← Algebra.smul_def, map_smul, trace_ii, Algebra.trace_algebraMap, finrank_eq]
+  rw [e, map_add (f := _), ← Algebra.smul_def, map_smul, trace_ii, Algebra.trace_algebraMap,
+    finrank_eq]
   simp
   ring
 
@@ -101,8 +103,7 @@ theorem herm_gm (x y : Fin 2 → E4) : herm gm x y = x 0 * cc (y 0) - x 1 * cc (
 theorem gm_herm (a b : Fin 2) : cc (gm a b) = gm b a := by
   fin_cases a <;> fin_cases b <;> simp [gm, cc]
 
-theorem gm_det : gm.det ≠ 0 := by
-  simp [gm, Matrix.det_fin_two]
+theorem gm_det : gm.det ≠ 0 := by simp [gm, Matrix.det_fin_two]
 
 def lat : Submodule (𝓞 E4) (Fin 2 → E4) where
   carrier := {x | ∀ a, IsIntegral ℤ (x a)}
@@ -117,8 +118,11 @@ theorem single_mem_lat (a : Fin 2) {c : E4} (hc : IsIntegral ℤ c) : Pi.single 
   · simpa [h] using isIntegral_zero
 
 theorem lat_fg : lat.FG := by
-  refine Submodule.fg_def.2 ⟨Set.range fun a : Fin 2 => (Pi.single a 1 : Fin 2 → E4),
-    Set.finite_range _, le_antisymm ?_ fun x hx => ?_⟩
+  refine Submodule.fg_def.2 ⟨
+    Set.range fun a : Fin 2 => (Pi.single a 1 : Fin 2 → E4),
+    Set.finite_range _,
+    le_antisymm ?_ fun x hx => ?_
+  ⟩
   · rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
     exact single_mem_lat a isIntegral_one
@@ -147,8 +151,7 @@ def cmt : Finset (E4 →+* ℂ) := by
   classical
   exact Finset.univ.filter fun τ => τ ii = Complex.I
 
-theorem mem_cmt {τ : E4 →+* ℂ} : τ ∈ cmt ↔ τ ii = Complex.I := by
-  simp [cmt]
+theorem mem_cmt {τ : E4 →+* ℂ} : τ ∈ cmt ↔ τ ii = Complex.I := by simp [cmt]
 
 theorem cmt_cmType (τ : E4 →+* ℂ) : τ ∈ cmt ↔ ComplexEmbedding.conjugate τ ∉ cmt := by
   have hI : -Complex.I ≠ Complex.I := fun h => by
@@ -157,21 +160,28 @@ theorem cmt_cmType (τ : E4 →+* ℂ) : τ ∈ cmt ↔ ComplexEmbedding.conjuga
   rw [mem_cmt, mem_cmt, ComplexEmbedding.conjugate_coe_eq]
   rcases emb_ii τ with h | h <;> simp [h, hI]
 
-theorem gram_one (τ : E4 →+* ℂ) :
-    gram τ gm 1 = Matrix.diagonal fun a : Fin 2 => ((sgn 1 (a : ℕ) : ℝ) : ℂ) := by
+theorem gram_one (τ : E4 →+* ℂ)
+    : gram τ gm 1 = Matrix.diagonal fun a : Fin 2 => ((sgn 1 (a : ℕ) : ℝ) : ℂ) := by
   ext a b
   fin_cases a <;> fin_cases b <;> simp [gram, hermC, col, sgn, gm, Matrix.one_apply]
 
 theorem half_ii_ne_zero : ii / 2 ≠ 0 := div_ne_zero ii_ne_zero two_ne_zero
 
-theorem exists_flagData : ∃ X : Data E4 2, X.Ψ = cmt ∧ X.Gm = gm ∧ X.p0 = 1 ∧ X.Λ = lat ∧
-    X.ξ0 = ii / 2 ∧ X.κ0 = -ii ∧ X.m = 3 ∧
-    (∀ γ, γ ∈ X.Γ ↔ IsUStab gm lat γ ∧
-      (∀ v ∈ lat, ∃ w ∈ lat, Matrix.mulVec (γ : Matrix (Fin 2) (Fin 2) E4) v = v + 3 • w)) ∧
-    ∀ la γ, X.χ la γ = 1 := by
+theorem exists_flagData
+    : ∃ X : Data E4 2,
+      X.Ψ = cmt ∧ X.Gm = gm ∧ X.p0 = 1 ∧ X.Λ = lat ∧ X.ξ0 = ii / 2 ∧ X.κ0 = -ii ∧ X.m = 3
+        ∧ (∀ γ,
+          γ ∈ X.Γ
+            ↔ IsUStab gm lat γ
+              ∧ (∀ v ∈ lat, ∃ w ∈ lat, Matrix.mulVec (γ : Matrix (Fin 2) (Fin 2) E4) v = v + 3 • w))
+        ∧ ∀ la γ, X.χ la γ = 1 := by
   refine FlagData.exists_data latMinkowski E4 2 1 3 3 cmt gm lat (ii / 2) (-ii) cmt_cmType gm_herm
-    gm_det (by norm_num) (fun τ _ => ⟨1, by simp, gram_one τ⟩) lat_fg lat_span le_rfl ?_
-    half_ii_ne_zero (Or.inr (by ring)) (fun τ hτ => ?_) (by norm_num) fun x hx y hy => ?_
+    gm_det (by norm_num)
+    (fun τ _ => ⟨1, by simp, gram_one τ⟩)
+    lat_fg lat_span le_rfl ?_ half_ii_ne_zero (Or.inr (by ring))
+    (fun τ hτ => ?_)
+    (by norm_num)
+    fun x hx y hy => ?_
   · have h : IsCMField.complexConj E4 ii = -ii := cc_ii
     simp [cc, h, map_ofNat, neg_div]
   · simp [mem_cmt.1 hτ]
@@ -186,8 +196,7 @@ theorem hyperbolicFlagData_base_point : flagData.p0 = 1 := exists_flagData.choos
 theorem flagData_Λ : flagData.Λ = lat := exists_flagData.choose_spec.2.2.2.1
 theorem flagData_κ0 : flagData.κ0 = -ii := exists_flagData.choose_spec.2.2.2.2.2.1
 
-theorem emb_ii_eq (τ : flagData.Ψ) : τ.1 ii = Complex.I :=
-  mem_cmt.1 (flagData_Ψ ▸ τ.2)
+theorem emb_ii_eq (τ : flagData.Ψ) : τ.1 ii = Complex.I := mem_cmt.1 (flagData_Ψ ▸ τ.2)
 
 theorem isIso_one : flagData.IsIso ![1, 1] := by
   refine ⟨?_, ?_, fun h => by simpa using congrFun h 0⟩

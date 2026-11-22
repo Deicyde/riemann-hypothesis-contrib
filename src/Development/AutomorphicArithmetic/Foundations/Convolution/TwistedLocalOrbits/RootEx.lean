@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
 namespace UpperTheory.ConvolutionTheory.Loc.RootExistence
 
@@ -53,18 +54,20 @@ private theorem Bd.pow_sub_one (h : Bd a (M - 1)) (ha : a ≤ 1) (m : ℕ) : Bd 
   induction m with
   | zero => simpa using Bd.zero
   | succ m ih =>
-    have e : M ^ (m + 1) - 1 = (M ^ m - 1) * M + (M - 1) := by
-      rw [pow_succ]; noncomm_ring
+    have e : M ^ (m + 1) - 1 = (M ^ m - 1) * M + (M - 1) := by rw [pow_succ]; noncomm_ring
     rw [e]
     exact Bd.add (by simpa using ih.mul (h.of_sub_one ha)) h
 
-private theorem Bd.pow_sub_pow (hM : Bd a (M - 1)) (hN : Bd a (N - 1)) (ha : a ≤ 1) (hd : Bd b (M - N)) (m : ℕ) :
-    Bd (a * b) (M ^ m - N ^ m - m • (M - N)) := by
+private theorem Bd.pow_sub_pow
+    (hM : Bd a (M - 1)) (hN : Bd a (N - 1)) (ha : a ≤ 1) (hd : Bd b (M - N)) (m : ℕ)
+    : Bd (a * b) (M ^ m - N ^ m - m • (M - N)) := by
   induction m with
   | zero => simpa using Bd.zero
   | succ m ih =>
-    have e : M ^ (m + 1) - N ^ (m + 1) - (m + 1) • (M - N) =
-        M * (M ^ m - N ^ m - m • (M - N)) + (M - 1) * (m • (M - N)) + (M - N) * (N ^ m - 1) := by
+    have e
+        : M ^ (m + 1) - N ^ (m + 1) - (m + 1) • (M - N)
+          = M * (M ^ m - N ^ m - m • (M - N)) + (M - 1) * (m • (M - N))
+            + (M - N) * (N ^ m - 1) := by
       rw [pow_succ', pow_succ', succ_nsmul]
       generalize m • (M - N) = D
       noncomm_ring
@@ -83,10 +86,13 @@ private theorem val_nat_le_one (q : ℕ) : valuation E (q : E) ≤ 1 := by
 
 end Bound
 
-variable {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
+variable
+  {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
 
-private theorem eq_zero_of_bd {ρ c : ValueGroupWithZero E} (hρ : ρ < 1) {M : Matrix (Fin n) (Fin n) E}
-    (h : ∀ k : ℕ, Bd (ρ ^ k * c) M) : M = 0 := by
+private theorem eq_zero_of_bd
+    {ρ c : ValueGroupWithZero E} (hρ : ρ < 1)
+    {M : Matrix (Fin n) (Fin n) E} (h : ∀ k : ℕ, Bd (ρ ^ k * c) M)
+    : M = 0 := by
   ext i j
   by_contra hne
   have hv : valuation E (M i j) ≠ 0 := by simpa using hne
@@ -98,14 +104,18 @@ private theorem eq_zero_of_bd {ρ c : ValueGroupWithZero E} (hρ : ρ < 1) {M : 
   rw [Units.val_mk0, lt_div_iff₀ (zero_lt_iff.mpr hc)] at hk
   exact absurd (h k i j) (not_le.mpr hk)
 
-private theorem isCompact_bd (c : ValueGroupWithZero E) : IsCompact {M : Matrix (Fin n) (Fin n) E | Bd c M} := by
-  have h := isCompact_pi_infinite (s := fun _ : Fin n => {x : Fin n → E | ∀ j, x j ∈ {y | valuation E y ≤ c}})
-    fun _ => isCompact_pi_infinite fun _ => IsNonarchimedeanLocalField.isCompact_closedBall E c
+private theorem isCompact_bd (c : ValueGroupWithZero E)
+    : IsCompact {M : Matrix (Fin n) (Fin n) E | Bd c M} := by
+  have h :=
+    isCompact_pi_infinite
+      (s := fun _ : Fin n => {x : Fin n → E | ∀ j, x j ∈ {y | valuation E y ≤ c}})
+      fun _ => isCompact_pi_infinite fun _ => IsNonarchimedeanLocalField.isCompact_closedBall E c
   exact h
 
-private theorem exists_root (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valuation E (q : E))
-    (g : Matrix (Fin n) (Fin n) E) (hg : Bd (r * valuation E (q : E)) (g - 1)) :
-    ∃ u : Matrix (Fin n) (Fin n) E, Bd r (u - 1) ∧ u ^ q = g := by
+private theorem exists_root
+    (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valuation E (q : E))
+    (g : Matrix (Fin n) (Fin n) E) (hg : Bd (r * valuation E (q : E)) (g - 1))
+    : ∃ u : Matrix (Fin n) (Fin n) E, Bd r (u - 1) ∧ u ^ q = g := by
   have hq0 : 0 < valuation E (q : E) := lt_of_le_of_lt zero_le hr
   have hq : (q : E) ≠ 0 := by
     intro h
@@ -122,7 +132,8 @@ private theorem exists_root (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valua
   have hcl : ∀ k, IsClosed (S k) := fun k =>
     (isCompact_bd r).isClosed.inter
       ((isCompact_bd (ρ ^ k * (r * valuation E (q : E)))).isClosed.preimage
-        (f := fun X : Matrix (Fin n) (Fin n) E => (X + 1) ^ q - g) (by fun_prop))
+        (f := fun X : Matrix (Fin n) (Fin n) E => (X + 1) ^ q - g)
+        (by fun_prop))
   have hanti : ∀ k, S (k + 1) ⊆ S k := fun k X hX =>
     ⟨hX.1, Bd.mono hX.2 (mul_le_mul' (pow_le_pow_right_of_le_one' hρ1.le k.le_succ) le_rfl)⟩
   have hne : ∀ k, (S k).Nonempty := by
@@ -143,25 +154,32 @@ private theorem exists_root (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valua
       have hXD : Bd r (X - D) :=
         Bd.sub hX (hD.mono (by simpa using mul_le_mul' (pow_le_one' hρ1.le k) (le_refl r)))
       refine ⟨X - D, hXD, ?_⟩
-      have h := Bd.pow_sub_pow (M := X + 1) (N := X - D + 1) (a := r) (b := ρ ^ k * r)
-        (by simpa using hX) (by simpa using hXD) hr1 (by simpa using hD) q
+      have h :=
+        Bd.pow_sub_pow (M := X + 1) (N := X - D + 1) (a := r) (b := ρ ^ k * r) (by simpa using hX)
+          (by simpa using hXD) hr1 (by simpa using hD) q
       have e1 : X + 1 - (X - D + 1) = D := by abel
       rw [e1, hqD] at h
       have h' := (Bd.zero (n := n)).sub h
-      have e2 : 0 - ((X + 1) ^ q - (X - D + 1) ^ q - ((X + 1) ^ q - g)) = (X - D + 1) ^ q - g := by abel
+      have e2 : 0 - ((X + 1) ^ q - (X - D + 1) ^ q - ((X + 1) ^ q - g)) = (X - D + 1) ^ q - g := by
+        abel
       have e3 : r * (ρ ^ k * r) = ρ ^ (k + 1) * (r * valuation E (q : E)) := by
         have : ρ * valuation E (q : E) = r := div_mul_cancel₀ _ hq0.ne'
-        calc r * (ρ ^ k * r) = ρ * valuation E (q : E) * (ρ ^ k * r) := by rw [this]
+        calc
+          r * (ρ ^ k * r)
+            = ρ * valuation E (q : E) * (ρ ^ k * r) := by rw [this]
           _ = _ := by rw [pow_succ]; ac_rfl
       rw [e2, e3] at h'
       exact h'
-  obtain ⟨X, hX⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hanti hne
-    ((isCompact_bd r).of_isClosed_subset (hcl 0) Set.inter_subset_left) hcl
+  obtain ⟨X, hX⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hanti hne
+      ((isCompact_bd r).of_isClosed_subset (hcl 0) Set.inter_subset_left) hcl
   rw [Set.mem_iInter] at hX
   exact ⟨X + 1, by simpa using (hX 0).1, sub_eq_zero.mp (eq_zero_of_bd hρ1 fun k => (hX k).2)⟩
 
-private theorem root_unique (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valuation E (q : E))
-    {A C : Matrix (Fin n) (Fin n) E} (hA : Bd r (A - 1)) (hC : Bd r (C - 1)) (h : A ^ q = C ^ q) : A = C := by
+private theorem root_unique
+    (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valuation E (q : E))
+    {A C : Matrix (Fin n) (Fin n) E} (hA : Bd r (A - 1)) (hC : Bd r (C - 1)) (h : A ^ q = C ^ q)
+    : A = C := by
   have hq0 : 0 < valuation E (q : E) := lt_of_le_of_lt zero_le hr
   have hq : (q : E) ≠ 0 := by
     intro h
@@ -183,9 +201,11 @@ private theorem root_unique (q : ℕ) (r : ValueGroupWithZero E) (hr : r < valua
 end UpperTheory.ConvolutionTheory.Loc.RootExistence
 
 open UpperTheory.ConvolutionTheory.Loc.RootExistence in
-theorem UpperTheory.ConvolutionTheory.Loc.rootEx :
-    ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n : ℕ) (q : ℕ) (r : ValueGroupWithZero E), r < valuation E (q : E) →
-      ∀ g ∈ ball n (r * valuation E (q : E)), ∃! u, u ∈ ball n r ∧ u ^ q = g := by
+theorem UpperTheory.ConvolutionTheory.Loc.rootEx
+    : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+        (n : ℕ) (q : ℕ) (r : ValueGroupWithZero E),
+      r < valuation E (q : E)
+        → ∀ g ∈ ball n (r * valuation E (q : E)), ∃! u, u ∈ ball n r ∧ u ^ q = g := by
   intro E _ _ _ _ n q r hr g hg
   have hq : q ≠ 0 := by
     rintro rfl

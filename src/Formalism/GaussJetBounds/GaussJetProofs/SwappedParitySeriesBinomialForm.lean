@@ -14,18 +14,19 @@ namespace Formalism.DworkPowerSeriesWeights
 
 open MvPowerSeries Formalism.IncomingBounds
 
-theorem bnx_lin_pow {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] (x y : σ) (a b : K) (k : ℕ)
-    (μ : σ →₀ ℕ) :
-    coeff μ ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k) =
-      ∑ r ∈ Finset.range (k + 1),
-        if Finsupp.single x r + Finsupp.single y (k - r) = μ then
-          a ^ r * b ^ (k - r) * (k.choose r : K) else 0 := by
+theorem bnx_lin_pow
+    {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] (x y : σ) (a b : K) (k : ℕ) (μ : σ →₀ ℕ)
+    : coeff μ ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k)
+      = ∑ r ∈ Finset.range (k + 1),
+          if Finsupp.single x r + Finsupp.single y (k - r) = μ then
+            a ^ r * b ^ (k - r) * (k.choose r : K) else 0 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [add_pow, map_sum]
   refine Finset.sum_congr rfl fun r _ => ?_
-  have e : (C a * X x : MvPowerSeries σ K) ^ r * (C b * X y) ^ (k - r) *
-      ((k.choose r : ℕ) : MvPowerSeries σ K) =
-      C (a ^ r * b ^ (k - r) * (k.choose r : K)) * (X x ^ r * X y ^ (k - r)) := by
+  have e
+      : (C a * X x : MvPowerSeries σ K) ^ r * (C b * X y) ^ (k - r)
+          * ((k.choose r : ℕ) : MvPowerSeries σ K)
+        = C (a ^ r * b ^ (k - r) * (k.choose r : K)) * (X x ^ r * X y ^ (k - r)) := by
     simp only [map_mul, map_pow, map_natCast]
     ring
   rw [e, coeff_C_mul, X_pow_eq, X_pow_eq, monomial_mul_monomial, one_mul, coeff_monomial]
@@ -34,9 +35,9 @@ theorem bnx_lin_pow {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] (x y : 
     simp
   · rw [if_neg (Ne.symm h), if_neg h, mul_zero]
 
-theorem bnx_single_add_single_eq {σ : Type*} {x y : σ} (hxy : x ≠ y) (r s i j : ℕ) :
-    Finsupp.single x r + Finsupp.single y s = Finsupp.single x i + Finsupp.single y j ↔
-      r = i ∧ s = j := by
+theorem bnx_single_add_single_eq {σ : Type*} {x y : σ} (hxy : x ≠ y) (r s i j : ℕ)
+    : Finsupp.single x r + Finsupp.single y s = Finsupp.single x i + Finsupp.single y j
+      ↔ r = i ∧ s = j := by
   constructor
   · intro h
     have h1 := DFunLike.congr_fun h x
@@ -46,10 +47,11 @@ theorem bnx_single_add_single_eq {σ : Type*} {x y : σ} (hxy : x ≠ y) (r s i 
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem bnx_lin_pow_val {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] {x y : σ} (hxy : x ≠ y)
-    (a b : K) (k i j : ℕ) :
-    coeff (Finsupp.single x i + Finsupp.single y j) ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k) =
-      if i + j = k then a ^ i * b ^ j * (k.choose i : K) else 0 := by
+theorem bnx_lin_pow_val
+    {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] {x y : σ} (hxy : x ≠ y) (a b : K) (k i j : ℕ)
+    : coeff (Finsupp.single x i + Finsupp.single y j)
+        ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k)
+      = if i + j = k then a ^ i * b ^ j * (k.choose i : K) else 0 := by
   rw [bnx_lin_pow]
   simp_rw [bnx_single_add_single_eq hxy]
   split_ifs with hk
@@ -69,10 +71,13 @@ theorem bnx_lin_pow_val {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] {x 
     simp only [Finset.mem_range] at hr
     omega
 
-theorem bnx_lin_pow_supp {K : Type u} [Field K] {σ : Type*} [DecidableEq σ] (x y : σ)
-    (a b : K) (k : ℕ) (μ : σ →₀ ℕ)
-    (h : coeff μ ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k) ≠ 0) (z : σ) (hz : μ z ≠ 0) :
-    z = x ∨ z = y := by
+theorem bnx_lin_pow_supp
+    {K : Type u} [Field K]
+    {σ : Type*} [DecidableEq σ]
+    (x y : σ) (a b : K) (k : ℕ) (μ : σ →₀ ℕ)
+    (h : coeff μ ((C a * X x + C b * X y : MvPowerSeries σ K) ^ k) ≠ 0)
+    (z : σ) (hz : μ z ≠ 0)
+    : z = x ∨ z = y := by
   rw [bnx_lin_pow] at h
   obtain ⟨r, _, hr⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
   split_ifs at hr with hμ
@@ -93,19 +98,23 @@ def bnxA (a b : ZMod d → K) (s : ZMod d) : MvPowerSeries (V2 d) K :=
 def bnxRes (m : V2 d →₀ ℕ) (s : ZMod d) : V2 d →₀ ℕ :=
   Finsupp.single (false, s) (m (false, s)) + Finsupp.single (true, s) (m (true, s))
 
-theorem bnxRes_apply (m : V2 d →₀ ℕ) (s : ZMod d) (z : V2 d) :
-    bnxRes m s z = if z.2 = s then m z else 0 := by
+theorem bnxRes_apply (m : V2 d →₀ ℕ) (s : ZMod d) (z : V2 d)
+    : bnxRes m s z = if z.2 = s then m z else 0 := by
   obtain ⟨b, t⟩ := z
   by_cases h : t = s
   · subst h
     cases b <;> simp [bnxRes, Finsupp.single_apply]
   · cases b <;> simp [bnxRes, Finsupp.single_apply, h, Ne.symm h]
 
-private theorem coeff_prod_bnxA_pow_eq_ite {K : Type u} [Field K] {d : ℕ} [NeZero d]
-    (a b : ZMod d → K) (k : ZMod d → ℕ) (S : Finset (ZMod d)) (m : V2 d →₀ ℕ) :
-    coeff m (∏ s ∈ S, bnxA a b s ^ k s) =
-      if ∀ z : V2 d, z.2 ∉ S → m z = 0 then
-        ∏ s ∈ S, coeff (bnxRes m s) (bnxA a b s ^ k s) else 0 := by
+private theorem coeff_prod_bnxA_pow_eq_ite
+    {K : Type u} [Field K]
+    {d : ℕ} [NeZero d]
+    (a b : ZMod d → K) (k : ZMod d → ℕ) (S : Finset (ZMod d)) (m : V2 d →₀ ℕ)
+    : coeff m (∏ s ∈ S, bnxA a b s ^ k s)
+      = if ∀ z : V2 d, z.2 ∉ S → m z = 0 then
+          ∏ s ∈ S, coeff (bnxRes m s) (bnxA a b s ^ k s)
+        else
+          0 := by
   revert m
   refine Finset.induction_on S ?_ ?_
   · intro m
@@ -123,8 +132,9 @@ private theorem coeff_prod_bnxA_pow_eq_ite {K : Type u} [Field K] {d : ℕ} [NeZ
     rw [Finset.prod_insert ha, Finset.prod_insert ha, coeff_mul]
     rw [Finset.sum_eq_single (bnxRes m c, m - bnxRes m c)]
     · rw [ih]
-      have hcond : (∀ z : V2 d, z.2 ∉ S → (m - bnxRes m c) z = 0) ↔
-          (∀ z : V2 d, z.2 ∉ insert c S → m z = 0) := by
+      have hcond
+          : (∀ z : V2 d, z.2 ∉ S → (m - bnxRes m c) z = 0)
+            ↔ (∀ z : V2 d, z.2 ∉ insert c S → m z = 0) := by
         constructor
         · intro h z hz
           have h1 := h z (fun hS => hz (Finset.mem_insert_of_mem hS))
@@ -152,8 +162,8 @@ private theorem coeff_prod_bnxA_pow_eq_ite {K : Type u} [Field K] {d : ℕ} [NeZ
       · rw [if_neg (mt hcond.1 hc), if_neg hc, mul_zero]
     · intro p hp hne
       first
-        | rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
-        | simp only [Finset.mem_antidiagonal] at hp
+      | rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
+      | simp only [Finset.mem_antidiagonal] at hp
       by_contra hnz
       have h1 : coeff p.1 (bnxA a b c ^ k c) ≠ 0 := left_ne_zero_of_mul hnz
       have h2 : coeff p.2 (∏ s ∈ S, bnxA a b s ^ k s) ≠ 0 := right_ne_zero_of_mul hnz
@@ -164,8 +174,8 @@ private theorem coeff_prod_bnxA_pow_eq_ite {K : Type u} [Field K] {d : ℕ} [NeZ
       have hs1 : ∀ z : V2 d, z.2 ≠ c → p.1 z = 0 := by
         intro z hz
         by_contra hz0
-        rcases bnx_lin_pow_supp (false, c) (true, c) (a c) (b c) (k c) p.1 h1 z hz0 with h | h <;>
-          (subst h; exact hz rfl)
+        rcases bnx_lin_pow_supp (false, c) (true, c) (a c) (b c) (k c) p.1 h1 z hz0 with h | h
+          <;> (subst h; exact hz rfl)
       apply hne
       have e1 : p.1 = bnxRes m c := by
         ext z
@@ -186,15 +196,13 @@ private theorem coeff_prod_bnxA_pow_eq_ite {K : Type u} [Field K] {d : ℕ} [NeZ
     · intro h
       exfalso
       apply h
-      first
-      | rw [Finset.HasAntidiagonal.mem_antidiagonal]
-      | simp only [Finset.mem_antidiagonal]
+      first | rw [Finset.HasAntidiagonal.mem_antidiagonal] | simp only [Finset.mem_antidiagonal]
       ext z
       rw [Finsupp.add_apply, Finsupp.tsub_apply, hr]
       split_ifs <;> omega
 
-theorem bnx_coeff_prod (a b : ZMod d → K) (k : ZMod d → ℕ) (m : V2 d →₀ ℕ) :
-    coeff m (∏ s, bnxA a b s ^ k s) = ∏ s, coeff (bnxRes m s) (bnxA a b s ^ k s) := by
+theorem bnx_coeff_prod (a b : ZMod d → K) (k : ZMod d → ℕ) (m : V2 d →₀ ℕ)
+    : coeff m (∏ s, bnxA a b s ^ k s) = ∏ s, coeff (bnxRes m s) (bnxA a b s ^ k s) := by
   rw [coeff_prod_bnxA_pow_eq_ite, if_pos (fun z hz => absurd (Finset.mem_univ _) hz)]
 
 end Blocks
@@ -207,26 +215,30 @@ def bnxN (m : V2 d →₀ ℕ) : ZMod d →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm fun s => m (false, s) + m (true, s)
 
 theorem bnxN_apply (m : V2 d →₀ ℕ) (s : ZMod d) : bnxN m s = m (false, s) + m (true, s) := by
-  first
-  | rfl
-  | simp [bnxN]
+  first | rfl | simp [bnxN]
 
-theorem bnx_coeff_subst (a b : ZMod d → K) (f : MvPowerSeries (ZMod d) K) (m : V2 d →₀ ℕ) :
-    coeff m (subst (bnxA a b) f) = coeff (bnxN m) f *
-      ∏ s, (a s ^ m (false, s) * b s ^ m (true, s) *
-        ((m (false, s) + m (true, s)).choose (m (false, s)) : K)) := by
+theorem bnx_coeff_subst (a b : ZMod d → K) (f : MvPowerSeries (ZMod d) K) (m : V2 d →₀ ℕ)
+    : coeff m (subst (bnxA a b) f)
+      = coeff (bnxN m) f
+        * ∏ s, (a s ^ m (false, s) * b s ^ m (true, s) *
+            ((m (false, s) + m (true, s)).choose (m (false, s)) : K)) := by
   have ha : HasSubst (bnxA a b) := hasSubst_of_constantCoeff_zero fun s => by simp [bnxA]
   rw [coeff_subst ha]
-  have hterm : ∀ dd : ZMod d →₀ ℕ, coeff m (dd.prod fun s e => bnxA a b s ^ e) =
-      ∏ s, (if m (false, s) + m (true, s) = dd s then
-        a s ^ m (false, s) * b s ^ m (true, s) * ((dd s).choose (m (false, s)) : K) else 0) := by
-    intro dd
-    rw [Finsupp.prod_fintype _ _ (fun s => pow_zero _), bnx_coeff_prod]
-    refine Finset.prod_congr rfl fun s _ => ?_
-    have hres : bnxRes m s = Finsupp.single (false, s) (m (false, s)) +
-        Finsupp.single (true, s) (m (true, s)) := rfl
-    rw [hres]
-    exact bnx_lin_pow_val (x := (false, s)) (y := (true, s)) (by simp) (a s) (b s) (dd s) _ _
+  have hterm
+      : ∀ dd : ZMod d →₀ ℕ,
+        coeff m (dd.prod fun s e => bnxA a b s ^ e)
+          = ∏ s, (if m (false, s) + m (true, s) = dd s then
+              a s ^ m (false, s) * b s ^ m (true, s) * ((dd s).choose (m (false, s)) : K) else 0) :=
+    by
+      intro dd
+      rw [Finsupp.prod_fintype _ _ (fun s => pow_zero _), bnx_coeff_prod]
+      refine Finset.prod_congr rfl fun s _ => ?_
+      have hres
+          : bnxRes m s
+            = Finsupp.single (false, s) (m (false, s)) + Finsupp.single (true, s) (m (true, s)) :=
+        rfl
+      rw [hres]
+      exact bnx_lin_pow_val (x := (false, s)) (y := (true, s)) (by simp) (a s) (b s) (dd s) _ _
   rw [finsum_eq_single _ (bnxN m)]
   · rw [hterm, smul_eq_mul]
     congr 1
@@ -244,30 +256,39 @@ theorem bnx_coeff_subst (a b : ZMod d → K) (f : MvPowerSeries (ZMod d) K) (m :
     apply hs
     rw [← h, bnxN_apply]
 
-theorem evenIndicator_series_binomial_form : (s1 : ZMod d → MvPowerSeries (V2 d) K) =
-    bnxA (fun _ => 1) (fun s => if s.val % 2 = 0 then 1 else 0) := by
+theorem evenIndicator_series_binomial_form
+    : (s1 : ZMod d → MvPowerSeries (V2 d) K)
+      = bnxA (fun _ => 1) (fun s => if s.val % 2 = 0 then 1 else 0) := by
   funext s
   simp only [s1, bnxA]
   split_ifs <;> simp
 
-theorem zero_series_binomial_form : (s0 : ZMod d → MvPowerSeries (V2 d) K) = bnxA (fun _ => 1) (fun _ => 0) := by
+theorem zero_series_binomial_form
+    : (s0 : ZMod d → MvPowerSeries (V2 d) K) = bnxA (fun _ => 1) (fun _ => 0) := by
   funext s
   simp [s0, bnxA]
 
-theorem swapped_parity_series_binomial_form : (s2 : ZMod d → MvPowerSeries (V2 d) K) =
-    bnxA (fun s => if s.val % 2 = 0 then 0 else 1) (fun s => if s.val % 2 = 0 then 1 else 0) := by
+theorem swapped_parity_series_binomial_form
+    : (s2 : ZMod d → MvPowerSeries (V2 d) K)
+      = bnxA
+        (fun s => if s.val % 2 = 0 then 0 else 1)
+        (fun s => if s.val % 2 = 0 then 1 else 0) := by
   funext s
   simp only [s2, bnxA]
   split_ifs <;> simp
 
-theorem oddIndicator_series_binomial_form : (s1' : ZMod d → MvPowerSeries (V2 d) K) =
-    bnxA (fun _ => 1) (fun s => if s.val % 2 = 0 then 0 else 1) := by
+theorem oddIndicator_series_binomial_form
+    : (s1' : ZMod d → MvPowerSeries (V2 d) K)
+      = bnxA (fun _ => 1) (fun s => if s.val % 2 = 0 then 0 else 1) := by
   funext s
   simp only [s1', bnxA]
   split_ifs <;> simp
 
-theorem parity_series_binomial_form : (s2' : ZMod d → MvPowerSeries (V2 d) K) =
-    bnxA (fun s => if s.val % 2 = 0 then 1 else 0) (fun s => if s.val % 2 = 0 then 0 else 1) := by
+theorem parity_series_binomial_form
+    : (s2' : ZMod d → MvPowerSeries (V2 d) K)
+      = bnxA
+        (fun s => if s.val % 2 = 0 then 1 else 0)
+        (fun s => if s.val % 2 = 0 then 0 else 1) := by
   funext s
   simp only [s2', bnxA]
   split_ifs <;> simp
@@ -276,24 +297,21 @@ def bnxM (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) : V2 d →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm fun x => if x.1 then n x.2 - k x.2 else k x.2
 
 theorem bnxM_false (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (s : ZMod d) : bnxM n k (false, s) = k s := by
-  first
-  | rfl
-  | simp [bnxM]
+  first | rfl | simp [bnxM]
 
-theorem bnxM_true (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (s : ZMod d) :
-    bnxM n k (true, s) = n s - k s := by
-  first
-  | rfl
-  | simp [bnxM]
+theorem bnxM_true (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (s : ZMod d)
+    : bnxM n k (true, s) = n s - k s := by
+  first | rfl | simp [bnxM]
 
-theorem bnxN_bnxM (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (hk : ∀ s, k s ≤ n s) : bnxN (bnxM n k) = n := by
+theorem bnxN_bnxM (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (hk : ∀ s, k s ≤ n s)
+    : bnxN (bnxM n k) = n := by
   ext s
   rw [bnxN_apply, bnxM_false, bnxM_true]
   have := hk s
   omega
 
-theorem bnx_degree_bnxM (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (hk : ∀ s, k s ≤ n s) :
-    (bnxM n k).degree = n.degree := by
+theorem bnx_degree_bnxM (n : ZMod d →₀ ℕ) (k : ZMod d → ℕ) (hk : ∀ s, k s ≤ n s)
+    : (bnxM n k).degree = n.degree := by
   rw [Finsupp.degree_eq_sum, Finsupp.degree_eq_sum, Fintype.sum_prod_type]
   simp only [Fintype.sum_bool, bnxM_true, bnxM_false]
   rw [← Finset.sum_add_distrib]
@@ -305,8 +323,8 @@ section De
 
 variable {K : Type u} [Field K] {d : ℕ} [NeZero d]
 
-theorem bnx_update_le (n : ZMod d →₀ ℕ) (s : ZMod d) (j : ℕ) (hj : j < n s) :
-    ∀ t, Function.update (⇑n) s j t ≤ n t := by
+theorem bnx_update_le (n : ZMod d →₀ ℕ) (s : ZMod d) (j : ℕ) (hj : j < n s)
+    : ∀ t, Function.update (⇑n) s j t ≤ n t := by
   intro t
   rw [Function.update_apply]
   split_ifs with h
@@ -314,41 +332,51 @@ theorem bnx_update_le (n : ZMod d →₀ ℕ) (s : ZMod d) (j : ℕ) (hj : j < n
     exact hj.le
   · exact le_rfl
 
-theorem bnx_prod_choose (n : ZMod d →₀ ℕ) (s : ZMod d) (j : ℕ) (hj : j < n s) (e : ZMod d → K)
-    (he : e s = 1) :
-    ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * e t ^ (n t - Function.update (⇑n) s j t) *
-      ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
-        (Function.update (⇑n) s j t) : K)) = ((n s).choose j : K) := by
+theorem bnx_prod_choose
+    (n : ZMod d →₀ ℕ) (s : ZMod d) (j : ℕ) (hj : j < n s) (e : ZMod d → K) (he : e s = 1)
+    : ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * e t ^ (n t - Function.update (⇑n) s j t) *
+        ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
+          (Function.update (⇑n) s j t) : K))
+      = ((n s).choose j : K) := by
   rw [Finset.prod_eq_single s]
   · first
-    | (rw [Function.update_apply, if_pos rfl, he, one_pow, one_pow, one_mul, one_mul,
-        Nat.add_sub_cancel' hj.le])
+    | (
+        rw [Function.update_apply, if_pos rfl, he, one_pow, one_pow, one_mul, one_mul,
+          Nat.add_sub_cancel' hj.le]
+      )
     | simp [Function.update_apply, he, Nat.add_sub_cancel' hj.le]
   · intro t _ hts
     simp [Function.update_apply, hts]
   · intro h
     exact absurd (Finset.mem_univ s) h
 
-theorem evenDerivative_binomial_coeff (be : MvPowerSeries (ZMod d) K) (n : ZMod d →₀ ℕ) (s : ZMod d)
-    (hs : s.val % 2 = 0) (j : ℕ) (hj : j < n s)
-    (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 = 0 ∧ t ≠ s ∧ n t ≠ 0) :
-    coeff (bnxM n (Function.update (⇑n) s j)) (de1 be) = coeff n be * ((n s).choose j : K) := by
+theorem evenDerivative_binomial_coeff
+    (be : MvPowerSeries (ZMod d) K)
+    (n : ZMod d →₀ ℕ)
+    (s : ZMod d) (hs : s.val % 2 = 0)
+    (j : ℕ) (hj : j < n s) (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 = 0 ∧ t ≠ s ∧ n t ≠ 0)
+    : coeff (bnxM n (Function.update (⇑n) s j)) (de1 be) = coeff n be * ((n s).choose j : K) := by
   have hk := bnx_update_le n s j hj
   unfold de1
-  rw [map_sub, map_sub, evenIndicator_series_binomial_form, zero_series_binomial_form, swapped_parity_series_binomial_form, bnx_coeff_subst, bnx_coeff_subst, bnx_coeff_subst,
+  rw [map_sub, map_sub, evenIndicator_series_binomial_form, zero_series_binomial_form,
+    swapped_parity_series_binomial_form, bnx_coeff_subst, bnx_coeff_subst, bnx_coeff_subst,
     bnxN_bnxM n _ hk]
   simp only [bnxM_false, bnxM_true]
   rw [bnx_prod_choose n s j hj (fun t => if t.val % 2 = 0 then (1 : K) else 0) (by simp [hs])]
-  have hz0 : ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * (0 : K) ^ (n t - Function.update (⇑n) s j t) *
-      ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
-        (Function.update (⇑n) s j t) : K)) = 0 := by
+  have hz0
+      : ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * (0 : K) ^ (n t - Function.update (⇑n) s j t) *
+          ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
+            (Function.update (⇑n) s j t) : K))
+        = 0 := by
     apply Finset.prod_eq_zero (Finset.mem_univ s)
     rw [Function.update_apply, if_pos rfl, zero_pow (by omega)]
     simp
-  have hz2 : ∏ t, ((if t.val % 2 = 0 then (0 : K) else 1) ^ Function.update (⇑n) s j t *
-      (if t.val % 2 = 0 then (1 : K) else 0) ^ (n t - Function.update (⇑n) s j t) *
-      ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
-        (Function.update (⇑n) s j t) : K)) = 0 := by
+  have hz2
+      : ∏ t, ((if t.val % 2 = 0 then (0 : K) else 1) ^ Function.update (⇑n) s j t *
+          (if t.val % 2 = 0 then (1 : K) else 0) ^ (n t - Function.update (⇑n) s j t) *
+          ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
+            (Function.update (⇑n) s j t) : K))
+        = 0 := by
     rcases hpos with hj0 | ⟨t, ht, hts, hnt⟩
     · apply Finset.prod_eq_zero (Finset.mem_univ s)
       rw [Function.update_apply, if_pos rfl, if_pos hs, zero_pow (by omega)]
@@ -358,26 +386,33 @@ theorem evenDerivative_binomial_coeff (be : MvPowerSeries (ZMod d) K) (n : ZMod 
       simp
   rw [hz0, hz2, mul_zero, sub_zero, sub_zero]
 
-theorem oddDerivative_binomial_coeff (be : MvPowerSeries (ZMod d) K) (n : ZMod d →₀ ℕ) (s : ZMod d)
-    (hs : s.val % 2 ≠ 0) (j : ℕ) (hj : j < n s)
-    (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 ≠ 0 ∧ t ≠ s ∧ n t ≠ 0) :
-    coeff (bnxM n (Function.update (⇑n) s j)) (de2 be) = coeff n be * ((n s).choose j : K) := by
+theorem oddDerivative_binomial_coeff
+    (be : MvPowerSeries (ZMod d) K)
+    (n : ZMod d →₀ ℕ)
+    (s : ZMod d) (hs : s.val % 2 ≠ 0)
+    (j : ℕ) (hj : j < n s) (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 ≠ 0 ∧ t ≠ s ∧ n t ≠ 0)
+    : coeff (bnxM n (Function.update (⇑n) s j)) (de2 be) = coeff n be * ((n s).choose j : K) := by
   have hk := bnx_update_le n s j hj
   unfold de2
-  rw [map_sub, map_sub, oddIndicator_series_binomial_form, zero_series_binomial_form, parity_series_binomial_form, bnx_coeff_subst, bnx_coeff_subst, bnx_coeff_subst,
+  rw [map_sub, map_sub, oddIndicator_series_binomial_form, zero_series_binomial_form,
+    parity_series_binomial_form, bnx_coeff_subst, bnx_coeff_subst, bnx_coeff_subst,
     bnxN_bnxM n _ hk]
   simp only [bnxM_false, bnxM_true]
   rw [bnx_prod_choose n s j hj (fun t => if t.val % 2 = 0 then (0 : K) else 1) (by simp [hs])]
-  have hz0 : ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * (0 : K) ^ (n t - Function.update (⇑n) s j t) *
-      ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
-        (Function.update (⇑n) s j t) : K)) = 0 := by
+  have hz0
+      : ∏ t, ((1 : K) ^ Function.update (⇑n) s j t * (0 : K) ^ (n t - Function.update (⇑n) s j t) *
+          ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
+            (Function.update (⇑n) s j t) : K))
+        = 0 := by
     apply Finset.prod_eq_zero (Finset.mem_univ s)
     rw [Function.update_apply, if_pos rfl, zero_pow (by omega)]
     simp
-  have hz2 : ∏ t, ((if t.val % 2 = 0 then (1 : K) else 0) ^ Function.update (⇑n) s j t *
-      (if t.val % 2 = 0 then (0 : K) else 1) ^ (n t - Function.update (⇑n) s j t) *
-      ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
-        (Function.update (⇑n) s j t) : K)) = 0 := by
+  have hz2
+      : ∏ t, ((if t.val % 2 = 0 then (1 : K) else 0) ^ Function.update (⇑n) s j t *
+          (if t.val % 2 = 0 then (0 : K) else 1) ^ (n t - Function.update (⇑n) s j t) *
+          ((Function.update (⇑n) s j t + (n t - Function.update (⇑n) s j t)).choose
+            (Function.update (⇑n) s j t) : K))
+        = 0 := by
     rcases hpos with hj0 | ⟨t, ht, hts, hnt⟩
     · apply Finset.prod_eq_zero (Finset.mem_univ s)
       rw [Function.update_apply, if_pos rfl, if_neg hs, zero_pow (by omega)]
@@ -393,8 +428,8 @@ section NormNat
 
 variable {K : Type u} [NormedField K] [IsUltrametricDist K]
 
-theorem bnx_norm_one {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ) (hB : ¬ l ∣ B) :
-    1 ≤ ‖(B : K)‖ := by
+theorem bnx_norm_one {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ) (hB : ¬ l ∣ B)
+    : 1 ≤ ‖(B : K)‖ := by
   have hcop : Nat.Coprime l B := (Nat.Prime.coprime_iff_not_dvd hl).2 hB
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 hcop
   have h1 : (u : K) * (l : K) + (v : K) * (B : K) = 1 := by
@@ -410,17 +445,22 @@ theorem bnx_norm_one {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ
   have hl0 : 0 ≤ ‖(l : K)‖ := norm_nonneg _
   have hB0 : 0 ≤ ‖(B : K)‖ := norm_nonneg _
   have hA : ‖(u : K)‖ * ‖(l : K)‖ < 1 := by
-    calc ‖(u : K)‖ * ‖(l : K)‖ ≤ 1 * ‖(l : K)‖ := mul_le_mul_of_nonneg_right hu hl0
+    calc
+      ‖(u : K)‖ * ‖(l : K)‖
+        ≤ 1 * ‖(l : K)‖ := mul_le_mul_of_nonneg_right hu hl0
       _ < 1 := by rw [one_mul]; exact hl1
   have hC : ‖(v : K)‖ * ‖(B : K)‖ ≤ ‖(B : K)‖ := by
-    calc ‖(v : K)‖ * ‖(B : K)‖ ≤ 1 * ‖(B : K)‖ := mul_le_mul_of_nonneg_right hv hB0
+    calc
+      ‖(v : K)‖ * ‖(B : K)‖
+        ≤ 1 * ‖(B : K)‖ := mul_le_mul_of_nonneg_right hv hB0
       _ = ‖(B : K)‖ := one_mul _
   rcases le_max_iff.1 key with h | h
   · linarith
   · linarith
 
-theorem bnx_norm_ge {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ) (hB0 : B ≠ 0)
-    (hB : ¬ l ^ 2 ∣ B) : ‖(l : K)‖ ≤ ‖(B : K)‖ := by
+theorem bnx_norm_ge
+    {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ) (hB0 : B ≠ 0) (hB : ¬ l ^ 2 ∣ B)
+    : ‖(l : K)‖ ≤ ‖(B : K)‖ := by
   by_cases hd : l ∣ B
   · obtain ⟨B', rfl⟩ := hd
     have hB' : ¬ l ∣ B' := fun h => hB (by rw [pow_two]; exact mul_dvd_mul_left l h)
@@ -433,22 +473,24 @@ theorem bnx_norm_ge {l : ℕ} (hl : l.Prime) (hl1 : ‖(l : K)‖ < 1) (B : ℕ)
 
 end NormNat
 
-theorem bnx_choose_lucas {l : ℕ} (hl : l.Prime) (c : ℕ) :
-    ∀ a : ℕ, (l ^ a * c).choose (l ^ a) ≡ c [MOD l] := by
+theorem bnx_choose_lucas {l : ℕ} (hl : l.Prime) (c : ℕ)
+    : ∀ a : ℕ, (l ^ a * c).choose (l ^ a) ≡ c [MOD l] := by
   haveI := Fact.mk hl
   intro a
   induction a with
   | zero => simp [Nat.ModEq]
   | succ a ih =>
-    have h := Choose.choose_modEq_choose_mod_mul_choose_div_nat (n := l * (l ^ a * c))
-      (k := l * l ^ a) (p := l)
+    have h :=
+      Choose.choose_modEq_choose_mod_mul_choose_div_nat (n := l * (l ^ a * c)) (k := l * l ^ a)
+        (p := l)
     rw [Nat.mul_mod_right, Nat.mul_mod_right, Nat.mul_div_cancel_left _ hl.pos,
-      Nat.mul_div_cancel_left _ hl.pos, Nat.choose_self, one_mul] at h
+        Nat.mul_div_cancel_left _ hl.pos, Nat.choose_self, one_mul]
+      at h
     rw [pow_succ', mul_assoc]
     exact h.trans ih
 
-theorem bnx_choose_nonpow {l : ℕ} (hl : l.Prime) (m : ℕ) (hm0 : m ≠ 0) (hm : ∀ e, m ≠ l ^ e) :
-    ∃ j, 0 < j ∧ j < m ∧ ¬ l ∣ m.choose j := by
+theorem bnx_choose_nonpow {l : ℕ} (hl : l.Prime) (m : ℕ) (hm0 : m ≠ 0) (hm : ∀ e, m ≠ l ^ e)
+    : ∃ j, 0 < j ∧ j < m ∧ ¬ l ∣ m.choose j := by
   obtain ⟨v, c, hc, hm'⟩ := Nat.exists_eq_pow_mul_and_not_dvd hm0 l hl.ne_one
   have hc1 : c ≠ 1 := by
     rintro rfl
@@ -466,9 +508,9 @@ theorem bnx_choose_nonpow {l : ℕ} (hl : l.Prime) (m : ℕ) (hm0 : m ≠ 0) (hm
     rw [← hm'] at h
     exact hc (Nat.modEq_zero_iff_dvd.1 (h.symm.trans (Nat.modEq_zero_iff_dvd.2 hd)))
 
-theorem bnx_choose_pow {l : ℕ} (hl : l.Prime) (e : ℕ) (he : 1 ≤ e) :
-    0 < l ^ (e - 1) ∧ l ^ (e - 1) < l ^ e ∧ (l ^ e).choose (l ^ (e - 1)) ≠ 0 ∧
-      ¬ l ^ 2 ∣ (l ^ e).choose (l ^ (e - 1)) := by
+theorem bnx_choose_pow {l : ℕ} (hl : l.Prime) (e : ℕ) (he : 1 ≤ e)
+    : 0 < l ^ (e - 1) ∧ l ^ (e - 1) < l ^ e ∧ (l ^ e).choose (l ^ (e - 1)) ≠ 0
+      ∧ ¬ l ^ 2 ∣ (l ^ e).choose (l ^ (e - 1)) := by
   have hlp := hl.pos
   have hk0 : 0 < l ^ (e - 1) := pow_pos hlp _
   have hN : l ^ e = l * l ^ (e - 1) := by
@@ -508,7 +550,8 @@ theorem bnx_choose_pow {l : ℕ} (hl : l.Prime) (e : ℕ) (he : 1 ≤ e) :
         exact Nat.mod_eq_of_lt (by omega)
       have hd1 : (l ^ (f + 1) - 1) / l = l ^ f - 1 := by
         rw [hsplit, Nat.add_mul_div_left _ _ hlp, Nat.div_eq_of_lt (by omega), zero_add]
-      have h := Choose.choose_modEq_choose_mod_mul_choose_div_nat (n := l ^ (f + 1) - 1) (k := i) (p := l)
+      have h :=
+        Choose.choose_modEq_choose_mod_mul_choose_div_nat (n := l ^ (f + 1) - 1) (k := i) (p := l)
       rw [hm1, hd1] at h
       have h2 : l ∣ (l - 1).choose (i % l) * (l ^ f - 1).choose (i / l) :=
         Nat.modEq_zero_iff_dvd.1 (h.symm.trans (Nat.modEq_zero_iff_dvd.2 hd))
@@ -527,8 +570,9 @@ theorem bnx_choose_pow {l : ℕ} (hl : l.Prime) (e : ℕ) (he : 1 ≤ e) :
         rw [hd1] at h6
         exact h6
   intro hdiv
-  have hid : (l ^ e - 1 + 1) * (l ^ e - 1).choose (l ^ (e - 1) - 1) =
-      (l ^ e - 1 + 1).choose (l ^ (e - 1) - 1 + 1) * (l ^ (e - 1) - 1 + 1) := by
+  have hid
+      : (l ^ e - 1 + 1) * (l ^ e - 1).choose (l ^ (e - 1) - 1)
+        = (l ^ e - 1 + 1).choose (l ^ (e - 1) - 1 + 1) * (l ^ (e - 1) - 1 + 1) := by
     first
     | exact Nat.add_one_mul_choose_eq _ _
     | exact Nat.succ_mul_choose_eq' _ _
@@ -542,22 +586,21 @@ theorem bnx_choose_pow {l : ℕ} (hl : l.Prime) (e : ℕ) (he : 1 ≤ e) :
     ring
   rw [hC, pow_two] at hdiv
   have h7 : l ∣ (l ^ e - 1).choose (l ^ (e - 1) - 1) := by
-    first
-    | exact Nat.dvd_of_mul_dvd_mul_left hlp hdiv
-    | exact (Nat.mul_dvd_mul_iff_left hlp).1 hdiv
+    first | exact Nat.dvd_of_mul_dvd_mul_left hlp hdiv | exact (Nat.mul_dvd_mul_iff_left hlp).1 hdiv
   exact hnd e _ (by omega) h7
 
 theorem bnx_pow_reduce (l d x : ℕ) (hl : 1 ≤ l) : l ^ x ≡ l ^ (x % d) [MOD l ^ d - 1] := by
   have h1 : l ^ d ≡ 1 [MOD l ^ d - 1] := by
     have : 1 ≤ l ^ d := Nat.one_le_pow _ _ (by omega)
     exact ((Nat.modEq_iff_dvd' this).2 dvd_rfl).symm
-  calc l ^ x = (l ^ d) ^ (x / d) * l ^ (x % d) := by
-        rw [← pow_mul, ← pow_add, Nat.div_add_mod]
+  calc
+    l ^ x
+      = (l ^ d) ^ (x / d) * l ^ (x % d) := by rw [← pow_mul, ← pow_add, Nat.div_add_mod]
     _ ≡ 1 ^ (x / d) * l ^ (x % d) [MOD l ^ d - 1] := (h1.pow _).mul_right _
     _ = l ^ (x % d) := by rw [one_pow, one_mul]
 
-theorem bnx_pow_mod (l d x y : ℕ) (hl : 3 ≤ l) (hd : 1 ≤ d)
-    (h : l ^ x ≡ l ^ y [MOD l ^ d - 1]) : x % d = y % d := by
+theorem bnx_pow_mod (l d x y : ℕ) (hl : 3 ≤ l) (hd : 1 ≤ d) (h : l ^ x ≡ l ^ y [MOD l ^ d - 1])
+    : x % d = y % d := by
   have hx := bnx_pow_reduce l d x (by omega)
   have hy := bnx_pow_reduce l d y (by omega)
   have h' : l ^ (x % d) ≡ l ^ (y % d) [MOD l ^ d - 1] := hx.symm.trans (h.trans hy)
@@ -583,15 +626,17 @@ theorem bnx_pow_mod (l d x y : ℕ) (hl : 3 ≤ l) (hd : 1 ≤ d)
     rwa [Nat.mod_eq_of_lt (hlt _ hxd), Nat.mod_eq_of_lt (hlt _ hyd)] at h5
   exact Nat.pow_right_injective (by omega : 2 ≤ l) heq
 
-private theorem finsupp_prod_torus_pow_eq_C_mul_monomial {K : Type u} [Field K] {d : ℕ} [NeZero d] (l : ℕ) (ζ : K)
-    (dd : ZMod d →₀ ℕ) :
-    (dd.prod fun t e => (torus l ζ t : MvPowerSeries (ZMod d) K) ^ e) =
-      C (∏ t, (ζ ^ lw l t) ^ dd t) * monomial dd 1 := by
+private theorem finsupp_prod_torus_pow_eq_C_mul_monomial
+    {K : Type u} [Field K] {d : ℕ} [NeZero d] (l : ℕ) (ζ : K) (dd : ZMod d →₀ ℕ)
+    : (dd.prod fun t e => (torus l ζ t : MvPowerSeries (ZMod d) K) ^ e)
+      = C (∏ t, (ζ ^ lw l t) ^ dd t) * monomial dd 1 := by
   rw [Finsupp.prod_fintype _ _ (fun t => pow_zero _)]
   simp only [torus, mul_pow, ← map_pow, Finset.prod_mul_distrib, map_prod]
   congr 1
-  have hmono : ∀ S : Finset (ZMod d), ∏ t ∈ S, (X t ^ dd t : MvPowerSeries (ZMod d) K) =
-      monomial (∑ t ∈ S, Finsupp.single t (dd t)) 1 := by
+  have hmono
+      : ∀ S : Finset (ZMod d),
+        ∏ t ∈ S, (X t ^ dd t : MvPowerSeries (ZMod d) K)
+          = monomial (∑ t ∈ S, Finsupp.single t (dd t)) 1 := by
     intro S
     refine Finset.induction_on S ?_ ?_
     · simp [monomial_zero_eq_C_apply]
@@ -602,12 +647,15 @@ private theorem finsupp_prod_torus_pow_eq_C_mul_monomial {K : Type u} [Field K] 
     ext u
     simp [Finsupp.finsetSum_apply, Finsupp.single_apply]]
 
-theorem bnx_torus_cong {K : Type u} [Field K] (l d : ℕ) [NeZero d] (hl : l.Prime) (hl3 : 3 ≤ l)
-    (hd2 : 2 ≤ d) (hde : Even d) (ζ : K) (hζ : IsPrimitiveRoot ζ (l ^ d - 1))
+theorem bnx_torus_cong
+    {K : Type u} [Field K]
+    (l d : ℕ) [NeZero d]
+    (hl : l.Prime) (hl3 : 3 ≤ l) (hd2 : 2 ≤ d) (hde : Even d)
+    (ζ : K) (hζ : IsPrimitiveRoot ζ (l ^ d - 1))
     (be : MvPowerSeries (ZMod d) K) (htor : subst (torus l ζ) be = be)
-    (s s' : ZMod d) (hs : s.val % 2 = 0) (hs' : s'.val % 2 ≠ 0) (α β : ℕ)
-    (hc : coeff (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) be ≠ 0) :
-    s + (α : ZMod d) = s' + (β : ZMod d) := by
+    (s s' : ZMod d) (hs : s.val % 2 = 0) (hs' : s'.val % 2 ≠ 0)
+    (α β : ℕ) (hc : coeff (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) be ≠ 0)
+    : s + (α : ZMod d) = s' + (β : ZMod d) := by
   have hk0 : 0 < l ^ d - 1 := by
     have : l ≤ l ^ d := Nat.le_self_pow (by omega) l
     omega
@@ -617,15 +665,21 @@ theorem bnx_torus_cong {K : Type u} [Field K] (l d : ℕ) [NeZero d] (hl : l.Pri
   have ha : HasSubst (torus l ζ : ZMod d → MvPowerSeries (ZMod d) K) :=
     hasSubst_of_constantCoeff_zero fun t => by simp [torus]
   have hcoef := congrArg (coeff (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β))) htor
-  rw [coeff_subst ha, finsum_eq_single _ (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β))] at hcoef
+  rw [coeff_subst ha, finsum_eq_single _ (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β))]
+    at hcoef
   swap
   · intro dd hdd
-    rw [finsupp_prod_torus_pow_eq_C_mul_monomial, coeff_C_mul, coeff_monomial, if_neg (Ne.symm hdd), mul_zero, smul_zero]
-  rw [finsupp_prod_torus_pow_eq_C_mul_monomial, coeff_C_mul, coeff_monomial, if_pos rfl, mul_one, smul_eq_mul] at hcoef
+    rw [finsupp_prod_torus_pow_eq_C_mul_monomial, coeff_C_mul, coeff_monomial, if_neg (Ne.symm hdd),
+      mul_zero, smul_zero]
+  rw [finsupp_prod_torus_pow_eq_C_mul_monomial, coeff_C_mul, coeff_monomial, if_pos rfl, mul_one,
+      smul_eq_mul]
+    at hcoef
   have hprod := mul_left_cancel₀ hc (hcoef.trans (mul_one _).symm)
   rw [Finset.prod_eq_mul s s' hss
-    (fun t _ ht => by simp [Finsupp.single_apply, Ne.symm ht.1, Ne.symm ht.2])
-    (fun h => absurd (Finset.mem_univ s) h) (fun h => absurd (Finset.mem_univ s') h)] at hprod
+      (fun t _ ht => by simp [Finsupp.single_apply, Ne.symm ht.1, Ne.symm ht.2])
+      (fun h => absurd (Finset.mem_univ s) h)
+      (fun h => absurd (Finset.mem_univ s') h)]
+    at hprod
   have hv1 : (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) s = l ^ α := by
     simp [Finsupp.single_apply, Ne.symm hss]
   have hv2 : (Finsupp.single s (l ^ α) + Finsupp.single s' (l ^ β)) s' = l ^ β := by
@@ -633,28 +687,28 @@ theorem bnx_torus_cong {K : Type u} [Field K] (l d : ℕ) [NeZero d] (hl : l.Pri
   rw [hv1, hv2] at hprod
   have hζ0 : ζ ≠ 0 := hζ.ne_zero hk0.ne'
   rw [← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, ← zpow_add₀ hζ0,
-    hζ.zpow_eq_one_iff_dvd] at hprod
+      hζ.zpow_eq_one_iff_dvd]
+    at hprod
   unfold lw at hprod
   rw [if_pos hs, if_neg hs'] at hprod
   have hmod : l ^ (s.val + α) ≡ l ^ (s'.val + β) [MOD l ^ d - 1] := by
     rw [Nat.modEq_iff_dvd]
-    have e : ((l ^ (s'.val + β) : ℕ) : ℤ) - ((l ^ (s.val + α) : ℕ) : ℤ) =
-        -((1 : ℤ) * (l : ℤ) ^ s.val * ((l ^ α : ℕ) : ℤ) +
-          (-1) * (l : ℤ) ^ s'.val * ((l ^ β : ℕ) : ℤ)) := by
+    have e
+        : ((l ^ (s'.val + β) : ℕ) : ℤ) - ((l ^ (s.val + α) : ℕ) : ℤ)
+          = -((1 : ℤ) * (l : ℤ) ^ s.val * ((l ^ α : ℕ) : ℤ)
+            + (-1) * (l : ℤ) ^ s'.val * ((l ^ β : ℕ) : ℤ)) := by
       push_cast
       ring
     rw [e]
-    first
-    | exact dvd_neg.2 hprod
-    | exact dvd_neg.2 (by exact_mod_cast hprod)
+    first | exact dvd_neg.2 hprod | exact dvd_neg.2 (by exact_mod_cast hprod)
   have key := bnx_pow_mod l d _ _ hl3 (by omega) hmod
   have h2 := congrArg (fun x : ℕ => (x : ZMod d)) key
   first
   | (simp only [ZMod.natCast_mod, Nat.cast_add, ZMod.natCast_zmod_val] at h2; exact h2)
   | (simp at h2; exact h2)
 
-theorem bnx_dot_const {ι : Type*} (n : ι →₀ ℕ) (c : ℝ) :
-    dot n (fun _ => c) = (n.degree : ℝ) * c := by
+theorem bnx_dot_const {ι : Type*} (n : ι →₀ ℕ) (c : ℝ)
+    : dot n (fun _ => c) = (n.degree : ℝ) * c := by
   unfold dot
   rw [Finsupp.sum, ← Finset.sum_mul]
   congr 1
@@ -667,38 +721,44 @@ section Sides
 
 variable {K : Type u} [NormedField K] {d : ℕ} [NeZero d]
 
-theorem bnx_sideE (be : MvPowerSeries (ZMod d) K) (pi r w : ℝ) (h1 : WtGe pi (fun _ => r) w (de1 be))
-    (n : ZMod d →₀ ℕ) (s : ZMod d) (hs : s.val % 2 = 0) (j : ℕ) (hj : j < n s)
-    (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 = 0 ∧ t ≠ s ∧ n t ≠ 0) :
-    ‖coeff n be‖ * ‖((n s).choose j : K)‖ ≤ pi ^ (w - dot n (fun _ => r)) := by
+theorem bnx_sideE
+    (be : MvPowerSeries (ZMod d) K) (pi r w : ℝ) (h1 : WtGe pi (fun _ => r) w (de1 be))
+    (n : ZMod d →₀ ℕ)
+    (s : ZMod d) (hs : s.val % 2 = 0)
+    (j : ℕ) (hj : j < n s) (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 = 0 ∧ t ≠ s ∧ n t ≠ 0)
+    : ‖coeff n be‖ * ‖((n s).choose j : K)‖ ≤ pi ^ (w - dot n (fun _ => r)) := by
   have h := h1 (bnxM n (Function.update (⇑n) s j))
   unfold MonoWtGe at h
   rw [evenDerivative_binomial_coeff be n s hs j hj hpos, norm_mul, bnx_dot_const,
-    bnx_degree_bnxM n _ (bnx_update_le n s j hj), ← bnx_dot_const] at h
+      bnx_degree_bnxM n _ (bnx_update_le n s j hj), ← bnx_dot_const]
+    at h
   exact h
 
-theorem bnx_sideO (be : MvPowerSeries (ZMod d) K) (pi r w : ℝ) (h2 : WtGe pi (fun _ => r) w (de2 be))
-    (n : ZMod d →₀ ℕ) (s : ZMod d) (hs : s.val % 2 ≠ 0) (j : ℕ) (hj : j < n s)
-    (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 ≠ 0 ∧ t ≠ s ∧ n t ≠ 0) :
-    ‖coeff n be‖ * ‖((n s).choose j : K)‖ ≤ pi ^ (w - dot n (fun _ => r)) := by
+theorem bnx_sideO
+    (be : MvPowerSeries (ZMod d) K) (pi r w : ℝ) (h2 : WtGe pi (fun _ => r) w (de2 be))
+    (n : ZMod d →₀ ℕ)
+    (s : ZMod d) (hs : s.val % 2 ≠ 0)
+    (j : ℕ) (hj : j < n s) (hpos : 0 < j ∨ ∃ t : ZMod d, t.val % 2 ≠ 0 ∧ t ≠ s ∧ n t ≠ 0)
+    : ‖coeff n be‖ * ‖((n s).choose j : K)‖ ≤ pi ^ (w - dot n (fun _ => r)) := by
   have h := h2 (bnxM n (Function.update (⇑n) s j))
   unfold MonoWtGe at h
   rw [oddDerivative_binomial_coeff be n s hs j hj hpos, norm_mul, bnx_dot_const,
-    bnx_degree_bnxM n _ (bnx_update_le n s j hj), ← bnx_dot_const] at h
+      bnx_degree_bnxM n _ (bnx_update_le n s j hj), ← bnx_dot_const]
+    at h
   exact h
 
 end Sides
 
-theorem bnx_div {pi a b X v : ℝ} (h0 : 0 < pi) (hb : pi ^ v ≤ b) (ha : 0 ≤ a) (h : a * b ≤ X) :
-    a ≤ X / pi ^ v := by
+theorem bnx_div {pi a b X v : ℝ} (h0 : 0 < pi) (hb : pi ^ v ≤ b) (ha : 0 ≤ a) (h : a * b ≤ X)
+    : a ≤ X / pi ^ v := by
   have hp : 0 < pi ^ v := Real.rpow_pos_of_pos h0 v
   rw [le_div_iff₀ hp]
   exact (mul_le_mul_of_nonneg_left hb ha).trans h
 
-theorem bnx_side_cases {d : ℕ} {l : ℕ} (hl : l.Prime) (P : ZMod d → Prop) (n : ZMod d →₀ ℕ)
-    (h : ∃ s, P s ∧ n s ≠ 0) :
-    (∃ s j, P s ∧ j < n s ∧ (0 < j ∨ ∃ t, P t ∧ t ≠ s ∧ n t ≠ 0) ∧ ¬ l ∣ (n s).choose j) ∨
-    (∃ s e, P s ∧ (∀ t, P t → t ≠ s → n t = 0) ∧ n s = l ^ e) := by
+theorem bnx_side_cases
+    {d : ℕ} {l : ℕ} (hl : l.Prime) (P : ZMod d → Prop) (n : ZMod d →₀ ℕ) (h : ∃ s, P s ∧ n s ≠ 0)
+    : (∃ s j, P s ∧ j < n s ∧ (0 < j ∨ ∃ t, P t ∧ t ≠ s ∧ n t ≠ 0) ∧ ¬ l ∣ (n s).choose j)
+      ∨ (∃ s e, P s ∧ (∀ t, P t → t ≠ s → n t = 0) ∧ n s = l ^ e) := by
   obtain ⟨s, hs, hns⟩ := h
   by_cases hex : ∃ t, P t ∧ t ≠ s ∧ n t ≠ 0
   · left
@@ -715,8 +775,11 @@ theorem bnx_side_cases {d : ℕ} {l : ℕ} (hl : l.Prime) (P : ZMod d → Prop) 
       obtain ⟨j, hj0, hjn, hjd⟩ := bnx_choose_nonpow hl (n s) hns hpow
       exact ⟨s, j, hs, hjn, Or.inl hj0, hjd⟩
 
-theorem bnx_degE_eq {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (s : ZMod d) (hs : s.val % 2 = 0)
-    (hu : ∀ t : ZMod d, t.val % 2 = 0 → t ≠ s → n t = 0) : degE n = n s := by
+theorem bnx_degE_eq
+    {d : ℕ} [NeZero d]
+    (n : ZMod d →₀ ℕ) (s : ZMod d)
+    (hs : s.val % 2 = 0) (hu : ∀ t : ZMod d, t.val % 2 = 0 → t ≠ s → n t = 0)
+    : degE n = n s := by
   unfold degE
   rw [Finset.sum_eq_single s]
   · rw [if_pos hs]
@@ -727,8 +790,11 @@ theorem bnx_degE_eq {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (s : ZMod d) (h
   · intro h
     exact absurd (Finset.mem_univ s) h
 
-theorem bnx_degO_eq {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (s : ZMod d) (hs : s.val % 2 ≠ 0)
-    (hu : ∀ t : ZMod d, t.val % 2 ≠ 0 → t ≠ s → n t = 0) : degO n = n s := by
+theorem bnx_degO_eq
+    {d : ℕ} [NeZero d]
+    (n : ZMod d →₀ ℕ) (s : ZMod d)
+    (hs : s.val % 2 ≠ 0) (hu : ∀ t : ZMod d, t.val % 2 ≠ 0 → t ≠ s → n t = 0)
+    : degO n = n s := by
   unfold degO
   rw [Finset.sum_eq_single s]
   · rw [if_neg hs]
@@ -739,8 +805,8 @@ theorem bnx_degO_eq {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (s : ZMod d) (h
   · intro h
     exact absurd (Finset.mem_univ s) h
 
-theorem bnx_exE {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degE n) :
-    ∃ s : ZMod d, s.val % 2 = 0 ∧ n s ≠ 0 := by
+theorem bnx_exE {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degE n)
+    : ∃ s : ZMod d, s.val % 2 = 0 ∧ n s ≠ 0 := by
   by_contra hne
   push_neg at hne
   have h0 : degE n = 0 := by
@@ -751,8 +817,8 @@ theorem bnx_exE {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degE n) :
     · rfl
   omega
 
-theorem bnx_exO {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degO n) :
-    ∃ s : ZMod d, s.val % 2 ≠ 0 ∧ n s ≠ 0 := by
+theorem bnx_exO {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degO n)
+    : ∃ s : ZMod d, s.val % 2 ≠ 0 ∧ n s ≠ 0 := by
   by_contra hne
   push_neg at hne
   have h0 : degO n = 0 := by
@@ -763,15 +829,17 @@ theorem bnx_exO {d : ℕ} [NeZero d] (n : ZMod d →₀ ℕ) (h : 0 < degO n) :
     · exact hne s hs
   omega
 
-private theorem monoWtGe_or_biPower_of_wtGe_de1_de2 {K : Type u} [NormedField K] [IsUltrametricDist K] [CharZero K]
-    {l d : ℕ} [NeZero d] (hl : l.Prime) (hl3 : 3 ≤ l) (hd2 : 2 ≤ d) (hde : Even d)
-    (hl1 : ‖(l : K)‖ < 1) (ζ : K) (hζ : IsPrimitiveRoot ζ (l ^ d - 1))
+private theorem monoWtGe_or_biPower_of_wtGe_de1_de2
+    {K : Type u} [NormedField K] [IsUltrametricDist K] [CharZero K]
+    {l d : ℕ} [NeZero d]
+    (hl : l.Prime) (hl3 : 3 ≤ l) (hd2 : 2 ≤ d) (hde : Even d) (hl1 : ‖(l : K)‖ < 1)
+    (ζ : K) (hζ : IsPrimitiveRoot ζ (l ^ d - 1))
     (be : MvPowerSeries (ZMod d) K) (htor : subst (torus l ζ) be = be) (hlow : NoLowBidegree be)
-    (r w : ℝ) (h1 : WtGe ‖(l : K)‖ (fun _ => r) w (de1 be))
-    (h2 : WtGe ‖(l : K)‖ (fun _ => r) w (de2 be))
-    (n : ZMod d →₀ ℕ) (hn : coeff n be ≠ 0) :
-    MonoWtGe ‖(l : K)‖ (fun _ => r) w n (coeff n be) ∨
-      (IsBiPower l n ∧ MonoWtGe ‖(l : K)‖ (fun _ => r) (w - 1) n (coeff n be)) := by
+    (r w : ℝ)
+    (h1 : WtGe ‖(l : K)‖ (fun _ => r) w (de1 be)) (h2 : WtGe ‖(l : K)‖ (fun _ => r) w (de2 be))
+    (n : ZMod d →₀ ℕ) (hn : coeff n be ≠ 0)
+    : MonoWtGe ‖(l : K)‖ (fun _ => r) w n (coeff n be)
+      ∨ (IsBiPower l n ∧ MonoWtGe ‖(l : K)‖ (fun _ => r) (w - 1) n (coeff n be)) := by
   have hpi0 : 0 < ‖(l : K)‖ := norm_pos_iff.2 (Nat.cast_ne_zero.2 hl.ne_zero)
   obtain ⟨hE, hO, hEO⟩ := hlow n hn
   have hc0 := norm_nonneg (coeff n be)
@@ -855,7 +923,8 @@ theorem binomial_coefficient_extraction : BinomExtract.{u} := by
     obtain ⟨m, hm⟩ := hlo
     omega
   have hpi0 : 0 < ‖(l : K)‖ := norm_pos_iff.2 (Nat.cast_ne_zero.2 hl.ne_zero)
-  have key := fun n hn => monoWtGe_or_biPower_of_wtGe_de1_de2 hl hl3 hd2 hde hl1 ζ hζ be htor hlow _ _ h1 h2 n hn
+  have key := fun n hn =>
+    monoWtGe_or_biPower_of_wtGe_de1_de2 hl hl3 hd2 hde hl1 ζ hζ be htor hlow _ _ h1 h2 n hn
   constructor
   · unfold WtGe
     intro n

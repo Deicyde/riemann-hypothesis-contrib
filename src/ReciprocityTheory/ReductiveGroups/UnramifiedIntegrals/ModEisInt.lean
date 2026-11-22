@@ -11,11 +11,16 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-private theorem hasSum_sigma_mul_qParam_pow_modularForm_E {k : ℕ} (hk : 3 ≤ k) (hke : Even k) (C : ℂ)
+private theorem hasSum_sigma_mul_qParam_pow_modularForm_E
+    {k : ℕ} (hk : 3 ≤ k) (hke : Even k)
+    (C : ℂ)
     (hC : (riemannZeta k)⁻¹ * (-2 * (Real.pi : ℂ) * Complex.I) ^ k / ((k - 1).factorial : ℂ) = C)
-    (τ : ℍ) :
-    HasSum (fun m : ℕ => (if m = 0 then (1 : ℂ) else C * (ArithmeticFunction.sigma (k - 1) m : ℂ)) *
-      Function.Periodic.qParam 1 (τ : ℂ) ^ m) (ModularForm.E hk τ) := by
+    (τ : ℍ)
+    : HasSum
+      (fun m : ℕ =>
+        (if m = 0 then (1 : ℂ) else C * (ArithmeticFunction.sigma (k - 1) m : ℂ))
+          * Function.Periodic.qParam 1 (τ : ℂ) ^ m)
+      (ModularForm.E hk τ) := by
   set q := Function.Periodic.qParam 1 (τ : ℂ) with hqdef
   have hqe : Complex.exp (2 * (Real.pi : ℂ) * Complex.I * τ) = q := by
     simp [hqdef, Function.Periodic.qParam]
@@ -26,38 +31,41 @@ private theorem hasSum_sigma_mul_qParam_pow_modularForm_E {k : ℕ} (hk : 3 ≤ 
     have := Real.pi_pos
     simp only [UpperHalfPlane.coe_im, div_one]
     nlinarith
-  have hσ : ∀ n : ℕ, ‖((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ n‖ ≤ (n : ℝ) ^ k * ‖q‖ ^ n := by
+  have hσ
+      : ∀ n : ℕ,
+        ‖((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ n‖ ≤ (n : ℝ) ^ k * ‖q‖ ^ n := by
     intro n
     rw [norm_mul, norm_pow, Complex.norm_natCast]
     gcongr
     rw [ArithmeticFunction.sigma_apply]
     push_cast
-    calc ∑ d ∈ n.divisors, (d : ℝ) ^ (k - 1) ≤ ∑ d ∈ n.divisors, (n : ℝ) ^ (k - 1) :=
-          Finset.sum_le_sum fun d hd => pow_le_pow_left₀ (by positivity)
-            (by exact_mod_cast Nat.divisor_le hd) _
+    calc
+      ∑ d ∈ n.divisors, (d : ℝ) ^ (k - 1) ≤ ∑ d ∈ n.divisors, (n : ℝ) ^ (k - 1) :=
+        Finset.sum_le_sum fun d hd =>
+          pow_le_pow_left₀ (by positivity) (by exact_mod_cast Nat.divisor_le hd) _
       _ = (n.divisors.card : ℝ) * (n : ℝ) ^ (k - 1) := by simp
       _ ≤ (n : ℝ) * (n : ℝ) ^ (k - 1) := by
-          gcongr
-          exact_mod_cast Nat.card_divisors_le_self n
+        gcongr
+        exact_mod_cast Nat.card_divisors_le_self n
       _ = (n : ℝ) ^ k := by
-          rw [← pow_succ']
-          congr 1
-          omega
+        rw [← pow_succ']
+        congr 1
+        omega
   have hsum : Summable fun n : ℕ => ((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ n :=
     Summable.of_norm_bounded (summable_pow_mul_geometric_of_norm_lt_one k (by simpa using hq)) hσ
-  have hsum1 : Summable fun n : ℕ =>
-      ((ArithmeticFunction.sigma (k - 1) (n + 1) : ℕ) : ℂ) * q ^ (n + 1) :=
+  have hsum1
+      : Summable fun n : ℕ => ((ArithmeticFunction.sigma (k - 1) (n + 1) : ℕ) : ℂ) * q ^ (n + 1) :=
     (summable_nat_add_iff 1).mpr hsum
   have hE := EisensteinSeries.q_expansion_riemannZeta hk hke τ
   rw [hE, hC, hqe]
   rw [← hasSum_nat_add_iff' 1]
   simp only [Finset.range_one, Finset.sum_singleton, pow_zero, if_true, mul_one,
     add_sub_cancel_left, Nat.add_eq_zero, one_ne_zero, and_false, if_false]
-  have ht : ∑' n : ℕ+, ((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ (n : ℕ) =
-      ∑' n : ℕ, ((ArithmeticFunction.sigma (k - 1) (n + 1) : ℕ) : ℂ) * q ^ (n + 1) :=
+  have ht
+      : ∑' n : ℕ+, ((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ (n : ℕ)
+        = ∑' n : ℕ, ((ArithmeticFunction.sigma (k - 1) (n + 1) : ℕ) : ℂ) * q ^ (n + 1) :=
     tsum_pnat_eq_tsum_succ (f := fun n => ((ArithmeticFunction.sigma (k - 1) n : ℕ) : ℂ) * q ^ n)
-  convert hsum1.hasSum.mul_left C using 1 <;>
-    first
+  convert hsum1.hasSum.mul_left C using 1 <;> first
     | rfl
     | (funext n <;> ring)
     | (congr 1 <;> (rw [← ht]; apply tsum_congr; intro n; simp))
@@ -66,10 +74,13 @@ theorem map_eisensteinFourInt : e4Z.map (Int.castRingHom ℂ) = qExpansion 1 E�
   have hE : E₄ = ModularForm.E (k := 4) (by norm_num) := rfl
   ext m
   refine ModularFormClass.qExpansion_coeff_unique (f := E₄) (h := 1)
-    (c := fun m => PowerSeries.coeff m (e4Z.map (Int.castRingHom ℂ))) one_pos (by simp) ?_ m
+    (c := fun m => PowerSeries.coeff m (e4Z.map (Int.castRingHom ℂ)))
+    one_pos (by simp) ?_ m
   intro τ
-  have hC : (riemannZeta ((4 : ℕ) : ℂ))⁻¹ * (-2 * (Real.pi : ℂ) * Complex.I) ^ 4 /
-      (((4 - 1).factorial : ℕ) : ℂ) = 240 := by
+  have hC
+      : (riemannZeta ((4 : ℕ) : ℂ))⁻¹ * (-2 * (Real.pi : ℂ) * Complex.I) ^ 4
+          / (((4 - 1).factorial : ℕ) : ℂ)
+        = 240 := by
     have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
     rw [show ((4 : ℕ) : ℂ) = 4 by norm_num, riemannZeta_four]
     have hI : Complex.I ^ 4 = 1 := Complex.I_pow_four
@@ -88,7 +99,8 @@ theorem map_eisensteinSixInt : e6Z.map (Int.castRingHom ℂ) = qExpansion 1 E₆
   have hE : E₆ = ModularForm.E (k := 6) (by norm_num) := rfl
   ext m
   refine ModularFormClass.qExpansion_coeff_unique (f := E₆) (h := 1)
-    (c := fun m => PowerSeries.coeff m (e6Z.map (Int.castRingHom ℂ))) one_pos (by simp) ?_ m
+    (c := fun m => PowerSeries.coeff m (e6Z.map (Int.castRingHom ℂ)))
+    one_pos (by simp) ?_ m
   intro τ
   have hb6 : bernoulli 6 = 1 / 42 := by
     have h5 : bernoulli' 5 = 0 := by
@@ -103,8 +115,10 @@ theorem map_eisensteinSixInt : e6Z.map (Int.castRingHom ℂ) = qExpansion 1 E₆
     rw [show ((6 : ℕ) : ℂ) = 2 * ((3 : ℕ) : ℂ) by norm_num, h6, hb6]
     norm_num [Nat.factorial]
     ring
-  have hC : (riemannZeta ((6 : ℕ) : ℂ))⁻¹ * (-2 * (Real.pi : ℂ) * Complex.I) ^ 6 /
-      (((6 - 1).factorial : ℕ) : ℂ) = -504 := by
+  have hC
+      : (riemannZeta ((6 : ℕ) : ℂ))⁻¹ * (-2 * (Real.pi : ℂ) * Complex.I) ^ 6
+          / (((6 - 1).factorial : ℕ) : ℂ)
+        = -504 := by
     have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
     rw [hz6]
     have hI : Complex.I ^ 6 = -1 := by

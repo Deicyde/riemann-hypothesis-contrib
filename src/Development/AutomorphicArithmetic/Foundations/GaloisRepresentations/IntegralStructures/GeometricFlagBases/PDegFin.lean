@@ -5,14 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.degFin_of :
-    KunnethLefschetz.QDual → CrystallineSemistableComparison.InSum → A9 → KunnethLefschetz.ProjBC → KunnethLefschetz.SumCl → KunnethLefschetz.SumHl → KunnethLefschetz.PiBC → RelDim → CompSum → DegFin := by
+theorem UpperTheory.Gal.Int.Geo.degFin_of
+    : KunnethLefschetz.QDual → CrystallineSemistableComparison.InSum → A9 → KunnethLefschetz.ProjBC
+      → KunnethLefschetz.SumCl → KunnethLefschetz.SumHl → KunnethLefschetz.PiBC → RelDim → CompSum
+      → DegFin := by
   intro hQ hS a9 h1 h2 h5 h6 hR hC l _ k _ _ hk X p hp hproj
   have hprop : IsProper p := h1.2 _ p hproj
   obtain ⟨r, Y, j, hj, hY⟩ := hC k p hp hprop
@@ -29,7 +33,8 @@ theorem UpperTheory.Gal.Int.Geo.degFin_of :
   have hb := fun n : ℤ => KunnethLefschetz.sumQ (l := l) h5 h6 hS j hj n
   refine ⟨fun n => ?_, ((2 * Finset.univ.sup d : ℕ) : ℤ), fun n hn => ?_⟩
   · have := fun s => (hD s).1 n
-    exact FiniteDimensional.of_injective (LinearMap.pi fun s => LateralTheory.EtaleTrace.pb l (j s) n) (hb n).1
+    exact FiniteDimensional.of_injective
+      (LinearMap.pi fun s => LateralTheory.EtaleTrace.pb l (j s) n) (hb n).1
   · rcases hn with hn | hn
     · have hs : ∀ i, Subsingleton (HtL l i (sch.obj X) n 0) := fun i =>
         (a9 (ZMod (l ^ i)) (tw (l ^ i) 0)).1 _ n hn

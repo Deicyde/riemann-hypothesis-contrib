@@ -8,21 +8,32 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankPosO
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace GlobalTheory.CompanionTheory.EGlue
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ}
 
-theorem exists_fd_slices (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (Sm E b)) (F : H E a b → ℂ)
-    (hF : F ∈ pairSpace U₁ U₂) :
-    ∃ (A : Submodule ℂ (Sm E a)) (B : Submodule ℂ (Sm E b)), FiniteDimensional ℂ A ∧ FiniteDimensional ℂ B ∧
-      (∀ m₂ : GA E b, ∃ φ ∈ A, φ.1 = fun x => F (x, m₂)) ∧ (∀ m₁ : GA E a, ∃ φ ∈ B, φ.1 = fun x => F (m₁, x)) := by
+theorem exists_fd_slices
+    (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (Sm E b)) (F : H E a b → ℂ)
+    (hF : F ∈ pairSpace U₁ U₂)
+    : ∃ (A : Submodule ℂ (Sm E a)) (B : Submodule ℂ (Sm E b)),
+      FiniteDimensional ℂ A ∧ FiniteDimensional ℂ B
+        ∧ (∀ m₂ : GA E b, ∃ φ ∈ A, φ.1 = fun x => F (x, m₂))
+        ∧ (∀ m₁ : GA E a, ∃ φ ∈ B, φ.1 = fun x => F (m₁, x)) := by
   induction hF using Submodule.span_induction with
   | mem F h =>
     obtain ⟨φ₁, -, φ₂, -, rfl⟩ := h
-    refine ⟨Submodule.span ℂ {φ₁}, Submodule.span ℂ {φ₂}, inferInstance, inferInstance, fun m₂ => ?_, fun m₁ => ?_⟩
+    refine ⟨
+      Submodule.span ℂ {φ₁},
+      Submodule.span ℂ {φ₂},
+      inferInstance,
+      inferInstance,
+      fun m₂ => ?_,
+      fun m₁ => ?_
+    ⟩
     · refine ⟨φ₂.1 m₂ • φ₁, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _), ?_⟩
       funext x
       simp [mul_comm]
@@ -30,8 +41,14 @@ theorem exists_fd_slices (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (
       funext x
       simp
   | zero =>
-    refine ⟨⊥, ⊥, inferInstance, inferInstance, fun m₂ => ⟨0, Submodule.zero_mem _, ?_⟩,
-      fun m₁ => ⟨0, Submodule.zero_mem _, ?_⟩⟩
+    refine ⟨
+      ⊥,
+      ⊥,
+      inferInstance,
+      inferInstance,
+      fun m₂ => ⟨0, Submodule.zero_mem _, ?_⟩,
+      fun m₁ => ⟨0, Submodule.zero_mem _, ?_⟩
+    ⟩
     · funext x
       simp
     · funext x
@@ -65,8 +82,10 @@ theorem exists_fd_slices (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (
 theorem pairFD_holds : PairFD := by
   intro E _ _ _ a b ι _ U₁ U₂ f hf
   choose A B hA hB h₁ h₂ using fun i => exists_fd_slices U₁ U₂ (f i) (hf i)
-  have hA' : FiniteDimensional ℂ (⨆ i, A i : Submodule ℂ (Sm E a)) := Submodule.finiteDimensional_iSup A
-  have hB' : FiniteDimensional ℂ (⨆ i, B i : Submodule ℂ (Sm E b)) := Submodule.finiteDimensional_iSup B
+  have hA' : FiniteDimensional ℂ (⨆ i, A i : Submodule ℂ (Sm E a)) :=
+    Submodule.finiteDimensional_iSup A
+  have hB' : FiniteDimensional ℂ (⨆ i, B i : Submodule ℂ (Sm E b)) :=
+    Submodule.finiteDimensional_iSup B
   constructor
   · refine Submodule.finiteDimensional_of_le (S₂ := ⨆ i, A i) (Submodule.span_le.2 ?_)
     rintro φ ⟨i, m₂, e⟩

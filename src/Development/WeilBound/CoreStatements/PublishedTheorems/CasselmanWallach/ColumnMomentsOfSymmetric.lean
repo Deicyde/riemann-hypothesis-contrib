@@ -14,7 +14,8 @@ namespace MatrixActionSingle
 
 variable {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-def act (A : Matrix (Fin n) (Fin n) (Module.End ℂ V)) : Module.End ℂ (PiLp 2 fun _ : Fin n => V) where
+def act (A : Matrix (Fin n) (Fin n) (Module.End ℂ V))
+    : Module.End ℂ (PiLp 2 fun _ : Fin n => V) where
   toFun u := WithLp.toLp 2 (fun a => ∑ b, A a b (u b))
   map_add' u w := by ext a; simp [Finset.sum_add_distrib]
   map_smul' c u := by ext a; simp [Finset.smul_sum]
@@ -79,29 +80,35 @@ theorem column_moments_of_symmetric : A7 → ColumnOperatorMoments := by
   unfold ColumnOperatorMoments ForMod
   intro n ε V _ _ E hM v hv e j
   have hu := hM.uni
-  have hsa : ∀ y z : PiLp 2 (fun _ : Fin n => V),
-      inner ℂ (act (Md ε E * Mm E) y) z = inner ℂ y (act (Md ε E * Mm E) z) := by
+  have hsa
+      : ∀ y z : PiLp 2 (fun _ : Fin n => V),
+        inner ℂ (act (Md ε E * Mm E) y) z = inner ℂ y (act (Md ε E * Mm E) z) := by
     intro y z
     rw [act_mul, act_mul, adj' ε E hu, adj ε E hu]
-  have hxn : ‖(PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))‖ = 1 := by
-    rw [PiLp.norm_single, hv]
-  have hn : ‖act (Mm E) (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))‖ ^ 2
-      = ∑ a, ‖E a e v‖ ^ 2 := by
+  have hxn : ‖(PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))‖ = 1 := by rw [PiLp.norm_single, hv]
+  have hn
+      : ‖act (Mm E) (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))‖ ^ 2
+        = ∑ a, ‖E a e v‖ ^ 2 := by
     rw [PiLp.norm_sq_eq_of_L2]
     refine Finset.sum_congr rfl fun a _ => ?_
     have := act_single (Mm E) e a v
     simp only [Mm, Matrix.of_apply] at this
     rw [← this]
     rfl
-  have hq : inner ℂ (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))
-      (act (Md ε E * Mm E) (PiLp.single 2 e v)) = ((∑ a, ‖E a e v‖ ^ 2 : ℝ) : ℂ) := by
+  have hq
+      : inner ℂ (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))
+          (act (Md ε E * Mm E) (PiLp.single 2 e v))
+        = ((∑ a, ‖E a e v‖ ^ 2 : ℝ) : ℂ) := by
     rw [act_mul, ← adj ε E hu, inner_self_eq_norm_sq_to_K, ← hn]
     norm_cast
-  have hre : (inner ℂ (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))
-      (act (Md ε E * Mm E) (PiLp.single 2 e v))).re = ∑ a, ‖E a e v‖ ^ 2 := by
+  have hre
+      : (inner ℂ (PiLp.single 2 e v : PiLp 2 (fun _ : Fin n => V))
+          (act (Md ε E * Mm E) (PiLp.single 2 e v))).re
+        = ∑ a, ‖E a e v‖ ^ 2 := by
     rw [hq, Complex.ofReal_re]
-  have key := h7 (PiLp 2 (fun _ : Fin n => V)) (act (Md ε E * Mm E)) hsa
-    (PiLp.single 2 e v) hxn (by rw [hre]; positivity) j
+  have key :=
+    h7 (PiLp 2 (fun _ : Fin n => V)) (act (Md ε E * Mm E)) hsa (PiLp.single 2 e v) hxn
+      (by rw [hre]; positivity) j
   rw [hre, ← act_pow, inner_single, act_single] at key
   exact key
 

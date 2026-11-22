@@ -16,29 +16,44 @@ open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.Hermiti
 
 def LastUnit : Prop :=
   ∀ (K F V : Type) [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V],
-    Formalism.HermitianLatticesTheory.IsCMUnram K → IsFixF K F → ∀ h : V →ₗ⋆[K] V →ₗ[K] K, h.IsSymm → Nondeg h →
-    ∀ U : Submodule K V, IsCompl U (orthK h U) → PosDefOn h (orthK h U) →
-    (∃ Λ₀ : Submodule (𝓞 K) V, Submodule.IsLattice K Λ₀ ∧ Formalism.HermitianLatticesTheory.IsUnimodular h Λ₀) →
-    ∀ M : Submodule (𝓞 K) V, IsLatIn U M → Formalism.HermitianLatticesTheory.IsIntegralLat h M →
-    ∀ 𝔭 : Ideal (𝓞 F), 𝔭.IsMaximal → ∀ b a, IsJordanIn h U M 𝔭 b a →
-    cJof 𝔭 a < finrank K (orthK h U) →
-    ∀ (π : 𝓞 F) (w : Fin (finrank K (orthK h U)) → V) (c : Fin (finrank K (orthK h U)) → F)
-      (τ : Fin (finrank K U) → Fin (finrank K (orthK h U))), IsGlueDataPre h U 𝔭 a π w c τ →
-      ∀ j : Fin (finrank K (orthK h U)), (j : ℕ) + 1 = finrank K (orthK h U) →
-      ∃ l : K, l ≠ 0 ∧ InP 𝔭 0 (algebraMap F K (c j) * (l * star l)) ∧
-        InP 𝔭 0 (algebraMap F K (c j) * (l * star l))⁻¹
+      [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
+      [IsScalarTower (𝓞 K) K V],
+    Formalism.HermitianLatticesTheory.IsCMUnram K → IsFixF K F
+      → ∀ h : V →ₗ⋆[K] V →ₗ[K] K,
+        h.IsSymm → Nondeg h
+          → ∀ U : Submodule K V,
+            IsCompl U (orthK h U) → PosDefOn h (orthK h U)
+              → (∃ Λ₀ : Submodule (𝓞 K) V,
+                Submodule.IsLattice K Λ₀ ∧ Formalism.HermitianLatticesTheory.IsUnimodular h Λ₀)
+              → ∀ M : Submodule (𝓞 K) V,
+                IsLatIn U M → Formalism.HermitianLatticesTheory.IsIntegralLat h M
+                  → ∀ 𝔭 : Ideal (𝓞 F),
+                    𝔭.IsMaximal
+                      → ∀ b a,
+                        IsJordanIn h U M 𝔭 b a → cJof 𝔭 a < finrank K (orthK h U)
+                          → ∀ (π : 𝓞 F) (w : Fin (finrank K (orthK h U)) → V)
+                              (c : Fin (finrank K (orthK h U)) → F)
+                              (τ : Fin (finrank K U) → Fin (finrank K (orthK h U))),
+                            IsGlueDataPre h U 𝔭 a π w c τ
+                              → ∀ j : Fin (finrank K (orthK h U)),
+                                (j : ℕ) + 1 = finrank K (orthK h U)
+                                  → ∃ l : K,
+                                    l ≠ 0 ∧ InP 𝔭 0 (algebraMap F K (c j) * (l * star l))
+                                      ∧ InP 𝔭 0 (algebraMap F K (c j) * (l * star l))⁻¹
 
 theorem lastRescale_of (hL : LastUnit) : LastRescale := by
-  intro K F V _ _ _ _ _ _ _ _ _ _ _ hK hF h hs hnd U hUc hpos hΛ₀ M hM hMi 𝔭 h𝔭 b a hba hc π w c τ hg
+  intro K F V _ _ _ _ _ _ _ _ _ _ _ hK hF h hs hnd U hUc hpos hΛ₀ M hM hMi 𝔭 h𝔭 b a hba hc π w c τ
+    hg
   have hm : 0 < finrank K (orthK h U) := lt_of_le_of_lt (Nat.zero_le _) hc
   set j₀ : Fin (finrank K (orthK h U)) := ⟨finrank K (orthK h U) - 1, by omega⟩ with hj₀
   obtain ⟨l, hl0, hl1, hl2⟩ :=
-    hL K F V hK hF h hs hnd U hUc hpos hΛ₀ M hM hMi 𝔭 h𝔭 b a hba hc π w c τ hg j₀ (by simp [j₀]; omega)
+    hL K F V hK hF h hs hnd U hUc hpos hΛ₀ M hM hMi 𝔭 h𝔭 b a hba hc π w c τ hg j₀
+      (by simp [j₀]; omega)
   obtain ⟨hwW, hwo, hwn, hτ, hu, hcong, hτl, hunit⟩ := hg
   obtain ⟨μ, hμ⟩ := (hF (l * star l)).1 (by rw [star_mul', star_star, mul_comm])
   have hμ0 : μ ≠ 0 := by
-    intro e; rw [e, map_zero] at hμ
+    intro e
+    rw [e, map_zero] at hμ
     exact mul_ne_zero hl0 (star_ne_zero.2 hl0) hμ.symm
   let w' := Function.update w j₀ (l • w j₀)
   let c' := Function.update c j₀ (μ * c j₀)
@@ -70,7 +85,8 @@ theorem lastRescale_of (hL : LastUnit) : LastRescale := by
       refine ⟨by ring, mul_ne_zero hμ0 (hwn j₀).2⟩
     · rw [hw'n j hj, hc'n j hj]; exact hwn j
   · intro i hi
-    rw [hc'n _ (hτ₀ i hi)]; exact hcong i hi
+    rw [hc'n _ (hτ₀ i hi)]
+    exact hcong i hi
   · intro j hnp
     by_cases hj : j = j₀
     · rw [hj, hc'₀]

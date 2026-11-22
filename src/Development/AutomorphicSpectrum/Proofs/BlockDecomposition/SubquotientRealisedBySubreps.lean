@@ -10,22 +10,28 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.SubquotPres
 
-theorem exists_equiv_subQuot : ∀ {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G V) (π : Representation ℂ G W),
-    IsSubquotient π ρ → ∃ A B : Subrepresentation ρ, B ≤ A ∧ Nonempty (π.Equiv (subQuot A B)) := by
+theorem exists_equiv_subQuot
+    : ∀ {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+        (ρ : Representation ℂ G V) (π : Representation ℂ G W),
+      IsSubquotient π ρ
+        → ∃ A B : Subrepresentation ρ, B ≤ A ∧ Nonempty (π.Equiv (subQuot A B)) := by
   intro G V W _ _ _ _ _ ρ π h
   obtain ⟨S, f, hf⟩ := h
-  have hint : ∀ (g : G) (x : S.toSubmodule),
-      f.toLinearMap (S.toRepresentation g x) = π g (f.toLinearMap x) := fun g x => by
+  have hint
+      : ∀ (g : G) (x : S.toSubmodule),
+        f.toLinearMap (S.toRepresentation g x) = π g (f.toLinearMap x) := fun g x => by
     simpa only [Representation.IntertwiningMap.toLinearMap_apply] using
       Representation.IntertwiningMap.isIntertwining _ _ f g x
   let K : Submodule ℂ S.toSubmodule := LinearMap.ker f.toLinearMap
-  let B : Subrepresentation ρ := ⟨K.map S.toSubmodule.subtype, by
-    intro g v hv
-    obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hv
-    refine Submodule.mem_map.mpr ⟨S.toRepresentation g x, ?_, rfl⟩
-    rw [LinearMap.mem_ker] at hx ⊢
-    rw [hint, hx, map_zero]⟩
+  let B : Subrepresentation ρ := ⟨
+    K.map S.toSubmodule.subtype,
+    by
+      intro g v hv
+      obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hv
+      refine Submodule.mem_map.mpr ⟨S.toRepresentation g x, ?_, rfl⟩
+      rw [LinearMap.mem_ker] at hx ⊢
+      rw [hint, hx, map_zero]
+  ⟩
   have hBS : B ≤ S := by
     show K.map S.toSubmodule.subtype ≤ S.toSubmodule
     exact Submodule.map_subtype_le _ _
@@ -45,8 +51,9 @@ theorem exists_equiv_subQuot : ∀ {G V W : Type} [Group G] [AddCommGroup V] [Mo
     intro g q
     obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     exact hint g x
-  have hT : ∀ g : G, e.symm.toLinearMap ∘ₗ π g =
-      GlobalTheory.SmGL.subQuot S B g ∘ₗ e.symm.toLinearMap := by
+  have hT
+      : ∀ g : G,
+        e.symm.toLinearMap ∘ₗ π g = GlobalTheory.SmGL.subQuot S B g ∘ₗ e.symm.toLinearMap := by
     intro g
     ext w
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe]
@@ -56,7 +63,11 @@ theorem exists_equiv_subQuot : ∀ {G V W : Type} [Group G] [AddCommGroup V] [Mo
     exact (hφint g q).symm
   let T : Representation.IntertwiningMap π (GlobalTheory.SmGL.subQuot S B) :=
     ⟨e.symm.toLinearMap, hT⟩
-  exact ⟨S, B, hBS, ⟨Representation.Equiv.mk' T e (fun w => e.apply_symm_apply w)
-    (fun q => e.symm_apply_apply q)⟩⟩
+  exact ⟨
+    S,
+    B,
+    hBS,
+    ⟨Representation.Equiv.mk' T e (fun w => e.apply_symm_apply w) (fun q => e.symm_apply_apply q)⟩
+  ⟩
 
 end GlobalTheory.CompanionTheory.SubquotPres

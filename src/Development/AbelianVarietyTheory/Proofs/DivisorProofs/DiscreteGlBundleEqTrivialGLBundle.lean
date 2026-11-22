@@ -6,16 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TrivV
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem disc_eq_trivV (N : ℕ) (F : PSh) (V : disc.obj F ⟶ ofCat (glCat N)) : V = trivV N (disc.obj F) := by
+theorem disc_eq_trivV (N : ℕ) (F : PSh) (V : disc.obj F ⟶ ofCat (glCat N))
+    : V = trivV N (disc.obj F) := by
   ext n U x
-  have h := congrArg
-    (fun φ : (disc.obj F).obj (op (SimplexCategory.mk 0)) ⟶ (ofCat (glCat N)).obj n =>
-      ConcreteCategory.hom (φ.app U) x)
-    (V.naturality (SimplexCategory.const n.unop (SimplexCategory.mk 0) 0).op)
+  have h :=
+    congrArg
+      (fun φ : (disc.obj F).obj (op (SimplexCategory.mk 0)) ⟶ (ofCat (glCat N)).obj n =>
+        ConcreteCategory.hom (φ.app U) x)
+      (V.naturality (SimplexCategory.const n.unop (SimplexCategory.mk 0) 0).op)
   simp at h
   show (ConcreteCategory.hom ((V.app n).app U)) x = _
   rw [h]
@@ -24,9 +27,9 @@ theorem disc_eq_trivV (N : ℕ) (F : PSh) (V : disc.obj F ⟶ ofCat (glCat N)) :
   intro i j f
   change (y : Fin 1 ⥤ (glCat N).obj (Scheme.Γ.obj U)).map (𝟙 (0 : Fin 1)) = _
   refine (CategoryTheory.Functor.map_id (y : Fin 1 ⥤ (glCat N).obj (Scheme.Γ.obj U)) 0).trans ?_
-  change 𝟙 (SingleObj.star (GL (Fin N) (Scheme.Γ.obj U))) =
-    eqToHom (rfl : SingleObj.star (GL (Fin N) (Scheme.Γ.obj U)) = _) ≫
-      𝟙 (SingleObj.star (GL (Fin N) (Scheme.Γ.obj U))) ≫ eqToHom rfl
+  change 𝟙 (SingleObj.star (GL (Fin N) (Scheme.Γ.obj U)))
+    = eqToHom (rfl : SingleObj.star (GL (Fin N) (Scheme.Γ.obj U)) = _)
+      ≫ 𝟙 (SingleObj.star (GL (Fin N) (Scheme.Γ.obj U))) ≫ eqToHom rfl
   erw [Category.id_comp, Category.id_comp]
   exact (eqToHom_refl _ _).symm
 

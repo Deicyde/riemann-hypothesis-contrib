@@ -20,13 +20,13 @@ noncomputable section
 
 attribute [local instance] algebraOfOver
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A] (X : Scheme.{u})
-  [X.Over (Spec (.of A))]
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+  (X : Scheme.{u}) [X.Over (Spec (.of A))]
 
 abbrev closedFibre : Set X := (X ↘ Spec (.of A)).base ⁻¹' {closedPoint A}
 
 variable {X}
-
 
 omit [IsNoetherianRing A] [IsLocalRing A] in
 lemma mem_basicOpen_algebraMap_iff (x : X) (a : A) :
@@ -35,7 +35,6 @@ lemma mem_basicOpen_algebraMap_iff (x : X) (a : A) :
     rfl
   rw [h1, ← Scheme.preimage_basicOpen_top, basicOpen_eq_of_affine]
   rfl
-
 
 omit [IsNoetherianRing A] in
 lemma exists_mem_basicOpen_of_not_mem_closedFibre {x : X} (hx : x ∉ closedFibre (A := A) X) :
@@ -49,7 +48,6 @@ lemma exists_mem_basicOpen_of_not_mem_closedFibre {x : X} (hx : x ∉ closedFibr
   obtain ⟨a, ha, hay⟩ := Set.not_subset.1 hnot
   exact ⟨a, ha, (mem_basicOpen_algebraMap_iff x a).2 hay⟩
 
-
 omit [IsNoetherianRing A] in
 lemma not_mem_basicOpen_of_mem_closedFibre {x : X} (hx : x ∈ closedFibre (A := A) X) {a : A}
     (ha : a ∈ maximalIdeal A) : x ∉ X.basicOpen (algebraMap A Γ(X, ⊤) a) := by
@@ -58,10 +56,8 @@ lemma not_mem_basicOpen_of_mem_closedFibre {x : X} (hx : x ∈ closedFibre (A :=
   rw [this]
   exact ha
 
-
 variable (A X) in
 abbrev fibreQuot (n : ℕ) : X.Modules := quotPow (maximalIdeal A) (𝟙_ X.Modules) n
-
 
 variable (A X) in
 abbrev fibreOne (n : ℕ) : Γ(fibreQuot A X n, ⊤) :=

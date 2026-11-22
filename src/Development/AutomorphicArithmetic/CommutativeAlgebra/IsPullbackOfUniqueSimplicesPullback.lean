@@ -4,12 +4,15 @@ public import Development.AutomorphicArithmetic.BlowupCategories.SpanScale
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
 
-theorem UpperTheory.isPullback_of_unique_simplices_pullback :
-    ∀ {P A B C : Spc} (t : P ⟶ A) (l : P ⟶ B) (r : A ⟶ C) (u : B ⟶ C), t ≫ r = l ≫ u →
-        (∀ (k : ℕ) (T : Scheme.{0}) (x : Sx A k T) (y : Sx B k T), x.map r = y.map u → ∃! z : Sx P k T, z.map t = x ∧ z.map l = y) →
-        IsPullback t l r u := by
+theorem UpperTheory.isPullback_of_unique_simplices_pullback
+    : ∀ {P A B C : Spc} (t : P ⟶ A) (l : P ⟶ B) (r : A ⟶ C) (u : B ⟶ C),
+      t ≫ r = l ≫ u
+        → (∀ (k : ℕ) (T : Scheme.{0}) (x : Sx A k T) (y : Sx B k T),
+          x.map r = y.map u → ∃! z : Sx P k T, z.map t = x ∧ z.map l = y)
+        → IsPullback t l r u := by
   intro P A B C t l r u hw h
   refine IsPullback.of_forall_isPullback_app (fun n => ?_)
   refine IsPullback.of_forall_isPullback_app (fun T => ?_)

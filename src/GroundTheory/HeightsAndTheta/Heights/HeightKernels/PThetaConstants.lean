@@ -32,7 +32,6 @@ lemma log_rhs (C ρ d : ℝ) (g : ℕ) (hd : 0 < d) :
 
 end KThetaConstants
 
-
 open KThetaConstants in
 theorem ThetaConstants.proof : ThetaConstants.Statement := by
   intro C₃ hC₃
@@ -46,7 +45,7 @@ theorem ThetaConstants.proof : ThetaConstants.Statement := by
   have hg0 : (0 : ℝ) < g := by linarith
   have h2g : (0 : ℝ) < 2 * g := by linarith
   have hl2g : Real.log 2 ≤ Real.log (2 * g) := Real.log_le_log (by norm_num) (by linarith)
-  have h1 : -Real.log d ≤ g * Real.log (2 * g) := by
+  have h1 : - Real.log d ≤ g * Real.log (2 * g) := by
     have hpow : ρ ^ 2 * (2 * (g : ℝ)) ^ (g - 1) ≤ (2 * (g : ℝ)) ^ g := by
       obtain ⟨n, rfl⟩ : ∃ n, g = n + 1 := ⟨g - 1, by omega⟩
       rw [Nat.add_sub_cancel, pow_succ' (2 * ((n + 1 : ℕ) : ℝ)) n]
@@ -59,10 +58,12 @@ theorem ThetaConstants.proof : ThetaConstants.Statement := by
     have : C₃ ≤ max C₃ 1 := le_max_left _ _
     nlinarith [mul_le_mul_of_nonneg_right this hg0.le,
       mul_le_mul_of_nonneg_left (show (g : ℝ) ≤ 2 * g by linarith) hK0.le]
-  have h5 : (g : ℝ) / 2 * Real.log (max C₃ 1) ≤
-      Real.log (max C₃ 1) / (2 * Real.log 2) * g * Real.log (2 * g) := by
-    rw [show Real.log (max C₃ 1) / (2 * Real.log 2) * g * Real.log (2 * g) =
-        (g * Real.log (max C₃ 1) * Real.log (2 * g)) / (2 * Real.log 2) by ring,
+  have h5
+      : (g : ℝ) / 2 * Real.log (max C₃ 1)
+        ≤ Real.log (max C₃ 1) / (2 * Real.log 2) * g * Real.log (2 * g) := by
+    rw [show Real.log (max C₃ 1) / (2 * Real.log 2) * g * Real.log (2 * g)
+          = (g * Real.log (max C₃ 1) * Real.log (2 * g)) / (2 * Real.log 2) by
+        ring,
       le_div_iff₀ (by positivity)]
     nlinarith [mul_le_mul_of_nonneg_left hl2g (mul_nonneg hg0.le hlK)]
   have ha := mul_le_mul_of_nonneg_left h2 (show (0 : ℝ) ≤ g / 2 by positivity)

@@ -17,9 +17,8 @@ section
 
 open Formalism.FrobeniusOrbits
 
-theorem ra_cond {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 3 ≤ L.sc.x) :
-    2 * D.host.v ≤ L.sc.b ∧ 2 * (D.R.k : ℝ) ≤ L.sc.b := by
-
+theorem ra_cond {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 3 ≤ L.sc.x)
+    : 2 * D.host.v ≤ L.sc.b ∧ 2 * (D.R.k : ℝ) ≤ L.sc.b := by
   have hx0 : 0 < L.sc.x := by linarith
   have hQD := S.2.2.2.2.2.2.1
   have hT := S.2.2.2.2.1
@@ -51,7 +50,8 @@ theorem ra_cond {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 3 ≤ L.sc.x)
       Real.sqrt_nonneg ((D.host.q : ℝ) * D.host.d),
       sq_nonneg (Real.sqrt ((D.host.q : ℝ) * D.host.d) - 1)]
   have hc1 : (1 : ℝ) ≤ (D.host.QS : ℝ) * D.host.q * D.host.d := by nlinarith
-  have hc36 : (D.host.QS : ℝ) * D.host.q * D.host.d ≤ ((D.host.QS : ℝ) * D.host.q * D.host.d) ^ 36 :=
+  have hc36
+      : (D.host.QS : ℝ) * D.host.q * D.host.d ≤ ((D.host.QS : ℝ) * D.host.q * D.host.d) ^ 36 :=
     le_self_pow₀ hc1 (by norm_num)
   have hL : 0 < L.sc.L := by
     show 0 < L.sc.x ^ L.sc.eps
@@ -79,8 +79,9 @@ theorem ra_cond {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 3 ≤ L.sc.x)
   constructor
   · rw [hv]
     have h11 : D.host.rdE ≤ (D.host.QS : ℝ) * D.host.q * D.host.d := by
-      have h12 : (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d)
-          ≤ (D.host.QS : ℝ) * ((D.host.q : ℝ) * D.host.d) := by
+      have h12
+          : (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d)
+            ≤ (D.host.QS : ℝ) * ((D.host.q : ℝ) * D.host.d) := by
         have : (0 : ℝ) ≤ D.host.QS := Nat.cast_nonneg _
         nlinarith [Real.sqrt_nonneg ((D.host.q : ℝ) * D.host.d)]
       nlinarith
@@ -89,7 +90,6 @@ theorem ra_cond {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : 3 ≤ L.sc.x)
     nlinarith
 
 theorem rank_m_le_x {D : D7} (L : SizeData₂ D) (S : SizesAt L) : (D.R.m : ℝ) ≤ L.sc.x := by
-
   have hx1 : 1 ≤ L.sc.x := L.sc.one_lt_alt.le
   have hx0 : 0 < L.sc.x := by linarith [L.sc.one_lt_alt]
   have he := L.sc.eps_pos
@@ -105,24 +105,30 @@ theorem rank_m_le_x {D : D7} (L : SizeData₂ D) (S : SizesAt L) : (D.R.m : ℝ)
     rw [Real.sqrt_eq_rpow]
     exact Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
   have hsn := Real.sqrt_nonneg (L.sc.x * L.sc.delta1)
-  calc (D.R.m : ℝ) ≤ L.sc.x ^ (L.sc.eps / 100) * Real.sqrt (L.sc.x * L.sc.delta1) := h1.2
+  calc
+    (D.R.m : ℝ)
+      ≤ L.sc.x ^ (L.sc.eps / 100) * Real.sqrt (L.sc.x * L.sc.delta1) := h1.2
     _ ≤ Real.sqrt L.sc.x * Real.sqrt L.sc.x := mul_le_mul hp hs hsn (Real.sqrt_nonneg _)
     _ = L.sc.x := Real.mul_self_sqrt hx0.le
 
-theorem ra_44 {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x) : 44 ≤ D.R.m := by
-
+theorem ra_44 {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x)
+    : 44 ≤ D.R.m := by
   have hx1 : 1 ≤ L.sc.x := L.sc.one_lt_alt.le
   have hx0 : 0 < L.sc.x := by linarith [L.sc.one_lt_alt]
   have he := L.sc.eps_pos
   have he2 := L.sc.eps_lt
   have h1 := S.2.1
   simp only [SizeM, szTh] at h1
-  have hkey : L.sc.x ^ (-(L.sc.eps / 100)) * Real.sqrt (L.sc.x * L.sc.delta1)
-      = L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) := by
+  have hkey
+      : L.sc.x ^ (-(L.sc.eps / 100)) * Real.sqrt (L.sc.x * L.sc.delta1)
+        = L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) := by
     simp only [Formalism.BasicNotions.Scale.delta1]
-    rw [Real.sqrt_eq_rpow, show L.sc.x * L.sc.x ^ (-(L.sc.eps / 8)) = L.sc.x ^ (1 + -(L.sc.eps / 8)) by
-      rw [Real.rpow_add hx0, Real.rpow_one], ← Real.rpow_mul hx0.le, ← Real.rpow_add hx0]
-  have hge : L.sc.x ^ ((1 : ℝ) / 4) ≤ L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) :=
+    rw [Real.sqrt_eq_rpow,
+      show L.sc.x * L.sc.x ^ (-(L.sc.eps / 8)) = L.sc.x ^ (1 + -(L.sc.eps / 8)) by
+        rw [Real.rpow_add hx0, Real.rpow_one],
+      ← Real.rpow_mul hx0.le, ← Real.rpow_add hx0]
+  have hge
+      : L.sc.x ^ ((1 : ℝ) / 4) ≤ L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) :=
     Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
   have h44 : (44 : ℝ) ≤ L.sc.x ^ ((1 : ℝ) / 4) := by
     have h2 := Real.rpow_le_rpow (by norm_num : (0 : ℝ) ≤ 44 ^ 4) hx (by norm_num : (0 : ℝ) ≤ 1 / 4)
@@ -132,9 +138,10 @@ theorem ra_44 {D : D7} (L : SizeData₂ D) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 
   have h3 : (44 : ℝ) ≤ D.R.m := by linarith [h1.1]
   exact_mod_cast h3
 
-theorem ra_Sc {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x) :
-    0 ≤ L.Sc ∧ L.Sc ≤ L.sc.b' ∧ L.sc.b' ≤ L.sc.b ∧ 100 * L.sc.b ≤ L.sc.a := by
-
+theorem ra_Sc
+    {D : D7}
+    (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x)
+    : 0 ≤ L.Sc ∧ L.Sc ≤ L.sc.b' ∧ L.sc.b' ≤ L.sc.b ∧ 100 * L.sc.b ≤ L.sc.a := by
   have hx1 : 1 ≤ L.sc.x := L.sc.one_lt_alt.le
   have hx0 : 0 < L.sc.x := by linarith [L.sc.one_lt_alt]
   have he := L.sc.eps_pos
@@ -142,7 +149,8 @@ theorem ra_Sc {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : Sizes
   have hx100 : (100 : ℝ) ≤ L.sc.x := by norm_num at hx; linarith
   have hb0 : 0 < L.sc.b := by simp only [Formalism.BasicNotions.Scale.b]; exact Real.exp_pos _
   have hb'0 : 0 ≤ L.sc.b' := by
-    simp only [Formalism.BasicNotions.Scale.b', Formalism.BasicNotions.Scale.a, Formalism.BasicNotions.Scale.X']
+    simp only [Formalism.BasicNotions.Scale.b', Formalism.BasicNotions.Scale.a,
+      Formalism.BasicNotions.Scale.X']
     positivity
   have h1 := S.2.1
   simp only [SizeM, szTh] at h1
@@ -165,12 +173,16 @@ theorem ra_Sc {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : Sizes
     simp only [Formalism.BasicNotions.Scale.w'']
     exact div_le_self hb'0 (by nlinarith)
 
-  have hkey : L.sc.x ^ (-(L.sc.eps / 100)) * Real.sqrt (L.sc.x * L.sc.delta1)
-      = L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) := by
+  have hkey
+      : L.sc.x ^ (-(L.sc.eps / 100)) * Real.sqrt (L.sc.x * L.sc.delta1)
+        = L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) := by
     simp only [Formalism.BasicNotions.Scale.delta1]
-    rw [Real.sqrt_eq_rpow, show L.sc.x * L.sc.x ^ (-(L.sc.eps / 8)) = L.sc.x ^ (1 + -(L.sc.eps / 8)) by
-      rw [Real.rpow_add hx0, Real.rpow_one], ← Real.rpow_mul hx0.le, ← Real.rpow_add hx0]
-  have hge : L.sc.x ^ ((1 : ℝ) / 4) ≤ L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) :=
+    rw [Real.sqrt_eq_rpow,
+      show L.sc.x * L.sc.x ^ (-(L.sc.eps / 8)) = L.sc.x ^ (1 + -(L.sc.eps / 8)) by
+        rw [Real.rpow_add hx0, Real.rpow_one],
+      ← Real.rpow_mul hx0.le, ← Real.rpow_add hx0]
+  have hge
+      : L.sc.x ^ ((1 : ℝ) / 4) ≤ L.sc.x ^ (-(L.sc.eps / 100) + (1 + -(L.sc.eps / 8)) * (1 / 2)) :=
     Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
   have hm4 : L.sc.x ^ ((1 : ℝ) / 4) ≤ (D.R.m : ℝ) := by linarith [h1.1]
   have hq0 : 0 < L.sc.x ^ ((1 : ℝ) / 4) := Real.rpow_pos_of_pos hx0 _
@@ -196,19 +208,24 @@ theorem ra_Sc {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : Sizes
     push_cast at hlogm
     nlinarith [Real.log_nonneg hx1]
   have hxe : L.sc.x ≤ Real.exp (L.sc.x ^ (L.sc.eps / 3)) := by
-    calc L.sc.x = Real.exp (Real.log L.sc.x) := (Real.exp_log hx0).symm
+    calc
+      L.sc.x
+        = Real.exp (Real.log L.sc.x) := (Real.exp_log hx0).symm
       _ ≤ Real.exp (L.sc.x ^ (L.sc.eps / 3)) := Real.exp_le_exp.mpr hlx
   refine ⟨hScp.le, ?_, ?_, ?_⟩
   · nlinarith
-  · simp only [Formalism.BasicNotions.Scale.b', Formalism.BasicNotions.Scale.a, Formalism.BasicNotions.Scale.X']
+  · simp only [Formalism.BasicNotions.Scale.b', Formalism.BasicNotions.Scale.a,
+      Formalism.BasicNotions.Scale.X']
     rw [div_le_iff₀ (Real.exp_pos _)]
     nlinarith [mul_le_mul_of_nonneg_right hxe hb0.le]
   · simp only [Formalism.BasicNotions.Scale.a]
     nlinarith [mul_le_mul_of_nonneg_right hx100 hb0.le]
 
-theorem rowsA_of' {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x) (CY : ℝ)
-    (hg : ∀ i : Fin 2, Real.log (D.host.g i : ℝ) ≤ CY * L.sc.L) :
-    StandardLattice.RowsA D L.sc CY ((D.s.Del : ℚ) : ℝ) := by
+theorem rowsA_of'
+    {D : D7}
+    (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x)
+    (CY : ℝ) (hg : ∀ i : Fin 2, Real.log (D.host.g i : ℝ) ≤ CY * L.sc.L)
+    : StandardLattice.RowsA D L.sc CY ((D.s.Del : ℚ) : ℝ) := by
   have hx3 : 3 ≤ L.sc.x := le_trans (by norm_num) hx
   obtain ⟨hk3, hm2, hkt, hkr, hn1, hf, hmk⟩ := db_rk D
   obtain ⟨hL1, hLx, hb2, hkb, hvb, hlx⟩ := db_basic L S hx3
@@ -222,9 +239,12 @@ theorem rowsA_of' {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : S
   have hbexp : L.sc.b = Real.exp L.sc.L := rfl
   have hSc := L.Sc_eq
 
-  have top : ∀ (u : D.what₂.Word) ρ, StandardLattice.IsTop D ρ → ∃ t : D.host.TT,
-      StandardLattice.uN D u ρ 0 = L.aT t + ((D.R.k : ℝ) - 1) / 2 ∧
-      StandardLattice.uN D u ρ (D.R.k - 1) = -(L.bT t : ℝ) - ((D.R.k : ℝ) - 1) / 2 := by
+  have top
+      : ∀ (u : D.what₂.Word) ρ,
+        StandardLattice.IsTop D ρ
+          → ∃ t : D.host.TT,
+            StandardLattice.uN D u ρ 0 = L.aT t + ((D.R.k : ℝ) - 1) / 2
+              ∧ StandardLattice.uN D u ρ (D.R.k - 1) = -(L.bT t : ℝ) - ((D.R.k : ℝ) - 1) / 2 := by
     intro u ρ htop
     have htop' : (D.eTau ρ : D.R.GG) ∈ D.host.topPlaces := htop
     unfold Host.topPlaces at htop'
@@ -255,7 +275,8 @@ theorem rowsA_of' {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : S
       have vk := (c8 ρ (D.R.k - 2) (by omega)).1
       rw [d3]
       rw [← hSc] at v0
-      have d2' : StandardLattice.uN D u ρ 0 - StandardLattice.vN D ρ 0 ≤ 2 * L.Sc := by rw [hSc]; linarith
+      have d2' : StandardLattice.uN D u ρ 0 - StandardLattice.vN D ρ 0 ≤ 2 * L.Sc := by
+        rw [hSc]; linarith
       linarith
   · intro u ρ htop
     obtain ⟨t, e1, e2⟩ := top u ρ htop
@@ -266,8 +287,11 @@ theorem rowsA_of' {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : S
     rw [← hSc] at v0
     constructor <;> linarith
 
-theorem rowsA_of_dataB {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x)
-    (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : StandardLattice.DataB D L.sc C0 Δ w) : StandardLattice.RowsA D L.sc C0 Δ := by
+theorem rowsA_of_dataB
+    {D : D7}
+    (L : SizeData₂ D) (P : ParameterChoice' D L) (S : SizesAt L) (hx : (44 : ℝ) ^ 4 ≤ L.sc.x)
+    (C0 Δ : ℝ) (w : ℕ → D.what₂.Tau → ℝ) (hB : StandardLattice.DataB D L.sc C0 Δ w)
+    : StandardLattice.RowsA D L.sc C0 Δ := by
   obtain ⟨-, -, -, -, -, h6, -, -, h9, -⟩ := hB
   obtain ⟨c8, c9, c10, c12⟩ := db_cloud L P
   have hk := D.R.k_ge
@@ -278,9 +302,12 @@ theorem rowsA_of_dataB {D : D7} (L : SizeData₂ D) (P : ParameterChoice' D L) (
   rw [hΔ]
   exact rowsA_of' L P S hx C0 fun i => (h6 i).2
 
-theorem rowsA_of_dataB_fam {eps : ℝ} (Fm : FamP eps) (x : ℝ) (h3 : (44 : ℝ) ^ 4 ≤ x) (hx : Fm.x1 < x) (i : Fm.Ix x)
-    (C0 Δ : ℝ) (w : ℕ → (Fm.D x i).what₂.Tau → ℝ) (hB : StandardLattice.DataB (Fm.D x i) (Fm.L x i).sc C0 Δ w) :
-    StandardLattice.RowsA (Fm.D x i) (Fm.L x i).sc C0 Δ := by
+theorem rowsA_of_dataB_fam
+    {eps : ℝ} (Fm : FamP eps)
+    (x : ℝ) (h3 : (44 : ℝ) ^ 4 ≤ x) (hx : Fm.x1 < x) (i : Fm.Ix x)
+    (C0 Δ : ℝ) (w : ℕ → (Fm.D x i).what₂.Tau → ℝ)
+    (hB : StandardLattice.DataB (Fm.D x i) (Fm.L x i).sc C0 Δ w)
+    : StandardLattice.RowsA (Fm.D x i) (Fm.L x i).sc C0 Δ := by
   have hLx := Fm.L_x x i hx
   have h3' : (44 : ℝ) ^ 4 ≤ (Fm.L x i).sc.x := by rw [hLx]; exact h3
   exact rowsA_of_dataB (Fm.L x i) (Fm.params x hx i) (Fm.sizes x hx i) h3' C0 Δ w hB
@@ -295,10 +322,12 @@ namespace Formalism.MainNotions.GlobalTheoryTheory
 
 open Formalism.BasicNotions Formalism.MainNotions
 
-theorem rowsAF_fam {eps : ℝ} (Fm : FamP eps) : StandardLattice.RowsAF Fm :=
-    fun C0 => ⟨(44 : ℝ) ^ 4, fun x h3 hx i Δ w hB => JDB.rowsA_of_dataB_fam Fm x h3 hx i C0 Δ w hB⟩
+theorem rowsAF_fam {eps : ℝ} (Fm : FamP eps) : StandardLattice.RowsAF Fm := fun C0 =>
+  ⟨(44 : ℝ) ^ 4, fun x h3 hx i Δ w hB => JDB.rowsA_of_dataB_fam Fm x h3 hx i C0 Δ w hB⟩
 
-theorem family_part_five_of_explicit_constants {eps : ℝ} (Fm : FamP eps) (h : StandardLattice.FamilyVandermondeCountExplicit Fm) : StandardLattice.PartFiveFamilyBounds Fm :=
-    StandardLattice.part_five_family_of_explicit Fm h (rowsAF_fam Fm)
+theorem family_part_five_of_explicit_constants
+    {eps : ℝ} (Fm : FamP eps) (h : StandardLattice.FamilyVandermondeCountExplicit Fm)
+    : StandardLattice.PartFiveFamilyBounds Fm :=
+  StandardLattice.part_five_family_of_explicit Fm h (rowsAF_fam Fm)
 
 end Formalism.MainNotions.GlobalTheoryTheory

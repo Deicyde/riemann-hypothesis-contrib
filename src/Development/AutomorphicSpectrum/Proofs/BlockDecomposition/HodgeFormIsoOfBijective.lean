@@ -11,18 +11,23 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR GlobalTheory.HodgeCoh
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR
+  GlobalTheory.HodgeCoh
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.HodgeFormTop
 
-open CrystallineSemistableComparison CrystallineSemistableComparison.Onto CrystallineSemistableComparison.HT CrystallineSemistableComparison.Om.L2 CrystallineSemistableComparison.Pb
+open CrystallineSemistableComparison CrystallineSemistableComparison.Onto
+  CrystallineSemistableComparison.HT CrystallineSemistableComparison.Om.L2
+  CrystallineSemistableComparison.Pb
 
 section
 variable {K : Type} [Field K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K))
 
-def omEq (a : ℕ) : CrystallineSemistableComparison.Onto.Om K (CrystallineSemistableComparison.Onto.Sec q ⊤) a ≃ₗ[K] OmU q ⊤ a := LinearEquiv.refl K (OmU q ⊤ a)
+def omEq (a : ℕ)
+    : CrystallineSemistableComparison.Onto.Om K (CrystallineSemistableComparison.Onto.Sec q ⊤) a ≃ₗ[K] OmU q ⊤ a :=
+  LinearEquiv.refl K (OmU q ⊤ a)
 
 abbrev resTop (a : ℕ) := CH.Mor.restrict (G q a) (inU q ⊤).ι
 
@@ -39,8 +44,9 @@ def LiftsT.toTop (Λ : LiftsT q) : Lifts q ⊤ where
   v T g := Λ.v T.obj g
   hv T g := Λ.hv T.obj g
 
-theorem isFormT_of_isForm {a : ℕ} (g₀ : Γ(X, ⊤)) (g : Fin a → Γ(X, ⊤)) (c : HV q ⊤ a a)
-    (h : IsForm q ⊤ (a := a) g₀ g c) : IsFormT q g₀ g ((resTopEquiv q a).symm c) := by
+theorem isFormT_of_isForm
+    {a : ℕ} (g₀ : Γ(X, ⊤)) (g : Fin a → Γ(X, ⊤)) (c : HV q ⊤ a a) (h : IsForm q ⊤ (a := a) g₀ g c)
+    : IsFormT q g₀ g ((resTopEquiv q a).symm c) := by
   intro Λ
   obtain ⟨f, hf, hc, hz⟩ := h (LiftsT.toTop q Λ)
   obtain ⟨z, rfl⟩ := (resTop_pullC_bij q a a).2 f
@@ -57,11 +63,15 @@ theorem isFormT_of_isForm {a : ℕ} (g₀ : Γ(X, ⊤)) (g : Fin a → Γ(X, ⊤
 
 end
 
-theorem main : ∀ {K : Type} [Field K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) (a : ℕ),
-    (∃ e : CrystallineSemistableComparison.Onto.Om K (CrystallineSemistableComparison.Onto.Sec q ⊤) a →ₗ[K] CrystallineSemistableComparison.Onto.HV q ⊤ a a, CrystallineSemistableComparison.Onto.IsOm q ⊤ a e ∧ Function.Bijective e) →
-    ∃ e' : CrystallineSemistableComparison.HT.Hdg q a a ≃ₗ[K] OmU q ⊤ a, CrystallineSemistableComparison.Om.L2.IsOmT q a e' := by
+theorem main
+    : ∀ {K : Type} [Field K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) (a : ℕ),
+      (∃ e : CrystallineSemistableComparison.Onto.Om K (CrystallineSemistableComparison.Onto.Sec q ⊤) a →ₗ[K] CrystallineSemistableComparison.Onto.HV q ⊤ a a,
+          CrystallineSemistableComparison.Onto.IsOm q ⊤ a e ∧ Function.Bijective e)
+        → ∃ e' : CrystallineSemistableComparison.HT.Hdg q a a ≃ₗ[K] OmU q ⊤ a,
+          CrystallineSemistableComparison.Om.L2.IsOmT q a e' := by
   intro K _ X q a ⟨e, he, hb⟩
-  refine ⟨((resTopEquiv q a).trans (LinearEquiv.ofBijective e hb).symm).trans (omEq q a), fun g₀ g => ?_⟩
+  refine
+    ⟨((resTopEquiv q a).trans (LinearEquiv.ofBijective e hb).symm).trans (omEq q a), fun g₀ g => ?_⟩
   exact isFormT_of_isForm q g₀ g _ (he g₀ g)
 
 end GlobalTheory.CompanionTheory.HodgeFormTop

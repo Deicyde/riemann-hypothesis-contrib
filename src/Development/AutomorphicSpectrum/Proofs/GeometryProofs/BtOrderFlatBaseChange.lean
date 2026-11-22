@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ExtensionOrde
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 noncomputable section
@@ -41,9 +42,10 @@ lemma tensor_frac_form (u : R' ⊗[R] FractionRing R) :
     rw [TensorProduct.add_tmul, TensorProduct.smul_tmul, TensorProduct.smul_tmul]
     congr 2 <;> (simp only [Algebra.smul_def, map_mul]; field_simp)
 
-def kapL (κ : FractionRing R →+* FractionRing R')
-    (hκ : κ.comp (algebraMap R _) = (algebraMap R' _).comp (algebraMap R R')) :
-    FractionRing R →ₗ[R] FractionRing R' where
+def kapL
+    (κ : FractionRing R →+* FractionRing R')
+    (hκ : κ.comp (algebraMap R _) = (algebraMap R' _).comp (algebraMap R R'))
+    : FractionRing R →ₗ[R] FractionRing R' where
   toFun := κ
   map_add' := map_add κ
   map_smul' r x := by
@@ -105,15 +107,17 @@ lemma tensor_pi_ext {T Q : Type} [Fintype T] [DecidableEq T] [AddCommGroup Q] [M
   rw [key, h]
   rfl
 
-theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
+theorem alg_core
+    {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
     (κ : FractionRing R →+* FractionRing R')
     (hκ : κ.comp (algebraMap R _) = (algebraMap R' _).comp (algebraMap R R'))
     (N : Submodule R (T → FractionRing R)) (M : Submodule R (T → R))
     (hM : ∀ f, f ∈ M ↔ ∀ t, (fun h => algebraMap R (FractionRing R) (f (t * h))) ∈ N)
     (g : T → R')
-    (hg : ∀ t, (fun h => algebraMap R' (FractionRing R') (g (t * h))) ∈
-      Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ N, w = fun h => κ (n h)}) :
-    g ∈ Submodule.span R' {g : T → R' | ∃ f ∈ M, g = fun t => algebraMap R R' (f t)} := by
+    (hg : ∀ t,
+      (fun h => algebraMap R' (FractionRing R') (g (t * h)))
+        ∈ Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ N, w = fun h => κ (n h)})
+    : g ∈ Submodule.span R' {g : T → R' | ∃ f ∈ M, g = fun t => algebraMap R R' (f t)} := by
   classical
   cases nonempty_fintype T
   let a : T → ((T → R) →ₗ[R] (T → FractionRing R)) := fun t =>
@@ -124,9 +128,10 @@ theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
     intro f
     constructor
     · intro hf
-      have hfM : f ∈ M := (hM f).2 fun t => by
-        have h1 : N.mkQ (a t f) = 0 := congrFun hf t
-        exact (Submodule.Quotient.mk_eq_zero N).1 h1
+      have hfM : f ∈ M :=
+        (hM f).2 fun t => by
+          have h1 : N.mkQ (a t f) = 0 := congrFun hf t
+          exact (Submodule.Quotient.mk_eq_zero N).1 h1
       exact ⟨⟨f, hfM⟩, rfl⟩
     · rintro ⟨m, rfl⟩
       funext t
@@ -135,21 +140,22 @@ theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
   have hexN := Module.Flat.lTensor_exact R' (LinearMap.exact_subtype_mkQ N)
   let z : R' ⊗[R] (T → R) := ∑ h, g h ⊗ₜ[R] (Pi.single h 1 : T → R)
   let cW := ((kapL κ hκ).compLeft T).liftBaseChange R'
-  have hc : ∀ t, cW ((a t).lTensor R' z) =
-      fun h => algebraMap R' (FractionRing R') (g (t * h)) := by
+  have hc
+      : ∀ t, cW ((a t).lTensor R' z) = fun h => algebraMap R' (FractionRing R') (g (t * h)) := by
     intro t
     funext h
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [z, map_sum, LinearMap.lTensor_tmul, cW, LinearMap.liftBaseChange_tmul, Finset.sum_apply,
-      Pi.smul_apply]
+      simp only [z, map_sum, LinearMap.lTensor_tmul, cW, LinearMap.liftBaseChange_tmul,
+        Finset.sum_apply, Pi.smul_apply]
     rw [Finset.sum_eq_single (t * h)]
     · have := congr($hκ 1)
       simp [LinearMap.compLeft_apply, ha, kapL, Algebra.smul_def]
     · intro b' _ hb'
       simp [LinearMap.compLeft_apply, ha, kapL, Ne.symm hb']
     · simp
-  have hN : ∀ t, ∃ y : R' ⊗[R] N, cW (N.subtype.lTensor R' y) =
-      fun h => algebraMap R' (FractionRing R') (g (t * h)) := by
+  have hN
+      : ∀ t, ∃ y : R' ⊗[R] N,
+        cW (N.subtype.lTensor R' y) = fun h => algebraMap R' (FractionRing R') (g (t * h)) := by
     intro t
     let cN := (((kapL κ hκ).compLeft T) ∘ₗ N.subtype).liftBaseChange R'
     have e1 : ∀ y, cN y = cW (N.subtype.lTensor R' y) := by
@@ -158,8 +164,9 @@ theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
       | zero => simp
       | tmul r n => simp [cN, cW, LinearMap.liftBaseChange_tmul]
       | add p q hp hq => simp only [map_add (f := _), hp, hq]
-    have hle : Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ N, w = fun h => κ (n h)} ≤
-        LinearMap.range cN := by
+    have hle
+        : Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ N, w = fun h => κ (n h)}
+          ≤ LinearMap.range cN := by
       rw [Submodule.span_le]
       rintro _ ⟨n, hn, rfl⟩
       refine ⟨(1 : R') ⊗ₜ[R] (⟨n, hn⟩ : N), ?_⟩
@@ -174,8 +181,7 @@ theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
     have e2 : (LinearMap.proj t : (T → (T → FractionRing R) ⧸ N) →ₗ[R] _) ∘ₗ b = N.mkQ ∘ₗ a t := rfl
     rw [e2, LinearMap.lTensor_comp, LinearMap.comp_apply]
     obtain ⟨y, hy⟩ := hN t
-    have e3 : (a t).lTensor R' z = N.subtype.lTensor R' y :=
-      inj_pi κ hκ ((hc t).trans hy.symm)
+    have e3 : (a t).lTensor R' z = N.subtype.lTensor R' y := inj_pi κ hκ ((hc t).trans hy.symm)
     rw [e3]
     exact (hexN _).2 ⟨y, rfl⟩
   obtain ⟨y, hy⟩ := (hexS z).1 hz
@@ -189,8 +195,10 @@ theorem alg_core {T : Type} [CommGroup T] [Finite T] [Module.Flat R R']
     · intro b' _ hb'
       simp [LinearMap.compLeft_apply, Ne.symm hb']
     · simp
-  have hall : ∀ y : R' ⊗[R] M, e (M.subtype.lTensor R' y) ∈
-      Submodule.span R' {g : T → R' | ∃ f ∈ M, g = fun t => algebraMap R R' (f t)} := by
+  have hall
+      : ∀ y : R' ⊗[R] M,
+        e (M.subtype.lTensor R' y)
+          ∈ Submodule.span R' {g : T → R' | ∃ f ∈ M, g = fun t => algebraMap R R' (f t)} := by
     intro y
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -263,16 +271,19 @@ lemma valAt_const (Γ : QFGroup R T) (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹�
   rw [← valAt_comp (Γ.pt t).left Γ.G.hom ⊤ ⊤ h' h (top_le_pre _), valAt_congr e _ _ (top_le_pre _), valAt_spec]
 
 def secFn (Γ : QFGroup R T) : Submodule R (T → FractionRing R) where
-  carrier := {f | ∃ s : Γ(Γ.G.left, ⊤), ∀ (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤),
-    valAt (Γ.pt t).left ⊤ h s = f t}
+  carrier :=
+    {f | ∃ s : Γ(Γ.G.left, ⊤), ∀ (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ ⊤),
+      valAt (Γ.pt t).left ⊤ h s = f t}
   add_mem' := by
     rintro f f' ⟨s, hs⟩ ⟨s', hs'⟩
     exact ⟨s + s', fun t h => by rw [valAt_add, hs, hs']; rfl⟩
   zero_mem' := ⟨0, fun t h => by rw [valAt_zero]; rfl⟩
   smul_mem' := by
     rintro r f ⟨s, hs⟩
-    refine ⟨(Γ.G.hom.appLE ⊤ ⊤ (top_le_pre _)).hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom r) * s,
-      fun t h => ?_⟩
+    refine ⟨
+      (Γ.G.hom.appLE ⊤ ⊤ (top_le_pre _)).hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom r) * s,
+      fun t h => ?_
+    ⟩
     rw [valAt_mul, valAt_const, hs]
     simp [Algebra.smul_def]
 
@@ -303,46 +314,57 @@ lemma pushout_induction {A B C D : CommRingCat.{0}} {a : A ⟶ B} {c : A ⟶ C} 
 
 variable {R' : Type} [CommRing R'] [IsDomain R'] [Algebra R R']
 
-theorem val_mem_span [Finite T] [Module.Flat R R'] (Γ : QFGroup R T) (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left)
-    (hbc : Γ'.IsBaseChange Γ (algebraMap R R') F)
+theorem val_mem_span
+    [Finite T] [Module.Flat R R']
+    (Γ : QFGroup R T) (Γ' : QFGroup R' T)
+    (F : Γ'.G.left ⟶ Γ.G.left) (hbc : Γ'.IsBaseChange Γ (algebraMap R R') F)
     (κ : FractionRing R →+* FractionRing R')
     (hκ : κ.comp (algebraMap R _) = (algebraMap R' _).comp (algebraMap R R'))
-    (x : Γ(Γ'.G.left, ⊤)) :
-    (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) x) ∈
-      Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ secFn Γ, w = fun h => κ (n h)} := by
+    (x : Γ(Γ'.G.left, ⊤))
+    : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) x)
+      ∈ Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ secFn Γ, w = fun h => κ (n h)} := by
   haveI := Γ.quasiCompact
   haveI := Γ.separated
   haveI : Flat (Spec.map (CommRingCat.ofHom (algebraMap R R'))) :=
     Flat.SpecMap_iff.mpr (RingHom.flat_algebraMap_iff.mpr inferInstance)
   have H := hbc.cart
-  have po := (isIso_pushoutSection_iff H (US := ⊤) (UT := ⊤) (UX := ⊤) (UY := ⊤) (top_le_pre _) (top_le_pre _)
-    (by simp)).1 (isIso_pushoutSection_of_isQuasiSeparated_of_flat_right H _ _ _ (isAffineOpen_top _)
-      (isAffineOpen_top _) (Γ.G.hom.isCompact_preimage (isAffineOpen_top _).isCompact)
-      (Γ.G.hom.isQuasiSeparated_preimage (isAffineOpen_top _).isQuasiSeparated))
-  refine pushout_induction po (fun y => (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) y) ∈
-      Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ secFn Γ, w = fun h => κ (n h)}) ?_ ?_ ?_ ?_ x
+  have po :=
+    (isIso_pushoutSection_iff H (US := ⊤) (UT := ⊤) (UX := ⊤) (UY := ⊤) (top_le_pre _)
+        (top_le_pre _) (by simp)).1
+      (isIso_pushoutSection_of_isQuasiSeparated_of_flat_right H _ _ _ (isAffineOpen_top _)
+        (isAffineOpen_top _) (Γ.G.hom.isCompact_preimage (isAffineOpen_top _).isCompact)
+        (Γ.G.hom.isQuasiSeparated_preimage (isAffineOpen_top _).isQuasiSeparated))
+  refine pushout_induction po
+    (fun y =>
+      (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) y)
+        ∈ Submodule.span R' {w : T → FractionRing R' | ∃ n ∈ secFn Γ, w = fun h => κ (n h)})
+    ?_ ?_ ?_ ?_ x
   · have : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) (0 : Γ(Γ'.G.left, ⊤))) = 0 := by
       funext t; exact valAt_zero _ _ _
     rw [this]
     exact Submodule.zero_mem _
   · intro s
-    refine Submodule.subset_span ⟨fun t => valAt (Γ.pt t).left ⊤ (top_le_pre _) s, ⟨s, fun _ _ => rfl⟩, ?_⟩
+    refine Submodule.subset_span
+      ⟨fun t => valAt (Γ.pt t).left ⊤ (top_le_pre _) s, ⟨s, fun _ _ => rfl⟩, ?_⟩
     funext t
     rw [← valAt_comp (Γ'.pt t).left F ⊤ ⊤ _ (top_le_pre _) (top_le_pre _),
-      valAt_congr (GlobalTheory.T.base_change_points_compat R T Γ R' Γ' F hbc κ hκ t) _ _ (top_le_pre _),
+      valAt_congr (GlobalTheory.T.base_change_points_compat R T Γ R' Γ' F hbc κ hκ t) _ _
+        (top_le_pre _),
       valAt_map κ _ _ (top_le_pre _)]
   · intro c n hn
-    have : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) (((Γ'.G.hom.appLE ⊤ ⊤ (top_le_pre _)).hom c) * n)) =
-        ((Scheme.ΓSpecIso (CommRingCat.of R')).hom.hom c) •
-          (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) n) := by
+    have : (fun t =>
+          valAt (Γ'.pt t).left ⊤ (top_le_pre _) (((Γ'.G.hom.appLE ⊤ ⊤ (top_le_pre _)).hom c) * n))
+        = ((Scheme.ΓSpecIso (CommRingCat.of R')).hom.hom c)
+          • (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) n) := by
       funext t
       rw [valAt_mul, valAt_const]
       simp [Algebra.smul_def]
     rw [this]
     exact Submodule.smul_mem _ _ hn
   · intro p q hp hq
-    have : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) (p + q)) =
-        (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) p) + (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) q) := by
+    have : (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) (p + q))
+        = (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) p)
+          + (fun t => valAt (Γ'.pt t).left ⊤ (top_le_pre _) q) := by
       funext t
       exact valAt_add _ _ _ _ _
     rw [this]
@@ -402,7 +424,12 @@ lemma ext_le_btOrder [Finite T] (Γ : QFGroup R T) (Γ' : QFGroup R' T) (F : Γ'
 
 end Sch
 
-theorem btOrder_flat_baseChange : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (R' : Type) [CommRing R'] [IsDomain R'] [Algebra R R'] (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left), Γ'.IsBaseChange Γ (algebraMap R R') F → Module.Flat R R' → Γ'.btOrder ⊤ = extOrder (algebraMap R R') (Γ.btOrder ⊤) := by
+theorem btOrder_flat_baseChange
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (R' : Type) [CommRing R'] [IsDomain R'] [Algebra R R'] (Γ' : QFGroup R' T)
+        (F : Γ'.G.left ⟶ Γ.G.left),
+      Γ'.IsBaseChange Γ (algebraMap R R') F → Module.Flat R R'
+        → Γ'.btOrder ⊤ = extOrder (algebraMap R R') (Γ.btOrder ⊤) := by
   intro R _ _ T _ _ Γ R' _ _ _ Γ' F hbc hflat
   obtain ⟨κ, hκ⟩ := exists_kappa (flat_inj (R := R) (R' := R'))
   exact le_antisymm (btOrder_le_ext Γ Γ' F hbc κ hκ) (ext_le_btOrder Γ Γ' F hbc κ hκ)

@@ -18,7 +18,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 namespace GlobalTheory.CompanionTheory.GE.Extend
 
@@ -26,8 +27,8 @@ section Defs
 
 variable {X : Scheme.{0}} (O : X.Opens) {P : X.Modules} {E : (O : Scheme.{0}).Modules}
 
-def extMap (f : P.restrict O.ι ⟶ E) (S : Subobject E) :
-    P ⟶ (Scheme.Modules.pushforward O.ι).obj (cokernel S.arrow) :=
+def extMap (f : P.restrict O.ι ⟶ E) (S : Subobject E)
+    : P ⟶ (Scheme.Modules.pushforward O.ι).obj (cokernel S.arrow) :=
   (Scheme.Modules.restrictAdjunction O.ι).homEquiv P _ (f ≫ cokernel.π S.arrow)
 
 def extSub (f : P.restrict O.ι ⟶ E) (S : Subobject E) : Subobject P :=
@@ -243,7 +244,31 @@ end GlobalTheory.CompanionTheory.GE.Extend
 
 namespace GlobalTheory.CompanionTheory.GE.Extend
 
-theorem extend : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (O : X.Opens), letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩; ∀ {P : X.Modules} {E : (O : Scheme.{0}).Modules}, IsCoherent P → IsCoherent E → ∀ f : P.restrict O.ι ⟶ E, Epi f → ∀ S : ℕ → Subobject E, ClosedSys I E S → ∀ T : (O : Scheme.{0}).IdealSheafData, IsProper (T.subschemeι ≫ ((O : Scheme.{0}) ↘ Spec (.of A))) → Scheme.Modules.SupportedIn (cokernel (S 0).arrow) (T.support : Set (O : Scheme.{0})) → IsClosed (O.ι '' (T.support : Set (O : Scheme.{0}))) ∧ ∃ Sb : ℕ → Subobject P, ClosedSys I P Sb ∧ (∀ e (W : (O : Scheme.{0}).Opens), IsAffineOpen W → ∀ x : Γ(P, O.ι ''ᵁ W), x ∈ secs (Sb e) (O.ι ''ᵁ W) ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W) ∧ ∀ e (V : X.Opens), Disjoint (V : Set X) (O.ι '' (T.support : Set (O : Scheme.{0}))) → secs (Sb e) V = Set.univ := by
+theorem extend
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (O : X.Opens),
+      letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩
+      ∀ {P : X.Modules} {E : (O : Scheme.{0}).Modules},
+        IsCoherent P → IsCoherent E
+          → ∀ f : P.restrict O.ι ⟶ E,
+            Epi f
+              → ∀ S : ℕ → Subobject E,
+                ClosedSys I E S
+                  → ∀ T : (O : Scheme.{0}).IdealSheafData,
+                    IsProper (T.subschemeι ≫ ((O : Scheme.{0}) ↘ Spec (.of A)))
+                      → Scheme.Modules.SupportedIn (cokernel (S 0).arrow)
+                        (T.support : Set (O : Scheme.{0}))
+                      → IsClosed (O.ι '' (T.support : Set (O : Scheme.{0})))
+                        ∧ ∃ Sb : ℕ → Subobject P,
+                          ClosedSys I P Sb
+                            ∧ (∀ e (W : (O : Scheme.{0}).Opens),
+                              IsAffineOpen W
+                                → ∀ x : Γ(P, O.ι ''ᵁ W),
+                                  x ∈ secs (Sb e) (O.ι ''ᵁ W)
+                                    ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W)
+                            ∧ ∀ e (V : X.Opens),
+                              Disjoint (V : Set X) (O.ι '' (T.support : Set (O : Scheme.{0})))
+                                → secs (Sb e) V = Set.univ := by
   intro A _ _ I X _ _ O
   letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩
   intro P E hP hE f hf S hS T hT hsupp
@@ -256,14 +281,21 @@ theorem extend : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) 
     rw [← Scheme.Opens.range_ι]
     exact ⟨y, rfl⟩
 
-  have hsuppe : ∀ e, Scheme.Modules.SupportedIn (cokernel (S e).arrow) (T.support : Set (O : Scheme.{0})) :=
-    fun e => Comb.supportedIn_of_secs_eq_univ hE.1 (hS.qcoh e) fun U hU hd =>
-      Comb.secs_sys_univ hS hE.1 hU (Comb.secs_eq_univ_of_supportedIn hE.1 (hS.qcoh 0) hsupp hU hd) e
+  have hsuppe
+      : ∀ e, Scheme.Modules.SupportedIn (cokernel (S e).arrow) (T.support : Set (O : Scheme.{0})) :=
+    fun e =>
+      Comb.supportedIn_of_secs_eq_univ hE.1 (hS.qcoh e) fun U hU hd =>
+        Comb.secs_sys_univ hS hE.1 hU
+          (Comb.secs_eq_univ_of_supportedIn hE.1 (hS.qcoh 0) hsupp hU hd) e
   let Sb : ℕ → Subobject P := fun e => extSub O f (S e)
-  have hq : ∀ e, ((Sb e : Subobject P) : X.Modules).IsQuasicoherent :=
-    fun e => qc_extSub (A := A) O hE f (S e) (hS.qcoh e)
-  have hchar : ∀ e (W : (O : Scheme.{0}).Opens), IsAffineOpen W → ∀ x : Γ(P, O.ι ''ᵁ W),
-      x ∈ secs (Sb e) (O.ι ''ᵁ W) ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W := by
+  have hq : ∀ e, ((Sb e : Subobject P) : X.Modules).IsQuasicoherent := fun e =>
+    qc_extSub (A := A) O hE f (S e) (hS.qcoh e)
+  have hchar
+      : ∀ e (W : (O : Scheme.{0}).Opens),
+        IsAffineOpen W
+          → ∀ x : Γ(P, O.ι ''ᵁ W),
+            x ∈ secs (Sb e) (O.ι ''ᵁ W)
+              ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W := by
     intro e W hW x
     haveI := hS.qcoh e
     rw [mem_secs_extSub, extMap_app_image]
@@ -273,23 +305,30 @@ theorem extend : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) 
     refine Set.eq_univ_of_forall fun x => ?_
     rw [mem_secs_extSub]
     exact extMap_app_eq_zero_of_disjoint O f (S e) (hsuppe e) V hV x
-  have hpowq : ∀ e, ((powSub I P (e + 1) : Subobject P) : X.Modules).IsQuasicoherent :=
-    fun e => (closedSys_pow I P).qcoh e
+  have hpowq : ∀ e, ((powSub I P (e + 1) : Subobject P) : X.Modules).IsQuasicoherent := fun e =>
+    (closedSys_pow I P).qcoh e
   have hpow : ∀ e, powSub I P (e + 1) ≤ Sb e := by
     intro e
-    refine le_of_cover O hZ hZO _ _ (hpowq e) (hq e) (fun W hW x hx => ?_)
+    refine le_of_cover O hZ hZO _ _ (hpowq e) (hq e)
+      (fun W hW x hx => ?_)
       (fun U _ hU x _ => by rw [huniv e U hU]; trivial)
     rw [hchar e W hW]
-    exact Comb.secs_mono (hS.pow_le e) W (ImageOpen.map_mem_secs_powSub I O hP.1 hE.1 f (e + 1) W hW x hx)
-  have hsup : ∀ e, (((Sb (e + 1) ⊔ powSub I P (e + 1)) : Subobject P) : X.Modules).IsQuasicoherent ∧
-      ∀ V : X.Opens, IsAffineOpen V → secs (Sb (e + 1) ⊔ powSub I P (e + 1)) V =
-        {x | ∃ s ∈ secs (Sb (e + 1)) V, ∃ t ∈ secs (powSub I P (e + 1)) V, x = s + t} :=
+    exact Comb.secs_mono (hS.pow_le e) W
+      (ImageOpen.map_mem_secs_powSub I O hP.1 hE.1 f (e + 1) W hW x hx)
+  have hsup
+      : ∀ e,
+        (((Sb (e + 1) ⊔ powSub I P (e + 1)) : Subobject P) : X.Modules).IsQuasicoherent
+          ∧ ∀ V : X.Opens,
+            IsAffineOpen V
+              → secs (Sb (e + 1) ⊔ powSub I P (e + 1)) V
+                = {x | ∃ s ∈ secs (Sb (e + 1)) V, ∃ t ∈ secs (powSub I P (e + 1)) V, x = s + t} :=
     fun e => supsecs hP.1 _ _ (hq (e + 1)) (hpowq e)
   refine ⟨hZ, Sb, ⟨hq, hpow, fun e => le_antisymm ?_ ?_⟩, hchar, huniv⟩
   · refine le_of_cover O hZ hZO _ _ (hq e) (hsup e).1 (fun W hW x hx => ?_) (fun U hU hd x _ => ?_)
     · have hW' : IsAffineOpen (O.ι ''ᵁ W) := hW.image_of_isOpenImmersion O.ι
       rw [hchar e W hW, hS.succ e,
-        (supsecs hE.1 _ _ (hS.qcoh (e + 1)) ((closedSys_pow I E).qcoh e)).2 W hW] at hx
+          (supsecs hE.1 _ _ (hS.qcoh (e + 1)) ((closedSys_pow I E).qcoh e)).2 W hW]
+        at hx
       obtain ⟨s, hs, t, ht, hst⟩ := hx
       obtain ⟨t', ht', hft'⟩ := exists_powSub_lift I O hP.1 hE.1 f hf (e + 1) W hW t ht
       rw [(hsup e).2 _ hW']
@@ -299,7 +338,8 @@ theorem extend : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) 
     · rw [(hsup e).2 U hU]
       refine ⟨x, by rw [huniv (e + 1) U hd]; trivial, 0, ⟨0, map_zero _⟩, (add_zero x).symm⟩
   · refine sup_le ?_ (hpow e)
-    refine le_of_cover O hZ hZO _ _ (hq (e + 1)) (hq e) (fun W hW x hx => ?_)
+    refine le_of_cover O hZ hZO _ _ (hq (e + 1)) (hq e)
+      (fun W hW x hx => ?_)
       (fun U _ hU x _ => by rw [huniv e U hU]; trivial)
     rw [hchar e W hW]
     rw [hchar (e + 1) W hW] at hx

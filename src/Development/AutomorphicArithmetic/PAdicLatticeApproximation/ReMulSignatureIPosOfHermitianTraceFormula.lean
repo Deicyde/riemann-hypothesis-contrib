@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open scoped ComplexOrder
@@ -102,8 +105,14 @@ private lemma form_ext (th : VQ D →+ Arch G) (lam : InfinitePlace G.F → ℂ)
 
 end
 
-theorem UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (th : VQ D →+ Arch G) (lam : InfinitePlace G.F → ℂ), (∀ c w v, th (L.rep c w) v = G.psi v c *ᵥ th w v) → (∀ u w, ((D.EF.baseChange ℚ u w : ℚ) : ℝ) = ∑ v, 2 * (lam v * hv (G.gram v) (th u v) (th w v)).re) → Submodule.span ℝ (Set.range th) = ⊤ → (∀ v, (starRingEnd ℂ) (lam v) = -lam v) → ∀ v, 0 < (lam v * sgnV L v * Complex.I).re := by
+theorem UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (th : VQ D →+ Arch G)
+        (lam : InfinitePlace G.F → ℂ),
+      (∀ c w v, th (L.rep c w) v = G.psi v c *ᵥ th w v)
+        → (∀ u w,
+          ((D.EF.baseChange ℚ u w : ℚ) : ℝ) = ∑ v, 2 * (lam v * hv (G.gram v) (th u v) (th w v)).re)
+        → Submodule.span ℝ (Set.range th) = ⊤ → (∀ v, (starRingEnd ℂ) (lam v) = - lam v)
+        → ∀ v, 0 < (lam v * sgnV L v * Complex.I).re := by
   intro p _ D G L th lam hrep hform hspan _ v
   obtain ⟨J, -, -, hpos, hPD⟩ := L.orient
   have hsurj : Function.Surjective (thR th) := by
@@ -123,8 +132,9 @@ theorem UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula :
     exact hz0 this.symm
   have h1 := hpos x hx0
   rw [form_ext th lam hform] at h1
-  have hsum : ∑ v', 2 * (lam v' * hv (G.gram v') (thR th (actOn L.rep ℝ J x) v') (thR th x v')).re
-      = 2 * (lam v * hv (G.gram v) (G.psiR v J *ᵥ z) z).re := by
+  have hsum
+      : ∑ v', 2 * (lam v' * hv (G.gram v') (thR th (actOn L.rep ℝ J x) v') (thR th x v')).re
+        = 2 * (lam v * hv (G.gram v) (G.psiR v J *ᵥ z) z).re := by
     rw [Finset.sum_eq_single v]
     · rw [thR_act L th hrep, hx]; simp
     · intro v' _ hv'
@@ -132,7 +142,9 @@ theorem UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula :
       simp [hv, Pi.single_eq_of_ne hv']
     · simp
   rw [hsum] at h1
-  have hif : (if v.embedding (L.e D.ω) = D.ρc then -Complex.I else Complex.I) = -(sgnV L v * Complex.I) := by
+  have hif
+      : (if v.embedding (L.e D.ω) = D.ρc then -Complex.I else Complex.I)
+        = -(sgnV L v * Complex.I) := by
     unfold sgnV
     split_ifs <;> simp
   have hss : sgnV L v * sgnV L v = 1 := by
@@ -143,16 +155,18 @@ theorem UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula :
   set h := hv (G.gram v) (G.psiR v J *ᵥ z) z with hh
   set q := star z ⬝ᵥ ((-(sgnV L v * Complex.I) • (G.gram v * G.psiR v J)) *ᵥ z) with hqdef
   have hqe : q = -(sgnV L v * Complex.I) * h := by
-    simp [hqdef, hh, hv, Matrix.neg_mulVec, Matrix.smul_mulVec, dotProduct_smul, Matrix.mulVec_mulVec]
+    simp [hqdef, hh, hv, Matrix.neg_mulVec, Matrix.smul_mulVec, dotProduct_smul,
+      Matrix.mulVec_mulVec]
   have hhq : h = sgnV L v * Complex.I * q := by
     rw [hqe]
     linear_combination (Complex.I * Complex.I * h) * hss + h * Complex.I_mul_I
   obtain ⟨hqre, hqim⟩ := Complex.pos_iff.1 hq
-  have hqr : q = (q.re : ℂ) := by
-    apply Complex.ext <;> simp [← hqim]
+  have hqr : q = (q.re : ℂ) := by apply Complex.ext <;> simp [← hqim]
   have hfin : (lam v * h).re = (lam v * sgnV L v * Complex.I).re * q.re := by
     rw [hhq, hqr]
-    have : lam v * (sgnV L v * Complex.I * (q.re : ℂ)) = (lam v * sgnV L v * Complex.I) * (q.re : ℂ) := by ring
+    have : lam v * (sgnV L v * Complex.I * (q.re : ℂ))
+        = (lam v * sgnV L v * Complex.I) * (q.re : ℂ) := by
+      ring
     simp only [Complex.ofReal_re]
     rw [this, Complex.re_mul_ofReal]
   rw [hfin] at h1

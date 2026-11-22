@@ -16,17 +16,22 @@ variable {G : Type} [Group G]
 
 def conjEquiv {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g * x * g⁻¹ ∈ H) : H' ≃ H where
   toFun x := ⟨g * x * g⁻¹, (hH' x).1 x.2⟩
-  invFun y := ⟨g⁻¹ * y * g, (hH' _).2 (by
-    have : g * (g⁻¹ * (y : G) * g) * g⁻¹ = y := by group
-    rw [this]; exact y.2)⟩
+  invFun y := ⟨
+    g⁻¹ * y * g,
+    (hH' _).2 (by
+      have : g * (g⁻¹ * (y : G) * g) * g⁻¹ = y := by group
+      rw [this]
+      exact y.2)
+  ⟩
   left_inv x := Subtype.ext (by simp only []; group)
   right_inv y := Subtype.ext (by simp only []; group)
 
 variable [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableSingletonClass G]
 
-theorem normaliser_conj {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g * x * g⁻¹ ∈ H)
-    {ρ : G → ℝ≥0∞} (hρ : IsQuotNormaliser H Measure.count ρ) :
-    IsQuotNormaliser H' Measure.count (fun x => ρ (g * x)) := by
+theorem normaliser_conj
+    {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g * x * g⁻¹ ∈ H)
+    {ρ : G → ℝ≥0∞} (hρ : IsQuotNormaliser H Measure.count ρ)
+    : IsQuotNormaliser H' Measure.count (fun x => ρ (g * x)) := by
   unfold IsQuotNormaliser at hρ ⊢
   refine ⟨hρ.1.comp (measurable_const_mul g), fun y => ?_⟩
   have h1 := hρ.2 (g * y)
@@ -37,9 +42,10 @@ theorem normaliser_conj {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g
   congr 1
   group
 
-theorem normaliser_unconj {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g * x * g⁻¹ ∈ H)
-    {ρ : G → ℝ≥0∞} (hρ : IsQuotNormaliser H' Measure.count ρ) :
-    IsQuotNormaliser H Measure.count (fun x => ρ (g⁻¹ * x)) := by
+theorem normaliser_unconj
+    {H H' : Subgroup G} {g : G} (hH' : ∀ x, x ∈ H' ↔ g * x * g⁻¹ ∈ H)
+    {ρ : G → ℝ≥0∞} (hρ : IsQuotNormaliser H' Measure.count ρ)
+    : IsQuotNormaliser H Measure.count (fun x => ρ (g⁻¹ * x)) := by
   have h2 : ∀ x, x ∈ H ↔ g⁻¹ * x * g⁻¹⁻¹ ∈ H' := by
     intro x
     rw [hH', show g * (g⁻¹ * x * g⁻¹⁻¹) * g⁻¹ = x by group]
@@ -58,8 +64,7 @@ theorem qConjOf_holds : QConjOf := by
       rw [← this]
       congr 1
       group
-    rw [hI G μ H' (fun x => F (g * x)) (fun x => ρ (g * x)) hmeas hinv hρ',
-      hI G μ H F ρ hF hFH hρ]
+    rw [hI G μ H' (fun x => F (g * x)) (fun x => ρ (g * x)) hmeas hinv hρ', hI G μ H F ρ hF hFH hρ]
     exact integral_mul_left_eq_self (fun x => F x * ((ρ x).toReal : ℂ)) g
   · have hex' : ¬ ∃ ρ, IsQuotNormaliser H' Measure.count ρ := by
       rintro ⟨ρ, hρ⟩

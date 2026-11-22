@@ -9,11 +9,11 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem exists_forall_ne_zero_of_countable_analytic :
-    ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] (U : Set E),
-      IsOpen U → IsPreconnected U → U.Nonempty → ∀ (ι : Type) [Countable ι] (f : ι → E → ℂ),
-      (∀ i, AnalyticOnNhd ℂ (f i) U) → (∀ i, ∃ x ∈ U, f i x ≠ 0) →
-      ∃ x ∈ U, ∀ i, f i x ≠ 0 := by
+theorem exists_forall_ne_zero_of_countable_analytic
+    : ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] (U : Set E),
+      IsOpen U → IsPreconnected U → U.Nonempty
+        → ∀ (ι : Type) [Countable ι] (f : ι → E → ℂ),
+          (∀ i, AnalyticOnNhd ℂ (f i) U) → (∀ i, ∃ x ∈ U, f i x ≠ 0) → ∃ x ∈ U, ∀ i, f i x ≠ 0 := by
   intro E _ _ _ U hU hc hne ι _ f hf hnz
   let S : ι → Set E := fun i => (U ∩ f i ⁻¹' ({0}ᶜ)) ∪ (closure U)ᶜ
   have hopen : ∀ i, IsOpen (S i) := fun i =>

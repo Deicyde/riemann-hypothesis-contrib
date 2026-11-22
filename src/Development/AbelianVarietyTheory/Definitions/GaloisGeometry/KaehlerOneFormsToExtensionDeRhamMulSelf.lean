@@ -13,25 +13,28 @@ open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD
 
 namespace GlobalTheory.W1
 
-variable (k K L : Type) [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L] [IsScalarTower k K L]
+variable
+  (k K L : Type)
+  [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L] [IsScalarTower k K L]
 
 def map1 : Ω[K⁄k] →ₗ[K] DR k L :=
   ((ι1 (R := k) (B := L)).restrictScalars K).comp (KaehlerDifferential.map k k K L)
 
 set_option autoImplicit false in
 open KaehlerDifferential in
-variable (k K L : Type) [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L]
-  [IsScalarTower k K L] in
-theorem _root_.GlobalTheory.W1.kaehlerOneFormsToExtensionDeRham_mul_self (ω : Ω[K⁄k]) :
-    _root_.GlobalTheory.W1.map1 k K L ω * _root_.GlobalTheory.W1.map1 k K L ω = 0 := by
+variable
+  (k K L : Type)
+  [Field k] [Field K] [Field L] [Algebra k K] [Algebra k L] [Algebra K L] [IsScalarTower k K L] in
+theorem _root_.GlobalTheory.W1.kaehlerOneFormsToExtensionDeRham_mul_self (ω : Ω[K⁄k])
+    : _root_.GlobalTheory.W1.map1 k K L ω * _root_.GlobalTheory.W1.map1 k K L ω = 0 := by
   unfold _root_.GlobalTheory.W1.map1 _root_.GlobalTheory.CechDR.ι1
   exact ExteriorAlgebra.ι_sq_zero _
 
-def mapDR : DR k K →ₐ[K] DR k L := ExteriorAlgebra.lift K ⟨map1 k K L, kaehlerOneFormsToExtensionDeRham_mul_self k K L⟩
+def mapDR : DR k K →ₐ[K] DR k L :=
+  ExteriorAlgebra.lift K ⟨map1 k K L, kaehlerOneFormsToExtensionDeRham_mul_self k K L⟩
 
 def IsTrDR (T : DR k L →ₗ[k] DR k K) : Prop :=
   ∀ (b : L) (ω : DR k K), T (b • mapDR k K L ω) = Algebra.trace K L b • ω
-
 
 open scoped Classical in
 open Classical in

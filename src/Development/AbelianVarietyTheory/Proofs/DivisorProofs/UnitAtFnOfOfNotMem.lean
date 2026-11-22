@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.Cartier GlobalTheory.Discrepancy
 
 namespace GlobalTheory.FieldPair
@@ -19,20 +20,23 @@ section SlopeTestRemainingChoices
 
 variable {X : Scheme.{0}} [IsIntegral X] {U : X.Opens} (hU : IsAffineOpen U) {y : X} (hy : y ∈ U)
 
-
 include hU in
-theorem unitAt_fnOf_of_not_mem {s : Γ(X, U)} (hs : s ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal) :
-    UnitAt y (fnOf U (gen_mem hy) s) := by
+theorem unitAt_fnOf_of_not_mem {s : Γ(X, U)} (hs : s ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal)
+    : UnitAt y (fnOf U (gen_mem hy) s) := by
   letI := X.presheaf.algebra_section_stalk (⟨y, hy⟩ : U)
   haveI := hU.isLocalization_stalk ⟨y, hy⟩
-  exact ⟨_, IsLocalization.map_units (X.presheaf.stalk y)
-    (⟨s, hs⟩ : (hU.primeIdealOf ⟨y, hy⟩).asIdeal.primeCompl), algebraMap_germ hy s⟩
-
+  exact ⟨
+    _,
+    IsLocalization.map_units (X.presheaf.stalk y)
+      (⟨s, hs⟩ : (hU.primeIdealOf ⟨y, hy⟩).asIdeal.primeCompl),
+    algebraMap_germ hy s
+  ⟩
 
 include hU in
-theorem regAt_exists_fraction {f : X.functionField} (hf : RegAt y f) :
-    ∃ c s : Γ(X, U), s ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal ∧
-      f * fnOf U (gen_mem hy) s = fnOf U (gen_mem hy) c := by
+theorem regAt_exists_fraction {f : X.functionField} (hf : RegAt y f)
+    : ∃ c s : Γ(X, U),
+      s ∉ (hU.primeIdealOf ⟨y, hy⟩).asIdeal
+        ∧ f * fnOf U (gen_mem hy) s = fnOf U (gen_mem hy) c := by
   letI := X.presheaf.algebra_section_stalk (⟨y, hy⟩ : U)
   haveI := hU.isLocalization_stalk ⟨y, hy⟩
   obtain ⟨a, rfl⟩ := hf
@@ -45,22 +49,22 @@ theorem regAt_exists_fraction {f : X.functionField} (hf : RegAt y f) :
 
 end SlopeTestRemainingChoices
 
-theorem isUnit_iff_inv_mem {K : Type} [Field K] {R : ValuationSubring K} (u : R) :
-    IsUnit u ↔ (u : K) ≠ 0 ∧ (u : K)⁻¹ ∈ R := by
+theorem isUnit_iff_inv_mem {K : Type} [Field K] {R : ValuationSubring K} (u : R)
+    : IsUnit u ↔ (u : K) ≠ 0 ∧ (u : K)⁻¹ ∈ R := by
   constructor
   · rintro ⟨v, rfl⟩
-    have h : ((v : R) : K) * ((v⁻¹ : Rˣ) : R) = 1 := by
-      rw [← R.coe_mul, Units.mul_inv]; rfl
+    have h : ((v : R) : K) * ((v⁻¹ : Rˣ) : R) = 1 := by rw [← R.coe_mul, Units.mul_inv]; rfl
     exact ⟨left_ne_zero_of_mul_eq_one h, (inv_eq_of_mul_eq_one_right h) ▸ (v⁻¹ : Rˣ).1.2⟩
   · rintro ⟨h0, hi⟩
     exact isUnit_iff_exists_inv.2 ⟨⟨_, hi⟩, Subtype.ext (mul_inv_cancel₀ h0)⟩
 
-theorem isPrimeOf_placeEquiv {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
-    (E : DivOver p) (x : X) :
-    (placeEquiv p E).IsPrimeOf (locRing x) ↔ ∃ z, z ⤳ x ∧ E.IsAt z := by
+theorem isPrimeOf_placeEquiv
+    {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k} (E : DivOver p) (x : X)
+    : (placeEquiv p E).IsPrimeOf (locRing x) ↔ ∃ z, z ⤳ x ∧ E.IsAt z := by
   obtain ⟨U, hU, hx, -⟩ := exists_isAffineOpen_mem_and_subset (x := x) (U := ⊤) trivial
-  have ord0 : ∀ {b : X.functionField}, b ≠ 0 → b ∈ E.ring → b⁻¹ ∈ E.ring →
-      (placeEquiv p E).ord b = 0 := fun {b} h0 h1 h2 => by
+  have ord0
+      : ∀ {b : X.functionField},
+        b ≠ 0 → b ∈ E.ring → b⁻¹ ∈ E.ring → (placeEquiv p E).ord b = 0 := fun {b} h0 h1 h2 => by
     have a1 := ((placeEquiv p E).ord_nonneg_iff h0).2 h1
     have a2 := ((placeEquiv p E).ord_nonneg_iff (inv_ne_zero h0)).2 h2
     rw [Place.ord_inv] at a2
@@ -71,14 +75,15 @@ theorem isPrimeOf_placeEquiv {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X
     let φ : Γ(X, U) →+* E.ring :=
       (fnOf U (gen_mem hx)).codRestrict E.ring fun a => hT _ (regAt_fnOf hx _ a)
     let P : PrimeSpectrum Γ(X, U) := ⟨(IsLocalRing.maximalIdeal E.ring).comap φ, inferInstance⟩
-    have memP (s : Γ(X, U)) : s ∉ P.asIdeal ↔
-        (fnOf U (gen_mem hx) s ≠ 0 ∧ (fnOf U (gen_mem hx) s)⁻¹ ∈ E.ring) := by
+    have memP (s : Γ(X, U))
+        : s ∉ P.asIdeal ↔ (fnOf U (gen_mem hx) s ≠ 0 ∧ (fnOf U (gen_mem hx) s)⁻¹ ∈ E.ring) := by
       change φ s ∉ IsLocalRing.maximalIdeal E.ring ↔ _
       rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not]
       exact isUnit_iff_inv_mem (φ s)
-    have hPQ : P ≤ hU.primeIdealOf ⟨x, hx⟩ := fun s hs => by_contra fun hs' =>
-      have h := unitAt_fnOf_of_not_mem hU hx hs'
-      (memP s).2 ⟨h.ne_zero, hT _ h.inv.regAt⟩ hs
+    have hPQ : P ≤ hU.primeIdealOf ⟨x, hx⟩ := fun s hs =>
+      by_contra fun hs' =>
+        have h := unitAt_fnOf_of_not_mem hU hx hs'
+        (memP s).2 ⟨h.ne_zero, hT _ h.inv.regAt⟩ hs
     have hz : hU.fromSpec P ∈ U := by
       have : hU.fromSpec P ∈ Set.range hU.fromSpec := ⟨P, rfl⟩
       rwa [hU.range_fromSpec] at this
@@ -86,8 +91,9 @@ theorem isPrimeOf_placeEquiv {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X
     have hP' : hU.primeIdealOf z = P :=
       hU.fromSpec.isOpenEmbedding.injective (hU.fromSpec_primeIdealOf z)
     have hzx : (z : X) ⤳ x := by
-      have h := ((PrimeSpectrum.le_iff_specializes P (hU.primeIdealOf ⟨x, hx⟩)).mp hPQ).map
-        hU.fromSpec.continuous
+      have h :=
+        ((PrimeSpectrum.le_iff_specializes P (hU.primeIdealOf ⟨x, hx⟩)).mp hPQ).map
+          hU.fromSpec.continuous
       rwa [hU.fromSpec_primeIdealOf ⟨x, hx⟩] at h
     clear_value z
     refine ⟨z, hzx, fun f => ⟨fun hf => ?_, fun hf => ?_⟩⟩
@@ -127,7 +133,14 @@ theorem isPrimeOf_placeEquiv {k : Type} [Field k] {X : Scheme.{0}} [IsIntegral X
     have hzU : z ∈ U := hzx.mem_open U.isOpen hx
     obtain ⟨c, s, hs, e⟩ := regAt_exists_fraction hU hzU ((hz f).1 hf)
     have hu := unitAt_fnOf_of_not_mem hU hzU hs
-    exact ⟨_, mem_locRing.2 (regAt_fnOf hx _ c), _, mem_locRing.2 (regAt_fnOf hx _ s), hu.ne_zero,
-      ord0 hu.ne_zero ((hz _).2 hu.regAt) ((hz _).2 hu.inv.regAt), e⟩
+    exact ⟨
+      _,
+      mem_locRing.2 (regAt_fnOf hx _ c),
+      _,
+      mem_locRing.2 (regAt_fnOf hx _ s),
+      hu.ne_zero,
+      ord0 hu.ne_zero ((hz _).2 hu.regAt) ((hz _).2 hu.inv.regAt),
+      e
+    ⟩
 
 end GlobalTheory.FieldPair

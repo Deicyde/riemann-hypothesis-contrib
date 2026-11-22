@@ -20,14 +20,19 @@ variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 theorem whitLeOne_of_dict
     (hU : ∀ n : ℕ, unipB k (Fin n) = GroundTheory.Automorphic.Iwasawa.unipotent k n)
     (hC : ∀ (ψ : AddChar k Circle) (n : ℕ) (u : unipB k (Fin n)),
-      ((GlobalTheory.LocGL.whitChar ψ n u : ℂˣ) : ℂ) =
-        GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ) (u : GL (Fin n) k))
-    (hR : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (N : Subgroup G)
-      (θ : N →* ℂˣ), Module.rank ℂ (TwJacquet ρ N θ) ≤ 1 ↔
-        Module.rank ℂ (GroundTheory.Automorphic.Whittaker.equivariantFunctionals ρ (fun u : N => ((θ u : ℂˣ) : ℂ))) ≤ 1)
-    (hA : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-      (ρ : Representation ℂ G V), GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ) :
-    GlobalTheory.BZMir.Whit.WhitLeOne k := by
+      ((GlobalTheory.LocGL.whitChar ψ n u : ℂˣ) : ℂ)
+        = GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ) (u : GL (Fin n) k))
+    (hR : ∀ {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
+        (N : Subgroup G) (θ : N →* ℂˣ),
+      Module.rank ℂ (TwJacquet ρ N θ) ≤ 1
+        ↔ Module.rank ℂ
+            (GroundTheory.Automorphic.Whittaker.equivariantFunctionals ρ
+              (fun u : N => ((θ u : ℂˣ) : ℂ)))
+          ≤ 1)
+    (hA : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V),
+      GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ)
+    : GlobalTheory.BZMir.Whit.WhitLeOne k := by
   intro n ψ V _ _ π hs hirr hψc hψ1
   have hadm : GroundTheory.Automorphic.IsAdmissible π :=
     (hA π).1 (PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top k n V π hs hirr)
@@ -40,12 +45,17 @@ theorem whitLeOne_of_dict
       (congrArg (fun f : AddChar k ℂ => f x) h).trans Circle.coe_one.symm
     exact h2
   have : π.IsIrreducible := hirr
-  have key := GroundTheory.Automorphic.ContragredientTranspose.rank_whittaker_le_one
-    (Circle.coeHom.compAddChar ψ) hc h1 π hadm
+  have key :=
+    GroundTheory.Automorphic.ContragredientTranspose.rank_whittaker_le_one
+      (Circle.coeHom.compAddChar ψ) hc h1 π hadm
   rw [hR]
-  have heq : GroundTheory.Automorphic.Whittaker.equivariantFunctionals π (fun u : unipB k (Fin n) => ((whitChar ψ n u : ℂˣ) : ℂ)) =
-      GroundTheory.Automorphic.Whittaker.equivariantFunctionals π (fun u : GroundTheory.Automorphic.Iwasawa.unipotent k n =>
-        GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ) (u : GL (Fin n) k)) := by
+  have heq
+      : GroundTheory.Automorphic.Whittaker.equivariantFunctionals π
+          (fun u : unipB k (Fin n) => ((whitChar ψ n u : ℂˣ) : ℂ))
+        = GroundTheory.Automorphic.Whittaker.equivariantFunctionals π
+          (fun u : GroundTheory.Automorphic.Iwasawa.unipotent k n =>
+            GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ)
+              (u : GL (Fin n) k)) := by
     ext ℓ
     constructor
     · intro h u v

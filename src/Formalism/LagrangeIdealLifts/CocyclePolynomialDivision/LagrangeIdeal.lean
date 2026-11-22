@@ -10,9 +10,11 @@ namespace Formalism.LIFT
 
 open Polynomial
 
-theorem prod_X_sub_C_dvd_of_injOn {R : Type} [CommRing R] [IsDomain R] {ι : Type}
-    (S : Finset ι) (c : ι → R) (hc : Set.InjOn c S) (G : R[X])
-    (hG : ∀ a ∈ S, G.eval (c a) = 0) : (∏ a ∈ S, (X - C (c a))) ∣ G := by
+theorem prod_X_sub_C_dvd_of_injOn
+    {R : Type} [CommRing R] [IsDomain R]
+    {ι : Type} (S : Finset ι) (c : ι → R) (hc : Set.InjOn c S)
+    (G : R[X]) (hG : ∀ a ∈ S, G.eval (c a) = 0)
+    : (∏ a ∈ S, (X - C (c a))) ∣ G := by
   classical
   by_cases hG0 : G = 0
   · rw [hG0]
@@ -22,11 +24,12 @@ theorem prod_X_sub_C_dvd_of_injOn {R : Type} [CommRing R] [IsDomain R] {ι : Typ
     intro x hx
     obtain ⟨a, ha, rfl⟩ := Multiset.mem_map.mp hx
     exact (Polynomial.mem_roots hG0).mpr (hG a ha)
-  calc (∏ a ∈ S, (X - C (c a))) = ((S.val.map c).map fun x => X - C x).prod := by
-        rw [Multiset.map_map]
-        rfl
+  calc
+    (∏ a ∈ S, (X - C (c a))) = ((S.val.map c).map fun x => X - C x).prod := by
+      rw [Multiset.map_map]
+      rfl
     _ ∣ (G.roots.map fun x => X - C x).prod :=
-        Multiset.prod_dvd_prod_of_le (Multiset.map_le_map hle)
+      Multiset.prod_dvd_prod_of_le (Multiset.map_le_map hle)
     _ ∣ G := Polynomial.prod_multiset_X_sub_C_dvd G
 
 theorem lagrangian_ideal_holds : LagrangeIdeal := by
@@ -39,13 +42,15 @@ theorem lagrangian_ideal_holds : LagrangeIdeal := by
     intro a ha
     rw [add_comm]
     exact Finset.le_sup (f := fun a => (∑ b ∈ S₂, w a b) + ∑ a' ∈ S₁.erase a, w a a') ha
-  have hval : ∀ a ∈ S₁, ∃ u : R,
-      ℓ ^ N = ((∏ a' ∈ S₁.erase a, (c a - c a')) * ∏ b ∈ S₂, (c a - c b)) * u := by
+  have hval
+      : ∀ a ∈ S₁, ∃ u : R,
+        ℓ ^ N = ((∏ a' ∈ S₁.erase a, (c a - c a')) * ∏ b ∈ S₂, (c a - c b)) * u := by
     intro a ha
     have hassoc : Associated ((∏ a' ∈ S₁.erase a, (c a - c a')) * ∏ b ∈ S₂, (c a - c b))
         (ℓ ^ ((∑ a' ∈ S₁.erase a, w a a') + ∑ b ∈ S₂, w a b)) := by
       rw [pow_add, ← Finset.prod_pow_eq_pow_sum, ← Finset.prod_pow_eq_pow_sum]
-      refine Associated.mul_mul (Associated.prod _ _ _ fun a' ha' => ?_) (Associated.prod _ _ _ fun b hb => ?_)
+      refine Associated.mul_mul (Associated.prod _ _ _ fun a' ha' => ?_)
+        (Associated.prod _ _ _ fun b hb => ?_)
       · exact hw a ha a' (Finset.mem_union_left _ (Finset.mem_of_mem_erase ha'))
           (Finset.ne_of_mem_erase ha').symm
       · refine hw a ha b (Finset.mem_union_right _ hb) ?_
@@ -57,8 +62,13 @@ theorem lagrangian_ideal_holds : LagrangeIdeal := by
   have hinj : Set.InjOn c S₁ := by
     intro a ha a' ha' heq
     by_contra hne
-    have hw' : w a a' ≤ N := le_trans (Finset.single_le_sum (f := fun x => w a x)
-      (fun _ _ => Nat.zero_le _) (Finset.mem_erase.mpr ⟨Ne.symm hne, ha'⟩)) (le_trans (Nat.le_add_right _ _) (hleN a ha))
+    have hw' : w a a' ≤ N :=
+      le_trans
+        (Finset.single_le_sum
+          (f := fun x => w a x)
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_erase.mpr ⟨Ne.symm hne, ha'⟩))
+        (le_trans (Nat.le_add_right _ _) (hleN a ha))
     have hpow : ℓ ^ w a a' ≠ 0 := by
       intro h0
       apply hℓN
@@ -74,8 +84,8 @@ theorem lagrangian_ideal_holds : LagrangeIdeal := by
       rw [hu a ha]
       ring
     · intro a₀ _ hne
-      rw [eval_mul, eval_prod, Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨Ne.symm hne, ha⟩)
-        (by simp), mul_zero]
+      rw [eval_mul, eval_prod,
+        Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨Ne.symm hne, ha⟩) (by simp), mul_zero]
     · intro h
       exact absurd ha h
   obtain ⟨k, hk⟩ := hQ

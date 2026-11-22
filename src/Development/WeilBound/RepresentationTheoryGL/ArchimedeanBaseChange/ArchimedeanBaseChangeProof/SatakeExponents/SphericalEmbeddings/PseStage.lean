@@ -15,12 +15,15 @@ open PositivityTheory.Rg.BcB.N3 PositivityTheory.Rg.BcB.N3.Pse
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 set_option maxHeartbeats 2000000 in
-theorem main {r t : ℕ} (A : Fin r → ℂˣ) (a b : ℂˣ) (B : Fin t → ℂˣ)
-    (T : (iP (k := k) ![a, b]).IntertwiningMap (iP (k := k) ![b, a])) (hT : KInj k T) :
-    ∃ T' : (iP (k := k) (Fin.append A (Fin.append ![a, b] B))).IntertwiningMap
-      (iP (k := k) (Fin.append A (Fin.append ![b, a] B))), KInj k T' := by
+theorem main
+    {r t : ℕ} (A : Fin r → ℂˣ)
+    (a b : ℂˣ)
+    (B : Fin t → ℂˣ)
+    (T : (iP (k := k) ![a, b]).IntertwiningMap (iP (k := k) ![b, a])) (hT : KInj k T)
+    : ∃ T' : (iP (k := k) (Fin.append A (Fin.append ![a, b] B))).IntertwiningMap
+        (iP (k := k) (Fin.append A (Fin.append ![b, a] B))),
+      KInj k T' := by
   obtain ⟨Ei⟩ := iP_append (k := k) 2 t ![a, b] B
   obtain ⟨Ei'⟩ := iP_append (k := k) 2 t ![b, a] B
   obtain ⟨Eo⟩ := iP_append (k := k) r (2 + t) A (Fin.append ![a, b] B)
@@ -35,9 +38,12 @@ theorem stageLift : StageLift k := by
   obtain ⟨t, ht⟩ : ∃ t, n = r + (2 + t) := ⟨n - (r + 2), by have := j.isLt; omega⟩
   subst ht
   obtain ⟨A, hA⟩ : ∃ A : Fin r → ℂˣ, ∀ l, A l = η (Fin.castAdd (2 + t) l) := ⟨_, fun _ => rfl⟩
-  obtain ⟨B, hB⟩ : ∃ B : Fin t → ℂˣ, ∀ l, B l = η (Fin.natAdd r (Fin.natAdd 2 l)) := ⟨_, fun _ => rfl⟩
-  have ei : ∀ h : 0 < 2, Fin.natAdd r (Fin.castAdd t (⟨0, h⟩ : Fin 2)) = i := fun h => Fin.ext (by simp [hr])
-  have ej : ∀ h : 1 < 2, Fin.natAdd r (Fin.castAdd t (⟨1, h⟩ : Fin 2)) = j := fun h => Fin.ext (by simp [hr, hij])
+  obtain ⟨B, hB⟩ : ∃ B : Fin t → ℂˣ, ∀ l, B l = η (Fin.natAdd r (Fin.natAdd 2 l)) :=
+    ⟨_, fun _ => rfl⟩
+  have ei : ∀ h : 0 < 2, Fin.natAdd r (Fin.castAdd t (⟨0, h⟩ : Fin 2)) = i := fun h =>
+    Fin.ext (by simp [hr])
+  have ej : ∀ h : 1 < 2, Fin.natAdd r (Fin.castAdd t (⟨1, h⟩ : Fin 2)) = j := fun h =>
+    Fin.ext (by simp [hr, hij])
   have h1 : η = Fin.append A (Fin.append ![η i, η j] B) := by
     funext x
     refine Fin.addCases (fun l => ?_) (fun l => ?_) x

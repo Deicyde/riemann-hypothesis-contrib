@@ -16,20 +16,27 @@ noncomputable section
 namespace GlobalTheory.ResEtaFOfPow
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 open Classical in
-theorem resEtaF_of_resEtaPow_k : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (B : Base F E),
-    _root_.UpperTheory.TP.W.GoodK σ B → ∀ (χ : (AF F ⊗[F] E)ˣ →* Circle) (n : ℕ),
-      ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ n → Formalism.IndefR.DatumF.ResEtaF χ n := by
+theorem resEtaF_of_resEtaPow_k
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      _root_.UpperTheory.TP.W.GoodK σ B
+        → ∀ (χ : (AF F ⊗[F] E)ˣ →* Circle) (n : ℕ),
+          ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ n
+            → Formalism.IndefR.DatumF.ResEtaF χ n := by
   intro F E _ _ _ _ _ σ B hB χ n hχ
   have hcm : IsCMExt F E σ := hB.cm
   refine ⟨exists_isEtaF hcm, fun η hη a => ?_⟩
   obtain ⟨-, h1, h2, h3⟩ := hη
   have hS : ∀ x ∈ normGrp F E, η x = 1 := by
-    have : normGrp F E ≤ η.ker := sup_le (by rintro _ ⟨y, rfl⟩; exact h1 y) (by rintro _ ⟨y, rfl⟩; exact h2 y)
+    have : normGrp F E ≤ η.ker :=
+      sup_le (by rintro _ ⟨y, rfl⟩; exact h1 y) (by rintro _ ⟨y, rfl⟩; exact h2 y)
     exact fun x hx => this hx
   have hsq : ∀ x, η x * η x = 1 := fun x => by rw [← map_mul]; exact hS _ (sq_mem_normGrp hcm x)
-  have key : ∀ x, ((χ (Formalism.IndefR.DatumF.idFF F E x) : Circle) : ℂ) = if x ∈ normGrp F E then 1 else (-1) ^ n :=
-    fun x => hχ x
+  have key
+      : ∀ x,
+        ((χ (Formalism.IndefR.DatumF.idFF F E x) : Circle) : ℂ)
+          = if x ∈ normGrp F E then 1 else (-1) ^ n := fun x =>
+    hχ x
   apply Circle.ext
   rw [key a, Circle.coe_pow]
   by_cases ha : a ∈ normGrp F E

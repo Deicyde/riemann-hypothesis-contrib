@@ -35,8 +35,9 @@ lemma herm_add_smul (x ξ y : Fin r → E) (e : E) : herm G (x + e • ξ) y = h
   rw [map_smul, smul_eq_mul] at h
   exact h
 
-variable {G} (hG : ∀ a b, cc (G a b) = G b a) {ξ : Fin r → E} {β : Fin n → Fin r → E}
-  (hβ : ∀ k, herm G (β k) ξ = 0) (hξξ : herm G ξ ξ = 0)
+variable
+  {G} (hG : ∀ a b, cc (G a b) = G b a)
+  {ξ : Fin r → E} {β : Fin n → Fin r → E} (hβ : ∀ k, herm G (β k) ξ = 0) (hξξ : herm G ξ ξ = 0)
 
 include hβ in
 lemma herm_B_ξ (c : Fin n → E) : herm G (∑ k, c k • β k) ξ = 0 := by

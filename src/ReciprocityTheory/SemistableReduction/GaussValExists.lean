@@ -9,16 +9,19 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MvPolynomial
 
-noncomputable def gaussRed {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U] {σ : Type}
-    (V : ValuationSubring U) (p : MvPolynomial σ Ω)
-    (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U)) :
-    MvPolynomial σ (IsLocalRing.ResidueField (V.comap (algebraMap Ω U))) :=
+noncomputable def gaussRed
+    {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U]
+    {σ : Type}
+    (V : ValuationSubring U) (p : MvPolynomial σ Ω) (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U))
+    : MvPolynomial σ (IsLocalRing.ResidueField (V.comap (algebraMap Ω U))) :=
   ∑ α ∈ p.support, monomial α (IsLocalRing.residue _ ⟨p.coeff α, hc α⟩)
 
-theorem gaussRed_coeff {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U] {σ : Type}
-    (V : ValuationSubring U) (p : MvPolynomial σ Ω)
-    (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U)) (α : σ →₀ ℕ) :
-    (gaussRed V p hc).coeff α = IsLocalRing.residue _ ⟨p.coeff α, hc α⟩ := by
+theorem gaussRed_coeff
+    {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U]
+    {σ : Type}
+    (V : ValuationSubring U) (p : MvPolynomial σ Ω) (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U))
+    (α : σ →₀ ℕ)
+    : (gaussRed V p hc).coeff α = IsLocalRing.residue _ ⟨p.coeff α, hc α⟩ := by
   classical
   unfold gaussRed
   rw [MvPolynomial.coeff_sum]
@@ -37,18 +40,24 @@ theorem gaussRed_coeff {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U] {σ : T
     rintro rfl
     exact h hb
 
-theorem gaussRed_eval {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U] {σ : Type}
-    (t : σ → U) (V : ValuationSubring U) (ht : ∀ s, t s ∈ V) (p : MvPolynomial σ Ω)
-    (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U)) :
-    letI := residueAlgebra V (algebraMap Ω U)
-    ∃ h : aeval t p ∈ V, IsLocalRing.residue V ⟨aeval t p, h⟩ =
-      aeval (fun s => IsLocalRing.residue V ⟨t s, ht s⟩) (gaussRed V p hc) := by
+theorem gaussRed_eval
+    {Ω U : Type} [Field Ω] [Field U] [Algebra Ω U]
+    {σ : Type} (t : σ → U)
+    (V : ValuationSubring U) (ht : ∀ s, t s ∈ V)
+    (p : MvPolynomial σ Ω) (hc : ∀ α, p.coeff α ∈ V.comap (algebraMap Ω U))
+    : letI := residueAlgebra V (algebraMap Ω U)
+      ∃ h : aeval t p ∈ V,
+        IsLocalRing.residue V ⟨aeval t p, h⟩
+          = aeval (fun s => IsLocalRing.residue V ⟨t s, ht s⟩) (gaussRed V p hc) := by
   try dsimp only
   letI := residueAlgebra V (algebraMap Ω U)
   classical
-  obtain ⟨y, hydef⟩ : ∃ y : V, y = ∑ α ∈ p.support,
-      comapInclusion V (algebraMap Ω U) ⟨p.coeff α, hc α⟩ *
-        ∏ s ∈ α.support, (⟨t s, ht s⟩ : V) ^ α s := ⟨_, rfl⟩
+  obtain ⟨y, hydef⟩
+      : ∃ y : V,
+        y = ∑ α ∈ p.support,
+          comapInclusion V (algebraMap Ω U) ⟨p.coeff α, hc α⟩ *
+            ∏ s ∈ α.support, (⟨t s, ht s⟩ : V) ^ α s :=
+    ⟨_, rfl⟩
   have hy : (y : U) = aeval t p := by
     change V.subtype y = _
     rw [hydef, MvPolynomial.aeval_def, MvPolynomial.eval₂_eq]

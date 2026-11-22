@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.LocallyConstantOfOpenSet.lc_of_open :
-    ∀ {G H : Type} [inst : Group G] [inst_1 : TopologicalSpace G]
-    [IsTopologicalGroup G] [inst_3 : Group H] (f : G →* H), IsOpen (↑f.ker : Set G) → IsLocallyConstant (⇑f : G → H) := by
+theorem UpperTheory.Reformulated.B.LocallyConstantOfOpenSet.lc_of_open
+    : ∀ {G H : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : Group H] (f : G →* H),
+      IsOpen (↑f.ker : Set G) → IsLocallyConstant (⇑f : G → H) := by
   intro G H _ _ _ _ f hk
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x

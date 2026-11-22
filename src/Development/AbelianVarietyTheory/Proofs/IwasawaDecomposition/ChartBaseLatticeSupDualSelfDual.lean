@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.TC.ChartBase
@@ -15,8 +17,8 @@ open NumberField
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem hform_one (σ : E →+* E) {n : ℕ} (x y : Fin n → E) :
-    Formalism.UG.hform σ (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
+theorem hform_one (σ : E →+* E) {n : ℕ} (x y : Fin n → E)
+    : Formalism.UG.hform σ (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
   unfold Formalism.UG.hform
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [Matrix.one_apply]
@@ -24,12 +26,16 @@ theorem hform_one (σ : E →+* E) {n : ℕ} (x y : Fin n → E) :
 theorem sig_int (σ : E →+* E) (s : 𝓞 E) : σ (s : E) ∈ (algebraMap (𝓞 E) E).range :=
   ⟨RingOfIntegers.mapRingHom σ s, rfl⟩
 
-theorem sup_dual_eq (σ : E →+* E) {n : ℕ} (t pb : 𝓞 E) (ht : (t : E) ≠ 0) (hpb : (pb : E) = σ t)
+theorem sup_dual_eq
+    (σ : E →+* E)
+    {n : ℕ}
+    (t pb : 𝓞 E) (ht : (t : E) ≠ 0) (hpb : (pb : E) = σ t)
     (Λ : Submodule (𝓞 E) (Fin n → E))
     (hΛ : ∀ x, x ∈ Λ ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = r ∧ (j.1 + 1 = n → t ∣ r))
-    (M : Submodule (𝓞 E) (Fin n → E))
-    (hM : ∀ x, x ∈ M ↔ ∀ j, x j ∈ (algebraMap (𝓞 E) E).range) :
-    Λ ⊔ Ideal.span {pb} • Submodule.span (𝓞 E) (Formalism.BasicNotions.dualSet σ (1 : Matrix (Fin n) (Fin n) E) Λ) = M := by
+    (M : Submodule (𝓞 E) (Fin n → E)) (hM : ∀ x, x ∈ M ↔ ∀ j, x j ∈ (algebraMap (𝓞 E) E).range)
+    : Λ ⊔ Ideal.span {pb}
+        • Submodule.span (𝓞 E) (Formalism.BasicNotions.dualSet σ (1 : Matrix (Fin n) (Fin n) E) Λ)
+      = M := by
   classical
   have hσt : σ (t : E) ≠ 0 := (map_ne_zero σ).2 ht
   have hpb0 : (pb : E) ≠ 0 := by rw [hpb]; exact hσt
@@ -37,24 +43,32 @@ theorem sup_dual_eq (σ : E →+* E) {n : ℕ} (t pb : 𝓞 E) (ht : (t : E) ≠
   · refine sup_le (fun x hx => (hM x).2 fun j => ?_) ?_
     · obtain ⟨r, hr, -⟩ := (hΛ x).1 hx j
       exact ⟨r, hr.symm⟩
-    ·
-      have key : ∀ y ∈ Submodule.span (𝓞 E) (Formalism.BasicNotions.dualSet σ (1 : Matrix (Fin n) (Fin n) E) Λ), pb • y ∈ M := by
+    · have key
+          : ∀ y
+              ∈ Submodule.span (𝓞 E)
+                (Formalism.BasicNotions.dualSet σ (1 : Matrix (Fin n) (Fin n) E) Λ),
+            pb • y ∈ M := by
         intro y hy
         induction hy using Submodule.span_induction with
         | mem y hy =>
           refine (hM _).2 fun j => ?_
-          have hs : ∀ c : 𝓞 E, (∀ j' : Fin n, j'.1 + 1 = n → t ∣ (if j' = j then c else 0)) →
-              Pi.single j (c : E) ∈ Λ := by
+          have hs
+              : ∀ c : 𝓞 E,
+                (∀ j' : Fin n, j'.1 + 1 = n → t ∣ (if j' = j then c else 0))
+                  → Pi.single j (c : E) ∈ Λ := by
             intro c hc
             refine (hΛ _).2 fun j' => ⟨if j' = j then c else 0, ?_, hc j'⟩
             by_cases h : j' = j
             · subst h; simp
             · simp [h, Pi.single_apply]
-          have hval : ∀ c : 𝓞 E, Pi.single j (c : E) ∈ Λ → σ (c : E) * y j ∈ (algebraMap (𝓞 E) E).range := by
+          have hval
+              : ∀ c : 𝓞 E,
+                Pi.single j (c : E) ∈ Λ → σ (c : E) * y j ∈ (algebraMap (𝓞 E) E).range := by
             intro c hc
             have := hy _ hc
             rw [hform_one] at this
-            rw [Finset.sum_eq_single j (fun b _ hb => by simp [Pi.single_apply, hb]) (by simp)] at this
+            rw [Finset.sum_eq_single j (fun b _ hb => by simp [Pi.single_apply, hb]) (by simp)]
+              at this
             simpa using this
           show ((pb • y) j) ∈ _
           rw [Pi.smul_apply, Algebra.smul_def]
@@ -62,10 +76,12 @@ theorem sup_dual_eq (σ : E →+* E) {n : ℕ} (t pb : 𝓞 E) (ht : (t : E) ≠
           · have h1 := hval t (hs t fun j' _ => by split_ifs <;> simp)
             rw [show algebraMap (𝓞 E) E pb = (pb : E) from rfl, hpb]
             exact h1
-          · have h1 := hval 1 (hs 1 fun j' hj' => by
-              split_ifs with h
-              · subst h; exact absurd hj' hj
-              · simp)
+          · have h1 :=
+              hval 1
+                (hs 1 fun j' hj' => by
+                  split_ifs with h
+                  · subst h; exact absurd hj' hj
+                  · simp)
             have h1' : y j ∈ (algebraMap (𝓞 E) E).range := by simpa using h1
             obtain ⟨a, ha⟩ := h1'
             exact ⟨pb * a, by rw [map_mul, ha]⟩
@@ -118,8 +134,8 @@ open NumberField
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem mem_reL_iff {a b : ℕ} (h : a = b) (L : Submodule (𝓞 E) (Fin a → E)) (x : Fin a → E) :
-    x ∈ L ↔ Formalism.L2.Forms.reV h E x ∈ Formalism.L2.Forms.reL h L := by
+theorem mem_reL_iff {a b : ℕ} (h : a = b) (L : Submodule (𝓞 E) (Fin a → E)) (x : Fin a → E)
+    : x ∈ L ↔ Formalism.L2.Forms.reV h E x ∈ Formalism.L2.Forms.reL h L := by
   subst h
   have e : ∀ y : Fin a → E, Formalism.L2.Forms.reV rfl E y = y := fun y => by
     funext j; simp [Formalism.L2.Forms.reV]
@@ -133,18 +149,20 @@ theorem mem_reL_iff {a b : ℕ} (h : a = b) (L : Submodule (𝓞 E) (Fin a → E
       exact this
     exact this ▸ hy
 
-theorem reV_apply {a b : ℕ} (h : a = b) (x : Fin a → E) (j : Fin b) :
-    Formalism.L2.Forms.reV h E x j = x (Fin.cast h.symm j) := by
+theorem reV_apply {a b : ℕ} (h : a = b) (x : Fin a → E) (j : Fin b)
+    : Formalism.L2.Forms.reV h E x j = x (Fin.cast h.symm j) := by
   subst h; simp [Formalism.L2.Forms.reV]
 
 end GlobalTheory.Mem.Col2.TC.ChartBase
 
 namespace GlobalTheory.Mem.Col2.TC.ChartBase
 
-theorem mem_of_baseL {B : Base} {a b : ℕ} (h : a = b) (t : 𝓞 B.host.E) (L : Submodule (𝓞 B.host.E) (Fin a → B.host.E))
+theorem mem_of_baseL
+    {B : Base} {a b : ℕ}
+    (h : a = b) (t : 𝓞 B.host.E) (L : Submodule (𝓞 B.host.E) (Fin a → B.host.E))
     (L' : Submodule (𝓞 B.host.E) (Fin b → B.host.E)) (hL' : L' = Formalism.L2.Forms.reL h L)
-    (hb : ∀ x, x ∈ L' ↔ x ∈ baseL B b t) (x : Fin a → B.host.E) :
-    x ∈ L ↔ ∀ j : Fin a, ∃ r : 𝓞 B.host.E, x j = r ∧ (j.1 + 1 = a → t ∣ r) := by
+    (hb : ∀ x, x ∈ L' ↔ x ∈ baseL B b t) (x : Fin a → B.host.E)
+    : x ∈ L ↔ ∀ j : Fin a, ∃ r : 𝓞 B.host.E, x j = r ∧ (j.1 + 1 = a → t ∣ r) := by
   rw [mem_reL_iff h L x, ← hL', hb]
   unfold baseL
   simp only [Set.mem_setOf_eq, reV_apply]
@@ -158,22 +176,43 @@ theorem mem_of_baseL {B : Base} {a b : ℕ} (h : a = b) (t : 𝓞 B.host.E) (L :
 
 end GlobalTheory.Mem.Col2.TC.ChartBase
 
-
 open GlobalTheory.Mem.Col2.TC.ChartBase in
-theorem GlobalTheory.Mem.Col2.TC.chart_base_sup_dual : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ∀ (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)) (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)) (A : ∀ u, Formalism.L2.Herm.AtT (I.rec7 l Z) u (H.vT u) (H.Fv u)), (∀ u, I.StdF l Z u (F u) ∧ I.StdLvC l Z u (F u)) → CarH H F → CarT H F A → ∀ u (pb : 𝓞 (I.rec7 l Z).host.E), (pb : (I.rec7 l Z).host.E) = (I.rec7 l Z).host.conj ((A u).piU : (I.rec7 l Z).host.E) → ∀ (i : ℕ) (h1 : 1 ≤ i) (hm : i ≤ (I.rec7 l Z).R.m) (β : H.Ch u i), (H.lev u i h1 hm β).Lb ⊔ Ideal.span {pb} • Formalism.L2.Herm.dualL (I.rec7 l Z).sp.cm ((I.rec7 l Z).sp.X i) (H.lev u i h1 hm β).Lb = Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i) ((I.rec7 l Z).sp.X i).L0 := by
+theorem GlobalTheory.Mem.Col2.TC.chart_base_sup_dual
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)),
+          ∀ (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z))
+              (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u))
+              (A : ∀ u, Formalism.L2.Herm.AtT (I.rec7 l Z) u (H.vT u) (H.Fv u)),
+            (∀ u, I.StdF l Z u (F u) ∧ I.StdLvC l Z u (F u)) → CarH H F → CarT H F A
+              → ∀ u (pb : 𝓞 (I.rec7 l Z).host.E),
+                (pb : (I.rec7 l Z).host.E)
+                    = (I.rec7 l Z).host.conj ((A u).piU : (I.rec7 l Z).host.E)
+                  → ∀ (i : ℕ) (h1 : 1 ≤ i) (hm : i ≤ (I.rec7 l Z).R.m) (β : H.Ch u i),
+                    (H.lev u i h1 hm β).Lb
+                        ⊔ Ideal.span {pb} • Formalism.L2.Herm.dualL (I.rec7 l Z).sp.cm
+                          ((I.rec7 l Z).sp.X i) (H.lev u i h1 hm β).Lb
+                      = Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i)
+                        ((I.rec7 l Z).sp.X i).L0 := by
   intro B X I hOk hP l Z H F A hS hH hT u pb hpb i h1 hm β
   have hC := GlobalTheory.T.trueColumn_spaces_standard_in_frameCoords I hOk hP l Z
   obtain ⟨hG, hL0, -⟩ := hC.2.2.2 i hm
 
   have hG1 : ((I.rec7 l Z).sp.X i).gram = 1 := by
     ext a b
-    have := congrFun (congrFun hG (finCongr (rankN (I.rec7 l Z) i hm) a)) (finCongr (rankN (I.rec7 l Z) i hm) b)
+    have :=
+      congrFun (congrFun hG (finCongr (rankN (I.rec7 l Z) i hm) a))
+        (finCongr (rankN (I.rec7 l Z) i hm) b)
     simpa [gramN, Matrix.one_apply] using this
 
-  have hσ : ∀ x : (I.rec7 l Z).host.E, ((I.rec7 l Z).sp.cm.sig : (I.rec7 l Z).host.E →+* (I.rec7 l Z).host.E) x = (I.rec7 l Z).host.conj x := fun x => by
+  have hσ
+      : ∀ x : (I.rec7 l Z).host.E,
+        ((I.rec7 l Z).sp.cm.sig : (I.rec7 l Z).host.E →+* (I.rec7 l Z).host.E) x
+          = (I.rec7 l Z).host.conj x := fun x => by
     have := (I.rec7 l Z).host.isCMField_hostE
-    exact (I.rec7 l Z).host.φ₀.injective ((NumberField.IsCMField.complexEmbedding_complexConj _ (I.rec7 l Z).host.φ₀ x).trans
-      ((I.rec7 l Z).host.conjE_apply (I.rec7 l Z).host.φ₀ x).symm)
+    exact (I.rec7 l Z).host.φ₀.injective
+      ((NumberField.IsCMField.complexEmbedding_complexConj _ (I.rec7 l Z).host.φ₀ x).trans
+        ((I.rec7 l Z).host.conjE_apply (I.rec7 l Z).host.φ₀ x).symm)
 
   have hpi : (A u).piU = X.piT u := (hT.piU u).symm.trans (hS u).1.piU
   have hT0 : ((X.piT u : 𝓞 B.host.E) : B.host.E) ≠ 0 := fun h0 => by
@@ -181,13 +220,19 @@ theorem GlobalTheory.Mem.Col2.TC.chart_base_sup_dual : ∀ {B : Base} {X : PreX 
     rw [h0, zero_mul] at e
     exact (B.T_prime u).ne_zero (by exact_mod_cast e.symm)
 
-  have hM : ∀ x, x ∈ Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i) ((I.rec7 l Z).sp.X i).L0 ↔ ∀ j, x j ∈ (algebraMap (𝓞 (I.rec7 l Z).host.E) (I.rec7 l Z).host.E).range := by
+  have hM
+      : ∀ x,
+        x ∈ Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i) ((I.rec7 l Z).sp.X i).L0
+          ↔ ∀ j, x j ∈ (algebraMap (𝓞 (I.rec7 l Z).host.E) (I.rec7 l Z).host.E).range := by
     intro x
     rw [mem_reL_iff (rankN (I.rec7 l Z) i hm) _ x]
-    have e : Formalism.L2.Forms.reL (rankN (I.rec7 l Z) i hm)
-        (Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i) ((I.rec7 l Z).sp.X i).L0) = selfDualLatticeCoords (I.rec7 l Z) i hm := by
+    have e
+        : Formalism.L2.Forms.reL (rankN (I.rec7 l Z) i hm)
+            (Formalism.L2.Herm.crdLat ((I.rec7 l Z).sp.X i) ((I.rec7 l Z).sp.X i).L0)
+          = selfDualLatticeCoords (I.rec7 l Z) i hm := by
       unfold Formalism.L2.Forms.reL Formalism.L2.Herm.crdLat
-      rw [← Submodule.map_comp]; rfl
+      rw [← Submodule.map_comp]
+      rfl
     rw [e, hL0]
     simp only [reV_apply]
     constructor
@@ -196,8 +241,11 @@ theorem GlobalTheory.Mem.Col2.TC.chart_base_sup_dual : ∀ {B : Base} {X : PreX 
       rwa [Fin.cast_cast, Fin.cast_eq_self] at h'
     · intro H j; exact H _
 
-  have hΛ : ∀ x, x ∈ (H.lev u i h1 hm β).Lb ↔ ∀ j : Fin ((I.rec7 l Z).sp.X i).rank, ∃ r : 𝓞 (I.rec7 l Z).host.E, x j = r ∧
-      (j.1 + 1 = ((I.rec7 l Z).sp.X i).rank → X.piT u ∣ r) := by
+  have hΛ
+      : ∀ x,
+        x ∈ (H.lev u i h1 hm β).Lb
+          ↔ ∀ j : Fin ((I.rec7 l Z).sp.X i).rank, ∃ r : 𝓞 (I.rec7 l Z).host.E,
+            x j = r ∧ (j.1 + 1 = ((I.rec7 l Z).sp.X i).rank → X.piT u ∣ r) := by
     rcases Nat.lt_or_ge i (I.rec7 l Z).R.m with hlt | hge
     · have h2 : i + 1 ≤ (I.rec7 l Z).R.m := hlt
       have hc := hH.carC u i h1 h2 β
@@ -210,7 +258,9 @@ theorem GlobalTheory.Mem.Col2.TC.chart_base_sup_dual : ∀ {B : Base} {X : PreX 
       exact mem_of_baseL (rankN (I.rec7 l Z) _ le_rfl) (X.piT u) _ _ hc.Lb_eq (hk.lb ())
   unfold Formalism.L2.Herm.dualL
   rw [hG1]
-  exact sup_dual_eq _ (X.piT u) pb hT0 (by
-    have e := hσ ((X.piT u : 𝓞 B.host.E) : B.host.E)
-    rw [hpi] at hpb
-    exact hpb.trans e.symm) _ hΛ _ hM
+  exact sup_dual_eq _ (X.piT u) pb hT0
+    (by
+      have e := hσ ((X.piT u : 𝓞 B.host.E) : B.host.E)
+      rw [hpi] at hpb
+      exact hpb.trans e.symm)
+    _ hΛ _ hM

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma crtPrimes (T : Finset ℕ) (hT : ∀ q ∈ T, q.Prime) (f : ℕ → ℤ) :
@@ -76,11 +77,12 @@ private lemma localInv (q : ℕ) (hq : q.Prime) (tr nm r : ℤ) (hD : ¬ (q : �
   refine ⟨b, -a, ?_⟩
   linear_combination hab
 
-theorem UpperTheory.Gal.W2.Seed.pIdemEx :
-    IdemEx := by
+theorem UpperTheory.Gal.W2.Seed.pIdemEx : IdemEx := by
   intro E _ _ bar ω tr nm _ hsum hprod M hM hloc
-  have hex : ∀ q : ℕ, q.Prime → q ∣ M → ∃ r s : ℤ, (q : ℤ) ∣ r ^ 2 - tr * r + nm ∧
-      (q : ℤ) ∣ s * (tr - 2 * r) - 1 := by
+  have hex
+      : ∀ q : ℕ,
+        q.Prime → q ∣ M
+          → ∃ r s : ℤ, (q : ℤ) ∣ r ^ 2 - tr * r + nm ∧ (q : ℤ) ∣ s * (tr - 2 * r) - 1 := by
     intro q hq hqM
     obtain ⟨hD, r, hr⟩ := hloc q hq hqM
     obtain ⟨s, hs⟩ := localInv q hq tr nm r hD hr

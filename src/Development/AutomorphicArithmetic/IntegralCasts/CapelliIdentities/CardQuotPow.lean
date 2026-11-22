@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Yzb5.resQ :
-    {F : Type} → [inst : Field F] → [inst_1 : ValuativeRel F] → ↥(ValuativeRel.valuation F).integer → ℕ :=
-    fun {F : Type} [Field F] [ValuativeRel F] (ϖ : ↥(ValuativeRel.valuation F).integer) ↦
-      Nat.card (↥(ValuativeRel.valuation F).integer ⧸ Ideal.span {ϖ})
+noncomputable def UpperTheory.Reformulated.B.Yzb5.resQ
+    : {F : Type} → [inst : Field F] → [inst_1 : ValuativeRel F]
+      → ↥(ValuativeRel.valuation F).integer
+      → ℕ := fun {F : Type} [Field F] [ValuativeRel F] (ϖ : ↥(ValuativeRel.valuation F).integer) ↦
+  Nat.card (↥(ValuativeRel.valuation F).integer ⧸ Ideal.span {ϖ})
 
 private lemma UpperTheory.Reformulated.B.Yzb5.card_quot_pow {R : Type*} [CommRing R] [IsDomain R] (p : R) (hp : p ≠ 0)
     (n : ℕ) :
@@ -104,18 +105,27 @@ private lemma UpperTheory.Reformulated.B.Yzb5.card_coker {R : Type*} [CommRing R
     Ideal.span_singleton_eq_span_singleton.mpr (hk i)
   rw [hs, UpperTheory.Reformulated.B.Yzb5.card_quot_pow p hp.ne_zero]
 
-theorem UpperTheory.Reformulated.B.Yzb5.relIndex_map :
-    ∀ {F : Type} [inst : Field F] [inst_1 : ValuativeRel F] [inst_2 : TopologicalSpace F] [IsNonarchimedeanLocalField F]
-      {ϖ : ↥(ValuativeRel.valuation F).integer},
-      Irreducible ϖ →
-        ∀ {W : Type} [inst_4 : AddCommGroup W] [inst_5 : _root_.Module F W] {ι : Type} [Fintype ι] (b : Module.Basis ι F W)
-          (ψ : W →ₗ[F] W) (a : ℤ) (u : (↥(ValuativeRel.valuation F).integer)ˣ),
-          (LinearMap.det : (W →ₗ[F] W) → F) ψ = (↑ϖ : F) ^ a * (↑(↑u : ↥(ValuativeRel.valuation F).integer) : F) →
-            ∀ (W0 : AddSubgroup W),
-              (∀ (x : W), x ∈ W0 ↔ ∀ (i : ι), ((b.repr : W → ι →₀ F) x : ι → F) i ∈ (ValuativeRel.valuation F).integer) →
-                (∀ (i j : ι),
-                    ((b.repr : W → ι →₀ F) ((ψ : W → W) ((b : ι → W) j)) : ι → F) i ∈ (ValuativeRel.valuation F).integer) →
-                  ∃ (m : ℕ), a = (↑m : ℤ) ∧ (AddSubgroup.map ψ.toAddMonoidHom W0).relIndex W0 = UpperTheory.Reformulated.B.Yzb5.resQ ϖ ^ m := by
+theorem UpperTheory.Reformulated.B.Yzb5.relIndex_map
+    : ∀ {F : Type} [inst : Field F] [inst_1 : ValuativeRel F] [inst_2 : TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] {ϖ : ↥(ValuativeRel.valuation F).integer},
+      Irreducible ϖ
+        → ∀ {W : Type} [inst_4 : AddCommGroup W] [inst_5 : _root_.Module F W] {ι : Type} [Fintype ι]
+            (b : Module.Basis ι F W) (ψ : W →ₗ[F] W) (a : ℤ)
+            (u : (↥(ValuativeRel.valuation F).integer)ˣ),
+          (LinearMap.det : (W →ₗ[F] W) → F) ψ
+              = (↑ϖ : F) ^ a * (↑(↑u : ↥(ValuativeRel.valuation F).integer) : F)
+            → ∀ (W0 : AddSubgroup W),
+              (∀ (x : W),
+                  x ∈ W0
+                    ↔ ∀ (i : ι),
+                      ((b.repr : W → ι →₀ F) x : ι → F) i ∈ (ValuativeRel.valuation F).integer)
+                → (∀ (i j : ι),
+                  ((b.repr : W → ι →₀ F) ((ψ : W → W) ((b : ι → W) j)) : ι → F) i
+                    ∈ (ValuativeRel.valuation F).integer)
+                → ∃ (m : ℕ),
+                  a = (↑m : ℤ)
+                    ∧ (AddSubgroup.map ψ.toAddMonoidHom W0).relIndex W0
+                      = UpperTheory.Reformulated.B.Yzb5.resQ ϖ ^ m := by
   intro F _ _ _ _ ϖ hϖ W _ _ ι _ b ψ a u hdet W0 hW0 hint
   classical
   let f := (ValuativeRel.valuation F).integer.subtype
@@ -127,8 +137,8 @@ theorem UpperTheory.Reformulated.B.Yzb5.relIndex_map :
     simp [f, M, LinearMap.toMatrix_apply]
     rfl
   have hϖ0 : (ϖ : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
-  have hu0 : ((u : (ValuativeRel.valuation F).integer) : F) ≠ 0 :=
-    fun h => u.ne_zero (Subtype.ext h)
+  have hu0 : ((u : (ValuativeRel.valuation F).integer) : F) ≠ 0 := fun h =>
+    u.ne_zero (Subtype.ext h)
   have hM0 : M.det ≠ 0 := by
     intro h
     rw [h, map_zero, hdet] at hMdet
@@ -141,8 +151,9 @@ theorem UpperTheory.Reformulated.B.Yzb5.relIndex_map :
     rw [zero_lt_iff]
     exact (Valuation.ne_zero_iff _).mpr hϖ0
   have ham : a = (m : ℤ) := by
-    have h1 : (ϖ : F) ^ a * ((u : (ValuativeRel.valuation F).integer) : F)
-        = ((v : (ValuativeRel.valuation F).integer) : F) * (ϖ : F) ^ (m : ℤ) := by
+    have h1
+        : (ϖ : F) ^ a * ((u : (ValuativeRel.valuation F).integer) : F)
+          = ((v : (ValuativeRel.valuation F).integer) : F) * (ϖ : F) ^ (m : ℤ) := by
       rw [← hdet, ← hMdet, hv]
       simp [f]
     have h2 := congrArg (ValuativeRel.valuation F) h1
@@ -190,8 +201,9 @@ theorem UpperTheory.Reformulated.B.Yzb5.relIndex_map :
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, map_smul, map_smul, Finsupp.smul_apply, smul_eq_mul, mul_comm]
     rfl
-  have hmap : AddSubgroup.map ψ.toAddMonoidHom W0
-      = AddSubgroup.map e (LinearMap.range M.mulVecLin).toAddSubgroup := by
+  have hmap
+      : AddSubgroup.map ψ.toAddMonoidHom W0
+        = AddSubgroup.map e (LinearMap.range M.mulVecLin).toAddSubgroup := by
     ext w
     rw [← hrange]
     simp only [AddSubgroup.mem_map, AddSubgroup.mem_top, true_and, Submodule.mem_toAddSubgroup,

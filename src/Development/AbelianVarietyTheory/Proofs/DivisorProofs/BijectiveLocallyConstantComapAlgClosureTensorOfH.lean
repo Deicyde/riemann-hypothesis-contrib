@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsEquival
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 noncomputable section
 
@@ -15,28 +16,31 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem locallyConstant_eq_of_specializes {Y Λ : Type*} [TopologicalSpace Y]
-    (φ : LocallyConstant Y Λ) {y y' : Y} (h : y ⤳ y') : φ y = φ y' :=
+theorem locallyConstant_eq_of_specializes
+    {Y Λ : Type*} [TopologicalSpace Y] (φ : LocallyConstant Y Λ) {y y' : Y} (h : y ⤳ y')
+    : φ y = φ y' :=
   h.mem_open (φ.isLocallyConstant.isOpen_fiber (φ y')) rfl
 
-theorem mem_iff_of_specializes_of_isClopen {Y : Type*} [TopologicalSpace Y] {V : Set Y}
-    (hV : IsClopen V) {y y' : Y} (h : y ⤳ y') : y ∈ V ↔ y' ∈ V :=
+theorem mem_iff_of_specializes_of_isClopen
+    {Y : Type*} [TopologicalSpace Y] {V : Set Y} (hV : IsClopen V) {y y' : Y} (h : y ⤳ y')
+    : y ∈ V ↔ y' ∈ V :=
   ⟨fun hy ↦ h.mem_closed hV.1 hy, fun hy ↦ h.mem_open hV.2 hy⟩
 
-theorem bijective_locallyConstant_comap_of_specializes_of_isClopen {X Y : Type*}
-    [TopologicalSpace X] [TopologicalSpace Y] (Λ : Type*) (f : C(X, Y))
-    (h1 : ∀ y : Y, ∃ x : X, y ⤳ f x)
-    (h2 : ∀ U : Set X, IsClopen U → ∃ V : Set Y, IsClopen V ∧ f ⁻¹' V = U) :
-    Function.Bijective (fun φ : LocallyConstant Y Λ ↦ φ.comap f) := by
+theorem bijective_locallyConstant_comap_of_specializes_of_isClopen
+    {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
+    (Λ : Type*)
+    (f : C(X, Y)) (h1 : ∀ y : Y, ∃ x : X, y ⤳ f x)
+    (h2 : ∀ U : Set X, IsClopen U → ∃ V : Set Y, IsClopen V ∧ f ⁻¹' V = U)
+    : Function.Bijective (fun φ : LocallyConstant Y Λ ↦ φ.comap f) := by
   choose g hg using h1
   refine ⟨fun φ ψ hφψ ↦ ?_, fun ψ ↦ ?_⟩
   · ext y
-    have h : (φ.comap f) (g y) = (ψ.comap f) (g y) := by
-      rw [show φ.comap f = ψ.comap f from hφψ]
+    have h : (φ.comap f) (g y) = (ψ.comap f) (g y) := by rw [show φ.comap f = ψ.comap f from hφψ]
     rw [locallyConstant_eq_of_specializes φ (hg y), locallyConstant_eq_of_specializes ψ (hg y)]
     simpa using h
-  · have key : ∀ l : Λ, ∃ V : Set Y, IsClopen V ∧ f ⁻¹' V = {x | ψ x = l} ∧
-        (fun y ↦ ψ (g y)) ⁻¹' {l} = V := by
+  · have key
+        : ∀ l : Λ, ∃ V : Set Y,
+          IsClopen V ∧ f ⁻¹' V = {x | ψ x = l} ∧ (fun y ↦ ψ (g y)) ⁻¹' {l} = V := by
       intro l
       obtain ⟨V, hV, hVU⟩ := h2 _ (ψ.isLocallyConstant.isClopen_fiber l)
       refine ⟨V, hV, hVU, ?_⟩
@@ -56,18 +60,19 @@ theorem bijective_locallyConstant_comap_of_specializes_of_isClopen {X Y : Type*}
       rw [← hV'] at hx
       exact hx
 
-theorem map_maximalIdeal_le_of_isIntegral (A B : Type*) [CommRing A] [IsLocalRing A] [CommRing B]
-    [Algebra A B] [Algebra.IsIntegral A B] (M : Ideal B) [M.IsMaximal] :
-    (maximalIdeal A).map (algebraMap A B) ≤ M := by
+theorem map_maximalIdeal_le_of_isIntegral
+    (A B : Type*) [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
+    (M : Ideal B) [M.IsMaximal]
+    : (maximalIdeal A).map (algebraMap A B) ≤ M := by
   rw [Ideal.map_le_iff_le_comap]
-  have : (M.comap (algebraMap A B)).IsMaximal :=
-    Ideal.isMaximal_under_of_isIntegral_of_isMaximal M
+  have : (M.comap (algebraMap A B)).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal M
   exact (IsLocalRing.eq_maximalIdeal this).ge
 
-theorem exists_isIdempotentElem_lift_quotient_of_isIntegral (A B : Type) [CommRing A]
-    [HenselianLocalRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
-    {c : B ⧸ (maximalIdeal A).map (algebraMap A B)} (hc : IsIdempotentElem c) :
-    ∃ e : B, IsIdempotentElem e ∧ Ideal.Quotient.mk _ e = c := by
+theorem exists_isIdempotentElem_lift_quotient_of_isIntegral
+    (A B : Type)
+    [CommRing A] [HenselianLocalRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
+    {c : B ⧸ (maximalIdeal A).map (algebraMap A B)} (hc : IsIdempotentElem c)
+    : ∃ e : B, IsIdempotentElem e ∧ Ideal.Quotient.mk _ e = c := by
   obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective c
   have hb : b * b - b ∈ (maximalIdeal A).map (algebraMap A B) := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, hc.eq, sub_self]
@@ -90,8 +95,8 @@ theorem exists_isIdempotentElem_lift_quotient_of_isIntegral (A B : Type) [CommRi
   have hb₀ : b₀ * b₀ - b₀ ∈ (maximalIdeal A).map (algebraMap A B₀) := by
     rw [hsum]
     exact Ideal.sum_mem _ fun i _ ↦ Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ (ha i))
-  obtain ⟨e₀, ⟨he₀, he₀b⟩, -⟩ := existsUnique_idempotent_lift_quotient A (S := B₀)
-    (c := Ideal.Quotient.mk _ b₀) (by
+  obtain ⟨e₀, ⟨he₀, he₀b⟩, -⟩ :=
+    existsUnique_idempotent_lift_quotient A (S := B₀) (c := Ideal.Quotient.mk _ b₀) (by
       show Ideal.Quotient.mk _ b₀ * Ideal.Quotient.mk _ b₀ = Ideal.Quotient.mk _ b₀
       rw [← map_mul, Ideal.Quotient.eq]
       exact hb₀)
@@ -101,7 +106,17 @@ theorem exists_isIdempotentElem_lift_quotient_of_isIntegral (A B : Type) [CommRi
   rw [Ideal.Quotient.eq]
   simpa using h
 
-theorem bijective_locallyConstant_comap_algebraicClosure_tensor : ∀ (Λ : Type) (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] [IsSepClosed (IsLocalRing.ResidueField A)] (B : Type) [CommRing B] [Algebra A B] [Algebra.IsIntegral A B], Function.Bijective (fun φ : LocallyConstant (PrimeSpectrum B) Λ => φ.comap ⟨PrimeSpectrum.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] AlgebraicClosure (IsLocalRing.ResidueField A) ⊗[A] B).toRingHom, PrimeSpectrum.continuous_comap _⟩) := by
+theorem bijective_locallyConstant_comap_algebraicClosure_tensor
+    : ∀ (Λ : Type) (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A]
+        [IsSepClosed (IsLocalRing.ResidueField A)] (B : Type) [CommRing B] [Algebra A B]
+        [Algebra.IsIntegral A B],
+      Function.Bijective (fun φ : LocallyConstant (PrimeSpectrum B) Λ =>
+        φ.comap ⟨
+          PrimeSpectrum.comap
+            (Algebra.TensorProduct.includeRight
+              : B →ₐ[A] AlgebraicClosure (IsLocalRing.ResidueField A) ⊗[A] B).toRingHom,
+          PrimeSpectrum.continuous_comap _
+        ⟩) := by
   intro Λ A _ _ _ _ B _ _ _
   let k := ResidueField A
   let Ω := AlgebraicClosure k
@@ -124,8 +139,8 @@ theorem bijective_locallyConstant_comap_algebraicClosure_tensor : ∀ (Λ : Type
     exact hle hx
   let e' : B ⧸ I →+* k ⊗[A] B := Ideal.Quotient.lift I ιk.toRingHom hIk
   have he'mk : ∀ b : B, e' (Ideal.Quotient.mk I b) = ιk b := fun b ↦ rfl
-  let σ : k →ₐ[A] B ⧸ I := Ideal.Quotient.liftₐ (maximalIdeal A) (Algebra.ofId A (B ⧸ I))
-    fun a ha ↦ by
+  let σ : k →ₐ[A] B ⧸ I :=
+    Ideal.Quotient.liftₐ (maximalIdeal A) (Algebra.ofId A (B ⧸ I)) fun a ha ↦ by
       rw [Algebra.ofId_apply]
       show Ideal.Quotient.mk I (algebraMap A B a) = 0
       exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem _ ha)
@@ -145,12 +160,13 @@ theorem bijective_locallyConstant_comap_algebraicClosure_tensor : ∀ (Λ : Type
   have hρ : IsHomeomorph (PrimeSpectrum.comap ρ) := by
     rw [PrimeSpectrum.comap_comp]
     exact (PrimeSpectrum.isHomeomorph_comap_of_bijective he').comp hμ
-  have hfac : ∀ x : PrimeSpectrum (Ω ⊗[A] B),
-      PrimeSpectrum.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom x =
-        PrimeSpectrum.comap (Ideal.Quotient.mk I) (PrimeSpectrum.comap ρ x) := by
+  have hfac
+      : ∀ x : PrimeSpectrum (Ω ⊗[A] B),
+        PrimeSpectrum.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom x
+          = PrimeSpectrum.comap (Ideal.Quotient.mk I) (PrimeSpectrum.comap ρ x) := by
     intro x
-    have : (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom =
-        ρ.comp (Ideal.Quotient.mk I) := by
+    have : (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom
+        = ρ.comp (Ideal.Quotient.mk I) := by
       ext b
       show (1 : Ω) ⊗ₜ[A] b = μ ((1 : k) ⊗ₜ[A] b)
       simp [μ]
@@ -161,8 +177,10 @@ theorem bijective_locallyConstant_comap_algebraicClosure_tensor : ∀ (Λ : Type
     obtain ⟨M, hM, hyM⟩ := Ideal.exists_le_maximal y.asIdeal y.isPrime.ne_top
     have hIM : I ≤ M := map_maximalIdeal_le_of_isIntegral A B M
     haveI := hM.isPrime
-    let P : PrimeSpectrum (B ⧸ I) := ⟨M.map (Ideal.Quotient.mk I),
-      Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])⟩
+    let P : PrimeSpectrum (B ⧸ I) := ⟨
+      M.map (Ideal.Quotient.mk I),
+      Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
+    ⟩
     have hPM : (PrimeSpectrum.comap (Ideal.Quotient.mk I) P).asIdeal = M := by
       show (M.map (Ideal.Quotient.mk I)).comap (Ideal.Quotient.mk I) = M
       rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
@@ -175,20 +193,21 @@ theorem bijective_locallyConstant_comap_algebraicClosure_tensor : ∀ (Λ : Type
     rw [hfac, hx, hPM]
     exact hyM
   · intro U hU
-    have hU' : IsClopen (PrimeSpectrum.comap ρ '' U) :=
-      ⟨hρ.isClosedMap U hU.1, hρ.isOpenMap U hU.2⟩
+    have hU' : IsClopen (PrimeSpectrum.comap ρ '' U) := ⟨hρ.isClosedMap U hU.1, hρ.isOpenMap U hU.2⟩
     set c := PrimeSpectrum.isIdempotentElemEquivClopens.symm ⟨_, hU'⟩ with hc
     obtain ⟨e, he, hec⟩ := exists_isIdempotentElem_lift_quotient_of_isIntegral A B c.2
-    have hU'c : (PrimeSpectrum.basicOpen (Ideal.Quotient.mk I e) : Set (PrimeSpectrum (B ⧸ I))) =
-        PrimeSpectrum.comap ρ '' U := by
+    have hU'c
+        : (PrimeSpectrum.basicOpen (Ideal.Quotient.mk I e) : Set (PrimeSpectrum (B ⧸ I)))
+          = PrimeSpectrum.comap ρ '' U := by
       rw [hec]
       exact congrArg SetLike.coe (PrimeSpectrum.basicOpen_isIdempotentElemEquivClopens_symm _)
     refine ⟨PrimeSpectrum.basicOpen e, ?_, ?_⟩
     · have := (PrimeSpectrum.isIdempotentElemEquivClopens ⟨e, he⟩).isClopen
       rwa [PrimeSpectrum.coe_isIdempotentElemEquivClopens_apply] at this
     · ext x
-      change PrimeSpectrum.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom x ∈
-        PrimeSpectrum.basicOpen e ↔ x ∈ U
+      change PrimeSpectrum.comap (Algebra.TensorProduct.includeRight : B →ₐ[A] Ω ⊗[A] B).toRingHom x
+          ∈ PrimeSpectrum.basicOpen e
+        ↔ x ∈ U
       rw [hfac, PrimeSpectrum.mem_basicOpen, PrimeSpectrum.comap_asIdeal, Ideal.mem_comap,
         ← PrimeSpectrum.mem_basicOpen, ← SetLike.mem_coe, hU'c, hρ.injective.mem_set_image]
 

@@ -10,13 +10,17 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValAtCompLoc
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 namespace PositivityTheory.HtPt.Ch
 
-theorem unitAt_div {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-    {Λ : Lat ξ Ω} {p : Cpt ξ} {s t : Ω} (hs : Λ.IsGenAt p s) (ht : Λ.IsGenAt p t) :
-    unitAt ξ p (s / t) := by
+theorem unitAt_div
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {Λ : Lat ξ Ω} {p : Cpt ξ} {s t : Ω}
+    (hs : Λ.IsGenAt p s) (ht : Λ.IsGenAt p t)
+    : unitAt ξ p (s / t) := by
   have key : ∀ {s t : Ω}, Λ.IsGenAt p s → Λ.IsGenAt p t → s / t ∈ regAt ξ p := by
     intro s t hs ht
     have : s ∈ Submodule.span (regAt ξ p) {t} := by
@@ -27,7 +31,10 @@ theorem unitAt_div {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingC
     exact a.2
   exact ⟨div_ne_zero hs.1 ht.1, key hs ht, by rw [inv_div]; exact key ht hs⟩
 
-theorem isdeg_unique : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type) [Field K] (C : ACurve K) (z : Spec (CommRingCat.of K) ⟶ X) (Y : CurveIn C z) (Λ : Lat ξ Ω) (n n' : ℤ), IsCptGen ξ → Y.IsDeg Λ n → Y.IsDeg Λ n' → n = n' := by
+theorem isdeg_unique
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (K : Type) [Field K]
+        (C : ACurve K) (z : Spec (CommRingCat.of K) ⟶ X) (Y : CurveIn C z) (Λ : Lat ξ Ω) (n n' : ℤ),
+      IsCptGen ξ → Y.IsDeg Λ n → Y.IsDeg Λ n' → n = n' := by
   intro X Ω _ ξ K _ C z Y Λ n n' hξ ⟨h₀, h, s₀, s, r, g₀, g, hr, hf, e⟩
     ⟨h₀', h', s₀', s', r', g₀', g', hr', hf', e'⟩
   obtain ⟨φ, hφ, hu⟩ := ValHom.exists_valAt_hom X Ω ξ K z h₀ hξ
@@ -39,8 +46,9 @@ theorem isdeg_unique : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (C
     obtain ⟨ψ, hψ, hv⟩ := ValHom.exists_valAt_hom X Ω ξ _ (Y.x i) (h i) hξ
     have u := unitAt_div (g i) (g' i)
     have hun : IsUnit (ψ ⟨_, u.2.1⟩) := (hv ⟨_, u.2.1⟩).2 u
-    have hval := GlobalTheory.T.valAt_comp_local_hom X Ω ξ _ K (C.v i).valuationSubring.subtype (Y.x i) _ _
-      ((hψ _ _).2 ⟨u.2.1, rfl⟩) (by rw [Y.gen i]; exact h₀)
+    have hval :=
+      GlobalTheory.T.valAt_comp_local_hom X Ω ξ _ K (C.v i).valuationSubring.subtype (Y.x i) _ _
+        ((hψ _ _).2 ⟨u.2.1, rfl⟩) (by rw [Y.gen i]; exact h₀)
     rw [Y.gen i] at hval
     obtain ⟨m1, e1⟩ := (hφ _ _).1 hval
     obtain ⟨m2, e2⟩ := (hφ _ _).1 (hr i).2
@@ -60,14 +68,18 @@ theorem isdeg_unique : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (C
       simp only [MulMemClass.coe_mul]
       field_simp
     rw [this, map_mul, hone, one_mul, map_mul]
-  have h2 : ∀ i, (C.w i : ℤ) * WithZero.log (C.v i (r i)) =
-      (C.w i : ℤ) * WithZero.log (C.v i (r' i)) + (C.w i : ℤ) * WithZero.log (C.v i c) := by
+  have h2
+      : ∀ i,
+        (C.w i : ℤ) * WithZero.log (C.v i (r i))
+          = (C.w i : ℤ) * WithZero.log (C.v i (r' i)) + (C.w i : ℤ) * WithZero.log (C.v i c) := by
     intro i
-    rw [key, WithZero.log_mul ((Valuation.ne_zero_iff _).2 (hr' i).1)
-      ((Valuation.ne_zero_iff _).2 hc), mul_add]
+    rw [key,
+      WithZero.log_mul ((Valuation.ne_zero_iff _).2 (hr' i).1) ((Valuation.ne_zero_iff _).2 hc),
+      mul_add]
   rw [e, e']
   simp only [h2]
   rw [finsum_add_distrib (hf'.subset fun i hi h1 => hi (by simp [h1]))
-    ((C.fin c hc).subset fun i hi h1 => hi (by simp [h1])), C.prod c hc, add_zero]
+      ((C.fin c hc).subset fun i hi h1 => hi (by simp [h1])),
+    C.prod c hc, add_zero]
 
 end PositivityTheory.HtPt.Ch

@@ -8,20 +8,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.exists_surj_over_finite :
-    ∀ (P Γ : Type) [Group P] [TopologicalSpace P] [IsTopologicalGroup P] [CompactSpace P] [TotallyDisconnectedSpace P] [Group Γ] (r h : ℕ) (x : Fin (r + h) → P) (γ : Fin r → Γ) (π : P →* Γ), TopGen (Set.range x) →
-      (∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] (y : Fin (r + h) → G), ∃ f : P →* G, Continuous f ∧ ∀ i, f (x i) = y i) →
-      Function.Surjective γ → IsOpen (π.ker : Set P) → (∀ i, π (x (Fin.castAdd h i)) = γ i) → (∀ i, π (x (Fin.natAdd r i)) = 1) →
-      ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] (q : G →* Γ), IsOpen (q.ker : Set G) → ∀ g : Fin r → G, (∀ i, q (g i) = γ i) →
-        (∃ z : Fin h → q.ker, TopGen (Set.range z)) →
-        ∃ f : P →* G, Continuous f ∧ Function.Surjective f ∧ q.comp f = π ∧ ∀ i, f (x (Fin.castAdd h i)) = g i := by
+theorem UpperTheory.V.AlgebraTools.exists_surj_over_finite
+    : ∀ (P Γ : Type) [Group P] [TopologicalSpace P] [IsTopologicalGroup P] [CompactSpace P]
+        [TotallyDisconnectedSpace P] [Group Γ] (r h : ℕ) (x : Fin (r + h) → P) (γ : Fin r → Γ)
+        (π : P →* Γ),
+      TopGen (Set.range x)
+        → (∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+            [TotallyDisconnectedSpace G] (y : Fin (r + h) → G),
+          ∃ f : P →* G,
+            Continuous f ∧ ∀ i, f (x i) = y i)
+        → Function.Surjective γ → IsOpen (π.ker : Set P) → (∀ i, π (x (Fin.castAdd h i)) = γ i)
+        → (∀ i, π (x (Fin.natAdd r i)) = 1)
+        → ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+            [TotallyDisconnectedSpace G] (q : G →* Γ),
+          IsOpen (q.ker : Set G)
+            → ∀ g : Fin r → G,
+              (∀ i, q (g i) = γ i) → (∃ z : Fin h → q.ker, TopGen (Set.range z))
+                → ∃ f : P →* G,
+                  Continuous f ∧ Function.Surjective f ∧ q.comp f = π
+                    ∧ ∀ i, f (x (Fin.castAdd h i)) = g i := by
   intro P Γ _ _ _ _ _ _ r h x γ π hden huniv hγ hπo hπl hπr G _ _ _ _ _ q hqo g hg hz
   obtain ⟨z, hzd⟩ := hz
   obtain ⟨f, hf, hfx⟩ := huniv G (Fin.append g (fun j => (z j : G)))
-  have hfl : ∀ i, f (x (Fin.castAdd h i)) = g i := fun i => by
-    rw [hfx, Fin.append_left]
-  have hfr : ∀ j, f (x (Fin.natAdd r j)) = z j := fun j => by
-    rw [hfx, Fin.append_right]
+  have hfl : ∀ i, f (x (Fin.castAdd h i)) = g i := fun i => by rw [hfx, Fin.append_left]
+  have hfr : ∀ j, f (x (Fin.natAdd r j)) = z j := fun j => by rw [hfx, Fin.append_right]
   refine ⟨f, hf, ?_, ?_, hfl⟩
   · haveI : T2Space G := inferInstance
     have hRc : IsClosed (Set.range f) := (isCompact_range hf).isClosed
@@ -67,8 +77,7 @@ theorem UpperTheory.V.AlgebraTools.exists_surj_over_finite :
     ext p
     let V : Set P := (fun a => p⁻¹ * a) ⁻¹' ((π.ker : Set P) ∩ (φ.ker : Set P))
     have hVo : IsOpen V := (hπo.inter hφo).preimage (continuous_const.mul continuous_id)
-    have hpV : p ∈ V := by
-      simp [V]
+    have hpV : p ∈ V := by simp [V]
     obtain ⟨d, ⟨hd1, hd2⟩, hdD⟩ := hden.inter_open_nonempty V hVo ⟨p, hpV⟩
     have e1 : π (p⁻¹ * d) = 1 := hd1
     have e2 : φ (p⁻¹ * d) = 1 := hd2

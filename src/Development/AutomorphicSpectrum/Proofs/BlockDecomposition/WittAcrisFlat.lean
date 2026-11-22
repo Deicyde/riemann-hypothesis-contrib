@@ -6,12 +6,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison.PAlg CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory Limits AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge
+  GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison.PAlg
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.FlatW
 
-theorem eq_zero_of_pow_mul_eq_zero {l : ℕ} [Fact l.Prime] (m : ℕ) {x : Acris l}
-    (h : (l : Acris l) ^ m * x = 0) : x = 0 := by
+theorem eq_zero_of_pow_mul_eq_zero
+    {l : ℕ} [Fact l.Prime] (m : ℕ) {x : Acris l} (h : (l : Acris l) ^ m * x = 0)
+    : x = 0 := by
   induction m with
   | zero => simpa using h
   | succ n ih =>
@@ -20,8 +23,10 @@ theorem eq_zero_of_pow_mul_eq_zero {l : ℕ} [Fact l.Prime] (m : ℕ) {x : Acris
     rw [← mul_assoc, ← pow_succ']
     exact h
 
-theorem flat_AW {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : CrystallineSemistableComparison.Res l K) :
-    Module.Flat (WittVector l r.k) (CrystallineSemistableComparison.Pb.AW r) := by
+theorem flat_AW
+    {l : ℕ} [Fact l.Prime]
+    {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : CrystallineSemistableComparison.Res l K)
+    : Module.Flat (WittVector l r.k) (CrystallineSemistableComparison.Pb.AW r) := by
   rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout, eq_bot_iff]
   intro a ha
   obtain ⟨⟨y, hy0⟩, hy⟩ := (Submodule.mem_torsion_iff _).1 ha

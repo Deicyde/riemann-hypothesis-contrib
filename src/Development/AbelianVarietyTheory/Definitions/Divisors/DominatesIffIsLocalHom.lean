@@ -19,10 +19,10 @@ variable (R : Subring K) [IsLocalRing R] (r : ℕ)
 
 end PolyTower
 
-
-theorem IsEtTower.ker_eq_span {cK : k →+* K} {R : Subring K} {cL : k →+* L} {T : Subring L}
-    {r : ℕ} {ι : R →+* T} {ψ : T →+* R} {τ : Fin r → T} (h : IsEtTower cK R cL T ι ψ τ) :
-    RingHom.ker ψ = Ideal.span (Set.range τ) := by
+theorem IsEtTower.ker_eq_span
+    {cK : k →+* K} {R : Subring K} {cL : k →+* L} {T : Subring L} {r : ℕ} {ι : R →+* T}
+    {ψ : T →+* R} {τ : Fin r → T} (h : IsEtTower cK R cL T ι ψ τ)
+    : RingHom.ker ψ = Ideal.span (Set.range τ) := by
   haveI := h.top.isLocalRing
   haveI : IsNoetherianRing T := by
     letI := (cL.codRestrict T h.top.const_mem).toAlgebra
@@ -38,17 +38,18 @@ theorem IsEtTower.ker_eq_span {cK : k →+* K} {R : Subring K} {cL : k →+* L} 
     show ψ _ = 0
     rw [map_sub, h.retr, sub_self]
   let Q : Ideal T := J ⊔ I * I
-  let g : T →ₐ[P] T ⧸ Q :=
-    { (Ideal.Quotient.mk Q).comp (ι.comp ψ) with
-      commutes' := fun x => by
-        have : ((Ideal.Quotient.mk Q).comp (ι.comp ψ)).comp (MvPolynomial.eval₂Hom ι τ) =
-            (Ideal.Quotient.mk Q).comp (MvPolynomial.eval₂Hom ι τ) := by
-          apply MvPolynomial.ringHom_ext
-          · intro a; simp [h.retr]
-          · intro i
-            have : τ i ∈ Q := Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
-            simp [h.zero, Ideal.Quotient.eq_zero_iff_mem.2 this]
-        exact RingHom.congr_fun this x }
+  let g : T →ₐ[P] T ⧸ Q := {
+    (Ideal.Quotient.mk Q).comp (ι.comp ψ) with
+    commutes' := fun x => by
+      have : ((Ideal.Quotient.mk Q).comp (ι.comp ψ)).comp (MvPolynomial.eval₂Hom ι τ)
+          = (Ideal.Quotient.mk Q).comp (MvPolynomial.eval₂Hom ι τ) := by
+        apply MvPolynomial.ringHom_ext
+        · intro a; simp [h.retr]
+        · intro i
+          have : τ i ∈ Q := Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
+          simp [h.zero, Ideal.Quotient.eq_zero_iff_mem.2 this]
+      exact RingHom.congr_fun this x
+  }
   have hn : IsNilpotent (I.map (Ideal.Quotient.mk Q)) := by
     refine ⟨2, ?_⟩
     rw [pow_two, ← Ideal.map_mul, Ideal.zero_eq_bot, Ideal.map_eq_bot_iff_le_ker, Ideal.mk_ker]
@@ -70,11 +71,13 @@ theorem IsEtTower.ker_eq_span {cK : k →+* K} {R : Subring K} {cL : k →+* L} 
   have hI : I ≤ Ideal.jacobson ⊥ := by
     rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top]
     exact IsLocalRing.le_maximalIdeal (RingHom.ker_ne_top ψ)
-  exact le_antisymm (Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian I) hI hIQ) hJI
+  exact le_antisymm (Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian I) hI hIQ)
+    hJI
 
-theorem IsEtTower.bijective_of_zero {cK : k →+* K} {R : Subring K} {cL : k →+* L} {T : Subring L}
-    {ι : R →+* T} {ψ : T →+* R} {τ : Fin 0 → T} (h : IsEtTower cK R cL T ι ψ τ) :
-    Function.Bijective ψ := by
+theorem IsEtTower.bijective_of_zero
+    {cK : k →+* K} {R : Subring K} {cL : k →+* L} {T : Subring L} {ι : R →+* T} {ψ : T →+* R}
+    {τ : Fin 0 → T} (h : IsEtTower cK R cL T ι ψ τ)
+    : Function.Bijective ψ := by
   refine ⟨(RingHom.injective_iff_ker_eq_bot ψ).2 ?_, fun a => ⟨ι a, h.retr a⟩⟩
   rw [h.ker_eq_span, Set.range_eq_empty, Ideal.span_empty]
 

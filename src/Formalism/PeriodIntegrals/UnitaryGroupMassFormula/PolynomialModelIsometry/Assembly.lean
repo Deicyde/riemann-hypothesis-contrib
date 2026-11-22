@@ -40,8 +40,10 @@ lemma rowAct_detPoly {N : ℕ} (A : Matrix (Fin N) (Fin N) ℂ) :
     simp [rowAct, Matrix.mul_apply]
   rw [detPoly, AlgHom.map_det, h1, Matrix.det_mul, ← RingHom.map_det]
 
-theorem modelIso_of_steps (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : LowerInv)
-    (hM : ModelMap) (hD : DetSplit) (hH : PI.HwIrred) : PI.ModelIso := by
+theorem modelIso_of_steps
+    (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : LowerInv) (hM : ModelMap) (hD : DetSplit)
+    (hH : PI.HwIrred)
+    : PI.ModelIso := by
   intro N Λ H _ _ σ S hU hK
   obtain ⟨hfin, hstab, hirr, ⟨v0, hv0S, hv0ne, hv0w⟩, hdom⟩ := hK
   have hK' : IsKTypeOf (allPos N) σ Λ S := ⟨hfin, hstab, hirr, ⟨v0, hv0S, hv0ne, hv0w⟩, hdom⟩
@@ -50,13 +52,16 @@ theorem modelIso_of_steps (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : Low
   choose μ hμ using hI N Λ H σ v0 hU hv0ne hv0w
   let w0 : S := ⟨v0, hv0S⟩
   have hw0ne : w0 ≠ 0 := by
-    intro h; apply hv0ne
+    intro h
+    apply hv0ne
     have := congrArg Subtype.val h
     simpa [w0] using this
   have hT' := hT N Λ H σ S K P hU hstab hPσ w0 hv0w
   have hL' := hL N Λ H σ S K P hU hK' hP hPσ w0 hv0w
-  have hT'' : ∀ (θ : Fin N → ℝ) (x : S), ⟪w0, P (torus θ) x⟫_ℂ =
-      Complex.exp (((∑ a, ((μ a : ℝ) + K) * θ a : ℝ) : ℂ) * Complex.I) * ⟪w0, x⟫_ℂ := by
+  have hT''
+      : ∀ (θ : Fin N → ℝ) (x : S),
+        ⟪w0, P (torus θ) x⟫_ℂ
+          = Complex.exp (((∑ a, ((μ a : ℝ) + K) * θ a : ℝ) : ℂ) * Complex.I) * ⟪w0, x⟫_ℂ := by
     intro θ x; rw [hT' θ x]; simp only [hμ]
   obtain ⟨ν, F, hν, hFmem, hF0, hFint⟩ := hM N S P w0 μ K hP hw0ne hT'' hL'
   have hanti : Antitone ν := by
@@ -123,10 +128,13 @@ theorem modelIso_of_steps (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : Low
       linear_combination (C (detPow ℂ N g lam.detShift) * detPoly N ^ c *
         rowAct ℂ (n := N) (g : Matrix (Fin N) (Fin N) ℂ)ᵀ f) * key
   obtain ⟨f0, hf0mem, hf0eq⟩ := hsplit (F w0) (hFmem' w0)
-  have hf0U : f0 ∈ U := Submodule.mem_inf.mpr ⟨hf0mem, Submodule.mem_comap.mpr
-    (LinearMap.mem_range.mpr ⟨w0, by simp only [mulD, LinearMap.mulLeft_apply]; exact hf0eq⟩)⟩
-  have hf0ne : f0 ≠ 0 := by
-    intro h; apply hF0; rw [hf0eq, h, mul_zero]
+  have hf0U : f0 ∈ U :=
+    Submodule.mem_inf.mpr ⟨
+      hf0mem,
+      Submodule.mem_comap.mpr (LinearMap.mem_range.mpr
+        ⟨w0, by simp only [mulD, LinearMap.mulLeft_apply]; exact hf0eq⟩)
+    ⟩
+  have hf0ne : f0 ≠ 0 := by intro h; apply hF0; rw [hf0eq, h, mul_zero]
   have hUeq : U = nablaSq ℂ N lam := by
     rcases (hH N lam).2.1 U inf_le_left hUst with h | h
     · exfalso; rw [h, Submodule.mem_bot] at hf0U; exact hf0ne hf0U
@@ -134,8 +142,7 @@ theorem modelIso_of_steps (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : Low
   have hFinj : Function.Injective F := by
     rw [← LinearMap.ker_eq_bot]
     let S' : Submodule ℂ H := (LinearMap.ker F).map S.subtype
-    have hS'le : S' ≤ S := by
-      rintro _ ⟨y, _, rfl⟩; exact y.2
+    have hS'le : S' ≤ S := by rintro _ ⟨y, _, rfl⟩; exact y.2
     have hS'st : IsKStableOn (allPos N) σ S' := by
       rintro g hg _ ⟨y, hy, rfl⟩
       have hd : g.det ^ K ≠ 0 := pow_ne_zero _ (det_ne_zero_of_mem_K hg)
@@ -164,18 +171,29 @@ theorem modelIso_of_steps (hA : PolyExt) (hI : LamInt) (hT : TorusEig) (hL : Low
     constructor
     · intro u v huv
       have := congrArg Subtype.val huv
-      simp only [φ, LinearMap.codRestrict_apply, LinearMap.comp_apply, Submodule.subtype_apply] at this
+      simp only [φ, LinearMap.codRestrict_apply, LinearMap.comp_apply, Submodule.subtype_apply]
+        at this
       exact Subtype.ext (hmulD_inj this)
     · rintro ⟨z, x, rfl⟩
       obtain ⟨f', hf'mem, hf'eq⟩ := hsplit (F x) (hFmem' x)
-      refine ⟨⟨f', Submodule.mem_inf.mpr ⟨hf'mem, Submodule.mem_comap.mpr
-        (LinearMap.mem_range.mpr ⟨x, by simp only [mulD, LinearMap.mulLeft_apply]; exact hf'eq⟩)⟩⟩, ?_⟩
+      refine ⟨
+        ⟨
+          f',
+          Submodule.mem_inf.mpr ⟨
+            hf'mem,
+            Submodule.mem_comap.mpr (LinearMap.mem_range.mpr
+              ⟨x, by simp only [mulD, LinearMap.mulLeft_apply]; exact hf'eq⟩)
+          ⟩
+        ⟩,
+        ?_
+      ⟩
       apply Subtype.ext
-      simp only [φ, LinearMap.codRestrict_apply, LinearMap.comp_apply, Submodule.subtype_apply, mulD,
-        LinearMap.mulLeft_apply]
+      simp only [φ, LinearMap.codRestrict_apply, LinearMap.comp_apply, Submodule.subtype_apply,
+        mulD, LinearMap.mulLeft_apply]
       exact hf'eq.symm
-  calc Module.finrank ℂ S = Module.finrank ℂ (LinearMap.range F) :=
-        (LinearMap.finrank_range_of_inj hFinj).symm
+  calc
+    Module.finrank ℂ S
+      = Module.finrank ℂ (LinearMap.range F) := (LinearMap.finrank_range_of_inj hFinj).symm
     _ = Module.finrank ℂ U := (LinearEquiv.ofBijective φ hφ).finrank_eq.symm
     _ = Module.finrank ℂ (nablaSq ℂ N lam) := (LinearEquiv.ofEq _ _ hUeq).finrank_eq
 

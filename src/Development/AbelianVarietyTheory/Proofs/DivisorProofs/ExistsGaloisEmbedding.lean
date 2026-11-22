@@ -6,12 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory.GaloisEmbeddingExistence
 
-theorem exists_galois_embedding (R R' : Type) [CommRing R] [IsDomain R] [CharZero R]
-    [CommRing R'] [IsDomain R'] [Algebra R R'] [Module.Finite R R']
-    (hinj : Function.Injective (algebraMap R R')) :
-    ∃ (L : IntermediateField (FractionRing R) (AlgebraicClosure (FractionRing R))),
-      FiniteDimensional (FractionRing R) L ∧ IsGalois (FractionRing R) L ∧
-        ∃ (j : R' →ₐ[R] L), Function.Injective j := by
+theorem exists_galois_embedding
+    (R R' : Type) [CommRing R] [IsDomain R] [CharZero R] [CommRing R'] [IsDomain R'] [Algebra R R']
+    [Module.Finite R R']
+    (hinj : Function.Injective (algebraMap R R'))
+    : ∃ (L : IntermediateField (FractionRing R) (AlgebraicClosure (FractionRing R))),
+      FiniteDimensional (FractionRing R) L ∧ IsGalois (FractionRing R) L
+        ∧ ∃ (j : R' →ₐ[R] L), Function.Injective j := by
   classical
   set K := FractionRing R
   set Ω := AlgebraicClosure K
@@ -23,8 +24,7 @@ theorem exists_galois_embedding (R R' : Type) [CommRing R] [IsDomain R] [CharZer
   haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective R K)
   let φ : R' →ₐ[R] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hφ : Function.Injective φ := by
     have h1 : (RingHom.ker φ).comap (algebraMap R R') = ⊥ := by
@@ -52,13 +52,14 @@ theorem exists_galois_embedding (R R' : Type) [CommRing R] [IsDomain R] [CharZer
       rw [Algebra.smul_def, map_mul, AlgHom.commutes, IsScalarTower.algebraMap_apply R K Ω]
       exact L.mul_mem (L.algebraMap_mem _) hx
   refine ⟨L, inferInstance, inferInstance, ?_⟩
-  let j : R' →ₐ[R] L :=
-    { toFun := fun x => ⟨φ x, hmem x⟩
-      map_one' := Subtype.ext (map_one φ)
-      map_mul' := fun x y => Subtype.ext (map_mul φ x y)
-      map_zero' := Subtype.ext (map_zero φ)
-      map_add' := fun x y => Subtype.ext (map_add φ x y)
-      commutes' := fun r => Subtype.ext (φ.commutes r) }
+  let j : R' →ₐ[R] L := {
+    toFun := fun x => ⟨φ x, hmem x⟩
+    map_one' := Subtype.ext (map_one φ)
+    map_mul' := fun x y => Subtype.ext (map_mul φ x y)
+    map_zero' := Subtype.ext (map_zero φ)
+    map_add' := fun x y => Subtype.ext (map_add φ x y)
+    commutes' := fun r => Subtype.ext (φ.commutes r)
+  }
   exact ⟨j, fun x y h => hφ (congrArg Subtype.val h)⟩
 
 end GlobalTheory.GaloisEmbeddingExistence

@@ -13,9 +13,10 @@ open MvPolynomial
 noncomputable section
 
 def ComplexMinimalPrimesContract.Statement : Prop :=
-  ∀ (σ : Type) [Fintype σ] (P : Ideal (MvPolynomial σ ℤ)), P.IsPrime →
-    ∀ Q ∈ (P.map (MvPolynomial.map (Int.castRingHom ℂ))).minimalPrimes,
-      Q.comap (MvPolynomial.map (Int.castRingHom ℂ)) = P
+  ∀ (σ : Type) [Fintype σ] (P : Ideal (MvPolynomial σ ℤ)),
+    P.IsPrime
+      → ∀ Q ∈ (P.map (MvPolynomial.map (Int.castRingHom ℂ))).minimalPrimes,
+        Q.comap (MvPolynomial.map (Int.castRingHom ℂ)) = P
 
 end
 

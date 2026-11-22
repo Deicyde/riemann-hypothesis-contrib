@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteTypeCy
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
@@ -42,15 +43,18 @@ theorem cycAway_le_of_dvd {n N : ℕ} (hN : N ≠ 0) (h : n ∣ N) : cycAway n �
 theorem zetaAway_pow_self {N : ℕ} (hN : N ≠ 0) : zetaAway N ^ N = 1 :=
   Subtype.ext (Complex.isPrimitiveRoot_exp N hN).pow_eq_one
 
-theorem formallyUnramified_cycAway {N : ℕ} (hN : N ≠ 0) (R : Type) [CommRing R] [Algebra R (cycAway N)] :
-    Algebra.FormallyUnramified R (cycAway N) := by
+theorem formallyUnramified_cycAway
+    {N : ℕ} (hN : N ≠ 0) (R : Type) [CommRing R] [Algebra R (cycAway N)]
+    : Algebra.FormallyUnramified R (cycAway N) := by
   have hD : ∀ x : cycAway N, KaehlerDifferential.D R (cycAway N) x = 0 := by
     rintro ⟨x, hx⟩
     induction hx using Subring.closure_induction with
     | mem x hx =>
       rcases hx with rfl | rfl
       · have h := congrArg (KaehlerDifferential.D R (cycAway N)) (zetaAway_pow_self hN)
-        rw [Derivation.leibniz_pow, Derivation.map_one_eq_zero, ← Nat.cast_smul_eq_nsmul (cycAway N), smul_smul] at h
+        rw [Derivation.leibniz_pow, Derivation.map_one_eq_zero,
+            ← Nat.cast_smul_eq_nsmul (cycAway N), smul_smul]
+          at h
         have hu : IsUnit ((N : cycAway N) * zetaAway N ^ (N - 1)) :=
           (isUnit_natCast hN).mul ((IsUnit.of_pow_eq_one (zetaAway_pow_self hN) hN).pow _)
         exact hu.smul_eq_zero.1 h
@@ -58,10 +62,14 @@ theorem formallyUnramified_cycAway {N : ℕ} (hN : N ≠ 0) (R : Type) [CommRing
         have hv : (N : cycAway N) * v = 1 :=
           Subtype.ext (by simpa [v] using mul_inv_cancel₀ (Nat.cast_ne_zero.2 hN : (N : ℂ) ≠ 0))
         have h := congrArg (KaehlerDifferential.D R (cycAway N)) hv
-        rw [Derivation.leibniz, Derivation.map_one_eq_zero, Derivation.map_natCast, smul_zero, add_zero] at h
+        rw [Derivation.leibniz, Derivation.map_one_eq_zero, Derivation.map_natCast, smul_zero,
+            add_zero]
+          at h
         exact (isUnit_natCast hN).smul_eq_zero.1 h
-    | zero => exact map_zero _
-    | one => exact Derivation.map_one_eq_zero _
+    | zero =>
+      exact map_zero _
+    | one =>
+      exact Derivation.map_one_eq_zero _
     | add x y hx' hy' hx hy =>
       have := map_add (KaehlerDifferential.D R (cycAway N)) ⟨x, hx'⟩ ⟨y, hy'⟩
       rw [hx, hy, add_zero] at this
@@ -81,16 +89,20 @@ theorem formallyUnramified_cycAway {N : ℕ} (hN : N ≠ 0) (R : Type) [CommRing
   rintro _ ⟨x, rfl⟩
   exact (Submodule.mem_bot (cycAway N)).2 (hD x)
 
-theorem isIntegral_inclusion_cycAway {n N a : ℕ} (hN : N ≠ 0) (h : n ∣ N) (ha : N ∣ n ^ a) :
-    (Subring.inclusion (cycAway_le_of_dvd hN h)).IsIntegral := by
+theorem isIntegral_inclusion_cycAway {n N a : ℕ} (hN : N ≠ 0) (h : n ∣ N) (ha : N ∣ n ^ a)
+    : (Subring.inclusion (cycAway_le_of_dvd hN h)).IsIntegral := by
   have hn : n ≠ 0 := fun h0 => hN (by simpa [h0] using h)
   rintro ⟨x, hx⟩
   induction hx using Subring.closure_induction with
   | mem x hx =>
     rcases hx with rfl | rfl
-    · exact ⟨Polynomial.X ^ N - Polynomial.C 1, Polynomial.monic_X_pow_sub_C _ hN, by
-        simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, map_one, Polynomial.eval₂_one]
-        exact sub_eq_zero.2 (zetaAway_pow_self hN)⟩
+    · exact ⟨
+        Polynomial.X ^ N - Polynomial.C 1,
+        Polynomial.monic_X_pow_sub_C _ hN,
+        by
+          simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, map_one, Polynomial.eval₂_one]
+          exact sub_eq_zero.2 (zetaAway_pow_self hN)
+      ⟩
     · obtain ⟨c, hc⟩ := ha
       let v : cycAway n := ⟨(n : ℂ)⁻¹, Subring.subset_closure (Or.inr rfl)⟩
       have hn' : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn
@@ -107,9 +119,12 @@ theorem isIntegral_inclusion_cycAway {n N a : ℕ} (hN : N ≠ 0) (h : n ∣ N) 
   | neg x _ hx => exact hx.neg _
   | mul x y _ _ hx hy => exact hx.mul _ hy
 
-theorem exists_inclusion_cycAway : ∀ n N : ℕ, N ≠ 0 → n ∣ N → ∃ j : cycAway n →+* cycAway N, Function.Injective j ∧
-    j (zetaAway n) = zetaAway N ^ (N / n) ∧
-    ((∃ a, N ∣ n ^ a) → IsFinite (spMap j) ∧ Etale (spMap j) ∧ Surjective (spMap j)) := by
+theorem exists_inclusion_cycAway
+    : ∀ n N : ℕ,
+      N ≠ 0 → n ∣ N
+        → ∃ j : cycAway n →+* cycAway N,
+          Function.Injective j ∧ j (zetaAway n) = zetaAway N ^ (N / n)
+            ∧ ((∃ a, N ∣ n ^ a) → IsFinite (spMap j) ∧ Etale (spMap j) ∧ Surjective (spMap j)) := by
   intro n N hN h
   have hn : n ≠ 0 := fun h0 => hN (by simpa [h0] using h)
   let j := Subring.inclusion (cycAway_le_of_dvd hN h)
@@ -124,7 +139,8 @@ theorem exists_inclusion_cycAway : ∀ n N : ℕ, N ≠ 0 → n ∣ N → ∃ j 
   have hfin : Module.Finite (cycAway n) (cycAway N) := Algebra.IsIntegral.finite
   have : FaithfulSMul (cycAway n) (cycAway N) := (faithfulSMul_iff_algebraMap_injective _ _).2 hj
   have : Module.Flat (cycAway n) (cycAway N) := inferInstance
-  have : Algebra.FinitePresentation (cycAway n) (cycAway N) := Algebra.FinitePresentation.of_finiteType.1 inferInstance
+  have : Algebra.FinitePresentation (cycAway n) (cycAway N) :=
+    Algebra.FinitePresentation.of_finiteType.1 inferInstance
   have := formallyUnramified_cycAway hN (cycAway n)
   have het : Algebra.Etale (cycAway n) (cycAway N) := Algebra.Etale.of_formallyUnramified_of_flat
   refine ⟨(IsFinite.SpecMap_iff _).2 hfin, HasRingHomProperty.Spec_iff.2 het, ⟨?_⟩⟩

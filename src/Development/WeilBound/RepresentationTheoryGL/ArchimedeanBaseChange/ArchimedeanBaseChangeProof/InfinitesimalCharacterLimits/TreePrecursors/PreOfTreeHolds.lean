@@ -38,8 +38,8 @@ theorem leafList_good : ∀ {N : ℕ} (t : Tr E N), t.Good → ∀ x ∈ t.leafL
     · exact leafList_good t₁ h.1 x hx
     · exact leafList_good t₂ h.2 x hx
 
-theorem sum_filter_pos (l : List (Σ M : ℕ, Submodule ℂ (Sm E M))) :
-    ((l.filter fun x => 0 < x.1).map Sigma.fst).sum = (l.map Sigma.fst).sum := by
+theorem sum_filter_pos (l : List (Σ M : ℕ, Submodule ℂ (Sm E M)))
+    : ((l.filter fun x => 0 < x.1).map Sigma.fst).sum = (l.map Sigma.fst).sum := by
   induction l with
   | nil => rfl
   | cons x l ih =>
@@ -60,20 +60,36 @@ theorem preOfTree : PreOfTree := by
   obtain ⟨l, hl⟩ : ∃ l, l = t.leafList.filter (fun x => 0 < x.1) := ⟨_, rfl⟩
   rw [← hl] at hpos
   have hsum : (l.map Sigma.fst).sum = N := by rw [hl, sum_filter_pos, leafList_sum]
-  have hg : ∀ i : Fin l.length, 0 < (l.get i).1 ∧ IsDiscrete (l.get i).2 :=
-    fun i => hpos _ (List.get_mem l i)
-  have hloc : ∀ (i : Fin l.length) (w : HeightOneSpectrum (𝓞 E)), ∃ σ, IsLocCompGL (l.get i).2 w σ :=
-    fun i w => GlobalTheory.DiscLocEx.exists_isLocCompGL CuspFormAutomorphicBounds.automorphicFormsFiniteGL E _ _ (hg i).2 w
+  have hg : ∀ i : Fin l.length, 0 < (l.get i).1 ∧ IsDiscrete (l.get i).2 := fun i =>
+    hpos _ (List.get_mem l i)
+  have hloc
+      : ∀ (i : Fin l.length) (w : HeightOneSpectrum (𝓞 E)), ∃ σ,
+        IsLocCompGL (l.get i).2 w σ := fun i w =>
+    GlobalTheory.DiscLocEx.exists_isLocCompGL CuspFormAutomorphicBounds.automorphicFormsFiniteGL E _
+      _ (hg i).2 w
   choose σ hσ using hloc
-  have hinf : ∀ (i : Fin l.length) (τ : E →+* ℂ), ∃ m, HasInfCharGL (l.get i).2 τ m :=
-    fun i τ => PInfInd2A.exists_hasInfCharGL (hg i).2 τ
+  have hinf : ∀ (i : Fin l.length) (τ : E →+* ℂ), ∃ m, HasInfCharGL (l.get i).2 τ m := fun i τ =>
+    PInfInd2A.exists_hasInfCharGL (hg i).2 τ
   choose m hm using hinf
   have hN : ∑ i : Fin l.length, (l.get i).1 = N := by
     have h1 : (List.ofFn fun i : Fin l.length => (l.get i).1) = l.map Sigma.fst := by
       apply List.ext_get <;> simp
     rw [← List.sum_ofFn, h1, hsum]
-  refine ⟨⟨l.length, fun i => (l.get i).1, hN, fun i => (l.get i).2, σ, m, fun i => (hg i).1,
-    fun i => (hg i).2, hσ, hm⟩, ?_⟩
+  refine ⟨
+    ⟨
+      l.length,
+      fun i => (l.get i).1,
+      hN,
+      fun i => (l.get i).2,
+      σ,
+      m,
+      fun i => (hg i).1,
+      fun i => (hg i).2,
+      hσ,
+      hm
+    ⟩,
+    ?_
+  ⟩
   show (List.ofFn fun i : Fin l.length => (⟨(l.get i).1, (l.get i).2⟩ : Σ M : ℕ, Submodule ℂ (Sm E M))) =
     t.leafList.filter fun x => 0 < x.1
   rw [← hl]
@@ -81,6 +97,8 @@ theorem preOfTree : PreOfTree := by
 
 end PositivityTheory.Rg.BcB.SpectralAccumulation.PreOfTreePf
 
-theorem PositivityTheory.Rg.BcB.SpectralAccumulation.preOfTree_holds : PositivityTheory.Rg.BcB.SpectralAccumulation.PreOfTree := PositivityTheory.Rg.BcB.SpectralAccumulation.PreOfTreePf.preOfTree
+theorem PositivityTheory.Rg.BcB.SpectralAccumulation.preOfTree_holds
+    : PositivityTheory.Rg.BcB.SpectralAccumulation.PreOfTree :=
+  PositivityTheory.Rg.BcB.SpectralAccumulation.PreOfTreePf.preOfTree
 
 end

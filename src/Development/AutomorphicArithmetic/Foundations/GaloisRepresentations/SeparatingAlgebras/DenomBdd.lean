@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open UpperTheory.Gal.Gen
 
@@ -79,11 +81,9 @@ end UpperTheory.Gal.Gen.IntegralMatrixDenominatorBound
 
 open GlobalTheory.CongW (IntMat) in
 open UpperTheory.Gal.Gen.IntegralMatrixDenominatorBound in
-theorem UpperTheory.Gal.Gen.denomBdd_pf :
-    UpperTheory.Gal.Gen.DenomBdd := by
+theorem UpperTheory.Gal.Gen.denomBdd_pf : UpperTheory.Gal.Gen.DenomBdd := by
   intro E _ _ _ l hl n Z hZ
-  have hl0 : ((l : ℕ) : 𝓞 E) ≠ 0 := by
-    exact_mod_cast hl.ne_zero
+  have hl0 : ((l : ℕ) : 𝓞 E) ≠ 0 := by exact_mod_cast hl.ne_zero
   have hS : {u : HeightOneSpectrum (𝓞 E) | ((l : ℕ) : 𝓞 E) ∈ u.asIdeal}.Finite := by
     refine (Ideal.finite_factors (I := Ideal.span {((l : ℕ) : 𝓞 E)}) ?_).subset ?_
     · simpa using hl0
@@ -91,39 +91,59 @@ theorem UpperTheory.Gal.Gen.denomBdd_pf :
       exact Ideal.dvd_span_singleton.2 hu
   have hopen : ∀ d : ℕ, IsOpen {g : UA E n | DenomLe l d g} := by
     intro d
-    have e : {g : UA E n | DenomLe l d g} = ⋂ u ∈ {u : HeightOneSpectrum (𝓞 E) | ((l : ℕ) : 𝓞 E) ∈ u.asIdeal},
-        ({g : UA E n | IntMat u (((l : u.adicCompletion E) ^ d) • ((cLoc u g : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E)))} ∩
-        {g : UA E n | IntMat u (((l : u.adicCompletion E) ^ d) • (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E)))}) := by
+    have e
+        : {g : UA E n | DenomLe l d g}
+          = ⋂ u ∈ {u : HeightOneSpectrum (𝓞 E) | ((l : ℕ) : 𝓞 E) ∈ u.asIdeal},
+            ({g : UA E n | IntMat u (((l : u.adicCompletion E) ^ d) • ((cLoc u g : GL (Fin n) (u.adicCompletion E)) :
+              Matrix (Fin n) (Fin n) (u.adicCompletion E)))} ∩
+            {g : UA E n | IntMat u (((l : u.adicCompletion E) ^ d) • (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E)) :
+              Matrix (Fin n) (Fin n) (u.adicCompletion E)))}) := by
       ext g
       simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_inter_iff, DenomLe]
     rw [e]
     refine hS.isOpen_biInter fun u _ => ?_
-    exact (isOpen_intMat u _ _ (Units.continuous_val.comp (GlobalTheory.BCT.GlobLev.continuous_cLoc u))).inter
-      (isOpen_intMat u _ _ (Units.continuous_coe_inv.comp (GlobalTheory.BCT.GlobLev.continuous_cLoc u)))
+    exact (isOpen_intMat u _ _
+        (Units.continuous_val.comp (GlobalTheory.BCT.GlobLev.continuous_cLoc u))).inter
+      (isOpen_intMat u _ _
+        (Units.continuous_coe_inv.comp (GlobalTheory.BCT.GlobLev.continuous_cLoc u)))
   have hmono : ∀ {d e : ℕ}, d ≤ e → ∀ g : UA E n, DenomLe l d g → DenomLe l e g :=
     fun hde g h u hu => ⟨intMat_mono u l _ hde (h u hu).1, intMat_mono u l _ hde (h u hu).2⟩
   have hcover : ∀ g : UA E n, ∃ d : ℕ, DenomLe l d g := by
     intro g
-    have h1 : ∀ u : HeightOneSpectrum (𝓞 E), ∃ d : ℕ, ((l : ℕ) : 𝓞 E) ∈ u.asIdeal →
-        IntMat u (((l : u.adicCompletion E) ^ d) • ((cLoc u g : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E))) ∧
-        IntMat u (((l : u.adicCompletion E) ^ d) • (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E))) := by
+    have h1
+        : ∀ u : HeightOneSpectrum (𝓞 E), ∃ d : ℕ,
+          ((l : ℕ) : 𝓞 E) ∈ u.asIdeal
+            → IntMat u
+                (((l : u.adicCompletion E) ^ d)
+                  • ((cLoc u g : GL (Fin n) (u.adicCompletion E))
+                    : Matrix (Fin n) (Fin n) (u.adicCompletion E)))
+              ∧ IntMat u
+                (((l : u.adicCompletion E) ^ d)
+                  • (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E))
+                    : Matrix (Fin n) (Fin n) (u.adicCompletion E))) := by
       intro u
       by_cases hu : ((l : ℕ) : 𝓞 E) ∈ u.asIdeal
-      · obtain ⟨d₁, h₁⟩ := exists_intMat u hu ((cLoc u g : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E))
-        obtain ⟨d₂, h₂⟩ := exists_intMat u hu (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (u.adicCompletion E))
-        exact ⟨max d₁ d₂, fun _ => ⟨intMat_mono u l _ (le_max_left _ _) h₁, intMat_mono u l _ (le_max_right _ _) h₂⟩⟩
+      · obtain ⟨d₁, h₁⟩ :=
+          exists_intMat u hu
+            ((cLoc u g : GL (Fin n) (u.adicCompletion E))
+              : Matrix (Fin n) (Fin n) (u.adicCompletion E))
+        obtain ⟨d₂, h₂⟩ :=
+          exists_intMat u hu
+            (((cLoc u g)⁻¹ : GL (Fin n) (u.adicCompletion E))
+              : Matrix (Fin n) (Fin n) (u.adicCompletion E))
+        exact ⟨
+          max d₁ d₂,
+          fun _ => ⟨intMat_mono u l _ (le_max_left _ _) h₁, intMat_mono u l _ (le_max_right _ _) h₂⟩
+        ⟩
       · exact ⟨0, fun h => absurd h hu⟩
     choose D hD using h1
     refine ⟨hS.toFinset.sup D, fun u hu => ?_⟩
     have hle : D u ≤ hS.toFinset.sup D := Finset.le_sup (hS.mem_toFinset.2 hu)
     exact ⟨intMat_mono u l _ hle (hD u hu).1, intMat_mono u l _ hle (hD u hu).2⟩
-  obtain ⟨d, hd⟩ := hZ.elim_directed_cover (fun d : ℕ => {g : UA E n | DenomLe l d g}) hopen
-    (fun g _ => Set.mem_iUnion.2 (hcover g))
-    (directed_of_isDirected_le fun _ _ hde g hg => hmono hde g hg)
+  obtain ⟨d, hd⟩ :=
+    hZ.elim_directed_cover
+      (fun d : ℕ => {g : UA E n | DenomLe l d g})
+      hopen
+      (fun g _ => Set.mem_iUnion.2 (hcover g))
+      (directed_of_isDirected_le fun _ _ hde g hg => hmono hde g hg)
   exact ⟨d, fun g hg => hd hg⟩

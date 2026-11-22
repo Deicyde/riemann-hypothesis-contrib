@@ -6,24 +6,33 @@ public import Mathlib
 
 namespace ReciprocityTheory.ChartRestriction.G.T0
 
-theorem ufd_mem_of_forall_prime {R : Type*} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
+theorem ufd_mem_of_forall_prime
+    {R : Type*} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
     (x : FractionRing R)
-    (h : ∀ p : R, Prime p → ∃ a b : R, ¬ p ∣ b ∧ x * algebraMap R (FractionRing R) b =
-      algebraMap R (FractionRing R) a) :
-    ∃ a : R, x = algebraMap R (FractionRing R) a := by
+    (h : ∀ p : R,
+      Prime p
+        → ∃ a b : R,
+          ¬ p ∣ b ∧ x * algebraMap R (FractionRing R) b = algebraMap R (FractionRing R) a)
+    : ∃ a : R, x = algebraMap R (FractionRing R) a := by
   classical
-  have key : ∀ c : R, c ≠ 0 → ∀ a0 : R, x * algebraMap R (FractionRing R) c =
-      algebraMap R (FractionRing R) a0 → ∃ a : R, x = algebraMap R (FractionRing R) a := by
+  have key
+      : ∀ c : R,
+        c ≠ 0
+          → ∀ a0 : R,
+            x * algebraMap R (FractionRing R) c = algebraMap R (FractionRing R) a0
+              → ∃ a : R, x = algebraMap R (FractionRing R) a := by
     intro c
     induction c using UniqueFactorizationMonoid.induction_on_prime with
     | h₁ => intro h0; exact absurd rfl h0
     | h₂ u hu =>
       intro _ a0 hx
       refine ⟨a0 * ↑(hu.unit⁻¹), ?_⟩
-      have hu' : algebraMap R (FractionRing R) u * algebraMap R (FractionRing R) ↑(hu.unit⁻¹) = 1 := by
+      have hu'
+          : algebraMap R (FractionRing R) u * algebraMap R (FractionRing R) ↑(hu.unit⁻¹) = 1 := by
         rw [← map_mul]; simp
-      calc x = x * (algebraMap R (FractionRing R) u * algebraMap R (FractionRing R) ↑(hu.unit⁻¹)) := by
-              rw [hu', mul_one]
+      calc
+        x = x * (algebraMap R (FractionRing R) u * algebraMap R (FractionRing R) ↑(hu.unit⁻¹)) := by
+          rw [hu', mul_one]
         _ = algebraMap R (FractionRing R) (a0 * ↑(hu.unit⁻¹)) := by rw [← mul_assoc, hx, map_mul]
     | h₃ c p hc hp ih =>
       intro _ a0 hx

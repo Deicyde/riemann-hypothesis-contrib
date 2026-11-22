@@ -12,9 +12,12 @@ noncomputable section
 namespace GlobalTheory.MemLoc.FrobLaws
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.MemLoc Polynomial
 
-theorem endo_root {k : Type} [CommRing k] [IsDomain k] (p : ℕ) [hp : Fact p.Prime] [CharP k p]
-    (φ : k →+* k) {a : k} {m : ℕ} (hm : 0 < m) (hpm : ¬ p ∣ m) (ha : a ^ m = 1) :
-    ∃ n : ℕ, φ a = a ^ (p ^ n) := by
+theorem endo_root
+    {k : Type} [CommRing k] [IsDomain k]
+    (p : ℕ) [hp : Fact p.Prime] [CharP k p]
+    (φ : k →+* k)
+    {a : k} {m : ℕ} (hm : 0 < m) (hpm : ¬ p ∣ m) (ha : a ^ m = 1)
+    : ∃ n : ℕ, φ a = a ^ (p ^ n) := by
   have hf : 0 < m.totient := Nat.totient_pos.2 hm
   have hcop : p.Coprime m := (Nat.Prime.coprime_iff_not_dvd hp.out).2 hpm
   let F : Subring k := RingHom.eqLocus (iterateFrobenius k p m.totient) (RingHom.id k)
@@ -41,13 +44,17 @@ theorem endo_root {k : Type} [CommRing k] [IsDomain k] (p : ℕ) [hp : Fact p.Pr
   letI : Field F := (Finite.isField_of_domain F).toField
   haveI : CharP F p := F.subtype.charP F.subtype_injective p
   letI : Algebra (ZMod p) F := ZMod.algebra F p
-  let ψ : F →+* F := (φ.comp F.subtype).codRestrict F fun y => by
-    rw [hF]
-    show φ y ^ _ = φ y
-    rw [← map_pow, (hF y).1 y.2]
-  let ψ' : F →ₐ[ZMod p] F :=
-    { ψ with commutes' := fun r =>
-        RingHom.congr_fun (RingHom.ext_zmod (ψ.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) F)) r }
+  let ψ : F →+* F :=
+    (φ.comp F.subtype).codRestrict F fun y => by
+      rw [hF]
+      show φ y ^ _ = φ y
+      rw [← map_pow, (hF y).1 y.2]
+  let ψ' : F →ₐ[ZMod p] F := {
+    ψ with
+    commutes' := fun r =>
+      RingHom.congr_fun (RingHom.ext_zmod (ψ.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) F))
+        r
+  }
   obtain ⟨j, hj⟩ := (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) F).2 ψ'
   refine ⟨j, ?_⟩
   have h1 : ψ' ⟨a, haF⟩ = (⟨a, haF⟩ : F) ^ (p ^ (j : ℕ)) := by
@@ -59,15 +66,16 @@ variable {l : ℕ} [hl : Fact l.Prime]
 
 theorem norm_gal (g : GQ l) (x : Om l) : ‖g x‖ = ‖x‖ := (spectralNorm_eq_of_equiv g x).symm
 
-def OO (l : ℕ) [Fact l.Prime] : Subring (Om l) := GlobalTheory.ClosedBallValuationSubring.closedBallSubring (Om l)
+def OO (l : ℕ) [Fact l.Prime] : Subring (Om l) :=
+  GlobalTheory.ClosedBallValuationSubring.closedBallSubring (Om l)
 
-def MM (l : ℕ) [Fact l.Prime] : Ideal (OO l) := GlobalTheory.ClosedBallValuationSubring.openBallIdeal (Om l)
+def MM (l : ℕ) [Fact l.Prime] : Ideal (OO l) :=
+  GlobalTheory.ClosedBallValuationSubring.openBallIdeal (Om l)
 
 theorem mem_MM (x : OO l) : x ∈ MM l ↔ ‖(x : Om l)‖ < 1 := Iff.rfl
 
 instance MM_prime : (MM l).IsPrime where
-  ne_top' := by
-    rw [Ideal.ne_top_iff_one, mem_MM]; simp
+  ne_top' := by rw [Ideal.ne_top_iff_one, mem_MM]; simp
   mem_or_mem' := fun {a b} h => by
     rw [mem_MM] at h
     by_contra hc
@@ -85,19 +93,20 @@ theorem res_eq_iff (a b : OO l) : res a = res b ↔ ‖(a : Om l) - b‖ < 1 := 
 instance kk_char : CharP (kk l) l := by
   refine (CharP.charP_iff_prime_eq_zero hl.out).2 ?_
   rw [← map_natCast (res (l := l)), Ideal.Quotient.eq_zero_iff_mem, mem_MM]
-  have h : ‖((l : ℚ_[l]) : Om l)‖ < 1 := by
-    rw [PadicAlgCl.norm_extends]; exact Padic.norm_p_lt_one
+  have h : ‖((l : ℚ_[l]) : Om l)‖ < 1 := by rw [PadicAlgCl.norm_extends]; exact Padic.norm_p_lt_one
   simpa using h
 
 def galO (g : GQ l) : OO l →+* OO l :=
   ((g : Om l →+* Om l).comp (OO l).subtype).codRestrict (OO l) fun x => by
     show ‖g x‖ ≤ 1
-    rw [norm_gal]; exact x.2
+    rw [norm_gal]
+    exact x.2
 
 def galK (g : GQ l) : kk l →+* kk l :=
   Ideal.quotientMap (MM l) (galO g) fun x hx => by
     show ‖g x‖ < 1
-    rw [norm_gal]; exact hx
+    rw [norm_gal]
+    exact hx
 
 theorem galK_res (g : GQ l) (x : OO l) : galK g (res x) = res (galO g x) := rfl
 
@@ -106,8 +115,10 @@ theorem norm_root {ζ : Om l} {m : ℕ} (hm : 0 < m) (h : ζ ^ m = 1) : ‖ζ‖
   rw [norm_pow, norm_one] at this
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hm.ne').1 this
 
-theorem res_inj {a b : OO l} {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) (ha : a ^ m = 1) (hb : b ^ m = 1)
-    (h : res a = res b) : a = b := by
+theorem res_inj
+    {a b : OO l} {m : ℕ}
+    (hm : 0 < m) (hlm : ¬ l ∣ m) (ha : a ^ m = 1) (hb : b ^ m = 1) (h : res a = res b)
+    : a = b := by
   by_contra hne
   have h1 := (Commute.all a b).geom_sum₂_mul m
   rw [ha, hb, sub_self] at h1
@@ -123,23 +134,24 @@ theorem res_inj {a b : OO l} {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) (ha : a ^
     rw [h6, zero_pow hm.ne'] at h5
     exact zero_ne_one h5
 
-theorem gal_root (h : GQ l) {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) :
-    ∃ n : ℕ, ∀ ζ : Om l, ζ ^ m = 1 → h ζ = ζ ^ (l ^ n) := by
+theorem gal_root (h : GQ l) {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m)
+    : ∃ n : ℕ, ∀ ζ : Om l, ζ ^ m = 1 → h ζ = ζ ^ (l ^ n) := by
   haveI : NeZero m := ⟨hm.ne'⟩
   obtain ⟨ξ, hξ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (Om l) m
   let a : OO l := ⟨ξ, (norm_root hm hξ.pow_eq_one).le⟩
   have ha : a ^ m = 1 := Subtype.ext hξ.pow_eq_one
   obtain ⟨n, hn⟩ := endo_root l (galK h) (a := res a) hm hlm (by rw [← map_pow, ha, map_one])
   rw [galK_res, ← map_pow] at hn
-  have h1 := res_inj hm hlm (by rw [← map_pow, ha, map_one])
-    (by rw [← pow_mul, mul_comm, pow_mul, ha, one_pow]) hn
+  have h1 :=
+    res_inj hm hlm (by rw [← map_pow, ha, map_one])
+      (by rw [← pow_mul, mul_comm, pow_mul, ha, one_pow]) hn
   have h2 : h ξ = ξ ^ (l ^ n) := congrArg Subtype.val h1
   refine ⟨n, fun ζ hζ => ?_⟩
   obtain ⟨i, -, rfl⟩ := hξ.eq_pow_of_pow_eq_one hζ
   rw [map_pow, h2, ← pow_mul, ← pow_mul, mul_comm]
 
-theorem exists_root (x : Om l) (hx : ‖x‖ = 1) :
-    ∃ (ζ : Om l) (m : ℕ), 0 < m ∧ ¬ l ∣ m ∧ ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 := by
+theorem exists_root (x : Om l) (hx : ‖x‖ = 1)
+    : ∃ (ζ : Om l) (m : ℕ), 0 < m ∧ ¬ l ∣ m ∧ ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 := by
   obtain ⟨n, hn, h⟩ := GlobalTheory.ResidueRoot.exists_pow_alg x hx
   obtain ⟨e, m, hlm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn.ne' l hl.out.ne_one
   have hm : 0 < m := Nat.pos_of_ne_zero (by rintro rfl; simp at hlm)
@@ -157,22 +169,31 @@ theorem exists_root (x : Om l) (hx : ‖x‖ = 1) :
   by_contra hc
   push Not at hc
   refine absurd h2 (not_lt.2 ?_)
-  exact Finset.prod_induction _ (fun r : ℝ => 1 ≤ r)
+  exact Finset.prod_induction _
+    (fun r : ℝ => 1 ≤ r)
     (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
-    le_rfl fun ζ hζ => hc ζ m hm hlm ((mem_nthRootsFinset hm _).1 hζ)
+    le_rfl
+    fun ζ hζ => hc ζ m hm hlm ((mem_nthRootsFinset hm _).1 hζ)
 
-theorem exists_level {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) :
-    ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧
-      ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h x = h' x := by
-  have key : ∀ {a b : Om l}, (∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧
-      ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h a = h' a) →
-      (∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧
-      ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h b = h' b) →
-      ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧
-      ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h a = h' a ∧ h b = h' b := by
+theorem exists_level {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l)
+    : ∃ m : ℕ,
+      0 < m ∧ ¬ l ∣ m ∧ ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h x = h' x := by
+  have key
+      : ∀ {a b : Om l},
+        (∃ m : ℕ,
+            0 < m ∧ ¬ l ∣ m ∧ ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h a = h' a)
+          → (∃ m : ℕ,
+            0 < m ∧ ¬ l ∣ m ∧ ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h b = h' b)
+          → ∃ m : ℕ,
+            0 < m ∧ ¬ l ∣ m
+              ∧ ∀ h h' : GQ l, (∀ ζ : Om l, ζ ^ m = 1 → h ζ = h' ζ) → h a = h' a ∧ h b = h' b := by
     rintro a b ⟨m, hm, hlm, ha⟩ ⟨n, hn, hln, hb⟩
-    refine ⟨m * n, Nat.mul_pos hm hn, fun hd => ((hl.out.dvd_mul).1 hd).elim hlm hln,
-      fun h h' H => ⟨ha h h' fun ζ hζ => H ζ ?_, hb h h' fun ζ hζ => H ζ ?_⟩⟩
+    refine ⟨
+      m * n,
+      Nat.mul_pos hm hn,
+      fun hd => ((hl.out.dvd_mul).1 hd).elim hlm hln,
+      fun h h' H => ⟨ha h h' fun ζ hζ => H ζ ?_, hb h h' fun ζ hζ => H ζ ?_⟩
+    ⟩
     · rw [pow_mul, hζ, one_pow]
     · rw [mul_comm, pow_mul, hζ, one_pow]
   unfold MaximalUnramifiedExtension at hx
@@ -184,7 +205,12 @@ theorem exists_level {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) :
     exact ⟨1, one_pos, hl.out.not_dvd_one, fun h h' _ => by rw [h.commutes, h'.commutes]⟩
   | add a b _ _ ha hb =>
     obtain ⟨m, hm, hlm, H⟩ := key ha hb
-    exact ⟨m, hm, hlm, fun h h' H' => by rw [map_add (f := _), map_add (f := _), (H h h' H').1, (H h h' H').2]⟩
+    exact ⟨
+      m,
+      hm,
+      hlm,
+      fun h h' H' => by rw [map_add (f := _), map_add (f := _), (H h h' H').1, (H h h' H').2]
+    ⟩
   | inv a _ ha =>
     obtain ⟨m, hm, hlm, H⟩ := ha
     exact ⟨m, hm, hlm, fun h h' H' => by rw [map_inv₀, map_inv₀, H h h' H']⟩
@@ -192,8 +218,8 @@ theorem exists_level {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) :
     obtain ⟨m, hm, hlm, H⟩ := key ha hb
     exact ⟨m, hm, hlm, fun h h' H' => by rw [map_mul, map_mul, (H h h' H').1, (H h h' H').2]⟩
 
-theorem exists_ext (σ : ↥(MaximalUnramifiedExtension l) →ₐ[ℚ_[l]] ↥(MaximalUnramifiedExtension l)) :
-    ∃ g : GQ l, ∀ x : ↥(MaximalUnramifiedExtension l), g x = (σ x : Om l) := by
+theorem exists_ext (σ : ↥(MaximalUnramifiedExtension l) →ₐ[ℚ_[l]] ↥(MaximalUnramifiedExtension l))
+    : ∃ g : GQ l, ∀ x : ↥(MaximalUnramifiedExtension l), g x = (σ x : Om l) := by
   let f : Om l →ₐ[ℚ_[l]] Om l := σ.liftNormal (Om l)
   refine ⟨AlgEquiv.ofBijective f (Algebra.IsAlgebraic.algHom_bijective f), fun x => ?_⟩
   exact σ.liftNormal_commutes (Om l) x
@@ -203,17 +229,25 @@ end GlobalTheory.MemLoc.FrobLaws
 namespace GlobalTheory.MemLoc
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc FrobLaws
 
-theorem frob_laws (l : ℕ) [hl : Fact l.Prime] (σ : ↥(MaximalUnramifiedExtension l) →ₐ[ℚ_[l]] ↥(MaximalUnramifiedExtension l))
-    (hσ : ∀ (c : ↥(MaximalUnramifiedExtension l)) (m : ℕ), 0 < m → ¬ l ∣ m → c ^ m = 1 → σ c = c ^ l) :
-    (∀ x : ↥(MaximalUnramifiedExtension l), ‖(x : Om l)‖ ≤ 1 → ‖((σ x : ↥(MaximalUnramifiedExtension l)) : Om l) - (x : Om l) ^ l‖ < 1) ∧
-    (∀ (K : FinExt l) (x : ↥(MaximalUnramifiedExtension l)), (x : Om l) ∈ K.1 → ((σ x : ↥(MaximalUnramifiedExtension l)) : Om l) ∈ K.1) ∧
-    (∀ x : ↥(MaximalUnramifiedExtension l), σ x = x → ∃ c : ℚ_[l], algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) c = x) := by
+theorem frob_laws
+    (l : ℕ) [hl : Fact l.Prime]
+    (σ : ↥(MaximalUnramifiedExtension l) →ₐ[ℚ_[l]] ↥(MaximalUnramifiedExtension l))
+    (hσ
+      : ∀ (c : ↥(MaximalUnramifiedExtension l)) (m : ℕ), 0 < m → ¬ l ∣ m → c ^ m = 1 → σ c = c ^ l)
+    : (∀ x : ↥(MaximalUnramifiedExtension l),
+        ‖(x : Om l)‖ ≤ 1 → ‖((σ x : ↥(MaximalUnramifiedExtension l)) : Om l) - (x : Om l) ^ l‖ < 1)
+      ∧ (∀ (K : FinExt l) (x : ↥(MaximalUnramifiedExtension l)),
+        (x : Om l) ∈ K.1 → ((σ x : ↥(MaximalUnramifiedExtension l)) : Om l) ∈ K.1)
+      ∧ (∀ x : ↥(MaximalUnramifiedExtension l),
+        σ x = x → ∃ c : ℚ_[l], algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) c = x) := by
   obtain ⟨g, hg⟩ := exists_ext σ
   have hroot : ∀ (ζ : Om l) (m : ℕ), 0 < m → ¬ l ∣ m → ζ ^ m = 1 → g ζ = ζ ^ l := by
     intro ζ m hm hlm hζ
-    let c : ↥(MaximalUnramifiedExtension l) := ⟨ζ, IntermediateField.subset_adjoin _ _ ⟨m, hm, hlm, hζ⟩⟩
+    let c : ↥(MaximalUnramifiedExtension l) :=
+      ⟨ζ, IntermediateField.subset_adjoin _ _ ⟨m, hm, hlm, hζ⟩⟩
     have := hσ c m hm hlm (Subtype.ext hζ)
-    rw [show ζ = (c : Om l) from rfl, hg, this]; rfl
+    rw [show ζ = (c : Om l) from rfl, hg, this]
+    rfl
   refine ⟨fun x hx => ?_, fun K x hx => ?_, fun x hx => ?_⟩
   · rw [← hg]
     let a : OO l := ⟨x, hx⟩
@@ -231,9 +265,10 @@ theorem frob_laws (l : ℕ) [hl : Fact l.Prime] (σ : ↥(MaximalUnramifiedExten
   · rw [← hg, ← InfiniteGalois.fixedField_fixingSubgroup K.1, IntermediateField.mem_fixedField_iff]
     intro h hh
     obtain ⟨m, hm, hlm, H⟩ := exists_level x.2
-    have h1 := H (h * g) (g * h) fun ζ hζ => by
-      rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, hroot ζ m hm hlm hζ, map_pow,
-        hroot (h ζ) m hm hlm (by rw [← map_pow, hζ, map_one])]
+    have h1 :=
+      H (h * g) (g * h) fun ζ hζ => by
+        rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, hroot ζ m hm hlm hζ, map_pow,
+          hroot (h ζ) m hm hlm (by rw [← map_pow, hζ, map_one])]
     rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply] at h1
     rw [h1, (IntermediateField.mem_fixingSubgroup_iff _ _).1 hh x hx]
   · have hgx : g x = x := by rw [hg, hx]
@@ -247,8 +282,8 @@ theorem frob_laws (l : ℕ) [hl : Fact l.Prime] (σ : ↥(MaximalUnramifiedExten
       | zero => simp
       | succ n ih =>
         rw [pow_succ', AlgEquiv.mul_apply, ih, map_pow, hroot ζ m hm hlm hζ, ← pow_mul, pow_succ']
-    obtain ⟨c, hc⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := ℚ_[l]) (x : Om l)).2
-      fun h => by
+    obtain ⟨c, hc⟩ :=
+      (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := ℚ_[l]) (x : Om l)).2 fun h => by
         obtain ⟨n, hn⟩ := gal_root h hm hlm
         rw [H h (g ^ n) fun ζ hζ => by rw [hn ζ hζ, hr n ζ hζ], hpow]
     exact ⟨c, Subtype.ext hc⟩

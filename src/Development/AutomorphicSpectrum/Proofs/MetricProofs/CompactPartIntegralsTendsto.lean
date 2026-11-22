@@ -5,7 +5,8 @@ public import ReciprocityTheory.AnalyticForms.LeviForms.ConvExpandStatement
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
@@ -14,43 +15,48 @@ noncomputable section
 
 open scoped ENNReal
 
-theorem cpt_chart_piece {e : ℕ} {X : Type} [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
-    {T O C : Set (Fin e → ℂ)} (hT : IsOpen T) {s : (Fin e → ℂ) → X} (hs : ContinuousOn s T)
-    {w : (Fin e → ℂ) → ℝ} (hO : MeasurableSet O) (hCm : MeasurableSet C) (hCT : C ⊆ T)
-    (hw : ContinuousOn w C) (hw0 : ∀ y ∈ T ∩ O, w y ≤ 0)
-    {G : X → ℝ} (hG : Measurable G) (hGz : ∀ y ∈ T, y ∉ O → y ∉ C → G (s y) = 0) :
-    (Integrable G (((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s) ↔
-      IntegrableOn (fun y => G (s y) * max (w y) 0) C) ∧
-    ∫ x, G x ∂(((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s) =
-      ∫ y in C, G (s y) * max (w y) 0 := by
+theorem cpt_chart_piece
+    {e : ℕ} {X : Type} [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
+    {T O C : Set (Fin e → ℂ)} (hT : IsOpen T)
+    {s : (Fin e → ℂ) → X} (hs : ContinuousOn s T)
+    {w : (Fin e → ℂ) → ℝ}
+    (hO : MeasurableSet O) (hCm : MeasurableSet C) (hCT : C ⊆ T) (hw : ContinuousOn w C)
+    (hw0 : ∀ y ∈ T ∩ O, w y ≤ 0)
+    {G : X → ℝ} (hG : Measurable G) (hGz : ∀ y ∈ T, y ∉ O → y ∉ C → G (s y) = 0)
+    : (Integrable G (((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s)
+        ↔ IntegrableOn (fun y => G (s y) * max (w y) 0) C)
+      ∧ ∫ x, G x ∂(((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s)
+        = ∫ y in C, G (s y) * max (w y) 0 := by
   have hTm : MeasurableSet T := hT.measurableSet
   have hsm : AEMeasurable s ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)) :=
     (hs.aemeasurable hTm).mono_ac (withDensity_absolutelyContinuous _ _)
-  have hGm := hG.aestronglyMeasurable
-    (μ := ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s)
+  have hGm :=
+    hG.aestronglyMeasurable
+      (μ := ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).map s)
   have h1 : ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)) (T ∩ O) = 0 := by
     rw [withDensity_apply _ (hTm.inter hO)]
     refine (setLIntegral_congr_fun (g := fun _ => 0) (hTm.inter hO) ?_).trans (by simp)
     intro y hy
     exact ENNReal.ofReal_of_nonpos (hw0 y hy)
   have h2 : ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)) Tᶜ = 0 :=
-    withDensity_absolutelyContinuous _ _ (by
-      rw [Measure.restrict_apply hTm.compl]; simp)
-  have hae : (G ∘ s) =ᵐ[(volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)]
-      C.indicator (G ∘ s) := by
+    withDensity_absolutelyContinuous _ _ (by rw [Measure.restrict_apply hTm.compl]; simp)
+  have hae
+      : (G ∘ s) =ᵐ[(volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)]
+        C.indicator (G ∘ s) := by
     have h3 := measure_union_null h1 h2
     refine measure_mono_null (fun y hy => ?_) h3
     by_contra hcon
-    simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_compl_iff, not_or, not_and,
-      not_not] at hcon
+    simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_compl_iff, not_or, not_and, not_not]
+      at hcon
     have hyT : y ∈ T := hcon.2
     have hyO : y ∉ O := hcon.1 hyT
     apply hy
     by_cases hyC : y ∈ C
     · simp [Set.indicator_of_mem hyC]
     · simp [Set.indicator_of_notMem hyC, hGz y hyT hyO hyC]
-  have hrest : ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).restrict C =
-      (volume.restrict C).withDensity fun y => ENNReal.ofReal (w y) := by
+  have hrest
+      : ((volume.restrict T).withDensity fun y => ENNReal.ofReal (w y)).restrict C
+        = (volume.restrict C).withDensity fun y => ENNReal.ofReal (w y) := by
     rw [restrict_withDensity hCm, Measure.restrict_restrict hCm, Set.inter_eq_left.2 hCT]
   have hwm : AEMeasurable (fun y => (w y).toNNReal) (volume.restrict C) :=
     (hw.aemeasurable hCm).real_toNNReal
@@ -68,82 +74,101 @@ theorem cpt_chart_piece {e : ℕ} {X : Type} [TopologicalSpace X] [MeasurableSpa
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X]
 
-def cptSet (A : FinHolAtlas e X) (P : ChartPartition A) (K : Set X) (j : Fin A.n) :
-    Set (Fin e → ℂ) :=
+def cptSet (A : FinHolAtlas e X) (P : ChartPartition A) (K : Set X) (j : Fin A.n)
+    : Set (Fin e → ℂ) :=
   A.chart j '' (K ∩ tsupport (P.χ j))
 
-def cptW (A : FinHolAtlas e X) (P : ChartPartition A) (Φ : Fin e → LocPot X) (j : Fin A.n)
-    (y : Fin e → ℂ) : ℝ :=
+def cptW
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X) (j : Fin A.n) (y : Fin e → ℂ)
+    : ℝ :=
   P.χ j ((A.chart j).symm y) * locDens A Φ j y
 
-theorem cptSet_symm_mem (A : FinHolAtlas e X) (P : ChartPartition A) (K : Set X) (j : Fin A.n)
-    {y : Fin e → ℂ} (hy : y ∈ cptSet A P K j) : (A.chart j).symm y ∈ K := by
+theorem cptSet_symm_mem
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (K : Set X) (j : Fin A.n)
+    {y : Fin e → ℂ} (hy : y ∈ cptSet A P K j)
+    : (A.chart j).symm y ∈ K := by
   obtain ⟨x, ⟨hxK, hxs⟩, rfl⟩ := hy
   rw [(A.chart j).left_inv (P.tsupport_subset j hxs)]
   exact hxK
 
-theorem cptSet_subset_target (A : FinHolAtlas e X) (P : ChartPartition A) (K : Set X) (j : Fin A.n) :
-    cptSet A P K j ⊆ (A.chart j).target := by
+theorem cptSet_subset_target (A : FinHolAtlas e X) (P : ChartPartition A) (K : Set X) (j : Fin A.n)
+    : cptSet A P K j ⊆ (A.chart j).target := by
   rintro y ⟨x, ⟨-, hxs⟩, rfl⟩
   exact (A.chart j).map_source (P.tsupport_subset j hxs)
 
-theorem cptSet_compact [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A) {K : Set X}
-    (hK : IsClosed K) (j : Fin A.n) : IsCompact (cptSet A P K j) := by
+theorem cptSet_compact
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    {K : Set X} (hK : IsClosed K)
+    (j : Fin A.n)
+    : IsCompact (cptSet A P K j) := by
   exact (hK.isCompact.inter_right (isClosed_tsupport _)).image_of_continuousOn
     ((A.chart j).continuousOn.mono fun x hx => P.tsupport_subset j hx.2)
 
-theorem cptSet_subset (A : FinHolAtlas e X) (P : ChartPartition A) {K U : Set X} (hKU : K ⊆ U)
-    (j : Fin A.n) : cptSet A P K j ⊆ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U := by
+theorem cptSet_subset
+    (A : FinHolAtlas e X) (P : ChartPartition A) {K U : Set X} (hKU : K ⊆ U) (j : Fin A.n)
+    : cptSet A P K j ⊆ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U := by
   intro y hy
   exact ⟨cptSet_subset_target A P K j hy, hKU (cptSet_symm_mem A P K j hy)⟩
 
-theorem cptW_continuousOn (A : FinHolAtlas e X) (P : ChartPartition A) (Φ : Fin e → LocPot X)
-    {K U : Set X} (hKU : K ⊆ U) (j : Fin A.n)
-    (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U)) :
-    ContinuousOn (cptW A P Φ j) (cptSet A P K j) := by
+theorem cptW_continuousOn
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X)
+    {K U : Set X} (hKU : K ⊆ U)
+    (j : Fin A.n) (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+    : ContinuousOn (cptW A P Φ j) (cptSet A P K j) := by
   have hχ : ContinuousOn (fun y => P.χ j ((A.chart j).symm y)) (cptSet A P K j) :=
     ((P.smooth j) j).continuousOn.mono fun y hy => ⟨cptSet_subset_target A P K j hy, Set.mem_univ _⟩
   exact hχ.mul (hc.mono (cptSet_subset A P hKU j))
 
 variable [MeasurableSpace X] [BorelSpace X]
 
-theorem cpt_chartMeasure [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A)
-    (Φ : Fin e → LocPot X) {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U) (j : Fin A.n)
-    (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
-    {G : X → ℝ} (hG : Measurable G) (hGK : ∀ x, x ∉ K → G x = 0) :
-    (Integrable G (chartMeasure A P Φ j) ↔
-      IntegrableOn (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0) (cptSet A P K j)) ∧
-    ∫ x, G x ∂chartMeasure A P Φ j =
-      ∫ y in cptSet A P K j, G ((A.chart j).symm y) * max (cptW A P Φ j y) 0 := by
-  have key := cpt_chart_piece (w := cptW A P Φ j) (s := (A.chart j).symm) (G := G)
-    (T := (A.chart j).target) (C := cptSet A P K j)
-    (O := (A.chart j).target ∩ (A.chart j).symm ⁻¹' (tsupport (P.χ j))ᶜ)
-    (A.chart j).open_target (A.chart j).continuousOn_symm
-    ((A.chart j).isOpen_inter_preimage_symm (isClosed_tsupport _).isOpen_compl).measurableSet
-    (cptSet_compact A P hK j).measurableSet (cptSet_subset_target A P K j)
-    (cptW_continuousOn A P Φ hKU j hc)
-    (by
-      rintro y ⟨-, -, hy⟩
-      have h0 : P.χ j ((A.chart j).symm y) = 0 := image_eq_zero_of_notMem_tsupport hy
-      simp [cptW, h0])
-    hG
-    (by
-      intro y hy hyO hyC
-      by_contra hne
-      have hxK : (A.chart j).symm y ∈ K := by
-        by_contra h
-        exact hne (hGK _ h)
-      have hxs : (A.chart j).symm y ∈ tsupport (P.χ j) := by
-        by_contra h
-        exact hyO ⟨hy, h⟩
-      exact hyC ⟨_, ⟨hxK, hxs⟩, (A.chart j).right_inv hy⟩)
+theorem cpt_chartMeasure
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X)
+    {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U)
+    (j : Fin A.n) (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+    {G : X → ℝ} (hG : Measurable G) (hGK : ∀ x, x ∉ K → G x = 0)
+    : (Integrable G (chartMeasure A P Φ j)
+        ↔ IntegrableOn (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0) (cptSet A P K j))
+      ∧ ∫ x, G x ∂chartMeasure A P Φ j
+        = ∫ y in cptSet A P K j, G ((A.chart j).symm y) * max (cptW A P Φ j y) 0 := by
+  have key :=
+    cpt_chart_piece (w := cptW A P Φ j) (s := (A.chart j).symm) (G := G) (T := (A.chart j).target)
+      (C := cptSet A P K j) (O := (A.chart j).target ∩ (A.chart j).symm ⁻¹' (tsupport (P.χ j))ᶜ)
+      (A.chart j).open_target (A.chart j).continuousOn_symm
+      ((A.chart j).isOpen_inter_preimage_symm (isClosed_tsupport _).isOpen_compl).measurableSet
+      (cptSet_compact A P hK j).measurableSet (cptSet_subset_target A P K j)
+      (cptW_continuousOn A P Φ hKU j hc)
+      (by
+        rintro y ⟨-, -, hy⟩
+        have h0 : P.χ j ((A.chart j).symm y) = 0 := image_eq_zero_of_notMem_tsupport hy
+        simp [cptW, h0])
+      hG
+      (by
+        intro y hy hyO hyC
+        by_contra hne
+        have hxK : (A.chart j).symm y ∈ K := by
+          by_contra h
+          exact hne (hGK _ h)
+        have hxs : (A.chart j).symm y ∈ tsupport (P.χ j) := by
+          by_contra h
+          exact hyO ⟨hy, h⟩
+        exact hyC ⟨_, ⟨hxK, hxs⟩, (A.chart j).right_inv hy⟩)
   exact key
 
-theorem cpt_aesm [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A)
-    (Φ : Fin e → LocPot X) {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U) (j : Fin A.n)
-    (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
-    {G : X → ℝ} (hG : Measurable G) :
-    AEStronglyMeasurable (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0)
+theorem cpt_aesm
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X)
+    {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U)
+    (j : Fin A.n) (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+    {G : X → ℝ} (hG : Measurable G)
+    : AEStronglyMeasurable
+      (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0)
       (volume.restrict (cptSet A P K j)) := by
   have hCm : MeasurableSet (cptSet A P K j) := (cptSet_compact A P hK j).isClosed.measurableSet
   have hs : ContinuousOn (A.chart j).symm (cptSet A P K j) :=
@@ -154,24 +179,28 @@ theorem cpt_aesm [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A)
     ((cptW_continuousOn A P Φ hKU j hc).aemeasurable hCm).max aemeasurable_const
   exact (h1.mul h2).aestronglyMeasurable
 
-theorem cpt_abs_max {c a B : ℝ} (hc : 0 ≤ c) (hc1 : c ≤ 1) (h : |a| ≤ B) :
-    |max (c * a) 0| ≤ B := by
+theorem cpt_abs_max {c a B : ℝ} (hc : 0 ≤ c) (hc1 : c ≤ 1) (h : |a| ≤ B) : |max (c * a) 0| ≤ B := by
   have hB : 0 ≤ B := le_trans (abs_nonneg a) h
   rw [abs_of_nonneg (le_max_right _ _)]
   refine max_le ?_ hB
-  calc c * a ≤ |c * a| := le_abs_self _
+  calc
+    c * a
+      ≤ |c * a| := le_abs_self _
     _ = c * |a| := by rw [abs_mul, abs_of_nonneg hc]
     _ ≤ 1 * |a| := mul_le_mul_of_nonneg_right hc1 (abs_nonneg a)
     _ ≤ B := by rw [one_mul]; exact h
 
-theorem cpt_integrableOn [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A)
-    (Φ : Fin e → LocPot X) {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U) (j : Fin A.n)
-    (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
-    {G : X → ℝ} (hG : Measurable G) {B : ℝ} (hB : ∀ x ∈ K, |G x| ≤ B) :
-    IntegrableOn (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0) (cptSet A P K j) := by
+theorem cpt_integrableOn
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X)
+    {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U)
+    (j : Fin A.n) (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+    {G : X → ℝ} (hG : Measurable G)
+    {B : ℝ} (hB : ∀ x ∈ K, |G x| ≤ B)
+    : IntegrableOn (fun y => G ((A.chart j).symm y) * max (cptW A P Φ j y) 0) (cptSet A P K j) := by
   have hCc := cptSet_compact A P hK j
-  obtain ⟨L, hL⟩ := hCc.exists_bound_of_continuousOn
-    (hc.mono (cptSet_subset A P hKU j))
+  obtain ⟨L, hL⟩ := hCc.exists_bound_of_continuousOn (hc.mono (cptSet_subset A P hKU j))
   haveI : IsFiniteMeasure (volume.restrict (cptSet A P K j)) :=
     ⟨by simpa using hCc.measure_lt_top⟩
   refine Integrable.of_bound (cpt_aesm A P Φ hK hKU j hc hG) (B * L)
@@ -182,17 +211,21 @@ theorem cpt_integrableOn [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartit
   rw [Real.norm_eq_abs, abs_mul]
   exact mul_le_mul (hB _ hx) a2 (abs_nonneg _) ((abs_nonneg _).trans (hB _ hx))
 
-theorem cpt_maMeasure [CompactSpace X] (A : FinHolAtlas e X) (hne : Nonempty (ChartPartition A))
-    (Φ : Fin e → LocPot X) {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U)
+theorem cpt_maMeasure
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (hne : Nonempty (ChartPartition A))
+    (Φ : Fin e → LocPot X)
+    {K U : Set X} (hK : IsClosed K) (hKU : K ⊆ U)
     (hc : ∀ j, ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
-    {G : X → ℝ} (hG : Measurable G) (hGK : ∀ x, x ∉ K → G x = 0) {B : ℝ}
-    (hB : ∀ x ∈ K, |G x| ≤ B) :
-    Integrable G (maMeasure A Φ) ∧ ∫ x, G x ∂maMeasure A Φ =
-      ∑ j, ∫ y in cptSet A hne.some K j,
-        G ((A.chart j).symm y) * max (cptW A hne.some Φ j y) 0 := by
+    {G : X → ℝ} (hG : Measurable G) (hGK : ∀ x, x ∉ K → G x = 0)
+    {B : ℝ} (hB : ∀ x ∈ K, |G x| ≤ B)
+    : Integrable G (maMeasure A Φ)
+      ∧ ∫ x, G x ∂maMeasure A Φ
+        = ∑ j, ∫ y in cptSet A hne.some K j,
+            G ((A.chart j).symm y) * max (cptW A hne.some Φ j y) 0 := by
   have hint : ∀ j, Integrable G (chartMeasure A hne.some Φ j) := fun j =>
-    (cpt_chartMeasure A hne.some Φ hK hKU j (hc j) hG hGK).1.2
-      (cpt_integrableOn A hne.some Φ hK hKU j (hc j) hG hB)
+    (cpt_chartMeasure A hne.some Φ hK hKU j (hc j) hG hGK).1.2 (cpt_integrableOn A hne.some Φ hK hKU
+      j (hc j) hG hB)
   have hmeasure : maMeasure A Φ = ∑ j, chartMeasure A hne.some Φ j := by
     unfold maMeasure
     rw [dite_eq_left hne]
@@ -202,8 +235,10 @@ theorem cpt_maMeasure [CompactSpace X] (A : FinHolAtlas e X) (hne : Nonempty (Ch
   rw [integral_finsetSum_measure fun j _ => hint j]
   exact Finset.sum_congr rfl fun j _ => (cpt_chartMeasure A hne.some Φ hK hKU j (hc j) hG hGK).2
 
-theorem cpt_meas {U S : Set X} (hU : IsOpen U) (hS : MeasurableSet S) (hSU : S ⊆ U) {f : X → ℝ}
-    (hf : ContinuousOn f U) : Measurable (S.indicator f) := by
+theorem cpt_meas
+    {U S : Set X} (hU : IsOpen U) (hS : MeasurableSet S) (hSU : S ⊆ U)
+    {f : X → ℝ} (hf : ContinuousOn f U)
+    : Measurable (S.indicator f) := by
   classical
   have h1 : Measurable (U.piecewise f 0) :=
     hf.measurable_piecewise (continuousOn_const (c := (0 : ℝ))) hU.measurableSet
@@ -215,39 +250,53 @@ theorem cpt_meas {U S : Set X} (hU : IsOpen U) (hS : MeasurableSet S) (hSU : S �
   rw [h2]
   exact h1.indicator hS
 
-theorem cpt_ind [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
-    (hne : Nonempty (ChartPartition A)) (Φ : Fin e → LocPot X) {K U S : Set X} (hU : IsOpen U)
-    (hK : IsCompact K) (hKU : K ⊆ U)
+theorem cpt_ind
+    [CompactSpace X] [T2Space X]
+    (A : FinHolAtlas e X) (hne : Nonempty (ChartPartition A))
+    (Φ : Fin e → LocPot X)
+    {K U S : Set X} (hU : IsOpen U) (hK : IsCompact K) (hKU : K ⊆ U)
     (hc : ∀ j, ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
-    (hS : MeasurableSet S) (hSK : S ⊆ K) {f : X → ℝ} (hf : ContinuousOn f U) :
-    Integrable (S.indicator f) (maMeasure A Φ) ∧ ∫ x in S, f x ∂maMeasure A Φ =
-      ∑ j, ∫ y in cptSet A hne.some K j,
-        S.indicator f ((A.chart j).symm y) * max (cptW A hne.some Φ j y) 0 := by
+    (hS : MeasurableSet S) (hSK : S ⊆ K)
+    {f : X → ℝ} (hf : ContinuousOn f U)
+    : Integrable (S.indicator f) (maMeasure A Φ)
+      ∧ ∫ x in S, f x ∂maMeasure A Φ
+        = ∑ j, ∫ y in cptSet A hne.some K j,
+            S.indicator f ((A.chart j).symm y) * max (cptW A hne.some Φ j y) 0 := by
   obtain ⟨M, hM⟩ := hK.exists_bound_of_continuousOn (hf.mono hKU)
   have hb : ∀ x ∈ K, |S.indicator f x| ≤ M := fun x hx => by
     by_cases hxS : x ∈ S
     · simpa [Set.indicator_of_mem hxS, Real.norm_eq_abs] using hM x hx
     · rw [Set.indicator_of_notMem hxS, abs_zero]
       exact (norm_nonneg _).trans (hM x hx)
-  have key := cpt_maMeasure A hne Φ hK.isClosed hKU hc (cpt_meas hU hS (hSK.trans hKU) hf)
-    (fun x hx => Set.indicator_of_notMem (fun h => hx (hSK h)) _) hb
+  have key :=
+    cpt_maMeasure A hne Φ hK.isClosed hKU hc (cpt_meas hU hS (hSK.trans hKU) hf)
+      (fun x hx => Set.indicator_of_notMem (fun h => hx (hSK h)) _)
+      hb
   refine ⟨key.1, ?_⟩
   rw [← integral_indicator hS]
   exact key.2
 
-theorem cpt_chart_tendsto [CompactSpace X] (A : FinHolAtlas e X) (P : ChartPartition A)
-    (Φ : Fin e → LocPot X) (ΦT : ℝ → Fin e → LocPot X) {K U E : Set X} (hU : IsOpen U)
-    (hK : IsCompact K) (hKc : IsClosed K) (hKU : K ⊆ U) (j : Fin A.n)
-    (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+theorem cpt_chart_tendsto
+    [CompactSpace X]
+    (A : FinHolAtlas e X) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X)
+    (ΦT : ℝ → Fin e → LocPot X)
+    {K U E : Set X} (hU : IsOpen U) (hK : IsCompact K) (hKc : IsClosed K) (hKU : K ⊆ U)
+    (j : Fin A.n) (hc : ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
     (hpot : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ i, IsPotential A (ΦT t i))
-    (hld : TendstoUniformlyOn (fun t => locDens A (ΦT t) j) (locDens A Φ j) (𝓝[>] 0)
-      (cptSet A P K j))
+    (hld
+      : TendstoUniformlyOn (fun t => locDens A (ΦT t) j) (locDens A Φ j) (𝓝[>] 0) (cptSet A P K j))
     {g : X → ℝ} {gT : ℝ → X → ℝ} (hgT : ∀ t, ContinuousOn (gT t) U) (hgc : ContinuousOn g U)
-    (hgU : TendstoUniformlyOn gT g (𝓝[>] 0) K) (hE : MeasurableSet E) (hEK : E ⊆ K) :
-    Tendsto (fun t => ∫ y in cptSet A P K j,
-        E.indicator (gT t) ((A.chart j).symm y) * max (cptW A P (ΦT t) j y) 0) (𝓝[>] 0)
-      (𝓝 (∫ y in cptSet A P K j,
-        E.indicator g ((A.chart j).symm y) * max (cptW A P Φ j y) 0)) := by
+    (hgU : TendstoUniformlyOn gT g (𝓝[>] 0) K)
+    (hE : MeasurableSet E) (hEK : E ⊆ K)
+    : Tendsto
+      (fun t =>
+        ∫ y in cptSet A P K j,
+          E.indicator (gT t) ((A.chart j).symm y) * max (cptW A P (ΦT t) j y) 0)
+      (𝓝[>] 0)
+      (𝓝
+        (∫ y in cptSet A P K j,
+          E.indicator g ((A.chart j).symm y) * max (cptW A P Φ j y) 0)) := by
   have hCc := cptSet_compact A P hKc j
   have hCm := hCc.measurableSet
   have hCV := cptSet_subset A P hKU j
@@ -255,8 +304,7 @@ theorem cpt_chart_tendsto [CompactSpace X] (A : FinHolAtlas e X) (P : ChartParti
   obtain ⟨L, hL⟩ := hCc.exists_bound_of_continuousOn (hc.mono hCV)
   refine tendsto_integral_filter_of_dominated_convergence (fun _ => (M + 1) * (L + 1)) ?_ ?_ ?_ ?_
   · filter_upwards [hpot] with t ht
-    exact cpt_aesm A P (ΦT t) hKc hKU j
-      ((locDensCont A _ ht j).mono Set.inter_subset_left)
+    exact cpt_aesm A P (ΦT t) hKc hKU j ((locDensCont A _ ht j).mono Set.inter_subset_left)
       (cpt_meas hU hE (hEK.trans hKU) (hgT t))
   · have h1 := Metric.tendstoUniformlyOn_iff.1 hgU 1 one_pos
     have h2 := Metric.tendstoUniformlyOn_iff.1 hld 1 one_pos
@@ -285,8 +333,9 @@ theorem cpt_chart_tendsto [CompactSpace X] (A : FinHolAtlas e X) (P : ChartParti
   · exact integrableOn_const hCc.measure_lt_top.ne
   · refine ae_restrict_of_forall_mem hCm fun y hy => ?_
     have hx := cptSet_symm_mem A P K j hy
-    have l1 : Tendsto (fun t => E.indicator (gT t) ((A.chart j).symm y)) (𝓝[>] 0)
-        (𝓝 (E.indicator g ((A.chart j).symm y))) := by
+    have l1 : Tendsto
+        (fun t => E.indicator (gT t) ((A.chart j).symm y))
+        (𝓝[>] 0) (𝓝 (E.indicator g ((A.chart j).symm y))) := by
       by_cases hxE : (A.chart j).symm y ∈ E
       · simp only [Set.indicator_of_mem hxE]
         exact hgU.tendsto_at hx
@@ -296,20 +345,22 @@ theorem cpt_chart_tendsto [CompactSpace X] (A : FinHolAtlas e X) (P : ChartParti
       hld.tendsto_at hy
     exact l1.mul (((l2.const_mul _)).max tendsto_const_nhds)
 
-theorem compact_part_integrals_tendsto :
-    ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] [MeasurableSpace X]
-      [BorelSpace X] (A : FinHolAtlas e X) (U : Set X) (Φ : Fin e → LocPot X)
-      (ΦT : ℝ → Fin e → LocPot X), IsOpen U →
-      (∀ j, ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U)) →
-      (∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ i, IsPotential A (ΦT t i)) →
-      (∀ j, ∀ K ⊆ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U, IsCompact K →
-        TendstoUniformlyOn (fun t => locDens A (ΦT t) j) (locDens A Φ j) (𝓝[>] 0) K) →
-      ∀ (g : X → ℝ) (gT : ℝ → X → ℝ), (∀ t, ContinuousOn (gT t) U) →
-        TendstoLocallyUniformlyOn gT g (𝓝[>] 0) U →
-        ∀ K E : Set X, IsCompact K → K ⊆ U → MeasurableSet E → E ⊆ K →
-          maMeasure A Φ K < ⊤ ∧ IntegrableOn g K (maMeasure A Φ) ∧
-            Tendsto (fun t => ∫ y in E, gT t y ∂maMeasure A (ΦT t)) (𝓝[>] 0)
-              (𝓝 (∫ y in E, g y ∂maMeasure A Φ)) := by
+theorem compact_part_integrals_tendsto
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] [MeasurableSpace X]
+        [BorelSpace X] (A : FinHolAtlas e X) (U : Set X) (Φ : Fin e → LocPot X)
+        (ΦT : ℝ → Fin e → LocPot X),
+      IsOpen U → (∀ j, ContinuousOn (locDens A Φ j) ((A.chart j).target ∩ (A.chart j).symm ⁻¹' U))
+        → (∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ i, IsPotential A (ΦT t i))
+        → (∀ j, ∀ K ⊆ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U,
+          IsCompact K → TendstoUniformlyOn (fun t => locDens A (ΦT t) j) (locDens A Φ j) (𝓝[>] 0) K)
+        → ∀ (g : X → ℝ) (gT : ℝ → X → ℝ),
+          (∀ t, ContinuousOn (gT t) U) → TendstoLocallyUniformlyOn gT g (𝓝[>] 0) U
+            → ∀ K E : Set X,
+              IsCompact K → K ⊆ U → MeasurableSet E → E ⊆ K
+                → maMeasure A Φ K < ⊤ ∧ IntegrableOn g K (maMeasure A Φ)
+                  ∧ Tendsto
+                    (fun t => ∫ y in E, gT t y ∂maMeasure A (ΦT t))
+                    (𝓝[>] 0) (𝓝 (∫ y in E, g y ∂maMeasure A Φ)) := by
   intro e X _ _ _ _ _ A U Φ ΦT hU hc hpot hunif g gT hgT hlim K E hK hKU hE hEK
   have hne : Nonempty (ChartPartition A) := existsPartition A
   have hKc : IsClosed K := hK.isClosed
@@ -324,13 +375,15 @@ theorem compact_part_integrals_tendsto :
   · have h := (integrable_indicator_iff hKm).1 c1.1
     exact ((integrableOn_const_iff (by simp)).1 h).resolve_left (by simp)
   · rw [c3.2]
-    refine Tendsto.congr' ?_ (tendsto_finsetSum _ fun j _ =>
-      cpt_chart_tendsto A hne.some Φ ΦT hU hK hKc hKU j (hc j) hpot
-        (hunif j _ (cptSet_subset A hne.some hKU j) (cptSet_compact A hne.some hKc j))
-        hgT hgc hgU hE hEK)
+    refine Tendsto.congr' ?_
+      (tendsto_finsetSum _ fun j _ =>
+        cpt_chart_tendsto A hne.some Φ ΦT hU hK hKc hKU j (hc j) hpot
+          (hunif j _ (cptSet_subset A hne.some hKU j) (cptSet_compact A hne.some hKc j)) hgT hgc hgU
+          hE hEK)
     filter_upwards [hpot] with t ht
     exact (cpt_ind A hne (ΦT t) hU hK hKU
-      (fun j => (locDensCont A _ ht j).mono Set.inter_subset_left) hE hEK (hgT t)).2.symm
+      (fun j => (locDensCont A _ ht j).mono Set.inter_subset_left)
+      hE hEK (hgT t)).2.symm
 
 end
 

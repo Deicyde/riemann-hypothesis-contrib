@@ -5,28 +5,39 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chebota
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ
 open UpperTheory.V.Z.Kato.Joint Polynomial
 
 section
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-private theorem cont_of_apply [IsAlgClosure ℚ Ω] {Y : Type} [TopologicalSpace Y] (ζ : Ω) (f : G ℚ Ω → Y)
-    (h : ∀ s t : G ℚ Ω, s ζ = t ζ → f s = f t) : Continuous f := by
+private theorem cont_of_apply
+    [IsAlgClosure ℚ Ω]
+    {Y : Type} [TopologicalSpace Y]
+    (ζ : Ω) (f : G ℚ Ω → Y) (h : ∀ s t : G ℚ Ω, s ζ = t ζ → f s = f t)
+    : Continuous f := by
   have hint : IsIntegral ℚ ζ :=
     ((IsAlgClosure.isAlgebraic (R := ℚ) (K := Ω)).isAlgebraic ζ).isIntegral
   haveI : FiniteDimensional ℚ (IntermediateField.adjoin ℚ {ζ}) :=
     IntermediateField.adjoin.finiteDimensional hint
-  have hH : IsOpen (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω)) :
-      Set (Ω ≃ₐ[ℚ] Ω)) := IntermediateField.fixingSubgroup_isOpen _
+  have hH : IsOpen
+      (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω))
+        : Set (Ω ≃ₐ[ℚ] Ω)) :=
+    IntermediateField.fixingSubgroup_isOpen _
   refine continuous_iff_continuousAt.2 fun t => ?_
-  have hU : IsOpen ((fun s : Ω ≃ₐ[ℚ] Ω => t⁻¹ * s) ⁻¹'
-      (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω)) :
-        Set (Ω ≃ₐ[ℚ] Ω))) := hH.preimage (continuous_const_mul _)
-  have ht : t ∈ (fun s : Ω ≃ₐ[ℚ] Ω => t⁻¹ * s) ⁻¹'
-      (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω)) :
-        Set (Ω ≃ₐ[ℚ] Ω)) := by
+  have hU : IsOpen
+      ((fun s : Ω ≃ₐ[ℚ] Ω => t⁻¹ * s)
+        ⁻¹' (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω))
+          : Set (Ω ≃ₐ[ℚ] Ω))) :=
+    hH.preimage (continuous_const_mul _)
+  have ht
+      : t
+        ∈ (fun s : Ω ≃ₐ[ℚ] Ω => t⁻¹ * s)
+          ⁻¹' (((IntermediateField.adjoin ℚ {ζ}).fixingSubgroup : Subgroup (Ω ≃ₐ[ℚ] Ω))
+            : Set (Ω ≃ₐ[ℚ] Ω)) := by
     simp only [Set.mem_preimage, inv_mul_cancel, SetLike.mem_coe]
     exact Subgroup.one_mem _
   refine (continuousAt_const (y := f t)).congr ?_
@@ -40,24 +51,32 @@ private theorem cont_of_apply [IsAlgClosure ℚ Ω] {Y : Type} [TopologicalSpace
     simpa using h3
   exact (h s t h2).symm
 
-private theorem root_pow {M n : ℕ} (hM : M ≠ 0) {B : ValuationSubring Ω} {v : Pl} (hB : IsPlaceOver B v)
-    (hv : ((M : ℕ) : 𝓞 ℚ) ∉ v.asIdeal) {s : G ℚ Ω} {ζ : Ω} (hζ : ζ ^ M = 1)
-    (hs : ∀ x, B.valuation x ≤ 1 → B.valuation (s x - x ^ n) < 1) : s ζ = ζ ^ n := by
+private theorem root_pow
+    {M n : ℕ} (hM : M ≠ 0)
+    {B : ValuationSubring Ω} {v : Pl} (hB : IsPlaceOver B v) (hv : ((M : ℕ) : 𝓞 ℚ) ∉ v.asIdeal)
+    {s : G ℚ Ω} {ζ : Ω}
+    (hζ : ζ ^ M = 1) (hs : ∀ x, B.valuation x ≤ 1 → B.valuation (s x - x ^ n) < 1)
+    : s ζ = ζ ^ n := by
   have hN : ¬ B.valuation (M : Ω) < 1 := fun h => hv ((hB _).1 (by simpa using h))
   refine eq_of_pow_eq_one B hN ?_ ?_ (hs ζ (valuation_eq_one_of_pow_eq_one B hM hζ).le)
   · rw [← map_pow, hζ, map_one]
   · rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
 
-private theorem expo_eq {M a b : ℕ} [NeZero M] {ζ : Ω} (hζ : IsPrimitiveRoot ζ M) (h : ζ ^ a = ζ ^ b) :
-    (a : ZMod M) = b := by
+private theorem expo_eq
+    {M a b : ℕ} [NeZero M] {ζ : Ω} (hζ : IsPrimitiveRoot ζ M) (h : ζ ^ a = ζ ^ b)
+    : (a : ZMod M) = b := by
   have hu := hζ.isUnit (NeZero.ne M)
   have h1 : IsPrimitiveRoot hu.unit M := IsPrimitiveRoot.coe_units_iff.mp (by simpa using hζ)
   have h2 : hu.unit ^ a = hu.unit ^ b := Units.ext (by simpa using h)
   rw [pow_eq_pow_iff_modEq, ← h1.eq_orderOf] at h2
   exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr h2
 
-private theorem det_of_charpoly {K : Type} [Field K] (ι : K ≃+* ℂ) {A : Matrix (Fin 2) (Fin 2) K} {a d : ℂ}
-    (h : A.charpoly.map ι.toRingHom = X ^ 2 - C a * X + C d) : ι A.det = d := by
+private theorem det_of_charpoly
+    {K : Type} [Field K]
+    (ι : K ≃+* ℂ)
+    {A : Matrix (Fin 2) (Fin 2) K} {a d : ℂ}
+    (h : A.charpoly.map ι.toRingHom = X ^ 2 - C a * X + C d)
+    : ι A.det = d := by
   have h0 := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p 0) h
   simp [Polynomial.coeff_map] at h0
   rw [Matrix.det_eq_sign_charpoly_coeff]
@@ -65,8 +84,7 @@ private theorem det_of_charpoly {K : Type} [Field K] (ι : K ≃+* ℂ) {A : Mat
 
 end
 
-theorem UpperTheory.V.Z.Kato.Joint.detIne :
-    UpperTheory.V.Z.Kato.Joint.DetIne := by
+theorem UpperTheory.V.Z.Kato.Joint.detIne : UpperTheory.V.Z.Kato.Joint.DetIne := by
   intro l _ Ω _ _ _ ι e S A W g χ hN hK hl hAtt s hs
   have hM : g.M ≠ 0 := g.pos.ne'
   haveI : NeZero g.M := ⟨hM⟩
@@ -101,20 +119,25 @@ theorem UpperTheory.V.Z.Kato.Joint.detIne :
   have key : f = fun t => F (t ζ) := by
     have hχc : Continuous (fun t : G ℚ Ω => (((χ t)⁻¹ ^ 2 : (Qbar l)ˣ) : Qbar l)) := by
       refine cont_of_apply η _ (fun a b hab => ?_)
-      have h0 : χ (b⁻¹ * a) = 1 := hK (b⁻¹ * a) (fun x hx => by
-        obtain ⟨i, -, rfl⟩ := hη.eq_pow_of_pow_eq_one hx
-        rw [map_pow]
-        simp [AlgEquiv.mul_apply, hab])
+      have h0 : χ (b⁻¹ * a) = 1 :=
+        hK (b⁻¹ * a) (fun x hx => by
+          obtain ⟨i, -, rfl⟩ := hη.eq_pow_of_pow_eq_one hx
+          rw [map_pow]
+          simp [AlgEquiv.mul_apply, hab])
       rw [map_mul, map_inv, inv_mul_eq_one] at h0
       rw [h0]
-    have hdt : ∀ t, ((W t : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)).det =
-        ((dt W t : (Qbar l)ˣ) : Qbar l) := fun t => rfl
+    have hdt
+        : ∀ t,
+          ((W t : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)).det
+            = ((dt W t : (Qbar l)ˣ) : Qbar l) := fun t =>
+      rfl
     have hdc : Continuous (fun t : G ℚ Ω => ((dt W t : (Qbar l)ˣ) : Qbar l)) := by
       simp only [← hdt]
       exact (Units.continuous_val.comp hN.cont).matrix_det
     have hfc : Continuous f := by
-      have h3 : f = fun t => ((dt W t : (Qbar l)ˣ) : Qbar l) *
-          (((χ t)⁻¹ ^ 2 : (Qbar l)ˣ) : Qbar l) := by
+      have h3
+          : f
+            = fun t => ((dt W t : (Qbar l)ˣ) : Qbar l) * (((χ t)⁻¹ ^ 2 : (Qbar l)ˣ) : Qbar l) := by
         funext t
         simp only [f, Units.val_mul]
       rw [h3]
@@ -123,8 +146,8 @@ theorem UpperTheory.V.Z.Kato.Joint.detIne :
     have hI : Ideal.span {((g.M * l : ℕ) : 𝓞 ℚ)} ≠ 0 := by
       rw [Ideal.zero_eq_bot, Ne, Ideal.span_singleton_eq_bot]
       exact Nat.cast_ne_zero.2 (mul_ne_zero hM hl0)
-    refine GlobalTheory.Published.ChebotarevDegreeOne.eq_of_frob GlobalTheory.Published.chebotarevDegreeOne'
-      (hbad.union (Ideal.finite_factors hI)) hfc hf'c ?_
+    refine GlobalTheory.Published.ChebotarevDegreeOne.eq_of_frob
+      GlobalTheory.Published.chebotarevDegreeOne' (hbad.union (Ideal.finite_factors hI)) hfc hf'c ?_
     intro w hw _ B hB σ hσ
     simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hw
     obtain ⟨hP, hdiv⟩ := hw

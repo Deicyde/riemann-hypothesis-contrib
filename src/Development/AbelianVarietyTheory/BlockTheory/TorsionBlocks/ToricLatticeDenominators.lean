@@ -10,27 +10,30 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.ArithmeticCylinders
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen
 open scoped TensorProduct
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators
 
 section Index
 
-variable {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-  {W : Type} [AddCommGroup W] [Module (FractionRing R) W] [Module R W]
-  [IsScalarTower R (FractionRing R) W]
+variable
+  {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+  {W : Type}
+  [AddCommGroup W] [Module (FractionRing R) W] [Module R W] [IsScalarTower R (FractionRing R) W]
 
 def IsLatIn (V : Submodule (FractionRing R) W) (L : Submodule R W) : Prop :=
   L.FG ∧ Submodule.span (FractionRing R) (L : Set W) = V
-
 
 end Index
 
 section Lattices
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
-  (Y : NExp D.R D.host D.what₂ D.LL0 N X) (i : X.Tw) (j : ℕ) (b : Bool)
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  {X : NTw D.R D.host D.what₂ D.LL0 N} (Y : NExp D.R D.host D.what₂ D.LL0 N X) (i : X.Tw)
+  (j : ℕ) (b : Bool)
 
 def eOp : Module.End (FractionRing (X.O i)) (Y.Fm i j b) :=
   MonoidAlgebra.lift (FractionRing (X.O i)) (Module.End (FractionRing (X.O i)) (Y.Fm i j b)) (G0g N)
@@ -48,8 +51,7 @@ def typePart : Submodule (FractionRing (X.O i)) (Y.Fm i j b) :=
 def V0 : Submodule (FractionRing (X.O i)) (Y.Fm i j b) :=
   LinearMap.range (eOp Y i j b) ⊓ typePart Y i j b
 
-def Theta : Submodule (X.O i) (Y.Fm i j b) :=
-  Submodule.span (X.O i) (Set.range (Y.th i j b))
+def Theta : Submodule (X.O i) (Y.Fm i j b) := Submodule.span (X.O i) (Set.range (Y.th i j b))
 
 def ATheta : Submodule (X.O i) (Y.Fm i j b) :=
   (Theta Y i j b).map ((AOp Y i j b).restrictScalars (X.O i))
@@ -72,7 +74,9 @@ end Lattices
 
 section Statement
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  {X : NTw D.R D.host D.what₂ D.LL0 N}
 
 variable (bkP : BKPh X)
 

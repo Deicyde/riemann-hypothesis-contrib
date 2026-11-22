@@ -5,22 +5,29 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsNor
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp
 
-theorem partialProd_inv_le (t : ℕ → ℝ) (ht : ∀ a, 0 < t a) (j : ℕ) (De : ℝ)
-    (h : ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ De ∨ (0 < b ∧ b < j ∧ t (b - 1) = t b)) :
-    ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ De := by
+theorem partialProd_inv_le
+    (t : ℕ → ℝ) (ht : ∀ a, 0 < t a)
+    (j : ℕ) (De : ℝ)
+    (h : ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ De ∨ (0 < b ∧ b < j ∧ t (b - 1) = t b))
+    : ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ De := by
   have hP : ∀ b, 0 < ∏ a ∈ Finset.range b, t a := fun b => Finset.prod_pos fun a _ => ht a
-  obtain ⟨m, hm, hmax⟩ := Finset.exists_max_image (Finset.range (j + 1))
-    (fun b => (∏ a ∈ Finset.range b, t a)⁻¹) ⟨0, by simp⟩
-  have hle : ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ (∏ a ∈ Finset.range m, t a)⁻¹ :=
-    fun b hb => hmax b (Finset.mem_range.2 (Nat.lt_succ_of_le hb))
+  obtain ⟨m, hm, hmax⟩ :=
+    Finset.exists_max_image (Finset.range (j + 1))
+      (fun b => (∏ a ∈ Finset.range b, t a)⁻¹)
+      ⟨0, by simp⟩
+  have hle : ∀ b ≤ j, (∏ a ∈ Finset.range b, t a)⁻¹ ≤ (∏ a ∈ Finset.range m, t a)⁻¹ := fun b hb =>
+    hmax b (Finset.mem_range.2 (Nat.lt_succ_of_le hb))
 
-  have key : ∀ b, b ≤ j → (∏ a ∈ Finset.range b, t a)⁻¹ = (∏ a ∈ Finset.range m, t a)⁻¹ →
-      (∏ a ∈ Finset.range m, t a)⁻¹ ≤ De := by
+  have key
+      : ∀ b,
+        b ≤ j → (∏ a ∈ Finset.range b, t a)⁻¹ = (∏ a ∈ Finset.range m, t a)⁻¹
+          → (∏ a ∈ Finset.range m, t a)⁻¹ ≤ De := by
     intro b
     induction b with
     | zero =>
@@ -49,9 +56,11 @@ theorem partialProd_inv_le (t : ℕ → ℝ) (ht : ∀ a, 0 < t a) (j : ℕ) (De
   intro b hb
   exact (hle b hb).trans (key m (Nat.lt_succ_iff.1 (Finset.mem_range.1 hm)) rfl)
 
-theorem norm_leading_minor_monomial {j l : ℕ} (hl : l ≤ j) (Z : Matrix (Fin j) (Fin j) ℂ) (w : Equiv.Perm (Fin j))
-    (hw : ∀ a b, Z a b ≠ 0 ↔ b = w a) (hc : ∀ a : Fin j, a.val < l → (w a).val < l) :
-    ‖(Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det‖ = ∏ a : Fin l, ‖Z (Fin.castLE hl a) (w (Fin.castLE hl a))‖ := by
+theorem norm_leading_minor_monomial
+    {j l : ℕ} (hl : l ≤ j) (Z : Matrix (Fin j) (Fin j) ℂ) (w : Equiv.Perm (Fin j))
+    (hw : ∀ a b, Z a b ≠ 0 ↔ b = w a) (hc : ∀ a : Fin j, a.val < l → (w a).val < l)
+    : ‖(Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det‖
+      = ∏ a : Fin l, ‖Z (Fin.castLE hl a) (w (Fin.castLE hl a))‖ := by
   set M := Z.submatrix (Fin.castLE hl) (Fin.castLE hl) with hM
 
   let f : Fin l → Fin l := fun a => ⟨(w (Fin.castLE hl a)).val, hc _ a.2⟩
@@ -89,7 +98,16 @@ theorem norm_leading_minor_monomial {j l : ℕ} (hl : l ≤ j) (Z : Matrix (Fin 
   · intro hn
     exact absurd (Finset.mem_univ _) hn
 
-theorem blockAnti_perm_partialProd : ∀ (j : ℕ) (β : Fin j → ℕ) (Z : Matrix (Fin j) (Fin j) ℂ) (De : ℝ), BlockAnti β Z → 1 ≤ De → (∀ (l : ℕ) (hl : l ≤ j), (Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det ≠ 0 → ‖(Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det‖⁻¹ ≤ De) → ∃ (w : Equiv.Perm (Fin j)), (∀ a b, Z a b ≠ 0 ↔ b = w a) ∧ (∀ a, β (w a) = β a) ∧ ∀ b : ℕ, (∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b), ‖Z a (w a)‖)⁻¹ ≤ De := by
+theorem blockAnti_perm_partialProd
+    : ∀ (j : ℕ) (β : Fin j → ℕ) (Z : Matrix (Fin j) (Fin j) ℂ) (De : ℝ),
+      BlockAnti β Z → 1 ≤ De
+        → (∀ (l : ℕ) (hl : l ≤ j),
+          (Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det ≠ 0
+            → ‖(Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det‖⁻¹ ≤ De)
+        → ∃ (w : Equiv.Perm (Fin j)),
+          (∀ a b, Z a b ≠ 0 ↔ b = w a) ∧ (∀ a, β (w a) = β a)
+            ∧ ∀ b : ℕ,
+              (∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b), ‖Z a (w a)‖)⁻¹ ≤ De := by
   intro j β Z De hZ _ hminor
   unfold BlockAnti at hZ
   obtain ⟨hmono, hdet, hblk, hanti⟩ := hZ
@@ -114,8 +132,7 @@ theorem blockAnti_perm_partialProd : ∀ (j : ℕ) (β : Fin j → ℕ) (Z : Mat
     · exact heq
     · exact absurd ((hanti a' (f a) a (f a) h2 h1 hb.symm).2.2 hgt) (lt_irrefl _)
   let w : Equiv.Perm (Fin j) := Equiv.ofBijective f (Finite.injective_iff_bijective.mp hinj)
-  have hw : ∀ a b, Z a b ≠ 0 ↔ b = w a := fun a b =>
-    ⟨huniq a b, fun h => by rw [h]; exact hf a⟩
+  have hw : ∀ a b, Z a b ≠ 0 ↔ b = w a := fun a b => ⟨huniq a b, fun h => by rw [h]; exact hf a⟩
   have hβ : ∀ a, β (w a) = β a := fun a => (hblk a (w a) (hf a)).symm
   refine ⟨w, hw, hβ, ?_⟩
 
@@ -129,8 +146,10 @@ theorem blockAnti_perm_partialProd : ∀ (j : ℕ) (β : Fin j → ℕ) (Z : Mat
   have htfin : ∀ a : Fin j, t a.val = ‖Z a (w a)‖ := by
     intro a
     simp [t]
-  have hconv : ∀ b, ∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b), ‖Z a (w a)‖ =
-      ∏ n ∈ Finset.range (min b j), t n := by
+  have hconv
+      : ∀ b,
+        ∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b), ‖Z a (w a)‖
+          = ∏ n ∈ Finset.range (min b j), t n := by
     intro b
     rw [Finset.prod_filter]
     simp_rw [← htfin]
@@ -146,7 +165,9 @@ theorem blockAnti_perm_partialProd : ∀ (j : ℕ) (β : Fin j → ℕ) (Z : Mat
     by_cases hbd : ∀ a : Fin j, a.val < l → (w a).val < l
     · left
       have hnorm := norm_leading_minor_monomial hl Z w hw hbd
-      have hprod : ∏ a : Fin l, ‖Z (Fin.castLE hl a) (w (Fin.castLE hl a))‖ = ∏ n ∈ Finset.range l, t n := by
+      have hprod
+          : ∏ a : Fin l, ‖Z (Fin.castLE hl a) (w (Fin.castLE hl a))‖
+            = ∏ n ∈ Finset.range l, t n := by
         rw [← Fin.prod_univ_eq_prod_range]
         exact Finset.prod_congr rfl fun a _ => (htfin (Fin.castLE hl a)).symm
       have hpos : 0 < ∏ n ∈ Finset.range l, t n := Finset.prod_pos fun n _ => ht n

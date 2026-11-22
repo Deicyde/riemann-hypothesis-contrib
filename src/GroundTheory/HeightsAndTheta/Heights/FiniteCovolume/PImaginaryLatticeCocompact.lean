@@ -11,7 +11,8 @@ open NumberField GroundTheory.Automorphic Module
 
 noncomputable section
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 
 theorem im_embedding_algebraMap (σ : E →+* ℂ) (c : F) : (σ (algebraMap F E c)).im = 0 := by
@@ -19,12 +20,12 @@ theorem im_embedding_algebraMap (σ : E →+* ℂ) (c : F) : (σ (algebraMap F E
   rw [conj_algebraMap] at h
   exact Complex.conj_eq_iff_im.mp h.symm
 
-
 omit [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] in
 variable (F E) in
 theorem exists_imaginary_integer : ∃ t : 𝓞 E, (t : E) ≠ 0 ∧ conj F E (t : E) = -(t : E) := by
   obtain ⟨ζ, hζ⟩ := exists_not_mem_range (F := F) (E := E)
-  obtain ⟨y, hy0, hyi⟩ := (IsFractionRing.isAlgebraic_iff ℤ ℚ E |>.mpr (.of_finite ℚ ζ)).exists_integral_multiple
+  obtain ⟨y, hy0, hyi⟩ :=
+    (IsFractionRing.isAlgebraic_iff ℤ ℚ E |>.mpr (.of_finite ℚ ζ)).exists_integral_multiple
   have hθF : y • ζ ∉ Set.range (algebraMap F E) := by
     rintro ⟨c, hc⟩
     apply hζ
@@ -43,7 +44,6 @@ theorem exists_imaginary_integer : ∃ t : 𝓞 E, (t : E) ≠ 0 ∧ conj F E (t
     rw [map_sub, conj_conj]
     ring
 
-
 omit [IsTotallyReal F] in
 variable (F E) in
 theorem card_infinitePlace_eq : Fintype.card (InfinitePlace E) = finrank ℚ F := by
@@ -60,12 +60,11 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
   obtain ⟨t, ht0, htc⟩ := exists_imaginary_integer F E
   let L : Free.ChooseBasisIndex ℤ (𝓞 F) → InfinitePlace E → ℝ := fun i w =>
     (w.embedding ((m : E) * algebraMap F E (integralBasis F i) * (t : E))).im
-  let T : (Free.ChooseBasisIndex ℤ (𝓞 F) → ℝ) →ₗ[ℝ] (InfinitePlace E → ℝ) :=
-    { toFun := fun c w => ∑ i, c i * L i w
-      map_add' := by
-        intro c d; ext w; simp [add_mul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro r c; ext w; simp [Finset.mul_sum, mul_assoc] }
+  let T : (Free.ChooseBasisIndex ℤ (𝓞 F) → ℝ) →ₗ[ℝ] (InfinitePlace E → ℝ) := {
+    toFun := fun c w => ∑ i, c i * L i w
+    map_add' := by intro c d; ext w; simp [add_mul, Finset.sum_add_distrib]
+    map_smul' := by intro r c; ext w; simp [Finset.mul_sum, mul_assoc]
+  }
 
   have hr : ∀ w : InfinitePlace E, (w.embedding (t : E)).im ≠ 0 := by
     intro w h
@@ -76,8 +75,11 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
       simp only [Complex.neg_re, Complex.conj_re] at h2
       linarith
     exact ht0 ((map_eq_zero _).mp (Complex.ext hre h))
-  have hL : ∀ i w, L i w =
-      m * (w.embedding (algebraMap F E (integralBasis F i))).re * (w.embedding (t : E)).im := by
+  have hL
+      : ∀ i w,
+        L i w
+          = m * (w.embedding (algebraMap F E (integralBasis F i))).re
+            * (w.embedding (t : E)).im := by
     intro i w
     simp only [L, map_mul, map_natCast, Complex.mul_im, Complex.mul_re, Complex.natCast_re,
       Complex.natCast_im, im_embedding_algebraMap]
@@ -85,28 +87,31 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
   have hinj : Function.Injective T := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro c hc
-    have hw : ∀ w : InfinitePlace E,
-        ∑ i, c i * (w.embedding (algebraMap F E (integralBasis F i))).re = 0 := by
+    have hw
+        : ∀ w : InfinitePlace E,
+          ∑ i, c i * (w.embedding (algebraMap F E (integralBasis F i))).re = 0 := by
       intro w
       have h1 : ∑ i, c i * L i w = 0 := congrFun hc w
-      have h2 : (∑ i, c i * (w.embedding (algebraMap F E (integralBasis F i))).re) *
-          ((m : ℝ) * (w.embedding (t : E)).im) = 0 := by
+      have h2
+          : (∑ i, c i * (w.embedding (algebraMap F E (integralBasis F i))).re)
+              * ((m : ℝ) * (w.embedding (t : E)).im)
+            = 0 := by
         rw [Finset.sum_mul, ← h1]
         refine Finset.sum_congr rfl fun i _ => ?_
-        rw [hL]; ring
-      exact (mul_eq_zero.mp h2).resolve_right
-        (mul_ne_zero (by exact_mod_cast hm.ne') (hr w))
+        rw [hL]
+        ring
+      exact (mul_eq_zero.mp h2).resolve_right (mul_ne_zero (by exact_mod_cast hm.ne') (hr w))
     have hτ : ∀ τ : F →+* ℂ, ∑ i, (c i : ℂ) * τ (integralBasis F i) = 0 := by
       intro τ
       let _ : Algebra F ℂ := τ.toAlgebra
       let σ : E →ₐ[F] ℂ := (by
         refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-        solve_by_elim* (maxDepth := 2) only [*,
-          @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+        solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
           @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
       have hστ : ∀ x : F, (σ : E →+* ℂ) (algebraMap F E x) = τ x := fun x => σ.commutes x
-      have hre : ∀ x : F,
-          ((InfinitePlace.mk (σ : E →+* ℂ)).embedding (algebraMap F E x)).re = (τ x).re := by
+      have hre
+          : ∀ x : F,
+            ((InfinitePlace.mk (σ : E →+* ℂ)).embedding (algebraMap F E x)).re = (τ x).re := by
         intro x
         rcases InfinitePlace.embedding_mk_eq (σ : E →+* ℂ) with h | h
         · rw [h, hστ]
@@ -125,11 +130,15 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
     have hli := (canonicalEmbedding.latticeBasis F).linearIndependent
     rw [Fintype.linearIndependent_iff] at hli
     funext i
-    have h0 := hli (fun i => (c i : ℂ)) (by
-      funext τ
-      simp only [Finset.sum_apply, Pi.smul_apply, canonicalEmbedding.latticeBasis_apply,
-        canonicalEmbedding.apply_at, smul_eq_mul, Pi.zero_apply]
-      exact hτ τ) i
+    have h0 :=
+      hli
+        (fun i => (c i : ℂ))
+        (by
+          funext τ
+          simp only [Finset.sum_apply, Pi.smul_apply, canonicalEmbedding.latticeBasis_apply,
+            canonicalEmbedding.apply_at, smul_eq_mul, Pi.zero_apply]
+          exact hτ τ)
+        i
     exact_mod_cast h0
   have hsurj : Function.Surjective T := by
     refine (LinearMap.injective_iff_surjective_of_finrank_eq_finrank ?_).mp hinj
@@ -144,8 +153,7 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
   have hk : ∀ k : ℤ, IsIntegral ℤ (k : E) := fun k => by
     simpa using isIntegral_algebraMap (R := ℤ) (A := E) (x := k)
   let x : E := ∑ i, (⌊c i⌋ : E) * algebraMap F E (integralBasis F i) * (t : E)
-  have hx : IsIntegral ℤ x :=
-    IsIntegral.sum _ fun i _ => ((hk _).mul (hint i)).mul t.2
+  have hx : IsIntegral ℤ x := IsIntegral.sum _ fun i _ => ((hk _).mul (hint i)).mul t.2
   refine ⟨⟨x, hx⟩, ?_, fun w => ?_⟩
   · change (m : E) * x + conj F E ((m : E) * x) = 0
     have : conj F E x = -x := by
@@ -158,7 +166,9 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
     ring
   · change |(w.embedding ((m : E) * x)).im - s w| ≤ ∑ i, ∑ w, |L i w|
     have key : (w.embedding ((m : E) * x)).im = ∑ i, (⌊c i⌋ : ℝ) * L i w := by
-      have e : (m : E) * x = ∑ i, (⌊c i⌋ : E) * ((m : E) * algebraMap F E (integralBasis F i) * (t : E)) := by
+      have e
+          : (m : E) * x
+            = ∑ i, (⌊c i⌋ : E) * ((m : E) * algebraMap F E (integralBasis F i) * (t : E)) := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         ring
@@ -176,8 +186,8 @@ theorem ImaginaryLatticeCocompact.proof : ImaginaryLatticeCocompact.Statement F 
         rw [abs_sub_comm, abs_le]
         constructor <;> linarith [Int.floor_le (c i), Int.lt_floor_add_one (c i)]
       exact mul_le_of_le_one_left (abs_nonneg _) this
-    exact h1.trans (Finset.single_le_sum (f := fun w' => |L i w'|) (fun _ _ => abs_nonneg _)
-      (Finset.mem_univ w))
+    exact h1.trans
+      (Finset.single_le_sum (f := fun w' => |L i w'|) (fun _ _ => abs_nonneg _) (Finset.mem_univ w))
 
 end
 

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExpSum
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 noncomputable section
@@ -345,8 +346,9 @@ lemma th_eq {𝓕 : LFam} {χ : AddChar 𝓕.G ℂ} (h : χ * χ = 1) (t : ℝ) 
   refine tsum_congr fun n => ?_
   rw [aChi_eq h, Complex.ofReal_mul]
 
-theorem norm_F_one_ge : ∃ A c : ℝ, 0 < A ∧ 0 < c ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ), χ * χ = 1 →
-    c / 𝓕.B ^ A ≤ ‖𝓕.F χ 1‖ := by
+theorem norm_F_one_ge
+    : ∃ A c : ℝ,
+      0 < A ∧ 0 < c ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ), χ * χ = 1 → c / 𝓕.B ^ A ≤ ‖𝓕.F χ 1‖ := by
   obtain ⟨C, hC, H⟩ := GlobalTheory.T.tsum_exp_mul_aChi_bounds
   set K := ∫ w in Set.Ioi (0 : ℝ), wt w with hK
   have hK0 : 0 ≤ K := setIntegral_nonneg measurableSet_Ioi fun w hw => wt_nonneg hw
@@ -367,13 +369,13 @@ theorem norm_F_one_ge : ∃ A c : ℝ, 0 < A ∧ 0 < c ∧ ∀ (𝓕 : LFam) (χ
   have hκ : 0 < 𝓕.κ := lt_of_lt_of_le (by positivity) 𝓕.κ_ge
   have hcard : (1 : ℝ) ≤ Fintype.card 𝓕.G := by exact_mod_cast Fintype.card_pos
   by_cases h1 : χ = 1
-  · have e : 𝓕.F χ 1 = ((𝓕.κ * Fintype.card 𝓕.G : ℝ) : ℂ) := by
-      simp [LFam.F, LFam.res, h1]
+  · have e : 𝓕.F χ 1 = ((𝓕.κ * Fintype.card 𝓕.G : ℝ) : ℂ) := by simp [LFam.F, LFam.res, h1]
     rw [e, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
-    calc min 1 (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45 ≤ 1 / 𝓕.B := by
-          gcongr
-          · exact min_le_left _ _
-          · exact le_self_pow₀ hB1 (by norm_num)
+    calc
+      min 1 (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45 ≤ 1 / 𝓕.B := by
+        gcongr
+        · exact min_le_left _ _
+        · exact le_self_pow₀ hB1 (by norm_num)
       _ ≤ 𝓕.κ := 𝓕.κ_ge
       _ ≤ _ := le_mul_of_one_le_right hκ.le hcard
   have h11 : (1 : AddChar 𝓕.G ℂ) * 1 = 1 := mul_one _
@@ -382,13 +384,14 @@ theorem norm_F_one_ge : ∃ A c : ℝ, 0 < A ∧ 0 < c ∧ ∀ (𝓕 : LFam) (χ
     intro t ht
     have := ((H 𝓕 1).1 t ht).2
     rw [th_eq h11, LFam.res, if_pos rfl, ← Complex.ofReal_div, ← Complex.ofReal_sub,
-      Complex.norm_real, Real.norm_eq_abs] at this
+        Complex.norm_real, Real.norm_eq_abs]
+      at this
     exact this
   have hQ : ∀ t, 0 < t → |th (bRe 𝓕 χ) t| ≤ C * 𝓕.B ^ 11 * min t (1 / t) := by
     intro t ht
     have := ((H 𝓕 χ).1 t ht).2
-    rw [th_eq hχ, LFam.res, if_neg h1, zero_div, sub_zero,
-      Complex.norm_real, Real.norm_eq_abs] at this
+    rw [th_eq hχ, LFam.res, if_neg h1, zero_div, sub_zero, Complex.norm_real, Real.norm_eq_abs]
+      at this
     exact this
   have hQ' : ∀ t, 1 ≤ t → |th (bRe 𝓕 χ) t| ≤ C * 𝓕.B * Real.exp (-(t / 2)) := by
     intro t ht
@@ -406,22 +409,25 @@ theorem norm_F_one_ge : ∃ A c : ℝ, 0 < A ∧ 0 < c ∧ ∀ (𝓕 : LFam) (χ
   have hs1 : s ≤ 1 := (div_le_one (by positivity)).2 (hδ1.trans (one_le_pow₀ hB1))
   have hv : 0 < s ^ 2 := by positivity
   have hv1 : s ^ 2 ≤ 1 := pow_le_one₀ hs0.le hs1
-  have up := integral_le (measurable_th _) (measurable_th _) hE hP hQ
-    (integrableOn_of_bounds (measurable_th _) hE hQ hQ') hv
-  have lo := besW_le_integral (bRe_le h11) (bRe_le hχ) (bRe_one 𝓕 1) (bRe_one 𝓕 χ)
-    (fun n => by simpa [bRe] using (𝓕.sq χ hχ n).1) hv
+  have up :=
+    integral_le (measurable_th _) (measurable_th _) hE hP hQ
+      (integrableOn_of_bounds (measurable_th _) hE hQ hQ') hv
+  have lo :=
+    besW_le_integral (bRe_le h11) (bRe_le hχ) (bRe_one 𝓕 1) (bRe_one 𝓕 χ)
+      (fun n => by simpa [bRe] using (𝓕.sq χ hχ n).1)
+      hv
   have lo' := besW_one_le hv hv1
   rw [Real.sqrt_sq hs0.le, ← hL, ← hK] at up
-  have e1 : (C * 𝓕.B ^ 11) ^ 2 * s * K = C ^ 2 * K * δ := by
-    rw [hs]; field_simp
+  have e1 : (C * 𝓕.B ^ 11) ^ 2 * s * K = C ^ 2 * K * δ := by rw [hs]; field_simp
   have h2 : w0 / 2 ≤ ρ / s ^ 2 * L := by linarith
   have hρ0 : 0 < ρ := by positivity
   have hρ1 : ρ ≤ 4 * 𝓕.B := mul_le_mul 𝓕.κ_le 𝓕.card_le (by positivity) (by norm_num)
   have h3 : w0 / 2 ≤ 4 * 𝓕.B / s ^ 2 * |L| :=
     h2.trans ((mul_le_mul_of_nonneg_left (le_abs_self L) (by positivity)).trans (by gcongr))
   rw [hF, Complex.norm_real, Real.norm_eq_abs]
-  calc min 1 (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45 ≤ (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45 := by
-        gcongr; exact min_le_right _ _
+  calc
+    min 1 (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45
+      ≤ (δ ^ 2 * w0 / 8) / 𝓕.B ^ 45 := by gcongr; exact min_le_right _ _
     _ = s ^ 2 / (4 * 𝓕.B) * (w0 / 2) := by rw [hs]; field_simp; norm_num
     _ ≤ s ^ 2 / (4 * 𝓕.B) * (4 * 𝓕.B / s ^ 2 * |L|) := by gcongr
     _ = |L| := by field_simp

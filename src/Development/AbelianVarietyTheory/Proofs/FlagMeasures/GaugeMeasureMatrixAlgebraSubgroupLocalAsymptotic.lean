@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnitarySubgro
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 open Filter Topology Metric
 
 noncomputable section
@@ -19,13 +20,15 @@ namespace GlobalTheory.GaugeSubLoc
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-theorem eventually_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure (Formalism.REAL.UJ ε)}
-    (hμ : IsGaugeSub S d μ) {θ : ℝ} (hθ : 1 < θ) :
-    ∀ᶠ ρ : ℝ in 𝓝[>] 0,
-      μ {g | Real.sqrt (Formalism.REAL.hs (uMat g - 1)) ≤ ρ} ≤
-        ENNReal.ofReal (θ * ρ ^ d) * volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1) ∧
-      ENNReal.ofReal (ρ ^ d) * volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≤
-        ENNReal.ofReal θ * μ {g | Real.sqrt (Formalism.REAL.hs (uMat g - 1)) ≤ ρ} := by
+theorem eventually_bounds
+    {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure (Formalism.REAL.UJ ε)}
+    (hμ : IsGaugeSub S d μ)
+    {θ : ℝ} (hθ : 1 < θ)
+    : ∀ᶠ ρ : ℝ in 𝓝[>] 0,
+        μ {g | Real.sqrt (Formalism.REAL.hs (uMat g - 1)) ≤ ρ} ≤
+          ENNReal.ofReal (θ * ρ ^ d) * volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1) ∧
+        ENNReal.ofReal (ρ ^ d) * volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1) ≤
+          ENNReal.ofReal θ * μ {g | Real.sqrt (Formalism.REAL.hs (uMat g - 1)) ≤ ρ} := by
   set ω := volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1)
   have h0 : ω ≠ 0 := (measure_ball_pos _ 0 one_pos).ne'
   have ht : ω ≠ ⊤ := measure_ball_lt_top.ne
@@ -47,8 +50,9 @@ theorem eventually_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measu
     exact a2.le
 
 open scoped Matrix.Norms.Frobenius in
-theorem norm_mul_bounds {θ : ℝ} (hθ : 1 < θ) (g Z : Matrix (Fin n) (Fin n) ℂ)
-    (hg : ‖g - 1‖ < 1 - θ⁻¹) : ‖g * Z‖ ≤ θ * ‖Z‖ ∧ ‖Z‖ ≤ θ * ‖g * Z‖ := by
+theorem norm_mul_bounds
+    {θ : ℝ} (hθ : 1 < θ) (g Z : Matrix (Fin n) (Fin n) ℂ) (hg : ‖g - 1‖ < 1 - θ⁻¹)
+    : ‖g * Z‖ ≤ θ * ‖Z‖ ∧ ‖Z‖ ≤ θ * ‖g * Z‖ := by
   have h1 : ‖g * Z - Z‖ ≤ (1 - θ⁻¹) * ‖Z‖ := by
     have : g * Z - Z = (g - 1) * Z := by rw [Matrix.sub_mul, Matrix.one_mul]
     rw [this]
@@ -61,26 +65,39 @@ theorem norm_mul_bounds {θ : ℝ} (hθ : 1 < θ) (g Z : Matrix (Fin n) (Fin n) 
   constructor
   · nlinarith
   · have : θ⁻¹ * ‖Z‖ ≤ ‖g * Z‖ := by linarith
-    calc ‖Z‖ = θ * (θ⁻¹ * ‖Z‖) := by rw [← mul_assoc, mul_comm θ, h3, one_mul]
+    calc
+      ‖Z‖
+        = θ * (θ⁻¹ * ‖Z‖) := by rw [← mul_assoc, mul_comm θ, h3, one_mul]
       _ ≤ _ := mul_le_mul_of_nonneg_left this (by linarith)
 
 open scoped Matrix.Norms.Frobenius in
-theorem density_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure (Formalism.REAL.UJ ε)}
+theorem density_bounds
+    {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure (Formalism.REAL.UJ ε)}
     (hμ : IsGaugeSub S d μ) (ψ : Formalism.REAL.UJ ε → EuclideanSpace ℝ (Fin d)) (hψ : Continuous ψ)
     {s : ℝ} (hs : 0 < s)
-    (h2 : ∀ g h : Formalism.REAL.UJ ε, g ∈ S → h ∈ S → ‖uMat g - 1‖ < s → ‖uMat h - 1‖ < s →
-      ‖uMat g - uMat h‖ ≤ 2 * ‖ψ g - ψ h‖)
-    (hlip : ∀ κ : ℝ, 1 < κ → ∃ δ : ℝ, 0 < δ ∧ ∀ g h : Formalism.REAL.UJ ε, g ∈ S → h ∈ S →
-      ‖uMat g - 1‖ < δ → ‖uMat h - 1‖ < δ →
-      ‖ψ g - ψ h‖ ≤ ‖uMat g - uMat h‖ ∧ ‖uMat g - uMat h‖ ≤ κ * ‖ψ g - ψ h‖)
-    (hsurj : ∀ δ : ℝ, 0 < δ → ∃ ρ : ℝ, 0 < ρ ∧ ∀ x : EuclideanSpace ℝ (Fin d), ‖x‖ < ρ →
-      ∃ g ∈ S, ‖uMat g - 1‖ < δ ∧ ψ g = x)
-    (κ : ℝ) (hκ : 1 < κ) :
-    ∃ δ : ℝ, 0 < δ ∧ ∀ x : EuclideanSpace ℝ (Fin d), ‖x‖ < δ → ∀ᶠ r : ℝ in 𝓝[>] 0,
-      (μ.restrict {g | ‖uMat g - 1‖ < s}).map ψ (closedBall x r) ≤
-        ENNReal.ofReal κ * volume (closedBall x r) ∧
-      volume (closedBall x r) ≤
-        ENNReal.ofReal κ * (μ.restrict {g | ‖uMat g - 1‖ < s}).map ψ (closedBall x r) := by
+    (h2 : ∀ g h : Formalism.REAL.UJ ε,
+      g ∈ S → h ∈ S → ‖uMat g - 1‖ < s → ‖uMat h - 1‖ < s → ‖uMat g - uMat h‖ ≤ 2 * ‖ψ g - ψ h‖)
+    (hlip : ∀ κ : ℝ,
+      1 < κ
+        → ∃ δ : ℝ,
+          0 < δ
+            ∧ ∀ g h : Formalism.REAL.UJ ε,
+              g ∈ S → h ∈ S → ‖uMat g - 1‖ < δ → ‖uMat h - 1‖ < δ
+                → ‖ψ g - ψ h‖ ≤ ‖uMat g - uMat h‖ ∧ ‖uMat g - uMat h‖ ≤ κ * ‖ψ g - ψ h‖)
+    (hsurj : ∀ δ : ℝ,
+      0 < δ
+        → ∃ ρ : ℝ,
+          0 < ρ ∧ ∀ x : EuclideanSpace ℝ (Fin d), ‖x‖ < ρ → ∃ g ∈ S, ‖uMat g - 1‖ < δ ∧ ψ g = x)
+    (κ : ℝ) (hκ : 1 < κ)
+    : ∃ δ : ℝ,
+      0 < δ
+        ∧ ∀ x : EuclideanSpace ℝ (Fin d),
+          ‖x‖ < δ
+            → ∀ᶠ r : ℝ in 𝓝[>] 0,
+              (μ.restrict {g | ‖uMat g - 1‖ < s}).map ψ (closedBall x r) ≤
+                ENNReal.ofReal κ * volume (closedBall x r) ∧
+              volume (closedBall x r) ≤
+                ENNReal.ofReal κ * (μ.restrict {g | ‖uMat g - 1‖ < s}).map ψ (closedBall x r) := by
   obtain ⟨θ, hθκ, hθ⟩ : ∃ θ : ℝ, θ ^ (2 * d + 1) < κ ∧ 1 < θ := by
     have : Tendsto (fun θ : ℝ => θ ^ (2 * d + 1)) (𝓝[>] 1) (𝓝 1) := by
       have : ContinuousAt (fun θ : ℝ => θ ^ (2 * d + 1)) 1 := by fun_prop
@@ -97,8 +114,10 @@ theorem density_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure 
   have hgs : ‖uMat g - 1‖ < s := hg1.trans_le (min_le_right _ _)
   have hgδ : ‖uMat g - 1‖ < δ₁ := hg1.trans_le (min_le_left _ _)
   have hae : ∀ᵐ h ∂μ, h ∈ S := hμ.1
-  have htr : ∀ t : ℝ, μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ t} =
-      μ {k | Real.sqrt (Formalism.REAL.hs (uMat k - 1)) ≤ t} := by
+  have htr
+      : ∀ t : ℝ,
+        μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ t}
+          = μ {k | Real.sqrt (Formalism.REAL.hs (uMat k - 1)) ≤ t} := by
     intro t
     conv_lhs => rw [← hμ.2.1 g hgS]
     rw [(measurableEmbedding_mulLeft g).map_apply]
@@ -121,8 +140,9 @@ theorem density_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure 
     Measure.addHaar_closedBall _ _ hr.le, finrank_euclideanSpace_fin]
   set ω := volume (ball (0 : EuclideanSpace ℝ (Fin d)) 1)
   constructor
-  · have hsub : μ (ψ ⁻¹' closedBall (ψ g) r ∩ {g | ‖uMat g - 1‖ < s}) ≤
-        μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ θ ^ 2 * r} := by
+  · have hsub
+        : μ (ψ ⁻¹' closedBall (ψ g) r ∩ {g | ‖uMat g - 1‖ < s})
+          ≤ μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ θ ^ 2 * r} := by
       refine measure_mono_ae ?_
       filter_upwards [hae] with h hS hh
       obtain ⟨b1, b2⟩ := hh
@@ -132,17 +152,22 @@ theorem density_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure 
       have b5 := (norm_mul_bounds hθ (uMat g) (uMat (g⁻¹ * h) - 1) hg3).2
       rw [hZ] at b5
       change ‖uMat (g⁻¹ * h) - 1‖ ≤ θ ^ 2 * r
-      calc _ ≤ θ * (θ * r) := b5.trans (mul_le_mul_of_nonneg_left
-            (b4.trans (mul_le_mul_of_nonneg_left b1' hθ0.le)) hθ0.le)
+      calc
+        _ ≤ θ * (θ * r) :=
+          b5.trans (mul_le_mul_of_nonneg_left (b4.trans (mul_le_mul_of_nonneg_left b1' hθ0.le))
+            hθ0.le)
         _ = _ := by ring
     rw [htr] at hsub
     refine (hsub.trans a1.1).trans ?_
     rw [← mul_assoc, ← ENNReal.ofReal_mul (by linarith)]
     refine mul_le_mul_left (ENNReal.ofReal_le_ofReal ?_) _
-    calc θ * (θ ^ 2 * r) ^ d = θ ^ (2 * d + 1) * r ^ d := by ring
+    calc
+      θ * (θ ^ 2 * r) ^ d
+        = θ ^ (2 * d + 1) * r ^ d := by ring
       _ ≤ _ := by gcongr
-  · have hsub : μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ θ⁻¹ * r} ≤
-        μ (ψ ⁻¹' closedBall (ψ g) r ∩ {g | ‖uMat g - 1‖ < s}) := by
+  · have hsub
+        : μ {h | ‖uMat (g⁻¹ * h) - 1‖ ≤ θ⁻¹ * r}
+          ≤ μ (ψ ⁻¹' closedBall (ψ g) r ∩ {g | ‖uMat g - 1‖ < s}) := by
       refine measure_mono_ae ?_
       filter_upwards [hae] with h hS hh
       have hh' : ‖uMat (g⁻¹ * h) - 1‖ ≤ θ⁻¹ * r := hh
@@ -160,15 +185,37 @@ theorem density_bounds {S : Set (Formalism.REAL.UJ ε)} {d : ℕ} {μ : Measure 
     refine (mul_le_mul_right a2.2 _).trans ?_
     rw [← mul_assoc, ← ENNReal.ofReal_mul (by positivity)]
     gcongr
-    calc θ ^ d * θ = θ ^ (d + 1) := by ring
+    calc
+      θ ^ d * θ
+        = θ ^ (d + 1) := by ring
       _ ≤ θ ^ (2 * d + 1) := pow_le_pow_right₀ hθ.le (by omega)
       _ ≤ _ := hθκ.le
 
-
 open scoped Matrix.Norms.Frobenius in
-theorem gauge_local_asymptotics : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ) (E : Fin d → Matrix (Fin n) (Fin n) ℂ), (∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) → (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0) → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E)) → ∀ μ : Measure (Formalism.REAL.UJ ε), IsGaugeSub {g | uMat g - 1 ∈ A} d μ → SigmaFinite μ ∧ IsFiniteMeasureOnCompacts μ ∧ (∀ μ', IsGaugeSub {g | uMat g - 1 ∈ A} d μ' → μ' = μ) ∧ ∃ r₀ : ℝ, 0 < r₀ ∧ ∀ r₁ : ℝ, 0 < r₁ → r₁ ≤ r₀ → ∀ φ : (Fin d → ℝ) → ℝ, Continuous φ → HasCompactSupport φ → Filter.Tendsto (fun r : ℝ => (r ^ d)⁻¹ * ∫ g in {g | Formalism.REAL.hs (uMat g - 1) < r₁}, φ (fun i => (((uMat g - 1) * (E i)ᴴ).trace).re / r) ∂μ) (nhdsWithin 0 (Set.Ioi 0)) (nhds (∫ t, φ t)) := by
+theorem gauge_local_asymptotics
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ)
+        (E : Fin d → Matrix (Fin n) (Fin n) ℂ),
+      (∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) → (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0)
+        → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E))
+        → ∀ μ : Measure (Formalism.REAL.UJ ε),
+          IsGaugeSub {g | uMat g - 1 ∈ A} d μ
+            → SigmaFinite μ ∧ IsFiniteMeasureOnCompacts μ
+              ∧ (∀ μ', IsGaugeSub {g | uMat g - 1 ∈ A} d μ' → μ' = μ)
+              ∧ ∃ r₀ : ℝ,
+                0 < r₀
+                  ∧ ∀ r₁ : ℝ,
+                    0 < r₁ → r₁ ≤ r₀
+                      → ∀ φ : (Fin d → ℝ) → ℝ,
+                        Continuous φ → HasCompactSupport φ
+                          → Filter.Tendsto
+                            (fun r : ℝ =>
+                              (r ^ d)⁻¹
+                                * ∫ g in {g | Formalism.REAL.hs (uMat g - 1) < r₁}, φ (fun i => (((uMat g - 1) * (E i)ᴴ).trace).re / r) ∂μ)
+                            (nhdsWithin 0 (Set.Ioi 0)) (nhds (∫ t, φ t)) := by
   intro n ε A d E hA hE hV μ hμ
-  obtain ⟨a1, a2, a3⟩ := GlobalTheory.T.isRiemannianHaarOnSubgroup_sigmaFinite_unique n ε (algSub ε A hA) (isClosed_algSub A hA) d μ hμ
+  obtain ⟨a1, a2, a3⟩ :=
+    GlobalTheory.T.isRiemannianHaarOnSubgroup_sigmaFinite_unique n ε (algSub ε A hA)
+      (isClosed_algSub A hA) d μ hμ
   refine ⟨a1, a2, a3, ?_⟩
   have hlip := GlobalTheory.T.unitarySubgroupChart_almost_isometric_near_one n ε A d E hA hE hV
   have hsurj := GlobalTheory.T.unitarySubgroupChart_surjective_near_origin n ε A d E hA hE hV
@@ -185,8 +232,9 @@ theorem gauge_local_asymptotics : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submo
   refine ⟨s₀ ^ 2, by positivity, fun r₁ hr₁ hr₁' φ hφ hφc => ?_⟩
   have hs : 0 < Real.sqrt r₁ := Real.sqrt_pos.2 hr₁
   have hs' : Real.sqrt r₁ ≤ s₀ := Real.sqrt_le_iff.2 ⟨hs2.le, hr₁'⟩
-  have hset : {g : Formalism.REAL.UJ ε | Formalism.REAL.hs (uMat g - 1) < r₁} =
-      {g | ‖uMat g - 1‖ < Real.sqrt r₁} := by
+  have hset
+      : {g : Formalism.REAL.UJ ε | Formalism.REAL.hs (uMat g - 1) < r₁}
+        = {g | ‖uMat g - 1‖ < Real.sqrt r₁} := by
     ext g
     simp only [Set.mem_ofPred_eq, ← GlobalTheory.GaugeConst.sqrt_hs]
     exact (Real.sqrt_lt_sqrt_iff_of_pos hr₁).symm
@@ -197,17 +245,23 @@ theorem gauge_local_asymptotics : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submo
     · intro g hg
       simp only [Set.mem_ofPred_eq, GlobalTheory.GaugeConst.sqrt_hs] at hg ⊢
       linarith
-  have hd := density_bounds hμ ψ hψ hs
-    (fun g h hg hh b1 b2 => (h2 g h hg hh (by linarith) (by linarith)).2) hlip hsurj
+  have hd :=
+    density_bounds hμ ψ hψ hs
+      (fun g h hg hh b1 b2 => (h2 g h hg hh (by linarith) (by linarith)).2)
+      hlip hsurj
   let e := EuclideanSpace.equiv (Fin d) ℝ
   have hΦ : Continuous (fun x : EuclideanSpace ℝ (Fin d) => φ (e x)) := hφ.comp e.continuous
-  have hv := GlobalTheory.T.tendsto_rescaled_integral_of_ball_density_bounds d _ inferInstance hd (fun x => φ (e x)) hΦ
-    (hφc.comp_homeomorph e.toHomeomorph)
+  have hv :=
+    GlobalTheory.T.tendsto_rescaled_integral_of_ball_density_bounds d _ inferInstance hd
+      (fun x => φ (e x))
+      hΦ (hφc.comp_homeomorph e.toHomeomorph)
   have hI : ∫ x : EuclideanSpace ℝ (Fin d), φ (e x) = ∫ t, φ t :=
     (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin d)).integral_comp' φ
   rw [hI] at hv
   refine hv.congr fun r => ?_
-  rw [integral_map (f := fun x => φ (e (r⁻¹ • x))) hψ.aemeasurable (hΦ.comp (continuous_const_smul r⁻¹)).aestronglyMeasurable]
+  rw [integral_map
+    (f := fun x => φ (e (r⁻¹ • x)))
+    hψ.aemeasurable (hΦ.comp (continuous_const_smul r⁻¹)).aestronglyMeasurable]
   congr 1
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   refine congrArg φ (funext fun i => ?_)

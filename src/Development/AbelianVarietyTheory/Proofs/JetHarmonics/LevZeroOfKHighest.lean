@@ -11,10 +11,15 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem lev_zero_of_kHighest : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (w : M), GlRel E → IsUnitary ε E → KHighest ε E (lowK ε μ) w → FiniteDimensional ℂ (kSpan ε E w) → Lev ε E μ 0 w := by
+theorem lev_zero_of_kHighest
+    : ∀ (M : Type) [NormedAddCommGroup M] [InnerProductSpace ℂ M] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ M) (μ : Fin n → ℝ) (w : M),
+      GlRel E → IsUnitary ε E → KHighest ε E (lowK ε μ) w → FiniteDimensional ℂ (kSpan ε E w)
+        → Lev ε E μ 0 w := by
   intro M _ _ n ε E μ w hrel _ hhi hfin
   have hk : KRel ε E := glRel_kRel ε E hrel
-  have hsq : ckv ε (lowK ε μ) ≤ (Real.sqrt (ckv ε (lowK ε μ)) + 4 * (n : ℝ) * ((0 : ℕ) : ℝ)) ^ 2 := by
+  have hsq
+      : ckv ε (lowK ε μ) ≤ (Real.sqrt (ckv ε (lowK ε μ)) + 4 * (n : ℝ) * ((0 : ℕ) : ℝ)) ^ 2 := by
     rcases le_total 0 (ckv ε (lowK ε μ)) with h | h
     · simp [Real.sq_sqrt h]
     · simp [Real.sqrt_eq_zero'.mpr h, h]

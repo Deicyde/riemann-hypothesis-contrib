@@ -7,17 +7,24 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitExEv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.AutUnr
 
 section Fixed
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem exists_fixed_of_mem_biSup (ρ : Representation ℂ (GQ L n) W) (K : Set (GAf L n))
-    (t : Finset (Submodule ℂ (GAf L n → W))) :
-    (∀ S ∈ t, NG.IsIrrRep ρ S) → ∀ f ∈ ⨆ S ∈ t, S, f ≠ 0 → (∀ κ ∈ K, NG.rt L n κ f = f) →
-      ∃ S ∈ t, ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ g = g := by
+theorem exists_fixed_of_mem_biSup
+    (ρ : Representation ℂ (GQ L n) W) (K : Set (GAf L n)) (t : Finset (Submodule ℂ (GAf L n → W)))
+    : (∀ S ∈ t, NG.IsIrrRep ρ S)
+      → ∀ f ∈ ⨆ S ∈ t, S,
+        f ≠ 0 → (∀ κ ∈ K, NG.rt L n κ f = f)
+          → ∃ S ∈ t, ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ g = g := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -64,9 +71,12 @@ theorem exists_fixed_of_mem_biSup (ρ : Representation ℂ (GQ L n) W) (K : Set 
       obtain ⟨S', hS', g, hg, hg0, hgf⟩ := ih ht' f hfN hf0 hfix
       exact ⟨S', Finset.mem_insert_of_mem hS', g, hg, hg0, hgf⟩
 
-theorem exists_fixed_of_isoTyp (ρ : Representation ℂ (GQ L n) W) {S : Submodule ℂ (GAf L n → W)}
-    (hS : ∀ h, ∀ f ∈ S, NG.rt L n h f ∈ S) (K : Set (GAf L n)) {f : GAf L n → W} (hf : f ∈ NG.isoTyp ρ S)
-    (hf0 : f ≠ 0) (hfix : ∀ κ ∈ K, NG.rt L n κ f = f) : ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ g = g := by
+theorem exists_fixed_of_isoTyp
+    (ρ : Representation ℂ (GQ L n) W)
+    {S : Submodule ℂ (GAf L n → W)} (hS : ∀ h, ∀ f ∈ S, NG.rt L n h f ∈ S)
+    (K : Set (GAf L n))
+    {f : GAf L n → W} (hf : f ∈ NG.isoTyp ρ S) (hf0 : f ≠ 0) (hfix : ∀ κ ∈ K, NG.rt L n κ f = f)
+    : ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ K, NG.rt L n κ g = g := by
   unfold NG.isoTyp at hf
   obtain ⟨s, hs, hfs⟩ := Submodule.mem_sSup_iff_exists_finset.1 hf
   obtain ⟨S', hS', g, hg, hg0, hgf⟩ :=
@@ -92,16 +102,17 @@ end GlobalTheory.AutUnr
 
 namespace GlobalTheory.AutUnr
 
-theorem mem_placesOver_of_overPl {D : D7} {p : ℕ} {w w' : PlE D.host}
-    {v : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))} (hw : NG.OverPl w v) (hw' : NG.OverPl w' v)
-    (h : w' ∈ placesOver D.host.E p) : w ∈ placesOver D.host.E p := by
+theorem mem_placesOver_of_overPl
+    {D : D7} {p : ℕ} {w w' : PlE D.host} {v : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))}
+    (hw : NG.OverPl w v) (hw' : NG.OverPl w' v) (h : w' ∈ placesOver D.host.E p)
+    : w ∈ placesOver D.host.E p := by
   have h1 : ((p : ℕ) : 𝓞 (maximalRealSubfield D.host.E)) ∈ v.asIdeal := by
     rw [← hw', Ideal.mem_comap, map_natCast]; exact h
   rw [← hw, Ideal.mem_comap, map_natCast] at h1
   exact h1
 
-theorem exists_splitPlace_eq (D : D7) (w : PlE D.host) (hw : IsSplitPl D.host w) :
-    ∃ s : SplitPlace D.host.E, s.w = w := by
+theorem exists_splitPlace_eq (D : D7) (w : PlE D.host) (hw : IsSplitPl D.host w)
+    : ∃ s : SplitPlace D.host.E, s.w = w := by
   obtain ⟨s, -, h, -⟩ := GlobalTheory.SplitConjPlace.splitEx_all D w hw
   refine ⟨GlobalTheory.SplitConjPlace.conjSP s, HeightOneSpectrum.ext (Ideal.ext fun x => ?_)⟩
   rw [GlobalTheory.SplitConjPlace.mem_conj_w]
@@ -109,6 +120,5 @@ theorem exists_splitPlace_eq (D : D7) (w : PlE D.host) (hw : IsSplitPl D.host w)
   rw [IsCMField.coe_ringOfIntegersComplexConj]
   exact D.host.φ₀.injective (by
     rw [NumberField.IsCMField.complexEmbedding_complexConj, Formalism.HC.HostAx.conjE_apply])
-
 
 end GlobalTheory.AutUnr

@@ -12,8 +12,9 @@ namespace NormVal
 
 section Det
 
-variable {R M : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-  [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M]
+variable
+  {R M : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup M] [Module R M]
+  [Module.Free R M] [Module.Finite R M]
 
 lemma length_quot_span_singleton (a : R) :
     Module.length R (R ⧸ Ideal.span {a}) = addVal R a := Ring.ord_eq_addVal a
@@ -96,8 +97,9 @@ end Det
 
 section Semilocal
 
-variable (R : Type*) {S : Type*} [CommRing R] [IsLocalRing R] [CommRing S] [Algebra R S]
-  [Module.Finite R S]
+variable
+  (R : Type*)
+  {S : Type*} [CommRing R] [IsLocalRing R] [CommRing S] [Algebra R S] [Module.Finite R S]
 
 lemma liesOver_maximalIdeal (n : Ideal S) [n.IsMaximal] : n.LiesOver (maximalIdeal R) :=
   ⟨(eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
@@ -111,7 +113,6 @@ lemma length_quot_maximal (n : Ideal S) [n.IsMaximal] :
   have : Module.Finite (R ⧸ maximalIdeal R) (S ⧸ n) := Module.Finite.of_restrictScalars_finite R _ _
   rw [← Module.length_eq_finrank]
   exact Module.length_eq_of_surjective Ideal.Quotient.mk_surjective
-
 
 lemma length_localization_quot_maximal (m n : MaximalSpectrum S) [Decidable (n = m)]
     (B : Type*) [CommRing B] [Algebra S B] [IsLocalization.AtPrime B n.asIdeal] :
@@ -129,8 +130,10 @@ lemma length_localization_quot_maximal (m n : MaximalSpectrum S) [Decidable (n =
     exact Ideal.eq_top_of_isUnit_mem _ (Ideal.mem_map_of_mem _ hy)
       (IsLocalization.map_units _ (⟨y, hyn⟩ : n.asIdeal.primeCompl))
 
-variable [Fintype (MaximalSpectrum S)] (A : MaximalSpectrum S → Type*) [∀ n, CommRing (A n)]
-  [∀ n, Algebra S (A n)] [∀ n, IsLocalization.AtPrime (A n) n.asIdeal]
+variable
+  [Fintype (MaximalSpectrum S)]
+  (A : MaximalSpectrum S → Type*)
+  [∀ n, CommRing (A n)] [∀ n, Algebra S (A n)] [∀ n, IsLocalization.AtPrime (A n) n.asIdeal]
 
 lemma length_eq_sum_tensor {X : Type*} [AddCommGroup X] [Module S X] (hX : IsFiniteLength S X) :
     ∀ [Module R X] [IsScalarTower R S X], Module.length R X =
@@ -179,11 +182,13 @@ end NormVal
 
 open NormVal
 
-variable (R : Type*) {S : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-  [CommRing S] [Algebra R S] [Module.Free R S] [Module.Finite R S]
+variable
+  (R : Type*)
+  {S : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing S] [Algebra R S]
+  [Module.Free R S] [Module.Finite R S]
 
-theorem addVal_norm_eq_length (x : S) :
-    addVal R (Algebra.norm R x) = Module.length R (S ⧸ Ideal.span {x}) := by
+theorem addVal_norm_eq_length (x : S)
+    : addVal R (Algebra.norm R x) = Module.length R (S ⧸ Ideal.span {x}) := by
   rw [Algebra.norm_apply, addVal_det]
   have h : LinearMap.range (Algebra.lmul R S x) = (Ideal.span {x}).restrictScalars R := by
     ext y
@@ -191,38 +196,41 @@ theorem addVal_norm_eq_length (x : S) :
   rw [(Submodule.quotEquivOfEq _ _ h).length_eq,
     (Submodule.Quotient.restrictScalarsEquiv R (Ideal.span {x})).length_eq]
 
-theorem addVal_norm_ne_top_iff (x : S) :
-    addVal R (Algebra.norm R x) ≠ ⊤ ↔ x ∈ nonZeroDivisors S := by
+theorem addVal_norm_ne_top_iff (x : S)
+    : addVal R (Algebra.norm R x) ≠ ⊤ ↔ x ∈ nonZeroDivisors S := by
   rw [Ne, addVal_eq_top_iff, Algebra.norm_apply, LinearMap.det_eq_zero_iff_ker_ne_bot, not_not,
     LinearMap.ker_eq_bot', mem_nonZeroDivisors_iff_left]
   simp
 
-theorem length_quot_span_ne_top_iff (x : S) :
-    Module.length R (S ⧸ Ideal.span {x}) ≠ ⊤ ↔ x ∈ nonZeroDivisors S := by
+theorem length_quot_span_ne_top_iff (x : S)
+    : Module.length R (S ⧸ Ideal.span {x}) ≠ ⊤ ↔ x ∈ nonZeroDivisors S := by
   rw [← addVal_norm_eq_length, addVal_norm_ne_top_iff]
 
 section Local
 
-variable [Fintype (MaximalSpectrum S)] (A : MaximalSpectrum S → Type*) [∀ n, CommRing (A n)]
-  [∀ n, Algebra S (A n)] [∀ n, IsLocalization.AtPrime (A n) n.asIdeal]
+variable
+  [Fintype (MaximalSpectrum S)]
+  (A : MaximalSpectrum S → Type*)
+  [∀ n, CommRing (A n)] [∀ n, Algebra S (A n)] [∀ n, IsLocalization.AtPrime (A n) n.asIdeal]
 
-theorem addVal_norm_eq_sum_length {x : S} (hx : x ∈ nonZeroDivisors S) :
-    addVal R (Algebra.norm R x) = ∑ n : MaximalSpectrum S,
-      Module.length (A n) (A n ⧸ Ideal.span {algebraMap S (A n) x}) * n.asIdeal.inertiaDeg R := by
+theorem addVal_norm_eq_sum_length {x : S} (hx : x ∈ nonZeroDivisors S)
+    : addVal R (Algebra.norm R x)
+      = ∑ n : MaximalSpectrum S,
+        Module.length (A n) (A n ⧸ Ideal.span {algebraMap S (A n) x}) * n.asIdeal.inertiaDeg R := by
   rw [addVal_norm_eq_length, length_quot_eq_sum R A _ ((length_quot_span_ne_top_iff R x).2 hx)]
   refine Finset.sum_congr rfl fun n _ => ?_
   rw [Ideal.map_span, Set.image_singleton]
 
 variable [∀ n, IsDomain (A n)] [∀ n, IsDiscreteValuationRing (A n)]
 
-theorem addVal_norm_eq_sum (x : S) :
-    addVal R (Algebra.norm R x) = ∑ n : MaximalSpectrum S,
-      addVal (A n) (algebraMap S (A n) x) * n.asIdeal.inertiaDeg R := by
+theorem addVal_norm_eq_sum (x : S)
+    : addVal R (Algebra.norm R x)
+      = ∑ n : MaximalSpectrum S,
+        addVal (A n) (algebraMap S (A n) x) * n.asIdeal.inertiaDeg R := by
   by_cases hx : x ∈ nonZeroDivisors S
   · rw [addVal_norm_eq_sum_length R A hx]
     exact Finset.sum_congr rfl fun n _ => by rw [length_quot_span_singleton]
-  · have h1 : addVal R (Algebra.norm R x) = ⊤ := by
-      rwa [← addVal_norm_ne_top_iff R, not_not] at hx
+  · have h1 : addVal R (Algebra.norm R x) = ⊤ := by rwa [← addVal_norm_ne_top_iff R, not_not] at hx
     rw [mem_nonZeroDivisors_iff_left] at hx
     push Not at hx
     obtain ⟨y, hxy, hy⟩ := hx
@@ -245,25 +253,24 @@ theorem addVal_norm_eq_sum (x : S) :
     rw [hx', addVal_zero, ENat.top_mul]
     exact_mod_cast (Ideal.inertiaDeg_pos n.asIdeal R).ne'
 
-
 include R in
-theorem addVal_localization_ne_top {x : S} (hx : x ∈ nonZeroDivisors S) (n : MaximalSpectrum S) :
-    addVal (A n) (algebraMap S (A n) x) ≠ ⊤ := by
+theorem addVal_localization_ne_top {x : S} (hx : x ∈ nonZeroDivisors S) (n : MaximalSpectrum S)
+    : addVal (A n) (algebraMap S (A n) x) ≠ ⊤ := by
   rw [Ne, addVal_eq_top_iff]
   intro h
   obtain ⟨s, hs⟩ := (IsLocalization.map_eq_zero_iff n.asIdeal.primeCompl (A n) x).1 h
   have : (s : S) = 0 := (mem_nonZeroDivisors_iff_left.mp hx) s (by simpa [mul_comm] using hs)
   exact s.2 (this ▸ n.asIdeal.zero_mem)
 
-variable [∀ n, Algebra R (A n)] [∀ n, IsScalarTower R S (A n)]
-  [∀ n, IsLocalHom (algebraMap R (A n))]
+variable
+  [∀ n, Algebra R (A n)] [∀ n, IsScalarTower R S (A n)] [∀ n, IsLocalHom (algebraMap R (A n))]
 
 end Local
 
-
 include R in
-theorem isDiscreteValuationRing_localization_of_isDedekindDomain [IsDedekindDomain S]
-    (n : MaximalSpectrum S) : IsDiscreteValuationRing (Localization.AtPrime n.asIdeal) := by
+theorem isDiscreteValuationRing_localization_of_isDedekindDomain
+    [IsDedekindDomain S] (n : MaximalSpectrum S)
+    : IsDiscreteValuationRing (Localization.AtPrime n.asIdeal) := by
   have := NormVal.liesOver_maximalIdeal R n.asIdeal
   exact IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain S
     (Ideal.ne_bot_of_liesOver_of_ne_bot (IsDiscreteValuationRing.not_a_field R) n.asIdeal) _

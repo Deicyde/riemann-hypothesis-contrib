@@ -12,8 +12,10 @@ set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.AlgCoproduct
 
-theorem exists_isWP : ∀ (A : Type) [CommRing A](B : Type) [CommRing B] [Algebra A B] (n : ℕ),
-    ∃ (K : Type) (_ : CommRing K) (_ : Algebra A K) (ι : Fin n → (B →ₐ[A] K)), IsWP ι := by
+theorem exists_isWP
+    : ∀ (A : Type) [CommRing A] (B : Type) [CommRing B] [Algebra A B] (n : ℕ),
+      ∃ (K : Type) (_ : CommRing K) (_ : Algebra A K) (ι : Fin n → (B →ₐ[A] K)),
+        IsWP ι := by
   intro A _ B _ _ n
   induction n with
   | zero =>
@@ -25,9 +27,14 @@ theorem exists_isWP : ∀ (A : Type) [CommRing A](B : Type) [CommRing B] [Algebr
       exact h
   | succ n ih =>
     obtain ⟨K, _, _, ι, hι⟩ := ih
-    refine ⟨B ⊗[A] K, inferInstance, inferInstance,
+    refine ⟨
+      B ⊗[A] K,
+      inferInstance,
+      inferInstance,
       Fin.cons Algebra.TensorProduct.includeLeft
-        (fun i => (Algebra.TensorProduct.includeRight).comp (ι i)), ?_⟩
+        (fun i => (Algebra.TensorProduct.includeRight).comp (ι i)),
+      ?_
+    ⟩
     constructor
     · intro T _ x y hy
       obtain ⟨z, hz, hzi⟩ := hι.ex T x (fun i => y i.succ) (fun i => hy i.succ)
@@ -47,8 +54,9 @@ theorem exists_isWP : ∀ (A : Type) [CommRing A](B : Type) [CommRing B] [Algebr
     · intro T _ z z' h hi
       have hB : ∀ b : B, z (b ⊗ₜ[A] 1) = z' (b ⊗ₜ[A] 1) := fun b => by
         simpa using RingHom.congr_fun (hi 0) b
-      have hK : (z.comp (Algebra.TensorProduct.includeRight : K →ₐ[A] B ⊗[A] K).toRingHom) =
-          z'.comp (Algebra.TensorProduct.includeRight : K →ₐ[A] B ⊗[A] K).toRingHom := by
+      have hK
+          : (z.comp (Algebra.TensorProduct.includeRight : K →ₐ[A] B ⊗[A] K).toRingHom)
+            = z'.comp (Algebra.TensorProduct.includeRight : K →ₐ[A] B ⊗[A] K).toRingHom := by
         refine hι.uniq T _ _ ?_ (fun i => ?_)
         · ext a
           have := RingHom.congr_fun h a

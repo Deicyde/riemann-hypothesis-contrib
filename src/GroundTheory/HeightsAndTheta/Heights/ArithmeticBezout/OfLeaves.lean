@@ -25,9 +25,10 @@ theorem SphereMeanLinear.full : SphereMeanLinear.Statement := sphereMeanLinear
 
 theorem ChowHeightMul.full : ChowHeightMul.Statement := chowHeightMul_of_mahlerMul mahlerMul
 
-theorem ChowHeightRecursion.of_leaves (hV : ChowFormSectionVertical.Statement)
-    (hA : MahlerSection.Statement) (hB : ChowFormBaseChange.Statement)
-    (hAv : BaseChangeAvoid.Statement) : ChowHeightRecursion.Statement :=
+theorem ChowHeightRecursion.of_leaves
+    (hV : ChowFormSectionVertical.Statement) (hA : MahlerSection.Statement)
+    (hB : ChowFormBaseChange.Statement) (hAv : BaseChangeAvoid.Statement)
+    : ChowHeightRecursion.Statement :=
   ChowHeightRecursion.proof hV hA hB hAv
 
 end GroundTheory.Heights₂.Heights

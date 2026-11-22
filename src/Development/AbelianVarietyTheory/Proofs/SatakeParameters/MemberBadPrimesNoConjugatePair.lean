@@ -6,13 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOfS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Forms Formalism.L2.Col Formalism.L2.DIV Formalism.HermitianLatticesTheory NumberField IsDedekindDomain Classical
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Forms
+  Formalism.L2.Col Formalism.L2.DIV Formalism.HermitianLatticesTheory NumberField IsDedekindDomain
+  Classical
 
 namespace GlobalTheory.BadNoConj
 
-theorem sall_noConj_ok : ∀ {X : Fields} {Pr : Primes X} (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S), X.Ok → Pr.Ok → IsSel X sel → ∀ u : Pr.Word, Pr.T u ∈ S → (∀ i, Pr.g i ∈ S) → ∀ P ∈ Sall sel mu u, conjPrime₂ P ∉ Sall sel mu u := by
+theorem sall_noConj_ok
+    : ∀ {X : Fields} {Pr : Primes X} (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+        {S : Set ℕ} (mu : Tup X.F X.E X.K S),
+      X.Ok → Pr.Ok → IsSel X sel
+        → ∀ u : Pr.Word,
+          Pr.T u ∈ S → (∀ i, Pr.g i ∈ S) → ∀ P ∈ Sall sel mu u, conjPrime₂ P ∉ Sall sel mu u := by
   intro X Pr sel S mu hX hPr hsel u hT hg
-  have hsplit : ∀ P, P ∈ Sall sel mu u ↔ P ∈ Pr.vT u ∪ Pr.vGs ∨ P ∈ QE sel (mu : Chr X.F X.E X.K) := by
+  have hsplit
+      : ∀ P, P ∈ Sall sel mu u ↔ P ∈ Pr.vT u ∪ Pr.vGs ∨ P ∈ QE sel (mu : Chr X.F X.E X.K) := by
     intro P
     unfold Sall rowSG uSG
     simp only [Finset.mem_union]

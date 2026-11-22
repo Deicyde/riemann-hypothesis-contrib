@@ -13,10 +13,11 @@ open scoped ContDiff Matrix
 
 namespace GlobalTheory.LeviRank
 
-theorem exists_select_forms {K M : Type} [Field K] [AddCommGroup M] [Module K M]
-    [FiniteDimensional K M] {n N : ℕ} (hn : Module.finrank K M = n)
-    (φ : Fin N → Module.Dual K M) (hφ : ∀ x, (∀ k, φ k x = 0) → x = 0) :
-    ∃ jj : Fin n → Fin N, ∀ x, (∀ k, φ (jj k) x = 0) → x = 0 := by
+theorem exists_select_forms
+    {K M : Type} [Field K] [AddCommGroup M] [Module K M] [FiniteDimensional K M]
+    {n N : ℕ}
+    (hn : Module.finrank K M = n) (φ : Fin N → Module.Dual K M) (hφ : ∀ x, (∀ k, φ k x = 0) → x = 0)
+    : ∃ jj : Fin n → Fin N, ∀ x, (∀ k, φ (jj k) x = 0) → x = 0 := by
   classical
   have hspan : Submodule.span K (Set.range φ) = ⊤ := by
     rw [eq_top_iff]
@@ -42,23 +43,28 @@ theorem exists_select_forms {K M : Type} [Field K] [AddCommGroup M] [Module K M]
   · intro f g _ _ hf hg; simp [hf, hg]
   · intro c f _ hf; simp [hf]
 
-theorem wJac_mulVec {n N : ℕ} (w : Fin N → V n → ℂ) (x : V n)
-    (hw : ∀ k, DifferentiableAt ℂ (w k) x) (ξ : V n) (k : Fin N) :
-    (wJac n N w x *ᵥ ξ.ofLp) k = fderiv ℂ (w k) x ξ := by
+theorem wJac_mulVec
+    {n N : ℕ}
+    (w : Fin N → V n → ℂ) (x : V n) (hw : ∀ k, DifferentiableAt ℂ (w k) x) (ξ : V n) (k : Fin N)
+    : (wJac n N w x *ᵥ ξ.ofLp) k = fderiv ℂ (w k) x ξ := by
   have hξ : ξ = ∑ j, ξ.ofLp j • bas n j := by
     ext i
     simp [bas, Pi.single_apply]
   conv_rhs => rw [hξ]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [wJac, Matrix.mulVec, dotProduct, wd_of_differentiableAt (hw k), map_sum, map_smul,
-    smul_eq_mul]
+      smul_eq_mul]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem main : ∀ (n N : ℕ) (w : Fin N → V n → ℂ) (U : Set (V n)), IsOpen U → (0 : V n) ∈ U →
-    (∀ k, DifferentiableOn ℂ (w k) U) → (∃ k, w k 0 ≠ 0) →
-    (∀ ξ : Fin n → ℂ, ξ ≠ 0 → 0 < (leviV n (fun z => ((Real.log (∑ k, ‖w k z‖ ^ 2) : ℝ) : ℂ)) 0 ξ).re) →
-    ∃ (j0 : Fin N) (jj : Fin n → Fin N), w j0 0 ≠ 0 ∧
-      (fderiv ℂ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0).det ≠ 0 := by
+theorem main
+    : ∀ (n N : ℕ) (w : Fin N → V n → ℂ) (U : Set (V n)),
+      IsOpen U → (0 : V n) ∈ U → (∀ k, DifferentiableOn ℂ (w k) U) → (∃ k, w k 0 ≠ 0)
+        → (∀ ξ : Fin n → ℂ,
+          ξ ≠ 0 → 0 < (leviV n (fun z => ((Real.log (∑ k, ‖w k z‖ ^ 2) : ℝ) : ℂ)) 0 ξ).re)
+        → ∃ (j0 : Fin N) (jj : Fin n → Fin N),
+          w j0 0 ≠ 0
+            ∧ (fderiv ℂ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0).det
+              ≠ 0 := by
   intro n N w U hU h0 hw ⟨j0, hj0⟩ hL
   have hC : ∀ k, ContDiffAt ℂ 2 (w k) 0 := fun k =>
     ((contDiffOn_of_differentiableOn n (w k) U hU (hw k)).contDiffAt (hU.mem_nhds h0)).of_le
@@ -73,8 +79,9 @@ theorem main : ∀ (n N : ℕ) (w : Fin N → V n → ℂ) (U : Set (V n)), IsOp
     by_contra hx0
     have hξ : x.ofLp ≠ 0 := fun h => hx0 (by ext i; simpa using congrFun h i)
     have h1 := hL _ hξ
-    have e1 : (fun z => ((Real.log (∑ k, ‖w k z‖ ^ 2) : ℝ) : ℂ)) =
-        fun y => ((Real.log (sqNorm (fun i => w i y)) : ℝ) : ℂ) := by
+    have e1
+        : (fun z => ((Real.log (∑ k, ‖w k z‖ ^ 2) : ℝ) : ℂ))
+          = fun y => ((Real.log (sqNorm (fun i => w i y)) : ℝ) : ℂ) := by
       funext y; simp [sqNorm, Complex.normSq_eq_norm_sq]
     rw [e1, leviLogNormSq n N w 0 x.ofLp hC hne] at h1
     have hJ : wJac n N w 0 *ᵥ x.ofLp = (fderiv ℂ (w j0) 0 x / w j0 0) • fun i => w i 0 := by
@@ -93,23 +100,34 @@ theorem main : ∀ (n N : ℕ) (w : Fin N → V n → ℂ) (U : Set (V n)), IsOp
       rw [projPerp_mulVec, star_dotProduct_self, inv_mul_cancel₀ hs, one_smul, sub_self]
     rw [hJ, Matrix.mulVec_smul, hP, smul_zero] at h1
     simp [sqNorm] at h1
-  obtain ⟨jj, hjj⟩ := exists_select_forms (K := ℂ) (M := V n) (n := n) (by simp)
-    (fun k => (fderiv ℂ (fun z => w k z / w j0 z) 0 : V n →L[ℂ] ℂ).toLinearMap) hker
+  obtain ⟨jj, hjj⟩ :=
+    exists_select_forms (K := ℂ) (M := V n) (n := n) (by simp)
+      (fun k => (fderiv ℂ (fun z => w k z / w j0 z) 0 : V n →L[ℂ] ℂ).toLinearMap)
+      hker
   refine ⟨j0, jj, hj0, ?_⟩
-  have hF : DifferentiableAt ℂ
-      (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0 :=
+  have hF
+      : DifferentiableAt ℂ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0 :=
     differentiableAt_euclidean.2 fun k => hQ (jj k)
   rw [ContinuousLinearMap.det, Ne, LinearMap.det_eq_zero_iff_ker_ne_bot, not_not,
     LinearMap.ker_eq_bot']
   intro x hx
   refine hjj x fun k => ?_
-  have h2 := ((EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ).hasFDerivAt.comp (0 : V n)
-    hF.hasFDerivAt).fderiv
-  have h3 : (fun z => w (jj k) z / w j0 z) = (EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ) ∘
-      (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) := rfl
+  have h2 :=
+    ((EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ).hasFDerivAt.comp (0 : V n)
+      hF.hasFDerivAt).fderiv
+  have h3
+      : (fun z => w (jj k) z / w j0 z)
+        = (EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ)
+          ∘ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) :=
+    rfl
   change fderiv ℂ (fun z => w (jj k) z / w j0 z) 0 x = 0
   rw [h3, h2, ContinuousLinearMap.comp_apply]
-  change (EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ) (((fderiv ℂ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0 : V n →L[ℂ] V n) : V n →ₗ[ℂ] V n) x) = 0
+  change (EuclideanSpace.proj (𝕜 := ℂ) k : V n →L[ℂ] ℂ)
+      (((fderiv ℂ (fun z : V n => (WithLp.toLp 2 fun k => w (jj k) z / w j0 z : V n)) 0
+            : V n →L[ℂ] V n)
+          : V n →ₗ[ℂ] V n)
+        x)
+    = 0
   rw [hx, map_zero]
 
 end GlobalTheory.LeviRank

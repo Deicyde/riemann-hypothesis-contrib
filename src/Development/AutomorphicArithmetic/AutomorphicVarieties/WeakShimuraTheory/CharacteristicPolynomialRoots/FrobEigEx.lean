@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC Formalism.MainNotions.N ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC Formalism.MainNotions.N
+  ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+  GlobalTheory.GalOfCusp
 
 open Pointwise in
-private theorem frob_back {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A : ValuationSubring Ω} {q : ℕ}
-    {g σ : G F Ω} (hσ : IsFrob (F := F) (g • A) q σ) : IsFrob (F := F) A q (g⁻¹ * σ * g) := by
+private theorem frob_back
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {q : ℕ} {g σ : G F Ω} (hσ : IsFrob (F := F) (g • A) q σ)
+    : IsFrob (F := F) A q (g⁻¹ * σ * g) := by
   have key : ∀ y : Ω, (g • A).valuation y < 1 ↔ A.valuation (g⁻¹ y) < 1 := by
     intro y
     rw [valuation_lt_one_iff', valuation_lt_one_iff',
@@ -28,8 +33,11 @@ private theorem frob_back {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Al
     convert h using 2
     simp [map_sub, map_pow, AlgEquiv.mul_apply]
 
-private theorem frob_ine {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A : ValuationSubring Ω} {q : ℕ}
-    {σ τ : G F Ω} (hσ : IsFrob (F := F) A q σ) (hτ : IsFrob (F := F) A q τ) : σ⁻¹ * τ ∈ Ine (F := F) A := by
+private theorem frob_ine
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {q : ℕ} {σ τ : G F Ω}
+    (hσ : IsFrob (F := F) A q σ) (hτ : IsFrob (F := F) A q τ)
+    : σ⁻¹ * τ ∈ Ine (F := F) A := by
   refine ⟨Subgroup.mul_mem _ (Subgroup.inv_mem _ hσ.1) hτ.1, fun x hx => ?_⟩
   have h1 : A.valuation (τ x - σ x) < 1 := by
     have h := Valuation.map_sub_lt A.valuation (hτ.2 x hx) (hσ.2 x hx)
@@ -39,8 +47,12 @@ private theorem frob_ine {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alg
   convert h1 using 2
   simp [map_sub, AlgEquiv.mul_apply]
 
-theorem UpperTheory.V.Ws.Pu.frobEigEx :
-    ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {n : ℕ} (ι : PadicAlgCl l ≃+* ℂ) (ρ : G F Ω →* GL (Fin n) (PadicAlgCl l)) (w : HeightOneSpectrum (𝓞 F)), (∀ A : ValuationSubring Ω, IsPlaceOver A w → ∀ s ∈ Ine (F := F) A, ρ s = 1) → ∃ b, Af.FrobEig ι ρ w b := by
+theorem UpperTheory.V.Ws.Pu.frobEigEx
+    : ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ}
+        [Fact l.Prime] {n : ℕ} (ι : PadicAlgCl l ≃+* ℂ) (ρ : G F Ω →* GL (Fin n) (PadicAlgCl l))
+        (w : HeightOneSpectrum (𝓞 F)),
+      (∀ A : ValuationSubring Ω, IsPlaceOver A w → ∀ s ∈ Ine (F := F) A, ρ s = 1)
+        → ∃ b, Af.FrobEig ι ρ w b := by
   intro F Ω _ _ _ _ _ l _ n ι ρ w hI
   obtain ⟨A₀, hA₀⟩ := exists_isPlaceOver Ω w
   obtain ⟨σ₀, hσ₀⟩ := exists_isFrob (F := F) hA₀

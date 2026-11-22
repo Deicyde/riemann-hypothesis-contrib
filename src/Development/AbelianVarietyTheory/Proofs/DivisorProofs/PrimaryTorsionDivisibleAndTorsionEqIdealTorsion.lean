@@ -8,8 +8,13 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem primaryTorsion_divisible_and_gTorsion :
-    ∀ (E : Type) [Field E] [NumberField E] (M : Type) [AddCommGroup M] [Module (𝓞 E) M] (g : ℕ) (I : Ideal (𝓞 E)), g.Prime → Ideal.absNorm I = g → (g : 𝓞 E) ∉ I ^ 2 → (∀ x : M, ∃ y : M, g • y = x) → (∀ (j : ℕ) (x : M), (∀ a ∈ I ^ j, a • x = 0) → ∃ y : M, g • y = x ∧ ∀ a ∈ I ^ (j + 1), a • y = 0) ∧ (∀ (j : ℕ) (x : M), (∀ a ∈ I ^ j, a • x = 0) → g • x = 0 → ∀ a ∈ I, a • x = 0) := by
+theorem primaryTorsion_divisible_and_gTorsion
+    : ∀ (E : Type) [Field E] [NumberField E] (M : Type) [AddCommGroup M] [Module (𝓞 E) M] (g : ℕ)
+        (I : Ideal (𝓞 E)),
+      g.Prime → Ideal.absNorm I = g → (g : 𝓞 E) ∉ I ^ 2 → (∀ x : M, ∃ y : M, g • y = x)
+        → (∀ (j : ℕ) (x : M),
+            (∀ a ∈ I ^ j, a • x = 0) → ∃ y : M, g • y = x ∧ ∀ a ∈ I ^ (j + 1), a • y = 0)
+          ∧ (∀ (j : ℕ) (x : M), (∀ a ∈ I ^ j, a • x = 0) → g • x = 0 → ∀ a ∈ I, a • x = 0) := by
   intro E _ _ M _ _ g I hg hN hg2 hdiv
   have hgI : (g : 𝓞 E) ∈ I := by
     have := Ideal.absNorm_mem I
@@ -24,8 +29,7 @@ theorem primaryTorsion_divisible_and_gTorsion :
   have hJI : ¬ J ≤ I := by
     intro h
     apply hg2
-    have h2 : Ideal.span {(g : 𝓞 E)} ≤ I ^ 2 := by
-      rw [hJ, pow_two]; exact Ideal.mul_mono_right h
+    have h2 : Ideal.span {(g : 𝓞 E)} ≤ I ^ 2 := by rw [hJ, pow_two]; exact Ideal.mul_mono_right h
     exact h2 (Ideal.mem_span_singleton_self _)
   have hsup : I ⊔ J = ⊤ := by
     by_contra h
@@ -43,8 +47,9 @@ theorem primaryTorsion_divisible_and_gTorsion :
       have hae : a * e ∈ I ^ j * Ideal.span {(g : 𝓞 E)} := by
         rw [hJ, ← mul_assoc, ← pow_succ]
         exact Ideal.mul_mem_mul ha he
-      have hker : I ^ j * Ideal.span {(g : 𝓞 E)} ≤
-          LinearMap.ker (LinearMap.toSpanSingleton (𝓞 E) M y0) := by
+      have hker
+          : I ^ j * Ideal.span {(g : 𝓞 E)}
+            ≤ LinearMap.ker (LinearMap.toSpanSingleton (𝓞 E) M y0) := by
         rw [Ideal.mul_le]
         intro c hc s hs
         obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton'.1 hs
@@ -53,9 +58,10 @@ theorem primaryTorsion_divisible_and_gTorsion :
         exact hx _ (Ideal.mul_mem_right _ _ hc)
       have := hker hae
       rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at this
-      rw [smul_smul]; exact this
-  · have hker : I ^ j ⊔ Ideal.span {(g : 𝓞 E)} ≤
-        LinearMap.ker (LinearMap.toSpanSingleton (𝓞 E) M x) := by
+      rw [smul_smul]
+      exact this
+  · have hker
+        : I ^ j ⊔ Ideal.span {(g : 𝓞 E)} ≤ LinearMap.ker (LinearMap.toSpanSingleton (𝓞 E) M x) := by
       refine sup_le (fun b hb => ?_) ?_
       · rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]; exact hx b hb
       · refine (Ideal.span_singleton_le_iff_mem _).2 ?_
@@ -66,7 +72,8 @@ theorem primaryTorsion_divisible_and_gTorsion :
       | zero => rw [pow_zero, Ideal.one_eq_top]; exact le_top.trans le_sup_left
       | succ k =>
         have h : I = I ^ (k + 1) ⊔ Ideal.span {(g : 𝓞 E)} := by
-          calc I = I * (I ^ k ⊔ J) := by rw [hpow k, Ideal.mul_top]
+          calc
+            I = I * (I ^ k ⊔ J) := by rw [hpow k, Ideal.mul_top]
             _ = I ^ (k + 1) ⊔ Ideal.span {(g : 𝓞 E)} := by rw [Ideal.mul_sup, hJ, pow_succ']
         exact h.le
     have := hker (hIle ha)

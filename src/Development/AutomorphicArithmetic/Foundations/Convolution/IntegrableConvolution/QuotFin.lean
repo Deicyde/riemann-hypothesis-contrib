@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Integrab
 open MeasureTheory Topology
 open scoped ENNReal
 
-theorem UpperTheory.ConvolutionTheory.L1.quotFin :
-    UpperTheory.ConvolutionTheory.L1.QuotFin := by
+theorem UpperTheory.ConvolutionTheory.L1.quotFin : UpperTheory.ConvolutionTheory.L1.QuotFin := by
   intro X T _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ _ ν _ _ i hi Φ ρ hΦ hinv hsupp hn
   obtain ⟨C, hC, hsup⟩ := hsupp
   obtain ⟨hρ, hnorm⟩ := hn
@@ -26,8 +25,7 @@ theorem UpperTheory.ConvolutionTheory.L1.quotFin :
     have ht' : t = 1 := ht
     subst ht'
     simpa using hCK hc
-  obtain ⟨U, V, hU, hV, h1U, hCV, hUV⟩ :=
-    generalized_tube_lemma isCompact_singleton hC hopen hsub
+  obtain ⟨U, V, hU, hV, h1U, hCV, hUV⟩ := generalized_tube_lemma isCompact_singleton hC hopen hsub
   obtain ⟨N, hN, hNU, hNc⟩ := local_compact_nhds (hU.mem_nhds (h1U rfl))
   have hNm : MeasurableSet N := hNc.measurableSet
   have hNpos : ν N ≠ 0 := (Measure.measure_pos_of_mem_nhds ν hN).ne'
@@ -60,48 +58,44 @@ theorem UpperTheory.ConvolutionTheory.L1.quotFin :
     have hle : ‖Φ (i t₀ * c)‖ₑ ≤ M := by
       rw [hinv, hM, ← ofReal_norm]
       exact ENNReal.ofReal_le_ofReal (hB c hc)
-    calc ‖Φ (i t₀ * c)‖ₑ ≤ M := hle
+    calc
+      ‖Φ (i t₀ * c)‖ₑ
+        ≤ M := hle
       _ = M / ν N * ν N := (ENNReal.div_mul_cancel hNpos hNfin).symm
       _ ≤ _ := by gcongr; exact hA t₀ c hc
   have hj1 : Measurable (fun p : X × T => ind (i p.2 * p.1) * ρ p.1) :=
     (hindm.comp ((him.comp measurable_snd).mul measurable_fst)).mul (hρ.comp measurable_fst)
   have hj2 : Measurable (fun p : T × X => ind p.2 * ρ ((i p.1)⁻¹ * p.2)) :=
-    (hindm.comp measurable_snd).mul
-      (hρ.comp (((him.comp measurable_fst).inv).mul measurable_snd))
+    (hindm.comp measurable_snd).mul (hρ.comp (((him.comp measurable_fst).inv).mul measurable_snd))
   have hmain : ∫⁻ x, (∫⁻ t, ind (i t * x) ∂ν) * ρ x ∂μ = μ K := by
-    calc ∫⁻ x, (∫⁻ t, ind (i t * x) ∂ν) * ρ x ∂μ
-        = ∫⁻ x, ∫⁻ t, ind (i t * x) * ρ x ∂ν ∂μ := by
-          refine lintegral_congr fun x => ?_
-          have hm : Measurable fun t : T => ind (i t * x) := hindm.comp (him.mul_const x)
-          exact (lintegral_mul_const (ρ x) hm).symm
-      _ = ∫⁻ t, ∫⁻ x, ind (i t * x) * ρ x ∂μ ∂ν :=
-          lintegral_lintegral_swap hj1.aemeasurable
+    calc
+      ∫⁻ x, (∫⁻ t, ind (i t * x) ∂ν) * ρ x ∂μ = ∫⁻ x, ∫⁻ t, ind (i t * x) * ρ x ∂ν ∂μ := by
+        refine lintegral_congr fun x => ?_
+        have hm : Measurable fun t : T => ind (i t * x) := hindm.comp (him.mul_const x)
+        exact (lintegral_mul_const (ρ x) hm).symm
+      _ = ∫⁻ t, ∫⁻ x, ind (i t * x) * ρ x ∂μ ∂ν := lintegral_lintegral_swap hj1.aemeasurable
       _ = ∫⁻ t, ∫⁻ y, ind y * ρ ((i t)⁻¹ * y) ∂μ ∂ν := by
-          refine lintegral_congr fun t => ?_
-          have := lintegral_mul_left_eq_self (μ := μ) (fun y => ind y * ρ ((i t)⁻¹ * y)) (i t)
-          rw [← this]
-          simp
-      _ = ∫⁻ y, ∫⁻ t, ind y * ρ ((i t)⁻¹ * y) ∂ν ∂μ :=
-          lintegral_lintegral_swap hj2.aemeasurable
+        refine lintegral_congr fun t => ?_
+        have := lintegral_mul_left_eq_self (μ := μ) (fun y => ind y * ρ ((i t)⁻¹ * y)) (i t)
+        rw [← this]
+        simp
+      _ = ∫⁻ y, ∫⁻ t, ind y * ρ ((i t)⁻¹ * y) ∂ν ∂μ := lintegral_lintegral_swap hj2.aemeasurable
       _ = ∫⁻ y, ind y ∂μ := by
-          refine lintegral_congr fun y => ?_
-          have hm : Measurable fun t : T => ρ (i t * y) :=
-            hρ.comp ((him).mul_const y)
-          have h2 : ∫⁻ t, ρ ((i t)⁻¹ * y) ∂ν = 1 := by
-            have := (Measure.measurePreserving_inv ν).lintegral_comp hm
-            simp only [Pi.inv_apply, map_inv] at this
-            rw [this, hnorm']
-          have hm' : Measurable fun t : T => ρ ((i t)⁻¹ * y) := hρ.comp (him.inv.mul_const y)
-          rw [lintegral_const_mul (ind y) hm', h2, mul_one]
-      _ = μ K := by
-          rw [hind, lintegral_indicator_one hKm]
-  calc ∫⁻ x, ‖Φ x‖ₑ * ρ x ∂μ
-      ≤ ∫⁻ x, M / ν N * ((∫⁻ t, ind (i t * x) ∂ν) * ρ x) ∂μ := by
-        refine lintegral_mono fun x => ?_
-        rw [← mul_assoc]
-        gcongr
-        exact hpt x
+        refine lintegral_congr fun y => ?_
+        have hm : Measurable fun t : T => ρ (i t * y) := hρ.comp ((him).mul_const y)
+        have h2 : ∫⁻ t, ρ ((i t)⁻¹ * y) ∂ν = 1 := by
+          have := (Measure.measurePreserving_inv ν).lintegral_comp hm
+          simp only [Pi.inv_apply, map_inv] at this
+          rw [this, hnorm']
+        have hm' : Measurable fun t : T => ρ ((i t)⁻¹ * y) := hρ.comp (him.inv.mul_const y)
+        rw [lintegral_const_mul (ind y) hm', h2, mul_one]
+      _ = μ K := by rw [hind, lintegral_indicator_one hKm]
+  calc
+    ∫⁻ x, ‖Φ x‖ₑ * ρ x ∂μ ≤ ∫⁻ x, M / ν N * ((∫⁻ t, ind (i t * x) ∂ν) * ρ x) ∂μ := by
+      refine lintegral_mono fun x => ?_
+      rw [← mul_assoc]
+      gcongr
+      exact hpt x
     _ = M / ν N * μ K := by
-        rw [lintegral_const_mul' _ _ (ENNReal.div_ne_top ENNReal.ofReal_ne_top hNpos), hmain]
-    _ < ⊤ := ENNReal.mul_lt_top
-        (ENNReal.div_lt_top ENNReal.ofReal_ne_top hNpos) hK.measure_lt_top
+      rw [lintegral_const_mul' _ _ (ENNReal.div_ne_top ENNReal.ofReal_ne_top hNpos), hmain]
+    _ < ⊤ := ENNReal.mul_lt_top (ENNReal.div_lt_top ENNReal.ofReal_ne_top hNpos) hK.measure_lt_top

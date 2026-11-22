@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Com
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil ValuativeRel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,10 +23,12 @@ namespace GlobalTheory.PlaceSplitPt
 
 section Val
 
-variable {K K' : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K K' : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [Field K'] [ValuativeRel K'] [TopologicalSpace K'] [IsNonarchimedeanLocalField K']
 
-theorem tendsto_pow_zero {x : K} (h : valuation K x < 1) : Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
+theorem tendsto_pow_zero {x : K} (h : valuation K x < 1)
+    : Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
   rw [(IsValuativeTopology.hasBasis_nhds_zero' K).tendsto_right_iff]
   intro γ hγ
   have : MulArchimedean (ValueGroupWithZero K) :=
@@ -37,8 +41,8 @@ theorem tendsto_pow_zero {x : K} (h : valuation K x < 1) : Tendsto (fun n : ℕ 
 theorem lt_one_mem_nhds : {y : K' | valuation K' y < 1} ∈ 𝓝 (0 : K') :=
   (IsValuativeTopology.hasBasis_nhds_zero' K').mem_iff.2 ⟨1, one_ne_zero, fun _ hy => hy⟩
 
-theorem lt_one_of_map (i : K →+* K') (hi : Continuous i) {x : K} (h : valuation K x < 1) :
-    valuation K' (i x) < 1 := by
+theorem lt_one_of_map (i : K →+* K') (hi : Continuous i) {x : K} (h : valuation K x < 1)
+    : valuation K' (i x) < 1 := by
   have h1 : Tendsto (fun n : ℕ => i x ^ n) atTop (𝓝 0) := by
     have := (hi.tendsto 0).comp (tendsto_pow_zero h)
     simpa [Function.comp_def, map_pow] using this
@@ -48,8 +52,8 @@ theorem lt_one_of_map (i : K →+* K') (hi : Continuous i) {x : K} (h : valuatio
   have : 1 ≤ valuation K' (i x ^ N) := by rw [map_pow]; exact one_le_pow₀ hc
   exact absurd hN (not_lt.2 this)
 
-theorem le_one_of_map (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K' (i y) ≤ 1) :
-    valuation K y ≤ 1 := by
+theorem le_one_of_map (i : K →+* K') (hi : Continuous i) {y : K} (h : valuation K' (i y) ≤ 1)
+    : valuation K y ≤ 1 := by
   by_contra hc
   push_neg at hc
   have hy : y ≠ 0 := fun h0 => by simp [h0] at hc
@@ -61,8 +65,8 @@ theorem le_one_of_map (i : K →+* K') (hi : Continuous i) {y : K} (h : valuatio
     exact (map_ne_zero i).2 hy
   exact absurd h (not_le.2 ((inv_lt_one₀ h0).1 h2))
 
-theorem mem_integer_iff_of_equiv (σ : K ≃+* K') (h1 : Continuous σ) (h2 : Continuous σ.symm) (a : K) :
-    a ∈ 𝒪[K] ↔ σ a ∈ 𝒪[K'] := by
+theorem mem_integer_iff_of_equiv (σ : K ≃+* K') (h1 : Continuous σ) (h2 : Continuous σ.symm) (a : K)
+    : a ∈ 𝒪[K] ↔ σ a ∈ 𝒪[K'] := by
   rw [Valuation.mem_integer_iff, Valuation.mem_integer_iff]
   constructor
   · intro h
@@ -73,9 +77,11 @@ theorem mem_integer_iff_of_equiv (σ : K ≃+* K') (h1 : Continuous σ) (h2 : Co
 
 end Val
 
-open GlobalTheory.FinPl GlobalTheory.FinPl.SplitPoint GlobalTheory.IdemModTwo GlobalTheory.SplitIdem GlobalTheory.SplitChart GlobalTheory.SplitHecke GlobalTheory.LocMod
+open GlobalTheory.FinPl GlobalTheory.FinPl.SplitPoint GlobalTheory.IdemModTwo GlobalTheory.SplitIdem
+  GlobalTheory.SplitChart GlobalTheory.SplitHecke GlobalTheory.LocMod
 
-variable {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 theorem ι_mul (p : Place D k) (x y : k) : p.ι (x * y) = p.ι x * p.ι y := by
   conv_lhs => rw [← p.π_ι x, ← p.π_ι y, ← RingHom.map_mul, p.ι_π, ← mul_assoc, Witness.e_ι]
@@ -115,12 +121,16 @@ theorem int_iff (a : k) : a ∈ 𝒪[k] ↔ finPart D (p.ι a) ∈ intAE D := by
 
 end Chart
 
-theorem exists_splitPt : ∀ {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (p : GlobalTheory.LocMod.Place D k), ∃ q : GlobalTheory.FinPl.SplitPt D k, GlobalTheory.LocMod.Place.ofSplitPt q = p := by
+theorem exists_splitPt
+    : ∀ {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] (p : GlobalTheory.LocMod.Place D k),
+      ∃ q : GlobalTheory.FinPl.SplitPt D k,
+        GlobalTheory.LocMod.Place.ofSplitPt q = p := by
   intro D k _ _ _ _ p
   obtain ⟨-, -, v, ε, hε, hs⟩ := p.split
   have he : SplitAt D v p.e := splitAt_of p.split hε hs
-  exact ⟨⟨v, p.e, p.split, ⟨ε, hε, hs⟩, p.π, p.ι, p.π_ι, p.ι_π, p.cont_π, p.cont_ι, int_iff p he⟩, rfl⟩
+  exact
+    ⟨⟨v, p.e, p.split, ⟨ε, hε, hs⟩, p.π, p.ι, p.π_ι, p.ι_π, p.cont_π, p.cont_ι, int_iff p he⟩, rfl⟩
 
 end GlobalTheory.PlaceSplitPt
 

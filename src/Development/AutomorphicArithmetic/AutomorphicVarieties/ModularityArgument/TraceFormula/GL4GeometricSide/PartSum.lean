@@ -11,20 +11,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RangeSta
 
 @[expose] public section
 
-open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD
+  PositivityTheory.Rg.BcB.Desc
 
 noncomputable section
 
 namespace UpperTheory.V.Z.GSp4Splitting.LowRankIsomorphism
 
-open Finset UpperTheory.RealTr GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCountG
+open Finset UpperTheory.RealTr GlobalTheory.CompanionTheory.RealCount
+  GlobalTheory.CompanionTheory.RealCountG
 
 variable {n : ℕ}
 
-private theorem part_sum (c : Fin n → Fin n → ℕ) (Q : Fin n → ℝ)
+private theorem part_sum
+    (c : Fin n → Fin n → ℕ) (Q : Fin n → ℝ)
     (hQ : ∀ x, Q x = ∑ a, ∑ b, (c a b : ℝ) * ((if x = a then 1 else 0) - (if x = b then 1 else 0)))
-    (S : Finset (Fin n)) :
-    ∑ x ∈ S, Q x = ∑ a, ∑ b, (c a b : ℝ) * ((if a ∈ S then 1 else 0) - (if b ∈ S then 1 else 0)) := by
+    (S : Finset (Fin n))
+    : ∑ x ∈ S, Q x
+      = ∑ a, ∑ b, (c a b : ℝ) * ((if a ∈ S then 1 else 0) - (if b ∈ S then 1 else 0)) := by
   simp only [hQ]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -52,13 +56,19 @@ private theorem domLE_of {ν m : Fin n → ℝ} (h : inCone (fun a => (a : ℕ))
     · simp
   · have hs := part_sum c (m - ν) hQ univ
     simp only [Pi.sub_apply, mem_univ, if_true, sub_self, mul_zero, Finset.sum_const_zero,
-      Finset.sum_sub_distrib] at hs
+        Finset.sum_sub_distrib]
+      at hs
     linarith
 
-private theorem int_of (lam : Fin n → ℤ) {ν : Fin n → ℝ} (h : inCone (fun a => (a : ℕ)) (m0 lam - ν)) :
-    ∃ z : Fin n → ℤ, ν = wtR z := by
+private theorem int_of
+    (lam : Fin n → ℤ) {ν : Fin n → ℝ} (h : inCone (fun a => (a : ℕ)) (m0 lam - ν))
+    : ∃ z : Fin n → ℤ, ν = wtR z := by
   obtain ⟨c, -, hQ⟩ := h
-  refine ⟨fun x => m0Z lam x - ∑ a, ∑ b, (c a b : ℤ) * ((if x = a then 1 else 0) - (if x = b then 1 else 0)), ?_⟩
+  refine ⟨
+    fun x =>
+      m0Z lam x - ∑ a, ∑ b, (c a b : ℤ) * ((if x = a then 1 else 0) - (if x = b then 1 else 0)),
+    ?_
+  ⟩
   funext x
   have hx := hQ x
   simp only [Pi.sub_apply, m0] at hx
@@ -66,16 +76,20 @@ private theorem int_of (lam : Fin n → ℤ) {ν : Fin n → ℝ} (h : inCone (f
   push_cast
   linarith
 
-private theorem harm_of (lam : Fin n → ℤ) (hl : Antitone lam) {ν : Fin n → ℝ} (hν : Antitone ν)
-    (h : inCone (fun a => (a : ℕ)) (m0 lam - ν)) (hd : LSq lam ≤ spinSq ν) : ν ∈ harmSet lam := by
+private theorem harm_of
+    (lam : Fin n → ℤ) (hl : Antitone lam)
+    {ν : Fin n → ℝ}
+    (hν : Antitone ν) (h : inCone (fun a => (a : ℕ)) (m0 lam - ν)) (hd : LSq lam ≤ spinSq ν)
+    : ν ∈ harmSet lam := by
   have hle := domLE_of h
   obtain ⟨z, rfl⟩ := int_of lam h
   have hz : Antitone z := fun a b hab => by
     have := hν hab
     simpa [wtR] using this
   rw [harmSet_eq]
-  refine Finset.mem_image_of_mem _ (GlobalTheory.T.harmonic_of_norm_bound lam hl z hz hle
-    (Tuple.sort fun a => -(wtR z - rhoV n) a) (((rearr n).2.1 (wtR z - rhoV n)).1) ?_)
+  refine Finset.mem_image_of_mem _
+    (GlobalTheory.T.harmonic_of_norm_bound lam hl z hz hle
+      (Tuple.sort fun a => - (wtR z - rhoV n) a) (((rearr n).2.1 (wtR z - rhoV n)).1) ?_)
   refine le_of_eq_of_le ?_ hd
   unfold LSq nsq m0 rhoV
   exact Finset.sum_congr rfl fun a _ => by ring
@@ -83,10 +97,10 @@ private theorem harm_of (lam : Fin n → ℤ) (hl : Antitone lam) {ν : Fin n �
 end UpperTheory.V.Z.GSp4Splitting.LowRankIsomorphism
 
 open UpperTheory.RealTr UpperTheory.V.Z.GSp4Splitting.LowRankIsomorphism in
-theorem UpperTheory.V.Z.GSp4Splitting.lowIso2 :
-    LowIso := by
+theorem UpperTheory.V.Z.GSp4Splitting.lowIso2 : LowIso := by
   intro n lam hl E T hT V _ _ E1 E2 σ A hc ⟨ν, hne, hcone⟩
-  have hK : UF (kF E1 E2) := ⟨GlobalTheory.CompanionTheory.RealCount.KHw.glRel_kF hc.pair, hc.pair.unitK⟩
+  have hK : UF (kF E1 E2) :=
+    ⟨GlobalTheory.CompanionTheory.RealCount.KHw.glRel_kF hc.pair, hc.pair.unitK⟩
   have hL : LocF (kF E1 E2) := fun x => by
     obtain ⟨S, h1, h2, -, h3, -⟩ := hc.der.2 x
     exact ⟨S, h1, h2, h3⟩
@@ -104,9 +118,11 @@ theorem UpperTheory.V.Z.GSp4Splitting.lowIso2 :
     exact pow_ne_zero n two_ne_zero ht.symm
   obtain ⟨x, hx, hx0⟩ := (Submodule.ne_bot_iff _).1 hneF
   obtain ⟨y, hy, hy0⟩ := (Submodule.ne_bot_iff _).1 hneK
-  obtain ⟨f, hf⟩ := Module.Projective.exists_dual_eq_one ℂ
-    (show (⟨x, hx⟩ : hw F ν) ≠ 0 from fun h => hx0 (congrArg Subtype.val h))
-  obtain ⟨t, ht, htφ, -⟩ := homSurj n E'.V V F (kF E1 E2) hF hK hL ν (f.smulRight (⟨y, hy⟩ : hw (kF E1 E2) ν))
+  obtain ⟨f, hf⟩ :=
+    Module.Projective.exists_dual_eq_one ℂ
+      (show (⟨x, hx⟩ : hw F ν) ≠ 0 from fun h => hx0 (congrArg Subtype.val h))
+  obtain ⟨t, ht, htφ, -⟩ :=
+    homSurj n E'.V V F (kF E1 E2) hF hK hL ν (f.smulRight (⟨y, hy⟩ : hw (kF E1 E2) ν))
   have htx : t x = y := by
     have := htφ ⟨x, hx⟩
     simpa [hf] using this

@@ -8,33 +8,37 @@ open NumberField Matrix
 
 namespace GlobalTheory
 
-theorem det_one_add_smul_poly_eval {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (z : ℂ) :
-    Polynomial.eval z (det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C)) = det (1 + z • M) := by
+theorem det_one_add_smul_poly_eval {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (z : ℂ)
+    : Polynomial.eval z (det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C))
+      = det (1 + z • M) := by
   rw [← Polynomial.coe_evalRingHom, RingHom.map_det]
   congr 1
   ext i j
   simp [Matrix.one_apply]
   split_ifs <;> simp [mul_comm]
 
-theorem det_one_add_smul_poly_ne_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) :
-    det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C) ≠ 0 := by
+theorem det_one_add_smul_poly_ne_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ)
+    : det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C) ≠ 0 := by
   intro h
   have := det_one_add_smul_poly_eval M 0
   rw [h] at this
   simp at this
 
-theorem finite_det_one_add_smul_eq_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) :
-    {z : ℂ | det (1 + z • M) = 0}.Finite := by
-  refine (Polynomial.rootSet_finite (det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C)) ℂ).subset ?_
+theorem finite_det_one_add_smul_eq_zero {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ)
+    : {z : ℂ | det (1 + z • M) = 0}.Finite := by
+  refine (Polynomial.rootSet_finite (det (1 + (Polynomial.X : Polynomial ℂ) • M.map Polynomial.C))
+    ℂ).subset ?_
   intro z hz
   rw [Polynomial.mem_rootSet_of_ne (det_one_add_smul_poly_ne_zero M)]
   simp only [Polynomial.aeval_def, Algebra.algebraMap_self, Polynomial.eval₂_id]
   rw [det_one_add_smul_poly_eval]
   exact hz
 
-theorem exists_normOne_det_one_add_ne_zero : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
-    (X : (L →+* ℂ) → Matrix (Fin n) (Fin n) ℂ),
-    ∃ a : L, a * (IsCMField.complexConj L : L →+* L) a = 1 ∧ ∀ σ : L →+* ℂ, (1 + σ a • X σ).det ≠ 0 := by
+theorem exists_normOne_det_one_add_ne_zero
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+        (X : (L →+* ℂ) → Matrix (Fin n) (Fin n) ℂ),
+      ∃ a : L,
+        a * (IsCMField.complexConj L : L →+* L) a = 1 ∧ ∀ σ : L →+* ℂ, (1 + σ a • X σ).det ≠ 0 := by
   intro L _ _ _ n X
   set c : L →+* L := (IsCMField.complexConj L : L →+* L) with hc
   have hcc : ∀ x, c (c x) = x := fun x => IsCMField.complexConj_apply_apply L x
@@ -70,8 +74,7 @@ theorem exists_normOne_det_one_add_ne_zero : ∀ (L : Type) [Field L] [NumberFie
     · exact absurd (sub_eq_zero.mp h4) hμ'
   have hfin : (⋃ σ : L →+* ℂ, (fun t => σ (a t)) ⁻¹' {z : ℂ | det (1 + z • X σ) = 0}).Finite := by
     refine Set.finite_iUnion fun σ => ?_
-    exact (finite_det_one_add_smul_eq_zero (X σ)).preimage
-      (fun t _ s _ h => hinj (σ.injective h))
+    exact (finite_det_one_add_smul_eq_zero (X σ)).preimage (fun t _ s _ h => hinj (σ.injective h))
   obtain ⟨t, ht⟩ := (Set.infinite_univ (α := ℚ)).diff hfin |>.nonempty
   refine ⟨a t, hnorm t, fun σ hσ => ht.2 ?_⟩
   exact Set.mem_iUnion.mpr ⟨σ, hσ⟩

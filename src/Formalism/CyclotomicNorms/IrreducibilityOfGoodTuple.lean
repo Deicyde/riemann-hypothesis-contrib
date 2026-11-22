@@ -16,8 +16,10 @@ public import Formalism.CyclotomicNorms.NonsquarefreeBounds.IrreducibilityOfRest
 
 namespace Formalism.CyclotomicNorms
 
-theorem restriction : Restriction := restriction_of_blocks_and_jordan blocks_form_cycle jordan_transitivity
+theorem restriction : Restriction :=
+  restriction_of_blocks_and_jordan blocks_form_cycle jordan_transitivity
 
-theorem irreducibility_of_good_tuple : IrreducibilityCriterion := irreducibility_of_restriction restriction
+theorem irreducibility_of_good_tuple : IrreducibilityCriterion :=
+  irreducibility_of_restriction restriction
 
 end Formalism.CyclotomicNorms

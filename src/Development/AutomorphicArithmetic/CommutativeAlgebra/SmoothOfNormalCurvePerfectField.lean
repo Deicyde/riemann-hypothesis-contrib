@@ -10,17 +10,18 @@ open IsLocalRing AlgebraicGeometry CategoryTheory
 
 namespace UpperTheory.LocallyOfRingHomAway
 
-private theorem exists_away (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing R] [IsDomain R]
-    [Algebra Ω R] [Algebra.FiniteType Ω R] [IsIntegrallyClosed R]
-    (hdim : ringKrullDim R ≤ 1) (hnf : ¬ IsField R) (m : Ideal R) [hm : m.IsMaximal] :
-    ∃ f ∉ m, Algebra.IsStandardSmoothOfRelativeDimension 1 Ω (Localization.Away f) := by
+private theorem exists_away
+    (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing R] [IsDomain R] [Algebra Ω R]
+    [Algebra.FiniteType Ω R] [IsIntegrallyClosed R]
+    (hdim : ringKrullDim R ≤ 1) (hnf : ¬ IsField R)
+    (m : Ideal R) [hm : m.IsMaximal]
+    : ∃ f ∉ m, Algebra.IsStandardSmoothOfRelativeDimension 1 Ω (Localization.Away f) := by
   have hnoeth : IsNoetherianRing R := Algebra.FiniteType.isNoetherianRing Ω R
   have hkd : Ring.KrullDimLE 1 R := by
     rw [Ring.krullDimLE_iff]
     exact_mod_cast hdim
-  have hdl : Ring.DimensionLEOne R :=
-    ⟨fun hp hprime => hprime.isMaximal_of_ne_bot hp⟩
-  have hded : IsDedekindDomain R := { }
+  have hdl : Ring.DimensionLEOne R := ⟨fun hp hprime => hprime.isMaximal_of_ne_bot hp⟩
+  have hded : IsDedekindDomain R := {}
   have hmbot : m ≠ ⊥ := by
     intro h
     apply hnf
@@ -45,22 +46,28 @@ private theorem exists_away (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing 
   have hsa : Algebra.IsSmoothAt Ω m := hsm
   exact GlobalTheory.exists_isStandardSmoothOfRelativeDimension_of_isSmoothAt Ω m (hrk.trans hcot)
 
-private theorem locally_of_ringHom (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing R] [IsDomain R]
-    (ψ : Ω →+* R) (hft : ψ.FiniteType) (hic : IsIntegrallyClosed R)
-    (hdim : ringKrullDim R ≤ 1) (hnf : ¬ IsField R) :
-    RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension 1) ψ := by
+private theorem locally_of_ringHom
+    (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [CommRing R] [IsDomain R]
+    (ψ : Ω →+* R) (hft : ψ.FiniteType)
+    (hic : IsIntegrallyClosed R) (hdim : ringKrullDim R ≤ 1) (hnf : ¬ IsField R)
+    : RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension 1) ψ := by
   letI : Algebra Ω R := ψ.toAlgebra
   haveI : Algebra.FiniteType Ω R := hft
-  refine ⟨{t | RingHom.IsStandardSmoothOfRelativeDimension 1
-    ((algebraMap R (Localization.Away t)).comp ψ)}, ?_, fun t ht => ht⟩
+  refine ⟨
+    {t | RingHom.IsStandardSmoothOfRelativeDimension 1
+      ((algebraMap R (Localization.Away t)).comp ψ)},
+    ?_,
+    fun t ht => ht
+  ⟩
   by_contra hne
   obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal _ hne
   obtain ⟨f, hf, hsm⟩ := exists_away Ω R hdim hnf M
   apply hf
   apply hle
   apply Ideal.subset_span
-  have heq : ((algebraMap R (Localization.Away f)).comp ψ).toAlgebra =
-      (inferInstance : Algebra Ω (Localization.Away f)) :=
+  have heq
+      : ((algebraMap R (Localization.Away f)).comp ψ).toAlgebra
+        = (inferInstance : Algebra Ω (Localization.Away f)) :=
     Algebra.algebra_ext _ _ (fun r => (IsScalarTower.algebraMap_apply Ω R _ r).symm)
   show @Algebra.IsStandardSmoothOfRelativeDimension 1 Ω (Localization.Away f) _ _
     ((algebraMap R (Localization.Away f)).comp ψ).toAlgebra
@@ -69,12 +76,14 @@ private theorem locally_of_ringHom (Ω R : Type) [Field Ω] [IsAlgClosed Ω] [Co
 
 end UpperTheory.LocallyOfRingHomAway
 
-theorem UpperTheory.smooth_of_normal_curve_perfectField :
-    LateralTheory.E.LeafModelCurveCut.LeafSmoothOfNormal := by
+theorem UpperTheory.smooth_of_normal_curve_perfectField
+    : LateralTheory.E.LeafModelCurveCut.LeafSmoothOfNormal := by
   intro Ω _ _ C c hint hlft hic hdim
-  have key : ∀ (V : C.Opens) (hV : IsAffineOpen V) (a b : C), a ∈ V → b ∈ V → a ≠ b →
-      RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension 1)
-        (c.appLE ⊤ V (by simp)).hom := by
+  have key
+      : ∀ (V : C.Opens) (hV : IsAffineOpen V) (a b : C),
+        a ∈ V → b ∈ V → a ≠ b
+          → RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension 1)
+            (c.appLE ⊤ V (by simp)).hom := by
     intro V hV a b ha hb hab
     haveI : Nonempty V := ⟨⟨a, ha⟩⟩
     have hdom : IsDomain Γ(C, V) := inferInstance
@@ -132,7 +141,8 @@ theorem UpperTheory.smooth_of_normal_curve_perfectField :
     exact absurd h0 (by norm_num)
   rw [HasRingHomProperty.iff_exists_appLE (P := @SmoothOfRelativeDimension 1)
     (RingHom.locally_stableUnderCompositionWithLocalizationAwaySource
-      (RingHom.isStandardSmoothOfRelativeDimension_stableUnderCompositionWithLocalizationAway 1).left)]
+      (RingHom.isStandardSmoothOfRelativeDimension_stableUnderCompositionWithLocalizationAway
+        1).left)]
   intro x
   by_cases hx : x = genericPoint C
   · obtain ⟨z, hz⟩ := hexists

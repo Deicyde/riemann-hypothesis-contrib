@@ -28,8 +28,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteModule
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.DescB
 open GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.LeviHC
 
 noncomputable section
@@ -41,11 +43,16 @@ open Formalism.REAL (GlRel qdet)
 
 section General
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
 
-theorem qdet_mem {B : Type} [Ring B] [Algebra ℂ B] {m : ℕ} (X : Fin m → Fin m → B) (S : Subalgebra ℂ B)
-    (hS : ∀ a b, X a b ∈ S) (u : ℂ) : qdet X u ∈ S := by
+theorem qdet_mem
+    {B : Type} [Ring B] [Algebra ℂ B]
+    {m : ℕ} (X : Fin m → Fin m → B)
+    (S : Subalgebra ℂ B) (hS : ∀ a b, X a b ∈ S)
+    (u : ℂ)
+    : qdet X u ∈ S := by
   unfold qdet Formalism.REAL.qminor
   refine S.sum_mem fun π _ => S.mul_mem (intCast_mem S _) (S.list_prod_mem fun x hx => ?_)
   obtain ⟨k, rfl⟩ := List.mem_ofFn.1 hx

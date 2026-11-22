@@ -14,10 +14,14 @@ variable {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
 def pullAdd (f : X →+ Y) (u : LinearMap.BilinForm ℤ Y) : LinearMap.BilinForm ℤ X :=
   u.compl₁₂ f.toIntLinearMap f.toIntLinearMap
 
-@[simp] theorem pullAdd_apply (f : X →+ Y) (u : LinearMap.BilinForm ℤ Y) (x y : X) : pullAdd f u x y = u (f x) (f y) := rfl
+@[simp]
+theorem pullAdd_apply (f : X →+ Y) (u : LinearMap.BilinForm ℤ Y) (x y : X)
+    : pullAdd f u x y = u (f x) (f y) :=
+  rfl
 
-theorem pullAdd_injective {f : X →+ Y} (hf : Function.Surjective f) : Function.Injective (pullAdd f) :=
-  fun u u' h => LinearMap.ext₂ fun a b => by
+theorem pullAdd_injective {f : X →+ Y} (hf : Function.Surjective f)
+    : Function.Injective (pullAdd f) := fun u u' h =>
+  LinearMap.ext₂ fun a b => by
     obtain ⟨a, rfl⟩ := hf a
     obtain ⟨b, rfl⟩ := hf b
     exact LinearMap.congr_fun₂ h a b

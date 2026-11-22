@@ -8,12 +8,20 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_family_adapted_filtration :
-    ∀ (E W : Type) [Field E] [AddCommGroup W] [Module E W] (D : Submodule E W) (F : ℤ → Submodule E W) (d : ℕ), Module.Finite E ↥D → Module.finrank E ↥D = d → (∀ a, F (a + 1) ≤ F a) → (∀ x, ∃ a, x ∈ F a) → (∀ x, (∀ a, x ∈ F a) → x = 0) → ∃ (x : Fin d → W) (u : Fin d → ℤ), (∀ k, x k ∈ D ∧ x k ∈ F (u k)) ∧ ∀ (a : ℤ) (c : Fin d → E), (∀ k, u k ≠ a → c k = 0) → ∑ k, c k • x k ∈ F (a + 1) → ∀ k, c k = 0 := by
+theorem exists_family_adapted_filtration
+    : ∀ (E W : Type) [Field E] [AddCommGroup W] [Module E W] (D : Submodule E W)
+        (F : ℤ → Submodule E W) (d : ℕ),
+      Module.Finite E ↥D → Module.finrank E ↥D = d → (∀ a, F (a + 1) ≤ F a) → (∀ x, ∃ a, x ∈ F a)
+        → (∀ x, (∀ a, x ∈ F a) → x = 0)
+        → ∃ (x : Fin d → W) (u : Fin d → ℤ),
+          (∀ k, x k ∈ D ∧ x k ∈ F (u k))
+            ∧ ∀ (a : ℤ) (c : Fin d → E),
+              (∀ k, u k ≠ a → c k = 0) → ∑ k, c k • x k ∈ F (a + 1) → ∀ k, c k = 0 := by
   intro E W _ _ _ D F d hfin hd hF hex hsep
   have anti : Antitone F := antitone_int_of_succ_le hF
   induction d generalizing D with
@@ -61,7 +69,8 @@ theorem exists_family_adapted_filtration :
       have hne0 : x0 ≠ 0 := fun h => hf0 (by simp [h])
       have := Submodule.finrank_sup_add_finrank_inf_eq (D ⊓ LinearMap.ker f) (Submodule.span E {x0})
       rw [hsup, hd, ((Submodule.disjoint_span_singleton' hne0).mpr hx0).eq_bot, finrank_bot,
-        finrank_span_singleton hne0] at this
+          finrank_span_singleton hne0]
+        at this
       omega
     obtain ⟨x, u, h1, h2⟩ := ih _ hfin' hd'
     refine ⟨Fin.cons x0 x, Fin.cons lo u, ?_, ?_⟩

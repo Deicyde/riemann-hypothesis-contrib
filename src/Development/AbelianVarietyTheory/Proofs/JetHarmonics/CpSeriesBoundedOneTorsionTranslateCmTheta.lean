@@ -23,40 +23,49 @@ theorem inOK_neg {d : ℕ} {z : ℂ} (h : InOK d z) : InOK d (-z) := by
   obtain ⟨u, v, rfl⟩ := h
   exact ⟨-u, -v, by push_cast; ring⟩
 
-theorem thetaTranslateValueAtZero_neg (d : ℕ) (θ : ℂ → ℂ) (he : ∀ z, θ (-z) = θ z) (t z : ℂ) :
-    U1 d (-t) θ z = U1 d t θ (-z) := by
+theorem thetaTranslateValueAtZero_neg (d : ℕ) (θ : ℂ → ℂ) (he : ∀ z, θ (-z) = θ z) (t z : ℂ)
+    : U1 d (-t) θ z = U1 d t θ (-z) := by
   unfold U1 h1
   rw [← he (z + -t)]
   congr 2
   · ring
   · simp only [map_neg]; ring
 
-theorem cmLatticeTranslationOperator_mul_neg_translate (d : ℕ) (θ : ℂ → ℂ) (t w : ℂ) :
-    U1 d t θ w * U1 d (-t) θ (w + t) = θ w * θ (w + t) := by
+theorem cmLatticeTranslationOperator_mul_neg_translate (d : ℕ) (θ : ℂ → ℂ) (t w : ℂ)
+    : U1 d t θ w * U1 d (-t) θ (w + t) = θ w * θ (w + t) := by
   unfold U1 h1
   have h0 : w + t + -t = w := by ring
   rw [h0, mul_mul_mul_comm, ← Complex.exp_add]
-  have : -(Real.pi : ℂ) * (((2 / Real.sqrt d : ℝ) : ℂ) * (w * conj t)) -
-      (Real.pi : ℂ) / 2 * (((2 / Real.sqrt d : ℝ) : ℂ) * (t * conj t)) +
-      (-(Real.pi : ℂ) * (((2 / Real.sqrt d : ℝ) : ℂ) * ((w + t) * conj (-t))) -
-      (Real.pi : ℂ) / 2 * (((2 / Real.sqrt d : ℝ) : ℂ) * (-t * conj (-t)))) = 0 := by
+  have : -(Real.pi : ℂ) * (((2 / Real.sqrt d : ℝ) : ℂ) * (w * conj t))
+        - (Real.pi : ℂ) / 2 * (((2 / Real.sqrt d : ℝ) : ℂ) * (t * conj t))
+        + (-(Real.pi : ℂ) * (((2 / Real.sqrt d : ℝ) : ℂ) * ((w + t) * conj (-t)))
+          - (Real.pi : ℂ) / 2 * (((2 / Real.sqrt d : ℝ) : ℂ) * (-t * conj (-t))))
+      = 0 := by
     simp only [map_neg]; ring
-  rw [this, Complex.exp_zero]; ring
+  rw [this, Complex.exp_zero]
+  ring
 
-theorem differentiable_cmLatticeTranslationOperator_of_diff (d : ℕ) (θ : ℂ → ℂ) (hθ : Differentiable ℂ θ) (t : ℂ) : Differentiable ℂ (U1 d t θ) := by
+theorem differentiable_cmLatticeTranslationOperator_of_diff
+    (d : ℕ) (θ : ℂ → ℂ) (hθ : Differentiable ℂ θ) (t : ℂ)
+    : Differentiable ℂ (U1 d t θ) := by
   unfold U1 h1
   fun_prop
 
-theorem ell_shift {L : PeriodPair} {φ : ℂ → ℂ} (h : Ell L φ) (a : ℂ) : Ell L (fun z => φ (z + a)) := by
+theorem ell_shift {L : PeriodPair} {φ : ℂ → ℂ} (h : Ell L φ) (a : ℂ)
+    : Ell L (fun z => φ (z + a)) := by
   refine ⟨fun x => ?_, fun l hl z => ?_⟩
   · have h1 : MeromorphicAt φ ((fun z : ℂ => z + a) x) := h.1 _
     exact h1.comp_analyticAt (f := φ) (g := fun z : ℂ => z + a) (by fun_prop)
   · have := h.2 l hl (z + a)
     show φ (z + l + a) = φ (z + a)
-    rw [← this]; congr 1; ring
+    rw [← this]
+    congr 1
+    ring
 
-theorem bd_one_of_inv {q : ℕ} [Fact q.Prime] (f g : ℂ_[q]⟦X⟧) (hf : Bdd f) (hg : Bdd g) (hfg : f * g = 1)
-    (h : ∀ B, Bd B g → Bd B f) : Bd 1 f := by
+theorem bd_one_of_inv
+    {q : ℕ} [Fact q.Prime]
+    (f g : ℂ_[q]⟦X⟧) (hf : Bdd f) (hg : Bdd g) (hfg : f * g = 1) (h : ∀ B, Bd B g → Bd B f)
+    : Bd 1 f := by
   have h1 : Bd 1 (f * g) := by
     rw [hfg]
     intro n
@@ -67,21 +76,27 @@ theorem bd_one_of_inv {q : ℕ} [Fact q.Prime] (f g : ℂ_[q]⟦X⟧) (hf : Bdd 
   by_contra hi
   push_neg at hi
   have hp : 0 < ‖coeff i f‖ := lt_trans one_pos hi
-  have hb : Bd (1 / ‖coeff i f‖) g := fun j => by
-    rw [le_div_iff₀ hp, mul_comm]; exact hm i j
+  have hb : Bd (1 / ‖coeff i f‖) g := fun j => by rw [le_div_iff₀ hp, mul_comm]; exact hm i j
   have := h _ hb i
   rw [le_div_iff₀ hp] at this
   nlinarith
 
-theorem bd_translate : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ), d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ → ∀ t : ℂ, PrimeTo d q t → ¬ InOK d (t - 1 / 2) → Bd 1 (hat M.ι (C ω * logS) (U1 d t θ)) := by
+theorem bd_translate
+    : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ),
+      d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ
+        → ∀ t : ℂ,
+          PrimeTo d q t → ¬ InOK d (t - 1 / 2) → Bd 1 (hat M.ι (C ω * logS) (U1 d t θ)) := by
   intro d q _ M ω θ hd h16 hsp hOK hch hth t hpt hnt
   obtain ⟨s, hs, hsq, hst⟩ := id hpt
   have hs0 : (s : ℂ) ≠ 0 := by exact_mod_cast hs.ne'
   obtain ⟨hdiff, h0, hev, -, hz⟩ := id hth
   have hθt : θ t ≠ 0 := fun h => hnt (hz t h)
-  have hP := GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd h16 hsp hOK hch hth t s hs hsq hst
-  have hN := GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd h16 hsp hOK hch hth (-t) s hs hsq
-    (by have := inOK_neg hst; rwa [← mul_neg] at this)
+  have hP :=
+    GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd h16 hsp hOK hch hth t s hs
+      hsq hst
+  have hN :=
+    GlobalTheory.MomOne.ScaledQuot.scaled_quotient_elliptic d q M ω θ hd h16 hsp hOK hch hth (-t) s
+      hs hsq (by have := inOK_neg hst; rwa [← mul_neg] at this)
   simp only at hP hN
   set φp : ℂ → ℂ := fun z => U1 d t θ ((s : ℂ) * z) / θ ((s : ℂ) * z) with hφp
   set φm : ℂ → ℂ := fun z => U1 d (-t) θ ((s : ℂ) * z) / θ ((s : ℂ) * z) with hφm
@@ -102,8 +117,7 @@ theorem bd_translate : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
     have : AnalyticAt ℂ ψ p := hψan p (hNp _ (by rwa [mul_add, hst']))
     exact absurd this.meromorphicOrderAt_nonneg (not_le.mpr hp)
   have hψb := GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ ψ hch hψe hψ0 hψp
-  have hback : (fun z => ψ (z + -t')) = φm := by
-    funext z; simp [hψ]
+  have hback : (fun z => ψ (z + -t')) = φm := by funext z; simp [hψ]
   have hℓ : constantCoeff (C ω * logS : ℂ_[q]⟦X⟧) = 0 := hch.2.1
   have hat1 := TaylorRead.hat_laws q M.ι _ hℓ
   have hmul := MulSeries.mulS_laws q
@@ -111,15 +125,24 @@ theorem bd_translate : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
   have hb1 : ∀ B, Bd B (hat M.ι (C ω * logS) ψ) → Bd B (hat M.ι (C ω * logS) φm) := by
     intro B hB
     by_cases hsm : M.Small (-t')
-    · have hin : InOK d (-t') := (GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd h16 hsp hOK hch).2.2.1 (-t')
-        ⟨s * s, Nat.mul_pos hs hs, Nat.Coprime.mul_left hsq hsq, by
-          have : ((s * s : ℕ) : ℂ) * (-t') = -((s : ℂ) * t) := by
-            rw [← hst']; push_cast; ring
-          rw [this]; exact inOK_neg hst⟩ hsm
+    · have hin : InOK d (-t') :=
+        (GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd h16 hsp hOK hch).2.2.1 (-t')
+          ⟨
+            s * s,
+            Nat.mul_pos hs hs,
+            Nat.Coprime.mul_left hsq hsq,
+            by
+              have : ((s * s : ℕ) : ℂ) * (-t') = -((s : ℂ) * t) := by rw [← hst']; push_cast; ring
+              rw [this]
+              exact inOK_neg hst
+          ⟩
+          hsm
       have hl : t' ∈ M.L.lattice := (hOK t').2 (by simpa using inOK_neg hin)
       have : ψ = φm := funext fun z => hNe.2 t' hl z
       rwa [← this]
-    · have := GlobalTheory.T.cpTransportedTaylorSeries_translate_norm_le q M _ ψ (-t') B hch hψe hψ0 hψt hψp hsm (by rwa [hback]) hB
+    · have :=
+        GlobalTheory.T.cpTransportedTaylorSeries_translate_norm_le q M _ ψ (-t') B hch hψe hψ0 hψt
+          hψp hsm (by rwa [hback]) hB
       rwa [hback] at this
 
   have hmp : φm = fun z => φp ((-1 : ℂ) * z) := by
@@ -152,7 +175,8 @@ theorem bd_translate : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
     bd_one_of_inv _ _ hPb hψb hprod fun B hB => hb2 B (hb1 B hB)
 
   have hθa : AnalyticAt ℂ θ 0 := hdiff.analyticAt 0
-  have hUa : AnalyticAt ℂ (U1 d t θ) 0 := (differentiable_cmLatticeTranslationOperator_of_diff d θ hdiff t).analyticAt 0
+  have hUa : AnalyticAt ℂ (U1 d t θ) 0 :=
+    (differentiable_cmLatticeTranslationOperator_of_diff d θ hdiff t).analyticAt 0
   set f : ℂ → ℂ := fun z => U1 d t θ z / θ z with hf
   have hfa : AnalyticAt ℂ f 0 := hUa.div hθa (by simp [h0])
   have hf1 : Bd 1 (hat M.ι (C ω * logS) f) := by
@@ -160,8 +184,10 @@ theorem bd_translate : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q])
     have e' : φp = fun z => f ((s : ℂ) * z) := rfl
     rw [e', e] at hP1
     exact (hmul.2.2.2.1 (s : ℤ_[q]) _ 1 (PadicInt.norm_natCast_eq_one_iff.2 hsq.symm)).1 hP1
-  have hθ1 := GlobalTheory.T.cm_even_theta_series_chart_coeff_integral d q M ω θ hd h16 hsp hOK hch hth
-  have hfin : hat M.ι (C ω * logS) (U1 d t θ) = hat M.ι (C ω * logS) f * hat M.ι (C ω * logS) θ := by
+  have hθ1 :=
+    GlobalTheory.T.cm_even_theta_series_chart_coeff_integral d q M ω θ hd h16 hsp hOK hch hth
+  have hfin
+      : hat M.ι (C ω * logS) (U1 d t θ) = hat M.ι (C ω * logS) f * hat M.ι (C ω * logS) θ := by
     rw [← (hat1.1 f θ hfa hθa).2.1]
     apply (hat1.1 _ _ hUa (hfa.mul hθa)).2.2.1
     apply Filter.Eventually.filter_mono nhdsWithin_le_nhds

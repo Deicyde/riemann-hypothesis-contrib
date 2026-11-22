@@ -8,41 +8,49 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34.ModelFPf
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.N.Ln34 TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.N.Ln34 TensorProduct
 
 section Local
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
-    (T : LocLat G Qp LL O) (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop) (π' Eπ : LetA O n)
-    (h' M σ : ℕ) (c : ZMod n) (α : FrA W π' Eπ h' M c) (β : FrB W π' Eπ h' M c)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+  (T : LocLat G Qp LL O) (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop)
+  (π' Eπ : LetA O n) (h' M σ : ℕ) (c : ZMod n) (α : FrA W π' Eπ h' M c) (β : FrB W π' Eπ h' M c)
 
-theorem modelF_local (hfr : IsFrame W Pt π' Eπ h' M σ c α β) (hcry : IsCrys PD T.ρ)
+theorem modelF_local
+    (hfr : IsFrame W Pt π' Eπ h' M σ c α β) (hcry : IsCrys PD T.ρ)
     (hjmp : ∀ τ, JumpsInV PD T.ρ τ (Set.Icc (-(h' : ℤ)) h')) (hs : W.s = 1) (hM : 1 ≤ M)
     (hπΔ : π' ∈ W.AΔ) (hEΔ : Eπ ∈ W.AΔ) (hπu : IsUnit (algebraMap (LetA O n) W.EE π'))
     {w w' : LetA O n} (hww : w' * w = 1) (hQ : W.Q = w * Eπ)
     {u u' : LetA O n} (hu' : u' ∈ W.AΔ) (huu : u' * u = 1) (hγE : W.γA W.gamK Eπ = u * Eπ)
     (h5a : ∀ x ∈ W.Nl T (c - 1), W.Q ^ h' • W.φD T x ∈ W.N T)
-    (hNP : ∀ y ∈ NcS W T c, y ∈ LamPS W T Eπ h' c) (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W Pt T)
-    (hpt : ∀ ζ τ, Pt c ζ τ → ζ ^ PD.p = 1 ∧ ζ ≠ 1) (hexp : ExpansionFormLetter W T Pt) :
-    ModelF W T Pt π' Eπ h' M c α β := by
+    (hNP : ∀ y ∈ NcS W T c, y ∈ LamPS W T Eπ h' c)
+    (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W Pt T)
+    (hpt : ∀ ζ τ, Pt c ζ τ → ζ ^ PD.p = 1 ∧ ζ ≠ 1) (hexp : ExpansionFormLetter W T Pt)
+    : ModelF W T Pt π' Eπ h' M c α β := by
   have F := hfr.1 T hcry hjmp
 
-  have C1 : ∀ x hx, x ∈ NL W T Pt π' Eπ h' c →
-      ∃ y hy, y ∈ NcS W T c ∧ α T ⟨x, hx⟩ = mkP W T π' Eπ h' M c y hy := by
+  have C1
+      : ∀ x hx,
+        x ∈ NL W T Pt π' Eπ h' c
+          → ∃ y hy, y ∈ NcS W T c ∧ α T ⟨x, hx⟩ = mkP W T π' Eπ h' M c y hy := by
     intro x hx hxNL
     induction hxNL using Submodule.span_induction with
     | mem x hxS =>
       obtain ⟨⟨y0, hy0⟩, hq⟩ := Submodule.Quotient.mk_surjective _ (α T ⟨x, hx⟩)
       have hα : α T ⟨x, hx⟩ = mkP W T π' Eπ h' M c y0 hy0 := hq.symm
-      have hN := alpha_core W T Pt π' Eπ h' M σ c α β hfr hcry hjmp hs hww hQ h5a hp4 hpt hexp
-        x hx hxS y0 hy0 hα
+      have hN :=
+        alpha_core W T Pt π' Eπ h' M σ c α β hfr hcry hjmp hs hww hQ h5a hp4 hpt hexp x hx hxS y0
+          hy0 hα
       obtain ⟨-, h2, h3⟩ := (mem_LamPS W T Eπ h' c y0).1 hy0
       exact ⟨y0, hy0, (mem_NcS W T c y0).2 ⟨hN, h2, h3⟩, hα⟩
     | zero =>
@@ -67,15 +75,26 @@ theorem modelF_local (hfr : IsFrame W Pt π' Eπ h' M σ c α β) (hcry : IsCrys
       rw [e, map_smul, e₁]
       exact (Submodule.Quotient.mk_smul _ _ _).symm
 
-  have C2 : ∀ y hy, y ∈ NcS W T c →
-      ∃ x hx, x ∈ NL W T Pt π' Eπ h' c ∧ β T ⟨y, hy⟩ = mkLA W T π' Eπ h' M c x hx := by
+  have C2
+      : ∀ y hy,
+        y ∈ NcS W T c
+          → ∃ x hx, x ∈ NL W T Pt π' Eπ h' c ∧ β T ⟨y, hy⟩ = mkLA W T π' Eπ h' M c x hx := by
     intro y hy hyN
     obtain ⟨⟨x, hx⟩, hq⟩ := Submodule.Quotient.mk_surjective _ (β T ⟨y, hy⟩)
-    exact ⟨x, hx, Submodule.subset_span (beta_core W T Pt π' Eπ h' M σ c α β hfr hcry hjmp hs hww
-      hQ hp4 hpt y hy ((mem_NcS W T c y).1 hyN).1 x hx hq.symm), hq.symm⟩
+    exact ⟨
+      x,
+      hx,
+      Submodule.subset_span (beta_core W T Pt π' Eπ h' M σ c α β hfr hcry hjmp hs hww hQ hp4 hpt y
+        hy ((mem_NcS W T c y).1 hyN).1 x hx hq.symm),
+      hq.symm
+    ⟩
 
-  have HighestWeightSpaceFinite : ∀ j : ℕ, j ≤ M → ∀ x hx y hy, α T ⟨x, hx⟩ = mkP W T π' Eπ h' M c y hy →
-      x ∈ piNL W T Pt π' Eπ h' c j → y ∈ PiNS W T π' j := by
+  have HighestWeightSpaceFinite
+      : ∀ j : ℕ,
+        j ≤ M
+          → ∀ x hx y hy,
+            α T ⟨x, hx⟩ = mkP W T π' Eπ h' M c y hy → x ∈ piNL W T Pt π' Eπ h' c j
+              → y ∈ PiNS W T π' j := by
     intro j hjM x hx y hy hα hpi
     obtain ⟨x', hx'NL, rfl⟩ := Submodule.mem_map.1 hpi
     have hx'L := NL_le_LamLA W T π' Eπ h' c Pt hx'NL
@@ -84,20 +103,28 @@ theorem modelF_local (hfr : IsFrame W Pt π' Eπ h' M σ c α β) (hcry : IsCrys
     have h2 := F.2.2.2.2.1 (π' ^ j) (W.AΔ.pow_mem hπΔ j) x' hx'L y' hy' hα' hx hay
     rw [hα] at h2
     have hd : y - π' ^ j • y' ∈ JP W T π' Eπ h' M c := by
-      have h2' : (Submodule.Quotient.mk (⟨y, hy⟩ : ↥(LamPS W T Eπ h' c)) : QLamP W T π' Eπ h' M c) =
-          Submodule.Quotient.mk ⟨π' ^ j • y', hay⟩ := h2
-      have := (Submodule.Quotient.eq
-        ((JP W T π' Eπ h' M c).comap (LamPS W T Eπ h' c).subtype)).1 h2'
+      have h2'
+          : (Submodule.Quotient.mk (⟨y, hy⟩ : ↥(LamPS W T Eπ h' c)) : QLamP W T π' Eπ h' M c)
+            = Submodule.Quotient.mk ⟨π' ^ j • y', hay⟩ :=
+        h2
+      have :=
+        (Submodule.Quotient.eq ((JP W T π' Eπ h' M c).comap (LamPS W T Eπ h' c).subtype)).1 h2'
       exact this
     obtain ⟨z, hzN, hz⟩ := JP_mem W T π' Eπ h' c hww hQ h5a M j hjM hd
     rw [mem_PiNS]
-    refine ⟨⟨y' + z, Submodule.add_mem _ ((mem_NcS W T c y').1 hy'N).1 hzN, ?_⟩,
-      ((mem_LamPS W T Eπ h' c y).1 hy).2.1⟩
+    refine ⟨
+      ⟨y' + z, Submodule.add_mem _ ((mem_NcS W T c y').1 hy'N).1 hzN, ?_⟩,
+      ((mem_LamPS W T Eπ h' c y).1 hy).2.1
+    ⟩
     rw [smul_add, ← hz]
     abel
 
-  have HighestWeightIntegral : ∀ j : ℕ, j ≤ M → ∀ y hy x hx, β T ⟨y, hy⟩ = mkLA W T π' Eπ h' M c x hx →
-      y ∈ PiNS W T π' j → x ∈ piNL W T Pt π' Eπ h' c j := by
+  have HighestWeightIntegral
+      : ∀ j : ℕ,
+        j ≤ M
+          → ∀ y hy x hx,
+            β T ⟨y, hy⟩ = mkLA W T π' Eπ h' M c x hx → y ∈ PiNS W T π' j
+              → x ∈ piNL W T Pt π' Eπ h' c j := by
     intro j hjM y hy x hx hβ hpi
     obtain ⟨⟨y1, hy1N, rfl⟩, -⟩ := (mem_PiNS W T π' j _).1 hpi
     have hunit : IsUnit (algebraMap (LetA O n) W.EE (π' ^ j)) := by
@@ -120,19 +147,25 @@ theorem modelF_local (hfr : IsFrame W Pt π' Eπ h' M σ c α β) (hcry : IsCrys
     have h6 := F.2.2.2.2.2.1 (π' ^ j) (W.AΔ.pow_mem hπΔ j) y1 hy1L x1 hx1 hβ1 hy hax
     rw [hβ] at h6
     have hd : x - smulLA W T π' c (π' ^ j) x1 ∈ JLA W T π' Eπ h' M c := by
-      have h6' : (Submodule.Quotient.mk (⟨x, hx⟩ : ↥(LamLA W T π' Eπ h' c ⊤)) :
-          QLamLA W T π' Eπ h' M c) = Submodule.Quotient.mk ⟨smulLA W T π' c (π' ^ j) x1, hax⟩ := h6
-      have := (Submodule.Quotient.eq
-        ((JLA W T π' Eπ h' M c).comap (LamLA W T π' Eπ h' c ⊤).subtype)).1 h6'
+      have h6'
+          : (Submodule.Quotient.mk (⟨x, hx⟩ : ↥(LamLA W T π' Eπ h' c ⊤)) : QLamLA W T π' Eπ h' M c)
+            = Submodule.Quotient.mk ⟨smulLA W T π' c (π' ^ j) x1, hax⟩ :=
+        h6
+      have :=
+        (Submodule.Quotient.eq ((JLA W T π' Eπ h' M c).comap (LamLA W T π' Eπ h' c ⊤).subtype)).1
+          h6'
       exact this
     have h1 := JLA_le W T Pt π' Eπ h' M c hs hww hQ hp4 hpt hjmp hπΔ hEΔ j hjM hd
     have h2 : smulLA W T π' c (π' ^ j) x1 ∈ piNL W T Pt π' Eπ h' c j :=
       Submodule.mem_map_of_mem hx1NL
     have := Submodule.add_mem _ h1 h2
     rwa [sub_add_cancel] at this
-  refine ⟨C1, C2, fun j _ hjM => ⟨HighestWeightSpaceFinite j hjM, HighestWeightIntegral j hjM⟩, ?_, ?_⟩
+  refine
+    ⟨C1, C2, fun j _ hjM => ⟨HighestWeightSpaceFinite j hjM, HighestWeightIntegral j hjM⟩, ?_, ?_⟩
   · intro x hx y hy hα hinv
-    have hγx : ((γLA W T π' c - LinearMap.id : LA W T π' c →ₗ[O] LA W T π' c) x) ∈ piNL W T Pt π' Eπ h' c 1 :=
+    have hγx
+        : ((γLA W T π' c - LinearMap.id : LA W T π' c →ₗ[O] LA W T π' c) x)
+          ∈ piNL W T Pt π' Eπ h' c 1 :=
       (Submodule.mem_inf.1 hinv).2
     rw [LinearMap.sub_apply, LinearMap.id_apply] at hγx
     refine (mem_InvS W T π' Eπ h' 1 c y).2 ⟨hy, ?_⟩

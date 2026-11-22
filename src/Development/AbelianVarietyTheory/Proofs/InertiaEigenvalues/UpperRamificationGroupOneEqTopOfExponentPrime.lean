@@ -6,13 +6,15 @@ public import GroundTheory.LocalFields.RamificationStructure
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem ringChar_residue_eq_of_ordIs (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] (p e : ℕ) (hp : p.Prime) (he : 0 < e) (h : OrdIs F p e) :
-    ringChar 𝓀[F] = p := by
+theorem ringChar_residue_eq_of_ordIs
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    (p e : ℕ) (hp : p.Prime) (he : 0 < e) (h : OrdIs F p e)
+    : ringChar 𝓀[F] = p := by
   have hnu : ¬ IsUnit (p : 𝒪[F]) := by
     intro hu
     have := (IsDiscreteValuationRing.addVal_eq_zero_of_unit (hu.unit))
@@ -30,11 +32,13 @@ theorem ringChar_residue_eq_of_ordIs (F : Type) [Field F] [ValuativeRel F] [Topo
   · exact absurd h1 CharP.ringChar_ne_one
   · exact h1
 
-theorem upperRamificationGroup_one_eq_top_of_exponent :
-    ∀ (F M : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [Field M]
-      [ValuativeRel M] [TopologicalSpace M] [IsNonarchimedeanLocalField M] [Algebra F M] [ValuativeExtension F M]
-      [FiniteDimensional F M] [IsGalois F M] (p e : ℕ), p.Prime → 0 < e → OrdIs F p e →
-      upperRamificationGroup F M 0 = ⊤ → (∀ σ : M ≃ₐ[F] M, σ ^ p = 1) → upperRamificationGroup F M 1 = ⊤ := by
+theorem upperRamificationGroup_one_eq_top_of_exponent
+    : ∀ (F M : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [Field M] [ValuativeRel M] [TopologicalSpace M] [IsNonarchimedeanLocalField M] [Algebra F M]
+        [ValuativeExtension F M] [FiniteDimensional F M] [IsGalois F M] (p e : ℕ),
+      p.Prime → 0 < e → OrdIs F p e → upperRamificationGroup F M 0 = ⊤
+        → (∀ σ : M ≃ₐ[F] M, σ ^ p = 1)
+        → upperRamificationGroup F M 1 = ⊤ := by
   intro F M _ _ _ _ _ _ _ _ _ _ _ _ p e hp he hord h0 hexp
   rw [upperRamificationGroup_zero] at h0
   have hchar := ringChar_residue_eq_of_ordIs F p e hp he hord
@@ -49,10 +53,15 @@ theorem upperRamificationGroup_one_eq_top_of_exponent :
       QuotientGroup.mk ⟨σ, hσ0⟩ with hq
     have hqp : q ^ p = 1 := by
       rw [hq, ← QuotientGroup.mk_pow]
-      have : (⟨σ, hσ0⟩ : lowerRamificationGroup F M 0) ^ p = 1 := Subtype.ext (by simpa using hexp σ)
+      have : (⟨σ, hσ0⟩ : lowerRamificationGroup F M 0) ^ p = 1 :=
+        Subtype.ext (by simpa using hexp σ)
       rw [this, QuotientGroup.mk_one]
-    have hqc : q ^ Nat.card (lowerRamificationGroup F M 0 ⧸
-        (lowerRamificationGroup F M 1).subgroupOf (lowerRamificationGroup F M 0)) = 1 := pow_card_eq_one'
+    have hqc
+        : q ^ Nat.card
+            (lowerRamificationGroup F M 0 ⧸
+              (lowerRamificationGroup F M 1).subgroupOf (lowerRamificationGroup F M 0))
+          = 1 :=
+      pow_card_eq_one'
     have hg : q ^ Nat.gcd _ p = 1 := pow_gcd_eq_one.mpr ⟨hqc, hqp⟩
     rw [hcop, pow_one, hq, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at hg
     exact hg
@@ -62,6 +71,7 @@ theorem upperRamificationGroup_one_eq_top_of_exponent :
     have h1' : lowerRamificationGroup F M (((0 : ℕ) : ℤ) + 1) = ⊤ := by simpa using h1
     rw [h1', Subgroup.relIndex_top_left] at this
     simpa [hphi0] using this
-  rw [← hphi1, upperRamificationGroup_herbrandPhi, ← Nat.cast_one, lowerRamificationGroupReal_natCast]
+  rw [← hphi1, upperRamificationGroup_herbrandPhi, ← Nat.cast_one,
+    lowerRamificationGroupReal_natCast]
   simpa using h1
 end GlobalTheory.PMon.Ram

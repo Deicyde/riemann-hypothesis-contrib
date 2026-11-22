@@ -10,8 +10,12 @@ namespace GlobalTheory.DI
 
 section LogMul
 
-variable {K Kt : Type} [Field K] [CommRing Kt] (p : ℕ) [Fact p.Prime] [CharP K p] (π : Kt →+* K)
-  {ι : Type} (F : ι → Kt →+* Kt) (s : Finset ι) (A : Subring K)
+variable
+  {K Kt : Type} [Field K] [CommRing Kt]
+  (p : ℕ) [Fact p.Prime] [CharP K p]
+  (π : Kt →+* K)
+  {ι : Type} (F : ι → Kt →+* Kt) (s : Finset ι)
+  (A : Subring K)
 
 omit [Fact p.Prime] in
 lemma logLift_pp_zero (hπ : IsFlatLift p π) : (p : Kt) * p = 0 := by

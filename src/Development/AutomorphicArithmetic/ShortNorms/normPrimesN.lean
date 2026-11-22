@@ -109,17 +109,26 @@ private lemma ev_log_sq (eps : ℝ) (he : 0 < eps) :
   exact mul_le_mul hx hx hl hp.le
 
 set_option maxHeartbeats 800000 in
-theorem normPrimesN :
-    ShortNorm → ∀ eps : ℝ, 0 < eps → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ N d : ℕ, ModAt x eps N d → ∀ Y : ℝ, 0 < Y → 8 * x ^ eps ≤ Real.log Y →
-      Y ^ ((9 : ℝ) / 10) ≤ ((normPrimes d N Y (2 * Y)).card : ℝ) := by
+theorem normPrimesN
+    : ShortNorm
+      → ∀ eps : ℝ,
+        0 < eps
+          → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ N d : ℕ,
+            ModAt x eps N d
+              → ∀ Y : ℝ,
+                0 < Y → 8 * x ^ eps ≤ Real.log Y
+                  → Y ^ ((9 : ℝ) / 10) ≤ ((normPrimes d N Y (2 * Y)).card : ℝ) := by
   intro hSN eps he
   unfold ShortNorm at hSN
   obtain ⟨A, c, c', hA, hc, hc', hmain⟩ := hSN
-  have ht : ∀ᶠ t : ℝ in atTop, 10000 ≤ t ∧ 50 * A ≤ t ∧ 13 / c ^ 2 ≤ t ∧ 40 * Real.exp (-(1 / 20) * t) ≤ c' :=
-    (eventually_ge_atTop 10000).and ((eventually_ge_atTop (50 * A)).and
-      ((eventually_ge_atTop (13 / c ^ 2)).and (eventually_exp_decay_le c' hc')))
+  have ht
+      : ∀ᶠ t : ℝ in atTop, 10000 ≤ t ∧ 50 * A ≤ t ∧ 13 / c ^ 2 ≤ t ∧ 40 * Real.exp (-(1 / 20) * t) ≤ c' :=
+    (eventually_ge_atTop 10000).and
+      ((eventually_ge_atTop (50 * A)).and
+        ((eventually_ge_atTop (13 / c ^ 2)).and (eventually_exp_decay_le c' hc')))
   have hx := (tendsto_rpow_atTop (show 0 < eps / 5 by linarith)).eventually ht
-  obtain ⟨x₀, hx₀⟩ := eventually_atTop.mp (hx.and ((ev_log_sq eps he).and (eventually_ge_atTop (1:ℝ))))
+  obtain ⟨x₀, hx₀⟩ :=
+    eventually_atTop.mp (hx.and ((ev_log_sq eps he).and (eventually_ge_atTop (1 : ℝ))))
   refine ⟨x₀, fun x hxx N d hMod Y hY hlogY => ?_⟩
   obtain ⟨⟨t1, t2, t3, t4⟩, hls, hx1⟩ := hx₀ x hxx
   unfold ModAt at hMod
@@ -130,27 +139,29 @@ theorem normPrimesN :
     congr 1
     push_cast
     ring
-  have hd0 : (0:ℝ) < d := by exact_mod_cast (show 0 < d by omega)
-  have hN0' : (0:ℝ) < N := by exact_mod_cast hN0
+  have hd0 : (0 : ℝ) < d := by exact_mod_cast (show 0 < d by omega)
+  have hN0' : (0 : ℝ) < N := by exact_mod_cast hN0
   have hdN' := Nat.le_of_dvd hN0 hdN
-  have hdleN : (d:ℝ) ≤ N := by exact_mod_cast hdN'
+  have hdleN : (d : ℝ) ≤ N := by exact_mod_cast hdN'
   have hlogd : Real.log d ≤ Real.log N := Real.log_le_log hd0 hdleN
   have hN3 : 3 ≤ N := by omega
-  have hd100' : (100:ℝ) ≤ d := by exact_mod_cast hd100
-  have hB1 : 1 < 4 * (d:ℝ) * (N:ℝ) ^ 2 := by nlinarith
-  have hlogB : Real.log (4 * (d:ℝ) * (N:ℝ) ^ 2) = Real.log 4 + Real.log d + 2 * Real.log N := by
+  have hd100' : (100 : ℝ) ≤ d := by exact_mod_cast hd100
+  have hB1 : 1 < 4 * (d : ℝ) * (N : ℝ) ^ 2 := by nlinarith
+  have hlogB : Real.log (4 * (d : ℝ) * (N : ℝ) ^ 2) = Real.log 4 + Real.log d + 2 * Real.log N := by
     rw [Real.log_mul (mul_ne_zero (by norm_num) hd0.ne') (pow_ne_zero _ hN0'.ne'),
       Real.log_mul (by norm_num) hd0.ne', Real.log_pow]
     push_cast
     ring
-  have hBt : Real.log (4 * (d:ℝ) * (N:ℝ) ^ 2) ≤ 10 * (x ^ (eps / 5)) ^ 2 := by
+  have hBt : Real.log (4 * (d : ℝ) * (N : ℝ) ^ 2) ≤ 10 * (x ^ (eps / 5)) ^ 2 := by
     rw [hlogB]
-    have h4 := Real.log_le_sub_one_of_pos (show (0:ℝ) < 4 by norm_num)
+    have h4 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 4 by norm_num)
     have q := mul_le_mul_of_nonneg_left hls (show 0 ≤ 3 * x ^ (eps / 5) by linarith)
-    have big : 10000 * 10000 ≤ x ^ (eps / 5) * x ^ (eps / 5) := mul_le_mul t1 t1 (by norm_num) (by linarith)
+    have big : 10000 * 10000 ≤ x ^ (eps / 5) * x ^ (eps / 5) :=
+      mul_le_mul t1 t1 (by norm_num) (by linarith)
     nlinarith
   have hYt : 8 * (x ^ (eps / 5)) ^ 5 ≤ Real.log Y := by rw [ht5]; exact hlogY
-  obtain ⟨hY1, hsq, hfin⟩ := core_sqrt A c c' (x ^ (eps / 5)) (4 * (d:ℝ) * (N:ℝ) ^ 2) Y hA hc t1 t2 t3 t4 hB1 hBt hY hYt
+  obtain ⟨hY1, hsq, hfin⟩ :=
+    core_sqrt A c c' (x ^ (eps / 5)) (4 * (d : ℝ) * (N : ℝ) ^ 2) Y hA hc t1 t2 t3 t4 hB1 hBt hY hYt
   have hexp : Real.exp (-c * Real.sqrt (Real.log Y)) ≤ 1 := by
     rw [Real.exp_le_one_iff]
     have := Real.sqrt_nonneg (Real.log Y)

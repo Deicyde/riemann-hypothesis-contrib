@@ -10,16 +10,21 @@ public import GroundTheory.AutomorphicForms.MeasuresGL
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Automorphic.Spherical
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
 open scoped ComplexConjugate
 
-theorem UpperTheory.heckeOperator_adjoint_inv_eq_heckeOperator :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (w : Pl K) (J : Subgroup (GL (Fin n) (w.adicCompletion K))),
-          IsOpen (J : Set (GL (Fin n) (w.adicCompletion K))) → IsCompact (J : Set (GL (Fin n) (w.adicCompletion K))) →
-          ∀ x : GL (Fin n) (w.adicCompletion K), ContinuousLinearMap.adjoint (Hop μ w J x⁻¹) = Hop μ w J x := by
+theorem UpperTheory.heckeOperator_adjoint_inv_eq_heckeOperator
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n)))
+        [μ.IsHaarMeasure] (w : Pl K) (J : Subgroup (GL (Fin n) (w.adicCompletion K))),
+      IsOpen (J : Set (GL (Fin n) (w.adicCompletion K)))
+        → IsCompact (J : Set (GL (Fin n) (w.adicCompletion K)))
+        → ∀ x : GL (Fin n) (w.adicCompletion K),
+          ContinuousLinearMap.adjoint (Hop μ w J x⁻¹) = Hop μ w J x := by
   intro K _ _ n μ _ w J hJ hc x
   borelize (GL (Fin n) (w.adicCompletion K))
   let P : TopologicalSpace.PositiveCompacts (GL (Fin n) (w.adicCompletion K)) :=
@@ -31,13 +36,15 @@ theorem UpperTheory.heckeOperator_adjoint_inv_eq_heckeOperator :
   have h2 := UpperTheory.ConvolutionTheory.C.hopOloc K n μ w m J x⁻¹ ⟨hc, hJ⟩ hm
   have ad := (UpperTheory.ConvolutionTheory.Tf.commPrj K n μ ⊥).2.2.2.2.2.2.2.1
   refine ContinuousLinearMap.ext fun v => ext_inner_left ℂ fun u => ?_
-  rw [ContinuousLinearMap.adjoint_inner_right, ← inner_conj_symm, h2, h1, ← integral_conj, ← integral_inv_eq_self]
+  rw [ContinuousLinearMap.adjoint_inner_right, ← inner_conj_symm, h2, h1, ← integral_conj,
+    ← integral_inv_eq_self]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   have e : rhoL μ w g⁻¹ = ContinuousLinearMap.adjoint (rhoL μ w g) := by
     unfold rhoL
     rw [ad, map_inv]
-  have e2 : g⁻¹ ∈ {g : GL (Fin n) (w.adicCompletion K) | ∃ a ∈ J, ∃ b ∈ J, g = a * x⁻¹ * b} ↔
-      g ∈ {g : GL (Fin n) (w.adicCompletion K) | ∃ a ∈ J, ∃ b ∈ J, g = a * x * b} := by
+  have e2
+      : g⁻¹ ∈ {g : GL (Fin n) (w.adicCompletion K) | ∃ a ∈ J, ∃ b ∈ J, g = a * x⁻¹ * b}
+        ↔ g ∈ {g : GL (Fin n) (w.adicCompletion K) | ∃ a ∈ J, ∃ b ∈ J, g = a * x * b} := by
     constructor
     · rintro ⟨a, ha, b, hb, e⟩
       exact ⟨b⁻¹, J.inv_mem hb, a⁻¹, J.inv_mem ha, by rw [← inv_inv g, e]; group⟩

@@ -13,46 +13,60 @@ namespace GlobalTheory.KummerAlg
 
 open MvPolynomial
 
-theorem smul_comm_of_invertible {B : Type} [CommRing B] {L : Type} [AddCommGroup L] [Module B L]
-    [Module.Invertible B L] (ψ : L →ₗ[B] B) (e ℓ : L) : ψ e • ℓ = ψ ℓ • e := by
+theorem smul_comm_of_invertible
+    {B : Type} [CommRing B]
+    {L : Type} [AddCommGroup L] [Module B L] [Module.Invertible B L]
+    (ψ : L →ₗ[B] B) (e ℓ : L)
+    : ψ e • ℓ = ψ ℓ • e := by
   let T : L ⊗[B] L →ₗ[B] L := TensorProduct.lift ((LinearMap.lsmul B L).compl₁₂ ψ LinearMap.id)
   have h := congrArg T (Module.Invertible.tmul_comm (R := B) (m₁ := e) (m₂ := ℓ))
   simpa [T] using h
 
 variable {B : Type} [CommRing B] {L : Type} [AddCommGroup L] [Module B L] {q : ℕ}
 
-def intersection_update_fsHerm_neg_one (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) : L →ₗ[B] B :=
+def intersection_update_fsHerm_neg_one
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    : L →ₗ[B] B :=
   φ.toLinearMap (fun _ => e) 0
 
-theorem position_apply (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e ℓ : L) :
-    intersection_update_fsHerm_neg_one φ e ℓ = φ (Function.update (fun _ => e) 0 ℓ) := rfl
+theorem position_apply (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e ℓ : L)
+    : intersection_update_fsHerm_neg_one φ e ℓ = φ (Function.update (fun _ => e) 0 ℓ) :=
+  rfl
 
-theorem position_self (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) :
-    intersection_update_fsHerm_neg_one φ e e = φ (fun _ => e) := by
+theorem position_self (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    : intersection_update_fsHerm_neg_one φ e e = φ (fun _ => e) := by
   rw [position_apply, Function.update_eq_self]
 
-theorem pow_mul_eq_mul_prod_position [Module.Invertible B L]
-    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) (ℓ : Fin (q + 1) → L) :
-    φ (fun _ => e) ^ (q + 1) * φ ℓ = φ (fun _ => e) * ∏ i, intersection_update_fsHerm_neg_one φ e (ℓ i) := by
+theorem pow_mul_eq_mul_prod_position
+    [Module.Invertible B L]
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) (ℓ : Fin (q + 1) → L)
+    : φ (fun _ => e) ^ (q + 1) * φ ℓ
+      = φ (fun _ => e) * ∏ i, intersection_update_fsHerm_neg_one φ e (ℓ i) := by
   have h1 : φ (fun i => φ (fun _ => e) • ℓ i) = φ (fun _ => e) ^ (q + 1) * φ ℓ := by
     rw [MultilinearMap.map_smul_univ, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
       smul_eq_mul, RingHom.id_apply]
-  have h2 : φ (fun i => intersection_update_fsHerm_neg_one φ e (ℓ i) • e) = (∏ i, intersection_update_fsHerm_neg_one φ e (ℓ i)) * φ (fun _ => e) := by
+  have h2
+      : φ (fun i => intersection_update_fsHerm_neg_one φ e (ℓ i) • e)
+        = (∏ i, intersection_update_fsHerm_neg_one φ e (ℓ i)) * φ (fun _ => e) := by
     simp only [MultilinearMap.map_smul_univ, smul_eq_mul, RingHom.id_apply]
-  have h3 : (fun i => φ (fun _ => e) • ℓ i) = (fun i => intersection_update_fsHerm_neg_one φ e (ℓ i) • e) := by
+  have h3
+      : (fun i => φ (fun _ => e) • ℓ i)
+        = (fun i => intersection_update_fsHerm_neg_one φ e (ℓ i) • e) := by
     funext i
     rw [← position_self φ e]
     exact smul_comm_of_invertible (intersection_update_fsHerm_neg_one φ e) e (ℓ i)
   rw [← h1, h3, h2, mul_comm]
 
-theorem algebraMap_mul_gen (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e ℓ : L) :
-    algebraMap B (Alg φ) (φ (fun _ => e)) * gen φ ℓ =
-      algebraMap B (Alg φ) (intersection_update_fsHerm_neg_one φ e ℓ) * gen φ e := by
+theorem algebraMap_mul_gen
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e ℓ : L)
+    : algebraMap B (Alg φ) (φ (fun _ => e)) * gen φ ℓ
+      = algebraMap B (Alg φ) (intersection_update_fsHerm_neg_one φ e ℓ) * gen φ e := by
   have hA := prod_gen φ (fun _ => e)
   have hB := prod_gen φ (Function.update (fun _ => e) 0 ℓ)
   rw [Fin.prod_univ_succ] at hA hB
   simp only [Function.update_self, ne_eq, Fin.succ_ne_zero, not_false_eq_true,
-    Function.update_of_ne] at hB
+      Function.update_of_ne]
+    at hB
   rw [position_apply, ← hB, ← hA]
   ring
 
@@ -62,9 +76,12 @@ namespace GlobalTheory.KummerAlg
 open MvPolynomial
 variable {B : Type} [CommRing B] {L : Type} [AddCommGroup L] [Module B L] {q : ℕ}
 
-theorem algHom_ext_of_isUnit (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
-    {R : Type} [CommRing R] [Algebra B R] (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
-    {g₁ g₂ : Alg φ →ₐ[B] R} (h : g₁ (gen φ e) = g₂ (gen φ e)) : g₁ = g₂ := by
+theorem algHom_ext_of_isUnit
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    {R : Type} [CommRing R] [Algebra B R]
+    (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
+    {g₁ g₂ : Alg φ →ₐ[B] R} (h : g₁ (gen φ e) = g₂ (gen φ e))
+    : g₁ = g₂ := by
   refine Ideal.Quotient.algHom_ext B (MvPolynomial.algHom_ext fun ℓ => ?_)
   change g₁ (gen φ ℓ) = g₂ (gen φ ℓ)
   have k₁ := congrArg g₁ (algebraMap_mul_gen φ e ℓ)
@@ -73,49 +90,68 @@ theorem algHom_ext_of_isUnit (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q
   apply hu.mul_left_cancel
   rw [k₁, k₂, h]
 
-def liftRoot [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
-    {R : Type} [CommRing R] [Algebra B R] (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
-    (x : R) (hx : x ^ (q + 1) = algebraMap B R (φ (fun _ => e))) : Alg φ →ₐ[B] R :=
+def liftRoot
+    [Module.Invertible B L]
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    {R : Type} [CommRing R] [Algebra B R]
+    (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
+    (x : R) (hx : x ^ (q + 1) = algebraMap B R (φ (fun _ => e)))
+    : Alg φ →ₐ[B] R :=
   Ideal.Quotient.liftₐ (ideal φ)
-    (MvPolynomial.aeval fun ℓ => algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x) <| by
-    intro a ha
-    have hle : ideal φ ≤ RingHom.ker (MvPolynomial.aeval (R := B) fun ℓ : L =>
-        algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x) := ?_
-    · exact hle ha
-    refine Ideal.span_le.2 ?_
-    rintro r ((⟨⟨a, b⟩, rfl⟩ | ⟨⟨c, a⟩, rfl⟩) | ⟨ℓ, rfl⟩)
-    · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-        map_sub, aeval_X, map_add]
-      ring
-    · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-        map_sub, map_mul, aeval_X, aeval_C, map_smul, smul_eq_mul]
-      ring
-    · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-        map_sub, map_prod, aeval_X, aeval_C]
-      rw [sub_eq_zero, Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_const,
-        Finset.prod_const, Finset.card_univ, Fintype.card_fin, hx]
-      have key := congrArg (algebraMap B R) (pow_mul_eq_mul_prod_position φ e ℓ)
-      simp only [map_mul, map_pow, map_prod] at key
-      set u := hu.unit
-      have hu' : (u : R) = algebraMap B R (φ (fun _ => e)) := rfl
-      rw [← hu'] at key ⊢
-      have hv : (↑u⁻¹ : R) ^ (q + 1) * (u : R) ^ (q + 1) = 1 := by
-        rw [← mul_pow, Units.inv_mul, one_pow]
-      apply (u ^ (q + 1)).isUnit.mul_right_cancel
-      rw [Units.val_pow_eq_pow_val]
-      calc (∏ i, algebraMap B R (intersection_update_fsHerm_neg_one φ e (ℓ i))) * ↑u⁻¹ ^ (q + 1) * ↑u * ↑u ^ (q + 1)
-          = (↑u * ∏ i, algebraMap B R (intersection_update_fsHerm_neg_one φ e (ℓ i))) * (↑u⁻¹ ^ (q + 1) * ↑u ^ (q + 1)) := by ring
-        _ = algebraMap B R (φ ℓ) * ↑u ^ (q + 1) := by rw [hv, mul_one, ← key]; ring
+      (MvPolynomial.aeval fun ℓ =>
+        algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x) <|
+    by
+      intro a ha
+      have hle
+          : ideal φ
+            ≤ RingHom.ker (MvPolynomial.aeval (R := B) fun ℓ : L =>
+              algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x) :=
+        ?_
+      · exact hle ha
+      refine Ideal.span_le.2 ?_
+      rintro r ((⟨⟨a, b⟩, rfl⟩ | ⟨⟨c, a⟩, rfl⟩) | ⟨ℓ, rfl⟩)
+      · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+          map_sub, aeval_X, map_add]
+        ring
+      · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+          map_sub, map_mul, aeval_X, aeval_C, map_smul, smul_eq_mul]
+        ring
+      · simp only [SetLike.mem_coe, RingHom.mem_ker, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+          map_sub, map_prod, aeval_X, aeval_C]
+        rw [sub_eq_zero, Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_const,
+          Finset.prod_const, Finset.card_univ, Fintype.card_fin, hx]
+        have key := congrArg (algebraMap B R) (pow_mul_eq_mul_prod_position φ e ℓ)
+        simp only [map_mul, map_pow, map_prod] at key
+        set u := hu.unit
+        have hu' : (u : R) = algebraMap B R (φ (fun _ => e)) := rfl
+        rw [← hu'] at key ⊢
+        have hv : (↑u⁻¹ : R) ^ (q + 1) * (u : R) ^ (q + 1) = 1 := by
+          rw [← mul_pow, Units.inv_mul, one_pow]
+        apply (u ^ (q + 1)).isUnit.mul_right_cancel
+        rw [Units.val_pow_eq_pow_val]
+        calc
+          (∏ i, algebraMap B R (intersection_update_fsHerm_neg_one φ e (ℓ i))) * ↑u⁻¹ ^ (q + 1) * ↑u
+                * ↑u ^ (q + 1)
+              = (↑u * ∏ i, algebraMap B R (intersection_update_fsHerm_neg_one φ e (ℓ i)))
+                * (↑u⁻¹ ^ (q + 1) * ↑u ^ (q + 1)) := by
+            ring
+          _ = algebraMap B R (φ ℓ) * ↑u ^ (q + 1) := by rw [hv, mul_one, ← key]; ring
 
-theorem liftRoot_gen [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B)
-    (e : L) {R : Type} [CommRing R] [Algebra B R] (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
-    (x : R) (hx : x ^ (q + 1) = algebraMap B R (φ (fun _ => e))) :
-    liftRoot φ e hu x hx (gen φ e) = x := by
-  have h0 : liftRoot φ e hu x hx (gen φ e) =
-      MvPolynomial.aeval (fun ℓ => algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x) (X e) := rfl
+theorem liftRoot_gen
+    [Module.Invertible B L]
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    {R : Type} [CommRing R] [Algebra B R]
+    (hu : IsUnit (algebraMap B R (φ (fun _ => e))))
+    (x : R) (hx : x ^ (q + 1) = algebraMap B R (φ (fun _ => e)))
+    : liftRoot φ e hu x hx (gen φ e) = x := by
+  have h0
+      : liftRoot φ e hu x hx (gen φ e)
+        = MvPolynomial.aeval
+          (fun ℓ => algebraMap B R (intersection_update_fsHerm_neg_one φ e ℓ) * ↑hu.unit⁻¹ * x)
+          (X e) :=
+    rfl
   rw [h0, aeval_X, position_self]
-  have : algebraMap B R (φ (fun _ => e)) * ↑hu.unit⁻¹ = 1 := by
-    exact hu.mul_val_inv
+  have : algebraMap B R (φ (fun _ => e)) * ↑hu.unit⁻¹ = 1 := by exact hu.mul_val_inv
   rw [this, one_mul]
 
 end GlobalTheory.KummerAlg
@@ -124,9 +160,12 @@ namespace GlobalTheory.KummerAlg
 open MvPolynomial
 variable {B : Type} [CommRing B] {L : Type} [AddCommGroup L] [Module B L] {q : ℕ}
 
-theorem smul_top_ne_top [Module.Invertible B L]
-    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (m : Ideal B) [hm : m.IsMaximal]
-    (e : L) (he : φ (fun _ => e) ∉ m) : m • (⊤ : Submodule B (Alg φ)) ≠ ⊤ := by
+theorem smul_top_ne_top
+    [Module.Invertible B L]
+    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B)
+    (m : Ideal B) [hm : m.IsMaximal]
+    (e : L) (he : φ (fun _ => e) ∉ m)
+    : m • (⊤ : Submodule B (Alg φ)) ≠ ⊤ := by
   letI : Field (B ⧸ m) := Ideal.Quotient.field m
   let K := AlgebraicClosure (B ⧸ m)
   have hK : ∀ b : B, algebraMap B K b = algebraMap (B ⧸ m) K (Ideal.Quotient.mk m b) := fun b =>
@@ -135,22 +174,23 @@ theorem smul_top_ne_top [Module.Invertible B L]
     rw [hK, isUnit_iff_ne_zero, ne_eq, map_eq_zero_iff _ (algebraMap (B ⧸ m) K).injective,
       Ideal.Quotient.eq_zero_iff_mem]
     exact he
-  obtain ⟨x, hx⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap B K (φ (fun _ => e)))
-    (Nat.succ_pos q)
+  obtain ⟨x, hx⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap B K (φ (fun _ => e))) (Nat.succ_pos q)
   let g := liftRoot φ e hu x hx
   intro htop
   have hle : m • (⊤ : Submodule B (Alg φ)) ≤ Submodule.comap g.toLinearMap ⊥ := by
     refine Submodule.smul_le.2 fun r hr n _ => ?_
     rw [Submodule.mem_comap, Submodule.mem_bot, AlgHom.toLinearMap_apply, map_smul,
       Algebra.smul_def, hK, (Ideal.Quotient.eq_zero_iff_mem).2 hr, map_zero, zero_mul]
-  have h1 : (1 : Alg φ) ∈ Submodule.comap g.toLinearMap ⊥ := hle (by rw [htop]; exact Submodule.mem_top)
+  have h1 : (1 : Alg φ) ∈ Submodule.comap g.toLinearMap ⊥ :=
+    hle (by rw [htop]; exact Submodule.mem_top)
   simp only [Submodule.mem_comap, AlgHom.toLinearMap_apply, map_one, Submodule.mem_bot] at h1
   exact one_ne_zero h1
 
-def awayEquiv [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) :
-    Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ ≃ₐ[Localization.Away (φ (fun _ => e))]
-      AdjoinRoot (Polynomial.X ^ (q + 1) - Polynomial.C
-        (algebraMap B (Localization.Away (φ (fun _ => e))) (φ (fun _ => e)))) := by
+def awayEquiv
+    [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    : Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ ≃ₐ[Localization.Away (φ (fun _ => e))]
+        AdjoinRoot (Polynomial.X ^ (q + 1) - Polynomial.C
+          (algebraMap B (Localization.Away (φ (fun _ => e))) (φ (fun _ => e)))) := by
   set f := φ (fun _ => e)
   set Bf := Localization.Away f
   set P : Polynomial Bf := Polynomial.X ^ (q + 1) - Polynomial.C (algebraMap B Bf f)
@@ -174,8 +214,9 @@ def awayEquiv [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _
     have := prod_gen φ (fun _ => e)
     rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin] at this
     exact this
-  let fwd : T →ₐ[Bf] A := Algebra.TensorProduct.lift (Algebra.ofId Bf A)
-    (liftRoot φ e huA (AdjoinRoot.root P) hxA) (fun _ _ => Commute.all _ _)
+  let fwd : T →ₐ[Bf] A :=
+    Algebra.TensorProduct.lift (Algebra.ofId Bf A) (liftRoot φ e huA (AdjoinRoot.root P) hxA)
+      (fun _ _ => Commute.all _ _)
   let bwd : A →ₐ[Bf] T := AdjoinRoot.liftAlgHom P (Algebra.ofId Bf T) ((1 : Bf) ⊗ₜ[B] gen φ e) hxT
   have hf : fwd ((1 : Bf) ⊗ₜ[B] gen φ e) = AdjoinRoot.root P := by
     rw [Algebra.TensorProduct.lift_tmul, map_one, one_mul]
@@ -185,13 +226,15 @@ def awayEquiv [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _
   · exact AdjoinRoot.algHom_ext (by simp only [AlgHom.comp_apply, hb, hf, AlgHom.id_apply])
   · refine Algebra.TensorProduct.ext (Subsingleton.elim _ _) ?_
     exact algHom_ext_of_isUnit φ e huT (by
-      simp only [AlgHom.comp_apply, AlgHom.coe_restrictScalars', Algebra.TensorProduct.includeRight_apply,
-        hf, hb, AlgHom.id_apply])
+      simp only [AlgHom.comp_apply, AlgHom.coe_restrictScalars',
+        Algebra.TensorProduct.includeRight_apply, hf, hb, AlgHom.id_apply])
 
-theorem away_finite_projective [Module.Invertible B L]
-    (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L) :
-    Module.Finite (Localization.Away (φ (fun _ => e))) (Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ) ∧
-    Module.Projective (Localization.Away (φ (fun _ => e))) (Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ) := by
+theorem away_finite_projective
+    [Module.Invertible B L] (φ : MultilinearMap (RingHom.id B) (fun _ : Fin (q + 1) => L) B) (e : L)
+    : Module.Finite (Localization.Away (φ (fun _ => e)))
+        (Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ)
+      ∧ Module.Projective (Localization.Away (φ (fun _ => e)))
+        (Localization.Away (φ (fun _ => e)) ⊗[B] Alg φ) := by
   set Bf := Localization.Away (φ (fun _ => e))
   have hmon : (Polynomial.X ^ (q + 1) - Polynomial.C (algebraMap B Bf (φ (fun _ => e)))).Monic :=
     Polynomial.monic_X_pow_sub_C _ (Nat.succ_ne_zero q)
@@ -205,11 +248,13 @@ end GlobalTheory.KummerAlg
 
 namespace GlobalTheory.KummerAlg
 
-theorem finite_projective_faithfullyFlat : ∀ (B : Type) [CommRing B] (L : Type) [AddCommGroup L]
-    [Module B L] [Module.Invertible B L] (q : ℕ) (φ : MultilinearMap (RingHom.id B) (fun _ : Fin q => L) B),
-    0 < q → (∀ p : Ideal B, p.IsPrime → ∃ e : L, φ (fun _ => e) ∉ p) →
-    Module.Finite B (GlobalTheory.KummerAlg.Alg φ) ∧ Module.Projective B (GlobalTheory.KummerAlg.Alg φ) ∧
-      Module.FaithfullyFlat B (GlobalTheory.KummerAlg.Alg φ) := by
+theorem finite_projective_faithfullyFlat
+    : ∀ (B : Type) [CommRing B] (L : Type) [AddCommGroup L] [Module B L] [Module.Invertible B L]
+        (q : ℕ) (φ : MultilinearMap (RingHom.id B) (fun _ : Fin q => L) B),
+      0 < q → (∀ p : Ideal B, p.IsPrime → ∃ e : L, φ (fun _ => e) ∉ p)
+        → Module.Finite B (GlobalTheory.KummerAlg.Alg φ)
+          ∧ Module.Projective B (GlobalTheory.KummerAlg.Alg φ)
+          ∧ Module.FaithfullyFlat B (GlobalTheory.KummerAlg.Alg φ) := by
   intro B _ L _ _ _ q φ hq hφ
   obtain ⟨n, rfl⟩ : ∃ n, q = n + 1 := ⟨q - 1, by omega⟩
   let s : Set B := Set.range (fun e : L => φ (fun _ => e))
@@ -220,8 +265,10 @@ theorem finite_projective_faithfullyFlat : ∀ (B : Type) [CommRing B] (L : Type
     exact he (hsm (Ideal.subset_span ⟨e, rfl⟩))
   let F : s → Type := fun g => Localization.Away g.1 ⊗[B] Alg φ
   let ϕ : ∀ g : s, Alg φ →ₗ[B] F g := fun g => TensorProduct.mk B (Localization.Away g.1) (Alg φ) 1
-  have hfp : ∀ g : s, Module.Finite (Localization.Away g.1) (F g) ∧
-      Module.Projective (Localization.Away g.1) (F g) := by
+  have hfp
+      : ∀ g : s,
+        Module.Finite (Localization.Away g.1) (F g)
+          ∧ Module.Projective (Localization.Away g.1) (F g) := by
     rintro ⟨_, e, rfl⟩
     exact away_finite_projective φ e
   haveI (g : s) : Module.Finite (Localization.Away g.1) (F g) := (hfp g).1

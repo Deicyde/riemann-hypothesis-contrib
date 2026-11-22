@@ -8,15 +8,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem mapDomain_partial_charpoly_power_zero {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H] (φ : G →* H) (h ph ta : G)
-    (u : Fin n → R) (i : Fin n) (y : R) :
-    MonoidAlgebra.mapDomainRingHom R φ (MonoidAlgebra.single h 1 * q2El ph ta u i y) =
-      MonoidAlgebra.single (φ h) 1 * q2El (φ ph) (φ ta) u i y := by
-  have hs : ∀ (g : G) (c : R), MonoidAlgebra.mapDomainRingHom R φ (MonoidAlgebra.single g c) =
-      MonoidAlgebra.single (φ g) c := fun g c => by simp
+private theorem mapDomain_partial_charpoly_power_zero
+    {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H]
+    (φ : G →* H) (h ph ta : G) (u : Fin n → R) (i : Fin n) (y : R)
+    : MonoidAlgebra.mapDomainRingHom R φ (MonoidAlgebra.single h 1 * q2El ph ta u i y)
+      = MonoidAlgebra.single (φ h) 1 * q2El (φ ph) (φ ta) u i y := by
+  have hs
+      : ∀ (g : G) (c : R),
+        MonoidAlgebra.mapDomainRingHom R φ (MonoidAlgebra.single g c)
+          = MonoidAlgebra.single (φ g) c := fun g c => by
+    simp
   simp only [q2El, map_mul, map_sub, map_one, map_list_prod, List.map_ofFn, hs]
   congr 4
   funext k
@@ -24,12 +29,16 @@ private theorem mapDomain_partial_charpoly_power_zero {n : ℕ} {R G H : Type} [
   · simp only [Function.comp_apply, if_pos hk, map_one]
   · simp only [Function.comp_apply, if_neg hk, map_sub, hs, map_one]
 
-private theorem mapRingHom_single_mul_partial_charpoly_element {n : ℕ} {R S G : Type} [CommRing R] [CommRing S] [Group G] (f : R →+* S) (h ph ta : G)
-    (u : Fin n → R) (i : Fin n) (y : R) :
-    MonoidAlgebra.mapRingHom G f (MonoidAlgebra.single h 1 * q2El ph ta u i y) =
-      MonoidAlgebra.single h 1 * q2El ph ta (fun k => f (u k)) i (f y) := by
-  have hs : ∀ (g : G) (c : R), MonoidAlgebra.mapRingHom G f (MonoidAlgebra.single g c) =
-      MonoidAlgebra.single g (f c) := fun g c => by simp
+private theorem mapRingHom_single_mul_partial_charpoly_element
+    {n : ℕ} {R S G : Type} [CommRing R] [CommRing S] [Group G]
+    (f : R →+* S) (h ph ta : G) (u : Fin n → R) (i : Fin n) (y : R)
+    : MonoidAlgebra.mapRingHom G f (MonoidAlgebra.single h 1 * q2El ph ta u i y)
+      = MonoidAlgebra.single h 1 * q2El ph ta (fun k => f (u k)) i (f y) := by
+  have hs
+      : ∀ (g : G) (c : R),
+        MonoidAlgebra.mapRingHom G f (MonoidAlgebra.single g c)
+          = MonoidAlgebra.single g (f c) := fun g c => by
+    simp
   simp only [q2El, map_mul, map_sub, map_one, map_list_prod, List.map_ofFn, hs]
   congr 4
   funext k
@@ -37,8 +46,10 @@ private theorem mapRingHom_single_mul_partial_charpoly_element {n : ℕ} {R S G 
   · simp only [Function.comp_apply, if_pos hk, map_one]
   · simp only [Function.comp_apply, if_neg hk, map_sub, hs, map_one]
 
-private theorem comap_tr {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H] (D : GDet n R H) (φ : G →* H)
-    (z : MonoidAlgebra R G) : (D.comap φ).tr z = D.tr (MonoidAlgebra.mapDomainRingHom R φ z) := by
+private theorem comap_tr
+    {n : ℕ} {R G H : Type} [CommRing R] [Group G] [Group H]
+    (D : GDet n R H) (φ : G →* H) (z : MonoidAlgebra R G)
+    : (D.comap φ).tr z = D.tr (MonoidAlgebra.mapDomainRingHom R φ z) := by
   have hc : (D.comap φ).chi z = D.chi (MonoidAlgebra.mapDomainRingHom R φ z) := by
     change D.D _ (MonoidAlgebra.mapDomainRingHom (Polynomial R) φ _) = D.D _ _
     congr 1

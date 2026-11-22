@@ -40,20 +40,23 @@ private lemma exists_retr {C D : Type*} [CommRing C] [CommRing D] [Algebra C D] 
 
 end FiniteTypeOfFiniteProjectiveExtension
 
-theorem UpperTheory.Reformulated.B.FiniteTypeDescent.main.{u_1, u_2, u_3} :
-    ∀ (R : Type u_1) (C : Type u_2) (D : Type u_3) [inst : CommRing R] [inst_1 : CommRing C] [inst_2 : CommRing D]
-      [inst_3 : Algebra R C] [inst_4 : Algebra C D] [inst_5 : Algebra R D] [IsScalarTower R C D] [Module.Finite C D]
-      [Module.Projective C D],
-      Function.Injective (⇑(Algebra.algebraMap C D) : C → D) → ∀ [Algebra.FiniteType R D], Algebra.FiniteType R C := by
+theorem UpperTheory.Reformulated.B.FiniteTypeDescent.main.{u_1, u_2, u_3}
+    : ∀ (R : Type u_1) (C : Type u_2) (D : Type u_3) [inst : CommRing R] [inst_1 : CommRing C]
+        [inst_2 : CommRing D] [inst_3 : Algebra R C] [inst_4 : Algebra C D] [inst_5 : Algebra R D]
+        [IsScalarTower R C D] [Module.Finite C D] [Module.Projective C D],
+      Function.Injective (⇑(Algebra.algebraMap C D) : C → D)
+        → ∀ [Algebra.FiniteType R D], Algebra.FiniteType R C := by
   intro R C D _ _ _ _ _ _ _ _ _ hinj hft
   obtain ⟨π, hπ⟩ := FiniteTypeOfFiniteProjectiveExtension.exists_retr (C := C) (D := D) hinj
   obtain ⟨B₀, hB₀, hB₀D⟩ := exists_subalgebra_of_fg R C D hft.out (Module.Finite.fg_top)
   haveI : Module.Finite B₀ D := ⟨hB₀D⟩
   let π' : D →ₗ[B₀] C := π.restrictScalars B₀
-  have hsurj : Function.Surjective π' := fun c =>
-    ⟨algebraMap C D c, by
+  have hsurj : Function.Surjective π' := fun c => ⟨
+    algebraMap C D c,
+    by
       show π (algebraMap C D c) = c
-      rw [Algebra.algebraMap_eq_smul_one, map_smul, hπ, smul_eq_mul, mul_one]⟩
+      rw [Algebra.algebraMap_eq_smul_one, map_smul, hπ, smul_eq_mul, mul_one]
+  ⟩
   haveI : Module.Finite B₀ C := Module.Finite.of_surjective π' hsurj
   haveI : Algebra.FiniteType R B₀ := ⟨B₀.fg_top.2 hB₀⟩
   exact Algebra.FiniteType.trans (S := B₀) inferInstance inferInstance

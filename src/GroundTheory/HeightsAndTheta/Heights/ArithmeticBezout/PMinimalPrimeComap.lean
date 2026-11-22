@@ -11,10 +11,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem MinimalPrimeComap.flat (K L : Type) [Field K] [Field L] (σ : K →+* L) (ι : Type) :
-    letI := σ.toAlgebra
-    letI := MvPolynomial.algebraMvPolynomial (σ := ι) (R := K) (S := L)
-    Module.Flat (MvPolynomial ι K) (MvPolynomial ι L) := by
+theorem MinimalPrimeComap.flat (K L : Type) [Field K] [Field L] (σ : K →+* L) (ι : Type)
+    : letI := σ.toAlgebra
+      letI := MvPolynomial.algebraMvPolynomial (σ := ι) (R := K) (S := L)
+      Module.Flat (MvPolynomial ι K) (MvPolynomial ι L) := by
   letI := σ.toAlgebra
   letI := MvPolynomial.algebraMvPolynomial (σ := ι) (R := K) (S := L)
   have h : Algebra.IsPushout K (MvPolynomial ι K) L (MvPolynomial ι L) := inferInstance

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ChainRu
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,24 +24,26 @@ namespace GlobalTheory.EtaleCoordLocal
 
 open IsLocalRing KaehlerDifferential
 
-theorem linearIndependent_one_tmul_D {k A : Type} [CommRing k] [CommRing A] [IsLocalRing A]
-    [Algebra k A] [Algebra.FormallySmooth k A] [Algebra.FormallySmooth k (ResidueField A)]
+theorem linearIndependent_one_tmul_D
+    {k A : Type} [CommRing k] [CommRing A] [IsLocalRing A] [Algebra k A]
+    [Algebra.FormallySmooth k A] [Algebra.FormallySmooth k (ResidueField A)]
     {J : Type} (f : J → A) (hf : ∀ j, f j ∈ maximalIdeal A)
-    (h : LinearIndependent (ResidueField A) (fun j =>
-      ((maximalIdeal A).toCotangent ⟨f j, hf j⟩ : CotangentSpace A))) :
-    LinearIndependent (ResidueField A) (fun j => (1 : ResidueField A) ⊗ₜ[A] D k A (f j)) := by
+    (h : LinearIndependent (ResidueField A)
+      (fun j => ((maximalIdeal A).toCotangent ⟨f j, hf j⟩ : CotangentSpace A)))
+    : LinearIndependent (ResidueField A) (fun j => (1 : ResidueField A) ⊗ₜ[A] D k A (f j)) := by
   have hs : Function.Surjective (algebraMap A (ResidueField A)) := residue_surjective
-  have hinj := (Algebra.FormallySmooth.kerCotangentToTensor_injective_iff (R := k) hs).mpr
-    inferInstance
+  have hinj :=
+    (Algebra.FormallySmooth.kerCotangentToTensor_injective_iff (R := k) hs).mpr inferInstance
   have hker : maximalIdeal A = RingHom.ker (algebraMap A (ResidueField A)) := ker_residue.symm
   let c := Ideal.Cotangent.equivOfEq _ _ hker
   let e : CotangentSpace A →ₗ[A] ResidueField A ⊗[A] Ω[A⁄k] :=
     kerCotangentToTensor k A (ResidueField A) ∘ₗ c.toLinearMap
   have he : Function.Injective (e.extendScalarsOfSurjective hs) := hinj.comp c.injective
   have := h.map' (e.extendScalarsOfSurjective hs) (LinearMap.ker_eq_bot.2 he)
-  have key : ⇑(e.extendScalarsOfSurjective hs) ∘ (fun j =>
-      ((maximalIdeal A).toCotangent ⟨f j, hf j⟩ : CotangentSpace A)) =
-      fun j => (1 : ResidueField A) ⊗ₜ[A] D k A (f j) := by
+  have key
+      : ⇑(e.extendScalarsOfSurjective hs)
+          ∘ (fun j => ((maximalIdeal A).toCotangent ⟨f j, hf j⟩ : CotangentSpace A))
+        = fun j => (1 : ResidueField A) ⊗ₜ[A] D k A (f j) := by
     funext j
     simp only [Function.comp_apply, LinearMap.extendScalarsOfSurjective_apply, e,
       LinearMap.comp_apply, LinearEquiv.coe_coe, c]
@@ -48,11 +52,12 @@ theorem linearIndependent_one_tmul_D {k A : Type} [CommRing k] [CommRing A] [IsL
   rw [key] at this
   exact this
 
-theorem span_one_tmul_D {k A : Type} [Field k] [CommRing A] [IsLocalRing A] [Algebra k A]
-    (hres : Function.Surjective (algebraMap k (ResidueField A))) {r : ℕ} (τ : Fin r → A)
-    (hspan : maximalIdeal A = Ideal.span (Set.range τ)) :
-    Submodule.span (ResidueField A)
-      (Set.range fun i => (1 : ResidueField A) ⊗ₜ[A] D k A (τ i)) = ⊤ := by
+theorem span_one_tmul_D
+    {k A : Type} [Field k] [CommRing A] [IsLocalRing A] [Algebra k A]
+    (hres : Function.Surjective (algebraMap k (ResidueField A)))
+    {r : ℕ} (τ : Fin r → A) (hspan : maximalIdeal A = Ideal.span (Set.range τ))
+    : Submodule.span (ResidueField A) (Set.range fun i => (1 : ResidueField A) ⊗ₜ[A] D k A (τ i))
+      = ⊤ := by
   set S := Submodule.span (ResidueField A)
       (Set.range fun i => (1 : ResidueField A) ⊗ₜ[A] D k A (τ i))
   have hτ0 : ∀ i, residue A (τ i) = 0 := fun i =>
@@ -83,8 +88,7 @@ theorem span_one_tmul_D {k A : Type} [Field k] [CommRing A] [IsLocalRing A] [Alg
 
   have h2 : ∀ ω : Ω[A⁄k], (1 : ResidueField A) ⊗ₜ[A] ω ∈ S := by
     intro ω
-    have hω : ω ∈ Submodule.span A (Set.range (D k A)) := by
-      rw [span_range_derivation]; trivial
+    have hω : ω ∈ Submodule.span A (Set.range (D k A)) := by rw [span_range_derivation]; trivial
     induction hω using Submodule.span_induction with
     | mem x hx => obtain ⟨a, rfl⟩ := hx; exact h1 a
     | zero => rw [TensorProduct.tmul_zero]; exact S.zero_mem
@@ -110,11 +114,13 @@ namespace GlobalTheory.EtaleCoordLocal
 
 open IsLocalRing KaehlerDifferential
 
-theorem exists_coords (k A : Type) [Field k] [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
-    [Algebra k A] [Algebra.EssFiniteType k A] [Algebra.FormallySmooth k A]
-    (hres : Function.Surjective (algebraMap k (ResidueField A))) :
-    ∃ (r : ℕ) (τ : Fin r → A), maximalIdeal A = Ideal.span (Set.range τ) ∧
-      ∃ b : Module.Basis (Fin r) A Ω[A⁄k], ∀ i, b i = D k A (τ i) := by
+theorem exists_coords
+    (k A : Type) [Field k] [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Algebra k A]
+    [Algebra.EssFiniteType k A] [Algebra.FormallySmooth k A]
+    (hres : Function.Surjective (algebraMap k (ResidueField A)))
+    : ∃ (r : ℕ) (τ : Fin r → A),
+      maximalIdeal A = Ideal.span (Set.range τ)
+        ∧ ∃ b : Module.Basis (Fin r) A Ω[A⁄k], ∀ i, b i = D k A (τ i) := by
   classical
   haveI : Algebra.FormallySmooth k (ResidueField A) :=
     Algebra.FormallySmooth.of_equiv
@@ -122,34 +128,40 @@ theorem exists_coords (k A : Type) [Field k] [CommRing A] [IsLocalRing A] [IsNoe
   let b0 := Module.finBasis (ResidueField A) (CotangentSpace A)
   choose τ' hτ' using fun i => Ideal.toCotangent_surjective (maximalIdeal A) (b0 i)
   have hspan : maximalIdeal A = Ideal.span (Set.range fun i => (τ' i : A)) := by
-    have h1 : Submodule.span (ResidueField A) ((maximalIdeal A).toCotangent '' Set.range τ') = ⊤ := by
-      rw [← Set.range_comp, show (maximalIdeal A).toCotangent ∘ τ' = ⇑b0 from funext hτ', b0.span_eq]
+    have h1
+        : Submodule.span (ResidueField A) ((maximalIdeal A).toCotangent '' Set.range τ') = ⊤ := by
+      rw [← Set.range_comp, show (maximalIdeal A).toCotangent ∘ τ' = ⇑b0 from funext hτ',
+        b0.span_eq]
     rw [CotangentSpace.span_image_eq_top_iff] at h1
     have h2 := congrArg (Submodule.map (maximalIdeal A).subtype) h1
     rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype, ← Set.range_comp] at h2
     exact h2.symm
   refine ⟨_, fun i => (τ' i : A), hspan, ?_⟩
-  have hli := linearIndependent_one_tmul_D (k := k) (fun i => (τ' i : A)) (fun i => (τ' i).2)
-    (by
+  have hli :=
+    linearIndependent_one_tmul_D (k := k) (fun i => (τ' i : A)) (fun i => (τ' i).2) (by
       have : (fun i => (maximalIdeal A).toCotangent ⟨(τ' i : A), (τ' i).2⟩) = ⇑b0 := funext hτ'
       rw [this]
       exact b0.linearIndependent)
   have hsp := span_one_tmul_D hres (fun i => (τ' i : A)) hspan
   haveI : Module.FinitePresentation A Ω[A⁄k] := Module.finitePresentation_of_finite A _
-  exact Module.exists_basis_of_basis_baseChange (R := A) (fun i => D k A (τ' i : A)) hli hsp
+  exact Module.exists_basis_of_basis_baseChange (R := A)
+    (fun i => D k A (τ' i : A))
+    hli hsp
     (Module.Flat.rTensor_preserves_injective_linearMap (maximalIdeal A).subtype
       Subtype.val_injective)
 
-theorem formallyEtale_eval₂Hom_of_basis (k A : Type) [CommRing k] [CommRing A] [Algebra k A]
-    [Algebra.FormallySmooth k A] {r : ℕ} (τ : Fin r → A) (b : Module.Basis (Fin r) A Ω[A⁄k])
-    (hb : ∀ i, b i = D k A (τ i)) : (MvPolynomial.eval₂Hom (algebraMap k A) τ).FormallyEtale := by
+theorem formallyEtale_eval₂Hom_of_basis
+    (k A : Type) [CommRing k] [CommRing A] [Algebra k A] [Algebra.FormallySmooth k A]
+    {r : ℕ} (τ : Fin r → A) (b : Module.Basis (Fin r) A Ω[A⁄k]) (hb : ∀ i, b i = D k A (τ i))
+    : (MvPolynomial.eval₂Hom (algebraMap k A) τ).FormallyEtale := by
   letI := (MvPolynomial.eval₂Hom (algebraMap k A) τ).toAlgebra
   haveI : IsScalarTower k (MvPolynomial (Fin r) k) A :=
     IsScalarTower.of_algebraMap_eq fun c => (MvPolynomial.eval₂Hom_C _ τ c).symm
   have hX (i : Fin r) : algebraMap (MvPolynomial (Fin r) k) A (MvPolynomial.X i) = τ i :=
     MvPolynomial.eval₂Hom_X' _ τ i
-  have he : mapBaseChange k (MvPolynomial (Fin r) k) A =
-      (((mvPolynomialBasis k (Fin r)).baseChange A).equiv b (Equiv.refl _)).toLinearMap := by
+  have he
+      : mapBaseChange k (MvPolynomial (Fin r) k) A
+        = (((mvPolynomialBasis k (Fin r)).baseChange A).equiv b (Equiv.refl _)).toLinearMap := by
     refine ((mvPolynomialBasis k (Fin r)).baseChange A).ext fun i => ?_
     rw [EtaleCoordJacobian.mapBaseChange_basis, hX, ← hb]
     simp only [LinearEquiv.coe_coe, Module.Basis.equiv_apply, Equiv.refl_apply]
@@ -175,13 +187,14 @@ namespace GlobalTheory.EtaleCoordLocal
 
 open IsLocalRing
 
-theorem exists_etaleCoords : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (B : Subring κ')
-    (hB : IsLocModel (algebraMap ℂ κ') B),
-    RatRes (algebraMap ℂ κ') B → ((algebraMap ℂ κ').codRestrict B hB.const_mem).FormallySmooth →
-    ∃ (r : ℕ) (τ : Fin r → B),
-      (letI := hB.isLocalRing; IsLocalRing.maximalIdeal B = Ideal.span (Set.range τ)) ∧
-      (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict B hB.const_mem) τ).FormallyEtale ∧
-      TrBasis (algebraMap ℂ κ') (fun i => (τ i : κ')) := by
+theorem exists_etaleCoords
+    : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (B : Subring κ')
+        (hB : IsLocModel (algebraMap ℂ κ') B),
+      RatRes (algebraMap ℂ κ') B → ((algebraMap ℂ κ').codRestrict B hB.const_mem).FormallySmooth
+        → ∃ (r : ℕ) (τ : Fin r → B),
+          (letI := hB.isLocalRing; IsLocalRing.maximalIdeal B = Ideal.span (Set.range τ))
+            ∧ (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict B hB.const_mem) τ).FormallyEtale
+            ∧ TrBasis (algebraMap ℂ κ') (fun i => (τ i : κ')) := by
   intro κ' _ _ B hB hres hsm
   letI := hB.isLocalRing
   let c0 : ℂ →+* B := (algebraMap ℂ κ').codRestrict B hB.const_mem
@@ -203,9 +216,7 @@ theorem exists_etaleCoords : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (B :
   obtain ⟨r, τ, hspan, b, hb⟩ := exists_coords ℂ B hres'
   refine ⟨r, τ, hspan, formallyEtale_eval₂Hom_of_basis ℂ B τ b hb, ?_⟩
   rcases Nat.eq_zero_or_pos r with rfl | hr
-  ·
-    have hmax : maximalIdeal B = ⊥ := by
-      rw [hspan, Set.range_eq_empty, Ideal.span_empty]
+  · have hmax : maximalIdeal B = ⊥ := by rw [hspan, Set.range_eq_empty, Ideal.span_empty]
     have hB0 : ∀ x : B, ∃ a : ℂ, x = c0 a := by
       intro x
       obtain ⟨a, ha⟩ := hres x x.2
@@ -220,17 +231,15 @@ theorem exists_etaleCoords : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (B :
       obtain ⟨d, hd⟩ := hB0 ⟨q, hq⟩
       have ha' : p = algebraMap ℂ κ' a := congrArg Subtype.val ha
       have hd' : q = algebraMap ℂ κ' d := congrArg Subtype.val hd
-      have hf : f = algebraMap ℂ κ' (a / d) := by
-        rw [map_div₀, ← ha', ← hd', eq_div_iff hq0, e]
+      have hf : f = algebraMap ℂ κ' (a / d) := by rw [map_div₀, ← ha', ← hd', eq_div_iff hq0, e]
       rw [hf]
       exact isAlgebraic_algebraMap _
     have e : (algebraMap ℂ κ').toAlgebra = (inferInstance : Algebra ℂ κ') :=
       Algebra.algebra_ext _ _ fun _ => rfl
     unfold TrBasis
     rw [e]
-    exact (algebraicIndependent_empty_type : AlgebraicIndependent ℂ fun i : Fin 0 => (τ i : κ')).isTranscendenceBasis_of_trdeg_le_of_finite
-      (by rw [trdeg_eq_zero]; exact zero_le)
-  · exact trBasis_of_isFreeGen_dForm (algebraMap ℂ κ') B hB r τ hr
-      (TopForm.isFreeGen_dForm τ b hb)
+    exact (algebraicIndependent_empty_type : AlgebraicIndependent ℂ fun i : Fin 0 =>
+      (τ i : κ')).isTranscendenceBasis_of_trdeg_le_of_finite (by rw [trdeg_eq_zero]; exact zero_le)
+  · exact trBasis_of_isFreeGen_dForm (algebraMap ℂ κ') B hB r τ hr (TopForm.isFreeGen_dForm τ b hb)
 
 end GlobalTheory.EtaleCoordLocal

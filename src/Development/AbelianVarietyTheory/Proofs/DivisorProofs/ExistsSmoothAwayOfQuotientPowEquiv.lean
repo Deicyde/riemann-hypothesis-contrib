@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsSmoot
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -16,10 +18,21 @@ namespace GlobalTheory.SmoothAdic
 
 open TensorProduct
 
-theorem exists_smooth_away_of_quotient_pow_equiv : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (O C : Type) [CommRing O] [Algebra R O] [CommRing C] [Algebra R C], Algebra.Smooth R O → Algebra.FiniteType R C → (∀ e : ℕ, Nonempty ((O ⧸ (maximalIdeal R ^ (e + 1)).map (algebraMap R O)) ≃ₐ[R] (C ⧸ (maximalIdeal R ^ (e + 1)).map (algebraMap R C)))) → ∀ q : Ideal C, q.IsPrime → q.comap (algebraMap R C) = maximalIdeal R → ∃ g : C, g ∉ q ∧ Algebra.Smooth R (Localization.Away g) := by
+theorem exists_smooth_away_of_quotient_pow_equiv
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (O C : Type) [CommRing O]
+        [Algebra R O] [CommRing C] [Algebra R C],
+      Algebra.Smooth R O → Algebra.FiniteType R C
+        → (∀ e : ℕ,
+          Nonempty
+            ((O ⧸ (maximalIdeal R ^ (e + 1)).map (algebraMap R O)) ≃ₐ[R] (C ⧸ (maximalIdeal R ^ (e + 1)).map (algebraMap R C))))
+        → ∀ q : Ideal C,
+          q.IsPrime → q.comap (algebraMap R C) = maximalIdeal R
+            → ∃ g : C, g ∉ q ∧ Algebra.Smooth R (Localization.Away g) := by
   intro R _ _ _ O C _ _ _ _ hO hC hiso q hq hqm
-  have hsm : ∀ e : ℕ, Algebra.Smooth (R ⧸ maximalIdeal R ^ (e + 1))
-      (TensorProduct R (R ⧸ maximalIdeal R ^ (e + 1)) C) := by
+  have hsm
+      : ∀ e : ℕ,
+        Algebra.Smooth (R ⧸ maximalIdeal R ^ (e + 1))
+          (TensorProduct R (R ⧸ maximalIdeal R ^ (e + 1)) C) := by
     intro e
     obtain ⟨φ⟩ := hiso e
     let J := maximalIdeal R ^ (e + 1)

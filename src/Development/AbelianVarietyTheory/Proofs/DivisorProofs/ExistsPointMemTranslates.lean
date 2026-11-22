@@ -5,18 +5,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AlgClosedFibre
 
-theorem exists_point_mem_translates :
-    ∀ (S : Scheme.{0}) (P : PolAV S) (K : Type) [Field K] [IsAlgClosed K] (t : Spec (CommRingCat.of K) ⟶ S),
-      IrreducibleSpace (Over.mk t ⊗ P.A).left → ∀ (U : (Over.mk t ⊗ P.A).left.Opens),
-      (U : Set (Over.mk t ⊗ P.A).left).Nonempty → ∀ (a c : Over.mk t ⟶ P.A) (p : Spec (CommRingCat.of K)),
-      ∃ u : Over.mk t ⟶ P.A, (lift (𝟙 (Over.mk t)) (c * u * a)).left p ∈ U ∧
-        (lift (𝟙 (Over.mk t)) (u⁻¹ * a)).left p ∈ U := by
+theorem exists_point_mem_translates
+    : ∀ (S : Scheme.{0}) (P : PolAV S) (K : Type) [Field K] [IsAlgClosed K]
+        (t : Spec (CommRingCat.of K) ⟶ S),
+      IrreducibleSpace (Over.mk t ⊗ P.A).left
+        → ∀ (U : (Over.mk t ⊗ P.A).left.Opens),
+          (U : Set (Over.mk t ⊗ P.A).left).Nonempty
+            → ∀ (a c : Over.mk t ⟶ P.A) (p : Spec (CommRingCat.of K)), ∃ u : Over.mk t ⟶ P.A,
+              (lift (𝟙 (Over.mk t)) (c * u * a)).left p ∈ U
+                ∧ (lift (𝟙 (Over.mk t)) (u⁻¹ * a)).left p ∈ U := by
   intro S P K _ _ t hirr U hU a c p
   let T : Over S := Over.mk t
   let E : Over S := T ⊗ P.A
@@ -42,17 +47,20 @@ theorem exists_point_mem_translates :
     · simp [g₂, h₂]
     · simp [g₂, h₂, MonObj.comp_mul, GrpObj.comp_inv, _root_.mul_assoc]
       exact (Category.id_comp _).symm
-  have ne : ∀ {f g : E ⟶ E}, g ≫ f = 𝟙 E → ((f.left ⁻¹ᵁ U : E.left.Opens) : Set E.left).Nonempty := by
+  have ne
+      : ∀ {f g : E ⟶ E}, g ≫ f = 𝟙 E → ((f.left ⁻¹ᵁ U : E.left.Opens) : Set E.left).Nonempty := by
     intro f g h
     obtain ⟨w, hw⟩ := hU
     refine ⟨g.left w, ?_⟩
     change f.left (g.left w) ∈ U
     rw [← Scheme.Hom.comp_apply, ← Over.comp_left, h]
     exact hw
-  have hin := nonempty_preirreducible_inter (TopologicalSpace.Opens.isOpen _)
+  have hin :=
+    nonempty_preirreducible_inter (TopologicalSpace.Opens.isOpen _)
       (TopologicalSpace.Opens.isOpen _) (ne e₁) (ne e₂)
-  obtain ⟨z, hz, hc⟩ := nonempty_inter_closedPoints hin
-    ((TopologicalSpace.Opens.isOpen _).inter (TopologicalSpace.Opens.isOpen _)).isLocallyClosed
+  obtain ⟨z, hz, hc⟩ :=
+    nonempty_inter_closedPoints hin
+      ((TopologicalSpace.Opens.isOpen _).inter (TopologicalSpace.Opens.isOpen _)).isLocallyClosed
   let q := pointOfClosedPoint (fst T P.A).left z hc
   have hq : q ≫ (fst T P.A).left = 𝟙 _ := pointOfClosedPoint_comp _ z hc
   have hqw : q ≫ E.hom = t := by

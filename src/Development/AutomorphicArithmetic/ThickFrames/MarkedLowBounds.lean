@@ -7,9 +7,11 @@ public import Formalism.SharpRestriction.GrowthBounds.UnramifiedQuadraticSetting
 
 open Finset UpperTheory.BernoulliSumsFrobeniusOrbits Formalism.G0
 
-theorem UpperTheory.BernoulliSumsFrobeniusOrbits.markedLow_bounds :
-    ∀ (δ : ℝ) (r : ℕ), 0 < δ → δ ≤ 1 / 100 →
-      (1 / 10 : ℝ) ^ (6 * r + 1) ≤ markedLow δ r (Formalism.MainNotions.G.goodU δ) ∧ markedLow δ r (Formalism.MainNotions.G.goodU δ) ≤ 1 := by
+theorem UpperTheory.BernoulliSumsFrobeniusOrbits.markedLow_bounds
+    : ∀ (δ : ℝ) (r : ℕ),
+      0 < δ → δ ≤ 1 / 100
+        → (1 / 10 : ℝ) ^ (6 * r + 1) ≤ markedLow δ r (Formalism.MainNotions.G.goodU δ)
+          ∧ markedLow δ r (Formalism.MainNotions.G.goodU δ) ≤ 1 := by
   intro δ r hδ hδ1
   unfold markedLow Formalism.MainNotions.G.goodU
   set u := ⌈1 / δ⌉₊ with hu
@@ -53,7 +55,8 @@ theorem UpperTheory.BernoulliSumsFrobeniusOrbits.markedLow_bounds :
       have h7 : 0 ≤ Real.exp 1 := (Real.exp_pos _).le
       rw [e3]
       nlinarith
-    have hmono : Real.exp (-(103 / 100)) ≤ Real.exp (u * Real.log (1 - δ)) := Real.exp_le_exp.mpr step
+    have hmono : Real.exp (-(103 / 100)) ≤ Real.exp (u * Real.log (1 - δ)) :=
+      Real.exp_le_exp.mpr step
     rw [Real.exp_neg] at hmono
     have hpos := Real.exp_pos (103 / 100 : ℝ)
     have hinv : 3 / 10 ≤ (Real.exp (103 / 100))⁻¹ := by
@@ -75,8 +78,10 @@ theorem UpperTheory.BernoulliSumsFrobeniusOrbits.markedLow_bounds :
   have hq0 : (0 : ℝ) ≤ ((u / 2 : ℕ) : ℝ) * δ := mul_nonneg (Nat.cast_nonneg _) hδ.le
   have hqδ : 99 / 200 ≤ ((u / 2 : ℕ) : ℝ) * δ := by nlinarith
   have hqδ2 : ((u / 2 : ℕ) : ℝ) * δ ≤ 1 := by nlinarith
-  have eB : ((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1) =
-      3 / 4 * ((((u / 2 : ℕ) : ℝ) * δ) * (1 - δ) ^ (u - 1)) := by ring
+  have eB
+      : ((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1)
+        = 3 / 4 * ((((u / 2 : ℕ) : ℝ) * δ) * (1 - δ) ^ (u - 1)) := by
+    ring
   have hB : 1 / 10 ≤ ((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1) := by
     rw [eB]
     have h := mul_le_mul hqδ (le_trans hA hP) (by norm_num) hq0
@@ -88,12 +93,14 @@ theorem UpperTheory.BernoulliSumsFrobeniusOrbits.markedLow_bounds :
   have hB0 : 0 ≤ ((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1) := by linarith
   have hA0 : 0 ≤ (1 - δ) ^ u := pow_nonneg h1δ.le _
   constructor
-  · calc (1 / 10 : ℝ) ^ (6 * r + 1) = (1 / 10 : ℝ) ^ (3 * r + 1) * (1 / 10 : ℝ) ^ (3 * r) := by
-          rw [← pow_add]
-          congr 1
-          ring
-      _ ≤ ((1 - δ) ^ u) ^ (3 * r + 1) * (((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1)) ^ (3 * r) :=
-          mul_le_mul (pow_le_pow_left₀ (by norm_num) (by linarith) _) (pow_le_pow_left₀ (by norm_num) hB _)
-            (by positivity) (pow_nonneg hA0 _)
+  · calc
+      (1 / 10 : ℝ) ^ (6 * r + 1) = (1 / 10 : ℝ) ^ (3 * r + 1) * (1 / 10 : ℝ) ^ (3 * r) := by
+        rw [← pow_add]
+        congr 1
+        ring
+      _ ≤ ((1 - δ) ^ u) ^ (3 * r + 1)
+          * (((u / 2 : ℕ) : ℝ) * (3 / 4 * δ) * (1 - δ) ^ (u - 1)) ^ (3 * r) :=
+        mul_le_mul (pow_le_pow_left₀ (by norm_num) (by linarith) _)
+          (pow_le_pow_left₀ (by norm_num) hB _) (by positivity) (pow_nonneg hA0 _)
   · exact mul_le_one₀ (pow_le_one₀ hA0 (pow_le_one₀ h1δ.le (by linarith))) (pow_nonneg hB0 _)
       (pow_le_one₀ hB0 hB1)

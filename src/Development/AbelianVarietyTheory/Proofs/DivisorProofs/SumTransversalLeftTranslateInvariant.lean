@@ -6,14 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem sum_transversal_left_translate_invariant :
-    ∀ {G X : Type} [Group G] [AddCommMonoid X] (H K : Subgroup G) (R : Finset G) (f : G → X),
-      (∀ r ∈ R, r ∈ H) → (∀ k ∈ H, ∃! r, r ∈ R ∧ r⁻¹ * k ∈ K) →
-      (∀ r ∈ H, ∀ c ∈ K, f (r * c) = f r) → ∀ k ∈ H, ∑ r ∈ R, f (k * r) = ∑ r ∈ R, f r := by
+theorem sum_transversal_left_translate_invariant
+    : ∀ {G X : Type} [Group G] [AddCommMonoid X] (H K : Subgroup G) (R : Finset G) (f : G → X),
+      (∀ r ∈ R, r ∈ H) → (∀ k ∈ H, ∃! r, r ∈ R ∧ r⁻¹ * k ∈ K) → (∀ r ∈ H, ∀ c ∈ K, f (r * c) = f r)
+        → ∀ k ∈ H, ∑ r ∈ R, f (k * r) = ∑ r ∈ R, f r := by
   intro G X _ _ H K R f hR hU hf k hk
   have hkH : ∀ a ∈ R, k * a ∈ H := fun a ha => H.mul_mem hk (hR a ha)
-  refine Finset.sum_bij (fun a ha => Classical.choose (hU (k * a) (hkH a ha)).exists)
-    (fun a ha => (Classical.choose_spec (hU (k * a) (hkH a ha)).exists).1) ?_ ?_ ?_
+  refine Finset.sum_bij
+    (fun a ha => Classical.choose (hU (k * a) (hkH a ha)).exists)
+    (fun a ha => (Classical.choose_spec (hU (k * a) (hkH a ha)).exists).1)
+    ?_ ?_ ?_
   · intro a₁ ha₁ a₂ ha₂ heq
     have h1 := (Classical.choose_spec (hU (k * a₁) (hkH a₁ ha₁)).exists).2
     have h2 := (Classical.choose_spec (hU (k * a₂) (hkH a₂ ha₂)).exists).2
@@ -22,7 +24,8 @@ theorem sum_transversal_left_translate_invariant :
     have hm : a₁⁻¹ * a₂ ∈ K := by
       have := K.mul_mem (K.inv_mem h1) h2
       simpa [mul_assoc] using this
-    have hu := (hU a₂ (hR a₂ ha₂)).unique (y₁ := a₁) (y₂ := a₂) ⟨ha₁, hm⟩ ⟨ha₂, by simpa using K.one_mem⟩
+    have hu :=
+      (hU a₂ (hR a₂ ha₂)).unique (y₁ := a₁) (y₂ := a₂) ⟨ha₁, hm⟩ ⟨ha₂, by simpa using K.one_mem⟩
     exact hu
   · intro b hb
     have hb' : k⁻¹ * b ∈ H := H.mul_mem (H.inv_mem hk) (hR b hb)

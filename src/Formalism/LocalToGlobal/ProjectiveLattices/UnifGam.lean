@@ -8,7 +8,9 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped Matrix
 
@@ -27,12 +29,12 @@ section Herm
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem herm_smul_left (G : Matrix (Fin r) (Fin r) E) (c : 𝓞 E) (u w : Fin r → E) :
-    herm G (c • u) w = (c : E) * herm G u w := by
+theorem herm_smul_left (G : Matrix (Fin r) (Fin r) E) (c : 𝓞 E) (u w : Fin r → E)
+    : herm G (c • u) w = (c : E) * herm G u w := by
   simp only [herm, smul_coord, Finset.mul_sum, mul_assoc]
 
-theorem herm_smul_right (G : Matrix (Fin r) (Fin r) E) (c : 𝓞 E) (u w : Fin r → E) :
-    herm G u (c • w) = cc (c : E) * herm G u w := by
+theorem herm_smul_right (G : Matrix (Fin r) (Fin r) E) (c : 𝓞 E) (u w : Fin r → E)
+    : herm G u (c • w) = cc (c : E) * herm G u w := by
   simp only [herm, smul_coord, Finset.mul_sum, cc, map_mul]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
@@ -40,8 +42,10 @@ end Herm
 
 section Gam
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {r : ℕ}
 
 end Gam
 

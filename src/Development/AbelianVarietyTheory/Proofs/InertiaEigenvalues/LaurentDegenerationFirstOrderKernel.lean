@@ -8,20 +8,25 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem laurent_degeneration_abstract (k : Type) [Field k] (K : Type) [Field K] [Algebra k K] (σ : K)
-    (O : K → Prop) (π0 π1 : K →ₗ[k] k) (h0 : ∀ z, O z → π0 (σ * z) = 0)
-    (h1 : ∀ z, π1 (σ * z) = π0 z) (hone : π0 1 = 1)
-    (hnorm : ∀ (a : ℕ) (y : Fin a → K), y ≠ 0 → ∃ (f : K) (c0 : Fin a), f * y c0 = 1 ∧ ∀ c, O (f * y c))
-    (a e : ℕ) (V : Submodule k (Fin a → k)) (U : Type) [AddCommGroup U] [Module k U]
-    (t u : V →ₗ[k] U) (he : e ≤ 1)
-    (H : ∀ x0 x1 : Fin (e + 1) → V, (∀ j, t (x0 j) = 0 ∧ t (x1 j) = u (x0 j)) →
-      ¬ LinearIndependent k x0)
+theorem laurent_degeneration_abstract
+    (k : Type) [Field k]
+    (K : Type) [Field K] [Algebra k K]
+    (σ : K) (O : K → Prop) (π0 π1 : K →ₗ[k] k)
+    (h0 : ∀ z, O z → π0 (σ * z) = 0) (h1 : ∀ z, π1 (σ * z) = π0 z) (hone : π0 1 = 1)
+    (hnorm
+      : ∀ (a : ℕ) (y : Fin a → K), y ≠ 0 → ∃ (f : K) (c0 : Fin a), f * y c0 = 1 ∧ ∀ c, O (f * y c))
+    (a e : ℕ) (V : Submodule k (Fin a → k))
+    (U : Type) [AddCommGroup U] [Module k U]
+    (t u : V →ₗ[k] U)
+    (he : e ≤ 1)
+    (H : ∀ x0 x1 : Fin (e + 1) → V,
+      (∀ j, t (x0 j) = 0 ∧ t (x1 j) = u (x0 j)) → ¬ LinearIndependent k x0)
     (y : Fin (e + 1) → Fin a → K)
-    (hy : ∀ j (π : K →ₗ[k] k), ∃ x x' : V, (∀ c, x.1 c = π (y j c)) ∧
-      (∀ c, x'.1 c = π (σ * y j c)) ∧ t x = u x') :
-    ¬ LinearIndependent K y := by
-  let P : (Fin a → K) → Prop := fun z => ∀ (π : K →ₗ[k] k), ∃ x x' : V, (∀ c, x.1 c = π (z c)) ∧
-      (∀ c, x'.1 c = π (σ * z c)) ∧ t x = u x'
+    (hy : ∀ j (π : K →ₗ[k] k), ∃ x x' : V,
+      (∀ c, x.1 c = π (y j c)) ∧ (∀ c, x'.1 c = π (σ * y j c)) ∧ t x = u x')
+    : ¬ LinearIndependent K y := by
+  let P : (Fin a → K) → Prop := fun z =>
+    ∀ (π : K →ₗ[k] k), ∃ x x' : V, (∀ c, x.1 c = π (z c)) ∧ (∀ c, x'.1 c = π (σ * z c)) ∧ t x = u x'
   have Psmul : ∀ (f : K) z, P z → P (f • z) := by
     intro f z hz π
     obtain ⟨x, x', h, h', h''⟩ := hz (π ∘ₗ LinearMap.mulLeft k f)
@@ -32,10 +37,18 @@ theorem laurent_degeneration_abstract (k : Type) [Field k] (K : Type) [Field K] 
     intro z w hz hw π
     obtain ⟨x, x', h, h', h''⟩ := hz π
     obtain ⟨v, v', g, g', g''⟩ := hw π
-    refine ⟨x - v, x' - v', fun c => by simp [h c, g c], fun c => by simp [h' c, g' c, mul_sub],
-      by simp [h'', g'']⟩
-  have key : ∀ z, P z → z ≠ 0 → ∃ (f : K) (c0 : Fin a) (x0 x1 : V), f * z c0 = 1 ∧
-      (∀ c, x0.1 c = π0 (f * z c)) ∧ t x0 = 0 ∧ t x1 = u x0 := by
+    refine ⟨
+      x - v,
+      x' - v',
+      fun c => by simp [h c, g c],
+      fun c => by simp [h' c, g' c, mul_sub],
+      by simp [h'', g'']
+    ⟩
+  have key
+      : ∀ z,
+        P z → z ≠ 0
+          → ∃ (f : K) (c0 : Fin a) (x0 x1 : V),
+            f * z c0 = 1 ∧ (∀ c, x0.1 c = π0 (f * z c)) ∧ t x0 = 0 ∧ t x1 = u x0 := by
     intro z hz hz0
     obtain ⟨f, c0, hf, hO⟩ := hnorm a z hz0
     have hP := Psmul f z hz
@@ -48,8 +61,8 @@ theorem laurent_degeneration_abstract (k : Type) [Field k] (K : Type) [Field K] 
     have hv' : v' = x := by
       ext c
       rw [g' c, h c, h1]
-    refine ⟨f, c0, x, v, hf, fun c => by simpa using h c, by rw [h'', hx', map_zero],
-      by rw [g'', hv']⟩
+    refine
+      ⟨f, c0, x, v, hf, fun c => by simpa using h c, by rw [h'', hx', map_zero], by rw [g'', hv']⟩
   intro hli
   obtain rfl | rfl : e = 0 ∨ e = 1 := by omega
   · obtain ⟨f, c0, x0, x1, hf, hx, ht, ht'⟩ := key (y 0) (hy 0) (hli.ne_zero 0)
@@ -85,9 +98,9 @@ theorem laurent_degeneration_abstract (k : Type) [Field k] (K : Type) [Field K] 
     simp [a0, e3] at a1
     exact ⟨a0, a1⟩
 
-theorem laurent_vector_normalise (k : Type) [Field k] (a : ℕ) (y : Fin a → HahnSeries ℤ k)
-    (hy : y ≠ 0) : ∃ (f : HahnSeries ℤ k) (c0 : Fin a), f * y c0 = 1 ∧
-      ∀ c, (f * y c).coeff (-1) = 0 := by
+theorem laurent_vector_normalise
+    (k : Type) [Field k] (a : ℕ) (y : Fin a → HahnSeries ℤ k) (hy : y ≠ 0)
+    : ∃ (f : HahnSeries ℤ k) (c0 : Fin a), f * y c0 = 1 ∧ ∀ c, (f * y c).coeff (-1) = 0 := by
   classical
   have hne : (Finset.univ.filter fun c => y c ≠ 0).Nonempty := by
     obtain ⟨c, hc⟩ := Function.ne_iff.1 hy
@@ -104,23 +117,34 @@ theorem laurent_vector_normalise (k : Type) [Field k] (a : ℕ) (y : Fin a → H
     rw [HahnSeries.order_mul (inv_ne_zero h0) hc]
     omega
 
-noncomputable def laurentCoeffForm (k : Type) [Field k] (n : ℤ) :
-    letI : Algebra k (HahnSeries ℤ k) := HahnSeries.instAlgebra
-    HahnSeries ℤ k →ₗ[k] k :=
+noncomputable def laurentCoeffForm (k : Type) [Field k] (n : ℤ)
+    : letI : Algebra k (HahnSeries ℤ k) := HahnSeries.instAlgebra
+      HahnSeries ℤ k →ₗ[k] k :=
   HahnSeries.coeff.linearMap n
 
-theorem laurent_degeneration : ∀ (k : Type) [Field k], ∃ (K : Type) (_ : Field K) (_ : Algebra k K) (σ : K), ∀ (a e : ℕ) (V : Submodule k (Fin a → k)) (U : Type) [AddCommGroup U] [Module k U] (t u : V →ₗ[k] U), e ≤ 1 → (∀ x0 x1 : Fin (e + 1) → V, (∀ j, t (x0 j) = 0 ∧ t (x1 j) = u (x0 j)) → ¬ LinearIndependent k x0) → ∀ y : Fin (e + 1) → Fin a → K, (∀ j (π : K →ₗ[k] k), ∃ x x' : V, (∀ c, x.1 c = π (y j c)) ∧ (∀ c, x'.1 c = π (σ * y j c)) ∧ t x = u x') → ¬ LinearIndependent K y := by
+theorem laurent_degeneration
+    : ∀ (k : Type) [Field k], ∃ (K : Type) (_ : Field K) (_ : Algebra k K) (σ : K),
+      ∀ (a e : ℕ) (V : Submodule k (Fin a → k)) (U : Type) [AddCommGroup U] [Module k U]
+          (t u : V →ₗ[k] U),
+        e ≤ 1
+          → (∀ x0 x1 : Fin (e + 1) → V,
+            (∀ j, t (x0 j) = 0 ∧ t (x1 j) = u (x0 j)) → ¬ LinearIndependent k x0)
+          → ∀ y : Fin (e + 1) → Fin a → K,
+            (∀ j (π : K →ₗ[k] k), ∃ x x' : V,
+                (∀ c, x.1 c = π (y j c)) ∧ (∀ c, x'.1 c = π (σ * y j c)) ∧ t x = u x')
+              → ¬ LinearIndependent K y := by
   intro k _
   letI : Algebra k (HahnSeries ℤ k) := HahnSeries.instAlgebra
   refine ⟨HahnSeries ℤ k, inferInstance, this, HahnSeries.single 1 1, ?_⟩
   intro a e V U _ _ t u
-  have hs : ∀ (z : HahnSeries ℤ k) (n : ℤ),
-      (HahnSeries.single (1 : ℤ) (1 : k) * z).coeff (n + 1) = z.coeff n := by
+  have hs
+      : ∀ (z : HahnSeries ℤ k) (n : ℤ),
+        (HahnSeries.single (1 : ℤ) (1 : k) * z).coeff (n + 1) = z.coeff n := by
     intro z n
     rw [HahnSeries.coeff_single_mul_add, one_mul]
   refine laurent_degeneration_abstract k (HahnSeries ℤ k) (HahnSeries.single 1 1)
-    (fun z => z.coeff (-1) = 0) (laurentCoeffForm k 0) (laurentCoeffForm k 1) ?_ ?_ ?_
-    (laurent_vector_normalise k) a e V U t u
+    (fun z => z.coeff (-1) = 0)
+    (laurentCoeffForm k 0) (laurentCoeffForm k 1) ?_ ?_ ?_ (laurent_vector_normalise k) a e V U t u
   · intro z hz
     exact (hs z (-1)).trans hz
   · intro z

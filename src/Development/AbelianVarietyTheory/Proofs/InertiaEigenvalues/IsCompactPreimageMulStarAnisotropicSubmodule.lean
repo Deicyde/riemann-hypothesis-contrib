@@ -9,7 +9,12 @@ open GlobalTheory.JR Matrix
 
 namespace GlobalTheory
 
-theorem mul_star_anisotropic_proper : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (V : Submodule E (Matrix (Fin r) (Fin r) E)), (∀ z ∈ V, z * star z = 0 → z = 0) → ∀ B : Set (Matrix (Fin r) (Fin r) E), IsCompact B → IsCompact {z : Matrix (Fin r) (Fin r) E | z ∈ V ∧ z * star z ∈ B} := by
+theorem mul_star_anisotropic_proper
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (V : Submodule E (Matrix (Fin r) (Fin r) E)),
+      (∀ z ∈ V, z * star z = 0 → z = 0)
+        → ∀ B : Set (Matrix (Fin r) (Fin r) E),
+          IsCompact B → IsCompact {z : Matrix (Fin r) (Fin r) E | z ∈ V ∧ z * star z ∈ B} := by
   intro F E _ _ _ _ hU r V hV B hB
   letI : NormedAddCommGroup (Matrix (Fin r) (Fin r) E) := Matrix.normedAddCommGroup
   letI : NormedSpace E (Matrix (Fin r) (Fin r) E) := Matrix.normedSpace
@@ -17,21 +22,25 @@ theorem mul_star_anisotropic_proper : ∀ (F E : Type) [NontriviallyNormedField 
   haveI : ProperSpace E := ProperSpace.of_locallyCompactSpace E
   haveI : ProperSpace (Matrix (Fin r) (Fin r) E) := FiniteDimensional.proper E _
   have hsE : Continuous (star : E → E) :=
-    AddMonoidHomClass.continuous_of_bound (starAddEquiv : E ≃+ E) 1 (fun x => by simp [hU.norm_star])
+    AddMonoidHomClass.continuous_of_bound (starAddEquiv : E ≃+ E) 1
+      (fun x => by simp [hU.norm_star])
   haveI : ContinuousStar E := ⟨hsE⟩
   have hQc : Continuous fun z : Matrix (Fin r) (Fin r) E => z * star z :=
     continuous_id.mul continuous_star
-  have hQs : ∀ (d : E) (z : Matrix (Fin r) (Fin r) E), (d • z) * star (d • z) = (d * star d) • (z * star z) := by
+  have hQs
+      : ∀ (d : E) (z : Matrix (Fin r) (Fin r) E),
+        (d • z) * star (d • z) = (d * star d) • (z * star z) := by
     intro d z
     rw [star_smul, smul_mul_smul_comm]
-  have hnd : ∀ d : E, ‖d * star d‖ = ‖d‖ ^ 2 := by
-    intro d; rw [norm_mul, hU.norm_star, sq]
-  have hVc : IsClosed (V : Set (Matrix (Fin r) (Fin r) E)) := Submodule.closed_of_finiteDimensional V
+  have hnd : ∀ d : E, ‖d * star d‖ = ‖d‖ ^ 2 := by intro d; rw [norm_mul, hU.norm_star, sq]
+  have hVc : IsClosed (V : Set (Matrix (Fin r) (Fin r) E)) :=
+    Submodule.closed_of_finiteDimensional V
   obtain ⟨k, hk⟩ := NormedField.exists_one_lt_norm E
   set A : Set (Matrix (Fin r) (Fin r) E) := {w | w ∈ V ∧ ‖k‖⁻¹ ≤ ‖w‖ ∧ ‖w‖ ≤ 1} with hA
   have hAc : IsCompact A := by
     apply Metric.isCompact_of_isClosed_isBounded
-    · exact hVc.inter ((isClosed_le continuous_const continuous_norm).inter (isClosed_le continuous_norm continuous_const))
+    · exact hVc.inter ((isClosed_le continuous_const continuous_norm).inter
+        (isClosed_le continuous_norm continuous_const))
     · exact (Metric.isBounded_closedBall (x := (0 : Matrix (Fin r) (Fin r) E)) (r := 1)).subset
         (fun w hw => by simpa using hw.2.2)
   have hkpos : 0 < ‖k‖⁻¹ := inv_pos.mpr (lt_trans one_pos hk)
@@ -51,7 +60,8 @@ theorem mul_star_anisotropic_proper : ∀ (F E : Type) [NontriviallyNormedField 
   obtain ⟨R, hR⟩ := (hB.isBounded).subset_closedBall 0
   apply Metric.isCompact_of_isClosed_isBounded
   · exact hVc.inter (hB.isClosed.preimage hQc)
-  · apply (Metric.isBounded_closedBall (x := (0 : Matrix (Fin r) (Fin r) E)) (r := Real.sqrt (|R| / c))).subset
+  · apply (Metric.isBounded_closedBall (x := (0 : Matrix (Fin r) (Fin r) E))
+      (r := Real.sqrt (|R| / c))).subset
     intro z hz
     rw [Metric.mem_closedBall, dist_zero_right]
     have hQR : ‖z * star z‖ ≤ |R| := by

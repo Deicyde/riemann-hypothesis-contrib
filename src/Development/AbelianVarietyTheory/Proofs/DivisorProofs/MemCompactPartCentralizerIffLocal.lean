@@ -11,15 +11,18 @@ open scoped Classical
 
 namespace GlobalTheory.BCT
 
-theorem mem_cptPart_iff_local (ι G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (H : ι → Type)
-    [∀ i, Group (H i)] [∀ i, TopologicalSpace (H i)] [∀ i, IsTopologicalGroup (H i)] [∀ i, T2Space (H i)]
-    (p : ∀ i, G →* H i) (KH : ∀ i, Subgroup (H i)) (T : Subgroup G) (TH : ∀ i, Subgroup (H i)) :
-    (∀ i, Continuous (p i)) → (∀ x : G, ∀ᶠ i in cofinite, p i x ∈ KH i) →
-    (∀ C : ∀ i, Set (H i), (∀ i, IsCompact (C i)) → (∀ᶠ i in cofinite, C i = KH i) →
-      IsCompact {x : G | ∀ i, p i x ∈ C i}) →
-    (∀ i, IsCompact (KH i : Set (H i))) → (∀ x, x ∈ T ↔ ∀ i, p i x ∈ TH i) →
-    (∀ i, ∀ a ∈ TH i, ∀ b ∈ TH i, a * b = b * a) →
-    ∀ x, x ∈ cptPart T ↔ x ∈ T ∧ ∀ i, p i x ∈ cptPart (TH i) := by
+theorem mem_cptPart_iff_local
+    (ι G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (H : ι → Type) [∀ i, Group (H i)] [∀ i, TopologicalSpace (H i)] [∀ i, IsTopologicalGroup (H i)]
+    [∀ i, T2Space (H i)]
+    (p : ∀ i, G →* H i) (KH : ∀ i, Subgroup (H i)) (T : Subgroup G) (TH : ∀ i, Subgroup (H i))
+    : (∀ i, Continuous (p i)) → (∀ x : G, ∀ᶠ i in cofinite, p i x ∈ KH i)
+      → (∀ C : ∀ i, Set (H i),
+        (∀ i, IsCompact (C i)) → (∀ᶠ i in cofinite, C i = KH i)
+          → IsCompact {x : G | ∀ i, p i x ∈ C i})
+      → (∀ i, IsCompact (KH i : Set (H i))) → (∀ x, x ∈ T ↔ ∀ i, p i x ∈ TH i)
+      → (∀ i, ∀ a ∈ TH i, ∀ b ∈ TH i, a * b = b * a)
+      → ∀ x, x ∈ cptPart T ↔ x ∈ T ∧ ∀ i, p i x ∈ cptPart (TH i) := by
   intro hp hcof hcpt hKH hT hcomm x
   constructor
   · intro hx
@@ -30,7 +33,8 @@ theorem mem_cptPart_iff_local (ι G : Type) [Group G] [TopologicalSpace G] [IsTo
       rw [SetLike.mem_coe, Subgroup.mem_inf, Subgroup.mem_iInf]
       refine ⟨htT, fun i => ?_⟩
       rw [Subgroup.mem_comap]
-      refine Subgroup.subset_closure (k := {s | s ∈ TH i ∧ IsCompact (closure (Subgroup.zpowers s : Set (H i)))})
+      refine Subgroup.subset_closure
+        (k := {s | s ∈ TH i ∧ IsCompact (closure (Subgroup.zpowers s : Set (H i)))})
         ⟨(hT t).1 htT i, ?_⟩
       have himc : IsCompact (p i '' closure (Subgroup.zpowers t : Set G)) := htc.image (hp i)
       refine himc.of_isClosed_subset isClosed_closure (closure_minimal ?_ himc.isClosed)
@@ -64,7 +68,8 @@ theorem mem_cptPart_iff_local (ι G : Type) [Group G] [TopologicalSpace G] [IsTo
       split_ifs with h
       · exact (KH i).zpow_mem h k
       · exact subset_closure ⟨k, rfl⟩
-    refine Subgroup.subset_closure (k := {s | s ∈ T ∧ IsCompact (closure (Subgroup.zpowers s : Set G))}) ⟨hxT, ?_⟩
+    refine Subgroup.subset_closure
+      (k := {s | s ∈ T ∧ IsCompact (closure (Subgroup.zpowers s : Set G))}) ⟨hxT, ?_⟩
     exact hS.of_isClosed_subset isClosed_closure (closure_minimal hsub hScl)
 
 end GlobalTheory.BCT

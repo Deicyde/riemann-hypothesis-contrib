@@ -12,7 +12,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,9 +22,11 @@ namespace GlobalTheory
 
 open Polynomial ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-private theorem isUnit_of_isUnit_map_of_ker_sq_eq_bot {R' R : Type} [CommRing R'] [CommRing R] (π : R' →+* R)
-    (hs : Function.Surjective π) (hk : RingHom.ker π ^ 2 = ⊥) (x : R') (hx : IsUnit (π x)) :
-    IsUnit x := by
+private theorem isUnit_of_isUnit_map_of_ker_sq_eq_bot
+    {R' R : Type} [CommRing R'] [CommRing R]
+    (π : R' →+* R) (hs : Function.Surjective π) (hk : RingHom.ker π ^ 2 = ⊥)
+    (x : R') (hx : IsUnit (π x))
+    : IsUnit x := by
   obtain ⟨y, hy⟩ := hx.exists_right_inv
   obtain ⟨y', rfl⟩ := hs y
   have h1 : x * y' - 1 ∈ RingHom.ker π := by simp [RingHom.mem_ker, hy]
@@ -33,14 +37,17 @@ private theorem isUnit_of_isUnit_map_of_ker_sq_eq_bot {R' R : Type} [CommRing R'
   rw [sub_add_cancel] at h3
   exact isUnit_of_mul_isUnit_left h3
 
-private theorem ringHom_aeval_eq_aeval_apply {R' R : Type} [CommRing R'] [CommRing R] (π : R' →+* R)
-    (f : ℤ[X]) (x : R') : π (Polynomial.aeval x f) = Polynomial.aeval (π x) f :=
+private theorem ringHom_aeval_eq_aeval_apply
+    {R' R : Type} [CommRing R'] [CommRing R] (π : R' →+* R) (f : ℤ[X]) (x : R')
+    : π (Polynomial.aeval x f) = Polynomial.aeval (π x) f :=
   (Polynomial.aeval_algHom_apply π.toIntAlgHom x f).symm
 
-private theorem exists_root_lift_of_ker_sq_eq_bot {R' R : Type} [CommRing R'] [CommRing R] (π : R' →+* R)
-    (hs : Function.Surjective π) (hk : RingHom.ker π ^ 2 = ⊥) (f : ℤ[X]) (z : R)
-    (hz : Polynomial.aeval z f = 0) (hd : IsUnit (Polynomial.aeval z (derivative f))) :
-    ∃ z' : R', π z' = z ∧ Polynomial.aeval z' f = 0 := by
+private theorem exists_root_lift_of_ker_sq_eq_bot
+    {R' R : Type} [CommRing R'] [CommRing R]
+    (π : R' →+* R) (hs : Function.Surjective π) (hk : RingHom.ker π ^ 2 = ⊥)
+    (f : ℤ[X]) (z : R)
+    (hz : Polynomial.aeval z f = 0) (hd : IsUnit (Polynomial.aeval z (derivative f)))
+    : ∃ z' : R', π z' = z ∧ Polynomial.aeval z' f = 0 := by
   obtain ⟨z₀, rfl⟩ := hs z
   have hu : IsUnit (Polynomial.aeval z₀ (derivative f)) :=
     isUnit_of_isUnit_map_of_ker_sq_eq_bot π hs hk _ (by rwa [ringHom_aeval_eq_aeval_apply])
@@ -53,12 +60,14 @@ private theorem exists_root_lift_of_ker_sq_eq_bot {R' R : Type} [CommRing R'] [C
     rwa [hk, Ideal.mem_bot] at this
   refine ⟨z₀ + -(v * Polynomial.aeval z₀ f), ?_, ?_⟩
   · rw [map_add (f := _), RingHom.mem_ker.mp h1, add_zero]
-  · rw [Polynomial.aeval_add_of_sq_eq_zero _ _ _ h2, mul_neg, ← _root_.mul_assoc, hv, _root_.one_mul,
-      add_neg_cancel]
+  · rw [Polynomial.aeval_add_of_sq_eq_zero _ _ _ h2, mul_neg, ← _root_.mul_assoc, hv,
+      _root_.one_mul, add_neg_cancel]
 
-private theorem isUnit_aeval_derivative_cyclotomic {R : Type} [CommRing R] (M : ℕ) (hM : M ≠ 0) (hu : IsUnit (M : R))
-    (z : R) (hz : Polynomial.aeval z (cyclotomic M ℤ) = 0) :
-    IsUnit (Polynomial.aeval z (derivative (cyclotomic M ℤ))) := by
+private theorem isUnit_aeval_derivative_cyclotomic
+    {R : Type} [CommRing R]
+    (M : ℕ) (hM : M ≠ 0) (hu : IsUnit (M : R))
+    (z : R) (hz : Polynomial.aeval z (cyclotomic M ℤ) = 0)
+    : IsUnit (Polynomial.aeval z (derivative (cyclotomic M ℤ))) := by
   obtain ⟨g, hg⟩ := cyclotomic.dvd_X_pow_sub_one M ℤ
   have h1 : z ^ M = 1 := by
     have := congrArg (Polynomial.aeval z) hg
@@ -67,19 +76,22 @@ private theorem isUnit_aeval_derivative_cyclotomic {R : Type} [CommRing R] (M : 
   have hzu : IsUnit z := IsUnit.of_pow_eq_one h1 hM
   have h2 := congrArg (fun q => Polynomial.aeval z (derivative q)) hg
   simp only [derivative_mul, map_add (f := _), map_mul, hz, zero_mul, add_zero, derivative_sub,
-    derivative_one, sub_zero, derivative_X_pow, map_natCast, map_pow, aeval_X] at h2
+      derivative_one, sub_zero, derivative_X_pow, map_natCast, map_pow, aeval_X]
+    at h2
   have h3 : IsUnit ((M : R) * z ^ (M - 1)) := hu.mul (hzu.pow _)
   rw [h2] at h3
   exact isUnit_of_mul_isUnit_left h3
 
-private theorem lift_squareZero_general {B R' R : Type} [CommRing B] [CommRing R'] [CommRing R]
+private theorem lift_squareZero_general
+    {B R' R : Type} [CommRing B] [CommRing R'] [CommRing R]
     (π : R' →+* R) (hs : Function.Surjective π) (hk : RingHom.ker π ^ 2 = ⊥)
-    (f : ℤ[X]) (ζ : B) (S : Submonoid ℕ) (h0 : Polynomial.aeval ζ f = 0)
-    (hinj : ∀ g : ℤ[X], Polynomial.aeval ζ g = 0 → f ∣ g)
+    (f : ℤ[X]) (ζ : B)
+    (S : Submonoid ℕ)
+    (h0 : Polynomial.aeval ζ f = 0) (hinj : ∀ g : ℤ[X], Polynomial.aeval ζ g = 0 → f ∣ g)
     (hS : ∀ n ∈ S, IsUnit (n : B))
     (hsurj : ∀ b : B, ∃ n ∈ S, ∃ g : ℤ[X], b * (n : B) = Polynomial.aeval ζ g)
-    (β : B →+* R) (z' : R') (hz : π z' = β ζ) (hz' : Polynomial.aeval z' f = 0) :
-    ∃ β' : B →+* R', π.comp β' = β := by
+    (β : B →+* R) (z' : R') (hz : π z' = β ζ) (hz' : Polynomial.aeval z' f = 0)
+    : ∃ β' : B →+* R', π.comp β' = β := by
   let φ : AdjoinRoot f →+* B := AdjoinRoot.lift (algebraMap ℤ B) ζ h0
   let α : AdjoinRoot f →+* R' := AdjoinRoot.lift (algebraMap ℤ R') z' hz'
   have hφ : ∀ g : ℤ[X], φ (AdjoinRoot.mk f g) = Polynomial.aeval ζ g := fun g =>
@@ -116,14 +128,15 @@ private def liftZP_S (p : ℕ) : Submonoid ℕ where
   mul_mem' := fun ha hb => ⟨mul_ne_zero ha.1 hb.1, Nat.Coprime.mul_left ha.2 hb.2⟩
   one_mem' := ⟨one_ne_zero, Nat.coprime_one_left p⟩
 
-private theorem isUnit_natCast_of_mem_denominators (p M n : ℕ) (hn : n ∈ liftZP_S p) : IsUnit (n : ZP p M) := by
+private theorem isUnit_natCast_of_mem_denominators (p M n : ℕ) (hn : n ∈ liftZP_S p)
+    : IsUnit (n : ZP p M) := by
   have hmem : (n : ℂ)⁻¹ ∈ ZP p M := Subring.subset_closure (Or.inr ⟨n, hn.2, rfl⟩)
   refine IsUnit.of_mul_eq_one (⟨_, hmem⟩ : ZP p M) (Subtype.ext ?_)
   have : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hn.1
   simp [this]
 
-private theorem exists_mul_eq_aeval_zeta_of_mem (p M : ℕ) (x : ℂ) (hx : x ∈ ZP p M) :
-    ∃ n ∈ liftZP_S p, ∃ g : ℤ[X], x * (n : ℂ) = Polynomial.aeval (zeta M) g := by
+private theorem exists_mul_eq_aeval_zeta_of_mem (p M : ℕ) (x : ℂ) (hx : x ∈ ZP p M)
+    : ∃ n ∈ liftZP_S p, ∃ g : ℤ[X], x * (n : ℂ) = Polynomial.aeval (zeta M) g := by
   induction hx using Subring.closure_induction with
   | mem x hx =>
     rcases hx with hx | ⟨n, hn, rfl⟩
@@ -132,8 +145,10 @@ private theorem exists_mul_eq_aeval_zeta_of_mem (p M : ℕ) (x : ℂ) (hx : x �
       · exact ⟨1, one_mem _, 0, by simp [h]⟩
       · have : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr h
         exact ⟨n, ⟨h, hn⟩, 1, by simp [this]⟩
-  | zero => exact ⟨1, one_mem _, 0, by simp⟩
-  | one => exact ⟨1, one_mem _, 1, by simp⟩
+  | zero =>
+    exact ⟨1, one_mem _, 0, by simp⟩
+  | one =>
+    exact ⟨1, one_mem _, 1, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨n, hn, g, hg⟩ := hx
     obtain ⟨m, hm, k, hk⟩ := hy
@@ -150,23 +165,31 @@ private theorem exists_mul_eq_aeval_zeta_of_mem (p M : ℕ) (x : ℂ) (hx : x �
     simp only [map_mul, Nat.cast_mul, ← hg, ← hk]
     ring
 
-theorem zp_lift_sqZero :
-  (∀ (p M : ℕ) (R' R : Type) [CommRing R'] [CommRing R] (π : R' →+* R), Function.Surjective π → RingHom.ker π ^ 2 = ⊥ → M.Coprime p → M ≠ 0 →
-    ∀ β : ReciprocityTheory.ChartRestriction.G.Geo.Tor.ZP p M →+* R, ∃ β' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.ZP p M →+* R', π.comp β' = β) := by
+theorem zp_lift_sqZero
+    : (∀ (p M : ℕ) (R' R : Type) [CommRing R'] [CommRing R] (π : R' →+* R),
+      Function.Surjective π → RingHom.ker π ^ 2 = ⊥ → M.Coprime p → M ≠ 0
+        → ∀ β : ReciprocityTheory.ChartRestriction.G.Geo.Tor.ZP p M →+* R,
+          ∃ β' : ReciprocityTheory.ChartRestriction.G.Geo.Tor.ZP p M →+* R',
+            π.comp β' = β) := by
   intro p M R' R _ _ π hs hk hMp hM β
   have hprim : IsPrimitiveRoot (zeta M) M := Complex.isPrimitiveRoot_exp M hM
   have hmin : cyclotomic M ℤ = minpoly ℤ (zeta M) :=
     cyclotomic_eq_minpoly hprim (Nat.pos_of_ne_zero hM)
-  have hcoe : ∀ g : ℤ[X], ((Polynomial.aeval (zetaZP p M) g : ZP p M) : ℂ)
-      = Polynomial.aeval (zeta M) g := fun g => ringHom_aeval_eq_aeval_apply (ZP p M).subtype g _
+  have hcoe
+      : ∀ g : ℤ[X],
+        ((Polynomial.aeval (zetaZP p M) g : ZP p M) : ℂ) = Polynomial.aeval (zeta M) g := fun g =>
+    ringHom_aeval_eq_aeval_apply (ZP p M).subtype g _
   have h0 : Polynomial.aeval (zetaZP p M) (cyclotomic M ℤ) = 0 := by
     apply Subtype.ext
     rw [hcoe, hmin]
     exact minpoly.aeval _ _
   have hβ0 : Polynomial.aeval (β (zetaZP p M)) (cyclotomic M ℤ) = 0 := by
     rw [← ringHom_aeval_eq_aeval_apply, h0, map_zero]
-  have hMu : IsUnit (M : R) := by simpa using (isUnit_natCast_of_mem_denominators p M M ⟨hM, hMp⟩).map β
-  obtain ⟨z', hz, hz'⟩ := exists_root_lift_of_ker_sq_eq_bot π hs hk _ _ hβ0 (isUnit_aeval_derivative_cyclotomic M hM hMu _ hβ0)
+  have hMu : IsUnit (M : R) := by
+    simpa using (isUnit_natCast_of_mem_denominators p M M ⟨hM, hMp⟩).map β
+  obtain ⟨z', hz, hz'⟩ :=
+    exists_root_lift_of_ker_sq_eq_bot π hs hk _ _ hβ0
+      (isUnit_aeval_derivative_cyclotomic M hM hMu _ hβ0)
   refine lift_squareZero_general π hs hk (cyclotomic M ℤ) (zetaZP p M) (liftZP_S p) h0 ?_
     (isUnit_natCast_of_mem_denominators p M) ?_ β z' hz hz'
   · intro g hg

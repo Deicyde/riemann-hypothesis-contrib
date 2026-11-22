@@ -8,10 +8,12 @@ open Matrix Finset Real
 
 namespace GlobalTheory
 
-theorem exists_consecutive_ratio_le_rpow :
-    ∀ (a q : ℕ) (τ : ℕ → ℝ), 1 ≤ a → a ≤ q → (∀ i ≤ a, 0 < τ i) → (∀ i < a, τ i < τ (i + 1)) →
-      τ a = 1 / 2 → ∃ b < a, τ b / τ (b + 1) ≤ (2 * τ 0) ^ ((1 : ℝ) / q) ∧
-        τ b ^ 2 ≤ (2 * τ 0) ^ ((1 : ℝ) / q) / 4 := by
+theorem exists_consecutive_ratio_le_rpow
+    : ∀ (a q : ℕ) (τ : ℕ → ℝ),
+      1 ≤ a → a ≤ q → (∀ i ≤ a, 0 < τ i) → (∀ i < a, τ i < τ (i + 1)) → τ a = 1 / 2
+        → ∃ b < a,
+          τ b / τ (b + 1) ≤ (2 * τ 0) ^ ((1 : ℝ) / q)
+            ∧ τ b ^ 2 ≤ (2 * τ 0) ^ ((1 : ℝ) / q) / 4 := by
   intro a q τ ha haq hpos hinc hta
 
   have hmono : ∀ j, j ≤ a → ∀ i, i ≤ j → τ i ≤ τ j := by
@@ -49,13 +51,16 @@ theorem exists_consecutive_ratio_le_rpow :
       | zero => intro _; simp
       | succ n ih =>
         intro hn
-        calc r ^ (n + 1) * τ (n + 1) = r ^ n * (r * τ (n + 1)) := by ring
-          _ ≤ r ^ n * τ n :=
-            mul_le_mul_of_nonneg_left (hstep n (by omega)).le (pow_nonneg hr0.le _)
+        calc
+          r ^ (n + 1) * τ (n + 1)
+            = r ^ n * (r * τ (n + 1)) := by ring
+          _ ≤ r ^ n * τ n := mul_le_mul_of_nonneg_left (hstep n (by omega)).le (pow_nonneg hr0.le _)
           _ ≤ τ 0 := ih (by omega)
     obtain ⟨c, rfl⟩ : ∃ c, a = c + 1 := ⟨a - 1, by omega⟩
     have hlast : r ^ (c + 1) * τ (c + 1) < τ 0 := by
-      calc r ^ (c + 1) * τ (c + 1) = r ^ c * (r * τ (c + 1)) := by ring
+      calc
+        r ^ (c + 1) * τ (c + 1)
+          = r ^ c * (r * τ (c + 1)) := by ring
         _ < r ^ c * τ c := mul_lt_mul_of_pos_left (hstep c (by omega)) (pow_pos hr0 _)
         _ ≤ τ 0 := hind c (by omega)
     rw [hta] at hlast

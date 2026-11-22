@@ -11,7 +11,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P.PBH Formalism.FourierDecayAlt.P.CutSH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P.PBH
+  Formalism.FourierDecayAlt.P.CutSH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -34,13 +36,15 @@ theorem family_derivative : CutSH.FamDeriv := by
       have hfd : DifferentiableAt ℝ f (t, γ) :=
         (hf.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hp)
       have hin := hasFDerivAt_prodMk_left (𝕜 := ℝ) t γ
-      rw [show (fun u : ℂ => f (u, γ)) = f ∘ fun u => (u, γ) from rfl, (hfd.hasFDerivAt.comp t hin).fderiv]
+      rw [show (fun u : ℂ => f (u, γ)) = f ∘ fun u => (u, γ) from rfl,
+        (hfd.hasFDerivAt.comp t hin).fderiv]
       rfl
   · intro K hK hK0
-    obtain ⟨δ, hδ, hsub⟩ := hK.exists_cthickening_subset_open (isOpen_compl_singleton (x := (0 : ℂ)))
-      (fun t ht => by simpa using hK0 t ht)
-    obtain ⟨C, hC, ε, hε, hCε⟩ := hsupp (Metric.cthickening δ K) hK.cthickening
-      (fun t ht => by simpa using hsub ht)
+    obtain ⟨δ, hδ, hsub⟩ :=
+      hK.exists_cthickening_subset_open (isOpen_compl_singleton (x := (0 : ℂ)))
+        (fun t ht => by simpa using hK0 t ht)
+    obtain ⟨C, hC, ε, hε, hCε⟩ :=
+      hsupp (Metric.cthickening δ K) hK.cthickening (fun t ht => by simpa using hsub ht)
     refine ⟨C, hC, ε, hε, fun t ht γ hne => ?_⟩
     have hγ : γ ∈ B.GV P.k (P.r - (j + 1)) := by
       by_contra h

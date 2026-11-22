@@ -8,9 +8,12 @@ open GlobalTheory.KZ GlobalTheory.CyclotomicQExpansion
 
 namespace GlobalTheory.CyclotomicQExpansion
 
-theorem qD_sub (Ω : Type) [Field Ω] [Algebra ℚ Ω] (ε : Ω →+* ℂ) (a b d : ℚ) (hk : 0 < a / d)
-    (φ : HahnSeries ℚ Ω) :
-    qD (sub ε a b d φ) = HahnSeries.C (algebraMap ℚ Ω (a / d)) * sub ε a b d (qD φ) := by
+theorem qD_sub
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω]
+    (ε : Ω →+* ℂ)
+    (a b d : ℚ) (hk : 0 < a / d)
+    (φ : HahnSeries ℚ Ω)
+    : qD (sub ε a b d φ) = HahnSeries.C (algebraMap ℚ Ω (a / d)) * sub ε a b d (qD φ) := by
   have hcm : ∀ (c : ℚ → Ω) (ψ : HahnSeries ℚ Ω) (r : ℚ), (cm c ψ).coeff r = c r * ψ.coeff r :=
     fun _ _ _ => rfl
   have hsc : ∀ (ψ : HahnSeries ℚ Ω) (r : ℚ), (scale (a / d) ψ).coeff (a / d * r) = ψ.coeff r := by

@@ -11,10 +11,11 @@ open GlobalTheory GlobalTheory.FieldPair
 
 namespace GlobalTheory.FieldPair
 
-theorem exists_place_isPrimeOf_of_height_eq_one {K : Type} [Field K] (cK : ℂ →+* K)
-    (R : Subring K) (hR : IsLocModel cK R) (hic : IsIntegrallyClosed R) (p : Ideal R)
-    (hpp : p.IsPrime) (hp : p.height = 1) :
-    ∃ P0 : Place cK, P0.IsPrimeOf R ∧ ∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ g ∉ p) := by
+theorem exists_place_isPrimeOf_of_height_eq_one
+    {K : Type} [Field K]
+    (cK : ℂ →+* K) (R : Subring K) (hR : IsLocModel cK R) (hic : IsIntegrallyClosed R) (p : Ideal R)
+    (hpp : p.IsPrime) (hp : p.height = 1)
+    : ∃ P0 : Place cK, P0.IsPrimeOf R ∧ ∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ g ∉ p) := by
   classical
   letI : Algebra ℂ R := (cK.codRestrict R hR.const_mem).toAlgebra
   haveI : Algebra.EssFiniteType ℂ R := hR.essFiniteType
@@ -29,11 +30,9 @@ theorem exists_place_isPrimeOf_of_height_eq_one {K : Type} [Field K] (cK : ℂ �
     intro x
     rw [hS, mem_primeLocalSubalgebra_iff]
     rfl
-  have hne : ∀ s : R, s ∉ p → (s : K) ≠ 0 := fun s hs h =>
-    hs ((Subtype.ext h : s = 0) ▸ p.zero_mem)
+  have hne : ∀ s : R, s ∉ p → (s : K) ≠ 0 := fun s hs h => hs ((Subtype.ext h : s = 0) ▸ p.zero_mem)
   have h1p : (1 : R) ∉ p := (Ideal.ne_top_iff_one p).mp hpp.ne_top
-  have hRS : ∀ r : R, (r : K) ∈ S := fun r =>
-    (hmem _).2 ⟨1, h1p, r, by simp⟩
+  have hRS : ∀ r : R, (r : K) ∈ S := fun r => (hmem _).2 ⟨1, h1p, r, by simp⟩
   have hinv : ∀ s : R, s ∉ p → (s : K)⁻¹ ∈ S := fun s hs =>
     (hmem _).2 ⟨s, hs, 1, by simp [mul_inv_cancel₀ (hne s hs)]⟩
   have hor : ∀ x : K, x ∈ S ∨ x⁻¹ ∈ S := by
@@ -46,12 +45,13 @@ theorem exists_place_isPrimeOf_of_height_eq_one {K : Type} [Field K] (cK : ℂ �
     omega
   let V : ValuationSubring K := { S.toSubring with mem_or_inv_mem' := hor }
   have hV : ∀ x : K, x ∈ V ↔ x ∈ S := fun _ => Iff.rfl
-  let ι : R →+* V :=
-    { toFun := fun r => ⟨r, hRS r⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let ι : R →+* V := {
+    toFun := fun r => ⟨r, hRS r⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   letI : Algebra R V := ι.toAlgebra
   have hunit : ∀ s : R, s ∉ p → IsUnit (algebraMap R V s) := fun s hs =>
     isUnit_iff_exists_inv.mpr ⟨⟨(s : K)⁻¹, hinv s hs⟩, Subtype.ext (mul_inv_cancel₀ (hne s hs))⟩
@@ -83,9 +83,10 @@ theorem exists_place_isPrimeOf_of_height_eq_one {K : Type} [Field K] (cK : ℂ �
     · intro h hgp
       have h' : 0 ≤ P0.ord (g : K)⁻¹ := by rw [P0.ord_inv, h]; rfl
       obtain ⟨s, hs, a, e⟩ := (hmem _).1 ((P0.ord_nonneg_iff (inv_ne_zero hg0)).1 h')
-      have : s = a * g := Subtype.ext (by
-        show (s : K) = a * g
-        rw [e, mul_assoc, inv_mul_cancel₀ hg0, mul_one])
+      have : s = a * g :=
+        Subtype.ext (by
+          show (s : K) = a * g
+          rw [e, mul_assoc, inv_mul_cancel₀ hg0, mul_one])
       exact hs (this ▸ p.mul_mem_left a hgp)
     · intro hgp
       exact P0.ord_eq_zero (u := algebraMap R V g) (hunit g hgp)

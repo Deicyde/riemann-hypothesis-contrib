@@ -34,47 +34,52 @@ theorem upOpen_mono : Monotone (upOpen i) := fun _ _ h ↦ Set.image_mono h
 def res (U : Y₀.Opens) : Γ(Y₁, upOpen i U) ⟶ Γ(Y₀, U) :=
   i.appLE (upOpen i U) U (preimage_upOpen i U).ge
 
-theorem res_naturality {U V : Y₀.Opens} (h : U ≤ V) :
-    Y₁.presheaf.map (homOfLE (upOpen_mono i h)).op ≫ res i U =
-      res i V ≫ Y₀.presheaf.map (homOfLE h).op := by
+theorem res_naturality {U V : Y₀.Opens} (h : U ≤ V)
+    : Y₁.presheaf.map (homOfLE (upOpen_mono i h)).op ≫ res i U
+      = res i V ≫ Y₀.presheaf.map (homOfLE h).op := by
   simp only [res, Scheme.Hom.map_appLE, Scheme.Hom.appLE_map]
 
 end One
 
 section Two
-variable {Y₀ Y₁ Y₂ : Scheme.{0}} (i₁ : Y₀ ⟶ Y₁) (i₂ : Y₀ ⟶ Y₂) [IsClosedImmersion i₁]
-  [Surjective i₁] [IsClosedImmersion i₂] [Surjective i₂]
+variable
+  {Y₀ Y₁ Y₂ : Scheme.{0}} (i₁ : Y₀ ⟶ Y₁) (i₂ : Y₀ ⟶ Y₂)
+  [IsClosedImmersion i₁] [Surjective i₁] [IsClosedImmersion i₂] [Surjective i₂]
 
 abbrev cone (U : Y₀.Opens) : PullbackCone (res i₁ U) (res i₂ U) :=
   CommRingCat.pullbackCone (res i₁ U) (res i₂ U)
 
-def coneIsLimit (U : Y₀.Opens) : IsLimit (cone i₁ i₂ U) :=
-  CommRingCat.pullbackConeIsLimit _ _
+def coneIsLimit (U : Y₀.Opens) : IsLimit (cone i₁ i₂ U) := CommRingCat.pullbackConeIsLimit _ _
 
 def fibMap {U V : Y₀.Opens} (h : U ≤ V) : (cone i₁ i₂ V).pt ⟶ (cone i₁ i₂ U).pt :=
   PullbackCone.IsLimit.lift (coneIsLimit i₁ i₂ U)
     ((cone i₁ i₂ V).fst ≫ Y₁.presheaf.map (homOfLE (upOpen_mono i₁ h)).op)
     ((cone i₁ i₂ V).snd ≫ Y₂.presheaf.map (homOfLE (upOpen_mono i₂ h)).op)
-    (by rw [Category.assoc, Category.assoc, res_naturality i₁ h, res_naturality i₂ h,
-      (cone i₁ i₂ V).condition_assoc])
+    (by
+      rw [Category.assoc, Category.assoc, res_naturality i₁ h, res_naturality i₂ h,
+        (cone i₁ i₂ V).condition_assoc])
 
 @[reassoc (attr := simp)]
-theorem fibMap_fst {U V : Y₀.Opens} (h : U ≤ V) : fibMap i₁ i₂ h ≫ (cone i₁ i₂ U).fst =
-    (cone i₁ i₂ V).fst ≫ Y₁.presheaf.map (homOfLE (upOpen_mono i₁ h)).op :=
+theorem fibMap_fst {U V : Y₀.Opens} (h : U ≤ V)
+    : fibMap i₁ i₂ h ≫ (cone i₁ i₂ U).fst
+      = (cone i₁ i₂ V).fst ≫ Y₁.presheaf.map (homOfLE (upOpen_mono i₁ h)).op :=
   PullbackCone.IsLimit.lift_fst _ _ _ _
 
 @[reassoc (attr := simp)]
-theorem fibMap_snd {U V : Y₀.Opens} (h : U ≤ V) : fibMap i₁ i₂ h ≫ (cone i₁ i₂ U).snd =
-    (cone i₁ i₂ V).snd ≫ Y₂.presheaf.map (homOfLE (upOpen_mono i₂ h)).op :=
+theorem fibMap_snd {U V : Y₀.Opens} (h : U ≤ V)
+    : fibMap i₁ i₂ h ≫ (cone i₁ i₂ U).snd
+      = (cone i₁ i₂ V).snd ≫ Y₂.presheaf.map (homOfLE (upOpen_mono i₂ h)).op :=
   PullbackCone.IsLimit.lift_snd _ _ _ _
 
 def fib : Y₀.Opensᵒᵖ ⥤ CommRingCat.{0} where
   obj U := (cone i₁ i₂ U.unop).pt
   map f := fibMap i₁ i₂ f.unop.le
-  map_id U := PullbackCone.IsLimit.hom_ext (coneIsLimit i₁ i₂ U.unop)
-    (by simp [homOfLE_refl]) (by simp [homOfLE_refl])
-  map_comp f g := PullbackCone.IsLimit.hom_ext (coneIsLimit i₁ i₂ _)
-    (by simp [← Functor.map_comp]; rfl) (by simp [← Functor.map_comp]; rfl)
+  map_id U :=
+    PullbackCone.IsLimit.hom_ext (coneIsLimit i₁ i₂ U.unop) (by simp [homOfLE_refl])
+      (by simp [homOfLE_refl])
+  map_comp f g :=
+    PullbackCone.IsLimit.hom_ext (coneIsLimit i₁ i₂ _) (by simp [← Functor.map_comp]; rfl)
+      (by simp [← Functor.map_comp]; rfl)
 
 def fibπ : fib i₁ i₂ ⟶ Y₀.presheaf where
   app U := (cone i₁ i₂ U.unop).fst ≫ res i₁ U.unop

@@ -118,12 +118,14 @@ lemma exists_hasQExpansion_discriminant : ∃ U : ℤ⟦X⟧, coeff 0 U = 1 ∧
   refine ⟨U, by rw [← h6, hU, coeff_succ_X_mul], ?_⟩
   rwa [hU, map_mul, map_X] at h2
 
-theorem exists_hasQExpansion_modularJ : ∃ J : ℤ⟦X⟧, coeff 0 J = 1 ∧
-    HasQExpansion 1 (fun τ ↦ 𝕢 1 τ * modularJ τ) (PowerSeries.map (Int.castRingHom ℂ) J) := by
+theorem exists_hasQExpansion_modularJ
+    : ∃ J : ℤ⟦X⟧,
+      coeff 0 J = 1
+        ∧ HasQExpansion 1 (fun τ ↦ 𝕢 1 τ * modularJ τ) (PowerSeries.map (Int.castRingHom ℂ) J) := by
   obtain ⟨U, hU0, hU⟩ := exists_hasQExpansion_discriminant
   have hq (τ : ℍ) : 𝕢 1 τ ≠ 0 := Periodic.qParam_ne_zero _
-  have hu : HasQExpansion 1 (fun τ ↦ discriminant τ / 𝕢 1 τ)
-      (PowerSeries.map (Int.castRingHom ℂ) U) :=
+  have hu
+      : HasQExpansion 1 (fun τ ↦ discriminant τ / 𝕢 1 τ) (PowerSeries.map (Int.castRingHom ℂ) U) :=
     .of_qParam_mul (hU.congr fun τ ↦ by field_simp [hq τ])
   have hE := (hasQExpansion_modularForm E₄).pow 3
   have heq (τ : ℍ) : 𝕢 1 τ ^ 1 * modularJ τ = E₄ τ ^ 3 / (discriminant τ / 𝕢 1 τ) := by
@@ -133,8 +135,9 @@ theorem exists_hasQExpansion_modularJ : ∃ J : ℤ⟦X⟧, coeff 0 J = 1 ∧
     exact ((hE.tendsto one_pos).div (hu.tendsto one_pos) (by simp [hU0])).isBigO_one ℝ
   have h1 := hasQExpansion_qParam_pow_mul modularJ_smul mdifferentiable_modularJ hbdd
   set φ := qExpansion 1 fun τ : ℍ ↦ 𝕢 1 τ ^ 1 * modularJ τ
-  have h2 := (h1.mul hu).unique one_pos (hE.congr fun τ ↦ by
-    rw [modularJ_def]; field_simp [hq τ, discriminant_ne_zero τ])
+  have h2 :=
+    (h1.mul hu).unique one_pos
+      (hE.congr fun τ ↦ by rw [modularJ_def]; field_simp [hq τ, discriminant_ne_zero τ])
   rw [qExpansion_E₄, ← map_pow] at h2
   set E : ℤ⟦X⟧ := (1 + 240 * PowerSeries.mk fun n ↦ (σ 3 n : ℤ)) ^ 3 with hE'
   have hUV : U * U.invOfUnit 1 = 1 := mul_invOfUnit U 1 (by simpa using hU0)
@@ -142,26 +145,28 @@ theorem exists_hasQExpansion_modularJ : ∃ J : ℤ⟦X⟧, coeff 0 J = 1 ∧
   rw [map_mul, ← h2, mul_assoc, ← map_mul, hUV, map_one, mul_one]
   simpa using h1
 
-theorem exists_polynomial_modularJ_of_hasQExpansion (A : AddSubgroup ℂ) {m : ℕ} {f : ℍ → ℂ}
-    {φ : ℂ⟦X⟧} (hinv : ∀ (γ : SL(2, ℤ)) (τ : ℍ), f (γ • τ) = f τ)
-    (hf : HasQExpansion 1 (fun τ ↦ 𝕢 1 τ ^ m * f τ) φ) (hA : ∀ k, coeff k φ ∈ A) :
-    ∃ P : Polynomial ℂ, P.natDegree ≤ m ∧ P.coeff m = coeff 0 φ ∧ (∀ i, P.coeff i ∈ A) ∧
-      ∀ τ, f τ = P.eval (modularJ τ) := by
+theorem exists_polynomial_modularJ_of_hasQExpansion
+    (A : AddSubgroup ℂ)
+    {m : ℕ} {f : ℍ → ℂ} {φ : ℂ⟦X⟧} (hinv : ∀ (γ : SL(2, ℤ)) (τ : ℍ), f (γ • τ) = f τ)
+    (hf : HasQExpansion 1 (fun τ ↦ 𝕢 1 τ ^ m * f τ) φ) (hA : ∀ k, coeff k φ ∈ A)
+    : ∃ P : Polynomial ℂ,
+      P.natDegree ≤ m ∧ P.coeff m = coeff 0 φ ∧ (∀ i, P.coeff i ∈ A)
+        ∧ ∀ τ, f τ = P.eval (modularJ τ) := by
   induction m generalizing f φ with
   | zero =>
     simp only [pow_zero, one_mul] at hf
-    have hs (γ : SL(2, ℤ)) : f ∣[(0 : ℤ)] γ = f := by
-      ext τ; simpa [SL_slash_apply] using hinv γ τ
-    let F : ModularForm 𝒮ℒ 0 :=
-      { toFun := f
-        slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦ hγ ▸ hs γ
-        holo' := hf.mdifferentiable one_pos
-        bdd_at_cusps' := fun {c} hc ↦ by
-          rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
-          rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
-          intro γ _
-          rw [hs γ]
-          exact hf.isBoundedAtImInfty one_pos }
+    have hs (γ : SL(2, ℤ)) : f ∣[(0 : ℤ)] γ = f := by ext τ; simpa [SL_slash_apply] using hinv γ τ
+    let F : ModularForm 𝒮ℒ 0 := {
+      toFun := f
+      slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦ hγ ▸ hs γ
+      holo' := hf.mdifferentiable one_pos
+      bdd_at_cusps' := fun {c} hc ↦ by
+        rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
+        rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
+        intro γ _
+        rw [hs γ]
+        exact hf.isBoundedAtImInfty one_pos
+    }
     obtain ⟨c, hc⟩ := ModularFormClass.levelOne_weight_zero_const F
     have hc' : f = fun _ ↦ c := hc
     have h0 : φ = C c := hf.unique one_pos (hc' ▸ HasQExpansion.const 1 c)
@@ -179,17 +184,20 @@ theorem exists_polynomial_modularJ_of_hasQExpansion (A : AddSubgroup ℂ) {m : �
       rw [hψ, map_sub, coeff_C_mul, ← map_pow, coeff_map]
       refine A.sub_mem (hA k) ?_
       simpa [mul_comm, hc] using A.zsmul_mem (hA 0) (coeff k (J ^ (m + 1)))
-    obtain ⟨χ, hχ⟩ : X ∣ ψ := X_dvd_iff.mpr (by
-      have : constantCoeff (PowerSeries.map (Int.castRingHom ℂ) J) = 1 := by
-        rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, hJ0, map_one]
-      simp [hψ, hc, this])
+    obtain ⟨χ, hχ⟩ : X ∣ ψ :=
+      X_dvd_iff.mpr (by
+        have : constantCoeff (PowerSeries.map (Int.castRingHom ℂ) J) = 1 := by
+          rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, hJ0, map_one]
+        simp [hψ, hc, this])
     have h2 : HasQExpansion 1 (fun τ ↦ 𝕢 1 τ ^ m * (f τ - c * modularJ τ ^ (m + 1))) χ :=
       .of_qParam_mul (hχ ▸ h1.congr fun τ ↦ by ring)
-    obtain ⟨P, hP1, -, hP3, hP4⟩ := ih (fun γ τ ↦ by rw [hinv, modularJ_smul]) h2
-      (fun k ↦ by simpa [hχ, coeff_succ_X_mul] using hψA (k + 1))
+    obtain ⟨P, hP1, -, hP3, hP4⟩ :=
+      ih
+        (fun γ τ ↦ by rw [hinv, modularJ_smul])
+        h2
+        (fun k ↦ by simpa [hχ, coeff_succ_X_mul] using hψA (k + 1))
     refine ⟨P + Polynomial.monomial (m + 1) c, ?_, ?_, fun i ↦ ?_, fun τ ↦ ?_⟩
-    · exact Polynomial.natDegree_add_le_of_degree_le (by omega)
-        (Polynomial.natDegree_monomial_le _)
+    · exact Polynomial.natDegree_add_le_of_degree_le (by omega) (Polynomial.natDegree_monomial_le _)
     · simp [Polynomial.coeff_eq_zero_of_natDegree_lt (Nat.lt_succ_of_le hP1)]
     · rw [Polynomial.coeff_add, Polynomial.coeff_monomial_apply]
       refine A.add_mem (hP3 i) ?_

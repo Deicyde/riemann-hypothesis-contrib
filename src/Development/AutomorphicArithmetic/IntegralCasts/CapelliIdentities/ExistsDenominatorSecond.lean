@@ -72,18 +72,18 @@ private lemma den_coprime_of_mul_eq {K V : Type*} [Field K] [NumberField K] [Add
       ring
     rwa [e]
 
-theorem UpperTheory.Reformulated.B.ExistsBaseFieldIntegerDenominator.exists_den :
-    ∀ {D : Formalism.BasicNotions.D7}
-    {Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Formalism.MainNotions.S.VS D).V},
-    Submodule.IsFullLattice D.host.E Λ →
-      ∀ (x : (Formalism.MainNotions.S.VS D).V),
-        ∃ (d : NumberField.RingOfIntegers ↥D.host.F),
-          d ≠ (0 : NumberField.RingOfIntegers ↥D.host.F) ∧
-            (Algebra.algebraMap (NumberField.RingOfIntegers ↥D.host.F) (NumberField.RingOfIntegers D.host.E) :
-                    NumberField.RingOfIntegers ↥D.host.F → NumberField.RingOfIntegers D.host.E)
-                  d •
-                x ∈
-              Λ := by
+theorem UpperTheory.Reformulated.B.ExistsBaseFieldIntegerDenominator.exists_den
+    : ∀ {D : Formalism.BasicNotions.D7}
+        {Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Formalism.MainNotions.S.VS D).V},
+      Submodule.IsFullLattice D.host.E Λ
+        → ∀ (x : (Formalism.MainNotions.S.VS D).V), ∃ (d : NumberField.RingOfIntegers ↥D.host.F),
+          d ≠ (0 : NumberField.RingOfIntegers ↥D.host.F)
+            ∧ (Algebra.algebraMap (NumberField.RingOfIntegers ↥D.host.F)
+                      (NumberField.RingOfIntegers D.host.E)
+                    : NumberField.RingOfIntegers ↥D.host.F → NumberField.RingOfIntegers D.host.E)
+                  d
+                • x
+              ∈ Λ := by
   intro D Λ hΛ x
   obtain ⟨n, hn, h⟩ := den_coprime_of_mul_eq Λ hΛ.span_eq_top x
   refine ⟨(n : NumberField.RingOfIntegers ↥D.host.F), Int.cast_ne_zero.2 hn, ?_⟩

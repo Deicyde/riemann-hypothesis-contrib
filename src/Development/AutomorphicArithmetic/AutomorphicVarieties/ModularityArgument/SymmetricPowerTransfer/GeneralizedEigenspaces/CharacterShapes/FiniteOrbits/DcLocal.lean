@@ -6,22 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem finsum_end_apply {α M : Type} [AddCommGroup M] [Module ℂ M] [Finite α]
-    (f : α → Module.End ℂ M) (x : M) : (∑ᶠ a, f a) x = ∑ᶠ a, f a x := by
+private theorem finsum_end_apply
+    {α M : Type} [AddCommGroup M] [Module ℂ M] [Finite α] (f : α → Module.End ℂ M) (x : M)
+    : (∑ᶠ a, f a) x = ∑ᶠ a, f a x := by
   cases nonempty_fintype α
   simp only [finsum_eq_sum_of_fintype, LinearMap.sum_apply]
 
-theorem UpperTheory.V.Z.Sym.So.dcLocal :
-    UpperTheory.V.Z.Sym.So.DcLocal := by
+theorem UpperTheory.V.Z.Sym.So.dcLocal : UpperTheory.V.Z.Sym.So.DcLocal := by
   intro H G V _ _ _ _ j p J U hpj hU hJ d hd
 
-  have hin : ∀ h : H, (h : H ⧸ J) ∈ MulAction.orbit J (d : H ⧸ J) →
-      ((j h : G) : G ⧸ U) ∈ MulAction.orbit U ((j d : G) : G ⧸ U) := by
+  have hin
+      : ∀ h : H,
+        (h : H ⧸ J) ∈ MulAction.orbit J (d : H ⧸ J)
+          → ((j h : G) : G ⧸ U) ∈ MulAction.orbit U ((j d : G) : G ⧸ U) := by
     rintro h ⟨a, ha⟩
     have h1 : (((a : H) * d : H) : H ⧸ J) = (h : H ⧸ J) := ha
     have h2 : ((a : H) * d)⁻¹ * h ∈ J := QuotientGroup.eq.1 h1
@@ -33,8 +37,9 @@ theorem UpperTheory.V.Z.Sym.So.dcLocal :
     refine QuotientGroup.eq.2 ?_
     simpa [map_mul] using h3
 
-  have hsurj : ∀ y ∈ MulAction.orbit U ((j d : G) : G ⧸ U),
-      ∃ h : H, (h : H ⧸ J) ∈ MulAction.orbit J (d : H ⧸ J) ∧ ((j h : G) : G ⧸ U) = y := by
+  have hsurj
+      : ∀ y ∈ MulAction.orbit U ((j d : G) : G ⧸ U), ∃ h : H,
+        (h : H ⧸ J) ∈ MulAction.orbit J (d : H ⧸ J) ∧ ((j h : G) : G ⧸ U) = y := by
     rintro y ⟨u, rfl⟩
     obtain ⟨hpu, hc⟩ := hU u u.2
     set c : G := (u : G) * (j (p u))⁻¹ with hcdef
@@ -43,7 +48,9 @@ theorem UpperTheory.V.Z.Sym.So.dcLocal :
     change ((j (p u * d) : G) : G ⧸ U) = (((u : G) * j d : G) : G ⧸ U)
     have hfac : (u : G) * j d = j (p u * d) * c := by
       have h1 : (u : G) = c * j (p u) := by simp [hcdef]
-      calc (u : G) * j d = c * j (p u * d) := by rw [map_mul, ← mul_assoc, ← h1]
+      calc
+        (u : G) * j d
+          = c * j (p u * d) := by rw [map_mul, ← mul_assoc, ← h1]
         _ = j (p u * d) * c := hc _
     rw [hfac]
     exact (QuotientGroup.mk_mul_of_mem _ hcU).symm

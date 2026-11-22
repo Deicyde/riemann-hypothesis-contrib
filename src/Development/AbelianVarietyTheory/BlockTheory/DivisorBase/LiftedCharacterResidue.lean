@@ -13,7 +13,9 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.LiftedCharacterResidue
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
   Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Mult
 open scoped TensorProduct
 
@@ -31,8 +33,8 @@ def stabLat (V : HSp D) : Subgroup (GA D V) where
   inv_mem' := by
     rintro a ⟨ha, ha'⟩
     refine ⟨(GfC V).inv_mem ha, fun z => ?_⟩
-    rw [← ha' ((finHom V a⁻¹).1.mulVec z), Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul, mul_inv_cancel,
-      map_one, Units.val_one, Matrix.one_mulVec]
+    rw [← ha' ((finHom V a⁻¹).1.mulVec z), Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul,
+      mul_inv_cancel, map_one, Units.val_one, Matrix.one_mulVec]
 
 def prinLev (V : HSp D) (N : ℕ) : Set (GA D V) :=
   {k | k ∈ stabLat V ∧ ∀ z ∈ latHat V, ∃ y ∈ latHat V, (finHom V k).1.mulVec z - z = N • y}

@@ -14,14 +14,16 @@ open Metric
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 theorem BrouwerFixedPoint.smooth_of_changeOfVariablesDegree
-    (hL : ChangeOfVariablesDegree.Statement) (n : ℕ) (g : (Fin n → ℝ) → Fin n → ℝ)
-    (hg : ContDiff ℝ ∞ g) (hgb : ∀ x, ‖g x‖ ≤ 1) : ∃ x, g x = x := by
+    (hL : ChangeOfVariablesDegree.Statement)
+    (n : ℕ) (g : (Fin n → ℝ) → Fin n → ℝ) (hg : ContDiff ℝ ∞ g) (hgb : ∀ x, ‖g x‖ ≤ 1)
+    : ∃ x, g x = x := by
   by_contra hne
   push Not at hne
   have hcont : ContinuousOn (fun x => ‖x - g x‖) (closedBall (0 : Fin n → ℝ) 2) :=
     (continuous_id.sub hg.continuous).norm.continuousOn
-  obtain ⟨x₀, -, hmin⟩ := (isCompact_closedBall (0 : Fin n → ℝ) 2).exists_isMinOn
-    (nonempty_closedBall.2 zero_le_two) hcont
+  obtain ⟨x₀, -, hmin⟩ :=
+    (isCompact_closedBall (0 : Fin n → ℝ) 2).exists_isMinOn (nonempty_closedBall.2 zero_le_two)
+      hcont
   have hε : 0 < ‖x₀ - g x₀‖ := norm_pos_iff.2 (sub_ne_zero.2 (hne x₀).symm)
   set δ := min ‖x₀ - g x₀‖ 1 with hδ_def
   have hδ : 0 < δ := lt_min hε one_pos
@@ -30,16 +32,14 @@ theorem BrouwerFixedPoint.smooth_of_changeOfVariablesDegree
   let φ : (Fin n → ℝ) → Fin n → ℝ := fun x => x - χ x • g x
   have hφ : ContDiff ℝ ∞ φ := contDiff_id.sub (χ.contDiff.smul hg)
   have hφc : HasCompactSupport (fun x => φ x - x) := by
-    have h : (fun x => φ x - x) = -((fun x => χ x) • g) := by
-      funext x; simp [φ]
+    have h : (fun x => φ x - x) = -((fun x => χ x) • g) := by funext x; simp [φ]
     rw [h]
     exact χ.hasCompactSupport.smul_right.neg
   have hφδ : ∀ x, δ ≤ ‖φ x‖ := by
     intro x
     by_cases hx : ‖x‖ ≤ 2
     · have hχ : χ x = 1 := χ.one_of_mem_closedBall (mem_closedBall_zero_iff.2 hx)
-      have h2 : ‖x₀ - g x₀‖ ≤ ‖x - g x‖ :=
-        isMinOn_iff.1 hmin x (mem_closedBall_zero_iff.2 hx)
+      have h2 : ‖x₀ - g x₀‖ ≤ ‖x - g x‖ := isMinOn_iff.1 hmin x (mem_closedBall_zero_iff.2 hx)
       simp only [φ, hχ, one_smul]
       exact (min_le_left _ _).trans h2
     · push Not at hx
@@ -54,16 +54,15 @@ theorem BrouwerFixedPoint.smooth_of_changeOfVariablesDegree
   have hzero : ∀ x, ψ (φ x) = 0 := by
     intro x
     by_contra h
-    have hmem : φ x ∈ ball (0 : Fin n → ℝ) δ := by
-      rw [← ψ.support_eq]; exact h
+    have hmem : φ x ∈ ball (0 : Fin n → ℝ) δ := by rw [← ψ.support_eq]; exact h
     rw [mem_ball_zero_iff] at hmem
     exact absurd (hφδ x) (not_le.2 hmem)
   have hL' := hL n φ hφ hφc ψ ψ.contDiff ψ.hasCompactSupport
   simp only [hzero, zero_mul, MeasureTheory.integral_zero] at hL'
   exact (ψ.integral_pos (μ := MeasureTheory.volume)).ne hL'
 
-theorem BrouwerFixedPoint.proof (hL : ChangeOfVariablesDegree.Statement) :
-    BrouwerFixedPoint.Statement := by
+theorem BrouwerFixedPoint.proof (hL : ChangeOfVariablesDegree.Statement)
+    : BrouwerFixedPoint.Statement := by
   intro n f hf hmaps
   by_contra hne
   push Not at hne
@@ -91,8 +90,9 @@ theorem BrouwerFixedPoint.proof (hL : ChangeOfVariablesDegree.Statement) :
   have hPlip : ∀ x y, dist (P x) (P y) ≤ dist x y := by
     intro x y
     refine (dist_pi_le_iff dist_nonneg).2 fun i => ?_
-    calc dist (P x i) (P y i) = |max (min (x i) 1) (-1) - max (min (y i) 1) (-1)| :=
-          Real.dist_eq _ _
+    calc
+      dist (P x i) (P y i)
+        = |max (min (x i) 1) (-1) - max (min (y i) 1) (-1)| := Real.dist_eq _ _
       _ ≤ |min (x i) 1 - min (y i) 1| := abs_max_sub_max_le_abs _ _ _
       _ ≤ max |x i - y i| |1 - 1| := abs_min_sub_min_le_max _ _ _ _
       _ = dist (x i) (y i) := by simp [Real.dist_eq]
@@ -122,20 +122,22 @@ theorem BrouwerFixedPoint.proof (hL : ChangeOfVariablesDegree.Statement) :
   have hgb : ∀ x, ‖c • G x‖ ≤ 1 := by
     intro x
     rw [norm_smul, Real.norm_of_nonneg hc0.le]
-    calc c * ‖G x‖ ≤ c * (1 + a) := mul_le_mul_of_nonneg_left (hGb x) hc0.le
+    calc
+      c * ‖G x‖
+        ≤ c * (1 + a) := mul_le_mul_of_nonneg_left (hGb x) hc0.le
       _ = 1 := hc
-  obtain ⟨x, hx⟩ := BrouwerFixedPoint.smooth_of_changeOfVariablesDegree hL n (fun x => c • G x)
-    (hG.const_smul c) hgb
+  obtain ⟨x, hx⟩ :=
+    BrouwerFixedPoint.smooth_of_changeOfVariablesDegree hL n
+      (fun x => c • G x)
+      (hG.const_smul c) hgb
   have hx' : c • G x = x := hx
   have hxB : x ∈ B := by
     rw [hB_def, mem_closedBall_zero_iff, ← hx']
     exact hgb x
   have hFx : F x = f x := by simp only [F, hPid x hxB]
-  have h1 : ‖f x - G x‖ < a := by
-    rw [← hFx, ← dist_eq_norm, dist_comm]; exact hGF x
+  have h1 : ‖f x - G x‖ < a := by rw [← hFx, ← dist_eq_norm, dist_comm]; exact hGF x
   have h2 : ‖G x - x‖ ≤ a := by
-    have h : G x - x = (1 - c) • G x := by
-      rw [sub_smul, one_smul, hx']
+    have h : G x - x = (1 - c) • G x := by rw [sub_smul, one_smul, hx']
     rw [h, norm_smul, Real.norm_of_nonneg (by linarith)]
     have := hGb x
     nlinarith

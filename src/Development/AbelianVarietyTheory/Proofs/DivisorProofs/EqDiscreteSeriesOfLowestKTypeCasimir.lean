@@ -25,10 +25,13 @@ theorem eq_discreteSeries_of_lowestKType_casimir : DatumEquiv := by
   obtain ⟨V', hV', hV0', hVK', hc'⟩ := arb_datum hD (casOnSmooth_of_isDS hD hgap)
   have htop := data_closGen_eq_top hgap hσ (isDerivedOn_smE hσ) hV hc hVK hirr hV0
   have htop' := data_closGen_eq_top hgap hσD (isDerivedOn_smE hσD) hV' hc' hVK' hD.2.2.2.1 hV0'
-  obtain ⟨U, hU⟩ := data_unitary_equiv hgap hσ (isDerivedOn_smE hσ) hV hc hVK hV0
-    hσD (isDerivedOn_smE hσD) hV' hc' hVK' hV0'
-  refine ⟨((LinearIsometryEquiv.ofTop _ _ htop).symm.trans U).trans (LinearIsometryEquiv.ofTop _ _ htop'),
-    fun g hg x => ?_⟩
+  obtain ⟨U, hU⟩ :=
+    data_unitary_equiv hgap hσ (isDerivedOn_smE hσ) hV hc hVK hV0 hσD (isDerivedOn_smE hσD) hV' hc'
+      hVK' hV0'
+  refine ⟨
+    ((LinearIsometryEquiv.ofTop _ _ htop).symm.trans U).trans (LinearIsometryEquiv.ofTop _ _ htop'),
+    fun g hg x => ?_
+  ⟩
   simp only [LinearIsometryEquiv.trans_apply, LinearIsometryEquiv.ofTop_apply]
   apply hU g hg
   simp only [LinearIsometryEquiv.ofTop_symm_apply_coe]

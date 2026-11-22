@@ -25,8 +25,7 @@ theorem isOpen_lt (γ : ValueGroupWithZero K) : IsOpen {x : K | valuation K x < 
   have := (valuation K).map_add_lt (x := y - x) (y := x) hy hx
   simpa using this
 
-theorem tendsto_pow {x : K} (h : valuation K x < 1) :
-    Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
+theorem tendsto_pow {x : K} (h : valuation K x < 1) : Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
   rw [(IsValuativeTopology.hasBasis_nhds_zero' K).tendsto_right_iff]
   intro γ hγ
   have : MulArchimedean (ValueGroupWithZero K) :=
@@ -50,9 +49,12 @@ end Place
 
 section Ext
 
-variable {F : Type} [Field F] [NumberField F] {l : ℕ} [Fact l.Prime]
-  {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Algebra ℚ_[l] K] {Ω : Type} [NormedField Ω] [NormedAlgebra ℚ_[l] Ω]
+variable
+  {F : Type} [Field F] [NumberField F]
+  {l : ℕ} [Fact l.Prime]
+  {K : Type}
+  [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [Algebra ℚ_[l] K]
+  {Ω : Type} [NormedField Ω] [NormedAlgebra ℚ_[l] Ω]
 
 end Ext
 

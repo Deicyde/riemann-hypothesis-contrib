@@ -12,7 +12,8 @@ namespace PI.FJMB
 
 variable {σ : Type*}
 
-private theorem fin_zero_lt_of_ne_zero {k : ℕ} (i : Fin (k + 1)) (hi : i ≠ 0) : (0 : Fin (k + 1)) < i := by
+private theorem fin_zero_lt_of_ne_zero {k : ℕ} (i : Fin (k + 1)) (hi : i ≠ 0)
+    : (0 : Fin (k + 1)) < i := by
   revert hi
   refine Fin.cases ?_ ?_ i
   · intro h
@@ -20,12 +21,14 @@ private theorem fin_zero_lt_of_ne_zero {k : ℕ} (i : Fin (k + 1)) (hi : i ≠ 0
   · intro j _
     exact Fin.succ_pos j
 
-private theorem aeval_fill_sub_multiple_of_zeroth_line {m n : ℕ} (ι : Fin (m + 1) × Fin n → σ) (hι : Function.Injective ι)
+private theorem aeval_fill_sub_multiple_of_zeroth_line
+    {m n : ℕ} (ι : Fin (m + 1) × Fin n → σ) (hι : Function.Injective ι)
     (f : MvPolynomial σ ℂ) (hf : ∀ b : Fin (m + 1), 0 < b → PI.FJM.bRow ι 0 b f = 0)
-    (M : Fin (m + 1) → Fin n → ℂ) (p : σ → ℂ) (c : Fin n) :
-    ∀ S : Finset (Fin (m + 1)), (0 : Fin (m + 1)) ∉ S →
-      aeval (fill ι (fun i k => if i ∈ S then M i k - M i c / M 0 c * M 0 k else M i k) p) f =
-        aeval (fill ι M p) f := by
+    (M : Fin (m + 1) → Fin n → ℂ) (p : σ → ℂ) (c : Fin n)
+    : ∀ S : Finset (Fin (m + 1)),
+      (0 : Fin (m + 1)) ∉ S
+        → aeval (fill ι (fun i k => if i ∈ S then M i k - M i c / M 0 c * M 0 k else M i k) p) f
+          = aeval (fill ι M p) f := by
   intro S
   refine Finset.induction_on S ?_ ?_
   · intro _
@@ -36,9 +39,11 @@ private theorem aeval_fill_sub_multiple_of_zeroth_line {m n : ℕ} (ι : Fin (m 
       exact hS (Finset.mem_insert_self _ _)
     have hS0 : (0 : Fin (m + 1)) ∉ S := fun h => hS (Finset.mem_insert_of_mem h)
     rw [← ih hS0]
-    have hfun : (fun i k => if i ∈ insert b S then M i k - M i c / M 0 c * M 0 k else M i k) =
-        rowAddM (fun i k => if i ∈ S then M i k - M i c / M 0 c * M 0 k else M i k) 0 b
-          (-(M b c / M 0 c)) := by
+    have hfun
+        : (fun i k => if i ∈ insert b S then M i k - M i c / M 0 c * M 0 k else M i k)
+          = rowAddM
+            (fun i k => if i ∈ S then M i k - M i c / M 0 c * M 0 k else M i k)
+            0 b (-(M b c / M 0 c)) := by
       funext i k
       by_cases hib : i = b
       · subst hib
@@ -47,12 +52,14 @@ private theorem aeval_fill_sub_multiple_of_zeroth_line {m n : ℕ} (ι : Fin (m 
     rw [hfun]
     exact row_inv ι hι 0 b (Ne.symm hb0) f (hf b (fin_zero_lt_of_ne_zero b hb0)) _ p _
 
-private theorem aeval_fill_column_elimination {m n : ℕ} (ι : Fin m × Fin (n + 1) → σ) (hι : Function.Injective ι)
+private theorem aeval_fill_column_elimination
+    {m n : ℕ} (ι : Fin m × Fin (n + 1) → σ) (hι : Function.Injective ι)
     (f : MvPolynomial σ ℂ) (hf : ∀ d : Fin (n + 1), 0 < d → PI.FJM.bCol ι 0 d f = 0)
-    (M : Fin m → Fin (n + 1) → ℂ) (p : σ → ℂ) (r : Fin m) :
-    ∀ T : Finset (Fin (n + 1)), (0 : Fin (n + 1)) ∉ T →
-      aeval (fill ι (fun i k => if k ∈ T then M i k - M r k / M r 0 * M i 0 else M i k) p) f =
-        aeval (fill ι M p) f := by
+    (M : Fin m → Fin (n + 1) → ℂ) (p : σ → ℂ) (r : Fin m)
+    : ∀ T : Finset (Fin (n + 1)),
+      (0 : Fin (n + 1)) ∉ T
+        → aeval (fill ι (fun i k => if k ∈ T then M i k - M r k / M r 0 * M i 0 else M i k) p) f
+          = aeval (fill ι M p) f := by
   intro T
   refine Finset.induction_on T ?_ ?_
   · intro _
@@ -63,9 +70,11 @@ private theorem aeval_fill_column_elimination {m n : ℕ} (ι : Fin m × Fin (n 
       exact hT (Finset.mem_insert_self _ _)
     have hT0 : (0 : Fin (n + 1)) ∉ T := fun h => hT (Finset.mem_insert_of_mem h)
     rw [← ih hT0]
-    have hfun : (fun i k => if k ∈ insert b T then M i k - M r k / M r 0 * M i 0 else M i k) =
-        colAddM (fun i k => if k ∈ T then M i k - M r k / M r 0 * M i 0 else M i k) 0 b
-          (-(M r b / M r 0)) := by
+    have hfun
+        : (fun i k => if k ∈ insert b T then M i k - M r k / M r 0 * M i 0 else M i k)
+          = colAddM
+            (fun i k => if k ∈ T then M i k - M r k / M r 0 * M i 0 else M i k)
+            0 b (-(M r b / M r 0)) := by
       funext i k
       by_cases hkb : k = b
       · subst hkb
@@ -74,8 +83,10 @@ private theorem aeval_fill_column_elimination {m n : ℕ} (ι : Fin m × Fin (n 
     rw [hfun]
     exact col_inv ι hι 0 b (Ne.symm hb0) f (hf b (fin_zero_lt_of_ne_zero b hb0)) _ p _
 
-theorem elim_step {m n : ℕ} (ι : Fin (m + 1) × Fin (n + 1) → σ) (hι : Function.Injective ι)
-    (f : MvPolynomial σ ℂ) (hf : HWB ι f) (hg : aeval (killS (edge ι)) f = 0) : f = 0 := by
+theorem elim_step
+    {m n : ℕ} (ι : Fin (m + 1) × Fin (n + 1) → σ) (hι : Function.Injective ι)
+    (f : MvPolynomial σ ℂ) (hf : HWB ι f) (hg : aeval (killS (edge ι)) f = 0)
+    : f = 0 := by
   haveI : Infinite ℂ := Infinite.of_injective (Nat.cast : ℕ → ℂ) Nat.cast_injective
   have key : ∀ y : σ → ℂ, y (ι (0, 0)) ≠ 0 → aeval y f = 0 := by
     intro y hc
@@ -92,30 +103,38 @@ theorem elim_step {m n : ℕ} (ι : Fin (m + 1) × Fin (n + 1) → σ) (hι : Fu
       · push_neg at hv
         exact fill_not ι M y v hv
     have h1 : aeval (fill ι M1 y) f = aeval (fill ι M y) f :=
-      aeval_fill_sub_multiple_of_zeroth_line ι hι f (fun b hb => hf.1 0 b hb) M y 0 (Finset.univ.erase 0) (by simp)
+      aeval_fill_sub_multiple_of_zeroth_line ι hι f
+        (fun b hb => hf.1 0 b hb)
+        M y 0 (Finset.univ.erase 0) (by simp)
     have h2 : aeval (fill ι M2 y) f = aeval (fill ι M1 y) f :=
-      aeval_fill_column_elimination ι hι f (fun d hd => hf.2 0 d hd) M1 y 0 (Finset.univ.erase 0) (by simp)
+      aeval_fill_column_elimination ι hι f
+        (fun d hd => hf.2 0 d hd)
+        M1 y 0 (Finset.univ.erase 0) (by simp)
     have hvan : ∀ v ∈ edge ι, fill ι M2 y v = 0 := by
       intro v hv
       simp only [edge, Set.mem_setOf_eq] at hv
       rcases hv with ⟨l, rfl⟩ | ⟨j, rfl⟩
       · rw [fill_ι hι]
         simp [M2, M1, M]
-        all_goals first
+        all_goals
+          first
           | (field_simp; done)
           | (field_simp; ring)
           | (rw [div_mul_cancel₀ _ hc, sub_self])
           | simp [hc]
       · rw [fill_ι hι]
         simp [M2, M1, M]
-        all_goals first
+        all_goals
+          first
           | (field_simp; done)
           | (field_simp; ring)
           | (rw [div_mul_cancel₀ _ hc, sub_self])
           | simp [hc]
     have h3 := aeval_killS_of_zero (edge ι) (fill ι M2 y) hvan f
     rw [hg, map_zero] at h3
-    calc aeval y f = aeval (fill ι M y) f := by rw [hy]
+    calc
+      aeval y f
+        = aeval (fill ι M y) f := by rw [hy]
       _ = aeval (fill ι M1 y) f := h1.symm
       _ = aeval (fill ι M2 y) f := h2.symm
       _ = 0 := h3.symm
@@ -126,14 +145,14 @@ theorem elim_step {m n : ℕ} (ι : Fin (m + 1) × Fin (n + 1) → σ) (hι : Fu
     by_cases hy0 : y (ι (0, 0)) = 0
     · rw [hy0, mul_zero]
     · have e : MvPolynomial.eval y f = aeval y f := by
-        first
-          | rfl
-          | simp [MvPolynomial.coe_aeval_eq_eval]
+        first | rfl | simp [MvPolynomial.coe_aeval_eq_eval]
       rw [e, key y hy0, zero_mul]
   exact (mul_eq_zero.mp hmul).resolve_right (MvPolynomial.X_ne_zero _)
 
-theorem diag_zero : ∀ (m n : ℕ) (ι : Fin m × Fin n → σ), Function.Injective ι → ∀ f : MvPolynomial σ ℂ,
-    HWB ι f → aeval (killS (offD ι)) f = 0 → f = 0 := by
+theorem diag_zero
+    : ∀ (m n : ℕ) (ι : Fin m × Fin n → σ),
+      Function.Injective ι
+        → ∀ f : MvPolynomial σ ℂ, HWB ι f → aeval (killS (offD ι)) f = 0 → f = 0 := by
   intro m
   induction m with
   | zero =>

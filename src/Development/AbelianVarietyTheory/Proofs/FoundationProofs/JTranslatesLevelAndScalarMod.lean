@@ -294,11 +294,28 @@ private lemma natCast_dvd_of_eq_sign_mul {x y : ℤ} {m : ℕ} {c : ℚ} (hc : c
     have h' : (x : ℚ) = ((m : ℤ) : ℚ) * ((-y : ℤ) : ℚ) := by push_cast; linarith
     exact_mod_cast h'
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.Scal.lev_and_scalar : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : _root_.GlobalTheory.KZ.Tower Ω ε), ∀ m : ℕ, 0 < m → (∀ g ∈ ({!![(m : ℤ), 0; 0, 1], !![1, 0; 0, (m : ℤ)], !![1, 1; 0, (m : ℤ)]} : Set (Matrix (Fin 2) (Fin 2) ℤ)), _root_.GlobalTheory.KZ.ES.Lev X m (X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK)) ∧ ∀ γ : SL(2, ℤ), (∀ g ∈ ({!![(m : ℤ), 0; 0, 1], !![1, 0; 0, (m : ℤ)], !![1, 1; 0, (m : ℤ)]} : Set (Matrix (Fin 2) (Fin 2) ℤ)), X.sl (_root_.GlobalTheory.KZ.ofSL γ) (X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK) = X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK) → (_root_.GlobalTheory.KZ.en γ 0 1 : ZMod m) = 0 ∧ (_root_.GlobalTheory.KZ.en γ 1 0 : ZMod m) = 0 ∧ (_root_.GlobalTheory.KZ.en γ 0 0 : ZMod m) = _root_.GlobalTheory.KZ.en γ 1 1 := by
+theorem _root_.GlobalTheory.KZ.ES.Scal.lev_and_scalar
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : _root_.GlobalTheory.KZ.Tower Ω ε),
+      ∀ m : ℕ,
+        0 < m
+          → (∀ g
+                ∈ ({!![(m : ℤ), 0; 0, 1], !![1, 0; 0, (m : ℤ)], !![1, 1; 0, (m : ℤ)]}
+                  : Set (Matrix (Fin 2) (Fin 2) ℤ)),
+              _root_.GlobalTheory.KZ.ES.Lev X m (X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK))
+            ∧ ∀ γ : SL(2, ℤ),
+              (∀ g
+                    ∈ ({!![(m : ℤ), 0; 0, 1], !![1, 0; 0, (m : ℤ)], !![1, 1; 0, (m : ℤ)]}
+                      : Set (Matrix (Fin 2) (Fin 2) ℤ)),
+                  X.sl (_root_.GlobalTheory.KZ.ofSL γ) (X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK)
+                    = X.sl (_root_.GlobalTheory.KZ.toGQ g) X.jK)
+                → (_root_.GlobalTheory.KZ.en γ 0 1 : ZMod m) = 0
+                  ∧ (_root_.GlobalTheory.KZ.en γ 1 0 : ZMod m) = 0
+                  ∧ (_root_.GlobalTheory.KZ.en γ 0 0 : ZMod m)
+                    = _root_.GlobalTheory.KZ.en γ 1 1 := by
   intro Ω _ _ _ ε X m hm
   haveI : NeZero m := ⟨hm.ne'⟩
   have hm' : (0 : ℤ) < m := by exact_mod_cast hm
@@ -311,71 +328,94 @@ theorem _root_.GlobalTheory.KZ.ES.Scal.lev_and_scalar : ∀ {Ω : Type} [Field �
     intro γ hγ
     rw [CongruenceSubgroup.Gamma_mem] at hγ
     obtain ⟨h00, h01, h10, h11⟩ := hγ
-    have hdet : (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 -
-        (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 = 1 := by
+    have hdet
+        : (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1
+            - (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0
+          = 1 := by
       have := γ.2
       rwa [Matrix.det_fin_two] at this
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hg
     rcases hg with rfl | rfl | rfl
     · obtain ⟨c', hc'⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ m).1 h10
-      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0,
-        m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1; c', (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1]) (by
+      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ
+        (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0,
+          m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1; c', (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1])
+        (by
           rw [Matrix.det_fin_two_of]
-          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 * hc') ?_
+          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 * hc')
+        ?_
       ext i j
-      fin_cases i <;> fin_cases j <;>
-        simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
-          toGQ_apply _ hd1, hc'] <;> ring
+      fin_cases i <;> fin_cases j
+        <;> simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
+          toGQ_apply _ hd1, hc']
+        <;> ring
     · obtain ⟨b', hb'⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ m).1 h01
-      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0, b';
-        m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0, (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1]) (by
+      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ
+        (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0, b';
+          m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0, (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1])
+        (by
           rw [Matrix.det_fin_two_of]
-          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * hb') ?_
+          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * hb')
+        ?_
       ext i j
-      fin_cases i <;> fin_cases j <;>
-        simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
-          toGQ_apply _ hd2, hb'] <;> ring
-    · have hz : (((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 -
-          (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℤ) : ZMod m) = 0 := by
+      fin_cases i <;> fin_cases j
+        <;> simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
+          toGQ_apply _ hd2, hb']
+        <;> ring
+    · have hz
+          : (((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1
+                  - (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0
+                : ℤ)
+              : ZMod m)
+            = 0 := by
         push_cast
         rw [h00, h01, h10, h11]
         ring
       obtain ⟨e', he'⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ m).1 hz
-      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 +
-        (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0, e'; m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0,
-        (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0]) (by
+      refine sl_ofSL_sl_jK_eq_of_mul_eq_intMatrix_mul X _ γ
+        (!![(γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 +
+          (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0, e'; m * (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0,
+          (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0])
+        (by
           rw [Matrix.det_fin_two_of]
-          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * he') ?_
-      have he'' : ((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 : ℚ) = (m : ℚ) * e' -
-          (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 +
-            (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 := by
+          linear_combination hdet + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * he')
+        ?_
+      have he''
+          : ((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 : ℚ)
+            = (m : ℚ) * e' - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0
+              + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 := by
         have := congrArg (fun z : ℤ => (z : ℚ)) he'
         push_cast at this
         linear_combination this
       ext i j
-      fin_cases i <;> fin_cases j <;>
-        simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
-          toGQ_apply _ hd3, he''] <;> ring
+      fin_cases i <;> fin_cases j
+        <;> simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, Matrix.map_apply,
+          toGQ_apply _ hd3, he'']
+        <;> ring
   · intro γ hfix
-    obtain ⟨σ₁, c₁, hc₁, e₁⟩ := exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![(m : ℤ), 0; 0, 1] (by simp))
-    obtain ⟨σ₂, c₂, hc₂, e₂⟩ := exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![1, 0; 0, (m : ℤ)] (by simp))
-    obtain ⟨σ₃, c₃, hc₃, e₃⟩ := exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![1, 1; 0, (m : ℤ)] (by simp))
+    obtain ⟨σ₁, c₁, hc₁, e₁⟩ :=
+      exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![(m : ℤ), 0; 0, 1] (by simp))
+    obtain ⟨σ₂, c₂, hc₂, e₂⟩ :=
+      exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![1, 0; 0, (m : ℤ)] (by simp))
+    obtain ⟨σ₃, c₃, hc₃, e₃⟩ :=
+      exists_smul_ofSL_mul_of_mul_ofSL X _ γ (hfix !![1, 1; 0, (m : ℤ)] (by simp))
     have E₁ := congrFun (congrFun e₁ 1) 0
     have E₂ := congrFun (congrFun e₂ 0) 1
     have E₃a := congrFun (congrFun e₃ 0) 0
     have E₃b := congrFun (congrFun e₃ 0) 1
-    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply,
-      toGQ_apply _ hd1] at E₁
-    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply,
-      toGQ_apply _ hd2] at E₂
-    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply,
-      toGQ_apply _ hd3] at E₃a E₃b
+    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, toGQ_apply _ hd1] at E₁
+    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, toGQ_apply _ hd2] at E₂
+    simp [Matrix.mul_apply, Fin.sum_univ_two, ofSL_apply, toGQ_apply _ hd3] at E₃a E₃b
     have hdiv₁ : (m : ℤ) ∣ (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 :=
-      natCast_dvd_of_eq_sign_mul (y := (σ₁ : Matrix (Fin 2) (Fin 2) ℤ) 1 0) hc₁ (by linear_combination E₁)
+      natCast_dvd_of_eq_sign_mul (y := (σ₁ : Matrix (Fin 2) (Fin 2) ℤ) 1 0) hc₁
+        (by linear_combination E₁)
     have hdiv₂ : (m : ℤ) ∣ (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 :=
-      natCast_dvd_of_eq_sign_mul (y := (σ₂ : Matrix (Fin 2) (Fin 2) ℤ) 0 1) hc₂ (by linear_combination E₂)
-    have hdiv₃ : (m : ℤ) ∣ (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 -
-        (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 :=
+      natCast_dvd_of_eq_sign_mul (y := (σ₂ : Matrix (Fin 2) (Fin 2) ℤ) 0 1) hc₂
+        (by linear_combination E₂)
+    have hdiv₃
+        : (m : ℤ)
+          ∣ (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 1 + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1
+            - (γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 - (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 :=
       natCast_dvd_of_eq_sign_mul (y := (σ₃ : Matrix (Fin 2) (Fin 2) ℤ) 0 1) hc₃
         (by push_cast; linear_combination E₃b - E₃a)
     have z₁ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ m).2 hdiv₁
@@ -383,7 +423,8 @@ theorem _root_.GlobalTheory.KZ.ES.Scal.lev_and_scalar : ∀ {Ω : Type} [Field �
     have z₃ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ m).2 hdiv₃
     push_cast at z₃
     refine ⟨z₂, z₁, ?_⟩
-    change (((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 : ℤ) : ZMod m) = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 : ℤ) : ZMod m)
+    change (((γ : Matrix (Fin 2) (Fin 2) ℤ) 0 0 : ℤ) : ZMod m)
+      = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1 : ℤ) : ZMod m)
     linear_combination -z₃ + z₂ - z₁
 
 end GlobalTheory.KZ.ES.Scal

@@ -10,17 +10,17 @@ noncomputable section
 
 namespace Formalism.L2.Geo.ExtensionFiltration.ExtInvMu
 
-open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Geo.ExtensionFiltration.ExtInvSk
+open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory
+  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Geo.ExtensionFiltration.ExtInvSk
 
 section Places
 
 variable (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
 
-
 open Classical in
-theorem card_fiber [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K) :
-    (Finset.univ.filter fun v' : InfinitePlace K' => v'.comap (algebraMap K K') = v).card =
-      finrank K K' := by
+theorem card_fiber [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K)
+    : (Finset.univ.filter fun v' : InfinitePlace K' => v'.comap (algebraMap K K') = v).card
+      = finrank K K' := by
   classical
   have h := InfinitePlace.unramifedPlacesOver_ncard_add_eq_finrank K' v
   have h0 : InfinitePlace.ramifiedPlacesOver K' v = ∅ := by
@@ -30,9 +30,11 @@ theorem card_fiber [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K)
     rintro ⟨_, hw⟩
     exact InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex _)
       (InfinitePlace.isRamified_iff.1 hw).2
-  have h1 : InfinitePlace.unramifiedPlacesOver K' v =
-      ((Finset.univ.filter fun v' : InfinitePlace K' => v'.comap (algebraMap K K') = v :
-        Finset (InfinitePlace K')) : Set (InfinitePlace K')) := by
+  have h1
+      : InfinitePlace.unramifiedPlacesOver K' v
+        = ((Finset.univ.filter fun v' : InfinitePlace K' => v'.comap (algebraMap K K') = v
+            : Finset (InfinitePlace K'))
+          : Set (InfinitePlace K')) := by
     ext w
     simp only [InfinitePlace.unramifiedPlacesOver, Set.mem_ofPred_eq, Finset.coe_filter,
       Finset.mem_univ, true_and]
@@ -49,7 +51,8 @@ theorem card_fiber [_root_.NumberField.IsTotallyComplex K] (v : InfinitePlace K)
   rw [h0, h1, Set.ncard_empty, mul_zero, add_zero, Set.ncard_coe_finset] at h
   exact h
 
-theorem nPl_ext [_root_.NumberField.IsTotallyComplex K] [_root_.NumberField.IsTotallyComplex K'] : nPl K' = finrank K K' * nPl K := by
+theorem nPl_ext [_root_.NumberField.IsTotallyComplex K] [_root_.NumberField.IsTotallyComplex K']
+    : nPl K' = finrank K K' * nPl K := by
   have h1 := sizeMu_finrank_eq K
   have h2 := sizeMu_finrank_eq K'
   have h3 := Module.finrank_mul_finrank ℚ K K'

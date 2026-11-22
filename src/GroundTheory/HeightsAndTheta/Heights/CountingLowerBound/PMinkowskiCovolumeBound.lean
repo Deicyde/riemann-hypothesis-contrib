@@ -55,20 +55,21 @@ theorem MinkowskiCovolumeBound.proof : MinkowskiCovolumeBound.Statement.{u} := b
   have hcovF := ZLattice.covolume_eq_measure_fundamentalDomain L volume fund
   have hF_fin : volume (ZSpan.fundamentalDomain (bZ.ofZLatticeBasis ℝ)) ≠ ⊤ :=
     (ZSpan.fundamentalDomain_isBounded _).measure_lt_top.ne
-  have hbig : volume (ZSpan.fundamentalDomain (bZ.ofZLatticeBasis ℝ)) * 2 ^ finrank ℝ V
-      < volume S := by
+  have hbig
+      : volume (ZSpan.fundamentalDomain (bZ.ofZLatticeBasis ℝ)) * 2 ^ finrank ℝ V < volume S := by
     rw [hS_vol, ← ENNReal.ofReal_toReal hF_fin, ← ENNReal.ofReal_ofNat 2,
       ← ENNReal.ofReal_pow (by norm_num), ← ENNReal.ofReal_mul ENNReal.toReal_nonneg,
       ENNReal.ofReal_lt_ofReal_iff (pow_pos (by positivity) _), mul_pow, ← hm_def,
       mul_comm _ (2 ^ m)]
     have : (volume (ZSpan.fundamentalDomain (bZ.ofZLatticeBasis ℝ))).toReal
-        = ZLattice.covolume L := by rw [hcovF]; rfl
+        = ZLattice.covolume L := by
+      rw [hcovF]; rfl
     rw [this]
     exact mul_lt_mul_of_pos_left hlt (by positivity)
   have : Countable L.toAddSubgroup := (inferInstance : Countable L)
   obtain ⟨x, hx0, hxS⟩ :=
-    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure (L := L.toAddSubgroup) fund
-      hS_symm hS_conv hbig
+    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure (L := L.toAddSubgroup) fund hS_symm
+      hS_conv hbig
 
   have hxL : (x : V) ∈ L := x.2
   have hxne : (x : V) ≠ 0 := fun h => hx0 (Subtype.ext h)
@@ -76,19 +77,21 @@ theorem MinkowskiCovolumeBound.proof : MinkowskiCovolumeBound.Statement.{u} := b
     intro i
     have := hxS
     simp only [S, f, Set.mem_preimage, mem_ball_zero_iff] at this
-    exact lt_of_le_of_lt (by simpa [Real.norm_eq_abs] using norm_le_pi_norm (WithLp.ofLp (b.repr (x : V))) i) this
+    exact lt_of_le_of_lt
+      (by simpa [Real.norm_eq_abs] using norm_le_pi_norm (WithLp.ofLp (b.repr (x : V))) i) this
   have hnormsq : ‖(x : V)‖ ^ 2 < lam ^ 2 := by
     rw [← b.repr.norm_map, EuclideanSpace.norm_sq_eq]
-    calc ∑ i, ‖b.repr (x : V) i‖ ^ 2 < ∑ _i : Fin m, c ^ 2 := by
-          apply Finset.sum_lt_sum_of_nonempty
-          · exact Finset.univ_nonempty_iff.mpr ⟨⟨0, hm⟩⟩
-          · intro i _
-            rw [Real.norm_eq_abs]
-            exact pow_lt_pow_left₀ (hcoord i) (abs_nonneg _) (by norm_num)
+    calc
+      ∑ i, ‖b.repr (x : V) i‖ ^ 2 < ∑ _i : Fin m, c ^ 2 := by
+        apply Finset.sum_lt_sum_of_nonempty
+        · exact Finset.univ_nonempty_iff.mpr ⟨⟨0, hm⟩⟩
+        · intro i _
+          rw [Real.norm_eq_abs]
+          exact pow_lt_pow_left₀ (hcoord i) (abs_nonneg _) (by norm_num)
       _ = lam ^ 2 := by
-          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hc, div_pow,
-            Real.sq_sqrt hm0.le]
-          field_simp
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hc, div_pow,
+          Real.sq_sqrt hm0.le]
+        field_simp
   have := hlow _ hxL hxne
   nlinarith [norm_nonneg (x : V)]
 

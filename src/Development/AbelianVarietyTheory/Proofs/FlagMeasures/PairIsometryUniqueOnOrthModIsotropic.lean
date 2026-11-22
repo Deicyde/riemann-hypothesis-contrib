@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LinearFormsBo
 
 @[expose] public section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,8 +20,10 @@ namespace GlobalTheory.LoopC.BetaUniq
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
 
-theorem keeps_orth {γ : S.V ≃ₗ[E] S.V} (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (P : Submodule E S.V)
-    (hP : ∀ x ∈ P, γ x ∈ P) : ∀ x ∈ orth S P, γ x ∈ orth S P := by
+theorem keeps_orth
+    {γ : S.V ≃ₗ[E] S.V} (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (P : Submodule E S.V) (hP : ∀ x ∈ P, γ x ∈ P)
+    : ∀ x ∈ orth S P, γ x ∈ orth S P := by
   have hle : P.map (γ : S.V →ₗ[E] S.V) ≤ P := by
     rintro _ ⟨x, hx, rfl⟩
     exact hP x hx
@@ -34,25 +37,27 @@ theorem keeps_orth {γ : S.V ≃ₗ[E] S.V} (hγ : γ ∈ Formalism.HermitianLat
   obtain ⟨y, hy, rfl⟩ := hy
   exact (hiso y x).trans (hx y hy)
 
-theorem exists_of_mem_gsmul {Λ : Submodule (𝓞 E) S.V} {g : ℕ} {a : S.V}
-    (h : a ∈ Ideal.span {(g : 𝓞 E)} • Λ) : ∃ l ∈ Λ, a = (g : E) • l := by
+theorem exists_of_mem_gsmul
+    {Λ : Submodule (𝓞 E) S.V} {g : ℕ} {a : S.V} (h : a ∈ Ideal.span {(g : 𝓞 E)} • Λ)
+    : ∃ l ∈ Λ, a = (g : E) • l := by
   rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists] at h
   obtain ⟨b, hb, rfl⟩ := h
   refine ⟨b, hb, ?_⟩
   rw [← algebraMap_smul E (g : 𝓞 E) b, map_natCast]
 
-theorem gsmul_mem {Λ : Submodule (𝓞 E) S.V} (g : ℕ) {l : S.V} (hl : l ∈ Λ) :
-    (g : E) • l ∈ Ideal.span {(g : 𝓞 E)} • Λ := by
+theorem gsmul_mem {Λ : Submodule (𝓞 E) S.V} (g : ℕ) {l : S.V} (hl : l ∈ Λ)
+    : (g : E) • l ∈ Ideal.span {(g : 𝓞 E)} • Λ := by
   rw [← map_natCast (algebraMap (𝓞 E) E) g, algebraMap_smul]
   exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) hl
 
-theorem int_pair {Λ : Submodule (𝓞 E) S.V} (hu : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) :
-    ∀ x ∈ Λ, ∀ y ∈ Λ, S.hT x y ∈ (1 : Submodule (𝓞 E) E) := fun x hx y hy => by
+theorem int_pair
+    {Λ : Submodule (𝓞 E) S.V} (hu : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    : ∀ x ∈ Λ, ∀ y ∈ Λ, S.hT x y ∈ (1 : Submodule (𝓞 E) E) := fun x hx y hy => by
   rw [← hu, Formalism.HermitianLatticesTheory.dualBasic_mem_dual] at hy
   exact hy x hx
 
-theorem exists_sub_smul_mem_orth {r : ℕ} {T' : E} (A : LFlag S r T') (hT : T' ≠ 0) :
-    ∀ x ∈ orth S (Xsp A), ∃ a : E, x - a • A.fl.z ∈ orth S (Xplus A) := by
+theorem exists_sub_smul_mem_orth {r : ℕ} {T' : E} (A : LFlag S r T') (hT : T' ≠ 0)
+    : ∀ x ∈ orth S (Xsp A), ∃ a : E, x - a • A.fl.z ∈ orth S (Xplus A) := by
   intro x hx
   rw [Formalism.MainNotions.mem_orth_iff] at hx
   refine ⟨S.hT A.fl.z x / (-T'), ?_⟩
@@ -66,16 +71,18 @@ end GlobalTheory.LoopC.BetaUniq
 
 namespace GlobalTheory.LoopC.BetaUniq
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
-    (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F : LFlag S r T) (A B : LFlag S r T')
-    (β₁ β₂ : S.V ≃ₗ[E] S.V), Submodule.IsLattice E Λ → Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ → 3 ≤ g → T' ≠ 0 →
-    (∀ x ∈ orth S (Xplus A), x ∉ Xsp A → 0 < Algebra.trace ℚ E (S.hT x x)) →
-    XLam Λ F ≤ Ideal.span {(g : 𝓞 E)} • Λ ⊔ XLam Λ A →
-    XLam Λ F ≤ Ideal.span {(g : 𝓞 E)} • Λ ⊔ XLam Λ B →
-    IsAutLam S Λ β₁ → (Xsp A).map (β₁ : S.V →ₗ[E] S.V) = Xsp B → β₁ A.fl.z - B.fl.z ∈ Xsp B →
-    IotaCompat Λ F A B β₁ g →
-    IsAutLam S Λ β₂ → (Xsp A).map (β₂ : S.V →ₗ[E] S.V) = Xsp B → β₂ A.fl.z - B.fl.z ∈ Xsp B →
-    IotaCompat Λ F A B β₂ g → ∀ x ∈ orth S (Xsp A), β₁ x - β₂ x ∈ Xsp B := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
+        (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F : LFlag S r T) (A B : LFlag S r T')
+        (β₁ β₂ : S.V ≃ₗ[E] S.V),
+      Submodule.IsLattice E Λ → Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ → 3 ≤ g
+        → T' ≠ 0 → (∀ x ∈ orth S (Xplus A), x ∉ Xsp A → 0 < Algebra.trace ℚ E (S.hT x x))
+        → XLam Λ F ≤ Ideal.span {(g : 𝓞 E)} • Λ ⊔ XLam Λ A
+        → XLam Λ F ≤ Ideal.span {(g : 𝓞 E)} • Λ ⊔ XLam Λ B → IsAutLam S Λ β₁
+        → (Xsp A).map (β₁ : S.V →ₗ[E] S.V) = Xsp B → β₁ A.fl.z - B.fl.z ∈ Xsp B
+        → IotaCompat Λ F A B β₁ g → IsAutLam S Λ β₂ → (Xsp A).map (β₂ : S.V →ₗ[E] S.V) = Xsp B
+        → β₂ A.fl.z - B.fl.z ∈ Xsp B → IotaCompat Λ F A B β₂ g
+        → ∀ x ∈ orth S (Xsp A), β₁ x - β₂ x ∈ Xsp B := by
   intro E _ _ _ S r T T' Λ g F A B β₁ β₂ hΛ hu hg hT' hpos hFA hFB h1a h1X h1z h1ι h2a h2X h2z h2ι
   have hg0 : (g : E) ≠ 0 := by exact_mod_cast (show g ≠ 0 by omega)
   have hΛ₁ : ∀ x, β₁ x ∈ Λ ↔ x ∈ Λ := FrEqv.aut_mem_iff h1a
@@ -92,22 +99,23 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace
   have hδ_apply : ∀ x, δ x = β₁.symm (β₂ x) := fun x => by
     rw [hδ_def, LinearEquiv.mul_apply, LinearEquiv.coe_inv]
   have hδ : δ ∈ Formalism.HermitianLatticesTheory.isom S.hT := mul_mem (inv_mem h1a.1) h2a.1
-  have hδX : ∀ x ∈ Xsp A, δ x ∈ Xsp A := fun x hx => by
-    rw [hδ_apply]; exact hX₁' _ (hX₂ x hx)
+  have hδX : ∀ x ∈ Xsp A, δ x ∈ Xsp A := fun x hx => by rw [hδ_apply]; exact hX₁' _ (hX₂ x hx)
   have hδz : δ A.fl.z - A.fl.z ∈ Xsp A := by
     have e : δ A.fl.z - A.fl.z = β₁.symm (β₂ A.fl.z - β₁ A.fl.z) := by
       rw [hδ_apply, map_sub, LinearEquiv.symm_apply_apply]
     rw [e]
     refine hX₁' _ ?_
     have := (Xsp B).sub_mem h2z h1z
-    convert this using 1; abel
+    convert this using 1
+    abel
   have hδXp : ∀ x ∈ Xplus A, δ x ∈ Xplus A := by
     intro x hx
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hx
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hb
     rw [map_add (f := _), map_smul]
     refine (Xplus A).add_mem (Submodule.mem_sup_left (hδX a ha)) ?_
-    have e : c • δ A.fl.z = c • (δ A.fl.z - A.fl.z) + c • A.fl.z := by rw [← smul_add]; congr 1; abel
+    have e : c • δ A.fl.z = c • (δ A.fl.z - A.fl.z) + c • A.fl.z := by
+      rw [← smul_add]; congr 1; abel
     rw [e]
     exact (Xplus A).add_mem (Submodule.mem_sup_left ((Xsp A).smul_mem c hδz))
       (Submodule.mem_sup_right (Submodule.smul_mem _ c (Submodule.mem_span_singleton_self _)))
@@ -131,17 +139,21 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace
     intro x hx
     obtain ⟨hxΛ, hxU⟩ := (hM x).1 hx
 
-    obtain ⟨l', hl'Λ, hl'⟩ := GlobalTheory.Mass.RowPerp.exists_sub_mem S.herm S.nondeg hΛ hu (orth S (Xsp F))
-      ((g : E)⁻¹ • x) (fun y hyΛ hy => by
-        have hyX : y ∈ Xsp F := GlobalTheory.Mass.RowPerp.mem_of_perp_perp S.nondeg (Xsp F) y fun w hw =>
-          Formalism.MainNotions.hT_swap_zero (hy w ((Formalism.MainNotions.mem_orth_iff _ _).2 hw))
-        obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 (hFA (Submodule.mem_inf.2 ⟨hyΛ, hyX⟩))
-        obtain ⟨l, hlΛ, rfl⟩ := exists_of_mem_gsmul ha
-        obtain ⟨t, ht⟩ := Submodule.mem_one.1 (hint x hxΛ l hlΛ)
-        refine Submodule.mem_one.2 ⟨t, ?_⟩
-        rw [LinearMap.map_smulₛₗ S.hT, LinearMap.smul_apply, map_add (f := _), map_smul,
-          hrad' x hxU b (Submodule.mem_inf.1 hb).2, add_zero, starRingEnd_apply, star_inv₀, star_natCast,
-          smul_eq_mul, smul_eq_mul, ht, inv_mul_cancel_left₀ hg0])
+    obtain ⟨l', hl'Λ, hl'⟩ :=
+      GlobalTheory.Mass.RowPerp.exists_sub_mem S.herm S.nondeg hΛ hu (orth S (Xsp F))
+        ((g : E)⁻¹ • x)
+        (fun y hyΛ hy => by
+          have hyX : y ∈ Xsp F :=
+            GlobalTheory.Mass.RowPerp.mem_of_perp_perp S.nondeg (Xsp F) y fun w hw =>
+              Formalism.MainNotions.hT_swap_zero (hy w
+                ((Formalism.MainNotions.mem_orth_iff _ _).2 hw))
+          obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 (hFA (Submodule.mem_inf.2 ⟨hyΛ, hyX⟩))
+          obtain ⟨l, hlΛ, rfl⟩ := exists_of_mem_gsmul ha
+          obtain ⟨t, ht⟩ := Submodule.mem_one.1 (hint x hxΛ l hlΛ)
+          refine Submodule.mem_one.2 ⟨t, ?_⟩
+          rw [LinearMap.map_smulₛₗ S.hT, LinearMap.smul_apply, map_add (f := _), map_smul,
+            hrad' x hxU b (Submodule.mem_inf.1 hb).2, add_zero, starRingEnd_apply, star_inv₀,
+            star_natCast, smul_eq_mul, smul_eq_mul, ht, inv_mul_cancel_left₀ hg0])
     set l : S.V := x - (g : E) • l' with hl_def
     have hlΛ : l ∈ Λ := by
       rw [hl_def, ← map_natCast (algebraMap (𝓞 E) E) g, algebraMap_smul]
@@ -164,7 +176,8 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace
         sup_le (sup_le le_sup_left hFB) le_sup_right
       have := (NgX Λ g F B).sub_mem hb1 hb2
       refine hle ?_
-      convert this using 1; abel
+      convert this using 1
+      abel
     obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 hdiff
     obtain ⟨lam, hlam, rfl⟩ := exists_of_mem_gsmul ha
     have hbA : β₁.symm b ∈ Xsp A := hX₁' b (Submodule.mem_inf.1 hb).2
@@ -179,21 +192,24 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace
     · rw [key]; exact hbA
   have hmain : ∀ x ∈ M, δ x - x ∈ Xsp A :=
     GlobalTheory.isom_sub_mem_of_congr E S.V S.hT U (Xsp A) M δ g S.herm hXU hrad hpos hMfg
-      (fun x hx => ((hM x).1 hx).2) hδ hδX hg hcong
+      (fun x hx => ((hM x).1 hx).2)
+      hδ hδX hg hcong
 
   have hext : ∀ x ∈ orth S (Xsp A), δ x - x ∈ Xsp A := by
     intro x hx
     obtain ⟨a, hy⟩ := exists_sub_smul_mem_orth A hT' x hx
     set y := x - a • A.fl.z with hy_def
-    have hfull : Submodule.IsFullLattice E Λ :=
-      { toIsLattice := hΛ, span_eq_top := GlobalTheory.LoopC.FunIdx.span_eq_top_of_unimodular Λ hΛ hu }
+    have hfull : Submodule.IsFullLattice E Λ := {
+      toIsLattice := hΛ
+      span_eq_top := GlobalTheory.LoopC.FunIdx.span_eq_top_of_unimodular Λ hΛ hu
+    }
     obtain ⟨d, hd0, hd⟩ := GlobalTheory.Mass.RowPerp.exists_smul_mem hfull y
-    have hdM : d • y ∈ M := (hM _).2 ⟨hd, by
-      rw [← algebraMap_smul E d y]; exact U.smul_mem _ hy⟩
+    have hdM : d • y ∈ M := (hM _).2 ⟨hd, by rw [← algebraMap_smul E d y]; exact U.smul_mem _ hy⟩
     have h1 := hmain _ hdM
     rw [← algebraMap_smul E d y, map_smul, ← smul_sub] at h1
     have hyX : δ y - y ∈ Xsp A :=
-      (Submodule.smul_mem_iff _ ((map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).mpr hd0)).1 h1
+      (Submodule.smul_mem_iff _ ((map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).mpr hd0)).1
+        h1
     have e : δ x - x = a • (δ A.fl.z - A.fl.z) + (δ y - y) := by
       rw [hy_def, map_sub, map_smul, smul_sub]; abel
     rw [e]

@@ -13,8 +13,8 @@ noncomputable section
 
 namespace Formalism.QuantumDeterminants
 
-def ggLastU (n : ℕ) : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ :=
-  fun i j => if i = Fin.last n ∧ j = Fin.last n then 1 else 0
+def ggLastU (n : ℕ) : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ := fun i j =>
+  if i = Fin.last n ∧ j = Fin.last n then 1 else 0
 
 lemma ggDet_swapBlocks (m : ℕ) :
     (fromBlocks (0 : Matrix (Fin m) (Fin m) ℂ) (1 : Matrix (Fin m) (Fin m) ℂ) 1 0).det = (-1) ^ m := by
@@ -183,9 +183,11 @@ lemma ggBlockA (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (
 theorem group_gram_holds : GGram := by
   intro k r z z' hz hz' g hg
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  have hM : gramM k r z z' g = fromBlocks (herm (Hpk k r) z z • ggLastU r) (Zhat k r z z' g)
-      (Zhat k r z z' g)ᴴ (herm (Hpk k r) z' z' • ggLastU r) := by
-    ext (a|a) (b|b)
+  have hM
+      : gramM k r z z' g
+        = fromBlocks (herm (Hpk k r) z z • ggLastU r) (Zhat k r z z' g) (Zhat k r z z' g)ᴴ
+          (herm (Hpk k r) z' z' • ggLastU r) := by
+    ext (a | a) (b | b)
     · exact ggBlockA k r z hz a b
     · rfl
     · show herm (Hpk k r) (fvec k r z b) (g *ᵥ fvec k r z' a) = star (Zhat k r z z' g b a)
@@ -201,8 +203,10 @@ theorem group_gram_holds : GGram := by
     have h1 : ((herm (Hpk k r) w w).re : ℂ) = herm (Hpk k r) w w := Complex.conj_eq_iff_re.1 hc
     rw [← h1, Tz, neg_neg]
   have hD1 : Dmin k r z z' g (Fin.last (r + 1)) = (Zhat k r z z' g).det := rfl
-  have hD0 : Dmin k r z z' g ⟨r, by omega⟩ =
-      ((Zhat k r z z' g).submatrix Fin.castSucc Fin.castSucc).det := rfl
+  have hD0
+      : Dmin k r z z' g ⟨r, by omega⟩
+        = ((Zhat k r z z' g).submatrix Fin.castSucc Fin.castSucc).det :=
+    rfl
   rw [hM, ggDet_keyM, det_conjTranspose, ← conjTranspose_submatrix, det_conjTranspose, ← mul_assoc,
     ← pow_add, Even.neg_one_pow ⟨r + 1, rfl⟩, one_mul, hreal z, hreal z']
   unfold Gf
@@ -243,7 +247,8 @@ theorem reverse_cauchy_schwarz_holds : RevCS := by
   set B := ∑ i ∈ s, ‖z' i‖ ^ 2 with hB
   have hA0 : 0 ≤ A := Finset.sum_nonneg (fun i _ => by positivity)
   have hB0 : 0 ≤ B := Finset.sum_nonneg (fun i _ => by positivity)
-  have hre : ∀ w : Fin (2 * r + k + 1) → ℂ, (∑ i ∈ s, star (w i) * w i).re = ∑ i ∈ s, ‖w i‖ ^ 2 := by
+  have hre
+      : ∀ w : Fin (2 * r + k + 1) → ℂ, (∑ i ∈ s, star (w i) * w i).re = ∑ i ∈ s, ‖w i‖ ^ 2 := by
     intro w
     rw [Complex.re_sum]
     exact Finset.sum_congr rfl (fun i _ => ggRe_star_mul (w i))

@@ -25,20 +25,20 @@ theorem cols_span (S : Submodule K (Fin n → K)) : Submodule.span K (Set.range 
 def form (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (u v : Fin n → K) : K :=
   (fun i => σ (u i)) ⬝ᵥ (D *ᵥ v)
 
-theorem form_add_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (u u' v : Fin n → K) :
-    form σ D (u + u') v = form σ D u v + form σ D u' v := by
+theorem form_add_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (u u' v : Fin n → K)
+    : form σ D (u + u') v = form σ D u v + form σ D u' v := by
   simp [form, dotProduct, add_mul, Finset.sum_add_distrib]
 
-theorem form_smul_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (c : K) (u v : Fin n → K) :
-    form σ D (c • u) v = σ c * form σ D u v := by
+theorem form_smul_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (c : K) (u v : Fin n → K)
+    : form σ D (c • u) v = σ c * form σ D u v := by
   simp [form, dotProduct, Finset.mul_sum, mul_assoc]
 
-theorem form_zero_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (v : Fin n → K) :
-    form σ D 0 v = 0 := by
+theorem form_zero_left (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (v : Fin n → K)
+    : form σ D 0 v = 0 := by
   simp [form, dotProduct]
 
-theorem mem_perpD (σ : K →+* K) (d : GL (Fin n) K) (W : Submodule K (Fin n → K)) (v : Fin n → K) :
-    v ∈ perpD σ d W ↔ ∀ x ∈ W, form σ (d⁻¹).val x v = 0 := by
+theorem mem_perpD (σ : K →+* K) (d : GL (Fin n) K) (W : Submodule K (Fin n → K)) (v : Fin n → K)
+    : v ∈ perpD σ d W ↔ ∀ x ∈ W, form σ (d⁻¹).val x v = 0 := by
   have h1 : d.val * (d⁻¹).val = 1 := Units.mul_inv d
   have h2 : (d⁻¹).val * d.val = 1 := Units.inv_mul d
   constructor
@@ -52,9 +52,11 @@ theorem mem_perpD (σ : K →+* K) (d : GL (Fin n) K) (W : Submodule K (Fin n �
     refine ⟨(d⁻¹).val *ᵥ v, fun x hx => h x hx, ?_⟩
     rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, h1, Matrix.one_mulVec]
 
-theorem form_swap (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x) (D γ : Matrix (Fin n) (Fin n) K)
-    (hγ : D * γ = (D.map σ)ᵀ) (u v : Fin n → K) :
-    form σ D u (γ *ᵥ v) = σ (form σ D v u) := by
+theorem form_swap
+    (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x)
+    (D γ : Matrix (Fin n) (Fin n) K) (hγ : D * γ = (D.map σ)ᵀ)
+    (u v : Fin n → K)
+    : form σ D u (γ *ᵥ v) = σ (form σ D v u) := by
   simp only [form, Matrix.mulVec_mulVec, hγ]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [dotProduct, mulVec, map_sum, map_mul, hσ, transpose_apply, map_apply, Finset.mul_sum]
@@ -62,34 +64,41 @@ theorem form_swap (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x) (D γ : Matrix (
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem entry {κ κ' : Type} [Fintype κ] [Fintype κ'] (σ : K →+* K)
-    (D : Matrix (Fin n) (Fin n) K) (M : Matrix (Fin n) κ K) (N : Matrix (Fin n) κ' K) (i j) :
-    ((M.map σ)ᵀ * D * N) i j = form σ D (fun k => M k i) (fun k => N k j) := by
+theorem entry
+    {κ κ' : Type} [Fintype κ] [Fintype κ']
+    (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (M : Matrix (Fin n) κ K) (N : Matrix (Fin n) κ' K)
+    (i j)
+    : ((M.map σ)ᵀ * D * N) i j = form σ D (fun k => M k i) (fun k => N k j) := by
   rw [Matrix.mul_assoc]; rfl
 
-theorem entry_mulVec {κ κ' : Type} [Fintype κ] [Fintype κ'] (σ : K →+* K)
-    (D : Matrix (Fin n) (Fin n) K) (M : Matrix (Fin n) κ K) (N : Matrix (Fin n) κ' K)
-    (c : κ' → K) (i) :
-    (((M.map σ)ᵀ * D * N) *ᵥ c) i = form σ D (fun k => M k i) (N *ᵥ c) := by
+theorem entry_mulVec
+    {κ κ' : Type} [Fintype κ] [Fintype κ']
+    (σ : K →+* K) (D : Matrix (Fin n) (Fin n) K) (M : Matrix (Fin n) κ K) (N : Matrix (Fin n) κ' K)
+    (c : κ' → K) (i)
+    : (((M.map σ)ᵀ * D * N) *ᵥ c) i = form σ D (fun k => M k i) (N *ᵥ c) := by
   rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]; rfl
 
-theorem exists_adapted (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x) (d : GL (Fin n) K)
-    (γ : Matrix (Fin n) (Fin n) K) (hγ : (d⁻¹).val * γ = ((d⁻¹).val.map σ)ᵀ)
-    (W : Submodule K (Fin n → K)) (hW : W.map (Matrix.toLin' γ) = W) :
-    ∃ (a b : ℕ) (B : Matrix (Fin n) (Fin a) K) (A : Matrix (Fin n) (Fin b) K),
-      LinearIndependent K (fromCols B A)ᵀ ∧
-      Submodule.span K (Set.range Bᵀ) = W ⊓ perpD σ d W ∧
-      Submodule.span K (Set.range (fromCols B A)ᵀ) = W ∧
-      ((fromCols B A).map σ)ᵀ * (d⁻¹).val * B = 0 ∧ (B.map σ)ᵀ * (d⁻¹).val * fromCols B A = 0 ∧
-      ((A.map σ)ᵀ * (d⁻¹).val * A).det ≠ 0 := by
+theorem exists_adapted
+    (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x)
+    (d : GL (Fin n) K) (γ : Matrix (Fin n) (Fin n) K) (hγ : (d⁻¹).val * γ = ((d⁻¹).val.map σ)ᵀ)
+    (W : Submodule K (Fin n → K)) (hW : W.map (Matrix.toLin' γ) = W)
+    : ∃ (a b : ℕ) (B : Matrix (Fin n) (Fin a) K) (A : Matrix (Fin n) (Fin b) K),
+      LinearIndependent K (fromCols B A)ᵀ ∧ Submodule.span K (Set.range Bᵀ) = W ⊓ perpD σ d W
+        ∧ Submodule.span K (Set.range (fromCols B A)ᵀ) = W
+        ∧ ((fromCols B A).map σ)ᵀ * (d⁻¹).val * B = 0 ∧ (B.map σ)ᵀ * (d⁻¹).val * fromCols B A = 0
+        ∧ ((A.map σ)ᵀ * (d⁻¹).val * A).det ≠ 0 := by
   obtain ⟨Q, hQ⟩ := Submodule.exists_isCompl (W ⊓ perpD σ d W)
   have hC : (W ⊓ perpD σ d W) ⊔ (Q ⊓ W) = W := by
     rw [← sup_inf_assoc_of_le Q (inf_le_left : W ⊓ perpD σ d W ≤ W), hQ.sup_eq_top, top_inf_eq]
   have hdis : Disjoint (W ⊓ perpD σ d W) (Q ⊓ W) := hQ.disjoint.mono_right inf_le_left
-  obtain ⟨a, u, hu, hus⟩ : ∃ (a : ℕ) (u : Fin a → Fin n → K), LinearIndependent K u ∧
-      Submodule.span K (Set.range u) = W ⊓ perpD σ d W := ⟨_, _, cols_li _, cols_span _⟩
-  obtain ⟨b, v, hv, hvs⟩ : ∃ (b : ℕ) (v : Fin b → Fin n → K), LinearIndependent K v ∧
-      Submodule.span K (Set.range v) = Q ⊓ W := ⟨_, _, cols_li _, cols_span _⟩
+  obtain ⟨a, u, hu, hus⟩
+      : ∃ (a : ℕ) (u : Fin a → Fin n → K),
+        LinearIndependent K u ∧ Submodule.span K (Set.range u) = W ⊓ perpD σ d W :=
+    ⟨_, _, cols_li _, cols_span _⟩
+  obtain ⟨b, v, hv, hvs⟩
+      : ∃ (b : ℕ) (v : Fin b → Fin n → K),
+        LinearIndependent K v ∧ Submodule.span K (Set.range v) = Q ⊓ W :=
+    ⟨_, _, cols_li _, cols_span _⟩
   have hum : ∀ j, u j ∈ W ⊓ perpD σ d W := fun j => hus ▸ Submodule.subset_span ⟨j, rfl⟩
   have hvm : ∀ j, v j ∈ Q ⊓ W := fun j => hvs ▸ Submodule.subset_span ⟨j, rfl⟩
   obtain ⟨B, hB⟩ : ∃ B : Matrix (Fin n) (Fin a) K, Bᵀ = u := ⟨(Matrix.of u)ᵀ, rfl⟩
@@ -160,7 +169,8 @@ theorem exists_adapted (σ : K →+* K) (hσ : ∀ x, σ (σ x) = x) (d : GL (Fi
 
 theorem radical : Radical := by
   intro E _ _ _ n d W hW
-  have hσ : ∀ x, conjE E (conjE E x) = x := fun x => NumberField.IsCMField.complexConj_apply_apply E x
+  have hσ : ∀ x, conjE E (conjE E x) = x := fun x =>
+    NumberField.IsCMField.complexConj_apply_apply E x
   refine exists_adapted (conjE E) hσ d (nrm d).val ?_ W hW
   have h2 : (d⁻¹).val * d.val = 1 := Units.inv_mul d
   rw [nrm, Units.val_mul, ← mul_assoc, h2, one_mul, thetaR_val]

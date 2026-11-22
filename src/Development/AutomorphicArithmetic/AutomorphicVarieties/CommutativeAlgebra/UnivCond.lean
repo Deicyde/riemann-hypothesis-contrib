@@ -7,18 +7,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem lift_map_map' {O : Type} [CommRing O] [IsLocalRing O] {Γ ι : Type} [Group Γ]
-    [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι] {rbar : Γ →* Matrix ι ι (ResidueField O)}
-    {R R' R'' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
-    [CommRing R''] [Algebra O R''] [IsCO O R''] (f : R →ₐ[O] R') (g : R' →ₐ[O] R'')
-    (r : Lift O rbar R) : Lift.map g (Lift.map f r) = Lift.map (g.comp f) r := by
+private theorem lift_map_map'
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι]
+    {rbar : Γ →* Matrix ι ι (ResidueField O)} {R R' R'' : Type} [CommRing R] [Algebra O R]
+    [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R'] [CommRing R''] [Algebra O R''] [IsCO O R'']
+    (f : R →ₐ[O] R') (g : R' →ₐ[O] R'') (r : Lift O rbar R)
+    : Lift.map g (Lift.map f r) = Lift.map (g.comp f) r := by
   apply Lift.ext
   ext x a b
   rfl
 
-theorem UpperTheory.V.Alg.univ_cond :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (Γ ι : Type) [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (r : Lift O rbar R) (P₀ P : Cond O rbar), Represents P₀ r → P.IsClosed → (∃ (R₁ : Type) (_ : CommRing R₁) (_ : Algebra O R₁) (_ : IsCO O R₁) (r₁ : Lift O rbar R₁), P₀ R₁ r₁ ∧ P R₁ r₁) →
-      ∃ (R' : Type) (_ : CommRing R') (_ : Algebra O R') (_ : IsCO O R') (p : R →ₐ[O] R'), Function.Surjective p ∧ Represents (fun C _ _ _ s => P₀ C s ∧ P C s) (r.map p) := by
+theorem UpperTheory.V.Alg.univ_cond
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (Γ ι : Type) [Group Γ] [TopologicalSpace Γ]
+        [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) (R : Type)
+        [CommRing R] [Algebra O R] [IsCO O R] (r : Lift O rbar R) (P₀ P : Cond O rbar),
+      Represents P₀ r → P.IsClosed
+        → (∃ (R₁ : Type) (_ : CommRing R₁) (_ : Algebra O R₁) (_ : IsCO O R₁) (r₁ : Lift O rbar R₁),
+          P₀ R₁ r₁ ∧ P R₁ r₁)
+        → ∃ (R' : Type) (_ : CommRing R') (_ : Algebra O R') (_ : IsCO O R') (p : R →ₐ[O] R'),
+          Function.Surjective p ∧ Represents (fun C _ _ _ s => P₀ C s ∧ P C s) (r.map p) := by
   intro O _ _ Γ ι _ _ _ _ rbar R _ _ _ r P₀ P hrep hcl hex
   obtain ⟨I, hI⟩ := hcl R r
   obtain ⟨R₁, _, _, _, r₁, h0, h1⟩ := hex
@@ -41,7 +49,15 @@ theorem UpperTheory.V.Alg.univ_cond :
     intro x hx
     rw [Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.subset_span hx
-  refine ⟨R ⧸ J, inferInstance, inferInstance, hco, Ideal.Quotient.mkₐ O J, Ideal.Quotient.mkₐ_surjective O J, ?_⟩
+  refine ⟨
+    R ⧸ J,
+    inferInstance,
+    inferInstance,
+    hco,
+    Ideal.Quotient.mkₐ O J,
+    Ideal.Quotient.mkₐ_surjective O J,
+    ?_
+  ⟩
   intro R'' _ _ _
   refine ⟨fun g => ?_, fun r' hr' => ?_⟩
   · rw [lift_map_map']

@@ -32,9 +32,7 @@ theorem jι_ne_zero {a : 𝓞 F} (ha : a ≠ 0) : jK (ι a) ≠ 0 := by
   apply ha
   have h1 : algebraMap F K (a : F) = 0 := h0
   rw [map_eq_zero] at h1
-  first
-  | exact_mod_cast h1
-  | exact RingOfIntegers.ext h1
+  first | exact_mod_cast h1 | exact RingOfIntegers.ext h1
 
 theorem IsUnif0.ne_zero {𝔭 : Ideal (𝓞 F)} {π₀ s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π₀ s₀) : π₀ ≠ 0 := by
   rintro rfl
@@ -44,8 +42,9 @@ theorem ne_zero_of_notMem {𝔭 : Ideal (𝓞 F)} {t : 𝓞 F} (ht : t ∉ 𝔭)
   rintro rfl
   exact ht (Submodule.zero_mem _)
 
-theorem mem_noncompactPart_iff {𝔭 : Ideal (𝓞 F)} [h𝔭 : 𝔭.IsPrime] {π₀ s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π₀ s₀) (k : ℕ)
-    (a : K) : InP 𝔭 k a ↔ ∃ s ∈ SP K 𝔭, a = jK (ι π₀) ^ k * s := by
+theorem mem_noncompactPart_iff
+    {𝔭 : Ideal (𝓞 F)} [h𝔭 : 𝔭.IsPrime] {π₀ s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π₀ s₀) (k : ℕ) (a : K)
+    : InP 𝔭 k a ↔ ∃ s ∈ SP K 𝔭, a = jK (ι π₀) ^ k * s := by
   have hp : 𝔭.IsPrime := h𝔭
   constructor
   · rintro ⟨t, ht, z, hz, e⟩
@@ -82,19 +81,22 @@ theorem exists_norm (hF : IsFixF K F) (u : 𝓞 K) : ∃ n₀ : 𝓞 F, ι n₀ 
     exact (isIntegral_algHom_iff ((algebraMap F K).toIntAlgHom) (algebraMap F K).injective).mp h1
   exact ⟨⟨f, hint⟩, RingOfIntegers.ext hf⟩
 
-theorem isLocUnif (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) [hp : 𝔭.IsPrime] {π₀ s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π₀ s₀) :
-    IsLocUnif (SP K 𝔭) (jK (ι π₀)) := by
-  refine
-    { star_mem := fun a ha => InP.conj hF ha
-      mem := jK_mem_SP _
-      fix := star_ι hF _
-      ne := jι_ne_zero hu.ne_zero
-      tr := ?tr
-      skew := ?skew
-      dv := ?dv
-      rad := ?rad
-      arch := ?arch }
+theorem isLocUnif
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) [hp : 𝔭.IsPrime]
+    {π₀ s₀ : 𝓞 F} (hu : IsUnif0 𝔭 π₀ s₀)
+    : IsLocUnif (SP K 𝔭) (jK (ι π₀)) := by
+  refine {
+    star_mem := fun a ha => InP.conj hF ha
+    mem := jK_mem_SP _
+    fix := star_ι hF _
+    ne := jι_ne_zero hu.ne_zero
+    tr := ?tr
+    skew := ?skew
+    dv := ?dv
+    rad := ?rad
+    arch := ?arch
+  }
   case tr =>
     obtain ⟨z, hz⟩ := exists_add_conj_eq hK hF (1 : 𝓞 F)
     refine ⟨jK z, jK_mem_SP _, ?_⟩
@@ -149,8 +151,7 @@ theorem isLocUnif (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsF
     obtain ⟨n₀, hn₀⟩ := exists_norm hF (ι t + ι π₀ * z)
     have hn : n₀ ∉ 𝔭 := by
       intro hmem
-      have hconj (a : 𝓞 F) : conjO K (ι a) = ι a :=
-        jK_inj (star_ι hF a)
+      have hconj (a : 𝓞 F) : conjO K (ι a) = ι a := jK_inj (star_ι hF a)
       have h1 : ι (n₀ - t * t) ∈ extP K 𝔭 := by
         have : ι (n₀ - t * t) = ι π₀ * (z * ι t + ι t * conjO K z + ι π₀ * z * conjO K z) := by
           rw [map_sub, hn₀, map_add (f := _), map_mul (conjO K), hconj t, hconj π₀, map_mul]
@@ -158,8 +159,7 @@ theorem isLocUnif (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsF
         rw [this]
         exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem ι hu.mem)
       have hdiff : n₀ - t * t ∈ 𝔭 := by
-        have hcomap : (extP K 𝔭).comap ι = 𝔭 :=
-          Ideal.comap_map_eq_self_of_faithfullyFlat 𝔭
+        have hcomap : (extP K 𝔭).comap ι = 𝔭 := Ideal.comap_map_eq_self_of_faithfullyFlat 𝔭
         rw [← hcomap]
         exact Ideal.mem_comap.mpr h1
       have h2 : t * t ∈ 𝔭 := by

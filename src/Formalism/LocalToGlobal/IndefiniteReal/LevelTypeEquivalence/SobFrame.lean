@@ -8,8 +8,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.PHeisFC
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
 open scoped TensorProduct
 
 namespace Formalism.IndefR.Eqv
@@ -18,16 +19,19 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-abbrev cED (D : D7) : AE D ≃L[AF D.host.F] (Fin (PHeisFC.nE D) → AF D.host.F) := PHeisFC.cE D.host.F D.host.E
+abbrev cED (D : D7) : AE D ≃L[AF D.host.F] (Fin (PHeisFC.nE D) → AF D.host.F) :=
+  PHeisFC.cE D.host.F D.host.E
 
 def eInf (D : D7) : AF D.host.F := pairA D.host.F 1 0
 
 def eFin (D : D7) : AF D.host.F := pairA D.host.F 0 1
 
-def cEf (D : D7) : (Af D.host.F ⊗[D.host.F] D.host.E) ≃ₗ[Af D.host.F] (Fin (PHeisFC.nE D) → Af D.host.F) :=
+def cEf (D : D7)
+    : (Af D.host.F ⊗[D.host.F] D.host.E) ≃ₗ[Af D.host.F] (Fin (PHeisFC.nE D) → Af D.host.F) :=
   (Algebra.TensorProduct.basis (Af D.host.F) (Module.finBasis D.host.F D.host.E)).equivFun
 
-def cEi (D : D7) : (Ainf D.host.F ⊗[D.host.F] D.host.E) ≃ₗ[Ainf D.host.F] (Fin (PHeisFC.nE D) → Ainf D.host.F) :=
+def cEi (D : D7)
+    : (Ainf D.host.F ⊗[D.host.F] D.host.E) ≃ₗ[Ainf D.host.F] (Fin (PHeisFC.nE D) → Ainf D.host.F) :=
   (Algebra.TensorProduct.basis (Ainf D.host.F) (Module.finBasis D.host.F D.host.E)).equivFun
 
 theorem cEf_finPart (x : AE D) : cEf D (finPart D x) = fun a => (cED D x a).2 := by

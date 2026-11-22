@@ -25,7 +25,8 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 noncomputable section
@@ -34,29 +35,34 @@ open Formalism.MainNotions.Gaps.CC.Fib MulAction Function
 
 variable {G : Type} [Group G]
 
-theorem twCent_left (θ : G →* G) (δ : G) {t : G} (ht : t ∈ twCent θ δ) (y : G) :
-    (t * y)⁻¹ * δ * θ (t * y) = y⁻¹ * δ * θ y := by
+theorem twCent_left (θ : G →* G) (δ : G) {t : G} (ht : t ∈ twCent θ δ) (y : G)
+    : (t * y)⁻¹ * δ * θ (t * y) = y⁻¹ * δ * θ y := by
   have h : t * δ = δ * θ t := ht
   have h2 : t⁻¹ * δ * θ t = δ := by rw [mul_assoc, ← h]; group
-  calc (t * y)⁻¹ * δ * θ (t * y) = y⁻¹ * (t⁻¹ * δ * θ t) * θ y := by rw [map_mul]; group
+  calc
+    (t * y)⁻¹ * δ * θ (t * y)
+      = y⁻¹ * (t⁻¹ * δ * θ t) * θ y := by rw [map_mul]; group
     _ = y⁻¹ * δ * θ y := by rw [h2]
 
-theorem Gam_mul (Γ U : Subgroup G) {γ z u : G} (hγ : γ ∈ Γ) (hu : u ∈ U) :
-    Gam Γ U (γ * z * u) = (Gam Γ U z).map (MulAut.conj γ).toMonoidHom := by
+theorem Gam_mul (Γ U : Subgroup G) {γ z u : G} (hγ : γ ∈ Γ) (hu : u ∈ U)
+    : Gam Γ U (γ * z * u) = (Gam Γ U z).map (MulAut.conj γ).toMonoidHom := by
   ext w
   simp only [Subgroup.mem_map, mem_Gam, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
   constructor
   · rintro ⟨h1, h2⟩
     refine ⟨γ⁻¹ * w * γ, ⟨Γ.mul_mem (Γ.mul_mem (Γ.inv_mem hγ) h1) hγ, ?_⟩, by group⟩
     have := U.mul_mem (U.mul_mem hu h2) (U.inv_mem hu)
-    convert this using 1; group
+    convert this using 1
+    group
   · rintro ⟨v, ⟨h1, h2⟩, rfl⟩
     refine ⟨Γ.mul_mem (Γ.mul_mem hγ h1) (Γ.inv_mem hγ), ?_⟩
     have := U.mul_mem (U.mul_mem (U.inv_mem hu) h2) hu
-    convert this using 1; group
+    convert this using 1
+    group
 
-theorem Gam_eq_stab {Γ K U : Subgroup G} (hUK : U ≤ K) (x : G) (k : K) :
-    Gam Γ U (x * k) = (stabilizer (Gam Γ K x) (k : K ⧸ U.subgroupOf K)).map (Gam Γ K x).subtype := by
+theorem Gam_eq_stab {Γ K U : Subgroup G} (hUK : U ≤ K) (x : G) (k : K)
+    : Gam Γ U (x * k)
+      = (stabilizer (Gam Γ K x) (k : K ⧸ U.subgroupOf K)).map (Gam Γ K x).subtype := by
   ext w
   constructor
   · intro hw
@@ -67,19 +73,21 @@ theorem Gam_eq_stab {Γ K U : Subgroup G} (hUK : U ≤ K) (x : G) (k : K) :
 
 variable [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem conj_mem_cpt (T : Subgroup G) {γ : G} (hγ : γ ∈ T) {t : G}
-    (ht : t ∈ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))}) :
-    (MulAut.conj γ).toMonoidHom t ∈ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))} := by
+theorem conj_mem_cpt
+    (T : Subgroup G)
+    {γ : G} (hγ : γ ∈ T)
+    {t : G} (ht : t ∈ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))})
+    : (MulAut.conj γ).toMonoidHom t
+      ∈ {t | t ∈ T ∧ IsCompact (closure (Subgroup.zpowers t : Set G))} := by
   obtain ⟨h1, h2⟩ := ht
   let h : G ≃ₜ G := (Homeomorph.mulRight γ⁻¹).trans (Homeomorph.mulLeft γ)
-  have hf : ⇑h = ⇑(MulAut.conj γ).toMonoidHom := by
-    funext z; simp [h, MulAut.conj_apply, mul_assoc]
+  have hf : ⇑h = ⇑(MulAut.conj γ).toMonoidHom := by funext z; simp [h, MulAut.conj_apply, mul_assoc]
   refine ⟨by simpa [MulAut.conj_apply] using T.mul_mem (T.mul_mem hγ h1) (T.inv_mem hγ), ?_⟩
   rw [← MonoidHom.map_zpowers, Subgroup.coe_map, ← hf, ← h.image_closure]
   exact h2.image h.continuous
 
-theorem cptPart_map_conj (T : Subgroup G) {γ : G} (hγ : γ ∈ T) :
-    (cptPart T).map (MulAut.conj γ).toMonoidHom = cptPart T := by
+theorem cptPart_map_conj (T : Subgroup G) {γ : G} (hγ : γ ∈ T)
+    : (cptPart T).map (MulAut.conj γ).toMonoidHom = cptPart T := by
   apply le_antisymm
   · rw [cptPart, MonoidHom.map_closure]
     apply Subgroup.closure_mono
@@ -87,12 +95,17 @@ theorem cptPart_map_conj (T : Subgroup G) {γ : G} (hγ : γ ∈ T) :
     exact conj_mem_cpt T hγ ht
   · rw [cptPart, Subgroup.closure_le]
     intro t ht
-    refine ⟨(MulAut.conj γ⁻¹).toMonoidHom t, Subgroup.subset_closure (conj_mem_cpt T (T.inv_mem hγ) ht), ?_⟩
+    refine ⟨
+      (MulAut.conj γ⁻¹).toMonoidHom t,
+      Subgroup.subset_closure (conj_mem_cpt T (T.inv_mem hγ) ht),
+      ?_
+    ⟩
     simp [MulAut.conj_apply, mul_assoc]
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-theorem finsum_sigma_of_finite {ι : Type} {β : ι → Type} [∀ i, Finite (β i)] (h : (Σ i, β i) → ℂ)
-    (hh : (support h).Finite) : ∑ᶠ p, h p = ∑ᶠ i, ∑ᶠ b, h ⟨i, b⟩ := by
+theorem finsum_sigma_of_finite
+    {ι : Type} {β : ι → Type} [∀ i, Finite (β i)] (h : (Σ i, β i) → ℂ) (hh : (support h).Finite)
+    : ∑ᶠ p, h p = ∑ᶠ i, ∑ᶠ b, h ⟨i, b⟩ := by
   letI : ∀ i, Fintype (β i) := fun i => Fintype.ofFinite _
   set I := hh.toFinset.image Sigma.fst
   have h1 : support h ⊆ ((I.sigma fun _ => Finset.univ : Finset (Σ i, β i)) : Set _) := by
@@ -102,7 +115,8 @@ theorem finsum_sigma_of_finite {ι : Type} {β : ι → Type} [∀ i, Finite (β
   have h2 : (support fun i => ∑ᶠ b, h ⟨i, b⟩) ⊆ (I : Set ι) := by
     intro i hi
     obtain ⟨b, hb⟩ : ∃ b, h ⟨i, b⟩ ≠ 0 := by
-      by_contra hc; push_neg at hc
+      by_contra hc
+      push_neg at hc
       exact hi (finsum_eq_zero_of_forall_eq_zero hc)
     simp only [Finset.mem_coe, I, Finset.mem_image]
     exact ⟨⟨i, b⟩, hh.mem_toFinset.2 hb, rfl⟩
@@ -111,9 +125,10 @@ theorem finsum_sigma_of_finite {ι : Type} {β : ι → Type} [∀ i, Finite (β
   rw [finsum_eq_sum_of_fintype]
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-theorem finsum_orbits {H X : Type} [Group H] [MulAction H X] [Finite X] (φ : X → ℂ)
-    (hφ : ∀ (h : H) y, φ (h • y) = φ y) :
-    ∑ᶠ y, φ y = ∑ᶠ ω : orbitRel.Quotient H X, ((orbit H ω.out).ncard : ℂ) * φ ω.out := by
+theorem finsum_orbits
+    {H X : Type} [Group H] [MulAction H X] [Finite X]
+    (φ : X → ℂ) (hφ : ∀ (h : H) y, φ (h • y) = φ y)
+    : ∑ᶠ y, φ y = ∑ᶠ ω : orbitRel.Quotient H X, ((orbit H ω.out).ncard : ℂ) * φ ω.out := by
   letI : Fintype X := Fintype.ofFinite X
   haveI : Finite (orbitRel.Quotient H X) := Quotient.finite _
   letI : Fintype (orbitRel.Quotient H X) := Fintype.ofFinite _
@@ -125,7 +140,9 @@ theorem finsum_orbits {H X : Type} [Group H] [MulAction H X] [Finite X] (φ : X 
     conv_lhs => rw [← Quotient.out_eq' ω]
     rw [Quotient.eq'']
     exact orbitRel_apply
-  have hc : ∀ y ∈ Finset.univ.filter (fun y => (Quotient.mk'' y : orbitRel.Quotient H X) = ω), φ y = φ ω.out := by
+  have hc
+      : ∀ y ∈ Finset.univ.filter (fun y => (Quotient.mk'' y : orbitRel.Quotient H X) = ω),
+        φ y = φ ω.out := by
     intro y hy
     obtain ⟨h, rfl⟩ := (hmem y).1 (Finset.mem_filter.1 hy).2
     exact hφ h _
@@ -138,9 +155,12 @@ theorem finsum_orbits {H X : Type} [Group H] [MulAction H X] [Finite X] (φ : X 
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
 theorem avg_const' {H : Type} [Group H] (u : H → ℂ) (c : ℂ) (hu : ∀ h, u h = c) : avg u = c := by
-  rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H u ⊤ (fun k _ => show ∀ x, u (x * k) = u x from fun x => by rw [hu, hu]) (by simp)]
+  rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H u ⊤
+    (fun k _ => show ∀ x, u (x * k) = u x from fun x => by rw [hu, hu])
+    (by simp)]
   simp only [hu, Subgroup.index_top, Nat.cast_one, inv_one, one_mul]
-  exact finsum_eq_single _ (1 : H ⧸ (⊤ : Subgroup H)) (fun x hx => absurd (QuotientGroup.subsingleton_quotient_top.elim x 1) hx)
+  exact finsum_eq_single _ (1 : H ⧸ (⊤ : Subgroup H))
+    (fun x hx => absurd (QuotientGroup.subsingleton_quotient_top.elim x 1) hx)
 
 theorem twOrb_eq_sum_smallerLevel : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (θ : G →* G) (K : Subgroup G), IsOpen (K : Set G) → IsCompact (K : Set G) → (∀ k ∈ K, θ k ∈ K) → ∀ K' : Subgroup G, IsLevel θ K K' → ∀ (δ : G) (f : G → ℂ), IsHecke K' f → (∀ x : G, twCent θ δ ⊓ K.map (MulAut.conj x).toMonoidHom ≤ cptPart (twCent θ δ) ∧ (twCent θ δ ⊓ K'.map (MulAut.conj x).toMonoidHom).relIndex (cptPart (twCent θ δ)) ≠ 0) → {q : DoubleCoset.Quotient (twCent θ δ : Set G) (K' : Set G) | f ((Quotient.out q)⁻¹ * δ * θ (Quotient.out q)) ≠ 0}.Finite → twOrb θ K δ f = ((K'.relIndex K : ℕ) : ℂ)⁻¹ * twOrb θ K' δ f ∧ twOrb θ K' δ f = ∑ᶠ q : DoubleCoset.Quotient (twCent θ δ : Set G) (K' : Set G), (((twCent θ δ ⊓ K'.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex (cptPart (twCent θ δ)) : ℕ) : ℂ) * f ((Quotient.out q)⁻¹ * δ * θ (Quotient.out q)) := by
   intro G _ _ _ θ K _hKo hKc _hθK K' hL δ f hf hT hfin

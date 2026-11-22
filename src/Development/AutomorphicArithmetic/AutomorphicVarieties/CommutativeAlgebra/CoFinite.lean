@@ -8,8 +8,8 @@ noncomputable section
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R) :
-    x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
+private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R)
+    : x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
   constructor
   · intro hx
     refine Submodule.smul_induction_on hx (fun a ha y _ i => ?_) (fun a b ha hb i => ?_)
@@ -19,8 +19,8 @@ private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} 
     rw [pi_eq_sum_univ x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (hx i) Submodule.mem_top
 
-private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ) :
-    IsPrecomplete I (Fin r → R) := by
+private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ)
+    : IsPrecomplete I (Fin r → R) := by
   refine ⟨fun {f} hf => ?_⟩
   have hc : ∀ i : Fin r, ∃ L : R, ∀ n, f n i ≡ L [SMOD (I ^ n • ⊤ : Submodule R R)] := by
     intro i
@@ -39,8 +39,10 @@ private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecom
   rw [SModEq.sub_mem] at this
   simpa [smul_eq_mul, Ideal.mul_top] using this
 
-private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    [Module.Finite R M] (I : Ideal R) [IsPrecomplete I R] : IsPrecomplete I M := by
+private theorem isPrecomplete_finite
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (I : Ideal R) [IsPrecomplete I R]
+    : IsPrecomplete I M := by
   obtain ⟨r, φ, hφ⟩ := Module.Finite.exists_fin' R M
   haveI := isPrecomplete_pi I r
   have himg : ∀ n : ℕ, (I ^ n • ⊤ : Submodule R M) = Submodule.map φ (I ^ n • ⊤) := by
@@ -52,7 +54,9 @@ private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] 
     have := SModEq.sub_mem.1 (hf (Nat.le_succ n))
     rw [← neg_sub]
     exact neg_mem this
-  have hd : ∀ n, ∃ d : Fin r → R, d ∈ (I ^ n • ⊤ : Submodule R (Fin r → R)) ∧ φ d = f (n + 1) - f n := by
+  have hd
+      : ∀ n, ∃ d : Fin r → R,
+        d ∈ (I ^ n • ⊤ : Submodule R (Fin r → R)) ∧ φ d = f (n + 1) - f n := by
     intro n
     have := hmem n
     rw [himg n, Submodule.mem_map] at this
@@ -65,13 +69,13 @@ private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] 
     induction n with
     | zero => simp [hg, hy0]
     | succ n ih =>
-      have : g (n + 1) = g n + d n := by
-        simp only [hg, Finset.sum_range_succ]; abel
-      rw [this, map_add (f := _), ih, hdφ]; abel
+      have : g (n + 1) = g n + d n := by simp only [hg, Finset.sum_range_succ]; abel
+      rw [this, map_add (f := _), ih, hdφ]
+      abel
   have hgc : ∀ {m n : ℕ}, m ≤ n → g m ≡ g n [SMOD (I ^ m • ⊤ : Submodule R (Fin r → R))] := by
     intro m n hmn
     rw [SModEq.sub_mem]
-    have : g m - g n = -∑ k ∈ Finset.Ico m n, d k := by
+    have : g m - g n = - ∑ k ∈ Finset.Ico m n, d k := by
       rw [Finset.sum_Ico_eq_sub _ hmn]; simp only [hg]; abel
     rw [this]
     refine neg_mem (Submodule.sum_mem _ fun k hk => ?_)
@@ -82,8 +86,12 @@ private theorem isPrecomplete_finite {R M : Type} [CommRing R] [AddCommGroup M] 
   rw [hgφ, ← himg n] at h1
   exact h1
 
-private theorem prec_cofinal {R : Type*} [CommRing R] {I J : Ideal R} (hJI : J ≤ I) {e : ℕ}
-    (he : I ^ e ≤ J) (hJ : IsPrecomplete J R) : IsPrecomplete I R := by
+private theorem prec_cofinal
+    {R : Type*} [CommRing R]
+    {I J : Ideal R} (hJI : J ≤ I)
+    {e : ℕ} (he : I ^ e ≤ J)
+    (hJ : IsPrecomplete J R)
+    : IsPrecomplete I R := by
   have hsm : ∀ (K : Ideal R) (x : R), x ∈ (K • (⊤ : Submodule R R)) ↔ x ∈ K := by
     intro K x
     simp [smul_eq_mul, Ideal.mul_top]
@@ -93,8 +101,9 @@ private theorem prec_cofinal {R : Type*} [CommRing R] {I J : Ideal R} (hJI : J �
     rw [pow_mul]
     exact Ideal.pow_right_mono he' k
   refine ⟨fun {f} hf => ?_⟩
-  have hgc : ∀ {m n : ℕ}, m ≤ n →
-      f ((e + 1) * m) ≡ f ((e + 1) * n) [SMOD (J ^ m • ⊤ : Submodule R R)] := by
+  have hgc
+      : ∀ {m n : ℕ},
+        m ≤ n → f ((e + 1) * m) ≡ f ((e + 1) * n) [SMOD (J ^ m • ⊤ : Submodule R R)] := by
     intro m n hmn
     have h := hf (Nat.mul_le_mul_left (e + 1) hmn)
     rw [SModEq.sub_mem, hsm] at h ⊢
@@ -108,8 +117,10 @@ private theorem prec_cofinal {R : Type*} [CommRing R] {I J : Ideal R} (hJI : J �
   have := Ideal.add_mem _ h1 h3
   simpa using this
 
-theorem UpperTheory.V.Alg.co_finite :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R'] [Algebra O R'] [Algebra R R'] [IsScalarTower O R R'] [Module.Finite R R'] [IsLocalRing R'],
+theorem UpperTheory.V.Alg.co_finite
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (R' : Type) [CommRing R'] [Algebra O R'] [Algebra R R'] [IsScalarTower O R R']
+        [Module.Finite R R'] [IsLocalRing R'],
       (∀ x : R', ∃ a : O, x - algebraMap O R' a ∈ maximalIdeal R') → IsCO O R' := by
   intro O _ _ R _ _ _ R' _ _ _ _ _ _ hres
   haveI : IsNoetherianRing R := IsCO.toIsNoetherian (O := O)
@@ -117,18 +128,23 @@ theorem UpperTheory.V.Alg.co_finite :
   haveI hN : IsNoetherianRing R' := isNoetherian_of_tower R this
   haveI : Algebra.IsIntegral R R' := inferInstance
   haveI hcompl : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
-  have hcomap : ∀ P : Ideal R', P.IsPrime → maximalIdeal R ≤ P.comap (algebraMap R R') → P = maximalIdeal R' := by
+  have hcomap
+      : ∀ P : Ideal R',
+        P.IsPrime → maximalIdeal R ≤ P.comap (algebraMap R R') → P = maximalIdeal R' := by
     intro P hP hle
     have hcm : (P.comap (algebraMap R R')).IsMaximal := by
       have hne : P.comap (algebraMap R R') ≠ ⊤ := (Ideal.IsPrime.comap (algebraMap R R')).ne_top
       have : P.comap (algebraMap R R') = maximalIdeal R :=
         le_antisymm (IsLocalRing.le_maximalIdeal hne) hle
-      rw [this]; infer_instance
+      rw [this]
+      infer_instance
     haveI := Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap R R')
       (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) P hcm
     exact IsLocalRing.eq_maximalIdeal this
   have hcm' : (maximalIdeal R').comap (algebraMap R R') = maximalIdeal R :=
-    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (R := R) (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal R'))
+    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (R := R)
+      (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance))
+      (maximalIdeal R'))
   have hloc : IsLocalHom (algebraMap R R') := by
     refine ⟨fun a ha => ?_⟩
     by_contra hna
@@ -136,8 +152,7 @@ theorem UpperTheory.V.Alg.co_finite :
     rw [← hcm', Ideal.mem_comap] at this
     exact (IsLocalRing.mem_maximalIdeal _).1 this ha
   set J : Ideal R' := (maximalIdeal R).map (algebraMap R R') with hJdef
-  have hJI : J ≤ maximalIdeal R' := by
-    rw [hJdef, Ideal.map_le_iff_le_comap, hcm']
+  have hJI : J ≤ maximalIdeal R' := by rw [hJdef, Ideal.map_le_iff_le_comap, hcm']
   have hrad : maximalIdeal R' ≤ J.radical := by
     rw [Ideal.radical_eq_sInf]
     refine le_sInf fun P hP => ?_
@@ -153,7 +168,8 @@ theorem UpperTheory.V.Alg.co_finite :
   have hlocO : IsLocalHom (algebraMap O R') := by
     rw [IsScalarTower.algebraMap_eq O R R']
     infer_instance
-  exact
-    { complete := { toIsHausdorff := inferInstance, toIsPrecomplete := hprec }
-      isLocalHom := hlocO
-      res_surj := hres }
+  exact {
+    complete := { toIsHausdorff := inferInstance, toIsPrecomplete := hprec }
+    isLocalHom := hlocO
+    res_surj := hres
+  }

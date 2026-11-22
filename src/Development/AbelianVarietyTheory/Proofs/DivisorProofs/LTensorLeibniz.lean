@@ -8,11 +8,14 @@ namespace GlobalTheory.TensorLeibnizRule
 
 open TensorProduct
 
-theorem lTensor_leibniz {R S : Type} [CommRing R] [Algebra ℂ R] [CommRing S] [Algebra ℂ S]
-    (d : Derivation ℂ S S) (x y : TensorProduct ℂ R S) :
-    (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S) (x * y) =
-      x * (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S) y +
-      y * (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S) x := by
+theorem lTensor_leibniz
+    {R S : Type} [CommRing R] [Algebra ℂ R] [CommRing S] [Algebra ℂ S]
+    (d : Derivation ℂ S S) (x y : TensorProduct ℂ R S)
+    : (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S) (x * y)
+      = x * (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S) y
+        + y
+          * (LinearMap.lTensor R (↑d : S →ₗ[ℂ] S) : TensorProduct ℂ R S → TensorProduct ℂ R S)
+            x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul r s =>

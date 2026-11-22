@@ -12,9 +12,7 @@ open NumberField IsDedekindDomain
 open scoped nonZeroDivisors ComplexOrder
 
 structure MLine (K : Type) [Field K] [NumberField K] where
-
   I : FractionalIdeal (𝓞 K)⁰ K
-
   n : (K →+* ℂ) → ℝ
 
 variable {K : Type} [Field K] [NumberField K]
@@ -44,7 +42,9 @@ def prodPow {V : Type} [Fintype V] (ℓ : V → MLine K) (k : V → ℕ) : MLine
 end MLine
 
 def IsLocGen (p : HeightOneSpectrum (𝓞 K)) (c : K) (I : FractionalIdeal (𝓞 K)⁰ K) : Prop :=
-  c ≠ 0 ∧ FractionalIdeal.count K p (FractionalIdeal.spanSingleton (𝓞 K)⁰ c) = FractionalIdeal.count K p I
+  c ≠ 0
+    ∧ FractionalIdeal.count K p (FractionalIdeal.spanSingleton (𝓞 K)⁰ c)
+      = FractionalIdeal.count K p I
 
 structure MLat (K : Type) [Field K] [NumberField K] (m : ℕ) where
   M : Submodule (𝓞 K) (Fin m → K)
@@ -59,7 +59,6 @@ def Good (L : MLat K m) : Prop :=
 
 def detSub (L : MLat K m) : Submodule (𝓞 K) K :=
   Submodule.span (𝓞 K) {d | ∃ x : Fin m → Fin m → K, (∀ i, x i ∈ L.M) ∧ d = (Matrix.of x).det}
-
 
 open Classical in
 def detIdeal (L : MLat K m) : FractionalIdeal (𝓞 K)⁰ K := by

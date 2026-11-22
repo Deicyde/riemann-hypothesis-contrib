@@ -7,7 +7,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactGroup
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open scoped ENNReal NNReal
 
 noncomputable section
@@ -103,13 +104,17 @@ end HBx
 
 theorem unipotent_integral_closed : UnipotentSetIsClosedSubgroup := by
   intro k r z hz
-  have key : ∀ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
-      unipotentBlockMatrix k r Bm S * unipotentBlockMatrix k r (-Bm) (-S) = 1 := by
+  have key
+      : ∀ (Bm : Matrix (Fin r) (Fin (k + 1)) ℂ) (S : Matrix (Fin r) (Fin r) ℂ),
+        unipotentBlockMatrix k r Bm S * unipotentBlockMatrix k r (-Bm) (-S) = 1 := by
     intro Bm S
     rw [NBk.nbm_mul]
     have e1 : Bm + -Bm = 0 := add_neg_cancel Bm
-    have e2 : S + -S + (1 / 2 : ℂ) • (-Bm * Matrix.diagonal (hW k) * Bmᴴ -
-        Bm * Matrix.diagonal (hW k) * (-Bm)ᴴ) = 0 := by
+    have e2
+        : S + -S
+            + (1 / 2 : ℂ)
+              • (-Bm * Matrix.diagonal (hW k) * Bmᴴ - Bm * Matrix.diagonal (hW k) * (-Bm)ᴴ)
+          = 0 := by
       simp [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg]
     rw [e1, e2, HBx.blk_zero]
   refine ⟨?_, ?_, ?_, ?_, HBx.isClosed_N0set z⟩
@@ -119,7 +124,8 @@ theorem unipotent_integral_closed : UnipotentSetIsClosedSubgroup := by
     obtain ⟨Ba, Sa, hBa, hSa, rfl⟩ := unipotent_eq_block k r z hz a ha
     obtain ⟨B, S, hB, hS, rfl⟩ := unipotent_eq_block k r z hz b hb
     rw [NBk.nbm_mul]
-    exact NBk.nb_mem _ _ hz (by rw [Matrix.add_mulVec, hBa, hB, add_zero]) (HBx.skew_mul Ba B Sa S hSa hS)
+    exact NBk.nb_mem _ _ hz (by rw [Matrix.add_mulVec, hBa, hB, add_zero])
+      (HBx.skew_mul Ba B Sa S hSa hS)
   · intro a ha
     obtain ⟨Ba, Sa, hBa, hSa, rfl⟩ := unipotent_eq_block k r z hz a ha
     rw [Matrix.inv_eq_right_inv (key Ba Sa)]

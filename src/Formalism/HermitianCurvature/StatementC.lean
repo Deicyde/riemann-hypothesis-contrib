@@ -45,57 +45,55 @@ def Mlev (k r j : ℕ) : ℤ := (k : ℤ) + 1 + 2 * ((r : ℤ) + 1 - j)
 def nAux (k r : ℕ) (GG : ℝ) (fr : ℕ → ℕ → ℝ) : ℕ → LPt → ℝ
   | _, [] => 1
   | b, (s, t) :: rest =>
-      (if b + s - 1 = r + 1 ∧ s = 1 then GG ^ (k - 1)
-        else (fr b s * ‖t‖) ^ (2 * (s : ℤ) * (Mlev k r (b + s - 1) + s - 3))) * nAux k r GG fr (b + s) rest
+    (if b + s - 1 = r + 1 ∧ s = 1 then
+       GG ^ (k - 1)
+     else
+       (fr b s * ‖t‖) ^ (2 * (s : ℤ) * (Mlev k r (b + s - 1) + s - 3)))
+      * nAux k r GG fr (b + s) rest
 
 def nLoc (k r : ℕ) (fr : ℕ → ℕ → ℝ) (G : LPt → ℝ) (p : LPt) : ℝ := nAux k r (G p) fr 1 p
 
-structure PlaceData (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] where
-
+structure PlaceData
+    (k r : ℕ)
+    (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] where
   bs : B.RealPlaceData k r Wp Wq
-
   f0 : B.Mat k r → (Wq →L[ℂ] Wp)
-
   G : LPt → ℝ
-
   RR : ℝ → ℕ → List Letter → LPt → LPt → ℂ
 
-structure HidaSetting (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
+structure HidaSetting
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (Wp Wq : InfinitePlace E → Type)
     [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
     [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] where
   f : ℕ
   pl : Fin f ≃ InfinitePlace E
-
   emb : Fin f → (E →+* ℂ)
-
   hemb : ∀ v, InfinitePlace.mk (emb v) = pl v
-
   G : Sz.Glob (InfinitePlace E)
-
   CA : ℝ
   de : ℕ → ℝ
   de' : ℕ → ℝ
   T : ℝ
   T' : ℝ
-
   l : ℕ
-
   grid : Fin f → ℕ → Finset ℝ
-
   grid1 : Fin f → Finset ℝ
-
   pd : ∀ v : Fin f, PlaceData G.k G.r (Wp (pl v)) (Wq (pl v))
-
   hv : G.v = S6.rd E / 2
-
-  hT : ∀ v, Formalism.QuantumDeterminants.Tz G.k G.r (pd v).bs.z = T ∧ Formalism.QuantumDeterminants.Tz G.k G.r (pd v).bs.z' = T'
+  hT
+    : ∀ v,
+      Formalism.QuantumDeterminants.Tz G.k G.r (pd v).bs.z = T
+        ∧ Formalism.QuantumDeterminants.Tz G.k G.r (pd v).bs.z' = T'
 
 def Kst : ℕ := 5
 
 namespace HidaSetting
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
   [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
   [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
   (S : HidaSetting E Wp Wq)
@@ -111,31 +109,35 @@ def g : ℕ := S.G.g1 * S.G.g2
 def fr (b s : ℕ) : ℝ := S6.rd E ^ (-(S6.nuBlock (S.G.r : ℤ) (b : ℤ) (s : ℤ) : ℝ))
 
 def gramLoc (v : Fin S.f) (ε : ℝ) (i : ℕ) (a : List Letter) (p q : LPt) : ℂ :=
-  ((√(nLoc S.G.k S.G.r S.fr (S.pd v).G p) * √(nLoc S.G.k S.G.r S.fr (S.pd v).G q) : ℝ) : ℂ) *
-    (S.pd v).RR ε i a p q
+  ((√(nLoc S.G.k S.G.r S.fr (S.pd v).G p) * √(nLoc S.G.k S.G.r S.fr (S.pd v).G q) : ℝ) : ℂ)
+    * (S.pd v).RR ε i a p q
 
 def gram (ε : ℝ) (i : ℕ) (w : Word S.f) (p q : TB.Pt E) : ℂ :=
   if i ≤ S.G.r + 1 then ∏ v, S.gramLoc v ε i (w v) (loc (S.σ v) p) (loc (S.σ v) q) else 0
 
-def N1 (ε : ℝ) (i : ℕ) (w : Word S.f) (Y : Finset (TB.Pt E)) (κ : TB.Pt E → TB.Pt E → ℂ)
-    (c : J.CV E) : ℂ :=
+def N1
+    (ε : ℝ) (i : ℕ) (w : Word S.f) (Y : Finset (TB.Pt E)) (κ : TB.Pt E → TB.Pt E → ℂ) (c : J.CV E)
+    : ℂ :=
   (∑ h ∈ Y, ∑ h' ∈ Y, κ h h' * ∏ v, S.gramLoc v ε i (w v)
-      (loc (S.σ v) h ++ [(1, c (S.pl v))]) (loc (S.σ v) h' ++ [(1, c (S.pl v))])) /
-    (Word.size S.P w : ℂ)
+      (loc (S.σ v) h ++ [(1, c (S.pl v))]) (loc (S.σ v) h' ++ [(1, c (S.pl v))]))
+    / (Word.size S.P w : ℂ)
 
 def psiInf (l : E) (c : J.CV E) : ℂ :=
-  Complex.exp (2 * Real.pi * Complex.I *
-    (((∑ v, 2 * (S.σ v l * c (S.pl v)).re) / (S.g : ℝ) : ℝ) : ℂ))
+  Complex.exp
+    (2 * Real.pi * Complex.I * (((∑ v, 2 * (S.σ v l * c (S.pl v)).re) / (S.g : ℝ) : ℝ) : ℂ))
 
-def Nhat (ε : ℝ) (i : ℕ) (w : Word S.f) (Y : Finset (TB.Pt E)) (κ : TB.Pt E → TB.Pt E → ℂ) (l : E) : ℂ :=
-  ((ZLattice.covolume (J.eLat E (S6.perLat E S.g (S6.nuBlock S.G.r i 1) 1) 1) : ℝ) : ℂ)⁻¹ *
-    ∫ c : J.CV E, S.N1 ε i w Y κ c * S.psiInf l c
+def Nhat (ε : ℝ) (i : ℕ) (w : Word S.f) (Y : Finset (TB.Pt E)) (κ : TB.Pt E → TB.Pt E → ℂ) (l : E)
+    : ℂ :=
+  ((ZLattice.covolume (J.eLat E (S6.perLat E S.g (S6.nuBlock S.G.r i 1) 1) 1) : ℝ) : ℂ)⁻¹
+    * ∫ c : J.CV E, S.N1 ε i w Y κ c * S.psiInf l c
 
 end HidaSetting
 
 namespace HidaSetting
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
   [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
   [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
   (S : HidaSetting E Wp Wq)
@@ -148,10 +150,10 @@ def cutHi (v : Fin S.f) : ℝ := (S.G.place (S.pl v)).Del / 2 - (S.G.place (S.pl
 
 def admitted (w : Word S.f) : Prop :=
   (∀ v, ∀ j (hj : j < (w v).length),
-    (if ((w v)[j]'hj).1 then ((w v)[j]'hj).2 else ((w v)[j]'hj).2 - 1) ∈
-      S.grid v ((w v).length - j) ∪ S.grid1 v) ∧
-  ∀ v, ∀ j j' : ℕ, ∀ (hj : j < (w v).length) (hj' : j' < (w v).length), j ≠ j' →
-    ∀ δ : ℤ, -2 ≤ δ → δ ≤ 2 → 2 < |((w v)[j]'hj).2 - ((w v)[j']'hj').2 + δ|
+      (if ((w v)[j]'hj).1 then ((w v)[j]'hj).2 else ((w v)[j]'hj).2 - 1)
+        ∈ S.grid v ((w v).length - j) ∪ S.grid1 v)
+    ∧ ∀ v, ∀ j j' : ℕ, ∀ (hj : j < (w v).length) (hj' : j' < (w v).length),
+      j ≠ j' → ∀ δ : ℤ, -2 ≤ δ → δ ≤ 2 → 2 < |((w v)[j]'hj).2 - ((w v)[j']'hj').2 + δ|
 
 def AdmN (w : Word S.f) : Prop := S.admitted w ∧ w.cnt ≤ S.Ntop
 
@@ -163,8 +165,10 @@ def nodes (v : Fin S.f) : Finset ℝ := (range (S.Ntop + 1)).biUnion (S.grid v) 
 
 def pts (v : Fin S.f) : Finset ℝ := S.nodes v ∪ (S.nodes v).image (· + 1)
 
-def mkData (Kr : ℕ → TB.Pt E → TB.Pt E → ℂ) (hK0 : Kr 0 [] [] = 1)
-    (Th : ℕ → ℕ → E → TB.Pt E → TB.Pt E → ℂ) (e : ℕ → ℝ) : TB.Data E S.W where
+def mkData
+    (Kr : ℕ → TB.Pt E → TB.Pt E → ℂ) (hK0 : Kr 0 [] [] = 1)
+    (Th : ℕ → ℕ → E → TB.Pt E → TB.Pt E → ℂ) (e : ℕ → ℝ)
+    : TB.Data E S.W where
   r := S.G.r
   f := S.f
   K := Kst
@@ -190,10 +194,14 @@ def mkData (Kr : ℕ → TB.Pt E → TB.Pt E → ℂ) (hK0 : Kr 0 [] [] = 1)
   Lad b := J.LadB E S.g S.G.r b
   Nhat ε i w := S.Nhat ε i w.1
   szD b v := J.thrS S.G S.CA S.de S.de' S.T S.T' S.l b 1 (S.pl v)
-  szL b s v := if b + s ≤ S.G.r + 1 then J.thrS S.G S.CA S.de S.de' S.T S.T' S.l b (s + 1) (S.pl v)
-    else 2 * J.thrP S.G S.CA S.de S.de' S.T S.T' S.l b (S.pl v)
-  vol b s := (∏ w, J.thrS S.G S.CA S.de S.de' S.T S.T' S.l b s w) ^ 2 /
-    (FractionalIdeal.absNorm (S6.dualIdl E S.g (S6.nuBlock S.G.r b s)) : ℝ)
+  szL b s v :=
+    if b + s ≤ S.G.r + 1 then
+      J.thrS S.G S.CA S.de S.de' S.T S.T' S.l b (s + 1) (S.pl v)
+    else
+      2 * J.thrP S.G S.CA S.de S.de' S.T S.T' S.l b (S.pl v)
+  vol b s :=
+    (∏ w, J.thrS S.G S.CA S.de S.de' S.T S.T' S.l b s w) ^ 2
+      / (FractionalIdeal.absNorm (S6.dualIdl E S.g (S6.nuBlock S.G.r b s)) : ℝ)
 
 def base : TB.Data E S.W :=
   S.mkData (fun i _ _ => if i = 0 then 1 else 0) (by simp) (fun _ _ _ _ _ => 0) (fun _ => 0)
@@ -207,44 +215,70 @@ end HidaSetting
 
 section abelianHodgeDeRham'
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Wp Wq : InfinitePlace E → Type}
   [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
   [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
 
 def ThmPPos (S : HidaSetting E Wp Wq) : Prop :=
-  ∀ v, ∀ ε, 0 < ε → ∀ i, i ≤ S.G.r + 1 → ∀ w : S.W, ∀ Y : Finset LPt,
-    TB.PSDOn Y (S.gramLoc v ε i (w.1 v))
+  ∀ v, ∀ ε,
+    0 < ε → ∀ i, i ≤ S.G.r + 1 → ∀ w : S.W, ∀ Y : Finset LPt, TB.PSDOn Y (S.gramLoc v ε i (w.1 v))
 
 def GridsOK (S : HidaSetting E Wp Wq) : Prop :=
   ∀ v,
-    6 * (S.Ntop : ℝ) ^ 3 + 6 * S.Ntop ≤ S.cutHi v - S.cutLo v ∧
-    (∀ a, ∀ y ∈ S.grid v a, 1 ≤ a ∧ a ≤ S.Ntop ∧ gridL (S.cutLo v) (S.cutHi v) S.Ntop a ≤ y ∧
-      y ≤ gridL (S.cutLo v) (S.cutHi v) S.Ntop a + (S.cutHi v - S.cutLo v) / (6 * S.Ntop) - 1) ∧
-    (∀ y ∈ S.grid1 v, y ∈ (S.G.place (S.pl v)).cutIntervalLong S.l S.Ntop ∧
-      y + 1 ∈ (S.G.place (S.pl v)).cutIntervalLong S.l S.Ntop) ∧
-    (∀ y ∈ S.grid1 v, ∀ y' ∈ S.grid1 v, y ≠ y' → ∀ e ∈ ({0, 1} : Finset ℝ), ∀ e' ∈ ({0, 1} : Finset ℝ),
-      (S.Ntop : ℝ) ^ 2 / 8 ≤ |(y + e) - (y' + e')|) ∧
-    (∀ y ∈ S.grid1 v, ∀ a, ∀ y' ∈ S.grid v a, ∀ e ∈ ({0, 1} : Finset ℝ), ∀ e' ∈ ({0, 1} : Finset ℝ),
-      (S.Ntop : ℝ) ^ 2 + 1 ≤ |(y + e) - (y' + e')|) ∧
-    (∀ y, ((∃ a, y ∈ S.grid v a) ∨ y ∈ S.grid1 v) →
-      y ∈ (S.G.place (S.pl v)).cutI S.l ∧ y + 1 ∈ (S.G.place (S.pl v)).cutI S.l ∧
-        S.P v y ≠ 0 ∧ S.P v (y + 1) ≠ 0)
+    6 * (S.Ntop : ℝ) ^ 3 + 6 * S.Ntop ≤ S.cutHi v - S.cutLo v
+      ∧ (∀ a, ∀ y ∈ S.grid v a,
+        1 ≤ a ∧ a ≤ S.Ntop ∧ gridL (S.cutLo v) (S.cutHi v) S.Ntop a ≤ y
+          ∧ y ≤ gridL (S.cutLo v) (S.cutHi v) S.Ntop a + (S.cutHi v - S.cutLo v) / (6 * S.Ntop) - 1)
+      ∧ (∀ y ∈ S.grid1 v,
+        y ∈ (S.G.place (S.pl v)).cutIntervalLong S.l S.Ntop
+          ∧ y + 1 ∈ (S.G.place (S.pl v)).cutIntervalLong S.l S.Ntop)
+      ∧ (∀ y ∈ S.grid1 v, ∀ y' ∈ S.grid1 v,
+        y ≠ y'
+          → ∀ e ∈ ({0, 1} : Finset ℝ), ∀ e' ∈ ({0, 1} : Finset ℝ),
+            (S.Ntop : ℝ) ^ 2 / 8 ≤ |(y + e) - (y' + e')|)
+      ∧ (∀ y ∈ S.grid1 v, ∀ a, ∀ y' ∈ S.grid v a, ∀ e ∈ ({0, 1} : Finset ℝ),
+        ∀ e' ∈ ({0, 1} : Finset ℝ),
+          (S.Ntop : ℝ) ^ 2 + 1 ≤ |(y + e) - (y' + e')|)
+      ∧ (∀ y,
+        ((∃ a, y ∈ S.grid v a) ∨ y ∈ S.grid1 v)
+          → y ∈ (S.G.place (S.pl v)).cutI S.l ∧ y + 1 ∈ (S.G.place (S.pl v)).cutI S.l ∧ S.P v y ≠ 0
+            ∧ S.P v (y + 1) ≠ 0)
 
 def ThmPInt (S : HidaSetting E Wp Wq) : Prop :=
-  ∀ ε, 0 < ε → ∀ i, 1 ≤ i → i ≤ S.G.r + 1 → ∀ w : S.W, ∀ Y : Finset (TB.Pt E),
-    (∀ h ∈ Y, TB.level h = i - 1) → ∀ κ, TB.PSDOn Y κ →
-      (∃ φ : J.CV E → ℂ, Continuous φ ∧
-        (∀ c : J.CV E, (∀ v, c (S.pl v) ≠ 0) → φ c = S.N1 ε i w.1 Y κ c) ∧
-        ∃ Cφ : ℝ, ∀ c : J.CV E, ‖φ c‖ ≤ Cφ * ∏ v, ((1 + ‖c (S.pl v)‖) ^ 3)⁻¹) ∧
-      S.Nhat ε i w.1 Y κ 0 = (S.base.N0 ε (i - 1) w Y κ : ℂ)
+  ∀ ε,
+    0 < ε
+      → ∀ i,
+        1 ≤ i → i ≤ S.G.r + 1
+          → ∀ w : S.W, ∀ Y : Finset (TB.Pt E),
+            (∀ h ∈ Y, TB.level h = i - 1)
+              → ∀ κ,
+                TB.PSDOn Y κ
+                  → (∃ φ : J.CV E → ℂ,
+                      Continuous φ
+                        ∧ (∀ c : J.CV E, (∀ v, c (S.pl v) ≠ 0) → φ c = S.N1 ε i w.1 Y κ c)
+                        ∧ ∃ Cφ : ℝ, ∀ c : J.CV E, ‖φ c‖ ≤ Cφ * ∏ v, ((1 + ‖c (S.pl v)‖) ^ 3)⁻¹)
+                    ∧ S.Nhat ε i w.1 Y κ 0 = (S.base.N0 ε (i - 1) w Y κ : ℂ)
 
 def PlaneWaveBoundAllPlaces (S : HidaSetting E Wp Wq) : Prop :=
-  ∀ ε, 0 < ε → ∀ i, 1 ≤ i → i ≤ S.G.r + 1 → ∀ w ∈ S.base.Wall, S.base.cnt w + Kst ≤ S.Ntop →
-    ∃ θ : Finset (Fin S.f) → S.W → ℝ, (∀ A, TB.IsProb (S.base.Wb (S.base.cnt w + Kst)) (θ A)) ∧
-      ∀ Y : Finset (TB.Pt E), (∀ h ∈ Y, TB.level h = i - 1) → ∀ κ, TB.PSDOn Y κ →
-        ∀ l ∈ S.base.Lad i, l ≠ 0 →
-          ‖S.Nhat ε i w.1 Y κ l‖ ≤ S.base.maj (S.base.szD i) l *
-            ∑ w' ∈ S.base.Wb (S.base.cnt w + Kst), θ (S.bigPlaces i l) w' * S.base.N0 ε (i - 1) w' Y κ
+  ∀ ε,
+    0 < ε
+      → ∀ i,
+        1 ≤ i → i ≤ S.G.r + 1
+          → ∀ w ∈ S.base.Wall,
+            S.base.cnt w + Kst ≤ S.Ntop
+              → ∃ θ : Finset (Fin S.f) → S.W → ℝ,
+                (∀ A, TB.IsProb (S.base.Wb (S.base.cnt w + Kst)) (θ A))
+                  ∧ ∀ Y : Finset (TB.Pt E),
+                    (∀ h ∈ Y, TB.level h = i - 1)
+                      → ∀ κ,
+                        TB.PSDOn Y κ
+                          → ∀ l ∈ S.base.Lad i,
+                            l ≠ 0
+                              → ‖S.Nhat ε i w.1 Y κ l‖
+                                ≤ S.base.maj (S.base.szD i) l
+                                  * ∑ w' ∈ S.base.Wb (S.base.cnt w + Kst), θ (S.bigPlaces i l) w' * S.base.N0 ε (i - 1) w' Y κ
 
 def OffDiagonalLiftBound (S : HidaSetting E Wp Wq) : Prop := S.base.EstLift
 
@@ -252,84 +286,92 @@ def CorollaryT (S : HidaSetting E Wp Wq) (C₄ : ℝ) : Prop := S.base.EstBlock 
 
 def LemmaE (S : HidaSetting E Wp Wq) (jv : Fin S.f → ℝ) : Prop :=
   ∀ w : S.W, ∀ v,
-    Tendsto (fun ε => (S.pd v).RR ε 0 (w.1 v) [] []) (𝓝[>] 0)
-      (𝓝 ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ))
+    Tendsto
+      (fun ε => (S.pd v).RR ε 0 (w.1 v) [] [])
+      (𝓝[>] 0) (𝓝 ((S.sizeAt v (w.1 v) * jv v : ℝ) : ℂ))
 
-def PropGram (S : HidaSetting E Wp Wq) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (Vt : TB.Pt E → H) : Prop :=
-  ∀ Y : Finset (TB.Pt E), (∀ p ∈ Y, TB.IsPt p (S.G.r + 1)) →
-    ∀ᶠ ε in 𝓝[>] 0, ∀ p ∈ Y, ∀ q ∈ Y,
-      S.gram ε (S.G.r + 1) (Word.emp S.f) p q = inner ℂ (Vt q) (Vt p)
+def PropGram
+    (S : HidaSetting E Wp Wq)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (Vt : TB.Pt E → H)
+    : Prop :=
+  ∀ Y : Finset (TB.Pt E),
+    (∀ p ∈ Y, TB.IsPt p (S.G.r + 1))
+      → ∀ᶠ ε in 𝓝[>] 0, ∀ p ∈ Y, ∀ q ∈ Y,
+          S.gram ε (S.G.r + 1) (Word.emp S.f) p q = inner ℂ (Vt q) (Vt p)
 
 end abelianHodgeDeRham'
 
 def GramPSDOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
     ThmPPos S → GridsOK S → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).GramPSD
 
 def WordsPosOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
     GridsOK S → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).WordsPos
 
 def EstWaveOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
-    GridsOK S → ThmPInt S → PlaneWaveBoundAllPlaces S → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstWave
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
+    GridsOK S → ThmPInt S → PlaneWaveBoundAllPlaces S
+      → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstWave
 
 def PoissonInputOfParts : Prop :=
-  J.EmbFacts → J.EuclidFrame → J.TraceDual → S6.LatticesGeneral →
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
-    0 < S.G.g1 → 0 < S.G.g2 → ThmPPos S → GridsOK S → ThmPInt S →
-    ∀ Kr hK0 Th e, PB.PoissonInput (S.mkData Kr hK0 Th e)
+  J.EmbFacts → J.EuclidFrame → J.TraceDual → S6.LatticesGeneral
+    → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
+        [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+        [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
+        (S : HidaSetting E Wp Wq),
+      0 < S.G.g1 → 0 < S.G.g2 → ThmPPos S → GridsOK S → ThmPInt S
+        → ∀ Kr hK0 Th e, PB.PoissonInput (S.mkData Kr hK0 Th e)
 
 def EstLiftOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq),
     OffDiagonalLiftBound S → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstLift
 
 def EstBlockOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
-    (C₄ : ℝ), CorollaryT S C₄ → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstBlock C₄
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
+      (C₄ : ℝ),
+    CorollaryT S C₄ → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstBlock C₄
 
 def EstEOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
-    (S : HidaSetting E Wp Wq) (jv : Fin S.f → ℝ), GridsOK S → LemmaE S jv →
-    ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstE (∏ v, jv v)
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
+      (jv : Fin S.f → ℝ),
+    GridsOK S → LemmaE S jv → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).EstE (∏ v, jv v)
 
 def CutoffOfParts : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
-    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (Vt : TB.Pt E → H), PropGram S Vt →
-    ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).Cutoff Vt
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
+      (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (Vt : TB.Pt E → H),
+    PropGram S Vt → ∀ Kr hK0 Th e, (S.mkData Kr hK0 Th e).Cutoff Vt
 
 def RealInputsConcrete : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Wp Wq : InfinitePlace E → Type)
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
-    (S : HidaSetting E Wp Wq) (jv : Fin S.f → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (Vt : TB.Pt E → H) (C₄ : ℝ),
-    0 < S.G.g1 → 0 < S.G.g2 →
-    ThmPPos S → GridsOK S → ThmPInt S → PlaneWaveBoundAllPlaces S → OffDiagonalLiftBound S → CorollaryT S C₄ → LemmaE S jv →
-    PropGram S Vt →
-    ∀ Kr hK0 Th e, PB.RealInputs (S.mkData Kr hK0 Th e) C₄ (∏ v, jv v) Vt
+      [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+      [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] (S : HidaSetting E Wp Wq)
+      (jv : Fin S.f → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+      (Vt : TB.Pt E → H) (C₄ : ℝ),
+    0 < S.G.g1 → 0 < S.G.g2 → ThmPPos S → GridsOK S → ThmPInt S → PlaneWaveBoundAllPlaces S
+      → OffDiagonalLiftBound S → CorollaryT S C₄ → LemmaE S jv → PropGram S Vt
+      → ∀ Kr hK0 Th e, PB.RealInputs (S.mkData Kr hK0 Th e) C₄ (∏ v, jv v) Vt
 
 def RealInputsConcreteOfParts : Prop :=
-  J.EmbFacts → J.EuclidFrame → J.TraceDual → S6.LatticesGeneral →
-  GramPSDOfParts → WordsPosOfParts → EstWaveOfParts → PoissonInputOfParts → EstLiftOfParts →
-  EstBlockOfParts → EstEOfParts → CutoffOfParts → RealInputsConcrete
+  J.EmbFacts → J.EuclidFrame → J.TraceDual → S6.LatticesGeneral → GramPSDOfParts → WordsPosOfParts
+    → EstWaveOfParts → PoissonInputOfParts → EstLiftOfParts → EstBlockOfParts → EstEOfParts
+    → CutoffOfParts
+    → RealInputsConcrete
 
 end
 

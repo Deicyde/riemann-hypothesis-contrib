@@ -9,25 +9,32 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 
 namespace UpperTheory.Gal.FiniteEtaleModels
 
-theorem desc_sq {I B : Type} {W Z Y Y' : Scheme.{0}} (cls : I → B) (f : I → (W ⟶ Z)) (kc : I → (W ⟶ Y')) (π : Z ⟶ Y) (t : B → (Y' ⟶ Y))
-    (h : ∀ c, f c ≫ π = kc c ≫ t (cls c)) :
-    Sigma.desc f ≫ π = (Sigma.desc fun c : I => kc c ≫ Sigma.ι (fun _ : B => Y') (cls c)) ≫ Sigma.desc t := by
+theorem desc_sq
+    {I B : Type} {W Z Y Y' : Scheme.{0}} (cls : I → B) (f : I → (W ⟶ Z)) (kc : I → (W ⟶ Y'))
+    (π : Z ⟶ Y) (t : B → (Y' ⟶ Y)) (h : ∀ c, f c ≫ π = kc c ≫ t (cls c))
+    : Sigma.desc f ≫ π
+      = (Sigma.desc fun c : I => kc c ≫ Sigma.ι (fun _ : B => Y') (cls c)) ≫ Sigma.desc t := by
   refine Limits.Sigma.hom_ext _ _ fun c => ?_
   simp only [Limits.Sigma.ι_desc_assoc, Limits.Sigma.ι_desc, Category.assoc, h]
 
 set_option maxHeartbeats 200000 in
 theorem liesAbs_of (hP : LPts) (hC : LCount) (hI : LIdx) (hS : SigmaFEt) : LiesAbs := by
   intro p _ D G L E _ _ gb k T N J A _ g θ O _ _ C j K₀ K₁ Y' π' s d hK hN hq0 hq1 hc hs hcos ht
-  have trc : ∀ {i i' : T.X.ι} (x y : G.GAf) (e : x = y) (a : x ∈ T.X.Δ)
-      (b : ∀ u ∈ T.X.K i, x * u * x⁻¹ ∈ T.X.K i') (a' : y ∈ T.X.Δ)
-      (b' : ∀ u ∈ T.X.K i, y * u * y⁻¹ ∈ T.X.K i'), T.X.tr i i' x a b = T.X.tr i i' y a' b' := by
+  have trc
+      : ∀ {i i' : T.X.ι} (x y : G.GAf) (e : x = y) (a : x ∈ T.X.Δ)
+          (b : ∀ u ∈ T.X.K i, x * u * x⁻¹ ∈ T.X.K i') (a' : y ∈ T.X.Δ)
+          (b' : ∀ u ∈ T.X.K i, y * u * y⁻¹ ∈ T.X.K i'),
+        T.X.tr i i' x a b = T.X.tr i i' y a' b' := by
     intro i i' x y e a b a' b'
     subst e
     rfl
@@ -65,8 +72,9 @@ theorem liesAbs_of (hP : LPts) (hC : LCount) (hI : LIdx) (hS : SigmaFEt) : LiesA
     simpa using KN_anti (g j).dvd hu
   have aH : ∀ x ∈ (g j).K, (g j).h * x ∈ T.X.Δ := fun x hx =>
     (T.Δ_eq _).2 ((g j).int.mul (integ_of_mem ((g j).le_one hx)))
-  have bH : ∀ x ∈ (g j).K, ∀ u ∈ T.X.K (T.lev (g j).M),
-      (g j).h * x * u * ((g j).h * x)⁻¹ ∈ T.X.K (T.lev N) := by
+  have bH
+      : ∀ x ∈ (g j).K, ∀ u ∈ T.X.K (T.lev (g j).M),
+        (g j).h * x * u * ((g j).h * x)⁻¹ ∈ T.X.K (T.lev N) := by
     intro x hx u hu
     rw [T.K_eq] at hu ⊢
     exact (g j).adm x hx u hu
@@ -85,13 +93,26 @@ theorem liesAbs_of (hP : LPts) (hC : LCount) (hI : LIdx) (hS : SigmaFEt) : LiesA
     rw [hc]
     simp only [kc, Category.assoc]
     exact (hq0.inv _ (hmem c) _ _).symm
-  have hsq : (T.tower N g).s j ≫ C.π =
-      (Limits.Sigma.desc fun c => kc c ≫ Limits.Sigma.ι (fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => Y') (cls c)) ≫
-        Limits.Sigma.desc fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => s :=
+  have hsq
+      : (T.tower N g).s j ≫ C.π
+        = (Limits.Sigma.desc fun c =>
+            kc c ≫ Limits.Sigma.ι (fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => Y') (cls c))
+          ≫ Limits.Sigma.desc fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => s :=
     desc_sq cls (fun _ => T.X.tr (T.lev (g j).M) (T.lev N) 1 a1 b1) kc C.π (fun _ => s) hsq'
-  refine ⟨∐ fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => Y', Limits.Sigma.desc fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => s, Limits.Sigma.desc tb,
-    Nat.card (↥(g j).K ⧸ K₀.subgroupOf (g j).K) * d, (T.X.K (T.lev (g j).M)).relIndex ((g j).K ⊓ K₁),
-    hS C.Y Y' s d _ hs, ?_, Nat.pos_of_ne_zero hm0, _, hsq, ?_, ?_⟩
+  refine ⟨
+    ∐ fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => Y',
+    Limits.Sigma.desc fun _ : ↥(g j).K ⧸ K₀.subgroupOf (g j).K => s,
+    Limits.Sigma.desc tb,
+    Nat.card (↥(g j).K ⧸ K₀.subgroupOf (g j).K) * d,
+    (T.X.K (T.lev (g j).M)).relIndex ((g j).K ⊓ K₁),
+    hS C.Y Y' s d _ hs,
+    ?_,
+    Nat.pos_of_ne_zero hm0,
+    _,
+    hsq,
+    ?_,
+    ?_
+  ⟩
   · refine Limits.Sigma.hom_ext _ _ fun b => ?_
     simp only [Limits.Sigma.ι_desc_assoc, tb, htb1]
   · refine Limits.Sigma.hom_ext _ _ fun c => ?_
@@ -102,17 +123,23 @@ theorem liesAbs_of (hP : LPts) (hC : LCount) (hI : LIdx) (hS : SigmaFEt) : LiesA
     have e : (g j).h * ↑(Quotient.out (cls c)) * u c = (g j).h * ↑(Quotient.out c) := by
       show (g j).h * ↑(Quotient.out (cls c)) * ((↑(Quotient.out (cls c)) : G.GAf)⁻¹ * ↑(Quotient.out c)) = _
       rw [_root_.mul_assoc, _root_.mul_inv_cancel_left]
-    have key := T.X.tr_mul (T.lev (g j).M) (T.lev (g j).M) (T.lev N) (u c) ((g j).h * ↑(Quotient.out (cls c)))
-      (hq0.adm _ (hmem c)).1 (hq0.adm _ (hmem c)).2 (aH _ (Quotient.out (cls c)).2) (bH _ (Quotient.out (cls c)).2)
-      (by rw [e]; exact aH _ (Quotient.out c).2) (by rw [e]; exact bH _ (Quotient.out c).2)
+    have key :=
+      T.X.tr_mul (T.lev (g j).M) (T.lev (g j).M) (T.lev N) (u c) ((g j).h * ↑(Quotient.out (cls c)))
+        (hq0.adm _ (hmem c)).1 (hq0.adm _ (hmem c)).2 (aH _ (Quotient.out (cls c)).2)
+        (bH _ (Quotient.out (cls c)).2) (by rw [e]; exact aH _ (Quotient.out c).2)
+        (by rw [e]; exact bH _ (Quotient.out c).2)
     show T.X.tr _ _ (u c) _ _ ≫ π' ≫ tb (cls c) = T.X.tr _ _ ((g j).h * ↑(Quotient.out c)) _ _ ≫ C.π
-    rw [show tb (cls c) = tb0 _ (Quotient.out (cls c)).2 from rfl, htb2 _ _ (aH _ (Quotient.out (cls c)).2) (bH _ (Quotient.out (cls c)).2)]
-    exact (Category.assoc _ _ _).symm.trans ((congrArg (· ≫ C.π) key).trans (congrArg (· ≫ C.π) (trc _ _ e _ _ _ _)))
+    rw [show tb (cls c) = tb0 _ (Quotient.out (cls c)).2 from rfl,
+      htb2 _ _ (aH _ (Quotient.out (cls c)).2) (bH _ (Quotient.out (cls c)).2)]
+    exact (Category.assoc _ _ _).symm.trans
+      ((congrArg (· ≫ C.π) key).trans (congrArg (· ≫ C.π) (trc _ _ e _ _ _ _)))
   · refine hC (g j).I _ _ _ C.Y Y' cls (T.X.tr (T.lev (g j).M) (T.lev N) 1 a1 b1) kc C.π s _
       (T.X.fin _ _ a1 b1) (T.X.etale _ _ a1 b1) hs.1 hs.2.1 ?_ hsq
     intro Ω _ _ z b y' hy
-    have hcount := hP E G.GAf T.X O (g j).K K₀ K₁ (L.KN (N : ℕ)) (T.lev (g j).M) (T.lev N) C.Y Y' C.p C.π π' s a1 b1
-      (T.K_eq N) (g j).le hN hK C.ov hq0 hq1 (hc a1 b1) hcos (↑(Quotient.out b)) (Quotient.out b).2 Ω z y' hy
+    have hcount :=
+      hP E G.GAf T.X O (g j).K K₀ K₁ (L.KN (N : ℕ)) (T.lev (g j).M) (T.lev N) C.Y Y' C.p C.π π' s a1
+        b1 (T.K_eq N) (g j).le hN hK C.ov hq0 hq1 (hc a1 b1) hcos (↑(Quotient.out b))
+        (Quotient.out b).2 Ω z y' hy
     rw [← hcount]
     refine Nat.card_congr (Equiv.subtypeEquivRight fun cx => ?_)
     constructor

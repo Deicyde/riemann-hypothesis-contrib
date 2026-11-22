@@ -15,13 +15,17 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.A12
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry GroundTheory.Heights₂.Heights.HilbertSamuel
+  Filter Topology
 
 namespace GlobalTheory.CompanionTheory.GenericFibre
 
-theorem isMultiHomogIdeal_map_rat {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) :
-    IsMultiHomogIdeal (P.map (MvPolynomial.map (Int.castRingHom ℚ))) := by
+theorem isMultiHomogIdeal_map_rat
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
+    : IsMultiHomogIdeal (P.map (MvPolynomial.map (Int.castRingHom ℚ))) := by
   obtain ⟨S, hS, rfl⟩ := hP
   refine ⟨MvPolynomial.map (Int.castRingHom ℚ) '' S, ?_, ?_⟩
   · rintro _ ⟨f, hf, rfl⟩
@@ -29,9 +33,9 @@ theorem isMultiHomogIdeal_map_rat {K : Type} [Fintype K] {ι : K → Type} [∀ 
     exact ⟨a, fun m hm k => ha m (MvPolynomial.support_map_subset _ _ hm) k⟩
   · exact Ideal.map_span _ _
 
-theorem finiteDimensional_chartLatQ :
-    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
-      (y : (Σ k, ι k) → Ω) (D : ℕ) (b : K → ℤ),
+theorem finiteDimensional_chartLatQ
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [CharZero Ω]
+        (y : (Σ k, ι k) → Ω) (D : ℕ) (b : K → ℤ),
       IsArithVar (mCoordIdeal y) (D + 1) → FiniteDimensional ℚ (chartLatQ y b 1) := by
   intro K _ ι _ Ω _ _ y D b hV
   classical
@@ -41,9 +45,11 @@ theorem finiteDimensional_chartLatQ :
   obtain ⟨e⟩ := ChartLatQCech.proof K ι Ω y (D + 1) b hV
   have hQ := isMultiHomogIdeal_map_rat hV.2.1.2.1
   have hG := QuotPartGraded.proof ℚ K ι _ hQ
-  have hS := PositivityTheory.HtPt.Ktw.a11 ℚ K ι _
-    (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.quotPart ℚ (Ideal.map (MvPolynomial.map (Int.castRingHom ℚ)) (mCoordIdeal y)))
-    inferInstance inferInstance hG
+  have hS :=
+    PositivityTheory.HtPt.Ktw.a11 ℚ K ι _
+      (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.quotPart ℚ
+        (Ideal.map (MvPolynomial.map (Int.castRingHom ℚ)) (mCoordIdeal y)))
+      inferInstance inferInstance hG
   haveI := hS.1 b 0
   exact Module.Finite.equiv e.symm
 

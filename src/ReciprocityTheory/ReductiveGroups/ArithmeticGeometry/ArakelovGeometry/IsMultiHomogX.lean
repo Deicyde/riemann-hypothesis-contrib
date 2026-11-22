@@ -29,13 +29,13 @@ theorem tdeg_sub_le (a c : K → ℕ) : tdeg (a - c) ≤ tdeg a := by
 theorem nrm_natCast [DecidableEq K] (a : K → ℕ) : nrm (fun k => (a k : ℤ)) = (tdeg a : ℝ) := by
   simp [nrm, tdeg, Nat.cast_sum]
 
-theorem pow_tdeg_mono {a b : K → ℕ} (h : tdeg a ≤ tdeg b) (m : ℕ) :
-    ((tdeg a : ℝ) + 1) ^ m ≤ ((tdeg b : ℝ) + 1) ^ m := by
+theorem pow_tdeg_mono {a b : K → ℕ} (h : tdeg a ≤ tdeg b) (m : ℕ)
+    : ((tdeg a : ℝ) + 1) ^ m ≤ ((tdeg b : ℝ) + 1) ^ m := by
   have h' : (tdeg a : ℝ) ≤ tdeg b := by exact_mod_cast h
   gcongr
 
-theorem isMultiHomog_X' [DecidableEq K] (b : K) (i : ι b) :
-    IsMultiHomog (X ⟨b, i⟩ : MRing ι) (Pi.single b 1) := by
+theorem isMultiHomog_X' [DecidableEq K] (b : K) (i : ι b)
+    : IsMultiHomog (X ⟨b, i⟩ : MRing ι) (Pi.single b 1) := by
   intro m hm k
   rw [MvPolynomial.support_X, Finset.mem_singleton] at hm
   subst hm
@@ -52,22 +52,28 @@ theorem isMultiHomog_X' [DecidableEq K] (b : K) (i : ι b) :
     · intro h; exact absurd (Finset.mem_univ i) h
   · simp [Finsupp.single_apply, hk, Ne.symm hk]
 
-theorem lg_step {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J) {f : MRing ι} {c : K → ℕ}
-    (hf : IsMultiHomog f c) {q : Ideal (MRing ι)} (hq : ∀ g, g ∈ q ↔ g * f ∈ J) {a : K → ℕ}
-    (hca : ∀ k, c k ≤ a k) {p : ℕ} (hp : 0 < p) (hpJ : (p : MRing ι) ∈ J) :
-    lg J a = lg (J ⊔ Ideal.span {f}) a + lg q (a - c) := by
+theorem lg_step
+    {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J)
+    {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c)
+    {q : Ideal (MRing ι)} (hq : ∀ g, g ∈ q ↔ g * f ∈ J)
+    {a : K → ℕ} (hca : ∀ k, c k ≤ a k)
+    {p : ℕ} (hp : 0 < p) (hpJ : (p : MRing ι) ∈ J)
+    : lg J a = lg (J ⊔ Ideal.span {f}) a + lg q (a - c) := by
   have hpq : (p : MRing ι) ∈ q := (hq _).mpr (J.mul_mem_right _ hpJ)
   rw [lg, card_mPiece_step hJ hf hq hca, Nat.cast_mul, Real.log_mul, lg, lg]
   · exact_mod_cast (card_mPiece_pos _ a hp (Ideal.mem_sup_left hpJ)).ne'
   · exact_mod_cast (card_mPiece_pos _ _ hp hpq).ne'
 
-theorem lg_chain (a : K → ℕ) {N : ℕ} {F : Fin (N + 1) → Ideal (MRing ι)} {f : Fin N → MRing ι}
-    {c : Fin N → K → ℕ} {q : Fin N → Ideal (MRing ι)} (h0 : IsMultiHomogIdeal (F 0))
-    (hlast : F (Fin.last N) = ⊤)
-    (hj : ∀ j : Fin N, IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧
-      ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
-    (ha : ∀ j k, c j k ≤ a k) {p : ℕ} (hp : 0 < p) (hpq : ∀ j, (p : MRing ι) ∈ q j) :
-    lg (F 0) a = ∑ j, lg (q j) (a - c j) := by
+theorem lg_chain
+    (a : K → ℕ)
+    {N : ℕ} {F : Fin (N + 1) → Ideal (MRing ι)} {f : Fin N → MRing ι} {c : Fin N → K → ℕ}
+    {q : Fin N → Ideal (MRing ι)} (h0 : IsMultiHomogIdeal (F 0)) (hlast : F (Fin.last N) = ⊤)
+    (hj : ∀ j : Fin N,
+      IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j}
+        ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
+    (ha : ∀ j k, c j k ≤ a k)
+    {p : ℕ} (hp : 0 < p) (hpq : ∀ j, (p : MRing ι) ∈ q j)
+    : lg (F 0) a = ∑ j, lg (q j) (a - c j) := by
   have hcard : Nat.card (mPiece (F 0) a) = ∏ j, Nat.card (mPiece (q j) (a - c j)) := by
     clear hpq
     induction N with
@@ -75,12 +81,16 @@ theorem lg_chain (a : K → ℕ) {N : ℕ} {F : Fin (N + 1) → Ideal (MRing ι)
       have htop : F 0 = ⊤ := hlast
       rw [htop, card_mPiece_top, Fin.prod_univ_zero]
     | succ N ih =>
-      have htail := ih (F := fun j => F j.succ) (f := fun j => f j.succ)
-        (c := fun j => c j.succ) (q := fun j => q j.succ)
-        (isMultiHomogIdeal_chain h0 (fun j => ⟨(hj j).1, (hj j).2.1⟩) 1)
-        (by simpa only [Fin.succ_last] using hlast)
-        (fun j => by simpa only [Fin.succ_castSucc] using hj j.succ)
-        (fun j => ha j.succ)
+      have htail :=
+        ih
+          (F := fun j => F j.succ)
+          (f := fun j => f j.succ)
+          (c := fun j => c j.succ)
+          (q := fun j => q j.succ)
+          (isMultiHomogIdeal_chain h0 (fun j => ⟨(hj j).1, (hj j).2.1⟩) 1)
+          (by simpa only [Fin.succ_last] using hlast)
+          (fun j => by simpa only [Fin.succ_castSucc] using hj j.succ)
+          (fun j => ha j.succ)
       obtain ⟨hf, hF, hq⟩ := hj 0
       rw [Fin.castSucc_zero] at hF hq
       rw [card_mPiece_step h0 hf hq (ha 0), ← hF, htail, Fin.prod_univ_succ, mul_comm]
@@ -89,16 +99,23 @@ theorem lg_chain (a : K → ℕ) {N : ℕ} {F : Fin (N + 1) → Ideal (MRing ι)
   · intro j _
     exact_mod_cast (card_mPiece_pos _ _ hp (hpq j)).ne'
 
-theorem walk_bound [DecidableEq K] (Δ : (K → ℕ) → ℝ) (a₁ m : ℕ) {B : ℝ} (hB : 0 ≤ B)
-    (hstep : ∀ a : K → ℕ, ∀ b, (∀ k, a₁ ≤ a k) → a₁ < a b →
-      |Δ a - Δ (a - Pi.single b 1)| ≤ B * m * ((tdeg a : ℝ) + 1) ^ (m - 1)) :
-    ∀ a : K → ℕ, (∀ k, a₁ ≤ a k) →
-      |Δ a| ≤ |Δ (fun _ => a₁)| + B * m * tdeg a * ((tdeg a : ℝ) + 1) ^ (m - 1) := by
+theorem walk_bound
+    [DecidableEq K]
+    (Δ : (K → ℕ) → ℝ) (a₁ m : ℕ)
+    {B : ℝ} (hB : 0 ≤ B)
+    (hstep : ∀ a : K → ℕ, ∀ b,
+      (∀ k, a₁ ≤ a k) → a₁ < a b
+        → |Δ a - Δ (a - Pi.single b 1)| ≤ B * m * ((tdeg a : ℝ) + 1) ^ (m - 1))
+    : ∀ a : K → ℕ,
+      (∀ k, a₁ ≤ a k)
+        → |Δ a| ≤ |Δ (fun _ => a₁)| + B * m * tdeg a * ((tdeg a : ℝ) + 1) ^ (m - 1) := by
   have hnn : ∀ a : K → ℕ, 0 ≤ B * m * (tdeg a : ℝ) * ((tdeg a : ℝ) + 1) ^ (m - 1) := fun a =>
     mul_nonneg (mul_nonneg (mul_nonneg hB (Nat.cast_nonneg _)) (Nat.cast_nonneg _))
       (pow_nonneg (by positivity) _)
-  have hconst : ∀ a : K → ℕ, (∀ k, a k ≤ a₁) → (∀ k, a₁ ≤ a k) →
-      |Δ a| ≤ |Δ (fun _ => a₁)| + B * m * tdeg a * ((tdeg a : ℝ) + 1) ^ (m - 1) := by
+  have hconst
+      : ∀ a : K → ℕ,
+        (∀ k, a k ≤ a₁) → (∀ k, a₁ ≤ a k)
+          → |Δ a| ≤ |Δ (fun _ => a₁)| + B * m * tdeg a * ((tdeg a : ℝ) + 1) ^ (m - 1) := by
     intro a h1 h2
     have hc : a = fun _ => a₁ := funext fun k => le_antisymm (h1 k) (h2 k)
     subst hc
@@ -133,7 +150,9 @@ theorem walk_bound [DecidableEq K] (Δ : (K → ℕ) → ℝ) (a₁ m : ℕ) {B 
         · simp [Pi.single_eq_of_ne hk] at e; rw [e]; exact ha k
       have htd : tdeg a' + 1 = tdeg a := by
         have h1 : ∑ k, (Pi.single b 1 : K → ℕ) k = 1 := by simp
-        calc tdeg a' + 1 = ∑ k, a' k + ∑ k, (Pi.single b 1 : K → ℕ) k := by rw [h1]; rfl
+        calc
+          tdeg a' + 1
+            = ∑ k, a' k + ∑ k, (Pi.single b 1 : K → ℕ) k := by rw [h1]; rfl
           _ = ∑ k, a k := by
             rw [← Finset.sum_add_distrib]
             exact Finset.sum_congr rfl fun k _ => ha'k k

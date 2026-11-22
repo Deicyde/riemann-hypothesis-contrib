@@ -9,7 +9,8 @@ noncomputable section
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
   Formalism.L2.SG.HidaSetting
 open scoped TensorProduct
 
@@ -25,7 +26,8 @@ theorem firstSplitCoord_smul (c : FpX X p) (t : TpX X p) : th1 X p θ (c • t) 
   rw [map_smul]
   rfl
 
-theorem secondSplitCoord_smul (c : FpX X p) (t : TpX X p) : th2 X p θ (c • t) = c * th2 X p θ t := by
+theorem secondSplitCoord_smul (c : FpX X p) (t : TpX X p)
+    : th2 X p θ (c • t) = c * th2 X p θ t := by
   show (θ (c • t)).2 = c * (θ t).2
   rw [map_smul]
   rfl
@@ -34,14 +36,18 @@ theorem osmul_eq (c : OpX X p) (t : TpX X p) : c • t = (c : FpX X p) • t := 
 
 theorem th_incl (e : X.B.I.E) : θ (inclR (FpX X p) e) = (iota1 X p θ e, iota2 X p θ e) := rfl
 
-theorem first_raising_mem_equivariant (h : UnitElt X p θ) (l : Fin X.B.I.n → X.B.I.E) (hl : l ∈ X.B.I.L) :
-    (fun j => θ.symm (iota1 X p θ (l j), 0)) ∈
-      latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+theorem first_raising_mem_equivariant
+    (h : UnitElt X p θ) (l : Fin X.B.I.n → X.B.I.E) (hl : l ∈ X.B.I.L)
+    : (fun j => θ.symm (iota1 X p θ (l j), 0))
+      ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
   obtain ⟨a, w, hw, hwa⟩ := h
-  have hc2 : iota2 X p θ (a : X.B.I.E) ∈ OpX X p := MassDataIdxLatFree.int_mem (OpX X p) (iota2 X p θ) a
-  have heq : (fun j => θ.symm (iota1 X p θ (l j), 0)) =
-      (⟨w, hw⟩ : OpX X p) • (ratV (F := X.B.I.F) (FpX X p) (a • l) -
-        (⟨iota2 X p θ (a : X.B.I.E), hc2⟩ : OpX X p) • ratV (F := X.B.I.F) (FpX X p) l) := by
+  have hc2 : iota2 X p θ (a : X.B.I.E) ∈ OpX X p :=
+    MassDataIdxLatFree.int_mem (OpX X p) (iota2 X p θ) a
+  have heq
+      : (fun j => θ.symm (iota1 X p θ (l j), 0))
+        = (⟨w, hw⟩ : OpX X p)
+          • (ratV (F := X.B.I.F) (FpX X p) (a • l)
+            - (⟨iota2 X p θ (a : X.B.I.E), hc2⟩ : OpX X p) • ratV (F := X.B.I.F) (FpX X p) l) := by
     funext j
     apply θ.injective
     rw [AlgEquiv.apply_symm_apply]
@@ -61,14 +67,17 @@ theorem first_raising_mem_equivariant (h : UnitElt X p θ) (l : Fin X.B.I.n → 
   · exact Submodule.subset_span ⟨a • l, X.B.I.L.smul_mem a hl, rfl⟩
   · exact Submodule.subset_span ⟨l, hl, rfl⟩
 
-theorem firstLattice_mem_local (h : UnitElt X p θ) (y : Fin X.B.I.n → FpX X p) (hy : y ∈ Mlat1 X p θ) :
-    (fun j => θ.symm (y j, 0)) ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+theorem firstLattice_mem_local
+    (h : UnitElt X p θ) (y : Fin X.B.I.n → FpX X p) (hy : y ∈ Mlat1 X p θ)
+    : (fun j => θ.symm (y j, 0))
+      ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
   induction hy using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨l, hl, rfl⟩ := hy
     exact first_raising_mem_equivariant X p θ h l hl
   | zero =>
-    convert Submodule.zero_mem (latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E))) using 1 <;> funext j <;> simp
+    convert Submodule.zero_mem (latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E))) using 1
+      <;> funext j <;> simp
   | add y y' _ _ hy hy' =>
     convert Submodule.add_mem _ hy hy' using 1
     funext j
@@ -81,22 +90,28 @@ theorem firstLattice_mem_local (h : UnitElt X p θ) (y : Fin X.B.I.n → FpX X p
     rw [← map_smul, Prod.smul_mk, smul_zero]
     rfl
 
-theorem secondLattice_mem_local (h : UnitElt X p θ) (z : Fin X.B.I.n → FpX X p) (hz : z ∈ Mlat2 X p θ) :
-    (fun j => θ.symm (0, z j)) ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+theorem secondLattice_mem_local
+    (h : UnitElt X p θ) (z : Fin X.B.I.n → FpX X p) (hz : z ∈ Mlat2 X p θ)
+    : (fun j => θ.symm (0, z j))
+      ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
   induction hz using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨l, hl, rfl⟩ := hz
     have h1 := first_raising_mem_equivariant X p θ h l hl
-    have h2 : ratV (F := X.B.I.F) (FpX X p) l ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) :=
+    have h2
+        : ratV (F := X.B.I.F) (FpX X p) l
+          ∈ latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) :=
       Submodule.subset_span ⟨l, hl, rfl⟩
     convert Submodule.sub_mem _ h2 h1 using 1
     funext j
     apply θ.injective
-    change θ (θ.symm (0, iota2 X p θ (l j))) = θ (inclR (FpX X p) (l j) - θ.symm (iota1 X p θ (l j), 0))
+    change θ (θ.symm (0, iota2 X p θ (l j)))
+      = θ (inclR (FpX X p) (l j) - θ.symm (iota1 X p θ (l j), 0))
     rw [map_sub, AlgEquiv.apply_symm_apply, AlgEquiv.apply_symm_apply, th_incl]
     ext <;> simp
   | zero =>
-    convert Submodule.zero_mem (latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E))) using 1 <;> funext j <;> simp
+    convert Submodule.zero_mem (latLoc (E := X.B.I.E) p.1 (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E))) using 1
+      <;> funext j <;> simp
   | add y y' _ _ hy hy' =>
     convert Submodule.add_mem _ hy hy' using 1
     funext j
@@ -128,7 +143,8 @@ theorem latSplit_of (h : UnitElt X p θ) : LatSplitP X p θ := by
       simp only [Pi.smul_apply, osmul_eq X p, firstSplitCoord_smul, secondSplitCoord_smul]
       exact ⟨Submodule.smul_mem _ c hx.1, Submodule.smul_mem _ c hx.2⟩
   · rintro ⟨h1, h2⟩
-    have hx : x = (fun j => θ.symm (th1 X p θ (x j), 0)) + (fun j => θ.symm (0, th2 X p θ (x j))) := by
+    have hx
+        : x = (fun j => θ.symm (th1 X p θ (x j), 0)) + (fun j => θ.symm (0, th2 X p θ (x j))) := by
       funext j
       simp only [Pi.add_apply]
       rw [← map_add (f := _), Prod.mk_add_mk, add_zero, zero_add]
@@ -136,7 +152,8 @@ theorem latSplit_of (h : UnitElt X p θ) : LatSplitP X p θ := by
       rw [AlgEquiv.apply_symm_apply]
       rfl
     rw [hx]
-    exact Submodule.add_mem _ (firstLattice_mem_local X p θ h _ h1) (secondLattice_mem_local X p θ h _ h2)
+    exact Submodule.add_mem _ (firstLattice_mem_local X p θ h _ h1)
+      (secondLattice_mem_local X p θ h _ h2)
 
 end Loc
 

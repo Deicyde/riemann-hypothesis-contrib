@@ -7,11 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ScaledBas
 
 open MeasureTheory ValuativeRel Matrix
 open scoped Pointwise
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
+open GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
 
 namespace GlobalTheory.RootEx.UnfoldShape
 
-theorem isLattice_stdLat_and_act : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ι : Type) [Fintype ι] [DecidableEq ι], Submodule.IsLattice k (stdLat k ι) ∧ ∀ (g : GL ι k) (L : Submodule 𝒪[k] (ι → k)), Submodule.IsLattice k L → Submodule.IsLattice k (act g L) := by
+theorem isLattice_stdLat_and_act
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ι : Type) [Fintype ι] [DecidableEq ι],
+      Submodule.IsLattice k (stdLat k ι)
+        ∧ ∀ (g : GL ι k) (L : Submodule 𝒪[k] (ι → k)),
+          Submodule.IsLattice k L → Submodule.IsLattice k (act g L) := by
   intro k _ _ _ _ ι _ _
   refine ⟨⟨?_, ?_⟩, fun g L hL => ⟨?_, ?_⟩⟩
   · unfold stdLat

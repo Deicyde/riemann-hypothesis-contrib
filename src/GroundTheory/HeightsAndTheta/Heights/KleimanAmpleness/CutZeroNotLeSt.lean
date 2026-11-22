@@ -15,9 +15,9 @@ universe u w
 
 def CutZeroNotLe.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (e : ℕ) (pp : Ideal (Poly k N)) (L : LineBundle k x) (s : Ω), IsSubvar x pp e →
-    s ∈ L.secs → (∃ I, s ∉ (L.twist (idealSys x pp)).sub I) →
-    ∃ f ∈ zeroIdeal L.toSubSystem s, f ∉ pp
+      (e : ℕ) (pp : Ideal (Poly k N)) (L : LineBundle k x) (s : Ω),
+    IsSubvar x pp e → s ∈ L.secs → (∃ I, s ∉ (L.twist (idealSys x pp)).sub I)
+      → ∃ f ∈ zeroIdeal L.toSubSystem s, f ∉ pp
 
 end
 

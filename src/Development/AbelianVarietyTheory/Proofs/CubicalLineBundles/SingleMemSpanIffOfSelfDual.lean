@@ -5,14 +5,25 @@ public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsTh
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM
 
-theorem single_mem_span_iff_of_selfDual : ∀ (O R K La I : Type) [CommRing O] [CommRing R] [Field K] [Algebra R K] [AddCommGroup La] [Module O La] [Fintype I] [DecidableEq I] (τ₀ : O →+* R) (h : La → La → O) (ev dv : La → I → K) (n : ℕ) (x y : Fin n → La), (∀ a b, algebraMap R K (τ₀ (h a b)) = ∑ i, ev a i * dv b i) → (∀ a, ev a = ∑ m, algebraMap R K (τ₀ (h a (y m))) • ev (x m)) → Submodule.span K (Set.range ev) = ⊤ → ∀ (i : I) (t : K), Pi.single i t ∈ Submodule.span R (Set.range ev) ↔ ∀ b, t * dv b i ∈ (algebraMap R K).range := by
+theorem single_mem_span_iff_of_selfDual
+    : ∀ (O R K La I : Type) [CommRing O] [CommRing R] [Field K] [Algebra R K] [AddCommGroup La]
+        [Module O La] [Fintype I] [DecidableEq I] (τ₀ : O →+* R) (h : La → La → O)
+        (ev dv : La → I → K) (n : ℕ) (x y : Fin n → La),
+      (∀ a b, algebraMap R K (τ₀ (h a b)) = ∑ i, ev a i * dv b i)
+        → (∀ a, ev a = ∑ m, algebraMap R K (τ₀ (h a (y m))) • ev (x m))
+        → Submodule.span K (Set.range ev) = ⊤
+        → ∀ (i : I) (t : K),
+          Pi.single i t ∈ Submodule.span R (Set.range ev)
+            ↔ ∀ b, t * dv b i ∈ (algebraMap R K).range := by
   intro O R K La I _ _ _ _ _ _ _ _ τ₀ h ev dv n x y hh hev hspan i t
   have hsum : ∀ b, ∑ j, (Pi.single i t : I → K) j * dv b j = t * dv b i := by
     intro b
@@ -29,7 +40,8 @@ theorem single_mem_span_iff_of_selfDual : ∀ (O R K La I : Type) [CommRing O] [
     | mem v hv =>
       obtain ⟨a, rfl⟩ := hv
       exact ⟨_, hh a b⟩
-    | zero => simp
+    | zero =>
+      simp
     | add u w _ _ hu hw =>
       simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]
       exact add_mem hu hw
@@ -49,7 +61,8 @@ theorem single_mem_span_iff_of_selfDual : ∀ (O R K La I : Type) [CommRing O] [
         obtain ⟨a, rfl⟩ := hv
         simp only [← hh]
         exact hev a
-      | zero => simp
+      | zero =>
+        simp
       | add u w _ _ hu hw =>
         simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, add_smul]
         rw [← hu, ← hw]

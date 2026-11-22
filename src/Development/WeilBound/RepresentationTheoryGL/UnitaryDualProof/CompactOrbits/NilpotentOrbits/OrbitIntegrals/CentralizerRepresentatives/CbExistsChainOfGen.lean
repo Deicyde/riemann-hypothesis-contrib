@@ -12,11 +12,13 @@ open Module Submodule
 
 variable {E W : Type} [Field E] [AddCommGroup W] [Module E W]
 
-theorem cb_exists_chain_of_gen (N : W →ₗ[E] W) (hN : IsNilpotent N) {ι : Type} [Fintype ι] {l : ι → ℕ}
-    (B0 : Module.Basis (Σ a, Fin (l a)) E W) (hB0 : IsChain N l B0) (hl : ∀ a, 0 < l a) (y : ι → W)
-    (hy0 : ∀ a, (N ^ l a) (y a) = 0)
-    (hy : ∀ a, B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E (Set.range (cbFam N l y)) ⊔ LinearMap.range N) :
-    ∃ B : Module.Basis (Σ a, Fin (l a)) E W, IsChain N l B ∧ ∀ p, B p = cbFam N l y p := by
+theorem cb_exists_chain_of_gen
+    (N : W →ₗ[E] W) (hN : IsNilpotent N)
+    {ι : Type} [Fintype ι]
+    {l : ι → ℕ} (B0 : Module.Basis (Σ a, Fin (l a)) E W) (hB0 : IsChain N l B0) (hl : ∀ a, 0 < l a)
+    (y : ι → W) (hy0 : ∀ a, (N ^ l a) (y a) = 0)
+    (hy : ∀ a, B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E (Set.range (cbFam N l y)) ⊔ LinearMap.range N)
+    : ∃ B : Module.Basis (Σ a, Fin (l a)) E W, IsChain N l B ∧ ∀ p, B p = cbFam N l y p := by
   set S := span E (Set.range (cbFam N l y)) with hSdef
   have hS : ∀ x ∈ S, N x ∈ S := by
     intro x hx
@@ -46,15 +48,18 @@ theorem cb_exists_chain_of_gen (N : W →ₗ[E] W) (hN : IsNilpotent N) {ι : Ty
   refine ⟨Basis.mk hli (by rw [← hSdef, hST]), ?_, fun p => by simp⟩
   exact cb_isChain_of_fam N l y hy0 _ (fun p => by simp)
 
-theorem cb_single (N : W →ₗ[E] W) (L : ℕ) (u : W) (hu : (N ^ L) u = 0) (c : Fin L → E) :
-    ∃ s ≤ L, ∃ y : W, (N ^ L) y = 0 ∧ (N ^ s) y = ∑ i, c i • (N ^ (i : ℕ)) u ∧
-      u ∈ span E {y} ⊔ LinearMap.range N := by
+theorem cb_single (N : W →ₗ[E] W) (L : ℕ) (u : W) (hu : (N ^ L) u = 0) (c : Fin L → E)
+    : ∃ s ≤ L, ∃ y : W,
+      (N ^ L) y = 0 ∧ (N ^ s) y = ∑ i, c i • (N ^ (i : ℕ)) u
+        ∧ u ∈ span E {y} ⊔ LinearMap.range N := by
   classical
   by_cases h : ∃ i, ∃ hi : i < L, c ⟨i, hi⟩ ≠ 0
-  · obtain ⟨s, ⟨hsL, hcs⟩, hmin⟩ : ∃ s, (∃ hi : s < L, c ⟨s, hi⟩ ≠ 0) ∧
-        ∀ i < s, ∀ hi : i < L, c ⟨i, hi⟩ = 0 :=
-      ⟨Nat.find h, Nat.find_spec h, fun i hi hiL => by
-        by_contra hne; exact Nat.find_min h hi ⟨hiL, hne⟩⟩
+  · obtain ⟨s, ⟨hsL, hcs⟩, hmin⟩
+        : ∃ s, (∃ hi : s < L, c ⟨s, hi⟩ ≠ 0) ∧ ∀ i < s, ∀ hi : i < L, c ⟨i, hi⟩ = 0 := ⟨
+      Nat.find h,
+      Nat.find_spec h,
+      fun i hi hiL => by by_contra hne; exact Nat.find_min h hi ⟨hiL, hne⟩
+    ⟩
     set y : W := ∑ i : Fin L, if s ≤ (i : ℕ) then c i • (N ^ ((i : ℕ) - s)) u else 0 with hydef
     set z : W := ∑ i : Fin L, if s < (i : ℕ) then c i • (N ^ ((i : ℕ) - s - 1)) u else 0 with hzdef
     refine ⟨s, hsL.le, y, ?_, ?_, ?_⟩
@@ -88,8 +93,9 @@ theorem cb_single (N : W →ₗ[E] W) (L : ℕ) (u : W) (hu : (N ^ L) u = 0) (c 
       have hu_eq : u = (c ⟨s, hsL⟩)⁻¹ • y - N ((c ⟨s, hsL⟩)⁻¹ • z) := by
         rw [hyz, smul_add, smul_smul, inv_mul_cancel₀ hcs, one_smul, map_smul]; abel
       rw [hu_eq]
-      exact Submodule.sub_mem _ (Submodule.mem_sup_left (Submodule.smul_mem _ _
-        (Submodule.mem_span_singleton_self y))) (Submodule.mem_sup_right (LinearMap.mem_range_self N _))
+      exact Submodule.sub_mem _
+        (Submodule.mem_sup_left (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self y)))
+        (Submodule.mem_sup_right (LinearMap.mem_range_self N _))
   · push Not at h
     refine ⟨L, le_rfl, u, hu, ?_, Submodule.mem_sup_left (Submodule.mem_span_singleton_self u)⟩
     rw [hu]
@@ -97,15 +103,21 @@ theorem cb_single (N : W →ₗ[E] W) (L : ℕ) (u : W) (hu : (N ^ L) u = 0) (c 
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [show c i = 0 from h i i.2, zero_smul]
 
-theorem cb_init (N : W →ₗ[E] W) {ι : Type} [Fintype ι] {l : ι → ℕ}
-    (B0 : Module.Basis (Σ a, Fin (l a)) E W) (hB0 : IsChain N l B0) (hl : ∀ a, 0 < l a) (v : W) :
-    ∃ (y : ι → W) (s : ι → ℕ), (∀ a, (N ^ l a) (y a) = 0) ∧
-      (∀ a, B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E (Set.range (cbFam N l y)) ⊔ LinearMap.range N) ∧
-      (∀ a, s a ≤ l a) ∧ v = ∑ a, (N ^ s a) (y a) := by
-  have H : ∀ a, ∃ s ≤ l a, ∃ y : W, (N ^ l a) y = 0 ∧
-      (N ^ s) y = ∑ i : Fin (l a), B0.repr v ⟨a, i⟩ • (N ^ (i : ℕ)) (B0 ⟨a, ⟨0, hl a⟩⟩) ∧
-      B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E {y} ⊔ LinearMap.range N :=
-    fun a => cb_single N (l a) _ (cb_isChain_len N hB0 a (hl a)) _
+theorem cb_init
+    (N : W →ₗ[E] W)
+    {ι : Type} [Fintype ι]
+    {l : ι → ℕ} (B0 : Module.Basis (Σ a, Fin (l a)) E W) (hB0 : IsChain N l B0) (hl : ∀ a, 0 < l a)
+    (v : W)
+    : ∃ (y : ι → W) (s : ι → ℕ),
+      (∀ a, (N ^ l a) (y a) = 0)
+        ∧ (∀ a, B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E (Set.range (cbFam N l y)) ⊔ LinearMap.range N)
+        ∧ (∀ a, s a ≤ l a) ∧ v = ∑ a, (N ^ s a) (y a) := by
+  have H
+      : ∀ a, ∃ s ≤ l a, ∃ y : W,
+        (N ^ l a) y = 0
+          ∧ (N ^ s) y = ∑ i : Fin (l a), B0.repr v ⟨a, i⟩ • (N ^ (i : ℕ)) (B0 ⟨a, ⟨0, hl a⟩⟩)
+          ∧ B0 ⟨a, ⟨0, hl a⟩⟩ ∈ span E {y} ⊔ LinearMap.range N := fun a =>
+    cb_single N (l a) _ (cb_isChain_len N hB0 a (hl a)) _
   choose s hs y hy0 hys hyu using H
   refine ⟨y, s, hy0, fun a => ?_, hs, ?_⟩
   · have hle : span E {y a} ≤ span E (Set.range (cbFam N l y)) := by

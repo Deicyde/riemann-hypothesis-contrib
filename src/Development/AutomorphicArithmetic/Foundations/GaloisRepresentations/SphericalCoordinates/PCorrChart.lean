@@ -4,13 +4,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-private theorem map_star_inv_mul {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (hdet : H.det ≠ 0) :
-    (H.map star)⁻¹ * H.map star = 1 := by
+private theorem map_star_inv_mul {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (hdet : H.det ≠ 0)
+    : (H.map star)⁻¹ * H.map star = 1 := by
   have hu : IsUnit H.det := isUnit_iff_ne_zero.mpr hdet
   have hHi : H * H⁻¹ = 1 := Matrix.mul_nonsing_inv H hu
   have hb : H.map star * (H⁻¹).map star = 1 := by
@@ -21,8 +23,9 @@ private theorem map_star_inv_mul {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (hde
   rw [hi]
   exact mul_eq_one_comm.mp hb
 
-theorem UpperTheory.Gal.W2.corrChart_of :
-    UpperTheory.Gal.W2.AdExists → UpperTheory.Gal.W2.PerLin → UpperTheory.Gal.W2.PtFibre → UpperTheory.Gal.W2.CorrChart := by
+theorem UpperTheory.Gal.W2.corrChart_of
+    : UpperTheory.Gal.W2.AdExists → UpperTheory.Gal.W2.PerLin → UpperTheory.Gal.W2.PtFibre
+      → UpperTheory.Gal.W2.CorrChart := by
   intro hAd hLin hFib O _ bar g ρ D X s A _ S k Z c₁ c₂ P₀ M₀ hP₀ hM₀ ga H hH L hL C hC hC'' z
   obtain ⟨hdet, hcomm, -⟩ := hAd O bar g ρ D P₀ M₀ hP₀ hM₀ ga H hH
   have hu : IsUnit H.det := isUnit_iff_ne_zero.mpr hdet
@@ -41,8 +44,9 @@ theorem UpperTheory.Gal.W2.corrChart_of :
     rw [Matrix.det_mul, h0, zero_mul] at h1
     exact zero_ne_one h1
   have hcommInv : ∀ a, ρ a * H⁻¹ = H⁻¹ * ρ a := fun a => by
-    calc ρ a * H⁻¹ = H⁻¹ * (H * ρ a) * H⁻¹ := by
-            rw [← Matrix.mul_assoc, hiH, Matrix.one_mul]
+    calc
+      ρ a * H⁻¹
+        = H⁻¹ * (H * ρ a) * H⁻¹ := by rw [← Matrix.mul_assoc, hiH, Matrix.one_mul]
       _ = H⁻¹ * (ρ a * H) * H⁻¹ := by rw [hcomm a]
       _ = H⁻¹ * ρ a * (H * H⁻¹) := by simp only [Matrix.mul_assoc]
       _ = H⁻¹ * ρ a := by rw [hHi, Matrix.mul_one]
@@ -53,16 +57,20 @@ theorem UpperTheory.Gal.W2.corrChart_of :
       Matrix.mulVec_mulVec, hC''def]
     have e : H * C * (H.map star)⁻¹ * H.map star = H * C := by
       rw [Matrix.mul_assoc, hbi, Matrix.mul_one]
-    rw [e, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_add, Matrix.mulVec_mulVec, hiH, Matrix.one_mulVec]
+    rw [e, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_add, Matrix.mulVec_mulVec, hiH,
+      Matrix.one_mulVec]
   have hcorr := hL (perC P₀ C) P'' hC hP'' hga z
-  let h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ) := LinearEquiv.ofLinear (Matrix.toLin' H) (Matrix.toLin' H⁻¹)
-    (by rw [← Matrix.toLin'_mul, hHi, Matrix.toLin'_one])
-    (by rw [← Matrix.toLin'_mul, hiH, Matrix.toLin'_one])
+  let h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ) :=
+    LinearEquiv.ofLinear (Matrix.toLin' H) (Matrix.toLin' H⁻¹)
+      (by rw [← Matrix.toLin'_mul, hHi, Matrix.toLin'_one])
+      (by rw [← Matrix.toLin'_mul, hiH, Matrix.toLin'_one])
   have happ : ∀ v, h v = H *ᵥ v := fun v => by
     show Matrix.toLin' H v = _
     rw [Matrix.toLin'_apply]
-  have hfib := (hFib O bar g ρ D X s A S k P'' hP'').2.2.2.2 (perC P₀ C'') h hC''
-    (fun x => by rw [happ, hP''apply, Matrix.mulVec_mulVec, hHi, Matrix.one_mulVec]) (L z)
+  have hfib :=
+    (hFib O bar g ρ D X s A S k P'' hP'').2.2.2.2 (perC P₀ C'') h hC''
+      (fun x => by rw [happ, hP''apply, Matrix.mulVec_mulVec, hHi, Matrix.one_mulVec])
+      (L z)
   have hz : fibMap H L z = fun j => h (L z j) := by
     funext j
     rw [happ]

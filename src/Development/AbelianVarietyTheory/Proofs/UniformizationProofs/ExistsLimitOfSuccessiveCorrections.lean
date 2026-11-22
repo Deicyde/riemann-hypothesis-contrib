@@ -6,15 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.Unif
 
-theorem exists_limit_of_successive_corrections (R : Type) [CommRing R] (a : R) (M : Type)
-    [AddCommGroup M] [Module R M] [IsPrecomplete (Ideal.span {a}) M] (K : ℕ → Submodule R M)
+theorem exists_limit_of_successive_corrections
+    (R : Type) [CommRing R]
+    (a : R) (M : Type) [AddCommGroup M] [Module R M] [IsPrecomplete (Ideal.span {a}) M]
+    (K : ℕ → Submodule R M)
     (hK : ∀ e, K (e + 1) ≤ K e) (ha : ∀ (e : ℕ) (x : M), a ^ (e + 1) • x ∈ K e)
-    (hs : ∀ e, ∀ x ∈ K e, ∃ y : M, x - a ^ (e + 1) • y ∈ K (e + 1)) :
-    ∀ e, ∀ x ∈ K e, ∃ x' y : M, (∀ e', x' ∈ K e') ∧ x - x' = a ^ (e + 1) • y := by
+    (hs : ∀ e, ∀ x ∈ K e, ∃ y : M, x - a ^ (e + 1) • y ∈ K (e + 1))
+    : ∀ e, ∀ x ∈ K e, ∃ x' y : M, (∀ e', x' ∈ K e') ∧ x - x' = a ^ (e + 1) • y := by
   intro e x hx
   have hanti : Antitone K := antitone_nat_of_succ_le hK
-  have hmem : ∀ (n : ℕ) (z : M), z ∈ (Ideal.span {a} ^ n • ⊤ : Submodule R M) ↔
-      ∃ y : M, z = a ^ n • y := by
+  have hmem
+      : ∀ (n : ℕ) (z : M),
+        z ∈ (Ideal.span {a} ^ n • ⊤ : Submodule R M) ↔ ∃ y : M, z = a ^ n • y := by
     intro n z
     rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul,
       Submodule.mem_smul_pointwise_iff_exists]
@@ -25,11 +28,14 @@ theorem exists_limit_of_successive_corrections (R : Type) [CommRing R] (a : R) (
       exact ⟨y, trivial, h.symm⟩
   choose y hy using hs
   let s : (n : ℕ) → K (e + n) := fun n =>
-    Nat.rec (motive := fun n => K (e + n)) ⟨x, hx⟩
-      (fun n z => ⟨z.1 - a ^ (e + n + 1) • y (e + n) z.1 z.2, hy _ _ _⟩) n
+    Nat.rec
+      (motive := fun n => K (e + n))
+      ⟨x, hx⟩
+      (fun n z => ⟨z.1 - a ^ (e + n + 1) • y (e + n) z.1 z.2, hy _ _ _⟩)
+      n
   have hs0 : (s 0 : M) = x := rfl
-  have hsn : ∀ n, (s (n + 1) : M) = s n - a ^ (e + n + 1) • y (e + n) (s n).1 (s n).2 :=
-    fun n => rfl
+  have hsn : ∀ n, (s (n + 1) : M) = s n - a ^ (e + n + 1) • y (e + n) (s n).1 (s n).2 := fun n =>
+    rfl
   have hd : ∀ m n, m ≤ n → ∃ z : M, (s m : M) - s n = a ^ (e + m + 1) • z := by
     intro m n hmn
     induction n, hmn using Nat.le_induction with
@@ -38,11 +44,10 @@ theorem exists_limit_of_successive_corrections (R : Type) [CommRing R] (a : R) (
       obtain ⟨z, hz⟩ := ih
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
       refine ⟨z + a ^ k • y (e + (m + k)) (s (m + k)).1 (s (m + k)).2, ?_⟩
-      rw [hsn, smul_add, ← hz, smul_smul, ← pow_add,
-        show e + m + 1 + k = e + (m + k) + 1 by ring]
+      rw [hsn, smul_add, ← hz, smul_smul, ← pow_add, show e + m + 1 + k = e + (m + k) + 1 by ring]
       abel
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := Ideal.span {a}) (M := M) inferInstance
-    (f := fun n => (s n : M)) (by
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {a}) (M := M) inferInstance (f := fun n => (s n : M)) (by
       intro m n hmn
       obtain ⟨z, hz⟩ := hd m n hmn
       rw [SModEq.sub_mem, hmem]

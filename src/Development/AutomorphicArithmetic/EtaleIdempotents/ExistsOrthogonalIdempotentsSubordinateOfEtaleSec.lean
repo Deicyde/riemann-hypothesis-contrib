@@ -11,7 +11,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
+open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison
+  UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
 
 private lemma key {R : Type} [CommRing R]
     (hsec : ∀ (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)), Etale f → Surjective f →
@@ -50,24 +51,28 @@ private lemma key {R : Type} [CommRing R]
     rw [Spec.map_comp, hr', Category.assoc, ← hg, hs, Spec.map_id]
   exact ⟨r'.hom, congrArg CommRingCat.Hom.hom hc⟩
 
-theorem UpperTheory.exists_orthogonalIdempotents_subordinate_of_etale_sections :
-    ∀ (R : Type) [CommRing R],
-        (∀ (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)), Etale f → Surjective f → ∃ s, s ≫ f = 𝟙 _) →
-        ∀ (ι : Type) (W : ι → Set (PrimeSpectrum R)), (∀ i, IsOpen (W i)) → (∀ p, ∃ i, p ∈ W i) →
-        ∃ (I : Type) (_ : Fintype I) (e : I → R) (a : I → ι), CompleteOrthogonalIdempotents e ∧
-          ∀ i (p : PrimeSpectrum R), e i ∉ p.asIdeal → p ∈ W (a i) := by
+theorem UpperTheory.exists_orthogonalIdempotents_subordinate_of_etale_sections
+    : ∀ (R : Type) [CommRing R],
+      (∀ (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)),
+          Etale f → Surjective f → ∃ s, s ≫ f = 𝟙 _)
+        → ∀ (ι : Type) (W : ι → Set (PrimeSpectrum R)),
+          (∀ i, IsOpen (W i)) → (∀ p, ∃ i, p ∈ W i)
+            → ∃ (I : Type) (_ : Fintype I) (e : I → R) (a : I → ι),
+              CompleteOrthogonalIdempotents e
+                ∧ ∀ i (p : PrimeSpectrum R), e i ∉ p.asIdeal → p ∈ W (a i) := by
   intro R _ hsec ι W hWo hWc
   classical
   let J : Type := {x : ι × R // (PrimeSpectrum.basicOpen x.2 : Set (PrimeSpectrum R)) ⊆ W x.1}
-  have hcov : (Set.univ : Set (PrimeSpectrum R)) ⊆
-      ⋃ j : J, (PrimeSpectrum.basicOpen j.1.2 : Set (PrimeSpectrum R)) := by
+  have hcov
+      : (Set.univ : Set (PrimeSpectrum R))
+        ⊆ ⋃ j : J, (PrimeSpectrum.basicOpen j.1.2 : Set (PrimeSpectrum R)) := by
     intro p _
     obtain ⟨i, hi⟩ := hWc p
     obtain ⟨_, ⟨f, rfl⟩, hpf, hsub⟩ :=
       PrimeSpectrum.isTopologicalBasis_basic_opens.exists_subset_of_mem_open hi (hWo i)
     exact Set.mem_iUnion.2 ⟨⟨(i, f), hsub⟩, hpf⟩
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover _
-    (fun j : J => (PrimeSpectrum.basicOpen j.1.2).isOpen) hcov
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover _ (fun j : J => (PrimeSpectrum.basicOpen j.1.2).isOpen) hcov
   let f : t → R := fun k => k.1.1.2
   have hcovI : ∀ p : PrimeSpectrum R, ∃ k, f k ∉ p.asIdeal := by
     intro p
@@ -82,8 +87,10 @@ theorem UpperTheory.exists_orthogonalIdempotents_subordinate_of_etale_sections :
     show f k ∉ p.asIdeal
     intro hf
     apply hp
-    have hu : Pi.single k 1 = algebraMap R (Π k, Localization.Away (f k)) (f k) *
-        Pi.single k (IsLocalization.Away.invSelf (f k)) := by
+    have hu
+        : Pi.single k 1
+          = algebraMap R (Π k, Localization.Away (f k)) (f k)
+            * Pi.single k (IsLocalization.Away.invSelf (f k)) := by
       ext l
       by_cases h : l = k
       · subst h

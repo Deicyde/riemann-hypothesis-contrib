@@ -84,7 +84,9 @@ open HomLocPf in
 theorem LeafHomLoc_of : LeafHomLoc := by
   intro R _ K L φ n hinj hsurj
   refine ⟨⟨fun {X} a b h => ?_⟩, ⟨fun {U} s => ?_⟩⟩
-  · change ((HomologicalComplex.homologyMap φ n).app X).hom a = ((HomologicalComplex.homologyMap φ n).app X).hom b at h
+  · change ((HomologicalComplex.homologyMap φ n).app X).hom a
+        = ((HomologicalComplex.homologyMap φ n).app X).hom b
+      at h
     obtain ⟨y, hy⟩ := π_surj K n X (a - b)
     have hb : Bdy L n X (((φ.f n).app X).hom (((K.iCycles n).app X).hom y)) := by
       rw [← cm_i, ← π_zero_iff, ← hm_π, hy, map_sub, h, sub_self]
@@ -102,8 +104,9 @@ theorem LeafHomLoc_of : LeafHomLoc := by
     obtain ⟨x', hx', hb⟩ := hSx f hf
     obtain ⟨y', rfl⟩ := lift_cyc K n _ x' hx'
     refine ⟨((K.homologyπ n).app (op V)).hom y', ?_⟩
-    change ((HomologicalComplex.homologyMap φ n).app (op V)).hom (((K.homologyπ n).app (op V)).hom y') =
-      ((L.homology n).map f.op).hom (((L.homologyπ n).app (op U)).hom y)
+    change ((HomologicalComplex.homologyMap φ n).app (op V)).hom
+        (((K.homologyπ n).app (op V)).hom y')
+      = ((L.homology n).map f.op).hom (((L.homologyπ n).app (op U)).hom y)
     rw [hm_π, nat_π, ← sub_eq_zero, ← map_sub, π_zero_iff, map_sub, cm_i, ← nat_i]
     exact hb
 

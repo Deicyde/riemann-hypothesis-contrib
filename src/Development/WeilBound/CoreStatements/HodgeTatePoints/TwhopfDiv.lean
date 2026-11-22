@@ -9,29 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FlatO
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G.Semi
 
 namespace PositivityTheory.HtPt.Twhopf
 
-
 open GlobalTheory.FibreFlat in
 set_option backward.isDefEq.respectTransparency false in
-theorem flat_of_flatOver_fields {X Y S : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ S)
-    (hY : LocallyOfFinitePresentation g) (h0 : LocallyOfFinitePresentation (f ≫ g))
-    (h1 : Flat (f ≫ g)) (h2 : LocallyQuasiFinite f)
-    (H : ∀ (k : Type) [Field k] (t : Spec (CommRingCat.of k) ⟶ S), FlatOver f g t) :
-    Flat f := by
+theorem flat_of_flatOver_fields
+    {X Y S : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ S) (hY : LocallyOfFinitePresentation g)
+    (h0 : LocallyOfFinitePresentation (f ≫ g)) (h1 : Flat (f ≫ g)) (h2 : LocallyQuasiFinite f)
+    (H : ∀ (k : Type) [Field k] (t : Spec (CommRingCat.of k) ⟶ S), FlatOver f g t)
+    : Flat f := by
   wlog hS : ∃ R, S = Spec R generalizing X Y S
   · refine IsZariskiLocalAtTarget.of_openCover (S.affineCover.pullback₁ g) fun i => ?_
     let u := S.affineCover.f i
     have sq := IsPullback.of_hasPullback f (pullback.fst g u)
     have sq' := IsPullback.of_hasPullback g u
-    refine this (pullback.snd f (pullback.fst g u)) (pullback.snd g u)
-      inferInstance (MorphismProperty.of_isPullback (sq.paste_vert sq') h0)
+    refine this (pullback.snd f (pullback.fst g u)) (pullback.snd g u) inferInstance
+      (MorphismProperty.of_isPullback (sq.paste_vert sq') h0)
       (MorphismProperty.of_isPullback (sq.paste_vert sq') h1)
       (MorphismProperty.of_isPullback (P := @LocallyQuasiFinite) sq h2)
-      (fun k _ t => ?_) ⟨_, rfl⟩
+      (fun k _ t => ?_)
+      ⟨_, rfl⟩
     intro W Z a b j h sq2 e
     refine ((H k (t ≫ u)).target sq) a b j h sq2 ?_
     rw [pullback.condition, reassoc_of% e]
@@ -39,19 +40,22 @@ theorem flat_of_flatOver_fields {X Y S : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ S)
   wlog hA : ∃ A, Y = Spec A generalizing X Y
   · refine IsZariskiLocalAtTarget.of_openCover Y.affineCover fun i => ?_
     have sq := IsPullback.of_hasPullback f (Y.affineCover.f i)
-    have e : pullback.snd f (Y.affineCover.f i) ≫ Y.affineCover.f i ≫ g =
-        pullback.fst f (Y.affineCover.f i) ≫ f ≫ g := by
+    have e
+        : pullback.snd f (Y.affineCover.f i) ≫ Y.affineCover.f i ≫ g
+          = pullback.fst f (Y.affineCover.f i) ≫ f ≫ g := by
       rw [← Category.assoc, ← sq.w, Category.assoc]
     exact this (pullback.snd f (Y.affineCover.f i))
       (MorphismProperty.of_isPullback (P := @LocallyQuasiFinite) sq h2) (Y.affineCover.f i ≫ g)
       inferInstance (by rw [e]; infer_instance) (by rw [e]; infer_instance)
-      (fun k _ t => (H k t).target sq) ⟨_, rfl⟩
+      (fun k _ t => (H k t).target sq)
+      ⟨_, rfl⟩
   obtain ⟨A, rfl⟩ := hA
   wlog hX : ∃ B, X = Spec B generalizing X
   · refine IsZariskiLocalAtSource.of_openCover X.affineCover fun i => ?_
     exact this (X.affineCover.f i ≫ f) inferInstance (by rw [Category.assoc]; infer_instance)
       (by rw [Category.assoc]; infer_instance)
-      (fun k _ t => (H k t).source _) ⟨_, rfl⟩
+      (fun k _ t => (H k t).source _)
+      ⟨_, rfl⟩
   obtain ⟨B, rfl⟩ := hX
   obtain ⟨f, rfl⟩ := Spec.map_surjective f
   obtain ⟨g, rfl⟩ := Spec.map_surjective g
@@ -71,8 +75,8 @@ theorem flat_of_flatOver_fields {X Y S : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ S)
     Algebra.FinitePresentation.of_restrict_scalars_finitePresentation R A B
   refine GlobalTheory.flat_of_quasiFinite_of_flat_fibres R A B fun k C _ _ _ t h e => ?_
   have sq := isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_tensorProduct A C B)
-  have := H k (Spec.map (CommRingCat.ofHom t)) _ _ _ (Spec.map (CommRingCat.ofHom h)) sq.flip
-    (by
+  have :=
+    H k (Spec.map (CommRingCat.ofHom t)) _ _ _ (Spec.map (CommRingCat.ofHom h)) sq.flip (by
       rw [← Spec.map_comp, ← Spec.map_comp]
       congr 1
       ext1
@@ -80,7 +84,9 @@ theorem flat_of_flatOver_fields {X Y S : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ S)
   rw [Flat.SpecMap_iff] at this
   exact RingHom.flat_algebraMap_iff.mp this
 
-theorem mul_flat : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S) [GrpObj G], IsSemiAbelian G → ∀ N : ℕ, 1 ≤ N → Flat ((𝟙 G) ^ N).left := by
+theorem mul_flat
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S) [GrpObj G],
+      IsSemiAbelian G → ∀ N : ℕ, 1 ≤ N → Flat ((𝟙 G) ^ N).left := by
   intro S _ G _ hG N hN
   have := hG.comm
   have := hG.smooth
@@ -92,10 +98,16 @@ theorem mul_flat : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S) [Gr
   have : QuasiCompact (((𝟙 G) ^ N).left ≫ G.hom) := by rw [Over.w]; infer_instance
   have : QuasiCompact ((𝟙 G) ^ N).left := QuasiCompact.of_comp _ G.hom
   exact flat_of_flatOver_fields _ G.hom inferInstance (by rw [Over.w]; infer_instance)
-    (by rw [Over.w]; infer_instance) hq fun k _ s =>
+    (by rw [Over.w]; infer_instance) hq
+    fun k _ s =>
       GlobalTheory.FibreFlat.flatOver_of_pullback _ s (GlobalTheory.IntDiv.flat_fibre G _ k s)
 
-theorem points_div : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)] (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S) [GrpObj G], IsSemiAbelian G → ∀ (x : Spec (CommRingCat.of V) ⟶ S) (N : ℕ), 1 ≤ N → ∀ c : Over.mk x ⟶ G, ∃ c' : Over.mk x ⟶ G, c' ^ N = c := by
+theorem points_div
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
+        (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S) [GrpObj G],
+      IsSemiAbelian G
+        → ∀ (x : Spec (CommRingCat.of V) ⟶ S) (N : ℕ),
+          1 ≤ N → ∀ c : Over.mk x ⟶ G, ∃ c' : Over.mk x ⟶ G, c' ^ N = c := by
   intro V _ _ _ _ S _ G _ hG x N hN c
   have := hG.comm
   have := hG.smooth
@@ -122,10 +134,12 @@ theorem points_div : ∀ (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] 
     have := GlobalTheory.ZJ.OmTest.surjective_mulN G N (by rw [hφ]; exact ho)
     rwa [hφ] at this
   obtain ⟨g, hg⟩ := hs (c.left (IsLocalRing.closedPoint V))
-  obtain ⟨z, -, hz⟩ := Scheme.Pullback.exists_preimage_pullback (f := φ.left) (g := c.left) g
-    (IsLocalRing.closedPoint V) hg
-  obtain ⟨s, hs', -⟩ := GlobalTheory.exists_section_of_quasiFinite_flat V (FractionRing V) _
-    (pullback.snd φ.left c.left) z hz
+  obtain ⟨z, -, hz⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := φ.left) (g := c.left) g
+      (IsLocalRing.closedPoint V) hg
+  obtain ⟨s, hs', -⟩ :=
+    GlobalTheory.exists_section_of_quasiFinite_flat V (FractionRing V) _
+      (pullback.snd φ.left c.left) z hz
   have e : (s ≫ pullback.fst φ.left c.left) ≫ φ.left = c.left := by
     rw [Category.assoc, pullback.condition, reassoc_of% hs']
   refine ⟨Over.homMk (s ≫ pullback.fst φ.left c.left) ?_, ?_⟩

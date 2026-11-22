@@ -10,8 +10,10 @@ namespace PI.QuotSetU.UnitaryGroupMassFormula
 
 open PI PI.QuotSetU
 
-theorem quotSetU_of (hUH : UHGroup) (hSub : SsetSub) (hSG : SsetGroup) (hMod : ModExists)
-    (hTG : TrivG) (hTS : TrivS) : PI.QuotSetU := by
+theorem quotSetU_of
+    (hUH : UHGroup) (hSub : SsetSub) (hSG : SsetGroup) (hMod : ModExists) (hTG : TrivG)
+    (hTS : TrivS)
+    : PI.QuotSetU := by
   intro k r z hz hT
   refine ⟨hUH k r, hSG k r z hz hT, hSub k r z, ?_, ?_⟩
   · intro μG hμ

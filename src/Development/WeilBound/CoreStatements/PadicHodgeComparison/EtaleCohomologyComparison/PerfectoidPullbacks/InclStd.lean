@@ -15,18 +15,20 @@ open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris Divided
 
 namespace CrystallineSemistableComparison.Pb
 
-def stdI {b : Base} {L : b.Fun} (Q : ObjectProperty (Thick L)) (r : Option ℤ) (c : b.R) : IdF (sP Q).A :=
+def stdI {b : Base} {L : b.Fun} (Q : ObjectProperty (Thick L)) (r : Option ℤ) (c : b.R)
+    : IdF (sP Q).A :=
   (match r with
     | none => IdF.bot _
     | some r => sFil Q r).sup (IdF.span _ c)
 
-theorem incl_std {b : Base} {L : b.Fun} {Q Q' : ObjectProperty (Thick L)} (h : Q' ≤ Q) (r : Option ℤ) (c : b.R) :
-    (incl h).Le (stdI Q r c) (stdI Q' r c) := by
+theorem incl_std
+    {b : Base} {L : b.Fun} {Q Q' : ObjectProperty (Thick L)} (h : Q' ≤ Q) (r : Option ℤ) (c : b.R)
+    : (incl h).Le (stdI Q r c) (stdI Q' r c) := by
   intro T x hx
   cases r <;> exact hx
 
-theorem incl_fil {b : Base} {L : b.Fun} {Q Q' : ObjectProperty (Thick L)} (h : Q' ≤ Q) (r : ℤ) :
-    (incl h).Le (sFil Q r) (sFil Q' r) := by
+theorem incl_fil {b : Base} {L : b.Fun} {Q Q' : ObjectProperty (Thick L)} (h : Q' ≤ Q) (r : ℤ)
+    : (incl h).Le (sFil Q r) (sFil Q' r) := by
   intro T x hx
   exact hx
 
@@ -46,12 +48,14 @@ variable {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.o
 abbrev KS (s : ℕ) (𝒱 : Set X.Opens) : ObjectProperty (Thick (smFun X q)) :=
   St (γ := dividedPowersBot K) (p := 0) (q := q) (κ := Ideal.Quotient.mk ⊥) (TF 1 s) 𝒱
 
-def resK (Q : ObjectProperty (Thick (smFun X q))) (j : ℕ) : HdR q j →ₗ[K] HO Q j := (CH.Mor.restrict (O (smFun X q)) Q.ι).pull j
+def resK (Q : ObjectProperty (Thick (smFun X q))) (j : ℕ) : HdR q j →ₗ[K] HO Q j :=
+  (CH.Mor.restrict (O (smFun X q)) Q.ι).pull j
 
 def quoK (Q : ObjectProperty (Thick (smFun X q))) (r : ℤ) (j : ℕ) : HdR q j →ₗ[K] HQ Q 0 r j :=
   ((toSq (sFil Q 0) (sFil Q r) fun T => T.obj.pdPow_zero).pull j).comp (resK q Q j)
 
-def cupK {i j n : ℕ} (h : i + j = n) (x : HdR q i) (y : HdR q j) : HdR q n := (CH.mulP (thA (smFun X q))).cup h x y
+def cupK {i j n : ℕ} (h : i + j = n) (x : HdR q i) (y : HdR q j) : HdR q n :=
+  (CH.mulP (thA (smFun X q))).cup h x y
 
 def oneK : HdR q 0 := CH.oneH (thA (smFun X q))
 

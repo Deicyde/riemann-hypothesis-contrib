@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.LocOver
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.LocOver
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,11 +17,13 @@ namespace GlobalTheory.CrtG
 theorem gS_ne_zero (D : D7) : gS D ≠ 0 := by
   unfold gS; exact Nat.mul_ne_zero (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero
 
-theorem exists_crt (D : D7) (p : PlF D) :
-    ∃ a₀ : 𝓞 D.host.F,
-      (∃ s : 𝓞 D.host.F, s ∉ p.asIdeal ∧ s * (a₀ - 1) ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)}) ∧
-      ∀ p' : PlF D, p' ≠ p → ∃ s : 𝓞 D.host.F, s ∉ p'.asIdeal ∧
-        s * a₀ ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)} := by
+theorem exists_crt (D : D7) (p : PlF D)
+    : ∃ a₀ : 𝓞 D.host.F,
+      (∃ s : 𝓞 D.host.F, s ∉ p.asIdeal ∧ s * (a₀ - 1) ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)})
+        ∧ ∀ p' : PlF D,
+          p' ≠ p
+            → ∃ s : 𝓞 D.host.F,
+              s ∉ p'.asIdeal ∧ s * a₀ ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)} := by
   set G : Ideal (𝓞 D.host.F) := Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)} with hGdef
   have hG : G ≠ 0 := by
     rw [Ideal.zero_eq_bot, Ne, hGdef, Ideal.span_singleton_eq_bot]
@@ -37,15 +40,16 @@ theorem exists_crt (D : D7) (p : PlF D) :
     refine ⟨s, hsp, ?_⟩
     have h1 : s * (a₀ - 1) = -(j * s) := by
       have : a₀ - 1 = -j := by rw [← hja]; ring
-      rw [this]; ring
+      rw [this]
+      ring
     rw [h1, hGA]
     exact neg_mem (Ideal.mul_mem_mul hj hsA)
   · intro p' hp'
     have hnot : ¬ p.asIdeal ^ k ≤ p'.asIdeal := by
       intro h
       have hle : p.asIdeal ≤ p'.asIdeal := p'.isPrime.le_of_pow_le h
-      exact hp' (IsDedekindDomain.HeightOneSpectrum.ext
-        (p.isMaximal.eq_of_le p'.isPrime.ne_top hle).symm)
+      exact hp' (IsDedekindDomain.HeightOneSpectrum.ext (p.isMaximal.eq_of_le p'.isPrime.ne_top
+        hle).symm)
     obtain ⟨s, hsk, hsp'⟩ := Set.not_subset.1 hnot
     refine ⟨s, hsp', ?_⟩
     rw [hGA]
@@ -55,15 +59,21 @@ end GlobalTheory.CrtG
 
 namespace GlobalTheory.CrtG
 
-theorem iE_div_g (D : D7) (p : PlF D) (y : 𝓞 D.host.F) (s : 𝓞 D.host.F) (hs : s ∉ p.asIdeal)
-    (hy : s * y ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)}) :
-    ∃ o ∈ (D.s.atP p).O, (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F)) =
-      (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o := by
+theorem iE_div_g
+    (D : D7) (p : PlF D) (y : 𝓞 D.host.F) (s : 𝓞 D.host.F)
+    (hs : s ∉ p.asIdeal) (hy : s * y ∈ Ideal.span {((gS D : ℕ) : 𝓞 D.host.F)})
+    : ∃ o ∈ (D.s.atP p).O,
+      (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F))
+        = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o := by
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hy
   have hg : ((gS D : ℕ) : D.host.E) ≠ 0 := by exact_mod_cast gS_ne_zero D
   set x : D.host.E := algebraMap D.host.F D.host.E (y : D.host.F) / ((gS D : ℕ) : D.host.E) with hx
-  have hcx : algebraMap D.host.F D.host.E (s : D.host.F) * x = algebraMap D.host.F D.host.E (c : D.host.F) := by
-    have h2 : ((c * ((gS D : ℕ) : 𝓞 D.host.F) : 𝓞 D.host.F) : D.host.F) = ((s * y : 𝓞 D.host.F) : D.host.F) := by
+  have hcx
+      : algebraMap D.host.F D.host.E (s : D.host.F) * x
+        = algebraMap D.host.F D.host.E (c : D.host.F) := by
+    have h2
+        : ((c * ((gS D : ℕ) : 𝓞 D.host.F) : 𝓞 D.host.F) : D.host.F)
+          = ((s * y : 𝓞 D.host.F) : D.host.F) := by
       rw [hc]
     push_cast at h2
     have h3 := congrArg (algebraMap D.host.F D.host.E) h2
@@ -72,10 +82,21 @@ theorem iE_div_g (D : D7) (p : PlF D) (y : 𝓞 D.host.F) (s : 𝓞 D.host.F) (h
   have hint : IsIntegral ℤ (algebraMap D.host.F D.host.E (s : D.host.F) * x) := by
     rw [hcx]
     exact (RingOfIntegers.isIntegral_coe c).map (IsScalarTower.toAlgHom ℤ D.host.F D.host.E)
-  refine ⟨(D.s.atP p).ιE x, (Formalism.L2.SG.Pf.LocalDenominators.iE_mem_O_iff_D p x).2 ⟨s, hs, hint⟩, ?_⟩
+  refine ⟨
+    (D.s.atP p).ιE x,
+    (Formalism.L2.SG.Pf.LocalDenominators.iE_mem_O_iff_D p x).2 ⟨s, hs, hint⟩,
+    ?_
+  ⟩
   rw [← map_mul, hx, mul_div_cancel₀ _ hg]
 
-theorem exists_one_here_zero_elsewhere : ∀ (D : D7) (p : PlF D), ∃ a : 𝓞 D.host.E, (∃ o ∈ (D.s.atP p).O, (D.s.atP p).ιE (a : D.host.E) - 1 = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o) ∧ ∀ p' : PlF D, p' ≠ p → ∃ o ∈ (D.s.atP p').O, (D.s.atP p').ιE (a : D.host.E) = (D.s.atP p').ιE ((gS D : ℕ) : D.host.E) * o := by
+theorem exists_one_here_zero_elsewhere
+    : ∀ (D : D7) (p : PlF D), ∃ a : 𝓞 D.host.E,
+      (∃ o ∈ (D.s.atP p).O,
+          (D.s.atP p).ιE (a : D.host.E) - 1 = (D.s.atP p).ιE ((gS D : ℕ) : D.host.E) * o)
+        ∧ ∀ p' : PlF D,
+          p' ≠ p
+            → ∃ o ∈ (D.s.atP p').O,
+              (D.s.atP p').ιE (a : D.host.E) = (D.s.atP p').ιE ((gS D : ℕ) : D.host.E) * o := by
   intro D p
   obtain ⟨a₀, ⟨s, hs, h1⟩, h2⟩ := exists_crt D p
   have hint : IsIntegral ℤ (algebraMap D.host.F D.host.E (a₀ : D.host.F)) :=

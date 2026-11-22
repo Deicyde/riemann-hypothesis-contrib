@@ -7,8 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix IsLocalRing UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.HV
 
-private theorem norm_lt_one_of_nonunit {l : ℕ} [Fact l.Prime] (c : Coef l) (b : c.O) (hb : ¬ IsUnit b) :
-    ‖(b : PadicAlgCl l)‖ < 1 := by
+private theorem norm_lt_one_of_nonunit
+    {l : ℕ} [Fact l.Prime] (c : Coef l) (b : c.O) (hb : ¬ IsUnit b)
+    : ‖(b : PadicAlgCl l)‖ < 1 := by
   classical
   haveI := c.dvr
   haveI := c.fin
@@ -33,8 +34,11 @@ private theorem norm_lt_one_of_nonunit {l : ℕ} [Fact l.Prime] (c : Coef l) (b 
     exact absurd hr (lt_irrefl 1)
   · exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) he).1 hr
 
-private theorem isLocPt_toBar {l : ℕ} [Fact l.Prime] {c : Coef l} {R : Type} [CommRing R] [Algebra c.O R]
-    [IsCO c.O R] (x : R →ₐ[c.O] c.O) : IsLocPt (toBar x) := by
+private theorem isLocPt_toBar
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} {R : Type} [CommRing R] [Algebra c.O R] [IsCO c.O R]
+    (x : R →ₐ[c.O] c.O)
+    : IsLocPt (toBar x) := by
   intro y hy
   refine norm_lt_one_of_nonunit c (x y) fun hu => ?_
   have h2 : IsUnit (y - algebraMap c.O R (x y)) := by
@@ -46,19 +50,25 @@ private theorem isLocPt_toBar {l : ℕ} [Fact l.Prime] {c : Coef l} {R : Type} [
   rw [map_sub, AlgHom.commutes] at h5
   simp at h5
 
-private theorem hom_ext_gr {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A)
-    [GradedAlgebra 𝒜] [CommRing K] [Algebra O K] (ξ ξ' : A →ₐ[O] K) (h : ∀ j, ∀ f ∈ 𝒜 j, ξ f = ξ' f) : ξ = ξ' := by
+private theorem hom_ext_gr
+    {O A K : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [CommRing K] [Algebra O K]
+    (ξ ξ' : A →ₐ[O] K) (h : ∀ j, ∀ f ∈ 𝒜 j, ξ f = ξ' f)
+    : ξ = ξ' := by
   refine AlgHom.ext fun f => ?_
   induction f using DirectSum.Decomposition.inductionOn 𝒜 with
   | zero => simp
   | homogeneous m => exact h _ _ m.2
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb]
 
-theorem UpperTheory.V.U3.gradedModel_pointCondition_of_ptHyp :
-    ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-      {η : Γ →* ℤˣ} {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
-      {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ} (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)), l ≠ 2 → Marks η Ψ cc g₁ →
-      M2 M.𝒜 M.Q.ideal → PtHyp η S.r.hom M.x₀ → M3 M.𝒜 (PadicAlgCl l) M.x M.Q.ideal := by
+theorem UpperTheory.V.U3.gradedModel_pointCondition_of_ptHyp
+    : ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ]
+        [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] {η : Γ →* ℤˣ}
+        {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
+        {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ}
+        (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)),
+      l ≠ 2 → Marks η Ψ cc g₁ → M2 M.𝒜 M.Q.ideal → PtHyp η S.r.hom M.x₀
+        → M3 M.𝒜 (PadicAlgCl l) M.x M.Q.ideal := by
   intro l _ c Γ H _ _ _ _ _ _ η Ψ N ι hι U I cc g₁ S M hl hm h2 hpt
   intro x₁ hS hN hP hne
   exfalso

@@ -11,15 +11,15 @@ open GlobalTheory.UnitLemma Matrix MeasureTheory
 
 namespace GlobalTheory
 
-theorem integral_rightCoset_fun_eq_finsum (G Λ : Type) [Group G] [TopologicalSpace G] [ContinuousMul G]
-    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsMulRightInvariant] (H : Set G)
-    (hH : IsOpen H) (hμ : μ H = 1) (π : G → Λ) (hπ : ∀ g g', π g' = π g ↔ g' * g⁻¹ ∈ H)
-    (s : Λ → ℂ) (hs : ∀ l, s l = 0 ∨ ‖s l‖ = 1) :
-    ∫ g, s (π g) ∂μ = ∑ᶠ l ∈ Set.range π, s l := by
+theorem integral_rightCoset_fun_eq_finsum
+    (G Λ : Type) [Group G] [TopologicalSpace G] [ContinuousMul G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsMulRightInvariant]
+    (H : Set G) (hH : IsOpen H) (hμ : μ H = 1)
+    (π : G → Λ) (hπ : ∀ g g', π g' = π g ↔ g' * g⁻¹ ∈ H)
+    (s : Λ → ℂ) (hs : ∀ l, s l = 0 ∨ ‖s l‖ = 1)
+    : ∫ g, s (π g) ∂μ = ∑ᶠ l ∈ Set.range π, s l := by
   classical
-
-  have hfib : ∀ g, π ⁻¹' {π g} = (fun x => x * g⁻¹) ⁻¹' H := by
-    intro g; ext x; simp [hπ g x]
+  have hfib : ∀ g, π ⁻¹' {π g} = (fun x => x * g⁻¹) ⁻¹' H := by intro g; ext x; simp [hπ g x]
   have hfibO : ∀ g, IsOpen (π ⁻¹' {π g}) := by
     intro g; rw [hfib g]; exact hH.preimage (continuous_mul_const _)
   have hfibM : ∀ l, MeasurableSet (π ⁻¹' {l}) := by
@@ -27,11 +27,12 @@ theorem integral_rightCoset_fun_eq_finsum (G Λ : Type) [Group G] [TopologicalSp
     by_cases hl : l ∈ Set.range π
     · obtain ⟨g, rfl⟩ := hl; exact (hfibO g).measurableSet
     · have : π ⁻¹' {l} = ∅ := by
-        ext x; simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
+        ext x
+        simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
         exact fun h => hl ⟨x, h⟩
-      rw [this]; exact MeasurableSet.empty
-  have hfib1 : ∀ g, μ (π ⁻¹' {π g}) = 1 := by
-    intro g; rw [hfib g, measure_preimage_mul_right, hμ]
+      rw [this]
+      exact MeasurableSet.empty
+  have hfib1 : ∀ g, μ (π ⁻¹' {π g}) = 1 := by intro g; rw [hfib g, measure_preimage_mul_right, hμ]
   set S := Set.range π ∩ Function.support s with hSdef
   by_cases hS : S.Finite
   · set T := hS.toFinset with hT
@@ -63,9 +64,11 @@ theorem integral_rightCoset_fun_eq_finsum (G Λ : Type) [Group G] [TopologicalSp
           haveI : IsFiniteMeasure (μ.restrict (π ⁻¹' {π g})) := ⟨by simp [hfib1 g]⟩
           exact integrable_const _
         · have : π ⁻¹' {l} = ∅ := by
-            ext x; simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
+            ext x
+            simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false]
             exact fun h => hl ⟨x, h⟩
-          rw [this]; exact integrableOn_empty)
+          rw [this]
+          exact integrableOn_empty)
   · rw [finsum_mem_eq_zero_of_infinite hS]
     apply integral_undef
     intro hint
@@ -73,31 +76,32 @@ theorem integral_rightCoset_fun_eq_finsum (G Λ : Type) [Group G] [TopologicalSp
 
     have hbound : ∀ F : Finset Λ, (↑F : Set Λ) ⊆ S → (F.card : ENNReal) ≤ ∫⁻ g, ‖s (π g)‖ₑ ∂μ := by
       intro F hF
-      calc (F.card : ENNReal) = ∑ l ∈ F, μ (π ⁻¹' {l}) := by
-            rw [Finset.card_eq_sum_ones, Nat.cast_sum]
-            refine Finset.sum_congr rfl ?_
-            intro l hl
-            obtain ⟨⟨g, rfl⟩, _⟩ := hF hl
-            simp [hfib1 g]
+      calc
+        (F.card : ENNReal) = ∑ l ∈ F, μ (π ⁻¹' {l}) := by
+          rw [Finset.card_eq_sum_ones, Nat.cast_sum]
+          refine Finset.sum_congr rfl ?_
+          intro l hl
+          obtain ⟨⟨g, rfl⟩, _⟩ := hF hl
+          simp [hfib1 g]
         _ = ∫⁻ g, ∑ l ∈ F, (π ⁻¹' {l}).indicator 1 g ∂μ := by
-            rw [MeasureTheory.lintegral_finsetSum]
-            · refine Finset.sum_congr rfl ?_
-              intro l _
-              rw [lintegral_indicator_one (hfibM l)]
-            · intro l _
-              exact (measurable_one.indicator (hfibM l))
+          rw [MeasureTheory.lintegral_finsetSum]
+          · refine Finset.sum_congr rfl ?_
+            intro l _
+            rw [lintegral_indicator_one (hfibM l)]
+          · intro l _
+            exact (measurable_one.indicator (hfibM l))
         _ ≤ ∫⁻ g, ‖s (π g)‖ₑ ∂μ := by
-            apply lintegral_mono
-            intro g
-            have : ∀ l, (π ⁻¹' {l}).indicator (1 : G → ENNReal) g = if π g = l then 1 else 0 := by
-              intro l; simp [Set.indicator_apply]
-            simp only [this, Finset.sum_ite_eq]
-            split_ifs with h
-            · obtain ⟨_, hsupp⟩ := hF h
-              rcases hs (π g) with h0 | h1
-              · exact absurd h0 hsupp
-              · rw [← ofReal_norm_eq_enorm, h1]; simp
-            · exact bot_le
+          apply lintegral_mono
+          intro g
+          have : ∀ l, (π ⁻¹' {l}).indicator (1 : G → ENNReal) g = if π g = l then 1 else 0 := by
+            intro l; simp [Set.indicator_apply]
+          simp only [this, Finset.sum_ite_eq]
+          split_ifs with h
+          · obtain ⟨_, hsupp⟩ := hF h
+            rcases hs (π g) with h0 | h1
+            · exact absurd h0 hsupp
+            · rw [← ofReal_norm_eq_enorm, h1]; simp
+          · exact bot_le
     obtain ⟨n, hn⟩ := ENNReal.exists_nat_gt hfin.ne
     obtain ⟨F, hFS, hFc⟩ := Set.Infinite.exists_subset_card_eq (hS : S.Infinite) n
     have := hbound F hFS

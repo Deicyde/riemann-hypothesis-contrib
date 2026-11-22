@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GoodModModT
 
 open NumberField MeasureTheory IsDedekindDomain UniqueFactorizationMonoid
 open scoped Classical Pointwise
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
-open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open GlobalTheory.NormDict GlobalTheory.NormExact GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 open GlobalTheory.SqTop (modT)
 open GlobalTheory.BottomIPData (sfB)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl Lat IsFockVec IsSphOff volQ)
@@ -46,8 +49,10 @@ def scaleInv (D : D7) (r : D.host.E) : Submodule (𝓞 D.host.E) D.host.E where
 def scaleLat (D : D7) (r : D.host.E) (n : ℕ) : Submodule (𝓞 D.host.E) (Fin n → D.host.E) :=
   Submodule.pi Set.univ fun _ => scaleInv D r
 
-theorem mem_scaleLat {r : D.host.E} {n : ℕ} {y : Fin n → D.host.E} :
-    y ∈ scaleLat D r n ↔ ∀ i, ∀ c ∈ D.host.ccE, r * (c : D.host.E) * y i ∈ (1 : Submodule (𝓞 D.host.E) D.host.E) := by
+theorem mem_scaleLat {r : D.host.E} {n : ℕ} {y : Fin n → D.host.E}
+    : y ∈ scaleLat D r n
+      ↔ ∀ i, ∀ c ∈ D.host.ccE,
+        r * (c : D.host.E) * y i ∈ (1 : Submodule (𝓞 D.host.E) D.host.E) := by
   simp only [scaleLat, Submodule.mem_pi, Set.mem_univ, true_implies]
   rfl
 

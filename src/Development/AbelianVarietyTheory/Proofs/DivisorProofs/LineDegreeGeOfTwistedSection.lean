@@ -14,8 +14,13 @@ set_option autoImplicit false
 
 namespace GlobalTheory.Nef.LineBound
 
-theorem le_ordVec {k F : Type} [Field k] [Field F] [Algebra k F] {n : ℕ} (v : Place k F) (x : Fin n → F)
-    (hx : x ≠ 0) (m : ℤ) (h : ∀ i, v.1 (x i) ≤ WithZero.exp (-m)) : m ≤ ordVec v x := by
+theorem le_ordVec
+    {k F : Type} [Field k] [Field F] [Algebra k F]
+    {n : ℕ}
+    (v : Place k F)
+    (x : Fin n → F) (hx : x ≠ 0)
+    (m : ℤ) (h : ∀ i, v.1 (x i) ≤ WithZero.exp (-m))
+    : m ≤ ordVec v x := by
   obtain ⟨i, hi⟩ := Function.ne_iff.1 hx
   have h0 : v.1 (x i) ≠ 0 := (Valuation.ne_zero_iff _).2 hi
   have h1 : v.1 (x i) ≤ nrm v x := Finset.le_sup (f := fun j => v.1 (x j)) (Finset.mem_univ i)
@@ -28,7 +33,18 @@ theorem le_ordVec {k F : Type} [Field k] [Field F] [Algebra k F] {n : ℕ} (v : 
 
 end GlobalTheory.Nef.LineBound
 
-theorem GlobalTheory.Nef.degLine_ge_of_twist : ∀ (k F : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field F] [Algebra k F], IsFF k F → ∀ (n : ℕ) (h : Place k F → Matrix (Fin n) (Fin n) F), admitted h → ∀ (v₀ : Place k F) (π : F), π ≠ 0 → ord v₀ π = 1 → ∀ (e : ℤ) (p : Fin n → F), p ≠ 0 → (∀ (v : Place k F) (i : Fin n), v.1 ((twistAt v₀ (π ^ (-e)) h v).mulVec p i) ≤ 1) → e ≤ degLine h p := by
+theorem GlobalTheory.Nef.degLine_ge_of_twist
+    : ∀ (k F : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field F] [Algebra k F],
+      IsFF k F
+        → ∀ (n : ℕ) (h : Place k F → Matrix (Fin n) (Fin n) F),
+          admitted h
+            → ∀ (v₀ : Place k F) (π : F),
+              π ≠ 0 → ord v₀ π = 1
+                → ∀ (e : ℤ) (p : Fin n → F),
+                  p ≠ 0
+                    → (∀ (v : Place k F) (i : Fin n),
+                      v.1 ((twistAt v₀ (π ^ (-e)) h v).mulVec p i) ≤ 1)
+                    → e ≤ degLine h p := by
   intro k F _ _ _ _ _ hF n h hA v₀ π hπ hord e p hp hle
   classical
   obtain ⟨-, hw⟩ := GlobalTheory.T.admissibleAdelicMatrixFamily_orders_finite k F hF n h hA
@@ -60,13 +76,16 @@ theorem GlobalTheory.Nef.degLine_ge_of_twist : ∀ (k F : Type) [Field k] [IsAlg
       ring_nf
       simp
     rw [this]
-    calc WithZero.exp (-e) * (WithZero.exp (-e * -1) * y) ≤ WithZero.exp (-e) * 1 := by gcongr
+    calc
+      WithZero.exp (-e) * (WithZero.exp (-e * -1) * y)
+        ≤ WithZero.exp (-e) * 1 := by gcongr
       _ = WithZero.exp (-e) := mul_one _
   have hs : Function.support d ⊆ ↑(hfin.toFinset ∪ {v₀}) := fun v hv => by
     simp only [Finset.coe_union, Set.Finite.coe_toFinset, Finset.coe_singleton]
     exact Or.inl (hsupp hv)
   show e ≤ ∑ᶠ v, d v
-  rw [finsum_eq_sum_of_support_subset _ hs, ← Finset.add_sum_erase _ _ (show v₀ ∈ hfin.toFinset ∪ {v₀} by simp)]
+  rw [finsum_eq_sum_of_support_subset _ hs,
+    ← Finset.add_sum_erase _ _ (show v₀ ∈ hfin.toFinset ∪ {v₀} by simp)]
   have : 0 ≤ ∑ x ∈ (hfin.toFinset ∪ {v₀}).erase v₀, d x :=
     Finset.sum_nonneg fun v hv => hnn v (Finset.ne_of_mem_erase hv)
   omega

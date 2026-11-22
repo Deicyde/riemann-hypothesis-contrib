@@ -6,15 +6,16 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitarySch
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.GLOpen
 
 theorem continuousOn_ringInverse_of_isOpenEmbedding_units
     (A : Type) [CommRing A] [TopologicalSpace A] [IsTopologicalRing A]
-    (hA : IsOpenEmbedding (Units.val : Aˣ → A)) :
-    ContinuousOn (Ring.inverse : A → A) {x | IsUnit x} := by
+    (hA : IsOpenEmbedding (Units.val : Aˣ → A))
+    : ContinuousOn (Ring.inverse : A → A) {x | IsUnit x} := by
   rintro _ ⟨u, rfl⟩
   refine ContinuousAt.continuousWithinAt ?_
   rw [← hA.continuousAt_iff]
@@ -26,27 +27,33 @@ theorem continuousOn_ringInverse_of_isOpenEmbedding_units
 
 theorem isOpenEmbedding_val_GL
     (A : Type) [CommRing A] [TopologicalSpace A] [IsTopologicalRing A]
-    (hA : IsOpenEmbedding (Units.val : Aˣ → A)) (n : ℕ) :
-    IsOpenEmbedding (Units.val : GL (Fin n) A → Matrix (Fin n) (Fin n) A) := by
-  have hdet : Continuous (fun M : Matrix (Fin n) (Fin n) A => M.det) :=
-    continuous_id.matrix_det
-  have hunit : ∀ M : Matrix (Fin n) (Fin n) A, IsUnit M ↔ IsUnit M.det :=
-    fun M => Matrix.isUnit_iff_isUnit_det M
+    (hA : IsOpenEmbedding (Units.val : Aˣ → A)) (n : ℕ)
+    : IsOpenEmbedding (Units.val : GL (Fin n) A → Matrix (Fin n) (Fin n) A) := by
+  have hdet : Continuous (fun M : Matrix (Fin n) (Fin n) A => M.det) := continuous_id.matrix_det
+  have hunit : ∀ M : Matrix (Fin n) (Fin n) A, IsUnit M ↔ IsUnit M.det := fun M =>
+    Matrix.isUnit_iff_isUnit_det M
   have hadj : Continuous (fun M : Matrix (Fin n) (Fin n) A => M.adjugate) :=
     continuous_id.matrix_adjugate
   have hopen : IsOpen {x : A | IsUnit x} := hA.isOpen_range
-  refine ⟨Units.isEmbedding_val_mk' (f := fun M : Matrix (Fin n) (Fin n) A => M⁻¹) ?_
-    fun u => (Matrix.coe_units_inv u).symm, ?_⟩
+  refine ⟨
+    Units.isEmbedding_val_mk'
+      (f := fun M : Matrix (Fin n) (Fin n) A => M⁻¹)
+      ?_
+      fun u => (Matrix.coe_units_inv u).symm,
+    ?_
+  ⟩
   · have hinv : ContinuousOn
-        (fun M : Matrix (Fin n) (Fin n) A => Ring.inverse M.det • M.adjugate) {M | IsUnit M} := by
-      have hri : ContinuousOn (fun M : Matrix (Fin n) (Fin n) A => Ring.inverse M.det)
-          {M | IsUnit M} :=
-        (GlobalTheory.CompanionTheory.SW.GLOpen.continuousOn_ringInverse_of_isOpenEmbedding_units A hA).comp hdet.continuousOn
-          fun M hM => (hunit M).mp hM
+        (fun M : Matrix (Fin n) (Fin n) A => Ring.inverse M.det • M.adjugate)
+        {M | IsUnit M} := by
+      have hri
+          : ContinuousOn (fun M : Matrix (Fin n) (Fin n) A => Ring.inverse M.det) {M | IsUnit M} :=
+        (GlobalTheory.CompanionTheory.SW.GLOpen.continuousOn_ringInverse_of_isOpenEmbedding_units A
+          hA).comp hdet.continuousOn fun M hM => (hunit M).mp hM
       exact hri.smul hadj.continuousOn
     exact hinv.congr fun M _ => Matrix.inv_def M
-  · have h : Set.range (Units.val : GL (Fin n) A → Matrix (Fin n) (Fin n) A) =
-        (fun M : Matrix (Fin n) (Fin n) A => M.det) ⁻¹' {x | IsUnit x} := by
+  · have h
+        : Set.range (Units.val : GL (Fin n) A → Matrix (Fin n) (Fin n) A)
+          = (fun M : Matrix (Fin n) (Fin n) A => M.det) ⁻¹' {x | IsUnit x} := by
       ext M
       exact hunit M
     rw [h]

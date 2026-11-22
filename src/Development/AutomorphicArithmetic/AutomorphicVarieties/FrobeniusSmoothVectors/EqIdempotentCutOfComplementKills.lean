@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem list_forall_eq_zero_of_nonpos_of_sum_eq_zero (L : List ℤ) (h : ∀ x ∈ L, x ≤ 0) (hs : L.sum = 0) : ∀ x ∈ L, x = 0 := by
+private theorem list_forall_eq_zero_of_nonpos_of_sum_eq_zero
+    (L : List ℤ) (h : ∀ x ∈ L, x ≤ 0) (hs : L.sum = 0)
+    : ∀ x ∈ L, x = 0 := by
   induction L with
   | nil => simp
   | cons a L ih =>
@@ -21,7 +23,10 @@ private theorem list_forall_eq_zero_of_nonpos_of_sum_eq_zero (L : List ℤ) (h :
       | cons b L ih2 =>
         simp only [List.sum_cons]
         have hb : b ≤ 0 := hL b (by simp)
-        have := ih2 (fun x hx => h x (by rcases List.mem_cons.mp hx with rfl | hx <;> simp [hx])) (fun x hx => hL x (by simp [hx]))
+        have :=
+          ih2
+            (fun x hx => h x (by rcases List.mem_cons.mp hx with rfl | hx <;> simp [hx]))
+            (fun x hx => hL x (by simp [hx]))
         linarith
     rcases List.mem_cons.mp hx with rfl | hx
     · linarith
@@ -37,8 +42,15 @@ private theorem eq_of_w_sub_w_eq_zero (n : ℕ) (i j : Fin n) (h : w n i - w n j
   apply Fin.ext
   split_ifs at h <;> omega
 
-theorem UpperTheory.V.Fr.adjoin_image_in_residue_range :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ} (S : Space O F n) {Q : Type} [CommRing Q] (f : ResidueField O →+* Q) (φ : S.A →+* Q), (∀ a : O, φ (algebraMap O S.A a) = f (residue O a)) → (S.u.map φ).triM = ⊥ → (S.u.map φ).IsBar f → ∀ z : S.A, (z : S.R) ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)}) → φ z ∈ f.range := by
+theorem UpperTheory.V.Fr.adjoin_image_in_residue_range
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O]
+        {F : Frame l (ResidueField O)} {n : ℕ} (S : Space O F n) {Q : Type} [CommRing Q]
+        (f : ResidueField O →+* Q) (φ : S.A →+* Q),
+      (∀ a : O, φ (algebraMap O S.A a) = f (residue O a)) → (S.u.map φ).triM = ⊥
+        → (S.u.map φ).IsBar f
+        → ∀ z : S.A,
+          (z : S.R) ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})
+            → φ z ∈ f.range := by
   intro l _ O _ _ F n S Q _ f φ hφ htri hbar z hz
   have hrA : ∀ g i j, S.ρ.r g i j ∈ S.A := fun g i j =>
     Algebra.subset_adjoin (Or.inr ⟨g, i, j, rfl⟩)
@@ -73,14 +85,20 @@ theorem UpperTheory.V.Fr.adjoin_image_in_residue_range :
       obtain ⟨s, -, rfl⟩ := List.mem_map.mp hy
       exact hrA _ _ _
     · exact hψA v i g
-  have key : ∀ x (hx : x ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})),
-      φ ⟨x, hDA hx⟩ ∈ f.range := by
+  have key
+      : ∀ x (hx : x ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})),
+        φ ⟨x, hDA hx⟩ ∈ f.range := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
       rcases hx with ⟨L, hsum, rfl⟩ | ⟨v, i, g, rfl⟩
-      · have e : (⟨(L.map fun s => S.ρ.r s.1 s.2.1 s.2.2).prod, hDA (Algebra.subset_adjoin (Or.inl ⟨L, hsum, rfl⟩))⟩ : S.A) =
-            (L.map fun s => (⟨S.ρ.r s.1 s.2.1 s.2.2, hrA _ _ _⟩ : S.A)).prod := by
+      · have e
+            : (⟨
+                 (L.map fun s => S.ρ.r s.1 s.2.1 s.2.2).prod,
+                 hDA (Algebra.subset_adjoin (Or.inl ⟨L, hsum, rfl⟩))
+               ⟩
+                : S.A)
+              = (L.map fun s => (⟨S.ρ.r s.1 s.2.1 s.2.2, hrA _ _ _⟩ : S.A)).prod := by
           apply Subtype.ext
           simp [List.map_map, Function.comp_def]
         rw [e, map_list_prod, List.map_map]
@@ -90,9 +108,12 @@ theorem UpperTheory.V.Fr.adjoin_image_in_residue_range :
           · exact zero_mem _
           · exact List.mem_map.mpr ⟨s, hs, hzero _ _ _ hlt⟩
         · push_neg at hex
-          have hterm := list_forall_eq_zero_of_nonpos_of_sum_eq_zero _ (fun x hx => by
-            obtain ⟨s, hs, rfl⟩ := List.mem_map.mp hx
-            exact w_sub_w_nonpos_of_le n _ _ (hex s hs)) hsum
+          have hterm :=
+            list_forall_eq_zero_of_nonpos_of_sum_eq_zero _
+              (fun x hx => by
+                obtain ⟨s, hs, rfl⟩ := List.mem_map.mp hx
+                exact w_sub_w_nonpos_of_le n _ _ (hex s hs))
+              hsum
           apply list_prod_mem
           intro y hy
           obtain ⟨s, hs, rfl⟩ := List.mem_map.mp hy

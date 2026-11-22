@@ -18,29 +18,32 @@ namespace GlobalTheory.UTrans
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
 open NumberField IsDedekindDomain Matrix in
 open scoped TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.UTrans.herm_diagonal_self {r : ℕ} (g u : Fin r → E) :
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal g) u u = ∑ i, u i * g i * _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (u i) := by
+theorem _root_.GlobalTheory.UTrans.herm_diagonal_self {r : ℕ} (g u : Fin r → E)
+    : _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal g) u u
+      = ∑ i, u i * g i * _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (u i) := by
   simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.herm, diagonal_apply, mul_ite, ite_mul]
 
-
 open NumberField IsDedekindDomain Matrix in
 open scoped TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.UTrans.exists_isotropic_diagonal {n : ℕ} (hn : 3 ≤ n) {g : Fin n → E}
-    (hg : ∀ i, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (g i) = g i) (hg0 : ∀ i, g i ≠ 0)
-    (hs : ∀ τ : E →+* ℂ, (∃ i, 0 < (τ (g i)).re) ∧ ∃ j, (τ (g j)).re < 0) :
-    ∃ z : Fin n → E, z ≠ 0 ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal g) z z = 0 := by
+theorem _root_.GlobalTheory.UTrans.exists_isotropic_diagonal
+    {n : ℕ} (hn : 3 ≤ n)
+    {g : Fin n → E} (hg : ∀ i, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (g i) = g i)
+    (hg0 : ∀ i, g i ≠ 0) (hs : ∀ τ : E →+* ℂ, (∃ i, 0 < (τ (g i)).re) ∧ ∃ j, (τ (g j)).re < 0)
+    : ∃ z : Fin n → E,
+      z ≠ 0 ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal g) z z = 0 := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   have hiso : _root_.GlobalTheory.LocalQuad.HermClass.Isotropy := fun F _ _ ι _ a h5 ha hsgn =>
-    _root_.GlobalTheory.LocalQuad.isotropic_of_indefinite _root_.GlobalTheory.QNorm.hasseNormSt F a h5 ha hsgn
-  have hsign : ∀ τ : E →+* ℂ, ∃ k : Fin m, 0 < (τ (g k.succ)).re ↔ 0 < (τ (-g 0)).re := by
+    _root_.GlobalTheory.LocalQuad.isotropic_of_indefinite _root_.GlobalTheory.QNorm.hasseNormSt F a
+      h5 ha hsgn
+  have hsign : ∀ τ : E →+* ℂ, ∃ k : Fin m, 0 < (τ (g k.succ)).re ↔ 0 < (τ (- g 0)).re := by
     intro τ
     obtain ⟨⟨i, hi⟩, j, hj⟩ := hs τ
-    have h0 : (τ (g 0)).re ≠ 0 := _root_.GlobalTheory.LocalQuad.HermClass.re_ne_zero τ (hg 0) (hg0 0)
+    have h0 : (τ (g 0)).re ≠ 0 :=
+      _root_.GlobalTheory.LocalQuad.HermClass.re_ne_zero τ (hg 0) (hg0 0)
     rw [map_neg, Complex.neg_re]
     by_cases hpos : 0 < (τ (g 0)).re
     · rcases Fin.eq_zero_or_eq_succ j with rfl | ⟨k, rfl⟩
@@ -50,16 +53,21 @@ theorem _root_.GlobalTheory.UTrans.exists_isotropic_diagonal {n : ℕ} (hn : 3 �
       rcases Fin.eq_zero_or_eq_succ i with rfl | ⟨k, rfl⟩
       · exact absurd hi hpos
       · exact ⟨k, iff_of_true hi (by linarith)⟩
-  have hc : _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (-g 0) = -g 0 := by
+  have hc : _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (- g 0) = - g 0 := by
     show IsCMField.complexConj E (-g 0) = -g 0
     rw [map_neg]
     exact congrArg Neg.neg (hg 0)
-  obtain ⟨w, hw⟩ := _root_.GlobalTheory.LocalQuad.HermClass.exists_represent hiso (r := m) (by omega)
-    (g := fun k => g k.succ) (fun k => hg _) (fun k => hg0 _) hc (neg_ne_zero.2 (hg0 0)) hsign
+  obtain ⟨w, hw⟩ :=
+    _root_.GlobalTheory.LocalQuad.HermClass.exists_represent hiso (r := m) (by omega)
+      (g := fun k => g k.succ)
+      (fun k => hg _)
+      (fun k => hg0 _)
+      hc (neg_ne_zero.2 (hg0 0)) hsign
   refine ⟨Fin.cons 1 w, fun h => one_ne_zero (α := E) (by simpa using congr_fun h 0), ?_⟩
   rw [_root_.GlobalTheory.UTrans.herm_diagonal_self] at hw ⊢
   rw [Fin.sum_univ_succ]
-  have h1 : _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (1 : E) = 1 := map_one (IsCMField.complexConj E)
+  have h1 : _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (1 : E) = 1 :=
+    map_one (IsCMField.complexConj E)
   simp only [Fin.cons_zero, Fin.cons_succ, one_mul, h1, mul_one]
   rw [hw]
   ring
@@ -117,25 +125,41 @@ private lemma exists_re_neg_of_herm_diagonal_re_neg {r : ℕ} (τ : E →+* ℂ)
   rw [re_mul_cc_eq_normSq_mul_re]
   exact mul_nonneg (Complex.normSq_nonneg _) (h i)
 
-
 open NumberField IsDedekindDomain Matrix in
 open scoped TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.UTrans.exists_isotropic_of_indefinite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E), (∀ a, σ a = IsCMField.complexConj E a) → _root_.GlobalTheory.UTrans.IsHerm σ G → 3 ≤ n → (∀ τ : E →+* ℂ, (∃ x, 0 < (τ (_root_.GlobalTheory.UTrans.hf σ G x x)).re) ∧ ∃ y, (τ (_root_.GlobalTheory.UTrans.hf σ G y y)).re < 0) → ∃ z : Fin n → E, z ≠ 0 ∧ _root_.GlobalTheory.UTrans.hf σ G z z = 0 := by
+theorem _root_.GlobalTheory.UTrans.exists_isotropic_of_indefinite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (σ : E →+* E)
+        (G : Matrix (Fin n) (Fin n) E),
+      (∀ a, σ a = IsCMField.complexConj E a) → _root_.GlobalTheory.UTrans.IsHerm σ G → 3 ≤ n
+        → (∀ τ : E →+* ℂ,
+          (∃ x, 0 < (τ (_root_.GlobalTheory.UTrans.hf σ G x x)).re)
+            ∧ ∃ y, (τ (_root_.GlobalTheory.UTrans.hf σ G y y)).re < 0)
+        → ∃ z : Fin n → E, z ≠ 0 ∧ _root_.GlobalTheory.UTrans.hf σ G z z = 0 := by
   intro E _ _ _ n σ G hσ hG hn hs
-  have hf : ∀ x y, _root_.GlobalTheory.UTrans.hf σ G x y = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G x y := by
+  have hf
+      : ∀ x y,
+        _root_.GlobalTheory.UTrans.hf σ G x y
+          = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G x y := by
     intro x y
-    simp only [_root_.GlobalTheory.UTrans.hf, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm, hσ]
+    simp only [_root_.GlobalTheory.UTrans.hf, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm,
+      hσ]
     rfl
-  have hGc : ∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (G a b) = G b a := fun a b => by
+  have hGc
+      : ∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (G a b) = G b a := fun a b => by
     rw [← hG.herm a b, hσ]
     rfl
   obtain ⟨P, d, hP, hPd, hd, -⟩ := _root_.GlobalTheory.HermDiag.exists_congr_diagonal_herm hGc
   have hPinv : ∀ x, P *ᵥ (P⁻¹ *ᵥ x) = x := fun x => by
     rw [mulVec_mulVec, mul_nonsing_inv _ (isUnit_iff_ne_zero.2 hP), one_mulVec]
-  have hform : ∀ y, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G (P *ᵥ y) (P *ᵥ y) = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal d) y y := fun y => by
+  have hform
+      : ∀ y,
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.herm G (P *ᵥ y) (P *ᵥ y)
+          = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal d) y
+            y := fun y => by
     rw [herm_mulVec_mulVec', hPd]
-  suffices ∃ y, y ≠ 0 ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal d) y y = 0 by
+  suffices ∃ y,
+      y ≠ 0 ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (Matrix.diagonal d) y y = 0 by
     obtain ⟨y, hy, hy0⟩ := this
     exact ⟨P *ᵥ y, fun h => hy (eq_zero_of_mulVec_eq_zero hP h), by rw [hf, hform, hy0]⟩
   by_cases hd0 : ∃ i, d i = 0
@@ -151,6 +175,9 @@ theorem _root_.GlobalTheory.UTrans.exists_isotropic_of_indefinite : ∀ (E : Typ
     obtain ⟨⟨x, hx⟩, y, hy⟩ := hs τ
     rw [hf, ← hPinv x, hform] at hx
     rw [hf, ← hPinv y, hform] at hy
-    exact ⟨exists_re_pos_of_herm_diagonal_re_pos τ d _ hx, exists_re_neg_of_herm_diagonal_re_neg τ d _ hy⟩
+    exact ⟨
+      exists_re_pos_of_herm_diagonal_re_pos τ d _ hx,
+      exists_re_neg_of_herm_diagonal_re_neg τ d _ hy
+    ⟩
 
 end GlobalTheory.UTrans

@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.Qe4.subalgebra_eq_top {K V : Type*} [Field K] [IsAlgClosed K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] (S : Subalgebra K (Module.End K V))
-    (h : ∀ N : Submodule K V, (∀ s ∈ S, ∀ v ∈ N, s v ∈ N) → N = ⊥ ∨ N = ⊤) : S = ⊤ := by
+private theorem UpperTheory.Reformulated.B.Qe4.subalgebra_eq_top
+    {K V : Type*} [Field K] [IsAlgClosed K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (S : Subalgebra K (Module.End K V))
+    (h : ∀ N : Submodule K V, (∀ s ∈ S, ∀ v ∈ N, s v ∈ N) → N = ⊥ ∨ N = ⊤)
+    : S = ⊤ := by
   rcases subsingleton_or_nontrivial V with hV | hV
   · rw [eq_top_iff]
     intro f _
@@ -19,13 +21,14 @@ private theorem UpperTheory.Reformulated.B.Qe4.subalgebra_eq_top {K V : Type*} [
     · exact Or.inr ((Submodule.restrictScalars_eq_top_iff K S V).1 h1)
   rw [eq_top_iff]
   intro f _
-  let F : Module.End (Module.End S V) V :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun φ v => by
-        obtain ⟨c, rfl⟩ := (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed K
-          (A := S) (V := V)).2 φ
-        exact f.map_smul c v }
+  let F : Module.End (Module.End S V) V := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun φ v => by
+      obtain ⟨c, rfl⟩ :=
+        (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed K (A := S) (V := V)).2 φ
+      exact f.map_smul c v
+  }
   classical
   let b := Module.finBasis K V
   obtain ⟨r, hr⟩ := jacobson_density (R := S) F (Finset.univ.image b)
@@ -34,17 +37,20 @@ private theorem UpperTheory.Reformulated.B.Qe4.subalgebra_eq_top {K V : Type*} [
   rw [this]
   exact r.2
 
-theorem UpperTheory.Reformulated.B.Qe4.irrIffSpan :
-    ∀ {K G ι : Type} [inst : Field K] [IsAlgClosed K] [inst_2 : Group G]
-    [inst_3 : Fintype ι] [inst_4 : DecidableEq ι] (ρ : G →* Matrix ι ι K),
-    (∀ (N : Submodule K (ι → K)), (∀ (g : G), ∀ v ∈ N, ((ρ : G → Matrix ι ι K) g).mulVec v ∈ N) → N = ⊥ ∨ N = ⊤) ↔
-      Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) = ⊤ := by
+theorem UpperTheory.Reformulated.B.Qe4.irrIffSpan
+    : ∀ {K G ι : Type} [inst : Field K] [IsAlgClosed K] [inst_2 : Group G] [inst_3 : Fintype ι]
+        [inst_4 : DecidableEq ι] (ρ : G →* Matrix ι ι K),
+      (∀ (N : Submodule K (ι → K)),
+          (∀ (g : G), ∀ v ∈ N, ((ρ : G → Matrix ι ι K) g).mulVec v ∈ N) → N = ⊥ ∨ N = ⊤)
+        ↔ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) = ⊤ := by
   intro K G ι _ _ _ _ _ ρ
   constructor
   · intro h
-    have hmul : ∀ x y : Matrix ι ι K, x ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) →
-        y ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) →
-        x * y ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) := by
+    have hmul
+        : ∀ x y : Matrix ι ι K,
+          x ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K))
+            → y ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K))
+            → x * y ∈ Submodule.span K (Set.range (⇑ρ : G → Matrix ι ι K)) := by
       intro x y hx hy
       have := Submodule.mul_mem_mul hx hy
       rw [Submodule.span_mul_span] at this

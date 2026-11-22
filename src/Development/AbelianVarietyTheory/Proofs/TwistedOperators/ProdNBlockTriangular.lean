@@ -12,9 +12,11 @@ namespace GlobalTheory.RootEx
 section
 variable {k : Type*} [Field k] {n : Type*} [Fintype n] [DecidableEq n] {c : ℕ}
 
-theorem prodN_mul_apply {p : ℕ} {h : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k} {g : GL (n ⊕ Fin c) k}
-    (hh : h.BlockTriangular (lev p)) (hg : InN p g) (r s : n ⊕ Fin c) (hrs : lev p s ≤ lev p r) :
-    (h * g.val) r s = h r s := by
+theorem prodN_mul_apply
+    {p : ℕ} {h : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k} {g : GL (n ⊕ Fin c) k}
+    (hh : h.BlockTriangular (lev p)) (hg : InN p g)
+    (r s : n ⊕ Fin c) (hrs : lev p s ≤ lev p r)
+    : (h * g.val) r s = h r s := by
   rw [Matrix.mul_apply, Finset.sum_eq_single s]
   · rw [hg s s le_rfl, Matrix.one_apply_eq, mul_one]
   · intro t _ hts
@@ -24,8 +26,8 @@ theorem prodN_mul_apply {p : ℕ} {h : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k} {g 
   · intro hs
     exact absurd (Finset.mem_univ s) hs
 
-theorem prodN_blockTriangular {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g) :
-    g.val.BlockTriangular (lev p) := by
+theorem prodN_blockTriangular {p : ℕ} {g : GL (n ⊕ Fin c) k} (hg : InN p g)
+    : g.val.BlockTriangular (lev p) := by
   intro i j hij
   rw [hg i j hij.le, Matrix.one_apply_ne]
   rintro rfl

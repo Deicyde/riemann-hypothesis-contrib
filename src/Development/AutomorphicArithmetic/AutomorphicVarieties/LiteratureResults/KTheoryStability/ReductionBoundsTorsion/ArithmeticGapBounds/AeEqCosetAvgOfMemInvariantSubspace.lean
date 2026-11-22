@@ -12,31 +12,37 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.KB.SpectralGap.PGap
 
-theorem idx_ne {Λ : Type} [Group Λ] {B E K : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K)
-    (h : (B.subgroupOf K).index ≠ 0) : (B.subgroupOf E).index ≠ 0 ∧ (E.subgroupOf K).index ≠ 0 := by
+theorem idx_ne
+    {Λ : Type} [Group Λ]
+    {B E K : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) (h : (B.subgroupOf K).index ≠ 0)
+    : (B.subgroupOf E).index ≠ 0 ∧ (E.subgroupOf K).index ≠ 0 := by
   have h' : (B.subgroupOf E).index * (E.subgroupOf K).index = (B.subgroupOf K).index :=
     Subgroup.relIndex_mul_relIndex B E K hBE hEK
   rw [← h'] at h
   exact ⟨left_ne_zero_of_mul h, right_ne_zero_of_mul h⟩
 
-theorem exists_not_mem {Λ : Type} [Group Λ] {B E : Subgroup Λ} (h : 25 ≤ (B.subgroupOf E).index) :
-    ∃ g ∈ E, g ∉ B := by
+theorem exists_not_mem {Λ : Type} [Group Λ] {B E : Subgroup Λ} (h : 25 ≤ (B.subgroupOf E).index)
+    : ∃ g ∈ E, g ∉ B := by
   by_contra hc
   push_neg at hc
   have htop : B.subgroupOf E = ⊤ := Subgroup.subgroupOf_eq_top.mpr (fun g hg => hc g hg)
   rw [htop, Subgroup.index_top] at h
   omega
 
-theorem twoTr_le {Λ : Type} [Group Λ] {E K G : Subgroup Λ} (htwo : TwoTr E K) (hEG : E ≤ G)
-    {g : Λ} (hgK : g ∈ K) (hgE : g ∉ E) (hgG : g ∈ G) : K ≤ G := by
+theorem twoTr_le
+    {Λ : Type} [Group Λ]
+    {E K G : Subgroup Λ} (htwo : TwoTr E K) (hEG : E ≤ G)
+    {g : Λ} (hgK : g ∈ K) (hgE : g ∉ E) (hgG : g ∈ G)
+    : K ≤ G := by
   intro g' hg'
   by_cases h : g' ∈ E
   · exact hEG h
   · obtain ⟨e, he, e', he', rfl⟩ := htwo g hgK hgE g' hg' h
     exact G.mul_mem (G.mul_mem (hEG he) hgG) (hEG he')
 
-theorem t_trick {I X Y : ℝ} (hX : 0 ≤ X) (hY : 0 ≤ Y) (h : ∀ t : ℝ, 0 < t → |I| ≤ (t * X + Y / t) / 10) :
-    |I| ≤ 1 / 5 * (Real.sqrt X * Real.sqrt Y) := by
+theorem t_trick
+    {I X Y : ℝ} (hX : 0 ≤ X) (hY : 0 ≤ Y) (h : ∀ t : ℝ, 0 < t → |I| ≤ (t * X + Y / t) / 10)
+    : |I| ≤ 1 / 5 * (Real.sqrt X * Real.sqrt Y) := by
   set s := Real.sqrt X with hs_def
   set r := Real.sqrt Y with hr_def
   have hs : 0 ≤ s := Real.sqrt_nonneg _
@@ -70,53 +76,63 @@ theorem t_trick {I X Y : ℝ} (hX : 0 ≤ X) (hY : 0 ≤ Y) (h : ∀ t : ℝ, 0 
 
 section Unf
 
-variable {Λ S : Type} [Group Λ] [Countable Λ] [Group S] [MeasurableSpace S] [MeasurableMul S]
-  (μ : Measure S) [μ.IsMulLeftInvariant] {j : Λ →* S}
-  (hU : Unfold) (hj : Function.Injective j) {B K : Subgroup Λ} (hBK : B ≤ K)
-  (hi : (B.subgroupOf K).index ≠ 0)
+variable
+  {Λ S : Type} [Group Λ] [Countable Λ] [Group S] [MeasurableSpace S] [MeasurableMul S]
+  (μ : Measure S) [μ.IsMulLeftInvariant]
+  {j : Λ →* S}
+  (hU : Unfold) (hj : Function.Injective j)
+  {B K : Subgroup Λ} (hBK : B ≤ K) (hi : (B.subgroupOf K).index ≠ 0)
 
 include μ hU hj hBK hi
 
 theorem u_inv {u : S → ℝ} (hu : LInv j B u) : LInv j K (avg j B K u) :=
   (hU Λ S μ j hj B K hBK hi).1 u hu
 
-theorem u_id {u : S → ℝ} (hu : LInv j K u) : avg j B K u = u :=
-  (hU Λ S μ j hj B K hBK hi).2.1 u hu
+theorem u_id {u : S → ℝ} (hu : LInv j K u) : avg j B K u = u := (hU Λ S μ j hj B K hBK hi).2.1 u hu
 
 theorem u_meas {u : S → ℝ} (hu : Measurable u) : Measurable (avg j B K u) :=
   (hU Λ S μ j hj B K hBK hi).2.2.1 u hu
 
-theorem u_trans {E : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) {u : S → ℝ} (hu : LInv j B u) :
-    avg j E K (avg j B E u) = avg j B K u :=
+theorem u_trans {E : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) {u : S → ℝ} (hu : LInv j B u)
+    : avg j E K (avg j B E u) = avg j B K u :=
   (hU Λ S μ j hj B K hBK hi).2.2.2.1 E hBE hEK u hu
 
-theorem u_dom {D : Set S} (hD : IsFundamentalDomain (K.map j) D μ) :
-    ∃ D' : Set S, IsFundamentalDomain (B.map j) D' μ :=
+theorem u_dom {D : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
+    : ∃ D' : Set S, IsFundamentalDomain (B.map j) D' μ :=
   ((hU Λ S μ j hj B K hBK hi).2.2.2.2 D hD).1
 
-theorem u_measure {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) : μ D' = (B.subgroupOf K).index * μ D :=
+theorem u_measure
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    : μ D' = (B.subgroupOf K).index * μ D :=
   (((hU Λ S μ j hj B K hBK hi).2.2.2.2 D hD).2 D' hD').1
 
-theorem u_int_iff {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u) :
-    IntegrableOn u D' μ ↔ IntegrableOn (avg j B K fun y => |u y|) D μ :=
+theorem u_int_iff
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u)
+    : IntegrableOn u D' μ ↔ IntegrableOn (avg j B K fun y => |u y|) D μ :=
   ((((hU Λ S μ j hj B K hBK hi).2.2.2.2 D hD).2 D' hD').2 u hm hu).1
 
-theorem u_int_eq {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u)
-    (hint : IntegrableOn u D' μ) :
-    ∫ x in D', u x ∂μ = (B.subgroupOf K).index * ∫ x in D, avg j B K u x ∂μ :=
+theorem u_int_eq
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u) (hint : IntegrableOn u D' μ)
+    : ∫ x in D', u x ∂μ = (B.subgroupOf K).index * ∫ x in D, avg j B K u x ∂μ :=
   (((((hU Λ S μ j hj B K hBK hi).2.2.2.2 D hD).2 D' hD').2 u hm hu).2 hint).2
 
-theorem u_int_avg {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u)
-    (hint : IntegrableOn u D' μ) : IntegrableOn (avg j B K u) D μ :=
+theorem u_int_avg
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    {u : S → ℝ} (hm : Measurable u) (hu : LInv j B u) (hint : IntegrableOn u D' μ)
+    : IntegrableOn (avg j B K u) D μ :=
   (((((hU Λ S μ j hj B K hBK hi).2.2.2.2 D hD).2 D' hD').2 u hm hu).2 hint).1
 
-theorem int_iff_inv {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) {u : S → ℝ} (hm : Measurable u) (hu : LInv j K u) :
-    IntegrableOn u D' μ ↔ IntegrableOn u D μ := by
+theorem int_iff_inv
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    {u : S → ℝ} (hm : Measurable u) (hu : LInv j K u)
+    : IntegrableOn u D' μ ↔ IntegrableOn u D μ := by
   have hB : LInv j B u := fun γ hγ x => hu γ (hBK hγ) x
   have habs : LInv j K (fun y => |u y|) := by
     intro γ hγ x
@@ -126,10 +142,11 @@ theorem int_iff_inv {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
   simp_rw [← Real.norm_eq_abs]
   exact integrable_norm_iff hm.aestronglyMeasurable
 
-theorem int_eq_inv {D D' : Set S} (hD : IsFundamentalDomain (K.map j) D μ)
-    (hD' : IsFundamentalDomain (B.map j) D' μ) {u : S → ℝ} (hm : Measurable u) (hu : LInv j K u)
-    (hint : IntegrableOn u D' μ) :
-    ∫ x in D', u x ∂μ = (B.subgroupOf K).index * ∫ x in D, u x ∂μ := by
+theorem int_eq_inv
+    {D D' : Set S}
+    (hD : IsFundamentalDomain (K.map j) D μ) (hD' : IsFundamentalDomain (B.map j) D' μ)
+    {u : S → ℝ} (hm : Measurable u) (hu : LInv j K u) (hint : IntegrableOn u D' μ)
+    : ∫ x in D', u x ∂μ = (B.subgroupOf K).index * ∫ x in D, u x ∂μ := by
   have hB : LInv j B u := fun γ hγ x => hu γ (hBK hγ) x
   rw [u_int_eq μ hU hj hBK hi hD hD' hm hB hint, u_id μ hU hj hBK hi hu]
 
@@ -137,8 +154,9 @@ end Unf
 
 section Sub
 
-variable {Λ S : Type} [Group Λ] [Group S] [MeasurableSpace S] (j : Λ →* S) (B : Subgroup Λ)
-  (μ : Measure S) (DB : Set S)
+variable
+  {Λ S : Type} [Group Λ] [Group S] [MeasurableSpace S]
+  (j : Λ →* S) (B : Subgroup Λ) (μ : Measure S) (DB : Set S)
 
 def R (E : Subgroup Λ) : Set (HL j B μ DB) :=
   {f | ∃ u, Good j B μ DB u ∧ Good j B μ DB (avg j B E u) ∧
@@ -151,23 +169,29 @@ theorem W_closed (E : Subgroup Λ) : IsClosed (W j B μ DB E : Set (HL j B μ DB
 
 end Sub
 
-theorem integrableOn_mul {S : Type} [MeasurableSpace S] {μ : Measure S} {D : Set S} {u v : S → ℝ}
-    (hu : MemLp u 2 (μ.restrict D)) (hv : MemLp v 2 (μ.restrict D)) :
-    IntegrableOn (fun x => u x * v x) D μ :=
+theorem integrableOn_mul
+    {S : Type} [MeasurableSpace S]
+    {μ : Measure S} {D : Set S} {u v : S → ℝ}
+    (hu : MemLp u 2 (μ.restrict D)) (hv : MemLp v 2 (μ.restrict D))
+    : IntegrableOn (fun x => u x * v x) D μ :=
   MemLp.integrable_mul (p := 2) (q := 2) hu hv
 
 section W
 
-variable {Λ S : Type} [Group Λ] [Countable Λ] [Group S] [MeasurableSpace S] [MeasurableMul S]
-  {μ : Measure S} [μ.IsMulLeftInvariant] {j : Λ →* S}
-  (hU : Unfold) (hj : Function.Injective j) {B : Subgroup Λ} {DB : Set S}
-  (hDB : IsFundamentalDomain (B.map j) DB μ)
+variable
+  {Λ S : Type} [Group Λ] [Countable Λ] [Group S] [MeasurableSpace S] [MeasurableMul S]
+  {μ : Measure S} [μ.IsMulLeftInvariant]
+  {j : Λ →* S}
+  (hU : Unfold) (hj : Function.Injective j)
+  {B : Subgroup Λ} {DB : Set S} (hDB : IsFundamentalDomain (B.map j) DB μ)
 
 include hU hj hDB
 
-theorem good_avg {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0) {DE : Set S}
-    (hDE : IsFundamentalDomain (E.map j) DE μ) {u : S → ℝ} (hu : Good j B μ DB u) :
-    Good j B μ DB (avg j B E u) := by
+theorem good_avg
+    {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0)
+    {DE : Set S} (hDE : IsFundamentalDomain (E.map j) DE μ)
+    {u : S → ℝ} (hu : Good j B μ DB u)
+    : Good j B μ DB (avg j B E u) := by
   obtain ⟨hm, hinv, hL⟩ := hu
   have hmA : Measurable (avg j B E u) := u_meas μ hU hj hBE hi hm
   have hEinv : LInv j E (avg j B E u) := u_inv μ hU hj hBE hi hinv
@@ -194,10 +218,12 @@ theorem good_avg {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index 
     (int_iff_inv μ hU hj hBE hi hDE hDB (hmA.pow_const 2) hsqE).2 h2
   exact (memLp_two_iff_integrable_sq hmA.aestronglyMeasurable).2 h3
 
-theorem ip_zero {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0) {DE : Set S}
-    (hDE : IsFundamentalDomain (E.map j) DE μ) {a r : S → ℝ} (ha : Good j B μ DB a) (haE : LInv j E a)
-    (hr : Good j B μ DB r) (hr' : Good j B μ DB (avg j B E r)) :
-    ∫ x in DB, a x * (r x - avg j B E r x) ∂μ = 0 := by
+theorem ip_zero
+    {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0)
+    {DE : Set S} (hDE : IsFundamentalDomain (E.map j) DE μ)
+    {a r : S → ℝ} (ha : Good j B μ DB a) (haE : LInv j E a) (hr : Good j B μ DB r)
+    (hr' : Good j B μ DB (avg j B E r))
+    : ∫ x in DB, a x * (r x - avg j B E r x) ∂μ = 0 := by
   obtain ⟨ham, hainv, haL⟩ := ha
   obtain ⟨hrm, hrinv, hrL⟩ := hr
   obtain ⟨hsm, hsinv, hsL⟩ := hr'
@@ -211,19 +237,23 @@ theorem ip_zero {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index �
   have haE2 : LInv j E (fun x => a x * avg j B E r x) := by
     intro γ hγ x
     simp only [haE γ hγ x, hsE γ hγ x]
-  have e1 : ∫ x in DB, a x * r x ∂μ =
-      (B.subgroupOf E).index * ∫ x in DE, avg j B E (fun y => a y * r y) x ∂μ :=
+  have e1
+      : ∫ x in DB, a x * r x ∂μ
+        = (B.subgroupOf E).index * ∫ x in DE, avg j B E (fun y => a y * r y) x ∂μ :=
     u_int_eq μ hU hj hBE hi hDE hDB (ham.mul hrm) harB hint1
-  have e2 : ∫ x in DB, a x * avg j B E r x ∂μ =
-      (B.subgroupOf E).index * ∫ x in DE, a x * avg j B E r x ∂μ :=
+  have e2
+      : ∫ x in DB, a x * avg j B E r x ∂μ
+        = (B.subgroupOf E).index * ∫ x in DE, a x * avg j B E r x ∂μ :=
     int_eq_inv μ hU hj hBE hi hDE hDB (ham.mul hsm) haE2 hint2
   simp only [avg_mul_left j haE r] at e1
   simp_rw [mul_sub]
   rw [integral_sub hint1 hint2, e1, e2, sub_self]
 
-theorem mem_W_of_inv {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0) {DE : Set S}
-    (hDE : IsFundamentalDomain (E.map j) DE μ) {u : S → ℝ} (hu : Good j B μ DB u) (huE : LInv j E u) :
-    cls (j := j) (B := B) (μ := μ) (DB := DB) u ∈ W j B μ DB E := by
+theorem mem_W_of_inv
+    {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0)
+    {DE : Set S} (hDE : IsFundamentalDomain (E.map j) DE μ)
+    {u : S → ℝ} (hu : Good j B μ DB u) (huE : LInv j E u)
+    : cls (j := j) (B := B) (μ := μ) (DB := DB) u ∈ W j B μ DB E := by
   unfold W
   rw [Submodule.mem_orthogonal]
   intro v hv
@@ -232,15 +262,17 @@ theorem mem_W_of_inv {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).in
     obtain ⟨r, hr, hr', rfl⟩ := hx
     let d : S → ℝ := fun x => r x - avg j B E r x
     have hd : Good j B μ DB d := good_sub hr hr'
-    have hdu :
-        ⟪cls (j := j) (B := B) (μ := μ) (DB := DB) d,
-          cls (j := j) (B := B) (μ := μ) (DB := DB) u⟫_ℝ = ∫ x in DB, u x * d x ∂μ := by
+    have hdu
+        : ⟪cls (j := j) (B := B) (μ := μ) (DB := DB) d,
+            cls (j := j) (B := B) (μ := μ) (DB := DB) u⟫_ℝ
+          = ∫ x in DB, u x * d x ∂μ := by
       rw [L2.inner_def]
       unfold cls
       rw [dite_eq_left hd, dite_eq_left hu]
-      have hpoint : (fun q => ⟪(memLp_lift hd).toLp (lift j B d) q,
-          (memLp_lift hu).toLp (lift j B u) q⟫_ℝ) =ᵐ[nu j B μ DB]
-          fun q => lift j B u q * lift j B d q := by
+      have hpoint
+          : (fun q => ⟪(memLp_lift hd).toLp (lift j B d) q,
+            (memLp_lift hu).toLp (lift j B u) q⟫_ℝ) =ᵐ[nu j B μ DB]
+            fun q => lift j B u q * lift j B d q := by
         filter_upwards [(memLp_lift hd).coeFn_toLp, (memLp_lift hu).coeFn_toLp] with q hqd hqu
         rw [hqd, hqu]
         simp only [RCLike.inner_apply, conj_trivial]
@@ -255,9 +287,12 @@ theorem mem_W_of_inv {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).in
   | add x y _ _ hx hy => rw [inner_add_left, hx, hy, add_zero]
   | smul c x _ hx => rw [inner_smul_left, hx, mul_zero]
 
-theorem ae_eq_cosetAvg_of_mem_invariantSubspace {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0) {DE : Set S}
-    (hDE : IsFundamentalDomain (E.map j) DE μ) {u : S → ℝ} (hu : Good j B μ DB u)
-    (hW : cls (j := j) (B := B) (μ := μ) (DB := DB) u ∈ W j B μ DB E) : u =ᵐ[μ.restrict DB] avg j B E u := by
+theorem ae_eq_cosetAvg_of_mem_invariantSubspace
+    {E : Subgroup Λ} (hBE : B ≤ E) (hi : (B.subgroupOf E).index ≠ 0)
+    {DE : Set S} (hDE : IsFundamentalDomain (E.map j) DE μ)
+    {u : S → ℝ}
+    (hu : Good j B μ DB u) (hW : cls (j := j) (B := B) (μ := μ) (DB := DB) u ∈ W j B μ DB E)
+    : u =ᵐ[μ.restrict DB] avg j B E u := by
   let toClass : (S → ℝ) → HL j B μ DB := cls (j := j) (B := B) (μ := μ) (DB := DB)
   let d : S → ℝ := fun x => u x - avg j B E u x
   have hA : Good j B μ DB (avg j B E u) := good_avg hU hj hDB hBE hi hDE hu
@@ -281,13 +316,16 @@ theorem ae_eq_cosetAvg_of_mem_invariantSubspace {E : Subgroup Λ} (hBE : B ≤ E
   rw [dite_eq_left hu, dite_eq_left hA, MemLp.toLp_eq_toLp_iff] at h3
   unfold nu Filter.EventuallyEq at h3
   rw [ae_map_iff measurable_pr.aemeasurable
-    (measurableSet_eq_fun (measurable_lift hu.1 hu.2.1) (measurable_lift hA.1 hA.2.1))] at h3
+      (measurableSet_eq_fun (measurable_lift hu.1 hu.2.1) (measurable_lift hA.1 hA.2.1))]
+    at h3
   change ∀ᵐ x ∂μ.restrict DB, u x = avg j B E u x
   simpa only [lift_pr hu.2.1, lift_pr hA.2.1] using h3
 
-theorem W_anti {E K : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) (hiK : (B.subgroupOf K).index ≠ 0)
-    {DE DK : Set S} (hDE : IsFundamentalDomain (E.map j) DE μ)
-    (hDK : IsFundamentalDomain (K.map j) DK μ) : W j B μ DB K ≤ W j B μ DB E := by
+theorem W_anti
+    {E K : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) (hiK : (B.subgroupOf K).index ≠ 0)
+    {DE DK : Set S}
+    (hDE : IsFundamentalDomain (E.map j) DE μ) (hDK : IsFundamentalDomain (K.map j) DK μ)
+    : W j B μ DB K ≤ W j B μ DB E := by
   have hiE : (B.subgroupOf E).index ≠ 0 := (idx_ne hBE hEK hiK).1
   have hBK : B ≤ K := hBE.trans hEK
   unfold W
@@ -299,8 +337,7 @@ theorem W_anti {E K : Subgroup Λ} (hBE : B ≤ E) (hEK : E ≤ K) (hiK : (B.sub
   have hK2 : Good j B μ DB (avg j B K (avg j B E r)) := good_avg hU hj hDB hBK hiK hDK hr'
   have htow : avg j B K (avg j B E r) = avg j B K r := by
     rw [← u_trans μ hU hj hBK hiK hBE hEK hr'.2.1,
-      u_id μ hU hj hBE hiE (u_inv μ hU hj hBE hiE hr.2.1),
-      u_trans μ hU hj hBK hiK hBE hEK hr.2.1]
+      u_id μ hU hj hBE hiE (u_inv μ hU hj hBE hiE hr.2.1), u_trans μ hU hj hBK hiK hBE hEK hr.2.1]
   let d₁ : S → ℝ := fun x => r x - avg j B K r x
   let d₂ : S → ℝ := fun x => avg j B E r x - avg j B K (avg j B E r) x
   have hd1 : Good j B μ DB d₁ := good_sub hr hK1

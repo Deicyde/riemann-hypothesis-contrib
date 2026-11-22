@@ -13,8 +13,9 @@ open Topology Filter
 
 noncomputable section
 
-theorem exists_lastCoord_ne_zero_of_mem_nhds {σ : Type} {U : Set (Option σ → ℂ)} {w : Option σ → ℂ}
-    (hU : U ∈ 𝓝 w) : ∃ v ∈ U, v none ≠ 0 := by
+theorem exists_lastCoord_ne_zero_of_mem_nhds
+    {σ : Type} {U : Set (Option σ → ℂ)} {w : Option σ → ℂ} (hU : U ∈ 𝓝 w)
+    : ∃ v ∈ U, v none ≠ 0 := by
   classical
   let g : ℂ → Option σ → ℂ := fun s => Function.update w none s
   have hg : Continuous g := by
@@ -31,7 +32,8 @@ theorem exists_lastCoord_ne_zero_of_mem_nhds {σ : Type} {U : Set (Option σ →
     by_cases h0 : w none = 0
     · rw [h0]; exact self_mem_nhdsWithin
     · exact nhdsWithin_le_nhds (isOpen_ne.mem_nhds h0)
-  obtain ⟨s, hs1, hs2⟩ := (((hev.filter_mono nhdsWithin_le_nhds) : ∀ᶠ s in 𝓝[≠] (w none), g s ∈ U).and hne).exists
+  obtain ⟨s, hs1, hs2⟩ :=
+    (((hev.filter_mono nhdsWithin_le_nhds) : ∀ᶠ s in 𝓝[≠] (w none), g s ∈ U).and hne).exists
   exact ⟨g s, hs1, by simpa [g] using hs2⟩
 
 theorem GeneralLinearCoordinates.proof : GeneralLinearCoordinates.Statement := by
@@ -74,8 +76,7 @@ theorem GeneralLinearCoordinates.proof : GeneralLinearCoordinates.Statement := b
     | none => simp [pointWithLast, e]; ring
     | some i => simp [pointWithLast, e]
   refine ⟨A, ?_⟩
-  have hfun : (fun t => f (A (pointWithLast 0 t))) = fun t : ℂ => f (t • v) := by
-    funext t; rw [hA]
+  have hfun : (fun t => f (A (pointWithLast 0 t))) = fun t : ℂ => f (t • v) := by funext t; rw [hA]
   rw [hfun]
 
   have hv0 : 0 < ‖v‖ := norm_pos_iff.mpr fun h => hvt (by rw [h]; rfl)
@@ -84,21 +85,24 @@ theorem GeneralLinearCoordinates.proof : GeneralLinearCoordinates.Statement := b
   have hR1 : (1 : ℂ) ∈ Metric.ball (0 : ℂ) R := by
     rw [Metric.mem_ball, dist_zero_right, norm_one]
     exact (one_lt_div hv0).mpr hvr
-  have hR0 : (0 : ℂ) ∈ Metric.ball (0 : ℂ) R := Metric.mem_ball_self (lt_trans one_pos
-    ((one_lt_div hv0).mpr hvr))
+  have hR0 : (0 : ℂ) ∈ Metric.ball (0 : ℂ) R :=
+    Metric.mem_ball_self (lt_trans one_pos ((one_lt_div hv0).mpr hvr))
   have han : AnalyticOnNhd ℂ (fun t : ℂ => f (t • v)) (Metric.ball (0 : ℂ) R) := by
     intro t ht
     have htv : t • v ∈ Metric.ball (0 : Option σ → ℂ) r := by
       rw [Metric.mem_ball, dist_zero_right, norm_smul]
       rw [Metric.mem_ball, dist_zero_right] at ht
-      calc ‖t‖ * ‖v‖ < R * ‖v‖ := mul_lt_mul_of_pos_right ht hv0
+      calc
+        ‖t‖ * ‖v‖
+          < R * ‖v‖ := mul_lt_mul_of_pos_right ht hv0
         _ = r := div_mul_cancel₀ r hv0.ne'
     have hs : AnalyticAt ℂ (fun s : ℂ => s • v) t := analyticAt_id.smul analyticAt_const
     show AnalyticAt ℂ (f ∘ fun s : ℂ => s • v) t
     exact AnalyticAt.comp (f := fun s : ℂ => s • v) (x := t) (hfr _ htv) hs
-  have hnot : ¬ (∀ᶠ t in 𝓝 (0 : ℂ), f (t • v) = 0) := by
+  have hnot : ¬(∀ᶠ t in 𝓝 (0 : ℂ), f (t • v) = 0) := by
     intro h
-    have := han.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball _ _).isPreconnected hR0 h hR1
+    have :=
+      han.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball _ _).isPreconnected hR0 h hR1
     simp at this
     exact hfv this
   have hne : analyticOrderAt (fun t : ℂ => f (t • v)) 0 ≠ ⊤ := fun h =>

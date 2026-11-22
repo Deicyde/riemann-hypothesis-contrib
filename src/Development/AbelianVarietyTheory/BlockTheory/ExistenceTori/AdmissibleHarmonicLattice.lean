@@ -45,8 +45,7 @@ theorem single_mem_stdMod (j : Fin n) : (Pi.single j 1 : Fin n → E) ∈ stdMod
 
 def Lat.std (E : Type) [Field E] (n : ℕ) : Lat E n where
   L := stdMod E n
-  fg := Submodule.fg_pi fun _ => by
-    rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
+  fg := Submodule.fg_pi fun _ => by rw [Submodule.one_eq_span]; exact Submodule.fg_span_singleton _
   span_top := by
     classical
     rw [eq_top_iff, ← (Pi.basisFun E (Fin n)).span_eq]
@@ -67,8 +66,7 @@ def Lat.StdAt (Λ : Lat E n) (s : ℕ) : Prop :=
 
 def mulStd (E : Type) [Field E] (n N : ℕ) : Submodule (𝓞 E) (Fin n → E) := (N : 𝓞 E) • stdMod E n
 
-def Lat.Admissible (Λ : Lat E n) (M N : ℕ) : Prop :=
-  Odd N ∧ M ∣ N ∧ mulStd E n N ≤ Λ.inter
+def Lat.Admissible (Λ : Lat E n) (M N : ℕ) : Prop := Odd N ∧ M ∣ N ∧ mulStd E n N ≤ Λ.inter
 
 def Lat.cardCenterZero (Λ : Lat E n) (r N : ℕ) : ℕ :=
   (mulStd E n N).toAddSubgroup.relIndex Λ.inter.toAddSubgroup ^ r
@@ -82,13 +80,17 @@ def Lat.map (Λ : Lat E n) (γ : (Fin n → E) ≃ₗ[E] (Fin n → E)) : Lat E 
   L := Λ.L.map (γ.toLinearMap.restrictScalars (𝓞 E))
   fg := Λ.fg.map _
   span_top := by
-    have h : ((Λ.L.map (γ.toLinearMap.restrictScalars (𝓞 E)) : Submodule (𝓞 E) (Fin n → E)) : Set (Fin n → E)) =
-        γ.toLinearMap '' (Λ.L : Set (Fin n → E)) := rfl
+    have h
+        : ((Λ.L.map (γ.toLinearMap.restrictScalars (𝓞 E)) : Submodule (𝓞 E) (Fin n → E))
+            : Set (Fin n → E))
+          = γ.toLinearMap '' (Λ.L : Set (Fin n → E)) :=
+      rfl
     rw [h, ← Submodule.map_span, Λ.span_top, Submodule.map_top, LinearEquiv.range]
 
 def Lat.InGenus (Λ : Lat E n) : Prop :=
-  ∀ p : ℕ, p.Prime → ∃ γ : (Fin n → E) ≃ₗ[E] (Fin n → E),
-    IsUnitary γ ∧ EqAtPrime p Λ.L ((Lat.std E n).map γ).L
+  ∀ p : ℕ,
+    p.Prime
+      → ∃ γ : (Fin n → E) ≃ₗ[E] (Fin n → E), IsUnitary γ ∧ EqAtPrime p Λ.L ((Lat.std E n).map γ).L
 
 section Poly
 
@@ -106,11 +108,10 @@ def harmSpace (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : Set (MvPolynomial (
 def harmLat (a : (E →+* ℂ) × ℕ → ℕ) (Λ : Lat E n) : Set (MvPolynomial (LtN Dw n) c.F) :=
   {P | P ∈ harmSpace Dw c a n ∧ P ∈ symLat Dw c Λ}
 
-def push (γ : (Fin n → E) ≃ₗ[E] (Fin n → E)) :
-    MvPolynomial (LtN Dw n) c.F →ₐ[c.F] MvPolynomial (LtN Dw n) c.F :=
+def push (γ : (Fin n → E) ≃ₗ[E] (Fin n → E))
+    : MvPolynomial (LtN Dw n) c.F →ₐ[c.F] MvPolynomial (LtN Dw n) c.F :=
   aeval fun ℓ => letter Dw c ℓ.1 ℓ.2.1 (γ (Pi.single ℓ.2.2 1))
 
 end Poly
-
 
 end GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleHarmonicLattice

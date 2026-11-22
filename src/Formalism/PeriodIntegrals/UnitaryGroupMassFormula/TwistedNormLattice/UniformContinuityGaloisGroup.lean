@@ -12,17 +12,15 @@ namespace PI.TwNormLat.W
 
 variable {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E))
 
-theorem one_notMem' : (1 : 𝓞 E) ∉ P.asIdeal :=
-  fun h => P.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h)
+theorem one_notMem' : (1 : 𝓞 E) ∉ P.asIdeal := fun h =>
+  P.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h)
 
 theorem mul_notMem' {s t : 𝓞 E} (hs : s ∉ P.asIdeal) (ht : t ∉ P.asIdeal) : s * t ∉ P.asIdeal :=
   fun h => (P.isPrime.mem_or_mem h).elim hs ht
 
-theorem intAt_zero : IntAt P (0 : E) := by
-  exact ⟨0, 1, PI.TwNormLat.W.one_notMem' P, by simp⟩
+theorem intAt_zero : IntAt P (0 : E) := by exact ⟨0, 1, PI.TwNormLat.W.one_notMem' P, by simp⟩
 
-theorem intAt_one : IntAt P (1 : E) := by
-  exact ⟨1, 1, PI.TwNormLat.W.one_notMem' P, by simp⟩
+theorem intAt_one : IntAt P (1 : E) := by exact ⟨1, 1, PI.TwNormLat.W.one_notMem' P, by simp⟩
 
 theorem intAt_natCast (k : ℕ) : IntAt P (k : E) := by
   exact ⟨k, 1, PI.TwNormLat.W.one_notMem' P, by simp⟩
@@ -66,8 +64,9 @@ theorem qE_ne_zero (hp : (Ideal.absNorm P.asIdeal).Prime) : qE P ≠ 0 := by
   show ((Ideal.absNorm P.asIdeal : ℕ) : E) ≠ 0
   exact Nat.cast_ne_zero.mpr hp.ne_zero
 
-theorem uniform_continuity_galois_group (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) {r : 𝓞 E} (hr : r ∈ P.asIdeal) :
-    ∃ s t : 𝓞 E, s ∉ P.asIdeal ∧ t * ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) = s * r := by
+theorem uniform_continuity_galois_group
+    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) {r : 𝓞 E} (hr : r ∈ P.asIdeal)
+    : ∃ s t : 𝓞 E, s ∉ P.asIdeal ∧ t * ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) = s * r := by
   have hqP : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∈ P.asIdeal := Ideal.absNorm_mem P.asIdeal
   have hle : Ideal.span {((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E)} ≤ P.asIdeal :=
     (Ideal.span_singleton_le_iff_mem _).mpr hqP
@@ -86,9 +85,11 @@ theorem uniform_continuity_galois_group (hq : ((Ideal.absNorm P.asIdeal : ℕ) :
   obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.mp hmem
   exact ⟨s, t, hsP, ht⟩
 
-theorem unit_of_not_div (hp : (Ideal.absNorm P.asIdeal).Prime)
-    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) {y : E} (hy : IntAt P y)
-    (hy' : ¬ IntAt P (y / qE P)) : IntAt P y⁻¹ := by
+theorem unit_of_not_div
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
+    {y : E} (hy : IntAt P y) (hy' : ¬ IntAt P (y / qE P))
+    : IntAt P y⁻¹ := by
   obtain ⟨r, s, hs, h⟩ := hy
   by_cases hr : r ∈ P.asIdeal
   · exfalso
@@ -131,8 +132,8 @@ theorem mem_stdAt {n : ℕ} (v : Sp E n) : v ∈ stdAt E n P ↔ ∀ l, IntAt P 
       map_mul, map_mul, ← hrs l]
     ring
 
-theorem mem_lam (N c : ℕ) (v : Sp E (N + c)) :
-    v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 ↔ ∀ l, IntAt P (v l) := by
+theorem mem_lam (N c : ℕ) (v : Sp E (N + c))
+    : v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 ↔ ∀ l, IntAt P (v l) := by
   show v ∈ Submodule.comap _ (stdAt E (N + c) P) ↔ _
   rw [Submodule.mem_comap, ← mem_stdAt P]
   refine Iff.of_eq (congrArg (· ∈ stdAt E (N + c) P) ?_)

@@ -23,7 +23,8 @@ theorem finite_presentation_ring_maps_pre_ind_spread : LateralTheory.E.SpreadPf.
       have : p i ∈ RingHom.ker π.toRingHom := by
         rw [← hs]; exact Ideal.subset_span (s.equivFin.symm i).2
       simpa using this
-    let φ : MvPolynomial (Fin n) (D.obj j) →+* T := π.toRingHom.comp (MvPolynomial.map (c.ι.app j).hom)
+    let φ : MvPolynomial (Fin n) (D.obj j) →+* T :=
+      π.toRingHom.comp (MvPolynomial.map (c.ι.app j).hom)
     have hφ : ∀ a ∈ I, φ a = 0 := by
       intro a ha
       have : I ≤ RingHom.ker φ := by
@@ -37,7 +38,8 @@ theorem finite_presentation_ring_maps_pre_ind_spread : LateralTheory.E.SpreadPf.
     have hfa : ∀ a : c.pt, f a = π (MvPolynomial.C a) := fun a => (π.commutes a).symm
     have hw : c.ι.app j ≫ f = f' ≫ g := by
       ext x
-      change f.hom (c.ι.app j x) = Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I (MvPolynomial.C x))
+      change f.hom (c.ι.app j x)
+        = Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I (MvPolynomial.C x))
       rw [Ideal.Quotient.lift_mk, hfa]
       simp [φ]
     have hfp : LateralTheory.E.SpreadPf.Cut.FP f' := by
@@ -51,8 +53,9 @@ theorem finite_presentation_ring_maps_pre_ind_spread : LateralTheory.E.SpreadPf.
       rw [AlgEquiv.symm_apply_eq]; rfl
     let Ψ : ∀ S : PushoutCocone (c.ι.app j) f', MvPolynomial (Fin n) c.pt →+* S.pt := fun S =>
       MvPolynomial.eval₂Hom S.inl.hom (fun i => S.inr (Ideal.Quotient.mk I (MvPolynomial.X i)))
-    have key : ∀ S : PushoutCocone (c.ι.app j) f',
-        (Ψ S).comp (MvPolynomial.map (c.ι.app j).hom) = S.inr.hom.comp (Ideal.Quotient.mk I) := by
+    have key
+        : ∀ S : PushoutCocone (c.ι.app j) f',
+          (Ψ S).comp (MvPolynomial.map (c.ι.app j).hom) = S.inr.hom.comp (Ideal.Quotient.mk I) := by
       intro S
       apply MvPolynomial.ringHom_ext
       · intro x
@@ -86,7 +89,8 @@ theorem finite_presentation_ring_maps_pre_ind_spread : LateralTheory.E.SpreadPf.
       simp [Ψ]
     · intro S
       refine CommRingCat.hom_ext (Ideal.Quotient.ringHom_ext (RingHom.ext fun y => ?_))
-      change desc S (Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I y)) = S.inr (Ideal.Quotient.mk I y)
+      change desc S (Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I y))
+        = S.inr (Ideal.Quotient.mk I y)
       rw [Ideal.Quotient.lift_mk]
       change desc S (π _) = _
       rw [hdesc, ← RingHom.comp_apply, key S]
@@ -102,8 +106,9 @@ theorem finite_presentation_ring_maps_pre_ind_spread : LateralTheory.E.SpreadPf.
           simpa [Ψ, hfa] using this
         · intro i
           have := congrArg (fun h => h.hom (Ideal.Quotient.mk I (MvPolynomial.X i))) h2
-          change m.hom (Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I (MvPolynomial.X i))) =
-            S.inr.hom (Ideal.Quotient.mk I (MvPolynomial.X i)) at this
+          change m.hom (Ideal.Quotient.lift I φ hφ (Ideal.Quotient.mk I (MvPolynomial.X i)))
+              = S.inr.hom (Ideal.Quotient.mk I (MvPolynomial.X i))
+            at this
           rw [Ideal.Quotient.lift_mk] at this
           simpa [Ψ, φ] using this
       exact congrArg (fun h => h y) this

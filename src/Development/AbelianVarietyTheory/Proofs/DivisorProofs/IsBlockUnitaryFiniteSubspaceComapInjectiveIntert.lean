@@ -9,10 +9,14 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem unitOn_comap_locU (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
-    (F : ι → ι → Module.End ℂ M) (M' : Type) [AddCommGroup M'] [Module ℂ M'] (F' : ι → ι → Module.End ℂ M')
-    (f : M →ₗ[ℂ] M') (hf : Function.Injective f) (hF : ∀ a b, s a = s b → ∀ x, f (F a b x) = F' a b (f x)) :
-    (∀ U' : Submodule ℂ M', UnitOn s F' U' → UnitOn s F (U'.comap f)) ∧ (LocU s F' → LocU s F) := by
+theorem unitOn_comap_locU
+    (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M]
+    (s : ι → Bool) (F : ι → ι → Module.End ℂ M)
+    (M' : Type) [AddCommGroup M'] [Module ℂ M']
+    (F' : ι → ι → Module.End ℂ M') (f : M →ₗ[ℂ] M')
+    (hf : Function.Injective f) (hF : ∀ a b, s a = s b → ∀ x, f (F a b x) = F' a b (f x))
+    : (∀ U' : Submodule ℂ M', UnitOn s F' U' → UnitOn s F (U'.comap f))
+      ∧ (LocU s F' → LocU s F) := by
   have key : ∀ U' : Submodule ℂ M', UnitOn s F' U' → UnitOn s F (U'.comap f) := by
     rintro U' ⟨hfin, hst, ip', hs, hp, hadj⟩
     refine ⟨?_, ?_, ?_⟩

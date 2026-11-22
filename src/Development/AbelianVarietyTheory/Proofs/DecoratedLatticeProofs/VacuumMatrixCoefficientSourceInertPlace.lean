@@ -16,8 +16,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Rel
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
 open GlobalTheory.FinZeta (Gv embV Kv VacFin IsLocKer KerU)
@@ -27,7 +30,6 @@ open Formalism.MainNotions.SchurIrreducible (IsSplit)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-
 
 open GlobalTheory.SplitScalar GlobalTheory.FinWeil GlobalTheory.WeilParts GlobalTheory.FinWeilO GlobalTheory.LatCoef in
 theorem GlobalTheory.VacSource.latticeIntertwiner_coefficient_vacua_source : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (hψ : IsStdChar D ψ (-1)) (lam : ℕ →* ℂ) (w₀ : 𝓞 D.host.E) (Om : GA D S × GA D T →* Module.End ℂ (GlobalTheory.FinWeilO.thetaSub ψ S T)), GlobalTheory.FinWeilO.IsLatRep hψ.1 (frameLat S) (frameLat T) w₀ lam Om → ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsCovolOne (ratL T S) μ 𝓕 → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (a : Gv S v) (f₁ f₂ : GlobalTheory.FinWeilO.thetaSub ψ S T), VacFin ψ S T v f₁ → VacFin ψ S T v f₂ → Lift.pet μ 𝓕 (Om (embV S v a, 1) f₁ : WO S T → ℂ) f₂ = (lam (GlobalTheory.FinWeil.idx (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)) ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).map (GlobalTheory.FinWeilO.rhoF S T (embV S v a, 1)))))⁻¹ * Lift.pet μ 𝓕 (f₁ : WO S T → ℂ) f₂ := by
@@ -85,30 +87,60 @@ theorem isSelfDualC_frameLat {D : D7} (V : HSp D) : IsSelfDualC V (frameLat V) :
   rw [h]
   exact GlobalTheory.PlaceModel.isSelfDualC_latFrame V
 
-theorem inv_neg_pow_mul (x : ℂ) (N M : ℕ) :
-    ((-x) ^ (N * M))⁻¹ = ((((-1 : ℂˣ) ^ N : ℂˣ) : ℂ) * (x ^ N)⁻¹) ^ (M : ℤ) := by
+theorem inv_neg_pow_mul (x : ℂ) (N M : ℕ)
+    : ((-x) ^ (N * M))⁻¹ = ((((-1 : ℂˣ) ^ N : ℂˣ) : ℂ) * (x ^ N)⁻¹) ^ (M : ℤ) := by
   rw [zpow_natCast, pow_mul, ← inv_pow, neg_pow, mul_inv, ← inv_pow (-1 : ℂ), inv_neg_one]
   push_cast
   rfl
 
-theorem vacuum_matrixCoefficient_source_inert_place : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)), IsWeilDatumO ψ S T χS χT om → ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsCovolOne (ratL T S) μ 𝓕 → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E)) (h : w.under (𝓞 D.host.F) = v), IsInertAt D.host.F D.host.E v w → UnrAt χS w → UnrAt χT w → ∀ c ϖ e, IsUnramInv ϖ c (qV D.host.F v) → IsInertChart D.sp.cm.sig S.gram (frameLat S) h c e → ∃ φ : GU c S.rank → ℂ, KerU ϖ (qV D.host.F v) T.rank ((-1) ^ T.rank) φ ∧ ∀ (g : GU c S.rank) (f₁ f₂ : WO S T → ℂ), VacFin ψ S T v f₁ → VacFin ψ S T v f₂ → Lift.pet μ 𝓕 (om (embV S v (e.symm g), 1) f₁) f₂ = φ g * Lift.pet μ 𝓕 f₁ f₂ := by
+theorem vacuum_matrixCoefficient_source_inert_place
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (AE D)ˣ →* Circle)
+        (om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)),
+      IsWeilDatumO ψ S T χS χT om
+        → ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+          IsCovolOne (ratL T S) μ 𝓕
+            → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E))
+                (h : w.under (𝓞 D.host.F) = v),
+              IsInertAt D.host.F D.host.E v w → UnrAt χS w → UnrAt χT w
+                → ∀ c ϖ e,
+                  IsUnramInv ϖ c (qV D.host.F v)
+                    → IsInertChart D.sp.cm.sig S.gram (frameLat S) h c e
+                    → ∃ φ : GU c S.rank → ℂ,
+                      KerU ϖ (qV D.host.F v) T.rank ((-1) ^ T.rank) φ
+                        ∧ ∀ (g : GU c S.rank) (f₁ f₂ : WO S T → ℂ),
+                          VacFin ψ S T v f₁ → VacFin ψ S T v f₂
+                            → Lift.pet μ 𝓕 (om (embV S v (e.symm g), 1) f₁) f₂
+                              = φ g * Lift.pet μ 𝓕 f₁ f₂ := by
   intro D ψ S T χS χT om hom μ 𝓕 hμ v w h hw uS uT c ϖ e hU he
   classical
   obtain ⟨lam, hlam, hsq⟩ := GlobalTheory.FinWeil.exists_goodNorm D
-  obtain ⟨w₀, Om, hL⟩ := GlobalTheory.FinWeilO.exists_isLatRep hom.std (isSelfDualC_frameLat S) (isSelfDualC_frameLat T) hlam
-  refine ⟨fun g => (lam (GlobalTheory.FinWeil.idx (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T))
-    ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).map (GlobalTheory.FinWeilO.rhoF S T (embV S v (e.symm g), 1)))))⁻¹,
-    fun d t ht k₁ hk₁ k₂ hk₂ => ?_, fun g f₁ f₂ h₁ h₂ => ?_⟩
+  obtain ⟨w₀, Om, hL⟩ :=
+    GlobalTheory.FinWeilO.exists_isLatRep hom.std (isSelfDualC_frameLat S) (isSelfDualC_frameLat T)
+      hlam
+  refine ⟨
+    fun g =>
+      (lam (GlobalTheory.FinWeil.idx (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T))
+        ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).map
+          (GlobalTheory.FinWeilO.rhoF S T (embV S v (e.symm g), 1)))))⁻¹,
+    fun d t ht k₁ hk₁ k₂ hk₂ => ?_,
+    fun g f₁ f₂ h₁ h₂ => ?_
+  ⟩
   · show (lam _)⁻¹ = _
-    rw [GlobalTheory.T.relIndex_homLattice_inert_move_source D S T v w h hw c ϖ e hU he d t ht k₁ hk₁ k₂ hk₂, map_pow, GlobalTheory.LamInert.lam_qV_inert D lam hlam v w hw]
+    rw [GlobalTheory.T.relIndex_homLattice_inert_move_source D S T v w h hw c ϖ e hU he d t ht k₁
+        hk₁ k₂ hk₂,
+      map_pow, GlobalTheory.LamInert.lam_qV_inert D lam hlam v w hw]
     have hs0 : 0 ≤ ∑ i, max (d i) 0 := Finset.sum_nonneg fun i _ => le_max_right _ _
     rw [← Int.toNat_of_nonneg hs0, zpow_natCast]
     generalize (∑ i, max (d i) 0).toNat = M
     exact inv_neg_pow_mul _ _ _
   · let g₁ : GlobalTheory.FinWeilO.thetaSub ψ S T := ⟨f₁, h₁.1⟩
     let g₂ : GlobalTheory.FinWeilO.thetaSub ψ S T := ⟨f₂, h₂.1⟩
-    have hn := GlobalTheory.T.weilDatum_source_inertPlace_eq_latticeIntertwiner D ψ S T χS χT om hom hom.std lam w₀ Om hL hlam v w h hw uS uT (e.symm g) g₁
-    have hc := GlobalTheory.VacSource.latticeIntertwiner_coefficient_vacua_source D ψ S T hom.std lam w₀ Om hL μ 𝓕 hμ v (e.symm g) g₁ g₂ h₁ h₂
+    have hn :=
+      GlobalTheory.T.weilDatum_source_inertPlace_eq_latticeIntertwiner D ψ S T χS χT om hom hom.std
+        lam w₀ Om hL hlam v w h hw uS uT (e.symm g) g₁
+    have hc :=
+      GlobalTheory.VacSource.latticeIntertwiner_coefficient_vacua_source D ψ S T hom.std lam w₀ Om
+        hL μ 𝓕 hμ v (e.symm g) g₁ g₂ h₁ h₂
     show Lift.pet μ 𝓕 (om (embV S v (e.symm g), 1) (g₁ : WO S T → ℂ)) (g₂ : WO S T → ℂ) = _ * Lift.pet μ 𝓕 (g₁ : WO S T → ℂ) (g₂ : WO S T → ℂ)
     rw [hn, hc]
 

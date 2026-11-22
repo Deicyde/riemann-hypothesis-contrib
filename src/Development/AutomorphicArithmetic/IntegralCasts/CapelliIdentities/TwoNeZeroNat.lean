@@ -4,34 +4,45 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.hecke_existence.HasChar :
-    ℕ → {M : ℕ} → DirichletCharacter ℂ M → (UpperHalfPlane → ℂ) → Prop :=
-    fun (k : ℕ) {M : ℕ} (χ : DirichletCharacter ℂ M) (f : UpperHalfPlane → ℂ) ↦
-      ∀ γ ∈ CongruenceSubgroup.Gamma0 M,
-        SlashAction.map (↑k : ℤ) γ f =
-          (χ : ZMod M → ℂ) (↑((↑γ : Matrix (Fin (2 : ℕ)) (Fin (2 : ℕ)) ℤ) (1 : Fin (2 : ℕ)) (1 : Fin (2 : ℕ))) : ZMod M) • f
+noncomputable def UpperTheory.Reformulated.B.hecke_existence.HasChar
+    : ℕ → {M : ℕ} → DirichletCharacter ℂ M → (UpperHalfPlane → ℂ)
+      → Prop := fun (k : ℕ) {M : ℕ} (χ : DirichletCharacter ℂ M) (f : UpperHalfPlane → ℂ) ↦
+  ∀ γ ∈ CongruenceSubgroup.Gamma0 M,
+    SlashAction.map (↑k : ℤ) γ f
+      = (χ : ZMod M → ℂ)
+          (↑((↑γ : Matrix (Fin (2 : ℕ)) (Fin (2 : ℕ)) ℤ) (1 : Fin (2 : ℕ)) (1 : Fin (2 : ℕ)))
+            : ZMod M)
+        • f
 
-noncomputable def UpperTheory.Reformulated.B.hecke_existence.coef :
-    (UpperHalfPlane → ℂ) → ℕ → ℂ :=
-    fun (f : UpperHalfPlane → ℂ) (n : ℕ) ↦ (PowerSeries.coeff n : PowerSeries ℂ → ℂ) (UpperHalfPlane.qExpansion (1 : ℝ) f)
+noncomputable def UpperTheory.Reformulated.B.hecke_existence.coef
+    : (UpperHalfPlane → ℂ) → ℕ → ℂ := fun (f : UpperHalfPlane → ℂ) (n : ℕ) ↦
+  (PowerSeries.coeff n : PowerSeries ℂ → ℂ) (UpperHalfPlane.qExpansion (1 : ℝ) f)
 
-noncomputable def UpperTheory.Reformulated.B.hecke_existence.HeckeEx :
-    Prop :=
-    ∀ (N k : ℕ) [NeZero N],
-      (1 : ℕ) ≤ k →
-        ∀ (χ : DirichletCharacter ℂ N)
-          (f : CuspForm (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (CongruenceSubgroup.Gamma1 N)) (↑k : ℤ)),
-          UpperTheory.Reformulated.B.hecke_existence.HasChar k χ (⇑f : UpperHalfPlane → ℂ) →
-            ∀ (p : ℕ),
-              Nat.Prime p →
-                ∃ (g : CuspForm (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (CongruenceSubgroup.Gamma1 N)) (↑k : ℤ)),
-                  UpperTheory.Reformulated.B.hecke_existence.HasChar k χ (⇑g : UpperHalfPlane → ℂ) ∧
-                    ∀ (n : ℕ),
-                      (1 : ℕ) ≤ n →
-                        UpperTheory.Reformulated.B.hecke_existence.coef (⇑g : UpperHalfPlane → ℂ) n =
-                          UpperTheory.Reformulated.B.hecke_existence.coef (⇑f : UpperHalfPlane → ℂ) (p * n) +
-                            (χ : ZMod N → ℂ) (↑p : ZMod N) * (↑p : ℂ) ^ (k - (1 : ℕ)) *
-                              if p ∣ n then UpperTheory.Reformulated.B.hecke_existence.coef (⇑f : UpperHalfPlane → ℂ) (n / p) else (0 : ℂ)
+noncomputable def UpperTheory.Reformulated.B.hecke_existence.HeckeEx : Prop :=
+  ∀ (N k : ℕ) [NeZero N],
+    (1 : ℕ) ≤ k
+      → ∀ (χ : DirichletCharacter ℂ N)
+          (f : CuspForm
+            (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (CongruenceSubgroup.Gamma1 N))
+            (↑k : ℤ)),
+        UpperTheory.Reformulated.B.hecke_existence.HasChar k χ (⇑f : UpperHalfPlane → ℂ)
+          → ∀ (p : ℕ),
+            Nat.Prime p
+              → ∃ (g : CuspForm
+                  (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) (CongruenceSubgroup.Gamma1 N))
+                  (↑k : ℤ)),
+                UpperTheory.Reformulated.B.hecke_existence.HasChar k χ (⇑g : UpperHalfPlane → ℂ)
+                  ∧ ∀ (n : ℕ),
+                    (1 : ℕ) ≤ n
+                      → UpperTheory.Reformulated.B.hecke_existence.coef (⇑g : UpperHalfPlane → ℂ) n
+                        = UpperTheory.Reformulated.B.hecke_existence.coef (⇑f : UpperHalfPlane → ℂ)
+                            (p * n)
+                          + (χ : ZMod N → ℂ) (↑p : ZMod N) * (↑p : ℂ) ^ (k - (1 : ℕ))
+                            * if p ∣ n then
+                                UpperTheory.Reformulated.B.hecke_existence.coef
+                                  (⇑f : UpperHalfPlane → ℂ) (n / p)
+                              else
+                                (0 : ℂ)
 
 namespace UpperTheory.Reformulated.B.hecke_existence
 
@@ -39,12 +50,10 @@ open UpperHalfPlane Matrix Matrix.SpecialLinearGroup OnePoint
 open scoped MatrixGroups ModularForm
 
 private noncomputable def matU (p : ℕ) [NeZero p] (j : ℤ) : GL (Fin 2) ℝ :=
-  GeneralLinearGroup.mkOfDetNeZero !![1, (j : ℝ); 0, (p : ℝ)]
-    (by simp [det_fin_two, NeZero.ne p])
+  GeneralLinearGroup.mkOfDetNeZero !![1, (j : ℝ); 0, (p : ℝ)] (by simp [det_fin_two, NeZero.ne p])
 
 private noncomputable def matV (p : ℕ) [NeZero p] : GL (Fin 2) ℝ :=
-  GeneralLinearGroup.mkOfDetNeZero !![(p : ℝ), 0; 0, 1]
-    (by simp [det_fin_two, NeZero.ne p])
+  GeneralLinearGroup.mkOfDetNeZero !![(p : ℝ), 0; 0, 1] (by simp [det_fin_two, NeZero.ne p])
 
 private lemma matU_val (p : ℕ) [NeZero p] (j : ℤ) :
     (matU p j : Matrix (Fin 2) (Fin 2) ℝ) = !![1, (j : ℝ); 0, (p : ℝ)] := rfl
@@ -138,8 +147,9 @@ private lemma slash_eq_V {N k p : ℕ} [NeZero N] [NeZero p] (hp : p.Prime)
     push_cast
     rw [map_mul, h0, zero_mul, zero_smul, zero_smul]
 
-private noncomputable def term {N : ℕ} (k p : ℕ) [NeZero p] (χ : DirichletCharacter ℂ N)
-    (f : ℍ → ℂ) (x : OnePoint (ZMod p)) : ℍ → ℂ :=
+private noncomputable def term
+    {N : ℕ} (k p : ℕ) [NeZero p] (χ : DirichletCharacter ℂ N) (f : ℍ → ℂ) (x : OnePoint (ZMod p))
+    : ℍ → ℂ :=
   x.elim (χ p • f ∣[(k : ℤ)] (matV p)) (fun i ↦ f ∣[(k : ℤ)] (matU p (-(i.val : ℤ))))
 
 private def Kills {p : ℕ} (a b c d : ZMod p) (x : OnePoint (ZMod p)) : Prop :=
@@ -364,43 +374,52 @@ private lemma hasSum_U (p : ℕ) [NeZero p] {f : ℍ → ℂ} {a : ℕ → ℂ}
 end UpperTheory.Reformulated.B.hecke_existence
 
 open UpperHalfPlane Matrix.SpecialLinearGroup OnePoint in
-theorem UpperTheory.Reformulated.B.hecke_existence.heckeEx :
-    UpperTheory.Reformulated.B.hecke_existence.HeckeEx := by
+theorem UpperTheory.Reformulated.B.hecke_existence.heckeEx
+    : UpperTheory.Reformulated.B.hecke_existence.HeckeEx := by
   intro N k _ hk χ f hf p hp
   haveI : Fact p.Prime := ⟨hp⟩
   have hchar := sum_hasChar (p := p) hf
   have hper : (1 : ℝ) ∈ (Subgroup.map (mapGL ℝ) (CongruenceSubgroup.Gamma1 N)).strictPeriods := by
     simp
-  let g : CuspForm (Subgroup.map (mapGL ℝ) (CongruenceSubgroup.Gamma1 N)) (k : ℤ) :=
-    { toFun := ∑ x, term k p χ f x
-      slash_action_eq' := by
-        rintro - ⟨γ, hγ, rfl⟩
-        have := hchar γ (CongruenceSubgroup.Gamma1_in_Gamma0 N hγ)
-        rw [((CongruenceSubgroup.Gamma1_mem N γ).mp hγ).2.1, map_one, one_smul] at this
-        exact this
-      holo' := by
-        refine Finset.sum_induction (fun x ↦ term k p χ f x) _ (fun _ _ ↦ MDifferentiable.add)
-          mdifferentiable_const (fun x _ ↦ ?_)
-        cases x with
-        | infty => exact ((ModularFormClass.holo f).slash _ _).const_smul _
-        | coe i => exact (ModularFormClass.holo f).slash _ _
-      zero_at_cusps' := fun hc ↦ by
-        refine isZeroAt_sum _ fun x ↦ ?_
-        cases x with
-        | infty =>
-          exact isZeroAt_smul
-            (IsZeroAt.smul_iff.mp (CuspFormClass.zero_at_cusps f (isCusp_V hc p))) _
-        | coe i => exact IsZeroAt.smul_iff.mp (CuspFormClass.zero_at_cusps f (isCusp_U hc p _)) }
+  let g : CuspForm (Subgroup.map (mapGL ℝ) (CongruenceSubgroup.Gamma1 N)) (k : ℤ) := {
+    toFun := ∑ x, term k p χ f x
+    slash_action_eq' := by
+      rintro - ⟨γ, hγ, rfl⟩
+      have := hchar γ (CongruenceSubgroup.Gamma1_in_Gamma0 N hγ)
+      rw [((CongruenceSubgroup.Gamma1_mem N γ).mp hγ).2.1, map_one, one_smul] at this
+      exact this
+    holo' := by
+      refine Finset.sum_induction
+        (fun x ↦ term k p χ f x)
+        _
+        (fun _ _ ↦ MDifferentiable.add)
+        mdifferentiable_const
+        (fun x _ ↦ ?_)
+      cases x with
+      | infty => exact ((ModularFormClass.holo f).slash _ _).const_smul _
+      | coe i => exact (ModularFormClass.holo f).slash _ _
+    zero_at_cusps' := fun hc ↦ by
+      refine isZeroAt_sum _ fun x ↦ ?_
+      cases x with
+      | infty =>
+        exact isZeroAt_smul (IsZeroAt.smul_iff.mp (CuspFormClass.zero_at_cusps f (isCusp_V hc p))) _
+      | coe i => exact IsZeroAt.smul_iff.mp (CuspFormClass.zero_at_cusps f (isCusp_U hc p _))
+  }
   refine ⟨g, hchar, fun n _ ↦ ?_⟩
   haveI : Fact (IsCusp ∞ (Subgroup.map (mapGL ℝ) (CongruenceSubgroup.Gamma1 N))) :=
     ⟨Subgroup.isCusp_of_mem_strictPeriods one_pos hper⟩
-  have hs : ∀ τ : ℍ, HasSum (fun m ↦ coef f m * Function.Periodic.qParam 1 τ ^ m) (f τ) :=
-    fun τ ↦ ModularForm.hasSum_qExpansion f one_pos hper τ
+  have hs : ∀ τ : ℍ, HasSum (fun m ↦ coef f m * Function.Periodic.qParam 1 τ ^ m) (f τ) := fun τ ↦
+    ModularForm.hasSum_qExpansion f one_pos hper τ
   symm
-  refine ModularFormClass.qExpansion_coeff_unique (f := g) (c := fun n ↦ coef f (p * n) +
-    χ p * (p : ℂ) ^ (k - 1) * if p ∣ n then coef f (n / p) else 0) one_pos hper (fun τ ↦ ?_) n
-  have hval : g τ = (∑ i : ZMod p, (p : ℂ)⁻¹ * f (matU p (-(i.val : ℤ)) • τ)) +
-      χ p * (p : ℂ) ^ (k - 1) * f (matV p • τ) := by
+  refine ModularFormClass.qExpansion_coeff_unique (f := g)
+    (c := fun n ↦ coef f (p * n) + χ p * (p : ℂ) ^ (k - 1) * if p ∣ n then coef f (n / p) else 0)
+    one_pos hper
+    (fun τ ↦ ?_)
+    n
+  have hval
+      : g τ
+        = (∑ i : ZMod p, (p : ℂ)⁻¹ * f (matU p (-(i.val : ℤ)) • τ))
+          + χ p * (p : ℂ) ^ (k - 1) * f (matV p • τ) := by
     change (∑ x, term k p χ f x) τ = _
     rw [Finset.sum_apply, add_comm]
     refine (Fintype.sum_option (fun x : Option (ZMod p) ↦ term k p χ f x τ)).trans ?_

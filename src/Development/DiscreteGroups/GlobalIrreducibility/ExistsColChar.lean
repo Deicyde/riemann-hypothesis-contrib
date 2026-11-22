@@ -13,7 +13,8 @@ set_option linter.unusedVariables false
 set_option linter.style.longLine false
 set_option linter.unusedSimpArgs false
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker Matrix DiscreteGroups.sglob.LConvGenM DiscreteGroups.sglob.LConvGenF
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker
+  Matrix DiscreteGroups.sglob.LConvGenM DiscreteGroups.sglob.LConvGenF
 
 namespace DiscreteGroups.sglob.LConvGenR
 
@@ -21,8 +22,12 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 variable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 variable (π : Representation ℂ (GL (Fin n) k) V) (ψ : AddChar k Circle)
 
-theorem exists_col_char {c : kˣ} (hc : HasConductor ψ c) (hs : IsSmooth π) (j : ℕ) (hj : j < n)
-    (h0 : KN π ψ (j + 1) ≠ ⊤) (S : Finset (Fin n)) : ∃ ξ : Fin n → k, KN π ψ (j + 1) ⊔ KUS π ψ j S ξ ≠ ⊤ := by
+theorem exists_col_char
+    {c : kˣ} (hc : HasConductor ψ c)
+    (hs : IsSmooth π)
+    (j : ℕ) (hj : j < n) (h0 : KN π ψ (j + 1) ≠ ⊤)
+    (S : Finset (Fin n))
+    : ∃ ξ : Fin n → k, KN π ψ (j + 1) ⊔ KUS π ψ j S ξ ≠ ⊤ := by
   induction S using Finset.induction_on with
   | empty => exact ⟨0, by rw [KUS_empty, sup_bot_eq]; exact h0⟩
   | insert a S ha ih =>
@@ -32,7 +37,8 @@ theorem exists_col_char {c : kˣ} (hc : HasConductor ψ c) (hs : IsSmooth π) (j
       simp only [σ]; rw [Pi.single_add, colU_add, map_mul]
     have hW : ∀ t, ∀ w ∈ KN π ψ (j + 1) ⊔ KUS π ψ j S ξ, σ t w ∈ KN π ψ (j + 1) ⊔ KUS π ψ j S ξ :=
       fun t w hw => W_stable π ψ j S ξ _ hw
-    obtain ⟨ξa, hξa⟩ := exists_character_sup_ne_top ψ σ hc hadd _ hW (fun v => smooth_col π hs j hj a v) hξ
+    obtain ⟨ξa, hξa⟩ :=
+      exists_character_sup_ne_top ψ σ hc hadd _ hW (fun v => smooth_col π hs j hj a v) hξ
     refine ⟨Function.update ξ a ξa, fun htop => hξa (eq_top_iff.2 ?_)⟩
     rw [← htop]
     refine sup_le (le_sup_left.trans le_sup_left) (Submodule.span_le.2 ?_)
@@ -48,24 +54,31 @@ theorem exists_col_char {c : kˣ} (hc : HasConductor ψ c) (hs : IsSmooth π) (j
       by_cases hra : r = a
       · subst hra; simp [cS]
       · simp [cS, hra, Pi.single_apply]
-    have hdot : dotj j (Function.update ξ a ξa) c =
-        dotj j (Function.update ξ a ξa) (Pi.single a (c a)) + dotj j ξ cS := by
+    have hdot
+        : dotj j (Function.update ξ a ξa) c
+          = dotj j (Function.update ξ a ξa) (Pi.single a (c a)) + dotj j ξ cS := by
       conv_lhs => rw [hsplit]
       rw [dotj_add, dotj_update j ξ cS a ξa (by simp [cS])]
-    have e : π (colU j c) v - ((ψ (dotj j (Function.update ξ a ξa) c) : Circle) : ℂ) • v =
-        σ (c a) (π (colU j cS) v - ((ψ (dotj j ξ cS) : Circle) : ℂ) • v) +
-        ((ψ (dotj j ξ cS) : Circle) : ℂ) • (σ (c a) v -
-          ((ψ (dotj j (Function.update ξ a ξa) (Pi.single a (c a))) : Circle) : ℂ) • v) := by
+    have e
+        : π (colU j c) v - ((ψ (dotj j (Function.update ξ a ξa) c) : Circle) : ℂ) • v
+          = σ (c a) (π (colU j cS) v - ((ψ (dotj j ξ cS) : Circle) : ℂ) • v)
+            + ((ψ (dotj j ξ cS) : Circle) : ℂ)
+              • (σ (c a) v
+                - ((ψ (dotj j (Function.update ξ a ξa) (Pi.single a (c a))) : Circle) : ℂ)
+                  • v) := by
       have hcol : π (colU j c) v = σ (c a) (π (colU j cS) v) := by
         conv_lhs => rw [hsplit]
         rw [colU_add, map_mul, Module.End.mul_apply]
-      rw [hcol, hdot, AddChar.map_add_eq_mul, Circle.coe_mul, map_sub, map_smul, smul_sub, smul_smul,
+      rw [hcol, hdot, AddChar.map_add_eq_mul, Circle.coe_mul, map_sub, map_smul, smul_sub,
+        smul_smul,
         mul_comm ((ψ (dotj j (Function.update ξ a ξa) (Pi.single a (c a))) : Circle) : ℂ)]
       abel
     show _ ∈ _
     rw [e]
-    refine Submodule.add_mem _ (Submodule.mem_sup_left (hW _ _ (Submodule.mem_sup_right
-      (Submodule.subset_span ⟨cS, hcS0, v, rfl⟩)))) (Submodule.smul_mem _ _ ?_)
+    refine Submodule.add_mem _
+      (Submodule.mem_sup_left (hW _ _
+        (Submodule.mem_sup_right (Submodule.subset_span ⟨cS, hcS0, v, rfl⟩))))
+      (Submodule.smul_mem _ _ ?_)
     rw [dotj_single]
     by_cases haj : a.val < j
     · rw [if_pos haj, Function.update_self]

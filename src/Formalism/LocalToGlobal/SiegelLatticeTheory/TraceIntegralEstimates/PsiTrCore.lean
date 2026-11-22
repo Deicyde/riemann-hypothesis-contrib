@@ -23,8 +23,8 @@ theorem incl_mem (o : 𝓞 E) : Formalism.UG.inclE (F := F) (Af F) (o : E) ∈ I
   refine ⟨⟨(o : E), o, rfl⟩, ?_⟩
   simp [Formalism.UG.inclE]
 
-theorem one_tmul_mem (c : Af F) (hc : ∀ v, c v ∈ v.adicCompletionIntegers F) :
-    (1 : E) ⊗ₜ[F] c ∈ IntAf F E := by
+theorem one_tmul_mem (c : Af F) (hc : ∀ v, c v ∈ v.adicCompletionIntegers F)
+    : (1 : E) ⊗ₜ[F] c ∈ IntAf F E := by
   show _ ∈ Formalism.UG.tensInt (F := F) (Af F) (Formalism.UG.intOE E) (Formalism.UG.intAd F)
   unfold Formalism.UG.tensInt
   apply Subring.subset_closure
@@ -32,8 +32,9 @@ theorem one_tmul_mem (c : Af F) (hc : ∀ v, c v ∈ v.adicCompletionIntegers F)
   exact ⟨⟨c, hc⟩, rfl⟩
 
 def congSub (n : ℤ) : Subring (E ⊗[F] Af F) where
-  carrier := {t | ∃ o : 𝓞 E, ∃ s ∈ IntAf F E,
-    t = Formalism.UG.inclE (F := F) (Af F) (o : E) + (n : E ⊗[F] Af F) * s}
+  carrier :=
+    {t | ∃ o : 𝓞 E, ∃ s ∈ IntAf F E,
+      t = Formalism.UG.inclE (F := F) (Af F) (o : E) + (n : E ⊗[F] Af F) * s}
   zero_mem' := ⟨0, 0, zero_mem _, by simp [RingOfIntegers.coe_eq_algebraMap]⟩
   one_mem' := ⟨1, 0, zero_mem _, by simp [RingOfIntegers.coe_eq_algebraMap]⟩
   add_mem' := by
@@ -48,8 +49,13 @@ def congSub (n : ℤ) : Subring (E ⊗[F] Af F) where
     ring
   mul_mem' := by
     rintro _ _ ⟨o, s, hs, rfl⟩ ⟨o', s', hs', rfl⟩
-    refine ⟨o * o', Formalism.UG.inclE (F := F) (Af F) (o : E) * s' + s * Formalism.UG.inclE (F := F) (Af F) (o' : E) +
-      (n : E ⊗[F] Af F) * s * s', ?_, ?_⟩
+    refine ⟨
+      o * o',
+      Formalism.UG.inclE (F := F) (Af F) (o : E) * s'
+        + s * Formalism.UG.inclE (F := F) (Af F) (o' : E) + (n : E ⊗[F] Af F) * s * s',
+      ?_,
+      ?_
+    ⟩
     · exact add_mem (add_mem (mul_mem (incl_mem o) hs') (mul_mem hs (incl_mem o')))
         (mul_mem (mul_mem (intCast_mem _ n) hs) hs')
     · simp only [RingOfIntegers.coe_eq_algebraMap, map_mul]
@@ -70,31 +76,37 @@ theorem intAf_le_congSub (n : ℤ) (hn : n ≠ 0) : IntAf F E ≤ congSub n := b
     have h1 : (n : Af F) * algebraMap F (Af F) ((n : F)⁻¹) = 1 := by
       rw [← map_intCast (algebraMap F (Af F)) n, ← map_mul, mul_inv_cancel₀ hnF, map_one]
     have key : (n : Af F) * c' = c - algebraMap F (Af F) (b : F) := by
-      calc (n : Af F) * c'
-          = (c - algebraMap F (Af F) (b : F)) * ((n : Af F) * algebraMap F (Af F) ((n : F)⁻¹)) := by
-            rw [hc'def]; ring
+      calc
+        (n : Af F) * c'
+            = (c - algebraMap F (Af F) (b : F))
+              * ((n : Af F) * algebraMap F (Af F) ((n : F)⁻¹)) := by
+          rw [hc'def]; ring
         _ = c - algebraMap F (Af F) (b : F) := by rw [h1, mul_one]
     have hc'int : ∀ v, c' v ∈ v.adicCompletionIntegers F := by
       intro v
-      have e : c' v = (c v - algebraMap F (v.adicCompletion F) (b : F)) *
-          algebraMap F (v.adicCompletion F) ((n : F)⁻¹) := by
+      have e
+          : c' v
+            = (c v - algebraMap F (v.adicCompletion F) (b : F))
+              * algebraMap F (v.adicCompletion F) ((n : F)⁻¹) := by
         rw [hc'def]; rfl
-      have hnv : Valued.v (algebraMap F (v.adicCompletion F) (n : F)) = v.intValuation (n : 𝓞 F) := by
+      have hnv
+          : Valued.v (algebraMap F (v.adicCompletion F) (n : F)) = v.intValuation (n : 𝓞 F) := by
         rw [← map_intCast (algebraMap (𝓞 F) F) n]
         exact (v.valuedAdicCompletion_eq_valuation' _).trans (v.valuation_of_algebraMap _)
       have hn0 : v.intValuation (n : 𝓞 F) ≠ 0 := by
         rw [← hnv, Valuation.ne_zero_iff]
         exact (map_ne_zero (algebraMap F (v.adicCompletion F))).mpr hnF
-      rw [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers, e, map_mul, map_inv₀, map_inv₀, hnv]
-      calc Valued.v (c v - algebraMap F (v.adicCompletion F) (b : F)) * (v.intValuation (n : 𝓞 F))⁻¹
+      rw [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers, e, map_mul, map_inv₀,
+        map_inv₀, hnv]
+      calc
+        Valued.v (c v - algebraMap F (v.adicCompletion F) (b : F)) * (v.intValuation (n : 𝓞 F))⁻¹
           ≤ v.intValuation (n : 𝓞 F) * (v.intValuation (n : 𝓞 F))⁻¹ := by gcongr; exact hb v
         _ = 1 := mul_inv_cancel₀ hn0
-    have hB : Formalism.UG.inclE (F := F) (Af F) ((algebraMap (𝓞 F) (𝓞 E) b : 𝓞 E) : E) =
-        (1 : E) ⊗ₜ[F] algebraMap F (Af F) (b : F) := by
+    have hB
+        : Formalism.UG.inclE (F := F) (Af F) ((algebraMap (𝓞 F) (𝓞 E) b : 𝓞 E) : E)
+          = (1 : E) ⊗ₜ[F] algebraMap F (Af F) (b : F) := by
       have hcoe : ((algebraMap (𝓞 F) (𝓞 E) b : 𝓞 E) : E) = algebraMap F E (b : F) := by
-        first
-        | rfl
-        | simp [RingOfIntegers.coe_eq_algebraMap, ← IsScalarTower.algebraMap_apply]
+        first | rfl | simp [RingOfIntegers.coe_eq_algebraMap, ← IsScalarTower.algebraMap_apply]
       rw [hcoe]
       simp only [Formalism.UG.inclE, Algebra.TensorProduct.includeLeftRingHom_apply]
       rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
@@ -149,25 +161,29 @@ private lemma sum_phi_add_star_eq_trace (I : AutInst) (z : I.E) :
 theorem psiTrCore_holds : Formalism.L2.SG.Pf.PsiTrCore := by
   intro I ψ hadd hint hprod y hy t ht
   obtain ⟨N, hN, hNy⟩ : ∃ N : ℤ, N ≠ 0 ∧ IsIntegral ℤ ((N : I.E) * y) := by
-    obtain ⟨⟨N, hN⟩, h⟩ := IsIntegral.exists_multiple_integral_of_isLocalization
-      (nonZeroDivisors ℤ) y (Algebra.IsIntegral.isIntegral (R := ℚ) y)
+    obtain ⟨⟨N, hN⟩, h⟩ :=
+      IsIntegral.exists_multiple_integral_of_isLocalization (nonZeroDivisors ℤ) y
+        (Algebra.IsIntegral.isIntegral (R := ℚ) y)
     refine ⟨N, nonZeroDivisors.ne_zero hN, ?_⟩
     rw [Submonoid.smul_def, zsmul_eq_mul] at h
     exact h
   let o₀ : 𝓞 I.E := ⟨(N : I.E) * y, hNy⟩
   obtain ⟨o, s, hs, rfl⟩ := intAf_le_congSub (F := I.F) (E := I.E) N hN ht
-  have hsplit : (Formalism.UG.inclE (F := I.F) (Af I.F) (o : I.E) + (N : I.E ⊗[I.F] Af I.F) * s) *
-      Formalism.UG.inclE (F := I.F) (Af I.F) y =
-      Formalism.UG.inclE (F := I.F) (Af I.F) ((o : I.E) * y) +
-        s * Formalism.UG.inclE (F := I.F) (Af I.F) (o₀ : I.E) := by
+  have hsplit
+      : (Formalism.UG.inclE (F := I.F) (Af I.F) (o : I.E) + (N : I.E ⊗[I.F] Af I.F) * s)
+          * Formalism.UG.inclE (F := I.F) (Af I.F) y
+        = Formalism.UG.inclE (F := I.F) (Af I.F) ((o : I.E) * y)
+          + s * Formalism.UG.inclE (F := I.F) (Af I.F) (o₀ : I.E) := by
     have h0 : (o₀ : I.E) = (N : I.E) * y := rfl
     rw [h0, map_mul, map_mul, map_intCast]
     ring
   rw [hsplit, hadd, hint _ (mul_mem hs (incl_mem o₀)), mul_one]
   obtain ⟨m, hm⟩ := hy o
   have hP := hprod ((o : I.E) * y)
-  have hexp : ∏ v, Complex.exp (2 * Real.pi * Complex.I *
-      (I.φ v ((o : I.E) * y) + star (I.φ v ((o : I.E) * y)))) = 1 := by
+  have hexp
+      : ∏ v, Complex.exp (2 * Real.pi * Complex.I *
+          (I.φ v ((o : I.E) * y) + star (I.φ v ((o : I.E) * y))))
+        = 1 := by
     rw [← Complex.exp_sum, ← Finset.mul_sum, sum_phi_add_star_eq_trace I, hm]
     push_cast
     rw [mul_comm]

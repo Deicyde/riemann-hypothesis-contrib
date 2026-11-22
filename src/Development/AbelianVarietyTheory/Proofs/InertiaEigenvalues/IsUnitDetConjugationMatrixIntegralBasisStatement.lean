@@ -9,19 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocal
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.isUnit_det_conjugationMatrix_integralBasis :
-    ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), (∀ x, φ (K.c x) = K'.c (φ x)) →
-      (letI : Algebra K.E K'.E := φ.toAlgebra
-       ∀ w : Module.Basis (Fin d) K.E K'.E,
-         (∀ z : K'.E, (∃ y : K'.O, algebraMap K'.O K'.E y = z) ↔
-           ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k) →
-         ∃ u : K.O, IsUnit u ∧
-           algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det) := by
+theorem _root_.GlobalTheory.T.isUnit_det_conjugationMatrix_integralBasis
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      (∀ x, φ (K.c x) = K'.c (φ x))
+        → (letI : Algebra K.E K'.E := φ.toAlgebra
+           ∀ w : Module.Basis (Fin d) K.E K'.E,
+             (∀ z : K'.E,
+                 (∃ y : K'.O, algebraMap K'.O K'.E y = z)
+                   ↔ ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k)
+               → ∃ u : K.O,
+                 IsUnit u
+                   ∧ algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det) := by
   intro K K' d φ hφ
   let : Algebra K.E K'.E := φ.toAlgebra
   intro w hw
-  have hunit : ∃ u : K.O, IsUnit u ∧
-      algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det := by
+  have hunit
+      : ∃ u : K.O,
+        IsUnit u ∧ algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det := by
     set C : Matrix (Fin d) (Fin d) K.E := Matrix.of fun m l => w.repr (K'.c (w l)) m with hC
     have hsm : ∀ (e : K.E) (x : K'.E), e • x = φ e * x := fun e x => rfl
     have hint : ∀ m l, ∃ a : K.O, algebraMap K.O K.E a = C m l := by

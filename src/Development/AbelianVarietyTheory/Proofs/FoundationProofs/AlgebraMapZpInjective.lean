@@ -19,8 +19,7 @@ variable {p : ℕ} [hp : Fact p.Prime] {Ω : Type} [Field Ω] [Algebra (O0 p) Ω
 
 def InR (ψ : O0 p →+* Ω) (y : Ω) : Prop :=
   ∃ (d : ℕ) (e : Fin d → Ω) (b : Fin d → O0 p),
-    (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp (p := p) (e t)) ∧
-    y = ∑ t, e t * ψ (b t)
+    (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp (p := p) (e t)) ∧ y = ∑ t, e t * ψ (b t)
 
 variable (p Ω) in
 abbrev zpAlg : Algebra ℤ_[p] Ω := ((algebraMap (O0 p) Ω).comp (algebraMap ℤ_[p] (O0 p))).toAlgebra
@@ -31,8 +30,8 @@ theorem isAlgZp_iff (x : Ω) : IsAlgZp (p := p) x ↔ @IsAlgebraic ℤ_[p] Ω _ 
   unfold IsAlgZp IsAlgebraic
   simp only [Polynomial.aeval_map_algebraMap]
 
-theorem isAlgZp_mul {x y : Ω} (hx : IsAlgZp (p := p) x) (hy : IsAlgZp (p := p) y) :
-    IsAlgZp (p := p) (x * y) := by
+theorem isAlgZp_mul {x y : Ω} (hx : IsAlgZp (p := p) x) (hy : IsAlgZp (p := p) y)
+    : IsAlgZp (p := p) (x * y) := by
   letI := zpAlg p Ω
   rw [isAlgZp_iff] at hx hy ⊢
   exact hx.mul hy
@@ -42,18 +41,20 @@ theorem isAlgZp_one : IsAlgZp (p := p) (1 : Ω) := by
   rw [isAlgZp_iff]
   exact isAlgebraic_one
 
-theorem isInt_psi {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ) (b : O0 p) :
-    IsInt (p := p) (ψ b) := by
+theorem isInt_psi {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ) (b : O0 p)
+    : IsInt (p := p) (ψ b) := by
   have hq : IsIntegral (O0 p) (T.qq n) := by
-    refine ⟨Polynomial.X ^ (p ^ n) - Polynomial.C (qO p),
-      Polynomial.monic_X_pow_sub_C _ (pow_ne_zero _ hp.out.ne_zero), ?_⟩
+    refine ⟨
+      Polynomial.X ^ (p ^ n) - Polynomial.C (qO p),
+      Polynomial.monic_X_pow_sub_C _ (pow_ne_zero _ hp.out.ne_zero),
+      ?_
+    ⟩
     rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, Basic.qq_pow, sub_self]
   have hb : ψ b ∈ ψ.range := ⟨b, rfl⟩
   rw [h.rng] at hb
   exact adjoin_le_integralClosure hq hb
 
-theorem inR_zero (ψ : O0 p →+* Ω) : InR ψ 0 :=
-  ⟨0, Fin.elim0, Fin.elim0, fun t => t.elim0, by simp⟩
+theorem inR_zero (ψ : O0 p →+* Ω) : InR ψ 0 := ⟨0, Fin.elim0, Fin.elim0, fun t => t.elim0, by simp⟩
 
 theorem inR_psi (ψ : O0 p →+* Ω) (b : O0 p) : InR ψ (ψ b) :=
   ⟨1, fun _ => 1, fun _ => b, fun _ => ⟨isIntegral_one, isAlgZp_one⟩, by simp⟩
@@ -68,22 +69,28 @@ theorem inR_add {ψ : O0 p →+* Ω} {x y : Ω} (hx : InR ψ x) (hy : InR ψ y) 
   · rw [Fin.sum_univ_add]
     simp
 
-theorem inR_sum {ψ : O0 p →+* Ω} {ι : Type*} (s : Finset ι) (f : ι → Ω) (hf : ∀ i ∈ s, InR ψ (f i)) :
-    InR ψ (∑ i ∈ s, f i) := by
+theorem inR_sum {ψ : O0 p →+* Ω} {ι : Type*} (s : Finset ι) (f : ι → Ω) (hf : ∀ i ∈ s, InR ψ (f i))
+    : InR ψ (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using inR_zero ψ
   | insert a s ha ih =>
     rw [Finset.sum_insert ha]
-    exact inR_add (hf a (Finset.mem_insert_self a s)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
+    exact inR_add (hf a (Finset.mem_insert_self a s))
+      (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
 
 theorem inR_mul {ψ : O0 p →+* Ω} {x y : Ω} (hx : InR ψ x) (hy : InR ψ y) : InR ψ (x * y) := by
   obtain ⟨d, e, b, he, rfl⟩ := hx
   obtain ⟨d', e', b', he', rfl⟩ := hy
   rw [Finset.sum_mul_sum]
   refine inR_sum _ _ fun i _ => inR_sum _ _ fun j _ => ?_
-  refine ⟨1, fun _ => e i * e' j, fun _ => b i * b' j,
-    fun _ => ⟨IsIntegral.mul (he i).1 (he' j).1, isAlgZp_mul (he i).2 (he' j).2⟩, ?_⟩
+  refine ⟨
+    1,
+    fun _ => e i * e' j,
+    fun _ => b i * b' j,
+    fun _ => ⟨IsIntegral.mul (he i).1 (he' j).1, isAlgZp_mul (he i).2 (he' j).2⟩,
+    ?_
+  ⟩
   simp only [Finset.univ_unique, Finset.sum_singleton, map_mul]
   ring
 
@@ -91,13 +98,14 @@ theorem inR_neg {ψ : O0 p →+* Ω} {x : Ω} (hx : InR ψ x) : InR ψ (-x) := b
   have := inR_mul (inR_psi ψ (-1)) hx
   simpa using this
 
-theorem InR.isInt {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ) {x : Ω} (hx : InR ψ x) :
-    IsInt (p := p) x := by
+theorem InR.isInt {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ) {x : Ω} (hx : InR ψ x)
+    : IsInt (p := p) x := by
   obtain ⟨d, e, b, he, rfl⟩ := hx
   exact IsIntegral.sum _ fun t _ => IsIntegral.mul (he t).1 (isInt_psi h (b t))
 
 theorem algebraMap_zp_injective : Function.Injective (algebraMap ℤ_[p] (O0 p)) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro m hm
   by_contra h0
   rw [PadicInt.unitCoeff_spec h0, map_mul, map_pow, map_natCast] at hm
@@ -106,8 +114,11 @@ theorem algebraMap_zp_injective : Function.Injective (algebraMap ℤ_[p] (O0 p))
   have hp0 : (p : O0 p) ^ m.valuation ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 hp.out.ne_zero)
   exact mul_ne_zero hu hp0 hm
 
-theorem exists_inR_of_isAlgZp (hc : IsClo p Ω) {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ) {x : Ω}
-    (hx : IsAlgZp (p := p) x) : ∃ D : O0 p, D ≠ 0 ∧ InR ψ (x * ψ D) := by
+theorem exists_inR_of_isAlgZp
+    (hc : IsClo p Ω)
+    {T : Tower p Ω} {n : ℕ} {ψ : O0 p →+* Ω} (h : IsReb T n ψ)
+    {x : Ω} (hx : IsAlgZp (p := p) x)
+    : ∃ D : O0 p, D ≠ 0 ∧ InR ψ (x * ψ D) := by
   letI := zpAlg p Ω
   haveI : IsScalarTower ℤ_[p] (O0 p) Ω := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have hx' := (isAlgZp_iff x).1 hx
@@ -128,8 +139,8 @@ theorem exists_inR_of_isAlgZp (hc : IsClo p Ω) {T : Tower p Ω} {n : ℕ} {ψ :
   · simp only [Finset.univ_unique, Finset.sum_singleton, map_one, mul_one]
     rw [hD, Algebra.smul_def, IsScalarTower.algebraMap_apply ℤ_[p] (O0 p) Ω, mul_comm]
 
-theorem algebraMap_zp_eq (m : ℤ_[p]) :
-    algebraMap ℤ_[p] (O0 p) m = algebraMap (Lau p) (O0 p) (HahnSeries.C m) := by
+theorem algebraMap_zp_eq (m : ℤ_[p])
+    : algebraMap ℤ_[p] (O0 p) m = algebraMap (Lau p) (O0 p) (HahnSeries.C m) := by
   have hH := (o0_isAdicComplete_span_p p).toIsHausdorff
   refine sub_eq_zero.1 (hH.haus' _ fun K => ?_)
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
@@ -144,11 +155,11 @@ theorem algebraMap_zp_eq (m : ℤ_[p]) :
 
 theorem isAlgZp_zp (m : ℤ_[p]) : IsAlgZp (p := p) (zp Ω m) := by
   refine ⟨Polynomial.X - Polynomial.C m, Polynomial.X_sub_C_ne_zero m, ?_⟩
-  rw [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, map_sub, Polynomial.aeval_X, Polynomial.aeval_C,
-    zp, algebraMap_zp_eq, HahnSeries.C_apply, sub_self]
+  rw [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, map_sub, Polynomial.aeval_X,
+    Polynomial.aeval_C, zp, algebraMap_zp_eq, HahnSeries.C_apply, sub_self]
 
-theorem isAlgZp_add {x y : Ω} (hx : IsAlgZp (p := p) x) (hy : IsAlgZp (p := p) y) :
-    IsAlgZp (p := p) (x + y) := by
+theorem isAlgZp_add {x y : Ω} (hx : IsAlgZp (p := p) x) (hy : IsAlgZp (p := p) y)
+    : IsAlgZp (p := p) (x + y) := by
   letI := zpAlg p Ω
   rw [isAlgZp_iff] at hx hy ⊢
   exact hx.add hy

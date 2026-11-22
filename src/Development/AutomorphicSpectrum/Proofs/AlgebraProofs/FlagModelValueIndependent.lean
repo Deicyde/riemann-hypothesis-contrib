@@ -17,11 +17,11 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FlagFurtherTe
 
 namespace GlobalTheory.CompanionTheory.CommAlg.FlagModelValue
 
-
 open GroundTheory.Heights₂.Heights.NumbersDVR in
 theorem main : FlagModelValueIndependence.Statement :=
   FlagModelValueIndependence.proof
-    (FlagPairValueIndependence.proof GlobalTheory.T.flag_plain_value_independent GlobalTheory.T.flag_further_term_independent_statement)
+    (FlagPairValueIndependence.proof GlobalTheory.T.flag_plain_value_independent
+      GlobalTheory.T.flag_further_term_independent_statement)
     (_root_.GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelCommonModel.proof
       GlobalTheory.CompanionTheory.CommAlg.joinTwoModels
       GlobalTheory.CompanionTheory.CommAlg.JoinPullbackAlt.main

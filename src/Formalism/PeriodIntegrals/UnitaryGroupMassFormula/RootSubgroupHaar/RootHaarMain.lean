@@ -14,10 +14,12 @@ namespace PI.AmpRootHaarW
 
 open Formalism.QuantumDeterminants Formalism.MainNotions.S PI.AmpRootCommon PI.AmpRootJacW
 
-theorem ext_of_injOn {α β : Type*} [TopologicalSpace α] [PolishSpace α] [MeasurableSpace α] [BorelSpace α]
-    [TopologicalSpace β] [T2Space β] [MeasurableSpace β] [BorelSpace β] {f : α → β} {S : Set α}
-    (hS : MeasurableSet S) (hf : Continuous f) (hinj : Set.InjOn f S) {μ ν : Measure α}
-    (hμ : μ Sᶜ = 0) (hν : ν Sᶜ = 0) (h : μ.map f = ν.map f) : μ = ν := by
+theorem ext_of_injOn
+    {α β : Type*} [TopologicalSpace α] [PolishSpace α] [MeasurableSpace α] [BorelSpace α]
+    [TopologicalSpace β] [T2Space β] [MeasurableSpace β] [BorelSpace β]
+    {f : α → β} {S : Set α} (hS : MeasurableSet S) (hf : Continuous f) (hinj : Set.InjOn f S)
+    {μ ν : Measure α} (hμ : μ Sᶜ = 0) (hν : ν Sᶜ = 0) (h : μ.map f = ν.map f)
+    : μ = ν := by
   ext A hA
   have hAS : MeasurableSet (A ∩ S) := hA.inter hS
   have himg : MeasurableSet (f '' (A ∩ S)) :=
@@ -72,8 +74,9 @@ theorem rootHaar_main : PI.AmpRootH.RootHaar := by
     have hae : f ∘ φ =ᵐ[μ₀] phiR p ∘ rootCoords k r L.z' p := by
       filter_upwards [hR] with x hx
       exact rootCoords_conj hz hz' hg hP hx
-    rw [Measure.map_congr hae, ← Measure.map_map (phiR_mp p).measurable
-      (continuous_rootCoords L.z' p).measurable, hmap, Measure.map_smul, (phiR_mp p).map_eq]
+    rw [Measure.map_congr hae,
+      ← Measure.map_map (phiR_mp p).measurable (continuous_rootCoords L.z' p).measurable, hmap,
+      Measure.map_smul, (phiR_mp p).map_eq]
     exact (phiR_mp p).measurable.aemeasurable
   have hc0 : c ≠ 0 := by
     rw [hc_def, ne_eq, ENNReal.ofReal_eq_zero, not_le]
@@ -119,8 +122,9 @@ theorem rootHaar_main : PI.AmpRootH.RootHaar := by
       have e2 := flagMat_mul hz hs.1 hy.1
       have e3 := flagZ_eq hz hz' hg hP hs
       have e4 := flagZ_eq hz hz' hg hP (a := Matrix.of y) hy
-      have e5 : 1 + vM (rootPat p) (f (fun i j => (s * Matrix.of y) i j)) =
-          (1 + vM (rootPat p) s') * (1 + vM (rootPat p) (f y)) := by
+      have e5
+          : 1 + vM (rootPat p) (f (fun i j => (s * Matrix.of y) i j))
+            = (1 + vM (rootPat p) s') * (1 + vM (rootPat p) (f y)) := by
         rw [← e1, e2, e3, e4]
         all_goals rfl
       have e6 := congrFun (congrFun e5 q.1.1) q.1.2

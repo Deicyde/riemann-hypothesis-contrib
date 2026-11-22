@@ -8,16 +8,18 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem linearIndependent_of_distinct_valuationLike :
-    ∀ (C V Γ ι : Type) [Field C] [AddCommGroup V] [Module C V] [LinearOrder Γ] (ν : V → Γ),
-      (∀ (c : C) (u : V), c ≠ 0 → ν (c • u) = ν u) →
-      (∀ u v : V, u ≠ 0 → v ≠ 0 → ν u < ν v → u + v ≠ 0 ∧ ν (u + v) = ν u) →
-      ∀ f : ι → V, (∀ i, f i ≠ 0) → Function.Injective (fun i => ν (f i)) →
-        LinearIndependent C f := by
+theorem linearIndependent_of_distinct_valuationLike
+    : ∀ (C V Γ ι : Type) [Field C] [AddCommGroup V] [Module C V] [LinearOrder Γ] (ν : V → Γ),
+      (∀ (c : C) (u : V), c ≠ 0 → ν (c • u) = ν u)
+        → (∀ u v : V, u ≠ 0 → v ≠ 0 → ν u < ν v → u + v ≠ 0 ∧ ν (u + v) = ν u)
+        → ∀ f : ι → V,
+          (∀ i, f i ≠ 0) → Function.Injective (fun i => ν (f i)) → LinearIndependent C f := by
   intro C V Γ ι _ _ _ _ ν hsm hadd f hf hinj
   classical
-  have key : ∀ (g : ι → C) (s : Finset ι), s.Nonempty → (∀ i ∈ s, g i ≠ 0) →
-      (∑ i ∈ s, g i • f i) ≠ 0 ∧ ∃ j ∈ s, ν (∑ i ∈ s, g i • f i) = ν (f j) := by
+  have key
+      : ∀ (g : ι → C) (s : Finset ι),
+        s.Nonempty → (∀ i ∈ s, g i ≠ 0)
+          → (∑ i ∈ s, g i • f i) ≠ 0 ∧ ∃ j ∈ s, ν (∑ i ∈ s, g i • f i) = ν (f j) := by
     intro g s
     induction s using Finset.induction_on with
     | empty => intro h; exact absurd h Finset.not_nonempty_empty

@@ -9,9 +9,10 @@ open CrystallineSemistableComparison.Pb.Kap
 
 namespace GlobalTheory.CompanionTheory.KapChain
 
-theorem rho_smul : ∀ {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K] (C : Chain.{1} Λ A B K) {j : ℕ}
-    (c : Λ) (x : ∀ n, C.S n j) (f : Module.Dual K (C.V j) →+ B), C.Rho x f →
-    C.Rho (c • x) ((AddMonoidHom.mulLeft (C.ι (C.lam c))).comp f) := by
+theorem rho_smul
+    : ∀ {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K] (C : Chain.{1} Λ A B K)
+        {j : ℕ} (c : Λ) (x : ∀ n, C.S n j) (f : Module.Dual K (C.V j) →+ B),
+      C.Rho x f → C.Rho (c • x) ((AddMonoidHom.mulLeft (C.ι (C.lam c))).comp f) := by
   intro Λ A B K _ _ _ _ C j c x f hf
   obtain ⟨h1, e, z, h2, h3⟩ := hf
   refine ⟨?_, e, C.lam c • z, ?_, ?_⟩

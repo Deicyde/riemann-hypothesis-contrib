@@ -7,8 +7,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -21,38 +24,44 @@ variable {X : Scheme.{0}} {Ω : Type} [Field Ω] (ξ : Spec (CommRingCat.of Ω) 
 def val (V : X.Opens) (hV : genPt ξ ∈ V) : Γ(X, V) →+* Ω :=
   (X.presheaf.germ V (genPt ξ) hV ≫ Scheme.stalkClosedPointTo ξ).hom
 
-theorem genMap_germ (V : X.Opens) (hV : genPt ξ ∈ V) (p : Cpt ξ) (hp : p.1 ∈ V) (f : Γ(X, V)) :
-    genMap ξ p (X.presheaf.germ V p.1 hp f) = val ξ V hV f := by
+theorem genMap_germ (V : X.Opens) (hV : genPt ξ ∈ V) (p : Cpt ξ) (hp : p.1 ∈ V) (f : Γ(X, V))
+    : genMap ξ p (X.presheaf.germ V p.1 hp f) = val ξ V hV f := by
   change (Scheme.stalkClosedPointTo ξ).hom
-    (X.presheaf.stalkSpecializes p.2 (X.presheaf.germ V p.1 hp f)) = _
+      (X.presheaf.stalkSpecializes p.2 (X.presheaf.germ V p.1 hp f))
+    = _
   rw [TopCat.Presheaf.germ_stalkSpecializes_apply]
   rfl
 
-theorem val_mem (V : X.Opens) (hV : genPt ξ ∈ V) (p : Cpt ξ) (hp : p.1 ∈ V) (f : Γ(X, V)) :
-    val ξ V hV f ∈ regAt ξ p :=
+theorem val_mem (V : X.Opens) (hV : genPt ξ ∈ V) (p : Cpt ξ) (hp : p.1 ∈ V) (f : Γ(X, V))
+    : val ξ V hV f ∈ regAt ξ p :=
   ⟨_, genMap_germ ξ V hV p hp f⟩
 
-theorem val_res {V V' : X.Opens} (h : V ≤ V') (hV : genPt ξ ∈ V) (f : Γ(X, V')) :
-    val ξ V hV (X.presheaf.map (homOfLE h).op f) = val ξ V' (h hV) f := by
-  change (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ V _ hV (X.presheaf.map (homOfLE h).op f)) = _
+theorem val_res {V V' : X.Opens} (h : V ≤ V') (hV : genPt ξ ∈ V) (f : Γ(X, V'))
+    : val ξ V hV (X.presheaf.map (homOfLE h).op f) = val ξ V' (h hV) f := by
+  change
+    (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ V _ hV (X.presheaf.map (homOfLE h).op f)) = _
   rw [TopCat.Presheaf.germ_res_apply]
   rfl
 
 variable {ξ}
 
-theorem val_injective (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V)
-    (hcl : ∀ q ∈ V, genPt ξ ⤳ q) : Function.Injective (val ξ V hV) := by
+theorem val_injective
+    (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V) (hcl : ∀ q ∈ V, genPt ξ ⤳ q)
+    : Function.Injective (val ξ V hV) := by
   intro f g hfg
   refine TopCat.Presheaf.section_ext X.sheaf V f g fun q hq => ?_
   apply hgen.inj ⟨q, hcl q hq⟩
   exact (genMap_germ ξ V hV ⟨q, hcl q hq⟩ hq f).trans
     (hfg.trans (genMap_germ ξ V hV ⟨q, hcl q hq⟩ hq g).symm)
 
-theorem exists_val_eq (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V)
-    (hcl : ∀ q ∈ V, genPt ξ ⤳ q) (a : Ω) (ha : ∀ p : Cpt ξ, p.1 ∈ V → a ∈ regAt ξ p) :
-    ∃ f, val ξ V hV f = a := by
-  have key : ∀ q : V, ∃ (O : X.Opens) (_ : q.1 ∈ O) (hle : O ≤ V) (hξ : genPt ξ ∈ O) (f : Γ(X, O)),
-      val ξ O hξ f = a := by
+theorem exists_val_eq
+    (hgen : IsCptGen ξ)
+    (V : X.Opens) (hV : genPt ξ ∈ V) (hcl : ∀ q ∈ V, genPt ξ ⤳ q)
+    (a : Ω) (ha : ∀ p : Cpt ξ, p.1 ∈ V → a ∈ regAt ξ p)
+    : ∃ f, val ξ V hV f = a := by
+  have key
+      : ∀ q : V, ∃ (O : X.Opens) (_ : q.1 ∈ O) (hle : O ≤ V) (hξ : genPt ξ ∈ O) (f : Γ(X, O)),
+        val ξ O hξ f = a := by
     rintro ⟨q, hq⟩
     obtain ⟨g, hg⟩ := ha ⟨q, hcl q hq⟩ hq
     obtain ⟨O, hqO, f, hf⟩ := TopCat.Presheaf.germ_exist X.presheaf g
@@ -61,25 +70,30 @@ theorem exists_val_eq (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V)
     rw [val_res, ← genMap_germ ξ O _ ⟨q, hcl q hq⟩ hqO, hf]
     exact hg
   choose O hqO hle hξ f hf using key
-  obtain ⟨s, hs, -⟩ := X.sheaf.existsUnique_gluing' O V (fun i => homOfLE (hle i))
-    (fun q hq => Opens.mem_iSup.2 ⟨⟨q, hq⟩, hqO ⟨q, hq⟩⟩) f (by
-      intro i j
-      by_cases hne : genPt ξ ∈ O i ⊓ O j
-      · apply val_injective hgen (O i ⊓ O j) hne (fun q hq => hcl q (hle i hq.1))
-        have e1 := val_res ξ (inf_le_left : O i ⊓ O j ≤ O i) hne (f i)
-        have e2 := val_res ξ (inf_le_right : O i ⊓ O j ≤ O j) hne (f j)
-        exact e1.trans ((hf i).trans ((hf j).symm.trans e2.symm))
-      · exfalso
-        apply hne
-        exact ⟨hξ i, hξ j⟩)
+  obtain ⟨s, hs, -⟩ :=
+    X.sheaf.existsUnique_gluing' O V
+      (fun i => homOfLE (hle i))
+      (fun q hq => Opens.mem_iSup.2 ⟨⟨q, hq⟩, hqO ⟨q, hq⟩⟩)
+      f
+      (by
+        intro i j
+        by_cases hne : genPt ξ ∈ O i ⊓ O j
+        · apply val_injective hgen (O i ⊓ O j) hne (fun q hq => hcl q (hle i hq.1))
+          have e1 := val_res ξ (inf_le_left : O i ⊓ O j ≤ O i) hne (f i)
+          have e2 := val_res ξ (inf_le_right : O i ⊓ O j ≤ O j) hne (f j)
+          exact e1.trans ((hf i).trans ((hf j).symm.trans e2.symm))
+        · exfalso
+          apply hne
+          exact ⟨hξ i, hξ j⟩)
   refine ⟨s, ?_⟩
   have := val_res ξ (hle ⟨_, hV⟩) (hξ ⟨_, hV⟩) s
   rw [← this]
   have h2 := hs ⟨_, hV⟩
   exact (congrArg _ h2).trans (hf ⟨_, hV⟩)
 
-theorem mem_basicOpen_iff (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V) (f : Γ(X, V))
-    (p : Cpt ξ) (hp : p.1 ∈ V) : p.1 ∈ X.basicOpen f ↔ unitAt ξ p (val ξ V hV f) := by
+theorem mem_basicOpen_iff
+    (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ V) (f : Γ(X, V)) (p : Cpt ξ) (hp : p.1 ∈ V)
+    : p.1 ∈ X.basicOpen f ↔ unitAt ξ p (val ξ V hV f) := by
   rw [X.mem_basicOpen f p.1 hp]
   constructor
   · intro h
@@ -95,9 +109,11 @@ theorem mem_basicOpen_iff (hgen : IsCptGen ξ) (V : X.Opens) (hV : genPt ξ ∈ 
     rw [map_mul, map_one, genMap_germ ξ V hV p hp f, hu]
     exact mul_inv_cancel₀ h0
 
-theorem exists_den {U : X.Opens} (hU : IsAffineOpen U) (hV : genPt ξ ∈ U)
-    (p : Cpt ξ) (hp : p.1 ∈ U) (a : Ω) (ha : a ∈ regAt ξ p) :
-    ∃ f g : Γ(X, U), p.1 ∈ X.basicOpen g ∧ val ξ U hV g * a = val ξ U hV f := by
+theorem exists_den
+    {U : X.Opens} (hU : IsAffineOpen U) (hV : genPt ξ ∈ U)
+    (p : Cpt ξ) (hp : p.1 ∈ U)
+    (a : Ω) (ha : a ∈ regAt ξ p)
+    : ∃ f g : Γ(X, U), p.1 ∈ X.basicOpen g ∧ val ξ U hV g * a = val ξ U hV f := by
   obtain ⟨t, rfl⟩ := ha
   let _ := X.presheaf.algebra_section_stalk ⟨p.1, hp⟩
   have hl := hU.isLocalization_stalk ⟨p.1, hp⟩
@@ -110,34 +126,42 @@ theorem exists_den {U : X.Opens} (hU : IsAffineOpen U) (hV : genPt ξ ∈ U)
   rw [mul_comm]
   exact h
 
-theorem exists_pow {U : X.Opens} (hgen : IsCptGen ξ) (hU : IsAffineOpen U) (hV : genPt ξ ∈ U)
-    (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (g : Γ(X, U)) (hg : genPt ξ ∈ X.basicOpen g) (a : Ω)
-    (ha : ∀ p : Cpt ξ, p.1 ∈ X.basicOpen g → a ∈ regAt ξ p) :
-    ∃ (N : ℕ) (f : Γ(X, U)), val ξ U hV g ^ N * a = val ξ U hV f := by
-  obtain ⟨b, rfl⟩ := exists_val_eq hgen (X.basicOpen g) hg
-    (fun q hq => hcl q (X.basicOpen_le g hq)) a ha
+theorem exists_pow
+    {U : X.Opens}
+    (hgen : IsCptGen ξ) (hU : IsAffineOpen U) (hV : genPt ξ ∈ U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q)
+    (g : Γ(X, U)) (hg : genPt ξ ∈ X.basicOpen g)
+    (a : Ω) (ha : ∀ p : Cpt ξ, p.1 ∈ X.basicOpen g → a ∈ regAt ξ p)
+    : ∃ (N : ℕ) (f : Γ(X, U)), val ξ U hV g ^ N * a = val ξ U hV f := by
+  obtain ⟨b, rfl⟩ :=
+    exists_val_eq hgen (X.basicOpen g) hg (fun q hq => hcl q (X.basicOpen_le g hq)) a ha
   let _ := hU.isLocalization_basicOpen g
   obtain ⟨N, f, h⟩ := IsLocalization.Away.surj g b
   refine ⟨N, f, ?_⟩
-  have e : ∀ r : Γ(X, U), val ξ (X.basicOpen g) hg (algebraMap Γ(X, U) Γ(X, X.basicOpen g) r)
-      = val ξ U hV r := fun r => val_res ξ (X.basicOpen_le g) hg r
+  have e
+      : ∀ r : Γ(X, U),
+        val ξ (X.basicOpen g) hg (algebraMap Γ(X, U) Γ(X, X.basicOpen g) r) = val ξ U hV r :=
+    fun r => val_res ξ (X.basicOpen_le g) hg r
   rw [← e g, ← e f, ← h, map_mul, map_pow, mul_comm]
 
-theorem mem_regAt_gen (hgen : IsCptGen ξ) (a : Ω) (h : genPt ξ ⤳ genPt ξ) :
-    a ∈ regAt ξ ⟨genPt ξ, h⟩ := by
+theorem mem_regAt_gen (hgen : IsCptGen ξ) (a : Ω) (h : genPt ξ ⤳ genPt ξ)
+    : a ∈ regAt ξ ⟨genPt ξ, h⟩ := by
   obtain ⟨t, ht⟩ := hgen.bij.2 a
   refine ⟨t, ?_⟩
   change (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.stalkSpecializes h t) = a
   rw [TopCat.Presheaf.stalkSpecializes_refl]
   exact ht
 
-theorem exists_common_den {κ' : Type} [Finite κ'] {U : X.Opens} (hU : IsAffineOpen U)
-    (hV : genPt ξ ∈ U) (p : Cpt ξ) (hp : p.1 ∈ U) (a : κ' → Ω) (ha : ∀ l, a l ∈ regAt ξ p) :
-    ∃ g : Γ(X, U), p.1 ∈ X.basicOpen g ∧ ∀ l, ∃ f, val ξ U hV g * a l = val ξ U hV f := by
+theorem exists_common_den
+    {κ' : Type} [Finite κ']
+    {U : X.Opens} (hU : IsAffineOpen U) (hV : genPt ξ ∈ U)
+    (p : Cpt ξ) (hp : p.1 ∈ U)
+    (a : κ' → Ω) (ha : ∀ l, a l ∈ regAt ξ p)
+    : ∃ g : Γ(X, U), p.1 ∈ X.basicOpen g ∧ ∀ l, ∃ f, val ξ U hV g * a l = val ξ U hV f := by
   classical
   have := Fintype.ofFinite κ'
-  have key : ∀ T : Finset κ', ∃ g : Γ(X, U), p.1 ∈ X.basicOpen g ∧
-      ∀ l ∈ T, ∃ f, val ξ U hV g * a l = val ξ U hV f := by
+  have key
+      : ∀ T : Finset κ', ∃ g : Γ(X, U),
+        p.1 ∈ X.basicOpen g ∧ ∀ l ∈ T, ∃ f, val ξ U hV g * a l = val ξ U hV f := by
     intro T
     induction T using Finset.induction_on with
     | empty =>
@@ -173,13 +197,14 @@ variable {U hξ s i}
 
 theorem chartOpen_le : chartOpen U hξ s i ≤ U := iSup_le fun _ => X.basicOpen_le _
 
-theorem basicOpen_le_chartOpen {g : Γ(X, U)} (hg : g ∈ denoms U hξ s i) :
-    X.basicOpen g ≤ chartOpen U hξ s i :=
+theorem basicOpen_le_chartOpen {g : Γ(X, U)} (hg : g ∈ denoms U hξ s i)
+    : X.basicOpen g ≤ chartOpen U hξ s i :=
   le_iSup (fun g : denoms U hξ s i => X.basicOpen g.1) ⟨g, hg⟩
 
-theorem mem_chartOpen [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
-    (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0) (q : X) :
-    q ∈ chartOpen U hξ s i ↔ q ∈ U ∧ ∃ h : genPt ξ ⤳ q, InChart ξ s i ⟨q, h⟩ := by
+theorem mem_chartOpen
+    [Finite κ']
+    (hgen : IsCptGen ξ) (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0) (q : X)
+    : q ∈ chartOpen U hξ s i ↔ q ∈ U ∧ ∃ h : genPt ξ ⤳ q, InChart ξ s i ⟨q, h⟩ := by
   constructor
   · intro hq
     have hqU := chartOpen_le hq
@@ -187,16 +212,17 @@ theorem mem_chartOpen [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
     obtain ⟨⟨g, hg⟩, hqg⟩ := Opens.mem_iSup.1 hq
     obtain ⟨h0, -, hinv⟩ := (mem_basicOpen_iff hgen U hξ g ⟨q, hcl q hqU⟩ hqU).1 hqg
     obtain ⟨f, hf⟩ := hg j
-    have e : s j / s i = (val ξ U hξ g)⁻¹ * val ξ U hξ f := by
-      rw [← hf]; field_simp
+    have e : s j / s i = (val ξ U hξ g)⁻¹ * val ξ U hξ f := by rw [← hf]; field_simp
     rw [e]
     exact mul_mem hinv (val_mem ξ U hξ ⟨q, hcl q hqU⟩ hqU f)
   · rintro ⟨hqU, h, -, hreg⟩
     obtain ⟨g, hg, hd⟩ := exists_common_den hU hξ ⟨q, h⟩ hqU (fun j => s j / s i) hreg
     exact basicOpen_le_chartOpen (g := g) hd hg
 
-theorem span_trace [Finite κ'] (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q)
-    (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p) : Ideal.span (trace U hξ s) = ⊤ := by
+theorem span_trace
+    [Finite κ']
+    (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p)
+    : Ideal.span (trace U hξ s) = ⊤ := by
   rw [← hU.iSup_basicOpen_eq_self_iff]
   refine le_antisymm (iSup_le fun _ => X.basicOpen_le _) fun q hq => ?_
   obtain ⟨j, hj0, hj⟩ := hs ⟨q, hcl q hq⟩
@@ -206,8 +232,9 @@ theorem span_trace [Finite κ'] (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt 
     exact ⟨f, by rw [← hf]; ring⟩
   · field_simp
 
-theorem exists_denom_of_trace (hsi : s i ≠ 0) {f : Γ(X, U)} (hf : f ∈ trace U hξ s) :
-    ∃ (a : Γ(X, U)) (j : κ'), a ∈ denoms U hξ s i ∧ val ξ U hξ f = val ξ U hξ a * (s j / s i) := by
+theorem exists_denom_of_trace (hsi : s i ≠ 0) {f : Γ(X, U)} (hf : f ∈ trace U hξ s)
+    : ∃ (a : Γ(X, U)) (j : κ'),
+      a ∈ denoms U hξ s i ∧ val ξ U hξ f = val ξ U hξ a * (s j / s i) := by
   obtain ⟨h, j, hh, hv⟩ := hf
   obtain ⟨a, ha⟩ := hh i
   refine ⟨a, j, fun l => ?_, ?_⟩
@@ -218,9 +245,11 @@ theorem exists_denom_of_trace (hsi : s i ≠ 0) {f : Γ(X, U)} (hf : f ∈ trace
   · rw [hv, ← ha]
     field_simp
 
-theorem chartOpen_affine [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
-    (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0) (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p)
-    (hW : genPt ξ ∈ chartOpen U hξ s i) : IsAffineOpen (chartOpen U hξ s i) := by
+theorem chartOpen_affine
+    [Finite κ']
+    (hgen : IsCptGen ξ) (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0)
+    (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p) (hW : genPt ξ ∈ chartOpen U hξ s i)
+    : IsAffineOpen (chartOpen U hξ s i) := by
   set W := chartOpen U hξ s i with hWdef
   have hWU : W ≤ U := chartOpen_le
   have hclW : ∀ q ∈ W, genPt ξ ⤳ q := fun q hq => hcl q (hWU hq)
@@ -248,23 +277,27 @@ theorem chartOpen_affine [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
     rw [Scheme.basicOpen_res, inf_eq_right.2 (basicOpen_le_chartOpen ha)]
     exact hU.basicOpen a
 
-theorem mem_of_regular [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
-    (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0) (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p)
-    (B : Subring Ω) (hA : ∀ f, val ξ U hξ f ∈ B) (ht : ∀ j, s j / s i ∈ B) (a : Ω)
-    (ha : ∀ p : Cpt ξ, p.1 ∈ chartOpen U hξ s i → a ∈ regAt ξ p) : a ∈ B := by
-  let c : Ideal Γ(X, U) :=
-    { carrier := {r | val ξ U hξ r * a ∈ B}
-      add_mem' := fun {u v} hu hv => by
-        change val ξ U hξ (u + v) * a ∈ B
-        rw [map_add (f := _), add_mul]
-        exact add_mem hu hv
-      zero_mem' := by
-        change val ξ U hξ 0 * a ∈ B
-        simp
-      smul_mem' := fun u v hv => by
-        change val ξ U hξ (u * v) * a ∈ B
-        rw [map_mul, _root_.mul_assoc]
-        exact mul_mem (hA u) hv }
+theorem mem_of_regular
+    [Finite κ']
+    (hgen : IsCptGen ξ) (hU : IsAffineOpen U) (hcl : ∀ q ∈ U, genPt ξ ⤳ q) (hsi : s i ≠ 0)
+    (hs : ∀ p : Cpt ξ, ∃ j, InChart ξ s j p)
+    (B : Subring Ω) (hA : ∀ f, val ξ U hξ f ∈ B) (ht : ∀ j, s j / s i ∈ B)
+    (a : Ω) (ha : ∀ p : Cpt ξ, p.1 ∈ chartOpen U hξ s i → a ∈ regAt ξ p)
+    : a ∈ B := by
+  let c : Ideal Γ(X, U) := {
+    carrier := {r | val ξ U hξ r * a ∈ B}
+    add_mem' := fun {u v} hu hv => by
+      change val ξ U hξ (u + v) * a ∈ B
+      rw [map_add (f := _), add_mul]
+      exact add_mem hu hv
+    zero_mem' := by
+      change val ξ U hξ 0 * a ∈ B
+      simp
+    smul_mem' := fun u v hv => by
+      change val ξ U hξ (u * v) * a ∈ B
+      rw [map_mul, _root_.mul_assoc]
+      exact mul_mem (hA u) hv
+  }
   have hrad : Ideal.span (trace U hξ s) ≤ c.radical := by
     rw [Ideal.span_le]
     intro f hf
@@ -277,8 +310,8 @@ theorem mem_of_regular [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
     · have hbξ : genPt ξ ∈ X.basicOpen b := by
         refine (mem_basicOpen_iff hgen U hξ b ⟨genPt ξ, specializes_rfl⟩ hξ).2
           ⟨hb0, mem_regAt_gen hgen _ _, mem_regAt_gen hgen _ _⟩
-      obtain ⟨N, e, he⟩ := exists_pow hgen hU hξ hcl b hbξ a
-        fun p hp => ha p (basicOpen_le_chartOpen hb hp)
+      obtain ⟨N, e, he⟩ :=
+        exists_pow hgen hU hξ hcl b hbξ a fun p hp => ha p (basicOpen_le_chartOpen hb hp)
       refine ⟨N, ?_⟩
       change val ξ U hξ (f ^ N) * a ∈ B
       rw [map_pow, hv, mul_pow, mul_right_comm, he]
@@ -294,10 +327,11 @@ theorem mem_of_regular [Finite κ'] (hgen : IsCptGen ξ) (hU : IsAffineOpen U)
 
 end Core
 
-theorem inChart_of_mul {κ κ' : Type} {x : κ → Ω} {s : κ' → Ω} {c : κ} {i : κ'} {p : Cpt ξ}
+theorem inChart_of_mul
+    {κ κ' : Type} {x : κ → Ω} {s : κ' → Ω} {c : κ} {i : κ'} {p : Cpt ξ}
     (hx : ∃ c, InChart ξ x c p) (hs : ∃ i, InChart ξ s i p) (hxc : x c ≠ 0) (hsi : s i ≠ 0)
-    (h : ∀ c' i', x c' / x c * (s i' / s i) ∈ regAt ξ p) :
-    InChart ξ x c p ∧ InChart ξ s i p := by
+    (h : ∀ c' i', x c' / x c * (s i' / s i) ∈ regAt ξ p)
+    : InChart ξ x c p ∧ InChart ξ s i p := by
   obtain ⟨c₀, hc₀, hx₀⟩ := hx
   obtain ⟨i₀, hi₀, hs₀⟩ := hs
   have hw := h c₀ i₀
@@ -311,14 +345,17 @@ theorem inChart_of_mul {κ κ' : Type} {x : κ → Ω} {s : κ' → Ω} {c : κ}
   · have : s i' / s i = (s i' / s i₀) * (s i₀ / s i) := by field_simp
     exact this ▸ mul_mem (hs₀ i') hv'
 
-theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Finite κ'] {x : κ → Ω}
-    {s : κ' → Ω} (hx : CoordTie o ξ x) (hs : ∀ p : Cpt ξ, ∃ i, InChart ξ s i p) {T : Type}
-    (z : T → Ω) (u : T → κ) (v : T → κ') (hz : ∀ q, z q = x (u q) * s (v q))
-    (hsurj : ∀ c i, ∃ q, u q = c ∧ v q = i) : CoordTie o ξ z := by
+theorem coordTie_mul
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {κ κ' : Type} [Finite κ']
+    {x : κ → Ω} {s : κ' → Ω} (hx : CoordTie o ξ x) (hs : ∀ p : Cpt ξ, ∃ i, InChart ξ s i p)
+    {T : Type} (z : T → Ω) (u : T → κ) (v : T → κ') (hz : ∀ q, z q = x (u q) * s (v q))
+    (hsurj : ∀ c i, ∃ q, u q = c ∧ v q = i)
+    : CoordTie o ξ z := by
   have hratio : ∀ q q', z q' / z q = x (u q') / x (u q) * (s (v q') / s (v q)) := fun q q' => by
     rw [hz, hz, mul_div_mul_comm]
-  have hchart : ∀ (q : T) (p : Cpt ξ), InChart ξ z q p →
-      InChart ξ x (u q) p ∧ InChart ξ s (v q) p := by
+  have hchart
+      : ∀ (q : T) (p : Cpt ξ), InChart ξ z q p → InChart ξ x (u q) p ∧ InChart ξ s (v q) p := by
     intro q p ⟨h0, h⟩
     rw [hz] at h0
     refine inChart_of_mul (hx.cover p) (hs p) (left_ne_zero_of_mul h0) (right_ne_zero_of_mul h0)
@@ -326,8 +363,8 @@ theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Fin
     obtain ⟨q', rfl, rfl⟩ := hsurj c' i'
     rw [← hratio]
     exact h q'
-  have hchart' : ∀ (q : T) (p : Cpt ξ), InChart ξ x (u q) p → InChart ξ s (v q) p →
-      InChart ξ z q p := by
+  have hchart'
+      : ∀ (q : T) (p : Cpt ξ), InChart ξ x (u q) p → InChart ξ s (v q) p → InChart ξ z q p := by
     intro q p ⟨h1, h2⟩ ⟨h3, h4⟩
     refine ⟨by rw [hz]; exact mul_ne_zero h1 h3, fun q' => ?_⟩
     rw [hratio]
@@ -336,12 +373,16 @@ theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Fin
     rw [hz] at h
     exact ⟨left_ne_zero_of_mul h, right_ne_zero_of_mul h⟩
 
-  have hdata : ∀ q, z q ≠ 0 → ∃ (U : X.Opens) (hξ : genPt ξ ∈ U), IsAffineOpen U ∧
-      (∀ q' ∈ U, genPt ξ ⤳ q') ∧ ∀ q' : X, q' ∈ U ↔ ∃ h : genPt ξ ⤳ q', InChart ξ x (u q) ⟨q', h⟩ := by
+  have hdata
+      : ∀ q,
+        z q ≠ 0
+          → ∃ (U : X.Opens) (hξ : genPt ξ ∈ U),
+            IsAffineOpen U ∧ (∀ q' ∈ U, genPt ξ ⤳ q')
+              ∧ ∀ q' : X, q' ∈ U ↔ ∃ h : genPt ξ ⤳ q', InChart ξ x (u q) ⟨q', h⟩ := by
     intro q h
     obtain ⟨U, hU, hm⟩ := hx.affine (u q) (hne q h).1
-    have hξ : genPt ξ ∈ U := (hm _).2 ⟨specializes_rfl, (hne q h).1,
-      fun _ => mem_regAt_gen hx.gen _ _⟩
+    have hξ : genPt ξ ∈ U :=
+      (hm _).2 ⟨specializes_rfl, (hne q h).1, fun _ => mem_regAt_gen hx.gen _ _⟩
     exact ⟨U, hξ, hU, fun q' hq' => ((hm q').1 hq').1, hm⟩
   refine ⟨hx.gen, fun p => ?_, fun q h => ?_, fun q h a => ?_⟩
   · obtain ⟨c, hc⟩ := hx.cover p
@@ -350,8 +391,8 @@ theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Fin
     exact ⟨q, hchart' q p hc hi⟩
   · obtain ⟨U, hξ, hU, hcl, hm⟩ := hdata q h
     have hmem := mem_chartOpen (hξ := hξ) (s := s) (i := v q) hx.gen hU hcl (hne q h).2
-    have hW : genPt ξ ∈ chartOpen U hξ s (v q) := (hmem _).2 ⟨hξ, specializes_rfl, (hne q h).2,
-      fun _ => mem_regAt_gen hx.gen _ _⟩
+    have hW : genPt ξ ∈ chartOpen U hξ s (v q) :=
+      (hmem _).2 ⟨hξ, specializes_rfl, (hne q h).2, fun _ => mem_regAt_gen hx.gen _ _⟩
     refine ⟨_, chartOpen_affine hx.gen hU hcl (hne q h).2 hs hW, fun q' => ?_⟩
     rw [hmem]
     constructor
@@ -370,8 +411,7 @@ theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Fin
       | mem a ha =>
         obtain ⟨q', rfl⟩ := ha
         exact hp.2 q'
-      | algebraMap r =>
-        exact (hx.ring (u q) (hne q h).1 _).1 (Subalgebra.algebraMap_mem _ r) p h1
+      | algebraMap r => exact (hx.ring (u q) (hne q h).1 _).1 (Subalgebra.algebraMap_mem _ r) p h1
       | add a b _ _ ha hb => exact add_mem ha hb
       | mul a b _ _ ha hb => exact mul_mem ha hb
     · intro ha
@@ -393,7 +433,10 @@ theorem coordTie_mul {o : Type} [CommRing o] [Algebra o Ω] {κ κ' : Type} [Fin
       have hle : Algebra.adjoin o (Set.range fun j => x j / x (u q)) ≤ S :=
         Algebra.adjoin_le (by rintro _ ⟨c, rfl⟩; exact hxS c)
       refine mem_of_regular (hξ := hξ) (s := s) (i := v q) (B := S.toSubring) hx.gen hU hcl
-        (hne q h).2 hs (fun f => ?_) hsS a fun p hp => ?_
+        (hne q h).2 hs
+        (fun f => ?_)
+        hsS a
+        fun p hp => ?_
       · apply hle
         refine (hx.ring (u q) (hne q h).1 _).2 fun p hp => ?_
         exact val_mem ξ U hξ p ((hm p.1).2 ⟨p.2, hp⟩) f
@@ -405,9 +448,20 @@ end GlobalTheory.CompanionTheory.Ar.AddBlock
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem coordTie_add_block : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (o : Type) [CommRing o] [Algebra o Ω] (κ κ' : Type) (x : κ → Ω) (s : κ' → Ω), CoordTie o ξ x → (∀ p : Cpt ξ, ∃ i, InChart ξ s i p) → [Finite κ] → [Finite κ'] → ∃ n : ℕ, CoordTie o ξ fun q : (Fin n → κ) × κ × κ' => (∏ a, x (q.1 a)) * x q.2.1 * s q.2.2 := by
+theorem coordTie_add_block
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (o : Type)
+        [CommRing o] [Algebra o Ω] (κ κ' : Type) (x : κ → Ω) (s : κ' → Ω),
+      CoordTie o ξ x → (∀ p : Cpt ξ, ∃ i, InChart ξ s i p) → [Finite κ] → [Finite κ']
+        → ∃ n : ℕ,
+          CoordTie o ξ fun q : (Fin n → κ) × κ × κ' => (∏ a, x (q.1 a)) * x q.2.1 * s q.2.2 := by
   intro X Ω _ ξ o _ _ κ κ' x s hx hs _ _
-  refine ⟨0, AddBlock.coordTie_mul hx hs _ (fun q => q.2.1) (fun q => q.2.2) (fun q => by simp)
-    fun c i => ⟨(Fin.elim0, c, i), rfl, rfl⟩⟩
+  refine ⟨
+    0,
+    AddBlock.coordTie_mul hx hs _
+      (fun q => q.2.1)
+      (fun q => q.2.2)
+      (fun q => by simp)
+      fun c i => ⟨(Fin.elim0, c, i), rfl, rfl⟩
+  ⟩
 
 end GlobalTheory.CompanionTheory.Ar

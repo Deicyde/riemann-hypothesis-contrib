@@ -28,8 +28,8 @@ private lemma res_univ_eq_zero {R : Type} [CommRing R] {A W : Scheme.{0}} (i : A
       (ConcreteCategory.hom ((yoneda.map i).app (op A))) (𝟙 A) := by simp
   rw [e, ← CupSpec.freeGen_map, ← sec_map_comp, h0, sec_map_zero]
 
-theorem UpperTheory.etale_purity_free_cover :
-    LateralTheory.CohomologicalPurity.Thom.LeafFreeCov := by
+theorem UpperTheory.etale_purity_free_cover
+    : LateralTheory.CohomologicalPurity.Thom.LeafFreeCov := by
   intro R _ X U V
   apply Preadditive.epi_of_cancel_zero
   intro Z g hg
@@ -44,8 +44,9 @@ theorem UpperTheory.etale_purity_free_cover :
       simpa using this
     · have := congrArg (biprod.inr ≫ ·) hg
       simpa using this
-  have cover : ∀ (O : X.Opens) (hO : O ≤ U ⊔ V) (y : (U ⊔ V : X.Opens).toScheme),
-      (U ⊔ V).ι y ∈ O → ∃ z, X.homOfLE hO z = y := by
+  have cover
+      : ∀ (O : X.Opens) (hO : O ≤ U ⊔ V) (y : (U ⊔ V : X.Opens).toScheme),
+        (U ⊔ V).ι y ∈ O → ∃ z, X.homOfLE hO z = y := by
     intro O hO y hy
     have hy' : (U ⊔ V).ι y ∈ Set.range O.ι := by
       rw [Scheme.Opens.range_ι]
@@ -57,37 +58,52 @@ theorem UpperTheory.etale_purity_free_cover :
   refine CupSpec.free_ext g 0 (fun T x => ?_)
   change Sec.map g (freeGen R _ T x) = 0
   let xx : T ⟶ (U ⊔ V : X.Opens).toScheme := x
-  obtain ⟨hsep, -⟩ := sec_sep_glue_of_points R Z T ι (fun i => pullback x (X.homOfLE (hle i)))
-    (fun i => pullback.fst x (X.homOfLE (hle i))) (fun i => inferInstance) (by
-      intro t
-      have hy : (U ⊔ V).ι (xx t) ∈ ((U ⊔ V : X.Opens) : Set X) := by
-        rw [← Scheme.Opens.range_ι]
-        exact ⟨xx t, rfl⟩
-      rw [TopologicalSpace.Opens.coe_sup] at hy
-      rcases hy with hU | hV
-      · obtain ⟨z, hz⟩ := cover U le_sup_left (xx t) hU
-        have ht : t ∈ Set.range (pullback.fst x (X.homOfLE (hle ⟨U, Or.inl rfl⟩))) := by
-          rw [Scheme.Pullback.range_fst]
-          exact ⟨z, hz⟩
-        obtain ⟨v, hv⟩ := ht
-        exact ⟨⟨U, Or.inl rfl⟩, v, hv⟩
-      · obtain ⟨z, hz⟩ := cover V le_sup_right (xx t) hV
-        have ht : t ∈ Set.range (pullback.fst x (X.homOfLE (hle ⟨V, Or.inr rfl⟩))) := by
-          rw [Scheme.Pullback.range_fst]
-          exact ⟨z, hz⟩
-        obtain ⟨v, hv⟩ := ht
-        exact ⟨⟨V, Or.inr rfl⟩, v, hv⟩)
+  obtain ⟨hsep, -⟩ :=
+    sec_sep_glue_of_points R Z T ι
+      (fun i => pullback x (X.homOfLE (hle i)))
+      (fun i => pullback.fst x (X.homOfLE (hle i)))
+      (fun i => inferInstance)
+      (by
+        intro t
+        have hy : (U ⊔ V).ι (xx t) ∈ ((U ⊔ V : X.Opens) : Set X) := by
+          rw [← Scheme.Opens.range_ι]
+          exact ⟨xx t, rfl⟩
+        rw [TopologicalSpace.Opens.coe_sup] at hy
+        rcases hy with hU | hV
+        · obtain ⟨z, hz⟩ := cover U le_sup_left (xx t) hU
+          have ht : t ∈ Set.range (pullback.fst x (X.homOfLE (hle ⟨U, Or.inl rfl⟩))) := by
+            rw [Scheme.Pullback.range_fst]
+            exact ⟨z, hz⟩
+          obtain ⟨v, hv⟩ := ht
+          exact ⟨⟨U, Or.inl rfl⟩, v, hv⟩
+        · obtain ⟨z, hz⟩ := cover V le_sup_right (xx t) hV
+          have ht : t ∈ Set.range (pullback.fst x (X.homOfLE (hle ⟨V, Or.inr rfl⟩))) := by
+            rw [Scheme.Pullback.range_fst]
+            exact ⟨z, hz⟩
+          obtain ⟨v, hv⟩ := ht
+          exact ⟨⟨V, Or.inr rfl⟩, v, hv⟩)
   apply hsep
   intro i
-  have z : Sec.map g (freeGen R (yoneda.obj (U ⊔ V : X.Opens).toScheme) i.1.toScheme (X.homOfLE (hle i))) = 0 := by
+  have z
+      : Sec.map g
+          (freeGen R (yoneda.obj (U ⊔ V : X.Opens).toScheme) i.1.toScheme (X.homOfLE (hle i)))
+        = 0 := by
     have := res_univ_eq_zero (X.homOfLE (hle i)) g (gz i)
-    rwa [sec_map_res, CupSpec.freeGen_res, show (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
-      (X.homOfLE (hle i)).op)) (𝟙 _) = X.homOfLE (hle i) by simp] at this
+    rwa [sec_map_res, CupSpec.freeGen_res,
+        show (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
+                (X.homOfLE (hle i)).op))
+              (𝟙 _)
+            = X.homOfLE (hle i) by
+          simp]
+      at this
   rw [sec_map_res, CupSpec.freeGen_res]
-  have e : (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
-      (pullback.fst x (X.homOfLE (hle i))).op)) x =
-      (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
-      (pullback.snd x (X.homOfLE (hle i))).op)) (X.homOfLE (hle i)) := by
+  have e
+      : (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
+            (pullback.fst x (X.homOfLE (hle i))).op))
+          x
+        = (ConcreteCategory.hom ((yoneda.obj (U ⊔ V : X.Opens).toScheme).map
+            (pullback.snd x (X.homOfLE (hle i))).op))
+          (X.homOfLE (hle i)) := by
     simp [pullback.condition]
   rw [e, ← CupSpec.freeGen_res, ← sec_map_res, z]
   exact map_zero _

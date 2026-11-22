@@ -15,13 +15,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (m c d k M : ℕ), 0 < m → 1 < c → 1 < d → Nat.Coprime c 6 → Nat.Coprime d 6 → Lv c d M → 0 < k →
-        ∀ t w, IsSec X m t → IsSymb X m c d M t w → ∃ Q : Row M → Row M → Pt X m, ∀ x y, Ok x y →
-          IsPt X m (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) (Q x y) ∧
-          (∀ s, Mv X m (X.gal s) s (Q (gr M s⁻¹ x) (gr M s⁻¹ y)) (Q x y) (slU X (dg k) (w s x y))) ∧
-          ∀ γ γ' : SL(2, ℤ), !![(k : ℤ), 0; 0, 1] * (γ : Matrix (Fin 2) (Fin 2) ℤ) = (γ' : Matrix (Fin 2) (Fin 2) ℤ) * !![(k : ℤ), 0; 0, 1] →
-            Mv X m (slR X (ofSL γ)) 1 (Q x y) (Q (rt x γ') (rt y γ')) 1 := by
+theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
+        (m c d k M : ℕ),
+      0 < m → 1 < c → 1 < d → Nat.Coprime c 6 → Nat.Coprime d 6 → Lv c d M → 0 < k
+        → ∀ t w,
+          IsSec X m t → IsSymb X m c d M t w
+            → ∃ Q : Row M → Row M → Pt X m, ∀ x y,
+              Ok x y
+                → IsPt X m (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) (Q x y)
+                  ∧ (∀ s,
+                    Mv X m (X.gal s) s (Q (gr M s⁻¹ x) (gr M s⁻¹ y)) (Q x y)
+                      (slU X (dg k) (w s x y)))
+                  ∧ ∀ γ γ' : SL(2, ℤ),
+                    !![(k : ℤ), 0; 0, 1] * (γ : Matrix (Fin 2) (Fin 2) ℤ)
+                        = (γ' : Matrix (Fin 2) (Fin 2) ℤ) * !![(k : ℤ), 0; 0, 1]
+                      → Mv X m (slR X (ofSL γ)) 1 (Q x y) (Q (rt x γ') (rt y γ')) 1 := by
   intro Ω _ _ _ ε X m c d k M hm hc hd hc6 hd6 hL hk t w hsec hsym
   obtain ⟨hM, hcM, hdM⟩ := hL
   have hA := admB Ω ε X
@@ -32,9 +41,11 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
   have hE := mvEx Ω ε X m hm
   have hcyc : cyc m (1 : Gal(Ω/ℚ)) = 1 := ((lgB Ω ε X m hm).2.2.2.2.2.2 1 1).2.1
   have hτ : admitted X (slR X (dg k)) 1 := hA.1 (dg k)
-  have hex : ∀ x y : Row M, ∃ Q : Pt X m, Ok x y →
-      IsPt X m (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) Q ∧
-        Mv X m (slR X (dg k)) 1 (t (sg X c M x) (sg X d M y)) Q 1 := by
+  have hex
+      : ∀ x y : Row M, ∃ Q : Pt X m,
+        Ok x y
+          → IsPt X m (X.sl (dg k) (sg X c M x)) (X.sl (dg k) (sg X d M y)) Q
+            ∧ Mv X m (slR X (dg k)) 1 (t (sg X c M x) (sg X d M y)) Q 1 := by
     intro x y
     by_cases h : Ok x y
     · obtain ⟨hx, hy, -, -⟩ := hR.2.1 x y h
@@ -48,14 +59,10 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
     have hxy' : Ok (gr M s⁻¹ x) (gr M s⁻¹ y) := (hR.2.1 x y hxy).2.2.1 s⁻¹
     obtain ⟨hx, hy, -, -⟩ := hR.2.1 x y hxy
     obtain ⟨hx', hy', -, -⟩ := hR.2.1 _ _ hxy'
-    have ex : gr M s (gr M s⁻¹ x) = x := by
-      rw [← (hR.1 s s⁻¹ x).1, mul_inv_cancel, (hR.1 1 1 x).2]
-    have ey : gr M s (gr M s⁻¹ y) = y := by
-      rw [← (hR.1 s s⁻¹ y).1, mul_inv_cancel, (hR.1 1 1 y).2]
-    have gu : X.gal s (sg X c M (gr M s⁻¹ x)) = sg X c M x := by
-      rw [(hSc _ hx').2.2.1 s, ex]
-    have gv : X.gal s (sg X d M (gr M s⁻¹ y)) = sg X d M y := by
-      rw [(hSd _ hy').2.2.1 s, ey]
+    have ex : gr M s (gr M s⁻¹ x) = x := by rw [← (hR.1 s s⁻¹ x).1, mul_inv_cancel, (hR.1 1 1 x).2]
+    have ey : gr M s (gr M s⁻¹ y) = y := by rw [← (hR.1 s s⁻¹ y).1, mul_inv_cancel, (hR.1 1 1 y).2]
+    have gu : X.gal s (sg X c M (gr M s⁻¹ x)) = sg X c M x := by rw [(hSc _ hx').2.2.1 s, ex]
+    have gv : X.gal s (sg X d M (gr M s⁻¹ y)) = sg X d M y := by rw [(hSd _ hy').2.2.1 s, ey]
     have hP' := (hsec _ _ (hSc _ hx').1 (hSd _ hy').1).1
     have hP := (hsec _ _ (hSc x hx).1 (hSd y hy).1).1
     obtain ⟨-, hmv⟩ := hsym s x y hxy
@@ -67,8 +74,8 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
     have hQg : IsPt X m (X.sl (dg k) (X.gal s (sg X c M (gr M s⁻¹ x))))
         (X.sl (dg k) (X.gal s (sg X d M (gr M s⁻¹ y)))) (Q x y) := by
       rw [gu, gv]; exact hQ1
-    have hcomp := mvComp Ω ε X m hm (X.gal s) (slR X (dg k)) s 1 (hA.2.1 s) hτ _ _ _ _ _
-      hP' hPg hQg _ _ hmv hQ2
+    have hcomp :=
+      mvComp Ω ε X m hm (X.gal s) (slR X (dg k)) s 1 (hA.2.1 s) hτ _ _ _ _ _ hP' hPg hQg _ _ hmv hQ2
     have heq : (X.gal s).trans (slR X (dg k)) = (slR X (dg k)).trans (X.gal s) := by
       ext f
       exact (hG.1 s f).symm
@@ -80,8 +87,9 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
     have hR' : IsPt X m (X.gal s (X.sl (dg k) (sg X c M (gr M s⁻¹ x))))
         (X.gal s (X.sl (dg k) (sg X d M (gr M s⁻¹ y)))) (Q x y) := by
       rw [hG.1 s, hG.1 s, gu, gv]; exact hQ1
-    have hres := PC.cancel Ω ε X m hm (slR X (dg k)) (X.gal s) 1 s hτ (hA.2.1 s) _ _ _ _ _
-      hP' hQ'1 hR' _ hQ'2 hc2
+    have hres :=
+      PC.cancel Ω ε X m hm (slR X (dg k)) (X.gal s) 1 s hτ (hA.2.1 s) _ _ _ _ _ hP' hQ'1 hR' _ hQ'2
+        hc2
     refine ((hE (X.gal s) s (hA.2.1 s) _ _ _ hQ'1).2.2.2 _ hR' _ _ hres).mpr ?_
     rcases Nat.lt_or_ge 1 m with h1 | h1
     · haveI : Fact (1 < m) := ⟨h1⟩
@@ -89,7 +97,11 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
       rw [hcyc, ZMod.val_one, pow_one, mul_one, one_pow, mul_one]
       rfl
     · obtain rfl : m = 1 := by omega
-      refine ⟨((unU X (slR X (dg k))) (w s x y) ^ (cyc 1 (1 : Gal(Ω/ℚ))).val * 1)⁻¹ * slU X (dg k) (w s x y), ?_⟩
+      refine ⟨
+        ((unU X (slR X (dg k))) (w s x y) ^ (cyc 1 (1 : Gal(Ω/ℚ))).val * 1)⁻¹
+          * slU X (dg k) (w s x y),
+        ?_
+      ⟩
       rw [pow_one, mul_inv_cancel_left]
   · intro γ γ' hγ
     obtain ⟨hx, hy, -, hrt⟩ := hR.2.1 x y hxy
@@ -108,8 +120,9 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
     have hQ''g : IsPt X m (X.sl (dg k) (X.sl (ofSL γ') (sg X c M x)))
         (X.sl (dg k) (X.sl (ofSL γ') (sg X d M y))) (Q (rt x γ') (rt y γ')) := by
       rw [← ux, ← vy]; exact hQ''1
-    have hcomp := mvComp Ω ε X m hm (slR X (ofSL γ')) (slR X (dg k)) 1 1 (hA.1 _) hτ _ _ _ _ _
-      hP.1 hP'' hQ''g _ _ h1 hQ''2
+    have hcomp :=
+      mvComp Ω ε X m hm (slR X (ofSL γ')) (slR X (dg k)) 1 1 (hA.1 _) hτ _ _ _ _ _ hP.1 hP'' hQ''g _
+        _ h1 hQ''2
     have heq : (slR X (ofSL γ')).trans (slR X (dg k)) = (slR X (dg k)).trans (slR X (ofSL γ)) := by
       ext f
       exact (hG.2.1 γ γ' hγ f).symm
@@ -117,5 +130,5 @@ theorem UpperTheory.V.Z.Kato.Sym.PC.dgPt :
     have hR' : IsPt X m (X.sl (ofSL γ) (X.sl (dg k) (sg X c M x)))
         (X.sl (ofSL γ) (X.sl (dg k) (sg X d M y))) (Q (rt x γ') (rt y γ')) := by
       rw [hG.2.1 γ γ' hγ, hG.2.1 γ γ' hγ, ← ux, ← vy]; exact hQ''1
-    exact PC.cancel Ω ε X m hm (slR X (dg k)) (slR X (ofSL γ)) 1 1 hτ (hA.1 _) _ _ _ _ _
-      hP.1 hQ1 hR' 1 hQ2 (by rw [mul_one]; exact hcomp)
+    exact PC.cancel Ω ε X m hm (slR X (dg k)) (slR X (ofSL γ)) 1 1 hτ (hA.1 _) _ _ _ _ _ hP.1 hQ1
+      hR' 1 hQ2 (by rw [mul_one]; exact hcomp)

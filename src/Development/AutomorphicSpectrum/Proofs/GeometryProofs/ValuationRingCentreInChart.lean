@@ -10,12 +10,13 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtChartLo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.OrVert
+open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.OrVert
 
 namespace GlobalTheory.CompanionTheory.Ar.OrVert
 
-theorem isUnit_valuationSubring_iff {Ω' : Type} [Field Ω'] (W : ValuationSubring Ω') (w : W) :
-    IsUnit w ↔ (w : Ω') ≠ 0 ∧ (w : Ω')⁻¹ ∈ W := by
+theorem isUnit_valuationSubring_iff {Ω' : Type} [Field Ω'] (W : ValuationSubring Ω') (w : W)
+    : IsUnit w ↔ (w : Ω') ≠ 0 ∧ (w : Ω')⁻¹ ∈ W := by
   constructor
   · intro h
     obtain ⟨v, hv⟩ := h.exists_right_inv
@@ -27,17 +28,26 @@ theorem isUnit_valuationSubring_iff {Ω' : Type} [Field Ω'] (W : ValuationSubri
     refine IsUnit.of_mul_eq_one (⟨(w : Ω')⁻¹, h1⟩ : W) (Subtype.ext ?_)
     exact mul_inv_cancel₀ h0
 
-theorem exists_domBy_chart : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (Ω Ω' : Type) [Field Ω] [Field Ω'] (y : (Σ k, J k) → Ω) (X : Scheme.{0}) (ξ : Spec (CommRingCat.of Ω) ⟶ X), (∀ q : X, genPt ξ ⤳ q) → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → ∀ (i : Ω →+* Ω') (W : ValuationSubring Ω') (c : (k : K) → J k), (∀ k, y ⟨k, c k⟩ ≠ 0) → (∀ k j, i (y ⟨k, j⟩ / y ⟨k, c k⟩) ∈ W) → ∃ q : Cpt ξ, InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c q ∧ DomBy W.toSubring i ξ q := by
+theorem exists_domBy_chart
+    : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (Ω Ω' : Type) [Field Ω]
+        [Field Ω'] (y : (Σ k, J k) → Ω) (X : Scheme.{0}) (ξ : Spec (CommRingCat.of Ω) ⟶ X),
+      (∀ q : X, genPt ξ ⤳ q) → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩)
+        → ∀ (i : Ω →+* Ω') (W : ValuationSubring Ω') (c : (k : K) → J k),
+          (∀ k, y ⟨k, c k⟩ ≠ 0) → (∀ k j, i (y ⟨k, j⟩ / y ⟨k, c k⟩) ∈ W)
+            → ∃ q : Cpt ξ,
+              InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c q
+                ∧ DomBy W.toSubring i ξ q := by
   intro K _ J _ Ω Ω' _ _ y X ξ hall htie i W c hy hW
   classical
   let x : ((k : K) → J k) → Ω := fun c' => ∏ k, y ⟨k, c' k⟩
-  let M : PModel ℤ x :=
-    { X := X
-      ξ := ξ
-      s := specZIsTerminal.from _
-      hover := specZIsTerminal.hom_ext _ _
-      all := hall
-      tie := htie }
+  let M : PModel ℤ x := {
+    X := X
+    ξ := ξ
+    s := specZIsTerminal.from _
+    hover := specZIsTerminal.hom_ext _ _
+    all := hall
+    tie := htie
+  }
   have hxc : x c ≠ 0 := Finset.prod_ne_zero_iff.2 fun k _ => hy k
   have hch : ∀ a ∈ chRing ℤ x c, i a ∈ W := by
     intro a ha
@@ -90,8 +100,7 @@ theorem exists_domBy_chart : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k,
       rw [map_div₀]
       field_simp
     have hU : unitAt M.ξ q u := hu u huc hiu (e ▸ mul_mem hinv (hv v hvc hvu))
-    have e2 : (u / v)⁻¹ = v * u⁻¹ := by
-      rw [inv_div, div_eq_mul_inv]
+    have e2 : (u / v)⁻¹ = v * u⁻¹ := by rw [inv_div, div_eq_mul_inv]
     rw [e2]
     exact mul_mem hvu.2.1 hU.2.2
 

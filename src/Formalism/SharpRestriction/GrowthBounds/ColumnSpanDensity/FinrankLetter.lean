@@ -10,8 +10,14 @@ namespace Formalism.MainNotions.flipOneThree.Pf
 
 open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
 
-theorem hwt_apply (m A B : ℕ) (i : Fin (m + 2)) :
-    hwt m A B i = if i = 0 then (A : ℤ) else if i = Fin.last (m + 1) then -(B : ℤ) else 0 := by
+theorem hwt_apply (m A B : ℕ) (i : Fin (m + 2))
+    : hwt m A B i
+      = if i = 0 then
+          (A : ℤ)
+        else if i = Fin.last (m + 1) then
+          -(B : ℤ)
+        else
+          0 := by
   unfold hwt
   induction i using Fin.cases with
   | zero => simp
@@ -26,9 +32,9 @@ theorem hwt_apply (m A B : ℕ) (i : Fin (m + 2)) :
       simp at this
       omega
 
-theorem cov_apply (m : ℕ) (d : ℤ) (i : Fin (m + 2)) :
-    (Fin.cons d (Fin.snoc (fun _ : Fin m => d) 0) : Fin (m + 2) → ℤ) i =
-      if i = Fin.last (m + 1) then 0 else d := by
+theorem cov_apply (m : ℕ) (d : ℤ) (i : Fin (m + 2))
+    : (Fin.cons d (Fin.snoc (fun _ : Fin m => d) 0) : Fin (m + 2) → ℤ) i
+      = if i = Fin.last (m + 1) then 0 else d := by
   induction i using Fin.cases with
   | zero =>
     rw [Fin.cons_zero, if_neg]
@@ -56,11 +62,12 @@ theorem last_ne_zero' (m : ℕ) : Fin.last (m + 1) ≠ 0 := by
   have := congrArg Fin.val h
   simp at this
 
-theorem prod_tops {n' : ℕ} (TT : Finset (Fin n')) (f : TT → ℚ) :
-    ∏ s : Fin n', (if h : s ∈ TT then f ⟨s, h⟩ else 1) = ∏ s : TT, f s := by
+theorem prod_tops {n' : ℕ} (TT : Finset (Fin n')) (f : TT → ℚ)
+    : ∏ s : Fin n', (if h : s ∈ TT then f ⟨s, h⟩ else 1) = ∏ s : TT, f s := by
   classical
-  have h1 : ∏ s : Fin n', (if h : s ∈ TT then f ⟨s, h⟩ else 1) =
-      ∏ s ∈ TT, (if h : s ∈ TT then f ⟨s, h⟩ else 1) := by
+  have h1
+      : ∏ s : Fin n', (if h : s ∈ TT then f ⟨s, h⟩ else 1)
+        = ∏ s ∈ TT, (if h : s ∈ TT then f ⟨s, h⟩ else 1) := by
     symm
     apply Finset.prod_subset (Finset.subset_univ _)
     intro s _ hs
@@ -69,21 +76,24 @@ theorem prod_tops {n' : ℕ} (TT : Finset (Fin n')) (f : TT → ℚ) :
   refine Finset.prod_congr rfl fun s _ => ?_
   rw [dif_pos s.2]
 
-theorem flatW_dom {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ) : IsDominant (flatW (m + 1) A B) := by
+theorem flatW_dom {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ)
+    : IsDominant (flatW (m + 1) A B) := by
   intro s i j hij
   unfold flatW
   split_ifs with hs h1 h2 h3 h4 h5 h6 h7 <;> first | omega | skip
   all_goals
     first
-    | (exfalso
-       subst_vars
-       first
-       | exact absurd (Fin.le_zero_iff.1 hij) (by assumption)
-       | exact absurd (le_antisymm (Fin.le_last _) hij) (by assumption))
+    | (
+        exfalso
+        subst_vars
+        first
+        | exact absurd (Fin.le_zero_iff.1 hij) (by assumption)
+        | exact absurd (le_antisymm (Fin.le_last _) hij) (by assumption)
+      )
 
-theorem lamAt_flat {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ) (s : Fin n') :
-    weylDim (m + 2) (lamAt (flatW (m + 1) A B) s) =
-      if h : s ∈ TT then (dimHar (m + 1) (A ⟨s, h⟩) (B ⟨s, h⟩) : ℚ) else 1 := by
+theorem lamAt_flat {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ) (s : Fin n')
+    : weylDim (m + 2) (lamAt (flatW (m + 1) A B) s)
+      = if h : s ∈ TT then (dimHar (m + 1) (A ⟨s, h⟩) (B ⟨s, h⟩) : ℚ) else 1 := by
   by_cases hs : s ∈ TT
   · rw [dif_pos hs]
     unfold lamAt
@@ -93,7 +103,8 @@ theorem lamAt_flat {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ
         rw [hwt_apply]
         simp [flatW, hs]
       rw [this, weylDim_hwt_eq]
-    · have : (fun i : Fin (m + 1 + 1) => -flatW (m + 1) A B s i.rev) = hwt m (B ⟨s, hs⟩) (A ⟨s, hs⟩) := by
+    · have : (fun i : Fin (m + 1 + 1) => - flatW (m + 1) A B s i.rev)
+          = hwt m (B ⟨s, hs⟩) (A ⟨s, hs⟩) := by
         funext i
         rw [hwt_apply]
         simp only [flatW, hs, dif_pos]
@@ -121,21 +132,32 @@ theorem lamAt_flat {n' : ℕ} (m : ℕ) {TT : Finset (Fin n')} (A B : TT → ℕ
       split_ifs <;> funext i <;> simp [flatW, hs]
     rw [this, weylDim_zero]
 
-theorem finrank_weyl (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D) (K : Type) [Field K] [CharZero K] (n : ℕ)
-    (nu : Fin n → ℕ) (hnu : Antitone nu) :
-    (Module.finrank K (Formalism.GradedWeylDivisibility.dualWeyl K n n nu) : ℚ) = weylDim n (fun i => (nu i : ℤ)) := by
+theorem finrank_weyl
+    (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D)
+    (K : Type) [Field K] [CharZero K]
+    (n : ℕ) (nu : Fin n → ℕ) (hnu : Antitone nu)
+    : (Module.finrank K (Formalism.GradedWeylDivisibility.dualWeyl K n n nu) : ℚ)
+      = weylDim n (fun i => (nu i : ℤ)) := by
   rw [h3 K n nu hnu]
   unfold weylDim
   refine Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
   push_cast
   rfl
 
-theorem finrank_letter (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D) (K : Type) [Field K] [CharZero K] (m d : ℕ)
-    (vec : Bool) :
-    Module.finrank K (Formalism.GradedWeylDivisibility.dualWeyl K (m + 1 + 1) (m + 1 + 1) (nuOf (letterWt (m + 1) d vec))) =
-      dimPol (m + 1) d := by
-  have hq : (Module.finrank K (Formalism.GradedWeylDivisibility.dualWeyl K (m + 1 + 1) (m + 1 + 1) (nuOf (letterWt (m + 1) d vec))) : ℚ) =
-      (dimPol (m + 1) d : ℚ) := by
+theorem finrank_letter
+    (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D)
+    (K : Type) [Field K] [CharZero K]
+    (m d : ℕ) (vec : Bool)
+    : Module.finrank K
+        (Formalism.GradedWeylDivisibility.dualWeyl K (m + 1 + 1) (m + 1 + 1)
+          (nuOf (letterWt (m + 1) d vec)))
+      = dimPol (m + 1) d := by
+  have hq
+      : (Module.finrank K
+            (Formalism.GradedWeylDivisibility.dualWeyl K (m + 1 + 1) (m + 1 + 1)
+              (nuOf (letterWt (m + 1) d vec)))
+          : ℚ)
+        = (dimPol (m + 1) d : ℚ) := by
     cases vec with
     | true =>
       have hnu : nuOf (letterWt (m + 1) d true) = fun i => if i = 0 then d else 0 := by
@@ -157,7 +179,8 @@ theorem finrank_letter (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotio
       rw [this, hnu]
       by_cases h : i = 0 <;> simp [h]
     | false =>
-      have hnu : nuOf (letterWt (m + 1) d false) = fun i => if i = Fin.last (m + 1) then 0 else d := by
+      have hnu
+          : nuOf (letterWt (m + 1) d false) = fun i => if i = Fin.last (m + 1) then 0 else d := by
         funext i
         simp only [nuOf, letterWt, Bool.false_eq_true, if_false, if_true]
         split_ifs <;> simp
@@ -176,7 +199,9 @@ theorem finrank_letter (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotio
       by_cases h : i = Fin.last (m + 1) <;> simp [h]
   exact_mod_cast hq
 
-theorem restDims_of (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D) (hW : WeylV) : RestDims := by
+theorem restDims_of
+    (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.ColumnSystems.adm3 D) (hW : WeylV)
+    : RestDims := by
   classical
   intro p n' R m hm TT A B
   obtain ⟨m, rfl⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
@@ -196,11 +221,13 @@ theorem restDims_of (D : Formalism.BasicNotions.D7) (h3 : Formalism.MainNotions.
     · rfl
     · exact mul_comm _ _
   · have h := hW R.Kf n' (m + 1) (flatW (m + 1) A B) (flatW_dom m A B)
-    have h2 : ((dimV R.Kf (flatW (m + 1) A B) : ℕ) : ℚ) =
-        ∏ s : Fin n', weylDim (m + 2) (lamAt (flatW (m + 1) A B) s) := by
+    have h2
+        : ((dimV R.Kf (flatW (m + 1) A B) : ℕ) : ℚ)
+          = ∏ s : Fin n', weylDim (m + 2) (lamAt (flatW (m + 1) A B) s) := by
       rw [h]
       unfold weylDim
-      refine Finset.prod_congr rfl fun s _ => Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
+      refine Finset.prod_congr rfl fun s _ =>
+        Finset.prod_congr rfl fun i _ => Finset.prod_congr rfl fun j _ => ?_
       push_cast
       rfl
     simp only [lamAt_flat] at h2

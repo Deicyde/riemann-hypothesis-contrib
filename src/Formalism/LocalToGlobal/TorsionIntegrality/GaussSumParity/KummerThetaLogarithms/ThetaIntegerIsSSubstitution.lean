@@ -19,24 +19,34 @@ open scoped BigOperators
 
 namespace Formalism.L2.Th1.D
 
-open Formalism.DworkPowerSeriesWeights (Integral mvExp torus BHyp Unram entLog oneLog thetaZ thetaOne frameJet frameJetOne
-  nablaO)
-open Formalism.InvariantFactorPaths.G7 (lgF at1 Simeq DivAB d1 swap2 UnrOK IsLawOfLog BetaHyp OmOK lamF thetaLog sSub zLin)
+open Formalism.DworkPowerSeriesWeights
+  (Integral mvExp torus BHyp Unram entLog oneLog thetaZ thetaOne frameJet frameJetOne nablaO)
+open Formalism.InvariantFactorPaths.G7
+  (lgF at1 Simeq DivAB d1 swap2 UnrOK IsLawOfLog BetaHyp OmOK lamF thetaLog sSub zLin)
 
 namespace CohomologyFunctoriality₂
 
-theorem norm_iter {K0 : Type} [NormedField K0] [IsUltrametricDist K0] [CharZero K0] {l : ℕ}
-    {σ : K0 →+* K0} (hU : UnrOK K0 l σ) {c : K0} (hc : ‖c‖ ≤ 1) (n : ℕ) : ‖σ^[n] c‖ ≤ 1 := by
+theorem norm_iter
+    {K0 : Type} [NormedField K0] [IsUltrametricDist K0] [CharZero K0]
+    {l : ℕ} {σ : K0 →+* K0} (hU : UnrOK K0 l σ)
+    {c : K0} (hc : ‖c‖ ≤ 1)
+    (n : ℕ)
+    : ‖σ^[n] c‖ ≤ 1 := by
   induction n with
   | zero => simpa using hc
   | succ n ih =>
     rw [Function.iterate_succ_apply']
     exact (frobSq K0 l σ hU).2 _ ih
 
-theorem frob_step {K0 K : Type} [NormedField K0] [IsUltrametricDist K0] [CharZero K0]
-    [NormedField K] {l d : ℕ} [NeZero d] {σ : K0 →+* K0} (j : K0 →+* K) (hU : UnrOK K0 l σ)
-    (hj : ∀ a, ‖j a‖ = ‖a‖) {c : K0} (hc : ‖c‖ ≤ 1) (hfix : σ^[d] c = c) (s : ZMod d) :
-    ‖j (σ^[(s + 1).val] c) - j (σ^[s.val] c) ^ l‖ ≤ (l : ℝ)⁻¹ := by
+theorem frob_step
+    {K0 K : Type} [NormedField K0] [IsUltrametricDist K0] [CharZero K0] [NormedField K]
+    {l d : ℕ} [NeZero d]
+    {σ : K0 →+* K0}
+    (j : K0 →+* K)
+    (hU : UnrOK K0 l σ) (hj : ∀ a, ‖j a‖ = ‖a‖)
+    {c : K0} (hc : ‖c‖ ≤ 1) (hfix : σ^[d] c = c)
+    (s : ZMod d)
+    : ‖j (σ^[(s + 1).val] c) - j (σ^[s.val] c) ^ l‖ ≤ (l : ℝ)⁻¹ := by
   have h := TranslateJetMomentLawAnyIdempotentLevel.iter_sub_one σ hfix (s + 1)
   rw [add_sub_cancel_right] at h
   rw [← h, ← map_pow, ← map_sub, hj]
@@ -49,10 +59,15 @@ theorem omega_integral_criterion : OmOKOf := by
   refine ⟨fun r s => ?_, fun r s => ?_, fun a b hab => ?_⟩
   · unfold conjJ
     rw [hj, hj]
-    exact ⟨CohomologyFunctoriality₂.norm_iter hU (hO.1 r).1 _, CohomologyFunctoriality₂.norm_iter hU (hO.1 r).2 _⟩
+    exact ⟨
+      CohomologyFunctoriality₂.norm_iter hU (hO.1 r).1 _,
+      CohomologyFunctoriality₂.norm_iter hU (hO.1 r).2 _
+    ⟩
   · unfold conjJ
-    exact ⟨CohomologyFunctoriality₂.frob_step j hU hj (hO.1 r).1 (hO.2 r).1 s,
-      CohomologyFunctoriality₂.frob_step j hU hj (hO.1 r).2 (hO.2 r).2 s⟩
+    exact ⟨
+      CohomologyFunctoriality₂.frob_step j hU hj (hO.1 r).1 (hO.2 r).1 s,
+      CohomologyFunctoriality₂.frob_step j hU hj (hO.1 r).2 (hO.2 r).2 s
+    ⟩
   · unfold conjJ
     have hE : Even (2 * ν) := even_two_mul ν
     have key : ∑ r, σ^[a.val] (oms r) * σ^[b.val] (om r) = if a = b then 1 else 0 := by
@@ -72,8 +87,8 @@ theorem omega_integral_criterion : OmOKOf := by
         have h := TranslateJetMomentLawAnyIdempotentLevel.dual2 hE σ hO.2 hT a b
         rw [Fintype.sum_prod_type, Fintype.sum_bool] at h
         simp only [mXY, TranslateJetMomentLawAnyIdempotentLevel.pXY, ha, hb, if_false] at h
-        simp only [Bool.false_eq_true, if_false, mul_zero, Finset.sum_const_zero, add_zero,
-          if_true] at h
+        simp only [Bool.false_eq_true, if_false, mul_zero, Finset.sum_const_zero, add_zero, if_true]
+          at h
         exact h
     have h2 := congrArg j key
     set_option synthInstance.maxHeartbeats 100000 in
@@ -99,11 +114,12 @@ namespace CohomologyFunctoriality₂
 
 open Formalism.InvariantFactorPaths.G7 Formalism.InvariantFactorPaths.G7.ScaledSeriesSubstitution
 
-theorem log_scale {K : Type} [Field K] (p : ℕ) (ϖ : K) (μ : PowerSeries K)
-    (h0 : PowerSeries.constantCoeff μ = 0)
-    (h1 : (PowerSeries.subst μ (lamF p ϖ) : PowerSeries K) = PowerSeries.X) :
-    (PowerSeries.subst (PowerSeries.C ϖ * μ) (lgF K p) : PowerSeries K) =
-      PowerSeries.C ϖ * PowerSeries.X := by
+theorem log_scale
+    {K : Type} [Field K]
+    (p : ℕ) (ϖ : K) (μ : PowerSeries K) (h0 : PowerSeries.constantCoeff μ = 0)
+    (h1 : (PowerSeries.subst μ (lamF p ϖ) : PowerSeries K) = PowerSeries.X)
+    : (PowerSeries.subst (PowerSeries.C ϖ * μ) (lgF K p) : PowerSeries K)
+      = PowerSeries.C ϖ * PowerSeries.X := by
   have e1 := LogarithmEquivalence.subst_lgF_scale p ϖ
   have hμ : PowerSeries.HasSubst μ := PowerSeries.HasSubst.of_constantCoeff_zero' h0
   have hX : PowerSeries.HasSubst (PowerSeries.C ϖ * PowerSeries.X : PowerSeries K) :=
@@ -111,7 +127,8 @@ theorem log_scale {K : Type} [Field K] (p : ℕ) (ϖ : K) (μ : PowerSeries K)
   have e2 := congrArg (fun f => (PowerSeries.subst μ f : PowerSeries K)) e1
   rw [PowerSeries.subst_comp_subst_apply hX hμ] at e2
   rw [← PowerSeries.coe_substAlgHom hμ, map_mul, map_mul, PowerSeries.coe_substAlgHom hμ, h1,
-    PowerSeries.subst_X hμ] at e2
+      PowerSeries.subst_X hμ]
+    at e2
   have e3 : (PowerSeries.substAlgHom hμ) (PowerSeries.C ϖ : PowerSeries K) = PowerSeries.C ϖ := by
     have : (PowerSeries.C ϖ : PowerSeries K) = algebraMap K _ ϖ := rfl
     rw [this, AlgHom.commutes]
@@ -119,33 +136,43 @@ theorem log_scale {K : Type} [Field K] (p : ℕ) (ϖ : K) (μ : PowerSeries K)
   rw [e3] at e2
   exact e2
 
-theorem log_coord {K : Type} [Field K] (p ν r0 r1 : ℕ) [NeZero ν]
-    (om oms : Fin ν → ZMod (2 * ν) → K) (ϖ : K) (μ : PowerSeries K) (x : Bool × EV ν r0 r1)
-    (hϖ : ϖ ≠ 0) (hμ0 : PowerSeries.constantCoeff μ = 0)
-    (hμ : (PowerSeries.subst μ (lamF p ϖ) : PowerSeries K) = PowerSeries.X) :
-    PowerSeries.subst (MvPowerSeries.subst
-        (fun y => MvPowerSeries.C ϖ⁻¹ * (MvPowerSeries.X y : MvPowerSeries (ZV ν r0 r1) K))
-        (MvPowerSeries.C ϖ * sSub om oms μ x)) (lgF K p) = zLin om oms x := by
+theorem log_coord
+    {K : Type} [Field K]
+    (p ν r0 r1 : ℕ) [NeZero ν]
+    (om oms : Fin ν → ZMod (2 * ν) → K)
+    (ϖ : K) (μ : PowerSeries K)
+    (x : Bool × EV ν r0 r1) (hϖ : ϖ ≠ 0) (hμ0 : PowerSeries.constantCoeff μ = 0)
+    (hμ : (PowerSeries.subst μ (lamF p ϖ) : PowerSeries K) = PowerSeries.X)
+    : PowerSeries.subst
+        (MvPowerSeries.subst
+          (fun y => MvPowerSeries.C ϖ⁻¹ * (MvPowerSeries.X y : MvPowerSeries (ZV ν r0 r1) K))
+          (MvPowerSeries.C ϖ * sSub om oms μ x))
+        (lgF K p)
+      = zLin om oms x := by
   have hb := hasSubst_scale (K := K) (ι := ZV ν r0 r1) ϖ⁻¹
   have hz : PowerSeries.HasSubst (zLin om oms x : MvPowerSeries (ZV ν r0 r1) K) :=
     PowerSeries.HasSubst.of_constantCoeff_zero (constantCoeff_zLin om oms x)
-  have hw : PowerSeries.HasSubst
-      (MvPowerSeries.C ϖ⁻¹ * zLin om oms x : MvPowerSeries (ZV ν r0 r1) K) :=
+  have hw
+      : PowerSeries.HasSubst (MvPowerSeries.C ϖ⁻¹ * zLin om oms x : MvPowerSeries (ZV ν r0 r1) K) :=
     PowerSeries.HasSubst.of_constantCoeff_zero (by rw [map_mul, constantCoeff_zLin, mul_zero])
   have hm : PowerSeries.HasSubst (PowerSeries.C ϖ * μ : PowerSeries K) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' (by rw [map_mul, hμ0, mul_zero])
-  have e1 : MvPowerSeries.subst
-      (fun y => MvPowerSeries.C ϖ⁻¹ * (MvPowerSeries.X y : MvPowerSeries (ZV ν r0 r1) K))
-      (MvPowerSeries.C ϖ * sSub om oms μ x) =
-      PowerSeries.subst (MvPowerSeries.C ϖ⁻¹ * zLin om oms x) (PowerSeries.C ϖ * μ) := by
+  have e1
+      : MvPowerSeries.subst
+          (fun y => MvPowerSeries.C ϖ⁻¹ * (MvPowerSeries.X y : MvPowerSeries (ZV ν r0 r1) K))
+          (MvPowerSeries.C ϖ * sSub om oms μ x)
+        = PowerSeries.subst (MvPowerSeries.C ϖ⁻¹ * zLin om oms x) (PowerSeries.C ϖ * μ) := by
     rw [subst_C_mul hb, ps_subst_C_mul hw]
     unfold sSub
     rw [FormalGroupLaws.subst_subst hb hz, subst_scale_zLin]
-  have e2 := congrArg (fun f => (PowerSeries.subst (MvPowerSeries.C ϖ⁻¹ * zLin om oms x) f :
-    MvPowerSeries (ZV ν r0 r1) K)) (log_scale p ϖ μ hμ0 hμ)
+  have e2 :=
+    congrArg
+      (fun f =>
+        (PowerSeries.subst (MvPowerSeries.C ϖ⁻¹ * zLin om oms x) f : MvPowerSeries (ZV ν r0 r1) K))
+      (log_scale p ϖ μ hμ0 hμ)
   rw [PowerSeries.subst_comp_subst_apply hm hw, ps_subst_C_mul hw ϖ PowerSeries.X,
-    PowerSeries.subst_X hw,
-    ← mul_assoc, ← map_mul, mul_inv_cancel₀ hϖ, map_one, one_mul] at e2
+      PowerSeries.subst_X hw, ← mul_assoc, ← map_mul, mul_inv_cancel₀ hϖ, map_one, one_mul]
+    at e2
   rw [e1]
   exact e2
 
@@ -153,14 +180,21 @@ end CohomologyFunctoriality₂
 
 theorem theta_integer_is_theta_log : ThetaInZIsThetaLog := by
   intro K0 K _ _ l ν r0 r1 _ σ j om oms ϖ μ hl hϖ hμ0 hμ Tht
-  rw [theta_integer_is_s_substitution, Formalism.InvariantFactorPaths.G7.Top.thetaLogIsSubst K ν r0 r1 _ _ ϖ μ Tht hμ0]
+  rw [theta_integer_is_s_substitution,
+    Formalism.InvariantFactorPaths.G7.Top.thetaLogIsSubst K ν r0 r1 _ _ ϖ μ Tht hμ0]
   congr 1
   funext x
-  have hb := Formalism.InvariantFactorPaths.G7.ScaledSeriesSubstitution.hasSubst_scale (K := K) (ι := Formalism.InvariantFactorPaths.G7.ZV ν r0 r1) ϖ⁻¹
-  have hcc : MvPowerSeries.constantCoeff (MvPowerSeries.subst
-      (fun y => MvPowerSeries.C ϖ⁻¹ *
-        (MvPowerSeries.X y : MvPowerSeries (Formalism.InvariantFactorPaths.G7.ZV ν r0 r1) K))
-      (MvPowerSeries.C ϖ * sSub (conjJ j σ om) (conjJ j σ oms) μ x)) = 0 := by
+  have hb :=
+    Formalism.InvariantFactorPaths.G7.ScaledSeriesSubstitution.hasSubst_scale (K := K)
+      (ι := Formalism.InvariantFactorPaths.G7.ZV ν r0 r1) ϖ⁻¹
+  have hcc
+      : MvPowerSeries.constantCoeff (MvPowerSeries.subst
+          (fun y =>
+            MvPowerSeries.C ϖ⁻¹
+              * (MvPowerSeries.X y
+                : MvPowerSeries (Formalism.InvariantFactorPaths.G7.ZV ν r0 r1) K))
+          (MvPowerSeries.C ϖ * sSub (conjJ j σ om) (conjJ j σ oms) μ x))
+        = 0 := by
     refine MvPowerSeries.constantCoeff_subst_eq_zero hb (fun i => by simp) ?_
     have h : MvPowerSeries.constantCoeff (sSub (conjJ j σ om) (conjJ j σ oms) μ x) = 0 :=
       PowerSeries.constantCoeff_subst_eq_zero
@@ -188,10 +222,11 @@ theorem kernel_of_f : KernelOfF := by
     rw [← hϖ, zero_pow]
     have : 2 ^ 2 ≤ p ^ 2 := Nat.pow_le_pow_left hU.2.1.le 2
     omega
-  obtain ⟨-, -, μ, hμ0, -, hμ, -, -⟩ := Formalism.InvariantFactorPaths.G7.Top.logRescale K p ϖ hU.1 hnp hϖ
+  obtain ⟨-, -, μ, hμ0, -, hμ, -, -⟩ :=
+    Formalism.InvariantFactorPaths.G7.Top.logRescale K p ϖ hU.1 hnp hϖ
   rw [theta_integer_is_theta_log K0 K p ν r0 r1 σ j om oms ϖ μ hU.1.two_le hϖ0 hμ0 hμ]
-  exact Formalism.InvariantFactorPaths.G7.Top.kernel_from_k_one_k p K0 σ hU hζ F hF be (betaHypOfF K0 p σ hU F be hF1 hF2) K j
-    ν r0 r1 hj _ _ ϖ μ U0 Φ hϖ (omega_integral_criterion K0 K p ν σ j hU hj om oms hO hT) hμ0 hμ hU0 hΦ0 hΦ
-    TT colN hts hp I n
+  exact Formalism.InvariantFactorPaths.G7.Top.kernel_from_k_one_k p K0 σ hU hζ F hF be
+    (betaHypOfF K0 p σ hU F be hF1 hF2) K j ν r0 r1 hj _ _ ϖ μ U0 Φ hϖ
+    (omega_integral_criterion K0 K p ν σ j hU hj om oms hO hT) hμ0 hμ hU0 hΦ0 hΦ TT colN hts hp I n
 
 end Formalism.L2.Th1.D

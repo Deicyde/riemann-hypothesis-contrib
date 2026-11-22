@@ -17,12 +17,18 @@ variable {R : Ranks} (P : HCParam R)
 def blkN (R : Ranks) (n : ℕ) : ℕ := (n - R.k) / (R.t + 1)
 
 def wtN (n : ℕ) : ℚ :=
-  if h : n < R.k then hcToWeightQ P.u ⟨n, h⟩
-  else if hb : blkN R n < R.m then -wG R (P.e ⟨blkN R n, hb⟩) (blkN R n + 1) else 0
+  if h : n < R.k then
+    hcToWeightQ P.u ⟨n, h⟩
+  else if hb : blkN R n < R.m then
+    - wG R (P.e ⟨blkN R n, hb⟩) (blkN R n + 1)
+  else
+    0
 
 def wtQ (j : ℕ) (hj : j ≤ R.m) (i : Fin (R.N j)) : ℚ :=
-  if h : i.1 < R.k then hcToWeightQ P.u ⟨i.1, h⟩
-  else -wG R (P.e ⟨(i.1 - R.k) / (R.t + 1), R.blk_lt hj i h⟩) ((i.1 - R.k) / (R.t + 1) + 1)
+  if h : i.1 < R.k then
+    hcToWeightQ P.u ⟨i.1, h⟩
+  else
+    - wG R (P.e ⟨(i.1 - R.k) / (R.t + 1), R.blk_lt hj i h⟩) ((i.1 - R.k) / (R.t + 1) + 1)
 
 theorem wtQ_eq_wtN (j : ℕ) (hj : j ≤ R.m) (i : Fin (R.N j)) : wtQ P j hj i = wtN P i.1 := by
   by_cases h : i.1 < R.k
@@ -48,13 +54,14 @@ theorem u_step (i : ℕ) (hi : i + 1 < R.k) : P.u ⟨i + 1, hi⟩ + 1 ≤ P.u �
   have f3 : ((a : ℚ) + 1) ≤ c := by exact_mod_cast (show a + 1 ≤ c by omega)
   linarith
 
-private theorem wtN_eq_neg_wG_blkN (n : ℕ) (hn : ¬ n < R.k) (hb : blkN R n < R.m) :
-    wtN P n = -wG R (P.e ⟨blkN R n, hb⟩) (blkN R n + 1) := by
+private theorem wtN_eq_neg_wG_blkN (n : ℕ) (hn : ¬ n < R.k) (hb : blkN R n < R.m)
+    : wtN P n = - wG R (P.e ⟨blkN R n, hb⟩) (blkN R n + 1) := by
   unfold wtN
   rw [dite_eq_right hn, dif_pos hb]
 
-private theorem neg_wG_le_of_adjacent_blocks (c c' : ℕ) (hc : c < R.m) (hc' : c' < R.m) (h : c' = c ∨ c' = c + 1) :
-    -wG R (P.e ⟨c', hc'⟩) (c' + 1) ≤ -wG R (P.e ⟨c, hc⟩) (c + 1) := by
+private theorem neg_wG_le_of_adjacent_blocks
+    (c c' : ℕ) (hc : c < R.m) (hc' : c' < R.m) (h : c' = c ∨ c' = c + 1)
+    : - wG R (P.e ⟨c', hc'⟩) (c' + 1) ≤ - wG R (P.e ⟨c, hc⟩) (c + 1) := by
   rcases h with rfl | rfl
   · exact le_rfl
   · have h1 : ((R.t : ℚ) + 3) / 2 ≤ P.e ⟨c + 1, hc'⟩ - P.b ⟨c + 1, hc'⟩ := P.gap_be ⟨c + 1, hc'⟩
@@ -151,10 +158,13 @@ theorem wtQ_int (j : ℕ) (hj : j ≤ R.m) (i : Fin (R.N j)) : ∃ z : ℤ, wtQ 
     ring
 
 def lamOf (j : ℕ) : DomWeight (R.N j) :=
-  if hj : j ≤ R.m then ⟨fun i => ⌊wtQ P j hj i⌋, fun _ _ hii => Int.floor_mono (wtQ_anti P j hj hii)⟩
-  else ⟨fun _ => 0, fun _ _ _ => le_rfl⟩
+  if hj : j ≤ R.m then
+    ⟨fun i => ⌊wtQ P j hj i⌋, fun _ _ hii => Int.floor_mono (wtQ_anti P j hj hii)⟩
+  else
+    ⟨fun _ => 0, fun _ _ _ => le_rfl⟩
 
-theorem lamOf_eq (j : ℕ) (hj : j ≤ R.m) (i : Fin (R.N j)) : ((lamOf P j).w i : ℚ) = wtQ P j hj i := by
+theorem lamOf_eq (j : ℕ) (hj : j ≤ R.m) (i : Fin (R.N j))
+    : ((lamOf P j).w i : ℚ) = wtQ P j hj i := by
   obtain ⟨z, hz⟩ := wtQ_int P j hj i
   simp only [lamOf, dif_pos hj, hz, Int.floor_intCast]
 
@@ -167,13 +177,16 @@ def fmZeroHLat (K : Type) [Field K] [NumberField K] [StarRing K] : HLat K where
   X := fun _ => 0
   L := ⊤
 
-instance fmZeroHLat_sub (K : Type) [Field K] [NumberField K] [StarRing K] :
-    Subsingleton (fmZeroHLat K).V := inferInstanceAs (Subsingleton (Fin 0 → K))
+instance fmZeroHLat_sub (K : Type) [Field K] [NumberField K] [StarRing K]
+    : Subsingleton (fmZeroHLat K).V :=
+  inferInstanceAs (Subsingleton (Fin 0 → K))
 
-instance fmZeroHLat_empty (K : Type) [Field K] [NumberField K] [StarRing K] :
-    IsEmpty (fmZeroHLat K).ι := inferInstanceAs (IsEmpty (Fin 0))
+instance fmZeroHLat_empty (K : Type) [Field K] [NumberField K] [StarRing K]
+    : IsEmpty (fmZeroHLat K).ι :=
+  inferInstanceAs (IsEmpty (Fin 0))
 
-theorem fmZeroHLat_good (K : Type) [Field K] [NumberField K] [StarRing K] : (fmZeroHLat K).Good := by
+theorem fmZeroHLat_good (K : Type) [Field K] [NumberField K] [StarRing K]
+    : (fmZeroHLat K).Good := by
   unfold HLat.Good
   refine ⟨fun v => ?_, ?_, Subsingleton.elim _ _⟩
   · rw [Matrix.det_isEmpty]
@@ -181,16 +194,19 @@ theorem fmZeroHLat_good (K : Type) [Field K] [NumberField K] [StarRing K] : (fmZ
   · rw [Subsingleton.elim (fmZeroHLat K).L ⊥]
     exact Submodule.fg_bot
 
-theorem fmZeroHLat_maj (K : Type) [Field K] [NumberField K] [StarRing K] (v : InfinitePlace K)
-    (x y : (fmZeroHLat K).V) :
-    Formalism.HermitianLatticesTheory.majAt (fmZeroHLat K).b (fmZeroHLat K).X v x y = 0 := by
+theorem fmZeroHLat_maj
+    (K : Type) [Field K] [NumberField K] [StarRing K] (v : InfinitePlace K) (x y : (fmZeroHLat K).V)
+    : Formalism.HermitianLatticesTheory.majAt (fmZeroHLat K).b (fmZeroHLat K).X v x y = 0 := by
   unfold Formalism.HermitianLatticesTheory.majAt
   exact Fintype.sum_empty _
 
 section Forms
 
-variable {R : Ranks} {LL : Type} [Field LL] [NumberField LL] [StarRing LL] (embLL : LL →+* ℂ)
-  (Pl : Rows.Places LL) {Tau : Type} [Fintype Tau] (hTau : Fintype.card Tau = R.f)
+variable
+  {R : Ranks} {LL : Type} [Field LL] [NumberField LL] [StarRing LL]
+  (embLL : LL →+* ℂ) (Pl : Rows.Places LL)
+  {Tau : Type} [Fintype Tau]
+  (hTau : Fintype.card Tau = R.f)
   {hc : Tau → HCParam R} (C : ColumnChain R Tau hc) [hE : ∀ i, IsEmpty (C.cls i)]
   (A : ColumnsAtT R C) (P : PeriodMap R C)
 
@@ -225,8 +241,8 @@ def formsToy : MemberForms LL embLL Pl Tau hc C A P where
   lat := fun _ => fmZeroHLat LL
   lat_good := fun _ => fmZeroHLat_good LL
   emb := fun _ => 0
-  emb_basis := fun _ => ⟨linearIndependent_empty_type, by
-    rw [Set.range_eq_empty, Submodule.span_empty]⟩
+  emb_basis := fun _ =>
+    ⟨linearIndependent_empty_type, by rw [Set.range_eq_empty, Submodule.span_empty]⟩
   emb_norm := fun i x => by
     rw [fmZeroHLat_maj]
     simp

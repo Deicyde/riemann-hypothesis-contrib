@@ -11,14 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.SiegelND GlobalTheory.CompanionTheory.SiegelND.Coef GlobalTheory.CompanionTheory.SiegelND.Coef.TestN
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.SiegelND GlobalTheory.CompanionTheory.SiegelND.Coef
+  GlobalTheory.CompanionTheory.SiegelND.Coef.TestN
 open scoped TensorProduct ENNReal
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Coef.TestN
 
-theorem traceGram_isSymm {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E) :
-    (Matrix.of fun k l : Fin d => Algebra.trace F E (b k * σ (b l))).IsSymm := by
+theorem traceGram_isSymm
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    : (Matrix.of fun k l : Fin d => Algebra.trace F E (b k * σ (b l))).IsSymm := by
   have hσ : ∀ e, σ (σ e) = e := sig_invol hCM
   let s : E ≃ₐ[F] E := AlgEquiv.ofAlgHom σ σ (AlgHom.ext hσ) (AlgHom.ext hσ)
   ext k l
@@ -30,9 +35,11 @@ theorem traceGram_isSymm {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   rw [hs] at h
   exact h.symm ▸ rfl
 
-theorem traceGram_det_ne_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E) :
-    (Matrix.of fun k l : Fin d => Algebra.trace F E (b k * σ (b l))).det ≠ 0 := by
+theorem traceGram_det_ne_zero
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (hCM : IsCMExt F E σ)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    : (Matrix.of fun k l : Fin d => Algebra.trace F E (b k * σ (b l))).det ≠ 0 := by
   have hσ : ∀ e, σ (σ e) = e := sig_invol hCM
   haveI : FiniteDimensional F E := Module.Finite.of_basis b
   intro h0
@@ -61,7 +68,12 @@ theorem traceGram_det_ne_zero {F E : Type} [Field F] [NumberField F] [Field E] [
   have := (Fintype.linearIndependent_iff.1 b.linearIndependent) v hy0
   exact funext this
 
-theorem coordForm_isSymm_det_ne_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n : ℕ), (coordForm σ b n).IsSymm ∧ (coordForm σ b n).det ≠ 0 := by
+theorem coordForm_isSymm_det_ne_zero
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n : ℕ),
+          (coordForm σ b n).IsSymm ∧ (coordForm σ b n).det ≠ 0 := by
   intro F E _ _ _ _ _ σ hCM d b n
   constructor
   · refine Matrix.IsSymm.fromBlocks (Matrix.isSymm_one) (by simp) ?_

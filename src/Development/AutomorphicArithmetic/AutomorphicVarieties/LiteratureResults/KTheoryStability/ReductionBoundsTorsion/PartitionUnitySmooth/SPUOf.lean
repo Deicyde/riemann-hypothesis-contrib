@@ -30,7 +30,8 @@ theorem sPU_of : SHt → SPU := fun hH =>
   have hE := pf_GREqv pf_Basic
   have hL := pf_GTLip pf_Basic hC
   have hP := pf_GProper pf_Basic
-  pf_GFin hH (gSmMin pf_Basic hC) (pf_GRSmooth pf_Basic) hE (pf_GRLow pf_Basic hC hE hL) (pf_GRDual pf_Basic hT hE hL)
-    (pf_GRLip pf_Basic hE hL) (pf_GThick pf_Basic hT) hP (pf_GBump pf_Basic hP) (pf_GNrm pf_Basic) pf_DerB
+  pf_GFin hH (gSmMin pf_Basic hC) (pf_GRSmooth pf_Basic) hE (pf_GRLow pf_Basic hC hE hL)
+    (pf_GRDual pf_Basic hT hE hL) (pf_GRLip pf_Basic hE hL) (pf_GThick pf_Basic hT) hP
+    (pf_GBump pf_Basic hP) (pf_GNrm pf_Basic) pf_DerB
 
 end PositivityTheory.KB

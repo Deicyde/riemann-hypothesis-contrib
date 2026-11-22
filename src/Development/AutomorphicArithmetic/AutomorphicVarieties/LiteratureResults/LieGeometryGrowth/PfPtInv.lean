@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 open UpperTheory.V.Lit.Geo
 open scoped TensorProduct
 
-private theorem open_stab {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (v : V) {S : Set G} (hS : IsOpen S) (h1 : (1 : G) ∈ S) (h : ∀ g ∈ S, ρ g v = v) :
-    IsOpen {g | ρ g v = v} := by
+private theorem open_stab
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (v : V)
+    {S : Set G} (hS : IsOpen S) (h1 : (1 : G) ∈ S) (h : ∀ g ∈ S, ρ g v = v)
+    : IsOpen {g | ρ g v = v} := by
   rw [isOpen_iff_forall_mem_open]
   intro g hg
   refine ⟨(fun x => g⁻¹ * x) ⁻¹' S, fun x hx => ?_, hS.preimage (by fun_prop), by simpa using h1⟩
@@ -20,17 +23,20 @@ private theorem open_stab {G V : Type} [Group G] [TopologicalSpace G] [IsTopolog
   show ρ x v = v
   rw [e, map_mul, Module.End.mul_apply, h _ hx, hg']
 
-theorem UpperTheory.V.Lit.Geo.Pf.ptInv :
-    UpperTheory.V.Lit.Geo.Pf.PtInv := by
+theorem UpperTheory.V.Lit.Geo.Pf.ptInv : UpperTheory.V.Lit.Geo.Pf.PtInv := by
   intro E _ _ _ a χ d G x y
-  have h : ∀ g, Pf.pt χ G x y g = ∑ i, ∑ j, G i j *
-      (starRingEnd ℂ ((mulChi a χ (cmp i x)).1 g) * (mulChi a χ (cmp j y)).1 g) := by
+  have h
+      : ∀ g,
+        Pf.pt χ G x y g
+          = ∑ i, ∑ j, G i j *
+            (starRingEnd ℂ ((mulChi a χ (cmp i x)).1 g) * (mulChi a χ (cmp j y)).1 g) := by
     intro g
-    have hn : ((‖((chiDet a χ g : ℂˣ) : ℂ)‖ ^ 2 : ℝ) : ℂ) =
-        starRingEnd ℂ ((chiDet a χ g : ℂˣ) : ℂ) * ((chiDet a χ g : ℂˣ) : ℂ) := by
+    have hn
+        : ((‖((chiDet a χ g : ℂˣ) : ℂ)‖ ^ 2 : ℝ) : ℂ)
+          = starRingEnd ℂ ((chiDet a χ g : ℂˣ) : ℂ) * ((chiDet a χ g : ℂˣ) : ℂ) := by
       rw [Complex.conj_mul']; push_cast; rfl
-    simp only [Pf.pt, hn, mulChi_apply, Pf.cmp_ev, dotProduct, Matrix.mulVec, Finset.mul_sum, map_mul, Pi.star_apply,
-      Complex.star_def]
+    simp only [Pf.pt, hn, mulChi_apply, Pf.cmp_ev, dotProduct, Matrix.mulVec, Finset.mul_sum,
+      map_mul, Pi.star_apply, Complex.star_def]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   have hc : Pf.TwInv χ x → Pf.TwInv χ y → Pf.CInv (Pf.pt χ G x y) := by
     intro hx hy
@@ -56,4 +62,5 @@ theorem UpperTheory.V.Lit.Geo.Pf.ptInv :
     refine Subtype.ext (funext fun g => ?_)
     change θ.1 (g * finGL E a k) = θ.1 g
     rw [hθ, hθ, h, h]
-    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by rw [e _ (h1 i), e _ (h2 j)]
+    exact Finset.sum_congr rfl fun i _ =>
+      Finset.sum_congr rfl fun j _ => by rw [e _ (h1 i), e _ (h2 j)]

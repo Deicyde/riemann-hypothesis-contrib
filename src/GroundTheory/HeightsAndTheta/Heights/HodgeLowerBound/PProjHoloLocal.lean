@@ -15,11 +15,13 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 
-theorem holoOn_comp_compatChart_symm {d : ℕ} {X : Type} [TopologicalSpace X]
+theorem holoOn_comp_compatChart_symm
+    {d : ℕ} {X : Type} [TopologicalSpace X]
     {A : ReciprocityTheory.AnForm.M.FinHolAtlas d X} {e : OpenPartialHomeomorph X (Fin d → ℂ)}
-    (he : ReciprocityTheory.AnForm.M.IsCompatChart A e) {U : Set X} {g : X → ℂ} (hg : A.HoloOn U g)
-    {u : Fin d → ℂ} (hu : u ∈ e.target) (huU : e.symm u ∈ U) :
-    DifferentiableAt ℂ (g ∘ e.symm) u := by
+    (he : ReciprocityTheory.AnForm.M.IsCompatChart A e)
+    {U : Set X} {g : X → ℂ} (hg : A.HoloOn U g)
+    {u : Fin d → ℂ} (hu : u ∈ e.target) (huU : e.symm u ∈ U)
+    : DifferentiableAt ℂ (g ∘ e.symm) u := by
   obtain ⟨j, hj⟩ := A.cover (e.symm u)
   have h1 : AnalyticAt ℂ (A.chart j ∘ e.symm) u := (he j).2 u ⟨hu, hj⟩
   have h2 : AnalyticAt ℂ (g ∘ (A.chart j).symm) ((A.chart j ∘ e.symm) u) := by
@@ -34,8 +36,10 @@ theorem holoOn_comp_compatChart_symm {d : ℕ} {X : Type} [TopologicalSpace X]
     simp only [Function.comp, (A.chart j).left_inv hu']
   exact (h2.comp h1).differentiableAt.congr_of_eventuallyEq h3
 
-theorem ProjHoloLocal.proof (hL : LocalOrbitChart.Statement)
-    (hO : IndefiniteRowSideFullHecke.ComplexSets.InjectiveHolomorphicInverse.Statement) : ProjHoloLocal.Statement := by
+theorem ProjHoloLocal.proof
+    (hL : LocalOrbitChart.Statement)
+    (hO : IndefiniteRowSideFullHecke.ComplexSets.InjectiveHolomorphicInverse.Statement)
+    : ProjHoloLocal.Statement := by
   intro II Ψ _ K _ ι _ Ω _ _ E _ _ D M e he z hz hze
 
   obtain ⟨N, hNo, hzN, κ, hκ, hκt, hκs⟩ := hL K ι Ω D.y D.n D.arith D.smoothGeneric z hz
@@ -74,8 +78,14 @@ theorem ProjHoloLocal.proof (hL : LocalOrbitChart.Statement)
 
   obtain ⟨O, hOo, hOeq⟩ :=
     continuousOn_iff'.1 M.cont (e.source ∩ e ⁻¹' T) (e.isOpen_inter_preimage hTo)
-  refine ⟨O ∩ (N ∩ κ ⁻¹' ((κ ∘ s ∘ e.symm) '' T)),
-    hOo.inter (hκ.continuousOn.isOpen_inter_preimage hNo hψo), ?_, g ∘ κ, ?_, ?_⟩
+  refine ⟨
+    O ∩ (N ∩ κ ⁻¹' ((κ ∘ s ∘ e.symm) '' T)),
+    hOo.inter (hκ.continuousOn.isOpen_inter_preimage hNo hψo),
+    ?_,
+    g ∘ κ,
+    ?_,
+    ?_
+  ⟩
   · refine ⟨?_, hzN, e (M.proj z), hxT, ?_⟩
     · have hz' : z ∈ M.proj ⁻¹' (e.source ∩ e ⁻¹' T) ∩ mcPts (mCoordIdeal D.y) := ⟨⟨hze, hxT⟩, hz⟩
       rw [hOeq] at hz'

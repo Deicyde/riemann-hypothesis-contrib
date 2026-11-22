@@ -9,8 +9,8 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField Module
 
-theorem CoeffLatticeBasis.proof (E : Type*) [Field E] [NumberField E] :
-    CoeffLatticeBasis.Statement E := by
+theorem CoeffLatticeBasis.proof (E : Type*) [Field E] [NumberField E]
+    : CoeffLatticeBasis.Statement E := by
   intro A hO hfg
   have : AddGroup.FG A := (AddGroup.fg_iff_addSubgroup_fg A).mpr hfg
   obtain ⟨n, b⟩ : Σ n : ℕ, Basis (Fin n) ℤ A := Module.basisOfFiniteTypeTorsionFree'
@@ -33,8 +33,7 @@ theorem CoeffLatticeBasis.proof (E : Type*) [Field E] [NumberField E] :
     rintro _ ⟨i, rfl⟩
     rw [integralBasis_apply]
     exact hA _ (hO ⟨_, rfl⟩)
-  have hn : finrank ℚ E = n := by
-    rw [finrank_eq_card_basis (Basis.mk hliQ hsp), Fintype.card_fin]
+  have hn : finrank ℚ E = n := by rw [finrank_eq_card_basis (Basis.mk hliQ hsp), Fintype.card_fin]
   exact ⟨b.reindex (finCongr hn.symm)⟩
 
 end GroundTheory.Heights₂.Heights.FiniteCovolume

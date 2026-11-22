@@ -8,15 +8,19 @@ open scoped Topology
 
 namespace GlobalTheory.CompanionTheory.OpenSubgroupCosets
 
-theorem exists_finset_unique_coset_reps :
-    ∀ {E : Type} [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E]
-      (D : AddSubgroup E), IsOpen (D : Set E) → ∀ (R : Set E), IsCompact R →
-      ∃ S : Finset E, (∀ s ∈ S, s ∈ R) ∧ ∀ x ∈ R, ∃! s, s ∈ S ∧ x - s ∈ D := by
+theorem exists_finset_unique_coset_reps
+    : ∀ {E : Type} [AddCommGroup E] [TopologicalSpace E] [IsTopologicalAddGroup E]
+        (D : AddSubgroup E),
+      IsOpen (D : Set E)
+        → ∀ (R : Set E),
+          IsCompact R → ∃ S : Finset E, (∀ s ∈ S, s ∈ R) ∧ ∀ x ∈ R, ∃! s, s ∈ S ∧ x - s ∈ D := by
   intro E _ _ _ D hD R hR
   classical
-  obtain ⟨t, ht⟩ := hR.elim_finite_subcover (fun x : E => (fun y => y - x) ⁻¹' (D : Set E))
-    (fun x => hD.preimage (continuous_sub_right x))
-    (fun r _ => Set.mem_iUnion.2 ⟨r, by simp⟩)
+  obtain ⟨t, ht⟩ :=
+    hR.elim_finite_subcover
+      (fun x : E => (fun y => y - x) ⁻¹' (D : Set E))
+      (fun x => hD.preimage (continuous_sub_right x))
+      (fun r _ => Set.mem_iUnion.2 ⟨r, by simp⟩)
   set π : E → E ⧸ D := QuotientAddGroup.mk with hπ
   have hfin : (π '' R).Finite := by
     apply (t.finite_toSet.image π).subset

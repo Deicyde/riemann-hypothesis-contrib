@@ -11,32 +11,35 @@ namespace GlobalTheory
 
 namespace GramSubmodular
 
-variable {m α β γ : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ]
-
+variable
+  {m α β γ : Type}
+  [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [DecidableEq α] [DecidableEq β] [DecidableEq γ]
 
 end GramSubmodular
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_det_re_nonneg_and_im_eq_zero (X : Matrix m α ℂ) : 0 ≤ (Xᴴ * X).det.re ∧ (Xᴴ * X).det.im = 0 := by
   have h := Complex.le_def.mp (posSemidef_conjTranspose_mul_self X).det_nonneg
   exact ⟨by simpa using h.1, by simpa using h.2.symm⟩
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_fromCols_eq_fromBlocks (X : Matrix m α ℂ) (N : Matrix m n ℂ) :
     (fromCols X N)ᴴ * fromCols X N = fromBlocks (Xᴴ * X) (Xᴴ * N) (Nᴴ * X) (Nᴴ * N) := by
   rw [conjTranspose_fromCols_eq_fromRows_conjTranspose, fromRows_mul_fromCols]
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_projection_residual_eq [DecidableEq m] (X : Matrix m α ℂ) (N : Matrix m n ℂ)
     (h : (Xᴴ * X).det ≠ 0) :
     ((1 - X * (Xᴴ * X)⁻¹ * Xᴴ) * N)ᴴ * ((1 - X * (Xᴴ * X)⁻¹ * Xᴴ) * N) =
@@ -61,8 +64,9 @@ private lemma gram_projection_residual_eq [DecidableEq m] (X : Matrix m α ℂ) 
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_det_fromCols_eq_mul_residual [DecidableEq m] (X : Matrix m α ℂ) (N : Matrix m n ℂ)
     (h : (Xᴴ * X).det ≠ 0) :
     ((fromCols X N)ᴴ * fromCols X N).det = (Xᴴ * X).det *
@@ -72,15 +76,17 @@ private lemma gram_det_fromCols_eq_mul_residual [DecidableEq m] (X : Matrix m α
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma re_mul_of_im_eq_zero {z w : ℂ} (hz : z.im = 0) : (z * w).re = z.re * w.re := by
   simp [Complex.mul_re, hz]
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_det_fromCols_eq_zero_of_gram_det_eq_zero (X : Matrix m α ℂ) (N : Matrix m n ℂ)
     (h : (Xᴴ * X).det = 0) : ((fromCols X N)ᴴ * fromCols X N).det = 0 := by
   obtain ⟨v, hv0, hv⟩ := exists_mulVec_eq_zero_iff.mpr h
@@ -94,8 +100,9 @@ private lemma gram_det_fromCols_eq_zero_of_gram_det_eq_zero (X : Matrix m α ℂ
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_det_fromCols_le_mul
     (hmono : ∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ), P.PosSemidef → Q.PosSemidef → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0))
     (Y : Matrix m β ℂ) (Z : Matrix m γ ℂ) :
@@ -115,8 +122,9 @@ private lemma gram_det_fromCols_le_mul
 
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
 private lemma gram_det_koteljanskii_inequality
     (hmono : ∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ), P.PosSemidef → Q.PosSemidef → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0))
     (X : Matrix m α ℂ) (Y : Matrix m β ℂ) (Z : Matrix m γ ℂ) :
@@ -133,24 +141,41 @@ private lemma gram_det_koteljanskii_inequality
       ((1 - X * (Xᴴ * X)⁻¹ * Xᴴ) * Z)
     nlinarith [mul_le_mul_of_nonneg_left hF (mul_self_nonneg (Xᴴ * X).det.re)]
 
-
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-variable {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n]
-  [DecidableEq α] [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
-theorem _root_.GlobalTheory.gram_det_submodular :
-    (∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ), P.PosSemidef → Q.PosSemidef → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0)) → (∀ (m α β γ : Type) [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [DecidableEq α] [DecidableEq β] [DecidableEq γ] (M : Matrix m (α ⊕ β ⊕ γ) ℂ), (((M.submatrix id (Sum.inl : α → α ⊕ β ⊕ γ))ᴴ * (M.submatrix id (Sum.inl : α → α ⊕ β ⊕ γ))).det.re) * (((M)ᴴ * (M)).det.re) ≤ (((M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ))ᴴ * (M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ))).det.re) * (((M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ))ᴴ * (M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ))).det.re)) := by
+variable
+  {m α β γ n : Type} [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [Fintype n] [DecidableEq α]
+  [DecidableEq β] [DecidableEq γ] [DecidableEq n] in
+theorem _root_.GlobalTheory.gram_det_submodular
+    : (∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ),
+        P.PosSemidef → Q.PosSemidef
+          → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re
+            ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0))
+      → (∀ (m α β γ : Type) [Fintype m] [Fintype α] [Fintype β] [Fintype γ] [DecidableEq α]
+          [DecidableEq β] [DecidableEq γ] (M : Matrix m (α ⊕ β ⊕ γ) ℂ),
+        (((M.submatrix id (Sum.inl : α → α ⊕ β ⊕ γ))ᴴ
+              * (M.submatrix id (Sum.inl : α → α ⊕ β ⊕ γ))).det.re)
+            * (((M)ᴴ * (M)).det.re)
+          ≤ (((M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ))ᴴ
+              * (M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ))).det.re)
+            * (((M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ))ᴴ
+              * (M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ))).det.re)) := by
   intro hmono m α β γ _ _ _ _ _ _ _ M
-  have key := gram_det_koteljanskii_inequality hmono (M.submatrix id Sum.inl)
-    (M.submatrix id (Sum.inr ∘ Sum.inl)) (M.submatrix id (Sum.inr ∘ Sum.inr))
-  have hM : fromCols (M.submatrix id Sum.inl)
-      (fromCols (M.submatrix id (Sum.inr ∘ Sum.inl)) (M.submatrix id (Sum.inr ∘ Sum.inr))) = M := by
+  have key :=
+    gram_det_koteljanskii_inequality hmono (M.submatrix id Sum.inl)
+      (M.submatrix id (Sum.inr ∘ Sum.inl)) (M.submatrix id (Sum.inr ∘ Sum.inr))
+  have hM
+      : fromCols (M.submatrix id Sum.inl)
+          (fromCols (M.submatrix id (Sum.inr ∘ Sum.inl)) (M.submatrix id (Sum.inr ∘ Sum.inr)))
+        = M := by
     ext x (a | b | c) <;> rfl
-  have hXY : fromCols (M.submatrix id Sum.inl) (M.submatrix id (Sum.inr ∘ Sum.inl)) =
-      M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ) := by
+  have hXY
+      : fromCols (M.submatrix id Sum.inl) (M.submatrix id (Sum.inr ∘ Sum.inl))
+        = M.submatrix id (Sum.map id Sum.inl : α ⊕ β → α ⊕ β ⊕ γ) := by
     ext x (a | b) <;> rfl
-  have hXZ : fromCols (M.submatrix id Sum.inl) (M.submatrix id (Sum.inr ∘ Sum.inr)) =
-      M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ) := by
+  have hXZ
+      : fromCols (M.submatrix id Sum.inl) (M.submatrix id (Sum.inr ∘ Sum.inr))
+        = M.submatrix id (Sum.map id Sum.inr : α ⊕ γ → α ⊕ β ⊕ γ) := by
     ext x (a | c) <;> rfl
   rwa [hM, hXY, hXZ] at key
 

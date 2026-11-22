@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.TL
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr Formalism.FourierDecayAlt.TL
 
 open TLC in
 theorem capelli_vector_equivariance : TL.CapVEquiv := by
@@ -27,7 +28,8 @@ theorem capelli_vector_equivariance : TL.CapVEquiv := by
     have h1 : herm (Hpk (n + 1) r) (∑ j, ν' j • B0 j) (∑ j, ν' j • B0 j) = 1 := by
       rw [hνν', Qx2.herm_uh hgU, hee]
     rw [HermitianFormSums.herm_comb hB0] at h1
-    have : ∀ a, ν' a * star (ν' a) = ((Complex.normSq (ν' a) : ℝ) : ℂ) := fun a => Complex.mul_conj (ν' a)
+    have : ∀ a, ν' a * star (ν' a) = ((Complex.normSq (ν' a) : ℝ) : ℂ) := fun a =>
+      Complex.mul_conj (ν' a)
     simp only [this] at h1
     rw [← Complex.ofReal_sum] at h1
     exact_mod_cast h1
@@ -40,7 +42,8 @@ theorem capelli_vector_equivariance : TL.CapVEquiv := by
       rcases hv with rfl | rfl
       · have e1 := Qx2.herm_uh hgU (Bs a) v
         rw [hg.2.2] at e1
-        rw [e1]; exact hBs.2.2 a _ (by simp)
+        rw [e1]
+        exact hBs.2.2 a _ (by simp)
       · rw [hνν', Qx2.herm_uh hgU]; exact hBs.2.2 a _ (by simp)
   have hF := capelli_vector_frame Wq (n + 1) r z' π' B0 Bs ν (by omega) hz hT hπ hB0 hν hBs w
   have hF' := capelli_vector_frame Wq (n + 1) r z' π' B0 Bs' ν' (by omega) hz hT hπ hB0 hν' hBs' w
@@ -58,11 +61,13 @@ theorem capelli_vector_equivariance : TL.CapVEquiv := by
   set U : Module.End ℂ Wq := (π' g : Wq →ₗ[ℂ] Wq) with hU
   set Ui : Module.End ℂ Wq := (π' h : Wq →ₗ[ℂ] Wq) with hUi
   have hUUi' : U * Ui = 1 := by
-    apply LinearMap.ext; intro v
+    apply LinearMap.ext
+    intro v
     have := congrArg (fun T : Wq →L[ℂ] Wq => T v) hUUi
     simpa [hU, hUi] using this
   have hUiU' : Ui * U = 1 := by
-    apply LinearMap.ext; intro v
+    apply LinearMap.ext
+    intro v
     have := congrArg (fun T : Wq →L[ℂ] Wq => T v) hUiU
     simpa [hU, hUi] using this
   have hEB : ∀ a b, U * EB π' Bs a b * Ui = EB π' Bs' a b := by
@@ -73,22 +78,27 @@ theorem capelli_vector_equivariance : TL.CapVEquiv := by
     obtain ⟨c1, c2⟩ := Qx8.hpart_conj Bs a b hgU
     unfold EB QrD.ecOp
     rw [c1, c2, e1, e2, hgi]
-    apply LinearMap.ext; intro v
+    apply LinearMap.ext
+    intro v
     simp [hU, hUi]
-  let f : Module.End ℂ Wq →+* Module.End ℂ Wq :=
-    { toFun := fun T => U * T * Ui
-      map_one' := by simp only [mul_one, hUUi']
-      map_mul' := fun S T => by
-        show U * (S * T) * Ui = U * S * Ui * (U * T * Ui)
-        calc U * (S * T) * Ui = U * S * (Ui * U) * T * Ui := by rw [hUiU']; noncomm_ring
-          _ = U * S * Ui * (U * T * Ui) := by noncomm_ring
-      map_zero' := by simp only [mul_zero, zero_mul]
-      map_add' := fun S T => by noncomm_ring }
+  let f : Module.End ℂ Wq →+* Module.End ℂ Wq := {
+    toFun := fun T => U * T * Ui
+    map_one' := by simp only [mul_one, hUUi']
+    map_mul' := fun S T => by
+      show U * (S * T) * Ui = U * S * Ui * (U * T * Ui)
+      calc
+        U * (S * T) * Ui
+          = U * S * (Ui * U) * T * Ui := by rw [hUiU']; noncomm_ring
+        _ = U * S * Ui * (U * T * Ui) := by noncomm_ring
+    map_zero' := by simp only [mul_zero, zero_mul]
+    map_add' := fun S T => by noncomm_ring
+  }
   have hf : ∀ v, f (algebraMap ℂ (Module.End ℂ Wq) v) = algebraMap ℂ (Module.End ℂ Wq) v := by
     intro v
     show U * algebraMap ℂ (Module.End ℂ Wq) v * Ui = _
     rw [← Algebra.commutes, mul_assoc, hUUi', mul_one]
-  have hqd := QuantumMinorExpansion.map_qminor (EB π' Bs') f hf (EB π' Bs) (fun a b => hEB a b) id id w
+  have hqd :=
+    QuantumMinorExpansion.map_qminor (EB π' Bs') f hf (EB π' Bs) (fun a b => hEB a b) id id w
   apply ContinuousLinearMap.ext
   intro v
   simp only [ContinuousLinearMap.comp_apply]

@@ -5,14 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix UpperTheory.Gal.TypesAndIwahori
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix UpperTheory.Gal.TypesAndIwahori
 
-private theorem unitRes_surj (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] : Function.Surjective (unitRes k) := by
-  exact IsLocalRing.surjective_units_map_of_local_ringHom _ IsLocalRing.residue_surjective inferInstance
+private theorem unitRes_surj
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Function.Surjective (unitRes k) := by
+  exact IsLocalRing.surjective_units_map_of_local_ringHom _ IsLocalRing.residue_surjective
+    inferInstance
 
-theorem UpperTheory.Gal.TypesAndIwahori.grpFacts :
-    UpperTheory.Gal.TypesAndIwahori.GrpFacts := by
+theorem UpperTheory.Gal.TypesAndIwahori.grpFacts : UpperTheory.Gal.TypesAndIwahori.GrpFacts := by
   intro k _ _ _ _ s θ μ hθ hμ a b hab
   have key : (∀ u, θ a (unitRes k u) = θ b (unitRes k u)) → False := by
     intro h
@@ -36,7 +38,8 @@ theorem UpperTheory.Gal.TypesAndIwahori.grpFacts :
       have hr : unitRes k u = 1 := by
         ext
         simp only [unitRes, Units.coe_map, MonoidHom.coe_coe, Units.val_one]
-        have hz : IsLocalRing.residue 𝒪[k] ((u : 𝒪[k]) - 1) = 0 := (IsLocalRing.residue_eq_zero_iff _).2 hu
+        have hz : IsLocalRing.residue 𝒪[k] ((u : 𝒪[k]) - 1) = 0 :=
+          (IsLocalRing.residue_eq_zero_iff _).2 hu
         rw [map_sub, map_one, sub_eq_zero] at hz
         exact hz
       rw [hdiv, hr, map_one, map_one, div_one]

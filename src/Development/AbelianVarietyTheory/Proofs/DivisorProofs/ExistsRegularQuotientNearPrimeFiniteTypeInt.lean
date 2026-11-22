@@ -10,10 +10,13 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem generically_regular_quotient_of_finiteType_int :
-    ∀ (B : Type) [CommRing B] [Algebra.FiniteType ℤ B] (p : Ideal B) [p.IsPrime], ∃ g, g ∉ p ∧
-      ∀ (q : Ideal B) [q.IsPrime], p ≤ q → g ∉ q →
-        IsRegularLocalRing (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q))) := by
+theorem generically_regular_quotient_of_finiteType_int
+    : ∀ (B : Type) [CommRing B] [Algebra.FiniteType ℤ B] (p : Ideal B) [p.IsPrime], ∃ g,
+      g ∉ p
+        ∧ ∀ (q : Ideal B) [q.IsPrime],
+          p ≤ q → g ∉ q
+            → IsRegularLocalRing
+              (Localization.AtPrime q ⧸ p.map (algebraMap B (Localization.AtPrime q))) := by
   intro B _ _ p hp
   by_cases h : ∀ a : ℤ, algebraMap ℤ B a ∈ p → a = 0
   · exact GlobalTheory.T.exists_genericallyRegular_quotient_dominating_prime ℤ B p h
@@ -40,8 +43,7 @@ theorem generically_regular_quotient_of_finiteType_int :
   let mk := Ideal.Quotient.mk I
   have hmk : Function.Surjective mk := Ideal.Quotient.mk_surjective
   have hker : RingHom.ker mk = I := Ideal.mk_ker
-  have hIp : I ≤ p := by
-    rw [hI, Ideal.span_le]; simpa using hlmem
+  have hIp : I ≤ p := by rw [hI, Ideal.span_le]; simpa using hlmem
   have hl0 : ∀ a ∈ Ideal.span {((l : ℕ) : ℤ)}, (Int.castRingHom (B ⧸ I)) a = 0 := by
     intro a ha
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton.mp ha
@@ -63,7 +65,8 @@ theorem generically_regular_quotient_of_finiteType_int :
       Finite.of_equiv _ (FractionRing.algEquiv (ZMod l) (ZMod l)).toEquiv.symm
     infer_instance
 
-  have corr : ∀ (r : Ideal B), r.IsPrime → I ≤ r → (r.map mk).IsPrime ∧ (r.map mk).comap mk = r := by
+  have corr
+      : ∀ (r : Ideal B), r.IsPrime → I ≤ r → (r.map mk).IsPrime ∧ (r.map mk).comap mk = r := by
     intro r hr hIr
     refine ⟨Ideal.map_isPrime_of_surjective hmk (by rw [hker]; exact hIr), ?_⟩
     rw [Ideal.comap_map_of_surjective' mk hmk, hker]
@@ -74,7 +77,8 @@ theorem generically_regular_quotient_of_finiteType_int :
     intro a ha
     by_contra ha0
     exact hp'.ne_top (Ideal.eq_top_of_isUnit_mem _ ha ((IsUnit.mk0 a ha0).map _))
-  obtain ⟨g', hg'p, hg'⟩ := GlobalTheory.T.exists_genericallyRegular_quotient_dominating_prime (ZMod l) (B ⧸ I) p' hdom
+  obtain ⟨g', hg'p, hg'⟩ :=
+    GlobalTheory.T.exists_genericallyRegular_quotient_dominating_prime (ZMod l) (B ⧸ I) p' hdom
   obtain ⟨g, rfl⟩ := hmk g'
   refine ⟨g, fun hg => hg'p hg, ?_⟩
   intro q hq hpq hgq

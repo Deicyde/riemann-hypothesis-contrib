@@ -82,8 +82,7 @@ theorem mod_lattice_absolute_value : ModXAbs := by
       rw [← hsξ, ← algebraMap_smul E ((g : ℕ) : 𝓞 E) l, map_natCast]
       abel
     have hlU : l ∈ Uo F' := by
-      have h1 : γ a - a - ξ ∈ Uo F' :=
-        sub_mem (sub_mem ((hU a).2 a.2) a.2) (xsp_le_orth F' hξX)
+      have h1 : γ a - a - ξ ∈ Uo F' := sub_mem (sub_mem ((hU a).2 a.2) a.2) (xsp_le_orth F' hξX)
       have : l = ((g : ℕ) : E)⁻¹ • (γ a - a - ξ) := by
         rw [← hgl, smul_smul, inv_mul_cancel₀ hgE, one_smul]
       rw [this]
@@ -102,15 +101,16 @@ theorem mod_lattice_absolute_value : ModXAbs := by
     rw [hco]
     exact hξX
   have hLb := Lb_lattice F' Λ hΛ
-  have hfg : (Lb F' Λ).FG := by
-    first | exact hLb.toIsLattice.fg | exact hLb.fg
+  have hfg : (Lb F' Λ).FG := by first | exact hLb.toIsLattice.fg | exact hLb.fg
   have hfix := mink_fix (Lb F' Λ) hfg φ hφL n hn hpow' g hg hcongQ
   have hall : ∀ q, φ q = q := by
-    have hle : Submodule.span E (Lb F' Λ : Set (Qt F')) ≤
-        LinearMap.ker (φ - LinearMap.id : Qt F' →ₗ[E] Qt F') := by
+    have hle
+        : Submodule.span E (Lb F' Λ : Set (Qt F'))
+          ≤ LinearMap.ker (φ - LinearMap.id : Qt F' →ₗ[E] Qt F') := by
       rw [Submodule.span_le]
       intro x hx
-      rw [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, hfix x hx, sub_self]
+      rw [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, hfix x hx,
+        sub_self]
     intro q
     have hq : q ∈ LinearMap.ker (φ - LinearMap.id : Qt F' →ₗ[E] Qt F') :=
       hle (by
@@ -124,15 +124,19 @@ theorem mod_lattice_absolute_value : ModXAbs := by
             (mem_Lb F' Λ).2 ⟨o • a, by simpa using hoa, rfl⟩
           have ho' : algebraMap (𝓞 E) E o ≠ 0 :=
             (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 ho
-          have ha : (Submodule.Quotient.mk (p := Pk F') a : Qt F') =
-              (algebraMap (𝓞 E) E o)⁻¹ • (Submodule.Quotient.mk (p := Pk F') (o • a) : Qt F') := by
-            rw [Submodule.Quotient.mk_smul, ← algebraMap_smul E o, smul_smul, inv_mul_cancel₀ ho', one_smul]
+          have ha
+              : (Submodule.Quotient.mk (p := Pk F') a : Qt F')
+                = (algebraMap (𝓞 E) E o)⁻¹
+                  • (Submodule.Quotient.mk (p := Pk F') (o • a) : Qt F') := by
+            rw [Submodule.Quotient.mk_smul, ← algebraMap_smul E o, smul_smul, inv_mul_cancel₀ ho',
+              one_smul]
           rw [ha]
           exact Submodule.smul_mem _ _ (Submodule.subset_span hmem))
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, sub_eq_zero] at hq
     exact hq
   have h := hall (Submodule.Quotient.mk ⟨v, hv⟩)
-  change Submodule.Quotient.mk (γU F' γ hU ⟨v, hv⟩) = Submodule.Quotient.mk (p := Pk F') ⟨v, hv⟩ at h
+  change Submodule.Quotient.mk (γU F' γ hU ⟨v, hv⟩) = Submodule.Quotient.mk (p := Pk F') ⟨v, hv⟩
+    at h
   rw [Submodule.Quotient.eq] at h
   exact h
 

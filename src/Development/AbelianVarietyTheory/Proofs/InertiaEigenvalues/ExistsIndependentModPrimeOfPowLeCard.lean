@@ -8,9 +8,12 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_linearIndependent_of_pow_le_card_zmod (l : ℕ) [Fact l.Prime] {Q ι : Type} [AddCommGroup Q] [Module (ZMod l) Q]
-    (Z : Finset ι) (w : ι → Q) (hinj : Set.InjOn w Z) (h : ℕ) (hcard : l ^ h ≤ Z.card) :
-    ∃ x : Fin h → ι, (∀ a, x a ∈ Z) ∧ LinearIndependent (ZMod l) (fun a => w (x a)) := by
+theorem exists_linearIndependent_of_pow_le_card_zmod
+    (l : ℕ) [Fact l.Prime]
+    {Q ι : Type} [AddCommGroup Q] [Module (ZMod l) Q]
+    (Z : Finset ι) (w : ι → Q) (hinj : Set.InjOn w Z)
+    (h : ℕ) (hcard : l ^ h ≤ Z.card)
+    : ∃ x : Fin h → ι, (∀ a, x a ∈ Z) ∧ LinearIndependent (ZMod l) (fun a => w (x a)) := by
   classical
   have hl1 : 1 < l := (Fact.out : l.Prime).one_lt
   have hs : (Z.image w).card = Z.card := Finset.card_image_of_injOn hinj
@@ -24,12 +27,15 @@ theorem exists_linearIndependent_of_pow_le_card_zmod (l : ℕ) [Fact l.Prime] {Q
     rw [← Subtype.range_coe (s := b)] at hy'
     exact (Submodule.mem_span_range_iff_exists_fun (ZMod l)).1 hy'
   have hle : (Z.image w).card ≤ l ^ Fintype.card b := by
-    have h3 : (Z.image w).card ≤ (Finset.univ.image (fun f : b → ZMod l => ∑ c, f c • (c : Q))).card := by
+    have h3
+        : (Z.image w).card
+          ≤ (Finset.univ.image (fun f : b → ZMod l => ∑ c, f c • (c : Q))).card := by
       apply Finset.card_le_card
       intro y hy
       obtain ⟨f, hf⟩ := hrange y hy
       exact Finset.mem_image.2 ⟨f, Finset.mem_univ _, hf⟩
-    calc _ ≤ _ := h3
+    calc
+      _ ≤ _ := h3
       _ ≤ (Finset.univ : Finset (b → ZMod l)).card := Finset.card_image_le
       _ = l ^ Fintype.card b := by rw [Finset.card_univ, Fintype.card_fun, ZMod.card]
   have hhb : h ≤ Fintype.card b := by
@@ -44,10 +50,12 @@ theorem exists_linearIndependent_of_pow_le_card_zmod (l : ℕ) [Fact l.Prime] {Q
   funext a
   exact hgw (e a)
 
-theorem ph_a_basis : ∀ (l : ℕ) [Fact l.Prime] (V ι : Type) [AddCommGroup V] (K' : AddSubgroup V) (h : ℕ)
-    (Z : Finset ι) (v : ι → V), (∀ x : V, l • x = 0) → l ^ h ≤ Z.card →
-    (∀ i ∈ Z, ∀ i' ∈ Z, i ≠ i' → v i - v i' ∉ K') →
-    ∃ x : Fin h → ι, (∀ a, x a ∈ Z) ∧ ∀ n : Fin h → ℕ, ∑ a, n a • v (x a) ∈ K' → ∀ a, l ∣ n a := by
+theorem ph_a_basis
+    : ∀ (l : ℕ) [Fact l.Prime] (V ι : Type) [AddCommGroup V] (K' : AddSubgroup V) (h : ℕ)
+        (Z : Finset ι) (v : ι → V),
+      (∀ x : V, l • x = 0) → l ^ h ≤ Z.card → (∀ i ∈ Z, ∀ i' ∈ Z, i ≠ i' → v i - v i' ∉ K')
+        → ∃ x : Fin h → ι,
+          (∀ a, x a ∈ Z) ∧ ∀ n : Fin h → ℕ, ∑ a, n a • v (x a) ∈ K' → ∀ a, l ∣ n a := by
   intro l _ V ι _ K' h Z v hl hcard hdist
   have hQ : ∀ y : V ⧸ K', l • y = 0 := by
     intro y
@@ -58,10 +66,12 @@ theorem ph_a_basis : ∀ (l : ℕ) [Fact l.Prime] (V ι : Type) [AddCommGroup V]
     intro i hi i' hi' he
     by_contra hne
     exact hdist i hi i' hi' hne ((QuotientAddGroup.eq_iff_sub_mem).1 he)
-  obtain ⟨x, hxZ, hli⟩ := exists_linearIndependent_of_pow_le_card_zmod l Z (fun i => (v i : V ⧸ K')) hinj h hcard
+  obtain ⟨x, hxZ, hli⟩ :=
+    exists_linearIndependent_of_pow_le_card_zmod l Z (fun i => (v i : V ⧸ K')) hinj h hcard
   refine ⟨x, hxZ, ?_⟩
   intro n hn a
-  have hm : QuotientAddGroup.mk' K' (∑ a, n a • v (x a)) = 0 := (QuotientAddGroup.eq_zero_iff _).2 hn
+  have hm : QuotientAddGroup.mk' K' (∑ a, n a • v (x a)) = 0 :=
+    (QuotientAddGroup.eq_zero_iff _).2 hn
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum] at hm
   simp only [map_nsmul, QuotientAddGroup.mk'_apply] at hm

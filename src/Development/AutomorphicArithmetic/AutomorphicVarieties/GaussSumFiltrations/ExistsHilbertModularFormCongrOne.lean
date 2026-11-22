@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 namespace UpperTheory.V
 
-theorem Published.exists_hilbertModularForm_congr_one : Published.HilbertOne := GlobalTheory.HilbertThetaSeries.hilbertOne
+theorem Published.exists_hilbertModularForm_congr_one : Published.HilbertOne :=
+  GlobalTheory.HilbertThetaSeries.hilbertOne
 
 theorem Lit.oneUse : Lit.OneUse := Lit.oneUse_of Published.exists_hilbertModularForm_congr_one
 

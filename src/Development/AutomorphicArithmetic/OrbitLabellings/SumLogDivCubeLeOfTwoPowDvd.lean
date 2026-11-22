@@ -49,16 +49,21 @@ private lemma sum_inv_sq_range_le (M : ℕ) : ∑ u ∈ Finset.range (M + 2), (1
     push_cast
     linarith
 
-theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd :
-    ∀ (e : ℕ), 1 ≤ e → ∀ S : Finset ℕ, (∀ l ∈ S, (2 ^ (e + 2) : ℤ) ∣ (l : ℤ) - 1 ∨ (2 ^ (e + 2) : ℤ) ∣ (l : ℤ) + 1) →
-    ∑ l ∈ S, Real.log l / (l : ℝ) ^ 3 ≤ Real.log ((2 : ℝ) ^ e) / ((2 : ℝ) ^ e) ^ 3 := by
+theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd
+    : ∀ (e : ℕ),
+      1 ≤ e
+        → ∀ S : Finset ℕ,
+          (∀ l ∈ S, (2 ^ (e + 2) : ℤ) ∣ (l : ℤ) - 1 ∨ (2 ^ (e + 2) : ℤ) ∣ (l : ℤ) + 1)
+            → ∑ l ∈ S, Real.log l / (l : ℝ) ^ 3 ≤ Real.log ((2 : ℝ) ^ e) / ((2 : ℝ) ^ e) ^ 3 := by
   intro e he S hS
   classical
   set N : ℕ := 2 ^ (e + 2) with hN
   have hN1 : 1 ≤ N := Nat.one_le_two_pow
   have hNR : (N : ℝ) = 4 * (2 : ℝ) ^ e := by rw [hN]; push_cast; ring
   have hn : (2 : ℝ) ≤ 2 ^ e := by
-    calc (2 : ℝ) = 2 ^ 1 := by norm_num
+    calc
+      (2 : ℝ)
+        = 2 ^ 1 := by norm_num
       _ ≤ 2 ^ e := pow_le_pow_right₀ (by norm_num) he
   set f : ℕ → ℝ := fun l => Real.log l / (l : ℝ) ^ 3 with hf
   have hf0 : ∀ l, 0 ≤ f l := fun l => div_nonneg (Real.log_natCast_nonneg l) (by positivity)
@@ -71,7 +76,8 @@ theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd :
     have hlM : l ≤ M := Finset.le_sup (f := id) hl
     have hZ : (2 ^ (e + 2) : ℤ) = (N : ℤ) := by rw [hN]; push_cast; ring
     have hN2 : 2 ≤ N := by
-      calc 2 = 2 ^ 1 := by norm_num
+      calc
+        2 = 2 ^ 1 := by norm_num
         _ ≤ 2 ^ (e + 2) := Nat.pow_le_pow_right (by norm_num) (by omega)
     rw [Finset.mem_union, Finset.mem_image, Finset.mem_image]
     rcases hS l hl with h | h
@@ -84,20 +90,20 @@ theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd :
           have := Int.le_of_dvd (by norm_num) h'
           omega
         · exact h0
-      have h' : N ∣ l - 1 := by
-        rw [← Int.natCast_dvd_natCast, Nat.cast_sub hl1]; simpa using h
+      have h' : N ∣ l - 1 := by rw [← Int.natCast_dvd_natCast, Nat.cast_sub hl1]; simpa using h
       obtain ⟨u, hu⟩ := h'
       refine ⟨u, ?_, by omega⟩
       have : u ≤ N * u := Nat.le_mul_of_pos_left u hN1
-      rw [hR, Finset.mem_range]; omega
+      rw [hR, Finset.mem_range]
+      omega
     · right
       rw [hZ] at h
-      have h' : N ∣ l + 1 := by
-        rw [← Int.natCast_dvd_natCast]; simpa using h
+      have h' : N ∣ l + 1 := by rw [← Int.natCast_dvd_natCast]; simpa using h
       obtain ⟨u, hu⟩ := h'
       refine ⟨u, ?_, by omega⟩
       have : u ≤ N * u := Nat.le_mul_of_pos_left u hN1
-      rw [hR, Finset.mem_range]; omega
+      rw [hR, Finset.mem_range]
+      omega
   have hb : ∑ u ∈ R, c * (1 / 4 * (1 / (u : ℝ) ^ 2)) ≤ c / 2 := by
     rw [← Finset.mul_sum, ← Finset.mul_sum]
     have h1 := sum_inv_sq_range_le M
@@ -110,7 +116,9 @@ theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd :
     rcases Nat.eq_zero_or_pos u with rfl | h0
     · simp [hf]
     · refine log_div_cube_le_scaled _ _ _ hn (by exact_mod_cast h0) ?_
-      push_cast; rw [hNR]; linarith
+      push_cast
+      rw [hNR]
+      linarith
   have hB : ∑ l ∈ R.image (fun u => N * u - 1), f l ≤ c / 2 := by
     refine (Finset.sum_image_le_of_nonneg (fun l _ => hf0 l)).trans (le_trans ?_ hb)
     refine Finset.sum_le_sum fun u _ => ?_
@@ -119,9 +127,12 @@ theorem UpperTheory.sum_log_div_cube_le_of_two_pow_dvd :
     · refine log_div_cube_le_scaled _ _ _ hn (by exact_mod_cast h0) ?_
       have : 1 ≤ N * u := Nat.mul_pos hN1 h0
       rw [Nat.cast_sub this]
-      push_cast; rw [hNR]
+      push_cast
+      rw [hNR]
   have h1 : ∑ l ∈ S, f l ≤ _ := Finset.sum_le_sum_of_subset_of_nonneg hsub (fun l _ _ => hf0 l)
-  have h2 := Finset.sum_union_inter (s₁ := R.image (fun u => N * u + 1)) (s₂ := R.image (fun u => N * u - 1)) (f := f)
+  have h2 :=
+    Finset.sum_union_inter (s₁ := R.image (fun u => N * u + 1)) (s₂ := R.image (fun u => N * u - 1))
+      (f := f)
   have h3 : 0 ≤ ∑ l ∈ R.image (fun u => N * u + 1) ∩ R.image (fun u => N * u - 1), f l :=
     Finset.sum_nonneg fun l _ => hf0 l
   linarith

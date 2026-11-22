@@ -12,9 +12,12 @@ namespace UpperTheory.V.W
 
 structure Det (n : ℕ) (A E : Type) [CommRing A] [Ring E] [Algebra A E] : Type 1 where
   D : ∀ (B : Type) [CommRing B] [Algebra A B], B ⊗[A] E →* B
-  nat : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B') (x : B ⊗[A] E),
-    D B' (Algebra.TensorProduct.map f (AlgHom.id A E) x) = f (D B x)
-  homog : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : B ⊗[A] E), D B (b • x) = b ^ n * D B x
+  nat
+    : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B')
+        (x : B ⊗[A] E),
+      D B' (Algebra.TensorProduct.map f (AlgHom.id A E) x) = f (D B x)
+  homog
+    : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : B ⊗[A] E), D B (b • x) = b ^ n * D B x
 
 namespace Det
 
@@ -32,7 +35,8 @@ def Kills (y : E) : Prop :=
 def pull {E' : Type} [Ring E'] [Algebra A E'] (φ : E' →ₐ[A] E) : Det n A E' where
   D B _ _ := (D.D B).comp (Algebra.TensorProduct.map (AlgHom.id B B) φ).toMonoidHom
   nat B B' _ _ _ _ f x := by
-    change D.D B' (Algebra.TensorProduct.map (AlgHom.id B' B') φ _) = f (D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ x))
+    change D.D B' (Algebra.TensorProduct.map (AlgHom.id B' B') φ _)
+      = f (D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ x))
     rw [← D.nat]
     congr 1
     induction x using TensorProduct.induction_on with
@@ -40,23 +44,30 @@ def pull {E' : Type} [Ring E'] [Algebra A E'] (φ : E' →ₐ[A] E) : Det n A E'
     | tmul a b => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
   homog B _ _ b x := by
-    change D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ (b • x)) = b ^ n * D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ x)
+    change D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ (b • x))
+      = b ^ n * D.D B (Algebra.TensorProduct.map (AlgHom.id B B) φ x)
     rw [map_smul, D.homog]
 
 end Det
 
 structure GDet (n : ℕ) (A G : Type) [CommRing A] [Group G] : Type 1 where
   D : ∀ (B : Type) [CommRing B] [Algebra A B], MonoidAlgebra B G →* B
-  nat : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B') (x : MonoidAlgebra B G),
-    D B' (MonoidAlgebra.mapRingHom G (f : B →+* B') x) = f (D B x)
-  homog : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : MonoidAlgebra B G), D B (b • x) = b ^ n * D B x
+  nat
+    : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B')
+        (x : MonoidAlgebra B G),
+      D B' (MonoidAlgebra.mapRingHom G (f : B →+* B') x) = f (D B x)
+  homog
+    : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : MonoidAlgebra B G),
+      D B (b • x) = b ^ n * D B x
 
 namespace GDet
 
 variable {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G)
 
-@[ext] theorem ext {D D' : GDet n A G}
-    (h : ∀ (B : Type) [CommRing B] [Algebra A B] (x), D.D B x = D'.D B x) : D = D' := by
+@[ext]
+theorem ext
+    {D D' : GDet n A G} (h : ∀ (B : Type) [CommRing B] [Algebra A B] (x), D.D B x = D'.D B x)
+    : D = D' := by
   cases D; cases D'; congr; funext B _ _; exact MonoidHom.ext (h B)
 
 def map {A' : Type} [CommRing A'] (f : A →+* A') : GDet n A' G where
@@ -70,7 +81,8 @@ def map {A' : Type} [CommRing A'] (f : A →+* A') : GDet n A' G where
 def comap {H : Type} [Group H] (φ : H →* G) : GDet n A H where
   D B _ _ := (D.D B).comp (MonoidAlgebra.mapDomainRingHom B φ).toMonoidHom
   nat B B' _ _ _ _ f x := by
-    change D.D B' (MonoidAlgebra.mapDomainRingHom B' φ _) = f (D.D B (MonoidAlgebra.mapDomainRingHom B φ x))
+    change D.D B' (MonoidAlgebra.mapDomainRingHom B' φ _)
+      = f (D.D B (MonoidAlgebra.mapDomainRingHom B φ x))
     rw [← D.nat]
     congr 1
     induction x using MonoidAlgebra.induction_linear with
@@ -78,11 +90,15 @@ def comap {H : Type} [Group H] (φ : H →* G) : GDet n A H where
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | single g r => simp
   homog B _ _ b x := by
-    change D.D B (MonoidAlgebra.mapDomainAlgHom B B φ (b • x)) = b ^ n * D.D B (MonoidAlgebra.mapDomainAlgHom B B φ x)
+    change D.D B (MonoidAlgebra.mapDomainAlgHom B B φ (b • x))
+      = b ^ n * D.D B (MonoidAlgebra.mapDomainAlgHom B B φ x)
     rw [map_smul, D.homog]
 
-def repAlg {ι : Type} [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι A) (B : Type) [CommRing B] [Algebra A B] :
-    MonoidAlgebra B G →ₐ[B] Matrix ι ι B :=
+def repAlg
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (ρ : G →* Matrix ι ι A)
+    (B : Type) [CommRing B] [Algebra A B]
+    : MonoidAlgebra B G →ₐ[B] Matrix ι ι B :=
   MonoidAlgebra.lift B (Matrix ι ι B) G ((RingHom.mapMatrix (algebraMap A B)).toMonoidHom.comp ρ)
 
 def ofRep (ρ : G →* Matrix (Fin n) (Fin n) A) : GDet n A G where
@@ -99,7 +115,8 @@ def ofRep (ρ : G →* Matrix (Fin n) (Fin n) A) : GDet n A G where
     change (repAlg ρ B (b • x)).det = b ^ n * (repAlg ρ B x).det
     rw [map_smul, Matrix.det_smul, Fintype.card_fin]
 
-def chi (y : MonoidAlgebra A G) : A[X] := D.D A[X] (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y)
+def chi (y : MonoidAlgebra A G) : A[X] :=
+  D.D A[X] (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y)
 
 def lam (i : ℕ) (y : MonoidAlgebra A G) : A := (-1) ^ i * (D.chi y).coeff (n - i)
 
@@ -119,12 +136,15 @@ def CH : Set (MonoidAlgebra A G) :=
 
 variable [TopologicalSpace G]
 
-def IsCont (I : Ideal A) : Prop := ∀ i, Alg.AdicCont I fun g : G => D.lam i (MonoidAlgebra.single g 1)
+def IsCont (I : Ideal A) : Prop :=
+  ∀ i, Alg.AdicCont I fun g : G => D.lam i (MonoidAlgebra.single g 1)
 
 end GDet
 
-def closureIdeal {A G : Type} [CommRing A] [Group G] [TopologicalSpace G] (I : Ideal A) (S : Set (MonoidAlgebra A G)) :
-    TwoSidedIdeal (MonoidAlgebra A G) :=
+def closureIdeal
+    {A G : Type} [CommRing A] [Group G] [TopologicalSpace G]
+    (I : Ideal A) (S : Set (MonoidAlgebra A G))
+    : TwoSidedIdeal (MonoidAlgebra A G) :=
   ⨅ (N : ℕ) (H : OpenNormalSubgroup G), TwoSidedIdeal.span
     (S ∪ {z | ∃ a ∈ I ^ N, z = MonoidAlgebra.single 1 a} ∪ {z | ∃ h ∈ H, z = MonoidAlgebra.single h 1 - 1})
 

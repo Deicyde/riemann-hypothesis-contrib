@@ -12,14 +12,15 @@ section PolyChart
 
 variable {K F₀ : Type} (V : Type) [Field K] [Field F₀] [Algebra K F₀] (R₀ : Subalgebra K F₀)
 
-noncomputable def polyChartHom :
-    MvPolynomial V R₀ →ₐ[K] FractionRing (MvPolynomial V F₀) :=
+noncomputable def polyChartHom : MvPolynomial V R₀ →ₐ[K] FractionRing (MvPolynomial V F₀) :=
   (IsScalarTower.toAlgHom K (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀))).comp
     (MvPolynomial.mapAlgHom R₀.val)
 
-theorem polyChartHom_apply (p : MvPolynomial V R₀) :
-    polyChartHom V R₀ p = algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀))
-      (MvPolynomial.map (R₀.val : R₀ →+* F₀) p) := rfl
+theorem polyChartHom_apply (p : MvPolynomial V R₀)
+    : polyChartHom V R₀ p
+      = algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀))
+        (MvPolynomial.map (R₀.val : R₀ →+* F₀) p) :=
+  rfl
 
 theorem polyChartHom_injective : Function.Injective (polyChartHom V R₀) := by
   intro p q h
@@ -27,22 +28,23 @@ theorem polyChartHom_injective : Function.Injective (polyChartHom V R₀) := by
   exact MvPolynomial.map_injective _ Subtype.val_injective
     (IsFractionRing.injective (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀)) h)
 
-theorem polyChartHom_C (a : R₀) :
-    polyChartHom V R₀ (C a) = algebraMap F₀ (FractionRing (MvPolynomial V F₀)) a := by
+theorem polyChartHom_C (a : R₀)
+    : polyChartHom V R₀ (C a) = algebraMap F₀ (FractionRing (MvPolynomial V F₀)) a := by
   rw [polyChartHom_apply, MvPolynomial.map_C,
     IsScalarTower.algebraMap_apply F₀ (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀))]
   rfl
 
-theorem polyChartHom_X (v : V) :
-    polyChartHom V R₀ (X v) =
-      algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀)) (X v) := by
+theorem polyChartHom_X (v : V)
+    : polyChartHom V R₀ (X v)
+      = algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀)) (X v) := by
   rw [polyChartHom_apply, MvPolynomial.map_X]
 
-theorem polyChartHom_range :
-    (polyChartHom V R₀).range = Algebra.adjoin K
-      ((algebraMap F₀ (FractionRing (MvPolynomial V F₀))) '' (R₀ : Set F₀) ∪
-        Set.range fun v : V =>
-          algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀)) (X v)) := by
+theorem polyChartHom_range
+    : (polyChartHom V R₀).range
+      = Algebra.adjoin K
+        ((algebraMap F₀ (FractionRing (MvPolynomial V F₀))) '' (R₀ : Set F₀)
+          ∪ Set.range fun v : V =>
+            algebraMap (MvPolynomial V F₀) (FractionRing (MvPolynomial V F₀)) (X v)) := by
   apply le_antisymm
   · rintro _ ⟨p, rfl⟩
     change polyChartHom V R₀ p ∈ _
@@ -50,7 +52,8 @@ theorem polyChartHom_range :
     | C a =>
       rw [polyChartHom_C]
       exact Algebra.subset_adjoin (Or.inl ⟨a, a.2, rfl⟩)
-    | add p q hp hq => rw [map_add]; exact add_mem hp hq
+    | add p q hp hq =>
+      rw [map_add]; exact add_mem hp hq
     | mul_X p v hp =>
       rw [map_mul, polyChartHom_X]
       exact mul_mem hp (Algebra.subset_adjoin (Or.inr ⟨v, rfl⟩))
@@ -59,10 +62,11 @@ theorem polyChartHom_range :
     · exact ⟨C ⟨a, ha⟩, polyChartHom_C V R₀ ⟨a, ha⟩⟩
     · exact ⟨X v, polyChartHom_X V R₀ v⟩
 
-theorem polyChart_clear (h : ∀ x : F₀, ∃ a ∈ R₀, ∃ b ∈ R₀, b ≠ 0 ∧ x * b = a)
-    (p : MvPolynomial V F₀) :
-    ∃ b : R₀, (b : F₀) ≠ 0 ∧ ∃ q : MvPolynomial V R₀,
-      p * C (b : F₀) = MvPolynomial.map (R₀.val : R₀ →+* F₀) q := by
+theorem polyChart_clear
+    (h : ∀ x : F₀, ∃ a ∈ R₀, ∃ b ∈ R₀, b ≠ 0 ∧ x * b = a) (p : MvPolynomial V F₀)
+    : ∃ b : R₀,
+      (b : F₀) ≠ 0
+        ∧ ∃ q : MvPolynomial V R₀, p * C (b : F₀) = MvPolynomial.map (R₀.val : R₀ →+* F₀) q := by
   induction p using MvPolynomial.induction_on with
   | C x =>
     obtain ⟨a, ha, b, hb, hb0, e⟩ := h x

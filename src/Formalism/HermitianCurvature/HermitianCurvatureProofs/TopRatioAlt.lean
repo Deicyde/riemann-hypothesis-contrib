@@ -23,7 +23,8 @@ theorem topRatio : TopRatio := by
   set α := S.cutLo v with hα
   set β := S.cutHi v with hβ
 
-  have hycut : I.OnCut (D.parOf S v).u (D.parOf S v).u' (S.l + 1) y := PBF.cutWord_mem (D.parOf S v) hcut (List.mem_cons_self)
+  have hycut : I.OnCut (D.parOf S v).u (D.parOf S v).u' (S.l + 1) y :=
+    PBF.cutWord_mem (D.parOf S v) hcut (List.mem_cons_self)
   obtain ⟨m, hm⟩ := hgr
   obtain ⟨hlenI, hpos, -, -, -, hlast⟩ := hGo v
   obtain ⟨hm1, hmN, hgl, hgu⟩ := hpos m y hm
@@ -41,7 +42,8 @@ theorem topRatio : TopRatio := by
     unfold C.gridL at hgu
     have hmN' : (m : ℝ) ≤ S.Ntop := by exact_mod_cast hmN
     have hN0 : (0 : ℝ) < S.Ntop := by linarith
-    have h6 : (2 * (m : ℝ) - 2) * ((β - α) / (6 * S.Ntop)) + (β - α) / (6 * S.Ntop) ≤ (β - α) / 3 := by
+    have h6
+        : (2 * (m : ℝ) - 2) * ((β - α) / (6 * S.Ntop)) + (β - α) / (6 * S.Ntop) ≤ (β - α) / 3 := by
       have hX : 0 ≤ (β - α) / (6 * S.Ntop) := by positivity
       have e2 : (2 * (S.Ntop : ℝ)) * ((β - α) / (6 * S.Ntop)) = (β - α) / 3 := by field_simp; ring
       have := mul_le_mul_of_nonneg_right (show 2 * (m : ℝ) - 1 ≤ 2 * S.Ntop by linarith) hX
@@ -60,7 +62,8 @@ theorem topRatio : TopRatio := by
   have hLQ : Real.exp (-(1 / 2)) ≤ Wd.qw q' wr y / q' y := by
     have h4 : 4 ≤ S.Ntop := by exact_mod_cast (by linarith : (4 : ℝ) ≤ S.Ntop)
     have hlen' : wr.length ≤ S.Ntop := by simp [hwr, D.positionted]; omega
-    refine (lemma_Q_estimate (Fin w.length) q' wr S.Ntop ((S.Ntop : ℝ) ^ 2 + 1) y h4 hlen' le_rfl ?_ hqy.ne').1
+    refine (lemma_Q_estimate (Fin w.length) q' wr S.Ntop ((S.Ntop : ℝ) ^ 2 + 1) y h4 hlen' le_rfl ?_
+      hqy.ne').1
     intro l hl
     obtain ⟨l0, hl0, rfl⟩ := List.mem_map.1 hl
     unfold D.positionted at hl0
@@ -78,8 +81,12 @@ theorem topRatio : TopRatio := by
   set rf : Fin w.length → ℝ := fun j => if e j = 0 then
       (if (w.get j).1 then (y + 1 - (w.get j).2) / (y - (w.get j).2)
         else ((w.get j).2 - y - 1) / ((w.get j).2 - y - 2)) else 1 with hrf
-  have hxs : Fr.xs (fun Y => M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ Y) (D.positionted w) e ((y : ℂ) + 1) =
-      (M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ ((y : ℂ) + 1)) * ((∏ j, rf j : ℝ) : ℂ) := by
+  have hxs
+      : Fr.xs
+          (fun Y => M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ Y)
+          (D.positionted w) e ((y : ℂ) + 1)
+        = (M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ ((y : ℂ) + 1))
+          * ((∏ j, rf j : ℝ) : ℂ) := by
     rw [xs_eq_prod]
     congr 1
     unfold D.positionted
@@ -95,34 +102,43 @@ theorem topRatio : TopRatio := by
       · simp only [hb, Bool.false_eq_true, if_false]; push_cast; ring
     · simp only [he, if_false, Complex.ofReal_one]
   set x0r : ℝ := (-1 : ℝ) ^ (S.G.k - (S.l + 1)) * I.xpoly S.G.k (M.rho (D.parOf S v) ρ) (y + 1) with hx0r
-  have hx0 : M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ ((y : ℂ) + 1) = ((x0r : ℝ) : ℂ) := by
+  have hx0
+      : M.sgn (D.parOf S v) (S.l + 1) * M.xC (D.parOf S v) ρ ((y : ℂ) + 1) = ((x0r : ℝ) : ℂ) := by
     simp only [hx0r, M.sgn, M.xC, I.xpoly, D.parOf]
     push_cast
     rfl
   have hinter := Formalism.FourierDecayAlt.P.types_interlace (D.parOf S v) hOK ρ
-  have hx0pos : 0 < x0r := Formalism.FourierDecayAlt.P.interlacing_sign S.G.k (D.parOf S v).u (D.parOf S v).u' (M.rho (D.parOf S v) ρ) (S.l + 1) y (by omega)
-    (by omega) hinter hycut 1 (by simp)
+  have hx0pos : 0 < x0r :=
+    Formalism.FourierDecayAlt.P.interlacing_sign S.G.k (D.parOf S v).u (D.parOf S v).u'
+      (M.rho (D.parOf S v) ρ) (S.l + 1) y (by omega) (by omega) hinter hycut 1 (by simp)
   have hD2 : (2 : ℝ) ≤ (S.Ntop : ℝ) ^ 2 - 1 := by nlinarith
   have hrf : ∀ j, 0 < rf j ∧ rf j ≤ 1 + 1 / ((S.Ntop : ℝ) ^ 2 - 1) := by
     intro j
     simp only [hrf]
     by_cases he : e j = 0
     · simp only [he, if_true]
-      exact phiL_bound (w.get j).1 (w.get j).2 y _ hD2 (by linarith [(hfar (w.get j) (List.get_mem _ _)).1])
+      exact phiL_bound (w.get j).1 (w.get j).2 y _ hD2
+        (by linarith [(hfar (w.get j) (List.get_mem _ _)).1])
     · simp only [he, if_false]
-      exact ⟨one_pos, by have : (0 : ℝ) ≤ 1 / ((S.Ntop : ℝ) ^ 2 - 1) := by positivity
-                         linarith⟩
+      exact ⟨
+        one_pos,
+        by
+          have : (0 : ℝ) ≤ 1 / ((S.Ntop : ℝ) ^ 2 - 1) := by positivity
+          linarith
+      ⟩
   have hF0 : 0 < ∏ j, rf j := Finset.prod_pos fun j _ => (hrf j).1
   have hF1 : ∏ j, rf j ≤ Real.exp ((S.Ntop : ℝ) / ((S.Ntop : ℝ) ^ 2 - 1)) := by
-    calc ∏ j, rf j ≤ ∏ _j : Fin w.length, (1 + 1 / ((S.Ntop : ℝ) ^ 2 - 1)) :=
-          Finset.prod_le_prod₀ (fun j _ => (hrf j).1.le) fun j _ => (hrf j).2
+    calc
+      ∏ j, rf j ≤ ∏ _j : Fin w.length, (1 + 1 / ((S.Ntop : ℝ) ^ 2 - 1)) :=
+        Finset.prod_le_prod₀ (fun j _ => (hrf j).1.le) fun j _ => (hrf j).2
       _ = (1 + 1 / ((S.Ntop : ℝ) ^ 2 - 1)) ^ w.length := by simp
-      _ ≤ Real.exp (w.length * (1 / ((S.Ntop : ℝ) ^ 2 - 1))) := one_add_pow_le_exp _ (by positivity) _
+      _ ≤ Real.exp (w.length * (1 / ((S.Ntop : ℝ) ^ 2 - 1))) :=
+        one_add_pow_le_exp _ (by positivity) _
       _ ≤ Real.exp ((S.Ntop : ℝ) / ((S.Ntop : ℝ) ^ 2 - 1)) := by
-          apply Real.exp_le_exp.2
-          rw [mul_one_div]
-          apply div_le_div_of_nonneg_right _ (by linarith)
-          exact_mod_cast hlen.le
+        apply Real.exp_le_exp.2
+        rw [mul_one_div]
+        apply div_le_div_of_nonneg_right _ (by linarith)
+        exact_mod_cast hlen.le
 
   have hR : topR (S.l + 1) w e ρ y = ((Wd.qw q' wr y / (x0r * ∏ j, rf j) : ℝ) : ℂ) := by
     unfold topR
@@ -140,19 +156,25 @@ theorem topRatio : TopRatio := by
   obtain ⟨hg, hk⟩ := glob_posT hB
   have hsA := supA_nonneg S hg hk v false
 
-  have hIR := Formalism.FourierDecayAlt.P.interlacing_ratio S.G.k (D.parOf S v).u (D.parOf S v).u' (M.rho (D.parOf S v) ρ)
-    (S.l + 1) y (by omega) (by omega) hinter hycut
-  have hul : 1 ≤ |y + 1 / 2 + (D.parOf S v).u (S.l + 1)| * |y + 1 / 2 + (D.parOf S v).u' (S.l + 1)| := by
+  have hIR :=
+    Formalism.FourierDecayAlt.P.interlacing_ratio S.G.k (D.parOf S v).u (D.parOf S v).u'
+      (M.rho (D.parOf S v) ρ) (S.l + 1) y (by omega) (by omega) hinter hycut
+  have hul
+      : 1 ≤ |y + 1 / 2 + (D.parOf S v).u (S.l + 1)| * |y + 1 / 2 + (D.parOf S v).u' (S.l + 1)| := by
     rcases hycut with ⟨h1, h2⟩ | ⟨h1, h2⟩
     · rw [abs_of_neg (by linarith), abs_of_pos (by linarith)]; nlinarith
     · rw [abs_of_pos (by linarith), abs_of_neg (by linarith)]; nlinarith
-  have hqprod : q' y = -(S.T * S.T') * ((∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u i)) *
-      ∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u' i)) := by
+  have hqprod
+      : q' y
+        = -(S.T * S.T')
+          * ((∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u i))
+            * ∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u' i)) := by
     simp only [hq']
     rw [PBF.qC_ofReal, Complex.ofReal_re, ← Finset.prod_mul_distrib]
   have hx0sq : x0r ^ 2 ≤ q' y / (S.T * S.T') := by
     have e1 : x0r ^ 2 = I.xpoly S.G.k (M.rho (D.parOf S v) ρ) (y + 1) ^ 2 := by
-      rw [hx0r, mul_pow, ← pow_mul, mul_comm (S.G.k - (S.l + 1)) 2, pow_mul, neg_one_sq, one_pow, one_mul]
+      rw [hx0r, mul_pow, ← pow_mul, mul_comm (S.G.k - (S.l + 1)) 2, pow_mul, neg_one_sq, one_pow,
+        one_mul]
     have hq := hqy
     change 0 < q' y at hq
     rw [hqprod] at hq
@@ -160,7 +182,9 @@ theorem topRatio : TopRatio := by
     generalize (∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u i)) = A at hq hIR ⊢
     generalize (∏ i ∈ Icc 1 S.G.k, (y + 1 / 2 + (D.parOf S v).u' i)) = B at hq hIR ⊢
     generalize I.xpoly S.G.k (M.rho (D.parOf S v) ρ) (y + 1) = X at hIR ⊢
-    generalize |y + 1 / 2 + (D.parOf S v).u (S.l + 1)| * |y + 1 / 2 + (D.parOf S v).u' (S.l + 1)| = U at hIR hul
+    generalize |y + 1 / 2 + (D.parOf S v).u (S.l + 1)| * |y + 1 / 2 + (D.parOf S v).u' (S.l + 1)|
+        = U
+      at hIR hul
     have hAB : A * B < 0 := by
       by_contra h
       push_neg at h
@@ -170,7 +194,9 @@ theorem topRatio : TopRatio := by
     rw [abs_of_neg hAB] at hIR
     have hX2 : 0 ≤ X ^ 2 := sq_nonneg X
     have h1 : X ^ 2 ≤ -(A * B) :=
-      calc X ^ 2 = X ^ 2 * 1 := (mul_one _).symm
+      calc
+        X ^ 2
+          = X ^ 2 * 1 := (mul_one _).symm
         _ ≤ X ^ 2 * U := mul_le_mul_of_nonneg_left hul hX2
         _ ≤ -(A * B) := hIR
     have h5 := mul_le_mul_of_nonneg_left h1 hTT.le
@@ -178,13 +204,14 @@ theorem topRatio : TopRatio := by
     rw [h6, mul_comm (X ^ 2)]
     exact h5
 
-  have hroot : ∀ t ∈ Icc 1 (Cf.k + Cf.m - 1), -Cf.lam t < α ∨ β < -Cf.lam t := by
+  have hroot : ∀ t ∈ Icc 1 (Cf.k + Cf.m - 1), - Cf.lam t < α ∨ β < - Cf.lam t := by
     intro t ht
     by_contra hcon
     push_neg at hcon
-    have hmem : -Cf.lam t ∈ Cf.cutI S.l := by rw [hCf, cutI_eq]; exact ⟨hcon.1, hcon.2⟩
-    have hfac := (Formalism.FourierDecayAlt.P.betaFactorisation Cf S.de S.de' S.G.ka S.T S.T' (-Cf.lam t) S.l (hOkp v)
-      hw hw' hT hT' hl1 hlk hne hmem).2.1
+    have hmem : - Cf.lam t ∈ Cf.cutI S.l := by rw [hCf, cutI_eq]; exact ⟨hcon.1, hcon.2⟩
+    have hfac :=
+      (Formalism.FourierDecayAlt.P.betaFactorisation Cf S.de S.de' S.G.ka S.T S.T' (- Cf.lam t) S.l
+        (hOkp v) hw hw' hT hT' hl1 hlk hne hmem).2.1
     apply hfac
     unfold Sz.Cfg.P
     exact Finset.prod_eq_zero ht (by ring)
@@ -217,7 +244,8 @@ theorem topRatio : TopRatio := by
     linarith
   have hF2 : F ^ 2 ≤ E1 := by
     have hN20' : (20 : ℝ) ≤ S.Ntop := hN20
-    have h1 : F ^ 2 ≤ Real.exp ((S.Ntop : ℝ) / ((S.Ntop : ℝ) ^ 2 - 1)) ^ 2 := pow_le_pow_left₀ hF0.le hF1 2
+    have h1 : F ^ 2 ≤ Real.exp ((S.Ntop : ℝ) / ((S.Ntop : ℝ) ^ 2 - 1)) ^ 2 :=
+      pow_le_pow_left₀ hF0.le hF1 2
     refine h1.trans ?_
     rw [← Real.exp_nat_mul, hE1]
     exact Real.exp_le_exp.2 (two_N_bound _ hN20').2
@@ -235,24 +263,32 @@ theorem topRatio : TopRatio := by
     have h1 : S.P v y ^ 2 = |S.P v y| * |S.P v y| := by rw [sq, abs_mul_abs_self]
     have h2 : |S.P v y| * |S.P v y| ≤ |S.P v y| * ((1 + 3 / (β - α)) ^ n * |S.P v (y + 1)|) :=
       mul_le_mul_of_nonneg_left hPr (abs_nonneg _)
-    have h3 : |S.P v y| * ((1 + 3 / (β - α)) ^ n * |S.P v (y + 1)|) =
-        (1 + 3 / (β - α)) ^ n * (Cf.core S.de S.de' S.T S.T' y ^ 2 * q' y) := by
+    have h3
+        : |S.P v y| * ((1 + 3 / (β - α)) ^ n * |S.P v (y + 1)|)
+          = (1 + 3 / (β - α)) ^ n * (Cf.core S.de S.de' S.T S.T' y ^ 2 * q' y) := by
       rw [← hcore2, abs_mul]; ring
-    have h4 : Cf.core S.de S.de' S.T S.T' y ^ 2 ≤ J.supA S.G S.de S.de' S.T S.T' S.l false (S.pl v) ^ 2 :=
+    have h4
+        : Cf.core S.de S.de' S.T S.T' y ^ 2
+          ≤ J.supA S.G S.de S.de' S.T S.T' S.l false (S.pl v) ^ 2 :=
       pow_le_pow_left₀ hcore0 hcore 2
-    have h5 : (1 + 3 / (β - α)) ^ n * (Cf.core S.de S.de' S.T S.T' y ^ 2 * q' y) ≤
-        E1 * (J.supA S.G S.de S.de' S.T S.T' S.l false (S.pl v) ^ 2 * q' y) := by
-      exact mul_le_mul hρP (mul_le_mul_of_nonneg_right h4 hqy.le) (mul_nonneg (pow_nonneg hcore0 2) hqy.le) hE1pos.le
-    calc S.P v y ^ 2 = |S.P v y| * |S.P v y| := h1
+    have h5
+        : (1 + 3 / (β - α)) ^ n * (Cf.core S.de S.de' S.T S.T' y ^ 2 * q' y)
+          ≤ E1 * (J.supA S.G S.de S.de' S.T S.T' S.l false (S.pl v) ^ 2 * q' y) := by
+      exact mul_le_mul hρP (mul_le_mul_of_nonneg_right h4 hqy.le)
+        (mul_nonneg (pow_nonneg hcore0 2) hqy.le) hE1pos.le
+    calc
+      S.P v y ^ 2
+        = |S.P v y| * |S.P v y| := h1
       _ ≤ _ := h2
       _ = _ := h3
       _ ≤ _ := h5
   have hqw2 : E1⁻¹ * q' y ≤ Wd.qw q' wr y := by rw [← hEinv]; exact (le_div_iff₀ hqy).1 hLQ
-  exact final_cmp |S.P v y| x0r F (q' y) (S.T * S.T') _ E1 (Wd.qw q' wr y) (abs_nonneg _) hx0pos hF0 hqy hTT
-    hsA hE1pos hE1sq (by rw [sq_abs]; exact hP2) hx0sq hF2 hqw2
+  exact final_cmp |S.P v y| x0r F (q' y) (S.T * S.T') _ E1 (Wd.qw q' wr y) (abs_nonneg _) hx0pos hF0
+    hqy hTT hsA hE1pos hE1sq (by rw [sq_abs]; exact hP2) hx0sq hF2 hqw2
 
 end
 
 end Formalism.FourierDecayAlt.P.PBL
 
-theorem Formalism.FourierDecayAlt.P.top_ratio : Formalism.FourierDecayAlt.P.PBL.TopRatio := Formalism.FourierDecayAlt.P.PBL.topRatio
+theorem Formalism.FourierDecayAlt.P.top_ratio : Formalism.FourierDecayAlt.P.PBL.TopRatio :=
+  Formalism.FourierDecayAlt.P.PBL.topRatio

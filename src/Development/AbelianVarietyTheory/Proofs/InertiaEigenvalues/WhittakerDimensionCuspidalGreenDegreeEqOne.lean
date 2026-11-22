@@ -23,11 +23,13 @@ theorem isClass_of_isIrr {G : Type} [Group G] {χ : G → ℂ} (h : IsIrr χ) : 
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem res_zero_left {d : ℕ} (χ : Gn g d → ℂ) (h : Gn g 0) (y : Gn g d) :
-    res 0 d χ h y = χ y := by
+theorem res_zero_left {d : ℕ} (χ : Gn g d → ℂ) (h : Gn g 0) (y : Gn g d) : res 0 d χ h y = χ y := by
   unfold res
-  have key : ∀ x : Gn g d, (InPar 0 (x : Mt g d) ∧ tl 0 (x : Mt g d) = (h : Mt g 0) ∧
-      br 0 d (x : Mt g d) = (y : Mt g d)) ↔ x = y := by
+  have key
+      : ∀ x : Gn g d,
+        (InPar 0 (x : Mt g d) ∧ tl 0 (x : Mt g d) = (h : Mt g 0)
+            ∧ br 0 d (x : Mt g d) = (y : Mt g d))
+          ↔ x = y := by
     intro x
     constructor
     · rintro ⟨-, -, hb⟩
@@ -43,14 +45,15 @@ theorem res_zero_left {d : ℕ} (χ : Gn g d → ℂ) (h : Gn g 0) (y : Gn g d) 
   rw [Finset.sum_ite_eq' Finset.univ y]
   simp
 
-theorem der_zero_one (ψ : AddChar (ZMod g) ℂ) {d : ℕ} (χ : Gn g d → ℂ) :
-    der ψ 0 χ 1 = wh ψ χ := by
+theorem der_zero_one (ψ : AddChar (ZMod g) ℂ) {d : ℕ} (χ : Gn g d → ℂ) : der ψ 0 χ 1 = wh ψ χ := by
   unfold der
   have : res 0 (d - 0) χ 1 = χ := funext fun y => res_zero_left χ 1 y
   rw [this]
 
-theorem der_cusp_eq_zero (ψ : AddChar (ZMod g) ℂ) {d m : ℕ} {χ : Gn g d → ℂ} (hχ : IsCusp χ)
-    (h0 : 0 < m) (hm : m < d) (h : Gn g m) : der ψ m χ h = 0 := by
+theorem der_cusp_eq_zero
+    (ψ : AddChar (ZMod g) ℂ)
+    {d m : ℕ} {χ : Gn g d → ℂ} (hχ : IsCusp χ) (h0 : 0 < m) (hm : m < d) (h : Gn g m)
+    : der ψ m χ h = 0 := by
   unfold der wh tr
   have : res m (d - m) χ h = fun _ => 0 := funext fun y => res_cusp_eq_zero g d m χ hχ h0 hm h y
   rw [this]
@@ -67,11 +70,15 @@ theorem green_deg_ne_zero (d : ℕ) : ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i -
   have := Nat.cast_injective h'
   omega
 
-theorem wh_cusp_eq_one : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (d : ℕ)
-    (χ : Gn g d → ℂ), IsCusp χ → χ 1 = ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) → wh ψ χ = 1 := by
+theorem wh_cusp_eq_one
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ),
+      ψ ≠ 1
+        → ∀ (d : ℕ) (χ : Gn g d → ℂ),
+          IsCusp χ → χ 1 = ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) → wh ψ χ = 1 := by
   intro g _ ψ hψ d χ hχ hdeg
   have hd : 0 < d := hχ.1
-  have hform := GlobalTheory.T.classFunction_degree_eq_sum_derivatives g ψ hψ d χ hd (isClass_of_isIrr hχ.2.1)
+  have hform :=
+    GlobalTheory.T.classFunction_degree_eq_sum_derivatives g ψ hψ d χ hd (isClass_of_isIrr hχ.2.1)
   rw [Finset.sum_eq_single 0] at hform
   · rw [der_zero_one, zero_add, hdeg] at hform
     have hne := green_deg_ne_zero (g := g) d

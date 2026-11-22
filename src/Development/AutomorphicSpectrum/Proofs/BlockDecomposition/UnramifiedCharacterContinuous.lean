@@ -15,18 +15,19 @@ public import GroundTheory.LocalFields.AbstractLocalReciprocity.ExistsEqNsmulOfP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 open GroundTheory.ProfCoh GroundTheory.LocalField ValuativeRel CategoryTheory
 
 namespace GlobalTheory.CompanionTheory.LocalUnram
 
-
 open GroundTheory.LocalField.Abstract in
-theorem continuous_of_additive_of_frobenius_eq_one :
-    ∀ (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-      [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (n : ℕ) [NeZero n] (χ : Gal(Ω/K) → ZMod n),
-      (∀ g h, χ (g * h) = χ g + χ h) →
-      (∀ g, unramifiedDegree K Ω g = Multiplicative.ofAdd 1 → χ g = 1) → Continuous χ := by
+theorem continuous_of_additive_of_frobenius_eq_one
+    : ∀ (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+        [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (n : ℕ) [NeZero n] (χ : Gal(Ω/K) → ZMod n),
+      (∀ g h, χ (g * h) = χ g + χ h)
+        → (∀ g, unramifiedDegree K Ω g = Multiplicative.ofAdd 1 → χ g = 1)
+        → Continuous χ := by
   intro K Ω _ _ _ _ _ _ _ n _ χ hadd h1
   obtain ⟨hcont, hsurj, -⟩ := unramifiedDegree_spec (K := K) (Ω := Ω)
   obtain ⟨N, rfl⟩ : ∃ N : ℕ+, (N : ℕ) = n := ⟨⟨n, NeZero.pos n⟩, rfl⟩
@@ -34,7 +35,7 @@ theorem continuous_of_additive_of_frobenius_eq_one :
     have h := hadd 1 1
     rw [mul_one] at h
     exact left_eq_add.mp h
-  have hinv : ∀ g, χ g⁻¹ = -χ g := fun g => by
+  have hinv : ∀ g, χ g⁻¹ = - χ g := fun g => by
     have h := hadd g⁻¹ g
     rw [inv_mul_cancel, hone] at h
     exact eq_neg_of_add_eq_zero_left h.symm
@@ -48,7 +49,8 @@ theorem continuous_of_additive_of_frobenius_eq_one :
     have h := h1 (g * f) (by rw [map_mul, hg, one_mul, hf])
     rw [hadd, hχf] at h
     exact add_eq_right.mp h
-  have key : ∀ g, χ g = ProfiniteInteger.proj N (Multiplicative.toAdd (unramifiedDegree K Ω g)) := by
+  have key
+      : ∀ g, χ g = ProfiniteInteger.proj N (Multiplicative.toAdd (unramifiedDegree K Ω g)) := by
     intro g
     set x := Multiplicative.toAdd (unramifiedDegree K Ω g) with hx
     set k : ℕ := (ProfiniteInteger.proj N x).val with hk
@@ -60,8 +62,8 @@ theorem continuous_of_additive_of_frobenius_eq_one :
     have hdeg : unramifiedDegree K Ω (g * (f ^ k)⁻¹ * (t ^ (N : ℕ))⁻¹) = 1 := by
       simp only [_root_.map_mul, _root_.map_inv, _root_.map_pow, hf, ht]
       apply Multiplicative.toAdd.injective
-      rw [toAdd_mul, toAdd_mul, toAdd_inv, toAdd_inv, toAdd_pow, toAdd_pow, toAdd_ofAdd, toAdd_ofAdd,
-        toAdd_one, ← hx, ← hw, nsmul_eq_mul, mul_one]
+      rw [toAdd_mul, toAdd_mul, toAdd_inv, toAdd_inv, toAdd_pow, toAdd_pow, toAdd_ofAdd,
+        toAdd_ofAdd, toAdd_one, ← hx, ← hw, nsmul_eq_mul, mul_one]
       ring
     have h0 := hker _ hdeg
     rw [hadd, hadd, hinv, hinv, hpow, hpow, hχf] at h0

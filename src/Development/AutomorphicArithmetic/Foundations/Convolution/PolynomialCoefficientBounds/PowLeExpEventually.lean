@@ -122,17 +122,27 @@ private lemma solve_bound2 (x a z η a₀ cq K₁ K E : ℝ) (d m j : ℕ) (hx :
         ((η / a₀) ^ m * (a₀ / η) ^ m) * E := by rw [e2, e3, mul_one]
     _ = _ := by ring
 
-theorem UpperTheory.ConvolutionTheory.FX.exponents2 :
-    ∀ (d : ℕ → ℕ), Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0) →
-    (∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial) →
-    ∀ (p : ℕ), 0 < p → ∀ (c₁ cq a₀ : ℝ), 0 < a₀ → a₀ ≤ 1 → ∃ η₀ : ℝ, 0 < η₀ ∧ η₀ < a₀ ∧ ∀ η : ℝ, 0 < η → η ≤ η₀ → ∃ N : ℝ,
-    ∀ (I : Type) [Fintype I] (a : I → ℝ) (ζ : I → ℂ), (∀ i, η < a i) → (∀ i, ζ i ≠ 0) →
-    Function.Injective (fun i => (a i, ζ i)) → ∀ (c : ℕ → I → ℂ) (c' : I → ℂ),
-    (∀ i, Tendsto (fun j => c j i) atTop (𝓝 (c' i))) →
-    (∀ s₀ : ℕ, ∃ K : ℝ, ∀ᶠ j : ℕ in atTop, ∀ s ≤ s₀, ∀ s' ≤ s₀,
-    ‖∑ i, c j i * (a i : ℂ) ^ d j * (cheb η (j / p + s) (a i) : ℂ) * ζ i ^ (j + s')‖ ≤
-    K ^ (d j + 1) * (Real.exp (c₁ * j) * (1 + (4 / η) ^ (j / p) / (d j).factorial) + (4 / η) ^ (j / p) * Real.exp (-N * j))) →
-    ∀ i, a₀ ≤ a i → Real.exp (-cq) ≤ ‖ζ i‖ → c' i = 0 := by
+theorem UpperTheory.ConvolutionTheory.FX.exponents2
+    : ∀ (d : ℕ → ℕ),
+      Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0)
+        → (∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial)
+        → ∀ (p : ℕ),
+          0 < p
+            → ∀ (c₁ cq a₀ : ℝ),
+              0 < a₀ → a₀ ≤ 1
+                → ∃ η₀ : ℝ,
+                  0 < η₀ ∧ η₀ < a₀
+                    ∧ ∀ η : ℝ,
+                      0 < η → η ≤ η₀
+                        → ∃ N : ℝ, ∀ (I : Type) [Fintype I] (a : I → ℝ) (ζ : I → ℂ),
+                          (∀ i, η < a i) → (∀ i, ζ i ≠ 0) → Function.Injective (fun i => (a i, ζ i))
+                            → ∀ (c : ℕ → I → ℂ) (c' : I → ℂ),
+                              (∀ i, Tendsto (fun j => c j i) atTop (𝓝 (c' i)))
+                                → (∀ s₀ : ℕ, ∃ K : ℝ,
+                                  ∀ᶠ j : ℕ in atTop, ∀ s ≤ s₀, ∀ s' ≤ s₀,
+                                    ‖∑ i, c j i * (a i : ℂ) ^ d j * (cheb η (j / p + s) (a i) : ℂ) * ζ i ^ (j + s')‖ ≤
+                                    K ^ (d j + 1) * (Real.exp (c₁ * j) * (1 + (4 / η) ^ (j / p) / (d j).factorial) + (4 / η) ^ (j / p) * Real.exp (-N * j)))
+                                → ∀ i, a₀ ≤ a i → Real.exp (-cq) ≤ ‖ζ i‖ → c' i = 0 := by
   intro d hd hfac p hp c₁ cq a₀ h0 h1
   obtain ⟨A, hA⟩ : ∃ A, A = |c₁ + cq + 1| + 1 := ⟨_, rfl⟩
   have hη₀a : a₀ * Real.exp (-(p * A)) < a₀ := by
@@ -153,10 +163,11 @@ theorem UpperTheory.ConvolutionTheory.FX.exponents2 :
     have h := hsep (j / p) j (fun i => c j i * (a i : ℂ) ^ d j) _ hj i
     have hai : 0 ≤ a i := by linarith
     simp only [norm_mul, norm_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hai] at h
-    exact (solve_bound2 _ _ _ η a₀ cq K₁ K _ _ _ _ (norm_nonneg _) hηp hηa h1 hi hζ
-      (by positivity) hL h).trans (err_bound2 p hp c₁ cq a₀ h0 h1 A η hA hηp hη j _ hF)
+    exact (solve_bound2 _ _ _ η a₀ cq K₁ K _ _ _ _ (norm_nonneg _) hηp hηa h1 hi hζ (by positivity)
+      hL h).trans (err_bound2 p hp c₁ cq a₀ h0 h1 A η hA hηp hη j _ hF)
   have hlim : Tendsto (fun j : ℕ => (Real.exp (p * A) + 2) * Real.exp (-j)) atTop (𝓝 0) := by
-    have := (Real.tendsto_exp_neg_atTop_nhds_zero.comp tendsto_natCast_atTop_atTop).const_mul
-      (Real.exp (p * A) + 2)
+    have :=
+      (Real.tendsto_exp_neg_atTop_nhds_zero.comp tendsto_natCast_atTop_atTop).const_mul
+        (Real.exp (p * A) + 2)
     simpa using this
   exact tendsto_nhds_unique (hc i) (squeeze_zero_norm' hev hlim)

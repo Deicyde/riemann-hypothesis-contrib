@@ -21,9 +21,10 @@ private def unitBallSubring (K : Type) [NormedField K] [IsUltrametricDist K] : S
     intro a ha
     simpa using ha
 
-theorem UpperTheory.Reformulated.B.Qh18.rootb :
-    ∀ {K : Type} [inst : NormedField K] [IsUltrametricDist K] (l m : ℕ),
-    Nat.Prime l → l ≠ (2 : ℕ) → ∀ (z : K), z ^ l ^ m = (1 : K) → ‖z - (1 : K)‖ ^ l ^ m ≤ ‖(↑l : K)‖ := by
+theorem UpperTheory.Reformulated.B.Qh18.rootb
+    : ∀ {K : Type} [inst : NormedField K] [IsUltrametricDist K] (l m : ℕ),
+      Nat.Prime l → l ≠ (2 : ℕ)
+        → ∀ (z : K), z ^ l ^ m = (1 : K) → ‖z - (1 : K)‖ ^ l ^ m ≤ ‖(↑l : K)‖ := by
   intro K _ _ l m hl _ z hz
   have hN : l ^ m ≠ 0 := pow_ne_zero _ hl.ne_zero
   have hz1 : ‖z‖ = 1 := by

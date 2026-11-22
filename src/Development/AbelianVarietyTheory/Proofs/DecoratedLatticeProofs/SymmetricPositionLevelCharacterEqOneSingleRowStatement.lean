@@ -6,9 +6,21 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (ϖ : kˣ) (ρ κ l : ℕ) (P : TypeDatum k (Fin κ ⊕ Fin l)), GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsSymLevel ψ ϖ ρ P → ∀ (i₀ : Fin l) (g : P.J), (∀ a b, a ≠ Sum.inr i₀ → (g : GL (Fin κ ⊕ Fin l) k).val a b = (1 : Matrix (Fin κ ⊕ Fin l) (Fin κ ⊕ Fin l) k) a b) → (∀ i : Fin l, i.val = i₀.val + 1 → (g : GL (Fin κ ⊕ Fin l) k).val (Sum.inr i₀) (Sum.inr i) = 0) → P.lam g = 1 := by
+theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle) (ϖ : kˣ) (ρ κ l : ℕ) (P : TypeDatum k (Fin κ ⊕ Fin l)),
+      GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsSymLevel ψ ϖ ρ P
+        → ∀ (i₀ : Fin l) (g : P.J),
+          (∀ a b,
+              a ≠ Sum.inr i₀
+                → (g : GL (Fin κ ⊕ Fin l) k).val a b
+                  = (1 : Matrix (Fin κ ⊕ Fin l) (Fin κ ⊕ Fin l) k) a b)
+            → (∀ i : Fin l,
+              i.val = i₀.val + 1 → (g : GL (Fin κ ⊕ Fin l) k).val (Sum.inr i₀) (Sum.inr i) = 0)
+            → P.lam g = 1 := by
   intro k _ _ _ _ ψ ϖ ρ κ l P hP i₀ g h1 h2
   have hs : simpleSum (g : GL (Fin κ ⊕ Fin l) k) = 0 := by
     unfold simpleSum
@@ -16,8 +28,7 @@ theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
     split_ifs with hij
     · by_cases hi : i = i₀
       · subst hi; exact h2 j hij
-      · have hne : i ≠ j := by
-          intro e; subst e; omega
+      · have hne : i ≠ j := by intro e; subst e; omega
         rw [h1 _ _ (by simpa using hi)]
         simp [hne]
     · rfl
@@ -25,8 +36,7 @@ theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
     unfold superSum
     refine Finset.sum_eq_zero fun a _ => Finset.sum_eq_zero fun b _ => ?_
     split_ifs with hab
-    · have hne : a ≠ b := by
-        intro e; subst e; omega
+    · have hne : a ≠ b := by intro e; subst e; omega
       rw [Matrix.toBlocks₁₁]
       simp only [Matrix.of_apply]
       rw [h1 _ _ (by simp)]
@@ -35,4 +45,3 @@ theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
   apply Units.ext
   rw [hP.2 g, hs, hu]
   simp
-

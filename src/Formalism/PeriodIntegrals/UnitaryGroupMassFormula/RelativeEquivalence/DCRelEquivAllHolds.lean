@@ -11,10 +11,13 @@ open scoped Classical
 
 namespace PI.DCRelEquiv.UnitaryGroupMassFormula
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
-theorem symm_mem_of_maps {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (n : V ≃ₗ[K] V) (U : Submodule K V) (h : ∀ x ∈ U, n x ∈ U) : ∀ x ∈ U, n.symm x ∈ U := by
+theorem symm_mem_of_maps
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (n : V ≃ₗ[K] V) (U : Submodule K V) (h : ∀ x ∈ U, n x ∈ U)
+    : ∀ x ∈ U, n.symm x ∈ U := by
   intro x hx
   let f : U →ₗ[K] U := (n : V →ₗ[K] V).restrict h
   have hinj : Function.Injective f := by
@@ -57,29 +60,38 @@ theorem e_mem_X (F : LFlag S r T) (i : Fin r) : F.fl.e i ∈ Xsp F := by
 theorem mem_orth_iff {U : Submodule E S.V} {y : S.V} : y ∈ orth S U ↔ ∀ x ∈ U, S.hT x y = 0 := by
   simp [orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem isom_app {g : S.V ≃ₗ[E] S.V} (h : g ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V) :
-    S.hT (g x) (g y) = S.hT x y := by
+theorem isom_app
+    {g : S.V ≃ₗ[E] S.V} (h : g ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V)
+    : S.hT (g x) (g y) = S.hT x y := by
   exact (show ∀ x y, S.hT (g x) (g y) = S.hT x y from h) x y
 
-theorem gmap_mul' (n m : S.V ≃ₗ[E] S.V) (L : Submodule (𝓞 E) S.V) :
-    Formalism.HermitianLatticesTheory.gmap (n * m) L = Formalism.HermitianLatticesTheory.gmap n (Formalism.HermitianLatticesTheory.gmap m L) := by
+theorem gmap_mul' (n m : S.V ≃ₗ[E] S.V) (L : Submodule (𝓞 E) S.V)
+    : Formalism.HermitianLatticesTheory.gmap (n * m) L
+      = Formalism.HermitianLatticesTheory.gmap n (Formalism.HermitianLatticesTheory.gmap m L) := by
   unfold Formalism.HermitianLatticesTheory.gmap
   rw [← Submodule.map_comp]
   rfl
 
-theorem gmap_one' (L : Submodule (𝓞 E) S.V) : Formalism.HermitianLatticesTheory.gmap (1 : S.V ≃ₗ[E] S.V) L = L := by
+theorem gmap_one' (L : Submodule (𝓞 E) S.V)
+    : Formalism.HermitianLatticesTheory.gmap (1 : S.V ≃ₗ[E] S.V) L = L := by
   unfold Formalism.HermitianLatticesTheory.gmap
   exact Submodule.map_id L
 
-theorem gmap_inv' {n : S.V ≃ₗ[E] S.V} {L : Submodule (𝓞 E) S.V} (hg : Formalism.HermitianLatticesTheory.gmap n L = L) :
-    Formalism.HermitianLatticesTheory.gmap n⁻¹ L = L := by
-  calc Formalism.HermitianLatticesTheory.gmap n⁻¹ L = Formalism.HermitianLatticesTheory.gmap n⁻¹ (Formalism.HermitianLatticesTheory.gmap n L) := by rw [hg]
+theorem gmap_inv'
+    {n : S.V ≃ₗ[E] S.V} {L : Submodule (𝓞 E) S.V}
+    (hg : Formalism.HermitianLatticesTheory.gmap n L = L)
+    : Formalism.HermitianLatticesTheory.gmap n⁻¹ L = L := by
+  calc
+    Formalism.HermitianLatticesTheory.gmap n⁻¹ L
+        = Formalism.HermitianLatticesTheory.gmap n⁻¹
+          (Formalism.HermitianLatticesTheory.gmap n L) := by
+      rw [hg]
     _ = L := by rw [← gmap_mul', inv_mul_cancel, gmap_one']
 
 variable {Λ : Submodule (𝓞 E) S.V}
 
-theorem autLam_mul {n m : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) (hm : IsAutLam S Λ m) :
-    IsAutLam S Λ (n * m) := by
+theorem autLam_mul {n m : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) (hm : IsAutLam S Λ m)
+    : IsAutLam S Λ (n * m) := by
   unfold IsAutLam at hn hm ⊢
   exact ⟨Subgroup.mul_mem _ hn.1 hm.1, by rw [gmap_mul', hm.2, hn.2]⟩
 
@@ -87,15 +99,15 @@ theorem autLam_inv {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) : IsAutLam S �
   unfold IsAutLam at hn ⊢
   exact ⟨Subgroup.inv_mem _ hn.1, gmap_inv' hn.2⟩
 
-theorem nlam_maps_Xflag {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (j : ℕ) :
-    ∀ x ∈ Xflag F (j + 1), n x ∈ Xflag F (j + 1) := by
+theorem nlam_maps_Xflag {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (j : ℕ)
+    : ∀ x ∈ Xflag F (j + 1), n x ∈ Xflag F (j + 1) := by
   intro x hx
   obtain ⟨-, hF, -⟩ := hn
   have h2 := add_mem (Xflag_mono F j (hF j x hx)) hx
   rwa [sub_add_cancel] at h2
 
-theorem nlam_maps_X {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) :
-    ∀ x ∈ Xsp F, n x ∈ Xsp F := by
+theorem nlam_maps_X {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : ∀ x ∈ Xsp F, n x ∈ Xsp F := by
   have hle : Xsp F ≤ (Xsp F).comap (n : S.V →ₗ[E] S.V) := by
     show Submodule.span E (Set.range F.fl.e) ≤ _
     rw [Submodule.span_le]
@@ -110,8 +122,7 @@ theorem nlam_inv {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F
   simp only [NLam, Set.mem_setOf_eq]
   refine ⟨autLam_inv hA, ?_, ?_⟩
   · intro j x hx
-    have hy : n.symm x ∈ Xflag F (j + 1) :=
-      symm_mem_of_maps n _ (nlam_maps_Xflag hn j) x hx
+    have hy : n.symm x ∈ Xflag F (j + 1) := symm_mem_of_maps n _ (nlam_maps_Xflag hn j) x hx
     have h1 := hF j _ hy
     rw [LinearEquiv.apply_symm_apply] at h1
     have h2 := neg_mem h1
@@ -130,8 +141,8 @@ theorem nlam_inv {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F
     rw [neg_sub] at h2
     exact h2
 
-theorem nlam_mul {F : LFlag S r T} {n m : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (hm : m ∈ NLam Λ F) :
-    n * m ∈ NLam Λ F := by
+theorem nlam_mul {F : LFlag S r T} {n m : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (hm : m ∈ NLam Λ F)
+    : n * m ∈ NLam Λ F := by
   obtain ⟨hnA, hnF, hnO⟩ := id hn
   obtain ⟨hmA, hmF, hmO⟩ := id hm
   simp only [NLam, Set.mem_setOf_eq]
@@ -147,39 +158,43 @@ theorem nlam_mul {F : LFlag S r T} {n m : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ
     rw [e]
     exact add_mem (nlam_maps_X hn _ (hmO x hx)) (hnO x hx)
 
-theorem e_of_frame {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a))
-    (i : Fin r) : F₂.fl.e i = g (F₁.fl.e i) := by
+theorem e_of_frame
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (i : Fin r)
+    : F₂.fl.e i = g (F₁.fl.e i) := by
   have h := hfr i.castSucc
   simp only [frame, FlagG.fvec, Fin.snoc_castSucc] at h
   exact h
 
-theorem Xflag_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
-    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (j : ℕ) :
-    Xflag F₂ j = (Xflag F₁ j).map (g : S.V →ₗ[E] S.V) := by
+theorem Xflag_transport
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (j : ℕ)
+    : Xflag F₂ j = (Xflag F₁ j).map (g : S.V →ₗ[E] S.V) := by
   have he : F₂.fl.e = (g : S.V →ₗ[E] S.V) ∘ F₁.fl.e := funext fun i => e_of_frame hfr i
   simp only [Xflag, FlagG.Xa]
   rw [Submodule.map_span, ← Set.image_comp, he]
 
-theorem Xsp_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
-    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) :
-    Xsp F₂ = (Xsp F₁).map (g : S.V →ₗ[E] S.V) := by
+theorem Xsp_transport
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a))
+    : Xsp F₂ = (Xsp F₁).map (g : S.V →ₗ[E] S.V) := by
   have he : F₂.fl.e = (g : S.V →ₗ[E] S.V) ∘ F₁.fl.e := funext fun i => e_of_frame hfr i
   simp only [Xsp, FlagG.X]
   rw [Submodule.map_span, ← Set.range_comp, he]
 
-theorem Xflag_mem_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
-    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (j : ℕ) (v : S.V) :
-    v ∈ Xflag F₂ j ↔ g.symm v ∈ Xflag F₁ j := by
+theorem Xflag_mem_transport
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a))
+    (j : ℕ) (v : S.V)
+    : v ∈ Xflag F₂ j ↔ g.symm v ∈ Xflag F₁ j := by
   rw [Xflag_transport hfr j, Submodule.mem_map_equiv]
 
-theorem Xsp_mem_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
-    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (v : S.V) :
-    v ∈ Xsp F₂ ↔ g.symm v ∈ Xsp F₁ := by
+theorem Xsp_mem_transport
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V} (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (v : S.V)
+    : v ∈ Xsp F₂ ↔ g.symm v ∈ Xsp F₁ := by
   rw [Xsp_transport hfr, Submodule.mem_map_equiv]
 
-theorem orth_mem_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
-    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (hg : g ∈ Formalism.HermitianLatticesTheory.isom S.hT) (v : S.V) :
-    v ∈ orth S (Xsp F₂) ↔ g.symm v ∈ orth S (Xsp F₁) := by
+theorem orth_mem_transport
+    {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
+    (hfr : ∀ a, frame F₂ a = g (frame F₁ a)) (hg : g ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (v : S.V)
+    : v ∈ orth S (Xsp F₂) ↔ g.symm v ∈ orth S (Xsp F₁) := by
   rw [mem_orth_iff, mem_orth_iff]
   constructor
   · intro h w hw
@@ -191,12 +206,14 @@ theorem orth_mem_transport {F₁ F₂ : LFlag S r T} {g : S.V ≃ₗ[E] S.V}
     have hx' := (Xsp_mem_transport hfr x).mp hx
     have h1 := h _ hx'
     rw [← isom_app hg (g.symm x) (g.symm v), LinearEquiv.apply_symm_apply,
-      LinearEquiv.apply_symm_apply] at h1
+        LinearEquiv.apply_symm_apply]
+      at h1
     exact h1
 
-theorem conj_cond (g x : S.V ≃ₗ[E] S.V) (A₁ B₁ A₂ B₂ : Submodule E S.V)
-    (hA : ∀ v, v ∈ A₂ ↔ g.symm v ∈ A₁) (hB : ∀ v, v ∈ B₂ ↔ g.symm v ∈ B₁) :
-    (∀ v ∈ A₂, x v - v ∈ B₂) ↔ (∀ w ∈ A₁, (g⁻¹ * x * g) w - w ∈ B₁) := by
+theorem conj_cond
+    (g x : S.V ≃ₗ[E] S.V) (A₁ B₁ A₂ B₂ : Submodule E S.V)
+    (hA : ∀ v, v ∈ A₂ ↔ g.symm v ∈ A₁) (hB : ∀ v, v ∈ B₂ ↔ g.symm v ∈ B₁)
+    : (∀ v ∈ A₂, x v - v ∈ B₂) ↔ (∀ w ∈ A₁, (g⁻¹ * x * g) w - w ∈ B₁) := by
   constructor
   · intro h w hw
     have hgw : g w ∈ A₂ := by rw [hA, LinearEquiv.symm_apply_apply]; exact hw
@@ -270,8 +287,14 @@ theorem dCRelEquivAll_holds : DCRelEquivAll := by
     have hm'' : (n₁ * m₁)⁻¹ * m₂ * (n₁ * m₁) ∈ NLam Λ F₁ :=
       (hC E S r T' Λ F₁ F₂ (n₁ * m₁) hg hfr' m₂).mp hm₂
     unfold DCRel
-    refine ⟨n₂ * n₁, nlam_mul hn₂ hn₁, m₁ * ((n₁ * m₁)⁻¹ * m₂ * (n₁ * m₁)), nlam_mul hm₁ hm'',
-      fun a => ?_, ?_⟩
+    refine ⟨
+      n₂ * n₁,
+      nlam_mul hn₂ hn₁,
+      m₁ * ((n₁ * m₁)⁻¹ * m₂ * (n₁ * m₁)),
+      nlam_mul hm₁ hm'',
+      fun a => ?_,
+      ?_
+    ⟩
     · rw [hfr₂ a, hfr₁ a]
       show n₂ (m₂ (n₁ (m₁ (frame F₁ a)))) =
         n₂ (n₁ (m₁ (m₁.symm (n₁.symm (m₂ (n₁ (m₁ (frame F₁ a))))))))

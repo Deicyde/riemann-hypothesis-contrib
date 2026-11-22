@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsModular
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -161,7 +162,18 @@ end GlobalTheory.EisM
 
 namespace GlobalTheory.EisM
 
-theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (e N : ℕ) (χ θ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l) (α : ℂ) (B : ℕ) (c : ℕ → ℂ), 1 ≤ e → 0 < N → ¬ l ∣ N → ‖ι.symm α‖ = 1 → (∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ), ε ≠ χ → MF (2 * e + 1) (N * l) (ch ε) a → lam B c a = 0) → (∀ a, MF (2 * e + 1) (N * l) (ch χ) a → lam B c (Uo l a) = α * lam B c a) → θ (-1) = (-1) ^ e * ψ (-1) → χ (-1) = -1 → MeasMu ι e ((-1) ^ e * ψ (-1)) (hat θ) (tw2 N ((-1) ^ e * ψ (-1))) ψ α B c ((2 / (N.totient : ℂ)) * val B c l α 1 (Zm (2 * e + 1) l (hat θ) (ch (θ * χ)) (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e))) := by
+theorem measMu_of_eig
+    : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (e N : ℕ) (χ θ : DirichletCharacter ℂ N)
+        (ψ : DirichletCharacter ℂ l) (α : ℂ) (B : ℕ) (c : ℕ → ℂ),
+      1 ≤ e → 0 < N → ¬ l ∣ N → ‖ι.symm α‖ = 1
+        → (∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ),
+          ε ≠ χ → MF (2 * e + 1) (N * l) (ch ε) a → lam B c a = 0)
+        → (∀ a, MF (2 * e + 1) (N * l) (ch χ) a → lam B c (Uo l a) = α * lam B c a)
+        → θ (-1) = (-1) ^ e * ψ (-1) → χ (-1) = -1
+        → MeasMu ι e ((-1) ^ e * ψ (-1)) (hat θ) (tw2 N ((-1) ^ e * ψ (-1))) ψ α B c
+          ((2 / (N.totient : ℂ)) * val B c l α 1
+            (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
+              (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e))) := by
   intro l _ ι e N χ θ ψ α B c he hN hlN hα hkill hU hθ hχ
   have hp : l.Prime := Fact.out
   have hα0 : α ≠ 0 := by rintro rfl; simp at hα
@@ -173,49 +185,73 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
   have hθχ : (θ * χ) (-1) = -s := by rw [MulChar.coeToFun_mul, Pi.mul_apply, hθ, hχ]; ring
   have hχeq : θ⁻¹ * (θ * χ) = χ := by rw [← mul_assoc, inv_mul_cancel, one_mul]
   have hodd : Odd (2 * e + 1) := odd_two_mul_add_one e
-  have hlift : ∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ) (m r : ℕ), m ≤ r →
-      MF (2 * e + 1) (N * l ^ (m + 1)) (ch ε) a → MF (2 * e + 1) (N * l ^ (r + 1)) (ch ε) a := fun ε a m r hmr ha =>
-    (GlobalTheory.EisM.mf_linear (2 * e + 1) _ (ch ε)).2.2.2.2.1 _ a (Nat.mul_dvd_mul_left N (pow_dvd_pow l (by omega))) ha
-  have hlev : ∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ) (m r : ℕ), m ≤ r →
-      MF (2 * e + 1) (N * l ^ (m + 1)) (ch ε) a → MF (2 * e + 1) (N * l) (ch ε) ((Uo l)^[r] a) := fun ε a m r hmr ha =>
-    (GlobalTheory.iterU_level_val_stable (2 * e + 1) N l r ε (fun _ => 0) α B c a (by omega) hp hα0 (hlift ε a m r hmr ha)).1
-  have hstab : ∀ (m : ℕ) (a : ℕ → ℂ), MF (2 * e + 1) (N * l ^ (m + 1)) (ch χ) a →
-      val B c l α (m + 1) a = val B c l α m a := by
+  have hlift
+      : ∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ) (m r : ℕ),
+        m ≤ r → MF (2 * e + 1) (N * l ^ (m + 1)) (ch ε) a
+          → MF (2 * e + 1) (N * l ^ (r + 1)) (ch ε) a := fun ε a m r hmr ha =>
+    (GlobalTheory.EisM.mf_linear (2 * e + 1) _ (ch ε)).2.2.2.2.1 _ a
+      (Nat.mul_dvd_mul_left N (pow_dvd_pow l (by omega))) ha
+  have hlev
+      : ∀ (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ) (m r : ℕ),
+        m ≤ r → MF (2 * e + 1) (N * l ^ (m + 1)) (ch ε) a
+          → MF (2 * e + 1) (N * l) (ch ε) ((Uo l)^[r] a) := fun ε a m r hmr ha =>
+    (GlobalTheory.iterU_level_val_stable (2 * e + 1) N l r ε
+      (fun _ => 0)
+      α B c a (by omega) hp hα0 (hlift ε a m r hmr ha)).1
+  have hstab
+      : ∀ (m : ℕ) (a : ℕ → ℂ),
+        MF (2 * e + 1) (N * l ^ (m + 1)) (ch χ) a → val B c l α (m + 1) a = val B c l α m a := by
     intro m a ha
     have h1 := hlev χ a m m le_rfl ha
     simp only [val]
     rw [Function.iterate_succ_apply', hU _ h1, pow_succ]
     field_simp
-  have hzero : ∀ (m r : ℕ) (f : ZMod (l ^ m) → ℂ) (ν : DirichletCharacter ℂ N), 1 ≤ m → m ≤ r →
-      (∀ y, f (-y) = s * f y) → ν ≠ θ * χ → ν (-1) ≠ s →
-      val B c l α r (Zm (2 * e + 1) l (hat θ) (ch ν) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) = 0 := by
+  have hzero
+      : ∀ (m r : ℕ) (f : ZMod (l ^ m) → ℂ) (ν : DirichletCharacter ℂ N),
+        1 ≤ m → m ≤ r → (∀ y, f (-y) = s * f y) → ν ≠ θ * χ → ν (-1) ≠ s
+          → val B c l α r
+              (Zm (2 * e + 1) l (hat θ) (ch ν)
+                (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)))
+            = 0 := by
     intro m r f ν hm hmr hf hne hνs
     have hνsq : ν (-1) * ν (-1) = 1 := by rw [← map_mul]; simp
-    have hν : ν (-1) = -θ (-1) := by
+    have hν : ν (-1) = - θ (-1) := by
       have h0 : (ν (-1) - s) * (ν (-1) + s) = 0 := by linear_combination hνsq - hs2
       rcases mul_eq_zero.1 h0 with h | h
       · exact absurd (sub_eq_zero.1 h) hνs
       · rw [hθ]; linear_combination h
-    have hMF := GlobalTheory.T.isModularFormCoeffSeq_eisensteinProduct_parity (2 * e + 1) N l m (θ⁻¹ * ν) θ ν f (by omega) hodd hN hp hm hlN rfl hν
-      (fun x => by rw [hf, hθ])
+    have hMF :=
+      GlobalTheory.T.isModularFormCoeffSeq_eisensteinProduct_parity (2 * e + 1) N l m (θ⁻¹ * ν) θ ν
+        f (by omega) hodd hN hp hm hlN rfl hν (fun x => by rw [hf, hθ])
     have hL := hlev _ _ m r hmr hMF
-    have hne' : θ⁻¹ * ν ≠ χ := by
-      intro h; apply hne; rw [← h, ← mul_assoc, mul_inv_cancel, one_mul]
+    have hne' : θ⁻¹ * ν ≠ χ := by intro h; apply hne; rw [← h, ← mul_assoc, mul_inv_cancel, one_mul]
     simp only [val, hkill _ _ hne' hL, mul_zero]
-  have htw : tw2 N s = fun B' => ∑ ν : DirichletCharacter ℂ N, ((N.totient : ℂ)⁻¹ * (1 - s * ν (-1))) * ch ν B' := by
+  have htw
+      : tw2 N s
+        = fun B' =>
+          ∑ ν : DirichletCharacter ℂ N, ((N.totient : ℂ)⁻¹ * (1 - s * ν (-1))) * ch ν B' := by
     funext B'
     rw [GlobalTheory.T.tw2_eq_inv_totient_mul_sum_characters N s hN B', Finset.mul_sum]
     exact Finset.sum_congr rfl fun ν _ => by ring
-  have hred : ∀ (m r : ℕ) (f : ZMod (l ^ m) → ℂ), 1 ≤ m → m ≤ r → (∀ y, f (-y) = s * f y) →
-      val B c l α r (Zm (2 * e + 1) l (hat θ) (tw2 N s) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) =
-        (2 / (N.totient : ℂ)) * val B c l α r (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
-          (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) := by
+  have hred
+      : ∀ (m r : ℕ) (f : ZMod (l ^ m) → ℂ),
+        1 ≤ m → m ≤ r → (∀ y, f (-y) = s * f y)
+          → val B c l α r
+              (Zm (2 * e + 1) l (hat θ) (tw2 N s)
+                (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)))
+            = (2 / (N.totient : ℂ)) * val B c l α r
+              (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
+                (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) := by
     intro m r f hm hmr hf
-    have hZ : Zm (2 * e + 1) l (hat θ) (tw2 N s) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)) =
-        fun n => ∑ ν : DirichletCharacter ℂ N, ((N.totient : ℂ)⁻¹ * (1 - s * ν (-1))) *
-          Zm (2 * e + 1) l (hat θ) (ch ν) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)) n := by
-      funext n
-      rw [htw, measMu_zm_sum]
+    have hZ
+        : Zm (2 * e + 1) l (hat θ) (tw2 N s)
+            (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))
+          = fun n =>
+            ∑ ν : DirichletCharacter ℂ N, ((N.totient : ℂ)⁻¹ * (1 - s * ν (-1))) *
+              Zm (2 * e + 1) l (hat θ) (ch ν) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)) n :=
+      by
+        funext n
+        rw [htw, measMu_zm_sum]
     rw [hZ, measMu_val_sum, Finset.sum_eq_single (θ * χ)]
     · rw [hθχ, show (1 : ℂ) - s * -s = 2 by linear_combination hs2, div_eq_mul_inv]
       ring
@@ -228,17 +264,22 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro m hm f f' hf hff'
     have hf' := measMu_parity_succ hp m f f' hff' s hf
-    have hMF : MF (2 * e + 1) (N * l ^ (m + 1)) (ch χ) (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
-        (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) := by
-      have := GlobalTheory.T.isModularFormCoeffSeq_eisensteinProduct_parity (2 * e + 1) N l m (θ⁻¹ * (θ * χ)) θ (θ * χ) f (by omega) hodd hN hp hm hlN rfl
-        (by rw [hθχ, hθ]) (fun x => by rw [hf, hθ])
+    have hMF : MF (2 * e + 1) (N * l ^ (m + 1)) (ch χ)
+        (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
+          (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))) := by
+      have :=
+        GlobalTheory.T.isModularFormCoeffSeq_eisensteinProduct_parity (2 * e + 1) N l m
+          (θ⁻¹ * (θ * χ)) θ (θ * χ) f (by omega) hodd hN hp hm hlN rfl (by rw [hθχ, hθ])
+          (fun x => by rw [hf, hθ])
       rwa [hχeq] at this
     unfold mesMu
-    rw [measMu_zm_congr _ _ _ _ _ (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))
+    rw [measMu_zm_congr _ _ _ _ _
+        (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))
         (fun x y _ hy => measMu_quo_succ hp m f f' hff' x y hy),
       hred m (m + 1) f hm (by omega) hf, hred m m f hm le_rfl hf, hstab m _ hMF]
   · have hsn : ‖ι.symm s‖ ≤ 1 := by
-      rw [hs, map_mul, norm_mul, map_pow, map_neg, map_one, norm_pow, norm_neg, norm_one, one_pow, one_mul]
+      rw [hs, map_mul, norm_mul, map_pow, map_neg, map_one, norm_pow, norm_neg, norm_one, one_pow,
+        one_mul]
       exact GlobalTheory.zs_norm_char_le_one ι hp.pos ψ _
     have hw : ∀ x, ‖ι.symm (tw2 N s x)‖ ≤ 1 := by
       intro x
@@ -249,15 +290,26 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
       · rw [norm_neg, map_mul, norm_mul]
         split_ifs <;> simp [hsn]
     refine ⟨∑ n ∈ Finset.range B, ‖ι.symm (c n)‖, fun m f δ hδ hf => ?_⟩
-    have := measMu_zm_val_bound ι (2 * e + 1) (hat θ) (tw2 N s) α B c hu hw hα m
-      (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)) (fun _ _ => 0) δ hδ (fun x y _ _ => by simpa using hf _)
+    have :=
+      measMu_zm_val_bound ι (2 * e + 1) (hat θ) (tw2 N s) α B c hu hw hα m
+        (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))
+        (fun _ _ => 0)
+        δ hδ
+        (fun x y _ _ => by simpa using hf _)
     rwa [measMu_zm_zero, measMu_val_zero, sub_zero] at this
   · classical
     set ζ : ℂ := cexp (2 * π * Complex.I / N) with hζ
-    let S : Finset (PadicAlgCl l) := insert (ι.symm α) (insert (ι.symm ζ) (insert (ι.symm s)
-      ((Finset.range B).image (fun n => ι.symm (c n)) ∪ Finset.univ.image (fun x : ZMod N => ι.symm (θ x)))))
-    refine ⟨IntermediateField.adjoin ℚ_[l] (S : Set (PadicAlgCl l)),
-      IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x), ?_⟩
+    let S : Finset (PadicAlgCl l) :=
+      insert (ι.symm α)
+        (insert (ι.symm ζ)
+          (insert (ι.symm s)
+            ((Finset.range B).image (fun n => ι.symm (c n))
+              ∪ Finset.univ.image (fun x : ZMod N => ι.symm (θ x)))))
+    refine ⟨
+      IntermediateField.adjoin ℚ_[l] (S : Set (PadicAlgCl l)),
+      IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x),
+      ?_
+    ⟩
     intro m f E' hE hf
     let F : Subfield ℂ := E'.toSubfield.comap (ι.symm : ℂ →+* PadicAlgCl l)
     have memF : ∀ z : ℂ, z ∈ F ↔ ι.symm z ∈ E' := fun z => Iff.rfl
@@ -266,12 +318,15 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
     have hαF : α ∈ F := hS _ (by simp [S])
     have hζF : ζ ∈ F := hS _ (by simp [S])
     have hsF : s ∈ F := hS _ (by simp [S])
-    have hc : ∀ n < B, c n ∈ F := fun n hn => hS _ (by
-      simp only [S, Finset.mem_insert, Finset.mem_union, Finset.mem_image, Finset.mem_range]
-      exact Or.inr (Or.inr (Or.inr (Or.inl ⟨n, hn, rfl⟩))))
-    have hθF : ∀ x : ZMod N, θ x ∈ F := fun x => hS _ (by
-      simp only [S, Finset.mem_insert, Finset.mem_union, Finset.mem_image, Finset.mem_univ, true_and]
-      exact Or.inr (Or.inr (Or.inr (Or.inr ⟨x, rfl⟩))))
+    have hc : ∀ n < B, c n ∈ F := fun n hn =>
+      hS _ (by
+        simp only [S, Finset.mem_insert, Finset.mem_union, Finset.mem_image, Finset.mem_range]
+        exact Or.inr (Or.inr (Or.inr (Or.inl ⟨n, hn, rfl⟩))))
+    have hθF : ∀ x : ZMod N, θ x ∈ F := fun x =>
+      hS _ (by
+        simp only [S, Finset.mem_insert, Finset.mem_union, Finset.mem_image, Finset.mem_univ,
+          true_and]
+        exact Or.inr (Or.inr (Or.inr (Or.inr ⟨x, rfl⟩))))
     have hfF : ∀ x, f x ∈ F := fun x => (memF _).2 (hf x)
     have hhat : ∀ d : ℤ, hat θ d ∈ F := by
       intro d
@@ -284,19 +339,31 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
     have htwF : ∀ B' : ℤ, tw2 N s B' ∈ F := by
       intro B'
       unfold tw2
-      refine F.sub_mem ?_ (F.mul_mem hsF ?_) <;> split_ifs <;> first | exact F.one_mem | exact F.zero_mem
-    have hZ : ∀ n, Zm (2 * e + 1) l (hat θ) (tw2 N s) (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹)) n ∈ F := by
+      refine F.sub_mem ?_ (F.mul_mem hsF ?_) <;> split_ifs
+        <;> first | exact F.one_mem | exact F.zero_mem
+    have hZ
+        : ∀ n,
+          Zm (2 * e + 1) l (hat θ) (tw2 N s)
+              (fun A d => f ((A : ZMod (l ^ m)) * (d : ZMod (l ^ m))⁻¹))
+              n
+            ∈ F := by
       intro n
       unfold Zm
       refine F.sum_mem fun p _ => F.sum_mem fun x _ => F.sum_mem fun y _ => ?_
       split_ifs
       · exact F.zero_mem
-      · exact F.mul_mem (F.mul_mem (F.mul_mem (F.pow_mem (natCast_mem F _) _) (hhat _)) (htwF _)) (hfF _)
+      · exact F.mul_mem (F.mul_mem (F.mul_mem (F.pow_mem (natCast_mem F _) _) (hhat _)) (htwF _))
+          (hfF _)
     show mesMu (2 * e + 1) l (hat θ) (tw2 N s) α B c m f ∈ F
     rw [mesMu, measMu_val_eq]
-    exact F.mul_mem (F.inv_mem (F.pow_mem hαF _)) (F.sum_mem fun n hn => F.mul_mem (hc n (Finset.mem_range.1 hn)) (hZ _))
-  · have hw' : ∀ x, ‖ι.symm (ch (θ * χ) x)‖ ≤ 1 := fun x => GlobalTheory.zs_norm_char_le_one ι hN (θ * χ) _
-    refine ⟨‖ι.symm (2 / (N.totient : ℂ))‖ * ∑ n ∈ Finset.range B, ‖ι.symm (c n)‖, fun m hm f δ hδ hf hfd => ?_⟩
+    exact F.mul_mem (F.inv_mem (F.pow_mem hαF _))
+      (F.sum_mem fun n hn => F.mul_mem (hc n (Finset.mem_range.1 hn)) (hZ _))
+  · have hw' : ∀ x, ‖ι.symm (ch (θ * χ) x)‖ ≤ 1 := fun x =>
+      GlobalTheory.zs_norm_char_le_one ι hN (θ * χ) _
+    refine ⟨
+      ‖ι.symm (2 / (N.totient : ℂ))‖ * ∑ n ∈ Finset.range B, ‖ι.symm (c n)‖,
+      fun m hm f δ hδ hf hfd => ?_
+    ⟩
     obtain ⟨ψ', h1, h2, h3⟩ := measMu_char_level_one l ψ
     have hpar1 : ψ' (-1) * θ (-1) = (-1) ^ (2 * e + 1 - 1 - e) := by
       rw [show 2 * e + 1 - 1 - e = e by omega, h3, hθ, hs]
@@ -304,24 +371,34 @@ theorem measMu_of_eig : ∀ (l : ℕ) [Fact l.Prime] (ι : PadicAlgCl l ≃+* �
     have hpar2 : ψ' (-1) * (θ * χ) (-1) = (-1) ^ (e + 1) := by
       rw [hθχ, h3, hs]
       linear_combination (-(-1 : ℂ) ^ e) * hψsq
-    have hMF0 := GlobalTheory.T.muModelProduct_isModularFormCoeffSeq_locallyAlgebraic (2 * e + 1) e N l 1 (θ⁻¹ * (θ * χ)) (hat θ) θ (θ * χ) ψ' (by omega) hN hp le_rfl hlN
-      (hat_char_props.1 N θ hN).1 (hat_char_props.1 N θ hN).2.1 rfl hpar1 hpar2
+    have hMF0 :=
+      GlobalTheory.T.muModelProduct_isModularFormCoeffSeq_locallyAlgebraic (2 * e + 1) e N l 1
+        (θ⁻¹ * (θ * χ)) (hat θ) θ (θ * χ) ψ' (by omega) hN hp le_rfl hlN (hat_char_props.1 N θ hN).1
+        (hat_char_props.1 N θ hN).2.1 rfl hpar1 hpar2
     rw [hχeq] at hMF0
-    have hG : (fun x y : ℕ => ch ψ' x * ch ψ'⁻¹ y * ((y : ℂ) / x) ^ e) =
-        fun x y : ℕ => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e := by
+    have hG
+        : (fun x y : ℕ => ch ψ' x * ch ψ'⁻¹ y * ((y : ℂ) / x) ^ e)
+          = fun x y : ℕ => ψ x * ψ⁻¹ y * ((y : ℂ) / x) ^ e := by
       funext x y; rw [h1, h2]
     rw [hG] at hMF0
-    have hall : ∀ r, 1 ≤ r → val B c l α r (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
-        (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e)) =
-        val B c l α 1 (Zm (2 * e + 1) l (hat θ) (ch (θ * χ)) (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e)) := by
+    have hall
+        : ∀ r,
+          1 ≤ r
+            → val B c l α r
+                (Zm (2 * e + 1) l (hat θ) (ch (θ * χ)) (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e))
+              = val B c l α 1
+                (Zm (2 * e + 1) l (hat θ) (ch (θ * χ))
+                  (fun A d => ψ A * ψ⁻¹ d * ((d : ℂ) / A) ^ e)) := by
       intro r hr
       induction r, hr using Nat.le_induction with
       | base => rfl
       | succ r hr ih => rw [hstab r _ (hlift χ _ 1 r hr hMF0), ih]
     unfold mesMu
     rw [hred m m f hm le_rfl hf, ← hall m hm, ← mul_sub, map_mul, norm_mul, mul_assoc]
-    exact mul_le_mul_of_nonneg_left (measMu_zm_val_bound ι (2 * e + 1) (hat θ) (ch (θ * χ)) α B c hu hw' hα m _ _ δ hδ
-      (fun x y hx hy => hfd x y hx hy)) (norm_nonneg _)
+    exact mul_le_mul_of_nonneg_left
+      (measMu_zm_val_bound ι (2 * e + 1) (hat θ) (ch (θ * χ)) α B c hu hw' hα m _ _ δ hδ
+        (fun x y hx hy => hfd x y hx hy))
+      (norm_nonneg _)
 
 end GlobalTheory.EisM
 

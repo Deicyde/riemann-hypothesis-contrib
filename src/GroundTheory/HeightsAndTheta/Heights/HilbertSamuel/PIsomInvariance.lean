@@ -14,44 +14,68 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2
 
 namespace IsomInvariance
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem exists_ratSection {P : Ideal (MRing ι)} (hP : P.IsPrime) (hrel : IsRelevant P) (B : HermLine ι) :
-    ∃ s t : MRing ι, IsRatSectionOn P B s t := by
+theorem exists_ratSection
+    {P : Ideal (MRing ι)} (hP : P.IsPrime) (hrel : IsRelevant P) (B : HermLine ι)
+    : ∃ s t : MRing ι, IsRatSectionOn P B s t := by
   classical
   let c : ∀ k, ι k := fun k => (hrel k).choose
   have hc : ∀ k, (X ⟨k, c k⟩ : MRing ι) ∉ P := fun k => (hrel k).choose_spec
-  exact ⟨_, _, fun k => (B.a k).toNat, fun k => (-B.a k).toNat, Inter.AvoidRing.isMultiHomog_coordProd c _,
-    Inter.AvoidRing.isMultiHomog_coordProd c _, Inter.AvoidRing.coordProd_not_mem hP c hc _,
-    Inter.AvoidRing.coordProd_not_mem hP c hc _, fun k => Int.toNat_sub_toNat_neg _⟩
+  exact ⟨
+    _,
+    _,
+    fun k => (B.a k).toNat,
+    fun k => (- B.a k).toNat,
+    Inter.AvoidRing.isMultiHomog_coordProd c _,
+    Inter.AvoidRing.isMultiHomog_coordProd c _,
+    Inter.AvoidRing.coordProd_not_mem hP c hc _,
+    Inter.AvoidRing.coordProd_not_mem hP c hc _,
+    fun k => Int.toNat_sub_toNat_neg _
+  ⟩
 
-theorem snoc_eq (hR : RatRStatement) {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ}
-    (hI : IsIntersectionFamily I) {P : Ideal (MRing ι)} {m : ℕ} (N : Fin m → HermLine ι) (A B : HermLine ι)
-    (hP : IsArithVar P (m + 1)) (hN : ∀ j, IsSmoothHerm (N j)) (hA : IsSmoothHerm A) (hB : IsSmoothHerm B)
-    (hAB : IsIsometricOn P A B) : I P (m + 1) (Fin.snoc N A) = I P (m + 1) (Fin.snoc N B) := by
+theorem snoc_eq
+    (hR : RatRStatement)
+    {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ} (hI : IsIntersectionFamily I)
+    {P : Ideal (MRing ι)} {m : ℕ} (N : Fin m → HermLine ι)
+    (A B : HermLine ι)
+    (hP : IsArithVar P (m + 1)) (hN : ∀ j, IsSmoothHerm (N j)) (hA : IsSmoothHerm A)
+    (hB : IsSmoothHerm B) (hAB : IsIsometricOn P A B)
+    : I P (m + 1) (Fin.snoc N A) = I P (m + 1) (Fin.snoc N B) := by
   obtain ⟨f, g, α, β, hf, hg, hfP, hgP, hdeg, hdiv, hnorm⟩ := hAB
   have hPp : P.IsPrime := hP.2.1.1
-  have nm : ∀ {x y : MRing ι}, x ∉ P → y ∉ P → x * y ∉ P := fun hx hy h => (hPp.mem_or_mem h).elim hx hy
+  have nm : ∀ {x y : MRing ι}, x ∉ P → y ∉ P → x * y ∉ P := fun hx hy h =>
+    (hPp.mem_or_mem h).elim hx hy
   obtain ⟨s, t, σ, τ, hs, ht, hsP, htP, hst⟩ := exists_ratSection hPp hP.2.1.2.2 B
-  have hB' : IsRatSectionOn P B (s * g) (t * g) :=
-    ⟨σ + β, τ + β, Inter.AvoidRing.isMultiHomog_mul hs hg, Inter.AvoidRing.isMultiHomog_mul ht hg,
-      nm hsP hgP, nm htP hgP, fun k => by have := hst k; simp only [Pi.add_apply]; push_cast; linarith⟩
-  have hA' : IsRatSectionOn P A (s * f * g) (t * g * g) :=
-    ⟨σ + α + β, τ + β + β,
-      Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul hs hf) hg,
-      Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul ht hg) hg,
-      nm (nm hsP hfP) hgP, nm (nm htP hgP) hgP,
-      fun k => by have := hst k; have := hdeg k; simp only [Pi.add_apply]; push_cast; linarith⟩
+  have hB' : IsRatSectionOn P B (s * g) (t * g) := ⟨
+    σ + β,
+    τ + β,
+    Inter.AvoidRing.isMultiHomog_mul hs hg,
+    Inter.AvoidRing.isMultiHomog_mul ht hg,
+    nm hsP hgP,
+    nm htP hgP,
+    fun k => by have := hst k; simp only [Pi.add_apply]; push_cast; linarith
+  ⟩
+  have hA' : IsRatSectionOn P A (s * f * g) (t * g * g) := ⟨
+    σ + α + β,
+    τ + β + β,
+    Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul hs hf) hg,
+    Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul ht hg) hg,
+    nm (nm hsP hfP) hgP,
+    nm (nm htP hgP) hgP,
+    fun k => by have := hst k; have := hdeg k; simp only [Pi.add_apply]; push_cast; linarith
+  ⟩
   rw [hR K ι I hI P m N A _ _ hP hN hA hA', hR K ι I hI P m N B _ _ hP hN hB hB']
   unfold recRRat
-  have hfg : cycR I P N f = cycR I P N g := by
-    rw [Inter.cycR_eq_sum, Inter.cycR_eq_sum, hdiv]
-  have hint : ptsIntegral P (pot N) (logNormRat A (s * f * g) (t * g * g)) =
-      ptsIntegral P (pot N) (logNormRat B (s * g) (t * g)) := by
+  have hfg : cycR I P N f = cycR I P N g := by rw [Inter.cycR_eq_sum, Inter.cycR_eq_sum, hdiv]
+  have hint
+      : ptsIntegral P (pot N) (logNormRat A (s * f * g) (t * g * g))
+        = ptsIntegral P (pot N) (logNormRat B (s * g) (t * g)) := by
     refine Inter.DiagRAux.ptsIntegral_congr_mcPts P (fun _ _ _ => rfl) fun z hz => ?_
     unfold logNormRat
     congr 1
@@ -74,12 +98,17 @@ theorem snoc_eq (hR : RatRStatement) {I : Ideal (MRing ι) → (n : ℕ) → (Fi
     Inter.cycR_mul I hPp N hsP hgP, hint, hfg]
   ring
 
-theorem update_eq (hR : RatRStatement) {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ}
-    (hI : IsIntersectionFamily I) {P : Ideal (MRing ι)} {n : ℕ} (L : Fin n → HermLine ι) (j : Fin n)
-    (B : HermLine ι) (hP : IsArithVar P n) (hL : ∀ i, IsSmoothHerm (L i)) (hB : IsSmoothHerm B)
-    (hLB : IsIsometricOn P (L j) B) : I P n L = I P n (Function.update L j B) := by
+theorem update_eq
+    (hR : RatRStatement)
+    {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ} (hI : IsIntersectionFamily I)
+    {P : Ideal (MRing ι)} {n : ℕ} (L : Fin n → HermLine ι) (j : Fin n)
+    (B : HermLine ι)
+    (hP : IsArithVar P n) (hL : ∀ i, IsSmoothHerm (L i)) (hB : IsSmoothHerm B)
+    (hLB : IsIsometricOn P (L j) B)
+    : I P n L = I P n (Function.update L j B) := by
   classical
-  obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.pos_iff_ne_zero.mp (Nat.lt_of_le_of_lt (Nat.zero_le _) j.2))
+  obtain ⟨m, rfl⟩ :=
+    Nat.exists_eq_succ_of_ne_zero (Nat.pos_iff_ne_zero.mp (Nat.lt_of_le_of_lt (Nat.zero_le _) j.2))
   have hL' : ∀ i, IsSmoothHerm (Function.update L j B i) := fun i => by
     by_cases hi : i = j
     · subst hi; simpa using hB

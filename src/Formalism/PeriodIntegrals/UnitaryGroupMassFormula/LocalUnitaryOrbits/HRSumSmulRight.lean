@@ -9,14 +9,18 @@ noncomputable section
 
 namespace PI.OmLocU
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain MeasureTheory
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem oEv_mul {x y : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) (hy : y ∈ OEv (E := E) v) :
-    x * y ∈ OEv (E := E) v := by
+theorem oEv_mul {x y : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) (hy : y ∈ OEv (E := E) v)
+    : x * y ∈ OEv (E := E) v := by
   unfold OEv at *
   rw [SetLike.mem_coe] at *
   induction hx using Submodule.span_induction with
@@ -46,29 +50,35 @@ theorem oEv_mul {x y : Fv F v ⊗[F] E} (hx : x ∈ OEv (E := E) v) (hy : y ∈ 
     rw [smul_mul_assoc]
     exact Submodule.smul_mem _ r ha
 
-theorem oEv_sum {ι : Type} (s : Finset ι) (f : ι → Fv F v ⊗[F] E) (h : ∀ i ∈ s, f i ∈ OEv (E := E) v) :
-    ∑ i ∈ s, f i ∈ OEv (E := E) v := by
+theorem oEv_sum
+    {ι : Type} (s : Finset ι) (f : ι → Fv F v ⊗[F] E) (h : ∀ i ∈ s, f i ∈ OEv (E := E) v)
+    : ∑ i ∈ s, f i ∈ OEv (E := E) v := by
   unfold OEv at *
   exact Submodule.sum_mem _ h
 
-theorem hR_sum_smul_right {a : ℕ} (x : Fin n → Fv F v ⊗[F] E) (c : Fin a → Fv F v ⊗[F] E)
-    (y : Fin a → Fin n → Fv F v ⊗[F] E) :
-    hR (Fv F v) σ J x (∑ k, c k • y k) = ∑ k, c k * hR (Fv F v) σ J x (y k) := by
+theorem hR_sum_smul_right
+    {a : ℕ}
+    (x : Fin n → Fv F v ⊗[F] E) (c : Fin a → Fv F v ⊗[F] E) (y : Fin a → Fin n → Fv F v ⊗[F] E)
+    : hR (Fv F v) σ J x (∑ k, c k • y k) = ∑ k, c k * hR (Fv F v) σ J x (y k) := by
   have := map_sum (PI.VolStabSW.hLin (Fv F v) σ J x) (fun k => c k • y k) Finset.univ
   simp only [map_smul, smul_eq_mul] at this
   exact this
 
-theorem hR_smul_left' (c : Fv F v ⊗[F] E) (x y : Fin n → Fv F v ⊗[F] E) :
-    hR (Fv F v) σ J (c • x) y = sigR (Fv F v) σ c * hR (Fv F v) σ J x y := by
+theorem hR_smul_left' (c : Fv F v ⊗[F] E) (x y : Fin n → Fv F v ⊗[F] E)
+    : hR (Fv F v) σ J (c • x) y = sigR (Fv F v) σ c * hR (Fv F v) σ J x y := by
   simp only [hR, Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hR_sum_smul_left {a : ℕ} (y : Fin n → Fv F v ⊗[F] E) (c : Fin a → Fv F v ⊗[F] E)
-    (x : Fin a → Fin n → Fv F v ⊗[F] E) :
-    hR (Fv F v) σ J (∑ k, c k • x k) y = ∑ k, sigR (Fv F v) σ (c k) * hR (Fv F v) σ J (x k) y := by
-  have := map_sum (AddMonoidHom.mk' (fun z => hR (Fv F v) σ J z y) (fun z z' => hR_add_left σ J z z' y))
-    (fun k => c k • x k) Finset.univ
+theorem hR_sum_smul_left
+    {a : ℕ}
+    (y : Fin n → Fv F v ⊗[F] E) (c : Fin a → Fv F v ⊗[F] E) (x : Fin a → Fin n → Fv F v ⊗[F] E)
+    : hR (Fv F v) σ J (∑ k, c k • x k) y
+      = ∑ k, sigR (Fv F v) σ (c k) * hR (Fv F v) σ J (x k) y := by
+  have :=
+    map_sum (AddMonoidHom.mk' (fun z => hR (Fv F v) σ J z y) (fun z z' => hR_add_left σ J z z' y))
+      (fun k => c k • x k)
+      Finset.univ
   simp only [AddMonoidHom.mk'_apply] at this
   rw [this]
   exact Finset.sum_congr rfl fun k _ => hR_smul_left' σ J v (c k) (x k) y
@@ -78,24 +88,29 @@ section Onto
 variable (Λ : Set (Fin n → E)) (ψ : AddChar (AF F) ℂ)
 
 def GramInvO (a : ℕ) (Y : TupV (E := E) v n a) : Prop :=
-  GoodY σ J ψ v Λ a Y → ∀ ϖ : Fv F v, IsUnif v ϖ → ∀ y ∈ LamT v Λ a,
-    (∀ i j, gramR (Fv F v) σ J y i j - gramR (Fv F v) σ J Y i j ∈ PO (E := E) v ϖ) →
-    ∃ Ginv : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E), (∀ i j, Ginv i j ∈ OEv (E := E) v) ∧
-      gramR (Fv F v) σ J y * Ginv = 1
+  GoodY σ J ψ v Λ a Y
+    → ∀ ϖ : Fv F v,
+      IsUnif v ϖ
+        → ∀ y ∈ LamT v Λ a,
+          (∀ i j, gramR (Fv F v) σ J y i j - gramR (Fv F v) σ J Y i j ∈ PO (E := E) v ϖ)
+            → ∃ Ginv : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E),
+              (∀ i j, Ginv i j ∈ OEv (E := E) v) ∧ gramR (Fv F v) σ J y * Ginv = 1
 
 def TrOnto : Prop :=
-  UnramAt (E := E) v → ∀ s ∈ OEv (E := E) v, sigR (Fv F v) σ s = s →
-    ∃ x ∈ OEv (E := E) v, x + sigR (Fv F v) σ x = s
+  UnramAt (E := E) v
+    → ∀ s ∈ OEv (E := E) v, sigR (Fv F v) σ s = s → ∃ x ∈ OEv (E := E) v, x + sigR (Fv F v) σ x = s
 
-theorem hensOnto_of (a : ℕ) (Y : TupV (E := E) v n a) (hGI : GramInvO σ J v Λ ψ a Y) (hTr : TrOnto σ v) :
-    HensOnto σ J v Λ ψ a Y := by
+theorem hensOnto_of
+    (a : ℕ) (Y : TupV (E := E) v n a) (hGI : GramInvO σ J v Λ ψ a Y) (hTr : TrOnto σ v)
+    : HensOnto σ J v Λ ψ a Y := by
   classical
   intro hGood ϖ hϖ y hy hyT S hS
   obtain ⟨Ginv, hGi, hGG⟩ := hGI hGood ϖ hϖ y hy hyT
   obtain ⟨L, -, hLΛ⟩ := hGood.2.1
   have hσ : ∀ x, σ (σ x) = x := PI.VolStabSW.sigma_invol σ hGood.1.1.2.2.2
   have hJ : ∀ i j, σ (J j i) = J i j := hGood.1.2.1.1
-  have hdiag : ∀ i, ∃ x ∈ OEv (E := E) v, x + sigR (Fv F v) σ x = (S : Matrix (Fin a) (Fin a) _) i i :=
+  have hdiag
+      : ∀ i, ∃ x ∈ OEv (E := E) v, x + sigR (Fv F v) σ x = (S : Matrix (Fin a) (Fin a) _) i i :=
     fun i => hTr hGood.2.2.2.1 _ (hS i i) (S.2 i i)
   choose x hx hxs using hdiag
   set A : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E) := fun i j =>
@@ -130,7 +145,8 @@ theorem hensOnto_of (a : ℕ) (Y : TupV (E := E) v n a) (hGI : GramInvO σ J v �
         rw [hCdef, ← Matrix.mul_assoc, hGG, Matrix.one_mul]
       rw [← this, Matrix.mul_apply]
       exact Finset.sum_congr rfl fun k _ => mul_comm _ _
-    have e2 : ∑ k, sigR (Fv F v) σ (C k i) * hR (Fv F v) σ J (y k) (y j) = sigR (Fv F v) σ (A j i) := by
+    have e2
+        : ∑ k, sigR (Fv F v) σ (C k i) * hR (Fv F v) σ J (y k) (y j) = sigR (Fv F v) σ (A j i) := by
       have : (gramR (Fv F v) σ J y * C) j i = A j i := by
         rw [hCdef, ← Matrix.mul_assoc, hGG, Matrix.one_mul]
       set_option synthInstance.maxHeartbeats 100000 in

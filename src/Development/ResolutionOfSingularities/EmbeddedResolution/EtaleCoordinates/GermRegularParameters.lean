@@ -18,39 +18,39 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-theorem germ_mem_maximalIdeal_iff {X : Scheme.{u}} {U : X.Opens} (hU : IsAffineOpen U)
-    (x : X) (hx : x ∈ U) (s : Γ(X, U)) :
-    X.presheaf.germ U x hx s ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk x) ↔
-      s ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
-  let instSt : Algebra Γ(X, U) (X.presheaf.stalk x) :=
-    (X.presheaf.germ U x hx).hom.toAlgebra
-  have instLoc : IsLocalization.AtPrime (X.presheaf.stalk x)
-      (hU.primeIdealOf ⟨x, hx⟩).asIdeal := hU.isLocalization_stalk ⟨x, hx⟩
+theorem germ_mem_maximalIdeal_iff
+    {X : Scheme.{u}} {U : X.Opens} (hU : IsAffineOpen U) (x : X) (hx : x ∈ U) (s : Γ(X, U))
+    : X.presheaf.germ U x hx s ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk x)
+      ↔ s ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
+  let instSt : Algebra Γ(X, U) (X.presheaf.stalk x) := (X.presheaf.germ U x hx).hom.toAlgebra
+  have instLoc : IsLocalization.AtPrime (X.presheaf.stalk x) (hU.primeIdealOf ⟨x, hx⟩).asIdeal :=
+    hU.isLocalization_stalk ⟨x, hx⟩
   exact IsLocalization.AtPrime.to_map_mem_maximal_iff (X.presheaf.stalk x)
     (hU.primeIdealOf ⟨x, hx⟩).asIdeal s
 
-variable {X : Scheme.{u}} {k : Type u} [Field k] {p : X ⟶ Spec (CommRingCat.of k)}
-  {U : X.Opens} {m : ℕ}
+variable
+  {X : Scheme.{u}} {k : Type u} [Field k] {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ}
 
-theorem exists_sections_span_eq_maximalIdeal_with_coords (hU : IsAffineOpen U)
-    (c : EtaleChart p U m) (x : X) (hx : x ∈ U) (J₀ : Finset (Fin m))
-    (hJ₀ : ∀ j ∈ J₀, X.presheaf.germ U x hx (c.coord j) ∈
-      IsLocalRing.maximalIdeal (X.presheaf.stalk x)) :
-    ∃ (d : ℕ) (f : Fin d → Γ(X, U)),
-      (∀ i, X.presheaf.germ U x hx (f i) ∈
-          IsLocalRing.maximalIdeal (X.presheaf.stalk x)) ∧
-      (∀ j ∈ J₀, ∃ i, f i = c.coord j) ∧
-      Ideal.span (Set.range fun i => X.presheaf.germ U x hx (f i)) =
-          IsLocalRing.maximalIdeal (X.presheaf.stalk x) ∧
-      (d : WithBot ℕ∞) = ringKrullDim (X.presheaf.stalk x) := by
+theorem exists_sections_span_eq_maximalIdeal_with_coords
+    (hU : IsAffineOpen U)
+    (c : EtaleChart p U m)
+    (x : X) (hx : x ∈ U)
+    (J₀ : Finset (Fin m))
+    (hJ₀ : ∀ j ∈ J₀,
+      X.presheaf.germ U x hx (c.coord j) ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk x))
+    : ∃ (d : ℕ) (f : Fin d → Γ(X, U)),
+      (∀ i, X.presheaf.germ U x hx (f i) ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk x))
+        ∧ (∀ j ∈ J₀, ∃ i, f i = c.coord j)
+        ∧ Ideal.span (Set.range fun i => X.presheaf.germ U x hx (f i))
+          = IsLocalRing.maximalIdeal (X.presheaf.stalk x)
+        ∧ (d : WithBot ℕ∞) = ringKrullDim (X.presheaf.stalk x) := by
   let instAlg : Algebra (CoordPolynomialRing k m) Γ(X, U) := c.algebra
   have instEt : Algebra.Etale (CoordPolynomialRing k m) Γ(X, U) := c.algebra_etale hU
-  let instSt : Algebra Γ(X, U) (X.presheaf.stalk x) :=
-    (X.presheaf.germ U x hx).hom.toAlgebra
-  have instLoc : IsLocalization.AtPrime (X.presheaf.stalk x)
-      (hU.primeIdealOf ⟨x, hx⟩).asIdeal := hU.isLocalization_stalk ⟨x, hx⟩
-  have halg : ∀ t : Γ(X, U),
-      algebraMap Γ(X, U) (X.presheaf.stalk x) t = X.presheaf.germ U x hx t := fun _ => rfl
+  let instSt : Algebra Γ(X, U) (X.presheaf.stalk x) := (X.presheaf.germ U x hx).hom.toAlgebra
+  have instLoc : IsLocalization.AtPrime (X.presheaf.stalk x) (hU.primeIdealOf ⟨x, hx⟩).asIdeal :=
+    hU.isLocalization_stalk ⟨x, hx⟩
+  have halg : ∀ t : Γ(X, U), algebraMap Γ(X, U) (X.presheaf.stalk x) t = X.presheaf.germ U x hx t :=
+    fun _ => rfl
   have hcoord : ∀ j : Fin m, etaleChartCoord k m Γ(X, U) j = c.coord j := by
     intro j
     show c.coordRingHom (MvPolynomial.X (ULift.up j : ULift.{u} (Fin m))) = c.coord j
@@ -70,12 +70,12 @@ theorem exists_sections_span_eq_maximalIdeal_with_coords (hU : IsAffineOpen U)
     exact ⟨i, by rw [hi, hcoord j]⟩
   · simpa only [halg] using hf3
 
-theorem exists_isRegularParameterSystem_with_coords_of_mem_prime (hU : IsAffineOpen U)
-    (c : EtaleChart p U m) (x : X) (hx : x ∈ U) (J₀ : Finset (Fin m))
-    (hJ₀ : ∀ j ∈ J₀, c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal) :
-    ∃ (n : ℕ) (f : Fin n → Γ(X, U)),
-      (∀ j ∈ J₀, ∃ i, f i = c.coord j) ∧
-      IsRegularParameterSystem (X.presheaf.stalk x) n
+theorem exists_isRegularParameterSystem_with_coords_of_mem_prime
+    (hU : IsAffineOpen U) (c : EtaleChart p U m)
+    (x : X) (hx : x ∈ U)
+    (J₀ : Finset (Fin m)) (hJ₀ : ∀ j ∈ J₀, c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal)
+    : ∃ (n : ℕ) (f : Fin n → Γ(X, U)),
+      (∀ j ∈ J₀, ∃ i, f i = c.coord j) ∧ IsRegularParameterSystem (X.presheaf.stalk x) n
         (fun i => X.presheaf.germ U x hx (f i)) := by
   obtain ⟨d, f, -, h2, h3, h4⟩ :=
     exists_sections_span_eq_maximalIdeal_with_coords hU c x hx J₀

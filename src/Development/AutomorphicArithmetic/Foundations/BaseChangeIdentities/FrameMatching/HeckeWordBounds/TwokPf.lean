@@ -7,21 +7,26 @@ public import Development.AutomorphicArithmetic.Foundations.BaseChangeIdentities
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
 
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.B3 PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcN.F2
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.B3 PositivityTheory.Rg.BcB.F.Eig
+  PositivityTheory.Rg.BcN.F2
 open UpperTheory.BaseChangeIdentities.FrameWordIdentity
 
-attribute [local instance] borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  borelG borelF borelA GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem exists_bound {E : Type} [Field E] [NumberField E] [IsCMField E] {B : Block E} (l : List (BGen B)) :
-    ∃ R : ℝ, 0 ≤ R ∧ ∀ s, Sum.inr s ∈ l → s.T ≤ R ∧ s.r + B.c ≤ R := by
+private theorem exists_bound
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {B : Block E} (l : List (BGen B))
+    : ∃ R : ℝ, 0 ≤ R ∧ ∀ s, Sum.inr s ∈ l → s.T ≤ R ∧ s.r + B.c ≤ R := by
   induction l with
   | nil => exact ⟨0, le_rfl, by simp⟩
   | cons g l ih =>
@@ -37,11 +42,13 @@ private theorem exists_bound {E : Type} [Field E] [NumberField E] [IsCMField E] 
         exact ⟨le_max_of_le_right (le_max_left _ _), le_max_of_le_right (le_max_right _ _)⟩
       · exact ⟨(hs s h).1.trans (le_max_left _ _), (hs s h).2.trans (le_max_left _ _)⟩
 
-theorem _root_.UpperTheory.BaseChangeIdentities.FrameWordIdentity.twok_pf :
-    BlockWordOperators → TwOk := by
+theorem _root_.UpperTheory.BaseChangeIdentities.FrameWordIdentity.twok_pf
+    : BlockWordOperators → TwOk := by
   intro hW hR E _ _ _ n π S T F₀ F h i
   have hadj := (hW E (F.B i) [] (F.t₂ i) 0 (by simp) (h.tok i).2 le_rfl (by simp)).2.2.2.2.1
-  have hgl : ∀ p, (gl F i p).Ok ∧ (gl F i p).op = if p.2 then star (F.g p.1 i).op else (F.g p.1 i).op := by
+  have hgl
+      : ∀ p,
+        (gl F i p).Ok ∧ (gl F i p).op = if p.2 then star (F.g p.1 i).op else (F.g p.1 i).op := by
     rintro ⟨x, s⟩
     cases s with
     | false => exact ⟨h.ok x i, rfl⟩

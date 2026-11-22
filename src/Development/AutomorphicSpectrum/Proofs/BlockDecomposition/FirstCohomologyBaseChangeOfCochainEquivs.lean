@@ -9,38 +9,46 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge
 
 namespace GlobalTheory.CompanionTheory.PerfectFirstCohomologyBaseChange
 
-theorem h1_baseChange (R R' C : Type) [CommRing R] [CommRing R'] [Algebra R R'] [Category.{0} C]
-    (F : C ⥤ CommAlgCat.{0} R) (F' : C ⥤ CommAlgCat.{0} R') (m : BC F F')
-    (E₀ : R' ⊗[R] C0 F ≃ₗ[R'] C0 F') (E₁ : R' ⊗[R] C1 F ≃ₗ[R'] C1 F')
-    (E₂ : R' ⊗[R] C2 F ≃ₗ[R'] C2 F')
-    (hE₁ : ∀ c, E₁ (1 ⊗ₜ c) = fun T T' φ ↦ m.α T' (c T T' φ))
+theorem h1_baseChange
+    (R R' C : Type) [CommRing R] [CommRing R'] [Algebra R R'] [Category.{0} C]
+    (F : C ⥤ CommAlgCat.{0} R) (F' : C ⥤ CommAlgCat.{0} R')
+    (m : BC F F') (E₀ : R' ⊗[R] C0 F ≃ₗ[R'] C0 F') (E₁ : R' ⊗[R] C1 F ≃ₗ[R'] C1 F')
+    (E₂ : R' ⊗[R] C2 F ≃ₗ[R'] C2 F') (hE₁ : ∀ c, E₁ (1 ⊗ₜ c) = fun T T' φ ↦ m.α T' (c T T' φ))
     (h01 : ∀ x, E₁ ((d0 F).baseChange R' x) = d0 F' (E₀ x))
     (h12 : ∀ x, E₂ ((d1 F).baseChange R' x) = d1 F' (E₁ x))
-    (hex : ∀ x : R' ⊗[R] C1 F, (d1 F).lTensor R' x = 0 →
-      ∃ (t : R' ⊗[R] Z1 F) (y : R' ⊗[R] C0 F),
-        (Z1 F).subtype.lTensor R' t + (d0 F).lTensor R' y = x)
+    (hex : ∀ x : R' ⊗[R] C1 F,
+      (d1 F).lTensor R' x = 0
+        → ∃ (t : R' ⊗[R] Z1 F) (y : R' ⊗[R] C0 F),
+          (Z1 F).subtype.lTensor R' t + (d0 F).lTensor R' y = x)
     (hinj : ∀ (t : R' ⊗[R] Z1 F) (y : R' ⊗[R] C0 F),
-      (Z1 F).subtype.lTensor R' t = (d0 F).lTensor R' y →
-        ∃ y' : R' ⊗[R] C0 F, ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F)).lTensor R' y' = t) :
-    ∃ e : R' ⊗[R] H1 F ≃ₗ[R'] H1 F', ∀ c, e (1 ⊗ₜ c) = m.coef.pull1 c := by
+      (Z1 F).subtype.lTensor R' t = (d0 F).lTensor R' y
+        → ∃ y' : R' ⊗[R] C0 F,
+          ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F)).lTensor R' y'
+            = t)
+    : ∃ e : R' ⊗[R] H1 F ≃ₗ[R'] H1 F', ∀ c, e (1 ⊗ₜ c) = m.coef.pull1 c := by
   letI : Module R (H1 F') := Module.compHom _ (algebraMap R R')
   haveI : IsScalarTower R R' (H1 F') := ⟨fun r s x ↦ by
     change (r • s) • x = algebraMap R R' r • s • x
     rw [Algebra.smul_def, mul_smul]⟩
-  let p : H1 F →ₗ[R] H1 F' :=
-    { toFun := m.coef.pull1
-      map_add' := map_add _
-      map_smul' := fun r c ↦ m.coef.pull1.map_smulₛₗ r c }
+  let p : H1 F →ₗ[R] H1 F' := {
+    toFun := m.coef.pull1
+    map_add' := map_add _
+    map_smul' := fun r c ↦ m.coef.pull1.map_smulₛₗ r c
+  }
   let Φ : R' ⊗[R] H1 F →ₗ[R'] H1 F' := p.liftBaseChange R'
   have hΦ : ∀ (r : R') (c : H1 F), Φ (r ⊗ₜ c) = r • m.coef.pull1 c := fun r c ↦
     LinearMap.liftBaseChange_tmul _ _ _ _
 
-  have key : ∀ t : R' ⊗[R] Z1 F, ∃ z' : Z1 F', z'.1 = E₁ ((Z1 F).subtype.lTensor R' t) ∧
-      Φ ((H1.mk F).lTensor R' t) = H1.mk F' z' := by
+  have key
+      : ∀ t : R' ⊗[R] Z1 F, ∃ z' : Z1 F',
+        z'.1 = E₁ ((Z1 F).subtype.lTensor R' t) ∧ Φ ((H1.mk F).lTensor R' t) = H1.mk F' z' := by
     intro t
     induction t using TensorProduct.induction_on with
     | zero => exact ⟨0, by simp, by simp⟩
@@ -76,13 +84,14 @@ theorem h1_baseChange (R R' C : Type) [CommRing R] [CommRing R'] [Algebra R R'] 
     obtain ⟨z'', h1, h2⟩ := key t
     refine ⟨(H1.mk F).lTensor R' t, ?_⟩
     rw [h2, H1.mk_eq_mk]
-    refine ⟨-E₀ y, ?_⟩
+    refine ⟨- E₀ y, ?_⟩
     have e := congrArg E₁ hty
     rw [LinearEquiv.apply_symm_apply, map_add (f := _), bc, h01, ← h1] at e
     rw [← e, map_neg]
     abel
   have hinjΦ : Function.Injective Φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro w hw
     obtain ⟨t, rfl⟩ := LinearMap.lTensor_surjective R' (H1.mk_surjective F) w
     obtain ⟨z'', h1, h2⟩ := key t
@@ -93,7 +102,9 @@ theorem h1_baseChange (R R' C : Type) [CommRing R] [CommRing R'] [Algebra R R'] 
       rw [bc, h01, LinearEquiv.apply_symm_apply, hg, h1]
     obtain ⟨y', rfl⟩ := hinj t _ e
     rw [← LinearMap.comp_apply, ← LinearMap.lTensor_comp]
-    have : (H1.mk F).comp ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F)) = 0 := by
+    have : (H1.mk F).comp
+          ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F))
+        = 0 := by
       ext1 g
       exact H1.mk_eq_zero.2 ⟨g, rfl⟩
     rw [this]

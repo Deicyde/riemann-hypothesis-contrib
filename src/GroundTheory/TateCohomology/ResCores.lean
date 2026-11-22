@@ -15,16 +15,15 @@ universe u
 
 variable {k G : Type u} [CommRing k] [Group G] [Fintype G] (S : Subgroup G) [Fintype S]
 
-
 section Res
 
-noncomputable def tateRes (n : ℤ) :
-    tateCohomologyFunctor (R := k) (G := G) n ⟶
-      resFunctor S.subtype ⋙ tateCohomologyFunctor (R := k) (G := S) n :=
-  (Functor.leftUnitor _).inv ≫
-    Functor.whiskerRight (Rep.resCoindAdjunction.{u, u} k S.subtype).unit _ ≫
-    (Functor.associator _ _ _).hom ≫
-    Functor.whiskerLeft (resFunctor S.subtype) (tateCoindNatIso S n).hom
+noncomputable def tateRes (n : ℤ)
+    : tateCohomologyFunctor (R := k) (G := G) n
+      ⟶ resFunctor S.subtype ⋙ tateCohomologyFunctor (R := k) (G := S) n :=
+  (Functor.leftUnitor _).inv
+    ≫ Functor.whiskerRight (Rep.resCoindAdjunction.{u, u} k S.subtype).unit _
+    ≫ (Functor.associator _ _ _).hom
+    ≫ Functor.whiskerLeft (resFunctor S.subtype) (tateCoindNatIso S n).hom
 
 lemma tateRes_app (n : ℤ) (A : Rep.{u} k G) :
     (tateRes S n).app A =
@@ -38,15 +37,14 @@ end Res
 
 section Cores
 
-
 open scoped Classical in
-noncomputable def tateCores (n : ℤ) :
-    resFunctor S.subtype ⋙ tateCohomologyFunctor (R := k) (G := S) n ⟶
-      tateCohomologyFunctor (R := k) (G := G) n :=
-  Functor.whiskerLeft (resFunctor S.subtype) (tateIndNatIso S n).inv ≫
-    (Functor.associator _ _ _).inv ≫
-    Functor.whiskerRight (Rep.indResAdjunction.{u} k S.subtype).counit _ ≫
-    (Functor.leftUnitor _).hom
+noncomputable def tateCores (n : ℤ)
+    : resFunctor S.subtype ⋙ tateCohomologyFunctor (R := k) (G := S) n
+      ⟶ tateCohomologyFunctor (R := k) (G := G) n :=
+  Functor.whiskerLeft (resFunctor S.subtype) (tateIndNatIso S n).inv
+    ≫ (Functor.associator _ _ _).inv
+    ≫ Functor.whiskerRight (Rep.indResAdjunction.{u} k S.subtype).counit _
+    ≫ (Functor.leftUnitor _).hom
 
 lemma tateCores_app (n : ℤ) (A : Rep.{u} k G) :
     (tateCores S n).app A =

@@ -9,7 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Top.V4
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField IsDedekindDomain
 
 structure RowLay (D : D7) (p0 : BaseLevelRowSide D) (X : DivX D) : Prop where
   rrDef : DV.RRDef D
@@ -18,12 +19,17 @@ structure RowLay (D : D7) (p0 : BaseLevelRowSide D) (X : DivX D) : Prop where
   lam_def : DV.LamDef D
   bu_def : Rows.BuDefQ D.what₂
   ft_occ : ∀ π, (∃ σ, D.what₂.ft σ = π) ∨ ∃ σ, D.what₂.ft0 σ = π
-  untw : ∀ w, D.what₂.muAt w = D.what₂.mu0 → ∀ j, 1 ≤ j → j ≤ D.R.m →
-    D.what₂.Ij D.what₂.mu0 j w = 0 ∧ D.what₂.jw D.what₂.mu0 j w = 0
+  untw
+    : ∀ w,
+      D.what₂.muAt w = D.what₂.mu0
+        → ∀ j, 1 ≤ j → j ≤ D.R.m → D.what₂.Ij D.what₂.mu0 j w = 0 ∧ D.what₂.jw D.what₂.mu0 j w = 0
   idx : IdxDefs D X
   kapR_def : DV.KapRBase X
 
-structure MuIsW (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B) (Wt : Set X.B.places.Pl) (xi : X.C.Tup → HChar X.B.host.E) : Prop where
+structure MuIsW
+    (X : Stages)
+    (f : Fr X.B.toPre) (T : TwDat X.B) (Wt : Set X.B.places.Pl) (xi : X.C.Tup → HChar X.B.host.E)
+    : Prop where
   inj : Function.Injective xi
   range : Set.range xi = T.set f
   mu0 : xi X.C.mu0 = 1
@@ -40,9 +46,13 @@ structure Core (K : Ctx) (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B) : Type 
   xi : X.C.Tup → HChar X.B.host.E
   Wt : Set X.B.places.Pl
   mu : MuIsW X f T Wt xi
-  forced : ∀ p : ℕ, p.Prime → ((∃ i, p = X.B.host.g i) ∨ p = X.B.host.d ∨ (p : ℝ) ≤ K.s.X'' X.B.R.n) → p ∈ T.pl
-  fval : ∀ L : SizeData₂ X.toD7, L.sc = K.s → WtEq L K.a K.b → Val K.C K.cD K.ch L → ∀ w, w ∉ Wt →
-    ∀ j ∈ SizeData₂.lifts X.toD7, Fval L j w = 0
+  forced
+    : ∀ p : ℕ,
+      p.Prime → ((∃ i, p = X.B.host.g i) ∨ p = X.B.host.d ∨ (p : ℝ) ≤ K.s.X'' X.B.R.n) → p ∈ T.pl
+  fval
+    : ∀ L : SizeData₂ X.toD7,
+      L.sc = K.s → WtEq L K.a K.b → Val K.C K.cD K.ch L
+        → ∀ w, w ∉ Wt → ∀ j ∈ SizeData₂.lifts X.toD7, Fval L j w = 0
   O : Obj2 X.toD7
   col : ColLay X.toD7 O.lev O.errX
   gatNum : GatNum K.s X.toD7
@@ -55,18 +65,25 @@ structure Core (K : Ctx) (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B) : Type 
   dsig_eq : ∀ τ, X.S.dsig τ = Vol.trueDsig X.B.R (X.B.hc τ)
   del : X.S.s.Del = (Delv K.s K.cD : ℚ)
   etaF : X.V.div.etaF = 6 * K.s.x ^ (-K.C.P.CF)
-  chiT : ∀ (k : Fin 2) (v : X.N.nd.PlG k), ∃ w : (ZMod (X.B.host.g k))ˣ, orderOf w = X.B.host.g k - 1 ∧
-    ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1))
+  chiT
+    : ∀ (k : Fin 2) (v : X.N.nd.PlG k), ∃ w : (ZMod (X.B.host.g k))ˣ,
+      orderOf w = X.B.host.g k - 1 ∧ ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1))
   nch_tie : NChTie X.toD7 O.nch
   nch_Q : ∀ w ∈ Wt, O.nch.Q w = T.Q w ∧ O.nch.k' w = T.k w
 
-abbrev Slot : Type 1 := ∀ (K : Ctx) (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B), Core K X f T → Prop
+abbrev Slot : Type 1 :=
+  ∀ (K : Ctx) (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B), Core K X f T → Prop
 
 structure KsCond (KP : ∀ B : Base, Fr B.toPre → Prop) : Prop where
-  ex : Ev fun K => ∀ (B₀ : Base) (f₀ : Fr B₀.toPre) (S₁ : IntermediateField ℚ ℂ → Finset ℂ)
-    (S₂ : IntermediateField ℚ ℂ → IntermediateField ℚ ℂ → Finset ℂ), K.Over B₀.toPre → (∀ F, ∀ z ∈ S₁ F, IsAlgebraic ℚ z) →
-    (∀ F F₀, ∀ z ∈ S₂ F F₀, IsAlgebraic ℚ z) →
-    ∃ (B : Base) (f : Fr B.toPre), B.toPre = B₀.toPre ∧ HEq f f₀ ∧ KP B f ∧ Has₂ B (S₁ B.KsC) (S₂ B.KsC B.fixedCoefficientFieldInComplex)
+  ex
+    : Ev fun K =>
+      ∀ (B₀ : Base) (f₀ : Fr B₀.toPre) (S₁ : IntermediateField ℚ ℂ → Finset ℂ)
+          (S₂ : IntermediateField ℚ ℂ → IntermediateField ℚ ℂ → Finset ℂ),
+        K.Over B₀.toPre → (∀ F, ∀ z ∈ S₁ F, IsAlgebraic ℚ z)
+          → (∀ F F₀, ∀ z ∈ S₂ F F₀, IsAlgebraic ℚ z)
+          → ∃ (B : Base) (f : Fr B.toPre),
+            B.toPre = B₀.toPre ∧ HEq f f₀ ∧ KP B f
+              ∧ Has₂ B (S₁ B.KsC) (S₂ B.KsC B.fixedCoefficientFieldInComplex)
   enl : ∀ (B B' : Base) (f : Fr B.toPre) (f' : Fr B'.toPre), Enl B B' → HEq f' f → KP B f → KP B' f'
 
 end GlobalTheory.Mem.Top.V4

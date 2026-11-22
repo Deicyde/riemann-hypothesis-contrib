@@ -33,8 +33,8 @@ lemma Pk_inj (k r : ℕ) (x : Fin (2 * r + k + 1) → ℂ) (h : Pk k r *ᵥ x = 
     _ = 0 := by rw [h, Matrix.mulVec_zero]
 
 def negMap (k r : ℕ) : (Fin (2 * r + k + 1) → ℂ) →ₗ[ℂ] (Fin (r + 1) → ℂ) :=
-  (LinearMap.funLeft ℂ ℂ (fun a : Fin (r + 1) => (⟨r + k + a.val, by omega⟩ : Fin (2 * r + k + 1)))).comp
-    (Matrix.mulVecLin (Pk k r))
+  (LinearMap.funLeft ℂ ℂ (fun a : Fin (r + 1) =>
+    (⟨r + k + a.val, by omega⟩ : Fin (2 * r + k + 1)))).comp (Matrix.mulVecLin (Pk k r))
 
 lemma eq_zero_of_negMap (k r : ℕ) (x : Fin (2 * r + k + 1) → ℂ) (hx : negMap k r x = 0)
     (hre : (herm (Hpk k r) x x).re ≤ 0) : x = 0 := by
@@ -67,13 +67,15 @@ lemma eq_zero_of_negMap (k r : ℕ) (x : Fin (2 * r + k + 1) → ℂ) (hx : negM
     simpa using Complex.normSq_eq_zero.mp h1
   · simpa using hneg i h
 
-theorem negBound (k r : ℕ) (W : Submodule ℂ (Fin (2 * r + k + 1) → ℂ))
-    (hW : ∀ x ∈ W, (herm (Hpk k r) x x).re ≤ 0) : Module.finrank ℂ W ≤ r + 1 := by
+theorem negBound
+    (k r : ℕ) (W : Submodule ℂ (Fin (2 * r + k + 1) → ℂ))
+    (hW : ∀ x ∈ W, (herm (Hpk k r) x x).re ≤ 0)
+    : Module.finrank ℂ W ≤ r + 1 := by
   have hinj : Function.Injective ((negMap k r).comp W.subtype) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
-    have h1 : (a : Fin (2 * r + k + 1) → ℂ) = 0 :=
-      eq_zero_of_negMap k r a ha (hW a a.2)
+    have h1 : (a : Fin (2 * r + k + 1) → ℂ) = 0 := eq_zero_of_negMap k r a ha (hW a a.2)
     exact Subtype.ext h1
   have h := LinearMap.finrank_le_finrank_of_injective hinj
   rw [Module.finrank_fin_fun] at h

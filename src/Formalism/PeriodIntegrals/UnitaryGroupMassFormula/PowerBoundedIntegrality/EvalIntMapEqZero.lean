@@ -9,8 +9,11 @@ namespace PI.PowBddIntWork
 
 open Matrix Polynomial
 
-theorem eval₂_int_map_eq_zero {A B : Type*} [Ring A] [Ring B] (ψ : A →+* B) (p : ℤ[X]) (a : A)
-    (h : p.eval₂ (algebraMap ℤ A) a = 0) : p.eval₂ (algebraMap ℤ B) (ψ a) = 0 := by
+theorem eval₂_int_map_eq_zero
+    {A B : Type*} [Ring A] [Ring B]
+    (ψ : A →+* B)
+    (p : ℤ[X]) (a : A) (h : p.eval₂ (algebraMap ℤ A) a = 0)
+    : p.eval₂ (algebraMap ℤ B) (ψ a) = 0 := by
   have e : ψ.comp (algebraMap ℤ A) = algebraMap ℤ B := RingHom.ext_int _ _
   rw [← e, ← Polynomial.hom_eval₂, h, map_zero]
 
@@ -32,7 +35,8 @@ theorem stepB : StepB := by
       rw [Polynomial.aeval_map_algebraMap, Polynomial.aeval_def, hp']
     rw [h2] at h1
     refine ⟨p, hpm, ?_⟩
-    have h3 : (p.map (algebraMap ℤ F)).eval μ = p.eval₂ (algebraMap ℤ F) μ := Polynomial.eval_map _ _
+    have h3 : (p.map (algebraMap ℤ F)).eval μ = p.eval₂ (algebraMap ℤ F) μ :=
+      Polynomial.eval_map _ _
     rw [← h3]
     by_contra hne
     rw [spectrum.mem_iff, sub_zero] at h1

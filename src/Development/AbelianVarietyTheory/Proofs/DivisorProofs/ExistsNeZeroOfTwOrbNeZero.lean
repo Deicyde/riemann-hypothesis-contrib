@@ -7,18 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThLInvolutiv
 @[expose] public section
 
 open NumberField IsDedekindDomain Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.BCT
 
-theorem exists_ne_zero_of_avg_ne_zero {H : Type} [Group H] (u : H → ℂ) (h : avg u ≠ 0) : ∃ k, u k ≠ 0 := by
+theorem exists_ne_zero_of_avg_ne_zero {H : Type} [Group H] (u : H → ℂ) (h : avg u ≠ 0)
+    : ∃ k, u k ≠ 0 := by
   by_contra hc
   push Not at hc
   exact h (by simp [avg, hc])
 
-theorem exists_ne_zero_of_twOrb_ne_zero {G : Type} [Group G] [TopologicalSpace G] (θ : G →* G) (K : Subgroup G) (δ : G)
-    (f : G → ℂ) (h : twOrb θ K δ f ≠ 0) : ∃ x, f (x⁻¹ * δ * θ x) ≠ 0 := by
+theorem exists_ne_zero_of_twOrb_ne_zero
+    {G : Type} [Group G] [TopologicalSpace G]
+    (θ : G →* G) (K : Subgroup G) (δ : G) (f : G → ℂ) (h : twOrb θ K δ f ≠ 0)
+    : ∃ x, f (x⁻¹ * δ * θ x) ≠ 0 := by
   by_contra hc
   push Not at hc
   apply h
@@ -26,8 +30,10 @@ theorem exists_ne_zero_of_twOrb_ne_zero {G : Type} [Group G] [TopologicalSpace G
   simp only [hc]
   simp [avg]
 
-theorem exists_ne_zero_of_clSum_ne_zero {G : Type} [Group G] [TopologicalSpace G] (θ : G →* G) (K : Subgroup G)
-    (S : Set G) (wt f : G → ℂ) (h : clSum θ K S wt f ≠ 0) : ∃ δ ∈ S, ∃ x, f (x⁻¹ * δ * θ x) ≠ 0 := by
+theorem exists_ne_zero_of_clSum_ne_zero
+    {G : Type} [Group G] [TopologicalSpace G]
+    (θ : G →* G) (K : Subgroup G) (S : Set G) (wt f : G → ℂ) (h : clSum θ K S wt f ≠ 0)
+    : ∃ δ ∈ S, ∃ x, f (x⁻¹ * δ * θ x) ≠ 0 := by
   by_contra hc
   apply h
   unfold clSum
@@ -37,8 +43,9 @@ theorem exists_ne_zero_of_clSum_ne_zero {G : Type} [Group G] [TopologicalSpace G
     exact hc ⟨c.rep, hS, exists_ne_zero_of_twOrb_ne_zero θ K c.rep f (right_ne_zero_of_mul hne)⟩
   · rfl
 
-theorem nrmL_twConj {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) (δ x : GLw n w) :
-    nrmL n w (x⁻¹ * δ * thL n w x) = x⁻¹ * nrmL n w δ * x := by
+theorem nrmL_twConj
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E) (δ x : GLw n w)
+    : nrmL n w (x⁻¹ * δ * thL n w x) = x⁻¹ * nrmL n w δ * x := by
   have hinv := TwistInvol.thL_involutive E n w x
   unfold nrmL
   unfold thL at hinv ⊢

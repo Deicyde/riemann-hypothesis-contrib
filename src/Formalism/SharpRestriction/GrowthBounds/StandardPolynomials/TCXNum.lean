@@ -13,12 +13,14 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-theorem tcx_roomR {b' g A P Q k c de be eps N Y N1 ka : ℝ} (hb : 0 < b') (hAP : g - k * P < A * P)
-    (hbT : b' * (1 - be) ≤ g) (hbe : be ≤ de / 2 - 18 * eps) (heps : 0 ≤ eps) (hde6 : de < 1 / 6)
-    (hde40 : 40 * eps ≤ de) (hepsk : 1 / k ≤ eps) (hk5 : 5 ≤ k) (hQ1 : 1 ≤ Q) (hP0 : 0 < P) (hPQ : P ≤ Q)
-    (sq_level_le_degree : 2 * N1 + 3 ≤ k) (hN2 : 2 ≤ N) (hY1 : 1 ≤ Y) (hHc : 1 * k ^ 3 * N * Q ^ 4 * c * Y ≤ b')
-    (hc1 : 1 ≤ c) (hA0 : 0 ≤ A) (hN10 : 0 ≤ N1) (hka : ka = 13 * k * N1 * Q) :
-    c * (ka + 2 * Q + 3 * k) + 4 ≤ de / 4 * A := by
+theorem tcx_roomR
+    {b' g A P Q k c de be eps N Y N1 ka : ℝ}
+    (hb : 0 < b') (hAP : g - k * P < A * P) (hbT : b' * (1 - be) ≤ g) (hbe : be ≤ de / 2 - 18 * eps)
+    (heps : 0 ≤ eps) (hde6 : de < 1 / 6) (hde40 : 40 * eps ≤ de) (hepsk : 1 / k ≤ eps) (hk5 : 5 ≤ k)
+    (hQ1 : 1 ≤ Q) (hP0 : 0 < P) (hPQ : P ≤ Q) (sq_level_le_degree : 2 * N1 + 3 ≤ k) (hN2 : 2 ≤ N)
+    (hY1 : 1 ≤ Y) (hHc : 1 * k ^ 3 * N * Q ^ 4 * c * Y ≤ b') (hc1 : 1 ≤ c) (hA0 : 0 ≤ A)
+    (hN10 : 0 ≤ N1) (hka : ka = 13 * k * N1 * Q)
+    : c * (ka + 2 * Q + 3 * k) + 4 ≤ de / 4 * A := by
   have hk0 : 0 < k := by linarith
   have hQ0 : 0 < Q := by linarith
   have hbe12 : be ≤ 1 / 12 := by linarith
@@ -36,11 +38,13 @@ theorem tcx_roomR {b' g A P Q k c de be eps N Y N1 ka : ℝ} (hb : 0 < b') (hAP 
     have a5 : 0 ≤ k ^ 3 * Q ^ 4 * c := by positivity
     have a2 : 2 * (k ^ 3 * Q ^ 4 * c) ≤ N * (k ^ 3 * Q ^ 4 * c) := mul_le_mul_of_nonneg_right hN2 a5
     have a6 : 0 ≤ N * (k ^ 3 * Q ^ 4 * c) := by positivity
-    have a3 : N * (k ^ 3 * Q ^ 4 * c) * 1 ≤ N * (k ^ 3 * Q ^ 4 * c) * Y := mul_le_mul_of_nonneg_left hY1 a6
+    have a3 : N * (k ^ 3 * Q ^ 4 * c) * 1 ≤ N * (k ^ 3 * Q ^ 4 * c) * Y :=
+      mul_le_mul_of_nonneg_left hY1 a6
     have a4 : 1 * k ^ 3 * N * Q ^ 4 * c * Y = N * (k ^ 3 * Q ^ 4 * c) * Y := by ring
     linarith
   have hA1 : ((11 / 6) * k ^ 3 * Q * c - k) * Q ≤ A * Q := by
-    have e : ((11 / 6) * k ^ 3 * Q * c - k) * Q = (11 / 12) * (2 * k ^ 3 * Q ^ 2 * c) - k * Q := by ring
+    have e : ((11 / 6) * k ^ 3 * Q * c - k) * Q = (11 / 12) * (2 * k ^ 3 * Q ^ 2 * c) - k * Q := by
+      ring
     rw [e]
     linarith
   have hA2 : (11 / 6) * k ^ 3 * Q * c - k ≤ A := le_of_mul_le_mul_right hA1 hQ0
@@ -51,7 +55,8 @@ theorem tcx_roomR {b' g A P Q k c de be eps N Y N1 ka : ℝ} (hb : 0 < b') (hAP 
     linarith
   have hfin : ((55 / 3) * k ^ 2 * Q * c - 10) * k ≤ de / 4 * A * k := by
     have a1 : 40 * A ≤ de * k * A := mul_le_mul_of_nonneg_right hdek hA0
-    have a2 : ((55 / 3) * k ^ 2 * Q * c - 10) * k = (10 / 1) * ((11 / 6) * k ^ 3 * Q * c - k) := by ring
+    have a2 : ((55 / 3) * k ^ 2 * Q * c - 10) * k = (10 / 1) * ((11 / 6) * k ^ 3 * Q * c - k) := by
+      ring
     have a3 : de / 4 * A * k = (de * k * A) / 4 := by ring
     rw [a2, a3]
     linarith
@@ -79,8 +84,10 @@ theorem tcx_roomR {b' g A P Q k c de be eps N Y N1 ka : ℝ} (hb : 0 < b') (hAP 
   have hfirst : c * (ka + 2 * Q + 3 * k) ≤ c * (13 * k ^ 2 * Q + 2 * Q + 3 * (k * Q)) := by
     apply mul_le_mul_of_nonneg_left _ hc0
     linarith
-  have e1 : c * (13 * k ^ 2 * Q + 2 * Q + 3 * (k * Q)) =
-      13 * (k * k * (Q * c)) + 2 * (Q * c) + 3 * (k * (Q * c)) := by ring
+  have e1
+      : c * (13 * k ^ 2 * Q + 2 * Q + 3 * (k * Q))
+        = 13 * (k * k * (Q * c)) + 2 * (Q * c) + 3 * (k * (Q * c)) := by
+    ring
   have e2 : 55 / 3 * k ^ 2 * Q * c = 55 / 3 * (k * k * (Q * c)) := by ring
   have e3 : 5 * k * (Q * c) = 5 * (k * (Q * c)) := by ring
   rw [e1] at hfirst
@@ -90,33 +97,51 @@ theorem tcx_roomR {b' g A P Q k c de be eps N Y N1 ka : ℝ} (hb : 0 < b') (hAP 
 
 variable {C0 Cde CE1 CE2 : ℝ} {X : Loc}
 
-theorem tcx_room (St : Std C0 Cde CE1 CE2 1 X) (hc : 1 ≤ X.c) (j : Fin (numSeg X.TT))
-    (b : SegBlock (segS X.TT j) X.m) (hdig : DigitsOK X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) b)
-    (i : Fin (segS X.TT j)) :
-    (X.c : ℝ) * (ka1 X + 2 * X.Q + 3 * X.k) + 4 ≤
-      X.de C0 Cde / 4 * (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
+theorem tcx_room
+    (St : Std C0 Cde CE1 CE2 1 X) (hc : 1 ≤ X.c)
+    (j : Fin (numSeg X.TT)) (b : SegBlock (segS X.TT j) X.m)
+    (hdig : DigitsOK X.p (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) b) (i : Fin (segS X.TT j))
+    : (X.c : ℝ) * (ka1 X + 2 * X.Q + 3 * X.k) + 4
+      ≤ X.de C0 Cde / 4 * (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
   obtain ⟨hP0, -, -, hQ, hPQ⟩ := St.levels j i
-  have hcb := coarse_bounds (X.bT (segPos X.TT j i)) (X.p ^ (segG X.TT j - (segDists X.TT j).get i)) (b.rz i)
-    (fun c => (hdig.1 i c).1) (hdig.2.1 i).1 (hdig.2.1 i).2
-  have hAP : (X.bT (segPos X.TT j i) : ℝ) - X.k * ((X.p ^ (segG X.TT j - (segDists X.TT j).get i) : ℕ) : ℝ) <
-      (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) * ((X.p ^ (segG X.TT j - (segDists X.TT j).get i) : ℕ) : ℝ) := hcb.2
-  have hbT : X.b' * (1 - _root_.Formalism.MainNotions.ColumnSystems.Pf.be X C0) ≤ (X.bT (segPos X.TT j i) : ℝ) := (St.winB _ (pos_mem X.TT j i).1).1
+  have hcb :=
+    coarse_bounds (X.bT (segPos X.TT j i)) (X.p ^ (segG X.TT j - (segDists X.TT j).get i)) (b.rz i)
+      (fun c => (hdig.1 i c).1)
+      (hdig.2.1 i).1 (hdig.2.1 i).2
+  have hAP
+      : (X.bT (segPos X.TT j i) : ℝ)
+          - X.k * ((X.p ^ (segG X.TT j - (segDists X.TT j).get i) : ℕ) : ℝ)
+        < (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ)
+          * ((X.p ^ (segG X.TT j - (segDists X.TT j).get i) : ℕ) : ℝ) :=
+    hcb.2
+  have hbT
+      : X.b' * (1 - _root_.Formalism.MainNotions.ColumnSystems.Pf.be X C0)
+        ≤ (X.bT (segPos X.TT j i) : ℝ) :=
+    (St.winB _ (pos_mem X.TT j i).1).1
   have hc1 : (1 : ℝ) ≤ (X.c : ℝ) := by exact_mod_cast hc
-  exact tcx_roomR St.bpos hAP hbT St.be18 St.eps0 St.de6 St.forty_epsilon_le_delta St.eps_ge St.k5 St.Q1 hP0 (hPQ.trans hQ) St.N1k
-    St.N2 St.Y1 St.Hc hc1 (Nat.cast_nonneg _) (Nat.cast_nonneg _) rfl
+  exact tcx_roomR St.bpos hAP hbT St.be18 St.eps0 St.de6 St.forty_epsilon_le_delta St.eps_ge St.k5
+    St.Q1 hP0 (hPQ.trans hQ) St.N1k St.N2 St.Y1 St.Hc hc1 (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+    rfl
 
 theorem tcx_floor {x y : ℝ} {z : ℤ} (h : x + z ≤ y) : ⌊x⌋ + z ≤ ⌊y⌋ := by
   apply Int.le_floor.2
   push_cast
   linarith [Int.floor_le x]
 
-theorem tcx_capdiff (p : ℕ) {s r : ℕ} (S : SegData s) (b b' : SegBlock s r) (l : ℕ) (D : ℤ) (hD : 0 ≤ D)
-    (h : ∀ i : Fin s, ((coarseA p S b i : ℤ) - (oEff S b i : ℤ)) - ((coarseA p S b' i : ℤ) - (oEff S b' i : ℤ)) ≤ D) :
-    cap p S b l - cap p S b' l ≤ (s : ℤ) * D := by
+theorem tcx_capdiff
+    (p : ℕ)
+    {s r : ℕ} (S : SegData s) (b b' : SegBlock s r)
+    (l : ℕ)
+    (D : ℤ) (hD : 0 ≤ D)
+    (h : ∀ i : Fin s,
+      ((coarseA p S b i : ℤ) - (oEff S b i : ℤ)) - ((coarseA p S b' i : ℤ) - (oEff S b' i : ℤ)) ≤ D)
+    : cap p S b l - cap p S b' l ≤ (s : ℤ) * D := by
   unfold cap
-  have h2 : ∀ i ∈ (Finset.univ : Finset (Fin s)),
-      (if (i : ℕ) < l then ((coarseA p S b i : ℤ) - (oEff S b i : ℤ)) else 0) -
-        (if (i : ℕ) < l then ((coarseA p S b' i : ℤ) - (oEff S b' i : ℤ)) else 0) ≤ D := by
+  have h2
+      : ∀ i ∈ (Finset.univ : Finset (Fin s)),
+        (if (i : ℕ) < l then ((coarseA p S b i : ℤ) - (oEff S b i : ℤ)) else 0)
+            - (if (i : ℕ) < l then ((coarseA p S b' i : ℤ) - (oEff S b' i : ℤ)) else 0)
+          ≤ D := by
     intro i _
     split_ifs
     · exact h i
@@ -126,19 +151,22 @@ theorem tcx_capdiff (p : ℕ) {s r : ℕ} (S : SegData s) (b b' : SegBlock s r) 
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at h3
   linarith
 
-theorem tcx_termU {A A' o o' K q : ℕ} (hA : A ≤ A' + K) (ho : o' ≤ o + 2 * (K + q)) :
-    ((A : ℤ) - (o : ℤ)) - ((A' : ℤ) - (o' : ℤ)) ≤ ((3 * K + 2 * q : ℕ) : ℤ) := by
+theorem tcx_termU {A A' o o' K q : ℕ} (hA : A ≤ A' + K) (ho : o' ≤ o + 2 * (K + q))
+    : ((A : ℤ) - (o : ℤ)) - ((A' : ℤ) - (o' : ℤ)) ≤ ((3 * K + 2 * q : ℕ) : ℤ) := by
   push_cast
   omega
 
-theorem tcx_termS {A A' w w' g g' K q : ℕ} (hA : A ≤ A' + K) (hw : w' ≤ w + (K + q)) (hg : g' ≤ g + (K + q)) :
-    ((A : ℤ) - ((w + g : ℕ) : ℤ)) - ((A' : ℤ) - ((w' + g' : ℕ) : ℤ)) ≤ ((3 * K + 2 * q : ℕ) : ℤ) := by
+theorem tcx_termS
+    {A A' w w' g g' K q : ℕ} (hA : A ≤ A' + K) (hw : w' ≤ w + (K + q)) (hg : g' ≤ g + (K + q))
+    : ((A : ℤ) - ((w + g : ℕ) : ℤ)) - ((A' : ℤ) - ((w' + g' : ℕ) : ℤ))
+      ≤ ((3 * K + 2 * q : ℕ) : ℤ) := by
   push_cast
   omega
 
-theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
-    (hstd : ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X) :
-    NumCoreAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
+theorem numCore_of_std
+    {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
+    (hstd : ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X)
+    : NumCoreAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
   intro X hD hH hcB mm _ n hn1 hnc e he1 hen j b hb
   have St := hstd X hD hH hcB
   have hc : 1 ≤ X.c := le_trans hn1 hnc
@@ -146,7 +174,8 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
   have hk5 := St.k5
   have hQ1 := St.Q1
   have hN1pos : (1 : ℝ) ≤ X.N1 := by exact_mod_cast St.N1pos
-  have hde0 : 0 ≤ X.de C0 Cde := le_trans (mul_nonneg (by norm_num) St.eps0) St.forty_epsilon_le_delta
+  have hde0 : 0 ≤ X.de C0 Cde :=
+    le_trans (mul_nonneg (by norm_num) St.eps0) St.forty_epsilon_le_delta
   have hde6 := St.de6
   have he1r : (1 : ℝ) ≤ e := by exact_mod_cast he1
   have hecr : (e : ℝ) ≤ X.c := by exact_mod_cast (le_of_lt (lt_of_lt_of_le hen hnc))
@@ -172,39 +201,50 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
   have hx : e * ka1 X = 13 * (X.N1 * X.k * X.Q * e) := by rw [hka]; ring
   have hN0 : (0 : ℝ) ≤ X.N1 := by linarith
   have b1 : (X.N1 : ℝ) * e ≤ X.N1 * X.k * X.Q * e := by
-    have := mul_le_mul_of_nonneg_left hkQ1 (mul_nonneg hN0 (by linarith : (0:ℝ) ≤ e))
+    have := mul_le_mul_of_nonneg_left hkQ1 (mul_nonneg hN0 (by linarith : (0 : ℝ) ≤ e))
     nlinarith
   have b2 : (X.N1 : ℝ) * X.k ≤ X.N1 * X.k * X.Q * e := by
     have := mul_le_mul_of_nonneg_left hQe1 (mul_nonneg hN0 hk0.le)
     nlinarith
   have b3 : (X.N1 : ℝ) * (X.Q * e) ≤ X.N1 * X.k * X.Q * e := by
     have h1k : (1 : ℝ) ≤ X.k := by linarith
-    have := mul_le_mul_of_nonneg_left h1k (mul_nonneg hN0 (by linarith : (0:ℝ) ≤ X.Q * e))
+    have := mul_le_mul_of_nonneg_left h1k (mul_nonneg hN0 (by linarith : (0 : ℝ) ≤ X.Q * e))
     nlinarith
   have b4 : X.k ≤ (X.N1 : ℝ) * X.k := le_mul_of_one_le_left hk0.le hN1pos
   have b5 : X.Q * e ≤ (X.N1 : ℝ) * (X.Q * e) := le_mul_of_one_le_left (by linarith) hN1pos
   have hnumA : 3 * X.k + 2 * (X.Q * e) ≤ e * ka1 X := by rw [hx]; linarith
-  have hnumB : (X.N1 : ℝ) * e + ((X.N1 : ℝ) + 1) * (X.k + X.Q * e) + (X.N1 : ℝ) * (3 * X.k + 2 * (X.Q * e)) ≤
-      e * ka1 X := by
-    have e1 : (X.N1 : ℝ) * e + ((X.N1 : ℝ) + 1) * (X.k + X.Q * e) + (X.N1 : ℝ) * (3 * X.k + 2 * (X.Q * e)) =
-        (X.N1 : ℝ) * e + 4 * ((X.N1 : ℝ) * X.k) + 3 * ((X.N1 : ℝ) * (X.Q * e)) + X.k + X.Q * e := by ring
+  have hnumB
+      : (X.N1 : ℝ) * e + ((X.N1 : ℝ) + 1) * (X.k + X.Q * e) + (X.N1 : ℝ) * (3 * X.k + 2 * (X.Q * e))
+        ≤ e * ka1 X := by
+    have e1
+        : (X.N1 : ℝ) * e + ((X.N1 : ℝ) + 1) * (X.k + X.Q * e)
+            + (X.N1 : ℝ) * (3 * X.k + 2 * (X.Q * e))
+          = (X.N1 : ℝ) * e + 4 * ((X.N1 : ℝ) * X.k) + 3 * ((X.N1 : ℝ) * (X.Q * e)) + X.k
+            + X.Q * e := by
+      ring
     rw [e1, hx]
     linarith
   refine ⟨?_, ?_⟩
-  ·
-    intro i hi
+  · intro i hi
     obtain ⟨-, hoR, -, -⟩ := hU i hi
     have room := tcx_room St hc j b hdig i
     have hEk : (((X.c - n : ℕ)) : ℝ) * ka1 X ≤ X.c * ka1 X := mul_le_mul_of_nonneg_right hE hkapos
     have hQec : X.Q * e ≤ X.Q * X.c := mul_le_mul_of_nonneg_left hecr hQ0.le
     have hkc : 0 ≤ X.k * X.c := by positivity
-    have goalR : ((1 + 2 * (X.p ^ X.G' * e) + b.o i : ℕ) : ℝ) ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
+    have goalR
+        : ((1 + 2 * (X.p ^ X.G' * e) + b.o i : ℕ) : ℝ)
+          ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
       push_cast
       rw [← hQdef]
-      have e1 : (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) * (1 - X.de C0 Cde / 4) =
-          (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) - X.de C0 Cde / 4 * (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
+      have e1
+          : (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) * (1 - X.de C0 Cde / 4)
+            = (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ)
+              - X.de C0 Cde / 4 * (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) := by
         ring
-      have e2 : (X.c : ℝ) * (ka1 X + 2 * X.Q + 3 * X.k) = X.c * ka1 X + 2 * (X.Q * X.c) + 3 * (X.k * X.c) := by ring
+      have e2
+          : (X.c : ℝ) * (ka1 X + 2 * X.Q + 3 * X.k)
+            = X.c * ka1 X + 2 * (X.Q * X.c) + 3 * (X.k * X.c) := by
+        ring
       rw [e1] at hoR
       rw [e2] at room
       linarith
@@ -220,7 +260,9 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
         push_cast at this
         rw [hkdef, hQdef]
         linarith
-      have hAR : (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ) ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) + X.k := by
+      have hAR
+          : (coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℝ)
+            ≤ (coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) + X.k := by
         have := (Nat.cast_le (α := ℝ)).2 (hA i)
         push_cast at this
         rw [hkdef]
@@ -229,8 +271,11 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
       have h5 := mul_le_mul_of_nonneg_right hAR hm
       have h6 : X.k * (1 - X.de C0 Cde / 4) ≤ X.k := by nlinarith
       rw [hE']
-      have e1 : ((coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) + X.k) * (1 - X.de C0 Cde / 4) =
-          (coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) * (1 - X.de C0 Cde / 4) + X.k * (1 - X.de C0 Cde / 4) := by ring
+      have e1
+          : ((coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) + X.k) * (1 - X.de C0 Cde / 4)
+            = (coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℝ) * (1 - X.de C0 Cde / 4)
+              + X.k * (1 - X.de C0 Cde / 4) := by
+        ring
       rw [e1] at h5
       linarith
     · intro i hi
@@ -252,10 +297,12 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
       rw [hE']
       linarith
     · intro l V hV
-      have hterm : ∀ i : Fin (segS X.TT j),
-          ((coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℤ) - (oEff (X.seg C0 CE1 CE2 j) b i : ℤ)) -
-            ((coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℤ) - (oEff (X.seg C0 CE1 CE2 j) b' i : ℤ)) ≤
-            ((3 * (X.m + 1) + 2 * (X.p ^ X.G' * e) : ℕ) : ℤ) := by
+      have hterm
+          : ∀ i : Fin (segS X.TT j),
+            ((coarseA X.p (X.seg C0 CE1 CE2 j) b i : ℤ) - (oEff (X.seg C0 CE1 CE2 j) b i : ℤ))
+                - ((coarseA X.p (X.seg C0 CE1 CE2 j) b' i : ℤ)
+                  - (oEff (X.seg C0 CE1 CE2 j) b' i : ℤ))
+              ≤ ((3 * (X.m + 1) + 2 * (X.p ^ X.G' * e) : ℕ) : ℤ) := by
         intro i
         by_cases hi : (i : ℕ) < (X.seg C0 CE1 CE2 j).sigma
         · have e1 : oEff (X.seg C0 CE1 CE2 j) b i = b.w i + b.sg i := if_pos hi
@@ -282,8 +329,10 @@ theorem numCore_of_std {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
       push_cast
       rw [hkdef, hQdef] at hnumB
       have e1 : (mm + (n : ℝ) * ka1 X) - (mm + ((n : ℝ) - e) * ka1 X) = e * ka1 X := by ring
-      have e2 : (X.N1 : ℝ) * (3 * ((X.m : ℝ) + 1) + 2 * ((X.p : ℝ) ^ X.G' * e)) =
-          (X.N1 : ℝ) * (3 * ((X.m : ℝ) + 1) + 2 * ((X.p : ℝ) ^ X.G' * e)) := rfl
+      have e2
+          : (X.N1 : ℝ) * (3 * ((X.m : ℝ) + 1) + 2 * ((X.p : ℝ) ^ X.G' * e))
+            = (X.N1 : ℝ) * (3 * ((X.m : ℝ) + 1) + 2 * ((X.p : ℝ) ^ X.G' * e)) :=
+        rfl
       linarith
 
 theorem restNumCore : RestNumCore :=

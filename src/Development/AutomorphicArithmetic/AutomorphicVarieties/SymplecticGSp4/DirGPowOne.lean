@@ -8,10 +8,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem cls_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {M : ℕ} (N : ℕ) [NeZero N] (hN : N ∣ M)
-    (s : G ℚ Ω) (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) : Chr.cls ℚ Ω N s = 1 := by
+private theorem cls_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {M : ℕ}
+    (N : ℕ) [NeZero N]
+    (hN : N ∣ M)
+    (s : G ℚ Ω) (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ)
+    : Chr.cls ℚ Ω N s = 1 := by
   refine (Chr.clsFacts ℚ Ω N).2.2.1 s 1 (fun ζ hζ => ?_)
   obtain ⟨k, rfl⟩ := hN
   rw [h ζ (by rw [pow_mul, hζ, one_pow]), Units.val_one, ZMod.val_one_eq_one_mod]
@@ -23,12 +30,22 @@ private theorem cls_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
     subst hN1
     simpa using hζ
 
-private theorem dirG_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {M N : ℕ} [NeZero N]
-    (χ : DirichletCharacter O N) (hN : N ∣ M) (s : G ℚ Ω) (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) : Chr.dirG ℚ Ω χ s = 1 := by
+private theorem dirG_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {M N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N) (hN : N ∣ M)
+    (s : G ℚ Ω) (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ)
+    : Chr.dirG ℚ Ω χ s = 1 := by
   rw [Chr.dirG, MonoidHom.comp_apply, cls_one N hN s h, map_one]
 
-private theorem dirG_pow_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {N : ℕ} [NeZero N]
-    (χ : DirichletCharacter O N) {a m : ℕ} (h : χ ^ a = 1) (ha : a ∣ m) : Chr.dirG ℚ Ω χ ^ m = 1 := by
+private theorem dirG_pow_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N)
+    {a m : ℕ} (h : χ ^ a = 1) (ha : a ∣ m)
+    : Chr.dirG ℚ Ω χ ^ m = 1 := by
   obtain ⟨k, rfl⟩ := ha
   refine MonoidHom.ext fun g => Units.ext ?_
   simp only [MonoidHom.pow_apply, MonoidHom.one_apply, Units.val_pow_eq_pow_val, Units.val_one,
@@ -42,22 +59,36 @@ private theorem tot_two (k : ℕ) : Nat.totient (2 ^ k) ∣ 2 ^ k := by
     rw [Nat.totient_prime_pow_succ Nat.prime_two, pow_succ]
     exact Nat.mul_dvd_mul_left _ (by norm_num)
 
-private theorem pow_tot {O : Type} [CommRing O] {N : ℕ} [NeZero N] (χ : DirichletCharacter O N) :
-    χ ^ Nat.totient N = 1 := by
+private theorem pow_tot {O : Type} [CommRing O] {N : ℕ} [NeZero N] (χ : DirichletCharacter O N)
+    : χ ^ Nat.totient N = 1 := by
   ext u
   rw [MulChar.pow_apply_coe, MulChar.one_apply_coe, ← map_pow, ← Units.val_pow_eq_pow_val,
     ZMod.pow_totient, Units.val_one, map_one]
 
-private theorem pow_tot_cond {O : Type} [CommRing O] {N : ℕ} [NeZero N] (χ : DirichletCharacter O N) :
-    χ ^ Nat.totient χ.conductor = 1 := by
+private theorem pow_tot_cond {O : Type} [CommRing O] {N : ℕ} [NeZero N] (χ : DirichletCharacter O N)
+    : χ ^ Nat.totient χ.conductor = 1 := by
   haveI : NeZero χ.conductor := ⟨DirichletCharacter.conductor_ne_zero χ⟩
-  rw [show χ ^ Nat.totient χ.conductor = DirichletCharacter.changeLevel χ.conductor_dvd_level
-      (χ.primitiveCharacter ^ Nat.totient χ.conductor) by
+  rw [show χ ^ Nat.totient χ.conductor
+      = DirichletCharacter.changeLevel χ.conductor_dvd_level
+        (χ.primitiveCharacter ^ Nat.totient χ.conductor) by
     rw [map_pow, χ.changeLevel_primitiveCharacter]]
   rw [pow_tot, map_one]
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.levOf :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (h : Host) (t : ℕ), h.Big t → ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (e : ℕ), l ≠ 2 → 0 < e → e < t → ∀ ψ ∈ h.X c e, ∀ D : Raw Ω c, D.Good → ∀ n' p₁ m₀ : ℕ, Aut.OfChar D e ψ n' p₁ m₀ → c2 ψ ≤ n' → m₀ ∣ h.o → (Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.ψ ∧ Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.ξ ∧ Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.om) ∧ D.ψ ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1 ∧ D.ξ ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1 ∧ D.om ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1 := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.levOf
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (h : Host) (t : ℕ),
+      h.Big t
+        → ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (e : ℕ),
+          l ≠ 2 → 0 < e → e < t
+            → ∀ ψ ∈ h.X c e, ∀ D : Raw Ω c,
+              D.Good
+                → ∀ n' p₁ m₀ : ℕ,
+                  Aut.OfChar D e ψ n' p₁ m₀ → c2 ψ ≤ n' → m₀ ∣ h.o
+                    → (Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.ψ
+                        ∧ Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.ξ
+                        ∧ Af.KillsMu (l * 2 ^ n' * h.N * p₁) D.om)
+                      ∧ D.ψ ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1
+                      ∧ D.ξ ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1
+                      ∧ D.om ^ ((l - 1) * 2 ^ n' * (2 * h.o)) = 1 := by
   intro Ω _ _ _ h t _ l _ c e _ _ _ ψ hψ D hD n' p₁ m₀ hc hc2 hm₀
   haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
   obtain ⟨hp₁, ξ', ξ₀, -, -, hord, hξ⟩ := hc.xi

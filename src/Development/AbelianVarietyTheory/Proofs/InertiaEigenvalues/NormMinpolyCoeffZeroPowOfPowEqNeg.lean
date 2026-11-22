@@ -8,22 +8,23 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.Conduc
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 namespace GlobalTheory
 
 open Polynomial
 
-theorem norm_minpoly_coeff_zero_pow_of_pow_eq_neg :
-    ∀ (l : ℕ) [Fact l.Prime] (F : IntermediateField ℚ_[l] (Om l)) (N : ℕ) (x : Om l), 0 < N →
-      x ^ N = -(l : Om l) →
-      ‖(((minpoly F x).coeff 0 : F) : Om l)‖ ^ N = ((l : ℝ)⁻¹) ^ (minpoly F x).natDegree := by
+theorem norm_minpoly_coeff_zero_pow_of_pow_eq_neg
+    : ∀ (l : ℕ) [Fact l.Prime] (F : IntermediateField ℚ_[l] (Om l)) (N : ℕ) (x : Om l),
+      0 < N → x ^ N = -(l : Om l)
+        → ‖(((minpoly F x).coeff 0 : F) : Om l)‖ ^ N = ((l : ℝ)⁻¹) ^ (minpoly F x).natDegree := by
   intro l _ F N x hN hx
   set P : F[X] := Polynomial.X ^ N + Polynomial.C (l : F) with hP
   have hPm : P.Monic := monic_X_pow_add_C _ hN.ne'
-  have hPx : aeval x P = 0 := by
-    simp [hP, hx]
+  have hPx : aeval x P = 0 := by simp [hP, hx]
   have hint : IsIntegral F x := ⟨P, hPm, by simpa [aeval_def] using hPx⟩
   have hm : (minpoly F x).Monic := minpoly.monic hint
   have hdvd : minpoly F x ∣ P := minpoly.dvd F x hPx
@@ -43,10 +44,11 @@ theorem norm_minpoly_coeff_zero_pow_of_pow_eq_neg :
     have hrN : r ^ N = -(l : Om l) := by
       have : r ^ N + (l : Om l) = 0 := by simpa [hP] using hPr
       exact eq_neg_of_add_eq_zero_left this
-    rw [← norm_pow, hrN, norm_neg, ← map_natCast (algebraMap ℚ_[l] (Om l)),
-      PadicAlgCl.norm_extends, Padic.norm_p]
+    rw [← norm_pow, hrN, norm_neg, ← map_natCast (algebraMap ℚ_[l] (Om l)), PadicAlgCl.norm_extends,
+      Padic.norm_p]
   have hprod : ‖q.roots.prod‖ ^ N = (q.roots.map fun r => ‖r‖ ^ N).prod := by
-    have := map_multiset_prod ((powMonoidHom N : ℝ →* ℝ).comp (normHom : Om l →*₀ ℝ).toMonoidHom) q.roots
+    have :=
+      map_multiset_prod ((powMonoidHom N : ℝ →* ℝ).comp (normHom : Om l →*₀ ℝ).toMonoidHom) q.roots
     simpa [Function.comp_def] using this
   rw [← hc, hs.coeff_zero_eq_prod_roots_of_monic hqm, norm_mul, mul_pow, norm_pow, norm_neg,
     norm_one, one_pow, one_pow, one_mul, hprod, Multiset.map_congr rfl hroot, Multiset.map_const',

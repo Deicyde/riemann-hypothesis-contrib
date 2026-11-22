@@ -7,7 +7,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace UnipMove.MajH
 
-open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.OrthonormalChartBounds UnipMove.GraphH NumberField Complex
+open ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.OrthonormalChartBounds UnipMove.GraphH NumberField Complex
 open scoped ComplexConjugate Matrix
 
 noncomputable section
@@ -231,24 +232,30 @@ private lemma hermC_sum_smul_left_fin_p0 (τ : E →+* ℂ) (G : Matrix (Fin r) 
     Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : ℝ} (hρ0 : 0 < ρ)
-    (hρ : ρ ≤ 1 / 10) {Z : X.Coord} (hZ : X.zN Z ≤ ρ) (τ : X.Ψ) (v : Fin r → ℂ) :
-    (1 - ρ) / (1 + ρ) * X.maj x τ v ≤ X.maj (X.xZ x Z) τ v ∧
-      X.maj (X.xZ x Z) τ v ≤ (1 + ρ) / (1 - ρ) * X.maj x τ v := by
+theorem maj_xZ'
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x)
+    {ρ : ℝ} (hρ0 : 0 < ρ) (hρ : ρ ≤ 1 / 10)
+    {Z : X.Coord} (hZ : X.zN Z ≤ ρ)
+    (τ : X.Ψ) (v : Fin r → ℂ)
+    : (1 - ρ) / (1 + ρ) * X.maj x τ v ≤ X.maj (X.xZ x Z) τ v
+      ∧ X.maj (X.xZ x Z) τ v ≤ (1 + ρ) / (1 - ρ) * X.maj x τ v := by
   have hρ1 : ρ < 1 := by linarith
   have hy : X.xZ x Z ∈ X.dom := xZ_mem_dom X hx ho (by linarith)
   have hdet : IsUnit (mat x τ).det := isUnit_iff_ne_zero.2 (hx τ).1
-  obtain ⟨ν, rfl⟩ : ∃ ν, v = mat x τ *ᵥ ν :=
-    ⟨(mat x τ)⁻¹ *ᵥ v, by rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hdet, Matrix.one_mulVec]⟩
+  obtain ⟨ν, rfl⟩ : ∃ ν, v = mat x τ *ᵥ ν := ⟨
+    (mat x τ)⁻¹ *ᵥ v,
+    by rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hdet, Matrix.one_mulVec]
+  ⟩
   have hmy : mat (X.xZ x Z) τ = mat x τ * X.lowBlock Z τ := rfl
   have hcol : ∀ k, col (mat (X.xZ x Z) τ) k = mat x τ *ᵥ col (X.lowBlock Z τ) k := by
     intro k
     ext j
     simp [hmy, col, Matrix.mul_apply, Matrix.mulVec, dotProduct]
 
-  have hpair : ∀ (u : Fin r → ℂ) (d : Fin X.p0),
-      hermC τ.1 X.Gm (mat x τ *ᵥ u) (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d)) =
-        top X u d - ((Matrix.of (Z τ))ᴴ *ᵥ bot X u) d := by
+  have hpair
+      : ∀ (u : Fin r → ℂ) (d : Fin X.p0),
+        hermC τ.1 X.Gm (mat x τ *ᵥ u) (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d))
+          = top X u d - ((Matrix.of (Z τ))ᴴ *ᵥ bot X u) d := by
     intro u d
     rw [hcol, hermC_ortho X ho τ, dot_top_col X Z τ, dot_bot_col X Z τ]
 
@@ -259,8 +266,9 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     split_ifs with h
     · simp [sgn]
     · rfl
-  have htopx : ∀ a : Fin X.p0,
-      hermC τ.1 X.Gm (mat x τ *ᵥ ν) (col (mat x τ) (Fin.castLE X.p0_le a)) = top X ν a := by
+  have htopx
+      : ∀ a : Fin X.p0,
+        hermC τ.1 X.Gm (mat x τ *ᵥ ν) (col (mat x τ) (Fin.castLE X.p0_le a)) = top X ν a := by
     intro a
     rw [hpair_ortho X ho τ ν]
     simp [top, sgn]
@@ -270,10 +278,10 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     congr 1
     unfold dot
     refine Finset.sum_congr rfl fun a _ => ?_
-    rw [Finset.sum_eq_single a (fun b _ hb => by rw [Matrix.one_apply_ne (Ne.symm hb)]; ring)
-      (by simp), Matrix.one_apply_eq, htopx, mul_one]
-  have hhv : (hermC τ.1 X.Gm (mat x τ *ᵥ ν) (mat x τ *ᵥ ν)).re =
-      nsq (top X ν) - nsq (bot X ν) := by
+    rw [Finset.sum_eq_single a (fun b _ hb => by rw [Matrix.one_apply_ne (Ne.symm hb)]; ring) (by
+        simp),
+      Matrix.one_apply_eq, htopx, mul_one]
+  have hhv : (hermC τ.1 X.Gm (mat x τ *ᵥ ν) (mat x τ *ᵥ ν)).re = nsq (top X ν) - nsq (bot X ν) := by
     rw [hermC_ortho X ho τ, Complex.sub_re, re_dot_self, re_dot_self]
   have hmajx : X.maj x τ (mat x τ *ᵥ ν) = nsq (top X ν) + nsq (bot X ν) := by
     unfold Data.maj
@@ -284,13 +292,13 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     open scoped ComplexOrder in
     exact Matrix.nonsing_inv_mul _
       ((Matrix.isUnit_iff_isUnit_det _).1 (X.gramPos_posDef hy τ).isUnit)
-  obtain ⟨h', hh'⟩ : ∃ h' : Fin X.p0 → ℂ, ∀ d, h' d =
-      hermC τ.1 X.Gm (mat x τ *ᵥ ν) (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d)) :=
+  obtain ⟨h', hh'⟩
+      : ∃ h' : Fin X.p0 → ℂ, ∀ d,
+        h' d = hermC τ.1 X.Gm (mat x τ *ᵥ ν) (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d)) :=
     ⟨_, fun _ => rfl⟩
-  obtain ⟨α, hα⟩ : ∃ α : Fin X.p0 → ℂ, ∀ a,
-      α a = ∑ b, h' b * (X.gramPos (X.xZ x Z) τ)⁻¹ b a := ⟨_, fun _ => rfl⟩
-  have hppos : X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν) =
-      mat x τ *ᵥ (X.lowBlock Z τ *ᵥ ext X α) := by
+  obtain ⟨α, hα⟩ : ∃ α : Fin X.p0 → ℂ, ∀ a, α a = ∑ b, h' b * (X.gramPos (X.xZ x Z) τ)⁻¹ b a :=
+    ⟨_, fun _ => rfl⟩
+  have hppos : X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν) = mat x τ *ᵥ (X.lowBlock Z τ *ᵥ ext X α) := by
     rw [Matrix.mulVec_mulVec, ← hmy, mulVec_ext X]
     unfold Data.ppos
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -307,18 +315,26 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
     refine Finset.sum_congr rfl fun _ _ => ?_
     ring
-  have horth : ∀ d, hermC τ.1 X.Gm (X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν))
-      (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d)) = h' d := by
+  have horth
+      : ∀ d,
+        hermC τ.1 X.Gm (X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν))
+            (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d))
+          = h' d := by
     intro d
-    have hG : ∀ a, hermC τ.1 X.Gm (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le a))
-        (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d)) = X.gramPos (X.xZ x Z) τ a d :=
-      fun a => (X.gramPos_apply _ τ a d).symm
+    have hG
+        : ∀ a,
+          hermC τ.1 X.Gm (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le a))
+              (col (mat (X.xZ x Z) τ) (Fin.castLE X.p0_le d))
+            = X.gramPos (X.xZ x Z) τ a d := fun a =>
+      (X.gramPos_apply _ τ a d).symm
     unfold Data.ppos
     rw [hermC_sum_smul_left_fin_p0]
     simp only [← hh', hG, Finset.sum_mul]
     rw [Finset.sum_comm]
-    have e : h' d = ∑ b, h' b *
-        ((X.gramPos (X.xZ x Z) τ)⁻¹ * X.gramPos (X.xZ x Z) τ) b d := by
+    have e
+        : h' d
+          = ∑ b, h' b *
+            ((X.gramPos (X.xZ x Z) τ)⁻¹ * X.gramPos (X.xZ x Z) τ) b d := by
       rw [hGinv]
       simp [Matrix.one_apply]
     rw [e]
@@ -327,8 +343,10 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     refine Finset.sum_congr rfl fun a _ => ?_
     ring
 
-  have hcoord : ∀ d, top X ν d - ((Matrix.of (Z τ))ᴴ *ᵥ bot X ν) d =
-      α d - ((Matrix.of (Z τ))ᴴ *ᵥ (Matrix.of (Z τ) *ᵥ α)) d := by
+  have hcoord
+      : ∀ d,
+        top X ν d - ((Matrix.of (Z τ))ᴴ *ᵥ bot X ν) d
+          = α d - ((Matrix.of (Z τ))ᴴ *ᵥ (Matrix.of (Z τ) *ᵥ α)) d := by
     intro d
     have h1 := horth d
     rw [hppos, hpair, hh', hpair, htopP, hbotP] at h1
@@ -344,27 +362,30 @@ theorem maj_xZ' {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     simp only [Pi.add_apply, Pi.sub_apply]
     linear_combination this
 
-  have hposy0 : X.posPart (X.xZ x Z) τ (mat x τ *ᵥ ν) =
-      (hermC τ.1 X.Gm (X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν)) (mat x τ *ᵥ ν)).re :=
+  have hposy0
+      : X.posPart (X.xZ x Z) τ (mat x τ *ᵥ ν)
+        = (hermC τ.1 X.Gm (X.ppos (X.xZ x Z) τ (mat x τ *ᵥ ν)) (mat x τ *ᵥ ν)).re :=
     (congrArg Complex.re (X.hermC_ppos_self τ (X.xZ x Z) (mat x τ *ᵥ ν))).symm
-  have hposy : X.posPart (X.xZ x Z) τ (mat x τ *ᵥ ν) =
-      nsq α - nsq (Matrix.of (Z τ) *ᵥ α) := by
+  have hposy : X.posPart (X.xZ x Z) τ (mat x τ *ᵥ ν) = nsq α - nsq (Matrix.of (Z τ) *ᵥ α) := by
     rw [hposy0, hppos, hermC_ortho X ho τ, htopP, hbotP, ht, hs, dot_add_right, dot_add_right,
       ← dot_adj]
     simp only [Complex.sub_re, Complex.add_re, re_dot_self]
     ring
-  have hmajy : X.maj (X.xZ x Z) τ (mat x τ *ᵥ ν) =
-      2 * (nsq α - nsq (Matrix.of (Z τ) *ᵥ α)) - (nsq (top X ν) - nsq (bot X ν)) := by
+  have hmajy
+      : X.maj (X.xZ x Z) τ (mat x τ *ᵥ ν)
+        = 2 * (nsq α - nsq (Matrix.of (Z τ) *ᵥ α)) - (nsq (top X ν) - nsq (bot X ν)) := by
     unfold Data.maj
     rw [hposy, hhv]
   have hen2 : ∀ {n : ℕ} (u : Fin n → ℂ), en u ^ 2 = nsq u := fun u => by
     rw [show en u = Real.sqrt (nsq u) by simp [en, nsq, EuclideanSpace.norm_eq],
       Real.sq_sqrt (show 0 ≤ nsq u from Finset.sum_nonneg fun _ _ => sq_nonneg _)]
-  have hnt : nsq (top X ν) = en α ^ 2 + en ((Matrix.of (Z τ))ᴴ *ᵥ q) ^ 2 +
-      2 * (dot (Matrix.of (Z τ) *ᵥ α) q).re := by
+  have hnt
+      : nsq (top X ν)
+        = en α ^ 2 + en ((Matrix.of (Z τ))ᴴ *ᵥ q) ^ 2 + 2 * (dot (Matrix.of (Z τ) *ᵥ α) q).re := by
     rw [ht, nsq_add, ← dot_adj, hen2, hen2]
-  have hns : nsq (bot X ν) = en (Matrix.of (Z τ) *ᵥ α) ^ 2 + en q ^ 2 +
-      2 * (dot (Matrix.of (Z τ) *ᵥ α) q).re := by
+  have hns
+      : nsq (bot X ν)
+        = en (Matrix.of (Z τ) *ᵥ α) ^ 2 + en q ^ 2 + 2 * (dot (Matrix.of (Z τ) *ᵥ α) q).re := by
     rw [hs, nsq_add, hen2, hen2]
   have hu := en_mulVec_le X Z τ hρ0.le hZ α
   have hw := en_adj_le X Z τ hρ0.le hZ q

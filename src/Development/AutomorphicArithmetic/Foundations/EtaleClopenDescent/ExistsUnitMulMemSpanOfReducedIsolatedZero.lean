@@ -8,11 +8,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAffCoverSp
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 KaehlerDifferential
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  KaehlerDifferential
 open scoped TensorProduct
 
-private theorem exists_algHom_complex_ker_eq_maximal (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A]
-    (m : Ideal A) [m.IsMaximal] : ∃ e : A →ₐ[ℂ] ℂ, ∀ x, e x = 0 ↔ x ∈ m := by
+private theorem exists_algHom_complex_ker_eq_maximal
+    (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A] (m : Ideal A) [m.IsMaximal]
+    : ∃ e : A →ₐ[ℂ] ℂ, ∀ x, e x = 0 ↔ x ∈ m := by
   letI := Ideal.Quotient.field m
   haveI : Module.Finite ℂ (A ⧸ m) := finite_of_finite_type_of_isJacobsonRing ℂ (A ⧸ m)
   have hb := IsAlgClosed.algebraMap_bijective_of_isIntegral (k := ℂ) (K := A ⧸ m)
@@ -21,9 +24,11 @@ private theorem exists_algHom_complex_ker_eq_maximal (A : Type) [CommRing A] [Al
   show φ.symm (Ideal.Quotient.mkₐ ℂ m x) = 0 ↔ _
   rw [map_eq_zero_iff _ φ.symm.injective, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
 
-private theorem mem_of_reduced_vanishing_on_zeros (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A]
-    (J : Ideal A) (hred : IsReduced (A ⧸ J)) (x : A)
-    (hx : ∀ e : A →ₐ[ℂ] ℂ, (∀ y ∈ J, e y = 0) → e x = 0) : x ∈ J := by
+private theorem mem_of_reduced_vanishing_on_zeros
+    (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A]
+    (J : Ideal A) (hred : IsReduced (A ⧸ J))
+    (x : A) (hx : ∀ e : A →ₐ[ℂ] ℂ, (∀ y ∈ J, e y = 0) → e x = 0)
+    : x ∈ J := by
   haveI : IsJacobsonRing A := isJacobsonRing_of_finiteType (A := ℂ)
   have hj : x ∈ J.jacobson := by
     rw [Ideal.jacobson, Submodule.mem_sInf]
@@ -38,11 +43,15 @@ private theorem mem_of_reduced_vanishing_on_zeros (A : Type) [CommRing A] [Algeb
     ⟨n, by rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]; exact hn⟩
   exact Ideal.Quotient.eq_zero_iff_mem.1 hnil.eq_zero
 
-theorem UpperTheory.Cb.exists_unit_mul_mem_span_of_reduced_isolated_zero :
-    ∀ (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A] (d : ℕ) (t : Fin d → A), IsReduced (A ⧸ Ideal.span (Set.range t)) → Finite {e : A →ₐ[ℂ] ℂ // ∀ j, e (t j) = 0} → ∀ e : A →ₐ[ℂ] ℂ, (∀ j, e (t j) = 0) → ∀ b : A, e b = 0 → ∃ (c : A) (g : Fin d → A), e c ≠ 0 ∧ c * b = ∑ l, g l * t l := by
+theorem UpperTheory.Cb.exists_unit_mul_mem_span_of_reduced_isolated_zero
+    : ∀ (A : Type) [CommRing A] [Algebra ℂ A] [Algebra.FiniteType ℂ A] (d : ℕ) (t : Fin d → A),
+      IsReduced (A ⧸ Ideal.span (Set.range t)) → Finite {e : A →ₐ[ℂ] ℂ // ∀ j, e (t j) = 0}
+        → ∀ e : A →ₐ[ℂ] ℂ,
+          (∀ j, e (t j) = 0)
+            → ∀ b : A, e b = 0 → ∃ (c : A) (g : Fin d → A), e c ≠ 0 ∧ c * b = ∑ l, g l * t l := by
   intro A _ _ _ d t hred hfin e he b hb
-  have key : ∀ s : {e' : A →ₐ[ℂ] ℂ // ∀ j, e' (t j) = 0},
-      ∃ a : A, e a ≠ 0 ∧ (s.1 ≠ e → s.1 a = 0) := by
+  have key
+      : ∀ s : {e' : A →ₐ[ℂ] ℂ // ∀ j, e' (t j) = 0}, ∃ a : A, e a ≠ 0 ∧ (s.1 ≠ e → s.1 a = 0) := by
     intro s
     by_cases hs : s.1 = e
     · exact ⟨1, by simp, fun h => absurd hs h⟩

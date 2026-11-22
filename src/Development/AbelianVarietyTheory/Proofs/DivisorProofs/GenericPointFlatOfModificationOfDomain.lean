@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.CstDvdOfCs
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -25,15 +27,15 @@ theorem Modif.flat_gp (R : Type) [CommRing R] [IsDomain R] (M : Modif R) : Flat 
   have hx : M.gp.base x = genericPoint M.S := by
     have hd : DenseRange M.gp.base := M.gp.denseRange
     have hr : Set.range M.gp.base = {M.gp.base x} := by
-      ext y; constructor
+      ext y
+      constructor
       · rintro ⟨z, rfl⟩; rw [Subsingleton.elim z x]; rfl
       · rintro rfl; exact ⟨x, rfl⟩
     have hg : IsGenericPoint (M.gp.base x) ⊤ := by
       rw [IsGenericPoint, ← hr]
       simpa [Set.top_eq_univ] using hd.closure_range
     exact hg.eq (genericPoint_spec M.S)
-  have hF : IsField (M.S.presheaf.stalk (M.gp.base x)) := by
-    rw [hx]; exact Field.toIsField _
+  have hF : IsField (M.S.presheaf.stalk (M.gp.base x)) := by rw [hx]; exact Field.toIsField _
   letI : Field (M.S.presheaf.stalk (M.gp.base x)) := hF.toField
   unfold RingHom.Flat
   exact inferInstance

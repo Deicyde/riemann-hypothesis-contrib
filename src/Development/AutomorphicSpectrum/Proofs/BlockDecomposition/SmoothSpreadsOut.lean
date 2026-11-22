@@ -17,12 +17,12 @@ section Witness
 
 variable {T S ι σ : Type} [CommRing T] [CommRing S] [Algebra T S]
 
-theorem exists_witness [Algebra.FormallySmooth T S] (Q : Algebra.Presentation T S ι σ) :
-    ∃ h : ι → Q.Ring, (∀ i, h i - X i ∈ Ideal.span (Set.range Q.relation)) ∧
-      ∀ j, aeval h (Q.relation j) ∈ Ideal.span (Set.range Q.relation) ^ 2 := by
+theorem exists_witness [Algebra.FormallySmooth T S] (Q : Algebra.Presentation T S ι σ)
+    : ∃ h : ι → Q.Ring,
+      (∀ i, h i - X i ∈ Ideal.span (Set.range Q.relation))
+        ∧ ∀ j, aeval h (Q.relation j) ∈ Ideal.span (Set.range Q.relation) ^ 2 := by
   let f : Q.Ring →ₐ[T] S := IsScalarTower.toAlgHom _ _ _
-  have hkerf : RingHom.ker f = Ideal.span (.range Q.relation) :=
-    Q.span_range_relation_eq_ker.symm
+  have hkerf : RingHom.ker f = Ideal.span (.range Q.relation) := Q.span_range_relation_eq_ker.symm
   obtain ⟨(τ : S →ₐ[T] MvPolynomial _ T ⧸ RingHom.ker f ^ 2), hsig⟩ :=
     (Algebra.FormallySmooth.iff_split_surjection f Q.algebraMap_surjective).mp inferInstance
   have hex (i : _) := Ideal.Quotient.mk_surjective (τ <| Q.val i)
@@ -42,14 +42,14 @@ theorem exists_witness [Algebra.FormallySmooth T S] (Q : Algebra.Presentation T 
       simp
     rwa [Ideal.Quotient.eq_zero_iff_mem, hkerf] at ho
 
-theorem formallySmooth_of_witness (Q : Algebra.Presentation T S ι σ) (h : ι → Q.Ring)
+theorem formallySmooth_of_witness
+    (Q : Algebra.Presentation T S ι σ) (h : ι → Q.Ring)
     (h1 : ∀ i, h i - X i ∈ Ideal.span (Set.range Q.relation))
-    (h2 : ∀ j, aeval h (Q.relation j) ∈ Ideal.span (Set.range Q.relation) ^ 2) :
-    Algebra.FormallySmooth T S := by
+    (h2 : ∀ j, aeval h (Q.relation j) ∈ Ideal.span (Set.range Q.relation) ^ 2)
+    : Algebra.FormallySmooth T S := by
   let f : Q.Ring →ₐ[T] S := IsScalarTower.toAlgHom _ _ _
   have hf : Function.Surjective f := Q.algebraMap_surjective
-  have hkerf : RingHom.ker f = Ideal.span (.range Q.relation) :=
-    Q.span_range_relation_eq_ker.symm
+  have hkerf : RingHom.ker f = Ideal.span (.range Q.relation) := Q.span_range_relation_eq_ker.symm
   let g₀ : Q.Ring →ₐ[T] Q.Ring ⧸ RingHom.ker f.toRingHom ^ 2 :=
     (Ideal.Quotient.mkₐ T _).comp (aeval h)
   have hg₀ : ∀ a ∈ RingHom.ker f.toRingHom, g₀ a = 0 := by
@@ -72,11 +72,13 @@ theorem formallySmooth_of_witness (Q : Algebra.Presentation T S ι σ) (h : ι �
   rw [← AlgHom.cancel_right hf]
   refine MvPolynomial.algHom_ext fun i ↦ ?_
   have hgf : g (f (X i)) = Ideal.Quotient.mk _ (h i) := by
-    have : (Ideal.quotientKerAlgEquivOfSurjective hf).symm (f (X i)) = Ideal.Quotient.mk _ (X i) := by
+    have : (Ideal.quotientKerAlgEquivOfSurjective hf).symm (f (X i))
+        = Ideal.Quotient.mk _ (X i) := by
       rw [AlgEquiv.symm_apply_eq]
       rfl
-    change (Ideal.Quotient.liftₐ _ g₀ hg₀)
-      ((Ideal.quotientKerAlgEquivOfSurjective hf).symm (f (X i))) = _
+    change (Ideal.Quotient.liftₐ _ g₀ hg₀) ((Ideal.quotientKerAlgEquivOfSurjective hf).symm
+        (f (X i)))
+      = _
     rw [this]
     change Ideal.Quotient.mk _ (aeval h (X i)) = _
     rw [aeval_X]
@@ -93,8 +95,8 @@ section Spread
 
 variable {R₀ R B : Type} [CommRing R₀] [CommRing R] [CommRing B] [Algebra R₀ R] [Algebra R₀ B]
 
-theorem span_range_sq {P : Type} [CommRing P] {σ : Type} (g : σ → P) :
-    Ideal.span (Set.range g) ^ 2 = Ideal.span (Set.range fun p : σ × σ ↦ g p.1 * g p.2) := by
+theorem span_range_sq {P : Type} [CommRing P] {σ : Type} (g : σ → P)
+    : Ideal.span (Set.range g) ^ 2 = Ideal.span (Set.range fun p : σ × σ ↦ g p.1 * g p.2) := by
   rw [pow_two, Ideal.span_mul_span']
   congr 1
   ext x
@@ -105,8 +107,8 @@ theorem span_range_sq {P : Type} [CommRing P] {σ : Type} (g : σ → P) :
   · rintro ⟨a, b, rfl⟩
     exact ⟨_, ⟨a, rfl⟩, _, ⟨b, rfl⟩, rfl⟩
 
-theorem exists_finite_smooth [Algebra.FinitePresentation R₀ B] [Algebra.Smooth R (R ⊗[R₀] B)] :
-    ∃ s : Set R, s.Finite ∧ ∀ A : Subalgebra R₀ R, s ⊆ A → Algebra.Smooth A (A ⊗[R₀] B) := by
+theorem exists_finite_smooth [Algebra.FinitePresentation R₀ B] [Algebra.Smooth R (R ⊗[R₀] B)]
+    : ∃ s : Set R, s.Finite ∧ ∀ A : Subalgebra R₀ R, s ⊆ A → Algebra.Smooth A (A ⊗[R₀] B) := by
   classical
   let P := Algebra.Presentation.ofFinitePresentation R₀ B
   let Q := P.baseChange R
@@ -115,8 +117,12 @@ theorem exists_finite_smooth [Algebra.FinitePresentation R₀ B] [Algebra.Smooth
   simp_rw [Ideal.mem_span_range_iff_exists_fun] at h1 h2
   choose c hc using h1
   choose d hd using h2
-  refine ⟨(⋃ i, ((h i).coeffs : Set R)) ∪ (⋃ i, ⋃ j, ((c i j).coeffs : Set R)) ∪
-    (⋃ i, ⋃ j, ((d i j).coeffs : Set R)), ?_, fun A hA ↦ ?_⟩
+  refine ⟨
+    (⋃ i, ((h i).coeffs : Set R)) ∪ (⋃ i, ⋃ j, ((c i j).coeffs : Set R))
+      ∪ (⋃ i, ⋃ j, ((d i j).coeffs : Set R)),
+    ?_,
+    fun A hA ↦ ?_
+  ⟩
   · refine .union (.union ?_ ?_) ?_
     · exact Set.finite_iUnion fun i ↦ Finset.finite_toSet _
     · exact Set.finite_iUnion fun i ↦ Set.finite_iUnion fun j ↦ Finset.finite_toSet _
@@ -128,12 +134,11 @@ theorem exists_finite_smooth [Algebra.FinitePresentation R₀ B] [Algebra.Smooth
   have lift {ι : Type} (p : MvPolynomial ι R) (hp : (p.coeffs : Set R) ⊆ A) : ∃ q, M q = p := by
     refine MvPolynomial.mem_range_map_iff_coeffs_subset.mpr fun x hx ↦ ?_
     exact ⟨⟨x, hp hx⟩, rfl⟩
-  have hh' (i) : ∃ q, M q = h i := lift _ fun x hx ↦
-    hA (.inl (.inl (Set.mem_iUnion.mpr ⟨i, hx⟩)))
-  have hc' (i j) : ∃ q, M q = c i j := lift _ fun x hx ↦
-    hA (.inl (.inr (Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨j, hx⟩⟩)))
-  have hd' (i j) : ∃ q, M q = d i j := lift _ fun x hx ↦
-    hA (.inr (Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨j, hx⟩⟩))
+  have hh' (i) : ∃ q, M q = h i := lift _ fun x hx ↦ hA (.inl (.inl (Set.mem_iUnion.mpr ⟨i, hx⟩)))
+  have hc' (i j) : ∃ q, M q = c i j :=
+    lift _ fun x hx ↦ hA (.inl (.inr (Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨j, hx⟩⟩)))
+  have hd' (i j) : ∃ q, M q = d i j :=
+    lift _ fun x hx ↦ hA (.inr (Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨j, hx⟩⟩))
   choose h' hh' using hh'
   choose c' hc' using hc'
   choose d' hd' using hd'
@@ -154,46 +159,56 @@ theorem exists_finite_smooth [Algebra.FinitePresentation R₀ B] [Algebra.Smooth
         induction q using MvPolynomial.induction_on with
         | C a => simp [M, MvPolynomial.algebraMap_apply]
         | add p q hp hq => simp only [map_add (f := _), hp, hq]
-        | mul_X p i hp =>
-          simp only [map_mul, aeval_X, hp, hh', hMX]
+        | mul_X p i hp => simp only [map_mul, aeval_X, hp, hh', hMX]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, hd', hrel, hMa, hd j]
+      simp only [map_sum, map_mul, hd', hrel, hMa, hd j]
   exact ⟨inferInstance, inferInstance⟩
 
 end Spread
 
 section Schemes
 
-theorem smooth_iff_of_isPullback {R₀ T B : Type} [CommRing R₀] [CommRing T] [CommRing B] [Algebra R₀ T]
-    [Algebra R₀ B] {U W : Scheme.{0}} (g : U ⟶ Spec (CommRingCat.of R₀)) (e : U ≅ Spec (CommRingCat.of B))
+theorem smooth_iff_of_isPullback
+    {R₀ T B : Type} [CommRing R₀] [CommRing T] [CommRing B] [Algebra R₀ T] [Algebra R₀ B]
+    {U W : Scheme.{0}} (g : U ⟶ Spec (CommRingCat.of R₀)) (e : U ≅ Spec (CommRingCat.of B))
     (he : e.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ B)) = g)
     {p : W ⟶ U} {q : W ⟶ Spec (CommRingCat.of T)}
-    (H : IsPullback p q g (Spec.map (CommRingCat.ofHom (algebraMap R₀ T)))) :
-    Smooth q ↔ Algebra.Smooth T (T ⊗[R₀] B) := by
-  have sq := (isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_tensorProduct R₀ T B)).flip
+    (H : IsPullback p q g (Spec.map (CommRingCat.ofHom (algebraMap R₀ T))))
+    : Smooth q ↔ Algebra.Smooth T (T ⊗[R₀] B) := by
+  have sq :=
+    (isPullback_SpecMap_of_isPushout _ _ _ _ (CommRingCat.isPushout_tensorProduct R₀ T B)).flip
   have H' : IsPullback (p ≫ e.hom) q (Spec.map (CommRingCat.ofHom (algebraMap R₀ B)))
       (Spec.map (CommRingCat.ofHom (algebraMap R₀ T))) :=
     H.of_iso (Iso.refl _) e (Iso.refl _) (Iso.refl _) (by simp) (by simp) (by simp [he]) (by simp)
-  have hq : (H'.isoIsPullback _ _ sq).hom ≫ Spec.map (CommRingCat.ofHom
-      (Algebra.TensorProduct.includeLeftRingHom : T →+* T ⊗[R₀] B)) = q :=
+  have hq
+      : (H'.isoIsPullback _ _ sq).hom ≫ Spec.map (CommRingCat.ofHom
+          (Algebra.TensorProduct.includeLeftRingHom : T →+* T ⊗[R₀] B))
+        = q :=
     IsPullback.isoIsPullback_hom_snd ..
   have : MorphismProperty.RespectsIso @Smooth.{0} := by
     first
-      | exact inferInstance
-      | exact HasRingHomProperty.respectsIso
-      | exact MorphismProperty.IsStableUnderBaseChange.respectsIso
-      | exact (HasRingHomProperty.isLocal_ringHomProperty (P := @Smooth.{0})).respectsIso.arrow
-  rw [← hq, MorphismProperty.cancel_left_of_respectsIso (P := @Smooth.{0}), HasRingHomProperty.Spec_iff (P := @Smooth.{0})]
+    | exact inferInstance
+    | exact HasRingHomProperty.respectsIso
+    | exact MorphismProperty.IsStableUnderBaseChange.respectsIso
+    | exact (HasRingHomProperty.isLocal_ringHomProperty (P := @Smooth.{0})).respectsIso.arrow
+  rw [← hq, MorphismProperty.cancel_left_of_respectsIso (P := @Smooth.{0}),
+    HasRingHomProperty.Spec_iff (P := @Smooth.{0})]
   exact RingHom.smooth_algebraMap (R := T) (S := T ⊗[R₀] B)
 
-theorem exists_finite_chart {R R₀ : Type} [CommRing R] [CommRing R₀] [Algebra R₀ R] {Y Y₀ U : Scheme.{0}}
-    {f : Y ⟶ Spec (CommRingCat.of R)} {f₀ : Y₀ ⟶ Spec (CommRingCat.of R₀)} {π : Y ⟶ Y₀}
-    (hlfp : LocallyOfFinitePresentation f₀)
-    (hpb : IsPullback π f f₀ (Spec.map (CommRingCat.ofHom (algebraMap R₀ R))))
-    (hf : Smooth f) [IsAffine U] (j : U ⟶ Y₀) [IsOpenImmersion j] :
-    ∃ s : Set R, s.Finite ∧ ∀ (A : Subalgebra R₀ R), s ⊆ A → ∀ {W : Scheme.{0}} {p : W ⟶ U}
-      {q : W ⟶ Spec (CommRingCat.of A)},
-      IsPullback p q (j ≫ f₀) (Spec.map (CommRingCat.ofHom (algebraMap R₀ A))) → Smooth q := by
+theorem exists_finite_chart
+    {R R₀ : Type} [CommRing R] [CommRing R₀] [Algebra R₀ R]
+    {Y Y₀ U : Scheme.{0}} {f : Y ⟶ Spec (CommRingCat.of R)} {f₀ : Y₀ ⟶ Spec (CommRingCat.of R₀)}
+    {π : Y ⟶ Y₀} (hlfp : LocallyOfFinitePresentation f₀)
+    (hpb : IsPullback π f f₀ (Spec.map (CommRingCat.ofHom (algebraMap R₀ R)))) (hf : Smooth f)
+    [IsAffine U]
+    (j : U ⟶ Y₀) [IsOpenImmersion j]
+    : ∃ s : Set R,
+      s.Finite
+        ∧ ∀ (A : Subalgebra R₀ R),
+          s ⊆ A
+            → ∀ {W : Scheme.{0}} {p : W ⟶ U} {q : W ⟶ Spec (CommRingCat.of A)},
+              IsPullback p q (j ≫ f₀) (Spec.map (CommRingCat.ofHom (algebraMap R₀ A)))
+                → Smooth q := by
   let B : Type := Γ(U, ⊤)
   let e : U ≅ Spec (CommRingCat.of B) := U.isoSpec
   let α : CommRingCat.of R₀ ⟶ CommRingCat.of B := Spec.preimage (e.inv ≫ j ≫ f₀)
@@ -209,8 +224,9 @@ theorem exists_finite_chart {R R₀ : Type} [CommRing R] [CommRing R₀] [Algebr
     rw [HasRingHomProperty.Spec_iff (P := @LocallyOfFinitePresentation.{0})] at this
     exact this
   have hsm : Algebra.Smooth R (R ⊗[R₀] B) := by
-    refine (smooth_iff_of_isPullback (j ≫ f₀) e he
-      ((IsPullback.of_hasPullback j π).paste_vert hpb)).mp ?_
+    refine
+      (smooth_iff_of_isPullback (j ≫ f₀) e he ((IsPullback.of_hasPullback j π).paste_vert hpb)).mp
+        ?_
     infer_instance
   obtain ⟨s, hs, H⟩ := exists_finite_smooth (R₀ := R₀) (R := R) (B := B)
   refine ⟨s, hs, fun A hA W p q hW ↦ ?_⟩
@@ -232,11 +248,13 @@ theorem smooth_spreads : GlobalTheory.SpreadingModels.Spreads (fun _ _ f ↦ Smo
   let A : Subalgebra R₀ R := Algebra.adjoin R₀ (⋃ i, s i)
   have hAfg : A.FG := ⟨(Set.finite_iUnion hs).toFinset, by simp [A]⟩
   have hft : Algebra.FiniteType R₀ A := (Subalgebra.fg_iff_finiteType A).mp hAfg
-  refine ⟨A, inferInstance, algebraMap R₀ A, algebraMap A R, rfl, Algebra.FiniteType.trans hfg hft, ?_⟩
+  refine
+    ⟨A, inferInstance, algebraMap R₀ A, algebraMap A R, rfl, Algebra.FiniteType.trans hfg hft, ?_⟩
   have hloc : IsZariskiLocalAtSource @Smooth.{0} := HasRingHomProperty.instIsZariskiLocalAtSource
   refine IsZariskiLocalAtSource.of_openCover (P := @Smooth.{0})
     (𝒰.pullback₁ (pullback.fst f₀ (Spec.map (CommRingCat.ofHom (algebraMap R₀ A))))) fun i ↦ ?_
-  exact H i A (fun x hx ↦ Algebra.subset_adjoin (Set.mem_iUnion.mpr ⟨i, hx⟩))
+  exact H i A
+    (fun x hx ↦ Algebra.subset_adjoin (Set.mem_iUnion.mpr ⟨i, hx⟩))
     ((IsPullback.of_hasPullback _ (𝒰.f i)).flip.paste_vert (IsPullback.of_hasPullback _ _))
 
 end GlobalTheory.CompanionTheory.SmoothSpread

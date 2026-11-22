@@ -11,10 +11,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 set_option linter.overlappingInstances false
 set_option synthInstance.maxHeartbeats 200000
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-private theorem int_of_norm {l : ℕ} [Fact l.Prime] (z : Qbar l) (hz : ‖z‖ ≤ 1) :
-    ∃ f : Polynomial ℤ_[l], f.Monic ∧ Polynomial.aeval z f = 0 := by
+private theorem int_of_norm {l : ℕ} [Fact l.Prime] (z : Qbar l) (hz : ‖z‖ ≤ 1)
+    : ∃ f : Polynomial ℤ_[l], f.Monic ∧ Polynomial.aeval z f = 0 := by
   have hi : IsIntegral ℚ_[l] z := Algebra.IsIntegral.isIntegral z
   have hm : (minpoly ℚ_[l] z).Monic := minpoly.monic hi
   have h1 : spectralValue (minpoly ℚ_[l] z) ≤ 1 := by
@@ -29,16 +31,22 @@ private theorem int_of_norm {l : ℕ} [Fact l.Prime] (z : Qbar l) (hz : ‖z‖ 
   refine ⟨f, hfm, ?_⟩
   rw [← Polynomial.aeval_map_algebraMap ℚ_[l], hf, minpoly.aeval]
 
-private theorem int_pt {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
-    (φ : ℤ_[l] →+* D) (hφ : ∀ t, ξ (φ t) = algebraMap ℤ_[l] (Qbar l) t) (a : D) :
-    ∃ f : Polynomial ℤ_[l], f.Monic ∧ ξ (f.eval₂ φ a) = 0 := by
+private theorem int_pt
+    {l : ℕ} [Fact l.Prime]
+    {D : Type} [CommRing D]
+    (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    (φ : ℤ_[l] →+* D) (hφ : ∀ t, ξ (φ t) = algebraMap ℤ_[l] (Qbar l) t)
+    (a : D)
+    : ∃ f : Polynomial ℤ_[l], f.Monic ∧ ξ (f.eval₂ φ a) = 0 := by
   obtain ⟨f, hf, h0⟩ := int_of_norm (ξ a) (h a)
   refine ⟨f, hf, ?_⟩
   rw [Polynomial.hom_eval₂, ← h0, Polynomial.aeval_def]
   congr 1
   exact RingHom.ext hφ
 
-private def nx {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1) : Ideal D where
+private def nx
+    {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    : Ideal D where
   carrier := {a | ‖ξ a‖ < 1}
   add_mem' {a b} ha hb := by
     show ‖ξ (a + b)‖ < 1
@@ -52,8 +60,9 @@ private def nx {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qb
     rw [smul_eq_mul, map_mul, norm_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_left (norm_nonneg _) (h c)) ha
 
-private theorem nx_prime {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1) :
-    (nx ξ h).IsPrime := by
+private theorem nx_prime
+    {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    : (nx ξ h).IsPrime := by
   refine ⟨fun e => ?_, fun {a b} hab => ?_⟩
   · have h1 : ‖ξ 1‖ < 1 := (Ideal.eq_top_iff_one _).1 e
     simp at h1
@@ -69,8 +78,12 @@ private theorem norm_l_lt {l : ℕ} [Fact l.Prime] : ‖(l : Qbar l)‖ < 1 := b
   rw [← map_natCast (algebraMap ℚ_[l] (Qbar l)) l, norm_algebraMap']
   exact Padic.norm_p_lt_one
 
-private theorem nx_max {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
-    (φ : ℤ_[l] →+* D) (hφ : ∀ t, ξ (φ t) = algebraMap ℤ_[l] (Qbar l) t) : (nx ξ h).IsMaximal := by
+private theorem nx_max
+    {l : ℕ} [Fact l.Prime]
+    {D : Type} [CommRing D]
+    (ξ : D →+* Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    (φ : ℤ_[l] →+* D) (hφ : ∀ t, ξ (φ t) = algebraMap ℤ_[l] (Qbar l) t)
+    : (nx ξ h).IsMaximal := by
   haveI hpr := nx_prime ξ h
   haveI hnt : Nontrivial (D ⧸ nx ξ h) := Ideal.Quotient.nontrivial_iff.2 hpr.ne_top
   haveI hdom : IsDomain (D ⧸ nx ξ h) := Ideal.Quotient.isDomain _
@@ -89,7 +102,8 @@ private theorem nx_max {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D 
   have hk : (maximalIdeal ℤ_[l]) ≤ (⊥ : Ideal (D ⧸ nx ξ h)).comap f := by
     rw [PadicInt.maximalIdeal_eq_span_p, Ideal.span_le, Set.singleton_subset_iff]
     show f (l : ℤ_[l]) ∈ (⊥ : Ideal (D ⧸ nx ξ h))
-    rw [Ideal.mem_bot, map_natCast, ← map_natCast (Ideal.Quotient.mk (nx ξ h)), Ideal.Quotient.eq_zero_iff_mem]
+    rw [Ideal.mem_bot, map_natCast, ← map_natCast (Ideal.Quotient.mk (nx ξ h)),
+      Ideal.Quotient.eq_zero_iff_mem]
     show ‖ξ (l : D)‖ < 1
     rw [map_natCast]
     exact norm_l_lt
@@ -97,14 +111,18 @@ private theorem nx_max {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] (ξ : D 
     rw [← (maximalIdeal.isMaximal ℤ_[l]).eq_of_le (Ideal.comap_ne_top _ hbp.ne_top) hk]
     exact maximalIdeal.isMaximal _
   haveI := Ideal.isMaximal_of_isIntegral_of_isMaximal_comap' f hf ⊥ hm
-  have h2 := Ideal.comap_isMaximal_of_surjective (Ideal.Quotient.mk (nx ξ h)) (K := (⊥ : Ideal (D ⧸ nx ξ h)))
-    Ideal.Quotient.mk_surjective
+  have h2 :=
+    Ideal.comap_isMaximal_of_surjective (Ideal.Quotient.mk (nx ξ h)) (K := (⊥ : Ideal (D ⧸ nx ξ h)))
+      Ideal.Quotient.mk_surjective
   rwa [← RingHom.ker_eq_comap_bot, Ideal.mk_ker] at h2
 
-private theorem td_zero {l : ℕ} [Fact l.Prime] {B A : Type} [CommRing B] [CommRing A] [Algebra B A] (q : Ideal A)
-    [q.IsPrime] (ψ : ℤ_[l] →+* B)
-    (h : ∀ a, ∃ f : Polynomial ℤ_[l], f.Monic ∧ f.eval₂ ((algebraMap B A).comp ψ) a ∈ q) :
-    Algebra.trdeg (B ⧸ q.comap (algebraMap B A)) (A ⧸ q) = 0 := by
+private theorem td_zero
+    {l : ℕ} [Fact l.Prime]
+    {B A : Type} [CommRing B] [CommRing A] [Algebra B A]
+    (q : Ideal A) [q.IsPrime]
+    (ψ : ℤ_[l] →+* B)
+    (h : ∀ a, ∃ f : Polynomial ℤ_[l], f.Monic ∧ f.eval₂ ((algebraMap B A).comp ψ) a ∈ q)
+    : Algebra.trdeg (B ⧸ q.comap (algebraMap B A)) (A ⧸ q) = 0 := by
   haveI hcp : (q.comap (algebraMap B A)).IsPrime := Ideal.IsPrime.comap _
   haveI hnt : Nontrivial (B ⧸ q.comap (algebraMap B A)) := Ideal.Quotient.nontrivial_iff.2 hcp.ne_top
   haveI : Algebra.IsIntegral (B ⧸ q.comap (algebraMap B A)) (A ⧸ q) := ⟨fun z => by
@@ -118,21 +136,29 @@ private theorem td_zero {l : ℕ} [Fact l.Prime] {B A : Type} [CommRing B] [Comm
   haveI : Algebra.IsAlgebraic (B ⧸ q.comap (algebraMap B A)) (A ⧸ q) := Algebra.IsIntegral.isAlgebraic
   exact trdeg_eq_zero
 
-private theorem down {A R : Type} [CommRing A] [CommRing R] [IsLocalRing R] (ι : A →+* R) (hf : ι.Flat)
-    (x q : Ideal A) [x.IsPrime] [q.IsPrime] (hq : q ≤ x) (hl : (maximalIdeal R).comap ι = x) :
-    ∃ Q : Ideal R, Q.IsPrime ∧ Q.comap ι = q ∧ Q ∈ (q.map ι).minimalPrimes := by
+private theorem down
+    {A R : Type} [CommRing A] [CommRing R] [IsLocalRing R]
+    (ι : A →+* R) (hf : ι.Flat)
+    (x q : Ideal A) [x.IsPrime] [q.IsPrime]
+    (hq : q ≤ x) (hl : (maximalIdeal R).comap ι = x)
+    : ∃ Q : Ideal R, Q.IsPrime ∧ Q.comap ι = q ∧ Q ∈ (q.map ι).minimalPrimes := by
   letI := ι.toAlgebra
   haveI : Module.Flat A R := hf
   haveI : Algebra.HasGoingDown A R := Algebra.HasGoingDown.of_flat
   haveI : (maximalIdeal R).LiesOver x := ⟨hl.symm⟩
-  obtain ⟨P, -, hp, hlo⟩ := Ideal.exists_ideal_le_liesOver_of_le (p := q) (q := x) (maximalIdeal R) hq
+  obtain ⟨P, -, hp, hlo⟩ :=
+    Ideal.exists_ideal_le_liesOver_of_le (p := q) (q := x) (maximalIdeal R) hq
   have hc : P.comap ι = q := hlo.over.symm
   have hne : q.map ι ≤ P := Ideal.map_le_iff_le_comap.2 hc.ge
   obtain ⟨Q, hQ, hQP⟩ := Ideal.exists_minimalPrimes_le hne
-  exact ⟨Q, hQ.1.1, le_antisymm (hc ▸ Ideal.comap_mono hQP) (Ideal.map_le_iff_le_comap.1 hQ.1.2), hQ⟩
+  exact
+    ⟨Q, hQ.1.1, le_antisymm (hc ▸ Ideal.comap_mono hQP) (Ideal.map_le_iff_le_comap.1 hQ.1.2), hQ⟩
 
-private theorem dim_ge {R : Type} [CommRing R] [IsLocalRing R] (Q : Ideal R) [Q.IsPrime] (z : R)
-    (hz : z ∈ maximalIdeal R) (hn : z ∉ Q) : 1 ≤ ringKrullDim (R ⧸ Q) := by
+private theorem dim_ge
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (Q : Ideal R) [Q.IsPrime]
+    (z : R) (hz : z ∈ maximalIdeal R) (hn : z ∉ Q)
+    : 1 ≤ ringKrullDim (R ⧸ Q) := by
   have hp : ((maximalIdeal R).map (Ideal.Quotient.mk Q)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective
       (by rw [Ideal.mk_ker]; exact le_maximalIdeal (Ideal.IsPrime.ne_top inferInstance))
@@ -141,7 +167,8 @@ private theorem dim_ge {R : Type} [CommRing R] [IsLocalRing R] (Q : Ideal R) [Q.
   have h0 : (0 : WithBot ℕ∞) < ringKrullDim (R ⧸ Q) := by
     refine Order.krullDim_pos_iff.2 ⟨⟨⊥, Ideal.isPrime_bot⟩, ⟨_, hp⟩, ?_⟩
     refine (PrimeSpectrum.asIdeal_lt_asIdeal _ _).1 (bot_lt_iff_ne_bot.2 fun e => ?_)
-    have h1 : Ideal.Quotient.mk Q z ∈ (maximalIdeal R).map (Ideal.Quotient.mk Q) := Ideal.mem_map_of_mem _ hz
+    have h1 : Ideal.Quotient.mk Q z ∈ (maximalIdeal R).map (Ideal.Quotient.mk Q) :=
+      Ideal.mem_map_of_mem _ hz
     have e' : (maximalIdeal R).map (Ideal.Quotient.mk Q) = ⊥ := e
     rw [e', Ideal.mem_bot, Ideal.Quotient.eq_zero_iff_mem] at h1
     exact hn h1
@@ -150,8 +177,10 @@ private theorem dim_ge {R : Type} [CommRing R] [IsLocalRing R] (Q : Ideal R) [Q.
   | bot => simp at h0
   | coe d => exact_mod_cast Order.one_le_iff_pos (α := ℕ∞).2 (by exact_mod_cast h0)
 
-private theorem dim_fin {O Y : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing Y] [Algebra O Y]
-    [Module.Finite O Y] : ringKrullDim Y ≤ 1 := by
+private theorem dim_fin
+    {O Y : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing Y] [Algebra O Y]
+    [Module.Finite O Y]
+    : ringKrullDim Y ≤ 1 := by
   have h1 : ringKrullDim O = 1 :=
     IsPrincipalIdealRing.ringKrullDim_eq_one O (IsDiscreteValuationRing.not_isField O)
   rw [← h1]
@@ -159,39 +188,63 @@ private theorem dim_fin {O Y : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
   exact (PrimeSpectrum.asIdeal_lt_asIdeal _ _).1
     (Ideal.IsIntegral.comap_lt_comap ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).2 hab))
 
-private theorem dim_pt {l : ℕ} [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (R : Type) [CommRing R] [Algebra c.O R]
-    [IsCO c.O R] (y : R →ₐ[c.O] Qbar l) : ringKrullDim (R ⧸ RingHom.ker y) ≤ 1 := by
+private theorem dim_pt
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l) [Fr.IsCoef l c.O]
+    (R : Type) [CommRing R] [Algebra c.O R] [IsCO c.O R]
+    (y : R →ₐ[c.O] Qbar l)
+    : ringKrullDim (R ⧸ RingHom.ker y) ≤ 1 := by
   haveI : Module.Finite c.O y.range := (coPt l c R y).1
   have hker : RingHom.ker (y.rangeRestrict : R →+* y.range) = RingHom.ker y := by
     ext a
     rw [RingHom.mem_ker, RingHom.mem_ker]
     exact Subtype.ext_iff
-  have e : R ⧸ RingHom.ker y ≃+* y.range := (Ideal.quotEquivOfEq hker.symm).trans
-    (RingHom.quotientKerEquivOfSurjective (f := (y.rangeRestrict : R →+* y.range)) y.rangeRestrict_surjective)
+  have e : R ⧸ RingHom.ker y ≃+* y.range :=
+    (Ideal.quotEquivOfEq hker.symm).trans
+      (RingHom.quotientKerEquivOfSurjective (f := (y.rangeRestrict : R →+* y.range))
+        y.rangeRestrict_surjective)
   rw [ringKrullDim_eq_of_ringEquiv e]
   exact dim_fin (O := c.O)
 
-private noncomputable def zA {l : ℕ} [Fact l.Prime] (c : Coef l) (B : Type) [CommRing B] [Algebra c.O B] : ℤ_[l] →+* B :=
+private noncomputable def zA
+    {l : ℕ} [Fact l.Prime] (c : Coef l) (B : Type) [CommRing B] [Algebra c.O B]
+    : ℤ_[l] →+* B :=
   (algebraMap c.O B).comp (algebraMap ℤ_[l] c.O)
 
-private theorem td_pt {l : ℕ} [Fact l.Prime] (c : Coef l) {F : Fr.Frame l (ResidueField c.O)} {n : ℕ} (S : Fr.Space c.O F n)
-    (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1) : S.td (RingHom.ker ξ) = 0 := by
+private theorem td_pt
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l)
+    {F : Fr.Frame l (ResidueField c.O)} {n : ℕ}
+    (S : Fr.Space c.O F n) (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    : S.td (RingHom.ker ξ) = 0 := by
   haveI hq : (RingHom.ker ξ).IsPrime := RingHom.ker_isPrime ξ
-  have hφ : ∀ t, (ξ : S.A →+* Qbar l) (((algebraMap S.B S.A).comp (zA c S.B)) t) = algebraMap ℤ_[l] (Qbar l) t := fun t =>
+  have hφ
+      : ∀ t,
+        (ξ : S.A →+* Qbar l) (((algebraMap S.B S.A).comp (zA c S.B)) t)
+          = algebraMap ℤ_[l] (Qbar l) t := fun t =>
     ((congrArg ξ (S.inc.commutes _)).trans (ξ.commutes _)).trans rfl
-  have h2 : ∀ a, ∃ f : Polynomial ℤ_[l], f.Monic ∧ f.eval₂ ((algebraMap S.B S.A).comp (zA c S.B)) a ∈ RingHom.ker ξ := fun a => by
+  have h2
+      : ∀ a, ∃ f : Polynomial ℤ_[l],
+        f.Monic ∧ f.eval₂ ((algebraMap S.B S.A).comp (zA c S.B)) a ∈ RingHom.ker ξ := fun a => by
     obtain ⟨f, hf, h0⟩ := int_pt (ξ : S.A →+* Qbar l) h _ hφ a
     exact ⟨f, hf, RingHom.mem_ker.2 h0⟩
   exact td_zero (RingHom.ker ξ) (zA c S.B) h2
 
-private theorem max_pt {l : ℕ} [Fact l.Prime] (c : Coef l) {F : Fr.Frame l (ResidueField c.O)} {n : ℕ} (S : Fr.Space c.O F n)
-    (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖(ξ : S.A →+* Qbar l) a‖ ≤ 1) : (nx (ξ : S.A →+* Qbar l) h).IsMaximal :=
+private theorem max_pt
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l)
+    {F : Fr.Frame l (ResidueField c.O)} {n : ℕ}
+    (S : Fr.Space c.O F n) (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖(ξ : S.A →+* Qbar l) a‖ ≤ 1)
+    : (nx (ξ : S.A →+* Qbar l) h).IsMaximal :=
   nx_max _ h (zA c S.A) fun t => (ξ.commutes _).trans rfl
 
-private theorem dim_up {l : ℕ} [Fact l.Prime] {c : Coef l} [Fr.IsCoef l c.O] {F : Fr.Frame l (ResidueField c.O)} {C₀ n : ℕ}
-    (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3) (S : Fr.Space c.O F n) (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
-    {x : Ideal S.A} (L : S.Loc x) (Q : Ideal L.R) (hQ : Q.IsPrime) (hc : L.im Q = RingHom.ker ξ) :
-    ringKrullDim (L.R ⧸ Q) ≤ 1 := by
+private theorem dim_up
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} [Fr.IsCoef l c.O]
+    {F : Fr.Frame l (ResidueField c.O)} {C₀ n : ℕ} (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3)
+    (S : Fr.Space c.O F n) (ξ : S.A →ₐ[c.O] Qbar l) (h : ∀ a, ‖ξ a‖ ≤ 1)
+    {x : Ideal S.A} (L : S.Loc x) (Q : Ideal L.R) (hQ : Q.IsPrime) (hc : L.im Q = RingHom.ker ξ)
+    : ringKrullDim (L.R ⧸ Q) ≤ 1 := by
   have hup := (Fr.loc_dim hF hn S x L).1 Q hQ 0 (by rw [hc, td_pt c S ξ h]; simp)
   have hpi : L.π Q = RingHom.ker (ξ.comp S.inc) := by
     show S.π (L.im Q) = _
@@ -204,20 +257,29 @@ private theorem dim_up {l : ℕ} [Fact l.Prime] {c : Coef l} [Fr.IsCoef l c.O] {
   rw [hpi] at hup
   simpa using hup.trans (by simpa using hd)
 
-private theorem l_mem {l : ℕ} {O R : Type} [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] [CommRing R] [Algebra O R]
-    [IsCO O R] : ((l : ℕ) : R) ∈ maximalIdeal R := by
+private theorem l_mem
+    {l : ℕ} {O R : Type}
+    [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] [CommRing R] [Algebra O R] [IsCO O R]
+    : ((l : ℕ) : R) ∈ maximalIdeal R := by
   rw [← res_eq_zero_iff O R, map_natCast]
   exact CharP.cast_eq_zero _ l
 
-private theorem l_not {l : ℕ} [Fact l.Prime] {A R : Type} [CommRing A] [CommRing R] (ι : A →+* R) (ξ : A →+* Qbar l)
-    (Q : Ideal R) (hc : ∀ a, ι a ∈ Q → ξ a = 0) : ((l : ℕ) : R) ∉ Q := fun h => by
+private theorem l_not
+    {l : ℕ} [Fact l.Prime]
+    {A R : Type} [CommRing A] [CommRing R]
+    (ι : A →+* R) (ξ : A →+* Qbar l) (Q : Ideal R) (hc : ∀ a, ι a ∈ Q → ξ a = 0)
+    : ((l : ℕ) : R) ∉ Q := fun h => by
   have h1 := hc (l : A) (by rw [map_natCast]; exact h)
   rw [map_natCast] at h1
   exact (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero) h1
 
-theorem UpperTheory.V.J.locAt :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O)) (C₀ n : ℕ), F.Ok C₀ → (n = 2 ∨ n = 3) →
-        ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l, IntPt S ξ → ∃ (x : Ideal S.A) (L : S.Loc x) (Q : Ideal L.R), Over S L (RingHom.ker ξ) Q := by
+theorem UpperTheory.V.J.locAt
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O))
+        (C₀ n : ℕ),
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l,
+          IntPt S ξ
+            → ∃ (x : Ideal S.A) (L : S.Loc x) (Q : Ideal L.R), Over S L (RingHom.ker ξ) Q := by
   intro l _ c _ F C₀ n hF hn S ξ hξ
   haveI hxm := max_pt c S ξ hξ.1
   have hB : S.mB ≤ S.π (nx (ξ : S.A →+* Qbar l) hξ.1) := fun b hb => hξ.2 b hb
@@ -228,9 +290,12 @@ theorem UpperTheory.V.J.locAt :
     show ‖ξ a‖ < 1
     rw [RingHom.mem_ker.1 ha, norm_zero]
     exact one_pos
-  obtain ⟨Q, hQ, hQc, hQm⟩ := @down S.A L.R _ _ _ (L.ι : S.A →+* L.R) hfl _ _ hxm.isPrime hq hqx L.lies
+  obtain ⟨Q, hQ, hQc, hQm⟩ :=
+    @down S.A L.R _ _ _ (L.ι : S.A →+* L.R) hfl _ _ hxm.isPrime hq hqx L.lies
   haveI := hQ
-  have hn' := l_not (l := l) (L.ι : S.A →+* L.R) (ξ : S.A →+* Qbar l) Q fun a ha => RingHom.mem_ker.1 (hQc.le ha)
+  have hn' :=
+    l_not (l := l) (L.ι : S.A →+* L.R) (ξ : S.A →+* Qbar l) Q fun a ha =>
+      RingHom.mem_ker.1 (hQc.le ha)
   have d1 := dim_up hF hn S ξ hξ.1 L Q hQ hQc
   have d2 := dim_ge Q _ (l_mem (l := l) (O := L.O') (R := L.R)) hn'
   exact ⟨_, L, Q, hQ, hQc, hQm, le_antisymm d1 d2⟩

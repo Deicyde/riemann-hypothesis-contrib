@@ -20,7 +20,8 @@ def toSub {G : Type} [Group G] (K : Set G) (hK : IsGrp K) : Subgroup G where
 
 section Sub
 
-variable {G : Type} [TopologicalSpace G] [Group G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [TopologicalSpace G] [Group G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
 lemma map_val_mul (K' : Subgroup G) (g : K') (α : Measure K') :
@@ -52,8 +53,7 @@ theorem haar_measure_existence : HaarExist := by
     rw [Measure.map_eq_zero_iff hv.aemeasurable] at h
     exact (Measure.measure_univ_pos.mp (isOpen_univ.measure_pos α Set.univ_nonempty)) h
   · rw [Measure.map_apply hv hKc.measurableSet.compl]
-    have h : (Subtype.val : H → G) ⁻¹' Kᶜ = ∅ :=
-      Set.eq_empty_iff_forall_notMem.2 fun x hx => hx x.2
+    have h : (Subtype.val : H → G) ⁻¹' Kᶜ = ∅ := Set.eq_empty_iff_forall_notMem.2 fun x hx => hx x.2
     rw [h, measure_empty]
   · intro s hs
     have h := map_val_mul H ⟨s, hs⟩ α
@@ -72,8 +72,10 @@ theorem haar_measure_uniqueness : HaarUniq := by
   have hme : MeasurableEmbedding (Subtype.val : H → G) :=
     MeasurableEmbedding.subtype_coe hKc.measurableSet
   let K₀ : TopologicalSpace.PositiveCompacts H := Classical.arbitrary _
-  have key : ∀ ρ : Measure G, InvOn ρ K → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧
-      ρ = c • (Measure.haarMeasure K₀).map Subtype.val := by
+  have key
+      : ∀ ρ : Measure G,
+        InvOn ρ K
+          → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ρ = c • (Measure.haarMeasure K₀).map Subtype.val := by
     intro ρ ⟨hσ, h0, hc, hinv⟩
     let ρ' : Measure H := ρ.comap Subtype.val
     have hback : ρ'.map Subtype.val = ρ := by
@@ -99,7 +101,8 @@ theorem haar_measure_uniqueness : HaarUniq := by
       have hne : Measure.haarMeasure K₀ (⋃ n, spanningSets ρ' n) ≠ 0 := by
         rw [iUnion_spanningSets]
         exact (lt_of_lt_of_le zero_lt_one
-          ((Measure.haarMeasure_self (K₀ := K₀)).symm.le.trans (measure_mono (Set.subset_univ _)))).ne'
+          ((Measure.haarMeasure_self (K₀ := K₀)).symm.le.trans
+            (measure_mono (Set.subset_univ _)))).ne'
       obtain ⟨n, hn⟩ : ∃ n, Measure.haarMeasure K₀ (spanningSets ρ' n) ≠ 0 := by
         by_contra hall
         push_neg at hall

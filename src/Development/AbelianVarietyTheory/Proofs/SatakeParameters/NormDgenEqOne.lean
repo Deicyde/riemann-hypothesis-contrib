@@ -7,11 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NormPadic
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Classical
 
 namespace GlobalTheory.EigenGenerator
 
-theorem norm_dgen_eq_one : ∀ (D : D7) (cD : D.what₂.Tau → ℂ), Formalism.L2.Ker.IsDgen D cD → ∀ (p : ℕ) [Fact p.Prime] (lm : Qbar →+* ℂ_[p]), p = D.host.d → ∀ τ, ‖lamC lm (cD τ)‖ = 1 := by
+theorem norm_dgen_eq_one
+    : ∀ (D : D7) (cD : D.what₂.Tau → ℂ),
+      Formalism.L2.Ker.IsDgen D cD
+        → ∀ (p : ℕ) [Fact p.Prime] (lm : Qbar →+* ℂ_[p]),
+          p = D.host.d → ∀ τ, ‖lamC lm (cD τ)‖ = 1 := by
   intro D cD hD p _ lm hp τ
   obtain ⟨M, hMnf, hM, hs⟩ := hD
   obtain ⟨s, hsc, hsp⟩ := hs τ

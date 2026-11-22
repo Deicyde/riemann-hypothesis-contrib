@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 open MulAction
 
-theorem UpperTheory.orbitalFiber_pushforward :
-    UpperTheory.V.Z.Sym.Glob.Fib.Push := by
+theorem UpperTheory.orbitalFiber_pushforward : UpperTheory.V.Z.Sym.Glob.Fib.Push := by
   intro H X' X _ _ _ H₀ q k hN hq hH₀ hk hT hfin hidx
   classical
   let F : orbitRel.Quotient H X → Set X' := fun i => {y | q y = Quotient.out i}
@@ -19,20 +18,29 @@ theorem UpperTheory.orbitalFiber_pushforward :
           exact mem_stabilizer_iff.mp h.2⟩
       one_smul := fun y => Subtype.ext (one_smul H (y : X'))
       mul_smul := fun a b y => Subtype.ext (mul_smul (a : H) (b : H) (y : X')) }
-  have hD := UpperTheory.orbitalFiber_decomposition H X' (orbitRel.Quotient H X) H₀ k
-    (fun i => stabilizer H (Quotient.out i)) (fun i => F i)
-    (fun i => (stabilizer H (Quotient.out i)).subtype) (fun i y => (y : X'))
-    (fun i y => k (y : X')) hN hk hT
-    (fun i h y => rfl) (fun i => Subtype.val_injective)
-    (fun i h y => hk (h : H) (y : X')) (fun i y _ => rfl) ?cover ?disj
+  have hD :=
+    UpperTheory.orbitalFiber_decomposition H X' (orbitRel.Quotient H X) H₀ k
+      (fun i => stabilizer H (Quotient.out i))
+      (fun i => F i)
+      (fun i => (stabilizer H (Quotient.out i)).subtype)
+      (fun i y => (y : X'))
+      (fun i y => k (y : X'))
+      hN hk hT
+      (fun i h y => rfl)
+      (fun i => Subtype.val_injective)
+      (fun i h y => hk (h : H) (y : X'))
+      (fun i y _ => rfl)
+      ?cover ?disj
   case cover =>
     intro x hx
     obtain ⟨g, hg⟩ := orbitRel_apply.mp (Quotient.mk_out (s := orbitRel H X) (q x))
     refine ⟨Quotient.mk _ (q x), ⟨g • x, ?_⟩, g⁻¹, ?_, ?_⟩
     · show q (g • x) = _
-      rw [hq]; exact hg
+      rw [hq]
+      exact hg
     · show k (g • x) ≠ 0
-      rw [hk]; exact hx
+      rw [hk]
+      exact hx
     · show x = g⁻¹ • g • x
       rw [inv_smul_smul]
   case disj =>
@@ -40,7 +48,8 @@ theorem UpperTheory.orbitalFiber_pushforward :
     have hqe : h • Quotient.out i = Quotient.out j := by
       have h1 : q (h • (y : X')) = q (y' : X') := congrArg q he
       rw [hq, show q (y : X') = Quotient.out i from y.2,
-        show q (y' : X') = Quotient.out j from y'.2] at h1
+          show q (y' : X') = Quotient.out j from y'.2]
+        at h1
       exact h1
     have hij : i = j := by
       rw [← Quotient.out_eq i, ← Quotient.out_eq j]

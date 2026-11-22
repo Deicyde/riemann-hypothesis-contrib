@@ -11,8 +11,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Nontrivi
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
+  PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
@@ -25,7 +27,8 @@ open PositivityTheory.Rg.BcB.F
 
 attribute [local instance] borelG borelF borelA
 
-theorem cosh_im_zero (c : ℂ) (hc : c.im = 0) (t : ℝ) : (Complex.cosh (t * c ^ (1 / 2 : ℂ))).im = 0 := by
+theorem cosh_im_zero (c : ℂ) (hc : c.im = 0) (t : ℝ)
+    : (Complex.cosh (t * c ^ (1 / 2 : ℂ))).im = 0 := by
   set s := c ^ (1 / 2 : ℂ) with hs
   have hsq : s ^ 2 = c := by
     have := Complex.cpow_nat_inv_pow c (n := 2) (by norm_num)
@@ -35,15 +38,13 @@ theorem cosh_im_zero (c : ℂ) (hc : c.im = 0) (t : ℝ) : (Complex.cosh (t * c 
     rw [hc, pow_two, Complex.mul_im] at h
     linarith
   rcases mul_eq_zero.1 him with h | h
-  · have e : (t : ℂ) * s = ((t * s.im : ℝ) : ℂ) * Complex.I := by
-      apply Complex.ext <;> simp [h]
+  · have e : (t : ℂ) * s = ((t * s.im : ℝ) : ℂ) * Complex.I := by apply Complex.ext <;> simp [h]
     rw [e, Complex.cosh_mul_I, ← Complex.ofReal_cos, Complex.ofReal_im]
-  · have e : (t : ℂ) * s = ((t * s.re : ℝ) : ℂ) := by
-      apply Complex.ext <;> simp [h]
+  · have e : (t : ℂ) * s = ((t * s.re : ℝ) : ℂ) := by apply Complex.ext <;> simp [h]
     rw [e, ← Complex.ofReal_cosh, Complex.ofReal_im]
 
-theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0) :
-    ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 := by
+theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0)
+    : ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 := by
   have hev : ∀ᶠ t : ℝ in nhds 0, ∀ i, ‖Complex.cosh (t * c i ^ (1 / 2 : ℂ)) - 1‖ < 1 / 2 := by
     rw [Filter.eventually_all]
     intro i
@@ -51,8 +52,9 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
     have h0 : Complex.cosh (((0 : ℝ) : ℂ) * c i ^ (1 / 2 : ℂ)) = 1 := by simp
     have ht := hcont.tendsto 0
     rw [h0] at ht
-    exact (ht.eventually (Metric.ball_mem_nhds 1 (by norm_num : (0 : ℝ) < 1 / 2))).mono fun t h => by
-      simpa [dist_eq_norm] using h
+    exact
+      (ht.eventually (Metric.ball_mem_nhds 1 (by norm_num : (0 : ℝ) < 1 / 2))).mono fun t h => by
+        simpa [dist_eq_norm] using h
   obtain ⟨δ, hδ, hδt⟩ := Metric.eventually_nhds_iff.1 hev
   let f : ContDiffBump (0 : ℝ) := ⟨δ / 4, δ / 2, by positivity, by linarith⟩
   let g0 : ℝ → ℝ := f.normed volume
@@ -71,7 +73,8 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
     rw [← integral_complex_ofReal]
     congr 1
     ext t
-    have e : Complex.cosh (t * c i ^ (1 / 2 : ℂ)) = ((Complex.cosh (t * c i ^ (1 / 2 : ℂ))).re : ℂ) :=
+    have e
+        : Complex.cosh (t * c i ^ (1 / 2 : ℂ)) = ((Complex.cosh (t * c i ^ (1 / 2 : ℂ))).re : ℂ) :=
       Complex.ext (by simp) (by rw [Complex.ofReal_im]; exact cosh_im_zero (c i) (hc i) t)
     conv_lhs => rw [e]
     push_cast
@@ -79,8 +82,11 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
   have hr : ∀ i, 0 < r i := by
     intro i
     have hint : Integrable (fun t => g0 t * (Complex.cosh (t * c i ^ (1 / 2 : ℂ))).re) volume :=
-      (f.continuous_normed.mul (hcr i)).integrable_of_hasCompactSupport f.hasCompactSupport_normed.mul_right
-    have hle : (fun t => g0 t * (1 / 2 : ℝ)) ≤ fun t => g0 t * (Complex.cosh (t * c i ^ (1 / 2 : ℂ))).re := by
+      (f.continuous_normed.mul (hcr i)).integrable_of_hasCompactSupport
+        f.hasCompactSupport_normed.mul_right
+    have hle
+        : (fun t => g0 t * (1 / 2 : ℝ))
+          ≤ fun t => g0 t * (Complex.cosh (t * c i ^ (1 / 2 : ℂ))).re := by
       intro t
       by_cases h0 : g0 t = 0
       · simp [h0]
@@ -101,7 +107,13 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
   set P : ℝ := ∏ i, r i with hP
   have hP0 : 0 < P := Finset.prod_pos fun i _ => hr i
   rcases isEmpty_or_nonempty ι with hι | hι
-  · refine ⟨g0, δ / 2, by positivity, ⟨f.contDiff_normed, fun t => f.normed_neg t, fun t ht => ?_⟩, by simp⟩
+  · refine ⟨
+      g0,
+      δ / 2,
+      by positivity,
+      ⟨f.contDiff_normed, fun t => f.normed_neg t, fun t ht => ?_⟩,
+      by simp
+    ⟩
     by_contra h
     have := hsupp t h
     linarith
@@ -110,8 +122,13 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
       have : 0 < m := Fintype.card_pos
       exact_mod_cast this.ne'
     set l : ℝ := P ^ (-(1 : ℝ) / m) with hl
-    refine ⟨fun t => l * g0 t, δ / 2, by positivity,
-      ⟨contDiff_const.mul f.contDiff_normed, fun t => by simp [g0, f.normed_neg], fun t ht => ?_⟩, ?_⟩
+    refine ⟨
+      fun t => l * g0 t,
+      δ / 2,
+      by positivity,
+      ⟨contDiff_const.mul f.contDiff_normed, fun t => by simp [g0, f.normed_neg], fun t ht => ?_⟩,
+      ?_
+    ⟩
     · have : g0 t = 0 := by
         by_contra h
         have := hsupp t h
@@ -129,8 +146,8 @@ theorem bump_one' (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).i
       simp only [hs]
       rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, ← hm]
       have hl' : l ^ m * P = 1 := by
-        rw [hl, ← Real.rpow_natCast, ← Real.rpow_mul hP0.le, div_mul_cancel₀ _ hm0, Real.rpow_neg_one,
-          inv_mul_cancel₀ hP0.ne']
+        rw [hl, ← Real.rpow_natCast, ← Real.rpow_mul hP0.le, div_mul_cancel₀ _ hm0,
+          Real.rpow_neg_one, inv_mul_cancel₀ hP0.ne']
       have : ((l ^ m * P : ℝ) : ℂ) = 1 := by rw [hl']; simp
       rw [← this, hP]
       push_cast

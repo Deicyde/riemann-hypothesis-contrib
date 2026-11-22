@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D1
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc
+  PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D1
 
 namespace GlobalTheory.CompanionTheory.Cutoff
 
@@ -20,11 +21,13 @@ def imgEquiv (g : GL (Fin n) K) : (Fin n → K) ≃ₗ[K] (Fin n → K) :=
     (by rw [← Matrix.toLin'_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.toLin'_one])
     (by rw [← Matrix.toLin'_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.toLin'_one])
 
-theorem img_eq_map (g : GL (Fin n) K) (W : Submodule K (Fin n → K)) :
-    img g W = W.map ((imgEquiv g : (Fin n → K) ≃ₗ[K] (Fin n → K)) : (Fin n → K) →ₗ[K] (Fin n → K)) := rfl
+theorem img_eq_map (g : GL (Fin n) K) (W : Submodule K (Fin n → K))
+    : img g W
+      = W.map ((imgEquiv g : (Fin n → K) ≃ₗ[K] (Fin n → K)) : (Fin n → K) →ₗ[K] (Fin n → K)) :=
+  rfl
 
-theorem finrank_img (g : GL (Fin n) K) (W : Submodule K (Fin n → K)) :
-    Module.finrank K (img g W) = Module.finrank K W := by
+theorem finrank_img (g : GL (Fin n) K) (W : Submodule K (Fin n → K))
+    : Module.finrank K (img g W) = Module.finrank K W := by
   rw [img_eq_map]
   exact LinearEquiv.finrank_map_eq _ _
 
@@ -32,17 +35,23 @@ theorem img_top (g : GL (Fin n) K) : img g (⊤ : Submodule K (Fin n → K)) = �
   rw [img_eq_map, Submodule.map_top]
   exact LinearEquiv.range _
 
-theorem img_img_inv (g : GL (Fin n) K) (W : Submodule K (Fin n → K)) :
-    img g (img (g⁻¹ : GL (Fin n) K) W) = W := by
+theorem img_img_inv (g : GL (Fin n) K) (W : Submodule K (Fin n → K))
+    : img g (img (g⁻¹ : GL (Fin n) K) W) = W := by
   unfold img
   rw [← Submodule.map_comp, ← Matrix.toLin'_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
     Matrix.toLin'_one, Submodule.map_id]
 
 end Img
 
-theorem mem_cutSet_of_mem (hR : DegRat) {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {n : ℕ} {τ : ℝ}
-    (g : GL (Fin n) E) {x : GA E n} (hx : x ∈ cutSet E n τ) : ratGL E n g * x ∈ cutSet E n τ := by
-  have hx' : (∀ W : Submodule E (Fin n → E), deg x W ≤ prof n τ (Module.finrank E W)) ∧ -τ ≤ deg x ⊤ := hx
+theorem mem_cutSet_of_mem
+    (hR : DegRat)
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {n : ℕ} {τ : ℝ} (g : GL (Fin n) E)
+    {x : GA E n} (hx : x ∈ cutSet E n τ)
+    : ratGL E n g * x ∈ cutSet E n τ := by
+  have hx'
+      : (∀ W : Submodule E (Fin n → E), deg x W ≤ prof n τ (Module.finrank E W)) ∧ -τ ≤ deg x ⊤ :=
+    hx
   show (∀ W : Submodule E (Fin n → E), deg (ratGL E n g * x) W ≤ prof n τ (Module.finrank E W)) ∧
     -τ ≤ deg (ratGL E n g * x) ⊤
   refine ⟨fun W => ?_, ?_⟩
@@ -58,8 +67,10 @@ theorem mem_cutSet_of_mem (hR : DegRat) {E : Type} [Field E] [NumberField E] [_r
 theorem mahler_of : DegBdd → DegRat → MahlerC → Mahler := by
   intro hB hR hM E _ _ _ n τ
   refine ⟨?_, ?_, ?_⟩
-  · have hset : cutSet E n τ = (⋂ W : Submodule E (Fin n → E), {x : GA E n | deg x W ≤ prof n τ (Module.finrank E W)}) ∩
-        {x : GA E n | -τ ≤ deg x ⊤} := by
+  · have hset
+        : cutSet E n τ
+          = (⋂ W : Submodule E (Fin n → E), {x : GA E n | deg x W ≤ prof n τ (Module.finrank E W)})
+            ∩ {x : GA E n | -τ ≤ deg x ⊤} := by
       ext x
       simp [cutSet]
     rw [hset]
@@ -73,7 +84,9 @@ theorem mahler_of : DegBdd → DegRat → MahlerC → Mahler := by
     · exact mem_cutSet_of_mem hR g
   · obtain ⟨C, hC, hsub⟩ := hM E n (|τ| * (2 * n + 1) ^ 2)
     refine ⟨C, hC, fun x hx => ?_⟩
-    have hx' : (∀ W : Submodule E (Fin n → E), deg x W ≤ prof n τ (Module.finrank E W)) ∧ -τ ≤ deg x ⊤ := hx
+    have hx'
+        : (∀ W : Submodule E (Fin n → E), deg x W ≤ prof n τ (Module.finrank E W)) ∧ -τ ≤ deg x ⊤ :=
+      hx
     have hn : (0 : ℝ) ≤ n := Nat.cast_nonneg n
     have hτ : τ ≤ |τ| := le_abs_self τ
     have hτ0 : 0 ≤ |τ| := abs_nonneg τ

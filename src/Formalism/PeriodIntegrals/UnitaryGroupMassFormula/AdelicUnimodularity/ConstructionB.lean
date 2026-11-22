@@ -12,18 +12,27 @@ namespace PI.WAU.B
 open Formalism.MainNotions.S MeasureTheory NumberField IsDedekindDomain Formalism.UG Matrix PI.WAU.B
 open scoped TensorProduct
 
-theorem cover_of {G : Type} [Group G] (K : Set G) (P : G → Prop) {C : Type} [Countable C]
-    (f : G → C) (hf : ∀ x y, P x → P y → f x = f y → y⁻¹ * x ∈ K) :
-    ∃ s : Set G, s.Countable ∧ ∀ x, P x → ∃ y ∈ s, y⁻¹ * x ∈ K := by
+theorem cover_of
+    {G : Type} [Group G]
+    (K : Set G) (P : G → Prop)
+    {C : Type} [Countable C]
+    (f : G → C) (hf : ∀ x y, P x → P y → f x = f y → y⁻¹ * x ∈ K)
+    : ∃ s : Set G, s.Countable ∧ ∀ x, P x → ∃ y ∈ s, y⁻¹ * x ∈ K := by
   classical
-  refine ⟨Set.range fun c : {c : C // ∃ x, P x ∧ f x = c} => c.2.choose, Set.countable_range _,
-    fun x hx => ?_⟩
+  refine ⟨
+    Set.range fun c : {c : C // ∃ x, P x ∧ f x = c} => c.2.choose,
+    Set.countable_range _,
+    fun x hx => ?_
+  ⟩
   let c : {c : C // ∃ x, P x ∧ f x = c} := ⟨f x, x, hx, rfl⟩
   obtain ⟨hP, hfc⟩ := c.2.choose_spec
   exact ⟨c.2.choose, ⟨c, rfl⟩, hf x _ hx hP hfc.symm⟩
 
-theorem nsmul_cancel {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V] {N : ℕ}
-    (hN : 0 < N) {v w : V} (h : N • v = N • w) : v = w := by
+theorem nsmul_cancel
+    {K V : Type} [Field K] [CharZero K] [AddCommGroup V] [Module K V]
+    {N : ℕ} (hN : 0 < N)
+    {v w : V} (h : N • v = N • w)
+    : v = w := by
   have h' : (N : K) • v = (N : K) • w := by
     rw [Nat.cast_smul_eq_nsmul K, Nat.cast_smul_eq_nsmul K]
     exact h
@@ -42,17 +51,24 @@ theorem fmat_mul_inv (y : I.Gf) : I.fmat y * I.fmat y⁻¹ = 1 := by
   rfl
 
 def PN (N : ℕ) (x : I.Gf) : Prop :=
-  0 < N ∧ ∀ j, N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf ∧
-    N • (I.fmat x⁻¹ *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf
+  0 < N
+    ∧ ∀ j,
+      N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf
+        ∧ N • (I.fmat x⁻¹ *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf
 
 def fN (N : ℕ) (x : I.Gf) : Fin k → Fin k → Bad I.F (N * N) → I.F := by
   classical
-  exact fun j => if h : N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ Tset (F := I.F) m then
-    fun i => cls (N * N) (h.choose i) else fun _ _ => 0
+  exact fun j =>
+    if h : N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ Tset (F := I.F) m then fun i =>
+      cls (N * N) (h.choose i)
+    else fun _ _ =>
+      0
 
-theorem half (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → ℤ, l = ∑ i, z i • m i)
+theorem half
+    (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → ℤ, l = ∑ i, z i • m i)
     {N : ℕ} {x y : I.Gf} (hx : PN I m N x) (hy : PN I m N y) (he : fN I m N x = fN I m N y)
-    (j : Fin k) : (I.fmat y⁻¹ * I.fmat x) *ᵥ ivec (F := I.F) (m j) ∈ I.Lf := by
+    (j : Fin k)
+    : (I.fmat y⁻¹ * I.fmat x) *ᵥ ivec (F := I.F) (m j) ∈ I.Lf := by
   classical
   obtain ⟨hN, hxj⟩ := hx
   obtain ⟨_, hyj⟩ := hy
@@ -65,15 +81,18 @@ theorem half (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → 
   obtain ⟨haI, haE⟩ := hTx.choose_spec
   obtain ⟨ha'I, ha'E⟩ := hTy.choose_spec
 
-  have hb : ∀ i, ∃ b : Af I.F, (∀ v, b v ∈ v.adicCompletionIntegers I.F) ∧
-      hTx.choose i - hTy.choose i = ((N * N : ℕ) : Af I.F) * b := fun i =>
+  have hb
+      : ∀ i, ∃ b : Af I.F,
+        (∀ v, b v ∈ v.adicCompletionIntegers I.F)
+          ∧ hTx.choose i - hTy.choose i = ((N * N : ℕ) : Af I.F) * b := fun i =>
     cls_eq (Nat.mul_pos hN hN) (haI i) (ha'I i) (congrFun hej i)
   choose b hbI hbE using hb
   set w : Fin I.n → I.E ⊗[I.F] Af I.F := ∑ i, incA I.F I.E (b i) • ivec (F := I.F) (m i) with hwdef
   have hw : w ∈ I.Lf :=
     Submodule.sum_mem _ fun i _ => smulO_mem (incA_mem (hbI i)) (ivec_mem (hm i))
-  have hdiff : N • (I.fmat x *ᵥ ivec (F := I.F) (m j) - I.fmat y *ᵥ ivec (F := I.F) (m j)) =
-      N • (N • w) := by
+  have hdiff
+      : N • (I.fmat x *ᵥ ivec (F := I.F) (m j) - I.fmat y *ᵥ ivec (F := I.F) (m j))
+        = N • (N • w) := by
     rw [smul_sub, haE, ha'E, ← Finset.sum_sub_distrib, hwdef, Finset.smul_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← sub_smul, ← map_sub, hbE i, map_mul, map_natCast, mul_smul, Nat.cast_smul_eq_nsmul,
@@ -92,13 +111,16 @@ theorem half (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → 
   have h2 := mulVec_lam hm hgen (N • I.fmat y⁻¹) hP hw
   rwa [Matrix.smul_mulVec, ← Matrix.mulVec_smul] at h2
 
-theorem step (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → ℤ, l = ∑ i, z i • m i)
-    {N : ℕ} {x y : I.Gf} (hx : PN I m N x) (hy : PN I m N y) (he : fN I m N x = fN I m N y) :
-    y⁻¹ * x ∈ I.Kset := by
+theorem step
+    (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → ℤ, l = ∑ i, z i • m i)
+    {N : ℕ} {x y : I.Gf} (hx : PN I m N x) (hy : PN I m N y) (he : fN I m N x = fN I m N y)
+    : y⁻¹ * x ∈ I.Kset := by
   show ∀ w, w ∈ I.Lf ↔
     (((y⁻¹ * x : I.Gf) : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) : Matrix _ _ _) *ᵥ w ∈ I.Lf
-  have hco : (((y⁻¹ * x : I.Gf) : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) : Matrix _ _ _) =
-      I.fmat y⁻¹ * I.fmat x := rfl
+  have hco
+      : (((y⁻¹ * x : I.Gf) : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) : Matrix _ _ _)
+        = I.fmat y⁻¹ * I.fmat x :=
+    rfl
   intro w
   rw [hco]
   constructor
@@ -112,10 +134,10 @@ theorem step (hm : ∀ i, m i ∈ I.L) (hgen : ∀ l ∈ I.L, ∃ z : Fin k → 
 
 theorem exists_PN (x : I.Gf) : ∃ N, PN I m N x := by
   classical
-  have hA : ∀ j, ∃ N : ℕ, 0 < N ∧ N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf :=
-    fun j => exists_nat_vec I.L_span _
-  have hB : ∀ j, ∃ N : ℕ, 0 < N ∧ N • (I.fmat x⁻¹ *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf :=
-    fun j => exists_nat_vec I.L_span _
+  have hA : ∀ j, ∃ N : ℕ, 0 < N ∧ N • (I.fmat x *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf := fun j =>
+    exists_nat_vec I.L_span _
+  have hB : ∀ j, ∃ N : ℕ, 0 < N ∧ N • (I.fmat x⁻¹ *ᵥ ivec (F := I.F) (m j)) ∈ I.Lf := fun j =>
+    exists_nat_vec I.L_span _
   choose A hA0 hA using hA
   choose B hB0 hB using hB
   refine ⟨(∏ j, A j) * ∏ j, B j, ?_, fun j => ⟨?_, ?_⟩⟩
@@ -138,8 +160,8 @@ open PI.WAU.B
 theorem compact_countable : KCountable := by
   intro I
   obtain ⟨k, m, hm, hgen⟩ := exists_gen I.L (Module.Finite.iff_fg.mpr I.L_fg)
-  have hcov : ∀ N : ℕ, ∃ s : Set I.Gf, s.Countable ∧
-      ∀ x, PN I m N x → ∃ y ∈ s, y⁻¹ * x ∈ I.Kset := by
+  have hcov
+      : ∀ N : ℕ, ∃ s : Set I.Gf, s.Countable ∧ ∀ x, PN I m N x → ∃ y ∈ s, y⁻¹ * x ∈ I.Kset := by
     intro N
     haveI : Countable (Bad I.F (N * N) → I.F) := countable_cls (N * N)
     exact cover_of I.Kset (PN I m N) (fN I m N) fun x y hx hy he => step I m hm hgen hx hy he

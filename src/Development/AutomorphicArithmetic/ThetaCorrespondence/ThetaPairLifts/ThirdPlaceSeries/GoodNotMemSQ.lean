@@ -16,10 +16,23 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.GoodOffLoc
-theorem good_not_mem_S_Q_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D), ∀ (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp) (_ : GlobalTheory.NJoin.Agree X P.M P.rep), ∀ (i : D.nd.Loc), Formalism.IndefR.RecTie.Used0 D (D.nd.mu i) → ∀ Pp, GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) Pp → Pp ∉ D.nd.S i ∧ Pp ∉ D.nd.Q i := by
+theorem good_not_mem_S_Q_alt
+    : GlobalTheory.Published.AutomorphicFormsFiniteGL
+      → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+          (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D),
+        ∀ (X : GlobalTheory.NJoin.RealAt D P.cf P.C P.tp)
+            (_ : GlobalTheory.NJoin.Agree X P.M P.rep),
+          ∀ (i : D.nd.Loc),
+            Formalism.IndefR.RecTie.Used0 D (D.nd.mu i)
+              → ∀ Pp,
+                GlobalTheory.Hk3.Good X.R (X.tupT (D.nd.mu i)) Pp
+                  → Pp ∉ D.nd.S i ∧ Pp ∉ D.nd.Q i := by
   intro _ hL D P X hA i _ w hG
   have hlev := X.recR.base.lev
   have hmu : D.nd.mu i = D.what₂.muAt (D.nd.w i) := by
@@ -50,8 +63,7 @@ theorem good_not_mem_S_Q_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL �
       refine (hd.ine w hw (D.nd.l i ^ a)).1 fun x hx => ?_
       have h1 : δ.loc w x * ψ.loc w x = 1 := (hmul x).symm.trans (hunr x hx)
       have h2 : ψ.loc w x ^ (D.nd.l i ^ a) = 1 :=
-        (MonoidHom.pow_apply ..).symm.trans
-          (congrArg (fun ξ : HChar D.host.E => ξ.loc w x) ha)
+        (MonoidHom.pow_apply ..).symm.trans (congrArg (fun ξ : HChar D.host.E => ξ.loc w x) ha)
       have h3 : (δ.loc w x * ψ.loc w x) ^ (D.nd.l i ^ a) = 1 := by rw [h1, one_pow]
       rwa [mul_pow, h2, mul_one] at h3
     have hl : (D.nd.l i).Prime := (D.nd.lPrime i).out
@@ -63,7 +75,8 @@ theorem good_not_mem_S_Q_alt : GlobalTheory.Published.AutomorphicFormsFiniteGL �
   have hng : ∀ k : Fin 2, w ∉ placesOver D.host.E (D.host.g k) := by
     intro k hw
     have hs : GlobalTheory.Mem.Chr.SplitsC D.host.E (D.host.g k) := D.nd.g_split k
-    rcases (GlobalTheory.BigOn.Inhab.overP_iff (D.host.g_prime k) hs (X.R.C.P.pb_over k) w).1 hw with h | ⟨w', h, hc⟩
+    rcases (GlobalTheory.BigOn.Inhab.overP_iff (D.host.g_prime k) hs (X.R.C.P.pb_over k) w).1 hw
+      with h | ⟨w', h, hc⟩
     · exact (hG w (Or.inl ((hlev.Pg w).2 ⟨k, GlobalTheory.BigOn.Inhab.mem_aboveK.1 h⟩))).1 rfl
     · exact (hG w' (Or.inl ((hlev.Pg w').2 ⟨k, GlobalTheory.BigOn.Inhab.mem_aboveK.1 h⟩))).2 hc
   refine ⟨fun hS => ?_, fun hQ => ?_⟩

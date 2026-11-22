@@ -15,15 +15,23 @@ theorem pow_near_one {z : ℂ} (h : ∀ n : ℕ, ‖z ^ n - 1‖ < 1 / 2) : z = 
   | exact _root_.GlobalTheory.InductiveNormBound.main
   | (apply _root_.GlobalTheory.InductiveNormBound.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.InductiveNormBound.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.InductiveNormBound.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.InductiveNormBound.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.InductiveNormBound.main ..)
 
-theorem cocycle_char_trivial_near_zero :
-    ∀ {A V : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [CompactSpace A]
-    [NonarchimedeanAddGroup A] [AddCommGroup V] [TopologicalSpace V] [T2Space V] (lam : A →+ V), Continuous lam →
-    ∀ (ε : V → V → ℂ), (∃ N ∈ nhds (0 : V), ∀ x ∈ N, ∀ y ∈ N, ε x y = 1) → (∀ x, ε x 0 = 1) →
-    ∀ (χ : A → ℂ), Continuous χ → (∀ a, lam a = 0 → χ a = 1) →
-    (∀ a b, χ (a + b) = χ a * χ b * ε (lam a) (lam b)) → ∃ U ∈ nhds (0 : V), ∀ a, lam a ∈ U → χ a = 1 := by
+theorem cocycle_char_trivial_near_zero
+    : ∀ {A V : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
+        [CompactSpace A] [NonarchimedeanAddGroup A] [AddCommGroup V] [TopologicalSpace V]
+        [T2Space V] (lam : A →+ V),
+      Continuous lam
+        → ∀ (ε : V → V → ℂ),
+          (∃ N ∈ nhds (0 : V), ∀ x ∈ N, ∀ y ∈ N, ε x y = 1) → (∀ x, ε x 0 = 1)
+            → ∀ (χ : A → ℂ),
+              Continuous χ → (∀ a, lam a = 0 → χ a = 1)
+                → (∀ a b, χ (a + b) = χ a * χ b * ε (lam a) (lam b))
+                → ∃ U ∈ nhds (0 : V), ∀ a, lam a ∈ U → χ a = 1 := by
   intro A V _ _ _ _ _ _ _ _ lam hlam ε ⟨N, hN, hεN⟩ hε0 χ hχ hker hmul
   have hχ0 : χ 0 = 1 := hker 0 (map_zero lam)
 

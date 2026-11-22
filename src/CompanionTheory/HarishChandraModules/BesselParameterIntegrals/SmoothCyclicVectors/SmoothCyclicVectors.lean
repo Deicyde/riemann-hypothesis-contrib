@@ -7,6 +7,7 @@ public import CompanionTheory.HarishChandraModules.BesselParameterIntegrals.Smoo
 
 namespace CompanionTheory.D.Upq.Sm
 
-theorem smooth_cyclic_vectors : PI.SmoothCyc := smoothCyc_of_kFinSmooth CompanionTheory.D.gk.admitted.k_finite_smooth
+theorem smooth_cyclic_vectors : PI.SmoothCyc :=
+  smoothCyc_of_kFinSmooth CompanionTheory.D.gk.admitted.k_finite_smooth
 
 end CompanionTheory.D.Upq.Sm

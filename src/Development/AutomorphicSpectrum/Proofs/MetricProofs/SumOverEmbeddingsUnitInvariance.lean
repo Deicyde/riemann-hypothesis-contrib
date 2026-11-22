@@ -22,11 +22,20 @@ public import GroundTheory.HeightsAndTheta.Heights.ElementarySymmetric.PBoundedS
 
 set_option maxSynthPendingDepth 1
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem sum_log_unit_mul_mass_eq_zero : ArithIntersectionSystemStatement → PtsIntegrableStatement → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (D : ℕ) (L : Fin D → HermLine ι) (θ : (𝓞 F)ˣ), IsArithVar (mCoordIdeal y) (D + 1) → Birational y → (∀ j, IsSmoothHerm (L j)) → (∀ z ∈ mcPts (mCoordIdeal y), ∃! s : F →+* ℂ, LiesOver y s z) → ∑ sg : F →+* ℂ, Real.log ‖sg ((θ : 𝓞 F) : F)‖ * ptsIntegral (mCoordIdeal y) (pot L) ({z | LiesOver y sg z}.indicator fun _ => (1 : ℝ)) = 0 := by
+theorem sum_log_unit_mul_mass_eq_zero
+    : ArithIntersectionSystemStatement → PtsIntegrableStatement
+      → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (F : Type)
+          [Field F] [NumberField F] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (D : ℕ)
+          (L : Fin D → HermLine ι) (θ : (𝓞 F)ˣ),
+        IsArithVar (mCoordIdeal y) (D + 1) → Birational y → (∀ j, IsSmoothHerm (L j))
+          → (∀ z ∈ mcPts (mCoordIdeal y), ∃! s : F →+* ℂ, LiesOver y s z)
+          → ∑ sg : F →+* ℂ, Real.log ‖sg ((θ : 𝓞 F) : F)‖ * ptsIntegral (mCoordIdeal y) (pot L) ({z | LiesOver y sg z}.indicator fun _ => (1 : ℝ))
+            = 0 := by
   intro hSys hInt K _ ι _ Ω _ F _ _ _ y D L θ hP hbir hL hex
   classical
   obtain ⟨II, hII, -⟩ := hSys
@@ -52,22 +61,30 @@ theorem sum_log_unit_mul_mass_eq_zero : ArithIntersectionSystemStatement → Pts
   have hf0 : aeval y f ≠ 0 := by
     rw [hfg]
     exact mul_ne_zero ht0 hg0
-  have hgP : g ∉ mCoordIdeal y := fun h => hg0
-    ((GroundTheory.Heights₂.Heights.Targets.BoundedSectionTransfer.mem_mCoordIdeal_iff y hg).mp h)
-  have hfP : f ∉ mCoordIdeal y := fun h => hf0
-    ((GroundTheory.Heights₂.Heights.Targets.BoundedSectionTransfer.mem_mCoordIdeal_iff y hf).mp h)
-  obtain ⟨B, hB0, hBs, hBl⟩ := exists_smooth_weight_const_near_embeddings K ι Ω F y
-    (fun sg => ‖sg x‖) (fun sg => norm_pos_iff.mpr ((map_ne_zero sg).mpr hx0)) hex
-  obtain ⟨A, hAa, hA⟩ : ∃ A : HermLine ι, (∀ k, A.a k = d k) ∧ IsSmoothHerm A :=
-    ⟨HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) (fun k => (d k : ℤ)), fun _ => rfl,
-      GroundTheory.Heights₂.Heights.Inter.isSmoothHerm_ofMetrics_fs _⟩
+  have hgP : g ∉ mCoordIdeal y := fun h =>
+    hg0 ((GroundTheory.Heights₂.Heights.Targets.BoundedSectionTransfer.mem_mCoordIdeal_iff y hg).mp
+      h)
+  have hfP : f ∉ mCoordIdeal y := fun h =>
+    hf0 ((GroundTheory.Heights₂.Heights.Targets.BoundedSectionTransfer.mem_mCoordIdeal_iff y hf).mp
+      h)
+  obtain ⟨B, hB0, hBs, hBl⟩ :=
+    exists_smooth_weight_const_near_embeddings K ι Ω F y
+      (fun sg => ‖sg x‖)
+      (fun sg => norm_pos_iff.mpr ((map_ne_zero sg).mpr hx0))
+      hex
+  obtain ⟨A, hAa, hA⟩ : ∃ A : HermLine ι, (∀ k, A.a k = d k) ∧ IsSmoothHerm A := ⟨
+    HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) (fun k => (d k : ℤ)),
+    fun _ => rfl,
+    GroundTheory.Heights₂.Heights.Inter.isSmoothHerm_ofMetrics_fs _
+  ⟩
   have hAB : IsSmoothHerm (A.tensor B) := ContDiffOn.mul hA hBs
-  have hABa : ∀ k, (A.tensor B).a k = d k := fun k => by
-    simp [HermLine.tensor, hB0, hAa k]
+  have hABa : ∀ k, (A.tensor B).a k = d k := fun k => by simp [HermLine.tensor, hB0, hAa k]
   have hRA := (hII K ι).2.2 (mCoordIdeal y) D L A g d hP hL hA hAa hg hgP
   have hRB := (hII K ι).2.2 (mCoordIdeal y) D L (A.tensor B) f d hP hL hAB hABa hf hfP
   have hadd := (hII K ι).2.1 (mCoordIdeal y) D L A B hP hL hA hBs
-  obtain ⟨hsupp, hmult⟩ := GlobalTheory.T.unit_ratio_divisor_support_eq K ι Ω y D d f g (algebraMap F Ω x) hP hf hg hg0 ht0 htI htI' hfg
+  obtain ⟨hsupp, hmult⟩ :=
+    GlobalTheory.T.unit_ratio_divisor_support_eq K ι Ω y D d f g (algebraMap F Ω x) hP hf hg hg0 ht0
+      htI htI' hfg
   have hlog : ∀ z ∈ mcPts (mCoordIdeal y), logNorm (A.tensor B) f z = logNorm A g z := by
     intro z hz
     obtain ⟨sg, hsg, -⟩ := hex z hz
@@ -80,13 +97,18 @@ theorem sum_log_unit_mul_mass_eq_zero : ArithIntersectionSystemStatement → Pts
     show ‖eval z (map (Int.castRingHom ℂ) f)‖ / (A.h z * B.h z) = _
     rw [hfz, hval, norm_mul]
     field_simp
-  have hrec : recR (II K ι) (mCoordIdeal y) L (A.tensor B) f = recR (II K ι) (mCoordIdeal y) L A g := by
+  have hrec
+      : recR (II K ι) (mCoordIdeal y) L (A.tensor B) f = recR (II K ι) (mCoordIdeal y) L A g := by
     unfold recR
     rw [hsupp]
     congr 1
     · exact finsum_mem_congr rfl fun W hW => by rw [hmult W hW]
-    · exact GroundTheory.Heights₂.Heights.Inter.DiagRAux.ptsIntegral_congr_mcPts _ (fun _ _ _ => rfl) hlog
-  rw [← intersection_locConst_trivial hInt K ι Ω F y D L B (fun sg => ‖sg x‖) II hII hP hL hB0 hBs hex hBl]
+    · exact GroundTheory.Heights₂.Heights.Inter.DiagRAux.ptsIntegral_congr_mcPts _
+        (fun _ _ _ => rfl)
+        hlog
+  rw [← intersection_locConst_trivial hInt K ι Ω F y D L B
+    (fun sg => ‖sg x‖)
+    II hII hP hL hB0 hBs hex hBl]
   linarith [hRA, hRB, hadd, hrec]
 
 end GlobalTheory.CompanionTheory.Ar.Giv

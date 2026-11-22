@@ -7,16 +7,18 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsF
 @[expose] public section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.GR
-open GlobalTheory.CompanionTheory.Ar.GR.SubGrp (exists_eq_spMap exists_sp_iso exists_grpObj_of_mono) in
+open GlobalTheory.CompanionTheory.Ar.GR.SubGrp
+  (exists_eq_spMap exists_sp_iso exists_grpObj_of_mono) in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.finite_flat_subgroup_scheme :
-    ∀ (R : Type) [CommRing R] (A : Over (Spec (CommRingCat.of R))) [GrpObj A]
-      (B : Type) [CommRing B] [Algebra R B] (h : sp (R₀ := R) B ⟶ A),
+theorem _root_.GlobalTheory.T.finite_flat_subgroup_scheme
+    : ∀ (R : Type) [CommRing R] (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (B : Type)
+        [CommRing B] [Algebra R B] (h : sp (R₀ := R) B ⟶ A),
       IsFinFlatSub A B h → ∃ _ : GrpObj (sp (R₀ := R) B), IsMonHom h ∧ Mono h := by
   intro R _ A _ B _ _ h H
   have hmono : Mono h := by
@@ -33,12 +35,13 @@ theorem _root_.GlobalTheory.T.finite_flat_subgroup_scheme :
     have hφψ := H.mono S φ ψ (by simp only [← hφ, ← hψ, Category.assoc, hab])
     have hj : j ≫ a = j ≫ b := by rw [← cancel_epi i, hφ, hψ, hφψ]
     exact congrArg (·.left) hj
-  have hmul : ∃ m : sp (R₀ := R) B ⊗ sp (R₀ := R) B ⟶ sp (R₀ := R) B,
-      m ≫ h = (fst _ _ ≫ h) * (snd _ _ ≫ h) := by
+  have hmul
+      : ∃ m : sp (R₀ := R) B ⊗ sp (R₀ := R) B ⟶ sp (R₀ := R) B,
+        m ≫ h = (fst _ _ ≫ h) * (snd _ _ ≫ h) := by
     have : IsAffine (sp (R₀ := R) B).left := inferInstanceAs (IsAffine (Spec _))
     have : IsAffine (sp (R₀ := R) B ⊗ sp (R₀ := R) B).left :=
-      Scheme.Pullback.isAffine_of_isAffine_isAffine_isAffine
-        (sp (R₀ := R) B).hom (sp (R₀ := R) B).hom
+      Scheme.Pullback.isAffine_of_isAffine_isAffine_isAffine (sp (R₀ := R) B).hom
+        (sp (R₀ := R) B).hom
     obtain ⟨S, _, _, j, _⟩ := exists_sp_iso (sp (R₀ := R) B ⊗ sp (R₀ := R) B)
     obtain ⟨φ, hφ⟩ := exists_eq_spMap (j ≫ fst _ _)
     obtain ⟨ψ, hψ⟩ := exists_eq_spMap (j ≫ snd _ _)

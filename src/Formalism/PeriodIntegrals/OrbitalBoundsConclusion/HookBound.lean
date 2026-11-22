@@ -7,4 +7,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HookLengthBound.
 
 @[expose] public section
 
-theorem hook_length_bound : PI.HookBound := PI.HookSteps.hookBound_of PI.HookSteps.Cap.capelli_determinant_identity
+theorem hook_length_bound : PI.HookBound :=
+  PI.HookSteps.hookBound_of PI.HookSteps.Cap.capelli_determinant_identity

@@ -14,16 +14,24 @@ open MvPolynomial
 
 universe u
 
-theorem EffectiveCase.proof (h₀ : NoCommonComponentCase.Statement.{u}) (h₁ : CommonFactorInduction.Statement.{u}) :
-    EffectiveCase.Statement.{u} := by
+theorem EffectiveCase.proof
+    (h₀ : NoCommonComponentCase.Statement.{u}) (h₁ : CommonFactorInduction.Statement.{u})
+    : EffectiveCase.Statement.{u} := by
   intro O _ _ _ ϖ hϖ
 
-  suffices H : ∀ n : ℕ, ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-      [∀ k, Fintype (ι k)] (P : Ideal (MRing ι O)) (d : ℕ), IsModelOver P (d + 1) →
-      ∀ (b : K → ℤ) (f g : MRing ι O), IsEffectiveVertical P ϖ b f g →
-      ∀ (c : K → ℕ) (s : MRing ι O), IsMultiHomog s c → s ∉ P →
-      (∀ H, divCycle P s H ≠ 0 → (C ϖ : MRing ι O) ∉ H → IsVerticalDivisor H ϖ b f g) →
-      commonExcess ϖ P f g s = n → ∀ L : Fin d → K → ℤ, cutIdentity ϖ P b f g c s L by
+  suffices H
+      : ∀ n : ℕ,
+        ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+            (P : Ideal (MRing ι O)) (d : ℕ),
+          IsModelOver P (d + 1)
+            → ∀ (b : K → ℤ) (f g : MRing ι O),
+              IsEffectiveVertical P ϖ b f g
+                → ∀ (c : K → ℕ) (s : MRing ι O),
+                  IsMultiHomog s c → s ∉ P
+                    → (∀ H,
+                      divCycle P s H ≠ 0 → (C ϖ : MRing ι O) ∉ H → IsVerticalDivisor H ϖ b f g)
+                    → commonExcess ϖ P f g s = n
+                    → ∀ L : Fin d → K → ℤ, cutIdentity ϖ P b f g c s L by
     intro K _ _ ι _ P d hP b f g hD c s hs hsP hH L
     exact H _ K ι P d hP b f g hD c s hs hsP hH rfl L
   intro n

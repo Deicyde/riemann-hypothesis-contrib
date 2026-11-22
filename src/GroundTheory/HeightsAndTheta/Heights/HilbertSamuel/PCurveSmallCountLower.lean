@@ -19,9 +19,10 @@ theorem statement_iff : CurveSmallCountLower.Statement ↔ Targets.CurveCountLow
 
 end CurveSmallCountLower
 
-theorem CurveSmallCountLower.proof (hD : Targets.CurveDegreeVert.Statement) (hV : Targets.CurveVertIndex.Statement)
-    (hL : Targets.CurveIndexLinear.Statement) (hN : Targets.CurveBoxCount.Statement) :
-    CurveSmallCountLower.Statement :=
+theorem CurveSmallCountLower.proof
+    (hD : Targets.CurveDegreeVert.Statement) (hV : Targets.CurveVertIndex.Statement)
+    (hL : Targets.CurveIndexLinear.Statement) (hN : Targets.CurveBoxCount.Statement)
+    : CurveSmallCountLower.Statement :=
   CurveSmallCountLower.statement_iff.mpr (Targets.CurveCountLower.proof hD hV hL hN)
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

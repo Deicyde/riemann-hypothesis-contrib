@@ -13,9 +13,10 @@ namespace Formalism.L2.SG.Pf.Carrier.DFrameAtPf
 
 open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.L2.SG.RealObj.InfCut.PtRepPf
 
-theorem exists_unitary_of_gram {k : ℕ} {M : Type*} [AddCommGroup M] [Module ℂ M]
-    (α β : M →ₗ[ℂ] (Fin k → ℂ)) (h : ∀ p q, star (α p) ⬝ᵥ α q = star (β p) ⬝ᵥ β q) :
-    ∃ ψ ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ p, ψ *ᵥ α p = β p := by
+theorem exists_unitary_of_gram
+    {k : ℕ} {M : Type*} [AddCommGroup M] [Module ℂ M]
+    (α β : M →ₗ[ℂ] (Fin k → ℂ)) (h : ∀ p q, star (α p) ⬝ᵥ α q = star (β p) ⬝ᵥ β q)
+    : ∃ ψ ∈ Matrix.unitaryGroup (Fin k) ℂ, ∀ p, ψ *ᵥ α p = β p := by
   let T : (Fin k → ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin k) := (WithLp.linearEquiv 2 ℂ (Fin k → ℂ)).symm
   have hT : ∀ u v, inner ℂ (T u) (T v) = star u ⬝ᵥ v := by
     intro u v
@@ -81,7 +82,8 @@ variable {n k : ℕ} (ε : Fin n → Bool)
 def liftV (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ) : Fin n → ℂ :=
   y + ∑ a, ((U - 1) *ᵥ wCoord ε wb y) a • wb a
 
-def liftL (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ) where
+def liftL (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ)
+    : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ) where
   toFun := liftV ε wb U
   map_add' x y := by
     have hw : wCoord ε wb (x + y) = wCoord ε wb x + wCoord ε wb y := by
@@ -89,63 +91,71 @@ def liftL (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) : (Fin
     simp only [liftV, hw, mulVec_add, Pi.add_apply, add_smul, Finset.sum_add_distrib]
     abel
   map_smul' c x := by
-    have hw : wCoord ε wb (c • x) = c • wCoord ε wb x := by
-      funext i; simp [wCoord, hJ_smul_right]
+    have hw : wCoord ε wb (c • x) = c • wCoord ε wb x := by funext i; simp [wCoord, hJ_smul_right]
     simp only [liftV, hw, mulVec_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, smul_add,
       Finset.smul_sum, smul_smul]
 
 def liftM (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
   LinearMap.toMatrix' (liftL ε wb U)
 
-theorem liftM_mulVec (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ) :
-    liftM ε wb U *ᵥ y = y + ∑ a, ((U - 1) *ᵥ wCoord ε wb y) a • wb a := by
+theorem liftM_mulVec (wb : Fin k → Fin n → ℂ) (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ)
+    : liftM ε wb U *ᵥ y = y + ∑ a, ((U - 1) *ᵥ wCoord ε wb y) a • wb a := by
   rw [liftM, LinearMap.toMatrix'_mulVec]; rfl
 
 variable {ε}
 
-theorem hJ_wb_sum {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
-    (c : Fin k) (p : Fin k → ℂ) : hJ ε (wb c) (∑ a, p a • wb a) = p c := by
+theorem hJ_wb_sum
+    {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (c : Fin k) (p : Fin k → ℂ)
+    : hJ ε (wb c) (∑ a, p a • wb a) = p c := by
   rw [hJ_sum_right]
   simp only [hJ_smul_right, hon, mul_ite, mul_one, mul_zero]
   simp
 
-theorem wCoord_liftM {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
-    (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ) :
-    wCoord ε wb (liftM ε wb U *ᵥ y) = U *ᵥ wCoord ε wb y := by
+theorem wCoord_liftM
+    {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ)
+    : wCoord ε wb (liftM ε wb U *ᵥ y) = U *ᵥ wCoord ε wb y := by
   funext c
   show hJ ε (wb c) (liftM ε wb U *ᵥ y) = (U *ᵥ wCoord ε wb y) c
   rw [liftM_mulVec, hJ_add_right, hJ_wb_sum hon, sub_mulVec, one_mulVec, Pi.sub_apply]
   show wCoord ε wb y c + _ = _
   ring
 
-theorem liftM_fix {wb : Fin k → Fin n → ℂ} (U : Matrix (Fin k) (Fin k) ℂ) (y : Fin n → ℂ)
-    (hy : ∀ i, hJ ε (wb i) y = 0) : liftM ε wb U *ᵥ y = y := by
+theorem liftM_fix
+    {wb : Fin k → Fin n → ℂ}
+    (U : Matrix (Fin k) (Fin k) ℂ)
+    (y : Fin n → ℂ) (hy : ∀ i, hJ ε (wb i) y = 0)
+    : liftM ε wb U *ᵥ y = y := by
   have h0 : wCoord ε wb y = 0 := funext hy
   rw [liftM_mulVec, h0, mulVec_zero]
   simp
 
-private theorem liftM_iso_lemma {wb : Fin k → Fin n → ℂ} (p : Fin k → ℂ) (y : Fin n → ℂ) :
-    hJ ε (∑ a, p a • wb a) y = star p ⬝ᵥ wCoord ε wb y := by
+private theorem liftM_iso_lemma {wb : Fin k → Fin n → ℂ} (p : Fin k → ℂ) (y : Fin n → ℂ)
+    : hJ ε (∑ a, p a • wb a) y = star p ⬝ᵥ wCoord ε wb y := by
   rw [hJ_sum_left]
   simp only [hJ_smul_left, dotProduct, wCoord, Pi.star_apply]
 
-private theorem liftM_iso_lemma_2 {wb : Fin k → Fin n → ℂ} (p : Fin k → ℂ) (x : Fin n → ℂ) :
-    hJ ε x (∑ a, p a • wb a) = star (wCoord ε wb x) ⬝ᵥ p := by
+private theorem liftM_iso_lemma_2 {wb : Fin k → Fin n → ℂ} (p : Fin k → ℂ) (x : Fin n → ℂ)
+    : hJ ε x (∑ a, p a • wb a) = star (wCoord ε wb x) ⬝ᵥ p := by
   rw [hJ_sum_right]
   simp only [hJ_smul_right, dotProduct, wCoord, Pi.star_apply, hJ_conj]
   exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 
-private theorem liftM_iso_lemma_3 {wb : Fin k → Fin n → ℂ}
-    (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0) (q p : Fin k → ℂ) :
-    hJ ε (∑ a, q a • wb a) (∑ a, p a • wb a) = star q ⬝ᵥ p := by
+private theorem liftM_iso_lemma_3
+    {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (q p : Fin k → ℂ)
+    : hJ ε (∑ a, q a • wb a) (∑ a, p a • wb a) = star q ⬝ᵥ p := by
   rw [liftM_iso_lemma]
   congr 1
   funext c
   exact hJ_wb_sum hon c p
 
-theorem liftM_iso {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
-    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ) (x y : Fin n → ℂ) :
-    hJ ε (liftM ε wb U *ᵥ x) (liftM ε wb U *ᵥ y) = hJ ε x y := by
+theorem liftM_iso
+    {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    (x y : Fin n → ℂ)
+    : hJ ε (liftM ε wb U *ᵥ x) (liftM ε wb U *ᵥ y) = hJ ε x y := by
   have hu : Uᴴ * U = 1 := by
     have h := Matrix.mem_unitaryGroup_iff'.mp hU
     rwa [Matrix.star_eq_conjTranspose] at h
@@ -154,18 +164,22 @@ theorem liftM_iso {wb : Fin k → Fin n → ℂ} (hon : ∀ i j, hJ ε (wb i) (w
     abel
   rw [liftM_mulVec, liftM_mulVec, hJ_add_left, hJ_add_right, hJ_add_right, liftM_iso_lemma_3 hon,
     liftM_iso_lemma_2, liftM_iso_lemma]
-  have e : ∀ a b : Fin k → ℂ, star a ⬝ᵥ ((U - 1) *ᵥ b) + (star ((U - 1) *ᵥ a) ⬝ᵥ b
-      + star ((U - 1) *ᵥ a) ⬝ᵥ ((U - 1) *ᵥ b))
-      = star a ⬝ᵥ (((U - 1) + (U - 1)ᴴ + (U - 1)ᴴ * (U - 1)) *ᵥ b) := by
+  have e
+      : ∀ a b : Fin k → ℂ,
+        star a ⬝ᵥ ((U - 1) *ᵥ b)
+            + (star ((U - 1) *ᵥ a) ⬝ᵥ b + star ((U - 1) *ᵥ a) ⬝ᵥ ((U - 1) *ᵥ b))
+          = star a ⬝ᵥ (((U - 1) + (U - 1)ᴴ + (U - 1)ᴴ * (U - 1)) *ᵥ b) := by
     intro a b
     rw [star_mulVec, ← dotProduct_mulVec, ← dotProduct_mulVec, add_mulVec, add_mulVec,
       ← mulVec_mulVec, dotProduct_add, dotProduct_add]
     ring
   rw [add_assoc, e, key, zero_mulVec, dotProduct_zero, add_zero]
 
-def liftU (wb : Fin k → Fin n → ℂ) (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
-    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ) : Formalism.REAL.UJ ε :=
-  ⟨(Matrix.isUnit_iff_isUnit_det _).2 (by
+def liftU
+    (wb : Fin k → Fin n → ℂ) (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    : Formalism.REAL.UJ ε := ⟨
+  (Matrix.isUnit_iff_isUnit_det _).2 (by
       have hA := inUJ_of_iso ε _ (liftM_iso hon U hU)
       unfold Formalism.REAL.inUJ at hA
       have h1 := congrArg Matrix.det hA
@@ -175,11 +189,17 @@ def liftU (wb : Fin k → Fin n → ℂ) (hon : ∀ i j, hJ ε (wb i) (wb j) = i
         rw [det_diagonal]
         exact Finset.prod_ne_zero_iff.2 fun a _ => by split_ifs <;> norm_num
       refine isUnit_iff_ne_zero.2 fun h0 => hJ0 ?_
-      rw [← h1, show (liftM ε wb U).det = 0 from h0, mul_zero])|>.unit, inUJ_of_iso ε _ (liftM_iso hon U hU)⟩
+      rw [← h1, show (liftM ε wb U).det = 0 from h0, mul_zero])
+    |>.unit,
+  inUJ_of_iso ε _ (liftM_iso hon U hU)
+⟩
 
-theorem liftU_mulVec (wb : Fin k → Fin n → ℂ) (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
-    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ) (y : Fin n → ℂ) :
-    uMat (liftU wb hon U hU) *ᵥ y = liftM ε wb U *ᵥ y := rfl
+theorem liftU_mulVec
+    (wb : Fin k → Fin n → ℂ) (hon : ∀ i j, hJ ε (wb i) (wb j) = if i = j then 1 else 0)
+    (U : Matrix (Fin k) (Fin k) ℂ) (hU : U ∈ Matrix.unitaryGroup (Fin k) ℂ)
+    (y : Fin n → ℂ)
+    : uMat (liftU wb hon U hU) *ᵥ y = liftM ε wb U *ᵥ y :=
+  rfl
 
 end Lift
 

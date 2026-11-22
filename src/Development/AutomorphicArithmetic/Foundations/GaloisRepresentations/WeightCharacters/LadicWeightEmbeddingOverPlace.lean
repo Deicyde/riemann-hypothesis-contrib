@@ -49,7 +49,8 @@ theorem sqExp_holds : SqExp := sqExp_h expBasic_holds evLem_holds dom_holds
 theorem topUp_holds : TopUp := topUp_of
 theorem torFacts_holds : TorFacts := torFacts_of
 theorem qR_holds : QR := qR_of
-theorem wtBd_holds : WtBd := wtBd_of expBasic_holds expDisj_holds sqExp_holds topUp_holds torFacts_holds
+theorem wtBd_holds : WtBd :=
+  wtBd_of expBasic_holds expDisj_holds sqExp_holds topUp_holds torFacts_holds
 theorem wExp_holds : WExp := wExp_h expBasic_holds sqExp_holds torFacts_holds
 theorem rFinEx_holds : RFinEx := rFinEx_of
 theorem deltaNear_holds : DeltaNear := deltaNear_h
@@ -68,12 +69,17 @@ theorem kapl_holds : Kapl := kapl_of kaplFin_holds
 theorem sepPoly_holds : SepPoly := sepPoly_of kapl_holds
 theorem nearSub_holds : NearSub := nearSub_of
 theorem pieces_holds : Pieces := pieces_of sepPoly_holds nearSub_holds
-theorem famOf_holds : FamOf := famOf_of expBasic_holds pevExp_holds sqExp_holds topUp_holds wExp_holds famOfA_holds
-theorem famEx_holds : FamEx := famEx_of neatLev_holds ellC_holds twist_holds twistBd_holds ladic_weight_embedding_over_place pieces_holds deltaNear_holds famOf_holds
+theorem famOf_holds : FamOf :=
+  famOf_of expBasic_holds pevExp_holds sqExp_holds topUp_holds wExp_holds famOfA_holds
+theorem famEx_holds : FamEx :=
+  famEx_of neatLev_holds ellC_holds twist_holds twistBd_holds ladic_weight_embedding_over_place
+    pieces_holds deltaNear_holds famOf_holds
 theorem famProj_holds : FamProj := famProj_of evLem_holds sumRep_holds
-theorem famSum_holds : FamSum := famSum_of expBasic_holds evLem_holds torFacts_holds qR_holds wtBd_holds embProj_holds
+theorem famSum_holds : FamSum :=
+  famSum_of expBasic_holds evLem_holds torFacts_holds qR_holds wtBd_holds embProj_holds
 theorem famWt_holds : FamWt := famWt_of famOff_holds famSum_holds
 
-theorem wtLacEx_holds : UpperTheory.Gal.Int.Cong.WtLacEx := top_of famEx_holds famProj_holds famWt_holds
+theorem wtLacEx_holds : UpperTheory.Gal.Int.Cong.WtLacEx :=
+  top_of famEx_holds famProj_holds famWt_holds
 
 end UpperTheory.Gal.Wt

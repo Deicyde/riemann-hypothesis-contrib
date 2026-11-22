@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SingleMemOfM
 @[expose] public section
 
 open scoped NNReal
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HerbrandBridge
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HerbrandBridge
 
 namespace GlobalTheory.Div.KerFil
 open GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference
 
-theorem mem_of_components : ∀ (C : Type) [Field C] (w : Valuation C ℝ≥0) (S : Type) [Fintype S]
-    [DecidableEq S] (a : S → w.valuationSubring) (N : ℕ)
-    (F : Submodule w.valuationSubring (S → Fin N → C)), Function.Injective a →
-    GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsFiltration a F → ∀ x ∈ GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a N,
-    (∀ s, x s ∈ GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace F s) → x ∈ F := by
+theorem mem_of_components
+    : ∀ (C : Type) [Field C] (w : Valuation C ℝ≥0) (S : Type) [Fintype S] [DecidableEq S]
+        (a : S → w.valuationSubring) (N : ℕ) (F : Submodule w.valuationSubring (S → Fin N → C)),
+      Function.Injective a
+        → GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.IsFiltration a F
+        → ∀ x ∈ GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.freeLattice a N,
+          (∀ s, x s ∈ GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference.filSpace F s)
+            → x ∈ F := by
   intro C _ w S _ _ a N F ha hF x hx hc
   have hle : ∀ s, filSpace F s ≤ clearDen F s := fun s => by
     refine Submodule.span_le.2 ?_
@@ -27,8 +31,10 @@ theorem mem_of_components : ∀ (C : Type) [Field C] (w : Valuation C ℝ≥0) (
   choose b hb hbx using fun s => hle s (hc s)
   have hB : (∏ s, b s) ≠ 0 := Finset.prod_ne_zero_iff.2 fun s _ => hb s
   refine hF.saturated x hx (∏ s, b s) hB ?_
-  have key : (∏ s, b s) • x = ∑ s, (∏ t ∈ Finset.univ.erase s, b t) •
-      (Pi.single s (b s • x s) : S → Fin N → C) := by
+  have key
+      : (∏ s, b s) • x
+        = ∑ s, (∏ t ∈ Finset.univ.erase s, b t) •
+          (Pi.single s (b s • x s) : S → Fin N → C) := by
     funext s' i
     rw [Finset.sum_apply, Finset.sum_apply, Finset.sum_eq_single s']
     · simp only [smul_pi_apply, Pi.single_eq_same, smul_vec_apply]

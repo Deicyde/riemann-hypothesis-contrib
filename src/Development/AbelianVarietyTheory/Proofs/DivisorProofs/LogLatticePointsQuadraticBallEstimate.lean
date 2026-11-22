@@ -13,7 +13,16 @@ open scoped ComplexOrder Matrix
 
 namespace GlobalTheory.HSAmp
 
-theorem log_ellCount_near : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ), A.PosDef → ∀ (T : Set (ι → ℤ)) (ρ R : ℝ), 0 ≤ ρ → 0 < R → AddSubgroup.closure T = ⊤ → (∀ z ∈ T, ∑ i, ∑ j, A i j * (z i : ℝ) * (z j : ℝ) ≤ ρ ^ 2) → 2 * Fintype.card ι * ρ ≤ R → {z : ι → ℤ | ∑ i, ∑ j, A i j * (z i : ℝ) * (z j : ℝ) ≤ R ^ 2}.Finite ∧ |Real.log (ellCount A R) - (Fintype.card ι * Real.log R - Real.log A.det / 2 + Real.log (volume {x : ι → ℝ | ∑ i, x i ^ 2 ≤ 1}).toReal)| ≤ Fintype.card ι * Real.log 2 := by
+theorem log_ellCount_near
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ),
+      A.PosDef
+        → ∀ (T : Set (ι → ℤ)) (ρ R : ℝ),
+          0 ≤ ρ → 0 < R → AddSubgroup.closure T = ⊤
+            → (∀ z ∈ T, ∑ i, ∑ j, A i j * (z i : ℝ) * (z j : ℝ) ≤ ρ ^ 2)
+            → 2 * Fintype.card ι * ρ ≤ R
+            → {z : ι → ℤ | ∑ i, ∑ j, A i j * (z i : ℝ) * (z j : ℝ) ≤ R ^ 2}.Finite
+              ∧ |Real.log (ellCount A R) - (Fintype.card ι * Real.log R - Real.log A.det / 2 + Real.log (volume {x : ι → ℝ | ∑ i, x i ^ 2 ≤ 1}).toReal)|
+                ≤ Fintype.card ι * Real.log 2 := by
   intro ι _ _ A hA T ρ R hρ hR hT hTz hRρ
   set n : ℕ := Fintype.card ι with hn
   set s : ℝ := n * ρ with hs
@@ -26,16 +35,22 @@ theorem log_ellCount_near : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (A : M
   refine ⟨hup.1, ?_⟩
   obtain ⟨-, hω0, hωt⟩ := volume_ellipsoid ι A hA 0 le_rfl
   set ω : ENNReal := volume {x : ι → ℝ | ∑ i, x i ^ 2 ≤ 1} with hω
-  have hVr : ∀ r : ℝ, 0 ≤ r → (volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r ^ 2}).toReal
-      = r ^ n / Real.sqrt A.det * ω.toReal := by
+  have hVr
+      : ∀ r : ℝ,
+        0 ≤ r
+          → (volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r ^ 2}).toReal
+            = r ^ n / Real.sqrt A.det * ω.toReal := by
     intro r hr
     rw [(volume_ellipsoid ι A hA r hr).1, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)]
   have hVfin : ∀ r : ℝ, 0 ≤ r → volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r ^ 2} ≠ ⊤ := by
     intro r hr
     rw [(volume_ellipsoid ι A hA r hr).1]
     exact ENNReal.mul_ne_top ENNReal.ofReal_ne_top hωt.ne
-  have hmono : ∀ r r' : ℝ, 0 ≤ r → r ≤ r' → volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r ^ 2}
-      ≤ volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r' ^ 2} := by
+  have hmono
+      : ∀ r r' : ℝ,
+        0 ≤ r → r ≤ r'
+          → volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r ^ 2}
+            ≤ volume {x : ι → ℝ | ∑ i, ∑ j, A i j * x i * x j ≤ r' ^ 2} := by
     intro r r' hr hrr
     apply measure_mono
     intro x hx

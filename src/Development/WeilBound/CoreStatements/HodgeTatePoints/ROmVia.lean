@@ -14,13 +14,16 @@ open scoped Matrix
 
 namespace PositivityTheory.HtPt.Rom
 
-private theorem prime_pow_le_sum_mul_pow_of_modEq (p f n : ℕ) (hp : p.Prime) (hf : 1 ≤ f) (e : Fin f → ℕ) (he : 2 ≤ ∑ i, e i)
-    (hc : ∑ i, e i * p ^ (i : ℕ) ≡ p ^ (n + 1) [MOD p ^ f - 1]) :
-    p ^ f ≤ ∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f) := by
+private theorem prime_pow_le_sum_mul_pow_of_modEq
+    (p f n : ℕ) (hp : p.Prime) (hf : 1 ≤ f) (e : Fin f → ℕ)
+    (he : 2 ≤ ∑ i, e i) (hc : ∑ i, e i * p ^ (i : ℕ) ≡ p ^ (n + 1) [MOD p ^ f - 1])
+    : p ^ f ≤ ∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f) := by
   have hp2 := hp.two_le
-  have hq : 2 ≤ p ^ f := le_trans hp2 (by
-    calc p = p ^ 1 := (pow_one p).symm
-      _ ≤ p ^ f := Nat.pow_le_pow_right (by omega) hf)
+  have hq : 2 ≤ p ^ f :=
+    le_trans hp2 (by
+      calc
+        p = p ^ 1 := (pow_one p).symm
+        _ ≤ p ^ f := Nat.pow_le_pow_right (by omega) hf)
   set M := p ^ f - 1 with hM
   set S := ∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f) with hS
   have hpf : (p : ZMod M) ^ f = 1 := by
@@ -66,10 +69,12 @@ private theorem prime_pow_le_sum_mul_pow_of_modEq (p f n : ℕ) (hp : p.Prime) (
     rw [this, Nat.mod_self, Nat.mod_eq_of_lt (by omega)] at hS1
     omega
 
-private theorem prod_pow_le_pow_of_frobenius_le (p f n : ℕ) (hp : 1 ≤ p) (hf : 1 ≤ f) (a : ℕ → NNReal) (h1 : ∀ m, a m ≤ 1)
-    (hs : ∀ m, a m ^ p ≤ a (m + 1)) (hper : ∀ m, a (m % f) = a m) (e : Fin f → ℕ)
-    (hS : p ^ f ≤ ∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f)) :
-    ∏ i : Fin f, a i ^ e i ≤ a n ^ p := by
+private theorem prod_pow_le_pow_of_frobenius_le
+    (p f n : ℕ) (hp : 1 ≤ p) (hf : 1 ≤ f)
+    (a : ℕ → NNReal)
+    (h1 : ∀ m, a m ≤ 1) (hs : ∀ m, a m ^ p ≤ a (m + 1)) (hper : ∀ m, a (m % f) = a m)
+    (e : Fin f → ℕ) (hS : p ^ f ≤ ∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f))
+    : ∏ i : Fin f, a i ^ e i ≤ a n ^ p := by
   have hit : ∀ t m, a m ^ (p ^ t) ≤ a (m + t) := by
     intro t
     induction t with
@@ -77,7 +82,9 @@ private theorem prod_pow_le_pow_of_frobenius_le (p f n : ℕ) (hp : 1 ≤ p) (hf
     | succ t ih =>
       intro m
       rw [pow_succ, pow_mul]
-      calc (a m ^ p ^ t) ^ p ≤ a (m + t) ^ p := pow_le_pow_left₀ (zero_le) (ih m) p
+      calc
+        (a m ^ p ^ t) ^ p
+          ≤ a (m + t) ^ p := pow_le_pow_left₀ (zero_le) (ih m) p
         _ ≤ a (m + t + 1) := hs _
         _ = a (m + (t + 1)) := by rw [add_assoc]
   have hi : ∀ i : Fin f, a i ^ p ^ ((n + f - i) % f) ≤ a n := by
@@ -94,26 +101,48 @@ private theorem prod_pow_le_pow_of_frobenius_le (p f n : ℕ) (hp : 1 ≤ p) (hf
     rw [← hper, hmod, hper]
   have hP : p ^ (f - 1) ≠ 0 := pow_ne_zero _ (by omega)
   rw [← pow_le_pow_iff_left₀ (zero_le) (zero_le) hP, ← Finset.prod_pow]
-  calc ∏ i : Fin f, (a i ^ e i) ^ p ^ (f - 1)
-      ≤ ∏ i : Fin f, a n ^ (e i * p ^ (f - 1 - (n + f - i) % f)) := by
-        refine Finset.prod_le_prod' (fun i _ => ?_)
-        have hil := i.isLt
-        have hr := Nat.mod_lt (n + f - i) (by omega : f > 0)
-        have hsplit : p ^ (f - 1) = p ^ ((n + f - i) % f) * p ^ (f - 1 - (n + f - i) % f) := by
-          rw [← pow_add]; congr 1; omega
-        rw [← pow_mul, hsplit, mul_left_comm, pow_mul]
-        exact pow_le_pow_left₀ (zero_le) (hi i) _
+  calc
+    ∏ i : Fin f, (a i ^ e i) ^ p ^ (f - 1)
+        ≤ ∏ i : Fin f, a n ^ (e i * p ^ (f - 1 - (n + f - i) % f)) := by
+      refine Finset.prod_le_prod' (fun i _ => ?_)
+      have hil := i.isLt
+      have hr := Nat.mod_lt (n + f - i) (by omega : f > 0)
+      have hsplit : p ^ (f - 1) = p ^ ((n + f - i) % f) * p ^ (f - 1 - (n + f - i) % f) := by
+        rw [← pow_add]; congr 1; omega
+      rw [← pow_mul, hsplit, mul_left_comm, pow_mul]
+      exact pow_le_pow_left₀ (zero_le) (hi i) _
     _ = a n ^ (∑ i : Fin f, e i * p ^ (f - 1 - (n + f - i) % f)) := Finset.prod_pow_eq_pow_sum _ _ _
     _ ≤ a n ^ (p ^ f) := pow_le_pow_of_le_one (zero_le) (h1 n) hS
-    _ = (a n ^ p) ^ p ^ (f - 1) := by
-        rw [← pow_mul, ← pow_succ']; congr 2; omega
+    _ = (a n ^ p) ^ p ^ (f - 1) := by rw [← pow_mul, ← pow_succ']; congr 2; omega
 
 open PositivityTheory.Xgn.A_xgr_r_om PositivityTheory.HtPt.Rb in
-theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers) : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable F AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ c : ℕ → R, (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n}) → ∀ n, (∀ r : R, (fun a => algebraMap R C (r * (σ ^ p ^ (n + 1)) a)) ∈ sqIdeal (augIdeal AA.carrier) ↔ r ∈ Ideal.span {c n ^ p}) ∧ (∃ δ : R, c n ^ p = δ * c (n + 1)) ∧ ∀ δ : R, c n ^ p = δ * c (n + 1) → HasLen v R (OmType AA.carrier (σ ^ p ^ (n + 1))) (v (algebraMap R C δ)) := by
+theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers)
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable F AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ c : ℕ → R,
+                      (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n})
+                        → ∀ n,
+                          (∀ r : R,
+                              (fun a => algebraMap R C (r * (σ ^ p ^ (n + 1)) a))
+                                  ∈ sqIdeal (augIdeal AA.carrier)
+                                ↔ r ∈ Ideal.span {c n ^ p})
+                            ∧ (∃ δ : R, c n ^ p = δ * c (n + 1))
+                            ∧ ∀ δ : R,
+                              c n ^ p = δ * c (n + 1)
+                                → HasLen v R (OmType AA.carrier (σ ^ p ^ (n + 1)))
+                                  (v (algebraMap R C δ)) := by
   intro p hpp C _ _ _ v R _ _ hv hp F _ _ _ _ f hcard AA hst σ hσ c hc n
   have hpr : p.Prime := hpp.out
   have hp2 := hpr.two_le
-  obtain ⟨hord, -, -, -, -⟩ := GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hp F f hcard σ hσ
+  obtain ⟨hord, -, -, -, -⟩ :=
+    GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hp F f hcard σ hσ
   obtain ⟨hval, hprod⟩ := h p C v R hv hp F f hcard AA hst σ hσ c hc
   haveI : IsDomain R := Function.Injective.isDomain (algebraMap R C) hv.hom_inj
   have hf1 : 1 ≤ f := by
@@ -134,7 +163,9 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
   have hstep : ∀ m, c m ^ p ∈ Ideal.span {c (m + 1)} := by
     intro m
     rw [← hc (m + 1), mem_x_ideal_iff]
-    have h1 := pow_mem_sq AA (σ ^ p ^ m) (c := c m) (by rw [hc]; exact Ideal.mem_span_singleton_self _) (k := p) hp2
+    have h1 :=
+      pow_mem_sq AA (σ ^ p ^ m) (c := c m) (by rw [hc]; exact Ideal.mem_span_singleton_self _)
+        (k := p) hp2
     rw [← pow_mul, ← pow_succ] at h1
     exact sq_le AA h1
   have hper : ∀ m, σ ^ p ^ (m % f) = σ ^ p ^ m := by
@@ -154,12 +185,17 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
   have haper : ∀ m, a (m % f) = a m := by
     intro m
     exact v_eq_of_span hv (by rw [← hc, ← hc, hper])
-  have hE : ∀ m, 1 ≤ m → m ≤ p ^ f - 1 → ∀ e ∈ eig AA.carrier (σ ^ m), ∃ d : Fin f → Fin p,
-      (∃ i, (d i : ℕ) ≠ 0) ∧ ∑ i : Fin f, (d i : ℕ) * p ^ (i : ℕ) = m ∧
-      v (e 1) ≤ ∏ i : Fin f, a i ^ (d i : ℕ) := by
+  have hE
+      : ∀ m,
+        1 ≤ m → m ≤ p ^ f - 1
+          → ∀ e ∈ eig AA.carrier (σ ^ m), ∃ d : Fin f → Fin p,
+            (∃ i, (d i : ℕ) ≠ 0) ∧ ∑ i : Fin f, (d i : ℕ) * p ^ (i : ℕ) = m
+              ∧ v (e 1) ≤ ∏ i : Fin f, a i ^ (d i : ℕ) := by
     intro m hm1 hm2 e he
-    have he' : e ∈ AA.carrier ∧ ∀ (x : F) (y : F), e (x • y) = algebraMap R C ((σ ^ m) x) * e y := he
-    obtain ⟨d, hd0, hdm⟩ := digits (p := p) (f := f) hm1 (by have := Nat.one_le_pow f p (by omega); omega)
+    have he' : e ∈ AA.carrier ∧ ∀ (x : F) (y : F), e (x • y) = algebraMap R C ((σ ^ m) x) * e y :=
+      he
+    obtain ⟨d, hd0, hdm⟩ :=
+      digits (p := p) (f := f) hm1 (by have := Nat.one_le_pow f p (by omega); omega)
     refine ⟨d, hd0, hdm, ?_⟩
     obtain ⟨t, ht⟩ := AA.le_int he'.1 1
     have hfun : (fun x : F => algebraMap R C (t * (σ ^ m) x)) = e := by
@@ -167,22 +203,23 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
       have := he'.2 x 1
       rw [smul_eq_mul, mul_one] at this
       rw [this, ← ht, map_mul, mul_comm]
-    have htm : t ∈ xIdeal AA.carrier (σ ^ m) := by
-      rw [mem_x_ideal_iff, hfun]; exact he'.1
+    have htm : t ∈ xIdeal AA.carrier (σ ^ m) := by rw [mem_x_ideal_iff, hfun]; exact he'.1
     rw [← hdm, hprod d hd0] at htm
     rw [← ht]
     refine le_trans (v_le_of_mem hv htm) (le_of_eq ?_)
     simp only [ha, map_prod, map_pow]
   set χ : MulChar F R := σ ^ p ^ (n + 1) with hχdef
   set L : (F → C) →ₗ[R] C := (LinearMap.proj (R := R) (φ := fun _ : F => C) (1 : F)).comp (projL χ) with hL
-  have hLapp : ∀ g, L g = proj χ g 1 := by
-    intro g; simp [hL, projL_apply]
-  have hbound : ∀ g ∈ augIdeal AA.carrier, ∀ g' ∈ augIdeal AA.carrier, v (L (g * g')) ≤ a n ^ p := by
+  have hLapp : ∀ g, L g = proj χ g 1 := by intro g; simp [hL, projL_apply]
+  have hbound
+      : ∀ g ∈ augIdeal AA.carrier, ∀ g' ∈ augIdeal AA.carrier, v (L (g * g')) ≤ a n ^ p := by
     intro g hg g' hg'
     obtain ⟨hPg, hsum, -⟩ := proj_props p C v R hv hp F f hcard F AA hst σ hσ g hg
     obtain ⟨hPg', hsum', -⟩ := proj_props p C v R hv hp F f hcard F AA hst σ hσ g' hg'
-    have hgg : g * g' = ∑ m ∈ Finset.Icc 1 (p ^ f - 1), ∑ m' ∈ Finset.Icc 1 (p ^ f - 1),
-        proj (σ ^ m) g * proj (σ ^ m') g' := by
+    have hgg
+        : g * g'
+          = ∑ m ∈ Finset.Icc 1 (p ^ f - 1), ∑ m' ∈ Finset.Icc 1 (p ^ f - 1),
+            proj (σ ^ m) g * proj (σ ^ m') g' := by
       conv_lhs => rw [hsum, hsum']
       rw [Finset.sum_mul_sum]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -192,10 +229,20 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
       rw [map_sum]
     refine Valuation.map_sum_le _ (fun m' hm' => ?_)
     rw [Finset.mem_Icc] at hm hm'
-    have e1 : proj (σ ^ m) g ∈ AA.carrier ∧ ∀ (x : F) (y : F), proj (σ ^ m) g (x • y) = algebraMap R C ((σ ^ m) x) * proj (σ ^ m) g y := hPg (σ ^ m)
-    have e2 : proj (σ ^ m') g' ∈ AA.carrier ∧ ∀ (x : F) (y : F), proj (σ ^ m') g' (x • y) = algebraMap R C ((σ ^ m') x) * proj (σ ^ m') g' y := hPg' (σ ^ m')
-    have heig : ∀ (x : F) (y : F), (proj (σ ^ m) g * proj (σ ^ m') g') (x • y) =
-        algebraMap R C ((σ ^ m * σ ^ m') x) * (proj (σ ^ m) g * proj (σ ^ m') g') y := by
+    have e1
+        : proj (σ ^ m) g ∈ AA.carrier
+          ∧ ∀ (x : F) (y : F),
+            proj (σ ^ m) g (x • y) = algebraMap R C ((σ ^ m) x) * proj (σ ^ m) g y :=
+      hPg (σ ^ m)
+    have e2
+        : proj (σ ^ m') g' ∈ AA.carrier
+          ∧ ∀ (x : F) (y : F),
+            proj (σ ^ m') g' (x • y) = algebraMap R C ((σ ^ m') x) * proj (σ ^ m') g' y :=
+      hPg' (σ ^ m')
+    have heig
+        : ∀ (x : F) (y : F),
+          (proj (σ ^ m) g * proj (σ ^ m') g') (x • y)
+            = algebraMap R C ((σ ^ m * σ ^ m') x) * (proj (σ ^ m) g * proj (σ ^ m') g') y := by
       intro x y
       simp only [Pi.mul_apply, e1.2, e2.2, MulChar.mul_apply, map_mul]
       ring
@@ -206,36 +253,54 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
       refine le_trans (mul_le_mul' hdv hdv') ?_
       rw [← Finset.prod_mul_distrib]
       simp only [← pow_add]
-      refine prod_pow_le_pow_of_frobenius_le p f n (by omega) hf1 a ha1 has haper (fun i => (d i : ℕ) + d' i) ?_
+      refine prod_pow_le_pow_of_frobenius_le p f n (by omega) hf1 a ha1 has haper
+        (fun i => (d i : ℕ) + d' i)
+        ?_
       refine prime_pow_le_sum_mul_pow_of_modEq p f n hpr hf1 _ ?_ ?_
       · obtain ⟨i, hi⟩ := hd0
         obtain ⟨i', hi'⟩ := hd0'
         rw [Finset.sum_add_distrib]
-        have h1 := Finset.single_le_sum (f := fun j => ((d j : Fin p) : ℕ)) (fun j _ => Nat.zero_le _) (Finset.mem_univ i)
-        have h2 := Finset.single_le_sum (f := fun j => ((d' j : Fin p) : ℕ)) (fun j _ => Nat.zero_le _) (Finset.mem_univ i')
+        have h1 :=
+          Finset.single_le_sum
+            (f := fun j => ((d j : Fin p) : ℕ))
+            (fun j _ => Nat.zero_le _)
+            (Finset.mem_univ i)
+        have h2 :=
+          Finset.single_le_sum
+            (f := fun j => ((d' j : Fin p) : ℕ))
+            (fun j _ => Nat.zero_le _)
+            (Finset.mem_univ i')
         omega
       · simp only [add_mul, Finset.sum_add_distrib, hdm, hdm']
         rw [← hord, ← pow_eq_pow_iff_modEq, pow_add, hχ]
     · rw [hLapp, proj_eigen_ne (Ne.symm hχ) _ heig]
       simp
   have hsqn : (fun x : F => algebraMap R C (c n ^ p * χ x)) ∈ sqIdeal (augIdeal AA.carrier) := by
-    have h1 := pow_mem_sq AA (σ ^ p ^ n) (c := c n) (by rw [hc]; exact Ideal.mem_span_singleton_self _) (k := p) hp2
+    have h1 :=
+      pow_mem_sq AA (σ ^ p ^ n) (c := c n) (by rw [hc]; exact Ideal.mem_span_singleton_self _)
+        (k := p) hp2
     rw [← pow_mul, ← pow_succ] at h1
     exact h1
-  have hP1 : ∀ r : R, (fun x : F => algebraMap R C (r * χ x)) ∈ sqIdeal (augIdeal AA.carrier) ↔
-      r ∈ Ideal.span {c n ^ p} := by
+  have hP1
+      : ∀ r : R,
+        (fun x : F => algebraMap R C (r * χ x)) ∈ sqIdeal (augIdeal AA.carrier)
+          ↔ r ∈ Ideal.span {c n ^ p} := by
     intro r
     constructor
     · intro hr
-      have h1 := sq_bound hv (augIdeal AA.carrier : Set (F → C)) L (a n ^ p)
-        (fun g hg g' hg' => hbound g hg g' hg') _ (by rwa [Submodule.span_eq])
-      rw [hLapp, proj_eigen_self hcardne χ _ (fun x y => eig_fun χ r x y), MulChar.map_one, mul_one] at h1
+      have h1 :=
+        sq_bound hv (augIdeal AA.carrier : Set (F → C)) L (a n ^ p)
+          (fun g hg g' hg' => hbound g hg g' hg')
+          _ (by rwa [Submodule.span_eq])
+      rw [hLapp, proj_eigen_self hcardne χ _ (fun x y => eig_fun χ r x y), MulChar.map_one, mul_one]
+        at h1
       rw [Ideal.mem_span_singleton]
       refine hv.dvd_of_le ?_
       simpa [ha, map_pow] using h1
     · intro hr
       obtain ⟨s, rfl⟩ := Ideal.mem_span_singleton'.1 hr
-      have : (fun x : F => algebraMap R C (s * c n ^ p * χ x)) = s • (fun x : F => algebraMap R C (c n ^ p * χ x)) := by
+      have : (fun x : F => algebraMap R C (s * c n ^ p * χ x))
+          = s • (fun x : F => algebraMap R C (c n ^ p * χ x)) := by
         funext x; simp [Algebra.smul_def, mul_assoc]
       rw [this]
       exact Submodule.smul_mem _ _ hsqn
@@ -246,8 +311,10 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
     set e0 : F → C := fun x => algebraMap R C (c (n + 1) * χ x) with he0def
     have he0 : e0 ∈ eig AA.carrier χ := by
       show e0 ∈ AA.carrier ∧ ∀ (x y : F), e0 (x • y) = algebraMap R C (χ x) * e0 y
-      exact ⟨(mem_x_ideal_iff _ _ _).1 (by rw [hc]; exact Ideal.mem_span_singleton_self _),
-        fun x y => eig_fun χ _ x y⟩
+      exact ⟨
+        (mem_x_ideal_iff _ _ _).1 (by rw [hc]; exact Ideal.mem_span_singleton_self _),
+        fun x y => eig_fun χ _ x y
+      ⟩
     let φ : R →ₗ[R] OmType AA.carrier χ :=
       (Submodule.mkQ _).comp (LinearMap.toSpanSingleton R _ (⟨e0, he0⟩ : eig AA.carrier χ))
     have hφ : ∀ r, φ r = Submodule.Quotient.mk (r • (⟨e0, he0⟩ : eig AA.carrier χ)) := fun r => rfl
@@ -263,8 +330,7 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
           have := hy'.2 x 1
           rw [smul_eq_mul, mul_one] at this
           rw [this, ← ht, map_mul, mul_comm]
-        have htm : t ∈ xIdeal AA.carrier χ := by
-          rw [mem_x_ideal_iff, hfun]; exact hy'.1
+        have htm : t ∈ xIdeal AA.carrier χ := by rw [mem_x_ideal_iff, hfun]; exact hy'.1
         rw [hc] at htm
         obtain ⟨s, rfl⟩ := Ideal.mem_span_singleton'.1 htm
         refine ⟨s, ?_⟩
@@ -277,11 +343,12 @@ theorem r_om_of (h : type_of% @GlobalTheory.T.fundamental_ideal_frobenius_powers
         simp [he0def, Algebra.smul_def, mul_assoc]
     · ext r
       rw [LinearMap.mem_ker, hφ, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
-      have hfun : ((r • (⟨e0, he0⟩ : eig AA.carrier χ) : eig AA.carrier χ) : F → C) =
-          (fun x : F => algebraMap R C (r * c (n + 1) * χ x)) := by
+      have hfun
+          : ((r • (⟨e0, he0⟩ : eig AA.carrier χ) : eig AA.carrier χ) : F → C)
+            = (fun x : F => algebraMap R C (r * c (n + 1) * χ x)) := by
         funext x
         simp [he0def, Algebra.smul_def, mul_assoc]
-      rw [Submodule.subtype_apply, hfun, hP1, hδ, Ideal.mem_span_singleton, Ideal.mem_span_singleton,
-        mul_dvd_mul_iff_right (hcne (n + 1))]
+      rw [Submodule.subtype_apply, hfun, hP1, hδ, Ideal.mem_span_singleton,
+        Ideal.mem_span_singleton, mul_dvd_mul_iff_right (hcne (n + 1))]
 
 end PositivityTheory.HtPt.Rom

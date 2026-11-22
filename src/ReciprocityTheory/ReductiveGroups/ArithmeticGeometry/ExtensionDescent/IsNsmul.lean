@@ -41,10 +41,12 @@ structure GtPt where
   s : ∀ χ : D.X, LB.Gen (LB.LinComb D.P.L (DegPre.gtφT D T b χ) DegPre.gtε)
   isGen : ∀ χ, (s χ).IsGen
   s_zero : LB.Gen.Corr D.P.L _ _ _ _ (s 0) (LB.oneGen D.P.L)
-  mult : ∀ χ χ' : D.X, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _ (s (χ + χ'))
-      (DegPre.cubAtT D T (DegPre.cT D T χ) (DegPre.cT D T χ') b))
-    (LB.mulGen D.P.L _ _ _ _ (s χ) (s χ'))
+  mult
+    : ∀ χ χ' : D.X,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (s (χ + χ'))
+          (DegPre.cubAtT D T (DegPre.cT D T χ) (DegPre.cT D T χ') b))
+        (LB.mulGen D.P.L _ _ _ _ (s χ) (s χ'))
 
 namespace GtPt
 
@@ -54,24 +56,27 @@ def IsZero (g : GtPt D T) : Prop :=
   g.b = DegPre.zeroT D T ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ) (LB.oneGen D.P.L)
 
 def IsAdd (g g' g'' : GtPt D T) : Prop :=
-  g''.b = padd D.P.A g.b g'.b ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.mulGen D.P.L _ _ _ _ (g''.s χ) (DegPre.cubAtT D T (DegPre.cT D T χ) g.b g'.b))
-    (LB.mulGen D.P.L _ _ _ _ (g.s χ) (g'.s χ))
+  g''.b = padd D.P.A g.b g'.b
+    ∧ ∀ χ,
+      LB.Gen.Corr D.P.L _ _ _ _
+        (LB.mulGen D.P.L _ _ _ _ (g''.s χ) (DegPre.cubAtT D T (DegPre.cT D T χ) g.b g'.b))
+        (LB.mulGen D.P.L _ _ _ _ (g.s χ) (g'.s χ))
 
 def IsNsmul (k : ℕ) (g h : GtPt D T) : Prop :=
-  ∃ gs : Fin (k + 1) → GtPt D T, (gs 0).IsZero ∧
-    (∀ i : Fin k, IsAdd (gs i.castSucc) g (gs i.succ)) ∧ gs (Fin.last k) = h
+  ∃ gs : Fin (k + 1) → GtPt D T,
+    (gs 0).IsZero ∧ (∀ i : Fin k, IsAdd (gs i.castSucc) g (gs i.succ)) ∧ gs (Fin.last k) = h
 
-def IsPull {T' : Over (Spec (CommRingCat.of R))} (h : T'.left ⟶ T.left) (g : GtPt D T)
-    (g' : GtPt D T') : Prop :=
-  g'.b.left = h ≫ g.b.left ∧
-    ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g'.s χ) (LB.pullGen D.P.L _ _ (g.s χ) h)
+def IsPull
+    {T' : Over (Spec (CommRingCat.of R))} (h : T'.left ⟶ T.left) (g : GtPt D T) (g' : GtPt D T')
+    : Prop :=
+  g'.b.left = h ≫ g.b.left
+    ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g'.s χ) (LB.pullGen D.P.L _ _ (g.s χ) h)
 
 variable (F : Type) [Field F] [Algebra (FractionRing R) F]
 
 def IsPullF (x : Spec (CommRingCat.of F) ⟶ T.left) (g : GtPt D T) (g' : GtPtF D F) : Prop :=
-  g'.b.left = x ≫ g.b.left ∧
-    ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g'.s χ) (LB.pullGen D.P.L _ _ (g.s χ) x)
+  g'.b.left = x ≫ g.b.left
+    ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g'.s χ) (LB.pullGen D.P.L _ _ (g.s χ) x)
 
 end GtPt
 
@@ -87,12 +92,14 @@ abbrev TW : Over (Spec (CommRingCat.of R)) := Over.mk W.ι
 abbrev overW (T : Over W.toScheme) : Over (Spec (CommRingCat.of R)) := (Over.map W.ι).obj T
 
 structure PsiOn where
-  psi : ∀ χ : D.X, LB.Gen (LB.LinComb D.P.L (K := PUnit)
-    (fun _ => (toUnit (TW W) ≫ D.c χ).left) (fun _ => -1))
+  psi
+    : ∀ χ : D.X,
+      LB.Gen (LB.LinComb D.P.L (K := PUnit) (fun _ => (toUnit (TW W) ≫ D.c χ).left) (fun _ => -1))
   psi_gen : ∀ χ, (psi χ).IsGen
-  psi_eq : ∀ χ, LB.Gen.Corr D.P.L _ _ _ _
-    (LB.pullGen D.P.L _ _ (psi χ) (jK R ∣_ W))
-    (LB.pullGen D.P.L _ _ (D.psi χ) (jK R ⁻¹ᵁ W).ι)
+  psi_eq
+    : ∀ χ,
+      LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ (psi χ) (jK R ∣_ W))
+        (LB.pullGen D.P.L _ _ (D.psi χ) (jK R ⁻¹ᵁ W).ι)
 
 namespace DegPre
 
@@ -113,10 +120,13 @@ def tau (ψW : PsiOn D W) (a b : D.X) :=
 
 end PsiOn
 
-def GtPt.IsIotaW {D : DegPre R} {W : (Spec (CommRingCat.of R)).Opens} (ψW : PsiOn D W)
-    {T : Over W.toScheme} (y : D.X) (g : GtPt D (overW W T)) : Prop :=
-  g.b = DegPre.cT D (overW W T) y ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ)
-    (LB.pullGen D.P.L _ _ (ψW.tau y χ) T.hom)
+def GtPt.IsIotaW
+    {D : DegPre R} {W : (Spec (CommRingCat.of R)).Opens} (ψW : PsiOn D W)
+    {T : Over W.toScheme}
+    (y : D.X) (g : GtPt D (overW W T))
+    : Prop :=
+  g.b = DegPre.cT D (overW W T) y
+    ∧ ∀ χ, LB.Gen.Corr D.P.L _ _ _ _ (g.s χ) (LB.pullGen D.P.L _ _ (ψW.tau y χ) T.hom)
 
 structure QkPtW (ψW : PsiOn D W) (k : ℕ) (T : Over W.toScheme) where
   y : D.X
@@ -127,15 +137,16 @@ namespace QkPtW
 
 variable {D W} {ψW : PsiOn D W} {k : ℕ} {T : Over W.toScheme}
 
-def IsAdd (p p' p'' : QkPtW D W ψW k T) : Prop :=
-  p''.y = p.y + p'.y ∧ GtPt.IsAdd p.g p'.g p''.g
+def IsAdd (p p' p'' : QkPtW D W ψW k T) : Prop := p''.y = p.y + p'.y ∧ GtPt.IsAdd p.g p'.g p''.g
 
-def IsPull {T' : Over W.toScheme} (h : T' ⟶ T) (p : QkPtW D W ψW k T) (p' : QkPtW D W ψW k T') :
-    Prop :=
+def IsPull {T' : Over W.toScheme} (h : T' ⟶ T) (p : QkPtW D W ψW k T) (p' : QkPtW D W ψW k T')
+    : Prop :=
   p'.y = p.y ∧ GtPt.IsPull h.left p.g p'.g
 
-def IsPullF (F : Type) [Field F] [Algebra (FractionRing R) F]
-    (x : Spec (CommRingCat.of F) ⟶ T.left) (p : QkPtW D W ψW k T) (p' : QkPt D F k) : Prop :=
+def IsPullF
+    (F : Type) [Field F] [Algebra (FractionRing R) F]
+    (x : Spec (CommRingCat.of F) ⟶ T.left) (p : QkPtW D W ψW k T) (p' : QkPt D F k)
+    : Prop :=
   p'.y = p.y ∧ GtPt.IsPullF F x p.g p'.g
 
 end QkPtW

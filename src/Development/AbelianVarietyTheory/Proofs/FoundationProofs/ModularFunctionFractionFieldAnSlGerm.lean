@@ -34,17 +34,22 @@ def germCompMob (g : GQ) : Mero →+* Mero where
     induction G using Filter.Germ.inductionOn
     rfl
 
-theorem germCompMob_coe (g : GQ) (φ : ℂ → ℂ) :
-    germCompMob g (φ : Mero) = ((fun z => φ (mob g z)) : Mero) := rfl
+theorem germCompMob_coe (g : GQ) (φ : ℂ → ℂ)
+    : germCompMob g (φ : Mero) = ((fun z => φ (mob g z)) : Mero) :=
+  rfl
 
-theorem an_sl_germ : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε) (g : GQ) (f : T.K) (φ : ℂ → ℂ), T.an f = (φ : Mero) → T.an (T.sl g f) = ((fun z => φ (mob g z)) : Mero) := by
+theorem an_sl_germ
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (T : Frac Ω ε) (g : GQ)
+        (f : T.K) (φ : ℂ → ℂ),
+      T.an f = (φ : Mero) → T.an (T.sl g f) = ((fun z => φ (mob g z)) : Mero) := by
   intro Ω _ _ _ ε T g f φ hf
   have key : T.an.comp ((T.sl g : T.K ≃ₐ[Ω] T.K) : T.K →+* T.K) = (germCompMob g).comp T.an := by
     apply (GlobalTheory.T.fractionField_ext_closure_injective Ω ε T).1 Mero
     intro a
     obtain ⟨a', ha', hs⟩ := (GlobalTheory.T.fractionField_ext_closure_injective Ω ε T).2.1 g a
     simp only [RingHom.comp_apply]
-    rw [show ((T.sl g : T.K ≃ₐ[Ω] T.K) : T.K →+* T.K) (T.io a) = T.sl g (T.io a) from rfl, hs, T.an_io, T.an_io]
+    rw [show ((T.sl g : T.K ≃ₐ[Ω] T.K) : T.K →+* T.K) (T.io a) = T.sl g (T.io a) from rfl, hs,
+      T.an_io, T.an_io]
     unfold germ
     rw [germCompMob_coe]
     apply (GlobalTheory.T.upperHalfPlane_germ_ringHom_and_restrict).2.2.1

@@ -32,9 +32,11 @@ theorem det_ne_of_inG {g : M2 n} (h : InG g) : g.det ≠ 0 := by
   rw [Matrix.det_mul, Matrix.det_mul, h0, mul_zero] at this
   exact det_JJ_ne this.symm
 
-def mkG (g : M2 n) (h : InG g) : GR n := ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero g (det_ne_of_inG h), h⟩
+def mkG (g : M2 n) (h : InG g) : GR n :=
+  ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero g (det_ne_of_inG h), h⟩
 
-@[simp] theorem mR_mkG (g : M2 n) (h : InG g) : mR (mkG g h) = g := rfl
+@[simp]
+theorem mR_mkG (g : M2 n) (h : InG g) : mR (mkG g h) = g := rfl
 
 theorem inG_nU (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) : InG (nU b) := by
   simp [InG, nU, JJ, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply, hb]
@@ -51,14 +53,18 @@ theorem inG_mM (a : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) : InG (mM a)
 
 def kth (θ : Fin n → ℝ) : M2 n :=
   fromBlocks (diagonal fun j => (Real.cos (θ j) : ℂ)) (diagonal fun j => (Real.sin (θ j) : ℂ))
-    (-diagonal fun j => (Real.sin (θ j) : ℂ)) (diagonal fun j => (Real.cos (θ j) : ℂ))
+    (- diagonal fun j => (Real.sin (θ j) : ℂ)) (diagonal fun j => (Real.cos (θ j) : ℂ))
 
 theorem inK_kth (θ : Fin n → ℝ) : InK (kth θ) := by
-  have hcs : ∀ j : Fin n, (Real.cos (θ j) : ℂ) * Real.cos (θ j) + (Real.sin (θ j) : ℂ) * Real.sin (θ j) = 1 := by
+  have hcs
+      : ∀ j : Fin n,
+        (Real.cos (θ j) : ℂ) * Real.cos (θ j) + (Real.sin (θ j) : ℂ) * Real.sin (θ j) = 1 := by
     intro j
     rw [← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_add]
     rw [← sq, ← sq, Real.cos_sq_add_sin_sq, Complex.ofReal_one]
-  have hsc : ∀ j : Fin n, (Real.sin (θ j) : ℂ) * Real.sin (θ j) + (Real.cos (θ j) : ℂ) * Real.cos (θ j) = 1 := by
+  have hsc
+      : ∀ j : Fin n,
+        (Real.sin (θ j) : ℂ) * Real.sin (θ j) + (Real.cos (θ j) : ℂ) * Real.cos (θ j) = 1 := by
     intro j
     rw [add_comm]
     exact hcs j
@@ -81,14 +87,18 @@ theorem inK_kth (θ : Fin n → ℝ) : InK (kth θ) := by
   · simp [kth, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply,
       Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal, -Complex.ofReal_cos,
       -Complex.ofReal_sin, Complex.conj_ofReal, hcs, hsc]
-    have h0 : (Matrix.diagonal fun i : Fin n => (Real.cos (θ i) : ℂ) * Real.sin (θ i) +
-        -((Real.sin (θ i) : ℂ) * Real.cos (θ i))) = 0 := by
+    have h0
+        : (Matrix.diagonal fun i : Fin n =>
+            (Real.cos (θ i) : ℂ) * Real.sin (θ i) + -((Real.sin (θ i) : ℂ) * Real.cos (θ i)))
+          = 0 := by
       rw [← Matrix.diagonal_zero]
       congr 1
       funext i
       ring
-    have h1 : (Matrix.diagonal fun i : Fin n => (Real.sin (θ i) : ℂ) * Real.cos (θ i) +
-        -((Real.cos (θ i) : ℂ) * Real.sin (θ i))) = 0 := by
+    have h1
+        : (Matrix.diagonal fun i : Fin n =>
+            (Real.sin (θ i) : ℂ) * Real.cos (θ i) + -((Real.cos (θ i) : ℂ) * Real.sin (θ i)))
+          = 0 := by
       rw [← Matrix.diagonal_zero]
       congr 1
       funext i

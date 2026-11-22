@@ -217,28 +217,40 @@ lemma covA_span (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Prime] (h
   have hm2 : (A : K) - B = 2 * m := by exact_mod_cast hm
   linear_combination (1 / 2 : K) * ha2 + (x / 2) * hb2 + (1 / 2 : K) * hm2
 
-theorem discr_K (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Prime] (hd4 : d % 4 = 3)
-    (x : K) (hx : x ^ 2 = -(d : K)) (hK : Module.finrank ℚ K = 2) :
-    NumberField.discr K = -(d : ℤ) := covA_discr K d hd4 x hx hK
+theorem discr_K
+    (K : Type) [Field K] [NumberField K]
+    (d : ℕ) [Fact d.Prime]
+    (hd4 : d % 4 = 3)
+    (x : K) (hx : x ^ 2 = -(d : K))
+    (hK : Module.finrank ℚ K = 2)
+    : NumberField.discr K = -(d : ℤ) :=
+  covA_discr K d hd4 x hx hK
 
-theorem latI_top_basis (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Prime] (hd4 : d % 4 = 3)
-    (x : K) (hx : x ^ 2 = -(d : K)) (hK : Module.finrank ℚ K = 2)
-    (φ : K →+* ℂ) :
-    ∃ a b : ℂ, 0 < ((starRingEnd ℂ) a * b).im ∧ latI φ ⊤ 1 = AddSubgroup.closure {a, b} ∧
-      ((starRingEnd ℂ) a * b).im = Real.sqrt d / 2 := by
+theorem latI_top_basis
+    (K : Type) [Field K] [NumberField K]
+    (d : ℕ) [Fact d.Prime]
+    (hd4 : d % 4 = 3)
+    (x : K) (hx : x ^ 2 = -(d : K))
+    (hK : Module.finrank ℚ K = 2) (φ : K →+* ℂ)
+    : ∃ a b : ℂ,
+      0 < ((starRingEnd ℂ) a * b).im ∧ latI φ ⊤ 1 = AddSubgroup.closure {a, b}
+        ∧ ((starRingEnd ℂ) a * b).im = Real.sqrt d / 2 := by
   obtain ⟨ω, hω, hspan⟩ := covA_span K d hd4 x hx hK
   have hd0 : 0 < d := (Fact.out : d.Prime).pos
   have hφx : (φ x) ^ 2 = -(d : ℂ) := by rw [← map_pow, hx]; simp
   have ht := covA_sq_im (φ x) d hd0 hφx
-  have key : ∀ ω' : 𝓞 K, (∀ y : 𝓞 K, ∃ m n : ℤ, y = (m : 𝓞 K) + (n : 𝓞 K) * ω') →
-      latI φ ⊤ 1 = AddSubgroup.closure {1, φ (ω' : K)} := by
+  have key
+      : ∀ ω' : 𝓞 K,
+        (∀ y : 𝓞 K, ∃ m n : ℤ, y = (m : 𝓞 K) + (n : 𝓞 K) * ω')
+          → latI φ ⊤ 1 = AddSubgroup.closure {1, φ (ω' : K)} := by
     intro ω' hsp
     apply le_antisymm
     · rw [latI, AddSubgroup.closure_le]
       rintro w ⟨c, -, rfl⟩
       obtain ⟨m, n, rfl⟩ := hsp c
-      have e : (1 : ℂ) * φ (((m : 𝓞 K) + (n : 𝓞 K) * ω' : 𝓞 K) : K) =
-          m • (1 : ℂ) + n • φ (ω' : K) := by
+      have e
+          : (1 : ℂ) * φ (((m : 𝓞 K) + (n : 𝓞 K) * ω' : 𝓞 K) : K)
+            = m • (1 : ℂ) + n • φ (ω' : K) := by
         push_cast
         simp [zsmul_eq_mul]
       rw [e]
@@ -253,8 +265,7 @@ theorem latI_top_basis (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Pr
   · refine ⟨1, φ (ω : K), ?_, key ω hspan, ?_⟩
     · simp [hωc]
       linarith
-    · have hs : Real.sqrt d = (φ x).im := by
-        rw [← ht, Real.sqrt_sq hpos.le]
+    · have hs : Real.sqrt d = (φ x).im := by rw [← ht, Real.sqrt_sq hpos.le]
       simp [hωc, hs]
   · have hneg' : (φ x).im < 0 := by
       rcases hneg.lt_or_eq with h | h
@@ -268,8 +279,7 @@ theorem latI_top_basis (K : Type) [Field K] [NumberField K] (d : ℕ) [Fact d.Pr
     · intro y
       obtain ⟨m, n, rfl⟩ := hspan y
       exact ⟨m + n, -n, by push_cast; ring⟩
-    · have hs : Real.sqrt d = -(φ x).im := by
-        rw [← ht, ← neg_sq, Real.sqrt_sq (by linarith)]
+    · have hs : Real.sqrt d = -(φ x).im := by rw [← ht, ← neg_sq, Real.sqrt_sq (by linarith)]
       have h1ω : φ ((1 - ω : 𝓞 K) : K) = (1 - φ x) / 2 := by
         push_cast
         rw [map_sub, map_one, hωc]

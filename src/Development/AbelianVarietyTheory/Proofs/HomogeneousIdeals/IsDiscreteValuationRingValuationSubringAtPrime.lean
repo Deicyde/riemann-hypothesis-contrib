@@ -12,32 +12,39 @@ open scoped nonZeroDivisors
 
 section Valuation
 
-variable (V : Type*) [CommRing V] [IsDomain V] [ValuationRing V] {K : Type*} [Field K] [CharZero K]
-  [Algebra V K] [IsFractionRing V K] {L : Type*} [Field L] [Algebra K L] [IsAlgClosed L]
+variable
+  (V : Type*) [CommRing V] [IsDomain V] [ValuationRing V]
+  {K : Type*} [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K]
+  {L : Type*} [Field L] [Algebra K L] [IsAlgClosed L]
   {W : WeierstrassCurve K} [W.IsElliptic]
 
 end Valuation
 
 section Good
 
-variable (R : Type*) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] {K : Type*} [Field K]
-  [Algebra R K] [IsFractionRing R K]
+variable
+  (R : Type*) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+  {K : Type*} [Field K] [Algebra R K] [IsFractionRing R K]
 
 end Good
 
-instance isDiscreteValuationRing_valuationSubringAtPrime {R : Type*} [CommRing R]
-    [IsDedekindDomain R] (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
-    (p : HeightOneSpectrum R) : IsDiscreteValuationRing (p.valuationSubringAtPrime K) :=
+instance isDiscreteValuationRing_valuationSubringAtPrime
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
+    (p : HeightOneSpectrum R)
+    : IsDiscreteValuationRing (p.valuationSubringAtPrime K) :=
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain R p.ne_bot _
 
 section Global
 
-variable {M : Type*} [Field M] [CharZero M] {L : Type*} [Field L] [Algebra M L] [IsAlgClosed L]
+variable
+  {M : Type*} [Field M] [CharZero M]
+  {L : Type*} [Field L] [Algebra M L] [IsAlgClosed L]
   {W : WeierstrassCurve M} [W.IsElliptic]
 
-theorem exists_model_ringOfIntegers (hj : IsIntegral ℤ W.j) (h : HasRationalTorsion W L 12)
-    (M' : Type*) [Field M'] [Algebra M M'] :
-    ∃ (C : VariableChange M') (W₀ : WeierstrassCurve (𝓞 M')),
+theorem exists_model_ringOfIntegers
+    (hj : IsIntegral ℤ W.j) (h : HasRationalTorsion W L 12) (M' : Type*) [Field M'] [Algebra M M']
+    : ∃ (C : VariableChange M') (W₀ : WeierstrassCurve (𝓞 M')),
       C • W.baseChange M' = W₀.baseChange M' ∧ W₀.Δ = 1 := by
   have : IsIntegrallyClosedIn (𝓞 M) M := inferInstance
   obtain ⟨C, W₀, e, h₀⟩ := exists_integral_model (𝓞 M) ⟨⟨W.j, hj⟩, rfl⟩ h
@@ -49,9 +56,10 @@ end Global
 
 section Finite
 
-theorem finite_nsmul_eq_zero_mul {G : Type*} [AddCommGroup G] {m n : ℕ}
-    (hm : {x : G | m • x = 0}.Finite) (hn : {x : G | n • x = 0}.Finite) :
-    {x : G | (m * n) • x = 0}.Finite := by
+theorem finite_nsmul_eq_zero_mul
+    {G : Type*} [AddCommGroup G]
+    {m n : ℕ} (hm : {x : G | m • x = 0}.Finite) (hn : {x : G | n • x = 0}.Finite)
+    : {x : G | (m * n) • x = 0}.Finite := by
   refine Set.Finite.of_finite_fibers (fun x => m • x) (hn.subset ?_) ?_
   · rintro _ ⟨x, hx, rfl⟩
     simpa [mul_nsmul] using hx
@@ -62,8 +70,10 @@ theorem finite_nsmul_eq_zero_mul {G : Type*} [AddCommGroup G] {m n : ℕ}
 
 variable {F : Type*} [Field F] {W : WeierstrassCurve F}
 
-theorem finite_points_of_root {p : F[X]} (hp : p ≠ 0) {s : Set W.toAffine.Point}
-    (hs : ∀ x y h, Point.some x y h ∈ s → p.eval x = 0) : s.Finite := by
+theorem finite_points_of_root
+    {p : F[X]} (hp : p ≠ 0)
+    {s : Set W.toAffine.Point} (hs : ∀ x y h, Point.some x y h ∈ s → p.eval x = 0)
+    : s.Finite := by
   refine Set.Finite.of_finite_fibers Point.xRep
     ((((p.rootSet_finite F).image fun x => ![x, 1]).insert ![1, 0]).subset ?_) ?_
   · rintro _ ⟨_ | ⟨x, y, h⟩, hP, rfl⟩
@@ -95,10 +105,12 @@ theorem finite_twelve_torsion : {P : W.toAffine.Point | 12 • P = 0}.Finite :=
 
 end Finite
 
-theorem exists_finite_hasRationalTorsion_twelve {K : Type*} [Field K] [CharZero K]
-    (W : WeierstrassCurve K) (L : Type*) [Field L] [Algebra K L] [Algebra.IsAlgebraic K L] :
-    ∃ M : IntermediateField K L, FiniteDimensional K M ∧
-      HasRationalTorsion (W.baseChange M) L 12 := by
+theorem exists_finite_hasRationalTorsion_twelve
+    {K : Type*} [Field K] [CharZero K]
+    (W : WeierstrassCurve K)
+    (L : Type*) [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    : ∃ M : IntermediateField K L,
+      FiniteDimensional K M ∧ HasRationalTorsion (W.baseChange M) L 12 := by
   classical
   have : CharZero L := charZero_of_injective_algebraMap (algebraMap K L).injective
   let c : (W.baseChange L).toAffine.Point → Set L
@@ -108,22 +120,40 @@ theorem exists_finite_hasRationalTorsion_twelve {K : Type*} [Field K] [CharZero 
     refine finite_twelve_torsion.biUnion ?_
     rintro (_ | _) - <;> simp [c]
   have := hfin.to_subtype
-  refine ⟨IntermediateField.adjoin K _, IntermediateField.finiteDimensional_adjoin
-    (S := ⋃ P ∈ {P : (W.baseChange L).toAffine.Point | 12 • P = 0}, c P)
-    fun x _ => Algebra.IsIntegral.isIntegral x, ?_⟩
+  refine ⟨
+    IntermediateField.adjoin K _,
+    IntermediateField.finiteDimensional_adjoin
+      (S := ⋃ P ∈ {P : (W.baseChange L).toAffine.Point | 12 • P = 0}, c P)
+      fun x _ => Algebra.IsIntegral.isIntegral x,
+    ?_
+  ⟩
   rw [hasRationalTorsion_iff]
   intro x y h h0
-  exact ⟨⟨⟨x, IntermediateField.subset_adjoin _ _ (Set.mem_biUnion (x := .some x y h) h0
-      (by simp [c]))⟩, rfl⟩,
-    ⟨⟨y, IntermediateField.subset_adjoin _ _ (Set.mem_biUnion (x := .some x y h) h0
-      (by simp [c]))⟩, rfl⟩⟩
+  exact ⟨
+    ⟨
+      ⟨
+        x,
+        IntermediateField.subset_adjoin _ _ (Set.mem_biUnion (x := .some x y h) h0 (by simp [c]))
+      ⟩,
+      rfl
+    ⟩,
+    ⟨
+      ⟨
+        y,
+        IntermediateField.subset_adjoin _ _ (Set.mem_biUnion (x := .some x y h) h0 (by simp [c]))
+      ⟩,
+      rfl
+    ⟩
+  ⟩
 
-theorem exists_finite_model_ringOfIntegers {K : Type*} [Field K] [NumberField K]
-    (W : WeierstrassCurve K) [W.IsElliptic] (hj : IsIntegral ℤ W.j) :
-    ∃ M : IntermediateField K (AlgebraicClosure K), NumberField M ∧
-      HasRationalTorsion (W.baseChange M) (AlgebraicClosure K) 12 ∧
-      ∃ (C : VariableChange M) (W₀ : WeierstrassCurve (𝓞 M)),
-        C • W.baseChange M = W₀.baseChange M ∧ W₀.Δ = 1 := by
+theorem exists_finite_model_ringOfIntegers
+    {K : Type*} [Field K] [NumberField K]
+    (W : WeierstrassCurve K) [W.IsElliptic]
+    (hj : IsIntegral ℤ W.j)
+    : ∃ M : IntermediateField K (AlgebraicClosure K),
+      NumberField M ∧ HasRationalTorsion (W.baseChange M) (AlgebraicClosure K) 12
+        ∧ ∃ (C : VariableChange M) (W₀ : WeierstrassCurve (𝓞 M)),
+          C • W.baseChange M = W₀.baseChange M ∧ W₀.Δ = 1 := by
   obtain ⟨M, hM, h⟩ := exists_finite_hasRationalTorsion_twelve W (AlgebraicClosure K)
   have : NumberField M := NumberField.of_module_finite K M
   have : (W.baseChange M).IsElliptic := inferInstanceAs (W.map (algebraMap K M)).IsElliptic

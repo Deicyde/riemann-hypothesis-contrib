@@ -7,13 +7,14 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.V.Z.Bc
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.RankTwoDescent
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.meanLaws :
-    MeanLaws := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.meanLaws : MeanLaws := by
   intro E _ _ N Ψ hΨ
   have hgl : Continuous (gl : G1 E → GL (Fin 2) (A E)) := by fun_prop
   haveI : IsFiniteMeasure (N.μ.restrict N.D) := ⟨by simpa using volE E N⟩

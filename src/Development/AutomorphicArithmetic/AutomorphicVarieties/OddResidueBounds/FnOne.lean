@@ -5,18 +5,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-theorem UpperTheory.V.Odd.fnOne :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime], Module.finrank E (Fn E Ω l 1) ∣ l - 1 ∧ (∃ ζ : Fn E Ω l 1, IsPrimitiveRoot ζ l) ∧ ∀ N : ℕ, 0 < N → Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ) → Nonempty (Fn E Ω l 1 →ₐ[ℚ] CyclotomicField (l * N) ℚ) := by
+theorem UpperTheory.V.Odd.fnOne
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ)
+        [Fact l.Prime],
+      Module.finrank E (Fn E Ω l 1) ∣ l - 1 ∧ (∃ ζ : Fn E Ω l 1, IsPrimitiveRoot ζ l)
+        ∧ ∀ N : ℕ,
+          0 < N → Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ)
+            → Nonempty (Fn E Ω l 1 →ₐ[ℚ] CyclotomicField (l * N) ℚ) := by
   intro E Ω _ _ _ _ _ l hl
   have hl0 : NeZero l := ⟨hl.out.ne_zero⟩
   have hc0 := (UpperTheory.V.Kum.fnCyc E Ω l 1).1
   rw [pow_one] at hc0
   have hc : IsCyclotomicExtension {l} E (Fn E Ω l 1) := hc0
   refine ⟨?_, ⟨_, IsCyclotomicExtension.zeta_spec l E (Fn E Ω l 1)⟩, ?_⟩
-  · have hfd : FiniteDimensional E (Fn E Ω l 1) :=
-      IsCyclotomicExtension.finiteDimensional {l} E _
+  · have hfd : FiniteDimensional E (Fn E Ω l 1) := IsCyclotomicExtension.finiteDimensional {l} E _
     have hg : IsGalois E (Fn E Ω l 1) := IsCyclotomicExtension.isGalois {l} E _
     rw [← IsGalois.card_aut_eq_finrank, ← Nat.totient_prime hl.out, ← ZMod.card_units_eq_totient,
       ← Nat.card_eq_fintype_card]
@@ -44,8 +50,9 @@ theorem UpperTheory.V.Odd.fnOne :
       rw [Polynomial.map_sub, Polynomial.map_one, Polynomial.map_pow, Polynomial.map_X]
       have h := Polynomial.X_pow_sub_one_splits hζN
       rwa [Polynomial.C_1] at h
-    let ψ := Polynomial.IsSplittingField.lift (CyclotomicField N ℚ)
-      (Polynomial.X ^ N - 1 : Polynomial ℚ) hsplitN
+    let ψ :=
+      Polynomial.IsSplittingField.lift (CyclotomicField N ℚ) (Polynomial.X ^ N - 1 : Polynomial ℚ)
+        hsplitN
     letI : Algebra E (CyclotomicField (l * N) ℚ) := ((ψ.comp φ) : E →+* _).toAlgebra
     have hsplitl : (Polynomial.map (algebraMap E (CyclotomicField (l * N) ℚ))
         (Polynomial.X ^ l - 1)).Splits := by
@@ -53,4 +60,6 @@ theorem UpperTheory.V.Odd.fnOne :
       have h := Polynomial.X_pow_sub_one_splits hζl
       rwa [Polynomial.C_1] at h
     exact ⟨((Polynomial.IsSplittingField.lift (Fn E Ω l 1) (Polynomial.X ^ l - 1 : Polynomial E)
-      hsplitl : Fn E Ω l 1 →ₐ[E] _) : Fn E Ω l 1 →+* _).toRatAlgHom⟩
+          hsplitl
+        : Fn E Ω l 1 →ₐ[E] _)
+      : Fn E Ω l 1 →+* _).toRatAlgHom⟩

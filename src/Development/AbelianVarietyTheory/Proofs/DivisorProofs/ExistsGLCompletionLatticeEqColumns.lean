@@ -25,12 +25,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulMat
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 namespace GlobalTheory.TwLat
 
-theorem exists_GLw_lat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (w : Pl E), ¬ IsSplitAt w → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) → (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x)) → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ) (b : Module.Basis (Fin m) K.E B.A), ∀ L : Submodule K.O B.A, GlobalTheory.UnitLemma.IsLat K.O K.E L → ∃ g : GLw m w, GlobalTheory.TwLat.lat e b g = L := by
+theorem exists_GLw_lat_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                → (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x))
+                → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ)
+                    (b : Module.Basis (Fin m) K.E B.A),
+                  ∀ L : Submodule K.O B.A,
+                    GlobalTheory.UnitLemma.IsLat K.O K.E L
+                      → ∃ g : GLw m w, GlobalTheory.TwLat.lat e b g = L := by
   intro E _ _ _ _ w _ K e _ _ _ B m b L hL
   obtain ⟨hfg, hsp⟩ := hL
   haveI : Module.Finite K.O L := Module.Finite.iff_fg.mpr hfg
@@ -46,8 +60,7 @@ theorem exists_GLw_lat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   let bL := Module.finBasis K.O L
   let v : Fin n → B.A := fun i => (bL i : B.A)
   have hspanO : Submodule.span K.O (Set.range v) = L := by
-    have : Set.range v = L.subtype '' Set.range bL := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range v = L.subtype '' Set.range bL := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, bL.span_eq, Submodule.map_subtype_top]
   have hli : LinearIndependent K.E v := by
     rw [← LinearIndependent.iff_fractionRing K.O K.E]
@@ -62,8 +75,7 @@ theorem exists_GLw_lat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     omega
   let v' : Fin m → B.A := v ∘ finCongr hnm.symm
   let bE' := bE.reindex (finCongr hnm)
-  have hv' : ∀ j, bE' j = v' j := by
-    intro j; simp [bE', v', bE, Module.Basis.mk_apply]
+  have hv' : ∀ j, bE' j = v' j := by intro j; simp [bE', v', bE, Module.Basis.mk_apply]
   let M : Matrix (Fin m) (Fin m) K.E := b.toMatrix bE'
   have hM : IsUnit M := by
     haveI := b.invertibleToMatrix bE'
@@ -72,9 +84,12 @@ theorem exists_GLw_lat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   refine ⟨hMe.unit, ?_⟩
   unfold lat
   rw [← hspanO]
-  have hcol : (fun j => ∑ i, e.symm ((hMe.unit : Matrix (Fin m) (Fin m) (w.adicCompletion E)) i j) • b i) = v' := by
+  have hcol
+      : (fun j => ∑ i, e.symm ((hMe.unit : Matrix (Fin m) (Fin m) (w.adicCompletion E)) i j) • b i)
+        = v' := by
     funext j
-    simp only [IsUnit.unit_spec, Matrix.map_apply, RingEquiv.symm_apply_apply, M, Module.Basis.toMatrix_apply]
+    simp only [IsUnit.unit_spec, Matrix.map_apply, RingEquiv.symm_apply_apply, M,
+      Module.Basis.toMatrix_apply]
     rw [b.sum_repr, hv']
   rw [hcol]
   congr 1

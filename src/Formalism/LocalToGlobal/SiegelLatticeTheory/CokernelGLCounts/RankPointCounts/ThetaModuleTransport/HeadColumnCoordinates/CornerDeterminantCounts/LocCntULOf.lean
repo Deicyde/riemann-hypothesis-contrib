@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUL
 
@@ -17,16 +18,18 @@ variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 theorem R_eq_O' (hs : M.split = none) : M.R = M.L.O := by
   simp only [Formalism.MainNotions.S.Loc.Model.R, hs]
 
-theorem dl_full' (H : HermSp M V) {r : ℕ} (f f' : Fin (r + 1) → V) :
-    H.Dl f f' (r + 1) = (H.Zhat f f').det := by
+theorem dl_full' (H : HermSp M V) {r : ℕ} (f f' : Fin (r + 1) → V)
+    : H.Dl f f' (r + 1) = (H.Zhat f f').det := by
   rw [Formalism.MainNotions.S.Loc.HermSp.Dl, dite_eq_left le_rfl]
   simp [Fin.castLE_rfl]
 
 theorem locCntUL_of
     (h1 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r n, ThetaMbeU M r n false))
     (h2 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r, MbeU M r))
-    (h3 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r, CornerU M r)) : Formalism.L2.SG.LocalCountModules.LocCntUL.LocCntUL := by
-  intro F _ _ _ E _ _ _ _ M hOK r n hmode V _ _ H hn t₁ f₂ f₂' φ φ' hyp hD Y₁ Y₂ be₁ be₂ al₁ al₂ eY eb
+    (h3 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r, CornerU M r))
+    : Formalism.L2.SG.LocalCountModules.LocCntUL.LocCntUL := by
+  intro F _ _ _ E _ _ _ _ M hOK r n hmode V _ _ H hn t₁ f₂ f₂' φ φ' hyp hD Y₁ Y₂ be₁ be₂ al₁ al₂ eY
+    eb
   have hs : M.split = none := by
     cases h : M.split with
     | none => rfl
@@ -49,28 +52,45 @@ theorem locCntUL_of
     intro a b
     rw [hR]
     exact (hg.1.1.2.2 (t₁.f' b)).1 (hg.1.2.2.1.1.1 b) (t₁.f a) (hg.1.2.1.1.1 a)
-  let Z₁ : M.Mat (r + 1) := ⟨Matrix.of fun a b => ⟨H.Zhat t₁.f t₁.f' a b, hint₁ a b⟩, by
-    have : (Matrix.of fun a b => (⟨H.Zhat t₁.f t₁.f' a b, hint₁ a b⟩ : M.R)).map M.R.subtype =
-      H.Zhat t₁.f t₁.f' := rfl
-    rw [this, ← dl_full']; exact hU1⟩
-  have hdet : headDet M Z₁.Z * (H.Zhat f₂ f₂').det =
-      ((H.Zhat f₂ f₂').submatrix Fin.castSucc Fin.castSucc).det * (Z₁.Z.map M.R.subtype).det := by
+  let Z₁ : M.Mat (r + 1) := ⟨
+    Matrix.of fun a b => ⟨H.Zhat t₁.f t₁.f' a b, hint₁ a b⟩,
+    by
+      have : (Matrix.of fun a b => (⟨H.Zhat t₁.f t₁.f' a b, hint₁ a b⟩ : M.R)).map M.R.subtype
+          = H.Zhat t₁.f t₁.f' :=
+        rfl
+      rw [this, ← dl_full']
+      exact hU1
+  ⟩
+  have hdet
+      : headDet M Z₁.Z * (H.Zhat f₂ f₂').det
+        = ((H.Zhat f₂ f₂').submatrix Fin.castSucc Fin.castSucc).det
+          * (Z₁.Z.map M.R.subtype).det := by
     show ((H.Zhat t₁.f t₁.f').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat f₂ f₂').det =
       ((H.Zhat f₂ f₂').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat t₁.f t₁.f').det
     rw [← dl_eq_det, ← dl_eq_det, ← dl_full', ← dl_full']
     exact hrel
   by_cases hint : ∀ a b, H.Zhat f₂ f₂' a b ∈ M.R
-  · let Z₂ : M.Mat (r + 1) := ⟨Matrix.of fun a b => ⟨H.Zhat f₂ f₂' a b, hint a b⟩, by
-      have : (Matrix.of fun a b => (⟨H.Zhat f₂ f₂' a b, hint a b⟩ : M.R)).map M.R.subtype =
-        H.Zhat f₂ f₂' := rfl
-      rw [this, ← dl_full']; exact hU2⟩
+  · let Z₂ : M.Mat (r + 1) := ⟨
+      Matrix.of fun a b => ⟨H.Zhat f₂ f₂' a b, hint a b⟩,
+      by
+        have : (Matrix.of fun a b => (⟨H.Zhat f₂ f₂' a b, hint a b⟩ : M.R)).map M.R.subtype
+            = H.Zhat f₂ f₂' :=
+          rfl
+        rw [this, ← dl_full']
+        exact hU2
+    ⟩
     have e₁ : Z₁.Z.map M.R.subtype = H.ZZplus t₁ := by rw [z₁]; rfl
     have e₂ : Z₂.Z.map M.R.subtype = HermSp.ZZplusOf M (H.Zhat f₂ f₂') t₁.T t₁.T' := by rw [z₂]; rfl
     rw [h1 F E M hOK r n hmode V H hn t₁ f₂ f₂' φ φ' hyp hD Z₁ Z₂ e₁ e₂]
     exact h2 F E M hOK r Z₁ Z₂ Y₁ Y₂ be₁ be₂ al₁ al₂
       (fun a b => ⟨Subtype.ext (eY a b).1, Subtype.ext (eY a b).2⟩)
-      (fun a => ⟨Subtype.ext (eb a).1, Subtype.ext (eb a).2.1, Subtype.ext (eb a).2.2.1,
-        Subtype.ext (eb a).2.2.2⟩) hdet
+      (fun a => ⟨
+        Subtype.ext (eb a).1,
+        Subtype.ext (eb a).2.1,
+        Subtype.ext (eb a).2.2.1,
+        Subtype.ext (eb a).2.2.2
+      ⟩)
+      hdet
   · have hTh : Theta H t₁ ⟨⊥, f₂, f₂', t₁.T, t₁.T'⟩ φ φ' = ∅ := by
       ext θ
       simp only [Set.mem_empty_iff_false, iff_false]

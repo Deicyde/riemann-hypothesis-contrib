@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TraceTranspos
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -244,19 +245,40 @@ private lemma hasInfChar_comp_perm {ε : Fin n → Bool} (s : Equiv.Perm (Fin n)
   intro v w hv hw
   exact isZEigen_comp_perm_submatrix s (h v w ((isKFin_comp_perm_submatrix_iff s σ v).1 hv) ((isKFin_comp_perm_submatrix_iff s σ w).1 hw))
 
-theorem permKType : ∀ (n : ℕ) (ε : Fin n → Bool) (s : Equiv.Perm (Fin n)) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), (∀ a b, a < b → ε (s a) = ε (s b) → s a < s b) → (∀ (μ : Fin n → ℝ) (S : Submodule ℂ H), IsKTypeOf ε σ μ S ↔ IsKTypeOf (ε ∘ s) (fun g => σ (g.submatrix s.symm s.symm)) (μ ∘ s) S) ∧ (∀ μ : Fin n → ℝ, vNormSq (ε ∘ s) (μ ∘ s) = vNormSq ε μ) ∧ rhoC (ε ∘ s) = rhoC ε ∘ s ∧ (IsSqIntIrr ε σ ↔ IsSqIntIrr (ε ∘ s) (fun g => σ (g.submatrix s.symm s.symm))) ∧ ∀ χ : Fin n → ℂ, (HasInfChar (ε ∘ s) χ (fun g => σ (g.submatrix s.symm s.symm)) ↔ HasInfChar ε χ σ) := by
+theorem permKType
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (s : Equiv.Perm (Fin n)) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+      (∀ a b, a < b → ε (s a) = ε (s b) → s a < s b)
+        → (∀ (μ : Fin n → ℝ) (S : Submodule ℂ H),
+            IsKTypeOf ε σ μ S
+              ↔ IsKTypeOf (ε ∘ s) (fun g => σ (g.submatrix s.symm s.symm)) (μ ∘ s) S)
+          ∧ (∀ μ : Fin n → ℝ, vNormSq (ε ∘ s) (μ ∘ s) = vNormSq ε μ) ∧ rhoC (ε ∘ s) = rhoC ε ∘ s
+          ∧ (IsSqIntIrr ε σ ↔ IsSqIntIrr (ε ∘ s) (fun g => σ (g.submatrix s.symm s.symm)))
+          ∧ ∀ χ : Fin n → ℂ,
+            (HasInfChar (ε ∘ s) χ (fun g => σ (g.submatrix s.symm s.symm)) ↔ HasInfChar ε χ σ) := by
   intro n ε s H _ _ σ hs
   have hs' := PermK.mono_symm hs
-  refine ⟨fun μ S => ⟨PermK.ktype_perm hs, fun h => ?_⟩, fun μ => PermK.vNormSq_perm hs μ, PermK.rhoC_perm hs,
-    ⟨PermK.sqIntIrr_perm s, fun h => ?_⟩, fun χ => ⟨fun h => ?_, hasInfChar_comp_perm s⟩⟩
+  refine ⟨
+    fun μ S => ⟨PermK.ktype_perm hs, fun h => ?_⟩,
+    fun μ => PermK.vNormSq_perm hs μ,
+    PermK.rhoC_perm hs,
+    ⟨PermK.sqIntIrr_perm s, fun h => ?_⟩,
+    fun χ => ⟨fun h => ?_, hasInfChar_comp_perm s⟩
+  ⟩
   · have h2 := PermK.ktype_perm hs' h
     rw [PermK.comp_symm, PermK.comp_symm] at h2
-    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm, Matrix.submatrix_id_id] using h2
+    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm,
+        Matrix.submatrix_id_id]
+      using h2
   · have h2 := PermK.sqIntIrr_perm s.symm h
     rw [PermK.comp_symm] at h2
-    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm, Matrix.submatrix_id_id] using h2
+    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm,
+        Matrix.submatrix_id_id]
+      using h2
   · have h2 := hasInfChar_comp_perm s.symm h
     rw [PermK.comp_symm] at h2
-    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm, Matrix.submatrix_id_id] using h2
+    simpa only [Equiv.symm_symm, Matrix.submatrix_submatrix, Equiv.self_comp_symm,
+        Matrix.submatrix_id_id]
+      using h2
 
 end GlobalTheory.DSId.PermK

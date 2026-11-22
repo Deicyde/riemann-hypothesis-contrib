@@ -6,13 +6,16 @@ public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 
 @[expose] public section
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped LaurentSeries PowerSeries
 namespace GlobalTheory.TopSteps
 
-theorem mem_cob_of_repr_mem_herrB : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l]
-    [NeZero n] {R : RingPG k l} (F : DFun R n G) (A : Ob k G) (z : G → Fin A.m → k)
-    (b g : ZMod n → Vc k A.m), Repr F A z b g → (b, g) ∈ herrB (F.D A) → z ∈ cob A := by
+theorem mem_cob_of_repr_mem_herrB
+    : ∀ {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n]
+        {R : RingPG k l} (F : DFun R n G) (A : Ob k G) (z : G → Fin A.m → k)
+        (b g : ZMod n → Vc k A.m),
+      Repr F A z b g → (b, g) ∈ herrB (F.D A) → z ∈ cob A := by
   intro k G _ _ l n _ _ _ R F A z b g hR hB
   obtain ⟨E, a, p, e, ε, hE, ha, hp, hinj, hex, hpe, hρe, hε⟩ := hR
   unfold GlobalTheory.Models.herrB at hB
@@ -48,10 +51,12 @@ theorem mem_cob_of_repr_mem_herrB : ∀ {k G : Type} [Field k] [Group G] {l n : 
 
   have hmap0 : ∀ i y, F.map A (GlobalTheory.Models.chr (1 : G →* kˣ)) 0 i y = 0 := by
     intro i y
-    have h := F.map_smul A (GlobalTheory.Models.chr (1 : G →* kˣ)) 0 0 hA h1 (fun _ _ => by simp) i y
+    have h :=
+      F.map_smul A (GlobalTheory.Models.chr (1 : G →* kˣ)) 0 0 hA h1 (fun _ _ => by simp) i y
     simpa using h
   have hpa : p ∘ₗ a = 0 := LinearMap.ext fun y => hex.apply_apply_eq_zero y
-  have hpa_map : ∀ i y, F.map E (GlobalTheory.Models.chr (1 : G →* kˣ)) p i (F.map A E a i y) = 0 := by
+  have hpa_map
+      : ∀ i y, F.map E (GlobalTheory.Models.chr (1 : G →* kˣ)) p i (F.map A E a i y) = 0 := by
     intro i y
     have h := F.map_comp A E (GlobalTheory.Models.chr (1 : G →* kˣ)) a p hA hE h1 ha hp i
     rw [hpa] at h
@@ -62,22 +67,25 @@ theorem mem_cob_of_repr_mem_herrB : ∀ {k G : Type} [Field k] [Group G] {l n : 
   set c : k := p (f one) 0 with hc
   have hqc : ∀ v : Fin 1 → k, p (f v) = c • v := by
     intro v
-    have hv : v = v 0 • one := funext fun j => by
-      obtain rfl : j = 0 := Subsingleton.elim _ _
-      simp [hone]
+    have hv : v = v 0 • one :=
+      funext fun j => by
+        obtain rfl : j = 0 := Subsingleton.elim _ _
+        simp [hone]
     rw [hv, map_smul, map_smul]
     funext j
     obtain rfl : j = 0 := Subsingleton.elim _ _
     simp [hc, hone, mul_comm]
   have hq : p ∘ₗ f = c • LinearMap.id := LinearMap.ext fun v => by simp [hqc]
-  have hidH : GlobalTheory.Models.IsHom (GlobalTheory.Models.chr (1 : G →* kˣ)) (GlobalTheory.Models.chr (1 : G →* kˣ)) LinearMap.id :=
-    fun _ _ => rfl
+  have hidH : GlobalTheory.Models.IsHom (GlobalTheory.Models.chr (1 : G →* kˣ))
+      (GlobalTheory.Models.chr (1 : G →* kˣ)) LinearMap.id := fun _ _ =>
+    rfl
 
   have hcu : c • F.unit 0 = F.unit 0 := by
     have hcomp := F.map_comp _ E _ f p h1 hE h1 hf hp 0
     have hval := LinearMap.congr_fun hcomp (F.unit 0)
     rw [LinearMap.comp_apply, hfη 0, hη, map_sub, (hε 0).1, hpa_map, sub_zero, hq,
-      F.map_smul _ _ _ c h1 h1 hidH, F.map_id _ h1] at hval
+        F.map_smul _ _ _ c h1 h1 hidH, F.map_id _ h1]
+      at hval
     simpa using hval
   have hc1 : c = 1 := by
     by_contra hne
@@ -91,8 +99,7 @@ theorem mem_cob_of_repr_mem_herrB : ∀ {k G : Type} [Field k] [Group G] {l n : 
   have hρ1 : ∀ σ (v : Fin 1 → k), (GlobalTheory.Models.chr (1 : G →* kˣ)).ρ σ v = v := fun σ v => by
     change ((1 : G →* kˣ) σ : k) • LinearMap.id v = v
     simp
-  have hw : ∀ σ, E.ρ σ (f one) = f one := fun σ => by
-    rw [← hf σ one, hρ1]
+  have hw : ∀ σ, E.ρ σ (f one) = f one := fun σ => by rw [← hf σ one, hρ1]
 
   have hker : p (e - f one) = 0 := by rw [map_sub, hpe, hpw, sub_self]
   obtain ⟨y, hy⟩ := (hex (e - f one)).1 hker

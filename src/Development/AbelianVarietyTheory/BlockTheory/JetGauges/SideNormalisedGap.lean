@@ -18,7 +18,9 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.SideNormalisedGap
 
 open MeasureTheory Matrix
 open scoped InnerProductSpace
-open PI.UpqRep (IsDSHpk IsLowUnitH IsHCTypeW IsKFinHpk IsCayleyU IsOrthProjOnto InLieHpk lowKSub smoothVecs dsigW)
+open PI.UpqRep
+  (IsDSHpk IsLowUnitH IsHCTypeW IsKFinHpk IsCayleyU IsOrthProjOnto InLieHpk lowKSub smoothVecs
+    dsigW)
 open Formalism.QuantumDeterminants (Mt UH Hpk Nset UWset inWb Tz IsHCParam GapAtLeast)
 open Formalism.FourierDecayAlt.B (gN)
 
@@ -61,30 +63,32 @@ def muS {k r : ℕ} (μW μN : Measure (Mt k r)) : Measure (Mt k r) := (μW.prod
 
 section Side
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {Vp : Type} [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
 
-def IsSide (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (h : ℝ)
-    (σ : Mat k r → (H →L[ℂ] H)) (w₀ : H) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) (u : Fin k → ℝ)
-    (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN μG ν : Measure (Mt k r)) : Prop :=
-  1 ≤ k ∧
-  (IsHCParam lam ∧ IsDSHpk k r ε lam σ ∧ GapAtLeast ε lam h) ∧
-  IsLowUnitH k r ε lam σ w₀ ∧
-  (inWb k r z ∧ 0 < Tz k r z) ∧
-  c ≠ 0 ∧
-  (IsHCParam u ∧ IsHCTypeW k r z u π) ∧
-  (PI.BesselPeriodGGP.IsHaarOn (UWset k r z) μW ∧ PI.BesselPeriodGGP.IsHaarOn (Nset k r) μN ∧
-    PI.BesselPeriodGGP.IsHaarOn (UH (Hpk k r)) μG) ∧
-  (SigmaFinite ν ∧ PI.BesselPeriodGGP.IsQuotMeas μG (muS μW μN) ν)
+def IsSide
+    (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
+    (h : ℝ) (σ : Mat k r → (H →L[ℂ] H)) (w₀ : H) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ)
+    (u : Fin k → ℝ) (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN μG ν : Measure (Mt k r))
+    : Prop :=
+  1 ≤ k ∧ (IsHCParam lam ∧ IsDSHpk k r ε lam σ ∧ GapAtLeast ε lam h) ∧ IsLowUnitH k r ε lam σ w₀
+    ∧ (inWb k r z ∧ 0 < Tz k r z) ∧ c ≠ 0 ∧ (IsHCParam u ∧ IsHCTypeW k r z u π)
+    ∧ (PI.BesselPeriodGGP.IsHaarOn (UWset k r z) μW ∧ PI.BesselPeriodGGP.IsHaarOn (Nset k r) μN
+      ∧ PI.BesselPeriodGGP.IsHaarOn (UH (Hpk k r)) μG)
+    ∧ (SigmaFinite ν ∧ PI.BesselPeriodGGP.IsQuotMeas μG (muS μW μN) ν)
 
-def IsSideNormalised (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (h : ℝ)
-    (σ : Mat k r → (H →L[ℂ] H)) (w₀ : H) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) (u : Fin k → ℝ)
-    (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN μG ν : Measure (Mt k r)) : Prop :=
+def IsSideNormalised
+    (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
+    (h : ℝ) (σ : Mat k r → (H →L[ℂ] H)) (w₀ : H) (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ)
+    (u : Fin k → ℝ) (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN μG ν : Measure (Mt k r))
+    : Prop :=
   IsSide k r ε lam h σ w₀ z c u π μW μN μG ν ∧ μW Set.univ = 1
 
 def KFinDecay (k r : ℕ) (σ : Mat k r → (H →L[ℂ] H)) (a : ℝ) : Prop :=
-  ∀ v v' : H, IsKFinHpk (k := k) (r := r) σ v → IsKFinHpk (k := k) (r := r) σ v' →
-    ∃ C : ℝ, ∀ x ∈ UH (Hpk k r), ‖⟪v', σ x v⟫_ℂ‖ ≤ C * gN x ^ (-a)
+  ∀ v v' : H,
+    IsKFinHpk (k := k) (r := r) σ v → IsKFinHpk (k := k) (r := r) σ v'
+      → ∃ C : ℝ, ∀ x ∈ UH (Hpk k r), ‖⟪v', σ x v⟫_ℂ‖ ≤ C * gN x ^ (-a)
 
 def wordSeminorm {k r : ℕ} (σ : Mat k r → (H →L[ℂ] H)) (Ws : List (List (Mat k r))) (w : H) : ℝ :=
   (Ws.map fun D => ‖dsigW (k := k) (r := r) σ D w‖).sum
@@ -92,18 +96,20 @@ def wordSeminorm {k r : ℕ} (σ : Mat k r → (H →L[ℂ] H)) (Ws : List (List
 end Side
 
 def DecKFin : Prop :=
-  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (h : ℝ)
-    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mat k r → (H →L[ℂ] H)),
-    1 ≤ k → IsHCParam lam → IsDSHpk k r ε lam σ → GapAtLeast ε lam h → DecGap k r h →
-    KFinDecay k r σ (decExp r h)
+  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (h : ℝ) (H : Type)
+      [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mat k r → (H →L[ℂ] H)),
+    1 ≤ k → IsHCParam lam → IsDSHpk k r ε lam σ → GapAtLeast ε lam h → DecGap k r h
+      → KFinDecay k r σ (decExp r h)
 
 def DecSmooth : Prop :=
-  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
-    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mat k r → (H →L[ℂ] H)) (a : ℝ),
-    IsHCParam lam → IsDSHpk k r ε lam σ → KFinDecay k r σ a →
-    ∀ v₀ : H, IsKFinHpk (k := k) (r := r) σ v₀ →
-      ∃ (C : ℝ) (Ws : List (List (Mat k r))), (∀ D ∈ Ws, ∀ X ∈ D, InLieHpk k r X) ∧
-        ∀ w ∈ smoothVecs (k := k) (r := r) σ, ∀ x ∈ UH (Hpk k r),
-          ‖⟪v₀, σ x w⟫_ℂ‖ ≤ C * wordSeminorm σ Ws w * gN x ^ (1 - a)
+  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (H : Type)
+      [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mat k r → (H →L[ℂ] H)) (a : ℝ),
+    IsHCParam lam → IsDSHpk k r ε lam σ → KFinDecay k r σ a
+      → ∀ v₀ : H,
+        IsKFinHpk (k := k) (r := r) σ v₀
+          → ∃ (C : ℝ) (Ws : List (List (Mat k r))),
+            (∀ D ∈ Ws, ∀ X ∈ D, InLieHpk k r X)
+              ∧ ∀ w ∈ smoothVecs (k := k) (r := r) σ, ∀ x ∈ UH (Hpk k r),
+                ‖⟪v₀, σ x w⟫_ℂ‖ ≤ C * wordSeminorm σ Ws w * gN x ^ (1 - a)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.SideNormalisedGap

@@ -9,7 +9,13 @@ open GlobalTheory.UT
 
 namespace GlobalTheory.TestFibre
 
-theorem exists_val_le_of_sumV_characters : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (X T : Type) [Fintype T] (χ : T → X → F) (cf : X → F) (ζ w : T → F) (α : X) (q : ℚ), (∀ t, SumV v (fun β => χ t β * cf β) (ζ t * w t)) → (∀ t, v (ζ t) = 0) → (∀ t β, v (χ t β) = 0) → v ((Fintype.card T : ℕ) : F) = 0 → v (cf α) = (q : WithTop ℚ) → (∀ β, β ≠ α → ∑ t, (χ t α)⁻¹ * χ t β = 0 ∨ (q : WithTop ℚ) < v (cf β)) → ∃ t, v (w t) ≤ (q : WithTop ℚ) := by
+theorem exists_val_le_of_sumV_characters
+    : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (X T : Type) [Fintype T]
+        (χ : T → X → F) (cf : X → F) (ζ w : T → F) (α : X) (q : ℚ),
+      (∀ t, SumV v (fun β => χ t β * cf β) (ζ t * w t)) → (∀ t, v (ζ t) = 0)
+        → (∀ t β, v (χ t β) = 0) → v ((Fintype.card T : ℕ) : F) = 0 → v (cf α) = (q : WithTop ℚ)
+        → (∀ β, β ≠ α → ∑ t, (χ t α)⁻¹ * χ t β = 0 ∨ (q : WithTop ℚ) < v (cf β))
+        → ∃ t, v (w t) ≤ (q : WithTop ℚ) := by
   classical
   intro F _ v X T _ χ cf ζ w α q hS hζ hχ hT hα hβ
   by_contra hcon
@@ -45,13 +51,15 @@ theorem exists_val_le_of_sumV_characters : ∀ (F : Type) [Field F] (v : AddValu
   have e1 : ∑ t, (χ t α)⁻¹ * χ t α = ((Fintype.card T : ℕ) : F) := by
     rw [Finset.sum_congr rfl fun t _ => inv_mul_cancel₀ (hne t)]
     simp
-  have e2 : ∑ t, (χ t α)⁻¹ * (∑ β ∈ U, χ t β * cf β) = ∑ β ∈ U, (∑ t, (χ t α)⁻¹ * χ t β) * cf β := by
+  have e2
+      : ∑ t, (χ t α)⁻¹ * (∑ β ∈ U, χ t β * cf β) = ∑ β ∈ U, (∑ t, (χ t α)⁻¹ * χ t β) * cf β := by
     simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
     exact Finset.sum_comm
-  have e : ((Fintype.card T : ℕ) : F) * cf α =
-      (∑ t, (χ t α)⁻¹ * (ζ t * w t)) +
-        (-(∑ t, (χ t α)⁻¹ * (ζ t * w t - ∑ β ∈ U, χ t β * cf β)) +
-          -(∑ β ∈ U.erase α, (∑ t, (χ t α)⁻¹ * χ t β) * cf β)) := by
+  have e
+      : ((Fintype.card T : ℕ) : F) * cf α
+        = (∑ t, (χ t α)⁻¹ * (ζ t * w t))
+          + (-(∑ t, (χ t α)⁻¹ * (ζ t * w t - ∑ β ∈ U, χ t β * cf β))
+            + -(∑ β ∈ U.erase α, (∑ t, (χ t α)⁻¹ * χ t β) * cf β)) := by
     simp only [mul_sub, Finset.sum_sub_distrib]
     rw [e2, ← Finset.add_sum_erase U _ hαU, e1]
     ring

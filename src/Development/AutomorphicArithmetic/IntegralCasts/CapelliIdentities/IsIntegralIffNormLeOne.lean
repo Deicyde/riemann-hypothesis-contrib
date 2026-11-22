@@ -6,13 +6,12 @@ public import Mathlib
 
 open Polynomial
 
-theorem UpperTheory.padicAlgCl_isIntegral_iff_norm_le_one :
-    ∀ {l : ℕ} [Fact (Nat.Prime l)] (x : PadicAlgCl l), IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ (1 : ℝ) := by
+theorem UpperTheory.padicAlgCl_isIntegral_iff_norm_le_one
+    : ∀ {l : ℕ} [Fact (Nat.Prime l)] (x : PadicAlgCl l), IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ (1 : ℝ) := by
   intro l _ x
   have hx : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have hm : (minpoly ℚ_[l] x).Monic := minpoly.monic hx
-  have key : ‖x‖ ≤ (1 : ℝ) ↔ ∀ n, ‖(minpoly ℚ_[l] x).coeff n‖ ≤ 1 :=
-    spectralValue_le_one_iff hm
+  have key : ‖x‖ ≤ (1 : ℝ) ↔ ∀ n, ‖(minpoly ℚ_[l] x).coeff n‖ ≤ 1 := spectralValue_le_one_iff hm
   rw [key]
   constructor
   · intro h n

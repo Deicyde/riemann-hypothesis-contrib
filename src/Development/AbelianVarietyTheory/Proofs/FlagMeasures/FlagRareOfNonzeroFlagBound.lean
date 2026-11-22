@@ -11,7 +11,9 @@ open MeasureTheory Formalism.MainNotions.S GlobalTheory.Count
 
 namespace GlobalTheory.FlagRareProof
 
-theorem flagRare_of_nonzeroFlagBound : GlobalTheory.FlagMeas.NonzeroFlagBound → GlobalTheory.IndefiniteRowSideFullHecke.RareFlags.FlagRare := by
+theorem flagRare_of_nonzeroFlagBound
+    : GlobalTheory.FlagMeas.NonzeroFlagBound
+      → GlobalTheory.IndefiniteRowSideFullHecke.RareFlags.FlagRare := by
   intro h
   refine ⟨⌈Real.exp 15⌉₊, ?_⟩
   intro B p q hsig hn hq hrd hf
@@ -32,8 +34,9 @@ theorem flagRare_of_nonzeroFlagBound : GlobalTheory.FlagMeas.NonzeroFlagBound �
   have hnf : 0 ≤ (B.I.n : ℝ) * (B.I.f : ℝ) * Real.log B.I.n :=
     mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _)) (by linarith)
   rw [prob, hset, Formalism.MainNotions.S.AutInst.vol, ← ENNReal.toReal_div]
-  calc _ ≤ Real.exp (-(1 / 3 * (B.I.n : ℝ) * B.I.f * Real.log B.I.n)) :=
-        ENNReal.toReal_le_of_le_ofReal (Real.exp_pos _).le key
+  calc
+    _ ≤ Real.exp (-(1 / 3 * (B.I.n : ℝ) * B.I.f * Real.log B.I.n)) :=
+      ENNReal.toReal_le_of_le_ofReal (Real.exp_pos _).le key
     _ ≤ _ := Real.exp_le_exp.2 (by nlinarith)
 
 end GlobalTheory.FlagRareProof

@@ -13,27 +13,28 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4 MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  ReciprocityTheory.ChartRestriction.G.AI.I4 MvPolynomial
 
 noncomputable section
 
 namespace PullFormsGeneric
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
-
+variable
+  {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [CharZero Ω]
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem aeval_mem (F : IntermediateField ℚ Ω) (w : (Σ k, ι k) → Ω) (hw : ∀ p, w p ∈ F) (f : MRing ι) :
-    aeval w f ∈ F := by
+theorem aeval_mem (F : IntermediateField ℚ Ω) (w : (Σ k, ι k) → Ω) (hw : ∀ p, w p ∈ F) (f : MRing ι)
+    : aeval w f ∈ F := by
   induction f using MvPolynomial.induction_on with
   | C a => rw [aeval_C, algebraMap_int_eq, eq_intCast]; exact intCast_mem F a
   | add p q hp hq => rw [map_add]; exact add_mem hp hq
   | mul_X p q hp => rw [map_mul, aeval_X]; exact mul_mem hp (hw q)
 
-
 omit [CharZero Ω] in
-theorem aeval_scale {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (y : (Σ k, ι k) → Ω) (t : K → Ω) :
-    aeval (fun p => y p * t p.1) g = aeval y g * ∏ k, t k ^ d k := by
+theorem aeval_scale
+    {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (y : (Σ k, ι k) → Ω) (t : K → Ω)
+    : aeval (fun p => y p * t p.1) g = aeval y g * ∏ k, t k ^ d k := by
   have h := congrArg (MvPolynomial.eval t) (ProjLine.mConeMap_eq_of_isMultiHomog y hg)
   rw [map_mul, eval_C, map_prod] at h
   simp only [map_pow, eval_X] at h
@@ -43,12 +44,14 @@ theorem aeval_scale {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (y : 
   · funext p
     simp
 
-theorem blockFnField_eq_top {y : (Σ k, ι k) → Ω} (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
-    (hB : Birational y) : blockFnField y = ⊤ := by
+theorem blockFnField_eq_top
+    {y : (Σ k, ι k) → Ω} (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (hB : Birational y)
+    : blockFnField y = ⊤ := by
   refine eq_top_iff.mpr fun x _ => ?_
   obtain ⟨d, g, h, hg, hh, hh0, hgh⟩ := hB x
   set t : K → Ω := fun k => (y ⟨k, c k⟩)⁻¹
-  have ht : ∏ k, t k ^ d k ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (inv_ne_zero (hc k))
+  have ht : ∏ k, t k ^ d k ≠ 0 :=
+    Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (inv_ne_zero (hc k))
   have hw : ∀ p, y p * t p.1 ∈ blockFnField y := fun p =>
     IntermediateField.subset_adjoin _ _ ⟨p, ⟨p.1, c p.1⟩, rfl, by simp [t, div_eq_mul_inv]⟩
   have hx : x = aeval (fun p => y p * t p.1) g / aeval (fun p => y p * t p.1) h := by
@@ -56,8 +59,9 @@ theorem blockFnField_eq_top {y : (Σ k, ι k) → Ω} (c : ∀ k, ι k) (hc : �
   rw [hx]
   exact div_mem (aeval_mem _ _ hw g) (aeval_mem _ _ hw h)
 
-theorem trdeg_eq {y : (Σ k, ι k) → Ω} {D : ℕ} (hA : IsArithVar (mCoordIdeal y) (D + 1))
-    (hB : Birational y) : Algebra.trdeg ℚ Ω = D := by
+theorem trdeg_eq
+    {y : (Σ k, ι k) → Ω} {D : ℕ} (hA : IsArithVar (mCoordIdeal y) (D + 1)) (hB : Birational y)
+    : Algebra.trdeg ℚ Ω = D := by
   obtain ⟨_, ⟨_, _, hrel⟩, _, hdim⟩ := hA
   obtain ⟨c, hc⟩ := CoordArithOfFnField.nonzero_of_relevant y hrel
   rw [CoordArithOfFnField.dim_eq y c hc] at hdim
@@ -79,12 +83,12 @@ theorem trdeg_eq {y : (Σ k, ι k) → Ω} {D : ℕ} (hA : IsArithVar (mCoordIde
   have : Algebra.IsAlgebraic ℤ ℚ := IsLocalization.isAlgebraic _ (nonZeroDivisors ℤ)
   rw [← h2, ← trdeg_add_eq ℤ ℚ (A := Ω), trdeg_eq_zero (R := ℤ) (A := ℚ), zero_add]
 
-
 omit [CharZero Ω] in
-theorem exists_ne_zero {y : (Σ k, ι k) → Ω} {D : ℕ} {e : K → ℕ} {L : Fin (D + 1) → MRing ι}
+theorem exists_ne_zero
+    {y : (Σ k, ι k) → Ω} {D : ℕ} {e : K → ℕ} {L : Fin (D + 1) → MRing ι}
     (hA : IsArithVar (mCoordIdeal y) (D + 1)) (hL : ∀ j, IsMultiHomog (L j) e)
-    (hz : ∀ z ∈ mcPts (mCoordIdeal y), ∃ j, eval z (map (Int.castRingHom ℂ) (L j)) ≠ 0) :
-    ∃ j, aeval y (L j) ≠ 0 := by
+    (hz : ∀ z ∈ mcPts (mCoordIdeal y), ∃ j, eval z (map (Int.castRingHom ℂ) (L j)) ≠ 0)
+    : ∃ j, aeval y (L j) ≠ 0 := by
   have hne : ¬ (⊤ : Ideal (MRing ι)) ≤ mCoordIdeal y := fun h =>
     (RingHom.ker_isPrime (mConeMap y)).ne_top (top_le_iff.mp h)
   obtain ⟨z, hzP, -⟩ := exists_mcPts_not_mem_mcPts hA hne
@@ -93,22 +97,24 @@ theorem exists_ne_zero {y : (Σ k, ι k) → Ω} {D : ℕ} {e : K → ℕ} {L : 
   change mConeMap y (L j) = 0
   rw [ProjLine.mConeMap_eq_of_isMultiHomog y (hL j), h0, map_zero, zero_mul]
 
-def dehom {D : ℕ} (j₀ : Fin (D + 1)) (F : MvPolynomial (Fin (D + 1)) ℚ) : MvPolynomial {i // i ≠ j₀} ℚ :=
+def dehom {D : ℕ} (j₀ : Fin (D + 1)) (F : MvPolynomial (Fin (D + 1)) ℚ)
+    : MvPolynomial {i // i ≠ j₀} ℚ :=
   bind₁ (fun i => if h : i = j₀ then 1 else X ⟨i, h⟩) F
 
 omit [Field Ω] [CharZero Ω] in
-theorem aeval_dehom {A : Type} [CommRing A] [Algebra ℚ A] {D : ℕ} (j₀ : Fin (D + 1))
-    (F : MvPolynomial (Fin (D + 1)) ℚ) (u : {i // i ≠ j₀} → A) :
-    aeval u (dehom j₀ F) = aeval (fun i => if h : i = j₀ then 1 else u ⟨i, h⟩) F := by
+theorem aeval_dehom
+    {A : Type} [CommRing A] [Algebra ℚ A]
+    {D : ℕ} (j₀ : Fin (D + 1)) (F : MvPolynomial (Fin (D + 1)) ℚ) (u : {i // i ≠ j₀} → A)
+    : aeval u (dehom j₀ F) = aeval (fun i => if h : i = j₀ then 1 else u ⟨i, h⟩) F := by
   rw [dehom, aeval_bind₁]
   refine congrArg (fun f => aeval f F) (funext fun i => ?_)
   split_ifs <;> simp
 
 end PullFormsGeneric
 
-
 open PullFormsGeneric in
-theorem PullFormsGeneric.proof (hR : PullRatiosAlgebraic.Statement) : PullFormsGeneric.Statement := by
+theorem PullFormsGeneric.proof (hR : PullRatiosAlgebraic.Statement)
+    : PullFormsGeneric.Statement := by
   intro K _ ι _ Ω _ _ y D e L hA hB he hL hz d F hF h0
   classical
   obtain ⟨j₀, hj₀⟩ := exists_ne_zero hA hL hz
@@ -135,14 +141,16 @@ theorem PullFormsGeneric.proof (hR : PullRatiosAlgebraic.Statement) : PullFormsG
   have hrel' : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0 := fun k => ⟨c k, hc k⟩
   have halg : Algebra.IsAlgebraic (Algebra.adjoin ℚ (Set.range r)) Ω := by
     refine ⟨fun x => IntermediateField.isAlgebraic_adjoin_iff.mp ?_⟩
-    have hle : blockFnField y ≤
-        (algebraicClosure (IntermediateField.adjoin ℚ (Set.range r)) Ω).restrictScalars ℚ := by
+    have hle
+        : blockFnField y
+          ≤ (algebraicClosure (IntermediateField.adjoin ℚ (Set.range r)) Ω).restrictScalars ℚ := by
       rw [blockFnField, IntermediateField.adjoin_le_iff]
       rintro _ ⟨p, q, hpq, rfl⟩
       refine (IntermediateField.mem_restrictScalars _).mpr (mem_algebraicClosure_iff.mpr ?_)
       have := hR K ι Ω y D e L hrel' he hL hz p q hpq
       rwa [hP] at this
-    have hx := hle ((blockFnField_eq_top c hc hB).symm ▸ IntermediateField.mem_top : x ∈ blockFnField y)
+    have hx :=
+      hle ((blockFnField_eq_top c hc hB).symm ▸ IntermediateField.mem_top : x ∈ blockFnField y)
     exact mem_algebraicClosure_iff.mp ((IntermediateField.mem_restrictScalars _).mp hx)
 
   have hcard : Cardinal.mk {i : Fin (D + 1) // i ≠ j₀} ≤ Algebra.trdeg ℚ Ω := by
@@ -170,7 +178,8 @@ theorem PullFormsGeneric.proof (hR : PullRatiosAlgebraic.Statement) : PullFormsG
     rw [map_mul, eval_X, map_zero]
     by_cases hx : x j₀ = 0
     · rw [hx, mul_zero]
-    · have h1 := FibreNormCharpoly.aeval_mul_of_isHomogeneous (Ω := ℚ) hF (x j₀) (fun i => x i / x j₀)
+    · have h1 :=
+        FibreNormCharpoly.aeval_mul_of_isHomogeneous (Ω := ℚ) hF (x j₀) (fun i => x i / x j₀)
       have h2 := aeval_dehom j₀ F (fun i => x i.1 / x j₀)
       have hw' : (fun i => if h : i = j₀ then (1 : ℚ) else x i / x j₀) = fun i => x i / x j₀ := by
         funext i

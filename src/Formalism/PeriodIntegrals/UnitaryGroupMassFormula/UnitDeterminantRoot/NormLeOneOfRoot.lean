@@ -53,7 +53,9 @@ theorem normOne : NormOne := by
     rintro z ⟨p, hp, hpz⟩
     apply norm_le_one_of_root p hp
     have h : (ι.toRingHom) (p.eval₂ (algebraMap ℤ ℂ) z) = 0 := by rw [hpz, map_zero]
-    rw [Polynomial.hom_eval₂, RingHom.ext_int (ι.toRingHom.comp (algebraMap ℤ ℂ)) (Int.castRingHom _)] at h
+    rw [Polynomial.hom_eval₂,
+        RingHom.ext_int (ι.toRingHom.comp (algebraMap ℤ ℂ)) (Int.castRingHom _)]
+      at h
     exact h
   have e1 := hI _ h1
   have e2 := hI _ h2

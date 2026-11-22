@@ -12,9 +12,10 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Comb
 
-theorem FrobeniusDimensionFormula.proof (h1 : CombTableEqWords.Statement)
-    (h2 : CombCfAtStair.Statement) (h3 : CombCfVandermondePsumOne.Statement) :
-    FrobeniusDimensionFormula.Statement := by
+theorem FrobeniusDimensionFormula.proof
+    (h1 : CombTableEqWords.Statement) (h2 : CombCfAtStair.Statement)
+    (h3 : CombCfVandermondePsumOne.Statement)
+    : FrobeniusDimensionFormula.Statement := by
   intro m lam hlam
   have hsum : ∑ i, (lam i + stair m i) = ∑ i, stair m i + ∑ i, lam i := by
     rw [Finset.sum_add_distrib, add_comm]

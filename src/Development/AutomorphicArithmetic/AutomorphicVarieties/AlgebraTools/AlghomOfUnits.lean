@@ -6,8 +6,14 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.alghom_of_units :
-    ∀ {K E : Type} [CommRing K] [Ring E] [Algebra K E] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)] (e : ∀ s, d s → d s → E), (∀ s i j k, e s i j * e s j k = e s i k) → (∀ s i j k l, j ≠ k → e s i j * e s k l = 0) → (∀ s t i j k l, s ≠ t → e s i j * e t k l = 0) → ∑ s, ∑ i, e s i i = 1 → ∃ j : (∀ s, Matrix (d s) (d s) K) →ₐ[K] E, ∀ s i k, j (Pi.single s (single i k 1)) = e s i k := by
+theorem UpperTheory.V.AlgebraTools.alghom_of_units
+    : ∀ {K E : Type} [CommRing K] [Ring E] [Algebra K E] {σ : Type} [Fintype σ] [DecidableEq σ]
+        (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+        (e : ∀ s, d s → d s → E),
+      (∀ s i j k, e s i j * e s j k = e s i k) → (∀ s i j k l, j ≠ k → e s i j * e s k l = 0)
+        → (∀ s t i j k l, s ≠ t → e s i j * e t k l = 0) → ∑ s, ∑ i, e s i i = 1
+        → ∃ j : (∀ s, Matrix (d s) (d s) K) →ₐ[K] E, ∀ s i k,
+          j (Pi.single s (single i k 1)) = e s i k := by
   intro K E _ _ _ σ _ _ d _ _ _ e hmul horth hst hsum
   let f : (∀ s, Matrix (d s) (d s) K) → E := fun M => ∑ s, ∑ i, ∑ k, M s i k • e s i k
   have hadd : ∀ M N, f (M + N) = f M + f N := by
@@ -16,8 +22,9 @@ theorem UpperTheory.V.AlgebraTools.alghom_of_units :
   have hsmul : ∀ (c : K) M, f (c • M) = c • f M := by
     intro c M
     simp only [f, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul, mul_smul, Finset.smul_sum]
-  have key : ∀ (N : ∀ s, Matrix (d s) (d s) K) s i j (a : K),
-      (a • e s i j) * f N = ∑ k, (a * N s j k) • e s i k := by
+  have key
+      : ∀ (N : ∀ s, Matrix (d s) (d s) K) s i j (a : K),
+        (a • e s i j) * f N = ∑ k, (a * N s j k) • e s i k := by
     intro N s i j a
     simp only [f]
     rw [Finset.mul_sum, Finset.sum_eq_single s]
@@ -47,11 +54,14 @@ theorem UpperTheory.V.AlgebraTools.alghom_of_units :
     refine Finset.sum_congr rfl fun s _ => Finset.sum_congr rfl fun i _ => ?_
     exact Finset.sum_comm
   have h1 : f 1 = 1 := by
-    simp only [f, Pi.one_apply, Matrix.one_apply, ite_smul, one_smul, zero_smul,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [f, Pi.one_apply, Matrix.one_apply, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
     exact hsum
-  let L : (∀ s, Matrix (d s) (d s) K) →ₗ[K] E :=
-    { toFun := f, map_add' := hadd, map_smul' := hsmul }
+  let L : (∀ s, Matrix (d s) (d s) K) →ₗ[K] E := {
+    toFun := f
+    map_add' := hadd
+    map_smul' := hsmul
+  }
   refine ⟨AlgHom.ofLinearMap L h1 hm, ?_⟩
   intro s i k
   show f (Pi.single s (Matrix.single i k 1)) = e s i k

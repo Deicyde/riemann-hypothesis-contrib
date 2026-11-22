@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HopfOrderPul
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 
@@ -28,7 +31,8 @@ namespace GlobalTheory.DenAway
 
 open IsDedekindDomain
 
-theorem isIntAf_algebraMap_inv_prime (p : ℕ) [Fact p.Prime] : IsIntAf (algebraMap ℚ (AfP p) (p : ℚ)⁻¹) := by
+theorem isIntAf_algebraMap_inv_prime (p : ℕ) [Fact p.Prime]
+    : IsIntAf (algebraMap ℚ (AfP p) (p : ℚ)⁻¹) := by
   intro v
   rw [AlgHom.commutes, HeightOneSpectrum.mem_adicCompletionIntegers]
   have h1 : v.1.valuation ℚ (algebraMap ℤ ℚ (p : ℤ)) = 1 := by
@@ -43,8 +47,9 @@ theorem isIntAf_algebraMap_inv_prime (p : ℕ) [Fact p.Prime] : IsIntAf (algebra
   simp only [eq_intCast, Int.cast_natCast] at h1
   rw [h1, inv_one]
 
-theorem exists_coprime_nat_adele : ∀ (p : ℕ) [Fact p.Prime] (a : AfP p),
-    ∃ j : ℕ, 0 < j ∧ j.Coprime p ∧ IsIntAf ((j : AfP p) * a) := by
+theorem exists_coprime_nat_adele
+    : ∀ (p : ℕ) [Fact p.Prime] (a : AfP p), ∃ j : ℕ,
+      0 < j ∧ j.Coprime p ∧ IsIntAf ((j : AfP p) * a) := by
   intro p _ a
   obtain ⟨n, hn, hna⟩ := exists_nat_adele a
   obtain ⟨e, j, hj, hnj⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn.ne' p (Fact.out : p.Prime).ne_one

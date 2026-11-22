@@ -132,8 +132,9 @@ end Map
 
 section Frac
 
-variable (V K : ι → Type) [∀ i, CommRing (V i)] [∀ i, IsDomain (V i)] [∀ i, Field (K i)]
-  [∀ i, Algebra (V i) (K i)]
+variable
+  (V K : ι → Type)
+  [∀ i, CommRing (V i)] [∀ i, IsDomain (V i)] [∀ i, Field (K i)] [∀ i, Algebra (V i) (K i)]
 
 instance : Algebra (Ult U V) (Ult U K) := (map U fun i => algebraMap (V i) (K i)).toAlgebra
 
@@ -142,7 +143,8 @@ lemma algebraMap_mk (a : ∀ i, V i) :
 
 instance [∀ i, IsFractionRing (V i) (K i)] : IsFractionRing (Ult U V) (Ult U K) := by
   have hinj : Function.Injective (algebraMap (Ult U V) (Ult U K)) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨a, rfl⟩ := mk_surjective U x
     rw [algebraMap_mk, mk_eq_zero_iff] at hx
@@ -181,9 +183,11 @@ variable {A : ι → Type} [∀ i, CommRing (A i)] {B : Type} [CommRing B]
 
 def IsAEHom (h : ∀ i, B → A i) : Prop := ∀ᶠ i in (U : Filter ι), ∃ p : B →+* A i, ⇑p = h i
 
-def ofFamily (h : ∀ i, B → A i) (h1 : ∀ᶠ i in (U : Filter ι), h i 1 = 1)
+def ofFamily
+    (h : ∀ i, B → A i) (h1 : ∀ᶠ i in (U : Filter ι), h i 1 = 1)
     (hadd : ∀ a b, ∀ᶠ i in (U : Filter ι), h i (a + b) = h i a + h i b)
-    (hmul : ∀ a b, ∀ᶠ i in (U : Filter ι), h i (a * b) = h i a * h i b) : B →+* Ult U A where
+    (hmul : ∀ a b, ∀ᶠ i in (U : Filter ι), h i (a * b) = h i a * h i b)
+    : B →+* Ult U A where
   toFun b := mk U (fun i => h i b)
   map_one' := by
     rw [← map_one (mk U), mk_eq_mk_iff]
@@ -203,8 +207,7 @@ lemma ofFamily_apply (h : ∀ i, B → A i) (h1 hadd hmul) (b : B) :
     ofFamily U h h1 hadd hmul b = mk U (fun i => h i b) := rfl
 
 def homOf (h : ∀ i, B → A i) (hh : IsAEHom U h) : B →+* Ult U A :=
-  ofFamily U h
-    (by filter_upwards [hh] with i ⟨p, hp⟩; rw [← hp, map_one])
+  ofFamily U h (by filter_upwards [hh] with i ⟨p, hp⟩; rw [← hp, map_one])
     (fun a b => by filter_upwards [hh] with i ⟨p, hp⟩; rw [← hp, map_add (f := _)])
     (fun a b => by filter_upwards [hh] with i ⟨p, hp⟩; rw [← hp, map_mul])
 
@@ -293,8 +296,8 @@ variable {X : Scheme.{0}}
 instance (W : X.affineOpens) : IsOpenImmersion W.2.fromSpec :=
   IsAffineOpen.isOpenImmersion_fromSpec W.2
 
-def pt (W : X.affineOpens) {A : Type} [CommRing A] (p : Γ(X, W.1) →+* A) :
-    Spec (CommRingCat.of A) ⟶ X :=
+def pt (W : X.affineOpens) {A : Type} [CommRing A] (p : Γ(X, W.1) →+* A)
+    : Spec (CommRingCat.of A) ⟶ X :=
   Spec.map (CommRingCat.ofHom p) ≫ W.2.fromSpec
 
 lemma map_pt (W : X.affineOpens) {A B : Type} [CommRing A] [CommRing B] (p : Γ(X, W.1) →+* A)
@@ -371,13 +374,14 @@ lemma exists_finite_affine_cover (O : X.Opens) (hO : IsCompact (O : Set X)) :
 
 variable {A : ι → Type} [∀ i, CommRing (A i)]
 
-theorem ae_pt_eq_of_pt_eq [IsLocalRing (Ult U A)]
+theorem ae_pt_eq_of_pt_eq
+    [IsLocalRing (Ult U A)]
     (hfp : ∀ W : X.affineOpens, Algebra.FinitePresentation ℤ Γ(X, W.1))
     {W₁ W₂ : X.affineOpens} {h₁ : ∀ i, Γ(X, W₁.1) → A i} {h₂ : ∀ i, Γ(X, W₂.1) → A i}
     {g₁ : Γ(X, W₁.1) →+* Ult U A} {g₂ : Γ(X, W₂.1) →+* Ult U A}
-    (r₁ : Rep U h₁ g₁) (r₂ : Rep U h₂ g₂) (H : pt W₁ g₁ = pt W₂ g₂) :
-    ∀ᶠ i in (U : Filter ι), ∀ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
-      ⇑p = h₁ i → ⇑q = h₂ i → pt W₁ p = pt W₂ q := by
+    (r₁ : Rep U h₁ g₁) (r₂ : Rep U h₂ g₂) (H : pt W₁ g₁ = pt W₂ g₂)
+    : ∀ᶠ i in (U : Filter ι), ∀ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
+        ⇑p = h₁ i → ⇑q = h₂ i → pt W₁ p = pt W₂ q := by
   set x : X := (pt W₁ g₁) (IsLocalRing.closedPoint (Ult U A) : PrimeSpectrum (Ult U A)) with hx
   have hx₁ : x ∈ W₁.1 := pt_mem _ _ _
   have hx₂ : x ∈ W₂.1 := by rw [hx, H]; exact pt_mem _ _ _
@@ -391,15 +395,12 @@ theorem ae_pt_eq_of_pt_eq [IsLocalRing (Ult U A)]
   haveI := hfp W₁
   haveI := hfp W₂
   obtain ⟨h, hr⟩ := exists_rep U T
-  have aeh : ∀ {W' : X.affineOpens} (hl : W.1 ≤ W'.1),
-      IsAEHom U (fun i b => h i (res hl b)) := by
+  have aeh : ∀ {W' : X.affineOpens} (hl : W.1 ≤ W'.1), IsAEHom U (fun i b => h i (res hl b)) := by
     intro W' hl
     filter_upwards [hr.1] with i ⟨t, ht⟩
     exact ⟨t.comp (res hl), by funext b; simp [← ht]⟩
-  have a₁ := ae_eq_of_fg U r₁.1 (aeh hle₁) (fun b => by
-    rw [← r₁.2, e₁]; exact hr.2 _)
-  have a₂ := ae_eq_of_fg U r₂.1 (aeh hle₂) (fun b => by
-    rw [← r₂.2, e₂]; exact hr.2 _)
+  have a₁ := ae_eq_of_fg U r₁.1 (aeh hle₁) (fun b => by rw [← r₁.2, e₁]; exact hr.2 _)
+  have a₂ := ae_eq_of_fg U r₂.1 (aeh hle₂) (fun b => by rw [← r₂.2, e₂]; exact hr.2 _)
   filter_upwards [a₁, a₂, hr.1] with i b₁ b₂ ⟨t, ht⟩ p q hp hq
   have p_eq : p = t.comp (res hle₁) := by
     ext b
@@ -413,19 +414,22 @@ theorem ae_pt_eq_of_pt_eq [IsLocalRing (Ult U A)]
     simpa [← ht] using this
   rw [p_eq, q_eq, pt_res, pt_res]
 
-theorem pt_eq_of_ae_pt_eq [QuasiSeparatedSpace X] [∀ i, IsLocalRing (A i)]
+theorem pt_eq_of_ae_pt_eq
+    [QuasiSeparatedSpace X] [∀ i, IsLocalRing (A i)]
     {W₁ W₂ : X.affineOpens} {h₁ : ∀ i, Γ(X, W₁.1) → A i} {h₂ : ∀ i, Γ(X, W₂.1) → A i}
     {g₁ : Γ(X, W₁.1) →+* Ult U A} {g₂ : Γ(X, W₂.1) →+* Ult U A}
     (r₁ : Rep U h₁ g₁) (r₂ : Rep U h₂ g₂)
-    (H : ∀ᶠ i in (U : Filter ι), ∃ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
-      ⇑p = h₁ i ∧ ⇑q = h₂ i ∧ pt W₁ p = pt W₂ q) :
-    pt W₁ g₁ = pt W₂ g₂ := by
+    (H
+      : ∀ᶠ i in (U : Filter ι), ∃ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
+        ⇑p = h₁ i ∧ ⇑q = h₂ i ∧ pt W₁ p = pt W₂ q)
+    : pt W₁ g₁ = pt W₂ g₂ := by
   have hc : IsCompact (((W₁.1 ⊓ W₂.1 : X.Opens)) : Set X) :=
     QuasiSeparatedSpace.inter_isCompact _ _ W₁.1.2 W₁.2.isCompact W₂.1.2 W₂.2.isCompact
   obtain ⟨S, hSf, hS1, hS2⟩ := exists_finite_affine_cover (W₁.1 ⊓ W₂.1) hc
-  have hQ : ∀ᶠ i in (U : Filter ι), ∃ W ∈ S, ∃ t : Γ(X, W.1) →+* A i,
-      ∃ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
-        ⇑p = h₁ i ∧ ⇑q = h₂ i ∧ pt W t = pt W₁ p ∧ pt W t = pt W₂ q := by
+  have hQ
+      : ∀ᶠ i in (U : Filter ι), ∃ W ∈ S, ∃ t : Γ(X, W.1) →+* A i,
+        ∃ (p : Γ(X, W₁.1) →+* A i) (q : Γ(X, W₂.1) →+* A i),
+          ⇑p = h₁ i ∧ ⇑q = h₂ i ∧ pt W t = pt W₁ p ∧ pt W t = pt W₂ q := by
     filter_upwards [H] with i ⟨p, q, hp, hq, e⟩
     have hx₁ : (pt W₁ p) (IsLocalRing.closedPoint (A i) : PrimeSpectrum (A i)) ∈ W₁.1 :=
       pt_mem _ _ _

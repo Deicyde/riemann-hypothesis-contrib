@@ -19,15 +19,17 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem one_mem_of_mul_mem_of_dual_derivations {k : Type u} [Field k] {B : Type u} [CommRing B]
-    [Algebra k B] (I : Ideal B) (y₁ y₂ f a b : B) (δ₁ δ₂ : Derivation k B B)
-    (hf : f ∈ I) (hy₁ : y₁ = a * f) (hy₂ : y₂ = b * f)
-    (e11 : δ₁ y₁ = 1) (e12 : δ₁ y₂ = 0) (e21 : δ₂ y₁ = 0) (e22 : δ₂ y₂ = 1) :
-    (1 : B) ∈ I := by
+private theorem one_mem_of_mul_mem_of_dual_derivations
+    {k : Type u} [Field k]
+    {B : Type u} [CommRing B] [Algebra k B]
+    (I : Ideal B) (y₁ y₂ f a b : B) (δ₁ δ₂ : Derivation k B B) (hf : f ∈ I) (hy₁ : y₁ = a * f)
+    (hy₂ : y₂ = b * f) (e11 : δ₁ y₁ = 1) (e12 : δ₁ y₂ = 0) (e21 : δ₂ y₁ = 0) (e22 : δ₂ y₂ = 1)
+    : (1 : B) ∈ I := by
   have hπf : (Ideal.Quotient.mk I) f = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr hf
-  have key : ∀ (δ : Derivation k B B) (c : B),
-      (Ideal.Quotient.mk I) (δ (c * f)) =
-        (Ideal.Quotient.mk I) c * (Ideal.Quotient.mk I) (δ f) := by
+  have key
+      : ∀ (δ : Derivation k B B) (c : B),
+        (Ideal.Quotient.mk I) (δ (c * f))
+          = (Ideal.Quotient.mk I) c * (Ideal.Quotient.mk I) (δ f) := by
     intro δ c
     rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul, hπf,
       zero_mul, add_zero]
@@ -40,28 +42,30 @@ private theorem one_mem_of_mul_mem_of_dual_derivations {k : Type u} [Field k] {B
   have k22 : (Ideal.Quotient.mk I) b * (Ideal.Quotient.mk I) (δ₂ f) = 1 := by
     rw [← key δ₂ b, ← hy₂, e22, map_one]
   have hone : (1 : B ⧸ I) = 0 := by
-    calc (1 : B ⧸ I)
-        = ((Ideal.Quotient.mk I) a * (Ideal.Quotient.mk I) (δ₁ f)) *
-            ((Ideal.Quotient.mk I) b * (Ideal.Quotient.mk I) (δ₂ f)) := by
-          rw [k11, k22, one_mul]
-      _ = ((Ideal.Quotient.mk I) a * (Ideal.Quotient.mk I) (δ₂ f)) *
-            ((Ideal.Quotient.mk I) b * (Ideal.Quotient.mk I) (δ₁ f)) := by ring
+    calc
+      (1 : B ⧸ I)
+          = ((Ideal.Quotient.mk I) a * (Ideal.Quotient.mk I) (δ₁ f))
+            * ((Ideal.Quotient.mk I) b * (Ideal.Quotient.mk I) (δ₂ f)) := by
+        rw [k11, k22, one_mul]
+      _ = ((Ideal.Quotient.mk I) a * (Ideal.Quotient.mk I) (δ₂ f))
+          * ((Ideal.Quotient.mk I) b * (Ideal.Quotient.mk I) (δ₁ f)) := by
+        ring
       _ = 0 := by rw [k12, k21, mul_zero]
   refine Ideal.Quotient.eq_zero_iff_mem.mp ?_
   rw [map_one]
   exact hone
 
-private theorem one_mem_of_coord_mem_span_singleton_of_ne {k : Type u} [Field k] {m : ℕ} {B : Type u} [CommRing B]
-    [Algebra (MvPolynomial (ULift.{u} (Fin m)) k) B] [Algebra k B]
+private theorem one_mem_of_coord_mem_span_singleton_of_ne
+    {k : Type u} [Field k]
+    {m : ℕ} {B : Type u} [CommRing B] [Algebra (MvPolynomial (ULift.{u} (Fin m)) k) B] [Algebra k B]
     [IsScalarTower k (MvPolynomial (ULift.{u} (Fin m)) k) B]
     [Algebra.FormallyEtale (MvPolynomial (ULift.{u} (Fin m)) k) B]
     (I : Ideal B) (h : B) (hI : I = Ideal.span ({h} : Set B))
-    (j₁ j₂ : Fin m) (hne : j₁ ≠ j₂)
-    (hm1 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) B (ULift.up j₁) ∈ I)
-    (hm2 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) B (ULift.up j₂) ∈ I) :
-    (1 : B) ∈ I := by
-  have hh : h ∈ I := by
-    rw [hI]; exact Ideal.mem_span_singleton_self h
+    (j₁ j₂ : Fin m)
+    (hne : j₁ ≠ j₂) (hm1 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) B (ULift.up j₁) ∈ I)
+    (hm2 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) B (ULift.up j₂) ∈ I)
+    : (1 : B) ∈ I := by
+  have hh : h ∈ I := by rw [hI]; exact Ideal.mem_span_singleton_self h
   rw [hI] at hm1 hm2
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.mp hm1
   obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp hm2
@@ -84,29 +88,31 @@ private theorem one_mem_of_coord_mem_span_singleton_of_ne {k : Type u} [Field k]
     change basis.repr (KaehlerDifferential.D k B (EtaleCoordinates.coord k ι B j)) i = _
     rw [← hbasis, Module.Basis.repr_self, Finsupp.single_apply]
     exact if_congr eq_comm rfl rfl
-  exact one_mem_of_mul_mem_of_dual_derivations I
-    (EtaleCoordinates.coord k ι B (ULift.up j₁))
-    (EtaleCoordinates.coord k ι B (ULift.up j₂)) h a b
-    (δ (ULift.up j₁)) (δ (ULift.up j₂)) hh ha.symm hb.symm
-    (by simp [hδ]) (by simp [hδ, hne']) (by simp [hδ, hne'.symm]) (by simp [hδ])
+  exact one_mem_of_mul_mem_of_dual_derivations I (EtaleCoordinates.coord k ι B (ULift.up j₁))
+    (EtaleCoordinates.coord k ι B (ULift.up j₂)) h a b (δ (ULift.up j₁)) (δ (ULift.up j₂)) hh
+    ha.symm hb.symm (by simp [hδ]) (by simp [hδ, hne']) (by simp [hδ, hne'.symm]) (by simp [hδ])
 
-private theorem ideal_eq_bot_of_opens_eq {X : Scheme.{u}} (D : X.IdealSheafData)
-    (W₁ W₂ : X.affineOpens) (hW : (W₁ : X.Opens) = (W₂ : X.Opens))
-    (h : D.ideal W₁ = ⊥) : D.ideal W₂ = ⊥ := by
+private theorem ideal_eq_bot_of_opens_eq
+    {X : Scheme.{u}} (D : X.IdealSheafData) (W₁ W₂ : X.affineOpens)
+    (hW : (W₁ : X.Opens) = (W₂ : X.Opens)) (h : D.ideal W₁ = ⊥)
+    : D.ideal W₂ = ⊥ := by
   obtain rfl : W₁ = W₂ := Subtype.ext hW
   exact h
 
-private theorem exists_ideal_eq_span_singleton_of_opens_eq {X : Scheme.{u}} (D : X.IdealSheafData)
-    (W₁ W₂ : X.affineOpens) (hW : (W₁ : X.Opens) = (W₂ : X.Opens))
-    (h : ∃ f, D.ideal W₂ = Ideal.span ({f} : Set Γ(X, (W₂ : X.Opens)))) :
-    ∃ f, D.ideal W₁ = Ideal.span ({f} : Set Γ(X, (W₁ : X.Opens))) := by
+private theorem exists_ideal_eq_span_singleton_of_opens_eq
+    {X : Scheme.{u}}
+    (D : X.IdealSheafData) (W₁ W₂ : X.affineOpens) (hW : (W₁ : X.Opens) = (W₂ : X.Opens))
+    (h : ∃ f, D.ideal W₂ = Ideal.span ({f} : Set Γ(X, (W₂ : X.Opens))))
+    : ∃ f, D.ideal W₁ = Ideal.span ({f} : Set Γ(X, (W₁ : X.Opens))) := by
   obtain rfl : W₁ = W₂ := Subtype.ext hW
   exact h
 
-theorem exists_etaleChart_restrictIdeal_eq_coordIdeal_singleton {X : Scheme.{u}} {k : Type u} [Field k]
-    [CharZero k] (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (D : X.IdealSheafData) (hD : IsSmoothDivisor p D) (x : X) (hx : x ∈ D.support) :
-    ∃ (U : X.Opens) (m : ℕ) (c : EtaleChart p U m) (j : Fin m),
+theorem exists_etaleChart_restrictIdeal_eq_coordIdeal_singleton
+    {X : Scheme.{u}} {k : Type u} [Field k] [CharZero k]
+    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (D : X.IdealSheafData) (hD : IsSmoothDivisor p D)
+    (x : X) (hx : x ∈ D.support)
+    : ∃ (U : X.Opens) (m : ℕ) (c : EtaleChart p U m) (j : Fin m),
       x ∈ U ∧ restrictIdeal D U = c.coordIdeal ({j} : Finset (Fin m)) := by
   rw [isSmoothDivisor_iff] at hD
   obtain ⟨hcart, hsm⟩ := hD
@@ -117,13 +123,15 @@ theorem exists_etaleChart_restrictIdeal_eq_coordIdeal_singleton {X : Scheme.{u}}
   obtain ⟨V, f, hxV, hfnzd, hVf⟩ := hcart x
   obtain ⟨g, g', hgg', hxg⟩ := exists_basicOpen_le_affine_inter hU V.2 x ⟨hxU, hxV⟩
   have hWaff : IsAffineOpen (X.basicOpen g) := hU.basicOpen g
-  have hresU : Ideal.map (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom
-      (D.ideal ⟨U, hU⟩) = D.ideal ⟨X.basicOpen g, hWaff⟩ :=
+  have hresU
+      : Ideal.map (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom (D.ideal ⟨U, hU⟩)
+        = D.ideal ⟨X.basicOpen g, hWaff⟩ :=
     D.map_ideal_basicOpen ⟨U, hU⟩ g
-  have hspan : D.ideal ⟨X.basicOpen g, hWaff⟩ =
-      Ideal.span ((fun j : Fin m =>
-        (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom (c.coord j)) ''
-          (S : Set (Fin m))) := by
+  have hspan
+      : D.ideal ⟨X.basicOpen g, hWaff⟩
+        = Ideal.span
+          ((fun j : Fin m => (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom (c.coord j))
+            '' (S : Set (Fin m))) := by
     rw [← hresU, hideal, Ideal.map_span, ← Set.image_comp]
     rfl
   have hxg' : x ∈ X.basicOpen g' := hgg' ▸ hxg
@@ -132,19 +140,16 @@ theorem exists_etaleChart_restrictIdeal_eq_coordIdeal_singleton {X : Scheme.{u}}
   have hSne : S.Nonempty := by
     rcases Finset.eq_empty_or_nonempty S with rfl | hne
     · exfalso
-      have h0 : D.ideal ⟨X.basicOpen g, hWaff⟩ = ⊥ := by
-        rw [hspan]; simp
+      have h0 : D.ideal ⟨X.basicOpen g, hWaff⟩ = ⊥ := by rw [hspan]; simp
       have h0' : D.ideal (X.affineBasicOpen g') = ⊥ :=
         ideal_eq_bot_of_opens_eq D ⟨X.basicOpen g, hWaff⟩ (X.affineBasicOpen g') hgg' h0
       have hfzero := Ideal.span_singleton_eq_bot.mp (hmap.trans h0')
-      have instLoc' : IsLocalization.Away g' Γ(X, X.basicOpen g') :=
-        V.2.isLocalization_basicOpen g'
+      have instLoc' : IsLocalization.Away g' Γ(X, X.basicOpen g') := V.2.isLocalization_basicOpen g'
       have hfa : algebraMap Γ(X, (V : X.Opens)) Γ(X, X.basicOpen g') f = 0 := hfzero
       obtain ⟨cc, hcc⟩ :=
-        (IsLocalization.eq_iff_exists (Submonoid.powers g')
-          Γ(X, X.basicOpen g')).mp (show
-            algebraMap Γ(X, (V : X.Opens)) Γ(X, X.basicOpen g') f =
-              algebraMap Γ(X, (V : X.Opens)) Γ(X, X.basicOpen g') 0 by
+        (IsLocalization.eq_iff_exists (Submonoid.powers g') Γ(X, X.basicOpen g')).mp
+          (show algebraMap Γ(X, (V : X.Opens)) Γ(X, X.basicOpen g') f
+              = algebraMap Γ(X, (V : X.Opens)) Γ(X, X.basicOpen g') 0 by
             rw [hfa, map_zero])
       have hz : (cc : Γ(X, (V : X.Opens))) = 0 :=
         (mem_nonZeroDivisors_iff.mp hfnzd).2 _ (by rw [hcc, mul_zero])
@@ -161,64 +166,65 @@ theorem exists_etaleChart_restrictIdeal_eq_coordIdeal_singleton {X : Scheme.{u}}
   have hcard1 : ∀ j₁ ∈ S, ∀ j₂ ∈ S, j₁ = j₂ := by
     intro j₁ hj₁ j₂ hj₂
     by_contra hne
-    obtain ⟨h, hI⟩ : ∃ h, D.ideal ⟨X.basicOpen g, hWaff⟩ =
-        Ideal.span ({h} : Set Γ(X, X.basicOpen g)) :=
-      exists_ideal_eq_span_singleton_of_opens_eq D ⟨X.basicOpen g, hWaff⟩ (X.affineBasicOpen g') hgg'
-        ⟨_, hmap.symm⟩
+    obtain ⟨h, hI⟩
+        : ∃ h, D.ideal ⟨X.basicOpen g, hWaff⟩ = Ideal.span ({h} : Set Γ(X, X.basicOpen g)) :=
+      exists_ideal_eq_span_singleton_of_opens_eq D ⟨X.basicOpen g, hWaff⟩ (X.affineBasicOpen g')
+        hgg' ⟨_, hmap.symm⟩
     let instPB : Algebra (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, X.basicOpen g) :=
       (((X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom).comp c.coordRingHom).toAlgebra
     let instkB : Algebra k Γ(X, X.basicOpen g) :=
       ((((X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom).comp c.coordRingHom).comp
         (MvPolynomial.C : k →+* MvPolynomial (ULift.{u} (Fin m)) k)).toAlgebra
-    have instTower : IsScalarTower k (MvPolynomial (ULift.{u} (Fin m)) k)
-        Γ(X, X.basicOpen g) :=
+    have instTower : IsScalarTower k (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, X.basicOpen g) :=
       IsScalarTower.of_algebraMap_eq fun _ => by
         rw [MvPolynomial.algebraMap_eq]
         rfl
     let instPA : Algebra (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) := c.algebra
     have instFE1 : Algebra.FormallyEtale (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) :=
       c.algebra_formallyEtale hU
-    have instScalarTower : IsScalarTower (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U)
-        Γ(X, X.basicOpen g) :=
+    have instScalarTower
+        : IsScalarTower (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) Γ(X, X.basicOpen g) :=
       IsScalarTower.of_algebraMap_eq fun _ => rfl
     have instLoc : IsLocalization.Away g Γ(X, X.basicOpen g) := hU.isLocalization_basicOpen g
     have instFE2 : Algebra.FormallyEtale Γ(X, U) Γ(X, X.basicOpen g) :=
       Algebra.FormallyEtale.of_isLocalization (Submonoid.powers g)
-    have instFE3 : Algebra.FormallyEtale (MvPolynomial (ULift.{u} (Fin m)) k)
-        Γ(X, X.basicOpen g) :=
-      Algebra.FormallyEtale.comp (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U)
-        Γ(X, X.basicOpen g)
-    have hcoord : ∀ j : Fin m,
-        EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j) =
-          (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom (c.coord j) := by
+    have instFE3 : Algebra.FormallyEtale (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, X.basicOpen g) :=
+      Algebra.FormallyEtale.comp (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) Γ(X, X.basicOpen g)
+    have hcoord
+        : ∀ j : Fin m,
+          EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j)
+            = (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom (c.coord j) := by
       intro j
       rw [EtaleCoordinates.coord_def]
       show (X.presheaf.map (homOfLE (X.basicOpen_le g)).op).hom
           (c.coordRingHom (MvPolynomial.X (ULift.up j))) = _
       rw [c.coordRingHom_X]
-    have hm1 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j₁) ∈
-        D.ideal ⟨X.basicOpen g, hWaff⟩ := by
+    have hm1
+        : EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j₁)
+          ∈ D.ideal ⟨X.basicOpen g, hWaff⟩ := by
       rw [hcoord, hspan]
       exact Ideal.subset_span ⟨j₁, hj₁, rfl⟩
-    have hm2 : EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j₂) ∈
-        D.ideal ⟨X.basicOpen g, hWaff⟩ := by
+    have hm2
+        : EtaleCoordinates.coord k (ULift.{u} (Fin m)) Γ(X, X.basicOpen g) (ULift.up j₂)
+          ∈ D.ideal ⟨X.basicOpen g, hWaff⟩ := by
       rw [hcoord, hspan]
       exact Ideal.subset_span ⟨j₂, hj₂, rfl⟩
     have hone : (1 : Γ(X, X.basicOpen g)) ∈ D.ideal ⟨X.basicOpen g, hWaff⟩ :=
-      one_mem_of_coord_mem_span_singleton_of_ne (D.ideal ⟨X.basicOpen g, hWaff⟩) h hI j₁ j₂ hne hm1 hm2
+      one_mem_of_coord_mem_span_singleton_of_ne (D.ideal ⟨X.basicOpen g, hWaff⟩) h hI j₁ j₂ hne hm1
+        hm2
     have htop : D.ideal ⟨X.basicOpen g, hWaff⟩ = ⊤ := (Ideal.eq_top_iff_one _).mpr hone
     have hle := ideal_le_primeIdealOf D hWaff hxg hx
     rw [htop] at hle
     exact (hWaff.primeIdealOf ⟨x, hxg⟩).isPrime.ne_top (top_le_iff.mp hle)
   obtain ⟨j, hj⟩ :=
-    Finset.card_eq_one.mp
-      (le_antisymm (Finset.card_le_one.mpr hcard1) (Finset.card_pos.mpr hSne))
+    Finset.card_eq_one.mp (le_antisymm (Finset.card_le_one.mpr hcard1) (Finset.card_pos.mpr hSne))
   exact ⟨U, m, c, j, hxU, by rw [hDU, hj]⟩
 
-theorem inStrictNormalCrossingPosition_singleton_of_isSmoothDivisor {X : Scheme.{u}} {k : Type u} [Field k]
-    [CharZero k] (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    (D : X.IdealSheafData) (hD : IsSmoothDivisor p D) :
-    InStrictNormalCrossingPosition p [D] := by
+theorem inStrictNormalCrossingPosition_singleton_of_isSmoothDivisor
+    {X : Scheme.{u}} {k : Type u} [Field k] [CharZero k]
+    (p : X ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
+    (D : X.IdealSheafData) (hD : IsSmoothDivisor p D)
+    : InStrictNormalCrossingPosition p [D] := by
   rw [inStrictNormalCrossingPosition_iff]
   refine ⟨?_, fun x => ?_⟩
   · intro D' hD'
@@ -243,8 +249,7 @@ theorem inStrictNormalCrossingPosition_singleton_of_isSmoothDivisor {X : Scheme.
         subst hi0
         simpa using hDU
     · obtain ⟨U, m, hxU, hUW, hUaff, hc⟩ :=
-        exists_etaleChart_le p x
-          (⟨((D.support : Set X))ᶜ, D.support.2.isOpen_compl⟩ : X.Opens) hx
+        exists_etaleChart_le p x (⟨((D.support : Set X))ᶜ, D.support.2.isOpen_compl⟩ : X.Opens) hx
       obtain ⟨c⟩ := hc
       have hbot : (D.comap U.ι).support = ⊥ := by
         rw [Scheme.IdealSheafData.support_comap]

@@ -9,14 +9,15 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open NumberField Module
 
-theorem WeightedIndexBound.proof (E : Type*) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+theorem WeightedIndexBound.proof
+    (E : Type*) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
     (h₁ : CoeffLatticeBasis.Statement E) (h₂ : IndexLeDet.Statement E)
     (h₃ : WeightedNormSq.Statement E) (h₄ : WeightedSpaceDim.Statement E)
     (h₅ : ∀ [Fact (finrank ℝ (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) = finrank ℚ E)],
       MinkowskiVolumeForm.Statement (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) (finrank ℚ E))
     (h₆ : ∀ [Fact (finrank ℝ (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) = finrank ℚ E)],
-      VolumeFormIntComb.Statement (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) (finrank ℚ E)) :
-    WeightedIndexBound.Statement E := by
+      VolumeFormIntComb.Statement (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) (finrank ℚ E))
+    : WeightedIndexBound.Statement E := by
   intro c hc A hOA hFG hmin r ⟨a, ha, hr⟩
   have : Fact (finrank ℝ (EuclideanSpace ℝ (InfinitePlace E × Fin 2)) = finrank ℚ E) := ⟨h₄⟩
   obtain ⟨e⟩ := h₁ A hOA hFG
@@ -85,20 +86,24 @@ theorem WeightedIndexBound.proof (E : Type*) [Field E] [NumberField E] [_root_.N
     nlinarith [norm_nonneg (Φ (a i : E)), mul_nonneg hr0 hlam0.le]
   have hhad : |o.volumeForm (fun i => Φ (a i : E))| ≤ (r * lam) ^ finrank ℚ E := by
     refine (o.abs_volumeForm_apply_le _).trans ?_
-    calc ∏ i, ‖Φ (a i : E)‖ ≤ ∏ _i : Fin (finrank ℚ E), r * lam :=
-          Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) (fun i _ => hnorm i)
+    calc
+      ∏ i, ‖Φ (a i : E)‖ ≤ ∏ _i : Fin (finrank ℚ E), r * lam :=
+        Finset.prod_le_prod₀ (fun i _ => norm_nonneg _) (fun i _ => hnorm i)
       _ = (r * lam) ^ finrank ℚ E := by simp
 
   have hpos : 0 < (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E := pow_pos (div_pos hlam0 hsd) _
-  have hkey : |(T.det : ℝ)| * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E ≤
-      (r * Real.sqrt (finrank ℚ E)) ^ finrank ℚ E * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E := by
-    calc |(T.det : ℝ)| * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E
-        ≤ |(T.det : ℝ)| * |o.volumeForm b| :=
-          mul_le_mul_of_nonneg_left hmink (abs_nonneg _)
+  have hkey
+      : |(T.det : ℝ)| * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E
+        ≤ (r * Real.sqrt (finrank ℚ E)) ^ finrank ℚ E
+          * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E := by
+    calc
+      |(T.det : ℝ)| * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E
+        ≤ |(T.det : ℝ)| * |o.volumeForm b| := mul_le_mul_of_nonneg_left hmink (abs_nonneg _)
       _ = |o.volumeForm (fun i => Φ (a i : E))| := by rw [hvol, abs_mul]
       _ ≤ (r * lam) ^ finrank ℚ E := hhad
-      _ = (r * Real.sqrt (finrank ℚ E)) ^ finrank ℚ E * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E := by
-          rw [← mul_pow]; congr 1; field_simp
+      _ = (r * Real.sqrt (finrank ℚ E)) ^ finrank ℚ E
+          * (lam / Real.sqrt (finrank ℚ E)) ^ finrank ℚ E := by
+        rw [← mul_pow]; congr 1; field_simp
   exact hidx.trans (le_of_mul_le_mul_right hkey hpos)
 
 end GroundTheory.Heights₂.Heights.FiniteCovolume

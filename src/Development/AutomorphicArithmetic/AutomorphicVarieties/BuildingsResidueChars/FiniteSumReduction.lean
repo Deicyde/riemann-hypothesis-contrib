@@ -6,26 +6,31 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open UpperTheory.V.Af UpperTheory.V.Af.Gu
 
-theorem UpperTheory.finiteSum_reduction :
-    SumRed := by
+theorem UpperTheory.finiteSum_reduction : SumRed := by
   intro Γ k _ _ a b r r' ha hb hirr
-  let W : Submodule k (Fin (a + b) → k) :=
-    { carrier := {v | ∀ j : Fin b, v (Fin.natAdd a j) = 0}
-      add_mem' := by
-        intro x y hx hy j
-        simp [hx j, hy j]
-      zero_mem' := by
-        intro j
-        rfl
-      smul_mem' := by
-        intro c x hx j
-        simp [hx j] }
-  have hinv : Formalism.MainNotions.N.IsInv (Formalism.MainNotions.SumRepresentations.At.sumRep r r') W := by
+  let W : Submodule k (Fin (a + b) → k) := {
+    carrier := {v | ∀ j : Fin b, v (Fin.natAdd a j) = 0}
+    add_mem' := by
+      intro x y hx hy j
+      simp [hx j, hy j]
+    zero_mem' := by
+      intro j
+      rfl
+    smul_mem' := by
+      intro c x hx j
+      simp [hx j]
+  }
+  have hinv : Formalism.MainNotions.N.IsInv
+      (Formalism.MainNotions.SumRepresentations.At.sumRep r r') W := by
     intro g v hv j
-    have hM : ((Formalism.MainNotions.SumRepresentations.At.sumRep r r' g : GL (Fin (a+b)) k) : Matrix (Fin (a+b)) (Fin (a+b)) k) =
-        Matrix.reindex finSumFinEquiv finSumFinEquiv
-          (Matrix.fromBlocks (((r g) : GL (Fin a) k) : Matrix (Fin a) (Fin a) k) (0 : Matrix (Fin a) (Fin b) k)
-            (0 : Matrix (Fin b) (Fin a) k) (((r' g) : GL (Fin b) k) : Matrix (Fin b) (Fin b) k)) := rfl
+    have hM
+        : ((Formalism.MainNotions.SumRepresentations.At.sumRep r r' g : GL (Fin (a + b)) k)
+            : Matrix (Fin (a + b)) (Fin (a + b)) k)
+          = Matrix.reindex finSumFinEquiv finSumFinEquiv
+            (Matrix.fromBlocks (((r g) : GL (Fin a) k) : Matrix (Fin a) (Fin a) k)
+              (0 : Matrix (Fin a) (Fin b) k) (0 : Matrix (Fin b) (Fin a) k)
+              (((r' g) : GL (Fin b) k) : Matrix (Fin b) (Fin b) k)) :=
+      rfl
     rw [hM]
     simp only [Matrix.mulVec, dotProduct, Matrix.reindex_apply, Matrix.submatrix_apply]
     rw [Fin.sum_univ_add]

@@ -23,11 +23,13 @@ variable {ι : Type} [Fintype ι] {Fq : ι → Type} [∀ v, Field (Fq v)] [∀ 
 def beta (ψ : ∀ v, AddChar (Fq v) ℂ) (s : Finset ι) (x : ∀ v, GL (Fin k) (Fq v)) : ℂ :=
   if ∀ w, w ∉ s → x w = 1 then ∏ v ∈ s, gam (ψ v) (x v) else 0
 
-theorem beta_insert (ψ : ∀ v, AddChar (Fq v) ℂ) {a : ι} {s : Finset ι} (ha : a ∉ s)
-    (z : ∀ v, GL (Fin k) (Fq v)) :
-    beta ψ (insert a s) z =
-      ∑ y : GL (Fin k) (Fq a), gam (ψ a) y * beta ψ s ((Pi.mulSingle a y)⁻¹ * z) := by
-  have hz : ∀ w, ((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) w = if w = a then 1 else z w := by
+theorem beta_insert
+    (ψ : ∀ v, AddChar (Fq v) ℂ) {a : ι} {s : Finset ι} (ha : a ∉ s) (z : ∀ v, GL (Fin k) (Fq v))
+    : beta ψ (insert a s) z
+      = ∑ y : GL (Fin k) (Fq a), gam (ψ a) y * beta ψ s ((Pi.mulSingle a y)⁻¹ * z) := by
+  have hz
+      : ∀ w,
+        ((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) w = if w = a then 1 else z w := by
     intro w
     by_cases hw : w = a
     · subst hw
@@ -35,8 +37,9 @@ theorem beta_insert (ψ : ∀ v, AddChar (Fq v) ℂ) {a : ι} {s : Finset ι} (h
     · simp [hw, Pi.mulSingle_eq_of_ne hw]
   rw [Finset.sum_eq_single (z a)]
   · unfold beta
-    have hcond : (∀ w, w ∉ insert a s → z w = 1) ↔
-        (∀ w, w ∉ s → ((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) w = 1) := by
+    have hcond
+        : (∀ w, w ∉ insert a s → z w = 1)
+          ↔ (∀ w, w ∉ s → ((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) w = 1) := by
       constructor
       · intro h w hw
         rw [hz]
@@ -48,8 +51,9 @@ theorem beta_insert (ψ : ∀ v, AddChar (Fq v) ℂ) {a : ι} {s : Finset ι} (h
         simp only [Finset.mem_insert, not_or] at hw
         have := h w hw.2
         rwa [hz, if_neg hw.1] at this
-    have hprod : ∏ v ∈ s, gam (ψ v) (((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) v) =
-        ∏ v ∈ s, gam (ψ v) (z v) := by
+    have hprod
+        : ∏ v ∈ s, gam (ψ v) (((Pi.mulSingle a (z a))⁻¹ * z : ∀ v, GL (Fin k) (Fq v)) v)
+          = ∏ v ∈ s, gam (ψ v) (z v) := by
       refine Finset.prod_congr rfl fun v hv => ?_
       rw [hz, if_neg (fun (h : v = a) => ha (h ▸ hv))]
     by_cases h : ∀ w, w ∉ insert a s → z w = 1
@@ -66,23 +70,26 @@ theorem beta_insert (ψ : ∀ v, AddChar (Fq v) ℂ) {a : ι} {s : Finset ι} (h
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem beta_univ (ψ : ∀ v, AddChar (Fq v) ℂ) (x : ∀ v, GL (Fin k) (Fq v)) :
-    beta ψ Finset.univ x = gamProd ψ x := by
+theorem beta_univ (ψ : ∀ v, AddChar (Fq v) ℂ) (x : ∀ v, GL (Fin k) (Fq v))
+    : beta ψ Finset.univ x = gamProd ψ x := by
   unfold beta gamProd
   rw [if_pos (fun w hw => absurd (Finset.mem_univ w) hw)]
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem placeOp_apply (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
-    (v : ι) (w : V) : placeOp ψ π v w = ∑ y, gam (ψ v) y • π (Pi.mulSingle v y) w := by
+theorem placeOp_apply
+    (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (v : ι) (w : V)
+    : placeOp ψ π v w = ∑ y, gam (ψ v) y • π (Pi.mulSingle v y) w := by
   simp only [placeOp, LinearMap.sum_apply, LinearMap.smul_apply]
 
-theorem totOp_apply (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
-    (w : V) : totOp ψ π w = ∑ x, gamProd ψ x • π x w := by
+theorem totOp_apply
+    (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (w : V)
+    : totOp ψ π w = ∑ x, gamProd ψ x • π x w := by
   simp only [totOp, LinearMap.sum_apply, LinearMap.smul_apply]
 
-theorem sum_beta_empty (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
-    (w : V) : ∑ x, beta ψ ∅ x • π x w = w := by
+theorem sum_beta_empty
+    (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (w : V)
+    : ∑ x, beta ψ ∅ x • π x w = w := by
   rw [Finset.sum_eq_single 1]
   · unfold beta
     simp
@@ -94,9 +101,11 @@ theorem sum_beta_empty (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem sum_beta_insert (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
-    {a : ι} {s : Finset ι} (ha : a ∉ s) (w : V) :
-    ∑ x, beta ψ (insert a s) x • π x w = placeOp ψ π a (∑ x, beta ψ s x • π x w) := by
+theorem sum_beta_insert
+    (ψ : ∀ v, AddChar (Fq v) ℂ) (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
+    {a : ι} {s : Finset ι} (ha : a ∉ s)
+    (w : V)
+    : ∑ x, beta ψ (insert a s) x • π x w = placeOp ψ π a (∑ x, beta ψ s x • π x w) := by
   rw [placeOp_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     simp_rw [beta_insert ψ ha, Finset.sum_smul, map_sum, map_smul, Finset.smul_sum]

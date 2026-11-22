@@ -59,20 +59,28 @@ lemma block_matrix_two_line {p s : ℕ} (t : ℝ) (A : Matrix (Fin s) (Fin s) �
   generalize finSumFinEquiv.symm j = v
   rcases u with a | a <;> rcases v with b | b <;> simp
 
-def lamZ (k : ℕ) {p s : ℕ} (ρ : ℕ) {σ : Equiv.Perm (Fin p)} (ξ : Xi k p s ρ σ) (e : Matrix (Fin s) (Fin s) ℂ) :
-    B.Mat k (p + s + ρ) :=
-  (Rn k (p + s) ρ ξ.1.2)⁻¹ *
-    dmuP k (p + s) ρ ((blk2 1 (Matrix.of ξ.2.1.2) 0 1)⁻¹ *
-      blk2 (0 : Matrix (Fin p) (Fin p) ℂ) 0 0 e * blk2 1 (Matrix.of ξ.2.1.2) 0 1) *
-    Rn k (p + s) ρ ξ.1.2
+def lamZ
+    (k : ℕ)
+    {p s : ℕ}
+    (ρ : ℕ)
+    {σ : Equiv.Perm (Fin p)} (ξ : Xi k p s ρ σ)
+    (e : Matrix (Fin s) (Fin s) ℂ)
+    : B.Mat k (p + s + ρ) :=
+  (Rn k (p + s) ρ ξ.1.2)⁻¹
+    * dmuP k (p + s) ρ
+      ((blk2 1 (Matrix.of ξ.2.1.2) 0 1)⁻¹ * blk2 (0 : Matrix (Fin p) (Fin p) ℂ) 0 0 e
+        * blk2 1 (Matrix.of ξ.2.1.2) 0 1)
+    * Rn k (p + s) ρ ξ.1.2
 
-def lamL (k : ℕ) {p s : ℕ} (ρ : ℕ) {σ : Equiv.Perm (Fin p)} (ξ : Xi k p s ρ σ) :
-    Matrix (Fin s) (Fin s) ℂ →ₗ[ℝ] B.Mat k (p + s + ρ) where
+def lamL (k : ℕ) {p s : ℕ} (ρ : ℕ) {σ : Equiv.Perm (Fin p)} (ξ : Xi k p s ρ σ)
+    : Matrix (Fin s) (Fin s) ℂ →ₗ[ℝ] B.Mat k (p + s + ρ) where
   toFun := lamZ k ρ ξ
   map_add' e e' := by
-    simp only [lamZ, block_matrix_two_zero_add, Matrix.mul_add, Matrix.add_mul, leviDifferential_add]
+    simp only [lamZ, block_matrix_two_zero_add, Matrix.mul_add, Matrix.add_mul,
+      leviDifferential_add]
   map_smul' c e := by
-    simp only [lamZ, block_matrix_two_zero_smul, Matrix.mul_smul, Matrix.smul_mul, leviDifferential_smul, RingHom.id_apply]
+    simp only [lamZ, block_matrix_two_zero_smul, Matrix.mul_smul, Matrix.smul_mul,
+      leviDifferential_smul, RingHom.id_apply]
 
 lemma coef_sum {s : ℕ} (Z W : G.Mat s) :
     ∑ i : Fin s × Fin s × Bool, coefZ Z W i • eMat i.1 i.2.1 i.2.2 = (Matrix.of Z)⁻¹ * Matrix.of W := by

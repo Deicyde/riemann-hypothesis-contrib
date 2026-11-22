@@ -19,13 +19,17 @@ def IsPhys (ε : Fin n → Bool) (x : Fin n × Fin n) : Prop := ε x.1 = true �
 instance (ε : Fin n → Bool) : DecidablePred (IsPhys ε) := fun x =>
   inferInstanceAs (Decidable (ε x.1 = true ∧ ε x.2 = false))
 
-def adMat (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ) :
-    Matrix (Fin n × Fin n) (Fin n × Fin n) ℂ := fun x y =>
-  if IsPhys ε x then (if IsPhys ε y then k x.1 y.1 * star (k x.2 y.2) else 0)
-  else if x = y then 1 else 0
+def adMat (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n × Fin n) (Fin n × Fin n) ℂ := fun x y =>
+  if IsPhys ε x then
+    (if IsPhys ε y then k x.1 y.1 * star (k x.2 y.2) else 0)
+  else if x = y then
+    1
+  else
+    0
 
-def adPhys (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ) :
-    (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ) :=
+def adPhys (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ)
+    : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ) :=
   Matrix.mulVecLin (adMat ε k)
 
 def ff (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ) : Fock n →ₐ[ℂ] Fock n :=
@@ -37,11 +41,10 @@ def cpV (v : Fin n × Fin n → ℂ) : Module.End ℂ (Fock n) :=
 def dualV (v : Fin n × Fin n → ℂ) : Module.Dual ℂ (Fin n × Fin n → ℂ) :=
   ∑ x, star (v x) • LinearMap.proj (R := ℂ) (φ := fun _ : Fin n × Fin n => ℂ) x
 
-def cmV (v : Fin n × Fin n → ℂ) : Module.End ℂ (Fock n) :=
-  CliffordAlgebra.contractLeft (dualV v)
+def cmV (v : Fin n × Fin n → ℂ) : Module.End ℂ (Fock n) := CliffordAlgebra.contractLeft (dualV v)
 
-def ffMat (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ) :
-    Matrix (Finset (Fin (n * n))) (Finset (Fin (n * n))) ℂ :=
+def ffMat (ε : Fin n → Bool) (k : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Finset (Fin (n * n))) (Finset (Fin (n * n))) ℂ :=
   LinearMap.toMatrix (fockBasis n) (fockBasis n) (ff ε k).toLinearMap
 
 def IsPhysSet (ε : Fin n → Bool) (S : Finset (Fin (n * n))) : Prop :=

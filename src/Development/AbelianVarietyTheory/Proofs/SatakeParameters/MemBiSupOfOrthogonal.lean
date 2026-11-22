@@ -17,9 +17,13 @@ namespace GlobalTheory.DownMemRoad
 open Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.ThetaExh
   GlobalTheory.IndefiniteRowSideFullHecke.ThetaLiftOfEachComponent
 
-theorem mem_biSup_of_orthogonal {V ι : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    (U : ι → Submodule ℂ V) (S : Set ι) (htop : ⨆ k, U k = ⊤) (horth : ∀ k k', k ≠ k' → U k ⟂ U k')
-    {v : V} (hv : ∀ k ∉ S, v ∈ (U k)ᗮ) : v ∈ ⨆ k ∈ S, U k := by
+theorem mem_biSup_of_orthogonal
+    {V ι : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (U : ι → Submodule ℂ V)
+    (S : Set ι)
+    (htop : ⨆ k, U k = ⊤) (horth : ∀ k k', k ≠ k' → U k ⟂ U k')
+    {v : V} (hv : ∀ k ∉ S, v ∈ (U k)ᗮ)
+    : v ∈ ⨆ k ∈ S, U k := by
   have hsup : (⨆ k ∈ S, U k) ⊔ (⨆ k ∈ Sᶜ, U k) = ⊤ := by
     rw [← htop]
     exact (iSup_split U (· ∈ S)).symm
@@ -45,14 +49,15 @@ theorem mem_biSup_of_orthogonal {V ι : Type*} [NormedAddCommGroup V] [InnerProd
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
 
-theorem hasParamW_of_thetaOf (hL : ParamLaws N A) {i : N.Loc} (hS : SplitLift N A i)
-    (hloc : LocOfPt N A i) {x : N.X i} {Sig : List (Part A.CG)} (hx : HasParamX N A i x Sig)
-    {σ : what₂.FT} {P : A.AV i} (hθ : thetaOf N A i σ P) (hP : A.ptV i P = some x) :
-    HasParamW N A i σ Sig := by
+theorem hasParamW_of_thetaOf
+    (hL : ParamLaws N A)
+    {i : N.Loc} (hS : SplitLift N A i) (hloc : LocOfPt N A i)
+    {x : N.X i} {Sig : List (Part A.CG)} (hx : HasParamX N A i x Sig)
+    {σ : what₂.FT} {P : A.AV i} (hθ : thetaOf N A i σ P) (hP : A.ptV i P = some x)
+    : HasParamW N A i σ Sig := by
   obtain ⟨P', hP', h1, -, h3, h4, -⟩ := hx
   refine ⟨fun p hp => ?_, ?_, fun w hw => ?_⟩
-  · have := h1 ⟨p.a, A.tw p.π A.etaTinv, p.d⟩
-      (List.mem_map.mpr ⟨p, List.mem_append_left _ hp, rfl⟩)
+  · have := h1 ⟨p.a, A.tw p.π A.etaTinv, p.d⟩ (List.mem_map.mpr ⟨p, List.mem_append_left _ hp, rfl⟩)
     exact ⟨this.1, this.2.1⟩
   · have e : rankIso N A Sig + R.t = R.nV := by
       rw [← h3]
@@ -63,8 +68,9 @@ theorem hasParamW_of_thetaOf (hL : ParamLaws N A) {i : N.Loc} (hS : SplitLift N 
     rw [← h4 w hw, ParUpRoad.isoLoc_lift N A hL, hS σ P hθ w hw] at e
     exact (hL w).2.2.2.2 _ _ _ ((hL w).2.2.2.1 _ _ _ (A.locG_dim _ w) e)
 
-theorem typeV_isOrtho_eigC {i : N.Loc} (hT : TypeOrth N A i) {x : N.X i} {P : A.AV i}
-    (hP : A.ptV i P ≠ some x) : A.typeV i P ⟂ eigC N A i x := by
+theorem typeV_isOrtho_eigC
+    {i : N.Loc} (hT : TypeOrth N A i) {x : N.X i} {P : A.AV i} (hP : A.ptV i P ≠ some x)
+    : A.typeV i P ⟂ eigC N A i x := by
   unfold eigC
   simp only [Submodule.isOrtho_iSup_right]
   intro P' hP'
@@ -72,11 +78,13 @@ theorem typeV_isOrtho_eigC {i : N.Loc} (hT : TypeOrth N A i) {x : N.X i} {P : A.
   rintro rfl
   exact hP hP'
 
-theorem thetaP_mem (hθ : EachRowHasThetaLift N A) (hL : ParamLaws N A) {i : N.Loc}
-    (htop : ⨆ σ, what₂.isot (N.j i) σ = ⊤) (hO : PartOrth N i) (hT : TypeOrth N A i)
-    (hS : SplitLift N A i) (hloc : LocOfPt N A i) {x : N.X i} {Sig : List (Part A.CG)}
-    (hx : HasParamX N A i x Sig) {F : what₂.Mt (N.mu i) (N.j i)} (hF : F ∈ eigC N A i x) :
-    what₂.thetaP (N.mu i) (N.j i) F ∈ MjSig N A i Sig := by
+theorem thetaP_mem
+    (hθ : EachRowHasThetaLift N A) (hL : ParamLaws N A)
+    {i : N.Loc} (htop : ⨆ σ, what₂.isot (N.j i) σ = ⊤) (hO : PartOrth N i) (hT : TypeOrth N A i)
+    (hS : SplitLift N A i) (hloc : LocOfPt N A i)
+    {x : N.X i} {Sig : List (Part A.CG)} (hx : HasParamX N A i x Sig)
+    {F : what₂.Mt (N.mu i) (N.j i)} (hF : F ∈ eigC N A i x)
+    : what₂.thetaP (N.mu i) (N.j i) F ∈ MjSig N A i Sig := by
   refine mem_biSup_of_orthogonal (what₂.isot (N.j i)) {σ | HasParamW N A i σ Sig} htop hO
     fun σ hσ => ?_
   by_cases h0 : what₂.isot (N.j i) σ = ⊥
@@ -89,10 +97,14 @@ theorem thetaP_mem (hθ : EachRowHasThetaLift N A) (hL : ParamLaws N A) {i : N.L
   rw [← LinearMap.adjoint_inner_left]
   exact (typeV_isOrtho_eigC N A hT hne).inner_eq (hP.2 ⟨f, hf, rfl⟩) hF
 
-theorem downMem : ∀ (R : Ranks) (H : Host R) (what₂ : Rows.Data R) (N : NData R H what₂) (A : NAut N)
-    (i : N.Loc), ThetaOne N A → Rows.IsotInternal what₂ → PartOrth N i → TypeOrth N A i → ParamLaws N A →
-      SplitLift N A i → LocOfPt N A i → DownMem N A i := by
+theorem downMem
+    : ∀ (R : Ranks) (H : Host R) (what₂ : Rows.Data R) (N : NData R H what₂) (A : NAut N)
+        (i : N.Loc),
+      ThetaOne N A → Rows.IsotInternal what₂ → PartOrth N i → TypeOrth N A i → ParamLaws N A
+        → SplitLift N A i → LocOfPt N A i
+        → DownMem N A i := by
   rintro R H what₂ N A i hθ hI hO hT hL hS hloc x - Sig hx _ ⟨F, hF, rfl⟩
-  exact thetaP_mem N A hθ hL (hI _ (N.j_range i).1 (N.j_range i).2).submodule_iSup_eq_top hO hT hS hloc hx hF
+  exact thetaP_mem N A hθ hL (hI _ (N.j_range i).1 (N.j_range i).2).submodule_iSup_eq_top hO hT hS
+    hloc hx hF
 
 end GlobalTheory.DownMemRoad

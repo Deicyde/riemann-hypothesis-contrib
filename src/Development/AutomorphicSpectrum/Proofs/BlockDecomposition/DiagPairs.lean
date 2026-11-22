@@ -14,7 +14,8 @@ open GlobalTheory.PRep GlobalTheory.SmGL Matrix ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.IwJac
 
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
 
 variable {k n}
 

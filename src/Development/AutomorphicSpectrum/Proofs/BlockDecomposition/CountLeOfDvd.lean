@@ -188,17 +188,19 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
 
   obtain ⟨s, hsdef⟩ : ∃ s : ℂ, s = (q : ℂ) ^ (((2 : ℕ) : ℂ)⁻¹) := ⟨_, rfl⟩
   have hs2 : s ^ 2 = q := by rw [hsdef]; exact Complex.cpow_nat_inv_pow _ (by norm_num)
-  have hs0 : s ≠ 0 := by
-    intro h; rw [h] at hs2; exact hq0 (by simpa using hs2.symm)
-  have hsn : ‖s‖ ^ 2 = q := by
-    rw [← norm_pow, hs2]; simp
-  have hpow : ∀ j ≤ n + 1, (q : ℂ) ^ (((j : ℂ) * (((n + 1 : ℕ) : ℂ) - j)) / 2) = s ^ (j * (n + 1 - j)) := by
+  have hs0 : s ≠ 0 := by intro h; rw [h] at hs2; exact hq0 (by simpa using hs2.symm)
+  have hsn : ‖s‖ ^ 2 = q := by rw [← norm_pow, hs2]; simp
+  have hpow
+      : ∀ j ≤ n + 1,
+        (q : ℂ) ^ (((j : ℂ) * (((n + 1 : ℕ) : ℂ) - j)) / 2) = s ^ (j * (n + 1 - j)) := by
     intro j hj
-    have : ((j : ℂ) * (((n + 1 : ℕ) : ℂ) - j)) / 2 = ((j * (n + 1 - j) : ℕ) : ℂ) * (((2 : ℕ) : ℂ)⁻¹) := by
+    have : ((j : ℂ) * (((n + 1 : ℕ) : ℂ) - j)) / 2
+        = ((j * (n + 1 - j) : ℕ) : ℂ) * (((2 : ℕ) : ℂ)⁻¹) := by
       rw [Nat.cast_mul, Nat.cast_sub hj]; push_cast; ring
     rw [this, Complex.cpow_nat_mul, ← hsdef]
 
-  obtain ⟨b, hbdef⟩ : ∃ b : ℕ → ℂ, ∀ j, b j = (-1) ^ j * s ^ (j * (j - 1)) * (s ^ (n * j))⁻¹ := ⟨_, fun _ => rfl⟩
+  obtain ⟨b, hbdef⟩ : ∃ b : ℕ → ℂ, ∀ j, b j = (-1) ^ j * s ^ (j * (j - 1)) * (s ^ (n * j))⁻¹ :=
+    ⟨_, fun _ => rfl⟩
   have hbtop : ∀ j ≤ n + 1, b j * s ^ (j * (n + 1 - j)) = (-1) ^ j := by
     intro j hj
     have e : j * (j - 1) + j * (n + 1 - j) = n * j := by
@@ -208,8 +210,11 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
       | succ j =>
         have : n + 1 - (j + 1) = i := by omega
         have hn' : n = j + i := by omega
-        rw [this, hn']; simp only [Nat.add_sub_cancel]; ring
-    rw [hbdef, mul_assoc, mul_assoc, mul_comm (s ^ (n * j))⁻¹, ← mul_assoc (s ^ (j * (j - 1))), ← pow_add, e]
+        rw [this, hn']
+        simp only [Nat.add_sub_cancel]
+        ring
+    rw [hbdef, mul_assoc, mul_assoc, mul_comm (s ^ (n * j))⁻¹, ← mul_assoc (s ^ (j * (j - 1))),
+      ← pow_add, e]
     rw [mul_inv_cancel₀ (pow_ne_zero _ hs0), mul_one]
   have hbrec : ∀ j, b (j + 1) = -((s ^ n)⁻¹ * b j * (q : ℂ) ^ j) := by
     intro j
@@ -220,7 +225,9 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
     rw [hbdef, hbdef, e, pow_add, ← hs2, ← pow_mul, Nat.mul_succ, pow_add s (n * j) n, mul_inv]
     ring
 
-  obtain ⟨Ee, hEe⟩ : ∃ Ee : Submodule ℂ V, Ee = Submodule.span ℂ (Z '' (Finset.range (n + 1) : Set ℕ)) := ⟨_, rfl⟩
+  obtain ⟨Ee, hEe⟩
+      : ∃ Ee : Submodule ℂ V, Ee = Submodule.span ℂ (Z '' (Finset.range (n + 1) : Set ℕ)) :=
+    ⟨_, rfl⟩
   have : FiniteDimensional ℂ Ee := by
     rw [hEe]; exact FiniteDimensional.span_of_finite ℂ ((Finset.finite_toSet _).image _)
   have hEmem : ∀ j ≤ n + 1, Z j ∈ Ee := by
@@ -228,11 +235,11 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
     rcases Nat.lt_or_ge j (n + 1) with h | h
     · rw [hEe]; exact Submodule.subset_span ⟨j, by simpa using h, rfl⟩
     · have : j = n + 1 := by omega
-      rw [this, hZtop]; exact Ee.zero_mem
+      rw [this, hZtop]
+      exact Ee.zero_mem
   have hEW : ∀ y ∈ Ee, y ∈ W := by
     intro y hy
-    have : Ee ≤ W := by
-      rw [hEe, Submodule.span_le]; rintro _ ⟨j, _, rfl⟩; exact hZW j
+    have : Ee ≤ W := by rw [hEe, Submodule.span_le]; rintro _ ⟨j, _, rfl⟩; exact hZW j
     exact this hy
   have hEU : ∀ y ∈ Ee, U y ∈ Ee := by
     have : Ee ≤ Ee.comap U := by
@@ -254,15 +261,17 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
   have hn : (fun j => b j • Zs j) (n + 1) = 0 := by
     apply Subtype.ext
     simp [hZs (n + 1) le_rfl, hZtop]
-  have hrec' : ∀ j ≤ n, (fun j => b j • Zs j) (j + 1) - T ((fun j => b j • Zs j) j) =
-      (((-1 : ℂ) ^ (j + 1)) * S.esymm (j + 1)) • Zs 0 := by
+  have hrec'
+      : ∀ j ≤ n,
+        (fun j => b j • Zs j) (j + 1) - T ((fun j => b j • Zs j) j)
+          = (((-1 : ℂ) ^ (j + 1)) * S.esymm (j + 1)) • Zs 0 := by
     intro j hj
     apply Subtype.ext
     have h1 := hbtop (j + 1) (by omega)
     have h2 := hbrec j
-    simp only [map_smul, Submodule.coe_sub, Submodule.coe_smul, hT, hZs (j + 1) (by omega), hZs j (by omega),
-      hZs 0 (by omega), hrec j hj, hpow (j + 1) (by omega)]
-    have key : ∀ w : V, b j • (s ^ n)⁻¹ • (q : ℂ) ^ j • w = (-b (j + 1)) • w := by
+    simp only [map_smul, Submodule.coe_sub, Submodule.coe_smul, hT, hZs (j + 1) (by omega),
+      hZs j (by omega), hZs 0 (by omega), hrec j hj, hpow (j + 1) (by omega)]
+    have key : ∀ w : V, b j • (s ^ n)⁻¹ • (q : ℂ) ^ j • w = (- b (j + 1)) • w := by
       intro w
       rw [smul_smul, smul_smul, h2]
       congr 1
@@ -276,13 +285,15 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
     rw [hT] at hy1
     have hy0 : (y : V) ≠ 0 := fun h => hy.2 (Subtype.ext h)
     have hUy : U y = (s ^ n * z) • (y : V) := by
-      calc U y = s ^ n • (s ^ n)⁻¹ • U y := by
-            rw [smul_smul, mul_inv_cancel₀ (pow_ne_zero _ hs0), one_smul]
+      calc
+        U y = s ^ n • (s ^ n)⁻¹ • U y := by
+          rw [smul_smul, mul_inv_cancel₀ (pow_ne_zero _ hs0), one_smul]
         _ = _ := by rw [hy1, Submodule.coe_smul, smul_smul]
     have hr := hpos y hy0
     have h1 := hexp y (hEW y y.2)
-    have h2 : (B ((s ^ n * z) • (y : V)) ((s ^ n * z) • (y : V))).re =
-        ‖s ^ n * z‖ ^ 2 * (B y y).re := by
+    have h2
+        : (B ((s ^ n * z) • (y : V)) ((s ^ n * z) • (y : V))).re
+          = ‖s ^ n * z‖ ^ 2 * (B y y).re := by
       simp only [map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, RingHom.id_apply]
       rw [← mul_assoc, mul_comm ((starRingEnd ℂ) _), Complex.mul_conj, Complex.re_ofReal_mul,
         Complex.normSq_eq_norm_sq]
@@ -313,7 +324,8 @@ theorem gapPoly : PositivityTheory.Rg.Rs.GapPoly := by
   rw [hpow j (by omega)] at hp
   show _ * φ (b j • Zs j) = _
   rw [map_smul, hφ, hZs j (by omega), smul_eq_mul, ← hbtop j (by omega)]
-  calc ((q : ℂ) ^ (n + 1) - 1) * (b j * B (Z j) (Z 0))
+  calc
+    ((q : ℂ) ^ (n + 1) - 1) * (b j * B (Z j) (Z 0))
       = b j * (((q : ℂ) ^ (n + 1) - 1) * B (Z j) (Z 0)) := by ring
     _ = _ := by rw [hp]; ring
 

@@ -7,7 +7,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -114,8 +115,10 @@ lemma vadd_smul {N M : ℕ} [NeZero M] (γ : SL(2, ℤ)) (hγ : ((N * M ^ 2 : �
   field_simp
   linear_combination he'
 
-theorem cf_twist : ∀ (k N M : ℕ) (χ : DirichletCharacter ℂ N) (φ : DirichletCharacter ℂ M) (g : ℕ → ℂ), 0 < M →
-    CF k N (ch χ) g → CF k (N * M ^ 2) (fun d => ch χ d * ch φ d ^ 2) (fun n => φ n * g n) := by
+theorem cf_twist
+    : ∀ (k N M : ℕ) (χ : DirichletCharacter ℂ N) (φ : DirichletCharacter ℂ M) (g : ℕ → ℂ),
+      0 < M → CF k N (ch χ) g
+        → CF k (N * M ^ 2) (fun d => ch χ d * ch φ d ^ 2) (fun n => φ n * g n) := by
   intro k N M χ φ g hM ⟨⟨hp, hi⟩, B, hB⟩
   haveI : NeZero M := ⟨hM.ne'⟩
   obtain ⟨c, hc1, hc2⟩ := exists_coeffs φ
@@ -137,8 +140,8 @@ theorem cf_twist : ∀ (k N M : ℕ) (χ : DirichletCharacter ℂ N) (φ : Diric
     rw [qs_twist φ hc1 hp, qs_twist φ hc1 hp,
       ← hb.sum_comp fun u : ZMod M => c u * qs g ((((u.val : ℤ) : ℝ) / M) +ᵥ τ), Finset.mul_sum]
     refine Finset.sum_congr rfl fun u _ => ?_
-    obtain ⟨δ, h0, h1, h2, h3⟩ := vadd_smul γ hγ (u.val : ℤ) ((((γ 1 1 : ℤ) : ZMod M) ^ 2 * u).val : ℤ)
-      (by simp) τ
+    obtain ⟨δ, h0, h1, h2, h3⟩ :=
+      vadd_smul γ hγ (u.val : ℤ) ((((γ 1 1 : ℤ) : ZMod M) ^ 2 * u).val : ℤ) (by simp) τ
     rw [h2, hi δ h0, h3, hc2 _ u (hu.pow 2)]
     simp only [ch, h1, map_pow]
     ring

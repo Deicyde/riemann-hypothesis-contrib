@@ -22,8 +22,7 @@ theorem sigma_conj (σ : H.E ≃ₐ[ℚ] H.E) (x : H.E) : σ (H.conj x) = H.conj
   have h2 := H.conjE_apply H.φ₀ (σ x)
   exact h1.trans h2.symm
 
-theorem galE_sigmaOf (g : R.GG) : H.galE (H.sigmaOf g) = g :=
-  (H.gal).apply_symm_apply g
+theorem galE_sigmaOf (g : R.GG) : H.galE (H.sigmaOf g) = g := (H.gal).apply_symm_apply g
 
 theorem sigmaOf_b (g : R.Psi) : H.sigmaOf g H.sqrtMinusD = H.sqrtMinusD :=
   (H.galE_mem_Psi_iff _).1 (by rw [galE_sigmaOf]; exact g.2)
@@ -33,7 +32,8 @@ theorem d_pos (H : _root_.Formalism.BasicNotions.Host R) : 0 < H.d := H.hyp.2.1.
 theorem b_sq (H : _root_.Formalism.BasicNotions.Host R) : H.sqrtMinusD ^ 2 = -(H.d : H.E) := by
   exact H.sqd_sq
 
-theorem conj_b (H : _root_.Formalism.BasicNotions.Host R) : H.conj H.sqrtMinusD = -H.sqrtMinusD := by
+theorem conj_b (H : _root_.Formalism.BasicNotions.Host R)
+    : H.conj H.sqrtMinusD = -H.sqrtMinusD := by
   apply H.φ₀.injective
   have h2 := H.conjE_apply H.φ₀ H.sqrtMinusD
   refine h2.trans ?_

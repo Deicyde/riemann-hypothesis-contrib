@@ -13,20 +13,28 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.CovComp
 
-theorem cancel_lTensor (A : Type) [CommRing A] (B : Type) [CommRing B] [Algebra A B]
+theorem cancel_lTensor
+    (A : Type) [CommRing A]
+    (B : Type) [CommRing B] [Algebra A B]
     (B₁ : Type) [CommRing B₁] [Algebra A B₁] [Algebra B B₁] [IsScalarTower A B B₁]
     {K₁ K₀ : Type} [AddCommGroup K₁] [Module A K₁] [AddCommGroup K₀] [Module A K₀]
-    (d : K₁ →ₗ[A] K₀) (w : B₁ ⊗[B] (B ⊗[A] K₁)) :
-    TensorProduct.AlgebraTensorModule.cancelBaseChange A B B₁ B₁ K₀ ((d.baseChange B).lTensor B₁ w) =
-      d.lTensor B₁ (TensorProduct.AlgebraTensorModule.cancelBaseChange A B B₁ B₁ K₁ w) := by
+    (d : K₁ →ₗ[A] K₀) (w : B₁ ⊗[B] (B ⊗[A] K₁))
+    : TensorProduct.AlgebraTensorModule.cancelBaseChange A B B₁ B₁ K₀
+        ((d.baseChange B).lTensor B₁ w)
+      = d.lTensor B₁ (TensorProduct.AlgebraTensorModule.cancelBaseChange A B B₁ B₁ K₁ w) := by
   induction w with
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
   | tmul b t =>
     induction t with
     | add x y hx hy => simp only [map_add (f := _), TensorProduct.tmul_add, hx, hy]
-    | tmul c k => simp [TensorProduct.AlgebraTensorModule.cancelBaseChange_tmul, TensorProduct.smul_tmul']
+    | tmul c k =>
+      simp [TensorProduct.AlgebraTensorModule.cancelBaseChange_tmul, TensorProduct.smul_tmul']
 
-theorem cov_comp : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A](B : Type) [CommRing B] [Algebra A B](B₁ : Type) [CommRing B₁] [Algebra A B₁] [Algebra B B₁] [IsScalarTower A B B₁] (r : ℕ → A), Pf p A → Pf p B → IsRt p r → Cov p r B → Cov p (fun k => algebraMap A B (r k)) B₁ → Cov p r B₁ := by
+theorem cov_comp
+    : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A] (B : Type) [CommRing B] [Algebra A B]
+        (B₁ : Type) [CommRing B₁] [Algebra A B₁] [Algebra B B₁] [IsScalarTower A B B₁] (r : ℕ → A),
+      Pf p A → Pf p B → IsRt p r → Cov p r B → Cov p (fun k => algebraMap A B (r k)) B₁
+        → Cov p r B₁ := by
   intro p _ A _ B _ _ B₁ _ _ _ _ r hA hB hr h1 h2
   unfold Cov at h1 h2 ⊢
   intro K₁ K₀ _ _ _ _ hK₁ hK₀ d hd z hz k

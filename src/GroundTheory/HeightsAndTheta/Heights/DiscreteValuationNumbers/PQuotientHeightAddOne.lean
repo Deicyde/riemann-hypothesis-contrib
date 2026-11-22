@@ -29,12 +29,11 @@ theorem QuotientHeightAddOne.proof : QuotientHeightAddOne.Statement := by
   have h1 : P.height = Order.height p := PrimeSpectrum.height_eq_orderHeight p
   have h2 : (P.comap (Ideal.Quotient.mk I)).height = Order.height (φ p) :=
     PrimeSpectrum.height_eq_orderHeight (φ p)
-  have hne : Nonempty { l : LTSeries (PrimeSpectrum (R ⧸ I)) // l.last = p } :=
+  have hne : Nonempty {l : LTSeries (PrimeSpectrum (R ⧸ I)) // l.last = p} :=
     ⟨⟨RelSeries.singleton _ p, rfl⟩⟩
   rw [h1, h2, Order.height_eq_iSup_last_eq p, iSup_subtype', ENat.iSup_add, iSup_le_iff]
   rintro ⟨l, hl⟩
-  let l' : LTSeries (PrimeSpectrum R) :=
-    (l.map φ hφ).cons z (by simpa using hz l.head)
+  let l' : LTSeries (PrimeSpectrum R) := (l.map φ hφ).cons z (by simpa using hz l.head)
   have hlast : l'.last = φ p := by simp [l', hl]
   have := Order.length_le_height (p := l') hlast.le
   simpa [l'] using this

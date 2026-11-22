@@ -17,7 +17,8 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 open ReciprocityTheory.AnForm (levi levi_comp)
 open scoped ContDiff
 
-theorem APrimeChartLeviLocal.proof (hP : ProjHoloLocal.Statement) : APrimeChartLeviLocal.Statement := by
+theorem APrimeChartLeviLocal.proof (hP : ProjHoloLocal.Statement)
+    : APrimeChartLeviLocal.Statement := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D O Lt _ _ _ X kc y₀ hy₀
   classical
   set ψ := X.S.R.chart kc with hψ
@@ -52,12 +53,14 @@ theorem APrimeChartLeviLocal.proof (hP : ProjHoloLocal.Statement) : APrimeChartL
     DifferentiableOn.analyticAt (fun t ht => (hSp t ht).1.1.differentiableWithinAt) hS
   set β : ℂ → Fin D.n → ℂ := fun t => F (γ t) with hβ
   have hβan : AnalyticAt ℂ β 0 :=
-    DifferentiableOn.analyticAt (fun t ht =>
-      ((hFd.differentiableAt (hWo'.mem_nhds (hSp t ht).2)).comp t (hSp t ht).1.1).differentiableWithinAt) hS
+    DifferentiableOn.analyticAt
+      (fun t ht =>
+        ((hFd.differentiableAt (hWo'.mem_nhds (hSp t ht).2)).comp t
+          (hSp t ht).1.1).differentiableWithinAt)
+      hS
   have hβψ : ∀ t ∈ S, X.M.proj (γ t) ∈ ψ.source ∧ ψ (X.M.proj (γ t)) = β t := fun t ht =>
     hF (γ t) ⟨(hSp t ht).2, (hSp t ht).1.2⟩
-  have hβ0 : β 0 = y₁ := by
-    rw [← (hβψ 0 (mem_of_mem_nhds hS)).2, hγ0]
+  have hβ0 : β 0 = y₁ := by rw [← (hβψ 0 (mem_of_mem_nhds hS)).2, hγ0]
   have hβv : HasDerivAt β v 0 := by
     refine hγv.congr_of_eventuallyEq ?_
     filter_upwards [hS] with t ht
@@ -65,12 +68,12 @@ theorem APrimeChartLeviLocal.proof (hP : ProjHoloLocal.Statement) : APrimeChartL
 
   have hβN : ∀ᶠ t in 𝓝 (0 : ℂ), β t ∈ W :=
     hβan.continuousAt.preimage_mem_nhds (by rw [hβ0]; exact hWo.mem_nhds hzW)
-  have hrelC : ∀ᶠ t in 𝓝 (0 : ℂ), (∀ k, ∃ i, g (β t) ⟨k, i⟩ ≠ 0) ∧
-      ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ γ t = torusSmul c (g (β t)) := by
+  have hrelC
+      : ∀ᶠ t in 𝓝 (0 : ℂ), (∀ k, ∃ i, g (β t) ⟨k, i⟩ ≠ 0) ∧
+        ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ γ t = torusSmul c (g (β t)) := by
     filter_upwards [hS, hβN] with t ht htN
     have e₁ := hs _ htN.2
-    have hpr : X.M.proj (γ t) = ψ.symm (β t) := by
-      rw [← (hβψ t ht).2, ψ.left_inv (hβψ t ht).1]
+    have hpr : X.M.proj (γ t) = ψ.symm (β t) := by rw [← (hβψ t ht).2, ψ.left_inv (hβψ t ht).1]
     exact ⟨e₁.1.1, (X.M.fibre _ e₁.1 _ (hSp t ht).1.2).1 (by rw [e₁.2, hpr])⟩
 
   set L₁ : (Fin 1 → ℂ) →L[ℂ] ℂ := ContinuousLinearMap.proj 0 with hL₁
@@ -85,26 +88,32 @@ theorem APrimeChartLeviLocal.proof (hP : ProjHoloLocal.Statement) : APrimeChartL
   have hβL0 : (β ∘ L₁) 0 = y₁ := by simp [hL0, hβ0]
   have hτ₂ : AnalyticAt ℂ (g ∘ (β ∘ L₁)) 0 := (hgan y₁ (hy₁ ▸ hzW)).comp_of_eq hβL hβL0
 
-  have hγD : HasFDerivAt (γ ∘ L₁) ((ContinuousLinearMap.smulRight (1 : ℂ →L[ℂ] ℂ) w).comp L₁) 0 := by
+  have hγD
+      : HasFDerivAt (γ ∘ L₁) ((ContinuousLinearMap.smulRight (1 : ℂ →L[ℂ] ℂ) w).comp L₁) 0 := by
     have h := hγw.hasFDerivAt
     rw [← hL0] at h
     exact h.comp 0 L₁.hasFDerivAt
-  have s1 := levi_comp (φ := φ) e₁ hτ₁
-    (by simp only [Function.comp_apply, hL0, hγ0]
-        exact NineStatements.APrimeLeviCharts.contDiffAt_log_h hsm hz.1)
+  have s1 :=
+    levi_comp (φ := φ) e₁ hτ₁ (by
+      simp only [Function.comp_apply, hL0, hγ0]
+      exact NineStatements.APrimeLeviCharts.contDiffAt_log_h hsm hz.1)
   rw [hγD.fderiv] at s1
-  simp only [Function.comp_apply, hL0, hγ0, ContinuousLinearMap.coe_comp', ContinuousLinearMap.smulRight_apply,
-    ContinuousLinearMap.one_apply, hLe, one_smul] at s1
+  simp only [Function.comp_apply, hL0, hγ0, ContinuousLinearMap.coe_comp',
+      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply, hLe, one_smul]
+    at s1
 
-  have hβD : HasFDerivAt (β ∘ L₁) ((ContinuousLinearMap.smulRight (1 : ℂ →L[ℂ] ℂ) v).comp L₁) 0 := by
+  have hβD
+      : HasFDerivAt (β ∘ L₁) ((ContinuousLinearMap.smulRight (1 : ℂ →L[ℂ] ℂ) v).comp L₁) 0 := by
     have h := hβv.hasFDerivAt
     rw [← hL0] at h
     exact h.comp 0 L₁.hasFDerivAt
-  have s3 := levi_comp (φ := φ ∘ g) e₁ hβL
-    (by rw [hβL0]; exact (hgC y₁ (hy₁ ▸ hzW)).of_le (WithTop.coe_le_coe.2 le_top))
+  have s3 :=
+    levi_comp (φ := φ ∘ g) e₁ hβL
+      (by rw [hβL0]; exact (hgC y₁ (hy₁ ▸ hzW)).of_le (WithTop.coe_le_coe.2 le_top))
   rw [hβD.fderiv, hβL0] at s3
-  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply, ContinuousLinearMap.smulRight_apply,
-    ContinuousLinearMap.one_apply, hLe, one_smul] at s3
+  simp only [ContinuousLinearMap.coe_comp', Function.comp_apply,
+      ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply, hLe, one_smul]
+    at s3
 
   have s2 := NineStatements.APrimeLeviCharts.levi_log_h_torus hsm hτ₁ hτ₂ (hLt.eventually hrelC) e₁
   rw [← s1]

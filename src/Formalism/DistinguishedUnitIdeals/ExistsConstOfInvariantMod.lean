@@ -18,8 +18,8 @@ structure Level (LL Ks Δ : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] where
   τ : Δ → Ks ≃ₐ[LL] Ks
   a : Δ → LLˣ
 
-abbrev Amb (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D]
-    [Module LL D] : Type :=
+abbrev Amb (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
+    : Type :=
   HahnModule ℤ Ks (Ks ⊗[LL] D)
 
 section
@@ -27,16 +27,19 @@ variable {LL Ks Δ D : Type} [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGr
 
 def cf (f : Amb LL Ks D) (i : ℤ) : Ks ⊗[LL] D := ((HahnModule.of Ks).symm f).coeff i
 
-def tD (D : Type) [AddCommGroup D] [Module LL D] (τ : Ks ≃ₐ[LL] Ks) :
-    (Ks ⊗[LL] D) →ₗ[LL] (Ks ⊗[LL] D) :=
+def tD (D : Type) [AddCommGroup D] [Module LL D] (τ : Ks ≃ₐ[LL] Ks)
+    : (Ks ⊗[LL] D) →ₗ[LL] (Ks ⊗[LL] D) :=
   LinearMap.rTensor D τ.toLinearMap
 
 def grd (τ : Ks ≃ₐ[LL] Ks) (a : LLˣ) : Amb LL Ks D →+ Amb LL Ks D where
-  toFun f := HahnModule.of Ks
-    { coeff := fun i => ((a ^ i : LLˣ) : LL) • tD D τ (cf f i)
-      isPWO_support' := ((HahnModule.of Ks).symm f).isPWO_support.mono (by
-        intro i hi h0
-        exact hi (by simp only [cf, h0, map_zero, smul_zero])) }
+  toFun f :=
+    HahnModule.of Ks {
+      coeff := fun i => ((a ^ i : LLˣ) : LL) • tD D τ (cf f i)
+      isPWO_support' :=
+        ((HahnModule.of Ks).symm f).isPWO_support.mono (by
+          intro i hi h0
+          exact hi (by simp only [cf, h0, map_zero, smul_zero]))
+    }
   map_zero' := by
     apply HahnModule.ext
     funext i
@@ -48,9 +51,10 @@ def grd (τ : Ks ≃ₐ[LL] Ks) (a : LLˣ) : Amb LL Ks D →+ Amb LL Ks D where
 
 def grdB (τ : Ks ≃ₐ[LL] Ks) (a : LLˣ) (x : HahnSeries ℤ Ks) : HahnSeries ℤ Ks where
   coeff i := algebraMap LL Ks ((a ^ i : LLˣ) : LL) * τ (x.coeff i)
-  isPWO_support' := x.isPWO_support.mono (by
-    intro i hi h0
-    exact hi (by simp only [h0, map_zero, mul_zero]))
+  isPWO_support' :=
+    x.isPWO_support.mono (by
+      intro i hi h0
+      exact hi (by simp only [h0, map_zero, mul_zero]))
 
 def Level.γ (Lev : Level LL Ks Δ) : Amb LL Ks D →+ Amb LL Ks D := grd Lev.σ Lev.u
 
@@ -63,8 +67,8 @@ def cstD (Ks : Type) [CommRing Ks] [Algebra LL Ks] (d : D) : Amb LL Ks D :=
 
 def tp (Ks : Type) [CommRing Ks] (g : ℤ) : HahnSeries ℤ Ks := HahnSeries.single g 1
 
-def Xi (Ks : Type) [CommRing Ks] [Algebra LL Ks] (X : ℤ → Submodule LL D) :
-    AddSubgroup (Amb LL Ks D) where
+def Xi (Ks : Type) [CommRing Ks] [Algebra LL Ks] (X : ℤ → Submodule LL D)
+    : AddSubgroup (Amb LL Ks D) where
   carrier := {f | ∀ i, cf f i ∈ (X i).baseChange Ks}
   zero_mem' := fun i => by simp [cf]
   add_mem' := fun {f g} hf hg i => by
@@ -72,7 +76,7 @@ def Xi (Ks : Type) [CommRing Ks] [Algebra LL Ks] (X : ℤ → Submodule LL D) :
     rw [this]
     exact Submodule.add_mem _ (hf i) (hg i)
   neg_mem' := fun {f} hf i => by
-    have : cf (-f) i = -cf f i := rfl
+    have : cf (-f) i = - cf f i := rfl
     rw [this]
     exact Submodule.neg_mem _ (hf i)
 
@@ -83,8 +87,8 @@ end
 
 def PPoly {R : Type} [CommRing R] (u : Rˣ) (ℓ E : ℕ) (JS : Finset ℤ) : Polynomial R :=
   (∏ i ∈ JS.erase 0, (Polynomial.X ^ (ℓ ^ E) -
-      Polynomial.C ((u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : Rˣ) : R))) *
-    ∑ k ∈ Finset.range (ℓ ^ E), Polynomial.X ^ k
+      Polynomial.C ((u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : Rˣ) : R)))
+    * ∑ k ∈ Finset.range (ℓ ^ E), Polynomial.X ^ k
 
 section
 variable {LL D : Type} [Field LL] [AddCommGroup D] [Module LL D]
@@ -119,10 +123,11 @@ section
 variable {LL Ks Δ : Type} [Field LL] [CommRing Ks] [Algebra LL Ks]
 
 def Level.FiniteOrderFixed (Lev : Level LL Ks Δ) (ℓ s : ℕ) : Prop :=
-  (∀ x : Ks, (⇑Lev.σ)^[ℓ ^ s] x = x) ∧
-  ∀ x : Ks, Lev.σ x = x → (∀ j, Lev.τ j x = x) → ∃ c : LL, algebraMap LL Ks c = x
+  (∀ x : Ks, (⇑Lev.σ)^[ℓ ^ s] x = x)
+    ∧ ∀ x : Ks, Lev.σ x = x → (∀ j, Lev.τ j x = x) → ∃ c : LL, algebraMap LL Ks c = x
 
-def Level.PhiGammaCommute (Lev : Level LL Ks Δ) : Prop := ∀ j x, Lev.σ (Lev.τ j x) = Lev.τ j (Lev.σ x)
+def Level.PhiGammaCommute (Lev : Level LL Ks Δ) : Prop :=
+  ∀ j x, Lev.σ (Lev.τ j x) = Lev.τ j (Lev.σ x)
 
 def Level.FactV (Lev : Level LL Ks Δ) : Prop := ∀ m : ℤ, m ≠ 0 → Lev.u ^ m ≠ 1
 
@@ -130,66 +135,76 @@ end
 
 def XiModule : Prop :=
   ∀ (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (X : ℤ → Submodule LL D), Monotone X → ∀ (a : PowerSeries Ks) (f : Amb LL Ks D),
-      f ∈ Xi Ks X → HahnSeries.ofPowerSeries ℤ Ks a • f ∈ Xi Ks X
+      (X : ℤ → Submodule LL D),
+    Monotone X
+      → ∀ (a : PowerSeries Ks) (f : Amb LL Ks D),
+        f ∈ Xi Ks X → HahnSeries.ofPowerSeries ℤ Ks a • f ∈ Xi Ks X
 
 def XiShift : Prop :=
   ∀ (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (X : ℤ → Submodule LL D) (g : ℤ) (f : Amb LL Ks D),
-      tp Ks g • f ∈ Xi Ks X ↔ f ∈ Xi Ks (fun i => X (i + g))
+      (X : ℤ → Submodule LL D) (g : ℤ) (f : Amb LL Ks D),
+    tp Ks g • f ∈ Xi Ks X ↔ f ∈ Xi Ks (fun i => X (i + g))
 
 def GrdSemi : Prop :=
   ∀ (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (τ : Ks ≃ₐ[LL] Ks) (a : LLˣ) (x : HahnSeries ℤ Ks) (f : Amb LL Ks D),
-      grd τ a (x • f) = grdB τ a x • grd τ a f
+      (τ : Ks ≃ₐ[LL] Ks) (a : LLˣ) (x : HahnSeries ℤ Ks) (f : Amb LL Ks D),
+    grd τ a (x • f) = grdB τ a x • grd τ a f
 
 def XiGam : Prop :=
   ∀ (LL Ks Δ D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (Lev : Level LL Ks Δ),
-    (∀ (X : ℤ → Submodule LL D) (f : Amb LL Ks D), f ∈ Xi Ks X → Lev.γ f ∈ Xi Ks X) ∧
-    (∀ d : D, Lev.γ (cstD Ks d) = cstD Ks d) ∧ (∀ d : D, Lev.Inv (cstD Ks d))
+      (Lev : Level LL Ks Δ),
+    (∀ (X : ℤ → Submodule LL D) (f : Amb LL Ks D), f ∈ Xi Ks X → Lev.γ f ∈ Xi Ks X)
+      ∧ (∀ d : D, Lev.γ (cstD Ks d) = cstD Ks d) ∧ (∀ d : D, Lev.Inv (cstD Ks d))
 
 def KillingPolyShape : Prop :=
   ∀ (LL Ks Δ D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (Lev : Level LL Ks Δ) (ℓ s E : ℕ), Lev.FiniteOrderFixed ℓ s → s ≤ E →
-    ∀ (kind : Kind) (g b : ℤ) (U : Submodule LL D) (JS : Finset ℤ), 0 ≤ g →
-    (kind ≠ Kind.thin → g < b) →
-    (∀ i, Win2 kind g b i → i ∈ JS) →
-    ∀ (f : Amb LL Ks D) (d : D), tp Ks g • (f - cstD Ks d) ∈ Xi Ks (NbK kind b U) →
-      Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks ((PPoly Lev.u ℓ E JS).eval 1 • d) ∈
-        Xi Ks (NbK kind b U)
+      (Lev : Level LL Ks Δ) (ℓ s E : ℕ),
+    Lev.FiniteOrderFixed ℓ s → s ≤ E
+      → ∀ (kind : Kind) (g b : ℤ) (U : Submodule LL D) (JS : Finset ℤ),
+        0 ≤ g → (kind ≠ Kind.thin → g < b) → (∀ i, Win2 kind g b i → i ∈ JS)
+          → ∀ (f : Amb LL Ks D) (d : D),
+            tp Ks g • (f - cstD Ks d) ∈ Xi Ks (NbK kind b U)
+              → Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks ((PPoly Lev.u ℓ E JS).eval 1 • d)
+                ∈ Xi Ks (NbK kind b U)
 
 def KillingPolyFiltration : Prop :=
   ∀ (LL Ks Δ D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (Lev : Level LL Ks Δ) (ℓ s E : ℕ), Lev.FiniteOrderFixed ℓ s → Lev.PhiGammaCommute → s ≤ E →
-    ∀ (g : ℤ) (Fil : ℤ → Submodule LL D) (JS : Finset ℤ), 0 ≤ g →
-    (∀ u z : ℤ, Fil u ≠ Fil (u + 1) → 1 ≤ z → z ≤ g → -u - z ∈ JS) →
-    ∀ (f : Amb LL Ks D) (d : D), Lev.Inv f →
-      tp Ks g • (f - cstD Ks d) ∈ Xi Ks (fun i => Fil (-i)) →
-      ∃ d' : D, Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks d' ∈ Xi Ks (fun i => Fil (-i))
+      (Lev : Level LL Ks Δ) (ℓ s E : ℕ),
+    Lev.FiniteOrderFixed ℓ s → Lev.PhiGammaCommute → s ≤ E
+      → ∀ (g : ℤ) (Fil : ℤ → Submodule LL D) (JS : Finset ℤ),
+        0 ≤ g → (∀ u z : ℤ, Fil u ≠ Fil (u + 1) → 1 ≤ z → z ≤ g → -u - z ∈ JS)
+          → ∀ (f : Amb LL Ks D) (d : D),
+            Lev.Inv f → tp Ks g • (f - cstD Ks d) ∈ Xi Ks (fun i => Fil (-i))
+              → ∃ d' : D, Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks d' ∈ Xi Ks (fun i => Fil (-i))
 
 def RDmod : Prop :=
-  Rounding →
-  ∀ (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
-    (Fil : ℤ → Submodule LL D) (kind : Kind) (G S η g b : ℤ), IsFilt Fil → 0 ≤ G → 0 ≤ S →
-    0 ≤ η → G ≤ g → S ≤ g → η ≤ g → (kind ≠ Kind.thin → g < b) → Jumps kind G S η b Fil →
-    (∀ f ∈ Xi Ks (NbK kind b (UOf kind b η Fil)), tp Ks g • f ∈ Xi Ks (fun i => Fil (-i))) ∧
-    (∀ f ∈ Xi Ks (fun i => Fil (-i)), tp Ks g • f ∈ Xi Ks (NbK kind b (UOf kind b η Fil)))
+  Rounding
+    → ∀ (LL Ks D : Type) [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
+        (Fil : ℤ → Submodule LL D) (kind : Kind) (G S η g b : ℤ),
+      IsFilt Fil → 0 ≤ G → 0 ≤ S → 0 ≤ η → G ≤ g → S ≤ g → η ≤ g → (kind ≠ Kind.thin → g < b)
+        → Jumps kind G S η b Fil
+        → (∀ f ∈ Xi Ks (NbK kind b (UOf kind b η Fil)), tp Ks g • f ∈ Xi Ks (fun i => Fil (-i)))
+          ∧ (∀ f ∈ Xi Ks (fun i => Fil (-i)), tp Ks g • f ∈ Xi Ks (NbK kind b (UOf kind b η Fil)))
 
 section
-variable {O : Type} [CommRing O] {B : E.Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] {L : E.Lat B n V} {c : ZMod n} {ell : ℕ} {Λ : PowerSeries O} {r : ℕ}
+variable
+  {O : Type} [CommRing O]
+  {B : E.Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  {L : E.Lat B n V} {c : ZMod n} {ell : ℕ} {Λ : PowerSeries O} {r : ℕ}
 
-structure LevelModel (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] where
+structure LevelModel
+    (S : E.LevelData L c ell Λ r)
+    (LL : Type) [Field LL] [Algebra O LL]
+    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)]
+    (Δ D : Type) [AddCommGroup D] [Module LL D] where
   lev : ∀ s, Level LL (Ks s) Δ
   ρ : ∀ s, PowerSeries O →+* PowerSeries (Ks s)
-  ρ_C : ∀ s (a : O), ρ s (PowerSeries.C a) =
-    PowerSeries.C (algebraMap LL (Ks s) (algebraMap O LL a))
+  ρ_C
+    : ∀ s (a : O), ρ s (PowerSeries.C a) = PowerSeries.C (algebraMap LL (Ks s) (algebraMap O LL a))
   pr : ∀ s, S.Lv →+ Amb LL (Ks s) D
-  pr_smul : ∀ s (a : PowerSeries O) (e : S.Lv),
-    pr s (a • e) = HahnSeries.ofPowerSeries ℤ (Ks s) (ρ s a) • pr s e
+  pr_smul
+    : ∀ s (a : PowerSeries O) (e : S.Lv),
+      pr s (a • e) = HahnSeries.ofPowerSeries ℤ (Ks s) (ρ s a) • pr s e
   pr_γ : ∀ s < ell, ∀ s' < ell, ∀ e : S.Lv, pr s' (S.gE s e) = (lev s').γ (pr s' e)
   pr_inv : ∀ s < ell, ∀ e : S.Lv, (lev s).Inv (pr s e)
   pr_inj : ∀ e e' : S.Lv, (∀ s < ell, pr s e = pr s e') → e = e'
@@ -198,14 +213,16 @@ structure LevelModel (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Alge
   b : ℕ → ℕ
   η : ℕ
   mem_Nl : ∀ s < ell, ∀ e : S.Lv, e ∈ S.Nl s ↔ pr s e ∈ Xi (Ks s) (fun i => Fil s (-i))
-  mem_Nb : ∀ s < ell, ∀ e : S.Lv, e ∈ S.Nb s ↔
-    pr s e ∈ Xi (Ks s) (NbK (kind s) (b s) (UOf (kind s) (b s) η (Fil s)))
+  mem_Nb
+    : ∀ s < ell, ∀ e : S.Lv,
+      e ∈ S.Nb s ↔ pr s e ∈ Xi (Ks s) (NbK (kind s) (b s) (UOf (kind s) (b s) η (Fil s)))
   mem_Dc : ∀ s < ell, ∀ e : S.Lv, e ∈ S.Dc s ↔ ∃ d : D, ∀ s' < ell, pr s' e = cstD (Ks s') d
   const : ∀ d : D, ∃ e : S.Lv, ∀ s' < ell, pr s' e = cstD (Ks s') d
 
-variable {S : E.LevelData L c ell Λ r} {LL : Type} [Field LL] [Algebra O LL]
-  {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] {Δ D : Type}
-  [AddCommGroup D] [Module LL D]
+variable
+  {S : E.LevelData L c ell Λ r} {LL : Type} [Field LL] [Algebra O LL]
+  {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)]
+  {Δ D : Type} [AddCommGroup D] [Module LL D]
 
 def LevelModel.K1b (R : LevelModel S LL Ks Δ D) : Prop :=
   ∀ s < ell, ∃ ε : (PowerSeries (Ks s))ˣ, R.ρ s (B.p s) = (ε : PowerSeries (Ks s)) * PowerSeries.X
@@ -216,52 +233,54 @@ def LevelModel.HasU (R : LevelModel S LL Ks Δ D) (u : Oˣ) : Prop :=
 end
 
 def RDOf : Prop :=
-  Rounding →
-  ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O) (r : ℕ)
-    (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] (R : LevelModel S LL Ks Δ D) (G Sz g : ℕ),
-    R.K1b → G ≤ g → Sz ≤ g → R.η ≤ g →
-    (∀ s < ell, IsFilt (R.Fil s) ∧ (R.kind s ≠ Kind.thin → g < R.b s) ∧
-      Jumps (R.kind s) G Sz R.η (R.b s) (R.Fil s)) →
-    S.RD g
+  Rounding
+    → ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
+        [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O)
+        (r : ℕ) (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL] (Ks : ℕ → Type)
+        [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type) [AddCommGroup D] [Module LL D]
+        (R : LevelModel S LL Ks Δ D) (G Sz g : ℕ),
+      R.K1b → G ≤ g → Sz ≤ g → R.η ≤ g
+        → (∀ s < ell,
+          IsFilt (R.Fil s) ∧ (R.kind s ≠ Kind.thin → g < R.b s)
+            ∧ Jumps (R.kind s) G Sz R.η (R.b s) (R.Fil s))
+        → S.RD g
 
 def KillingPolynomialDegreeBound : Prop :=
   ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O) (r : ℕ)
-    (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] (R : LevelModel S LL Ks Δ D) (ℓ : ℕ), 0 < ℓ →
-    (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s ∧ (R.lev s).FactV) → S.K2iii
+      [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O)
+      (r : ℕ) (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL] (Ks : ℕ → Type)
+      [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type) [AddCommGroup D] [Module LL D]
+      (R : LevelModel S LL Ks Δ D) (ℓ : ℕ),
+    0 < ℓ → (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s ∧ (R.lev s).FactV) → S.K2iii
 
 def KillingPolynomialValuationBound : Prop :=
   ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O) (r : ℕ)
-    (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] (R : LevelModel S LL Ks Δ D) (u : Oˣ) (ℓ E g : ℕ) (JS : Finset ℤ),
-    R.K1b → R.HasU u → ell ≤ E + 1 → (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s) →
-    (∀ s < ell, (R.kind s ≠ Kind.thin → g < R.b s) ∧
-      ∀ i, Win2 (R.kind s) g (R.b s) i → i ∈ JS) →
-    S.K3a2 g (PPoly u ℓ E JS)
+      [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O)
+      (r : ℕ) (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL] (Ks : ℕ → Type)
+      [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type) [AddCommGroup D] [Module LL D]
+      (R : LevelModel S LL Ks Δ D) (u : Oˣ) (ℓ E g : ℕ) (JS : Finset ℤ),
+    R.K1b → R.HasU u → ell ≤ E + 1 → (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s)
+      → (∀ s < ell, (R.kind s ≠ Kind.thin → g < R.b s) ∧ ∀ i, Win2 (R.kind s) g (R.b s) i → i ∈ JS)
+      → S.K3a2 g (PPoly u ℓ E JS)
 
 def KillingPolynomialLeadingUnit : Prop :=
   ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O) (r : ℕ)
-    (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] (R : LevelModel S LL Ks Δ D) (u : Oˣ) (ℓ E g : ℕ) (JS : Finset ℤ),
-    R.K1b → R.HasU u → ell ≤ E + 1 → (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s ∧ (R.lev s).PhiGammaCommute) →
-    (∀ s < ell, Antitone (R.Fil s)) →
-    (∀ s < ell, ∀ v z : ℤ, R.Fil s v ≠ R.Fil s (v + 1) → 1 ≤ z → z ≤ g → -v - z ∈ JS) →
-    S.K3a4 g (PPoly u ℓ E JS)
+      [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O)
+      (r : ℕ) (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL] (Ks : ℕ → Type)
+      [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type) [AddCommGroup D] [Module LL D]
+      (R : LevelModel S LL Ks Δ D) (u : Oˣ) (ℓ E g : ℕ) (JS : Finset ℤ),
+    R.K1b → R.HasU u → ell ≤ E + 1
+      → (∀ s < ell, (R.lev s).FiniteOrderFixed ℓ s ∧ (R.lev s).PhiGammaCommute)
+      → (∀ s < ell, Antitone (R.Fil s))
+      → (∀ s < ell, ∀ v z : ℤ, R.Fil s v ≠ R.Fil s (v + 1) → 1 ≤ z → z ≤ g → -v - z ∈ JS)
+      → S.K3a4 g (PPoly u ℓ E JS)
 
 def DcFixOf : Prop :=
   ∀ (O : Type) [CommRing O] (B : E.Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O) (r : ℕ)
-    (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL]
-    (Ks : ℕ → Type) [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type)
-    [AddCommGroup D] [Module LL D] (_R : LevelModel S LL Ks Δ D), S.DcFix
+      [Module (PowerSeries O) V] (L : E.Lat B n V) (c : ZMod n) (ell : ℕ) (Λ : PowerSeries O)
+      (r : ℕ) (S : E.LevelData L c ell Λ r) (LL : Type) [Field LL] [Algebra O LL] (Ks : ℕ → Type)
+      [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] (Δ D : Type) [AddCommGroup D] [Module LL D]
+      (_R : LevelModel S LL Ks Δ D),
+    S.DcFix
 
 end Formalism.ExponentWindows.G

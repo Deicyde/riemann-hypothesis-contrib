@@ -25,60 +25,66 @@ open GlobalTheory.SqZero
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-variable {R : Type} [CommRing R] {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+variable
+  {R : Type} [CommRing R]
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
   {n : ℕ} {v : Fin n → (epsR R ⟶ G)}
 
-theorem isLieComb_iff_tanExp (c : Fin n → R) (w : epsR R ⟶ G) :
-    IsLieComb c v w ↔ w = tanExp v c := isLieComb_iff_lieExp c w
+theorem isLieComb_iff_tanExp (c : Fin n → R) (w : epsR R ⟶ G) : IsLieComb c v w ↔ w = tanExp v c :=
+  isLieComb_iff_lieExp c w
 
 theorem isTangent_tanExp (hv : ∀ i, IsTangent (v i)) (c : Fin n → R) : IsTangent (tanExp v c) :=
   (isTan_iff _).1 (isTanOver_tanExp hv c)
 
-def combHom (hv : ∀ i, IsTangent (v i)) :
-    (Fin n → R) →+ Additive (sp (R₀ := R) (DualNumber R) ⟶ G) :=
-  AddMonoidHom.mk' (fun c => Additive.ofMul (tanExp v c)) (fun c c' => by
-    rw [← ofMul_mul]
-    refine congrArg Additive.ofMul ?_
-    rw [← lieExp_add hv _ _ _ _ (fun _ => TrivSqZeroExt.inr_mul_inr _ _ _)
-      (fun _ => by rw [← TrivSqZeroExt.inr_add]; exact TrivSqZeroExt.inr_mul_inr _ _ _)]
-    exact lieExp_congr _ (fun i => TrivSqZeroExt.inr_add _ _ _) _ _)
+def combHom (hv : ∀ i, IsTangent (v i))
+    : (Fin n → R) →+ Additive (sp (R₀ := R) (DualNumber R) ⟶ G) :=
+  AddMonoidHom.mk'
+    (fun c => Additive.ofMul (tanExp v c))
+    (fun c c' => by
+      rw [← ofMul_mul]
+      refine congrArg Additive.ofMul ?_
+      rw [← lieExp_add hv _ _ _ _
+        (fun _ => TrivSqZeroExt.inr_mul_inr _ _ _)
+        (fun _ => by rw [← TrivSqZeroExt.inr_add]; exact TrivSqZeroExt.inr_mul_inr _ _ _)]
+      exact lieExp_congr _ (fun i => TrivSqZeroExt.inr_add _ _ _) _ _)
 
-theorem tanExp_tanExp (hv : ∀ i, IsTangent (v i)) {m : ℕ} (M : Fin m → Fin n → R)
-    (c : Fin m → R) : tanExp (fun i => tanExp v (M i)) c = tanExp v (∑ i, c i • M i) := by
+theorem tanExp_tanExp (hv : ∀ i, IsTangent (v i)) {m : ℕ} (M : Fin m → Fin n → R) (c : Fin m → R)
+    : tanExp (fun i => tanExp v (M i)) c = tanExp v (∑ i, c i • M i) := by
   change _ = (combHom hv (∑ i, c i • M i)).toMul
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, toMul_sum, tanExp, lieExp]
   refine Finset.prod_congr rfl fun i _ => ?_
   refine (comp_lieExp v _ _ _).trans ?_
-  exact lieExp_congr _ (fun j => by
-    simp [epsTo, dualTo_apply, TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.inl_mul_inr,
-      mul_comm, smul_smul]) _ _
+  exact lieExp_congr _
+    (fun j => by
+      simp [epsTo, dualTo_apply, TrivSqZeroExt.algebraMap_eq_inl, TrivSqZeroExt.inl_mul_inr,
+        mul_comm, smul_smul])
+    _ _
 
-theorem tanExp_single (hv : ∀ i, IsTangent (v i)) (i : Fin n) :
-    tanExp v (Pi.single i (1 : R)) = v i := by
+theorem tanExp_single (hv : ∀ i, IsTangent (v i)) (i : Fin n)
+    : tanExp v (Pi.single i (1 : R)) = v i := by
   rw [tanExp, lieExp, Finset.prod_eq_single i]
-  · have : ∀ h, epsTo R (inr ((Pi.single i (1 : R) : Fin n → R) i) : DualNumber R) h =
-        AlgHom.id R _ := fun h => DualNumber.algHom_ext (by
-      rw [epsTo_eps, Pi.single_eq_same]; rfl)
+  · have : ∀ h,
+        epsTo R (inr ((Pi.single i (1 : R) : Fin n → R) i) : DualNumber R) h = AlgHom.id R _ :=
+      fun h => DualNumber.algHom_ext (by rw [epsTo_eps, Pi.single_eq_same]; rfl)
     rw [this, spMap_id]
     exact Category.id_comp _
   · intro j _ hj
     exact epsTo_zero_comp ((isTan_iff _).2 (hv j)) _ (by simp [Pi.single_eq_of_ne hj]) _
   · simp
 
-theorem isLieBasis_iff_isUnit_det (hv : IsLieBasis v) (M : Matrix (Fin n) (Fin n) R) :
-    IsLieBasis (fun i => tanExp v (M i)) ↔ IsUnit M.det := by
-  have key : ∀ c : Fin n → R,
-      tanExp (fun i => tanExp v (M i)) c = tanExp v (Matrix.vecMul c M) := fun c => by
+theorem isLieBasis_iff_isUnit_det (hv : IsLieBasis v) (M : Matrix (Fin n) (Fin n) R)
+    : IsLieBasis (fun i => tanExp v (M i)) ↔ IsUnit M.det := by
+  have key
+      : ∀ c : Fin n → R,
+        tanExp (fun i => tanExp v (M i)) c = tanExp v (Matrix.vecMul c M) := fun c => by
     rw [Matrix.vecMul_eq_sum]
     exact tanExp_tanExp hv.1 (fun i => M i) c
   have hinj : Function.Injective (fun c : Fin n → R => tanExp v c) := by
     intro a b hab
     obtain ⟨c, hc, hu⟩ := hv.2 (tanExp v b) (isTangent_tanExp hv.1 b)
-    have ha : IsLieComb a v (tanExp v b) :=
-      (isLieComb_iff_tanExp _ _).2 hab.symm
-    have hb : IsLieComb b v (tanExp v b) :=
-      (isLieComb_iff_tanExp _ _).2 rfl
+    have ha : IsLieComb a v (tanExp v b) := (isLieComb_iff_tanExp _ _).2 hab.symm
+    have hb : IsLieComb b v (tanExp v b) := (isLieComb_iff_tanExp _ _).2 rfl
     exact (hu a ha).trans (hu b hb).symm
   rw [← Matrix.isUnit_iff_isUnit_det]
   constructor
@@ -100,25 +106,30 @@ theorem isLieBasis_iff_isUnit_det (hv : IsLieBasis v) (M : Matrix (Fin n) (Fin n
       rw [isLieComb_iff_tanExp, key, hd, ← hc'] at h'
       exact Matrix.vecMul_injective_of_isUnit h (hinj h').symm
 
-theorem lieComb_algebra (R : Type) [CommRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
-    (n : ℕ) (v : Fin n → (epsR R ⟶ G)) (hv : ∀ i, IsTangent (v i)) :
-    (∀ c, ∃! w, IsLieComb c v w) ∧ (∀ c w, IsLieComb c v w → IsTangent w) ∧
-    (∀ (m : ℕ) (M : Fin m → Fin n → R) (v' : Fin m → (epsR R ⟶ G)) (c : Fin m → R) (w),
-      (∀ i, IsLieComb (M i) v (v' i)) → IsLieComb c v' w → IsLieComb (∑ i, c i • M i) v w) ∧
-    (∀ i, IsLieComb (Pi.single i 1) v (v i)) ∧
-    ∀ (M : Matrix (Fin n) (Fin n) R) (v' : Fin n → (epsR R ⟶ G)), IsLieBasis v →
-      (∀ i, IsLieComb (M i) v (v' i)) → (IsLieBasis v' ↔ IsUnit M.det) := by
-  refine ⟨fun c => ⟨tanExp v c, (isLieComb_iff_tanExp _ _).2 rfl,
-    fun w hw => (isLieComb_iff_tanExp _ _).1 hw⟩, fun c w hw => ?_, fun m M v' c w hM hw => ?_,
-    fun i => (isLieComb_iff_tanExp _ _).2 (tanExp_single hv i).symm, fun M v' hb hM => ?_⟩
+theorem lieComb_algebra
+    (R : Type) [CommRing R]
+    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+    (n : ℕ) (v : Fin n → (epsR R ⟶ G)) (hv : ∀ i, IsTangent (v i))
+    : (∀ c, ∃! w, IsLieComb c v w) ∧ (∀ c w, IsLieComb c v w → IsTangent w)
+      ∧ (∀ (m : ℕ) (M : Fin m → Fin n → R) (v' : Fin m → (epsR R ⟶ G)) (c : Fin m → R) (w),
+        (∀ i, IsLieComb (M i) v (v' i)) → IsLieComb c v' w → IsLieComb (∑ i, c i • M i) v w)
+      ∧ (∀ i, IsLieComb (Pi.single i 1) v (v i))
+      ∧ ∀ (M : Matrix (Fin n) (Fin n) R) (v' : Fin n → (epsR R ⟶ G)),
+        IsLieBasis v → (∀ i, IsLieComb (M i) v (v' i)) → (IsLieBasis v' ↔ IsUnit M.det) := by
+  refine ⟨
+    fun c =>
+      ⟨tanExp v c, (isLieComb_iff_tanExp _ _).2 rfl, fun w hw => (isLieComb_iff_tanExp _ _).1 hw⟩,
+    fun c w hw => ?_,
+    fun m M v' c w hM hw => ?_,
+    fun i => (isLieComb_iff_tanExp _ _).2 (tanExp_single hv i).symm,
+    fun M v' hb hM => ?_
+  ⟩
   · rw [(isLieComb_iff_tanExp _ _).1 hw]
     exact isTangent_tanExp hv c
-  · obtain rfl : v' = fun i => tanExp v (M i) :=
-      funext fun i => (isLieComb_iff_tanExp _ _).1 (hM i)
+  · obtain rfl : v' = fun i => tanExp v (M i) := funext fun i => (isLieComb_iff_tanExp _ _).1 (hM i)
     rw [isLieComb_iff_tanExp] at hw ⊢
     rw [hw, tanExp_tanExp hv]
-  · obtain rfl : v' = fun i => tanExp v (M i) :=
-      funext fun i => (isLieComb_iff_tanExp _ _).1 (hM i)
+  · obtain rfl : v' = fun i => tanExp v (M i) := funext fun i => (isLieComb_iff_tanExp _ _).1 (hM i)
     exact isLieBasis_iff_isUnit_det hb M
 
 end GlobalTheory.LieComb

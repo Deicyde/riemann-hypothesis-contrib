@@ -33,8 +33,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS
+  GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -42,17 +47,23 @@ namespace GlobalTheory.OffTrace
 open GlobalTheory.FinPl GlobalTheory.LatPair
 open scoped Pointwise
 
-theorem supp_mulVec' {D : D7} {m n : ℕ} (X : Matrix (Fin m) (Fin n) (AE D)) {I : Ideal (AE D)} {y : Fin n → AE D}
-    (hy : ∀ i, y i ∈ I) (i : Fin m) : (X *ᵥ y) i ∈ I := by
+theorem supp_mulVec'
+    {D : D7} {m n : ℕ} (X : Matrix (Fin m) (Fin n) (AE D))
+    {I : Ideal (AE D)} {y : Fin n → AE D} (hy : ∀ i, y i ∈ I)
+    (i : Fin m)
+    : (X *ᵥ y) i ∈ I := by
   simp only [Matrix.mulVec, dotProduct]
   exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (hy j)
 
 theorem colMul_zero' {D : D7} {m n : ℕ} (x : Mx D m n) (i : Fin n) : colMul x i 0 = 0 := by
   funext r; simp [colMul]
 
-theorem glued_stab_iff {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : Type} [Fintype n] [DecidableEq n] (q : Unif k) (P : Pair k n) (g : GL n k) :
-    GlobalTheory.RootEx.embX 1 g • gluedS q 1 P.ker P.vec = gluedS q 1 P.ker P.vec ↔ g • P = P := by
+theorem glued_stab_iff
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (q : Unif k) (P : Pair k n) (g : GL n k)
+    : GlobalTheory.RootEx.embX 1 g • gluedS q 1 P.ker P.vec = gluedS q 1 P.ker P.vec
+      ↔ g • P = P := by
   rw [GlobalTheory.LevelUnfold.embX_smul_gluedS, Pair.smul_eq_iff P.hasVal_vec]
   constructor
   · intro h
@@ -68,10 +79,16 @@ theorem glued_stab_iff {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k
     rw [h1]
     exact GlobalTheory.LevelUnfold.gluedS_congr h2
 
-theorem moves_emb_iff {D : D7} {S A B : HSp D} (o : OrthDec S A B) (M : GlobalTheory.FinPl.Lat S) (LA : GlobalTheory.FinPl.Lat A)
-    (LB : GlobalTheory.FinPl.Lat B) (v : GlobalTheory.FinPl.Pl D) (h : GlobalTheory.FinPl.OrthAt o M LA LB v) (κ : GA D A) :
-    GlobalTheory.FinPl.Moves S (o.emb (κ, 1)) M M (· = v) ↔ GlobalTheory.FinPl.Moves A κ LA LA (· = v) := by
-  have e1 : ∀ y, o.pA *ᵥ (Formalism.L2.Theta.mt S (o.emb (κ, 1)) *ᵥ y) = Formalism.L2.Theta.mt A κ *ᵥ (o.pA *ᵥ y) := fun y => by
+theorem moves_emb_iff
+    {D : D7} {S A B : HSp D} (o : OrthDec S A B) (M : GlobalTheory.FinPl.Lat S)
+    (LA : GlobalTheory.FinPl.Lat A) (LB : GlobalTheory.FinPl.Lat B) (v : GlobalTheory.FinPl.Pl D)
+    (h : GlobalTheory.FinPl.OrthAt o M LA LB v) (κ : GA D A)
+    : GlobalTheory.FinPl.Moves S (o.emb (κ, 1)) M M (· = v)
+      ↔ GlobalTheory.FinPl.Moves A κ LA LA (· = v) := by
+  have e1
+      : ∀ y,
+        o.pA *ᵥ (Formalism.L2.Theta.mt S (o.emb (κ, 1)) *ᵥ y)
+          = Formalism.L2.Theta.mt A κ *ᵥ (o.pA *ᵥ y) := fun y => by
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]; congr 1; exact o.pA_emb κ 1
   have e2 : ∀ y, o.pB *ᵥ (Formalism.L2.Theta.mt S (o.emb (κ, 1)) *ᵥ y) = o.pB *ᵥ y := fun y => by
     rw [Matrix.mulVec_mulVec, o.pB_emb]; simp [Formalism.L2.Theta.mt]
@@ -86,15 +103,23 @@ theorem moves_emb_iff {D : D7} {S A B : HSp D} (o : OrthDec S A B) (M : GlobalTh
   · intro hA y hy
     rw [h, h, e1, e2, ← hA _ (supp_mulVec' _ hy)]
 
-theorem carriesLattice_wittEmbedding_iff_core {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (N : GlobalTheory.FinPl.Lat S) (M : GlobalTheory.FinPl.Lat S₀)
-    (v : GlobalTheory.FinPl.Pl D) (h : GlobalTheory.FinPl.MonoAt d N M v) (g : GA D S₀) :
-    GlobalTheory.FinPl.Moves S (d.emb0 g) N N (· = v) ↔ GlobalTheory.FinPl.Moves S₀ g M M (· = v) := by
+theorem carriesLattice_wittEmbedding_iff_core
+    {D : D7} {S S₀ : HSp D} {ρ : ℕ}
+    (d : HypDec S S₀ ρ) (N : GlobalTheory.FinPl.Lat S) (M : GlobalTheory.FinPl.Lat S₀)
+    (v : GlobalTheory.FinPl.Pl D) (h : GlobalTheory.FinPl.MonoAt d N M v) (g : GA D S₀)
+    : GlobalTheory.FinPl.Moves S (d.emb0 g) N N (· = v)
+      ↔ GlobalTheory.FinPl.Moves S₀ g M M (· = v) := by
   have eX : ∀ y, d.pX *ᵥ (Formalism.L2.Theta.mt S (d.emb0 g) *ᵥ y) = d.pX *ᵥ y := fun y => by
     rw [Matrix.mulVec_mulVec, d.wittDecomp_projX_anisotropicEmbedding]
   have eY : ∀ y, d.pY *ᵥ (Formalism.L2.Theta.mt S (d.emb0 g) *ᵥ y) = d.pY *ᵥ y := fun y => by
     rw [Matrix.mulVec_mulVec, d.wittDecomp_projY_anisotropicEmbedding]
-  have e0 : ∀ y, d.p0 *ᵥ (Formalism.L2.Theta.mt S (d.emb0 g) *ᵥ y) = Formalism.L2.Theta.mt S₀ g *ᵥ (d.p0 *ᵥ y) := fun y => by
-    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]; congr 1; exact d.wittDecomp_projAnisotropic_anisotropicEmbedding g
+  have e0
+      : ∀ y,
+        d.p0 *ᵥ (Formalism.L2.Theta.mt S (d.emb0 g) *ᵥ y)
+          = Formalism.L2.Theta.mt S₀ g *ᵥ (d.p0 *ᵥ y) := fun y => by
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+    congr 1
+    exact d.wittDecomp_projAnisotropic_anisotropicEmbedding g
   constructor
   · intro hM y₀ hy₀
     have hy : ∀ i, (d.j0 *ᵥ y₀) i ∈ idAt D (· = v) := supp_mulVec' _ hy₀
@@ -107,9 +132,12 @@ theorem carriesLattice_wittEmbedding_iff_core {D : D7} {S S₀ : HSp D} {ρ : �
   · intro hA y hy
     rw [h, h, eX, eY, e0, ← hA _ (supp_mulVec' _ hy)]
 
-theorem exists_gl_frame {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {p : GlobalTheory.FinPl.SplitPt D k} {S : HSp D} {n : Type} [Fintype n] [DecidableEq n] (β : GlobalTheory.FinPl.Frame p S n)
-    (κ : GA D S) : ∃ g : GL n k, (mt S κ).map p.pr = β.b * g.val * β.b' := by
+theorem exists_gl_frame
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {p : GlobalTheory.FinPl.SplitPt D k} {S : HSp D} {n : Type} [Fintype n] [DecidableEq n]
+    (β : GlobalTheory.FinPl.Frame p S n) (κ : GA D S)
+    : ∃ g : GL n k, (mt S κ).map p.pr = β.b * g.val * β.b' := by
   have e1 : mt S κ * mt S κ⁻¹ = 1 := by
     rw [show mt S κ * mt S κ⁻¹ = mt S (κ * κ⁻¹) from rfl, mul_inv_cancel]; rfl
   have e2 : mt S κ⁻¹ * mt S κ = 1 := by
@@ -121,18 +149,20 @@ theorem exists_gl_frame {D : D7} {k : Type} [Field k] [ValuativeRel k] [Topologi
     rw [← Matrix.map_mul, e2]
     exact Matrix.map_one _ (map_zero _) (map_one _)
   refine ⟨⟨β.b' * (mt S κ).map p.pr * β.b, β.b' * (mt S κ⁻¹).map p.pr * β.b, ?_, ?_⟩, ?_⟩
-  · calc β.b' * (mt S κ).map p.pr * β.b * (β.b' * (mt S κ⁻¹).map p.pr * β.b)
+  · calc
+      β.b' * (mt S κ).map p.pr * β.b * (β.b' * (mt S κ⁻¹).map p.pr * β.b)
           = β.b' * ((mt S κ).map p.pr * (β.b * β.b') * (mt S κ⁻¹).map p.pr) * β.b := by
-            simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [β.bb', Matrix.mul_one, hM, Matrix.mul_one, β.b'b]
-  · calc β.b' * (mt S κ⁻¹).map p.pr * β.b * (β.b' * (mt S κ).map p.pr * β.b)
+        simp only [Matrix.mul_assoc]
+      _ = 1 := by rw [β.bb', Matrix.mul_one, hM, Matrix.mul_one, β.b'b]
+  · calc
+      β.b' * (mt S κ⁻¹).map p.pr * β.b * (β.b' * (mt S κ).map p.pr * β.b)
           = β.b' * ((mt S κ⁻¹).map p.pr * (β.b * β.b') * (mt S κ).map p.pr) * β.b := by
-            simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [β.bb', Matrix.mul_one, hM', Matrix.mul_one, β.b'b]
+        simp only [Matrix.mul_assoc]
+      _ = 1 := by rw [β.bb', Matrix.mul_one, hM', Matrix.mul_one, β.b'b]
   · show _ = β.b * (β.b' * (mt S κ).map p.pr * β.b) * β.b'
-    calc (mt S κ).map p.pr = (β.b * β.b') * (mt S κ).map p.pr * (β.b * β.b') := by
-          rw [β.bb', Matrix.one_mul, Matrix.mul_one]
+    calc
+      (mt S κ).map p.pr = (β.b * β.b') * (mt S κ).map p.pr * (β.b * β.b') := by
+        rw [β.bb', Matrix.one_mul, Matrix.mul_one]
       _ = _ := by simp only [Matrix.mul_assoc]
 
 end GlobalTheory.OffTrace
-

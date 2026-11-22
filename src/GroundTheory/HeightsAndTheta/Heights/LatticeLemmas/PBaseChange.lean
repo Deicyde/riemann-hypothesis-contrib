@@ -17,30 +17,32 @@ noncomputable section
 section GramDet
 
 variable {K : Type*} [Field K] [NumberField K] {L : Type*} [Field L] [NumberField L] [Algebra K L]
-variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E]
-
+variable
+  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
 
 omit [NumberField K] [NumberField L] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] in
-theorem baseChangeCoord_one_tmul (τ : L →+* ℂ) (e : E) :
-    baseChangeCoord τ ((1 : ComplexAt τ) ⊗ₜ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] e)) =
-      (1 : ComplexAt (τ.comp (algebraMap K L))) ⊗ₜ e := by
+theorem baseChangeCoord_one_tmul (τ : L →+* ℂ) (e : E)
+    : baseChangeCoord τ ((1 : ComplexAt τ) ⊗ₜ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] e))
+      = (1 : ComplexAt (τ.comp (algebraMap K L))) ⊗ₜ e := by
   rw [baseChangeCoord_tmul]
   congr 1
   simp
 
-theorem gramDet_baseChange (h : HermitianMetric K E) (τ : L →+* ℂ) {ι : Type*} [Fintype ι]
-    [DecidableEq ι] (s : ι → E) :
-    gramDet (h.baseChange L) τ (fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i) =
-      gramDet h (τ.comp (algebraMap K L)) s := by
-  have hv : ∀ i j, inner ℂ (fibreVec (h.baseChange L) τ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] s i))
-      (fibreVec (h.baseChange L) τ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] s j)) =
-      inner ℂ (fibreVec h (τ.comp (algebraMap K L)) (s i))
-        (fibreVec h (τ.comp (algebraMap K L)) (s j)) := by
+theorem gramDet_baseChange
+    (h : HermitianMetric K E) (τ : L →+* ℂ) {ι : Type*} [Fintype ι] [DecidableEq ι] (s : ι → E)
+    : gramDet (h.baseChange L) τ (fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i)
+      = gramDet h (τ.comp (algebraMap K L)) s := by
+  have hv
+      : ∀ i j,
+        inner ℂ (fibreVec (h.baseChange L) τ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] s i))
+            (fibreVec (h.baseChange L) τ ((1 : 𝓞 L) ⊗ₜ[𝓞 K] s j))
+          = inner ℂ (fibreVec h (τ.comp (algebraMap K L)) (s i))
+            (fibreVec h (τ.comp (algebraMap K L)) (s j)) := by
     intro i j
     rw [fibreVec, fibreVec, FibreSpace.inner_equiv]
     change inner ℂ (FibreSpace.equiv h _ (baseChangeCoord τ _))
-      (FibreSpace.equiv h _ (baseChangeCoord τ _)) = _
+        (FibreSpace.equiv h _ (baseChangeCoord τ _))
+      = _
     rw [baseChangeCoord_one_tmul, baseChangeCoord_one_tmul]
     rfl
   simp only [gramDet]
@@ -72,14 +74,16 @@ theorem BaseChange.proof : BaseChange.Statement := by
   have ht : LinearIndependent (𝓞 L) (fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i) := by
     rw [← hfb]
     exact bL.linearIndependent.map' f (LinearMap.ker_eq_bot.mpr hf)
-  have hspan : Submodule.span (𝓞 L) (Set.range fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i) =
-      LinearMap.range f := by
+  have hspan
+      : Submodule.span (𝓞 L) (Set.range fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i) = LinearMap.range f := by
     rw [LinearMap.range_eq_map, ← bL.span_eq, Submodule.map_span, ← Set.range_comp, hfb]
 
   have hfin : Finite (M.carrier ⧸ N) := finite_quotient_span hs (Fintype.card_fin _)
-  have hidx : Nat.card ((𝓞 L ⊗[𝓞 K] M.carrier) ⧸
-      Submodule.span (𝓞 L) (Set.range fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i)) =
-      Nat.card (M.carrier ⧸ N) ^ Module.finrank K L := by
+  have hidx
+      : Nat.card
+          ((𝓞 L ⊗[𝓞 K] M.carrier) ⧸
+            Submodule.span (𝓞 L) (Set.range fun i ↦ (1 : 𝓞 L) ⊗ₜ[𝓞 K] s i))
+        = Nat.card (M.carrier ⧸ N) ^ Module.finrank K L := by
     rw [hspan, ← card_tensor_integers L]
     exact Nat.card_congr (AlgebraTensorModule.tensorQuotientEquiv (𝓞 L) (𝓞 K) (𝓞 L) N).toEquiv.symm
 

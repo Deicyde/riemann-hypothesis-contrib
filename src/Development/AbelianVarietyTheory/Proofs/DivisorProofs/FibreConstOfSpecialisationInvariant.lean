@@ -6,9 +6,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricR
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc GlobalTheory.TorusPart
 open Classical
@@ -17,14 +21,16 @@ open GlobalTheory.Poinc.FibLat GlobalTheory.Poinc.Eq8
 
 namespace GlobalTheory
 
-theorem fibre_exists_finite_generizing {Y Z : Type} [TopologicalSpace Y] [TopologicalSpace Z]
-    [TopologicalSpace.NoetherianSpace Y] [QuasiSober Y] [T0Space Z] (q : Y → Z)
-    (hq : Continuous q) (z : Z) :
-    ∃ T : Set Y, T.Finite ∧ (∀ e ∈ T, q e = z) ∧ ∀ w, q w = z → ∃ e ∈ T, e ⤳ w := by
+theorem fibre_exists_finite_generizing
+    {Y Z : Type} [TopologicalSpace Y] [TopologicalSpace Z] [TopologicalSpace.NoetherianSpace Y]
+    [QuasiSober Y] [T0Space Z]
+    (q : Y → Z) (hq : Continuous q)
+    (z : Z)
+    : ∃ T : Set Y, T.Finite ∧ (∀ e ∈ T, q e = z) ∧ ∀ w, q w = z → ∃ e ∈ T, e ⤳ w := by
   have hfin : (irreducibleComponents (q ⁻¹' {z})).Finite :=
     TopologicalSpace.NoetherianSpace.finite_irreducibleComponents
-  have key : ∀ C : irreducibleComponents (q ⁻¹' {z}),
-      ∃ e : Y, q e = z ∧ ∀ c ∈ C.1, e ⤳ (c : Y) := by
+  have key
+      : ∀ C : irreducibleComponents (q ⁻¹' {z}), ∃ e : Y, q e = z ∧ ∀ c ∈ C.1, e ⤳ (c : Y) := by
     intro C
     have hC : IsIrreducible C.1 := C.2.1
     have hCi : IsIrreducible (((↑) : q ⁻¹' {z} → Y) '' C.1) :=
@@ -54,34 +60,47 @@ theorem fibre_exists_finite_generizing {Y Z : Type} [TopologicalSpace Y] [Topolo
     refine ⟨f ⟨_, irreducibleComponent_mem_irreducibleComponents w'⟩, ⟨_, rfl⟩, ?_⟩
     exact (hf _).2 w' mem_irreducibleComponent
 
-theorem fibre_const_of_specializes_invariant : ∀ (Y Z : Type) [TopologicalSpace Y] [TopologicalSpace Z] [TopologicalSpace.NoetherianSpace Y] [QuasiSober Y] [T0Space Z] (q : Y → Z), Continuous q → ∀ z : Z, _root_.IsPreconnected (q ⁻¹' {z}) → ∀ P : Y → Prop, (∀ a b, q a = z → q b = z → a ⤳ b → (P a ↔ P b)) → ∀ a b, q a = z → q b = z → P a → P b := by
+theorem fibre_const_of_specializes_invariant
+    : ∀ (Y Z : Type) [TopologicalSpace Y] [TopologicalSpace Z] [TopologicalSpace.NoetherianSpace Y]
+        [QuasiSober Y] [T0Space Z] (q : Y → Z),
+      Continuous q
+        → ∀ z : Z,
+          _root_.IsPreconnected (q ⁻¹' {z})
+            → ∀ P : Y → Prop,
+              (∀ a b, q a = z → q b = z → a ⤳ b → (P a ↔ P b))
+                → ∀ a b, q a = z → q b = z → P a → P b := by
   intro Y Z _ _ _ _ _ q hq z hpc P hP a b ha hb hPa
   obtain ⟨T, hTf, hTz, hTs⟩ := fibre_exists_finite_generizing q hq z
   by_contra hPb
-  have closed : ∀ R : Y → Prop, IsClosed (⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y)) :=
-    fun R => (hTf.subset (show {e ∈ T | R e} ⊆ T from fun _ h => h.1)).isClosed_biUnion (fun _ _ => isClosed_closure)
-  have mem : ∀ (R : Y → Prop) (e w : Y), e ∈ T → R e → e ⤳ w →
-      w ∈ ⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y) := by
+  have closed : ∀ R : Y → Prop, IsClosed (⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y)) := fun R =>
+    (hTf.subset (show {e ∈ T | R e} ⊆ T from fun _ h => h.1)).isClosed_biUnion
+      (fun _ _ => isClosed_closure)
+  have mem
+      : ∀ (R : Y → Prop) (e w : Y),
+        e ∈ T → R e → e ⤳ w → w ∈ ⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y) := by
     intro R e w he hR hs
     exact Set.mem_biUnion ⟨he, hR⟩ (specializes_iff_mem_closure.1 hs)
-  have mem' : ∀ (R : Y → Prop) (w : Y), w ∈ ⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y) →
-      ∃ e, e ∈ T ∧ R e ∧ e ⤳ w := by
+  have mem'
+      : ∀ (R : Y → Prop) (w : Y),
+        w ∈ ⋃ e ∈ {e ∈ T | R e}, closure ({e} : Set Y) → ∃ e, e ∈ T ∧ R e ∧ e ⤳ w := by
     intro R w hw
     obtain ⟨e, ⟨he, hR⟩, hc⟩ := Set.mem_iUnion₂.1 hw
     exact ⟨e, he, hR, specializes_iff_mem_closure.2 hc⟩
-  obtain ⟨w, hwS, hwt, hwt'⟩ := isPreconnected_closed_iff.1 hpc _ _ (closed P) (closed (fun e => ¬ P e))
-    (by
-      intro w hw
-      obtain ⟨e, he, hs⟩ := hTs w hw
-      by_cases h : P e
-      · exact Or.inl (mem P e w he h hs)
-      · exact Or.inr (mem _ e w he h hs))
-    (by
-      obtain ⟨e, he, hs⟩ := hTs a ha
-      exact ⟨a, ha, mem P e a he ((hP e a (hTz e he) ha hs).2 hPa) hs⟩)
-    (by
-      obtain ⟨e, he, hs⟩ := hTs b hb
-      exact ⟨b, hb, mem (fun e => ¬ P e) e b he (fun h => hPb ((hP e b (hTz e he) hb hs).1 h)) hs⟩)
+  obtain ⟨w, hwS, hwt, hwt'⟩ :=
+    isPreconnected_closed_iff.1 hpc _ _ (closed P) (closed (fun e => ¬ P e))
+      (by
+        intro w hw
+        obtain ⟨e, he, hs⟩ := hTs w hw
+        by_cases h : P e
+        · exact Or.inl (mem P e w he h hs)
+        · exact Or.inr (mem _ e w he h hs))
+      (by
+        obtain ⟨e, he, hs⟩ := hTs a ha
+        exact ⟨a, ha, mem P e a he ((hP e a (hTz e he) ha hs).2 hPa) hs⟩)
+      (by
+        obtain ⟨e, he, hs⟩ := hTs b hb
+        exact
+          ⟨b, hb, mem (fun e => ¬ P e) e b he (fun h => hPb ((hP e b (hTz e he) hb hs).1 h)) hs⟩)
   have hwz : q w = z := hwS
   obtain ⟨e₁, h₁, hP₁, hs₁⟩ := mem' P w hwt
   obtain ⟨e₂, h₂, hP₂, hs₂⟩ := mem' _ w hwt'

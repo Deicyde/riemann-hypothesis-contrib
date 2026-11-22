@@ -10,18 +10,25 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanish
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory.Discrepancy
 
-theorem inMultAt_one_iff_kltAt {k : Type} [Field k] [CharZero k] {X : Scheme.{0}} [IsIntegral X]
-    [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] {p : X ⟶ Sp k} {n : ℕ} (hp : IsProjOver p)
-    (hn : topologicalKrullDim X = n) {Δ : X → ℚ} {η : RatForms p n} {m : ℕ} {G : CartierDiv X}
-    (hM : IsLogMult p n Δ η m G) (y : X) : InMultAt p n η m G y 1 ↔ KltAt p n Δ y := by
+theorem inMultAt_one_iff_kltAt
+    {k : Type} [Field k] [CharZero k]
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
+    {p : X ⟶ Sp k} {n : ℕ} (hp : IsProjOver p) (hn : topologicalKrullDim X = n)
+    {Δ : X → ℚ} {η : RatForms p n} {m : ℕ} {G : CartierDiv X} (hM : IsLogMult p n Δ η m G)
+    (y : X)
+    : InMultAt p n η m G y 1 ↔ KltAt p n Δ y := by
   haveI : IsProper p := GlobalTheory.CommonModel.isProper_of_isProjOver hp
-  have hkey : ∀ g, G.IsEqn y g → (KltAt p n Δ y ↔ ∀ (E : DivOver p), E.Through y → -1 < discrep E η m g) :=
+  have hkey
+      : ∀ g,
+        G.IsEqn y g → (KltAt p n Δ y ↔ ∀ (E : DivOver p), E.Through y → -1 < discrep E η m g) :=
     fun g hg => IsLogEqn.kltAt_iff hn hM.ne_zero hM.pos (hM.eqn y g hg)
   constructor
   · intro h
@@ -34,11 +41,14 @@ theorem inMultAt_one_iff_kltAt {k : Type} [Field k] [CharZero k] {X : Scheme.{0}
     have h1 := (hkey g hg).1 h E hE
     simpa [DivOver.ord_one] using h1
 
-theorem one_mem_ideal_iff {k : Type} [Field k] [CharZero k] {X : Scheme.{0}} [IsIntegral X]
-    [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] {p : X ⟶ Sp k} {n : ℕ} (hp : IsProjOver p)
-    (hn : topologicalKrullDim X = n) {Δ : X → ℚ} {η : RatForms p n} {m : ℕ} {G : CartierDiv X}
-    (hM : IsLogMult p n Δ η m G) {J : X.IdealSheafData} (hJ : IsMultIdeal p n η m G J)
-    (U : X.affineOpens) : (1 : Γ(X, U.1)) ∈ J.ideal U ↔ ∀ y ∈ U.1, KltAt p n Δ y := by
+theorem one_mem_ideal_iff
+    {k : Type} [Field k] [CharZero k]
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X]
+    {p : X ⟶ Sp k} {n : ℕ} (hp : IsProjOver p) (hn : topologicalKrullDim X = n)
+    {Δ : X → ℚ} {η : RatForms p n} {m : ℕ} {G : CartierDiv X} (hM : IsLogMult p n Δ η m G)
+    {J : X.IdealSheafData} (hJ : IsMultIdeal p n η m G J)
+    (U : X.affineOpens)
+    : (1 : Γ(X, U.1)) ∈ J.ideal U ↔ ∀ y ∈ U.1, KltAt p n Δ y := by
   rw [hJ U 1]
   constructor
   · intro h y hy
@@ -48,7 +58,16 @@ theorem one_mem_ideal_iff {k : Type} [Field k] [CharZero k] {X : Scheme.{0}} [Is
     subst this
     exact (inMultAt_one_iff_kltAt hp hn hM y).2 (h y hy)
 
-theorem mem_support_multIdeal_iff : ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (Δ : X → ℚ) (η : RatForms p n) (m : ℕ) (G : CartierDiv X) (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y), IsLogMult p n Δ η m G → IsLogRes p n η m G s K B → ∀ J : X.IdealSheafData, IsMultIdeal p n η m G J → ∀ x : X, x ∈ J.support ↔ ¬ KltAt p n Δ x := by
+theorem mem_support_multIdeal_iff
+    : ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
+        [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ),
+      IsProjOver p → topologicalKrullDim X = n
+        → ∀ (Δ : X → ℚ) (η : RatForms p n) (m : ℕ) (G : CartierDiv X) (Y : Scheme.{0})
+            [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y)
+            (B : Closeds Y),
+          IsLogMult p n Δ η m G → IsLogRes p n η m G s K B
+            → ∀ J : X.IdealSheafData,
+              IsMultIdeal p n η m G J → ∀ x : X, x ∈ J.support ↔ ¬ KltAt p n Δ x := by
   intro k _ _ X _ _ _ p n hp hn Δ η m G Y _ _ s _ K B hM hR J hJ x
   have hO := (isOpen_kltAt_and_lcAt_of_isLogRes k X p n hp hn Δ η m G Y s K B hM hR).1
   have hb : ∀ {U : X.Opens} {z : X}, z ∈ U → ∃ U' ∈ X.affineOpens, z ∈ U' ∧ U' ≤ U :=
@@ -71,8 +90,10 @@ theorem mem_support_multIdeal_iff : ∀ (k : Type) [Field k] [CharZero k] (X : S
     obtain ⟨f, hf, hfx⟩ := h2
     rw [Scheme.mem_basicOpen X f x hxV] at hfx
     haveI : Nonempty V := ⟨⟨x, hxV⟩⟩
-    have hgen : algebraMap (X.presheaf.stalk x) X.functionField (X.presheaf.germ V x hxV f) =
-        X.germToFunctionField V f := by simp
+    have hgen
+        : algebraMap (X.presheaf.stalk x) X.functionField (X.presheaf.germ V x hxV f)
+          = X.germToFunctionField V f := by
+      simp
     have hunit : IsUnit (X.germToFunctionField V f) := by
       rw [← hgen]
       exact hfx.map _

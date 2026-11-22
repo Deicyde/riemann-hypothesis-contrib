@@ -29,8 +29,7 @@ def Mp {r : ℕ} (X : Data E r) (ξ : Fin r → E) : Submodule (𝓞 E) (Fin r �
   carrier := {μ | μ ∈ X.Λ ∧ herm X.Gm μ ξ = 0}
   add_mem' := fun ha hb => ⟨X.Λ.add_mem ha.1 hb.1, by rw [herm_add_left, ha.2, hb.2, add_zero]⟩
   zero_mem' := ⟨X.Λ.zero_mem, by simp [herm]⟩
-  smul_mem' := fun β μ h => ⟨X.Λ.smul_mem β h.1, by
-    rw [smul_O, herm_smul_left, h.2, mul_zero]⟩
+  smul_mem' := fun β μ h => ⟨X.Λ.smul_mem β h.1, by rw [smul_O, herm_smul_left, h.2, mul_zero]⟩
 
 def Nx {r : ℕ} (X : Data E r) (ξ : Fin r → E) : Submodule (𝓞 E) (Mp X ξ) where
   carrier := {m | ∃ e : E, (m : Fin r → E) = e • ξ}
@@ -78,14 +77,15 @@ theorem isotropicCoefficientSplitting_holds : IsotropicCoefficientSplitting (E :
   haveI : Module.FinitePresentation (𝓞 E) (Mp X ξ ⧸ Nx X ξ) :=
     Module.finitePresentation_of_finite _ _
   haveI : Module.Projective (𝓞 E) (Mp X ξ ⧸ Nx X ξ) := Module.Flat.projective_of_finitePresentation
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property (Nx X ξ).mkQ LinearMap.id
-    (Submodule.mkQ_surjective _)
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property (Nx X ξ).mkQ LinearMap.id (Submodule.mkQ_surjective _)
   set ρ : Mp X ξ →ₗ[𝓞 E] Mp X ξ := LinearMap.id - s ∘ₗ (Nx X ξ).mkQ with hρdef
   have hρN : ∀ m, ∃ e : E, ((ρ m : Mp X ξ) : Fin r → E) = e • ξ := by
     intro m
     have h1 : (Nx X ξ).mkQ (s ((Nx X ξ).mkQ m)) = (Nx X ξ).mkQ m := LinearMap.congr_fun hs _
     have h2 : (Nx X ξ).mkQ (ρ m) = 0 := by
-      rw [hρdef, LinearMap.sub_apply, map_sub, LinearMap.id_apply, LinearMap.comp_apply, h1, sub_self]
+      rw [hρdef, LinearMap.sub_apply, map_sub, LinearMap.id_apply, LinearMap.comp_apply, h1,
+        sub_self]
     exact (Submodule.Quotient.mk_eq_zero _).1 h2
   choose coef hcoef using hρN
   have hρid : ∀ m ∈ Nx X ξ, ρ m = m := by

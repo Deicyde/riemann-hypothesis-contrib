@@ -30,17 +30,41 @@ theorem ph_cancel {a b : ℂ} (hb0 : b ≠ 0) (hb : Ph b) (hab : Ph (a * b)) : P
   have h := ph_mul hab (ph_inv hb)
   rwa [mul_assoc, mul_inv_cancel₀ hb0, mul_one] at h
 
-
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.Phase.Calc.calculus : (∀ a b : ℂ, _root_.GlobalTheory.Phase.Ph a → _root_.GlobalTheory.Phase.Ph b → _root_.GlobalTheory.Phase.Ph (a * b)) ∧ (∀ a : ℂ, _root_.GlobalTheory.Phase.Ph a → _root_.GlobalTheory.Phase.Ph (conj a) ∧ _root_.GlobalTheory.Phase.Ph a⁻¹) ∧
-    (∀ t : ℝ, _root_.GlobalTheory.Phase.Ph (t : ℂ)) ∧ (∀ a : ℂ, _root_.GlobalTheory.Phase.IsMu a → _root_.GlobalTheory.Phase.Ph a ∧ ‖a‖ = 1) ∧ (∀ a : ℂ, _root_.GlobalTheory.Phase.Ph a → ‖a‖ = 1 → _root_.GlobalTheory.Phase.IsMu a) ∧
-    (∀ a b : ℂ, _root_.GlobalTheory.Phase.IsMu a → _root_.GlobalTheory.Phase.IsMu b → _root_.GlobalTheory.Phase.IsMu (a * b) ∧ _root_.GlobalTheory.Phase.IsMu a⁻¹ ∧ _root_.GlobalTheory.Phase.IsMu (conj a)) ∧
-    (∀ (a : ℂ) (k : ℕ), 0 < k → (_root_.GlobalTheory.Phase.IsMu (a ^ k) → _root_.GlobalTheory.Phase.IsMu a) ∧ (_root_.GlobalTheory.Phase.Ph (a ^ k) → _root_.GlobalTheory.Phase.Ph a)) ∧
-    (∀ q : ℚ, _root_.GlobalTheory.Phase.IsMu (cexp (π * I * (q : ℂ)))) ∧ ∀ a b : ℂ, b ≠ 0 → _root_.GlobalTheory.Phase.Ph b → _root_.GlobalTheory.Phase.Ph (a * b) → _root_.GlobalTheory.Phase.Ph a := by
-  refine ⟨fun a b ha hb => ha.mul hb, fun a ha => ⟨?_, ha.inv⟩, fun t => ?_, fun a ha => ?_,
-    fun a ha h1 => ?_, fun a b ha hb => ⟨?_, ?_, ?_⟩, fun a k hk => ⟨?_, ?_⟩, fun q => ?_,
-    fun a b hb0 hb hab => ?_⟩
+theorem _root_.GlobalTheory.Phase.Calc.calculus
+    : (∀ a b : ℂ,
+        _root_.GlobalTheory.Phase.Ph a → _root_.GlobalTheory.Phase.Ph b
+          → _root_.GlobalTheory.Phase.Ph (a * b))
+      ∧ (∀ a : ℂ,
+        _root_.GlobalTheory.Phase.Ph a
+          → _root_.GlobalTheory.Phase.Ph (conj a) ∧ _root_.GlobalTheory.Phase.Ph a⁻¹)
+      ∧ (∀ t : ℝ, _root_.GlobalTheory.Phase.Ph (t : ℂ))
+      ∧ (∀ a : ℂ, _root_.GlobalTheory.Phase.IsMu a → _root_.GlobalTheory.Phase.Ph a ∧ ‖a‖ = 1)
+      ∧ (∀ a : ℂ, _root_.GlobalTheory.Phase.Ph a → ‖a‖ = 1 → _root_.GlobalTheory.Phase.IsMu a)
+      ∧ (∀ a b : ℂ,
+        _root_.GlobalTheory.Phase.IsMu a → _root_.GlobalTheory.Phase.IsMu b
+          → _root_.GlobalTheory.Phase.IsMu (a * b) ∧ _root_.GlobalTheory.Phase.IsMu a⁻¹
+            ∧ _root_.GlobalTheory.Phase.IsMu (conj a))
+      ∧ (∀ (a : ℂ) (k : ℕ),
+        0 < k
+          → (_root_.GlobalTheory.Phase.IsMu (a ^ k) → _root_.GlobalTheory.Phase.IsMu a)
+            ∧ (_root_.GlobalTheory.Phase.Ph (a ^ k) → _root_.GlobalTheory.Phase.Ph a))
+      ∧ (∀ q : ℚ, _root_.GlobalTheory.Phase.IsMu (cexp (π * I * (q : ℂ))))
+      ∧ ∀ a b : ℂ,
+        b ≠ 0 → _root_.GlobalTheory.Phase.Ph b → _root_.GlobalTheory.Phase.Ph (a * b)
+          → _root_.GlobalTheory.Phase.Ph a := by
+  refine ⟨
+    fun a b ha hb => ha.mul hb,
+    fun a ha => ⟨?_, ha.inv⟩,
+    fun t => ?_,
+    fun a ha => ?_,
+    fun a ha h1 => ?_,
+    fun a b ha hb => ⟨?_, ?_, ?_⟩,
+    fun a k hk => ⟨?_, ?_⟩,
+    fun q => ?_,
+    fun a b hb0 hb hab => ?_
+  ⟩
   · obtain ⟨m, hm, h⟩ := ha
     refine ⟨m, hm, ?_⟩
     rw [← map_pow, h, Complex.norm_conj, map_pow, Complex.conj_ofReal]

@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedWeil
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta IsDedekindDomain NumberField
 open scoped TensorProduct
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ShiftMapsUpDown
@@ -18,8 +20,10 @@ variable {D : D7}
 
 abbrev AEf (D : D7) : Type := Af D.host.F ⊗[D.host.F] D.host.E
 
-def locPart (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)) : AE D →+* Fv D.host.F v ⊗[D.host.F] D.host.E :=
-  (Algebra.TensorProduct.map (evalV D.host.F v) (AlgHom.id D.host.F D.host.E)).toRingHom.comp (finPart D)
+def locPart (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F))
+    : AE D →+* Fv D.host.F v ⊗[D.host.F] D.host.E :=
+  (Algebra.TensorProduct.map (evalV D.host.F v) (AlgHom.id D.host.F D.host.E)).toRingHom.comp
+    (finPart D)
 
 def gramFin (V : HSp D) : Matrix (Fin V.rank) (Fin V.rank) (AEf D) :=
   V.gram.map (inclR (F := D.host.F) (Af D.host.F))
@@ -53,15 +57,16 @@ theorem mapUp_add (V W : HSp D) (x y : WA V W) : mapUp V W (x + y) = mapUp V W x
   ext i j
   simp [mapUp, Matrix.mul_apply, add_mul, Finset.sum_add_distrib]
 
-theorem mapDown_add (V W : HSp D) (x y : WA V W) : mapDown V W (x + y) = mapDown V W x + mapDown V W y := by
+theorem mapDown_add (V W : HSp D) (x y : WA V W)
+    : mapDown V W (x + y) = mapDown V W x + mapDown V W y := by
   ext i j
   simp [mapDown, Matrix.mul_apply, add_mul, Finset.sum_add_distrib]
 
-theorem mapUp_neg (V W : HSp D) (x : WA V W) : mapUp V W (-x) = -mapUp V W x := by
+theorem mapUp_neg (V W : HSp D) (x : WA V W) : mapUp V W (-x) = - mapUp V W x := by
   ext i j
   simp [mapUp, Matrix.mul_apply]
 
-theorem mapDown_neg (V W : HSp D) (x : WA V W) : mapDown V W (-x) = -mapDown V W x := by
+theorem mapDown_neg (V W : HSp D) (x : WA V W) : mapDown V W (-x) = - mapDown V W x := by
   ext i j
   simp [mapDown, Matrix.mul_apply]
 
@@ -74,8 +79,9 @@ theorem mapDown_zero (V W : HSp D) : mapDown V W 0 = 0 := by
   simp [mapDown, Matrix.mul_apply]
 
 def homInt (V W : HSp D) : AddSubgroup (WA V W) where
-  carrier := {x | if V.rank ≤ W.rank then ∀ y ∈ latFin V, (mapUp V W x).mulVec y ∈ latFinAA W
-    else ∀ y ∈ latFin W, (mapDown V W x).mulVec y ∈ latFinAA V}
+  carrier :=
+    {x | if V.rank ≤ W.rank then ∀ y ∈ latFin V, (mapUp V W x).mulVec y ∈ latFinAA W
+      else ∀ y ∈ latFin W, (mapDown V W x).mulVec y ∈ latFinAA V}
   zero_mem' := by
     simp only [Set.mem_setOf_eq, mapUp_zero, mapDown_zero, Matrix.zero_mulVec]
     split_ifs
@@ -97,31 +103,45 @@ def homInt (V W : HSp D) : AddSubgroup (WA V W) where
 def homLat (V W : HSp D) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) : AddSubgroup (WA V W) :=
   offS V W S ⊓ homInt V W
 
-def UnramOutside (D : D7) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (χ : (AE D)ˣ →* Circle) : Prop :=
-  ∀ x : (AE D)ˣ, infPart D (x : AE D) = 1 → finPart D (x : AE D) ∈ intAE D →
-    finPart D ((x⁻¹ : (AE D)ˣ) : AE D) ∈ intAE D → (∀ v ∈ S, locPart D v (x : AE D) = 1) → χ x = 1
+def UnramOutside (D : D7) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (χ : (AE D)ˣ →* Circle)
+    : Prop :=
+  ∀ x : (AE D)ˣ,
+    infPart D (x : AE D) = 1 → finPart D (x : AE D) ∈ intAE D
+      → finPart D ((x⁻¹ : (AE D)ˣ) : AE D) ∈ intAE D → (∀ v ∈ S, locPart D v (x : AE D) = 1)
+      → χ x = 1
 
 def vacSignOf (ψ : AddChar (AF D.host.F) ℂ) (θ : D.host.E) (V W : HSp D) (l : WA V W) : ℂ :=
-  ψ (algebraMap D.host.F (AF D.host.F) (1 / 2) *
-    Algebra.trace (AF D.host.F) (AE D) (incA D (θ * D.host.xi0) * hHom V W l l))
+  ψ
+    (algebraMap D.host.F (AF D.host.F) (1 / 2)
+      * Algebra.trace (AF D.host.F) (AE D) (incA D (θ * D.host.xi0) * hHom V W l l))
 
 def theta0 (D : D7) : D.host.E := (1 + D.host.sqrtMinusD) / 2
 
-def vacSign (ψ : AddChar (AF D.host.F) ℂ) (V W : HSp D) (l : WA V W) : ℂ := vacSignOf ψ (theta0 D) V W l
+def vacSign (ψ : AddChar (AF D.host.F) ℂ) (V W : HSp D) (l : WA V W) : ℂ :=
+  vacSignOf ψ (theta0 D) V W l
 
 variable {X : ThetaX D} {T : ThetaTied D X}
 
-def IsVacuum (Wl : WeilTied D X T) (V W : HSp D) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (Φ : X.Sch V W) : Prop :=
+def IsVacuum
+    (Wl : WeilTied D X T)
+    (V W : HSp D)
+    (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (Φ : X.Sch V W)
+    : Prop :=
   ∀ l ∈ homLat V W S, Heisenberg₂ Wl.ψ V W l (Wl.evS V W Φ) = vacSign Wl.ψ V W l • Wl.evS V W Φ
 
 def HomLatSelfDual (D : D7) : Prop :=
-  ∀ ψ : AddChar (AF D.host.F) ℂ, IsStdChar D ψ (-1) → ∀ (V W : HSp D) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))),
-    ∀ x ∈ offS V W S, x ∈ homLat V W S ↔ ∀ l ∈ homLat V W S, ψ (sympl V W x l) = 1
+  ∀ ψ : AddChar (AF D.host.F) ℂ,
+    IsStdChar D ψ (-1)
+      → ∀ (V W : HSp D) (S : Finset (HeightOneSpectrum (𝓞 D.host.F))), ∀ x ∈ offS V W S,
+        x ∈ homLat V W S ↔ ∀ l ∈ homLat V W S, ψ (sympl V W x l) = 1
 
 def HyperspecialFixesVacuum (Wl : WeilTied D X T) : Prop :=
-  ∀ (V W : HSp D) (χ χ' : X.Chr), V.rank ≠ W.rank → ResEta D (T.eChr χ) V.rank → ResEta D (T.eChr χ') W.rank →
-    ∀ S : Finset (HeightOneSpectrum (𝓞 D.host.F)), UnramOutside D S (T.eChr χ) → UnramOutside D S (T.eChr χ') →
-      ∀ g ∈ KsphC V S, ∀ h ∈ KsphC W S, ∀ Φ : X.Sch V W, IsVacuum Wl V W S Φ → Wl.om V W χ χ' (g, h) Φ = Φ
+  ∀ (V W : HSp D) (χ χ' : X.Chr),
+    V.rank ≠ W.rank → ResEta D (T.eChr χ) V.rank → ResEta D (T.eChr χ') W.rank
+      → ∀ S : Finset (HeightOneSpectrum (𝓞 D.host.F)),
+        UnramOutside D S (T.eChr χ) → UnramOutside D S (T.eChr χ')
+          → ∀ g ∈ KsphC V S, ∀ h ∈ KsphC W S, ∀ Φ : X.Sch V W,
+            IsVacuum Wl V W S Φ → Wl.om V W χ χ' (g, h) Φ = Φ
 
 end GlobalTheory.IndefiniteRowSideFullHecke.ShiftMapsUpDown
 

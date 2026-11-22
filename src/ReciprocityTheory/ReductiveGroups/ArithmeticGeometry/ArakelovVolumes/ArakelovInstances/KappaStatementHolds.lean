@@ -10,28 +10,30 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Inst.KapPf
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.L2DbarEstimates Matrix Topology Filter
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.L2DbarEstimates Matrix
+  Topology Filter
 open scoped Classical
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem nmat_lower (w : V (nd X)) (τ : X.Ψ) : (mat (nmat X w) τ).BlockTriangular OrderDual.toDual := by
+theorem nmat_lower (w : V (nd X)) (τ : X.Ψ)
+    : (mat (nmat X w) τ).BlockTriangular OrderDual.toDual := by
   intro i j hij
   have hij' : i < j := hij
   simp [mat, nmat, hij'.ne, not_lt.mpr hij'.le]
 
-theorem ninv_lower (w : V (nd X)) (τ : X.Ψ) (x y : Fin r) (hxy : x < y) :
-    Ring.inverse (mat (nmat X w) τ) x y = 0 := by
+theorem ninv_lower (w : V (nd X)) (τ : X.Ψ) (x y : Fin r) (hxy : x < y)
+    : Ring.inverse (mat (nmat X w) τ) x y = 0 := by
   have : Invertible (mat (nmat X w) τ) := (isUnit_nmat X τ w).invertible
   have h := Matrix.blockTriangular_inv_of_blockTriangular (nmat_lower X w τ)
   rw [← Matrix.nonsing_inv_eq_ringInverse]
   exact h hxy
 
-theorem ninv_diag (w : V (nd X)) (τ : X.Ψ) (a : Fin r) : Ring.inverse (mat (nmat X w) τ) a a = 1 := by
-  have hu : IsUnit (mat (nmat X w) τ).det :=
-    (Matrix.isUnit_iff_isUnit_det _).mp (isUnit_nmat X τ w)
+theorem ninv_diag (w : V (nd X)) (τ : X.Ψ) (a : Fin r)
+    : Ring.inverse (mat (nmat X w) τ) a a = 1 := by
+  have hu : IsUnit (mat (nmat X w) τ).det := (Matrix.isUnit_iff_isUnit_det _).mp (isUnit_nmat X τ w)
 
   have h1 := congrFun (congrFun (Matrix.mul_nonsing_inv _ hu) a) a
   rw [Matrix.mul_apply, Finset.sum_eq_single a] at h1
@@ -50,20 +52,23 @@ theorem ninv_diag (w : V (nd X)) (τ : X.Ψ) (a : Fin r) : Ring.inverse (mat (nm
 def ninvF (w : V (nd X)) : Frame X.Ψ r := fun τ a c => Ring.inverse (mat (nmat X w) τ) a c
 
 theorem det_lmulL_ninv (w : V (nd X)) : LinearMap.det (lmulL X (ninvF X w)) = 1 :=
-  det_lmulL_unit X (ninvF X w) (fun τ a x h => ninv_lower X w τ a x h) (fun τ a => ninv_diag X w τ a)
+  det_lmulL_unit X (ninvF X w)
+    (fun τ a x h => ninv_lower X w τ a x h)
+    (fun τ a => ninv_diag X w τ a)
 
-theorem embF_lmulL (w : V (nd X)) (τ : X.Ψ) (v : V (nd X)) (x c : Fin r) :
-    embF X (lmulL X (ninvF X w) (vecOf X v)) τ x c =
-      (Ring.inverse (mat (nmat X w) τ) * Lin X τ v) x c := by
-  have hl : ∀ (N : Frame X.Ψ r) (u : Ent X → ℂ) (e : Ent X),
-      lmulL X N u e = ∑ k, N e.1 e.2.1.1 k * embF X u e.1 k e.2.1.2 := fun _ _ _ => rfl
+theorem embF_lmulL (w : V (nd X)) (τ : X.Ψ) (v : V (nd X)) (x c : Fin r)
+    : embF X (lmulL X (ninvF X w) (vecOf X v)) τ x c
+      = (Ring.inverse (mat (nmat X w) τ) * Lin X τ v) x c := by
+  have hl
+      : ∀ (N : Frame X.Ψ r) (u : Ent X → ℂ) (e : Ent X),
+        lmulL X N u e = ∑ k, N e.1 e.2.1.1 k * embF X u e.1 k e.2.1.2 := fun _ _ _ =>
+    rfl
   have hL : ∀ k c' : Fin r, Lin X τ v k c' = embF X (vecOf X v) τ k c' := fun _ _ => rfl
   rw [Matrix.mul_apply]
   by_cases h : c < x
   · rw [embF, dite_eq_left h, hl]
     rfl
-  ·
-    rw [embF, dite_eq_right h]
+  · rw [embF, dite_eq_right h]
     symm
     refine Finset.sum_eq_zero fun k _ => ?_
     by_cases hk : c < k
@@ -82,13 +87,17 @@ theorem kappa_statement_holds : KapGGStatement (E := E) := by
   set Φ' := fderiv ℂ Φ z with hΦ'
   have hΦ : HasFDerivAt Φ Φ' z := ((hdiff z hz).differentiableAt (hU.mem_nhds hz)).hasFDerivAt
 
-  have hmat : ∀ z' ∈ U, ∀ τ : X.Ψ, mat x0 τ * mat (nmat X z') τ =
-      ((γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x1 τ) *
-        (mat (nmat X (Φ z')) τ * mat (bf z') τ) := by
+  have hmat
+      : ∀ z' ∈ U, ∀ τ : X.Ψ,
+        mat x0 τ * mat (nmat X z') τ
+          = ((γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x1 τ)
+            * (mat (nmat X (Φ z')) τ * mat (bf z') τ) := by
     intro z' hz' τ
     have h := congrFun (hrel z' hz').2.2 τ
-    change mat x0 τ * mat (nmat X z') τ = (γ : Matrix (Fin r) (Fin r) E).map τ.1 *
-      ((mat x1 τ * mat (nmat X (Φ z')) τ) * mat (bf z') τ) at h
+    change mat x0 τ * mat (nmat X z') τ
+        = (γ : Matrix (Fin r) (Fin r) E).map τ.1
+          * ((mat x1 τ * mat (nmat X (Φ z')) τ) * mat (bf z') τ)
+      at h
     rw [h]
     simp only [Matrix.mul_assoc]
 
@@ -97,8 +106,11 @@ theorem kappa_statement_holds : KapGGStatement (E := E) := by
     have h0 : (mat x0 τ * mat (nmat X z) τ).det ≠ 0 := (hdom τ).1
     rw [hmat z hz τ, Matrix.det_mul] at h0
     exact isUnit_iff_ne_zero.mpr (left_ne_zero_of_mul h0)
-  have hrel' : ∀ τ : X.Ψ, ∀ z' ∈ U, mat (nmat X (Φ z')) τ * mat (bf z') τ =
-      (((γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x1 τ)⁻¹ * mat x0 τ) * mat (nmat X z') τ := by
+  have hrel'
+      : ∀ τ : X.Ψ, ∀ z' ∈ U,
+        mat (nmat X (Φ z')) τ * mat (bf z') τ
+          = (((γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x1 τ)⁻¹ * mat x0 τ)
+            * mat (nmat X z') τ := by
     intro τ z' hz'
     rw [Matrix.mul_assoc, hmat z' hz' τ, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ (hG τ),
       Matrix.one_mul]
@@ -106,14 +118,16 @@ theorem kappa_statement_holds : KapGGStatement (E := E) := by
     fun τ z' hz' a c h => ((hrel z' hz').2.1 τ).2 a c h
   set b := bf z with hb
 
-  have key : (rmulL X b) ∘ₗ (lmulL X (ninvF X (Φ z))) ∘ₗ
-      ((vecL X : V (nd X) →ₗ[ℂ] (Ent X → ℂ)) ∘ₗ (Φ' : V (nd X) →ₗ[ℂ] V (nd X)) ∘ₗ
-        ((vecL X).symm : (Ent X → ℂ) →ₗ[ℂ] V (nd X))) =
-      (lmulL X b) ∘ₗ (lmulL X (ninvF X z)) := by
+  have key
+      : (rmulL X b) ∘ₗ (lmulL X (ninvF X (Φ z)))
+          ∘ₗ ((vecL X : V (nd X) →ₗ[ℂ] (Ent X → ℂ)) ∘ₗ (Φ' : V (nd X) →ₗ[ℂ] V (nd X))
+            ∘ₗ ((vecL X).symm : (Ent X → ℂ) →ₗ[ℂ] V (nd X)))
+        = (lmulL X b) ∘ₗ (lmulL X (ninvF X z)) := by
     refine LinearMap.ext fun u => funext fun e => ?_
     obtain ⟨h, rfl⟩ : ∃ h, vecL X h = u := ⟨(vecL X).symm u, (vecL X).apply_symm_apply u⟩
     rcases e with ⟨τ, ⟨⟨a, c⟩, hca⟩⟩
-    have hld := lower_deriv X τ _ U hU Φ (fun z' => mat (bf z') τ) (hrel' τ) (hup τ) z hz Φ' hΦ h a c hca
+    have hld :=
+      lower_deriv X τ _ U hU Φ (fun z' => mat (bf z') τ) (hrel' τ) (hup τ) z hz Φ' hΦ h a c hca
     rw [Matrix.sub_apply, sub_eq_zero, Matrix.mul_apply, Matrix.mul_apply] at hld
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
       ContinuousLinearMap.coe_coe]

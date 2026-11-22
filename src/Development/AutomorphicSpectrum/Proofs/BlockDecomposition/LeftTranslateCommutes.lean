@@ -17,18 +17,32 @@ open PositivityTheory.RgBcC PositivityTheory.RgBcC.Fc
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def lTrL {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (V : Type)
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] (x : G n) : Lp V 2 μ →L[ℂ] Lp V 2 μ :=
-  (Lp.compMeasurePreservingₗᵢ ℂ (fun y : G n => x * y) (measurePreserving_mul_left μ x)).toContinuousLinearMap
+def lTrL
+    {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (x : G n)
+    : Lp V 2 μ →L[ℂ] Lp V 2 μ :=
+  (Lp.compMeasurePreservingₗᵢ ℂ
+    (fun y : G n => x * y)
+    (measurePreserving_mul_left μ x)).toContinuousLinearMap
 
-theorem memLp_lTr {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] {V : Type}
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] (x : G n) {f : Mat n → V}
-    (hf : MemLp (fun y : G n => f y.val) 2 μ) : MemLp (fun y : G n => lTr x f y.val) 2 μ :=
+theorem memLp_lTr
+    {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (x : G n)
+    {f : Mat n → V} (hf : MemLp (fun y : G n => f y.val) 2 μ)
+    : MemLp (fun y : G n => lTr x f y.val) 2 μ :=
   hf.comp_measurePreserving (measurePreserving_mul_left μ x)
 
-theorem lTrL_cls {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] {V : Type}
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] (x : G n) {f : Mat n → V}
-    (hf : MemLp (fun y : G n => f y.val) 2 μ) : lTrL μ V x (cls μ f) = cls μ (lTr x f) := by
+theorem lTrL_cls
+    {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (x : G n)
+    {f : Mat n → V} (hf : MemLp (fun y : G n => f y.val) 2 μ)
+    : lTrL μ V x (cls μ f) = cls μ (lTr x f) := by
   unfold cls
   rw [dite_eq_left hf, dite_eq_left (memLp_lTr μ x hf)]
   exact Lp.toLp_compMeasurePreserving hf (measurePreserving_mul_left μ x)

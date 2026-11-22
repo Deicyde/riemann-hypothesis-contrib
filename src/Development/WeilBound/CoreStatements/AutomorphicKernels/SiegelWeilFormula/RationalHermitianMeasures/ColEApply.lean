@@ -11,14 +11,19 @@ set_option linter.unusedSectionVars false
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.MeasD
 
-open PositivityTheory.SiegelWeilFormula PositivityTheory.SiegelWeilFormula.KWhit PositivityTheory.SiegelWeilFormula.kfour
+open PositivityTheory.SiegelWeilFormula PositivityTheory.SiegelWeilFormula.KWhit
+  PositivityTheory.SiegelWeilFormula.kfour
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 def colE (m n : ℕ) : (Fin n → Fin m → AF F ⊗[F] E) ≃ₜ+ Mx F E m n where
   toFun := toMx
@@ -26,13 +31,16 @@ def colE (m n : ℕ) : (Fin n → Fin m → AF F ⊗[F] E) ≃ₜ+ Mx F E m n wh
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
   map_add' := fun _ _ => rfl
-  continuous_toFun := continuous_pi fun a => continuous_pi fun j => (continuous_apply a).comp (continuous_apply j)
-  continuous_invFun := continuous_pi fun j => continuous_pi fun a => (continuous_apply j).comp (continuous_apply a)
+  continuous_toFun :=
+    continuous_pi fun a => continuous_pi fun j => (continuous_apply a).comp (continuous_apply j)
+  continuous_invFun :=
+    continuous_pi fun j => continuous_pi fun a => (continuous_apply j).comp (continuous_apply a)
 
-def colM (m n : ℕ) : (Fin n → Fin m → AF F ⊗[F] E) ≃ᵐ Mx F E m n := (colE (F := F) (E := E) m n).toHomeomorph.toMeasurableEquiv
+def colM (m n : ℕ) : (Fin n → Fin m → AF F ⊗[F] E) ≃ᵐ Mx F E m n :=
+  (colE (F := F) (E := E) m n).toHomeomorph.toMeasurableEquiv
 
-theorem toMx_mem {m n : ℕ} (Y : Fin n → Fin m → AF F ⊗[F] E) :
-    toMx Y ∈ ratMx F E m n ↔ Y ∈ MeasP.ratTupA F E n m := by
+theorem toMx_mem {m n : ℕ} (Y : Fin n → Fin m → AF F ⊗[F] E)
+    : toMx Y ∈ ratMx F E m n ↔ Y ∈ MeasP.ratTupA F E n m := by
   rw [mem_ratMx]
   constructor
   · rintro ⟨X, hX⟩
@@ -51,14 +59,18 @@ def ratEq (m n : ℕ) : ratMx F E m n ≃ MeasP.ratTupA F E n m where
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem meas_toMx (d : SD σ) (μ : Measure (Fin d.n → Fin d.m → AF F ⊗[F] E)) (𝓕 : Set (Fin d.n → Fin d.m → AF F ⊗[F] E))
-    (hμ : μ.IsAddHaarMeasure) (hF : IsAddFundamentalDomain (MeasP.ratTupA F E d.n d.m) 𝓕 μ) (h1 : μ 𝓕 = 1) :
-    MeasurableEmbedding (toMx (F := F) (E := E) (m := d.m) (n := d.n)) ∧ (μ.map toMx).IsAddHaarMeasure ∧
-      IsAddFundamentalDomain d.ratM (toMx '' 𝓕) (μ.map toMx) ∧ μ.map toMx (toMx '' 𝓕) = 1 := by
-  have hemb : MeasurableEmbedding (toMx (F := F) (E := E) (m := d.m) (n := d.n)) := (colM d.m d.n).measurableEmbedding
+theorem meas_toMx
+    (d : SD σ) (μ : Measure (Fin d.n → Fin d.m → AF F ⊗[F] E))
+    (𝓕 : Set (Fin d.n → Fin d.m → AF F ⊗[F] E)) (hμ : μ.IsAddHaarMeasure)
+    (hF : IsAddFundamentalDomain (MeasP.ratTupA F E d.n d.m) 𝓕 μ) (h1 : μ 𝓕 = 1)
+    : MeasurableEmbedding (toMx (F := F) (E := E) (m := d.m) (n := d.n))
+      ∧ (μ.map toMx).IsAddHaarMeasure ∧ IsAddFundamentalDomain d.ratM (toMx '' 𝓕) (μ.map toMx)
+      ∧ μ.map toMx (toMx '' 𝓕) = 1 := by
+  have hemb : MeasurableEmbedding (toMx (F := F) (E := E) (m := d.m) (n := d.n)) :=
+    (colM d.m d.n).measurableEmbedding
   refine ⟨hemb, ?_, ?_, ?_⟩
-  · exact (colE (F := F) (E := E) d.m d.n).toAddEquiv.isAddHaarMeasure_map μ (colE d.m d.n).continuous
-      (colE d.m d.n).symm.continuous
+  · exact (colE (F := F) (E := E) d.m d.n).toAddEquiv.isAddHaarMeasure_map μ
+      (colE d.m d.n).continuous (colE d.m d.n).symm.continuous
   · rw [ratM_eq]
     refine hF.image_of_equiv (colM d.m d.n).toEquiv ?_ (ratEq d.m d.n) ?_
     · exact ((colM d.m d.n).measurePreserving_symm μ).quasiMeasurePreserving

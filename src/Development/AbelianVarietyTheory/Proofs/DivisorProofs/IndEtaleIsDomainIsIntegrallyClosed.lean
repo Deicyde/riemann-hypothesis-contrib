@@ -13,7 +13,8 @@ namespace IndEtaleNormal
 
 open Polynomial
 
-variable {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
+variable
+  {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
   {ι : Type} [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
 
 lemma exists_mem_of_finset (Si : ι → Subalgebra R S) (hmono : Monotone Si)
@@ -85,21 +86,27 @@ lemma isIntegrallyClosed [IsDomain S] (Si : ι → Subalgebra R S) (hmono : Mono
 
 end IndEtaleNormal
 
-theorem indEtale_isDomain_isIntegrallyClosed :
-    ∀ (R S : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CommRing S] [Algebra R S]
-      [Nontrivial S], (∃ (ι : Type) (_ : Preorder ι) (_ : IsDirected ι (· ≤ ·)) (_ : Nonempty ι)
-        (Si : ι → Subalgebra R S), Monotone Si ∧ (∀ s : S, ∃ i, s ∈ Si i) ∧
-        ∀ i, ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A)
-          (q : Ideal A) (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[R] Si i)) →
-      IsDomain S ∧ IsIntegrallyClosed S := by
+theorem indEtale_isDomain_isIntegrallyClosed
+    : ∀ (R S : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CommRing S] [Algebra R S]
+        [Nontrivial S],
+      (∃ (ι : Type) (_ : Preorder ι) (_ : IsDirected ι (· ≤ ·)) (_ : Nonempty ι)
+            (Si : ι → Subalgebra R S),
+          Monotone Si ∧ (∀ s : S, ∃ i, s ∈ Si i)
+            ∧ ∀ i,
+              ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
+                  (_ : q.IsPrime),
+                Nonempty (Localization.AtPrime q ≃ₐ[R] Si i))
+        → IsDomain S ∧ IsIntegrallyClosed S := by
   intro R S _ _ _ _ _ _ h
   obtain ⟨ι, _, _, _, Si, hmono, hcov, hloc⟩ := h
   have hic : ∀ i, IsDomain (Si i) ∧ IsIntegrallyClosed (Si i) := by
     intro i
     obtain ⟨A, _, _, _, q, _, ⟨e⟩⟩ := hloc i
     obtain ⟨h1, h2⟩ := etale_localization_atPrime_isDomain_isIntegrallyClosed R A q
-    exact ⟨MulEquiv.isDomain (Localization.AtPrime q) e.symm.toMulEquiv,
-      IsIntegrallyClosed.of_equiv e.toRingEquiv⟩
+    exact ⟨
+      MulEquiv.isDomain (Localization.AtPrime q) e.symm.toMulEquiv,
+      IsIntegrallyClosed.of_equiv e.toRingEquiv
+    ⟩
   haveI := IndEtaleNormal.isDomain Si hmono hcov (fun i => (hic i).1)
   exact ⟨inferInstance, IndEtaleNormal.isIntegrallyClosed Si hmono hcov hic⟩
 

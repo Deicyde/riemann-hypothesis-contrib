@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-private theorem UpperTheory.V.KT.finite_subfamily_spans_dual {E Y : Type*} [AddCommGroup E] [Module ℝ E]
-    [Module.Finite ℝ E] (f : Y → Module.Dual ℝ E) (S : Set Y) :
-    ∃ M : Finset Y, M.card ≤ Module.finrank ℝ E ∧ (∀ y ∈ M, y ∈ S) ∧
-      ∀ k : E, (∀ y ∈ M, f y k = 0) → ∀ y ∈ S, f y k = 0 := by
+private theorem UpperTheory.V.KT.finite_subfamily_spans_dual
+    {E Y : Type*} [AddCommGroup E] [Module ℝ E] [Module.Finite ℝ E]
+    (f : Y → Module.Dual ℝ E) (S : Set Y)
+    : ∃ M : Finset Y,
+      M.card ≤ Module.finrank ℝ E ∧ (∀ y ∈ M, y ∈ S)
+        ∧ ∀ k : E, (∀ y ∈ M, f y k = 0) → ∀ y ∈ S, f y k = 0 := by
   classical
   obtain ⟨b, hbs, hspan, hli⟩ := exists_linearIndependent ℝ (f '' S)
   have hbfin : b.Finite := hli.setFinite
@@ -19,7 +21,8 @@ private theorem UpperTheory.V.KT.finite_subfamily_spans_dual {E Y : Type*} [AddC
   choose g hgS hgf using hch
   refine ⟨hbfin.toFinset.attach.image (fun φ => g φ.1 (hbfin.mem_toFinset.mp φ.2)), ?_, ?_, ?_⟩
   · haveI : Fintype b := hbfin.fintype
-    calc (hbfin.toFinset.attach.image (fun φ => g φ.1 (hbfin.mem_toFinset.mp φ.2))).card
+    calc
+      (hbfin.toFinset.attach.image (fun φ => g φ.1 (hbfin.mem_toFinset.mp φ.2))).card
         ≤ hbfin.toFinset.attach.card := Finset.card_image_le
       _ = hbfin.toFinset.card := Finset.card_attach
       _ = Fintype.card b := hbfin.card_toFinset
@@ -38,13 +41,17 @@ private theorem UpperTheory.V.KT.finite_subfamily_spans_dual {E Y : Type*} [AddC
     have hm := hle (Submodule.subset_span ⟨y, hy, rfl⟩)
     rwa [LinearMap.mem_ker, Module.Dual.eval_apply] at hm
 
-theorem UpperTheory.V.KT.vxdet :
-    ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ) (v : Vx L N),
-    ∃ M : Finset (Lat L N), M.card ≤ dd L N * N ∧ (∀ y ∈ M, q v.1 y = 1) ∧
-      ∀ h : HS L N, (∀ y ∈ M, q h y = 1) → h = v.1 := by
+theorem UpperTheory.V.KT.vxdet
+    : ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ)
+        (v : Vx L N),
+      ∃ M : Finset (Lat L N),
+        M.card ≤ dd L N * N ∧ (∀ y ∈ M, q v.1 y = 1)
+          ∧ ∀ h : HS L N, (∀ y ∈ M, q h y = 1) → h = v.1 := by
   intro L _ _ _ N v
-  obtain ⟨M, hMc, hMS, hMk⟩ := UpperTheory.V.KT.finite_subfamily_spans_dual (E := HS L N)
-    (fun y : Lat L N => (ev y : Module.Dual ℝ (HS L N))) {y | y ≠ 0 ∧ q v.1 y = 1}
+  obtain ⟨M, hMc, hMS, hMk⟩ :=
+    UpperTheory.V.KT.finite_subfamily_spans_dual (E := HS L N)
+      (fun y : Lat L N => (ev y : Module.Dual ℝ (HS L N)))
+      {y | y ≠ 0 ∧ q v.1 y = 1}
   refine ⟨M, hMc.trans (rankhs L N), fun y hy => (hMS y hy).2, ?_⟩
   intro h hh
   have hk : ∀ y ∈ M, ev y (h - v.1) = 0 := by

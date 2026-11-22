@@ -9,7 +9,8 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 namespace Formalism.MainNotions.Ext.CutA
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.GL3Theta Formalism.MainNotions.Ext NumberField
 
 section
 variable (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
@@ -70,16 +71,17 @@ theorem tauKc_one : tauKc D lam 1 = 1 := by
   convert map_one lam
   simp
 
-theorem tau_norm (a : 𝓞 D.host.K) :
-    tauK D lam (a : D.host.K) * tauKc D lam (a : D.host.K) = ((Algebra.norm ℤ a : ℤ) : ℂ_[p]) := by
+theorem tau_norm (a : 𝓞 D.host.K)
+    : tauK D lam (a : D.host.K) * tauKc D lam (a : D.host.K)
+      = ((Algebra.norm ℤ a : ℤ) : ℂ_[p]) := by
   have h := Formalism.MainNotions.UnusedSlot33.HK.norm_int D.host a
   rw [Algebra.intNorm_eq_norm] at h
   unfold tauK tauKc
   rw [← lamPhi_mul, ← h, lamPhi_int]
 
-theorem tau_trace (a : 𝓞 D.host.K) :
-    tauK D lam (a : D.host.K) + tauKc D lam (a : D.host.K) =
-      ((Algebra.norm ℤ (1 + a) - Algebra.norm ℤ a - 1 : ℤ) : ℂ_[p]) := by
+theorem tau_trace (a : 𝓞 D.host.K)
+    : tauK D lam (a : D.host.K) + tauKc D lam (a : D.host.K)
+      = ((Algebra.norm ℤ (1 + a) - Algebra.norm ℤ a - 1 : ℤ) : ℂ_[p]) := by
   have h1 := tau_norm D lam (1 + a)
   have h2 := tau_norm D lam a
   have e : ((1 + a : 𝓞 D.host.K) : D.host.K) = 1 + (a : D.host.K) := by push_cast; ring
@@ -101,21 +103,25 @@ theorem isClosed_range_zc : IsClosed (Set.range (zc : ℤ_[p] → ℂ_[p])) :=
 theorem okpTrace_holds : OkpTrace D := by
   intro q _ l α hα
   unfold OKp at hα
-  have hs : Set.range (fun a : 𝓞 D.host.K => (tauK D l (a : D.host.K), tauKc D l (a : D.host.K))) ⊆
-      (fun β : ℂ_[q] × ℂ_[q] => β.1 + β.2) ⁻¹' Set.range (zc : ℤ_[q] → ℂ_[q]) := by
+  have hs
+      : Set.range (fun a : 𝓞 D.host.K => (tauK D l (a : D.host.K), tauKc D l (a : D.host.K)))
+        ⊆ (fun β : ℂ_[q] × ℂ_[q] => β.1 + β.2) ⁻¹' Set.range (zc : ℤ_[q] → ℂ_[q]) := by
     rintro _ ⟨a, rfl⟩
     exact ⟨_, (zc_int _).trans (tau_trace D l a).symm⟩
-  obtain ⟨n, hn⟩ := closure_minimal hs (isClosed_range_zc.preimage (continuous_fst.add continuous_snd)) hα
+  obtain ⟨n, hn⟩ :=
+    closure_minimal hs (isClosed_range_zc.preimage (continuous_fst.add continuous_snd)) hα
   exact ⟨n, hn.symm⟩
 
 theorem okpNorm_holds : OkpNorm D := by
   intro q _ l α hα
   unfold OKp at hα
-  have hs : Set.range (fun a : 𝓞 D.host.K => (tauK D l (a : D.host.K), tauKc D l (a : D.host.K))) ⊆
-      (fun β : ℂ_[q] × ℂ_[q] => β.1 * β.2) ⁻¹' Set.range (zc : ℤ_[q] → ℂ_[q]) := by
+  have hs
+      : Set.range (fun a : 𝓞 D.host.K => (tauK D l (a : D.host.K), tauKc D l (a : D.host.K)))
+        ⊆ (fun β : ℂ_[q] × ℂ_[q] => β.1 * β.2) ⁻¹' Set.range (zc : ℤ_[q] → ℂ_[q]) := by
     rintro _ ⟨a, rfl⟩
     exact ⟨_, (zc_int _).trans (tau_norm D l a).symm⟩
-  obtain ⟨n, hn⟩ := closure_minimal hs (isClosed_range_zc.preimage (continuous_fst.mul continuous_snd)) hα
+  obtain ⟨n, hn⟩ :=
+    closure_minimal hs (isClosed_range_zc.preimage (continuous_fst.mul continuous_snd)) hα
   exact ⟨n, hn.symm⟩
 
 end
@@ -127,8 +133,7 @@ theorem norm_zc (z : ℤ_[p]) : ‖zc z‖ = ‖z‖ := by
   unfold zc
   rw [norm_algebraMap', PadicInt.norm_def]
 
-theorem norm_int_cp (n : ℤ) : ‖(n : ℂ_[p])‖ = ‖(n : ℤ_[p])‖ := by
-  rw [← zc_int, norm_zc]
+theorem norm_int_cp (n : ℤ) : ‖(n : ℂ_[p])‖ = ‖(n : ℤ_[p])‖ := by rw [← zc_int, norm_zc]
 
 theorem norm_int_cp_le (n : ℤ) : ‖(n : ℂ_[p])‖ ≤ 1 := by
   rw [norm_int_cp]
@@ -169,8 +174,9 @@ theorem norm_le_one_of_quad (x : ℂ_[p]) (t n : ℤ) (h : x ^ 2 = t * x - n) : 
 
 theorem okp_norm_le (α : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) : ‖α.1‖ ≤ 1 ∧ ‖α.2‖ ≤ 1 := by
   unfold OKp at hα
-  have hs : Set.range (fun a : 𝓞 D.host.K => (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K))) ⊆
-      {β : ℂ_[p] × ℂ_[p] | ‖β.1‖ ≤ 1 ∧ ‖β.2‖ ≤ 1} := by
+  have hs
+      : Set.range (fun a : 𝓞 D.host.K => (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)))
+        ⊆ {β : ℂ_[p] × ℂ_[p] | ‖β.1‖ ≤ 1 ∧ ‖β.2‖ ≤ 1} := by
     rintro _ ⟨a, rfl⟩
     have hT := tau_trace D lam a
     have hN := tau_norm D lam a
@@ -205,9 +211,10 @@ private lemma tauKc_neg_lemma_4 (a : D.host.K) : tauKc D lam (-a) = -tauKc D lam
 
 theorem okp_neg' (α : ℂ_[p] × ℂ_[p]) (hα : α ∈ OKp D lam) : -α ∈ OKp D lam := by
   unfold OKp at hα ⊢
-  have hs : Set.range (fun a : 𝓞 D.host.K => (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K))) ⊆
-      (fun β : ℂ_[p] × ℂ_[p] => -β) ⁻¹'
-        closure (Set.range (fun a : 𝓞 D.host.K => (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)))) := by
+  have hs
+      : Set.range (fun a : 𝓞 D.host.K => (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)))
+        ⊆ (fun β : ℂ_[p] × ℂ_[p] => -β) ⁻¹' closure (Set.range (fun a : 𝓞 D.host.K =>
+          (tauK D lam (a : D.host.K), tauKc D lam (a : D.host.K)))) := by
     rintro _ ⟨a, rfl⟩
     refine subset_closure ⟨-a, ?_⟩
     ext <;> simp [tauK_neg_lemma_3, tauKc_neg_lemma_4]
@@ -227,8 +234,8 @@ private lemma sub_unit_lemma_2 (x c : ℂ_[p]) (hx : ‖x‖ < 1) (hc : ‖c‖ 
   rw [norm_neg, hc] at h
   exact absurd h (not_le.mpr (max_lt hx hlt))
 
-theorem pick_c (hp : p ≠ 2) (x y : ℂ_[p]) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (hxy : ¬ (‖x‖ = 1 ∧ ‖y‖ = 1)) :
-    ∃ c : ℂ_[p], (c = 1 ∨ c = -1) ∧ ‖x - c‖ = 1 ∧ ‖y - c‖ = 1 := by
+theorem pick_c (hp : p ≠ 2) (x y : ℂ_[p]) (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (hxy : ¬(‖x‖ = 1 ∧ ‖y‖ = 1))
+    : ∃ c : ℂ_[p], (c = 1 ∨ c = -1) ∧ ‖x - c‖ = 1 ∧ ‖y - c‖ = 1 := by
   have hn1 : ‖(1 : ℂ_[p])‖ = 1 := norm_one
   have hnm1 : ‖(-1 : ℂ_[p])‖ = 1 := by rw [norm_neg, norm_one]
   have hboth : ∀ z : ℂ_[p], ‖z‖ ≤ 1 → ‖z - 1‖ = 1 ∨ ‖z - (-1)‖ = 1 := by
@@ -315,27 +322,38 @@ theorem sqrtMinusD_sq : D.host.sqrtMinusD ^ 2 = -(D.host.d : D.host.E) := by
   have h1 : D.host.φ₀ D.host.sqrtMinusD = Complex.I * (Real.sqrt D.host.d : ℂ) := D.host.φ₀_mem
   rw [map_pow, h1, map_neg, map_natCast, mul_pow, Complex.I_sq, ← Complex.ofReal_pow,
     Real.sq_sqrt (Nat.cast_nonneg _)]
-  push_cast; ring
+  push_cast
+  ring
 
-noncomputable def sK : 𝓞 D.host.K :=
-  ⟨⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩, by
-    refine ⟨Polynomial.X ^ 2 + Polynomial.C (D.host.d : ℤ), Polynomial.monic_X_pow_add_C _ two_ne_zero, ?_⟩
-    have h : (⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ : D.host.K) ^ 2 = -(D.host.d : D.host.K) :=
+noncomputable def sK : 𝓞 D.host.K := ⟨
+  ⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩,
+  by
+    refine ⟨
+      Polynomial.X ^ 2 + Polynomial.C (D.host.d : ℤ),
+      Polynomial.monic_X_pow_add_C _ two_ne_zero,
+      ?_
+    ⟩
+    have h
+        : (⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ : D.host.K) ^ 2
+          = -(D.host.d : D.host.K) :=
       Subtype.ext (by push_cast; exact sqrtMinusD_sq D)
-    simp [h]⟩
+    simp [h]
+⟩
 
 theorem tauKc_sK : tauKc D lam (sK D : D.host.K) = - tauK D lam (sK D : D.host.K) := by
   have h0 : tauK D lam ((sK D : D.host.K) + (-(sK D : D.host.K))) = 0 := by
     rw [add_neg_cancel]
     have := lamPhi_int D lam 0
-    unfold tauK; simpa using this
+    unfold tauK
+    simpa using this
   rw [tauK_add] at h0
   have e : tauKc D lam (sK D : D.host.K) = tauK D lam (-(sK D : D.host.K)) := by
     unfold tauKc tauK
     congr 2
     show D.host.conj D.host.sqrtMinusD = -D.host.sqrtMinusD
     exact Formalism.MainNotions.UnusedSlot33.HK.conj_b D.host
-  rw [e]; linear_combination h0
+  rw [e]
+  linear_combination h0
 
 private lemma tauK_int_lemma_5 (n : ℤ) : tauK D lam (n : D.host.K) = (n : ℂ_[p]) := by
   unfold tauK
@@ -344,10 +362,15 @@ private lemma tauK_int_lemma_5 (n : ℤ) : tauK D lam (n : D.host.K) = (n : ℂ_
   exact lamPhi_int D lam n
 
 theorem tauK_sK_sq : tauK D lam (sK D : D.host.K) ^ 2 = -((D.host.d : ℤ) : ℂ_[p]) := by
-  have h0 : (⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ : D.host.K) ^ 2 = -(D.host.d : D.host.K) :=
+  have h0
+      : (⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ : D.host.K) ^ 2
+        = -(D.host.d : D.host.K) :=
     Subtype.ext (by push_cast; exact sqrtMinusD_sq D)
   have h1 : ((sK D : D.host.K)) ^ 2 = ((-(D.host.d : ℤ) : ℤ) : D.host.K) := by
-    rw [show ((sK D : D.host.K)) = ⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ from rfl, h0]
+    rw [show ((sK D : D.host.K))
+          = ⟨D.host.sqrtMinusD, Formalism.MainNotions.UnusedSlot33.HK.bE_mem D.host⟩ from
+        rfl,
+      h0]
     first | (push_cast; done) | (push_cast; ring) | (push_cast; rfl) | simp
   rw [sq, ← tauK_mul, ← sq, h1, tauK_int_lemma_5]
   first | (push_cast; done) | (push_cast; ring) | (push_cast; rfl) | simp
@@ -364,8 +387,7 @@ theorem okpDiff_holds : OkpDiff D := by
   have hsq := norm_tauK_sK_sq D lam
   have hd : D.host.d.Prime := D.host.hyp.2.1
   split_ifs with h
-  · have e : ‖((D.host.d : ℤ) : ℤ_[p])‖ = (p : ℝ)⁻¹ := by
-      rw [← h]; simp
+  · have e : ‖((D.host.d : ℤ) : ℤ_[p])‖ = (p : ℝ)⁻¹ := by rw [← h]; simp
     rw [e] at hsq
     rw [← Real.sqrt_sq t0, hsq, Real.sqrt_inv, Real.sqrt_eq_rpow]
   · have hnd : ¬ (p : ℤ) ∣ (D.host.d : ℤ) := by
@@ -385,23 +407,32 @@ theorem lamC_one (lam : Qbar →+* ℂ_[p]) : lamC lam 1 = 1 := by
   simp
   exact map_one lam
 
-theorem coeff_one_subst (f s : PowerSeries ℂ_[p]) (hf : PowerSeries.constantCoeff f = 0) :
-    PowerSeries.coeff 1 (PowerSeries.subst f s : PowerSeries ℂ_[p]) = PowerSeries.coeff 1 s * PowerSeries.coeff 1 f := by
+theorem coeff_one_subst (f s : PowerSeries ℂ_[p]) (hf : PowerSeries.constantCoeff f = 0)
+    : PowerSeries.coeff 1 (PowerSeries.subst f s : PowerSeries ℂ_[p])
+      = PowerSeries.coeff 1 s * PowerSeries.coeff 1 f := by
   have ha : PowerSeries.HasSubst f := PowerSeries.HasSubst.of_constantCoeff_zero' hf
-  have key : ∀ t : PowerSeries ℂ_[p], (PowerSeries.subst f t : PowerSeries ℂ_[p]) =
-      (PowerSeries.subst f (PowerSeries.mk fun n => PowerSeries.coeff (n + 1) t) : PowerSeries ℂ_[p]) * f +
-        PowerSeries.C (PowerSeries.constantCoeff t) := by
+  have key
+      : ∀ t : PowerSeries ℂ_[p],
+        (PowerSeries.subst f t : PowerSeries ℂ_[p])
+          = (PowerSeries.subst f (PowerSeries.mk fun n => PowerSeries.coeff (n + 1) t)
+                : PowerSeries ℂ_[p])
+              * f
+            + PowerSeries.C (PowerSeries.constantCoeff t) := by
     intro t
     conv_lhs => rw [PowerSeries.eq_shift_mul_X_add_const t]
-    rw [PowerSeries.subst_add ha, PowerSeries.subst_mul ha, PowerSeries.subst_X ha, PowerSeries.subst_C]
+    rw [PowerSeries.subst_add ha, PowerSeries.subst_mul ha, PowerSeries.subst_X ha,
+      PowerSeries.subst_C]
     rfl
-  have c0 : ∀ t : PowerSeries ℂ_[p], PowerSeries.constantCoeff (PowerSeries.subst f t : PowerSeries ℂ_[p]) =
-      PowerSeries.constantCoeff t := by
+  have c0
+      : ∀ t : PowerSeries ℂ_[p],
+        PowerSeries.constantCoeff (PowerSeries.subst f t : PowerSeries ℂ_[p])
+          = PowerSeries.constantCoeff t := by
     intro t
     rw [key t, map_add (f := _), map_mul, hf, mul_zero, zero_add, PowerSeries.constantCoeff_C]
-  rw [key s, map_add (f := _), PowerSeries.coeff_C, if_neg one_ne_zero, add_zero, PowerSeries.coeff_mul,
-    Finset.Nat.antidiagonal_succ]
-  simp only [Finset.Nat.antidiagonal_zero, Finset.map_singleton, Finset.sum_cons, Finset.sum_singleton]
+  rw [key s, map_add (f := _), PowerSeries.coeff_C, if_neg one_ne_zero, add_zero,
+    PowerSeries.coeff_mul, Finset.Nat.antidiagonal_succ]
+  simp only [Finset.Nat.antidiagonal_zero, Finset.map_singleton, Finset.sum_cons,
+    Finset.sum_singleton]
   simp [PowerSeries.coeff_zero_eq_constantCoeff_apply, hf, c0]
 
 theorem ePhiOne_holds (D : D7) : EPhiOne D := by
@@ -409,7 +440,8 @@ theorem ePhiOne_holds (D : D7) : EPhiOne D := by
   obtain ⟨hcI, -, hδ, hL, ok⟩ := hA
   have hsp := Formalism.MainNotions.Ext.sgStar_spec D cc hcI.1 δ hδ
   have hs1 : PowerSeries.coeff 1 (sgSer g.lam g.abelian₂) = 1 := by
-    rw [hL]; unfold sgSer
+    rw [hL]
+    unfold sgSer
     rw [PowerSeries.coeff_mk, iteratedDeriv_one, hsp.2.1]
     simpa using lamC_one g.lam
   have hw0 : PowerSeries.constantCoeff g.wq = 1 := by
@@ -425,92 +457,132 @@ theorem ePhiOne_holds (D : D7) : EPhiOne D := by
   have hl0 : PowerSeries.constantCoeff (flog (g.C • wModel g.lam g.abelian₂) g.wq) = 0 := by
     unfold flog; rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_mk]; simp
   have hl1 : PowerSeries.coeff 1 (flog (g.C • wModel g.lam g.abelian₂) g.wq) = 1 := by
-    unfold flog; rw [PowerSeries.coeff_mk]; simp [PowerSeries.coeff_zero_eq_constantCoeff_apply, hom]
+    unfold flog
+    rw [PowerSeries.coeff_mk]
+    simp [PowerSeries.coeff_zero_eq_constantCoeff_apply, hom]
   set ep : ℂ_[p] := ((g.C.u⁻¹ : ℂ_[p]ˣ) : ℂ_[p]) with hep
   have hep0 : ep ≠ 0 := Units.ne_zero _
-  have hf0 : PowerSeries.constantCoeff (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep * flog (g.C • wModel g.lam g.abelian₂) g.wq) = 0 := by
+  have hf0
+      : PowerSeries.constantCoeff
+          (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep * flog (g.C • wModel g.lam g.abelian₂) g.wq)
+        = 0 := by
     rw [map_mul, hl0, mul_zero]
-  have hf1 : PowerSeries.coeff 1 (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep * flog (g.C • wModel g.lam g.abelian₂) g.wq) = ep := by
-    have e : algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep = PowerSeries.C ep := by
-      rfl
+  have hf1
+      : PowerSeries.coeff 1
+          (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep * flog (g.C • wModel g.lam g.abelian₂) g.wq)
+        = ep := by
+    have e : algebraMap ℂ_[p] (PowerSeries ℂ_[p]) ep = PowerSeries.C ep := by rfl
     rw [e, PowerSeries.coeff_C_mul, hl1, mul_one]
   unfold ePhi1
   simp only []
-  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_mk, zero_add, coeff_one_subst _ _ hf0,
-    hs1, hf1, one_mul, inv_mul_cancel₀ hep0]
+  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_mk, zero_add,
+    coeff_one_subst _ _ hf0, hs1, hf1, one_mul, inv_mul_cancel₀ hep0]
 
 end
 
-theorem phNorm_of' (H1 : PhNormOfUnits) (H2 : PhNormClosed) (D : D7) (hOK : PhNormOK D) (he : endInt D)
-    (ha : addInt D) (hB : beBiadd D) : phNorm D :=
-  phNorm_of H1 H2 D hOK (okpUnitsDense_holds D) (okpTwoUnits2_holds D) (okpTrace_holds D) (okpNorm_holds D) he ha hB
+theorem phNorm_of'
+    (H1 : PhNormOfUnits) (H2 : PhNormClosed)
+    (D : D7) (hOK : PhNormOK D) (he : endInt D) (ha : addInt D) (hB : beBiadd D)
+    : phNorm D :=
+  phNorm_of H1 H2 D hOK (okpUnitsDense_holds D) (okpTwoUnits2_holds D) (okpTrace_holds D)
+    (okpNorm_holds D) he ha hB
 
-theorem beConj_of' (H : BeConjOfNorm) (D : D7) (he : endInt D) (ha : addInt D) (hn : phNorm D) (hB : beBiadd D) :
-    beConj D :=
+theorem beConj_of'
+    (H : BeConjOfNorm) (D : D7) (he : endInt D) (ha : addInt D) (hn : phNorm D) (hB : beBiadd D)
+    : beConj D :=
   beConj_of H D (okpNorm_holds D) (okpTwoUnits_holds D) he ha hn hB
 
-theorem jetsPh_of' (HH : JetsHigh) (H1 : JetsOne) (H2 : JetsTwo) (D : D7) (hc : cube D) (hn : phNorm D)
-    (hb : beConj D) : jetsPh D :=
+theorem jetsPh_of'
+    (HH : JetsHigh) (H1 : JetsOne) (H2 : JetsTwo)
+    (D : D7) (hc : cube D) (hn : phNorm D) (hb : beConj D)
+    : jetsPh D :=
   jetsPh_of HH H1 H2 D hc hn hb (okpDiff_holds D)
 
 def LemmaThreeOneThird : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p), g.Ok → IntegralMv (g.add (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p]) →
-    ∃ n : MvPowerSeries (Fin 3) ℂ_[p], IntegralMv n ∧ MvPowerSeries.constantCoeff n = 1 ∧
-      (Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1) +
-          (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 0 - Xv 2) +
-          (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 1 - Xv 0) =
-        g.add (g.add (Xv 0) (Xv 1)) (Xv 2) * g.sub (Xv 0) (Xv 1) * g.sub (Xv 1) (Xv 2) * g.sub (Xv 2) (Xv 0) * n
+  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p),
+    g.Ok → IntegralMv (g.add (Xv 0) (Xv 1) : MvPowerSeries (Fin 2) ℂ_[p])
+      → ∃ n : MvPowerSeries (Fin 3) ℂ_[p],
+        IntegralMv n ∧ MvPowerSeries.constantCoeff n = 1
+          ∧ (Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1)
+              + (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+                * (Xv 0 - Xv 2)
+              + (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+                * (Xv 1 - Xv 0)
+            = g.add (g.add (Xv 0) (Xv 1)) (Xv 2) * g.sub (Xv 0) (Xv 1) * g.sub (Xv 1) (Xv 2)
+              * g.sub (Xv 2) (Xv 0) * n
 
 def Cube3OfDet : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p), g.Ok →
-    PowerSeries.constantCoeff (ePhi1 g.lam g.abelian₂ g.C g.wq) = 1 →
-    ((Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1) +
-          (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 0 - Xv 2) +
-          (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 1 - Xv 0)) *
-        PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 *
-        PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 *
-        PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 =
-      PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) *
-          PowerSeries.subst (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 0) (Xv 1) *
-          PowerSeries.subst (g.sub (Xv 0) (Xv 1) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 1) (Xv 2) *
-          PowerSeries.subst (g.sub (Xv 1) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 2) (Xv 0) *
-          PowerSeries.subst (g.sub (Xv 2) (Xv 0) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) →
-    (∃ n : MvPowerSeries (Fin 3) ℂ_[p], IntegralMv n ∧ MvPowerSeries.constantCoeff n = 1 ∧
-      (Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1) +
-          (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 0 - Xv 2) +
-          (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 1 - Xv 0) =
-        g.add (g.add (Xv 0) (Xv 1)) (Xv 2) * g.sub (Xv 0) (Xv 1) * g.sub (Xv 1) (Xv 2) * g.sub (Xv 2) (Xv 0) * n) →
-    Simeq (g.phAt (g.add (g.add (Xv 0) (Xv 1)) (Xv 2)) + g.phAt (g.sub (Xv 0) (Xv 1)) +
-        g.phAt (g.sub (Xv 1) (Xv 2)) + g.phAt (g.sub (Xv 2) (Xv 0)) : MvPowerSeries (Fin 3) ℂ_[p])
-      (3 * (g.phAt (Xv 0) + g.phAt (Xv 1) + g.phAt (Xv 2)))
+  ∀ (p : ℕ) [Fact p.Prime] (g : G1 p),
+    g.Ok → PowerSeries.constantCoeff (ePhi1 g.lam g.abelian₂ g.C g.wq) = 1
+      → ((Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1)
+            + (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+              * (Xv 0 - Xv 2)
+            + (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+              * (Xv 1 - Xv 0))
+          * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+          * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+          * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+        = PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * (g.add (g.add (Xv 0) (Xv 1)) (Xv 2)
+            * PowerSeries.subst (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p])
+              (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 0) (Xv 1) * PowerSeries.subst
+            (g.sub (Xv 0) (Xv 1) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 1) (Xv 2) * PowerSeries.subst
+            (g.sub (Xv 1) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 2) (Xv 0) * PowerSeries.subst
+            (g.sub (Xv 2) (Xv 0) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+      → (∃ n : MvPowerSeries (Fin 3) ℂ_[p],
+        IntegralMv n ∧ MvPowerSeries.constantCoeff n = 1
+          ∧ (Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1)
+              + (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+                * (Xv 0 - Xv 2)
+              + (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+                * (Xv 1 - Xv 0)
+            = g.add (g.add (Xv 0) (Xv 1)) (Xv 2) * g.sub (Xv 0) (Xv 1) * g.sub (Xv 1) (Xv 2)
+              * g.sub (Xv 2) (Xv 0) * n)
+      → Simeq
+        (g.phAt (g.add (g.add (Xv 0) (Xv 1)) (Xv 2)) + g.phAt (g.sub (Xv 0) (Xv 1))
+            + g.phAt (g.sub (Xv 1) (Xv 2)) + g.phAt (g.sub (Xv 2) (Xv 0))
+          : MvPowerSeries (Fin 3) ℂ_[p])
+        (3 * (g.phAt (Xv 0) + g.phAt (Xv 1) + g.phAt (Xv 2)))
 
 def PAdicFrobeniusStickelberger (D : D7) : Prop :=
-  ∀ (p : ℕ) [Fact p.Prime] (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (g : G1 p), At D cc δ g →
-    ((Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1) +
-          (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 0 - Xv 2) +
-          (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 1 - Xv 0)) *
-        PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 *
-        PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 *
-        PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq) ^ 3 =
-      PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq *
-        (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) *
-          PowerSeries.subst (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 0) (Xv 1) *
-          PowerSeries.subst (g.sub (Xv 0) (Xv 1) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 1) (Xv 2) *
-          PowerSeries.subst (g.sub (Xv 1) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)) *
-        (g.sub (Xv 2) (Xv 0) *
-          PowerSeries.subst (g.sub (Xv 2) (Xv 0) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+  ∀ (p : ℕ) [Fact p.Prime] (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (g : G1 p),
+    At D cc δ g
+      → ((Xv 0) ^ 3 * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq * (Xv 2 - Xv 1)
+            + (Xv 1) ^ 3 * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+              * (Xv 0 - Xv 2)
+            + (Xv 2) ^ 3 * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+              * (Xv 1 - Xv 0))
+          * PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+          * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+          * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq)
+            ^ 3
+        = PowerSeries.subst (Xv 0 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * PowerSeries.subst (Xv 1 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * PowerSeries.subst (Xv 2 : MvPowerSeries (Fin 3) ℂ_[p]) g.wq
+          * (g.add (g.add (Xv 0) (Xv 1)) (Xv 2)
+            * PowerSeries.subst (g.add (g.add (Xv 0) (Xv 1)) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p])
+              (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 0) (Xv 1) * PowerSeries.subst
+            (g.sub (Xv 0) (Xv 1) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 1) (Xv 2) * PowerSeries.subst
+            (g.sub (Xv 1) (Xv 2) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
+          * (g.sub (Xv 2) (Xv 0) * PowerSeries.subst
+            (g.sub (Xv 2) (Xv 0) : MvPowerSeries (Fin 3) ℂ_[p]) (ePhi1 g.lam g.abelian₂ g.C g.wq))
 
-theorem cube_second_identity_of_determinant (H31 : LemmaThreeOneThird) (HC : Cube3OfDet) (D : D7) (hQ : PAdicFrobeniusStickelberger D) (ha : addInt D) : cube3 D := by
+theorem cube_second_identity_of_determinant
+    (H31 : LemmaThreeOneThird) (HC : Cube3OfDet)
+    (D : D7) (hQ : PAdicFrobeniusStickelberger D) (ha : addInt D)
+    : cube3 D := by
   intro q _ cc δ g hA
   have hok : g.Ok := hA.2.2.2.2
   exact HC q g hok (ePhiOne_holds D q cc δ g hA) (hQ q cc δ g hA) (H31 q g hok (ha q cc δ g hA).1)

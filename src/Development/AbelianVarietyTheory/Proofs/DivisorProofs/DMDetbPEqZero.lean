@@ -22,12 +22,14 @@ theorem modeDerivation_det_eq_zero : GlobalTheory.PsCo.Cw2a.T_dM_detb := by
   have hdet : detbP n = Mx.det := rfl
   rw [hdet, key]
   simp_rw [hD]
-  have htr : ∑ i, ∑ j, Mx.adjugate j i * (Mx * W - W * Mx) i j
-      = Matrix.trace (Mx.adjugate * (Mx * W - W * Mx)) := by
+  have htr
+      : ∑ i, ∑ j, Mx.adjugate j i * (Mx * W - W * Mx) i j
+        = Matrix.trace (Mx.adjugate * (Mx * W - W * Mx)) := by
     simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply]
     rw [Finset.sum_comm]
-  rw [htr, Matrix.mul_sub, Matrix.trace_sub, ← Matrix.mul_assoc Mx.adjugate Mx W, Matrix.adjugate_mul,
-    ← Matrix.mul_assoc Mx.adjugate W Mx, Matrix.trace_mul_comm (Mx.adjugate * W) Mx,
-    ← Matrix.mul_assoc Mx Mx.adjugate W, Matrix.mul_adjugate, sub_self]
+  rw [htr, Matrix.mul_sub, Matrix.trace_sub, ← Matrix.mul_assoc Mx.adjugate Mx W,
+    Matrix.adjugate_mul, ← Matrix.mul_assoc Mx.adjugate W Mx,
+    Matrix.trace_mul_comm (Mx.adjugate * W) Mx, ← Matrix.mul_assoc Mx Mx.adjugate W,
+    Matrix.mul_adjugate, sub_self]
 
 end GlobalTheory.PsCo.Cw2a

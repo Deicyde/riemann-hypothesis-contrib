@@ -16,23 +16,34 @@ theorem desint : JointRep → Tonelli → WeakAE → EigAE → LocInt → NonZer
   let _ : MeasurableSpace (Lp ℂ 2 ν) := borel _
   have : BorelSpace (Lp ℂ 2 ν) := ⟨rfl⟩
   obtain ⟨Ψ, hΨm, hΨ⟩ := hJR S ν
-  obtain ⟨f, hrep, hinv⟩ : ∃ f : ι → X.G → S → ℂ, (∀ i, IsRep (F i) (f i)) ∧
-      ∀ i, ∀ γ ∈ X.Γ, ∀ x s, f i (γ * x) s = f i x s :=
-    ⟨fun i x s => Ψ (F i x) s, fun i =>
-      ⟨hΨm.comp (((hd.cont i).measurable.comp measurable_fst).prodMk measurable_snd), fun x => hΨ (F i x)⟩,
-      fun i γ hγ x s => by simp only [hd.inv i γ hγ x]⟩
+  obtain ⟨f, hrep, hinv⟩
+      : ∃ f : ι → X.G → S → ℂ,
+        (∀ i, IsRep (F i) (f i)) ∧ ∀ i, ∀ γ ∈ X.Γ, ∀ x s, f i (γ * x) s = f i x s := ⟨
+    fun i x s => Ψ (F i x) s,
+    fun i => ⟨
+      hΨm.comp (((hd.cont i).measurable.comp measurable_fst).prodMk measurable_snd),
+      fun x => hΨ (F i x)
+    ⟩,
+    fun i γ hγ x s => by simp only [hd.inv i γ hγ x]
+  ⟩
   have : SFinite X.ν := by unfold Ctx.ν; infer_instance
   have hT : ∀ᵐ s ∂ν, ∀ i, ∫⁻ x, W x * ‖f i x s‖ₑ ^ 2 ∂X.ν < ⊤ :=
     ae_all_iff.2 fun i => hTon X.G S X.ν ν (F i) (f i) W (hrep i) hW (hd.wt i)
-  have hE : ∀ᵐ s ∂ν, ∀ c i, ∀ᵐ x ∂X.μ,
-      ∑ j, ∫ y, Φ c i j y * conj (f j (x * y) s) ∂X.μ = σ c s * conj (f i x s) :=
-    ae_all_iff.2 fun c => hEig X ι S ν F f (Φ c) (σ c) (hσ c).2.choose hd.cont hrep (hΦ c) (hσ c).1
-      (hσ c).2.choose_spec (hd.eig c)
+  have hE
+      : ∀ᵐ s ∂ν, ∀ c i, ∀ᵐ x ∂X.μ,
+        ∑ j, ∫ y, Φ c i j y * conj (f j (x * y) s) ∂X.μ = σ c s * conj (f i x s) :=
+    ae_all_iff.2 fun c =>
+      hEig X ι S ν F f (Φ c) (σ c) (hσ c).2.choose hd.cont hrep (hΦ c) (hσ c).1 (hσ c).2.choose_spec
+        (hd.eig c)
   have hL : ∀ᵐ s ∂ν, ∀ i, LocallyIntegrable (fun x => f i x s) X.μ :=
     ae_all_iff.2 fun i => hLoc X S ν (F i) (f i) (hd.cont i) (hrep i)
   have hO : ∀ᵐ s ∂ν, ∀ n, ∑ i, ∫ x, g n i x * conj (f i x s) ∂X.ν = 0 :=
-    ae_all_iff.2 fun n => hWk X.G S ι X.ν ν F f (g n) 0 hrep (fun i => (hd.gint n i).1)
-      (fun i => (hd.gint n i).2) MemLp.zero (fun h => by rw [hd.orth n h]; simp)
+    ae_all_iff.2 fun n =>
+      hWk X.G S ι X.ν ν F f (g n) 0 hrep
+        (fun i => (hd.gint n i).1)
+        (fun i => (hd.gint n i).2)
+        MemLp.zero
+        (fun h => by rw [hd.orth n h]; simp)
   have hN : ¬ ∀ᵐ s ∂ν, ∀ i, ∀ᵐ x ∂X.μ, f i x s = 0 := by
     intro h
     apply hd.ne
@@ -43,18 +54,26 @@ theorem desint : JointRep → Tonelli → WeakAE → EigAE → LocInt → NonZer
   have huL : ∀ i, LocallyIntegrable (fun x => conj (f i x s)) X.μ := fun i =>
     (hsL i).mono (Complex.continuous_conj.comp_aestronglyMeasurable (hsL i).aestronglyMeasurable)
       (Eventually.of_forall fun x => by simp)
-  obtain ⟨f', hf', heig⟩ := hSm X ι κ (fun i x => conj (f i x s)) Φ (fun c => σ c s) c₀ huL
-    (fun i γ hγ x => by simp only [hinv i γ hγ x s]) hΦ hs0 hsE
+  obtain ⟨f', hf', heig⟩ :=
+    hSm X ι κ
+      (fun i x => conj (f i x s))
+      Φ
+      (fun c => σ c s)
+      c₀ huL
+      (fun i γ hγ x => by simp only [hinv i γ hγ x s])
+      hΦ hs0 hsE
   have hae : ∀ i, f' i =ᵐ[X.ν] fun x => conj (f i x s) := fun i => by
     unfold Ctx.ν; exact ae_restrict_of_ae (hf' i).2.1
-  refine ⟨s, hsP, f', ⟨fun i => (hf' i).1, ?_, fun i => (hf' i).2.2, fun i => ?_, heig, fun n => ?_⟩⟩
+  refine
+    ⟨s, hsP, f', ⟨fun i => (hf' i).1, ?_, fun i => (hf' i).2.2, fun i => ?_, heig, fun n => ?_⟩⟩
   · intro h0
     apply hsN
     intro i
     filter_upwards [(hf' i).2.1] with x hx
     simp only [h0, Pi.zero_apply] at hx
     simpa using hx.symm
-  · rw [lintegral_congr_ae (g := fun x => W x * ‖f i x s‖ₑ ^ 2)
+  · rw [lintegral_congr_ae
+      (g := fun x => W x * ‖f i x s‖ₑ ^ 2)
       ((hae i).mono fun x hx => by simp only [hx, RCLike.enorm_conj])]
     exact hsT i
   · rw [← hsO n]

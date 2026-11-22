@@ -22,26 +22,28 @@ section
 
 variable {k : Type u} [Field k] {N : ℕ}
 
-theorem oneBlock_homogeneousComponent (f : NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) k) (n : ℕ) :
-    oneBlock (S := k) (N := N) (homogeneousComponent n f) =
-      homogeneousComponent n (oneBlock (S := k) (N := N) f) := by
+theorem oneBlock_homogeneousComponent (f : NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) k) (n : ℕ)
+    : oneBlock (S := k) (N := N) (homogeneousComponent n f)
+      = homogeneousComponent n (oneBlock (S := k) (N := N) f) := by
   classical
-  have ho : ∀ g, oneBlock (S := k) (N := N) g = rename (HilbertPositive.blockEquiv N) g := fun _ => rfl
+  have ho : ∀ g, oneBlock (S := k) (N := N) g = rename (HilbertPositive.blockEquiv N) g := fun _ =>
+    rfl
   ext d
   set d' := Finsupp.mapDomain (HilbertPositive.blockEquiv N).symm d with hd'
   have hd : d = Finsupp.mapDomain (HilbertPositive.blockEquiv N) d' := by
     rw [hd', ← Finsupp.mapDomain_comp, Equiv.self_comp_symm, Finsupp.mapDomain_id]
-  have hdeg : d.degree = d'.degree := by
-    rw [hd, Finsupp.degree_mapDomain]
+  have hdeg : d.degree = d'.degree := by rw [hd, Finsupp.degree_mapDomain]
   rw [ho, ho, coeff_homogeneousComponent, hd,
     coeff_rename_mapDomain _ (HilbertPositive.blockEquiv N).injective,
-    coeff_rename_mapDomain _ (HilbertPositive.blockEquiv N).injective, coeff_homogeneousComponent, ← hd, hdeg]
+    coeff_rename_mapDomain _ (HilbertPositive.blockEquiv N).injective, coeff_homogeneousComponent,
+    ← hd, hdeg]
 
-theorem isMultiProjPrime_comap_oneBlock {Ω : Type w} [Field Ω] [Algebra k Ω] {x : Fin (N + 1) → Ω}
-    {pp : Ideal (Poly k N)} (h : IsSubvar x pp 0) :
-    NumbersDVR.IsMultiProjPrime (pp.comap (oneBlock (S := k) (N := N)).toRingHom) ∧
-      FieldNumbers.relDim (pp.comap (oneBlock (S := k) (N := N)).toRingHom) =
-        ((0 : ℕ) : WithBot (WithTop ℤ)) := by
+theorem isMultiProjPrime_comap_oneBlock
+    {Ω : Type w} [Field Ω] [Algebra k Ω]
+    {x : Fin (N + 1) → Ω} {pp : Ideal (Poly k N)} (h : IsSubvar x pp 0)
+    : NumbersDVR.IsMultiProjPrime (pp.comap (oneBlock (S := k) (N := N)).toRingHom)
+      ∧ FieldNumbers.relDim (pp.comap (oneBlock (S := k) (N := N)).toRingHom)
+        = ((0 : ℕ) : WithBot (WithTop ℤ)) := by
   have := h.isPrime
   let e : NumbersDVR.MRing (fun _ : Unit => Fin (N + 1)) k ≃+* Poly k N :=
     (renameEquiv k (HilbertPositive.blockEquiv N)).toRingEquiv
@@ -49,8 +51,9 @@ theorem isMultiProjPrime_comap_oneBlock {Ω : Type w} [Field Ω] [Algebra k Ω] 
     Ideal.ext fun _ => Iff.rfl
   refine ⟨⟨Ideal.comap_isPrime _ _, ?_, ?_⟩, ?_⟩
   · intro f hf b
-    have heq : weightedHomogeneousComponent (NumbersDVR.blockWeight (fun _ : Unit => Fin (N + 1))) b f =
-        homogeneousComponent (b ()) f := by
+    have heq
+        : weightedHomogeneousComponent (NumbersDVR.blockWeight (fun _ : Unit => Fin (N + 1))) b f
+          = homogeneousComponent (b ()) f := by
       ext d
       rw [coeff_weightedHomogeneousComponent, coeff_homogeneousComponent,
         HilbertPositive.weight_blockWeight_one d]

@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MinSt5OfMinS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
 open ReciprocityTheory.AnForm.R
 open scoped CategoryTheory.Obj
 open GlobalTheory.SiegJoin
@@ -17,10 +20,16 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TorDown
 
-theorem ext_of_fraction_meet : ∀ (Z : Scheme.{0}) (R R' : Type) [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R'] [IsLocalRing R'] (gam : FractionRing R →+* FractionRing R'), (∀ (x : FractionRing R) (w : R'), algebraMap R' _ w = gam x → ∃ r : R, algebraMap R _ r = x) → ∀ (x : Sp (FractionRing R) ⟶ Z) (a' : Sp R' ⟶ Z), jK R' ≫ a' = spMap gam ≫ x → ∃ a : Sp R ⟶ Z, jK R ≫ a = x := by
+theorem ext_of_fraction_meet
+    : ∀ (Z : Scheme.{0}) (R R' : Type) [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R']
+        [IsLocalRing R'] (gam : FractionRing R →+* FractionRing R'),
+      (∀ (x : FractionRing R) (w : R'), algebraMap R' _ w = gam x → ∃ r : R, algebraMap R _ r = x)
+        → ∀ (x : Sp (FractionRing R) ⟶ Z) (a' : Sp R' ⟶ Z),
+          jK R' ≫ a' = spMap gam ≫ x → ∃ a : Sp R ⟶ Z, jK R ≫ a = x := by
   intro Z R R' _ _ _ _ _ gam hgam x a' hx
-  obtain ⟨U, hU, hz, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 Z.isBasis_affineOpens)
-    (show a' (IsLocalRing.closedPoint R') ∈ (⊤ : Z.Opens) from trivial)
+  obtain ⟨U, hU, hz, -⟩ :=
+    (TopologicalSpace.Opens.isBasis_iff_nbhd.1 Z.isBasis_affineOpens)
+      (show a' (IsLocalRing.closedPoint R') ∈ (⊤ : Z.Opens) from trivial)
   have hU' : IsAffineOpen U := hU
   have hra : Set.range a' ⊆ Set.range hU'.fromSpec := by
     rw [hU'.range_fromSpec]
@@ -40,7 +49,8 @@ theorem ext_of_fraction_meet : ∀ (Z : Scheme.{0}) (R R' : Type) [CommRing R] [
   rw [← Spec.map_preimage (IsOpenImmersion.lift hU'.fromSpec x hrx)] at hx₁
   set ψ := Spec.preimage (IsOpenImmersion.lift hU'.fromSpec a' hra) with hψ
   set χ := Spec.preimage (IsOpenImmersion.lift hU'.fromSpec x hrx) with hχ
-  have key : ψ ≫ CommRingCat.ofHom (algebraMap R' (FractionRing R')) = χ ≫ CommRingCat.ofHom gam := by
+  have key
+      : ψ ≫ CommRingCat.ofHom (algebraMap R' (FractionRing R')) = χ ≫ CommRingCat.ofHom gam := by
     apply Spec.map_injective
     rw [← cancel_mono hU'.fromSpec, Spec.map_comp, Spec.map_comp, Category.assoc, Category.assoc,
       ha₁, hx₁]
@@ -53,8 +63,9 @@ theorem ext_of_fraction_meet : ∀ (Z : Scheme.{0}) (R R' : Type) [CommRing R] [
     exact ⟨r, hr⟩
   have hinj : Function.Injective (algebraMap R (FractionRing R)).rangeRestrict := fun a b h =>
     IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val h)
-  let eR := RingEquiv.ofBijective (algebraMap R (FractionRing R)).rangeRestrict
-    ⟨hinj, RingHom.rangeRestrict_surjective _⟩
+  let eR :=
+    RingEquiv.ofBijective (algebraMap R (FractionRing R)).rangeRestrict
+      ⟨hinj, RingHom.rangeRestrict_surjective _⟩
   let θ : Γ(Z, U) →+* R := eR.symm.toRingHom.comp (χ.hom.codRestrict _ hmem)
   have hθ : ∀ b, algebraMap R (FractionRing R) (θ b) = χ.hom b := by
     intro b

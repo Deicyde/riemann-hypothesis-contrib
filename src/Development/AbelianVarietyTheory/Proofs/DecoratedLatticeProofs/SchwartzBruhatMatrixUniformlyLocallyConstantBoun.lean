@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing
 open GlobalTheory.FinPl
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -17,14 +20,25 @@ noncomputable section
 
 namespace GlobalTheory.SBUnif
 
-theorem uniform : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] (Ψ : Matrix n n' k → ℂ), Ψ ∈ SB (Matrix n n' k) → ∃ N : ℕ, 0 < N ∧ (∀ X Y : Matrix n n' k, (∀ i j, Y i j ∈ 𝒪[k]) → Ψ (X + (N : k) • Y) = Ψ X) ∧ ∀ X, Ψ X ≠ 0 → ∀ i j, (N : k) * X i j ∈ 𝒪[k] := by
+theorem uniform
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+        (Ψ : Matrix n n' k → ℂ),
+      Ψ ∈ SB (Matrix n n' k)
+        → ∃ N : ℕ,
+          0 < N ∧ (∀ X Y : Matrix n n' k, (∀ i j, Y i j ∈ 𝒪[k]) → Ψ (X + (N : k) • Y) = Ψ X)
+            ∧ ∀ X, Ψ X ≠ 0 → ∀ i j, (N : k) * X i j ∈ 𝒪[k] := by
   intro k _ _ _ _ n n' _ _ _ _ Ψ hΨ
   classical
-  obtain ⟨a, ha⟩ := GlobalTheory.LocMod.Inhab.exists_box_subset (GlobalTheory.LocMod.Inhab.eventually_invariant hΨ)
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.LocMod.Inhab.exists_box_subset (GlobalTheory.LocMod.Inhab.eventually_invariant hΨ)
   have hinv : ∀ X u, u ∈ GlobalTheory.LocMod.Inhab.box n n' a → Ψ (X + u) = Ψ X := fun X u hu =>
-    GlobalTheory.LocMod.Inhab.invariant_of_tsupport (K := GlobalTheory.LocMod.Inhab.box n n' a) (fun u hu => ha u hu) u hu X
+    GlobalTheory.LocMod.Inhab.invariant_of_tsupport (K := GlobalTheory.LocMod.Inhab.box n n' a)
+      (fun u hu => ha u hu)
+      u hu X
   obtain ⟨R, hR⟩ := GlobalTheory.LocMod.Inhab.exists_cosets hΨ a
-  let F : Finset k := insert (a : k) ((R ×ˢ (Finset.univ ×ˢ Finset.univ)).image fun x => x.1 x.2.1 x.2.2)
+  let F : Finset k :=
+    insert (a : k) ((R ×ˢ (Finset.univ ×ˢ Finset.univ)).image fun x => x.1 x.2.1 x.2.2)
   obtain ⟨b, -, hb⟩ := F.exists_max_image (fun x => valuation k x) ⟨_, Finset.mem_insert_self _ _⟩
   have hab : valuation k (a : k) ≤ valuation k b := hb _ (Finset.mem_insert_self _ _)
   have ha0 : valuation k (a : k) ≠ 0 := by simp
@@ -47,16 +61,19 @@ theorem uniform : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
     refine hinv X _ fun r q => ?_
     rw [Matrix.smul_apply, smul_eq_mul, map_mul, Nat.cast_pow, map_pow]
     have hY' : valuation k (Y r q) ≤ 1 := hY r q
-    calc valuation k (resCard k : k) ^ (e₁ + e₂) * valuation k (Y r q)
-        ≤ valuation k (resCard k : k) ^ e₁ * 1 :=
-          mul_le_mul' (pow_le_pow_right_of_le_one' hq.le (Nat.le_add_right _ _)) hY'
+    calc
+      valuation k (resCard k : k) ^ (e₁ + e₂) * valuation k (Y r q)
+          ≤ valuation k (resCard k : k) ^ e₁ * 1 :=
+        mul_le_mul' (pow_le_pow_right_of_le_one' hq.le (Nat.le_add_right _ _)) hY'
       _ ≤ valuation k (a : k) := by rw [mul_one]; exact he₁.le
   · intro X hX i j
     show valuation k _ ≤ 1
     rw [map_mul, Nat.cast_pow, map_pow]
-    calc valuation k (resCard k : k) ^ (e₁ + e₂) * valuation k (X i j)
-        ≤ (valuation k b)⁻¹ * valuation k b :=
-          mul_le_mul' ((pow_le_pow_right_of_le_one' hq.le (Nat.le_add_left _ _)).trans he₂.le) (hsupp X hX i j)
+    calc
+      valuation k (resCard k : k) ^ (e₁ + e₂) * valuation k (X i j)
+          ≤ (valuation k b)⁻¹ * valuation k b :=
+        mul_le_mul' ((pow_le_pow_right_of_le_one' hq.le (Nat.le_add_left _ _)).trans he₂.le)
+          (hsupp X hX i j)
       _ = 1 := inv_mul_cancel₀ hb0
 
 end GlobalTheory.SBUnif

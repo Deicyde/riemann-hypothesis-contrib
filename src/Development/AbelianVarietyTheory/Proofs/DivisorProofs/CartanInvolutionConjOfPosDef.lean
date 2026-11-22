@@ -10,12 +10,12 @@ open scoped RealInnerProductSpace ContDiff Real ComplexOrder MatrixOrder
 
 namespace GlobalTheory
 
-
 open scoped MatrixOrder in
-theorem cartanInvolution_conj_of_posDef (ι : Type) [Fintype ι] [DecidableEq ι]
-    (s s' : Matrix ι ι ℂ) (hs : sᴴ = s) (hss : s * s = 1) (hs's' : s' * s' = 1)
-    (hM : (s * s').PosDef) :
-    ∃ a : Matrix ι ι ℂ, aᴴ * s * a = s ∧ a * s = s' * a := by
+theorem cartanInvolution_conj_of_posDef
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (s s' : Matrix ι ι ℂ)
+    (hs : sᴴ = s) (hss : s * s = 1) (hs's' : s' * s' = 1) (hM : (s * s').PosDef)
+    : ∃ a : Matrix ι ι ℂ, aᴴ * s * a = s ∧ a * s = s' * a := by
   set M := s * s' with hMdef
   have hMpsd : M.PosSemidef := hM.posSemidef
   have hM0 : 0 ≤ M := Matrix.nonneg_iff_posSemidef.mpr hMpsd
@@ -27,13 +27,16 @@ theorem cartanInvolution_conj_of_posDef (ι : Type) [Fintype ι] [DecidableEq ι
   have hsM : s * M = s' := by rw [hMdef, ← Matrix.mul_assoc, hss, Matrix.one_mul]
   have hMinv : M⁻¹ = s * M * s := by
     apply Matrix.inv_eq_left_inv
-    calc s * M * s * M = (s * M) * (s * M) := by simp only [Matrix.mul_assoc]
+    calc
+      s * M * s * M
+        = (s * M) * (s * M) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hsM, hs's']
   have hsRs : CFC.sqrt M⁻¹ = s * R * s := by
     refine CFC.sqrt_unique ?_ ?_
-    · calc s * R * s * (s * R * s) = s * (R * R) * s := by
-            simp only [Matrix.mul_assoc]
-            rw [← Matrix.mul_assoc s s, hss, Matrix.one_mul]
+    · calc
+        s * R * s * (s * R * s) = s * (R * R) * s := by
+          simp only [Matrix.mul_assoc]
+          rw [← Matrix.mul_assoc s s, hss, Matrix.one_mul]
         _ = M⁻¹ := by rw [hRR, hMinv]
     · have h := hRpsd.conjTranspose_mul_mul_same s
       rw [hs] at h
@@ -50,7 +53,9 @@ theorem cartanInvolution_conj_of_posDef (ι : Type) [Fintype ι] [DecidableEq ι
   refine ⟨R⁻¹, ?_, ?_⟩
   · rw [Matrix.conjTranspose_nonsing_inv, hRh, Matrix.mul_assoc, hsRinv, ← Matrix.mul_assoc,
       Matrix.nonsing_inv_mul _ hRu, Matrix.one_mul]
-  · calc R⁻¹ * s = s * R := by rw [hRinv, Matrix.mul_assoc, hss, Matrix.mul_one]
+  · calc
+      R⁻¹ * s
+        = s * R := by rw [hRinv, Matrix.mul_assoc, hss, Matrix.mul_one]
       _ = s * M * R⁻¹ := by
         rw [← hRR, Matrix.mul_assoc s, Matrix.mul_assoc R, Matrix.mul_nonsing_inv _ hRu,
           Matrix.mul_one]

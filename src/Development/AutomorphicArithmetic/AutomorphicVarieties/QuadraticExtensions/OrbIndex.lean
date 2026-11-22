@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
 namespace UpperTheory.V.Two.DyadicOrbitIndex
@@ -35,8 +37,9 @@ private theorem intCast_mem_vQ (n : ℤ) : ((n : ℤ) : 𝓞 ℚ) ∈ (vQ l).asI
 private theorem val_intCast_le_one (A : ValuationSubring Ω) (n : ℤ) : A.valuation (n : Ω) ≤ 1 :=
   (A.valuation_le_one_iff _).mpr (intCast_mem A n)
 
-private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ) :
-    A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
+private theorem val_intCast_lt_one_iff
+    (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) (n : ℤ)
+    : A.valuation (n : Ω) < 1 ↔ ((l : ℕ) : ℤ) ∣ n := by
   constructor
   · intro h
     by_contra hnd
@@ -47,7 +50,8 @@ private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuati
       refine Valuation.map_add_lt _ ?_ ?_
       · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_intCast_le_one A a)) hA
       · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_intCast_le_one A b)) h
-    have h2 : (a : Ω) * ((l : ℕ) : Ω) + (b : Ω) * (n : Ω) = 1 := by exact_mod_cast congrArg (Int.cast : ℤ → Ω) hab
+    have h2 : (a : Ω) * ((l : ℕ) : Ω) + (b : Ω) * (n : Ω) = 1 := by
+      exact_mod_cast congrArg (Int.cast : ℤ → Ω) hab
     rw [h2, map_one] at h1
     exact lt_irrefl _ h1
   · rintro ⟨k, rfl⟩
@@ -55,18 +59,23 @@ private theorem val_intCast_lt_one_iff (A : ValuationSubring Ω) (hA : A.valuati
     rw [map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' (val_intCast_le_one A k)) hA
 
-private theorem isPlaceOver_vQ [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) :
-    IsPlaceOver (F := ℚ) A (vQ l) := by
+private theorem isPlaceOver_vQ
+    [Algebra ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   intro x
-  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = ((n : ℤ) : 𝓞 ℚ) :=
-    ⟨Rat.ringOfIntegersEquiv x, by
+  obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = ((n : ℤ) : 𝓞 ℚ) := ⟨
+    Rat.ringOfIntegersEquiv x,
+    by
       have := Rat.ringOfIntegersEquiv.symm_apply_apply x
-      rw [← this]; simp⟩
+      rw [← this]
+      simp
+  ⟩
   rw [intCast_mem_vQ, ← val_intCast_lt_one_iff A hA]
   simp
 
-private theorem smul_val_lt [Algebra ℚ Ω] (g : G ℚ Ω) (A : ValuationSubring Ω) (n : ℕ)
-    (hA : A.valuation (n : Ω) < 1) : (g • A).valuation (n : Ω) < 1 := by
+private theorem smul_val_lt
+    [Algebra ℚ Ω] (g : G ℚ Ω) (A : ValuationSubring Ω) (n : ℕ) (hA : A.valuation (n : Ω) < 1)
+    : (g • A).valuation (n : Ω) < 1 := by
   rw [← ValuationSubring.mem_nonunits_iff, ValuationSubring.mem_nonunits_iff_or] at hA ⊢
   rcases hA with h | h
   · exact Or.inl h
@@ -80,8 +89,11 @@ private theorem smul_val_lt [Algebra ℚ Ω] (g : G ℚ Ω) (A : ValuationSubrin
 end UpperTheory.V.Two.DyadicOrbitIndex
 
 open UpperTheory.V.Two.DyadicOrbitIndex in
-theorem UpperTheory.V.Two.orbIndex :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (p : ℕ) (V : Subgroup (G ℚ Ω)) [V.Normal] (A₀ : ValuationSubring Ω), p.Prime → A₀.valuation (p : Ω) < 1 → (V ⊔ Dec (F := ℚ) A₀).index ≠ 0 → OrbLe V p (V ⊔ Dec (F := ℚ) A₀).index := by
+theorem UpperTheory.V.Two.orbIndex
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (p : ℕ) (V : Subgroup (G ℚ Ω))
+        [V.Normal] (A₀ : ValuationSubring Ω),
+      p.Prime → A₀.valuation (p : Ω) < 1 → (V ⊔ Dec (F := ℚ) A₀).index ≠ 0
+        → OrbLe V p (V ⊔ Dec (F := ℚ) A₀).index := by
   intro Ω _ _ _ p V hV A₀ hp h0 hi
   classical
   haveI : Fact p.Prime := ⟨hp⟩
@@ -94,16 +106,21 @@ theorem UpperTheory.V.Two.orbIndex :
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hB
     exact smul_val_lt _ _ _ h0
   · intro A hA
-    obtain ⟨g, rfl⟩ := exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ A₀ h0) (isPlaceOver_vQ A hA)
+    obtain ⟨g, rfl⟩ :=
+      exists_smul_eq_of_isPlaceOver (F := ℚ) (isPlaceOver_vQ A₀ h0) (isPlaceOver_vQ A hA)
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (V ⊔ Dec (F := ℚ) A₀) g
-    have hm : (h⁻¹ : G ℚ Ω) ∈ ((V ⊔ Dec (F := ℚ) A₀ : Subgroup (G ℚ Ω)) : Set (G ℚ Ω)) := inv_mem h.2
+    have hm : (h⁻¹ : G ℚ Ω) ∈ ((V ⊔ Dec (F := ℚ) A₀ : Subgroup (G ℚ Ω)) : Set (G ℚ Ω)) :=
+      inv_mem h.2
     rw [Subgroup.normal_mul] at hm
     obtain ⟨v, hv, d, hd, e⟩ := hm
     set r := (QuotientGroup.mk g : G ℚ Ω ⧸ (V ⊔ Dec (F := ℚ) A₀)).out with hr
-    refine ⟨r • A₀, Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩, r * v * r⁻¹, hV.conj_mem v hv r, ?_⟩
+    refine
+      ⟨r • A₀, Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩, r * v * r⁻¹, hV.conj_mem v hv r, ?_⟩
     have hd' : d • A₀ = A₀ := (mem_Dec (F := ℚ)).1 hd
     have eg : g = r * v * d := by
       have e' : v * d = (h : G ℚ Ω)⁻¹ := e
-      rw [mul_assoc, e', hh]; group
+      rw [mul_assoc, e', hh]
+      group
     rw [eg, mul_smul (r * v) d, hd', smul_smul]
-    congr 1; group
+    congr 1
+    group

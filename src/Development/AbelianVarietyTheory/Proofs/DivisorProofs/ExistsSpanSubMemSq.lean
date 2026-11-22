@@ -97,17 +97,21 @@ lemma exists_sub_mem_pow (B : Subalgebra O A) (I : Ideal A)
     rw [e]
     exact hm
 
-theorem aeval_surjective (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A]
-    [Module.Finite O A] [IsLocalRing A] (q : O) (hq : q ∈ IsLocalRing.maximalIdeal O)
-    (ε : A →ₐ[O] O) (d : ℕ) (x : Fin d → A) (hx : ∀ i, ε (x i) = 0)
-    (hN : ∀ i, ∃ N : ℕ, algebraMap O A q ∣ x i ^ N)
-    (hs : Submodule.span O (Set.range fun i ↦ GlobalTheory.AugCot.d ε (x i)) = ⊤) :
-    Function.Surjective (MvPolynomial.aeval x : MvPolynomial (Fin d) O → A) := by
+theorem aeval_surjective
+    (O A : Type)
+    [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Module.Finite O A] [IsLocalRing A]
+    (q : O) (hq : q ∈ IsLocalRing.maximalIdeal O)
+    (ε : A →ₐ[O] O) (d : ℕ) (x : Fin d → A)
+    (hx : ∀ i, ε (x i) = 0) (hN : ∀ i, ∃ N : ℕ, algebraMap O A q ∣ x i ^ N)
+    (hs : Submodule.span O (Set.range fun i ↦ GlobalTheory.AugCot.d ε (x i)) = ⊤)
+    : Function.Surjective (MvPolynomial.aeval x : MvPolynomial (Fin d) O → A) := by
   classical
   let B : Subalgebra O A := Algebra.adjoin O (Set.range x)
-  have h0 : ∀ a, ∃ b ∈ B, a - b ∈ RingHom.ker ε := fun a =>
-    ⟨algebraMap O A (ε a), B.algebraMap_mem _,
-      RingHom.mem_ker.mpr (show ε (a - algebraMap O A (ε a)) = 0 by simp)⟩
+  have h0 : ∀ a, ∃ b ∈ B, a - b ∈ RingHom.ker ε := fun a => ⟨
+    algebraMap O A (ε a),
+    B.algebraMap_mem _,
+    RingHom.mem_ker.mpr (show ε (a - algebraMap O A (ε a)) = 0 by simp)
+  ⟩
   have h1 : ∀ c ∈ RingHom.ker ε, ∃ m ∈ B, m ∈ RingHom.ker ε ∧ c - m ∈ RingHom.ker ε ^ 2 := by
     intro c hc
     obtain ⟨m, hm, hmI, hcm⟩ := exists_span_sub_mem_sq ε x hx hs hc

@@ -11,16 +11,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZarhinBundle
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 attribute [local instance] Over.cartesianMonoidalCategory
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.quasiInv_of :
-    PairCalc → DivC → QuasiInv := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.quasiInv_of : PairCalc → DivC → QuasiInv := by
   intro hPair hDiv p _ D R _ b N κ _ _ _ s c hc o o' ψ hψ hfin hsur hpol hker
   obtain ⟨hAdd, -, -, ⟨e, he, hE⟩, hcalc⟩ := hPair p D R b N (Sp κ) s o
   obtain ⟨hAdd', -⟩ := hPair p D R b N (Sp κ) s o'
@@ -43,7 +45,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.quasiInv_of :
       rw [MonObj.comp_pow, GlobalTheory.ZarhinKerB.evc_pow_left _ hAdd, ← hmul, Category.assoc, hx,
         MonObj.comp_one]
       exact IsAdditive.evc_one _ hAdd' _
-    refine GlobalTheory.T.abelianScheme_torsionPoint_trivial_of_geometric (Sp κ) o.A o.ab T (x ^ c) e (hunit T) h1 ?_
+    refine GlobalTheory.T.abelianScheme_torsionPoint_trivial_of_geometric (Sp κ) o.A o.ab T (x ^ c)
+      e (hunit T) h1 ?_
     intro k _ _ _ z g
     rw [MonObj.comp_pow]
     have hg : g ≫ x = 1 := hker k z (g ≫ x) (by rw [Category.assoc, hx, MonObj.comp_one])
@@ -54,15 +57,16 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.quasiInv_of :
   let Av' : GlobalTheory.AV.AbVar κ := ⟨o'.A, o'.ab, d', hd'⟩
   let q : Av ⟶ Av' := GlobalTheory.AV.AbVar.Hom.mk (A := Av) (B := Av') ψ
   have hpm : IsMonHom (𝟙 o.A ^ c) :=
-    (GlobalTheory.AV.AbVar.homSub Av Av).pow_mem (show (𝟙 Av.X) ∈ GlobalTheory.AV.AbVar.homSub Av Av from
-      (inferInstance : IsMonHom (𝟙 o.A))) c
+    (GlobalTheory.AV.AbVar.homSub Av Av).pow_mem
+      (show (𝟙 Av.X) ∈ GlobalTheory.AV.AbVar.homSub Av Av from (inferInstance : IsMonHom (𝟙 o.A))) c
   let f : Av ⟶ Av := GlobalTheory.AV.AbVar.Hom.mk (A := Av) (B := Av) (𝟙 o.A ^ c)
   have hfhom : f.hom = 𝟙 o.A ^ c := rfl
   have hq : GlobalTheory.AV.AbVar.IsIsogeny q := ⟨hfin, hsur⟩
-  obtain ⟨g, hg⟩ := GlobalTheory.AV.AbVar.exists_factor_of_isogeny κ Av Av' Av q f hq (by
-    intro T x hx
-    rw [hfhom, MonObj.comp_pow, Category.comp_id]
-    exact hkc T x hx)
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.AV.AbVar.exists_factor_of_isogeny κ Av Av' Av q f hq (by
+      intro T x hx
+      rw [hfhom, MonObj.comp_pow, Category.comp_id]
+      exact hkc T x hx)
   have hgm : IsMonHom g.hom := (Additive.toMul g).2
   have hgψ : ψ ≫ g.hom = 𝟙 o.A ^ c := by
     rw [← hfhom, ← hg]

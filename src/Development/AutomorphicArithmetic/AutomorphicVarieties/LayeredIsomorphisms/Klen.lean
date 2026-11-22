@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
+open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
 
-private theorem isTotallyComplex_of_hasMuQ (l : ℕ) [Fact l.Prime] (L : Type) [Field L] [NumberField L] (h : HasMuQ l L) :
-    IsTotallyComplex L := by
+private theorem isTotallyComplex_of_hasMuQ
+    (l : ℕ) [Fact l.Prime] (L : Type) [Field L] [NumberField L] (h : HasMuQ l L)
+    : IsTotallyComplex L := by
   obtain ⟨ζ, hζ⟩ := h
   set n := if l = 2 then 4 else l with hn
   have hn2 : 2 < n := by
     have := (Fact.out : l.Prime).two_le
-    rw [hn]; split_ifs with h2
+    rw [hn]
+    split_ifs with h2
     · norm_num
     · omega
   have : NeZero n := ⟨by omega⟩
@@ -24,10 +27,17 @@ private theorem isTotallyComplex_of_hasMuQ (l : ℕ) [Fact l.Prime] (L : Type) [
     IsCyclotomicExtension.Rat.isTotallyComplex (IntermediateField.adjoin ℚ {ζ}) hn2
   exact isTotallyComplex_of_algebra (IntermediateField.adjoin ℚ {ζ}) L
 
-theorem UpperTheory.V.Win.klen :
-    ∀ CK : ℝ, LemmaK CK → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω]
-      [IsAlgClosure L Ω] (D : LData L Ω l), HasMuQ l L → ∀ e : ℕ, 1 ≤ e →
-        VLen D e ≠ ⊤ ∧ ((VLen D e).toNat : ℝ) ≤ 2 * kBound CK e (Module.finrank ℚ L) (discr L).natAbs := by
+theorem UpperTheory.V.Win.klen
+    : ∀ CK : ℝ,
+      LemmaK CK
+        → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω]
+            [IsAlgClosure L Ω] (D : LData L Ω l),
+          HasMuQ l L
+            → ∀ e : ℕ,
+              1 ≤ e
+                → VLen D e ≠ ⊤
+                  ∧ ((VLen D e).toNat : ℝ)
+                    ≤ 2 * kBound CK e (Module.finrank ℚ L) (discr L).natAbs := by
   intro CK hK l _ L Ω _ _ _ _ _ D hmu e he
   have htc := isTotallyComplex_of_hasMuQ l L hmu
   obtain ⟨hfin, hlog⟩ := hK l L Ω D htc hmu e he

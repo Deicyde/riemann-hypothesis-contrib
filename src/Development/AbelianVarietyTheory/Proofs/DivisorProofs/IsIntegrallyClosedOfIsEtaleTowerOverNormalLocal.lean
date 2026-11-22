@@ -9,16 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsDomain
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory.EtNormal
 
-theorem isDomain_and_isIntegrallyClosed_of_formallyEtale (A T : Type*) [CommRing A] [IsDomain A]
-    [IsIntegrallyClosed A] [IsNoetherianRing A] [CommRing T] [IsLocalRing T] [Algebra A T]
-    [Algebra.FormallyEtale A T] [Algebra.EssFiniteType A T] :
-    IsDomain T ∧ IsIntegrallyClosed T := by
+theorem isDomain_and_isIntegrallyClosed_of_formallyEtale
+    (A T : Type*) [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [IsNoetherianRing A] [CommRing T]
+    [IsLocalRing T] [Algebra A T] [Algebra.FormallyEtale A T] [Algebra.EssFiniteType A T]
+    : IsDomain T ∧ IsIntegrallyClosed T := by
   let B := Algebra.EssFiniteType.subalgebra A T
   let P : Ideal B := (IsLocalRing.maximalIdeal T).comap (algebraMap B T)
   haveI hP : P.IsPrime := Ideal.comap_isPrime _ _
@@ -39,17 +41,20 @@ theorem isDomain_and_isIntegrallyClosed_of_formallyEtale (A T : Type*) [CommRing
   obtain ⟨f, hfP, n, _, _, _⟩ :=
     Algebra.IsSmoothAt.exists_isStandardEtale_mvPolynomial (R := A) (p := P)
   have := isIntegrallyClosed_mvPolynomial_fin A n
-  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (.powers f)
-    (Localization.Away f) P ?_
-    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_etale (MvPolynomial (Fin n) A) q _) T
+  refine isDomain_and_isIntegrallyClosed_atPrime_of_isLocalization (.powers f) (Localization.Away f)
+    P ?_
+    (fun q _ ↦ isDomain_and_isIntegrallyClosed_atPrime_of_etale (MvPolynomial (Fin n) A) q _)
+    T
   rwa [Ideal.disjoint_powers_iff_notMem_of_isPrime]
 
 end GlobalTheory.EtNormal
 
 namespace GlobalTheory.FieldPair
 
-theorem isIntegrallyClosed_of_isEtTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K) (T : Subring L)
-    (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T), IsEtTower cK R cL T ι ψ τ → IsIntegrallyClosed T := by
+theorem isIntegrallyClosed_of_isEtTower
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T),
+      IsEtTower cK R cL T ι ψ τ → IsIntegrallyClosed T := by
   intro K L _ _ cK cL r R T ι ψ τ h
   haveI := h.top.isLocalRing
   haveI := h.normal

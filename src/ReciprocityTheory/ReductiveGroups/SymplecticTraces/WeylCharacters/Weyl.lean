@@ -15,7 +15,6 @@ namespace ReciprocityTheory.ChartRestriction.TR.Weyl
 
 open ReciprocityTheory.ChartRestriction.DS.S7
 
-theorem weyl : WeylStatement :=
-  weyl_of (kCharGT_of (uChar_of sqChar)) blockComb
+theorem weyl : WeylStatement := weyl_of (kCharGT_of (uChar_of sqChar)) blockComb
 
 end ReciprocityTheory.ChartRestriction.TR.Weyl

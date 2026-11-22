@@ -20,16 +20,15 @@ def eM (α : Fin m → ℂ) : Matrix (Fin m) (Fin m) ℂ :=
 def hM (α : Fin m → ℂ) (μ : Fin m → ℕ) : Matrix (Fin m) (Fin m) ℂ :=
   Matrix.of fun k j => hZ ((μ j : ℤ) - (k.rev : ℕ)) α
 
-theorem factor (hE : ERel) (α : Fin m → ℂ) (μ : Fin m → ℕ) :
-    (Matrix.of fun i j => α i ^ μ j) = eM α * hM α μ := by
+theorem factor (hE : ERel) (α : Fin m → ℂ) (μ : Fin m → ℕ)
+    : (Matrix.of fun i j => α i ^ μ j) = eM α * hM α μ := by
   ext i j
   rw [Matrix.of_apply, hE m α i (μ j), Matrix.mul_apply]
   simp only [eM, hM, Matrix.of_apply]
   rw [← Fin.sum_univ_eq_sum_range (fun r => (-1 : ℂ) ^ r * eEx α i r * hZ ((μ j : ℤ) - (r : ℤ)) α)]
   exact (Fintype.sum_equiv Fin.revPerm _ _ (fun k => rfl)).symm
 
-theorem hZ_neg (α : Fin m → ℂ) {z : ℤ} (hz : z < 0) : hZ z α = 0 := by
-  simp [hZ, hz]
+theorem hZ_neg (α : Fin m → ℂ) {z : ℤ} (hz : z < 0) : hZ z α = 0 := by simp [hZ, hz]
 
 theorem hZ_zero (α : Fin m → ℂ) : hZ 0 α = 1 := by
   simp only [hZ, hN, lt_irrefl, if_false, Int.toNat_zero]
@@ -55,8 +54,8 @@ theorem det_hM_stair (α : Fin m → ℂ) : (hM α (stair m)).det = 1 := by
     have := j.isLt
     omega
 
-theorem hM_add_stair (α : Fin m → ℂ) (l : Fin m → ℕ) :
-    hM α (l + stair m) = Matrix.of fun i j : Fin m => hZ ((l j : ℤ) - j + i) α := by
+theorem hM_add_stair (α : Fin m → ℂ) (l : Fin m → ℕ)
+    : hM α (l + stair m) = Matrix.of fun i j : Fin m => hZ ((l j : ℤ) - j + i) α := by
   ext k j
   simp only [hM, Matrix.of_apply, Pi.add_apply, stair, Fin.val_rev]
   congr 1

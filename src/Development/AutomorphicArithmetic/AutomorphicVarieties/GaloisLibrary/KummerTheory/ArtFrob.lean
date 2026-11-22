@@ -4,12 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
 section SlopeTestRemainingChoices
 
-variable {K L Ω : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L] [Algebra L Ω]
-  [Algebra K Ω] [IsScalarTower K L Ω]
+variable
+  {K L Ω : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L]
+  [Algebra L Ω] [Algebra K Ω] [IsScalarTower K L Ω]
 
 private theorem int_mem (A : ValuationSubring Ω) {b : Ω} (hb : IsIntegral ℤ b) : b ∈ A := by
   have h : IsIntegral A b := hb.tower_top
@@ -21,22 +24,26 @@ omit [NumberField L] in
 private theorem int_mem' (A : ValuationSubring Ω) (x : 𝓞 L) : algebraMap L Ω (x : L) ∈ A := by
   exact int_mem A (RingOfIntegers.isIntegral_coe x).algebraMap
 
-private theorem place_between {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v) :
-    ∃ w : HeightOneSpectrum (𝓞 L), IsPlaceOver A w ∧ w.asIdeal.LiesOver v.asIdeal := by
+private theorem place_between
+    {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 K)} (hA : IsPlaceOver A v)
+    : ∃ w : HeightOneSpectrum (𝓞 L), IsPlaceOver A w ∧ w.asIdeal.LiesOver v.asIdeal := by
   classical
-  let f : 𝓞 L →+* A :=
-    { toFun := fun x => ⟨algebraMap L Ω (x : L), int_mem' A x⟩
-      map_one' := by ext; simp
-      map_mul' := by intro x y; ext; simp
-      map_zero' := by ext; simp
-      map_add' := by intro x y; ext; simp }
-  have hmem : ∀ x : 𝓞 L, x ∈ (IsLocalRing.maximalIdeal A).comap f ↔
-      A.valuation (algebraMap L Ω (x : L)) < 1 := by
+  let f : 𝓞 L →+* A := {
+    toFun := fun x => ⟨algebraMap L Ω (x : L), int_mem' A x⟩
+    map_one' := by ext; simp
+    map_mul' := by intro x y; ext; simp
+    map_zero' := by ext; simp
+    map_add' := by intro x y; ext; simp
+  }
+  have hmem
+      : ∀ x : 𝓞 L,
+        x ∈ (IsLocalRing.maximalIdeal A).comap f ↔ A.valuation (algebraMap L Ω (x : L)) < 1 := by
     intro x
     rw [Ideal.mem_comap, ValuationSubring.valuation_lt_one_iff]
     rfl
-  have hv : ∀ y : 𝓞 K, algebraMap L Ω ((algebraMap (𝓞 K) (𝓞 L) y : 𝓞 L) : L) =
-      algebraMap K Ω (y : K) := by
+  have hv
+      : ∀ y : 𝓞 K,
+        algebraMap L Ω ((algebraMap (𝓞 K) (𝓞 L) y : 𝓞 L) : L) = algebraMap K Ω (y : K) := by
     intro y
     rw [IsScalarTower.algebraMap_apply K L Ω]
     congr 1
@@ -63,13 +70,16 @@ private theorem place_between {A : ValuationSubring Ω} {v : HeightOneSpectrum (
 variable [IsGalois K L]
 
 omit [NumberField K] [NumberField L] in
-private theorem coe_res_smul (σ : G K Ω) (x : 𝓞 L) :
-    algebraMap L Ω ((AlgEquiv.restrictNormalHom L σ • x : 𝓞 L) : L) = σ (algebraMap L Ω (x : L)) :=
+private theorem coe_res_smul (σ : G K Ω) (x : 𝓞 L)
+    : algebraMap L Ω ((AlgEquiv.restrictNormalHom L σ • x : 𝓞 L) : L)
+      = σ (algebraMap L Ω (x : L)) :=
   AlgEquiv.restrictNormal_commutes σ L (x : L)
 
-private theorem res_frob {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)} {v : HeightOneSpectrum (𝓞 K)}
-    (hw : IsPlaceOver A w) [h : w.asIdeal.LiesOver v.asIdeal] {σ : G K Ω} (hσ : IsFrob (F := K) A (normV v) σ) :
-    IsArithFrobAt (𝓞 K) (AlgEquiv.restrictNormalHom L σ) w.asIdeal := by
+private theorem res_frob
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 L)} {v : HeightOneSpectrum (𝓞 K)}
+    (hw : IsPlaceOver A w) [h : w.asIdeal.LiesOver v.asIdeal]
+    {σ : G K Ω} (hσ : IsFrob (F := K) A (normV v) σ)
+    : IsArithFrobAt (𝓞 K) (AlgEquiv.restrictNormalHom L σ) w.asIdeal := by
   have hq : Nat.card (𝓞 K ⧸ w.asIdeal.under (𝓞 K)) = normV v := by
     rw [← h.over]
     rfl
@@ -82,8 +92,10 @@ private theorem res_frob {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 
 end SlopeTestRemainingChoices
 
 open GroundTheory.Global in
-theorem UpperTheory.V.Kum.artFrob :
-    ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (σ : G K Ω), IsPlaceOver A v → IsFrob (F := K) A (normV v) σ → artCl K Ω σ = primeCl v := by
+theorem UpperTheory.V.Kum.artFrob
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)) (σ : G K Ω),
+      IsPlaceOver A v → IsFrob (F := K) A (normV v) σ → artCl K Ω σ = primeCl v := by
   intro K Ω _ _ _ _ _ A v σ hA hσ
   haveI := IsAlgClosure.isAlgClosed K (K := Ω)
   obtain ⟨w, hw, hlo⟩ := place_between (L := hilbertClassField K Ω) hA

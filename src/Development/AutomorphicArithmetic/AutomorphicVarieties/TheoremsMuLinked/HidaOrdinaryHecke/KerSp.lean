@@ -6,14 +6,21 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.kerSp :
-    ∀ {A K M W : Type} [CommRing A] [Field K] [AddCommGroup M] [Module A M] [AddCommGroup W] [Module K W] (Y0 Y : Submodule A M) [Module.Free A Y0] (e : Module.End A Y0), IsIdempotentElem e → Y ≤ Y0 → (∀ y : Y0, (y : M) ∈ Y ↔ e y = y) → ∀ (χ : A →+* K) (sp : M → W), (∀ f ∈ Y0, ∀ f' ∈ Y0, sp (f + f') = sp f + sp f') → (∀ f ∈ Y0, ∀ b : A, sp (b • f) = χ b • sp f) → (∀ (κ : Type) (b : Module.Basis κ A Y0), LinearIndependent K fun i => sp (b i)) → ∀ f : Y, sp f = 0 ↔ f ∈ (RingHom.ker χ • ⊤ : Submodule A Y) := by
+theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.kerSp
+    : ∀ {A K M W : Type} [CommRing A] [Field K] [AddCommGroup M] [Module A M] [AddCommGroup W]
+        [Module K W] (Y0 Y : Submodule A M) [Module.Free A Y0] (e : Module.End A Y0),
+      IsIdempotentElem e → Y ≤ Y0 → (∀ y : Y0, (y : M) ∈ Y ↔ e y = y)
+        → ∀ (χ : A →+* K) (sp : M → W),
+          (∀ f ∈ Y0, ∀ f' ∈ Y0, sp (f + f') = sp f + sp f')
+            → (∀ f ∈ Y0, ∀ b : A, sp (b • f) = χ b • sp f)
+            → (∀ (κ : Type) (b : Module.Basis κ A Y0), LinearIndependent K fun i => sp (b i))
+            → ∀ f : Y, sp f = 0 ↔ f ∈ (RingHom.ker χ • ⊤ : Submodule A Y) := by
   intro A K M W _ _ _ _ _ _ Y0 Y _ e he hYY0 hiff χ sp hadd hsmul hli f
   classical
-  have hsp0 : sp 0 = 0 := by
-    simpa using hadd 0 Y0.zero_mem 0 Y0.zero_mem
-  have hsum : ∀ {ι : Type} (s : Finset ι) (g : ι → M), (∀ i, g i ∈ Y0) →
-      sp (∑ i ∈ s, g i) = ∑ i ∈ s, sp (g i) := by
+  have hsp0 : sp 0 = 0 := by simpa using hadd 0 Y0.zero_mem 0 Y0.zero_mem
+  have hsum
+      : ∀ {ι : Type} (s : Finset ι) (g : ι → M),
+        (∀ i, g i ∈ Y0) → sp (∑ i ∈ s, g i) = ∑ i ∈ s, sp (g i) := by
     intro ι s g hg
     induction s using Finset.induction_on with
     | empty => simp [hsp0]

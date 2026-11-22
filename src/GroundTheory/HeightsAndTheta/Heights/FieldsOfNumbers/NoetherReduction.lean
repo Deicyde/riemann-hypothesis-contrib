@@ -15,14 +15,13 @@ universe u
 theorem finite_integralClosure_of_forall_mvPolynomial
     (k A : Type u) [Field k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A]
     (K : Type u) [Field K] [Algebra A K] [IsFractionRing A K]
-    (L : Type u) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L]
-    [IsScalarTower A K L]
+    (L : Type u) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L] [IsScalarTower A K L]
     (hpoly : ∀ (s : ℕ) (L' : Type u) [Field L'] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L']
-      [FiniteDimensional (FractionRing (MvPolynomial (Fin s) k)) L']
-      [Algebra (MvPolynomial (Fin s) k) L']
-      [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L'],
-      Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L')) :
-    Module.Finite A (integralClosure A L) := by
+        [FiniteDimensional (FractionRing (MvPolynomial (Fin s) k)) L']
+        [Algebra (MvPolynomial (Fin s) k) L']
+        [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L'],
+      Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L'))
+    : Module.Finite A (integralClosure A L) := by
   obtain ⟨s, g, hginj, hgfin⟩ := exists_finite_inj_algHom_of_fg k A
   set B := MvPolynomial (Fin s) k
   let : Algebra B A := g.toRingHom.toAlgebra
@@ -31,20 +30,21 @@ theorem finite_integralClosure_of_forall_mvPolynomial
   let : Algebra B L := ((algebraMap A L).comp (algebraMap B A)).toAlgebra
   have : IsScalarTower B A K := IsScalarTower.of_algebraMap_eq' rfl
   have : IsScalarTower B A L := IsScalarTower.of_algebraMap_eq' rfl
-  have : IsScalarTower B K L := IsScalarTower.of_algebraMap_eq fun x => by
-    change algebraMap A L (algebraMap B A x) = algebraMap K L (algebraMap A K (algebraMap B A x))
-    exact IsScalarTower.algebraMap_apply A K L _
-  have hinjBK : Function.Injective (algebraMap B K) :=
-    (IsFractionRing.injective A K).comp hginj
+  have : IsScalarTower B K L :=
+    IsScalarTower.of_algebraMap_eq fun x => by
+      change algebraMap A L (algebraMap B A x) = algebraMap K L (algebraMap A K (algebraMap B A x))
+      exact IsScalarTower.algebraMap_apply A K L _
+  have hinjBK : Function.Injective (algebraMap B K) := (IsFractionRing.injective A K).comp hginj
   have : FaithfulSMul B K := (faithfulSMul_iff_algebraMap_injective B K).mpr hinjBK
   let : Algebra (FractionRing B) K := FractionRing.liftAlgebra B K
   let : Algebra (FractionRing B) L :=
     ((algebraMap K L).comp (algebraMap (FractionRing B) K)).toAlgebra
   have : IsScalarTower (FractionRing B) K L := IsScalarTower.of_algebraMap_eq' rfl
-  have : IsScalarTower B (FractionRing B) L := IsScalarTower.of_algebraMap_eq fun x => by
-    rw [IsScalarTower.algebraMap_apply (FractionRing B) K L,
-      ← IsScalarTower.algebraMap_apply B (FractionRing B) K,
-      ← IsScalarTower.algebraMap_apply B K L]
+  have : IsScalarTower B (FractionRing B) L :=
+    IsScalarTower.of_algebraMap_eq fun x => by
+      rw [IsScalarTower.algebraMap_apply (FractionRing B) K L,
+        ← IsScalarTower.algebraMap_apply B (FractionRing B) K,
+        ← IsScalarTower.algebraMap_apply B K L]
   have : Algebra.IsIntegral B A := Algebra.IsIntegral.of_finite B A
   have : FiniteDimensional (FractionRing B) K := by
     obtain ⟨t, ht⟩ := (Module.Finite.fg_top : (⊤ : Submodule B A).FG)
@@ -73,11 +73,13 @@ theorem finite_integralClosure_of_forall_mvPolynomial
       obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := A) x
       exact div_mem (hA a) (hA b)
     rw [htop] at hfd
-    exact (IntermediateField.topEquiv (F := FractionRing B) (E := K)).toLinearEquiv.finiteDimensional
+    exact (IntermediateField.topEquiv (F := FractionRing B)
+      (E := K)).toLinearEquiv.finiteDimensional
   have : FiniteDimensional (FractionRing B) L := Module.Finite.trans K L
   have hB := hpoly s L
-  have hle : (integralClosure A L).toSubmodule.restrictScalars B ≤
-      (integralClosure B L).toSubmodule := fun y hy => isIntegral_trans (R := B) (A := A) y hy
+  have hle
+      : (integralClosure A L).toSubmodule.restrictScalars B ≤ (integralClosure B L).toSubmodule :=
+    fun y hy => isIntegral_trans (R := B) (A := A) y hy
   have : IsNoetherian B (integralClosure B L).toSubmodule :=
     isNoetherian_of_isNoetherianRing_of_finite B (integralClosure B L)
   have : IsNoetherian B ((integralClosure A L).toSubmodule.restrictScalars B) :=
@@ -86,26 +88,28 @@ theorem finite_integralClosure_of_forall_mvPolynomial
     Module.IsNoetherian.finite B ((integralClosure A L).toSubmodule.restrictScalars B)
   exact Module.Finite.of_restrictScalars_finite B A (integralClosure A L)
 
-theorem finite_integralClosure_mvPolynomial_of_isSeparable (k : Type u) [Field k] (s : ℕ)
-    (L : Type u) [Field L] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L]
+theorem finite_integralClosure_mvPolynomial_of_isSeparable
+    (k : Type u) [Field k]
+    (s : ℕ) (L : Type u) [Field L] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L]
     [FiniteDimensional (FractionRing (MvPolynomial (Fin s) k)) L]
     [Algebra.IsSeparable (FractionRing (MvPolynomial (Fin s) k)) L]
     [Algebra (MvPolynomial (Fin s) k) L]
-    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L] :
-    Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) :=
+    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L]
+    : Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) :=
   IsIntegralClosure.finite (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L
     (integralClosure (MvPolynomial (Fin s) k) L)
 
-theorem finite_integralClosure_mvPolynomial_of_charZero (k : Type u) [Field k] [CharZero k]
+theorem finite_integralClosure_mvPolynomial_of_charZero
+    (k : Type u) [Field k] [CharZero k]
     (s : ℕ) (L : Type u) [Field L] [Algebra (FractionRing (MvPolynomial (Fin s) k)) L]
     [FiniteDimensional (FractionRing (MvPolynomial (Fin s) k)) L]
     [Algebra (MvPolynomial (Fin s) k) L]
-    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L] :
-    Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) := by
+    [IsScalarTower (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k)) L]
+    : Module.Finite (MvPolynomial (Fin s) k) (integralClosure (MvPolynomial (Fin s) k) L) := by
   have : CharZero (FractionRing (MvPolynomial (Fin s) k)) :=
-    (RingHom.charZero_iff ((algebraMap (MvPolynomial (Fin s) k)
-      (FractionRing (MvPolynomial (Fin s) k))).comp (algebraMap k (MvPolynomial (Fin s) k))).injective).mp
-      inferInstance
+    (RingHom.charZero_iff
+      ((algebraMap (MvPolynomial (Fin s) k) (FractionRing (MvPolynomial (Fin s) k))).comp
+        (algebraMap k (MvPolynomial (Fin s) k))).injective).mp inferInstance
   exact finite_integralClosure_mvPolynomial_of_isSeparable k s L
 
 end GroundTheory.Heights₂.Heights.FieldNumbers

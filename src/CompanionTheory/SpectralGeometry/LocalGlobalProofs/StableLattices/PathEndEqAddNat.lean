@@ -8,9 +8,9 @@ namespace GlobalTheory.CompanionTheory.RgPath
 
 open CompanionTheory.RgExh
 
-theorem pathEnd_eq_add_nat {n : ℕ} (ss : List (_root_.Fin n)) :
-    ∀ χ : _root_.Fin n → ℂ, ∃ m : _root_.Fin n → ℕ, pathEnd χ ss = χ + (fun a => (m a : ℂ)) ∧
-      ∀ a, a ∈ ss → 1 ≤ m a := by
+theorem pathEnd_eq_add_nat {n : ℕ} (ss : List (_root_.Fin n))
+    : ∀ χ : _root_.Fin n → ℂ, ∃ m : _root_.Fin n → ℕ,
+      pathEnd χ ss = χ + (fun a => (m a : ℂ)) ∧ ∀ a, a ∈ ss → 1 ≤ m a := by
   induction ss with
   | nil =>
     intro χ
@@ -36,9 +36,8 @@ theorem pathEnd_eq_add_nat {n : ℕ} (ss : List (_root_.Fin n)) :
         simpa only [Pi.add_apply, Pi.single_eq_same] using Nat.succ_le_succ (Nat.zero_le (m' s))
       · exact (hm a ha).trans (Nat.le_add_right _ _)
 
-theorem pathEndNat (n : ℕ) (χ : _root_.Fin n → ℂ) (ss : List (_root_.Fin n)) :
-    ∃ m : _root_.Fin n → ℕ, pathEnd χ ss = χ + (fun a => (m a : ℂ)) ∧
-      ∀ a, a ∈ ss → 1 ≤ m a :=
+theorem pathEndNat (n : ℕ) (χ : _root_.Fin n → ℂ) (ss : List (_root_.Fin n))
+    : ∃ m : _root_.Fin n → ℕ, pathEnd χ ss = χ + (fun a => (m a : ℂ)) ∧ ∀ a, a ∈ ss → 1 ≤ m a :=
   pathEnd_eq_add_nat ss χ
 
 end GlobalTheory.CompanionTheory.RgPath

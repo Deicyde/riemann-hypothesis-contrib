@@ -56,25 +56,29 @@ lemma vol_img (δ : (m → ℂ) ≃ₗ[ℂ] (m → ℂ)) (Λ : AddSubgroup (m �
 
 end Vol
 
-def thetaO {a : ℕ} {b c : ℤ} {d : ℕ} (hok : UnitDetRootDefs.CmOK a b c d) : 𝓞 (KF b d) :=
-  ⟨⟨UnitDetRootDefs.cmTheta b d, theta_mem b d⟩, by
+def thetaO {a : ℕ} {b c : ℤ} {d : ℕ} (hok : UnitDetRootDefs.CmOK a b c d) : 𝓞 (KF b d) := ⟨
+  ⟨UnitDetRootDefs.cmTheta b d, theta_mem b d⟩,
+  by
     rw [mem_integralClosure_iff]
     refine ⟨Polynomial.X ^ 2 - Polynomial.C b * Polynomial.X + Polynomial.C ((a : ℤ) * c), ?_, ?_⟩
     · monicity!
     · apply (KF b d).val.injective
-      have h : ((KF b d).val.toRingHom) ((Polynomial.X ^ 2 - Polynomial.C b * Polynomial.X +
-          Polynomial.C ((a : ℤ) * c)).eval₂ (algebraMap ℤ (KF b d)) ⟨UnitDetRootDefs.cmTheta b d, theta_mem b d⟩)
-          = (Polynomial.X ^ 2 - Polynomial.C b * Polynomial.X +
-          Polynomial.C ((a : ℤ) * c)).eval₂ (Int.castRingHom ℂ) (UnitDetRootDefs.cmTheta b d) := by
-        rw [Polynomial.hom_eval₂, RingHom.ext_int ((KF b d).val.toRingHom.comp (algebraMap ℤ (KF b d)))
-          (Int.castRingHom ℂ)]
+      have h
+          : ((KF b d).val.toRingHom)
+              ((Polynomial.X ^ 2 - Polynomial.C b * Polynomial.X + Polynomial.C ((a : ℤ) * c)).eval₂
+                (algebraMap ℤ (KF b d)) ⟨UnitDetRootDefs.cmTheta b d, theta_mem b d⟩)
+            = (Polynomial.X ^ 2 - Polynomial.C b * Polynomial.X + Polynomial.C ((a : ℤ) * c)).eval₂
+              (Int.castRingHom ℂ) (UnitDetRootDefs.cmTheta b d) := by
+        rw [Polynomial.hom_eval₂,
+          RingHom.ext_int ((KF b d).val.toRingHom.comp (algebraMap ℤ (KF b d))) (Int.castRingHom ℂ)]
         rfl
       change ((KF b d).val.toRingHom) _ = (KF b d).val 0
       rw [h, map_zero]
       rw [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul, Polynomial.eval₂_X_pow,
         Polynomial.eval₂_C, Polynomial.eval₂_C, Polynomial.eval₂_X]
       simp only [eq_intCast, Int.cast_mul, Int.cast_natCast]
-      linear_combination theta_sq hok⟩
+      linear_combination theta_sq hok
+⟩
 
 lemma algebraMap_thetaO {a : ℕ} {b c : ℤ} {d : ℕ} (hok : UnitDetRootDefs.CmOK a b c d) :
     algebraMap (𝓞 (KF b d)) ℂ (thetaO hok) = UnitDetRootDefs.cmTheta b d := by

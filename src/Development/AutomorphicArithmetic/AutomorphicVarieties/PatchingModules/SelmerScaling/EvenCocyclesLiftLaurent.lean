@@ -6,10 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.k2F :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n), ∀ (k : Kap x), K2 h k → EvenCocyclesLiftLaurent h k := by
+theorem UpperTheory.V.Pa.k2F
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ)
+        (x : NP G0.frame n),
+      ∀ (k : Kap x),
+        K2 h k → EvenCocyclesLiftLaurent h k := by
   intro l _ L G G0 h n x k hK z hz
   set f := algebraMap x.A x.Fr with hf
   have ht : f x.t ≠ 0 := by
@@ -39,5 +43,5 @@ theorem UpperTheory.V.Pa.k2F :
     rw [hΨe j γ a b]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.sum_apply, Finset.sum_apply, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul,
-      map_sum, map_mul, hz2]
+        map_sum, map_mul, hz2]
     refine Finset.sum_congr rfl fun i _ => by ring

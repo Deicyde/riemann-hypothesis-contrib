@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Densit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ShortIntervalPrimes
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory
+  Formalism.MainNotions.ShortIntervalPrimes
 
 namespace GlobalTheory.ZerosNearOne
 

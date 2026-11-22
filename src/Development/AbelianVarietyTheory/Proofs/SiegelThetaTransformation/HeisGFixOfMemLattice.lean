@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -24,7 +25,17 @@ private lemma isIntegral_crd_of_mem {E : Type} [Field E] [NumberField E] [IsCMFi
   rw [← vecQ_intCast X bas m, crd_vecQ hs]
   simpa using isIntegral_algebraMap (R := ℤ) (A := ℚ) (x := m j)
 
-theorem heisG_fix_of_mem_lattice : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ φ : TF n g, IsSB φ → ∃ N : ℕ, 0 < N ∧ ∀ y : Matrix (Fin n) (Fin r) E, (∀ k, y k ∈ X.Λ) → ∀ j : ℕ, heisG X bas (((j * N : ℕ) : E) • y) φ = φ := by
+theorem heisG_fix_of_mem_lattice
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ)
+        (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
+        (n : ℕ),
+      IsSympl X bas → Even n
+        → ∀ φ : TF n g,
+          IsSB φ
+            → ∃ N : ℕ,
+              0 < N
+                ∧ ∀ y : Matrix (Fin n) (Fin r) E,
+                  (∀ k, y k ∈ X.Λ) → ∀ j : ℕ, heisG X bas (((j * N : ℕ) : E) • y) φ = φ := by
   intro E _ _ _ r X g q0 hr bas idx n hs hn φ hφ
   obtain ⟨R, hR, hlev⟩ := hφ
   refine ⟨2 * R, by omega, fun y hy j => ?_⟩
@@ -37,7 +48,8 @@ theorem heisG_fix_of_mem_lattice : ∀ (E : Type) [Field E] [NumberField E] [IsC
   rw [hsc, GlobalTheory.SW.TensVac.heisG_eq hs, map_nsmul, Prod.smul_fst, Prod.smul_snd,
     ← Nat.cast_smul_eq_nsmul ℚ (2 * R) (GlobalTheory.SW.TensVac.crdHom hs (j • y)).1,
     ← Nat.cast_smul_eq_nsmul ℚ (2 * R) (GlobalTheory.SW.TensVac.crdHom hs (j • y)).2]
-  exact GlobalTheory.SW.TensVac.heisS_fix hlev (fun k i => isIntegral_crd_of_mem hs (hmem k) (Sum.inl i))
+  exact GlobalTheory.SW.TensVac.heisS_fix hlev
+    (fun k i => isIntegral_crd_of_mem hs (hmem k) (Sum.inl i))
     (fun k i => isIntegral_crd_of_mem hs (hmem k) (Sum.inr i))
 
 end GlobalTheory.Ker

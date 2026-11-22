@@ -19,8 +19,7 @@ def IsFam {ι : Type} (act : ι → SL(2, ℤ) → ι) (w : ℤ) (f : ι → ℍ
 def IsRAct {ι : Type} (act : ι → SL(2, ℤ) → ι) : Prop :=
   (∀ i, act i 1 = i) ∧ ∀ i γ δ, act (act i γ) δ = act i (γ * δ)
 
-def ActBij {ι : Type} (act : ι → SL(2, ℤ) → ι) : Prop :=
-  ∀ γ, Function.Bijective fun i => act i γ
+def ActBij {ι : Type} (act : ι → SL(2, ℤ) → ι) : Prop := ∀ γ, Function.Bijective fun i => act i γ
 
 def conv (a b : ℕ → ℂ) (n : ℕ) : ℂ := ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, a p.1 * b p.2
 
@@ -28,7 +27,8 @@ def spread (M : ℕ) (a : ℕ → ℂ) (n : ℕ) : ℂ := if M ∣ n then a (n /
 
 def QAll (p : ℂ → Prop) (N : ℕ) (f : ℍ → ℂ) : Prop := ∃ a, HasQ N f a ∧ ∀ n, p (a n)
 
-def QConj (g : ℂ ≃+* ℂ) (N : ℕ) (f f' : ℍ → ℂ) : Prop := ∃ a, HasQ N f a ∧ HasQ N f' fun n => g (a n)
+def QConj (g : ℂ ≃+* ℂ) (N : ℕ) (f f' : ℍ → ℂ) : Prop :=
+  ∃ a, HasQ N f a ∧ HasQ N f' fun n => g (a n)
 
 def tauPair (τ : ℍ) : PeriodPair where
   ω₁ := τ
@@ -53,10 +53,14 @@ theorem IsRAct.actBij {ι : Type} {act : ι → SL(2, ℤ) → ι} (h : IsRAct a
   · show act (act i γ⁻¹) γ = i
     rw [hmul, inv_mul_cancel, hone]
 
-theorem hasQ_iff (N : ℕ) (f : ℍ → ℂ) (a : ℕ → ℂ) :
-    HasQ N f a ↔ ∀ τ : ℍ, HasSum (fun n : ℕ => a n * Complex.exp (2 * Real.pi * Complex.I * τ / N) ^ n) (f τ) := by
-  have key : ∀ (τ : ℍ) (n : ℕ), Complex.exp (2 * Real.pi * Complex.I * n * τ / N)
-      = Complex.exp (2 * Real.pi * Complex.I * τ / N) ^ n := by
+theorem hasQ_iff (N : ℕ) (f : ℍ → ℂ) (a : ℕ → ℂ)
+    : HasQ N f a
+      ↔ ∀ τ : ℍ,
+        HasSum (fun n : ℕ => a n * Complex.exp (2 * Real.pi * Complex.I * τ / N) ^ n) (f τ) := by
+  have key
+      : ∀ (τ : ℍ) (n : ℕ),
+        Complex.exp (2 * Real.pi * Complex.I * n * τ / N)
+          = Complex.exp (2 * Real.pi * Complex.I * τ / N) ^ n := by
     intro τ n
     rw [← Complex.exp_nat_mul]
     congr 1

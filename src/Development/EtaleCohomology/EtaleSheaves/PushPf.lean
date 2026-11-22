@@ -91,18 +91,18 @@ theorem Push_of : LateralTheory.E.AlgResPropsPf.Push := by
     have := congrArg (fun φ => φ.hom a) h.w
     simpa using this
   let S := (phi v.hom Q).range
-  let T : Subring D :=
-    { carrier := {x | IsAlgebraic S (Ideal.Quotient.mk Q x)}
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq, map_mul] at *; exact ha.mul hb
-      one_mem' := by simp only [Set.mem_ofPred_eq, map_one]; exact isAlgebraic_one
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq, map_add (f := _)] at *; exact ha.add hb
-      zero_mem' := by simp only [Set.mem_ofPred_eq, map_zero]; exact isAlgebraic_zero
-      neg_mem' := fun {a} ha => by
-        simp only [Set.mem_ofPred_eq, map_neg] at *
-        have := (isAlgebraic_algebraMap (R := S) (A := D ⧸ Q) (-1)).mul ha
-        simpa using this }
+  let T : Subring D := {
+    carrier := {x | IsAlgebraic S (Ideal.Quotient.mk Q x)}
+    mul_mem' := fun {a b} ha hb => by simp only [Set.mem_ofPred_eq, map_mul] at *; exact ha.mul hb
+    one_mem' := by simp only [Set.mem_ofPred_eq, map_one]; exact isAlgebraic_one
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq, map_add (f := _)] at *; exact ha.add hb
+    zero_mem' := by simp only [Set.mem_ofPred_eq, map_zero]; exact isAlgebraic_zero
+    neg_mem' := fun {a} ha => by
+      simp only [Set.mem_ofPred_eq, map_neg] at *
+      have := (isAlgebraic_algebraMap (R := S) (A := D ⧸ Q) (-1)).mul ha
+      simpa using this
+  }
   have hv : ∀ c, v.hom c ∈ T := fun c => by
     refine alg_of v.hom Q (v.hom c) (X - Polynomial.C c) 1 ?_ ?_
     · simp only [coeff_sub, coeff_X_one, coeff_C, one_ne_zero, if_false, sub_zero, map_one]

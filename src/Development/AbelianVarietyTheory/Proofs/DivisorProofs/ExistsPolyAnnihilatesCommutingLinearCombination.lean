@@ -10,10 +10,16 @@ open Polynomial
 
 namespace GlobalTheory.CommutingPoly
 
-theorem exists_poly_annihilates_linear_combination : ∀ {M : Type} [AddCommGroup M] [Module ℂ M] {ι : Type} [Fintype ι] (A : ι → Module.End ℂ M),
-    (∀ i j, Commute (A i) (A j)) → ∀ (c : ι → ℂ) (P : ι → Polynomial ℂ), (∀ i, P i ≠ 0) →
-      ∃ p : Polynomial ℂ, p ≠ 0 ∧ ∀ v : M, (∀ i, Polynomial.aeval (A i) (P i) v = 0) →
-        Polynomial.aeval (∑ i, c i • A i) p v = 0 := by
+theorem exists_poly_annihilates_linear_combination
+    : ∀ {M : Type} [AddCommGroup M] [Module ℂ M] {ι : Type} [Fintype ι] (A : ι → Module.End ℂ M),
+      (∀ i j, Commute (A i) (A j))
+        → ∀ (c : ι → ℂ) (P : ι → Polynomial ℂ),
+          (∀ i, P i ≠ 0)
+            → ∃ p : Polynomial ℂ,
+              p ≠ 0
+                ∧ ∀ v : M,
+                  (∀ i, Polynomial.aeval (A i) (P i) v = 0)
+                    → Polynomial.aeval (∑ i, c i • A i) p v = 0 := by
   intro M _ _ ι _ A hc c P hP
   classical
   letI : IsMulCommutative (Algebra.adjoin ℂ (Set.range A)) :=
@@ -22,18 +28,21 @@ theorem exists_poly_annihilates_linear_combination : ∀ {M : Type} [AddCommGrou
       exact hc i j)
   open scoped IsMulCommutative in
   let S := Algebra.adjoin ℂ (Set.range A)
-  let I : Ideal S :=
-    { carrier := {a | ∀ v : M, (∀ i, Polynomial.aeval (A i) (P i) v = 0) → (a : Module.End ℂ M) v = 0}
-      add_mem' := by
-        intro a b ha hb v hv
-        simp only [Set.mem_setOf_eq] at ha hb
-        simp [ha v hv, hb v hv]
-      zero_mem' := by intro v _; simp
-      smul_mem' := by
-        intro a b hb v hv
-        show ((a * b : S) : Module.End ℂ M) v = 0
-        rw [Subalgebra.coe_mul, Module.End.mul_apply, hb v hv, map_zero] }
-  have hI : ∀ a : S, a ∈ I ↔ ∀ v : M, (∀ i, Polynomial.aeval (A i) (P i) v = 0) → (a : Module.End ℂ M) v = 0 :=
+  let I : Ideal S := {
+    carrier := {a | ∀ v : M, (∀ i, Polynomial.aeval (A i) (P i) v = 0) → (a : Module.End ℂ M) v = 0}
+    add_mem' := by
+      intro a b ha hb v hv
+      simp only [Set.mem_setOf_eq] at ha hb
+      simp [ha v hv, hb v hv]
+    zero_mem' := by intro v _; simp
+    smul_mem' := by
+      intro a b hb v hv
+      show ((a * b : S) : Module.End ℂ M) v = 0
+      rw [Subalgebra.coe_mul, Module.End.mul_apply, hb v hv, map_zero]
+  }
+  have hI
+      : ∀ a : S,
+        a ∈ I ↔ ∀ v : M, (∀ i, Polynomial.aeval (A i) (P i) v = 0) → (a : Module.End ℂ M) v = 0 :=
     fun a => Iff.rfl
   let t : ι → S := fun i => ⟨A i, Algebra.subset_adjoin ⟨i, rfl⟩⟩
   let q : S →ₐ[ℂ] S ⧸ I := Ideal.Quotient.mkₐ ℂ I

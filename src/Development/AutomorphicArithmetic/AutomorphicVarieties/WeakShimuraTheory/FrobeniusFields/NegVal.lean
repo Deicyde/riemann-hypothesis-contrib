@@ -6,10 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem neg_val {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O] (χ : Γ →* Oˣ) (h0 : 0 < orderOf χ)
-    (h : Even (orderOf χ)) : ∃ σ, χ σ = -1 := by
+private theorem neg_val
+    {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O]
+    (χ : Γ →* Oˣ) (h0 : 0 < orderOf χ) (h : Even (orderOf χ))
+    : ∃ σ, χ σ = -1 := by
   obtain ⟨k, hk⟩ := h
   have h1 : χ ^ k ≠ 1 := pow_ne_one_of_lt_orderOf (by omega) (by omega)
   obtain ⟨σ, hσ⟩ : ∃ σ, χ σ ^ k ≠ 1 := by
@@ -25,14 +29,21 @@ private theorem neg_val {Γ O : Type} [Group Γ] [CommRing O] [IsDomain O] (χ :
   · exact absurd (Units.ext h4) hσ
   · exact Units.ext h4
 
-theorem UpperTheory.V.Ws.ev2 :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), Ctx2 D → ∀ (κ : G ℚ Ω →* c.Oˣ) (j : ℕ), κ ^ l ^ j = 1 → ∃ t, D.om t = 1 ∧ κ t = 1 ∧ Raw.bar D.Psi t = -1 := by
+theorem UpperTheory.V.Ws.ev2
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      Ctx2 D
+        → ∀ (κ : G ℚ Ω →* c.Oˣ) (j : ℕ),
+          κ ^ l ^ j = 1 → ∃ t, D.om t = 1 ∧ κ t = 1 ∧ Raw.bar D.Psi t = -1 := by
   intro Ω _ _ _ l hl c D ⟨hG, h, t, e, ψ, _, _, _, _, ⟨_, hev, _⟩, hO⟩ κ j hκ
   have lp : l.Prime := hl.out
-  have hT : IsOmT c D.om := ⟨hG.om_pow, fun σ => by
-    have := hG.om_bar σ
-    rw [← IsLocalRing.residue_eq_zero_iff, map_sub]
-    exact sub_eq_zero.2 this⟩
+  have hT : IsOmT c D.om := ⟨
+    hG.om_pow,
+    fun σ => by
+      have := hG.om_bar σ
+      rw [← IsLocalRing.residue_eq_zero_iff, map_sub]
+      exact sub_eq_zero.2 this
+  ⟩
   have hk := ((omT Ω l c).2 D.om hT).2.1
   obtain ⟨b, -, -, hb⟩ := (psiBar Ω l c D.om hT h.N ψ).1
   have ho := (psiBar Ω l c D.om hT h.N (chiP l ψ)).2.2.1
@@ -58,6 +69,7 @@ theorem UpperTheory.V.Ws.ev2 :
   · rw [map_pow, ← MonoidHom.pow_apply, hκ, MonoidHom.one_apply]
   · have e5 := hb D.e ((σ * τ⁻¹) ^ l ^ j)
     rw [MonoidHom.mul_apply, MonoidHom.pow_apply, e3, e4, one_pow, one_mul, ← hO.psi,
-      ← IsLocalRing.residue_eq_zero_iff, map_sub, sub_eq_zero] at e5
+        ← IsLocalRing.residue_eq_zero_iff, map_sub, sub_eq_zero]
+      at e5
     refine e5.trans ?_
     simp

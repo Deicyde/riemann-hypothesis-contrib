@@ -5,23 +5,32 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.AbelianDeR
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.AbLaw
+  GlobalTheory.CechPic GlobalTheory.AbDual
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.ClosedPts
 
-theorem isClosed_singleton_of_finite_points : ∀ (k : Type) [Field k] [IsAlgClosed k] (Z : Scheme.{0}) (s : Z ⟶ Sp k) [LocallyOfFiniteType s], Set.Finite {σ : Sp k ⟶ Z | σ ≫ s = 𝟙 _} → ∀ z : Z, IsClosed ({z} : Set Z) := by
+theorem isClosed_singleton_of_finite_points
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (Z : Scheme.{0}) (s : Z ⟶ Sp k)
+        [LocallyOfFiniteType s],
+      Set.Finite {σ : Sp k ⟶ Z | σ ≫ s = 𝟙 _} → ∀ z : Z, IsClosed ({z} : Set Z) := by
   intro k _ _ Z s _ hfin z
   haveI : JacobsonSpace (Sp k) :=
     (PrimeSpectrum.isJacobsonRing_iff_jacobsonSpace (R := k)).mp inferInstance
   haveI : JacobsonSpace Z := LocallyOfFiniteType.jacobsonSpace s
   let pt : Sp k := IsLocalRing.closedPoint (CommRingCat.of k)
-  have hsec : ∀ x : Z, IsClosed ({x} : Set Z) →
-      x ∈ (fun σ : Sp k ⟶ Z => σ pt) '' {σ : Sp k ⟶ Z | σ ≫ s = 𝟙 _} := by
+  have hsec
+      : ∀ x : Z,
+        IsClosed ({x} : Set Z)
+          → x ∈ (fun σ : Sp k ⟶ Z => σ pt) '' {σ : Sp k ⟶ Z | σ ≫ s = 𝟙 _} := by
     intro x hx
     haveI := (isClosed_singleton_iff_locallyOfFiniteType (x := x)).mp hx
-    obtain ⟨g, hg⟩ : ∃ g : CommRingCat.of k ⟶ Z.residueField x,
-        Spec.map g = Z.fromSpecResidueField x ≫ s :=
+    obtain ⟨g, hg⟩
+        : ∃ g : CommRingCat.of k ⟶ Z.residueField x, Spec.map g = Z.fromSpecResidueField x ≫ s :=
       ⟨Spec.preimage (Z.fromSpecResidueField x ≫ s), Spec.map_preimage _⟩
     have hlft : LocallyOfFiniteType (Spec.map g) := by rw [hg]; infer_instance
     have hft : g.hom.FiniteType := HasRingHomProperty.Spec_iff.mp hlft
@@ -44,8 +53,7 @@ theorem isClosed_singleton_of_finite_points : ∀ (k : Type) [Field k] [IsAlgClo
     · simp [Scheme.fromSpecResidueField_apply]
   have hcp : (closedPoints Z).Finite :=
     (hfin.image (fun σ : Sp k ⟶ Z => σ pt)).subset (fun x hx => hsec x hx)
-  have hT : (closure ({z} : Set Z) ∩ closedPoints Z).Finite :=
-    hcp.subset Set.inter_subset_right
+  have hT : (closure ({z} : Set Z) ∩ closedPoints Z).Finite := hcp.subset Set.inter_subset_right
   have hTc : IsClosed (closure ({z} : Set Z) ∩ closedPoints Z) := by
     rw [← Set.biUnion_of_singleton (closure ({z} : Set Z) ∩ closedPoints Z)]
     exact hT.isClosed_biUnion (fun t ht => ht.2)

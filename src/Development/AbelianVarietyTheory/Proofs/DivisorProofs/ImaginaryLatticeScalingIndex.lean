@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmulMemOfIsI
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.LieDisc
+open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.LieDisc
 
 noncomputable section
 
@@ -36,7 +37,8 @@ theorem range_dm : LinearMap.range (dm E) = imSp E := by
   constructor
   · rintro ⟨x, rfl⟩
     change cc (x - cc x) = -(x - cc x)
-    rw [show cc (x - cc x) = cc x - cc (cc x) by simp [cc], cc_cc]; ring
+    rw [show cc (x - cc x) = cc x - cc (cc x) by simp [cc], cc_cc]
+    ring
   · intro hy
     refine ⟨(1 / 2 : ℚ) • y, ?_⟩
     change (1 / 2 : ℚ) • y - cc ((1 / 2 : ℚ) • y) = y
@@ -47,10 +49,11 @@ theorem range_dm : LinearMap.range (dm E) = imSp E := by
 theorem mem_ker_dm {x : E} : x ∈ LinearMap.ker (dm E) ↔ x ∈ maximalRealSubfield E := by
   rw [LinearMap.mem_ker, ← IsCMField.complexConj_eq_self_iff]
   change x - cc x = 0 ↔ _
-  rw [sub_eq_zero, eq_comm]; rfl
+  rw [sub_eq_zero, eq_comm]
+  rfl
 
-def kerEquiv (E : Type) [Field E] [NumberField E] [IsCMField E] :
-    LinearMap.ker (dm E) ≃ₗ[ℚ] maximalRealSubfield E where
+def kerEquiv (E : Type) [Field E] [NumberField E] [IsCMField E]
+    : LinearMap.ker (dm E) ≃ₗ[ℚ] maximalRealSubfield E where
   toFun x := ⟨x.1, mem_ker_dm.1 x.2⟩
   invFun y := ⟨y.1, mem_ker_dm.2 y.2⟩
   map_add' x y := rfl
@@ -61,7 +64,9 @@ def kerEquiv (E : Type) [Field E] [NumberField E] [IsCMField E] :
 theorem finrank_imSp : Module.finrank ℚ (imSp E) = fdeg E := by
   have h := LinearMap.finrank_range_add_finrank_ker (dm E)
   rw [range_dm, (kerEquiv E).finrank_eq] at h
-  have h1 := (letI : Module.Free (maximalRealSubfield E) E := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (maximalRealSubfield E) E)
+  have h1 :=
+    (letI : Module.Free (maximalRealSubfield E) E := Module.Free.of_divisionRing _ _
+     Module.finrank_mul_finrank ℚ (maximalRealSubfield E) E)
   have h2 : Module.finrank (maximalRealSubfield E) E = 2 :=
     Algebra.IsQuadraticExtension.finrank_eq_two _ _
   unfold fdeg
@@ -69,11 +74,13 @@ theorem finrank_imSp : Module.finrank ℚ (imSp E) = fdeg E := by
   omega
 
 instance : Module.Finite ℤ (imLat E) := by
-  let f : imLat E →+ 𝓞 E :=
-    { toFun := fun x => ⟨x.1, x.2.1⟩
-      map_zero' := rfl
-      map_add' := fun x y => rfl }
-  exact Module.Finite.of_injective f.toIntLinearMap (fun x y h => Subtype.ext (congrArg Subtype.val h :))
+  let f : imLat E →+ 𝓞 E := {
+    toFun := fun x => ⟨x.1, x.2.1⟩
+    map_zero' := rfl
+    map_add' := fun x y => rfl
+  }
+  exact Module.Finite.of_injective f.toIntLinearMap
+    (fun x y h => Subtype.ext (congrArg Subtype.val h :))
 
 instance : Module.Free ℤ (imLat E) := Module.free_of_finite_type_torsion_free'
 
@@ -116,11 +123,12 @@ theorem finrank_imLat : Module.finrank ℤ (imLat E) = fdeg E := by
 
 end GlobalTheory.LieDisc.ImIndex
 
-
 open GlobalTheory.LieDisc.ImIndex in
-theorem GlobalTheory.LieDisc.relIndex_mulLeft_imLat : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ),
-    Unr E → 1 ≤ r →
-      (AddSubgroup.map (AddMonoidHom.mulLeft (r : E)) (imLat E)).relIndex (imLat E) = r ^ fdeg E := by
+theorem GlobalTheory.LieDisc.relIndex_mulLeft_imLat
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ),
+      Unr E → 1 ≤ r
+        → (AddSubgroup.map (AddMonoidHom.mulLeft (r : E)) (imLat E)).relIndex (imLat E)
+          = r ^ fdeg E := by
   intro E _ _ _ r _ _
   rw [AddSubgroup.relIndex, ← finrank_imLat, ← AddSubgroup.index_range_nsmul (imLat E) r]
   congr 1

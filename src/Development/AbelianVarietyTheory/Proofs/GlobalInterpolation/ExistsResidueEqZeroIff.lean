@@ -8,21 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Finite
 @[expose] public section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory.ResidueBoxVolume
 
-
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-theorem _root_.GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-    (x : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) :
-    (∃ y : v.adicCompletionIntegers F, x = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ∧
-      IsLocalRing.residue (v.adicCompletionIntegers F) y = 0) ↔ Valued.v x < 1 := by
+theorem _root_.GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
+    (x : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+    : (∃ y : v.adicCompletionIntegers F,
+        x = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+          ∧ IsLocalRing.residue (v.adicCompletionIntegers F) y = 0)
+      ↔ Valued.v x < 1 := by
   constructor
   · rintro ⟨y, rfl, hy⟩
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
-      HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one] at hy
+        HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one]
+      at hy
     exact lt_of_le_of_ne ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ v).1 y.2) hy
   · intro hx
     refine ⟨⟨x, (HeightOneSpectrum.mem_adicCompletionIntegers _ _ v).2 hx.le⟩, rfl, ?_⟩
@@ -32,28 +37,39 @@ theorem _root_.GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff {F : Typ
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-theorem _root_.GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    IsOpen {x : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v | Valued.v x < 1} := by
-  rw [isOpen_iff_mem_nhds]
-  intro x hx
-  rw [Valued.mem_nhds]
-  refine ⟨1, fun y hy => ?_⟩
-  simp only [Set.mem_setOf_eq] at hx hy ⊢
-  have hy' : y = (y - x) + x := by ring
-  rw [hy']
-  exact Valuation.map_add_lt _ (by simpa using hy) hx
+theorem _root_.GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one
+    {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : IsOpen
+      {x : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v | Valued.v x < 1} :=
+  by
+    rw [isOpen_iff_mem_nhds]
+    intro x hx
+    rw [Valued.mem_nhds]
+    refine ⟨1, fun y hy => ?_⟩
+    simp only [Set.mem_setOf_eq] at hx hy ⊢
+    have hy' : y = (y - x) + x := by ring
+    rw [hy']
+    exact Valuation.map_add_lt _ (by simpa using hy) hx
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {V : Type}
-  [AddCommGroup V] [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] {ι : Type} [Fintype ι] in
-private theorem mem_residue_box_singleton_iff (e : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
-    (s : ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F)) (x : V) :
-    (∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _)) ↔
-    ∀ i, ∃ y : v.adicCompletionIntegers F, e x i = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ∧
-      IsLocalRing.residue (v.adicCompletionIntegers F) y = s i := by
+variable
+  {F : Type} [Field F] [NumberField F]
+  {v : HeightOneSpectrum (𝓞 F)} {V : Type} [AddCommGroup V]
+  [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V]
+  [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  {ι : Type} [Fintype ι] in
+private theorem mem_residue_box_singleton_iff
+    (e
+      : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
+    (s : ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F)) (x : V)
+    : (∃ y : ι → v.adicCompletionIntegers F,
+        (∀ i,
+            e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
+          ∧ (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _))
+      ↔ ∀ i, ∃ y : v.adicCompletionIntegers F,
+        e x i = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+          ∧ IsLocalRing.residue (v.adicCompletionIntegers F) y = s i := by
   simp only [Set.mem_singleton_iff, funext_iff]
   constructor
   · rintro ⟨y, h1, h2⟩ i
@@ -64,14 +80,18 @@ private theorem mem_residue_box_singleton_iff (e : V ≃L[_root_.Formalism.MainN
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-private theorem exists_residue_eq_iff_exists_residue_sub_eq_zero {F : Type} [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (a : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+private theorem exists_residue_eq_iff_exists_residue_sub_eq_zero
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
+    (a : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
     (c : IsLocalRing.ResidueField (v.adicCompletionIntegers F)) (t : v.adicCompletionIntegers F)
-    (ht : IsLocalRing.residue (v.adicCompletionIntegers F) t = c) :
-    (∃ y : v.adicCompletionIntegers F, a = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ∧
-      IsLocalRing.residue (v.adicCompletionIntegers F) y = c) ↔
-    ∃ y : v.adicCompletionIntegers F, a - t = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ∧
-      IsLocalRing.residue (v.adicCompletionIntegers F) y = 0 := by
+    (ht : IsLocalRing.residue (v.adicCompletionIntegers F) t = c)
+    : (∃ y : v.adicCompletionIntegers F,
+        a = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+          ∧ IsLocalRing.residue (v.adicCompletionIntegers F) y = c)
+      ↔ ∃ y : v.adicCompletionIntegers F,
+        a - t = (y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+          ∧ IsLocalRing.residue (v.adicCompletionIntegers F) y = 0 := by
   constructor
   · rintro ⟨y, rfl, hy⟩
     exact ⟨y - t, rfl, by rw [map_sub, hy, ht, sub_self]⟩
@@ -83,63 +103,91 @@ private theorem exists_residue_eq_iff_exists_residue_sub_eq_zero {F : Type} [Fie
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {V : Type}
-  [AddCommGroup V] [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] {ι : Type} [Fintype ι] in
-private theorem exists_residueBox_eq_preimage_add_lemma_2 (e : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
-    (s : ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F)) :
-    ∃ w : V, {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _)} =
-      (fun x => x + w) ⁻¹' {x | ∃ y : ι → v.adicCompletionIntegers F,
-        (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-        (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
+variable
+  {F : Type} [Field F] [NumberField F]
+  {v : HeightOneSpectrum (𝓞 F)} {V : Type} [AddCommGroup V]
+  [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V]
+  [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  {ι : Type} [Fintype ι] in
+private theorem exists_residueBox_eq_preimage_add_lemma_2
+    (e
+      : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
+    (s : ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F))
+    : ∃ w : V,
+      {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+          (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _)}
+        = (fun x => x + w)
+          ⁻¹' {x | ∃ y : ι → v.adicCompletionIntegers F,
+            (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+            (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
   choose t ht using fun i => IsLocalRing.residue_surjective (s i)
-  refine ⟨-e.symm (fun i => (t i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)), ?_⟩
+  refine ⟨
+    - e.symm (fun i =>
+      (t i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)),
+    ?_
+  ⟩
   ext x
   simp only [Set.mem_setOf_eq, Set.mem_preimage, mem_residue_box_singleton_iff, Pi.zero_apply,
-    map_add, map_neg, map_sub, ContinuousLinearEquiv.apply_symm_apply, Pi.add_apply,
-    Pi.neg_apply, Pi.sub_apply, ← sub_eq_add_neg]
+    map_add, map_neg, map_sub, ContinuousLinearEquiv.apply_symm_apply, Pi.add_apply, Pi.neg_apply,
+    Pi.sub_apply, ← sub_eq_add_neg]
   exact forall_congr' fun i => exists_residue_eq_iff_exists_residue_sub_eq_zero v _ _ _ (ht i)
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {V : Type}
-  [AddCommGroup V] [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] {ι : Type} [Fintype ι] in
-private theorem measurableSet_residue_box_zero (e : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) :
-    MeasurableSet {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
-  have h : {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} =
-      ⋂ i, (fun x => e x i) ⁻¹' {a : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v | Valued.v a < 1} := by
-    ext x
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, mem_residue_box_singleton_iff,
-      Pi.zero_apply, _root_.GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff]
+variable
+  {F : Type} [Field F] [NumberField F]
+  {v : HeightOneSpectrum (𝓞 F)} {V : Type} [AddCommGroup V]
+  [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V]
+  [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  {ι : Type} [Fintype ι] in
+private theorem measurableSet_residue_box_zero
+    (e
+      : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
+    : MeasurableSet
+      {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+        (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
+  have h
+      : {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+          (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)}
+        = ⋂ i, (fun x => e x i) ⁻¹' {a : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v | Valued.v a < 1} :=
+    by
+      ext x
+      simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, mem_residue_box_singleton_iff,
+        Pi.zero_apply, _root_.GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff]
   rw [h]
   exact (isOpen_iInter_of_finite fun i =>
-    (_root_.GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one v).preimage ((continuous_apply i).comp e.continuous)).measurableSet
+    (_root_.GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one v).preimage
+      ((continuous_apply i).comp e.continuous)).measurableSet
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in
-variable {F : Type} [Field F] [NumberField F] {v : HeightOneSpectrum (𝓞 F)} {V : Type}
-  [AddCommGroup V] [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] {ι : Type} [Fintype ι] in
-private theorem measure_residueBox_lemma (μ : Measure V) [μ.IsAddHaarMeasure]
-    (e : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
-    (S : Set (ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F))) :
-    μ {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ S} =
-    S.ncard * μ {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
+variable
+  {F : Type} [Field F] [NumberField F]
+  {v : HeightOneSpectrum (𝓞 F)} {V : Type} [AddCommGroup V]
+  [Module (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) V]
+  [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  {ι : Type} [Fintype ι] in
+private theorem measure_residueBox_lemma
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (e
+      : V ≃L[_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v] (ι → _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v))
+    (S : Set (ι → IsLocalRing.ResidueField (v.adicCompletionIntegers F)))
+    : μ
+        {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+        (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ S}
+      = S.ncard * μ
+        {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+          (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({0} : Set _)} := by
   classical
   haveI : Finite (IsLocalRing.ResidueField (v.adicCompletionIntegers F)) :=
     _root_.GlobalTheory.SelfDualGenus.finite_residueField_adicCompletionIntegers v
   have hS : S.Finite := S.toFinite
-  have hunion : {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-      (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ S} =
-      ⋃ s ∈ hS.toFinset, {x | ∃ y : ι → v.adicCompletionIntegers F,
-        (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
-        (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _)} := by
+  have hunion
+      : {x | ∃ y : ι → v.adicCompletionIntegers F, (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+          (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ S}
+        = ⋃ s ∈ hS.toFinset, {x | ∃ y : ι → v.adicCompletionIntegers F,
+            (∀ i, e x i = (y i : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)) ∧
+            (fun i => IsLocalRing.residue (v.adicCompletionIntegers F) (y i)) ∈ ({s} : Set _)} := by
     ext x
     simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.Finite.mem_toFinset, Set.mem_singleton_iff,
       exists_prop]
@@ -165,7 +213,6 @@ private theorem measure_residueBox_lemma (μ : Measure V) [μ.IsAddHaarMeasure]
     obtain ⟨w, hw⟩ := exists_residueBox_eq_preimage_add_lemma_2 e s
     rw [hw]
     exact (measurableSet_residue_box_zero e).preimage (continuous_add_const w).measurable
-
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain MeasureTheory Topology in

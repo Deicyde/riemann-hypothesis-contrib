@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SymplecticFo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.DblScal
 open scoped Matrix
@@ -21,29 +23,37 @@ namespace GlobalTheory.DblScal
 
 open Matrix
 
-theorem isUnit_det_dbl_map {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {v : Pl (F := F)}
-    (t : E →ₐ[F] Fv F v) {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (hJ : J.det ≠ 0) :
-    IsUnit ((dbl J).map t).det := by
-  have e : ((dbl J).map t).det = (t : E →+* Fv F v) (dbl J).det := by
-    rw [RingHom.map_det]; rfl
+theorem isUnit_det_dbl_map
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {v : Pl (F := F)} (t : E →ₐ[F] Fv F v)
+    {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (hJ : J.det ≠ 0)
+    : IsUnit ((dbl J).map t).det := by
+  have e : ((dbl J).map t).det = (t : E →+* Fv F v) (dbl J).det := by rw [RingHom.map_det]; rfl
   rw [e, isUnit_iff_ne_zero]
   have hd : (dbl J).det ≠ 0 := by
     rw [dbl, Matrix.det_fromBlocks_zero₂₁, Matrix.det_neg]
     exact mul_ne_zero hJ (mul_ne_zero (pow_ne_zero _ (by simp)) hJ)
   exact (map_ne_zero_iff _ (t : E →+* Fv F v).injective).2 hd
 
-theorem unitary_at {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-    {v : Pl (F := F)} (t : E →ₐ[F] Fv F v) {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (X : UD σ J) :
-    ((X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW t))ᵀ * (dbl J).map t *
-      (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW (t.comp σ)) = (dbl J).map t := by
-  have hX : (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E))ᵀ * dbl (incM F J) *
-      (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (cA σ) = dbl (incM F J) := X.2
+theorem unitary_at
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} {v : Pl (F := F)} (t : E →ₐ[F] Fv F v)
+    {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (X : UD σ J)
+    : ((X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW t))ᵀ * (dbl J).map t
+        * (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW (t.comp σ))
+      = (dbl J).map t := by
+  have hX
+      : (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E))ᵀ * dbl (incM F J)
+          * (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (cA σ)
+        = dbl (incM F J) :=
+    X.2
   have h := congrArg (fun M => M.map (piW t)) hX
   simp only [Matrix.map_mul, Matrix.transpose_map] at h
   have eD : (dbl (incM F J)).map (piW t) = (dbl J).map t := by
     ext (i | i) (j | j) <;> simp [dbl, incM, GlobalTheory.Div.CoordOpp.piW_inclR]
-  have eC : ((X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (cA σ)).map (piW t) =
-      (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW (t.comp σ)) := by
+  have eC
+      : ((X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (cA σ)).map (piW t)
+        = (X.1.val : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E)).map (piW (t.comp σ)) := by
     ext i j; simp [GlobalTheory.Div.CoordOpp.piW_cA]
   rw [eD, eC] at h
   simpa [Matrix.transpose_map] using h
@@ -51,16 +61,22 @@ theorem unitary_at {F E : Type} [Field F] [NumberField F] [Field E] [NumberField
 end GlobalTheory.DblScal
 
 open GlobalTheory.DblScal in
-theorem GlobalTheory.DblScal.locMatD_injOn : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∀ (d : ℕ) (J : Matrix (Fin d) (Fin d) E), J.det ≠ 0 →
-    ∀ (v : Pl (F := F)) (t : E →ₐ[F] Fv F v) (c : GL (Fin d) (Fv F v)),
-    Set.InjOn (locMatD (σ := σ) (J := J) t c) (UDAt σ J (evFin F v)) := by
+theorem GlobalTheory.DblScal.locMatD_injOn
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (J : Matrix (Fin d) (Fin d) E),
+          J.det ≠ 0
+            → ∀ (v : Pl (F := F)) (t : E →ₐ[F] Fv F v) (c : GL (Fin d) (Fv F v)),
+              Set.InjOn (locMatD (σ := σ) (J := J) t c) (UDAt σ J (evFin F v)) := by
   intro F E _ _ _ _ _ σ hcm d J hJ v t c p hp q hq hpq
   set P : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E) := p.1.val with hPdef
   set Q : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (AE F E) := q.1.val with hQdef
 
-  have e0 : (dsum c)⁻¹ * Matrix.GeneralLinearGroup.map (piW t) p.1 * dsum c =
-      (dsum c)⁻¹ * Matrix.GeneralLinearGroup.map (piW t) q.1 * dsum c := hpq
+  have e0
+      : (dsum c)⁻¹ * Matrix.GeneralLinearGroup.map (piW t) p.1 * dsum c
+        = (dsum c)⁻¹ * Matrix.GeneralLinearGroup.map (piW t) q.1 * dsum c :=
+    hpq
   have eG := mul_left_cancel (mul_right_cancel e0)
   have h1 : P.map (piW t) = Q.map (piW t) := congrArg Units.val eG
 
@@ -82,7 +98,8 @@ theorem GlobalTheory.DblScal.locMatD_injOn : ∀ (F E : Type) [Field F] [NumberF
     simpa only [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hD, Matrix.one_mul] using this
 
   set e := GlobalTheory.EmbChart.atPlace v (1 : Fv F v)
-  have hev : evFin F v (1 - e) = 0 := by rw [map_sub, map_one, GlobalTheory.EmbChart.evFin_atPlace, sub_self]
+  have hev : evFin F v (1 - e) = 0 := by
+    rw [map_sub, map_one, GlobalTheory.EmbChart.evFin_atPlace, sub_self]
   have hp' : At (evFin F v) (P - 1) := hp
   have hq' : At (evFin F v) (Q - 1) := hq
   have hM : P - Q = e • (P - Q) := by

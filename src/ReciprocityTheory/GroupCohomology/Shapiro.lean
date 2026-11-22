@@ -27,10 +27,13 @@ theorem shp_hom_ext {φ ψ : Hom A B} (h : ∀ n, φ.f n = ψ.f n) : φ = ψ := 
   funext n
   exact h n
 
-theorem shp_bij_of_inv (φ : Hom A B) (ψ : Hom B A) (n : ℕ) (h1 : (ψ.comp φ).H n = (Hom.id A).H n)
-    (h2 : (φ.comp ψ).H n = (Hom.id B).H n) : Bijective (φ.H n) := by
-  have hcomp : ∀ {P Q S : Cx R} (α : Hom Q S) (β : Hom P Q) (x : P.H n),
-      (α.comp β).H n x = α.H n (β.H n x) := by
+theorem shp_bij_of_inv
+    (φ : Hom A B) (ψ : Hom B A) (n : ℕ)
+    (h1 : (ψ.comp φ).H n = (Hom.id A).H n) (h2 : (φ.comp ψ).H n = (Hom.id B).H n)
+    : Bijective (φ.H n) := by
+  have hcomp
+      : ∀ {P Q S : Cx R} (α : Hom Q S) (β : Hom P Q) (x : P.H n),
+        (α.comp β).H n x = α.H n (β.H n x) := by
     intro P Q S α β x
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     rfl
@@ -39,7 +42,8 @@ theorem shp_bij_of_inv (φ : Hom A B) (ψ : Hom B A) (n : ℕ) (h1 : (ψ.comp φ
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     rfl
   refine ⟨fun x y hxy => ?_, fun y => ⟨ψ.H n y, ?_⟩⟩
-  · calc x = (Hom.id A).H n x := (hid x).symm
+  · calc
+      x = (Hom.id A).H n x := (hid x).symm
       _ = (ψ.comp φ).H n x := by rw [h1]
       _ = ψ.H n (φ.H n x) := hcomp ψ φ x
       _ = ψ.H n (φ.H n y) := by rw [hxy]
@@ -52,10 +56,13 @@ theorem shp_qi_of_bij (φ : Hom A B) (h : ∀ n, Bijective (φ.f n)) : φ.QuasiI
   let e : ∀ n, A.X n ≃ₗ[R] B.X n := fun n => LinearEquiv.ofBijective (φ.f n) (h n)
   have h1 : ∀ m (y : B.X m), φ.f m ((e m).symm y) = y := fun m y => (e m).apply_symm_apply y
   have h0 : ∀ m (x : A.X m), (e m).symm (φ.f m x) = x := fun m x => (e m).symm_apply_apply x
-  let ψ : Hom B A := ⟨fun n => (e n).symm.toLinearMap, fun n x => by
-    apply (h (n + 1)).1
-    show φ.f (n + 1) ((e (n + 1)).symm (B.d n x)) = φ.f (n + 1) (A.d n ((e n).symm x))
-    rw [φ.comm, h1, h1]⟩
+  let ψ : Hom B A := ⟨
+    fun n => (e n).symm.toLinearMap,
+    fun n x => by
+      apply (h (n + 1)).1
+      show φ.f (n + 1) ((e (n + 1)).symm (B.d n x)) = φ.f (n + 1) (A.d n ((e n).symm x))
+      rw [φ.comm, h1, h1]
+  ⟩
   intro n
   apply shp_bij_of_inv φ ψ n
   · congr 1
@@ -73,7 +80,9 @@ end QI
 
 section Push
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R]
+  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {U : Subgroup G} {M : TRep R U} {C : TRep R G} (ev : Pair C M) (hφ : ev.φ = U.subtype)
 
 include hφ in
@@ -82,24 +91,29 @@ theorem shp_phi (y : U) : ev.φ y = (y : G) := by
   rfl
 
 def shpPush (n : ℕ) : hcoch C G n →ₗ[R] hcoch M G n where
-  toFun F := ⟨fun x => ev.u (F.1 x), ev.u_cont.comp F.2.1, fun g x => by
-    have h := F.2.2 (g : G) x
-    show ev.u (F.1 fun i => (g : G) * x i) = M.rho g (ev.u (F.1 x))
-    rw [← ev.equiv, shp_phi ev hφ]
-    exact congrArg ev.u h⟩
+  toFun F := ⟨
+    fun x => ev.u (F.1 x),
+    ev.u_cont.comp F.2.1,
+    fun g x => by
+      have h := F.2.2 (g : G) x
+      show ev.u (F.1 fun i => (g : G) * x i) = M.rho g (ev.u (F.1 x))
+      rw [← ev.equiv, shp_phi ev hφ]
+      exact congrArg ev.u h
+  ⟩
   map_add' F F' := Subtype.ext (funext fun x => map_add ev.u _ _)
   map_smul' c F := Subtype.ext (funext fun x => map_smul ev.u _ _)
 
 theorem shpPush_apply (n : ℕ) (F : hcoch C G n) (x) : (shpPush ev hφ n F).1 x = ev.u (F.1 x) := rfl
 
-theorem shpPush_hd (n : ℕ) (F : hcoch C G n) (F' : hcoch C G (n + 1)) (h : F'.1 = hd n F.1) :
-    (shpPush ev hφ (n + 1) F').1 = hd n (shpPush ev hφ n F).1 := by
+theorem shpPush_hd (n : ℕ) (F : hcoch C G n) (F' : hcoch C G (n + 1)) (h : F'.1 = hd n F.1)
+    : (shpPush ev hφ (n + 1) F').1 = hd n (shpPush ev hφ n F).1 := by
   funext x
   rw [shpPush_apply, h]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hd, map_sum, map_zsmul, shpPush_apply]
+  simp only [hd, map_sum, map_zsmul, shpPush_apply]
 
-variable (j : C.V → C(G, M.V)) (hj : Topology.IsEmbedding j) (hjc : ∀ c g, j c g = ev.u (C.rho g c))
+variable
+  (j : C.V → C(G, M.V)) (hj : Topology.IsEmbedding j) (hjc : ∀ c g, j c g = ev.u (C.rho g c))
   (hr : ∀ f : C(G, M.V), (∀ (x : U) g, f (x * g) = M.rho x (f g)) → f ∈ Set.range j)
 
 include hj hjc hr in
@@ -115,8 +129,11 @@ theorem shpPush_bij (n : ℕ) : Bijective (shpPush ev hφ n) := by
     simpa only [shpPush_apply] using h'
   · intro K
     have hKc : Continuous K.1 := K.2.1
-    let m2 : C((Fin (n + 1) → G) × G, M.V) := ⟨fun q => K.1 fun i => q.2 * q.1 i,
-      hKc.comp (continuous_pi fun i => continuous_snd.mul ((continuous_apply i).comp continuous_fst))⟩
+    let m2 : C((Fin (n + 1) → G) × G, M.V) := ⟨
+      fun q => K.1 fun i => q.2 * q.1 i,
+      hKc.comp (continuous_pi fun i =>
+        continuous_snd.mul ((continuous_apply i).comp continuous_fst))
+    ⟩
     let Φ : (Fin (n + 1) → G) → C(G, M.V) := fun q => ContinuousMap.curry m2 q
     have hΦ : Continuous Φ := (ContinuousMap.curry m2).continuous
     have hΦr : ∀ q, ∃ c, j c = Φ q := by
@@ -159,27 +176,36 @@ theorem shapiro_holds : ShapiroStatement.{u} := by
   obtain ⟨eC, hC, hCf, -⟩ := homogIso_holds R G C
   obtain ⟨eM, hM, hMf, -⟩ := homogIso_holds R U M
   obtain ⟨B, eB, hB⟩ := homogExists_holds R U M G
-  obtain ⟨P, hP⟩ : ∃ P : Hom C.coch B, ∀ n f, eB n (P.f n f) = shpPush ev hφ n (eC n f) :=
-    ⟨⟨fun n => ((eB n).symm.toLinearMap.comp (shpPush ev hφ n)).comp (eC n).toLinearMap, fun n F => by
-      apply (eB (n + 1)).injective
-      apply Subtype.ext
-      rw [hB]
-      simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
-      exact shpPush_hd ev hφ n _ _ (hC n F)⟩,
-     fun n f => (eB n).apply_symm_apply _⟩
-  obtain ⟨φ1, hφ1⟩ := (prism_holds R U M U G M.coch B eM eB hM hB).1 Subtype.val
-    continuous_subtype_val (fun g x => rfl)
+  obtain ⟨P, hP⟩ : ∃ P : Hom C.coch B, ∀ n f, eB n (P.f n f) = shpPush ev hφ n (eC n f) := ⟨
+    ⟨
+      fun n => ((eB n).symm.toLinearMap.comp (shpPush ev hφ n)).comp (eC n).toLinearMap,
+      fun n F => by
+        apply (eB (n + 1)).injective
+        apply Subtype.ext
+        rw [hB]
+        simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
+        exact shpPush_hd ev hφ n _ _ (hC n F)
+    ⟩,
+    fun n f => (eB n).apply_symm_apply _
+  ⟩
+  obtain ⟨φ1, hφ1⟩ :=
+    (prism_holds R U M U G M.coch B eM eB hM hB).1 Subtype.val continuous_subtype_val
+      (fun g x => rfl)
   obtain ⟨φ2, hφ2⟩ := (prism_holds R U M G U B M.coch eB eM hB hM).1 r hrc (fun g x => hrx g x)
   have h12 : ∀ n, (φ1.comp φ2).H n = (Hom.id M.coch).H n :=
-    (prism_holds R U M U U M.coch M.coch eM eM hM hM).2 (fun u => r u) id (φ1.comp φ2) (Hom.id _)
-      (hrc.comp continuous_subtype_val) continuous_id (fun g x => hrx g x) (fun g x => rfl)
+    (prism_holds R U M U U M.coch M.coch eM eM hM hM).2
+      (fun u => r u)
+      id (φ1.comp φ2) (Hom.id _) (hrc.comp continuous_subtype_val) continuous_id
+      (fun g x => hrx g x)
+      (fun g x => rfl)
       (fun n F x => by
         show (eM n (φ1.f n (φ2.f n F))).1 x = _
         rw [hφ1, hφ2])
       (fun n F x => rfl)
   have h21 : ∀ n, (φ2.comp φ1).H n = (Hom.id B).H n :=
-    (prism_holds R U M G G B B eB eB hB hB).2 (fun g => (r g : G)) id (φ2.comp φ1) (Hom.id _)
-      (continuous_subtype_val.comp hrc) continuous_id
+    (prism_holds R U M G G B B eB eB hB hB).2
+      (fun g => (r g : G))
+      id (φ2.comp φ1) (Hom.id _) (continuous_subtype_val.comp hrc) continuous_id
       (fun g x => by
         show ((r (↑g * x) : U) : G) = ↑g * ↑(r x)
         rw [hrx, Subgroup.coe_mul])
@@ -197,20 +223,26 @@ theorem shapiro_holds : ShapiroStatement.{u} := by
     exact (eB n).symm.bijective.comp
       ((shpPush_bij (ev := ev) (hφ := hφ) (j := j) (hj := hj) (hjc := hjc) (hr := hrj) n).comp
         (eC n).bijective)
-  have hL : ∀ n f x, (eM n (ev.hom.f n f)).1 x =
-      ev.u (C.rho (x 0 : G) (f.1 fun i => ((x i.castSucc : G))⁻¹ * x i.succ)) := by
+  have hL
+      : ∀ n f x,
+        (eM n (ev.hom.f n f)).1 x
+          = ev.u (C.rho (x 0 : G) (f.1 fun i => ((x i.castSucc : G))⁻¹ * x i.succ)) := by
     intro n f x
     rw [hMf]
     show M.rho (x 0) (ev.u (f.1 fun i => ev.φ ((x i.castSucc)⁻¹ * x i.succ))) = _
     rw [← ev.equiv]
     simp only [shp_phi ev hφ, Subgroup.coe_mul, Subgroup.coe_inv]
-  have hR : ∀ n f x, (eM n ((φ1.comp P).f n f)).1 x =
-      ev.u (C.rho (x 0 : G) (f.1 fun i => ((x i.castSucc : G))⁻¹ * x i.succ)) := by
+  have hR
+      : ∀ n f x,
+        (eM n ((φ1.comp P).f n f)).1 x
+          = ev.u (C.rho (x 0 : G) (f.1 fun i => ((x i.castSucc : G))⁻¹ * x i.succ)) := by
     intro n f x
     show (eM n (φ1.f n (P.f n f))).1 x = _
     rw [hφ1, hP, shpPush_apply, hCf]
-  have hev : ev.hom = φ1.comp P := shp_hom_ext fun n => LinearMap.ext fun f =>
-    (eM n).injective (Subtype.ext (funext fun x => (hL n f x).trans (hR n f x).symm))
+  have hev : ev.hom = φ1.comp P :=
+    shp_hom_ext fun n =>
+      LinearMap.ext fun f =>
+        (eM n).injective (Subtype.ext (funext fun x => (hL n f x).trans (hR n f x).symm))
   intro n
   rw [hev]
   have hc : ∀ y, (φ1.comp P).H n y = φ1.H n (P.H n y) := fun y => by
@@ -222,7 +254,9 @@ theorem shapiro_holds : ShapiroStatement.{u} := by
 
 section Coind
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R]
+  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   (U : Subgroup G) (M : TRep R U)
 
 def coindSub : Submodule R C(G, M.V) where
@@ -234,9 +268,13 @@ def coindSub : Submodule R C(G, M.V) where
 variable {U M}
 
 def coindTr (g : G) : coindSub U M →ₗ[R] coindSub U M where
-  toFun f := ⟨f.1.comp ⟨(· * g), continuous_mul_const g⟩, fun x h => by
-    show f.1 (x * h * g) = M.rho x (f.1 (h * g))
-    rw [mul_assoc]; exact f.2 x (h * g)⟩
+  toFun f := ⟨
+    f.1.comp ⟨(· * g), continuous_mul_const g⟩,
+    fun x h => by
+      show f.1 (x * h * g) = M.rho x (f.1 (h * g))
+      rw [mul_assoc]
+      exact f.2 x (h * g)
+  ⟩
   map_add' f f' := rfl
   map_smul' c f := rfl
 
@@ -244,12 +282,16 @@ variable (U M)
 
 def coindRho : Representation R G (coindSub U M) where
   toFun := coindTr
-  map_one' := LinearMap.ext fun f => Subtype.ext (ContinuousMap.ext fun h => by
-    change f.1 (h * 1) = f.1 h
-    rw [mul_one])
-  map_mul' g g' := LinearMap.ext fun f => Subtype.ext (ContinuousMap.ext fun h => by
-    show f.1 (h * (g * g')) = f.1 (h * g * g')
-    rw [mul_assoc])
+  map_one' :=
+    LinearMap.ext fun f =>
+      Subtype.ext (ContinuousMap.ext fun h => by
+        change f.1 (h * 1) = f.1 h
+        rw [mul_one])
+  map_mul' g g' :=
+    LinearMap.ext fun f =>
+      Subtype.ext (ContinuousMap.ext fun h => by
+        show f.1 (h * (g * g')) = f.1 (h * g * g')
+        rw [mul_assoc])
 
 instance : ContinuousConstSMul R (coindSub U M) :=
   ⟨fun c => ((continuous_const_smul c).comp continuous_subtype_val).subtype_mk _⟩
@@ -280,12 +322,13 @@ def coindEv : Pair (coindRep U M) M where
     show f.1 (1 * (g : G)) = M.rho g (f.1 1)
     have h := f.2 g 1
     rw [mul_one] at h
-    rw [one_mul]; exact h
+    rw [one_mul]
+    exact h
 
 theorem coindEv_isCoind : IsCoind U M (coindRep U M) (coindEv U M) := by
   unfold IsCoind
-  refine ⟨rfl, fun f => f.1, Topology.IsEmbedding.subtypeVal, fun c g => ?_,
-    fun f hf => ⟨⟨f, hf⟩, rfl⟩⟩
+  refine
+    ⟨rfl, fun f => f.1, Topology.IsEmbedding.subtypeVal, fun c g => ?_, fun f hf => ⟨⟨f, hf⟩, rfl⟩⟩
   show c.1 g = c.1 (1 * g)
   rw [one_mul]
 

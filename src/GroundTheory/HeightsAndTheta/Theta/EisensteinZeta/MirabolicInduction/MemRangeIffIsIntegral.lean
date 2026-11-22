@@ -43,8 +43,7 @@ theorem smul_def (a : E) (z : CAt σ) : a • z = ofComplex σ (σ a) * z := rfl
 theorem complex_smul_def (c : ℂ) (z : CAt σ) : c • z = ofComplex σ c * z := rfl
 
 instance : SMulCommClass E ℂ (CAt σ) where
-  smul_comm a c z := by
-    rw [smul_def, complex_smul_def, complex_smul_def, smul_def, mul_left_comm]
+  smul_comm a c z := by rw [smul_def, complex_smul_def, complex_smul_def, smul_def, mul_left_comm]
 
 end CAt
 
@@ -63,8 +62,8 @@ theorem fib_smul_eq (a : CAt σ) (x : Fib σ V) : a • x = (ofComplex σ).symm 
   | tmul z e => rw [smul_tmul', smul_tmul', complex_smul_def, smul_eq_mul]; rfl
   | add x y hx hy => rw [smul_add, smul_add, hx, hy]
 
-instance (W : Type) [AddCommGroup W] [Module E W] :
-    LinearMap.CompatibleSMul (Fib σ V) (Fib σ W) ℂ (CAt σ) where
+instance (W : Type) [AddCommGroup W] [Module E W]
+    : LinearMap.CompatibleSMul (Fib σ V) (Fib σ W) ℂ (CAt σ) where
   map_smul f c x := by
     rw [show c • x = (ofComplex σ c) • x from (fib_smul_eq σ V _ x).symm,
       show c • f x = (ofComplex σ c) • f x from (fib_smul_eq σ W _ (f x)).symm, map_smul]
@@ -76,18 +75,17 @@ instance [FiniteDimensional E V] : FiniteDimensional ℂ (Fib σ V) := by
 end FibSMul
 
 structure MetSpace (E : Type) [Field E] [NumberField E] where
-
   V : Type
   [instAddCommGroup : AddCommGroup V]
   [instModule : Module E V]
   [instFD : FiniteDimensional E V]
   [instModuleO : Module (𝓞 E) V]
   [instTower : IsScalarTower (𝓞 E) E V]
-
   form : ∀ τ : InfinitePlace E, InnerProductSpace.Core ℂ (Fib τ.embedding V)
 
-attribute [instance] MetSpace.instAddCommGroup MetSpace.instModule MetSpace.instFD
-  MetSpace.instModuleO MetSpace.instTower
+attribute [instance]
+  MetSpace.instAddCommGroup MetSpace.instModule MetSpace.instFD MetSpace.instModuleO
+  MetSpace.instTower
 
 variable {E : Type} [Field E] [NumberField E]
 
@@ -114,13 +112,10 @@ instance (τ : InfinitePlace E) : FiniteDimensional ℂ (S.FibSp τ) :=
 
 def pt (τ : InfinitePlace E) (v : S.V) : S.FibSp τ := (1 : CAt τ.embedding) ⊗ₜ[E] v
 
-
 end MetSpace
-
 
 variable (E) in
 def fPl : ℕ := Fintype.card (InfinitePlace E)
-
 
 variable (E) in
 def rd : ℝ := |(discr E : ℝ)| ^ ((1 : ℝ) / (2 * fPl E))
@@ -141,33 +136,34 @@ def fibSub (W : Submodule E S.V) (τ : InfinitePlace E) : Submodule ℂ (S.FibSp
   (LinearMap.range (TensorProduct.AlgebraTensorModule.lTensor (CAt τ.embedding) (CAt τ.embedding)
     (W.subtype.restrictScalars E))).restrictScalars ℂ
 
-def quotEquiv (W : Submodule E S.V) (τ : InfinitePlace E) :
-    Fib τ.embedding (S.V ⧸ W) ≃ₗ[ℂ] S.FibSp τ ⧸ S.fibSub W τ :=
+def quotEquiv (W : Submodule E S.V) (τ : InfinitePlace E)
+    : Fib τ.embedding (S.V ⧸ W) ≃ₗ[ℂ] S.FibSp τ ⧸ S.fibSub W τ :=
   ((TensorProduct.AlgebraTensorModule.tensorQuotientEquiv (CAt τ.embedding) E (CAt τ.embedding)
     W).restrictScalars ℂ).trans (Submodule.Quotient.restrictScalarsEquiv ℂ _).symm
 
-def quotMap (W : Submodule E S.V) (τ : InfinitePlace E) :
-    Fib τ.embedding (S.V ⧸ W) →ₗ[ℂ] S.FibSp τ :=
-  (S.fibSub W τ)ᗮ.subtype ∘ₗ
-    ((Submodule.quotientEquivOfIsCompl (S.fibSub W τ) (S.fibSub W τ)ᗮ
-      (Submodule.isCompl_orthogonal _)).toLinearMap ∘ₗ (S.quotEquiv W τ).toLinearMap)
+def quotMap (W : Submodule E S.V) (τ : InfinitePlace E)
+    : Fib τ.embedding (S.V ⧸ W) →ₗ[ℂ] S.FibSp τ :=
+  (S.fibSub W τ)ᗮ.subtype
+    ∘ₗ ((Submodule.quotientEquivOfIsCompl (S.fibSub W τ) (S.fibSub W τ)ᗮ
+        (Submodule.isCompl_orthogonal _)).toLinearMap
+      ∘ₗ (S.quotEquiv W τ).toLinearMap)
 
-theorem quotMap_injective (W : Submodule E S.V) (τ : InfinitePlace E) :
-    Function.Injective (S.quotMap W τ) := by
+theorem quotMap_injective (W : Submodule E S.V) (τ : InfinitePlace E)
+    : Function.Injective (S.quotMap W τ) := by
   intro a b h
-  exact (S.quotEquiv W τ).injective ((Submodule.quotientEquivOfIsCompl (S.fibSub W τ) (S.fibSub W τ)ᗮ
-    (Submodule.isCompl_orthogonal _)).injective ((S.fibSub W τ)ᗮ.injective_subtype h))
+  exact (S.quotEquiv W τ).injective
+    ((Submodule.quotientEquivOfIsCompl (S.fibSub W τ) (S.fibSub W τ)ᗮ
+      (Submodule.isCompl_orthogonal _)).injective ((S.fibSub W τ)ᗮ.injective_subtype h))
 
 def quot (W : Submodule E S.V) : MetSpace E where
   V := S.V ⧸ W
   form τ := Heights.coreOfInjective (S.quotMap W τ) (S.quotMap_injective W τ)
 
-def restrictMap (W : Submodule E S.V) (τ : InfinitePlace E) :
-    Fib τ.embedding W →ₗ[ℂ] S.FibSp τ :=
+def restrictMap (W : Submodule E S.V) (τ : InfinitePlace E) : Fib τ.embedding W →ₗ[ℂ] S.FibSp τ :=
   (W.subtype.baseChange (CAt τ.embedding)).restrictScalars ℂ
 
-theorem restrictMap_injective (W : Submodule E S.V) (τ : InfinitePlace E) :
-    Function.Injective (S.restrictMap W τ) := by
+theorem restrictMap_injective (W : Submodule E S.V) (τ : InfinitePlace E)
+    : Function.Injective (S.restrictMap W τ) := by
   change Function.Injective (W.subtype.baseChange (CAt τ.embedding))
   rw [LinearMap.baseChange_eq_ltensor]
   exact Module.Flat.lTensor_preserves_injective_linearMap _ W.injective_subtype
@@ -176,13 +172,14 @@ def restrict (W : Submodule E S.V) : MetSpace E where
   V := W
   form τ := Heights.coreOfInjective (S.restrictMap W τ) (S.restrictMap_injective W τ)
 
-def dualCoord (τ : InfinitePlace E) :
-    Fib τ.embedding (Module.Dual E S.V) →ₗ[CAt τ.embedding]
-      Module.Dual (CAt τ.embedding) (Fib τ.embedding S.V) :=
+def dualCoord (τ : InfinitePlace E)
+    : Fib τ.embedding (Module.Dual E S.V) →ₗ[CAt τ.embedding]
+        Module.Dual (CAt τ.embedding) (Fib τ.embedding S.V) :=
   LinearMap.liftBaseChange (CAt τ.embedding) (Module.Dual.baseChange (CAt τ.embedding))
 
-theorem dualCoord_tmul_tmul (τ : InfinitePlace E) (z w : CAt τ.embedding) (φ : Module.Dual E S.V)
-    (v : S.V) : S.dualCoord τ (z ⊗ₜ φ) (w ⊗ₜ v) = z * (algebraMap E (CAt τ.embedding) (φ v) * w) := by
+theorem dualCoord_tmul_tmul
+    (τ : InfinitePlace E) (z w : CAt τ.embedding) (φ : Module.Dual E S.V) (v : S.V)
+    : S.dualCoord τ (z ⊗ₜ φ) (w ⊗ₜ v) = z * (algebraMap E (CAt τ.embedding) (φ v) * w) := by
   rw [dualCoord, LinearMap.liftBaseChange_tmul, LinearMap.smul_apply,
     Module.Dual.baseChange_apply_tmul, smul_eq_mul, Algebra.smul_def]
 
@@ -212,35 +209,38 @@ theorem dualCoord_injective (τ : InfinitePlace E) : Function.Injective (S.dualC
   intro x y hxy
   rw [← hrec x, ← hrec y, hxy]
 
-def dualFunctional (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V)) :
-    StrongDual ℂ (S.FibSp τ) :=
-  LinearMap.toContinuousLinearMap ((ofComplex τ.embedding).symm.toLinearMap ∘ₗ
-    ((S.dualCoord τ x).restrictScalars ℂ : S.FibSp τ →ₗ[ℂ] CAt τ.embedding))
+def dualFunctional (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V))
+    : StrongDual ℂ (S.FibSp τ) :=
+  LinearMap.toContinuousLinearMap
+    ((ofComplex τ.embedding).symm.toLinearMap
+      ∘ₗ ((S.dualCoord τ x).restrictScalars ℂ : S.FibSp τ →ₗ[ℂ] CAt τ.embedding))
 
 def riesz (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V)) : S.FibSp τ :=
   (InnerProductSpace.toDual ℂ (S.FibSp τ)).symm (S.dualFunctional τ x)
 
-theorem inner_riesz (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V))
-    (v : S.FibSp τ) :
-    inner ℂ (S.riesz τ x) v = (ofComplex τ.embedding).symm (S.dualCoord τ x ((S.toSp τ).symm v)) := by
+theorem inner_riesz (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V)) (v : S.FibSp τ)
+    : inner ℂ (S.riesz τ x) v
+      = (ofComplex τ.embedding).symm (S.dualCoord τ x ((S.toSp τ).symm v)) := by
   rw [riesz, InnerProductSpace.toDual_symm_apply]
   rfl
 
-theorem riesz_add (τ : InfinitePlace E) (x y : Fib τ.embedding (Module.Dual E S.V)) :
-    S.riesz τ (x + y) = S.riesz τ x + S.riesz τ y := by
+theorem riesz_add (τ : InfinitePlace E) (x y : Fib τ.embedding (Module.Dual E S.V))
+    : S.riesz τ (x + y) = S.riesz τ x + S.riesz τ y := by
   refine ext_inner_right ℂ fun v ↦ ?_
-  rw [inner_add_left, inner_riesz, inner_riesz, inner_riesz, map_add (f := _), LinearMap.add_apply, map_add (f := _)]
+  rw [inner_add_left, inner_riesz, inner_riesz, inner_riesz, map_add (f := _), LinearMap.add_apply,
+    map_add (f := _)]
 
-theorem riesz_smul (τ : InfinitePlace E) (c : ℂ) (x : Fib τ.embedding (Module.Dual E S.V)) :
-    S.riesz τ (c • x) = starRingEnd ℂ c • S.riesz τ x := by
+theorem riesz_smul (τ : InfinitePlace E) (c : ℂ) (x : Fib τ.embedding (Module.Dual E S.V))
+    : S.riesz τ (c • x) = starRingEnd ℂ c • S.riesz τ x := by
   refine ext_inner_right ℂ fun v ↦ ?_
   have hc : c • x = ofComplex τ.embedding c • x := by
     rw [fib_smul_eq τ.embedding _ (ofComplex τ.embedding c) x, AlgEquiv.symm_apply_apply]
   rw [inner_smul_left, Complex.conj_conj, inner_riesz, inner_riesz, hc, map_smul,
     LinearMap.smul_apply, smul_eq_mul, map_mul, AlgEquiv.symm_apply_apply]
 
-theorem riesz_eq_zero (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V))
-    (hx : S.riesz τ x = 0) : x = 0 := by
+theorem riesz_eq_zero
+    (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual E S.V)) (hx : S.riesz τ x = 0)
+    : x = 0 := by
   refine S.dualCoord_injective τ ?_
   rw [map_zero]
   refine LinearMap.ext fun u ↦ ?_
@@ -250,7 +250,8 @@ theorem riesz_eq_zero (τ : InfinitePlace E) (x : Fib τ.embedding (Module.Dual 
   exact (ofComplex τ.embedding).symm.injective (by rw [← this, map_zero])
 
 @[instance_reducible]
-def dualCore (τ : InfinitePlace E) : InnerProductSpace.Core ℂ (Fib τ.embedding (Module.Dual E S.V)) where
+def dualCore (τ : InfinitePlace E)
+    : InnerProductSpace.Core ℂ (Fib τ.embedding (Module.Dual E S.V)) where
   inner x y := inner ℂ (S.riesz τ y) (S.riesz τ x)
   conj_inner_symm x y := inner_conj_symm _ _
   re_inner_nonneg x := inner_self_nonneg
@@ -285,9 +286,9 @@ namespace MetSpace
 
 variable (S : MetSpace E)
 
-def fibMap (T : MetSpace E) (φ : S.V →ₗ[E] T.V) (τ : InfinitePlace E) :
-    S.FibSp τ →ₗ[ℂ] T.FibSp τ :=
-  ((φ.baseChange (CAt τ.embedding)).restrictScalars ℂ : Fib τ.embedding S.V →ₗ[ℂ] Fib τ.embedding T.V)
+def fibMap (T : MetSpace E) (φ : S.V →ₗ[E] T.V) (τ : InfinitePlace E) : S.FibSp τ →ₗ[ℂ] T.FibSp τ :=
+  ((φ.baseChange (CAt τ.embedding)).restrictScalars ℂ
+    : Fib τ.embedding S.V →ₗ[ℂ] Fib τ.embedding T.V)
 
 end MetSpace
 
@@ -297,17 +298,14 @@ variable (S : MetSpace E)
 
 end MetSpace
 
-structure SelfDualFrame (F E : Type) [Field F] [Field E] [NumberField E] [Algebra F E]
-    [Algebra.IsQuadraticExtension F E] where
-
+structure SelfDualFrame
+    (F E : Type)
+    [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E] where
   S : MetSpace E
-
   B : HermitianForm F E S.V
-
   L : Submodule (𝓞 E) S.V
   fg : L.FG
   selfDual : IsSelfDual B L
-
   θ : ∀ τ : InfinitePlace E, S.FibSp τ →ₗ[ℂ] S.FibSp τ
   θ_θ : ∀ τ u, θ τ (θ τ u) = u
   θ_isometry : ∀ τ u v, inner ℂ (θ τ u) (θ τ v) = inner ℂ u v
@@ -330,15 +328,17 @@ def stdCoord (σ : E →+* ℂ) : Fib σ (Fin n → E) ≃ₗ[ℂ] EuclideanSpac
 
 variable {E n}
 
-theorem stdCoord_tmul (σ : E →+* ℂ) (z : CAt σ) (v : Fin n → E) (i : Fin n) :
-    stdCoord E n σ (z ⊗ₜ v) i = σ (v i) * (ofComplex σ).symm z := rfl
+theorem stdCoord_tmul (σ : E →+* ℂ) (z : CAt σ) (v : Fin n → E) (i : Fin n)
+    : stdCoord E n σ (z ⊗ₜ v) i = σ (v i) * (ofComplex σ).symm z :=
+  rfl
 
 variable (E n)
 
 def MetSpace.standard : MetSpace E where
   V := Fin n → E
-  form τ := Heights.coreOfInjective (stdCoord E n τ.embedding).toLinearMap
-    (stdCoord E n τ.embedding).injective
+  form τ :=
+    Heights.coreOfInjective (stdCoord E n τ.embedding).toLinearMap
+      (stdCoord E n τ.embedding).injective
 
 def stdLat : Submodule (𝓞 E) (Fin n → E) :=
   Submodule.span (𝓞 E) (Set.range fun i : Fin n => (Pi.single i 1 : Fin n → E))
@@ -347,12 +347,11 @@ variable {E n}
 
 theorem stdLat_fg : (stdLat E n).FG := Submodule.fg_span (Set.finite_range _)
 
-theorem mem_range_iff_isIntegral (x : E) :
-    x ∈ Set.range (algebraMap (𝓞 E) E) ↔ IsIntegral ℤ x :=
+theorem mem_range_iff_isIntegral (x : E) : x ∈ Set.range (algebraMap (𝓞 E) E) ↔ IsIntegral ℤ x :=
   ⟨fun ⟨c, hc⟩ => hc ▸ RingOfIntegers.isIntegral_coe c, fun h => ⟨⟨x, h⟩, rfl⟩⟩
 
-theorem mem_stdLat_iff (y : Fin n → E) :
-    y ∈ stdLat E n ↔ ∀ i, y i ∈ Set.range (algebraMap (𝓞 E) E) := by
+theorem mem_stdLat_iff (y : Fin n → E)
+    : y ∈ stdLat E n ↔ ∀ i, y i ∈ Set.range (algebraMap (𝓞 E) E) := by
   rw [stdLat, Submodule.mem_span_range_iff_exists_fun]
   constructor
   · rintro ⟨c, rfl⟩ i
@@ -368,7 +367,8 @@ end Standard
 
 section Frame
 
-variable (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
+variable
+  (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
   [Algebra F E] [Algebra.IsQuadraticExtension F E]
 
 def signs : Fin 2 → Fˣ := ![1, -1]
@@ -390,7 +390,8 @@ end Frame
 
 section Frame
 
-variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
+variable
+  {F : Type} [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
   [Algebra F E] [Algebra.IsQuadraticExtension F E]
 
 theorem isIntegral_conj {x : E} (hx : IsIntegral ℤ x) : IsIntegral ℤ (conj F E x) :=
@@ -398,9 +399,10 @@ theorem isIntegral_conj {x : E} (hx : IsIntegral ℤ x) : IsIntegral ℤ (conj F
 
 def hypForm : HermitianForm F E (Fin 2 → E) := diagForm (signs F)
 
-theorem hypForm_apply (y y' : Fin 2 → E) :
-    (hypForm (F := F) (E := E)).toSesq y y' =
-      ∑ i, conj F E (y i) * algebraMap F E (signs F i) * y' i := rfl
+theorem hypForm_apply (y y' : Fin 2 → E)
+    : (hypForm (F := F) (E := E)).toSesq y y'
+      = ∑ i, conj F E (y i) * algebraMap F E (signs F i) * y' i :=
+  rfl
 
 theorem stdLat_isSelfDual : IsSelfDual (hypForm (F := F) (E := E)) (stdLat E 2) := by
   intro y
@@ -411,11 +413,12 @@ theorem stdLat_isSelfDual : IsSelfDual (hypForm (F := F) (E := E)) (stdLat E 2) 
     refine ((isIntegral_conj (hy i)).mul ?_).mul (hl i)
     fin_cases i <;> simp [signs, isIntegral_one, IsIntegral.neg]
   · intro h i
-    have key := h (Pi.single i 1) (by
-      intro j
-      by_cases hij : j = i
-      · subst hij; simp [isIntegral_one]
-      · simp [Pi.single_apply, hij, isIntegral_zero])
+    have key :=
+      h (Pi.single i 1) (by
+        intro j
+        by_cases hij : j = i
+        · subst hij; simp [isIntegral_one]
+        · simp [Pi.single_apply, hij, isIntegral_zero])
     rw [Finset.sum_eq_single i (fun j _ hj => by simp [Pi.single_apply, hj]) (by simp)] at key
     simp only [Pi.single_eq_same, mul_one] at key
     have hc : IsIntegral ℤ (conj F E (y i)) := by
@@ -428,12 +431,13 @@ end Frame
 
 section Frame2
 
-variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
+variable
+  {F : Type} [Field F] [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
   [Algebra F E] [Algebra.IsQuadraticExtension F E]
 
-theorem stdCoord_flip (τ : InfinitePlace E) (u : Fib τ.embedding (Fin 2 → E)) (i : Fin 2) :
-    stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) u) i =
-      τ.embedding (algebraMap F E (signs F i)) * stdCoord E 2 τ.embedding u i := by
+theorem stdCoord_flip (τ : InfinitePlace E) (u : Fib τ.embedding (Fin 2 → E)) (i : Fin 2)
+    : stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) u) i
+      = τ.embedding (algebraMap F E (signs F i)) * stdCoord E 2 τ.embedding u i := by
   induction u using TensorProduct.induction_on with
   | zero => simp
   | tmul z v =>
@@ -441,35 +445,40 @@ theorem stdCoord_flip (τ : InfinitePlace E) (u : Fib τ.embedding (Fin 2 → E)
     simp only [flipMap, LinearMap.pi_apply, LinearMap.smul_apply, LinearMap.proj_apply, smul_eq_mul,
       map_mul]
     ring
-  | add u v hu hv => rw [map_add (f := _), map_add (f := _), PiLp.add_apply, hu, hv, map_add (f := _), PiLp.add_apply, mul_add]
+  | add u v hu hv =>
+    rw [map_add (f := _), map_add (f := _), PiLp.add_apply, hu, hv, map_add (f := _),
+      PiLp.add_apply, mul_add]
 
-theorem signs_conj_mul (τ : InfinitePlace E) (i : Fin 2) :
-    starRingEnd ℂ (τ.embedding (algebraMap F E (signs F i))) *
-      τ.embedding (algebraMap F E (signs F i)) = 1 := by
+theorem signs_conj_mul (τ : InfinitePlace E) (i : Fin 2)
+    : starRingEnd ℂ (τ.embedding (algebraMap F E (signs F i)))
+        * τ.embedding (algebraMap F E (signs F i))
+      = 1 := by
   fin_cases i <;> simp [signs]
 
-theorem flip_flip_fib (τ : InfinitePlace E) (u : Fib τ.embedding (Fin 2 → E)) :
-    (flipMap F).baseChange (CAt τ.embedding) ((flipMap F).baseChange (CAt τ.embedding) u) = u := by
+theorem flip_flip_fib (τ : InfinitePlace E) (u : Fib τ.embedding (Fin 2 → E))
+    : (flipMap F).baseChange (CAt τ.embedding) ((flipMap F).baseChange (CAt τ.embedding) u)
+      = u := by
   rw [← LinearMap.comp_apply, ← LinearMap.baseChange_comp]
   have h : flipMap F ∘ₗ flipMap F = (LinearMap.id : (Fin 2 → E) →ₗ[E] (Fin 2 → E)) :=
     LinearMap.ext flipMap_flipMap
   rw [h, LinearMap.baseChange_id, LinearMap.id_apply]
 
-theorem flip_isometry (τ : InfinitePlace E) (u v : Fib τ.embedding (Fin 2 → E)) :
-    inner ℂ (stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) u))
-        (stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) v)) =
-      inner ℂ (stdCoord E 2 τ.embedding u) (stdCoord E 2 τ.embedding v) := by
+theorem flip_isometry (τ : InfinitePlace E) (u v : Fib τ.embedding (Fin 2 → E))
+    : inner ℂ (stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) u))
+        (stdCoord E 2 τ.embedding ((flipMap F).baseChange (CAt τ.embedding) v))
+      = inner ℂ (stdCoord E 2 τ.embedding u) (stdCoord E 2 τ.embedding v) := by
   simp only [PiLp.inner_apply, RCLike.inner_apply, stdCoord_flip]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul]
   linear_combination (stdCoord E 2 τ.embedding v i *
     starRingEnd ℂ (stdCoord E 2 τ.embedding u i)) * signs_conj_mul (F := F) τ i
 
-theorem flip_majorant (τ : InfinitePlace E) (y y' : Fin 2 → E) :
-    inner ℂ (stdCoord E 2 τ.embedding
-        ((flipMap F).baseChange (CAt τ.embedding) ((1 : CAt τ.embedding) ⊗ₜ y)))
-        (stdCoord E 2 τ.embedding ((1 : CAt τ.embedding) ⊗ₜ y')) =
-      τ.embedding ((hypForm (F := F) (E := E)).toSesq y y') := by
+theorem flip_majorant (τ : InfinitePlace E) (y y' : Fin 2 → E)
+    : inner ℂ
+        (stdCoord E 2 τ.embedding
+          ((flipMap F).baseChange (CAt τ.embedding) ((1 : CAt τ.embedding) ⊗ₜ y)))
+        (stdCoord E 2 τ.embedding ((1 : CAt τ.embedding) ⊗ₜ y'))
+      = τ.embedding ((hypForm (F := F) (E := E)).toSesq y y') := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [LinearMap.baseChange_tmul, hypForm_apply, map_sum]
   simp only [PiLp.inner_apply, RCLike.inner_apply, stdCoord_tmul]

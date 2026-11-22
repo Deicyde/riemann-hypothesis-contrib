@@ -18,10 +18,13 @@ open Classical
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
-theorem u2ringPf_zetaO {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) {ζ : ↥LL.1}
-    (hζ : IsPrimitiveRoot ζ l) : ∃ z : ↥(OL LL), IsPrimitiveRoot z l := by
+theorem u2ringPf_zetaO
+    {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) {ζ : ↥LL.1} (hζ : IsPrimitiveRoot ζ l)
+    : ∃ z : ↥(OL LL), IsPrimitiveRoot z l := by
   have hv : 0 ≤ P.v LL ζ := by
     have h1 : P.v LL (ζ ^ l) = 0 := by rw [hζ.pow_eq_one, AddValuation.map_one]
     rw [AddValuation.map_pow] at h1
@@ -41,7 +44,8 @@ theorem u2ringPf_zetaO {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l)
       · exact absurd (by exact_mod_cast h3 : l = 0) (Fact.out : l.Prime).ne_zero
       · rw [h3]; exact le_refl _
   refine ⟨⟨ζ, (P.v_O LL ζ).1 hv⟩, ?_⟩
-  exact IsPrimitiveRoot.of_map_of_injective (f := algebraMap ↥(OL LL) ↥LL.1) hζ Subtype.val_injective
+  exact IsPrimitiveRoot.of_map_of_injective (f := algebraMap ↥(OL LL) ↥LL.1) hζ
+    Subtype.val_injective
 
 theorem u2ring_pf : SecondRingHypothesis := by
   intro D HW F Cm CA CB CK _ l _ hl K LL hG π' E hR h' hh' c
@@ -57,10 +61,12 @@ theorem u2ring_pf : SecondRingHypothesis := by
   have hpu := Formalism.MainNotions.WachCoordinates.Br.not_isUnit_p ((HW l).W K 1 LL hG) hV
   have hpm : ((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ∈ IsLocalRing.maximalIdeal ↥(OL LL) :=
     (IsLocalRing.mem_maximalIdeal _).2 hpu
-  have hp0 : ((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ≠ 0 := Nat.cast_ne_zero.2 (by rw [hpl]; exact hlp.ne_zero)
+  have hp0 : ((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ≠ 0 :=
+    Nat.cast_ne_zero.2 (by rw [hpl]; exact hlp.ne_zero)
   have : IsAdicComplete (Ideal.span {((((D.loc l).PD K).p : ℕ) : ↥(OL LL))}) ↥(OL LL) := by
     rw [hpl]; exact Formalism.MainNotions.WachCoordinates.Br.complete_OL LL
-  have : IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) := AdicCompletionMax.isAdicComplete_max hp0 hpm
+  have : IsAdicComplete (IsLocalRing.maximalIdeal ↥(OL LL)) ↥(OL LL) :=
+    AdicCompletionMax.isAdicComplete_max hp0 hpm
   have hs : 1 ≤ sK l K := DescentValuation.u3downPf_sK_pos hl K LL hG
   have hd := DvdPf.dvdCondition l hl K LL hG
   have hes : eK K * sK l K = ((D.loc l).PD K).p - 1 := by rw [hpl]; exact Nat.mul_div_cancel' hd
@@ -68,12 +74,14 @@ theorem u2ring_pf : SecondRingHypothesis := by
   obtain ⟨ζ, hζ⟩ := u2ringPf_zetaO (D.loc l) LL hζL
   have hζ' : IsPrimitiveRoot ζ ((D.loc l).PD K).p := by rw [hpl]; exact hζ
   have hι : Function.Injective (algebraMap ↥(OL LL) ↥LL.1) := Subtype.val_injective
-  have hRv : ∀ y : ↥LL.1, 0 ≤ (D.loc l).v LL y ↔ ∃ a : ↥(OL LL), algebraMap ↥(OL LL) ↥LL.1 a = y := by
+  have hRv
+      : ∀ y : ↥LL.1, 0 ≤ (D.loc l).v LL y ↔ ∃ a : ↥(OL LL), algebraMap ↥(OL LL) ↥LL.1 a = y := by
     intro y
     rw [(D.loc l).v_O LL y]
     exact ⟨fun h => ⟨⟨y, h⟩, rfl⟩, fun ⟨a, ha⟩ => ha ▸ a.2⟩
-  obtain ⟨a, r, ha, hrm, hE, hnr⟩ := u2ringPfT_split ((HW l).W K 1 LL hG) hR hs hes hpm c ζ hζ' hp2 hι hRv
-  exact u2ringPfD_main ((HW l).W K 1 LL hG) hR hs (((HW l).W K 1 LL hG).gamK_eq_one hs1 hp2) le_rfl c a ha r
-    hrm hE hnr h' hh'
+  obtain ⟨a, r, ha, hrm, hE, hnr⟩ :=
+    u2ringPfT_split ((HW l).W K 1 LL hG) hR hs hes hpm c ζ hζ' hp2 hι hRv
+  exact u2ringPfD_main ((HW l).W K 1 LL hG) hR hs (((HW l).W K 1 LL hG).gamK_eq_one hs1 hp2) le_rfl
+    c a ha r hrm hE hnr h' hh'
 
 end Formalism.MainNotions.N.Ln34

@@ -13,11 +13,10 @@ open scoped ComplexOrder
 
 variable (K : Type*) [Field K] [NumberField K]
 
-theorem standardHermitian_gram_posDef (σ : K →+* ℂ) {m n : ℕ} (v : Fin n → Fin m → K)
-    (hv : LinearIndependent K v) :
-    (Matrix.of fun i j => ∑ k, starRingEnd ℂ (σ (v i k)) * σ (v j k)).PosDef := by
+theorem standardHermitian_gram_posDef
+    (σ : K →+* ℂ) {m n : ℕ} (v : Fin n → Fin m → K) (hv : LinearIndependent K v)
+    : (Matrix.of fun i j => ∑ k, starRingEnd ℂ (σ (v i k)) * σ (v j k)).PosDef := by
   classical
-
   let Vt : Matrix (Fin m) (Fin n) K := Matrix.of fun k j => v j k
   let B : Matrix (Fin m) (Fin n) ℂ := Vt.map σ
   have hker : LinearMap.ker (Matrix.toLin' Vt) = ⊥ := by
@@ -26,8 +25,8 @@ theorem standardHermitian_gram_posDef (σ : K →+* ℂ) {m n : ℕ} (v : Fin n 
     have h0 : ∑ j, g j • v j = 0 := by
       ext k
       have := congrFun hg k
-      simp only [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Vt, Matrix.of_apply,
-        Pi.zero_apply] at this
+      simp only [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Vt, Matrix.of_apply, Pi.zero_apply]
+        at this
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
       rw [← this]
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _

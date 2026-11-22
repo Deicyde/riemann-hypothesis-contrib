@@ -5,23 +5,30 @@ public import Development.EtaleCohomology.KummerTheory.BockCut
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.KummerTheory.RedEpiPf
 open LateralTheory.KummerTheory.BockCut
 
-theorem res_comp {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (k : W ⟶ V) (g : V ⟶ U)
-    (y : Sec F U) : Sec.res (k ≫ g) y = Sec.res k (Sec.res g y) := by
+theorem res_comp
+    {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (k : W ⟶ V) (g : V ⟶ U) (y : Sec F U)
+    : Sec.res (k ≫ g) y = Sec.res k (Sec.res g y) := by
   simp [Sec.res]
 
-theorem sec_TZ_eq_zero {q : ℕ} (hq : q = 1) (i : ℤ) {V : Scheme.{0}} (x : Sec (TZ q i) V) : x = 0 := by
+theorem sec_TZ_eq_zero {q : ℕ} (hq : q = 1) (i : ℤ) {V : Scheme.{0}} (x : Sec (TZ q i) V)
+    : x = 0 := by
   subst hq
   have : Subsingleton (Sec (tw 1 i) V) := Module.subsingleton (ULift.{1} (ZMod 1)) _
   exact Subsingleton.elim (α := Sec (tw 1 i) V) x 0
 
-theorem RedEpi_of (h_tw : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyGenerated) (h_pb : LateralTheory.EtaleFoundations.PrimitiveRootsOfUnityBasicIdentities)
-    (h_pl : LateralTheory.EtaleFoundations.EtalePrimitiveRootsExistLocally) (h_me : LateralTheory.EtaleFoundations.EtaleSheafMonoEpiSectionCriteria)
-    (h_lb : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure) : LateralTheory.KummerTheory.BockCut.RedEpi := by
+theorem RedEpi_of
+    (h_tw : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyGenerated)
+    (h_pb : LateralTheory.EtaleFoundations.PrimitiveRootsOfUnityBasicIdentities)
+    (h_pl : LateralTheory.EtaleFoundations.EtalePrimitiveRootsExistLocally)
+    (h_me : LateralTheory.EtaleFoundations.EtaleSheafMonoEpiSectionCriteria)
+    (h_lb : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure)
+    : LateralTheory.KummerTheory.BockCut.RedEpi := by
   intro l _ c a hac i π hπ
   obtain ⟨hall, hmono, -, -, htrans, -, -⟩ := h_lb
   have hl0 : l ≠ 0 := (Fact.out : l.Prime).ne_zero
@@ -33,8 +40,12 @@ theorem RedEpi_of (h_tw : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsL
   · apply hall
     intro V g
     exact ⟨0, (sec_TZ_eq_zero (pow_zero l) i _).trans (sec_TZ_eq_zero (pow_zero l) i _).symm⟩
-  · suffices key : ∀ y' : Sec (tw (l ^ a) i) U, Loc U fun V g =>
-        ∃ x : Sec (TZ (l ^ c) i) V, Sec.map π x = (Sec.res (F := tw (l ^ a) i) g y' : Sec (tw (l ^ a) i) V) from key y
+  · suffices key
+        : ∀ y' : Sec (tw (l ^ a) i) U,
+          Loc U fun V g =>
+            ∃ x : Sec (TZ (l ^ c) i) V,
+              Sec.map π x = (Sec.res (F := tw (l ^ a) i) g y' : Sec (tw (l ^ a) i) V) from
+      key y
     clear y
     intro y
     apply htrans
@@ -56,14 +67,18 @@ theorem RedEpi_of (h_tw : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsL
       refine hmono _ _ _ ((h_pl (l ^ c) V).1 hlc) ?_
       rintro W k ⟨ζ⟩
       obtain ⟨ζ', hζ'⟩ := (h_pb (l ^ c) Γ(W, ⊤)).2.2.2.2.2 (l ^ a) (pow_dvd_pow l hac) ζ
-      refine hmono _ _ _ ((h_tw (l ^ a) i).2.1 W ζ' (Sec.res (F := tw (l ^ a) i) k (Sec.res (F := tw (l ^ a) i) g y))) ?_
+      refine hmono _ _ _
+        ((h_tw (l ^ a) i).2.1 W ζ'
+          (Sec.res (F := tw (l ^ a) i) k (Sec.res (F := tw (l ^ a) i) g y)))
+        ?_
       rintro W' k' ⟨e, he⟩
       beta_reduce
       refine ⟨e • genZ i (ζ.map k'.appTop.hom), ?_⟩
       have hr : (ζ'.map k'.appTop.hom).1 = (ζ.map k'.appTop.hom).1 ^ (l ^ c / l ^ a) := by
         show k'.appTop.hom ζ'.1 = (k'.appTop.hom ζ.1) ^ _
         rw [hζ', map_pow]
-      have e3 : Sec.res (F := tw (l ^ a) i) ((k' ≫ k) ≫ g) y = e • twGen i (ζ'.map k'.appTop.hom) := by
+      have e3
+          : Sec.res (F := tw (l ^ a) i) ((k' ≫ k) ≫ g) y = e • twGen i (ζ'.map k'.appTop.hom) := by
         rw [res_comp, res_comp, he]
       have e4 : Sec.map π (e • genZ i (ζ.map k'.appTop.hom)) = e • genZ i (ζ'.map k'.appTop.hom) :=
         (map_nsmul (π.hom.app (op W')).hom e _).trans (congrArg (fun z => e • z) (hπ W' _ _ hr))

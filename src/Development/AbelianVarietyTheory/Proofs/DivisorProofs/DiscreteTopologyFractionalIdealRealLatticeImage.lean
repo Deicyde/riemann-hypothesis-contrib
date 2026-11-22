@@ -5,28 +5,29 @@ public import Formalism.LatticeTheta.Statement
 
 @[expose] public section
 
-open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
+open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR
+  GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
 open scoped FourierTransform RealInnerProductSpace
 
 namespace GlobalTheory.LipschitzTR
 
-noncomputable def toMixedTR (F : Type) [Field F] [NumberField F] (x : RSp F) :
-    mixedEmbedding.mixedSpace F :=
+noncomputable def toMixedTR (F : Type) [Field F] [NumberField F] (x : RSp F)
+    : mixedEmbedding.mixedSpace F :=
   (fun w => x (InfinitePlace.embedding_of_isReal w.prop), fun _ => 0)
 
-theorem continuous_toMixedTR (F : Type) [Field F] [NumberField F] :
-    Continuous (toMixedTR F) := by
+theorem continuous_toMixedTR (F : Type) [Field F] [NumberField F] : Continuous (toMixedTR F) := by
   refine Continuous.prodMk (continuous_pi fun w => ?_) continuous_const
   exact (PiLp.continuous_apply 2 _ _)
 
-theorem toMixedTR_remb (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (a : F) :
-    toMixedTR F (remb F a) = mixedEmbedding F a := by
+theorem toMixedTR_remb (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (a : F)
+    : toMixedTR F (remb F a) = mixedEmbedding F a := by
   refine Prod.ext (funext fun w => ?_) (funext fun w => ?_)
   · simp [toMixedTR, mixedEmbedding.mixedEmbedding_apply_isReal]
   · exact absurd (IsTotallyReal.isReal w.1) (InfinitePlace.not_isReal_iff_isComplex.mpr w.2)
 
-theorem discrete_latOf : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
-    (N : FractionalIdeal (𝓞 F)⁰ F), DiscreteTopology (latOf N) := by
+theorem discrete_latOf
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (N : FractionalIdeal (𝓞 F)⁰ F),
+      DiscreteTopology (latOf N) := by
   intro F _ _ _ N
   by_cases hN : N = 0
   · have : Subsingleton (latOf N) := by
@@ -36,7 +37,9 @@ theorem discrete_latOf : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
       obtain ⟨b, hb, rfl⟩ := (mem_latOf N y).1 hy
       subst hN
       rw [FractionalIdeal.mem_zero_iff] at ha hb
-      subst ha; subst hb; rfl
+      subst ha
+      subst hb
+      rfl
     infer_instance
   · let I : (FractionalIdeal (𝓞 F)⁰ F)ˣ := Units.mk0 N hN
     have hmem : ∀ x : latOf N, toMixedTR F x ∈ mixedEmbedding.idealLattice F I := by
@@ -53,6 +56,7 @@ theorem discrete_latOf : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
       have : toMixedTR F (remb F a) = toMixedTR F (remb F b) := congrArg Subtype.val hxy
       rw [toMixedTR_remb, toMixedTR_remb] at this
       have hab := NumberField.mixedEmbedding_injective F this
-      subst hab; rfl
+      subst hab
+      rfl
 
 end GlobalTheory.LipschitzTR

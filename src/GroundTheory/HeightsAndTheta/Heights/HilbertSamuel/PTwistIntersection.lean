@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology
 
 noncomputable section
 
@@ -21,23 +22,28 @@ namespace TwistIntersection
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem sheetDensity_add_locConst (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
+theorem sheetDensity_add_locConst
+    (P : Ideal (MRing ι))
+    {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
     (h : ∀ j, ∀ z ∈ mcPts P, ∃ c : ℝ, ∀ᶠ u in 𝓝 z, φ' j u = φ j u + c)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ) :
-    sheetDensity P Ψ φ' g y w = sheetDensity P Ψ φ g y w := by
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ)
+    : sheetDensity P Ψ φ' g y w = sheetDensity P Ψ φ g y w := by
   unfold sheetDensity
   split_ifs with hγ
   · congr 1
     have hev := hγ.choose_spec.2
-    have hH : ∀ k, cxHessian (fun y' => φ' k (hγ.choose y')) y =
-        cxHessian (fun y' => φ k (hγ.choose y')) y := by
+    have hH
+        : ∀ k,
+          cxHessian (fun y' => φ' k (hγ.choose y')) y
+            = cxHessian (fun y' => φ k (hγ.choose y')) y := by
       intro k
       obtain ⟨c, hc⟩ := h k _ hev.self_of_nhds.2.1
       have h1 : (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y] fun y' => φ k (hγ.choose y') + c :=
         hev.self_of_nhds.1.continuousAt.eventually hc
-      have h2 : fderiv ℝ (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y]
-          fderiv ℝ (fun y' => φ k (hγ.choose y')) := by
+      have h2
+          : fderiv ℝ (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y]
+            fderiv ℝ (fun y' => φ k (hγ.choose y')) := by
         filter_upwards [h1.eventuallyEq_nhds] with x hx
         rw [hx.fderiv_eq, fderiv_add_const]
       unfold cxHessian
@@ -45,18 +51,22 @@ theorem sheetDensity_add_locConst (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin
     simp only [maDensity, hH]
   · rfl
 
-theorem ptsIntegral_add_locConst (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
-    (h : ∀ j, ∀ z ∈ mcPts P, ∃ c : ℝ, ∀ᶠ u in 𝓝 z, φ' j u = φ j u + c) (g : ((Σ k, ι k) → ℂ) → ℝ) :
-    ptsIntegral P φ' g = ptsIntegral P φ g := by
+theorem ptsIntegral_add_locConst
+    (P : Ideal (MRing ι))
+    {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
+    (h : ∀ j, ∀ z ∈ mcPts P, ∃ c : ℝ, ∀ᶠ u in 𝓝 z, φ' j u = φ j u + c)
+    (g : ((Σ k, ι k) → ℂ) → ℝ)
+    : ptsIntegral P φ' g = ptsIntegral P φ g := by
   unfold ptsIntegral
   split_ifs
   · simp only [ptsIntegralAt, sheetDensity_add_locConst P h]
   · rfl
 
-theorem I_snoc_degZero {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ} (hI : IsIntersectionFamily I)
-    {P : Ideal (MRing ι)} {n : ℕ} {L : Fin n → HermLine ι} {B : HermLine ι} (hP : IsArithVar P (n + 1))
-    (hL : ∀ j, IsSmoothHerm (L j)) (hB : IsSmoothHerm B) (ha : B.a = 0) :
-    I P (n + 1) (Fin.snoc L B) = -ptsIntegral P (pot L) (logNorm B 1) := by
+theorem I_snoc_degZero
+    {I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ} (hI : IsIntersectionFamily I)
+    {P : Ideal (MRing ι)} {n : ℕ} {L : Fin n → HermLine ι} {B : HermLine ι}
+    (hP : IsArithVar P (n + 1)) (hL : ∀ j, IsSmoothHerm (L j)) (hB : IsSmoothHerm B) (ha : B.a = 0)
+    : I P (n + 1) (Fin.snoc L B) = - ptsIntegral P (pot L) (logNorm B 1) := by
   have hhom : IsMultiHomog (1 : MRing ι) 0 := by
     intro m hm k
     rw [MvPolynomial.support_one, Finset.mem_singleton] at hm

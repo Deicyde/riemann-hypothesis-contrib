@@ -6,14 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory.AlgHomEqEval
 
-theorem algHom_eq_eval : ∀ {K : Type} [inst : Field K] {P : Type} [Fintype P] [DecidableEq P]
-    (θ : (P → K) →ₐ[K] K), ∃ (p : P), ∀ (z : P → K), (θ : (P → K) → K) z = z p := by
+theorem algHom_eq_eval
+    : ∀ {K : Type} [inst : Field K] {P : Type} [Fintype P] [DecidableEq P] (θ : (P → K) →ₐ[K] K),
+      ∃ (p : P), ∀ (z : P → K),
+        (θ : (P → K) → K) z = z p := by
   intro K _ P _ _ θ
   have hsum : ∑ p, (Pi.single p (1:K) : P → K) = 1 := by
     ext x; simp [Finset.sum_apply, Pi.single_apply]
   have h1 : ∑ p, θ (Pi.single p 1) = 1 := by
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, hsum, map_one]
+    rw [← map_sum, hsum, map_one]
   obtain ⟨p, -, hp⟩ : ∃ p ∈ Finset.univ, θ (Pi.single p 1) ≠ 0 := by
     by_contra h
     push_neg at h

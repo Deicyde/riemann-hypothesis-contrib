@@ -15,8 +15,6 @@ theorem b1Ar : FirstOrderDualArithmeticBound := by
   refine b1abs l (locOf r) (globOf r V0) T n x k al _ V0.frame.D0 A d' s.odd ?_ hab
     (arPl hcoh l L Ω s V0 O n r hS).1 hρ hN4 hE hD
   rw [← hsum]
-  first
-    | exact (finsum_eq_sum_of_fintype _).symm
-    | (convert (finsum_eq_sum_of_fintype d').symm)
+  first | exact (finsum_eq_sum_of_fintype _).symm | (convert (finsum_eq_sum_of_fintype d').symm)
 
 end UpperTheory.V.Pa

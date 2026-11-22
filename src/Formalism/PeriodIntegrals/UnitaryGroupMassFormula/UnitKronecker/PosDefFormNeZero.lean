@@ -10,18 +10,25 @@ namespace PI.UnitKronW
 
 open Matrix Polynomial ComplexOrder
 
-theorem form_pres {k : ℕ} {H G : Matrix (Fin k) (Fin k) ℂ} (hG : Gᴴ * H * G = H) (x y : Fin k → ℂ) :
-    star (G *ᵥ x) ⬝ᵥ (H *ᵥ (G *ᵥ y)) = star x ⬝ᵥ (H *ᵥ y) := by
+theorem form_pres {k : ℕ} {H G : Matrix (Fin k) (Fin k) ℂ} (hG : Gᴴ * H * G = H) (x y : Fin k → ℂ)
+    : star (G *ᵥ x) ⬝ᵥ (H *ᵥ (G *ᵥ y)) = star x ⬝ᵥ (H *ᵥ y) := by
   conv_rhs => rw [← hG, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec,
     ← Matrix.star_mulVec]
 
-theorem posDef_form_ne_zero {k : ℕ} {H : Matrix (Fin k) (Fin k) ℂ} (hH : H.PosDef) {v : Fin k → ℂ}
-    (hv : v ≠ 0) : star v ⬝ᵥ (H *ᵥ v) ≠ 0 :=
+theorem posDef_form_ne_zero
+    {k : ℕ} {H : Matrix (Fin k) (Fin k) ℂ} (hH : H.PosDef) {v : Fin k → ℂ} (hv : v ≠ 0)
+    : star v ⬝ᵥ (H *ᵥ v) ≠ 0 :=
   ((Matrix.posDef_iff_dotProduct_mulVec.mp hH).2 hv).ne'
 
-theorem exists_eigenvector {k : ℕ} (G : Matrix (Fin k) (Fin k) ℂ) (μ : ℂ) (hμ : G.charpoly.IsRoot μ) :
-    ∃ v : Fin k → ℂ, v ≠ 0 ∧ G *ᵥ v = μ • v := by
-  first | exact Bl.general_b_fact_right_bis.goal1 .. | (apply Bl.general_b_fact_right_bis.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_right_bis.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_bis.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_right_bis.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_bis.goal1 <;> first | assumption | infer_instance)
+theorem exists_eigenvector {k : ℕ} (G : Matrix (Fin k) (Fin k) ℂ) (μ : ℂ) (hμ : G.charpoly.IsRoot μ)
+    : ∃ v : Fin k → ℂ, v ≠ 0 ∧ G *ᵥ v = μ • v := by
+  first
+  | exact Bl.general_b_fact_right_bis.goal1 ..
+  | (apply Bl.general_b_fact_right_bis.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_right_bis.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_bis.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_right_bis.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_bis.goal1 <;> first | assumption | infer_instance)
 
 theorem stepA : StepA := by
   intro k H G hH hG μ hμ

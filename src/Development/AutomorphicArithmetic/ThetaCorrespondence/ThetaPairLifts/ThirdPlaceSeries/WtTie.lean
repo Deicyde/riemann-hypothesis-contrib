@@ -21,7 +21,8 @@ open GlobalTheory.FunObj.SqNum GlobalTheory.SignedHC
 section Arith
 variable {D : D7}
 end Arith
-theorem wt_tie_alt (h : _root_.GlobalTheory.BigTop.Fun.SizeAtAlt) : _root_.GlobalTheory.BigTop.Fun.LeafWeightBound @Comparison₂ := by
+theorem wt_tie_alt (h : _root_.GlobalTheory.BigTop.Fun.SizeAtAlt)
+    : _root_.GlobalTheory.BigTop.Fun.LeafWeightBound @Comparison₂ := by
   obtain ⟨e, he, h⟩ := h
   refine ⟨0, fun CF _ => ⟨e, he, fun eps h1 h2 => ?_⟩⟩
   obtain ⟨K, hK⟩ := h eps h1 h2
@@ -39,7 +40,9 @@ theorem wt_tie_alt (h : _root_.GlobalTheory.BigTop.Fun.SizeAtAlt) : _root_.Globa
   have l10 : Real.log 10 ≤ Real.log (Fm.L x i).sc.b := Real.log_le_log (by norm_num) (by linarith)
   have l0 : 0 ≤ Real.log (Fm.L x i).sc.b := l10.trans' (Real.log_nonneg (by norm_num))
   refine ⟨w1, w2.trans (by nlinarith), ?_⟩
-  calc Real.log (maxWt _ 1 : ℝ) ≤ Real.log (10 * (Fm.L x i).sc.b) := Real.log_le_log (by linarith) w2
+  calc
+    Real.log (maxWt _ 1 : ℝ)
+      ≤ Real.log (10 * (Fm.L x i).sc.b) := Real.log_le_log (by linarith) w2
     _ = Real.log 10 + Real.log (Fm.L x i).sc.b := Real.log_mul (by norm_num) hb0.ne'
     _ ≤ 2 * Real.log (Fm.L x i).sc.b := by linarith
     _ ≤ C * Real.log (Fm.L x i).sc.b := by nlinarith

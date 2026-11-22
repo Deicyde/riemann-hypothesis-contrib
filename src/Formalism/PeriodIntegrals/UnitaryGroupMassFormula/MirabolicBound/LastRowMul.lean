@@ -17,43 +17,50 @@ section Entries
 
 variable {F : Type} [Field F] [Fintype F] {n : ℕ}
 
-@[simp] theorem blkM_cc (A : Matrix (Fin n) (Fin n) F) (i j : Fin n) :
-    blkM A (Fin.castSucc i) (Fin.castSucc j) = A i j := by
+@[simp]
+theorem blkM_cc (A : Matrix (Fin n) (Fin n) F) (i j : Fin n)
+    : blkM A (Fin.castSucc i) (Fin.castSucc j) = A i j := by
   simp [blkM, finSumFinEquiv_symm_apply_castSucc]
 
-@[simp] theorem blkM_cl (A : Matrix (Fin n) (Fin n) F) (i : Fin n) :
-    blkM A (Fin.castSucc i) (Fin.last n) = 0 := by
+@[simp]
+theorem blkM_cl (A : Matrix (Fin n) (Fin n) F) (i : Fin n)
+    : blkM A (Fin.castSucc i) (Fin.last n) = 0 := by
   simp [blkM, finSumFinEquiv_symm_apply_castSucc, finSumFinEquiv_symm_last]
 
-@[simp] theorem blkM_lc (A : Matrix (Fin n) (Fin n) F) (j : Fin n) :
-    blkM A (Fin.last n) (Fin.castSucc j) = 0 := by
+@[simp]
+theorem blkM_lc (A : Matrix (Fin n) (Fin n) F) (j : Fin n)
+    : blkM A (Fin.last n) (Fin.castSucc j) = 0 := by
   simp [blkM, finSumFinEquiv_symm_apply_castSucc, finSumFinEquiv_symm_last]
 
-@[simp] theorem blkM_ll (A : Matrix (Fin n) (Fin n) F) :
-    blkM A (Fin.last n) (Fin.last n) = 1 := by
+@[simp]
+theorem blkM_ll (A : Matrix (Fin n) (Fin n) F) : blkM A (Fin.last n) (Fin.last n) = 1 := by
   simp [blkM, finSumFinEquiv_symm_last]
 
-@[simp] theorem colM_cc (x : Fin n → F) (i j : Fin n) :
-    colM x (Fin.castSucc i) (Fin.castSucc j) = (1 : Matrix (Fin n) (Fin n) F) i j := by
+@[simp]
+theorem colM_cc (x : Fin n → F) (i j : Fin n)
+    : colM x (Fin.castSucc i) (Fin.castSucc j) = (1 : Matrix (Fin n) (Fin n) F) i j := by
   simp [colM, finSumFinEquiv_symm_apply_castSucc]
 
-@[simp] theorem colM_cl (x : Fin n → F) (i : Fin n) :
-    colM x (Fin.castSucc i) (Fin.last n) = x i := by
+@[simp]
+theorem colM_cl (x : Fin n → F) (i : Fin n) : colM x (Fin.castSucc i) (Fin.last n) = x i := by
   simp [colM, finSumFinEquiv_symm_apply_castSucc, finSumFinEquiv_symm_last]
 
-@[simp] theorem colM_lc (x : Fin n → F) (j : Fin n) :
-    colM x (Fin.last n) (Fin.castSucc j) = 0 := by
+@[simp]
+theorem colM_lc (x : Fin n → F) (j : Fin n) : colM x (Fin.last n) (Fin.castSucc j) = 0 := by
   simp [colM, finSumFinEquiv_symm_apply_castSucc, finSumFinEquiv_symm_last]
 
-@[simp] theorem colM_ll (x : Fin n → F) :
-    colM x (Fin.last n) (Fin.last n) = 1 := by
+@[simp]
+theorem colM_ll (x : Fin n → F) : colM x (Fin.last n) (Fin.last n) = 1 := by
   simp [colM, finSumFinEquiv_symm_last]
 
-theorem E_val (A : GL (Fin n) F) : ((E F n A : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F) =
-    blkM (A : Matrix (Fin n) (Fin n) F) := rfl
+theorem E_val (A : GL (Fin n) F)
+    : ((E F n A : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F)
+      = blkM (A : Matrix (Fin n) (Fin n) F) :=
+  rfl
 
-theorem col_val (x : Fin n → F) : ((col x : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F) =
-    colM x := rfl
+theorem col_val (x : Fin n → F)
+    : ((col x : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F) = colM x :=
+  rfl
 
 end Entries
 
@@ -102,18 +109,22 @@ theorem colFacts : ColFacts := by
         exact Matrix.one_apply_ne (ne_of_gt (Fin.castSucc_lt_castSucc_iff.mp hij))
   · rw [col_val]
     unfold superdiag
-    have h0 : ∀ i j : Fin (n + 1),
-        (if (j : ℕ) = (i : ℕ) + 1 then (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) F) i j else 0) = 0 := by
+    have h0
+        : ∀ i j : Fin (n + 1),
+          (if (j : ℕ) = (i : ℕ) + 1 then (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) F) i j else 0)
+            = 0 := by
       intro i j
       split_ifs with h
       · rw [Matrix.one_apply_ne]
-        intro e; subst e; omega
+        intro e
+        subst e
+        omega
       · rfl
     have hl : ∀ i : Fin (n + 1), (n = (i : ℕ)) ↔ (i = Fin.last n) := by
       intro i; rw [Fin.ext_iff, Fin.val_last]; omega
     rw [Fin.sum_univ_castSucc]
-    simp only [Fin.sum_univ_castSucc (n := n + 1), colM_cc, colM_cl, colM_lc, colM_ll, Fin.val_castSucc,
-      Fin.val_last, h0, ite_self, add_left_inj, hl]
+    simp only [Fin.sum_univ_castSucc (n := n + 1), colM_cc, colM_cl, colM_lc, colM_ll,
+      Fin.val_castSucc, Fin.val_last, h0, ite_self, add_left_inj, hl]
     simp
 
 theorem conjCol : ConjCol := by
@@ -146,18 +157,24 @@ theorem baseProp : BaseProp := by
     ext v
     simpa using LinearMap.congr_fun h v
 
-theorem lastRowE_E {F : Type} [Field F] [Fintype F] {n : ℕ} (A : GL (Fin n) F) : LastRowE (E F n A) := by
+theorem lastRowE_E {F : Type} [Field F] [Fintype F] {n : ℕ} (A : GL (Fin n) F)
+    : LastRowE (E F n A) := by
   intro j
   rw [E_val]
   induction j using Fin.lastCases with
   | last => simp
   | cast j => simp [Fin.castSucc_ne_last]
 
-theorem lastRow_mul {F : Type} [Field F] [Fintype F] {n : ℕ} {p : GL (Fin (n + 1)) F} (hp : LastRowE p)
-    (g : GL (Fin (n + 1)) F) (j : Fin (n + 1)) :
-    ((p * g : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j =
-      (g : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j := by
-  have h2 : ∀ l, (p : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) l = if l = Fin.last n then 1 else 0 := hp
+theorem lastRow_mul
+    {F : Type} [Field F] [Fintype F]
+    {n : ℕ} {p : GL (Fin (n + 1)) F} (hp : LastRowE p) (g : GL (Fin (n + 1)) F) (j : Fin (n + 1))
+    : ((p * g : GL (Fin (n + 1)) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j
+      = (g : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j := by
+  have h2
+      : ∀ l,
+        (p : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) l
+          = if l = Fin.last n then 1 else 0 :=
+    hp
   rw [Units.val_mul, Matrix.mul_apply]
   simp only [h2, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
 

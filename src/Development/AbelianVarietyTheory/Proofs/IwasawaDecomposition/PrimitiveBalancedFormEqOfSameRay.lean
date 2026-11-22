@@ -5,20 +5,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NotIs
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem balForms_zsmul_cancel {O : Type} [CommRing O] {bar : O → O} {X : Type} [AddCommGroup X] [Module O X]
-    {g : ℤ} (hg : g ≠ 0) {a b : balForms bar X} (h : g • a = g • b) : a = b := by
+theorem balForms_zsmul_cancel
+    {O : Type} [CommRing O]
+    {bar : O → O} {X : Type} [AddCommGroup X] [Module O X]
+    {g : ℤ} (hg : g ≠ 0)
+    {a b : balForms bar X} (h : g • a = g • b)
+    : a = b := by
   apply Subtype.ext
   refine LinearMap.ext₂ fun y z => ?_
   have h2 := LinearMap.congr_fun₂ (congrArg Subtype.val h) y z
   simp only [Submodule.coe_smul, LinearMap.smul_apply, smul_eq_mul] at h2
   exact mul_left_cancel₀ hg h2
 
-theorem isPrim_ray_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X]
-    (β β' : balForms bar X) (p r : ℕ), IsPrim bar β → IsPrim bar β' → 0 < p → 0 < r → p • β = r • β' → β = β' := by
+theorem isPrim_ray_eq
+    : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X]
+        (β β' : balForms bar X) (p r : ℕ),
+      IsPrim bar β → IsPrim bar β' → 0 < p → 0 < r → p • β = r • β' → β = β' := by
   intro O _ bar X _ _ β β' p r hβ hβ' hp hr h
   set g := Nat.gcd p r with hgdef
   have hg : 0 < g := Nat.gcd_pos_of_pos_left r hp
@@ -33,7 +40,8 @@ theorem isPrim_ray_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [
 
   have h1 : (p₁ : ℤ) • β = (r₁ : ℤ) • β' := by
     apply balForms_zsmul_cancel (g := (g : ℤ)) (by exact_mod_cast hg.ne')
-    rw [smul_smul, smul_smul, ← Nat.cast_mul, ← Nat.cast_mul, ← hp₁, ← hr₁, natCast_zsmul, natCast_zsmul]
+    rw [smul_smul, smul_smul, ← Nat.cast_mul, ← Nat.cast_mul, ← hp₁, ← hr₁, natCast_zsmul,
+      natCast_zsmul]
     exact h
 
   have hbez : (p₁ : ℤ) * Nat.gcdA p₁ r₁ + (r₁ : ℤ) * Nat.gcdB p₁ r₁ = 1 := by
@@ -42,18 +50,21 @@ theorem isPrim_ray_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [
   set v := Nat.gcdB p₁ r₁
   have hr1 : r₁ = 1 := by
     apply hβ r₁ (u • β' + v • β)
-    calc β = ((p₁ : ℤ) * u + (r₁ : ℤ) * v) • β := by rw [hbez, one_smul]
+    calc
+      β = ((p₁ : ℤ) * u + (r₁ : ℤ) * v) • β := by rw [hbez, one_smul]
       _ = u • ((p₁ : ℤ) • β) + (r₁ : ℤ) • (v • β) := by
-          rw [add_smul, smul_smul, smul_smul, mul_comm (p₁ : ℤ) u]
+        rw [add_smul, smul_smul, smul_smul, mul_comm (p₁ : ℤ) u]
       _ = r₁ • (u • β' + v • β) := by
-          rw [h1, smul_smul, mul_comm u, ← smul_smul, ← smul_add, natCast_zsmul]
+        rw [h1, smul_smul, mul_comm u, ← smul_smul, ← smul_add, natCast_zsmul]
   have hp1 : p₁ = 1 := by
     apply hβ' p₁ (u • β' + v • β)
-    calc β' = ((p₁ : ℤ) * u + (r₁ : ℤ) * v) • β' := by rw [hbez, one_smul]
+    calc
+      β'
+        = ((p₁ : ℤ) * u + (r₁ : ℤ) * v) • β' := by rw [hbez, one_smul]
       _ = (p₁ : ℤ) • (u • β') + v • ((r₁ : ℤ) • β') := by
-          rw [add_smul, smul_smul, smul_smul, mul_comm (r₁ : ℤ) v]
+        rw [add_smul, smul_smul, smul_smul, mul_comm (r₁ : ℤ) v]
       _ = p₁ • (u • β' + v • β) := by
-          rw [← h1, smul_smul v, mul_comm v, ← smul_smul, ← smul_add, natCast_zsmul]
+        rw [← h1, smul_smul v, mul_comm v, ← smul_smul, ← smul_add, natCast_zsmul]
   rw [hr1, hp1] at h1
   simpa using h1
 

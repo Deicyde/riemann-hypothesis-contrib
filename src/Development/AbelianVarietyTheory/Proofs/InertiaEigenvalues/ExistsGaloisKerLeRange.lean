@@ -7,19 +7,22 @@ public import GroundTheory.LocalFields.FiniteExtension
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem exists_galois_ker_le_range (l : ℕ) [Fact l.Prime] (U : Subgroup (GQ l)) (S : Set (Om l))
-    (hU : IsOpen (U : Set (GQ l))) (hS : S.Finite) :
-    ∃ (L : Type) (_ : Field L) (_ : ValuativeRel L) (_ : TopologicalSpace L) (_ : IsNonarchimedeanLocalField L)
-      (_ : Algebra ℚ_[l] L) (_ : ValuativeExtension ℚ_[l] L) (_ : FiniteDimensional ℚ_[l] L)
-      (_ : IsGalois ℚ_[l] L) (_ : Algebra L (Om l)) (_ : IsScalarTower ℚ_[l] L (Om l)),
-      (AlgEquiv.restrictNormalHom L : GQ l →* (L ≃ₐ[ℚ_[l]] L)).ker ≤ U ∧
-        S ⊆ Set.range (algebraMap L (Om l)) := by
-  obtain ⟨E, hE, hEU⟩ := (krullTopology_mem_nhds_one_iff ℚ_[l] (Om l) (U : Set (GQ l))).mp
-    (hU.mem_nhds U.one_mem)
+theorem exists_galois_ker_le_range
+    (l : ℕ) [Fact l.Prime]
+    (U : Subgroup (GQ l)) (S : Set (Om l)) (hU : IsOpen (U : Set (GQ l))) (hS : S.Finite)
+    : ∃ (L : Type) (_ : Field L) (_ : ValuativeRel L) (_ : TopologicalSpace L)
+        (_ : IsNonarchimedeanLocalField L) (_ : Algebra ℚ_[l] L) (_ : ValuativeExtension ℚ_[l] L)
+        (_ : FiniteDimensional ℚ_[l] L) (_ : IsGalois ℚ_[l] L) (_ : Algebra L (Om l))
+        (_ : IsScalarTower ℚ_[l] L (Om l)),
+      (AlgEquiv.restrictNormalHom L : GQ l →* (L ≃ₐ[ℚ_[l]] L)).ker ≤ U
+        ∧ S ⊆ Set.range (algebraMap L (Om l)) := by
+  obtain ⟨E, hE, hEU⟩ :=
+    (krullTopology_mem_nhds_one_iff ℚ_[l] (Om l) (U : Set (GQ l))).mp (hU.mem_nhds U.one_mem)
   haveI := hS.to_subtype
   haveI : FiniteDimensional ℚ_[l] (IntermediateField.adjoin ℚ_[l] S) :=
     IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
@@ -30,8 +33,21 @@ theorem exists_galois_ker_le_range (l : ℕ) [Fact l.Prime] (U : Subgroup (GQ l)
   haveI : IsGalois ℚ_[l] M := isGalois_iff.mpr ⟨inferInstance, inferInstance⟩
   have hFM : F ≤ M := IntermediateField.le_normalClosure F
   obtain ⟨vr, top, hloc, hext⟩ := exists_isNonarchimedeanLocalField_valuativeExtension ℚ_[l] M
-  refine ⟨M, inferInstance, vr, top, hloc, inferInstance, hext, inferInstance, inferInstance,
-    inferInstance, inferInstance, ?_, ?_⟩
+  refine ⟨
+    M,
+    inferInstance,
+    vr,
+    top,
+    hloc,
+    inferInstance,
+    hext,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ?_,
+    ?_
+  ⟩
   · rw [IntermediateField.restrictNormalHom_ker]
     intro σ hσ
     apply hEU

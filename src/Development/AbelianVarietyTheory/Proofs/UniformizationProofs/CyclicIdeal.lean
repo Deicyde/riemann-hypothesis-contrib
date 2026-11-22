@@ -12,8 +12,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.UU
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -21,12 +24,14 @@ noncomputable section
 namespace GlobalTheory.UU.SecCyclic
 open GlobalTheory.AbLaw.Seesaw
 
-theorem coker_equiv {R : Type} [CommRing R] {a b : ℕ} (D : Matrix (Fin b) (Fin a) R) (v₀ : Fin a → R)
-    (k : Fin a) (hk : IsUnit (v₀ k))
-    (hker : ∀ (R' : Type) [CommRing R'] (g : R →+* R'),
-      ∀ w, (D.map g).mulVec w = 0 → ∃ c : R', w = c • (g ∘ v₀)) :
-    Nonempty (((Fin a → R) ⧸ LinearMap.range D.transpose.mulVecLin) ≃ₗ[R]
-      (R ⧸ Ideal.span (Set.range (D.mulVec v₀)))) := by
+theorem coker_equiv
+    {R : Type} [CommRing R]
+    {a b : ℕ} (D : Matrix (Fin b) (Fin a) R) (v₀ : Fin a → R) (k : Fin a) (hk : IsUnit (v₀ k))
+    (hker : ∀ (R' : Type) [CommRing R'] (g : R →+* R'), ∀ w,
+      (D.map g).mulVec w = 0 → ∃ c : R', w = c • (g ∘ v₀))
+    : Nonempty
+      (((Fin a → R) ⧸ LinearMap.range D.transpose.mulVecLin) ≃ₗ[R]
+        (R ⧸ Ideal.span (Set.range (D.mulVec v₀)))) := by
   classical
   set N := LinearMap.range D.transpose.mulVecLin with hN
   set I := Ideal.span (Set.range (D.mulVec v₀)) with hI
@@ -36,14 +41,17 @@ theorem coker_equiv {R : Type} [CommRing R] {a b : ℕ} (D : Matrix (Fin b) (Fin
     refine (Submodule.Quotient.mk_eq_zero N).2 ⟨Pi.single i 1, ?_⟩
     funext j
     simp [Pi.single_apply, Finset.sum_apply]
-  obtain ⟨c, hc⟩ := hker (TrivSqZeroExt R ((Fin a → R) ⧸ N)) (TrivSqZeroExt.inlHom R ((Fin a → R) ⧸ N))
-    (fun j => TrivSqZeroExt.inr (N.mkQ (Pi.single j 1))) (by
-      funext i
-      change ∑ j, TrivSqZeroExt.inl (D i j) * TrivSqZeroExt.inr (N.mkQ (Pi.single j 1)) = (0 : TrivSqZeroExt R ((Fin a → R) ⧸ N))
-      have := congrArg (TrivSqZeroExt.inrHom R ((Fin a → R) ⧸ N)) (hrow i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at this
-      exact (Finset.sum_congr rfl fun j _ => TrivSqZeroExt.inl_mul_inr _ _).trans this)
+  obtain ⟨c, hc⟩ :=
+    hker (TrivSqZeroExt R ((Fin a → R) ⧸ N)) (TrivSqZeroExt.inlHom R ((Fin a → R) ⧸ N))
+      (fun j => TrivSqZeroExt.inr (N.mkQ (Pi.single j 1)))
+      (by
+        funext i
+        change ∑ j, TrivSqZeroExt.inl (D i j) * TrivSqZeroExt.inr (N.mkQ (Pi.single j 1))
+          = (0 : TrivSqZeroExt R ((Fin a → R) ⧸ N))
+        have := congrArg (TrivSqZeroExt.inrHom R ((Fin a → R) ⧸ N)) (hrow i)
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum, map_zero] at this
+        exact (Finset.sum_congr rfl fun j _ => TrivSqZeroExt.inl_mul_inr _ _).trans this)
   have he : ∀ j, N.mkQ (Pi.single j 1) = v₀ j • c.snd := fun j => by
     have := congrArg TrivSqZeroExt.snd (congrFun hc j)
     change _ = (c * TrivSqZeroExt.inl (v₀ j)).snd at this
@@ -55,7 +63,7 @@ theorem coker_equiv {R : Type} [CommRing R] {a b : ℕ} (D : Matrix (Fin b) (Fin
       simp [Pi.single_apply, Finset.sum_apply]
     conv_lhs => rw [this]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, he, smul_smul, dotProduct, Finset.sum_smul]
+    simp only [map_sum, map_smul, he, smul_smul, dotProduct, Finset.sum_smul]
   have hIq : ∀ r ∈ I, r • c.snd = 0 := fun r hr => by
     refine Submodule.span_induction (p := fun r _ => r • c.snd = 0) ?_ (zero_smul _ _) ?_ ?_ hr
     · rintro _ ⟨i, rfl⟩
@@ -83,14 +91,33 @@ theorem coker_equiv {R : Type} [CommRing R] {a b : ℕ} (D : Matrix (Fin b) (Fin
       exact (Submodule.Quotient.mk_eq_zero N).1 ((hx x).trans (hIq _ h))
   exact ⟨(Submodule.quotEquivOfEq _ _ hk').trans (φ.quotKerEquivOfSurjective hs)⟩
 
-theorem cyclic_ideal : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) (M : LB X), M.IsLB → ∀ P : Perf f M, UniversallyClosed f → Surjective f → ∀ (K : Type) [Field K] (g₀ : R →+* K), IsLocalHom g₀ → ∀ (X₀ : Scheme.{0}) (π₀ : X₀ ⟶ X) (f₀ : X₀ ⟶ Spec (CommRingCat.of K)), IsPullback π₀ f₀ f (Spec.map (CommRingCat.ofHom g₀)) → Function.Bijective f₀.appTop.hom → Triv (M.pull π₀) → ∃ I : Ideal R, Nonempty (((Fin P.a → R) ⧸ LinearMap.range P.D₀.transpose.mulVecLin) ≃ₗ[R] (R ⧸ I)) ∧ ∀ (R' : Type) [CommRing R'] (g : R →+* R') (X' : Scheme.{0}) (π : X' ⟶ X) (f' : X' ⟶ Spec (CommRingCat.of R')), IsPullback π f' f (Spec.map (CommRingCat.ofHom g)) → (Triv (M.pull π) ↔ I ≤ RingHom.ker g) := by
+theorem cyclic_ideal
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R))
+        (M : LB X),
+      M.IsLB
+        → ∀ P : Perf f M,
+          UniversallyClosed f → Surjective f
+            → ∀ (K : Type) [Field K] (g₀ : R →+* K),
+              IsLocalHom g₀
+                → ∀ (X₀ : Scheme.{0}) (π₀ : X₀ ⟶ X) (f₀ : X₀ ⟶ Spec (CommRingCat.of K)),
+                  IsPullback π₀ f₀ f (Spec.map (CommRingCat.ofHom g₀))
+                    → Function.Bijective f₀.appTop.hom → Triv (M.pull π₀)
+                    → ∃ I : Ideal R,
+                      Nonempty
+                          (((Fin P.a → R) ⧸ LinearMap.range P.D₀.transpose.mulVecLin) ≃ₗ[R] (R ⧸ I))
+                        ∧ ∀ (R' : Type) [CommRing R'] (g : R →+* R') (X' : Scheme.{0}) (π : X' ⟶ X)
+                            (f' : X' ⟶ Spec (CommRingCat.of R')),
+                          IsPullback π f' f (Spec.map (CommRingCat.ofHom g))
+                            → (Triv (M.pull π) ↔ I ≤ RingHom.ker g) := by
   intro R _ _ X f M hM P hcl hsurj K _ g₀ hloc X₀ π₀ f₀ h₀ hb ht
   obtain ⟨v, hv, hu, hline⟩ := loc_of_triv P h₀ hM ht
   have unit_of : ∀ r : R, g₀ r ≠ 0 → IsUnit r := fun r hr => hloc.map_nonunit r hr.isUnit
   let z : Spec (CommRingCat.of K) := (⊥ : PrimeSpectrum K)
-  have unit_cst : ∀ (R' : Type) [CommRing R'] (g : R →+* R') (X' : Scheme.{0}) (π : X' ⟶ X)
-      (f' : X' ⟶ Spec (CommRingCat.of R')), IsPullback π f' f (Spec.map (CommRingCat.ofHom g)) →
-      ∀ (c : R') (w : Fin P.a → R'), (∀ i, IsUnit (loc P π f' (c • w) i)) → IsUnit c := by
+  have unit_cst
+      : ∀ (R' : Type) [CommRing R'] (g : R →+* R') (X' : Scheme.{0}) (π : X' ⟶ X)
+          (f' : X' ⟶ Spec (CommRingCat.of R')),
+        IsPullback π f' f (Spec.map (CommRingCat.ofHom g))
+          → ∀ (c : R') (w : Fin P.a → R'), (∀ i, IsUnit (loc P π f' (c • w) i)) → IsUnit c := by
     intro R' _ g X' π f' h c w H
     by_contra hc
     obtain ⟨m, hm, hcm⟩ := exists_max_ideal_of_mem_nonunits hc
@@ -106,15 +133,18 @@ theorem cyclic_ideal : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{
     rintro rfl
     exact not_isUnit_zero (unit_cst K g₀ X₀ π₀ f₀ h₀ 0 0 (by rwa [smul_zero]))
   obtain ⟨δ, v₀, hδ, hker₀⟩ := exists_kernel_vector g₀ P.D₀ v hv0 (hline hb.2)
-  have hker : ∀ (R' : Type) [CommRing R'] (g : R →+* R'),
-      ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : R', w = c • (g ∘ v₀) :=
-    fun R' _ g => hker₀ R' g ((unit_of δ hδ).map g)
+  have hker
+      : ∀ (R' : Type) [CommRing R'] (g : R →+* R'), ∀ w,
+        (P.D₀.map g).mulVec w = 0 → ∃ c : R', w = c • (g ∘ v₀) := fun R' _ g =>
+    hker₀ R' g ((unit_of δ hδ).map g)
   obtain ⟨c₀, hc₀⟩ := hker K g₀ v hv
   obtain ⟨k, hk⟩ := Function.ne_iff.1 hv0
-  have hk' : IsUnit (v₀ k) := unit_of _ fun h0 => hk (by
-    rw [hc₀]
-    change c₀ * g₀ (v₀ k) = 0
-    rw [h0, mul_zero])
+  have hk' : IsUnit (v₀ k) :=
+    unit_of _ fun h0 =>
+      hk (by
+        rw [hc₀]
+        change c₀ * g₀ (v₀ k) = 0
+        rw [h0, mul_zero])
   let G : X.Opens := ⨆ i, X.basicOpen (loc₀ P v₀ i)
   have hZ : IsClosed (f '' (G : Set X)ᶜ) := f.isClosedMap _ G.isOpen.isClosed_compl
   have hp : Spec.map (CommRingCat.ofHom g₀) z ∈ (f '' (G : Set X)ᶜ)ᶜ := by
@@ -127,11 +157,17 @@ theorem cyclic_ideal : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X : Scheme.{
     rw [← Scheme.preimage_basicOpen] at h₂
     exact hx (TopologicalSpace.Opens.mem_iSup.2 ⟨i, h₂⟩)
   obtain ⟨_, ⟨r₁, rfl⟩, hr₁, hsub⟩ :=
-    (PrimeSpectrum.isTopologicalBasis_basic_opens (R := R)).exists_subset_of_mem_open hp hZ.isOpen_compl
+    (PrimeSpectrum.isTopologicalBasis_basic_opens (R := R)).exists_subset_of_mem_open hp
+      hZ.isOpen_compl
   have hr₁' : IsUnit r₁ := unit_of r₁ hr₁
-  refine ⟨Ideal.span (Set.range (P.D₀.mulVec v₀)), coker_equiv P.D₀ v₀ k hk' hker,
-    fun R' _ g X' π f' h => ?_⟩
-  have hI : Ideal.span (Set.range (P.D₀.mulVec v₀)) ≤ RingHom.ker g ↔ (P.D₀.map g).mulVec (g ∘ v₀) = 0 := by
+  refine ⟨
+    Ideal.span (Set.range (P.D₀.mulVec v₀)),
+    coker_equiv P.D₀ v₀ k hk' hker,
+    fun R' _ g X' π f' h => ?_
+  ⟩
+  have hI
+      : Ideal.span (Set.range (P.D₀.mulVec v₀)) ≤ RingHom.ker g
+        ↔ (P.D₀.map g).mulVec (g ∘ v₀) = 0 := by
     rw [Ideal.span_le, Set.range_subset_iff, funext_iff]
     refine forall_congr' fun j => ?_
     rw [← RingHom.map_mulVec]

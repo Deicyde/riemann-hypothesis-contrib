@@ -11,10 +11,12 @@ noncomputable section
 
 namespace GlobalTheory.FinalJoin2
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.FinalJoin
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.FinalJoin
 open scoped TensorProduct
 
-def IntUnit {D : D7} (x : (AfE D)ˣ) : Prop := (x : AfE D) ∈ intAE D ∧ ((x⁻¹ : (AfE D)ˣ) : AfE D) ∈ intAE D
+def IntUnit {D : D7} (x : (AfE D)ˣ) : Prop :=
+  (x : AfE D) ∈ intAE D ∧ ((x⁻¹ : (AfE D)ˣ) : AfE D) ∈ intAE D
 
 structure XiRec (D : D7) (p : ℕ) (de : (AfE D)ˣ →* ℂˣ) : Prop where
   real : ∀ (x : (AfE D)ˣ) (a : Af D.host.F), (x : AfE D) = a ⊗ₜ 1 → de x = 1

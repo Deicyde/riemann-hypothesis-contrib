@@ -12,8 +12,9 @@ namespace GlobalTheory.InertSquareNorm
 open NumberField Module IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S.Lat
 open scoped Classical
 
-theorem isSquare_card_of_involution {k : Type} [Field k] [Finite k] (s : k ≃+* k)
-    (hs : ∀ x, s (s x) = x) (h1 : ∃ x, s x ≠ x) : IsSquare (Nat.card k) := by
+theorem isSquare_card_of_involution
+    {k : Type} [Field k] [Finite k] (s : k ≃+* k) (hs : ∀ x, s (s x) = x) (h1 : ∃ x, s x ≠ x)
+    : IsSquare (Nat.card k) := by
   classical
   have hs2 : s ^ 2 = 1 := by
     ext x
@@ -36,16 +37,22 @@ theorem isSquare_card_of_involution {k : Type} [Field k] [Finite k] (s : k ≃+*
     (FixedPoints.finrank_eq_card (Subgroup.zpowers s) k).trans hcardG
   haveI : Fintype k := Fintype.ofFinite k
   haveI : Fintype (FixedPoints.subfield (Subgroup.zpowers s) k) := Fintype.ofFinite _
-  have hk : Fintype.card k = Fintype.card (FixedPoints.subfield (Subgroup.zpowers s) k) ^
-      Module.finrank (FixedPoints.subfield (Subgroup.zpowers s) k) k :=
+  have hk
+      : Fintype.card k
+        = Fintype.card (FixedPoints.subfield (Subgroup.zpowers s) k)
+          ^ Module.finrank (FixedPoints.subfield (Subgroup.zpowers s) k) k :=
     Module.card_eq_pow_finrank
   refine ⟨Fintype.card (FixedPoints.subfield (Subgroup.zpowers s) k), ?_⟩
   rw [Nat.card_eq_fintype_card, hk, hfin, pow_two]
 
-theorem isSquare_absNorm : ∀ (E : Type) [Field E] [NumberField E] [StarRing E], Formalism.HermitianLatticesTheory.IsCMUnram E → ∀ P : HeightOneSpectrum (𝓞 E), Formalism.HermitianLatticesTheory.conjIdeal (K := E) P.asIdeal = P.asIdeal → IsSquare (Ideal.absNorm P.asIdeal) := by
+theorem isSquare_absNorm
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+      Formalism.HermitianLatticesTheory.IsCMUnram E
+        → ∀ P : HeightOneSpectrum (𝓞 E),
+          Formalism.HermitianLatticesTheory.conjIdeal (K := E) P.asIdeal = P.asIdeal
+            → IsSquare (Ideal.absNorm P.asIdeal) := by
   intro E _ _ _ hE P hP
   classical
-
   let c : 𝓞 E →+* 𝓞 E := RingOfIntegers.mapRingHom (starRingEnd E)
   have hc : ∀ x : 𝓞 E, algebraMap (𝓞 E) E (c x) = star (algebraMap (𝓞 E) E x) := fun x => rfl
   have hcc : ∀ x : 𝓞 E, c (c x) = x := fun x => RingOfIntegers.ext (by simp [c])
@@ -63,8 +70,12 @@ theorem isSquare_absNorm : ∀ (E : Type) [Field E] [NumberField E] [StarRing E]
     intro y
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective y
     rw [hsb_mk, hsb_mk, hcc]
-  let s : (𝓞 E ⧸ P.asIdeal) ≃+* (𝓞 E ⧸ P.asIdeal) :=
-    { sb with invFun := sb, left_inv := hsb, right_inv := hsb }
+  let s : (𝓞 E ⧸ P.asIdeal) ≃+* (𝓞 E ⧸ P.asIdeal) := {
+    sb with
+    invFun := sb
+    left_inv := hsb
+    right_inv := hsb
+  }
   have hN : Ideal.absNorm P.asIdeal = Nat.card (𝓞 E ⧸ P.asIdeal) := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   haveI : Finite (𝓞 E ⧸ P.asIdeal) := by

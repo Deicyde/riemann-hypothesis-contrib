@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardAbelianV
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,8 +19,11 @@ noncomputable section
 
 namespace GlobalTheory.ActTrivialInj
 
-theorem exists_nat_eq_mul {F : Type} [Field F] [NumberField F] {O : Type} [CommRing O] [Algebra O F]
-    [IsFractionRing O F] {x : O} (hx : x ≠ 0) : ∃ n : ℕ, n ≠ 0 ∧ ∃ r : O, (n : O) = x * r := by
+theorem exists_nat_eq_mul
+    {F : Type} [Field F] [NumberField F]
+    {O : Type} [CommRing O] [Algebra O F] [IsFractionRing O F]
+    {x : O} (hx : x ≠ 0)
+    : ∃ n : ℕ, n ≠ 0 ∧ ∃ r : O, (n : O) = x * r := by
   set y := algebraMap O F x with hydef
   have hy : y ≠ 0 := by
     intro h
@@ -31,7 +35,8 @@ theorem exists_nat_eq_mul {F : Type} [Field F] [NumberField F] {O : Type} [CommR
   have hp0 : (minpoly ℚ y).coeff 0 ≠ 0 := minpoly.coeff_zero_ne_zero hint hy
   set q := IsLocalization.integerNormalization (nonZeroDivisors ℤ) (minpoly ℚ y) with hqdef
   have hq : Polynomial.aeval y q = 0 :=
-    IsLocalization.integerNormalization_aeval_eq_zero (nonZeroDivisors ℤ) (minpoly ℚ y) (minpoly.aeval ℚ y)
+    IsLocalization.integerNormalization_aeval_eq_zero (nonZeroDivisors ℤ) (minpoly ℚ y)
+      (minpoly.aeval ℚ y)
   obtain ⟨b, hb0, hb⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ) (minpoly ℚ y)
   set c := q.coeff 0 with hcdef
   have hc : c ≠ 0 := by
@@ -47,7 +52,9 @@ theorem exists_nat_eq_mul {F : Type} [Field F] [NumberField F] {O : Type} [CommR
     rw [← Polynomial.aeval_algebraMap_apply, map_zero]
     exact hq
   have key := congrArg (Polynomial.aeval x) (Polynomial.X_mul_divX_add q)
-  rw [hO, map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, ← hcdef, algebraMap_int_eq, eq_intCast] at key
+  rw [hO, map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, ← hcdef,
+      algebraMap_int_eq, eq_intCast]
+    at key
   have hc' : (c : O) = x * -(Polynomial.aeval x q.divX) := by linear_combination key
   refine ⟨c.natAbs, Int.natAbs_ne_zero.2 hc, ?_⟩
   have hn : ((c.natAbs : ℕ) : O) = ((|c| : ℤ) : O) := by rw [← Int.natCast_natAbs, Int.cast_natCast]
@@ -55,14 +62,24 @@ theorem exists_nat_eq_mul {F : Type} [Field F] [NumberField F] {O : Type} [CommR
   · exact ⟨-(Polynomial.aeval x q.divX), by rw [hn, h, hc']⟩
   · exact ⟨Polynomial.aeval x q.divX, by rw [hn, h, Int.cast_neg, hc']; ring⟩
 
-theorem eq_zero_of_act_pullback_eq_one : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [IsSepClosed Ω] (A : Over (Sp K)) [GrpObj A] [IsCommMonObj A], IsAbelianScheme A → (∃ d : ℕ, 0 < d ∧ SmoothOfRelativeDimension d A.hom) → ∀ (l : ℕ) [Fact l.Prime], (l : K) ≠ 0 → ∀ (F : Type) [Field F] [NumberField F] (O : Type) [CommRing O] [Algebra O F] [IsFractionRing O F] (α : OAct O A) (x : O), (OAct.pullback (spMap (algebraMap K (AlgebraicClosure Ω))) A α).act x = 1 → x = 0 := by
+theorem eq_zero_of_act_pullback_eq_one
+    : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [IsSepClosed Ω] (A : Over (Sp K)) [GrpObj A]
+        [IsCommMonObj A],
+      IsAbelianScheme A → (∃ d : ℕ, 0 < d ∧ SmoothOfRelativeDimension d A.hom)
+        → ∀ (l : ℕ) [Fact l.Prime],
+          (l : K) ≠ 0
+            → ∀ (F : Type) [Field F] [NumberField F] (O : Type) [CommRing O] [Algebra O F]
+                [IsFractionRing O F] (α : OAct O A) (x : O),
+              (OAct.pullback (spMap (algebraMap K (AlgebraicClosure Ω))) A α).act x = 1
+                → x = 0 := by
   rintro K Ω _ _ _ _ A _ _ hA ⟨d, hd, hsm⟩ l _ hl F _ _ O _ _ _ α x hx
   by_contra hx0
   have hl' : l.Prime := Fact.out
   set L := AlgebraicClosure Ω
   set t : Sp L ⟶ Sp K := spMap (algebraMap K L) with htdef
   have hgp := isGrpPullback_pullback A t
-  obtain ⟨e, he⟩ := GlobalTheory.exists_mulEquiv_of_isGrpPullback hgp (𝟙 (Sp L)) t (Category.id_comp t).symm
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.exists_mulEquiv_of_isGrpPullback hgp (𝟙 (Sp L)) t (Category.id_comp t).symm
   have h1 : ∀ y : ptOver K L ⟶ A, y ≫ α.act x = 1 := by
     intro y
     obtain ⟨v, rfl⟩ := e.surjective y
@@ -95,14 +112,17 @@ theorem eq_zero_of_act_pullback_eq_one : ∀ (K Ω : Type) [Field K] [Field Ω] 
     have e3 := pow_gcd_eq_one.2 ⟨e1, e2⟩
     rwa [hcop.gcd_eq_one, pow_one] at e3
   have hlK : ∀ k : ℕ, ((l ^ k : ℕ) : K) ≠ 0 := fun k => by rw [Nat.cast_pow]; exact pow_ne_zero _ hl
-  have cN := GlobalTheory.SepClosedTorsion.card_torsion_sepClosed K L A hA d hsm (l ^ (v + 1)) (hlK _)
+  have cN :=
+    GlobalTheory.SepClosedTorsion.card_torsion_sepClosed K L A hA d hsm (l ^ (v + 1)) (hlK _)
   have cv := GlobalTheory.SepClosedTorsion.card_torsion_sepClosed K L A hA d hsm (l ^ v) (hlK _)
   have hfin : Finite {y : ptOver K L ⟶ A // y ^ (l ^ v) = 1} :=
     Nat.finite_of_card_ne_zero (by rw [cv]; exact pow_ne_zero _ (pow_ne_zero _ hl'.ne_zero))
-  have hle := Nat.card_le_card_of_injective
-    (fun y : {y : ptOver K L ⟶ A // y ^ (l ^ (v + 1)) = 1} =>
-      (⟨y.1, hsub y.1 y.2⟩ : {y : ptOver K L ⟶ A // y ^ (l ^ v) = 1}))
-    (fun a b h => Subtype.ext (congrArg (fun z : {y : ptOver K L ⟶ A // y ^ (l ^ v) = 1} => z.1) h))
+  have hle :=
+    Nat.card_le_card_of_injective
+      (fun y : {y : ptOver K L ⟶ A // y ^ (l ^ (v + 1)) = 1} =>
+        (⟨y.1, hsub y.1 y.2⟩ : {y : ptOver K L ⟶ A // y ^ (l ^ v) = 1}))
+      (fun a b h =>
+        Subtype.ext (congrArg (fun z : {y : ptOver K L ⟶ A // y ^ (l ^ v) = 1} => z.1) h))
   rw [cN, cv] at hle
   have hlt : (l ^ v) ^ (2 * d) < (l ^ (v + 1)) ^ (2 * d) :=
     Nat.pow_lt_pow_left (Nat.pow_lt_pow_right hl'.one_lt (Nat.lt_succ_self v)) (by omega)

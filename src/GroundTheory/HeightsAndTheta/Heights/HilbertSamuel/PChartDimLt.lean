@@ -17,8 +17,9 @@ noncomputable section
 
 theorem ChartDimLt.proof : ChartDimLt.Statement := by
   intro K _ ι _ J e p hJ hdim
-  have key : ∀ Z ∈ (ReciprocityTheory.AnForm.R.chartIdeal J p).minimalPrimes,
-      ∃ s : ℕ, ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ Z) = s ∧ s < e := by
+  have key
+      : ∀ Z ∈ (ReciprocityTheory.AnForm.R.chartIdeal J p).minimalPrimes, ∃ s : ℕ,
+        ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ Z) = s ∧ s < e := by
     intro Z hZ
     have : Z.IsPrime := hZ.1.1
     obtain ⟨s, hs, hle⟩ := ChartDimLt.exists_dim_add_card_le hJ p Z hZ.1.2
@@ -34,10 +35,12 @@ theorem ChartDimLt.proof : ChartDimLt.Statement := by
     obtain ⟨s, -, hs⟩ := key Z hZ
     omega
   | succ n =>
-    have hn : ((n : ℕ) : WithBot ℕ∞) < ((n + 1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast Nat.lt_succ_self n
+    have hn : ((n : ℕ) : WithBot ℕ∞) < ((n + 1 : ℕ) : WithBot ℕ∞) := by
+      exact_mod_cast Nat.lt_succ_self n
     refine lt_of_le_of_lt
-      (Targets.BaseChangeMin.ringKrullDim_quotient_le_of_minimalPrimes (N := ((n : ℕ) : WithBot ℕ∞)) _
-        fun Z hZ => ?_) hn
+      (Targets.BaseChangeMin.ringKrullDim_quotient_le_of_minimalPrimes (N := ((n : ℕ) : WithBot ℕ∞))
+        _ fun Z hZ => ?_)
+      hn
     obtain ⟨s, hs, hsn⟩ := key Z hZ
     rw [hs]
     exact_mod_cast (by omega : s ≤ n)

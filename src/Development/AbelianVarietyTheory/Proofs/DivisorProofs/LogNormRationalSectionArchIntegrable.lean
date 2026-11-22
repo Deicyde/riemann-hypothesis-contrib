@@ -19,8 +19,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchIntegrab
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.Cartier GlobalTheory.CovTest GlobalTheory.LineForm
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxForm GlobalTheory.CxPts GlobalTheory.VB
+  GlobalTheory.Cartier GlobalTheory.CovTest GlobalTheory.LineForm
 open scoped Classical
 
 set_option autoImplicit false
@@ -29,18 +31,22 @@ open Set Filter Topology
 
 namespace GlobalTheory.LogNormIntGen
 
-theorem archIntegrable : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k}
-    {D : ℕ}, IsArithVar p D → GenSmooth p D → ∀ (M N : HermLB p) {r : N.B.ι → X.functionFieldˣ}
-      (hr : GlobalTheory.Cartier.IsRatSec N.B r), M.ArchIntegrable N D hr := by
+theorem archIntegrable
+    : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp k} {D : ℕ},
+      IsArithVar p D → GenSmooth p D
+        → ∀ (M N : HermLB p) {r : N.B.ι → X.functionFieldˣ}
+            (hr : GlobalTheory.Cartier.IsRatSec N.B r),
+          M.ArchIntegrable N D hr := by
   intro k _ X _ p D hX hs M N r hr σ
   have := hX.compactSpace σ
   have := CxPts.secondCountableTopology_of_isProjOver σ hX.isProjOver
   obtain ⟨R⟩ := hs σ
   have hσ : Function.Injective σ := ChernNull.injective_of_arithVar hX σ
-  have key (ε : ℤˣ) : IntegrableOn (logNorm (N.φ σ) r) (offSupp p σ (N.div hr))
-      ((M.φ σ).chernPart D ε) := by
-    have h (y : CxPts p σ) : ∃ O ∈ 𝓝 y, IntegrableOn (logNorm (N.φ σ) r)
-        (offSupp p σ (N.div hr) ∩ O) ((M.φ σ).chernPart D ε) :=
+  have key (ε : ℤˣ)
+      : IntegrableOn (logNorm (N.φ σ) r) (offSupp p σ (N.div hr)) ((M.φ σ).chernPart D ε) := by
+    have h (y : CxPts p σ)
+        : ∃ O ∈ 𝓝 y,
+          IntegrableOn (logNorm (N.φ σ) r) (offSupp p σ (N.div hr) ∩ O) ((M.φ σ).chernPart D ε) :=
       have ⟨_, hi⟩ := R.cover y
       LogNormInt.exists_integrableOn hσ (M.cInf σ) (N.cInf σ) hr ε _ hi
     choose O hO hint using h

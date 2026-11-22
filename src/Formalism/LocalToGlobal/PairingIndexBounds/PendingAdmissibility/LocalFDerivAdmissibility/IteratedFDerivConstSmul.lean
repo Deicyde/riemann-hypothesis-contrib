@@ -11,9 +11,11 @@ open Formalism.BasicNotions Formalism.MainNotions
 
 namespace Formalism.L2.PairingIndexBounds.PowerSeriesNecessity
 
-theorem iteratedFDeriv_const_smul' {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup F]
-    [NormedSpace ℂ F] (c : ℂ) (hc : c ≠ 0) (f : E → F) (n : ℕ) :
-    iteratedFDeriv ℂ n (fun y => c • f y) = c • iteratedFDeriv ℂ n f := by
+theorem iteratedFDeriv_const_smul'
+    {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup F] [NormedSpace ℂ F]
+    (c : ℂ) (hc : c ≠ 0)
+    (f : E → F) (n : ℕ)
+    : iteratedFDeriv ℂ n (fun y => c • f y) = c • iteratedFDeriv ℂ n f := by
   let _ : Invertible c := invertibleOfNonzero hc
   induction n with
   | zero =>
@@ -26,15 +28,24 @@ theorem iteratedFDeriv_const_smul' {E F : Type} [NormedAddCommGroup E] [NormedSp
     rw [fderiv_const_smul_of_invertible c, map_smul]
     rfl
 
-theorem taylor_const_mul (D : D7) {N N' : ℕ} (s : ℂ) (hs : s ≠ 0) (G : TaylorLogMetric.VC D N N' → ℂ) (α : TaylorLogMetric.Mono D N N') :
-    TaylorLogMetric.taylor D (fun z => s * G z) α = s * TaylorLogMetric.taylor D G α := by
+theorem taylor_const_mul
+    (D : D7)
+    {N N' : ℕ}
+    (s : ℂ) (hs : s ≠ 0)
+    (G : TaylorLogMetric.VC D N N' → ℂ) (α : TaylorLogMetric.Mono D N N')
+    : TaylorLogMetric.taylor D (fun z => s * G z) α = s * TaylorLogMetric.taylor D G α := by
   unfold TaylorLogMetric.taylor
   have h := iteratedFDeriv_const_smul' s hs G (Multiset.card α.toMultiset)
   simp only [smul_eq_mul] at h
   rw [h, Pi.smul_apply, ContinuousMultilinearMap.smul_apply, smul_eq_mul, mul_div_assoc]
 
-theorem lamC_mul {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar →+* ℂ_[p]) {s : ℂ} (hs : s ∈ TaylorLogMetric.Qbar) (hs0 : s ≠ 0) (t : ℂ) :
-    TaylorLogMetric.lamC lam (s * t) = TaylorLogMetric.lamC lam s * TaylorLogMetric.lamC lam t := by
+theorem lamC_mul
+    {p : ℕ} [Fact p.Prime]
+    (lam : TaylorLogMetric.Qbar →+* ℂ_[p])
+    {s : ℂ} (hs : s ∈ TaylorLogMetric.Qbar) (hs0 : s ≠ 0)
+    (t : ℂ)
+    : TaylorLogMetric.lamC lam (s * t)
+      = TaylorLogMetric.lamC lam s * TaylorLogMetric.lamC lam t := by
   unfold TaylorLogMetric.lamC
   by_cases ht : t ∈ TaylorLogMetric.Qbar
   · have hst : s * t ∈ TaylorLogMetric.Qbar := TaylorLogMetric.Qbar.mul_mem hs ht
@@ -43,13 +54,19 @@ theorem lamC_mul {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar →+* ℂ_
   · have hst : s * t ∉ TaylorLogMetric.Qbar := by
       intro h
       apply ht
-      have : s⁻¹ * (s * t) ∈ TaylorLogMetric.Qbar := TaylorLogMetric.Qbar.mul_mem (TaylorLogMetric.Qbar.inv_mem hs) h
+      have : s⁻¹ * (s * t) ∈ TaylorLogMetric.Qbar :=
+        TaylorLogMetric.Qbar.mul_mem (TaylorLogMetric.Qbar.inv_mem hs) h
       rwa [← mul_assoc, inv_mul_cancel₀ hs0, one_mul] at this
     rw [dite_eq_right hst, dite_eq_right ht, mul_zero]
 
-theorem pSer_const_mul (D : D7) {N N' p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar →+* ℂ_[p]) {s : ℂ} (hs : s ∈ TaylorLogMetric.Qbar)
-    (G : TaylorLogMetric.VC D N N' → ℂ) :
-    TaylorLogMetric.pSer D lam (fun z => s * G z) = MvPowerSeries.C (TaylorLogMetric.lamC lam s) * TaylorLogMetric.pSer D lam G := by
+theorem pSer_const_mul
+    (D : D7)
+    {N N' p : ℕ} [Fact p.Prime]
+    (lam : TaylorLogMetric.Qbar →+* ℂ_[p])
+    {s : ℂ} (hs : s ∈ TaylorLogMetric.Qbar)
+    (G : TaylorLogMetric.VC D N N' → ℂ)
+    : TaylorLogMetric.pSer D lam (fun z => s * G z)
+      = MvPowerSeries.C (TaylorLogMetric.lamC lam s) * TaylorLogMetric.pSer D lam G := by
   by_cases hs0 : s = 0
   · subst hs0
     ext α

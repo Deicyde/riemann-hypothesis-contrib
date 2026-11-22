@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Sec
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.ChartRestriction.G.Out
@@ -17,9 +18,13 @@ noncomputable section
 
 namespace GlobalTheory.HomFixUniv
 
-theorem embedsBy_fA_of_isBCBasis (Rg : Type) [CommRing Rg] (B : Over (Sp Rg)) [GrpObj B] (M : LB B.left) (k mB : ℕ)
-    (bB : Fin mB → LB.Sec (LPow B M (k : ℤ) (topS Rg))) (hB : IsAbelianScheme B) (hM : M.IsLB) (_hk : 1 ≤ k)
-    (hVA : VeryAmpleAt B M k) (hb : IsBCBasis B M k bB) : GlobalTheory.AmpleSpan.EmbedsBy (GlobalTheory.HomFixUniv.fA B) bB := by
+theorem embedsBy_fA_of_isBCBasis
+    (Rg : Type) [CommRing Rg]
+    (B : Over (Sp Rg)) [GrpObj B]
+    (M : LB B.left) (k mB : ℕ) (bB : Fin mB → LB.Sec (LPow B M (k : ℤ) (topS Rg)))
+    (hB : IsAbelianScheme B) (hM : M.IsLB) (_hk : 1 ≤ k) (hVA : VeryAmpleAt B M k)
+    (hb : IsBCBasis B M k bB)
+    : GlobalTheory.AmpleSpan.EmbedsBy (GlobalTheory.HomFixUniv.fA B) bB := by
   have hp : IsProper B.hom := hB.proper
   let t : Spec (CommRingCat.of Rg) ⟶ (topS Rg).left := (Sp Rg).topIso.inv
   choose b' hb' using fun i => GlobalTheory.AbLaw.SecBC.exists_pullSec B M (k : ℤ) (homAt t) (bB i)
@@ -39,7 +44,7 @@ theorem embedsBy_fA_of_isBCBasis (Rg : Type) [CommRing Rg] (B : Over (Sp Rg)) [G
   have sq : IsPullback (inv (homAt t ▷ B).left) (fA B) (fst (baseAt t) B).left (𝟙 _) := by
     refine IsPullback.of_horiz_isIso ⟨?_⟩
     rw [IsIso.inv_comp_eq, Category.comp_id, hw, Category.comp_id]
-  exact GlobalTheory.AmpleSpan.EmbedsBy.secScal hM sq hE
-    fun i => GlobalTheory.AmpleSpan.secScal_symm hM (hS i) (IsIso.inv_hom_id _)
+  exact GlobalTheory.AmpleSpan.EmbedsBy.secScal hM sq hE fun i =>
+    GlobalTheory.AmpleSpan.secScal_symm hM (hS i) (IsIso.inv_hom_id _)
 
 end GlobalTheory.HomFixUniv

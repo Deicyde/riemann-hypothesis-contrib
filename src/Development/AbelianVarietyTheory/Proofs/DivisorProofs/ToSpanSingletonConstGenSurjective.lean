@@ -13,9 +13,10 @@ namespace GlobalTheory
 
 namespace PDivGroup
 
-theorem exists_algHom_pi_eq_eval {O ι : Type*} [CommRing O] [Nontrivial O] [Finite ι]
-    (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1) (f : (ι → O) →ₐ[O] O) :
-    ∃ k, ∀ g, f g = g k := by
+theorem exists_algHom_pi_eq_eval
+    {O ι : Type*} [CommRing O] [Nontrivial O] [Finite ι]
+    (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1) (f : (ι → O) →ₐ[O] O)
+    : ∃ k, ∀ g, f g = g k := by
   classical
   have := Fintype.ofFinite ι
   have h1 : ∃ k, f (Pi.single k 1) ≠ 0 := by
@@ -45,12 +46,12 @@ variable (p : ℕ) (O : Type) [CommRing O] [Fact p.Prime]
 
 variable [Nontrivial O]
 
-theorem toSpanSingleton_constGen_surjective
-    (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1) :
-    Function.Surjective (LinearMap.toSpanSingleton ℤ_[p] _ (constGen p O)) := fun t => by
+theorem toSpanSingleton_constGen_surjective (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1)
+    : Function.Surjective (LinearMap.toSpanSingleton ℤ_[p] _ (constGen p O)) := fun t => by
   have h1 : ∀ n, ∃ k : ℕ, ∀ φ, t.pt n φ = constFun p O n φ k := fun n => by
-    obtain ⟨k, hk⟩ := exists_algHom_pi_eq_eval hO
-      ((t.pt n).comp ((constFun p O n).symm : (ZMod (p ^ n) → O) →ₐ[O] (const p O).A n))
+    obtain ⟨k, hk⟩ :=
+      exists_algHom_pi_eq_eval hO
+        ((t.pt n).comp ((constFun p O n).symm : (ZMod (p ^ n) → O) →ₐ[O] (const p O).A n))
     refine ⟨k.val, fun φ => ?_⟩
     rw [ZMod.natCast_zmod_val, ← hk (constFun p O n φ)]
     exact congrArg (t.pt n) ((constFun p O n).symm_apply_apply φ).symm
@@ -64,14 +65,15 @@ theorem toSpanSingleton_constGen_surjective
   have h3 : ∀ n, (p : ℤ) ^ n ∣ (k (n + 1) : ℤ) - k n := fun n => by
     rw [← Nat.cast_pow, ← ZMod.intCast_zmod_eq_zero_iff_dvd, Int.cast_sub, Int.cast_natCast,
       Int.cast_natCast, h2, sub_self]
-  refine ⟨PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun n => (k n : ℤ)) p h3),
-    TateOver.ext (funext fun n => AlgHom.ext fun φ => ?_)⟩
+  refine ⟨
+    PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun n => (k n : ℤ)) p h3),
+    TateOver.ext (funext fun n => AlgHom.ext fun φ => ?_)
+  ⟩
   rw [LinearMap.toSpanSingleton_apply, smul_constGen_pt,
     PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub (fun n => (k n : ℤ)) p h3 n, Int.cast_natCast, hk]
 
-theorem toSpanSingleton_constGen_bijective
-    (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1) :
-    Function.Bijective (LinearMap.toSpanSingleton ℤ_[p] _ (constGen p O)) :=
+theorem toSpanSingleton_constGen_bijective (hO : ∀ e : O, IsIdempotentElem e → e = 0 ∨ e = 1)
+    : Function.Bijective (LinearMap.toSpanSingleton ℤ_[p] _ (constGen p O)) :=
   ⟨toSpanSingleton_constGen_injective p O, toSpanSingleton_constGen_surjective p O hO⟩
 
 end PDivGroup

@@ -16,7 +16,8 @@ section Groups
 
 variable (k : Type) [CommRing k] (n c : ℕ)
 
-def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k := if h : i < N then v ⟨i, h⟩ else 0
+def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k :=
+  if h : i < N then v ⟨i, h⟩ else 0
 
 def eN (N i : ℕ) : Fin N → k := fun l => if l.1 = i then 1 else 0
 
@@ -32,9 +33,8 @@ def inX : (Fin n → k) →ₗ[k] (Fin (n + c) → k) :=
   LinearMap.pi fun l => if h : l.1 < n then LinearMap.proj ⟨l.1, h⟩ else 0
 
 def R1cond (r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) : Prop :=
-  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n ∧
-    ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
-
+  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n
+    ∧ ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
 
 variable {k n c}
 
@@ -57,11 +57,17 @@ abbrev FC : Type := {p : Fin (n + c) × Fin (n' + c') // IsFree n' n c p.1.1 p.2
 
 variable {n' c' n c}
 
-def xx1 (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' c' n c → k) : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k) :=
+def xx1 (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' c' n c → k)
+    : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k) :=
   Matrix.toLin' (Matrix.of fun (l : Fin (n + c)) (s : Fin (n' + c')) =>
-    if hf : IsFree n' n c l.1 s.1 then t ⟨(l, s), hf⟩
-    else if hs : s.1 < n' then (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
-    else if l.1 = n + (s.1 - n') then 1 else 0)
+    if hf : IsFree n' n c l.1 s.1 then
+      t ⟨(l, s), hf⟩
+    else if hs : s.1 < n' then
+      (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
+    else if l.1 = n + (s.1 - n') then
+      1
+    else
+      0)
 
 def chArg (x : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k)) : k :=
   ∑ i ∈ Finset.range c, atN (x (eN k (n' + c') (n' + i + 1))) (n + i)

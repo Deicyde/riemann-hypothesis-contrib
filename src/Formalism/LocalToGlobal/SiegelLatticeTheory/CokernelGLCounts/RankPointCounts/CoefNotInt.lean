@@ -19,42 +19,56 @@ noncomputable section
 
 namespace PI.CntNotIntW
 
-open NumberField IsDedekindDomain Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField IsDedekindDomain Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical ValuativeRel
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 def NotIntR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → NotInt (M := M) δ u u' F0 what₂
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂ → NotInt (M := M) δ u u' F0 what₂
 
 def IntOnEZR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
-        F' ∈ EZ (Tn u') F0 Λ Z → ∀ p a b, ZZP (M := M) δ u u' p Z a b ∈ (M p).R
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂
+              → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
+                F' ∈ EZ (Tn u') F0 Λ Z → ∀ p a b, ZZP (M := M) δ u u' p Z a b ∈ (M p).R
 
 def IntLR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
-        F' ∈ EZ (Tn u') F0 Λ Z → ∀ p, (M p).split = none → ∀ a b, ZhatLoc M δ p Z a b ∈ (M p).L.O
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂
+              → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
+                F' ∈ EZ (Tn u') F0 Λ Z
+                  → ∀ p, (M p).split = none → ∀ a b, ZhatLoc M δ p Z a b ∈ (M p).L.O
 
 def IntGR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
-        F' ∈ EZ (Tn u') F0 Λ Z → ∀ p (g : Loc.SplitG (M p).L), (M p).split = some g →
-          ∀ a b, ZZP (M := M) δ u u' p Z a b ∈ (M p).R
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂
+              → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
+                F' ∈ EZ (Tn u') F0 Λ Z
+                  → ∀ p (g : Loc.SplitG (M p).L),
+                    (M p).split = some g → ∀ a b, ZZP (M := M) δ u u' p Z a b ∈ (M p).R
 
 theorem intOnEZR_of (hL : IntLR) (hG : IntGR) : IntOnEZR := by
   intro D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p a b
@@ -96,8 +110,9 @@ theorem intLR_of (hG : LocGen) : IntLR := by
   have hcj : (M p).L.cj = (D.s.atP p).cj := (hA p).2.2.1
   show frFac δ p b * (M p).L.cj (frFac δ p a) * (D.s.atP p).ιE (Z a b) ∈ (M p).L.O
   rw [hcj, cj_frFac, hO]
-  have e2 : frFac δ p b * frFac δ p a * (D.s.atP p).ιE (Z a b) =
-      (wb * wa) * (D.s.atP p).ιE (xa * xb * Z a b) := by
+  have e2
+      : frFac δ p b * frFac δ p a * (D.s.atP p).ιE (Z a b)
+        = (wb * wa) * (D.s.atP p).ιE (xa * xb * Z a b) := by
     unfold frFac
     rw [hfa, hfb, map_mul, map_mul]
     ring
@@ -107,14 +122,20 @@ theorem intLR_of (hG : LocGen) : IntLR := by
   exact (D.s.atP p).O.mul_mem ((D.s.atP p).O.mul_mem hwb hwa) (iE_mem_O D p o)
 
 def NormGR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
-        F' ∈ EZ (Tn u') F0 Λ Z → ∀ p (g : Loc.SplitG (M p).L), (M p).split = some g →
-          ∀ a b, NormAt g (ZhatLoc M δ p Z) (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
-            (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) a b
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂
+              → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
+                F' ∈ EZ (Tn u') F0 Λ Z
+                  → ∀ p (g : Loc.SplitG (M p).L),
+                    (M p).split = some g
+                      → ∀ a b,
+                        NormAt g (ZhatLoc M δ p Z) (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+                          (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) a b
 
 theorem intGR_of (hN : NormGR) : IntGR := by
   intro D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p g hs a b
@@ -122,26 +143,45 @@ theorem intGR_of (hN : NormGR) : IntGR := by
     (hN D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p g hs) a b
 
 def CongGR : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
-    (∀ p, Agree δ M p) → ∀ (u u' : D.what₂.Word),
-    (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2] →
-    ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
-      IsRowReps D F0 what₂ → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
-        F' ∈ EZ (Tn u') F0 Λ Z → ∀ p (g : Loc.SplitG (M p).L), (M p).split = some g → ∀ a b,
-          (∃ s : 𝒪[(D.s.atP p).Fp], (g.e ((D.s.atP p).ιE (Z a b))).1 +
-            (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) else 0) =
-              (g.q : (D.s.atP p).Fp) * s) ∧
-          (∃ s : 𝒪[(D.s.atP p).Fp], (g.e ((D.s.atP p).ιE (Z a b))).2 +
-            (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) else 0) =
-              (g.q : (D.s.atP p).Fp) * s) ∧
-          (∃ s : 𝒪[(D.s.atP p).Fp], (g.e ((D.s.atP p).ιE (Z a b))).1 + (g.e ((D.s.atP p).ιE (Z b a))).2 +
-            (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
-              (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) + (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp) else 0) =
-              (g.q : (D.s.atP p).Fp) ^ 2 * s)
+  ∀ (D : Formalism.BasicNotions.D7) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
+      (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep),
+    (∀ p, Agree δ M p)
+      → ∀ (u u' : D.what₂.Word),
+        (D.mem u).A.T ≡ (D.mem u').A.T [MOD (Lat.gS D) ^ 2]
+          → ∀ (F0 : FlagG (VS D) D.R.rS (Tn u)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+            IsRowReps D F0 what₂
+              → ∀ Λ ∈ what₂, ∀ (Z : MatZ D) (F' : LFlag (D.sp.Y 0) D.R.rS (Tn u')),
+                F' ∈ EZ (Tn u') F0 Λ Z
+                  → ∀ p (g : Loc.SplitG (M p).L),
+                    (M p).split = some g
+                      → ∀ a b,
+                        (∃ s : 𝒪[(D.s.atP p).Fp],
+                            (g.e ((D.s.atP p).ιE (Z a b))).1
+                                + (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                                     (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+                                   else
+                                     0)
+                              = (g.q : (D.s.atP p).Fp) * s)
+                          ∧ (∃ s : 𝒪[(D.s.atP p).Fp],
+                            (g.e ((D.s.atP p).ιE (Z a b))).2
+                                + (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                                     (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+                                   else
+                                     0)
+                              = (g.q : (D.s.atP p).Fp) * s)
+                          ∧ (∃ s : 𝒪[(D.s.atP p).Fp],
+                            (g.e ((D.s.atP p).ιE (Z a b))).1 + (g.e ((D.s.atP p).ιE (Z b a))).2
+                                + (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                                     (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+                                       + (((D.mem u').A.T : ℕ) : (D.s.atP p).Fp)
+                                   else
+                                     0)
+                              = (g.q : (D.s.atP p).Fp) ^ 2 * s)
 
 theorem normGR_of (h1 : FrIntG) (h2 : CongGR) : NormGR := by
   intro D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p g hs a b
-  obtain ⟨⟨s1, hs1⟩, ⟨s2, hs2⟩, ⟨s3, hs3⟩⟩ := h2 D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p g hs a b
+  obtain ⟨⟨s1, hs1⟩, ⟨s2, hs2⟩, ⟨s3, hs3⟩⟩ :=
+    h2 D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p g hs a b
   have ia := h1 D δ M hA p g hs a
   have ib := h1 D δ M hA p g hs b
   have ca := frFac_coord D δ M hA p g a
@@ -160,9 +200,13 @@ theorem normGR_of (h1 : FrIntG) (h2 : CongGR) : NormGR := by
     · linear_combination hs1
     · linear_combination hs2
     · linear_combination hs3
-  · have hc' : ¬ (b = Fin.last D.R.rS ∧ a = Fin.last D.R.rS) := fun h' => hc ⟨h'.2, h'.1⟩
+  · have hc' : ¬(b = Fin.last D.R.rS ∧ a = Fin.last D.R.rS) := fun h' => hc ⟨h'.2, h'.1⟩
     simp only [hc, if_false, add_zero] at hs1 hs2 hs3 ⊢
-    refine ⟨⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s1, ?_⟩, ⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s2, ?_⟩, ⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s3, ?_⟩⟩
+    refine ⟨
+      ⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s1, ?_⟩,
+      ⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s2, ?_⟩,
+      ⟨⟨xb, ib⟩ * ⟨xa, ia⟩ * s3, ?_⟩
+    ⟩
     · push_cast; linear_combination (xb * xa) * hs1
     · push_cast; linear_combination (xb * xa) * hs2
     · push_cast; linear_combination (xb * xa) * hs3
@@ -186,42 +230,60 @@ theorem congruence_global_holds : CongGR := by
   have hl0 : Loc.resChar p ≠ 0 := (D.s.atP p).ellPrime.out.ne_zero
   have hl : valuation (D.s.atP p).Fp ((Loc.resChar p : ℕ) : (D.s.atP p).Fp) < 1 := by
     rw [← hq]; exact val_q_lt p g
-  have hg : ((gS D : ℕ) : (D.s.atP p).Fp) =
-      (g.q : (D.s.atP p).Fp) * ((k : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) := by
+  have hg
+      : ((gS D : ℕ) : (D.s.atP p).Fp)
+        = (g.q : (D.s.atP p).Fp) * ((k : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) := by
     rw [hk, hq]; push_cast; ring
   have hgv : valuation (D.s.atP p).Fp ((gS D : ℕ) : (D.s.atP p).Fp) < 1 := by
     rw [hg, Valuation.map_mul]
-    exact mul_lt_of_lt_of_le_one (val_q_lt p g) ((Valuation.mem_integer_iff _ _).1 (k : 𝒪[(D.s.atP p).Fp]).2)
-  have hgP : ∀ σ : D.host.E →+* (D.s.atP p).Fp,
-      ((gS D : ℕ) : 𝓞 D.host.E) ∈ (vPrime σ (Loc.resChar p) hl0 hl).asIdeal := fun σ => by
+    exact mul_lt_of_lt_of_le_one (val_q_lt p g)
+      ((Valuation.mem_integer_iff _ _).1 (k : 𝒪[(D.s.atP p).Fp]).2)
+  have hgP
+      : ∀ σ : D.host.E →+* (D.s.atP p).Fp,
+        ((gS D : ℕ) : 𝓞 D.host.E) ∈ (vPrime σ (Loc.resChar p) hl0 hl).asIdeal := fun σ => by
     show _ ∈ vIdeal σ
     rw [mem_vIdeal]
     simpa using hgv
-  have hP2' : ∀ s : 𝓞 D.host.E, s ∉ (vPrime (sg2 p g) (Loc.resChar p) hl0 hl).asIdeal →
-      valuation (D.s.atP p).Fp (sg1 p g (star (s : D.host.E))) = 1 := fun s hs' => by
+  have hP2'
+      : ∀ s : 𝓞 D.host.E,
+        s ∉ (vPrime (sg2 p g) (Loc.resChar p) hl0 hl).asIdeal
+          → valuation (D.s.atP p).Fp (sg1 p g (star (s : D.host.E))) = 1 := fun s hs' => by
     rw [firstSplitEmbed_star δ hA p g]
     exact val_one_of_not_mem _ _ hl0 hl s hs'
-  have hdec : ∀ a b, (VS D).hT (F0.fvec a) (F'.fl.fvec b) =
-      (VS D).hT (F0.fvec a) (F0.fvec b) + (VS D).hT (F0.fvec a) (F'.fl.fvec b - F0.fvec b) := fun a b => by
+  have hdec
+      : ∀ a b,
+        (VS D).hT (F0.fvec a) (F'.fl.fvec b)
+          = (VS D).hT (F0.fvec a) (F0.fvec b)
+            + (VS D).hT (F0.fvec a) (F'.fl.fvec b - F0.fvec b) := fun a b => by
     rw [← map_add (f := _)]; congr 1; abel
-  have key : ∀ σ : D.host.E →+* (D.s.atP p).Fp, ∃ s : 𝒪[(D.s.atP p).Fp], σ (Z a b) +
-      (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp) else 0) =
-        (g.q : (D.s.atP p).Fp) * s := by
+  have key
+      : ∀ σ : D.host.E →+* (D.s.atP p).Fp, ∃ s : 𝒪[(D.s.atP p).Fp],
+        σ (Z a b)
+            + (if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then
+                 (((D.mem u).A.T : ℕ) : (D.s.atP p).Fp)
+               else
+                 0)
+          = (g.q : (D.s.atP p).Fp) * s := by
     intro σ
-    obtain ⟨t, ht⟩ := cong_one Λ hU' (hf a) (hy b) σ _ (hgP σ) (val_one_of_not_mem σ _ hl0 hl) g.q k hg
+    obtain ⟨t, ht⟩ :=
+      cong_one Λ hU' (hf a) (hy b) σ _ (hgP σ) (val_one_of_not_mem σ _ hl0 hl) g.q k hg
     refine ⟨t, ?_⟩
     rw [hZc, hdec, map_add (f := _), ht, flag_gram F0 a b]
     split_ifs <;> simp [Tn]
   refine ⟨key (sg1 p g), key (sg2 p g), ?_⟩
-  obtain ⟨t, ht⟩ := cong_two Λ hU' (hy a) (hy b) (sg1 p g) (vPrime (sg1 p g) (Loc.resChar p) hl0 hl)
-    (vPrime (sg2 p g) (Loc.resChar p) hl0 hl) (hgP _) (hgP _) (val_one_of_not_mem _ _ hl0 hl) hP2' g.q k hg
+  obtain ⟨t, ht⟩ :=
+    cong_two Λ hU' (hy a) (hy b) (sg1 p g) (vPrime (sg1 p g) (Loc.resChar p) hl0 hl)
+      (vPrime (sg2 p g) (Loc.resChar p) hl0 hl) (hgP _) (hgP _) (val_one_of_not_mem _ _ hl0 hl) hP2'
+      g.q k hg
   refine ⟨-t, ?_⟩
   change sg1 p g (Z a b) + sg2 p g (Z b a) + _ = _
   have hst : star (Z b a) = (VS D).hT (F'.fl.fvec a) (F0.fvec b) := by
     rw [hZc, ← starRingEnd_apply]
     exact (VS D).herm.eq _ _
-  have hid : Z a b + star (Z b a) = (VS D).hT (F0.fvec a) (F0.fvec b) + (VS D).hT (F'.fl.fvec a) (F'.fl.fvec b) -
-      (VS D).hT (F'.fl.fvec a - F0.fvec a) (F'.fl.fvec b - F0.fvec b) := by
+  have hid
+      : Z a b + star (Z b a)
+        = (VS D).hT (F0.fvec a) (F0.fvec b) + (VS D).hT (F'.fl.fvec a) (F'.fl.fvec b)
+          - (VS D).hT (F'.fl.fvec a - F0.fvec a) (F'.fl.fvec b - F0.fvec b) := by
     rw [hst, hZc]
     simp only [map_sub, LinearMap.sub_apply]
     ring
@@ -239,8 +301,11 @@ theorem notIntR_of (h : IntOnEZR) : NotIntR := by
   exact hn (h D δ M hA u u' hT F0 what₂ hR Λ hΛ Z F' hF' p a b)
 
 theorem integral_on_pairs_holds : IntOnEZR :=
-  have hD : LocDiff := locDiff_of trace_dual_lattice (dualApprox_of small_powers_bound tensorLiftSurjective) small_powers_bound
-  intOnEZR_of (intLR_of (locGen_of hD dual_lattice_powers)) (intGR_of (normGR_of (frIntG_of hD different_lattice_index) congruence_global_holds))
+  have hD : LocDiff :=
+    locDiff_of trace_dual_lattice (dualApprox_of small_powers_bound tensorLiftSurjective)
+      small_powers_bound
+  intOnEZR_of (intLR_of (locGen_of hD dual_lattice_powers))
+    (intGR_of (normGR_of (frIntG_of hD different_lattice_index) congruence_global_holds))
 
 theorem not_integral_holds : NotIntR := notIntR_of integral_on_pairs_holds
 
@@ -248,23 +313,27 @@ end PI.CntNotIntW
 
 namespace Formalism.L2.SG.Pf.FCount
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
   Formalism.L2.SG.LsDatumB Formalism.L2.SG.Pf.PCount
 open Classical ValuativeRel
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem nuNotCls_of {D : Formalism.BasicNotions.D7} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
-    {δ : ∀ p : PlF D, (D.s.atP p).Fp} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-    {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
-    (hO : ∀ Zd : TermLoc.LocDat D, InOrbZ Zd u u') : NuNotCls M δ u u' F0 what₂ := by
+theorem nuNotCls_of
+    {D : Formalism.BasicNotions.D7} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+    {δ : ∀ p : PlF D, (D.s.atP p).Fp} {u u' : D.what₂.Word}
+    {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+    (hO : ∀ Zd : TermLoc.LocDat D, InOrbZ Zd u u')
+    : NuNotCls M δ u u' F0 what₂ := by
   intro hA hT _ hrows w Z hZ hp
   obtain ⟨p, hp⟩ := hp
   apply PI.CntNotIntW.not_integral_holds D δ M hA u u' hT F0 what₂ hrows Z
   by_contra hall
   push Not at hall
   apply hp
-  refine ⟨CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p, fun a b => ?_, hO ⟨δ, M, hA⟩ w Z hZ p, rfl⟩
+  refine
+    ⟨CntLocal.ZZP (M := M) δ u u' p Z * LsDatumB.sgnP p, fun a b => ?_, hO ⟨δ, M, hA⟩ w Z hZ p, rfl⟩
   simp only [LsDatumB.sgnP, Matrix.mul_diagonal]
   exact Subring.mul_mem _ (hall p a b) (Subring.pow_mem _ (Subring.neg_mem _ (Subring.one_mem _)) _)
 

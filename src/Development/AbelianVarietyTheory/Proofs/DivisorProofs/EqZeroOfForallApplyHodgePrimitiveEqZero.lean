@@ -14,10 +14,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLieCor
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -26,12 +29,14 @@ noncomputable section
 
 namespace GlobalTheory.PDivGroup
 
-theorem eq_zero_of_forall_apply_psi_eq_zero :
-    ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ), (p : R) ^ N = 0 →
-    ∀ (A : Over (Sp R)) [GrpObj A], IsAbelianScheme A → LieExact A →
-    ∀ (G : PDivGroup p R) (t : TorsionTower G A) (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
-    (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c))) →
-    ∀ x : G.Lie, (∀ c, x (ψ c) = 0) → x = 0 := by
+theorem eq_zero_of_forall_apply_psi_eq_zero
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ),
+      (p : R) ^ N = 0
+        → ∀ (A : Over (Sp R)) [GrpObj A],
+          IsAbelianScheme A → LieExact A
+            → ∀ (G : PDivGroup p R) (t : TorsionTower G A) (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
+              (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c)))
+                → ∀ x : G.Lie, (∀ c, x (ψ c) = 0) → x = 0 := by
   intro p _ R _ N hN A _ hA hL G t ψ hψ x hx
   have : IsAdicComplete (Ideal.span {(p : R)}) R :=
     GlobalTheory.isAdicComplete_span_natCast_of_isNilpotent p R ⟨N, hN⟩

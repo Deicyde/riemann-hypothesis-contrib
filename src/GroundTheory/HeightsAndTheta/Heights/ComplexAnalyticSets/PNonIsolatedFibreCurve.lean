@@ -14,16 +14,19 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Metric Filter
 
-theorem NonIsolatedFibreCurve.analyticOnNhd_of_differentiableOn {k : ℕ} {O : Set (Fin k → ℂ)}
-    {g : (Fin k → ℂ) → ℂ} (hO : IsOpen O) (hg : DifferentiableOn ℂ g O) : AnalyticOnNhd ℂ g O := by
+theorem NonIsolatedFibreCurve.analyticOnNhd_of_differentiableOn
+    {k : ℕ} {O : Set (Fin k → ℂ)} {g : (Fin k → ℂ) → ℂ}
+    (hO : IsOpen O) (hg : DifferentiableOn ℂ g O)
+    : AnalyticOnNhd ℂ g O := by
   refine analyticOnNhd_of_continuousOn_of_separately hO hg.continuousOn fun z hz i => ?_
   have h1 : DifferentiableAt ℂ g (Function.update z i (z i)) := by
     rw [Function.update_eq_self]
     exact hg.differentiableAt (hO.mem_nhds hz)
   exact h1.comp (z i) (hasFDerivAt_update z (z i)).differentiableAt
 
-theorem NonIsolatedFibreCurve.proof (hComp : AnalyticGermComponents.Statement)
-    (hCurve : IrreducibleGermCurve.Statement) : NonIsolatedFibreCurve.Statement := by
+theorem NonIsolatedFibreCurve.proof
+    (hComp : AnalyticGermComponents.Statement) (hCurve : IrreducibleGermCurve.Statement)
+    : NonIsolatedFibreCurve.Statement := by
   intro k m U f p hU hf hp hacc
   set Z : Set (Fin k → ℂ) := {v | v ∈ U ∧ f v = f p} with hZ
   have hZan : IsAnalyticNear Z p := by
@@ -53,7 +56,8 @@ theorem NonIsolatedFibreCurve.proof (hComp : AnalyticGermComponents.Statement)
     exact hy j ⟨hne, hj⟩
   obtain ⟨r, hr, γ, hγd, hγi, hγ0, hγm⟩ := hCurve (Fin k) (Y i) p (hY i).1 (hY i).2 hi
 
-  have hcont : ContinuousAt γ 0 := (hγd.differentiableAt (isOpen_ball.mem_nhds (mem_ball_self hr))).continuousAt
+  have hcont : ContinuousAt γ 0 :=
+    (hγd.differentiableAt (isOpen_ball.mem_nhds (mem_ball_self hr))).continuousAt
   have hpre : γ ⁻¹' W ∈ 𝓝 (0 : ℂ) := hcont.preimage_mem_nhds (by rwa [hγ0])
   obtain ⟨ε, hε, hεW⟩ := Metric.mem_nhds_iff.1 hpre
   have hsub : ball (0 : ℂ) (min r ε) ⊆ ball 0 r := ball_subset_ball (min_le_left _ _)

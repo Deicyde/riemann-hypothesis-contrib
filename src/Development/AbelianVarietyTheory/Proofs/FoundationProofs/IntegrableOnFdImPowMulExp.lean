@@ -6,7 +6,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
@@ -28,12 +29,15 @@ theorem fd_volume_lt_top : volume ModularGroup.fd < ⊤ := by
   refine lt_of_le_of_lt (lintegral_mono_set hsub) ?_
   rw [← lintegral_indicator hSm]
   set g : ℂ → ENNReal := fun z => ↑((1 / ‖z.im‖₊) ^ 2 : NNReal) with hg
-  have e := (Complex.volume_preserving_equiv_real_prod.symm _).lintegral_comp_emb
-    Complex.measurableEquivRealProd.symm.measurableEmbedding (S.indicator g)
+  have e :=
+    (Complex.volume_preserving_equiv_real_prod.symm _).lintegral_comp_emb
+      Complex.measurableEquivRealProd.symm.measurableEmbedding (S.indicator g)
   rw [← e]
-  have hle : ∀ p : ℝ × ℝ, S.indicator g (Complex.measurableEquivRealProd.symm p) ≤
-      (Set.Icc (-(1 / 2 : ℝ)) (1 / 2)).indicator (fun _ => (1 : ENNReal)) p.1 *
-      (Set.Ici (1 / 2 : ℝ)).indicator (fun y => ENNReal.ofReal (1 / y ^ 2)) p.2 := by
+  have hle
+      : ∀ p : ℝ × ℝ,
+        S.indicator g (Complex.measurableEquivRealProd.symm p)
+          ≤ (Set.Icc (-(1 / 2 : ℝ)) (1 / 2)).indicator (fun _ => (1 : ENNReal)) p.1
+            * (Set.Ici (1 / 2 : ℝ)).indicator (fun y => ENNReal.ofReal (1 / y ^ 2)) p.2 := by
     rintro ⟨x, y⟩
     have hsy : Complex.measurableEquivRealProd.symm (x, y) = ⟨x, y⟩ := rfl
     rw [hsy]
@@ -52,9 +56,10 @@ theorem fd_volume_lt_top : volume ModularGroup.fd < ⊤ := by
     · rw [Set.indicator_of_notMem hm]
       exact bot_le
   refine lt_of_le_of_lt (lintegral_mono hle) ?_
-  rw [Measure.volume_eq_prod, lintegral_prod_mul (aemeasurable_const.indicator measurableSet_Icc)
-    ((by fun_prop : Measurable fun y : ℝ => ENNReal.ofReal (1 / y ^ 2)).aemeasurable.indicator
-      measurableSet_Ici)]
+  rw [Measure.volume_eq_prod,
+    lintegral_prod_mul (aemeasurable_const.indicator measurableSet_Icc)
+      ((by fun_prop : Measurable fun y : ℝ => ENNReal.ofReal (1 / y ^ 2)).aemeasurable.indicator
+        measurableSet_Ici)]
   rw [lintegral_indicator measurableSet_Icc, lintegral_indicator measurableSet_Ici,
     setLIntegral_const, one_mul, Real.volume_Icc]
   refine ENNReal.mul_lt_top ENNReal.ofReal_lt_top ?_
@@ -76,21 +81,23 @@ theorem fd_measurableSet : MeasurableSet ModularGroup.fd := by
     isClosed_le (UpperHalfPlane.continuous_re.abs) continuous_const
   exact h1.inter h2
 
-theorem pow_mul_exp_neg_le (δ : ℝ) (A : ℕ) (hδ : 0 < δ) {y : ℝ} (hy : 0 ≤ y) :
-    y ^ A * Real.exp (-δ * y) ≤ (A.factorial : ℝ) / δ ^ A := by
+theorem pow_mul_exp_neg_le (δ : ℝ) (A : ℕ) (hδ : 0 < δ) {y : ℝ} (hy : 0 ≤ y)
+    : y ^ A * Real.exp (-δ * y) ≤ (A.factorial : ℝ) / δ ^ A := by
   have h := Real.pow_div_factorial_le_exp (δ * y) (mul_nonneg hδ.le hy) A
   have hf : (0 : ℝ) < A.factorial := by exact_mod_cast A.factorial_pos
   have hδA : 0 < δ ^ A := pow_pos hδ A
   rw [div_le_iff₀ hf, mul_pow] at h
   rw [le_div_iff₀ hδA, neg_mul, Real.exp_neg]
   have he := Real.exp_pos (δ * y)
-  calc y ^ A * (Real.exp (δ * y))⁻¹ * δ ^ A = δ ^ A * y ^ A * (Real.exp (δ * y))⁻¹ := by ring
+  calc
+    y ^ A * (Real.exp (δ * y))⁻¹ * δ ^ A
+      = δ ^ A * y ^ A * (Real.exp (δ * y))⁻¹ := by ring
     _ ≤ Real.exp (δ * y) * A.factorial * (Real.exp (δ * y))⁻¹ := by gcongr
     _ = A.factorial := by field_simp
 
-theorem integrableOn_fd_im_pow_mul_exp :
-    ∀ (δ : ℝ) (A : ℕ), 0 < δ →
-      IntegrableOn (fun τ : ℍ => τ.im ^ A * Real.exp (-δ * τ.im)) ModularGroup.fd := by
+theorem integrableOn_fd_im_pow_mul_exp
+    : ∀ (δ : ℝ) (A : ℕ),
+      0 < δ → IntegrableOn (fun τ : ℍ => τ.im ^ A * Real.exp (-δ * τ.im)) ModularGroup.fd := by
   intro δ A hδ
   refine Measure.integrableOn_of_bounded (M := (A.factorial : ℝ) / δ ^ A) fd_volume_lt_top.ne
     (by fun_prop : Continuous fun τ : ℍ => τ.im ^ A * Real.exp (-δ * τ.im)).aestronglyMeasurable

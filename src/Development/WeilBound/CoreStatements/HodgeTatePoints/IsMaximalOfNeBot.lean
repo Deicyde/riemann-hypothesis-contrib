@@ -9,9 +9,10 @@ namespace PositivityTheory.HtPt.Plen
 
 open GroundTheory.FunctionField IsLocalRing
 
-theorem finite_closure (k K A : Type) [Field k] [Field K] [CommRing A] [IsDomain A] [Algebra k A]
-    [Algebra A K] [IsFractionRing A K] [Algebra.EssFiniteType k A] :
-    Module.Finite A (integralClosure A K) := by
+theorem finite_closure
+    (k K A : Type) [Field k] [Field K] [CommRing A] [IsDomain A] [Algebra k A] [Algebra A K]
+    [IsFractionRing A K] [Algebra.EssFiniteType k A]
+    : Module.Finite A (integralClosure A K) := by
   classical
   have hinj : Function.Injective (algebraMap A K) := IsFractionRing.injective A K
   have hR : ∀ r : Algebra.EssFiniteType.subalgebra k A, algebraMap _ K r = algebraMap A K (r : A) :=
@@ -29,20 +30,22 @@ theorem finite_closure (k K A : Type) [Field k] [Field K] [CommRing A] [IsDomain
     have ht : IsUnit ((t.1 : Algebra.EssFiniteType.subalgebra k A) : A) := t.2
     have hs0 : algebraMap A K (s.1 : A) ≠ 0 := (hs.map _).ne_zero
     have ht0 : algebraMap A K (t.1 : A) ≠ 0 := (ht.map _).ne_zero
-    have hb0 : algebraMap A K b ≠ 0 :=
-      (map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hb)
+    have hb0 : algebraMap A K b ≠ 0 := (map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hb)
     have ha2 : a * (s.1 : A) = (a₁ : A) := ha
     have hb2 : b * (t.1 : A) = (b₁ : A) := hb'
     refine ⟨a₁ * t.1, b₁ * s.1, ?_⟩
     rw [map_mul, map_mul, hR, hR, hR, hR, ← ha2, ← hb2, map_mul, map_mul]
     field_simp
-  have hfin := GroundTheory.Heights₂.Heights.FieldNumbers.NoetherIntegralClosureFinite.proof k
-    (Algebra.EssFiniteType.subalgebra k A) K K
+  have hfin :=
+    GroundTheory.Heights₂.Heights.FieldNumbers.NoetherIntegralClosureFinite.proof k
+      (Algebra.EssFiniteType.subalgebra k A) K K
   have hfg : (integralClosure (Algebra.EssFiniteType.subalgebra k A) K).toSubmodule.FG :=
     Module.Finite.iff_fg.1 hfin
   obtain ⟨t, ht⟩ := hfg
-  have hmem : ∀ x : K, IsIntegral (Algebra.EssFiniteType.subalgebra k A) x ↔
-      x ∈ Submodule.span (Algebra.EssFiniteType.subalgebra k A) (t : Set K) := by
+  have hmem
+      : ∀ x : K,
+        IsIntegral (Algebra.EssFiniteType.subalgebra k A) x
+          ↔ x ∈ Submodule.span (Algebra.EssFiniteType.subalgebra k A) (t : Set K) := by
     intro x
     rw [ht]
     rfl
@@ -53,10 +56,11 @@ theorem finite_closure (k K A : Type) [Field k] [Field K] [CommRing A] [IsDomain
       exact ((hmem x).2 (Submodule.subset_span hx)).tower_top
     · intro x hx
       have hx' : IsIntegral A x := hx
-      obtain ⟨m, hm⟩ := hx'.exists_multiple_integral_of_isLocalization
-        (Algebra.EssFiniteType.submonoid k A)
-      have h1 := Submodule.span_le_restrictScalars (Algebra.EssFiniteType.subalgebra k A) A
-        (t : Set K) ((hmem _).1 hm)
+      obtain ⟨m, hm⟩ :=
+        hx'.exists_multiple_integral_of_isLocalization (Algebra.EssFiniteType.submonoid k A)
+      have h1 :=
+        Submodule.span_le_restrictScalars (Algebra.EssFiniteType.subalgebra k A) A (t : Set K)
+          ((hmem _).1 hm)
       have hu : IsUnit ((m.1 : Algebra.EssFiniteType.subalgebra k A) : A) := m.2
       obtain ⟨u, hu⟩ := hu
       have h2 : (u : A) • x ∈ Submodule.span A (t : Set K) := by
@@ -68,8 +72,10 @@ theorem finite_closure (k K A : Type) [Field k] [Field K] [CommRing A] [IsDomain
 
 variable {k K : Type} [Field k] [Field K] [Algebra k K] [IsFunctionField k K]
 
-noncomputable def resHom (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
-    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring) : A →ₐ[k] v.ResidueField where
+noncomputable def resHom
+    (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
+    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring)
+    : A →ₐ[k] v.ResidueField where
   toRingHom := (residue v.ring).comp (RingHom.codRestrict (algebraMap A K) v.ring hv)
   commutes' c := by
     change residue v.ring _ = residue v.ring (algebraMap k v.ring c)
@@ -77,15 +83,19 @@ noncomputable def resHom (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [Is
     exact Subtype.ext (IsScalarTower.algebraMap_apply k A K c).symm
 
 omit [IsFunctionField k K] in
-theorem resHom_eq_zero (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
-    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring) (a : A) :
-    resHom A v hv a = 0 ↔ v.ring.valuation (algebraMap A K a) < 1 := by
+theorem resHom_eq_zero
+    (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
+    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring)
+    (a : A)
+    : resHom A v hv a = 0 ↔ v.ring.valuation (algebraMap A K a) < 1 := by
   change residue v.ring ⟨algebraMap A K a, hv a⟩ = 0 ↔ _
   rw [residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff]
 
-theorem isMaximal_center (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
-    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring) (p : Ideal A)
-    (hp : ∀ a, a ∈ p ↔ v.ring.valuation (algebraMap A K a) < 1) : p.IsMaximal := by
+theorem isMaximal_center
+    (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
+    (v : Place k K) (hv : ∀ a : A, algebraMap A K a ∈ v.ring)
+    (p : Ideal A) (hp : ∀ a, a ∈ p ↔ v.ring.valuation (algebraMap A K a) < 1)
+    : p.IsMaximal := by
   have hker : p = RingHom.ker (resHom A v hv) := by
     ext a
     rw [hp, RingHom.mem_ker, resHom_eq_zero]
@@ -97,9 +107,11 @@ theorem isMaximal_center (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [Is
   have : (RingHom.ker (resHom A v hv)).IsPrime := RingHom.ker_isPrime _
   exact Ideal.Quotient.maximal_of_isField _ (IsArtinianRing.isField_of_isDomain _)
 
-theorem isMaximal_of_ne_bot (A : Type) [CommRing A] [Algebra k A] [Algebra A K]
-    [IsScalarTower k A K] (hinj : Function.Injective (algebraMap A K)) (p : Ideal A) (hp0 : p ≠ ⊥)
-    (hp : p.IsPrime) : p.IsMaximal := by
+theorem isMaximal_of_ne_bot
+    (A : Type) [CommRing A] [Algebra k A] [Algebra A K] [IsScalarTower k A K]
+    (hinj : Function.Injective (algebraMap A K))
+    (p : Ideal A) (hp0 : p ≠ ⊥) (hp : p.IsPrime)
+    : p.IsMaximal := by
   have hu : ∀ y : p.primeCompl, IsUnit (algebraMap A K y) := fun y => by
     refine IsUnit.mk0 _ ((map_ne_zero_iff _ hinj).2 fun h => y.2 ?_)
     rw [h]
@@ -110,10 +122,13 @@ theorem isMaximal_of_ne_bot (A : Type) [CommRing A] [Algebra k A] [Algebra A K]
   have hA : ∀ a, algebraMap A K a ∈ V := fun a => hg a ▸ hV (algebraMap A _ a)
   have key : ∀ a, a ∈ p ↔ V.valuation (algebraMap A K a) < 1 := by
     intro a
-    have h1 : IsUnit (g.codRestrict V.toSubring hV (algebraMap A _ a)) ↔
-        IsUnit (algebraMap A (Localization.AtPrime p) a) := isUnit_map_iff _ _
-    have h2 : IsUnit (g.codRestrict V.toSubring hV (algebraMap A _ a)) ↔
-        V.valuation (g (algebraMap A _ a)) = 1 :=
+    have h1
+        : IsUnit (g.codRestrict V.toSubring hV (algebraMap A _ a))
+          ↔ IsUnit (algebraMap A (Localization.AtPrime p) a) :=
+      isUnit_map_iff _ _
+    have h2
+        : IsUnit (g.codRestrict V.toSubring hV (algebraMap A _ a))
+          ↔ V.valuation (g (algebraMap A _ a)) = 1 :=
       V.valuation_eq_one_iff ⟨g (algebraMap A _ a), hV _⟩
     rw [IsLocalization.AtPrime.isUnit_to_map_iff (Localization.AtPrime p) p, h2, hg] at h1
     have h3 : V.valuation (algebraMap A K a) ≤ 1 := (V.valuation_le_one_iff _).2 (hA a)
@@ -124,13 +139,18 @@ theorem isMaximal_of_ne_bot (A : Type) [CommRing A] [Algebra k A] [Algebra A K]
     obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp0
     have h1 := (key a).1 ha
     have h0 : algebraMap A K a ≠ 0 := (map_ne_zero_iff _ hinj).2 ha0
-    have h2 := ((⊤ : ValuationSubring K).valuation_le_one_iff (algebraMap A K a)⁻¹).2
-      (ValuationSubring.mem_top _)
+    have h2 :=
+      ((⊤ : ValuationSubring K).valuation_le_one_iff (algebraMap A K a)⁻¹).2
+        (ValuationSubring.mem_top _)
     rw [map_inv₀, inv_le_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 h0))] at h2
     exact absurd h1 (not_lt.2 h2)
-  let v : Place k K := ⟨V, hne, fun c => by
-    rw [IsScalarTower.algebraMap_apply k A K]
-    exact hA _⟩
+  let v : Place k K := ⟨
+    V,
+    hne,
+    fun c => by
+      rw [IsScalarTower.algebraMap_apply k A K]
+      exact hA _
+  ⟩
   exact isMaximal_center A v hA p key
 
 end PositivityTheory.HtPt.Plen

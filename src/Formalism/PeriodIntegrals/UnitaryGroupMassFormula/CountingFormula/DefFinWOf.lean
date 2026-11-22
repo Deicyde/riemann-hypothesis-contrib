@@ -10,20 +10,24 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 def DefFinW : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (P : Submodule ℤ (VS D).V), P.FG → ∀ c : D.host.E,
-    {w : (VS D).V | w ∈ P ∧ (∀ a, (VS D).hT (D.sp.hypE a) w = 0) ∧ (∀ a, (VS D).hT (D.sp.hypF a) w = 0) ∧
-      (VS D).hT D.sp.zm w = 0 ∧ (VS D).hT w w = c}.Finite
+  ∀ (D : Formalism.BasicNotions.D7) (P : Submodule ℤ (VS D).V),
+    P.FG
+      → ∀ c : D.host.E,
+        {w : (VS D).V | w ∈ P ∧ (∀ a, (VS D).hT (D.sp.hypE a) w = 0) ∧ (∀ a, (VS D).hT (D.sp.hypF a) w = 0) ∧
+          (VS D).hT D.sp.zm w = 0 ∧ (VS D).hT w w = c}.Finite
 
 def WPos : Prop :=
-  ∀ (D : Formalism.BasicNotions.D7) (w : (VS D).V), (∀ a, (VS D).hT (D.sp.hypE a) w = 0) →
-    (∀ a, (VS D).hT (D.sp.hypF a) w = 0) → (VS D).hT D.sp.zm w = 0 → w ≠ 0 →
-      0 < Algebra.trace ℚ D.host.E ((VS D).hT w w)
+  ∀ (D : Formalism.BasicNotions.D7) (w : (VS D).V),
+    (∀ a, (VS D).hT (D.sp.hypE a) w = 0) → (∀ a, (VS D).hT (D.sp.hypF a) w = 0)
+      → (VS D).hT D.sp.zm w = 0 → w ≠ 0
+      → 0 < Algebra.trace ℚ D.host.E ((VS D).hT w w)
 
 theorem defFinW_of (hW : WPos) : DefFinW := by
   intro D P hP c
@@ -36,21 +40,31 @@ theorem defFinW_of (hW : WPos) : DefFinW := by
   have hsmR : ∀ (q : ℚ) (v w : (VS D).V), (VS D).hT v (q • w) = (q : D.host.E) * (VS D).hT v w := by
     intro q v w
     rw [hsm, map_smul, smul_eq_mul, eq_ratCast]
-  have htr : ∀ (q : ℚ) (y : D.host.E), Algebra.trace ℚ D.host.E ((q : D.host.E) * y) = q * Algebra.trace ℚ D.host.E y := by
+  have htr
+      : ∀ (q : ℚ) (y : D.host.E),
+        Algebra.trace ℚ D.host.E ((q : D.host.E) * y) = q * Algebra.trace ℚ D.host.E y := by
     intro q y
     rw [show (q : D.host.E) * y = q • y by rw [Algebra.smul_def, eq_ratCast], map_smul, smul_eq_mul]
-  let Wq : Submodule ℚ (VS D).V :=
-    { carrier := {w | (∀ a, (VS D).hT (D.sp.hypE a) w = 0) ∧ (∀ a, (VS D).hT (D.sp.hypF a) w = 0) ∧
+  let Wq : Submodule ℚ (VS D).V := {
+    carrier :=
+      {w | (∀ a, (VS D).hT (D.sp.hypE a) w = 0) ∧ (∀ a, (VS D).hT (D.sp.hypF a) w = 0) ∧
         (VS D).hT D.sp.zm w = 0}
-      add_mem' := by
-        rintro x y ⟨hx1, hx2, hx3⟩ ⟨hy1, hy2, hy3⟩
-        exact ⟨fun a => by rw [map_add (f := _), hx1, hy1, add_zero],
-          fun a => by rw [map_add (f := _), hx2, hy2, add_zero], by rw [map_add (f := _), hx3, hy3, add_zero]⟩
-      zero_mem' := ⟨fun a => map_zero _, fun a => map_zero _, map_zero _⟩
-      smul_mem' := by
-        rintro q x ⟨hx1, hx2, hx3⟩
-        exact ⟨fun a => by rw [hsmR, hx1, mul_zero], fun a => by rw [hsmR, hx2, mul_zero],
-          by rw [hsmR, hx3, mul_zero]⟩ }
+    add_mem' := by
+      rintro x y ⟨hx1, hx2, hx3⟩ ⟨hy1, hy2, hy3⟩
+      exact ⟨
+        fun a => by rw [map_add (f := _), hx1, hy1, add_zero],
+        fun a => by rw [map_add (f := _), hx2, hy2, add_zero],
+        by rw [map_add (f := _), hx3, hy3, add_zero]
+      ⟩
+    zero_mem' := ⟨fun a => map_zero _, fun a => map_zero _, map_zero _⟩
+    smul_mem' := by
+      rintro q x ⟨hx1, hx2, hx3⟩
+      exact ⟨
+        fun a => by rw [hsmR, hx1, mul_zero],
+        fun a => by rw [hsmR, hx2, mul_zero],
+        by rw [hsmR, hx3, mul_zero]
+      ⟩
+  }
   let A0 : Submodule ℤ (VS D).V := P ⊓ Wq.restrictScalars ℤ
   have hA0 : A0.FG := by
     haveI := isNoetherian_of_fg_of_noetherian P hP
@@ -69,12 +83,14 @@ theorem defFinW_of (hW : WPos) : DefFinW := by
       rw [← hs]
       exact Submodule.subset_span hx
     exact (Submodule.mem_inf.mp hx').2
-  let B : LinearMap.BilinForm ℚ U := LinearMap.mk₂ ℚ
-    (fun u v : U => (Algebra.trace ℚ D.host.E ((VS D).hT u v) + Algebra.trace ℚ D.host.E ((VS D).hT v u)) / 2)
-    (fun m1 m2 n => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
-    (fun q m n => by simp only [Submodule.coe_smul, hsmL, hsmR, htr, smul_eq_mul]; ring)
-    (fun m n1 n2 => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
-    (fun q m n => by simp only [Submodule.coe_smul, hsmL, hsmR, htr, smul_eq_mul]; ring)
+  let B : LinearMap.BilinForm ℚ U :=
+    LinearMap.mk₂ ℚ
+      (fun u v : U =>
+        (Algebra.trace ℚ D.host.E ((VS D).hT u v) + Algebra.trace ℚ D.host.E ((VS D).hT v u)) / 2)
+      (fun m1 m2 n => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
+      (fun q m n => by simp only [Submodule.coe_smul, hsmL, hsmR, htr, smul_eq_mul]; ring)
+      (fun m n1 n2 => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
+      (fun q m n => by simp only [Submodule.coe_smul, hsmL, hsmR, htr, smul_eq_mul]; ring)
   have hS : ∀ x y, B x y = B y x := fun x y => by
     simp only [B, LinearMap.mk₂_apply]
     ring
@@ -86,8 +102,7 @@ theorem defFinW_of (hW : WPos) : DefFinW := by
     linarith
   let A : Submodule ℤ U := A0.comap (U.subtype.restrictScalars ℤ)
   have hA : A.FG := by
-    refine Submodule.fg_of_fg_map_injective (U.subtype.restrictScalars ℤ)
-      Subtype.val_injective ?_
+    refine Submodule.fg_of_fg_map_injective (U.subtype.restrictScalars ℤ) Subtype.val_injective ?_
     rw [Submodule.map_comap_eq_self (fun w hw => ⟨⟨w, hA0U w hw⟩, rfl⟩)]
     exact ⟨s, hs⟩
   have hfin := finite_le_of_posDef B hS hpos A hA (Algebra.trace ℚ D.host.E c)

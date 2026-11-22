@@ -12,10 +12,13 @@ namespace PositivityTheory.Rg.Sw.Glob.Gen3H
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem max_surj_inj (V : Submodule k (Fin n → k)) (X : Matrix (Fin n) (Fin n) k) (I : Finset (Fin n))
+theorem max_surj_inj
+    (V : Submodule k (Fin n → k)) (X : Matrix (Fin n) (Fin n) k) (I : Finset (Fin n))
     (hS : ∀ t : Fin n → k, ∃ u ∈ V, ∀ i ∈ I, (u ᵥ* X) i = t i)
-    (hmax : ∀ I' : Finset (Fin n), (∀ t : Fin n → k, ∃ u ∈ V, ∀ i ∈ I', (u ᵥ* X) i = t i) → I'.card ≤ I.card)
-    (u : Fin n → k) (hu : u ∈ V) (h0 : ∀ i ∈ I, (u ᵥ* X) i = 0) : u ᵥ* X = 0 := by
+    (hmax : ∀ I' : Finset (Fin n),
+      (∀ t : Fin n → k, ∃ u ∈ V, ∀ i ∈ I', (u ᵥ* X) i = t i) → I'.card ≤ I.card)
+    (u : Fin n → k) (hu : u ∈ V) (h0 : ∀ i ∈ I, (u ᵥ* X) i = 0)
+    : u ᵥ* X = 0 := by
   classical
   by_contra hne
   obtain ⟨j, hj⟩ : ∃ j, (u ᵥ* X) j ≠ 0 := by
@@ -56,29 +59,39 @@ theorem locRedSplit : LocRedSplit := by
     simp only [V1, LinearMap.mem_ker, Matrix.toLin'_apply]
     rw [← Matrix.vecMul_transpose, Matrix.transpose_transpose]
 
-  let SC : Finset (Fin n) → Prop := fun I => ∀ t : Fin n → k, ∃ u ∈ (⊤ : Submodule k (Fin n → k)), ∀ i ∈ I, (u ᵥ* C) i = t i
-  obtain ⟨I, hI, hmaxI⟩ := Finset.exists_max_image ((Finset.univ : Finset (Finset (Fin n))).filter SC) Finset.card
-    ⟨∅, Finset.mem_filter.2 ⟨Finset.mem_univ _, fun t => ⟨0, Submodule.mem_top, by simp⟩⟩⟩
+  let SC : Finset (Fin n) → Prop := fun I =>
+    ∀ t : Fin n → k, ∃ u ∈ (⊤ : Submodule k (Fin n → k)), ∀ i ∈ I, (u ᵥ* C) i = t i
+  obtain ⟨I, hI, hmaxI⟩ :=
+    Finset.exists_max_image ((Finset.univ : Finset (Finset (Fin n))).filter SC) Finset.card
+      ⟨∅, Finset.mem_filter.2 ⟨Finset.mem_univ _, fun t => ⟨0, Submodule.mem_top, by simp⟩⟩⟩
   have hSI : SC I := (Finset.mem_filter.1 hI).2
   have hInjC : ∀ u : Fin n → k, (∀ i ∈ I, (u ᵥ* C) i = 0) → u ᵥ* C = 0 := fun u h0 =>
-    max_surj_inj ⊤ C I hSI (fun I' h => hmaxI I' (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩)) u Submodule.mem_top h0
+    max_surj_inj ⊤ C I hSI
+      (fun I' h => hmaxI I' (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩))
+      u Submodule.mem_top h0
 
   let SD : Finset (Fin n) → Prop := fun J => ∀ t : Fin n → k, ∃ u ∈ V1, ∀ j ∈ J, (u ᵥ* D) j = t j
-  obtain ⟨J, hJ, hmaxJ⟩ := Finset.exists_max_image ((Finset.univ : Finset (Finset (Fin n))).filter SD) Finset.card
-    ⟨∅, Finset.mem_filter.2 ⟨Finset.mem_univ _, fun t => ⟨0, V1.zero_mem, by simp⟩⟩⟩
+  obtain ⟨J, hJ, hmaxJ⟩ :=
+    Finset.exists_max_image ((Finset.univ : Finset (Finset (Fin n))).filter SD) Finset.card
+      ⟨∅, Finset.mem_filter.2 ⟨Finset.mem_univ _, fun t => ⟨0, V1.zero_mem, by simp⟩⟩⟩
   have hSJ : SD J := (Finset.mem_filter.1 hJ).2
-  have hInjD : ∀ u : Fin n → k, u ᵥ* C = 0 → (∀ j ∈ J, (u ᵥ* D) j = 0) → u ᵥ* D = 0 := fun u hu h0 =>
-    max_surj_inj V1 D J hSJ (fun J' h => hmaxJ J' (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩)) u ((hV1 u).2 hu) h0
+  have hInjD
+      : ∀ u : Fin n → k, u ᵥ* C = 0 → (∀ j ∈ J, (u ᵥ* D) j = 0) → u ᵥ* D = 0 := fun u hu h0 =>
+    max_surj_inj V1 D J hSJ
+      (fun J' h => hmaxJ J' (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩))
+      u ((hV1 u).2 hu) h0
 
   have hcard : I.card + J.card ≤ n := by
-    let Φ : (Fin n → k) →ₗ[k] ({x // x ∈ I} ⊕ {x // x ∈ J} → k) :=
-      { toFun := fun u => Sum.elim (fun i => (u ᵥ* C) i.1) (fun j => (u ᵥ* D) j.1)
-        map_add' := fun u v => by funext x; rcases x with x | x <;> simp [add_vecMul]
-        map_smul' := fun c u => by funext x; rcases x with x | x <;> simp [smul_vecMul] }
+    let Φ : (Fin n → k) →ₗ[k] ({x // x ∈ I} ⊕ {x // x ∈ J} → k) := {
+      toFun := fun u => Sum.elim (fun i => (u ᵥ* C) i.1) (fun j => (u ᵥ* D) j.1)
+      map_add' := fun u v => by funext x; rcases x with x | x <;> simp [add_vecMul]
+      map_smul' := fun c u => by funext x; rcases x with x | x <;> simp [smul_vecMul]
+    }
     have hsurj : Function.Surjective Φ := by
       intro t
       obtain ⟨u1, -, hu1⟩ := hSI (fun i => if h : i ∈ I then t (Sum.inl ⟨i, h⟩) else 0)
-      obtain ⟨u2, hu2V, hu2⟩ := hSJ (fun j => (if h : j ∈ J then t (Sum.inr ⟨j, h⟩) else 0) - (u1 ᵥ* D) j)
+      obtain ⟨u2, hu2V, hu2⟩ :=
+        hSJ (fun j => (if h : j ∈ J then t (Sum.inr ⟨j, h⟩) else 0) - (u1 ᵥ* D) j)
       have hu2C : u2 ᵥ* C = 0 := (hV1 u2).1 hu2V
       refine ⟨u1 + u2, ?_⟩
       funext x
@@ -90,12 +103,15 @@ theorem locRedSplit : LocRedSplit := by
         ring
     have := LinearMap.finrank_range_le Φ
     rw [LinearMap.range_eq_top.2 hsurj, finrank_top, Module.finrank_fintype_fun_eq_card,
-      Module.finrank_fintype_fun_eq_card, Fintype.card_sum, Fintype.card_coe, Fintype.card_coe, Fintype.card_fin] at this
+        Module.finrank_fintype_fun_eq_card, Fintype.card_sum, Fintype.card_coe, Fintype.card_coe,
+        Fintype.card_fin]
+      at this
     exact this
 
   have hJle : J.card ≤ Iᶜ.card := by rw [Finset.card_compl, Fintype.card_fin]; omega
-  obtain ⟨T, hJT, -, hTcard⟩ := Finset.exists_subsuperset_card_eq (Finset.subset_univ J) hJle
-    (by rw [Finset.card_univ, Fintype.card_fin, Finset.card_compl, Fintype.card_fin]; omega)
+  obtain ⟨T, hJT, -, hTcard⟩ :=
+    Finset.exists_subsuperset_card_eq (Finset.subset_univ J) hJle
+      (by rw [Finset.card_univ, Fintype.card_fin, Finset.card_compl, Fintype.card_fin]; omega)
   have hce : Fintype.card {x // x ∈ Iᶜ} = Fintype.card {x // x ∈ T} := by
     rw [Fintype.card_coe, Fintype.card_coe, hTcard]
   let e : {x // x ∈ Iᶜ} ≃ {x // x ∈ T} := Fintype.equivOfCardEq hce
@@ -113,7 +129,8 @@ theorem locRedSplit : LocRedSplit := by
     rcases Int.units_eq_one_or (Equiv.Perm.sign π⁻¹) with h | h <;> simp [h]
   have hPent : ∀ l i, P l i = if l = π i then 1 else 0 := by
     intro l i
-    simp only [P, Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq]
+    simp only [P, Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply,
+      Option.mem_def, Option.some.injEq]
     congr 1
     exact propext ⟨fun h => by rw [← h]; simp, fun h => by rw [h]; simp⟩
   have hvP : ∀ (w : Fin n → k) (i : Fin n), (w ᵥ* P) i = w (π i) := by
@@ -121,7 +138,8 @@ theorem locRedSplit : LocRedSplit := by
     simp [vecMul, dotProduct, hPent]
   refine ⟨1, Matrix.nonsingInvUnit P hPdet, I, ?_⟩
   have hPv : ((Matrix.nonsingInvUnit P hPdet : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) = P := rfl
-  rw [Matrix.mul_assoc, wIm, block_matrix_mul, block_lower_right_mul_block_matrix, ← hGs, ← hC, ← hD, isUnit_iff_ne_zero, hPv]
+  rw [Matrix.mul_assoc, wIm, block_matrix_mul, block_lower_right_mul_block_matrix, ← hGs, ← hC,
+    ← hD, isUnit_iff_ne_zero, hPv]
   simp only [Units.val_one, Matrix.zero_mul, add_zero, zero_add, Matrix.one_mul]
   rw [← Matrix.mul_assoc D]
   intro hdet

@@ -8,21 +8,25 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln03.Pf
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br Formalism.ExponentWindows Formalism.ExponentWindows.G TensorProduct Formalism.MainNotions.N.Ln03
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br
+  Formalism.ExponentWindows Formalism.ExponentWindows.G TensorProduct Formalism.MainNotions.N.Ln03
 
 section Conv
 
 variable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
 
-theorem Pf_LvExp_coeff_neg (x : PowerSeries R) (k : ℕ) :
-    (HahnSeries.ofPowerSeries ℤ R x).coeff (Int.negSucc k) = 0 := by
+theorem Pf_LvExp_coeff_neg (x : PowerSeries R) (k : ℕ)
+    : (HahnSeries.ofPowerSeries ℤ R x).coeff (Int.negSucc k) = 0 := by
   rw [HahnSeries.ofPowerSeries_apply, HahnSeries.embDomain_of_notMem_range]
   simp
 
-theorem Pf_LvExp_coeff_smul (x : PowerSeries R) (y : HahnModule ℤ R M) (m : ℤ)
-    (hy : ∀ k < m, ((HahnModule.of R).symm y).coeff k = 0) (k : ℤ) (N : ℕ) (hN : k - m < N) :
-    ((HahnModule.of R).symm (HahnSeries.ofPowerSeries ℤ R x • y)).coeff k =
-      ∑ j ∈ Finset.range N, PowerSeries.coeff j x • ((HahnModule.of R).symm y).coeff (k - j) := by
+theorem Pf_LvExp_coeff_smul
+    (x : PowerSeries R)
+    (y : HahnModule ℤ R M) (m : ℤ) (hy : ∀ k < m, ((HahnModule.of R).symm y).coeff k = 0)
+    (k : ℤ) (N : ℕ) (hN : k - m < N)
+    : ((HahnModule.of R).symm (HahnSeries.ofPowerSeries ℤ R x • y)).coeff k
+      = ∑ j ∈ Finset.range N, PowerSeries.coeff j x • ((HahnModule.of R).symm y).coeff (k - j) := by
   rw [HahnModule.coeff_smul]
   symm
   refine Finset.sum_bij_ne_zero (fun j _ _ => ((j : ℤ), k - j)) ?_ ?_ ?_ ?_
@@ -61,9 +65,10 @@ theorem Pf_LvExp_coeff_smul (x : PowerSeries R) (y : HahnModule ℤ R M) (m : �
     dsimp only
     rw [HahnSeries.ofPowerSeries_apply_coeff]
 
-theorem Pf_LvExp_finsum (f : PowerSeries R) (g : ℤ → M) (m : ℤ) (hg : ∀ k < m, g k = 0) (k : ℤ) (N : ℕ)
-    (hN : k - m < N) :
-    ∑ᶠ j : ℕ, PowerSeries.coeff j f • g (k - j) = ∑ j ∈ Finset.range N, PowerSeries.coeff j f • g (k - j) := by
+theorem Pf_LvExp_finsum
+    (f : PowerSeries R) (g : ℤ → M) (m : ℤ) (hg : ∀ k < m, g k = 0) (k : ℤ) (N : ℕ) (hN : k - m < N)
+    : ∑ᶠ j : ℕ, PowerSeries.coeff j f • g (k - j)
+      = ∑ j ∈ Finset.range N, PowerSeries.coeff j f • g (k - j) := by
   apply finsum_eq_sum_of_support_subset
   intro j hj
   simp only [Finset.coe_range, Set.mem_Iio]
@@ -74,18 +79,24 @@ theorem Pf_LvExp_finsum (f : PowerSeries R) (g : ℤ → M) (m : ℤ) (hg : ∀ 
 
 end Conv
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n] {W : LocWach PD LL O v n}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
+  {W : LocWach PD LL O v n}
 
-theorem Pf_LvExp_ιV_inj (T : LocLat G Qp LL O) : Function.Injective (ιV PD (LL := LL) (V := T.V)) := by
-  have h : ∀ y, ιV PD (LL := LL) (V := T.V) y =
-      ((PD.ι.toLinearMap.restrictScalars Qp).lTensor T.V) y := fun y => by
+theorem Pf_LvExp_ιV_inj (T : LocLat G Qp LL O)
+    : Function.Injective (ιV PD (LL := LL) (V := T.V)) := by
+  have h
+      : ∀ y,
+        ιV PD (LL := LL) (V := T.V) y
+          = ((PD.ι.toLinearMap.restrictScalars Qp).lTensor T.V) y := fun y => by
     induction y using TensorProduct.induction_on with
     | zero => simp
     | tmul x b => simp [ιV]
@@ -95,40 +106,50 @@ theorem Pf_LvExp_ιV_inj (T : LocLat G Qp LL O) : Function.Injective (ιV PD (LL
   rw [h, h] at hab
   exact Module.Flat.lTensor_preserves_injective_linearMap _ hi hab
 
-
 open Classical in
-def Pf_LvExp_Φ (W : LocWach PD LL O v n) (s : ℕ) (D : Type) [AddCommGroup D] [Module LL D] :
-    KsW W s ⊗[LL] D ≃ₗ[LL] (Rs LL PD.p s → D) :=
+def Pf_LvExp_Φ (W : LocWach PD LL O v n) (s : ℕ) (D : Type) [AddCommGroup D] [Module LL D]
+    : KsW W s ⊗[LL] D ≃ₗ[LL] (Rs LL PD.p s → D) :=
   (TensorProduct.comm LL (KsW W s) D).trans (TensorProduct.piScalarRight LL LL D (Rs LL PD.p s))
 
-theorem Pf_LvExp_Φ_toKsD (s : ℕ) (D : Type) [AddCommGroup D] [Module LL D]
-    (f : Rs LL PD.p s → D) : Pf_LvExp_Φ W s D (toKsD W s D f) = f := by
-  simp only [Pf_LvExp_Φ, toKsD, LinearEquiv.trans_apply, LinearMap.coe_comp,
-    LinearEquiv.coe_coe, Function.comp_apply]
+theorem Pf_LvExp_Φ_toKsD (s : ℕ) (D : Type) [AddCommGroup D] [Module LL D] (f : Rs LL PD.p s → D)
+    : Pf_LvExp_Φ W s D (toKsD W s D f) = f := by
+  simp only [Pf_LvExp_Φ, toKsD, LinearEquiv.trans_apply, LinearMap.coe_comp, LinearEquiv.coe_coe,
+    Function.comp_apply]
   rw [← TensorProduct.comm_symm, LinearEquiv.symm_apply_apply, LinearEquiv.apply_symm_apply]
 
-theorem Pf_LvExp_Φ_smul (s : ℕ) (D : Type) [AddCommGroup D] [Module LL D] (f : KsW W s)
-    (z : KsW W s ⊗[LL] D) (ζ : Rs LL PD.p s) :
-    Pf_LvExp_Φ W s D (f • z) ζ = f ζ • Pf_LvExp_Φ W s D z ζ := by
+theorem Pf_LvExp_Φ_smul
+    (s : ℕ)
+    (D : Type) [AddCommGroup D] [Module LL D]
+    (f : KsW W s) (z : KsW W s ⊗[LL] D) (ζ : Rs LL PD.p s)
+    : Pf_LvExp_Φ W s D (f • z) ζ = f ζ • Pf_LvExp_Φ W s D z ζ := by
   induction z using TensorProduct.induction_on with
   | zero => simp
-  | tmul g d => simp [Pf_LvExp_Φ, TensorProduct.smul_tmul', TensorProduct.piScalarRightHom_tmul, mul_smul]
-  | add z z' hz hz' => rw [smul_add, map_add (f := _), map_add (f := _), Pi.add_apply, Pi.add_apply, hz, hz', smul_add]
+  | tmul g d =>
+    simp [Pf_LvExp_Φ, TensorProduct.smul_tmul', TensorProduct.piScalarRightHom_tmul, mul_smul]
+  | add z z' hz hz' =>
+    rw [smul_add, map_add (f := _), map_add (f := _), Pi.add_apply, Pi.add_apply, hz, hz', smul_add]
 
-theorem Pf_LvExp_coeff_expN (Lb : LevB W) (s : ℕ) (T : LocLat G Qp LL O) (c : ZMod n) (y : ↥(W.N T))
-    (k : ℤ) : ((HahnModule.of (KsW W s)).symm (expN Lb s T c y)).coeff k = coefN Lb s T c y k :=
+theorem Pf_LvExp_coeff_expN
+    (Lb : LevB W) (s : ℕ) (T : LocLat G Qp LL O) (c : ZMod n) (y : ↥(W.N T)) (k : ℤ)
+    : ((HahnModule.of (KsW W s)).symm (expN Lb s T c y)).coeff k = coefN Lb s T c y k :=
   rfl
 
-theorem Pf_LvExp_Φ_coefN (Lb : LevB W) (s : ℕ) (T : LocLat G Qp LL O) (c : ZMod n) (y : ↥(W.N T))
-    (k : ℤ) (ζ : Rs LL PD.p s) :
-    ((Pf_LvExp_Φ W s (Dc W T c) (coefN Lb s T c y k) ζ : Dc W T c) : T.V ⊗[Qp] B) =
-      Lb.levB T c ζ y k := by
+theorem Pf_LvExp_Φ_coefN
+    (Lb : LevB W)
+    (s : ℕ) (T : LocLat G Qp LL O)
+    (c : ZMod n) (y : ↥(W.N T)) (k : ℤ) (ζ : Rs LL PD.p s)
+    : ((Pf_LvExp_Φ W s (Dc W T c) (coefN Lb s T c y k) ζ : Dc W T c) : T.V ⊗[Qp] B)
+      = Lb.levB T c ζ y k := by
   simp only [coefN, Pf_LvExp_Φ_toKsD]
 
-theorem expSemi_holds (Lb : LevB W) (hR : Ring9 W) (T : LocLat G Qp LL O) (c : ZMod n)
+theorem expSemi_holds
+    (Lb : LevB W)
+    (hR : Ring9 W)
+    (T : LocLat G Qp LL O)
+    (c : ZMod n)
     (levN_eq : ∀ (T : LocLat G Qp LL O) (i : ZMod n) (ζ : LL) (x : ↥(W.N T)) (k : ℤ),
-      W.levN T i ζ x k = ιV PD (LL := LL) (V := T.V) (Lb.levB T i ζ x k)) :
-    ExpSemi Lb hR T c := by
+      W.levN T i ζ x k = ιV PD (LL := LL) (V := T.V) (Lb.levB T i ζ x k))
+    : ExpSemi Lb hR T c := by
   intro s a y hy
   obtain ⟨m, hm⟩ := bdd_coefN Lb s T c y
   have hm' : ∀ k < m, coefN Lb s T c y k = 0 := fun k hk => by
@@ -137,7 +158,9 @@ theorem expSemi_holds (Lb : LevB W) (hR : Ring9 W) (T : LocLat G Qp LL O) (c : Z
   apply (HahnModule.of (KsW W s)).symm.injective
   ext k
   obtain ⟨N, hN⟩ : ∃ N : ℕ, k - m < N := ⟨(k - m).toNat + 1, by omega⟩
-  rw [Pf_LvExp_coeff_smul _ _ m (fun k' hk' => by rw [Pf_LvExp_coeff_expN]; exact hm' k' hk') k N hN]
+  rw [Pf_LvExp_coeff_smul _ _ m
+    (fun k' hk' => by rw [Pf_LvExp_coeff_expN]; exact hm' k' hk')
+    k N hN]
   simp only [Pf_LvExp_coeff_expN]
   apply (Pf_LvExp_Φ W s (Dc W T c)).injective
   funext ζ

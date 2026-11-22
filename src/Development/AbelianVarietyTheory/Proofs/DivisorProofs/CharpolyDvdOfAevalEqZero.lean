@@ -13,8 +13,8 @@ open Polynomial Matrix Formalism.UG
 
 namespace GlobalTheory.SepCharpoly
 
-theorem charpoly_dvd_of_aeval_eq_zero :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (M : Matrix (Fin n) (Fin n) R) (p : R[X]),
+theorem charpoly_dvd_of_aeval_eq_zero
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (M : Matrix (Fin n) (Fin n) R) (p : R[X]),
       M.charpoly.Separable → aeval M p = 0 → M.charpoly ∣ p := by
   intro R _ _ n M p hs hp
   classical

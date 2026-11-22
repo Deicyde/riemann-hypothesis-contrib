@@ -8,10 +8,11 @@ open NumberField IsDedekindDomain UniqueFactorizationMonoid
 
 namespace GlobalTheory.CompanionTheory.Ggeo
 
-theorem exists_mem_count_normalizedFactors_span_eq :
-    ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (I P : Ideal R), I ≠ ⊥ → P.IsPrime → P ≠ ⊥ →
-      ∃ x ∈ I, x ≠ 0 ∧
-        (normalizedFactors (Ideal.span {x})).count P = (normalizedFactors I).count P := by
+theorem exists_mem_count_normalizedFactors_span_eq
+    : ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (I P : Ideal R),
+      I ≠ ⊥ → P.IsPrime → P ≠ ⊥
+        → ∃ x ∈ I,
+          x ≠ 0 ∧ (normalizedFactors (Ideal.span {x})).count P = (normalizedFactors I).count P := by
   intro R _ _ I P hI hP hP0
   have hlt : I * P < I := by
     refine lt_of_le_of_ne Ideal.mul_le_left fun h => hP.ne_top ?_

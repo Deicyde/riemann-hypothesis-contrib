@@ -40,8 +40,7 @@ variable (A B : Type u) [CommRing A] [CommRing B] [Algebra A B] (n : ℕ)
 
 def gradedMap : grading A n →+*ᵍ grading B n where
   toRingHom := MvPolynomial.map (algebraMap A B)
-  map_mem {_ _} hx :=
-    (mem_homogeneousSubmodule _ _).2 (((mem_homogeneousSubmodule _ _).1 hx).map _)
+  map_mem {_ _} hx := (mem_homogeneousSubmodule _ _).2 (((mem_homogeneousSubmodule _ _).1 hx).map _)
 
 lemma gradedMap_apply (p : MvPolynomial (Fin (n + 1)) A) :
     gradedMap A B n p = MvPolynomial.map (algebraMap A B) p := rfl
@@ -63,15 +62,17 @@ def baseChangeMap : projectiveSpace B n ⟶ projectiveSpace A n :=
 
 def stdAffineCover (A : Type u) [CommRing A] (n : ℕ) : (projectiveSpace A n).AffineOpenCover :=
   Proj.affineOpenCoverOfIrrelevantLESpan (grading A n)
-    (fun j : Fin (n + 1) => (X j : MvPolynomial (Fin (n + 1)) A)) (fun j => X_mem j)
-    (fun _ => Nat.one_pos) (irrelevant_le_span_X A n)
+    (fun j : Fin (n + 1) => (X j : MvPolynomial (Fin (n + 1)) A))
+    (fun j => X_mem j)
+    (fun _ => Nat.one_pos)
+    (irrelevant_le_span_X A n)
 
-def chartAlgebraMap (A : Type u) [CommRing A] {n : ℕ} (s : MvPolynomial (Fin (n + 1)) A) :
-    A →+* Away (grading A n) s :=
+def chartAlgebraMap (A : Type u) [CommRing A] {n : ℕ} (s : MvPolynomial (Fin (n + 1)) A)
+    : A →+* Away (grading A n) s :=
   (fromZeroRingHom (grading A n) _).comp (algebraMap A (grading A n 0))
 
-def awayCongr {s t : MvPolynomial (Fin (n + 1)) B} (h : s = t) :
-    Away (grading B n) s ≃+* Away (grading B n) t := by
+def awayCongr {s t : MvPolynomial (Fin (n + 1)) B} (h : s = t)
+    : Away (grading B n) s ≃+* Away (grading B n) t := by
   subst h
   exact RingEquiv.refl _
 
@@ -131,17 +132,17 @@ lemma map_polyToChart_apply (j : Fin (n + 1)) (p : MvPolynomial {i // i ≠ j} A
       (awayCongr B n (gradedMap_X A B n j)).symm (polyToChart B j (MvPolynomial.map (algebraMap A B) p)) :=
   congrArg (fun φ => φ p) (map_polyToChart (A := A) (B := B) j)
 
-
 attribute [local instance] MvPolynomial.algebraMvPolynomial in
-theorem isPushout_chart (j : Fin (n + 1)) :
-    IsPushout (CommRingCat.ofHom (algebraMap A B)) (CommRingCat.ofHom (chartAlgebraMap A (X j)))
+theorem isPushout_chart (j : Fin (n + 1))
+    : IsPushout (CommRingCat.ofHom (algebraMap A B)) (CommRingCat.ofHom (chartAlgebraMap A (X j)))
       (CommRingCat.ofHom (chartAlgebraMap B (gradedMap A B n (X j))))
       (CommRingCat.ofHom (Away.map (gradedMap A B n) (X j))) := by
-  have h0 := CommRingCat.isPushout_of_isPushout A B (MvPolynomial {i // i ≠ j} A)
-    (MvPolynomial {i // i ≠ j} B)
+  have h0 :=
+    CommRingCat.isPushout_of_isPushout A B (MvPolynomial {i // i ≠ j} A)
+      (MvPolynomial {i // i ≠ j} B)
   refine h0.of_iso (Iso.refl _) (Iso.refl _) (chartEquiv A j).symm.toCommRingCatIso
-    ((chartEquiv B j).symm.trans (awayCongr B n (gradedMap_X A B n j)).symm).toCommRingCatIso
-    ?_ ?_ ?_ ?_
+    ((chartEquiv B j).symm.trans (awayCongr B n (gradedMap_X A B n j)).symm).toCommRingCatIso ?_ ?_
+    ?_ ?_
   · ext x
     rfl
   · ext x
@@ -149,9 +150,8 @@ theorem isPushout_chart (j : Fin (n + 1)) :
   · ext x
     simp [chartEquiv_symm_apply, polyToChart_C, awayCongr_symm, awayCongr_chartAlgebraMap]
   · apply CommRingCat.hom_ext
-    apply MvPolynomial.ringHom_ext <;> intro x <;>
-      simp [chartEquiv_symm_apply, map_polyToChart_apply]
-
+    apply MvPolynomial.ringHom_ext <;> intro x
+      <;> simp [chartEquiv_symm_apply, map_polyToChart_apply]
 
 variable (A) in
 lemma awayι_toSpecBase {s : MvPolynomial (Fin (n + 1)) A} {d : ℕ} (hs : s ∈ grading A n d)
@@ -161,10 +161,9 @@ lemma awayι_toSpecBase {s : MvPolynomial (Fin (n + 1)) A} {d : ℕ} (hs : s ∈
   rw [toSpecBase, ← Category.assoc, Proj.awayι_toSpecZero, ← Spec.map_comp]
   rfl
 
-
 variable (A B n) in
-theorem isPullback_baseChange :
-    IsPullback (baseChangeMap A B n) (toSpecBase B n) (toSpecBase A n)
+theorem isPullback_baseChange
+    : IsPullback (baseChangeMap A B n) (toSpecBase B n) (toSpecBase A n)
       (Spec.map (CommRingCat.ofHom (algebraMap A B))) := by
   refine Scheme.isPullback_of_openCover _ _ _ _ (stdAffineCover A n).openCover fun j => ?_
   have hQ : IsPullback (Spec.map (CommRingCat.ofHom (Away.map (gradedMap A B n) (X j))))

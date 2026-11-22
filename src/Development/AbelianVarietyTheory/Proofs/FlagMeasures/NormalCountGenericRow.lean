@@ -19,7 +19,8 @@ namespace GlobalTheory
 theorem stepNormalsG_holds : StepNormalsG :=
   Formalism.L2.SG.NGCut.NormalInvariants.Gen.stepNormalsG_of
     (Formalism.L2.SG.Pf.nmlInvG_of Formalism.L2.SG.NGCut.NormalVectorPairings.NmlLine_holds
-      Formalism.L2.SG.NGCut.NormalIntegrality.NmlInt_holds Formalism.L2.SG.NGCut.NormalVectorPairings.NmlSep_holds)
+      Formalism.L2.SG.NGCut.NormalIntegrality.NmlInt_holds
+      Formalism.L2.SG.NGCut.NormalVectorPairings.NmlSep_holds)
     Formalism.L2.SG.NGCut.NormalCount.NormCount_holds
     GlobalTheory.T.equalWords_nonGeneric_estimates_chain.2.2.2.1
 

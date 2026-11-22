@@ -19,27 +19,29 @@ namespace VerticalPointSurjective
 
 variable {T : Type} [Fintype T]
 
-
 omit [Fintype T] in
-theorem ringHom_aeval {A A' : Type*} [CommRing A] [CommRing A'] [Algebra ℤ A] (f : A →+* A')
-    (z : (Σ _ : Unit, T) → A) (g : MRing (fun _ : Unit => T)) :
-    f (aeval z g) = aeval (fun p => f (z p)) g := by
+theorem ringHom_aeval
+    {A A' : Type*} [CommRing A] [CommRing A'] [Algebra ℤ A]
+    (f : A →+* A') (z : (Σ _ : Unit, T) → A) (g : MRing (fun _ : Unit => T))
+    : f (aeval z g) = aeval (fun p => f (z p)) g := by
   induction g using MvPolynomial.induction_on with
   | C a => simp only [aeval_C]; rw [eq_intCast, eq_intCast, map_intCast]
   | add p q hp hq => simp [hp, hq]
   | mul_X p n hp => simp [hp]
 
-theorem aeval_smul_of_homog {S : Type*} [CommRing S] {g : MRing (fun _ : Unit => T)} {d : ℕ}
-    (hg : IsMultiHomog g (fun _ => d)) (c : S) (z : (Σ _ : Unit, T) → S) :
-    aeval (fun p => c * z p) g = c ^ d * aeval z g := by
+theorem aeval_smul_of_homog
+    {S : Type*} [CommRing S]
+    {g : MRing (fun _ : Unit => T)} {d : ℕ} (hg : IsMultiHomog g (fun _ => d))
+    (c : S) (z : (Σ _ : Unit, T) → S)
+    : aeval (fun p => c * z p) g = c ^ d * aeval z g := by
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
-  rw [aeval_monomial, aeval_monomial,
-    Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
+  rw [aeval_monomial, aeval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
+    Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
   have hdeg : ∑ p : (Σ _ : Unit, T), m p = d := by
     rw [Fintype.sum_sigma, Fintype.sum_unique]
     exact hg m hm default
@@ -48,65 +50,80 @@ theorem aeval_smul_of_homog {S : Type*} [CommRing S] {g : MRing (fun _ : Unit =>
 
 variable {K' : Type} [Field K']
 
-theorem aeval_ratio_of_homog (y : (Σ _ : Unit, T) → K') (t : T) {g : MRing (fun _ : Unit => T)}
-    {d : ℕ} (hg : IsMultiHomog g (fun _ => d)) :
-    aeval (fun p => y p / y ⟨(), t⟩) g = aeval y g / y ⟨(), t⟩ ^ d := by
+theorem aeval_ratio_of_homog
+    (y : (Σ _ : Unit, T) → K') (t : T)
+    {g : MRing (fun _ : Unit => T)} {d : ℕ} (hg : IsMultiHomog g (fun _ => d))
+    : aeval (fun p => y p / y ⟨(), t⟩) g = aeval y g / y ⟨(), t⟩ ^ d := by
   have h := aeval_smul_of_homog hg (y ⟨(), t⟩)⁻¹ y
   rw [show (fun p => y p / y ⟨(), t⟩) = fun p => (y ⟨(), t⟩)⁻¹ * y p from
-    funext fun p => by rw [div_eq_inv_mul], h, inv_pow, div_eq_inv_mul]
+      funext fun p => by rw [div_eq_inv_mul],
+    h, inv_pow, div_eq_inv_mul]
 
-theorem mem_mCoordIdeal_iff {Ω : Type} [Field Ω] (y : (Σ _ : Unit, T) → Ω)
-    {g : MRing (fun _ : Unit => T)} {d : ℕ} (hg : IsMultiHomog g (fun _ => d)) :
-    g ∈ mCoordIdeal y ↔ aeval y g = 0 := by
+theorem mem_mCoordIdeal_iff
+    {Ω : Type} [Field Ω]
+    (y : (Σ _ : Unit, T) → Ω)
+    {g : MRing (fun _ : Unit => T)} {d : ℕ} (hg : IsMultiHomog g (fun _ => d))
+    : g ∈ mCoordIdeal y ↔ aeval y g = 0 := by
   rw [mCoordIdeal, RingHom.mem_ker, HilbertSamuel.SectionBounded.mConeMap_homog y hg, mul_eq_zero,
     C_eq_zero]
   exact or_iff_left (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (X_ne_zero k))
 
-theorem sub_mem_mCoordIdeal {Ω : Type} [Field Ω] (y : (Σ _ : Unit, T) → Ω)
+theorem sub_mem_mCoordIdeal
+    {Ω : Type} [Field Ω]
+    (y : (Σ _ : Unit, T) → Ω)
     {f g : MRing (fun _ : Unit => T)} {d : ℕ} (hf : IsMultiHomog f (fun _ => d))
-    (hg : IsMultiHomog g (fun _ => d)) (h : aeval y f = aeval y g) : f - g ∈ mCoordIdeal y := by
+    (hg : IsMultiHomog g (fun _ => d)) (h : aeval y f = aeval y g)
+    : f - g ∈ mCoordIdeal y := by
   rw [mem_mCoordIdeal_iff y (HilbertSamuel.SectionBounded.homog_sub hf hg), map_sub, h, sub_self]
 
-theorem homogDeg {f : MRing (fun _ : Unit => T)} {a b : ℕ} (hf : IsMultiHomog f (fun _ => a))
-    (h : a = b) : IsMultiHomog f (fun _ => b) :=
+theorem homogDeg
+    {f : MRing (fun _ : Unit => T)} {a b : ℕ} (hf : IsMultiHomog f (fun _ => a)) (h : a = b)
+    : IsMultiHomog f (fun _ => b) :=
   HilbertSamuel.SectionBounded.homog_congr hf fun _ => h
 
-theorem homogMul {f g : MRing (fun _ : Unit => T)} {a b : ℕ} (hf : IsMultiHomog f (fun _ => a))
-    (hg : IsMultiHomog g (fun _ => b)) : IsMultiHomog (f * g) (fun _ => a + b) :=
-  HilbertSamuel.SectionBounded.homog_congr (HilbertSamuel.SectionBounded.homog_mul hf hg) fun _ => rfl
+theorem homogMul
+    {f g : MRing (fun _ : Unit => T)} {a b : ℕ}
+    (hf : IsMultiHomog f (fun _ => a)) (hg : IsMultiHomog g (fun _ => b))
+    : IsMultiHomog (f * g) (fun _ => a + b) :=
+  HilbertSamuel.SectionBounded.homog_congr (HilbertSamuel.SectionBounded.homog_mul hf hg) fun _ =>
+    rfl
 
 theorem homogXt (t : T) : IsMultiHomog (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) (fun _ => 1) :=
   HilbertSamuel.SectionBounded.homog_congr (HilbertSamuel.SectionBounded.homog_X _) fun k => by
     cases k; simp
 
-theorem homogXtPow (t : T) (n : ℕ) :
-    IsMultiHomog ((X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ n) (fun _ => n) :=
+theorem homogXtPow (t : T) (n : ℕ)
+    : IsMultiHomog ((X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ n) (fun _ => n) :=
   HilbertSamuel.SectionBounded.homog_congr (HilbertSamuel.SectionBounded.homog_pow (homogXt t) n)
     fun _ => by simp
 
-theorem exists_form (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0) (c : curveRing y) :
-    ∃ (e : ℕ) (g : MRing (fun _ : Unit => T)), IsMultiHomog g (fun _ => e) ∧
-      aeval y g = (c : K') * y ⟨(), t⟩ ^ e := by
+theorem exists_form (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0) (c : curveRing y)
+    : ∃ (e : ℕ) (g : MRing (fun _ : Unit => T)),
+      IsMultiHomog g (fun _ => e) ∧ aeval y g = (c : K') * y ⟨(), t⟩ ^ e := by
   have hc : (c : K') ∈ chartRingZ y (fun _ => t) := mem_curveRing.mp c.2 (fun _ => t) (fun _ => ht)
   obtain ⟨δ, g, hg, hgy⟩ :=
     HilbertSamuel.SectionBounded.exists_form_of_mem_chartRingZ y (fun _ => t) (fun _ => ht) hc
   refine ⟨δ (), g, HilbertSamuel.SectionBounded.homog_congr hg fun k => by cases k; rfl, ?_⟩
   rw [hgy, Fintype.prod_unique]
 
-def formSet (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T))) :
-    Set (curveRing y) :=
+def formSet (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T)))
+    : Set (curveRing y) :=
   {c | ∃ (e : ℕ) (g : MRing (fun _ : Unit => T)), IsMultiHomog g (fun _ => e) ∧
     aeval y g = (c : K') * y ⟨(), t⟩ ^ e ∧ g ∈ Q}
 
-theorem mem_formSet_of {y : (Σ _ : Unit, T) → K'} {t : T} {Q : Ideal (MRing (fun _ : Unit => T))}
-    {c : curveRing y} (e : ℕ) {g : MRing (fun _ : Unit => T)} (hg : IsMultiHomog g (fun _ => e))
-    (hv : aeval y g = (c : K') * y ⟨(), t⟩ ^ e) (hgQ : g ∈ Q) : c ∈ formSet y t Q := by
+theorem mem_formSet_of
+    {y : (Σ _ : Unit, T) → K'} {t : T} {Q : Ideal (MRing (fun _ : Unit => T))} {c : curveRing y}
+    (e : ℕ)
+    {g : MRing (fun _ : Unit => T)}
+    (hg : IsMultiHomog g (fun _ => e)) (hv : aeval y g = (c : K') * y ⟨(), t⟩ ^ e) (hgQ : g ∈ Q)
+    : c ∈ formSet y t Q := by
   rw [formSet, Set.mem_ofPred_eq]
   exact ⟨e, g, hg, hv, hgQ⟩
 
-theorem formSet_add (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T)))
-    {c1 c2 : curveRing y} (h1 : c1 ∈ formSet y t Q) (h2 : c2 ∈ formSet y t Q) :
-    c1 + c2 ∈ formSet y t Q := by
+theorem formSet_add
+    (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T)))
+    {c1 c2 : curveRing y} (h1 : c1 ∈ formSet y t Q) (h2 : c2 ∈ formSet y t Q)
+    : c1 + c2 ∈ formSet y t Q := by
   obtain ⟨e1, g1, hg1, hv1, hQ1⟩ := h1
   obtain ⟨e2, g2, hg2, hv2, hQ2⟩ := h2
   have H1 := homogMul hg1 (homogXtPow t e2)
@@ -117,14 +134,17 @@ theorem formSet_add (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun
   rw [map_add (f := _), map_mul, map_mul, map_pow, map_pow, aeval_X, hv1, hv2, Subring.coe_add]
   ring
 
-theorem formSet_zero (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T))) :
-    (0 : curveRing y) ∈ formSet y t Q := by
+theorem formSet_zero (y : (Σ _ : Unit, T) → K') (t : T) (Q : Ideal (MRing (fun _ : Unit => T)))
+    : (0 : curveRing y) ∈ formSet y t Q := by
   rw [formSet, Set.mem_ofPred_eq]
   exact ⟨0, 0, HilbertSamuel.SectionBounded.homog_zero _, by simp, Q.zero_mem⟩
 
-theorem formSet_mul (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0)
-    (Q : Ideal (MRing (fun _ : Unit => T))) (c : curveRing y) {c2 : curveRing y}
-    (h2 : c2 ∈ formSet y t Q) : c * c2 ∈ formSet y t Q := by
+theorem formSet_mul
+    (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0)
+    (Q : Ideal (MRing (fun _ : Unit => T)))
+    (c : curveRing y)
+    {c2 : curveRing y} (h2 : c2 ∈ formSet y t Q)
+    : c * c2 ∈ formSet y t Q := by
   obtain ⟨e2, g2, hg2, hv2, hQ2⟩ := h2
   obtain ⟨e, h, hh, hv⟩ := exists_form y t ht c
   have H := homogMul hh hg2
@@ -133,34 +153,43 @@ theorem formSet_mul (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ �
   rw [map_mul, hv, hv2, Subring.coe_mul]
   ring
 
-def formIdeal (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0)
-    (Q : Ideal (MRing (fun _ : Unit => T))) : Ideal (curveRing y) where
+def formIdeal
+    (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0) (Q : Ideal (MRing (fun _ : Unit => T)))
+    : Ideal (curveRing y) where
   carrier := formSet y t Q
   add_mem' := fun h1 h2 => formSet_add y t Q h1 h2
   zero_mem' := formSet_zero y t Q
   smul_mem' := fun c _ h2 => formSet_mul y t ht Q c h2
 
-theorem mem_formIdeal {y : (Σ _ : Unit, T) → K'} {t : T} {ht : y ⟨(), t⟩ ≠ 0}
-    {Q : Ideal (MRing (fun _ : Unit => T))} {c : curveRing y} :
-    c ∈ formIdeal y t ht Q ↔ c ∈ formSet y t Q :=
+theorem mem_formIdeal
+    {y : (Σ _ : Unit, T) → K'} {t : T}
+    {ht : y ⟨(), t⟩ ≠ 0} {Q : Ideal (MRing (fun _ : Unit => T))} {c : curveRing y}
+    : c ∈ formIdeal y t ht Q ↔ c ∈ formSet y t Q :=
   Iff.rfl
 
-theorem le_of_minimal_prime_over_coord (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0)
-    (hfin : Module.Finite ℤ (curveRing y)) (m : Ideal (curveRing y)) (hm : m.IsMaximal)
-    (W Q : Ideal (MRing (fun _ : Unit => T))) (hQ : Q.IsPrime) (hPQ : mCoordIdeal y ≤ Q) (hQW : Q ≤ W)
-    (hXt : (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ∉ W)
+theorem le_of_minimal_prime_over_coord
+    (y : (Σ _ : Unit, T) → K') (t : T) (ht : y ⟨(), t⟩ ≠ 0)
+    (hfin : Module.Finite ℤ (curveRing y))
+    (m : Ideal (curveRing y)) (hm : m.IsMaximal)
+    (W Q : Ideal (MRing (fun _ : Unit => T))) (hQ : Q.IsPrime) (hPQ : mCoordIdeal y ≤ Q)
+    (hQW : Q ≤ W) (hXt : (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ∉ W)
     (hWB : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ} (c : curveRing y),
       IsMultiHomog g (fun _ => d) → aeval y g = (c : K') * y ⟨(), t⟩ ^ d → (g ∈ W ↔ c ∈ m))
-    (hWfrac : ∀ {f : MRing (fun _ : Unit => T)} {n : ℕ}, IsMultiHomog f (fun _ => n) →
-      f ∈ W → ∃ a' b' : curveRing y, a' ∈ m ∧ b' ∉ m ∧
-        ((b' : curveRing y) : K') * aeval y f = (a' : K') * y ⟨(), t⟩ ^ n)
-    (hWforms : IsMultiHomogIdeal W) {a b : curveRing y} (ha0 : a ≠ 0)
+    (hWfrac : ∀ {f : MRing (fun _ : Unit => T)} {n : ℕ},
+      IsMultiHomog f (fun _ => n) → f ∈ W
+        → ∃ a' b' : curveRing y,
+          a' ∈ m ∧ b' ∉ m ∧ ((b' : curveRing y) : K') * aeval y f = (a' : K') * y ⟨(), t⟩ ^ n)
+    (hWforms : IsMultiHomogIdeal W)
+    {a b : curveRing y} (ha0 : a ≠ 0)
     {s : MRing (fun _ : Unit => T)} (hs : IsMultiHomog s (fun _ => 1)) (hsQ : s ∈ Q)
-    (hbx : (b : K') * aeval y s = (a : K') * y ⟨(), t⟩) : W ≤ Q := by
-  have hXtpowQ : ∀ n, (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ n ∉ Q :=
-    fun n h => hXt (hQW (hQ.mem_of_pow_mem _ h))
-  have htr : ∀ {f g : MRing (fun _ : Unit => T)} {n : ℕ}, IsMultiHomog f (fun _ => n) →
-      IsMultiHomog g (fun _ => n) → aeval y f = aeval y g → g ∈ Q → f ∈ Q := by
+    (hbx : (b : K') * aeval y s = (a : K') * y ⟨(), t⟩)
+    : W ≤ Q := by
+  have hXtpowQ : ∀ n, (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ n ∉ Q := fun n h =>
+    hXt (hQW (hQ.mem_of_pow_mem _ h))
+  have htr
+      : ∀ {f g : MRing (fun _ : Unit => T)} {n : ℕ},
+        IsMultiHomog f (fun _ => n) → IsMultiHomog g (fun _ => n) → aeval y f = aeval y g → g ∈ Q
+          → f ∈ Q := by
     intro f g n hf hg he hgQ
     have h1 := Q.add_mem (hPQ (sub_mem_mCoordIdeal y hf hg he)) hgQ
     rwa [sub_add_cancel] at h1
@@ -199,7 +228,8 @@ theorem le_of_minimal_prime_over_coord (y : (Σ _ : Unit, T) → K') (t : T) (ht
   have hIQmax : (formIdeal y t ht Q).IsMaximal := by
     have hcomap : (formIdeal y t ht Q).comap (algebraMap ℤ (curveRing y)) ≠ ⊥ :=
       Ideal.comap_ne_bot_of_integral_mem ha0 haIQ (Algebra.IsIntegral.isIntegral a)
-    have : ((formIdeal y t ht Q).comap (algebraMap ℤ (curveRing y))).IsPrime := Ideal.IsPrime.comap _
+    have : ((formIdeal y t ht Q).comap (algebraMap ℤ (curveRing y))).IsPrime :=
+      Ideal.IsPrime.comap _
     letI := hIQprime
     exact Ideal.isMaximal_of_isIntegral_of_isMaximal_under _ (IsPrime.to_maximal_ideal hcomap)
   have hIQeq : formIdeal y t ht Q = m := hIQmax.eq_of_le hm.ne_top hIQm
@@ -233,8 +263,8 @@ theorem le_of_minimal_prime_over_coord (y : (Σ _ : Unit, T) → K') (t : T) (ht
     · exact h5
   · exact absurd h3 (hXtpowQ ea)
 
-theorem locLen_quot_eq_zero {R : Type*} [CommRing R] (m : Ideal R) [m.IsPrime] {a : R} (ha : a ∉ m) :
-    locLen m (R ⧸ Ideal.span {a}) = 0 := by
+theorem locLen_quot_eq_zero {R : Type*} [CommRing R] (m : Ideal R) [m.IsPrime] {a : R} (ha : a ∉ m)
+    : locLen m (R ⧸ Ideal.span {a}) = 0 := by
   have key : ∀ w : LocalizedModule m.primeCompl (R ⧸ Ideal.span {a}), w = 0 := by
     intro w
     induction w using LocalizedModule.induction_on with
@@ -253,10 +283,9 @@ theorem locLen_quot_eq_zero {R : Type*} [CommRing R] (m : Ideal R) [m.IsPrime] {
 
 end VerticalPointSurjective
 
-
 open VerticalPointSurjective in
-theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal.Statement) :
-    VertPointSurj.Statement := by
+theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal.Statement)
+    : VertPointSurj.Statement := by
   classical
   intro T _ K' _ _ y s hP hs hsP m hm hlen
   obtain ⟨hfin, -, hch⟩ := hC T K' y hP
@@ -278,35 +307,42 @@ theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal
     (IsLocalization.lift_injective_iff hunit).mpr fun c c' =>
       ⟨fun h => by rw [hinj0 h], fun h => by rw [Subtype.val_injective h]⟩
   have hιB : ∀ c : curveRing y, ι (algebraMap _ L c) = c := fun c => IsLocalization.lift_eq hunit c
-  have hιmk : ∀ (a : curveRing y) (b : m.primeCompl) (v : K'),
-      ι (IsLocalization.mk' L a b) = v ↔ (a : K') = ((b : curveRing y) : K') * v :=
-    fun a b v => IsLocalization.lift_mk'_spec hunit a v b
+  have hιmk
+      : ∀ (a : curveRing y) (b : m.primeCompl) (v : K'),
+        ι (IsLocalization.mk' L a b) = v ↔ (a : K') = ((b : curveRing y) : K') * v := fun a b v =>
+    IsLocalization.lift_mk'_spec hunit a v b
 
   choose α β hβ hαβ using hrat
-  let ρ : (Σ _ : Unit, T) → L := fun p => IsLocalization.mk' L (α p.2) (⟨β p.2, hβ p.2⟩ : m.primeCompl)
+  let ρ : (Σ _ : Unit, T) → L := fun p =>
+    IsLocalization.mk' L (α p.2) (⟨β p.2, hβ p.2⟩ : m.primeCompl)
   have hιρ : ∀ p, ι (ρ p) = y p / y ⟨(), t⟩ := by
     rintro ⟨⟨⟩, u⟩
     exact (hιmk _ _ _).mpr (hαβ u).symm
-  have hιev : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ}, IsMultiHomog g (fun _ => d) →
-      ι (aeval ρ g) = aeval y g / y ⟨(), t⟩ ^ d := by
+  have hιev
+      : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ},
+        IsMultiHomog g (fun _ => d) → ι (aeval ρ g) = aeval y g / y ⟨(), t⟩ ^ d := by
     intro g d hg
     rw [ringHom_aeval ι ρ g, show (fun p => ι (ρ p)) = fun p => y p / y ⟨(), t⟩ from funext hιρ]
     exact aeval_ratio_of_homog y t hg
-  have hevB : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ} (c : curveRing y),
-      IsMultiHomog g (fun _ => d) → aeval y g = (c : K') * y ⟨(), t⟩ ^ d →
-        aeval ρ g = algebraMap _ L c := by
+  have hevB
+      : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ} (c : curveRing y),
+        IsMultiHomog g (fun _ => d) → aeval y g = (c : K') * y ⟨(), t⟩ ^ d
+          → aeval ρ g = algebraMap _ L c := by
     intro g d c hg hgc
     apply hιinj
     rw [hιev hg, hιB, hgc, mul_div_assoc, div_self (pow_ne_zero _ hyt), mul_one]
 
   let r : (Σ _ : Unit, T) → IsLocalRing.ResidueField L := fun p => IsLocalRing.residue L (ρ p)
-  have hWform : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ}, IsMultiHomog g (fun _ => d) →
-      (g ∈ mCoordIdeal r ↔ aeval ρ g ∈ IsLocalRing.maximalIdeal L) := by
+  have hWform
+      : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ},
+        IsMultiHomog g (fun _ => d)
+          → (g ∈ mCoordIdeal r ↔ aeval ρ g ∈ IsLocalRing.maximalIdeal L) := by
     intro g d hg
     rw [mem_mCoordIdeal_iff r hg, ← IsLocalRing.residue_eq_zero_iff, ringHom_aeval]
-  have hWB : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ} (c : curveRing y),
-      IsMultiHomog g (fun _ => d) → aeval y g = (c : K') * y ⟨(), t⟩ ^ d →
-        (g ∈ mCoordIdeal r ↔ c ∈ m) := by
+  have hWB
+      : ∀ {g : MRing (fun _ : Unit => T)} {d : ℕ} (c : curveRing y),
+        IsMultiHomog g (fun _ => d) → aeval y g = (c : K') * y ⟨(), t⟩ ^ d
+          → (g ∈ mCoordIdeal r ↔ c ∈ m) := by
     intro g d c hg hgc
     rw [hWform hg, hevB c hg hgc]
     exact IsLocalization.AtPrime.to_map_mem_maximal_iff L m c
@@ -367,16 +403,18 @@ theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal
     · intro c hc
       obtain ⟨e, g, hg, hgc⟩ := exists_form y t hyt c
       have hgW : g ∈ mCoordIdeal r := (hWB c hg hgc).mpr hc
-      have hXW : (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ e ∉ mCoordIdeal r :=
-        fun h => hXt (hWprime.mem_of_pow_mem _ h)
+      have hXW : (X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ e ∉ mCoordIdeal r := fun h =>
+        hXt (hWprime.mem_of_pow_mem _ h)
       have hval : (c : K') * aeval y ((X ⟨(), t⟩ : MRing (fun _ : Unit => T)) ^ e) = aeval y g := by
         rw [map_pow, aeval_X, hgc]
-      have key : ∀ h : MRing (fun _ : Unit => T), IsMultiHomog h (fun _ => e) → h ∉ mCoordIdeal r →
-          (c : K') * aeval y h = aeval y g →
-          c ∈ {b : curveRing y | ∃ (d : Unit → ℕ) (g h : MRing (fun _ : Unit => T)),
-            IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ mCoordIdeal r ∧ h ∉ mCoordIdeal r ∧
-              (b : K') * aeval y h = aeval y g} :=
-        fun h hh hhW hv => ⟨fun _ => e, g, h, hg, hh, hgW, hhW, hv⟩
+      have key
+          : ∀ h : MRing (fun _ : Unit => T),
+            IsMultiHomog h (fun _ => e) → h ∉ mCoordIdeal r → (c : K') * aeval y h = aeval y g
+              → c
+                ∈ {b : curveRing y | ∃ (d : Unit → ℕ) (g h : MRing (fun _ : Unit => T)),
+                  IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ mCoordIdeal r ∧ h ∉ mCoordIdeal r ∧
+                    (b : K') * aeval y h = aeval y g} := fun h hh hhW hv =>
+        ⟨fun _ => e, g, h, hg, hh, hgW, hhW, hv⟩
       exact Ideal.subset_span (key _ (homogXtPow t e) hXW hval)
   have ha0 : a ≠ 0 := by
     intro h0
@@ -389,9 +427,12 @@ theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal
     have h2 := hbx
     rw [h0, ZeroMemClass.coe_zero, zero_mul] at h2
     exact mul_ne_zero hb0 hx0 h2
-  have hWfrac : ∀ {f : MRing (fun _ : Unit => T)} {n : ℕ}, IsMultiHomog f (fun _ => n) →
-      f ∈ mCoordIdeal r → ∃ a' b' : curveRing y, a' ∈ m ∧ b' ∉ m ∧
-        ((b' : curveRing y) : K') * aeval y f = (a' : K') * y ⟨(), t⟩ ^ n := by
+  have hWfrac
+      : ∀ {f : MRing (fun _ : Unit => T)} {n : ℕ},
+        IsMultiHomog f (fun _ => n) → f ∈ mCoordIdeal r
+          → ∃ a' b' : curveRing y,
+            a' ∈ m ∧ b' ∉ m
+              ∧ ((b' : curveRing y) : K') * aeval y f = (a' : K') * y ⟨(), t⟩ ^ n := by
     intro f n hf hfW
     obtain ⟨⟨a', b'⟩, hab'⟩ := IsLocalization.mk'_surjective m.primeCompl (aeval ρ f)
     dsimp only at hab'
@@ -404,13 +445,14 @@ theorem VertPointSurj.proof (hC : CurveCharts.Statement) (hSQ : SectionQuotLocal
       rw [(hιmk a' b' _).mp h1]
       field_simp
 
-  have hmin : ∀ Q : Ideal (MRing (fun _ : Unit => T)), Q.IsPrime → mCoordIdeal y ⊔ Ideal.span {s} ≤ Q →
-      Q ≤ mCoordIdeal r → mCoordIdeal r ≤ Q := by
+  have hmin
+      : ∀ Q : Ideal (MRing (fun _ : Unit => T)),
+        Q.IsPrime → mCoordIdeal y ⊔ Ideal.span {s} ≤ Q → Q ≤ mCoordIdeal r → mCoordIdeal r ≤ Q := by
     intro Q hQ hJQ hQW
     have hPQ : mCoordIdeal y ≤ Q := le_trans le_sup_left hJQ
     have hsQ : s ∈ Q := hJQ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self s))
-    exact le_of_minimal_prime_over_coord y t hyt hfin m hm (mCoordIdeal r) Q hQ hPQ hQW hXt hWB hWfrac
-      (CoordinateConeArithVar.isMultiHomogIdeal r) ha0 hs hsQ hbx
+    exact le_of_minimal_prime_over_coord y t hyt hfin m hm (mCoordIdeal r) Q hQ hPQ hQW hXt hWB
+      hWfrac (CoordinateConeArithVar.isMultiHomogIdeal r) ha0 hs hsQ hbx
   have hmp : mCoordIdeal r ∈ (mCoordIdeal y ⊔ Ideal.span {s}).minimalPrimes :=
     ⟨⟨hWprime, hJW⟩, fun Q hQ hQW => hmin Q hQ.1 hQ.2 hQW⟩
   have hD : mCoordIdeal r ∈ divSupp (mCoordIdeal y) s := by

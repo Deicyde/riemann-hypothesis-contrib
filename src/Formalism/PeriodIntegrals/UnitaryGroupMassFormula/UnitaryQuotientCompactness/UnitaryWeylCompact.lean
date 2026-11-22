@@ -83,9 +83,9 @@ lemma norm_H_bvec_le (j i : Fin (2 * r + k + 1)) : ‖(Hpk k r *ᵥ bvec j) i‖
   exact norm_bvec_le _ _
 
 def Bd (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) : ℝ :=
-  ((2 * r + k + 1 : ℕ) : ℝ) +
-    (Real.sqrt (∑ i ∈ Wp k r, ‖z i‖ ^ 2) * ((2 * r + k + 1 : ℕ) : ℝ) + ∑ i, ‖z i‖) /
-      (‖z (lI k r)‖ - Real.sqrt (∑ i ∈ Wp k r, ‖z i‖ ^ 2))
+  ((2 * r + k + 1 : ℕ) : ℝ)
+    + (Real.sqrt (∑ i ∈ Wp k r, ‖z i‖ ^ 2) * ((2 * r + k + 1 : ℕ) : ℝ) + ∑ i, ‖z i‖)
+      / (‖z (lI k r)‖ - Real.sqrt (∑ i ∈ Wp k r, ‖z i‖ ^ 2))
 
 lemma uw_entry_bound {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
     {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r z)
@@ -205,21 +205,26 @@ open PI PI.QuotSetU PI.QuotSetU.UnitaryGroupMassFormula.SW PI.QuotSetU.UnitaryGr
 
 theorem unitary_weyl_compact : UWCompact := by
   intro k r z hz hT
-  have hcont : ∀ v : Fin (2 * r + k + 1) → ℂ,
-      Continuous fun g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ => g *ᵥ v :=
+  have hcont
+      : ∀ v : Fin (2 * r + k + 1) → ℂ,
+        Continuous fun g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ => g *ᵥ v :=
     fun v => Continuous.matrix_mulVec continuous_id continuous_const
   have hcl : IsClosed (UWset k r z) := by
-    have e : UWset k r z = UH (Hpk k r) ∩ ((⋂ a : Fin r,
-        ({g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ | g *ᵥ bvec (eI k r a) = bvec (eI k r a)} ∩
-          {g | g *ᵥ bvec (esI k r a) = bvec (esI k r a)})) ∩ {g | g *ᵥ z = z}) := by
+    have e
+        : UWset k r z
+          = UH (Hpk k r)
+            ∩ ((⋂ a : Fin r,
+                 ({g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ | g *ᵥ bvec (eI k r a) = bvec (eI k r a)} ∩
+                   {g | g *ᵥ bvec (esI k r a) = bvec (esI k r a)}))
+              ∩ {g | g *ᵥ z = z}) := by
       ext g
       simp only [UWset, Set.mem_inter_iff, Set.mem_iInter, Set.mem_ofPred_eq]
     rw [e]
     refine (unitary_hermitian_group k r).1.inter (IsClosed.inter (isClosed_iInter fun a => ?_) ?_)
     · exact (isClosed_eq (hcont _) continuous_const).inter (isClosed_eq (hcont _) continuous_const)
     · exact isClosed_eq (hcont _) continuous_const
-  have hB : IsCompact (Set.pi Set.univ fun _ : Fin (2 * r + k + 1) => Set.pi Set.univ fun _ : Fin (2 * r + k + 1) =>
-      Metric.closedBall (0 : ℂ) (Bd k r z)) :=
+  have hB : IsCompact (Set.pi Set.univ fun _ : Fin (2 * r + k + 1) =>
+      Set.pi Set.univ fun _ : Fin (2 * r + k + 1) => Metric.closedBall (0 : ℂ) (Bd k r z)) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   refine hB.of_isClosed_subset hcl ?_
   intro g hg i _ j _

@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
@@ -26,8 +28,11 @@ private lemma exists_emb (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Alg
   letI : Algebra L ℂ := φ.toAlgebra
   exact ⟨(IsAlgClosed.lift (R := L) (S := Ω) (M := ℂ)).toRingHom⟩
 
-theorem UpperTheory.V.Z.Sym.Ga.conjEx :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω], ∃ c : G (maximalRealSubfield L) Ω, IsConjEl c := by
+theorem UpperTheory.V.Z.Sym.Ga.conjEx
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+        [IsAlgClosure L Ω],
+      ∃ c : G (maximalRealSubfield L) Ω,
+        IsConjEl c := by
   intro L Ω _ _ _ _ _ _
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap L Ω).injective
   haveI : IsAlgClosure ℚ Ω := IsAlgClosure.ofAlgebraic ℚ L Ω
@@ -36,7 +41,8 @@ theorem UpperTheory.V.Z.Sym.Ga.conjEx :
   let j' : Ω →ₐ[ℚ] ℂ := j.toRatAlgHom
   let τ' : Ω →ₐ[ℚ] ℂ := ((starRingEnd ℂ).comp j).toRatAlgHom
   let e : Ω ≃ₐ[ℚ] j'.fieldRange :=
-    (AlgEquiv.ofInjectiveField j').trans (Subalgebra.equivOfEq _ _ (AlgHom.fieldRange_toSubalgebra j').symm)
+    (AlgEquiv.ofInjectiveField j').trans
+      (Subalgebra.equivOfEq _ _ (AlgHom.fieldRange_toSubalgebra j').symm)
   have hN : Normal ℚ j'.fieldRange := Normal.of_algEquiv e
   have hr := @AlgHom.fieldRange_of_normal ℚ ℂ _ _ _ j'.fieldRange hN (τ'.comp e.symm.toAlgHom)
   have hex : ∀ x : Ω, ∃ y : Ω, j y = starRingEnd ℂ (j x) := by
@@ -48,14 +54,16 @@ theorem UpperTheory.V.Z.Sym.Ga.conjEx :
     exact ⟨y, hy⟩
   choose σ hσ using hex
   have inj := j.injective
-  let c : Ω ≃ₐ[maximalRealSubfield L] Ω :=
-    { toFun := σ
-      invFun := σ
-      left_inv := fun x => inj (by rw [hσ, hσ, Complex.conj_conj])
-      right_inv := fun x => inj (by rw [hσ, hσ, Complex.conj_conj])
-      map_mul' := fun x y => inj (by simp only [hσ, map_mul])
-      map_add' := fun x y => inj (by simp only [hσ, map_add (f := _)])
-      commutes' := fun r => inj (by
+  let c : Ω ≃ₐ[maximalRealSubfield L] Ω := {
+    toFun := σ
+    invFun := σ
+    left_inv := fun x => inj (by rw [hσ, hσ, Complex.conj_conj])
+    right_inv := fun x => inj (by rw [hσ, hσ, Complex.conj_conj])
+    map_mul' := fun x y => inj (by simp only [hσ, map_mul])
+    map_add' := fun x y => inj (by simp only [hσ, map_add (f := _)])
+    commutes' := fun r =>
+      inj (by
         rw [hσ]
-        exact conj_real (j.comp (algebraMap (maximalRealSubfield L) Ω)) r) }
+        exact conj_real (j.comp (algebraMap (maximalRealSubfield L) Ω)) r)
+  }
   exact ⟨c, j, fun x => hσ x⟩

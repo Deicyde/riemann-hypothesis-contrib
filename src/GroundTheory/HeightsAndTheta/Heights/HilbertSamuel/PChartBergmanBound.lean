@@ -137,10 +137,9 @@ lemma det_smul_re {D : ℕ} {H : Matrix (Fin D) (Fin D) ℂ} {lam : Fin D → �
 
 end ChartBergmanBound
 
-
 open ChartBergmanBound in
-theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTaylorTwo.Statement) :
-    ChartBergmanBound.Statement := by
+theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTaylorTwo.Statement)
+    : ChartBergmanBound.Statement := by
   intro D U ψ ρ y₀ hU hy₀ hψ hρ hρ0 hlevi ε hε
   have hψ' : ContDiffAt ℝ 2 ψ y₀ := hψ.contDiffAt (hU.mem_nhds hy₀)
   have hH : (hessC ψ y₀).PosSemidef := ReciprocityTheory.AnForm.M.hessC_posSemidef ψ y₀ hψ' hlevi
@@ -169,8 +168,9 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
       (continuous_const.sub continuous_id).continuousAt (by norm_num)).mul continuousAt_const
   have hev : ∀ᶠ t in 𝓝 (0 : ℝ), Real.exp (t * K) / (1 - t) * g < Λ + ε * ρ₀ :=
     hcont.eventually_mem (Iio_mem_nhds (by simpa using hRlt))
-  have hev' : ∀ᶠ t in 𝓝[>] (0 : ℝ), (Real.exp (t * K) / (1 - t) * g < Λ + ε * ρ₀ ∧ t < 1) ∧
-      0 < t :=
+  have hev'
+      : ∀ᶠ t in 𝓝[>] (0 : ℝ), (Real.exp (t * K) / (1 - t) * g < Λ + ε * ρ₀ ∧ t < 1) ∧
+        0 < t :=
     ((hev.and (Iio_mem_nhds one_pos)).filter_mono nhdsWithin_le_nhds).and self_mem_nhdsWithin
   obtain ⟨t, ⟨htlt, ht1⟩, ht0⟩ := hev'.exists
   have h1t : 0 < 1 - t := by linarith
@@ -202,12 +202,15 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
     have hw' : ‖w‖ ≤ s := by simpa [hB] using hw
     have h1 : ‖N *ᵥ w‖ ≤ C * s := (hC w).trans (by gcongr)
     refine ⟨h1.trans_lt hCs, ?_⟩
-    calc (n : ℝ) * ‖N *ᵥ w‖ ^ 2 ≤ n * (C * s) ^ 2 := by gcongr
+    calc
+      (n : ℝ) * ‖N *ᵥ w‖ ^ 2
+        ≤ n * (C * s) ^ 2 := by gcongr
       _ = C ^ 2 * (n * s ^ 2) := by ring
       _ = K := by rw [hs2]
-  have hΦU : ∀ w ∈ B, y₀ + N *ᵥ w ∈ U := fun w hw => hδU (by
-    rw [Metric.mem_ball, dist_eq_norm, add_sub_cancel_left]
-    exact (hzB w hw).1.trans_le ((min_le_right _ _).trans (min_le_right _ _)))
+  have hΦU : ∀ w ∈ B, y₀ + N *ᵥ w ∈ U := fun w hw =>
+    hδU (by
+      rw [Metric.mem_ball, dist_eq_norm, add_sub_cancel_left]
+      exact (hzB w hw).1.trans_le ((min_le_right _ _).trans (min_le_right _ _)))
   set G : (Fin D → ℂ) → ℂ := fun w => F (y₀ + N *ᵥ w) *
     Complex.exp (((-(n : ℝ) / 2 : ℝ) : ℂ) * (a ⬝ᵥ (N *ᵥ w) + (N *ᵥ w) ⬝ᵥ (b *ᵥ (N *ᵥ w))))
     with hGdef
@@ -216,8 +219,7 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
     intro w hw
     have hlin := analyticAt_mulVec N w
     have haff : AnalyticAt ℂ (fun w : Fin D → ℂ => y₀ + N *ᵥ w) w := analyticAt_const.add hlin
-    have hPa : AnalyticAt ℂ
-        (fun w : Fin D → ℂ => a ⬝ᵥ (N *ᵥ w) + (N *ᵥ w) ⬝ᵥ (b *ᵥ (N *ᵥ w))) w :=
+    have hPa : AnalyticAt ℂ (fun w : Fin D → ℂ => a ⬝ᵥ (N *ᵥ w) + (N *ᵥ w) ⬝ᵥ (b *ᵥ (N *ᵥ w))) w :=
       (analyticAt_poly a b (N *ᵥ w)).comp hlin
     exact ((hF _ (hΦU w hw)).comp_of_eq haff rfl).mul ((analyticAt_const.mul hPa).cexp)
   have hPn := hP D n lam R G (by omega) hR0 hlam hGan
@@ -225,24 +227,26 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
   set k : ℝ := (1 - t) * ρ₀ * Real.exp (-(n : ℝ) * ψ y₀) * Real.exp (-(t * K)) with hk
   have hk0 : 0 ≤ k := by positivity
 
-  have hpt : ∀ w ∈ B, ENNReal.ofReal (k * (‖G w‖ ^ 2 *
-        Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2))) ≤
-      ENNReal.ofReal (‖F (y₀ + N *ᵥ w)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (y₀ + N *ᵥ w)) *
-        ρ (y₀ + N *ᵥ w)) := by
+  have hpt
+      : ∀ w ∈ B,
+        ENNReal.ofReal (k * (‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)))
+          ≤ ENNReal.ofReal
+            (‖F (y₀ + N *ᵥ w)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (y₀ + N *ᵥ w)) * ρ (y₀ + N *ᵥ w)) := by
     intro w hw
     apply ENNReal.ofReal_le_ofReal
     obtain ⟨hzδ, hzK⟩ := hzB w hw
     have hqw := hq w
-    have hGw : ‖G w‖ ^ 2 = ‖F (y₀ + N *ᵥ w)‖ ^ 2 *
-        Real.exp (-(n : ℝ) * (a ⬝ᵥ (N *ᵥ w) + (N *ᵥ w) ⬝ᵥ (b *ᵥ (N *ᵥ w))).re) := by
+    have hGw
+        : ‖G w‖ ^ 2
+          = ‖F (y₀ + N *ᵥ w)‖ ^ 2
+            * Real.exp (-(n : ℝ) * (a ⬝ᵥ (N *ᵥ w) + (N *ᵥ w) ⬝ᵥ (b *ᵥ (N *ᵥ w))).re) := by
       simp only [hGdef]
       rw [norm_mul, Complex.norm_exp, Complex.re_ofReal_mul, mul_pow, sq (Real.exp _),
         ← Real.exp_add]
       congr 2
       ring
     set z := N *ᵥ w with hz
-    have hzδ₁ : dist z 0 < δ₁ := by
-      rw [dist_zero_right]; exact hzδ.trans_le (min_le_left _ _)
+    have hzδ₁ : dist z 0 < δ₁ := by rw [dist_zero_right]; exact hzδ.trans_le (min_le_left _ _)
     have hzδ₂ : dist (y₀ + z) y₀ < δ₂ := by
       rw [dist_eq_norm, add_sub_cancel_left]
       exact hzδ.trans_le ((min_le_right _ _).trans (min_le_left _ _))
@@ -252,15 +256,18 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
     set r := ψ (y₀ + z) - ψ y₀ - (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re -
       (z ⬝ᵥ (hessC ψ y₀ *ᵥ star z)).re with hrdef
     have hr1 : r ≤ t * ‖z‖ ^ 2 := (le_abs_self _).trans hrem
-    have hexp : Real.exp (-(n : ℝ) * ψ (y₀ + z)) =
-        Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) * Real.exp (-(n : ℝ) * ψ y₀) *
-          Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2) * Real.exp (-(n : ℝ) * r) := by
+    have hexp
+        : Real.exp (-(n : ℝ) * ψ (y₀ + z))
+          = Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) * Real.exp (-(n : ℝ) * ψ y₀)
+            * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2) * Real.exp (-(n : ℝ) * r) := by
       rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add, ← hqw, hrdef]
       congr 1
       ring
     have hnr : -(t * K) ≤ -(n : ℝ) * r := by
       have : (n : ℝ) * r ≤ t * K := by
-        calc (n : ℝ) * r ≤ n * (t * ‖z‖ ^ 2) := by gcongr
+        calc
+          (n : ℝ) * r
+            ≤ n * (t * ‖z‖ ^ 2) := by gcongr
           _ = t * (n * ‖z‖ ^ 2) := by ring
           _ ≤ t * K := by gcongr
       linarith
@@ -268,16 +275,19 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
     set X := ‖F (y₀ + z)‖ ^ 2 * Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) *
       Real.exp (-(n : ℝ) * ψ y₀) * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2) with hX
     have hX0 : 0 ≤ X := by positivity
-    calc (1 - t) * ρ₀ * Real.exp (-(n : ℝ) * ψ y₀) * Real.exp (-(t * K)) *
-          (‖F (y₀ + z)‖ ^ 2 * Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) *
-            Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2))
+    calc
+      (1 - t) * ρ₀ * Real.exp (-(n : ℝ) * ψ y₀) * Real.exp (-(t * K))
+          * (‖F (y₀ + z)‖ ^ 2 * Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re)
+            * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2))
         = X * (Real.exp (-(t * K)) * ((1 - t) * ρ₀)) := by rw [hX]; ring
       _ ≤ X * (Real.exp (-(n : ℝ) * r) * ρ (y₀ + z)) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul (Real.exp_le_exp.2 hnr) hρy.le
-            (by positivity) (Real.exp_pos _).le) hX0
-      _ = ‖F (y₀ + z)‖ ^ 2 * (Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) *
-            Real.exp (-(n : ℝ) * ψ y₀) * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2) *
-            Real.exp (-(n : ℝ) * r)) * ρ (y₀ + z) := by rw [hX]; ring
+        mul_le_mul_of_nonneg_left
+          (mul_le_mul (Real.exp_le_exp.2 hnr) hρy.le (by positivity) (Real.exp_pos _).le) hX0
+      _ = ‖F (y₀ + z)‖ ^ 2
+          * (Real.exp (-(n : ℝ) * (a ⬝ᵥ z + z ⬝ᵥ (b *ᵥ z)).re) * Real.exp (-(n : ℝ) * ψ y₀)
+            * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2) * Real.exp (-(n : ℝ) * r))
+          * ρ (y₀ + z) := by
+        rw [hX]; ring
 
   have hΦ : MeasurePreserving (fun w : Fin D → ℂ => y₀ + N *ᵥ w) volume volume :=
     (measurePreserving_add_left volume y₀).comp (measurePreserving_mulVec hNdet)
@@ -285,41 +295,52 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
     have hker : LinearMap.ker (Matrix.toLin' N) = ⊥ := LinearMap.ker_eq_bot.2 hNinj
     exact ((Homeomorph.addLeft y₀).isClosedEmbedding.comp
       (LinearMap.isClosedEmbedding_of_injective hker)).measurableEmbedding
-  have hint : ENNReal.ofReal (∫ w in B, ‖G w‖ ^ 2 *
-        Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) ≤
-      ∫⁻ w in B, ENNReal.ofReal (‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) := by
-    calc _ ≤ ‖∫ w in B, ‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)‖ₑ := by
-          rw [Real.enorm_eq_ofReal_abs]; exact ENNReal.ofReal_le_ofReal (le_abs_self _)
+  have hint
+      : ENNReal.ofReal
+          (∫ w in B, ‖G w‖ ^ 2 *
+            Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2))
+        ≤ ∫⁻ w in B, ENNReal.ofReal (‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) := by
+    calc
+      _ ≤ ‖∫ w in B, ‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)‖ₑ := by
+        rw [Real.enorm_eq_ofReal_abs]; exact ENNReal.ofReal_le_ofReal (le_abs_self _)
       _ ≤ ∫⁻ w in B, ‖‖G w‖ ^ 2 * Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)‖ₑ :=
-          enorm_integral_le_lintegral_enorm _
+        enorm_integral_le_lintegral_enorm _
       _ = _ := lintegral_congr fun w => Real.enorm_eq_ofReal (by positivity)
-  have hmain : ENNReal.ofReal (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ *
-        ∏ j, gaussDiscMass (lam j) R)) ≤
-      ∫⁻ y in U, ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ρ y) := by
-    calc _ ≤ ENNReal.ofReal (k * ∫ w in B, ‖G w‖ ^ 2 *
+  have hmain
+      : ENNReal.ofReal (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * ∏ j, gaussDiscMass (lam j) R))
+        ≤ ∫⁻ y in U, ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ρ y) := by
+    calc
+      _ ≤ ENNReal.ofReal
+          (k
+            * ∫ w in B, ‖G w‖ ^ 2 *
+              Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) :=
+        ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_left hPn hk0)
+      _ = ENNReal.ofReal k * ENNReal.ofReal
+          (∫ w in B, ‖G w‖ ^ 2 *
             Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) :=
-          ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_left hPn hk0)
-      _ = ENNReal.ofReal k * ENNReal.ofReal (∫ w in B, ‖G w‖ ^ 2 *
-            Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) := ENNReal.ofReal_mul hk0
-      _ ≤ ENNReal.ofReal k * ∫⁻ w in B, ENNReal.ofReal (‖G w‖ ^ 2 *
-            Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) := by gcongr
+        ENNReal.ofReal_mul hk0
+      _ ≤ ENNReal.ofReal k
+          * ∫⁻ w in B, ENNReal.ofReal (‖G w‖ ^ 2 *
+            Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) := by
+        gcongr
       _ = ∫⁻ w in B, ENNReal.ofReal k * ENNReal.ofReal (‖G w‖ ^ 2 *
             Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2)) :=
-          (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
+        (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
       _ = ∫⁻ w in B, ENNReal.ofReal (k * (‖G w‖ ^ 2 *
             Real.exp (-(n : ℝ) * ∑ j, lam j * ‖w j‖ ^ 2))) :=
-          lintegral_congr fun w => (ENNReal.ofReal_mul hk0).symm
+        lintegral_congr fun w => (ENNReal.ofReal_mul hk0).symm
       _ ≤ ∫⁻ w in B, ENNReal.ofReal (‖F (y₀ + N *ᵥ w)‖ ^ 2 *
             Real.exp (-(n : ℝ) * ψ (y₀ + N *ᵥ w)) * ρ (y₀ + N *ᵥ w)) :=
-          setLIntegral_mono' Metric.isClosed_closedBall.measurableSet hpt
+        setLIntegral_mono' Metric.isClosed_closedBall.measurableSet hpt
       _ = ∫⁻ y in (fun w : Fin D → ℂ => y₀ + N *ᵥ w) '' B,
             ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ρ y) :=
-          hΦ.setLIntegral_comp_emb hemb
-            (fun y => ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ρ y)) B
+        hΦ.setLIntegral_comp_emb hemb
+          (fun y => ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ρ y))
+          B
       _ ≤ _ := lintegral_mono_set (image_subset_iff.2 hΦU)
 
-  have hkey : 1 ≤ (Λ / ρ₀ + ε) *
-      ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R) := by
+  have hkey
+      : 1 ≤ (Λ / ρ₀ + ε) * ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R) := by
     have e1 : Real.exp (t * K) * g < (Λ + ε * ρ₀) * (1 - t) := by
       rw [div_mul_eq_mul_div, div_lt_iff₀ h1t] at htlt
       exact htlt
@@ -327,31 +348,35 @@ theorem ChartBergmanBound.proof (hP : PolydiscSubmean.Statement) (hT : ComplexTa
       have := mul_lt_mul_of_pos_right e1 hIpos
       rwa [mul_assoc, hgI, mul_one] at this
     have e3 : (Λ / ρ₀ + ε) * ρ₀ = Λ + ε * ρ₀ := by field_simp
-    have e4 : Real.exp (t * K) * Real.exp (-(t * K)) = 1 := by
-      rw [← Real.exp_add]; simp
-    calc (1 : ℝ) = Real.exp (t * K) * Real.exp (-(t * K)) := e4.symm
+    have e4 : Real.exp (t * K) * Real.exp (-(t * K)) = 1 := by rw [← Real.exp_add]; simp
+    calc
+      (1 : ℝ)
+        = Real.exp (t * K) * Real.exp (-(t * K)) := e4.symm
       _ ≤ ((Λ + ε * ρ₀) * (1 - t) * ∏ j, gaussDiscMass (lam j) R) * Real.exp (-(t * K)) :=
-          mul_le_mul_of_nonneg_right e2.le (Real.exp_pos _).le
+        mul_le_mul_of_nonneg_right e2.le (Real.exp_pos _).le
       _ = (Λ / ρ₀ + ε) * ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R) := by
-          rw [← e3]; ring
+        rw [← e3]; ring
   have hKc : 0 ≤ (Λ / ρ₀ + ε) * (n : ℝ) ^ D :=
     mul_nonneg (add_nonneg (div_nonneg hΛ0 hρ0.le) hε.le) (by positivity)
-  calc ENNReal.ofReal (‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀))
-      ≤ ENNReal.ofReal ((Λ / ρ₀ + ε) * (n : ℝ) ^ D) *
-          ENNReal.ofReal (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * ∏ j, gaussDiscMass (lam j) R)) := by
-        rw [← ENNReal.ofReal_mul hKc]
-        apply ENNReal.ofReal_le_ofReal
-        have hnD : (n : ℝ) ^ D * ((n : ℝ) ^ D)⁻¹ = 1 := mul_inv_cancel₀ (by positivity)
-        calc ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀)
-            = ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀) * 1 := (mul_one _).symm
-          _ ≤ ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀) * ((Λ / ρ₀ + ε) *
-              ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R)) :=
-            mul_le_mul_of_nonneg_left hkey (by positivity)
-          _ = (Λ / ρ₀ + ε) * (n : ℝ) ^ D *
-              (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * ∏ j, gaussDiscMass (lam j) R)) := by
-            rw [hk]
-            linear_combination (-(‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀) * ((Λ / ρ₀ + ε) *
-              ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R)))) * hnD
+  calc
+    ENNReal.ofReal (‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀))
+        ≤ ENNReal.ofReal ((Λ / ρ₀ + ε) * (n : ℝ) ^ D)
+          * ENNReal.ofReal (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * ∏ j, gaussDiscMass (lam j) R)) := by
+      rw [← ENNReal.ofReal_mul hKc]
+      apply ENNReal.ofReal_le_ofReal
+      have hnD : (n : ℝ) ^ D * ((n : ℝ) ^ D)⁻¹ = 1 := mul_inv_cancel₀ (by positivity)
+      calc
+        ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀)
+          = ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀) * 1 := (mul_one _).symm
+        _ ≤ ‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀)
+            * ((Λ / ρ₀ + ε)
+              * ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R)) :=
+          mul_le_mul_of_nonneg_left hkey (by positivity)
+        _ = (Λ / ρ₀ + ε) * (n : ℝ) ^ D
+            * (k * (‖F y₀‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * ∏ j, gaussDiscMass (lam j) R)) := by
+          rw [hk]
+          linear_combination (-(‖F y₀‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y₀) * ((Λ / ρ₀ + ε) *
+            ((1 - t) * ρ₀ * Real.exp (-(t * K)) * ∏ j, gaussDiscMass (lam j) R)))) * hnD
     _ ≤ _ := by gcongr
 
 end

@@ -12,20 +12,36 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsAutFunS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 namespace GlobalTheory.ThLiftCusp
 
-theorem isCuspFun_of_approx {D : D7} (V : HSp D) (f : GA D V → ℂ) (hf : Continuous f)
-    (hl : ∀ γ ∈ GQ V, ∀ g, f (γ * g) = f g) (N : ℕ)
-    (h : ∀ ε : ℝ, 0 < ε → ∃ ψ : GA D V → ℂ, Continuous ψ ∧ (∀ γ ∈ GQ V, ∀ g, ψ (γ * g) = ψ g) ∧ IsCuspFun V ψ ∧
-      ∀ g, ‖ψ g - f g‖ ≤ ε * GlobalTheory.Grow.height V g ^ N) : IsCuspFun V f := by
+theorem isCuspFun_of_approx
+    {D : D7}
+    (V : HSp D) (f : GA D V → ℂ) (hf : Continuous f) (hl : ∀ γ ∈ GQ V, ∀ g, f (γ * g) = f g)
+    (N : ℕ)
+    (h : ∀ ε : ℝ,
+      0 < ε
+        → ∃ ψ : GA D V → ℂ,
+          Continuous ψ ∧ (∀ γ ∈ GQ V, ∀ g, ψ (γ * g) = ψ g) ∧ IsCuspFun V ψ
+            ∧ ∀ g, ‖ψ g - f g‖ ≤ ε * GlobalTheory.Grow.height V g ^ N)
+    : IsCuspFun V f := by
   choose ψ hψ using fun n : ℕ => h (1 / ((n : ℝ) + 1)) Nat.one_div_pos_of_nat
-  refine GlobalTheory.CuspLimit.isCuspFun_of_tendsto D V N ψ f (fun n => ⟨(hψ n).1, (hψ n).2.1, (hψ n).2.2.1⟩) hf hl ?_
-  have hb : ∀ n : ℕ, GlobalTheory.Size.growthSize V N (ψ n - f) ≤ ENNReal.ofReal (1 / ((n : ℝ) + 1)) := fun n =>
-    (GlobalTheory.Size.growthSize_le_iff Nat.one_div_pos_of_nat.le).2 fun g => by simpa using (hψ n).2.2.2 g
+  refine GlobalTheory.CuspLimit.isCuspFun_of_tendsto D V N ψ f
+    (fun n => ⟨(hψ n).1, (hψ n).2.1, (hψ n).2.2.1⟩)
+    hf hl ?_
+  have hb
+      : ∀ n : ℕ,
+        GlobalTheory.Size.growthSize V N (ψ n - f) ≤ ENNReal.ofReal (1 / ((n : ℝ) + 1)) := fun n =>
+    (GlobalTheory.Size.growthSize_le_iff Nat.one_div_pos_of_nat.le).2 fun g => by
+      simpa using (hψ n).2.2.2 g
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds ?_ (fun n => zero_le) hb
   simpa using (ENNReal.tendsto_ofReal tendsto_one_div_add_atTop_nhds_zero_nat)
 
@@ -33,18 +49,26 @@ end GlobalTheory.ThLiftCusp
 
 namespace GlobalTheory.ThLiftCusp
 
-theorem norm_lift_sub_le {X H : Type} [MeasurableSpace X] (μ : Measure X) (K K' : H → X → ℂ) (φ φ' : X → ℂ)
-    (u : H → ℝ) (w : X → ℝ) (C e δ : ℝ) (hC : 0 ≤ C) (he : 0 ≤ e) (hu : ∀ h, 0 ≤ u h)
-    (hK : ∀ h x, ‖K h x‖ ≤ C * u h * w x) (hKK : ∀ h x, ‖K' h x - K h x‖ ≤ e * u h * w x)
-    (h1 : Integrable (fun x => w x * ‖φ x‖) μ) (h2 : Integrable (fun x => w x * ‖φ' x - φ x‖) μ)
-    (hδ : ∫ x, w x * ‖φ' x - φ x‖ ∂μ ≤ δ)
-    (hA : ∀ h, Integrable (fun x => K' h x * φ' x) μ) (hB : ∀ h, Integrable (fun x => K h x * φ x) μ) (h : H) :
-    ‖∫ x, K' h x * φ' x ∂μ - ∫ x, K h x * φ x ∂μ‖ ≤ u h * (e * ∫ x, w x * ‖φ x‖ ∂μ + (e + C) * δ) := by
+theorem norm_lift_sub_le
+    {X H : Type} [MeasurableSpace X]
+    (μ : Measure X) (K K' : H → X → ℂ) (φ φ' : X → ℂ) (u : H → ℝ) (w : X → ℝ)
+    (C e δ : ℝ) (hC : 0 ≤ C) (he : 0 ≤ e)
+    (hu : ∀ h, 0 ≤ u h) (hK : ∀ h x, ‖K h x‖ ≤ C * u h * w x)
+    (hKK : ∀ h x, ‖K' h x - K h x‖ ≤ e * u h * w x) (h1 : Integrable (fun x => w x * ‖φ x‖) μ)
+    (h2 : Integrable (fun x => w x * ‖φ' x - φ x‖) μ) (hδ : ∫ x, w x * ‖φ' x - φ x‖ ∂μ ≤ δ)
+    (hA : ∀ h, Integrable (fun x => K' h x * φ' x) μ)
+    (hB : ∀ h, Integrable (fun x => K h x * φ x) μ) (h : H)
+    : ‖∫ x, K' h x * φ' x ∂μ - ∫ x, K h x * φ x ∂μ‖
+      ≤ u h * (e * ∫ x, w x * ‖φ x‖ ∂μ + (e + C) * δ) := by
   rw [← integral_sub (hA h) (hB h)]
-  have hpt : ∀ x, ‖K' h x * φ' x - K h x * φ x‖ ≤
-      u h * (e * (w x * ‖φ x‖) + (e + C) * (w x * ‖φ' x - φ x‖)) := fun x => by
-    have e1 : K' h x * φ' x - K h x * φ x =
-        (K' h x - K h x) * φ x + (K' h x - K h x) * (φ' x - φ x) + K h x * (φ' x - φ x) := by ring
+  have hpt
+      : ∀ x,
+        ‖K' h x * φ' x - K h x * φ x‖
+          ≤ u h * (e * (w x * ‖φ x‖) + (e + C) * (w x * ‖φ' x - φ x‖)) := fun x => by
+    have e1
+        : K' h x * φ' x - K h x * φ x
+          = (K' h x - K h x) * φ x + (K' h x - K h x) * (φ' x - φ x) + K h x * (φ' x - φ x) := by
+      ring
     rw [e1]
     refine (norm_add₃_le).trans ?_
     rw [norm_mul, norm_mul, norm_mul]

@@ -9,10 +9,15 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-theorem UpperTheory.V.abelian₂.weier :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] (ϖ : O), Irreducible ϖ → ∀ f : O⟦X⟧, f ≠ 0 →
-      ∃ (m : ℕ) (P : Polynomial O) (U : O⟦X⟧), mu f = m ∧ P.IsDistinguishedAt (maximalIdeal O) ∧ P.natDegree = lam f ∧
-        IsUnit U ∧ f = C ϖ ^ m * (P : O⟦X⟧) * U := by
+theorem UpperTheory.V.abelian₂.weier
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ f : O⟦X⟧,
+          f ≠ 0
+            → ∃ (m : ℕ) (P : Polynomial O) (U : O⟦X⟧),
+              mu f = m ∧ P.IsDistinguishedAt (maximalIdeal O) ∧ P.natDegree = lam f ∧ IsUnit U
+                ∧ f = C ϖ ^ m * (P : O⟦X⟧) * U := by
   intro O _ _ _ _ ϖ hϖ f hf
   have htop : mu f ≠ ⊤ := fun h => hf (mu_eq_top_iff.mp h)
   have hM := mu_dvd O ϖ hϖ

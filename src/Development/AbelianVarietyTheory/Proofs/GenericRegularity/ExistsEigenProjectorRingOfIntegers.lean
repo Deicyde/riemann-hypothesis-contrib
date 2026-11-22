@@ -10,9 +10,12 @@ namespace GlobalTheory
 
 open NumberField Matrix in
 open Polynomial in
-private theorem aeval_mulVec_of_eigenvector {K R : Type} [Field K] [CommRing R] [Algebra K R] {n : ℕ}
-    (M : Matrix (Fin n) (Fin n) R) (μ : K) (x : Fin n → R) (hx : M *ᵥ x = algebraMap K R μ • x)
-    (p : K[X]) : (aeval M p) *ᵥ x = algebraMap K R (p.eval μ) • x := by
+private theorem aeval_mulVec_of_eigenvector
+    {K R : Type} [Field K] [CommRing R] [Algebra K R]
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) R)
+    (μ : K) (x : Fin n → R) (hx : M *ᵥ x = algebraMap K R μ • x)
+    (p : K[X])
+    : (aeval M p) *ᵥ x = algebraMap K R (p.eval μ) • x := by
   have hpow : ∀ k : ℕ, (M ^ k) *ᵥ x = algebraMap K R (μ ^ k) • x := by
     intro k
     induction k with
@@ -25,29 +28,42 @@ private theorem aeval_mulVec_of_eigenvector {K R : Type} [Field K] [CommRing R] 
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [Matrix.smul_mulVec, hpow, map_mul, mul_smul, algebraMap_smul]
 
-
 open NumberField Matrix in
 open Polynomial in
-theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers : ∀ (E K : Type) [Field E] [NumberField E] [Field K] (emb : (E →+* ℂ) → (E →+* K)), Function.Injective emb → ∀ τ : E →+* ℂ, ∃ (m : ℕ) (a : Fin m → 𝓞 E) (κ : Fin m → K), ∀ (R : Type) [CommRing R] [Algebra K R] (n : ℕ) (ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) R), (∀ b : 𝓞 E, ρ b * (∑ k, algebraMap K R (κ k) • ρ (a k)) = algebraMap K R (emb τ (b : E)) • ∑ k, algebraMap K R (κ k) • ρ (a k)) ∧ ∀ x : Fin n → R, (∀ b : 𝓞 E, (ρ b).mulVec x = algebraMap K R (emb τ (b : E)) • x) → (∑ k, algebraMap K R (κ k) • ρ (a k)).mulVec x = x := by
+theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers
+    : ∀ (E K : Type) [Field E] [NumberField E] [Field K] (emb : (E →+* ℂ) → (E →+* K)),
+      Function.Injective emb
+        → ∀ τ : E →+* ℂ, ∃ (m : ℕ) (a : Fin m → 𝓞 E) (κ : Fin m → K),
+          ∀ (R : Type) [CommRing R] [Algebra K R] (n : ℕ) (ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) R),
+            (∀ b : 𝓞 E,
+                ρ b * (∑ k, algebraMap K R (κ k) • ρ (a k))
+                  = algebraMap K R (emb τ (b : E)) • ∑ k, algebraMap K R (κ k) • ρ (a k))
+              ∧ ∀ x : Fin n → R,
+                (∀ b : 𝓞 E, (ρ b).mulVec x = algebraMap K R (emb τ (b : E)) • x)
+                  → (∑ k, algebraMap K R (κ k) • ρ (a k)).mulVec x = x := by
   intro E K _ _ _ emb hemb τ
   classical
   haveI : CharZero K := ⟨fun a b h => by
     have : (emb τ) (a : E) = (emb τ) (b : E) := by simpa using h
     exact Nat.cast_injective ((emb τ).injective this)⟩
   obtain ⟨α0, hα0⟩ := Field.exists_primitive_element ℚ E
-  obtain ⟨y, hy0, hyint⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (Algebra.IsAlgebraic.isAlgebraic α0)).exists_integral_multiple
+  obtain ⟨y, hy0, hyint⟩ :=
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr
+      (Algebra.IsAlgebraic.isAlgebraic α0)).exists_integral_multiple
   let θ : 𝓞 E := ⟨y • α0, hyint⟩
   have hθ : (θ : E) = y • α0 := rfl
   have hadj : Algebra.adjoin ℚ {α0} = ⊤ := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-      (Algebra.IsAlgebraic.isAlgebraic α0), hα0, IntermediateField.top_toSubalgebra]
+        (Algebra.IsAlgebraic.isAlgebraic α0),
+      hα0, IntermediateField.top_toSubalgebra]
 
   have hsep : ∀ σ σ' : E →+* K, σ θ = σ' θ → σ = σ' := by
     intro σ σ' h
     rw [hθ, map_zsmul, map_zsmul] at h
     have h' : σ α0 = σ' α0 := smul_right_injective K (by exact_mod_cast hy0) h
-    have := AlgHom.ext_of_adjoin_eq_top (φ₁ := σ.toRatAlgHom) (φ₂ := σ'.toRatAlgHom) hadj
-      (by rintro _ rfl; exact h')
+    have :=
+      AlgHom.ext_of_adjoin_eq_top (φ₁ := σ.toRatAlgHom) (φ₂ := σ'.toRatAlgHom) hadj
+        (by rintro _ rfl; exact h')
     ext z
     exact congrArg (fun φ : E →ₐ[ℚ] K => φ z) this
   have hpoly : ∀ b : 𝓞 E, ∃ D : ℤ, D ≠ 0 ∧ ∃ h : ℤ[X], (D : 𝓞 E) * b = aeval θ h := by
@@ -55,10 +71,14 @@ theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers : ∀ (E K : T
     have hb : (b : E) ∈ Algebra.adjoin ℚ {α0} := hadj ▸ Algebra.mem_top
     rw [Algebra.adjoin_singleton_eq_range_aeval] at hb
     obtain ⟨p, hp⟩ := hb
-    obtain ⟨c, hc⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ)
-      (p.comp (C ((y : ℚ)⁻¹) * X))
-    refine ⟨c, nonZeroDivisors.ne_zero hc.1, IsLocalization.integerNormalization (nonZeroDivisors ℤ)
-      (p.comp (C ((y : ℚ)⁻¹) * X)), ?_⟩
+    obtain ⟨c, hc⟩ :=
+      IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ) (p.comp (C ((y : ℚ)⁻¹) * X))
+    refine ⟨
+      c,
+      nonZeroDivisors.ne_zero hc.1,
+      IsLocalization.integerNormalization (nonZeroDivisors ℤ) (p.comp (C ((y : ℚ)⁻¹) * X)),
+      ?_
+    ⟩
     have hy' : (y : E) ≠ 0 := by exact_mod_cast hy0
     have hθα : aeval (θ : E) (C ((y : ℚ)⁻¹) * X) = α0 := by
       rw [hθ, zsmul_eq_mul]
@@ -97,15 +117,17 @@ theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers : ∀ (E K : T
         ← hfmon.natDegree_map (algebraMap ℤ ℚ),
         ← minpoly.isIntegrallyClosed_eq_field_fractions' ℚ hθint]
       exact minpoly.natDegree_le _
-  have hPρ : ∀ (R : Type) [CommRing R] [Algebra K R] (n : ℕ)
-      (ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) R), aeval (ρ θ) P = 0 := by
+  have hPρ
+      : ∀ (R : Type) [CommRing R] [Algebra K R] (n : ℕ) (ρ : 𝓞 E →+* Matrix (Fin n) (Fin n) R),
+        aeval (ρ θ) P = 0 := by
     intro R _ _ n ρ
     rw [← hfK, aeval_map_algebraMap, show ρ θ = ρ.toIntAlgHom θ from rfl, aeval_algHom_apply, hf0,
       map_zero]
   let c : K := (∏ τ' ∈ Finset.univ.erase τ, (σ τ - σ τ'))⁻¹
   let G : K[X] := C c * ∏ τ' ∈ Finset.univ.erase τ, (X - C (σ τ'))
   have hprod_ne : ∏ τ' ∈ Finset.univ.erase τ, (σ τ - σ τ') ≠ 0 :=
-    Finset.prod_ne_zero_iff.2 fun τ' h => sub_ne_zero.2 fun e => (Finset.ne_of_mem_erase h) (hσinj e).symm
+    Finset.prod_ne_zero_iff.2 fun τ' h =>
+      sub_ne_zero.2 fun e => (Finset.ne_of_mem_erase h) (hσinj e).symm
   have hGev : G.eval (σ τ) = 1 := by
     simp only [G, c, eval_mul, eval_C, eval_prod, eval_sub, eval_X]
     exact inv_mul_cancel₀ hprod_ne
@@ -116,14 +138,16 @@ theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers : ∀ (E K : T
   clear_value G c P
   refine ⟨G.natDegree + 1, fun k => θ ^ (k : ℕ), fun k => G.coeff k, ?_⟩
   intro R _ _ n ρ
-  have hsum : ∑ k : Fin (G.natDegree + 1), algebraMap K R (G.coeff k) • ρ (θ ^ (k : ℕ)) =
-      aeval (ρ θ) G := by
+  have hsum
+      : ∑ k : Fin (G.natDegree + 1), algebraMap K R (G.coeff k) • ρ (θ ^ (k : ℕ))
+        = aeval (ρ θ) G := by
     rw [aeval_eq_sum_range, ← Fin.sum_univ_eq_sum_range]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_pow, algebraMap_smul]
   rw [hsum]
-  have hsmul : ∀ (k : K) (M : Matrix (Fin n) (Fin n) R),
-      algebraMap K (Matrix (Fin n) (Fin n) R) k * M = algebraMap K R k • M := by
+  have hsmul
+      : ∀ (k : K) (M : Matrix (Fin n) (Fin n) R),
+        algebraMap K (Matrix (Fin n) (Fin n) R) k * M = algebraMap K R k • M := by
     intro k M
     rw [Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, algebraMap_smul]
   refine ⟨fun b => ?_, fun x hx => ?_⟩
@@ -135,11 +159,13 @@ theorem _root_.GlobalTheory.exists_eigen_projector_ringOfIntegers : ∀ (E K : T
         show σ τ = ((emb τ).comp (algebraMap (𝓞 E) E)).toIntAlgHom θ from rfl, aeval_algHom_apply,
         ← hh]
       simp
-    have hq := (mul_divByMonic_eq_iff_isRoot (p := hK - C r) (a := σ τ)).2
-      (by rw [IsRoot, eval_sub, eval_C, hrdef, sub_self])
+    have hq :=
+      (mul_divByMonic_eq_iff_isRoot (p := hK - C r) (a := σ τ)).2
+        (by rw [IsRoot, eval_sub, eval_C, hrdef, sub_self])
     have hkey : hK * G = C r * G + C c * ((hK - C r) /ₘ (X - C (σ τ))) * P := by
-      calc hK * G = C r * G + ((X - C (σ τ)) * ((hK - C r) /ₘ (X - C (σ τ)))) * G := by
-            rw [hq]; ring
+      calc
+        hK * G
+          = C r * G + ((X - C (σ τ)) * ((hK - C r) /ₘ (X - C (σ τ)))) * G := by rw [hq]; ring
         _ = C r * G + ((hK - C r) /ₘ (X - C (σ τ))) * ((X - C (σ τ)) * G) := by ring
         _ = _ := by rw [hXG]; ring
     have hev := congrArg (aeval (ρ θ)) hkey

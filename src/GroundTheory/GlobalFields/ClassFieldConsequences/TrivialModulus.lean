@@ -21,15 +21,15 @@ section Unramified
 variable (K : Type*) [Field K] [NumberField K] (L : Type*) [Field L] [Algebra K L]
 
 def IsUnramifiedEverywhere : Prop :=
-  (∀ v : HeightOneSpectrum (𝓞 K), Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal) ∧
-    ∀ v : InfinitePlace K, v.IsUnramifiedIn L
+  (∀ v : HeightOneSpectrum (𝓞 K), Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal)
+    ∧ ∀ v : InfinitePlace K, v.IsUnramifiedIn L
 
 variable [NumberField L]
 
-theorem isUnramifiedIn_iff_ramificationIdx (v : HeightOneSpectrum (𝓞 K)) :
-    Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal ↔
-      ∀ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal →
-        w.asIdeal.ramificationIdx (𝓞 K) = 1 := by
+theorem isUnramifiedIn_iff_ramificationIdx (v : HeightOneSpectrum (𝓞 K))
+    : Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal
+      ↔ ∀ w : HeightOneSpectrum (𝓞 L),
+        w.asIdeal.LiesOver v.asIdeal → w.asIdeal.ramificationIdx (𝓞 K) = 1 := by
   constructor
   · intro h w hw
     exact Ideal.ramificationIdx_eq_one_iff.2 (h w.asIdeal w.isPrime hw)
@@ -39,8 +39,8 @@ theorem isUnramifiedIn_iff_ramificationIdx (v : HeightOneSpectrum (𝓞 K)) :
 
 variable [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
 
-theorem infiniteLocalSymbol_eq_one_iff (v : InfinitePlace K) :
-    infiniteLocalSymbol L v = 1 ↔ v.IsUnramifiedIn L := by
+theorem infiniteLocalSymbol_eq_one_iff (v : InfinitePlace K)
+    : infiniteLocalSymbol L v = 1 ↔ v.IsUnramifiedIn L := by
   by_cases hv : v.IsReal
   · constructor
     · intro h w hw
@@ -48,8 +48,10 @@ theorem infiniteLocalSymbol_eq_one_iff (v : InfinitePlace K) :
         subst hw
         exact ⟨rfl⟩
       by_contra hram
-      have hneg : InfinitePlace.Completion.extensionEmbeddingOfIsReal hv
-          ((-1 : (v.Completion)ˣ) : v.Completion) < 0 := by
+      have hneg
+          : InfinitePlace.Completion.extensionEmbeddingOfIsReal hv
+              ((-1 : (v.Completion)ˣ) : v.Completion)
+            < 0 := by
         simp
       have h1 := infiniteLocalSymbol_apply L v hv ⟨w, this⟩ (-1)
       rw [h, if_pos hneg, MonoidHom.one_apply] at h1
@@ -66,25 +68,29 @@ theorem infiniteLocalSymbol_eq_one_iff (v : InfinitePlace K) :
   · rw [infiniteLocalSymbol_of_not_isReal L v hv]
     simp only [true_iff]
     intro w hw
-    exact NumberField.InfinitePlace.isUnramified_iff.2
-      (Or.inr (hw ▸ NumberField.InfinitePlace.not_isReal_iff_isComplex.1 hv))
+    exact NumberField.InfinitePlace.isUnramified_iff.2 (Or.inr
+      (hw ▸ NumberField.InfinitePlace.not_isReal_iff_isComplex.1 hv))
 
-theorem units_le_ker_localSymbol_of_isUnramifiedIn (v : HeightOneSpectrum (𝓞 K))
-    (h : Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal) :
-    (Submonoid.ofClass (v.adicCompletionIntegers K)).units ≤ (localSymbol L v).ker := by
+theorem units_le_ker_localSymbol_of_isUnramifiedIn
+    (v : HeightOneSpectrum (𝓞 K)) (h : Algebra.IsUnramifiedIn (𝓞 L) v.asIdeal)
+    : (Submonoid.ofClass (v.adicCompletionIntegers K)).units ≤ (localSymbol L v).ker := by
   obtain ⟨w⟩ := nonempty_placesOver L v
   exact units_le_ker_localSymbol L v w ((isUnramifiedIn_iff_ramificationIdx K L v).1 h w.1 w.2)
 
-theorem ideleSymbol_eq_one_of_isUnramifiedEverywhere (h : IsUnramifiedEverywhere K L)
-    {x : IdeleGroup K} (hx : ∀ v, finiteProj v x ∈ (Submonoid.ofClass (v.adicCompletionIntegers K)).units) :
-    ideleSymbol K L x = 1 := by
+theorem ideleSymbol_eq_one_of_isUnramifiedEverywhere
+    (h : IsUnramifiedEverywhere K L)
+    {x : IdeleGroup K}
+    (hx : ∀ v, finiteProj v x ∈ (Submonoid.ofClass (v.adicCompletionIntegers K)).units)
+    : ideleSymbol K L x = 1 := by
   have hN : ∀ v, (Submonoid.ofClass (v.adicCompletionIntegers K)).units ≤ (localSymbol L v).ker :=
     fun v ↦ units_le_ker_localSymbol_of_isUnramifiedIn K L v (h.1 v)
-  have hNinf : ∀ w : InfinitePlace K, (⊤ : Subgroup (w.Completion)ˣ) ≤ (infiniteLocalSymbol L w).ker := by
+  have hNinf
+      : ∀ w : InfinitePlace K, (⊤ : Subgroup (w.Completion)ˣ) ≤ (infiniteLocalSymbol L w).ker := by
     intro w
     rw [(infiniteLocalSymbol_eq_one_iff K L w).2 (h.2 w), MonoidHom.ker_one]
   have h1 : ∀ v, localSymbol L v (finiteProj v x) = 1 := fun v ↦ hN v (hx v)
-  have h2 : ∀ w, infiniteLocalSymbol L w (infiniteProj w x) = 1 := fun w ↦ hNinf w (Subgroup.mem_top _)
+  have h2 : ∀ w, infiniteLocalSymbol L w (infiniteProj w x) = 1 := fun w ↦
+    hNinf w (Subgroup.mem_top _)
   rw [ideleSymbol_apply]
   simp only [h1, h2, finprod_one, Finset.prod_const_one, mul_one]
 
@@ -94,8 +100,10 @@ section Descent
 
 variable {K : Type*} [Field K] [NumberField K] {Ω : Type*} [Field Ω] [Algebra K Ω]
 
-theorem IsUnramifiedEverywhere.of_le {E M : IntermediateField K Ω} (hEM : E ≤ M) [FiniteDimensional K M]
-    (hM : IsUnramifiedEverywhere K M) : IsUnramifiedEverywhere K E := by
+theorem IsUnramifiedEverywhere.of_le
+    {E M : IntermediateField K Ω} (hEM : E ≤ M) [FiniteDimensional K M]
+    (hM : IsUnramifiedEverywhere K M)
+    : IsUnramifiedEverywhere K E := by
   refine ⟨fun v ↦ GroundTheory.ProfCoh.isUnramifiedIn_of_le hEM v (hM.1 v), fun v w hw ↦ ?_⟩
   have : FiniteDimensional K E := GroundTheory.ProfCoh.finiteDimensional_of_le hEM
   let _ : Algebra E M := (IntermediateField.inclusion hEM).toAlgebra
@@ -107,8 +115,9 @@ theorem IsUnramifiedEverywhere.of_le {E M : IntermediateField K Ω} (hEM : E ≤
   · left
     have hc : w'.comap (algebraMap K M) = v := by
       rw [IsScalarTower.algebraMap_eq K E M, NumberField.InfinitePlace.comap_comp, hw]
-    have hw'r : w'.IsReal := (NumberField.InfinitePlace.isUnramified_iff.1 (hM.2 v w' hc)).resolve_right
-      (by rw [hc]; exact NumberField.InfinitePlace.not_isComplex_iff_isReal.2 hv)
+    have hw'r : w'.IsReal :=
+      (NumberField.InfinitePlace.isUnramified_iff.1 (hM.2 v w' hc)).resolve_right
+        (by rw [hc]; exact NumberField.InfinitePlace.not_isComplex_iff_isReal.2 hv)
     exact hw'r.comap _
   · right
     rw [hw]
@@ -120,17 +129,17 @@ variable {K : Type u} [Field K] [NumberField K]
 
 namespace Modulus
 
-def one : Modulus K :=
-  ⟨⊤, top_ne_bot, ∅⟩
+def one : Modulus K := ⟨⊤, top_ne_bot, ∅⟩
 
-theorem not_dvd_one_ideal (v : HeightOneSpectrum (𝓞 K)) : ¬ v.asIdeal ∣ (one : Modulus K).ideal := by
+theorem not_dvd_one_ideal (v : HeightOneSpectrum (𝓞 K))
+    : ¬ v.asIdeal ∣ (one : Modulus K).ideal := by
   change ¬ v.asIdeal ∣ ⊤
   rw [Ideal.dvd_iff_le]
   exact fun h ↦ v.isPrime.ne_top (top_le_iff.1 h)
 
 theorem idelesOneMod_one : (one : Modulus K).idelesOneMod = ⊤ :=
-  eq_top_iff.2 fun _ _ ↦ one.mem_idelesOneMod.2
-    ⟨fun v hv ↦ (not_dvd_one_ideal v hv).elim, fun _ hw ↦ hw.elim⟩
+  eq_top_iff.2 fun _ _ ↦
+    one.mem_idelesOneMod.2 ⟨fun v hv ↦ (not_dvd_one_ideal v hv).elim, fun _ hw ↦ hw.elim⟩
 
 theorem congruenceSubgroup_one : (one : Modulus K).congruenceSubgroup = standardOpenSubgroup K := by
   rw [congruenceSubgroup_eq_inf, idelesOneMod_one, top_inf_eq]
@@ -141,8 +150,8 @@ theorem coprimeIdeals_one : (one : Modulus K).coprimeIdeals = ⊤ :=
 theorem rayUnits_one : (one : Modulus K).rayUnits = ⊤ := by
   rw [rayUnits, idelesOneMod_one, Subgroup.comap_top]
 
-theorem classGroup_mk_eq_one_iff {I : (FractionalIdeal (𝓞 K)⁰ K)ˣ} :
-    ClassGroup.mk K I = 1 ↔ I ∈ (toPrincipalIdeal (𝓞 K) K).range := by
+theorem classGroup_mk_eq_one_iff {I : (FractionalIdeal (𝓞 K)⁰ K)ˣ}
+    : ClassGroup.mk K I = 1 ↔ I ∈ (toPrincipalIdeal (𝓞 K) K).range := by
   rw [← (ClassGroup.equiv K).injective.eq_iff, ClassGroup.equiv_mk, map_one,
     FractionalIdeal.canonicalEquiv_self, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact Iff.rfl
@@ -166,13 +175,13 @@ def classGroupEquiv : (one : Modulus K).IdealRayClassGroup ≃* ClassGroup (𝓞
   (QuotientGroup.quotientMulEquivOfEq ker_toClassGroup.symm).trans
     (QuotientGroup.quotientKerEquivOfSurjective _ toClassGroup_surjective)
 
-theorem classGroupEquiv_mk (I : (one : Modulus K).coprimeIdeals) :
-    classGroupEquiv (QuotientGroup.mk I) = ClassGroup.mk K (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :=
+theorem classGroupEquiv_mk (I : (one : Modulus K).coprimeIdeals)
+    : classGroupEquiv (QuotientGroup.mk I) = ClassGroup.mk K (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :=
   rfl
 
-theorem classGroupEquiv_primeClass (v : HeightOneSpectrum (𝓞 K)) :
-    classGroupEquiv (one.primeClass (not_dvd_one_ideal v)) =
-      ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ := by
+theorem classGroupEquiv_primeClass (v : HeightOneSpectrum (𝓞 K))
+    : classGroupEquiv (one.primeClass (not_dvd_one_ideal v))
+      = ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ := by
   rw [primeClass, classGroupEquiv_mk, ← ClassGroup.mk_mk0 (K := K)]
   congr 1
 

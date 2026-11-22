@@ -20,8 +20,10 @@ theorem global_arithmetic_identity : GlobalArithmeticIdentity := by
   have hs : 0 < Real.sqrt ((2 * v) ^ f) := Real.sqrt_pos.2 hd
   have hfac : (0 : ℝ) < ((M - 1).factorial : ℝ) := by exact_mod_cast Nat.factorial_pos _
   have hpi := Real.pi_pos
-  have key : ((2 * v) ^ f) ^ M = ((2 * Real.pi) ^ M / ((M - 1).factorial : ℝ)) ^ f *
-      (((M - 1).factorial : ℝ) * (v / Real.pi) ^ M) ^ f := by
+  have key
+      : ((2 * v) ^ f) ^ M
+        = ((2 * Real.pi) ^ M / ((M - 1).factorial : ℝ)) ^ f
+          * (((M - 1).factorial : ℝ) * (v / Real.pi) ^ M) ^ f := by
     rw [← pow_mul, mul_comm f M, pow_mul, ← mul_pow]
     congr 1
     rw [div_pow]

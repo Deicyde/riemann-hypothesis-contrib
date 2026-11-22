@@ -15,37 +15,44 @@ open MeasureTheory Metric Filter Topology ReciprocityTheory.ChartRestriction.G.G
 
 namespace PtsSumMeasurable
 
-theorem measurable_maDensity {D : ℕ} (φ : Fin D → (Fin D → ℂ) → ℝ) :
-    Measurable (maDensity φ) := by
+theorem measurable_maDensity {D : ℕ} (φ : Fin D → (Fin D → ℂ) → ℝ) : Measurable (maDensity φ) := by
   set M : ((Fin D → ℂ) →L[ℝ] (Fin D → ℂ) →L[ℝ] ℝ) → Matrix (Fin D) (Fin D) ℂ := fun H i j =>
     ((H (Pi.single i 1) (Pi.single j 1) +
         H (Complex.I • Pi.single i 1) (Complex.I • Pi.single j 1) : ℝ) +
       Complex.I * ((H (Pi.single i 1) (Complex.I • Pi.single j 1) -
         H (Complex.I • Pi.single i 1) (Pi.single j 1) : ℝ))) / 4 with hMdef
-  have hM : Continuous M := continuous_pi fun i => continuous_pi fun j => by
-    simp only [hMdef]
-    set_option synthInstance.maxHeartbeats 200000 in
-      fun_prop
+  have hM : Continuous M :=
+    continuous_pi fun i =>
+      continuous_pi fun j => by
+        simp only [hMdef]
+        set_option synthInstance.maxHeartbeats 200000 in
+        fun_prop
   have hdisc : Continuous fun B : Fin D → Matrix (Fin D) (Fin D) ℂ => (mixedDisc B).re := by
     unfold mixedDisc
     exact Complex.continuous_re.comp (continuous_const.mul (continuous_finsetSum _ fun S _ =>
       continuous_const.mul (Continuous.matrix_det (continuous_finsetSum _ fun k _ =>
         continuous_apply k))))
-  have heq : maDensity φ = fun z => (D.factorial : ℝ) * (2 / Real.pi) ^ D *
-      (mixedDisc fun k => M (fderiv ℝ (fderiv ℝ (φ k)) z)).re := rfl
+  have heq
+      : maDensity φ
+        = fun z =>
+          (D.factorial : ℝ) * (2 / Real.pi) ^ D
+            * (mixedDisc fun k => M (fderiv ℝ (fderiv ℝ (φ k)) z)).re :=
+    rfl
   rw [heq]
-  exact measurable_const.mul ((hdisc.comp (continuous_pi fun k => hM.comp (continuous_apply k))).measurable.comp
-    (Measurable.of_eval fun k => measurable_fderiv ℝ _))
+  exact measurable_const.mul
+    ((hdisc.comp (continuous_pi fun k => hM.comp (continuous_apply k))).measurable.comp
+      (Measurable.of_eval fun k => measurable_fderiv ℝ _))
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {e : ℕ}
 
-theorem exists_lift_family {P : Ideal (MRing ι)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (fibre P Ψ y).Finite) :
-    ∃ (B : ℕ → Set (Fin e → ℂ)) (γ : ℕ → (Fin e → ℂ) → (Σ k, ι k) → ℂ),
-      (∀ m, IsOpen (B m)) ∧
-      (∀ m, ∀ y ∈ B m, DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ mcPts P ∧
-        Ψ (segre (γ m y)) = Fin.cons 1 y) ∧
-      ∀ y w γ', IsSheet P Ψ y w γ' → ∃ m, y ∈ B m ∧ segre (γ m y) = w := by
+theorem exists_lift_family
+    {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hfin : ∀ y, (fibre P Ψ y).Finite)
+    : ∃ (B : ℕ → Set (Fin e → ℂ)) (γ : ℕ → (Fin e → ℂ) → (Σ k, ι k) → ℂ),
+      (∀ m, IsOpen (B m))
+        ∧ (∀ m, ∀ y ∈ B m,
+          DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ mcPts P ∧ Ψ (segre (γ m y)) = Fin.cons 1 y)
+        ∧ ∀ y w γ', IsSheet P Ψ y w γ' → ∃ m, y ∈ B m ∧ segre (γ m y) = w := by
   classical
   obtain ⟨D, hDc, hDd⟩ := TopologicalSpace.exists_countable_dense (Fin e → ℂ)
   have hρ : ∀ n : ℕ, (0 : ℝ) < 1 / (n + 1) := fun n => by positivity
@@ -55,8 +62,9 @@ theorem exists_lift_family {P : Ideal (MRing ι)}
     (secSet_finite osgood hfin (p.1 : Fin e → ℂ) (hρ p.2)).countable.to_subtype
   let T := Σ p : D × ℕ, secSet P Ψ (Bl p)
   let Lift : T → ((Fin e → ℂ) → (Σ k, ι k) → ℂ) → Prop := fun t γ =>
-    ∀ y ∈ Bl t.1, DifferentiableAt ℂ γ y ∧ γ y ∈ mcPts P ∧
-      segre (γ y) = (t.2 : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y
+    ∀ y ∈ Bl t.1,
+      DifferentiableAt ℂ γ y ∧ γ y ∈ mcPts P
+        ∧ segre (γ y) = (t.2 : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y
   let Bo : Option T → Set (Fin e → ℂ) := fun o =>
     o.elim ∅ fun t => if ∃ γ, Lift t γ then Bl t.1 else ∅
   let γo : Option T → (Fin e → ℂ) → (Σ k, ι k) → ℂ := fun o =>
@@ -73,8 +81,9 @@ theorem exists_lift_family {P : Ideal (MRing ι)}
       split_ifs
       · exact isOpen_ball
       · exact isOpen_empty
-  have hlift : ∀ o, ∀ y ∈ Bo o, DifferentiableAt ℂ (γo o) y ∧ γo o y ∈ mcPts P ∧
-      Ψ (segre (γo o y)) = Fin.cons 1 y := by
+  have hlift
+      : ∀ o, ∀ y ∈ Bo o,
+        DifferentiableAt ℂ (γo o) y ∧ γo o y ∈ mcPts P ∧ Ψ (segre (γo o y)) = Fin.cons 1 y := by
     rintro (_ | t) y hy
     · exact absurd hy (Set.notMem_empty y)
     · rw [hBsome] at hy
@@ -86,8 +95,13 @@ theorem exists_lift_family {P : Ideal (MRing ι)}
         obtain ⟨z, -, -, hΨ⟩ := hfib y hy
         rw [h3, hΨ]
       · exact absurd hy (Set.notMem_empty y)
-  refine ⟨fun m => Bo (f m), fun m => γo (f m), fun m => hBo (f m), fun m => hlift (f m),
-    fun y w γ' hγ' => ?_⟩
+  refine ⟨
+    fun m => Bo (f m),
+    fun m => γo (f m),
+    fun m => hBo (f m),
+    fun m => hlift (f m),
+    fun y w γ' hγ' => ?_
+  ⟩
   · obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.mp hγ'.2
     obtain ⟨n, hn⟩ := exists_nat_one_div_lt (half_pos hε)
     obtain ⟨d, hdy, hdD⟩ := Metric.dense_iff.mp hDd y _ (hρ n)
@@ -100,14 +114,22 @@ theorem exists_lift_family {P : Ideal (MRing ι)}
       intro y' hy'
       have hy'' : dist y' d < 1 / ((n : ℝ) + 1) := hy'
       rw [mem_ball] at hdy ⊢
-      calc dist y' y ≤ dist y' d + dist d y := dist_triangle _ _ _
+      calc
+        dist y' y
+          ≤ dist y' d + dist d y := dist_triangle _ _ _
         _ < 1 / ((n : ℝ) + 1) + 1 / ((n : ℝ) + 1) := add_lt_add hy'' hdy
         _ < ε := by linarith
-    have hG := mem_secSet_of_sheet (P := P) (Ψ := Ψ) (B := Bl p) (γ := γ') fun y' hy' =>
-      hball y' (hBsub hy')
+    have hG :=
+      mem_secSet_of_sheet (P := P) (Ψ := Ψ) (B := Bl p) (γ := γ') fun y' hy' => hball y' (hBsub hy')
     let t : T := ⟨p, _, hG⟩
-    have hL : ∃ γ, Lift t γ := ⟨γ', fun y' hy' => ⟨(hball y' (hBsub hy')).1,
-      (hball y' (hBsub hy')).2.1, by simp only [t]; rw [Set.indicator_of_mem hy']⟩⟩
+    have hL : ∃ γ, Lift t γ := ⟨
+      γ',
+      fun y' hy' => ⟨
+        (hball y' (hBsub hy')).1,
+        (hball y' (hBsub hy')).2.1,
+        by simp only [t]; rw [Set.indicator_of_mem hy']
+      ⟩
+    ⟩
     obtain ⟨m, hm⟩ := hf (some t)
     refine ⟨m, ?_, ?_⟩
     · show y ∈ Bo (f m)

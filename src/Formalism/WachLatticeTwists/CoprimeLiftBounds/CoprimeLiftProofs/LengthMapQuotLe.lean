@@ -27,23 +27,32 @@ lemma length_map_quot_le {O X Y : Type*} [CommRing O] [AddCommGroup X] [Module O
     exact ⟨Submodule.Quotient.mk x, rfl⟩
 
 theorem rowRho : StatRowRho := by
-  intro O _ _ _ Dw _ M _ _ ρM ε T₁ T₂ _ _ _ _ ρ₁ π γ C₁ CP Hc Cs _ _ cls pr Fs Im X
-    hTate hIm hle hX hcup
-  refine ⟨(annih pr Im).map Hc.subtype, Submodule.map_mono (annih_anti pr hle),
+  intro O _ _ _ Dw _ M _ _ ρM ε T₁ T₂ _ _ _ _ ρ₁ π γ C₁ CP Hc Cs _ _ cls pr Fs Im X hTate hIm hle hX
+    hcup
+  refine ⟨
+    (annih pr Im).map Hc.subtype,
+    Submodule.map_mono (annih_anti pr hle),
     (length_map_quot_le Hc.subtype (annih pr Im) (annih pr Fs)).trans
-      (annColength O Hc Cs pr Fs Im hle), fun b hb => ?_⟩
+      (annColength O Hc Cs pr Fs Im hle),
+    fun b hb => ?_
+  ⟩
   refine ⟨⟨_, hX b hb⟩, ?_, rfl⟩
   refine (mem_annih pr Im _).2 fun x hx => ?_
   obtain ⟨a, ha, hC, rfl⟩ := hIm x hx
   exact hTate a b (hX b hb) ha hC (hcup b hb a ha hC)
 
 section PsiY
-variable {O A T' G : Type*} [CommRing O] [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G]
+variable
+  {O A T' G : Type*} [CommRing O] [Ring A] [Algebra O A] [CommRing T'] [Algebra T' A] [Group G]
   {M : Type*} [AddCommGroup M] [Module A M] [Module O M] [IsScalarTower O A M]
 
-def psiY (r : G →* A) (χ : G →* T'ˣ) (E e₁ : A) (δ : T') {ι : Type*} [DecidableEq ι]
-    (D : ι → Subgroup G) (j : ι → ℕ) (Kc : ∀ l, Fin (j l) → G → A) (k0 : ι → G → A)
-    (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M) : Ymod r χ E →ₗ[O] M :=
+def psiY
+    (r : G →* A) (χ : G →* T'ˣ) (E e₁ : A) (δ : T')
+    {ι : Type*} [DecidableEq ι]
+    (D : ι → Subgroup G)
+    (j : ι → ℕ) (Kc : ∀ l, Fin (j l) → G → A)
+    (k0 : ι → G → A) (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M)
+    : Ymod r χ E →ₗ[O] M :=
   (φ ∘ₗ (Submodule.mkQ _) ∘ₗ (LinearMap.inl A (Ymod r χ E) _)).restrictScalars O
 
 end PsiY

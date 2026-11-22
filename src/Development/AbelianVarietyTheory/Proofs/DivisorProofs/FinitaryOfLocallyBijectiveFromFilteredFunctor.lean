@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SheafSection
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.FinitaryOfLocBij
 
@@ -118,16 +119,26 @@ lemma po_colim {J : Type} [SmallCategory J] {D : J ⥤ CommRingCat.{0}} {c : Coc
   rw [← e1, ← hk.2.1] at hbig
   exact IsPushout.of_top hbig hk.2.2 hk.1
 
-theorem surj (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (η : M ⟶ onRings F)
+theorem surj
+    (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (η : M ⟶ onRings F)
     (hM : PreservesFilteredColimitsOfSize.{0, 0} M)
-    (hloc : ∀ (A : CommRingCat.{0}) (x : (onRings F).obj A), ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i) (m : ∀ i, M.obj (B i)), (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p) ∧ ∀ i, (η.app (B i)).hom (m i) = ((onRings F).map (g i)).hom x)
-    (hinj : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D), IsColimit c → ∀ (j : J) (y : (onRings F).obj (D.obj j)), ((onRings F).map (c.ι.app j)).hom y = 0 → ∃ (k : J) (f : j ⟶ k), ((onRings F).map (D.map f)).hom y = 0)
-    (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D)
-    (hc : IsColimit c) (x : (onRings F).obj c.pt) :
-    ∃ (j : J) (y : (onRings F).obj (D.obj j)), ((onRings F).map (c.ι.app j)).hom y = x := by
+    (hloc : ∀ (A : CommRingCat.{0}) (x : (onRings F).obj A),
+      ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i)
+          (m : ∀ i, M.obj (B i)),
+        (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p)
+          ∧ ∀ i, (η.app (B i)).hom (m i) = ((onRings F).map (g i)).hom x)
+    (hinj : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D),
+      IsColimit c
+        → ∀ (j : J) (y : (onRings F).obj (D.obj j)),
+          ((onRings F).map (c.ι.app j)).hom y = 0
+            → ∃ (k : J) (f : j ⟶ k), ((onRings F).map (D.map f)).hom y = 0)
+    (J : Type) [SmallCategory J] [IsFiltered J]
+    (D : J ⥤ CommRingCat.{0}) (c : Cocone D) (hc : IsColimit c) (x : (onRings F).obj c.pt)
+    : ∃ (j : J) (y : (onRings F).obj (D.obj j)), ((onRings F).map (c.ι.app j)).hom y = x := by
   classical
   obtain ⟨ι, _, B, g, m, hg, hcov, hm⟩ := hloc _ x
-  have hMel := (GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements _ M).2.1 hM
+  have hMel :=
+    (GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements _ M).2.1 hM
   obtain ⟨j0⟩ := IsFiltered.nonempty (C := J)
   obtain ⟨j, -, B', g', h, hsq, hcov'⟩ :=
     GlobalTheory.EtaleCoverDescent.exists_etale_cover_model_of_isColimit J D c hc ι B g hg hcov j0
@@ -140,8 +151,8 @@ theorem surj (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (
   letI := Fintype.ofFinite ι
   obtain ⟨K, hK⟩ := IsFiltered.sup_objs_exists (Finset.univ.image k)
   have e : ∀ i, k i ⟶ K := fun i => (hK (Finset.mem_image_of_mem _ (Finset.mem_univ i))).some
-  let s : ∀ i, (onRings F).obj ((D' i).obj K) :=
-    fun i => (η.app _).hom ((M.map ((D' i).map (e i))).hom (n i))
+  let s : ∀ i, (onRings F).obj ((D' i).obj K) := fun i =>
+    (η.app _).hom ((M.map ((D' i).map (e i))).hom (n i))
   have hs : ∀ i, ((onRings F).map ((ιB i).app K)).hom (s i) = ((onRings F).map (g i)).hom x := by
     intro i
     simp only [s]
@@ -149,19 +160,21 @@ theorem surj (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (
     exact hm i
   let Kp : Under K.right → Under j := fun L => Under.mk (K.hom ≫ L.hom)
   let φ : ∀ L : Under K.right, K ⟶ Kp L := fun L => Under.homMk L.hom
-  let s' : ∀ (L : Under K.right) i, (onRings F).obj ((D' i).obj (Kp L)) :=
-    fun L i => ((onRings F).map ((D' i).map (φ L))).hom (s i)
-  have hover : ∀ a b : ι, ∃ L0 : Under K.right, ∀ (L : Under K.right) (_ : L0 ⟶ L),
-      ((onRings F).map (pushout.inl ((u a).app (Kp L)) ((u b).app (Kp L)))).hom (s' L a) =
-      ((onRings F).map (pushout.inr ((u a).app (Kp L)) ((u b).app (Kp L)))).hom (s' L b) := by
+  let s' : ∀ (L : Under K.right) i, (onRings F).obj ((D' i).obj (Kp L)) := fun L i =>
+    ((onRings F).map ((D' i).map (φ L))).hom (s i)
+  have hover
+      : ∀ a b : ι, ∃ L0 : Under K.right, ∀ (L : Under K.right) (_ : L0 ⟶ L),
+        ((onRings F).map (pushout.inl ((u a).app (Kp L)) ((u b).app (Kp L)))).hom (s' L a)
+          = ((onRings F).map (pushout.inr ((u a).app (Kp L)) ((u b).app (Kp L)))).hom (s' L b) := by
     intro a b
     let w : pushout ((u a).app K) ((u b).app K) ⟶ pushout (g a) (g b) :=
       pushout.desc ((ιB a).app K ≫ pushout.inl (g a) (g b)) ((ιB b).app K ≫ pushout.inr (g a) (g b))
         (by
-          have hua : ∀ i, (u i).app K ≫ (ιB i).app K = c.ι.app K.right ≫ g i := fun i => (hpush i K).2.2
+          have hua : ∀ i, (u i).app K ≫ (ιB i).app K = c.ι.app K.right ≫ g i := fun i =>
+            (hpush i K).2.2
           rw [reassoc_of% (hua a), reassoc_of% (hua b)]
-          exact (Category.assoc _ _ _).trans ((c.ι.app K.right ≫= pushout.condition).trans
-            (Category.assoc _ _ _).symm))
+          exact (Category.assoc _ _ _).trans
+            ((c.ι.app K.right ≫= pushout.condition).trans (Category.assoc _ _ _).symm))
     let t : (onRings F).obj (pushout ((u a).app K) ((u b).app K)) :=
       ((onRings F).map (pushout.inl _ _)).hom (s a) - ((onRings F).map (pushout.inr _ _)).hom (s b)
     have ht : ((onRings F).map w).hom t = 0 := by
@@ -186,33 +199,35 @@ theorem surj (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (
         simpa using (v''.naturality (f ≫ ψ)).symm
       rw [← e1, map_comp_apply, map_comp_apply, hf, map_zero]
     let w' : pushout ((u a).app K) ((u b).app K) ⟶ pushout ((u a).app (Kp L)) ((u b).app (Kp L)) :=
-      pushout.desc ((D' a).map (φ L) ≫ pushout.inl _ _) ((D' b).map (φ L) ≫ pushout.inr _ _)
-        (by
-          rw [← Category.assoc, ← Category.assoc, ← (u a).naturality, ← (u b).naturality]
-          simp only [Category.assoc, pushout.condition])
+      pushout.desc ((D' a).map (φ L) ≫ pushout.inl _ _) ((D' b).map (φ L) ≫ pushout.inr _ _) (by
+        rw [← Category.assoc, ← Category.assoc, ← (u a).naturality, ← (u b).naturality]
+        simp only [Category.assoc, pushout.condition])
     have hPO' : IsPushout ((u a).app K ≫ pushout.inl _ _) (D.map L.hom) w'
         ((u a).app (Kp L) ≫ pushout.inl _ _) :=
       isPushout_pushouts (po_stage (fun k => (hpush a k).1) (φ L))
-        (po_stage (fun k => (hpush b k).1) (φ L))
-        (IsPushout.of_hasPushout _ _) (IsPushout.of_hasPushout _ _) (pushout.inl_desc _ _ _)
-        (pushout.inr_desc _ _ _)
+        (po_stage (fun k => (hpush b k).1) (φ L)) (IsPushout.of_hasPushout _ _)
+        (IsPushout.of_hasPushout _ _) (pushout.inl_desc _ _ _) (pushout.inr_desc _ _ _)
     have hw' : v''.app L ≫ ((hpush'' L).1.isoIsPushout _ _ hPO').hom = w' :=
       IsPushout.inl_isoIsPushout_hom _ _ (hpush'' L).1 hPO'
-    have hwt : ((onRings F).map w').hom t = 0 := by
-      rw [← hw', map_comp_apply, hvL, map_zero]
-    simp only [t, map_sub, sub_eq_zero, ← map_comp_apply, w', pushout.inl_desc,
-      pushout.inr_desc] at hwt
+    have hwt : ((onRings F).map w').hom t = 0 := by rw [← hw', map_comp_apply, hvL, map_zero]
+    simp only [t, map_sub, sub_eq_zero, ← map_comp_apply, w', pushout.inl_desc, pushout.inr_desc]
+      at hwt
     simpa only [s', ← map_comp_apply] using hwt
   choose L0 hL0 using hover
   obtain ⟨Lc, hLc⟩ := IsFiltered.sup_objs_exists (Finset.univ.image (fun p : ι × ι => L0 p.1 p.2))
   have ψ : ∀ a b, L0 a b ⟶ Lc := fun a b =>
     (hLc (Finset.mem_image_of_mem (fun p : ι × ι => L0 p.1 p.2) (Finset.mem_univ (a, b)))).some
   let e' : ∀ i, D.obj Lc.right ⟶ (D' i).obj (Kp Lc) := fun i => (u i).app (Kp Lc)
-  obtain ⟨y, hy⟩ := glue F e'
-    (fun i => etale_inr (hpush i (Kp Lc)).1 (hsq i).1)
-    (cover_inr g' (D.map (Kp Lc).hom) (fun i => (v i).app (Kp Lc)) e'
-      (fun i => (hpush i _).1) hcov')
-    (s' Lc) (fun a b => hL0 a b Lc (ψ a b))
+  obtain ⟨y, hy⟩ :=
+    glue F e'
+      (fun i => etale_inr (hpush i (Kp Lc)).1 (hsq i).1)
+      (cover_inr g' (D.map (Kp Lc).hom)
+        (fun i => (v i).app (Kp Lc))
+        e'
+        (fun i => (hpush i _).1)
+        hcov')
+      (s' Lc)
+      (fun a b => hL0 a b Lc (ψ a b))
   refine ⟨Lc.right, y, ?_⟩
   apply sep F g hg hcov
   intro i
@@ -225,11 +240,26 @@ end GlobalTheory.EtC.FinitaryOfLocBij
 
 namespace GlobalTheory.EtC.FinitaryOfLocBij
 
-theorem finitary_of_locally_bijective : ∀ (R : Type) [CommRing R] (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R) (η : M ⟶ onRings F), PreservesFilteredColimitsOfSize.{0, 0} M → (∀ (A : CommRingCat.{0}) (x : (onRings F).obj A), ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i) (m : ∀ i, M.obj (B i)), (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p) ∧ ∀ i, (η.app (B i)).hom (m i) = ((onRings F).map (g i)).hom x) → (∀ (A : CommRingCat.{0}) (m : M.obj A), (η.app A).hom m = 0 → ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i), (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p) ∧ ∀ i, (M.map (g i)).hom m = 0) → Finitary F := by
+theorem finitary_of_locally_bijective
+    : ∀ (R : Type) [CommRing R] (M : CommRingCat.{0} ⥤ ModuleCat.{1} (ULift.{1} R)) (F : Shv R)
+        (η : M ⟶ onRings F),
+      PreservesFilteredColimitsOfSize.{0, 0} M
+        → (∀ (A : CommRingCat.{0}) (x : (onRings F).obj A),
+          ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i)
+              (m : ∀ i, M.obj (B i)),
+            (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p)
+              ∧ ∀ i, (η.app (B i)).hom (m i) = ((onRings F).map (g i)).hom x)
+        → (∀ (A : CommRingCat.{0}) (m : M.obj A),
+          (η.app A).hom m = 0
+            → ∃ (ι : Type) (_ : Finite ι) (B : ι → CommRingCat.{0}) (g : ∀ i, A ⟶ B i),
+              (∀ i, (g i).hom.Etale) ∧ (∀ p : Spec A, ∃ i v, Spec.map (g i) v = p)
+                ∧ ∀ i, (M.map (g i)).hom m = 0)
+        → Finitary F := by
   intro R _ M F η hM hloc hker
   have hinj := GlobalTheory.T.sheafSection_eq_zero_at_stage_of_filtered_colimit R M F η hM hloc hker
   show PreservesFilteredColimitsOfSize.{0, 0} (onRings F)
-  refine (GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements _ (onRings F)).2.2 ?_
+  refine (GlobalTheory.EtC.FilteredElements.preservesFilteredColimits_modules_iff_elements _
+    (onRings F)).2.2 ?_
   intro J _ _ D c hc
   exact ⟨surj M F η hM hloc hinj J D c hc, hinj J D c hc⟩
 

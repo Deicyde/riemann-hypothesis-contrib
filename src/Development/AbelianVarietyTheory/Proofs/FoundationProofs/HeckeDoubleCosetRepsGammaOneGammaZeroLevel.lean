@@ -299,13 +299,16 @@ lemma diag_mem {N l q : ℕ} (hq : q.Prime) (hqNl : ¬ q ∣ N * l) (hqN : IsUni
     ext a b
     fin_cases a <;> fin_cases b <;> simp [dg, Matrix.mul_apply, Fin.sum_univ_two] <;> ring
 
-theorem tq_reps {N l q : ℕ} (hq : q.Prime) (hqNl : ¬ q ∣ N * l) (σ : SL(2, ℤ))
-    (hσ : IsDiam N l (q : ZMod N) σ) : IsDCReps (Lev N l) (dg 1 q) (tqFam q σ) := by
+theorem tq_reps
+    {N l q : ℕ} (hq : q.Prime) (hqNl : ¬ q ∣ N * l) (σ : SL(2, ℤ)) (hσ : IsDiam N l (q : ZMod N) σ)
+    : IsDCReps (Lev N l) (dg 1 q) (tqFam q σ) := by
   have := Fact.mk hq
-  have hqN : IsUnit (q : ZMod N) := (ZMod.isUnit_iff_coprime q N).2
-    ((Nat.Prime.coprime_iff_not_dvd hq).2 fun h => hqNl (dvd_mul_of_dvd_left h l))
-  have hql : IsUnit (q : ZMod l) := (ZMod.isUnit_iff_coprime q l).2
-    ((Nat.Prime.coprime_iff_not_dvd hq).2 fun h => hqNl (dvd_mul_of_dvd_right h N))
+  have hqN : IsUnit (q : ZMod N) :=
+    (ZMod.isUnit_iff_coprime q N).2
+      ((Nat.Prime.coprime_iff_not_dvd hq).2 fun h => hqNl (dvd_mul_of_dvd_left h l))
+  have hql : IsUnit (q : ZMod l) :=
+    (ZMod.isUnit_iff_coprime q l).2
+      ((Nat.Prime.coprime_iff_not_dvd hq).2 fun h => hqNl (dvd_mul_of_dvd_right h N))
   refine ⟨fun i => ?_, fun γ₁ γ₂ => ?_⟩
   · by_cases hi : (i : ℕ) < q
     · rw [tqFam_lt σ i hi]
@@ -314,10 +317,13 @@ theorem tq_reps {N l q : ℕ} (hq : q.Prime) (hqNl : ¬ q ∣ N * l) (σ : SL(2,
       exact diag_mem hq hqNl hqN σ hσ
   · obtain ⟨hdet, ha, hc, hcl⟩ := dc_entries q γ₁ γ₂ γ₁.2 γ₂.2
     have key : ∃ i, ∃ γ : Lev N l, mat γ₁ * dg 1 q * mat γ₂ = mat γ * tqFam q σ i := by
-      by_cases hnd : (((mat γ₁ * dg 1 q * mat γ₂) 0 0 : ℤ) : ZMod q) = 0 ∧
-          (((mat γ₁ * dg 1 q * mat γ₂) 1 0 : ℤ) : ZMod q) = 0
-      · obtain ⟨γ, hγ, hM⟩ := diam_case hq.ne_zero hqN hql σ hσ _ hdet ha hc hcl
-          ((CharP.intCast_eq_zero_iff (ZMod q) q _).1 hnd.1) ((CharP.intCast_eq_zero_iff (ZMod q) q _).1 hnd.2)
+      by_cases hnd
+        : (((mat γ₁ * dg 1 q * mat γ₂) 0 0 : ℤ) : ZMod q) = 0
+          ∧ (((mat γ₁ * dg 1 q * mat γ₂) 1 0 : ℤ) : ZMod q) = 0
+      · obtain ⟨γ, hγ, hM⟩ :=
+          diam_case hq.ne_zero hqN hql σ hσ _ hdet ha hc hcl
+            ((CharP.intCast_eq_zero_iff (ZMod q) q _).1 hnd.1)
+            ((CharP.intCast_eq_zero_iff (ZMod q) q _).1 hnd.2)
         exact ⟨Fin.last q, ⟨γ, hγ⟩, by rw [tqFam_ge σ _ (by simp)]; exact hM⟩
       · obtain ⟨j, hj, γ, hγ, hM⟩ := exists_upper hq hqN _ hdet ha hc hcl hnd
         exact ⟨⟨j, by omega⟩, ⟨γ, hγ⟩, by rw [tqFam_lt σ _ hj]; exact hM⟩
@@ -343,15 +349,19 @@ private lemma mul_dg_mul_entry_ne_zero_mod_prime (l : ℕ) [Fact l.Prime] (A B :
   rw [ZMod.natCast_self, mul_zero, zero_mul, add_zero]
   exact mul_ne_zero hA0 hB0
 
-theorem ul_reps {N l : ℕ} (hl : l.Prime) (hlN : ¬ l ∣ N) : IsDCReps (Lev N l) (dg 1 l) (ulFam l) := by
+theorem ul_reps {N l : ℕ} (hl : l.Prime) (hlN : ¬ l ∣ N)
+    : IsDCReps (Lev N l) (dg 1 l) (ulFam l) := by
   have := Fact.mk hl
-  have hlN' : IsUnit (l : ZMod N) := (ZMod.isUnit_iff_coprime l N).2 ((Nat.Prime.coprime_iff_not_dvd hl).2 hlN)
+  have hlN' : IsUnit (l : ZMod N) :=
+    (ZMod.isUnit_iff_coprime l N).2 ((Nat.Prime.coprime_iff_not_dvd hl).2 hlN)
   refine ⟨fun i => upper_mem N l l i, fun γ₁ γ₂ => ?_⟩
   obtain ⟨hdet, ha, hc, hcl⟩ := dc_entries l γ₁ γ₂ γ₁.2 γ₂.2
   have h₁ := γ₁.2
   have h₂ := γ₂.2
   rw [lev_iff] at h₁ h₂
-  have hx := mul_dg_mul_entry_ne_zero_mod_prime l (mat γ₁) (mat γ₂) (sl2_entry_det_eq_one γ₁) (sl2_entry_det_eq_one γ₂) h₁.2.2.2 h₂.2.2.2
+  have hx :=
+    mul_dg_mul_entry_ne_zero_mod_prime l (mat γ₁) (mat γ₂) (sl2_entry_det_eq_one γ₁)
+      (sl2_entry_det_eq_one γ₂) h₁.2.2.2 h₂.2.2.2
   obtain ⟨j, hj, γ, hγ, hM⟩ := exists_upper hl hlN' _ hdet ha hc hcl (fun h => hx h.1)
   refine ⟨⟨j, hj⟩, ⟨⟨γ, hγ⟩, hM⟩, fun i' ⟨γ', hγ'⟩ => ?_⟩
   have h2 := cancel_left γ' γ (hγ'.symm.trans hM)
@@ -387,16 +397,30 @@ lemma diam_conj {N l : ℕ} {d : ZMod N} {σ : SL(2, ℤ)} (hσ : IsDiam N l d �
   · linear_combination (((mat γ 0 0 : ℤ) : ZMod N) * ((mat σ 1 1 : ℤ) : ZMod N) - ((mat σ 1 0 : ℤ) : ZMod N) * ((mat γ 0 1 : ℤ) : ZMod N) - ((mat σ 1 1 : ℤ) : ZMod N) * ((mat γ 1 1 : ℤ) : ZMod N)) * hs10N + ((mat σ 1 1 : ℤ) : ZMod N) * ((mat σ 1 1 : ℤ) : ZMod N) * g10
   · linear_combination (((mat γ 0 0 : ℤ) : ZMod l) * ((mat σ 1 1 : ℤ) : ZMod l) - ((mat σ 1 0 : ℤ) : ZMod l) * ((mat γ 0 1 : ℤ) : ZMod l) - ((mat σ 1 1 : ℤ) : ZMod l) * ((mat γ 1 1 : ℤ) : ZMod l)) * hs10l + ((mat σ 1 1 : ℤ) : ZMod l) * ((mat σ 1 1 : ℤ) : ZMod l) * g10l
 
-theorem diam_reps {N l : ℕ} (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N l d σ) :
-    IsDCReps (Lev N l) (mat σ) (fun _ : Unit => mat σ) := by
-  refine ⟨fun _ => ⟨1, 1, by simp⟩, fun γ₁ γ₂ => ⟨(), ⟨⟨(γ₁ : SL(2, ℤ)) * (σ * (γ₂ : SL(2, ℤ)) * σ⁻¹),
-    mul_mem γ₁.2 (diam_conj hσ γ₂ γ₂.2)⟩, ?_⟩, fun _ _ => rfl⟩⟩
+theorem diam_reps {N l : ℕ} (d : ZMod N) (σ : SL(2, ℤ)) (hσ : IsDiam N l d σ)
+    : IsDCReps (Lev N l) (mat σ) (fun _ : Unit => mat σ) := by
+  refine ⟨
+    fun _ => ⟨1, 1, by simp⟩,
+    fun γ₁ γ₂ => ⟨
+      (),
+      ⟨⟨(γ₁ : SL(2, ℤ)) * (σ * (γ₂ : SL(2, ℤ)) * σ⁻¹), mul_mem γ₁.2 (diam_conj hσ γ₂ γ₂.2)⟩, ?_⟩,
+      fun _ _ => rfl
+    ⟩
+  ⟩
   simp only [← mat_mul']
   congr 1
   show (γ₁ : SL(2, ℤ)) * σ * γ₂ = (γ₁ : SL(2, ℤ)) * (σ * (γ₂ : SL(2, ℤ)) * σ⁻¹) * σ
   group
 
-theorem dcReps_level : ∀ (N l : ℕ), 5 ≤ N → l.Prime → ¬ l ∣ N → (∀ (q : ℕ) (σ : SL(2, ℤ)), q.Prime → ¬ q ∣ N * l → IsDiam N l (q : ZMod N) σ → IsDCReps (Lev N l) (dg 1 q) (tqFam q σ)) ∧ IsDCReps (Lev N l) (dg 1 l) (ulFam l) ∧ ∀ (d : ZMod N) (σ : SL(2, ℤ)), IsDiam N l d σ → IsDCReps (Lev N l) (mat σ) (fun _ : Unit => mat σ) := by
+theorem dcReps_level
+    : ∀ (N l : ℕ),
+      5 ≤ N → l.Prime → ¬ l ∣ N
+        → (∀ (q : ℕ) (σ : SL(2, ℤ)),
+            q.Prime → ¬ q ∣ N * l → IsDiam N l (q : ZMod N) σ
+              → IsDCReps (Lev N l) (dg 1 q) (tqFam q σ))
+          ∧ IsDCReps (Lev N l) (dg 1 l) (ulFam l)
+          ∧ ∀ (d : ZMod N) (σ : SL(2, ℤ)),
+            IsDiam N l d σ → IsDCReps (Lev N l) (mat σ) (fun _ : Unit => mat σ) := by
   intro N l _ hl hlN
   exact ⟨fun q σ hq hqNl hσ => tq_reps hq hqNl σ hσ, ul_reps hl hlN, fun d σ hσ => diam_reps d σ hσ⟩
 

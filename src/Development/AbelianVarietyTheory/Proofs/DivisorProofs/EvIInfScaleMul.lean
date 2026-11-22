@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix ENNReal
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped Classical
 
 noncomputable section
@@ -17,8 +19,10 @@ namespace GlobalTheory.TorusTheta
 
 variable (F : Type) [Field F] [NumberField F]
 
-def infScale (s : ℝ) : AF F :=
-  ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (algebraMap ℝ (mixedEmbedding.mixedSpace F) s), 1)
+def infScale (s : ℝ) : AF F := (
+  (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (algebraMap ℝ (mixedEmbedding.mixedSpace F) s),
+  1
+)
 
 theorem infScale_mul_fst (s : ℝ) (x : AF F) : (infScale F s * x).1 = (infScale F s).1 * x.1 := rfl
 

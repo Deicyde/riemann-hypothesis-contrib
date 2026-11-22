@@ -11,11 +11,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EtaleLif
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Site
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Pb.Site
 
 namespace GlobalTheory.CompanionTheory.PDSpanning
 
-theorem exists_sum_dpow : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (z : (pq B).P), ∃ b : ℕ →₀ B, z = b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1) := by
+theorem exists_sum_dpow
+    : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (z : (pq B).P), ∃ b : ℕ →₀ B,
+      z = b.sum fun k c => algebraMap B (pq B).P c * (eta δ).dpow k ((pq B).e 1) := by
   intro B _ J δ z
   refine ⟨(pq B).e.repr z, ?_⟩
   have h := (pq B).e.linearCombination_repr z

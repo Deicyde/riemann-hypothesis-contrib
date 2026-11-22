@@ -17,8 +17,8 @@ def hkSig (k r : ℕ) (i : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
 
 def hkEps (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ := if i.val = r + k then -1 else 1
 
-theorem hk_apply (k r : ℕ) (i j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j = hkSig k r i then hkEps k r i else 0 := by
+theorem hk_apply (k r : ℕ) (i j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j = hkSig k r i then hkEps k r i else 0 := by
   obtain ⟨i, hi⟩ := i
   obtain ⟨j, hj⟩ := j
   simp only [Hpk, hkSig, hkEps, Fin.ext_iff]

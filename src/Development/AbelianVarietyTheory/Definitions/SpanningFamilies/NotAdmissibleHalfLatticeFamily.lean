@@ -33,12 +33,15 @@ theorem mem_stdL {m : ℕ} (x : Fin m → E) : x ∈ stdL E m ↔ ∀ a, IsInteg
       by_cases h : a = b
       · subst h; simpa using isIntegral_one
       · simpa [Pi.single_apply, h] using isIntegral_zero
-    | zero => intro a; exact isIntegral_zero
-    | add x y _ _ hx hy => intro a; exact (hx a).add (hy a)
+    | zero =>
+      intro a; exact isIntegral_zero
+    | add x y _ _ hx hy =>
+      intro a; exact (hx a).add (hy a)
     | smul c x _ hx =>
       intro a
       have : (c • x) a = (c : E) * x a := rfl
-      rw [this]; exact c.isIntegral_coe.mul (hx a)
+      rw [this]
+      exact c.isIntegral_coe.mul (hx a)
   · intro hx
     have : x = ∑ a, (⟨x a, hx a⟩ : 𝓞 E) • (Pi.single a 1 : Fin m → E) := by
       ext b
@@ -58,14 +61,9 @@ theorem herm_one {m : ℕ} (x y : Fin m → E) : herm 1 x y = ∑ a, x a * cc (y
   rw [Finset.sum_eq_single a] <;> simp +contextual [Matrix.one_apply, eq_comm]
 
 omit [IsCMField E] in
-theorem nat_smul_mem {m : ℕ} (Λ : Lt E m) (s : ℕ) {v : Fin m → E} (hv : v ∈ Λ) :
-    (s : E) • v ∈ Λ := by
+theorem nat_smul_mem {m : ℕ} (Λ : Lt E m) (s : ℕ) {v : Fin m → E} (hv : v ∈ Λ)
+    : (s : E) • v ∈ Λ := by
   rw [Nat.cast_smul_eq_nsmul]; exact Λ.toAddSubgroup.nsmul_mem hv s
-
-
-
-
-
 
 end
 

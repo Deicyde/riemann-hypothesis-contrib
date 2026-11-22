@@ -14,17 +14,12 @@ open scoped nonZeroDivisors
 namespace GlobalTheory.Hk
 
 structure LFam where
-
   G : Type
   [ag : AddCommGroup G]
   [ft : Fintype G]
-
   B : ℝ
-
   κ : ℝ
-
   a : G → ℕ → ℝ
-
   lam : G → ℕ → ℝ
   B_ge : 4 ≤ B
   card_le : (Fintype.card G : ℝ) ≤ B
@@ -35,13 +30,19 @@ structure LFam where
   a_one : a 0 1 = 1
   a_one_ne : ∀ g, g ≠ 0 → a g 1 = 0
   count : ∀ (g : G) (x : ℝ), 1 ≤ x → |∑ n ∈ Icc 1 ⌊x⌋₊, a g n - κ * x| ≤ 10 * Real.sqrt x
-  theta : ∀ (g : G) (t : ℝ), 0 < t → t ≤ 1 → |∑' n : ℕ, a g n * Real.exp (-(t * n)) - κ / t| ≤ B ^ 10 * t
+  theta
+    : ∀ (g : G) (t : ℝ),
+      0 < t → t ≤ 1 → |∑' n : ℕ, a g n * Real.exp (-(t * n)) - κ / t| ≤ B ^ 10 * t
   lam_nonneg : ∀ g n, 0 ≤ lam g n
   lam_le : ∀ n, ∑ g, lam g n ≤ 2 * Λ n
   conv : ∀ g n, a g n * Real.log n = ∑ h, ∑ p ∈ n.divisorsAntidiagonal, lam h p.1 * a (g - h) p.2
-  sq : ∀ χ : AddChar G ℂ, χ * χ = 1 → ∀ n : ℕ,
-    0 ≤ ∑ p ∈ n.divisorsAntidiagonal, (∑ g, a g p.1) * ∑ g, (χ g).re * a g p.2 ∧
-    ∑ g, a g n ≤ ∑ p ∈ (n ^ 2).divisorsAntidiagonal, (∑ g, a g p.1) * ∑ g, (χ g).re * a g p.2
+  sq
+    : ∀ χ : AddChar G ℂ,
+      χ * χ = 1
+        → ∀ n : ℕ,
+          0 ≤ ∑ p ∈ n.divisorsAntidiagonal, (∑ g, a g p.1) * ∑ g, (χ g).re * a g p.2
+            ∧ ∑ g, a g n
+              ≤ ∑ p ∈ (n ^ 2).divisorsAntidiagonal, (∑ g, a g p.1) * ∑ g, (χ g).re * a g p.2
 
 attribute [instance] LFam.ag LFam.ft
 
@@ -53,13 +54,11 @@ def aChi (n : ℕ) : ℂ := ∑ g, χ g * (𝓕.a g n : ℂ)
 
 def lamChi (n : ℕ) : ℂ := ∑ g, χ g * (𝓕.lam g n : ℂ)
 
-
 open Classical in
 def res : ℂ := if χ = 1 then ((𝓕.κ * Fintype.card 𝓕.G : ℝ) : ℂ) else 0
 
 def mel (s : ℂ) : ℂ :=
   ∫ x in Set.Ioi (1 : ℝ), ((∑ n ∈ Icc 1 ⌊x⌋₊, 𝓕.aChi χ n) - 𝓕.res χ * x) * (x : ℂ) ^ (-s - 1)
-
 
 open Classical in
 def F (s : ℂ) : ℂ := if χ = 1 then 𝓕.res χ * s + (s - 1) * s * 𝓕.mel χ s else s * 𝓕.mel χ s
@@ -69,8 +68,8 @@ def psi (x : ℝ) : ℂ := ∑ n ∈ Icc 1 ⌊x⌋₊, 𝓕.lamChi χ n
 def ell (t : ℝ) : ℝ := Real.log (𝓕.B * (|t| + 2))
 
 def ExcZ (c : ℝ) (Z : Finset ℝ) : Prop :=
-  Z.card ≤ 1 ∧ (∀ β ∈ Z, 1 - c / 𝓕.ell 0 ≤ β ∧ β < 1 ∧ 𝓕.F χ β = 0 ∧ deriv (𝓕.F χ) β ≠ 0) ∧
-    ∀ s : ℂ, 1 - c / 𝓕.ell s.im ≤ s.re → 𝓕.F χ s = 0 → ∃ β ∈ Z, s = (β : ℂ)
+  Z.card ≤ 1 ∧ (∀ β ∈ Z, 1 - c / 𝓕.ell 0 ≤ β ∧ β < 1 ∧ 𝓕.F χ β = 0 ∧ deriv (𝓕.F χ) β ≠ 0)
+    ∧ ∀ s : ℂ, 1 - c / 𝓕.ell s.im ≤ s.re → 𝓕.F χ s = 0 → ∃ β ∈ Z, s = (β : ℂ)
 
 theorem two_lt_ell (t : ℝ) : 2 < 𝓕.ell t := by
   have hB := 𝓕.B_ge
@@ -83,10 +82,10 @@ theorem two_lt_ell (t : ℝ) : 2 < 𝓕.ell t := by
   unfold ell
   linarith
 
-theorem half_lt_re_of_region {c : ℝ} (hc : c ≤ 1) {s : ℂ} (hs : 1 - c / 𝓕.ell s.im ≤ s.re) : 1 / 2 < s.re := by
+theorem half_lt_re_of_region {c : ℝ} (hc : c ≤ 1) {s : ℂ} (hs : 1 - c / 𝓕.ell s.im ≤ s.re)
+    : 1 / 2 < s.re := by
   have h := 𝓕.two_lt_ell s.im
-  have : c / 𝓕.ell s.im < 1 / 2 := by
-    rw [div_lt_iff₀ (by linarith)]; linarith
+  have : c / 𝓕.ell s.im < 1 / 2 := by rw [div_lt_iff₀ (by linarith)]; linarith
   linarith
 
 end LFam
@@ -98,13 +97,14 @@ variable {K : Type} [Field K] [NumberField K] {M : ℕ} (D : GlobalTheory.Mem.Ra
 def idealsIn (g : D.G) (n : ℕ) : Set (Ideal (𝓞 K)) :=
   {I | I ≠ ⊥ ∧ IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ Ideal.absNorm I = n ∧ D.cls I = g}
 
-
 open Classical in
-def lamIdeal (I : Ideal (𝓞 K)) : ℝ :=
-  by
-    classical
-    exact if ∃ (P : Ideal (𝓞 K)) (k : ℕ), P.IsPrime ∧ P ≠ ⊥ ∧ 1 ≤ k ∧ I = P ^ k then
-      Real.log (Ideal.absNorm I.radical) else 0
+def lamIdeal (I : Ideal (𝓞 K)) : ℝ := by
+  classical
+  exact
+    if ∃ (P : Ideal (𝓞 K)) (k : ℕ), P.IsPrime ∧ P ≠ ⊥ ∧ 1 ≤ k ∧ I = P ^ k then
+      Real.log (Ideal.absNorm I.radical)
+    else
+      0
 
 def aRay (g : D.G) (n : ℕ) : ℝ := ((idealsIn D g n).ncard : ℝ)
 
@@ -133,48 +133,62 @@ theorem count_odd (N : ℕ) : |∑ n ∈ Icc 1 N, ao n - N / 2| ≤ 1 / 2 := by
       rw [Finset.sum_Icc_succ_top (by omega), ih]
       unfold ao
       by_cases h : Odd k
-      · have : ¬ Odd (k+1) := by rw [Nat.odd_add_one]; simpa using h
-        simp [h, this]; ring
-      · have : Odd (k+1) := by rw [Nat.odd_add_one]; simpa using h
-        simp [h, this]; ring
-  rw [this]; unfold ao; split_ifs <;> simp [abs_le] <;> norm_num
+      · have : ¬ Odd (k + 1) := by rw [Nat.odd_add_one]; simpa using h
+        simp [h, this]
+        ring
+      · have : Odd (k + 1) := by rw [Nat.odd_add_one]; simpa using h
+        simp [h, this]
+        ring
+  rw [this]
+  unfold ao
+  split_ifs <;> simp [abs_le] <;> norm_num
 
-theorem tsum_odd (t : ℝ) (ht : 0 < t) :
-    ∑' n : ℕ, ao n * Real.exp (-(t * n)) = Real.exp (-t) / (1 - Real.exp (-t) ^ 2) := by
+theorem tsum_odd (t : ℝ) (ht : 0 < t)
+    : ∑' n : ℕ, ao n * Real.exp (-(t * n)) = Real.exp (-t) / (1 - Real.exp (-t) ^ 2) := by
   have h1 : Real.exp (-t) < 1 := by simpa using ht
   have h0 := Real.exp_pos (-t)
   have hq : Real.exp (-t) ^ 2 < 1 := by nlinarith
-  have ho : HasSum (fun k : ℕ => ao (2 * k + 1) * Real.exp (-(t * ((2 * k + 1 : ℕ) : ℝ))))
+  have ho : HasSum
+      (fun k : ℕ => ao (2 * k + 1) * Real.exp (-(t * ((2 * k + 1 : ℕ) : ℝ))))
       (Real.exp (-t) * (1 - Real.exp (-t) ^ 2)⁻¹) := by
     have := (hasSum_geometric_of_lt_one (by positivity) hq).mul_left (Real.exp (-t))
-    have e : (fun k : ℕ => ao (2 * k + 1) * Real.exp (-(t * ((2 * k + 1 : ℕ) : ℝ)))) =
-        fun i : ℕ => Real.exp (-t) * (Real.exp (-t) ^ 2) ^ i := by
+    have e
+        : (fun k : ℕ => ao (2 * k + 1) * Real.exp (-(t * ((2 * k + 1 : ℕ) : ℝ))))
+          = fun i : ℕ => Real.exp (-t) * (Real.exp (-t) ^ 2) ^ i := by
       funext k
       rw [← pow_mul, ← pow_succ', ← Real.exp_nat_mul]
-      simp [ao]; ring
-    rw [e]; exact this
+      simp [ao]
+      ring
+    rw [e]
+    exact this
   have he : HasSum (fun k : ℕ => ao (2 * k) * Real.exp (-(t * ((2 * k : ℕ) : ℝ)))) 0 := by
-    have e : (fun k : ℕ => ao (2 * k) * Real.exp (-(t * ((2 * k : ℕ) : ℝ)))) = fun _ : ℕ => (0 : ℝ) := by
+    have e
+        : (fun k : ℕ => ao (2 * k) * Real.exp (-(t * ((2 * k : ℕ) : ℝ))))
+          = fun _ : ℕ => (0 : ℝ) := by
       funext k
       have : ¬ Odd (2 * k) := by simp
       simp only [ao, if_neg this, zero_mul]
-    rw [e]; exact hasSum_zero
+    rw [e]
+    exact hasSum_zero
   have := HasSum.even_add_odd (f := fun n : ℕ => ao n * Real.exp (-(t * n))) he ho
-  rw [this.tsum_eq]; simp [div_eq_mul_inv]
+  rw [this.tsum_eq]
+  simp [div_eq_mul_inv]
 
-theorem sinh_bound (t : ℝ) (ht : 0 < t) (h1 : t ≤ 1) :
-    |Real.exp (-t) / (1 - Real.exp (-t) ^ 2) - (1 / 2) / t| ≤ 4 ^ 10 * t := by
+theorem sinh_bound (t : ℝ) (ht : 0 < t) (h1 : t ≤ 1)
+    : |Real.exp (-t) / (1 - Real.exp (-t) ^ 2) - (1 / 2) / t| ≤ 4 ^ 10 * t := by
   have hs : Real.exp (-t) / (1 - Real.exp (-t) ^ 2) = (1 / 2) / Real.sinh t := by
     have h1 : Real.exp (-t) < 1 := by simpa using ht
     have h0 := Real.exp_pos (-t)
     have hq : 0 < 1 - Real.exp (-t) ^ 2 := by nlinarith
     have hp : 0 < Real.sinh t := Real.sinh_pos_iff.2 ht
     have e : Real.exp t * Real.exp (-t) = 1 := by rw [← Real.exp_add]; simp
-    rw [div_eq_div_iff hq.ne' hp.ne', Real.sinh_eq]; nlinarith
+    rw [div_eq_div_iff hq.ne' hp.ne', Real.sinh_eq]
+    nlinarith
   have hl : t ≤ Real.sinh t := Real.self_le_sinh_iff.2 ht.le
   have hu : Real.sinh t ≤ t + t ^ 3 := by
     have a := Real.exp_bound (x := t) (by rw [abs_of_pos ht]; exact h1) (n := 3) (by norm_num)
-    have b := Real.exp_bound (x := -t) (by rw [abs_neg, abs_of_pos ht]; exact h1) (n := 3) (by norm_num)
+    have b :=
+      Real.exp_bound (x := -t) (by rw [abs_neg, abs_of_pos ht]; exact h1) (n := 3) (by norm_num)
     simp [Finset.sum_range_succ, abs_of_pos ht, Nat.factorial] at a b
     rw [abs_le] at a b
     rw [Real.sinh_eq]
@@ -210,13 +224,15 @@ def fam : LFam where
     have h1 := Nat.floor_le (show 0 ≤ x by linarith)
     have h2 := Nat.lt_floor_add_one x
     have h3 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.2 hx
-    rw [abs_le]; constructor <;> linarith [h.1, h.2]
+    rw [abs_le]
+    constructor <;> linarith [h.1, h.2]
   theta _ t ht h1 := by rw [tsum_odd t ht]; exact sinh_bound t ht h1
   lam_nonneg _ n := mul_nonneg (ao_nonneg n) vonMangoldt_nonneg
   lam_le n := by
     have := @vonMangoldt_nonneg n
     simp only [Finset.sum_const, Finset.card_univ, ZMod.card, one_smul]
-    unfold ao; split_ifs <;> linarith
+    unfold ao
+    split_ifs <;> linarith
   conv _ n := by
     simp only [Finset.sum_const, Finset.card_univ, ZMod.card, one_smul]
     have : ∀ p ∈ n.divisorsAntidiagonal, ao p.1 * Λ p.1 * ao p.2 = ao n * Λ p.1 := by
@@ -224,7 +240,8 @@ def fam : LFam where
       rw [← (Nat.mem_divisorsAntidiagonal.1 hp).1]
       unfold ao
       by_cases h1 : Odd p.1 <;> by_cases h2 : Odd p.2 <;> simp [h1, h2, Nat.odd_mul]
-    rw [Finset.sum_congr rfl this, ← Finset.mul_sum, Nat.sum_divisorsAntidiagonal (fun a _ => Λ a), vonMangoldt_sum]
+    rw [Finset.sum_congr rfl this, ← Finset.mul_sum, Nat.sum_divisorsAntidiagonal (fun a _ => Λ a),
+      vonMangoldt_sum]
   sq χ _ n := by
     have hχ : ∀ g : ZMod 1, (χ g).re = 1 := fun g => by rw [Subsingleton.elim g 0]; simp
     simp only [hχ, Finset.sum_const, Finset.card_univ, ZMod.card, one_smul, one_mul]
@@ -232,9 +249,13 @@ def fam : LFam where
     rcases eq_or_ne n 0 with rfl | hn
     · simp [ao]
     · have hm : (n, n) ∈ (n ^ 2).divisorsAntidiagonal := by simp [hn, sq]
-      refine le_trans ?_ (Finset.single_le_sum (f := fun p : ℕ × ℕ => ao p.1 * ao p.2)
-        (fun p _ => mul_nonneg (ao_nonneg _) (ao_nonneg _)) hm)
-      unfold ao; split_ifs <;> simp
+      refine le_trans ?_
+        (Finset.single_le_sum
+          (f := fun p : ℕ × ℕ => ao p.1 * ao p.2)
+          (fun p _ => mul_nonneg (ao_nonneg _) (ao_nonneg _))
+          hm)
+      unfold ao
+      split_ifs <;> simp
 
 theorem res_fam : fam.res 1 = 1 / 2 := by
   have : (((1 / 2 : ℝ) * Fintype.card (ZMod 1) : ℝ) : ℂ) = 1 / 2 := by simp

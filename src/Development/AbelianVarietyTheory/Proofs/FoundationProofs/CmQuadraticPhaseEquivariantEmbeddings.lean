@@ -10,13 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsRi
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.QuadPhase
 
-theorem exists_top_extension (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ) (S : Set ℂ) (hS : S.Countable) :
-    ∃ σ : (⊤ : IntermediateField ℚ ℂ) →ₐ[ℚ] ℂ, ∀ x ∈ S, x ∈ M → cj ⊤ σ x = cj M ρ x := by
+theorem exists_top_extension
+    (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ) (S : Set ℂ) (hS : S.Countable)
+    : ∃ σ : (⊤ : IntermediateField ℚ ℂ) →ₐ[ℚ] ℂ, ∀ x ∈ S, x ∈ M → cj ⊤ σ x = cj M ρ x := by
   let M₀ : IntermediateField ℚ ℂ := IntermediateField.adjoin ℚ (S ∩ (M : Set ℂ))
   have hle : M₀ ≤ M := IntermediateField.adjoin_le_iff.2 Set.inter_subset_right
   have hc : Countable M₀ := by
@@ -25,8 +28,9 @@ theorem exists_top_extension (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ]
     refine Cardinal.mk_le_aleph0_iff.1 (h1.trans (max_le (max_le ?_ ?_) le_rfl))
     · exact Cardinal.mk_le_aleph0
     · exact Cardinal.mk_le_aleph0_iff.2 h2
-  obtain ⟨σ, hσ⟩ := GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq (K := M₀)
-    (algebraMap M₀ ℂ) ((ρ.comp (IntermediateField.inclusion hle)).toRingHom)
+  obtain ⟨σ, hσ⟩ :=
+    GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq (K := M₀) (algebraMap M₀ ℂ)
+      ((ρ.comp (IntermediateField.inclusion hle)).toRingHom)
   refine ⟨((σ : ℂ →+* ℂ).toRatAlgHom).comp (IntermediateField.val ⊤), fun x hx hxM => ?_⟩
   have hx0 : x ∈ M₀ := IntermediateField.subset_adjoin ℚ _ ⟨hx, hxM⟩
   have h := hσ ⟨x, hx0⟩
@@ -43,22 +47,26 @@ theorem ee_add (s t : ℝ) : ee (s + t) = ee s * ee t := by
 
 theorem ee_zero : ee 0 = 1 := by simp [ee]
 
-theorem cmQuadraticForm_eq_alternatingForm (D : D7) (Λ : AddSubgroup ℂ) (x : ℂ) : q1 D Λ x = gl3FieldFirst Λ (w0 D * x) x := by
+theorem cmQuadraticForm_eq_alternatingForm (D : D7) (Λ : AddSubgroup ℂ) (x : ℂ)
+    : q1 D Λ x = gl3FieldFirst Λ (w0 D * x) x := by
   unfold q1 gl3FieldFirst w0
   rw [mul_assoc, Complex.mul_conj, Complex.normSq_eq_norm_sq]
-  simp only [Complex.mul_im, Complex.ofReal_im, Complex.ofReal_re, Complex.div_ofNat_im, Complex.add_im,
-    Complex.one_im, Complex.I_re, Complex.I_im]
+  simp only [Complex.mul_im, Complex.ofReal_im, Complex.ofReal_re, Complex.div_ofNat_im,
+    Complex.add_im, Complex.one_im, Complex.I_re, Complex.I_im]
   ring
 
-theorem cmQuadraticForm_half_eq_alternatingForm (D : D7) (Λ : AddSubgroup ℂ) (x : ℂ) : q1 D Λ x / 2 = gl3FieldFirst Λ (w0 D * x / 2) x := by
+theorem cmQuadraticForm_half_eq_alternatingForm (D : D7) (Λ : AddSubgroup ℂ) (x : ℂ)
+    : q1 D Λ x / 2 = gl3FieldFirst Λ (w0 D * x / 2) x := by
   rw [cmQuadraticForm_eq_alternatingForm]
   unfold gl3FieldFirst
   rw [div_mul_eq_mul_div, Complex.div_ofNat_im]
   ring
 
-theorem cmQuadraticForm_half_add_translation (D : D7) (Λ : AddSubgroup ℂ) (x l : ℂ) (m : ℕ) :
-    q1 D Λ (x + 2 * (m : ℂ) * l) / 2 = q1 D Λ x / 2 + gl3FieldFirst Λ (w0 D * ((m : ℂ) * x)) l +
-      gl3FieldFirst Λ (w0 D * l) ((m : ℂ) * x) + gl3FieldFirst Λ (w0 D * l) (((2 * m * m : ℕ) : ℂ) * l) := by
+theorem cmQuadraticForm_half_add_translation (D : D7) (Λ : AddSubgroup ℂ) (x l : ℂ) (m : ℕ)
+    : q1 D Λ (x + 2 * (m : ℂ) * l) / 2
+      = q1 D Λ x / 2 + gl3FieldFirst Λ (w0 D * ((m : ℂ) * x)) l
+        + gl3FieldFirst Λ (w0 D * l) ((m : ℂ) * x)
+        + gl3FieldFirst Λ (w0 D * l) (((2 * m * m : ℕ) : ℂ) * l) := by
   rw [cmQuadraticForm_half_eq_alternatingForm, cmQuadraticForm_half_eq_alternatingForm]
   unfold gl3FieldFirst
   rw [← add_div, ← add_div, ← add_div, ← Complex.add_im, ← Complex.add_im, ← Complex.add_im]
@@ -67,11 +75,13 @@ theorem cmQuadraticForm_half_add_translation (D : D7) (Λ : AddSubgroup ℂ) (x 
   push_cast
   ring
 
-theorem phase_top (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ)
-    (hc : Crv D cc δ) (ρ : (⊤ : IntermediateField ℚ ℂ) →ₐ[ℚ] ℂ) (hK : FixK D ⊤ ρ)
-    (x x' : ℂ) (m₀ : ℕ) (hm : 0 < m₀) (hx : (m₀ : ℂ) * x ∈ lamOf D cc δ)
-    (hA : Adp1 ⊤ ρ (lamOf D cc δ) (2 * m₀) x x') :
-    cj ⊤ ρ (ee (q1 D (lamOf D cc δ) x / 2)) = ee (q1 D (lamConj ⊤ ρ (lamOf D cc δ)) x' / 2) := by
+theorem phase_top
+    (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) (cc : Ideal (𝓞 D.host.K))
+    (δ : ℂ) (hc : Crv D cc δ)
+    (ρ : (⊤ : IntermediateField ℚ ℂ) →ₐ[ℚ] ℂ) (hK : FixK D ⊤ ρ)
+    (x x' : ℂ) (m₀ : ℕ)
+    (hm : 0 < m₀) (hx : (m₀ : ℂ) * x ∈ lamOf D cc δ) (hA : Adp1 ⊤ ρ (lamOf D cc δ) (2 * m₀) x x')
+    : cj ⊤ ρ (ee (q1 D (lamOf D cc δ) x / 2)) = ee (q1 D (lamConj ⊤ ρ (lamOf D cc δ)) x' / 2) := by
   obtain ⟨hex, huniq, -, hadd, hmul, hord, -⟩ :=
     hS cc δ hc ⊤ ρ hK IntermediateField.mem_top IntermediateField.mem_top
   have hWP := hW cc δ hc ⊤ ρ hK IntermediateField.mem_top IntermediateField.mem_top
@@ -93,8 +103,9 @@ theorem phase_top (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) (cc : 
     · exact h.2
     · exact absurd (by rw [mul_zero]; exact zero_mem _) h.1
   have hint : ∀ l ∈ Λ', ∀ l' ∈ Λ', ee (gl3FieldFirst Λ' l l') = 1 := fun l hl l' hl' => by
-    have h := hWP 0 0 l l' 1 one_pos (by simp) (by simp)
-      (Or.inl ⟨by simp, by simpa using hl⟩) (Or.inl ⟨by simp, by simpa using hl'⟩) IntermediateField.mem_top
+    have h :=
+      hWP 0 0 l l' 1 one_pos (by simp) (by simp) (Or.inl ⟨by simp, by simpa using hl⟩)
+        (Or.inl ⟨by simp, by simpa using hl'⟩) IntermediateField.mem_top
     rw [← h]
     have h0 : gl3FieldFirst Λ 0 0 = 0 := by simp [gl3FieldFirst]
     rw [h0, ee_zero]
@@ -107,8 +118,9 @@ theorem phase_top (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) (cc : 
   have htn : ((4 * m₀ * m₀ : ℕ) : ℂ) * (x / (4 * (m₀ : ℂ))) = (m₀ : ℂ) * x := by
     push_cast
     field_simp
-  obtain ⟨t', ht'⟩ := hex (x / (4 * (m₀ : ℂ))) ⟨4 * m₀ * m₀, by positivity, htn ▸ hx⟩
-    (Or.inr ⟨IntermediateField.mem_top, IntermediateField.mem_top⟩)
+  obtain ⟨t', ht'⟩ :=
+    hex (x / (4 * (m₀ : ℂ))) ⟨4 * m₀ * m₀, by positivity, htn ▸ hx⟩
+      (Or.inr ⟨IntermediateField.mem_top, IntermediateField.mem_top⟩)
   set y : ℂ := 4 * (m₀ : ℂ) * t' with hy
   have hA2 : Adp1 ⊤ ρ Λ (2 * m₀) x y := by
     have h := hadd _ _ _ _ ht' ht'
@@ -145,27 +157,32 @@ theorem phase_top (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) (cc : 
     push_cast
     field_simp
     ring
-  have hmain := hWP (w0 D * x / 2) x (w0 D * y / 2) y (2 * m₀) (by positivity)
-    (by
-      convert hw _ hx using 1
-      push_cast
-      ring)
-    (by
-      convert hnat Λ 2 _ hx using 1
-      push_cast
-      ring)
-    hA3 hA2 IntermediateField.mem_top
-  rw [hx', cmQuadraticForm_half_add_translation, ee_add, ee_add, ee_add, hint _ (hw' _ hμ) _ hl, hint _ (hw' _ hl) _ hμ,
-    hint _ (hw' _ hl) _ (hnat Λ' _ _ hl), cmQuadraticForm_half_eq_alternatingForm, cmQuadraticForm_half_eq_alternatingForm, hmain]
+  have hmain :=
+    hWP (w0 D * x / 2) x (w0 D * y / 2) y (2 * m₀) (by positivity)
+      (by
+        convert hw _ hx using 1
+        push_cast
+        ring)
+      (by
+        convert hnat Λ 2 _ hx using 1
+        push_cast
+        ring)
+      hA3 hA2 IntermediateField.mem_top
+  rw [hx', cmQuadraticForm_half_add_translation, ee_add, ee_add, ee_add, hint _ (hw' _ hμ) _ hl,
+    hint _ (hw' _ hl) _ hμ, hint _ (hw' _ hl) _ (hnat Λ' _ _ hl),
+    cmQuadraticForm_half_eq_alternatingForm, cmQuadraticForm_half_eq_alternatingForm, hmain]
   simp
 
 theorem galPh1_of (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) : galPh1 D := by
   intro cc δ hc
-  refine ⟨fun x => cmQuadraticForm_eq_alternatingForm D _ x, fun M ρ hK h2 h3 x x' m₀ hm hx hA he => ?_⟩
+  refine
+    ⟨fun x => cmQuadraticForm_eq_alternatingForm D _ x, fun M ρ hK h2 h3 x x' m₀ hm hx hA he => ?_⟩
   set Λ := lamOf D cc δ with hΛ
   have hKc : Countable D.host.K := Finsupp.Countable.of_moduleFinite (R := ℚ)
-  let S : Set ℂ := Set.range (fun a : D.host.K => D.host.φ₀ (a : D.host.E)) ∪
-    {g2 Λ, g3 Λ, wpF Λ (x / ((2 * m₀ : ℕ) : ℂ)), wpD Λ (x / ((2 * m₀ : ℕ) : ℂ)), ee (q1 D Λ x / 2)}
+  let S : Set ℂ :=
+    Set.range (fun a : D.host.K => D.host.φ₀ (a : D.host.E)) ∪ {
+      g2 Λ, g3 Λ, wpF Λ (x / ((2 * m₀ : ℕ) : ℂ)), wpD Λ (x / ((2 * m₀ : ℕ) : ℂ)), ee (q1 D Λ x / 2)
+    }
   have hSc : S.Countable := (Set.countable_range _).union (Set.toFinite _).countable
   obtain ⟨σ, hσ⟩ := exists_top_extension M ρ S hSc
   have hK' : FixK D ⊤ σ := fun a =>
@@ -189,6 +206,7 @@ theorem galPh1_of (D : D7) (hS : galStar D) (hW : WeilPairingGaloisAlt D) : galP
   exact h
 
 theorem galPh1_all : ∀ D : D7, galPh1 D := fun D =>
-  galPh1_of D (GlobalTheory.T.galStar_complexMultiplication_points D) (GlobalTheory.T.weilPairing_galois_equivariant_cm_torsion D)
+  galPh1_of D (GlobalTheory.T.galStar_complexMultiplication_points D)
+    (GlobalTheory.T.weilPairing_galois_equivariant_cm_torsion D)
 
 end GlobalTheory.QuadPhase

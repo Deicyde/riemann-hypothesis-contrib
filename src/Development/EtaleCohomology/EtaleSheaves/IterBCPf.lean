@@ -9,8 +9,9 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut LateralTheo
 
 namespace LateralTheory.E.IterBCPf
 
-theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q) :
-    ∀ {X P' : Scheme.{0}} {a : P' ⟶ P} {q' : P' ⟶ X} {g : X ⟶ S}, IsPullback a q' q g → IterLine q' := by
+theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q)
+    : ∀ {X P' : Scheme.{0}} {a : P' ⟶ P} {q' : P' ⟶ X} {g : X ⟶ S},
+      IsPullback a q' q g → IterLine q' := by
   induction hq with
   | iso e he =>
     intro X P' a q' g w
@@ -22,7 +23,8 @@ theorem iterLine_of_isPullback {S P : Scheme.{0}} {q : P ⟶ S} (hq : IterLine q
     have hm : q' = m ≫ pullback.snd k g := (pullback.lift_snd _ _ _).symm
     have ht : IsPullback a m l (pullback.fst k g) := by
       refine IsPullback.of_bot ?_ (pullback.lift_fst _ _ _).symm hb
-      rw [← hm]; exact w
+      rw [← hm]
+      exact w
     rw [hm]
     exact IterLine.comp m _ (IsLine.bc hl ht) (ih hb)
 

@@ -11,8 +11,10 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes GlobalTheory.LKGeo.MultScale
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo
+  GlobalTheory.LKRes GlobalTheory.LKGeo.MultScale
 open UpperTheory.Gal.Int.Geo
 open scoped TensorProduct
 
@@ -20,9 +22,10 @@ namespace UpperTheory.MultiplicativeUnitDivisibility
 
 variable {p : ℕ} [Fact p.Prime]
 
-private theorem exists_dvd_EFA (D : Datum p) (d : ℤ) (hd : ∀ x y : D.La, d ∣ D.EF x y)
-    {v w : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) (hw : w ∈ LaHat D) :
-    ∃ c : AfP p, IsIntAf c ∧ EFA D v w = (d : AfP p) * c := by
+private theorem exists_dvd_EFA
+    (D : Datum p) (d : ℤ) (hd : ∀ x y : D.La, d ∣ D.EF x y)
+    {v w : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) (hw : w ∈ LaHat D)
+    : ∃ c : AfP p, IsIntAf c ∧ EFA D v w = (d : AfP p) * c := by
   induction hv using AddSubgroup.closure_induction with
   | mem v hv =>
     obtain ⟨a, x, ha, rfl⟩ := hv
@@ -34,7 +37,8 @@ private theorem exists_dvd_EFA (D : Datum p) (d : ℤ) (hd : ∀ x y : D.La, d �
       rw [EFA_tmul, hk]
       push_cast
       ring
-    | zero => exact ⟨0, isIntAf_zero, by simp⟩
+    | zero =>
+      exact ⟨0, isIntAf_zero, by simp⟩
     | add u u' _ _ h h' =>
       obtain ⟨c, hc, e⟩ := h
       obtain ⟨c', hc', e'⟩ := h'
@@ -42,11 +46,13 @@ private theorem exists_dvd_EFA (D : Datum p) (d : ℤ) (hd : ∀ x y : D.La, d �
     | neg u _ h =>
       obtain ⟨c, hc, e⟩ := h
       exact ⟨-c, isIntAf_neg hc, by rw [map_neg, e, mul_neg]⟩
-  | zero => exact ⟨0, isIntAf_zero, by simp⟩
+  | zero =>
+    exact ⟨0, isIntAf_zero, by simp⟩
   | add u u' _ _ h h' =>
     obtain ⟨c, hc, e⟩ := h
     obtain ⟨c', hc', e'⟩ := h'
-    exact ⟨c + c', isIntAf_add hc hc', by rw [map_add (f := _), LinearMap.add_apply, e, e', mul_add]⟩
+    exact
+      ⟨c + c', isIntAf_add hc hc', by rw [map_add (f := _), LinearMap.add_apply, e, e', mul_add]⟩
   | neg u _ h =>
     obtain ⟨c, hc, e⟩ := h
     exact ⟨-c, isIntAf_neg hc, by rw [map_neg, LinearMap.neg_apply, e, mul_neg]⟩
@@ -70,8 +76,10 @@ private theorem isUnit_intCast {d : ℤ} (hd : d ≠ 0) : IsUnit (d : AfP p) := 
   have h : IsUnit (d : ℚ) := (Int.cast_ne_zero.mpr hd).isUnit
   simpa using h.map (algebraMap ℚ (AfP p))
 
-private theorem isIntAf_sim {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.GAf)
-    (hg : ∀ v ∈ LaHat D, L.actG g v ∈ LaHat D) : IsIntAf ((uSimR (AfP p) g : (AfP p)ˣ) : AfP p) := by
+private theorem isIntAf_sim
+    {D : Datum p} {G : HTGroup p}
+    (L : Link D G) (g : G.GAf) (hg : ∀ v ∈ LaHat D, L.actG g v ∈ LaHat D)
+    : IsIntAf ((uSimR (AfP p) g : (AfP p)ˣ) : AfP p) := by
   let S : Set ℤ := {z | ∃ x y : D.La, D.EF x y = z}
   obtain ⟨d, hdI⟩ := (IsPrincipalIdealRing.principal (Ideal.span S)).principal
   have hdvd : ∀ x y : D.La, d ∣ D.EF x y := by
@@ -86,8 +94,9 @@ private theorem isIntAf_sim {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.
     apply hxy
     obtain ⟨k, hk⟩ := hdvd x y
     rw [hk, zero_mul]
-  have key : ∀ z ∈ Ideal.span S, ∃ c : AfP p, IsIntAf c ∧
-      ((uSimR (AfP p) g : (AfP p)ˣ) : AfP p) * (z : AfP p) = (d : AfP p) * c := by
+  have key
+      : ∀ z ∈ Ideal.span S, ∃ c : AfP p,
+        IsIntAf c ∧ ((uSimR (AfP p) g : (AfP p)ˣ) : AfP p) * (z : AfP p) = (d : AfP p) * c := by
     intro z hz
     change z ∈ Submodule.span ℤ S at hz
     induction hz using Submodule.span_induction with
@@ -97,7 +106,8 @@ private theorem isIntAf_sim {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.
       rw [EFA_inAf] at h1
       rw [← h1]
       exact exists_dvd_EFA D d hdvd (hg _ (inAf_mem D x)) (hg _ (inAf_mem D y))
-    | zero => exact ⟨0, isIntAf_zero, by simp⟩
+    | zero =>
+      exact ⟨0, isIntAf_zero, by simp⟩
     | add a b _ _ h1 h2 =>
       obtain ⟨c1, h1i, h1e⟩ := h1
       obtain ⟨c2, h2i, h2e⟩ := h2
@@ -114,8 +124,11 @@ private theorem isIntAf_sim {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.
   rw [hsc]
   exact hc
 
-private theorem pow_dvd_of_isIntAf {q k c c' : ℕ} (hq : q.Prime) (hqp : q ≠ p) {t : AfP p} (ht : IsIntAf t)
-    (h : (c : AfP p) = c' * t) (hd : q ^ k ∣ c') : q ^ k ∣ c := by
+private theorem pow_dvd_of_isIntAf
+    {q k c c' : ℕ} (hq : q.Prime) (hqp : q ≠ p)
+    {t : AfP p} (ht : IsIntAf t) (h : (c : AfP p) = c' * t)
+    (hd : q ^ k ∣ c')
+    : q ^ k ∣ c := by
   obtain ⟨m, rfl⟩ := hd
   have hm : IsIntAf ((m : AfP p) * t) := by
     have hmi := isIntAf_intCast (p := p) (m : ℤ)
@@ -123,9 +136,11 @@ private theorem pow_dvd_of_isIntAf {q k c c' : ℕ} (hq : q.Prime) (hqp : q ≠ 
     exact isIntAf_mul hmi ht
   have hqz : Prime (q : ℤ) := Nat.prime_iff_prime_int.mp hq
   have hq0 : (q : ℤ) ≠ 0 := by exact_mod_cast hq.ne_zero
-  let v0 : HeightOneSpectrum ℤ :=
-    ⟨Ideal.span {(q : ℤ)}, (Ideal.span_singleton_prime hq0).mpr hqz,
-      by rw [Ne, Ideal.span_singleton_eq_bot]; exact hq0⟩
+  let v0 : HeightOneSpectrum ℤ := ⟨
+    Ideal.span {(q : ℤ)},
+    (Ideal.span_singleton_prime hq0).mpr hqz,
+    by rw [Ne, Ideal.span_singleton_eq_bot]; exact hq0
+  ⟩
   have hv0p : v0.asIdeal ≠ Ideal.span {(p : ℤ)} := by
     intro heq
     have hmem : (q : ℤ) ∈ Ideal.span {(p : ℤ)} := heq ▸ Ideal.mem_span_singleton_self _
@@ -133,10 +148,13 @@ private theorem pow_dvd_of_isIntAf {q k c c' : ℕ} (hq : q.Prime) (hqp : q ≠ 
     have hpq : p ∣ q := Int.natCast_dvd_natCast.mp hmem
     exact hqp ((Nat.prime_dvd_prime_iff_eq Fact.out hq).mp hpq).symm
   let v : AwayP p := ⟨v0, hv0p⟩
-  have hev : (AfP.eval v) (c : AfP p) =
-      (q : HeightOneSpectrum.adicCompletion ℚ v0) ^ k * (AfP.eval v) ((m : AfP p) * t) := by
+  have hev
+      : (AfP.eval v) (c : AfP p)
+        = (q : HeightOneSpectrum.adicCompletion ℚ v0) ^ k * (AfP.eval v) ((m : AfP p) * t) := by
     rw [h, Nat.cast_mul, Nat.cast_pow, mul_assoc, map_mul, map_pow, map_natCast]
-  have hval : ∀ n : ℕ, Valued.v (n : HeightOneSpectrum.adicCompletion ℚ v0) = v0.intValuation (n : ℤ) := by
+  have hval
+      : ∀ n : ℕ,
+        Valued.v (n : HeightOneSpectrum.adicCompletion ℚ v0) = v0.intValuation (n : ℤ) := by
     intro n
     have h1 := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := ℚ) v0 (n : ℤ)
     rw [HeightOneSpectrum.valuation_of_algebraMap] at h1
@@ -158,8 +176,9 @@ private theorem pow_dvd_of_isIntAf {q k c c' : ℕ} (hq : q.Prime) (hqp : q ≠ 
   rw [Ideal.span_singleton_pow, Ideal.span_singleton_dvd_span_singleton_iff_dvd] at hle
   exact_mod_cast hle
 
-private theorem dvd_of_isIntAf {c c' : ℕ} (hc' : c'.Coprime p) {t : AfP p} (ht : IsIntAf t)
-    (h : (c : AfP p) = c' * t) : c' ∣ c := by
+private theorem dvd_of_isIntAf
+    {c c' : ℕ} (hc' : c'.Coprime p) {t : AfP p} (ht : IsIntAf t) (h : (c : AfP p) = c' * t)
+    : c' ∣ c := by
   rw [Nat.dvd_iff_prime_pow_dvd_dvd c c']
   intro q k hq hqk
   rcases Nat.eq_zero_or_pos k with rfl | hk

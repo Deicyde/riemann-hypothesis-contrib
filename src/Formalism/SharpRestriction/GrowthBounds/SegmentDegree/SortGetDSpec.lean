@@ -8,23 +8,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf.TE
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
-theorem sort_getD_spec (s : Finset ℤ) (r : ℕ) (hr : 0 < r) (hrs : r ≤ s.card) :
-    (s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0 ∈ s ∧
-      (s.filter ((s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0 ≤ ·)).card = r := by
+theorem sort_getD_spec (s : Finset ℤ) (r : ℕ) (hr : 0 < r) (hrs : r ≤ s.card)
+    : (s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0 ∈ s
+      ∧ (s.filter ((s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0 ≤ ·)).card = r := by
   classical
   have hlen : (s.sort (· ≤ ·)).length = s.card := Finset.length_sort _
   have hk : (s.sort (· ≤ ·)).length - r < s.card := by omega
   set f := s.orderEmbOfFin rfl with hf
-  have hget : (s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0 = f ⟨(s.sort (· ≤ ·)).length - r, hk⟩ := by
+  have hget
+      : (s.sort (· ≤ ·)).getD ((s.sort (· ≤ ·)).length - r) 0
+        = f ⟨(s.sort (· ≤ ·)).length - r, hk⟩ := by
     rw [hf, Finset.orderEmbOfFin_apply, List.getD_eq_getElem]
     · simp [Fin.getElem_fin]
     · omega
   rw [hget]
   refine ⟨Finset.orderEmbOfFin_mem s rfl _, ?_⟩
-  have hset : s.filter (f ⟨(s.sort (· ≤ ·)).length - r, hk⟩ ≤ ·) =
-      (Finset.univ.filter (fun i : Fin s.card => (s.sort (· ≤ ·)).length - r ≤ i.val ∧ i.val < s.card)).map f.toEmbedding := by
+  have hset
+      : s.filter (f ⟨(s.sort (· ≤ ·)).length - r, hk⟩ ≤ ·)
+        = (Finset.univ.filter (fun i : Fin s.card =>
+          (s.sort (· ≤ ·)).length - r ≤ i.val ∧ i.val < s.card)).map f.toEmbedding := by
     ext y
     simp only [Finset.mem_filter, Finset.mem_map, Finset.mem_univ, true_and]
     constructor
@@ -39,9 +44,11 @@ theorem sort_getD_spec (s : Finset ℤ) (r : ℕ) (hr : 0 < r) (hrs : r ≤ s.ca
 
 variable {n' r : ℕ} [NeZero n'] [NeZero r] {F : Frames n' r} {L₁ N₁ : ℕ}
 
-theorem oldest_spec (hV : F.Valid L₁ N₁) (j : ℤ) (i : Fin (segN F j)) (hi : r ≤ i.val) :
-    F.oldest j (segE F j i) ∈ F.letters j ∧ Even (F.oldest j (segE F j i)) ∧ F.oldest j (segE F j i) < segE F j i ∧
-      ((F.letters j).filter fun z => F.oldest j (segE F j i) ≤ z ∧ z < segE F j i ∧ Even z).card = r := by
+theorem oldest_spec (hV : F.Valid L₁ N₁) (j : ℤ) (i : Fin (segN F j)) (hi : r ≤ i.val)
+    : F.oldest j (segE F j i) ∈ F.letters j ∧ Even (F.oldest j (segE F j i))
+      ∧ F.oldest j (segE F j i) < segE F j i
+      ∧ ((F.letters j).filter fun z => F.oldest j (segE F j i) ≤ z ∧ z < segE F j i ∧ Even z).card
+        = r := by
   classical
   set E := segE F j i with hE
   have hmono : StrictMono (segE F j) := fun a b hab => by
@@ -58,7 +65,8 @@ theorem oldest_spec (hV : F.Valid L₁ N₁) (j : ℤ) (i : Fin (segN F j)) (hi 
     show k.val < i.val
     omega
   have hcard : r ≤ ((F.letters j).filter fun z => Even z ∧ z < E).card := by
-    have hsub : (Finset.range r).image (F.fr (j - 1)) ⊆ (F.letters j).filter fun z => Even z ∧ z < E := by
+    have hsub
+        : (Finset.range r).image (F.fr (j - 1)) ⊆ (F.letters j).filter fun z => Even z ∧ z < E := by
       intro x hx
       simp only [Finset.mem_image, Finset.mem_range] at hx
       obtain ⟨i', hi', rfl⟩ := hx
@@ -66,13 +74,18 @@ theorem oldest_spec (hV : F.Valid L₁ N₁) (j : ℤ) (i : Fin (segN F j)) (hi 
       exact ⟨frp_mem hV j i' hi', (hV.2.2.2.2.1 (j - 1) i' hi').2, hlow i' hi'⟩
     have hinj : Set.InjOn (F.fr (j - 1)) (Finset.range r) := fun a ha b hb h =>
       fr_inj hV _ a b (Finset.mem_range.1 ha) (Finset.mem_range.1 hb) h
-    calc r = ((Finset.range r).image (F.fr (j - 1))).card := by
-          rw [Finset.card_image_of_injOn hinj, Finset.card_range]
+    calc
+      r = ((Finset.range r).image (F.fr (j - 1))).card := by
+        rw [Finset.card_image_of_injOn hinj, Finset.card_range]
       _ ≤ _ := Finset.card_le_card hsub
-  obtain ⟨hm, hc⟩ := sort_getD_spec ((F.letters j).filter fun z => Even z ∧ z < E) r
-    (Nat.pos_of_ne_zero (NeZero.ne r)) hcard
-  have hold : F.oldest j E = (((F.letters j).filter fun z => Even z ∧ z < E).sort (· ≤ ·)).getD
-      ((((F.letters j).filter fun z => Even z ∧ z < E).sort (· ≤ ·)).length - r) 0 := rfl
+  obtain ⟨hm, hc⟩ :=
+    sort_getD_spec ((F.letters j).filter fun z => Even z ∧ z < E) r
+      (Nat.pos_of_ne_zero (NeZero.ne r)) hcard
+  have hold
+      : F.oldest j E
+        = (((F.letters j).filter fun z => Even z ∧ z < E).sort (· ≤ ·)).getD
+          ((((F.letters j).filter fun z => Even z ∧ z < E).sort (· ≤ ·)).length - r) 0 :=
+    rfl
   rw [hold]
   simp only [Finset.mem_filter] at hm
   refine ⟨hm.1, hm.2.1, hm.2.2, ?_⟩
@@ -80,9 +93,13 @@ theorem oldest_spec (hV : F.Valid L₁ N₁) (j : ℤ) (i : Fin (segN F j)) (hi 
   refine Eq.trans ?_ hc
   exact congrArg Finset.card (Finset.filter_congr (fun z _ => by tauto))
 
-theorem exists_od (hV : F.Valid L₁ N₁) (j : ℤ) : ∃ od : Fin (segN F j) → Fin (segN F j), ∀ i, r ≤ i.val →
-    segE F j (od i) = F.oldest j (segE F j i) ∧ od i < i ∧ (segLL F j).vec (od i) = true ∧
-      (Finset.univ.filter fun l : Fin (segN F j) => od i ≤ l ∧ l < i ∧ (segLL F j).vec l = true).card = r := by
+theorem exists_od (hV : F.Valid L₁ N₁) (j : ℤ)
+    : ∃ od : Fin (segN F j) → Fin (segN F j), ∀ i,
+      r ≤ i.val
+        → segE F j (od i) = F.oldest j (segE F j i) ∧ od i < i ∧ (segLL F j).vec (od i) = true
+          ∧ (Finset.univ.filter fun l : Fin (segN F j) =>
+              od i ≤ l ∧ l < i ∧ (segLL F j).vec l = true).card
+            = r := by
   classical
   have hmono : StrictMono (segE F j) := fun a b hab => by
     simp only [segE]
@@ -106,11 +123,13 @@ theorem exists_od (hV : F.Valid L₁ N₁) (j : ℤ) : ∃ od : Fin (segN F j) �
   refine ⟨hk, hmono.lt_iff_lt.1 (by rw [hk]; exact hlt), by simp [segLL, LZ, hk, hev], ?_⟩
   rw [← hk] at hc
   refine Eq.trans ?_ hc
-  have hset : (F.letters j).filter (fun z => segE F j (g i) ≤ z ∧ z < segE F j i ∧ Even z) =
-      (Finset.univ.filter fun l : Fin (segN F j) => g i ≤ l ∧ l < i ∧ (segLL F j).vec l = true).map
-        ⟨segE F j, hmono.injective⟩ := by
+  have hset
+      : (F.letters j).filter (fun z => segE F j (g i) ≤ z ∧ z < segE F j i ∧ Even z)
+        = (Finset.univ.filter fun l : Fin (segN F j) =>
+          g i ≤ l ∧ l < i ∧ (segLL F j).vec l = true).map ⟨segE F j, hmono.injective⟩ := by
     ext z
-    simp only [Finset.mem_filter, Finset.mem_map, Finset.mem_univ, true_and, Function.Embedding.coeFn_mk]
+    simp only [Finset.mem_filter, Finset.mem_map, Finset.mem_univ, true_and,
+      Function.Embedding.coeFn_mk]
     constructor
     · rintro ⟨hz, h1, h2, h3⟩
       obtain ⟨l, rfl⟩ := hsurj z hz

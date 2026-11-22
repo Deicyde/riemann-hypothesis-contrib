@@ -10,12 +10,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TraceSpl
 
 open NumberField IsDedekindDomain
 
-private theorem not_both (F : Type) [Field F] [NumberField F] (h : IsTotallyReal F) (h' : IsTotallyComplex F) : False := by
+private theorem not_both
+    (F : Type) [Field F] [NumberField F] (h : IsTotallyReal F) (h' : IsTotallyComplex F)
+    : False := by
   obtain ⟨v⟩ : Nonempty (InfinitePlace F) := inferInstance
   exact (InfinitePlace.not_isReal_iff_isComplex.2 (h'.isComplex v)) (h.isReal v)
 
-theorem UpperTheory.ConvolutionTheory.Sph.cbcSph :
-    UpperTheory.ConvolutionTheory.Sph.CBCsph := by
+theorem UpperTheory.ConvolutionTheory.Sph.cbcSph : UpperTheory.ConvolutionTheory.Sph.CBCsph := by
   intro K M _ _ _ _ _ _ hp hK n hn π P hW v hv
   haveI := hK
   haveI hM : IsTotallyComplex M := isTotallyComplex_of_algebra K M
@@ -32,5 +33,8 @@ theorem UpperTheory.ConvolutionTheory.Sph.cbcSph :
   have hu : UpperTheory.ConvolutionTheory.GM.Unr M v := fun w =>
     hv w.1 (HeightOneSpectrum.ext (Ideal.LiesOver.over (P := w.1.asIdeal) (p := v.asIdeal)).symm)
   have hn' : 0 < n := hn
-  exact ⟨fun B hB w hw f hf => UpperTheory.ConvolutionTheory.Sph.up K M σ hσ hp n hn' π P hW v hu B hB w hw f hf,
-    fun h => UpperTheory.ConvolutionTheory.Sph.down K M σ hσ hp n hn' π P hW v hu h⟩
+  exact ⟨
+    fun B hB w hw f hf =>
+      UpperTheory.ConvolutionTheory.Sph.up K M σ hσ hp n hn' π P hW v hu B hB w hw f hf,
+    fun h => UpperTheory.ConvolutionTheory.Sph.down K M σ hσ hp n hn' π P hW v hu h
+  ⟩

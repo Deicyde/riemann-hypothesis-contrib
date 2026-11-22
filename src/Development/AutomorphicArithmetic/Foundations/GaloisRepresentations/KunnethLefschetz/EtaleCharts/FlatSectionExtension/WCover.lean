@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.wCover :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d), Smooth (cP B) ∧ Surjective (cP B) := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.wCover
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d),
+      Smooth (cP B) ∧ Surjective (cP B) := by
   intro K _ W Z Y q i π D d B
   refine ⟨?_, ⟨fun x => ?_⟩⟩
   · have : IsZariskiLocalAtSource @Smooth.{0} := HasRingHomProperty.instIsZariskiLocalAtSource
@@ -19,7 +22,6 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.wCover :
     obtain ⟨y, hy⟩ : x ∈ Set.range (oW B α).ι := by
       rw [Scheme.Opens.range_ι]
       exact hα
-    have h : wI B α ≫ cP B = (oW B α).ι := by
-      simp [wI, cP]
+    have h : wI B α ≫ cP B = (oW B α).ι := by simp [wI, cP]
     refine ⟨wI B α y, ?_⟩
     rw [← Scheme.Hom.comp_apply, h, hy]

@@ -16,12 +16,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 variable {R : Type} [CommRing R] {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
 
-theorem isTan_comp {w : sp (R₀ := R) (DualNumber R) ⟶ G} (hw : IsTan w) (f : G ⟶ G) [IsMonHom f] : IsTan (w ≫ f) := by
+theorem isTan_comp {w : sp (R₀ := R) (DualNumber R) ⟶ G} (hw : IsTan w) (f : G ⟶ G) [IsMonHom f]
+    : IsTan (w ≫ f) := by
   unfold IsTan at hw ⊢
   rw [← Category.assoc, hw]
-  first
-  | simp only [Hom.one_def, Category.assoc, IsMonHom.one_hom]
-  | simp [Hom.one_def]
+  first | simp only [Hom.one_def, Category.assoc, IsMonHom.one_hom] | simp [Hom.one_def]
 
 variable {n : ℕ} {x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G} (hx : IsUnivChart G n x)
 
@@ -40,17 +39,21 @@ theorem tcoord_tvec (c : Fin n → R) : tcoord hx (tvec (x := x) c) (isTan_tvec 
   (exists_coord hx (tvec (x := x) c) (isTan_tvec hx c)).unique (tcoord_spec hx _ _) rfl
 
 include hx in
-theorem tvec_add (c c' : Fin n → R) : tvec (x := x) (c + c') = tvec (x := x) c * tvec (x := x) c' := by
-  refine sp_tangent_ext hx (isTan_tvec hx (c + c')) (isTan_mul (isTan_tvec hx c) (isTan_tvec hx c')) ?_
+theorem tvec_add (c c' : Fin n → R)
+    : tvec (x := x) (c + c') = tvec (x := x) c * tvec (x := x) c' := by
+  refine sp_tangent_ext hx (isTan_tvec hx (c + c')) (isTan_mul (isTan_tvec hx c) (isTan_tvec hx c'))
+    ?_
   rw [tcoord_mul hx (isTan_tvec hx c) (isTan_tvec hx c'), tcoord_tvec, tcoord_tvec, tcoord_tvec]
 
 include hx in
-theorem tvec_smul (a : R) (c : Fin n → R) : tvec (x := x) (a • c) = spMap (scaleD a) ≫ tvec (x := x) c := by
+theorem tvec_smul (a : R) (c : Fin n → R)
+    : tvec (x := x) (a • c) = spMap (scaleD a) ≫ tvec (x := x) c := by
   refine sp_tangent_ext hx (isTan_tvec hx (a • c)) (isTan_scale a (isTan_tvec hx c)) ?_
   rw [tcoord_scale hx a (isTan_tvec hx c), tcoord_tvec, tcoord_tvec]
 
-theorem tcoord_congr {w w' : sp (R₀ := R) (DualNumber R) ⟶ G} (h : w = w') (hw : IsTan w) (hw' : IsTan w') :
-    tcoord hx w hw = tcoord hx w' hw' := by
+theorem tcoord_congr
+    {w w' : sp (R₀ := R) (DualNumber R) ⟶ G} (h : w = w') (hw : IsTan w) (hw' : IsTan w')
+    : tcoord hx w hw = tcoord hx w' hw' := by
   subst h
   rfl
 
@@ -58,9 +61,11 @@ def tmap (f : G ⟶ G) [IsMonHom f] : (Fin n → R) →ₗ[R] (Fin n → R) wher
   toFun c := tcoord hx (tvec (x := x) c ≫ f) (isTan_comp (isTan_tvec hx c) f)
   map_add' c c' := by
     have e : tvec (x := x) (c + c') ≫ f = (tvec (x := x) c ≫ f) * (tvec (x := x) c' ≫ f) := by
-      rw [tvec_add hx, Hom.mul_def, Hom.mul_def, Category.assoc, IsMonHom.mul_hom, ← Category.assoc, lift_map]
+      rw [tvec_add hx, Hom.mul_def, Hom.mul_def, Category.assoc, IsMonHom.mul_hom, ← Category.assoc,
+        lift_map]
     show tcoord hx _ _ = tcoord hx _ _ + tcoord hx _ _
-    rw [tcoord_congr hx e _ (isTan_mul (isTan_comp (isTan_tvec hx c) f) (isTan_comp (isTan_tvec hx c') f)),
+    rw [tcoord_congr hx e _
+        (isTan_mul (isTan_comp (isTan_tvec hx c) f) (isTan_comp (isTan_tvec hx c') f)),
       tcoord_mul hx]
   map_smul' a c := by
     have e : tvec (x := x) (a • c) ≫ f = spMap (scaleD a) ≫ (tvec (x := x) c ≫ f) := by
@@ -68,7 +73,8 @@ def tmap (f : G ⟶ G) [IsMonHom f] : (Fin n → R) →ₗ[R] (Fin n → R) wher
     show tcoord hx _ _ = a • tcoord hx _ _
     rw [tcoord_congr hx e _ (isTan_scale a (isTan_comp (isTan_tvec hx c) f)), tcoord_scale hx]
 
-theorem tvec_tmap (f : G ⟶ G) [IsMonHom f] (c : Fin n → R) : tvec (x := x) (tmap hx f c) = tvec (x := x) c ≫ f :=
+theorem tvec_tmap (f : G ⟶ G) [IsMonHom f] (c : Fin n → R)
+    : tvec (x := x) (tmap hx f c) = tvec (x := x) c ≫ f :=
   (tcoord_spec hx (tvec (x := x) c ≫ f) (isTan_comp (isTan_tvec hx c) f)).symm
 
 end ReciprocityTheory.ChartRestriction.G.Chart

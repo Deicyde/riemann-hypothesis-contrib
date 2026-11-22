@@ -5,26 +5,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PicEqZeroOfF
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-
 open GlobalTheory.CechPic GlobalTheory.BirigUniq in
-theorem UpperTheory.Gal.G3.pPolUniq :
-    PolUniq := by
+theorem UpperTheory.Gal.G3.pPolUniq : PolUniq := by
   intro S A A' _ _ _ _ hA hA' ψ hm hfin het hsurj P Q hP hQ h1 h2 h3 h4 hiso
   have hfl : Flat (Over.Hom.left ψ) := inferInstance
   have hqc : QuasiCompact (Over.Hom.left ψ) := inferInstance
-  have hcls : ∀ {Y : Scheme} (F : Y ⟶ (G2 A').left),
-      pull F (cls P hP - cls Q hQ) = cls (P.pull F) (pull_isLB hP F) - cls (Q.pull F) (pull_isLB hQ F) := by
+  have hcls
+      : ∀ {Y : Scheme} (F : Y ⟶ (G2 A').left),
+        pull F (cls P hP - cls Q hQ)
+          = cls (P.pull F) (pull_isLB hP F) - cls (Q.pull F) (pull_isLB hQ F) := by
     intro Y F
     rw [map_sub]
     rfl
-  have hzero : ∀ {Y : Scheme} (F : Y ⟶ (G2 A').left), LBIso (P.pull F) (Q.pull F) →
-      pull F (cls P hP - cls Q hQ) = 0 := by
+  have hzero
+      : ∀ {Y : Scheme} (F : Y ⟶ (G2 A').left),
+        LBIso (P.pull F) (Q.pull F) → pull F (cls P hP - cls Q hQ) = 0 := by
     intro Y F h
     rw [hcls, sub_eq_zero]
     exact (cls_eq_iff _ _).mpr h
@@ -51,8 +55,7 @@ theorem UpperTheory.Gal.G3.pPolUniq :
       have h' : pull (Over.Hom.left (lift (fst A A ≫ ψ) (snd A A ≫ ψ))) d = 0 := hsq
       rw [h', map_zero]
   have he : pull (Over.Hom.left E) d = 0 := by
-    have : W' ≫ W ≫ E = E := by
-      apply CartesianMonoidalCategory.hom_ext <;> simp [E, W, W']
+    have : W' ≫ W ≫ E = E := by apply CartesianMonoidalCategory.hom_ext <;> simp [E, W, W']
     rw [← this, pull_comp_left, hf, map_zero]
   have hd0 : d = 0 := pic_eq_zero_of_fpqc A' A' A hA' ψ hfl hsurj hqc d hs1 he
   rw [hd, sub_eq_zero] at hd0

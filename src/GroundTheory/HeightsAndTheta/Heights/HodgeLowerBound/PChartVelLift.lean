@@ -15,9 +15,11 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
 
-theorem hasDerivAt_eval_comp {σ : Type*} [Fintype σ] (f : MvPolynomial σ ℂ) {γ : ℂ → σ → ℂ} {w : σ → ℂ} {t : ℂ}
-    (hγ : HasDerivAt γ w t) :
-    HasDerivAt (fun s => eval (γ s) f) (∑ i, eval (γ t) (pderiv i f) * w i) t := by
+theorem hasDerivAt_eval_comp
+    {σ : Type*} [Fintype σ]
+    (f : MvPolynomial σ ℂ)
+    {γ : ℂ → σ → ℂ} {w : σ → ℂ} {t : ℂ} (hγ : HasDerivAt γ w t)
+    : HasDerivAt (fun s => eval (γ s) f) (∑ i, eval (γ t) (pderiv i f) * w i) t := by
   classical
   induction f using MvPolynomial.induction_on with
   | C a => simpa using hasDerivAt_const t a
@@ -35,8 +37,10 @@ theorem hasDerivAt_eval_comp {σ : Type*} [Fintype σ] (f : MvPolynomial σ ℂ)
       simp
     rw [hf]
     refine (hp.mul hn).congr_deriv ?_
-    have hs : ∑ i, eval (γ t) (pderiv i (p * X n)) * w i =
-        ∑ i, eval (γ t) (pderiv i p) * w i * γ t n + ∑ i, eval (γ t) p * ((Pi.single n (1 : ℂ) : σ → ℂ) i * w i) := by
+    have hs
+        : ∑ i, eval (γ t) (pderiv i (p * X n)) * w i
+          = ∑ i, eval (γ t) (pderiv i p) * w i * γ t n
+            + ∑ i, eval (γ t) p * ((Pi.single n (1 : ℂ) : σ → ℂ) i * w i) := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [Derivation.leibniz, pderiv_X, smul_eq_mul, map_add (f := _), map_mul, eval_X]
@@ -53,15 +57,17 @@ theorem hasDerivAt_eval_comp {σ : Type*} [Fintype σ] (f : MvPolynomial σ ℂ)
 theorem ChartVelLift.proof (hP : ProjHoloLocal.Statement) : ChartVelLift.Statement := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D O Lt _ _ _ X k y hy v hv
   classical
-  have hcompat : ReciprocityTheory.AnForm.M.IsCompatChart X.M.atlas (X.S.R.chart k) := X.S.R.compat k
+  have hcompat : ReciprocityTheory.AnForm.M.IsCompatChart X.M.atlas (X.S.R.chart k) :=
+    X.S.R.compat k
   have hx : (X.S.R.chart k).symm y ∈ (X.S.R.chart k).source := (X.S.R.chart k).map_target hy
   obtain ⟨U, hUo, hxU, s, hs, hshol⟩ := X.M.sections ((X.S.R.chart k).symm y)
   obtain ⟨j, hj⟩ := X.M.atlas.cover ((X.S.R.chart k).symm y)
 
   set V : Set (Fin D.n → ℂ) := (X.S.R.chart k).target ∩
     (X.S.R.chart k).symm ⁻¹' (U ∩ (X.M.atlas.chart j).source) with hV
-  have hVo : IsOpen V := (X.S.R.chart k).continuousOn_symm.isOpen_inter_preimage (X.S.R.chart k).open_target
-    (hUo.inter (X.M.atlas.chart j).open_source)
+  have hVo : IsOpen V :=
+    (X.S.R.chart k).continuousOn_symm.isOpen_inter_preimage (X.S.R.chart k).open_target
+      (hUo.inter (X.M.atlas.chart j).open_source)
 
   have hanal : ∀ u ∈ V, ∀ p, AnalyticAt ℂ (fun u => s ((X.S.R.chart k).symm u) p) u := by
     intro u hu p
@@ -92,9 +98,11 @@ theorem ChartVelLift.proof (hP : ProjHoloLocal.Statement) : ChartVelLift.Stateme
     exact ⟨hy, hxU, hj⟩
   set γ : ℂ → (Σ k, ι k) → ℂ := fun σ => s ((X.S.R.chart k).symm (L σ)) with hγdef
   have hγd : ∀ σ ∈ T, DifferentiableAt ℂ γ σ := fun σ hσ =>
-    differentiableAt_pi.2 fun p => (hanal (L σ) hσ p).differentiableAt.comp σ (hLd σ).differentiableAt
-  have hγmem : ∀ σ ∈ T, γ σ ∈ mcPts (mCoordIdeal D.y) ∧
-      X.M.proj (γ σ) = (X.S.R.chart k).symm (L σ) := fun σ hσ => hs _ hσ.2.1
+    differentiableAt_pi.2 fun p =>
+      (hanal (L σ) hσ p).differentiableAt.comp σ (hLd σ).differentiableAt
+  have hγmem
+      : ∀ σ ∈ T, γ σ ∈ mcPts (mCoordIdeal D.y) ∧ X.M.proj (γ σ) = (X.S.R.chart k).symm (L σ) :=
+    fun σ hσ => hs _ hσ.2.1
   have hγ0 : γ 0 = s ((X.S.R.chart k).symm y) := by simp [hγdef, hL0]
   have hγw : HasDerivAt γ (deriv γ 0) 0 := (hγd 0 hT0).hasDerivAt
   have hTn : T ∈ 𝓝 (0 : ℂ) := hTo.mem_nhds hT0
@@ -107,15 +115,13 @@ theorem ChartVelLift.proof (hP : ProjHoloLocal.Statement) : ChartVelLift.Stateme
   refine ⟨γ 0, hz, hpz, deriv γ 0, ⟨γ, rfl, hγw, ?_, (hLd 0).congr_of_eventuallyEq hline⟩, ?_, ?_⟩
   · filter_upwards [hTn] with σ hσ
     exact ⟨hγd σ hσ, (hγmem σ hσ).1⟩
-  ·
-    intro f hf
+  · intro f hf
     have hder := hasDerivAt_eval_comp (map (Int.castRingHom ℂ) f) hγw
     have hzero : (fun σ => eval (γ σ) (map (Int.castRingHom ℂ) f)) =ᶠ[𝓝 0] fun _ => (0 : ℂ) := by
       filter_upwards [hTn] with σ hσ
       exact (hγmem σ hσ).1.2 f hf
     exact hder.unique ((hasDerivAt_const (0 : ℂ) (0 : ℂ)).congr_of_eventuallyEq hzero)
-  ·
-    intro c hwc
+  · intro c hwc
     obtain ⟨W, hWo, hzW, F, hFd, hF⟩ :=
       hP II Ψ K ι Ω E D X.M (X.S.R.chart k) hcompat (γ 0) hz (by rw [hpz]; exact hx)
     have hFz : HasFDerivAt F (fderiv ℂ F (γ 0)) (γ 0) :=

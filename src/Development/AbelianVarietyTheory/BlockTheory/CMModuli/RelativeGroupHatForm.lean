@@ -9,7 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.RelativeGroupHatForm
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct
 
@@ -17,13 +18,15 @@ def zhatSubring : Subring (∀ n : ℕ+, ZMod n) where
   carrier := {f | ∀ (m n : ℕ+) (h : (m : ℕ) ∣ n), ZMod.castHom h (ZMod m) (f n) = f m}
   mul_mem' {a b} ha hb m n h := by rw [Pi.mul_apply, map_mul, ha m n h, hb m n h, Pi.mul_apply]
   one_mem' m n h := by rw [Pi.one_apply, map_one, Pi.one_apply]
-  add_mem' {a b} ha hb m n h := by rw [Pi.add_apply, map_add (f := _), ha m n h, hb m n h, Pi.add_apply]
+  add_mem' {a b} ha hb m n h := by
+    rw [Pi.add_apply, map_add (f := _), ha m n h, hb m n h, Pi.add_apply]
   zero_mem' m n h := by rw [Pi.zero_apply, map_zero, Pi.zero_apply]
   neg_mem' {a} ha m n h := by rw [Pi.neg_apply, map_neg, ha m n h, Pi.neg_apply]
 
 abbrev Zhat : Type := zhatSubring
 
-def Zhat.red (n : ℕ+) : Zhat →+* ZMod n := (Pi.evalRingHom (fun m : ℕ+ => ZMod m) n).comp zhatSubring.subtype
+def Zhat.red (n : ℕ+) : Zhat →+* ZMod n :=
+  (Pi.evalRingHom (fun m : ℕ+ => ZMod m) n).comp zhatSubring.subtype
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
@@ -35,14 +38,22 @@ def hatMul (D : Datum H) (c : 𝓞 E) : Lhat D →ₗ[Zhat] Lhat D :=
 def hatForm (D : Datum H) : LinearMap.BilinForm Zhat (Lhat D) := D.EF.baseChange Zhat
 
 def hatSub (D : Datum H) (𝔞 : Ideal (𝓞 E)) : Submodule Zhat (Lhat D) :=
-  Submodule.span Zhat ((fun a : D.La => (1 : Zhat) ⊗ₜ[ℤ] a) '' (𝔞 • (⊤ : Submodule (𝓞 E) D.La) : Submodule (𝓞 E) D.La))
+  Submodule.span Zhat
+    ((fun a : D.La => (1 : Zhat) ⊗ₜ[ℤ] a)
+      '' (𝔞 • (⊤ : Submodule (𝓞 E) D.La) : Submodule (𝓞 E) D.La))
 
 def simGroup (D : Datum H) (l : Level H) : Subgroup (Lhat D ≃ₗ[Zhat] Lhat D) where
-  carrier := {g | (∀ c x, g (hatMul D c x) = hatMul D c (g x)) ∧
-    ∃ ν : Zhatˣ, Zhat.red ⟨l.A, l.A_pos⟩ ν = 1 ∧ ∀ x y, hatForm D (g x) (g y) = ν * hatForm D x y}
+  carrier :=
+    {g | (∀ c x, g (hatMul D c x) = hatMul D c (g x)) ∧
+      ∃ ν : Zhatˣ, Zhat.red ⟨l.A, l.A_pos⟩ ν = 1 ∧ ∀ x y, hatForm D (g x) (g y) = ν * hatForm D x y}
   mul_mem' := by
     rintro g h ⟨hg, ν, hν, eg⟩ ⟨hh, ν', hν', eh⟩
-    refine ⟨fun c x => ?_, ν * ν', by rw [Units.val_mul, map_mul, hν, hν', _root_.mul_one], fun x y => ?_⟩
+    refine ⟨
+      fun c x => ?_,
+      ν * ν',
+      by rw [Units.val_mul, map_mul, hν, hν', _root_.mul_one],
+      fun x y => ?_
+    ⟩
     · show g (h _) = hatMul D c (g (h x))
       rw [hh, hg]
     · show hatForm D (g (h x)) (g (h y)) = _
@@ -74,7 +85,8 @@ def congSub (D : Datum H) (𝔞 : Ideal (𝓞 E)) : Subgroup (Lhat D ≃ₗ[Zhat
 def trivAt (D : Datum H) (l : Level H) : Subgroup (Lhat D ≃ₗ[Zhat] Lhat D) :=
   congSub D l.Mb ⊓ congSub D (Ideal.span {(l.A : 𝓞 E)})
 
-def relGroup (D : Datum H) (l l₂ : Level H) : Subgroup (Lhat D ≃ₗ[Zhat] Lhat D) := simGroup D l₂ ⊓ trivAt D l
+def relGroup (D : Datum H) (l l₂ : Level H) : Subgroup (Lhat D ≃ₗ[Zhat] Lhat D) :=
+  simGroup D l₂ ⊓ trivAt D l
 
 theorem zeta_pow_div {m n : ℕ} (hn : 0 < n) (h : m ∣ n) : zeta n ^ (n / m) = zeta m := by
   obtain ⟨k, rfl⟩ := h
@@ -105,7 +117,8 @@ def lowerCoeff {l l₂ : Level H} (h : l.Dvd l₂) (c : Coeff l₂) : Coeff l wh
   conj := c.conj
   zeta_mem := by
     have hp : 0 < l₂.M' := Nat.lcm_pos (by have := l₂.three_le; omega) l₂.A_pos
-    have hd : l.M' ∣ l₂.M' := Nat.lcm_dvd (h.1.trans (Nat.dvd_lcm_left _ _)) (h.2.2.trans (Nat.dvd_lcm_right _ _))
+    have hd : l.M' ∣ l₂.M' :=
+      Nat.lcm_dvd (h.1.trans (Nat.dvd_lcm_left _ _)) (h.2.2.trans (Nat.dvd_lcm_right _ _))
     rw [← zeta_pow_div hp hd]
     exact pow_mem c.zeta_mem _
   le := (KA_le h).trans c.le
@@ -117,43 +130,51 @@ def IsOver (h : l.Dvd l₂) (Xo : Moduli D l) (Xo₂ : Moduli D l₂) (π : Xo�
 
 def PullsBack (Xo : Moduli D l) (Xo₂ : Moduli D l₂) (π : Xo₂.X ⟶ Xo.X) : Prop :=
   ∃ m : SABMap Xo₂.univ.t Xo.univ.t π,
-    (∀ a, (Xo₂.univ.eta a ^ (l₂.M / l.M)).left ≫ m.φ = π ≫ (Xo.univ.eta a).left) ∧
-    (∀ a, (Xo₂.univ.etaA a ^ (l₂.A / l.A)).left ≫ m.φ = π ≫ (Xo.univ.etaA a).left)
+    (∀ a, (Xo₂.univ.eta a ^ (l₂.M / l.M)).left ≫ m.φ = π ≫ (Xo.univ.eta a).left)
+      ∧ (∀ a, (Xo₂.univ.etaA a ^ (l₂.A / l.A)).left ≫ m.φ = π ≫ (Xo.univ.etaA a).left)
 
 def ChangesLevelBy (Xo : Moduli D l) (g : Lhat D ≃ₗ[Zhat] Lhat D) (r : Xo.X ⟶ Xo.X) : Prop :=
   ∃ m : SABMap Xo.univ.t Xo.univ.t r,
-    (∀ a b : D.La, g (1 ⊗ₜ a) - 1 ⊗ₜ b ∈ hatSub D l.Mb →
-      (Xo.univ.eta b).left ≫ m.φ = r ≫ (Xo.univ.eta a).left) ∧
-    (∀ a b : D.La, g (1 ⊗ₜ a) - 1 ⊗ₜ b ∈ hatSub D (Ideal.span {(l.A : 𝓞 E)}) →
-      (Xo.univ.etaA b).left ≫ m.φ = r ≫ (Xo.univ.etaA a).left)
+    (∀ a b : D.La,
+        g (1 ⊗ₜ a) - 1 ⊗ₜ b ∈ hatSub D l.Mb → (Xo.univ.eta b).left ≫ m.φ = r ≫ (Xo.univ.eta a).left)
+      ∧ (∀ a b : D.La,
+        g (1 ⊗ₜ a) - 1 ⊗ₜ b ∈ hatSub D (Ideal.span {(l.A : 𝓞 E)})
+          → (Xo.univ.etaA b).left ≫ m.φ = r ≫ (Xo.univ.etaA a).left)
 
-theorem spMap_inclusion_comp {A B C : IntermediateField ℚ ℂ} (h₁ : A ≤ B) (h₂ : B ≤ C) :
-    spMap (IntermediateField.inclusion h₂).toRingHom ≫ spMap (IntermediateField.inclusion h₁).toRingHom =
-      spMap (IntermediateField.inclusion (h₁.trans h₂)).toRingHom := by
+theorem spMap_inclusion_comp {A B C : IntermediateField ℚ ℂ} (h₁ : A ≤ B) (h₂ : B ≤ C)
+    : spMap (IntermediateField.inclusion h₂).toRingHom
+        ≫ spMap (IntermediateField.inclusion h₁).toRingHom
+      = spMap (IntermediateField.inclusion (h₁.trans h₂)).toRingHom := by
   unfold spMap
   rw [← Spec.map_comp]
   rfl
 
-def levelMapF (h : l.Dvd l₂) {Xo : Moduli D l} {Xo₂ : Moduli D l₂} {π : Xo₂.X ⟶ Xo.X} (hπ : IsOver h Xo Xo₂ π)
-    (c : Coeff l₂) : Xo₂.XF c ⟶ Xo.XF (lowerCoeff h c) :=
+def levelMapF
+    (h : l.Dvd l₂)
+    {Xo : Moduli D l} {Xo₂ : Moduli D l₂} {π : Xo₂.X ⟶ Xo.X} (hπ : IsOver h Xo Xo₂ π)
+    (c : Coeff l₂)
+    : Xo₂.XF c ⟶ Xo.XF (lowerCoeff h c) :=
   pullback.lift (pullback.fst _ _ ≫ π) (pullback.snd _ _) (by
-    rw [Category.assoc, hπ, ← Category.assoc, pullback.condition, Category.assoc, spMap_inclusion_comp]
+    rw [Category.assoc, hπ, ← Category.assoc, pullback.condition, Category.assoc,
+      spMap_inclusion_comp]
     rfl)
 
-def endF {Xo : Moduli D l} (r : Xo.X ⟶ Xo.X) (hr : r ≫ Xo.s = Xo.s) (c : Coeff l) : Xo.XF c ⟶ Xo.XF c :=
-  pullback.lift (pullback.fst _ _ ≫ r) (pullback.snd _ _) (by rw [Category.assoc, hr, pullback.condition])
+def endF {Xo : Moduli D l} (r : Xo.X ⟶ Xo.X) (hr : r ≫ Xo.s = Xo.s) (c : Coeff l)
+    : Xo.XF c ⟶ Xo.XF c :=
+  pullback.lift (pullback.fst _ _ ≫ r) (pullback.snd _ _)
+    (by rw [Category.assoc, hr, pullback.condition])
 
-def IsLevelCovering (h : l.Dvd l₂) {Xo : Moduli D l} {Xo₂ : Moduli D l₂} {π : Xo₂.X ⟶ Xo.X}
-    (hπ : IsOver h Xo Xo₂ π) : Prop :=
+def IsLevelCovering
+    (h : l.Dvd l₂) {Xo : Moduli D l} {Xo₂ : Moduli D l₂} {π : Xo₂.X ⟶ Xo.X} (hπ : IsOver h Xo Xo₂ π)
+    : Prop :=
   ∃ (ρ : relGroup D l l₂ → (Xo₂.X ≅ Xo₂.X)) (hρ : ∀ g, (ρ g).hom ≫ Xo₂.s = Xo₂.s),
-    ρ 1 = Iso.refl _ ∧ (∀ g g', ρ (g * g') = ρ g ≪≫ ρ g') ∧
-    (∀ g, ChangesLevelBy Xo₂ g.1 (ρ g).hom) ∧
-    (∀ g, (ρ g).hom ≫ π = π) ∧
-    ∀ c : Coeff l₂,
-      IsFinite (levelMapF h hπ c) ∧ Etale (levelMapF h hπ c) ∧ Surjective (levelMapF h hπ c) ∧
-      ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ Xo₂.XF c),
-        (∀ y : Sp k ⟶ Xo₂.XF c, y ≫ levelMapF h hπ c = x ≫ levelMapF h hπ c →
-          ∃ g, x ≫ endF (ρ g).hom (hρ g) c = y) ∧
-        ∀ g, x ≫ endF (ρ g).hom (hρ g) c = x ↔ g.1 ∈ trivAt D l₂
+    ρ 1 = Iso.refl _ ∧ (∀ g g', ρ (g * g') = ρ g ≪≫ ρ g') ∧ (∀ g, ChangesLevelBy Xo₂ g.1 (ρ g).hom)
+      ∧ (∀ g, (ρ g).hom ≫ π = π)
+      ∧ ∀ c : Coeff l₂,
+        IsFinite (levelMapF h hπ c) ∧ Etale (levelMapF h hπ c) ∧ Surjective (levelMapF h hπ c)
+          ∧ ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ Xo₂.XF c),
+            (∀ y : Sp k ⟶ Xo₂.XF c,
+                y ≫ levelMapF h hπ c = x ≫ levelMapF h hπ c → ∃ g, x ≫ endF (ρ g).hom (hρ g) c = y)
+              ∧ ∀ g, x ≫ endF (ρ g).hom (hρ g) c = x ↔ g.1 ∈ trivAt D l₂
 
 end GlobalTheory.IndefiniteRowSideFullHecke.RelativeGroupHatForm

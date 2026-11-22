@@ -9,15 +9,18 @@ namespace ReciprocityTheory.L2DbarEstimates.C
 open MeasureTheory Metric Set Filter Topology Complex
 open scoped ENNReal
 
-theorem ae_eq_eqOn {n : ℕ} {Ω : Set (V n)} {U U' : V n → ℂ} (hΩ : IsOpen Ω)
-    (hU : ContinuousOn U Ω) (hU' : ContinuousOn U' Ω) (h : U =ᵐ[volume.restrict Ω] U') :
-    EqOn U U' Ω := by
+theorem ae_eq_eqOn
+    {n : ℕ} {Ω : Set (V n)} {U U' : V n → ℂ} (hΩ : IsOpen Ω) (hU : ContinuousOn U Ω)
+    (hU' : ContinuousOn U' Ω) (h : U =ᵐ[volume.restrict Ω] U')
+    : EqOn U U' Ω := by
   exact Measure.eqOn_open_of_ae_eq h hΩ hU hU'
 
-theorem reg_glue {n : ℕ} {Ω : Set (V n)} {u : V n → ℂ} (hΩ : IsOpen Ω)
-    (hloc : ∀ x ∈ Ω, ∃ r > 0, ball x r ⊆ Ω ∧
-      ∃ U : V n → ℂ, DifferentiableOn ℂ U (ball x r) ∧ u =ᵐ[volume.restrict (ball x r)] U) :
-    ∃ U : V n → ℂ, DifferentiableOn ℂ U Ω ∧ u =ᵐ[volume.restrict Ω] U := by
+theorem reg_glue
+    {n : ℕ} {Ω : Set (V n)} {u : V n → ℂ} (hΩ : IsOpen Ω)
+    (hloc : ∀ x ∈ Ω, ∃ r > 0,
+      ball x r ⊆ Ω
+        ∧ ∃ U : V n → ℂ, DifferentiableOn ℂ U (ball x r) ∧ u =ᵐ[volume.restrict (ball x r)] U)
+    : ∃ U : V n → ℂ, DifferentiableOn ℂ U Ω ∧ u =ᵐ[volume.restrict Ω] U := by
   classical
   choose! r hr hsub U hU hae using hloc
   have agree : ∀ x ∈ Ω, ∀ y ∈ Ω, EqOn (U x) (U y) (ball x (r x) ∩ ball y (r y)) := by
@@ -40,8 +43,10 @@ theorem reg_glue {n : ℕ} {Ω : Set (V n)} {u : V n → ℂ} (hΩ : IsOpen Ω)
     have hev : (fun x => U x x) =ᶠ[𝓝 y] U y :=
       Filter.eventually_of_mem hnhds (fun x hx => loc y hy x hx)
     exact (((hU y hy).differentiableAt hnhds).congr_of_eventuallyEq hev).differentiableWithinAt
-  · obtain ⟨T, hTc, hT⟩ := TopologicalSpace.isOpen_iUnion_countable
-      (fun x : Ω => ball (x : V n) (r x)) (fun _ => isOpen_ball)
+  · obtain ⟨T, hTc, hT⟩ :=
+      TopologicalSpace.isOpen_iUnion_countable
+        (fun x : Ω => ball (x : V n) (r x))
+        (fun _ => isOpen_ball)
     have hcov : Ω = ⋃ x ∈ T, ball ((x : Ω) : V n) (r x) := by
       rw [hT]
       ext z

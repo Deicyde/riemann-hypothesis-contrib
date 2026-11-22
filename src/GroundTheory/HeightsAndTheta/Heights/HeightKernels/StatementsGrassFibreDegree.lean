@@ -10,13 +10,16 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+  MvPolynomial
 
 noncomputable section
 
 def GrassFibreDegree.Statement : Prop :=
-  ∀ (n p : ℕ), p.Prime →
-    vertR (grassIdeal 1 1 n) (fun _ : Fin n => fsMulti (plBlocks 1 1 n)) (C (p : ℤ)) = Real.log p
+  ∀ (n p : ℕ),
+    p.Prime
+      → vertR (grassIdeal 1 1 n) (fun _ : Fin n => fsMulti (plBlocks 1 1 n)) (C (p : ℤ))
+        = Real.log p
 
 end
 

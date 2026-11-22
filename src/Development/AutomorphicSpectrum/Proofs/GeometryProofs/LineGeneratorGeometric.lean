@@ -15,35 +15,47 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.StalkClosedP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.ConstRatio
 
-theorem ratio_mem {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {x : Cpt ξ}
-    {W : Type} [AddCommGroup W] [Module Ω W] {e : W} {s t : Ω} (he : e ≠ 0) (hs : s ≠ 0)
-    (hst : Submodule.span (regAt ξ x) {s • e} = Submodule.span (regAt ξ x) {t • e}) : t / s ∈ regAt ξ x := by
+theorem ratio_mem
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {x : Cpt ξ} {W : Type} [AddCommGroup W] [Module Ω W]
+    {e : W} {s t : Ω} (he : e ≠ 0) (hs : s ≠ 0)
+    (hst : Submodule.span (regAt ξ x) {s • e} = Submodule.span (regAt ξ x) {t • e})
+    : t / s ∈ regAt ξ x := by
   have : t • e ∈ Submodule.span (regAt ξ x) {s • e} := hst ▸ Submodule.mem_span_singleton_self _
   obtain ⟨r, hr⟩ := Submodule.mem_span_singleton.mp this
   have hr' : ((r : Ω) * s) • e = t • e := by rw [mul_smul]; exact hr
   have := smul_left_injective Ω he hr'
-  rw [← this, mul_div_cancel_right₀ _ hs]; exact r.2
+  rw [← this, mul_div_cancel_right₀ _ hs]
+  exact r.2
 
-theorem exists_smul_eq {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {x : Cpt ξ}
-    {W : Type} [AddCommGroup W] [Module Ω W] {a a' : W} {α α' : Ω} (hα' : α' ≠ 0)
-    (h : Submodule.span (regAt ξ x) {α • a} = Submodule.span (regAt ξ x) {α' • a'}) : ∃ f : Ω, a' = f • a := by
+theorem exists_smul_eq
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {x : Cpt ξ} {W : Type} [AddCommGroup W] [Module Ω W]
+    {a a' : W} {α α' : Ω}
+    (hα' : α' ≠ 0) (h : Submodule.span (regAt ξ x) {α • a} = Submodule.span (regAt ξ x) {α' • a'})
+    : ∃ f : Ω, a' = f • a := by
   have : α' • a' ∈ Submodule.span (regAt ξ x) {α • a} := h ▸ Submodule.mem_span_singleton_self _
   obtain ⟨r, hr⟩ := Submodule.mem_span_singleton.mp this
   have hr' : ((r : Ω) * α) • a = α' • a' := by rw [mul_smul]; exact hr
   refine ⟨α'⁻¹ * ((r : Ω) * α), ?_⟩
   rw [mul_smul, hr', smul_smul, inv_mul_cancel₀ hα', one_smul]
 
-theorem unit_of_coeff {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V]
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {A B : Lat ξ V} {p q : ℕ} {a : ⋀[Ω]^p V} {b : ⋀[Ω]^q V} {s t : Ω}
-    {x : Cpt ξ} (ha : a ≠ 0) (hb : b ≠ 0) (hs : s ≠ 0) (ht : t ≠ 0) (h : IsCoeffAt A B p q a b x 1)
-    (h' : IsCoeffAt A B p q (s • a) (t • b) x 1) : unitAt ξ x (s / t) := by
+theorem unit_of_coeff
+    {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {A B : Lat ξ V} {p q : ℕ} {a : ⋀[Ω]^p V} {b : ⋀[Ω]^q V}
+    {s t : Ω} {x : Cpt ξ} (ha : a ≠ 0) (hb : b ≠ 0) (hs : s ≠ 0) (ht : t ≠ 0)
+    (h : IsCoeffAt A B p q a b x 1) (h' : IsCoeffAt A B p q (s • a) (t • b) x 1)
+    : unitAt ξ x (s / t) := by
   obtain ⟨α, β, hα, -, hA, hB, e⟩ := h
   obtain ⟨α', β', hα', -, hA', hB', e'⟩ := h'
   rw [_root_.one_mul] at e e'
@@ -55,14 +67,18 @@ theorem unit_of_coeff {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V]
   have k4 := ratio_mem hb (mul_ne_zero hα' ht) (hB'.symm.trans hB)
   refine ⟨div_ne_zero hs ht, ?_, ?_⟩
   · have := mul_mem k1 k4
-    convert this using 1; field_simp
+    convert this using 1
+    field_simp
   · have := mul_mem k2 k3
-    convert this using 1; field_simp
+    convert this using 1
+    field_simp
 
-theorem exists_factors {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V]
+theorem exists_factors
+    {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V]
     {ξ : Spec (CommRingCat.of Ω) ⟶ X} {A B : Lat ξ V} {p q : ℕ} {a a' : ⋀[Ω]^p V} {b b' : ⋀[Ω]^q V}
-    {T : Set (Cpt ξ)} (hT : T.Nonempty) (h : IsLineGenOn A B p q a b T) (h' : IsLineGenOn A B p q a' b' T) :
-    ∃ s t : Ω, s ≠ 0 ∧ t ≠ 0 ∧ a' = s • a ∧ b' = t • b ∧ ∀ x ∈ T, unitAt ξ x (s / t) := by
+    {T : Set (Cpt ξ)}
+    (hT : T.Nonempty) (h : IsLineGenOn A B p q a b T) (h' : IsLineGenOn A B p q a' b' T)
+    : ∃ s t : Ω, s ≠ 0 ∧ t ≠ 0 ∧ a' = s • a ∧ b' = t • b ∧ ∀ x ∈ T, unitAt ξ x (s / t) := by
   obtain ⟨ha, hb, h⟩ := h
   obtain ⟨ha', hb', h'⟩ := h'
   obtain ⟨x₀, hx₀⟩ := hT
@@ -81,28 +97,37 @@ theorem exists_factors {X : Scheme.{0}} {Ω V : Type} [Field Ω] [AddCommGroup V
   rw [hs, ht] at this
   exact unit_of_coeff ha hb hs0 ht0 (h x hx) this
 
-theorem isProper_of_proj {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R} (h : IsProjOver f) :
-    IsProper f := by
+theorem isProper_of_proj {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R} (h : IsProjOver f)
+    : IsProper f := by
   obtain ⟨m, i, hi, rfl⟩ := h
   have := isProper_str R m
   infer_instance
 
-theorem const_ratio : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (U : Set (Xo.XF c)) (Z : CptOver Y U) (τ : E →+* ℂ) (a a' : ⋀[Z.Ω]^D.p Z.V) (b b' : ⋀[Z.Ω]^D.q Z.V), (Function.Injective β ∧ IsNoetherianRing O ∧ ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a) → Z.IsGeom → IsLineGenOn (Z.eig τ) (Z.eig (ComplexEmbedding.conjugate τ)) D.p D.q a b Z.genFib → IsLineGenOn (Z.eig τ) (Z.eig (ComplexEmbedding.conjugate τ)) D.p D.q a' b' Z.genFib → ∃ (x : c.F) (s t : Z.Ω), x ≠ 0 ∧ t ≠ 0 ∧ s = Z.inc x * t ∧ a' = s • a ∧ b' = t • b := by
+theorem const_ratio
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (U : Set (Xo.XF c)) (Z : CptOver Y U) (τ : E →+* ℂ) (a a' : ⋀[Z.Ω]^D.p Z.V)
+        (b b' : ⋀[Z.Ω]^D.q Z.V),
+      (Function.Injective β ∧ IsNoetherianRing O ∧ ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a)
+        → Z.IsGeom
+        → IsLineGenOn (Z.eig τ) (Z.eig (ComplexEmbedding.conjugate τ)) D.p D.q a b Z.genFib
+        → IsLineGenOn (Z.eig τ) (Z.eig (ComplexEmbedding.conjugate τ)) D.p D.q a' b' Z.genFib
+        → ∃ (x : c.F) (s t : Z.Ω), x ≠ 0 ∧ t ≠ 0 ∧ s = Z.inc x * t ∧ a' = s • a ∧ b' = t • b := by
   intro E _ _ _ H D l Xo c O _ β Y U Z τ a a' b b' ⟨hβ, hN, hfrac⟩ hG h h'
   haveI : IsDomain O := hβ.isDomain β
   letI : Algebra O Z.Ω := (Z.inc.comp β).toAlgebra
   have halg : ∀ o : O, algebraMap O Z.Ω o = Z.inc (β o) := fun _ => rfl
   have hover : (Z.ξ₀ ≫ Y.j) ≫ Y.s = Spec.map (CommRingCat.ofHom (algebraMap O Z.Ω)) := by
     have e : (Z.ξ₀ ≫ Y.j) ≫ Y.s = spMap Z.inc ≫ spMap β := by
-      rw [Model.j, Category.assoc, Category.assoc, pullback.condition, ← Category.assoc Y.jQ, Y.jQ_over,
-        ← Category.assoc, Z.over_inc]
+      rw [Model.j, Category.assoc, Category.assoc, pullback.condition, ← Category.assoc Y.jQ,
+        Y.jQ_over, ← Category.assoc, Z.over_inc]
     rw [e, spMap, spMap, ← Spec.map_comp]
     rfl
   have hinj : Function.Injective (algebraMap O Z.Ω) := Z.inc.injective.comp hβ
   have hcc : ConstClosed O Z.Ω := by
     rintro w ⟨f, hf0, hf⟩
-    obtain ⟨x, rfl⟩ := hG w ⟨f.map β, (Polynomial.map_ne_zero_iff hβ).2 hf0, by
-      rw [Polynomial.eval₂_map]; exact hf⟩
+    obtain ⟨x, rfl⟩ :=
+      hG w ⟨f.map β, (Polynomial.map_ne_zero_iff hβ).2 hf0, by rw [Polynomial.eval₂_map]; exact hf⟩
     obtain ⟨u, v, hv, e⟩ := hfrac x
     refine ⟨u, v, fun h0 => hv (by rw [h0, map_zero]), ?_⟩
     rw [halg, halg, ← map_mul, e]
@@ -127,11 +152,17 @@ theorem const_ratio : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
   obtain ⟨s, t, hs, ht, rfl, rfl, hu⟩ := exists_factors hne h h'
   haveI : IsProper Y.s := isProper_of_proj Y.proj
   let L : Lat (Z.ξ₀ ≫ Y.j) Z.Ω := fun p => Submodule.span (regAt (Z.ξ₀ ≫ Y.j) p) {1}
-  obtain ⟨x', y', hy', e⟩ := (GlobalTheory.T.line_lattice_generic_sections Y.X Z.Ω (Z.ξ₀ ≫ Y.j) O Y.s hover hinj Z.gen hcc L 1
-    (fun p _ => ⟨one_ne_zero, rfl⟩) (s / t)).1 (fun p hp =>
-      Submodule.mem_span_singleton.2 ⟨⟨s / t, (hu p (hsub hp)).2.1⟩, by
-        show (s / t) * 1 = _
-        rw [_root_.mul_one]⟩)
+  obtain ⟨x', y', hy', e⟩ :=
+    (GlobalTheory.T.line_lattice_generic_sections Y.X Z.Ω (Z.ξ₀ ≫ Y.j) O Y.s hover hinj Z.gen hcc L
+        1
+        (fun p _ => ⟨one_ne_zero, rfl⟩)
+        (s / t)).1 (fun p hp =>
+      Submodule.mem_span_singleton.2 ⟨
+        ⟨s / t, (hu p (hsub hp)).2.1⟩,
+        by
+          show (s / t) * 1 = _
+          rw [_root_.mul_one]
+      ⟩)
   have hy : β y' ≠ 0 := fun h0 => hy' (hβ (by rw [h0, map_zero]))
   rw [_root_.mul_one, halg, halg] at e
   have hx' : β x' ≠ 0 := by

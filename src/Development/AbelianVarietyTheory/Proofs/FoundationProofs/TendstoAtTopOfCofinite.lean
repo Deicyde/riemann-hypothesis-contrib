@@ -6,7 +6,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.RowLim
@@ -63,7 +64,8 @@ lemma symS_shift_tendsto (r : ℕ) : ∀ f : ℤ → ℂ, Tendsto f cofinite (�
     beta_reduce
     rw [e]; ring
 
-noncomputable def mean (L : ℕ) (k : ℤ → ℂ) (d : ℤ) : ℂ := (L : ℂ)⁻¹ * ∑ r ∈ Finset.range L, k (d + r)
+noncomputable def mean (L : ℕ) (k : ℤ → ℂ) (d : ℤ) : ℂ :=
+  (L : ℂ)⁻¹ * ∑ r ∈ Finset.range L, k (d + r)
 
 lemma mean_tendsto {L : ℕ} {k : ℤ → ℂ} (hk : Tendsto k cofinite (𝓝 0)) :
     Tendsto (mean L k) cofinite (𝓝 0) := by
@@ -103,16 +105,23 @@ lemma symS_mul_mean_tendsto {L : ℕ} {A k : ℤ → ℂ} {C : ℝ} (hA : ∀ d,
     symS_shift_tendsto r (f r) (bdd_mul_tendsto (fun d => hA (d - r)) hk)
   simpa using this.const_mul ((L : ℂ)⁻¹)
 
-theorem rowlim : ∀ (L : ℕ) (A g : ℤ → ℂ) (G : ℤ × ℤ → ℂ) (c : ℤ), 0 < L → (∃ C : ℝ, ∀ d, ‖A d‖ ≤ C) → (∀ d, ∑ r ∈ Finset.range L, A (d - r) = 0) → (∀ d, G (c, d) = g d) → Tendsto g cofinite (𝓝 0) → (Summable fun d : ℤ => A d * dif L (0, 1) (dif L (0, 1) G) (c, d)) → Tendsto (fun R : ℕ => ∑ d ∈ Finset.Icc (-(R : ℤ)) R, A d * g d) atTop (𝓝 (∑' d : ℤ, A d * dif L (0, 1) (dif L (0, 1) G) (c, d))) := by
+theorem rowlim
+    : ∀ (L : ℕ) (A g : ℤ → ℂ) (G : ℤ × ℤ → ℂ) (c : ℤ),
+      0 < L → (∃ C : ℝ, ∀ d, ‖A d‖ ≤ C) → (∀ d, ∑ r ∈ Finset.range L, A (d - r) = 0)
+        → (∀ d, G (c, d) = g d) → Tendsto g cofinite (𝓝 0)
+        → (Summable fun d : ℤ => A d * dif L (0, 1) (dif L (0, 1) G) (c, d))
+        → Tendsto
+          (fun R : ℕ => ∑ d ∈ Finset.Icc (-(R : ℤ)) R, A d * g d)
+          atTop (𝓝 (∑' d : ℤ, A d * dif L (0, 1) (dif L (0, 1) G) (c, d))) := by
   intro L A g G c _ ⟨C, hA⟩ hsum hG hg hS
-  have hpt : ∀ (F : ℤ × ℤ → ℂ) (d : ℤ), dif L (0, 1) F (c, d) = F (c, d) - mean L (fun e => F (c, e)) d := by
+  have hpt
+      : ∀ (F : ℤ × ℤ → ℂ) (d : ℤ),
+        dif L (0, 1) F (c, d) = F (c, d) - mean L (fun e => F (c, e)) d := by
     intro F d
-    have e : ∀ r : ℕ, (c, d) + (r : ℤ) • ((0 : ℤ), (1 : ℤ)) = (c, d + r) := by
-      intro r; ext <;> simp
+    have e : ∀ r : ℕ, (c, d) + (r : ℤ) • ((0 : ℤ), (1 : ℤ)) = (c, d + r) := by intro r; ext <;> simp
     simp only [dif, mean, e]
   set h : ℤ → ℂ := fun d => g d - mean L g d with hh
-  have hG1 : ∀ d, dif L (0, 1) G (c, d) = h d := by
-    intro d; rw [hpt]; simp only [hh, hG]
+  have hG1 : ∀ d, dif L (0, 1) G (c, d) = h d := by intro d; rw [hpt]; simp only [hh, hG]
   have hG2 : ∀ d, dif L (0, 1) (dif L (0, 1) G) (c, d) = h d - mean L h d := by
     intro d; rw [hpt, hG1]; simp only [hG1]
   simp only [hG2] at hS ⊢
@@ -125,6 +134,7 @@ theorem rowlim : ∀ (L : ℕ) (A g : ℤ → ℂ) (G : ℤ × ℤ → ℂ) (c :
   refine (tendsto_congr fun R => ?_).1 this
   simp only [Function.comp, symS, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun d _ => ?_
-  simp only [hh]; ring
+  simp only [hh]
+  ring
 
 end GlobalTheory.RowLim

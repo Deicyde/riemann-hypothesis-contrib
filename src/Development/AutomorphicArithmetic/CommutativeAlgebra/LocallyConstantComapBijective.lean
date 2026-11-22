@@ -6,10 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
-private theorem clopen_pre_inj {B B' : Type} [CommRing B] [CommRing B'] (φ : B →+* B')
-    (h : ∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e')
+private theorem clopen_pre_inj
+    {B B' : Type} [CommRing B] [CommRing B']
+    (φ : B →+* B') (h : ∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e')
     {C D : Set (PrimeSpectrum B)} (hC : IsClopen C) (hD : IsClopen D)
-    (hCD : PrimeSpectrum.comap φ ⁻¹' C = PrimeSpectrum.comap φ ⁻¹' D) : C = D := by
+    (hCD : PrimeSpectrum.comap φ ⁻¹' C = PrimeSpectrum.comap φ ⁻¹' D)
+    : C = D := by
   obtain ⟨e, he, rfl⟩ := PrimeSpectrum.isClopen_iff.1 hC
   obtain ⟨d, hd, rfl⟩ := PrimeSpectrum.isClopen_iff.1 hD
   have h1 : φ e = φ d := by
@@ -19,16 +21,20 @@ private theorem clopen_pre_inj {B B' : Type} [CommRing B] [CommRing B'] (φ : B 
     exact hCD
   rw [(h (φ e) (he.map φ)).unique ⟨he, rfl⟩ ⟨hd, h1.symm⟩]
 
-private theorem clopen_pre_surj {B B' : Type} [CommRing B] [CommRing B'] (φ : B →+* B')
-    (h : ∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e')
-    {C' : Set (PrimeSpectrum B')} (hC' : IsClopen C') :
-    ∃ C : Set (PrimeSpectrum B), IsClopen C ∧ PrimeSpectrum.comap φ ⁻¹' C = C' := by
+private theorem clopen_pre_surj
+    {B B' : Type} [CommRing B] [CommRing B']
+    (φ : B →+* B') (h : ∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e')
+    {C' : Set (PrimeSpectrum B')} (hC' : IsClopen C')
+    : ∃ C : Set (PrimeSpectrum B), IsClopen C ∧ PrimeSpectrum.comap φ ⁻¹' C = C' := by
   obtain ⟨e', he', rfl⟩ := PrimeSpectrum.isClopen_iff.1 hC'
   obtain ⟨e, ⟨he, rfl⟩, -⟩ := h e' he'
   exact ⟨_, PrimeSpectrum.isClopen_iff.2 ⟨e, he, rfl⟩, rfl⟩
 
-theorem UpperTheory.locallyConstant_comap_bijective :
-    ∀ (B B' : Type) [CommRing B] [CommRing B'] (φ : B →+* B') (Y : Type), (∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e') → Function.Bijective (fun a : LocallyConstant (PrimeSpectrum B) Y => a.comap ⟨PrimeSpectrum.comap φ, PrimeSpectrum.continuous_comap φ⟩) := by
+theorem UpperTheory.locallyConstant_comap_bijective
+    : ∀ (B B' : Type) [CommRing B] [CommRing B'] (φ : B →+* B') (Y : Type),
+      (∀ e' : B', IsIdempotentElem e' → ∃! e : B, IsIdempotentElem e ∧ φ e = e')
+        → Function.Bijective (fun a : LocallyConstant (PrimeSpectrum B) Y =>
+          a.comap ⟨PrimeSpectrum.comap φ, PrimeSpectrum.continuous_comap φ⟩) := by
   intro B B' _ _ φ Y h
   constructor
   · intro a b hab
@@ -58,8 +64,7 @@ theorem UpperTheory.locallyConstant_comap_bijective :
         Set.mem_empty_iff_false, iff_false, not_and]
       exact fun h1 h2 => hyz (h1.symm.trans h2)
     have hcov : (⋃ y ∈ Set.range a', C y) = Set.univ := by
-      apply clopen_pre_inj φ h
-        (a'.range_finite.isClopen_biUnion fun y _ => hCc y) isClopen_univ
+      apply clopen_pre_inj φ h (a'.range_finite.isClopen_biUnion fun y _ => hCc y) isClopen_univ
       rw [Set.preimage_iUnion₂, Set.preimage_univ]
       ext q
       simp only [Set.mem_iUnion, Set.mem_univ, iff_true]

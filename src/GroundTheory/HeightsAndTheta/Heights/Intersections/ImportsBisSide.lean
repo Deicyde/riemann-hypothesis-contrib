@@ -17,8 +17,10 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem RegularityFormula.proof (hN : RegularityFunctionFieldNumber.Statement) (hO : RegularityOrder.Statement)
-    (hL : RegularityLocal.Statement) : RegularityFormula.Statement := by
+theorem RegularityFormula.proof
+    (hN : RegularityFunctionFieldNumber.Statement) (hO : RegularityOrder.Statement)
+    (hL : RegularityLocal.Statement)
+    : RegularityFormula.Statement := by
   classical
   intro K _ ι _ P b hP hb hbW
   obtain ⟨hF, hNF⟩ := hN K ι P hP
@@ -29,7 +31,9 @@ theorem RegularityFormula.proof (hN : RegularityFunctionFieldNumber.Statement) (
   have hb' : b' ≠ 0 := fun h => hb (congrArg Subtype.val h)
   obtain ⟨hfs, hsum⟩ := hL K ι P b' hP hb'
   refine ⟨hfs, hsum.trans ?_⟩
-  have hI := (ReciprocityTheory.ChartRestriction.G.AI.index_thm (funField P) (regRing P) hfree hfin (hrank hF) b' hb').2
+  have hI :=
+    (ReciprocityTheory.ChartRestriction.G.AI.index_thm (funField P) (regRing P) hfree hfin
+      (hrank hF) b' hb').2
   exact hI.trans (finsum_eq_sum_of_fintype _).symm
 
 end

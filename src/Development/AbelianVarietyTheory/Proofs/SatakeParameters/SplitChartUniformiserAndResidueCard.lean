@@ -8,7 +8,10 @@ public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.GlintPrincRelIndexNeZe
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.SplitHecke
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+  GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,16 +19,17 @@ namespace GlobalTheory.SplitUnif
 
 section General
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F)) (φ : E →+* v.adicCompletion F)
-
 
 omit [NumberField E] [Algebra F E] in
 theorem map_mem (x : 𝓞 E) : φ x ∈ v.adicCompletionIntegers F := by
   have h2 : IsIntegral (v.adicCompletionIntegers F) (φ x) :=
     IsIntegral.map_of_comp_eq (Int.castRingHom _) φ (RingHom.ext_int _ _) x.isIntegral_coe
-  obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := v.adicCompletionIntegers F)
-    (K := v.adicCompletion F)).1 h2
+  obtain ⟨y, hy⟩ :=
+    (IsIntegrallyClosed.isIntegral_iff (R := v.adicCompletionIntegers F)
+      (K := v.adicCompletion F)).1 h2
   rw [← hy]
   exact y.2
 
@@ -35,12 +39,15 @@ theorem lt_one_iff (x : WithZero (Multiplicative ℤ)) : x < 1 ↔ x ≤ WithZer
   · rw [← WithZero.exp_log h, ← WithZero.exp_zero, WithZero.exp_lt_exp, WithZero.exp_le_exp]
     omega
 
-theorem mem_max (x : v.adicCompletionIntegers F) :
-    x ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) ↔ Valued.v (x : v.adicCompletion F) < 1 :=
-  Valuation.mem_maximalIdeal_iff (v := (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))))
+theorem mem_max (x : v.adicCompletionIntegers F)
+    : x ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F)
+      ↔ Valued.v (x : v.adicCompletion F) < 1 :=
+  Valuation.mem_maximalIdeal_iff
+    (v := (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))))
 
-theorem irreducible_of_valued (p : v.adicCompletionIntegers F)
-    (hp : Valued.v (p : v.adicCompletion F) = WithZero.exp (-1)) : Irreducible p := by
+theorem irreducible_of_valued
+    (p : v.adicCompletionIntegers F) (hp : Valued.v (p : v.adicCompletion F) = WithZero.exp (-1))
+    : Irreducible p := by
   have hp0 : (p : v.adicCompletion F) ≠ 0 := by
     intro h
     rw [h, map_zero] at hp
@@ -59,20 +66,23 @@ theorem irreducible_of_valued (p : v.adicCompletionIntegers F)
     rw [map_mul]
     exact mul_le_of_le_one_left' a.2
 
-variable (P : HeightOneSpectrum (𝓞 E))
+variable
+  (P : HeightOneSpectrum (𝓞 E))
   (hφ : ∀ t : F, φ (algebraMap F E t) = algebraMap F (v.adicCompletion F) t)
   (hP : ∀ x : 𝓞 E, x ∈ P.asIdeal ↔ Valued.v (φ x) < 1)
 
 include hφ hP in
-theorem valued_unif (ϖ : 𝓞 E) (h1 : ϖ ∈ P.asIdeal) (h2 : ϖ ∉ P.asIdeal ^ 2) :
-    Valued.v (φ ϖ) = WithZero.exp (-1) := by
+theorem valued_unif (ϖ : 𝓞 E) (h1 : ϖ ∈ P.asIdeal) (h2 : ϖ ∉ P.asIdeal ^ 2)
+    : Valued.v (φ ϖ) = WithZero.exp (-1) := by
   refine le_antisymm ((lt_one_iff _).1 ((hP ϖ).1 h1)) ?_
   obtain ⟨t, ht⟩ := v.intValuation_exists_uniformizer
   let s : 𝓞 E := algebraMap (𝓞 F) (𝓞 E) t
   have hs : Valued.v (φ s) = WithZero.exp (-1) := by
     have e1 : (s : E) = algebraMap F E (algebraMap (𝓞 F) F t) := rfl
-    have e2 : Valued.v (algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F t)) =
-        v.valuation F (algebraMap (𝓞 F) F t) := v.valuedAdicCompletion_eq_valuation' _
+    have e2
+        : Valued.v (algebraMap F (v.adicCompletion F) (algebraMap (𝓞 F) F t))
+          = v.valuation F (algebraMap (𝓞 F) F t) :=
+      v.valuedAdicCompletion_eq_valuation' _
     rw [e1, hφ, e2, HeightOneSpectrum.valuation_of_algebraMap, ht]
   have hsP : s ∈ P.asIdeal := by rw [hP, lt_one_iff, hs]
   have hϖ0 : (ϖ : E) ≠ 0 := by
@@ -107,8 +117,9 @@ theorem valued_unif (ϖ : 𝓞 E) (h1 : ϖ ∈ P.asIdeal) (h2 : ϖ ∉ P.asIdeal
   exact mul_le_of_le_one_left' (map_mem v φ n)
 
 include hφ hP in
-theorem card_residueField :
-    Nat.card (IsLocalRing.ResidueField (v.adicCompletionIntegers F)) = Ideal.absNorm P.asIdeal := by
+theorem card_residueField
+    : Nat.card (IsLocalRing.ResidueField (v.adicCompletionIntegers F))
+      = Ideal.absNorm P.asIdeal := by
   let ψ : 𝓞 E →+* v.adicCompletionIntegers F :=
     (φ.comp (algebraMap (𝓞 E) E)).codRestrict _ (map_mem v φ)
   let χ : 𝓞 E →+* IsLocalRing.ResidueField (v.adicCompletionIntegers F) :=
@@ -126,8 +137,9 @@ theorem card_residueField :
     refine ⟨algebraMap (𝓞 F) (𝓞 E) r, ?_⟩
     show IsLocalRing.residue _ (ψ _) = _
     rw [eq_comm, ← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, mem_max]
-    have e1 : ((ψ (algebraMap (𝓞 F) (𝓞 E) r) : v.adicCompletionIntegers F) : v.adicCompletion F) =
-        algebraMap (𝓞 F) (v.adicCompletion F) r := by
+    have e1
+        : ((ψ (algebraMap (𝓞 F) (𝓞 E) r) : v.adicCompletionIntegers F) : v.adicCompletion F)
+          = algebraMap (𝓞 F) (v.adicCompletion F) r := by
       rw [IsScalarTower.algebraMap_apply (𝓞 F) F (v.adicCompletion F), ← hφ]
       rfl
     rw [AddSubgroupClass.coe_sub, e1]
@@ -137,16 +149,27 @@ theorem card_residueField :
 
 end General
 
-theorem unif_chart : ∀ {D : D7} (e : AE D) (P : HeightOneSpectrum (𝓞 D.host.E)) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v), IsIdemAt e P → Chart e v π → ∀ ϖ : 𝓞 D.host.E, ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2 → (∃ p : Ov D v, algebraMap (Ov D v) (Fv D.host.F v) p = π (incA D (ϖ : D.host.E)) ∧ Irreducible p) ∧ Nat.card (IsLocalRing.ResidueField (Ov D v)) = Ideal.absNorm P.asIdeal := by
+theorem unif_chart
+    : ∀ {D : D7} (e : AE D) (P : HeightOneSpectrum (𝓞 D.host.E))
+        (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
+      IsIdemAt e P → Chart e v π
+        → ∀ ϖ : 𝓞 D.host.E,
+          ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2
+            → (∃ p : Ov D v,
+                algebraMap (Ov D v) (Fv D.host.F v) p = π (incA D (ϖ : D.host.E)) ∧ Irreducible p)
+              ∧ Nat.card (IsLocalRing.ResidueField (Ov D v)) = Ideal.absNorm P.asIdeal := by
   intro D e P v π he hc ϖ h1 h2
   let φ : D.host.E →+* v.adicCompletion D.host.F := π.comp (incA D)
-  have hφ : ∀ t : D.host.F, φ (algebraMap D.host.F D.host.E t) =
-      algebraMap D.host.F (v.adicCompletion D.host.F) t := by
+  have hφ
+      : ∀ t : D.host.F,
+        φ (algebraMap D.host.F D.host.E t) = algebraMap D.host.F (v.adicCompletion D.host.F) t := by
     intro t
-    have e1 : incA D (algebraMap D.host.F D.host.E t) =
-        algebraMap (AF D.host.F) (AE D) (algebraMap D.host.F (AF D.host.F) t) := by
+    have e1
+        : incA D (algebraMap D.host.F D.host.E t)
+          = algebraMap (AF D.host.F) (AE D) (algebraMap D.host.F (AF D.host.F) t) := by
       rw [← IsScalarTower.algebraMap_apply]
-      exact (Algebra.TensorProduct.includeRight (R := D.host.F) (A := AF D.host.F) (B := D.host.E)).commutes t
+      exact (Algebra.TensorProduct.includeRight (R := D.host.F) (A := AF D.host.F)
+        (B := D.host.E)).commutes t
     show π (incA D _) = _
     rw [e1, hc.2.2.1, AlgHom.commutes, AlgHom.commutes]
   have hP : ∀ x : 𝓞 D.host.E, x ∈ P.asIdeal ↔ Valued.v (φ x) < 1 := by
@@ -159,8 +182,10 @@ theorem unif_chart : ∀ {D : D7} (e : AE D) (P : HeightOneSpectrum (𝓞 D.host
       rw [he.2 x hx, hc.2.2.2, isInt_Ov]
       show ¬ Valued.v (φ (x : D.host.E)⁻¹) ≤ 1 ↔ _
       rw [map_inv₀, map_inv₀, not_le, one_lt_inv₀ (zero_lt_iff.2 hx0)]
-  exact ⟨⟨⟨φ ϖ, map_mem v φ ϖ⟩, rfl, irreducible_of_valued v _ (valued_unif v φ P hφ hP ϖ h1 h2)⟩,
-    card_residueField v φ P hφ hP⟩
+  exact ⟨
+    ⟨⟨φ ϖ, map_mem v φ ϖ⟩, rfl, irreducible_of_valued v _ (valued_unif v φ P hφ hP ϖ h1 h2)⟩,
+    card_residueField v φ P hφ hP
+  ⟩
 
 end GlobalTheory.SplitUnif
 

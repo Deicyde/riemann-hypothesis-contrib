@@ -11,9 +11,15 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem kummer_approx_critical : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ), p.Prime →
-    ∀ F : Subfield L, ApproxRoot p v F → v (p : L) < 1 → ∀ α : L, α ^ p ∈ F → 0 < v (p : L) →
-    ∀ s : ℝ≥0, 1 < s → ∃ y ∈ F, v (α - y) ^ (p - 1) ≤ s * v (p : L) * v α ^ (p - 1) := by
+theorem kummer_approx_critical
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
+      p.Prime
+        → ∀ F : Subfield L,
+          ApproxRoot p v F → v (p : L) < 1
+            → ∀ α : L,
+              α ^ p ∈ F → 0 < v (p : L)
+                → ∀ s : ℝ≥0,
+                  1 < s → ∃ y ∈ F, v (α - y) ^ (p - 1) ≤ s * v (p : L) * v α ^ (p - 1) := by
   intro L _ v p hp F hF hvp α hα hvp0 s hs
   obtain ⟨θ, hθ, hθF⟩ := hF
   have hp2 : 2 ≤ p := hp.two_le
@@ -34,19 +40,27 @@ theorem kummer_approx_critical : ∀ (L : Type) [Field L] (v : Valuation L ℝ�
     exact ⟨inv_lt_one_of_one_lt₀ hs, hθ, hvp⟩
   have step : ∀ y ∈ F, v (α - y) ≤ a → ∃ y' ∈ F, v (α - y') ^ p ≤ η * v (α - y) ^ p := by
     intro y hy hya
-    obtain ⟨y', hy', h⟩ := GlobalTheory.T.exists_improved_approx_kummer_generator L v p hp F θ hθ.le hvp.le hθF α y hα hy hya
+    obtain ⟨y', hy', h⟩ :=
+      GlobalTheory.T.exists_improved_approx_kummer_generator L v p hp F θ hθ.le hvp.le hθF α y hα hy
+        hya
     refine ⟨y', hy', h.trans ?_⟩
     have hcb := hcon y hy
     set b := v (α - y)
     apply max_le
     · have h0 : s * (v (p : L) * a ^ (p - 1)) ≤ b ^ (p - 1) := by
-        calc s * (v (p : L) * a ^ (p - 1)) = c := by rw [hc_def]; ring
+        calc
+          s * (v (p : L) * a ^ (p - 1))
+            = c := by rw [hc_def]; ring
           _ ≤ _ := hcb.le
       have h2 : v (p : L) * a ^ (p - 1) ≤ s⁻¹ * b ^ (p - 1) := by
-        calc v (p : L) * a ^ (p - 1) = s⁻¹ * (s * (v (p : L) * a ^ (p - 1))) := (inv_mul_cancel_left₀ hs0.ne' _).symm
+        calc
+          v (p : L) * a ^ (p - 1)
+            = s⁻¹ * (s * (v (p : L) * a ^ (p - 1))) := (inv_mul_cancel_left₀ hs0.ne' _).symm
           _ ≤ s⁻¹ * b ^ (p - 1) := by gcongr
       have h1 : v (p : L) * b * a ^ (p - 1) ≤ s⁻¹ * b ^ p := by
-        calc v (p : L) * b * a ^ (p - 1) = b * (v (p : L) * a ^ (p - 1)) := by ring
+        calc
+          v (p : L) * b * a ^ (p - 1)
+            = b * (v (p : L) * a ^ (p - 1)) := by ring
           _ ≤ b * (s⁻¹ * b ^ (p - 1)) := by gcongr
           _ = s⁻¹ * (b ^ (p - 1) * b) := by ring
           _ = s⁻¹ * b ^ p := by rw [← pow_succ]; congr 2; omega
@@ -63,7 +77,9 @@ theorem kummer_approx_critical : ∀ (L : Type) [Field L] (v : Valuation L ℝ�
         h'.trans (mul_le_of_le_one_left (by positivity) hη.le)
       refine ⟨y', hy', ?_, ?_⟩
       · exact ((pow_le_pow_iff_left₀ (by positivity) (by positivity) hp.ne_zero).1 hle).trans hya
-      · calc v (α - y') ^ p ≤ η * v (α - y) ^ p := h'
+      · calc
+          v (α - y') ^ p
+            ≤ η * v (α - y) ^ p := h'
           _ ≤ η * (η ^ k * a ^ p) := by gcongr
           _ = η ^ (k + 1) * a ^ p := by ring
   have hA : 0 < (a ^ p) ^ (p - 1) := by positivity
@@ -71,13 +87,18 @@ theorem kummer_approx_critical : ∀ (L : Type) [Field L] (v : Valuation L ℝ�
   obtain ⟨y, hy, -, hyk⟩ := iter k
   have hcb := hcon y hy
   have e1 : c ^ p < (v (α - y) ^ p) ^ (p - 1) := by
-    calc c ^ p < (v (α - y) ^ (p - 1)) ^ p := pow_lt_pow_left₀ hcb (by positivity) hp.ne_zero
+    calc
+      c ^ p
+        < (v (α - y) ^ (p - 1)) ^ p := pow_lt_pow_left₀ hcb (by positivity) hp.ne_zero
       _ = _ := by rw [← pow_mul, ← pow_mul, mul_comm]
   have e2 : (v (α - y) ^ p) ^ (p - 1) ≤ η ^ k * (a ^ p) ^ (p - 1) := by
-    calc (v (α - y) ^ p) ^ (p - 1) ≤ (η ^ k * a ^ p) ^ (p - 1) := pow_le_pow_left₀ (by positivity) hyk _
+    calc
+      (v (α - y) ^ p) ^ (p - 1)
+        ≤ (η ^ k * a ^ p) ^ (p - 1) := pow_le_pow_left₀ (by positivity) hyk _
       _ = (η ^ k) ^ (p - 1) * (a ^ p) ^ (p - 1) := mul_pow _ _ _
       _ ≤ η ^ k * (a ^ p) ^ (p - 1) :=
-          mul_le_mul_of_nonneg_right (pow_le_of_le_one (by positivity) (pow_le_one₀ (by positivity) hη.le) hp1) (by positivity)
+        mul_le_mul_of_nonneg_right
+          (pow_le_of_le_one (by positivity) (pow_le_one₀ (by positivity) hη.le) hp1) (by positivity)
   have e3 : η ^ k * (a ^ p) ^ (p - 1) < c ^ p := (lt_div_iff₀ hA).1 hk
   exact lt_irrefl _ ((e1.trans_le e2).trans e3)
 

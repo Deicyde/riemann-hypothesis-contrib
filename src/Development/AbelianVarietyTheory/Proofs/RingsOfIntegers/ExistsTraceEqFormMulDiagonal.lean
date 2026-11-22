@@ -11,14 +11,20 @@ namespace GlobalTheory.TraceDiagonal
 open IsLocalRing
 open scoped TensorProduct
 
-theorem exists_trace_eq_of_isUnit_det {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
+theorem exists_trace_eq_of_isUnit_det
+    {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
     {d : ℕ} (b : Module.Basis (Fin d) A R) (M : Matrix (Fin d) (Fin d) A)
-    (h : ∀ x : R, (∑ i, ∑ j, M i j • TensorProduct.tmul A (b i) (b j)) *
-      (TensorProduct.tmul A x 1 - TensorProduct.tmul A 1 x) = 0) (hu : IsUnit M.det) :
-    ∃ lam : R →ₗ[A] A, ∀ x : R,
+    (h : ∀ x : R,
+      (∑ i, ∑ j, M i j • TensorProduct.tmul A (b i) (b j))
+          * (TensorProduct.tmul A x 1 - TensorProduct.tmul A 1 x)
+        = 0)
+    (hu : IsUnit M.det)
+    : ∃ lam : R →ₗ[A] A, ∀ x : R,
       Algebra.trace A R x = lam (x * ∑ i, ∑ j, M i j • (b i * b j)) := by
-  have hΦ : ∀ f : R →ₗ[A] A, ∑ i, ∑ j, (M i j * f (b i)) • b j
-      = b.equivFun.symm (Matrix.vecMul (fun i => f (b i)) M) := by
+  have hΦ
+      : ∀ f : R →ₗ[A] A,
+        ∑ i, ∑ j, (M i j * f (b i)) • b j
+          = b.equivFun.symm (Matrix.vecMul (fun i => f (b i)) M) := by
     intro f
     rw [b.equivFun_symm_apply, Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -49,7 +55,19 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem exists_trace_eq_form_mul_diagonal : ∀ (A R : Type) [CommRing A] [IsLocalRing A] [CommRing R] [Algebra A R] [Module.Free A R] [Module.Finite A R] (Δ : TensorProduct A R R) (ε : R →+* ResidueField A), ε.comp (algebraMap A R) = residue A → (∀ x : R, ε x = 0 → ∃ m : ℕ, x ^ m ∈ (maximalIdeal A).map (algebraMap A R)) → (∀ x : R, (TensorProduct.tmul A x 1 - TensorProduct.tmul A 1 x) * Δ = 0) → (∀ (s : Finset (R × R)), Δ = ∑ p ∈ s, TensorProduct.tmul A p.1 p.2 → ∀ lift : ResidueField A → A, (∀ z, residue A (lift z) = z) → ∑ p ∈ s, lift (ε p.1) • p.2 ∉ (maximalIdeal A).map (algebraMap A R)) → ∃ lam : R →ₗ[A] A, ∀ x : R, Algebra.trace A R x = lam (x * Algebra.TensorProduct.lmul' (S := R) A Δ) := by
+theorem exists_trace_eq_form_mul_diagonal
+    : ∀ (A R : Type) [CommRing A] [IsLocalRing A] [CommRing R] [Algebra A R] [Module.Free A R]
+        [Module.Finite A R] (Δ : TensorProduct A R R) (ε : R →+* ResidueField A),
+      ε.comp (algebraMap A R) = residue A
+        → (∀ x : R, ε x = 0 → ∃ m : ℕ, x ^ m ∈ (maximalIdeal A).map (algebraMap A R))
+        → (∀ x : R, (TensorProduct.tmul A x 1 - TensorProduct.tmul A 1 x) * Δ = 0)
+        → (∀ (s : Finset (R × R)),
+          Δ = ∑ p ∈ s, TensorProduct.tmul A p.1 p.2
+            → ∀ lift : ResidueField A → A,
+              (∀ z, residue A (lift z) = z)
+                → ∑ p ∈ s, lift (ε p.1) • p.2 ∉ (maximalIdeal A).map (algebraMap A R))
+        → ∃ lam : R →ₗ[A] A, ∀ x : R,
+          Algebra.trace A R x = lam (x * Algebra.TensorProduct.lmul' (S := R) A Δ) := by
   intro A R _ _ _ _ _ _ Δ ε hε hnil hΔ hne
   classical
   let b := Module.finBasis A R
@@ -81,18 +99,20 @@ theorem exists_trace_eq_form_mul_diagonal : ∀ (A R : Type) [CommRing A] [IsLoc
   refine DiscrJacobian.isUnit_det_of_productMap_ne_zero (C := R ⧸ I) b n N hN ev ?_ ?_
     (Ideal.Quotient.mkₐ A I) (Algebra.TensorProduct.comm A R R Δ) M.transpose ?_ ?_ ?_
   · intro w hw
-    have : n ≤ RingHom.ker ev := Ideal.span_le.2 (by
-      rintro _ ⟨j, rfl⟩
-      simp only [SetLike.mem_coe, RingHom.mem_ker, hev]
-      rw [map_sub, hεa, hlift, sub_self])
+    have : n ≤ RingHom.ker ev :=
+      Ideal.span_le.2 (by
+        rintro _ ⟨j, rfl⟩
+        simp only [SetLike.mem_coe, RingHom.mem_ker, hev]
+        rw [map_sub, hεa, hlift, sub_self])
     exact this hw
   · intro w
     refine ⟨∑ i, b.repr w i * lift (ε (b i)), ?_⟩
-    have e : w - algebraMap A R (∑ i, b.repr w i * lift (ε (b i)))
-        = ∑ i, algebraMap A R (b.repr w i) * (b i - algebraMap A R (lift (ε (b i)))) := by
+    have e
+        : w - algebraMap A R (∑ i, b.repr w i * lift (ε (b i)))
+          = ∑ i, algebraMap A R (b.repr w i) * (b i - algebraMap A R (lift (ε (b i)))) := by
       conv_lhs => lhs; rw [← b.sum_repr w]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, mul_sub, Finset.sum_sub_distrib, Algebra.smul_def]
+      simp only [map_sum, map_mul, mul_sub, Finset.sum_sub_distrib, Algebra.smul_def]
     rw [e]
     exact n.sum_mem fun j _ => n.mul_mem_left _ (Ideal.subset_span ⟨j, rfl⟩)
   · rw [hM, Finset.sum_comm]
@@ -100,14 +120,16 @@ theorem exists_trace_eq_form_mul_diagonal : ∀ (A R : Type) [CommRing A] [IsLoc
   · intro x
     have := congrArg (Algebra.TensorProduct.comm A R R) (hΔ x)
     rw [map_mul, map_sub, map_zero, Algebra.TensorProduct.comm_tmul,
-      Algebra.TensorProduct.comm_tmul] at this
+        Algebra.TensorProduct.comm_tmul]
+      at this
     linear_combination -this
   · intro h0
     refine hne s hs lift hlift (Ideal.Quotient.eq_zero_iff_mem.1 ?_)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← h0, hs, map_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
-    have e : algebraMap k (R ⧸ I) (ε p.1) = Ideal.Quotient.mk I (algebraMap A R (lift (ε p.1))) := by
+    have e
+        : algebraMap k (R ⧸ I) (ε p.1) = Ideal.Quotient.mk I (algebraMap A R (lift (ε p.1))) := by
       conv_lhs => rw [← hlift (ε p.1)]
       rfl
     rw [Algebra.smul_def, map_mul, ← e, mul_comm]

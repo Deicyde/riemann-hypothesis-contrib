@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Different
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 namespace GlobalTheory.EvenTheta
@@ -18,8 +20,11 @@ theorem norm_two_Cp_eq_one (p : ℕ) [Fact p.Prime] (hp : p ≠ 2) : ‖(2 : ℂ
   rw [h2, h, norm_algebraMap', Padic.norm_natCast_eq_one_iff]
   exact (Nat.coprime_primes (Fact.out) Nat.prime_two).2 hp
 
-theorem intSer_of_sq (p : ℕ) [Fact p.Prime] (hp : p ≠ 2) (H : PowerSeries ℂ_[p])
-    (h0 : PowerSeries.constantCoeff H = 1) (hH : IntSer (H ^ 2)) : IntSer H := by
+theorem intSer_of_sq
+    (p : ℕ) [Fact p.Prime]
+    (hp : p ≠ 2)
+    (H : PowerSeries ℂ_[p]) (h0 : PowerSeries.constantCoeff H = 1) (hH : IntSer (H ^ 2))
+    : IntSer H := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -30,7 +35,8 @@ theorem intSer_of_sq (p : ℕ) [Fact p.Prime] (hp : p ≠ 2) (H : PowerSeries �
       rw [pow_two, PowerSeries.coeff_mul]
     have m1 : ((0 : ℕ), n) ∈ Finset.HasAntidiagonal.antidiagonal n := by simp
     have m2 : (n, (0 : ℕ)) ∈ (Finset.HasAntidiagonal.antidiagonal n).erase (0, n) := by
-      simp only [Finset.mem_erase, Finset.HasAntidiagonal.mem_antidiagonal, add_zero, and_true, ne_eq, Prod.mk.injEq]
+      simp only [Finset.mem_erase, Finset.HasAntidiagonal.mem_antidiagonal, add_zero, and_true,
+        ne_eq, Prod.mk.injEq]
       omega
     have c0 : PowerSeries.coeff 0 H = 1 := by rw [PowerSeries.coeff_zero_eq_constantCoeff]; exact h0
     set S := ∑ q ∈ ((Finset.HasAntidiagonal.antidiagonal n).erase (0, n)).erase (n, 0), f q with hS
@@ -55,10 +61,13 @@ theorem intSer_of_sq (p : ℕ) [Fact p.Prime] (hp : p ≠ 2) (H : PowerSeries �
     rw [← h2, e]
     rw [sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hH n) ?_)
-    rw [norm_neg]; exact hSle
+    rw [norm_neg]
+    exact hSle
 
-theorem intSer_of_sq_main : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ H : PowerSeries ℂ_[p],
-    PowerSeries.constantCoeff H = 1 → IntSer (H ^ 2) → IntSer H :=
+theorem intSer_of_sq_main
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ H : PowerSeries ℂ_[p], PowerSeries.constantCoeff H = 1 → IntSer (H ^ 2) → IntSer H :=
   fun p _ hp H h0 hH => intSer_of_sq p hp H h0 hH
 
 end GlobalTheory.EvenTheta

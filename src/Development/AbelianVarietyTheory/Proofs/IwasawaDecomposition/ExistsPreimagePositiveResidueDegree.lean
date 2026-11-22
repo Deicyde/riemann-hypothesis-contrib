@@ -11,15 +11,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmallSection
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.CechPic
 
 namespace GlobalTheory
 
-
 set_option backward.isDefEq.respectTransparency.types false in
-theorem exists_residueDegree_pos_of_mem_range (W Z : Scheme.{0}) (g : W ⟶ Z) [QuasiCompact g]
-    [LocallyOfFiniteType g] (z : Z) (hz : z ∈ Set.range g) :
-    ∃ w, g w = z ∧ 0 < g.residueDegree w := by
+theorem exists_residueDegree_pos_of_mem_range
+    (W Z : Scheme.{0}) (g : W ⟶ Z) [QuasiCompact g] [LocallyOfFiniteType g]
+    (z : Z) (hz : z ∈ Set.range g)
+    : ∃ w, g w = z ∧ 0 < g.residueDegree w := by
   obtain ⟨w₀, hw₀⟩ := hz
   let F := g.fiber z
   have hne : (Set.univ : Set F).Nonempty := ⟨(g.fiberHomeo z).symm ⟨w₀, hw₀⟩, trivial⟩
@@ -32,7 +34,8 @@ theorem exists_residueDegree_pos_of_mem_range (W Z : Scheme.{0}) (g : W ⟶ Z) [
   have e : h x = z := by
     have := (g.range_fiberι z).le ⟨x, rfl⟩
     simpa [h] using this
-  let β : Z.residueField z ⟶ F.residueField x := (Z.residueFieldCongr e.symm).hom ≫ h.residueFieldMap x
+  let β : Z.residueField z ⟶ F.residueField x :=
+    (Z.residueFieldCongr e.symm).hom ≫ h.residueFieldMap x
   have hβ : Spec.map β = F.fromSpecResidueField x ≫ g.fiberToSpecResidueField z := by
     rw [← cancel_mono (Z.fromSpecResidueField z)]
     simp only [β, Spec.map_comp, Category.assoc, Scheme.residueFieldCongr_fromSpecResidueField,
@@ -51,16 +54,19 @@ theorem exists_residueDegree_pos_of_mem_range (W Z : Scheme.{0}) (g : W ⟶ Z) [
     exact hβf.comp (RingHom.Finite.of_surjective _
       (ConcreteCategory.bijective_of_isIso (Z.residueFieldCongr e.symm).inv).2)
   refine ⟨g.fiberι z x, e, ?_⟩
-  rw [show h.residueFieldMap x = g.residueFieldMap (g.fiberι z x) ≫ (g.fiberι z).residueFieldMap x
-    from Scheme.residueFieldMap_comp _ _ _] at hhf
+  rw [show h.residueFieldMap x
+        = g.residueFieldMap (g.fiberι z x) ≫ (g.fiberι z).residueFieldMap x from
+      Scheme.residueFieldMap_comp _ _ _]
+    at hhf
   letI := (g.residueFieldMap (g.fiberι z x)).hom.toAlgebra
   letI := ((g.fiberι z).residueFieldMap x).hom.toAlgebra
   letI := (g.residueFieldMap (g.fiberι z x) ≫ (g.fiberι z).residueFieldMap x).hom.toAlgebra
   haveI : IsScalarTower (Z.residueField (g (g.fiberι z x))) (W.residueField (g.fiberι z x))
       (F.residueField x) := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : Module.Finite (Z.residueField (g (g.fiberι z x))) (F.residueField x) := hhf
-  let φ := IsScalarTower.toAlgHom (Z.residueField (g (g.fiberι z x)))
-    (W.residueField (g.fiberι z x)) (F.residueField x)
+  let φ :=
+    IsScalarTower.toAlgHom (Z.residueField (g (g.fiberι z x))) (W.residueField (g.fiberι z x))
+      (F.residueField x)
   haveI : Module.Finite (Z.residueField (g (g.fiberι z x))) (W.residueField (g.fiberι z x)) :=
     Module.Finite.of_injective φ.toLinearMap φ.toRingHom.injective
   exact Module.finrank_pos

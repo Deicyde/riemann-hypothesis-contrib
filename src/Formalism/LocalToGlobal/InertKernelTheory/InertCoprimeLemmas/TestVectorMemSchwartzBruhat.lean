@@ -50,8 +50,10 @@ section Chain
 
 open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
 
-variable {D : D7} {N N' r : ℕ} {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (Λ : AddSubgroup ℂ)
-  (C : WeierstrassCurve.VariableChange ℂ_[p]) (wq : PowerSeries ℂ_[p]) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
+variable
+  {D : D7} {N N' r : ℕ} {p : ℕ} [Fact p.Prime]
+  (lam : Qbar →+* ℂ_[p]) (Λ : AddSubgroup ℂ) (C : WeierstrassCurve.VariableChange ℂ_[p])
+  (wq : PowerSeries ℂ_[p]) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
 
 end Chain
 
@@ -65,12 +67,14 @@ theorem test_vector_mem_schwartz_bruhat (x : D.host.E) : D.host.φ₀ x ∈ Qbar
   rw [mem_algebraicClosure_iff']
   exact (Algebra.IsIntegral.isIntegral x).map D.host.φ₀.toRatAlgHom
 
-theorem isPadicIntegral_lamC_K (c : 𝓞 D.host.K) : IsIntP (lamC lam (D.host.φ₀ ((c : D.host.K) : D.host.E))) := by
+theorem isPadicIntegral_lamC_K (c : 𝓞 D.host.K)
+    : IsIntP (lamC lam (D.host.φ₀ ((c : D.host.K) : D.host.E))) := by
   have hI : IsIntegral ℤ ((c : D.host.K) : D.host.E) :=
     map_isIntegral_int (algebraMap D.host.K D.host.E) (NumberField.RingOfIntegers.isIntegral_coe c)
   unfold lamC
   rw [dite_eq_left (test_vector_mem_schwartz_bruhat _)]
-  exact RestC.norm_le_one_of_int (map_isIntegral_int (lam.comp (D.host.φ₀.codRestrict Qbar test_vector_mem_schwartz_bruhat)) hI)
+  exact RestC.norm_le_one_of_int (map_isIntegral_int
+    (lam.comp (D.host.φ₀.codRestrict Qbar test_vector_mem_schwartz_bruhat)) hI)
 
 variable (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
 

@@ -16,15 +16,16 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem SchAltPartitionExpansion.alt_partition_add_stair_eq {r : ℕ} (lam : Fin r → ℕ) :
-    Comb.alt (fun i : Fin r => lam i + (r - 1 - (i : ℕ))) =
-      vandermondeOf (fun i : Fin r => (X i : MvPolynomial (Fin r) ℚ)) * schur (Fin r) lam := by
+theorem SchAltPartitionExpansion.alt_partition_add_stair_eq {r : ℕ} (lam : Fin r → ℕ)
+    : Comb.alt (fun i : Fin r => lam i + (r - 1 - (i : ℕ)))
+      = vandermondeOf (fun i : Fin r => (X i : MvPolynomial (Fin r) ℚ)) * schur (Fin r) lam := by
   unfold Comb.alt
   rw [← Matrix.det_transpose, mul_comm]
   exact Schur.det_pow_add_staircase_eq lam
 
-theorem SchAltPartitionExpansion.strictAnti_partition_add_stair {r n : ℕ} {lam : Fin r → ℕ} (hlam : lam ∈ partitionsOf r n) :
-    StrictAnti (fun i : Fin r => lam i + (r - 1 - (i : ℕ))) := by
+theorem SchAltPartitionExpansion.strictAnti_partition_add_stair
+    {r n : ℕ} {lam : Fin r → ℕ} (hlam : lam ∈ partitionsOf r n)
+    : StrictAnti (fun i : Fin r => lam i + (r - 1 - (i : ℕ))) := by
   unfold partitionsOf at hlam
   rw [Finset.mem_filter] at hlam
   intro i j hij
@@ -34,8 +35,8 @@ theorem SchAltPartitionExpansion.strictAnti_partition_add_stair {r n : ℕ} {lam
   simp only
   omega
 
-theorem SchAltPartitionExpansion.proof (h1 : SchStrictAntiSplit.Statement) :
-    SchAltPartitionExpansion.Statement := by
+theorem SchAltPartitionExpansion.proof (h1 : SchStrictAntiSplit.Statement)
+    : SchAltPartitionExpansion.Statement := by
   intro r n P hP hhom
   set e : (Fin r → ℕ) → (Fin r →₀ ℕ) := fun lam =>
     Finsupp.equivFunOnFinite.symm fun i : Fin r => lam i + (r - 1 - (i : ℕ)) with he
@@ -46,10 +47,11 @@ theorem SchAltPartitionExpansion.proof (h1 : SchStrictAntiSplit.Statement) :
     simp only [he, Finsupp.coe_equivFunOnFinite_symm] at this
     omega
 
-  have hR : ∑ lam ∈ partitionsOf r n,
-      C (AddMonoidAlgebra.coeff P (e lam)) *
-        (vandermondeOf (fun i : Fin r => (X i : MvPolynomial (Fin r) ℚ)) * schur (Fin r) lam) =
-      ∑ d ∈ (partitionsOf r n).image e, AddMonoidAlgebra.coeff P d • Comb.alt (⇑d) := by
+  have hR
+      : ∑ lam ∈ partitionsOf r n,
+          C (AddMonoidAlgebra.coeff P (e lam)) *
+            (vandermondeOf (fun i : Fin r => (X i : MvPolynomial (Fin r) ℚ)) * schur (Fin r) lam)
+        = ∑ d ∈ (partitionsOf r n).image e, AddMonoidAlgebra.coeff P d • Comb.alt (⇑d) := by
     rw [Finset.sum_image e_inj]
     refine Finset.sum_congr rfl fun lam _ => ?_
     rw [C_mul', ← SchAltPartitionExpansion.alt_partition_add_stair_eq]

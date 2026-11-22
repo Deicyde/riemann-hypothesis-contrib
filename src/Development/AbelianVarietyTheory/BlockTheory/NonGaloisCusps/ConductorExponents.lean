@@ -35,30 +35,34 @@ structure Numerics (l e N η H : ℕ) (Sig : Finset (ZMod e)) (U : Finset ℤ) :
 
 section
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-  [IsUnitBall O K] {l e a : ℕ} [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
-  [TameDescentExponentData K l e a] {ι₀ ι₁ ι₂ : Type} [Fintype ι₀] [DecidableEq ι₀] [Fintype ι₁]
-  [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] {η H : ℕ}
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+  {l e a : ℕ}
+  [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a]
+  {ι₀ ι₁ ι₂ : Type}
+  [Fintype ι₀] [DecidableEq ι₀] [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+  {η H : ℕ}
   {D₀ : BKDat O K l e a ι₀ η H} {D₁ : BKDat O K l e a ι₁ η H} {D₂ : BKDat O K l e a ι₂ η H}
 
 def Hyp (F : BKHom D₀ D₁) (G : BKHom D₁ D₂) (N : ℕ) (Sig : Finset (ZMod e)) (U : Finset ℤ) : Prop :=
-  IsExactTriple F.toHom G.toHom ∧ Numerics l e N η H Sig U ∧
-    D₁.IsOfType (Sig : Set (ZMod e)) (U : Set ℤ) ∧ ∀ τ, D₂.desc.chars τ ⊆ (Sig : Set (ZMod e))
+  IsExactTriple F.toHom G.toHom ∧ Numerics l e N η H Sig U
+    ∧ D₁.IsOfType (Sig : Set (ZMod e)) (U : Set ℤ) ∧ ∀ τ, D₂.desc.chars τ ⊆ (Sig : Set (ZMod e))
 
 def Lifts (G : BKHom D₁ D₂) (k : ℕ) (y₂' m₂ : Vec K a ι₂) : Prop :=
-  ∃ y' ∈ D₁.Y', ∃ m ∈ D₁.Minv, D₁.Mon (y' + D₁.phi m) = 0 ∧
-    G.app (y' + D₁.phi m) = (l : K) ^ k • (y₂' + D₂.phi m₂)
+  ∃ y' ∈ D₁.Y', ∃ m ∈ D₁.Minv,
+    D₁.Mon (y' + D₁.phi m) = 0 ∧ G.app (y' + D₁.phi m) = (l : K) ^ k • (y₂' + D₂.phi m₂)
 
 end
 
 def Lifting : Prop :=
-  ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-    [IsUnitBall O K] (l e a : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
-    [TameDescentExponentData K l e a] [CompleteSpace K] (ι₀ ι₁ ι₂ : Type) [Fintype ι₀] [DecidableEq ι₀]
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] (η H : ℕ)
-    (D₀ : BKDat O K l e a ι₀ η H) (D₁ : BKDat O K l e a ι₁ η H) (D₂ : BKDat O K l e a ι₂ η H)
-    (F : BKHom D₀ D₁) (G : BKHom D₁ D₂) (N : ℕ) (Sig : Finset (ZMod e)) (U : Finset ℤ),
-    Hyp F G N Sig U → ∀ y₂' ∈ D₂.Y', ∀ m₂ ∈ D₂.Minv, D₂.Mon (y₂' + D₂.phi m₂) = 0 →
-      Lifts G (kExp N η (maxPeriod l Sig)) y₂' m₂
+  ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+      (l e a : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+      [TameDescentExponentData K l e a] [CompleteSpace K] (ι₀ ι₁ ι₂ : Type) [Fintype ι₀]
+      [DecidableEq ι₀] [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] (η H : ℕ)
+      (D₀ : BKDat O K l e a ι₀ η H) (D₁ : BKDat O K l e a ι₁ η H) (D₂ : BKDat O K l e a ι₂ η H)
+      (F : BKHom D₀ D₁) (G : BKHom D₁ D₂) (N : ℕ) (Sig : Finset (ZMod e)) (U : Finset ℤ),
+    Hyp F G N Sig U
+      → ∀ y₂' ∈ D₂.Y', ∀ m₂ ∈ D₂.Minv,
+        D₂.Mon (y₂' + D₂.phi m₂) = 0 → Lifts G (kExp N η (maxPeriod l Sig)) y₂' m₂
 
 end GlobalTheory.IndefiniteRowSideFullHecke.ConductorExponents

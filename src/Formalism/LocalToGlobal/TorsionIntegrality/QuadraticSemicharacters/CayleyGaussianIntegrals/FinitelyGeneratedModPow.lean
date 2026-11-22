@@ -23,7 +23,8 @@ theorem isLat_stdLat (L : PeriodPair) (m : Type) [Fintype m] : IsLat (stdLat L m
   constructor
   · let f : stdLat L m → (∀ _ : m, L.lattice) := fun x i => ⟨x.1 i, x.2 i (Set.mem_univ i)⟩
     have hf : Continuous f :=
-      continuous_pi fun i => Continuous.subtype_mk ((continuous_apply i).comp continuous_subtype_val) _
+      continuous_pi fun i =>
+        Continuous.subtype_mk ((continuous_apply i).comp continuous_subtype_val) _
     have hinj : Function.Injective f := by
       intro x y hxy
       apply Subtype.ext
@@ -40,8 +41,9 @@ theorem isLat_stdLat (L : PeriodPair) (m : Type) [Fintype m] : IsLat (stdLat L m
     have h1 : x i ∈ Submodule.span ℝ (L.lattice : Set ℂ) := by
       rw [IsZLattice.span_top (K := ℝ) (L := L.lattice)]
       trivial
-    have h2 : (Submodule.span ℝ (L.lattice : Set ℂ)).map (LinearMap.single ℝ (fun _ : m => ℂ) i)
-        ≤ Submodule.span ℝ ((stdLat L m : AddSubgroup (m → ℂ)) : Set (m → ℂ)) := by
+    have h2
+        : (Submodule.span ℝ (L.lattice : Set ℂ)).map (LinearMap.single ℝ (fun _ : m => ℂ) i)
+          ≤ Submodule.span ℝ ((stdLat L m : AddSubgroup (m → ℂ)) : Set (m → ℂ)) := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨y, hy, rfl⟩
       apply Submodule.subset_span
@@ -52,8 +54,10 @@ theorem isLat_stdLat (L : PeriodPair) (m : Type) [Fintype m] : IsLat (stdLat L m
       · simp [hj]
     exact h2 ⟨x i, h1, rfl⟩
 
-theorem isLat_of_comm {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {Λ Λ₁ : AddSubgroup V}
-    (hL : IsLat Λ) (h1 : Λ₁.relIndex Λ ≠ 0) (h2 : Λ.relIndex Λ₁ ≠ 0) : IsLat Λ₁ := by
+theorem isLat_of_comm
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {Λ Λ₁ : AddSubgroup V} (hL : IsLat Λ) (h1 : Λ₁.relIndex Λ ≠ 0) (h2 : Λ.relIndex Λ₁ ≠ 0)
+    : IsLat Λ₁ := by
   constructor
   · have := hL.1
     obtain ⟨N, hN⟩ : ∃ N : ℕ, N = (Λ.relIndex Λ₁).factorial := ⟨_, rfl⟩
@@ -74,12 +78,16 @@ theorem isLat_of_comm {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {Λ
     rw [eq_top_iff, ← h3]
     exact Submodule.span_mono fun x hx => hx.2
 
-theorem relIdx_trans {V : Type*} [AddCommGroup V] {Λ₁ Λ₂ Λ₃ : AddSubgroup V} (h12 : relIdx Λ₁ Λ₂ ≠ 0)
-    (h23 : relIdx Λ₂ Λ₃ ≠ 0) : relIdx Λ₁ Λ₃ ≠ 0 :=
+theorem relIdx_trans
+    {V : Type*} [AddCommGroup V]
+    {Λ₁ Λ₂ Λ₃ : AddSubgroup V} (h12 : relIdx Λ₁ Λ₂ ≠ 0) (h23 : relIdx Λ₂ Λ₃ ≠ 0)
+    : relIdx Λ₁ Λ₃ ≠ 0 :=
   AddSubgroup.relIndex_ne_zero_trans h12 h23
 
-theorem imgLat_trans {V : Type*} [AddCommGroup V] [Module ℂ V] (g g' : V ≃ₗ[ℂ] V) (Λ : AddSubgroup V) :
-    imgLat ((g.trans g' : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) Λ = imgLat (g' : V →ₗ[ℂ] V) (imgLat (g : V →ₗ[ℂ] V) Λ) := by
+theorem imgLat_trans
+    {V : Type*} [AddCommGroup V] [Module ℂ V] (g g' : V ≃ₗ[ℂ] V) (Λ : AddSubgroup V)
+    : imgLat ((g.trans g' : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) Λ
+      = imgLat (g' : V →ₗ[ℂ] V) (imgLat (g : V →ₗ[ℂ] V) Λ) := by
   ext x
   simp only [imgLat, AddSubgroup.mem_map, LinearMap.toAddMonoidHom_coe, LinearEquiv.coe_coe,
     LinearEquiv.trans_apply]
@@ -89,19 +97,20 @@ theorem imgLat_trans {V : Type*} [AddCommGroup V] [Module ℂ V] (g g' : V ≃�
   · rintro ⟨_, ⟨y, hy, rfl⟩, rfl⟩
     exact ⟨y, hy, rfl⟩
 
-theorem norm_mul_eq_one {l : ℕ} [Fact l.Prime] (ι : ℂ ≃+* ℂ_[l]) (κ c D : ℂ) (hc8 : c ^ 8 = D ^ 4)
-    (hκ : ‖ι κ‖ ^ 2 * ‖ι D‖ = 1) : ‖ι (κ * c)‖ = 1 := by
-  have h1 : ‖ι c‖ ^ 8 = ‖ι D‖ ^ 4 := by
-    rw [← norm_pow, ← norm_pow, ← map_pow, ← map_pow, hc8]
+theorem norm_mul_eq_one
+    {l : ℕ} [Fact l.Prime]
+    (ι : ℂ ≃+* ℂ_[l]) (κ c D : ℂ) (hc8 : c ^ 8 = D ^ 4) (hκ : ‖ι κ‖ ^ 2 * ‖ι D‖ = 1)
+    : ‖ι (κ * c)‖ = 1 := by
+  have h1 : ‖ι c‖ ^ 8 = ‖ι D‖ ^ 4 := by rw [← norm_pow, ← norm_pow, ← map_pow, ← map_pow, hc8]
   have h2 : (‖ι κ‖ * ‖ι c‖) ^ 8 = 1 := by
     rw [mul_pow, h1]
-    calc _ = (‖ι κ‖ ^ 2 * ‖ι D‖) ^ 4 := by ring
+    calc
+      _ = (‖ι κ‖ ^ 2 * ‖ι D‖) ^ 4 := by ring
       _ = 1 := by rw [hκ, one_pow]
   rw [map_mul, norm_mul]
   exact (pow_eq_one_iff_of_nonneg (by positivity) (by norm_num)).1 h2
 
 end KR
-
 
 open KR in
 theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
@@ -109,10 +118,14 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
   have hE : UnitaryEighth := UnitaryEighth_of hC (UnitaryGauss_of gaussSumEighthPower) unitary_index
   obtain ⟨H, hHdef⟩ : ∃ H : Sesq (Fin 4 × n → ℂ), H = stdH L (Fin 4 × n) := ⟨_, rfl⟩
   obtain ⟨Λ₀, hΛ₀⟩ : ∃ Λ₀ : AddSubgroup (Fin 4 × n → ℂ), Λ₀ = stdLat L (Fin 4 × n) := ⟨_, rfl⟩
-  obtain ⟨Λa, hΛa⟩ : ∃ Λa : AddSubgroup (Fin 4 × n → ℂ),
-    Λa = imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := ⟨_, rfl⟩
-  obtain ⟨Λb, hΛb⟩ : ∃ Λb : AddSubgroup (Fin 4 × n → ℂ),
-    Λb = imgLat (g₁ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := ⟨_, rfl⟩
+  obtain ⟨Λa, hΛa⟩
+      : ∃ Λa : AddSubgroup (Fin 4 × n → ℂ),
+        Λa = imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) :=
+    ⟨_, rfl⟩
+  obtain ⟨Λb, hΛb⟩
+      : ∃ Λb : AddSubgroup (Fin 4 × n → ℂ),
+        Λb = imgLat (g₁ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) :=
+    ⟨_, rfl⟩
   obtain ⟨δ, hδ⟩ : ∃ δ : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ), δ = g₀.symm.trans g₁ := ⟨_, rfl⟩
   obtain ⟨F, hF⟩ : ∃ F : (Fin 4 × n → ℂ) → ℂ, F = F0 L ω₀ (Fin 4 × n) := ⟨_, rfl⟩
   have hHerm : IsHerm H := hHdef ▸ (stdHBasic L (Fin 4 × n)).2.1
@@ -150,8 +163,8 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
     simp only [LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply] at h0 h1 ⊢
     rw [hδap, hδap, hHdef, h1, h0]
   have hinj : Function.Injective
-      ((LinearMap.id - (δ.symm : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ))) :
-        (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) := by
+      ((LinearMap.id - (δ.symm : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)))
+        : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx
     have h1 : x = g₀ (g₁.symm x) := by
@@ -162,19 +175,20 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
     simpa using congrArg g₁ h2
   obtain ⟨Ae, hAe⟩ : ∃ Ae : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ), ∀ x, Ae x = x - δ.symm x :=
     ⟨LinearEquiv.ofInjectiveEndo _ hinj, fun x => rfl⟩
-  have hU : UnitaryData H Λa β δ Ae :=
-    { herm := hHerm
-      pos := hPos
-      selfDual := sda
-      semi := sca
-      isom := hiso
-      semi' := by rw [hδΛ]; exact scb
-      inv := by
-        intro x _
-        rw [hδap, D1.betaAlpha, ← D0.betaAlpha, LinearEquiv.apply_symm_apply]
-      idx₁ := by rw [hδΛ]; exact iba
-      idx₂ := by rw [hδΛ]; exact iab
-      cay := hAe }
+  have hU : UnitaryData H Λa β δ Ae := {
+    herm := hHerm
+    pos := hPos
+    selfDual := sda
+    semi := sca
+    isom := hiso
+    semi' := by rw [hδΛ]; exact scb
+    inv := by
+      intro x _
+      rw [hδap, D1.betaAlpha, ← D0.betaAlpha, LinearEquiv.apply_symm_apply]
+    idx₁ := by rw [hδΛ]; exact iba
+    idx₂ := by rw [hδΛ]; exact iab
+    cay := hAe
+  }
 
   obtain ⟨hFmem, hF1⟩ := product_theta_mem' L ω₀ (Fin 4 × n) D0.per D0.half β D0.betaStd
   rw [← hF, ← hHdef, ← hΛ₀] at hFmem
@@ -187,8 +201,8 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
     intro G hG
     rw [hHdef, hΛ₀] at hG
     exact ⟨G 0, hF ▸ thStd L ω₀ _ D0.per D0.half β D0.betaStd G hG⟩
-  obtain ⟨hGa0, hGaline⟩ := lineTransport (Fin 4 × n → ℂ) H hHerm Λ₀ Λa β sd0 sda sc0 sca i0a ia0 F hFmem
-    hFne hFline
+  obtain ⟨hGa0, hGaline⟩ :=
+    lineTransport (Fin 4 × n → ℂ) H hHerm Λ₀ Λa β sd0 sda sc0 sca i0a ia0 F hFmem hFne hFline
   have hGamem : inter H β Λ₀ Λa F ∈ Th H β Λa := interTh _ H hHerm Λ₀ Λa β sca i0a F hFmem
   have hLine : AtMostLine H β Λa := by
     intro θ hθ hθ0 G hG
@@ -213,14 +227,29 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
   obtain ⟨S, hS⟩ := (repsExist _ _ _ hidxA).1
   have hconst := hC _ H Λa β δ Ae hLata hU hLine S hS _ hGamem
   have hc8 := hE _ H Λa β δ Ae hLata hU hLine _ hGamem hGa0 _ hconst
-  obtain ⟨c, hc⟩ : ∃ c : ℂ, c = (‖LinearMap.det (Ae : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ))‖ : ℂ)
-      / LinearMap.det (Ae : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) * gaussC H β Ae S := ⟨_, rfl⟩
+  obtain ⟨c, hc⟩
+      : ∃ c : ℂ,
+        c = (‖LinearMap.det (Ae : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ))‖ : ℂ)
+          / LinearMap.det (Ae : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) * gaussC H β Ae S :=
+    ⟨_, rfl⟩
   rw [← hc] at hconst hc8
   rw [hδΛ] at hconst
 
-  have hT : TripleData H β Λ₀ Λa Λb :=
-    { herm := hHerm, sd₁ := sd0, sd₂ := sda, sd₃ := sdb, sc₁ := sc0, sc₂ := sca, sc₃ := scb
-      i₁₂ := i0a, i₂₁ := ia0, i₁₃ := i0b, i₃₁ := ib0, i₂₃ := iab, i₃₂ := iba }
+  have hT : TripleData H β Λ₀ Λa Λb := {
+    herm := hHerm
+    sd₁ := sd0
+    sd₂ := sda
+    sd₃ := sdb
+    sc₁ := sc0
+    sc₂ := sca
+    sc₃ := scb
+    i₁₂ := i0a
+    i₂₁ := ia0
+    i₁₃ := i0b
+    i₃₁ := ib0
+    i₂₃ := iab
+    i₃₂ := iba
+  }
   obtain ⟨S₂, hS₂⟩ := (repsExist _ _ _ i0a).1
   obtain ⟨S₃, hS₃⟩ := (repsExist _ _ _ iab).1
   have hμ8 := TripleEighth_proof _ H β Λ₀ Λa Λb hT ⟨F, hFmem.2, hFne⟩ S₂ S₃ hS₂ hS₃
@@ -233,34 +262,40 @@ theorem KernelRatio_of (hC : UnitaryConstant) : KernelRatio := by
     simp only [kernel4, Pi.smul_apply, smul_eq_mul]
     rw [← hHdef, ← hΛ₀, ← hΛa, ← hΛb, ← hF, h1, mul_assoc]
 
-theorem quadraticSemicharacterIdentityEquivalent_of_kernelRatio (hK : KernelRatio) : quadraticSemicharacterIdentityEquivalent := by
-  intro l _ L ι ω₀ lg linv ph hlog hph hTr n _ _ h Λ α β g₀ g₁ D0 D1 hfix hl κ hκ θ hθ hθκ t N hN hlN hNt
-    O _ τ γ B' hB
+theorem quadraticSemicharacterIdentityEquivalent_of_kernelRatio (hK : KernelRatio)
+    : quadraticSemicharacterIdentityEquivalent := by
+  intro l _ L ι ω₀ lg linv ph hlog hph hTr n _ _ h Λ α β g₀ g₁ D0 D1 hfix hl κ hκ θ hθ hθκ t N hN
+    hlN hNt O _ τ γ B' hB
   obtain ⟨c, hc8, hc⟩ := hK L ω₀ n h Λ α β g₀ g₁ D0 D1 hfix
-  refine quadraticSemicharacters_fact l L ι ω₀ lg linv ph hlog hph hTr n h Λ α β g₁ D1 hl (κ * c) ?_ θ hθ ?_ t N hN hlN hNt
-    O τ γ B' hB
+  refine quadraticSemicharacters_fact l L ι ω₀ lg linv ph hlog hph hTr n h Λ α β g₁ D1 hl (κ * c) ?_
+    θ hθ ?_ t N hN hlN hNt O τ γ B' hB
   · exact le_of_eq (KR.norm_mul_eq_one ι κ c _ hc8 hκ)
   · rw [hθκ, hc, smul_smul]
 
-
 open KR in
-theorem quadraticSemicharacterIdentityReformulated_of_kernelRatio_of_localStandard_of_kappaExists (hK : KernelRatio) (hL : LocalStandard) (hκ : KappaExists) : quadraticSemicharacterIdentityReformulated := by
+theorem quadraticSemicharacterIdentityReformulated_of_kernelRatio_of_localStandard_of_kappaExists
+    (hK : KernelRatio) (hL : LocalStandard) (hκ : KappaExists)
+    : quadraticSemicharacterIdentityReformulated := by
   intro a b c d ha hd lam hlam hOK n _ _ h Λ g₀ hg₀ hsd hst i1 i2
   obtain ⟨h4, hodd, h8, hprime⟩ := hOK
   have hsda := CmData.selfDual_img _ _ g₀ hg₀ _ (CmData.isSelfDual_matH_blk4_pow4 h Λ hsd)
-  have hsta : ∀ x ∈ imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ),
-      Formalism.L2.Th1.F.cmTheta b d • x ∈ imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := by
+  have hsta
+      : ∀ x ∈ imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ),
+        Formalism.L2.Th1.F.cmTheta b d • x
+          ∈ imgLat (g₀ : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := by
     rintro x ⟨x', hx', rfl⟩
     refine ⟨Formalism.L2.Th1.F.cmTheta b d • x', fun a' => hst _ (hx' a'), ?_⟩
     simp
-  obtain ⟨κ, hκ0, hκalg, hκabs, hκl⟩ := hκ a b c d ha hd lam hlam ⟨h4, hodd, h8, hprime⟩ (Fin 4 × n) _ hsda hsta i1 i2
+  obtain ⟨κ, hκ0, hκalg, hκabs, hκl⟩ :=
+    hκ a b c d ha hd lam hlam ⟨h4, hodd, h8, hprime⟩ (Fin 4 × n) _ hsda hsta i1 i2
   refine ⟨κ, hκ0, hκalg, hκabs, fun θ hθ hθκ l _ ι => ?_⟩
-  obtain ⟨δ, hδiso, hδfix, j1, jl, j2⟩ := hL a b c d ha hd lam hlam ⟨h4, hodd, h8, hprime⟩ (Fin 4 × n) _ hsda hsta i1 i2
-    l Fact.out
+  obtain ⟨δ, hδiso, hδfix, j1, jl, j2⟩ :=
+    hL a b c d ha hd lam hlam ⟨h4, hodd, h8, hprime⟩ (Fin 4 × n) _ hsda hsta i1 i2 l Fact.out
   have hκδ := hκl l ι δ hδiso j1 jl j2
   rw [← KR.imgLat_trans] at j1 jl j2
   have hg₁ : IsIsom (matH (blk4 h)) (stdH (cmL a b d ha hd lam hlam) (Fin 4 × n))
-      ((g₀.trans δ : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ)) : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) := by
+      ((g₀.trans δ : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ))
+        : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) := by
     intro x y
     have h1 := hδiso (g₀ x) (g₀ y)
     have h0 := hg₀ x y
@@ -276,9 +311,16 @@ theorem quadraticSemicharacterIdentityReformulated_of_kernelRatio_of_localStanda
     have h1 : g₀ x = 0 := hδfix _ hx
     simpa using congrArg g₀.symm h1
   rw [← hcomp] at hκδ
-  refine ⟨g₀.trans δ, hg₁, jl, j2, ?_, fun lg linv ph hlog hph hTr t N hN hlN hNt O _ τ γ B' hB =>
-    quadraticSemicharacterIdentityEquivalent_of_kernelRatio hK l _ ι _ lg linv ph hlog hph hTr n h Λ _ _ g₀ (g₀.trans δ) D0 D1 hfix jl κ hκδ θ hθ hθκ
-      t N hN hlN hNt O τ γ B' hB⟩
+  refine ⟨
+    g₀.trans δ,
+    hg₁,
+    jl,
+    j2,
+    ?_,
+    fun lg linv ph hlog hph hTr t N hN hlN hNt O _ τ γ B' hB =>
+      quadraticSemicharacterIdentityEquivalent_of_kernelRatio hK l _ ι _ lg linv ph hlog hph hTr n h
+        Λ _ _ g₀ (g₀.trans δ) D0 D1 hfix jl κ hκδ θ hθ hθκ t N hN hlN hNt O τ γ B' hB
+  ⟩
   obtain ⟨e, he8, he⟩ := hK _ _ n h Λ _ _ g₀ (g₀.trans δ) D0 D1 hfix
   exact ⟨κ * e, KR.norm_mul_eq_one ι κ e _ he8 hκδ, by rw [hθκ, he, smul_smul]⟩
 

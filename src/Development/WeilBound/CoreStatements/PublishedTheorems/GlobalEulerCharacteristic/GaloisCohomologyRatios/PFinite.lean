@@ -10,12 +10,16 @@ namespace PositivityTheory.Lit1.GEN.X
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-variable {K L : FiniteSubfield} [Fact (K ≤ L)] {S : Set (HeightOneSpectrum (𝓞 K.1))} {ℓ : ℕ} [Fact ℓ.Prime]
-  (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S) [Normal K.1 L.1]
+variable
+  {K L : FiniteSubfield} [Fact (K ≤ L)]
+  {S : Set (HeightOneSpectrum (𝓞 K.1))} {ℓ : ℕ} [Fact ℓ.Prime]
+  (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+  [Normal K.1 L.1]
 
 omit [Normal K.1 L.1] in
 theorem module_finite_S_units [Finite S] : Module.Finite ℤ (AA hL 0) := by
-  have : Finite (placesOver S : Set (HeightOneSpectrum (𝓞 L.1))) := finite_placesOver (L := L.1) (S := S)
+  have : Finite (placesOver S : Set (HeightOneSpectrum (𝓞 L.1))) :=
+    finite_placesOver (L := L.1) (S := S)
   exact Module.Finite.equiv (gsH0SUnitsEquiv hL).symm.toIntLinearEquiv
 
 omit [Normal K.1 L.1] in
@@ -39,8 +43,9 @@ theorem finite_torsN_AA [Finite S] (i : ℕ) (hi : i ≤ 1) : Finite (TorsN (AA 
   · have := finite_H1_S_units hL
     exact Subtype.finite
 
-theorem card_gal_eq_index : Nat.card (L.1 ≃ₐ[K.1] L.1) =
-    (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).index := by
+theorem card_gal_eq_index
+    : Nat.card (L.1 ≃ₐ[K.1] L.1)
+      = (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S)).index := by
   rw [Subgroup.index]
   exact (Nat.card_congr (gsQuotientGalEquiv hL).toEquiv).symm
 

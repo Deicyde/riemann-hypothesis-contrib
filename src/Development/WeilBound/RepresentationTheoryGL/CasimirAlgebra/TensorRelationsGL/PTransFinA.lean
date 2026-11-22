@@ -12,8 +12,11 @@ namespace PositivityTheory.Rg.Cz
 
 namespace TF
 
-theorem coef {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (d : ℕ) (y : ℕ → Y) (S : Set ℂ) (hS : S.Infinite)
-    (h : ∀ u ∈ S, ∑ i ∈ Finset.range d, u ^ i • y i = 0) : ∀ i ∈ Finset.range d, y i = 0 := by
+theorem coef
+    {Y : Type*} [AddCommGroup Y] [Module ℂ Y]
+    (d : ℕ) (y : ℕ → Y) (S : Set ℂ)
+    (hS : S.Infinite) (h : ∀ u ∈ S, ∑ i ∈ Finset.range d, u ^ i • y i = 0)
+    : ∀ i ∈ Finset.range d, y i = 0 := by
   intro i hi
   rw [← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro f
@@ -26,17 +29,22 @@ theorem coef {Y : Type*} [AddCommGroup Y] [Module ℂ Y] (d : ℕ) (y : ℕ → 
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_smul, smul_eq_mul, map_zero] at hfu
     show Polynomial.eval u p = 0
-    simp only [hp, Polynomial.eval_finsetSum, Polynomial.eval_mul,
-      Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X]
+    simp only [hp, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C,
+      Polynomial.eval_pow, Polynomial.eval_X]
     rw [← hfu]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   have hc := congrArg (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q i) hroot
-  simp only [hp, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow, Polynomial.coeff_zero] at hc
+  simp only [hp, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow, Polynomial.coeff_zero]
+    at hc
   rw [Finset.sum_ite_eq] at hc
   simpa [hi] using hc
 
-theorem qdet_mem {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (F : Fin n → Fin n → A) (B : Subalgebra ℂ A)
-    (hF : ∀ a b, F a b ∈ B) (u : ℂ) : qdet F u ∈ B := by
+theorem qdet_mem
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {n : ℕ} (F : Fin n → Fin n → A)
+    (B : Subalgebra ℂ A) (hF : ∀ a b, F a b ∈ B)
+    (u : ℂ)
+    : qdet F u ∈ B := by
   unfold qdet qminor
   refine B.sum_mem fun σ _ => B.mul_mem ?_ (B.list_prod_mem ?_)
   · exact intCast_mem B _
@@ -49,9 +57,15 @@ theorem qdet_mem {A : Type*} [Ring A] [Algebra ℂ A] {n : ℕ} (F : Fin n → F
     · exact B.algebraMap_mem _
     · exact B.zero_mem
 
-theorem inv_aux {A : Type*} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) (x : A) (hx : x ∈ B) (u : ℂ) :
-    ∀ L : List ℂ, (∀ c ∈ L, u + c ≠ 0) → ∃ h ∈ B, Commute h x ∧ ∃ β : ℂ, β ≠ 0 ∧
-      (L.map fun c => x - algebraMap ℂ A c).prod = (algebraMap ℂ A u + x) * h + algebraMap ℂ A β := by
+theorem inv_aux {A : Type*} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) (x : A) (hx : x ∈ B) (u : ℂ)
+    : ∀ L : List ℂ,
+      (∀ c ∈ L, u + c ≠ 0)
+        → ∃ h ∈ B,
+          Commute h x
+            ∧ ∃ β : ℂ,
+              β ≠ 0
+                ∧ (L.map fun c => x - algebraMap ℂ A c).prod
+                  = (algebraMap ℂ A u + x) * h + algebraMap ℂ A β := by
   intro L
   induction L with
   | nil =>
@@ -65,9 +79,14 @@ theorem inv_aux {A : Type*} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) (x :
     have hcm : Commute ((x - algebraMap ℂ A c) * h + algebraMap ℂ A β) x :=
       (((Commute.refl x).sub_left (Algebra.commute_algebraMap_left c x)).mul_left hc).add_left
         (Algebra.commute_algebraMap_left β x)
-    refine ⟨(x - algebraMap ℂ A c) * h + algebraMap ℂ A β,
+    refine ⟨
+      (x - algebraMap ℂ A c) * h + algebraMap ℂ A β,
       B.add_mem (B.mul_mem (B.sub_mem hx (B.algebraMap_mem c)) hB) (B.algebraMap_mem β),
-      hcm, -((u + c) * β), neg_ne_zero.mpr (mul_ne_zero hs hβ), ?_⟩
+      hcm,
+      -((u + c) * β),
+      neg_ne_zero.mpr (mul_ne_zero hs hβ),
+      ?_
+    ⟩
     rw [List.map_cons, List.prod_cons, heq]
     have hq : x - algebraMap ℂ A c = (algebraMap ℂ A u + x) - algebraMap ℂ A (u + c) := by
       rw [map_add (f := _)]; abel
@@ -76,24 +95,29 @@ theorem inv_aux {A : Type*} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) (x :
     generalize algebraMap ℂ A u + x = v at ht ⊢
     generalize algebraMap ℂ A (u + c) = t at ht ⊢
     generalize algebraMap ℂ A β = w
-    calc (v - t) * (v * h + w) = v * v * h + v * w - t * v * h - t * w := by noncomm_ring
+    calc
+      (v - t) * (v * h + w)
+        = v * v * h + v * w - t * v * h - t * w := by noncomm_ring
       _ = v * v * h + v * w - v * t * h - t * w := by rw [ht]
       _ = v * ((v - t) * h + w) + -(t * w) := by noncomm_ring
 
-theorem inv_of_alg {A : Type*} [Ring A] [Algebra ℂ A] (B : Subalgebra ℂ A) (x : A) (hx : x ∈ B) (u : ℂ)
-    (L : List ℂ) (h0 : (L.map fun c => x - algebraMap ℂ A c).prod = 0) (hu : ∀ c ∈ L, u + c ≠ 0) :
-    ∃ h ∈ B, h * (algebraMap ℂ A u + x) = 1 := by
+theorem inv_of_alg
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    (B : Subalgebra ℂ A) (x : A) (hx : x ∈ B)
+    (u : ℂ) (L : List ℂ)
+    (h0 : (L.map fun c => x - algebraMap ℂ A c).prod = 0) (hu : ∀ c ∈ L, u + c ≠ 0)
+    : ∃ h ∈ B, h * (algebraMap ℂ A u + x) = 1 := by
   obtain ⟨h, hB, hc, β, hβ, heq⟩ := inv_aux B x hx u L hu
   rw [h0] at heq
   have hv : h * (algebraMap ℂ A u + x) = (algebraMap ℂ A u + x) * h :=
     ((Algebra.commute_algebraMap_left u h).symm.add_right hc).eq
-  have hvh : (algebraMap ℂ A u + x) * h = -algebraMap ℂ A β := eq_neg_of_add_eq_zero_left heq.symm
+  have hvh : (algebraMap ℂ A u + x) * h = - algebraMap ℂ A β := eq_neg_of_add_eq_zero_left heq.symm
   refine ⟨algebraMap ℂ A (-β⁻¹) * h, B.mul_mem (B.algebraMap_mem _) hB, ?_⟩
   rw [mul_assoc, hv, hvh, mul_neg, ← map_mul]
   simp [hβ]
 
-theorem left_inv_prod {A : Type*} [Ring A] (B : Subring A) :
-    ∀ l : List A, (∀ a ∈ l, ∃ h ∈ B, h * a = 1) → ∃ h ∈ B, h * l.prod = 1 := by
+theorem left_inv_prod {A : Type*} [Ring A] (B : Subring A)
+    : ∀ l : List A, (∀ a ∈ l, ∃ h ∈ B, h * a = 1) → ∃ h ∈ B, h * l.prod = 1 := by
   intro l
   induction l with
   | nil => intro _; exact ⟨1, B.one_mem, by simp⟩
@@ -104,9 +128,9 @@ theorem left_inv_prod {A : Type*} [Ring A] (B : Subring A) :
     refine ⟨h * ha, B.mul_mem hB' hB, ?_⟩
     rw [List.prod_cons, mul_assoc, ← mul_assoc ha, hae, one_mul, he]
 
-theorem eig_prod {W : Type*} [AddCommGroup W] [Module ℂ W] (φ : W →ₗ[ℂ] ℂ) :
-    ∀ l : List (Module.End ℂ W), (∀ a ∈ l, ∃ μ : ℂ, μ ≠ 0 ∧ φ ∘ₗ a = μ • φ) →
-      ∃ μ : ℂ, μ ≠ 0 ∧ φ ∘ₗ l.prod = μ • φ := by
+theorem eig_prod {W : Type*} [AddCommGroup W] [Module ℂ W] (φ : W →ₗ[ℂ] ℂ)
+    : ∀ l : List (Module.End ℂ W),
+      (∀ a ∈ l, ∃ μ : ℂ, μ ≠ 0 ∧ φ ∘ₗ a = μ • φ) → ∃ μ : ℂ, μ ≠ 0 ∧ φ ∘ₗ l.prod = μ • φ := by
   intro l hl
   induction l with
   | nil => exact ⟨1, one_ne_zero, by ext; simp⟩

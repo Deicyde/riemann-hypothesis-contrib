@@ -18,18 +18,20 @@ noncomputable section
 
 namespace FibreLocal
 
-@[local instance] theorem isProbabilityMeasure_sphere : IsProbabilityMeasure sphereMeasure :=
-  sphereInv_thm.1
+@[local instance]
+theorem isProbabilityMeasure_sphere : IsProbabilityMeasure sphereMeasure := sphereInv_thm.1
 
-theorem add_mul_gPoly (k : ℕ) :
-    (X 0 + X 1 : MvPolynomial (Fin 2) ℝ) * gPoly k = X 1 * (X 0 ^ (2 * k) - X 1 ^ (2 * k)) := by
+theorem add_mul_gPoly (k : ℕ)
+    : (X 0 + X 1 : MvPolynomial (Fin 2) ℝ) * gPoly k = X 1 * (X 0 ^ (2 * k) - X 1 ^ (2 * k)) := by
   have h := (Commute.all (-(X 1 : MvPolynomial (Fin 2) ℝ)) (X 0)).geom_sum₂_mul (2 * k)
-  have hs : ∑ j ∈ Finset.range (2 * k),
-      (-1 : ℝ) ^ j • ((X 0 : MvPolynomial (Fin 2) ℝ) ^ (2 * k - 1 - j) * X 1 ^ j) =
-      ∑ i ∈ Finset.range (2 * k), (-(X 1 : MvPolynomial (Fin 2) ℝ)) ^ i * X 0 ^ (2 * k - 1 - i) := by
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [Algebra.smul_def, map_pow, map_neg, map_one, neg_pow (X 1 : MvPolynomial (Fin 2) ℝ)]
-    ring
+  have hs
+      : ∑ j ∈ Finset.range (2 * k),
+          (-1 : ℝ) ^ j • ((X 0 : MvPolynomial (Fin 2) ℝ) ^ (2 * k - 1 - j) * X 1 ^ j)
+        = ∑ i ∈ Finset.range (2 * k), (-(X 1 : MvPolynomial (Fin 2) ℝ)) ^ i * X 0 ^ (2 * k - 1 - i) :=
+    by
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [Algebra.smul_def, map_pow, map_neg, map_one, neg_pow (X 1 : MvPolynomial (Fin 2) ℝ)]
+      ring
   rw [gPoly, hs]
   rw [(even_two_mul k).neg_pow] at h
   linear_combination (-(X 1 : MvPolynomial (Fin 2) ℝ)) * h
@@ -44,19 +46,21 @@ theorem gPoly_eq (k : ℕ) : gPoly k = FlagBundles.gKernel ℝ k := by
 theorem dgPoly_eq (k : ℕ) : dgPoly k = FlagBundles.gMixed k := by
   rw [dgPoly, FlagBundles.gMixed, gPoly_eq]
 
-theorem integrable_kernel :
-    Integrable (fun p : S2 × S2 => (1 / 2 : ℝ) * Real.log ((1 - inner ℝ (p.1 : E3) (p.2 : E3)) / 2))
+theorem integrable_kernel
+    : Integrable
+      (fun p : S2 × S2 => (1 / 2 : ℝ) * Real.log ((1 - inner ℝ (p.1 : E3) (p.2 : E3)) / 2))
       (sphereMeasure.prod sphereMeasure) :=
   FlagBundles.FibreIntegralInvariant.integrable_kernel FlagBundles.FibreConstantClosedForm.full
 
-theorem integrable_mul (f : S2 × S2 → ℝ) (hf : Continuous f) :
-    Integrable (fun p : S2 × S2 =>
-      (1 / 2 : ℝ) * Real.log ((1 - inner ℝ (p.1 : E3) (p.2 : E3)) / 2) * f p)
+theorem integrable_mul (f : S2 × S2 → ℝ) (hf : Continuous f)
+    : Integrable
+      (fun p : S2 × S2 => (1 / 2 : ℝ) * Real.log ((1 - inner ℝ (p.1 : E3) (p.2 : E3)) / 2) * f p)
       (sphereMeasure.prod sphereMeasure) :=
   FlagBundles.FibreIntegralInvariant.integrable_term integrable_kernel f hf
 
-theorem continuous_evalPair (g : MvPolynomial (Fin 2) ℝ) (u v : S2 × S2 → ℝ) (hu : Continuous u)
-    (hv : Continuous v) : Continuous fun p => eval ![u p, v p] g := by
+theorem continuous_evalPair
+    (g : MvPolynomial (Fin 2) ℝ) (u v : S2 × S2 → ℝ) (hu : Continuous u) (hv : Continuous v)
+    : Continuous fun p => eval ![u p, v p] g := by
   have h2 : Continuous fun p => (![u p, v p] : Fin 2 → ℝ) := by
     refine continuous_pi fun i => ?_
     fin_cases i
@@ -64,18 +68,20 @@ theorem continuous_evalPair (g : MvPolynomial (Fin 2) ℝ) (u v : S2 × S2 → �
     · simpa using hv
   exact (MvPolynomial.continuous_eval g).comp h2
 
-theorem kappa_eq (k : ℕ) : kappa k = -FlagBundles.fibreConstant k := by
+theorem kappa_eq (k : ℕ) : kappa k = - FlagBundles.fibreConstant k := by
   have hc : Continuous fun p : S2 × S2 => eval ![(p.1 : E3) 2, (p.2 : E3) 2] (dgPoly k) :=
-    continuous_evalPair _ _ _ ((EuclideanSpace.proj (2 : Fin 3)).continuous.comp
-      (continuous_subtype_val.comp continuous_fst))
-      ((EuclideanSpace.proj (2 : Fin 3)).continuous.comp (continuous_subtype_val.comp continuous_snd))
+    continuous_evalPair _ _ _
+      ((EuclideanSpace.proj (2 : Fin 3)).continuous.comp
+        (continuous_subtype_val.comp continuous_fst))
+      ((EuclideanSpace.proj (2 : Fin 3)).continuous.comp
+        (continuous_subtype_val.comp continuous_snd))
   rw [kappa, FlagBundles.fibreConstant, neg_inj]
   refine (integral_prod _ (integrable_mul _ hc)).symm.trans ?_
   simp_rw [dgPoly_eq]
   rfl
 
-theorem sphere_moment (a : E3) (m : ℕ) :
-    ∫ n : S2, inner ℝ a (n : E3) ^ (2 * m) ∂sphereMeasure = inner ℝ a a ^ m / (2 * m + 1) := by
+theorem sphere_moment (a : E3) (m : ℕ)
+    : ∫ n : S2, inner ℝ a (n : E3) ^ (2 * m) ∂sphereMeasure = inner ℝ a a ^ m / (2 * m + 1) := by
   by_cases ha : a = 0
   · subst ha
     rcases Nat.eq_zero_or_pos m with rfl | hm
@@ -88,8 +94,10 @@ theorem sphere_moment (a : E3) (m : ℕ) :
     have hin : ∀ n : S2, inner ℝ a (n : E3) = r * inner ℝ (n : E3) u := by
       intro n
       rw [hu, inner_smul_right, real_inner_comm, ← mul_assoc, mul_inv_cancel₀ hr0, one_mul]
-    have hA := (archimedes_thm u u u (fun t => (r * t) ^ (2 * m)) hu1
-      (Continuous.intervalIntegrable (by fun_prop) _ _)).2.1
+    have hA :=
+      (archimedes_thm u u u
+        (fun t => (r * t) ^ (2 * m))
+        hu1 (Continuous.intervalIntegrable (by fun_prop) _ _)).2.1
     simp_rw [hin]
     rw [hA]
     simp_rw [mul_pow]
@@ -100,10 +108,12 @@ theorem sphere_moment (a : E3) (m : ℕ) :
     field_simp
     ring
 
-theorem eval_momentPoly {Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (w : Ω → ℝ)
-    (Q : MvPolynomial (Fin 3) (Ω → ℝ)) (hQ : ∀ m, Integrable (fun p => w p * AddMonoidAlgebra.coeff Q m p) μ)
-    (a : Fin 3 → ℝ) :
-    eval a (momentPoly μ w Q) = ∫ p, w p * eval₂ (Pi.evalRingHom (fun _ : Ω => ℝ) p) a Q ∂μ := by
+theorem eval_momentPoly
+    {Ω : Type*} [MeasurableSpace Ω]
+    (μ : Measure Ω) (w : Ω → ℝ) (Q : MvPolynomial (Fin 3) (Ω → ℝ))
+    (hQ : ∀ m, Integrable (fun p => w p * AddMonoidAlgebra.coeff Q m p) μ)
+    (a : Fin 3 → ℝ)
+    : eval a (momentPoly μ w Q) = ∫ p, w p * eval₂ (Pi.evalRingHom (fun _ : Ω => ℝ) p) a Q ∂μ := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [momentPoly, map_sum]
   simp only [eval_monomial]
@@ -119,28 +129,35 @@ theorem eval_momentPoly {Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (w :
 def coordS (i : Fin 3) : C(S2, ℝ) :=
   ⟨fun n => (n : E3) i, (EuclideanSpace.proj i).continuous.comp continuous_subtype_val⟩
 
-theorem dotPoly_id_pow (N : ℕ) :
-    (dotPoly (id : S2 → S2)) ^ N =
-      MvPolynomial.map (ContinuousMap.coeFnRingHom : C(S2, ℝ) →+* (S2 → ℝ)) ((∑ i, X i * C (coordS i)) ^ N) := by
+theorem dotPoly_id_pow (N : ℕ)
+    : (dotPoly (id : S2 → S2)) ^ N
+      = MvPolynomial.map (ContinuousMap.coeFnRingHom : C(S2, ℝ) →+* (S2 → ℝ))
+        ((∑ i, X i * C (coordS i)) ^ N) := by
   rw [map_pow, dotPoly]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, map_mul, map_X, map_C]
   rfl
 
-theorem pushMomentPoly_eq (k : ℕ) (hk : 1 ≤ k) :
-    pushMomentPoly k = -(∑ i, X i ^ 2) ^ (k - 1) := by
+theorem pushMomentPoly_eq (k : ℕ) (hk : 1 ≤ k) : pushMomentPoly k = - (∑ i, X i ^ 2) ^ (k - 1) := by
   apply MvPolynomial.funext
   intro a
-  have hQ : ∀ m, Integrable (fun p : S2 => (1 : ℝ) * AddMonoidAlgebra.coeff ((dotPoly (id : S2 → S2)) ^ (2 * k - 2)) m p)
-      sphereMeasure := by
+  have hQ
+      : ∀ m,
+        Integrable
+          (fun p : S2 =>
+            (1 : ℝ) * AddMonoidAlgebra.coeff ((dotPoly (id : S2 → S2)) ^ (2 * k - 2)) m p)
+          sphereMeasure := by
     intro m
     rw [dotPoly_id_pow, coeff_map]
     simp only [one_mul]
-    exact (ContinuousMap.continuous (AddMonoidAlgebra.coeff ((∑ i, X i * C (coordS i)) ^ (2 * k - 2)) m)).integrable_of_hasCompactSupport
+    exact (ContinuousMap.continuous (AddMonoidAlgebra.coeff
+        ((∑ i, X i * C (coordS i)) ^ (2 * k - 2)) m)).integrable_of_hasCompactSupport
       (HasCompactSupport.of_compactSpace _)
   rw [pushMomentPoly, smul_eval, eval_momentPoly _ _ _ hQ]
-  have he : ∀ p : S2, eval₂ (Pi.evalRingHom (fun _ : S2 => ℝ) p) a ((dotPoly id) ^ (2 * k - 2)) =
-      inner ℝ (WithLp.toLp 2 a : E3) (p : E3) ^ (2 * k - 2) := by
+  have he
+      : ∀ p : S2,
+        eval₂ (Pi.evalRingHom (fun _ : S2 => ℝ) p) a ((dotPoly id) ^ (2 * k - 2))
+          = inner ℝ (WithLp.toLp 2 a : E3) (p : E3) ^ (2 * k - 2) := by
     intro p
     rw [eval₂_pow, dotPoly]
     simp [eval₂_sum, PiLp.inner_apply, mul_comm]
@@ -162,8 +179,9 @@ theorem pushMomentPoly_eq (k : ℕ) (hk : 1 ≤ k) :
   ring
 
 theorem fibreMomentPoly_eq (k : ℕ) : fibreMomentPoly k = FlagBundles.fibrePoly k := by
-  have hQ : aeval ![dotPoly (Prod.fst : S2 × S2 → S2), dotPoly Prod.snd] (dgPoly k) =
-      FlagBundles.FibreIntegralInvariant.fibreQ k := by
+  have hQ
+      : aeval ![dotPoly (Prod.fst : S2 × S2 → S2), dotPoly Prod.snd] (dgPoly k)
+        = FlagBundles.FibreIntegralInvariant.fibreQ k := by
     rw [FlagBundles.FibreIntegralInvariant.fibreQ, dgPoly_eq]
     refine congrArg (fun x => aeval x (FlagBundles.gMixed k)) ?_
     funext r
@@ -173,8 +191,10 @@ theorem fibreMomentPoly_eq (k : ℕ) : fibreMomentPoly k = FlagBundles.fibrePoly
 
 theorem proof : FibreLocal.Statement := by
   refine ⟨fun k a => ?_, fun k B _ _ a => ?_, fun k hk a => ?_, fun k hk B _ _ a => ?_, fun k => ?_⟩
-  · have hc : Continuous fun p : S2 × S2 => eval ![inner ℝ a (p.1 : E3), inner ℝ a (p.2 : E3)] (dgPoly k) :=
-      continuous_evalPair _ _ _ (continuous_const.inner (continuous_subtype_val.comp continuous_fst))
+  · have hc : Continuous fun p : S2 × S2 =>
+        eval ![inner ℝ a (p.1 : E3), inner ℝ a (p.2 : E3)] (dgPoly k) :=
+      continuous_evalPair _ _ _
+        (continuous_const.inner (continuous_subtype_val.comp continuous_fst))
         (continuous_const.inner (continuous_subtype_val.comp continuous_snd))
     refine (integral_prod _ (integrable_mul _ hc)).symm.trans ?_
     simp_rw [dgPoly_eq]
@@ -192,7 +212,7 @@ theorem proof : FibreLocal.Statement := by
     ring
   · rw [pushMomentPoly_eq k hk]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_neg, map_pow, map_sum, aeval_X]
+    simp [map_neg, map_pow, map_sum, aeval_X]
   · rw [kappa_eq, FlagBundles.fibreConstant_eq]
     ring
 

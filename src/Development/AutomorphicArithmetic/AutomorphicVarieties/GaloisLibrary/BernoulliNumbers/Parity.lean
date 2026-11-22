@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_parity :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] {N : ℕ} [NeZero N] (k : ℕ) (χ : DirichletCharacter Ω N), (χ.toUnitHom.ker ∈ parKer N k ↔ χ (-1) = (-1) ^ k) ∧ (χ.primitiveCharacter (-1) = χ (-1)) := by
+theorem UpperTheory.V.Bern.b_parity
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] {N : ℕ} [NeZero N] (k : ℕ) (χ : DirichletCharacter Ω N),
+      (χ.toUnitHom.ker ∈ parKer N k ↔ χ (-1) = (-1) ^ k)
+        ∧ (χ.primitiveCharacter (-1) = χ (-1)) := by
   intro Ω _ _ N _ k χ
   have hne : (-1 : Ω) ≠ 1 := by norm_num
   refine ⟨?_, ?_⟩
@@ -29,5 +31,6 @@ theorem UpperTheory.V.Bern.b_parity :
   · have hd := DirichletCharacter.conductor_dvd_level χ
     have h := DirichletCharacter.changeLevel_eq_cast_of_dvd χ.primitiveCharacter hd (-1)
     rw [DirichletCharacter.changeLevel_primitiveCharacter, Units.val_neg, Units.val_one,
-      ZMod.cast_neg hd, ZMod.cast_one hd] at h
+        ZMod.cast_neg hd, ZMod.cast_one hd]
+      at h
     exact h.symm

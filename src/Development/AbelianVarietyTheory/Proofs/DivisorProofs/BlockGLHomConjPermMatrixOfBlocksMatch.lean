@@ -6,24 +6,27 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
+open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic
+  GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
 
 namespace GlobalTheory.Proof.BlockConj
 
-theorem range_blockEnum {r d : ℕ} (b : Fin r → ℕ) (c : ℕ) (h : (block b c).card = d) (k : Fin r) :
-    k ∈ Set.range (blockEnum b c h) ↔ b k = c := by
+theorem range_blockEnum {r d : ℕ} (b : Fin r → ℕ) (c : ℕ) (h : (block b c).card = d) (k : Fin r)
+    : k ∈ Set.range (blockEnum b c h) ↔ b k = c := by
   have h1 : Set.range (blockEnum b c h) = (block b c : Set (Fin r)) :=
     Finset.range_orderEmbOfFin (block b c) h
   rw [h1]
   simp [block]
 
-theorem blockHom_conj_permGL (F : Type) [Field F] (r : ℕ) (b b' : Fin r → ℕ) (w : Equiv.Perm (Fin r))
-    (hw : ∀ i j : Fin r, b i = b j ↔ b' (w i) = b' (w j)) (i : Fin r) :
-    (block b (b i)).card = (block b' (b' (w i))).card ∧
-    ∀ (d : ℕ) (h : (block b (b i)).card = d) (h' : (block b' (b' (w i))).card = d),
-      ∃ π : GL (Fin d) F, ∀ g : GL (Fin d) F,
-        (blockHom F b' (b' (w i)) h' (π * g * π⁻¹) : GL (Fin r) F) * permGL F w =
-          permGL F w * (blockHom F b (b i) h g : GL (Fin r) F) := by
+theorem blockHom_conj_permGL
+    (F : Type) [Field F]
+    (r : ℕ) (b b' : Fin r → ℕ) (w : Equiv.Perm (Fin r))
+    (hw : ∀ i j : Fin r, b i = b j ↔ b' (w i) = b' (w j)) (i : Fin r)
+    : (block b (b i)).card = (block b' (b' (w i))).card
+      ∧ ∀ (d : ℕ) (h : (block b (b i)).card = d) (h' : (block b' (b' (w i))).card = d),
+        ∃ π : GL (Fin d) F, ∀ g : GL (Fin d) F,
+          (blockHom F b' (b' (w i)) h' (π * g * π⁻¹) : GL (Fin r) F) * permGL F w
+            = permGL F w * (blockHom F b (b i) h g : GL (Fin r) F) := by
   refine ⟨?_, fun d h h' => ?_⟩
   · refine Finset.card_equiv w fun k => ?_
     simp [block, hw k i]

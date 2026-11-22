@@ -24,7 +24,8 @@ structure IsFieldDec {ι : Type} [Fintype ι] (e : A) (f : ι → A) : Prop wher
 def NonDiscreteAt [TopologicalSpace A] (f : A) : Prop := ∀ V ∈ 𝓝 (0 : A), ∃ x ∈ V, x ≠ 0 ∧ f * x = x
 
 def IsHaarMod [TopologicalSpace A] [MeasurableSpace A] (md : Aˣ →* ℝ≥0) : Prop :=
-  ∀ h : Measure A, h.IsAddHaarMeasure → ∀ u : Aˣ, h.map (fun x => (u : A) * x) = ((md u : ℝ≥0∞))⁻¹ • h
+  ∀ h : Measure A,
+    h.IsAddHaarMeasure → ∀ u : Aˣ, h.map (fun x => (u : A) * x) = ((md u : ℝ≥0∞))⁻¹ • h
 
 abbrev Fx (A : Type) (m n : ℕ) : Type := Matrix (Fin m) (Fin n) A
 

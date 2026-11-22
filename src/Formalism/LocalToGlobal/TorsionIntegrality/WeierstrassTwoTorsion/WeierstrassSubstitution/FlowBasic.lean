@@ -26,7 +26,7 @@ theorem map_one (h : IsDer D) : D 1 = 0 := by
   rw [show (1 : A) * 1 = 1 by ring] at h1
   linear_combination -h1
 
-theorem map_neg (h : IsDer D) (a : A) : D (-a) = -D a := by
+theorem map_neg (h : IsDer D) (a : A) : D (-a) = - D a := by
   have h1 := h.1 a (-a)
   rw [show a + -a = 0 by ring, h.map_zero] at h1
   linear_combination -h1
@@ -47,7 +47,7 @@ theorem map_sq (h : IsDer D) (a : A) : D (a ^ 2) = 2 * a * D a := by
   rw [pow_two, h.map_mul]
   ring
 
-theorem map_of_mul_eq_one (h : IsDer D) {v w : A} (hvw : v * w = 1) : D v = -v ^ 2 * D w := by
+theorem map_of_mul_eq_one (h : IsDer D) {v w : A} (hvw : v * w = 1) : D v = - v ^ 2 * D w := by
   have h2 := h.2 v w
   rw [hvw, h.map_one] at h2
   linear_combination (-D v) * hvw - v * h2
@@ -117,7 +117,7 @@ theorem chartFlowNegation : FlowNegUW.{u} := by
   have hDq : D (-1 + W.a₁ * u + W.a₃ * w) = W.a₁ * fwAt W u w + W.a₃ * fuAt W u w := by
     simp only [h.map_add, h.map_neg, h.map_one, h.map_mul, c1, c3, hDu, hDw]
     ring
-  have hDr : D r = -r ^ 2 * (W.a₁ * fwAt W u w + W.a₃ * fuAt W u w) := by
+  have hDr : D r = - r ^ 2 * (W.a₁ * fwAt W u w + W.a₃ * fuAt W u w) := by
     rw [h.map_of_mul_eq_one hr, hDq]
   refine ⟨?_, ?_, ?_⟩
   · unfold WEq
@@ -134,9 +134,12 @@ theorem chartFlowNegation : FlowNegUW.{u} := by
 theorem chordFormula : ChordRegular.{u} := by
   intro A _ W x y xP yP t h1 h2 ht
   rw [WeierstrassCurve.Affine.equation_iff] at h1 h2
-  have hX : W.toAffine.addX x xP ((y - yP) * t) = xP +
-      ((W.a₄ - W.a₁ * yP + 2 * W.a₂ * xP + 3 * xP ^ 2) * x - (2 * yP + W.a₁ * xP + W.a₃) * y
-        + (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3)) * t ^ 2 := by
+  have hX
+      : W.toAffine.addX x xP ((y - yP) * t)
+        = xP
+          + ((W.a₄ - W.a₁ * yP + 2 * W.a₂ * xP + 3 * xP ^ 2) * x - (2 * yP + W.a₁ * xP + W.a₃) * y
+              + (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3))
+            * t ^ 2 := by
     simp only [WeierstrassCurve.Affine.addX]
     linear_combination t ^ 2 * h1 + t ^ 2 * h2
       - (W.a₁ * (y - yP) * t - (W.a₂ + x + 2 * xP) * (1 + t * (x - xP))) * ht

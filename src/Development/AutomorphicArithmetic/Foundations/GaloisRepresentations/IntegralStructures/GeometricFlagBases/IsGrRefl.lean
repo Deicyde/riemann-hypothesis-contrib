@@ -10,23 +10,29 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain GlobalTheory.EtC TensorProduct
+open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain GlobalTheory.EtC
+  TensorProduct
 open GlobalTheory.GalV (HTower Htot hop galV Splits IsCorrOp IsGalois)
 open GlobalTheory.HodgeCoh (hodgeH hodgeTrace hodgePull)
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace UpperTheory.Gal.Int.Geo
 
 def FEt {Y X : Scheme.{0}} (f : Y ⟶ X) (d : ℕ) : Prop :=
-  IsFinite f ∧ Etale f ∧ ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Spec (CommRingCat.of K) ⟶ X),
-    Nat.card {y : Spec (CommRingCat.of K) ⟶ Y // y ≫ f = x} = d
+  IsFinite f ∧ Etale f
+    ∧ ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Spec (CommRingCat.of K) ⟶ X),
+      Nat.card {y : Spec (CommRingCat.of K) ⟶ Y // y ≫ f = x} = d
 
-theorem fEt_id (X : Scheme.{0}) : FEt (𝟙 X) 1 :=
-  ⟨inferInstance, inferInstance, fun K _ _ x => by
+theorem fEt_id (X : Scheme.{0}) : FEt (𝟙 X) 1 := ⟨
+  inferInstance,
+  inferInstance,
+  fun K _ _ x => by
     have : Unique {y : Spec (CommRingCat.of K) ⟶ X // y ≫ 𝟙 X = x} :=
       ⟨⟨⟨x, Category.comp_id x⟩⟩, fun a => Subtype.ext ((Category.comp_id a.1).symm.trans a.2)⟩
-    exact Nat.card_unique⟩
+    exact Nat.card_unique
+⟩
 
 section Tower
 
@@ -45,15 +51,23 @@ def bc (H : HTower k) (K : Type) [Field K] [Algebra k K] : HTower K where
     simp only [HTower.sΩ, HTower.tΩ, GlobalTheory.Et.geomMap]
     erw [pullback.lift_snd, pullback.lift_snd]
 
-def bcAlong (H : HTower k) {K : Type} [Field K] (τ : k →+* K) : HTower K := letI := τ.toAlgebra; bc H K
+def bcAlong (H : HTower k) {K : Type} [Field K] (τ : k →+* K) : HTower K :=
+  letI := τ.toAlgebra; bc H K
 
 def IsHEig (H : HTower k) (θ : H.Γ → k) (a b : ℕ) (x : hodgeH H.q a b) : Prop :=
   ∀ g, ∃ (_ : IsFinite (H.s g)) (_ : Etale (H.s g)),
-    hodgeTrace (s := H.q) (s' := H.s g ≫ H.q) (f := H.s g) rfl a b (hodgePull (s := H.q) (s' := H.s g ≫ H.q) (H.comm g) a b x) = θ g • x
+    hodgeTrace (s := H.q) (s' := H.s g ≫ H.q) (f := H.s g) rfl a b
+        (hodgePull (s := H.q) (s' := H.s g ≫ H.q) (H.comm g) a b x)
+      = θ g • x
 
-def HOcc (H : HTower k) (θ : H.Γ → k) (a : ℕ) : Prop := ∃ (b : ℕ) (x : hodgeH H.q a b), x ≠ 0 ∧ IsHEig H θ a b x
+def HOcc (H : HTower k) (θ : H.Γ → k) (a : ℕ) : Prop :=
+  ∃ (b : ℕ) (x : hodgeH H.q a b), x ≠ 0 ∧ IsHEig H θ a b x
 
-variable (l : ℕ) [Fact l.Prime] (H : HTower k) (Ω : Type) [Field Ω] [Algebra k Ω] (L : Type) [Field L] [Algebra ℚ_[l] L]
+variable
+  (l : ℕ) [Fact l.Prime]
+  (H : HTower k)
+  (Ω : Type) [Field Ω] [Algebra k Ω]
+  (L : Type) [Field L] [Algebra ℚ_[l] L]
 
 def piece (θ : H.Γ → L) : Submodule L (L ⊗[ℚ_[l]] Htot l (sch.obj (H.geomZ Ω))) :=
   ⨅ g, Module.End.eigenspace ((hop l H Ω g).baseChange L) (θ g)
@@ -65,14 +79,18 @@ def IsMat (θ : H.Γ → L) {d : ℕ} (ρ : (Ω ≃ₐ[k] Ω) →* GL (Fin d) L)
 end Tower
 
 def IsGr {Γ L : Type} [Group Γ] [Field L] {d : ℕ} (ρ₀ ρ : Γ →* GL (Fin d) L) : Prop :=
-  ∃ c : Fin d → ℕ, ∀ g, (ρ₀ g : Matrix (Fin d) (Fin d) L).BlockTriangular c ∧
-    ∀ i j, (ρ g : Matrix (Fin d) (Fin d) L) i j = if c i = c j then (ρ₀ g : Matrix (Fin d) (Fin d) L) i j else 0
+  ∃ c : Fin d → ℕ, ∀ g,
+    (ρ₀ g : Matrix (Fin d) (Fin d) L).BlockTriangular c
+      ∧ ∀ i j,
+        (ρ g : Matrix (Fin d) (Fin d) L) i j
+          = if c i = c j then (ρ₀ g : Matrix (Fin d) (Fin d) L) i j else 0
 
 section Cover
 
 variable {k : Type} [Field k] {L : Type} [Field L]
 
-abbrev gen (O k : Type) [CommRing O] [Field k] [Algebra O k] : Spec (CommRingCat.of k) ⟶ Spec (CommRingCat.of O) :=
+abbrev gen (O k : Type) [CommRing O] [Field k] [Algebra O k]
+    : Spec (CommRingCat.of k) ⟶ Spec (CommRingCat.of O) :=
   Spec.map (CommRingCat.ofHom (algebraMap O k))
 
 structure Cover (H : HTower k) (θ : H.Γ → L) (O : Type) [CommRing O] [Algebra O k] : Type 1 where
@@ -100,19 +118,24 @@ variable {H : HTower k} {θ : H.Γ → L} {O : Type} [CommRing O] [Algebra O k]
 
 def Cover.Onto (C : Cover H θ O) : Prop := Surjective (pullback.lift C.π H.q C.ov)
 
-theorem Cover.isGalois (C : Cover H θ O) (h : C.Onto) : IsGalois (pullback.lift C.π H.q C.ov) C.Δ C.a :=
+theorem Cover.isGalois (C : Cover H θ O) (h : C.Onto)
+    : IsGalois (pullback.lift C.π H.q C.ov) C.Δ C.a :=
   ⟨C.finπ, C.etπ, h, C.one, C.mul, C.spl⟩
 
 def Cover.Lies (C : Cover H θ O) (g : H.Γ) {T : Scheme.{0}} (s t : T ⟶ C.Y) (m : ℕ) : Prop :=
-  0 < m ∧ ∃ (κ : H.Y g ⟶ T) (h : H.s g ≫ C.π = κ ≫ s), κ ≫ t = H.t g ≫ C.π ∧ FEt (pullback.lift (H.s g) κ h) m
+  0 < m
+    ∧ ∃ (κ : H.Y g ⟶ T) (h : H.s g ≫ C.π = κ ≫ s),
+      κ ≫ t = H.t g ≫ C.π ∧ FEt (pullback.lift (H.s g) κ h) m
 
 def Cover.Good (C : Cover H θ O) : Prop :=
   ∀ g, ∃ (T : Scheme.{0}) (s t : T ⟶ C.Y) (d m : ℕ), FEt s d ∧ t ≫ C.p = s ≫ C.p ∧ C.Lies g s t m
 
 def Cover.Cong (C : Cover H θ O) (p f n : ℕ) (ϑ : ℕ → L) : Prop :=
-  ∃ (ϖ : O) (T : Fin (n + 1) → crystallineComparison.Corr p C.Y) (γ : Fin (n + 1) → H.Γ) (m : Fin (n + 1) → ℕ), Irreducible ϖ ∧
-    crystallineComparison.PtId p (p ^ f) n (crystallineComparison.fn C.p ϖ) T ∧
-    ∀ j, (T j).r ≫ C.p = (T j).p ≫ C.p ∧ C.Lies (γ j) (T j).p (T j).r (m j) ∧ θ (γ j) = m j * ϑ j
+  ∃ (ϖ : O) (T : Fin (n + 1) → crystallineComparison.Corr p C.Y) (γ : Fin (n + 1) → H.Γ)
+      (m : Fin (n + 1) → ℕ),
+    Irreducible ϖ ∧ crystallineComparison.PtId p (p ^ f) n (crystallineComparison.fn C.p ϖ) T
+      ∧ ∀ j,
+        (T j).r ≫ C.p = (T j).p ≫ C.p ∧ C.Lies (γ j) (T j).p (T j).r (m j) ∧ θ (γ j) = m j * ϑ j
 
 end Cover
 
@@ -129,10 +152,12 @@ def GoodAt : Prop := ∃ C : Cover H θ (Ow w), C.Onto ∧ C.Good
 def GoodAtW : Prop := ∃ C : Cover H θ (Ow w), C.Good
 
 def CongAt (n : ℕ) (ϑ : ℕ → L) : Prop :=
-  ∃ (C : Cover H θ (Ow w)) (p f : ℕ), p.Prime ∧ (p : 𝓞 E) ∈ w.asIdeal ∧ Ideal.absNorm w.asIdeal = p ^ f ∧ C.Onto ∧ C.Cong p f n ϑ
+  ∃ (C : Cover H θ (Ow w)) (p f : ℕ),
+    p.Prime ∧ (p : 𝓞 E) ∈ w.asIdeal ∧ Ideal.absNorm w.asIdeal = p ^ f ∧ C.Onto ∧ C.Cong p f n ϑ
 
 def CongAtW (n : ℕ) (ϑ : ℕ → L) : Prop :=
-  ∃ (C : Cover H θ (Ow w)) (p f : ℕ), p.Prime ∧ (p : 𝓞 E) ∈ w.asIdeal ∧ Ideal.absNorm w.asIdeal = p ^ f ∧ C.Cong p f n ϑ
+  ∃ (C : Cover H θ (Ow w)) (p f : ℕ),
+    p.Prime ∧ (p : 𝓞 E) ∈ w.asIdeal ∧ Ideal.absNorm w.asIdeal = p ^ f ∧ C.Cong p f n ϑ
 
 end Place
 

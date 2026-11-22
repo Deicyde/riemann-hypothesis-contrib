@@ -12,7 +12,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
 
 theorem VeroneseGraphImage.proof : VeroneseGraphImage.Statement := by
   intro D
@@ -51,9 +52,10 @@ theorem VeroneseGraphImage.proof : VeroneseGraphImage.Statement := by
       · simp [ψ, ev]
     exact fun p => RingHom.congr_fun h p
   let G : MRing (GlobalTheory (Veronese.Idx D)) →+* MvPolynomial Unit (Veronese.Fld D) :=
-    (MvPolynomial.map φ).comp ((graphMap P (Veronese.forms D)).comp
-      (rename (inrV (ι := GlobalTheory (Fin (D + 1))) (ι₂ := GlobalTheory (Veronese.Idx D))) :
-        MRing (GlobalTheory (Veronese.Idx D)) →ₐ[ℤ] _).toRingHom)
+    (MvPolynomial.map φ).comp
+      ((graphMap P (Veronese.forms D)).comp
+        (rename (inrV (ι := GlobalTheory (Fin (D + 1))) (ι₂ := GlobalTheory (Veronese.Idx D)))
+          : MRing (GlobalTheory (Veronese.Idx D)) →ₐ[ℤ] _).toRingHom)
   have hG : ∀ f, G f = ψ (coneMap ℤ (Veronese.x D) f) := by
     have h : G = ψ.comp (coneMap ℤ (Veronese.x D)).toRingHom := by
       apply MvPolynomial.ringHom_ext
@@ -62,9 +64,12 @@ theorem VeroneseGraphImage.proof : VeroneseGraphImage.Statement := by
           (RingHom.ext_int (G.comp C) ((ψ.comp (coneMap ℤ (Veronese.x D)).toRingHom).comp C)) n
       · rintro ⟨u, q⟩
         cases u
-        simp only [G, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-          rename_X]
-        rw [show (inrV (ι := GlobalTheory (Fin (D + 1))) (ι₂ := GlobalTheory (Veronese.Idx D)) ⟨(), q⟩) = ⟨Sum.inr (), q⟩ from rfl]
+        simp only [G, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
+          RingHom.coe_coe, rename_X]
+        rw [show (inrV (ι := GlobalTheory (Fin (D + 1))) (ι₂ := GlobalTheory (Veronese.Idx D))
+              ⟨(), q⟩)
+            = ⟨Sum.inr (), q⟩ from
+          rfl]
         rw [graphMap, eval₂Hom_X']
         simp only [map_mul, map_C, map_X, coneMap, aeval_X]
         rw [show φ (Ideal.Quotient.mk P (Veronese.forms D ⟨(), q⟩)) = Veronese.x D ⟨(), q⟩ from by

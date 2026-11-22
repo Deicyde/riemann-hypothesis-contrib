@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsSquareInte
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.UAut
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.UAut
 open scoped TensorProduct
 open GlobalTheory.Mem.UnipCocompact
 
@@ -15,22 +16,24 @@ variable {S ι : Type} [Ring S] [Fintype ι] {ε : ι → S} {w : ι → ℤ}
 
 def dg (ε : ι → S) (w : ι → ℤ) (x : S) : S := ∑ a, ∑ b, if w a = w b then ε a * x * ε b else 0
 
-theorem ext_sand (he : CompleteOrthogonalIdempotents ε) {x y : S} (h : ∀ a b, ε a * x * ε b = ε a * y * ε b) : x = y := by
+theorem ext_sand
+    (he : CompleteOrthogonalIdempotents ε) {x y : S} (h : ∀ a b, ε a * x * ε b = ε a * y * ε b)
+    : x = y := by
   have e : ∀ z : S, z = ∑ a, ∑ b, ε a * z * ε b := fun z => by
     simp only [← Finset.mul_sum, ← Finset.sum_mul, he.complete, mul_one, one_mul]
   rw [e x, e y]
   simp only [h]
 
-theorem sand_mul (he : CompleteOrthogonalIdempotents ε) (x y : S) (a b : ι) :
-    ε a * (x * y) * ε b = ∑ c, (ε a * x * ε c) * (ε c * y * ε b) := by
+theorem sand_mul (he : CompleteOrthogonalIdempotents ε) (x y : S) (a b : ι)
+    : ε a * (x * y) * ε b = ∑ c, (ε a * x * ε c) * (ε c * y * ε b) := by
   have e : ∀ c, (ε a * x * ε c) * (ε c * y * ε b) = ε a * x * ε c * (y * ε b) := fun c => by
     rw [mul_assoc (ε c) y, ← mul_assoc _ (ε c) (y * ε b), mul_assoc _ (ε c) (ε c), (he.idem c).eq]
   simp only [e]
   rw [← Finset.sum_mul, ← Finset.mul_sum, he.complete]
   simp only [mul_one, mul_assoc]
 
-theorem sand_dg (he : CompleteOrthogonalIdempotents ε) (x : S) (a b : ι) :
-    ε a * dg ε w x * ε b = if w a = w b then ε a * x * ε b else 0 := by
+theorem sand_dg (he : CompleteOrthogonalIdempotents ε) (x : S) (a b : ι)
+    : ε a * dg ε w x * ε b = if w a = w b then ε a * x * ε b else 0 := by
   classical
   rw [dg, Finset.mul_sum, Finset.sum_mul, Finset.sum_eq_single a, Finset.mul_sum, Finset.sum_mul,
     Finset.sum_eq_single b]
@@ -50,9 +53,11 @@ theorem sand_dg (he : CompleteOrthogonalIdempotents ε) (x : S) (a b : ι) :
     · simp
   · simp
 
-theorem dg_mul_dg (he : CompleteOrthogonalIdempotents ε) {x y : S} (h : x * y = 1)
-    (hx : ∀ a b, w a < w b → ε a * x * ε b = 0) (hy : ∀ a b, w a < w b → ε a * y * ε b = 0) :
-    dg ε w x * dg ε w y = 1 := by
+theorem dg_mul_dg
+    (he : CompleteOrthogonalIdempotents ε)
+    {x y : S} (h : x * y = 1) (hx : ∀ a b, w a < w b → ε a * x * ε b = 0)
+    (hy : ∀ a b, w a < w b → ε a * y * ε b = 0)
+    : dg ε w x * dg ε w y = 1 := by
   refine ext_sand he fun a b => ?_
   by_cases hab : w a = w b
   · rw [← h, sand_mul he, sand_mul he]
@@ -69,9 +74,20 @@ theorem dg_mul_dg (he : CompleteOrthogonalIdempotents ε) {x y : S} (h : x * y =
     · rw [if_neg (show ¬ w c = w b from h1 ▸ hab), mul_zero]
     · rw [if_neg h1, zero_mul]
 
-theorem exists_weightPart : ∀ {S ι : Type} [Ring S] [Fintype ι] (st : S →+ S) (ε : ι → S) (w : ι → ℤ) (τ : ι → ι), (∀ x y, st (x * y) = st y * st x) → (∀ x, st (st x) = x) → CompleteOrthogonalIdempotents ε → (∀ a, st (ε a) = ε (τ a)) → (∀ a, w (τ a) = -w a) → (∀ a, τ (τ a) = a) → ∀ x y : S, x * y = 1 → y * x = 1 → st x = y → (∀ a b, w a < w b → ε a * x * ε b = 0) → (∀ a b, w a < w b → ε a * y * ε b = 0) → ∃ m m' : S, m * m' = 1 ∧ m' * m = 1 ∧ st m = m' ∧ (∀ a b, w a ≠ w b → ε a * m * ε b = 0) ∧ (∀ a b, w a ≠ w b → ε a * m' * ε b = 0) ∧ x * m' - 1 ∈ raise ε w 0 ∧ ∀ S₀ : Subring S, (∀ a, ε a ∈ S₀) → x ∈ S₀ → y ∈ S₀ → m ∈ S₀ ∧ m' ∈ S₀ := by
+theorem exists_weightPart
+    : ∀ {S ι : Type} [Ring S] [Fintype ι] (st : S →+ S) (ε : ι → S) (w : ι → ℤ) (τ : ι → ι),
+      (∀ x y, st (x * y) = st y * st x) → (∀ x, st (st x) = x) → CompleteOrthogonalIdempotents ε
+        → (∀ a, st (ε a) = ε (τ a)) → (∀ a, w (τ a) = - w a) → (∀ a, τ (τ a) = a)
+        → ∀ x y : S,
+          x * y = 1 → y * x = 1 → st x = y → (∀ a b, w a < w b → ε a * x * ε b = 0)
+            → (∀ a b, w a < w b → ε a * y * ε b = 0)
+            → ∃ m m' : S,
+              m * m' = 1 ∧ m' * m = 1 ∧ st m = m' ∧ (∀ a b, w a ≠ w b → ε a * m * ε b = 0)
+                ∧ (∀ a b, w a ≠ w b → ε a * m' * ε b = 0) ∧ x * m' - 1 ∈ raise ε w 0
+                ∧ ∀ S₀ : Subring S, (∀ a, ε a ∈ S₀) → x ∈ S₀ → y ∈ S₀ → m ∈ S₀ ∧ m' ∈ S₀ := by
   intro S ι _ _ st ε w τ hst hss he hε hw hτ x y hxy hyx hs hx hy
-  have hm : ∀ z a b, w a ≠ w b → ε a * dg ε w z * ε b = 0 := fun z a b h => by rw [sand_dg he, if_neg h]
+  have hm : ∀ z a b, w a ≠ w b → ε a * dg ε w z * ε b = 0 := fun z a b h => by
+    rw [sand_dg he, if_neg h]
   have h1 := dg_mul_dg he hxy hx hy
   refine ⟨dg ε w x, dg ε w y, h1, dg_mul_dg he hyx hy hx, ?_, hm x, hm y, ?_, ?_⟩
   · have key : ∀ z a b, ε a * st z * ε b = st (ε (τ b) * z * ε (τ a)) := fun z a b => by
@@ -93,10 +109,11 @@ theorem exists_weightPart : ∀ {S ι : Type} [Ring S] [Fintype ι] (st : S →+
     · rw [hm y c b h, mul_zero]
   · intro S₀ h0 hx0 hy0
     have : ∀ z ∈ S₀, dg ε w z ∈ S₀ := fun z hz =>
-      sum_mem fun a _ => sum_mem fun b _ => by
-        split_ifs
-        · exact mul_mem (mul_mem (h0 a) hz) (h0 b)
-        · exact zero_mem _
+      sum_mem fun a _ =>
+        sum_mem fun b _ => by
+          split_ifs
+          · exact mul_mem (mul_mem (h0 a) hz) (h0 b)
+          · exact zero_mem _
     exact ⟨this x hx0, this y hy0⟩
 
 end GlobalTheory.WeightPart

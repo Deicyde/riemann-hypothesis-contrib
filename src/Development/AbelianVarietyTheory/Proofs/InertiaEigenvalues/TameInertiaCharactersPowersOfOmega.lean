@@ -15,63 +15,98 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Inertia
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.TameIner
 
-theorem mem_IK_iff : ∀ (l : ℕ) [Fact l.Prime] (g : Gl l), g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) ↔ ∀ x : Om l, ‖x‖ ≤ 1 → ‖(g : GQ l) x - x‖ < 1 :=
+theorem mem_IK_iff
+    : ∀ (l : ℕ) [Fact l.Prime] (g : Gl l),
+      g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l)
+        ↔ ∀ x : Om l, ‖x‖ ≤ 1 → ‖(g : GQ l) x - x‖ < 1 :=
   GlobalTheory.T.mem_inertia_Ql_iff_residue_trivial
 
-theorem minpoly_root : ∀ (l : ℕ) [Fact l.Prime] (M : ℕ), 0 < M → ∀ (ρ ξ : Om l), ρ ^ M = -(l : Om l) → ξ ^ M = 1 → Polynomial.aeval (ξ * ρ) (minpoly ↥(MaximalUnramifiedExtension l) ρ) = 0 :=
+theorem minpoly_root
+    : ∀ (l : ℕ) [Fact l.Prime] (M : ℕ),
+      0 < M
+        → ∀ (ρ ξ : Om l),
+          ρ ^ M = -(l : Om l) → ξ ^ M = 1
+            → Polynomial.aeval (ξ * ρ) (minpoly ↥(MaximalUnramifiedExtension l) ρ) = 0 :=
   GlobalTheory.T.aeval_rootOfUnity_mul_kummer_root_minpoly
 
-theorem exists_lift : ∀ (l : ℕ) [Fact l.Prime] (x y : Om l), Polynomial.aeval y (minpoly ↥(MaximalUnramifiedExtension l) x) = 0 → ∃ g : GQ l, (∀ z ∈ MaximalUnramifiedExtension l, g z = z) ∧ g x = y :=
+theorem exists_lift
+    : ∀ (l : ℕ) [Fact l.Prime] (x y : Om l),
+      Polynomial.aeval y (minpoly ↥(MaximalUnramifiedExtension l) x) = 0
+        → ∃ g : GQ l, (∀ z ∈ MaximalUnramifiedExtension l, g z = z) ∧ g x = y :=
   GlobalTheory.T.exists_galois_fixing_maxUnramified_map_conj
 
-theorem exists_open_normal : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l) (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ), IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) → ∃ F : FinExt l, Normal ℚ_[l] ↥F.1 ∧ ∀ g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)), (∀ x ∈ F.1, ((g : Gl l) : GQ l) x = x) → χ g = 1 :=
+theorem exists_open_normal
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l)
+        (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ),
+      IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)))
+        → ∃ F : FinExt l,
+          Normal ℚ_[l] ↥F.1
+            ∧ ∀ g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)),
+              (∀ x ∈ F.1, ((g : Gl l) : GQ l) x = x) → χ g = 1 :=
   GlobalTheory.T.inertia_char_openKer_trivial_fixing_normal
 
-theorem exists_pow_fix : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), Normal ℚ_[l] ↥F.1 → ∀ g : GQ l, (∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖) → ∃ s : ℕ, ∀ x ∈ F.1, (g ^ l ^ s) x = x :=
+theorem exists_pow_fix
+    : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l),
+      Normal ℚ_[l] ↥F.1
+        → ∀ g : GQ l,
+          (∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖) → ∃ s : ℕ, ∀ x ∈ F.1, (g ^ l ^ s) x = x :=
   GlobalTheory.T.exists_prime_pow_fixing_normal_of_near
 
-theorem near_of_fix_root : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), ∃ M : ℕ, 0 < M ∧ ¬ l ∣ M ∧ ∀ ρ : Om l, ρ ^ M = -(l : Om l) → ∀ g : GQ l, (∀ y : Om l, ‖y‖ ≤ 1 → ‖g y - y‖ < 1) → g ρ = ρ → ∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖ :=
+theorem near_of_fix_root
+    : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), ∃ M : ℕ,
+      0 < M ∧ ¬ l ∣ M
+        ∧ ∀ ρ : Om l,
+          ρ ^ M = -(l : Om l)
+            → ∀ g : GQ l,
+              (∀ y : Om l, ‖y‖ ≤ 1 → ‖g y - y‖ < 1) → g ρ = ρ
+                → ∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖ :=
   GlobalTheory.T.inertia_fixing_kummer_root_moves_less
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-
 open GlobalTheory.MemLoc.FrobLaws in
-theorem fix_root (g : Gl l) (hg : g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l)) {ζ : Om l} {m : ℕ} (hm : 0 < m)
-    (hlm : ¬ l ∣ m) (hζ : ζ ^ m = 1) : (g : GQ l) ζ = ζ := by
+theorem fix_root
+    (g : Gl l) (hg : g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l))
+    {ζ : Om l} {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) (hζ : ζ ^ m = 1)
+    : (g : GQ l) ζ = ζ := by
   have h1 := (mem_IK_iff l g).1 hg ζ (norm_root hm hζ).le
   have hgζ : ((g : GQ l) ζ) ^ m = 1 := by rw [← map_pow, hζ, map_one]
   let a : OO l := ⟨(g : GQ l) ζ, show ‖(g : GQ l) ζ‖ ≤ 1 from (norm_root hm hgζ).le⟩
   let b : OO l := ⟨ζ, show ‖ζ‖ ≤ 1 from (norm_root hm hζ).le⟩
-  have := res_inj (a := a) (b := b) hm hlm (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hgζ))
-    (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hζ)) ((res_eq_iff a b).2 h1)
+  have :=
+    res_inj (a := a) (b := b) hm hlm (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hgζ))
+      (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hζ)) ((res_eq_iff a b).2 h1)
   exact congrArg Subtype.val this
 
-
 open GlobalTheory.MemLoc.FrobLaws in
-theorem frob_root (Fr : Gl l) (hFr : ∀ x : Om l, x ∈ MaximalUnramifiedExtension l → ‖x‖ ≤ 1 → ‖(Fr : GQ l) x - x ^ l‖ < 1)
-    {ζ : Om l} {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) (hζ : ζ ^ m = 1) : (Fr : GQ l) ζ = ζ ^ l := by
+theorem frob_root
+    (Fr : Gl l)
+    (hFr : ∀ x : Om l, x ∈ MaximalUnramifiedExtension l → ‖x‖ ≤ 1 → ‖(Fr : GQ l) x - x ^ l‖ < 1)
+    {ζ : Om l} {m : ℕ} (hm : 0 < m) (hlm : ¬ l ∣ m) (hζ : ζ ^ m = 1)
+    : (Fr : GQ l) ζ = ζ ^ l := by
   have hK : ζ ∈ MaximalUnramifiedExtension l := IntermediateField.subset_adjoin _ _ ⟨m, hm, hlm, hζ⟩
   have h1 := hFr ζ hK (norm_root hm hζ).le
   have hgζ : ((Fr : GQ l) ζ) ^ m = 1 := by rw [← map_pow, hζ, map_one]
   have hζl : (ζ ^ l) ^ m = 1 := by rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
   let a : OO l := ⟨(Fr : GQ l) ζ, show ‖(Fr : GQ l) ζ‖ ≤ 1 from (norm_root hm hgζ).le⟩
   let b : OO l := ⟨ζ ^ l, show ‖ζ ^ l‖ ≤ 1 from (norm_root hm hζl).le⟩
-  have := res_inj (a := a) (b := b) hm hlm (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hgζ))
-    (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hζl)) ((res_eq_iff a b).2 h1)
+  have :=
+    res_inj (a := a) (b := b) hm hlm (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hgζ))
+      (Subtype.ext (by rw [SubmonoidClass.coe_pow]; exact hζl)) ((res_eq_iff a b).2 h1)
   exact congrArg Subtype.val this
 
-
 open GlobalTheory.MemLoc.FrobLaws in
-theorem mem_IK_of_fix_Kur (g : Gl l) (hg : ∀ x ∈ MaximalUnramifiedExtension l, (g : GQ l) x = x) :
-    g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) := by
+theorem mem_IK_of_fix_Kur (g : Gl l) (hg : ∀ x ∈ MaximalUnramifiedExtension l, (g : GQ l) x = x)
+    : g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) := by
   have key : ∀ y : Om l, ‖y‖ < 1 → ‖(g : GQ l) y - y‖ < 1 := fun y hy => by
     rw [sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ?_ ?_)
@@ -87,8 +122,9 @@ theorem mem_IK_of_fix_Kur (g : Gl l) (hg : ∀ x ∈ MaximalUnramifiedExtension 
     rw [e]
     exact key _ hn
 
-theorem exists_inertia {M : ℕ} (hM : 0 < M) (ρ ζ : Om l) (hρ : ρ ^ M = -(l : Om l)) (hζ : ζ ^ M = 1) :
-    ∃ g : Gl l, g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) ∧ (g : GQ l) ρ = ζ * ρ := by
+theorem exists_inertia {M : ℕ} (hM : 0 < M) (ρ ζ : Om l) (hρ : ρ ^ M = -(l : Om l)) (hζ : ζ ^ M = 1)
+    : ∃ g : Gl l,
+      g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) ∧ (g : GQ l) ρ = ζ * ρ := by
   obtain ⟨g, hgK, hgρ⟩ := exists_lift l ρ (ζ * ρ) (minpoly_root l M hM ρ ζ hρ hζ)
   have hmem : g ∈ GK (Formalism.MainNotions.ElementDenominator.qlExt l) := by
     rw [GK, IntermediateField.mem_fixingSubgroup_iff]
@@ -98,10 +134,16 @@ theorem exists_inertia {M : ℕ} (hM : 0 < M) (ρ ζ : Om l) (hρ : ρ ^ M = -(l
     exact g.commutes c
   exact ⟨⟨g, hmem⟩, mem_IK_of_fix_Kur _ hgK, hgρ⟩
 
-theorem chi_trivial (LL : FinExt l) (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ)
-    (ho : IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)))) (hc : Nat.Coprime (orderOf χ) l) :
-    ∃ M : ℕ, 0 < M ∧ ¬ l ∣ M ∧ ∀ ρ : Om l, ρ ^ M = -(l : Om l) →
-      ∀ g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)), ((g : Gl l) : GQ l) ρ = ρ → χ g = 1 := by
+theorem chi_trivial
+    (LL : FinExt l) (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ)
+    (ho : IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))))
+    (hc : Nat.Coprime (orderOf χ) l)
+    : ∃ M : ℕ,
+      0 < M ∧ ¬ l ∣ M
+        ∧ ∀ ρ : Om l,
+          ρ ^ M = -(l : Om l)
+            → ∀ g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)),
+              ((g : Gl l) : GQ l) ρ = ρ → χ g = 1 := by
   obtain ⟨F, hFn, hF⟩ := exists_open_normal l LL χ ho
   obtain ⟨M, hM, hlM, hnear⟩ := near_of_fix_root l F
   refine ⟨M, hM, hlM, fun ρ hρ g hg => ?_⟩
@@ -118,7 +160,26 @@ end GlobalTheory.TameIner
 
 namespace GlobalTheory.TameIner
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (ϖ : PiSys l e) (LL : FinExt l) [HasUnr a LL] [TameDescentExponentData ↥LL.1 l e a], (∀ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), ∃ w : ↥LL.1, (w : Om l) * ϖ.seq 0 = (g : GQ l) (ϖ.seq 0) ∧ w ^ e = 1) ∧ (∃ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), ∃ w : ↥LL.1, (w : Om l) * ϖ.seq 0 = (g : GQ l) (ϖ.seq 0) ∧ IsPrimitiveRoot w e) ∧ ∀ (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ), IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) → Nat.Coprime (orderOf χ) l → (∀ (Fr : Gl l), (∀ x : Om l, x ∈ MaximalUnramifiedExtension l → ‖x‖ ≤ 1 → ‖(Fr : GQ l) x - x ^ l‖ < 1) → ∀ g h : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)), (g : Gl l) = Fr⁻¹ * h * Fr → χ h = χ g ^ l) ∧ (χ ^ e = 1 → ∃ c : ZMod e, ∀ (g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) (w : ↥LL.1), (w : Om l) * ϖ.seq 0 = ((g : Gl l) : GQ l) (ϖ.seq 0) → (χ g : ↥LL.1) = w ^ c.val) := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (ϖ : PiSys l e) (LL : FinExt l)
+        [HasUnr a LL] [TameDescentExponentData ↥LL.1 l e a],
+      (∀ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), ∃ w : ↥LL.1,
+          (w : Om l) * ϖ.seq 0 = (g : GQ l) (ϖ.seq 0) ∧ w ^ e = 1)
+        ∧ (∃ g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l), ∃ w : ↥LL.1,
+          (w : Om l) * ϖ.seq 0 = (g : GQ l) (ϖ.seq 0) ∧ IsPrimitiveRoot w e)
+        ∧ ∀ (χ : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) →* (↥LL.1)ˣ),
+          IsOpen (χ.ker : Set ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)))
+            → Nat.Coprime (orderOf χ) l
+            → (∀ (Fr : Gl l),
+                (∀ x : Om l,
+                    x ∈ MaximalUnramifiedExtension l → ‖x‖ ≤ 1 → ‖(Fr : GQ l) x - x ^ l‖ < 1)
+                  → ∀ g h : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)),
+                    (g : Gl l) = Fr⁻¹ * h * Fr → χ h = χ g ^ l)
+              ∧ (χ ^ e = 1
+                → ∃ c : ZMod e,
+                  ∀ (g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) (w : ↥LL.1),
+                    (w : Om l) * ϖ.seq 0 = ((g : Gl l) : GQ l) (ϖ.seq 0)
+                      → (χ g : ↥LL.1) = w ^ c.val) := by
   intro l _ a e _ _ ϖ LL _ _
   have hp : l.Prime := Fact.out
   obtain ⟨z, hz⟩ := TameDescentExponentData.prim (K := ↥LL.1) (l := l) (e := e) (a := a)
@@ -128,7 +189,8 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (�
     have h1 : l ∣ l ^ a := dvd_pow_self l (NeZero.ne a)
     rw [← TameDescentExponentData.succ_eq (K := ↥LL.1) (l := l) (e := e) (a := a)] at h1
     exact hp.not_dvd_one ((Nat.dvd_add_right h).1 h1)
-  have hzO : IsPrimitiveRoot ((z : ↥LL.1) : Om l) e := hz.map_of_injective (f := LL.1.val) LL.1.val.injective
+  have hzO : IsPrimitiveRoot ((z : ↥LL.1) : Om l) e :=
+    hz.map_of_injective (f := LL.1.val) LL.1.val.injective
   have hl0 : (l : Om l) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
   have hπ0 : ϖ.seq 0 ≠ 0 := ϖ.seq_ne_zero 0
   have hroot : ∀ w : Om l, w ^ e = 1 → ∃ k < e, ((z ^ k : ↥LL.1) : Om l) = w := by
@@ -158,8 +220,10 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (�
       rintro rfl
       rw [zero_pow hM.ne', eq_comm, neg_eq_zero] at hρ
       exact hl0 hρ
-    have hζσ : ∀ g : Gl l, g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) → (g : GQ l) ζ = ζ := fun g hg =>
-      fix_root g hg hM hlM hζ.pow_eq_one
+    have hζσ
+        : ∀ g : Gl l,
+          g ∈ IK (Formalism.MainNotions.ElementDenominator.qlExt l) → (g : GQ l) ζ = ζ :=
+      fun g hg => fix_root g hg hM hlM hζ.pow_eq_one
     have hrat : ∀ g : Gl l, ∃ j : ℕ, (g : GQ l) ρ = ζ ^ j * ρ := by
       intro g
       have h1 : ((g : GQ l) ρ / ρ) ^ (M0 * e) = 1 := by
@@ -171,16 +235,24 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (�
       induction j with
       | zero => simp
       | succ j ih =>
-        rw [pow_succ, Subgroup.coe_mul, AlgEquiv.mul_apply, hσρ, map_mul, ih, hζσ _ (Subgroup.pow_mem _ hσ j), pow_succ]
+        rw [pow_succ, Subgroup.coe_mul, AlgEquiv.mul_apply, hσρ, map_mul, ih,
+          hζσ _ (Subgroup.pow_mem _ hσ j), pow_succ]
         ring
     set σ' : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l)) := ⟨σ, hσ⟩ with hσ'
-    have hχg : ∀ (g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) (j : ℕ), ((g : Gl l) : GQ l) ρ = ζ ^ j * ρ →
-        χ g = χ σ' ^ j := by
+    have hχg
+        : ∀ (g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) (j : ℕ),
+          ((g : Gl l) : GQ l) ρ = ζ ^ j * ρ → χ g = χ σ' ^ j := by
       intro g j hj
-      have hfix : ((((σ' ^ j)⁻¹ * g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) : Gl l) : GQ l) ρ = ρ := by
+      have hfix
+          : ((((σ' ^ j)⁻¹ * g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) : Gl l)
+                : GQ l)
+              ρ
+            = ρ := by
         have h2 := hσpow j
-        have h3 : ((((σ' ^ j)⁻¹ * g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) : Gl l) : GQ l) =
-            ((σ ^ j : Gl l) : GQ l)⁻¹ * ((g : Gl l) : GQ l) := by
+        have h3
+            : ((((σ' ^ j)⁻¹ * g : ↥(IK (Formalism.MainNotions.ElementDenominator.qlExt l))) : Gl l)
+                : GQ l)
+              = ((σ ^ j : Gl l) : GQ l)⁻¹ * ((g : Gl l) : GQ l) := by
           simp [σ']
         rw [h3, AlgEquiv.mul_apply, hj, ← h2]
         exact AlgEquiv.symm_apply_apply _ ρ
@@ -198,10 +270,11 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (�
       have hFr1 : (Fr : GQ l) (ζ ^ i * ρ) = ρ := by
         rw [← hi]
         show (Fr : GQ l) (((Fr⁻¹ : Gl l) : GQ l) ρ) = ρ
-        rw [← AlgEquiv.mul_apply, ← Subgroup.coe_mul, mul_inv_cancel, Subgroup.coe_one, AlgEquiv.one_apply]
+        rw [← AlgEquiv.mul_apply, ← Subgroup.coe_mul, mul_inv_cancel, Subgroup.coe_one,
+          AlgEquiv.one_apply]
       have hhρ : ((h : Gl l) : GQ l) ρ = ζ ^ (j * l) * ρ := by
-        rw [hh, Subgroup.coe_mul, Subgroup.coe_mul, AlgEquiv.mul_apply, AlgEquiv.mul_apply, hi, map_mul,
-          map_pow, hζσ g g.2, hj]
+        rw [hh, Subgroup.coe_mul, Subgroup.coe_mul, AlgEquiv.mul_apply, AlgEquiv.mul_apply, hi,
+          map_mul, map_pow, hζσ g g.2, hj]
         have e1 : ζ ^ i * (ζ ^ j * ρ) = ζ ^ j * (ζ ^ i * ρ) := by ring
         rw [e1, map_mul, hFr1, map_pow, hFrζ, ← pow_mul, mul_comm l j]
       rw [hχg h _ hhρ, hχg g j hj, pow_mul]
@@ -230,7 +303,8 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (�
         apply Subtype.ext
         have e2 : (w : Om l) * ϖ.seq 0 = (ζ ^ M0) ^ j * ϖ.seq 0 := hw.trans hgπ
         rw [mul_left_inj' hπ0, ← hs] at e2
-        rw [e2]; rfl
+        rw [e2]
+        rfl
       rw [hw']
       ring
 

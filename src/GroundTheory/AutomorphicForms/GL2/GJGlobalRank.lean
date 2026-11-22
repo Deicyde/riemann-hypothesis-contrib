@@ -54,8 +54,9 @@ noncomputable def unitsEquiv : GL (Fin n) K ≃ {ξ : Matrix (Fin n) (Fin n) K /
 
 variable {E : Type*} [NormedAddCommGroup E] [CompleteSpace E]
 
-theorem tsum_eq_tsum_GL_add {f : Matrix (Fin n) (Fin n) K → E} (hf : Summable f) :
-    ∑' ξ, f ξ = ∑' γ : GL (Fin n) K, f γ + ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.det = 0}, f ξ := by
+theorem tsum_eq_tsum_GL_add {f : Matrix (Fin n) (Fin n) K → E} (hf : Summable f)
+    : ∑' ξ, f ξ
+      = ∑' γ : GL (Fin n) K, f γ + ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.det = 0}, f ξ := by
   rw [← hf.tsum_subtype_add_tsum_subtype_compl {ξ | IsUnit ξ.det}]
   congr 1
   · exact ((unitsEquiv (K := K) (n := n)).tsum_eq (fun ξ => f ξ)).symm
@@ -65,11 +66,12 @@ theorem tsum_eq_tsum_GL_add {f : Matrix (Fin n) (Fin n) K → E} (hf : Summable 
     rw [e]
     rfl
 
-theorem tsum_det_eq_zero_eq_sum_rank {f : Matrix (Fin n) (Fin n) K → E} (hf : Summable f) :
-    ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.det = 0}, f ξ =
-      ∑ r : Fin n, ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.rank = r}, f ξ := by
-  have e : {ξ : Matrix (Fin n) (Fin n) K | ξ.det = 0} =
-      ⋃ r ∈ (Finset.univ : Finset (Fin n)), {ξ | ξ.rank = (r : ℕ)} := by
+theorem tsum_det_eq_zero_eq_sum_rank {f : Matrix (Fin n) (Fin n) K → E} (hf : Summable f)
+    : ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.det = 0}, f ξ
+      = ∑ r : Fin n, ∑' ξ : {ξ : Matrix (Fin n) (Fin n) K // ξ.rank = r}, f ξ := by
+  have e
+      : {ξ : Matrix (Fin n) (Fin n) K | ξ.det = 0}
+        = ⋃ r ∈ (Finset.univ : Finset (Fin n)), {ξ | ξ.rank = (r : ℕ)} := by
     ext ξ
     simp only [Set.mem_ofPred_eq, Finset.mem_univ, Set.iUnion_true, Set.mem_iUnion]
     constructor
@@ -80,8 +82,10 @@ theorem tsum_det_eq_zero_eq_sum_rank {f : Matrix (Fin n) (Fin n) K → E} (hf : 
       have := (rank_eq_iff_isUnit_det ξ).2 (isUnit_iff_ne_zero.2 h)
       have hr' := r.2
       omega
-  have hd : ((Finset.univ : Finset (Fin n)) : Set (Fin n)).Pairwise
-      (Function.onFun Disjoint fun r : Fin n => {ξ : Matrix (Fin n) (Fin n) K | ξ.rank = (r : ℕ)}) := by
+  have hd
+      : ((Finset.univ : Finset (Fin n)) : Set (Fin n)).Pairwise
+        (Function.onFun Disjoint fun r : Fin n =>
+          {ξ : Matrix (Fin n) (Fin n) K | ξ.rank = (r : ℕ)}) := by
     intro r _ r' _ hrr'
     refine Set.disjoint_left.2 fun ξ h h' => hrr' (Fin.ext ?_)
     simp only [Set.mem_ofPred_eq] at h h'

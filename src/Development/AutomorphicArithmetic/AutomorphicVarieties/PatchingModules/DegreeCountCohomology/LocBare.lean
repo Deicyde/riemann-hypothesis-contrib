@@ -4,11 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem cardZ {k D M : Type} [CommRing k] [Group D] [TopologicalSpace D] [AddCommGroup M] [Module k M]
-    [Finite M] [TopologicalSpace M] [DiscreteTopology M] (σ : Representation k D M) (hσ : ContAction σ)
-    [Finite (H1 σ)] : Finite (Z1 σ) ∧ Nat.card (Z1 σ) * Nat.card (H0 σ) = Nat.card (H1 σ) * Nat.card M := by
+private theorem cardZ
+    {k D M : Type} [CommRing k] [Group D] [TopologicalSpace D] [AddCommGroup M] [Module k M]
+    [Finite M] [TopologicalSpace M] [DiscreteTopology M]
+    (σ : Representation k D M) (hσ : ContAction σ) [Finite (H1 σ)]
+    : Finite (Z1 σ) ∧ Nat.card (Z1 σ) * Nat.card (H0 σ) = Nat.card (H1 σ) * Nat.card M := by
   classical
   have hB : B1 σ ≤ Z1 σ := by
     intro f hf
@@ -32,8 +35,7 @@ private theorem cardZ {k D M : Type} [CommRing k] [Group D] [TopologicalSpace D]
     · rw [hker]
   have hS : Nat.card (Submodule.comap (Z1 σ).subtype (B1 σ)) = Nat.card (B1 σ) :=
     Nat.card_congr (Submodule.comapSubtypeEquivOfLe hB).toEquiv
-  have hZ : Nat.card (Z1 σ) =
-      Nat.card (Submodule.comap (Z1 σ).subtype (B1 σ)) * Nat.card (H1 σ) :=
+  have hZ : Nat.card (Z1 σ) = Nat.card (Submodule.comap (Z1 σ).subtype (B1 σ)) * Nat.card (H1 σ) :=
     Submodule.card_eq_card_quotient_mul_card _
   haveI hBfin : Finite (B1 σ) := Finite.of_surjective _ (d0 σ).surjective_rangeRestrict
   have hpos1 : 0 < Nat.card (B1 σ) := Nat.card_pos
@@ -44,17 +46,19 @@ private theorem cardZ {k D M : Type} [CommRing k] [Group D] [TopologicalSpace D]
   · rw [hZ, hS, hM]
     ring
 
-private theorem cardDual (k V : Type) [Field k] [AddCommGroup V] [Module k V] [Finite V] :
-    Nat.card (Module.Dual k V) = Nat.card V := by
+private theorem cardDual (k V : Type) [Field k] [AddCommGroup V] [Module k V] [Finite V]
+    : Nat.card (Module.Dual k V) = Nat.card V := by
   haveI : Module.Finite k V := Module.Finite.of_finite
   exact Nat.card_congr (Module.Free.chooseBasis k V).toDualEquiv.symm.toEquiv
 
-private theorem cardInv {n : ℕ} [Fact n.Prime] {D M M' : Type} [Group D] [AddCommGroup M] [Module (ZMod n) M]
-    [AddCommGroup M'] [Module (ZMod n) M'] [Finite M] [Finite M'] (χ : D →* (ZMod n)ˣ)
-    (σ : Representation (ZMod n) D M) (τ : D → M' → M') (b : M →+ M' →+ ZMod n)
+private theorem cardInv
+    {n : ℕ} [Fact n.Prime]
+    {D M M' : Type} [Group D] [AddCommGroup M] [Module (ZMod n) M] [AddCommGroup M']
+    [Module (ZMod n) M'] [Finite M] [Finite M']
+    (χ : D →* (ZMod n)ˣ) (σ : Representation (ZMod n) D M) (τ : D → M' → M') (b : M →+ M' →+ ZMod n)
     (hl : ∀ x, (∀ y, b x y = 0) → x = 0) (hr : ∀ y, (∀ x, b x y = 0) → y = 0)
-    (he : ∀ g x y, b (σ g x) (τ g y) = χ g * b x y) :
-    Nat.card (H0 ((twDual χ σ).comp (MonoidHom.id D))) = Nat.card {y : M' // ∀ g, τ g y = y} := by
+    (he : ∀ g x y, b (σ g x) (τ g y) = χ g * b x y)
+    : Nat.card (H0 ((twDual χ σ).comp (MonoidHom.id D))) = Nat.card {y : M' // ∀ g, τ g y = y} := by
   classical
   let Φ : M' → Module.Dual (ZMod n) M := fun y => (b.flip y).toZModLinearMap n
   have hΦ : ∀ y x, Φ y x = b x y := fun y x => rfl
@@ -104,7 +108,8 @@ private theorem cardInv {n : ℕ} [Fact n.Prime] {D M M' : Type} [Group D] [AddC
       rfl
   refine (Nat.card_congr (Equiv.ofBijective
     (fun y : {y : M' // ∀ g, τ g y = y} =>
-      (⟨Φ y.1, (hmem y.1).2 y.2⟩ : ↥(H0 ((twDual χ σ).comp (MonoidHom.id D))))) ⟨?_, ?_⟩)).symm
+      (⟨Φ y.1, (hmem y.1).2 y.2⟩ : ↥(H0 ((twDual χ σ).comp (MonoidHom.id D)))))
+    ⟨?_, ?_⟩)).symm
   · intro y y' h
     exact Subtype.ext (hΦi (congrArg Subtype.val h))
   · intro φ
@@ -114,22 +119,30 @@ private theorem cardInv {n : ℕ} [Fact n.Prime] {D M M' : Type} [Group D] [AddC
       exact φ.2
     exact ⟨⟨y, (hmem y).1 hy'⟩, Subtype.ext hy⟩
 
-private def zRep (n : ℕ) {R D M : Type} [CommRing R] [Group D] [AddCommGroup M] [Module R M] [Module (ZMod n) M]
-    (ρ : Representation R D M) : Representation (ZMod n) D M where
+private def zRep
+    (n : ℕ)
+    {R D M : Type} [CommRing R] [Group D] [AddCommGroup M] [Module R M] [Module (ZMod n) M]
+    (ρ : Representation R D M)
+    : Representation (ZMod n) D M where
   toFun g := (ρ g).toAddMonoidHom.toZModLinearMap n
-  map_one' := LinearMap.ext fun m => by
-    show ρ 1 m = m
-    rw [map_one]; rfl
-  map_mul' g h := LinearMap.ext fun m => by
-    show ρ (g * h) m = ρ g (ρ h m)
-    rw [map_mul]; rfl
+  map_one' :=
+    LinearMap.ext fun m => by
+      show ρ 1 m = m
+      rw [map_one]
+      rfl
+  map_mul' g h :=
+    LinearMap.ext fun m => by
+      show ρ (g * h) m = ρ g (ρ h m)
+      rw [map_mul]
+      rfl
 
-private theorem cast_toZMod {l : ℕ} [Fact l.Prime] (h : l ^ 1 ∣ l) (x : ℤ_[l]) :
-    ZMod.castHom h (ZMod (l ^ 1)) (PadicInt.toZMod x) = PadicInt.toZModPow 1 x := by
+private theorem cast_toZMod {l : ℕ} [Fact l.Prime] (h : l ^ 1 ∣ l) (x : ℤ_[l])
+    : ZMod.castHom h (ZMod (l ^ 1)) (PadicInt.toZMod x) = PadicInt.toZModPow 1 x := by
   have hinj : Function.Injective (ZMod.castHom h (ZMod (l ^ 1))) := by
     haveI : Fact (1 < l ^ 1) := ⟨by rw [pow_one]; exact (Fact.out : l.Prime).one_lt⟩
     exact (ZMod.castHom h (ZMod (l ^ 1))).injective
-  have hspan : Ideal.span {((l : ℤ_[l])) ^ 1} = RingHom.ker (PadicInt.toZMod : ℤ_[l] →+* ZMod l) := by
+  have hspan
+      : Ideal.span {((l : ℤ_[l])) ^ 1} = RingHom.ker (PadicInt.toZMod : ℤ_[l] →+* ZMod l) := by
     rw [pow_one, PadicInt.ker_toZMod, PadicInt.maximalIdeal_eq_span_p]
   have key : (ZMod.castHom h (ZMod (l ^ 1))).comp PadicInt.toZMod = PadicInt.toZModPow 1 := by
     apply ZMod.ringHom_eq_of_ker_eq
@@ -144,23 +157,34 @@ private theorem cast_toZMod {l : ℕ} [Fact l.Prime] (h : l ^ 1 ∣ l) (x : ℤ_
       rw [hy, map_zero]
   exact congrArg (fun f : ℤ_[l] →+* ZMod (l ^ 1) => f x) key
 
-theorem UpperTheory.V.Pa.locBare :
-    LocalFiniteness → LocalTateDuality → LocalEulerChar → ∀ (l : ℕ) [Fact l.Prime] (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)), IsPlaceOver A v → (((l : ℕ) : 𝓞 F) ∈ v.asIdeal → LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) (locDeg v)) ∧ (((l : ℕ) : 𝓞 F) ∉ v.asIdeal → LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) 0) := by
+theorem UpperTheory.V.Pa.locBare
+    : LocalFiniteness → LocalTateDuality → LocalEulerChar
+      → ∀ (l : ℕ) [Fact l.Prime] (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+          [IsAlgClosure F Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)),
+        IsPlaceOver A v
+          → (((l : ℕ) : 𝓞 F) ∈ v.asIdeal
+              → LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) (locDeg v))
+            ∧ (((l : ℕ) : 𝓞 F) ∉ v.asIdeal
+              → LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) 0) := by
   intro hF hT hE l _ F Ω _ _ _ _ _ A v hv
   haveI hl1 : Fact (l ^ 1).Prime := ⟨by rw [pow_one]; exact Fact.out⟩
   have hdvd : l ^ 1 ∣ l := by rw [pow_one]
-  have tate : ∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M]
-      [TopologicalSpace M] [DiscreteTopology M]
-      (σ : Representation (ZMod (l ^ 1)) (Dec (F := F) A) M), ReciprocityTheory.Gal.ContAction σ →
-      Nat.card ↥(H0 ((twDual ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) σ).comp
-        (MonoidHom.id (Dec (F := F) A)))) ≠ 0 →
-      Nat.card (H2 σ) = Nat.card ↥(H0 ((twDual ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) σ).comp
-        (MonoidHom.id (Dec (F := F) A)))) := by
+  have tate
+      : ∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M]
+          [DiscreteTopology M] (σ : Representation (ZMod (l ^ 1)) (Dec (F := F) A) M),
+        ReciprocityTheory.Gal.ContAction σ
+          → Nat.card ↥(H0 ((twDual ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) σ).comp
+              (MonoidHom.id (Dec (F := F) A))))
+            ≠ 0
+          → Nat.card (H2 σ)
+            = Nat.card ↥(H0 ((twDual ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) σ).comp
+              (MonoidHom.id (Dec (F := F) A)))) := by
     intro M _ _ _ _ _ σ hσ hne
     haveI := Nat.finite_of_card_ne_zero hne
     obtain ⟨⟨eχ⟩, -, -, -, h20⟩ := hT F Ω l 1 M A σ v one_pos hv hσ
-    have hχiso : Nonempty (H2 ((charRep ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype)).comp
-        (MonoidHom.id (Dec (F := F) A))) ≃ₗ[ZMod (l ^ 1)] ZMod (l ^ 1)) := by
+    have hχiso : Nonempty
+        (H2 ((charRep ((cycMod F Ω l 1).comp (Dec (F := F) A).subtype)).comp
+          (MonoidHom.id (Dec (F := F) A))) ≃ₗ[ZMod (l ^ 1)] ZMod (l ^ 1)) := by
       rw [MonoidHom.comp_id]
       exact ⟨eχ⟩
     obtain ⟨e2⟩ := hχiso
@@ -168,11 +192,13 @@ theorem UpperTheory.V.Pa.locBare :
       rw [MonoidHom.comp_id]
     rw [hc1, Nat.card_congr (Equiv.ofBijective _ h20),
       Nat.card_congr (LinearEquiv.congrRight e2).toEquiv, cardDual]
-  have core : ∀ d : ℕ, (∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M]
-      [TopologicalSpace M] [DiscreteTopology M]
-      (rho : Representation (ZMod (l ^ 1)) (Dec (F := F) A) M), ReciprocityTheory.Gal.ContAction rho →
-      Nat.card (H1 rho) = Nat.card (H0 rho) * Nat.card (H2 rho) * Nat.card M ^ d) →
-      LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) d := by
+  have core
+      : ∀ d : ℕ,
+        (∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M]
+              [DiscreteTopology M] (rho : Representation (ZMod (l ^ 1)) (Dec (F := F) A) M),
+            ReciprocityTheory.Gal.ContAction rho
+              → Nat.card (H1 rho) = Nat.card (H0 rho) * Nat.card (H2 rho) * Nat.card M ^ d)
+          → LocCount (Dec (F := F) A) ((cycZ F Ω l).comp (Dec (F := F) A).subtype) d := by
     intro d hEd R M M' _ _ _ _ _ _ _ ρ ρ' b hLC hD
     have hkill : ∀ x : M, (l ^ 1 : ℕ) • x = 0 := by
       intro x
@@ -218,8 +244,10 @@ theorem UpperTheory.V.Pa.locBare :
       intro x
       apply cinj
       rw [← hb', h x, map_zero]
-    have he' : ∀ (g : Dec (F := F) A) (x : M) (y : M'),
-        b' (ρ g x) (τ g y) = (((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) g : ZMod (l ^ 1)) * b' x y := by
+    have he'
+        : ∀ (g : Dec (F := F) A) (x : M) (y : M'),
+          b' (ρ g x) (τ g y)
+            = (((cycMod F Ω l 1).comp (Dec (F := F) A).subtype) g : ZMod (l ^ 1)) * b' x y := by
       intro g x y
       show c (b (ρ g x) (ρ' g y)) = _ * c (b x y)
       rw [hD.equiv, map_mul]
@@ -231,12 +259,12 @@ theorem UpperTheory.V.Pa.locBare :
     rw [← hinvc] at hpos
     have hinv2 : Nat.card ↥ρ'.invariants = Nat.card {y : M' // ∀ g, τ g y = y} :=
       Nat.card_congr (Equiv.subtypeEquivRight (fun y => Iff.rfl))
-    have hH2 : Nat.card (H2 σ) = Nat.card ↥ρ'.invariants := by
-      rw [tate M σ hσ hpos, hinvc, hinv2]
-    have hZeq : ↥(Zl ρ) ≃ ↥(Z1 σ) := Equiv.subtypeEquivRight (fun z => by
-      show (IsLocallyConstant z ∧ _) ↔ (Continuous z ∧ _)
-      rw [IsLocallyConstant.iff_continuous]
-      rfl)
+    have hH2 : Nat.card (H2 σ) = Nat.card ↥ρ'.invariants := by rw [tate M σ hσ hpos, hinvc, hinv2]
+    have hZeq : ↥(Zl ρ) ≃ ↥(Z1 σ) :=
+      Equiv.subtypeEquivRight (fun z => by
+        show (IsLocallyConstant z ∧ _) ↔ (Continuous z ∧ _)
+        rw [IsLocallyConstant.iff_continuous]
+        rfl)
     refine ⟨Finite.of_equiv _ hZeq.symm, ?_⟩
     rw [Nat.card_congr hZeq]
     refine Nat.eq_of_mul_eq_mul_right ?_ (hZc.trans ?_)

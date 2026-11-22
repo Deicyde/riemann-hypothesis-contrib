@@ -10,6 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandr
 namespace GlobalTheory
 
 theorem automorphicFormsFiniteGL : GlobalTheory.Published.AutomorphicFormsFiniteGL :=
-  GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen GlobalTheory.T.harishChandraFinitenessTotallyComplexGL_proof
+  GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen
+    GlobalTheory.T.harishChandraFinitenessTotallyComplexGL_proof
 
 end GlobalTheory

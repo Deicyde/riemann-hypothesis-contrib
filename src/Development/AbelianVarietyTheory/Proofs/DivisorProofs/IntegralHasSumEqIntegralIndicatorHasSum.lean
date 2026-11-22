@@ -8,12 +8,14 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem integral_hasSum_eq_integral_indicator_hasSum :
-    ∀ {X ι : Type} [MeasurableSpace X] [Countable ι] (μ : Measure X) (k : ι → X → ℂ),
-      (∀ i, Integrable (k i) μ) → {i | ∫ x, ‖k i x‖ ∂μ ≠ 0}.Finite →
-      ∀ (p : Set ι) (K Kp : X → ℂ), (∀ x, HasSum (fun i => k i x) (K x)) →
-      (∀ x, HasSum (fun i => p.indicator (fun i => k i x) i) (Kp x)) →
-      (∀ i ∉ p, ∫ x, k i x ∂μ = 0) → ∫ x, K x ∂μ = ∫ x, Kp x ∂μ := by
+theorem integral_hasSum_eq_integral_indicator_hasSum
+    : ∀ {X ι : Type} [MeasurableSpace X] [Countable ι] (μ : Measure X) (k : ι → X → ℂ),
+      (∀ i, Integrable (k i) μ) → {i | ∫ x, ‖k i x‖ ∂μ ≠ 0}.Finite
+        → ∀ (p : Set ι) (K Kp : X → ℂ),
+          (∀ x, HasSum (fun i => k i x) (K x))
+            → (∀ x, HasSum (fun i => p.indicator (fun i => k i x) i) (Kp x))
+            → (∀ i ∉ p, ∫ x, k i x ∂μ = 0)
+            → ∫ x, K x ∂μ = ∫ x, Kp x ∂μ := by
   intro X ι _ _ μ k hk hfin p K Kp hK hKp h0
   classical
   set s := hfin.toFinset with hs
@@ -41,8 +43,8 @@ theorem integral_hasSum_eq_integral_indicator_hasSum :
     by_cases hp : i ∈ p
     · simp [Set.indicator_of_mem hp, hx i hi]
     · simp [Set.indicator_of_notMem hp]
-  have hind : ∀ i, (fun x => p.indicator (fun i => k i x) i) =
-      if i ∈ p then k i else fun _ => 0 := by
+  have hind
+      : ∀ i, (fun x => p.indicator (fun i => k i x) i) = if i ∈ p then k i else fun _ => 0 := by
     intro i
     by_cases hp : i ∈ p
     · funext x; simp [Set.indicator_of_mem hp, hp]
@@ -50,7 +52,8 @@ theorem integral_hasSum_eq_integral_indicator_hasSum :
   rw [integral_congr_ae hKae, integral_congr_ae hKpae,
     MeasureTheory.integral_finsetSum s (fun i _ => hk i),
     MeasureTheory.integral_finsetSum s (fun i _ => by
-      rw [hind i]; split_ifs
+      rw [hind i]
+      split_ifs
       · exact hk i
       · exact integrable_zero _ _ _)]
   refine Finset.sum_congr rfl (fun i _ => ?_)

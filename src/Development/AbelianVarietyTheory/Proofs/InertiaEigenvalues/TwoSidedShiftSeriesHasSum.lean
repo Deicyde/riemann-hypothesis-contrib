@@ -8,22 +8,26 @@ open Polynomial
 
 namespace GlobalTheory.TwoSidedShift
 
-theorem mem_pow_span_iff (l : ℕ) (A : Type) [CommRing A] (n : ℕ) (x : A) :
-    x ∈ ((Ideal.span {(l : A)}) ^ n • ⊤ : Submodule A A) ↔ (l : A) ^ n ∣ x := by
+theorem mem_pow_span_iff (l : ℕ) (A : Type) [CommRing A] (n : ℕ) (x : A)
+    : x ∈ ((Ideal.span {(l : A)}) ^ n • ⊤ : Submodule A A) ↔ (l : A) ^ n ∣ x := by
   simp [Ideal.span_singleton_pow, Ideal.mem_span_singleton]
 
-theorem exists_sum_shift : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A]
-    [IsAdicComplete (Ideal.span {(l : A)}) A] (φ : A →+* A) (h : ℕ) (c : ℤ → A),
-    (∀ n : ℤ, (l : A) ^ n.natAbs ∣ c n) → (∀ n : ℤ, φ^[h] (c n) = (l : A) * c (n + 1)) →
-    ∃ w : A, φ^[h] w = (l : A) * w ∧ ∀ Θ : A →+* ℂ_[l], (∀ a, ‖Θ a‖ ≤ 1) →
-      HasSum (fun n : ℤ => Θ (c n)) (Θ w) := by
+theorem exists_sum_shift
+    : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] [IsAdicComplete (Ideal.span {(l : A)}) A]
+        (φ : A →+* A) (h : ℕ) (c : ℤ → A),
+      (∀ n : ℤ, (l : A) ^ n.natAbs ∣ c n) → (∀ n : ℤ, φ^[h] (c n) = (l : A) * c (n + 1))
+        → ∃ w : A,
+          φ^[h] w = (l : A) * w
+            ∧ ∀ Θ : A →+* ℂ_[l], (∀ a, ‖Θ a‖ ≤ 1) → HasSum (fun n : ℤ => Θ (c n)) (Θ w) := by
   intro l _ A _ _ φ h c hc hsh
   set ψ : A →+* A := φ ^ h with hψdef
   have hψ : ∀ x, φ^[h] x = ψ x := fun x => by rw [hψdef, RingHom.coe_pow]
   have hsh' : ∀ n : ℤ, ψ (c n) = (l : A) * c (n + 1) := fun n => by rw [← hψ]; exact hsh n
   set T : ℕ → A := fun N => ∑ n ∈ Finset.Icc (-(N : ℤ)) N, c n with hT
-  have hIcc : ∀ N : ℕ, Finset.Icc (-((N + 1 : ℕ) : ℤ)) ((N + 1 : ℕ) : ℤ)
-      = insert (-((N + 1 : ℕ) : ℤ)) (insert ((N + 1 : ℕ) : ℤ) (Finset.Icc (-(N : ℤ)) N)) := by
+  have hIcc
+      : ∀ N : ℕ,
+        Finset.Icc (-((N + 1 : ℕ) : ℤ)) ((N + 1 : ℕ) : ℤ)
+          = insert (-((N + 1 : ℕ) : ℤ)) (insert ((N + 1 : ℕ) : ℤ) (Finset.Icc (-(N : ℤ)) N)) := by
     intro N; ext x; simp only [Finset.mem_Icc, Finset.mem_insert]; push_cast; omega
   have hstep : ∀ N : ℕ, T (N + 1) = T N + c ((N + 1 : ℕ) : ℤ) + c (-((N + 1 : ℕ) : ℤ)) := by
     intro N
@@ -34,8 +38,10 @@ theorem exists_sum_shift : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A]
     · simp only [Finset.mem_insert, Finset.mem_Icc]; push_cast; omega
   have hdstep : ∀ N : ℕ, (l : A) ^ (N + 1) ∣ T (N + 1) - T N := by
     intro N
-    rw [hstep N, show T N + c ((N + 1 : ℕ) : ℤ) + c (-((N + 1 : ℕ) : ℤ)) - T N
-      = c ((N + 1 : ℕ) : ℤ) + c (-((N + 1 : ℕ) : ℤ)) by ring]
+    rw [hstep N,
+      show T N + c ((N + 1 : ℕ) : ℤ) + c (-((N + 1 : ℕ) : ℤ)) - T N
+          = c ((N + 1 : ℕ) : ℤ) + c (-((N + 1 : ℕ) : ℤ)) by
+        ring]
     refine dvd_add ?_ ?_
     · have := hc ((N + 1 : ℕ) : ℤ)
       rwa [show (((N + 1 : ℕ) : ℤ)).natAbs = N + 1 by omega] at this
@@ -48,15 +54,17 @@ theorem exists_sum_shift : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A]
     | succ n hmn ih =>
       rw [show T (n + 1) - T m = (T (n + 1) - T n) + (T n - T m) by ring]
       exact dvd_add ((pow_dvd_pow _ (by omega)).trans (hdstep n)) ih
-  obtain ⟨w, hw⟩ := IsPrecomplete.prec (I := Ideal.span {(l : A)}) inferInstance (f := T)
-    (fun {m n} hmn => by
+  obtain ⟨w, hw⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {(l : A)}) inferInstance (f := T) (fun {m n} hmn => by
       rw [SModEq.sub_mem, mem_pow_span_iff]
-      rw [← dvd_neg, neg_sub]; exact hcauchy m n hmn)
+      rw [← dvd_neg, neg_sub]
+      exact hcauchy m n hmn)
   have hwT : ∀ N : ℕ, (l : A) ^ N ∣ w - T N := by
     intro N
     have := hw N
     rw [SModEq.sub_mem, mem_pow_span_iff] at this
-    rw [← dvd_neg, neg_sub]; exact this
+    rw [← dvd_neg, neg_sub]
+    exact this
 
   have hE : ∀ N : ℕ, ψ (T N) - (l : A) * T N = (l : A) * (c ((N : ℤ) + 1) - c (-(N : ℤ))) := by
     intro N
@@ -113,11 +121,18 @@ theorem exists_sum_shift : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← map_sum, ← map_sub]
       refine hbound N _ ?_
-      rw [← dvd_neg, neg_sub]; exact hwT N
+      rw [← dvd_neg, neg_sub]
+      exact hwT N
     rw [add_sub_assoc]
     exact lt_of_le_of_lt ((IsUltrametricDist.norm_add_le_max _ _).trans (max_le hrest hhead)) hN
 
 end GlobalTheory.TwoSidedShift
 
-theorem GlobalTheory.twoSided_shift_series : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] [IsAdicComplete (Ideal.span {(l : A)}) A] (φ : A →+* A) (h : ℕ) (c : ℤ → A), (∀ n : ℤ, (l : A) ^ n.natAbs ∣ c n) → (∀ n : ℤ, φ^[h] (c n) = (l : A) * c (n + 1)) → ∃ w : A, φ^[h] w = (l : A) * w ∧ ∀ Θ : A →+* ℂ_[l], (∀ a, ‖Θ a‖ ≤ 1) → HasSum (fun n : ℤ => Θ (c n)) (Θ w) :=
+theorem GlobalTheory.twoSided_shift_series
+    : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] [IsAdicComplete (Ideal.span {(l : A)}) A]
+        (φ : A →+* A) (h : ℕ) (c : ℤ → A),
+      (∀ n : ℤ, (l : A) ^ n.natAbs ∣ c n) → (∀ n : ℤ, φ^[h] (c n) = (l : A) * c (n + 1))
+        → ∃ w : A,
+          φ^[h] w = (l : A) * w
+            ∧ ∀ Θ : A →+* ℂ_[l], (∀ a, ‖Θ a‖ ≤ 1) → HasSum (fun n : ℤ => Θ (c n)) (Θ w) :=
   GlobalTheory.TwoSidedShift.exists_sum_shift

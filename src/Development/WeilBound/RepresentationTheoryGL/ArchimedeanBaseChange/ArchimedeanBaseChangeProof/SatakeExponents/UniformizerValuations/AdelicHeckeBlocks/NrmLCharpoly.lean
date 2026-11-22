@@ -14,7 +14,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.E
+  PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open PositivityTheory.Rg.BcN.F2 (mconv)
@@ -30,13 +31,19 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n a b : ℕ}
 
 open PositivityTheory.Rg.Tf.Loc (twConj)
 
-theorem nrmL_charpoly {w : Pl E} (hw : ¬ IsSplitAt w) {u : GL (Fin n) E} (hu : IsTransl u) (d : GL (Fin n) E)
-    (x : GA E n) :
-    (nrmL n w (GeneralLinearGroup.map (pLoc E w) (gFin (twConj (thetaA E n) x (ratGL E n d)) * (ratF E n u)⁻¹))).val.charpoly
+theorem nrmL_charpoly
+    {w : Pl E} (hw : ¬ IsSplitAt w)
+    {u : GL (Fin n) E} (hu : IsTransl u)
+    (d : GL (Fin n) E) (x : GA E n)
+    : (nrmL n w
+        (GeneralLinearGroup.map (pLoc E w)
+          (gFin (twConj (thetaA E n) x (ratGL E n d)) * (ratF E n u)⁻¹))).val.charpoly
       = (nrm d).val.charpoly.map (algebraMap E (w.adicCompletion E)) := by
   set c := GeneralLinearGroup.map (pFin E) x
-  have h1 : GeneralLinearGroup.map (pLoc E w) (gFin (twConj (thetaA E n) x (ratGL E n d)) * (ratF E n u)⁻¹) =
-      GeneralLinearGroup.map (pLoc E w) (c⁻¹ * ratF E n (d * u⁻¹) * thF E n c) := by
+  have h1
+      : GeneralLinearGroup.map (pLoc E w)
+          (gFin (twConj (thetaA E n) x (ratGL E n d)) * (ratF E n u)⁻¹)
+        = GeneralLinearGroup.map (pLoc E w) (c⁻¹ * ratF E n (d * u⁻¹) * thF E n c) := by
     rw [← adeleqof_cpt translAd_holds hu d x w, cpt, adeleqof_map_cW]
     congr 1
     rw [map_mul, map_inv, adeleqof_pFin_ratGL]
@@ -50,9 +57,13 @@ theorem nrmL_charpoly {w : Pl E} (hw : ¬ IsSplitAt w) {u : GL (Fin n) E} (hu : 
     rw [← poleq_norm E n u hu d, map_mul (ratF E n), ← hr0, ← hs0, map_mul, map_mul, map_inv,
       GlobalTheory.EulerTw.Comm.thF_thF, hr]
     group
-  have h3 : nrmL n w (GeneralLinearGroup.map (pLoc E w) (c⁻¹ * r * thF E n c)) =
-      GeneralLinearGroup.map (pLoc E w) (c⁻¹ * ratF E n (nrm d) * c) := by
-    have hz : ∀ g, thetaGL n (cj w) (GeneralLinearGroup.map (pLoc E w) g) = GeneralLinearGroup.map (pLoc E w) (thF E n g) := by
+  have h3
+      : nrmL n w (GeneralLinearGroup.map (pLoc E w) (c⁻¹ * r * thF E n c))
+        = GeneralLinearGroup.map (pLoc E w) (c⁻¹ * ratF E n (nrm d) * c) := by
+    have hz
+        : ∀ g,
+          thetaGL n (cj w) (GeneralLinearGroup.map (pLoc E w) g)
+            = GeneralLinearGroup.map (pLoc E w) (thF E n g) := by
       intro g; rw [GlobalTheory.CompanionTheory.SuppFinTw.map_thF_of_not_split hw, thL, if_neg hw]
     rw [nrmL, if_neg hw, hz, ← map_mul, h2]
   rw [h1, h3, map_mul, map_mul, map_inv, Units.val_mul, Units.val_mul, Matrix.coe_units_inv,
@@ -65,13 +76,18 @@ theorem val_mem {m : ℕ} (y : GL (Fin m) ℂ) : y.val ∈ GLs m := by
   exact ((Matrix.isUnit_iff_isUnit_det _).mp y.isUnit).ne_zero
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
-theorem phiOf_cont {m : ℕ} [MeasurableSpace (G m)] {μ : Measure (G m)} {M : KMod m} (Tθ : M.V →L[ℂ] M.V)
-    {k : Mat m → (M.V →L[ℂ] M.V)} {val} {T : ℝ} (hM : IsMult μ M k val T) : Continuous (phiOf M Tθ k) := by
+theorem phiOf_cont
+    {m : ℕ} [MeasurableSpace (G m)]
+    {μ : Measure (G m)} {M : KMod m} (Tθ : M.V →L[ℂ] M.V)
+    {k : Mat m → (M.V →L[ℂ] M.V)} {val} {T : ℝ} (hM : IsMult μ M k val T)
+    : Continuous (phiOf M Tθ k) := by
   obtain ⟨l, c, w, g, ks, hks, hk, -⟩ := hM
   set F : GL (Fin m) ℂ → (M.V →L[ℂ] M.V) := fun y => ∑ i, c i • ks i y.val with hFdef
   have hkF : ∀ y : GL (Fin m) ℂ, k y.val = F y := fun y => hk _ (val_mem y)
-  have hF : Continuous F := continuous_finsetSum _ fun i _ =>
-    (((hks i).2.1.continuousOn).comp_continuous Units.continuous_val fun y => val_mem y).const_smul (c i)
+  have hF : Continuous F :=
+    continuous_finsetSum _ fun i _ =>
+      (((hks i).2.1.continuousOn).comp_continuous Units.continuous_val fun y =>
+        val_mem y).const_smul (c i)
   let L : (M.V →L[ℂ] M.V) →ₗ[ℂ] ℂ := (LinearMap.trace ℂ M.V).comp (ContinuousLinearMap.coeLM ℂ)
   have hphi : phiOf M Tθ k = fun y => L (F y * Tθ) := by
     funext y
@@ -80,8 +96,11 @@ theorem phiOf_cont {m : ℕ} [MeasurableSpace (G m)] {μ : Measure (G m)} {M : K
   rw [hphi]
   exact L.continuous_of_finiteDimensional.comp (hF.mul continuous_const)
 
-theorem phiOf_lg {m : ℕ} {M : KMod m} (Tθ : M.V →L[ℂ] M.V) {k : Mat m → (M.V →L[ℂ] M.V)} (c T : ℝ)
-    (hk : ∀ y ∈ GLs m, c * (1 + T) < lg y → k y = 0) (y : G m) (hy : phiOf M Tθ k y ≠ 0) : lg y.val ≤ c * (1 + T) := by
+theorem phiOf_lg
+    {m : ℕ} {M : KMod m} (Tθ : M.V →L[ℂ] M.V)
+    {k : Mat m → (M.V →L[ℂ] M.V)} (c T : ℝ) (hk : ∀ y ∈ GLs m, c * (1 + T) < lg y → k y = 0)
+    (y : G m) (hy : phiOf M Tθ k y ≠ 0)
+    : lg y.val ≤ c * (1 + T) := by
   by_contra h
   push Not at h
   apply hy
@@ -97,14 +116,18 @@ theorem regOf : RegOf := by
   refine ⟨fun d x h₂' hne => ?_, fun d x h₁' hne => ?_⟩
   · have hf := (GlobalTheory.CompanionTheory.SuppFinTw.factors_ne h₁ h₂ _ hne w hwS).1
     have hs1 := Polynomial.Separable.of_mul_left (hreg _ hf)
-    change (nrmL a w (GeneralLinearGroup.map (pLoc E w)
-      (gFin (twConj (thetaA E a) x (ratGL E a d)) * (ratF E a u₁)⁻¹))).val.charpoly.Separable at hs1
+    change (nrmL a w
+        (GeneralLinearGroup.map (pLoc E w)
+          (gFin (twConj (thetaA E a) x (ratGL E a d)) * (ratF E a u₁)⁻¹))).val.charpoly.Separable
+      at hs1
     rw [Reg.nrmL_charpoly hns hu₁] at hs1
     exact (Polynomial.separable_map _).1 hs1
   · have hf := (GlobalTheory.CompanionTheory.SuppFinTw.factors_ne h₁ h₂ _ hne w hwS).1
     have hs1 := Polynomial.Separable.of_mul_right (hreg _ hf)
-    change (nrmL b w (GeneralLinearGroup.map (pLoc E w)
-      (gFin (twConj (thetaA E b) x (ratGL E b d)) * (ratF E b u₂)⁻¹))).val.charpoly.Separable at hs1
+    change (nrmL b w
+        (GeneralLinearGroup.map (pLoc E w)
+          (gFin (twConj (thetaA E b) x (ratGL E b d)) * (ratF E b u₂)⁻¹))).val.charpoly.Separable
+      at hs1
     rw [Reg.nrmL_charpoly hns hu₂] at hs1
     exact (Polynomial.separable_map _).1 hs1
 
@@ -131,23 +154,34 @@ theorem pTTest (h0 : RegOf) (h1 : FinConv) (h2 : FmTr) (hk : KerEx) : PTTest := 
     exact hFm (h * γ⁻¹)
   have hT1 : 0 ≤ 1 + t.T := by linarith [ht.T]
   have hR0 : 0 ≤ c₀ * (1 + t.T) := mul_nonneg hc₀0 hT1
-  have hfa : ∀ v, Continuous (phiOf (B.Ma v) (Ta v) (t.ka v)) ∧ VeryCusp (phiOf (B.Ma v) (Ta v) (t.ka v)) ∧
-      ∀ y, phiOf (B.Ma v) (Ta v) (t.ka v) y ≠ 0 → lg y.val ≤ c₀ * (1 + t.T) := fun v =>
-    ⟨Reg.phiOf_cont _ (ht.ka v), hVC.1 v _ _ _ (ht.ka v), fun y hy =>
+  have hfa
+      : ∀ v,
+        Continuous (phiOf (B.Ma v) (Ta v) (t.ka v)) ∧ VeryCusp (phiOf (B.Ma v) (Ta v) (t.ka v))
+          ∧ ∀ y, phiOf (B.Ma v) (Ta v) (t.ka v) y ≠ 0 → lg y.val ≤ c₀ * (1 + t.T) := fun v => ⟨
+    Reg.phiOf_cont _ (ht.ka v),
+    hVC.1 v _ _ _ (ht.ka v),
+    fun y hy =>
       (Reg.phiOf_lg _ ca t.T ((hca B.μa (B.Ma v)).2 _ _ t.T ht.T (ht.ka v)) y hy).trans
-        (mul_le_mul_of_nonneg_right ((le_max_left ca cb).trans (le_max_right _ _)) hT1)⟩
-  have hfb : ∀ v, Continuous (phiOf (B.Mb v) (Tb v) (t.kb v)) ∧ VeryCusp (phiOf (B.Mb v) (Tb v) (t.kb v)) ∧
-      ∀ y, phiOf (B.Mb v) (Tb v) (t.kb v) y ≠ 0 → lg y.val ≤ c₀ * (1 + t.T) := fun v =>
-    ⟨Reg.phiOf_cont _ (ht.kb v), hVC.2 v _ _ _ (ht.kb v), fun y hy =>
+        (mul_le_mul_of_nonneg_right ((le_max_left ca cb).trans (le_max_right _ _)) hT1)
+  ⟩
+  have hfb
+      : ∀ v,
+        Continuous (phiOf (B.Mb v) (Tb v) (t.kb v)) ∧ VeryCusp (phiOf (B.Mb v) (Tb v) (t.kb v))
+          ∧ ∀ y, phiOf (B.Mb v) (Tb v) (t.kb v) y ≠ 0 → lg y.val ≤ c₀ * (1 + t.T) := fun v => ⟨
+    Reg.phiOf_cont _ (ht.kb v),
+    hVC.2 v _ _ _ (ht.kb v),
+    fun y hy =>
       (Reg.phiOf_lg _ cb t.T ((hcb B.μb (B.Mb v)).2 _ _ t.T ht.T (ht.kb v)) y hy).trans
-        (mul_le_mul_of_nonneg_right ((le_max_right ca cb).trans (le_max_right _ _)) hT1)⟩
+        (mul_le_mul_of_nonneg_right ((le_max_right ca cb).trans (le_max_right _ _)) hT1)
+  ⟩
   have hsz : ∀ h, Ψ h ≠ 0 → logSize (finGL E B.a h.1) ≤ t.r ∧ logSize (finGL E B.b h.2) ≤ t.r := by
     intro h hh
     rw [← hΨeq] at hh
     obtain ⟨x, -, hx⟩ := Finset.exists_ne_zero_of_sum_ne_zero hh
     obtain ⟨y, -, hy⟩ := Finset.exists_ne_zero_of_sum_ne_zero hx
     exact ht.size x y h (left_ne_zero_of_mul hy)
-  have hfin : ∀ g, Ψ g ≠ 0 → finFn S (L.tr P N) L.t (g * γ⁻¹) ≠ 0 := fun g hg => right_ne_zero_of_mul hg
+  have hfin : ∀ g, Ψ g ≠ 0 → finFn S (L.tr P N) L.t (g * γ⁻¹) ≠ 0 := fun g hg =>
+    right_ne_zero_of_mul hg
   obtain ⟨hr₁, hr₂⟩ := h0 E B.a B.b S u₁ u₂ hu₁ hu₂ (L.tr P N) L.t hTr hL.2 hreg
   set U' : Subgroup (Hf E B.a B.b) := U ⊓ U.comap (MulAut.conj γ).toMonoidHom with hU'
   have hU'o : IsOpen (U' : Set (Hf E B.a B.b)) := by
@@ -166,12 +200,18 @@ theorem pTTest (h0 : RegOf) (h1 : FinConv) (h2 : FmTr) (hk : KerEx) : PTTest := 
       rw [e, (hU _ hc _).2]
   have hcsΨ : HasCompactSupport Ψ :=
     (hcs.comp_homeomorph (Homeomorph.mulRight γ⁻¹)).mul_left (f := fun _ => B.vol⁻¹)
-  have key := PositivityTheory.Rg.BcB.CG.test2J E B.a B.b (fun v => phiOf (B.Ma v) (Ta v) (t.ka v))
-    (fun v => phiOf (B.Mb v) (Tb v) (t.kb v)) Ψ (c₀ * (1 + t.T)) t.r U' hR0 hfa hfb hcsΨ hU'o hΨU hsz
-    (fun d x h₂ hne => hr₁ d x h₂ (hfin _ hne)) (fun d x h₁ hne => hr₂ d x h₁ (hfin _ hne))
-  have hfun : trM t.Φ (opM Ta Tb (tenN P B e N)) = fun g =>
-      (∏ v, phiOf (B.Ma v) (Ta v) (t.ka v) (gInf v g.1)) * (∏ v, phiOf (B.Mb v) (Tb v) (t.kb v) (gInf v g.2)) *
-        Ψ (hFin g) := by
+  have key :=
+    PositivityTheory.Rg.BcB.CG.test2J E B.a B.b
+      (fun v => phiOf (B.Ma v) (Ta v) (t.ka v))
+      (fun v => phiOf (B.Mb v) (Tb v) (t.kb v))
+      Ψ (c₀ * (1 + t.T)) t.r U' hR0 hfa hfb hcsΨ hU'o hΨU hsz
+      (fun d x h₂ hne => hr₁ d x h₂ (hfin _ hne))
+      (fun d x h₁ hne => hr₂ d x h₁ (hfin _ hne))
+  have hfun
+      : trM t.Φ (opM Ta Tb (tenN P B e N))
+        = fun g =>
+          (∏ v, phiOf (B.Ma v) (Ta v) (t.ka v) (gInf v g.1))
+            * (∏ v, phiOf (B.Mb v) (Tb v) (t.kb v) (gInf v g.2)) * Ψ (hFin g) := by
     funext g
     rw [PT.Φ, PositivityTheory.Rg.BcB.CG.tensTr, hΨeq]
   rw [hfun]

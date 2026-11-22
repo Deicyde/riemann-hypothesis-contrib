@@ -10,9 +10,10 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
-    (hstd : ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X) :
-    OPlusAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
+theorem oPlusAt_of
+    {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
+    (hstd : ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X)
+    : OPlusAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc := by
   intro X hD hH hC j b hk
   have St := hstd X hD hH hC
   have hk4 := hk.2.2.2
@@ -64,9 +65,11 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
   have e3 : (La / q + 4 / P ^ 2) * (s * (2 * A / P)) ≤ A / 4 + 4 * A / 125 := by
     have hsA : 0 ≤ s * (2 * A / P) := by positivity
     have g1 : (La / q + 4 / P ^ 2) * (s * (2 * A / P)) ≤ (La + 4 / P ^ 2) * (s * (2 * A / P)) :=
-      mul_le_mul_of_nonneg_right (by
-        have := div_le_self (show (0 : ℝ) ≤ La by linarith) hq1
-        linarith) hsA
+      mul_le_mul_of_nonneg_right
+        (by
+          have := div_le_self (show (0 : ℝ) ≤ La by linarith) hq1
+          linarith)
+        hsA
     have g2 : (La + 4 / P ^ 2) * (s * (2 * A / P)) = 2 * La * s * A / P + 8 * s * A / P ^ 3 := by
       field_simp
       ring
@@ -101,15 +104,16 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
       have f2 := mul_le_mul_of_nonneg_right hkP hb.le
       linarith
     linarith
-  have coarseA_mul {s r : ℕ} (p : ℕ) (S : SegData s) (b : SegBlock s r) (i : Fin s) :
-      (coarseA p S b i : ℝ) * (p : ℝ) ^ (S.G - S.d i) ≤ (S.bTop i : ℝ) := by
+  have coarseA_mul {s r : ℕ} (p : ℕ) (S : SegData s) (b : SegBlock s r) (i : Fin s)
+      : (coarseA p S b i : ℝ) * (p : ℝ) ^ (S.G - S.d i) ≤ (S.bTop i : ℝ) := by
     have h : coarseA p S b i * p ^ (S.G - S.d i) ≤ S.bTop i := by
       unfold coarseA SegData.P
       exact (Nat.div_mul_le_self _ _).trans (Nat.sub_le _ _)
     exact_mod_cast h
-  
-  have cap_le {s r : ℕ} (p : ℕ) (S : SegData s) (b : SegBlock s r) (l : ℕ) :
-      (cap p S b l : ℝ) ≤ (S.A0 p : ℝ) + ∑ i : Fin s, if (i : ℕ) < l then (coarseA p S b i : ℝ) else 0 := by
+
+  have cap_le {s r : ℕ} (p : ℕ) (S : SegData s) (b : SegBlock s r) (l : ℕ)
+      : (cap p S b l : ℝ)
+        ≤ (S.A0 p : ℝ) + ∑ i : Fin s, if (i : ℕ) < l then (coarseA p S b i : ℝ) else 0 := by
     unfold cap
     push_cast
     apply add_le_add le_rfl
@@ -119,9 +123,9 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
     · have h0 : (0 : ℝ) ≤ (oEff S b i : ℝ) := Nat.cast_nonneg _
       linarith
     · exact le_rfl
-  
-  have base_exponent_le_a {s : ℕ} (p : ℕ) (hp : 0 < p) (S : SegData s) (hE : 0 ≤ S.E0) :
-      (S.A0 p : ℝ) ≤ (S.a : ℝ) / (p : ℝ) ^ S.G := by
+
+  have base_exponent_le_a {s : ℕ} (p : ℕ) (hp : 0 < p) (S : SegData s) (hE : 0 ≤ S.E0)
+      : (S.A0 p : ℝ) ≤ (S.a : ℝ) / (p : ℝ) ^ S.G := by
     unfold SegData.A0 SegData.Qj
     push_cast
     have hp' : (0 : ℝ) < (p : ℝ) := by exact_mod_cast hp
@@ -160,8 +164,11 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
     have h2 := mul_le_mul_of_nonneg_left hbe St.bpos.le
     nlinarith
   have hplus : (S.bPlus : ℝ) ≤ b' * (1 + be) := (St.winB _ (next_mem X.TT j).1).2
-  have hO : Oplus p r S b ≤ S.a / (p : ℝ) ^ 2 + (s : ℝ) * (2 * (b' / p)) +
-      (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * ((s : ℝ) * (2 * (S.a : ℝ) / p)) + 2 * (S.La * b' / ((r : ℝ) + 1)) := by
+  have hO
+      : Oplus p r S b
+        ≤ S.a / (p : ℝ) ^ 2 + (s : ℝ) * (2 * (b' / p))
+          + (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * ((s : ℝ) * (2 * (S.a : ℝ) / p))
+          + 2 * (S.La * b' / ((r : ℝ) + 1)) := by
     have hp5 : (5 : ℝ) ≤ p := hp5nat_real
     have hp0 : (0 : ℝ) < p := by linarith
     have hb0 := St.bpos
@@ -176,7 +183,9 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
         omega
       unfold SegData.P
       push_cast
-      calc (p : ℝ) = (p : ℝ) ^ 1 := (pow_one _).symm
+      calc
+        (p : ℝ)
+          = (p : ℝ) ^ 1 := (pow_one _).symm
         _ ≤ (p : ℝ) ^ (S.G - S.d i) := pow_le_pow_right₀ (by linarith) h1
     have hcoarse : ∀ i : Fin s, (coarseA p S b i : ℝ) ≤ 2 * (b' / p) := by
       intro i
@@ -195,21 +204,24 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
         have hq : (p : ℝ) ^ 2 ≤ (p : ℝ) ^ S.G := pow_le_pow_right₀ (by linarith) hG2
         have hq0 : (0 : ℝ) < (p : ℝ) ^ 2 := by positivity
         exact h3.trans (div_le_div_of_nonneg_left ha0 hq0 hq)
-      have h4 : (∑ i : Fin s, if (i : ℕ) < s then (coarseA p S b i : ℝ) else 0) ≤
-          (s : ℝ) * (2 * (b' / p)) := by
-        calc (∑ i : Fin s, if (i : ℕ) < s then (coarseA p S b i : ℝ) else 0)
-            ≤ ∑ _i : Fin s, 2 * (b' / p) := by
-              apply Finset.sum_le_sum
-              intro i _
-              rw [if_pos i.2]
-              exact hcoarse i
+      have h4
+          : (∑ i : Fin s, if (i : ℕ) < s then (coarseA p S b i : ℝ) else 0)
+            ≤ (s : ℝ) * (2 * (b' / p)) := by
+        calc
+          (∑ i : Fin s, if (i : ℕ) < s then (coarseA p S b i : ℝ) else 0)
+              ≤ ∑ _i : Fin s, 2 * (b' / p) := by
+            apply Finset.sum_le_sum
+            intro i _
+            rw [if_pos i.2]
+            exact hcoarse i
           _ = (s : ℝ) * (2 * (b' / p)) := by simp
       linarith
     have hsumP : (∑ i, 2 * (S.a : ℝ) / (S.P p i : ℝ)) ≤ (s : ℝ) * (2 * (S.a : ℝ) / p) := by
-      calc (∑ i, 2 * (S.a : ℝ) / (S.P p i : ℝ)) ≤ ∑ _i : Fin s, 2 * (S.a : ℝ) / p := by
-            apply Finset.sum_le_sum
-            intro i _
-            exact div_le_div_of_nonneg_left (by positivity) hp0 (hPi i)
+      calc
+        (∑ i, 2 * (S.a : ℝ) / (S.P p i : ℝ)) ≤ ∑ _i : Fin s, 2 * (S.a : ℝ) / p := by
+          apply Finset.sum_le_sum
+          intro i _
+          exact div_le_div_of_nonneg_left (by positivity) hp0 (hPi i)
         _ = (s : ℝ) * (2 * (S.a : ℝ) / p) := by simp
     have hcoef : 0 ≤ S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2 :=
       add_nonneg (div_nonneg hLa hr0.le) (by positivity)
@@ -223,8 +235,9 @@ theorem oPlusAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ}
       have hinv : 0 ≤ ((r : ℝ) + 1)⁻¹ := inv_nonneg.mpr hr0.le
       simp only [div_eq_mul_inv]
       nlinarith [mul_le_mul_of_nonneg_right hnum hinv]
-    have h2 : (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * (∑ i, 2 * (S.a : ℝ) / (S.P p i : ℝ)) ≤
-        (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * ((s : ℝ) * (2 * (S.a : ℝ) / p)) :=
+    have h2
+        : (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * (∑ i, 2 * (S.a : ℝ) / (S.P p i : ℝ))
+          ≤ (S.La / ((r : ℝ) + 1) + 4 / (p : ℝ) ^ 2) * ((s : ℝ) * (2 * (S.a : ℝ) / p)) :=
       mul_le_mul_of_nonneg_left hsumP hcoef
     unfold Oplus
     linarith [hcap, h2, h3]

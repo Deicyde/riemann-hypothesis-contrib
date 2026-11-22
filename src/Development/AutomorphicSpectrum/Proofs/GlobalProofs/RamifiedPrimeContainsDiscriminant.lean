@@ -10,10 +10,10 @@ namespace GlobalTheory.CompanionTheory.GlobalFiniteness
 
 theorem natAbs_discr_mul_prod_absNorm_mem_of_dvd_differentIdeal
     (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (S : Finset (HeightOneSpectrum (𝓞 F)))
-    (hS : ∀ v ∉ S, Algebra.IsUnramifiedIn (𝓞 E) v.asIdeal)
-    (P : Ideal (𝓞 E)) [hP : P.IsPrime] (hP0 : P ≠ ⊥) (hdvd : P ∣ differentIdeal ℤ (𝓞 E)) :
-    (((discr F).natAbs * ∏ v ∈ S, v.asIdeal.absNorm : ℕ) : 𝓞 E) ∈ P := by
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (hS : ∀ v ∉ S, Algebra.IsUnramifiedIn (𝓞 E) v.asIdeal)
+    (P : Ideal (𝓞 E)) [hP : P.IsPrime]
+    (hP0 : P ≠ ⊥) (hdvd : P ∣ differentIdeal ℤ (𝓞 E))
+    : (((discr F).natAbs * ∏ v ∈ S, v.asIdeal.absNorm : ℕ) : 𝓞 E) ∈ P := by
   by_contra ht
   have hv0 : P.under (𝓞 F) ≠ ⊥ := Ideal.under_ne_bot (𝓞 F) hP0
   have hvp : (P.under (𝓞 F)).IsPrime := inferInstance
@@ -39,7 +39,8 @@ theorem natAbs_discr_mul_prod_absNorm_mem_of_dvd_differentIdeal
     rw [Nat.cast_mul]
     apply Ideal.mul_mem_right
     apply hcast
-    have hmap : differentIdeal ℤ (𝓞 F) ≤ v.asIdeal := Ideal.map_le_iff_le_comap.1 (Ideal.le_of_dvd h)
+    have hmap : differentIdeal ℤ (𝓞 F) ≤ v.asIdeal :=
+      Ideal.map_le_iff_le_comap.1 (Ideal.le_of_dvd h)
     apply hmap
     rw [← absNorm_differentIdeal F (𝓞 F)]
     exact Ideal.absNorm_mem _

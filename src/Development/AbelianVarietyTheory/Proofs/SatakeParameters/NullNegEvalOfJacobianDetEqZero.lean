@@ -15,10 +15,13 @@ open MeasureTheory Topology
 
 namespace GlobalTheory.ChartSard
 
-theorem null_negEv_of_det_eq_zero : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d : ℕ) (U : X.Opens) (ch : GlobalTheory.AlgChart p (RingHom.id ℂ) d)
-    (φ : Fin d → Γ(X, U)), ∃ E : Set (Fin d → ℂ), MeasureTheory.volume E = 0 ∧
-      ∀ z ∈ ch.e.source, ∀ hz : z ∈ GlobalTheory.CxPts.ptsIn p (RingHom.id ℂ) U,
-        (ch.jacMat φ z).det = 0 → (fun j => -GlobalTheory.CxPts.evHom hz (φ j)) ∈ E := by
+theorem null_negEv_of_det_eq_zero
+    : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d : ℕ) (U : X.Opens)
+        (ch : GlobalTheory.AlgChart p (RingHom.id ℂ) d) (φ : Fin d → Γ(X, U)),
+      ∃ E : Set (Fin d → ℂ),
+        MeasureTheory.volume E = 0
+          ∧ ∀ z ∈ ch.e.source, ∀ hz : z ∈ GlobalTheory.CxPts.ptsIn p (RingHom.id ℂ) U,
+            (ch.jacMat φ z).det = 0 → (fun j => - GlobalTheory.CxPts.evHom hz (φ j)) ∈ E := by
   intro X p d U ch φ
   set T : (Fin d → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin d) :=
     (EuclideanSpace.equiv (Fin d) ℂ).symm.toContinuousLinearMap with hT
@@ -26,9 +29,14 @@ theorem null_negEv_of_det_eq_zero : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d :
   set g : Fin d → EuclideanSpace ℂ (Fin d) → ℂ :=
     fun j => GlobalTheory.CxPts.ev p (RingHom.id ℂ) U (φ j) ∘ ch.e.symm with hg
   set H : (Fin d → ℂ) → (Fin d → ℂ) := fun w j => -g j (T w) with hH
-  refine ⟨H '' {w | DifferentiableAt ℝ H w ∧ (fderiv ℝ H w).det = 0},
-    addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume (f' := fun w => fderiv ℝ H w)
-      (fun w hw => hw.1.hasFDerivAt.hasFDerivWithinAt) (fun w hw => hw.2), ?_⟩
+  refine ⟨
+    H '' {w | DifferentiableAt ℝ H w ∧ (fderiv ℝ H w).det = 0},
+    addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume
+      (f' := fun w => fderiv ℝ H w)
+      (fun w hw => hw.1.hasFDerivAt.hasFDerivWithinAt)
+      (fun w hw => hw.2),
+    ?_
+  ⟩
   intro z hzs hz hdet
   set w : Fin d → ℂ := (ch.e z).ofLp with hw
   have hTz : T w = ch.e z := rfl
@@ -48,8 +56,8 @@ theorem null_negEv_of_det_eq_zero : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d :
     have hj := congrFun hv j
     simp only [Matrix.mulVec, dotProduct, Pi.zero_apply] at hj
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hM, ContinuousLinearMap.pi_apply, neg_apply,
-      ContinuousLinearMap.comp_apply, hTv, map_sum, map_smul, smul_eq_mul, Pi.zero_apply, neg_eq_zero]
+      simp only [hM, ContinuousLinearMap.pi_apply, neg_apply, ContinuousLinearMap.comp_apply, hTv,
+        map_sum, map_smul, smul_eq_mul, Pi.zero_apply, neg_eq_zero]
     rw [← hj]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [mul_comm]

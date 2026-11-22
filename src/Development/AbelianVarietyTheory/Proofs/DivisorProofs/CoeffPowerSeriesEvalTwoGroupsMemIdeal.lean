@@ -9,10 +9,11 @@ open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory
 
 namespace GlobalTheory.IdealAt2
 
-theorem coeff_powerSeriesEvalTwoGroups_mem_ideal : ∀ (R : Type) [CommRing R] (d : ℕ) (τ : Type) (I : Ideal R)
-    (t : MvPowerSeries (Fin d ⊕ Fin d) R) (u v : Fin d → MvPowerSeries τ R),
-    (∀ i, constantCoeff (u i) = 0) → (∀ i, constantCoeff (v i) = 0) →
-    (∀ α, coeff α t ∈ I) → ∀ α, coeff α (at2 t u v) ∈ I := by
+theorem coeff_powerSeriesEvalTwoGroups_mem_ideal
+    : ∀ (R : Type) [CommRing R] (d : ℕ) (τ : Type) (I : Ideal R)
+        (t : MvPowerSeries (Fin d ⊕ Fin d) R) (u v : Fin d → MvPowerSeries τ R),
+      (∀ i, constantCoeff (u i) = 0) → (∀ i, constantCoeff (v i) = 0) → (∀ α, coeff α t ∈ I)
+        → ∀ α, coeff α (at2 t u v) ∈ I := by
   intro R _ d τ I t u v hu hv ht α
   have hs : HasSubst (Sum.elim u v) :=
     hasSubst_of_constantCoeff_zero fun s => by cases s <;> simp [hu, hv]

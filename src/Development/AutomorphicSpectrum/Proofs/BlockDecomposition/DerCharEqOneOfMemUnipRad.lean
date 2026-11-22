@@ -16,11 +16,14 @@ namespace GlobalTheory.CompanionTheory.BZMirJac
 
 section Abstract
 
-variable {M V X Y : Type} [Group M] [AddCommGroup V] [Module ℂ V] [AddCommGroup X] [Module ℂ X]
+variable
+  {M V X Y : Type} [Group M] [AddCommGroup V] [Module ℂ V] [AddCommGroup X] [Module ℂ X]
   [AddCommGroup Y] [Module ℂ Y]
 
-theorem ker_comp_mkQ (K₁ K : Submodule ℂ V) (q : (V ⧸ K₁) →ₗ[ℂ] X) (e : LinearMap.ker q = K.map K₁.mkQ)
-    (hle : K₁ ≤ K) : LinearMap.ker (q ∘ₗ K₁.mkQ) = K := by
+theorem ker_comp_mkQ
+    (K₁ K : Submodule ℂ V) (q : (V ⧸ K₁) →ₗ[ℂ] X)
+    (e : LinearMap.ker q = K.map K₁.mkQ) (hle : K₁ ≤ K)
+    : LinearMap.ker (q ∘ₗ K₁.mkQ) = K := by
   rw [LinearMap.ker_comp, e, Submodule.comap_map_eq, Submodule.ker_mkQ, sup_eq_left.2 hle]
 
 end Abstract
@@ -39,16 +42,22 @@ section IterRep
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ) : ∀ (j : ℕ) (τ : MRep k (n + j)),
-    ∃ q : τ.V →ₗ[ℂ] TwJacquet (iterPhi k ψ j τ).ρ (MirUin k n) 1, Function.Surjective q ∧
-      LinearMap.ker q = twKer τ.ρ (derUnipM k (n + j) n) (derCharM k ψ (n + j) n) ∧
-      ∀ g v, q (τ.ρ (embedding₂ k n j g) v) = psiMinus k (iterPhi k ψ j τ).ρ g (q v) := by
+theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ)
+    : ∀ (j : ℕ) (τ : MRep k (n + j)), ∃ q : τ.V →ₗ[ℂ] TwJacquet (iterPhi k ψ j τ).ρ (MirUin k n) 1,
+      Function.Surjective q
+        ∧ LinearMap.ker q = twKer τ.ρ (derUnipM k (n + j) n) (derCharM k ψ (n + j) n)
+        ∧ ∀ g v, q (τ.ρ (embedding₂ k n j g) v) = psiMinus k (iterPhi k ψ j τ).ρ g (q v) := by
   intro j
   induction j with
   | zero =>
     intro τ
-    exact ⟨Submodule.mkQ _, Submodule.mkQ_surjective _,
-      (Submodule.ker_mkQ _).trans (GlobalTheory.CompanionTheory.BZMir.twKer_MirUin_eq_derUnipM k ψ n τ.V τ.ρ), fun _ _ => rfl⟩
+    exact ⟨
+      Submodule.mkQ _,
+      Submodule.mkQ_surjective _,
+      (Submodule.ker_mkQ _).trans
+        (GlobalTheory.CompanionTheory.BZMir.twKer_MirUin_eq_derUnipM k ψ n τ.V τ.ρ),
+      fun _ _ => rfl
+    ⟩
   | succ j ih =>
     intro τ
     obtain ⟨q', hs, hk, hi⟩ := ih (MRep.phiM k ψ τ)
@@ -62,8 +71,7 @@ theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ) : ∀ (j : ℕ) (τ :
     let s := (levi k (n + j + 1)).comp (Mir k (n + j)).subtype
     let K₁ := twKer τ.ρ N₁ θ₁
     let K := twKer τ.ρ N θ
-    let L : Submodule ℂ (τ.V ⧸ K₁) :=
-      twKer (twAct τ.ρ N₁ θ₁ s (levi_stab ψ (n + j))) N₂ θ₂
+    let L : Submodule ℂ (τ.V ⧸ K₁) := twKer (twAct τ.ρ N₁ θ₁ s (levi_stab ψ (n + j))) N₂ θ₂
     have hle : K₁ ≤ K := by
       refine Submodule.span_le.2 ?_
       rintro w ⟨u, v, rfl⟩
@@ -76,10 +84,10 @@ theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ) : ∀ (j : ℕ) (τ :
         induction x using Submodule.Quotient.induction_on with
         | H v =>
           obtain ⟨ha, hθ⟩ := GlobalTheory.CompanionTheory.BZMirStep.levi_step ψ hnm a
-          refine ⟨τ.ρ (s a) v - (θ ⟨s a, ha⟩ : ℂ) • v,
-            Submodule.subset_span ⟨⟨s a, ha⟩, v, rfl⟩, ?_⟩
-          change K₁.mkQ (τ.ρ (s a) v - (θ ⟨s a, ha⟩ : ℂ) • v) =
-            K₁.mkQ (τ.ρ (s a) v) - (θ₂ a : ℂ) • K₁.mkQ v
+          refine
+            ⟨τ.ρ (s a) v - (θ ⟨s a, ha⟩ : ℂ) • v, Submodule.subset_span ⟨⟨s a, ha⟩, v, rfl⟩, ?_⟩
+          change K₁.mkQ (τ.ρ (s a) v - (θ ⟨s a, ha⟩ : ℂ) • v)
+            = K₁.mkQ (τ.ρ (s a) v) - (θ₂ a : ℂ) • K₁.mkQ v
           rw [map_sub, map_smul, hθ]
       · rw [Submodule.map_le_iff_le_comap]
         refine Submodule.span_le.2 ?_
@@ -90,9 +98,10 @@ theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ) : ∀ (j : ℕ) (τ :
         have hθ : θ u = θ₁ u₁ * θ₂ a := by
           have hu' : u = ⟨u₁, hu₁⟩ * ⟨s a, ha⟩ := Subtype.ext hu
           rw [hu', map_mul, hθ₁, hθ₂]
-        have hdec : τ.ρ (u : Mir k (n + j + 1)) v - (θ u : ℂ) • v =
-            (τ.ρ u₁ (τ.ρ (s a) v) - (θ₁ u₁ : ℂ) • τ.ρ (s a) v) +
-              (θ₁ u₁ : ℂ) • (τ.ρ (s a) v - (θ₂ a : ℂ) • v) := by
+        have hdec
+            : τ.ρ (u : Mir k (n + j + 1)) v - (θ u : ℂ) • v
+              = (τ.ρ u₁ (τ.ρ (s a) v) - (θ₁ u₁ : ℂ) • τ.ρ (s a) v)
+                + (θ₁ u₁ : ℂ) • (τ.ρ (s a) v - (θ₂ a : ℂ) • v) := by
           rw [hθ, hu, map_mul, mul_apply_eq_comp, Units.val_mul, smul_sub, mul_smul]
           abel
         have hz : τ.ρ u₁ (τ.ρ (s a) v) - (θ₁ u₁ : ℂ) • τ.ρ (s a) v ∈ K₁ :=
@@ -102,8 +111,7 @@ theorem iterPhi_quotient (ψ : AddChar k Circle) (n : ℕ) : ∀ (j : ℕ) (τ :
         change K₁.mkQ _ ∈ L
         rw [hdec, map_add, hzero, zero_add, map_smul]
         refine Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, K₁.mkQ v, ?_⟩)
-        change K₁.mkQ (τ.ρ (s a) v - (θ₂ a : ℂ) • v) =
-          K₁.mkQ (τ.ρ (s a) v) - (θ₂ a : ℂ) • K₁.mkQ v
+        change K₁.mkQ (τ.ρ (s a) v - (θ₂ a : ℂ) • v) = K₁.mkQ (τ.ρ (s a) v) - (θ₂ a : ℂ) • K₁.mkQ v
         rw [map_sub, map_smul]
     refine ⟨q' ∘ₗ K₁.mkQ, hs.comp K₁.mkQ_surjective, ?_, fun g v => ?_⟩
     · exact ker_comp_mkQ K₁ K q' (hk.trans e) hle
@@ -115,40 +123,44 @@ section Concrete
 
 variable {k : Type} [Field k]
 
-theorem emb_inl_inl {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i j : Fin n) :
-    (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inl j)) =
-      (g.1 : Matrix (Fin n) (Fin n) k) i j := by
+theorem emb_inl_inl {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i j : Fin n)
+    : (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inl j))
+      = (g.1 : Matrix (Fin n) (Fin n) k) i j := by
   rw [val_emb₂]
   simp [reindex_apply, submatrix_apply]
 
-theorem emb_inl_inr {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i : Fin n) (j : Fin t) :
-    (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inr j)) = 0 := by
+theorem emb_inl_inr
+    {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i : Fin n) (j : Fin t)
+    : (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inr j))
+      = 0 := by
   rw [val_emb₂]
   simp [reindex_apply, submatrix_apply]
 
-theorem emb_inr_inl {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i : Fin t) (j : Fin n) :
-    (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inl j)) = 0 := by
+theorem emb_inr_inl
+    {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i : Fin t) (j : Fin n)
+    : (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inl j))
+      = 0 := by
   rw [val_emb₂]
   simp [reindex_apply, submatrix_apply]
 
-theorem emb_inr_inr {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i j : Fin t) :
-    (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inr j)) =
-      (g.2 : Matrix (Fin t) (Fin t) k) i j := by
+theorem emb_inr_inr {n t N : ℕ} (h : n + t = N) (g : GL (Fin n) k × GL (Fin t) k) (i j : Fin t)
+    : (emb₂ k (stdSum h) g : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inr j))
+      = (g.2 : Matrix (Fin t) (Fin t) k) i j := by
   rw [val_emb₂]
   simp [reindex_apply, submatrix_apply]
 
-theorem one_inr_inr {n t N : ℕ} (h : n + t = N) (i j : Fin t) :
-    (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inr j)) =
-      (1 : Matrix (Fin t) (Fin t) k) i j := by
+theorem one_inr_inr {n t N : ℕ} (h : n + t = N) (i j : Fin t)
+    : (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inr j))
+      = (1 : Matrix (Fin t) (Fin t) k) i j := by
   rw [Matrix.one_apply, Matrix.one_apply]
   simp only [Equiv.apply_eq_iff_eq, Sum.inr.injEq]
 
-theorem one_inl_inr {n t N : ℕ} (h : n + t = N) (i : Fin n) (j : Fin t) :
-    (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inr j)) = 0 := by
+theorem one_inl_inr {n t N : ℕ} (h : n + t = N) (i : Fin n) (j : Fin t)
+    : (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inl i)) (stdSum h (Sum.inr j)) = 0 := by
   simp
 
-theorem one_inr_inl {n t N : ℕ} (h : n + t = N) (i : Fin t) (j : Fin n) :
-    (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inl j)) = 0 := by
+theorem one_inr_inl {n t N : ℕ} (h : n + t = N) (i : Fin t) (j : Fin n)
+    : (1 : Matrix (Fin N) (Fin N) k) (stdSum h (Sum.inr i)) (stdSum h (Sum.inl j)) = 0 := by
   simp
 
 end Concrete
@@ -163,21 +175,33 @@ section Entries
 
 variable {k : Type} [Field k]
 
-theorem glEmbMat_block_apply {n m : ℕ} (hnm : n ≤ m) (g : Matrix (Fin n) (Fin n) k) (A : Matrix (Fin m) (Fin m) k)
-    (hA : ∀ r s : Fin m, A r s = if h : (r : ℕ) < n ∧ (s : ℕ) < n then g ⟨r, h.1⟩ ⟨s, h.2⟩
-      else (1 : Matrix (Fin m) (Fin m) k) r s) (r s : Fin (m + 1)) :
-    glEmbMat k m A r s = if h : (r : ℕ) < n ∧ (s : ℕ) < n then g ⟨r, h.1⟩ ⟨s, h.2⟩
-      else (1 : Matrix (Fin (m + 1)) (Fin (m + 1)) k) r s := by
+theorem glEmbMat_block_apply
+    {n m : ℕ} (hnm : n ≤ m) (g : Matrix (Fin n) (Fin n) k) (A : Matrix (Fin m) (Fin m) k)
+    (hA : ∀ r s : Fin m,
+      A r s
+        = if h : (r : ℕ) < n ∧ (s : ℕ) < n then
+            g ⟨r, h.1⟩ ⟨s, h.2⟩
+          else
+            (1 : Matrix (Fin m) (Fin m) k) r s)
+    (r s : Fin (m + 1))
+    : glEmbMat k m A r s
+      = if h : (r : ℕ) < n ∧ (s : ℕ) < n then
+          g ⟨r, h.1⟩ ⟨s, h.2⟩
+        else
+          (1 : Matrix (Fin (m + 1)) (Fin (m + 1)) k) r s := by
   induction r using Fin.lastCases with
   | last =>
     rw [dite_eq_right (fun h => by have := h.1; simp at this; omega)]
     induction s using Fin.lastCases with
     | last => rw [GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_last_last, one_apply_eq]
-    | cast s => rw [GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_last_castSucc, one_apply_ne (Fin.castSucc_ne_last s).symm]
+    | cast s =>
+      rw [GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_last_castSucc,
+        one_apply_ne (Fin.castSucc_ne_last s).symm]
   | cast r =>
     induction s using Fin.lastCases with
     | last =>
-      rw [dite_eq_right (fun h => by have := h.2; simp at this; omega), GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_castSucc_last,
+      rw [dite_eq_right (fun h => by have := h.2; simp at this; omega),
+        GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_castSucc_last,
         one_apply_ne (Fin.castSucc_ne_last r)]
     | cast s =>
       rw [GlobalTheory.CompanionTheory.BZMirStep.glEmbMat_castSucc_castSucc, hA r s]
@@ -188,17 +212,25 @@ theorem glEmbMat_block_apply {n m : ℕ} (hnm : n ≤ m) (g : Matrix (Fin n) (Fi
         rw [Matrix.one_apply, Matrix.one_apply]
         simp only [Fin.castSucc_inj]
 
-theorem iotaM_apply (n : ℕ) (g : GL (Fin n) k) : ∀ (j : ℕ) (r s : Fin (n + j + 1)),
-    (((embedding₂ k n j g : Mir k (n + j)) : GL (Fin (n + j + 1)) k) : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k) r s =
-      if h : (r : ℕ) < n ∧ (s : ℕ) < n then (g : Matrix (Fin n) (Fin n) k) ⟨r, h.1⟩ ⟨s, h.2⟩
-      else (1 : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k) r s
-  | 0, r, s => glEmbMat_block_apply le_rfl (g : Matrix (Fin n) (Fin n) k) (g : Matrix (Fin n) (Fin n) k)
-      (fun r s => by rw [dite_eq_left ⟨r.2, s.2⟩]) r s
-  | j + 1, r, s => glEmbMat_block_apply (by omega) (g : Matrix (Fin n) (Fin n) k) _ (iotaM_apply n g j) r s
+theorem iotaM_apply (n : ℕ) (g : GL (Fin n) k)
+    : ∀ (j : ℕ) (r s : Fin (n + j + 1)),
+      (((embedding₂ k n j g : Mir k (n + j)) : GL (Fin (n + j + 1)) k)
+            : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k)
+          r s
+        = if h : (r : ℕ) < n ∧ (s : ℕ) < n then
+            (g : Matrix (Fin n) (Fin n) k) ⟨r, h.1⟩ ⟨s, h.2⟩
+          else
+            (1 : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k) r s
+  | 0, r, s =>
+    glEmbMat_block_apply le_rfl (g : Matrix (Fin n) (Fin n) k) (g : Matrix (Fin n) (Fin n) k)
+      (fun r s => by rw [dite_eq_left ⟨r.2, s.2⟩])
+      r s
+  | j + 1, r, s =>
+    glEmbMat_block_apply (by omega) (g : Matrix (Fin n) (Fin n) k) _ (iotaM_apply n g j) r s
 
-theorem iotaM_eq_emb (n j : ℕ) (g : GL (Fin n) k) :
-    ((embedding₂ k n j g : Mir k (n + j)) : GL (Fin (n + j + 1)) k) =
-      emb₂ k (stdSum (rfl : n + (j + 1) = n + j + 1)) (g, 1) := by
+theorem iotaM_eq_emb (n j : ℕ) (g : GL (Fin n) k)
+    : ((embedding₂ k n j g : Mir k (n + j)) : GL (Fin (n + j + 1)) k)
+      = emb₂ k (stdSum (rfl : n + (j + 1) = n + j + 1)) (g, 1) := by
   apply Units.ext
   ext r s
   rw [iotaM_apply]

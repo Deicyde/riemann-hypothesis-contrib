@@ -9,13 +9,14 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.T.splitStrong :
-    UpperTheory.ConvolutionTheory.T.DescStep → UpperTheory.ConvolutionTheory.T.SplitStrong := by
+theorem UpperTheory.ConvolutionTheory.T.splitStrong
+    : UpperTheory.ConvolutionTheory.T.DescStep → UpperTheory.ConvolutionTheory.T.SplitStrong := by
   intro hD F E _ _ _ _ _ _ _ _ σ hσ hp n hn π P hc hw v w i hi hcomp τ τ' hτ hτ'
   obtain ⟨-, -, -, -, -, hpl⟩ := UpperTheory.ConvolutionTheory.T.places F E hp
   obtain ⟨hs, u, rfl, hiu⟩ := hpl v w i hi hcomp
   obtain ⟨π', hl, hloc⟩ := hD F E σ hσ hp n hn P hc v u hs
-  obtain ⟨η, hη, hiso⟩ := (UpperTheory.ConvolutionTheory.R.fibre_holds F E hp n hn (.cx π') (.cx P) hl.1).2 (.cx π) hw
+  obtain ⟨η, hη, hiso⟩ :=
+    (UpperTheory.ConvolutionTheory.R.fibre_holds F E hp n hn (.cx π') (.cx P) hl.1).2 (.cx π) hw
   have he : π'.twist η = π := (UpperTheory.ConvolutionTheory.Dp.isoEq F n (π'.twist η) π).1 hiso
   subst he
   have hτ₀ : (UpperTheory.CBC.Cusp.cx π').locComp v τ := by

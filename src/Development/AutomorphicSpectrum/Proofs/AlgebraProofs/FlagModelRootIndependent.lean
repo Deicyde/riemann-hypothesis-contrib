@@ -10,6 +10,7 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FlagModelValu
 namespace GlobalTheory.CompanionTheory.Ar.RootIndep
 
 theorem main : GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelRootIndependence.Statement :=
-  GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelRootIndependence.proof GlobalTheory.T.flag_model_value_independent
+  GroundTheory.Heights₂.Heights.NumbersDVR.FlagModelRootIndependence.proof
+    GlobalTheory.T.flag_model_value_independent
 
 end GlobalTheory.CompanionTheory.Ar.RootIndep

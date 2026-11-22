@@ -13,8 +13,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MeasureTheory Set Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M GroundTheory.Heights₂.Heights
-  GroundTheory.Heights₂.Heights.CP
+open MeasureTheory Set Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.CP
 open scoped ComplexConjugate ENNReal ContDiff Matrix
 
 noncomputable section
@@ -58,7 +58,8 @@ def projAtlas (N : ℕ) : FinHolAtlas N (CP N) where
 
 def projMatrix : CP N → (Fin (N + 1) → Fin (N + 1) → ℂ) :=
   Projectivization.lift
-    (fun v : {v : Fin (N + 1) → ℂ // v ≠ 0} => fun i j => v.1 i * conj (v.1 j) / ((normSq2 v.1 : ℝ) : ℂ))
+    (fun v : {v : Fin (N + 1) → ℂ // v ≠ 0} => fun i j =>
+      v.1 i * conj (v.1 j) / ((normSq2 v.1 : ℝ) : ℂ))
     (by
       rintro ⟨a, ha⟩ ⟨b, hb⟩ t rfl
       have ht : t ≠ 0 := by rintro rfl; simp at ha
@@ -127,22 +128,23 @@ lemma dNormSqSum_apply (a b : Fin N → ℂ) :
   simp [dNormSqSum, Complex.inner, mul_add]
 
 def dNCLM : (Fin N → ℂ) →L[ℝ] ((Fin N → ℂ) →L[ℝ] ℝ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := dNormSqSum
-      map_add' := fun a b => by
-        ext v
-        simp only [dNormSqSum_apply, ContinuousLinearMap.add_apply, ← Finset.sum_add_distrib]
-        refine Finset.sum_congr rfl fun m _ => ?_
-        simp only [Pi.add_apply, map_add (f := _), mul_add, Complex.add_re]
-      map_smul' := fun c a => by
-        ext v
-        simp only [dNormSqSum_apply, ContinuousLinearMap.smul_apply, RingHom.id_apply,
-          smul_eq_mul, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun m _ => ?_
-        simp only [Pi.smul_apply, Complex.real_smul, map_mul, Complex.conj_ofReal]
-        rw [show v m * ((c : ℂ) * conj (a m)) = (c : ℂ) * (v m * conj (a m)) by ring,
-          Complex.re_ofReal_mul]
-        ring }
+  LinearMap.toContinuousLinearMap {
+    toFun := dNormSqSum
+    map_add' := fun a b => by
+      ext v
+      simp only [dNormSqSum_apply, ContinuousLinearMap.add_apply, ← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      simp only [Pi.add_apply, map_add (f := _), mul_add, Complex.add_re]
+    map_smul' := fun c a => by
+      ext v
+      simp only [dNormSqSum_apply, ContinuousLinearMap.smul_apply, RingHom.id_apply, smul_eq_mul,
+        Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      simp only [Pi.smul_apply, Complex.real_smul, map_mul, Complex.conj_ofReal]
+      rw [show v m * ((c : ℂ) * conj (a m)) = (c : ℂ) * (v m * conj (a m)) by ring,
+        Complex.re_ofReal_mul]
+      ring
+  }
 
 lemma coe_dNCLM : ⇑(dNCLM (N := N)) = dNormSqSum := rfl
 
@@ -176,9 +178,10 @@ lemma I_smul_single (i : Fin N) : Complex.I • (Pi.single i 1 : Fin N → ℂ) 
   · subst h; simp
   · simp [h]
 
-theorem hessC_logPot (z : Fin N → ℂ) :
-    hessC logPot z = (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) •
-      (1 - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) • Matrix.vecMulVec (star z) z) := by
+theorem hessC_logPot (z : Fin N → ℂ)
+    : hessC logPot z
+      = (((1 + normSqSum z)⁻¹ : ℝ) : ℂ)
+        • (1 - (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) • Matrix.vecMulVec (star z) z) := by
   ext i j
   simp only [hessC, fderiv2_logPot, I_smul_single, dNormSqSum_single, ← inv_pow]
   generalize (1 + normSqSum z)⁻¹ = r
@@ -189,8 +192,8 @@ theorem hessC_logPot (z : Fin N → ℂ) :
     apply Complex.ext <;> simp [Complex.mul_re, Complex.mul_im, sq] <;> ring
   · apply Complex.ext <;> simp [h, Complex.mul_re, Complex.mul_im, sq] <;> ring
 
-theorem hessC_logPot_eq_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    hessC logPot z = ((2 * Real.pi : ℝ) : ℂ) • chernCoeff i z := by
+theorem hessC_logPot_eq_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : hessC logPot z = ((2 * Real.pi : ℝ) : ℂ) • chernCoeff i z := by
   rw [hessC_logPot, chernCoeff_eq_matrix, smul_smul]
   congr 1
   have hq := one_add_normSqSum_pos z
@@ -201,8 +204,8 @@ theorem hessC_logPot_eq_chernCoeff (i : Fin (N + 1)) (z : Fin N → ℂ) :
 theorem levi_logPot_nonneg (z w : Fin N → ℂ) : 0 ≤ levi logPot z w := by
   have h := re_star_dot_hessC (logPot (N := N)) z (star w)
   conv_rhs at h => rw [star_star]
-  rw [← h, hessC_logPot_eq_chernCoeff 0, Matrix.smul_mulVec, dotProduct_smul,
-    chernCoeff_quadForm, smul_eq_mul, ← Complex.ofReal_mul, Complex.ofReal_re]
+  rw [← h, hessC_logPot_eq_chernCoeff 0, Matrix.smul_mulVec, dotProduct_smul, chernCoeff_quadForm,
+    smul_eq_mul, ← Complex.ofReal_mul, Complex.ofReal_re]
   have hq := one_add_normSqSum_pos z
   have hpi := Real.pi_pos
   have hCS := norm_dotProduct_sq_le z (star w)

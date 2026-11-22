@@ -11,17 +11,22 @@ open scoped Classical
 
 noncomputable section
 namespace GlobalTheory.SymChain.SymData
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData
+  GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
 
-theorem exists_N_embX_inv_mul_mem_KOne :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (s κ : ℕ)
-      (S : GlobalTheory.SymChain.SymData k s κ), ∀ x ∈ S.P.J, ∃ (n : GL (Fin κ ⊕ Fin (s + 1)) k) (γ : GL (Fin κ) k),
-        n ∈ GlobalTheory.RootEx.N k (Fin κ) (s + 1) (S.ρ + 1) ∧ n ∈ S.P.J ∧ GlobalTheory.RootEx.embX (s + 1) γ ∈ S.P.J ∧
-        (n * GlobalTheory.RootEx.embX (s + 1) γ)⁻¹ * x ∈ GlobalTheory.SplitWeil.KOne k (Fin κ ⊕ Fin (s + 1)) := by
+theorem exists_N_embX_inv_mul_mem_KOne
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (s κ : ℕ) (S : GlobalTheory.SymChain.SymData k s κ),
+      ∀ x ∈ S.P.J, ∃ (n : GL (Fin κ ⊕ Fin (s + 1)) k) (γ : GL (Fin κ) k),
+        n ∈ GlobalTheory.RootEx.N k (Fin κ) (s + 1) (S.ρ + 1) ∧ n ∈ S.P.J
+          ∧ GlobalTheory.RootEx.embX (s + 1) γ ∈ S.P.J
+          ∧ (n * GlobalTheory.RootEx.embX (s + 1) γ)⁻¹ * x
+            ∈ GlobalTheory.SplitWeil.KOne k (Fin κ ⊕ Fin (s + 1)) := by
   intro k _ _ _ _ s κ S x hx
-  have mem_J_iff_pattern (g : GL (Fin κ ⊕ Fin (s + 1)) k) :
-      g ∈ S.P.J ↔ g ∈ KO k _ ∧ ∀ a b, ¬ FreeTop S.ρ a b →
-        valuation k (g.val a b - (1 : Matrix _ _ k) a b) < 1 := by
+  have mem_J_iff_pattern (g : GL (Fin κ ⊕ Fin (s + 1)) k)
+      : g ∈ S.P.J
+        ↔ g ∈ KO k _
+          ∧ ∀ a b, ¬ FreeTop S.ρ a b → valuation k (g.val a b - (1 : Matrix _ _ k) a b) < 1 := by
     rw [S.sym.1 g]
     constructor
     · rintro ⟨u, hu, γ, hγ, g₀, hg₀, hgb⟩
@@ -29,9 +34,9 @@ theorem exists_N_embX_inv_mul_mem_KOne :
       rw [← hg₀, SymPattern.entry_lt_iff, hgb]
       exact SymPattern.pat_of_mul S.ρ u ((Radical.mem_N_iff u).mp hu) γ hγ a b hab
     · rintro ⟨⟨g₀, hg₀⟩, hpat⟩
-      obtain ⟨u, hu, γ, hγ, he⟩ := SymPattern.exists_of_pat S.ρ
-        (Matrix.GeneralLinearGroup.map (IsLocalRing.residue 𝒪[k]) g₀) (fun a b hab => by
-          rw [← SymPattern.entry_lt_iff, hg₀]; exact hpat a b hab)
+      obtain ⟨u, hu, γ, hγ, he⟩ :=
+        SymPattern.exists_of_pat S.ρ (Matrix.GeneralLinearGroup.map (IsLocalRing.residue 𝒪[k]) g₀)
+          (fun a b hab => by rw [← SymPattern.entry_lt_iff, hg₀]; exact hpat a b hab)
       exact ⟨u, (Radical.mem_N_iff u).mpr hu, γ, hγ, g₀, hg₀, he⟩
   obtain ⟨hxK, hpat⟩ := (mem_J_iff_pattern x).1 hx
   set M : Matrix (Fin κ ⊕ Fin (s + 1)) (Fin κ ⊕ Fin (s + 1)) k :=
@@ -57,8 +62,7 @@ theorem exists_N_embX_inv_mul_mem_KOne :
       simp [Matrix.one_apply]
     simp only [e1]
     rw [← Matrix.mul_apply, Matrix.one_mul]
-  have hγint : ∀ i j, γ.val i j ∈ 𝒪[k] := fun i j => by
-    rw [hγv]; exact intM_of_mem_KO hMK _ _
+  have hγint : ∀ i j, γ.val i j ∈ 𝒪[k] := fun i j => by rw [hγv]; exact intM_of_mem_KO hMK _ _
 
   have hγK : γ ∈ KO k (Fin κ) := by
     let A₀ : Matrix (Fin κ) (Fin κ) 𝒪[k] := fun i j => ⟨γ.val i j, hγint i j⟩
@@ -80,16 +84,19 @@ theorem exists_N_embX_inv_mul_mem_KOne :
       exact intM_fromBlocks.2 ⟨intM_of_mem_KO (inv_mem hγK), intM_zero, intM_zero, intM_one⟩
   have hnK : n ∈ KO k _ := by
     have : n = (x * u) * (embX (s + 1) γ)⁻¹ := by rw [e]; group
-    rw [this]; exact mul_mem hMK (inv_mem hembK)
+    rw [this]
+    exact mul_mem hMK (inv_mem hembK)
   refine ⟨n, γ, (Radical.mem_N_iff n).2 hn, ?_, ?_, ?_⟩
   · refine (mem_J_iff_pattern n).2 ⟨hnK, fun a b hab => ?_⟩
     have h1 := GlobalTheory.SymPattern.pat_of_mul S.ρ n hn 1 (fun r s _ => rfl) a b hab
     rw [map_one, mul_one] at h1
-    rw [h1, sub_self, map_zero]; exact zero_lt_one
+    rw [h1, sub_self, map_zero]
+    exact zero_lt_one
   · refine (mem_J_iff_pattern _).2 ⟨hembK, fun a b hab => ?_⟩
     have h1 := GlobalTheory.SymPattern.pat_of_mul S.ρ 1 (fun r s _ => rfl) γ hγ a b hab
     rw [one_mul] at h1
-    rw [h1, sub_self, map_zero]; exact zero_lt_one
+    rw [h1, sub_self, map_zero]
+    exact zero_lt_one
   · rw [← e, _root_.mul_inv_rev, mul_assoc, inv_mul_cancel, mul_one]
     exact inv_mem hu
 

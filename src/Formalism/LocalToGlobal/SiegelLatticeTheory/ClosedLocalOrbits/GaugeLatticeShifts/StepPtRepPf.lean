@@ -17,8 +17,8 @@ namespace Formalism.L2.SG.RealObj.InfCut
 open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting
 
 def StepPtRepDiag : Prop :=
-  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (sc : ℝ), 0 < sc →
-    ∀ (i0 : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k), PtRepExists X u u' sc i0 i0
+  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (sc : ℝ),
+    0 < sc → ∀ (i0 : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k), PtRepExists X u u' sc i0 i0
 
 namespace PtRepPf
 
@@ -26,13 +26,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-theorem hJ_crd (v : InfinitePlace X.B.I.F) (x y : (VS D).V) :
-    hJ (X.B.I.ε v) (rv X.B.I v (X.crd x)) (rv X.B.I v (X.crd y)) = X.B.I.φ v (X.ιE.symm ((VS D).hT x y)) := by
+theorem hJ_crd (v : InfinitePlace X.B.I.F) (x y : (VS D).V)
+    : hJ (X.B.I.ε v) (rv X.B.I v (X.crd x)) (rv X.B.I v (X.crd y))
+      = X.B.I.φ v (X.ιE.symm ((VS D).hT x y)) := by
   rw [← Formalism.L2.SG.PoincareInHH.Cut.hform_crd (X := X) x y]
-  first
-  | rw [RingEquiv.symm_apply_apply]
-  | simp only [RingEquiv.symm_apply_apply]
-  | simp
+  first | rw [RingEquiv.symm_apply_apply] | simp only [RingEquiv.symm_apply_apply] | simp
   exact PI.ScPiFrameW.hJ_rv X.B.I v (X.crd x) (X.crd y)
 
 def frU (u : D.what₂.Word) (v : InfinitePlace X.B.I.F) : Fr (X.B.I.ε v) D.R.rS D.R.k where
@@ -79,19 +77,29 @@ theorem famSc_one {n r : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) 
 
 end PtRepPf
 
-
 open PtRepPf in
 theorem real_point_representative_diagonal : StepPtRepDiag := by
   intro D X u u' sc hsc i0 w hw
-  have hloc := fun v => locMain (frU X u v) (frU X u' v) rfl (i0 v) (ZhatO (ptC X v w)) (hw v) sc hsc
+  have hloc := fun v =>
+    locMain (frU X u v) (frU X u' v) rfl (i0 v) (ZhatO (ptC X v w)) (hw v) sc hsc
   choose g hgZ φ hφ hD using hloc
   have hω : ∀ v, hJ (X.B.I.ε v) (X.wfr u' v (i0 v)) (X.wfr u' v (i0 v)) = 1 := fun v => by
     rw [X.wfr_on, if_pos rfl]
-  refine ⟨g, fun v => ?_, 1, fun v => rotU (X.B.I.ε v) (X.wfr u' v (i0 v)) (hω v) (φ v) (hφ v), ?_, ?_, ?_⟩
+  refine ⟨
+    g,
+    fun v => ?_,
+    1,
+    fun v => rotU (X.B.I.ε v) (X.wfr u' v (i0 v)) (hω v) (φ v) (hφ v),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show ZhatO (Zhat (X.B.I.ε v) (frm X u 1 v) (frm X u' 1 v) (uMat (g v))) = ptC X v w
     simp only [frm, famSc_one]
     rw [show Zhat (X.B.I.ε v) (fam (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)))
-        (fam (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u'))) (uMat (g v)) = ZhatO (ptC X v w) from hgZ v,
+            (fam (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u'))) (uMat (g v))
+          = ZhatO (ptC X v w) from
+        hgZ v,
       zhatO_zhatO]
   · intro v x _
     show uMat (1 : Formalism.REAL.UJ (X.B.I.ε v)) *ᵥ rv X.B.I v x = rv X.B.I v x
@@ -109,9 +117,10 @@ theorem real_point_representative_diagonal : StepPtRepDiag := by
       ext a b
       show hJ (X.B.I.ε v) (X.wfr u v a) (uMat (1 : Formalism.REAL.UJ (X.B.I.ε v)) *ᵥ X.wfr u v b) = _
       simp [uMat, X.wfr_on, Matrix.one_apply]
-    have hm2 : Formalism.L2.SG.HidaSetting.matW X.B.I (X.wfr u' v) v
-        (fun v => rotU (X.B.I.ε v) (X.wfr u' v (i0 v)) (hω v) (φ v) (hφ v)) =
-        Matrix.diagonal fun i => if i = i0 v then φ v else 1 := by
+    have hm2
+        : Formalism.L2.SG.HidaSetting.matW X.B.I (X.wfr u' v) v
+            (fun v => rotU (X.B.I.ε v) (X.wfr u' v (i0 v)) (hω v) (φ v) (hφ v))
+          = Matrix.diagonal fun i => if i = i0 v then φ v else 1 := by
       ext a b
       show hJ (X.B.I.ε v) (X.wfr u' v a)
         (uMat (rotU (X.B.I.ε v) (X.wfr u' v (i0 v)) (hω v) (φ v) (hφ v)) *ᵥ X.wfr u' v b) = _

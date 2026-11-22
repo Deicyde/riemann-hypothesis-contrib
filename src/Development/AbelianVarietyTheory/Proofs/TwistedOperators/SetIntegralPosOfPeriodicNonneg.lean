@@ -116,10 +116,26 @@ private lemma exists_charSum_approx {Q : Type} [TopologicalSpace Q] [CompactSpac
     _ ≤ ‖f - g‖ := (f - g).norm_coe_le_norm q
     _ ≤ δ := by rw [← dist_eq_norm]; exact hfg.le
 
-
 open MeasureTheory in
 open scoped Pointwise in
-theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G), IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K) → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ), (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y) → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1) → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → ∀ (μ : Measure G) (𝓕 : Set G), μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → ∀ l : List (G → ℂ), (∀ Φ ∈ l, Continuous Φ ∧ ∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x) → ∀ ε : ℝ, 0 < ε → ∃ (s : Finset A) (c : A → ℂ), ∀ Φ ∈ l, ∀ x, ‖Φ x - ∑ a ∈ s, c a * ((∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x)‖ ≤ ε := by
+theorem _root_.GlobalTheory.exists_summation_kernel_periodic
+    : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G),
+      IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K)
+        → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ),
+          (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y)
+            → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1)
+            → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ)
+            → ∀ (μ : Measure G) (𝓕 : Set G),
+              μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ
+                → ∀ l : List (G → ℂ),
+                  (∀ Φ ∈ l, Continuous Φ ∧ ∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x)
+                    → ∀ ε : ℝ,
+                      0 < ε
+                        → ∃ (s : Finset A) (c : A → ℂ), ∀ Φ ∈ l, ∀ x,
+                          ‖Φ x - ∑ a ∈ s, c a * ((∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x)‖
+                            ≤ ε := by
   intro G _ _ _ _ _ _ _ _ Γ _ K hK hcov A _ χ hχc hχmul hχadd hχ0 hχnorm hχΓ μ 𝓕 hμ h𝓕 l hl ε hε
   classical
   haveI : Countable Γ := TopologicalSpace.separableSpace_iff_countable.mp inferInstance
@@ -138,13 +154,14 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
   have hcc : ∀ a x, starRingEnd ℂ (χ a x) = χ (-a) x := by
     intro a x
     have h1 : χ a x * χ (-a) x = 1 := by rw [← hχadd, add_neg_cancel, hχ0]
-    have h2 : starRingEnd ℂ (χ a x) * χ a x = 1 := by
-      rw [Complex.conj_mul', hχnorm]; simp
-    calc starRingEnd ℂ (χ a x) = starRingEnd ℂ (χ a x) * (χ a x * χ (-a) x) := by
-          rw [h1, _root_.mul_one]
+    have h2 : starRingEnd ℂ (χ a x) * χ a x = 1 := by rw [Complex.conj_mul', hχnorm]; simp
+    calc
+      starRingEnd ℂ (χ a x)
+        = starRingEnd ℂ (χ a x) * (χ a x * χ (-a) x) := by rw [h1, _root_.mul_one]
       _ = χ (-a) x := by rw [← _root_.mul_assoc, h2, _root_.one_mul]
   have hψmul : ∀ a b, ψ (a + b) = ψ a * ψ b := by
-    intro a b; ext q
+    intro a b
+    ext q
     induction q using QuotientAddGroup.induction_on with
     | H x => simp [hψ, hχadd]
   have hψ0 : ψ 0 = 1 := by
@@ -152,27 +169,30 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
     induction q using QuotientAddGroup.induction_on with
     | H x => simp [hψ, hχ0]
   have hψstar : ∀ a, star (ψ a) = ψ (-a) := by
-    intro a; ext q
+    intro a
+    ext q
     induction q using QuotientAddGroup.induction_on with
     | H x => simp [hψ, ← hcc]
   have hψsep : ∀ p q : G ⧸ Γ, p ≠ q → ∃ a, ψ a p ≠ ψ a q := by
     intro p q hpq
     induction p using QuotientAddGroup.induction_on with
     | H x =>
-    induction q using QuotientAddGroup.induction_on with
-    | H y =>
-    by_contra hcon
-    push_neg at hcon
-    apply hpq
-    rw [QuotientAddGroup.eq]
-    apply (hχΓ (-x + y)).mp
-    intro a
-    have e := hcon a
-    rw [hψ, hψ] at e
-    rw [hχmul, ← e, ← hχmul, neg_add_cancel, hχz]
+      induction q using QuotientAddGroup.induction_on with
+      | H y =>
+        by_contra hcon
+        push_neg at hcon
+        apply hpq
+        rw [QuotientAddGroup.eq]
+        apply (hχΓ (-x + y)).mp
+        intro a
+        have e := hcon a
+        rw [hψ, hψ] at e
+        rw [hχmul, ← e, ← hχmul, neg_add_cancel, hχz]
   have hη : (0 : ℝ) < ε / 2 := by positivity
-  have hev : ∀ Φ ∈ l.toFinset, ∀ᶠ w in nhds (0 : G ⧸ Γ), ∀ x y : G, (y : G ⧸ Γ) = w →
-      ‖Φ (x + y) - Φ x‖ ≤ ε / 2 := by
+  have hev
+      : ∀ Φ ∈ l.toFinset,
+        ∀ᶠ w in nhds (0 : G ⧸ Γ), ∀ x y : G, (y : G ⧸ Γ) = w →
+          ‖Φ (x + y) - Φ x‖ ≤ ε / 2 := by
     intro Φ hΦ
     rw [List.mem_toFinset] at hΦ
     obtain ⟨Ψ, hΨ⟩ := exists_continuous_descend_of_periodic Γ (hl Φ hΦ).1 (hl Φ hΦ).2
@@ -181,16 +201,18 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
     rwa [← hy, ← QuotientAddGroup.mk_add, hΨ, hΨ] at this
   obtain ⟨U, hU, hUprop⟩ := ((Filter.eventually_all_finset l.toFinset).2 hev).exists_mem
   obtain ⟨O, hOU, hOopen, h0O⟩ := mem_nhds_iff.mp hU
-  obtain ⟨b, hb0, hb1, hb01⟩ := exists_continuous_zero_one_of_isClosed hOopen.isClosed_compl
-    (isClosed_singleton (x := (0 : G ⧸ Γ)))
-    (Set.disjoint_singleton_right.mpr (by simpa using h0O))
+  obtain ⟨b, hb0, hb1, hb01⟩ :=
+    exists_continuous_zero_one_of_isClosed hOopen.isClosed_compl
+      (isClosed_singleton (x := (0 : G ⧸ Γ)))
+      (Set.disjoint_singleton_right.mpr (by simpa using h0O))
   have hMev : ∀ Φ ∈ l.toFinset, ∀ᶠ M in Filter.atTop, ∀ x, ‖Φ x‖ ≤ M := by
     intro Φ hΦ
     rw [List.mem_toFinset] at hΦ
     obtain ⟨M, hM⟩ := exists_norm_le_of_periodic Γ hK hcov (hl Φ hΦ).1 (hl Φ hΦ).2
     exact Filter.eventually_atTop.2 ⟨M, fun M' hM' x => (hM x).trans hM'⟩
   obtain ⟨M, hM⟩ := ((Filter.eventually_all_finset l.toFinset).2 hMev).exists
-  have hfin : μ 𝓕 < ⊤ := _root_.GlobalTheory.measure_addFundamentalDomain_lt_top_of_cocompact Γ hK hcov μ h𝓕
+  have hfin : μ 𝓕 < ⊤ :=
+    _root_.GlobalTheory.measure_addFundamentalDomain_lt_top_of_cocompact Γ hK hcov μ h𝓕
   haveI : IsFiniteMeasure (μ.restrict 𝓕) := isFiniteMeasure_restrict.mpr hfin.ne
   set β : G → ℝ := fun y => b (y : G ⧸ Γ) with hβ
   have hβc : Continuous β := b.continuous.comp continuous_quotient_mk'
@@ -208,9 +230,10 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
     rw [QuotientAddGroup.eq]
     convert Γ.neg_mem hγ using 1
     abel
-  have hβint : IntegrableOn β 𝓕 μ := Integrable.of_bound hβc.aestronglyMeasurable 1
-    (Filter.Eventually.of_forall fun y => by
-      rw [Real.norm_eq_abs, abs_of_nonneg (hβ0 y)]; exact hβ1 y)
+  have hβint : IntegrableOn β 𝓕 μ :=
+    Integrable.of_bound hβc.aestronglyMeasurable 1
+      (Filter.Eventually.of_forall fun y => by
+        rw [Real.norm_eq_abs, abs_of_nonneg (hβ0 y)]; exact hβ1 y)
   have hI : 0 < I := by
     rw [hIdef, setIntegral_pos_iff_support_of_nonneg_ae (Filter.Eventually.of_forall hβ0) hβint]
     rw [pos_iff_ne_zero]
@@ -237,10 +260,14 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
   refine ⟨s, fun a => starRingEnd ℂ (d a), fun Φ hΦ x => ?_⟩
   obtain ⟨hΦc, hΦp⟩ := hl Φ hΦ
   have hMΦ : ∀ y, ‖Φ y‖ ≤ M := hM Φ (List.mem_toFinset.mpr hΦ)
-  have hconv : ∀ a, (∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x =
-      ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (χ a y) ∂μ := fun a =>
-    (_root_.GlobalTheory.fourierCoeff_mul_char_conv_and_hasDerivAt G Γ K hK hcov μ 𝓕 hμ h𝓕 (χ a) (hχc a) (hχmul a)
-      (hχnorm a) (fun γ hγ => (hχΓ γ).mpr hγ a) Φ hΦc hΦp).1 x
+  have hconv
+      : ∀ a,
+        (∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x
+          = ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (χ a y) ∂μ := fun a =>
+    (_root_.GlobalTheory.fourierCoeff_mul_char_conv_and_hasDerivAt G Γ K hK hcov μ 𝓕 hμ h𝓕 (χ a)
+      (hχc a) (hχmul a) (hχnorm a)
+      (fun γ hγ => (hχΓ γ).mpr hγ a)
+      Φ hΦc hΦp).1 x
   set k : G → ℂ := fun y => ∑ a ∈ s, d a * χ a y with hkdef
   have hkc : Continuous k := by fun_prop
   have hk : ∀ y, ‖((β y / I : ℝ) : ℂ) - k y‖ ≤ δ := by
@@ -251,8 +278,9 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
     intro y
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun a _ => ?_)
     rw [norm_mul, hχnorm, _root_.mul_one]
-  have hsum : ∑ a ∈ s, starRingEnd ℂ (d a) * ((∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x)
-      = ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (k y) ∂μ := by
+  have hsum
+      : ∑ a ∈ s, starRingEnd ℂ (d a) * ((∫ y in 𝓕, Φ y * starRingEnd ℂ (χ a y) ∂μ) * χ a x)
+        = ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (k y) ∂μ := by
     simp_rw [hconv, ← integral_const_mul]
     rw [← MeasureTheory.integral_finsetSum]
     · congr 1
@@ -270,53 +298,58 @@ theorem _root_.GlobalTheory.exists_summation_kernel_periodic : ∀ (G : Type) [A
     rw [integral_const_mul, integral_complex_ofReal, integral_div, ← hIdef, div_self hI.ne']
     simp
   have hint1 : Integrable (fun y => Φ x * ((β y / I : ℝ) : ℂ)) (μ.restrict 𝓕) :=
-    Integrable.of_bound (by fun_prop) (M * (1 / I)) (Filter.Eventually.of_forall fun y => by
-      rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (div_nonneg (hβ0 y) hI.le)]
-      exact mul_le_mul (hMΦ x) (div_le_div_of_nonneg_right (hβ1 y) hI.le)
-        (div_nonneg (hβ0 y) hI.le) ((norm_nonneg _).trans (hMΦ x)))
+    Integrable.of_bound (by fun_prop) (M * (1 / I))
+      (Filter.Eventually.of_forall fun y => by
+        rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (div_nonneg (hβ0 y) hI.le)]
+        exact mul_le_mul (hMΦ x) (div_le_div_of_nonneg_right (hβ1 y) hI.le)
+          (div_nonneg (hβ0 y) hI.le) ((norm_nonneg _).trans (hMΦ x)))
   have hint2 : Integrable (fun y => Φ (x + y) * starRingEnd ℂ (k y)) (μ.restrict 𝓕) :=
-    Integrable.of_bound (by fun_prop) (M * ∑ a ∈ s, ‖d a‖) (Filter.Eventually.of_forall fun y => by
-      rw [norm_mul, Complex.norm_conj]
-      exact mul_le_mul (hMΦ _) (hkb y) (norm_nonneg _) ((norm_nonneg _).trans (hMΦ x)))
+    Integrable.of_bound (by fun_prop) (M * ∑ a ∈ s, ‖d a‖)
+      (Filter.Eventually.of_forall fun y => by
+        rw [norm_mul, Complex.norm_conj]
+        exact mul_le_mul (hMΦ _) (hkb y) (norm_nonneg _) ((norm_nonneg _).trans (hMΦ x)))
   have hgint : Integrable (fun y => ε / 2 * (β y / I) + M * δ) (μ.restrict 𝓕) :=
     ((hβint.div_const I).const_mul _).add (integrable_const _)
-  calc ‖Φ x - ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (k y) ∂μ‖
-      = ‖∫ y in 𝓕, (Φ x * ((β y / I : ℝ) : ℂ) - Φ (x + y) * starRingEnd ℂ (k y)) ∂μ‖ := by
-        rw [integral_sub hint1 hint2, hIone]
+  calc
+    ‖Φ x - ∫ y in 𝓕, Φ (x + y) * starRingEnd ℂ (k y) ∂μ‖
+        = ‖∫ y in 𝓕, (Φ x * ((β y / I : ℝ) : ℂ) - Φ (x + y) * starRingEnd ℂ (k y)) ∂μ‖ := by
+      rw [integral_sub hint1 hint2, hIone]
     _ ≤ ∫ y in 𝓕, (ε / 2 * (β y / I) + M * δ) ∂μ := by
-        refine norm_integral_le_of_norm_le hgint (Filter.Eventually.of_forall fun y => ?_)
-        have e : Φ x * ((β y / I : ℝ) : ℂ) - Φ (x + y) * starRingEnd ℂ (k y) =
-            (Φ x - Φ (x + y)) * ((β y / I : ℝ) : ℂ) +
-              Φ (x + y) * starRingEnd ℂ (((β y / I : ℝ) : ℂ) - k y) := by
-          simp only [map_sub, Complex.conj_ofReal]; ring
-        rw [e]
-        refine (norm_add_le _ _).trans (add_le_add ?_ ?_)
-        · rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (div_nonneg (hβ0 y) hI.le)]
-          by_cases hy : β y = 0
-          · simp [hy]
-          · refine mul_le_mul_of_nonneg_right ?_ (div_nonneg (hβ0 y) hI.le)
-            rw [norm_sub_rev]
-            exact hUprop _ (hβU y hy) Φ (List.mem_toFinset.mpr hΦ) x y rfl
-        · rw [norm_mul, Complex.norm_conj]
-          exact mul_le_mul (hMΦ _) (hk y) (norm_nonneg _) ((norm_nonneg _).trans (hMΦ x))
+      refine norm_integral_le_of_norm_le hgint (Filter.Eventually.of_forall fun y => ?_)
+      have e
+          : Φ x * ((β y / I : ℝ) : ℂ) - Φ (x + y) * starRingEnd ℂ (k y)
+            = (Φ x - Φ (x + y)) * ((β y / I : ℝ) : ℂ)
+              + Φ (x + y) * starRingEnd ℂ (((β y / I : ℝ) : ℂ) - k y) := by
+        simp only [map_sub, Complex.conj_ofReal]; ring
+      rw [e]
+      refine (norm_add_le _ _).trans (add_le_add ?_ ?_)
+      · rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (div_nonneg (hβ0 y) hI.le)]
+        by_cases hy : β y = 0
+        · simp [hy]
+        · refine mul_le_mul_of_nonneg_right ?_ (div_nonneg (hβ0 y) hI.le)
+          rw [norm_sub_rev]
+          exact hUprop _ (hβU y hy) Φ (List.mem_toFinset.mpr hΦ) x y rfl
+      · rw [norm_mul, Complex.norm_conj]
+        exact mul_le_mul (hMΦ _) (hk y) (norm_nonneg _) ((norm_nonneg _).trans (hMΦ x))
     _ = ε / 2 + M * δ * m := by
-        rw [integral_add ((hβint.div_const I).const_mul _) (integrable_const _), integral_const_mul,
-          integral_div, ← hIdef, div_self hI.ne', setIntegral_const]
-        simp [hm, smul_eq_mul, Measure.real]
-        ring
+      rw [integral_add ((hβint.div_const I).const_mul _) (integrable_const _), integral_const_mul,
+        integral_div, ← hIdef, div_self hI.ne', setIntegral_const]
+      simp [hm, smul_eq_mul, Measure.real]
+      ring
     _ ≤ ε := by
-        have h1 : M * δ * m ≤ ε / 2 := by
-          have hMle : M ≤ |M| + 1 := (le_abs_self M).trans (by linarith)
-          have hmle : m ≤ m + 1 := by linarith
-          calc M * δ * m ≤ (|M| + 1) * δ * (m + 1) := by
-                rcases le_or_gt 0 M with hM0 | hM0
-                · exact mul_le_mul (mul_le_mul_of_nonneg_right hMle hδ.le) hmle hm0 (by positivity)
-                · have : M * δ * m ≤ 0 := by
-                    have := mul_nonpos_of_nonpos_of_nonneg (mul_nonpos_of_nonpos_of_nonneg hM0.le hδ.le) hm0
-                    exact this
-                  exact this.trans (by positivity)
-            _ = ε / 2 := by
-                rw [hδdef]; field_simp
-        linarith
+      have h1 : M * δ * m ≤ ε / 2 := by
+        have hMle : M ≤ |M| + 1 := (le_abs_self M).trans (by linarith)
+        have hmle : m ≤ m + 1 := by linarith
+        calc
+          M * δ * m ≤ (|M| + 1) * δ * (m + 1) := by
+            rcases le_or_gt 0 M with hM0 | hM0
+            · exact mul_le_mul (mul_le_mul_of_nonneg_right hMle hδ.le) hmle hm0 (by positivity)
+            · have : M * δ * m ≤ 0 := by
+                have :=
+                  mul_nonpos_of_nonpos_of_nonneg (mul_nonpos_of_nonpos_of_nonneg hM0.le hδ.le) hm0
+                exact this
+              exact this.trans (by positivity)
+          _ = ε / 2 := by rw [hδdef]; field_simp
+      linarith
 
 end GlobalTheory

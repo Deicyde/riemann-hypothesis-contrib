@@ -17,18 +17,18 @@ namespace GlobalTheory.HeckeExtend
 
 variable {F : Type} [Field F] [NumberField F]
 
-
 variable (F) in
 theorem intF_isOpen (M : ℕ) (hM : 0 < M) : IsOpen (intF F M) := by
-  let S : AddSubgroup (Af F) :=
-    { carrier := {c | ∃ a : Af F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ c = M • a}
-      zero_mem' := ⟨0, fun v => zero_mem _, (smul_zero M).symm⟩
-      add_mem' := by
-        rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
-        exact ⟨a + b, fun v => add_mem (ha v) (hb v), (smul_add M a b).symm⟩
-      neg_mem' := by
-        rintro _ ⟨a, ha, rfl⟩
-        exact ⟨-a, fun v => neg_mem (ha v), (smul_neg M a).symm⟩ }
+  let S : AddSubgroup (Af F) := {
+    carrier := {c | ∃ a : Af F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ c = M • a}
+    zero_mem' := ⟨0, fun v => zero_mem _, (smul_zero M).symm⟩
+    add_mem' := by
+      rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
+      exact ⟨a + b, fun v => add_mem (ha v) (hb v), (smul_add M a b).symm⟩
+    neg_mem' := by
+      rintro _ ⟨a, ha, rfl⟩
+      exact ⟨-a, fun v => neg_mem (ha v), (smul_neg M a).symm⟩
+  }
   have hS : IsOpen (S : Set (Af F)) :=
     S.isOpen_of_mem_nhds (g := 0) (GlobalTheory.AdLat.OpenLat.nsmul_integral_mem_nhds F M hM)
   have e : intF F M = Prod.snd ⁻¹' (S : Set (Af F)) := by
@@ -41,21 +41,24 @@ theorem intF_isOpen (M : ℕ) (hM : 0 < M) : IsOpen (intF F M) := by
   rw [e]
   exact hS.preimage continuous_snd
 
-theorem exists_intF_one_mul (M : ℕ) (hM : 0 < M) {x : AF F} (hx : x ∈ intF F M) :
-    ∃ s ∈ intF F 1, (M : AF F) * s = x := by
+theorem exists_intF_one_mul (M : ℕ) (hM : 0 < M) {x : AF F} (hx : x ∈ intF F M)
+    : ∃ s ∈ intF F 1, (M : AF F) * s = x := by
   obtain ⟨c, hc, e⟩ := hx
   have hM' : (M : F) ≠ 0 := Nat.cast_ne_zero.mpr hM.ne'
   refine ⟨algebraMap F (AF F) ((M : F)⁻¹) * x, ⟨c, hc, ?_⟩, ?_⟩
   · show (algebraMap F (AF F) ((M : F)⁻¹)).2 * x.2 = 1 • c
     rw [e, one_smul, nsmul_eq_mul]
     have h2 : (algebraMap F (AF F) ((M : F)⁻¹)).2 = algebraMap F (Af F) ((M : F)⁻¹) := rfl
-    rw [h2, ← mul_assoc, ← map_natCast (algebraMap F (Af F)) M, ← map_mul, inv_mul_cancel₀ hM', map_one, one_mul]
-  · rw [← mul_assoc, ← map_natCast (algebraMap F (AF F)) M, ← map_mul, mul_inv_cancel₀ hM', map_one, one_mul]
+    rw [h2, ← mul_assoc, ← map_natCast (algebraMap F (Af F)) M, ← map_mul, inv_mul_cancel₀ hM',
+      map_one, one_mul]
+  · rw [← mul_assoc, ← map_natCast (algebraMap F (AF F)) M, ← map_mul, mul_inv_cancel₀ hM', map_one,
+      one_mul]
 
 end GlobalTheory.HeckeExtend
 
-theorem GlobalTheory.HeckeExtend.CE_isOpen : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (N : ℕ), 0 < N → IsOpen (CE F E N : Set (AF F ⊗[F] E)) := by
+theorem GlobalTheory.HeckeExtend.CE_isOpen
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ),
+      0 < N → IsOpen (CE F E N : Set (AF F ⊗[F] E)) := by
   intro F E _ _ _ _ _ N hN
   haveI : IsTopologicalAddGroup (AF F ⊗[F] E) := IsModuleTopology.topologicalAddGroup (AF F) _
   haveI : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ _ _
@@ -64,7 +67,8 @@ theorem GlobalTheory.HeckeExtend.CE_isOpen : ∀ (F E : Type) [Field F] [NumberF
     intro i
     have : Algebra.IsAlgebraic ℤ ℚ := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
     have : Algebra.IsAlgebraic ℤ E := Algebra.IsAlgebraic.trans ℤ ℚ E
-    obtain ⟨y, hy, h⟩ := IsAlgebraic.exists_integral_multiple (R := ℤ) (z := b₀ i) (Algebra.IsAlgebraic.isAlgebraic _)
+    obtain ⟨y, hy, h⟩ :=
+      IsAlgebraic.exists_integral_multiple (R := ℤ) (z := b₀ i) (Algebra.IsAlgebraic.isAlgebraic _)
     refine ⟨(y * y).natAbs, Int.natAbs_pos.2 (mul_ne_zero hy hy), ?_⟩
     have h1 : (((y * y).natAbs : ℕ) : E) = (y : E) * (y : E) := by
       rw [← Int.cast_natCast, Int.natAbs_of_nonneg (mul_self_nonneg y), Int.cast_mul]
@@ -86,8 +90,11 @@ theorem GlobalTheory.HeckeExtend.CE_isOpen : ∀ (F E : Type) [Field F] [NumberF
     intro z hz
     have hz' : ∀ i, B.repr z i ∈ intF F (N * d i) := fun i => Set.mem_iInter.1 hz i
     choose s hs hsx using fun i => exists_intF_one_mul (N * d i) (Nat.mul_pos hN (hd i)) (hz' i)
-    refine mem_CE.2 ⟨∑ i, algebraMap (AF F) (AF F ⊗[F] E) (s i) * incAF F E ((⟨(d i : E) * b₀ i, hdint i⟩ : 𝓞 E) : E),
-      sum_mem fun i _ => AddSubgroup.subset_closure ⟨s i, hs i, ⟨(d i : E) * b₀ i, hdint i⟩, rfl⟩, ?_⟩
+    refine mem_CE.2 ⟨
+      ∑ i, algebraMap (AF F) (AF F ⊗[F] E) (s i) * incAF F E ((⟨(d i : E) * b₀ i, hdint i⟩ : 𝓞 E) : E),
+      sum_mem fun i _ => AddSubgroup.subset_closure ⟨s i, hs i, ⟨(d i : E) * b₀ i, hdint i⟩, rfl⟩,
+      ?_
+    ⟩
     rw [Finset.smul_sum]
     conv_rhs => rw [← B.sum_repr z]
     refine Finset.sum_congr rfl fun i _ => ?_

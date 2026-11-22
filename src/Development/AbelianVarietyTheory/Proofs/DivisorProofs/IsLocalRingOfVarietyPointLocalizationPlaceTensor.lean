@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToQMemMaxima
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair GlobalTheory.GraphLocal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair GlobalTheory.GraphLocal
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -21,8 +23,8 @@ namespace GlobalTheory.GraphLocal
 
 variable {K κ' : Type} [Field K] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ']
 
-theorem exists_mul_mem_tens (E : Place (algebraMap ℂ K)) (w : K ⊗[ℂ] κ') :
-    ∃ d ∈ E.ring, d ≠ 0 ∧ (d ⊗ₜ[ℂ] (1 : κ')) * w ∈ tens (κ' := κ') (placeAlg E) := by
+theorem exists_mul_mem_tens (E : Place (algebraMap ℂ K)) (w : K ⊗[ℂ] κ')
+    : ∃ d ∈ E.ring, d ≠ 0 ∧ (d ⊗ₜ[ℂ] (1 : κ')) * w ∈ tens (κ' := κ') (placeAlg E) := by
   induction w using TensorProduct.induction_on with
   | zero => exact ⟨1, one_mem _, one_ne_zero, by simpa using zero_mem _⟩
   | tmul x y =>
@@ -38,32 +40,36 @@ theorem exists_mul_mem_tens (E : Place (algebraMap ℂ K)) (w : K ⊗[ℂ] κ') 
     obtain ⟨d₁, hd₁, hd₁0, h₁⟩ := hu
     obtain ⟨d₂, hd₂, hd₂0, h₂⟩ := hv
     refine ⟨d₁ * d₂, mul_mem hd₁ hd₂, mul_ne_zero hd₁0 hd₂0, ?_⟩
-    have e : ((d₁ * d₂) ⊗ₜ[ℂ] (1 : κ')) * (u + v) =
-        (d₂ ⊗ₜ[ℂ] (1 : κ')) * ((d₁ ⊗ₜ[ℂ] (1 : κ')) * u) +
-          (d₁ ⊗ₜ[ℂ] (1 : κ')) * ((d₂ ⊗ₜ[ℂ] (1 : κ')) * v) := by
+    have e
+        : ((d₁ * d₂) ⊗ₜ[ℂ] (1 : κ')) * (u + v)
+          = (d₂ ⊗ₜ[ℂ] (1 : κ')) * ((d₁ ⊗ₜ[ℂ] (1 : κ')) * u)
+            + (d₁ ⊗ₜ[ℂ] (1 : κ')) * ((d₂ ⊗ₜ[ℂ] (1 : κ')) * v) := by
       rw [← mul_assoc, ← mul_assoc, Algebra.TensorProduct.tmul_mul_tmul,
         Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_comm d₂ d₁, mul_add]
     rw [e]
     exact add_mem (mul_mem (tmul_mem hd₂ 1) h₁) (mul_mem (tmul_mem hd₁ 1) h₂)
 
-theorem isLocModel_locAt : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ'] [Algebra ℂ L]
-    [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L] [IsFractionRing (K ⊗[ℂ] κ') L]
-    (E : Place (algebraMap ℂ K)) (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime],
-  (∃ O' : Subring κ', IsLocModel (algebraMap ℂ κ') O') →
-  IsLocModel (algebraMap ℂ L) (locAt (L := L) 𝔭) := by
+theorem isLocModel_locAt
+    : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ'] [Algebra ℂ L]
+        [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L] [IsFractionRing (K ⊗[ℂ] κ') L]
+        (E : Place (algebraMap ℂ K)) (𝔭 : Ideal (tens (κ' := κ') (placeAlg E))) [𝔭.IsPrime],
+      (∃ O' : Subring κ', IsLocModel (algebraMap ℂ κ') O')
+        → IsLocModel (algebraMap ℂ L) (locAt (L := L) 𝔭) := by
   intro K κ' L _ _ _ _ _ _ _ _ _ E 𝔭 _ hO
   obtain ⟨O', hO'⟩ := hO
   have hinj : Function.Injective (algebraMap (K ⊗[ℂ] κ') L) := IsFractionRing.injective _ L
   have hc : ∀ a : ℂ, algebraMap ℂ L a ∈ locAt (L := L) 𝔭 := fun a => by
     rw [IsScalarTower.algebraMap_apply ℂ (K ⊗[ℂ] κ') L]
     exact (toQ (L := L) 𝔭 (algebraMap ℂ (tens (κ' := κ') (placeAlg E)) a)).2
-  refine
-    { const_mem := hc
-      isLocalRing := isLocalRing_locAt 𝔭 hinj
-      essFiniteType := ?_
-      frac := ?_ }
-  · have e : (algebraMap ℂ L).codRestrict (locAt (L := L) 𝔭) hc =
-        (toQ (L := L) 𝔭).comp (algebraMap ℂ (tens (κ' := κ') (placeAlg E))) := by
+  refine {
+    const_mem := hc
+    isLocalRing := isLocalRing_locAt 𝔭 hinj
+    essFiniteType := ?_
+    frac := ?_
+  }
+  · have e
+        : (algebraMap ℂ L).codRestrict (locAt (L := L) 𝔭) hc
+          = (toQ (L := L) 𝔭).comp (algebraMap ℂ (tens (κ' := κ') (placeAlg E))) := by
       ext a
       simp only [RingHom.codRestrict_apply, RingHom.comp_apply, coe_toQ]
       exact IsScalarTower.algebraMap_apply ℂ (K ⊗[ℂ] κ') L a
@@ -132,13 +138,13 @@ theorem isLocModel_locAt : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] 
       rw [hD2, mul_assoc]; exact mul_mem (tmul_mem hd₁ 1) h₂
     have hDu : IsUnit D := by
       refine IsUnit.of_mul_eq_one ((d₁ * d₂)⁻¹ ⊗ₜ[ℂ] (1 : κ')) ?_
-      rw [hD, Algebra.TensorProduct.tmul_mul_tmul, mul_one,
-        mul_inv_cancel₀ (mul_ne_zero hd₁0 hd₂0)]
+      rw [hD, Algebra.TensorProduct.tmul_mul_tmul, mul_one, mul_inv_cancel₀ (mul_ne_zero hd₁0 hd₂0)]
       rfl
     have hD0 : algebraMap (K ⊗[ℂ] κ') L D ≠ 0 := (hDu.map _).ne_zero
     refine ⟨_, (toQ (L := L) 𝔭 ⟨D * u, hu⟩).2, _, (toQ (L := L) 𝔭 ⟨D * v, hv'⟩).2, ?_, ?_⟩
     · show algebraMap (K ⊗[ℂ] κ') L (D * v) ≠ 0
-      rw [map_mul]; exact mul_ne_zero hD0 hv0
+      rw [map_mul]
+      exact mul_ne_zero hD0 hv0
     · show _ * algebraMap (K ⊗[ℂ] κ') L (D * v) = algebraMap (K ⊗[ℂ] κ') L (D * u)
       rw [map_mul, map_mul]
       field_simp

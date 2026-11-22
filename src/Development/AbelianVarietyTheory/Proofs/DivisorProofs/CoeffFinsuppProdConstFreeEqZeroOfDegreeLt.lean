@@ -4,13 +4,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.DivMono
 
-theorem coeff_finsuppProd_eq_zero_of_degree_lt :
-    ∀ (R : Type) [CommRing R] (σ τ : Type) (u : τ → MvPowerSeries σ R), (∀ j, constantCoeff (u j) = 0) →
-      ∀ (α : τ →₀ ℕ) (β : σ →₀ ℕ), β.degree < α.degree → coeff β (α.prod fun j e => u j ^ e) = 0 := by
+theorem coeff_finsuppProd_eq_zero_of_degree_lt
+    : ∀ (R : Type) [CommRing R] (σ τ : Type) (u : τ → MvPowerSeries σ R),
+      (∀ j, constantCoeff (u j) = 0)
+        → ∀ (α : τ →₀ ℕ) (β : σ →₀ ℕ),
+          β.degree < α.degree → coeff β (α.prod fun j e => u j ^ e) = 0 := by
   intro R _ σ τ u hu α β hβ
   apply coeff_of_lt_order
   have hle : ((α.degree : ℕ) : ℕ∞) ≤ (α.prod fun j e => u j ^ e).order := by

@@ -13,21 +13,25 @@ open Formalism.MainNotions.S.Loc
 
 namespace PI.LocHerm.OProj
 
-def Concl {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+def Concl
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
     {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-    (M : Model F E) : Prop :=
-  ∀ (W : Type) [AddCommGroup W] [Module E W] (P : Submodule M.L.O W), P.FG →
-    Module.Projective M.L.O P
+    (M : Model F E)
+    : Prop :=
+  ∀ (W : Type) [AddCommGroup W] [Module E W] (P : Submodule M.L.O W),
+    P.FG → Module.Projective M.L.O P
 
 def SqCase : Prop :=
   AllLoc fun {F} _ _ _ {E} _ _ _ _ M =>
-  ∀ θ ∈ M.L.O, M.L.cj θ = -θ → ∀ D : 𝒪[F], (D : F) ≠ 0 → θ * θ = algebraMap F E D →
-    (∃ s : F, s * s = D) → Concl M
+    ∀ θ ∈ M.L.O,
+      M.L.cj θ = -θ
+        → ∀ D : 𝒪[F], (D : F) ≠ 0 → θ * θ = algebraMap F E D → (∃ s : F, s * s = D) → Concl M
 
 def NonSqCase : Prop :=
   AllLoc fun {F} _ _ _ {E} _ _ _ _ M =>
-  ∀ θ ∈ M.L.O, M.L.cj θ = -θ → ∀ D : 𝒪[F], (D : F) ≠ 0 → θ * θ = algebraMap F E D →
-    (¬ ∃ s : F, s * s = D) → Concl M
+    ∀ θ ∈ M.L.O,
+      M.L.cj θ = -θ
+        → ∀ D : 𝒪[F], (D : F) ≠ 0 → θ * θ = algebraMap F E D → (¬ ∃ s : F, s * s = D) → Concl M
 
 theorem locOProj_of (hS : SqCase) (hN : NonSqCase) : PI.LocHerm.LocOProj := by
   intro F _ _ _ E _ _ _ _ M hM

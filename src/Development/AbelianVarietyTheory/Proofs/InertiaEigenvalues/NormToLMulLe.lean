@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WordApp
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC GroundTheory.Global GroundTheory.Global.IdeleGroup
+open NumberField Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+  GlobalTheory.UnitaryBC GroundTheory.Global GroundTheory.Global.IdeleGroup
 open scoped Pointwise
 
 noncomputable section
@@ -25,24 +26,27 @@ namespace GlobalTheory.MSpanDecay.ColConvGrowth
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem norm_toL_mul_le (M P : Matrix (Fin a) (Fin a) (Cinf E)) :
-    ‖toL (M * P)‖ ≤ (a : ℝ) * ‖toL M‖ * ‖toL P‖ := by
+theorem norm_toL_mul_le (M P : Matrix (Fin a) (Fin a) (Cinf E))
+    : ‖toL (M * P)‖ ≤ (a : ℝ) * ‖toL M‖ * ‖toL P‖ := by
   have hM : ∀ i k, ‖M i k‖ ≤ ‖toL M‖ := fun i k =>
     (norm_le_pi_norm (toL M i) k).trans (norm_le_pi_norm (toL M) i)
   have hP : ∀ i k, ‖P i k‖ ≤ ‖toL P‖ := fun i k =>
     (norm_le_pi_norm (toL P i) k).trans (norm_le_pi_norm (toL P) i)
-  refine pi_norm_le_iff_of_nonneg (by positivity) |>.2 fun i =>
-    pi_norm_le_iff_of_nonneg (by positivity) |>.2 fun j => ?_
+  refine pi_norm_le_iff_of_nonneg (by positivity)
+    |>.2 fun i => pi_norm_le_iff_of_nonneg (by positivity) |>.2 fun j => ?_
   change ‖(M * P) i j‖ ≤ _
   rw [Matrix.mul_apply]
-  calc ‖∑ k, M i k * P k j‖ ≤ ∑ k, ‖M i k * P k j‖ := norm_sum_le _ _
-    _ ≤ ∑ _k : Fin a, ‖toL M‖ * ‖toL P‖ := Finset.sum_le_sum fun k _ =>
+  calc
+    ‖∑ k, M i k * P k j‖
+      ≤ ∑ k, ‖M i k * P k j‖ := norm_sum_le _ _
+    _ ≤ ∑ _k : Fin a, ‖toL M‖ * ‖toL P‖ :=
+      Finset.sum_le_sum fun k _ =>
         (norm_mul_le _ _).trans (mul_le_mul (hM i k) (hP k j) (norm_nonneg _) (norm_nonneg _))
     _ = (a : ℝ) * ‖toL M‖ * ‖toL P‖ := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_assoc]
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_assoc]
 
-theorem height_mul_le (y u : GL (Fin a) (Cinf E)) :
-    height (y * u) ≤ ((a : ℝ) + 1) * height y * height u := by
+theorem height_mul_le (y u : GL (Fin a) (Cinf E))
+    : height (y * u) ≤ ((a : ℝ) + 1) * height y * height u := by
   have h1 := norm_toL_mul_le y.val u.val
   have h2 := norm_toL_mul_le (u⁻¹).val (y⁻¹).val
   have e1 : (y * u).val = y.val * u.val := rfl

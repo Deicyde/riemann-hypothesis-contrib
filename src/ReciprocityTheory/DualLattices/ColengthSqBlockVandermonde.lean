@@ -14,11 +14,13 @@ open ReciprocityTheory.PGsh.L2
 
 variable {C : Type} [Field C] {v : Valuation C NNReal}
 
-def sumLat {n s : ℕ} (Mτ : Fin n → Lat v (Fin s)) : Lat v (Fin n × Fin s) :=
-  ⟨Matrix.reindex (Equiv.prodComm (Fin s) (Fin n)) (Equiv.prodComm (Fin s) (Fin n))
-      (Matrix.blockDiagonal fun τ => (Mτ τ).B), by
+def sumLat {n s : ℕ} (Mτ : Fin n → Lat v (Fin s)) : Lat v (Fin n × Fin s) := ⟨
+  Matrix.reindex (Equiv.prodComm (Fin s) (Fin n)) (Equiv.prodComm (Fin s) (Fin n))
+    (Matrix.blockDiagonal fun τ => (Mτ τ).B),
+  by
     rw [Matrix.det_reindex_self, Matrix.det_blockDiagonal]
-    exact Finset.prod_ne_zero_iff.2 fun τ _ => (Mτ τ).det_ne⟩
+    exact Finset.prod_ne_zero_iff.2 fun τ _ => (Mτ τ).det_ne
+⟩
 
 lemma sumLat_apply {n s : ℕ} (Mτ : Fin n → Lat v (Fin s)) (x y : Fin n × Fin s) :
     (sumLat Mτ).B x y = if x.1 = y.1 then (Mτ x.1).B x.2 y.2 else 0 := by

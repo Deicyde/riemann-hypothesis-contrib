@@ -61,7 +61,9 @@ theorem Sc_ge (P : ParameterChoice' D L) : 4096 * (D.R.k : ℝ) ^ 2 ≤ L.Sc := 
   have hD := P.Del_ge.2.2.2
   have hm : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
   have hm10 : (1024 : ℝ) ≤ (D.R.m : ℝ) ^ 10 := by
-    calc (1024 : ℝ) = 2 ^ 10 := by norm_num
+    calc
+      (1024 : ℝ)
+        = 2 ^ 10 := by norm_num
       _ ≤ (D.R.m : ℝ) ^ 10 := pow_le_pow_left₀ (by norm_num) hm 10
   have hN : (D.R.k : ℝ) ≤ (D.R.N D.R.m : ℝ) := by
     have : D.R.k ≤ D.R.N D.R.m := by unfold Ranks.N; omega
@@ -96,18 +98,22 @@ theorem bT_le' (P : ParameterChoice' D L) (t : D.host.TT) : (L.bT t : ℝ) ≤ 5
   have h4 := P.rho_le
   unfold LevelStarExponents.rhoP at h4
   have h5 : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k ≤ 1 / 4 := by
-    have : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k =
-      4 * (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) := by ring
+    have : 4 * LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k
+        = 4 * (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) := by
+      ring
     linarith
-  have h6 : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k =
-      (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) * L.sc.b' := by ring
+  have h6
+      : LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG * L.sc.b' / D.R.k
+        = (LevelStarExponents.Nstar L * L.sc.x ^ L.sc.eps * L.LaG / D.R.k) * L.sc.b' := by
+    ring
   have h7 := P.bT_le t
   rw [h6] at h7
   nlinarith [L.sc.b'_pos]
 
 end ParameterChoice'
 
-theorem SizeData₂.aT_le' {D : D7} (L : SizeData₂ D) (t : D.host.TT) : (L.aT t : ℝ) ≤ 6 / 5 * L.sc.a := by
+theorem SizeData₂.aT_le' {D : D7} (L : SizeData₂ D) (t : D.host.TT)
+    : (L.aT t : ℝ) ≤ 6 / 5 * L.sc.a := by
   have hk : (5 : ℝ) ≤ D.R.k := by exact_mod_cast D.R.five_le_k
   have hx : (1 : ℝ) ≤ L.sc.x ^ (Scale.A / 2) :=
     Real.one_le_rpow L.sc.one_lt_alt.le (by unfold Scale.A; norm_num)
@@ -122,12 +128,14 @@ variable {D : D7}
 
 def lamFst (D : D7) : Fin (D.R.N 0) := ⟨0, by have := D.R.five_le_k; simp only [Ranks.N]; omega⟩
 
-def lamLst (D : D7) : Fin (D.R.N 0) := ⟨D.R.k - 1, by have := D.R.five_le_k; simp only [Ranks.N]; omega⟩
+def lamLst (D : D7) : Fin (D.R.N 0) :=
+  ⟨D.R.k - 1, by have := D.R.five_le_k; simp only [Ranks.N]; omega⟩
 
-theorem columnWeight_spread_eq (u : D.what₂.Word) (τ : D.what₂.Tau) :
-    ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ) =
-      (((D.hc τ).u ⟨0, by have := D.R.five_le_k; omega⟩ : ℚ) : ℝ) -
-        (((D.hc τ).u ⟨D.R.k - 1, by have := D.R.five_le_k; omega⟩ : ℚ) : ℝ) - ((D.R.k : ℝ) - 1) := by
+theorem columnWeight_spread_eq (u : D.what₂.Word) (τ : D.what₂.Tau)
+    : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ)
+      = (((D.hc τ).u ⟨0, by have := D.R.five_le_k; omega⟩ : ℚ) : ℝ)
+        - (((D.hc τ).u ⟨D.R.k - 1, by have := D.R.five_le_k; omega⟩ : ℚ) : ℝ)
+        - ((D.R.k : ℝ) - 1) := by
   have hk := D.R.five_le_k
   have h0 := (D.fm u).lam_eq 0 (Nat.zero_le _) τ (lamFst D)
   have h1 := (D.fm u).lam_eq 0 (Nat.zero_le _) τ (lamLst D)
@@ -138,11 +146,11 @@ theorem columnWeight_spread_eq (u : D.what₂.Word) (τ : D.what₂.Tau) :
   simp only [hcToWeightQ, rhoVec, lamFst, lamLst] at h0 h1
   rw [D.hcW_first u τ (by omega)] at h0
   rw [D.hcW_last u τ (by omega)] at h1
-  have hc : ((D.R.k - 1 : ℕ) : ℚ) = (D.R.k : ℚ) - 1 := by
-    rw [Nat.cast_sub (by omega)]; simp
+  have hc : ((D.R.k - 1 : ℕ) : ℚ) = (D.R.k : ℚ) - 1 := by rw [Nat.cast_sub (by omega)]; simp
   rw [hc] at h1
-  have hq : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℚ) =
-      (D.hc τ).u ⟨0, by omega⟩ - (D.hc τ).u ⟨D.R.k - 1, by omega⟩ - ((D.R.k : ℚ) - 1) := by
+  have hq
+      : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℚ)
+        = (D.hc τ).u ⟨0, by omega⟩ - (D.hc τ).u ⟨D.R.k - 1, by omega⟩ - ((D.R.k : ℚ) - 1) := by
     push_cast
     simp only [lamFst, lamLst]
     rw [h0, h1]
@@ -154,19 +162,22 @@ theorem columnWeight_spread_eq (u : D.what₂.Word) (τ : D.what₂.Tau) :
 
 variable {L : SizeData₂ D}
 
-theorem columnWeight_spread_at_top (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what₂.Tau) (t : D.host.TT)
-    (ht : (D.eTau τ : D.R.GG) = D.R.tau1 t) :
-    ((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) = L.aT t + L.bT t := by
+theorem columnWeight_spread_at_top
+    (L : SizeData₂ D) (u : D.what₂.Word)
+    (τ : D.what₂.Tau) (t : D.host.TT) (ht : (D.eTau τ : D.R.GG) = D.R.tau1 t)
+    : ((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) = L.aT t + L.bT t := by
   have h := columnWeight_spread_eq u τ
   obtain ⟨h1, h2⟩ := L.top_u τ t (by have := D.R.five_le_k; omega) ht
   rw [h1, h2] at h
-  have : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ) = ((L.aT t + L.bT t : ℤ) : ℝ) := by
+  have : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ)
+      = ((L.aT t + L.bT t : ℤ) : ℝ) := by
     rw [h]; push_cast; ring
   exact_mod_cast this
 
-theorem columnWeight_spread_off_top (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (ht : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces) :
-    ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ) ≤ 3 * L.Sc := by
+theorem columnWeight_spread_off_top
+    (P : ParameterChoice' D L) (u : D.what₂.Word)
+    (τ : D.what₂.Tau) (ht : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces)
+    : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ) ≤ 3 * L.Sc := by
   have hk := D.R.five_le_k
   have hkR := P.five_le_k
   rw [columnWeight_spread_eq u τ]
@@ -178,8 +189,9 @@ theorem columnWeight_spread_off_top (P : ParameterChoice' D L) (u : D.what₂.Wo
   push_cast at h1 ⊢
   linarith
 
-theorem columnWeight_spread_le (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau) :
-    ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ) ≤ 3 * L.sc.a := by
+theorem columnWeight_spread_le (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    : ((((D.fm u).lam 0 τ).w (lamFst D) - ((D.fm u).lam 0 τ).w (lamLst D) : ℤ) : ℝ)
+      ≤ 3 * L.sc.a := by
   by_cases ht : (D.eTau τ : D.R.GG) ∈ D.host.topPlaces
   · obtain ⟨t, htT, hte⟩ := Finset.mem_image.mp ht
     rw [columnWeight_spread_at_top L u τ ⟨t, htT⟩ hte.symm]
@@ -192,26 +204,44 @@ theorem columnWeight_spread_le (P : ParameterChoice' D L) (u : D.what₂.Word) (
     have h2 := P.Sc_le
     linarith [L.Sc_pos]
 
-theorem gat_ell_le (P : ParameterChoice' D L) (T : GatTies D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+theorem gat_ell_le
+    (P : ParameterChoice' D L)
+    (T : GatTies D)
+    (u : D.what₂.Word) (w : D.what₂.places.Pl)
     (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) (v : Fin (D.gat u w h).P.nV)
-    (s : Fin ((D.gat u w h).P.n' v)) :
-    (((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _) : ℤ) : ℝ) ≤ 3 * L.sc.a := by
+    (s : Fin ((D.gat u w h).P.n' v))
+    : (((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _) : ℤ) : ℝ)
+      ≤ 3 * L.sc.a := by
   have hk := T.gat_k u w h
   rw [T.gat_lam u w h v s 0, T.gat_lam u w h v s (Fin.last _)]
-  have e0 : (⟨(0 : Fin ((D.gat u w h).P.m + 1)).1, by
-      have h1 := T.gat_k u w h; simp only [Ranks.N]; simp; omega⟩ : Fin (D.R.N 0)) = lamFst D := rfl
-  have e1 : (⟨(Fin.last (D.gat u w h).P.m).1, by
-      have h1 := T.gat_k u w h; simp only [Ranks.N]; simp; omega⟩ : Fin (D.R.N 0)) = lamLst D := by
+  have e0
+      : (⟨
+           (0 : Fin ((D.gat u w h).P.m + 1)).1,
+           by have h1 := T.gat_k u w h; simp only [Ranks.N]; simp; omega
+         ⟩
+          : Fin (D.R.N 0))
+        = lamFst D :=
+    rfl
+  have e1
+      : (⟨
+           (Fin.last (D.gat u w h).P.m).1,
+           by have h1 := T.gat_k u w h; simp only [Ranks.N]; simp; omega
+         ⟩
+          : Fin (D.R.N 0))
+        = lamLst D := by
     apply Fin.ext
     simp only [lamLst, Fin.val_last]
     omega
   rw [e0, e1]
   exact columnWeight_spread_le P u _
 
-theorem gat_ellWt_le (P : ParameterChoice' D L) (T : GatTies D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+theorem gat_ellWt_le
+    (P : ParameterChoice' D L)
+    (T : GatTies D)
+    (u : D.what₂.Word) (w : D.what₂.places.Pl)
     (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) (v : Fin (D.gat u w h).P.nV)
-    (s : Fin ((D.gat u w h).P.n' v)) :
-    (ellWt ((D.gat u w h).P.lam0 v s) : ℝ) ≤ 3 * L.sc.a := by
+    (s : Fin ((D.gat u w h).P.n' v))
+    : (ellWt ((D.gat u w h).P.lam0 v s) : ℝ) ≤ 3 * L.sc.a := by
   have h1 := gat_ell_le P T u w h v s
   have h2 : 0 ≤ (D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _) := by
     have := (D.gat u w h).P.dom v s (Fin.zero_le (Fin.last _))
@@ -219,15 +249,16 @@ theorem gat_ellWt_le (P : ParameterChoice' D L) (T : GatTies D) (u : D.what₂.W
   have h3 : lastIdx ((D.gat u w h).P.m + 1) = Fin.last _ := rfl
   unfold ellWt
   rw [h3]
-  have h4 : ((((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _)).toNat : ℕ) : ℝ) =
-      (((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _) : ℤ) : ℝ) := by
+  have h4
+      : ((((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _)).toNat : ℕ) : ℝ)
+        = (((D.gat u w h).P.lam0 v s 0 - (D.gat u w h).P.lam0 v s (Fin.last _) : ℤ) : ℝ) := by
     have := Int.toNat_of_nonneg h2
     exact_mod_cast this
   rw [h4]
   exact h1
 
-theorem ellWt_lamAt {n' m : ℕ} (lam0 : Fin n' → Fin (m + 1) → ℤ) (s : Fin n') :
-    ellWt (lamAt lam0 s) = ellWt (lam0 s) := by
+theorem ellWt_lamAt {n' m : ℕ} (lam0 : Fin n' → Fin (m + 1) → ℤ) (s : Fin n')
+    : ellWt (lamAt lam0 s) = ellWt (lam0 s) := by
   have h3 : lastIdx (m + 1) = Fin.last _ := rfl
   unfold ellWt lamAt
   rw [h3]
@@ -237,10 +268,13 @@ theorem ellWt_lamAt {n' m : ℕ} (lam0 : Fin n' → Fin (m + 1) → ℤ) (s : Fi
     congr 1
     ring
 
-theorem gat_ellWt_lamAt_le (P : ParameterChoice' D L) (T : GatTies D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+theorem gat_ellWt_lamAt_le
+    (P : ParameterChoice' D L)
+    (T : GatTies D)
+    (u : D.what₂.Word) (w : D.what₂.places.Pl)
     (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) (v : Fin (D.gat u w h).P.nV)
-    (s : Fin ((D.gat u w h).P.n' v)) :
-    (ellWt (lamAt ((D.gat u w h).P.lam0 v) s) : ℝ) ≤ 3 * L.sc.a := by
+    (s : Fin ((D.gat u w h).P.n' v))
+    : (ellWt (lamAt ((D.gat u w h).P.lam0 v) s) : ℝ) ≤ 3 * L.sc.a := by
   rw [ellWt_lamAt]
   exact gat_ellWt_le P T u w h v s
 

@@ -11,14 +11,15 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIsoApp
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.CompanionTheory.Ar.Approx
 
-theorem connectedSpace_of_isField_globalFunctions (Z : Scheme.{0}) (h : IsField Γ(Z, ⊤)) :
-    ConnectedSpace Z := by
+theorem connectedSpace_of_isField_globalFunctions (Z : Scheme.{0}) (h : IsField Γ(Z, ⊤))
+    : ConnectedSpace Z := by
   have hne : Nonempty Z := by
     by_contra hZ
     have hb : (⊤ : Z.Opens) = ⊥ := by
@@ -39,16 +40,17 @@ theorem connectedSpace_of_isField_globalFunctions (Z : Scheme.{0}) (h : IsField 
     · right
       obtain ⟨b, hb⟩ := h.mul_inv_cancel h0
       have h1 : e = 1 := by
-        calc e = e * e * b := by rw [_root_.mul_assoc, hb, _root_.mul_one]
+        calc
+          e = e * e * b := by rw [_root_.mul_assoc, hb, _root_.mul_one]
           _ = e * b := by rw [he]
           _ = 1 := hb
       rw [← hUe, h1, Z.basicOpen_of_isUnit isUnit_one]
       rfl
   exact { toPreconnectedSpace := hp, toNonempty := hne }
 
-theorem geometricallyConnected_of_isIso_appTop :
-    ∀ (K : Type) [Field K] (X : Scheme.{0}) (p : X ⟶ Sp K), QuasiCompact p → QuasiSeparated p →
-      IsIso p.appTop → GeometricallyConnected p := by
+theorem geometricallyConnected_of_isIso_appTop
+    : ∀ (K : Type) [Field K] (X : Scheme.{0}) (p : X ⟶ Sp K),
+      QuasiCompact p → QuasiSeparated p → IsIso p.appTop → GeometricallyConnected p := by
   intro K _ X p _ _ _
   refine ⟨fun L _ y Z a q H => ?_⟩
   have hy : Flat y := by

@@ -7,12 +7,19 @@ public import GroundTheory.GlobalFields.CyclotomicCharacters.ProfinitePadic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ GlobalTheory.Glue
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ
+  GlobalTheory.Glue
 
 namespace GlobalTheory
 
-theorem fixed_cycMod_of_fixed_cycZ : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ (F : Finset Ω) (y : Ω), (∀ s ∈ Ine (F := ℚ) A, (∀ z ∈ F, s z = z) → cycZ ℚ Ω l s = 1 → s y = y) →
-  ∃ m : ℕ, ∀ s : G ℚ Ω, s ∈ Ine (F := ℚ) A ∧ (∀ z ∈ F, s z = z) ∧ cycMod ℚ Ω l m s = 1 → s y = y := by
+theorem fixed_cycMod_of_fixed_cycZ
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+        (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1
+        → ∀ (F : Finset Ω) (y : Ω),
+          (∀ s ∈ Ine (F := ℚ) A, (∀ z ∈ F, s z = z) → cycZ ℚ Ω l s = 1 → s y = y)
+            → ∃ m : ℕ, ∀ s : G ℚ Ω,
+              s ∈ Ine (F := ℚ) A ∧ (∀ z ∈ F, s z = z) ∧ cycMod ℚ Ω l m s = 1 → s y = y := by
   intro l _ Ω _ _ _ A _ F y hy
   haveI : CompactSpace (G ℚ Ω) := inferInstanceAs (CompactSpace (Ω ≃ₐ[ℚ] Ω))
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
@@ -21,7 +28,8 @@ theorem fixed_cycMod_of_fixed_cycZ : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [F
   have : FiniteDimensional ℚ K :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsAlgebraic.isAlgebraic y).isIntegral
   have hSo : IsOpen (MulAction.stabilizer (G ℚ Ω) y : Set (G ℚ Ω)) := by
-    refine Subgroup.isOpen_mono (H₁ := K.fixingSubgroup) ?_ (IntermediateField.fixingSubgroup_isOpen K)
+    refine Subgroup.isOpen_mono (H₁ := K.fixingSubgroup) ?_
+      (IntermediateField.fixingSubgroup_isOpen K)
     intro g hg
     exact (IntermediateField.mem_fixingSubgroup_iff K g).mp hg y
       (IntermediateField.subset_adjoin ℚ _ (Set.mem_singleton y))
@@ -31,8 +39,9 @@ theorem fixed_cycMod_of_fixed_cycZ : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [F
   have hH0c : IsClosed H0 :=
     (isClosed_Ine A).inter (isClosed_biInter fun z _ => isClosed_setOf_apply z (fun t => t = z))
 
-  have hcm : ∀ (m : ℕ) (s : G ℚ Ω), cycMod ℚ Ω l m s = 1 ↔
-      PadicInt.toZModPow m ((cycZ ℚ Ω l s : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
+  have hcm
+      : ∀ (m : ℕ) (s : G ℚ Ω),
+        cycMod ℚ Ω l m s = 1 ↔ PadicInt.toZModPow m ((cycZ ℚ Ω l s : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
     intro m s; rw [Units.ext_iff]; rfl
   set C : ℕ → Set (G ℚ Ω) := fun m =>
     (H0 ∩ {s | PadicInt.toZModPow m ((cycZ ℚ Ω l s : ℤ_[l]ˣ) : ℤ_[l]) = 1}) ∩ Sᶜ with hC
@@ -58,8 +67,10 @@ theorem fixed_cycMod_of_fixed_cycZ : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [F
     exact hs2
   have hdir : Directed (· ⊇ ·) C := fun m k =>
     ⟨max m k, hmono m _ (le_max_left m k), hmono k _ (le_max_right m k)⟩
-  obtain ⟨s, hs⟩ := IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed C hdir hCn
-    (fun m => (hCc m).isCompact) hCc
+  obtain ⟨s, hs⟩ :=
+    IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed C hdir hCn
+      (fun m => (hCc m).isCompact)
+      hCc
   simp only [Set.mem_iInter] at hs
   obtain ⟨⟨h0i, h0f⟩, -⟩ := (hs 0).1
   have hz : cycZ ℚ Ω l s = 1 := by

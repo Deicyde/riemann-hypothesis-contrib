@@ -8,14 +8,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.TrueGeo GlobalTheory.ShFam
+open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
+  Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.TrueGeo GlobalTheory.ShFam
 
 namespace GlobalTheory.ShFam
 
-def shimXOfPkg {D : D7} {G : DV.Geo D.what₂.LL} {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)} {ng : NgPkg}
-    {N j : ℕ} {Comp : Type} [Fintype Comp] [Nonempty Comp] (cx : CxPkg D.what₂.Tau N j Comp)
-    (alg : AlgPkg G D.what₂.Tau N Comp) (pad : PadPkg D N j Comp jC ng) (h : 1 ≤ j ∧ j < N) (lev : Finset ℕ)
-    (hlev : ∀ p ∈ lev, p.Prime) : DV.ShimX D.what₂.Tau where
+def shimXOfPkg
+    {D : D7} {G : DV.Geo D.what₂.LL} {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)}
+    {ng : NgPkg} {N j : ℕ} {Comp : Type} [Fintype Comp] [Nonempty Comp]
+    (cx : CxPkg D.what₂.Tau N j Comp) (alg : AlgPkg G D.what₂.Tau N Comp)
+    (pad : PadPkg D N j Comp jC ng) (h : 1 ≤ j ∧ j < N)
+    (lev : Finset ℕ) (hlev : ∀ p ∈ lev, p.Prime)
+    : DV.ShimX D.what₂.Tau where
   N := N
   j := j
   j_pos := h.1
@@ -69,7 +74,9 @@ def shimXOfPkg {D : D7} {G : DV.Geo D.what₂.LL} {jC : ∀ (p : ℕ) [Fact p.Pr
   Mbar := alg.Mbar
 
 section
-variable {D : D7} {A : Amb D} {F : SrcFam A} {L : CmList A} {C : CxSt D.what₂.LL} (K : CutSt C) (R : ResSt C)
+variable
+  {D : D7} {A : Amb D} {F : SrcFam A} {L : CmList A} {C : CxSt D.what₂.LL}
+  (K : CutSt C) (R : ResSt C)
   {jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)} {ng : NgPkg} (k : Kits F L C jC ng)
 
 end

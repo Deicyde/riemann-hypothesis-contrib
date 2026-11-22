@@ -7,27 +7,40 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpecM
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum GlobalTheory.Mum.Desc
 
-theorem GlobalTheory.Mum.Desc.lab_onto_of_labExt : ∀ (R : Type) [CommRing R] [IsDomain R] [CharZero R] (D : DegPre R) (A : PolAV (Sp (FractionRing R))) (N : ℕ), 1 ≤ N → ∀ (lab : QkPt D (Kb R) N → (TFK (R := R) (Kb R) ⟶ A.A)) (F : Type) [Field F] [IsAlgClosed F] [Algebra (FractionRing R) F] (em : Kb R →ₐ[FractionRing R] F) (lab' : QkPt D F N → (TFK (R := R) F ⟶ A.A)), LabExt em lab lab' → (∀ x : TFK (R := R) F ⟶ A.A, x ^ N = 1 ↔ ∃ p, lab' p = x) → ∀ x : TFK (R := R) (Kb R) ⟶ A.A, x ^ N = 1 ↔ ∃ p, lab p = x := by
+theorem GlobalTheory.Mum.Desc.lab_onto_of_labExt
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [CharZero R] (D : DegPre R)
+        (A : PolAV (Sp (FractionRing R))) (N : ℕ),
+      1 ≤ N
+        → ∀ (lab : QkPt D (Kb R) N → (TFK (R := R) (Kb R) ⟶ A.A)) (F : Type) [Field F]
+            [IsAlgClosed F] [Algebra (FractionRing R) F] (em : Kb R →ₐ[FractionRing R] F)
+            (lab' : QkPt D F N → (TFK (R := R) F ⟶ A.A)),
+          LabExt em lab lab' → (∀ x : TFK (R := R) F ⟶ A.A, x ^ N = 1 ↔ ∃ p, lab' p = x)
+            → ∀ x : TFK (R := R) (Kb R) ⟶ A.A, x ^ N = 1 ↔ ∃ p, lab p = x := by
   intro R _ _ _ D A N hN lab F _ _ _ em lab' hext hon x
   obtain ⟨h1, h2⟩ := GlobalTheory.T.levelPoints_algClosure_fractionRing_bijective R D F em N hN
   have cancel : ∀ y y' : TFK (R := R) (Kb R) ⟶ A.A, baseEm em ≫ y = baseEm em ≫ y' → y = y' := by
     intro y y' h
     apply Over.OverMorphism.ext
-    have spec_map_field_cancel {K C : Type} [Field K] [Field C] (gam : K →+* C)
-        {X : Scheme} (y y' : Sp K ⟶ X)
-        (h : spMap gam ≫ y = spMap gam ≫ y') : y = y' := by
+    have spec_map_field_cancel
+        {K C : Type} [Field K] [Field C]
+        (gam : K →+* C)
+        {X : Scheme} (y y' : Sp K ⟶ X) (h : spMap gam ≫ y = spMap gam ≫ y')
+        : y = y' := by
       obtain ⟨⟨p, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y
       obtain ⟨⟨p', φ'⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y'
       simp only [Scheme.SpecToEquivOfField_symm_apply] at h ⊢
-      have e : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
-          spMap gam ≫ (Spec.map ψ ≫ X.fromSpecResidueField q) =
-            (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
+      have e
+          : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
+            spMap gam ≫ (Spec.map ψ ≫ X.fromSpecResidueField q)
+              = (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
         intro q ψ
         simp only [Scheme.SpecToEquivOfField_symm_apply, spMap, Spec.map_comp, Category.assoc]
       rw [e, e] at h

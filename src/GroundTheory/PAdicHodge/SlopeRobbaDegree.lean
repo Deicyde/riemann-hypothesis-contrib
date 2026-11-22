@@ -18,15 +18,15 @@ open Filter Topology Laurent Module
 
 set_option linter.unusedSectionVars false
 
-variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable
+  {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
   [IsDiscreteValuationRing (normInteger K)]
-
 
 variable (K) in
 def dvUnif : K := ((IsDiscreteValuationRing.exists_irreducible (normInteger K)).choose : K)
 
-theorem irreducible_dvUnif :
-    Irreducible (IsDiscreteValuationRing.exists_irreducible (normInteger K)).choose :=
+theorem irreducible_dvUnif
+    : Irreducible (IsDiscreteValuationRing.exists_irreducible (normInteger K)).choose :=
   (IsDiscreteValuationRing.exists_irreducible (normInteger K)).choose_spec
 
 theorem norm_eq_one_of_isUnit {z : normInteger K} (hz : IsUnit z) : ‖(z : K)‖ = 1 := by

@@ -7,15 +7,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
 private theorem UpperTheory.V.LDataCardLeFinrank.transport_mem_NS
-    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {F' Ω' : Type} [Field F']
-    [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω'] {l : ℕ} [Fact l.Prime] (f : F →+* F')
-    (σ : Ω ≃+* Ω') (hσ : ∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x)) (φ : G F' Ω' →* G F Ω)
-    (h1 : Continuous φ) (h2 : ∀ g x, σ (φ g x) = g (σ x))
-    {S : Set (HeightOneSpectrum (𝓞 F))} (hS : S = Above F l) {S' : Set (HeightOneSpectrum (𝓞 F'))}
-    (hS' : S' = Above F' l) : NS Ω' S' ≤ (NS Ω S).comap φ := by
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {F' Ω' : Type} [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω']
+    {l : ℕ} [Fact l.Prime]
+    (f : F →+* F') (σ : Ω ≃+* Ω') (hσ : ∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x))
+    (φ : G F' Ω' →* G F Ω) (h1 : Continuous φ) (h2 : ∀ g x, σ (φ g x) = g (σ x))
+    {S : Set (HeightOneSpectrum (𝓞 F))} (hS : S = Above F l)
+    {S' : Set (HeightOneSpectrum (𝓞 F'))} (hS' : S' = Above F' l)
+    : NS Ω' S' ≤ (NS Ω S).comap φ := by
   have hN : (NS Ω S).Normal := Subgroup.is_normal_topologicalClosure _
   have hclosed : IsClosed ((NS Ω S).comap φ : Set (G F' Ω')) := (isClosed_NS Ω S).preimage h1
   haveI : ((NS Ω S).comap φ).Normal := hN.comap φ
@@ -35,11 +38,17 @@ private theorem UpperTheory.V.LDataCardLeFinrank.transport_mem_NS
   rw [hS'] at hv'
   exact fun h => hv' ((habove l).1 h)
 
-theorem UpperTheory.V.LDataCardLeFinrank.gsTransport :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (F' Ω' : Type) [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω'] (l : ℕ) [Fact l.Prime] (D : LData F Ω l) (D' : LData F' Ω' l) (f : F ≃+* F') (σ : Ω ≃+* Ω'), (∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x)) →
-      ∃ (φ : G F' Ω' ≃* G F Ω) (ψ : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F'))) ≃* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))),
-        Continuous φ ∧ Continuous φ.symm ∧ Continuous ψ ∧ Continuous ψ.symm ∧ (∀ g x, σ (φ g x) = g (σ x)) ∧
-        (∀ g, ψ (toGS Ω' _ g) = toGS Ω _ (φ g)) ∧ ∀ g, D.chi (ψ g) = D'.chi g := by
+theorem UpperTheory.V.LDataCardLeFinrank.gsTransport
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (F' Ω' : Type) [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω']
+        (l : ℕ) [Fact l.Prime] (D : LData F Ω l) (D' : LData F' Ω' l) (f : F ≃+* F') (σ : Ω ≃+* Ω'),
+      (∀ x, σ (algebraMap F Ω x) = algebraMap F' Ω' (f x))
+        → ∃ (φ : G F' Ω' ≃* G F Ω)
+            (ψ : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F')))
+              ≃* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))),
+          Continuous φ ∧ Continuous φ.symm ∧ Continuous ψ ∧ Continuous ψ.symm
+            ∧ (∀ g x, σ (φ g x) = g (σ x)) ∧ (∀ g, ψ (toGS Ω' _ g) = toGS Ω _ (φ g))
+            ∧ ∀ g, D.chi (ψ g) = D'.chi g := by
   intro F Ω _ _ _ _ _ F' Ω' _ _ _ _ _ l _ D D' f σ hσ
   obtain ⟨φ, hφc, hφact, hφcyc, -, -⟩ := galTransport F Ω F' Ω' (f : F →+* F') σ hσ
   have hσ' : ∀ x : F', σ.symm (algebraMap F' Ω' x) = algebraMap F Ω ((f.symm : F' →+* F) x) := by
@@ -62,24 +71,34 @@ theorem UpperTheory.V.LDataCardLeFinrank.gsTransport :
     rw [hφact]
     apply σ.symm.injective
     rw [hφ'act, RingEquiv.symm_apply_apply, RingEquiv.symm_apply_apply]
-  let Φ : G F' Ω' ≃* G F Ω :=
-    { toFun := φ, invFun := φ', left_inv := hleft, right_inv := hright, map_mul' := φ.map_mul }
+  let Φ : G F' Ω' ≃* G F Ω := {
+    toFun := φ
+    invFun := φ'
+    left_inv := hleft
+    right_inv := hright
+    map_mul' := φ.map_mul
+  }
   haveI : (NS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F')))).Normal :=
     Subgroup.is_normal_topologicalClosure _
   haveI : (NS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))).Normal :=
     Subgroup.is_normal_topologicalClosure _
-  have hmap : (NS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F')))).map (Φ : G F' Ω' →* G F Ω) =
-      NS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) := by
+  have hmap
+      : (NS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F')))).map (Φ : G F' Ω' →* G F Ω)
+        = NS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) := by
     apply le_antisymm
     · rw [Subgroup.map_le_iff_le_comap]
-      exact UpperTheory.V.LDataCardLeFinrank.transport_mem_NS (f : F →+* F') σ hσ φ hφc hφact D.hS D'.hS
+      exact UpperTheory.V.LDataCardLeFinrank.transport_mem_NS (f : F →+* F') σ hσ φ hφc hφact D.hS
+        D'.hS
     · intro h hh
       refine ⟨φ' h, ?_, hright h⟩
-      exact UpperTheory.V.LDataCardLeFinrank.transport_mem_NS (f.symm : F' →+* F) σ.symm hσ' φ' hφ'c hφ'act D'.hS D.hS hh
-  let Ψ : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F'))) ≃* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) :=
+      exact UpperTheory.V.LDataCardLeFinrank.transport_mem_NS (f.symm : F' →+* F) σ.symm hσ' φ' hφ'c
+        hφ'act D'.hS D.hS hh
+  let Ψ
+      : GS Ω' (D'.S : Set (HeightOneSpectrum (𝓞 F')))
+        ≃* GS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) :=
     QuotientGroup.congr _ _ Φ hmap
-  have hΨmk : ∀ g : G F' Ω', Ψ (QuotientGroup.mk g) = QuotientGroup.mk (φ g) :=
-    fun g => QuotientGroup.congr_mk _ _ Φ hmap g
+  have hΨmk : ∀ g : G F' Ω', Ψ (QuotientGroup.mk g) = QuotientGroup.mk (φ g) := fun g =>
+    QuotientGroup.congr_mk _ _ Φ hmap g
   have hΨsmk : ∀ g : G F Ω, Ψ.symm (QuotientGroup.mk g) = QuotientGroup.mk (φ' g) := by
     intro g
     apply Ψ.injective

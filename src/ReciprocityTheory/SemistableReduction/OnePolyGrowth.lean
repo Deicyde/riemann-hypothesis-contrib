@@ -9,14 +9,19 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Filter Topology Function Metric Polynomial
 
-theorem entire_poly_of_growth (k : ℕ) : ∀ (g : ℂ → ℂ) (A : ℝ), Differentiable ℂ g →
-    (∀ t, ‖g t‖ ≤ A * (1 + ‖t‖) ^ k) →
-    ∃ P : Polynomial ℂ, P.natDegree ≤ k ∧ ∀ t, g t = P.eval t := by
-  first | exact Bl.IterateZero.goal1 .. | (apply Bl.IterateZero.goal1 <;> assumption) | (intros; apply Bl.IterateZero.goal1 <;> assumption)
+theorem entire_poly_of_growth (k : ℕ)
+    : ∀ (g : ℂ → ℂ) (A : ℝ),
+      Differentiable ℂ g → (∀ t, ‖g t‖ ≤ A * (1 + ‖t‖) ^ k)
+        → ∃ P : Polynomial ℂ, P.natDegree ≤ k ∧ ∀ t, g t = P.eval t := by
+  first
+  | exact Bl.IterateZero.goal1 ..
+  | (apply Bl.IterateZero.goal1 <;> assumption)
+  | (intros; apply Bl.IterateZero.goal1 <;> assumption)
 
-theorem exists_entire_of_finite_growth (f : ℂ → ℂ) (B : Set ℂ) (A : ℝ) (k : ℕ) (hB : B.Finite)
-    (hf : DifferentiableOn ℂ f Bᶜ) (hb : ∀ t ∉ B, ‖f t‖ ≤ A * (1 + ‖t‖) ^ k) :
-    ∃ g : ℂ → ℂ, Differentiable ℂ g ∧ ∀ t ∉ B, g t = f t := by
+theorem exists_entire_of_finite_growth
+    (f : ℂ → ℂ) (B : Set ℂ) (A : ℝ) (k : ℕ)
+    (hB : B.Finite) (hf : DifferentiableOn ℂ f Bᶜ) (hb : ∀ t ∉ B, ‖f t‖ ≤ A * (1 + ‖t‖) ^ k)
+    : ∃ g : ℂ → ℂ, Differentiable ℂ g ∧ ∀ t ∉ B, g t = f t := by
   classical
   let g : ℂ → ℂ := fun t => if t ∈ B then limUnder (𝓝[≠] t) f else f t
   refine ⟨g, fun c => ?_, fun t ht => if_neg ht⟩
@@ -35,13 +40,14 @@ theorem exists_entire_of_finite_growth (f : ℂ → ℂ) (B : Set ℂ) (A : ℝ)
         rw [mem_ball, dist_eq_norm] at h
         have := norm_le_norm_add_norm_sub' t c
         linarith [norm_sub_rev t c]
-      calc ‖f t‖ ≤ A * (1 + ‖t‖) ^ k := hb t (hsub ht)
+      calc
+        ‖f t‖
+          ≤ A * (1 + ‖t‖) ^ k := hb t (hsub ht)
         _ ≤ |A| * (1 + ‖t‖) ^ k := mul_le_mul_of_nonneg_right (le_abs_self A) (by positivity)
         _ ≤ |A| * (2 + ‖c‖) ^ k :=
-            mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) (by linarith) k)
-              (abs_nonneg A)
-    have hdiff := Complex.differentiableOn_update_limUnder_of_bddAbove hsn
-      (hf.mono hsub) hbdd
+          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) (by linarith) k)
+            (abs_nonneg A)
+    have hdiff := Complex.differentiableOn_update_limUnder_of_bddAbove hsn (hf.mono hsub) hbdd
     refine (hdiff.differentiableAt hsn).congr_of_eventuallyEq ?_
     filter_upwards [hsn] with t ht
     by_cases htc : t = c

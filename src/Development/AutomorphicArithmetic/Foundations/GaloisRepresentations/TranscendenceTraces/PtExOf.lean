@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.ptEx_of :
-    PtEx := by
+theorem UpperTheory.Gal.TranscendenceTraces.ptEx_of : PtEx := by
   intro X s
   let Ω : Type := AlgebraicClosure (X.residueField s)
   let y : gp Ω ⟶ Spec (X.residueField s) :=

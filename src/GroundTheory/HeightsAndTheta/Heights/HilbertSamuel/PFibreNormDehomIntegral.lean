@@ -12,11 +12,13 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  MvPolynomial
 
 namespace FibreNormDehomIntegral
 
-theorem den_eq_one_of_padicValRat_nonneg {a : ℚ} (h : ∀ p : ℕ, p.Prime → 0 ≤ padicValRat p a) : a.den = 1 := by
+theorem den_eq_one_of_padicValRat_nonneg {a : ℚ} (h : ∀ p : ℕ, p.Prime → 0 ≤ padicValRat p a)
+    : a.den = 1 := by
   by_contra hne
   obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
   have := Fact.mk hp
@@ -32,11 +34,11 @@ theorem den_eq_one_of_padicValRat_nonneg {a : ℚ} (h : ∀ p : ℕ, p.Prime →
 
 end FibreNormDehomIntegral
 
-
 open FibreNormDehomIntegral in
-theorem FibreNormDehomIntegral.proof (hF : FibreNormBadPrimesFinite.Statement)
-    (hG : FibreNormGoodPrimeIntegral.Statement) (hB : FibreNormPrimeBound.Statement) :
-    FibreNormDehomIntegral.Statement := by
+theorem FibreNormDehomIntegral.proof
+    (hF : FibreNormBadPrimesFinite.Statement) (hG : FibreNormGoodPrimeIntegral.Statement)
+    (hB : FibreNormPrimeBound.Statement)
+    : FibreNormDehomIntegral.Statement := by
   classical
   intro K _ ι _ Ω _ _ y D e L q hV hBir he hL hz
   have hSf := hF K ι Ω y D e L hV hBir he hL hz
@@ -71,8 +73,10 @@ theorem FibreNormDehomIntegral.proof (hF : FibreNormBadPrimesFinite.Statement)
       have : (0 : ℤ) ≤ (τ : ℤ) * (multiplicity p M₀ : ℤ) := by positivity
       linarith
 
-  have hmem : ((M₀ : ℚ) ^ τ) • c (Module.finrank (pullField y L) Ω) ∈
-      Set.range (map (Int.castRingHom ℚ) : MvPolynomial (Fin (D + 1)) ℤ → MvPolynomial (Fin (D + 1)) ℚ) := by
+  have hmem
+      : ((M₀ : ℚ) ^ τ) • c (Module.finrank (pullField y L) Ω) ∈ Set.range
+        (map (Int.castRingHom ℚ)
+          : MvPolynomial (Fin (D + 1)) ℤ → MvPolynomial (Fin (D + 1)) ℚ) := by
     rw [mem_range_map_iff_coeffs_subset]
     intro a ha
     obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.mp ha

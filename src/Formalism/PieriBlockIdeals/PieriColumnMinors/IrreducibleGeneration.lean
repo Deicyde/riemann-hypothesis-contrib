@@ -10,11 +10,15 @@ open MvPolynomial
 
 namespace Formalism.CohomologicalDescent.LPR
 
-open Formalism.GradedWeylDivisibility Formalism.CohomologicalDescent.Symmetrization Formalism.CohomologicalDescent.BinaryFormsExample Formalism.CohomologicalDescent.LP Formalism.CohomologicalDescent.LR
+open Formalism.GradedWeylDivisibility Formalism.CohomologicalDescent.Symmetrization
+  Formalism.CohomologicalDescent.BinaryFormsExample Formalism.CohomologicalDescent.LP
+  Formalism.CohomologicalDescent.LR
 
-theorem lpr_inv {K A : Type*} [Field K] [AddCommGroup A] [Module K A] (f : Module.End K A) (p : Submodule K A)
-    (hp : ∀ x ∈ p, f x ∈ p) (s : Finset K) :
-    ∀ x : K → A, (∀ μ ∈ s, f (x μ) = μ • x μ) → ∑ μ ∈ s, x μ ∈ p → ∀ μ ∈ s, x μ ∈ p := by
+theorem lpr_inv
+    {K A : Type*} [Field K] [AddCommGroup A] [Module K A]
+    (f : Module.End K A) (p : Submodule K A) (hp : ∀ x ∈ p, f x ∈ p)
+    (s : Finset K)
+    : ∀ x : K → A, (∀ μ ∈ s, f (x μ) = μ • x μ) → ∑ μ ∈ s, x μ ∈ p → ∀ μ ∈ s, x μ ∈ p := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -31,12 +35,13 @@ theorem lpr_inv {K A : Type*} [Field K] [AddCommGroup A] [Module K A] (f : Modul
     have e : f (x a + ∑ μ ∈ s, x μ) - a • (x a + ∑ μ ∈ s, x μ) = ∑ μ ∈ s, (μ - a) • x μ := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_add (f := _), map_sum, smul_add, Finset.smul_sum, Finset.sum_congr rfl hxs, hxa]
-      rw [show a • x a + ∑ μ ∈ s, μ • x μ - (a • x a + ∑ μ ∈ s, a • x μ) =
-          ∑ μ ∈ s, μ • x μ - ∑ μ ∈ s, a • x μ by abel, ← Finset.sum_sub_distrib]
+      rw [show a • x a + ∑ μ ∈ s, μ • x μ - (a • x a + ∑ μ ∈ s, a • x μ)
+            = ∑ μ ∈ s, μ • x μ - ∑ μ ∈ s, a • x μ by
+          abel,
+        ← Finset.sum_sub_distrib]
       exact Finset.sum_congr rfl fun μ _ => (sub_smul μ a (x μ)).symm
     rw [e] at h1
-    have ih' := ih (fun μ => (μ - a) • x μ)
-      (fun μ hμ => by rw [map_smul, hxs μ hμ, smul_comm]) h1
+    have ih' := ih (fun μ => (μ - a) • x μ) (fun μ hμ => by rw [map_smul, hxs μ hμ, smul_comm]) h1
     have hs : ∀ μ ∈ s, x μ ∈ p := fun μ hμ => by
       have hμa : μ - a ≠ 0 := sub_ne_zero.mpr (fun h => ha (h ▸ hμ))
       have h2 := p.smul_mem (μ - a)⁻¹ (ih' μ hμ)
@@ -56,7 +61,8 @@ theorem diagonal_transfer : DiagTransfer := by
     rw [hf]
     exact Submodule.mem_top
   obtain ⟨c, hcmem, hcsum⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).mp hx
-  have heig : ∀ μ ∈ c.support, f (c μ) = μ • c μ := fun μ _ => Module.End.mem_eigenspace_iff.mp (hcmem μ)
+  have heig : ∀ μ ∈ c.support, f (c μ) = μ • c μ := fun μ _ =>
+    Module.End.mem_eigenspace_iff.mp (hcmem μ)
   have hsum : ∑ μ ∈ c.support, c μ ∈ LinearMap.range i := ⟨x, hcsum.symm⟩
   have hp : ∀ y ∈ LinearMap.range i, f y ∈ LinearMap.range i := by
     rintro _ ⟨z, rfl⟩
@@ -107,7 +113,9 @@ theorem irreducible_generation : IrredGen := by
 theorem euler_diagonal : EulerDiag := by
   intro r n a
   classical
-  have hsum : ∀ m : Fin r × Fin n →₀ ℕ, ∑ i ∈ m.support.filter (fun i => i.1 = a), m i = ∑ s, m (a, s) := by
+  have hsum
+      : ∀ m : Fin r × Fin n →₀ ℕ,
+        ∑ i ∈ m.support.filter (fun i => i.1 = a), m i = ∑ s, m (a, s) := by
     intro m
     rw [Finset.sum_filter]
     rw [Finset.sum_subset (Finset.subset_univ m.support) (fun i _ hi => by
@@ -118,14 +126,17 @@ theorem euler_diagonal : EulerDiag := by
     · intro b _ hb
       simp [hb]
     · simp
-  have key : ∀ (m : Fin r × Fin n →₀ ℕ) (c : ℚ),
-      der r n a a (monomial m c) = ((∑ s, m (a, s) : ℕ) : ℚ) • monomial m c := by
+  have key
+      : ∀ (m : Fin r × Fin n →₀ ℕ) (c : ℚ),
+        der r n a a (monomial m c) = ((∑ s, m (a, s) : ℕ) : ℚ) • monomial m c := by
     intro m c
     unfold der
     rw [MvPolynomial.mkDerivation_monomial, Finsupp.sum]
-    have hterm : ∀ i ∈ m.support, (monomial (m - Finsupp.single i 1)) ((m i : ℕ) : ℚ) •
-        (if i.1 = a then (X (a, i.2) : MvPolynomial (Fin r × Fin n) ℚ) else 0) =
-        if i.1 = a then monomial m ((m i : ℚ)) else 0 := by
+    have hterm
+        : ∀ i ∈ m.support,
+          (monomial (m - Finsupp.single i 1)) ((m i : ℕ) : ℚ)
+              • (if i.1 = a then (X (a, i.2) : MvPolynomial (Fin r × Fin n) ℚ) else 0)
+            = if i.1 = a then monomial m ((m i : ℚ)) else 0 := by
       intro i hi
       split_ifs with h
       · rw [smul_eq_mul, show (a, i.2) = i from Prod.ext h.symm rfl, X, monomial_mul, mul_one,
@@ -133,8 +144,8 @@ theorem euler_diagonal : EulerDiag := by
         exact Finsupp.single_le_iff.2 (Nat.one_le_iff_ne_zero.2 (Finsupp.mem_support_iff.1 hi))
       · rw [smul_zero]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl hterm, ← Finset.sum_filter, ← map_sum (monomial m), smul_monomial, smul_monomial,
-      smul_eq_mul, smul_eq_mul]
+      rw [Finset.sum_congr rfl hterm, ← Finset.sum_filter, ← map_sum (monomial m), smul_monomial,
+        smul_monomial, smul_eq_mul, smul_eq_mul]
     congr 1
     rw [mul_comm, ← hsum m]
     push_cast
@@ -151,30 +162,42 @@ theorem real_form_finite : RealFinite := by
   intro r n ν
   classical
   have hfin : Set.Finite {d : Fin r × Fin n →₀ ℕ | Finsupp.weight (colW r n) d = ν} := by
-    apply Set.Finite.subset (Finset.Iic (Finsupp.equivFunOnFinite.symm (fun q : Fin r × Fin n => ν q.2))).finite_toSet
+    apply Set.Finite.subset (Finset.Iic (Finsupp.equivFunOnFinite.symm (fun q : Fin r × Fin n =>
+      ν q.2))).finite_toSet
     intro d hd
     simp only [Set.mem_setOf_eq] at hd
     rw [Finset.coe_Iic, Set.mem_Iic, Finsupp.le_def]
     intro q
     have h := congrFun hd q.2
     rw [Finsupp.weight_apply, Finsupp.sum] at h
-    simp only [Finset.sum_apply, Pi.smul_apply, colW, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
-      mul_zero] at h
+    simp only [Finset.sum_apply, Pi.smul_apply, colW, Pi.single_apply, smul_eq_mul, mul_ite,
+        mul_one, mul_zero]
+      at h
     show d q ≤ ν q.2
     rw [← h]
     by_cases hq : q ∈ d.support
-    · calc d q = (if q.2 = q.2 then d q else 0) := by simp
-        _ ≤ _ := Finset.single_le_sum (f := fun i => if q.2 = i.2 then d i else 0) (fun _ _ => Nat.zero_le _) hq
+    · calc
+        d q
+          = (if q.2 = q.2 then d q else 0) := by simp
+        _ ≤ _ :=
+          Finset.single_le_sum
+            (f := fun i => if q.2 = i.2 then d i else 0)
+            (fun _ _ => Nat.zero_le _)
+            hq
     · rw [show d q = 0 from by simpa using hq]
       exact Nat.zero_le _
-  have hW : weightedHomogeneousSubmodule ℚ (colW r n) ν ≤
-      Submodule.span ℚ ((fun d => monomial d (1 : ℚ)) '' {d | Finsupp.weight (colW r n) d = ν}) := by
+  have hW
+      : weightedHomogeneousSubmodule ℚ (colW r n) ν
+        ≤ Submodule.span ℚ
+          ((fun d => monomial d (1 : ℚ)) '' {d | Finsupp.weight (colW r n) d = ν}) := by
     intro p hp
     rw [mem_weightedHomogeneousSubmodule] at hp
     rw [p.as_sum]
     refine Submodule.sum_mem _ fun d hd => ?_
     have hdS : Finsupp.weight (colW r n) d = ν := hp (mem_support_iff.1 hd)
-    rw [show monomial d (AddMonoidAlgebra.coeff p d) = AddMonoidAlgebra.coeff p d • monomial d (1 : ℚ) by rw [smul_monomial, smul_eq_mul, mul_one]]
+    rw [show monomial d (AddMonoidAlgebra.coeff p d)
+        = AddMonoidAlgebra.coeff p d • monomial d (1 : ℚ) by
+      rw [smul_monomial, smul_eq_mul, mul_one]]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨d, hdS, rfl⟩)
   haveI : FiniteDimensional ℚ ↥(Submodule.span ℚ ((fun d => monomial d (1 : ℚ)) ''
       {d | Finsupp.weight (colW r n) d = ν})) := FiniteDimensional.span_of_finite ℚ (hfin.image _)
@@ -192,15 +215,22 @@ theorem real_form_modular : RealFormMod := by
   · intro x hx
     show 0 < formB p q w lam2 x x
     rw [formB_apply]
-    refine div_pos ((fockQPos _ ((x : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) ((x : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)).2 ?_) (hw_norm_pos _)
+    refine div_pos
+      ((fockQPos _ ((x : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)
+        ((x : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)).2 ?_)
+      (hw_norm_pos _)
     intro h0
     exact hx (Subtype.ext (Subtype.ext h0))
   · intro a b x y
     exact real_contragredient p q w lam2 (Sum.inr a) (Sum.inr b) x y
   · intro a
     refine diagonal_transfer ℚ _ _
-      ((dualWeyl ℚ (p + q) (p + q) (LD.blockWt p q w lam2)).subtype ∘ₗ (rationalBlockModuleSetting p q w lam2).W.subtype)
-      _ (der (p + q) (p + q) (idx p q (Sum.inr a)) (idx p q (Sum.inr a)) : Module.End ℚ (MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)) ?_ ?_ (euler_diagonal _ _ _)
+      ((dualWeyl ℚ (p + q) (p + q) (LD.blockWt p q w lam2)).subtype
+        ∘ₗ (rationalBlockModuleSetting p q w lam2).W.subtype)
+      _
+      (der (p + q) (p + q) (idx p q (Sum.inr a)) (idx p q (Sum.inr a))
+        : Module.End ℚ (MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ))
+      ?_ ?_ (euler_diagonal _ _ _)
     · exact (Subtype.val_injective).comp Subtype.val_injective
     · intro x; rfl
 
@@ -210,14 +240,17 @@ theorem real_highest_weight : RealHW := by
   refine ⟨?_, ?_, ?_⟩
   · intro h0
     apply hwNe ℚ (p + q) (p + q) le_rfl (LD.blockWt p q w lam2)
-    rw [← hh, h0]; rfl
+    rw [← hh, h0]
+    rfl
   · intro a b hab
-    apply Subtype.ext; apply Subtype.ext
+    apply Subtype.ext
+    apply Subtype.ext
     show der _ _ (Fin.natAdd p a) (Fin.natAdd p b) ((h : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) = 0
     rw [hh]
     exact der_hw_raise _ _ _ (by rw [Fin.lt_def] at hab ⊢; simpa using hab)
   · intro a
-    apply Subtype.ext; apply Subtype.ext
+    apply Subtype.ext
+    apply Subtype.ext
     show der _ _ (Fin.natAdd p a) (Fin.natAdd p a) ((h : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ) =
       (lam2 a : ℚ) • ((h : VQ p q w lam2) : MvPolynomial (Fin (p + q) × Fin (p + q)) ℚ)
     rw [hh, (der_diag_iff _ _).1 (hw_rowHom _ hanti)]
@@ -227,11 +260,14 @@ theorem real_highest_weight : RealHW := by
 theorem real_form_generation : RealGen := by
   intro p q w lam2 ha hb S hS hall
   have : FiniteDimensional ℚ (VQ p q w lam2) := real_form_finite _ _ _
-  let h : (rationalBlockModuleSetting p q w lam2).W := ⟨hwV p q w lam2 ha hb, hwV_mem p q w lam2 ha hb⟩
+  let h : (rationalBlockModuleSetting p q w lam2).W :=
+    ⟨hwV p q w lam2 ha hb, hwV_mem p q w lam2 ha hb⟩
   obtain ⟨hne, hhw⟩ := real_highest_weight p q w lam2 ha hb h rfl
   refine irreducible_generation ℚ _ q _ _ (real_form_modular p q w lam2) h hne ?_ S hS (hall h hhw)
   intro Z hZ hZne
-  have h1 := real_irreducible p q w lam2 ha hb (Z.map (rationalBlockModuleSetting p q w lam2).W.subtype) ?_ ?_ ?_ (hwV p q w lam2 ha hb) rfl
+  have h1 :=
+    real_irreducible p q w lam2 ha hb (Z.map (rationalBlockModuleSetting p q w lam2).W.subtype) ?_
+      ?_ ?_ (hwV p q w lam2 ha hb) rfl
   · obtain ⟨y, hy, hyh⟩ := h1
     have : y = h := Subtype.ext hyh
     rwa [← this]
@@ -243,7 +279,9 @@ theorem real_form_generation : RealGen := by
     apply hZne
     rw [eq_bot_iff]
     intro y hy
-    have : ((rationalBlockModuleSetting p q w lam2).W.subtype y) ∈ Z.map (rationalBlockModuleSetting p q w lam2).W.subtype := ⟨y, hy, rfl⟩
+    have : ((rationalBlockModuleSetting p q w lam2).W.subtype y)
+        ∈ Z.map (rationalBlockModuleSetting p q w lam2).W.subtype :=
+      ⟨y, hy, rfl⟩
     rw [h0, Submodule.mem_bot] at this
     rw [Submodule.mem_bot]
     exact Subtype.ext this
@@ -251,6 +289,7 @@ theorem real_form_generation : RealGen := by
 theorem pieri_real_form : PieriReal := by
   intro p q w lam2 ha hb n
   have : FiniteDimensional ℚ (VQ p q w lam2) := real_form_finite _ _ _
-  exact pieri_generated ℚ (Fin p) _ q _ _ lam2 (real_form_modular p q w lam2) (real_form_generation p q w lam2 ha hb) n
+  exact pieri_generated ℚ (Fin p) _ q _ _ lam2 (real_form_modular p q w lam2)
+    (real_form_generation p q w lam2 ha hb) n
 
 end Formalism.CohomologicalDescent.LPR

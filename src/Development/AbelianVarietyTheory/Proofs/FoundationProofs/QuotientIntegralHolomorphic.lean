@@ -16,8 +16,8 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem norm_root_monic_le (n : ℕ) (s : Fin n → ℂ) (y : ℂ)
-    (hy : y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0) : ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
+theorem norm_root_monic_le (n : ℕ) (s : Fin n → ℂ) (y : ℂ) (hy : y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0)
+    : ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
   have hS : 0 ≤ ∑ j, ‖s j‖ := Finset.sum_nonneg fun j _ => norm_nonneg _
   by_cases h1 : ‖y‖ ≤ 1
   · linarith
@@ -25,9 +25,11 @@ theorem norm_root_monic_le (n : ℕ) (s : Fin n → ℂ) (y : ℂ)
   cases n with
   | zero => simp at hy
   | succ m =>
-    have hyn : y ^ (m + 1) = -∑ j, s j * y ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hy
+    have hyn : y ^ (m + 1) = - ∑ j, s j * y ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hy
     have hle : ‖y‖ ^ (m + 1) ≤ (∑ j, ‖s j‖) * ‖y‖ ^ m := by
-      calc ‖y‖ ^ (m + 1) = ‖y ^ (m + 1)‖ := (norm_pow _ _).symm
+      calc
+        ‖y‖ ^ (m + 1)
+          = ‖y ^ (m + 1)‖ := (norm_pow _ _).symm
         _ = ‖∑ j, s j * y ^ (j : ℕ)‖ := by rw [hyn, norm_neg]
         _ ≤ ∑ j, ‖s j * y ^ (j : ℕ)‖ := norm_sum_le _ _
         _ ≤ ∑ j : Fin (m + 1), ‖s j‖ * ‖y‖ ^ m := by
@@ -50,7 +52,14 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ → ℂ) (s : Fin n → ℂ → ℂ), IsOpen U → IsPreconnected U → DifferentiableOn ℂ A U → DifferentiableOn ℂ D U → (∀ j, DifferentiableOn ℂ (s j) U) → (∃ z ∈ U, D z ≠ 0) → (∀ z ∈ U, A z ^ n + ∑ j, s j z * A z ^ (j : ℕ) * D z ^ (n - j) = 0) → ∃ h : ℂ → ℂ, DifferentiableOn ℂ h U ∧ (∀ z ∈ U, A z = h z * D z) ∧ ∀ z ∈ U, h z ^ n + ∑ j, s j z * h z ^ (j : ℕ) = 0 := by
+theorem quotient_integral_holomorphic
+    : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ → ℂ) (s : Fin n → ℂ → ℂ),
+      IsOpen U → IsPreconnected U → DifferentiableOn ℂ A U → DifferentiableOn ℂ D U
+        → (∀ j, DifferentiableOn ℂ (s j) U) → (∃ z ∈ U, D z ≠ 0)
+        → (∀ z ∈ U, A z ^ n + ∑ j, s j z * A z ^ (j : ℕ) * D z ^ (n - j) = 0)
+        → ∃ h : ℂ → ℂ,
+          DifferentiableOn ℂ h U ∧ (∀ z ∈ U, A z = h z * D z)
+            ∧ ∀ z ∈ U, h z ^ n + ∑ j, s j z * h z ^ (j : ℕ) = 0 := by
   intro U n A D s hU hUc hA hD hs ⟨z₁, hz₁U, hz₁⟩ heq
   classical
   have hiso : ∀ z₀ ∈ U, ∀ᶠ w in 𝓝[≠] z₀, D w ≠ 0 := by
@@ -63,8 +72,9 @@ theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ �
   have hroot : ∀ w ∈ U, D w ≠ 0 → (A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ) = 0 := by
     intro w hw hDw
     have hDn : D w ^ n ≠ 0 := pow_ne_zero _ hDw
-    have key : D w ^ n * ((A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ))
-        = A w ^ n + ∑ j, s j w * A w ^ (j : ℕ) * D w ^ (n - j) := by
+    have key
+        : D w ^ n * ((A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ))
+          = A w ^ n + ∑ j, s j w * A w ^ (j : ℕ) * D w ^ (n - j) := by
       rw [mul_add, Finset.mul_sum]
       congr 1
       · rw [div_pow, mul_div_cancel₀ _ hDn]
@@ -88,8 +98,10 @@ theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ �
     rcases Nat.eq_zero_or_pos n with hn | hn
     · subst hn; simp at this
     · exact (pow_eq_zero_iff hn.ne').1 this
-  obtain ⟨h, hh⟩ : ∃ h : ℂ → ℂ, ∀ z, h z =
-      if D z = 0 then limUnder (𝓝[≠] z) (fun w => A w / D w) else A z / D z := ⟨_, fun z => rfl⟩
+  obtain ⟨h, hh⟩
+      : ∃ h : ℂ → ℂ, ∀ z,
+        h z = if D z = 0 then limUnder (𝓝[≠] z) (fun w => A w / D w) else A z / D z :=
+    ⟨_, fun z => rfl⟩
   have hdiffAt : ∀ z₀ ∈ U, DifferentiableAt ℂ h z₀ := by
     intro z₀ hz₀
     have hUn : U ∈ 𝓝 z₀ := hU.mem_nhds hz₀
@@ -114,15 +126,19 @@ theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ �
       have hbd : BddAbove (norm ∘ (fun w => A w / D w) '' (Metric.ball z₀ r \ {z₀})) := by
         refine ⟨1 + ∑ j, (‖s j z₀‖ + 1), ?_⟩
         rintro _ ⟨w, hw, rfl⟩
-        have := GlobalTheory.norm_root_monic_le n (fun j => s j w) (A w / D w) (hroot w (hsub w hw.1) (hne w hw.1 hw.2))
+        have :=
+          GlobalTheory.norm_root_monic_le n
+            (fun j => s j w)
+            (A w / D w) (hroot w (hsub w hw.1) (hne w hw.1 hw.2))
         show ‖A w / D w‖ ≤ _
         refine this.trans ?_
         gcongr with j
         exact (hsb w hw.1 j).le
-      have hg := Complex.differentiableOn_update_limUnder_of_bddAbove
-        (Metric.ball_mem_nhds z₀ hr) hfd hbd
-      have heqg : h =ᶠ[𝓝 z₀] Function.update (fun w => A w / D w) z₀
-          (limUnder (𝓝[≠] z₀) (fun w => A w / D w)) := by
+      have hg :=
+        Complex.differentiableOn_update_limUnder_of_bddAbove (Metric.ball_mem_nhds z₀ hr) hfd hbd
+      have heqg
+          : h =ᶠ[𝓝 z₀] Function.update (fun w => A w / D w) z₀
+            (limUnder (𝓝[≠] z₀) (fun w => A w / D w)) := by
         filter_upwards [Metric.ball_mem_nhds z₀ hr] with w hw
         by_cases hw0 : w = z₀
         · subst hw0; rw [hh, if_pos hDz, Function.update_self]
@@ -143,9 +159,10 @@ theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ �
     · have hUn : U ∈ 𝓝 z := hU.mem_nhds hz
       have hFd : DifferentiableAt ℂ (fun w => h w ^ n + ∑ j, s j w * h w ^ (j : ℕ)) z := by
         apply ((hdiffAt z hz).pow n).add
-        have hsum := DifferentiableAt.sum (u := Finset.univ)
-          (A := fun (j : Fin n) (w : ℂ) => s j w * h w ^ (j : ℕ))
-          (fun j _ => ((hs j).differentiableAt hUn).mul ((hdiffAt z hz).pow _))
+        have hsum :=
+          DifferentiableAt.sum (u := Finset.univ)
+            (A := fun (j : Fin n) (w : ℂ) => s j w * h w ^ (j : ℕ))
+            (fun j _ => ((hs j).differentiableAt hUn).mul ((hdiffAt z hz).pow _))
         convert hsum using 1
         ext w
         simp [Finset.sum_apply]

@@ -11,38 +11,45 @@ noncomputable section
 
 namespace GlobalTheory.IndEtaleLoc
 
-variable {J : Type} [SmallCategory J] (D : J ⥤ CommRingCat.{0}) {S : Type} [CommRing S]
+variable
+  {J : Type} [SmallCategory J]
+  (D : J ⥤ CommRingCat.{0})
+  {S : Type} [CommRing S]
   (s : D ⟶ (Functor.const J).obj (CommRingCat.of S)) (M : Submonoid S)
 
 structure Idx where
-
   j : J
-
   e : D.obj j
   mem : (s.app j).hom e ∈ M
 
 variable {D s M}
 
-theorem app_map_apply {j k : J} (φ : j ⟶ k) (x : D.obj j) :
-    (s.app k).hom ((D.map φ).hom x) = (s.app j).hom x := by
+theorem app_map_apply {j k : J} (φ : j ⟶ k) (x : D.obj j)
+    : (s.app k).hom ((D.map φ).hom x) = (s.app j).hom x := by
   have h := congr(($(s.naturality φ)).hom x)
   simpa using h
 
 instance : SmallCategory (Idx D s M) where
   Hom a b := {φ : a.j ⟶ b.j // ∃ c : D.obj b.j, (D.map φ).hom a.e * c = b.e}
   id a := ⟨𝟙 a.j, 1, by simp⟩
-  comp φ ψ := ⟨φ.1 ≫ ψ.1, by
-    obtain ⟨c, hc⟩ := φ.2
-    obtain ⟨d, hd⟩ := ψ.2
-    exact ⟨(D.map ψ.1).hom c * d, by
-      rw [Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply, ← mul_assoc, ← map_mul, hc,
-        hd]⟩⟩
+  comp φ ψ := ⟨
+    φ.1 ≫ ψ.1,
+    by
+      obtain ⟨c, hc⟩ := φ.2
+      obtain ⟨d, hd⟩ := ψ.2
+      exact ⟨
+        (D.map ψ.1).hom c * d,
+        by
+          rw [Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply, ← mul_assoc, ← map_mul,
+            hc, hd]
+      ⟩
+  ⟩
   id_comp _ := Subtype.ext (Category.id_comp _)
   comp_id _ := Subtype.ext (Category.comp_id _)
   assoc _ _ _ := Subtype.ext (Category.assoc _ _ _)
 
-theorem isUnit_map {a b : Idx D s M} (φ : a ⟶ b) :
-    IsUnit (algebraMap (D.obj b.j) (Localization.Away b.e) ((D.map φ.1).hom a.e)) := by
+theorem isUnit_map {a b : Idx D s M} (φ : a ⟶ b)
+    : IsUnit (algebraMap (D.obj b.j) (Localization.Away b.e) ((D.map φ.1).hom a.e)) := by
   obtain ⟨c, hc⟩ := φ.2
   refine isUnit_of_mul_isUnit_left (y := algebraMap _ (Localization.Away b.e) c) ?_
   rw [← map_mul, hc]
@@ -52,8 +59,9 @@ def locMap {a b : Idx D s M} (φ : a ⟶ b) : Localization.Away a.e →+* Locali
   IsLocalization.Away.lift a.e (g := (algebraMap _ (Localization.Away b.e)).comp (D.map φ.1).hom)
     (isUnit_map φ)
 
-@[simp] theorem locMap_algebraMap {a b : Idx D s M} (φ : a ⟶ b) (x : D.obj a.j) :
-    locMap φ (algebraMap _ _ x) = algebraMap _ (Localization.Away b.e) ((D.map φ.1).hom x) := by
+@[simp]
+theorem locMap_algebraMap {a b : Idx D s M} (φ : a ⟶ b) (x : D.obj a.j)
+    : locMap φ (algebraMap _ _ x) = algebraMap _ (Localization.Away b.e) ((D.map φ.1).hom x) := by
   simp [locMap, IsLocalization.Away.lift]
 
 variable (D s M)
@@ -74,7 +82,9 @@ end GlobalTheory.IndEtaleLoc
 
 namespace GlobalTheory.IndEtaleLoc
 
-variable {J : Type} [SmallCategory J] {D : J ⥤ CommRingCat.{0}} {S : Type} [CommRing S]
+variable
+  {J : Type} [SmallCategory J]
+  {D : J ⥤ CommRingCat.{0}} {S : Type} [CommRing S]
   {s : D ⟶ (Functor.const J).obj (CommRingCat.of S)} {M : Submonoid S}
 
 instance [IsFiltered J] : IsFiltered (Idx D s M) := by
@@ -84,13 +94,20 @@ instance [IsFiltered J] : IsFiltered (Idx D s M) := by
   refine { cocone_objs := fun a b => ?_, cocone_maps := fun a b φ ψ => ?_ }
   · let u := IsFiltered.leftToMax a.j b.j
     let v := IsFiltered.rightToMax a.j b.j
-    refine ⟨⟨IsFiltered.max a.j b.j, (D.map u).hom a.e * (D.map v).hom b.e, ?_⟩,
-      ⟨u, (D.map v).hom b.e, rfl⟩, ⟨v, (D.map u).hom a.e, mul_comm _ _⟩, trivial⟩
+    refine ⟨
+      ⟨IsFiltered.max a.j b.j, (D.map u).hom a.e * (D.map v).hom b.e, ?_⟩,
+      ⟨u, (D.map v).hom b.e, rfl⟩,
+      ⟨v, (D.map u).hom a.e, mul_comm _ _⟩,
+      trivial
+    ⟩
     rw [map_mul, app_map_apply, app_map_apply]
     exact M.mul_mem a.mem b.mem
   · let h := IsFiltered.coeqHom φ.1 ψ.1
-    refine ⟨⟨IsFiltered.coeq φ.1 ψ.1, (D.map h).hom b.e, by rw [app_map_apply]; exact b.mem⟩,
-      ⟨h, 1, mul_one _⟩, Subtype.ext ?_⟩
+    refine ⟨
+      ⟨IsFiltered.coeq φ.1 ψ.1, (D.map h).hom b.e, by rw [app_map_apply]; exact b.mem⟩,
+      ⟨h, 1, mul_one _⟩,
+      Subtype.ext ?_
+    ⟩
     change φ.1 ≫ h = ψ.1 ≫ h
     exact IsFiltered.coeq_condition φ.1 ψ.1
 
@@ -98,19 +115,22 @@ end GlobalTheory.IndEtaleLoc
 
 namespace GlobalTheory.IndEtaleLoc
 
-variable {J : Type} [SmallCategory J] {D : J ⥤ CommRingCat.{0}} {S : Type} [CommRing S]
+variable
+  {J : Type} [SmallCategory J]
+  {D : J ⥤ CommRingCat.{0}} {S : Type} [CommRing S]
   {s : D ⟶ (Functor.const J).obj (CommRingCat.of S)} {M : Submonoid S}
 
-def fromBase {R : Type} [CommRing R] (t : (Functor.const J).obj (CommRingCat.of R) ⟶ D) :
-    (Functor.const (Idx D s M)).obj (CommRingCat.of R) ⟶ diag D s M where
+def fromBase {R : Type} [CommRing R] (t : (Functor.const J).obj (CommRingCat.of R) ⟶ D)
+    : (Functor.const (Idx D s M)).obj (CommRingCat.of R) ⟶ diag D s M where
   app a := CommRingCat.ofHom ((algebraMap (D.obj a.j) (Localization.Away a.e)).comp (t.app a.j).hom)
   naturality a b φ := by
     ext x
     have h := congr(($(t.naturality φ.1)).hom x)
-    simp only [Functor.const_obj_obj, Functor.const_obj_map, Category.id_comp,
-      CommRingCat.hom_comp, RingHom.comp_apply] at h
-    change algebraMap _ (Localization.Away b.e) ((t.app b.j).hom x) =
-      locMap φ (algebraMap _ (Localization.Away a.e) ((t.app a.j).hom x))
+    simp only [Functor.const_obj_obj, Functor.const_obj_map, Category.id_comp, CommRingCat.hom_comp,
+        RingHom.comp_apply]
+      at h
+    change algebraMap _ (Localization.Away b.e) ((t.app b.j).hom x)
+      = locMap φ (algebraMap _ (Localization.Away a.e) ((t.app a.j).hom x))
     rw [locMap_algebraMap, h]
 
 variable (S' : Type) [CommRing S'] [Algebra S S'] [IsLocalization M S']
@@ -119,9 +139,10 @@ def leg (a : Idx D s M) : Localization.Away a.e →+* S' :=
   IsLocalization.Away.lift a.e (g := (algebraMap S S').comp ((s.app a.j).hom : D.obj a.j →+* S))
     (IsLocalization.map_units S' (⟨(s.app a.j).hom a.e, a.mem⟩ : M))
 
-@[simp] theorem leg_algebraMap (a : Idx D s M) (x : D.obj a.j) :
-    leg S' a (algebraMap (D.obj a.j) (Localization.Away a.e) x) =
-      algebraMap S S' (((s.app a.j).hom : D.obj a.j →+* S) x) := by
+@[simp]
+theorem leg_algebraMap (a : Idx D s M) (x : D.obj a.j)
+    : leg S' a (algebraMap (D.obj a.j) (Localization.Away a.e) x)
+      = algebraMap S S' (((s.app a.j).hom : D.obj a.j →+* S) x) := by
   simp [leg, IsLocalization.Away.lift]
 
 def toLoc : diag D s M ⟶ (Functor.const (Idx D s M)).obj (CommRingCat.of S') where
@@ -131,13 +152,13 @@ def toLoc : diag D s M ⟶ (Functor.const (Idx D s M)).obj (CommRingCat.of S') w
     change (leg S' b).comp (locMap φ) = (RingHom.id S').comp (leg S' a)
     rw [RingHom.id_comp]
     refine IsLocalization.ringHom_ext (Submonoid.powers a.e) (RingHom.ext fun x => ?_)
-    change leg S' b (locMap φ (algebraMap _ (Localization.Away a.e) x)) =
-      leg S' a (algebraMap _ (Localization.Away a.e) x)
+    change leg S' b (locMap φ (algebraMap _ (Localization.Away a.e) x))
+      = leg S' a (algebraMap _ (Localization.Away a.e) x)
     rw [locMap_algebraMap, leg_algebraMap, leg_algebraMap]
     exact congrArg _ (app_map_apply φ.1 x)
 
-def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
-    IsColimit (Cocone.mk _ (toLoc (s := s) (M := M) S')) := by
+def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s))
+    : IsColimit (Cocone.mk _ (toLoc (s := s) (M := M) S')) := by
   have hc := isColimitOfPreserves (forget CommRingCat.{0}) hs
   haveI : ReflectsColimit (diag D s M) (forget CommRingCat.{0}) :=
     reflectsColimit_of_reflectsIsomorphisms _ _
@@ -157,8 +178,8 @@ def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
     refine ⟨a, IsLocalization.mk' (Localization.Away a.e) ((D.map u).hom y') p, ?_⟩
     change _ = leg S' a _
     rw [IsLocalization.mk'_eq_iff_eq_mul]
-    have h1 := congrArg (leg S' a) (IsLocalization.mk'_spec (Localization.Away a.e)
-      ((D.map u).hom y') p)
+    have h1 :=
+      congrArg (leg S' a) (IsLocalization.mk'_spec (Localization.Away a.e) ((D.map u).hom y') p)
     rw [map_mul, leg_algebraMap, leg_algebraMap] at h1
     have e1 : (s.app a.j).hom (p : D.obj a.j) = (m : S) := by
       change (s.app _).hom ((D.map v).hom m') = (m : S)
@@ -168,8 +189,9 @@ def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
       rw [app_map_apply, hy']
     rw [e1, e2] at h1
     exact h1.symm
-  have hinj : ∀ (a : Idx D s M) (x y : Localization.Away a.e), leg S' a x = leg S' a y →
-      ∃ (b : Idx D s M) (f : a ⟶ b), locMap f x = locMap f y := by
+  have hinj
+      : ∀ (a : Idx D s M) (x y : Localization.Away a.e),
+        leg S' a x = leg S' a y → ∃ (b : Idx D s M) (f : a ⟶ b), locMap f x = locMap f y := by
     intro a x y hxy
     suffices H : ∀ z, leg S' a z = 0 → ∃ (b : Idx D s M) (f : a ⟶ b), locMap f z = 0 by
       obtain ⟨b, f, hf⟩ := H (x - y) (by rw [map_sub, hxy, sub_self])
@@ -177,8 +199,8 @@ def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
       rwa [map_sub, sub_eq_zero] at hf
     intro z hz
     obtain ⟨⟨c, ⟨_, n, rfl⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers a.e) z
-    have hspec := IsLocalization.mk'_spec (Localization.Away a.e) c
-      (⟨a.e ^ n, n, rfl⟩ : Submonoid.powers a.e)
+    have hspec :=
+      IsLocalization.mk'_spec (Localization.Away a.e) c (⟨a.e ^ n, n, rfl⟩ : Submonoid.powers a.e)
     have hc0 : algebraMap S S' ((s.app a.j).hom c) = 0 := by
       have := congrArg (leg S' a) hspec
       rw [map_mul, hz, zero_mul, leg_algebraMap] at this
@@ -188,14 +210,18 @@ def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
     change (s.app k).hom m' = (m : S) at hm'
     let u := IsFiltered.leftToMax a.j k
     let v := IsFiltered.rightToMax a.j k
-    have h0 : (s.app (IsFiltered.max a.j k)).hom ((D.map v).hom m' * (D.map u).hom c) =
-        (s.app (IsFiltered.max a.j k)).hom 0 := by
+    have h0
+        : (s.app (IsFiltered.max a.j k)).hom ((D.map v).hom m' * (D.map u).hom c)
+          = (s.app (IsFiltered.max a.j k)).hom 0 := by
       rw [map_mul, app_map_apply, app_map_apply, hm', map_zero, hm]
     obtain ⟨l, f1, hf1⟩ := (Types.FilteredColimit.isColimit_eq_iff' hc _ _).1 h0
     have hf1' : (D.map f1).hom ((D.map v).hom m' * (D.map u).hom c) = (D.map f1).hom 0 := hf1
     rw [map_zero, map_mul] at hf1'
-    let b : Idx D s M := ⟨l, (D.map (u ≫ f1)).hom a.e * (D.map (v ≫ f1)).hom m', by
-      rw [map_mul, app_map_apply, app_map_apply, hm']; exact M.mul_mem a.mem m.2⟩
+    let b : Idx D s M := ⟨
+      l,
+      (D.map (u ≫ f1)).hom a.e * (D.map (v ≫ f1)).hom m',
+      by rw [map_mul, app_map_apply, app_map_apply, hm']; exact M.mul_mem a.mem m.2
+    ⟩
     let f : a ⟶ b := ⟨u ≫ f1, (D.map (v ≫ f1)).hom m', rfl⟩
     refine ⟨b, f, ?_⟩
     have hu : IsUnit (locMap f (algebraMap _ _ (a.e ^ n))) := by
@@ -206,8 +232,9 @@ def isColimitToLoc [IsFiltered J] (hs : IsColimit (Cocone.mk _ s)) :
         IsLocalization.Away.algebraMap_isUnit b.e
       refine (hb.mul_right_eq_zero).1 ?_
       rw [← map_mul]
-      have : b.e * (D.map f.1).hom c = (D.map (u ≫ f1)).hom a.e *
-          ((D.map f1).hom ((D.map v).hom m') * (D.map f1).hom ((D.map u).hom c)) := by
+      have : b.e * (D.map f.1).hom c
+          = (D.map (u ≫ f1)).hom a.e
+            * ((D.map f1).hom ((D.map v).hom m') * (D.map f1).hom ((D.map u).hom c)) := by
         simp only [b, f, Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply]
         ring
       rw [this, hf1', mul_zero, map_zero]
@@ -220,14 +247,24 @@ end GlobalTheory.IndEtaleLoc
 
 namespace GlobalTheory.IndEtaleLoc
 
-theorem isIndEtale_of_isLocalization : ∀ (R S S' : Type) [CommRing R] [CommRing S] [CommRing S']
-    [Algebra R S] [Algebra S S'] [Algebra R S'] [IsScalarTower R S S'] (M : Submonoid S)
-    [IsLocalization M S'], GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap R S) →
-      GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap R S') := by
+theorem isIndEtale_of_isLocalization
+    : ∀ (R S S' : Type) [CommRing R] [CommRing S] [CommRing S'] [Algebra R S] [Algebra S S']
+        [Algebra R S'] [IsScalarTower R S S'] (M : Submonoid S) [IsLocalization M S'],
+      GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap R S)
+        → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap R
+          S') := by
   intro R S S' _ _ _ _ _ _ _ M _ h
   obtain ⟨J, _, _, D, t, s, hs, hst⟩ := h
-  refine ⟨Idx D s M, inferInstance, inferInstance, diag D s M, fromBase t, toLoc S',
-    isColimitToLoc S' hs, fun a => ⟨?_, ?_⟩⟩
+  refine ⟨
+    Idx D s M,
+    inferInstance,
+    inferInstance,
+    diag D s M,
+    fromBase t,
+    toLoc S',
+    isColimitToLoc S' hs,
+    fun a => ⟨?_, ?_⟩
+  ⟩
   · show RingHom.Etale ((algebraMap (D.obj a.j) (Localization.Away a.e)).comp (t.app a.j).hom)
     exact RingHom.Etale.stableUnderComposition _ _ (hst a.j).1
       (RingHom.etale_algebraMap.2 (Algebra.Etale.of_isLocalizationAway a.e))

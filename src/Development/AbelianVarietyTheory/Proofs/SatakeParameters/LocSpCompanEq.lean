@@ -10,7 +10,11 @@ public import Formalism.LocalToGlobal.GlobalTheory.BaseLatticeSelfDual
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat
+  Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms
+  Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,13 +23,16 @@ namespace GlobalTheory.TwV.CompSp
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix in
 attribute [local instance] _root_.Formalism.BasicNotions.Host.cmStar in
-theorem _root_.GlobalTheory.TwV.CompSp.locSp_compan_eq : ∀ {R : _root_.Formalism.BasicNotions.Ranks} {F E : Type} [Field F]
-    [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (sp : _root_.Formalism.BasicNotions.Spaces R F E)
-    (W K : Type) [CommRing W] [Field K] [Algebra W K] (ρ : E →+* K) {N : ℕ}
-    (J : Matrix (Fin N) (Fin N) E) (a : 𝓞 E) (T : ℕ) (Λ : Submodule (𝓞 E) (Fin N → E)),
-    IsUnit (T : W) → (∀ z ∈ _root_.Formalism.BasicNotions.dualSet (sp.cm.sig : E →+* E) J Λ, (T : E) • z ∈ Λ) →
-      _root_.GlobalTheory.TwV.locSp W ρ (_root_.Formalism.L2.PairingIndexBounds.F.compan (sp := sp) J a Λ) =
-        _root_.GlobalTheory.TwV.locSp W ρ Λ := by
+theorem _root_.GlobalTheory.TwV.CompSp.locSp_compan_eq
+    : ∀ {R : _root_.Formalism.BasicNotions.Ranks} {F E : Type} [Field F] [NumberField F] [Field E]
+        [NumberField E] [StarRing E] [Algebra F E] (sp : _root_.Formalism.BasicNotions.Spaces R F E)
+        (W K : Type) [CommRing W] [Field K] [Algebra W K] (ρ : E →+* K) {N : ℕ}
+        (J : Matrix (Fin N) (Fin N) E) (a : 𝓞 E) (T : ℕ) (Λ : Submodule (𝓞 E) (Fin N → E)),
+      IsUnit (T : W)
+        → (∀ z ∈ _root_.Formalism.BasicNotions.dualSet (sp.cm.sig : E →+* E) J Λ, (T : E) • z ∈ Λ)
+        → _root_.GlobalTheory.TwV.locSp W ρ
+            (_root_.Formalism.L2.PairingIndexBounds.F.compan (sp := sp) J a Λ)
+          = _root_.GlobalTheory.TwV.locSp W ρ Λ := by
   intro R F E _ _ _ _ _ _ sp W K _ _ _ ρ N J a T Λ hT hdual
   have hsub : Λ ≤ _root_.Formalism.L2.PairingIndexBounds.F.compan (sp := sp) J a Λ := by
     simp only [_root_.Formalism.L2.PairingIndexBounds.F.compan]
@@ -37,11 +44,12 @@ theorem _root_.GlobalTheory.TwV.CompSp.locSp_compan_eq : ∀ {R : _root_.Formali
     have hΛS : Λ ≤ S := fun y hy => by
       simp only [S, Submodule.mem_comap, LinearMap.smul_apply, LinearMap.id_apply]
       exact nsmul_mem hy T
-    have hDS : Submodule.span (𝓞 E) (_root_.Formalism.BasicNotions.dualSet (sp.cm.sig : E →+* E) J Λ) ≤ S := by
+    have hDS
+        : Submodule.span (𝓞 E) (_root_.Formalism.BasicNotions.dualSet (sp.cm.sig : E →+* E) J Λ)
+          ≤ S := by
       rw [Submodule.span_le]
       intro z hz
-      simp only [S, SetLike.mem_coe, Submodule.mem_comap, LinearMap.smul_apply,
-        LinearMap.id_apply]
+      simp only [S, SetLike.mem_coe, Submodule.mem_comap, LinearMap.smul_apply, LinearMap.id_apply]
       simpa [Nat.cast_smul_eq_nsmul] using hdual z hz
     have hle : _root_.Formalism.L2.PairingIndexBounds.F.compan (sp := sp) J a Λ ≤ S := by
       simp only [_root_.Formalism.L2.PairingIndexBounds.F.compan]
@@ -53,8 +61,9 @@ theorem _root_.GlobalTheory.TwV.CompSp.locSp_compan_eq : ∀ {R : _root_.Formali
   · rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨u, hu⟩ := hT
-    have h1 : (fun k => ρ ((T • x) k)) ∈
-        Submodule.span W ((fun x k ↦ ρ (x k)) '' (Λ : Set (Fin N → E))) :=
+    have h1
+        : (fun k => ρ ((T • x) k))
+          ∈ Submodule.span W ((fun x k ↦ ρ (x k)) '' (Λ : Set (Fin N → E))) :=
       Submodule.subset_span ⟨_, key x hx, rfl⟩
     have h2 : (fun k => ρ ((T • x) k)) = (u : W) • (fun k => ρ (x k)) := by
       funext k

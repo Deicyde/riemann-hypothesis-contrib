@@ -13,30 +13,40 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace Formalism.FourierDecayAlt.P.WirtingerOperators
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.LevelPointCoordinates
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.LevelPointCoordinates
 
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-def TopG {ι X : Type} [DecidableEq ι] (Eop : ι → ι → (X → E) → (X → E)) (u : ℂ) (a b : ι) (f : X → E) : X → E :=
-  fun g => (if a = b then u • f g else 0) + Eop a b f g
+def TopG
+    {ι X : Type} [DecidableEq ι] (Eop : ι → ι → (X → E) → (X → E)) (u : ℂ) (a b : ι) (f : X → E)
+    : X → E := fun g =>
+  (if a = b then u • f g else 0) + Eop a b f g
 
-def qminG {ι X : Type} [DecidableEq ι] {t : ℕ} (Eop : ι → ι → (X → E) → (X → E)) (a b : Fin t → ι) (u : ℂ)
-    (f : X → E) : X → E :=
+def qminG
+    {ι X : Type} [DecidableEq ι]
+    {t : ℕ}
+    (Eop : ι → ι → (X → E) → (X → E)) (a b : Fin t → ι) (u : ℂ) (f : X → E)
+    : X → E :=
   ∑ σ : Equiv.Perm (Fin t), (((Equiv.Perm.sign σ : ℤ) : ℂ) •
     (List.ofFn fun k : Fin t => TopG Eop (u - ((k : ℕ) : ℂ)) (a (σ k)) (b k)).foldr (fun T h => T h) f)
 
 def EopZ (k r j : ℕ) (p q : Fin (2 * r + k + 1)) : (MJ j → E) → MJ j → E :=
-  if hp : p.val < j then (if hq : q.val < j then EZ ⟨p.val, hp⟩ ⟨q.val, hq⟩ else fun _ _ => 0)
+  if hp : p.val < j then
+    (if hq : q.val < j then EZ ⟨p.val, hp⟩ ⟨q.val, hq⟩ else fun _ _ => 0)
   else if hp' : 2 * r + k < p.val + j then
     (if hq' : 2 * r + k < q.val + j then
-      EZs ⟨2 * r + k - p.val, by omega⟩ ⟨2 * r + k - q.val, by omega⟩ else fun _ _ => 0)
-  else fun _ _ => 0
+       EZs ⟨2 * r + k - p.val, by omega⟩ ⟨2 * r + k - q.val, by omega⟩
+     else fun _ _ =>
+       0)
+  else fun _ _ =>
+    0
 
-def cZ {j N : ℕ} (Z : MJ j) (p : Fin N) (a : Fin j) : ℂ := if hp : p.val < j then Z a ⟨p.val, hp⟩ else 0
+def cZ {j N : ℕ} (Z : MJ j) (p : Fin N) (a : Fin j) : ℂ :=
+  if hp : p.val < j then Z a ⟨p.val, hp⟩ else 0
 
 def cvZ (k r : ℕ) {j : ℕ} (Z : MJ j) (p : Fin (2 * r + k + 1)) (a : Fin j) : ℂ :=
   if hp : 2 * r + k < p.val + j then conj (Z a ⟨2 * r + k - p.val, by omega⟩) else 0
-
 
 open scoped Classical in
 def AZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (u : ℂ) (h : MJ j → E) : MJ j → E := fun Z =>
@@ -46,7 +56,6 @@ def AZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (u : ℂ) (h : MJ j → E)
         qminG (EopZ (E := E) k r j) (C3.xR k r m hm) c u h Z
     else 0
 
-
 open scoped Classical in
 def AvZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (ell : ℂ) (h : MJ j → E) : MJ j → E := fun Z =>
   ∑ B : Fin m → Fin (2 * r + k + 1),
@@ -55,12 +64,15 @@ def AvZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (ell : ℂ) (h : MJ j →
         qminG (EopZ (E := E) k r j) B (C3.sR k r m hm) (ell + (m : ℂ) - 1) h Z
     else 0
 
-def Aform (k r j : ℕ) (hj : j + 1 ≤ r) (l : C.Letter) (e : Fin 2) (h : MJ j → E) : MJ j → E := fun Z =>
-  if e = 1 ∧ j = 0 then 0 else
-  if l.1 then
+def Aform (k r j : ℕ) (hj : j + 1 ≤ r) (l : C.Letter) (e : Fin 2) (h : MJ j → E)
+    : MJ j → E := fun Z =>
+  if e = 1 ∧ j = 0 then
+    0
+  else if l.1 then
     (Z.det)⁻¹ • AZ k r j (j - e) (by omega) (by omega) ((l.2 : ℂ) + ((2 * r + k : ℕ) : ℂ) / 2) h Z
   else
-    (conj Z.det)⁻¹ • AvZ k r j (j - e) (by omega) (by omega) ((l.2 : ℂ) - ((2 * r + k : ℕ) : ℂ) / 2) h Z
+    (conj Z.det)⁻¹
+      • AvZ k r j (j - e) (by omega) (by omega) ((l.2 : ℂ) - ((2 * r + k : ℕ) : ℂ) / 2) h Z
 
 section zop
 
@@ -82,21 +94,25 @@ theorem zop_EopZ (k r j : ℕ) (p q : Fin (2 * r + k + 1)) : ZOp (E := E) (EopZ 
   · exact zop_zero
   · exact zop_zero
 
-theorem zop_TopG (k r j : ℕ) (u : ℂ) (p q : Fin (2 * r + k + 1)) :
-    ZOp (E := E) (TopG (EopZ k r j) u p q) := by
+theorem zop_TopG (k r j : ℕ) (u : ℂ) (p q : Fin (2 * r + k + 1))
+    : ZOp (E := E) (TopG (EopZ k r j) u p q) := by
   have h1 : ZOp (E := E) (j := j) (fun f g => if p = q then u • f g else 0) := by
     split_ifs
     · exact zop_id.csmul u
     · exact zop_zero
   exact h1.add' (zop_EopZ hR k r j p q)
 
-theorem zop_qminG (k r j : ℕ) {t : ℕ} (a b : Fin t → Fin (2 * r + k + 1)) (u : ℂ) :
-    ZOp (E := E) (qminG (EopZ k r j) a b u) := by
-  have e : (qminG (E := E) (EopZ k r j) a b u) = fun h Z => ∑ σ ∈ (Finset.univ : Finset (Equiv.Perm (Fin t))),
-      (((Equiv.Perm.sign σ : ℤ) : ℂ) • (List.ofFn fun k' : Fin t =>
-        TopG (EopZ (E := E) k r j) (u - ((k' : ℕ) : ℂ)) (a (σ k')) (b k')).foldr (fun T h => T h) h Z) := by
-    funext h Z
-    simp [qminG, Finset.sum_apply]
+theorem zop_qminG (k r j : ℕ) {t : ℕ} (a b : Fin t → Fin (2 * r + k + 1)) (u : ℂ)
+    : ZOp (E := E) (qminG (EopZ k r j) a b u) := by
+  have e
+      : (qminG (E := E) (EopZ k r j) a b u)
+        = fun h Z =>
+          ∑ σ ∈ (Finset.univ : Finset (Equiv.Perm (Fin t))),
+            (((Equiv.Perm.sign σ : ℤ) : ℂ) • (List.ofFn fun k' : Fin t =>
+              TopG (EopZ (E := E) k r j) (u - ((k' : ℕ) : ℂ)) (a (σ k')) (b k')).foldr (fun T h => T h) h Z) :=
+    by
+      funext h Z
+      simp [qminG, Finset.sum_apply]
   rw [e]
   refine zop_sum _ (fun σ _ => ?_)
   refine ZOp.csmul ?_ _
@@ -109,8 +125,9 @@ end zop
 theorem contDiff_entry {j : ℕ} (a b : Fin j) : ContDiff ℝ ∞ fun Z : MJ j => Z a b :=
   (contDiff_apply ℝ (fun _ => ℂ) b).comp (contDiff_apply ℝ (fun _ => (Fin j → ℂ)) a)
 
-theorem contDiff_det_of {j m : ℕ} (M : MJ j → Matrix (Fin m) (Fin m) ℂ) (hM : ∀ a b, ContDiff ℝ ∞ fun Z => M Z a b) :
-    ContDiff ℝ ∞ fun Z => (M Z).det := by
+theorem contDiff_det_of
+    {j m : ℕ} (M : MJ j → Matrix (Fin m) (Fin m) ℂ) (hM : ∀ a b, ContDiff ℝ ∞ fun Z => M Z a b)
+    : ContDiff ℝ ∞ fun Z => (M Z).det := by
   simp only [Matrix.det_apply]
   refine ContDiff.sum (fun σ _ => ?_)
   simp only [Units.smul_def, zsmul_eq_mul]
@@ -122,8 +139,8 @@ theorem contDiff_cZ {j N : ℕ} (p : Fin N) (a : Fin j) : ContDiff ℝ ∞ fun Z
   · exact contDiff_entry _ _
   · exact contDiff_const
 
-theorem contDiff_cvZ (k r : ℕ) {j : ℕ} (p : Fin (2 * r + k + 1)) (a : Fin j) :
-    ContDiff ℝ ∞ fun Z : MJ j => cvZ k r Z p a := by
+theorem contDiff_cvZ (k r : ℕ) {j : ℕ} (p : Fin (2 * r + k + 1)) (a : Fin j)
+    : ContDiff ℝ ∞ fun Z : MJ j => cvZ k r Z p a := by
   unfold cvZ
   split_ifs
   · exact Complex.conjCLE.contDiff.comp (contDiff_entry _ _)
@@ -132,9 +149,10 @@ theorem contDiff_cvZ (k r : ℕ) {j : ℕ} (p : Fin (2 * r + k + 1)) (a : Fin j)
 theorem contDiffOn_invDet {j : ℕ} : ContDiffOn ℝ ∞ (fun Z : MJ j => (Z.det)⁻¹) {Z | Z.det ≠ 0} :=
   (contDiff_det_of (fun Z => Z) (fun a b => contDiff_entry a b)).contDiffOn.inv (fun Z hZ => hZ)
 
-theorem contDiffOn_invConjDet {j : ℕ} :
-    ContDiffOn ℝ ∞ (fun Z : MJ j => (conj Z.det)⁻¹) {Z | Z.det ≠ 0} :=
-  (Complex.conjCLE.contDiff.comp (contDiff_det_of (fun Z => Z) (fun a b => contDiff_entry a b))).contDiffOn.inv
+theorem contDiffOn_invConjDet {j : ℕ}
+    : ContDiffOn ℝ ∞ (fun Z : MJ j => (conj Z.det)⁻¹) {Z | Z.det ≠ 0} :=
+  (Complex.conjCLE.contDiff.comp
+      (contDiff_det_of (fun Z => Z) (fun a b => contDiff_entry a b))).contDiffOn.inv
     (fun Z hZ => by simpa using hZ)
 
 section zop2
@@ -142,7 +160,8 @@ section zop2
 variable (hR : ZOpRd)
 include hR
 
-theorem zop_AZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (u : ℂ) : ZOp (E := E) (AZ k r j m hm hmj u) := by
+theorem zop_AZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (u : ℂ)
+    : ZOp (E := E) (AZ k r j m hm hmj u) := by
   classical
   unfold AZ
   refine zop_sum _ (fun c _ => ?_)
@@ -151,7 +170,8 @@ theorem zop_AZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (u : ℂ) : ZOp (E
       (contDiff_det_of _ (fun a l => contDiff_cZ _ _)).contDiffOn
   · exact zop_zero
 
-theorem zop_AvZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (ell : ℂ) : ZOp (E := E) (AvZ k r j m hm hmj ell) := by
+theorem zop_AvZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (ell : ℂ)
+    : ZOp (E := E) (AvZ k r j m hm hmj ell) := by
   classical
   unfold AvZ
   refine zop_sum _ (fun c _ => ?_)
@@ -160,8 +180,8 @@ theorem zop_AvZ (k r j m : ℕ) (hm : m ≤ r) (hmj : m ≤ j) (ell : ℂ) : ZOp
       (contDiff_det_of _ (fun a l => contDiff_cvZ k r _ _)).contDiffOn
   · exact zop_zero
 
-theorem zop_Aform (k r j : ℕ) (hj : j + 1 ≤ r) (l : C.Letter) (e : Fin 2) :
-    ZOp (E := E) (Aform k r j hj l e) := by
+theorem zop_Aform (k r j : ℕ) (hj : j + 1 ≤ r) (l : C.Letter) (e : Fin 2)
+    : ZOp (E := E) (Aform k r j hj l e) := by
   unfold Aform
   split_ifs
   · exact zop_zero

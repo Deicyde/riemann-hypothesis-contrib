@@ -28,9 +28,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne
+  GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
 
-private theorem charpoly_conj_gl {k : Type} [Field k] {n : ℕ} (g a : GL (Fin n) k) :
-    ((g * a * g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).charpoly =
-      (a : Matrix (Fin n) (Fin n) k).charpoly := by
+private theorem charpoly_conj_gl {k : Type} [Field k] {n : ℕ} (g a : GL (Fin n) k)
+    : ((g * a * g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).charpoly
+      = (a : Matrix (Fin n) (Fin n) k).charpoly := by
   rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, Matrix.charpoly_units_conj]

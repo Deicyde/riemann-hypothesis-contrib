@@ -9,8 +9,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GeometricSi
 
 open UpperTheory.V.Lit.Geo NumberField
 
-theorem UpperTheory.geometry_of_numbers_lattice_estimate :
-    LatScale := by
+theorem UpperTheory.geometry_of_numbers_lattice_estimate : LatScale := by
   intro E _ _ _ a ha L hL
   letI : InnerProductSpace ℝ (EuclideanSpace ℂ (Fin a × InfinitePlace E)) :=
     InnerProductSpace.rclikeToReal ℂ _
@@ -26,12 +25,15 @@ theorem UpperTheory.geometry_of_numbers_lattice_estimate :
     (euc.toLinearMap.toAddMonoidHom.comp (pt (rt g))).comp (lat L g).subtype
   have hφ : ∀ v : lat L g, ‖φ v‖ ^ 2 = qf (pt (rt g) v.1) := fun v => norm_euc_sq _
   have hM : (0 : ℝ) < max B 1 := lt_max_of_lt_right one_pos
-  have key := UpperTheory.scaling_invariance_of_geometric_functional (lat L g) (EuclideanSpace ℂ (Fin a × InfinitePlace E)) φ
-    (Real.sqrt (1 / max B 1)) (Real.sqrt_pos.2 (by positivity)) (fun v hv => by
-      have h1 := hB v.1 v.2 (fun h => hv (Subtype.ext h))
-      rw [← hφ] at h1
-      apply Real.sqrt_le_iff.2
-      refine ⟨norm_nonneg _, ?_⟩
-      rw [div_le_iff₀ hM, mul_comm]
-      exact h1.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (sq_nonneg _)))
+  have key :=
+    UpperTheory.scaling_invariance_of_geometric_functional (lat L g)
+      (EuclideanSpace ℂ (Fin a × InfinitePlace E)) φ (Real.sqrt (1 / max B 1))
+      (Real.sqrt_pos.2 (by positivity))
+      (fun v hv => by
+        have h1 := hB v.1 v.2 (fun h => hv (Subtype.ext h))
+        rw [← hφ] at h1
+        apply Real.sqrt_le_iff.2
+        refine ⟨norm_nonneg _, ?_⟩
+        rw [div_le_iff₀ hM, mul_comm]
+        exact h1.trans (mul_le_mul_of_nonneg_right (le_max_left _ _) (sq_nonneg _)))
   simpa only [hφ] using key

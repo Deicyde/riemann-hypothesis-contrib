@@ -5,7 +5,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 @[expose] public section
 
-open Matrix GroundTheory.Automorphic GroundTheory.Automorphic.Iwasawa PositivityTheory.JacquetShalikaLocal
+open Matrix GroundTheory.Automorphic GroundTheory.Automorphic.Iwasawa
+  PositivityTheory.JacquetShalikaLocal
 
 namespace GlobalTheory.CompanionTheory.JSBound.ColumnUnipotent
 
@@ -13,21 +14,25 @@ section Algebra
 
 variable {F : Type} [Field F] {n : ℕ}
 
-theorem cM_eq_zero_of_ne {k : ℕ} (x : Fin (k + 1) → F) {i j : Fin n}
-    (h : ¬ ((j : ℕ) = k + 1 ∧ (i : ℕ) < k + 1)) : cM n k x i j = 0 := by
+theorem cM_eq_zero_of_ne
+    {k : ℕ} (x : Fin (k + 1) → F) {i j : Fin n} (h : ¬((j : ℕ) = k + 1 ∧ (i : ℕ) < k + 1))
+    : cM n k x i j = 0 := by
   simp only [cM, Matrix.of_apply]
   rw [dite_eq_right h]
 
-theorem cM_eq_of {k : ℕ} (x : Fin (k + 1) → F) {i j : Fin n} (hj : (j : ℕ) = k + 1)
-    (hi : (i : ℕ) < k + 1) : cM n k x i j = x ⟨i, hi⟩ := by
+theorem cM_eq_of
+    {k : ℕ} (x : Fin (k + 1) → F) {i j : Fin n} (hj : (j : ℕ) = k + 1) (hi : (i : ℕ) < k + 1)
+    : cM n k x i j = x ⟨i, hi⟩ := by
   simp only [cM, Matrix.of_apply]
   rw [dite_eq_left ⟨hj, hi⟩]
 
-theorem col_val (k : ℕ) (x : Fin (k + 1) → F) :
-    ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 + cM n k x := rfl
+theorem col_val (k : ℕ) (x : Fin (k + 1) → F)
+    : ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 + cM n k x :=
+  rfl
 
-theorem col_inv_val (k : ℕ) (x : Fin (k + 1) → F) :
-    (((col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 - cM n k x := rfl
+theorem col_inv_val (k : ℕ) (x : Fin (k + 1) → F)
+    : (((col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 - cM n k x :=
+  rfl
 
 theorem col_mem (k : ℕ) (x : Fin (k + 1) → F) : col n k x ∈ unipotent F n := by
   refine ⟨fun i j hij => ?_, fun i => ?_⟩
@@ -36,8 +41,8 @@ theorem col_mem (k : ℕ) (x : Fin (k + 1) → F) : col n k x ∈ unipotent F n 
       cM_eq_zero_of_ne x (by omega), add_zero]
   · rw [col_val, Matrix.add_apply, Matrix.one_apply_eq, cM_eq_zero_of_ne x (by omega), add_zero]
 
-theorem superdiagSum_cM {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F) :
-    Whittaker.superdiagSum (cM n k x) = x (Fin.last k) := by
+theorem superdiagSum_cM {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F)
+    : Whittaker.superdiagSum (cM n k x) = x (Fin.last k) := by
   unfold Whittaker.superdiagSum
   rw [Finset.sum_eq_single (⟨k, by omega⟩ : Fin n), Finset.sum_eq_single (⟨k + 1, hk⟩ : Fin n)]
   · rw [if_pos rfl, cM_eq_of x rfl (by simp)]
@@ -56,14 +61,16 @@ theorem superdiagSum_cM {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F) :
     · rfl
   · simp
 
-theorem psiN_col (ψ : AddChar F ℂ) {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F) :
-    Whittaker.psiN ψ (col n k x) = ψ (x (Fin.last k)) := by
+theorem psiN_col (ψ : AddChar F ℂ) {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F)
+    : Whittaker.psiN ψ (col n k x) = ψ (x (Fin.last k)) := by
   rw [Whittaker.psiN, col_val, Whittaker.superdiagSum_add, Whittaker.superdiagSum_one, zero_add,
     superdiagSum_cM hk]
 
-theorem mul_cM {k : ℕ} {M : Matrix (Fin n) (Fin n) F}
+theorem mul_cM
+    {k : ℕ} {M : Matrix (Fin n) (Fin n) F}
     (hM : ∀ i j : Fin n, (j : ℕ) ≤ k → M i j = (1 : Matrix (Fin n) (Fin n) F) i j)
-    (x : Fin (k + 1) → F) : M * cM n k x = cM n k x := by
+    (x : Fin (k + 1) → F)
+    : M * cM n k x = cM n k x := by
   have h : M * cM n k x = 1 * cM n k x := by
     ext i j
     rw [Matrix.mul_apply, Matrix.mul_apply]
@@ -73,25 +80,29 @@ theorem mul_cM {k : ℕ} {M : Matrix (Fin n) (Fin n) F}
     · rw [cM_eq_zero_of_ne x (i := l) (j := j) (by omega), mul_zero, mul_zero]
   rw [h, one_mul]
 
-theorem conj_expand {M C : Matrix (Fin n) (Fin n) F} (hMC : M * C = C) (hCC : C * C = 0) :
-    (1 + C) * M * (1 - C) = M + C * M - C := by
-  calc (1 + C) * M * (1 - C) = M + C * M - M * C - C * (M * C) := by noncomm_ring
+theorem conj_expand {M C : Matrix (Fin n) (Fin n) F} (hMC : M * C = C) (hCC : C * C = 0)
+    : (1 + C) * M * (1 - C) = M + C * M - C := by
+  calc
+    (1 + C) * M * (1 - C)
+      = M + C * M - M * C - C * (M * C) := by noncomm_ring
     _ = M + C * M - C := by rw [hMC, hCC, sub_zero]
 
 end Algebra
 
 section Local
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-theorem inU_split (ψ : AddChar F ℂ) {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F) (hg : inU k g) :
-    ∃ (g' : GL (Fin n) F) (x : Fin (k + 1) → F), inU (k + 1) g' ∧ g = g' * col n k x ∧
-      Whittaker.psiN ψ g = Whittaker.psiN ψ g' * ψ (x (Fin.last k)) := by
+theorem inU_split (ψ : AddChar F ℂ) {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F) (hg : inU k g)
+    : ∃ (g' : GL (Fin n) F) (x : Fin (k + 1) → F),
+      inU (k + 1) g' ∧ g = g' * col n k x
+        ∧ Whittaker.psiN ψ g = Whittaker.psiN ψ g' * ψ (x (Fin.last k)) := by
   obtain ⟨hu, hc⟩ := hg
   let x : Fin (k + 1) → F := fun i => (g : Matrix (Fin n) (Fin n) F) ⟨i, by omega⟩ ⟨k + 1, hk⟩
-  have hv : ((g * (col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
-      (g : Matrix (Fin n) (Fin n) F) - cM n k x := by
+  have hv
+      : ((g * (col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+        = (g : Matrix (Fin n) (Fin n) F) - cM n k x := by
     rw [Units.val_mul, col_inv_val, mul_sub, mul_one, mul_cM hc]
   have hm : g * (col n k x)⁻¹ ∈ unipotent F n :=
     (unipotent F n).mul_mem hu ((unipotent F n).inv_mem (col_mem k x))
@@ -120,20 +131,27 @@ theorem inU_split (ψ : AddChar F ℂ) {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n
       rw [inv_mul_cancel_right]
     rw [h, Whittaker.psiN_mul ψ hm (col_mem k x), psiN_col ψ hk]
 
-theorem inU_conj (ψ : AddChar F ℂ) {k : ℕ} (g : GL (Fin n) F) (hg : inU (k + 1) g)
-    (x : Fin (k + 1) → F) :
-    ∃ g' : GL (Fin n) F, inU (k + 1) g' ∧ col n k x * g = g' * col n k x ∧
-      Whittaker.psiN ψ g' = Whittaker.psiN ψ g := by
+theorem inU_conj
+    (ψ : AddChar F ℂ) {k : ℕ} (g : GL (Fin n) F) (hg : inU (k + 1) g) (x : Fin (k + 1) → F)
+    : ∃ g' : GL (Fin n) F,
+      inU (k + 1) g' ∧ col n k x * g = g' * col n k x
+        ∧ Whittaker.psiN ψ g' = Whittaker.psiN ψ g := by
   obtain ⟨hu, hc⟩ := hg
   have hcol : col n k x ∈ unipotent F n := col_mem k x
   have hcg := (unipotent F n).mul_mem hcol hu
   have hinv := (unipotent F n).inv_mem hcol
-  have hv : ((col n k x * g * (col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
-      (g : Matrix (Fin n) (Fin n) F) + cM n k x * (g : Matrix (Fin n) (Fin n) F) - cM n k x := by
+  have hv
+      : ((col n k x * g * (col n k x)⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+        = (g : Matrix (Fin n) (Fin n) F) + cM n k x * (g : Matrix (Fin n) (Fin n) F)
+          - cM n k x := by
     rw [Units.val_mul, Units.val_mul, col_val, col_inv_val]
     exact conj_expand (mul_cM (fun i j hj => hc i j (by omega)) x) (cM_mul k x x)
-  refine ⟨col n k x * g * (col n k x)⁻¹, ⟨(unipotent F n).mul_mem hcg hinv, fun i j hj => ?_⟩,
-    (inv_mul_cancel_right _ _).symm, ?_⟩
+  refine ⟨
+    col n k x * g * (col n k x)⁻¹,
+    ⟨(unipotent F n).mul_mem hcg hinv, fun i j hj => ?_⟩,
+    (inv_mul_cancel_right _ _).symm,
+    ?_
+  ⟩
   · have hC : (cM n k x * (g : Matrix (Fin n) (Fin n) F)) i j = cM n k x i j := by
       rw [Matrix.mul_apply, Finset.sum_congr rfl fun l _ => by rw [hc l j hj], ← Matrix.mul_apply,
         mul_one]

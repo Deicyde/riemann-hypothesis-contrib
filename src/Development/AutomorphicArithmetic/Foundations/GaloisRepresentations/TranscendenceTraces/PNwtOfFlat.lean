@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.nwtOfFlat_of :
-    WtFlat → WtUnique → GenBasic → NwtOfFlat := by
+theorem UpperTheory.Gal.TranscendenceTraces.nwtOfFlat_of
+    : WtFlat → WtUnique → GenBasic → NwtOfFlat := by
   intro hW hU hG Z S p _ _ _
   have hm : IsNwt p (mult p) := ⟨hW p, fun _ _ _ _ _ => rfl⟩
   have hex : ∃ w, IsNwt p w := ⟨mult p, hm⟩

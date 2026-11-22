@@ -15,7 +15,8 @@ noncomputable section
 
 namespace GlobalTheory.DepthBoundTest
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 
 variable {D : D7}
 
@@ -29,8 +30,11 @@ theorem choose_two_add (p q : ℕ) : (p + q).choose 2 = p * q + p.choose 2 + q.c
 
 theorem dimY_eq_flag {j : ℕ} (hj : InR D j) : WeightFamilies.dimY D j = D.R.f * D.R.r.choose 2 := by
   have h : D.R.r = (D.R.sigW j).1 + (D.R.sigW j).2 := by
-    have := hj.1; have := hj.2
-    unfold Ranks.r Ranks.sigW; simp only; omega
+    have := hj.1
+    have := hj.2
+    unfold Ranks.r Ranks.sigW
+    simp only
+    omega
   unfold WeightFamilies.dimY
   rw [h, choose_two_add, Nat.choose_two_right, Nat.choose_two_right]
 
@@ -38,7 +42,9 @@ variable {L : SizeData₂ D} {P : ParameterChoice' D L}
 
 section Record
 
-variable {B : WeightFamilies.Prov D} {Q : ModuliIntegralCharts.Prov D} {j : ℕ} (X : WeightAlgebra.PJ D B Q j)
+variable
+  {B : WeightFamilies.Prov D} {Q : ModuliIntegralCharts.Prov D} {j : ℕ}
+  (X : WeightAlgebra.PJ D B Q j)
 
 end Record
 

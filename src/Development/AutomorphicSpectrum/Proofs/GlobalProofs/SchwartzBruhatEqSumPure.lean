@@ -9,7 +9,9 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.Hypotheses₂.OneV
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV
 open scoped TensorProduct ENNReal Topology
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Dec
@@ -20,14 +22,14 @@ section Group
 
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
 
-theorem invariant_mem_nhds {f : V → ℂ} (h1 : IsLocallyConstant f) (h2 : HasCompactSupport f) :
-    {u : V | ∀ x, f (x + u) = f x} ∈ 𝓝 (0 : V) := by
+theorem invariant_mem_nhds {f : V → ℂ} (h1 : IsLocallyConstant f) (h2 : HasCompactSupport f)
+    : {u : V | ∀ x, f (x + u) = f x} ∈ 𝓝 (0 : V) := by
   have hg : IsLocallyConstant fun p : V × V => f (p.1 + p.2) - f p.1 :=
     (h1.comp_continuous (f := fun p : V × V => p.1 + p.2) (by fun_prop)).sub
       (h1.comp_continuous (f := fun p : V × V => p.1) (by fun_prop))
   have hn := hg.isOpen_fiber 0
-  obtain ⟨u, v, _, hv, hCu, h0, huv⟩ := generalized_tube_lemma h2.isCompact
-    (isCompact_singleton (x := (0 : V))) hn (by
+  obtain ⟨u, v, _, hv, hCu, h0, huv⟩ :=
+    generalized_tube_lemma h2.isCompact (isCompact_singleton (x := (0 : V))) hn (by
       rintro ⟨c, x⟩ ⟨_, hx⟩
       have hx' : x = 0 := hx
       subst hx'
@@ -46,13 +48,17 @@ theorem invariant_mem_nhds {f : V → ℂ} (h1 : IsLocallyConstant f) (h2 : HasC
       exact h.symm
     · rw [image_eq_zero_of_notMem_tsupport hx, image_eq_zero_of_notMem_tsupport hx']
 
-theorem eq_sum_cosets {φ : V → ℂ} (hφ : HasCompactSupport φ) (L : AddSubgroup V) (hL : IsOpen (L : Set V))
-    (hinv : ∀ x, ∀ l ∈ L, φ (x + l) = φ x) :
-    ∃ s : Finset V, ∀ x, φ x = ∑ a ∈ s, φ a * Set.indicator {y | y - a ∈ L} (fun _ => (1 : ℂ)) x := by
+theorem eq_sum_cosets
+    {φ : V → ℂ} (hφ : HasCompactSupport φ)
+    (L : AddSubgroup V) (hL : IsOpen (L : Set V)) (hinv : ∀ x, ∀ l ∈ L, φ (x + l) = φ x)
+    : ∃ s : Finset V, ∀ x,
+      φ x = ∑ a ∈ s, φ a * Set.indicator {y | y - a ∈ L} (fun _ => (1 : ℂ)) x := by
   classical
-  obtain ⟨t, ht⟩ := hφ.isCompact.elim_finite_subcover (fun a : V => {y | y - a ∈ L})
-    (fun a => hL.preimage (continuous_id.sub continuous_const))
-    (fun x _ => Set.mem_iUnion.2 ⟨x, by simp [L.zero_mem]⟩)
+  obtain ⟨t, ht⟩ :=
+    hφ.isCompact.elim_finite_subcover
+      (fun a : V => {y | y - a ∈ L})
+      (fun a => hL.preimage (continuous_id.sub continuous_const))
+      (fun x _ => Set.mem_iUnion.2 ⟨x, by simp [L.zero_mem]⟩)
   let T : Finset (V ⧸ L) := t.image (QuotientAddGroup.mk : V → V ⧸ L)
   refine ⟨T.image Quotient.out, fun x => ?_⟩
   rw [Finset.sum_image (fun a _ b _ hab => Quotient.out_injective hab)]
@@ -66,14 +72,18 @@ theorem eq_sum_cosets {φ : V → ℂ} (hφ : HasCompactSupport φ) (L : AddSubg
     rw [← this]
     congr 1
     abel
-  have hterm : ∀ q : V ⧸ L, φ q.out * Set.indicator {y | y - q.out ∈ L} (fun _ => (1 : ℂ)) x
-      = if q = (x : V ⧸ L) then φ x else 0 := by
+  have hterm
+      : ∀ q : V ⧸ L,
+        φ q.out * Set.indicator {y | y - q.out ∈ L} (fun _ => (1 : ℂ)) x
+          = if q = (x : V ⧸ L) then φ x else 0 := by
     intro q
     by_cases hq : q = (x : V ⧸ L)
     · subst hq
-      rw [if_pos rfl, Set.indicator_of_mem (show x ∈ {y | y - ((x : V ⧸ L)).out ∈ L} from (key _).2 rfl),
-        hval, mul_one]
-    · rw [if_neg hq, Set.indicator_of_notMem (show x ∉ {y | y - q.out ∈ L} from fun hx => hq ((key _).1 hx)),
+      rw [if_pos rfl,
+        Set.indicator_of_mem (show x ∈ {y | y - ((x : V ⧸ L)).out ∈ L} from (key _).2 rfl), hval,
+        mul_one]
+    · rw [if_neg hq,
+        Set.indicator_of_notMem (show x ∉ {y | y - q.out ∈ L} from fun hx => hq ((key _).1 hx)),
         mul_zero]
   simp only [hterm, Finset.sum_ite_eq']
   split_ifs with hx
@@ -88,35 +98,45 @@ theorem eq_sum_cosets {φ : V → ℂ} (hφ : HasCompactSupport φ) (L : AddSubg
 
 end Group
 
-theorem exists_nhds_of_pi {ι X : Type} [Finite ι] [TopologicalSpace X] {x : X} {U : Set (ι → X)}
-    (hU : U ∈ 𝓝 (fun _ => x)) : ∃ W ∈ 𝓝 x, ∀ c : ι → X, (∀ i, c i ∈ W) → c ∈ U := by
+theorem exists_nhds_of_pi
+    {ι X : Type} [Finite ι] [TopologicalSpace X] {x : X} {U : Set (ι → X)} (hU : U ∈ 𝓝 (fun _ => x))
+    : ∃ W ∈ 𝓝 x, ∀ c : ι → X, (∀ i, c i ∈ W) → c ∈ U := by
   rw [nhds_pi, Filter.mem_pi] at hU
   obtain ⟨I, hI, t, ht, hsub⟩ := hU
-  exact ⟨⋂ i ∈ I, t i, (Filter.biInter_mem hI).2 fun i _ => ht i, fun c hc =>
-    hsub fun i hi => Set.mem_iInter₂.1 (hc i) i hi⟩
+  exact ⟨
+    ⋂ i ∈ I, t i,
+    (Filter.biInter_mem hI).2 fun i _ => ht i,
+    fun c hc => hsub fun i hi => Set.mem_iInter₂.1 (hc i) i hi
+  ⟩
 
 variable {F : Type} [Field F] [NumberField F]
 
-def intSub (v : HeightOneSpectrum (𝓞 F)) : OpenAddSubgroup (Fv F v) :=
-  ⟨(v.adicCompletionIntegers F).toSubring.toAddSubgroup, ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v⟩
+def intSub (v : HeightOneSpectrum (𝓞 F)) : OpenAddSubgroup (Fv F v) := ⟨
+  (v.adicCompletionIntegers F).toSubring.toAddSubgroup,
+  ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v
+⟩
 
-theorem mem_intSub (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v) :
-    x ∈ intSub v ↔ x ∈ v.adicCompletionIntegers F := Iff.rfl
+theorem mem_intSub (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v)
+    : x ∈ intSub v ↔ x ∈ v.adicCompletionIntegers F :=
+  Iff.rfl
 
-theorem exists_box_subset {W : Set (Af F)} (hW : W ∈ 𝓝 (0 : Af F)) :
-    ∃ (T : Finset (HeightOneSpectrum (𝓞 F))) (P : ∀ v : HeightOneSpectrum (𝓞 F), OpenAddSubgroup (Fv F v)),
+theorem exists_box_subset {W : Set (Af F)} (hW : W ∈ 𝓝 (0 : Af F))
+    : ∃ (T : Finset (HeightOneSpectrum (𝓞 F)))
+        (P : ∀ v : HeightOneSpectrum (𝓞 F), OpenAddSubgroup (Fv F v)),
       (∀ v, P v ≤ intSub v) ∧ (∀ v, v ∉ T → P v = intSub v) ∧ {y : Af F | ∀ v, y v ∈ P v} ⊆ W := by
   classical
   let R := fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F
-  let A := fun v : HeightOneSpectrum (𝓞 F) => (v.adicCompletionIntegers F : Set (v.adicCompletion F))
+  let A := fun v : HeightOneSpectrum (𝓞 F) =>
+    (v.adicCompletionIntegers F : Set (v.adicCompletion F))
   have hc : Continuous (RestrictedProduct.structureMap R A Filter.cofinite) :=
     RestrictedProduct.isEmbedding_structureMap.continuous
   have hp : (RestrictedProduct.structureMap R A Filter.cofinite) ⁻¹' W ∈ 𝓝 (fun v => (0 : A v)) :=
     hc.continuousAt.preimage_mem_nhds hW
   rw [nhds_pi, Filter.mem_pi] at hp
   obtain ⟨I, hI, t, ht, hsub⟩ := hp
-  have hQ : ∀ v : HeightOneSpectrum (𝓞 F), ∃ Q : OpenAddSubgroup (Fv F v), Q ≤ intSub v ∧
-      ∀ x : A v, (x : Fv F v) ∈ Q → x ∈ t v := by
+  have hQ
+      : ∀ v : HeightOneSpectrum (𝓞 F), ∃ Q : OpenAddSubgroup (Fv F v),
+        Q ≤ intSub v ∧ ∀ x : A v, (x : Fv F v) ∈ Q → x ∈ t v := by
     intro v
     obtain ⟨u, hu, hut⟩ := mem_nhds_subtype _ _ _ |>.1 (ht v)
     have h0 : u ∩ (intSub v : Set (Fv F v)) ∈ 𝓝 (0 : Fv F v) :=
@@ -142,25 +162,27 @@ theorem exists_box_subset {W : Set (Af F)} (hW : W ∈ 𝓝 (0 : Af F)) :
       · have := hy v
         simp only [hv, if_false] at this
         exact this
-    have : (fun v => (⟨y v, hint v⟩ : A v)) ∈ (RestrictedProduct.structureMap R A Filter.cofinite) ⁻¹' W := by
+    have : (fun v => (⟨y v, hint v⟩ : A v))
+        ∈ (RestrictedProduct.structureMap R A Filter.cofinite) ⁻¹' W := by
       refine hsub fun v hv => hQ2 v _ ?_
       have := hy v
       simp only [hv, if_true] at this
       exact this
     exact this
 
-variable {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E] {d : ℕ} (b : Module.Basis (Fin d) F E)
+variable
+  {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E] {d : ℕ} (b : Module.Basis (Fin d) F E)
 
-theorem crd_add {R : Type} [CommRing R] [Algebra F R] (x y : R ⊗[F] E) (k : Fin d) :
-    crd b R (x + y) k = crd b R x k + crd b R y k := by
+theorem crd_add {R : Type} [CommRing R] [Algebra F R] (x y : R ⊗[F] E) (k : Fin d)
+    : crd b R (x + y) k = crd b R x k + crd b R y k := by
   simp [crd]
 
-theorem crd_neg {R : Type} [CommRing R] [Algebra F R] (x : R ⊗[F] E) (k : Fin d) :
-    crd b R (-x) k = - crd b R x k := by
+theorem crd_neg {R : Type} [CommRing R] [Algebra F R] (x : R ⊗[F] E) (k : Fin d)
+    : crd b R (-x) k = - crd b R x k := by
   simp [crd]
 
-theorem crd_zero {R : Type} [CommRing R] [Algebra F R] (k : Fin d) :
-    crd b R (0 : R ⊗[F] E) k = 0 := by
+theorem crd_zero {R : Type} [CommRing R] [Algebra F R] (k : Fin d)
+    : crd b R (0 : R ⊗[F] E) k = 0 := by
   simp [crd]
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.OneV.Coef.Dec

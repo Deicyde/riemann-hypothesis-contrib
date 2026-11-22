@@ -11,6 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ProductModule
 namespace GlobalTheory.HTieLeaf
 
 theorem main : Formalism.L2.SG.FamDefs.HTie :=
-  Formalism.L2.SG.NGHTie.hTie_of GlobalTheory.T.local_height_base_pair_eq_module_product GlobalTheory.DiffModProd.htDelta GlobalTheory.T.product_modules_type_uniformisers_eq_power
+  Formalism.L2.SG.NGHTie.hTie_of GlobalTheory.T.local_height_base_pair_eq_module_product
+    GlobalTheory.DiffModProd.htDelta GlobalTheory.T.product_modules_type_uniformisers_eq_power
 
 end GlobalTheory.HTieLeaf

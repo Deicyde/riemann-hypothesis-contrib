@@ -6,19 +6,22 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory
 
-theorem exchange_independent_completion (E M : Type) [Field E] [AddCommGroup M] [Module E M]
+theorem exchange_independent_completion
+    (E M : Type) [Field E] [AddCommGroup M] [Module E M]
     (n d : ℕ) (v : Fin n → M) (w : Fin d → M) (hv : LinearIndependent E v)
-    (hw : LinearIndependent E w) (hvw : ∀ k, v k ∈ Submodule.span E (Set.range w)) :
-    ∃ K : Finset (Fin d), n + K.card = d ∧ LinearIndependent E (Sum.elim v fun k : K => w k) := by
+    (hw : LinearIndependent E w) (hvw : ∀ k, v k ∈ Submodule.span E (Set.range w))
+    : ∃ K : Finset (Fin d), n + K.card = d ∧ LinearIndependent E (Sum.elim v fun k : K => w k) := by
   classical
-  obtain ⟨b, hbt, hsb, htb, hb⟩ := exists_linearIndepOn_id_extension
-    (s := Set.range v) (t := Set.range v ∪ Set.range w) (K := E)
-    hv.linearIndepOn_id Set.subset_union_left
+  obtain ⟨b, hbt, hsb, htb, hb⟩ :=
+    exists_linearIndepOn_id_extension (s := Set.range v) (t := Set.range v ∪ Set.range w) (K := E)
+      hv.linearIndepOn_id Set.subset_union_left
   let K : Finset (Fin d) := Finset.univ.filter (fun k => w k ∈ b ∧ w k ∉ Set.range v)
   let u : Fin n ⊕ K → M := Sum.elim v fun k : K => w k
   have hK : ∀ k : K, w k ∈ b ∧ w k ∉ Set.range v := fun k => (Finset.mem_filter.1 k.2).2
@@ -43,7 +46,9 @@ theorem exchange_independent_completion (E M : Type) [Field E] [AddCommGroup M] 
         · have hk : k ∈ K := Finset.mem_filter.2 ⟨Finset.mem_univ _, hx, hxv⟩
           exact ⟨Sum.inr ⟨k, hk⟩, rfl⟩
   have hli : LinearIndependent E u :=
-    LinearIndependent.comp (show LinearIndependent E (fun x : b => (x : M)) from hb) (fun x => (⟨u x, hu_mem x⟩ : b)) (fun x y h => hu_inj (congrArg Subtype.val h))
+    LinearIndependent.comp (show LinearIndependent E (fun x : b => (x : M)) from hb)
+      (fun x => (⟨u x, hu_mem x⟩ : b))
+      (fun x y h => hu_inj (congrArg Subtype.val h))
   refine ⟨K, ?_, hli⟩
   have hspan : Submodule.span E (Set.range u) = Submodule.span E (Set.range w) := by
     apply le_antisymm

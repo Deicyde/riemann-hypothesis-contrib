@@ -6,10 +6,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.BlockInd
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix UpperTheory.Gal.TypesAndIwahori
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix UpperTheory.Gal.TypesAndIwahori
 
-theorem UpperTheory.Gal.TypesAndIwahori.finTri :
-    UpperTheory.Gal.TypesAndIwahori.FinTri := by
+theorem UpperTheory.Gal.TypesAndIwahori.finTri : UpperTheory.Gal.TypesAndIwahori.FinTri := by
   intro R _ N s d hd h hh
   have hp : h ∈ parab R (stdBlocks d hd) := by
     rw [mem_parab_iff]

@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.PositiveDens
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Matrix
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -13,15 +14,21 @@ namespace Formalism.FourierDecayAlt.P.JCx5
 
 section partE
 
-open Formalism.FourierDecayAlt.P.JCx2 Formalism.FourierDecayAlt.P.BetaSesquilinearity Formalism.FourierDecayAlt.P.JCx4
+open Formalism.FourierDecayAlt.P.JCx2 Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  Formalism.FourierDecayAlt.P.JCx4
 
-theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
-    (mm m0 : ℕ) (hm0 : m0 ≤ mm) (A' : ℝ) (hA' : 0 ≤ A') (F : Mat k r → E) (hF : CkOn (mm : ℕ∞) (GV k r) F)
-    (z z' : Fin (2 * r + k + 1) → ℂ) (ε : ℝ) (hε : 0 < ε) (hsupp : ∀ g ∈ GV k r, F g ≠ 0 → ε ≤ Gf k r z z' g)
-    (R τ : ℝ) (hR : 0 < R) (hτ : 0 < τ) :
-    ∃ y : Mat k r → E, CkOn (⊤ : ℕ∞) (GV k r) y ∧ (∀ (A'' : ℝ) (m' : ℕ), InCC A'' m' y) ∧
-      (∀ g ∈ GV k r, y g ≠ 0 → ε / 4 ≤ Gf k r z z' g) ∧
-      CCle A' m0 (fun g => pdPhi (R⁻¹ • g) • F g - y g) τ ∧ HasCompactSupport y := by
+theorem me_approx_one_cpt
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
+    (mm m0 : ℕ) (hm0 : m0 ≤ mm)
+    (A' : ℝ) (hA' : 0 ≤ A')
+    (F : Mat k r → E) (hF : CkOn (mm : ℕ∞) (GV k r) F)
+    (z z' : Fin (2 * r + k + 1) → ℂ) (ε : ℝ)
+    (hε : 0 < ε) (hsupp : ∀ g ∈ GV k r, F g ≠ 0 → ε ≤ Gf k r z z' g)
+    (R τ : ℝ) (hR : 0 < R) (hτ : 0 < τ)
+    : ∃ y : Mat k r → E,
+      CkOn (⊤ : ℕ∞) (GV k r) y ∧ (∀ (A'' : ℝ) (m' : ℕ), InCC A'' m' y)
+        ∧ (∀ g ∈ GV k r, y g ≠ 0 → ε / 4 ≤ Gf k r z z' g)
+        ∧ CCle A' m0 (fun g => pdPhi (R⁻¹ • g) • F g - y g) τ ∧ HasCompactSupport y := by
   haveI : ProperSpace (Mat k r) := FiniteDimensional.proper_real _
   obtain ⟨X, hXc, hXs, hXe, hXQ⟩ := extend mm F hF z z' ε hε hsupp R hR
   obtain ⟨Cb, hCb0, hCb⟩ := dlr_bound (k := k) (r := r) (E := E) m0
@@ -29,9 +36,11 @@ theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedS
     obtain ⟨ρ, hρ⟩ := hXs.isCompact.isBounded.subset_closedBall (0 : Mat k r)
     exact ⟨ρ, fun g hg => by simpa using hρ (subset_tsupport _ hg)⟩
   have hBc : IsCompact (Metric.closedBall (0 : Mat k r) (ρX + 1)) := isCompact_closedBall _ _
-  have hGf : Continuous fun g : Mat k r => Gf k r z z' g := Formalism.FourierDecayAlt.P.DifferentialOperatorClasses.gf_cont k r z z'
-  obtain ⟨δ₁, hδ₁, hδ₁'⟩ := Metric.uniformContinuousOn_iff.1
-    (hBc.uniformContinuousOn_of_continuous hGf.continuousOn) (ε / 4) (by positivity)
+  have hGf : Continuous fun g : Mat k r => Gf k r z z' g :=
+    Formalism.FourierDecayAlt.P.DifferentialOperatorClasses.gf_cont k r z z'
+  obtain ⟨δ₁, hδ₁, hδ₁'⟩ :=
+    Metric.uniformContinuousOn_iff.1 (hBc.uniformContinuousOn_of_continuous hGf.continuousOn)
+      (ε / 4) (by positivity)
   have hgN : Continuous fun g : Mat k r => gN g := by unfold gN; fun_prop
   have hWc : Continuous fun g : Mat k r => gN g ^ A' * (1 + ‖g‖) ^ m0 :=
     ((Real.continuous_rpow_const hA').comp hgN).mul (by fun_prop)
@@ -47,9 +56,12 @@ theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedS
     rw [hηdef, mul_div_assoc']
     rw [div_le_iff₀ hden]
     nlinarith
-  have hm0' : ((m0 : ℕ∞) : WithTop ℕ∞) ≤ ((mm : ℕ∞) : WithTop ℕ∞) := WithTop.coe_le_coe.2 (by exact_mod_cast hm0)
-  have htop : ∀ n : ℕ, ((n : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞) := fun n => WithTop.coe_le_coe.2 le_top
-  obtain ⟨y, hys, hyc, hysupp, hyd⟩ := mollify m0 X (hXc.of_le hm0') hXs η (min 1 δ₁) hη (lt_min one_pos hδ₁)
+  have hm0' : ((m0 : ℕ∞) : WithTop ℕ∞) ≤ ((mm : ℕ∞) : WithTop ℕ∞) :=
+    WithTop.coe_le_coe.2 (by exact_mod_cast hm0)
+  have htop : ∀ n : ℕ, ((n : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞) := fun n =>
+    WithTop.coe_le_coe.2 le_top
+  obtain ⟨y, hys, hyc, hysupp, hyd⟩ :=
+    mollify m0 X (hXc.of_le hm0') hXs η (min 1 δ₁) hη (lt_min one_pos hδ₁)
   have hyB : ∀ g, y g ≠ 0 → ‖g‖ < ρX + 1 := by
     intro g hg
     obtain ⟨g', hd, hX'⟩ := hysupp g hg
@@ -60,10 +72,21 @@ theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedS
     rw [dist_eq_norm] at hd
     have h3 : ‖g - g'‖ < 1 := lt_of_lt_of_le hd (min_le_left _ _)
     linarith
-  refine ⟨y, fun g₀ _ => ⟨Set.univ, y, isOpen_univ, trivial, hys.contDiffOn, fun _ _ _ => rfl⟩, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    y,
+    fun g₀ _ => ⟨Set.univ, y, isOpen_univ, trivial, hys.contDiffOn, fun _ _ _ => rfl⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro A'' m'
-    refine Formalism.FourierDecayAlt.P.compact_support_finite_class k r E y (Metric.closedBall 0 (ρX + 1))
-      (fun g₀ _ => ⟨Set.univ, y, isOpen_univ, trivial, hys.contDiffOn, fun _ _ _ => rfl⟩) hBc (fun g hg => ?_) A'' m'
+    refine Formalism.FourierDecayAlt.P.compact_support_finite_class k r E y
+      (Metric.closedBall 0 (ρX + 1))
+      (fun g₀ _ => ⟨Set.univ, y, isOpen_univ, trivial, hys.contDiffOn, fun _ _ _ => rfl⟩)
+      hBc
+      (fun g hg => ?_)
+      A'' m'
     by_contra h
     exact hg (mem_closedBall_zero_iff.2 (le_of_lt (hyB g h)))
   · intro g _ hy0
@@ -71,13 +94,19 @@ theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedS
     have h1 := hXQ g' hX'
     have hg'B : g' ∈ Metric.closedBall (0 : Mat k r) (ρX + 1) :=
       mem_closedBall_zero_iff.2 (by linarith [hρX g' hX'])
-    have hgB : g ∈ Metric.closedBall (0 : Mat k r) (ρX + 1) := mem_closedBall_zero_iff.2 (le_of_lt (hyB g hy0))
+    have hgB : g ∈ Metric.closedBall (0 : Mat k r) (ρX + 1) :=
+      mem_closedBall_zero_iff.2 (le_of_lt (hyB g hy0))
     have h2 := hδ₁' g hgB g' hg'B (lt_of_lt_of_le hd (min_le_right _ _))
     rw [Real.dist_eq, abs_sub_lt_iff] at h2
     linarith [h2.2]
   · have hXY : CCle A' m0 (fun g => X g - y g) τ := by
-      have hcd : ContDiff ℝ ((m0 : ℕ∞) : WithTop ℕ∞) (fun g => X g - y g) := (hXc.of_le hm0').sub (hys.of_le (htop m0))
-      refine ⟨fun g₀ _ => ⟨Set.univ, fun g => X g - y g, isOpen_univ, trivial, hcd.contDiffOn, fun _ _ _ => rfl⟩, ?_⟩
+      have hcd : ContDiff ℝ ((m0 : ℕ∞) : WithTop ℕ∞) (fun g => X g - y g) :=
+        (hXc.of_le hm0').sub (hys.of_le (htop m0))
+      refine ⟨
+        fun g₀ _ =>
+          ⟨Set.univ, fun g => X g - y g, isOpen_univ, trivial, hcd.contDiffOn, fun _ _ _ => rfl⟩,
+        ?_
+      ⟩
       intro u v hu hv hl g _
       have hb := hCb (fun g => X g - y g) hcd u v hu hv hl g
       have hgN0 : 0 ≤ gN g ^ A' := Real.rpow_nonneg (Real.sqrt_nonneg _) _
@@ -85,25 +114,34 @@ theorem me_approx_one_cpt {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedS
       · have hi : ∀ i ∈ Finset.range (m0 + 1), ‖iteratedFDeriv ℝ i (fun g => X g - y g) g‖ ≤ η := by
           intro i hi
           have hi' : i ≤ m0 := by simpa [Nat.lt_succ_iff] using hi
-          have e1 : iteratedFDeriv ℝ i (fun g => X g - y g) g = iteratedFDeriv ℝ i X g - iteratedFDeriv ℝ i y g :=
-            iteratedFDeriv_sub_apply ((hXc.of_le (le_trans (WithTop.coe_le_coe.2 (by exact_mod_cast hi')) hm0')).contDiffAt)
+          have e1
+              : iteratedFDeriv ℝ i (fun g => X g - y g) g
+                = iteratedFDeriv ℝ i X g - iteratedFDeriv ℝ i y g :=
+            iteratedFDeriv_sub_apply
+              ((hXc.of_le (le_trans (WithTop.coe_le_coe.2 (by exact_mod_cast hi'))
+                hm0')).contDiffAt)
               ((hys.of_le (htop i)).contDiffAt)
           rw [e1, norm_sub_rev]
           exact hyd i hi' g
-        have hsum : ∑ i ∈ Finset.range (m0 + 1), ‖iteratedFDeriv ℝ i (fun g => X g - y g) g‖ ≤ (m0 + 1) * η := by
+        have hsum
+            : ∑ i ∈ Finset.range (m0 + 1), ‖iteratedFDeriv ℝ i (fun g => X g - y g) g‖
+              ≤ (m0 + 1) * η := by
           have := Finset.sum_le_card_nsmul _ _ _ hi
           simpa [Finset.card_range, nsmul_eq_mul] using this
         have hWg : gN g ^ A' * (1 + ‖g‖) ^ m0 ≤ W := by
           have := hW₀ g (mem_closedBall_zero_iff.2 hgB)
-          exact le_trans (le_abs_self _) (le_trans (by simpa [Real.norm_eq_abs] using this) (le_max_left _ _))
+          exact le_trans (le_abs_self _)
+            (le_trans (by simpa [Real.norm_eq_abs] using this) (le_max_left _ _))
         have h1p : 0 ≤ (1 + ‖g‖) ^ m0 := by positivity
-        calc gN g ^ A' * ‖dLR u v (fun g => X g - y g) g‖
-            ≤ gN g ^ A' * (Cb * (1 + ‖g‖) ^ m0 * ((m0 + 1) * η)) :=
-              mul_le_mul_of_nonneg_left (hb.trans (mul_le_mul_of_nonneg_left hsum (mul_nonneg hCb0 h1p))) hgN0
+        calc
+          gN g ^ A' * ‖dLR u v (fun g => X g - y g) g‖
+              ≤ gN g ^ A' * (Cb * (1 + ‖g‖) ^ m0 * ((m0 + 1) * η)) :=
+            mul_le_mul_of_nonneg_left
+              (hb.trans (mul_le_mul_of_nonneg_left hsum (mul_nonneg hCb0 h1p))) hgN0
           _ = Cb * (gN g ^ A' * (1 + ‖g‖) ^ m0) * (m0 + 1) * η := by ring
           _ ≤ Cb * W * (m0 + 1) * η := by
-              have : 0 ≤ ((m0 : ℝ) + 1) * η := by positivity
-              nlinarith [mul_le_mul_of_nonneg_left hWg hCb0]
+            have : 0 ≤ ((m0 : ℝ) + 1) * η := by positivity
+            nlinarith [mul_le_mul_of_nonneg_left hWg hCb0]
           _ ≤ τ := hCbη
       · have hev : (fun g => X g - y g) =ᶠ[nhds g] fun _ => (0 : E) := by
           filter_upwards [(isOpen_lt continuous_const continuous_norm).mem_nhds (not_le.1 hgB)] with g' hg'
@@ -137,7 +175,8 @@ end Formalism.FourierDecayAlt.P.JCx5
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.FourierDecayAlt.P.JCx2 Formalism.FourierDecayAlt.P.BetaSesquilinearity Formalism.FourierDecayAlt.P.JCx4 Formalism.FourierDecayAlt.P.JCx5
+open Formalism.FourierDecayAlt.P.JCx2 Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  Formalism.FourierDecayAlt.P.JCx4 Formalism.FourierDecayAlt.P.JCx5
 
 theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensityCpt := by
   intro Wp Wq _ _ _ _ _ _ P0 T s j w A mm ε hε hA hmm H x hx
@@ -151,8 +190,8 @@ theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensi
   have hcx0 : ∀ a, 0 ≤ cx a := fun a => pd_ccle_nonneg (hcx a)
   set c0 : ℝ := ∑ a, cx a with hc0def
   have hc0 : 0 ≤ c0 := Finset.sum_nonneg fun a _ => hcx0 a
-  have hX : ∀ a, CCle A mm (x a) c0 := fun a => pd_ccle_mono_c (hcx a)
-    (Finset.single_le_sum (f := cx) (fun b _ => hcx0 b) (Finset.mem_univ a))
+  have hX : ∀ a, CCle A mm (x a) c0 := fun a =>
+    pd_ccle_mono_c (hcx a) (Finset.single_le_sum (f := cx) (fun b _ => hcx0 b) (Finset.mem_univ a))
   obtain ⟨Cf, hCf0, hCf⟩ := formLev_bound_mm P0 T s j w A hA
   obtain ⟨Kc, hKc0, hKc⟩ := pd_cut_ccle (k := P0.k) (r := P0.r - j) (E := Wq →L[ℂ] Wp) mm
   refine pd_nonneg_of_approx _ (Cf * (2 * c0 + 1)) fun R hR1 => ?_
@@ -167,8 +206,9 @@ theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensi
     have h1 : 2 * Kc * c0 / τ ≤ R' := le_max_right _ _
     rw [div_le_iff₀ hτ] at h1
     nlinarith
-  have happ := fun a => me_approx_one_cpt mm _ hm0 (A - 1) hA1 (x a) (hx a).1 (T.bs j).z (T.bs j).z' ε hε (hx a).2.2
-    R' (τ / 2) hR' (by positivity)
+  have happ := fun a =>
+    me_approx_one_cpt mm _ hm0 (A - 1) hA1 (x a) (hx a).1 (T.bs j).z (T.bs j).z' ε hε (hx a).2.2 R'
+      (τ / 2) hR' (by positivity)
   choose y hyck hyin hysupp hycc hycpt using happ
   have hpos := H (ε / 4) (by positivity) y fun a => ⟨⟨hyck a, hyin a, hysupp a⟩, hycpt a⟩
   set e : Wd.Ix (Fin w.length) → Mat P0.k (P0.r - j) → (Wq →L[ℂ] Wp) := x - y with hedef
@@ -184,7 +224,8 @@ theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensi
     exact pd_ccle_mono_c h2 (by linarith)
   have hx1 : ∀ a, CCle (A - 1) (5 + (2 * (P0.r - (j : ℕ)) + P0.k + 1) * w.length) (x a) c0 :=
     fun a => pd_ccle_mono (by linarith) hm0 (hX a)
-  have hy1 : ∀ a, CCle (A - 1) (5 + (2 * (P0.r - (j : ℕ)) + P0.k + 1) * w.length) (y a) (c0 + τ) := by
+  have hy1
+      : ∀ a, CCle (A - 1) (5 + (2 * (P0.r - (j : ℕ)) + P0.k + 1) * w.length) (y a) (c0 + τ) := by
     intro a
     have h := CCle_add (hx1 a) (CCle_smul (-1) (he a))
     have e3 : (fun g => x a g + (-1 : ℂ) • e a g) = y a := by
@@ -193,9 +234,11 @@ theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensi
       abel
     rw [e3] at h
     simpa using h
-  have hv : ∀ {F : Mat P0.k (P0.r - j) → (Wq →L[ℂ] Wp)} {c : ℝ},
-      CCle (A - 1) (5 + (2 * (P0.r - (j : ℕ)) + P0.k + 1) * w.length) F c →
-      CCle (A - 1 - 2 * (w.length : ℝ)) 5 F c := fun h => pd_ccle_mono (by linarith) (by omega) h
+  have hv
+      : ∀ {F : Mat P0.k (P0.r - j) → (Wq →L[ℂ] Wp)} {c : ℝ},
+        CCle (A - 1) (5 + (2 * (P0.r - (j : ℕ)) + P0.k + 1) * w.length) F c
+          → CCle (A - 1 - 2 * (w.length : ℝ)) 5 F c := fun h =>
+    pd_ccle_mono (by linarith) (by omega) h
 
   have hxI : ∀ a, InCC A mm (x a) := fun a => (hx a).2.1
   have hyI : ∀ a, InCC A mm (y a) := fun a => hyin a A mm
@@ -221,10 +264,14 @@ theorem positive_density_compact_support : Formalism.FourierDecayAlt.JC.PosDensi
   have hb1 := hCf y e (c0 + τ) τ hy1 fun a => hv (he a)
   have hb2 := hCf e x τ c0 he fun a => hv (hx1 a)
   rw [hS1, hS2, map_one, one_mul, one_mul]
-  have e5 : D.formLev T s j w y y + D.formLev T s j w y e + D.formLev T s j w e x - D.formLev T s j w y y =
-      D.formLev T s j w y e + D.formLev T s j w e x := by ring
+  have e5
+      : D.formLev T s j w y y + D.formLev T s j w y e + D.formLev T s j w e x
+          - D.formLev T s j w y y
+        = D.formLev T s j w y e + D.formLev T s j w e x := by
+    ring
   rw [e5]
-  calc ‖D.formLev T s j w y e + D.formLev T s j w e x‖
+  calc
+    ‖D.formLev T s j w y e + D.formLev T s j w e x‖
       ≤ ‖D.formLev T s j w y e‖ + ‖D.formLev T s j w e x‖ := norm_add_le _ _
     _ ≤ Cf * (c0 + τ) * τ + Cf * τ * c0 := add_le_add hb1 hb2
     _ ≤ Cf * (2 * c0 + 1) * τ := by nlinarith [mul_nonneg hCf0 hτ.le]
@@ -239,16 +286,23 @@ open scoped ComplexOrder
 
 theorem theorem_P_module_compact_support : Formalism.FourierDecayAlt.JC.ThmPModuleOfActualCpt := by
   intro hP hRMF hPD hSesq Wp Wq _ _ _ _ _ _ P0 T l0 N admitted A mm hl0 hl0k hAdmN hA hmm hdata
-  refine ⟨fun j => JCx2.KKcM (T.bs j) A mm, fun j w hw => ?_, fun j F ε hε hF hF1 hF3 => ⟨ε, hε, hF1, hF, hF3⟩⟩
+  refine ⟨
+    fun j => JCx2.KKcM (T.bs j) A mm,
+    fun j w hw => ?_,
+    fun j F ε hε hF hF1 hF3 => ⟨ε, hε, hF1, hF, hF3⟩
+  ⟩
   have hlen := hAdmN w hw
   have hA' : P5.Auser P0 w.length + 1 ≤ A := le_trans (by linarith [JCx2.auser_mono P0 hlen]) hA
   have hmm' : P5.mmUser P0 w.length ≤ mm := le_trans (JCx2.mmUser_mono P0 hlen) hmm
-  have hmemK : ∀ x : Wd.Ix (Fin w.length) → B.Mat P0.k (P0.r - j) → (Wq →L[ℂ] Wp),
-      x ∈ Submodule.pi Set.univ (fun _ => JCx2.KKcM (T.bs j) A mm) →
-      ∃ ε, 0 < ε ∧ ∀ a, JC.CCCoefM (T.bs j) A mm ε (x a) := by
+  have hmemK
+      : ∀ x : Wd.Ix (Fin w.length) → B.Mat P0.k (P0.r - j) → (Wq →L[ℂ] Wp),
+        x ∈ Submodule.pi Set.univ (fun _ => JCx2.KKcM (T.bs j) A mm)
+          → ∃ ε, 0 < ε ∧ ∀ a, JC.CCCoefM (T.bs j) A mm ε (x a) := by
     intro x hx
-    exact JCx2.exists_common_eps (fun a ε => JC.CCCoefM (T.bs j) A mm ε (x a))
-      (fun a ε ε' _ h hF => JCx2.cCCoefM_mono h hF) (fun a => hx a (Set.mem_univ a))
+    exact JCx2.exists_common_eps
+      (fun a ε => JC.CCCoefM (T.bs j) A mm ε (x a))
+      (fun a ε ε' _ h hF => JCx2.cCCoefM_mono h hF)
+      (fun a => hx a (Set.mem_univ a))
   refine ⟨fun x hx x' hx' y hy c => ?_, fun x hx => ?_⟩
   · obtain ⟨e1, he1, h1⟩ := hmemK x hx
     obtain ⟨e2, he2, h2⟩ := hmemK x' hx'
@@ -270,12 +324,14 @@ theorem theorem_P_module_compact_support : Formalism.FourierDecayAlt.JC.ThmPModu
     have hmu : P5.mmUser (JC.parLev P0 j) (Fintype.card (Fin w.length)) ≤ mm := by
       rw [Fintype.card_fin]
       exact (JCx2.mmUser_parLev P0 j w.length).trans hmm'
-    obtain ⟨K, hThm, -, -, hJ⟩ := hP Wp Wq (Fin w.length) (JC.parLev P0 j) (T.bs j).z (T.bs j).z' (T.bs j).π
-      (T.bs j).π' X μ L st l0 (T.bs j) A mm hD hl0 hl0k rfl rfl rfl rfl hAu hmu
+    obtain ⟨K, hThm, -, -, hJ⟩ :=
+      hP Wp Wq (Fin w.length) (JC.parLev P0 j) (T.bs j).z (T.bs j).z' (T.bs j).π (T.bs j).π' X μ L
+        st l0 (T.bs j) A mm hD hl0 hl0k rfl rfl rfl rfl hAu hmu
     choose Φ hΦK hΦ using fun a => hJ (v a) ε₁ hε₁ (hvn a).1.2.1 (hvn a).2 (hvn a).1.2.2
     rw [hform w v v Φ Φ ε₁ hε₁ hvn' hvn' hΦ hΦ]
-    have hpos := ((hThm (D.positionted w) (hOK w hw)).2.2 0 (fun _ => 1) (fun _ => one_ne_zero)).2 Φ
-      (fun a _ => hΦK a)
+    have hpos :=
+      ((hThm (D.positionted w) (hOK w hw)).2.2 0 (fun _ => 1) (fun _ => one_ne_zero)).2 Φ
+        (fun a _ => hΦK a)
     have hpos' : 0 ≤ P5.form μ 0 (P5.act (P5.RRi L st 0 (D.positionted w)) Φ) Φ 0 :=
       hpos.trans_eq (JCx2.form_zero_indep μ _ _ _ _)
     exact mul_nonneg (by exact_mod_cast hC.le) hpos'

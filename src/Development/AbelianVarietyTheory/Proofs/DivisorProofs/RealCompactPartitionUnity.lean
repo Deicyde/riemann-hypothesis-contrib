@@ -23,12 +23,11 @@ theorem bump_eq_zero {t : ℝ} (h : 1 ≤ |t|) : bump t = 0 := by
   · rw [Real.smoothTransition.zero_of_nonpos (by linarith),
       Real.smoothTransition.zero_of_nonpos (by linarith)]
     simp
-  · rw [Real.smoothTransition.one_of_one_le (by linarith),
-      Real.smoothTransition.one_of_one_le h]
+  · rw [Real.smoothTransition.one_of_one_le (by linarith), Real.smoothTransition.one_of_one_le h]
     simp
 
-theorem bump_local (y : ℝ) (k : ℤ) (hk : k ∉ ({⌊y⌋ - 1, ⌊y⌋, ⌊y⌋ + 1} : Finset ℤ)) :
-    bump (y - k) = 0 := by
+theorem bump_local (y : ℝ) (k : ℤ) (hk : k ∉ ({⌊y⌋ - 1, ⌊y⌋, ⌊y⌋ + 1} : Finset ℤ))
+    : bump (y - k) = 0 := by
   apply bump_eq_zero
   simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hk
   have h1 := Int.floor_le y
@@ -36,9 +35,13 @@ theorem bump_local (y : ℝ) (k : ℤ) (hk : k ∉ ({⌊y⌋ - 1, ⌊y⌋, ⌊y�
   have : k ≤ ⌊y⌋ - 2 ∨ ⌊y⌋ + 2 ≤ k := by omega
   rcases this with h | h
   · have h' : (k : ℝ) ≤ (⌊y⌋ : ℝ) - 2 := by exact_mod_cast h
-    rw [le_abs']; right; linarith
+    rw [le_abs']
+    right
+    linarith
   · have h' : (⌊y⌋ : ℝ) + 2 ≤ (k : ℝ) := by exact_mod_cast h
-    rw [le_abs']; left; linarith
+    rw [le_abs']
+    left
+    linarith
 
 theorem bump_sum (y : ℝ) : ∑ k ∈ ({⌊y⌋ - 1, ⌊y⌋, ⌊y⌋ + 1} : Finset ℤ), bump (y - k) = 1 := by
   rw [Finset.sum_insert (by simp; omega), Finset.sum_insert (by simp), Finset.sum_singleton]
@@ -54,10 +57,12 @@ theorem bump_sum (y : ℝ) : ∑ k ∈ ({⌊y⌋ - 1, ⌊y⌋, ⌊y⌋ + 1} : Fi
   rw [e1, e2, ha, hb]
   ring
 
-theorem summable_lattice {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    (L : Submodule ℤ E) [DiscreteTopology L] :
-    Summable fun z : L => ((1 + ‖z‖) ^ (Module.finrank ℤ L + 1))⁻¹ := by
-  refine Summable.of_norm_bounded_eventually (ZLattice.summable_norm_pow_inv L _ (Nat.lt_succ_self _)) ?_
+theorem summable_lattice
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    : Summable fun z : L => ((1 + ‖z‖) ^ (Module.finrank ℤ L + 1))⁻¹ := by
+  refine Summable.of_norm_bounded_eventually
+    (ZLattice.summable_norm_pow_inv L _ (Nat.lt_succ_self _)) ?_
   refine (Set.finite_singleton (0 : L)).subset fun z hz => ?_
   by_contra h0
   apply hz
@@ -86,35 +91,43 @@ theorem bumpProd_compact (e : V ≃L[ℝ] (Fin n → ℝ)) : HasCompactSupport (
   have : ∃ i, 1 ≤ |e x i| := by
     by_contra h
     simp only [not_exists, not_le] at h
-    exact hx ⟨e x, Set.mem_univ_pi.2 fun i => ⟨(abs_lt.1 (h i)).1.le, (abs_lt.1 (h i)).2.le⟩,
-      e.symm_apply_apply x⟩
+    exact hx ⟨
+      e x,
+      Set.mem_univ_pi.2 fun i => ⟨(abs_lt.1 (h i)).1.le, (abs_lt.1 (h i)).2.le⟩,
+      e.symm_apply_apply x
+    ⟩
   obtain ⟨i, hi⟩ := this
   exact Finset.prod_eq_zero (Finset.mem_univ i) (bump_eq_zero hi)
 
-theorem bumpProd_sub (e : V ≃L[ℝ] (Fin n → ℝ)) (x : V) (j : Fin n → ℤ) :
-    bumpProd e (x - latPt e j) = ∏ i, bump (e x i - j i) := by
+theorem bumpProd_sub (e : V ≃L[ℝ] (Fin n → ℝ)) (x : V) (j : Fin n → ℤ)
+    : bumpProd e (x - latPt e j) = ∏ i, bump (e x i - j i) := by
   simp [bumpProd, latPt, map_sub]
 
-theorem hasSum_bumpProd (e : V ≃L[ℝ] (Fin n → ℝ)) (x : V) :
-    HasSum (fun j : Fin n → ℤ => bumpProd e (x - latPt e j)) 1 := by
+theorem hasSum_bumpProd (e : V ≃L[ℝ] (Fin n → ℝ)) (x : V)
+    : HasSum (fun j : Fin n → ℤ => bumpProd e (x - latPt e j)) 1 := by
   simp only [bumpProd_sub]
   generalize e x = y
-  have hsum : ∑ j ∈ Fintype.piFinset (fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ)),
-      ∏ i, bump (y i - j i) = 1 := by
-    rw [← Finset.prod_univ_sum (t := fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ))
+  have hsum
+      : ∑ j ∈ Fintype.piFinset (fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ)),
+          ∏ i, bump (y i - j i)
+        = 1 := by
+    rw [← Finset.prod_univ_sum
+      (t := fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ))
       (f := fun i k => bump (y i - k))]
     exact Finset.prod_eq_one fun i _ => bump_sum (y i)
-  have h := hasSum_sum_of_ne_finset_zero (L := SummationFilter.unconditional _)
-    (f := fun j : Fin n → ℤ => ∏ i, bump (y i - j i))
-    (s := Fintype.piFinset (fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ))) (by
-      intro j hj
-      rw [Fintype.mem_piFinset, not_forall] at hj
-      obtain ⟨i, hi⟩ := hj
-      exact Finset.prod_eq_zero (Finset.mem_univ i) (bump_local _ _ hi))
+  have h :=
+    hasSum_sum_of_ne_finset_zero (L := SummationFilter.unconditional _)
+      (f := fun j : Fin n → ℤ => ∏ i, bump (y i - j i))
+      (s := Fintype.piFinset (fun i => ({⌊y i⌋ - 1, ⌊y i⌋, ⌊y i⌋ + 1} : Finset ℤ)))
+      (by
+        intro j hj
+        rw [Fintype.mem_piFinset, not_forall] at hj
+        obtain ⟨i, hi⟩ := hj
+        exact Finset.prod_eq_zero (Finset.mem_univ i) (bump_local _ _ hi))
   rwa [hsum] at h
 
-theorem summable_latPt [FiniteDimensional ℝ V] (b : Module.Basis (Fin n) ℝ V) :
-    ∃ M : ℕ, Summable (fun j : Fin n → ℤ => ((1 + ‖latPt b.equivFunL j‖) ^ M)⁻¹) := by
+theorem summable_latPt [FiniteDimensional ℝ V] (b : Module.Basis (Fin n) ℝ V)
+    : ∃ M : ℕ, Summable (fun j : Fin n → ℤ => ((1 + ‖latPt b.equivFunL j‖) ^ M)⁻¹) := by
   have hmem : ∀ j, latPt b.equivFunL j ∈ Submodule.span ℤ (Set.range b) := fun j => by
     have : latPt b.equivFunL j = ∑ i, (j i : ℝ) • b i := b.equivFun_symm_apply _
     rw [this]
@@ -132,8 +145,11 @@ theorem summable_latPt [FiniteDimensional ℝ V] (b : Module.Basis (Fin n) ℝ V
   refine ⟨Module.finrank ℤ (Submodule.span ℤ (Set.range b)) + 1, h.congr fun j => ?_⟩
   simp only [Function.comp_apply, Submodule.coe_norm]
 
-theorem finite_of_summable {ι : Type} (a : ι → ℝ) (ha : ∀ j, 0 ≤ a j) (M : ℕ)
-    (hS : Summable (fun j => ((1 + a j) ^ M)⁻¹)) (R : ℝ) : {j | a j ≤ R}.Finite := by
+theorem finite_of_summable
+    {ι : Type} (a : ι → ℝ) (ha : ∀ j, 0 ≤ a j)
+    (M : ℕ) (hS : Summable (fun j => ((1 + a j) ^ M)⁻¹))
+    (R : ℝ)
+    : {j | a j ≤ R}.Finite := by
   have ht := hS.tendsto_cofinite_zero
   have hR : (0 : ℝ) ≤ max R 0 := le_max_right _ _
   have hε : (0 : ℝ) < ((1 + max R 0) ^ M)⁻¹ := by positivity
@@ -148,11 +164,13 @@ theorem finite_of_summable {ι : Type} (a : ι → ℝ) (ha : ∀ j, 0 ≤ a j) 
 
 end
 
-theorem exists_lattice_partition :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V],
-    ∃ ψ : SchwartzMap V ℂ, HasCompactSupport (ψ : V → ℂ) ∧ (∀ x, starRingEnd ℂ (ψ x) = ψ x) ∧
-      ∃ v : (Fin (Module.finrank ℝ V) → ℤ) → V, (∀ x, HasSum (fun j => ψ (x - v j)) 1) ∧
-        (∀ R : ℝ, {j | ‖v j‖ ≤ R}.Finite) ∧ ∃ M : ℕ, Summable (fun j => ((1 + ‖v j‖) ^ M)⁻¹) := by
+theorem exists_lattice_partition
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V],
+      ∃ ψ : SchwartzMap V ℂ,
+        HasCompactSupport (ψ : V → ℂ) ∧ (∀ x, starRingEnd ℂ (ψ x) = ψ x)
+          ∧ ∃ v : (Fin (Module.finrank ℝ V) → ℤ) → V,
+            (∀ x, HasSum (fun j => ψ (x - v j)) 1) ∧ (∀ R : ℝ, {j | ‖v j‖ ≤ R}.Finite)
+              ∧ ∃ M : ℕ, Summable (fun j => ((1 + ‖v j‖) ^ M)⁻¹) := by
   intro V _ _ _
   obtain ⟨M, hS⟩ := summable_latPt (Module.finBasis ℝ V)
   generalize (Module.finBasis ℝ V).equivFunL = e at hS

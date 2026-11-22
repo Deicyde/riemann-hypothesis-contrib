@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LineBun
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.FibLat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.FibLat
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -21,7 +25,18 @@ noncomputable section
 
 namespace GlobalTheory.UPoinc.GFib
 
-theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf) (X : USetup C) (wi : UWit X) (Y : RatModel X.o₁ X.Ω₁) (U₀ : Y.Z.Opens) (EE : Y.Lat X.S.J) (FinalForm : ZHOut X.ρ Y U₀ EE) (q : Y.Z ⟶ X.M.Z), X.S.Over₀ Y U₀ → X.S.IsEE Y U₀ EE → Y.pt ≫ q = X.M.pt → ∀ z : X.M.Z, X.S.TT X.M z ≤ X.S.HH X.M z → ∃ (f : 𝓞 E → (FinalForm.G ⟶ FinalForm.G)) (gγ : X.S.TT X.M z → (Over.mk Y.pt ⟶ FinalForm.G)), GlobalTheory.UPoinc.GFib.IsEndoExt X wi FinalForm f ∧ GlobalTheory.UPoinc.GFib.IsTorsExt X wi FinalForm q z gγ := by
+theorem endo_torsion_ext
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf) (X : USetup C)
+        (wi : UWit X) (Y : RatModel X.o₁ X.Ω₁) (U₀ : Y.Z.Opens) (EE : Y.Lat X.S.J)
+        (FinalForm : ZHOut X.ρ Y U₀ EE) (q : Y.Z ⟶ X.M.Z),
+      X.S.Over₀ Y U₀ → X.S.IsEE Y U₀ EE → Y.pt ≫ q = X.M.pt
+        → ∀ z : X.M.Z,
+          X.S.TT X.M z ≤ X.S.HH X.M z
+            → ∃ (f : 𝓞 E → (FinalForm.G ⟶ FinalForm.G))
+                (gγ : X.S.TT X.M z → (Over.mk Y.pt ⟶ FinalForm.G)),
+              GlobalTheory.UPoinc.GFib.IsEndoExt X wi FinalForm f
+                ∧ GlobalTheory.UPoinc.GFib.IsTorsExt X wi FinalForm q z gγ := by
   intro E _ _ _ H Dw l Xo cf C X wi Y U₀ EE FinalForm q hO _ hq z hTH
   have hU : (U₀ : Set Y.Z).Nonempty := hO.ne
   have hr : Set.range Y.pt ⊆ Set.range U₀.ι := by
@@ -38,7 +53,8 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
   have hν₂ : ν ≫ pullback.snd _ _ = wi.G.hom ≫ x := pullback.lift_snd _ _ _
   let ψ : wi.G.left ⟶ FinalForm.G.left := ν ≫ FinalForm.φ
   have hQ := isGrpPullback_pullback X.ρ.P.A FinalForm.u₀
-  have gα : IsGrpPullback wi.G X.ρ.P.A (x ≫ FinalForm.u₀) (ν ≫ pullback.fst X.ρ.P.A.hom FinalForm.u₀) :=
+  have gα
+      : IsGrpPullback wi.G X.ρ.P.A (x ≫ FinalForm.u₀) (ν ≫ pullback.fst X.ρ.P.A.hom FinalForm.u₀) :=
     wi.hα.congr hxu.symm hν₁.symm
   have gν : IsGrpPullback wi.G ((Over.pullback FinalForm.u₀).obj X.ρ.P.A) x ν := hQ.cancel gα hν₂
   have gW : IsGrpPullback wi.G FinalForm.G Y.pt ψ := (gν.comp FinalForm.cart).congr hx rfl
@@ -48,15 +64,19 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
 
   let P := (Over.pullback Y.pt).obj FinalForm.G
   have gA := isGrpPullback_pullback FinalForm.G Y.pt
-  let k : P.left ⟶ wi.G.left := gW.1.lift (pullback.fst FinalForm.G.hom Y.pt) P.hom pullback.condition
+  let k : P.left ⟶ wi.G.left :=
+    gW.1.lift (pullback.fst FinalForm.G.hom Y.pt) P.hom pullback.condition
   have hk₁ : k ≫ ψ = pullback.fst FinalForm.G.hom Y.pt := gW.1.lift_fst _ _ _
   have hk₂ : k ≫ wi.G.hom = P.hom := gW.1.lift_snd _ _ _
   have gk : IsGrpPullback P wi.G (𝟙 _) k :=
     gW.cancel (gA.congr (Category.id_comp _).symm hk₁.symm) (by rw [hk₂, Category.comp_id])
   haveI : IsIso k := gk.1.isIso_fst_of_isIso
 
-  have hE : ∀ a : 𝓞 E, ∃ F : FinalForm.G ⟶ FinalForm.G, IsMonHom F ∧ ∀ e₁ : wi.G ⟶ wi.G,
-      e₁.left ≫ wi.β = wi.β ≫ (Xo.univ.t.act.act a).left → e₁.left ≫ ψ = ψ ≫ F.left := by
+  have hE
+      : ∀ a : 𝓞 E, ∃ F : FinalForm.G ⟶ FinalForm.G,
+        IsMonHom F
+          ∧ ∀ e₁ : wi.G ⟶ wi.G,
+            e₁.left ≫ wi.β = wi.β ≫ (Xo.univ.t.act.act a).left → e₁.left ≫ ψ = ψ ≫ F.left := by
     intro a
     obtain ⟨e₀, he₀, pa⟩ := GlobalTheory.SymBaseChange.exists_endo wi.hβ (Xo.univ.t.act.act a)
     have he₀l : e₀.left ≫ wi.β = wi.β ≫ (Xo.univ.t.act.act a).left := by
@@ -68,7 +88,9 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
       have := congrArg (fun z => z.left) (pw (𝟙 _))
       simpa [pushPt] using this
     obtain ⟨F, ⟨hF, hFw⟩, -⟩ := FinalForm.endo w' hw'
-    have hF' : w'.left ≫ pullback.fst FinalForm.G.hom Y.pt = pullback.fst FinalForm.G.hom Y.pt ≫ F.left := by
+    have hF'
+        : w'.left ≫ pullback.fst FinalForm.G.hom Y.pt
+          = pullback.fst FinalForm.G.hom Y.pt ≫ F.left := by
       rw [← hFw]
       simp only [Over.pullback_map_left, pullback.lift_fst]
     refine ⟨F, hF, fun e₁ he₁ => ?_⟩
@@ -77,13 +99,18 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
     have e1 : k ≫ e₁.left ≫ ψ = w'.left ≫ k ≫ ψ := by rw [← Category.assoc, ← hw'l, Category.assoc]
     rw [← cancel_epi k, e1, hk₁, hF', ← hk₁, Category.assoc]
   choose f hf using hE
-  have hT : ∀ t : X.S.TT X.M z, ∃ g : Over.mk Y.pt ⟶ FinalForm.G, g ^ (X.S.r * X.S.N) = 1 ∧
-      (∀ w : Sp X.Ω₁ ⟶ wi.G.left, w ≫ wi.G.hom = 𝟙 _ →
-        w ≫ wi.α = spMap X.S.R.val.toRingHom ≫ (X.ρ.pt (t : X.S.Gam)).left → w ≫ ψ = g.left) ∧
-      ∀ w, q.base w = z → ExtNear g w := by
+  have hT
+      : ∀ t : X.S.TT X.M z, ∃ g : Over.mk Y.pt ⟶ FinalForm.G,
+        g ^ (X.S.r * X.S.N) = 1
+          ∧ (∀ w : Sp X.Ω₁ ⟶ wi.G.left,
+            w ≫ wi.G.hom = 𝟙 _ → w ≫ wi.α = spMap X.S.R.val.toRingHom ≫ (X.ρ.pt (t : X.S.Gam)).left
+              → w ≫ ψ = g.left)
+          ∧ ∀ w, q.base w = z → ExtNear g w := by
     intro t
     set b : X.S.Gam := (t : X.S.Gam) with hbdef
-    have hb : (spMap X.S.R.val.toRingHom ≫ (X.ρ.pt b).left) ≫ X.ρ.P.A.hom = 𝟙 _ ≫ spMap X.S.R.val.toRingHom := by
+    have hb
+        : (spMap X.S.R.val.toRingHom ≫ (X.ρ.pt b).left) ≫ X.ρ.P.A.hom
+          = 𝟙 _ ≫ spMap X.S.R.val.toRingHom := by
       rw [Category.assoc, Over.w (X.ρ.pt b)]; simp
     let w₀ := wi.hα.1.lift _ _ hb
     have hw₁ : w₀ ≫ wi.α = spMap X.S.R.val.toRingHom ≫ (X.ρ.pt b).left := wi.hα.1.lift_fst _ _ _
@@ -112,7 +139,9 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
         simp [pushPt, sec0, U, hw₁]
       have hsec : sec0 ^ (X.S.r * X.S.N) = 1 := by
         apply GlobalTheory.SymBaseChange.pushPt_injective wi.hα
-        have e1 : pushPt wi.hα.1.w (sec0 ^ (X.S.r * X.S.N)) = (pushPt wi.hα.1.w sec0) ^ (X.S.r * X.S.N) :=
+        have e1
+            : pushPt wi.hα.1.w (sec0 ^ (X.S.r * X.S.N))
+              = (pushPt wi.hα.1.w sec0) ^ (X.S.r * X.S.N) :=
           map_pow (pushHom wi.hα _) sec0 _
         have e2 : pushPt wi.hα.1.w (1 : Over.mk (𝟙 (Sp X.Ω₁)) ⟶ wi.G) = 1 :=
           map_one (pushHom wi.hα _)
@@ -124,8 +153,7 @@ theorem endo_torsion_ext : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
         map_pow (preHom V) _ _
       have f2 : (pushPt gW.1.w sec0) ^ (X.S.r * X.S.N) = pushPt gW.1.w (sec0 ^ (X.S.r * X.S.N)) :=
         (map_pow (pushHom gW _) sec0 _).symm
-      have f3 : pushPt gW.1.w (1 : Over.mk (𝟙 (Sp X.Ω₁)) ⟶ wi.G) = 1 :=
-        map_one (pushHom gW _)
+      have f3 : pushPt gW.1.w (1 : Over.mk (𝟙 (Sp X.Ω₁)) ⟶ wi.G) = 1 := map_one (pushHom gW _)
       have f4 : V ≫ (1 : Over.mk (𝟙 (Sp X.Ω₁) ≫ Y.pt) ⟶ FinalForm.G) = 1 := map_one (preHom V)
       rw [f1, f2, hsec, f3, f4]
     · intro w h1 h2

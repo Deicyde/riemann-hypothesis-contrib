@@ -23,18 +23,23 @@ noncomputable section
 
 namespace AreaFormulaLocal
 
-theorem normDet_comp_of_norm {E F G : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-    [NormedAddCommGroup G] [InnerProductSpace ℝ G] [FiniteDimensional ℝ G]
-    (Q : F →ₗ[ℝ] G) (hQ : ∀ v, ‖Q v‖ = ‖v‖) (M : E →ₗ[ℝ] F) :
-    (Q ∘ₗ M).normDet = M.normDet := by
+theorem normDet_comp_of_norm
+    {E F G : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F] [NormedAddCommGroup G]
+    [InnerProductSpace ℝ G] [FiniteDimensional ℝ G]
+    (Q : F →ₗ[ℝ] G) (hQ : ∀ v, ‖Q v‖ = ‖v‖)
+    (M : E →ₗ[ℝ] F)
+    : (Q ∘ₗ M).normDet = M.normDet := by
   rw [LinearMap.normDet_comp,
     show (Q.domRestrict (LinearMap.range M)).normDet = 1 from
-      LinearIsometry.normDet_eq_one ⟨Q.domRestrict _, fun v => hQ v⟩, one_mul]
+      LinearIsometry.normDet_eq_one ⟨Q.domRestrict _, fun v => hQ v⟩,
+    one_mul]
 
-theorem exists_frame {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
-    (W : Submodule ℝ F) {k : ℕ} (hW : finrank ℝ W = k) :
-    ∃ (m : ℕ) (c : F →L[ℝ] EuclideanSpace ℝ (Fin k)) (c' : F →L[ℝ] EuclideanSpace ℝ (Fin m)),
+theorem exists_frame
+    {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F] [FiniteDimensional ℝ F]
+    (W : Submodule ℝ F)
+    {k : ℕ} (hW : finrank ℝ W = k)
+    : ∃ (m : ℕ) (c : F →L[ℝ] EuclideanSpace ℝ (Fin k)) (c' : F →L[ℝ] EuclideanSpace ℝ (Fin m)),
       (∀ z, ‖AreaGraphPiece.pairPt (c z) (c' z)‖ = ‖z‖) ∧ ∀ w ∈ W, c' w = 0 := by
   have h1 := (Wᗮ).finrank_add_finrank_orthogonal
   have h2 := W.finrank_add_finrank_orthogonal
@@ -42,10 +47,15 @@ theorem exists_frame {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F
   let b : OrthonormalBasis (Fin k) ℝ (Wᗮᗮ : Submodule ℝ F) :=
     (stdOrthonormalBasis ℝ (Wᗮᗮ : Submodule ℝ F)).reindex (finCongr hK)
   let b' := stdOrthonormalBasis ℝ (Wᗮ : Submodule ℝ F)
-  refine ⟨finrank ℝ (Wᗮ : Submodule ℝ F),
-    (b.repr.toContinuousLinearEquiv : (Wᗮᗮ : Submodule ℝ F) →L[ℝ] _).comp (Wᗮᗮ).orthogonalProjectionOnto,
-    (b'.repr.toContinuousLinearEquiv : (Wᗮ : Submodule ℝ F) →L[ℝ] _).comp (Wᗮ).orthogonalProjectionOnto,
-    fun z => ?_, fun w hw => ?_⟩
+  refine ⟨
+    finrank ℝ (Wᗮ : Submodule ℝ F),
+    (b.repr.toContinuousLinearEquiv : (Wᗮᗮ : Submodule ℝ F) →L[ℝ] _).comp
+      (Wᗮᗮ).orthogonalProjectionOnto,
+    (b'.repr.toContinuousLinearEquiv : (Wᗮ : Submodule ℝ F) →L[ℝ] _).comp
+      (Wᗮ).orthogonalProjectionOnto,
+    fun z => ?_,
+    fun w hw => ?_
+  ⟩
   · refine (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).1 ?_
     rw [AreaGraphPiece.norm_pairPt_sq, Submodule.norm_sq_eq_add_norm_sq_projection z (Wᗮ), add_comm]
     simp
@@ -53,15 +63,19 @@ theorem exists_frame {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F
       Submodule.orthogonalProjectionOnto_eq_zero_iff.2 (W.le_orthogonal_orthogonal hw)
     simp [h0]
 
-theorem setLIntegral_image {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] {k : ℕ} (hk : finrank ℝ E = k)
-    {B : Set E} (hB : MeasurableSet B) {a : E → EuclideanSpace ℝ (Fin k)}
-    {a' : E → E →L[ℝ] EuclideanSpace ℝ (Fin k)} (ha' : ∀ x ∈ B, HasFDerivWithinAt a (a' x) B x)
-    (hinj : InjOn a B) (g : EuclideanSpace ℝ (Fin k) → ℝ≥0∞) :
-    ∫⁻ y in a '' B, g y ∂(μH[(k : ℝ)]) =
-      ∫⁻ x in B, g (a x) *
-        ENNReal.ofReal (a' x : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet ∂(μH[(k : ℝ)]) := by
-  let R : E ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin k) := ((stdOrthonormalBasis ℝ E).reindex (finCongr hk)).repr
+theorem setLIntegral_image
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [MeasurableSpace E] [BorelSpace E]
+    {k : ℕ} (hk : finrank ℝ E = k)
+    {B : Set E} (hB : MeasurableSet B)
+    {a : E → EuclideanSpace ℝ (Fin k)} {a' : E → E →L[ℝ] EuclideanSpace ℝ (Fin k)}
+    (ha' : ∀ x ∈ B, HasFDerivWithinAt a (a' x) B x) (hinj : InjOn a B)
+    (g : EuclideanSpace ℝ (Fin k) → ℝ≥0∞)
+    : ∫⁻ y in a '' B, g y ∂(μH[(k : ℝ)])
+      = ∫⁻ x in B, g (a x) *
+          ENNReal.ofReal (a' x : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet ∂(μH[(k : ℝ)]) := by
+  let R : E ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin k) :=
+    ((stdOrthonormalBasis ℝ E).reindex (finCongr hk)).repr
   let Rs : EuclideanSpace ℝ (Fin k) →L[ℝ] E := (R.symm.toContinuousLinearEquiv : _ →L[ℝ] E)
   have : (μH[(k : ℝ)] : Measure E).IsAddHaarMeasure := by
     have := isAddHaarMeasure_hausdorffMeasure (E := E)
@@ -74,26 +88,28 @@ theorem setLIntegral_image {E : Type*} [NormedAddCommGroup E] [InnerProductSpace
   have hemb : MeasurableEmbedding R := R.toHomeomorph.measurableEmbedding
   rw [himg, ← hpres.setLIntegral_comp_emb hemb,
     lintegral_image_eq_lintegral_abs_det_fderiv_mul (μH[(k : ℝ)]) hB
-      (f := fun x => R.symm (a x)) (f' := fun x => Rs.comp (a' x))
+      (f := fun x => R.symm (a x))
+      (f' := fun x => Rs.comp (a' x))
       (fun x hx => Rs.hasFDerivAt.comp_hasFDerivWithinAt x (ha' x hx))
       (fun x hx y hy hxy => hinj hx hy (R.symm.injective hxy))]
   refine setLIntegral_congr_fun hB fun x _ => ?_
   have hN : |(Rs.comp (a' x)).det| = (a' x : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet := by
     rw [ContinuousLinearMap.det, ← LinearMap.normDet_eq_abs_det]
-    exact normDet_comp_of_norm (Rs : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] E) (fun v => by simp [Rs])
+    exact normDet_comp_of_norm (Rs : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] E)
+      (fun v => by simp [Rs])
       (a' x : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k))
   simp only [LinearIsometryEquiv.apply_symm_apply]
   rw [hN, mul_comm]
 
 end AreaFormulaLocal
 
-
 open AreaFormulaLocal AreaGraphPiece in
 theorem AreaFormulaLocal.proof : AreaFormulaLocal.Statement := by
   intro E F _ _ _ _ _ _ _ _ _ _ k hk U f x₀ hU hf hx₀ hinj
   classical
-  have hAG : AreaGraph.Statement := AreaGraph.proof
-    (AreaGraphBound.proof AreaGraphPiece.proof AreaGraphPartition.proof GraphJacContinuous.proof)
+  have hAG : AreaGraph.Statement :=
+    AreaGraph.proof (AreaGraphBound.proof AreaGraphPiece.proof AreaGraphPartition.proof
+      GraphJacContinuous.proof)
   have hfc : ∀ x ∈ U, ContDiffAt ℝ 1 f x := fun x hx => hf.contDiffAt (hU.mem_nhds hx)
   have hfd : ∀ x ∈ U, HasFDerivAt f (fderiv ℝ f x) x := fun x hx =>
     ((hfc x hx).differentiableAt one_ne_zero).hasFDerivAt
@@ -102,17 +118,18 @@ theorem AreaFormulaLocal.proof : AreaFormulaLocal.Statement := by
   have hWk : finrank ℝ (LinearMap.range (D : E →ₗ[ℝ] F)) = k := by
     rw [LinearMap.finrank_range_of_inj hinj, hk]
   obtain ⟨m, c, c', hcc, hc'⟩ := exists_frame (LinearMap.range (D : E →ₗ[ℝ] F)) hWk
-  let Q : F →ₗ[ℝ] EuclideanSpace ℝ (Fin k ⊕ Fin m) :=
-    { toFun := fun z => pairPt (c z) (c' z)
-      map_add' := fun z w => by rw [map_add (f := _), map_add (f := _), pairPt_add]
-      map_smul' := fun r z => by rw [map_smul, map_smul, pairPt_smul]; rfl }
+  let Q : F →ₗ[ℝ] EuclideanSpace ℝ (Fin k ⊕ Fin m) := {
+    toFun := fun z => pairPt (c z) (c' z)
+    map_add' := fun z w => by rw [map_add (f := _), map_add (f := _), pairPt_add]
+    map_smul' := fun r z => by rw [map_smul, map_smul, pairPt_smul]; rfl
+  }
   have hQ : ∀ z, ‖Q z‖ = ‖z‖ := hcc
 
   let a : E → EuclideanSpace ℝ (Fin k) := fun x => c (f x)
   have had : ∀ x ∈ U, HasFDerivAt a (c.comp (fderiv ℝ f x)) x := fun x hx =>
     c.hasFDerivAt.comp x (hfd x hx)
-  have hinj0 : Function.Injective ((c.comp D : E →L[ℝ] EuclideanSpace ℝ (Fin k)) :
-      E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)) := by
+  have hinj0 : Function.Injective
+      ((c.comp D : E →L[ℝ] EuclideanSpace ℝ (Fin k)) : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)) := by
     intro v w hvw
     apply hinj
     have hv : D (v - w) ∈ LinearMap.range (D : E →ₗ[ℝ] F) := ⟨v - w, rfl⟩
@@ -175,10 +192,12 @@ theorem AreaFormulaLocal.proof : AreaFormulaLocal.Statement := by
     show pairPt (c (f x)) (c' (f x)) = pairPt (a x) (c' (f (φ.symm (a x))))
     rw [hleft x hx]
 
-  have hJ : ∀ x ∈ V, areaJacobian (fderiv ℝ f x : E →ₗ[ℝ] F) =
-      graphJac (fderiv ℝ h (a x) : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m)) *
-        ((c.comp (fderiv ℝ f x) : E →L[ℝ] EuclideanSpace ℝ (Fin k)) :
-          E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet := by
+  have hJ
+      : ∀ x ∈ V,
+        areaJacobian (fderiv ℝ f x : E →ₗ[ℝ] F)
+          = graphJac (fderiv ℝ h (a x) : EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))
+            * ((c.comp (fderiv ℝ f x) : E →L[ℝ] EuclideanSpace ℝ (Fin k))
+              : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet := by
     intro x hx
     have hhd : HasFDerivAt h (fderiv ℝ h (a x)) (a x) :=
       ((hhc.contDiffAt (hTo.mem_nhds ⟨x, hx, rfl⟩)).differentiableAt one_ne_zero).hasFDerivAt
@@ -187,11 +206,13 @@ theorem AreaFormulaLocal.proof : AreaFormulaLocal.Statement := by
     have h2 : HasFDerivAt (fun z => h (a z)) ((fderiv ℝ h (a x)).comp (c.comp (fderiv ℝ f x))) x :=
       hhd.comp x (had x (hVU hx))
     have heq : c'.comp (fderiv ℝ f x) = (fderiv ℝ h (a x)).comp (c.comp (fderiv ℝ f x)) :=
-      h1.unique (h2.congr_of_eventuallyEq (Filter.eventually_of_mem (hVo.mem_nhds hx)
-        fun z hz => by simp only [h, hleft z hz]))
-    have hlin : Q ∘ₗ (fderiv ℝ f x : E →ₗ[ℝ] F) =
-        graphLin (fderiv ℝ h (a x)) ∘ₗ ((c.comp (fderiv ℝ f x) : E →L[ℝ] EuclideanSpace ℝ (Fin k)) :
-          E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)) := by
+      h1.unique (h2.congr_of_eventuallyEq (Filter.eventually_of_mem (hVo.mem_nhds hx) fun z hz => by
+        simp only [h, hleft z hz]))
+    have hlin
+        : Q ∘ₗ (fderiv ℝ f x : E →ₗ[ℝ] F)
+          = graphLin (fderiv ℝ h (a x))
+            ∘ₗ ((c.comp (fderiv ℝ f x) : E →L[ℝ] EuclideanSpace ℝ (Fin k))
+              : E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)) := by
       refine LinearMap.ext fun v => ?_
       have hv := congrArg (fun M : E →L[ℝ] EuclideanSpace ℝ (Fin m) => M v) heq
       simp only [ContinuousLinearMap.comp_apply] at hv
@@ -205,25 +226,27 @@ theorem AreaFormulaLocal.proof : AreaFormulaLocal.Statement := by
   have hinjB : InjOn a B := φ.injOn.mono hBV'
   have haB : MeasurableSet (a '' B) :=
     hB.image_of_continuousOn_injOn
-      (fun x hx => (had x (hVU (hBV hx))).continuousAt.continuousWithinAt) hinjB
+      (fun x hx => (had x (hVU (hBV hx))).continuousAt.continuousWithinAt)
+      hinjB
   have hBT : a '' B ⊆ T := image_mono hBV
   have hQi : Isometry Q := AddMonoidHomClass.isometry_of_norm Q hQ
-  calc μH[(k : ℝ)] (f '' B) = μH[(k : ℝ)] (Q '' (f '' B)) :=
-        (hQi.hausdorffMeasure_image (Or.inl (Nat.cast_nonneg k)) _).symm
+  calc
+    μH[(k : ℝ)] (f '' B) = μH[(k : ℝ)] (Q '' (f '' B)) :=
+      (hQi.hausdorffMeasure_image (Or.inl (Nat.cast_nonneg k)) _).symm
     _ = μH[(k : ℝ)] (realGraphPt h '' (a '' B)) := by
-        rw [image_image, image_image]
-        exact congrArg _ (image_congr fun x hx => hQf x (hBV hx))
+      rw [image_image, image_image]
+      exact congrArg _ (image_congr fun x hx => hQf x (hBV hx))
     _ = ∫⁻ y in a '' B, ENNReal.ofReal (graphJac (fderiv ℝ h y :
           EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) ∂(μH[(k : ℝ)]) :=
-        hAG k m T h hTo hhc (a '' B) hBT haB
+      hAG k m T h hTo hhc (a '' B) hBT haB
     _ = ∫⁻ x in B, ENNReal.ofReal (graphJac (fderiv ℝ h (a x) :
           EuclideanSpace ℝ (Fin k) →ₗ[ℝ] EuclideanSpace ℝ (Fin m))) *
           ENNReal.ofReal ((c.comp (fderiv ℝ f x) : E →L[ℝ] EuclideanSpace ℝ (Fin k)) :
             E →ₗ[ℝ] EuclideanSpace ℝ (Fin k)).normDet ∂(μH[(k : ℝ)]) :=
-        setLIntegral_image hk hB (fun x hx => (had x (hVU (hBV hx))).hasFDerivWithinAt) hinjB _
+      setLIntegral_image hk hB (fun x hx => (had x (hVU (hBV hx))).hasFDerivWithinAt) hinjB _
     _ = _ := by
-        refine setLIntegral_congr_fun hB fun x hx => ?_
-        rw [hJ x (hBV hx), ENNReal.ofReal_mul (by unfold graphJac; exact Real.sqrt_nonneg _)]
+      refine setLIntegral_congr_fun hB fun x hx => ?_
+      rw [hJ x (hBV hx), ENNReal.ofReal_mul (by unfold graphJac; exact Real.sqrt_nonneg _)]
 
 end
 

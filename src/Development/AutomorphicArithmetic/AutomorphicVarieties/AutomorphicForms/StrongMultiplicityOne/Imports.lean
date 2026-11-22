@@ -20,7 +20,8 @@ def tr : Cinf E →ₗ[ℝ] ℝ where
   toFun x := ∑ w, 2 * (x w).re
   map_add' x y := by simp only [Pi.add_apply, Complex.add_re, mul_add, Finset.sum_add_distrib]
   map_smul' c x := by
-    simp only [Pi.smul_apply, Complex.real_smul, Complex.re_ofReal_mul, RingHom.id_apply, smul_eq_mul, Finset.mul_sum]
+    simp only [Pi.smul_apply, Complex.real_smul, Complex.re_ofReal_mul, RingHom.id_apply,
+      smul_eq_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => by ring
 
 theorem tr_apply (x : Cinf E) : tr E x = ∑ w, 2 * (x w).re := rfl

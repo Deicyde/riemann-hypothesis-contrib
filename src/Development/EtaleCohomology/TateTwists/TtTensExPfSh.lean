@@ -17,44 +17,56 @@ abbrev shK {I J : Cx R} (T : TensPre I J) : Cx R :=
   ((presheafToSheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))).mapHomologicalComplex
     (ComplexShape.up ℤ)).obj T.P
 
-abbrev tS {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ) :
-    Tens I J U w →ₗ[ULift.{1} R] Sec ((shK T).X w) U :=
+abbrev tS {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ)
+    : Tens I J U w →ₗ[ULift.{1} R] Sec ((shK T).X w) U :=
   ((toSheafify Scheme.etaleTopology.{0} (T.P.X w)).app (op U)).hom ∘ₗ (T.e U w).toLinearMap
 
-theorem tS_nat {I J : Cx R} (T : TensPre I J) {V U : Scheme.{0}} (g : V ⟶ U) (w : ℤ) (x : Tens I J U w) :
-    Sec.res g (tS T U w x) = tS T V w (Tens.res g w x) := by
-  have h1 := ConcreteCategory.congr_hom ((toSheafify Scheme.etaleTopology.{0} (T.P.X w)).naturality g.op) (T.e U w x)
+theorem tS_nat
+    {I J : Cx R} (T : TensPre I J) {V U : Scheme.{0}} (g : V ⟶ U) (w : ℤ) (x : Tens I J U w)
+    : Sec.res g (tS T U w x) = tS T V w (Tens.res g w x) := by
+  have h1 :=
+    ConcreteCategory.congr_hom ((toSheafify Scheme.etaleTopology.{0} (T.P.X w)).naturality g.op)
+      (T.e U w x)
   simp only [ConcreteCategory.comp_apply] at h1
   show Sec.res g (((toSheafify Scheme.etaleTopology.{0} (T.P.X w)).app (op U)).hom (T.e U w x)) =
     ((toSheafify Scheme.etaleTopology.{0} (T.P.X w)).app (op V)).hom (T.e V w (Tens.res g w x))
   rw [T.nat]
   exact h1.symm
 
-theorem tS_d {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ) (x : Tens I J U w) :
-    Sec.map ((shK T).d w (w + 1)) (tS T U w x) =
-      ((toSheafify Scheme.etaleTopology.{0} (T.P.X (w + 1))).app (op U)).hom
+theorem tS_d {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ) (x : Tens I J U w)
+    : Sec.map ((shK T).d w (w + 1)) (tS T U w x)
+      = ((toSheafify Scheme.etaleTopology.{0} (T.P.X (w + 1))).app (op U)).hom
         (((T.P.d w (w + 1)).app (op U)).hom (T.e U w x)) := by
   simp only [tS, LinearMap.comp_apply, LinearEquiv.coe_coe]
-  exact (ConcreteCategory.congr_hom (congrArg (fun f => NatTrans.app f (op U))
-    (toSheafify_naturality Scheme.etaleTopology.{0} (T.P.d w (w + 1)))) _).symm
+  exact (ConcreteCategory.congr_hom
+    (congrArg
+      (fun f => NatTrans.app f (op U))
+      (toSheafify_naturality Scheme.etaleTopology.{0} (T.P.d w (w + 1))))
+    _).symm
 
 def shPair {I J : Cx R} (T : TensPre I J) : Pair I J (shK T) where
-  mul U s t w h := (TensorProduct.mk _ _ _).compr₂ (tS T U w ∘ₗ DirectSum.lof (ULift.{1} R) {p : ℤ × ℤ // p.1 + p.2 = w} (fun p => Sec (I.X p.1.1) U ⊗[ULift.{1} R] Sec (J.X p.1.2) U) ⟨(s, t), h⟩)
+  mul U s t w h :=
+    (TensorProduct.mk _ _ _).compr₂
+      (tS T U w ∘ₗ DirectSum.lof (ULift.{1} R) {p : ℤ × ℤ // p.1 + p.2 = w}
+        (fun p => Sec (I.X p.1.1) U ⊗[ULift.{1} R] Sec (J.X p.1.2) U)
+        ⟨(s, t), h⟩)
   nat {V} {U} g s t w h a b := by
-    change Sec.res g (tS T U w (DirectSum.of _ ⟨(s, t), h⟩ (a ⊗ₜ b))) =
-      tS T V w (DirectSum.of _ ⟨(s, t), h⟩ (Sec.res g a ⊗ₜ Sec.res g b))
+    change Sec.res g (tS T U w (DirectSum.of _ ⟨(s, t), h⟩ (a ⊗ₜ b)))
+      = tS T V w (DirectSum.of _ ⟨(s, t), h⟩ (Sec.res g a ⊗ₜ Sec.res g b))
     rw [tS_nat, Tens.res, DirectSum.lmap_of, TensorProduct.map_tmul]
   leibniz U s t w h a b := by
-    change Sec.map ((shK T).d w (w + 1))
-      (tS T U w (DirectSum.of _ ⟨(s, t), h⟩ (a ⊗ₜ b))) = _
+    change Sec.map ((shK T).d w (w + 1)) (tS T U w (DirectSum.of _ ⟨(s, t), h⟩ (a ⊗ₜ b))) = _
     rw [tS_d, T.leibniz]
     simp only [map_add, Units.smul_def, map_zsmul]
     rfl
 
-theorem shPair_lift {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ) :
-    (shPair T).lift U w = tS T U w := by
+theorem shPair_lift {I J : Cx R} (T : TensPre I J) (U : Scheme.{0}) (w : ℤ)
+    : (shPair T).lift U w = tS T U w := by
   classical
-  apply DirectSum.linearMap_ext; intro p; apply TensorProduct.ext'; intro a b
+  apply DirectSum.linearMap_ext
+  intro p
+  apply TensorProduct.ext'
+  intro a b
   simp [Pair.lift, shPair, DirectSum.toModule_lof]
 
 theorem shPair_isTensor {I J : Cx R} (T : TensPre I J) : (shPair T).IsTensor := by
@@ -75,7 +87,8 @@ theorem shPair_isTensor {I J : Cx R} (T : TensPre I J) : (shPair T).IsTensor := 
     rw [← T.nat] at h2
     exact (LinearEquiv.map_eq_zero_iff _).mp h2
 
-theorem etale_presheaf_tensor_data_sheafification_is_tensor_complex : tt_tens_sheafify := fun _ _ _ _ T => ⟨_, shPair T, shPair_isTensor T⟩
+theorem etale_presheaf_tensor_data_sheafification_is_tensor_complex : tt_tens_sheafify :=
+  fun _ _ _ _ T => ⟨_, shPair T, shPair_isTensor T⟩
 
 end
 

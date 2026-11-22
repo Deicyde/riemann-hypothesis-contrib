@@ -15,23 +15,30 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SmoothW
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem LocLanglands.isSmoothChar_of_comp {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
-    {a : Weil h →* (w.adicCompletion E)ˣ} (hs : Function.Surjective a)
-    (hc : Continuous fun σ : Ine (F := E) A => a (ineIncl h σ))
-    (ho : ∀ σ, ord (w.adicCompletion E) (a σ) = -deg σ) {χ : (w.adicCompletion E)ˣ →* ℂˣ}
-    (hχ : WeilDeligne.IsSmooth (χ.comp a)) : IsSmoothChar χ := by
+theorem LocLanglands.isSmoothChar_of_comp
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+    {a : Weil h →* (w.adicCompletion E)ˣ}
+    (hs : Function.Surjective a) (hc : Continuous fun σ : Ine (F := E) A => a (ineIncl h σ))
+    (ho : ∀ σ, ord (w.adicCompletion E) (a σ) = - deg σ)
+    {χ : (w.adicCompletion E)ˣ →* ℂˣ} (hχ : WeilDeligne.IsSmooth (χ.comp a))
+    : IsSmoothChar χ := by
   haveI : CompactSpace (Ine (F := E) A) := isCompact_iff_compactSpace.1 (isClosed_Ine A).isCompact
   have hK : IsOpen {σ : Ine (F := E) A | χ (a (ineIncl h σ)) = 1} := hχ
-  have hC : IsClosed ((fun σ : Ine (F := E) A => a (ineIncl h σ)) ''
-      {σ : Ine (F := E) A | χ (a (ineIncl h σ)) = 1}ᶜ) :=
+  have hC : IsClosed
+      ((fun σ : Ine (F := E) A => a (ineIncl h σ))
+        '' {σ : Ine (F := E) A | χ (a (ineIncl h σ)) = 1}ᶜ) :=
     (hK.isClosed_compl.isCompact.image hc).isClosed
-  have hU : {x : (w.adicCompletion E)ˣ | valuation (w.adicCompletion E) (x : w.adicCompletion E) = 1} ∈ nhds 1 := by
+  have hU
+      : {x : (w.adicCompletion E)ˣ | valuation (w.adicCompletion E) (x : w.adicCompletion E) = 1}
+        ∈ nhds 1 := by
     have h1 : {x : w.adicCompletion E | valuation (w.adicCompletion E) (x - 1) < 1} ∈ nhds 1 := by
       rw [IsValuativeTopology.mem_nhds_iff]
       exact ⟨1, fun z hz => by simpa [neg_add_eq_sub] using hz⟩
@@ -41,8 +48,9 @@ theorem LocLanglands.isSmoothChar_of_comp {E Ω : Type} [Field E] [NumberField E
     have := Valuation.map_one_add_of_lt _ h3
     simpa using this
   refine Subgroup.isOpen_of_mem_nhds χ.ker (g := 1) ?_
-  have h1 : (1 : (w.adicCompletion E)ˣ) ∈ ((fun σ : Ine (F := E) A => a (ineIncl h σ)) ''
-      {σ : Ine (F := E) A | χ (a (ineIncl h σ)) = 1}ᶜ)ᶜ := by
+  have h1
+      : (1 : (w.adicCompletion E)ˣ) ∈ ((fun σ : Ine (F := E) A => a (ineIncl h σ))
+        '' {σ : Ine (F := E) A | χ (a (ineIncl h σ)) = 1}ᶜ)ᶜ := by
     rintro ⟨σ, hσ, e⟩
     refine hσ ?_
     have e' : a (ineIncl h σ) = 1 := e

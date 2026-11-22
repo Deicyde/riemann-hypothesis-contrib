@@ -6,21 +6,22 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.JacquetLanglands
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
 open scoped ContDiff
 
 namespace UpperTheory.Esk.ImaginaryUnitActionLemmas
 
 open UpperTheory.Esk
 
-
 open Classical in
 def Fx {I : Type} (f : X I → ℂ) (w : I → ℂ) : ℂ :=
   if h : ∀ v, (w v).im ≠ 0 then f (fun v => ⟨w v, h v⟩) else 0
 
-theorem Fx_eq {I : Type} (f : X I → ℂ) {w : I → ℂ} (h : ∀ v, (w v).im ≠ 0) :
-    Fx f w = f (fun v => ⟨w v, h v⟩) := by
+theorem Fx_eq {I : Type} (f : X I → ℂ) {w : I → ℂ} (h : ∀ v, (w v).im ≠ 0)
+    : Fx f w = f (fun v => ⟨w v, h v⟩) := by
   rw [Fx, dite_eq_left h]
 
 theorem Fx_val {I : Type} (f : X I → ℂ) (z : X I) : Fx f (fun v => (z v).1) = f z :=
@@ -31,13 +32,15 @@ theorem isOpen_U (I : Type) [Finite I] : IsOpen {w : I → ℂ | ∀ v, (w v).im
   exact isOpen_iInter_of_finite fun v =>
     isOpen_ne_fun (Complex.continuous_im.comp (continuous_apply v)) continuous_const
 
-theorem analytic_Fx (hO : Osg) {I : Type} [Fintype I] (f : X I → ℂ) (hf : SepHol f) :
-    AnalyticOnNhd ℂ (Fx f) {w : I → ℂ | ∀ v, (w v).im ≠ 0} := by
+theorem analytic_Fx (hO : Osg) {I : Type} [Fintype I] (f : X I → ℂ) (hf : SepHol f)
+    : AnalyticOnNhd ℂ (Fx f) {w : I → ℂ | ∀ v, (w v).im ≠ 0} := by
   classical
   obtain ⟨hc, hh⟩ := hf
   refine hO I _ (isOpen_U I) (Fx f) ?_ ?_
   · rw [continuousOn_iff_continuous_domRestrict]
-    have e : Set.domRestrict {w : I → ℂ | ∀ v, (w v).im ≠ 0} (Fx f) = fun w => f (fun v => ⟨w.1 v, w.2 v⟩) := by
+    have e
+        : Set.domRestrict {w : I → ℂ | ∀ v, (w v).im ≠ 0} (Fx f)
+          = fun w => f (fun v => ⟨w.1 v, w.2 v⟩) := by
       funext w
       exact Fx_eq f w.2
     rw [e]
@@ -91,9 +94,13 @@ theorem dn_ne {M : Matrix (Fin 2) (Fin 2) ℝ} (h : dt M ≠ 0) : dn M ≠ 0 := 
   apply h
   simp [dt, h1, h2]
 
-theorem cd_parts {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (M : E → Matrix (Fin 2) (Fin 2) ℝ) (m0 : E)
-    (hM : ∀ i j, ContDiffAt ℝ ∞ (fun m => M m i j) m0) (h0 : dt (M m0) ≠ 0) (k : ℕ) :
-    ContDiffAt ℝ ∞ (fun m => nm (M m) * (dn (M m))⁻¹) m0 ∧ ContDiffAt ℝ ∞ (fun m => jj k (M m)) m0 := by
+theorem cd_parts
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (M : E → Matrix (Fin 2) (Fin 2) ℝ) (m0 : E)
+    (hM : ∀ i j, ContDiffAt ℝ ∞ (fun m => M m i j) m0) (h0 : dt (M m0) ≠ 0)
+    (k : ℕ)
+    : ContDiffAt ℝ ∞ (fun m => nm (M m) * (dn (M m))⁻¹) m0
+      ∧ ContDiffAt ℝ ∞ (fun m => jj k (M m)) m0 := by
   have hC : ∀ i j, ContDiffAt ℝ ∞ (fun m => ((M m i j : ℝ) : ℂ)) m0 := fun i j =>
     Complex.ofRealCLM.contDiff.contDiffAt.comp m0 (hM i j)
   have hdn : ContDiffAt ℝ ∞ (fun m => dn (M m)) m0 := by
@@ -107,27 +114,36 @@ theorem cd_parts {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (M : E �
     exact ((hM 0 0).mul (hM 1 1)).sub ((hM 0 1).mul (hM 1 0))
   refine ⟨hnm.mul (hdn.inv (dn_ne h0)), ?_⟩
   unfold jj
-  exact (hdn.pow k).mul (Complex.ofRealCLM.contDiff.contDiffAt.comp m0
-    ((hdt.abs h0).rpow_const_of_ne (p := -(k : ℝ) / 2) (abs_ne_zero.2 h0)))
+  exact (hdn.pow k).mul
+    (Complex.ofRealCLM.contDiff.contDiffAt.comp m0
+      ((hdt.abs h0).rpow_const_of_ne (p := -(k : ℝ) / 2) (abs_ne_zero.2 h0)))
 
-theorem chart_smooth (hO : Osg) (hB : B1b) (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+theorem chart_smooth
+    (hO : Osg) (hB : B1b)
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
     (k : InfinitePlace F → ℕ) (f : X (InfinitePlace F) × GF F → ℂ) (φ : GA F 2 → ℂ)
-    (hf : ∀ x, SepHol fun z => f (z, x)) (hR : Rel k f φ) (g0 : GA F 2) :
-    ContDiffOn ℝ ∞ (TR.chart φ g0) (TR.invSet F 2) := by
+    (hf : ∀ x, SepHol fun z => f (z, x)) (hR : Rel k f φ) (g0 : GA F 2)
+    : ContDiffOn ℝ ∞ (TR.chart φ g0) (TR.invSet F 2) := by
   obtain ⟨-, hj1, -⟩ := hB
-  obtain ⟨y0, x0, rfl⟩ : ∃ (y0 : GL (Fin 2) (TR.Rinf F)) (x0 : GF F), g0 = TR.infGL F 2 y0 * finGL F 2 x0 :=
+  obtain ⟨y0, x0, rfl⟩
+      : ∃ (y0 : GL (Fin 2) (TR.Rinf F)) (x0 : GF F), g0 = TR.infGL F 2 y0 * finGL F 2 x0 :=
     ⟨_, _, (TR.infGL_mul_finGL g0).symm⟩
-  have hj : ∀ g : GL (Fin 2) (TR.Rinf F), ∏ v, j1 (k v) (gv v g) iP ≠ 0 :=
-    fun g => Finset.prod_ne_zero_iff.2 fun v _ => hj1 _ _ _
-  have key : ∀ y : GL (Fin 2) (TR.Rinf F), TR.chart φ (TR.infGL F 2 y0 * finGL F 2 x0) (TR.toL y.val) =
-      f (fun v => gv v (y0 * y) • iP, x0) * (∏ v, j1 (k v) (gv v (y0 * y)) iP)⁻¹ := by
+  have hj : ∀ g : GL (Fin 2) (TR.Rinf F), ∏ v, j1 (k v) (gv v g) iP ≠ 0 := fun g =>
+    Finset.prod_ne_zero_iff.2 fun v _ => hj1 _ _ _
+  have key
+      : ∀ y : GL (Fin 2) (TR.Rinf F),
+        TR.chart φ (TR.infGL F 2 y0 * finGL F 2 x0) (TR.toL y.val)
+          = f (fun v => gv v (y0 * y) • iP, x0) * (∏ v, j1 (k v) (gv v (y0 * y)) iP)⁻¹ := by
     intro y
-    have e : TR.infGL F 2 y0 * finGL F 2 x0 * TR.infGL F 2 y = TR.infGL F 2 (y0 * y) * finGL F 2 x0 := by
+    have e
+        : TR.infGL F 2 y0 * finGL F 2 x0 * TR.infGL F 2 y
+          = TR.infGL F 2 (y0 * y) * finGL F 2 x0 := by
       rw [mul_assoc, ← TR.infGL_comm, ← mul_assoc, ← map_mul]
     rw [TR.chart_val, e, eq_mul_inv_iff_mul_eq₀ (hj _)]
     exact hR (y0 * y) x0
   let A : Matrix (Fin 2) (Fin 2) (TR.Rinf F) := y0.val
-  let M : InfinitePlace F → TR.Lie F 2 → Matrix (Fin 2) (Fin 2) ℝ := fun v m i j => ∑ l, A i l v * m l j v
+  let M : InfinitePlace F → TR.Lie F 2 → Matrix (Fin 2) (Fin 2) ℝ := fun v m i j =>
+    ∑ l, A i l v * m l j v
   have hM : ∀ (y : GL (Fin 2) (TR.Rinf F)) v, M v (TR.toL y.val) = (gv v (y0 * y)).val := by
     intro y v
     ext i j
@@ -135,10 +151,11 @@ theorem chart_smooth (hO : Osg) (hB : B1b) (F : Type) [Field F] [NumberField F] 
     change _ = ((y0 * y).val i j) v
     rw [Units.val_mul, Matrix.mul_apply, Finset.sum_apply]
     rfl
-  let G : TR.Lie F 2 → ℂ := fun m => Fx (fun z => f (z, x0)) (fun v => nm (M v m) * (dn (M v m))⁻¹) *
-    (∏ v, jj (k v) (M v m))⁻¹
-  have hG : ∀ y : GL (Fin 2) (TR.Rinf F),
-      TR.chart φ (TR.infGL F 2 y0 * finGL F 2 x0) (TR.toL y.val) = G (TR.toL y.val) := by
+  let G : TR.Lie F 2 → ℂ := fun m =>
+    Fx (fun z => f (z, x0)) (fun v => nm (M v m) * (dn (M v m))⁻¹) * (∏ v, jj (k v) (M v m))⁻¹
+  have hG
+      : ∀ y : GL (Fin 2) (TR.Rinf F),
+        TR.chart φ (TR.infGL F 2 y0 * finGL F 2 x0) (TR.toL y.val) = G (TR.toL y.val) := by
     intro y
     rw [key]
     simp only [G, hM, ← smul_iP, ← automorphy_factor_at_i_eq]
@@ -157,16 +174,22 @@ theorem chart_smooth (hO : Osg) (hB : B1b) (F : Type) [Field F] [NumberField F] 
       have h := (gv v (y0 * y)).det_ne_zero
       rw [det_eq] at h
       exact h
-    have hP : ∀ v, ContDiffAt ℝ ∞ (fun m => nm (M v m) * (dn (M v m))⁻¹) (TR.toL y.val) ∧
-        ContDiffAt ℝ ∞ (fun m => jj (k v) (M v m)) (TR.toL y.val) := fun v => cd_parts (M v) _ (hE v) (hdt v) (k v)
+    have hP
+        : ∀ v,
+          ContDiffAt ℝ ∞ (fun m => nm (M v m) * (dn (M v m))⁻¹) (TR.toL y.val)
+            ∧ ContDiffAt ℝ ∞ (fun m => jj (k v) (M v m)) (TR.toL y.val) := fun v =>
+      cd_parts (M v) _ (hE v) (hdt v) (k v)
     have hw : ∀ v, (nm (M v (TR.toL y.val)) * (dn (M v (TR.toL y.val)))⁻¹).im ≠ 0 := by
       intro v
       rw [hM, ← smul_iP]
       exact (gv v (y0 * y) • iP).2
-    have h1 : ContDiffAt ℝ ∞ (fun m => Fx (fun z => f (z, x0)) (fun v => nm (M v m) * (dn (M v m))⁻¹))
+    have h1 : ContDiffAt ℝ ∞
+        (fun m => Fx (fun z => f (z, x0)) (fun v => nm (M v m) * (dn (M v m))⁻¹))
         (TR.toL y.val) :=
       ContDiffAt.comp (g := Fx (fun z => f (z, x0))) (TR.toL y.val)
-        ((hA (fun v => nm (M v (TR.toL y.val)) * (dn (M v (TR.toL y.val)))⁻¹) hw).contDiffAt.restrict_scalars ℝ)
+        ((hA
+          (fun v => nm (M v (TR.toL y.val)) * (dn (M v (TR.toL y.val)))⁻¹)
+          hw).contDiffAt.restrict_scalars ℝ)
         ((contDiffAt_pi (Φ := fun m v => nm (M v m) * (dn (M v m))⁻¹)).2 fun v => (hP v).1)
     have h2 : ContDiffAt ℝ ∞ (fun m => ∏ v, jj (k v) (M v m)) (TR.toL y.val) :=
       contDiffAt_prod fun v _ => (hP v).2
@@ -179,6 +202,7 @@ theorem chart_smooth (hO : Osg) (hB : B1b) (F : Type) [Field F] [NumberField F] 
 
 end UpperTheory.Esk.ImaginaryUnitActionLemmas
 
-theorem UpperTheory.Esk.hyperbolic_orbit_bound_proof : UpperTheory.Esk.Osg → UpperTheory.Esk.B1b → UpperTheory.Esk.H2b := by
+theorem UpperTheory.Esk.hyperbolic_orbit_bound_proof
+    : UpperTheory.Esk.Osg → UpperTheory.Esk.B1b → UpperTheory.Esk.H2b := by
   intro hO hB F _ _ _ k c _ om χ _ _ _ _ f φ hf hR g
   exact UpperTheory.Esk.ImaginaryUnitActionLemmas.chart_smooth hO hB F k f φ hf.hol hR g

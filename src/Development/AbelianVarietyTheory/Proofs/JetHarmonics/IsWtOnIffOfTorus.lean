@@ -39,12 +39,13 @@ theorem Kset_eq (ε : Fin n → Bool) : PI.UpqRep.Kset ε = HarishChandraRootDat
     · rw [hab, mul_comm]
     · rw [h a b hab, zero_mul, mul_zero]
 
-theorem isHCParam_iff (μ : Fin n → ℝ) : PI.UpqRep.IsHCParam μ ↔ HarishChandraRootData.IsHCParam μ := by
+theorem isHCParam_iff (μ : Fin n → ℝ)
+    : PI.UpqRep.IsHCParam μ ↔ HarishChandraRootData.IsHCParam μ := by
   unfold PI.UpqRep.IsHCParam HarishChandraRootData.IsHCParam
   exact and_congr_right fun _ => forall_congr' fun a => exists_congr fun m => sub_eq_iff_eq_add
 
-theorem cDom_iff (ε : Fin n → Bool) (ω Λ : Fin n → ℝ) :
-    PI.UpqRep.CDom ε ω Λ ↔ HarishChandraRootData.CptLE ε ω Λ := by
+theorem cDom_iff (ε : Fin n → Bool) (ω Λ : Fin n → ℝ)
+    : PI.UpqRep.CDom ε ω Λ ↔ HarishChandraRootData.CptLE ε ω Λ := by
   unfold PI.UpqRep.CDom HarishChandraRootData.CptLE
   constructor
   · rintro ⟨c, hc, h⟩
@@ -68,14 +69,16 @@ theorem cDom_iff (ε : Fin n → Bool) (ω Λ : Fin n → ℝ) :
       · simp [if_pos hx, root_eq]
       · simp [if_neg hx]
 
-theorem torus_eq (θ : Fin n → ℝ) :
-    (Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I)) = HarishChandraRootData.torus θ := by
+theorem torus_eq (θ : Fin n → ℝ)
+    : (Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I))
+      = HarishChandraRootData.torus θ := by
   unfold HarishChandraRootData.torus
   congr 1
   funext a
   rw [mul_comm]
 
-theorem torus_mem (ε : Fin n → Bool) (θ : Fin n → ℝ) : HarishChandraRootData.torus θ ∈ HarishChandraRootData.grpK ε := by
+theorem torus_mem (ε : Fin n → Bool) (θ : Fin n → ℝ)
+    : HarishChandraRootData.torus θ ∈ HarishChandraRootData.grpK ε := by
   refine ⟨?_, fun a b hab => ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff, HarishChandraRootData.torus, Matrix.star_eq_conjTranspose,
       Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -90,20 +93,20 @@ section Rep
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem isURepOn_iff (G : Set (Matrix (Fin n) (Fin n) ℂ))
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) :
-    PI.UpqRep.IsURepOn G σ ↔ HarishChandraRootData.IsUnitaryRepOn G σ := by
+theorem isURepOn_iff (G : Set (Matrix (Fin n) (Fin n) ℂ)) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H)
+    : PI.UpqRep.IsURepOn G σ ↔ HarishChandraRootData.IsUnitaryRepOn G σ := by
   constructor
   · rintro ⟨⟨h1, h2⟩, h3, h4⟩
     exact ⟨h1, h2, h3, h4⟩
   · rintro ⟨h1, h2, h3, h4⟩
     exact ⟨⟨h1, h2⟩, h3, h4⟩
 
-theorem isWtOn_iff_of_torus (G : Set (Matrix (Fin n) (Fin n) ℂ))
-    (hG : ∀ θ, HarishChandraRootData.torus θ ∈ G)
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) (v : H) :
-    PI.UpqRep.IsWtOn G σ ω v ↔ v ∈ HarishChandraRootData.weightSpace σ ω := by
-  change _ ↔ ∀ θ : Fin n → ℝ, σ (HarishChandraRootData.torus θ) v = HarishChandraRootData.wtChar ω θ • v
+theorem isWtOn_iff_of_torus
+    (G : Set (Matrix (Fin n) (Fin n) ℂ)) (hG : ∀ θ, HarishChandraRootData.torus θ ∈ G)
+    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) (v : H)
+    : PI.UpqRep.IsWtOn G σ ω v ↔ v ∈ HarishChandraRootData.weightSpace σ ω := by
+  change _
+    ↔ ∀ θ : Fin n → ℝ, σ (HarishChandraRootData.torus θ) v = HarishChandraRootData.wtChar ω θ • v
   unfold PI.UpqRep.IsWtOn HarishChandraRootData.wtChar
   simp only [torus_eq]
   constructor
@@ -112,22 +115,23 @@ theorem isWtOn_iff_of_torus (G : Set (Matrix (Fin n) (Fin n) ℂ))
   · intro h θ _
     rw [h θ, mul_comm Complex.I]
 
-theorem isWtOn_iff (ε : Fin n → Bool)
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) (v : H) :
-    PI.UpqRep.IsWtOn (PI.UpqRep.Kset ε) σ ω v ↔ v ∈ HarishChandraRootData.weightSpace σ ω := by
+theorem isWtOn_iff
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (ω : Fin n → ℝ) (v : H)
+    : PI.UpqRep.IsWtOn (PI.UpqRep.Kset ε) σ ω v ↔ v ∈ HarishChandraRootData.weightSpace σ ω := by
   refine isWtOn_iff_of_torus _ (fun θ => ?_) σ ω v
   rw [Kset_eq]
   exact torus_mem ε θ
 
-theorem isKStableOn_iff (ε : Fin n → Bool)
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (S : Submodule ℂ H) :
-    PI.UpqRep.IsKStableOn ε σ S ↔ HarishChandraRootData.KStable ε σ S := by
+theorem isKStableOn_iff
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (S : Submodule ℂ H)
+    : PI.UpqRep.IsKStableOn ε σ S ↔ HarishChandraRootData.KStable ε σ S := by
   unfold PI.UpqRep.IsKStableOn HarishChandraRootData.KStable
   rw [Kset_eq]
 
-theorem isKTypeOf_iff (ε : Fin n → Bool)
-    (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (Λ : Fin n → ℝ) (S : Submodule ℂ H) :
-    PI.UpqRep.IsKTypeOf ε σ Λ S ↔ HarishChandraRootData.IsKType ε σ S Λ := by
+theorem isKTypeOf_iff
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H) (Λ : Fin n → ℝ)
+    (S : Submodule ℂ H)
+    : PI.UpqRep.IsKTypeOf ε σ Λ S ↔ HarishChandraRootData.IsKType ε σ S Λ := by
   simp only [PI.UpqRep.IsKTypeOf, isKStableOn_iff, isWtOn_iff, cDom_iff]
   constructor
   · rintro ⟨h1, h2, h3, ⟨v, hv, hv0, hw⟩, h5⟩
@@ -135,8 +139,11 @@ theorem isKTypeOf_iff (ε : Fin n → Bool)
   · rintro ⟨h1, h2, h3, ⟨v, hv, hv0, hw⟩, h5⟩
     exact ⟨h1, h2, h3, ⟨v, hv, hv0, hw⟩, fun ω v hv hv0 hw => h5 ω v hv ⟨hv0, hw⟩⟩
 
-theorem weight_integral {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {ω : Fin n → ℝ} {v : H}
-    (h : HarishChandraRootData.IsWeightVector σ ω v) (a : Fin n) : ∃ m : ℤ, ω a = m := by
+theorem weight_integral
+    {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {ω : Fin n → ℝ} {v : H}
+    (h : HarishChandraRootData.IsWeightVector σ ω v)
+    (a : Fin n)
+    : ∃ m : ℤ, ω a = m := by
   obtain ⟨hv0, hv⟩ := h
   have hw : ∀ θ, σ (HarishChandraRootData.torus θ) v = HarishChandraRootData.wtChar ω θ • v := hv
   obtain ⟨θ₁, hθ₁⟩ : ∃ θ₁ : Fin n → ℝ, θ₁ = Pi.single a (2 * Real.pi) := ⟨_, rfl⟩
@@ -164,8 +171,7 @@ theorem weight_integral {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {ω 
   unfold HarishChandraRootData.wtChar at hc
   obtain ⟨m, hm⟩ := Complex.exp_eq_one_iff.mp hc
   refine ⟨m, ?_⟩
-  have hsum : (∑ b, ω b * θ₁ b) = ω a * (2 * Real.pi) := by
-    simp [hθ₁, Pi.single_apply]
+  have hsum : (∑ b, ω b * θ₁ b) = ω a * (2 * Real.pi) := by simp [hθ₁, Pi.single_apply]
   rw [hsum] at hm
   have hpi : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero]
   have hc' : ((ω a : ℝ) : ℂ) = ((m : ℝ) : ℂ) := by
@@ -174,8 +180,8 @@ theorem weight_integral {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {ω 
     linear_combination hm
   exact_mod_cast hc'
 
-theorem cptLE_pair {ε : Fin n → Bool} {ω Λ : Fin n → ℝ} (h : HarishChandraRootData.CptLE ε ω Λ) :
-    ∑ i : Fin n, ((i : ℕ) : ℝ) * (Λ - ω) i ≤ 0 := by
+theorem cptLE_pair {ε : Fin n → Bool} {ω Λ : Fin n → ℝ} (h : HarishChandraRootData.CptLE ε ω Λ)
+    : ∑ i : Fin n, ((i : ℕ) : ℝ) * (Λ - ω) i ≤ 0 := by
   obtain ⟨c, hc⟩ := h
   rw [hc]
   simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
@@ -184,19 +190,24 @@ theorem cptLE_pair {ε : Fin n → Bool} {ω Λ : Fin n → ℝ} (h : HarishChan
   intro x hx
   have hlt : x.1 < x.2 := (Finset.mem_filter.mp hx).2.1
   have hne : x.2 ≠ x.1 := (ne_of_lt hlt).symm
-  have key : ∑ i : Fin n, ((i : ℕ) : ℝ) * ((c x : ℝ) * HarishChandraRootData.root x.1 x.2 i) =
-      (c x : ℝ) * (((x.1 : ℕ) : ℝ) - ((x.2 : ℕ) : ℝ)) := by
-    simp only [HarishChandraRootData.root, Pi.sub_apply, Pi.single_apply, mul_sub, Finset.sum_sub_distrib,
-      mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  have key
+      : ∑ i : Fin n, ((i : ℕ) : ℝ) * ((c x : ℝ) * HarishChandraRootData.root x.1 x.2 i)
+        = (c x : ℝ) * (((x.1 : ℕ) : ℝ) - ((x.2 : ℕ) : ℝ)) := by
+    simp only [HarishChandraRootData.root, Pi.sub_apply, Pi.single_apply, mul_sub,
+      Finset.sum_sub_distrib, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+      if_true]
     ring
   rw [key]
   apply mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg _)
   have : ((x.1 : ℕ) : ℝ) < ((x.2 : ℕ) : ℝ) := by exact_mod_cast hlt
   linarith
 
-theorem highest_dominant {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H}
-    (hσ : HarishChandraRootData.IsUnitaryRepOn (HarishChandraRootData.grpK ε) σ) {S : Submodule ℂ H} {Λ : Fin n → ℝ}
-    (h : HarishChandraRootData.IsKType ε σ S Λ) {a b : Fin n} (hab : a < b) (hε : ε a = ε b) : Λ b ≤ Λ a := by
+theorem highest_dominant
+    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H}
+    (hσ : HarishChandraRootData.IsUnitaryRepOn (HarishChandraRootData.grpK ε) σ)
+    {S : Submodule ℂ H} {Λ : Fin n → ℝ} (h : HarishChandraRootData.IsKType ε σ S Λ)
+    {a b : Fin n} (hab : a < b) (hε : ε a = ε b)
+    : Λ b ≤ Λ a := by
   set s : Equiv.Perm (Fin n) := Equiv.swap a b with hs_def
   have hεs : ∀ i, ε (s i) = ε i := by
     intro i
@@ -205,8 +216,9 @@ theorem highest_dominant {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ 
     · rw [h1, hε]
     · rw [h2, hε]
     · rfl
-  obtain ⟨P, hP⟩ : ∃ P : Matrix (Fin n) (Fin n) ℂ,
-      P = Matrix.of fun i j => if s i = j then (1 : ℂ) else 0 := ⟨_, rfl⟩
+  obtain ⟨P, hP⟩
+      : ∃ P : Matrix (Fin n) (Fin n) ℂ, P = Matrix.of fun i j => if s i = j then (1 : ℂ) else 0 :=
+    ⟨_, rfl⟩
   have hPl : ∀ M : Matrix (Fin n) (Fin n) ℂ, P * M = M.submatrix s id := by
     intro M
     ext i k
@@ -233,7 +245,9 @@ theorem highest_dominant {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ 
     · rw [hP, Matrix.of_apply, if_neg]
       rintro rfl
       exact hij (hεs i).symm
-  have hcomm : ∀ θ : Fin n → ℝ, HarishChandraRootData.torus θ * P = P * HarishChandraRootData.torus (fun i => θ (s i)) := by
+  have hcomm
+      : ∀ θ : Fin n → ℝ,
+        HarishChandraRootData.torus θ * P = P * HarishChandraRootData.torus (fun i => θ (s i)) := by
     intro θ
     rw [hPl, hPr]
     ext i k
@@ -261,21 +275,23 @@ theorem highest_dominant {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ 
     have hre : ∑ i, Λ i * θ (s i) = ∑ i, Λ (s i) * θ i := by
       rw [← Equiv.sum_comp s (fun i => Λ i * θ (s i))]
       simp [hs_def, Equiv.swap_apply_self]
-    calc σ (HarishChandraRootData.torus θ) (σ P v) = σ (HarishChandraRootData.torus θ * P) v := by
-          rw [hσ.map_mul _ (hTK θ) _ hPK]
-          rfl
+    calc
+      σ (HarishChandraRootData.torus θ) (σ P v) = σ (HarishChandraRootData.torus θ * P) v := by
+        rw [hσ.map_mul _ (hTK θ) _ hPK]
+        rfl
       _ = σ (P * HarishChandraRootData.torus (fun i => θ (s i))) v := by rw [hcomm]
       _ = σ P (σ (HarishChandraRootData.torus (fun i => θ (s i))) v) := by
-          rw [hσ.map_mul _ hPK _ (hTK _)]
-          rfl
+        rw [hσ.map_mul _ hPK _ (hTK _)]
+        rfl
       _ = HarishChandraRootData.wtChar Λ (fun i => θ (s i)) • σ P v := by
-          rw [hvw', ContinuousLinearMap.map_smul]
+        rw [hvw', ContinuousLinearMap.map_smul]
       _ = HarishChandraRootData.wtChar (fun i => Λ (s i)) θ • σ P v := by
-          unfold HarishChandraRootData.wtChar
-          rw [hre]
+        unfold HarishChandraRootData.wtChar
+        rw [hre]
   have hle := cptLE_pair (h.le_highest _ (σ P v) hwS hww)
-  have hsum : ∑ i : Fin n, ((i : ℕ) : ℝ) * (Λ - fun i => Λ (s i)) i =
-      (((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) * (Λ a - Λ b) := by
+  have hsum
+      : ∑ i : Fin n, ((i : ℕ) : ℝ) * (Λ - fun i => Λ (s i)) i
+        = (((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) * (Λ a - Λ b) := by
     rw [Fintype.sum_eq_add a b (ne_of_lt hab)]
     · simp only [Pi.sub_apply, hs_def, Equiv.swap_apply_left, Equiv.swap_apply_right]
       ring
@@ -287,16 +303,17 @@ theorem highest_dominant {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ 
 
 end Rep
 
-theorem UJset_allPos (k : ℕ) : PI.UpqRep.UJset (PI.UpqRep.allPos k) =
-    (Matrix.unitaryGroup (Fin k) ℂ : Set (Matrix (Fin k) (Fin k) ℂ)) := by
+theorem UJset_allPos (k : ℕ)
+    : PI.UpqRep.UJset (PI.UpqRep.allPos k)
+      = (Matrix.unitaryGroup (Fin k) ℂ : Set (Matrix (Fin k) (Fin k) ℂ)) := by
   have hJ : PI.UpqRep.Jm (PI.UpqRep.allPos k) = 1 := by
     simp [PI.UpqRep.Jm, PI.UpqRep.allPos, Matrix.diagonal_one]
   ext g
   simp only [PI.UpqRep.UJset, PI.UpqRep.inUJ, Set.mem_ofPred_eq, hJ, Matrix.mul_one,
     SetLike.mem_coe, Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
 
-theorem lowK_allPos (k : ℕ) (u : Fin k → ℝ) :
-    PI.UpqRep.lowK (PI.UpqRep.allPos k) u = u - HarishChandraRootData.rhoU k := by
+theorem lowK_allPos (k : ℕ) (u : Fin k → ℝ)
+    : PI.UpqRep.lowK (PI.UpqRep.allPos k) u = u - HarishChandraRootData.rhoU k := by
   funext a
   have ha : (a : ℕ) + 1 ≤ k := a.isLt
   have h1 : ((Finset.univ.filter fun b : Fin k => a < b).card : ℝ) = (k : ℝ) - 1 - (a : ℕ) := by
@@ -304,20 +321,23 @@ theorem lowK_allPos (k : ℕ) (u : Fin k → ℝ) :
       Nat.cast_sub (show 1 ≤ k by omega), Nat.cast_one]
   have h2 : ((Finset.univ.filter fun b : Fin k => b < a).card : ℝ) = (a : ℕ) := by
     rw [Finset.filter_gt_eq_Iio, Fin.card_Iio]
-  simp only [PI.UpqRep.lowK, PI.UpqRep.rhoN, PI.UpqRep.rhoC, PI.UpqRep.allPos, HarishChandraRootData.rhoU,
-    Pi.add_apply, Pi.sub_apply, ne_eq, not_true_eq_false, and_false, Finset.filter_false,
-    Finset.card_empty, and_true, h1, h2, Nat.cast_zero, sub_zero, zero_div, add_zero]
+  simp only [PI.UpqRep.lowK, PI.UpqRep.rhoN, PI.UpqRep.rhoC, PI.UpqRep.allPos,
+    HarishChandraRootData.rhoU, Pi.add_apply, Pi.sub_apply, ne_eq, not_true_eq_false, and_false,
+    Finset.filter_false, Finset.card_empty, and_true, h1, h2, Nat.cast_zero, sub_zero, zero_div,
+    add_zero]
   ring
 
-theorem isHCTypeU_iff {k : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (u : Fin k → ℝ) (π : Matrix (Fin k) (Fin k) ℂ → H →L[ℂ] H) :
-    PI.UpqRep.IsHCTypeU k u π ↔ HarishChandraRootData.IsCompactIrrep π u := by
+theorem isHCTypeU_iff
+    {k : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (u : Fin k → ℝ) (π : Matrix (Fin k) (Fin k) ℂ → H →L[ℂ] H)
+    : PI.UpqRep.IsHCTypeU k u π ↔ HarishChandraRootData.IsCompactIrrep π u := by
   have hc : PI.UpqRep.allPos k = fun _ => true := rfl
   unfold PI.UpqRep.IsHCTypeU
   rw [isURepOn_iff, UJset_allPos, isKTypeOf_iff, lowK_allPos, hc]
   constructor
   · rintro ⟨-, -, hrep, htype⟩
-    have hrep' : HarishChandraRootData.IsUnitaryRepOn (HarishChandraRootData.grpK (fun _ : Fin k => true)) π := by
+    have hrep' : HarishChandraRootData.IsUnitaryRepOn
+        (HarishChandraRootData.grpK (fun _ : Fin k => true)) π := by
       rw [HarishChandraRootData.grpK_const]
       exact hrep
     obtain ⟨v, -, hv⟩ := htype.exists_highest

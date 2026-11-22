@@ -9,13 +9,26 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem lintegral_norm_pow_mul_le_sqrt_weighted_sq :
-    ∀ {E F : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] [NormedAddCommGroup F], ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (H : E → F), Continuous H → ∀ k : ℕ, ∫⁻ z, ENNReal.ofReal (‖z‖ ^ k * ‖H z‖) ∂μ ≤ C * (∫⁻ z, ENNReal.ofReal ((‖z‖ ^ k * ‖H z‖) ^ 2) ∂μ + ∫⁻ z, ENNReal.ofReal ((‖z‖ ^ (k + finrank ℝ E + 1) * ‖H z‖) ^ 2) ∂μ) ^ (1 / 2 : ℝ) := by
+theorem lintegral_norm_pow_mul_le_sqrt_weighted_sq
+    : ∀ {E F : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+        [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure]
+        [NormedAddCommGroup F],
+      ∃ C : ℝ≥0∞,
+        C ≠ ∞
+          ∧ ∀ (H : E → F),
+            Continuous H
+              → ∀ k : ℕ,
+                ∫⁻ z, ENNReal.ofReal (‖z‖ ^ k * ‖H z‖) ∂μ
+                  ≤ C
+                    * (∫⁻ z, ENNReal.ofReal ((‖z‖ ^ k * ‖H z‖) ^ 2) ∂μ
+                        + ∫⁻ z, ENNReal.ofReal ((‖z‖ ^ (k + finrank ℝ E + 1) * ‖H z‖) ^ 2) ∂μ)
+                      ^ (1 / 2 : ℝ) := by
   intro E F _ _ _ _ _ μ _ _
   set s : ℕ := finrank ℝ E + 1 with hs
   have hfin : ∫⁻ z : E, ENNReal.ofReal ((1 + ‖z‖) ^ (-((2 * s : ℕ) : ℝ))) ∂μ < ∞ := by
     apply finite_integral_one_add_norm
-    rw [hs]; push_cast
+    rw [hs]
+    push_cast
     have : (0 : ℝ) ≤ finrank ℝ E := Nat.cast_nonneg _
     linarith
   set A := ∫⁻ z : E, ENNReal.ofReal ((1 + ‖z‖) ^ (-((2 * s : ℕ) : ℝ))) ∂μ with hA
@@ -48,8 +61,12 @@ theorem lintegral_norm_pow_mul_le_sqrt_weighted_sq :
     congr 1
     rw [Real.rpow_neg (by positivity), Real.rpow_natCast, Real.rpow_two, inv_pow, ← pow_mul,
       mul_comm]
-  have h3 : ∀ z, g z ^ (2 : ℝ) ≤ B * (ENNReal.ofReal ((‖z‖ ^ k * ‖H z‖) ^ 2) +
-      ENNReal.ofReal ((‖z‖ ^ (k + finrank ℝ E + 1) * ‖H z‖) ^ 2)) := by
+  have h3
+      : ∀ z,
+        g z ^ (2 : ℝ)
+          ≤ B
+            * (ENNReal.ofReal ((‖z‖ ^ k * ‖H z‖) ^ 2)
+              + ENNReal.ofReal ((‖z‖ ^ (k + finrank ℝ E + 1) * ‖H z‖) ^ 2)) := by
     intro z
     simp only [g, hB]
     rw [ENNReal.ofReal_rpow_of_nonneg (by positivity) (by norm_num),
@@ -57,10 +74,10 @@ theorem lintegral_norm_pow_mul_le_sqrt_weighted_sq :
     apply ENNReal.ofReal_le_ofReal
     have h := add_pow_le (zero_le_one) (norm_nonneg z) (2 * s)
     rw [Real.rpow_two, add_assoc, ← hs]
-    calc ((1 + ‖z‖) ^ s * (‖z‖ ^ k * ‖H z‖)) ^ 2
+    calc
+      ((1 + ‖z‖) ^ s * (‖z‖ ^ k * ‖H z‖)) ^ 2
         = (1 + ‖z‖) ^ (2 * s) * (‖z‖ ^ k * ‖H z‖) ^ 2 := by ring
-      _ ≤ (2 ^ (2 * s - 1) * (1 ^ (2 * s) + ‖z‖ ^ (2 * s))) * (‖z‖ ^ k * ‖H z‖) ^ 2 := by
-        gcongr
+      _ ≤ (2 ^ (2 * s - 1) * (1 ^ (2 * s) + ‖z‖ ^ (2 * s))) * (‖z‖ ^ k * ‖H z‖) ^ 2 := by gcongr
       _ = _ := by rw [one_pow]; ring
   simp only [h1, h2] at key
   refine key.trans ?_

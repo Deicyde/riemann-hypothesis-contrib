@@ -13,7 +13,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
 
 namespace GlobalTheory
 
@@ -31,35 +32,52 @@ theorem canonGauge_sub_isBiadd : G2.CanonicalGaugeDiffBiadditive := by
   have h0' : constantCoeff h' = 0 := by
     have := congrArg constantCoeff hh'.ax0
     rwa [gt_const_ev_eq _ (pair_points_zero_constant hz (hp 0)), map_zero] at this
-  have inj : ∀ {n : ℕ} {a b : PS k n d}, constantCoeff a = 0 → constantCoeff b = 0 →
-      FB.expS k a = FB.expS k b → a = b := fun ha hb e => exp_inj ha hb e
+  have inj
+      : ∀ {n : ℕ} {a b : PS k n d},
+        constantCoeff a = 0 → constantCoeff b = 0 → FB.expS k a = FB.expS k b → a = b :=
+    fun ha hb e => exp_inj ha hb e
   refine ⟨?_, ?_, ?_, ?_, fun a => ?_⟩
   · rw [gt_ev_sub _ (pair_points_zero_constant hz (hp 0)), hh.ax0, hh'.ax0, sub_zero]
   · rw [gt_ev_sub _ (pair_points_zero_constant (hp 0) hz), hh.ax1, hh'.ax1, sub_zero]
   · have a1 := pair_points_zero_constant (hp (n := 3) 0) (hp 2)
     have a2 := pair_points_zero_constant (hp (n := 3) 1) (hp 2)
     have a3 := pair_points_zero_constant (gp_addOf _ hF _ _ (hp (n := 3) 0) (hp 1)) (hp 2)
-    have e := inj
-      (by rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0, gt_const_ev _ a3 _ h0]; simp)
-      (by rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0', gt_const_ev _ a3 _ h0']; simp)
-      (hh.ph1.symm.trans hh'.ph1)
+    have e :=
+      inj
+        (by
+          rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0,
+            gt_const_ev _ a3 _ h0]
+          simp)
+        (by
+          rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0',
+            gt_const_ev _ a3 _ h0']
+          simp)
+        (hh.ph1.symm.trans hh'.ph1)
     rw [gt_ev_sub _ a1, gt_ev_sub _ a2, gt_ev_sub _ a3]
     linear_combination -e
   · have a1 := pair_points_zero_constant (hp (n := 3) 0) (hp 1)
     have a2 := pair_points_zero_constant (hp (n := 3) 0) (hp 2)
     have a3 := pair_points_zero_constant (hp (n := 3) 0) (gp_addOf _ hF _ _ (hp (n := 3) 1) (hp 2))
-    have e := inj
-      (by rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0, gt_const_ev _ a3 _ h0]; simp)
-      (by rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0', gt_const_ev _ a3 _ h0']; simp)
-      (hh.ph2.symm.trans hh'.ph2)
+    have e :=
+      inj
+        (by
+          rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0,
+            gt_const_ev _ a3 _ h0]
+          simp)
+        (by
+          rw [map_sub, map_add (f := _), gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0',
+            gt_const_ev _ a3 _ h0']
+          simp)
+        (hh.ph2.symm.trans hh'.ph2)
     rw [gt_ev_sub _ a1, gt_ev_sub _ a2, gt_ev_sub _ a3]
     linear_combination -e
   · have a1 := pair_points_zero_constant (gp_comp1 _ _ (hA a) (hp (n := 2) 0)) (hp 1)
-    have a2 := pair_points_zero_constant (hp (n := 2) 0) (gp_comp1 _ _ (hA (star a)) (hp (n := 2) 1))
-    have e := inj
-      (by rw [map_sub, gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0, sub_zero])
-      (by rw [map_sub, gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0', sub_zero])
-      ((hh.ad a).symm.trans (hh'.ad a))
+    have a2 :=
+      pair_points_zero_constant (hp (n := 2) 0) (gp_comp1 _ _ (hA (star a)) (hp (n := 2) 1))
+    have e :=
+      inj (by rw [map_sub, gt_const_ev _ a1 _ h0, gt_const_ev _ a2 _ h0, sub_zero])
+        (by rw [map_sub, gt_const_ev _ a1 _ h0', gt_const_ev _ a2 _ h0', sub_zero])
+        ((hh.ad a).symm.trans (hh'.ad a))
     rw [gt_ev_sub _ a1, gt_ev_sub _ a2]
     linear_combination -e
 

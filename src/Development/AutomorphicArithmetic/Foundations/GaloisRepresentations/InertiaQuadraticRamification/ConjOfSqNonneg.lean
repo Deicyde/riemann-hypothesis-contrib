@@ -6,22 +6,25 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CmSubfiel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published GlobalTheory.RealGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+  GlobalTheory.RealGal GlobalTheory.UnitaryBC
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 open Polynomial
 open scoped IntermediateField
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign
 
-private theorem sq_parts (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) :
-    z.re ^ 2 - z.im ^ 2 = a ∧ z.re * z.im = 0 := by
+private theorem sq_parts (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ))
+    : z.re ^ 2 - z.im ^ 2 = a ∧ z.re * z.im = 0 := by
   have h1 := congrArg Complex.re h
   have h2 := congrArg Complex.im h
-  simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.intCast_re, Complex.intCast_im] at h1 h2
+  simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.intCast_re, Complex.intCast_im]
+    at h1 h2
   exact ⟨by linarith, by linarith⟩
 
-private theorem conj_of_sq_nonneg (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (ha : 0 ≤ a) :
-    z = starRingEnd ℂ z := by
+private theorem conj_of_sq_nonneg (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (ha : 0 ≤ a)
+    : z = starRingEnd ℂ z := by
   obtain ⟨h1, h2⟩ := sq_parts z a h
   have ha' : (0 : ℝ) ≤ a := by exact_mod_cast ha
   have him : z.im = 0 := by
@@ -31,8 +34,8 @@ private theorem conj_of_sq_nonneg (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (h
     · exact h3
   exact (Complex.conj_eq_iff_im.mpr him).symm
 
-private theorem conj_of_sq_nonpos (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (ha : a ≤ 0) :
-    -z = starRingEnd ℂ z := by
+private theorem conj_of_sq_nonpos (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (ha : a ≤ 0)
+    : -z = starRingEnd ℂ z := by
   obtain ⟨h1, h2⟩ := sq_parts z a h
   have ha' : (a : ℝ) ≤ 0 := by exact_mod_cast ha
   have hre : z.re = 0 := by
@@ -46,8 +49,7 @@ private theorem conj_of_sq_nonpos (z : ℂ) (a : ℤ) (h : z ^ 2 = (a : ℂ)) (h
 
 end UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.mkQ :
-    MkQ := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.mkQ : MkQ := by
   intro Y Ω _ _ _ _ _ _ x a hx ⟨g, hg⟩
   have hxa : x ^ 2 = algebraMap Y Ω (a : Y) := by rw [hx, map_intCast]
   have heval : aeval x (X ^ 2 - C (a : Y) : Y[X]) = 0 := by
@@ -62,15 +64,26 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.mkQ :
   have hmin : minpoly Y x = X ^ 2 - C (a : Y) :=
     (minpoly.eq_of_irreducible_of_monic hirr heval (monic_X_pow_sub_C _ two_ne_zero)).symm
   have hdeg : (minpoly Y x).natDegree = 2 := by rw [hmin, natDegree_X_pow_sub_C _]
-  have hfin : Module.finrank Y Y⟮x⟯ = 2 := by
-    rw [IntermediateField.adjoin.finrank hint, hdeg]
+  have hfin : Module.finrank Y Y⟮x⟯ = 2 := by rw [IntermediateField.adjoin.finrank hint, hdeg]
   haveI := IntermediateField.adjoin.finiteDimensional hint
   haveI nf : NumberField Y⟮x⟯ := NumberField.of_module_finite Y _
   have hconj : x ∈ GlobalTheory.CMSub.conjStable Ω := by
     have hφ : ∀ φ : Ω →+* ℂ, (φ x) ^ 2 = (a : ℂ) := fun φ => by rw [← map_pow, hx, map_intCast]
     rcases le_total 0 a with ha | ha
-    · exact ⟨x, fun φ => UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign.conj_of_sq_nonneg _ a (hφ φ) ha⟩
-    · exact ⟨-x, fun φ => by rw [map_neg]; exact UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign.conj_of_sq_nonpos _ a (hφ φ) ha⟩
+    · exact ⟨
+        x,
+        fun φ =>
+          UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign.conj_of_sq_nonneg _
+            a (hφ φ) ha
+      ⟩
+    · exact ⟨
+        -x,
+        fun φ => by
+          rw [map_neg]
+          exact
+            UpperTheory.Gal.UnramifiedFromSplittingCriterion.SquareConjugationSign.conj_of_sq_nonpos
+              _ a (hφ φ) ha
+      ⟩
   have hle : Y⟮x⟯ ≤ GlobalTheory.CMSub.conjField Y Ω := by
     rw [IntermediateField.adjoin_le_iff]
     intro y hy
@@ -84,9 +97,12 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.mkQ :
     obtain ⟨f, hf, rfl⟩ := (IntermediateField.adjoin.powerBasis hint).exists_eq_aeval y
     rw [IntermediateField.adjoin.powerBasis_dim, hdeg] at hf
     refine ⟨f.coeff 0, f.coeff 1, ?_⟩
-    have hf' : f = C (f.coeff 1) * X + C (f.coeff 0) := Polynomial.eq_X_add_C_of_natDegree_le_one (by omega)
-    rw [hf', map_add (f := _), map_mul, aeval_C, aeval_C, aeval_X, IntermediateField.adjoin.powerBasis_gen, add_comm]
-    simp only [coeff_add, coeff_C_mul, coeff_X_zero, coeff_X_one, coeff_C_zero, coeff_C_succ, mul_zero, mul_one, zero_add, add_zero]
+    have hf' : f = C (f.coeff 1) * X + C (f.coeff 0) :=
+      Polynomial.eq_X_add_C_of_natDegree_le_one (by omega)
+    rw [hf', map_add (f := _), map_mul, aeval_C, aeval_C, aeval_X,
+      IntermediateField.adjoin.powerBasis_gen, add_comm]
+    simp only [coeff_add, coeff_C_mul, coeff_X_zero, coeff_X_one, coeff_C_zero, coeff_C_succ,
+      mul_zero, mul_one, zero_add, add_zero]
     rfl
   refine ⟨⟨Y⟮x⟯, nf, cm, hfin⟩, hxK, hspan, ?_⟩
   intro F _ _ h hY hhx y

@@ -14,36 +14,44 @@ open ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y
 
 noncomputable section
 
-variable {n : ℕ} {Y : Type*} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
-  [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La]
+variable
+  {n : ℕ} {Y : Type*}
+  [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+  {ι : Type*} {La : Type*} [AddCommGroup La]
 
 def wt (A : WeightedAtlas n Y ι La) (E : La) (β : ι → Y → ℂ) (z : Y → V n) (y : Y) : ℝ :=
-  -Real.log (A.nsq (A.kap + E) β y) + Real.log (A.nsq A.kap (jdet A z) y)
+  - Real.log (A.nsq (A.kap + E) β y) + Real.log (A.nsq A.kap (jdet A z) y)
 
 def quot (A : WeightedAtlas n Y ι La) (h β : ι → Y → ℂ) (y : Y) : ℂ :=
   h (A.pick y) y / β (A.pick y) y
 
-
 open scoped Classical in
-def ext0 {Y : Type*} (U : Set Y) (f : U → ℂ) (y : Y) : ℂ :=
-  if hy : y ∈ U then f ⟨y, hy⟩ else 0
+def ext0 {Y : Type*} (U : Set Y) (f : U → ℂ) (y : Y) : ℂ := if hy : y ∈ U then f ⟨y, hy⟩ else 0
 
-theorem extendByZeroOnSubset_apply_coe {Y : Type*} (U : Set Y) (f : U → ℂ) (y : U) : ext0 U f y = f y := by
+theorem extendByZeroOnSubset_apply_coe {Y : Type*} (U : Set Y) (f : U → ℂ) (y : U)
+    : ext0 U f y = f y := by
   simp [ext0, y.2]
 
 end
 
 end GlobalTheory.OTY.TwEst
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
-theorem GlobalTheory.OTY.TwEst.nz_facts {n : ℕ} {Y : Type} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
-    [MeasurableSpace Y] [BorelSpace Y] {ι La : Type} [AddCommGroup La] (A : WeightedAtlas n Y ι La)
-    (L Λ : La) (s : Fin n → ι → Y → ℂ) (τ : ι → Y → ℂ) (C : ℝ) (hC0 : 0 < C)
-    (hsq : ∀ y, A.sqn L s y ≤ 1) (hC : ∀ y, A.nsq Λ τ y ≤ C * A.sqn L s y) (y : Y) (hy : y ∈ nz A τ) :
-    y ∉ A.zeroSet s ∧ psi A L s y ≤ 0 ∧
-      -psi A L s y ≤ (n : ℝ) * (-Real.log (A.nsq Λ τ y)) + (n : ℝ) * Real.log C := by
+theorem GlobalTheory.OTY.TwEst.nz_facts
+    {n : ℕ} {Y : Type}
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    {ι La : Type} [AddCommGroup La]
+    (A : WeightedAtlas n Y ι La)
+    (L Λ : La) (s : Fin n → ι → Y → ℂ)
+    (τ : ι → Y → ℂ)
+    (C : ℝ) (hC0 : 0 < C)
+    (hsq : ∀ y, A.sqn L s y ≤ 1) (hC : ∀ y, A.nsq Λ τ y ≤ C * A.sqn L s y)
+    (y : Y) (hy : y ∈ nz A τ)
+    : y ∉ A.zeroSet s ∧ psi A L s y ≤ 0
+      ∧ - psi A L s y ≤ (n : ℝ) * (- Real.log (A.nsq Λ τ y)) + (n : ℝ) * Real.log C := by
   have hτy : τ (A.pick y) y ≠ 0 := hy
   have hτ0 : 0 < A.nsq Λ τ y := by
     unfold WeightedAtlas.nsq

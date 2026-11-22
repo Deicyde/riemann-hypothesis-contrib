@@ -6,11 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MulAction
 
-private theorem fib_abs {O I : Type} {P : I → Type} (F : ∀ i, P i → O) (S : ∀ i, Set (P i)) (B : Set O) (hB : B.Finite)
+private theorem fib_abs
+    {O I : Type} {P : I → Type} (F : ∀ i, P i → O) (S : ∀ i, Set (P i)) (B : Set O) (hB : B.Finite)
     (w : O → ℂ) (wi : ∀ i, P i → ℂ) (hw : ∀ o, o ∉ B → w o = 0) (hwi : ∀ i p, p ∉ S i → wi i p = 0)
     (hF : ∀ i, ∀ p ∈ S i, F i p ∈ B ∧ wi i p = w (F i p)) (hs : ∀ o ∈ B, ∃ i, ∃ p ∈ S i, F i p = o)
-    (hij : ∀ i j, ∀ p ∈ S i, ∀ q ∈ S j, F i p = F j q → i = j) (hinj : ∀ i, Set.InjOn (F i) (S i)) :
-    ∑ᶠ o, w o = ∑ᶠ i, ∑ᶠ p, wi i p := by
+    (hij : ∀ i j, ∀ p ∈ S i, ∀ q ∈ S j, F i p = F j q → i = j) (hinj : ∀ i, Set.InjOn (F i) (S i))
+    : ∑ᶠ o, w o = ∑ᶠ i, ∑ᶠ p, wi i p := by
   classical
   have h1 : ∀ i, ∑ᶠ p, wi i p = ∑ᶠ o ∈ F i '' S i, w o := by
     intro i
@@ -58,8 +59,9 @@ private theorem fib_abs {O I : Type} {P : I → Type} (F : ∀ i, P i → O) (S 
     rintro _ ⟨p, hp, rfl⟩ ⟨q, hq, h⟩
     exact hne (hij i j p hp q hq h.symm)
 
-private theorem rel_smul {H X : Type} [Group H] [MulAction H X] (H₀ : Subgroup H) (hn : H₀.Normal) (h : H) (x : X) :
-    H₀.relIndex (stabilizer H (h • x)) = H₀.relIndex (stabilizer H x) := by
+private theorem rel_smul
+    {H X : Type} [Group H] [MulAction H X] (H₀ : Subgroup H) (hn : H₀.Normal) (h : H) (x : X)
+    : H₀.relIndex (stabilizer H (h • x)) = H₀.relIndex (stabilizer H x) := by
   have h0 : H₀.map (MulAut.conj h).toMonoidHom = H₀ := by
     ext z
     constructor
@@ -73,25 +75,29 @@ private theorem rel_smul {H X : Type} [Group H] [MulAction H X] (H₀ : Subgroup
   conv_lhs => rw [← h0]
   exact Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj h).injective
 
-private theorem out_mk {H X : Type} [Group H] [MulAction H X] (x : X) :
-    ∃ h : H, (Quotient.mk (orbitRel H X) x).out = h • x := by
+private theorem out_mk {H X : Type} [Group H] [MulAction H X] (x : X)
+    : ∃ h : H, (Quotient.mk (orbitRel H X) x).out = h • x := by
   have : (Quotient.mk (orbitRel H X) x).out ∈ orbit H x :=
     orbitRel_apply.1 (Quotient.exact (Quotient.out_eq (Quotient.mk (orbitRel H X) x)))
   obtain ⟨h, hh⟩ := this
   exact ⟨h, hh.symm⟩
 
-private theorem mk_smul {H X : Type} [Group H] [MulAction H X] (h : H) (x : X) :
-    Quotient.mk (orbitRel H X) (h • x) = Quotient.mk (orbitRel H X) x :=
+private theorem mk_smul {H X : Type} [Group H] [MulAction H X] (h : H) (x : X)
+    : Quotient.mk (orbitRel H X) (h • x) = Quotient.mk (orbitRel H X) x :=
   Quotient.sound (orbitRel_apply.2 ⟨h, rfl⟩)
 
-theorem UpperTheory.orbitalFiber_decomposition :
-    UpperTheory.V.Z.Sym.Glob.Fib.Decomp := by
+theorem UpperTheory.orbitalFiber_decomposition : UpperTheory.V.Z.Sym.Glob.Fib.Decomp := by
   intro H X I _ _ H₀ k Hi Yi _ _ φ e ki hn hk hT he hinj hki hke hs hu
   unfold UpperTheory.V.Z.Sym.gq
-  have hex : ∀ x x' : X, Quotient.mk (orbitRel H X) x' = Quotient.mk (orbitRel H X) x → ∃ h : H, h • x = x' :=
+  have hex
+      : ∀ x x' : X,
+        Quotient.mk (orbitRel H X) x' = Quotient.mk (orbitRel H X) x → ∃ h : H, h • x = x' :=
     fun x x' h => orbitRel_apply.1 (Quotient.exact h)
-  refine fib_abs (fun i (p : orbitRel.Quotient (Hi i) (Yi i)) => (Quotient.mk (orbitRel H X) (e i p.out) : orbitRel.Quotient H X))
-    (fun i => {p | ki i p.out ≠ 0}) {o | k o.out ≠ 0} ?_ _ _ ?_ ?_ ?_ ?_ ?_ ?_
+  refine fib_abs
+    (fun i (p : orbitRel.Quotient (Hi i) (Yi i)) =>
+      (Quotient.mk (orbitRel H X) (e i p.out) : orbitRel.Quotient H X))
+    (fun i => {p | ki i p.out ≠ 0})
+    {o | k o.out ≠ 0} ?_ _ _ ?_ ?_ ?_ ?_ ?_ ?_
   · obtain ⟨T, hT⟩ := hT
     refine (T.finite_toSet.image (Quotient.mk (orbitRel H X))).subset fun o ho => ?_
     obtain ⟨h, s, hs, ho⟩ := hT _ ho
@@ -107,7 +113,8 @@ theorem UpperTheory.orbitalFiber_decomposition :
   · intro i p hp
     have hp' : ki i p.out ≠ 0 := hp
     obtain ⟨h, hh⟩ := out_mk (H := H) (e i p.out)
-    have hv : k (Quotient.mk (orbitRel H X) (e i p.out)).out = ki i p.out := by rw [hh, hk, hke i _ hp']
+    have hv : k (Quotient.mk (orbitRel H X) (e i p.out)).out = ki i p.out := by
+      rw [hh, hk, hke i _ hp']
     refine ⟨fun h0 => hp' (hv ▸ h0), ?_⟩
     have hst : (stabilizer (Hi i) p.out).map (φ i) = stabilizer H (e i p.out) := by
       ext g

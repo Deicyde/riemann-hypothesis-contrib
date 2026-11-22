@@ -14,12 +14,16 @@ noncomputable section
 
 namespace Formalism.ExtensionFiltration
 
-theorem log_covolume_slope_mu :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
-      (d : ℕ), 0 < d → ∀ X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ,
-      (∀ v, IsUnit (X v).det) → ∀ M : Submodule (𝓞 K) (Fin d → K),
-      Submodule.IsFullLattice K M →
-      Formalism.DivisionValues.lcv X M = -((d : ℝ) * Formalism.HN.muDef (Pi.basisFun K (Fin d)) X M) := by
+theorem log_covolume_slope_mu
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+        (d : ℕ),
+      0 < d
+        → ∀ X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ,
+          (∀ v, IsUnit (X v).det)
+            → ∀ M : Submodule (𝓞 K) (Fin d → K),
+              Submodule.IsFullLattice K M
+                → Formalism.DivisionValues.lcv X M
+                  = -((d : ℝ) * Formalism.HN.muDef (Pi.basisFun K (Fin d)) X M) := by
   intro K _ _ _ _ d hd X hX M hM
   have hfg : M.FG := hM.toIsLattice.fg
   have hspan : Submodule.span K (M : Set (Fin d → K)) = ⊤ :=
@@ -35,9 +39,11 @@ theorem log_covolume_slope_mu :
       simp
     rw [h, h2] at hrk
     omega
-  obtain ⟨-, hmu, -⟩ := Formalism.HN.size_maximal_slope K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX M hfg hne
+  obtain ⟨-, hmu, -⟩ :=
+    Formalism.HN.size_maximal_slope K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX M hfg hne
   have hht : 0 < Formalism.HN.ht (Pi.basisFun K (Fin d)) X M :=
-    (Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX M hfg).2.2
+    (Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX M
+      hfg).2.2
   have hn : (finrank ℚ K : ℝ) = 2 * (Formalism.HN.nPl K : ℝ) := by
     exact_mod_cast Formalism.HN.sizeMu_finrank_eq K
   have hf : (0 : ℝ) < Formalism.HN.nPl K := by
@@ -45,6 +51,5 @@ theorem log_covolume_slope_mu :
   have hDr : (0 : ℝ) < d := by exact_mod_cast hd
   rw [hmu, Formalism.HN.size, Real.log_rpow hht, hrk, Formalism.DivisionValues.lcv, hn]
   field_simp
-
 
 end Formalism.ExtensionFiltration

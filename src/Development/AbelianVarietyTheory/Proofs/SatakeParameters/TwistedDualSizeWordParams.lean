@@ -13,12 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MaxSizeAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
-theorem recWord_wordNum : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ}
-    (g : ZMod n → D.R.GG) (ψ : D.R.GG), Roomy L C → IsOrbit g ψ → WordNum L (recWord L j ε g) := by
+theorem recWord_wordNum
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ} (g : ZMod n → D.R.GG)
+        (ψ : D.R.GG),
+      Roomy L C → IsOrbit g ψ → WordNum L (recWord L j ε g) := by
   intro D L C j ε n g ψ hR hO
   obtain ⟨rfl, hg⟩ := hO
   generalize g 0 = τ at hg
@@ -26,7 +30,8 @@ theorem recWord_wordNum : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.
   have hsm := pageWord_S_eta_m L j ε τ ψ
   refine ⟨?_, ?_, ?_, hsm.1, hsm.2.1, rfl⟩
   · intro a
-    obtain ⟨hsz, -, -, hth⟩ := GlobalTheory.T.twistedDualSizeWord_letter_eq_pageWord L C j ε τ ψ hR a
+    obtain ⟨hsz, -, -, hth⟩ :=
+      GlobalTheory.T.twistedDualSizeWord_letter_eq_pageWord L C j ε τ ψ hR a
     rcases GlobalTheory.T.twistedDualOrbitPageWord_thickOr L C j ε τ ψ hR a with h | h
     · exact Or.inl (hth.2 h)
     · refine Or.inr ?_

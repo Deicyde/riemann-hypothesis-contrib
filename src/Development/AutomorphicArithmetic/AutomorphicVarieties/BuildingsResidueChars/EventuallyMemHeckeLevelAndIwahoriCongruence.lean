@@ -11,53 +11,75 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 set_option synthInstance.maxHeartbeats 200000
 
-private theorem cmp_of {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {w : Plc L}
-    (h : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal) (x : UA L n) : cmp n w ((away l L n).rangeRestrict x) = cLoc w x := by
+private theorem cmp_of
+    {l : ℕ} [Fact l.Prime]
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} {w : Plc L} (h : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal) (x : UA L n)
+    : cmp n w ((away l L n).rangeRestrict x) = cLoc w x := by
   unfold CaseU.cmp
   rw [dite_eq_left h]
   rfl
 
-private theorem cmp_not {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {w : Plc L}
-    (h : ¬ ((l : ℕ) : 𝓞 L) ∉ w.asIdeal) (x : Ga l L n) : cmp n w x = 1 := by
+private theorem cmp_not
+    {l : ℕ} [Fact l.Prime]
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} {w : Plc L} (h : ¬ ((l : ℕ) : 𝓞 L) ∉ w.asIdeal) (x : Ga l L n)
+    : cmp n w x = 1 := by
   unfold CaseU.cmp
   rw [dite_eq_right h]
   rfl
 
-private theorem cmp_cont (l : ℕ) [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] (n : ℕ) (w : Plc L) :
-    Continuous fun k : finU (E := L) (n := n) => cmp n w ((away l L n).rangeRestrict (k : UA L n)) := by
+private theorem cmp_cont
+    (l : ℕ) [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] (n : ℕ) (w : Plc L)
+    : Continuous fun k : finU (E := L) (n := n) =>
+      cmp n w ((away l L n).rangeRestrict (k : UA L n)) := by
   by_cases h : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal
   · simp only [cmp_of h]
-    exact ((UpperTheory.unitaryAdelic_localComponents_continuous_levels_open L n).1 w).comp continuous_subtype_val
+    exact ((UpperTheory.unitaryAdelic_localComponents_continuous_levels_open L n).1 w).comp
+      continuous_subtype_val
   · simp only [cmp_not h]
     exact continuous_const
 
-private theorem cmp_ev (l : ℕ) [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] (n : ℕ) (w : Plc L)
-    (U : Subgroup (GLw n w)) (hU : IsOpen (U : Set (GLw n w))) :
-    ∀ᶠ k : finU (E := L) (n := n) in nhds 1, cmp n w ((away l L n).rangeRestrict (k : UA L n)) ∈ U := by
-  refine (hU.preimage (cmp_cont l n w)).mem_nhds ?_
-  change cmp n w ((away l L n).rangeRestrict ((1 : finU (E := L) (n := n)) : UA L n)) ∈ U
-  rw [OneMemClass.coe_one, map_one, map_one]
-  exact one_mem U
+private theorem cmp_ev
+    (l : ℕ) [Fact l.Prime]
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    (n : ℕ) (w : Plc L) (U : Subgroup (GLw n w)) (hU : IsOpen (U : Set (GLw n w)))
+    : ∀ᶠ k : finU (E := L) (n := n) in nhds 1, cmp n w ((away l L n).rangeRestrict (k : UA L n)) ∈ U :=
+  by
+    refine (hU.preimage (cmp_cont l n w)).mem_nhds ?_
+    change cmp n w ((away l L n).rangeRestrict ((1 : finU (E := L) (n := n)) : UA L n)) ∈ U
+    rw [OneMemClass.coe_one, map_one, map_one]
+    exact one_mem U
 
-private theorem cmp_int {l : ℕ} [Fact l.Prime] {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {w : Plc L}
-    (x : UA L n) (hx : cLoc w x ∈ KO (w.adicCompletion L) (Fin n)) :
-    cmp n w ((away l L n).rangeRestrict x) ∈ KO (w.adicCompletion L) (Fin n) := by
+private theorem cmp_int
+    {l : ℕ} [Fact l.Prime]
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} {w : Plc L} (x : UA L n) (hx : cLoc w x ∈ KO (w.adicCompletion L) (Fin n))
+    : cmp n w ((away l L n).rangeRestrict x) ∈ KO (w.adicCompletion L) (Fin n) := by
   by_cases h : ((l : ℕ) : 𝓞 L) ∉ w.asIdeal
   · rwa [cmp_of h]
   · rw [cmp_not h]
     exact one_mem _
 
-private theorem pi_mem_first_iwahori_filtration {σ : Type} [Finite σ] {G : σ → Type} [∀ v, Group (G v)] (I : ∀ v, Iwa (G v)) (b : ℕ)
-    (g : ∀ v, G v) (hg : ∀ v, g v ∈ (I v).I1 b) : g ∈ (piIwa I).I1 b := by
+private theorem pi_mem_first_iwahori_filtration
+    {σ : Type} [Finite σ]
+    {G : σ → Type} [∀ v, Group (G v)]
+    (I : ∀ v, Iwa (G v)) (b : ℕ) (g : ∀ v, G v) (hg : ∀ v, g v ∈ (I v).I1 b)
+    : g ∈ (piIwa I).I1 b := by
   choose x hx t ht y hy e using fun v => (iwMem _ (I v) b (g v)).2.1.1 (hg v)
-  exact (iwMem _ (piIwa I) b g).2.1.2 ⟨x, fun v _ => hx v, t, fun v _ => ht v, y, fun v _ => hy v, funext e⟩
+  exact (iwMem _ (piIwa I) b g).2.1.2
+    ⟨x, fun v _ => hx v, t, fun v _ => ht v, y, fun v _ => hy v, funext e⟩
 
 theorem UpperTheory.eventually_mem_heckeLevel_and_iwahoriCongruence :
     ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ), 1 ≤ n → ∀ (V : s.Lev) (Q : QData V) (c : Coef l) (m : ℕ) (τ₀ : KT n (wt s) →* GL (Fin m) c.O), IsOpen (τ₀.ker : Set (KT n (wt s))) → ∀ (K : (hset Q τ₀).Lev) (b : ℕ), ∀ᶠ k : finU (E := L) (n := n) in nhds 1, (∃ u : Ub n s, u ∈ (hset Q τ₀).lev K ∧ (u : Ga l L n) = (away l L n).rangeRestrict (k : UA L n) ∧ τ₀ (toKT n s u) = 1) ∧ (fun v : V.frame.Vl => cLoc (s.w v.1) (k : UA L n)) ∈ (hset Q τ₀).X.I.I1 b := by

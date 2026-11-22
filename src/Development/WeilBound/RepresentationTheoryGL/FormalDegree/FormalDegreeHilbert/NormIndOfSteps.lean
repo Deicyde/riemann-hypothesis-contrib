@@ -43,7 +43,9 @@ namespace PositivityTheory.RgFd
 
 open ReciprocityTheory.ChartRestriction.DS PositivityTheory.RgDs
 
-theorem hsInt : HsInt := GlobalTheory.CompanionTheory.RgFd.hsInt GlobalTheory.CompanionTheory.HsPsProof.hsPs hsPol phiMul phiCont
+theorem hsInt : HsInt :=
+  GlobalTheory.CompanionTheory.RgFd.hsInt GlobalTheory.CompanionTheory.HsPsProof.hsPs hsPol phiMul
+    phiCont
 
 theorem psiNorm_of (hI : NormInd) : PsiNorm := by
   intro n ε lam hl
@@ -54,9 +56,13 @@ theorem psiNorm_of (hI : NormInd) : PsiNorm := by
 
 theorem modelDS_of (hL : ExplicitFunctionSquareIntegrable) (hK : Key) (hH : Hilb) : ModelDS := by
   intro n ε lam T μ hl hμ
-  have hP : IsPsiFor ε lam T (S7.PsiM T μ) :=
-    ⟨fun k₁ k₂ g hg => S7.psiM_equiv T μ k₁ k₂ hg, S7.psiM_one T μ, S7.psiM_smooth T μ hμ,
-      fun g hg => S7.psiM_casimir T μ hμ hg, hL n ε lam T μ hl hμ⟩
+  have hP : IsPsiFor ε lam T (S7.PsiM T μ) := ⟨
+    fun k₁ k₂ g hg => S7.psiM_equiv T μ k₁ k₂ hg,
+    S7.psiM_one T μ,
+    S7.psiM_smooth T μ hμ,
+    fun g hg => S7.psiM_casimir T μ hμ hg,
+    hL n ε lam T μ hl hμ
+  ⟩
   exact ⟨hP, (hH n ε lam T _ hl hP (hK n ε lam T μ hl hμ hP)).1⟩
 
 theorem realMetaplectic_of_forall (h : FdAll) : GlobalTheory.Published.FormalDegreeCompactDual := by
@@ -69,8 +75,10 @@ theorem fdAll_of_norm (hN : PsiNorm) (hK : Key) (hH : Hilb) : FdAll :=
   have hM := modelDS_of (square_integrable_of_norm hN) hK hH
   fdAll_of hM (fdModel_of degPsi hlamStable (formF_of hlamStable (kmapZero_of hlamStable)) hN hM)
 
-theorem normInd_of_steps (hP : CoefPow)
-    (h : MomW → CoefPow → KNull → HsPol → PhiMul → PhiLe → PhiCont → HsInt → GapNorm → NormInd) : NormInd :=
+theorem normInd_of_steps
+    (hP : CoefPow)
+    (h : MomW → CoefPow → KNull → HsPol → PhiMul → PhiLe → PhiCont → HsInt → GapNorm → NormInd)
+    : NormInd :=
   h momW hP (kNull_of momW hP) hsPol phiMul phiLe phiCont hsInt (gapNorm_of degPsi)
 
 end PositivityTheory.RgFd

@@ -6,7 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MulMatM
 
 open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
-theorem GlobalTheory.JR.descFn_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (M : Meas r F E) (Ax : selfAdjoint (Matrix (Fin r) (Fin r) E)) (j : A.L ≃ₗ[E] (Fin r → E)) (lam : F) (α : Matrix.unitaryGroup (Fin r) E → ℝ), IsLocallyConstant α → HasCompactSupport α → ∀ f : Hn r F E → ℂ, IsTest f → IsTest (A.descFn M Ax j lam α f) := by
+theorem GlobalTheory.JR.descFn_isTest
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (M : Meas r F E)
+        (Ax : selfAdjoint (Matrix (Fin r) (Fin r) E)) (j : A.L ≃ₗ[E] (Fin r → E)) (lam : F)
+        (α : Matrix.unitaryGroup (Fin r) E → ℝ),
+      IsLocallyConstant α → HasCompactSupport α
+        → ∀ f : Hn r F E → ℂ, IsTest f → IsTest (A.descFn M Ax j lam α f) := by
   intro F E _ _ _ _ _ A r M Ax j lam α hαl hαc f hf
 
   have hstar : Continuous (star : E → E) := by
@@ -18,12 +24,15 @@ theorem GlobalTheory.JR.descFn_isTest : ∀ (F E : Type) [NontriviallyNormedFiel
   haveI : ProperSpace F := ProperSpace.of_locallyCompactSpace F
   haveI : IsTopologicalAddGroup A.L := IsModuleTopology.topologicalAddGroup F A.L
   haveI : FiniteDimensional F E := Module.finite_of_finrank_eq_succ (Unram.finrank_eq (F := F) (E := E))
-  have hj : Continuous j := IsModuleTopology.continuous_of_linearMap ((j : A.L →ₗ[E] (Fin r → E)).restrictScalars F)
+  have hj : Continuous j :=
+    IsModuleTopology.continuous_of_linearMap ((j : A.L →ₗ[E] (Fin r → E)).restrictScalars F)
   have hjs : Continuous j.symm :=
     LinearMap.continuous_of_finiteDimensional ((j.symm : (Fin r → E) →ₗ[E] A.L).restrictScalars F)
 
-  have hact : Continuous (fun p : A.L × Matrix.unitaryGroup (Fin r) E => (actU p.2 (Ax, j p.1, lam) : Hn r F E)) := by
-    have hg : Continuous (fun p : A.L × Matrix.unitaryGroup (Fin r) E => (p.2 : Matrix (Fin r) (Fin r) E)) :=
+  have hact : Continuous (fun p : A.L × Matrix.unitaryGroup (Fin r) E =>
+      (actU p.2 (Ax, j p.1, lam) : Hn r F E)) := by
+    have hg : Continuous (fun p : A.L × Matrix.unitaryGroup (Fin r) E =>
+        (p.2 : Matrix (Fin r) (Fin r) E)) :=
       continuous_subtype_val.comp continuous_snd
     have c1 : Continuous (fun p : A.L × Matrix.unitaryGroup (Fin r) E =>
         (p.2 : Matrix (Fin r) (Fin r) E) * Ax.1 * star (p.2 : Matrix (Fin r) (Fin r) E)) :=
@@ -44,9 +53,13 @@ theorem GlobalTheory.JR.descFn_isTest : ∀ (F E : Type) [NontriviallyNormedFiel
       refine hαc.isCompact.eventually_forall_of_forall_eventually ?_
       intro g _
       have h1 := (IsLocallyConstant.iff_eventually_eq Φ).1 hΦl (y0, g)
-      have h2 : ∀ᶠ z : A.L × Matrix.unitaryGroup (Fin r) E in 𝓝 (y0, g), Φ (y0, z.2) = Φ (y0, g) := by
-        have h3 : Tendsto (fun z : A.L × Matrix.unitaryGroup (Fin r) E => ((y0, z.2) : A.L × _)) (𝓝 (y0, g)) (𝓝 (y0, g)) := by
-          have : Continuous (fun z : A.L × Matrix.unitaryGroup (Fin r) E => ((y0, z.2) : A.L × _)) :=
+      have h2
+          : ∀ᶠ z : A.L × Matrix.unitaryGroup (Fin r) E in 𝓝 (y0, g), Φ (y0, z.2) = Φ (y0, g) := by
+        have h3 : Tendsto
+            (fun z : A.L × Matrix.unitaryGroup (Fin r) E => ((y0, z.2) : A.L × _))
+            (𝓝 (y0, g)) (𝓝 (y0, g)) := by
+          have : Continuous (fun z : A.L × Matrix.unitaryGroup (Fin r) E =>
+              ((y0, z.2) : A.L × _)) :=
             continuous_const.prodMk continuous_snd
           simpa using this.tendsto (y0, g)
         exact h3.eventually h1
@@ -61,13 +74,16 @@ theorem GlobalTheory.JR.descFn_isTest : ∀ (F E : Type) [NontriviallyNormedFiel
     · have : α g = 0 := image_eq_zero_of_notMem_tsupport hg
       simp [hΦ, this]
   · let S : Set (Fin r → E) := Prod.fst '' (Prod.snd '' tsupport f)
-    let Kset : Set A.L := (fun p : Matrix.unitaryGroup (Fin r) E × (Fin r → E) => j.symm (star (p.1 : Matrix (Fin r) (Fin r) E) *ᵥ p.2)) '' (tsupport α ×ˢ S)
-    have hS : IsCompact S :=
-      (hf.2.isCompact.image continuous_snd).image continuous_fst
+    let Kset : Set A.L :=
+      (fun p : Matrix.unitaryGroup (Fin r) E × (Fin r → E) =>
+          j.symm (star (p.1 : Matrix (Fin r) (Fin r) E) *ᵥ p.2))
+        '' (tsupport α ×ˢ S)
+    have hS : IsCompact S := (hf.2.isCompact.image continuous_snd).image continuous_fst
     have hK : IsCompact Kset := by
       refine (hαc.isCompact.prod hS).image ?_
       refine hjs.comp ?_
-      exact Continuous.matrix_mulVec ((continuous_subtype_val.comp continuous_fst).star) continuous_snd
+      exact Continuous.matrix_mulVec ((continuous_subtype_val.comp continuous_fst).star)
+        continuous_snd
     have hKc : IsClosed Kset := by
       have h1 : IsClosed (j '' Kset) := (hK.image hj).isClosed
       have h2 : Kset = j ⁻¹' (j '' Kset) := (Set.preimage_image_eq _ j.injective).symm
@@ -92,5 +108,6 @@ theorem GlobalTheory.JR.descFn_isTest : ∀ (F E : Type) [NontriviallyNormedFiel
     refine ⟨(g, g.1 *ᵥ j y), ⟨subset_tsupport _ hαg', ?_⟩, ?_⟩
     · exact ⟨(actU g (Ax, j y, lam)).2, ⟨actU g (Ax, j y, lam), subset_tsupport _ hfg, rfl⟩, rfl⟩
     · simp only [Matrix.mulVec_mulVec]
-      have hu : star (g.1 : Matrix (Fin r) (Fin r) E) * g.1 = 1 := Matrix.UnitaryGroup.star_mul_self g
+      have hu : star (g.1 : Matrix (Fin r) (Fin r) E) * g.1 = 1 :=
+        Matrix.UnitaryGroup.star_mul_self g
       rw [hu, Matrix.one_mulVec, LinearEquiv.symm_apply_apply]

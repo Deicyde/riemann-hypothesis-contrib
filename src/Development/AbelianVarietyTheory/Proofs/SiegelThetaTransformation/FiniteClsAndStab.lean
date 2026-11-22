@@ -16,8 +16,8 @@ open GlobalTheory.SW.Base
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-noncomputable def red (M : ℕ) (Λ : Lt E n) (s : ℕ) (h : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n) :
-    Λ →ₗ[𝓞 E] (Fin n → 𝓞 E ⧸ Ideal.span {(M : 𝓞 E)}) where
+noncomputable def red (M : ℕ) (Λ : Lt E n) (s : ℕ) (h : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n)
+    : Λ →ₗ[𝓞 E] (Fin n → 𝓞 E ⧸ Ideal.span {(M : 𝓞 E)}) where
   toFun x a := Ideal.Quotient.mk _ ⟨(s : E) * x.1 a, (mem_stdL _).1 (h _ x.2) a⟩
   map_add' x y := by
     funext a
@@ -356,31 +356,40 @@ private lemma exists_moves_mem_Vset_of_mem_DH {M : ℕ} {h : Matrix (Fin n) (Fin
       push_cast
       ring
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real in
-theorem _root_.GlobalTheory.SW.finite_cls_and_stab : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (n M : ℕ), 0 < M → Finite (_root_.GlobalTheory.SW.Cls E n M) ∧
-    _root_.GlobalTheory.SW.stdL E n ∈ _root_.GlobalTheory.SW.Vset E n M ∧
-    (∀ Λ ∈ _root_.GlobalTheory.SW.Vset E n M,
-      {h ∈ _root_.GlobalTheory.SW.DH E n M | _root_.GlobalTheory.SW.Moves h Λ Λ}.Finite ∧
-        0 < _root_.GlobalTheory.SW.wt M Λ) ∧
-    (1 ∈ _root_.GlobalTheory.SW.DH E n M ∧
-      ∀ h ∈ _root_.GlobalTheory.SW.DH E n M,
-        _root_.GlobalTheory.SW.ccT h ∈ _root_.GlobalTheory.SW.DH E n M ∧
-          ∀ h' ∈ _root_.GlobalTheory.SW.DH E n M,
-            h * h' ∈ _root_.GlobalTheory.SW.DH E n M) ∧
-    ∀ h ∈ _root_.GlobalTheory.SW.DH E n M, ∀ Λ ∈ _root_.GlobalTheory.SW.Vset E n M,
-      ∃ Λ' ∈ _root_.GlobalTheory.SW.Vset E n M, _root_.GlobalTheory.SW.Moves h Λ Λ' := by
+theorem _root_.GlobalTheory.SW.finite_cls_and_stab
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n M : ℕ),
+      0 < M
+        → Finite (_root_.GlobalTheory.SW.Cls E n M)
+          ∧ _root_.GlobalTheory.SW.stdL E n ∈ _root_.GlobalTheory.SW.Vset E n M
+          ∧ (∀ Λ ∈ _root_.GlobalTheory.SW.Vset E n M,
+            {h ∈ _root_.GlobalTheory.SW.DH E n M | _root_.GlobalTheory.SW.Moves h Λ Λ}.Finite
+              ∧ 0 < _root_.GlobalTheory.SW.wt M Λ)
+          ∧ (1 ∈ _root_.GlobalTheory.SW.DH E n M
+            ∧ ∀ h ∈ _root_.GlobalTheory.SW.DH E n M,
+              _root_.GlobalTheory.SW.ccT h ∈ _root_.GlobalTheory.SW.DH E n M
+                ∧ ∀ h' ∈ _root_.GlobalTheory.SW.DH E n M, h * h' ∈ _root_.GlobalTheory.SW.DH E n M)
+          ∧ ∀ h ∈ _root_.GlobalTheory.SW.DH E n M, ∀ Λ ∈ _root_.GlobalTheory.SW.Vset E n M,
+            ∃ Λ' ∈ _root_.GlobalTheory.SW.Vset E n M,
+              _root_.GlobalTheory.SW.Moves h Λ Λ' := by
   intro E _ _ _ n M hM
-  refine ⟨finite_cls' M hM, _root_.GlobalTheory.SW.Base.stdL_mem_Vset n M,
+  refine ⟨
+    finite_cls' M hM,
+    _root_.GlobalTheory.SW.Base.stdL_mem_Vset n M,
     fun Λ hΛ => ⟨finite_stabiliser_DH M hΛ, ?_⟩,
-    ⟨_root_.GlobalTheory.SW.Base.one_mem_DH M, fun h hh =>
-      ⟨_root_.GlobalTheory.SW.Base.ccT_mem_DH hh,
-        fun h' hh' => _root_.GlobalTheory.SW.Base.mul_mem_DH hh hh'⟩⟩,
-    fun h hh Λ hΛ => exists_moves_mem_Vset_of_mem_DH hh hΛ⟩
-  have hne : {h | h ∈ _root_.GlobalTheory.SW.DH E n M ∧
-      _root_.GlobalTheory.SW.Moves h Λ Λ}.Nonempty :=
+    ⟨
+      _root_.GlobalTheory.SW.Base.one_mem_DH M,
+      fun h hh => ⟨
+        _root_.GlobalTheory.SW.Base.ccT_mem_DH hh,
+        fun h' hh' => _root_.GlobalTheory.SW.Base.mul_mem_DH hh hh'
+      ⟩
+    ⟩,
+    fun h hh Λ hΛ => exists_moves_mem_Vset_of_mem_DH hh hΛ
+  ⟩
+  have hne
+      : {h | h ∈ _root_.GlobalTheory.SW.DH E n M ∧
+        _root_.GlobalTheory.SW.Moves h Λ Λ}.Nonempty :=
     ⟨1, _root_.GlobalTheory.SW.Base.one_mem_DH M, _root_.GlobalTheory.SW.Base.moves_one Λ⟩
   unfold _root_.GlobalTheory.SW.wt
   exact inv_pos.2 (Nat.cast_pos.2 ((Set.ncard_pos (finite_stabiliser_DH M hΛ)).2 hne))

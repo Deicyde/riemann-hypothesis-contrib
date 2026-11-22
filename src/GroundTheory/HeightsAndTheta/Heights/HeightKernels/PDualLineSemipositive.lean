@@ -19,17 +19,17 @@ noncomputable section
 
 namespace DualLineSemipositiveAlt
 
-
 open scoped MatrixOrder in
-theorem exists_conjTranspose_mul_self {n : Type} [Fintype n] [DecidableEq n] {M : Matrix n n ℂ}
-    (hM : M.PosSemidef) : ∃ B : Matrix n n ℂ, M = Bᴴ * B := by
+theorem exists_conjTranspose_mul_self
+    {n : Type} [Fintype n] [DecidableEq n] {M : Matrix n n ℂ} (hM : M.PosSemidef)
+    : ∃ B : Matrix n n ℂ, M = Bᴴ * B := by
   have h0 : 0 ≤ M := Matrix.nonneg_iff_posSemidef.mpr hM
   refine ⟨CFC.sqrt M, ?_⟩
   rw [← Matrix.star_eq_conjTranspose, (CFC.sqrt_nonneg M).isSelfAdjoint.star_eq,
     CFC.sqrt_mul_sqrt_self M h0]
 
-theorem re_star_dotProduct_mulVec {n : Type} [Fintype n] (B : Matrix n n ℂ) (w : n → ℂ) :
-    (star w ⬝ᵥ ((Bᴴ * B) *ᵥ w)).re = ∑ j, ‖(B *ᵥ w) j‖ ^ 2 := by
+theorem re_star_dotProduct_mulVec {n : Type} [Fintype n] (B : Matrix n n ℂ) (w : n → ℂ)
+    : (star w ⬝ᵥ ((Bᴴ * B) *ᵥ w)).re = ∑ j, ‖(B *ᵥ w) j‖ ^ 2 := by
   rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec]
   simp only [dotProduct, Pi.star_apply, Complex.re_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -40,22 +40,25 @@ variable {K : Type} [Field K] [NumberField K] {i : ℕ} {T : Type} [Fintype T] [
 def factor (F : HermLattice K i) (σ : K →+* ℂ) : Matrix (Fin i) (Fin i) ℂ :=
   Classical.choose (exists_conjTranspose_mul_self (F.posDef σ).posSemidef)
 
-theorem factor_spec (F : HermLattice K i) (σ : K →+* ℂ) :
-    F.metric σ = (factor F σ)ᴴ * factor F σ :=
+theorem factor_spec (F : HermLattice K i) (σ : K →+* ℂ) : F.metric σ = (factor F σ)ᴴ * factor F σ :=
   Classical.choose_spec (exists_conjTranspose_mul_self (F.posDef σ).posSemidef)
 
-def coordMap {F : HermLattice K i} (b : Module.Basis T ℤ (dualLattice F))
-    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b))) :
-    ((Σ _ : Unit, T) → ℂ) →ₗ[ℂ] ((K →+* ℂ) × Fin i → ℂ) :=
-  (LinearMap.pi fun p : (K →+* ℂ) × Fin i => (LinearMap.proj p.2) ∘ₗ (factor F p.1).mulVecLin ∘ₗ
-      (LinearMap.pi fun k => LinearMap.proj (p.1, k))) ∘ₗ (dualRecover b hb).toLinearMap ∘ₗ
-    (LinearMap.pi fun t => LinearMap.proj (⟨(), t⟩ : Σ _ : Unit, T))
-
+def coordMap
+    {F : HermLattice K i} (b : Module.Basis T ℤ (dualLattice F))
+    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
+    : ((Σ _ : Unit, T) → ℂ) →ₗ[ℂ] ((K →+* ℂ) × Fin i → ℂ) :=
+  (LinearMap.pi fun p : (K →+* ℂ) × Fin i =>
+      (LinearMap.proj p.2) ∘ₗ (factor F p.1).mulVecLin
+        ∘ₗ (LinearMap.pi fun k => LinearMap.proj (p.1, k)))
+    ∘ₗ (dualRecover b hb).toLinearMap
+    ∘ₗ (LinearMap.pi fun t => LinearMap.proj (⟨(), t⟩ : Σ _ : Unit, T))
 
 omit [Fintype T] [DecidableEq T] in
-theorem dualLine_h_eq {F : HermLattice K i} (b : Module.Basis T ℤ (dualLattice F))
-    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b))) (z : (Σ _ : Unit, T) → ℂ) :
-    (dualLine F b hb).h z = (fsMetric (ι := (K →+* ℂ) × Fin i)).ρ (coordMap b hb z) := by
+theorem dualLine_h_eq
+    {F : HermLattice K i} (b : Module.Basis T ℤ (dualLattice F))
+    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
+    (z : (Σ _ : Unit, T) → ℂ)
+    : (dualLine F b hb).h z = (fsMetric (ι := (K →+* ℂ) × Fin i)).ρ (coordMap b hb z) := by
   show Real.sqrt (dualNormSq b hb fun t => z ⟨(), t⟩) = ‖WithLp.toLp 2 (coordMap b hb z)‖
   rw [EuclideanSpace.norm_eq]
   congr 1
@@ -66,7 +69,6 @@ theorem dualLine_h_eq {F : HermLattice K i} (b : Module.Basis T ℤ (dualLattice
   rfl
 
 end DualLineSemipositiveAlt
-
 
 open DualLineSemipositiveAlt in
 theorem DualLineSemipositive.proof : DualLineSemipositive.Statement := by
@@ -84,18 +86,21 @@ theorem DualLineSemipositive.proof : DualLineSemipositive.Statement := by
   refine ⟨?_, fun z hz w _ => ?_⟩
   · intro z hz
     rw [hfun]
-    exact ((HilbertSamuel.ProjLine.isSmoothMetric_fs.contDiffAt (isOpen_ne.mem_nhds (hne z hz))).comp z
-      (τc.restrictScalars ℝ).contDiff.contDiffAt).contDiffWithinAt
+    exact
+      ((HilbertSamuel.ProjLine.isSmoothMetric_fs.contDiffAt (isOpen_ne.mem_nhds (hne z hz))).comp z
+        (τc.restrictScalars ℝ).contDiff.contDiffAt).contDiffWithinAt
   · change 0 ≤ ReciprocityTheory.AnForm.levi (fun z => Real.log ((dualLine F b hb).h z)) z w
-    have hlog : (fun z => Real.log ((dualLine F b hb).h z)) =
-        (fun u => Real.log ((fsMetric (ι := (K →+* ℂ) × Fin i)).ρ u)) ∘ τc := by
+    have hlog
+        : (fun z => Real.log ((dualLine F b hb).h z))
+          = (fun u => Real.log ((fsMetric (ι := (K →+* ℂ) × Fin i)).ρ u)) ∘ τc := by
       funext y
       simp only [Function.comp_apply, hh]
     have hz0 := hne z hz.1
     have hρ : ContDiffAt ℝ 2 (fsMetric (ι := (K →+* ℂ) × Fin i)).ρ (τc z) :=
       (HilbertSamuel.ProjLine.isSmoothMetric_fs.contDiffAt (isOpen_ne.mem_nhds hz0)).of_le
         (WithTop.coe_le_coe.2 le_top)
-    have hlog₀ : ContDiffAt ℝ 2 (fun u => Real.log ((fsMetric (ι := (K →+* ℂ) × Fin i)).ρ u)) (τc z) :=
+    have hlog₀
+        : ContDiffAt ℝ 2 (fun u => Real.log ((fsMetric (ι := (K →+* ℂ) × Fin i)).ρ u)) (τc z) :=
       hρ.log ((fsMetric (ι := (K →+* ℂ) × Fin i)).pos _ hz0).ne'
     rw [hlog, ReciprocityTheory.AnForm.levi_comp w (τc.analyticAt z) hlog₀]
     exact HilbertSamuel.ProjLine.leviForm_log_fs_nonneg hz0 _

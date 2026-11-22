@@ -63,11 +63,12 @@ lemma eI_inj {n : ℕ} : Function.Injective (eI (n := n)) := by
   unfold eI at this
   by_cases hI : i ∈ I <;> by_cases hJ : i ∈ J <;> simp_all
 
-
 open Classical in
 def aF {n : ℕ} (S : Finset (Finset (Fin n))) (co : Finset (Fin n) → ℂ) : (Fin n → ℤ) →₀ ℂ :=
-  Finsupp.mapDomain eI (Finsupp.onFinset S (fun I => if I ∈ S then co I else 0)
-    (fun I hI => by by_contra h'; exact hI (if_neg h')))
+  Finsupp.mapDomain eI
+    (Finsupp.onFinset S
+      (fun I => if I ∈ S then co I else 0)
+      (fun I hI => by by_contra h'; exact hI (if_neg h')))
 
 lemma aF_sum {M : Type*} [AddCommMonoid M] {n : ℕ} (S : Finset (Finset (Fin n))) (co : Finset (Fin n) → ℂ)
     (h : (Fin n → ℤ) → ℂ → M) (h0 : ∀ ν, h ν 0 = 0) : (aF S co).sum h = ∑ I ∈ S, h (eI I) (co I) := by
@@ -87,10 +88,12 @@ end LatticeNorms
 
 section place
 
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
-def scF (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) : ℝ := (Real.sqrt (TBB.jN2 p F).toReal)⁻¹
+def scF (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) : ℝ :=
+  (Real.sqrt (TBB.jN2 p F).toReal)⁻¹
 
 def unitF (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) : B.Mat P.k P.r → (Wq →L[ℂ] Wp) :=
   fun g => ((scF p F : ℝ) : ℂ) • F g
@@ -164,8 +167,10 @@ lemma meas_unitF (p : KB.Pl P Wp Wq) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp))
   simp_rw [Ew_csmul, ENNReal.ofReal_mul (sq_nonneg ‖((scF p F : ℝ) : ℂ)‖)]
   exact hm.const_mul _
 
-structure PieriExpansionData (P : M.Par) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] where
+structure PieriExpansionData
+    (P : M.Par)
+    (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] where
   n : ℕ
   J : (Fin n → ℤ) → B.Mat P.k P.r → (Wq →L[ℂ] Wp)
   lam : Fin n → ℤ
@@ -175,53 +180,74 @@ structure PieriExpansionData (P : M.Par) (Wp Wq : Type) [NormedAddCommGroup Wp] 
   H : ℝ
 
 def PieriExpansion (p : KB.Pl P Wp Wq) (d : PieriExpansionData P Wp Wq) : Prop :=
-  ∀ μ, LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0 → ∀ c : Fin (P.r + 1) → ℂ, D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) →
-    0 < TBB.Gp p (TBB.bigPt P.r c) →
-    (D.ptMatN (TBB.bigPt P.r c) (P.r + 1)).det • p.V (d.J μ) (TBB.bigPt P.r c) =
-      ∑ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)),
-        d.tau μ I • p.V (d.J (μ + LatticeNorms.eI I)) (TBB.bigPt P.r c)
+  ∀ μ,
+    LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0
+      → ∀ c : Fin (P.r + 1) → ℂ,
+        D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) → 0 < TBB.Gp p (TBB.bigPt P.r c)
+          → (D.ptMatN (TBB.bigPt P.r c) (P.r + 1)).det • p.V (d.J μ) (TBB.bigPt P.r c)
+            = ∑ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)),
+                d.tau μ I • p.V (d.J (μ + LatticeNorms.eI I)) (TBB.bigPt P.r c)
 
 def PieriCoefficientBound (d : PieriExpansionData P Wp Wq) : Prop :=
-  ∀ μ, LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0 → ∀ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)),
-    ‖d.tau μ I‖ ≤ d.H ^ (P.r + 1)
+  ∀ μ,
+    LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0
+      → ∀ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)), ‖d.tau μ I‖ ≤ d.H ^ (P.r + 1)
 
 def PieriDegreeConditions (p : KB.Pl P Wp Wq) (d : PieriExpansionData P Wp Wq) : Prop :=
-  0 < TBB.jN2 p (d.J d.lam) ∧
-  (∀ μ, LatticeNorms.N1 (μ - d.lam) ≤ d.q0 → TBB.jN2 p (d.J μ) < ⊤ ∧
-    (TBB.jN2 p (d.J μ) = 0 → ∀ c : Fin (P.r + 1) → ℂ, D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) →
-      0 < TBB.Gp p (TBB.bigPt P.r c) → p.V (d.J μ) (TBB.bigPt P.r c) = 0)) ∧
-  ∀ μ, LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0 → TBB.jN2 p (d.J μ) ≠ 0 →
-    ∀ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)),
-    TBB.jN2 p (d.J (μ + LatticeNorms.eI I)) ≤ ENNReal.ofReal ((Real.exp 1 * d.n) ^ (P.r + 1)) * TBB.jN2 p (d.J μ)
+  0 < TBB.jN2 p (d.J d.lam)
+    ∧ (∀ μ,
+      LatticeNorms.N1 (μ - d.lam) ≤ d.q0
+        → TBB.jN2 p (d.J μ) < ⊤
+          ∧ (TBB.jN2 p (d.J μ) = 0
+            → ∀ c : Fin (P.r + 1) → ℂ,
+              D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) → 0 < TBB.Gp p (TBB.bigPt P.r c)
+                → p.V (d.J μ) (TBB.bigPt P.r c) = 0))
+    ∧ ∀ μ,
+      LatticeNorms.N1 (μ - d.lam) + d.c0 ≤ d.q0 → TBB.jN2 p (d.J μ) ≠ 0
+        → ∀ I ∈ powersetCard (P.r + 1) (univ : Finset (Fin d.n)),
+          TBB.jN2 p (d.J (μ + LatticeNorms.eI I))
+            ≤ ENNReal.ofReal ((Real.exp 1 * d.n) ^ (P.r + 1)) * TBB.jN2 p (d.J μ)
 
 def PieriMeasurability (p : KB.Pl P Wp Wq) (d : PieriExpansionData P Wp Wq) : Prop :=
-  ∀ μ, AEMeasurable fun c : Fin (P.r + 1) → ℂ =>
-    ENNReal.ofReal (TBB.Ew p (fun _ => 1) (d.J μ) (P.r + 1) [] (TBB.bigPt P.r c))
+  ∀ μ,
+    AEMeasurable fun c : Fin (P.r + 1) → ℂ =>
+      ENNReal.ofReal (TBB.Ew p (fun _ => 1) (d.J μ) (P.r + 1) [] (TBB.bigPt P.r c))
 
-def pieriExpansionUnitFamily (p : KB.Pl P Wp Wq) (d : PieriExpansionData P Wp Wq) (μ : Fin d.n → ℤ) : B.Mat P.k P.r → (Wq →L[ℂ] Wp) :=
+def pieriExpansionUnitFamily (p : KB.Pl P Wp Wq) (d : PieriExpansionData P Wp Wq) (μ : Fin d.n → ℤ)
+    : B.Mat P.k P.r → (Wq →L[ℂ] Wp) :=
   unitF p (d.J μ)
 
-theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (b C₃ : ℝ) (a₁ : ℕ)
-    (d : PieriExpansionData P Wp Wq) (hf : f = unitF p (d.J d.lam)) (hH : 0 ≤ d.H) (hc0 : P.r + 1 ≤ d.c0)
-    (hrange : (P.r + 1) * a₁ + d.c0 ≤ d.q0)
+theorem family_expansion_of_parts
+    (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (b C₃ : ℝ) (a₁ : ℕ)
+    (d : PieriExpansionData P Wp Wq) (hf : f = unitF p (d.J d.lam)) (hH : 0 ≤ d.H)
+    (hc0 : P.r + 1 ≤ d.c0) (hrange : (P.r + 1) * a₁ + d.c0 ≤ d.q0)
     (hGb : (2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H) ^ (P.r + 1) ≤ b ^ (C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2))
-    (hP : PieriExpansion p d) (hT : PieriCoefficientBound d) (hD : PieriDegreeConditions p d) (hM : PieriMeasurability p d) : FamilyDerivativeExpansion p f b C₃ a₁ := by
+    (hP : PieriExpansion p d) (hT : PieriCoefficientBound d) (hD : PieriDegreeConditions p d)
+    (hM : PieriMeasurability p d)
+    : FamilyDerivativeExpansion p f b C₃ a₁ := by
   classical
   have hn0 : (0 : ℝ) ≤ (d.n : ℝ) := Nat.cast_nonneg _
   have hGam0 : 0 ≤ 2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H :=
     mul_nonneg (mul_nonneg (by norm_num) (Real.rpow_nonneg hn0 _)) hH
-  have hV0 : ∀ (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (c : Fin (P.r + 1) → ℂ),
-      ¬ (D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) ∧ 0 < TBB.Gp p (TBB.bigPt P.r c)) →
-      p.V F (TBB.bigPt P.r c) = 0 := by
+  have hV0
+      : ∀ (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (c : Fin (P.r + 1) → ℂ),
+        ¬(D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) ∧ 0 < TBB.Gp p (TBB.bigPt P.r c))
+          → p.V F (TBB.bigPt P.r c) = 0 := by
     intro F c hc
     unfold KB.Pl.V D.vecV
     split_ifs with h1 <;> first | rfl | exact absurd h1 hc
-  have hfamV : ∀ ν (c : Fin (P.r + 1) → ℂ), p.V (pieriExpansionUnitFamily p d ν) (TBB.bigPt P.r c) =
-      ((scF p (d.J ν) : ℝ) : ℂ) • p.V (d.J ν) (TBB.bigPt P.r c) := fun ν c => V_csmul p (d.J ν) _ _
-  have hJV : ∀ ν (c : Fin (P.r + 1) → ℂ), LatticeNorms.N1 (ν - d.lam) ≤ d.q0 →
-      D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) → 0 < TBB.Gp p (TBB.bigPt P.r c) →
-      p.V (d.J ν) (TBB.bigPt P.r c) =
-        ((Real.sqrt (TBB.jN2 p (d.J ν)).toReal : ℝ) : ℂ) • p.V (pieriExpansionUnitFamily p d ν) (TBB.bigPt P.r c) := by
+  have hfamV
+      : ∀ ν (c : Fin (P.r + 1) → ℂ),
+        p.V (pieriExpansionUnitFamily p d ν) (TBB.bigPt P.r c)
+          = ((scF p (d.J ν) : ℝ) : ℂ) • p.V (d.J ν) (TBB.bigPt P.r c) := fun ν c =>
+    V_csmul p (d.J ν) _ _
+  have hJV
+      : ∀ ν (c : Fin (P.r + 1) → ℂ),
+        LatticeNorms.N1 (ν - d.lam) ≤ d.q0 → D.IsLocPt (TBB.bigPt P.r c) (P.r + 1)
+          → 0 < TBB.Gp p (TBB.bigPt P.r c)
+          → p.V (d.J ν) (TBB.bigPt P.r c)
+            = ((Real.sqrt (TBB.jN2 p (d.J ν)).toReal : ℝ) : ℂ)
+              • p.V (pieriExpansionUnitFamily p d ν) (TBB.bigPt P.r c) := by
     intro ν c hν hl hg
     rw [hfamV, smul_smul, ← Complex.ofReal_mul]
     by_cases h0 : TBB.jN2 p (d.J ν) = 0
@@ -230,13 +256,33 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
       have hpos : 0 < Real.sqrt (TBB.jN2 p (d.J ν)).toReal :=
         Real.sqrt_pos.mpr (ENNReal.toReal_pos h0 ht.ne)
       rw [scF, mul_inv_cancel₀ hpos.ne', Complex.ofReal_one, one_smul]
-  refine ⟨Fin d.n → ℤ, inferInstance, pieriExpansionUnitFamily p d, d.lam, LatticeNorms.N1, LatticeNorms.Ninf, d.c0, d.q0,
-    2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H, ?_, hGam0, LatticeNorms.n1_add_le, LatticeNorms.Ninf_add, LatticeNorms.n1_zero, LatticeNorms.Ninf_zero, ?_,
-    hrange, hGb, ?_, fun μ => meas_unitF p _ (hM μ)⟩
+  refine ⟨
+    Fin d.n → ℤ,
+    inferInstance,
+    pieriExpansionUnitFamily p d,
+    d.lam,
+    LatticeNorms.N1,
+    LatticeNorms.Ninf,
+    d.c0,
+    d.q0,
+    2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H,
+    ?_,
+    hGam0,
+    LatticeNorms.n1_add_le,
+    LatticeNorms.Ninf_add,
+    LatticeNorms.n1_zero,
+    LatticeNorms.Ninf_zero,
+    ?_,
+    hrange,
+    hGb,
+    ?_,
+    fun μ => meas_unitF p _ (hM μ)
+  ⟩
   · rw [hf]; rfl
   rotate_left
   · intro μ
-    have hl : LatticeNorms.N1 (d.lam - d.lam) ≤ d.q0 := by rw [sub_self, LatticeNorms.n1_zero]; exact Nat.zero_le _
+    have hl : LatticeNorms.N1 (d.lam - d.lam) ≤ d.q0 := by
+      rw [sub_self, LatticeNorms.n1_zero]; exact Nat.zero_le _
     rw [hf, norm_sq_unit_normalization p _ hD.1 (hD.2.1 d.lam hl).1]
     exact norm_sq_unit_normalization_le p _
   intro μ hμ
@@ -244,15 +290,21 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
   have hrngI : ∀ I ∈ S, LatticeNorms.N1 (μ + LatticeNorms.eI I - d.lam) ≤ d.q0 := by
     intro I hI
     have hc := (Finset.mem_powersetCard.mp hI).2
-    calc LatticeNorms.N1 (μ + LatticeNorms.eI I - d.lam) = LatticeNorms.N1 ((μ - d.lam) + LatticeNorms.eI I) := by congr 1; abel
-      _ ≤ LatticeNorms.N1 (μ - d.lam) + LatticeNorms.N1 (LatticeNorms.eI I) := LatticeNorms.n1_add_le _ _
+    calc
+      LatticeNorms.N1 (μ + LatticeNorms.eI I - d.lam)
+        = LatticeNorms.N1 ((μ - d.lam) + LatticeNorms.eI I) := by congr 1; abel
+      _ ≤ LatticeNorms.N1 (μ - d.lam) + LatticeNorms.N1 (LatticeNorms.eI I) :=
+        LatticeNorms.n1_add_le _ _
       _ ≤ d.q0 := by rw [LatticeNorms.n1_eI_eq_card, hc]; omega
   let co : Finset (Fin d.n) → ℂ := fun I =>
-    ((scF p (d.J μ) : ℝ) : ℂ) * d.tau μ I * ((Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal : ℝ) : ℂ)
+    ((scF p (d.J μ) : ℝ) : ℂ) * d.tau μ I
+      * ((Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal : ℝ) : ℂ)
   refine ⟨LatticeNorms.aF S co, ?_, ?_, ?_⟩
   · funext c
-    rw [LatticeNorms.aF_sum S co (fun ν z => z • fun c => p.V (pieriExpansionUnitFamily p d (μ + ν)) (TBB.bigPt P.r c))
-      (fun ν => zero_smul _ _), Finset.sum_apply]
+    rw [LatticeNorms.aF_sum S co
+        (fun ν z => z • fun c => p.V (pieriExpansionUnitFamily p d (μ + ν)) (TBB.bigPt P.r c))
+        (fun ν => zero_smul _ _),
+      Finset.sum_apply]
     simp only [Pi.smul_apply]
     by_cases hg : D.IsLocPt (TBB.bigPt P.r c) (P.r + 1) ∧ 0 < TBB.Gp p (TBB.bigPt P.r c)
     · obtain ⟨hl, hG⟩ := hg
@@ -264,7 +316,10 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
   rotate_left
   · intro ν hν
     obtain ⟨I, hI, rfl⟩ := LatticeNorms.mem_supp_aF S co ν hν
-    exact ⟨by rw [LatticeNorms.n1_eI_eq_card, (Finset.mem_powersetCard.mp hI).2], LatticeNorms.Ninf_eI I⟩
+    exact ⟨
+      by rw [LatticeNorms.n1_eI_eq_card, (Finset.mem_powersetCard.mp hI).2],
+      LatticeNorms.Ninf_eI I
+    ⟩
   rw [LatticeNorms.aF_sum S co (fun _ z => ‖z‖) (fun _ => norm_zero)]
   have hE0 : 0 ≤ (Real.exp 1 * d.n) ^ (P.r + 1) := pow_nonneg (mul_nonneg (Real.exp_pos 1).le hn0) _
   have hco : ∀ I ∈ S, ‖co I‖ ≤ d.H ^ (P.r + 1) * Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) := by
@@ -283,31 +338,45 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
       have hdeg := hD.2.2 μ hμ h0 I hI
       have hfin : ENNReal.ofReal ((Real.exp 1 * d.n) ^ (P.r + 1)) * TBB.jN2 p (d.J μ) ≠ ⊤ :=
         ENNReal.mul_ne_top ENNReal.ofReal_ne_top ht.ne
-      have htI : (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal ≤
-          (Real.exp 1 * d.n) ^ (P.r + 1) * (TBB.jN2 p (d.J μ)).toReal := by
+      have htI
+          : (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal
+            ≤ (Real.exp 1 * d.n) ^ (P.r + 1) * (TBB.jN2 p (d.J μ)).toReal := by
         have h1 := ENNReal.toReal_mono hfin hdeg
         rwa [ENNReal.toReal_mul, ENNReal.toReal_ofReal hE0] at h1
-      have hsI : Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal ≤
-          Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) * Real.sqrt (TBB.jN2 p (d.J μ)).toReal := by
+      have hsI
+          : Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal
+            ≤ Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))
+              * Real.sqrt (TBB.jN2 p (d.J μ)).toReal := by
         rw [← Real.sqrt_mul hE0]
         exact Real.sqrt_le_sqrt htI
-      have hnorm : ‖co I‖ = ‖d.tau μ I‖ * ((Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹ *
-          Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal) := by
+      have hnorm
+          : ‖co I‖
+            = ‖d.tau μ I‖
+              * ((Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹
+                * Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal) := by
         simp only [co, scF, norm_mul, Complex.norm_real, Real.norm_eq_abs,
           abs_of_nonneg (inv_nonneg.mpr (Real.sqrt_nonneg (TBB.jN2 p (d.J μ)).toReal)),
           abs_of_nonneg (Real.sqrt_nonneg (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal)]
         ring
       rw [hnorm]
-      have hratio : (Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹ *
-          Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal ≤ Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) := by
-        calc _ ≤ (Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹ * (Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) *
-              Real.sqrt (TBB.jN2 p (d.J μ)).toReal) := mul_le_mul_of_nonneg_left hsI (inv_nonneg.mpr hsμ.le)
+      have hratio
+          : (Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹
+              * Real.sqrt (TBB.jN2 p (d.J (μ + LatticeNorms.eI I))).toReal
+            ≤ Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) := by
+        calc
+          _ ≤ (Real.sqrt (TBB.jN2 p (d.J μ)).toReal)⁻¹
+              * (Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))
+                * Real.sqrt (TBB.jN2 p (d.J μ)).toReal) :=
+            mul_le_mul_of_nonneg_left hsI (inv_nonneg.mpr hsμ.le)
           _ = Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) := by
             rw [mul_comm (Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))), inv_mul_cancel_left₀ hsμ.ne']
-      exact mul_le_mul hτ hratio (mul_nonneg (inv_nonneg.mpr hsμ.le) (Real.sqrt_nonneg _)) (pow_nonneg hH _)
-  have hsq : Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) =
-      (Real.sqrt (Real.exp 1) * Real.sqrt d.n) ^ (P.r + 1) := by
-    rw [← Real.sqrt_mul (Real.exp_pos 1).le, ← Real.sqrt_sq (pow_nonneg (Real.sqrt_nonneg (Real.exp 1 * d.n)) (P.r + 1))]
+      exact mul_le_mul hτ hratio (mul_nonneg (inv_nonneg.mpr hsμ.le) (Real.sqrt_nonneg _))
+        (pow_nonneg hH _)
+  have hsq
+      : Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))
+        = (Real.sqrt (Real.exp 1) * Real.sqrt d.n) ^ (P.r + 1) := by
+    rw [← Real.sqrt_mul (Real.exp_pos 1).le,
+      ← Real.sqrt_sq (pow_nonneg (Real.sqrt_nonneg (Real.exp 1 * d.n)) (P.r + 1))]
     congr 1
     rw [← pow_mul, mul_comm (P.r + 1) 2, pow_mul, Real.sq_sqrt (mul_nonneg (Real.exp_pos 1).le hn0)]
   have hn32 : (d.n : ℝ) ^ (3 / 2 : ℝ) = d.n * Real.sqrt d.n := by
@@ -318,32 +387,38 @@ theorem family_expansion_of_parts (p : KB.Pl P Wp Wq) (f : B.Mat P.k P.r → (Wq
       have := Real.exp_one_lt_d9
       norm_num at this ⊢
       linarith
-    calc Real.sqrt (Real.exp 1) ≤ Real.sqrt (2 ^ 2) := Real.sqrt_le_sqrt h4
+    calc
+      Real.sqrt (Real.exp 1)
+        ≤ Real.sqrt (2 ^ 2) := Real.sqrt_le_sqrt h4
       _ = 2 := Real.sqrt_sq (by norm_num)
   have hcard : ((S.card : ℕ) : ℝ) ≤ (d.n : ℝ) ^ (P.r + 1) := by
     rw [hS, Finset.card_powersetCard, Finset.card_univ, Fintype.card_fin]
     exact_mod_cast (Nat.choose_le_descFactorial _ _).trans (Nat.descFactorial_le_pow _ _)
   have hbase : 0 ≤ (d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n) :=
     mul_nonneg (mul_nonneg hn0 hH) (mul_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _))
-  have hb2 : (d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n) ≤ 2 * (d.n * Real.sqrt d.n) * d.H := by
-    have h1 := mul_le_mul_of_nonneg_left hse (mul_nonneg (mul_nonneg hn0 hH) (Real.sqrt_nonneg (d.n : ℝ)))
+  have hb2
+      : (d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n)
+        ≤ 2 * (d.n * Real.sqrt d.n) * d.H := by
+    have h1 :=
+      mul_le_mul_of_nonneg_left hse (mul_nonneg (mul_nonneg hn0 hH) (Real.sqrt_nonneg (d.n : ℝ)))
     nlinarith [h1]
-  calc ∑ I ∈ S, ‖co I‖ ≤ ∑ I ∈ S, d.H ^ (P.r + 1) * Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) :=
-        Finset.sum_le_sum hco
+  calc
+    ∑ I ∈ S, ‖co I‖ ≤ ∑ I ∈ S, d.H ^ (P.r + 1) * Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1)) :=
+      Finset.sum_le_sum hco
     _ = (S.card : ℝ) * (d.H ^ (P.r + 1) * Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))) := by
-        rw [Finset.sum_const, nsmul_eq_mul]
+      rw [Finset.sum_const, nsmul_eq_mul]
     _ ≤ (d.n : ℝ) ^ (P.r + 1) * (d.H ^ (P.r + 1) * Real.sqrt ((Real.exp 1 * d.n) ^ (P.r + 1))) :=
-        mul_le_mul_of_nonneg_right hcard (mul_nonneg (pow_nonneg hH _) (Real.sqrt_nonneg _))
-    _ = ((d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n)) ^ (P.r + 1) := by rw [hsq]; ring
+      mul_le_mul_of_nonneg_right hcard (mul_nonneg (pow_nonneg hH _) (Real.sqrt_nonneg _))
+    _ = ((d.n : ℝ) * d.H * (Real.sqrt (Real.exp 1) * Real.sqrt d.n)) ^ (P.r + 1) := by
+      rw [hsq]; ring
     _ ≤ (2 * (d.n * Real.sqrt d.n) * d.H) ^ (P.r + 1) := by
-        first
-          | exact pow_le_pow_left₀ hbase hb2 _
-          | exact pow_le_pow_left hbase hb2 _
+      first | exact pow_le_pow_left₀ hbase hb2 _ | exact pow_le_pow_left hbase hb2 _
     _ = (2 * (d.n : ℝ) ^ (3 / 2 : ℝ) * d.H) ^ (P.r + 1) := by rw [hn32]
 
-theorem coefficient_growth_le_power (n r : ℕ) (b H CH C₃ : ℝ) (hb : 2 ≤ b) (hn : (n : ℝ) ≤ b) (hH : 0 ≤ H)
-    (hHb : H ≤ b ^ (CH * ((2 * r + 2 : ℕ) : ℝ))) (hC : CH / 2 + 5 / 8 ≤ C₃) :
-    (2 * (n : ℝ) ^ (3 / 2 : ℝ) * H) ^ (r + 1) ≤ b ^ (C₃ * ((2 * r + 2 : ℕ) : ℝ) ^ 2) := by
+theorem coefficient_growth_le_power
+    (n r : ℕ) (b H CH C₃ : ℝ) (hb : 2 ≤ b) (hn : (n : ℝ) ≤ b) (hH : 0 ≤ H)
+    (hHb : H ≤ b ^ (CH * ((2 * r + 2 : ℕ) : ℝ))) (hC : CH / 2 + 5 / 8 ≤ C₃)
+    : (2 * (n : ℝ) ^ (3 / 2 : ℝ) * H) ^ (r + 1) ≤ b ^ (C₃ * ((2 * r + 2 : ℕ) : ℝ) ^ 2) := by
   have hb1 : (1 : ℝ) ≤ b := by linarith
   have hb0 : (0 : ℝ) < b := by linarith
   have hm : ((2 * r + 2 : ℕ) : ℝ) = 2 * (r : ℝ) + 2 := by push_cast; ring
@@ -354,15 +429,18 @@ theorem coefficient_growth_le_power (n r : ℕ) (b H CH C₃ : ℝ) (hb : 2 ≤ 
   have hn32 : (0 : ℝ) ≤ (n : ℝ) ^ (3 / 2 : ℝ) := Real.rpow_nonneg hn0 _
   have hX0 : 0 ≤ 2 * (n : ℝ) ^ (3 / 2 : ℝ) * H := mul_nonneg (by positivity) hH
   have hX : 2 * (n : ℝ) ^ (3 / 2 : ℝ) * H ≤ b ^ ((5 / 2 : ℝ) + CH * (2 * (r : ℝ) + 2)) := by
-    have e : b ^ ((5 / 2 : ℝ) + CH * (2 * (r : ℝ) + 2)) = b * b ^ (3 / 2 : ℝ) * b ^ (CH * (2 * (r : ℝ) + 2)) := by
-      rw [Real.rpow_add hb0, show (5 / 2 : ℝ) = 1 + 3 / 2 by norm_num, Real.rpow_add hb0, Real.rpow_one]
+    have e
+        : b ^ ((5 / 2 : ℝ) + CH * (2 * (r : ℝ) + 2))
+          = b * b ^ (3 / 2 : ℝ) * b ^ (CH * (2 * (r : ℝ) + 2)) := by
+      rw [Real.rpow_add hb0, show (5 / 2 : ℝ) = 1 + 3 / 2 by norm_num, Real.rpow_add hb0,
+        Real.rpow_one]
     rw [e]
     have h1 : 2 * (n : ℝ) ^ (3 / 2 : ℝ) ≤ b * b ^ (3 / 2 : ℝ) := mul_le_mul hb h32 hn32 hb0.le
     exact mul_le_mul h1 hHb hH (mul_pos hb0 (Real.rpow_pos_of_pos hb0 _)).le
-  have hpow : (2 * (n : ℝ) ^ (3 / 2 : ℝ) * H) ^ (r + 1) ≤ (b ^ ((5 / 2 : ℝ) + CH * (2 * (r : ℝ) + 2))) ^ (r + 1) := by
-    first
-      | exact pow_le_pow_left₀ hX0 hX (r + 1)
-      | exact pow_le_pow_left hX0 hX (r + 1)
+  have hpow
+      : (2 * (n : ℝ) ^ (3 / 2 : ℝ) * H) ^ (r + 1)
+        ≤ (b ^ ((5 / 2 : ℝ) + CH * (2 * (r : ℝ) + 2))) ^ (r + 1) := by
+    first | exact pow_le_pow_left₀ hX0 hX (r + 1) | exact pow_le_pow_left hX0 hX (r + 1)
   refine hpow.trans ?_
   rw [← Real.rpow_natCast, ← Real.rpow_mul hb0.le]
   apply Real.rpow_le_rpow_of_exponent_le hb1

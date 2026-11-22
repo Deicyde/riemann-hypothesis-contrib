@@ -11,26 +11,23 @@ namespace GlobalTheory.LeftRightDerivations
 variable {k : Type*} {H : Type*} [CommSemiring k] [CommSemiring H] [Bialgebra k H]
 
 def IsCounitDerivation (φ : H →ₗ[k] k) : Prop :=
-  ∀ a b : H, φ (a * b) =
-    Coalgebra.counit (R := k) a * φ b + Coalgebra.counit (R := k) b * φ a
+  ∀ a b : H, φ (a * b) = Coalgebra.counit (R := k) a * φ b + Coalgebra.counit (R := k) b * φ a
 
 noncomputable def contrRight (φ : H →ₗ[k] k) : H ⊗[k] H →ₗ[k] H :=
   (TensorProduct.rid k H).toLinearMap ∘ₗ LinearMap.lTensor H φ
 
-@[simp] theorem contrRight_tmul (φ : H →ₗ[k] k) (a b : H) :
-    contrRight φ (a ⊗ₜ[k] b) = φ b • a := by
+@[simp]
+theorem contrRight_tmul (φ : H →ₗ[k] k) (a b : H) : contrRight φ (a ⊗ₜ[k] b) = φ b • a := by
   simp [contrRight]
 
-theorem contrRight_counit_comul (a : H) :
-    contrRight (Coalgebra.counit (R := k)) (Coalgebra.comul (R := k) a) = a := by
-
+theorem contrRight_counit_comul (a : H)
+    : contrRight (Coalgebra.counit (R := k)) (Coalgebra.comul (R := k) a) = a := by
   simp [contrRight, Coalgebra.lTensor_counit_comul]
 
-theorem contrRight_mul {φ : H →ₗ[k] k} (hφ : IsCounitDerivation φ) (s t : H ⊗[k] H) :
-    contrRight φ (s * t) =
-      contrRight (Coalgebra.counit (R := k)) s * contrRight φ t +
-        contrRight (Coalgebra.counit (R := k)) t * contrRight φ s := by
-
+theorem contrRight_mul {φ : H →ₗ[k] k} (hφ : IsCounitDerivation φ) (s t : H ⊗[k] H)
+    : contrRight φ (s * t)
+      = contrRight (Coalgebra.counit (R := k)) s * contrRight φ t
+        + contrRight (Coalgebra.counit (R := k)) t * contrRight φ s := by
   induction s using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [add_mul, map_add (f := _), hx, hy]; ring
@@ -51,7 +48,6 @@ section Ring
 variable {k : Type*} {H : Type*} [CommRing k] [CommRing H] [Bialgebra k H]
 
 theorem IsCounitDerivation.map_one {φ : H →ₗ[k] k} (hφ : IsCounitDerivation φ) : φ 1 = 0 := by
-
   have h := hφ 1 1
   rw [mul_one, Bialgebra.counit_one, one_mul] at h
   simpa using h

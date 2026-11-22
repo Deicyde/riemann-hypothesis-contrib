@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
 open GlobalTheory.FinZeta (Gv embV Kv VacFin IsLocKer KerU)
@@ -23,15 +26,18 @@ noncomputable section
 
 namespace GlobalTheory.ChainOnto.InertValue
 
-theorem npow_eq_zpow {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) (N : ℕ)
-    (hN : Ideal.absNorm w.asIdeal = N ^ 2) (k : ℤ) (z : ℂ) (hz : 2 * z = k) :
-    GlobalTheory.LFun.npow w z = (N : ℂ) ^ k := by
+theorem npow_eq_zpow
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (𝓞 K)) (N : ℕ) (hN : Ideal.absNorm w.asIdeal = N ^ 2)
+    (k : ℤ) (z : ℂ) (hz : 2 * z = k)
+    : GlobalTheory.LFun.npow w z = (N : ℂ) ^ k := by
   have hlog : (Complex.log (N : ℂ) * ((2 : ℕ) : ℂ)).im = 0 := by
     rw [Complex.mul_im, Complex.log_im, Complex.log_re, ← Complex.ofReal_natCast N,
       Complex.arg_ofReal_of_nonneg (Nat.cast_nonneg _)]
     simp
   rw [GlobalTheory.LFun.npow, hN, Nat.cast_pow, ← Complex.cpow_natCast (N : ℂ) 2,
-    ← Complex.cpow_mul (x := (N : ℂ)) (y := ((2 : ℕ) : ℂ)) (z := z) (by rw [hlog]; linarith [Real.pi_pos]) (by rw [hlog]; linarith [Real.pi_pos])]
+    ← Complex.cpow_mul (x := (N : ℂ)) (y := ((2 : ℕ) : ℂ)) (z := z)
+      (by rw [hlog]; linarith [Real.pi_pos]) (by rw [hlog]; linarith [Real.pi_pos])]
   rw [show ((2 : ℕ) : ℂ) * z = (k : ℂ) by rw [← hz]; norm_num, Complex.cpow_intCast]
 
 theorem range_reflect (t : ℕ) : (Multiset.range t).map (fun i => t - 1 - i) = Multiset.range t := by
@@ -46,14 +52,25 @@ theorem range_reflect (t : ℕ) : (Multiset.range t).map (fun i => t - 1 - i) = 
 
 end GlobalTheory.ChainOnto.InertValue
 
-
 open GlobalTheory.ChainOnto.InertValue in
-theorem GlobalTheory.ChainOnto.val_seg_of_isInertAt : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ), IsHeckeChar D χ → Formalism.L2.Theta.ResEta D χ n → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E)), w.under (𝓞 D.host.F) = v → IsInertAt D.host.F D.host.E v w → UnrAt χ w → val (F := D.host.F) χ w = (-1) ^ n ∧ ∀ (qu z : ℂˣ) (t : ℕ), (qu : ℂ) = qV D.host.F v → seg w z t = (GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace.str qu t).map (z * ·) := by
+theorem GlobalTheory.ChainOnto.val_seg_of_isInertAt
+    : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ),
+      IsHeckeChar D χ → Formalism.L2.Theta.ResEta D χ n
+        → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E)),
+          w.under (𝓞 D.host.F) = v → IsInertAt D.host.F D.host.E v w → UnrAt χ w
+            → val (F := D.host.F) χ w = (-1) ^ n
+              ∧ ∀ (qu z : ℂˣ) (t : ℕ),
+                (qu : ℂ) = qV D.host.F v
+                  → seg w z t
+                    = (GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace.str qu
+                      t).map (z * ·) := by
   intro D χ n _ hres v w hwv hw hu
   refine ⟨GlobalTheory.LFun.ResEta.val_of_isInertAt D.sp.cm.deg2 hres hw hu, ?_⟩
   intro qu z t hqu
-  have hN : Ideal.absNorm w.asIdeal = qV D.host.F v ^ 2 := GlobalTheory.LFun.InertChart.absNorm_eq D.sp.cm.deg2 hw
-  rw [GlobalTheory.LFun.seg, GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace.str, Int.toNat_natCast, Multiset.map_map, Finset.range_val]
+  have hN : Ideal.absNorm w.asIdeal = qV D.host.F v ^ 2 :=
+    GlobalTheory.LFun.InertChart.absNorm_eq D.sp.cm.deg2 hw
+  rw [GlobalTheory.LFun.seg, GlobalTheory.IndefiniteRowSideFullHecke.SphericalThetaInertPlace.str,
+    Int.toNat_natCast, Multiset.map_map, Finset.range_val]
   conv_lhs => rw [← range_reflect t, Multiset.map_map]
   refine Multiset.map_congr rfl fun i hi => ?_
   rw [Multiset.mem_range] at hi

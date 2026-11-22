@@ -36,8 +36,7 @@ theorem v_map : veluV (W.map f) (f a) (f b) = f (veluV W a b) := by
   · rw [if_neg (by rwa [map_eq_zero_iff f f.injective]), if_neg h]
     simp [map_sub, map_mul, map_ofNat]
 
-theorem u_map : veluU (W.map f) (f a) (f b) = f (veluU W a b) := by
-  simp [veluU, gy_map]
+theorem u_map : veluU (W.map f) (f a) (f b) = f (veluU W a b) := by simp [veluU, gy_map]
 
 end Map
 
@@ -56,13 +55,17 @@ include hW ha hb
 
 theorem gx_mem : veluGx W a b ∈ unitBall K := by
   unfold veluGx
-  exact sub_mem (add_mem (add_mem (mul_mem three_mem (pow_mem (mem.mpr ha) 2))
-    (mul_mem (mul_mem two_mem (mem.mpr hW.2.1)) (mem.mpr ha))) (mem.mpr hW.2.2.2.1))
+  exact sub_mem
+    (add_mem
+      (add_mem (mul_mem three_mem (pow_mem (mem.mpr ha) 2))
+        (mul_mem (mul_mem two_mem (mem.mpr hW.2.1)) (mem.mpr ha)))
+      (mem.mpr hW.2.2.2.1))
     (mul_mem (mem.mpr hW.1) (mem.mpr hb))
 
 theorem gy_mem : veluGy W a b ∈ unitBall K := by
   unfold veluGy
-  exact sub_mem (sub_mem (mul_mem (neg_mem two_mem) (mem.mpr hb)) (mul_mem (mem.mpr hW.1) (mem.mpr ha)))
+  exact sub_mem
+    (sub_mem (mul_mem (neg_mem two_mem) (mem.mpr hb)) (mul_mem (mem.mpr hW.1) (mem.mpr ha)))
     (mem.mpr hW.2.2.1)
 
 theorem v_mem : veluV W a b ∈ unitBall K := by
@@ -82,17 +85,20 @@ section Terms
 
 variable {F : Type*} [Field F]
 
-theorem termX (x xQ u Di v uQ : F) (h : (x - xQ)⁻¹ = u ^ 2 * Di) :
-    (v / (x - xQ) + uQ / (x - xQ) ^ 2) * u ^ 2 = u ^ 4 * (v * Di + uQ * u ^ 2 * Di ^ 2) := by
+theorem termX (x xQ u Di v uQ : F) (h : (x - xQ)⁻¹ = u ^ 2 * Di)
+    : (v / (x - xQ) + uQ / (x - xQ) ^ 2) * u ^ 2 = u ^ 4 * (v * Di + uQ * u ^ 2 * Di ^ 2) := by
   simp only [div_eq_mul_inv, ← inv_pow, h]
   ring
 
-theorem termY (x y xQ yQ u Di Ui v uQ c a1 a3 : F) (h : (x - xQ)⁻¹ = u ^ 2 * Di)
-    (hx : x * u ^ 2 = Ui) (hy : y * u ^ 3 = -Ui) :
-    (uQ * (2 * y + a1 * x + a3) / (x - xQ) ^ 3 + v * (a1 * (x - xQ) + y - yQ) / (x - xQ) ^ 2
-        + c / (x - xQ) ^ 2) * u ^ 3 =
-      u ^ 4 * (uQ * (-2 * Ui * u ^ 2 + a1 * Ui * u ^ 3 + a3 * u ^ 5) * Di ^ 3
-        + v * (a1 * (Ui - xQ * u ^ 2) * u - Ui - yQ * u ^ 3) * Di ^ 2 + c * u ^ 3 * Di ^ 2) := by
+theorem termY
+    (x y xQ yQ u Di Ui v uQ c a1 a3 : F)
+    (h : (x - xQ)⁻¹ = u ^ 2 * Di) (hx : x * u ^ 2 = Ui) (hy : y * u ^ 3 = -Ui)
+    : (uQ * (2 * y + a1 * x + a3) / (x - xQ) ^ 3 + v * (a1 * (x - xQ) + y - yQ) / (x - xQ) ^ 2
+          + c / (x - xQ) ^ 2)
+        * u ^ 3
+      = u ^ 4
+        * (uQ * (-2 * Ui * u ^ 2 + a1 * Ui * u ^ 3 + a3 * u ^ 5) * Di ^ 3
+          + v * (a1 * (Ui - xQ * u ^ 2) * u - Ui - yQ * u ^ 3) * Di ^ 2 + c * u ^ 3 * Di ^ 2) := by
   simp only [div_eq_mul_inv, ← inv_pow, h]
   linear_combination (uQ * Di ^ 3 * a1 * u ^ 7 + v * Di ^ 2 * a1 * u ^ 5) * hx
     + (2 * uQ * Di ^ 3 * u ^ 6 + v * Di ^ 2 * u ^ 4) * hy
@@ -108,7 +114,8 @@ theorem velu_u_series : VeluUSeries.{u} := by
   let φ : PowerSeries (unitBall K) →+* PowerSeries K := PowerSeries.map (unitBall K).subtype
   let ι : MvPowerSeries Unit K →+* L := algebraMap (MvPowerSeries Unit K) L
   let ψ : PowerSeries (unitBall K) →+* L := ι.comp φ
-  have hφcoeff : ∀ (g : PowerSeries (unitBall K)) (n : ℕ), coeff n (φ g) = ((coeff n g : unitBall K) : K) :=
+  have hφcoeff
+      : ∀ (g : PowerSeries (unitBall K)) (n : ℕ), coeff n (φ g) = ((coeff n g : unitBall K) : K) :=
     fun g n => coeff_map _ n g
   have hψC : ∀ (a : K) (h : a ∈ unitBall K), ψ (C ⟨a, h⟩) = algebraMap K L a := by
     intro a h
@@ -122,7 +129,8 @@ theorem velu_u_series : VeluUSeries.{u} := by
     rw [map_X, hu]
   have hinj : Function.Injective ι := IsFractionRing.injective _ _
   have hu0 : u ≠ 0 := by
-    rw [← hu]; intro h
+    rw [← hu]
+    intro h
     exact PowerSeries.X_ne_zero (hinj (by rw [h, map_zero]))
 
   obtain ⟨e, he⟩ := WeierstrassPointSeriesTail.factor W w hw
@@ -131,10 +139,12 @@ theorem velu_u_series : VeluUSeries.{u} := by
     intro n
     have h := coeff_X_pow_mul (1 + X * e) 3 n
     rw [← he] at h
-    rw [← h]; exact hwI _
-  obtain ⟨U', hU'⟩ : ∃ U' : PowerSeries (unitBall K), φ U' = 1 + X * e :=
-    ⟨PowerSeries.mk fun n => ⟨coeff n (1 + X * e), mem.mpr (hUI n)⟩, by
-      ext n; rw [hφcoeff, coeff_mk]⟩
+    rw [← h]
+    exact hwI _
+  obtain ⟨U', hU'⟩ : ∃ U' : PowerSeries (unitBall K), φ U' = 1 + X * e := ⟨
+    PowerSeries.mk fun n => ⟨coeff n (1 + X * e), mem.mpr (hUI n)⟩,
+    by ext n; rw [hφcoeff, coeff_mk]
+  ⟩
   have hcU : constantCoeff U' = 1 := by
     apply Subtype.ext
     have h := hφcoeff U' 0
@@ -153,22 +163,30 @@ theorem velu_u_series : VeluUSeries.{u} := by
     intro i
     rw [map_sub, map_mul, map_pow, constantCoeff_X, hcUi]
     simp
-  have hDex : ∀ i, ∃ D : PowerSeries (unitBall K), (Ui' - C (xq i) * X ^ 2) * D = 1 :=
-    fun i => ⟨_, mul_invOfUnit (Ui' - C (xq i) * X ^ 2) 1 (by rw [hcD i]; rfl)⟩
+  have hDex : ∀ i, ∃ D : PowerSeries (unitBall K), (Ui' - C (xq i) * X ^ 2) * D = 1 := fun i =>
+    ⟨_, mul_invOfUnit (Ui' - C (xq i) * X ^ 2) 1 (by rw [hcD i]; rfl)⟩
   choose Di hDD using hDex
   let a1' : unitBall K := ⟨W.a₁, mem.mpr hW.1⟩
   let a3' : unitBall K := ⟨W.a₃, mem.mpr hW.2.2.1⟩
   let vq : Fin k → unitBall K := fun i => ⟨veluV W (S i).1 (S i).2, v_mem hW (hS i).1 (hS i).2⟩
   let uq : Fin k → unitBall K := fun i => ⟨veluU W (S i).1 (S i).2, u_mem hW (hS i).1 (hS i).2⟩
-  let cq : Fin k → unitBall K := fun i =>
-    ⟨W.a₁ * veluU W (S i).1 (S i).2 - veluGx W (S i).1 (S i).2 * veluGy W (S i).1 (S i).2,
-      c_mem hW (hS i).1 (hS i).2⟩
-  obtain ⟨EX, hEX⟩ : ∃ EX : PowerSeries (unitBall K), EX = Ui' + X ^ 4 *
-      ∑ i, (C (vq i) * Di i + C (uq i) * X ^ 2 * Di i ^ 2) := ⟨_, rfl⟩
-  obtain ⟨EY, hEY⟩ : ∃ EY : PowerSeries (unitBall K), EY = Ui' + X ^ 4 *
-      ∑ i, (C (uq i) * (-2 * Ui' * X ^ 2 + C a1' * Ui' * X ^ 3 + C a3' * X ^ 5) * Di i ^ 3
-        + C (vq i) * (C a1' * (Ui' - C (xq i) * X ^ 2) * X - Ui' - C (yq i) * X ^ 3) * Di i ^ 2
-        + C (cq i) * X ^ 3 * Di i ^ 2) := ⟨_, rfl⟩
+  let cq : Fin k → unitBall K := fun i => ⟨
+    W.a₁ * veluU W (S i).1 (S i).2 - veluGx W (S i).1 (S i).2 * veluGy W (S i).1 (S i).2,
+    c_mem hW (hS i).1 (hS i).2
+  ⟩
+  obtain ⟨EX, hEX⟩
+      : ∃ EX : PowerSeries (unitBall K),
+        EX = Ui' + X ^ 4 * ∑ i, (C (vq i) * Di i + C (uq i) * X ^ 2 * Di i ^ 2) :=
+    ⟨_, rfl⟩
+  obtain ⟨EY, hEY⟩
+      : ∃ EY : PowerSeries (unitBall K),
+        EY
+          = Ui'
+            + X ^ 4
+              * ∑ i, (C (uq i) * (-2 * Ui' * X ^ 2 + C a1' * Ui' * X ^ 3 + C a3' * X ^ 5) * Di i ^ 3
+                  + C (vq i) * (C a1' * (Ui' - C (xq i) * X ^ 2) * X - Ui' - C (yq i) * X ^ 3) * Di i ^ 2
+                  + C (cq i) * X ^ 3 * Di i ^ 2) :=
+    ⟨_, rfl⟩
   have hcEX : constantCoeff EX = 1 := by simp [hEX, hcUi]
   have hcEY : constantCoeff EY = 1 := by simp [hEY, hcUi]
   obtain ⟨EYi, hEE⟩ : ∃ EYi : PowerSeries (unitBall K), EY * EYi = 1 :=
@@ -193,7 +211,7 @@ theorem velu_u_series : VeluUSeries.{u} := by
     show ι (X : PowerSeries K) / ι (w.subst (X : PowerSeries K)) * u ^ 2 = ψ Ui'
     rw [hsub, hιw, hu, div_mul_eq_mul_div, div_eq_iff hu30]
     linear_combination (-u ^ 3) * hUUl
-  have hy : y * u ^ 3 = -ψ Ui' := by
+  have hy : y * u ^ 3 = - ψ Ui' := by
     show -1 / ι (w.subst (X : PowerSeries K)) * u ^ 3 = -ψ Ui'
     rw [hsub, hιw, div_mul_eq_mul_div, div_eq_iff hu30]
     linear_combination u ^ 3 * hUUl
@@ -209,43 +227,60 @@ theorem velu_u_series : VeluUSeries.{u} := by
     (v_map (algebraMap K L) W _ _).trans (hψC _ _).symm
   have hU : ∀ i, veluU WL (SL i).1 (SL i).2 = ψ (C (uq i)) := fun i =>
     (u_map (algebraMap K L) W _ _).trans (hψC _ _).symm
-  have hc : ∀ i, WL.a₁ * veluU WL (SL i).1 (SL i).2
-      - veluGx WL (SL i).1 (SL i).2 * veluGy WL (SL i).1 (SL i).2 = ψ (C (cq i)) := by
+  have hc
+      : ∀ i,
+        WL.a₁ * veluU WL (SL i).1 (SL i).2
+            - veluGx WL (SL i).1 (SL i).2 * veluGy WL (SL i).1 (SL i).2
+          = ψ (C (cq i)) := by
     intro i
     rw [hψC, map_sub, map_mul, map_mul, ← u_map, ← gx_map, ← gy_map]
     rfl
   have ha1 : WL.a₁ = ψ (C a1') := (hψC _ _).symm
   have ha3 : WL.a₃ = ψ (C a3') := (hψC _ _).symm
   have hXe : veluX WL SL x * u ^ 2 = ψ EX := by
-    have e1 : ψ EX = ψ Ui' + u ^ 4 * ∑ i, (ψ (C (vq i)) * ψ (Di i)
-        + ψ (C (uq i)) * u ^ 2 * ψ (Di i) ^ 2) := by
+    have e1
+        : ψ EX
+          = ψ Ui'
+            + u ^ 4
+              * ∑ i, (ψ (C (vq i)) * ψ (Di i)
+                + ψ (C (uq i)) * u ^ 2 * ψ (Di i) ^ 2) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [hEX]; simp only [map_add (f := _), map_mul, map_pow, map_sum, hψX]
+      rw [hEX]; simp only [map_add (f := _), map_mul, map_pow, map_sum, hψX]
     rw [e1]
     simp only [veluX]
     rw [add_mul, Finset.sum_mul, hx, Finset.mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [termX _ _ _ _ _ _ (hinv i), hv i, hU i]
-  have hYe : veluY WL SL x y * u ^ 3 = -ψ EY := by
-    have e2 : ψ EY = ψ Ui' + u ^ 4 * ∑ i, (ψ (C (uq i)) * (-2 * ψ Ui' * u ^ 2
-        + ψ (C a1') * ψ Ui' * u ^ 3 + ψ (C a3') * u ^ 5) * ψ (Di i) ^ 3
-        + ψ (C (vq i)) * (ψ (C a1') * (ψ Ui' - ψ (C (xq i)) * u ^ 2) * u - ψ Ui'
-          - ψ (C (yq i)) * u ^ 3) * ψ (Di i) ^ 2
-        + ψ (C (cq i)) * u ^ 3 * ψ (Di i) ^ 2) := by
+  have hYe : veluY WL SL x y * u ^ 3 = - ψ EY := by
+    have e2
+        : ψ EY
+          = ψ Ui'
+            + u ^ 4
+              * ∑ i, (ψ (C (uq i)) * (-2 * ψ Ui' * u ^ 2
+                + ψ (C a1') * ψ Ui' * u ^ 3 + ψ (C a3') * u ^ 5) * ψ (Di i) ^ 3
+                + ψ (C (vq i)) * (ψ (C a1') * (ψ Ui' - ψ (C (xq i)) * u ^ 2) * u - ψ Ui'
+                  - ψ (C (yq i)) * u ^ 3) * ψ (Di i) ^ 2
+                + ψ (C (cq i)) * u ^ 3 * ψ (Di i) ^ 2) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [hEY]; simp only [map_add (f := _), map_mul, map_pow, map_sum, map_sub, map_neg, map_ofNat, hψX]
-    have hs : ∀ i ∈ Finset.univ, (veluU WL (SL i).1 (SL i).2 * (2 * y + WL.a₁ * x + WL.a₃)
-          / (x - (SL i).1) ^ 3
-        + veluV WL (SL i).1 (SL i).2 * (WL.a₁ * (x - (SL i).1) + y - (SL i).2) / (x - (SL i).1) ^ 2
-        + (WL.a₁ * veluU WL (SL i).1 (SL i).2
-            - veluGx WL (SL i).1 (SL i).2 * veluGy WL (SL i).1 (SL i).2) / (x - (SL i).1) ^ 2)
-          * u ^ 3 =
-        u ^ 4 * (ψ (C (uq i)) * (-2 * ψ Ui' * u ^ 2
-        + ψ (C a1') * ψ Ui' * u ^ 3 + ψ (C a3') * u ^ 5) * ψ (Di i) ^ 3
-        + ψ (C (vq i)) * (ψ (C a1') * (ψ Ui' - ψ (C (xq i)) * u ^ 2) * u - ψ Ui'
-          - ψ (C (yq i)) * u ^ 3) * ψ (Di i) ^ 2
-        + ψ (C (cq i)) * u ^ 3 * ψ (Di i) ^ 2) := by
+      rw [hEY]
+      simp only [map_add (f := _), map_mul, map_pow, map_sum, map_sub, map_neg, map_ofNat, hψX]
+    have hs
+        : ∀ i ∈ Finset.univ,
+          (veluU WL (SL i).1 (SL i).2 * (2 * y + WL.a₁ * x + WL.a₃) / (x - (SL i).1) ^ 3
+                + veluV WL (SL i).1 (SL i).2 * (WL.a₁ * (x - (SL i).1) + y - (SL i).2)
+                  / (x - (SL i).1) ^ 2
+                + (WL.a₁ * veluU WL (SL i).1 (SL i).2
+                    - veluGx WL (SL i).1 (SL i).2 * veluGy WL (SL i).1 (SL i).2)
+                  / (x - (SL i).1) ^ 2)
+              * u ^ 3
+            = u ^ 4
+              * (ψ (C (uq i)) * (-2 * ψ Ui' * u ^ 2 + ψ (C a1') * ψ Ui' * u ^ 3 + ψ (C a3') * u ^ 5)
+                  * ψ (Di i) ^ 3
+                + ψ (C (vq i))
+                  * (ψ (C a1') * (ψ Ui' - ψ (C (xq i)) * u ^ 2) * u - ψ Ui' - ψ (C (yq i)) * u ^ 3)
+                  * ψ (Di i) ^ 2
+                + ψ (C (cq i)) * u ^ 3 * ψ (Di i) ^ 2) := by
       intro i _
       rw [termY _ _ _ _ _ _ _ _ _ _ _ _ (hinv i) hx hy, hc i, hv i, hU i, ha1, ha3, hxq i, hyq i]
     rw [e2]

@@ -7,13 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsC
 
 namespace GlobalTheory
 
-theorem exists_valuedField_centred_subalgebra (R K : Type) [CommRing R] [IsDomain R]
-    [IsNoetherianRing R] [Field K] [Algebra R K] [FaithfulSMul R K] [Algebra.IsAlgebraic R K]
-    (u : R) (hu : u ≠ 0) (A : Subalgebra R K) (hA : A.FG) (P : Ideal A) (hP : P.IsPrime)
-    (huP : algebraMap R A u ∈ P) :
-    ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
-      (_ : IsAlgClosed C) (gam : K →+* C), (∀ x ∈ A, ‖gam x‖ ≤ 1) ∧
-        ∀ x : A, x ∈ P → ‖gam (x : K)‖ < 1 := by
+theorem exists_valuedField_centred_subalgebra
+    (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [Field K] [Algebra R K]
+    [FaithfulSMul R K] [Algebra.IsAlgebraic R K]
+    (u : R) (hu : u ≠ 0)
+    (A : Subalgebra R K) (hA : A.FG) (P : Ideal A) (hP : P.IsPrime) (huP : algebraMap R A u ∈ P)
+    : ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C)
+        (_ : IsAlgClosed C) (gam : K →+* C),
+      (∀ x ∈ A, ‖gam x‖ ≤ 1) ∧ ∀ x : A, x ∈ P → ‖gam (x : K)‖ < 1 := by
   have hinjK : Function.Injective (algebraMap R K) := FaithfulSMul.algebraMap_injective R K
   have hinj : Function.Injective (algebraMap R A) := by
     intro a b hab
@@ -28,14 +29,30 @@ theorem exists_valuedField_centred_subalgebra (R K : Type) [CommRing R] [IsDomai
     intro h
     rw [h, Ideal.mem_bot] at huP
     exact hu (hinj (by rw [huP, map_zero]))
-  obtain ⟨C, i1, i2, i3, i4, gam, h1, h2⟩ := GlobalTheory.T.exists_complete_algClosed_field_centred_at_prime A K P hP hne
+  obtain ⟨C, i1, i2, i3, i4, gam, h1, h2⟩ :=
+    GlobalTheory.T.exists_complete_algClosed_field_centred_at_prime A K P hP hne
   exact ⟨C, i1, i2, i3, i4, gam, fun x hx => h1 ⟨x, hx⟩, fun x hx => h2 x hx⟩
 
-theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R] [Field K] [Algebra R K] [FaithfulSMul R K] [Algebra.IsAlgebraic R K] (u : R), u ∈ IsLocalRing.maximalIdeal R → u ≠ 0 → ∀ R₁ : Subalgebra R K, Module.Finite R R₁ → ∀ S : ValuationSubring K, (∀ r, algebraMap R K r ∈ S) → ∀ e : ℕ, ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C) (_ : IsAlgClosed C) (gam : K →+* C), (∀ r, ‖gam (algebraMap R K r)‖ ≤ 1) ∧ ‖gam (algebraMap R K u)‖ < 1 ∧ ∀ f ∈ R₁, S.valuation f < 1 → ‖gam f‖ < 1 ∧ (S.valuation (algebraMap R K u) = 1 → ‖gam f‖ ≤ ‖gam (algebraMap R K u)‖ ^ e) := by
+theorem exists_valuedField_centre_le_pow
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R] [Field K]
+        [Algebra R K] [FaithfulSMul R K] [Algebra.IsAlgebraic R K] (u : R),
+      u ∈ IsLocalRing.maximalIdeal R → u ≠ 0
+        → ∀ R₁ : Subalgebra R K,
+          Module.Finite R R₁
+            → ∀ S : ValuationSubring K,
+              (∀ r, algebraMap R K r ∈ S)
+                → ∀ e : ℕ,
+                  ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C)
+                      (_ : CompleteSpace C) (_ : IsAlgClosed C) (gam : K →+* C),
+                    (∀ r, ‖gam (algebraMap R K r)‖ ≤ 1) ∧ ‖gam (algebraMap R K u)‖ < 1
+                      ∧ ∀ f ∈ R₁,
+                        S.valuation f < 1
+                          → ‖gam f‖ < 1
+                            ∧ (S.valuation (algebraMap R K u) = 1
+                              → ‖gam f‖ ≤ ‖gam (algebraMap R K u)‖ ^ e) := by
   intro R K _ _ _ _ _ _ _ _ u hum hu R₁ hfin S hS e
   have hinjK : Function.Injective (algebraMap R K) := FaithfulSMul.algebraMap_injective R K
-  have hR : ∀ r, S.valuation (algebraMap R K r) ≤ 1 := fun r =>
-    (S.valuation_le_one_iff _).2 (hS r)
+  have hR : ∀ r, S.valuation (algebraMap R K r) ≤ 1 := fun r => (S.valuation_le_one_iff _).2 (hS r)
   have hR₁ : ∀ x ∈ R₁, S.valuation x ≤ 1 := by
     intro x hx
     have hint : IsIntegral R x := by
@@ -48,16 +65,16 @@ theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDoma
     rw [← hy]
     exact (S.valuation_le_one_iff _).2 y.2
   have hfg : (Subalgebra.toSubmodule R₁).FG := Module.Finite.iff_fg.1 hfin
-  let q : Ideal R₁ :=
-    { carrier := {x | S.valuation (x : K) < 1}
-      add_mem' := fun {a b} ha hb => by
-        simpa using S.valuation.map_add_lt ha hb
-      zero_mem' := by simp
-      smul_mem' := fun c x hx => by
-        have hx' : S.valuation (x : K) < 1 := hx
-        show S.valuation ((c : K) * (x : K)) < 1
-        rw [map_mul]
-        exact lt_of_le_of_lt (mul_le_of_le_one_left' (hR₁ _ c.2)) hx' }
+  let q : Ideal R₁ := {
+    carrier := {x | S.valuation (x : K) < 1}
+    add_mem' := fun {a b} ha hb => by simpa using S.valuation.map_add_lt ha hb
+    zero_mem' := by simp
+    smul_mem' := fun c x hx => by
+      have hx' : S.valuation (x : K) < 1 := hx
+      show S.valuation ((c : K) * (x : K)) < 1
+      rw [map_mul]
+      exact lt_of_le_of_lt (mul_le_of_le_one_left' (hR₁ _ c.2)) hx'
+  }
   have hq : ∀ x : R₁, x ∈ q ↔ S.valuation (x : K) < 1 := fun _ => Iff.rfl
   have hqp : q.IsPrime := by
     refine ⟨?_, ?_⟩
@@ -66,18 +83,18 @@ theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDoma
       by_contra hcon
       rw [not_or, hq, hq, not_lt, not_lt] at hcon
       rw [hq, Subalgebra.coe_mul, map_mul, le_antisymm (hR₁ _ a.2) hcon.1,
-        le_antisymm (hR₁ _ b.2) hcon.2] at hab
+          le_antisymm (hR₁ _ b.2) hcon.2]
+        at hab
       simp at hab
   by_cases hv : S.valuation (algebraMap R K u) = 1
-  ·
-    set U : K := algebraMap R K u with hU
+  · set U : K := algebraMap R K u with hU
     have hU0 : U ≠ 0 := fun h => hu (hinjK (by rw [← hU, h, map_zero]))
     let Q : Submodule R K := (q.restrictScalars R).map R₁.val.toLinearMap
     have hQ : Q.FG := by
       haveI : IsNoetherian R R₁ := isNoetherian_of_isNoetherianRing_of_finite R R₁
       exact Submodule.FG.map _ (IsNoetherian.noetherian _)
-    let N : Submodule R K := Subalgebra.toSubmodule R₁ ⊔
-      Q.map (LinearMap.mulRight R (U ^ (e + 1))⁻¹)
+    let N : Submodule R K :=
+      Subalgebra.toSubmodule R₁ ⊔ Q.map (LinearMap.mulRight R (U ^ (e + 1))⁻¹)
     have hN : N.FG := Submodule.FG.sup hfg (hQ.map _)
     let A : Subalgebra R K := Algebra.adjoin R (N : Set K)
     have hA : A.FG := by
@@ -93,7 +110,8 @@ theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDoma
         refine ⟨a, ha, ?_⟩
         have hg' : S.valuation (g : K) < 1 := hg
         simpa [hv] using hg'
-      | algebraMap r => exact ⟨_, R₁.algebraMap_mem r, by simp⟩
+      | algebraMap r =>
+        exact ⟨_, R₁.algebraMap_mem r, by simp⟩
       | add x y _ _ hx hy =>
         obtain ⟨a, ha, hx⟩ := hx
         obtain ⟨b, hb, hy⟩ := hy
@@ -138,8 +156,8 @@ theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDoma
     refine ⟨C, i1, i2, i3, i4, gam, fun r => h1 _ (A.algebraMap_mem r), hgu, ?_⟩
     intro f hf hvf
     have hmem : f * (U ^ (e + 1))⁻¹ ∈ A :=
-      Algebra.subset_adjoin (Submodule.mem_sup_right
-        (Submodule.mem_map.2 ⟨f, Submodule.mem_map.2 ⟨⟨f, hf⟩, hvf, rfl⟩, rfl⟩))
+      Algebra.subset_adjoin (Submodule.mem_sup_right (Submodule.mem_map.2
+        ⟨f, Submodule.mem_map.2 ⟨⟨f, hf⟩, hvf, rfl⟩, rfl⟩))
     have hle : ‖gam f‖ ≤ ‖gam U‖ ^ (e + 1) := by
       have hf' : f = f * (U ^ (e + 1))⁻¹ * U ^ (e + 1) := by field_simp
       have h3 := h1 _ hmem
@@ -149,9 +167,18 @@ theorem exists_valuedField_centre_le_pow : ∀ (R K : Type) [CommRing R] [IsDoma
     exact pow_le_pow_of_le_one (norm_nonneg _) hgu.le (by omega)
   · have huq : algebraMap R R₁ u ∈ q := lt_of_le_of_ne (hR u) hv
     obtain ⟨C, i1, i2, i3, i4, gam, h1, h2⟩ :=
-      exists_valuedField_centred_subalgebra R K u hu R₁ (Subalgebra.fg_of_fg_toSubmodule hfg)
-        q hqp huq
-    exact ⟨C, i1, i2, i3, i4, gam, fun r => h1 _ (R₁.algebraMap_mem r), h2 _ huq,
-      fun f hf hvf => ⟨h2 ⟨f, hf⟩ hvf, fun h => absurd h hv⟩⟩
+      exists_valuedField_centred_subalgebra R K u hu R₁ (Subalgebra.fg_of_fg_toSubmodule hfg) q hqp
+        huq
+    exact ⟨
+      C,
+      i1,
+      i2,
+      i3,
+      i4,
+      gam,
+      fun r => h1 _ (R₁.algebraMap_mem r),
+      h2 _ huq,
+      fun f hf hvf => ⟨h2 ⟨f, hf⟩ hvf, fun h => absurd h hv⟩
+    ⟩
 
 end GlobalTheory

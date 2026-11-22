@@ -13,20 +13,30 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 namespace RD
 
 variable {d : SD σ} (R : RD d) (w : InfinitePlace F)
 
-theorem stepW_pf (hT : TAll) (hA : AuxiliaryPrimeFunction) : ∀ (ε : ℤˣ) (w₀ : d.G), d.IsW ε w₀ →
-    ∃ (C s : ℂ) (B : d.MF → d.MF), s ≠ 0 ∧ R.StepOK w w₀ (fun f u => C * ∫ v : Fin d.m → Fin d.n → ℂ,
-      Complex.exp (2 * Real.pi * Complex.I * ((s * Matrix.trace ((Matrix.of u)ᴴ * Matrix.of v)).re : ℂ)) * f v) B := by
+theorem stepW_pf (hT : TAll) (hA : AuxiliaryPrimeFunction)
+    : ∀ (ε : ℤˣ) (w₀ : d.G),
+      d.IsW ε w₀
+        → ∃ (C s : ℂ) (B : d.MF → d.MF),
+          s ≠ 0 ∧ R.StepOK w w₀
+            (fun f u =>
+              C * ∫ v : Fin d.m → Fin d.n → ℂ,
+                Complex.exp (2 * Real.pi * Complex.I * ((s * Matrix.trace ((Matrix.of u)ᴴ * Matrix.of v)).re : ℂ)) * f v)
+            B := by
   intro ε w₀ hw
   obtain ⟨⟨ν, hν⟩, -, -⟩ := hA F E σ d
   obtain ⟨C, μ', -, -, hfact⟩ := KFock.intFact F E σ d R w ν hν
@@ -34,8 +44,14 @@ theorem stepW_pf (hT : TAll) (hA : AuxiliaryPrimeFunction) : ∀ (ε : ℤˣ) (w
     refine div_ne_zero (mul_ne_zero (mul_ne_zero (by norm_num) ?_) ?_) (KW.zeta_ne R)
     · exact Int.cast_ne_zero.mpr (Units.ne_zero ε)
     · exact Int.cast_ne_zero.mpr (Units.ne_zero (R.sg w))
-  refine ⟨(C : ℂ), _, fun Ψ X => ∫ Z, d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z.1)) * Ψ Z.1 ∂μ', hs,
-    fun f hf => KW.locFT_sw _ _ hs f hf, fun Ψ hΨ => ⟨?_, ?_⟩⟩
+  refine ⟨
+    (C : ℂ),
+    _,
+    fun Ψ X => ∫ Z, d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z.1)) * Ψ Z.1 ∂μ',
+    hs,
+    fun f hf => KW.locFT_sw _ _ hs f hf,
+    fun Ψ hΨ => ⟨?_, ?_⟩
+  ⟩
   · intro X Z hZ1 hZ2
     refine MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall fun Z₀ => ?_)
     simp only
@@ -49,8 +65,11 @@ theorem stepW_pf (hT : TAll) (hA : AuxiliaryPrimeFunction) : ∀ (ε : ℤˣ) (w
       intro X' Z hZ1 hZ2
       simp only [Ψ']
       rw [KW.rest_inv R w X' Z ⟨hZ1, hZ2⟩, hΨ X' Z hZ1 hZ2]
-    have e : (fun Z => d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z)) * R.tens w f Ψ Z) =
-        R.tens w (fun u => d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X (KW.insL R w u))) * f u) Ψ' := by
+    have e
+        : (fun Z => d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z)) * R.tens w f Ψ Z)
+          = R.tens w
+            (fun u => d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X (KW.insL R w u))) * f u)
+            Ψ' := by
       funext Z
       simp only [RD.tens, Ψ']
       have h := KW.psi_add_right d ε X (KW.insL R w (R.loc w Z)) (Z - KW.insL R w (R.loc w Z))
@@ -58,7 +77,8 @@ theorem stepW_pf (hT : TAll) (hA : AuxiliaryPrimeFunction) : ∀ (ε : ℤˣ) (w
       rw [h]
       ring
     rw [e, hfact _ Ψ' hΨ']
-    have e2 : ∫ Z, Ψ' Z.1 ∂μ' = ∫ Z, d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z.1)) * Ψ Z.1 ∂μ' := by
+    have e2
+        : ∫ Z, Ψ' Z.1 ∂μ' = ∫ Z, d.B.ψ (((ε : ℤ) : AF F) * d.tt (d.gram X Z.1)) * Ψ Z.1 ∂μ' := by
       refine MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall fun Z => ?_)
       simp only [Ψ']
       rw [KFock.loc_of_mem d R w Z.2, KW.insL_zero, sub_zero]

@@ -5,13 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-private theorem add_vanish {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-    [CompactSpace H] (f : H → PadicAlgCl l) (hf : Continuous f) (hm : ∀ a b, f (a * b) = f a + f b)
-    {ι : Type} (u : ι → H) (g : H)
-    (hg : ∀ (A : Type) [CommGroup A] [Finite A], IsPGroup l A → ∀ χ : H →* A, IsOpen (χ.ker : Set H) →
-      (∀ a, χ (u a) = 1) → χ g = 1) (hu : ∀ a, f (u a) = 0) : f g = 0 := by
+private theorem add_vanish
+    {l : ℕ} [Fact l.Prime]
+    {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [CompactSpace H]
+    (f : H → PadicAlgCl l) (hf : Continuous f) (hm : ∀ a b, f (a * b) = f a + f b)
+    {ι : Type} (u : ι → H)
+    (g : H)
+    (hg : ∀ (A : Type) [CommGroup A] [Finite A],
+      IsPGroup l A → ∀ χ : H →* A, IsOpen (χ.ker : Set H) → (∀ a, χ (u a) = 1) → χ g = 1)
+    (hu : ∀ a, f (u a) = 0)
+    : f g = 0 := by
   classical
   have f1 : f 1 = 0 := by
     have h11 := hm 1 1
@@ -26,16 +33,17 @@ private theorem add_vanish {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [Topolo
       rw [pow_succ, hm, ih]
       push_cast
       ring
-  let fm : H →* Multiplicative (PadicAlgCl l) :=
-    { toFun := fun h => Multiplicative.ofAdd (f h)
-      map_one' := by
-        show Multiplicative.ofAdd (f 1) = 1
-        rw [f1]
-        rfl
-      map_mul' := fun a b => by
-        show Multiplicative.ofAdd (f (a * b)) = Multiplicative.ofAdd (f a) * Multiplicative.ofAdd (f b)
-        rw [hm]
-        rfl }
+  let fm : H →* Multiplicative (PadicAlgCl l) := {
+    toFun := fun h => Multiplicative.ofAdd (f h)
+    map_one' := by
+      show Multiplicative.ofAdd (f 1) = 1
+      rw [f1]
+      rfl
+    map_mul' := fun a b => by
+      show Multiplicative.ofAdd (f (a * b)) = Multiplicative.ofAdd (f a) * Multiplicative.ofAdd (f b)
+      rw [hm]
+      rfl
+  }
   have hl : ‖((l : ℕ) : PadicAlgCl l)‖ = 1 / (l : ℝ) := by
     rw [← PadicAlgCl.valuation_coe, PadicAlgCl.valuation_p]
     simp
@@ -44,19 +52,20 @@ private theorem add_vanish {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [Topolo
     exact (div_lt_one (by linarith)).mpr h2
   have key : ∀ ε : ℝ, 0 < ε → ‖f g‖ < ε := by
     intro ε hε
-    let W : Subgroup (Multiplicative (PadicAlgCl l)) :=
-      { carrier := {x | ‖Multiplicative.toAdd x‖ < ε}
-        one_mem' := by
-          show ‖(0 : PadicAlgCl l)‖ < ε
-          rw [norm_zero]
-          exact hε
-        mul_mem' := fun {a b} ha hb => by
-          show ‖Multiplicative.toAdd a + Multiplicative.toAdd b‖ < ε
-          exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
-        inv_mem' := fun {a} ha => by
-          show ‖-Multiplicative.toAdd a‖ < ε
-          rw [norm_neg]
-          exact ha }
+    let W : Subgroup (Multiplicative (PadicAlgCl l)) := {
+      carrier := {x | ‖Multiplicative.toAdd x‖ < ε}
+      one_mem' := by
+        show ‖(0 : PadicAlgCl l)‖ < ε
+        rw [norm_zero]
+        exact hε
+      mul_mem' := fun {a b} ha hb => by
+        show ‖Multiplicative.toAdd a + Multiplicative.toAdd b‖ < ε
+        exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
+      inv_mem' := fun {a} ha => by
+        show ‖-Multiplicative.toAdd a‖ < ε
+        rw [norm_neg]
+        exact ha
+    }
     let N : Subgroup fm.range := W.subgroupOf fm.range
     let χ : H →* fm.range ⧸ N := (QuotientGroup.mk' N).comp fm.rangeRestrict
     have hker : ∀ h, χ h = 1 ↔ ‖f h‖ < ε := by
@@ -85,23 +94,28 @@ private theorem add_vanish {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [Topolo
       obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one (div_pos hε hpos) hl1
       refine ⟨k, ?_⟩
       rw [← map_pow, hker, fpow, norm_mul, Nat.cast_pow, norm_pow, hl]
-      calc (1 / (l : ℝ)) ^ k * ‖f h‖ ≤ (1 / (l : ℝ)) ^ k * (‖f h‖ + 1) := by
-            gcongr
-            linarith
+      calc
+        (1 / (l : ℝ)) ^ k * ‖f h‖ ≤ (1 / (l : ℝ)) ^ k * (‖f h‖ + 1) := by
+          gcongr
+          linarith
         _ < ε / (‖f h‖ + 1) * (‖f h‖ + 1) := by gcongr
         _ = ε := by field_simp
     exact (hker g).mp (hg _ hp χ hopen (fun a => (hker _).mpr (by rw [hu a, norm_zero]; exact hε)))
   by_contra hne
   exact lt_irrefl _ (key _ (norm_pos_iff.mpr hne))
 
-private theorem rank_le_card_add_rank_of_kernel {K M : Type} [Field K] [AddCommGroup M] [Module K M] {ι : Type} [Fintype ι]
-    (P Q : Submodule K M) (e : ι → M →ₗ[K] K) (h : ∀ x ∈ P, (∀ i, e i x = 0) → x ∈ Q) :
-    Module.rank K P ≤ (Fintype.card ι : ℕ) + Module.rank K Q := by
+private theorem rank_le_card_add_rank_of_kernel
+    {K M : Type} [Field K] [AddCommGroup M] [Module K M]
+    {ι : Type} [Fintype ι]
+    (P Q : Submodule K M) (e : ι → M →ₗ[K] K) (h : ∀ x ∈ P, (∀ i, e i x = 0) → x ∈ Q)
+    : Module.rank K P ≤ (Fintype.card ι : ℕ) + Module.rank K Q := by
   classical
   let φ : P →ₗ[K] (ι → K) := LinearMap.pi (fun i => (e i).comp P.subtype)
   have h1 := LinearMap.rank_range_add_rank_ker φ
   have h2 : Module.rank K (LinearMap.range φ) ≤ (Fintype.card ι : ℕ) := by
-    calc Module.rank K (LinearMap.range φ) ≤ Module.rank K (ι → K) := Submodule.rank_le _
+    calc
+      Module.rank K (LinearMap.range φ)
+        ≤ Module.rank K (ι → K) := Submodule.rank_le _
       _ = _ := rank_fun'
   have h3 : Module.rank K (LinearMap.ker φ) ≤ Module.rank K Q := by
     rw [(Submodule.equivMapOfInjective P.subtype Subtype.val_injective (LinearMap.ker φ)).rank_eq]
@@ -115,16 +129,25 @@ private theorem rank_le_card_add_rank_of_kernel {K M : Type} [Field K] [AddCommG
   exact add_le_add h2 h3
 
 set_option synthInstance.maxHeartbeats 200000 in
-theorem UpperTheory.V.J.tanBound :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O)) (C₀ n : ℕ), F.Ok C₀ → (n = 2 ∨ n = 3) →
-        ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l, IntPt S ξ →
-          Module.rank (Qbar l) (PtDer ξ (Qbar l)) ≤ (n * F.d : ℕ) + Module.rank (Qbar l) (FixTan S ξ) := by
+theorem UpperTheory.V.J.tanBound
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O))
+        (C₀ n : ℕ),
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l,
+          IntPt S ξ
+            → Module.rank (Qbar l) (PtDer ξ (Qbar l))
+              ≤ (n * F.d : ℕ) + Module.rank (Qbar l) (FixTan S ξ) := by
   intro l _ c _ F C₀ n hF hn S ξ hξ
   choose u a₀ hu1 hu2 hgen using hF.gen
-  let ev : S.A → ((S.A →ₗ[c.O] Qbar l) →ₗ[Qbar l] Qbar l) := fun x =>
-    { toFun := fun D => D x, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
-  have key := rank_le_card_add_rank_of_kernel (PtDer ξ (Qbar l)) (FixTan S ξ)
-    (fun j : (Σ v : F.V, Fin n × Fin (F.dv v)) => ev ↑(S.u.ψ j.1 j.2.1 (u j.1 j.2.2))) ?_
+  let ev : S.A → ((S.A →ₗ[c.O] Qbar l) →ₗ[Qbar l] Qbar l) := fun x => {
+    toFun := fun D => D x
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
+  have key :=
+    rank_le_card_add_rank_of_kernel (PtDer ξ (Qbar l)) (FixTan S ξ)
+      (fun j : (Σ v : F.V, Fin n × Fin (F.dv v)) => ev ↑(S.u.ψ j.1 j.2.1 (u j.1 j.2.2)))
+      ?_
   · have hc : Fintype.card (Σ v : F.V, Fin n × Fin (F.dv v)) = n * F.d := by
       rw [Fintype.card_sigma, UpperTheory.V.Fr.Frame.d, Finset.mul_sum]
       refine Finset.sum_congr rfl (fun v _ => ?_)
@@ -156,8 +179,7 @@ theorem UpperTheory.V.J.tanBound :
       have := hz ⟨v, (i, a)⟩
       simp only [f]
       rw [show D ↑((S.u.ψ v i) (u v a)) = 0 from this, zero_mul]
-    have h0 := add_vanish f hfc hfm (u v) g
-      (fun A _ _ hA χ ho h1 => hgen v A hA χ ho h1 g hg) hzero
+    have h0 := add_vanish f hfc hfm (u v) g (fun A _ _ hA χ ho h1 => hgen v A hA χ ho h1 g hg) hzero
     have hg0 := hne g
     simp only [f, mul_eq_zero, inv_eq_zero] at h0
     exact h0.resolve_right hg0

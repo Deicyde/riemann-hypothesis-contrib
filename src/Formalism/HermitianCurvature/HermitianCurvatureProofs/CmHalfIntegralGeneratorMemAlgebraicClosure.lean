@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -51,14 +52,16 @@ lemma mem_UH_of [DecidableEq ι] {g : Matrix ι ι ℂ} (hg : ∀ u v, herm H (g
   rw [← tk_herm_single (gᴴ * H * g) i j, ← tk_herm_conjTranspose, hg, tk_herm_single]
 end herm
 
-def mk3 (k r' : ℕ) (a : ℂ) (y : Fin (2 * r' + k + 1) → ℂ) (b : ℂ) : Fin (2 * (1 + r') + k + 1) → ℂ :=
+def mk3 (k r' : ℕ) (a : ℂ) (y : Fin (2 * r' + k + 1) → ℂ) (b : ℂ)
+    : Fin (2 * (1 + r') + k + 1) → ℂ :=
   a • e0 k r' + liftVec k 1 r' y + b • es0 k r'
 
 def cF (u : Fin (2 * (1 + r') + k + 1) → ℂ) : ℂ := u ⟨0, by omega⟩
 
 def cL (u : Fin (2 * (1 + r') + k + 1) → ℂ) : ℂ := u ⟨2 * (1 + r') + k, by omega⟩
 
-def mid (u : Fin (2 * (1 + r') + k + 1) → ℂ) : Fin (2 * r' + k + 1) → ℂ := fun j => u (levPos k 1 r' j)
+def mid (u : Fin (2 * (1 + r') + k + 1) → ℂ) : Fin (2 * r' + k + 1) → ℂ := fun j =>
+  u (levPos k 1 r' j)
 
 private lemma e0_apply_eq_ite (i : Fin (2 * (1 + r') + k + 1)) : e0 k r' i = if i.val = 0 then 1 else 0 := by
   have h : (i = eI k (1 + r') (a0 r')) ↔ i.val = 0 := Fin.ext_iff
@@ -439,7 +442,8 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 def μx : Measure ℂ := (volume : Measure ℂ).withDensity fun c => ENNReal.ofReal ((‖c‖ ^ 2)⁻¹)
 
@@ -449,34 +453,41 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
-theorem map_mulVec_volume {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.det ≠ 0) :
-    (volume : Measure (Fin n → ℂ)).map (fun y => A *ᵥ y) = ENNReal.ofReal ((‖A.det‖ ^ 2)⁻¹) • volume := by
+theorem map_mulVec_volume {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.det ≠ 0)
+    : (volume : Measure (Fin n → ℂ)).map (fun y => A *ᵥ y)
+      = ENNReal.ofReal ((‖A.det‖ ^ 2)⁻¹) • volume := by
   have hdet : LinearMap.det ((Matrix.toLin' A).restrictScalars ℝ) = ‖A.det‖ ^ 2 := by
-    rw [LinearMap.det_restrictScalars, LinearMap.det_toLin', Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq]
+    rw [LinearMap.det_restrictScalars, LinearMap.det_toLin', Algebra.norm_complex_apply,
+      Complex.normSq_eq_norm_sq]
   have hpos : (0 : ℝ) < ‖A.det‖ ^ 2 := by have := norm_pos_iff.2 hA; positivity
-  have h := Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (Fin n → ℂ))
-    (f := (Matrix.toLin' A).restrictScalars ℝ) (by rw [hdet]; exact hpos.ne')
+  have h :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (Fin n → ℂ))
+      (f := (Matrix.toLin' A).restrictScalars ℝ) (by rw [hdet]; exact hpos.ne')
   rw [hdet, abs_of_pos (inv_pos.2 hpos)] at h
   exact h
 
-theorem map_smul_volume {n : ℕ} (c : ℂ) (hc : c ≠ 0) :
-    (volume : Measure (Fin n → ℂ)).map (fun y => c • y) = ENNReal.ofReal ((‖c‖ ^ (2 * n))⁻¹) • volume := by
+theorem map_smul_volume {n : ℕ} (c : ℂ) (hc : c ≠ 0)
+    : (volume : Measure (Fin n → ℂ)).map (fun y => c • y)
+      = ENNReal.ofReal ((‖c‖ ^ (2 * n))⁻¹) • volume := by
   have hA : (c • (1 : Matrix (Fin n) (Fin n) ℂ)).det ≠ 0 := by simp [Matrix.det_smul, hc]
   have e : (fun y : Fin n → ℂ => c • y) = fun y => (c • (1 : Matrix (Fin n) (Fin n) ℂ)) *ᵥ y := by
     funext y; ext i; simp [Matrix.mulVec, dotProduct, Matrix.one_apply]
-  rw [e, map_mulVec_volume _ hA, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin, norm_pow, ← pow_mul, mul_comm n 2]
+  rw [e, map_mulVec_volume _ hA, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin,
+    norm_pow, ← pow_mul, mul_comm n 2]
 
-theorem map_mul_volume_real (t : ℝ) (ht : t ≠ 0) :
-    (volume : Measure ℝ).map (fun s => t * s) = ENNReal.ofReal (|t|⁻¹) • volume := by
+theorem map_mul_volume_real (t : ℝ) (ht : t ≠ 0)
+    : (volume : Measure ℝ).map (fun s => t * s) = ENNReal.ofReal (|t|⁻¹) • volume := by
   rw [Real.map_volume_mul_left ht, abs_inv]
 
 end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 def mi2D (l c : ℂ) : ℂ →L[ℝ] ℂ :=
   ((ContinuousLinearMap.smulRight (1 : ℂ →L[ℂ] ℂ) (l * -((conj c) ^ 2)⁻¹)).restrictScalars ℝ).comp
@@ -540,11 +551,14 @@ theorem μx_map_inv (l : ℂ) (hl : l ≠ 0) : μx.map (fun c => l / conj c) = �
   rw [lintegral_map hg (conj_inverse_map_measurable l)]
   unfold μx
   have hgl : Measurable fun a : ℂ => g (l / conj a) := hg.comp (conj_inverse_map_measurable l)
-  rw [lintegral_withDensity_eq_lintegral_mul _ hw hg, lintegral_withDensity_eq_lintegral_mul _ hw hgl]
-  have key := lintegral_image_eq_lintegral_abs_det_fderiv_mul (volume : Measure ℂ)
-    (s := {(0 : ℂ)}ᶜ) (f := fun c : ℂ => l / conj c) (f' := mi2D l) (MeasurableSet.singleton _).compl
-    (fun x hx => (conj_inverse_map_has_fderiv l x hx).hasFDerivWithinAt) (conj_inverse_map_inj_on l hl)
-    ((fun c : ℂ => ENNReal.ofReal ((‖c‖ ^ 2)⁻¹)) * g)
+  rw [lintegral_withDensity_eq_lintegral_mul _ hw hg,
+    lintegral_withDensity_eq_lintegral_mul _ hw hgl]
+  have key :=
+    lintegral_image_eq_lintegral_abs_det_fderiv_mul (volume : Measure ℂ) (s := {(0 : ℂ)}ᶜ)
+      (f := fun c : ℂ => l / conj c)
+      (f' := mi2D l) (MeasurableSet.singleton _).compl
+      (fun x hx => (conj_inverse_map_has_fderiv l x hx).hasFDerivWithinAt)
+      (conj_inverse_map_inj_on l hl) ((fun c : ℂ => ENNReal.ofReal ((‖c‖ ^ 2)⁻¹)) * g)
   rw [conj_inverse_map_image l hl, restrict_compl_zero_eq] at key
   rw [key]
   refine lintegral_congr_ae ?_
@@ -562,16 +576,23 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
-theorem lintegral_inv_norm_lt_top (R : ℝ) :
-    (∫⁻ c in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (‖c‖⁻¹)) < ∞ := by
-  rw [← lintegral_indicator Metric.isClosed_closedBall.measurableSet, ← Complex.lintegral_comp_polarCoord_symm]
+theorem lintegral_inv_norm_lt_top (R : ℝ)
+    : (∫⁻ c in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (‖c‖⁻¹)) < ∞ := by
+  rw [← lintegral_indicator Metric.isClosed_closedBall.measurableSet,
+    ← Complex.lintegral_comp_polarCoord_symm]
   have hS : MeasurableSet (Set.Ioc (0 : ℝ) R ×ˢ Set.Ioo (-Real.pi) Real.pi) :=
     measurableSet_Ioc.prod measurableSet_Ioo
-  have hle : ∀ p ∈ polarCoord.target, ENNReal.ofReal p.1 •
-      (Metric.closedBall (0 : ℂ) R).indicator (fun c => ENNReal.ofReal (‖c‖⁻¹)) (Complex.polarCoord.symm p) ≤
-      (Set.Ioc (0 : ℝ) R ×ˢ Set.Ioo (-Real.pi) Real.pi).indicator (fun _ => (1 : ℝ≥0∞)) p := by
+  have hle
+      : ∀ p ∈ polarCoord.target,
+        ENNReal.ofReal p.1 • (Metric.closedBall (0 : ℂ) R).indicator
+            (fun c => ENNReal.ofReal (‖c‖⁻¹))
+            (Complex.polarCoord.symm p)
+          ≤ (Set.Ioc (0 : ℝ) R ×ˢ Set.Ioo (-Real.pi) Real.pi).indicator
+            (fun _ => (1 : ℝ≥0∞))
+            p := by
     intro p hp
     rw [polarCoord_target] at hp
     have hp1 : 0 < p.1 := hp.1
@@ -589,15 +610,16 @@ theorem lintegral_inv_norm_lt_top (R : ℝ) :
       exact zero_le
   refine lt_of_le_of_lt (setLIntegral_mono' polarCoord.open_target.measurableSet hle) ?_
   refine lt_of_le_of_lt (setLIntegral_le_lintegral _ _) ?_
-  rw [lintegral_indicator hS, setLIntegral_const, one_mul, Measure.volume_eq_prod, Measure.prod_prod,
-    Real.volume_Ioc, Real.volume_Ioo]
+  rw [lintegral_indicator hS, setLIntegral_const, one_mul, Measure.volume_eq_prod,
+    Measure.prod_prod, Real.volume_Ioc, Real.volume_Ioo]
   exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top ENNReal.ofReal_lt_top
 
 end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -616,7 +638,8 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -640,10 +663,12 @@ lemma heisenberg_coordinate_measurable : Measurable (fun x : HPar k r' => hb k r
 
 theorem Ψt_meas : Measurable (Ψt k r') := by
   unfold Ψt mk3
-  have h1 : Measurable (fun p : ℂ × HPar k r' => hb k r' p.2.1 p.2.2) := heisenberg_coordinate_measurable.comp measurable_snd
+  have h1 : Measurable (fun p : ℂ × HPar k r' => hb k r' p.2.1 p.2.2) :=
+    heisenberg_coordinate_measurable.comp measurable_snd
   have h2 : Measurable (fun p : ℂ × HPar k r' => liftVec k 1 r' p.2.1) :=
     lift_vector_measurable.comp (measurable_fst.comp measurable_snd)
-  have h3 : Measurable (fun p : ℂ × HPar k r' => conj p.1) := Complex.continuous_conj.measurable.comp measurable_fst
+  have h3 : Measurable (fun p : ℂ × HPar k r' => conj p.1) :=
+    Complex.continuous_conj.measurable.comp measurable_fst
   exact (((h1.div h3).smul_const _).add h2).add (measurable_fst.smul_const _)
 
 lemma unitary_levi_det_norm_one (g₁ : Mat k r') (hg : g₁ ∈ GV k r') : ‖g₁.det‖ = 1 := by
@@ -662,12 +687,15 @@ lemma unitary_levi_det_norm_one (g₁ : Mat k r') (hg : g₁ ∈ GV k r') : ‖g
   have h5 : ‖g₁.det‖ ^ 2 = 1 := by exact_mod_cast h4
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp h5
 
-theorem Tl_mp (g₁ : Mat k r') (hg : g₁ ∈ GV k r') :
-    MeasurePreserving (Tl k r' g₁) (μx.prod (volume : Measure (HPar k r'))) (μx.prod (volume : Measure (HPar k r'))) := by
+theorem Tl_mp (g₁ : Mat k r') (hg : g₁ ∈ GV k r')
+    : MeasurePreserving (Tl k r' g₁) (μx.prod (volume : Measure (HPar k r')))
+      (μx.prod (volume : Measure (HPar k r'))) := by
   have hdet := unitary_levi_det_norm_one g₁ hg
   have hne : g₁.det ≠ 0 := by intro h; rw [h, norm_zero] at hdet; exact zero_ne_one hdet
-  have hmv : MeasurePreserving (fun y : Fin (2 * r' + k + 1) → ℂ => g₁ *ᵥ y) volume volume :=
-    ⟨(continuous_const.matrix_mulVec continuous_id).measurable, by rw [map_mulVec_volume g₁ hne, hdet]; simp⟩
+  have hmv : MeasurePreserving (fun y : Fin (2 * r' + k + 1) → ℂ => g₁ *ᵥ y) volume volume := ⟨
+    (continuous_const.matrix_mulVec continuous_id).measurable,
+    by rw [map_mulVec_volume g₁ hne, hdet]; simp
+  ⟩
   exact (MeasurePreserving.id μx).prod (hmv.prod (MeasurePreserving.id (volume : Measure ℝ)))
 
 def cm1Θ (k r' : ℕ) (p : ℂ × HPar k r') : ℂ × HPar k r' := (p.1, (p.1 • p.2.1, ‖p.1‖ ^ 2 * p.2.2))
@@ -740,15 +768,19 @@ lemma parametrisation_map_measure :
 
 theorem cone_eq : coneMeas k r' = ((μx.prod (volume : Measure (HPar k r')))).map (Ψt k r') := by
   unfold coneMeas
-  have e : (fun p : ℂ × HPar k r' => p.1 • (es0 k r' + liftVec k 1 r' p.2.1 + hb k r' p.2.1 p.2.2 • e0 k r')) =
-      Ψt k r' ∘ cm1Θ k r' := funext parametrisation_eq_scaled_sum
+  have e
+      : (fun p : ℂ × HPar k r' =>
+          p.1 • (es0 k r' + liftVec k 1 r' p.2.1 + hb k r' p.2.1 p.2.2 • e0 k r'))
+        = Ψt k r' ∘ cm1Θ k r' :=
+    funext parametrisation_eq_scaled_sum
   rw [e, ← Measure.map_map Ψt_meas parametrisation_map_measurable, parametrisation_map_measure]
 
 end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -770,17 +802,22 @@ lemma ae_second_coordinate_ne_zero : ∀ᵐ q : HPar k r' ∂(volume : Measure (
   have : {q : HPar k r' | ¬ q.2 ≠ 0} = Set.univ ×ˢ {0} := by ext q; simp
   rw [this, Measure.prod_prod, Real.volume_singleton, mul_zero]
 
-theorem Tw_mp (c₀ : ℂ) (hc : c₀ ≠ 0) :
-    MeasurePreserving (Tw k r' c₀) (μx.prod (volume : Measure (HPar k r'))) (μx.prod (volume : Measure (HPar k r'))) := by
-  have hbase : MeasurePreserving (fun q : HPar k r' => ((q.1, -q.2) : HPar k r')) volume volume := by
-    have := (MeasurePreserving.id (volume : Measure (Fin (2 * r' + k + 1) → ℂ))).prod
-      (Measure.measurePreserving_neg (volume : Measure ℝ))
+theorem Tw_mp (c₀ : ℂ) (hc : c₀ ≠ 0)
+    : MeasurePreserving (Tw k r' c₀) (μx.prod (volume : Measure (HPar k r')))
+      (μx.prod (volume : Measure (HPar k r'))) := by
+  have hbase
+      : MeasurePreserving (fun q : HPar k r' => ((q.1, -q.2) : HPar k r')) volume volume := by
+    have :=
+      (MeasurePreserving.id (volume : Measure (Fin (2 * r' + k + 1) → ℂ))).prod
+        (Measure.measurePreserving_neg (volume : Measure ℝ))
     rw [← Measure.volume_eq_prod] at this
     exact this
   have hS : MeasurePreserving
-      (fun p : HPar k r' × ℂ => (((p.1.1, -p.1.2) : HPar k r'), c₀ * hb k r' p.1.1 p.1.2 / conj p.2))
+      (fun p : HPar k r' × ℂ =>
+        (((p.1.1, -p.1.2) : HPar k r'), c₀ * hb k r' p.1.1 p.1.2 / conj p.2))
       ((volume : Measure (HPar k r')).prod μx) ((volume : Measure (HPar k r')).prod μx) := by
-    refine hbase.skew_product (g := fun (q : HPar k r') (c : ℂ) => c₀ * hb k r' q.1 q.2 / conj c) ?_ ?_
+    refine
+      hbase.skew_product (g := fun (q : HPar k r') (c : ℂ) => c₀ * hb k r' q.1 q.2 / conj c) ?_ ?_
     · have h1 : Measurable fun p : HPar k r' × ℂ => hb k r' p.1.1 p.1.2 :=
         (heisenberg_quadratic_continuous.comp continuous_fst).measurable
       have h2 : Measurable fun p : HPar k r' × ℂ => conj p.2 :=
@@ -790,48 +827,70 @@ theorem Tw_mp (c₀ : ℂ) (hc : c₀ ≠ 0) :
       refine μx_map_inv _ (mul_ne_zero hc ?_)
       intro h0
       apply hq
-      rw [← hb_im (k := k) (r' := r') q.1 q.2, h0]; rfl
-  have hT : Tw k r' c₀ = Prod.swap ∘ (fun p : HPar k r' × ℂ =>
-      (((p.1.1, -p.1.2) : HPar k r'), c₀ * hb k r' p.1.1 p.1.2 / conj p.2)) ∘ Prod.swap := by
+      rw [← hb_im (k := k) (r' := r') q.1 q.2, h0]
+      rfl
+  have hT
+      : Tw k r' c₀
+        = Prod.swap
+          ∘ (fun p : HPar k r' × ℂ =>
+            (((p.1.1, -p.1.2) : HPar k r'), c₀ * hb k r' p.1.1 p.1.2 / conj p.2))
+          ∘ Prod.swap := by
     funext p; rfl
   rw [hT]
-  exact (prod_swap_measure_preserving (volume : Measure (HPar k r')) μx).comp (hS.comp (prod_swap_measure_preserving μx (volume : Measure (HPar k r'))))
+  exact (prod_swap_measure_preserving (volume : Measure (HPar k r')) μx).comp
+    (hS.comp (prod_swap_measure_preserving μx (volume : Measure (HPar k r'))))
 
-theorem Tn_mp (x₀ : HPar k r') :
-    MeasurePreserving (Tn k r' x₀) (μx.prod (volume : Measure (HPar k r'))) (μx.prod (volume : Measure (HPar k r'))) := by
+theorem Tn_mp (x₀ : HPar k r')
+    : MeasurePreserving (Tn k r' x₀) (μx.prod (volume : Measure (HPar k r')))
+      (μx.prod (volume : Measure (HPar k r'))) := by
   have hm : Measurable fun p : ℂ × HPar k r' =>
-      ((p.2.1 + p.1 • x₀.1, p.2.2 - (conj p.1 * herm (Hpk k r') p.2.1 x₀.1).im + ‖p.1‖ ^ 2 * x₀.2) : HPar k r') := by
+      ((p.2.1 + p.1 • x₀.1, p.2.2 - (conj p.1 * herm (Hpk k r') p.2.1 x₀.1).im + ‖p.1‖ ^ 2 * x₀.2)
+        : HPar k r') := by
     have h : Continuous fun p : ℂ × HPar k r' => herm (Hpk k r') p.2.1 x₀.1 :=
-      (hermitian_form_continuous (Hpk k r')).comp ((continuous_fst.comp continuous_snd).prodMk continuous_const)
-    have h2 : Continuous fun p : ℂ × HPar k r' => conj p.1 := Complex.continuous_conj.comp continuous_fst
+      (hermitian_form_continuous (Hpk k r')).comp
+        ((continuous_fst.comp continuous_snd).prodMk continuous_const)
+    have h2 : Continuous fun p : ℂ × HPar k r' => conj p.1 :=
+      Complex.continuous_conj.comp continuous_fst
     have h3 : Continuous fun p : ℂ × HPar k r' => (conj p.1 * herm (Hpk k r') p.2.1 x₀.1).im :=
       Complex.continuous_im.comp (h2.mul h)
     apply Continuous.measurable
     fun_prop
   refine (MeasurePreserving.id μx).skew_product
-    (g := fun (c : ℂ) (q : HPar k r') => ((q.1 + c • x₀.1, q.2 - (conj c * herm (Hpk k r') q.1 x₀.1).im + ‖c‖ ^ 2 * x₀.2) : HPar k r')) hm ?_
+    (g := fun (c : ℂ) (q : HPar k r') =>
+      ((q.1 + c • x₀.1, q.2 - (conj c * herm (Hpk k r') q.1 x₀.1).im + ‖c‖ ^ 2 * x₀.2) : HPar k r'))
+    hm ?_
   refine Filter.Eventually.of_forall fun c => ?_
   have hsk : MeasurePreserving
-      (fun q : HPar k r' => ((q.1 + c • x₀.1, q.2 - (conj c * herm (Hpk k r') q.1 x₀.1).im + ‖c‖ ^ 2 * x₀.2) : HPar k r'))
+      (fun q : HPar k r' =>
+        ((q.1 + c • x₀.1, q.2 - (conj c * herm (Hpk k r') q.1 x₀.1).im + ‖c‖ ^ 2 * x₀.2)
+          : HPar k r'))
       ((volume : Measure (Fin (2 * r' + k + 1) → ℂ)).prod (volume : Measure ℝ))
       ((volume : Measure (Fin (2 * r' + k + 1) → ℂ)).prod (volume : Measure ℝ)) := by
-    refine (measurePreserving_add_right (volume : Measure (Fin (2 * r' + k + 1) → ℂ)) (c • x₀.1)).skew_product
-      (g := fun (y : Fin (2 * r' + k + 1) → ℂ) (s : ℝ) => s - (conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2) ?_ ?_
-    · exact (hm.comp (measurable_const.prodMk measurable_id : Measurable fun q : HPar k r' => (c, q))).snd
+    refine (measurePreserving_add_right (volume : Measure (Fin (2 * r' + k + 1) → ℂ))
+        (c • x₀.1)).skew_product
+      (g := fun (y : Fin (2 * r' + k + 1) → ℂ) (s : ℝ) =>
+        s - (conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2)
+      ?_ ?_
+    · exact (hm.comp
+        (measurable_const.prodMk measurable_id : Measurable fun q : HPar k r' => (c, q))).snd
     · refine Filter.Eventually.of_forall fun y => ?_
-      have := (measurePreserving_add_right (volume : Measure ℝ)
-        (-(conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2)).map_eq
-      have he : (fun s : ℝ => s - (conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2) =
-          fun s : ℝ => s + (-(conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2) := by
+      have :=
+        (measurePreserving_add_right (volume : Measure ℝ)
+          (-(conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2)).map_eq
+      have he
+          : (fun s : ℝ => s - (conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2)
+            = fun s : ℝ => s + (-(conj c * herm (Hpk k r') y x₀.1).im + ‖c‖ ^ 2 * x₀.2) := by
         funext s; ring
-      rw [he]; exact this
+      rw [he]
+      exact this
   exact hsk.map_eq
 
 end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -969,10 +1028,12 @@ def alL (h : Mat k (1 + r')) : (Fin (2 * r' + k + 1) → ℂ) →ₗ[ℂ] (Fin (
   toFun y := mid (h *ᵥ mk3 k r' 0 y 0)
   map_add' y y' := by
     have : mk3 k r' 0 (y + y') 0 = mk3 k r' 0 y 0 + mk3 k r' 0 y' 0 := by rw [three_block_add]; simp
-    rw [this, Matrix.mulVec_add]; rfl
+    rw [this, Matrix.mulVec_add]
+    rfl
   map_smul' c y := by
     have : mk3 k r' 0 (c • y) 0 = c • mk3 k r' 0 y 0 := by rw [three_block_smul]; simp
-    rw [this, Matrix.mulVec_smul]; rfl
+    rw [this, Matrix.mulVec_smul]
+    rfl
 
 lemma al_fix {h : Mat k (1 + r')} (hh : h ∈ GV k (1 + r')) (h1 : h *ᵥ e0 k r' = e0 k r')
     (h2 : h *ᵥ es0 k r' = es0 k r') : ∃ g₁ ∈ GV k r', h = ιLev k 1 r' g₁ := by
@@ -1021,9 +1082,12 @@ theorem al_stabDecomp : StabDecomp := by
     have hnes : heis0 k r' x *ᵥ es0 k r' = g *ᵥ es0 k r' := by
       rw [heisenberg_dual_base_vector, ← three_block_eta (g *ᵥ es0 k r'), hb1]
       conv_rhs => rw [ha]
-    obtain ⟨g₁, hg₁, hgg⟩ := al_fix (h := (heis0 k r' x)⁻¹ * g) (al_mul_mem (al_inv_mem hn) hg)
-      (by rw [← Matrix.mulVec_mulVec, he]; exact al_inv_mulVec (al_unit hn) (heisenberg_fixes_isotropic_vector x))
-      (by rw [← Matrix.mulVec_mulVec]; exact al_inv_mulVec (al_unit hn) hnes)
+    obtain ⟨g₁, hg₁, hgg⟩ :=
+      al_fix (h := (heis0 k r' x)⁻¹ * g) (al_mul_mem (al_inv_mem hn) hg)
+        (by
+          rw [← Matrix.mulVec_mulVec, he]
+          exact al_inv_mulVec (al_unit hn) (heisenberg_fixes_isotropic_vector x))
+        (by rw [← Matrix.mulVec_mulVec]; exact al_inv_mulVec (al_unit hn) hnes)
     refine ⟨heis0 k r' x, ⟨x, rfl⟩, ιLev k 1 r' g₁, ⟨g₁, hg₁, rfl⟩, ?_⟩
     rw [← hgg, Matrix.mul_nonsing_inv_cancel_left _ _ (al_unit hn)]
   · rintro ⟨n, ⟨x, rfl⟩, l, ⟨g₁, hg₁, rfl⟩, rfl⟩
@@ -1046,7 +1110,10 @@ lemma al_oneStep_mem (x x' : HPar k r') {c : ℂ} (hc : c ≠ 0) {g₁ : Mat k r
 theorem al_oneStepMem : OneStepMem := by
   unfold OneStepMem
   intro k r' x x' c hc g₁ hg
-  exact ⟨al_oneStep_mem x x' hc hg, by rw [one_parameter_element_base_vector, al_cL_eq, three_block_last]⟩
+  exact ⟨
+    al_oneStep_mem x x' hc hg,
+    by rw [one_parameter_element_base_vector, al_cL_eq, three_block_last]
+  ⟩
 
 lemma al_oneStep_inj {x x' z z' : HPar k r'} {c : ℂ} (hc : c ≠ 0) {g₁ h₁ : Mat k r'}
     (h : oneStep k r' x c g₁ x' = oneStep k r' z c h₁ z') : x = z ∧ g₁ = h₁ ∧ x' = z' := by
@@ -1149,10 +1216,11 @@ lemma al_phi (g : Mat k (1 + r')) (w : Fin (2 * (1 + r') + k + 1) → ℂ) (a b 
   rw [three_block_split a b y]
   simp only [Matrix.mulVec_add, Matrix.mulVec_smul, herm_add_left, herm_smul_left]
 
-theorem gen_induction (P : Mat k (1 + r') → Prop) (hmul : ∀ a b, P a → P b → P (a * b))
-    (hcancel : ∀ a b, P (a * b) → P b → P a)
-    (hH : ∀ x, P (heis0 k r' x)) (hw : ∀ c, c ≠ 0 → P (w0 k r' c)) (hl : ∀ g₁ ∈ GV k r', P (ιLev k 1 r' g₁)) :
-    ∀ g ∈ GV k (1 + r'), P g := by
+theorem gen_induction
+    (P : Mat k (1 + r') → Prop) (hmul : ∀ a b, P a → P b → P (a * b))
+    (hcancel : ∀ a b, P (a * b) → P b → P a) (hH : ∀ x, P (heis0 k r' x))
+    (hw : ∀ c, c ≠ 0 → P (w0 k r' c)) (hl : ∀ g₁ ∈ GV k r', P (ιLev k 1 r' g₁))
+    : ∀ g ∈ GV k (1 + r'), P g := by
   have big : ∀ g ∈ GV k (1 + r'), herm (Hpk k (1 + r')) (g *ᵥ e0 k r') (e0 k r') ≠ 0 → P g := by
     intro g hg hc
     obtain ⟨x, g₁, x', hg₁, he⟩ := al_oneStep_exists hg hc
@@ -1162,11 +1230,16 @@ theorem gen_induction (P : Mat k (1 + r') → Prop) (hmul : ∀ a b, P a → P b
     exact hmul _ _ (hmul _ _ (hmul _ _ (hH _) (hw _ hc)) (hl _ hg₁)) (hH _)
   intro g hg
   by_cases hc : herm (Hpk k (1 + r')) (g *ᵥ e0 k r') (e0 k r') = 0
-  · have hex : ∃ x : HPar k r', herm (Hpk k (1 + r')) (g *ᵥ mk3 k r' (hb k r' x.1 x.2) x.1 1) (e0 k r') ≠ 0 := by
+  · have hex
+        : ∃ x : HPar k r',
+          herm (Hpk k (1 + r')) (g *ᵥ mk3 k r' (hb k r' x.1 x.2) x.1 1) (e0 k r') ≠ 0 := by
       by_contra hno
       push Not at hno
-      have h1 : ∀ y, herm (Hpk k (1 + r')) (g *ᵥ mk3 k r' 0 y 0) (e0 k r') +
-          herm (Hpk k (1 + r')) (g *ᵥ es0 k r') (e0 k r') = 0 := by
+      have h1
+          : ∀ y,
+            herm (Hpk k (1 + r')) (g *ᵥ mk3 k r' 0 y 0) (e0 k r')
+                + herm (Hpk k (1 + r')) (g *ᵥ es0 k r') (e0 k r')
+              = 0 := by
         intro y
         have := hno (y, 0)
         rw [al_phi, hc] at this
@@ -1181,15 +1254,21 @@ theorem gen_induction (P : Mat k (1 + r') → Prop) (hmul : ∀ a b, P a → P b
         rw [← three_block_eta u, al_phi, hc, h2]
         have := h1 (mid u)
         rw [h2, add_zero] at this
-        rw [this]; simp
+        rw [this]
+        simp
       have h4 := h3 (g⁻¹ *ᵥ es0 k r')
-      rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (al_unit hg), Matrix.one_mulVec, al_cL_eq, dual_base_vector_eq_single, three_block_last] at h4
+      rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (al_unit hg), Matrix.one_mulVec, al_cL_eq,
+          dual_base_vector_eq_single, three_block_last]
+        at h4
       exact one_ne_zero h4
     obtain ⟨x, hx⟩ := hex
     have hPh : P (heis0 k r' x * w0 k r' 1) := hmul _ _ (hH x) (hw 1 one_ne_zero)
     apply hcancel g (heis0 k r' x * w0 k r' 1) _ hPh
-    apply big _ (al_mul_mem hg (al_mul_mem (heis_mem x) (cmHalfIntegralGenerator_mem_algebraicClosure 1 one_ne_zero)))
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, long_weyl_element_base_vector, ← dual_base_vector_eq_single, heisenberg_dual_base_vector]
+    apply big _
+      (al_mul_mem hg
+        (al_mul_mem (heis_mem x) (cmHalfIntegralGenerator_mem_algebraicClosure 1 one_ne_zero)))
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, long_weyl_element_base_vector,
+      ← dual_base_vector_eq_single, heisenberg_dual_base_vector]
     exact hx
   · exact big g hg hc
 
@@ -1197,15 +1276,19 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem stabilizer_one_parameter_mem : Formalism.FourierDecayAlt.B2.OneStepMem := Formalism.FourierDecayAlt.P.B2x8.al_oneStepMem
-theorem rank_one_coordinates_formula : Formalism.FourierDecayAlt.B2.OneStepCoord := Formalism.FourierDecayAlt.P.B2x8.al_oneStepCoord
-theorem stabilizer_factorization : Formalism.FourierDecayAlt.B2.StabDecomp := Formalism.FourierDecayAlt.P.B2x8.al_stabDecomp
+theorem stabilizer_one_parameter_mem : Formalism.FourierDecayAlt.B2.OneStepMem :=
+  Formalism.FourierDecayAlt.P.B2x8.al_oneStepMem
+theorem rank_one_coordinates_formula : Formalism.FourierDecayAlt.B2.OneStepCoord :=
+  Formalism.FourierDecayAlt.P.B2x8.al_oneStepCoord
+theorem stabilizer_factorization : Formalism.FourierDecayAlt.B2.StabDecomp :=
+  Formalism.FourierDecayAlt.P.B2x8.al_stabDecomp
 
 end Formalism.FourierDecayAlt.P
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -1295,14 +1378,19 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 B2x8
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 B2x8
 
 theorem isotropic_cone_invariance : Formalism.FourierDecayAlt.B2.ConeInv := by
   unfold Formalism.FourierDecayAlt.B2.ConeInv
   intro k r' g hg
-  have e : ∀ a b : Mat k (1 + r'), (fun x => (a * b) *ᵥ x) = (fun x => a *ᵥ x) ∘ (fun x => b *ᵥ x) := by
+  have e
+      : ∀ a b : Mat k (1 + r'),
+        (fun x => (a * b) *ᵥ x) = (fun x => a *ᵥ x) ∘ (fun x => b *ᵥ x) := by
     intro a b; funext x; simp [Matrix.mulVec_mulVec]
-  refine B2x8.gen_induction (fun g => (coneMeas k r').map (fun x => g *ᵥ x) = coneMeas k r') ?_ ?_ ?_ ?_ ?_ g hg
+  refine B2x8.gen_induction
+    (fun g => (coneMeas k r').map (fun x => g *ᵥ x) = coneMeas k r')
+    ?_ ?_ ?_ ?_ ?_ g hg
   · intro a b ha hb'
     try dsimp only at ha hb' ⊢
     rw [e, ← Measure.map_map (B2x8.cf_mulVec_meas a) (B2x8.cf_mulVec_meas b), hb', ha]
@@ -1311,22 +1399,27 @@ theorem isotropic_cone_invariance : Formalism.FourierDecayAlt.B2.ConeInv := by
     rw [e, ← Measure.map_map (B2x8.cf_mulVec_meas a) (B2x8.cf_mulVec_meas b), hb'] at hab
     exact hab
   · intro x
-    exact B2x8.cf_inv_of _ _ (B2x8.Tn_mp x) (B2x8.ae_first_coordinate_ne_zero.mono fun p hp => B2x8.cf_heis_Ψt x p hp)
+    exact B2x8.cf_inv_of _ _ (B2x8.Tn_mp x)
+      (B2x8.ae_first_coordinate_ne_zero.mono fun p hp => B2x8.cf_heis_Ψt x p hp)
   · intro c hc
     exact B2x8.cf_inv_of _ _ (B2x8.Tw_mp c hc)
-      ((B2x8.ae_first_coordinate_ne_zero.and B2x8.ae_heisenberg_parameter_ne_zero).mono fun p hp => B2x8.long_weyl_parametrisation_twist c hc p hp.1 hp.2)
+      ((B2x8.ae_first_coordinate_ne_zero.and B2x8.ae_heisenberg_parameter_ne_zero).mono fun p hp =>
+        B2x8.long_weyl_parametrisation_twist c hc p hp.1 hp.2)
   · intro g₁ hg₁
-    exact B2x8.cf_inv_of _ _ (B2x8.Tl_mp g₁ hg₁) (Filter.Eventually.of_forall fun p => B2x8.cf_lev_Ψt g₁ hg₁ p)
+    exact B2x8.cf_inv_of _ _ (B2x8.Tl_mp g₁ hg₁)
+      (Filter.Eventually.of_forall fun p => B2x8.cf_lev_Ψt g₁ hg₁ p)
 
 end Formalism.FourierDecayAlt.P
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
-def cgS (k r' : ℕ) (R : ℝ) : Set (ℂ × HPar k r') := {p | ‖p.1‖ ≤ R ∧ ‖p.2.1‖ ≤ R ∧ |p.2.2| ≤ R * ‖p.1‖}
+def cgS (k r' : ℕ) (R : ℝ) : Set (ℂ × HPar k r') :=
+  {p | ‖p.1‖ ≤ R ∧ ‖p.2.1‖ ≤ R ∧ |p.2.2| ≤ R * ‖p.1‖}
 
 lemma cg_closed (R : ℝ) : IsClosed (cgS k r' R) := by
   show IsClosed ({p : ℂ × HPar k r' | ‖p.1‖ ≤ R} ∩ ({p | ‖p.2.1‖ ≤ R} ∩ {p | |p.2.2| ≤ R * ‖p.1‖}))
@@ -1396,7 +1489,8 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 B2x8
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 B2x8
 
 theorem isotropic_cone_finite_measure : Formalism.FourierDecayAlt.B2.ConeFinite := by
   unfold Formalism.FourierDecayAlt.B2.ConeFinite
@@ -1404,10 +1498,14 @@ theorem isotropic_cone_finite_measure : Formalism.FourierDecayAlt.B2.ConeFinite 
   obtain ⟨R, hR⟩ := hK.isBounded.subset_closedBall 0
   rw [B2x8.cone_eq]
   refine lt_of_le_of_lt ?_ (B2x8.cg_finite (k := k) (r' := r') (max R 0) (le_max_right _ _))
-  refine le_trans (measure_mono (hR.trans (Metric.closedBall_subset_closedBall (le_max_left R 0)))) ?_
+  refine le_trans (measure_mono (hR.trans (Metric.closedBall_subset_closedBall (le_max_left R 0))))
+    ?_
   rw [Measure.map_apply B2x8.Ψt_meas measurableSet_closedBall]
-  have hnull : (B2x8.μx.prod (volume : Measure (HPar k r'))) {p | ¬ p.1 ≠ 0} = 0 := ae_iff.mp B2x8.ae_first_coordinate_ne_zero
-  have hsub : B2x8.Ψt k r' ⁻¹' Metric.closedBall 0 (max R 0) ⊆ B2x8.cgS k r' (max R 0) ∪ {p | ¬ p.1 ≠ 0} := by
+  have hnull : (B2x8.μx.prod (volume : Measure (HPar k r'))) {p | ¬ p.1 ≠ 0} = 0 :=
+    ae_iff.mp B2x8.ae_first_coordinate_ne_zero
+  have hsub
+      : B2x8.Ψt k r' ⁻¹' Metric.closedBall 0 (max R 0)
+        ⊆ B2x8.cgS k r' (max R 0) ∪ {p | ¬ p.1 ≠ 0} := by
     intro p hpK
     by_cases hp : p.1 ≠ 0
     · exact Or.inl (B2x8.cg_mem (max R 0) (le_max_right _ _) p hp (by simpa using hpK))
@@ -1419,7 +1517,8 @@ end Formalism.FourierDecayAlt.P
 
 namespace Formalism.FourierDecayAlt.P.B2x8
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 section dj
 variable {k r : ℕ}
@@ -1430,6 +1529,7 @@ end Formalism.FourierDecayAlt.P.B2x8
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x8
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x8
 
 end Formalism.FourierDecayAlt.P

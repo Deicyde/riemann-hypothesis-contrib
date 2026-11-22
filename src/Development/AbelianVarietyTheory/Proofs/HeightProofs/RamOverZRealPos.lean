@@ -6,19 +6,31 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.SpanResCha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
 
 namespace GlobalTheory
 
-theorem ramOverZ_real_pos {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K)) :
-    (0 : ℝ) < (ramOverZ la : ℝ) := by
-  exact_mod_cast Nat.pos_of_ne_zero (Formalism.MainNotions.ModuliIntegralCharts.H1.H1algLink.ramOverZ_ne_zero la)
+theorem ramOverZ_real_pos {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
+    : (0 : ℝ) < (ramOverZ la : ℝ) := by
+  exact_mod_cast Nat.pos_of_ne_zero
+    (Formalism.MainNotions.ModuliIntegralCharts.H1.H1algLink.ramOverZ_ne_zero la)
 
-theorem numerical_h_one_of_weighted_bound : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j), ∀ (large₂ : SizeData₂ D) (wL : WeightFamilies.Wt D j) (nus : HeightOneSpectrum (𝓞 T.Q.c.F) → ℝ), Formalism.MainNotions.Gaps.EtaleWeightGaps.WeightedPrimeSumBoundAlt large₂ (recPJ h j hj) wL nus → NumericalH1Condition T.Q.c (fun la => nus la / (ramOverZ la : ℝ)) (WeightAlgebra.PN D large₂) wL.size ∧ nuOf T.Q.c (fun la => nus la / (ramOverZ la : ℝ)) = nus := by
+theorem numerical_h_one_of_weighted_bound
+    : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j),
+      ∀ (large₂ : SizeData₂ D) (wL : WeightFamilies.Wt D j)
+          (nus : HeightOneSpectrum (𝓞 T.Q.c.F) → ℝ),
+        Formalism.MainNotions.Gaps.EtaleWeightGaps.WeightedPrimeSumBoundAlt large₂ (recPJ h j hj) wL
+            nus
+          → NumericalH1Condition T.Q.c
+              (fun la => nus la / (ramOverZ la : ℝ))
+              (WeightAlgebra.PN D large₂) wL.size
+            ∧ nuOf T.Q.c (fun la => nus la / (ramOverZ la : ℝ)) = nus := by
   intro D T h j hj large₂ wL nus hH
   obtain ⟨h0, h1, h2⟩ := hH
-  have he : ∀ la : HeightOneSpectrum (𝓞 T.Q.c.F),
-      (ramOverZ la : ℝ) * (nus la / (ramOverZ la : ℝ)) = nus la := fun la =>
+  have he
+      : ∀ la : HeightOneSpectrum (𝓞 T.Q.c.F),
+        (ramOverZ la : ℝ) * (nus la / (ramOverZ la : ℝ)) = nus la := fun la =>
     mul_div_cancel₀ _ (ramOverZ_real_pos la).ne'
   refine ⟨⟨fun la => div_nonneg (h0 la) (Nat.cast_nonneg _), h1.subset ?_, ?_⟩, funext he⟩
   · intro la hla h'

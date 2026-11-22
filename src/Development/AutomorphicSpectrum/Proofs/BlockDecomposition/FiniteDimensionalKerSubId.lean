@@ -9,9 +9,9 @@ open NumberField GlobalTheory.CuspRep MeasureTheory PositivityTheory.Affgl
 
 namespace GlobalTheory.CompanionTheory.CompactFix
 
-theorem finiteDimensional_ker_sub_id {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X]
-    (T : X →L[ℂ] X) (hT : IsCompactOperator T) :
-    FiniteDimensional ℂ (LinearMap.ker ((T : X →ₗ[ℂ] X) - LinearMap.id)) := by
+theorem finiteDimensional_ker_sub_id
+    {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X] (T : X →L[ℂ] X) (hT : IsCompactOperator T)
+    : FiniteDimensional ℂ (LinearMap.ker ((T : X →ₗ[ℂ] X) - LinearMap.id)) := by
   set K : Submodule ℂ X := LinearMap.ker ((T : X →ₗ[ℂ] X) - LinearMap.id) with hK
   have hfix : ∀ x ∈ K, T x = x := by
     intro x hx
@@ -31,10 +31,12 @@ theorem finiteDimensional_ker_sub_id {X : Type} [NormedAddCommGroup X] [NormedSp
   have hpre : (T ⁻¹' C) ∈ nhds (0 : X) := hCsub
   obtain ⟨r, hr, hball⟩ := Metric.nhds_basis_closedBall.mem_iff.1 hpre
   have hcomp : IsCompact (Metric.closedBall (0 : K) r) := by
-    have hemb : Topology.IsClosedEmbedding (Subtype.val : K → X) := hclosed.isClosedEmbedding_subtypeVal
+    have hemb : Topology.IsClosedEmbedding (Subtype.val : K → X) :=
+      hclosed.isClosedEmbedding_subtypeVal
     rw [hemb.isCompact_iff]
     refine hC.of_isClosed_subset ?_ ?_
-    · have : (Subtype.val '' Metric.closedBall (0 : K) r) = (K : Set X) ∩ Metric.closedBall 0 r := by
+    · have : (Subtype.val '' Metric.closedBall (0 : K) r)
+          = (K : Set X) ∩ Metric.closedBall 0 r := by
         ext x
         simp [Metric.mem_closedBall, dist_eq_norm, and_comm]
       rw [this]

@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.R
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem dim_le_of_primes {R : Type} [CommRing R] (I : Ideal R) (d : WithBot ℕ∞)
-    (h : ∀ P : Ideal R, P.IsPrime → I ≤ P → ringKrullDim (R ⧸ P) ≤ d) : ringKrullDim (R ⧸ I) ≤ d := by
+private theorem dim_le_of_primes
+    {R : Type} [CommRing R]
+    (I : Ideal R) (d : WithBot ℕ∞) (h : ∀ P : Ideal R, P.IsPrime → I ≤ P → ringKrullDim (R ⧸ P) ≤ d)
+    : ringKrullDim (R ⧸ I) ≤ d := by
   rw [ringKrullDim_quotient]
   unfold Order.krullDim
   refine iSup_le fun s => ?_
@@ -25,15 +27,19 @@ private theorem dim_le_of_primes {R : Type} [CommRing R] (I : Ideal R) (d : With
     intro i
     have hle : s.head ≤ s i := s.monotone (Fin.zero_le i)
     exact (PrimeSpectrum.mem_zeroLocus _ _).mpr hle
-  let s' : LTSeries (PrimeSpectrum.zeroLocus (R := R) q.asIdeal) :=
-    { length := s.length
-      toFun := fun i => ⟨(s i).1, hmem i⟩
-      step := fun i => s.step i }
+  let s' : LTSeries (PrimeSpectrum.zeroLocus (R := R) q.asIdeal) := {
+    length := s.length
+    toFun := fun i => ⟨(s i).1, hmem i⟩
+    step := fun i => s.step i
+  }
   exact le_trans (Order.LTSeries.length_le_krullDim s') hP
 
-private theorem trdeg_le_of_dim {B A : Type} [CommRing B] [CommRing A] [Algebra B A] [Algebra.FiniteType B A]
-    (η : Ideal A) [η.IsPrime] (hm : (η.comap (algebraMap B A)).IsMaximal) (t : ℕ)
-    (h : ringKrullDim (A ⧸ η) ≤ t) : Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) ≤ t := by
+private theorem trdeg_le_of_dim
+    {B A : Type} [CommRing B] [CommRing A] [Algebra B A] [Algebra.FiniteType B A]
+    (η : Ideal A) [η.IsPrime]
+    (hm : (η.comap (algebraMap B A)).IsMaximal)
+    (t : ℕ) (h : ringKrullDim (A ⧸ η) ≤ t)
+    : Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) ≤ t := by
   haveI := hm
   letI : Field (B ⧸ η.comap (algebraMap B A)) := Ideal.Quotient.field _
   haveI : IsDomain (A ⧸ η) := Ideal.Quotient.isDomain η
@@ -48,14 +54,18 @@ private theorem trdeg_le_of_dim {B A : Type} [CommRing B] [CommRing A] [Algebra 
   have hdt : d ≤ t := by exact_mod_cast h
   exact_mod_cast hdt
 
-private theorem exists_field_injective_ringHom_of_isDomain (D : Type) [CommRing D] [IsDomain D] :
-    ∃ (K : Type) (_ : Field K) (j : D →+* K), Function.Injective j := by
+private theorem exists_field_injective_ringHom_of_isDomain (D : Type) [CommRing D] [IsDomain D]
+    : ∃ (K : Type) (_ : Field K) (j : D →+* K), Function.Injective j := by
   set_option synthInstance.maxHeartbeats 400000 in
   exact ⟨FractionRing D, inferInstance, algebraMap D _, IsFractionRing.injective D (FractionRing D)⟩
 
 set_option maxHeartbeats 800000 in
-theorem UpperTheory.V.Fr.fib_dim :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), ¬ S.u.triP ≤ x → ringKrullDim (L.R ⧸ S.mB.map L.b) ≤ (2 * C₀ : ℕ) := by
+theorem UpperTheory.V.Fr.fib_dim
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x),
+          ¬ S.u.triP ≤ x → ringKrullDim (L.R ⧸ S.mB.map L.b) ≤ (2 * C₀ : ℕ) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S x L hx
   obtain ⟨hCO, hmB⟩ := co_B hF hn S
   haveI := hCO
@@ -81,7 +91,8 @@ theorem UpperTheory.V.Fr.fib_dim :
     unfold Space.x0
     exact Ideal.map_le_iff_le_comap.mpr hπ
   have hηx : L.im P ≤ x := by
-    have h1 : Ideal.comap (L.ι : S.A →+* L.R) P ≤ Ideal.comap (L.ι : S.A →+* L.R) (maximalIdeal L.R) :=
+    have h1
+        : Ideal.comap (L.ι : S.A →+* L.R) P ≤ Ideal.comap (L.ι : S.A →+* L.R) (maximalIdeal L.R) :=
       Ideal.comap_mono (IsLocalRing.le_maximalIdeal hP.ne_top)
     exact h1.trans L.lies.le
   haveI : IsDomain (S.A ⧸ L.im P) := Ideal.Quotient.isDomain _
@@ -96,8 +107,10 @@ theorem UpperTheory.V.Fr.fib_dim :
     · exact h
   have hdimA : ringKrullDim (S.A ⧸ L.im P) ≤ ((2 * C₀ : ℕ) : WithBot ℕ∞) := by
     have hle : S.x0 ⊔ S.u.triM ≤ L.im P := sup_le hx0 hM
-    exact le_trans (ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle)
-      (Ideal.Quotient.factor_surjective hle)) hl42
+    exact le_trans
+      (ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle)
+        (Ideal.Quotient.factor_surjective hle))
+      hl42
   have htd : S.td (L.im P) ≤ ((2 * C₀ : ℕ) : Cardinal) := by
     unfold Space.td
     exact trdeg_le_of_dim (L.im P) hπmax (2 * C₀) hdimA

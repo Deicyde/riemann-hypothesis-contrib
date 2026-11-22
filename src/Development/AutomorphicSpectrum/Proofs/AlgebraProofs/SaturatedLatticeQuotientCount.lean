@@ -7,9 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsEqNsmul
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem mem_of_forall_exists_sub_eq_nsmul (Λ : Type) [AddCommGroup Λ] [Module.Finite ℤ Λ]
-    (W : Submodule ℤ Λ) (hW : ∀ (k : ℤ) x, k ≠ 0 → k • x ∈ W → x ∈ W) (x : Λ)
-    (h : ∀ N : ℕ, 0 < N → ∃ w ∈ W, ∃ b : Λ, x - w = N • b) : x ∈ W := by
+theorem mem_of_forall_exists_sub_eq_nsmul
+    (Λ : Type) [AddCommGroup Λ] [Module.Finite ℤ Λ]
+    (W : Submodule ℤ Λ) (hW : ∀ (k : ℤ) x, k ≠ 0 → k • x ∈ W → x ∈ W)
+    (x : Λ) (h : ∀ N : ℕ, 0 < N → ∃ w ∈ W, ∃ b : Λ, x - w = N • b)
+    : x ∈ W := by
   have htf : Module.IsTorsionFree ℤ (Λ ⧸ W) := by
     refine Module.IsTorsionFree.of_smul_eq_zero fun r m hrm => ?_
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective W m
@@ -30,8 +32,9 @@ theorem mem_of_forall_exists_sub_eq_nsmul (Λ : Type) [AddCommGroup Λ] [Module.
   have hq : (Submodule.Quotient.mk x : Λ ⧸ W) = (n + 1) • Submodule.Quotient.mk b := by
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.eq, ← hb]
     simpa using hw
-  have hc : bs.repr (Submodule.Quotient.mk x) i =
-      ((n + 1 : ℕ) : ℤ) * bs.repr (Submodule.Quotient.mk b) i := by
+  have hc
+      : bs.repr (Submodule.Quotient.mk x) i
+        = ((n + 1 : ℕ) : ℤ) * bs.repr (Submodule.Quotient.mk b) i := by
     rw [hq, map_nsmul, Finsupp.smul_apply, nsmul_eq_mul]
   have habs := congrArg Int.natAbs hc
   rw [Int.natAbs_mul, Int.natAbs_natCast, hn] at habs
@@ -41,22 +44,25 @@ theorem mem_of_forall_exists_sub_eq_nsmul (Λ : Type) [AddCommGroup Λ] [Module.
     exact Int.natAbs_eq_zero.mp hn
   · nlinarith
 
-theorem mem_of_forall_card_mul_eq_pow :
-    ∀ (Λ : Type) [AddCommGroup Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ]
-      (B : LinearMap.BilinForm ℤ Λ), Function.Bijective B → (∀ x, B x x = 0) →
-      ∀ W : Submodule ℤ Λ, (∀ (k : ℤ) x, k ≠ 0 → k • x ∈ W → x ∈ W) →
-      (∀ N : ℕ, 0 < N →
-        ∃ T : Set (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))),
-          Nat.card (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))) * Nat.card T
-            = N ^ Module.finrank ℤ Λ ∧
-          ∀ x y : W, Submodule.Quotient.mk x ∈ T → (N : ℤ) ∣ B x y) →
-      ∀ x, (∀ y ∈ W, B x y = 0) → x ∈ W := by
+theorem mem_of_forall_card_mul_eq_pow
+    : ∀ (Λ : Type) [AddCommGroup Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ]
+        (B : LinearMap.BilinForm ℤ Λ),
+      Function.Bijective B → (∀ x, B x x = 0)
+        → ∀ W : Submodule ℤ Λ,
+          (∀ (k : ℤ) x, k ≠ 0 → k • x ∈ W → x ∈ W)
+            → (∀ N : ℕ,
+              0 < N
+                → ∃ T : Set (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))),
+                  Nat.card (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))) * Nat.card T
+                      = N ^ Module.finrank ℤ Λ
+                    ∧ ∀ x y : W, Submodule.Quotient.mk x ∈ T → (N : ℤ) ∣ B x y)
+            → ∀ x, (∀ y ∈ W, B x y = 0) → x ∈ W := by
   intro Λ _ _ _ B hB halt W hW hT x hx
   apply mem_of_forall_exists_sub_eq_nsmul Λ W hW x
   intro N hN
   obtain ⟨T, hcard, hTpair⟩ := hT N hN
-  let R : Λ → (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))) → Prop :=
-    fun a p => ∃ w : W, Submodule.Quotient.mk w = p ∧ ∃ b : Λ, a - w = N • b
+  let R : Λ → (W ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : W →ₗ[ℤ] W))) → Prop := fun a p =>
+    ∃ w : W, Submodule.Quotient.mk w = p ∧ ∃ b : Λ, a - w = N • b
   have h1 : ∀ a b p, R a p → R (a + N • b) p := by
     rintro a b p ⟨w, hw, b0, hb0⟩
     refine ⟨w, hw, b0 + b, ?_⟩
@@ -83,7 +89,8 @@ theorem mem_of_forall_card_mul_eq_pow :
     have ha' : a' = w' + N • b' := by rw [← hb']; abel
     have hww := hTpair w w' hp
     have hexp : B (↑w + N • b) (↑w' + N • b') = B w w' + N * (B w b' + B b w' + N * B b b') := by
-      simp only [map_add (f := _), LinearMap.add_apply, map_nsmul, LinearMap.smul_apply, nsmul_eq_mul]
+      simp only [map_add (f := _), LinearMap.add_apply, map_nsmul, LinearMap.smul_apply,
+        nsmul_eq_mul]
       ring
     rw [ha, ha', hexp]
     exact dvd_add hww (dvd_mul_right _ _)

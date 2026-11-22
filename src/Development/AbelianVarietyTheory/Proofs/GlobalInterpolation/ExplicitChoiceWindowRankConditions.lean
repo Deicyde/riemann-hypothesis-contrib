@@ -6,12 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.PairRo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem nWv_lower (R : Ranks) (s : Scale) :
-    10 * R.r * (R.f + R.f * (R.k - 1) ^ 3) ≤ nWv R s := by
+theorem nWv_lower (R : Ranks) (s : Scale) : 10 * R.r * (R.f + R.f * (R.k - 1) ^ 3) ≤ nWv R s := by
   have hk : 1 ≤ R.k := by have := R.m_add_three_le_k; omega
   have hm : (0 : ℝ) < R.m := by
     have := R.two_le_m
@@ -24,18 +24,22 @@ theorem nWv_lower (R : Ranks) (s : Scale) :
     have : (1 : ℝ) ≤ R.k := by exact_mod_cast hk
     linarith
   have hL2 : 1 ≤ s.L ^ 2 := one_le_pow₀ hL
-  have h1 : (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 ≤
-      (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m := by
+  have h1
+      : (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 ≤ (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m := by
     rw [le_div_iff₀ hm]
     have hA : (0 : ℝ) ≤ (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 := by positivity
     have hf : (0 : ℝ) ≤ R.f := by positivity
-    calc (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 * R.m ≤ (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 * R.f :=
-          mul_le_mul_of_nonneg_left hmf hA
+    calc
+      (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 * R.m
+        ≤ (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3 * R.f := mul_le_mul_of_nonneg_left hmf hA
       _ = (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * 1 := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_left hL2 (by positivity)
-  have h2 := Nat.le_ceil (10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m) / 8)
-  have h3 : 10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3) ≤
-      10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m) :=
+  have h2 :=
+    Nat.le_ceil
+      (10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m) / 8)
+  have h3
+      : 10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) * ((R.k : ℝ) - 1) ^ 3)
+        ≤ 10 * (R.r : ℝ) * ((R.f : ℝ) + (R.f : ℝ) ^ 2 * ((R.k : ℝ) - 1) ^ 3 * s.L ^ 2 / R.m) :=
     mul_le_mul_of_nonneg_left (by linarith) (by positivity)
   have h4 : ((10 * R.r * (R.f + R.f * (R.k - 1) ^ 3) : ℕ) : ℝ) ≤ (nWv R s : ℕ) := by
     unfold nWv
@@ -43,9 +47,9 @@ theorem nWv_lower (R : Ranks) (s : Scale) :
     linarith
   exact_mod_cast h4
 
-theorem nWv_three_lower (R : Ranks) (s : Scale) :
-    R.f * R.r * (R.r + 1) ≤ nWv R s ∧ (R.k - 1) * R.f + 2 * R.r ≤ nWv R s ∧
-      8 * R.f * R.r + 4 ≤ nWv R s := by
+theorem nWv_three_lower (R : Ranks) (s : Scale)
+    : R.f * R.r * (R.r + 1) ≤ nWv R s ∧ (R.k - 1) * R.f + 2 * R.r ≤ nWv R s
+      ∧ 8 * R.f * R.r + 4 ≤ nWv R s := by
   have h := nWv_lower R s
   have h2 := R.two_le_m
   have h3 := R.m_add_three_le_k
@@ -69,7 +73,16 @@ theorem nWv_three_lower (R : Ranks) (s : Scale) :
   have a4 : 8 * f * r = 8 * (f * r) := by ring
   refine ⟨by omega, by omega, by omega⟩
 
-theorem szRow_nW : SzRow (fun C D L => (nW L C.P.CnW ≤ ((nWv D.R L.sc : ℕ) : ℝ) ∧ ((nWv D.R L.sc : ℕ) : ℝ) < nW L C.P.CnW + 8) ∧ (8 ∣ (nWv D.R L.sc : ℕ)) ∧ (D.R.r + D.R.t = (8 * D.R.f * D.R.r + 4 : ℕ) + (TOv L.sc : ℕ) * (nWv D.R L.sc : ℕ)) ∧ ((TOv L.sc : ℕ) = ⌈L.sc.x ^ C.T.cTO⌉₊) ∧ (Odd (D.R.r + 6 : ℕ)) ∧ (D.R.r + 5 < (D.R.r + 6 : ℕ)) ∧ ((D.R.r + 6 : ℕ) ≤ D.R.r + 7) ∧ (D.R.f * D.R.r * (D.R.r + 1) ≤ (nWv D.R L.sc : ℕ) ∧ (D.R.k - 1) * D.R.f + 2 * D.R.r ≤ (nWv D.R L.sc : ℕ) ∧ (8 * D.R.f * D.R.r + 4 : ℕ) ≤ (nWv D.R L.sc : ℕ))) := by
+theorem szRow_nW
+    : SzRow (fun C D L =>
+      (nW L C.P.CnW ≤ ((nWv D.R L.sc : ℕ) : ℝ) ∧ ((nWv D.R L.sc : ℕ) : ℝ) < nW L C.P.CnW + 8)
+        ∧ (8 ∣ (nWv D.R L.sc : ℕ))
+        ∧ (D.R.r + D.R.t = (8 * D.R.f * D.R.r + 4 : ℕ) + (TOv L.sc : ℕ) * (nWv D.R L.sc : ℕ))
+        ∧ ((TOv L.sc : ℕ) = ⌈L.sc.x ^ C.T.cTO⌉₊) ∧ (Odd (D.R.r + 6 : ℕ))
+        ∧ (D.R.r + 5 < (D.R.r + 6 : ℕ)) ∧ ((D.R.r + 6 : ℕ) ≤ D.R.r + 7)
+        ∧ (D.R.f * D.R.r * (D.R.r + 1) ≤ (nWv D.R L.sc : ℕ)
+          ∧ (D.R.k - 1) * D.R.f + 2 * D.R.r ≤ (nWv D.R L.sc : ℕ)
+          ∧ (8 * D.R.f * D.R.r + 4 : ℕ) ≤ (nWv D.R L.sc : ℕ))) := by
   intro eps _ _ C hC
   refine ⟨0, fun cD _ => ⟨0, fun ch _ => ⟨0, fun D L _ _ hV => ?_⟩⟩⟩
   have hW : C.P.CnW = 10 := by
@@ -81,13 +94,24 @@ theorem szRow_nW : SzRow (fun C D L => (nW L C.P.CnW ≤ ((nWv D.R L.sc : ℕ) :
     have : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
     have : (1 : ℝ) ≤ D.R.k := by exact_mod_cast this
     linarith
-  refine ⟨⟨?_, ?_⟩, Dvd.intro _ rfl, hV.ranks.2.2.2, ?_, ?_, by omega, by omega, nWv_three_lower _ _⟩
-  · rw [hW]; unfold nW nWv
-    have := Nat.le_ceil (10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m) / 8)
+  refine
+    ⟨⟨?_, ?_⟩, Dvd.intro _ rfl, hV.ranks.2.2.2, ?_, ?_, by omega, by omega, nWv_three_lower _ _⟩
+  · rw [hW]
+    unfold nW nWv
+    have :=
+      Nat.le_ceil
+        (10 * (D.R.r : ℝ)
+          * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m) / 8)
     push_cast
     linarith
-  · rw [hW]; unfold nW nWv
-    have := Nat.ceil_lt_add_one (a := 10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m) / 8) (by positivity)
+  · rw [hW]
+    unfold nW nWv
+    have :=
+      Nat.ceil_lt_add_one
+        (a :=
+          10 * (D.R.r : ℝ)
+            * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m) / 8)
+        (by positivity)
     push_cast
     linarith
   · rw [hT]; rfl

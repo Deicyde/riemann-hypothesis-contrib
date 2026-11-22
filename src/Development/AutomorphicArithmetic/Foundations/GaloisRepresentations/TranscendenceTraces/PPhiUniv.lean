@@ -7,13 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleToSheaf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC
+  UpperTheory.Gal.TranscendenceTraces
 open scoped DirectSum Classical
 
 namespace UpperTheory.Gal.TranscendenceTraces
 
-private def famL {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J)
-    {U : Scheme.{0}} (u : U ⟶ S) : Sec G (pullback p u) →ₗ[ULift.{1} (ZMod Q)] Sec J U where
+private def famL
+    {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S)
+    {G J : Shv (ZMod Q)} (t : Fam0 p G J)
+    {U : Scheme.{0}} (u : U ⟶ S)
+    : Sec G (pullback p u) →ₗ[ULift.{1} (ZMod Q)] Sec J U where
   toFun := t.app (Sq.of p u)
   map_add' := map_add _
   map_smul' c a := by
@@ -24,27 +28,33 @@ private def famL {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)}
     rw [hc, RingHom.id_apply, Int.cast_smul_eq_zsmul]
     exact (map_zsmul (t.app (Sq.of p u)) n a).trans (Int.cast_smul_eq_zsmul _ n _).symm
 
-private def famS {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J)
-    (U : Scheme.{0}) : DS p G U →ₗ[ULift.{1} (ZMod Q)] Sec J U :=
+private def famS
+    {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J) (U : Scheme.{0})
+    : DS p G U →ₗ[ULift.{1} (ZMod Q)] Sec J U :=
   DirectSum.toModule _ _ _ fun u => famL p t u
 
-private theorem famS_inc {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J)
-    {U : Scheme.{0}} (u : U ⟶ S) (a : Sec G (pullback p u)) :
-    famS p t U (inc p G u a) = t.app (Sq.of p u) a :=
+private theorem famS_inc
+    {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S)
+    {G J : Shv (ZMod Q)} (t : Fam0 p G J)
+    {U : Scheme.{0}} (u : U ⟶ S) (a : Sec G (pullback p u))
+    : famS p t U (inc p G u a) = t.app (Sq.of p u) a :=
   DirectSum.toModule_lof _ _ _
 
-private def famP {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J) :
-    phiP p G ⟶ J.obj where
+private def famP {Q : ℕ} {Z S : Scheme.{0}} (p : Z ⟶ S) {G J : Shv (ZMod Q)} (t : Fam0 p G J)
+    : phiP p G ⟶ J.obj where
   app U := ModuleCat.ofHom (famS p t U.unop)
-  naturality U V g := ModuleCat.hom_ext (DS.hom_ext p fun u a => by
-    change famS p t _ (DS.res p G g.unop (inc p G u a)) = Sec.res g.unop (famS p t _ (inc p G u a))
-    rw [DS.res_inc p G g.unop u _ rfl, famS_inc, famS_inc]
-    exact (t.nat (A := Sq.of p (g.unop ≫ u)) (B := Sq.of p u)
-      ⟨g.unop, pbm p g.unop u _ rfl, rfl, pbm_fst .., pbm_snd ..⟩ a).symm)
+  naturality U V g :=
+    ModuleCat.hom_ext (DS.hom_ext p fun u a => by
+      change famS p t _ (DS.res p G g.unop (inc p G u a))
+        = Sec.res g.unop (famS p t _ (inc p G u a))
+      rw [DS.res_inc p G g.unop u _ rfl, famS_inc, famS_inc]
+      exact (t.nat (A := Sq.of p (g.unop ≫ u)) (B := Sq.of p u)
+        ⟨g.unop, pbm p g.unop u _ rfl, rfl, pbm_fst .., pbm_snd ..⟩ a).symm)
 
 theorem phiUniv_of : PhiUniv := by
   intro Q Z S p G J t
-  obtain ⟨ψ, hψ, huniq⟩ := (GlobalTheory.T.etaleToSheafify_locally_bijective_and_lift (ZMod Q) (phiP p G)).2.2 J (famP p t)
+  obtain ⟨ψ, hψ, huniq⟩ :=
+    (GlobalTheory.T.etaleToSheafify_locally_bijective_and_lift (ZMod Q) (phiP p G)).2.2 J (famP p t)
   have key : ∀ (U : Scheme) (y : DS p G U), Sec.map ψ (phiSec p G U y) = famS p t U y := by
     intro U y
     exact congrArg (fun φ => ModuleCat.Hom.hom (φ.app (op U)) y) hψ

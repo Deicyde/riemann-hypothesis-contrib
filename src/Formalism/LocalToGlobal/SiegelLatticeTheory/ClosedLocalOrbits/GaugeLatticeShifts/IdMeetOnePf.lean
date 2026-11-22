@@ -13,17 +13,22 @@ namespace Formalism.L2.SG.Pf.IdMeet
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full
-  Formalism.L2.SG.PoincareInHH.Cut
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full Formalism.L2.SG.PoincareInHH.Cut
 
 section Gen
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
-theorem nlam_iff_of_rel {Λ : Submodule (𝓞 D.host.E) (VS D).V} {p q : GCar X u u F0 F0 Λ Λ}
-    (h : GRel X u u F0 F0 Λ Λ p q) : p.1.2 ∈ NLam Λ (lf D F0) ↔ q.1.2 ∈ NLam Λ (lf D F0) := by
+theorem nlam_iff_of_rel
+    {Λ : Submodule (𝓞 D.host.E) (VS D).V} {p q : GCar X u u F0 F0 Λ Λ}
+    (h : GRel X u u F0 F0 Λ Λ p q)
+    : p.1.2 ∈ NLam Λ (lf D F0) ↔ q.1.2 ∈ NLam Λ (lf D F0) := by
   obtain ⟨n, hn, n', hn', hq⟩ := h
   let H := NLamSub Λ (lf D F0)
   rw [hq]
@@ -35,10 +40,13 @@ theorem nlam_iff_of_rel {Λ : Submodule (𝓞 D.host.E) (VS D).V} {p q : GCar X 
     rw [e]
     exact H.mul_mem (H.mul_mem (H.inv_mem hn) hq') (H.inv_mem hn')
 
-theorem nlam_out_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (p : GCar X u u F0 F0 Λ Λ) :
-    (Quot.out (Quot.mk (GRel X u u F0 F0 Λ Λ) p)).1.2 ∈ NLam Λ (lf D F0) ↔ p.1.2 ∈ NLam Λ (lf D F0) := by
-  have key : ∀ a b : GCar X u u F0 F0 Λ Λ, Relation.EqvGen (GRel X u u F0 F0 Λ Λ) a b →
-      (a.1.2 ∈ NLam Λ (lf D F0) ↔ b.1.2 ∈ NLam Λ (lf D F0)) := by
+theorem nlam_out_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (p : GCar X u u F0 F0 Λ Λ)
+    : (Quot.out (Quot.mk (GRel X u u F0 F0 Λ Λ) p)).1.2 ∈ NLam Λ (lf D F0)
+      ↔ p.1.2 ∈ NLam Λ (lf D F0) := by
+  have key
+      : ∀ a b : GCar X u u F0 F0 Λ Λ,
+        Relation.EqvGen (GRel X u u F0 F0 Λ Λ) a b
+          → (a.1.2 ∈ NLam Λ (lf D F0) ↔ b.1.2 ∈ NLam Λ (lf D F0)) := by
     intro a b hab
     induction hab with
     | rel a b h => exact nlam_iff_of_rel h
@@ -47,7 +55,8 @@ theorem nlam_out_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (p : GCar X u u F
     | trans a b c _ _ ih1 ih2 => exact ih1.trans ih2
   exact key _ _ (Quot.eqvGen_exact (Quot.out_eq (Quot.mk (GRel X u u F0 F0 Λ Λ) p)))
 
-theorem isId_of_lin {t : GTerm X u u F0 F0 what₂ what₂} (h : t.lin ∈ NLam t.lam (lf D F0)) : t.isId := by
+theorem isId_of_lin {t : GTerm X u u F0 F0 what₂ what₂} (h : t.lin ∈ NLam t.lam (lf D F0))
+    : t.isId := by
   unfold GTerm.isId Formalism.L2.SG.FourParts.termIsId Formalism.L2.SG.FourParts.IsIdT
   refine ⟨t.frame, ⟨t.rep.2.2.2.2, rfl⟩, ?_⟩
   unfold Formalism.L2.SG.FourParts.IsIdF
@@ -74,11 +83,19 @@ theorem idMeetOneC_of (hK : IdMeetKeyC) : IdMeetOneC := by
     obtain ⟨lam₂, mem₂, lam₂', mem₂', cls₂⟩ := t'
     simp only at hl hl' hr hr'
     subst hl hl' hr hr'
-    have h1' : (Quot.out cls).1.2 ∈ Formalism.L2.SG.Pf.NLamSub ((Y.cs u).lamOf ρ) (lf D (X.Fu u)) := h1
-    have h2' : (Quot.out cls₂).1.2 ∈ Formalism.L2.SG.Pf.NLamSub ((Y.cs u).lamOf ρ) (lf D (X.Fu u)) := h2
-    have hrel : GRel X u u (X.Fu u) (X.Fu u) ((Y.cs u).lamOf ρ) ((Y.cs u).lamOf ρ) (Quot.out cls) (Quot.out cls₂) :=
-      ⟨(Quot.out cls₂).1.2 * ((Quot.out cls).1.2)⁻¹,
-        Subgroup.mul_mem _ h2' (Subgroup.inv_mem _ h1'), 1, Formalism.L2.SG.Pf.nlam_one _ _, by group⟩
+    have h1' : (Quot.out cls).1.2 ∈ Formalism.L2.SG.Pf.NLamSub ((Y.cs u).lamOf ρ) (lf D (X.Fu u)) :=
+      h1
+    have h2'
+        : (Quot.out cls₂).1.2 ∈ Formalism.L2.SG.Pf.NLamSub ((Y.cs u).lamOf ρ) (lf D (X.Fu u)) :=
+      h2
+    have hrel : GRel X u u (X.Fu u) (X.Fu u) ((Y.cs u).lamOf ρ) ((Y.cs u).lamOf ρ) (Quot.out cls)
+        (Quot.out cls₂) := ⟨
+      (Quot.out cls₂).1.2 * ((Quot.out cls).1.2)⁻¹,
+      Subgroup.mul_mem _ h2' (Subgroup.inv_mem _ h1'),
+      1,
+      Formalism.L2.SG.Pf.nlam_one _ _,
+      by group
+    ⟩
     have hs := Quot.sound hrel
     have hc : cls = cls₂ := (Quot.out_eq cls).symm.trans (hs.trans (Quot.out_eq cls₂))
     subst hc

@@ -28,9 +28,10 @@ abbrev ptIdeal (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) : Ideal (ptLoc
 
 abbrev ptQuot (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) : Type := ptLoc w ⧸ ptIdeal I w
 
-theorem exists_mul_mem_of_algebraMap_mem (w : σ → ℂ) (J : Ideal (MvPolynomial σ ℂ)) (x : MvPolynomial σ ℂ)
-    (hx : algebraMap _ (ptLoc w) x ∈ J.map (algebraMap _ (ptLoc w))) :
-    ∃ s : MvPolynomial σ ℂ, eval w s ≠ 0 ∧ s * x ∈ J := by
+theorem exists_mul_mem_of_algebraMap_mem
+    (w : σ → ℂ) (J : Ideal (MvPolynomial σ ℂ)) (x : MvPolynomial σ ℂ)
+    (hx : algebraMap _ (ptLoc w) x ∈ J.map (algebraMap _ (ptLoc w)))
+    : ∃ s : MvPolynomial σ ℂ, eval w s ≠ 0 ∧ s * x ∈ J := by
   obtain ⟨⟨y, s⟩, hys⟩ := (IsLocalization.mem_map_algebraMap_iff (ptMax w).primeCompl _).1 hx
   rw [← map_mul] at hys
   obtain ⟨c, hc⟩ := (IsLocalization.eq_iff_exists (ptMax w).primeCompl _).1 hys
@@ -43,20 +44,25 @@ theorem exists_mul_mem_of_algebraMap_mem (w : σ → ℂ) (J : Ideal (MvPolynomi
 
 variable [Fintype σ]
 
-theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ)
-    (hw : w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn I) (S : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S]
-    [Algebra (ptLoc w) S] [Algebra (MvPolynomial σ ℂ) S] [IsScalarTower (MvPolynomial σ ℂ) (ptLoc w) S]
+theorem exists_of_isDiscreteValuationRing
+    (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ)
+    (hw : w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn I)
+    (S : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Algebra (ptLoc w) S]
+    [Algebra (MvPolynomial σ ℂ) S] [IsScalarTower (MvPolynomial σ ℂ) (ptLoc w) S]
     (hsurj : Function.Surjective (algebraMap (ptLoc w) S))
-    (hker : RingHom.ker (algebraMap (ptLoc w) S) = ptIdeal I w) :
-    ∃ (k : ℕ) (f : Fin k → MvPolynomial σ ℂ) (D : MvPolynomial σ ℂ),
-      k + 1 = Fintype.card σ ∧ (∀ j, f j ∈ I) ∧
-        LinearIndependent ℂ (fun j (i : σ) => eval w (pderiv i (f j))) ∧
-        eval w D ≠ 0 ∧ ∀ p ∈ I, D * p ∈ Ideal.span (Set.range f) := by
+    (hker : RingHom.ker (algebraMap (ptLoc w) S) = ptIdeal I w)
+    : ∃ (k : ℕ) (f : Fin k → MvPolynomial σ ℂ) (D : MvPolynomial σ ℂ),
+      k + 1 = Fintype.card σ ∧ (∀ j, f j ∈ I)
+        ∧ LinearIndependent ℂ (fun j (i : σ) => eval w (pderiv i (f j))) ∧ eval w D ≠ 0
+        ∧ ∀ p ∈ I, D * p ∈ Ideal.span (Set.range f) := by
   classical
-  have hRS : ∀ y, algebraMap (MvPolynomial σ ℂ) S y =
-      algebraMap (ptLoc w) S (algebraMap _ (ptLoc w) y) := fun y => IsScalarTower.algebraMap_apply _ _ _ y
+  have hRS
+      : ∀ y,
+        algebraMap (MvPolynomial σ ℂ) S y = algebraMap (ptLoc w) S (algebraMap _ (ptLoc w) y) :=
+    fun y => IsScalarTower.algebraMap_apply _ _ _ y
   have hIm : I ≤ ptMax w := fun q hq => RingHom.mem_ker.2 (hw q hq)
-  have hmax : (ptMax w).IsMaximal := RingHom.ker_isMaximal_of_surjective _ (fun c => ⟨C c, eval_C _⟩)
+  have hmax : (ptMax w).IsMaximal :=
+    RingHom.ker_isMaximal_of_surjective _ (fun c => ⟨C c, eval_C _⟩)
 
   have hcomapPS : (maximalIdeal S).comap (algebraMap (ptLoc w) S) = maximalIdeal (ptLoc w) :=
     eq_maximalIdeal (Ideal.comap_isMaximal_of_surjective _ hsurj)
@@ -69,25 +75,28 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
   have hunit : ∀ s : MvPolynomial σ ℂ, eval w s ≠ 0 → IsUnit (algebraMap _ S s) := by
     intro s hs
     rw [hRS]
-    exact (IsLocalization.map_units (ptLoc w) (⟨s, fun h => hs (RingHom.mem_ker.1 h)⟩ :
-      (ptMax w).primeCompl)).map _
-  have hspec : ∀ (a : MvPolynomial σ ℂ) (s : (ptMax w).primeCompl),
-      algebraMap (ptLoc w) S (IsLocalization.mk' (ptLoc w) a s) *
-        algebraMap _ S (s : MvPolynomial σ ℂ) = algebraMap _ S a := by
+    exact (IsLocalization.map_units (ptLoc w)
+      (⟨s, fun h => hs (RingHom.mem_ker.1 h)⟩ : (ptMax w).primeCompl)).map _
+  have hspec
+      : ∀ (a : MvPolynomial σ ℂ) (s : (ptMax w).primeCompl),
+        algebraMap (ptLoc w) S (IsLocalization.mk' (ptLoc w) a s)
+            * algebraMap _ S (s : MvPolynomial σ ℂ)
+          = algebraMap _ S a := by
     intro a s
     rw [hRS, hRS, ← map_mul, IsLocalization.mk'_spec]
 
   set V : Submodule ℂ (σ → ℂ) := (I.restrictScalars ℂ).map (grad w) with hV
 
-  have hQ : ∀ x : MvPolynomial σ ℂ, algebraMap _ S x ∈ maximalIdeal S ^ 2 →
-      grad w x ∈ V := by
+  have hQ : ∀ x : MvPolynomial σ ℂ, algebraMap _ S x ∈ maximalIdeal S ^ 2 → grad w x ∈ V := by
     intro x hx
-    have hx' : algebraMap (ptLoc w) S (algebraMap _ (ptLoc w) x) ∈
-        ((ptMax w ^ 2).map (algebraMap _ (ptLoc w))).map (algebraMap (ptLoc w) S) := by
+    have hx'
+        : algebraMap (ptLoc w) S (algebraMap _ (ptLoc w) x)
+          ∈ ((ptMax w ^ 2).map (algebraMap _ (ptLoc w))).map (algebraMap (ptLoc w) S) := by
       rw [Ideal.map_map, ← IsScalarTower.algebraMap_eq, Ideal.map_pow, hmap, ← hRS]
       exact hx
-    rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective _ hsurj, ← RingHom.ker_eq_comap_bot, hker, ptIdeal,
-      ← Ideal.map_sup] at hx'
+    rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective _ hsurj, ← RingHom.ker_eq_comap_bot, hker,
+        ptIdeal, ← Ideal.map_sup]
+      at hx'
     obtain ⟨s, hs, hsx⟩ := exists_mul_mem_of_algebraMap_mem w _ x hx'
     obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.1 hsx
     have hxm : eval w x = 0 := by
@@ -95,7 +104,8 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
       rw [RingHom.mem_ker, map_mul] at h1
       exact (mul_eq_zero.1 h1).resolve_left hs
     have h2 : eval w s • grad w x = grad w z := by
-      rw [← grad_mul_of_eval_eq_zero w s x hxm, ← hyz, map_add (f := _), grad_eq_zero_of_mem_sq w hy, zero_add]
+      rw [← grad_mul_of_eval_eq_zero w s x hxm, ← hyz, map_add (f := _),
+        grad_eq_zero_of_mem_sq w hy, zero_add]
     have h3 : grad w z ∈ V := ⟨z, hz, rfl⟩
     have h4 : grad w x = (eval w s)⁻¹ • grad w z := by
       rw [← h2, smul_smul, inv_mul_cancel₀ hs, one_smul]
@@ -107,18 +117,17 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
     have hXi : ∀ i, algebraMap _ S (X i - C (w i)) ∈ maximalIdeal S ^ 2 := by
       intro i
       obtain ⟨p, hp, hpg⟩ : Pi.single i (1 : ℂ) ∈ V := hVtop ▸ Submodule.mem_top
-      have hm : X i - C (w i) - p ∈ ptMax w :=
-        Ideal.sub_mem _ (by simp [RingHom.mem_ker]) (hIm hp)
+      have hm : X i - C (w i) - p ∈ ptMax w := Ideal.sub_mem _ (by simp [RingHom.mem_ker]) (hIm hp)
       have hg : grad w (X i - C (w i) - p) = 0 := by rw [map_sub, grad_X_sub_C, hpg, sub_self]
       have h2 := mem_sq_of_grad_eq_zero w hm hg
       have hp0 : algebraMap _ S p = 0 := by
         rw [hRS, ← RingHom.mem_ker, hker]
         exact Ideal.mem_map_of_mem _ hp
-      rw [show X i - C (w i) = (X i - C (w i) - p) + p by ring, map_add (f := _), hp0, add_zero, ← hmap,
-        ← Ideal.map_pow]
+      rw [show X i - C (w i) = (X i - C (w i) - p) + p by ring, map_add (f := _), hp0, add_zero,
+        ← hmap, ← Ideal.map_pow]
       exact Ideal.mem_map_of_mem _ h2
-    have hgen : maximalIdeal S =
-        Ideal.span (Set.range fun i => algebraMap _ S (X i - C (w i))) := by
+    have hgen
+        : maximalIdeal S = Ideal.span (Set.range fun i => algebraMap _ S (X i - C (w i))) := by
       rw [← hmap, show ptMax w = _ from ker_eval_eq_span w, Ideal.map_span, ← Set.range_comp]
       rfl
     have hle : maximalIdeal S ≤ maximalIdeal S • maximalIdeal S := by
@@ -127,8 +136,8 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
       rintro _ ⟨i, rfl⟩
       exact hXi i
     have hbot : maximalIdeal S = ⊥ :=
-      Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal S) (maximalIdeal S) (IsNoetherian.noetherian _) hle
-        (maximalIdeal_le_jacobson ⊥)
+      Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal S) (maximalIdeal S)
+        (IsNoetherian.noetherian _) hle (maximalIdeal_le_jacobson ⊥)
     exact IsDiscreteValuationRing.not_isField S (isField_iff_maximalIdeal_eq.2 hbot)
 
   have hres : ∀ b : S, ∃ c : ℂ, b - algebraMap (MvPolynomial σ ℂ) S (C c) ∈ maximalIdeal S := by
@@ -137,9 +146,11 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
     obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective (ptMax w).primeCompl p'
     have hs : eval w (s : MvPolynomial σ ℂ) ≠ 0 := fun h => s.2 (RingHom.mem_ker.2 h)
     refine ⟨eval w a / eval w (s : MvPolynomial σ ℂ), ?_⟩
-    have hmem : algebraMap _ S (a - C (eval w a / eval w (s : MvPolynomial σ ℂ)) * (s : MvPolynomial σ ℂ)) ∈
-        maximalIdeal S := by
-      rw [← Ideal.mem_comap, hcomap, RingHom.mem_ker, map_sub, map_mul, eval_C, div_mul_cancel₀ _ hs, sub_self]
+    have hmem
+        : algebraMap _ S (a - C (eval w a / eval w (s : MvPolynomial σ ℂ)) * (s : MvPolynomial σ ℂ))
+          ∈ maximalIdeal S := by
+      rw [← Ideal.mem_comap, hcomap, RingHom.mem_ker, map_sub, map_mul, eval_C,
+        div_mul_cancel₀ _ hs, sub_self]
     rw [← Ideal.mul_unit_mem_iff_mem _ (hunit _ hs), sub_mul, hspec, ← map_mul, ← map_sub]
     exact hmem
 
@@ -171,7 +182,8 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
     rw [Pi.basisFun_apply]
     exact hsup i
 
-  obtain ⟨N, g, hg⟩ := Submodule.fg_iff_exists_fin_generating_family.1 (Ideal.fg_of_isNoetherianRing I)
+  obtain ⟨N, g, hg⟩ :=
+    Submodule.fg_iff_exists_fin_generating_family.1 (Ideal.fg_of_isNoetherianRing I)
   have hgI : ∀ j, g j ∈ I := fun j => hg ▸ Submodule.subset_span ⟨j, rfl⟩
   have hVg : V = Submodule.span ℂ (Set.range (grad w ∘ g)) := by
     apply le_antisymm
@@ -224,26 +236,30 @@ theorem exists_of_isDiscreteValuationRing (I : Ideal (MvPolynomial σ ℂ)) (w :
     have h2 := mem_sq_of_grad_eq_zero w hzm hzg
     rw [show p = (p - ∑ j, C (c j) * f j) + ∑ j, C (c j) * f j by ring]
     exact Ideal.add_mem _ (Ideal.mem_sup_right h2)
-      (Ideal.mem_sup_left (Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
+      (Ideal.mem_sup_left (Ideal.sum_mem _ fun j _ =>
+        Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
 
-  have hcov : RingHom.ker (algebraMap (ptLoc w) S) ≤
-      Ideal.span (Set.range (algebraMap _ (ptLoc w) ∘ f)) ⊔ maximalIdeal (ptLoc w) ^ 2 := by
-    rw [hker, Set.range_comp, ← Ideal.map_span, ← Localization.AtPrime.map_eq_maximalIdeal, ← Ideal.map_pow,
-      ← Ideal.map_sup]
+  have hcov
+      : RingHom.ker (algebraMap (ptLoc w) S)
+        ≤ Ideal.span (Set.range (algebraMap _ (ptLoc w) ∘ f)) ⊔ maximalIdeal (ptLoc w) ^ 2 := by
+    rw [hker, Set.range_comp, ← Ideal.map_span, ← Localization.AtPrime.map_eq_maximalIdeal,
+      ← Ideal.map_pow, ← Ideal.map_sup]
     exact Ideal.map_mono hcovR
-  have hfker : ∀ j, (algebraMap _ (ptLoc w) ∘ f) j ∈ RingHom.ker (algebraMap (ptLoc w) S) :=
-    fun j => by rw [hker]; exact Ideal.mem_map_of_mem _ (hfI j)
+  have hfker
+      : ∀ j, (algebraMap _ (ptLoc w) ∘ f) j ∈ RingHom.ker (algebraMap (ptLoc w) S) := fun j => by
+    rw [hker]; exact Ideal.mem_map_of_mem _ (hfI j)
   have hμ : (maximalIdeal S).spanFinrank ≤ 1 := by
     rw [hgena]
-    calc (Ideal.span {algebraMap _ S a}).spanFinrank
-        ≤ ({algebraMap _ S a} : Set S).ncard :=
-          Submodule.spanFinrank_span_le_ncard_of_finite (Set.finite_singleton _)
+    calc
+      (Ideal.span {algebraMap _ S a}).spanFinrank ≤ ({algebraMap _ S a} : Set S).ncard :=
+        Submodule.spanFinrank_span_le_ncard_of_finite (Set.finite_singleton _)
       _ = 1 := Set.ncard_singleton _
   have hdim : ((1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim S := by
     rw [IsDiscreteValuationRing.ringKrullDim_eq_one]
     simp
-  have hIP := GroundTheory.Arith.Jacobian.ker_le_span_of_spanFinrank_le (P := ptLoc w) (S := S)
-    hsurj (algebraMap _ (ptLoc w) ∘ f) hfker hcov 1 hμ hdim
+  have hIP :=
+    GroundTheory.Arith.Jacobian.ker_le_span_of_spanFinrank_le (P := ptLoc w) (S := S) hsurj
+      (algebraMap _ (ptLoc w) ∘ f) hfker hcov 1 hμ hdim
 
   have hden : ∀ j, ∃ s : MvPolynomial σ ℂ, eval w s ≠ 0 ∧ s * g j ∈ Ideal.span (Set.range f) := by
     intro j

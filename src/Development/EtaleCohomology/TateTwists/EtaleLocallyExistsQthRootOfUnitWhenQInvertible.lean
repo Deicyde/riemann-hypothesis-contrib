@@ -4,7 +4,8 @@ public import Development.EtaleCohomology.TateTwists.FirstChernSpecOfRepresentat
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.FirstChernUniqueness
 
@@ -28,8 +29,11 @@ lemma loc_imp {U : Scheme.{0}} {P Q : ∀ V : Scheme.{0}, (V ⟶ U) → Prop} (h
   obtain ⟨S, hS, hSP⟩ := hP
   exact ⟨S, hS, fun V g hg => h V g (hSP V g hg)⟩
 
-def EtaleLocallyExistsQthRootOfUnitWhenQInvertible : Prop := ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}), IsUnit (q : Γ(U, ⊤)) → ∀ u : (Γ(U, ⊤))ˣ,
-  Loc U fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u
+def EtaleLocallyExistsQthRootOfUnitWhenQInvertible : Prop :=
+  ∀ (q : ℕ) [NeZero q] (U : Scheme.{0}),
+    IsUnit (q : Γ(U, ⊤))
+      → ∀ u : (Γ(U, ⊤))ˣ,
+        Loc U fun V g => ∃ v : (Γ(V, ⊤))ˣ, v ^ q = Units.map g.appTop.hom.toMonoidHom u
 
 lemma glMat_res {V U : Scheme.{0}} (g : V ⟶ U) (y : Sx (ofCat (glCat 1)) 1 U) :
     (glMat (y.res g) : Matrix (Fin 1) (Fin 1) Γ(V, ⊤)) = g.appTop.hom.mapMatrix (glMat y : Matrix (Fin 1) (Fin 1) Γ(U, ⊤)) := by

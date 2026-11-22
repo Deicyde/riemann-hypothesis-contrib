@@ -10,22 +10,31 @@ open GlobalTheory.ConvSer Polynomial
 
 namespace GlobalTheory.ConvSer
 
-theorem norm_coeff_prod_X_sub_C_le_pow {K : Type} [NormedField K] [IsUltrametricDist K]
-    (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) (S : Finset K) (hS : ∀ x ∈ S, ‖x‖ ≤ θ) (a : ℕ) :
-    ‖(∏ x ∈ S, (X - C x) : K[X]).coeff a‖ ≤ θ ^ (S.card - a) := by
+theorem norm_coeff_prod_X_sub_C_le_pow
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1)
+    (S : Finset K) (hS : ∀ x ∈ S, ‖x‖ ≤ θ)
+    (a : ℕ)
+    : ‖(∏ x ∈ S, (X - C x) : K[X]).coeff a‖ ≤ θ ^ (S.card - a) := by
   first
   | exact @_root_.GlobalTheory.RootProductCoeffBound.main
   | exact _root_.GlobalTheory.RootProductCoeffBound.main
   | (apply _root_.GlobalTheory.RootProductCoeffBound.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.RootProductCoeffBound.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.RootProductCoeffBound.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.RootProductCoeffBound.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.RootProductCoeffBound.main ..)
 
-theorem exists_pow_eq_interpolation {K : Type} [NormedField K] [IsUltrametricDist K]
-    (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) (S : Finset K) (hS : ∀ x ∈ S, ‖x‖ ≤ θ)
-    (hN : 0 < S.card) (k : ℕ) :
-    ∃ Q : K[X], (∀ a, S.card ≤ a → Q.coeff a = 0) ∧ (∀ a, ‖Q.coeff a‖ ≤ θ ^ (k - a)) ∧
-      ∀ x ∈ S, Q.eval x = x ^ k := by
+theorem exists_pow_eq_interpolation
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1)
+    (S : Finset K) (hS : ∀ x ∈ S, ‖x‖ ≤ θ) (hN : 0 < S.card)
+    (k : ℕ)
+    : ∃ Q : K[X],
+      (∀ a, S.card ≤ a → Q.coeff a = 0) ∧ (∀ a, ‖Q.coeff a‖ ≤ θ ^ (k - a))
+        ∧ ∀ x ∈ S, Q.eval x = x ^ k := by
   induction k with
   | zero =>
     refine ⟨1, fun a ha => ?_, fun a => ?_, by simp⟩
@@ -44,13 +53,15 @@ theorem exists_pow_eq_interpolation {K : Type} [NormedField K] [IsUltrametricDis
       rw [coeff_sub, coeff_X_mul, coeff_C_mul]
       rcases (show n = b ∨ n < b by omega) with rfl | h
       · have : P.coeff (n + 1) = 1 := by rw [← hPd]; exact hPm.coeff_natDegree
-        rw [this]; simp
+        rw [this]
+        simp
       · rw [hQ0 b (by omega), coeff_eq_zero_of_natDegree_lt (p := P) (by omega)]; simp
     · by_cases ha : n + 1 < a
       · obtain ⟨b, rfl⟩ : ∃ b, a = b + 1 := ⟨a - 1, by omega⟩
         rw [coeff_sub, coeff_X_mul, coeff_C_mul, hQ0 b (by omega),
           coeff_eq_zero_of_natDegree_lt (p := P) (by omega)]
-        simp; positivity
+        simp
+        positivity
       rw [coeff_sub, coeff_C_mul, sub_eq_add_neg]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
       · cases a with
@@ -59,9 +70,10 @@ theorem exists_pow_eq_interpolation {K : Type} [NormedField K] [IsUltrametricDis
           rw [coeff_X_mul]
           simpa using hQ1 a
       · rw [norm_neg, norm_mul]
-        calc _ ≤ θ ^ (k - n) * θ ^ (S.card - a) :=
-              mul_le_mul (hQ1 n) (norm_coeff_prod_X_sub_C_le_pow θ h0 h1 S hS a) (norm_nonneg _)
-                (by positivity)
+        calc
+          _ ≤ θ ^ (k - n) * θ ^ (S.card - a) :=
+            mul_le_mul (hQ1 n) (norm_coeff_prod_X_sub_C_le_pow θ h0 h1 S hS a) (norm_nonneg _)
+              (by positivity)
           _ = θ ^ (k - n + (S.card - a)) := by ring
           _ ≤ _ := pow_le_pow_of_le_one h0 h1 (by omega)
     · have : P.eval x = 0 := by
@@ -69,11 +81,13 @@ theorem exists_pow_eq_interpolation {K : Type} [NormedField K] [IsUltrametricDis
         exact Finset.prod_eq_zero hx (by simp)
       simp [this, hQ2 x hx, pow_succ']
 
-theorem exists_integral_interpolation_two :
-    ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (S : Finset K)
-      (H : MvPowerSeries (Fin 2) K), (∀ x ∈ S, ‖x‖ < 1) → Intg H →
-      ∃ c : Fin S.card → Fin S.card → K, (∀ a b, ‖c a b‖ ≤ 1) ∧ ∀ x ∈ S, ∀ y ∈ S,
-        ev H ![x, y] = ∑ a, ∑ b, c a b * x ^ (a : ℕ) * y ^ (b : ℕ) := by
+theorem exists_integral_interpolation_two
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (S : Finset K)
+        (H : MvPowerSeries (Fin 2) K),
+      (∀ x ∈ S, ‖x‖ < 1) → Intg H
+        → ∃ c : Fin S.card → Fin S.card → K,
+          (∀ a b, ‖c a b‖ ≤ 1)
+            ∧ ∀ x ∈ S, ∀ y ∈ S, ev H ![x, y] = ∑ a, ∑ b, c a b * x ^ (a : ℕ) * y ^ (b : ℕ) := by
   intro K _ _ _ S H hS hH
   rcases S.eq_empty_or_nonempty with rfl | hne
   · exact ⟨fun _ _ => 0, by simp, by simp⟩
@@ -106,8 +120,12 @@ theorem exists_integral_interpolation_two :
     intro a b
     refine Summable.of_norm_bounded ?_ (hT a b)
     have h : Summable (fun p : ℕ × ℕ => θ ^ (p.1 - a) * θ ^ (p.2 - b)) :=
-      Summable.mul_of_nonneg (f := fun k : ℕ => θ ^ (k - a)) (g := fun k : ℕ => θ ^ (k - b))
-        (hg a) (hg b) (fun _ => pow_nonneg h0 _) (fun _ => pow_nonneg h0 _)
+      Summable.mul_of_nonneg
+        (f := fun k : ℕ => θ ^ (k - a))
+        (g := fun k : ℕ => θ ^ (k - b))
+        (hg a) (hg b)
+        (fun _ => pow_nonneg h0 _)
+        (fun _ => pow_nonneg h0 _)
     have hinj : Function.Injective (fun ν : Fin 2 →₀ ℕ => (ν 0, ν 1)) := by
       intro ν μ h
       simp only [Prod.mk.injEq] at h
@@ -119,13 +137,14 @@ theorem exists_integral_interpolation_two :
     simpa only [Function.comp_def] using h'
   refine ⟨fun a b => ∑' ν, T a b ν, fun a b => ?_, fun x hx y hy => ?_⟩
   · refine IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg zero_le_one (fun ν => ?_)
-    exact (hT a b ν).trans (mul_le_one₀ (pow_le_one₀ h0 h1.le) (by positivity)
-      (pow_le_one₀ h0 h1.le))
-  · have h : HasSum (fun ν => ∑ a : Fin S.card, ∑ b : Fin S.card,
-        T a b ν * x ^ (a : ℕ) * y ^ (b : ℕ))
+    exact (hT a b ν).trans
+      (mul_le_one₀ (pow_le_one₀ h0 h1.le) (by positivity) (pow_le_one₀ h0 h1.le))
+  · have h : HasSum
+        (fun ν =>
+          ∑ a : Fin S.card, ∑ b : Fin S.card,
+            T a b ν * x ^ (a : ℕ) * y ^ (b : ℕ))
         (∑ a : Fin S.card, ∑ b : Fin S.card, (∑' ν, T a b ν) * x ^ (a : ℕ) * y ^ (b : ℕ)) :=
-      hasSum_sum fun a _ => hasSum_sum fun b _ =>
-        ((hsum a b).hasSum.mul_right _).mul_right _
+      hasSum_sum fun a _ => hasSum_sum fun b _ => ((hsum a b).hasSum.mul_right _).mul_right _
     rw [← h.tsum_eq, ev]
     congr 1
     funext ν

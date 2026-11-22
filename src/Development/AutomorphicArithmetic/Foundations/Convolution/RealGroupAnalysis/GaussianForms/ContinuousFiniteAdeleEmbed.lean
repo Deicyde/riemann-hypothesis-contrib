@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -17,16 +19,19 @@ private lemma exists_cube {ι Y : Type} [Finite ι] [TopologicalSpace Y] {y₀ :
   obtain ⟨I, t, ht, hsub⟩ := hW
   exact ⟨⋂ i, t i, Filter.iInter_mem.2 ht, fun y hy => hsub fun i _ => Set.mem_iInter.1 (hy i) i⟩
 
-private noncomputable def fin0 {F : Type} [Field F] [NumberField F] (x : FiniteAdeleRing (𝓞 F) F) : A F := (0, x)
+private noncomputable def fin0 {F : Type} [Field F] [NumberField F] (x : FiniteAdeleRing (𝓞 F) F)
+    : A F :=
+  (0, x)
 
 private lemma continuous_finiteAdeleEmbed {F : Type} [Field F] [NumberField F] :
     Continuous (fin0 (F := F)) :=
   show Continuous fun x : FiniteAdeleRing (𝓞 F) F => ((0, x) : InfiniteAdeleRing F × FiniteAdeleRing (𝓞 F) F) from
     continuous_const.prodMk continuous_id
 
-private noncomputable def oneAdd {F : Type} [Field F] [NumberField F]
-    (X : Fin 2 × Fin 2 → FiniteAdeleRing (𝓞 F) F) : Matrix (Fin 2) (Fin 2) (A F) :=
-  fun i j => (1 : Matrix (Fin 2) (Fin 2) (A F)) i j + fin0 (X (i, j))
+private noncomputable def oneAdd
+    {F : Type} [Field F] [NumberField F] (X : Fin 2 × Fin 2 → FiniteAdeleRing (𝓞 F) F)
+    : Matrix (Fin 2) (Fin 2) (A F) := fun i j =>
+  (1 : Matrix (Fin 2) (Fin 2) (A F)) i j + fin0 (X (i, j))
 
 private lemma continuous_oneAdd {F : Type} [Field F] [NumberField F] :
     Continuous (oneAdd (F := F)) := by
@@ -39,15 +44,15 @@ private lemma oneAdd_zero {F : Type} [Field F] [NumberField F] :
   change (1 : Matrix (Fin 2) (Fin 2) (A F)) i j + 0 = _
   exact add_zero _
 
-theorem UpperTheory.ConvolutionTheory.R2.C.unrOf :
-    ∀ (F : Type) [Field F] [NumberField F] (P : G1 F → Prop), (∀ᶠ g in 𝓝 (1 : G1 F), InfOne g → P g) → ∀ᶠ v in cofinite, ∀ g, At v g → IntAt v g → P g := by
+theorem UpperTheory.ConvolutionTheory.R2.C.unrOf
+    : ∀ (F : Type) [Field F] [NumberField F] (P : G1 F → Prop),
+      (∀ᶠ g in 𝓝 (1 : G1 F), InfOne g → P g) → ∀ᶠ v in cofinite, ∀ g, At v g → IntAt v g → P g := by
   intro F _ _ P h
   have hind : IsInducing (fun g : G1 F => (g : Matrix (Fin 2) (Fin 2) (A F))) :=
     Matrix.SpecialLinearGroup.isClosedEmbedding_val.isInducing
   rw [Filter.Eventually, hind.nhds_eq_comap, Filter.mem_comap] at h
   obtain ⟨S, hS, hSP⟩ := h
-  have h1 : S ∈ 𝓝 (oneAdd (F := F) fun _ => 0) := by
-    rw [oneAdd_zero]; simpa using hS
+  have h1 : S ∈ 𝓝 (oneAdd (F := F) fun _ => 0) := by rw [oneAdd_zero]; simpa using hS
   have h2 := continuous_oneAdd.continuousAt.preimage_mem_nhds h1
   obtain ⟨U, hU, hUS⟩ := exists_cube h2
   obtain ⟨J, hJ⟩ := exists_idealFiniteAdeles_subset hU

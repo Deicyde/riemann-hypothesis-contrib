@@ -9,8 +9,9 @@ noncomputable section
 namespace Formalism.CoboundaryTransfers
 
 section DiagramChase₂
-variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {B : Base O A} {M : ℕ}
-  {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+variable
+  {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+  {B : Base O A} {M : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
   {D' : Type} [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
 
 lemma chase_qpow_bij (W : WachMod B M D) (j : ℕ) :
@@ -162,11 +163,16 @@ theorem cocycleLiftOfExact_holds : DiagramChase₂ := by
   have hC2 : W₀.C2 ω := ⟨s₀, qsat s₀ (by rw [hs₀]; exact hsmem), hωs₀⟩
 
   obtain ⟨m, hm, hpm⟩ := hC x hx
-  have hpu : S.π.f (((B.p : O) ^ e) • y₁ - (W₁.φ m - m)) = ((B.p : O) ^ k) • (((B.p : O) ^ e) • y) := by
-    rw [map_sub, map_sub, hpO, hpφ, hpy₁, hpm, map_smul W₂.φ, smul_add, smul_sub, smul_comm ((B.p : O) ^ e) ((B.p : O) ^ k) y]
+  have hpu
+      : S.π.f (((B.p : O) ^ e) • y₁ - (W₁.φ m - m)) = ((B.p : O) ^ k) • (((B.p : O) ^ e) • y) := by
+    rw [map_sub, map_sub, hpO, hpφ, hpy₁, hpm, map_smul W₂.φ, smul_add, smul_sub,
+      smul_comm ((B.p : O) ^ e) ((B.p : O) ^ k) y]
     abel
-  have hpv : S.π.f (((B.p : O) ^ e) • z₁ - (W₁.γ m - m)) = ((B.p : O) ^ k) • (((B.p : O) ^ e) • (B.X • n)) := by
-    rw [map_sub, map_sub, hpO, hpγ, hpz₁, hpm, map_smul W₂.γ, smul_add, smul_sub, smul_comm ((B.p : O) ^ e) ((B.p : O) ^ k) (B.X • n)]
+  have hpv
+      : S.π.f (((B.p : O) ^ e) • z₁ - (W₁.γ m - m))
+        = ((B.p : O) ^ k) • (((B.p : O) ^ e) • (B.X • n)) := by
+    rw [map_sub, map_sub, hpO, hpγ, hpz₁, hpm, map_smul W₂.γ, smul_add, smul_sub,
+      smul_comm ((B.p : O) ^ e) ((B.p : O) ^ k) (B.X • n)]
     abel
   have hα0 : S.π.f (((B.p : O) ^ k) • yt - (((B.p : O) ^ e) • y₁ - (W₁.φ m - m))) = 0 := by
     rw [map_sub, hpO, hpyt, hpu, sub_self]
@@ -174,8 +180,10 @@ theorem cocycleLiftOfExact_holds : DiagramChase₂ := by
     rw [map_sub, hpO, hpzt, hpv, sub_self]
   obtain ⟨α, hα⟩ := (S.exact _).1 hα0
   obtain ⟨β, hβ⟩ := (S.exact _).1 hβ0
-  have hduv : W₁.d1 (((B.p : O) ^ e) • y₁ - (W₁.φ m - m)) (((B.p : O) ^ e) • z₁ - (W₁.γ m - m)) = 0 := by
-    rw [diffOne_sub, WachMod_d1_smul, hd₁, smul_zero, WachMod_d1_phi_sub_gamma_sub_eq_zero, sub_zero]
+  have hduv
+      : W₁.d1 (((B.p : O) ^ e) • y₁ - (W₁.φ m - m)) (((B.p : O) ^ e) • z₁ - (W₁.γ m - m)) = 0 := by
+    rw [diffOne_sub, WachMod_d1_smul, hd₁, smul_zero, WachMod_d1_phi_sub_gamma_sub_eq_zero,
+      sub_zero]
   have hdαβ : W₀.d1 α β = ((B.p : O) ^ k) • ω := by
     apply S.ι_inj
     rw [map_diffOne, hα, hβ, diffOne_sub, hduv, sub_zero, WachMod_d1_smul, ← hω, hiO]
@@ -184,7 +192,8 @@ theorem cocycleLiftOfExact_holds : DiagramChase₂ := by
   have hQα : W₀.QInv α := qsat α (by rw [hα]; exact chase_Q_sub W₁ (chase_Q_smul W₁ _ hQyt) hQu)
   obtain ⟨m', hm', hγm⟩ := W₁.γ_N m hm
   have hiβ : S.ι.f β = B.X • (((B.p : O) ^ k) • b - (((B.p : O) ^ e) • n₁ - m')) := by
-    rw [hβ, hz₁, hγm, smul_sub, smul_sub, smul_comm B.X ((B.p : O) ^ k) b, smul_comm B.X ((B.p : O) ^ e) n₁]
+    rw [hβ, hz₁, hγm, smul_sub, smul_sub, smul_comm B.X ((B.p : O) ^ k) b,
+      smul_comm B.X ((B.p : O) ^ e) n₁]
   have hKb : ((B.p : O) ^ k) • b - (((B.p : O) ^ e) • n₁ - m') ∈ W₁.N :=
     W₁.N.sub_mem (W₁.N.smul_of_tower_mem _ hb) (W₁.N.sub_mem (W₁.N.smul_of_tower_mem _ hn₁) hm')
   obtain ⟨β₀, hβ₀, hββ₀⟩ := key β _ hiβ

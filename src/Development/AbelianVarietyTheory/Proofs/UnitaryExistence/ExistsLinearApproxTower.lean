@@ -85,10 +85,11 @@ omit [NumberField E] in
 lemma mulVec_nsmul (g : Matrix (Fin n) (Fin n) (RA F E)) (N : ℕ) (z : Fin n → RA F E) :
     g *ᵥ (N • z) = N • (g *ᵥ z) := map_nsmul g.mulVecLin N z
 
-def rel (L Λ : Submodule (𝓞 E) (Fin n → E)) (g : Matrix (Fin n) (Fin n) (RA F E)) (N : ℕ) :
-    Submodule (𝓞 E) (L × Λ) where
-  carrier := {p | ∃ w ∈ hat F (L : Set (Fin n → E)),
-    fv F (p.2 : Fin n → E) = g *ᵥ (fv F (p.1 : Fin n → E) + N • w)}
+def rel (L Λ : Submodule (𝓞 E) (Fin n → E)) (g : Matrix (Fin n) (Fin n) (RA F E)) (N : ℕ)
+    : Submodule (𝓞 E) (L × Λ) where
+  carrier :=
+    {p | ∃ w ∈ hat F (L : Set (Fin n → E)),
+      fv F (p.2 : Fin n → E) = g *ᵥ (fv F (p.1 : Fin n → E) + N • w)}
   zero_mem' := ⟨0, zero_mem _, by simp [fv_zero]⟩
   add_mem' := by
     rintro p q ⟨w, hw, hp⟩ ⟨w', hw', hq⟩
@@ -106,34 +107,57 @@ def rel (L Λ : Submodule (𝓞 E) (Fin n → E)) (g : Matrix (Fin n) (Fin n) (R
 end GlobalTheory.AdLat.Tower
 
 open GlobalTheory.AdLat.Tower in
-theorem GlobalTheory.AdLat.exists_linear_approx_tower : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (g : GL (Fin n) (RA F E)) (Λ : Submodule (𝓞 E) (Fin n → E)), L.FG → Submodule.span E (L : Set (Fin n → E)) = ⊤ → (Λ : Set (Fin n → E)) = latOf F (g : Matrix (Fin n) (Fin n) (RA F E)) L → ∃ f : ℕ → (L →ₗ[𝓞 E] Λ), (∀ N : ℕ, 0 < N → ∀ a : L, ∃ w ∈ (hat F (L : Set (Fin n → E))), fv F (f N a : Fin n → E) = (g : Matrix (Fin n) (Fin n) (RA F E)) *ᵥ (fv F (a : Fin n → E) + N • w)) ∧ (∀ N m : ℕ, 0 < N → 0 < m → ∀ a, ∃ v, f (N * m) a = f N a + N • v) ∧ ∀ N : ℕ, 0 < N → (∀ a, (∃ v, f N a = N • v) ↔ ∃ v, a = N • v) ∧ ∀ a', ∃ a v, a' = f N a + N • v := by
+theorem GlobalTheory.AdLat.exists_linear_approx_tower
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
+        (L : Submodule (𝓞 E) (Fin n → E)) (g : GL (Fin n) (RA F E))
+        (Λ : Submodule (𝓞 E) (Fin n → E)),
+      L.FG → Submodule.span E (L : Set (Fin n → E)) = ⊤
+        → (Λ : Set (Fin n → E)) = latOf F (g : Matrix (Fin n) (Fin n) (RA F E)) L
+        → ∃ f : ℕ → (L →ₗ[𝓞 E] Λ),
+          (∀ N : ℕ,
+              0 < N
+                → ∀ a : L, ∃ w ∈ (hat F (L : Set (Fin n → E))),
+                  fv F (f N a : Fin n → E)
+                    = (g : Matrix (Fin n) (Fin n) (RA F E)) *ᵥ (fv F (a : Fin n → E) + N • w))
+            ∧ (∀ N m : ℕ, 0 < N → 0 < m → ∀ a, ∃ v, f (N * m) a = f N a + N • v)
+            ∧ ∀ N : ℕ,
+              0 < N
+                → (∀ a, (∃ v, f N a = N • v) ↔ ∃ v, a = N • v)
+                  ∧ ∀ a', ∃ a v, a' = f N a + N • v := by
   intro F E _ _ _ _ _ n L g Λ hL hsp hΛ
-  obtain ⟨Λ', h1, hΛfg, hΛsp, hhat⟩ := GlobalTheory.T.exists_lattice_rationalVectorsInAdelicTranslate F E n L g hL hsp
+  obtain ⟨Λ', h1, hΛfg, hΛsp, hhat⟩ :=
+    GlobalTheory.T.exists_lattice_rationalVectorsInAdelicTranslate F E n L g hL hsp
   obtain rfl : Λ = Λ' := SetLike.coe_injective (hΛ.trans h1.symm)
-  obtain ⟨hLc, hLa, -, -⟩ := GlobalTheory.T.adelicCompletion_rational_points_and_approximation F E n L hL hsp
-  obtain ⟨hΛc, hΛa, -, -⟩ := GlobalTheory.T.adelicCompletion_rational_points_and_approximation F E n Λ hΛfg hΛsp
+  obtain ⟨hLc, hLa, -, -⟩ :=
+    GlobalTheory.T.adelicCompletion_rational_points_and_approximation F E n L hL hsp
+  obtain ⟨hΛc, hΛa, -, -⟩ :=
+    GlobalTheory.T.adelicCompletion_rational_points_and_approximation F E n Λ hΛfg hΛsp
   set G : Matrix (Fin n) (Fin n) (RA F E) := g.val with hG
   have hto : ∀ u ∈ hat F (L : Set (Fin n → E)), G *ᵥ u ∈ hat F (Λ : Set (Fin n → E)) := by
     intro u hu
     rw [← SetLike.mem_coe, hhat]
     exact ⟨u, hu, rfl⟩
-  have hfrom : ∀ z ∈ hat F (Λ : Set (Fin n → E)), ∃ u ∈ hat F (L : Set (Fin n → E)), G *ᵥ u = z := by
+  have hfrom
+      : ∀ z ∈ hat F (Λ : Set (Fin n → E)), ∃ u ∈ hat F (L : Set (Fin n → E)), G *ᵥ u = z := by
     intro z hz
     rw [← SetLike.mem_coe, hhat] at hz
     exact hz
   have hinj : ∀ u u' : Fin n → RA F E, G *ᵥ u = G *ᵥ u' → u = u' := by
     intro u u' h
-    have := congrArg (fun t => ((g⁻¹ : GL (Fin n) (RA F E)) : Matrix (Fin n) (Fin n) (RA F E)) *ᵥ t) h
+    have :=
+      congrArg (fun t => ((g⁻¹ : GL (Fin n) (RA F E)) : Matrix (Fin n) (Fin n) (RA F E)) *ᵥ t) h
     simp only [hG, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec] at this
     exact this
   haveI := projective_of_fg L hL
-  have key : ∀ N : ℕ, ∃ f : L →ₗ[𝓞 E] Λ, 0 < N → ∀ a : L, ∃ w ∈ hat F (L : Set (Fin n → E)),
-      fv F (f a : Fin n → E) = G *ᵥ (fv F (a : Fin n → E) + N • w) := by
+  have key
+      : ∀ N : ℕ, ∃ f : L →ₗ[𝓞 E] Λ,
+        0 < N
+          → ∀ a : L, ∃ w ∈ hat F (L : Set (Fin n → E)),
+            fv F (f a : Fin n → E) = G *ᵥ (fv F (a : Fin n → E) + N • w) := by
     intro N
     rcases Nat.eq_zero_or_pos N with h0 | hN
     · exact ⟨0, fun h => absurd h (by omega)⟩
-    have hsurj : Function.Surjective
-        ((LinearMap.fst (𝓞 E) L Λ).comp (rel L Λ G N).subtype) := by
+    have hsurj : Function.Surjective ((LinearMap.fst (𝓞 E) L Λ).comp (rel L Λ G N).subtype) := by
       intro a
       obtain ⟨x, hx, w, hw, e⟩ := hΛa N hN _ (hto _ ((hLc a).2 a.2))
       obtain ⟨u, hu, rfl⟩ := hfrom w hw
@@ -151,8 +175,8 @@ theorem GlobalTheory.AdLat.exists_linear_approx_tower : ∀ (F E : Type) [Field 
   · intro N m hN hm a
     obtain ⟨w, hw, e⟩ := hf N hN a
     obtain ⟨w', hw', e'⟩ := hf (N * m) (Nat.mul_pos hN hm) a
-    obtain ⟨v, hv⟩ := exists_div hΛc hN (f (N * m) a - f N a)
-      (hto _ (sub_mem (nsmul_mem hw' m) hw)) (by
+    obtain ⟨v, hv⟩ :=
+      exists_div hΛc hN (f (N * m) a - f N a) (hto _ (sub_mem (nsmul_mem hw' m) hw)) (by
         rw [Submodule.coe_sub, fv_sub, e, e', ← mulVec_nsmul, ← Matrix.mulVec_sub, smul_sub,
           mul_smul]
         congr 1
@@ -172,8 +196,9 @@ theorem GlobalTheory.AdLat.exists_linear_approx_tower : ∀ (F E : Type) [Field 
     · obtain ⟨u, hu, eu⟩ := hfrom _ ((hΛc a').2 a'.2)
       obtain ⟨x, hx, w, hw, rfl⟩ := hLa N hN u hu
       obtain ⟨w', hw', e'⟩ := hf N hN ⟨x, hx⟩
-      obtain ⟨v, hv⟩ := exists_div hΛc hN (a' - f N ⟨x, hx⟩) (hto _ (sub_mem hw hw')) (by
-        rw [Submodule.coe_sub, fv_sub, ← eu, e', ← mulVec_nsmul, ← Matrix.mulVec_sub, smul_sub]
-        congr 1
-        abel)
+      obtain ⟨v, hv⟩ :=
+        exists_div hΛc hN (a' - f N ⟨x, hx⟩) (hto _ (sub_mem hw hw')) (by
+          rw [Submodule.coe_sub, fv_sub, ← eu, e', ← mulVec_nsmul, ← Matrix.mulVec_sub, smul_sub]
+          congr 1
+          abel)
       exact ⟨⟨x, hx⟩, v, by rw [← hv]; abel⟩

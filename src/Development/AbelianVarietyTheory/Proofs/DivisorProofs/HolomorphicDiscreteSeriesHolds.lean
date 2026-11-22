@@ -22,9 +22,11 @@ theorem holomorphicDiscreteSeries_holds : GlobalTheory.Published.HolomorphicDisc
   haveI := hc
   haveI := hnt
   obtain ⟨D, E, hK⟩ := GlobalTheory.T.exists_kFiniteModule_irreducible_unitary n ε H σ hU hI
-  have low := GlobalTheory.T.lowestKTypeSpace_holomorphicKModule_killed n ε H σ D E lam hHC hHol hDS hK
+  have low :=
+    GlobalTheory.T.lowestKTypeSpace_holomorphicKModule_killed n ε H σ D E lam hHC hHol hDS hK
   refine ⟨?_, ?_, ?_, ?_⟩
-  · exact fun μ S hS => GlobalTheory.T.kType_weight_mem_cone_over_lowest_kType n ε H σ D E lam hHC hHol hDS hK μ S hS
+  · exact fun μ S hS =>
+      GlobalTheory.T.kType_weight_mem_cone_over_lowest_kType n ε H σ D E lam hHC hHol hDS hK μ S hS
   · exact fun v hv => GlobalTheory.T.kFinite_smoothVec_of_irreducible_unitaryRep n ε H σ hU hI v hv
   · intro Z hZ v hv
     let vD : D := ⟨v, low.1 hv⟩
@@ -35,10 +37,11 @@ theorem holomorphicDiscreteSeries_holds : GlobalTheory.Published.HolomorphicDisc
       · rw [low.2.2.2 b a hab.2 hab.1 vD hx, smul_zero]
       · rw [hZ a b hab, zero_smul]
     change GlobalTheory.SmVec.dRepC (Formalism.REAL.Jm ε) σ Z (vD : H) = 0
-    rw [GlobalTheory.T.complexifiedDerivedAction_eq_sum_kFiniteModule n ε H σ D E hK Z vD,
-      h0, Submodule.coe_zero]
+    rw [GlobalTheory.T.complexifiedDerivedAction_eq_sum_kFiniteModule n ε H σ D E hK Z vD, h0,
+      Submodule.coe_zero]
   · intro v
-    rw [GlobalTheory.T.raisingSpan_eq_map_span_words_of_isKMod n ε H σ D E hK _ low.1, GlobalTheory.T.kFinite_span_raisingOperator_words_lowestKType n ε H σ D E lam hHC hHol hDS hK,
+    rw [GlobalTheory.T.raisingSpan_eq_map_span_words_of_isKMod n ε H σ D E hK _ low.1,
+      GlobalTheory.T.kFinite_span_raisingOperator_words_lowestKType n ε H σ D E lam hHC hHol hDS hK,
       Submodule.map_top, Submodule.range_subtype]
     exact (hK.mem v).symm
 

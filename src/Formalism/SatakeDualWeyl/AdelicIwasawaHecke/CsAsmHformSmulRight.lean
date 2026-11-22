@@ -14,40 +14,49 @@ namespace Formalism.UG.P
 
 open Formalism.UG Formalism.UG.CS
 
-theorem csAsm_hform_smul_right {E : Type} [Field E] (σ : E →+* E) {n : Type} [Fintype n]
-    (J : Matrix n n E) (c : E) (y x : n → E) :
-    hform σ J y (c • x) = c * hform σ J y x := by
+theorem csAsm_hform_smul_right
+    {E : Type} [Field E]
+    (σ : E →+* E)
+    {n : Type} [Fintype n]
+    (J : Matrix n n E) (c : E) (y x : n → E)
+    : hform σ J y (c • x) = c * hform σ J y x := by
   unfold Formalism.UG.hform
   simp [Matrix.mulVec_smul, dotProduct_smul, Finset.mul_sum, smul_eq_mul, mul_left_comm]
 
-theorem csAsm_gmap_mul {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (a b : V ≃ₗ[K] V)
-    (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap (a * b) L = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
+theorem csAsm_gmap_mul
+    {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+    [Module R V] [IsScalarTower R K V]
+    (a b : V ≃ₗ[K] V) (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap (a * b) L
+      = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
   unfold Formalism.HermitianLatticesTheory.gmap
   rw [← Submodule.map_comp]
-  first
-  | rfl
-  | (congr 1; ext x; simp [LinearEquiv.mul_apply])
+  first | rfl | (congr 1; ext x; simp [LinearEquiv.mul_apply])
 
-theorem csAsm_gmap_one {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
+theorem csAsm_gmap_one
+    {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+    [Module R V] [IsScalarTower R K V]
+    (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
   unfold Formalism.HermitianLatticesTheory.gmap
   simp
 
-theorem csAsm_gmap_inv {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (a : V ≃ₗ[K] V)
-    (L : Submodule R V) :
-    Formalism.HermitianLatticesTheory.gmap a⁻¹ (Formalism.HermitianLatticesTheory.gmap a L) = L := by
+theorem csAsm_gmap_inv
+    {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+    [Module R V] [IsScalarTower R K V]
+    (a : V ≃ₗ[K] V) (L : Submodule R V)
+    : Formalism.HermitianLatticesTheory.gmap a⁻¹ (Formalism.HermitianLatticesTheory.gmap a L)
+      = L := by
   rw [← csAsm_gmap_mul, inv_mul_cancel, csAsm_gmap_one]
 
-theorem classSetFiniteL_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos : Formalism.UG.CS.TracePos)
+theorem classSetFiniteL_of
+    (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos : Formalism.UG.CS.TracePos)
     (hFormSymm : Formalism.UG.CS.FormSymm) (hIsomUJ : Formalism.UG.CS.IsomUJ)
     (hGlobLatLattice : Formalism.UG.CS.GlobLatLattice) (hClassInj : Formalism.UG.CS.ClassInj)
     (hScaleBound : Formalism.UG.CS.ScaleBound) (hDualBound : Formalism.UG.CS.DualBound)
-    (hClassSetFiniteBdd : Formalism.UG.CS.ClassSetFiniteBdd) (hStdLatFull : Formalism.UG.CS.StdLatFull) :
-    Formalism.UG.ClassSetFiniteL := by
+    (hClassSetFiniteBdd : Formalism.UG.CS.ClassSetFiniteBdd)
+    (hStdLatFull : Formalism.UG.CS.StdLatFull)
+    : Formalism.UG.ClassSetFiniteL := by
   intro F E _ _ _ _ _ n _ _ σ J hσ hJ hdet hdef Λ hfin hspan
   have hinv : ∀ e, (σ : E →+* E) ((σ : E →+* E) e) = e := fun e => hSigmaInvol F E σ hσ e
   obtain ⟨c, hc0, hcpos⟩ := hTracePos F E n σ J hdef
@@ -58,9 +67,7 @@ theorem classSetFiniteL_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos
   have hcF : ((c : 𝓞 F) : F) ≠ 0 := by
     intro h
     apply hc0
-    first
-    | exact_mod_cast h
-    | exact RingOfIntegers.ext h
+    first | exact_mod_cast h | exact RingOfIntegers.ext h
   have hcE0 : cE ≠ 0 := by
     rw [hcE]
     exact (map_ne_zero _).mpr hcF
@@ -79,10 +86,14 @@ theorem classSetFiniteL_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos
     intro x hx
     rw [hfe]
     exact hcpos x hx
-  obtain ⟨s, hs⟩ := hClassSetFiniteBdd E (n → E) (formJ (σ : E →+* E) hinv J cE) hsymm hpos d (e * cO) hd0
-    (mul_ne_zero he0 hcO0)
-  have key : ∀ g : UPts σ J (FiniteAdeleRing (𝓞 F) F), ∃ N ∈ s, ∃ φ ∈ Formalism.HermitianLatticesTheory.isom (formJ (σ : E →+* E) hinv J cE),
-      Formalism.HermitianLatticesTheory.gmap φ N = globLat (g : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ := by
+  obtain ⟨s, hs⟩ :=
+    hClassSetFiniteBdd E (n → E) (formJ (σ : E →+* E) hinv J cE) hsymm hpos d (e * cO) hd0
+      (mul_ne_zero he0 hcO0)
+  have key
+      : ∀ g : UPts σ J (FiniteAdeleRing (𝓞 F) F), ∃ N ∈ s,
+        ∃ φ ∈ Formalism.HermitianLatticesTheory.isom (formJ (σ : E →+* E) hinv J cE),
+          Formalism.HermitianLatticesTheory.gmap φ N
+            = globLat (g : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ := by
     intro g
     apply hs
     · exact hGlobLatLattice F E n Λ hfin hspan g
@@ -94,10 +105,12 @@ theorem classSetFiniteL_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos
       show algebraMap (𝓞 E) E d * hform (σ : E →+* E) J x y * cE = algebraMap (𝓞 E) E d * (cE * hform (σ : E →+* E) J x y)
       ring
     · intro x hx
-      simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-        LinearMap.restrictScalars_apply, Submodule.mem_one] at hx
-      have hx' : ∀ y ∈ globLat (g : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ,
-          hform (σ : E →+* E) J y (cE • x) ∈ (algebraMap (𝓞 E) E).range := by
+      simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+          Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
+        at hx
+      have hx'
+          : ∀ y ∈ globLat (g : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ,
+            hform (σ : E →+* E) J y (cE • x) ∈ (algebraMap (𝓞 E) E).range := by
         intro y hy
         obtain ⟨o, ho⟩ := hx y hy
         rw [hfe] at ho
@@ -110,37 +123,53 @@ theorem classSetFiniteL_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos
       rw [map_mul, hcOE, smul_smul]
   classical
   choose N hN φ hφ hφN using key
-  let f : ClassSet ((ratPts σ J (FiniteAdeleRing (𝓞 F) F)).subgroupOf (UPts σ J (FiniteAdeleRing (𝓞 F) F)))
-      ((levelAfL σ J Λ).subgroupOf (UPts σ J (FiniteAdeleRing (𝓞 F) F))) → s :=
-    fun q => ⟨N (Quotient.out q), hN (Quotient.out q)⟩
+  let f
+      : ClassSet
+          ((ratPts σ J (FiniteAdeleRing (𝓞 F) F)).subgroupOf (UPts σ J (FiniteAdeleRing (𝓞 F) F)))
+          ((levelAfL σ J Λ).subgroupOf (UPts σ J (FiniteAdeleRing (𝓞 F) F)))
+        → s := fun q =>
+    ⟨N (Quotient.out q), hN (Quotient.out q)⟩
   have hf : Function.Injective f := by
     intro q1 q2 h12
     have hNN : N (Quotient.out q1) = N (Quotient.out q2) := congrArg Subtype.val h12
-    obtain ⟨γ, hγ⟩ : ∃ γ : GL n E, glEquiv γ = φ (Quotient.out q1) * (φ (Quotient.out q2))⁻¹ :=
-      ⟨Matrix.GeneralLinearGroup.toLin.symm ((LinearMap.GeneralLinearGroup.generalLinearEquiv E (n → E)).symm
-        (φ (Quotient.out q1) * (φ (Quotient.out q2))⁻¹)), by simp [glEquiv]⟩
+    obtain ⟨γ, hγ⟩ : ∃ γ : GL n E, glEquiv γ = φ (Quotient.out q1) * (φ (Quotient.out q2))⁻¹ := ⟨
+      Matrix.GeneralLinearGroup.toLin.symm
+        ((LinearMap.GeneralLinearGroup.generalLinearEquiv E (n → E)).symm
+          (φ (Quotient.out q1) * (φ (Quotient.out q2))⁻¹)),
+      by simp [glEquiv]
+    ⟩
     have hUJ : γ ∈ UJ (σ : E →+* E) J :=
       (hIsomUJ E (σ : E →+* E) hinv n J cE hcE0 hσc γ).mpr (by
         rw [hγ]
         exact mul_mem (hφ _) (inv_mem (hφ _)))
-    have hlat : globLat ((Quotient.out q1 : UPts σ J (FiniteAdeleRing (𝓞 F) F)) : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ =
-        Formalism.HermitianLatticesTheory.gmap (glEquiv γ) (globLat ((Quotient.out q2 : UPts σ J (FiniteAdeleRing (𝓞 F) F)) :
-          GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) Λ) := by
+    have hlat
+        : globLat
+            ((Quotient.out q1 : UPts σ J (FiniteAdeleRing (𝓞 F) F))
+              : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
+            Λ
+          = Formalism.HermitianLatticesTheory.gmap (glEquiv γ)
+            (globLat
+              ((Quotient.out q2 : UPts σ J (FiniteAdeleRing (𝓞 F) F))
+                : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
+              Λ) := by
       rw [hγ, csAsm_gmap_mul, ← hφN (Quotient.out q2), csAsm_gmap_inv, ← hNN, hφN]
     have h3 := hClassInj F E n σ J Λ hfin hspan (Quotient.out q1) (Quotient.out q2) γ hUJ hlat
     rwa [DoubleCoset.out_eq', DoubleCoset.out_eq'] at h3
   exact Finite.of_injective f hf
 
-theorem classSetFinite_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos : Formalism.UG.CS.TracePos)
+theorem classSetFinite_of
+    (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos : Formalism.UG.CS.TracePos)
     (hFormSymm : Formalism.UG.CS.FormSymm) (hIsomUJ : Formalism.UG.CS.IsomUJ)
     (hGlobLatLattice : Formalism.UG.CS.GlobLatLattice) (hClassInj : Formalism.UG.CS.ClassInj)
     (hScaleBound : Formalism.UG.CS.ScaleBound) (hDualBound : Formalism.UG.CS.DualBound)
-    (hClassSetFiniteBdd : Formalism.UG.CS.ClassSetFiniteBdd) (hStdLatFull : Formalism.UG.CS.StdLatFull) :
-    Formalism.UG.ClassSetFinite := by
+    (hClassSetFiniteBdd : Formalism.UG.CS.ClassSetFiniteBdd)
+    (hStdLatFull : Formalism.UG.CS.StdLatFull)
+    : Formalism.UG.ClassSetFinite := by
   intro F E _ _ _ _ _ n _ _ σ J hσ hJ hdet hdef
-  have h := classSetFiniteL_of hSigmaInvol hTracePos hFormSymm hIsomUJ hGlobLatLattice hClassInj hScaleBound
-    hDualBound hClassSetFiniteBdd hStdLatFull F E n σ J hσ hJ hdet hdef (stdLat (n := n) (A := E) (𝓞 E))
-    (hStdLatFull E n).1 (hStdLatFull E n).2
+  have h :=
+    classSetFiniteL_of hSigmaInvol hTracePos hFormSymm hIsomUJ hGlobLatLattice hClassInj hScaleBound
+      hDualBound hClassSetFiniteBdd hStdLatFull F E n σ J hσ hJ hdet hdef
+      (stdLat (n := n) (A := E) (𝓞 E)) (hStdLatFull E n).1 (hStdLatFull E n).2
   have heq : levelAfL σ J (stdLat (n := n) (A := E) (𝓞 E)) = levelAf σ J := by
     unfold Formalism.UG.levelAfL Formalism.UG.levelAf
     congr 1
@@ -149,27 +178,37 @@ theorem classSetFinite_of (hSigmaInvol : Formalism.UG.CS.SigmaInvol) (hTracePos 
       rw [Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
       simp only [SetLike.mem_coe, Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies,
-        LinearMap.mem_range] at hx ⊢
+          LinearMap.mem_range]
+        at hx ⊢
       intro i
       obtain ⟨a, ha⟩ := hx i
-      exact ⟨⟨inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x i),
-        Subring.subset_closure (Or.inl ⟨⟨x i, a, ha⟩, rfl⟩)⟩, rfl⟩
+      exact ⟨
+        ⟨
+          inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x i),
+          Subring.subset_closure (Or.inl ⟨⟨x i, a, ha⟩, rfl⟩)
+        ⟩,
+        rfl
+      ⟩
     · intro v hv
       simp only [Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies,
-        LinearMap.mem_range] at hv
+          LinearMap.mem_range]
+        at hv
       unfold Formalism.UG.latS
       rw [pi_eq_sum_univ v]
       refine Submodule.sum_mem _ (fun i _ => ?_)
       obtain ⟨y, hy⟩ := hv i
       have hy' : (y : E ⊗[F] FiniteAdeleRing (𝓞 F) F) = v i := hy
-      have hsm : (v i • fun j => if i = j then (1 : E ⊗[F] FiniteAdeleRing (𝓞 F) F) else 0) =
-          y • (fun j => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (if i = j then (1 : E) else 0)) := by
+      have hsm
+          : (v i • fun j => if i = j then (1 : E ⊗[F] FiniteAdeleRing (𝓞 F) F) else 0)
+            = y • (fun j =>
+              inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (if i = j then (1 : E) else 0)) := by
         ext j
         simp only [Pi.smul_apply, smul_eq_mul, Subring.smul_def]
         rw [← hy']
         split_ifs <;> simp
       rw [hsm]
-      refine Submodule.smul_mem _ y (Submodule.subset_span ⟨fun j => if i = j then (1 : E) else 0, ?_, rfl⟩)
+      refine Submodule.smul_mem _ y
+        (Submodule.subset_span ⟨fun j => if i = j then (1 : E) else 0, ?_, rfl⟩)
       simp only [SetLike.mem_coe, Formalism.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_implies,
         LinearMap.mem_range]
       intro j

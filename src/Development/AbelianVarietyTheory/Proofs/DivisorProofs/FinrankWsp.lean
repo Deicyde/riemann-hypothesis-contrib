@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KernSum
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -20,12 +21,14 @@ abbrev Wsp (lam : InfinitePlace E → DomWeight n) : Type :=
   PiTensorProduct ℂ fun v : InfinitePlace E => nablaSq ℂ n (lam v)
 
 def wAt (lam : InfinitePlace E → DomWeight n) (γ : UE E n) : Wsp lam →ₗ[ℂ] Wsp lam :=
-  PiTensorProduct.map fun v => GlobalTheory.Branching.sqRep ℂ n (lam v) (GeneralLinearGroup.map v.embedding γ.1)
+  PiTensorProduct.map fun v =>
+    GlobalTheory.Branching.sqRep ℂ n (lam v) (GeneralLinearGroup.map v.embedding γ.1)
 
-def vecM (S : Set (Pl E)) (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : Pl E, Subgroup (UL n w)) :
-    Submodule ℂ (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) where
-  carrier := {F | (∀ (γ : UE E n) x, F (finPt γ * x) = (wAt lam γ⁻¹).dualMap (F x)) ∧
-    ∀ k ∈ globLev S K', ∀ x, F (x * k) = F x}
+def vecM (S : Set (Pl E)) (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : Pl E, Subgroup (UL n w))
+    : Submodule ℂ (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) where
+  carrier :=
+    {F | (∀ (γ : UE E n) x, F (finPt γ * x) = (wAt lam γ⁻¹).dualMap (F x)) ∧
+      ∀ k ∈ globLev S K', ∀ x, F (x * k) = F x}
   add_mem' := by
     intro a b ha hb
     refine ⟨fun γ x => ?_, fun k hk x => ?_⟩
@@ -38,20 +41,23 @@ def vecM (S : Set (Pl E)) (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : 
     · simp only [Pi.smul_apply, ha.1 γ x, map_smul]
     · simp only [Pi.smul_apply, ha.2 k hk x]
 
-def hopM (S : Set (Pl E)) (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : Pl E, Subgroup (UL n w))
-    (f : ∀ w : Pl E, UL n w → ℂ) :
-    (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) →ₗ[ℂ] (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) :=
-  levOp (rightReg ℂ (finU (E := E) (n := n)) (Module.Dual ℂ (Wsp lam))) (globLev S (KL n)) (globLev S K') (globFn S f)
-    LinearMap.id
+def hopM
+    (S : Set (Pl E)) (lam : InfinitePlace E → DomWeight n) (K' : ∀ w : Pl E, Subgroup (UL n w))
+    (f : ∀ w : Pl E, UL n w → ℂ)
+    : (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) →ₗ[ℂ] (finU (E := E) (n := n) → Module.Dual ℂ (Wsp lam)) :=
+  levOp (rightReg ℂ (finU (E := E) (n := n)) (Module.Dual ℂ (Wsp lam))) (globLev S (KL n))
+    (globLev S K') (globFn S f) LinearMap.id
 
 end GlobalTheory.BCT.TrKer
 
 namespace GlobalTheory.BCT.TrKer
 
-theorem trace_piMap {ι : Type} [Fintype ι] {M : ι → Type} [∀ c, AddCommGroup (M c)] [∀ c, Module ℂ (M c)]
-    [∀ c, Module.Finite ℂ (M c)] (f : ∀ c, M c →ₗ[ℂ] M c) :
-    LinearMap.trace ℂ (PiTensorProduct ℂ M) (PiTensorProduct.map f) =
-      ∏ c, LinearMap.trace ℂ (M c) (f c) := by
+theorem trace_piMap
+    {ι : Type} [Fintype ι]
+    {M : ι → Type} [∀ c, AddCommGroup (M c)] [∀ c, Module ℂ (M c)] [∀ c, Module.Finite ℂ (M c)]
+    (f : ∀ c, M c →ₗ[ℂ] M c)
+    : LinearMap.trace ℂ (PiTensorProduct ℂ M) (PiTensorProduct.map f)
+      = ∏ c, LinearMap.trace ℂ (M c) (f c) := by
   classical
   let bc := fun c => Module.Free.chooseBasis ℂ (M c)
   let B := Basis.piTensorProduct bc
@@ -66,8 +72,9 @@ theorem trace_piMap {ι : Type} [Fintype ι] {M : ι → Type} [∀ c, AddCommGr
   rw [Matrix.diag, LinearMap.toMatrix_apply, Basis.piTensorProduct_apply, PiTensorProduct.map_tprod,
     Basis.piTensorProduct_repr_tprod_apply]
 
-theorem finrank_wsp {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (lam : InfinitePlace E → DomWeight n) :
-    (Module.finrank ℂ (Wsp lam) : ℂ) = dimW lam := by
+theorem finrank_wsp
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (lam : InfinitePlace E → DomWeight n)
+    : (Module.finrank ℂ (Wsp lam) : ℂ) = dimW lam := by
   rw [← LinearMap.trace_id, ← PiTensorProduct.map_id, trace_piMap]
   unfold dimW
   simp

@@ -13,12 +13,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.permCard :
-    ∀ (G : Type) [Group G] (s j A : ℕ) (X : Type) [MulAction G X], OrbLe G X A → StabLe G X s →
-      1 ≤ s → CardLe (groupHomology (permRep G X) (j + 1)) (s ^ (A * s ^ (j + 1))) := by
+theorem UpperTheory.V.KH.permCard
+    : ∀ (G : Type) [Group G] (s j A : ℕ) (X : Type) [MulAction G X],
+      OrbLe G X A → StabLe G X s → 1 ≤ s
+        → CardLe (groupHomology (permRep G X) (j + 1)) (s ^ (A * s ^ (j + 1))) := by
   intro G _ s j A
-  have hempty : ∀ (A : ℕ) (X : Type) [MulAction G X] [IsEmpty X], 1 ≤ s →
-      CardLe (groupHomology (permRep G X) (j + 1)) (s ^ (A * s ^ (j + 1))) := by
+  have hempty
+      : ∀ (A : ℕ) (X : Type) [MulAction G X] [IsEmpty X],
+        1 ≤ s → CardLe (groupHomology (permRep G X) (j + 1)) (s ^ (A * s ^ (j + 1))) := by
     intro A X _ _ hs
     obtain ⟨h1, h2⟩ := permEmpty G X (j + 1)
     exact ⟨h1, h2.trans (Nat.one_le_pow _ _ hs)⟩

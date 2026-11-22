@@ -7,21 +7,27 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.LFun PositivityTheory.JacquetShalikaLocal
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.LFun
+  PositivityTheory.JacquetShalikaLocal
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.SatakeBound
 
-theorem jacquetShalikaBound_of_steps : ParameterUpperBound → liftZP_unit → ParameterAbsoluteValues → lift_levelP_alt₂ → G1 → G2 → G3 → G4 → GlobalTheory.Published.JacquetShalikaBound := by
+theorem jacquetShalikaBound_of_steps
+    : ParameterUpperBound → liftZP_unit → ParameterAbsoluteValues → lift_levelP_alt₂ → G1 → G2 → G3
+      → G4
+      → GlobalTheory.Published.JacquetShalikaBound := by
   intro h10 h11 h11b h12 g1 g2 g3 g4 E _ _ _ a π hU w B hB α hα
   obtain ⟨L, rfl⟩ : ∃ L : List ℂˣ, (L : Multiset ℂˣ) = B := ⟨B.toList, Multiset.coe_toList B⟩
   have hcard : L.length = a := by simpa using hB.card
   subst hcard
-  have hBz : (L : Multiset ℂˣ) = Finset.univ.val.map L.get := by rw [Fin.univ_val_map, List.ofFn_get]
+  have hBz : (L : Multiset ℂˣ) = Finset.univ.val.map L.get := by
+    rw [Fin.univ_val_map, List.ofFn_get]
   obtain ⟨i, rfl⟩ : ∃ i, L.get i = α := List.mem_iff_get.1 (Multiset.mem_coe.1 hα)
   have ha : 1 ≤ L.length := Fin.pos i
-  induction π using Quotient.inductionOn with | _ π => ?_
+  induction π using Quotient.inductionOn with
+  | _ π => ?_
   set z := L.get with hz
   let F := w.adicCompletion E
   letI : MeasurableSpace F := borel F
@@ -33,12 +39,14 @@ theorem jacquetShalikaBound_of_steps : ParameterUpperBound → liftZP_unit → P
   have hs := g3 E L.length π w
   obtain ⟨hq, h12'⟩ := h12 E w
   have hH : Heig (π.locRep w) v z := h12' L.length π.V (π.locRep w) v z hv
-  have hq1 : (1 : ℝ) < (Ideal.absNorm w.asIdeal : ℝ) := by exact_mod_cast NumberField.HeightOneSpectrum.one_lt_absNorm w
+  have hq1 : (1 : ℝ) < (Ideal.absNorm w.asIdeal : ℝ) := by
+    exact_mod_cast NumberField.HeightOneSpectrum.one_lt_absNorm w
   have hpair := h11b L.length z (h11 F L.length π.V (π.locRep w) Bf hBf v z hv.1 hH)
   have hup : ∀ j, ‖(z j : ℂ)‖ < Real.sqrt (Ideal.absNorm w.asIdeal : ℝ) := by
     intro j
     rcases Nat.lt_or_ge 1 L.length with h2 | h1
-    · have := h10 F Measure.addHaar ψ hψ L.length π.V (π.locRep w) hs h2 l Bf hW hBf v z hH ⟨g, hlv⟩ j
+    · have :=
+        h10 F Measure.addHaar ψ hψ L.length π.V (π.locRep w) hs h2 l Bf hW hBf v z hH ⟨g, hlv⟩ j
       rwa [hq] at this
     · obtain ⟨k, hk⟩ := hpair j
       have hkj : k = j := Fin.ext (by have := k.2; have := j.2; omega)
@@ -51,7 +59,8 @@ theorem jacquetShalikaBound_of_steps : ParameterUpperBound → liftZP_unit → P
   obtain ⟨k, hk⟩ := hpair i
   have hkpos : 0 < ‖(z k : ℂ)‖ := norm_pos_iff.2 (Units.ne_zero _)
   have hi : ‖(z i : ℂ)‖ = ‖(z k : ℂ)‖⁻¹ := eq_inv_of_mul_eq_one_right hk
-  have hsq : (Ideal.absNorm w.asIdeal : ℝ) ^ (1 / 2 : ℝ) = Real.sqrt (Ideal.absNorm w.asIdeal : ℝ) :=
+  have hsq
+      : (Ideal.absNorm w.asIdeal : ℝ) ^ (1 / 2 : ℝ) = Real.sqrt (Ideal.absNorm w.asIdeal : ℝ) :=
     (Real.sqrt_eq_rpow _).symm
   refine ⟨?_, ?_⟩
   · rw [Real.rpow_neg (by positivity), hsq, hi]

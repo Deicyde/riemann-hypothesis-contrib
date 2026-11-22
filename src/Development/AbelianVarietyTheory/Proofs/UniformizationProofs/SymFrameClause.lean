@@ -21,8 +21,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Torsi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
@@ -31,10 +34,13 @@ noncomputable section
 
 namespace GlobalTheory.SymFrameClause
 
-theorem exists_symLift (R : Type) [CommRing R] [IsDomain R] [CharZero R]
-    (A : PolAV (Spec (CommRingCat.of (FractionRing R)))) (F : Type) [Field F] [Algebra (FractionRing R) F]
-    (N : ℕ) (hN : Odd N) (x : TFK (R := R) F ⟶ A.A) (hx : x ^ N = 1) :
-    ∃ θ : ThetaGrp A.A A.L (N : ℤ) (TFK (R := R) F), SymLift A.A A.L N N x θ := by
+theorem exists_symLift
+    (R : Type) [CommRing R] [IsDomain R] [CharZero R]
+    (A : PolAV (Spec (CommRingCat.of (FractionRing R))))
+    (F : Type) [Field F] [Algebra (FractionRing R) F]
+    (N : ℕ) (hN : Odd N)
+    (x : TFK (R := R) F ⟶ A.A) (hx : x ^ N = 1)
+    : ∃ θ : ThetaGrp A.A A.L (N : ℤ) (TFK (R := R) F), SymLift A.A A.L N N x θ := by
   have hLaw : Laws := GlobalTheory.firstFiveLaws.1
   have hL := A.isLB
   let T := TFK (R := R) F
@@ -56,11 +62,15 @@ theorem exists_symLift (R : Type) [CommRing R] [IsDomain R] [CharZero R]
 
 theorem symFrame_clause : AllU fun {_} _ _ {_} {_} {_} {_} _ _ U => Cl.SymFrame U := by
   intro R _ _ _ I hI D A G _ _ hG U F _ _ _ N hN p
-  refine ⟨GlobalTheory.UT.SymFrame.main GlobalTheory.firstFiveLaws R I hI D F N hN p, fun x hx => ⟨?_, ?_⟩⟩
+  refine ⟨
+    GlobalTheory.UT.SymFrame.main GlobalTheory.firstFiveLaws R I hI D F N hN p,
+    fun x hx => ⟨?_, ?_⟩
+  ⟩
   · obtain ⟨f, hf, hpow⟩ := GlobalTheory.TorsionIso.torsion_clause R I hI D A G hG U F N hN.pos
     refine exists_symLift R A F N hN x ?_
     rw [(hf.1 p x).1 hx]
     exact hpow p
-  · exact GlobalTheory.UT.symLift_acts_as_phi GlobalTheory.firstFiveLaws R I hI D A G hG U F N hN p x hx
+  · exact GlobalTheory.UT.symLift_acts_as_phi GlobalTheory.firstFiveLaws R I hI D A G hG U F N hN p
+      x hx
 
 end GlobalTheory.SymFrameClause

@@ -11,16 +11,13 @@ namespace Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.Cy
 variable {l : ℕ} [hl : Fact l.Prime]
 
 theorem norm_lt_one_iff_toZMod (x : ℤ_[l]) : ‖x‖ < 1 ↔ PadicInt.toZMod x = 0 := by
-
   rw [← RingHom.mem_ker, PadicInt.ker_toZMod, IsLocalRing.mem_maximalIdeal, PadicInt.mem_nonunits]
 
 theorem norm_le_inv_of_lt_one (x : ℤ_[l]) (h : ‖x‖ < 1) : ‖x‖ ≤ (l : ℝ) ^ (-((1 : ℕ) : ℤ)) := by
-
   rw [show (-((1 : ℕ) : ℤ)) = -1 by simp, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one]
   simpa using h
 
 theorem teich (c : ℤ_[l]) (hc : ‖c‖ = 1) : ∃ ω : ℤ_[l], ω ^ (l - 1) = 1 ∧ ‖ω - c‖ < 1 := by
-
   classical
   set F : Polynomial ℤ := Polynomial.X ^ (l - 1) - 1 with hFdef
   have hc0 : PadicInt.toZMod c ≠ 0 := fun h0 => by
@@ -34,19 +31,22 @@ theorem teich (c : ℤ_[l]) (hc : ‖c‖ = 1) : ∃ ω : ℤ_[l], ω ^ (l - 1) 
     have := Nat.le_of_dvd (by omega) h
     omega
   have e1 : Polynomial.aeval c F = c ^ (l - 1) - 1 := by simp [hFdef]
-  have e2 : Polynomial.aeval c (Polynomial.derivative F) = ((l - 1 : ℕ) : ℤ_[l]) * c ^ (l - 1 - 1) := by
+  have e2
+      : Polynomial.aeval c (Polynomial.derivative F) = ((l - 1 : ℕ) : ℤ_[l]) * c ^ (l - 1 - 1) := by
     simp [hFdef, Polynomial.derivative_X_pow]
   have hF' : ‖Polynomial.aeval c (Polynomial.derivative F)‖ = 1 := by
     rw [e2, norm_mul, norm_pow, hc, one_pow, mul_one, hn]
   have hF : ‖Polynomial.aeval c F‖ < 1 := by
-    rw [e1, norm_lt_one_iff_toZMod, map_sub, map_pow, map_one, ZMod.pow_card_sub_one_eq_one hc0, sub_self]
+    rw [e1, norm_lt_one_iff_toZMod, map_sub, map_pow, map_one, ZMod.pow_card_sub_one_eq_one hc0,
+      sub_self]
   obtain ⟨z, hz, hzc, -⟩ := hensels_lemma (F := F) (a := c) (by rw [hF', one_pow]; exact hF)
   refine ⟨z, ?_, ?_⟩
   · simpa [hFdef, sub_eq_zero] using hz
   · rw [hF'] at hzc; exact hzc
 
-theorem pow_approx (hl2 : l ≠ 2) (u : ℤ_[l]) (hu : ‖u - 1‖ = (l : ℝ)⁻¹) (c : ℤ_[l]) (hc : ‖c - 1‖ < 1)
-    (n : ℕ) : ∃ k : ℕ, ‖u ^ k - c‖ ≤ (l : ℝ) ^ (-((n + 1 : ℕ) : ℤ)) := by
+theorem pow_approx
+    (hl2 : l ≠ 2) (u : ℤ_[l]) (hu : ‖u - 1‖ = (l : ℝ)⁻¹) (c : ℤ_[l]) (hc : ‖c - 1‖ < 1) (n : ℕ)
+    : ∃ k : ℕ, ‖u ^ k - c‖ ≤ (l : ℝ) ^ (-((n + 1 : ℕ) : ℤ)) := by
   have hp := hl.out
   have h3 : 3 ≤ l := by have := hp.two_le; omega
 
@@ -66,18 +66,20 @@ theorem pow_approx (hl2 : l ≠ 2) (u : ℤ_[l]) (hu : ‖u - 1‖ = (l : ℝ)�
     rw [ha_def, Int.cast_natCast, ZMod.natCast_zmod_val]
   have ha : ¬ (l : ℤ) ∣ a := by
     intro hdvd
-    have h1 : (a : ZMod (l ^ 1)) = 0 := by
-      rw [ZMod.intCast_zmod_eq_zero_iff_dvd]; simpa using hdvd
+    have h1 : (a : ZMod (l ^ 1)) = 0 := by rw [ZMod.intCast_zmod_eq_zero_iff_dvd]; simpa using hdvd
     have h2 : (a : ZMod (l ^ 1)) = PadicInt.toZModPow 1 r := by
-      rw [← PadicInt.zmod_cast_comp_toZModPow 1 (n + 1) (by omega), RingHom.comp_apply, ← ha_cast, map_intCast]
-    rw [h2, ← RingHom.mem_ker, PadicInt.ker_toZModPow, ← PadicInt.norm_le_pow_iff_mem_span_pow, hrn] at h1
+      rw [← PadicInt.zmod_cast_comp_toZModPow 1 (n + 1) (by omega), RingHom.comp_apply, ← ha_cast,
+        map_intCast]
+    rw [h2, ← RingHom.mem_ker, PadicInt.ker_toZModPow, ← PadicInt.norm_le_pow_iff_mem_span_pow, hrn]
+      at h1
     have : (l : ℝ) ^ (-((1 : ℕ) : ℤ)) < 1 := by
       rw [Nat.cast_one, zpow_neg_one]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hp.one_lt)
     linarith
   have hord : orderOf (1 + (l : ZMod (l ^ (n + 1))) ^ 1 * a) = l ^ n :=
     ZMod.orderOf_one_add_mul_prime_pow hp 1 (by omega) a ha n
   have hub : PadicInt.toZModPow (n + 1) u = 1 + (l : ZMod (l ^ (n + 1))) ^ 1 * a := by
-    have : u = 1 + (l : ℤ_[l]) ^ 1 * r := by rw [pow_one, mul_comm]; rw [pow_one] at hr; rw [hr]; ring
+    have : u = 1 + (l : ℤ_[l]) ^ 1 * r := by
+      rw [pow_one, mul_comm]; rw [pow_one] at hr; rw [hr]; ring
     rw [this, map_add (f := _), map_one, map_mul, map_pow, map_natCast, ha_cast]
 
   have huu : IsUnit (PadicInt.toZModPow (n + 1) u) := by
@@ -102,22 +104,27 @@ theorem pow_approx (hl2 : l ≠ 2) (u : ℤ_[l]) (hu : ‖u - 1‖ = (l : ℝ)�
   have hdiv : l ^ 1 ∣ l ^ (n + 1) := pow_dvd_pow l (by omega)
   haveI : NeZero (l ^ (n + 1)) := ⟨pow_ne_zero _ hp.ne_zero⟩
   haveI : NeZero (l ^ 1) := ⟨pow_ne_zero _ hp.ne_zero⟩
-  have hker : ∀ x : ℤ_[l], ‖x - 1‖ < 1 → ∀ hx : IsUnit (PadicInt.toZModPow (n + 1) x), hx.unit ∈ (ZMod.unitsMap hdiv).ker := by
+  have hker
+      : ∀ x : ℤ_[l],
+        ‖x - 1‖ < 1
+          → ∀ hx : IsUnit (PadicInt.toZModPow (n + 1) x), hx.unit ∈ (ZMod.unitsMap hdiv).ker := by
     intro x hx hxu
     rw [MonoidHom.mem_ker, Units.ext_iff, ZMod.unitsMap_def, Units.coe_map, IsUnit.unit_spec]
     change ZMod.castHom hdiv (ZMod (l ^ 1)) (PadicInt.toZModPow (n + 1) x) = 1
-    rw [← RingHom.comp_apply, PadicInt.zmod_cast_comp_toZModPow 1 (n + 1) (by omega),
-      ← sub_eq_zero, ← map_one (PadicInt.toZModPow 1), ← map_sub, ← RingHom.mem_ker,
-      PadicInt.ker_toZModPow, ← PadicInt.norm_le_pow_iff_mem_span_pow]
+    rw [← RingHom.comp_apply, PadicInt.zmod_cast_comp_toZModPow 1 (n + 1) (by omega), ← sub_eq_zero,
+      ← map_one (PadicInt.toZModPow 1), ← map_sub, ← RingHom.mem_ker, PadicInt.ker_toZModPow,
+      ← PadicInt.norm_le_pow_iff_mem_span_pow]
     exact norm_le_inv_of_lt_one _ hx
-  have hUk : U ∈ (ZMod.unitsMap hdiv).ker := hker u (by rw [hu]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hp.one_lt)) huu
+  have hUk : U ∈ (ZMod.unitsMap hdiv).ker :=
+    hker u (by rw [hu]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hp.one_lt)) huu
   have hCk : C ∈ (ZMod.unitsMap hdiv).ker := hker c hc hcu
 
   have hcardG : Nat.card (ZMod (l ^ (n + 1)))ˣ = l ^ n * (l - 1) := by
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime_pow_succ hp]
   have hcardH : Nat.card (ZMod (l ^ 1))ˣ = l - 1 := by
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, pow_one, Nat.totient_prime hp]
-  have hrange : (ZMod.unitsMap hdiv).range = ⊤ := MonoidHom.range_eq_top.2 (ZMod.unitsMap_surjective hdiv)
+  have hrange : (ZMod.unitsMap hdiv).range = ⊤ :=
+    MonoidHom.range_eq_top.2 (ZMod.unitsMap_surjective hdiv)
   have hcardK : Nat.card (ZMod.unitsMap hdiv).ker = l ^ n := by
     have h1 := Subgroup.card_mul_index (ZMod.unitsMap hdiv).ker
     rw [Subgroup.index_ker, hrange, Subgroup.card_top, hcardH, hcardG] at h1
@@ -130,8 +137,8 @@ theorem pow_approx (hl2 : l ≠ 2) (u : ℤ_[l]) (hu : ‖u - 1‖ = (l : ℝ)�
   rw [← hzp, ← mem_powers_iff_mem_zpowers] at hCk
   obtain ⟨k, hk⟩ := hCk
   refine ⟨k, ?_⟩
-  rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_pow,
-    sub_eq_zero]
+  rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub,
+    map_pow, sub_eq_zero]
   have := congrArg Units.val hk
   simpa [U, C] using this
 

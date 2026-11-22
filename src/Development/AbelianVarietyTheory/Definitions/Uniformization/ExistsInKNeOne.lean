@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.HomBaseC
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -21,23 +23,26 @@ noncomputable section
 namespace GlobalTheory.UU
 
 def InK {S : Scheme.{0}} (B : Over S) [GrpObj B] (L : LB B.left) {T : Over S} (x : T ⟶ B) : Prop :=
-  ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧ ∃ c : LB.Gen ((translDiff B L x).pull ((fst T B).left ⁻¹ᵁ V).ι), c.IsGen
+  ∀ p : T.left, ∃ V : T.left.Opens,
+    p ∈ V ∧ ∃ c : LB.Gen ((translDiff B L x).pull ((fst T B).left ⁻¹ᵁ V).ι), c.IsGen
 
 variable {S : Scheme.{0}} {B : Over S} [GrpObj B] {L : LB B.left} {T T' : Over S}
 
 theorem inK_iff_memKL (x : T ⟶ B) : InK B L x ↔ MemKL B L x := Iff.rfl
 
-theorem inK_iff_locGen (x : T ⟶ B) : InK B L x ↔
-    KerPow.LocGen L (K := Fin 2) (fst T B).left ![(translPt B x).left, (snd T B).left] ![1, -1] :=
+theorem inK_iff_locGen (x : T ⟶ B)
+    : InK B L x
+      ↔ KerPow.LocGen L (K := Fin 2) (fst T B).left ![(translPt B x).left, (snd T B).left]
+        ![1, -1] :=
   KerPow.locGen_iff _ _ _
-
 
 theorem inK_one (hL : L.IsLB) (T : Over S) : InK B L (1 : T ⟶ B) := memKL_one hL T
 
 theorem InK.comp {x : T ⟶ B} (hx : InK B L x) (u : T' ⟶ T) : InK B L (u ≫ x) := MemKL.comp hx u
 
-theorem InK.translate {x : T ⟶ B} (hx : InK B L x) (y : T ⟶ B) :
-    KerPow.LocGen L (K := Fin 2) (fst T B).left ![(translPt B (x * y)).left, (translPt B y).left] ![1, -1] := by
+theorem InK.translate {x : T ⟶ B} (hx : InK B L x) (y : T ⟶ B)
+    : KerPow.LocGen L (K := Fin 2) (fst T B).left ![(translPt B (x * y)).left, (translPt B y).left]
+      ![1, -1] := by
   let τ : T ⊗ B ⟶ T ⊗ B := lift (fst T B) (translPt B y)
   have k₁ : τ ≫ fst T B = fst T B := lift_fst _ _
   have k₂ : τ ≫ snd T B = translPt B y := lift_snd _ _
@@ -57,14 +62,15 @@ theorem InK.inv (hL : L.IsLB) {x : T ⟶ B} (hx : InK B L x) : InK B L x⁻¹ :=
   rw [mul_inv_cancel, KerPow.translPt_one]
   simp [Fin.prod_univ_two]
 
-theorem InK.mul (hL : L.IsLB) {x y : T ⟶ B} (hx : InK B L x) (hy : InK B L y) : InK B L (x * y) := by
+theorem InK.mul (hL : L.IsLB) {x y : T ⟶ B} (hx : InK B L x) (hy : InK B L y)
+    : InK B L (x * y) := by
   have triv : KerPow.LocGen L (K := Fin 0) (fst T B).left ![] ![] :=
     KerPow.locGen_of_trivial hL fun U _ h => by simp
-  have H := triv.comb hL ((inK_iff_locGen y).1 hy) (φ'' := ![(snd T B).left, (translPt B y).left]) (ε'' := ![1, -1])
-    fun U _ h => by simp [Fin.prod_univ_two]
+  have H :=
+    triv.comb hL ((inK_iff_locGen y).1 hy) (φ'' := ![(snd T B).left, (translPt B y).left])
+      (ε'' := ![1, -1]) fun U _ h => by simp [Fin.prod_univ_two]
   refine (inK_iff_locGen _).2 ((hx.translate y).comb hL H fun U _ h => ?_)
   simp [Fin.prod_univ_two]
-
 
 variable (B) in
 def kSubgroup (hL : L.IsLB) (T : Over S) : Subgroup (T ⟶ B) where
@@ -79,11 +85,13 @@ theorem InK.eq_one (hK : KTriv B L) {x : T ⟶ B} (hx : InK B L x) : x = 1 :=
 theorem kTriv_iff_forall : KTriv B L ↔ ∀ (T : Over S) (x : T ⟶ B), InK B L x → x = 1 :=
   ⟨fun hK _ _ hx => hx.eq_one hK, fun h _ _ _ x hx => h _ x hx⟩
 
-theorem inK_of_push {S' : Scheme.{0}} {f : S' ⟶ S} {B' : Over S'} [GrpObj B'] {φ : B'.left ⟶ B.left}
-    {L' : LB B'.left} (h : IsGrpPullback B' B f φ) (hL : L.IsLB) (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ))
-    {Z : Over S'} (x : Z ⟶ B') (hx : InK B L (pushPt h.1.w x)) : InK B' L' x :=
+theorem inK_of_push
+    {S' : Scheme.{0}} {f : S' ⟶ S} {B' : Over S'} [GrpObj B']
+    {φ : B'.left ⟶ B.left} {L' : LB B'.left} (h : IsGrpPullback B' B f φ)
+    (hL : L.IsLB) (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ))
+    {Z : Over S'} (x : Z ⟶ B') (hx : InK B L (pushPt h.1.w x))
+    : InK B' L' x :=
   memKL_of_push h hL hL' hw x hx
-
 
 variable (B) in
 theorem inK_triv (x : T ⟶ B) : InK B (Inh.trivLB B.left) x := by

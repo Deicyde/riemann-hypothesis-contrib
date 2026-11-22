@@ -13,8 +13,9 @@ namespace UpperTheory.Gal.KunnethLefschetz
 theorem topPart_holds : TopPart := by
   intro l _ k _ _ hl d X p hp hR hLow hKun lam s a hlam Λ hΛ δ
   classical
-  have hmem : δ ∈ Submodule.span ℚ_[l]
-      {w | ∃ a b, ∃ (h : a + b = 2 * (d : ℤ)), ∃ u v, w = ext2 l p h u v} := by
+  have hmem
+      : δ ∈ Submodule.span ℚ_[l]
+        {w | ∃ a b, ∃ (h : a + b = 2 * (d : ℤ)), ∃ u v, w = ext2 l p h u v} := by
     rw [hKun.span]
     trivial
   induction hmem using Submodule.span_induction with
@@ -29,21 +30,23 @@ theorem topPart_holds : TopPart := by
     · subst hb
       obtain rfl : a' = 2 * (d : ℤ) := by omega
       let F : V l X (2 * (d : ℤ)) →ₗ[ℚ_[l]] V l (pullback p p) (2 * (d : ℤ)) :=
-        (cupV l (pullback p p) h').flip (pb l (pullback.snd p p) 0 v) ∘ₗ
-          pb l (pullback.fst p p) (2 * (d : ℤ))
-      have hsum : ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) (a.repr u t • v) =
-          ext2 l p h' u v := by
-        calc ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) (a.repr u t • v)
-            = ∑ t, a.repr u t • F (a t) := by
-              refine Finset.sum_congr rfl fun t _ => ?_
-              simp only [ext2, F, map_smul, LinearMap.comp_apply, LinearMap.flip_apply]
+        (cupV l (pullback p p) h').flip (pb l (pullback.snd p p) 0 v)
+          ∘ₗ pb l (pullback.fst p p) (2 * (d : ℤ))
+      have hsum
+          : ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) (a.repr u t • v)
+            = ext2 l p h' u v := by
+        calc
+          ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) (a.repr u t • v)
+              = ∑ t, a.repr u t • F (a t) := by
+            refine Finset.sum_congr rfl fun t _ => ?_
+            simp only [ext2, F, map_smul, LinearMap.comp_apply, LinearMap.flip_apply]
           _ = F (∑ t, a.repr u t • a t) := by
-              set_option synthInstance.maxHeartbeats 100000 in
-                rw [map_sum]
-              simp only [map_smul]
+            set_option synthInstance.maxHeartbeats 100000 in
+              rw [map_sum]
+            simp only [map_smul]
           _ = ext2 l p h' u v := by
-              rw [a.sum_repr]
-              rfl
+            rw [a.sum_repr]
+            rfl
       refine ⟨fun t => a.repr u t • v, ?_, ?_⟩
       · rw [hΛ.1 u v, ← Finset.sum_smul]
         congr 1
@@ -56,7 +59,9 @@ theorem topPart_holds : TopPart := by
     · refine ⟨0, ?_, ?_⟩
       · simp only [Pi.zero_apply, Finset.sum_const_zero]
         exact (hΛ.2 a' b' h' (ne_of_gt hb) u v).symm
-      · have h0 : ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) ((0 : Fin s → V l X 0) t) = 0 := by
+      · have h0
+            : ∑ t, ext2 l p (add_zero _ : 2 * (d : ℤ) + 0 = 2 * d) (a t) ((0 : Fin s → V l X 0) t)
+              = 0 := by
           simp [ext2]
         rw [h0, sub_zero]
         rcases le_or_gt 0 a' with ha | ha

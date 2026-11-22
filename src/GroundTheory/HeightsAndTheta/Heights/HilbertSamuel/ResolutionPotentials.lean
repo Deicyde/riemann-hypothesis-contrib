@@ -11,38 +11,44 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.AnForm.M Filter Topology
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.AnForm.M Filter Topology
 open scoped ContDiff
 
 noncomputable section
 
 variable {D : ℕ} {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ]
 
-theorem resLift_continuousOn (d : HSMDatum D Ω κ) (x : d.R.X) (p : Ix κ) :
-    ContinuousOn (fun z => d.R.lift x z p) (d.R.U x) := by
+theorem resLift_continuousOn (d : HSMDatum D Ω κ) (x : d.R.X) (p : Ix κ)
+    : ContinuousOn (fun z => d.R.lift x z p) (d.R.U x) := by
   intro z hz
   obtain ⟨j, hj⟩ := d.R.A.cover z
   have hzt : d.R.A.chart j z ∈ (d.R.A.chart j).target := (d.R.A.chart j).map_source hj
   have hc : ContinuousAt ((fun z => d.R.lift x z p) ∘ (d.R.A.chart j).symm) (d.R.A.chart j z) :=
     (d.R.holo x p j _ ⟨hzt, by rwa [Set.mem_preimage, (d.R.A.chart j).left_inv hj]⟩).continuousAt
-  have h := ((d.R.A.chart j).symm.continuousAt_iff_continuousAt_comp_right
-    (f := fun z => d.R.lift x z p) (x := z) (by simpa using hj)).mpr (by simpa using hc)
+  have h :=
+    ((d.R.A.chart j).symm.continuousAt_iff_continuousAt_comp_right
+      (f := fun z => d.R.lift x z p)
+      (x := z) (by simpa using hj)).mpr (by simpa using hc)
   exact h.continuousWithinAt
 
-theorem resLift_contDiffOn (d : HSMDatum D Ω κ) (x : d.R.X) (j : Fin d.R.A.n) :
-    ContDiffOn ℝ ∞ (fun y => d.R.lift x ((d.R.A.chart j).symm y))
+theorem resLift_contDiffOn (d : HSMDatum D Ω κ) (x : d.R.X) (j : Fin d.R.A.n)
+    : ContDiffOn ℝ ∞
+      (fun y => d.R.lift x ((d.R.A.chart j).symm y))
       ((d.R.A.chart j).target ∩ (d.R.A.chart j).symm ⁻¹' d.R.U x) :=
   contDiffOn_pi.mpr fun p => ((d.R.holo x p j).contDiffOn_of_completeSpace).restrict_scalars ℝ
 
-theorem resPot_smoothOn (d : HSMDatum D Ω κ) {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m)
-    (x : d.R.X) : d.R.A.SmoothOn ((resPot d m).U x) ((resPot d m).φ x) := fun j => by
-  have hne : ∀ y ∈ (d.R.A.chart j).target ∩ (d.R.A.chart j).symm ⁻¹' d.R.U x,
-      d.R.lift x ((d.R.A.chart j).symm y) ∈ {z : Ix κ → ℂ | z ≠ 0} :=
-    fun y hy => gaamix_ne_zero_of_mcPts (d.R.mem x _ hy.2)
+theorem resPot_smoothOn
+    (d : HSMDatum D Ω κ) {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m) (x : d.R.X)
+    : d.R.A.SmoothOn ((resPot d m).U x) ((resPot d m).φ x) := fun j => by
+  have hne
+      : ∀ y ∈ (d.R.A.chart j).target ∩ (d.R.A.chart j).symm ⁻¹' d.R.U x,
+        d.R.lift x ((d.R.A.chart j).symm y) ∈ {z : Ix κ → ℂ | z ≠ 0} := fun y hy =>
+    gaamix_ne_zero_of_mcPts (d.R.mem x _ hy.2)
   exact (hm.comp (resLift_contDiffOn d x j) hne).log fun y hy => (m.pos _ (hne y hy)).ne'
 
-theorem isPotential_resPot (d : HSMDatum D Ω κ) {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m) :
-    IsPotential d.R.A (resPot d m) := by
+theorem isPotential_resPot (d : HSMDatum D Ω κ) {m : ConeMetric ℂ (Ix κ)} (hm : IsSmoothMetric m)
+    : IsPotential d.R.A (resPot d m) := by
   refine ⟨resPot_smoothOn d hm, fun x x' y hy => ?_⟩
   have hy' : y ∈ d.R.U x ∩ d.R.U x' := hy
   obtain ⟨p, hp⟩ := (d.R.mem x' y hy'.2).1 ()
@@ -100,18 +106,20 @@ theorem isPotential_resPot (d : HSMDatum D Ω κ) {m : ConeMetric ℂ (Ix κ)} (
       Real.log_div (norm_ne_zero_iff.mpr (hc' ())) (norm_ne_zero_iff.mpr hr)]
     ring
 
-theorem continuous_logRatio_resPt (d : HSMDatum D Ω κ) {m₀ m₁ : ConeMetric ℂ (Ix κ)}
-    (h₀ : IsSmoothMetric m₀) (h₁ : IsSmoothMetric m₁) :
-    Continuous fun y => logRatio m₀ m₁ (resPt d y) := by
+theorem continuous_logRatio_resPt
+    (d : HSMDatum D Ω κ)
+    {m₀ m₁ : ConeMetric ℂ (Ix κ)} (h₀ : IsSmoothMetric m₀) (h₁ : IsSmoothMetric m₁)
+    : Continuous fun y => logRatio m₀ m₁ (resPt d y) := by
   refine continuous_iff_continuousAt.2 fun y0 => ?_
   have hU : d.R.U y0 ∈ 𝓝 y0 := (d.R.isOpen_U y0).mem_nhds (d.R.mem_U y0)
   have hL : ContinuousOn (d.R.lift y0) (d.R.U y0) :=
     continuousOn_pi.2 fun p => resLift_continuousOn d y0 p
   have hlog : ContinuousOn (fun y => logRatio m₀ m₁ (d.R.lift y0 y)) (d.R.U y0) :=
-    (gbamix_smooth_logRatio h₀ h₁).continuousOn.comp hL
-      fun y hy => gaamix_ne_zero_of_mcPts (d.R.mem y0 y hy)
-  have heq : (fun y => logRatio m₀ m₁ (d.R.lift y0 y)) =ᶠ[𝓝 y0]
-      fun y => logRatio m₀ m₁ (resPt d y) := by
+    (gbamix_smooth_logRatio h₀ h₁).continuousOn.comp hL fun y hy =>
+      gaamix_ne_zero_of_mcPts (d.R.mem y0 y hy)
+  have heq
+      : (fun y => logRatio m₀ m₁ (d.R.lift y0 y)) =ᶠ[𝓝 y0]
+        fun y => logRatio m₀ m₁ (resPt d y) := by
     filter_upwards [hU] with y hy
     obtain ⟨c, hc, hcy⟩ := d.R.compat y y0 y ⟨d.R.mem_U y, hy⟩
     show _ = logRatio m₀ m₁ (d.R.lift y y)

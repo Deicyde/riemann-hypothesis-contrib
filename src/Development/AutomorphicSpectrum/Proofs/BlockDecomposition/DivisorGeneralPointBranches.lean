@@ -26,18 +26,17 @@ public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.BranchInverse
 
 namespace GlobalTheory.CompanionTheory.ComplexSets
 
-
 open GroundTheory.Heights₂.Heights in
-theorem divisorGeneralPointBranches : GroundTheory.Heights₂.Heights.DivisorGeneralPointBranches.Statement :=
+theorem divisorGeneralPointBranches
+    : GroundTheory.Heights₂.Heights.DivisorGeneralPointBranches.Statement :=
   DivisorGeneralPointBranches.proof DivisorOneComponent.proof
     (DivisorBranches.proof IndefiniteRowSideFullHecke.ComplexSets.NormalModelExists.proof
       GroundTheory.Heights₂.Heights.AutoClose.DivisorRegularGeneric
-      (NormalDivisorChartGeneric.proof
-        (NormalModelDivisorChartGeneric.proof
-          (NormalModelGoodPointGeneric.proof NormalCodimOneCompleteIntersection.proof
-            NormalCodimOneUniformiser.proof JacobianRankOffHypersurface.proof
-            ProjectionUnramifiedGeneric.proof)
-          NormalModelGoodPointChart.proof))
+      (NormalDivisorChartGeneric.proof (NormalModelDivisorChartGeneric.proof
+        (NormalModelGoodPointGeneric.proof NormalCodimOneCompleteIntersection.proof
+          NormalCodimOneUniformiser.proof JacobianRankOffHypersurface.proof
+          ProjectionUnramifiedGeneric.proof)
+        NormalModelGoodPointChart.proof))
       NormalDoublePointsGeneric.proof DivisorGoodPointBranches.proof)
 
 end GlobalTheory.CompanionTheory.ComplexSets

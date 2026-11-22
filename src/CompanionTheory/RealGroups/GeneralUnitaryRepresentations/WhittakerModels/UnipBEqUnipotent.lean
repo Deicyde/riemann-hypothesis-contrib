@@ -12,8 +12,10 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
 
 namespace CompanionTheory.rg.gu.whit
 
-theorem unipB_eq_unipotent (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : ℕ) : unipB k (Fin n) = GroundTheory.Automorphic.Iwasawa.unipotent k n := by
+theorem unipB_eq_unipotent
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ)
+    : unipB k (Fin n) = GroundTheory.Automorphic.Iwasawa.unipotent k n := by
   ext g
   rw [mem_unipB]
   constructor
@@ -22,20 +24,27 @@ theorem unipB_eq_unipotent (k : Type) [Field k] [ValuativeRel k] [TopologicalSpa
   · rintro ⟨h1, h2⟩
     exact ⟨fun i j hij => h1 hij, h2⟩
 
-theorem whitChar_eq_psiN (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (n : ℕ) (u : unipB k (Fin n)) :
-    ((whitChar ψ n u : ℂˣ) : ℂ) =
-      GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ) (u : GL (Fin n) k) := by
-  have hs : (∑ p : Fin n × Fin n with (p.2 : ℕ) = p.1 + 1, (u : GL (Fin n) k).val p.1 p.2) =
-      GroundTheory.Automorphic.Whittaker.superdiagSum ((u : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
+theorem whitChar_eq_psiN
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ψ : AddChar k Circle)
+    (n : ℕ) (u : unipB k (Fin n))
+    : ((whitChar ψ n u : ℂˣ) : ℂ)
+      = GroundTheory.Automorphic.Whittaker.psiN (Circle.coeHom.compAddChar ψ)
+        (u : GL (Fin n) k) := by
+  have hs
+      : (∑ p : Fin n × Fin n with (p.2 : ℕ) = p.1 + 1, (u : GL (Fin n) k).val p.1 p.2)
+        = GroundTheory.Automorphic.Whittaker.superdiagSum
+          ((u : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     rw [Finset.sum_filter, Fintype.sum_prod_type]
     rfl
   show ((Circle.toUnits (ψ _) : ℂˣ) : ℂ) = ((ψ (GroundTheory.Automorphic.Whittaker.superdiagSum _) : Circle) : ℂ)
   rw [hs]
   rfl
 
-theorem isAdmissible_iff {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ G V) : GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ := by
+theorem isAdmissible_iff
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    : GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ := by
   have hfix : ∀ K : Subgroup G, fixed ρ K = GroundTheory.Automorphic.fixedVectors ρ K := by
     intro K
     ext v

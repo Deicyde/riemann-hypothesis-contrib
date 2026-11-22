@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Eventuall
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.SplitFlip GlobalTheory.KSplit
-attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL Formalism.DoubleCosetMeasures.instMeasMat
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.SplitFlip
+  GlobalTheory.KSplit
+attribute [-instance]
+  Formalism.DoubleCosetMeasures.instMeasGL Formalism.DoubleCosetMeasures.instMeasMat
 open GlobalTheory.IndefiniteRowSideFullHecke.ScaledIntegerPeriodic
 
 namespace GlobalTheory.ShellCosets
 
-theorem piece_eq_of_mem {G : Type*} [Group G] (K : Subgroup G) {c c' g : G}
-    (h1 : c⁻¹ * g ∈ K) (h2 : c'⁻¹ * g ∈ K) :
-    {h : G | c⁻¹ * h ∈ K} = {h : G | c'⁻¹ * h ∈ K} := by
+theorem piece_eq_of_mem
+    {G : Type*} [Group G] (K : Subgroup G) {c c' g : G} (h1 : c⁻¹ * g ∈ K) (h2 : c'⁻¹ * g ∈ K)
+    : {h : G | c⁻¹ * h ∈ K} = {h : G | c'⁻¹ * h ∈ K} := by
   ext h
   simp only [Set.mem_setOf_eq]
   constructor
@@ -26,11 +28,15 @@ theorem piece_eq_of_mem {G : Type*} [Group G] (K : Subgroup G) {c c' g : G}
     have := K.mul_mem (K.mul_mem h1 (K.inv_mem h2)) hh
     simpa [mul_assoc] using this
 
-theorem shell_cosets : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (ϖ : kˣ) (a : ℕ) (n : Fin a → ℤ), ∃ t : Finset (GL (Fin a) k), (∀ x ∈ t, x ∈ KO k (Fin a)) ∧
-      shellSet ϖ n = ⋃ x ∈ t, {g : GL (Fin a) k | (x * diagGL (fun i => ϖ ^ n i))⁻¹ * g ∈ KO k (Fin a)} ∧
-      (t : Set (GL (Fin a) k)).PairwiseDisjoint
-        (fun x => {g : GL (Fin a) k | (x * diagGL (fun i => ϖ ^ n i))⁻¹ * g ∈ KO k (Fin a)}) := by
+theorem shell_cosets
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ϖ : kˣ) (a : ℕ) (n : Fin a → ℤ),
+      ∃ t : Finset (GL (Fin a) k),
+        (∀ x ∈ t, x ∈ KO k (Fin a))
+          ∧ shellSet ϖ n
+            = ⋃ x ∈ t, {g : GL (Fin a) k | (x * diagGL (fun i => ϖ ^ n i))⁻¹ * g ∈ KO k (Fin a)}
+          ∧ (t : Set (GL (Fin a) k)).PairwiseDisjoint (fun x =>
+            {g : GL (Fin a) k | (x * diagGL (fun i => ϖ ^ n i))⁻¹ * g ∈ KO k (Fin a)}) := by
   intro k _ _ _ _ ϖ a n
   classical
   set d : GL (Fin a) k := diagGL (fun i => ϖ ^ n i) with hd
@@ -42,7 +48,10 @@ theorem shell_cosets : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpa
     intro x hx g hg
     rw [mem_shellSet]
     exact ⟨x, hx, _, hg, by rw [← hd]; group⟩
-  have himg : shellSet ϖ n = (fun p : GL (Fin a) k × GL (Fin a) k => p.1 * d * p.2) '' ((K : Set _) ×ˢ (K : Set _)) := by
+  have himg
+      : shellSet ϖ n
+        = (fun p : GL (Fin a) k × GL (Fin a) k => p.1 * d * p.2)
+          '' ((K : Set _) ×ˢ (K : Set _)) := by
     ext g
     rw [mem_shellSet]
     constructor
@@ -50,7 +59,8 @@ theorem shell_cosets : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpa
     · rintro ⟨⟨x, y⟩, ⟨hx, hy⟩, rfl⟩; exact ⟨x, hx, y, hy, rfl⟩
   have hcomp : IsCompact (shellSet ϖ n) := by
     rw [himg]
-    exact (GlobalTheory.SplitFlip.isCompact_KO.prod GlobalTheory.SplitFlip.isCompact_KO).image (by fun_prop)
+    exact (GlobalTheory.SplitFlip.isCompact_KO.prod GlobalTheory.SplitFlip.isCompact_KO).image
+      (by fun_prop)
   have hcov : shellSet ϖ n ⊆ ⋃ x : K, P x := by
     intro g hg
     obtain ⟨x, hx, y, hy, rfl⟩ := mem_shellSet.mp hg
@@ -80,9 +90,11 @@ theorem shell_cosets : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpa
     · intro g hg
       obtain ⟨x, hxs, hgx⟩ := Set.mem_iUnion₂.mp (hs hg)
       have hx' : (x : GL (Fin a) k) ∈ s' := Finset.mem_image_of_mem _ hxs
-      refine Set.mem_iUnion₂.mpr ⟨r (P x), Finset.mem_image_of_mem _ (Finset.mem_image_of_mem _ hx'), ?_⟩
+      refine Set.mem_iUnion₂.mpr
+        ⟨r (P x), Finset.mem_image_of_mem _ (Finset.mem_image_of_mem _ hx'), ?_⟩
       show g ∈ P (r (P x))
-      rw [(hr _ hx').2]; exact hgx
+      rw [(hr _ hx').2]
+      exact hgx
     · intro g hg
       obtain ⟨y, hy, hgy⟩ := Set.mem_iUnion₂.mp hg
       obtain ⟨x, hx, rfl⟩ := ht y hy

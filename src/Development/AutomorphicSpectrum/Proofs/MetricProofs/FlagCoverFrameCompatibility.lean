@@ -14,25 +14,36 @@ public import GroundTheory.HeightsAndTheta.Heights.Intersections.PtsOverPt
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
-theorem trans_blockDiag_det : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j) (Cv : FlagCover M' M) (b : (Σ k, baseIdx ι' M'.blk k) → ℂ) (F' : FrameData ι' Ψ N M'.Ω M'.blk) (F : FrameData ι Ψ N M.Ω M.blk), b ∈ mcPts (mCoordIdeal M'.x) → M'.IsFrame F' → M.IsFrame F → M'.GoodAt F' (mCoordIdeal b) → M.GoodAt F (mCoordIdeal (b ∘ Cv.v)) → ∀ τ, IsBlockDiag j (Cv.trans F' F b τ) ∧ (Cv.trans F' F b τ).det ≠ 0 := by
+theorem trans_blockDiag_det
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)]
+        (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j)
+        (Cv : FlagCover M' M) (b : (Σ k, baseIdx ι' M'.blk k) → ℂ)
+        (F' : FrameData ι' Ψ N M'.Ω M'.blk) (F : FrameData ι Ψ N M.Ω M.blk),
+      b ∈ mcPts (mCoordIdeal M'.x) → M'.IsFrame F' → M.IsFrame F → M'.GoodAt F' (mCoordIdeal b)
+        → M.GoodAt F (mCoordIdeal (b ∘ Cv.v))
+        → ∀ τ, IsBlockDiag j (Cv.trans F' F b τ) ∧ (Cv.trans F' F b τ).det ≠ 0 := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv b F' F hb hF' hF hG' hG τ
   have hT := hF.1 τ
   have hT' := hF'.1 τ
   have hdet : ((F.T τ).map Cv.φ).det ≠ 0 := by
-    have e : ((F.T τ).map Cv.φ).det = Cv.φ (F.T τ).det := by
-      rw [RingHom.map_det]; rfl
+    have e : ((F.T τ).map Cv.φ).det = Cv.φ (F.T τ).det := by rw [RingHom.map_det]; rfl
     rw [e]
     exact (map_ne_zero Cv.φ).2 hT.2
   have hu : IsUnit ((F.T τ).map Cv.φ).det := isUnit_iff_ne_zero.2 hdet
   have hu' : IsUnit (F'.T τ).det := isUnit_iff_ne_zero.2 hT'.2
-  have hA : IsBlockDiag j (((F.T τ).map Cv.φ)⁻¹ * F'.T τ) :=
-    ((hT.1.map Cv.φ).inv hu).mul hT'.1
+  have hA : IsBlockDiag j (((F.T τ).map Cv.φ)⁻¹ * F'.T τ) := ((hT.1.map Cv.φ).inv hu).mul hT'.1
   have hreg := Cv.agree b hb F' F hF' hF hG' hG τ
   have hz : valMat M'.x b (1 : Matrix (Fin N) (Fin N) M'.Ω) = 1 := by
     have hring := ValRing.regAt_valAt_ring _ _ _ M'.x b hb

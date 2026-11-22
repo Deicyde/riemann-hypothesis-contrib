@@ -11,8 +11,9 @@ noncomputable section
 
 open IsLocalRing
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
-  [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+variable
+  {𝒪 : Type*}
+  [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
 
 section Values
 
@@ -22,26 +23,29 @@ def wVal (z : 𝒪) : 𝒪 := psEvalAt (formalW W) (fun _ : Unit => z)
 
 def vVal (z : 𝒪) : 𝒪 := psEvalAt (formalV W) (fun _ : Unit => z)
 
-theorem evAlgHom_unit_X {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) :
-    evAlgHom (fun _ : Unit => z) (fun _ => hz) PowerSeries.X = z := by
+theorem evAlgHom_unit_X {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪)
+    : evAlgHom (fun _ : Unit => z) (fun _ => hz) PowerSeries.X = z := by
   rw [evAlgHom_apply]; exact psEvalAt_X _ ()
 
-theorem evAlgHom_unit_C {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) (r : 𝒪) :
-    evAlgHom (fun _ : Unit => z) (fun _ => hz) (PowerSeries.C r) = r := by
+theorem evAlgHom_unit_C {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) (r : 𝒪)
+    : evAlgHom (fun _ : Unit => z) (fun _ => hz) (PowerSeries.C r) = r := by
   rw [← PowerSeries.algebraMap_eq, AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply]
 
-theorem map_C_evAlgHom {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) :
-    (W.map PowerSeries.C).map (evAlgHom (fun _ : Unit => z) (fun _ => hz) : PowerSeries 𝒪 →+* 𝒪)
+theorem map_C_evAlgHom {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪)
+    : (W.map PowerSeries.C).map (evAlgHom (fun _ : Unit => z) (fun _ => hz) : PowerSeries 𝒪 →+* 𝒪)
       = W := by
   rw [WeierstrassCurve.map_map]
   ext <;> simp [evAlgHom_unit_C]
 
 theorem zwPoly_wVal {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : zwPoly W z (wVal W z) = 0 := by
-  have := congrArg (evAlgHom (fun _ : Unit => z) (fun _ => hz) : PowerSeries 𝒪 →+* 𝒪)
-    (zwPoly_formalW W)
+  have :=
+    congrArg (evAlgHom (fun _ : Unit => z) (fun _ => hz) : PowerSeries 𝒪 →+* 𝒪) (zwPoly_formalW W)
   rw [map_zwPoly, map_zero, map_C_evAlgHom] at this
-  have h2 : zwPoly W (evAlgHom (fun _ : Unit => z) (fun _ => hz) PowerSeries.X)
-      (evAlgHom (fun _ : Unit => z) (fun _ => hz) (formalW W)) = 0 := this
+  have h2
+      : zwPoly W (evAlgHom (fun _ : Unit => z) (fun _ => hz) PowerSeries.X)
+          (evAlgHom (fun _ : Unit => z) (fun _ => hz) (formalW W))
+        = 0 :=
+    this
   rwa [evAlgHom_unit_X, evAlgHom_apply] at h2
 
 theorem wVal_eq {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : wVal W z = z ^ 3 * vVal W z := by
@@ -50,9 +54,14 @@ theorem wVal_eq {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : wVal W z = z ^ 3 * v
 
 theorem isUnit_vVal {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : IsUnit (vVal W z) := by
   have h : vVal W z - 1 ∈ maximalIdeal 𝒪 := by
-    have := psEvalAt_mem (f := formalV W - 1) (by
-      rw [map_sub, map_one, show MvPowerSeries.constantCoeff (formalV W) = 1 from
-        constantCoeff_formalV W, sub_self]; exact zero_mem _) (a := fun _ : Unit => z) (fun _ => hz)
+    have :=
+      psEvalAt_mem (f := formalV W - 1)
+        (by
+          rw [map_sub, map_one,
+            show MvPowerSeries.constantCoeff (formalV W) = 1 from constantCoeff_formalV W, sub_self]
+          exact zero_mem _)
+        (a := fun _ : Unit => z)
+        (fun _ => hz)
     rwa [← evAlgHom_apply _ (fun _ => hz), map_sub, map_one, evAlgHom_apply] at this
   by_contra hu
   have h1 : vVal W z ∈ maximalIdeal 𝒪 := (mem_maximalIdeal _).2 hu
@@ -62,27 +71,33 @@ theorem isUnit_vVal {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : IsUnit (vVal W z
   exact (maximalIdeal.isMaximal 𝒪).ne_top ((Ideal.eq_top_iff_one _).2 this)
 
 theorem wVal_mem {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) : wVal W z ∈ maximalIdeal 𝒪 :=
-  psEvalAt_mem (by rw [show MvPowerSeries.constantCoeff (formalW W) = 0 from
-    constantCoeff_formalW W]; exact zero_mem _) (fun _ => hz)
+  psEvalAt_mem
+    (by
+      rw [show MvPowerSeries.constantCoeff (formalW W) = 0 from constantCoeff_formalW W]
+      exact zero_mem _)
+    (fun _ => hz)
 
 theorem wVal_ne_zero {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) (hz0 : z ≠ 0) : wVal W z ≠ 0 := by
   rw [wVal_eq W hz]
   exact mul_ne_zero (pow_ne_zero _ hz0) (isUnit_vVal W hz).ne_zero
 
-theorem eq_wVal {z w : 𝒪} (hz : z ∈ maximalIdeal 𝒪) (hw : w ∈ maximalIdeal 𝒪)
-    (h : zwPoly W z w = 0) : w = wVal W z := by
+theorem eq_wVal {z w : 𝒪} (hz : z ∈ maximalIdeal 𝒪) (hw : w ∈ maximalIdeal 𝒪) (h : zwPoly W z w = 0)
+    : w = wVal W z := by
   refine eq_of_zwPoly_eq_zero W h (zwPoly_wVal W hz) ?_
-  have hm : W.a₁ * z + W.a₂ * z ^ 2 + W.a₃ * (w + wVal W z) + W.a₄ * z * (w + wVal W z) +
-      W.a₆ * (w ^ 2 + w * wVal W z + wVal W z ^ 2) ∈ maximalIdeal 𝒪 := by
+  have hm
+      : W.a₁ * z + W.a₂ * z ^ 2 + W.a₃ * (w + wVal W z) + W.a₄ * z * (w + wVal W z)
+          + W.a₆ * (w ^ 2 + w * wVal W z + wVal W z ^ 2)
+        ∈ maximalIdeal 𝒪 := by
     have hw' := wVal_mem W hz
     refine Ideal.add_mem _ (Ideal.add_mem _ (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_) ?_) ?_
     · exact Ideal.mul_mem_left _ _ hz
     · exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ hz _ (by norm_num))
     · exact Ideal.mul_mem_left _ _ (Ideal.add_mem _ hw hw')
     · exact Ideal.mul_mem_left _ _ (Ideal.add_mem _ hw hw')
-    · exact Ideal.mul_mem_left _ _ (Ideal.add_mem _ (Ideal.add_mem _
-        (Ideal.pow_mem_of_mem _ hw _ (by norm_num)) (Ideal.mul_mem_right _ _ hw))
-        (Ideal.pow_mem_of_mem _ hw' _ (by norm_num)))
+    · exact Ideal.mul_mem_left _ _
+        (Ideal.add_mem _
+          (Ideal.add_mem _ (Ideal.pow_mem_of_mem _ hw _ (by norm_num)) (Ideal.mul_mem_right _ _ hw))
+          (Ideal.pow_mem_of_mem _ hw' _ (by norm_num)))
   by_contra hu
   have h1 := (mem_maximalIdeal _).2 hu
   have := Ideal.add_mem _ h1 hm
@@ -96,8 +111,8 @@ section Points
 variable (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] (W : WeierstrassCurve 𝒪)
 
 omit [IsFractionRing 𝒪 K] in
-theorem zwPoly_wVal_map {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) :
-    zwPoly (W.map (algebraMap 𝒪 K)) (algebraMap 𝒪 K z) (algebraMap 𝒪 K (wVal W z)) = 0 := by
+theorem zwPoly_wVal_map {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪)
+    : zwPoly (W.map (algebraMap 𝒪 K)) (algebraMap 𝒪 K z) (algebraMap 𝒪 K (wVal W z)) = 0 := by
   rw [← map_zwPoly, zwPoly_wVal W hz, map_zero]
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] in
@@ -127,8 +142,7 @@ variable [(W.map (algebraMap 𝒪 K)).IsElliptic]
 def pointE (x : MaxIdealPoint (formalGroup W)) : (W.map (algebraMap 𝒪 K)).toAffine.Point :=
   zwPoint (W.map (algebraMap 𝒪 K)) (algebraMap 𝒪 K x.val) (algebraMap 𝒪 K (wVal W x.val))
 
-theorem wVal_zero : wVal W 0 = 0 := by
-  rw [wVal_eq W (zero_mem _), zero_pow (by norm_num), zero_mul]
+theorem wVal_zero : wVal W 0 = 0 := by rw [wVal_eq W (zero_mem _), zero_pow (by norm_num), zero_mul]
 
 omit [IsFractionRing 𝒪 K] in
 theorem pointE_zero : pointE K W 0 = 0 := by
@@ -137,15 +151,14 @@ theorem pointE_zero : pointE K W 0 = 0 := by
   apply h
   rw [MaxIdealPoint.val_zero, wVal_zero, map_zero]
 
-theorem pointE_of_ne_zero {x : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0) :
-    pointE K W x = WeierstrassCurve.Affine.Point.mk (equation_of_zwPoly _
-      (zwPoly_wVal_map K W x.val_mem)
-      ((map_ne_zero_iff _ (IsFractionRing.injective 𝒪 K)).2 (wVal_ne_zero W x.val_mem hx))) :=
+theorem pointE_of_ne_zero {x : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0)
+    : pointE K W x
+      = WeierstrassCurve.Affine.Point.mk (equation_of_zwPoly _ (zwPoly_wVal_map K W x.val_mem)
+        ((map_ne_zero_iff _ (IsFractionRing.injective 𝒪 K)).2 (wVal_ne_zero W x.val_mem hx))) :=
   zwPoint_of _ (zwPoly_wVal_map K W x.val_mem)
     ((map_ne_zero_iff _ (IsFractionRing.injective 𝒪 K)).2 (wVal_ne_zero W x.val_mem hx))
 
-theorem pointE_ne_zero {x : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0) :
-    pointE K W x ≠ 0 := by
+theorem pointE_ne_zero {x : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0) : pointE K W x ≠ 0 := by
   rw [pointE_of_ne_zero K W hx]
   exact WeierstrassCurve.Affine.Point.some_ne_zero _
 
@@ -179,11 +192,11 @@ theorem pointE_injective : Function.Injective (pointE K W) := by
   rw [e, div_left_inj₀ hwy] at h1
   exact Subtype.ext (hι h1)
 
-theorem val_neg_eq (x : MaxIdealPoint (formalGroup W)) :
-    (-x).val = psEvalAt (invSeries W) (fun _ : Unit => x.val) := by
+theorem val_neg_eq (x : MaxIdealPoint (formalGroup W))
+    : (-x).val = psEvalAt (invSeries W) (fun _ : Unit => x.val) := by
   rw [MaxIdealPoint.val_neg, inv_formalGroup]
 
-theorem pointE_neg (x : MaxIdealPoint (formalGroup W)) : pointE K W (-x) = -pointE K W x := by
+theorem pointE_neg (x : MaxIdealPoint (formalGroup W)) : pointE K W (-x) = - pointE K W x := by
   by_cases hx : x.val = 0
   · have hx' : x = 0 := Subtype.ext hx
     rw [hx', neg_zero, pointE_zero]
@@ -197,14 +210,15 @@ theorem pointE_neg (x : MaxIdealPoint (formalGroup W)) : pointE K W (-x) = -poin
   have ψw : ψ (formalW W) = wVal W x.val := evAlgHom_apply _ _ _
   have he : (1 - W.a₁ * x.val - W.a₃ * wVal W x.val) * e = 1 := by
     have := congrArg ψ (mul_invOfUnit_one (constantCoeff_invDen W))
-    rwa [map_mul, map_one, invDen, map_sub, map_sub, map_one, map_mul, map_mul, ψC, ψC, ψX,
-      ψw] at this
+    rwa [map_mul, map_one, invDen, map_sub, map_sub, map_one, map_mul, map_mul, ψC, ψC, ψX, ψw] at
+      this
   have hz : (-x).val = -x.val * e := by
     rw [val_neg_eq, ← evAlgHom_apply _ (fun _ => x.val_mem), invSeries, map_mul, map_neg, ψX]
-  have hw : wVal W (-x).val = -wVal W x.val * e := by
+  have hw : wVal W (-x).val = - wVal W x.val * e := by
     rw [wVal, val_neg_eq]
-    rw [← psEvalAt_powerSeries_subst (PowerSeries.HasSubst.of_constantCoeff_zero
-      (constantCoeff_invSeries W)) _ (fun _ => x.val_mem)]
+    rw [← psEvalAt_powerSeries_subst
+      (PowerSeries.HasSubst.of_constantCoeff_zero (constantCoeff_invSeries W)) _
+      (fun _ => x.val_mem)]
     change psEvalAt (wAt W (invSeries W)) _ = _
     rw [wAt_invSeries, ← evAlgHom_apply _ (fun _ => x.val_mem), map_mul, map_neg, ψw]
   have hw0 : ι (wVal W x.val) ≠ 0 := (map_ne_zero_iff _ hι).2 (wVal_ne_zero W x.val_mem hx)
@@ -216,10 +230,11 @@ theorem pointE_neg (x : MaxIdealPoint (formalGroup W)) : pointE K W (-x) = -poin
 
 variable [DecidableEq K]
 
-theorem pointE_add_of_ne {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0) (hy : y.val ≠ 0)
-    (hxy : algebraMap 𝒪 K x.val / algebraMap 𝒪 K (wVal W x.val) ≠
-      algebraMap 𝒪 K y.val / algebraMap 𝒪 K (wVal W y.val)) :
-    pointE K W (x + y) = pointE K W x + pointE K W y := by
+theorem pointE_add_of_ne
+    {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0) (hy : y.val ≠ 0)
+    (hxy : algebraMap 𝒪 K x.val / algebraMap 𝒪 K (wVal W x.val)
+      ≠ algebraMap 𝒪 K y.val / algebraMap 𝒪 K (wVal W y.val))
+    : pointE K W (x + y) = pointE K W x + pointE K W y := by
   have : Infinite K := infinite_fraction (𝒪 := 𝒪) K
   set ι := algebraMap 𝒪 K
   have hι : Function.Injective ι := IsFractionRing.injective 𝒪 K
@@ -230,8 +245,9 @@ theorem pointE_add_of_ne {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0
   have ψw : ∀ i, ψ (wAt W (MvPowerSeries.X i)) = wVal W (![x.val, y.val] i) := fun i => by
     rw [evAlgHom_apply, wAt, psEvalAt_powerSeries_subst (PowerSeries.HasSubst.X i) _ hab,
       psEvalAt_X, wVal]
-  have hc0 : ∀ f : MvPowerSeries (Fin 2) 𝒪, MvPowerSeries.constantCoeff f = 0 →
-      ψ f ∈ maximalIdeal 𝒪 := fun f hf => by
+  have hc0
+      : ∀ f : MvPowerSeries (Fin 2) 𝒪,
+        MvPowerSeries.constantCoeff f = 0 → ψ f ∈ maximalIdeal 𝒪 := fun f hf => by
     rw [evAlgHom_apply]; exact psEvalAt_mem (by rw [hf]; exact zero_mem _) hab
   have hW : W.map (algebraMap 𝒪 𝒪) = W := by
     rw [Algebra.algebraMap_self]; exact WeierstrassCurve.map_id W
@@ -241,18 +257,15 @@ theorem pointE_add_of_ne {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0
   set z₃ := ψ (thirdZ W)
   set w₃ := ψ (thirdW W)
   set e := ψ (MvPowerSeries.invOfUnit (negDen W) 1)
-  have rl₁ : wVal W x.val = l * x.val + n := by
-    have := apply_wAt_X_zero W ψ; rwa [ψw, ψX0] at this
-  have rl₂ : wVal W y.val = l * y.val + n := by
-    have := apply_wAt_X_one W ψ; rwa [ψw, ψX1] at this
-  have rb : secantB W l * b = 1 := by
-    have := secantB_apply_mul W ψ; rwa [hW] at this
+  have rl₁ : wVal W x.val = l * x.val + n := by have := apply_wAt_X_zero W ψ; rwa [ψw, ψX0] at this
+  have rl₂ : wVal W y.val = l * y.val + n := by have := apply_wAt_X_one W ψ; rwa [ψw, ψX1] at this
+  have rb : secantB W l * b = 1 := by have := secantB_apply_mul W ψ; rwa [hW] at this
   have rz₃ : z₃ = -x.val - y.val - secantA W l n * b := by
     have := apply_thirdZ W ψ; rwa [ψX0, ψX1, hW] at this
   have rw₃ : w₃ = l * z₃ + n := apply_thirdW W ψ
   have re : (1 - W.a₁ * z₃ - W.a₃ * w₃) * e = 1 := by
-    have := negDen_apply_mul W ψ; rwa [Algebra.algebraMap_self, RingHom.id_apply,
-      RingHom.id_apply] at this
+    have := negDen_apply_mul W ψ
+    rwa [Algebra.algebraMap_self, RingHom.id_apply, RingHom.id_apply] at this
   have rF : (x + y).val = -z₃ * e := by
     rw [MaxIdealPoint.val_add, formalGroup_toPowerSeries, ← evAlgHom_apply _ hab, apply_addSeries]
 
@@ -261,12 +274,13 @@ theorem pointE_add_of_ne {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0
   have hw₂ : ι (wVal W y.val) ≠ 0 := (map_ne_zero_iff ι hι).2 (wVal_ne_zero W y.val_mem hy)
   have hb' : secantB V (ι l) * ι b = 1 := by
     have := congrArg ι rb; rwa [map_mul, map_secantB, map_one] at this
-  have hz₃' : ι z₃ = -ι x.val - ι y.val - secantA V (ι l) (ι n) * ι b := by
+  have hz₃' : ι z₃ = - ι x.val - ι y.val - secantA V (ι l) (ι n) * ι b := by
     rw [rz₃, map_sub, map_sub, map_neg, map_mul, map_secantA]
   have hw₃' : ι w₃ = ι l * ι z₃ + ι n := by rw [rw₃, map_add (f := _), map_mul]
-  obtain ⟨h₃, hw₃0, hsum⟩ := secant_spec V (zwPoly_wVal_map K W x.val_mem)
-    (zwPoly_wVal_map K W y.val_mem) hw₁ hw₂ (by rw [rl₁, map_add (f := _), map_mul])
-    (by rw [rl₂, map_add (f := _), map_mul]) hb' hxy hz₃' hw₃'
+  obtain ⟨h₃, hw₃0, hsum⟩ :=
+    secant_spec V (zwPoly_wVal_map K W x.val_mem) (zwPoly_wVal_map K W y.val_mem) hw₁ hw₂
+      (by rw [rl₁, map_add (f := _), map_mul]) (by rw [rl₂, map_add (f := _), map_mul]) hb' hxy hz₃'
+      hw₃'
   have he' : (1 - V.a₁ * ι z₃ - V.a₃ * ι w₃) * ι e = 1 := by
     have := congrArg ι re
     rwa [map_mul, map_sub, map_sub, map_mul, map_mul, map_one] at this
@@ -281,18 +295,21 @@ theorem pointE_add_of_ne {x y : MaxIdealPoint (formalGroup W)} (hx : x.val ≠ 0
     exact Ideal.mul_mem_right _ _ ((Ideal.neg_mem_iff _).2 (hc0 _ (constantCoeff_thirdW W)))
   rw [pointE, pointE, pointE, hsum, hneg, ← hwF, rF, map_mul, map_mul, map_neg, map_neg]
 
-theorem pointE_add_of_ne' {x y : MaxIdealPoint (formalGroup W)} (hx : x ≠ 0) (hy : y ≠ 0)
-    (h₁ : y ≠ x) (h₂ : y ≠ -x) : pointE K W (x + y) = pointE K W x + pointE K W y := by
+theorem pointE_add_of_ne'
+    {x y : MaxIdealPoint (formalGroup W)} (hx : x ≠ 0) (hy : y ≠ 0) (h₁ : y ≠ x) (h₂ : y ≠ -x)
+    : pointE K W (x + y) = pointE K W x + pointE K W y := by
   classical
   have hx' : x.val ≠ 0 := fun h => hx (Subtype.ext h)
   have hy' : y.val ≠ 0 := fun h => hy (Subtype.ext h)
   refine pointE_add_of_ne K W hx' hy' ?_
   intro hxy
   have hι := IsFractionRing.injective 𝒪 K
-  have p₁ := WeierstrassCurve.Affine.equation_iff_nonsingular.mp (equation_of_zwPoly _
-    (zwPoly_wVal_map K W x.val_mem) ((map_ne_zero_iff _ hι).2 (wVal_ne_zero W x.val_mem hx')))
-  have p₂ := WeierstrassCurve.Affine.equation_iff_nonsingular.mp (equation_of_zwPoly _
-    (zwPoly_wVal_map K W y.val_mem) ((map_ne_zero_iff _ hι).2 (wVal_ne_zero W y.val_mem hy')))
+  have p₁ :=
+    WeierstrassCurve.Affine.equation_iff_nonsingular.mp (equation_of_zwPoly _
+      (zwPoly_wVal_map K W x.val_mem) ((map_ne_zero_iff _ hι).2 (wVal_ne_zero W x.val_mem hx')))
+  have p₂ :=
+    WeierstrassCurve.Affine.equation_iff_nonsingular.mp (equation_of_zwPoly _
+      (zwPoly_wVal_map K W y.val_mem) ((map_ne_zero_iff _ hι).2 (wVal_ne_zero W y.val_mem hy')))
   have e₁ : pointE K W x = WeierstrassCurve.Affine.Point.some _ _ p₁ := pointE_of_ne_zero K W hx'
   have e₂ : pointE K W y = WeierstrassCurve.Affine.Point.some _ _ p₂ := pointE_of_ne_zero K W hy'
   rcases (WeierstrassCurve.Affine.Point.X_eq_iff (h₁ := p₁) (h₂ := p₂)).1 hxy with h | h
@@ -301,38 +318,43 @@ theorem pointE_add_of_ne' {x y : MaxIdealPoint (formalGroup W)} (hx : x ≠ 0) (
   · rw [← e₁, ← e₂, ← pointE_neg] at h
     exact h₂ (by rw [pointE_injective K W h, neg_neg])
 
-theorem pointE_add_self (a : MaxIdealPoint (formalGroup W)) :
-    pointE K W (a + a) = pointE K W a + pointE K W a := by
+theorem pointE_add_self (a : MaxIdealPoint (formalGroup W))
+    : pointE K W (a + a) = pointE K W a + pointE K W a := by
   classical
   by_cases ha : a = 0
   · rw [ha, add_zero, pointE_zero, add_zero]
   by_cases h2 : a + a = 0
   · have hna : -a = a := (eq_neg_of_add_eq_zero_left h2).symm
-    have hP : pointE K W a = -pointE K W a := by rw [← pointE_neg, hna]
+    have hP : pointE K W a = - pointE K W a := by rw [← pointE_neg, hna]
     rw [h2, pointE_zero]
     nth_rewrite 2 [hP]
     rw [add_neg_cancel]
   have : Infinite (MaxIdealPoint (formalGroup W)) := (infinite_maximalIdeal (𝒪 := 𝒪)).to_subtype
-  obtain ⟨t, ht⟩ := Infinite.exists_notMem_finset
-    ({0, a, -a, a + a, -(a + a)} : Finset (MaxIdealPoint (formalGroup W)))
+  obtain ⟨t, ht⟩ :=
+    Infinite.exists_notMem_finset
+      ({0, a, -a, a + a, -(a + a)} : Finset (MaxIdealPoint (formalGroup W)))
   simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at ht
   obtain ⟨ht0, hta, htna, ht2a, htn2a⟩ := ht
   have e₁ := pointE_add_of_ne' K W ha ht0 hta htna
   have hat : a + t ≠ 0 := fun h => htna (eq_neg_of_add_eq_zero_right h)
-  have e₂ := pointE_add_of_ne' K W hat ha (fun h => ht0 (by
-      have := congrArg (fun s => -a + s) h; simpa using this.symm))
-    (fun h => htn2a (by
-      have h' : -a = a + t := neg_eq_iff_eq_neg.mpr h
-      rw [neg_add', h']; abel))
+  have e₂ :=
+    pointE_add_of_ne' K W hat ha
+      (fun h => ht0 (by have := congrArg (fun s => -a + s) h; simpa using this.symm))
+      (fun h =>
+        htn2a (by
+          have h' : -a = a + t := neg_eq_iff_eq_neg.mpr h
+          rw [neg_add', h']
+          abel))
   have e₃ := pointE_add_of_ne' K W h2 ht0 ht2a htn2a
   have hsum : a + t + a = a + a + t := by abel
   rw [hsum, e₃, e₁] at e₂
   have : pointE K W (a + a) = pointE K W a + pointE K W t + pointE K W a - pointE K W t := by
     rw [← e₂]; abel
-  rw [this]; abel
+  rw [this]
+  abel
 
-theorem pointE_add (x y : MaxIdealPoint (formalGroup W)) :
-    pointE K W (x + y) = pointE K W x + pointE K W y := by
+theorem pointE_add (x y : MaxIdealPoint (formalGroup W))
+    : pointE K W (x + y) = pointE K W x + pointE K W y := by
   by_cases hx : x = 0
   · rw [hx, zero_add, pointE_zero, zero_add]
   by_cases hy : y = 0
@@ -350,22 +372,24 @@ def pointEHom : MaxIdealPoint (formalGroup W) →+ (W.map (algebraMap 𝒪 K)).t
 
 omit [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
   [IsFractionRing 𝒪 K] [(W.map (algebraMap 𝒪 K)).IsElliptic] [DecidableEq K] in
-theorem zwPoly_of_equation {X Y : K} (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation X Y)
-    (hY : Y ≠ 0) : zwPoly (W.map (algebraMap 𝒪 K)) (-X / Y) (-1 / Y) = 0 := by
+theorem zwPoly_of_equation
+    {X Y : K} (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation X Y) (hY : Y ≠ 0)
+    : zwPoly (W.map (algebraMap 𝒪 K)) (-X / Y) (-1 / Y) = 0 := by
   rw [WeierstrassCurve.Affine.equation_iff] at h
-  have key : zwPoly (W.map (algebraMap 𝒪 K)) (-X / Y) (-1 / Y) =
-      (Y ^ 2 + (W.map (algebraMap 𝒪 K)).a₁ * X * Y + (W.map (algebraMap 𝒪 K)).a₃ * Y -
-        (X ^ 3 + (W.map (algebraMap 𝒪 K)).a₂ * X ^ 2 + (W.map (algebraMap 𝒪 K)).a₄ * X +
-          (W.map (algebraMap 𝒪 K)).a₆)) / Y ^ 3 := by
+  have key
+      : zwPoly (W.map (algebraMap 𝒪 K)) (-X / Y) (-1 / Y)
+        = (Y ^ 2 + (W.map (algebraMap 𝒪 K)).a₁ * X * Y + (W.map (algebraMap 𝒪 K)).a₃ * Y
+            - (X ^ 3 + (W.map (algebraMap 𝒪 K)).a₂ * X ^ 2 + (W.map (algebraMap 𝒪 K)).a₄ * X
+              + (W.map (algebraMap 𝒪 K)).a₆))
+          / Y ^ 3 := by
     unfold zwPoly; field_simp; ring
   rw [key, h, sub_self, zero_div]
 
-
 omit [DecidableEq K] in
-theorem mem_range_pointE_iff (P : (W.map (algebraMap 𝒪 K)).toAffine.Point) :
-    P ∈ Set.range (pointE K W) ↔ ∀ (x y : K)
-      (h : (W.map (algebraMap 𝒪 K)).toAffine.Nonsingular x y),
-      P = .some x y h → x ∉ Set.range (algebraMap 𝒪 K) := by
+theorem mem_range_pointE_iff (P : (W.map (algebraMap 𝒪 K)).toAffine.Point)
+    : P ∈ Set.range (pointE K W)
+      ↔ ∀ (x y : K) (h : (W.map (algebraMap 𝒪 K)).toAffine.Nonsingular x y),
+        P = .some x y h → x ∉ Set.range (algebraMap 𝒪 K) := by
   constructor
   · have hι : Function.Injective (algebraMap 𝒪 K) := IsFractionRing.injective 𝒪 K
     rintro ⟨z, rfl⟩ x y h hP ⟨r, hr⟩
@@ -410,25 +434,34 @@ theorem mem_range_pointE_iff (P : (W.map (algebraMap 𝒪 K)).toAffine.Point) :
     rw [WeierstrassCurve.Affine.equation_iff] at hE
     have hU : Y / X ∉ Set.range (algebraMap 𝒪 K) := by
       rintro ⟨u, hu⟩
-      have key : (algebraMap 𝒪 K) (u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 -
-          (1 + W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3)) = 0 := by
+      have key
+          : (algebraMap 𝒪 K)
+              (u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2
+                - (1 + W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3))
+            = 0 := by
         simp only [map_sub, map_add (f := _), map_mul, map_pow, map_one, hu, ht]
         simp only [WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
-          WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆] at hE
+            WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
+          at hE
         field_simp
         linear_combination hE
       have k2 := sub_eq_zero.1 (hι (key.trans (map_zero (algebraMap 𝒪 K)).symm))
-      have hm : u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 - (W.a₂ * t + W.a₄ * t ^ 2 +
-          W.a₆ * t ^ 3) ∈ maximalIdeal 𝒪 := by
+      have hm
+          : u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 - (W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3)
+            ∈ maximalIdeal 𝒪 := by
         refine Ideal.sub_mem _ (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_)
-          (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_) <;>
-          first
-          | exact Ideal.mul_mem_left _ _ htm
-          | exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ htm _ (by norm_num))
+            (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_)
+          <;> first
+            | exact Ideal.mul_mem_left _ _ htm
+            | exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ htm _ (by norm_num))
       have : (1 : 𝒪) ∈ maximalIdeal 𝒪 := by
-        have e : (1 : 𝒪) = u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 - (W.a₂ * t + W.a₄ * t ^ 2 +
-            W.a₆ * t ^ 3) := by linear_combination -k2
-        rw [e]; exact hm
+        have e
+            : (1 : 𝒪)
+              = u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2
+                - (W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3) := by
+          linear_combination -k2
+        rw [e]
+        exact hm
       exact (maximalIdeal.isMaximal 𝒪).ne_top ((Ideal.eq_top_iff_one _).2 this)
     have hY0 : Y ≠ 0 := fun h => hU ⟨0, by rw [h, zero_div, map_zero]⟩
     obtain ⟨s, hs⟩ : ∃ s, (algebraMap 𝒪 K) s = (Y / X)⁻¹ := by
@@ -451,7 +484,8 @@ theorem mem_range_pointE_iff (P : (W.map (algebraMap 𝒪 K)).toAffine.Point) :
     refine ⟨MaxIdealPoint.mk (-s) hz, ?_⟩
     have hs0 : (MaxIdealPoint.mk (-s) hz : MaxIdealPoint (formalGroup W)).val ≠ 0 := by
       rw [MaxIdealPoint.val_mk, neg_ne_zero]
-      intro h; apply hY0
+      intro h
+      apply hY0
       have : (algebraMap 𝒪 K) s = 0 := by rw [h, map_zero]
       rw [hs, inv_eq_zero, div_eq_zero_iff] at this
       exact this.resolve_right hX0
@@ -462,9 +496,10 @@ theorem mem_range_pointE_iff (P : (W.map (algebraMap 𝒪 K)).toAffine.Point) :
     constructor <;> field_simp
 
 def E1 : AddSubgroup (W.map (algebraMap 𝒪 K)).toAffine.Point :=
-  (pointEHom K W).range.copy {P | ∀ (x y : K)
-    (h : (W.map (algebraMap 𝒪 K)).toAffine.Nonsingular x y),
-    P = .some x y h → x ∉ Set.range (algebraMap 𝒪 K)}
+  (pointEHom K W).range.copy
+    {P | ∀ (x y : K)
+      (h : (W.map (algebraMap 𝒪 K)).toAffine.Nonsingular x y),
+      P = .some x y h → x ∉ Set.range (algebraMap 𝒪 K)}
     (by ext P; rw [Set.mem_ofPred_eq, ← mem_range_pointE_iff]; rfl)
 
 end Points

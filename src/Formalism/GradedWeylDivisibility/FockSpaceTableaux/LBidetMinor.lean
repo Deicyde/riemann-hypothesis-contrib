@@ -13,8 +13,8 @@ namespace Formalism.GradedWeylDivisibility
 
 def initW (n s : ℕ) : Fin n → ℕ := fun t => if t.val < s then 1 else 0
 
-theorem sum_single_castLE {n s : ℕ} (hs : s ≤ n) :
-    (∑ q : Fin s, (Pi.single (Fin.castLE hs q) 1 : Fin n → ℕ)) = initW n s := by
+theorem sum_single_castLE {n s : ℕ} (hs : s ≤ n)
+    : (∑ q : Fin s, (Pi.single (Fin.castLE hs q) 1 : Fin n → ℕ)) = initW n s := by
   funext t
   rw [Finset.sum_apply]
   simp only [initW]
@@ -38,9 +38,9 @@ theorem sum_single_castLE {n s : ℕ} (hs : s ≤ n) :
     subst htq
     exact q.isLt
 
-theorem initMinor_isWeightedHomogeneous {R : Type*} [CommRing R] {r n s : ℕ}
-    (I : Fin s → Fin r) (hs : s ≤ n) :
-    IsWeightedHomogeneous (colW r n) (initMinor R I hs) (initW n s) := by
+theorem initMinor_isWeightedHomogeneous
+    {R : Type*} [CommRing R] {r n s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n)
+    : IsWeightedHomogeneous (colW r n) (initMinor R I hs) (initW n s) := by
   rw [← mem_weightedHomogeneousSubmodule]
   unfold initMinor
   rw [Matrix.det_apply]
@@ -52,20 +52,23 @@ theorem initMinor_isWeightedHomogeneous {R : Type*} [CommRing R] {r n s : ℕ}
   intro q _
   exact isWeightedHomogeneous_X (R := R) (colW r n) (I (σ q), Fin.castLE hs q)
 
-theorem algHom_det_of {R A B : Type*} [CommRing R] [CommRing A] [CommRing B] [Algebra R A]
-    [Algebra R B] (φ : A →ₐ[R] B) {s : ℕ} (M : Fin s → Fin s → A) :
-    φ (Matrix.of M).det = (Matrix.of fun p q => φ (M p q)).det := by
+theorem algHom_det_of
+    {R A B : Type*} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
+    (φ : A →ₐ[R] B)
+    {s : ℕ} (M : Fin s → Fin s → A)
+    : φ (Matrix.of M).det = (Matrix.of fun p q => φ (M p q)).det := by
   rw [AlgHom.map_det]
   rfl
 
-theorem colAddGen_X {R : Type*} [CommRing R] {r n : ℕ} (l j : Fin n) (v : Fin r × Fin n) :
-    colAddGen R l j (X v) =
-      if v.2 = j then X (some v) + X none * X (some (v.1, l)) else X (some v) := by
+theorem colAddGen_X {R : Type*} [CommRing R] {r n : ℕ} (l j : Fin n) (v : Fin r × Fin n)
+    : colAddGen R l j (X v)
+      = if v.2 = j then X (some v) + X none * X (some (v.1, l)) else X (some v) := by
   simp only [colAddGen, aeval_X]
 
-theorem initMinor_invariant {R : Type*} [CommRing R] {r n s : ℕ}
-    (I : Fin s → Fin r) (hs : s ≤ n) (l j : Fin n) (hlj : l < j) :
-    colAddGen R l j (initMinor R I hs) = rename some (initMinor R I hs) := by
+theorem initMinor_invariant
+    {R : Type*} [CommRing R]
+    {r n s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n) (l j : Fin n) (hlj : l < j)
+    : colAddGen R l j (initMinor R I hs) = rename some (initMinor R I hs) := by
   unfold initMinor
   rw [algHom_det_of, algHom_det_of]
   simp only [colAddGen_X, rename_X]
@@ -76,7 +79,8 @@ theorem initMinor_invariant {R : Type*} [CommRing R] {r n s : ℕ}
       exact hlj.ne' (Fin.ext (Fin.mk.inj_iff.mp h))
     rw [← Matrix.det_updateCol_add_smul_self
       (Matrix.of fun p q : Fin s =>
-        (X (some (I p, Fin.castLE hs q)) : MvPolynomial (Option (Fin r × Fin n)) R)) hjl (X none)]
+        (X (some (I p, Fin.castLE hs q)) : MvPolynomial (Option (Fin r × Fin n)) R))
+      hjl (X none)]
     congr 1
     ext p q
     simp only [Matrix.updateCol_apply, Matrix.of_apply]
@@ -101,9 +105,8 @@ theorem initMinor_invariant {R : Type*} [CommRing R] {r n s : ℕ}
       exact q.isLt
     rw [if_neg hne]
 
-theorem initMinor_mem {R : Type*} [CommRing R] {r n s : ℕ}
-    (I : Fin s → Fin r) (hs : s ≤ n) :
-    initMinor R I hs ∈ dualWeyl R r n (initW n s) := by
+theorem initMinor_mem {R : Type*} [CommRing R] {r n s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n)
+    : initMinor R I hs ∈ dualWeyl R r n (initW n s) := by
   unfold dualWeyl
   refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
   · rw [mem_weightedHomogeneousSubmodule]

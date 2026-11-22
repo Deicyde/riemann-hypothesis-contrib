@@ -8,12 +8,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGener
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL
+  GlobalTheory.SplitWeil UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem sphC_fin {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    {K : Subgroup G} (hL : IsCompact (K : Set G)) (hK' : IsOpen (K : Set G)) (x : G) :
-    (MulAction.orbit K (x : G ⧸ K)).Finite := by
+private theorem sphC_fin
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {K : Subgroup G} (hL : IsCompact (K : Set G)) (hK' : IsOpen (K : Set G))
+    (x : G)
+    : (MulAction.orbit K (x : G ⧸ K)).Finite := by
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hK'
   have hc : Continuous fun g : G => ((g * x : G) : G ⧸ K) :=
     QuotientGroup.continuous_mk.comp (continuous_id.mul continuous_const)
@@ -21,10 +26,12 @@ private theorem sphC_fin {G : Type} [Group G] [TopologicalSpace G] [IsTopologica
   rintro _ ⟨g, rfl⟩
   exact ⟨g, g.2, rfl⟩
 
-private theorem sphC_le {H : Type} [Group H] (K : Subgroup H) (θ : H →* H) (hθ : ∀ x, θ (θ x) = x)
-    (hK : ∀ k ∈ K, θ k ∈ K) (hd : ∀ x, ∃ k ∈ K, ∃ k' ∈ K, θ x⁻¹ = k * x * k')
-    (hfin : ∀ x : H, (MulAction.orbit K (x : H ⧸ K)).Finite) (x : H) :
-    (MulAction.orbit K (x : H ⧸ K)).ncard ≤ (MulAction.orbit K ((x⁻¹ : H) : H ⧸ K)).ncard := by
+private theorem sphC_le
+    {H : Type} [Group H]
+    (K : Subgroup H) (θ : H →* H) (hθ : ∀ x, θ (θ x) = x) (hK : ∀ k ∈ K, θ k ∈ K)
+    (hd : ∀ x, ∃ k ∈ K, ∃ k' ∈ K, θ x⁻¹ = k * x * k')
+    (hfin : ∀ x : H, (MulAction.orbit K (x : H ⧸ K)).Finite) (x : H)
+    : (MulAction.orbit K (x : H ⧸ K)).ncard ≤ (MulAction.orbit K ((x⁻¹ : H) : H ⧸ K)).ncard := by
   refine Set.ncard_le_ncard_of_injOn (fun q => ((θ q.out : H) : H ⧸ K)) ?_ ?_ (hfin _)
   · rintro q ⟨a, ha⟩
     have h : (((a : H) * x : H) : H ⧸ K) = (q.out : H ⧸ K) := by
@@ -45,9 +52,12 @@ private theorem sphC_le {H : Type} [Group H] (K : Subgroup H) (θ : H →* H) (h
     rw [← QuotientGroup.out_eq' p, ← QuotientGroup.out_eq' q]
     exact QuotientGroup.eq.mpr h1
 
-private theorem sphC_central {A H M : Type} [CommRing A] [Group H] [AddCommGroup M] [Module A M]
-    (ρ : Representation A H M) (K : Subgroup H) (z : H) (hz : ∀ g, g * z = z * g) (v : M) (hv : v ∈ fixd ρ K) :
-    dc ρ K K z v = ρ z v := by
+private theorem sphC_central
+    {A H M : Type} [CommRing A] [Group H] [AddCommGroup M] [Module A M]
+    (ρ : Representation A H M) (K : Subgroup H)
+    (z : H) (hz : ∀ g, g * z = z * g)
+    (v : M) (hv : v ∈ fixd ρ K)
+    : dc ρ K K z v = ρ z v := by
   have ho : MulAction.orbit K (z : H ⧸ K) = {(z : H ⧸ K)} := by
     ext q
     constructor
@@ -61,16 +71,20 @@ private theorem sphC_central {A H M : Type} [CommRing A] [Group H] [AddCommGroup
   obtain ⟨m, hm⟩ := QuotientGroup.mk_out_eq_mul K z
   rw [hm, map_mul, Module.End.mul_apply, hv m m.2]
 
-private theorem sphC_invT {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : ℕ} (g : GL (Fin n) k) (hg : g ∈ KO k (Fin n)) : GlobalTheory.CuspRep.invT n k g ∈ KO k (Fin n) := by
+private theorem sphC_invT
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} (g : GL (Fin n) k) (hg : g ∈ KO k (Fin n))
+    : GlobalTheory.CuspRep.invT n k g ∈ KO k (Fin n) := by
   rw [GlobalTheory.SplitFlip.mem_KO_iff] at hg ⊢
   exact ⟨fun i j => hg.2 j i, fun i j => hg.1 j i⟩
 
-private theorem sphC_cartan {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : ℕ} (g : GL (Fin n) k) :
-    ∃ a ∈ KO k (Fin n), ∃ b ∈ KO k (Fin n), GlobalTheory.CuspRep.invT n k g⁻¹ = a * g * b := by
-  obtain ⟨c, hc⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[k])
-    (fun p : Fin n × Fin n => g.val p.1 p.2)
+private theorem sphC_cartan
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} (g : GL (Fin n) k)
+    : ∃ a ∈ KO k (Fin n), ∃ b ∈ KO k (Fin n), GlobalTheory.CuspRep.invT n k g⁻¹ = a * g * b := by
+  obtain ⟨c, hc⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪[k])
+      (fun p : Fin n × Fin n => g.val p.1 p.2)
   choose f hf using hc
   obtain ⟨U, V, d, hU, hV, hΦ, -⟩ := KStar.Selmer.exists_smith n (Matrix.of fun i j => f (i, j))
   obtain ⟨u, rfl⟩ := (Matrix.isUnit_iff_isUnit_det U).2 hU
@@ -79,16 +93,20 @@ private theorem sphC_cartan {k : Type} [Field k] [ValuativeRel k] [TopologicalSp
   set w' : GL (Fin n) k := Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) w with hw'
   have hu : u' ∈ KO k (Fin n) := ⟨u, rfl⟩
   have hw : w' ∈ KO k (Fin n) := ⟨w, rfl⟩
-  have hc0 : algebraMap 𝒪[k] k c ≠ 0 := fun h =>
-    nonZeroDivisors.ne_zero c.2 (Subtype.ext h)
-  have h1 : algebraMap 𝒪[k] k c • g.val =
-      u'.val * Matrix.diagonal (fun i => algebraMap 𝒪[k] k (d i)) * w'.val := by
+  have hc0 : algebraMap 𝒪[k] k c ≠ 0 := fun h => nonZeroDivisors.ne_zero c.2 (Subtype.ext h)
+  have h1
+      : algebraMap 𝒪[k] k c • g.val
+        = u'.val * Matrix.diagonal (fun i => algebraMap 𝒪[k] k (d i)) * w'.val := by
     have h2 := congrArg (algebraMap 𝒪[k] k).mapMatrix hΦ
-    rw [map_mul, map_mul, RingHom.mapMatrix_apply (M := Matrix.diagonal d), Matrix.diagonal_map (map_zero _)] at h2
+    rw [map_mul, map_mul, RingHom.mapMatrix_apply (M := Matrix.diagonal d),
+        Matrix.diagonal_map (map_zero _)]
+      at h2
     refine Eq.trans ?_ h2
     ext i j
     exact (hf (i, j)).symm
-  have h3 : algebraMap 𝒪[k] k c • (u'⁻¹ * g * w'⁻¹).val = Matrix.diagonal (fun i => algebraMap 𝒪[k] k (d i)) := by
+  have h3
+      : algebraMap 𝒪[k] k c • (u'⁻¹ * g * w'⁻¹).val
+        = Matrix.diagonal (fun i => algebraMap 𝒪[k] k (d i)) := by
     rw [Units.val_mul, Units.val_mul, ← smul_mul_assoc, ← mul_smul_comm, h1]
     simp only [← mul_assoc, Units.inv_mul, one_mul]
     rw [mul_assoc, Units.mul_inv, mul_one]
@@ -98,21 +116,38 @@ private theorem sphC_cartan {k : Type} [Field k] [ValuativeRel k] [TopologicalSp
     apply smul_right_injective _ hc0
     simp only
     rw [← Matrix.transpose_smul, h3, Matrix.diagonal_transpose]
-  refine ⟨GlobalTheory.CuspRep.invT n k w'⁻¹ * u'⁻¹, mul_mem (sphC_invT _ (inv_mem hw)) (inv_mem hu),
-    w'⁻¹ * GlobalTheory.CuspRep.invT n k u'⁻¹, mul_mem (inv_mem hw) (sphC_invT _ (inv_mem hu)), ?_⟩
+  refine ⟨
+    GlobalTheory.CuspRep.invT n k w'⁻¹ * u'⁻¹,
+    mul_mem (sphC_invT _ (inv_mem hw)) (inv_mem hu),
+    w'⁻¹ * GlobalTheory.CuspRep.invT n k u'⁻¹,
+    mul_mem (inv_mem hw) (sphC_invT _ (inv_mem hu)),
+    ?_
+  ⟩
   have h5 : g⁻¹ = w'⁻¹ * (u'⁻¹ * g * w'⁻¹)⁻¹ * u'⁻¹ := by group
   rw [h5, map_mul, map_mul, h4]
   simp only [mul_assoc]
 
-theorem UpperTheory.V.Hi.sphComm :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (ρ : Representation A (GL (Fin n) k) M), (∀ x : GL (Fin n) k, (MulAction.orbit (KO k (Fin n)) (x : GL (Fin n) k ⧸ KO k (Fin n))).Finite) ∧ (∀ x y, ∀ v ∈ fixd ρ (KO k (Fin n)), dc ρ (KO k (Fin n)) (KO k (Fin n)) x (dc ρ (KO k (Fin n)) (KO k (Fin n)) y v) = dc ρ (KO k (Fin n)) (KO k (Fin n)) y (dc ρ (KO k (Fin n)) (KO k (Fin n)) x v)) ∧ ∀ v ∈ fixd ρ (KO k (Fin n)), sphOp ρ 0 v = v ∧ sphOp ρ n v = ρ (al k n n) v := by
+theorem UpperTheory.V.Hi.sphComm
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (A M : Type) [CommRing A] [AddCommGroup M] [Module A M]
+        (ρ : Representation A (GL (Fin n) k) M),
+      (∀ x : GL (Fin n) k,
+          (MulAction.orbit (KO k (Fin n)) (x : GL (Fin n) k ⧸ KO k (Fin n))).Finite)
+        ∧ (∀ x y, ∀ v ∈ fixd ρ (KO k (Fin n)),
+          dc ρ (KO k (Fin n)) (KO k (Fin n)) x (dc ρ (KO k (Fin n)) (KO k (Fin n)) y v)
+            = dc ρ (KO k (Fin n)) (KO k (Fin n)) y (dc ρ (KO k (Fin n)) (KO k (Fin n)) x v))
+        ∧ ∀ v ∈ fixd ρ (KO k (Fin n)), sphOp ρ 0 v = v ∧ sphOp ρ n v = ρ (al k n n) v := by
   intro k _ _ _ _ n A M _ _ _ ρ
-  have hfin : ∀ x : GL (Fin n) k, (MulAction.orbit (KO k (Fin n)) (x : GL (Fin n) k ⧸ KO k (Fin n))).Finite :=
+  have hfin
+      : ∀ x : GL (Fin n) k,
+        (MulAction.orbit (KO k (Fin n)) (x : GL (Fin n) k ⧸ KO k (Fin n))).Finite :=
     sphC_fin GlobalTheory.SplitFlip.isCompact_KO GlobalTheory.SplitFlip.isOpen_KO
-  have hθ : ∀ x, GlobalTheory.CuspRep.invT n k (GlobalTheory.CuspRep.invT n k x) = x := fun x => Units.ext rfl
+  have hθ : ∀ x, GlobalTheory.CuspRep.invT n k (GlobalTheory.CuspRep.invT n k x) = x := fun x =>
+    Units.ext rfl
   have hle := sphC_le (KO k (Fin n)) (GlobalTheory.CuspRep.invT n k) hθ sphC_invT sphC_cartan hfin
   refine ⟨hfin, ?_, fun v hv => ⟨?_, ?_⟩⟩
-  · refine dcGelfand A _ M ρ _ (fun x => GlobalTheory.CuspRep.invT n k x⁻¹) ?_ ?_ ?_ sphC_cartan hfin ?_
+  · refine
+      dcGelfand A _ M ρ _ (fun x => GlobalTheory.CuspRep.invT n k x⁻¹) ?_ ?_ ?_ sphC_cartan hfin ?_
     · intro x y
       rw [mul_inv_rev, map_mul]
     · intro x

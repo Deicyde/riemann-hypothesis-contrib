@@ -7,8 +7,13 @@ public import Mathlib.RingTheory.Ideal.KrullsHeightTheorem
 
 open IsLocalRing UpperTheory.V.Alg
 
-theorem UpperTheory.height_ker_section_le_of_cotangent_generators :
-    ∀ (O S : Type) [CommRing O] [IsDomain O] [CommRing S] [Algebra O S] [IsNoetherianRing S] (x : S →ₐ[O] O) (n : ℕ) (t : Fin n → S), (∀ i, x (t i) = 0) → (∀ a, x a = 0 → ∃ (e : O) (o : Fin n → O), e ≠ 0 ∧ e • a - ∑ i, o i • t i ∈ RingHom.ker x ^ 2) → (RingHom.ker x).height ≤ (n : ℕ∞) := by
+theorem UpperTheory.height_ker_section_le_of_cotangent_generators
+    : ∀ (O S : Type) [CommRing O] [IsDomain O] [CommRing S] [Algebra O S] [IsNoetherianRing S]
+        (x : S →ₐ[O] O) (n : ℕ) (t : Fin n → S),
+      (∀ i, x (t i) = 0)
+        → (∀ a,
+          x a = 0 → ∃ (e : O) (o : Fin n → O), e ≠ 0 ∧ e • a - ∑ i, o i • t i ∈ RingHom.ker x ^ 2)
+        → (RingHom.ker x).height ≤ (n : ℕ∞) := by
   classical
   intro O S _ _ _ _ _ x n t ht hx
   set P := RingHom.ker x with hPdef
@@ -43,15 +48,19 @@ theorem UpperTheory.height_ker_section_le_of_cotangent_generators :
       rw [Algebra.smul_def, map_mul]
       refine Ideal.mul_mem_left _ _ (Ideal.subset_span ?_)
       simp
-    have h4 : algebraMap S L (algebraMap O S e) * algebraMap S L a ∈ T ⊔ maximalIdeal L • maximalIdeal L := by
-      have : algebraMap S L (algebraMap O S e) * algebraMap S L a = algebraMap S L (∑ i, o i • t i) + algebraMap S L (e • a - ∑ i, o i • t i) := by
+    have h4
+        : algebraMap S L (algebraMap O S e) * algebraMap S L a
+          ∈ T ⊔ maximalIdeal L • maximalIdeal L := by
+      have : algebraMap S L (algebraMap O S e) * algebraMap S L a
+          = algebraMap S L (∑ i, o i • t i) + algebraMap S L (e • a - ∑ i, o i • t i) := by
         rw [← map_mul, ← Algebra.smul_def, ← map_add (f := _)]
         congr 1
         abel
       rw [this]
       exact Ideal.add_mem _ (Ideal.mem_sup_left h3) (Ideal.mem_sup_right h2)
     obtain ⟨u, hu⟩ := hunit
-    have : algebraMap S L a = ((u⁻¹ : Lˣ) : L) * (algebraMap S L (algebraMap O S e) * algebraMap S L a) := by
+    have : algebraMap S L a
+        = ((u⁻¹ : Lˣ) : L) * (algebraMap S L (algebraMap O S e) * algebraMap S L a) := by
       rw [← hu, ← mul_assoc, Units.inv_mul, one_mul]
     rw [this]
     exact Ideal.mul_mem_left _ _ h4
@@ -66,9 +75,12 @@ theorem UpperTheory.height_ker_section_le_of_cotangent_generators :
     exact ⟨⟨inferInstance, le_rfl⟩, fun q hq _ => hq.2⟩
   have hh := Ideal.height_le_card_of_mem_minimalPrimes_span_finset hmin
   have hPL : P.height = (maximalIdeal L).height := by
-    rw [← IsLocalization.height_under P.primeCompl (maximalIdeal L), Localization.AtPrime.under_maximalIdeal]
+    rw [← IsLocalization.height_under P.primeCompl (maximalIdeal L),
+      Localization.AtPrime.under_maximalIdeal]
   rw [hPL]
   refine hh.trans ?_
   have hc : (Finset.univ.image (fun i => algebraMap S L (t i))).card ≤ n := by
-    simpa using (Finset.card_image_le (s := (Finset.univ : Finset (Fin n))) (f := fun i => algebraMap S L (t i)))
+    simpa using
+      (Finset.card_image_le (s := (Finset.univ : Finset (Fin n)))
+        (f := fun i => algebraMap S L (t i)))
   exact_mod_cast hc

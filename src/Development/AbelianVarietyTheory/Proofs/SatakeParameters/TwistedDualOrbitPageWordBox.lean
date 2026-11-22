@@ -15,8 +15,9 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem pageWord_box : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) (τ φ : D.R.GG),
-    Roomy L C → (pageWord L j ε τ φ).Box := by
+theorem pageWord_box
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) (τ φ : D.R.GG),
+      Roomy L C → (pageWord L j ε τ φ).Box := by
   intro D L C j ε τ φ hR
   have hb := (GlobalTheory.T.roundedSizeBound_window L C hR).1
   have hw := (GlobalTheory.T.maxNonThickSizeShifted_value_and_bounds L C hR).2.2

@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory
+  UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
 
-theorem UpperTheory.Gal.LocD.etaEx :
-    EtaEx := by
+theorem UpperTheory.Gal.LocD.etaEx : EtaEx := by
   intro G _ _ _ _ _ _ B s p hp hper P κ hκ hs hB hne
   obtain ⟨f₀, hf₀, g₀, h0⟩ := hne
   obtain ⟨K, hK, hKf⟩ := GroundTheory.Automorphic.exists_forall_mul_left (R := ℂ) hf₀
@@ -17,8 +17,7 @@ theorem UpperTheory.Gal.LocD.etaEx :
     intro b f g
     obtain ⟨c, hc⟩ := hB b
     have hc0 := hc f₀ g₀
-    have : e b = c := by
-      rw [he]; dsimp only; rw [hc0, mul_div_assoc, div_self h0, mul_one]
+    have : e b = c := by rw [he]; dsimp only; rw [hc0, mul_div_assoc, div_self h0, mul_one]
     rw [this, hc]
   have hpow : ∀ (n : ℕ) (f : G → ℂ) (g : G), P (f ∘ s^[n]) g = (κ : ℂ) ^ n * P f (s^[n] g) := by
     intro n
@@ -37,8 +36,7 @@ theorem UpperTheory.Gal.LocD.etaEx :
       exact this
     have hk' : κ ^ p = 1 := by exact_mod_cast hk
     exact (pow_eq_one_iff_of_nonneg hκ.le hp.ne').1 hk'
-  have e1 : e 1 = 1 := by
-    rw [he]; dsimp only; simp [div_self h0]
+  have e1 : e 1 = 1 := by rw [he]; dsimp only; simp [div_self h0]
   have emul : ∀ b b' : B, e (b * b') = e b * e b' := by
     intro b b'
     have h := hη b (fun x => f₀ ((b' : G)⁻¹ * x)) g₀
@@ -59,8 +57,7 @@ theorem UpperTheory.Gal.LocD.etaEx :
     rw [hfix, div_self h0]
   · show e b' = e b
     have hg1 : s (s^[p - 1] g₀) = g₀ := by
-      rw [← Function.iterate_succ_apply' (f := s), Nat.succ_eq_add_one, Nat.sub_add_cancel hp,
-        hper]
+      rw [← Function.iterate_succ_apply' (f := s), Nat.succ_eq_add_one, Nat.sub_add_cancel hp, hper]
     have hA := hη b (f₀ ∘ s) (s^[p - 1] g₀)
     rw [hs, hg1] at hA
     have hfun : (fun x => (f₀ ∘ s) ((b : G)⁻¹ * x)) = (fun x => f₀ ((b' : G)⁻¹ * x)) ∘ s := by
@@ -69,6 +66,7 @@ theorem UpperTheory.Gal.LocD.etaEx :
     rw [hfun, hs, hg1, hη b' f₀ g₀] at hA
     have hκ0 : (κ : ℂ) ≠ 0 := by exact_mod_cast hκ.ne'
     have h3 : e b' * P f₀ g₀ = e b * P f₀ g₀ := by
-      have := mul_left_cancel₀ hκ0 (hA.trans (by ring : e b * (↑κ * P f₀ g₀) = ↑κ * (e b * P f₀ g₀)))
+      have :=
+        mul_left_cancel₀ hκ0 (hA.trans (by ring : e b * (↑κ * P f₀ g₀) = ↑κ * (e b * P f₀ g₀)))
       exact this
     exact mul_right_cancel₀ h0 h3

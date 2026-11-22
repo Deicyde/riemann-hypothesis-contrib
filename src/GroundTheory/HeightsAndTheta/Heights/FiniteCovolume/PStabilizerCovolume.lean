@@ -21,11 +21,13 @@ noncomputable section
 
 universe u
 
-theorem exists_covering_of_relIndex_ne_zero {G K : Type*} [Group G] [MeasurableSpace G]
-    [MeasurableMul G] [Group K] (μ : Measure G) [μ.IsMulLeftInvariant] (f : K →* G)
-    (A B : Subgroup K) (hidx : A.relIndex B ≠ 0) (FD : Set G)
-    (hFD : IsFundamentalDomain (B.map f) FD μ) (hfin : μ FD < ⊤) :
-    ∃ T : Set G, MeasurableSet T ∧ μ T < ⊤ ∧ ∀ l, ∃ a ∈ A, f a * l ∈ T := by
+theorem exists_covering_of_relIndex_ne_zero
+    {G K : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G] [Group K]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (f : K →* G)
+    (A B : Subgroup K) (hidx : A.relIndex B ≠ 0)
+    (FD : Set G) (hFD : IsFundamentalDomain (B.map f) FD μ) (hfin : μ FD < ⊤)
+    : ∃ T : Set G, MeasurableSet T ∧ μ T < ⊤ ∧ ∀ l, ∃ a ∈ A, f a * l ∈ T := by
   classical
   have : (A.subgroupOf B).FiniteIndex := ⟨hidx⟩
   have : Finite (B ⧸ A.subgroupOf B) := Subgroup.finite_quotient_of_finiteIndex
@@ -33,10 +35,17 @@ theorem exists_covering_of_relIndex_ne_zero {G K : Type*} [Group G] [MeasurableS
   set bad := {l : G | ¬ ∃ γ : B.map f, γ • l ∈ FD} with hbad_def
   have hbad : μ bad = 0 :=
     measure_eq_zero_iff_ae_notMem.2 (hFD.ae_covers.mono fun x hx hx' => hx' hx)
-  refine ⟨(⋃ k : B ⧸ A.subgroupOf B, (fun x => f ((Quotient.out k : B) : K) * x) ⁻¹'
-    toMeasurable μ FD) ∪ toMeasurable μ bad, ?_, ?_, ?_⟩
-  · exact (MeasurableSet.iUnion fun k => (measurableSet_toMeasurable μ FD).preimage
-      (measurable_const_mul _)).union (measurableSet_toMeasurable μ bad)
+  refine ⟨
+    (⋃ k : B ⧸ A.subgroupOf B, (fun x => f ((Quotient.out k : B) : K) * x) ⁻¹'
+      toMeasurable μ FD)
+      ∪ toMeasurable μ bad,
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · exact (MeasurableSet.iUnion fun k =>
+        (measurableSet_toMeasurable μ FD).preimage (measurable_const_mul _)).union
+      (measurableSet_toMeasurable μ bad)
   · refine lt_of_le_of_lt (measure_union_le _ _) ?_
     rw [measure_toMeasurable, hbad, add_zero]
     refine lt_of_le_of_lt (measure_iUnion_fintype_le μ _) ?_
@@ -53,23 +62,25 @@ theorem exists_covering_of_relIndex_ne_zero {G K : Type*} [Group G] [MeasurableS
       have hcA : (((c : B) : K)) ∈ A := c.2
       refine ⟨((c : B) : K)⁻¹, inv_mem hcA, Or.inl (Set.mem_iUnion.2 ⟨k, ?_⟩)⟩
       apply subset_toMeasurable
-      have e : ((Quotient.out k : B) : K) = b * ((c : B) : K) := by
-        rw [hc]; rfl
+      have e : ((Quotient.out k : B) : K) = b * ((c : B) : K) := by rw [hc]; rfl
       simp only [e, map_mul, map_inv, mul_assoc, mul_inv_cancel_left]
       simpa [Subgroup.smul_def] using hγl
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type u} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem StabilizerCovolumeFinite.proof [FiniteDimensional E W] (h : HermitianForm F E W)
-    (v : Basis ι E W) (h₁ : CovolumeFiniteBelow.{u} F E (finrank E W))
+theorem StabilizerCovolumeFinite.proof
+    [FiniteDimensional E W]
+    (h : HermitianForm F E W) (v : Basis ι E W)
+    (h₁ : CovolumeFiniteBelow.{u} F E (finrank E W))
     (h₂ : ∀ (x₀ w₀ : W) (h' : HermitianForm F E (hypComplement h x₀ w₀)) (n : ℕ)
-      (v' : Basis (Fin n) E (hypComplement h x₀ w₀)),
+        (v' : Basis (Fin n) E (hypComplement h x₀ w₀)),
       SemidirectCovering.Statement (vecFixGroup h v x₀) (archUnitary h' v') (unipRadical h v x₀))
     (h₃ : StabilizerLevi.Statement h v) (h₄ : UnipotentModulus.Statement h v)
-    (h₅ : UnipotentCocompact.Statement h v) (h₆ : CongruenceLift.Statement h) :
-    StabilizerCovolumeFinite.Statement h v := by
+    (h₅ : UnipotentCocompact.Statement h v) (h₆ : CongruenceLift.Statement h)
+    : StabilizerCovolumeFinite.Statement h v := by
   classical
   intro D La x₀ hLa hx₀ hne hiso ν hν
 
@@ -87,10 +98,10 @@ theorem StabilizerCovolumeFinite.proof [FiniteDimensional E W] (h : HermitianFor
 
   obtain ⟨D', La', G'', hLa', hG'', hidx, hlift⟩ := h₆ D La x₀ w₀ hLa hx₀ hp h' hh'
   let μL : Measure (archUnitary h' v') := Measure.haar
-  obtain ⟨FD', hFD', hFD'fin⟩ :=
-    h₁ (hypComplement h x₀ w₀) h' _ v' hlt μL D' La' hLa'
-  obtain ⟨T, hTm, hTfin, hT⟩ := exists_covering_of_relIndex_ne_zero μL (archEmbed h' v') G''
-    (latticeStab h' La') hidx FD' hFD' hFD'fin
+  obtain ⟨FD', hFD', hFD'fin⟩ := h₁ (hypComplement h x₀ w₀) h' _ v' hlt μL D' La' hLa'
+  obtain ⟨T, hTm, hTfin, hT⟩ :=
+    exists_covering_of_relIndex_ne_zero μL (archEmbed h' v') G'' (latticeStab h' La') hidx FD' hFD'
+      hFD'fin
   set Γ := (vecStabGroup h v La x₀).subgroupOf (vecFixGroup h v x₀) with hΓ
   have hcovL : ∀ l, ∃ γ ∈ Γ, q γ * l ∈ T := by
     intro l
@@ -112,8 +123,8 @@ theorem StabilizerCovolumeFinite.proof [FiniteDimensional E W] (h : HermitianFor
       exact ⟨by rintro ⟨n, rfl⟩; exact n.2, fun hg => ⟨⟨g, hg⟩, rfl⟩⟩
     rw [this]
     exact (isClosed_unipRadical h v x₀).preimage continuous_subtype_val
-  have hjr : ∀ g, q g = 1 ↔ g ∈ j.range := fun g => (hker g).trans
-    ⟨fun hg => ⟨⟨g, hg⟩, rfl⟩, by rintro ⟨n, rfl⟩; exact n.2⟩
+  have hjr : ∀ g, q g = 1 ↔ g ∈ j.range := fun g =>
+    (hker g).trans ⟨fun hg => ⟨⟨g, hg⟩, rfl⟩, by rintro ⟨n, rfl⟩; exact n.2⟩
   let μN : Measure (unipRadical h v x₀) := Measure.haar
   have hemb : MeasurableEmbedding (Subtype.val : vecFixGroup h v x₀ → archUnitary h v) :=
     (isClosed_vecFixGroup h v x₀).isClosedEmbedding_subtypeVal.measurableEmbedding
@@ -123,12 +134,12 @@ theorem StabilizerCovolumeFinite.proof [FiniteDimensional E W] (h : HermitianFor
     have hf : Continuous fun n : unipRadical h v x₀ => i l * j n * (i l)⁻¹ :=
       (continuous_const.mul hjc).mul continuous_const
     rw [← hemb.comap_map (μN.map _), ← hemb.comap_map (μN.map j),
-      Measure.map_map hemb.measurable hf.measurable,
-      Measure.map_map hemb.measurable hjc.measurable]
-    have e1 : (Subtype.val ∘ fun n : unipRadical h v x₀ => i l * j n * (i l)⁻¹) =
-        fun n : unipRadical h v x₀ =>
-          ((i l : vecFixGroup h v x₀) : archUnitary h v) * (n : archUnitary h v) *
-            ((i l : vecFixGroup h v x₀) : archUnitary h v)⁻¹ := by
+      Measure.map_map hemb.measurable hf.measurable, Measure.map_map hemb.measurable hjc.measurable]
+    have e1
+        : (Subtype.val ∘ fun n : unipRadical h v x₀ => i l * j n * (i l)⁻¹)
+          = fun n : unipRadical h v x₀ =>
+            ((i l : vecFixGroup h v x₀) : archUnitary h v) * (n : archUnitary h v)
+              * ((i l : vecFixGroup h v x₀) : archUnitary h v)⁻¹ := by
       funext n
       simp [j]
     have e2 : (Subtype.val ∘ j) = (Subtype.val : unipRadical h v x₀ → archUnitary h v) := by
@@ -151,8 +162,8 @@ theorem StabilizerCovolumeFinite.proof [FiniteDimensional E W] (h : HermitianFor
       (continuous_subtype_val.subtype_mk _) (Subgroup.inclusion_injective hle)
   have hdisc : DiscreteTopology Γ :=
     DiscreteTopology.of_continuous_injective
-      (f := fun x : Γ => (⟨((x : vecFixGroup h v x₀) : archUnitary h v), x.2⟩ :
-        vecStabGroup h v La x₀))
+      (f := fun x : Γ =>
+        (⟨((x : vecFixGroup h v x₀) : archUnitary h v), x.2⟩ : vecStabGroup h v La x₀))
       ((continuous_subtype_val.comp continuous_subtype_val).subtype_mk _)
       (fun a b hab => Subtype.ext (Subtype.ext (by simpa using congrArg Subtype.val hab)))
   have : Countable Γ := TopologicalSpace.separableSpace_iff_countable.1 inferInstance

@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FirstDiff
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -105,7 +106,7 @@ lemma one_le_norm {x : ℤ × ℤ} (hx : x ≠ 0) : 1 ≤ ‖x‖ := by
     exact le_max_of_le_right (by exact_mod_cast Int.one_le_abs h2)
   · exact le_max_of_le_left (by exact_mod_cast Int.one_le_abs h1)
 
-def g (x : ℤ × ℤ) : ℝ := ‖x‖ ^ (-(3:ℝ)) + if x = 0 then 1 else 0
+def g (x : ℤ × ℤ) : ℝ := ‖x‖ ^ (-(3 : ℝ)) + if x = 0 then 1 else 0
 
 lemma g_summ : Summable g := summ3.add (hasSum_ite_eq (0 : ℤ × ℤ) (1:ℝ)).summable
 
@@ -118,15 +119,19 @@ lemma g_ne {x : ℤ × ℤ} (hx : x ≠ 0) : g x = (‖x‖ ^ 3)⁻¹ := by
   simp only [g, if_neg hx, add_zero]
   rw [Real.rpow_neg (norm_nonneg x)]; norm_cast
 
-theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), ∀ τ : ℍ, ∃ u : ℤ × ℤ → ℝ,
-    Summable u ∧ ∑' x, u x ≤ C * (τ.im ^ A + (τ.im ^ A)⁻¹) ∧
-    ∀ (s : ℝ) (x : ℤ × ℤ), 0 ≤ s → s ≤ 1 →
-      ‖dif L (0, 1) (fun y : ℤ × ℤ => trm j s ((y.1 : ℂ) * τ + y.2)) x‖ ≤ u x := by
+theorem rowbd
+    : ∀ j L : ℕ,
+      2 ≤ j → 0 < L
+        → ∃ (C : ℝ) (A : ℕ), ∀ τ : ℍ, ∃ u : ℤ × ℤ → ℝ,
+          Summable u ∧ ∑' x, u x ≤ C * (τ.im ^ A + (τ.im ^ A)⁻¹)
+            ∧ ∀ (s : ℝ) (x : ℤ × ℤ),
+              0 ≤ s → s ≤ 1
+                → ‖dif L (0, 1) (fun y : ℤ × ℤ => trm j s ((y.1 : ℂ) * τ + y.2)) x‖ ≤ u x := by
   intro j L hj hL
   obtain ⟨C1, hC1⟩ := GlobalTheory.T.norm_trm_sub_trm_add_le j
   set C1' := max C1 0 with hC1'
   have hC1'0 : 0 ≤ C1' := le_max_right _ _
-  have hLr : (1:ℝ) ≤ L := by exact_mod_cast hL
+  have hLr : (1 : ℝ) ≤ L := by exact_mod_cast hL
   set K : ℝ := 2 ^ (j + 3) * (4 * L) ^ 3 + 8 * C1' * L with hK
   have hK0 : 0 ≤ K := by positivity
   set S : ℝ := ∑' x : ℤ × ℤ, g x
@@ -145,11 +150,15 @@ theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), �
       · have h' : m = 1 := min_eq_left h
         have := one_le_pow₀ h (n := j + 5)
         have : 0 ≤ (τ.im ^ (j + 5))⁻¹ := by positivity
-        rw [hM, h', one_pow, inv_one]; linarith
+        rw [hM, h', one_pow, inv_one]
+        linarith
       · have h' : m = τ.im := min_eq_right h
         have := pow_pos τ.im_pos (j + 5)
-        rw [hM, h']; linarith
-    calc K * M * S = K * S * M := by ring
+        rw [hM, h']
+        linarith
+    calc
+      K * M * S
+        = K * S * M := by ring
       _ ≤ K * S * (τ.im ^ (j + 5) + (τ.im ^ (j + 5))⁻¹) :=
         mul_le_mul_of_nonneg_left hMb (mul_nonneg hK0 hS)
   · intro s x hs0 hs1
@@ -170,11 +179,11 @@ theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), �
         have h1 : 1 ≤ ‖e y‖ := one_le_norm (fun h => hy (hez y h))
         have := hlow y
         nlinarith
-    have htr : ∀ r : ℕ, F (x + (r:ℤ) • ((0:ℤ), (1:ℤ))) =
-        trm j s (((x.1 : ℂ) * τ + x.2) + (r:ℂ)) := by
+    have htr
+        : ∀ r : ℕ,
+          F (x + (r : ℤ) • ((0 : ℤ), (1 : ℤ))) = trm j s (((x.1 : ℂ) * τ + x.2) + (r : ℂ)) := by
       intro r; simp only [hF]; congr 1; simp; push_cast; ring
-    have hM' : M = (m ^ (j + 2))⁻¹ * (m ^ 3)⁻¹ := by
-      rw [hM, ← mul_inv, ← pow_add]
+    have hM' : M = (m ^ (j + 2))⁻¹ * (m ^ 3)⁻¹ := by rw [hM, ← mul_inv, ← pow_add]
     have hm3 : 1 ≤ (m ^ 3)⁻¹ := (one_le_inv₀ (pow_pos hm0 _)).mpr (pow_le_one₀ hm0.le hm1)
     have ha0 : 0 < (m ^ (j + 2))⁻¹ := by positivity
     have hB0 : ((m / 2) ^ (j + 2))⁻¹ = 2 ^ (j + 2) * (m ^ (j + 2))⁻¹ := by
@@ -183,9 +192,8 @@ theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), �
     set P := ‖e x‖ with hP
     have hxl : m * P ≤ 2 * t := hlow x
     have hP0 : 0 ≤ P := norm_nonneg _
-    rcases le_or_gt (2 * (L:ℝ)) t with hA | hB
-    ·
-      have ht1 : 1 ≤ t := by linarith
+    rcases le_or_gt (2 * (L : ℝ)) t with hA | hB
+    · have ht1 : 1 ≤ t := by linarith
       have ht0 : 0 < t := by linarith
       have hx0 : e x ≠ 0 := by
         intro h0
@@ -193,18 +201,19 @@ theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), �
         simp [ht, hx] at hA
         linarith
       have hP1 : 1 ≤ P := one_le_norm hx0
-      have hstep : ∀ r ∈ Finset.range L, ‖F x - F (x + (r:ℤ) • ((0:ℤ), (1:ℤ)))‖ ≤
-          C1' * L * (t ^ 3)⁻¹ := by
+      have hstep
+          : ∀ r ∈ Finset.range L, ‖F x - F (x + (r:ℤ) • ((0:ℤ), (1:ℤ)))‖ ≤ C1' * L * (t ^ 3)⁻¹ := by
         intro r hr
-        have hrL : (r:ℝ) ≤ L := by exact_mod_cast (Finset.mem_range.mp hr).le
+        have hrL : (r : ℝ) ≤ L := by exact_mod_cast (Finset.mem_range.mp hr).le
         have hx' : F x = trm j s ((x.1 : ℂ) * τ + x.2) := rfl
         rw [htr, hx']
         have hra : ‖(r:ℂ)‖ = r := by simp
-        have h := hC1 s ((x.1 : ℂ) * τ + x.2) (r:ℂ) hs0 hs1 ht1 (by rw [hra]; linarith)
+        have h := hC1 s ((x.1 : ℂ) * τ + x.2) (r : ℂ) hs0 hs1 ht1 (by rw [hra]; linarith)
         rw [hra, ← ht] at h
         have hpow : t ^ 3 ≤ t ^ (j + 1) := pow_le_pow_right₀ ht1 (by omega)
-        have hr0 : (0:ℝ) ≤ r := by positivity
-        calc _ ≤ C1 * r / t ^ (j + 1) := h
+        have hr0 : (0 : ℝ) ≤ r := by positivity
+        calc
+          _ ≤ C1 * r / t ^ (j + 1) := h
           _ ≤ C1' * r / t ^ (j + 1) := by gcongr; exact le_max_left _ _
           _ ≤ C1' * L / t ^ (j + 1) := by gcongr
           _ ≤ C1' * L / t ^ 3 := by gcongr
@@ -222,49 +231,54 @@ theorem rowbd : ∀ j L : ℕ, 2 ≤ j → 0 < L → ∃ (C : ℝ) (A : ℕ), �
       have hmp : ((m * P) ^ 3)⁻¹ = (m ^ 3)⁻¹ * (P ^ 3)⁻¹ := by rw [mul_pow, mul_inv]
       have hq0 : 0 ≤ (m ^ 3)⁻¹ * (P ^ 3)⁻¹ := by positivity
       have hK1 : 8 * C1' * L ≤ K := by
-        have : (0:ℝ) ≤ 2 ^ (j + 3) * (4 * L) ^ 3 := by positivity
-        rw [hK]; linarith
-      calc C1' * L * (t ^ 3)⁻¹ ≤ C1' * L * (8 * ((m ^ 3)⁻¹ * (P ^ 3)⁻¹)) := by
-            rw [← hmp]; exact mul_le_mul_of_nonneg_left h8 (by positivity)
+        have : (0 : ℝ) ≤ 2 ^ (j + 3) * (4 * L) ^ 3 := by positivity
+        rw [hK]
+        linarith
+      calc
+        C1' * L * (t ^ 3)⁻¹ ≤ C1' * L * (8 * ((m ^ 3)⁻¹ * (P ^ 3)⁻¹)) := by
+          rw [← hmp]; exact mul_le_mul_of_nonneg_left h8 (by positivity)
         _ = (8 * C1' * L) * 1 * ((m ^ 3)⁻¹ * (P ^ 3)⁻¹) := by ring
         _ ≤ K * (m ^ (j + 2))⁻¹ * ((m ^ 3)⁻¹ * (P ^ 3)⁻¹) := by
-            gcongr
-            exact (one_le_inv₀ (pow_pos hm0 _)).mpr (pow_le_one₀ hm0.le hm1)
+          gcongr
+          exact (one_le_inv₀ (pow_pos hm0 _)).mpr (pow_le_one₀ hm0.le hm1)
         _ = K * ((m ^ (j + 2))⁻¹ * (m ^ 3)⁻¹) * (P ^ 3)⁻¹ := by ring
-    ·
-      have hstep : ∀ r ∈ Finset.range L, ‖F x - F (x + (r:ℤ) • ((0:ℤ), (1:ℤ)))‖ ≤
-          2 * ((m / 2) ^ (j + 2))⁻¹ := by
+    · have hstep
+          : ∀ r ∈ Finset.range L,
+            ‖F x - F (x + (r:ℤ) • ((0:ℤ), (1:ℤ)))‖ ≤ 2 * ((m / 2) ^ (j + 2))⁻¹ := by
         intro r _
         have h1 := hFb x
-        have h2 := hFb (x + (r:ℤ) • ((0:ℤ), (1:ℤ)))
+        have h2 := hFb (x + (r : ℤ) • ((0 : ℤ), (1 : ℤ)))
         exact (norm_sub_le _ _).trans (by linarith)
       refine (dif_le hL _ F x _ hstep).trans ?_
       show 2 * ((m / 2) ^ (j + 2))⁻¹ ≤ K * M * g (e x)
       rw [hB0, hM']
       have hK2 : 2 ^ (j + 3) * (4 * L) ^ 3 ≤ K := by
         have : 0 ≤ 8 * C1' * L := by positivity
-        rw [hK]; linarith
-      have h2j : (2:ℝ) * 2 ^ (j + 2) = 2 ^ (j + 3) := by ring
+        rw [hK]
+        linarith
+      have h2j : (2 : ℝ) * 2 ^ (j + 2) = 2 ^ (j + 3) := by ring
       by_cases hx0 : e x = 0
       · rw [hx0, g_zero]
-        have h4 : (1:ℝ) ≤ (4 * L) ^ 3 := one_le_pow₀ (by linarith)
+        have h4 : (1 : ℝ) ≤ (4 * L) ^ 3 := one_le_pow₀ (by linarith)
         have hK3 : 2 ^ (j + 3) ≤ K := by
-          have : (2:ℝ) ^ (j + 3) * 1 ≤ 2 ^ (j + 3) * (4 * L) ^ 3 := by gcongr
+          have : (2 : ℝ) ^ (j + 3) * 1 ≤ 2 ^ (j + 3) * (4 * L) ^ 3 := by gcongr
           linarith
-        calc 2 * (2 ^ (j + 2) * (m ^ (j + 2))⁻¹) = 2 ^ (j + 3) * (m ^ (j + 2))⁻¹ * 1 := by
-              rw [← h2j]; ring
+        calc
+          2 * (2 ^ (j + 2) * (m ^ (j + 2))⁻¹)
+            = 2 ^ (j + 3) * (m ^ (j + 2))⁻¹ * 1 := by rw [← h2j]; ring
           _ ≤ K * (m ^ (j + 2))⁻¹ * (m ^ 3)⁻¹ := by gcongr
           _ = _ := by ring
       · rw [g_ne hx0]
         have hP1 : 1 ≤ P := one_le_norm hx0
         have hmP : 0 < m * P := by positivity
         have hmPL : (m * P) ^ 3 ≤ (4 * L) ^ 3 := pow_le_pow_left₀ hmP.le (by linarith) 3
-        have hinv : ((4 * (L:ℝ)) ^ 3)⁻¹ ≤ (m ^ 3)⁻¹ * (P ^ 3)⁻¹ := by
+        have hinv : ((4 * (L : ℝ)) ^ 3)⁻¹ ≤ (m ^ 3)⁻¹ * (P ^ 3)⁻¹ := by
           rw [← mul_inv, ← mul_pow]; exact inv_anti₀ (by positivity) hmPL
-        have h4 : (0:ℝ) < (4 * L) ^ 3 := by positivity
-        calc 2 * (2 ^ (j + 2) * (m ^ (j + 2))⁻¹)
-            = 2 ^ (j + 3) * (4 * L) ^ 3 * (m ^ (j + 2))⁻¹ * ((4 * (L:ℝ)) ^ 3)⁻¹ := by
-              rw [← h2j]; field_simp
+        have h4 : (0 : ℝ) < (4 * L) ^ 3 := by positivity
+        calc
+          2 * (2 ^ (j + 2) * (m ^ (j + 2))⁻¹)
+              = 2 ^ (j + 3) * (4 * L) ^ 3 * (m ^ (j + 2))⁻¹ * ((4 * (L : ℝ)) ^ 3)⁻¹ := by
+            rw [← h2j]; field_simp
           _ ≤ K * (m ^ (j + 2))⁻¹ * ((m ^ 3)⁻¹ * (P ^ 3)⁻¹) := by gcongr
           _ = K * ((m ^ (j + 2))⁻¹ * (m ^ 3)⁻¹) * (P ^ 3)⁻¹ := by ring
 

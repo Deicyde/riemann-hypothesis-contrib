@@ -10,28 +10,29 @@ open Submodule
 
 section LatRetract
 
-variable {O K V V' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-  [Algebra O K] [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V]
-  [IsScalarTower O K V] [AddCommGroup V'] [Module K V'] [Module O V'] [IsScalarTower O K V']
+variable
+  {O K V V' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+  [AddCommGroup V'] [Module K V'] [Module O V'] [IsScalarTower O K V']
   {ι ι' : Type} [Fintype ι] [Fintype ι']
 
 omit [IsDiscreteValuationRing O] in
 private theorem lrt_am_ne {a : O} (ha : a ≠ 0) : algebraMap O K a ≠ 0 :=
   (map_ne_zero_iff _ (IsFractionRing.injective O K)).2 ha
 
-private theorem lrt_tf (O K V : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K]
-    [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V] :
-    Module.IsTorsionFree O V :=
+private theorem lrt_tf
+    (O K V : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K]
+    [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+    : Module.IsTorsionFree O V :=
   ⟨fun r hr x y hxy => by
     have hr0 : r ≠ 0 := hr.ne_zero
     have h1 : algebraMap O K r • x = algebraMap O K r • y := by
       rw [algebraMap_smul, algebraMap_smul]; exact hxy
     exact smul_right_injective V (lrt_am_ne (K := K) hr0) h1⟩
 
-
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] [Fintype ι] in
-private theorem lrt_coord (b : Module.Basis ι K V) {y : V}
-    (hy : y ∈ span O (Set.range b)) (i : ι) : b.repr y i ∈ Set.range (algebraMap O K) := by
+private theorem lrt_coord (b : Module.Basis ι K V) {y : V} (hy : y ∈ span O (Set.range b)) (i : ι)
+    : b.repr y i ∈ Set.range (algebraMap O K) := by
   classical
   induction hy using Submodule.span_induction with
   | mem x hx =>
@@ -39,22 +40,24 @@ private theorem lrt_coord (b : Module.Basis ι K V) {y : V}
     by_cases hji : j = i
     · subst hji; exact ⟨1, by simp⟩
     · exact ⟨0, by simp [hji]⟩
-  | zero => exact ⟨0, by simp⟩
+  | zero =>
+    exact ⟨0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨u, hu⟩ := hx
     obtain ⟨v, hv⟩ := hy
     exact ⟨u + v, by simp [hu, hv]⟩
   | smul a x _ hx =>
     obtain ⟨u, hu⟩ := hx
-    exact ⟨a * u, by
-      rw [← algebraMap_smul K a x, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, hu]⟩
-
+    exact ⟨
+      a * u,
+      by rw [← algebraMap_smul K a x, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, hu]
+    ⟩
 
 omit [IsDiscreteValuationRing O] in
-private theorem lrt_den (b : Module.Basis ι K V) (F : V) :
-    ∃ a : O, a ≠ 0 ∧ a • F ∈ span O (Set.range b) := by
-  obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O)
-    (fun i => b.repr F i)
+private theorem lrt_den (b : Module.Basis ι K V) (F : V)
+    : ∃ a : O, a ≠ 0 ∧ a • F ∈ span O (Set.range b) := by
+  obtain ⟨a, ha⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) (fun i => b.repr F i)
   refine ⟨a, nonZeroDivisors.ne_zero a.2, ?_⟩
   have hF : (a : O) • F = ∑ i, (a : O) • (b.repr F i • b i) := by
     rw [← Finset.smul_sum, b.sum_repr F]
@@ -64,10 +67,12 @@ private theorem lrt_den (b : Module.Basis ι K V) (F : V) :
   rw [← smul_assoc, ← hz, algebraMap_smul]
   exact Submodule.smul_mem _ _ (subset_span ⟨i, rfl⟩)
 
-private theorem lrt_inj (b : Module.Basis ι K V) (b' : Module.Basis ι' K V') (io : V →ₗ[K] V')
-    (h : ∀ F, io F ∈ Submodule.span O (Set.range b') ↔ F ∈ Submodule.span O (Set.range b)) :
-    Function.Injective io := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem lrt_inj
+    (b : Module.Basis ι K V) (b' : Module.Basis ι' K V') (io : V →ₗ[K] V')
+    (h : ∀ F, io F ∈ Submodule.span O (Set.range b') ↔ F ∈ Submodule.span O (Set.range b))
+    : Function.Injective io := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro F hF
   by_contra hne
   have h0 : b.repr F ≠ 0 := by simpa using hne
@@ -84,7 +89,16 @@ private theorem lrt_inj (b : Module.Basis ι K V) (b' : Module.Basis ι' K V') (
   have h2 := IsFractionRing.injective O K h1
   exact hϖ.not_isUnit (IsUnit.of_mul_eq_one _ h2)
 
-theorem latRetract {O K V V' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V] [AddCommGroup V'] [Module K V'] [Module O V'] [IsScalarTower O K V'] {ι ι' : Type} [Fintype ι] [Fintype ι'] (b : Module.Basis ι K V) (b' : Module.Basis ι' K V') (io : V →ₗ[K] V') (h : ∀ F, io F ∈ Submodule.span O (Set.range b') ↔ F ∈ Submodule.span O (Set.range b)) : ∃ ret : V' →ₗ[K] V, (∀ F, ret (io F) = F) ∧ ∀ G ∈ Submodule.span O (Set.range b'), ret G ∈ Submodule.span O (Set.range b) := by
+theorem latRetract
+    {O K V V' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+    [AddCommGroup V'] [Module K V'] [Module O V'] [IsScalarTower O K V']
+    {ι ι' : Type} [Fintype ι] [Fintype ι']
+    (b : Module.Basis ι K V) (b' : Module.Basis ι' K V') (io : V →ₗ[K] V')
+    (h : ∀ F, io F ∈ Submodule.span O (Set.range b') ↔ F ∈ Submodule.span O (Set.range b))
+    : ∃ ret : V' →ₗ[K] V,
+      (∀ F, ret (io F) = F)
+        ∧ ∀ G ∈ Submodule.span O (Set.range b'), ret G ∈ Submodule.span O (Set.range b) := by
   classical
   have : Module.IsTorsionFree O V := lrt_tf O K V
   have : Module.IsTorsionFree O V' := lrt_tf O K V'
@@ -116,21 +130,20 @@ theorem latRetract {O K V V' : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
     exact ⟨⟨_, hmem⟩, Subtype.ext hcalc⟩
   obtain ⟨s, hs⟩ := N.mkQ.exists_rightInverse_of_surjective N.range_mkQ
   let e := LinearEquiv.ofInjective ioR hinj
-  let p : R' →ₗ[O] N := (LinearMap.id - s ∘ₗ N.mkQ).codRestrict N (fun y => by
-    rw [← Quotient.mk_eq_zero, ← mkQ_apply, LinearMap.sub_apply, map_sub, sub_eq_zero]
-    exact (LinearMap.congr_fun hs (N.mkQ y)).symm)
+  let p : R' →ₗ[O] N :=
+    (LinearMap.id - s ∘ₗ N.mkQ).codRestrict N (fun y => by
+      rw [← Quotient.mk_eq_zero, ← mkQ_apply, LinearMap.sub_apply, map_sub, sub_eq_zero]
+      exact (LinearMap.congr_fun hs (N.mkQ y)).symm)
   let retO : R' →ₗ[O] R := e.symm.toLinearMap ∘ₗ p
   have hretO : ∀ x : R, retO (ioR x) = x := by
     intro x
     show e.symm (p (ioR x)) = x
     rw [LinearEquiv.symm_apply_eq]
     apply Subtype.ext
-    have h0 : N.mkQ (ioR x) = 0 := by
-      rw [mkQ_apply, Quotient.mk_eq_zero]; exact ⟨x, rfl⟩
+    have h0 : N.mkQ (ioR x) = 0 := by rw [mkQ_apply, Quotient.mk_eq_zero]; exact ⟨x, rfl⟩
     show (LinearMap.id - s ∘ₗ N.mkQ : R' →ₗ[O] R') (ioR x) = ioR x
     simp [h0]
-  let ret : V' →ₗ[K] V :=
-    b'.constr K (fun j => ((retO ⟨b' j, subset_span ⟨j, rfl⟩⟩ : R) : V))
+  let ret : V' →ₗ[K] V := b'.constr K (fun j => ((retO ⟨b' j, subset_span ⟨j, rfl⟩⟩ : R) : V))
   have hret : ∀ G (hG : G ∈ R'), ret G = retO ⟨G, hG⟩ := by
     intro G hG
     induction hG using Submodule.span_induction with

@@ -12,8 +12,9 @@ namespace Formalism.L2.G.Model.TS
 
 open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.InvariantFactorPaths.INST
 
-theorem charZero_of_irreducible_natCast {W : Type*} [CommRing W] [IsDomain W] {p : ℕ} (hp : p.Prime)
-    (h : Irreducible (p : W)) : CharZero W := by
+theorem charZero_of_irreducible_natCast
+    {W : Type*} [CommRing W] [IsDomain W] {p : ℕ} (hp : p.Prime) (h : Irreducible (p : W))
+    : CharZero W := by
   rcases CharP.char_is_prime_or_zero W (ringChar W) with hq | hq
   · exfalso
     haveI : CharP W (ringChar W) := ringChar.charP W
@@ -31,7 +32,8 @@ theorem charZero_of_irreducible_natCast {W : Type*} [CommRing W] [IsDomain W] {p
       exact ringChar.charP W
     exact CharP.charP_to_charZero W
 
-theorem nuOf_antitone {m : ℕ} {lam : Fin (m + 1) → ℤ} (hl : Antitone lam) : Antitone (nuOf lam) := by
+theorem nuOf_antitone {m : ℕ} {lam : Fin (m + 1) → ℤ} (hl : Antitone lam)
+    : Antitone (nuOf lam) := by
   intro a b hab
   exact Int.toNat_le_toNat (sub_le_sub_right (hl hab) _)
 
@@ -39,8 +41,8 @@ theorem lastIdx_succ (m : ℕ) : lastIdx (m + 1) = Fin.last m := by
   ext
   simp [lastIdx]
 
-theorem nuOf_le_ellWt {m : ℕ} {lam : Fin (m + 1) → ℤ} (hl : Antitone lam) (t : Fin (m + 1)) :
-    nuOf lam t ≤ ellWt lam := by
+theorem nuOf_le_ellWt {m : ℕ} {lam : Fin (m + 1) → ℤ} (hl : Antitone lam) (t : Fin (m + 1))
+    : nuOf lam t ≤ ellWt lam := by
   unfold ellWt
   rw [lastIdx_succ]
   exact Int.toNat_le_toNat (sub_le_sub_right (hl (Fin.zero_le t)) _)

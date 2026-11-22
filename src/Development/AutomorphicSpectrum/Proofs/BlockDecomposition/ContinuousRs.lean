@@ -12,8 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MixedMode
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -35,15 +39,18 @@ theorem rs_zero (σ : (D.what₂.Tau → ℂ) →+ AE D) : rs σ 0 = 0 := by
   have : (fun _ : D.what₂.Tau => ((0 : ℝ) : ℂ)) = 0 := by funext; simp
   rw [this, map_zero]
 
-theorem finPart_cA (z : AE D) :
-    finPart D (cA D z) = sigR (Af D.host.F) D.sp.cm.sig (finPart D z) := by
+theorem finPart_cA (z : AE D)
+    : finPart D (cA D z) = sigR (Af D.host.F) D.sp.cm.sig (finPart D z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp only [map_zero]
   | tmul a x => rfl
-  | add a b ha hb => rw [RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _), ha, hb]
+  | add a b ha hb =>
+    rw [RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _),
+      RingHom.map_add (f := _), ha, hb]
 
-theorem cA_rs {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) (s : ℝ) :
-    cA D (rs σ s) = rs σ s := by
+theorem cA_rs
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) (s : ℝ)
+    : cA D (rs σ s) = rs σ s := by
   refine sub_eq_zero.1 (hσ.ext _ ?_ fun τ => ?_)
   · have h0 : finPart D (rs σ s) = 0 := hσ.fin _
     rw [RingHom.map_sub, finPart_cA, h0, map_zero, sub_zero]
@@ -54,17 +61,23 @@ theorem cA_rs {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : Gl
     rw [hσ.comp]
     simp
 
-theorem continuous_rs {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) :
-    Continuous (rs σ) :=
+theorem continuous_rs
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ)
+    : Continuous (rs σ) :=
   hσ.cont.comp (continuous_pi fun _ => Complex.continuous_ofReal)
 
-def path {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ) (a : HermE D r) :
-    ℝ →+ hermA D r where
-  toFun s := ⟨rs σ s • a.1.map (incA D), by
-    show adj (rs σ s • a.1.map (incA D)) = rs σ s • a.1.map (incA D)
-    rw [adj_smul, cA_rs hσ]
-    congr 1
-    exact GlobalTheory.CompanionTheory.HermPoisson.rat_mem_hermA a⟩
+def path
+    {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalTheory.FockCompare.Chart θ σ)
+    (a : HermE D r)
+    : ℝ →+ hermA D r where
+  toFun s := ⟨
+    rs σ s • a.1.map (incA D),
+    by
+      show adj (rs σ s • a.1.map (incA D)) = rs σ s • a.1.map (incA D)
+      rw [adj_smul, cA_rs hσ]
+      congr 1
+      exact GlobalTheory.CompanionTheory.HermPoisson.rat_mem_hermA a
+  ⟩
   map_zero' := by
     apply Subtype.ext
     show rs σ 0 • a.1.map (incA D) = 0
@@ -75,7 +88,7 @@ def path {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D} (hσ : GlobalT
     rw [rs_add, add_smul]
 
 def lam (θ : InfFam D) (α : D.host.F) (t : AE D) : ℝ :=
-  -∑ τ, (θ τ (infPart D (incA D (algebraMap D.host.F D.host.E α) * t))).re
+  - ∑ τ, (θ τ (infPart D (incA D (algebraMap D.host.F D.host.E α) * t))).re
 
 def multM (θ : InfFam D) (α : D.host.F) (V : HSp D) (a : HermE D r) (y : Mx D V.rank r) : ℝ :=
   lam θ α (Matrix.trace (HMul.hMul (a.1.map (incA D)) (inner V y y) : Mx D r r))

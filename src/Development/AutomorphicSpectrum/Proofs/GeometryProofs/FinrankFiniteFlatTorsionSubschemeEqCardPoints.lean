@@ -33,14 +33,21 @@ theorem rt0_ne_neg (H : Host E) : H.rt0 ≠ -H.rt0 := by
   exact rt0_ne_zero H ((mul_eq_zero.mp h2).resolve_left two_ne_zero)
 
 theorem labelEmb_injective (c : Coeff l) : Function.Injective (labelEmb (H := H) c) := by
-  have val : ∀ {s t : CMType H ⊕ CMType H}, labelEmb c s = labelEmb c t → ∀ a : 𝓞 E,
-      ((labelEmb c s a : c.F) : ℂ) = ((labelEmb c t a : c.F) : ℂ) := fun h a => by rw [h]
+  have val
+      : ∀ {s t : CMType H ⊕ CMType H},
+        labelEmb c s = labelEmb c t
+          → ∀ a : 𝓞 E, ((labelEmb c s a : c.F) : ℂ) = ((labelEmb c t a : c.F) : ℂ) := fun h a => by
+    rw [h]
   rintro (τ | τ) (τ' | τ') h
   · refine congrArg Sum.inl (Subtype.ext (emb_ext fun a => val h a))
-  · exact absurd ((HodgeCptTest.labelEmb_inl_rt c τ).symm.trans
-      ((val h H.rt).trans (HodgeCptTest.labelEmb_inr_rt c τ'))) (rt0_ne_neg H)
-  · exact absurd ((HodgeCptTest.labelEmb_inl_rt c τ').symm.trans
-      ((val h H.rt).symm.trans (HodgeCptTest.labelEmb_inr_rt c τ))) (rt0_ne_neg H)
+  · exact absurd
+      ((HodgeCptTest.labelEmb_inl_rt c τ).symm.trans
+        ((val h H.rt).trans (HodgeCptTest.labelEmb_inr_rt c τ')))
+      (rt0_ne_neg H)
+  · exact absurd
+      ((HodgeCptTest.labelEmb_inl_rt c τ').symm.trans
+        ((val h H.rt).symm.trans (HodgeCptTest.labelEmb_inr_rt c τ)))
+      (rt0_ne_neg H)
   · refine congrArg Sum.inr (Subtype.ext (emb_ext fun a => ?_))
     have := val h (H.bar.symm a)
     simpa [labelEmb] using this
@@ -54,11 +61,13 @@ theorem labelCx_bijective (H : Host E) : Function.Bijective (labelCx H) := by
     · exact congrArg Sum.inl (Subtype.ext h)
     · have h1 := RingHom.congr_fun h (H.rt : E)
       simp only [labelCx, Sum.elim_inl, Sum.elim_inr, RingHom.comp_apply, τ.2, τ'.2,
-        HodgeCptTest.imaginary_root_conj] at h1
+          HodgeCptTest.imaginary_root_conj]
+        at h1
       exact absurd h1 (rt0_ne_neg H)
     · have h1 := RingHom.congr_fun h (H.rt : E)
       simp only [labelCx, Sum.elim_inl, Sum.elim_inr, RingHom.comp_apply, τ.2, τ'.2,
-        HodgeCptTest.imaginary_root_conj] at h1
+          HodgeCptTest.imaginary_root_conj]
+        at h1
       exact absurd h1.symm (rt0_ne_neg H)
     · refine congrArg Sum.inr (Subtype.ext (RingHom.ext fun x => ?_))
       exact (starRingEnd ℂ).injective (RingHom.congr_fun h x)
@@ -76,12 +85,16 @@ theorem labelCx_bijective (H : Host E) : Function.Bijective (labelCx H) := by
       refine ⟨.inr ⟨(starRingEnd ℂ).comp σ, ht⟩, RingHom.ext fun x => ?_⟩
       simp [labelCx]
 
-theorem labels_injective_card : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H)
-    (c : Coeff l) [Fintype (CMType H)] (Ω : Type) [Field Ω] (cst : c.F →+* Ω),
-    Function.Injective (fun s : CMType H ⊕ CMType H => cst.comp (labelEmb c s)) ∧
-      Fintype.card (CMType H ⊕ CMType H) = Module.finrank ℚ E := by
+theorem labels_injective_card
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l)
+        [Fintype (CMType H)] (Ω : Type) [Field Ω] (cst : c.F →+* Ω),
+      Function.Injective (fun s : CMType H ⊕ CMType H => cst.comp (labelEmb c s))
+        ∧ Fintype.card (CMType H ⊕ CMType H) = Module.finrank ℚ E := by
   intro E _ _ _ H l c _ Ω _ cst
-  refine ⟨fun s t h => labelEmb_injective c (RingHom.ext fun a => cst.injective (RingHom.congr_fun h a)), ?_⟩
+  refine ⟨
+    fun s t h => labelEmb_injective c (RingHom.ext fun a => cst.injective (RingHom.congr_fun h a)),
+    ?_
+  ⟩
   rw [Fintype.card_of_bijective (labelCx_bijective H), NumberField.Embeddings.card]
 
 end GlobalTheory.CompanionTheory.Ar.LabelCount

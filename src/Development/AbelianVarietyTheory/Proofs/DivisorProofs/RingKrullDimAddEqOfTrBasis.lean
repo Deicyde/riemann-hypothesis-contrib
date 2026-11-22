@@ -16,23 +16,27 @@ open Algebra
 
 namespace GlobalTheory.LocModelDim
 
-theorem isAlgebraic_of_forall_mul {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
-    (h : ∀ s : S, ∃ a b : R, algebraMap R S b ≠ 0 ∧ s * algebraMap R S b = algebraMap R S a) :
-    Algebra.IsAlgebraic R S := by
+theorem isAlgebraic_of_forall_mul
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
+    (h : ∀ s : S, ∃ a b : R, algebraMap R S b ≠ 0 ∧ s * algebraMap R S b = algebraMap R S a)
+    : Algebra.IsAlgebraic R S := by
   refine ⟨fun s => ?_⟩
   obtain ⟨a, b, hb, e⟩ := h s
   refine ⟨Polynomial.C b * Polynomial.X - Polynomial.C a, fun h0 => hb ?_, ?_⟩
   · have h1 := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p 1) h0
-    simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C_succ,
-      sub_zero, Polynomial.coeff_zero, if_true] at h1
+    simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C_succ, sub_zero,
+        Polynomial.coeff_zero, if_true]
+      at h1
     rw [h1, map_zero]
   · rw [map_sub, map_mul, Polynomial.aeval_X, Polynomial.aeval_C, Polynomial.aeval_C, mul_comm, e,
       sub_self]
 
-theorem ringKrullDim_add_trdeg {k R Ω : Type} [Field k] [CommRing R] [IsDomain R]
-    [IsLocalRing R] [Algebra k R] [Algebra.EssFiniteType k R] [Field Ω] [Algebra R Ω]
-    [Algebra k Ω] [IsScalarTower k R Ω] (hχ : Function.Surjective (algebraMap R Ω)) {n m : ℕ}
-    (hn : trdeg k Ω = n) (hm : trdeg k R = m) : ringKrullDim R + n = m := by
+theorem ringKrullDim_add_trdeg
+    {k R Ω : Type} [Field k] [CommRing R] [IsDomain R] [IsLocalRing R] [Algebra k R]
+    [Algebra.EssFiniteType k R] [Field Ω] [Algebra R Ω] [Algebra k Ω] [IsScalarTower k R Ω]
+    (hχ : Function.Surjective (algebraMap R Ω))
+    {n m : ℕ} (hn : trdeg k Ω = n) (hm : trdeg k R = m)
+    : ringKrullDim R + n = m := by
   set A := EssFiniteType.subalgebra k R
   set ι := algebraMap A R
   set f : A →+* Ω := (algebraMap R Ω).comp ι with hf
@@ -99,5 +103,7 @@ theorem ringKrullDim_add_trdeg {k R Ω : Type} [Field k] [CommRing R] [IsDomain 
 end GlobalTheory.LocModelDim
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair

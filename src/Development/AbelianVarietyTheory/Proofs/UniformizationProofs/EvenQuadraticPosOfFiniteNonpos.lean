@@ -10,22 +10,27 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem cubeRel_even_nsmul {X : Type} [AddCommGroup X] (φ : X → ℤ)
-    (h : ∀ a b c, φ (a + b + c) + φ a + φ b + φ c = φ (a + b) + φ (a + c) + φ (b + c))
-    (he : ∀ a, φ (-a) = φ a) (a : X) (n : ℕ) : φ (n • a) = (n : ℤ) ^ 2 * φ a := by
+theorem cubeRel_even_nsmul
+    {X : Type} [AddCommGroup X]
+    (φ : X → ℤ) (h : ∀ a b c, φ (a + b + c) + φ a + φ b + φ c = φ (a + b) + φ (a + c) + φ (b + c))
+    (he : ∀ a, φ (-a) = φ a)
+    (a : X) (n : ℕ)
+    : φ (n • a) = (n : ℤ) ^ 2 * φ a := by
   have h0 : φ 0 = 0 := by
     have := h 0 0 0
     simp only [add_zero] at this
     linarith
-  have key : ∀ n : ℕ, φ (n • a) = (n : ℤ) ^ 2 * φ a ∧
-      φ ((n + 1) • a) = ((n + 1 : ℕ) : ℤ) ^ 2 * φ a := by
+  have key
+      : ∀ n : ℕ, φ (n • a) = (n : ℤ) ^ 2 * φ a ∧ φ ((n + 1) • a) = ((n + 1 : ℕ) : ℤ) ^ 2 * φ a := by
     intro n
     induction n with
     | zero => simp [h0]
@@ -40,7 +45,11 @@ theorem cubeRel_even_nsmul {X : Type} [AddCommGroup X] (φ : X → ℤ)
       linear_combination -h1
   exact (key n).1
 
-theorem even_quadratic_pos_of_finite_nonpos : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] (φ : X → ℤ), (∀ a b c, φ (a + b + c) + φ a + φ b + φ c = φ (a + b) + φ (a + c) + φ (b + c)) → (∀ a, φ (-a) = φ a) → {a | φ a ≤ 0}.Finite → ∀ a, a ≠ 0 → 0 < φ a := by
+theorem even_quadratic_pos_of_finite_nonpos
+    : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] (φ : X → ℤ),
+      (∀ a b c, φ (a + b + c) + φ a + φ b + φ c = φ (a + b) + φ (a + c) + φ (b + c))
+        → (∀ a, φ (-a) = φ a) → {a | φ a ≤ 0}.Finite
+        → ∀ a, a ≠ 0 → 0 < φ a := by
   intro X _ _ φ h he hfin a ha
   by_contra hle
   rw [not_lt] at hle

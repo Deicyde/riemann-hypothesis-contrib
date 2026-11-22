@@ -11,7 +11,11 @@ noncomputable section
 
 namespace Deduction
 
-open Deduction.CH Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.LChain
+open Deduction.CH Formalism Formalism.D5 Formalism.RankGapBounds.WeightedMeanData
+  Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.LChain
 
 namespace CharacterBalanceMoves
 
@@ -20,8 +24,9 @@ variable {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
 def e1 (h : H) : E0 × H := (((1 : ZMod 2), (0 : ZMod 2)), h)
 
 def Th (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (T2 : Finset H) (b y : ℝ) (u0 t : H) : ℂ :=
-  (1 / ((PhiSet (H := H)).card : ℂ)) * ∑ s ∈ T2, ∑ ψ : AddChar (E0 × H) ℂ,
-    ψ (-(e1 (s + u0 - t))) * ((b : ℂ) * GPsi D ell ψ y)
+  (1 / ((PhiSet (H := H)).card : ℂ))
+    * ∑ s ∈ T2, ∑ ψ : AddChar (E0 × H) ℂ,
+      ψ (-(e1 (s + u0 - t))) * ((b : ℂ) * GPsi D ell ψ y)
 
 lemma mem_psi (A0 : AddSubgroup H) (ψ : AddChar (E0 × H) ℂ) : ψ ∈ PsiA A0 ↔ ∀ s ∈ A0, ψ (0, s) = 1 := by
   classical
@@ -182,11 +187,12 @@ lemma triv (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) {x Cd : ℝ} 
   have h3 : 0 ≤ Real.log x := Real.log_nonneg (by linarith)
   nlinarith
 
-
 open Classical in
-def vv (Kp : Finset (AddChar (E0 × H) ℂ)) (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (c x : ℝ)
-    (ψ : AddChar (E0 × H) ℂ) : ℝ :=
-  if ψ ∈ Kp then wtA c ψ * (GPsi D ell ψ x).re else -‖GPsi D ell ψ x‖
+def vv
+    (Kp : Finset (AddChar (E0 × H) ℂ)) (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (c x : ℝ)
+    (ψ : AddChar (E0 × H) ℂ)
+    : ℝ :=
+  if ψ ∈ Kp then wtA c ψ * (GPsi D ell ψ x).re else - ‖GPsi D ell ψ x‖
 
 lemma sum_vv (A0 : AddSubgroup H) (Kp : Finset (AddChar (E0 × H) ℂ)) (hKp : ∀ ψ ∈ Kp, ψ ∈ PsiA A0)
     (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (c x : ℝ) :
@@ -344,24 +350,32 @@ lemma core (A0 : AddSubgroup H) (D : ArithData H) (S : Finset ℕ) (hD : HostFac
 end CharacterBalanceMoves
 
 set_option maxHeartbeats 1600000 in
-theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| ≤ 1) : ∃ x1 : ℝ, ∀ x ≥ x1,
-    ∀ (H : Type) [AddCommGroup H] [Fintype H] [DecidableEq H] (m : ℕ) (D : ArithData H) (S : Finset ℕ)
-      (ell : AddChar (E0 × H) ℂ → ℂ) (N : ℕ) (TT T2 : Finset H) (a : H → ℝ) (w : H → Fin m → E0 × H → ℝ)
-      (b b' k aE η X' θ : ℝ) (A0 : AddSubgroup H) (Kp : Finset (AddChar (E0 × H) ℂ)),
-      HostFactsS D S → 0 < b → 0 ≤ aE → 0 < k → (m : ℝ) ≤ x ^ ((1 : ℝ) / 2 + ε / 2) → x * m ≤ k →
-      SizesA A0 TT T2 a w N x b b' η X' θ → ThinScales D ell X' θ → CostWindows x (fPl H) b η θ →
-      RestSize ε x (Fintype.card H) TT.card T2.card m b k aE → (∀ s ∈ T2, s ∈ A0) → CharsA ell A0 Kp TT c M Ko CE ε x →
-      (∀ u ∈ A0, gapA D N ell TT a w u ≤ x ^ (C * ε) * errorBracketSizeWindows x ε (Fintype.card H) TT.card T2.card m b k aE) →
-      GmA D ell Kp c x ≤ x ^ ((1 : ℝ) / 2 + (C + 3) * ε) + SigA D ell A0 Kp x := by
+theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| ≤ 1)
+    : ∃ x1 : ℝ, ∀ x ≥ x1,
+      ∀ (H : Type) [AddCommGroup H] [Fintype H] [DecidableEq H] (m : ℕ) (D : ArithData H)
+          (S : Finset ℕ) (ell : AddChar (E0 × H) ℂ → ℂ) (N : ℕ) (TT T2 : Finset H) (a : H → ℝ)
+          (w : H → Fin m → E0 × H → ℝ) (b b' k aE η X' θ : ℝ) (A0 : AddSubgroup H)
+          (Kp : Finset (AddChar (E0 × H) ℂ)),
+        HostFactsS D S → 0 < b → 0 ≤ aE → 0 < k → (m : ℝ) ≤ x ^ ((1 : ℝ) / 2 + ε / 2) → x * m ≤ k
+          → SizesA A0 TT T2 a w N x b b' η X' θ → ThinScales D ell X' θ
+          → CostWindows x (fPl H) b η θ → RestSize ε x (Fintype.card H) TT.card T2.card m b k aE
+          → (∀ s ∈ T2, s ∈ A0) → CharsA ell A0 Kp TT c M Ko CE ε x
+          → (∀ u ∈ A0,
+            gapA D N ell TT a w u
+              ≤ x ^ (C * ε) * errorBracketSizeWindows x ε (Fintype.card H) TT.card T2.card m b k aE)
+          → GmA D ell Kp c x ≤ x ^ ((1 : ℝ) / 2 + (C + 3) * ε) + SigA D ell A0 Kp x := by
   obtain ⟨Cd, hCd, hDer⟩ := derivative_integral_all
-  obtain ⟨x₁, hx₁⟩ := Filter.eventually_atTop.1
-    ((tendsto_rpow_atTop (show 0 < 3 * ε / 8 by positivity)).eventually_ge_atTop 26)
+  obtain ⟨x₁, hx₁⟩ :=
+    Filter.eventually_atTop.1
+      ((tendsto_rpow_atTop (show 0 < 3 * ε / 8 by positivity)).eventually_ge_atTop 26)
   set A1 : ℝ := 5 + Cd + |Ko| + |M| * (4 + Cd + |Ko|) + 4 * |CE| with hA1
   have hA10 : 0 ≤ A1 := by positivity
-  obtain ⟨x₂, hx₂⟩ := Filter.eventually_atTop.1
-    ((tendsto_rpow_atTop (show (0 : ℝ) < 1 / 4 by norm_num)).eventually_ge_atTop (|M| * A1))
+  obtain ⟨x₂, hx₂⟩ :=
+    Filter.eventually_atTop.1
+      ((tendsto_rpow_atTop (show (0 : ℝ) < 1 / 4 by norm_num)).eventually_ge_atTop (|M| * A1))
   refine ⟨max 3 (max x₁ x₂), fun x hx => ?_⟩
-  intro H _ _ _ m D S ell N TT T2 a w b b' k aE η X' θ A0 Kp hHost hb ha hk hm hxm hS hThin hCost hSize hT2 hCh hTop
+  intro H _ _ _ m D S ell N TT T2 a w b b' k aE η X' θ A0 Kp hHost hb ha hk hm hxm hS hThin hCost
+    hSize hT2 hCh hTop
   obtain ⟨h0K, hKp, hM, hE2, hKo, hE3⟩ := hCh
   have hx3 : 3 ≤ x := le_of_max_le_left hx
   have h26 := hx₁ x (le_of_max_le_left (le_of_max_le_right hx))
@@ -370,8 +384,19 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
   have w1 : 1 ≤ x := by linarith
   have hW : SizeWindows C ε x (Fintype.card H) TT.card T2.card m b k aE
       (x ^ (C * ε) * errorBracketSizeWindows x ε (Fintype.card H) TT.card T2.card m b k aE) :=
-    (size_windows_split _ _ _ _ _ _ _ _ _ _ _).2 ⟨hSize, le_refl _, ⟨hx3, h26⟩, hε, hC,
-      Fintype.card_pos, hb, ha, Finset.card_le_univ T2, hm, hxm⟩
+    (size_windows_split _ _ _ _ _ _ _ _ _ _ _).2 ⟨
+      hSize,
+      le_refl _,
+      ⟨hx3, h26⟩,
+      hε,
+      hC,
+      Fintype.card_pos,
+      hb,
+      ha,
+      Finset.card_le_univ T2,
+      hm,
+      hxm
+    ⟩
   set s : ℝ := x ^ ((1 : ℝ) / 4) with hs
   set e : ℝ := x ^ ε with he
   have hs1 : 1 ≤ s := Real.one_le_rpow w1 (by norm_num)
@@ -400,13 +425,19 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
   have hCe : 0 ≤ |CE| * (s * e) := by positivity
   have hKe : 0 ≤ |Ko| * (s * e) := by positivity
   have hCde : 0 ≤ Cd * (s * e) := by positivity
-  have hR : A1 * (s * e) = 5 * (s * e) + Cd * (s * e) + |Ko| * (s * e) + |M| * (4 + Cd + |Ko|) * (s * e)
-      + 4 * (|CE| * (s * e)) := by
+  have hR
+      : A1 * (s * e)
+        = 5 * (s * e) + Cd * (s * e) + |Ko| * (s * e) + |M| * (4 + Cd + |Ko|) * (s * e)
+          + 4 * (|CE| * (s * e)) := by
     rw [hA1]; ring
   have hρ0 : 0 ≤ x ^ (-1 + ε) := Real.rpow_nonneg hx0.le _
   have r1 : Cd ≤ A1 * (s * e) := by linarith [up Cd hCd]
-  have r2 : Real.log (x + 1) + Cd + |Ko| + |M| * x ^ (-1 + ε) * (x * (Real.log x + Cd + |Ko|)) ≤ A1 * (s * e) := by
-    have e1 : |M| * x ^ (-1 + ε) * (x * (Real.log x + Cd + |Ko|)) = |M| * ((Real.log x + Cd + |Ko|) * e) := by
+  have r2
+      : Real.log (x + 1) + Cd + |Ko| + |M| * x ^ (-1 + ε) * (x * (Real.log x + Cd + |Ko|))
+        ≤ A1 * (s * e) := by
+    have e1
+        : |M| * x ^ (-1 + ε) * (x * (Real.log x + Cd + |Ko|))
+          = |M| * ((Real.log x + Cd + |Ko|) * e) := by
       rw [← hρ]; ring
     have e2 : Real.log x + Cd + |Ko| ≤ (4 + Cd + |Ko|) * s := by
       have := le_mul_of_one_le_right hCd hs1
@@ -418,30 +449,39 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
     rw [e1]
     linarith [up Cd hCd, up _ (abs_nonneg Ko)]
   have r3 : Real.log (x + 1) + Cd + |CE| * Real.log x ≤ A1 * (s * e) := by
-    have e1 : |CE| * Real.log x ≤ |CE| * (4 * (s * e)) := mul_le_mul_of_nonneg_left (by linarith) (abs_nonneg CE)
+    have e1 : |CE| * Real.log x ≤ |CE| * (4 * (s * e)) :=
+      mul_le_mul_of_nonneg_left (by linarith) (abs_nonneg CE)
     linarith [up Cd hCd]
-  have hone := CharacterBalanceMoves.one_char A0 Kp D ell TT (fun t => a t / b) (c := c) (ρ := |M| * x ^ (-1 + ε)) (Ko := |Ko|)
-    (L := |CE| * Real.log x) hx3 hCd hS.2.2.2.2.2.1 (hDer H D ell) (by positivity) (abs_nonneg _) h0K
-    (fun ψ h => (hKp ψ h).2)
-    (fun ψ h h' => (hE2 ψ h h').trans (by gcongr; exact le_abs_self M))
-    (fun ψ h h' => (hKo ψ h h').trans (le_abs_self Ko))
-    (fun ψ h h1 => (hE3 ψ h h1).trans (mul_le_mul_of_nonneg_right (le_abs_self CE) hl0))
-    r1 r2 r3
+  have hone :=
+    CharacterBalanceMoves.one_char A0 Kp D ell TT
+      (fun t => a t / b)
+      (c := c) (ρ := |M| * x ^ (-1 + ε)) (Ko := |Ko|) (L := |CE| * Real.log x) hx3 hCd
+      hS.2.2.2.2.2.1 (hDer H D ell) (by positivity) (abs_nonneg _) h0K
+      (fun ψ h => (hKp ψ h).2)
+      (fun ψ h h' => (hE2 ψ h h').trans (by gcongr; exact le_abs_self M))
+      (fun ψ h h' => (hKo ψ h h').trans (le_abs_self Ko))
+      (fun ψ h h1 => (hE3 ψ h h1).trans (mul_le_mul_of_nonneg_right (le_abs_self CE) hl0))
+      r1 r2 r3
   set G : ℝ := GmA D ell Kp c x - SigA D ell A0 Kp x with hG
-  have hY : (TT.card : ℝ) * (G - 4 * x ^ ((1 : ℝ) / 2 + ε)) ≤
-      ∑ t ∈ TT, (∑ ψ ∈ PsiA A0, ψ (CharacterBalanceMoves.e1 t) * GPsi D ell ψ (a t / b)).re := by
-    simp_rw [Complex.re_sum]
-    rw [Finset.sum_comm]
-    refine le_trans ?_ (Finset.sum_le_sum hone)
-    rw [← Finset.mul_sum, Finset.sum_sub_distrib, CharacterBalanceMoves.sum_vv A0 Kp (fun ψ h => (hKp ψ h).1), Finset.sum_const,
-      nsmul_eq_mul, hX]
-    refine mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)
-    have k1 := mul_le_mul_of_nonneg_right (hM.trans (le_abs_self M)) (show 0 ≤ A1 * (s * e) by positivity)
-    have k2 := mul_le_mul_of_nonneg_right hbig (show 0 ≤ s * e by positivity)
-    have k3 : 0 ≤ s * (s * e) := by positivity
-    have k4 : |M| * (A1 * (s * e)) = |M| * A1 * (s * e) := by ring
-    linarith
-  have hc' := CharacterBalanceMoves.core A0 D S hHost ell N TT T2 a w hx3 hb hS hThin hCost hT2 hTop hY
+  have hY
+      : (TT.card : ℝ) * (G - 4 * x ^ ((1 : ℝ) / 2 + ε))
+        ≤ ∑ t ∈ TT, (∑ ψ ∈ PsiA A0, ψ (CharacterBalanceMoves.e1 t) * GPsi D ell ψ (a t / b)).re :=
+    by
+      simp_rw [Complex.re_sum]
+      rw [Finset.sum_comm]
+      refine le_trans ?_ (Finset.sum_le_sum hone)
+      rw [← Finset.mul_sum, Finset.sum_sub_distrib,
+        CharacterBalanceMoves.sum_vv A0 Kp (fun ψ h => (hKp ψ h).1), Finset.sum_const, nsmul_eq_mul,
+        hX]
+      refine mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)
+      have k1 :=
+        mul_le_mul_of_nonneg_right (hM.trans (le_abs_self M)) (show 0 ≤ A1 * (s * e) by positivity)
+      have k2 := mul_le_mul_of_nonneg_right hbig (show 0 ≤ s * e by positivity)
+      have k3 : 0 ≤ s * (s * e) := by positivity
+      have k4 : |M| * (A1 * (s * e)) = |M| * A1 * (s * e) := by ring
+      linarith
+  have hc' :=
+    CharacterBalanceMoves.core A0 D S hHost ell N TT T2 a w hx3 hb hS hThin hCost hT2 hTop hY
   have hz := proposition_size_bound _ _ _ _ _ _ _ _ _ _ _ G hW hc'
   linarith
 

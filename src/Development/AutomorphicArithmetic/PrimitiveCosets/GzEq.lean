@@ -4,14 +4,18 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.CoreAtH
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-theorem UpperTheory.Comparison₂.Gz_eq :
-    ∀ y : ℝ, Formalism.Gz y = An.G y ∧ An.G y = Deduction.G y := by
+theorem UpperTheory.Comparison₂.Gz_eq
+    : ∀ y : ℝ, Formalism.Gz y = An.G y ∧ An.G y = Deduction.G y := by
   intro y
-  have hsum : ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / (n : ℝ) - 1)
-      = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / (n : ℝ) - 1) 0 := by
+  have hsum
+      : ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, ArithmeticFunction.vonMangoldt n * (y / (n : ℝ) - 1)
+        = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / (n : ℝ) - 1) 0 := by
     apply Finset.sum_congr rfl
     intro n hn
     rw [Finset.mem_Icc] at hn
@@ -29,8 +33,9 @@ theorem UpperTheory.Comparison₂.Gz_eq :
       rw [sub_nonneg, le_div_iff₀ hpos, one_mul]
       exact hy
     rw [max_eq_left this]
-  have hre : (Deduction.ramp (fun _ => 1) y).re
-      = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / (n : ℝ) - 1) 0 := by
+  have hre
+      : (Deduction.ramp (fun _ => 1) y).re
+        = ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, An.abelian₂ n * max (y / (n : ℝ) - 1) 0 := by
     have hsub : Finset.Icc 1 ⌊y⌋₊ ⊆ Finset.range (⌊y⌋₊ + 1) := by
       intro n hn
       rw [Finset.mem_Icc] at hn

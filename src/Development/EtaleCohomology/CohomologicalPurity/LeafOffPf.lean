@@ -20,7 +20,10 @@ theorem LeafOff_of : LeafOff := by
   obtain ⟨y0, rfl⟩ := hr
   have hw := congrArg (fun g => g.base y0) F.cart.w
   simp only [Scheme.Hom.comp_base] at hw
-  have hU : F.w.base ((Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk F.I))).base y0) ∈ (P.U : Set P.X) := hy
+  have hU
+      : F.w.base ((Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk F.I))).base y0)
+        ∈ (P.U : Set P.X) :=
+    hy
   rw [P.hU] at hU
   exact hU ⟨F.z.base y0, hw.symm⟩
 

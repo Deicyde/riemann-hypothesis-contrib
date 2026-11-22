@@ -16,15 +16,19 @@ variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
 def dvrOrderNat (x : O) : ℕ := (IsDiscreteValuationRing.addVal O x).toNat
 
-theorem dvr_order_coe_addVal {a : O} (ha : a ≠ 0) : ((dvrOrderNat a : ℕ) : ℕ∞) = IsDiscreteValuationRing.addVal O a := by
+theorem dvr_order_coe_addVal {a : O} (ha : a ≠ 0)
+    : ((dvrOrderNat a : ℕ) : ℕ∞) = IsDiscreteValuationRing.addVal O a := by
   unfold dvrOrderNat
   first
-    | exact ENat.coe_toNat (by rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff])
-    | exact ENat.coe_toNat ((AddValuation.top_iff _).not.mpr ha)
+  | exact ENat.coe_toNat (by rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff])
+  | exact ENat.coe_toNat ((AddValuation.top_iff _).not.mpr ha)
 
-theorem dvr_order_mul {a b : O} (ha : a ≠ 0) (hb : b ≠ 0) : dvrOrderNat (a * b) = dvrOrderNat a + dvrOrderNat b := by
+theorem dvr_order_mul {a b : O} (ha : a ≠ 0) (hb : b ≠ 0)
+    : dvrOrderNat (a * b) = dvrOrderNat a + dvrOrderNat b := by
   have h1 := dvr_order_coe_addVal (mul_ne_zero ha hb)
-  rw [(IsDiscreteValuationRing.addVal O).map_mul, ← dvr_order_coe_addVal ha, ← dvr_order_coe_addVal hb] at h1
+  rw [(IsDiscreteValuationRing.addVal O).map_mul, ← dvr_order_coe_addVal ha,
+      ← dvr_order_coe_addVal hb]
+    at h1
   exact_mod_cast h1
 
 theorem dvr_order_pow {a : O} (ha : a ≠ 0) (k : ℕ) : dvrOrderNat (a ^ k) = k * dvrOrderNat a := by
@@ -36,8 +40,8 @@ theorem dvr_order_pow {a : O} (ha : a ≠ 0) (k : ℕ) : dvrOrderNat (a ^ k) = k
     rw [pow_succ, dvr_order_mul (pow_ne_zero n ha) ha, ih]
     ring
 
-theorem dvr_order_add_ge_min {a b : O} (ha : a ≠ 0) (hb : b ≠ 0) (hab : a + b ≠ 0) :
-    min (dvrOrderNat a) (dvrOrderNat b) ≤ dvrOrderNat (a + b) := by
+theorem dvr_order_add_ge_min {a b : O} (ha : a ≠ 0) (hb : b ≠ 0) (hab : a + b ≠ 0)
+    : min (dvrOrderNat a) (dvrOrderNat b) ≤ dvrOrderNat (a + b) := by
   have h := (IsDiscreteValuationRing.addVal O).map_add a b
   rw [← dvr_order_coe_addVal ha, ← dvr_order_coe_addVal hb, ← dvr_order_coe_addVal hab] at h
   rcases le_total (dvrOrderNat a) (dvrOrderNat b) with hle | hle
@@ -55,12 +59,13 @@ theorem dvr_order_neg (a : O) : dvrOrderNat (-a) = dvrOrderNat a := by
 theorem dvr_order_unit_eq_zero {a : O} (ha : IsUnit a) : dvrOrderNat a = 0 := by
   unfold dvrOrderNat
   first
-    | rw [IsDiscreteValuationRing.addVal_eq_zero_iff.2 ha]; rfl
-    | (obtain ⟨u, rfl⟩ := ha; simp [IsDiscreteValuationRing.addVal_eq_zero_of_unit])
+  | rw [IsDiscreteValuationRing.addVal_eq_zero_iff.2 ha]; rfl
+  | (obtain ⟨u, rfl⟩ := ha; simp [IsDiscreteValuationRing.addVal_eq_zero_of_unit])
 
-theorem ord_eq_order_sub_of_fraction (x : KK O) (a b : O) (ha : a ≠ 0) (hb : b ≠ 0)
-    (h : x * algebraMap O (KK O) b = algebraMap O (KK O) a) :
-    ordW x = (((dvrOrderNat a : ℤ) - (dvrOrderNat b : ℤ) : ℤ) : WithTop ℤ) := by
+theorem ord_eq_order_sub_of_fraction
+    (x : KK O) (a b : O)
+    (ha : a ≠ 0) (hb : b ≠ 0) (h : x * algebraMap O (KK O) b = algebraMap O (KK O) a)
+    : ordW x = (((dvrOrderNat a : ℤ) - (dvrOrderNat b : ℤ) : ℤ) : WithTop ℤ) := by
   have hinj := IsFractionRing.injective O (KK O)
   have hx : x ≠ 0 := by
     rintro rfl
@@ -86,8 +91,8 @@ theorem ramification_index_ne_zero {p : ℕ} (S : UniformizedDVR p O) : ramE p O
   obtain ⟨w, hw, hpm, hp0, _⟩ := S
   unfold ramE
   have hnu : ¬ IsUnit (p : O) := (IsLocalRing.mem_maximalIdeal _).1 hpm
-  have h0 : IsDiscreteValuationRing.addVal O (p : O) ≠ 0 :=
-    fun h => hnu (IsDiscreteValuationRing.addVal_eq_zero_iff.1 h)
+  have h0 : IsDiscreteValuationRing.addVal O (p : O) ≠ 0 := fun h =>
+    hnu (IsDiscreteValuationRing.addVal_eq_zero_iff.1 h)
   have htop : IsDiscreteValuationRing.addVal O (p : O) ≠ ⊤ := by
     rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
   intro h
@@ -99,14 +104,18 @@ theorem valuation_zero_alt (p : ℕ) : vK p (0 : KK O) = ⊤ := by
   unfold vK ordW
   simp
 
-theorem valuation_eq_of_fraction (p : ℕ) (x : KK O) (a b : O) (ha : a ≠ 0) (hb : b ≠ 0)
-    (h : x * algebraMap O (KK O) b = algebraMap O (KK O) a) :
-    vK p x = (((((dvrOrderNat a : ℤ) - (dvrOrderNat b : ℤ) : ℤ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
+theorem valuation_eq_of_fraction
+    (p : ℕ)
+    (x : KK O) (a b : O)
+    (ha : a ≠ 0) (hb : b ≠ 0) (h : x * algebraMap O (KK O) b = algebraMap O (KK O) a)
+    : vK p x
+      = (((((dvrOrderNat a : ℤ) - (dvrOrderNat b : ℤ) : ℤ) : ℚ) / (ramE p O : ℚ) : ℚ)
+        : WithTop ℚ) := by
   unfold vK
   rw [ord_eq_order_sub_of_fraction x a b ha hb h, WithTop.map_coe]
 
-theorem exists_fraction_of_ne_zero (x : KK O) (hx : x ≠ 0) : ∃ a b : O, a ≠ 0 ∧ b ≠ 0 ∧
-    x * algebraMap O (KK O) b = algebraMap O (KK O) a := by
+theorem exists_fraction_of_ne_zero (x : KK O) (hx : x ≠ 0)
+    : ∃ a b : O, a ≠ 0 ∧ b ≠ 0 ∧ x * algebraMap O (KK O) b = algebraMap O (KK O) a := by
   obtain ⟨⟨a, b⟩, hab⟩ := IsLocalization.surj (nonZeroDivisors O) x
   have hb0 : (b : O) ≠ 0 := nonZeroDivisors.ne_zero b.2
   refine ⟨a, b, ?_, hb0, hab⟩
@@ -137,7 +146,8 @@ theorem valuation_neg (p : ℕ) (x : KK O) : vK p (-x) = vK p x := by
   · rw [hx, neg_zero]
   obtain ⟨a, b, ha, hb, hab⟩ := exists_fraction_of_ne_zero x hx
   rw [valuation_eq_of_fraction p x a b ha hb hab,
-    valuation_eq_of_fraction p (-x) (-a) b (neg_ne_zero.2 ha) hb (by rw [map_neg, ← hab]; ring), dvr_order_neg]
+    valuation_eq_of_fraction p (-x) (-a) b (neg_ne_zero.2 ha) hb (by rw [map_neg, ← hab]; ring),
+    dvr_order_neg]
 
 theorem valuation_add_ge_min (p : ℕ) (x y : KK O) : min (vK p x) (vK p y) ≤ vK p (x + y) := by
   by_cases hx : x = 0
@@ -167,10 +177,16 @@ theorem valuation_add_ge_min (p : ℕ) (x y : KK O) : min (vK p x) (vK p y) ≤ 
   have hA := mul_ne_zero ha hd
   have hC := mul_ne_zero hc hb
   have hS := dvr_order_add_ge_min hA hC hs0
-  rw [valuation_eq_of_fraction p x _ _ hA hbd e1, valuation_eq_of_fraction p y _ _ hC hbd e2, valuation_eq_of_fraction p (x + y) _ _ hs0 hbd e3]
-  have hmono : ∀ m : ℕ, m ≤ dvrOrderNat (a * d + c * b) →
-      (((((m : ℤ) - (dvrOrderNat (b * d) : ℤ) : ℤ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) ≤
-      (((((dvrOrderNat (a * d + c * b) : ℤ) - (dvrOrderNat (b * d) : ℤ) : ℤ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
+  rw [valuation_eq_of_fraction p x _ _ hA hbd e1, valuation_eq_of_fraction p y _ _ hC hbd e2,
+    valuation_eq_of_fraction p (x + y) _ _ hs0 hbd e3]
+  have hmono
+      : ∀ m : ℕ,
+        m ≤ dvrOrderNat (a * d + c * b)
+          → (((((m : ℤ) - (dvrOrderNat (b * d) : ℤ) : ℤ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ)
+            ≤ (((((dvrOrderNat (a * d + c * b) : ℤ) - (dvrOrderNat (b * d) : ℤ) : ℤ) : ℚ)
+                  / (ramE p O : ℚ)
+                : ℚ)
+              : WithTop ℚ) := by
     intro m hm
     rw [WithTop.coe_le_coe]
     apply div_le_div_of_nonneg_right _ (Nat.cast_nonneg _)
@@ -181,15 +197,18 @@ theorem valuation_add_ge_min (p : ℕ) (x y : KK O) : min (vK p x) (vK p y) ≤ 
   · rw [min_eq_right hle] at hS
     exact min_le_of_right_le (hmono _ hS)
 
-theorem valuation_algebraMap_eq_alt (p : ℕ) (o : O) (ho : o ≠ 0) :
-    vK p (algebraMap O (KK O) o) = ((((dvrOrderNat o : ℕ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
-  rw [valuation_eq_of_fraction p _ o 1 ho one_ne_zero (by rw [map_one, mul_one]), dvr_order_unit_eq_zero isUnit_one]
+theorem valuation_algebraMap_eq_alt (p : ℕ) (o : O) (ho : o ≠ 0)
+    : vK p (algebraMap O (KK O) o)
+      = ((((dvrOrderNat o : ℕ) : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
+  rw [valuation_eq_of_fraction p _ o 1 ho one_ne_zero (by rw [map_one, mul_one]),
+    dvr_order_unit_eq_zero isUnit_one]
   congr 1
   all_goals push_cast
   all_goals ring
 
-theorem natCast_isUnit_of_coprime {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (n : ℕ) (hn : ¬ p ∣ n) :
-    IsUnit (n : O) := by
+theorem natCast_isUnit_of_coprime
+    {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (n : ℕ) (hn : ¬ p ∣ n)
+    : IsUnit (n : O) := by
   have hpm := S.p_mem
   by_contra hnu
   have hn' : (n : O) ∈ IsLocalRing.maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).2 hnu
@@ -204,7 +223,8 @@ theorem natCast_isUnit_of_coprime {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hpm) (Ideal.mul_mem_left _ _ hn')
   exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).2 h1m)
 
-theorem natCast_ne_zero_in_dvr {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (m : ℕ) (hm : m ≠ 0) : (m : O) ≠ 0 := by
+theorem natCast_ne_zero_in_dvr {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (m : ℕ) (hm : m ≠ 0)
+    : (m : O) ≠ 0 := by
   obtain ⟨k, n, hn, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hm p hp.ne_one
   push_cast
   exact mul_ne_zero (pow_ne_zero _ S.p_ne) (natCast_isUnit_of_coprime hp S n hn).ne_zero
@@ -214,15 +234,17 @@ theorem dvr_ring_charZero {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) : Ch
   by_contra h
   exact natCast_ne_zero_in_dvr hp S m h hm
 
-theorem dvr_fraction_field_char_zero {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) : CharZero (KK O) := by
+theorem dvr_fraction_field_char_zero {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O)
+    : CharZero (KK O) := by
   haveI := dvr_ring_charZero hp S
   refine charZero_of_inj_zero fun n hn => ?_
   have h' : algebraMap O (KK O) (n : O) = 0 := by rw [map_natCast]; exact hn
   have h'' : (n : O) = 0 := IsFractionRing.injective O (KK O) (by rw [h', map_zero])
   exact_mod_cast h''
 
-theorem valuation_natCast_padicVal {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (m : ℕ) (hm : m ≠ 0) :
-    vK p (m : KK O) = ((padicValNat p m : ℚ) : WithTop ℚ) := by
+theorem valuation_natCast_padicVal
+    {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) (m : ℕ) (hm : m ≠ 0)
+    : vK p (m : KK O) = ((padicValNat p m : ℚ) : WithTop ℚ) := by
   obtain ⟨k, n, hn, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hm p hp.ne_one
   have hn0 : n ≠ 0 := by
     rintro rfl
@@ -243,21 +265,23 @@ theorem valuation_natCast_padicVal {p : ℕ} (hp : p.Prime) (S : UniformizedDVR 
   push_cast
   field_simp
 
-theorem valuation_nonneg_iff_integral {p : ℕ} (S : UniformizedDVR p O) (x : KK O) :
-    0 ≤ vK p x ↔ ∃ o : O, x = algebraMap O (KK O) o := by
+theorem valuation_nonneg_iff_integral {p : ℕ} (S : UniformizedDVR p O) (x : KK O)
+    : 0 ≤ vK p x ↔ ∃ o : O, x = algebraMap O (KK O) o := by
   constructor
   · intro h0
     by_cases hx : x = 0
     · exact ⟨0, by rw [hx, map_zero]⟩
     obtain ⟨a, b, ha, hb, hab⟩ := exists_fraction_of_ne_zero x hx
     rw [valuation_eq_of_fraction p x a b ha hb hab] at h0
-    have he : (0 : ℚ) < ramE p O := by exact_mod_cast Nat.pos_of_ne_zero (ramification_index_ne_zero S)
+    have he : (0 : ℚ) < ramE p O := by
+      exact_mod_cast Nat.pos_of_ne_zero (ramification_index_ne_zero S)
     have h1 := WithTop.coe_nonneg.1 h0
     rw [le_div_iff₀ he, zero_mul] at h1
     have h3 : (0 : ℤ) ≤ (dvrOrderNat a : ℤ) - (dvrOrderNat b : ℤ) := by exact_mod_cast h1
     have h2 : dvrOrderNat b ≤ dvrOrderNat a := by omega
-    have hdvd : b ∣ a := IsDiscreteValuationRing.addVal_le_iff_dvd.1
-      (by rw [← dvr_order_coe_addVal hb, ← dvr_order_coe_addVal ha]; exact ENat.coe_le_coe.2 h2)
+    have hdvd : b ∣ a :=
+      IsDiscreteValuationRing.addVal_le_iff_dvd.1 (by
+        rw [← dvr_order_coe_addVal hb, ← dvr_order_coe_addVal ha]; exact ENat.coe_le_coe.2 h2)
     obtain ⟨c, rfl⟩ := hdvd
     have hb' : algebraMap O (KK O) b ≠ 0 :=
       (map_ne_zero_iff _ (IsFractionRing.injective O (KK O))).2 hb
@@ -269,9 +293,16 @@ theorem valuation_nonneg_iff_integral {p : ℕ} (S : UniformizedDVR p O) (x : KK
     rw [valuation_algebraMap_eq_alt p o ho]
     exact WithTop.coe_nonneg.2 (div_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _))
 
-theorem valuation_properties_hold {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O) : ValuationProperties p O := by
+theorem valuation_properties_hold {p : ℕ} (hp : p.Prime) (S : UniformizedDVR p O)
+    : ValuationProperties p O := by
   unfold ValuationProperties
-  exact ⟨valuation_zero_alt p, valuation_mul_alt p, valuation_add_ge_min p, fun m hm => valuation_natCast_padicVal hp S m hm, valuation_neg p,
-    valuation_nonneg_iff_integral S⟩
+  exact ⟨
+    valuation_zero_alt p,
+    valuation_mul_alt p,
+    valuation_add_ge_min p,
+    fun m hm => valuation_natCast_padicVal hp S m hm,
+    valuation_neg p,
+    valuation_nonneg_iff_integral S
+  ⟩
 
 end Formalism.MainNotions.G.GLWeightTheory

@@ -8,16 +8,17 @@ open Equiv Equiv.Perm Finset
 
 namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 
-theorem card_disjoint_perm {α : Type} [Fintype α] [DecidableEq α] (c : Perm α)
-    (B : Finset (Perm α)) (hB : ∀ τ, τ ∈ B ↔ c.Disjoint τ) :
-    B.card = (Fintype.card α - c.support.card).factorial := by
+theorem card_disjoint_perm
+    {α : Type} [Fintype α] [DecidableEq α]
+    (c : Perm α) (B : Finset (Perm α)) (hB : ∀ τ, τ ∈ B ↔ c.Disjoint τ)
+    : B.card = (Fintype.card α - c.support.card).factorial := by
   classical
   have hB' : B = Finset.univ.filter (fun τ => c.Disjoint τ) := by
     ext τ
     simp [hB]
   rw [hB', ← Fintype.card_subtype]
 
-  have e : {τ : Perm α // c.Disjoint τ} ≃ {f : Perm α // ∀ a, ¬ (a ∉ c.support) → f a = a} :=
+  have e : {τ : Perm α // c.Disjoint τ} ≃ {f : Perm α // ∀ a, ¬(a ∉ c.support) → f a = a} :=
     Equiv.subtypeEquivRight fun τ => by
       constructor
       · intro h a ha
@@ -33,14 +34,17 @@ theorem card_disjoint_perm {α : Type} [Fintype α] [DecidableEq α] (c : Perm �
   rw [Fintype.card_congr (e.trans (Equiv.Perm.subtypeEquivSubtypePerm _).symm), Fintype.card_perm,
     Fintype.card_subtype_compl, Fintype.card_coe]
 
-theorem prime_cycle_perm_count (N p : ℕ) (hp : p.Prime) (hpN : p ≤ N) (hN2 : N < 2 * p)
-    (S : Finset (Perm (Fin N))) (hS : ∀ σ, σ ∈ S ↔ p ∈ σ.cycleType) :
-    p * S.card = N.factorial := by
+theorem prime_cycle_perm_count
+    (N p : ℕ) (hp : p.Prime) (hpN : p ≤ N) (hN2 : N < 2 * p) (S : Finset (Perm (Fin N)))
+    (hS : ∀ σ, σ ∈ S ↔ p ∈ σ.cycleType)
+    : p * S.card = N.factorial := by
   classical
   have hp2 : 2 ≤ p := hp.two_le
-  obtain ⟨C, hCdef⟩ : ∃ C : Finset (Perm (Fin N)), C = Finset.univ.filter (fun g => g.cycleType = {p}) :=
+  obtain ⟨C, hCdef⟩
+      : ∃ C : Finset (Perm (Fin N)), C = Finset.univ.filter (fun g => g.cycleType = {p}) :=
     ⟨_, rfl⟩
-  have hmemT : ∀ σ : Perm (Fin N), p ∈ σ.cycleType ↔ ∃ c ∈ σ.cycleFactorsFinset, c.support.card = p := by
+  have hmemT
+      : ∀ σ : Perm (Fin N), p ∈ σ.cycleType ↔ ∃ c ∈ σ.cycleFactorsFinset, c.support.card = p := by
     intro σ
     rw [Equiv.Perm.cycleType_def, Multiset.mem_map]
     simp only [Finset.mem_val, Function.comp_apply]
@@ -61,23 +65,30 @@ theorem prime_cycle_perm_count (N p : ℕ) (hp : p.Prime) (hpN : p ≤ N) (hN2 :
     constructor
     · intro hσ
       obtain ⟨c, hc, hcp⟩ := (hmemT σ).1 ((hS σ).1 hσ)
-      exact Finset.mem_biUnion.2 ⟨c, hmemC c (Equiv.Perm.mem_cycleFactorsFinset_iff.1 hc).1 hcp,
-        Finset.mem_filter.2 ⟨hσ, hc⟩⟩
+      exact Finset.mem_biUnion.2 ⟨
+        c,
+        hmemC c (Equiv.Perm.mem_cycleFactorsFinset_iff.1 hc).1 hcp,
+        Finset.mem_filter.2 ⟨hσ, hc⟩
+      ⟩
     · intro h
       obtain ⟨c, _, hσ⟩ := Finset.mem_biUnion.1 h
       exact (Finset.mem_filter.1 hσ).1
 
-  have hdisj : (C : Set (Perm (Fin N))).PairwiseDisjoint
-      (fun c => S.filter (fun σ => c ∈ σ.cycleFactorsFinset)) := by
+  have hdisj
+      : (C : Set (Perm (Fin N))).PairwiseDisjoint
+        (fun c => S.filter (fun σ => c ∈ σ.cycleFactorsFinset)) := by
     intro c hc c' hc' hne
     show _root_.Disjoint _ _
     rw [Finset.disjoint_left]
     intro σ h1 h2
-    have hd := Equiv.Perm.cycleFactorsFinset_pairwise_disjoint σ
-      (Finset.mem_coe.2 (Finset.mem_filter.1 h1).2) (Finset.mem_coe.2 (Finset.mem_filter.1 h2).2) hne
+    have hd :=
+      Equiv.Perm.cycleFactorsFinset_pairwise_disjoint σ
+        (Finset.mem_coe.2 (Finset.mem_filter.1 h1).2) (Finset.mem_coe.2 (Finset.mem_filter.1 h2).2)
+        hne
     have hcard := Finset.card_le_univ (c.support ∪ c'.support)
     rw [Finset.card_union_of_disjoint hd.disjoint_support, (hCsupp c (Finset.mem_coe.1 hc)).2,
-      (hCsupp c' (Finset.mem_coe.1 hc')).2, Fintype.card_fin] at hcard
+        (hCsupp c' (Finset.mem_coe.1 hc')).2, Fintype.card_fin]
+      at hcard
     omega
 
   have hF : ∀ c ∈ C, (S.filter (fun σ => c ∈ σ.cycleFactorsFinset)).card = (N - p).factorial := by
@@ -98,18 +109,21 @@ theorem prime_cycle_perm_count (N p : ℕ) (hp : p.Prime) (hpN : p ≤ N) (hN2 :
       exact mul_left_cancel h
     · intro σ hσ
       have hmem := (Finset.mem_filter.1 hσ).2
-      have hd : c.Disjoint (σ * c⁻¹) := (Equiv.Perm.disjoint_mul_inv_of_mem_cycleFactorsFinset hmem).symm
+      have hd : c.Disjoint (σ * c⁻¹) :=
+        (Equiv.Perm.disjoint_mul_inv_of_mem_cycleFactorsFinset hmem).symm
       refine ⟨σ * c⁻¹, Finset.mem_filter.2 ⟨Finset.mem_univ _, hd⟩, ?_⟩
       rw [hd.commute.eq, inv_mul_cancel_right]
   have hcard : S.card = C.card * (N - p).factorial := by
     rw [hSU, Finset.card_biUnion hdisj, Finset.sum_congr rfl hF, Finset.sum_const, smul_eq_mul]
   have hC : C.card = (p - 1).factorial * N.choose p := by
-    have h := Equiv.Perm.card_of_cycleType_singleton (α := Fin N) hp2 (by rw [Fintype.card_fin]; exact hpN)
+    have h :=
+      Equiv.Perm.card_of_cycleType_singleton (α := Fin N) hp2 (by rw [Fintype.card_fin]; exact hpN)
     rw [Fintype.card_fin] at h
     rw [hCdef]
     exact h
   rw [hcard, hC]
-  calc p * ((p - 1).factorial * N.choose p * (N - p).factorial)
+  calc
+    p * ((p - 1).factorial * N.choose p * (N - p).factorial)
       = N.choose p * (p * (p - 1).factorial) * (N - p).factorial := by ring
     _ = N.factorial := by
       rw [Nat.mul_factorial_pred hp.ne_zero, Nat.choose_mul_factorial_mul_factorial hpN]

@@ -17,18 +17,20 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UpqRepVocabul
 
 @[expose] public section
 
-open BpJoin Formalism.FourierDecayAlt Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.QuantumDeterminants GlobalTheory.ThA
+open BpJoin Formalism.FourierDecayAlt Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.QuantumDeterminants GlobalTheory.ThA
 
 namespace GlobalTheory
 
-theorem bpNear_thresholds (k r : ℕ) (hk : 1 ≤ k) :
-    2 * ThreeDimData.Mexp r * (ThreeDimData.AS k r + ThreeDimData.AG k r) + ThreeDimData.AG k r + 3 ≤
-        31 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) ∧
-      9 * ((r : ℝ) + 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + 3 * ThreeDimData.AG k r + 3 ≤
-        24 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) ∧
-      ((r : ℝ) + 1) ^ 2 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤
-        2 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) ∧
-      1 ≤ ((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3 := by
+theorem bpNear_thresholds (k r : ℕ) (hk : 1 ≤ k)
+    : 2 * ThreeDimData.Mexp r * (ThreeDimData.AS k r + ThreeDimData.AG k r) + ThreeDimData.AG k r
+          + 3
+        ≤ 31 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)
+      ∧ 9 * ((r : ℝ) + 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + 3 * ThreeDimData.AG k r + 3
+        ≤ 24 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)
+      ∧ ((r : ℝ) + 1) ^ 2 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1)
+        ≤ 2 * (((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)
+      ∧ 1 ≤ ((r : ℝ) + 1) ^ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 3 := by
   have hr : (0 : ℝ) ≤ r := Nat.cast_nonneg r
   have hk' : (1 : ℝ) ≤ k := by exact_mod_cast hk
   have hn : ((2 * r + k + 1 : ℕ) : ℝ) = 2 * r + k + 1 := by push_cast; ring
@@ -41,18 +43,25 @@ theorem bpNear_thresholds (k r : ℕ) (hk : 1 ≤ k) :
   have hM : ThreeDimData.Mexp r ≤ 2 * s ^ 2 := by unfold ThreeDimData.Mexp; rw [hs]; nlinarith
   have hM0 : 0 ≤ ThreeDimData.Mexp r := by unfold ThreeDimData.Mexp; positivity
   have hG : ThreeDimData.AG k r ≤ 4 * n * s := by
-    unfold ThreeDimData.AG; rw [← hs]
+    unfold ThreeDimData.AG
+    rw [← hs]
     have : (k : ℝ) + r ≤ n := by linarith
     nlinarith
   have hG0 : 0 ≤ ThreeDimData.AG k r := by unfold ThreeDimData.AG; positivity
-  have hd : ThreeDimData.dN k r ≤ 2 * s * n := by unfold ThreeDimData.dN; rw [hs, hn]; nlinarith [mul_nonneg hr hr]
-  have hd0 : 0 ≤ ThreeDimData.dN k r := by unfold ThreeDimData.dN; nlinarith [mul_nonneg hr hr, mul_nonneg hr (by linarith : (0 : ℝ) ≤ k)]
+  have hd : ThreeDimData.dN k r ≤ 2 * s * n := by
+    unfold ThreeDimData.dN; rw [hs, hn]; nlinarith [mul_nonneg hr hr]
+  have hd0 : 0 ≤ ThreeDimData.dN k r := by
+    unfold ThreeDimData.dN; nlinarith [mul_nonneg hr hr, mul_nonneg hr (by linarith : (0 : ℝ) ≤ k)]
   have hS : ThreeDimData.AS k r ≤ n * (2 * s * n) := by
     unfold ThreeDimData.AS
     refine mul_le_mul ?_ hd hd0 (by linarith)
-    rw [hn]; push_cast; linarith
+    rw [hn]
+    push_cast
+    linarith
   have hS0 : 0 ≤ ThreeDimData.AS k r := by unfold ThreeDimData.AS; positivity
-  have hP : ThreeDimData.Mexp r * (ThreeDimData.AS k r + ThreeDimData.AG k r) ≤ 2 * s ^ 2 * (n * (2 * s * n) + 4 * n * s) :=
+  have hP
+      : ThreeDimData.Mexp r * (ThreeDimData.AS k r + ThreeDimData.AG k r)
+        ≤ 2 * s ^ 2 * (n * (2 * s * n) + 4 * n * s) :=
     mul_le_mul hM (by linarith) (by linarith) (by positivity)
   have k32 := key 3 2 (by omega) (by omega)
   have k31 := key 3 1 (by omega) (by omega)
@@ -62,7 +71,9 @@ theorem bpNear_thresholds (k r : ℕ) (hk : 1 ≤ k) :
   have k00 := key 0 0 (by omega) (by omega)
   have hrn : s ^ 2 * (r * n) ≤ s ^ 3 * n ^ 1 := by
     have : (r : ℝ) * n ≤ s * n := mul_le_mul_of_nonneg_right (by linarith) (by linarith)
-    calc s ^ 2 * (r * n) ≤ s ^ 2 * (s * n) := mul_le_mul_of_nonneg_left this (by positivity)
+    calc
+      s ^ 2 * (r * n)
+        ≤ s ^ 2 * (s * n) := mul_le_mul_of_nonneg_left this (by positivity)
       _ = s ^ 3 * n ^ 1 := by ring
   refine ⟨?_, ?_, ?_, ?_⟩
   · nlinarith
@@ -70,12 +81,19 @@ theorem bpNear_thresholds (k r : ℕ) (hk : 1 ≤ k) :
   · nlinarith
   · simpa using k00
 
-theorem bpNear_gapOK (k r : ℕ) (hk : 1 ≤ k) (c Cg : ℝ) (hC : 240 + 2 * |c| ≤ Cg) :
-    ThreeDimData.GapOK k r (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-      (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) / 2) ∧
-    c * ((r : ℝ) + 1) ^ 2 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1) ≤
-      ThreeDimData.aOf r (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-        (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) / 2) - 1 := by
+theorem bpNear_gapOK (k r : ℕ) (hk : 1 ≤ k) (c Cg : ℝ) (hC : 240 + 2 * |c| ≤ Cg)
+    : ThreeDimData.GapOK k r
+        (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+          * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+            + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)
+          / 2)
+      ∧ c * ((r : ℝ) + 1) ^ 2 * ((r : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) + 1)
+        ≤ ThreeDimData.aOf r
+            (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+              * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+                + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)
+              / 2)
+          - 1 := by
   obtain ⟨h1, h2, h3, h4⟩ := bpNear_thresholds k r hk
   have hr : (0 : ℝ) ≤ r := Nat.cast_nonneg r
   have hc : 0 ≤ |c| := abs_nonneg c
@@ -88,17 +106,23 @@ theorem bpNear_gapOK (k r : ℕ) (hk : 1 ≤ k) (c Cg : ℝ) (hC : 240 + 2 * |c|
   have hs1 : (1 : ℝ) ≤ 2 * ((r : ℝ) + 1) := by linarith
   have hpos : (0 : ℝ) < 2 * ((r : ℝ) + 1) := by linarith
   have hsq : 0 < Real.sqrt (2 * ((r : ℝ) + 1)) := Real.sqrt_pos.2 hpos
-  have hpow : (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) =
-      (2 * ((r : ℝ) + 1)) ^ 4 * Real.sqrt (2 * ((r : ℝ) + 1)) := by
-    rw [Real.sqrt_eq_rpow, show (9 : ℝ) / 2 = (4 : ℕ) + 1 / 2 by norm_num, Real.rpow_add hpos, Real.rpow_natCast]
+  have hpow
+      : (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2)
+        = (2 * ((r : ℝ) + 1)) ^ 4 * Real.sqrt (2 * ((r : ℝ) + 1)) := by
+    rw [Real.sqrt_eq_rpow, show (9 : ℝ) / 2 = (4 : ℕ) + 1 / 2 by norm_num, Real.rpow_add hpos,
+      Real.rpow_natCast]
   have hge : 1 ≤ (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) := Real.one_le_rpow hs1 (by norm_num)
-  have hZ : n ^ 3 ≤ N * n ^ 2 + n ^ 3 := by have : 0 ≤ N * n ^ 2 := by positivity
-                                            linarith
+  have hZ : n ^ 3 ≤ N * n ^ 2 + n ^ 3 := by
+    have : 0 ≤ N * n ^ 2 := by positivity
+    linarith
   have hCg : 0 ≤ Cg := by linarith
-  have ha : Cg * (((r : ℝ) + 1) ^ 4 * n ^ 3) ≤
-      ThreeDimData.aOf r (Cg * (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) * (N * n ^ 2 + n ^ 3) / 2) := by
-    have e : ThreeDimData.aOf r (Cg * (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) * (N * n ^ 2 + n ^ 3) / 2) =
-        Cg * (((r : ℝ) + 1) ^ 4 * (N * n ^ 2 + n ^ 3)) := by
+  have ha
+      : Cg * (((r : ℝ) + 1) ^ 4 * n ^ 3)
+        ≤ ThreeDimData.aOf r
+          (Cg * (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) * (N * n ^ 2 + n ^ 3) / 2) := by
+    have e
+        : ThreeDimData.aOf r (Cg * (2 * ((r : ℝ) + 1)) ^ ((9 : ℝ) / 2) * (N * n ^ 2 + n ^ 3) / 2)
+          = Cg * (((r : ℝ) + 1) ^ 4 * (N * n ^ 2 + n ^ 3)) := by
       unfold ThreeDimData.aOf; rw [hpow]; field_simp; ring
     rw [e]
     exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hZ (by positivity)) hCg
@@ -116,14 +140,20 @@ theorem bpNear_gapOK (k r : ℕ) (hk : 1 ≤ k) (c Cg : ℝ) (hC : 240 + 2 * |c|
       mul_le_mul (le_abs_self c) h3 e0 hc
     nlinarith
 
-theorem bpNear_gapAtLeast {n : ℕ} (ε : Fin n → Bool) (lam lam0 : Fin n → ℝ) (h : ℝ) (h0 : GapAtLeast ε lam0 h)
-    (hg : AllGaps lam0 (200 * l1 lam lam0)) : GapAtLeast ε lam (h / 2) := by
+theorem bpNear_gapAtLeast
+    {n : ℕ} (ε : Fin n → Bool) (lam lam0 : Fin n → ℝ)
+    (h : ℝ) (h0 : GapAtLeast ε lam0 h)
+    (hg : AllGaps lam0 (200 * l1 lam lam0))
+    : GapAtLeast ε lam (h / 2) := by
   intro a b hab
   have hne : a ≠ b := fun e => hab (by rw [e])
   have h1 := h0 a b hab
   have h2 := hg a b hne
   have hd : ∀ s, |lam s - lam0 s| ≤ l1 lam lam0 := fun s =>
-    Finset.single_le_sum (f := fun a => |lam a - lam0 a|) (fun _ _ => abs_nonneg _) (Finset.mem_univ s)
+    Finset.single_le_sum
+      (f := fun a => |lam a - lam0 a|)
+      (fun _ _ => abs_nonneg _)
+      (Finset.mem_univ s)
   have h3 : |lam0 a - lam0 b| ≤ |lam a - lam b| + |lam a - lam0 a| + |lam b - lam0 b| := by
     have e : lam0 a - lam0 b = (lam a - lam b) - (lam a - lam0 a) + (lam b - lam0 b) := by ring
     rw [e]

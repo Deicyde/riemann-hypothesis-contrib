@@ -6,16 +6,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 
 noncomputable section
 namespace GlobalTheory.TrivLocus
 
-theorem exists_ker_iff_minors {K : Type} [Field K] {a b : ℕ} (D : Matrix (Fin b) (Fin a) K) :
-    (∃ v : Fin a → K, v ≠ 0 ∧ D.mulVec v = 0) ↔ ∀ σ : Fin a → Fin b, (D.submatrix σ id).det = 0 := by
+theorem exists_ker_iff_minors {K : Type} [Field K] {a b : ℕ} (D : Matrix (Fin b) (Fin a) K)
+    : (∃ v : Fin a → K, v ≠ 0 ∧ D.mulVec v = 0)
+      ↔ ∀ σ : Fin a → Fin b, (D.submatrix σ id).det = 0 := by
   classical
   constructor
   · rintro ⟨v, hv, h⟩ σ
@@ -43,18 +46,22 @@ theorem exists_ker_iff_minors {K : Type} [Field K] {a b : ℕ} (D : Matrix (Fin 
     have hu := (Matrix.isUnit_iff_isUnit_det _).1 (Matrix.linearIndependent_rows_iff_isUnit.1 hli')
     exact hu.ne_zero (h _)
 
-theorem nontrivial_ker_iff {R K : Type} [CommRing R] [Field K] (g : R →+* K) {a b : ℕ}
-    (D : Matrix (Fin b) (Fin a) R) :
-    Nontrivial {v : Fin a → K // (D.map g).mulVec v = 0} ↔
-      ∀ σ : Fin a → Fin b, (D.submatrix σ id).det ∈ RingHom.ker g := by
+theorem nontrivial_ker_iff
+    {R K : Type} [CommRing R] [Field K] (g : R →+* K) {a b : ℕ} (D : Matrix (Fin b) (Fin a) R)
+    : Nontrivial {v : Fin a → K // (D.map g).mulVec v = 0}
+      ↔ ∀ σ : Fin a → Fin b, (D.submatrix σ id).det ∈ RingHom.ker g := by
   have h := exists_ker_iff_minors (D.map g)
-  have h' : ∀ σ : Fin a → Fin b, ((D.map g).submatrix σ id).det = g (D.submatrix σ id).det := fun σ => by
+  have h'
+      : ∀ σ : Fin a → Fin b,
+        ((D.map g).submatrix σ id).det = g (D.submatrix σ id).det := fun σ => by
     rw [RingHom.map_det]; rfl
   simp only [h'] at h
   simp only [RingHom.mem_ker]
   rw [← h, nontrivial_iff_exists_ne ⟨0, Matrix.mulVec_zero _⟩]
-  exact ⟨fun ⟨v, hv⟩ => ⟨v.1, fun e => hv (Subtype.ext e), v.2⟩,
-    fun ⟨v, hv, e⟩ => ⟨⟨v, e⟩, fun e' => hv (congrArg Subtype.val e')⟩⟩
+  exact ⟨
+    fun ⟨v, hv⟩ => ⟨v.1, fun e => hv (Subtype.ext e), v.2⟩,
+    fun ⟨v, hv, e⟩ => ⟨⟨v, e⟩, fun e' => hv (congrArg Subtype.val e')⟩
+  ⟩
 
 variable {X Y : Scheme.{0}}
 
@@ -62,7 +69,8 @@ def zeroSec (N : LB X) : LB.Sec N where
   f := fun _ => 0
   compat := fun _ _ => by rw [map_zero, map_zero, mul_zero]
 
-theorem nontrivial_sec_iff (N : LB X) : Nontrivial (LB.Sec N) ↔ ∃ (s : LB.Sec N) (i : N.ι), s.f i ≠ 0 := by
+theorem nontrivial_sec_iff (N : LB X)
+    : Nontrivial (LB.Sec N) ↔ ∃ (s : LB.Sec N) (i : N.ι), s.f i ≠ 0 := by
   rw [nontrivial_iff_exists_ne (zeroSec N)]
   refine exists_congr fun s => ?_
   obtain ⟨sf, hs⟩ := s
@@ -80,13 +88,18 @@ theorem pull_pw (M : LB X) (π : Y ⟶ X) (t : ℤ) : (pw M t).pull π = pw (M.p
   refine congrArg (LB.mk (M.pull π).ι (M.pull π).U) ?_
   funext j j'
   change ∏ _k : PUnit, _ = (∏ _k : PUnit, _) ^ t
-  refine Eq.trans ?_ (Finset.prod_zpow (G := Γ(Y, LB.wchart M (fun _ : PUnit => π) j ⊓ LB.wchart M (fun _ : PUnit => π) j')ˣ) _ _ t)
+  refine Eq.trans ?_
+    (Finset.prod_zpow
+      (G := Γ(Y, LB.wchart M (fun _ : PUnit => π) j ⊓ LB.wchart M (fun _ : PUnit => π) j')ˣ) _ _ t)
   refine Finset.prod_congr rfl fun k _ => ?_
   refine (zpow_one _).trans (Eq.trans ?_ (congrArg (· ^ t) (zpow_one _)).symm)
   exact (congrArg (res _) (map_zpow (pullU π _) (M.g (j k) (j' k)) t)).trans (map_zpow (res _) _ t)
 
-theorem rs_ne_zero [IsIntegral X] {U V : X.Opens} (h : V ≤ U) (hV : (V : Set X).Nonempty) {x : Γ(X, U)}
-    (hx : x ≠ 0) : rs X h x ≠ 0 := by
+theorem rs_ne_zero
+    [IsIntegral X]
+    {U V : X.Opens} (h : V ≤ U) (hV : (V : Set X).Nonempty)
+    {x : Γ(X, U)} (hx : x ≠ 0)
+    : rs X h x ≠ 0 := by
   have : Nonempty V := hV.to_subtype
   intro e
   exact hx (map_injective_of_isIntegral X (homOfLE h) (e.trans (map_zero _).symm))
@@ -97,8 +110,8 @@ theorem nonempty_of_ne_zero {U : X.Opens} {x : Γ(X, U)} (hx : x ≠ 0) : (U : S
   subst this
   exact hx (Subsingleton.elim _ _)
 
-theorem triv_iff [IsIntegral X] (hX : IsField Γ(X, ⊤)) (N : LB X) (hN : ⨆ i, N.U i = ⊤) :
-    Triv N ↔ Nontrivial (LB.Sec N) ∧ Nontrivial (LB.Sec (pw N (-1))) := by
+theorem triv_iff [IsIntegral X] (hX : IsField Γ(X, ⊤)) (N : LB X) (hN : ⨆ i, N.U i = ⊤)
+    : Triv N ↔ Nontrivial (LB.Sec N) ∧ Nontrivial (LB.Sec (pw N (-1))) := by
   rw [nontrivial_sec_iff, nontrivial_sec_iff]
   constructor
   · rintro ⟨t, ht⟩
@@ -106,8 +119,10 @@ theorem triv_iff [IsIntegral X] (hX : IsField Γ(X, ⊤)) (N : LB X) (hN : ⨆ i
     have hx : x ∈ ⨆ i, N.U i := by rw [hN]; trivial
     obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 hx
     have : Nonempty (N.U i) := ⟨⟨x, hi⟩⟩
-    refine ⟨⟨⟨fun i => (t.s i).val, fun i j => congrArg Units.val (ht i j)⟩, i, (t.s i).ne_zero⟩,
-      ⟨⟨fun i => ((t.s i)⁻¹).val, fun i j => ?_⟩, i, ((t.s i)⁻¹).ne_zero⟩⟩
+    refine ⟨
+      ⟨⟨fun i => (t.s i).val, fun i j => congrArg Units.val (ht i j)⟩, i, (t.s i).ne_zero⟩,
+      ⟨⟨fun i => ((t.s i)⁻¹).val, fun i j => ?_⟩, i, ((t.s i)⁻¹).ne_zero⟩
+    ⟩
     have h := congrArg (·⁻¹) (ht i j)
     simp only [mul_inv, ← map_inv] at h
     rw [← zpow_neg_one (N.g i j)] at h
@@ -116,25 +131,34 @@ theorem triv_iff [IsIntegral X] (hX : IsField Γ(X, ⊤)) (N : LB X) (hN : ⨆ i
     let s' : ∀ k : N.ι, Γ(X, N.U k) := s''.f
     change N.ι at j
     change s' j ≠ 0 at hj
-    have hc : ∀ k l, rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s.f k * s' k) =
-        rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s.f l * s' l) := by
+    have hc
+        : ∀ k l,
+          rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s.f k * s' k)
+            = rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s.f l * s' l) := by
       intro k l
-      have h₁ : rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s.f k) =
-        (N.g k l).val * rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s.f l) := s.compat k l
-      have h₂ : rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s' k) =
-        (N.g k l ^ (-1 : ℤ)).val * rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s' l) := s''.compat k l
-      rw [map_mul, map_mul, h₁, h₂, _root_.mul_mul_mul_comm, ← Units.val_mul, zpow_neg_one, mul_inv_cancel,
-        Units.val_one, _root_.one_mul]
-    obtain ⟨h, hh, -⟩ := X.sheaf.existsUnique_gluing' N.U ⊤ (fun _ => homOfLE le_top) hN.ge
-      (fun k => s.f k * s' k) hc
+      have h₁
+          : rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s.f k)
+            = (N.g k l).val * rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s.f l) :=
+        s.compat k l
+      have h₂
+          : rs X (inf_le_left : N.U k ⊓ N.U l ≤ N.U k) (s' k)
+            = (N.g k l ^ (-1 : ℤ)).val * rs X (inf_le_right : N.U k ⊓ N.U l ≤ N.U l) (s' l) :=
+        s''.compat k l
+      rw [map_mul, map_mul, h₁, h₂, _root_.mul_mul_mul_comm, ← Units.val_mul, zpow_neg_one,
+        mul_inv_cancel, Units.val_one, _root_.one_mul]
+    obtain ⟨h, hh, -⟩ :=
+      X.sheaf.existsUnique_gluing' N.U ⊤ (fun _ => homOfLE le_top) hN.ge (fun k => s.f k * s' k) hc
     change Γ(X, ⊤) at h
     have hh' : ∀ k, rs X (le_top : N.U k ≤ ⊤) h = s.f k * s' k := hh
     have hne : (↑(N.U i ⊓ N.U j) : Set X).Nonempty :=
-      nonempty_preirreducible_inter (N.U i).isOpen (N.U j).isOpen (nonempty_of_ne_zero hi) (nonempty_of_ne_zero hj)
+      nonempty_preirreducible_inter (N.U i).isOpen (N.U j).isOpen (nonempty_of_ne_zero hi)
+        (nonempty_of_ne_zero hj)
     have hsj : s.f j ≠ 0 := by
       intro e
-      have h₁ : rs X (inf_le_left : N.U i ⊓ N.U j ≤ N.U i) (s.f i) =
-        (N.g i j).val * rs X (inf_le_right : N.U i ⊓ N.U j ≤ N.U j) (s.f j) := s.compat i j
+      have h₁
+          : rs X (inf_le_left : N.U i ⊓ N.U j ≤ N.U i) (s.f i)
+            = (N.g i j).val * rs X (inf_le_right : N.U i ⊓ N.U j ≤ N.U j) (s.f j) :=
+        s.compat i j
       rw [e, map_zero, mul_zero] at h₁
       exact rs_ne_zero _ hne hi h₁
     have : Nonempty (N.U j) := (nonempty_of_ne_zero hsj).to_subtype
@@ -150,12 +174,17 @@ theorem triv_iff [IsIntegral X] (hX : IsField Γ(X, ⊤)) (N : LB X) (hN : ⨆ i
       isUnit_of_mul_isUnit_left (hh' k ▸ hu.map (rs X (le_top : N.U k ≤ ⊤)))
     exact ⟨⟨fun k => (hs k).unit⟩, fun k l => Units.ext (s.compat k l)⟩
 
-theorem triv_fibre_iff {R : Type} [CommRing R] {f : X ⟶ Spec (CommRingCat.of R)} {M : LB X} (hM : M.IsLB)
-    (P : Perf f M) (Q : Perf f (pw M (-1))) [IsProper f] [GeometricallyIntegral f]
-    {K : Type} [Field K] (g : R →+* K) {X' : Scheme.{0}} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of K)}
-    (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g))) :
-    Triv (M.pull π) ↔ (∀ σ : Fin P.a → Fin P.b, (P.D₀.submatrix σ id).det ∈ RingHom.ker g) ∧
-      ∀ σ : Fin Q.a → Fin Q.b, (Q.D₀.submatrix σ id).det ∈ RingHom.ker g := by
+theorem triv_fibre_iff
+    {R : Type} [CommRing R]
+    {f : X ⟶ Spec (CommRingCat.of R)} {M : LB X}
+    (hM : M.IsLB) (P : Perf f M) (Q : Perf f (pw M (-1))) [IsProper f] [GeometricallyIntegral f]
+    {K : Type} [Field K]
+    (g : R →+* K)
+    {X' : Scheme.{0}} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of K)}
+    (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
+    : Triv (M.pull π)
+      ↔ (∀ σ : Fin P.a → Fin P.b, (P.D₀.submatrix σ id).det ∈ RingHom.ker g)
+        ∧ ∀ σ : Fin Q.a → Fin Q.b, (Q.D₀.submatrix σ id).det ∈ RingHom.ker g := by
   have : IsIntegral X' := GeometricallyIntegral.geometrically_isIntegral _ _ _ h
   have : IsProper f' := MorphismProperty.of_isPullback (P := @IsProper) h inferInstance
   obtain ⟨E, -⟩ := P.sec K g X' π f' h

@@ -8,9 +8,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem isBezout_of_flat_of_formallyUnramified (W B : Type) [CommRing W] [IsDomain W] [IsBezout W]
-    [CommRing B] [IsDomain B] [IsLocalRing B] [Algebra W B] [Module.Flat W B]
-    [Algebra.EssFiniteType W B] [Algebra.FormallyUnramified W B] : IsBezout B := by
+theorem isBezout_of_flat_of_formallyUnramified
+    (W B : Type) [CommRing W] [IsDomain W] [IsBezout W] [CommRing B] [IsDomain B] [IsLocalRing B]
+    [Algebra W B] [Module.Flat W B] [Algebra.EssFiniteType W B] [Algebra.FormallyUnramified W B]
+    : IsBezout B := by
   refine ⟨fun J hJ => ?_⟩
   have hfin : Module.Finite B J := Module.Finite.iff_fg.2 hJ
   have htB : Submodule.torsion W B = ⊥ :=
@@ -26,9 +27,10 @@ theorem isBezout_of_flat_of_formallyUnramified (W B : Type) [CommRing W] [IsDoma
   rw [← Submodule.rank_le_one_iff_isPrincipal]
   exact (Submodule.rank_le J).trans (Module.rank_self B).le
 
-theorem isAlgebraic_of_flat_of_formallyUnramified (W B : Type) [CommRing W] [IsDomain W]
-    [CommRing B] [Algebra W B] [Module.Flat W B]
-    [Algebra.EssFiniteType W B] [Algebra.FormallyUnramified W B] : Algebra.IsAlgebraic W B := by
+theorem isAlgebraic_of_flat_of_formallyUnramified
+    (W B : Type) [CommRing W] [IsDomain W] [CommRing B] [Algebra W B] [Module.Flat W B]
+    [Algebra.EssFiniteType W B] [Algebra.FormallyUnramified W B]
+    : Algebra.IsAlgebraic W B := by
   let K := FractionRing W
   have hfin : Module.Finite K (K ⊗[W] B) := Algebra.FormallyUnramified.finite_of_free K _
   have halg : Algebra.IsAlgebraic K (K ⊗[W] B) := inferInstance
@@ -38,10 +40,11 @@ theorem isAlgebraic_of_flat_of_formallyUnramified (W B : Type) [CommRing W] [IsD
     (Algebra.TensorProduct.includeRight (R := W) (A := K) (B := B))
     (Algebra.TensorProduct.includeRight_injective (IsFractionRing.injective W K))
 
-theorem valuationRing_of_flat_of_formallyUnramified :
-    ∀ (W B : Type) [CommRing W] [IsDomain W] [ValuationRing W] [CommRing B] [IsDomain B]
-      [IsLocalRing B] [Algebra W B] [Module.Flat W B] [Algebra.EssFiniteType W B]
-      [Algebra.FormallyUnramified W B], ValuationRing B ∧ Algebra.IsAlgebraic W B := by
+theorem valuationRing_of_flat_of_formallyUnramified
+    : ∀ (W B : Type) [CommRing W] [IsDomain W] [ValuationRing W] [CommRing B] [IsDomain B]
+        [IsLocalRing B] [Algebra W B] [Module.Flat W B] [Algebra.EssFiniteType W B]
+        [Algebra.FormallyUnramified W B],
+      ValuationRing B ∧ Algebra.IsAlgebraic W B := by
   intro W B _ _ _ _ _ _ _ _ _ _
   have := isBezout_of_flat_of_formallyUnramified W B
   exact ⟨inferInstance, isAlgebraic_of_flat_of_formallyUnramified W B⟩

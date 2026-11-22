@@ -14,11 +14,14 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix
 open TopologicalSpace
 open Formalism.DegreeFormula Formalism.MJ Formalism.UG Formalism.L2.Geo Formalism.L2.PjFree
 open Formalism.L2.Pj (FrPt CAt embK)
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.PullbackSections
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.ChartRestriction.G.PullbackSections
 open GlobalTheory.HodgeDomain GlobalTheory.LieMet GlobalTheory.CxPts
 open GlobalTheory.AllWt (Psi ptF framesOn LiesOn)
 open scoped ComplexOrder
@@ -34,10 +37,11 @@ section Std
 variable (X : Data E r) (hj : j ≤ r) (κ : Tau ≃ X.Ψ)
 
 def stdMat (z : Pt Tau j (r - j)) : Frame X.Ψ r := fun τ =>
-  (mat (x0F X) τ * reindex (idx hj).symm (idx hj).symm (fromBlocks 1 (z (κ.symm τ)) 0 1) : Matrix (Fin r) (Fin r) ℂ)
+  (mat (x0F X) τ * reindex (idx hj).symm (idx hj).symm (fromBlocks 1 (z (κ.symm τ)) 0 1)
+    : Matrix (Fin r) (Fin r) ℂ)
 
-theorem frameCo_stdMat (z : Pt Tau j (r - j)) (τ : X.Ψ) :
-    frameCo X hj (stdMat X hj κ z) τ = fromBlocks 1 (z (κ.symm τ)) 0 1 := by
+theorem frameCo_stdMat (z : Pt Tau j (r - j)) (τ : X.Ψ)
+    : frameCo X hj (stdMat X hj κ z) τ = fromBlocks 1 (z (κ.symm τ)) 0 1 := by
   show reindex _ _ (_ * (mat (x0F X) τ * _)) = _
   rw [nonsing_inv_mul_cancel_left _ _ (det_x0F X τ).isUnit]
   simp
@@ -46,8 +50,8 @@ theorem domPt_stdMat (z : Pt Tau j (r - j)) : domPt X hj κ (stdMat X hj κ z) =
   funext t
   simp [domPt, frameCo_stdMat, moeb_zero]
 
-theorem stdMat_mem (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j)) :
-    stdMat X hj κ z ∈ X.dom := by
+theorem stdMat_mem (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j))
+    : stdMat X hj κ z ∈ X.dom := by
   refine ExF.mem_dom_of_gramPos X fun τ => ⟨?_, ?_⟩
   · show (mat (x0F X) τ * _).det ≠ 0
     rw [det_mul, det_reindex_self, det_fromBlocks_zero₂₁]
@@ -55,39 +59,50 @@ theorem stdMat_mem (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI T
   have h0 := congrArg transpose (isOrth_x0F X τ)
   rw [gram_eq_mul, diagonal_transpose, hp] at h0
   set N : Matrix (Fin j ⊕ Fin (r - j)) (Fin j ⊕ Fin (r - j)) ℂ := fromBlocks 1 (z (κ.symm τ)) 0 1 with hN
-  have h1 : reindex (idx hj) (idx hj) (gram τ.1 X.Gm (mat (stdMat X hj κ z) τ))ᵀ = Nᴴ * -Jpq j (r - j) * N := by
+  have h1
+      : reindex (idx hj) (idx hj) (gram τ.1 X.Gm (mat (stdMat X hj κ z) τ))ᵀ
+        = Nᴴ * - Jpq j (r - j) * N := by
     rw [gram_eq_mul, ← reindex_sgn hj, ← h0]
     show reindex _ _ ((mat (x0F X) τ * reindex _ _ N)ᴴ * _ * (mat (x0F X) τ * reindex _ _ N)) = _
-    simp only [conjTranspose_mul, reindex_apply, conjTranspose_submatrix, ← submatrix_mul_equiv _ _ _ (idx hj).symm,
-      submatrix_submatrix, Equiv.symm_symm, Equiv.self_comp_symm, submatrix_id_id, Matrix.mul_assoc]
-  have h2 : (Nᴴ * -Jpq j (r - j) * N).toBlocks₂₂ = hQ (z (κ.symm τ)) := by
-    simp [hN, Jpq, fromBlocks_conjTranspose, fromBlocks_neg, fromBlocks_multiply, hQ, sub_eq_neg_add]
-  have h3 : X.gramPos (stdMat X hj κ z) τ = ((hQ (z (κ.symm τ))).submatrix (finCongr hp) (finCongr hp))ᵀ := by
+    simp only [conjTranspose_mul, reindex_apply, conjTranspose_submatrix,
+      ← submatrix_mul_equiv _ _ _ (idx hj).symm, submatrix_submatrix, Equiv.symm_symm,
+      Equiv.self_comp_symm, submatrix_id_id, Matrix.mul_assoc]
+  have h2 : (Nᴴ * - Jpq j (r - j) * N).toBlocks₂₂ = hQ (z (κ.symm τ)) := by
+    simp [hN, Jpq, fromBlocks_conjTranspose, fromBlocks_neg, fromBlocks_multiply, hQ,
+      sub_eq_neg_add]
+  have h3
+      : X.gramPos (stdMat X hj κ z) τ
+        = ((hQ (z (κ.symm τ))).submatrix (finCongr hp) (finCongr hp))ᵀ := by
     ext a b
     have e : ∀ a : Fin X.p0, (idx hj).symm (Sum.inr (finCongr hp a)) = Fin.castLE X.p0_le a :=
       fun a => Fin.ext (idx_symm_inr hj _)
     rw [← h2, ← h1]
-    simp only [transpose_apply, submatrix_apply, toBlocks₂₂, of_apply, reindex_apply, e, Data.gramPos]
+    simp only [transpose_apply, submatrix_apply, toBlocks₂₂, of_apply, reindex_apply, e,
+      Data.gramPos]
   rw [h3]
   exact (PosDef.submatrix (hz (κ.symm τ)) (finCongr hp).injective).transpose
 
-
 open Classical in
 def stdFrame (hp : X.p0 = r - j) (z : Pt Tau j (r - j)) : X.dom :=
-  if h : z ∈ DomI Tau j (r - j) then ⟨stdMat X hj κ z, stdMat_mem X hj κ hp h⟩
-  else ⟨stdMat X hj κ 0, stdMat_mem X hj κ hp fun _ => zero_mem_hcDom _ _⟩
+  if h : z ∈ DomI Tau j (r - j) then
+    ⟨stdMat X hj κ z, stdMat_mem X hj κ hp h⟩
+  else
+    ⟨stdMat X hj κ 0, stdMat_mem X hj κ hp fun _ => zero_mem_hcDom _ _⟩
 
-theorem stdFrame_val (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j)) :
-    (stdFrame X hj κ hp z).1 = stdMat X hj κ z := by rw [stdFrame, dite_eq_left hz]
+theorem stdFrame_val (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j))
+    : (stdFrame X hj κ hp z).1 = stdMat X hj κ z := by
+  rw [stdFrame, dite_eq_left hz]
 
-theorem domPt_stdFrame (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j)) :
-    domPt X hj κ (stdFrame X hj κ hp z).1 = z := by rw [stdFrame_val X hj κ hp hz, domPt_stdMat]
+theorem domPt_stdFrame (hp : X.p0 = r - j) {z : Pt Tau j (r - j)} (hz : z ∈ DomI Tau j (r - j))
+    : domPt X hj κ (stdFrame X hj κ hp z).1 = z := by
+  rw [stdFrame_val X hj κ hp hz, domPt_stdMat]
 
 end Std
 
 section Tor
 
-variable {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
   (Y : Model Xo c (RingHom.id c.F)) (σ : c.F →+* ℂ)
 
 abbrev torC : Scheme.{0} := pullback Y.s (spMap σ)
@@ -108,18 +123,21 @@ def xC (y : FrPt Xo c (CAt σ)) : Sp ℂ ⟶ Xo.X := y.x
 
 theorem ptC_fst (y : FrPt Xo c (CAt σ)) : ptC y ≫ pullback.fst _ _ = xC y := pullback.lift_fst _ _ _
 
-theorem ptC_snd (y : FrPt Xo c (CAt σ)) : ptC y ≫ pullback.snd _ _ = spMap σ := pullback.lift_snd _ _ _
+theorem ptC_snd (y : FrPt Xo c (CAt σ)) : ptC y ≫ pullback.snd _ _ = spMap σ :=
+  pullback.lift_snd _ _ _
 
-def torPt (y : FrPt Xo c (CAt σ)) : TorPts Y σ :=
-  ⟨pullback.lift (ptC y ≫ Y.j) (spMap (RingHom.id ℂ)) (by
-      rw [Model.j, Category.assoc, Category.assoc, pullback.condition, ← Category.assoc Y.jQ, Y.jQ_over,
-        ← Category.assoc, ptC_snd, ← Spec.map_comp, ← Spec.map_comp]
-      rfl), pullback.lift_snd _ _ _⟩
+def torPt (y : FrPt Xo c (CAt σ)) : TorPts Y σ := ⟨
+  pullback.lift (ptC y ≫ Y.j) (spMap (RingHom.id ℂ)) (by
+    rw [Model.j, Category.assoc, Category.assoc, pullback.condition, ← Category.assoc Y.jQ,
+      Y.jQ_over, ← Category.assoc, ptC_snd, ← Spec.map_comp, ← Spec.map_comp]
+    rfl),
+  pullback.lift_snd _ _ _
+⟩
 
-theorem torPt_pr (y : FrPt Xo c (CAt σ)) : (torPt Y y).1 ≫ torPr Y σ = ptC y ≫ Y.j := pullback.lift_fst _ _ _
+theorem torPt_pr (y : FrPt Xo c (CAt σ)) : (torPt Y y).1 ≫ torPr Y σ = ptC y ≫ Y.j :=
+  pullback.lift_fst _ _ _
 
 abbrev LieAt (y : TorPts Y σ) : Type := TanM (y.1 ≫ torPr Y σ) Y.t.G
-
 
 variable (σ) in
 abbrev LieForm : Type := ∀ y : TorPts Y σ, LieAt Y y →ₗ[ℂ] LieAt Y y →ₗ⋆[ℂ] ℂ
@@ -131,17 +149,16 @@ end Tor
 
 section Bd
 
-variable {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  (Y : Model Xo c (RingHom.id c.F)) {σ : c.F →+* ℂ}
+variable
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+  (Y : Model Xo c (RingHom.id c.F))
+  {σ : c.F →+* ℂ}
 
 variable (U : Unf Xo c σ r) (hU : IsUnf U) (e : Dw.p = j) (hσ : GoodEmb c σ) (T : Tau ≃ Psi H)
 
-
 def letter (t : Tau) : Psi H := (letterAt hσ).symm (T t)
 
-
 variable [Fintype Tau]
-
 
 variable (B : ∀ k, BdData Tau j (r - j) (gammaU (U.X k) (le_of_isUnf U hU e) (cmEquiv U hU T k)))
 
@@ -153,10 +170,12 @@ section Flat
 
 open GlobalTheory.FlatLine GlobalTheory.AllWt
 
-variable {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) {x : ℝ}
-  (sig : ∀ (Z : Formalism.L2.Pj.Comp Xo c) (τ : Psi H), FlatSec (fun σ => (U σ).toPj) x Z τ)
-  {σ : c.F →+* ℂ} (hU : IsUnf (U σ)) (hσ : GoodEmb c σ) (T : Tau ≃ Psi H)
+variable
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+  (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r)
+  {x : ℝ} (sig : ∀ (Z : Formalism.L2.Pj.Comp Xo c) (τ : Psi H), FlatSec (fun σ => (U σ).toPj) x Z τ)
+  {σ : c.F →+* ℂ} (hU : IsUnf (U σ)) (hσ : GoodEmb c σ)
+  (T : Tau ≃ Psi H)
 
 variable {U sig hU hσ T}
 

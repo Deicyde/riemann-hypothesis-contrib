@@ -22,21 +22,22 @@ def remb : F →+ RSp F where
 
 variable {F}
 
-@[simp] theorem remb_apply (a : F) (τ : F →+* ℝ) : remb F a τ = τ a := rfl
+@[simp]
+theorem remb_apply (a : F) (τ : F →+* ℝ) : remb F a τ = τ a := rfl
 
 def latOf (N : FractionalIdeal (𝓞 F)⁰ F) : Submodule ℤ (RSp F) :=
   Submodule.map (remb F).toIntLinearMap ((N : Submodule (𝓞 F) F).restrictScalars ℤ)
 
-theorem mem_latOf (N : FractionalIdeal (𝓞 F)⁰ F) (x : RSp F) :
-    x ∈ latOf N ↔ ∃ a ∈ N, remb F a = x := by
+theorem mem_latOf (N : FractionalIdeal (𝓞 F)⁰ F) (x : RSp F)
+    : x ∈ latOf N ↔ ∃ a ∈ N, remb F a = x := by
   simp [latOf]
 
 def phi1 (k : ℕ) (w : ℂ) (t : ℝ) : ℂ :=
   if 0 < (SignType.sign w.im : ℝ) * t then
     ((|t| ^ (k - 1) : ℝ) : ℂ) * Complex.exp (2 * Real.pi * Complex.I * t * w)
-  else 0
+  else
+    0
 
-def Phi (k : ℕ) (z : (F →+* ℝ) → ℂ) (ξ : RSp F) : ℂ :=
-  ∏ τ : F →+* ℝ, phi1 k (z τ) (ξ τ)
+def Phi (k : ℕ) (z : (F →+* ℝ) → ℂ) (ξ : RSp F) : ℂ := ∏ τ : F →+* ℝ, phi1 k (z τ) (ξ τ)
 
 end GlobalTheory.LipschitzTR

@@ -6,9 +6,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Generali
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
@@ -59,9 +63,13 @@ private lemma finite_translates_double_coset {G : Type} [Group G] [TopologicalSp
   rintro c ⟨u, hu, rfl⟩
   exact ⟨u, hu, rfl⟩
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.heckeSimple :
-    ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (Z : Submodule ℂ V) (U : Subgroup G), CO U → SimpleIn ρ Z → (∀ v ∈ Z, IsOpen {g | ρ g v = v}) →
-      ∀ Q ≤ Z, (∀ v ∈ Q, ∀ u ∈ U, ρ u v = v) → (∀ g, ∀ v ∈ Q, hopR ρ U g v ∈ Q) → Q = ⊥ ∨ ∀ v ∈ Z, (∀ u ∈ U, ρ u v = v) → v ∈ Q := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.heckeSimple
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] {V : Type} [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V) (Z : Submodule ℂ V) (U : Subgroup G),
+      CO U → SimpleIn ρ Z → (∀ v ∈ Z, IsOpen {g | ρ g v = v})
+        → ∀ Q ≤ Z,
+          (∀ v ∈ Q, ∀ u ∈ U, ρ u v = v) → (∀ g, ∀ v ∈ Q, hopR ρ U g v ∈ Q)
+            → Q = ⊥ ∨ ∀ v ∈ Z, (∀ u ∈ U, ρ u v = v) → v ∈ Q := by
   intro G _ _ _ V _ _ ρ Z U hU hS hsm Q hQZ hQfix hQhop
   by_cases hQ : Q = ⊥
   · exact Or.inl hQ
@@ -71,16 +79,17 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.heckeSim
   set W : Submodule ℂ V := Submodule.span ℂ {x | ∃ u : U, ∃ z ∈ Z, x = σ u z - z} with hW
   have hZN : ∀ z ∈ Z, ∃ N : Subgroup U, N.FiniteIndex ∧ ∀ n ∈ N, σ n z = z := by
     intro z hz
-    let N : Subgroup U :=
-      { carrier := {n | σ n z = z}
-        one_mem' := by simp
-        mul_mem' := fun {a b} ha hb => by
-          simp only [Set.mem_setOf_eq] at ha hb ⊢
-          rw [map_mul, Module.End.mul_apply, hb, ha]
-        inv_mem' := fun {a} ha => by
-          simp only [Set.mem_setOf_eq] at ha ⊢
-          conv_lhs => rw [← ha]
-          rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+    let N : Subgroup U := {
+      carrier := {n | σ n z = z}
+      one_mem' := by simp
+      mul_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        rw [map_mul, Module.End.mul_apply, hb, ha]
+      inv_mem' := fun {a} ha => by
+        simp only [Set.mem_setOf_eq] at ha ⊢
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+    }
     haveI : CompactSpace U := isCompact_iff_compactSpace.mp hU.1
     have ho : IsOpen (N : Set U) := (hsm z hz).preimage continuous_subtype_val
     haveI := N.quotient_finite_of_isOpen ho
@@ -101,7 +110,8 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.heckeSim
     have h3 := (Q ⊔ W).sub_mem (Submodule.mem_sup_left h1) (Submodule.mem_sup_right h2)
     rw [sub_sub_cancel] at h3
     have hne : ((hfin.toFinset.card : ℕ) : ℂ) ≠ 0 := by
-      have : hfin.toFinset.Nonempty := ⟨QuotientGroup.mk (1 * g), hfin.mem_toFinset.mpr ⟨1, U.one_mem, rfl⟩⟩
+      have : hfin.toFinset.Nonempty :=
+        ⟨QuotientGroup.mk (1 * g), hfin.mem_toFinset.mpr ⟨1, U.one_mem, rfl⟩⟩
       exact_mod_cast this.card_ne_zero
     exact ((Q ⊔ W).smul_mem_iff hne).mp h3
   set T : Submodule ℂ V := Submodule.span ℂ {x | ∃ g : G, ∃ q ∈ Q, x = ρ g q} with hT

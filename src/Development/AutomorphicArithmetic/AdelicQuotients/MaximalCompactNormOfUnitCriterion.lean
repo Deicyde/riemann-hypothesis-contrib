@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.LocalGro
 @[expose] public section
 
 open PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory.G UpperTheory.ConvolutionTheory.T4
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.SemiLocal
 
-theorem UpperTheory.maximalCompactNorm_of_unit_criterion :
-    K1 → Triv → UnitIff → Compat → SelmerRankBoundLaurent := by
+theorem UpperTheory.maximalCompactNorm_of_unit_criterion
+    : K1 → Triv → UnitIff → Compat → SelmerRankBoundLaurent := by
   intro hK hT hU hC F _ _ n hn γ hγ
   have hincl : PositivityTheory.Rg.Tf.Loc.incl γ = γ := by
     ext i j
     rfl
-  have hnorm : PositivityTheory.Rg.Tf.Loc.normGL (1 : F ≃ₐ[F] F) γ = PositivityTheory.Rg.Tf.Loc.incl γ := by
+  have hnorm
+      : PositivityTheory.Rg.Tf.Loc.normGL (1 : F ≃ₐ[F] F) γ
+        = PositivityTheory.Rg.Tf.Loc.incl γ := by
     rw [hincl, PositivityTheory.Rg.Tf.Loc.normGL, Module.finrank_self]
     simp [PositivityTheory.Rg.Tf.Loc.twNorm]
   have h1 : ∀ τ : F ≃ₐ[F] F, τ ∈ Subgroup.zpowers (1 : F ≃ₐ[F] F) := fun τ => by
@@ -22,12 +25,15 @@ theorem UpperTheory.maximalCompactNorm_of_unit_criterion :
     exact one_mem _
   obtain ⟨-, -, -, c4, -, -, -, c8⟩ := hC F F 1 n
   filter_upwards [hK F F 1 h1 n hn γ γ hγ hnorm] with v hv x
-  have hdiag : mapGL n (atFin v) (AdelicGLn.diagonal F n γ) =
-      mapGL n (incFin F v) (finAt v (AdelicGLn.diagonal F n γ)) := by
+  have hdiag
+      : mapGL n (atFin v) (AdelicGLn.diagonal F n γ)
+        = mapGL n (incFin F v) (finAt v (AdelicGLn.diagonal F n γ)) := by
     have h := c4 v (AdelicGLn.diagonal F n γ)
     rw [c8, hincl] at h
     exact h
-  have hgal : ∀ y : GL (Fin n) (CompletionsOver F v), mapGL n (galFin (1 : F ≃ₐ[F] F) v) y = y := fun y => by
+  have hgal
+      : ∀ y : GL (Fin n) (CompletionsOver F v),
+        mapGL n (galFin (1 : F ≃ₐ[F] F) v) y = y := fun y => by
     rw [((hT F).2.2 v).1]
     ext i j
     rfl

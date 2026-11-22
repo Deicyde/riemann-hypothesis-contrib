@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -15,37 +17,44 @@ namespace GlobalTheory.BSP.TopBasisCons
 
 variable {S A : Type} [CommRing S] [CommRing A] {s : S →+* A} {I : Ideal S} {ι : Type} {b : ι → A}
 
-
 variable (s I b) in
 def Approx (x : A) (f : ι → S) : Prop :=
   ∀ n : ℕ, ∃ F : Finset ι, (∀ i, i ∉ F → f i ∈ I ^ n) ∧ x - ∑ i ∈ F, s (f i) * b i ∈ (I ^ n).map s
 
-theorem smodEq_iff (x y : S) (n : ℕ) : x ≡ y [SMOD (I ^ n • ⊤ : Submodule S S)] ↔ x - y ∈ I ^ n := by
+theorem smodEq_iff (x y : S) (n : ℕ)
+    : x ≡ y [SMOD (I ^ n • ⊤ : Submodule S S)] ↔ x - y ∈ I ^ n := by
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
 
-theorem sum_sub_sum_mem {f : ι → S} {n : ℕ} {F G : Finset ι} (hF : ∀ i, i ∉ F → f i ∈ I ^ n)
-    (hG : ∀ i, i ∉ G → f i ∈ I ^ n) :
-    ∑ i ∈ F, s (f i) * b i - ∑ i ∈ G, s (f i) * b i ∈ (I ^ n).map s := by
+theorem sum_sub_sum_mem
+    {f : ι → S} {n : ℕ} {F G : Finset ι}
+    (hF : ∀ i, i ∉ F → f i ∈ I ^ n) (hG : ∀ i, i ∉ G → f i ∈ I ^ n)
+    : ∑ i ∈ F, s (f i) * b i - ∑ i ∈ G, s (f i) * b i ∈ (I ^ n).map s := by
   classical
   rw [← Finset.sum_sdiff (Finset.inter_subset_left : F ∩ G ⊆ F),
     ← Finset.sum_sdiff (Finset.inter_subset_right : F ∩ G ⊆ G), add_sub_add_right_eq_sub]
-  refine sub_mem (Ideal.sum_mem _ fun i hi => Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hG i fun h => ?_)))
-    (Ideal.sum_mem _ fun i hi => Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hF i fun h => ?_)))
+  refine sub_mem
+    (Ideal.sum_mem _ fun i hi =>
+      Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hG i fun h => ?_)))
+    (Ideal.sum_mem _ fun i hi =>
+      Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hF i fun h => ?_)))
   · exact (Finset.mem_sdiff.1 hi).2 (Finset.mem_inter.2 ⟨(Finset.mem_sdiff.1 hi).1, h⟩)
   · exact (Finset.mem_sdiff.1 hi).2 (Finset.mem_inter.2 ⟨h, (Finset.mem_sdiff.1 hi).1⟩)
 
-theorem Approx.approx {x : A} {f : ι → S} (h : Approx s I b x f) (n : ℕ) (F : Finset ι)
-    (hF : ∀ i, i ∉ F → f i ∈ I ^ n) : x - ∑ i ∈ F, s (f i) * b i ∈ (I ^ n).map s := by
+theorem Approx.approx
+    {x : A} {f : ι → S} (h : Approx s I b x f)
+    (n : ℕ) (F : Finset ι) (hF : ∀ i, i ∉ F → f i ∈ I ^ n)
+    : x - ∑ i ∈ F, s (f i) * b i ∈ (I ^ n).map s := by
   obtain ⟨G, hG, hx⟩ := h n
   have := sub_mem hx (sum_sub_sum_mem (s := s) (b := b) hF hG)
   rwa [sub_sub_sub_cancel_right] at this
 
-theorem Approx.finite {x : A} {f : ι → S} (h : Approx s I b x f) (n : ℕ) : {i | f i ∉ I ^ n}.Finite := by
+theorem Approx.finite {x : A} {f : ι → S} (h : Approx s I b x f) (n : ℕ)
+    : {i | f i ∉ I ^ n}.Finite := by
   obtain ⟨F, hF, -⟩ := h n
   exact F.finite_toSet.subset fun i hi => by_contra fun h' => hi (hF i h')
 
-theorem Approx.add {x y : A} {f g : ι → S} (hx : Approx s I b x f) (hy : Approx s I b y g) :
-    Approx s I b (x + y) (f + g) := by
+theorem Approx.add {x y : A} {f g : ι → S} (hx : Approx s I b x f) (hy : Approx s I b y g)
+    : Approx s I b (x + y) (f + g) := by
   classical
   intro n
   obtain ⟨F, hF, -⟩ := hx n
@@ -59,8 +68,8 @@ theorem Approx.add {x y : A} {f g : ι → S} (hx : Approx s I b x f) (hy : Appr
     simp only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
     ring
 
-theorem Approx.mul {x : A} {f : ι → S} (hx : Approx s I b x f) (a : S) :
-    Approx s I b (s a * x) (fun i => a * f i) := by
+theorem Approx.mul {x : A} {f : ι → S} (hx : Approx s I b x f) (a : S)
+    : Approx s I b (s a * x) (fun i => a * f i) := by
   intro n
   obtain ⟨F, hF, h⟩ := hx n
   refine ⟨F, fun i hi => Ideal.mul_mem_left _ _ (hF i hi), ?_⟩
@@ -73,9 +82,12 @@ theorem approx_single [DecidableEq ι] (i : ι) : Approx s I b (b i) (Pi.single 
   rw [Pi.single_eq_of_ne (by simpa using hj)]
   exact zero_mem _
 
-theorem Approx.eq_zero (hH : IsHausdorff I S)
-    (hst : ∀ n : ℕ, ∃ m : ℕ, ∀ a : ι →₀ S, a.sum (fun i y => s y * b i) ∈ (I ^ m).map s → ∀ i, a i ∈ I ^ n)
-    {h : ι → S} (hh : Approx s I b 0 h) : h = 0 := by
+theorem Approx.eq_zero
+    (hH : IsHausdorff I S)
+    (hst : ∀ n : ℕ, ∃ m : ℕ, ∀ a : ι →₀ S,
+      a.sum (fun i y => s y * b i) ∈ (I ^ m).map s → ∀ i, a i ∈ I ^ n)
+    {h : ι → S} (hh : Approx s I b 0 h)
+    : h = 0 := by
   classical
   funext i
   refine hH.haus (h i) fun n => ?_
@@ -83,8 +95,12 @@ theorem Approx.eq_zero (hH : IsHausdorff I S)
   obtain ⟨m, hm⟩ := hst n
   obtain ⟨F, hF, hs⟩ := hh (max n m)
   by_cases hi : i ∈ F
-  · have key := hm (Finsupp.onFinset F (fun j => if j ∈ F then h j else 0)
-      (fun j hj => by by_contra hj'; simp [hj'] at hj)) ?_ i
+  · have key :=
+      hm
+        (Finsupp.onFinset F
+          (fun j => if j ∈ F then h j else 0)
+          (fun j hj => by by_contra hj'; simp [hj'] at hj))
+        ?_ i
     · simpa [hi] using key
     · rw [Finsupp.onFinset_sum _ (fun j => by simp)]
       have e : ∑ j ∈ F, s (if j ∈ F then h j else 0) * b j = -(0 - ∑ j ∈ F, s (h j) * b j) := by
@@ -100,12 +116,14 @@ namespace GlobalTheory.BSP.TopBasisCons
 
 variable {S A : Type} [CommRing S] [CommRing A] {s : S →+* A} {I : Ideal S} {ι : Type} {b : ι → A}
 
-theorem exists_step (hsp : ∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y => s y * b i) ∈ I.map s) (n : ℕ) (y : A)
-    (hy : y ∈ (I ^ n).map s) : ∃ a : ι →₀ S, (∀ i, a i ∈ I ^ n) ∧
-      y - a.sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s := by
+theorem exists_step
+    (hsp : ∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y => s y * b i) ∈ I.map s)
+    (n : ℕ) (y : A) (hy : y ∈ (I ^ n).map s)
+    : ∃ a : ι →₀ S,
+      (∀ i, a i ∈ I ^ n) ∧ y - a.sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s := by
   classical
-  let T : A → Prop := fun y => ∃ a : ι →₀ S, (∀ i, a i ∈ I ^ n) ∧
-      y - a.sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s
+  let T : A → Prop := fun y =>
+    ∃ a : ι →₀ S, (∀ i, a i ∈ I ^ n) ∧ y - a.sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s
   have T0 : T 0 := ⟨0, fun _ => zero_mem _, by simp⟩
   have Tadd : ∀ y y', T y → T y' → T (y + y') := by
     rintro y y' ⟨a, ha, hy⟩ ⟨a', ha', hy'⟩
@@ -116,9 +134,15 @@ theorem exists_step (hsp : ∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y =>
   have T1 : ∀ t ∈ I ^ n, ∀ w : A, T (s t * w) := by
     intro t ht w
     obtain ⟨a, ha⟩ := hsp w
-    refine ⟨t • a, fun i => by rw [Finsupp.smul_apply, smul_eq_mul]; exact Ideal.mul_mem_right _ _ ht, ?_⟩
+    refine ⟨
+      t • a,
+      fun i => by rw [Finsupp.smul_apply, smul_eq_mul]; exact Ideal.mul_mem_right _ _ ht,
+      ?_
+    ⟩
     rw [Finsupp.sum_smul_index (fun _ => by simp)]
-    have e : s t * w - a.sum (fun i c => s (t * c) * b i) = s t * (w - a.sum (fun i c => s c * b i)) := by
+    have e
+        : s t * w - a.sum (fun i c => s (t * c) * b i)
+          = s t * (w - a.sum (fun i c => s c * b i)) := by
       rw [mul_sub, Finsupp.mul_sum]
       simp only [map_mul, mul_assoc]
     rw [e, Ideal.map_pow, pow_succ]
@@ -134,10 +158,12 @@ theorem exists_step (hsp : ∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y =>
     | smul a x _ hx => exact fun z => by rw [smul_eq_mul, ← mul_assoc]; exact hx (z * a)
   simpa using key y hy 1
 
-theorem exists_approx (hS : IsPrecomplete I S) (g : ℕ → A → ι →₀ S)
-    (hg1 : ∀ n y, y ∈ (I ^ n).map s → ∀ i, g n y i ∈ I ^ n)
-    (hg2 : ∀ n y, y ∈ (I ^ n).map s → y - (g n y).sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s) (x : A) :
-    ∃ f, Approx s I b x f := by
+theorem exists_approx
+    (hS : IsPrecomplete I S)
+    (g : ℕ → A → ι →₀ S) (hg1 : ∀ n y, y ∈ (I ^ n).map s → ∀ i, g n y i ∈ I ^ n)
+    (hg2 : ∀ n y, y ∈ (I ^ n).map s → y - (g n y).sum (fun i c => s c * b i) ∈ (I ^ (n + 1)).map s)
+    (x : A)
+    : ∃ f, Approx s I b x f := by
   classical
   let r : ℕ → A := fun n => Nat.rec x (fun k rk => rk - (g k rk).sum (fun i c => s c * b i)) n
   have hrs : ∀ k, r (k + 1) = r k - (g k (r k)).sum (fun i c => s c * b i) := fun k => rfl
@@ -160,41 +186,51 @@ theorem exists_approx (hS : IsPrecomplete I S) (g : ℕ → A → ι →₀ S)
     exact Ideal.sum_mem _ fun k hk => Ideal.pow_le_pow_right (Finset.mem_Ico.1 hk).1 (ha k i)
   have hlim : ∀ i, ∃ L, ∀ N, P N i - L ∈ I ^ N := by
     intro i
-    obtain ⟨L, hL⟩ := hS.prec (f := fun N => P N i) fun {m n} hmn => by
-      rw [smodEq_iff, ← neg_sub]; exact neg_mem (hP i m n hmn)
+    obtain ⟨L, hL⟩ :=
+      hS.prec
+        (f := fun N => P N i)
+        fun {m n} hmn => by rw [smodEq_iff, ← neg_sub]; exact neg_mem (hP i m n hmn)
     exact ⟨L, fun N => (smodEq_iff _ _ _).1 (hL N)⟩
   choose f hf using hlim
   refine ⟨f, fun n => ?_⟩
   let F : Finset ι := (Finset.range n).biUnion fun k => (a k).support
-  have hPF : ∀ i, i ∉ F → P n i = 0 := fun i hi => Finset.sum_eq_zero fun k hk => by
-    by_contra h
-    exact hi (Finset.mem_biUnion.2 ⟨k, hk, Finsupp.mem_support_iff.2 h⟩)
+  have hPF : ∀ i, i ∉ F → P n i = 0 := fun i hi =>
+    Finset.sum_eq_zero fun k hk => by
+      by_contra h
+      exact hi (Finset.mem_biUnion.2 ⟨k, hk, Finsupp.mem_support_iff.2 h⟩)
   refine ⟨F, fun i hi => ?_, ?_⟩
   · have := neg_mem (hf i n)
     rwa [hPF i hi, zero_sub, neg_neg] at this
-  · have hsum : ∑ k ∈ Finset.range n, (a k).sum (fun i c => s c * b i) = ∑ i ∈ F, s (P n i) * b i := by
-      rw [Finset.sum_congr rfl fun k hk => Finsupp.sum_of_support_subset (a k) (s := F)
-        (fun i hi => Finset.mem_biUnion.2 ⟨k, hk, hi⟩) (fun i c => s c * b i) (fun _ _ => by simp),
+  · have hsum
+        : ∑ k ∈ Finset.range n, (a k).sum (fun i c => s c * b i) = ∑ i ∈ F, s (P n i) * b i := by
+      rw [Finset.sum_congr rfl fun k hk =>
+          Finsupp.sum_of_support_subset (a k) (s := F)
+            (fun i hi => Finset.mem_biUnion.2 ⟨k, hk, hi⟩)
+            (fun i c => s c * b i)
+            (fun _ _ => by simp),
         Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => ?_
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [P, map_sum, Finset.sum_mul]
+      simp only [P, map_sum, Finset.sum_mul]
     have e : x - ∑ i ∈ F, s (f i) * b i = r n + ∑ i ∈ F, s (P n i - f i) * b i := by
       rw [hrx, hsum]
       simp only [map_sub, sub_mul, Finset.sum_sub_distrib]
       ring
     rw [e]
-    exact add_mem (hrm n) (Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hf i n)))
+    exact add_mem (hrm n)
+      (Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem s (hf i n)))
 
 end GlobalTheory.BSP.TopBasisCons
 
-
 open GlobalTheory.BSP.TopBasisCons in
-theorem GlobalTheory.BSP.exists_topBasis_of_span_of_strict : ∀ (S A : Type) [CommRing S] [CommRing A] (s : S →+* A)
-    (I : Ideal S) (ι : Type) (b : ι → A) (i₀ : ι), b i₀ = 1 → I.FG → IsAdicComplete I S →
-    IsAdicComplete (I.map s) A → (∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y => s y * b i) ∈ I.map s) →
-    (∀ n : ℕ, ∃ m : ℕ, ∀ a : ι →₀ S, a.sum (fun i y => s y * b i) ∈ (I ^ m).map s → ∀ i, a i ∈ I ^ n) →
-    ∃ TB : TopBasis s I ι, TB.b = b := by
+theorem GlobalTheory.BSP.exists_topBasis_of_span_of_strict
+    : ∀ (S A : Type) [CommRing S] [CommRing A] (s : S →+* A) (I : Ideal S) (ι : Type) (b : ι → A)
+        (i₀ : ι),
+      b i₀ = 1 → I.FG → IsAdicComplete I S → IsAdicComplete (I.map s) A
+        → (∀ x : A, ∃ a : ι →₀ S, x - a.sum (fun i y => s y * b i) ∈ I.map s)
+        → (∀ n : ℕ, ∃ m : ℕ, ∀ a : ι →₀ S,
+          a.sum (fun i y => s y * b i) ∈ (I ^ m).map s → ∀ i, a i ∈ I ^ n)
+        → ∃ TB : TopBasis s I ι, TB.b = b := by
   intro S A _ _ s I ι b i₀ hb0 _ hS hA hsp hst
   classical
   choose! g hg1 hg2 using exists_step (s := s) (I := I) (b := b) hsp
@@ -211,7 +247,9 @@ theorem GlobalTheory.BSP.exists_topBasis_of_span_of_strict : ∀ (S A : Type) [C
     simp only [Pi.add_apply, Pi.zero_apply, neg_one_mul] at hi
     exact sub_eq_zero.1 (by rw [sub_eq_add_neg]; exact hi)
   let c : ι → A →+ S := fun i =>
-    AddMonoidHom.mk' (fun x => coef x i) fun x y => congrFun (huniq (hcoef (x + y)) ((hcoef x).add (hcoef y))) i
+    AddMonoidHom.mk'
+      (fun x => coef x i)
+      fun x y => congrFun (huniq (hcoef (x + y)) ((hcoef x).add (hcoef y))) i
   refine ⟨⟨b, c, ?_, ?_, ?_, ?_, ?_, hA, i₀, hb0⟩, rfl⟩
   · intro i a x
     change coef (s a * x) i = a * coef x i

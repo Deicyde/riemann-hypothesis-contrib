@@ -5,4 +5,5 @@ public import Development.WeilBound.ThetaLifts.LeviDeterminants.MixedModels.Mixe
 
 @[expose] public section
 
-theorem PositivityTheory.Mix.mixX_closed : PositivityTheory.ThKG.MixX := GlobalTheory.ThKMixX.mixed_model_plane_X_m
+theorem PositivityTheory.Mix.mixX_closed : PositivityTheory.ThKG.MixX :=
+  GlobalTheory.ThKMixX.mixed_model_plane_X_m

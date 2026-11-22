@@ -8,7 +8,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -16,13 +17,17 @@ namespace PositivityTheory.Rg.DzCount
 
 namespace CentralCharacterTransfer
 
-theorem equiv_apply {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} (φ : ρ.Equiv σ) (g : G) (v : V) :
-    φ (ρ g v) = σ g (φ v) :=
+theorem equiv_apply
+    {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} (φ : ρ.Equiv σ)
+    (g : G) (v : V)
+    : φ (ρ g v) = σ g (φ v) :=
   Representation.IntertwiningMap.isIntertwining ρ σ φ.toIntertwiningMap g v
 
-theorem mem_fixed_iff {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
-    {H : Subgroup G} {v : V} : v ∈ fixed ρ H ↔ ∀ h ∈ H, ρ h v = v := by
+theorem mem_fixed_iff
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} {H : Subgroup G} {v : V}
+    : v ∈ fixed ρ H ↔ ∀ h ∈ H, ρ h v = v := by
   change (∀ h : H, ρ h v = ((1 : H →* ℂˣ) h : ℂ) • v) ↔ _
   simp only [MonoidHom.one_apply, Units.val_one, one_smul]
   constructor
@@ -31,9 +36,11 @@ theorem mem_fixed_iff {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {ρ
   · intro hv h
     exact hv h h.2
 
-theorem map_fixed {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} (φ : ρ.Equiv σ) (H : Subgroup G) :
-    (fixed ρ H).map φ.toLinearEquiv.toLinearMap = fixed σ H := by
+theorem map_fixed
+    {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} (φ : ρ.Equiv σ)
+    (H : Subgroup G)
+    : (fixed ρ H).map φ.toLinearEquiv.toLinearMap = fixed σ H := by
   ext w
   simp only [Submodule.mem_map, mem_fixed_iff]
   constructor
@@ -47,9 +54,12 @@ theorem map_fixed {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddC
     change φ _ = φ _
     rw [equiv_apply, e2, hw h hh]
 
-theorem hasCentralChar_of_equiv {k V W : Type} [Field k] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {n : ℕ} {π : Representation ℂ (GL (Fin n) k) V} {σ : Representation ℂ (GL (Fin n) k) W} (φ : π.Equiv σ)
-    {ω : kˣ →* ℂˣ} (h : HasCentralChar π ω) : HasCentralChar σ ω := by
+theorem hasCentralChar_of_equiv
+    {k V W : Type} [Field k] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {n : ℕ} {π : Representation ℂ (GL (Fin n) k) V} {σ : Representation ℂ (GL (Fin n) k) W}
+    (φ : π.Equiv σ)
+    {ω : kˣ →* ℂˣ} (h : HasCentralChar π ω)
+    : HasCentralChar σ ω := by
   intro z w
   have e2 : φ (φ.toLinearEquiv.symm w) = w := φ.toLinearEquiv.apply_symm_apply w
   rw [← e2, ← equiv_apply, h z]
@@ -57,22 +67,28 @@ theorem hasCentralChar_of_equiv {k V W : Type} [Field k] [AddCommGroup V] [Modul
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem transfer {W W' V V' : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
-    [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] {n : ℕ}
-    {τ : Representation ℂ (GL (Fin n) 𝓀[k]) W} {τ' : Representation ℂ (GL (Fin n) 𝓀[k]) W'}
+theorem transfer
+    {W W' V V' : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
+    {n : ℕ} {τ : Representation ℂ (GL (Fin n) 𝓀[k]) W} {τ' : Representation ℂ (GL (Fin n) 𝓀[k]) W'}
     {π : Representation ℂ (GL (Fin n) k) V} {π' : Representation ℂ (GL (Fin n) k) V'}
     {j : W →ₗ[ℂ] V} {j' : W' →ₗ[ℂ] V'} (hj : IsTypeMap τ π j) (hj' : IsTypeMap τ' π' j')
-    (hf : fixed π (KOne k (Fin n)) = LinearMap.range j) (hf' : fixed π' (KOne k (Fin n)) = LinearMap.range j')
-    (φ : π.Equiv π') : ∃ e : W ≃ₗ[ℂ] W', ∀ g v, e (τ g v) = τ' g (e v) := by
+    (hf : fixed π (KOne k (Fin n)) = LinearMap.range j)
+    (hf' : fixed π' (KOne k (Fin n)) = LinearMap.range j') (φ : π.Equiv π')
+    : ∃ e : W ≃ₗ[ℂ] W', ∀ g v, e (τ g v) = τ' g (e v) := by
   have hm := map_fixed φ (KOne k (Fin n))
   rw [hf, hf'] at hm
-  let e : W ≃ₗ[ℂ] W' := (LinearEquiv.ofInjective j hj.1).trans
-    ((φ.toLinearEquiv.submoduleMap (LinearMap.range j)).trans
-      ((LinearEquiv.ofEq _ _ hm).trans (LinearEquiv.ofInjective j' hj'.1).symm))
+  let e : W ≃ₗ[ℂ] W' :=
+    (LinearEquiv.ofInjective j hj.1).trans
+      ((φ.toLinearEquiv.submoduleMap (LinearMap.range j)).trans
+        ((LinearEquiv.ofEq _ _ hm).trans (LinearEquiv.ofInjective j' hj'.1).symm))
   have key : ∀ w, j' (e w) = φ (j w) := by
     intro w
-    have h1 := congrArg Subtype.val ((LinearEquiv.ofInjective j' hj'.1).apply_symm_apply
-      ((LinearEquiv.ofEq _ _ hm) ((φ.toLinearEquiv.submoduleMap _) ((LinearEquiv.ofInjective j hj.1) w))))
+    have h1 :=
+      congrArg Subtype.val
+        ((LinearEquiv.ofInjective j' hj'.1).apply_symm_apply
+          ((LinearEquiv.ofEq _ _ hm) ((φ.toLinearEquiv.submoduleMap _)
+            ((LinearEquiv.ofInjective j hj.1) w))))
     rw [LinearEquiv.ofInjective_apply] at h1
     exact h1
   refine ⟨e, fun g v => ?_⟩
@@ -88,9 +104,10 @@ theorem st8a : St4 → St5 → St6 → St7 → St8a := by
   classical
   intro h4 h5 h6 h7 k _ _ _ _ n hn ϖ hϖ c
   obtain ⟨τ, hτ, hinj⟩ := h7 𝓀[k] n hn
-  have hdata : ∀ P ∈ Lab 𝓀[k] n, ∃ (π : IrrRep (GL (Fin n) k)) (ω : kˣ →* ℂˣ) (j : (τ P).V →ₗ[ℂ] π.V),
-      HasCentralChar π.ρ ω ∧ ω ϖ = c ∧ IsTypeMap (τ P).ρ π.ρ j :=
-    fun P hP => h4 k (τ P).V n hn (τ P).ρ (hτ P hP).1 ϖ hϖ c
+  have hdata
+      : ∀ P ∈ Lab 𝓀[k] n, ∃ (π : IrrRep (GL (Fin n) k)) (ω : kˣ →* ℂˣ) (j : (τ P).V →ₗ[ℂ] π.V),
+        HasCentralChar π.ρ ω ∧ ω ϖ = c ∧ IsTypeMap (τ P).ρ π.ρ j := fun P hP =>
+    h4 k (τ P).V n hn (τ P).ρ (hτ P hP).1 ϖ hϖ c
   choose π ω j hω hc hj using hdata
   have hirr : (1 : Representation ℂ (GL (Fin n) k) ℂ).IsIrreducible := by
     refine { exists_pair_ne := ⟨⊥, ⊤, fun h => ?_⟩, eq_bot_or_eq_top := fun s => ?_ }
@@ -104,8 +121,9 @@ theorem st8a : St4 → St5 → St6 → St7 → St8a := by
   have hF : ∀ P (hP : P ∈ Lab 𝓀[k] n), F P = ⟨n, Quotient.mk _ (π P hP)⟩ := by
     intro P hP
     simp only [F, dif_pos hP]
-  have hfix : ∀ P (hP : P ∈ Lab 𝓀[k] n),
-      fixed (π P hP).ρ (KOne k (Fin n)) = LinearMap.range (j P hP) := by
+  have hfix
+      : ∀ P (hP : P ∈ Lab 𝓀[k] n),
+        fixed (π P hP).ρ (KOne k (Fin n)) = LinearMap.range (j P hP) := by
     intro P hP
     haveI := GlobalTheory.SmGL.nontrivial_of_irreducible (hτ P hP).1
     exact h6 k (τ P).V n (τ P).ρ (hτ P hP).2 (π P hP) (ω P hP) (hω P hP) (j P hP) (hj P hP)

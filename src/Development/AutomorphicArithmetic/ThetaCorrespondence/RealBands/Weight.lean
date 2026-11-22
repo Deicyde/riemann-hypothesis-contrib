@@ -7,7 +7,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.FrobeniusBoundOfMulNea
 
 @[expose] public section
 
-open MeasureTheory Filter Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas GlobalTheory.RealInd UpperTheory.Lit.Cusp
+open MeasureTheory Filter Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas
+  GlobalTheory.RealInd UpperTheory.Lit.Cusp
 open GlobalTheory.Dec (IsHaarSub IsIsoC NW IsSqIntIrr)
 open scoped Topology InnerProductSpace
 
@@ -61,9 +62,9 @@ private lemma slice_le {n : ℕ} {ε : Fin n → Bool} (S : Subgroup (UJ ε)) (�
     rw [this]
     exact bot_le
 
-theorem UpperTheory.Lit.Cusp.integrable_wt :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (S : Subgroup (UJ ε)) (ν : Measure (UJ ε)), IsHaarSub (S : Set (UJ ε)) ν →
-      Integrable (fun g : UJ ε => (wt g)⁻¹) ν := by
+theorem UpperTheory.Lit.Cusp.integrable_wt
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (S : Subgroup (UJ ε)) (ν : Measure (UJ ε)),
+      IsHaarSub (S : Set (UJ ε)) ν → Integrable (fun g : UJ ε => (wt g)⁻¹) ν := by
   intro n ε S ν hν
   classical
   haveI : IsFiniteMeasureOnCompacts ν := hν.2.1
@@ -76,8 +77,9 @@ theorem UpperTheory.Lit.Cusp.integrable_wt :
   have hO_pos : 0 < lam O := hO_open.measure_pos lam ⟨Matrix.of.symm 1, by simp [O, hs]⟩
   have hW_fin : ν W < ⊤ := by
     have hc : IsCompact W := by
-      have := (isClosedEmbeddingMatrix n ε).1.isCompact_preimage
-        ((hermitian_small_ball n ε).1 ((2 * Real.sqrt n + 1) ^ 2))
+      have :=
+        (isClosedEmbeddingMatrix n ε).1.isCompact_preimage ((hermitian_small_ball n ε).1
+          ((2 * Real.sqrt n + 1) ^ 2))
       convert this using 1
       ext g
       exact ⟨fun h => ⟨g.2, h⟩, fun h => h.2⟩
@@ -85,19 +87,25 @@ theorem UpperTheory.Lit.Cusp.integrable_wt :
   have hwpos : ∀ g : UJ ε, 0 < wt g := fun g => by unfold wt; positivity
   have hwc : Continuous fun g : UJ ε => (wt g)⁻¹ := by
     refine Continuous.inv₀ ?_ fun g => (hwpos g).ne'
-    exact (continuous_const.add (continuous_hs_real_place_taylor.comp (continuous_coeMatrix ε)).sqrt).pow _
+    exact (continuous_const.add (continuous_hs_real_place_taylor.comp (continuous_coeMatrix
+      ε)).sqrt).pow _
   let w : UJ ε → ENNReal := fun g => ENNReal.ofReal (wt g)⁻¹
   have hwm : Measurable w := hwc.measurable.ennreal_ofReal
-  let U : Set (UJ ε × MatrixCoordinates n) := {p | hs (coeMatrixAlt ε p.1⁻¹ * Matrix.of p.2 - 1) < 1 / 4}
+  let U : Set (UJ ε × MatrixCoordinates n) :=
+    {p | hs (coeMatrixAlt ε p.1⁻¹ * Matrix.of p.2 - 1) < 1 / 4}
   have hU : MeasurableSet U :=
-    (isOpen_lt (continuous_hs_real_place_taylor.comp ((((continuous_coeMatrix ε).comp (continuous_inv.comp continuous_fst)).matrix_mul
-      (hof.comp continuous_snd)).sub continuous_const)) continuous_const).measurableSet
+    (isOpen_lt
+      (continuous_hs_real_place_taylor.comp
+        ((((continuous_coeMatrix ε).comp (continuous_inv.comp continuous_fst)).matrix_mul
+          (hof.comp continuous_snd)).sub continuous_const))
+      continuous_const).measurableSet
   let f : UJ ε → MatrixCoordinates n → ENNReal := fun g x => U.indicator (fun p => w p.1) (g, x)
   have hf : Measurable (Function.uncurry f) := (hwm.comp measurable_fst).indicator hU
   have h1 : ∫⁻ g, ∫⁻ x, f g x ∂lam ∂ν = (∫⁻ g, w g ∂ν) * lam O := by
     rw [← lintegral_mul_const _ hwm]
     refine lintegral_congr fun g => ?_
-    have hdet : LinearMap.det (leftMulReal (coeMatrixAlt ε g⁻¹)) = 1 := det_leftMulReal_eq_one (g⁻¹).2
+    have hdet : LinearMap.det (leftMulReal (coeMatrixAlt ε g⁻¹)) = 1 :=
+      det_leftMulReal_eq_one (g⁻¹).2
     have e : f g = (leftMulReal (coeMatrixAlt ε g⁻¹) ⁻¹' O).indicator fun _ => w g := by
       funext x
       rfl
@@ -107,7 +115,8 @@ theorem UpperTheory.Lit.Cusp.integrable_wt :
       Measure.addHaar_preimage_linearMap lam (by rw [hdet]; exact one_ne_zero), hdet]
     simp
   let c : ENNReal := ENNReal.ofReal ((Real.sqrt n + 1) ^ (2 * n ^ 2 + 1))
-  let b : MatrixCoordinates n → ENNReal := fun x => ENNReal.ofReal ((1 + ‖x‖) ^ (-((2 * n ^ 2 + 1 : ℕ) : ℝ)))
+  let b : MatrixCoordinates n → ENNReal := fun x =>
+    ENNReal.ofReal ((1 + ‖x‖) ^ (-((2 * n ^ 2 + 1 : ℕ) : ℝ)))
   have hfr : Module.finrank ℝ (MatrixCoordinates n) = 2 * n ^ 2 := by
     simp [MatrixCoordinates, Module.finrank_pi_fintype, Complex.finrank_real_complex]; ring
   have hb : ∫⁻ x, b x ∂lam < ⊤ :=
@@ -116,23 +125,24 @@ theorem UpperTheory.Lit.Cusp.integrable_wt :
     intro x
     have hm : MeasurableSet {g : UJ ε | hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4} :=
       measurable_prodMk_right hU
-    calc ∫⁻ g, f g x ∂ν
-        ≤ ∫⁻ g, {g : UJ ε | hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4}.indicator
-            (fun _ => c * b x) g ∂ν := by
-          refine lintegral_mono fun g => ?_
-          by_cases hg : hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4
-          · have hgU : (g, x) ∈ U := hg
-            simp only [f]
-            rw [Set.indicator_of_mem hgU, Set.indicator_of_mem (by exact hg)]
-            simp only [w, c, b]
-            rw [← ENNReal.ofReal_mul (by positivity)]
-            exact ENNReal.ofReal_le_ofReal (wt_le g x hg)
-          · have hgU : (g, x) ∉ U := hg
-            simp only [f]
-            rw [Set.indicator_of_notMem hgU]
-            exact bot_le
+    calc
+      ∫⁻ g, f g x ∂ν
+          ≤ ∫⁻ g, {g : UJ ε | hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4}.indicator
+              (fun _ => c * b x) g ∂ν := by
+        refine lintegral_mono fun g => ?_
+        by_cases hg : hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4
+        · have hgU : (g, x) ∈ U := hg
+          simp only [f]
+          rw [Set.indicator_of_mem hgU, Set.indicator_of_mem (by exact hg)]
+          simp only [w, c, b]
+          rw [← ENNReal.ofReal_mul (by positivity)]
+          exact ENNReal.ofReal_le_ofReal (wt_le g x hg)
+        · have hgU : (g, x) ∉ U := hg
+          simp only [f]
+          rw [Set.indicator_of_notMem hgU]
+          exact bot_le
       _ = c * b x * ν {g : UJ ε | hs (coeMatrixAlt ε g⁻¹ * Matrix.of x - 1) < 1 / 4} :=
-          lintegral_indicator_const hm _
+        lintegral_indicator_const hm _
       _ ≤ c * b x * ν W := mul_le_mul' le_rfl (slice_le S ν hν x)
       _ = (c * ν W) * b x := by ring
   have hcW : c * ν W ≠ ⊤ := ENNReal.mul_ne_top ENNReal.ofReal_ne_top hW_fin.ne

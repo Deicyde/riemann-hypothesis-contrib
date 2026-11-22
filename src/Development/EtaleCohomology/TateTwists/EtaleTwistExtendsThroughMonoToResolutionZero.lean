@@ -4,22 +4,27 @@ public import Development.EtaleCohomology.TateTwists.EtaleKummerTriangleExists
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 namespace LateralTheory.EtaleFoundations
 
 def EtaleKummerSectionsIntoTwistEmbeddingExist : Prop :=
-  ∀ (q : ℕ) [NeZero q], ∃ (M : Shv (ZMod q)) (j : tw q 1 ⟶ M), Mono j ∧
-    ∃ s : ∀ U : Scheme.{0}, (Γ(U, ⊤))ˣ → Sec M U,
-      (∀ (V U : Scheme.{0}) (g : V ⟶ U) (v : (Γ(U, ⊤))ˣ), IsUnit (q : Γ(U, ⊤)) →
-        Sec.res g (s U v) = s V (Units.map g.appTop.hom.toMonoidHom v)) ∧
-      ∀ (U : Scheme.{0}) (ζ : Prim q Γ(U, ⊤)) (v w : (Γ(U, ⊤))ˣ), (w : Γ(U, ⊤)) = ζ.1 * v →
-        s U w = s U v + Sec.map j (twGen 1 ζ)
+  ∀ (q : ℕ) [NeZero q], ∃ (M : Shv (ZMod q)) (j : tw q 1 ⟶ M),
+    Mono j
+      ∧ ∃ s : ∀ U : Scheme.{0}, (Γ(U, ⊤))ˣ → Sec M U,
+        (∀ (V U : Scheme.{0}) (g : V ⟶ U) (v : (Γ(U, ⊤))ˣ),
+            IsUnit (q : Γ(U, ⊤)) → Sec.res g (s U v) = s V (Units.map g.appTop.hom.toMonoidHom v))
+          ∧ ∀ (U : Scheme.{0}) (ζ : Prim q Γ(U, ⊤)) (v w : (Γ(U, ⊤))ˣ),
+            (w : Γ(U, ⊤)) = ζ.1 * v → s U w = s U v + Sec.map j (twGen 1 ζ)
 
 def EtaleTwistExtendsThroughMonoToResolutionZero : Prop :=
-  ∀ (q : ℕ) [NeZero q] (M : Shv (ZMod q)) (j : tw q 1 ⟶ M), Mono j →
-    ∃ e : M ⟶ (res _ (tw q 1)).X 0, j ≫ e = resι _ (tw q 1)
+  ∀ (q : ℕ) [NeZero q] (M : Shv (ZMod q)) (j : tw q 1 ⟶ M),
+    Mono j → ∃ e : M ⟶ (res _ (tw q 1)).X 0, j ≫ e = resι _ (tw q 1)
 
-theorem etale_kummer_torsor_class_exists_of_tors_and_ext (h1 : EtaleKummerSectionsIntoTwistEmbeddingExist) (h2 : EtaleTwistExtendsThroughMonoToResolutionZero) : EtaleKummerTriangleExists := by
+theorem etale_kummer_torsor_class_exists_of_tors_and_ext
+    (h1 : EtaleKummerSectionsIntoTwistEmbeddingExist)
+    (h2 : EtaleTwistExtendsThroughMonoToResolutionZero)
+    : EtaleKummerTriangleExists := by
   intro q _
   apply pick_spec
   obtain ⟨M, j, hj, s, hs1, hs2⟩ := h1 q

@@ -7,23 +7,30 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk
 
-theorem sum_lam_zero_le_card_normPrimes (𝓕 : LFam) (d M : ℕ)
-    (hN : ∀ p : ℕ, p.Prime → 𝓕.lam 0 p ≠ 0 → GlobalTheory.Mem.An.NormOne d M p) (X Y : ℝ) (hY : 1 ≤ Y) :
-    ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊Y⌋₊, 𝓕.lam 0 n ≤
-      2 * Real.log Y * ((GlobalTheory.Mem.An.normPrimes d M X Y).card : ℝ) +
-        2 * (Chebyshev.psi Y - Chebyshev.theta Y) := by
+theorem sum_lam_zero_le_card_normPrimes
+    (𝓕 : LFam) (d M : ℕ) (hN : ∀ p : ℕ, p.Prime → 𝓕.lam 0 p ≠ 0 → GlobalTheory.Mem.An.NormOne d M p)
+    (X Y : ℝ) (hY : 1 ≤ Y)
+    : ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊Y⌋₊, 𝓕.lam 0 n
+      ≤ 2 * Real.log Y * ((GlobalTheory.Mem.An.normPrimes d M X Y).card : ℝ)
+        + 2 * (Chebyshev.psi Y - Chebyshev.theta Y) := by
   have hl : ∀ n, 𝓕.lam 0 n ≤ 2 * vonMangoldt n := fun n =>
-    le_trans (Finset.single_le_sum (f := fun g => 𝓕.lam g n) (fun g _ => 𝓕.lam_nonneg g n)
-      (Finset.mem_univ _)) (𝓕.lam_le n)
+    le_trans
+      (Finset.single_le_sum
+        (f := fun g => 𝓕.lam g n)
+        (fun g _ => 𝓕.lam_nonneg g n)
+        (Finset.mem_univ _))
+      (𝓕.lam_le n)
   rw [← Finset.sum_filter_add_sum_filter_not _ (fun n : ℕ => n.Prime)]
   apply add_le_add
-  · have h1 : ∑ n ∈ (Finset.Ioc ⌊X⌋₊ ⌊Y⌋₊).filter (fun n : ℕ => n.Prime), 𝓕.lam 0 n =
-        ∑ n ∈ GlobalTheory.Mem.An.normPrimes d M X Y, 𝓕.lam 0 n := by
+  · have h1
+        : ∑ n ∈ (Finset.Ioc ⌊X⌋₊ ⌊Y⌋₊).filter (fun n : ℕ => n.Prime), 𝓕.lam 0 n
+          = ∑ n ∈ GlobalTheory.Mem.An.normPrimes d M X Y, 𝓕.lam 0 n := by
       symm
       apply Finset.sum_subset
       · intro p hp
@@ -38,8 +45,7 @@ theorem sum_lam_zero_le_card_normPrimes (𝓕 : LFam) (d M : ℕ)
     intro p hp
     simp only [GlobalTheory.Mem.An.normPrimes, Finset.mem_filter, Finset.mem_Ioc] at hp
     have h2 : (p : ℝ) ≤ Y := (Nat.le_floor_iff (by linarith)).1 hp.1.2
-    have h3 : Real.log p ≤ Real.log Y :=
-      Real.log_le_log (by exact_mod_cast hp.2.1.pos) h2
+    have h3 : Real.log p ≤ Real.log Y := Real.log_le_log (by exact_mod_cast hp.2.1.pos) h2
     have h4 := hl p
     rw [vonMangoldt_apply_prime hp.2.1] at h4
     linarith
@@ -51,11 +57,11 @@ theorem sum_lam_zero_le_card_normPrimes (𝓕 : LFam) (d M : ℕ)
       have := @vonMangoldt_nonneg n
       positivity
 
-theorem sqrt_le_short_main {A K c B X h : ℝ} (hA : 0 < A) (hK : 0 < K) (hc : 0 < c)
-    (hcT : c ≤ 1 / (2 * (1 + A) + 2 + K)) (hB : 4 ≤ B) (hX : 1 ≤ X)
-    (hBX : Real.log B ≤ c * Real.sqrt (Real.log X))
-    (hh : Real.exp (-c * Real.sqrt (Real.log X)) ≤ h) :
-    1 ≤ Real.log X ∧ K * Real.sqrt X ≤ h * X / B ^ A := by
+theorem sqrt_le_short_main
+    {A K c B X h : ℝ} (hA : 0 < A) (hK : 0 < K) (hc : 0 < c) (hcT : c ≤ 1 / (2 * (1 + A) + 2 + K))
+    (hB : 4 ≤ B) (hX : 1 ≤ X) (hBX : Real.log B ≤ c * Real.sqrt (Real.log X))
+    (hh : Real.exp (-c * Real.sqrt (Real.log X)) ≤ h)
+    : 1 ≤ Real.log X ∧ K * Real.sqrt X ≤ h * X / B ^ A := by
   set s := Real.sqrt (Real.log X) with hs
   have hL : 0 ≤ Real.log X := Real.log_nonneg hX
   have hs0 : 0 ≤ s := Real.sqrt_nonneg _
@@ -78,7 +84,8 @@ theorem sqrt_le_short_main {A K c B X h : ℝ} (hA : 0 < A) (hK : 0 < K) (hc : 0
   have hX0 : 0 < X := by linarith
   have hsq : Real.sqrt X = Real.exp (s * s / 2) := by
     rw [hss, Real.sqrt_eq_rpow, Real.rpow_def_of_pos hX0]
-    congr 1; ring
+    congr 1
+    ring
   have hXe : X = Real.exp (s * s) := by rw [hss, Real.exp_log hX0]
   have hcs : c * s ≤ s := by nlinarith
   have hBA : B ^ A ≤ Real.exp (A * s) := by
@@ -92,21 +99,34 @@ theorem sqrt_le_short_main {A K c B X h : ℝ} (hA : 0 < A) (hK : 0 < K) (hc : 0
     nlinarith
   have hBA0 : 0 < B ^ A := Real.rpow_pos_of_pos hB0 A
   rw [le_div_iff₀ hBA0, hsq]
-  calc K * Real.exp (s * s / 2) * B ^ A
-      ≤ Real.exp (s * s / 2 - (1 + A) * s) * Real.exp (s * s / 2) * Real.exp (A * s) := by
-        gcongr
-    _ = Real.exp (-s) * Real.exp (s * s) := by
-        simp only [← Real.exp_add]; congr 1; ring
-    _ ≤ h * X := by
-        rw [← hXe]; gcongr
+  calc
+    K * Real.exp (s * s / 2) * B ^ A
+      ≤ Real.exp (s * s / 2 - (1 + A) * s) * Real.exp (s * s / 2) * Real.exp (A * s) := by gcongr
+    _ = Real.exp (-s) * Real.exp (s * s) := by simp only [← Real.exp_add]; congr 1; ring
+    _ ≤ h * X := by rw [← hXe]; gcongr
 
-theorem normPrimes_short_interval_lower : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 0 < c' ∧ ∀ (d M : ℕ) (X h : ℝ), d.Prime → d % 4 = 3 → 100 ≤ d → 3 ≤ M → 1 ≤ X → Real.log (4 * (d : ℝ) * (M : ℝ) ^ 2) ≤ c * Real.sqrt (Real.log X) → Real.exp (-c * Real.sqrt (Real.log X)) ≤ h → h ≤ 1 → c' * h * X / ((4 * (d : ℝ) * (M : ℝ) ^ 2) ^ A * Real.log X) ≤ ((GlobalTheory.Mem.An.normPrimes d M X (X * (1 + h))).card : ℝ) := by
+theorem normPrimes_short_interval_lower
+    : ∃ A c c' : ℝ,
+      0 < A ∧ 0 < c ∧ 0 < c'
+        ∧ ∀ (d M : ℕ) (X h : ℝ),
+          d.Prime → d % 4 = 3 → 100 ≤ d → 3 ≤ M → 1 ≤ X
+            → Real.log (4 * (d : ℝ) * (M : ℝ) ^ 2) ≤ c * Real.sqrt (Real.log X)
+            → Real.exp (-c * Real.sqrt (Real.log X)) ≤ h → h ≤ 1
+            → c' * h * X / ((4 * (d : ℝ) * (M : ℝ) ^ 2) ^ A * Real.log X)
+              ≤ ((GlobalTheory.Mem.An.normPrimes d M X (X * (1 + h))).card : ℝ) := by
   obtain ⟨A, c₀, e, hA, hc₀, he, H⟩ := GlobalTheory.T.exists_lam_zero_sum_shortInterval_ge
   obtain ⟨C, hC⟩ := Chebyshev.psi_sub_theta_le_mul_sqrt
   set K : ℝ := 8 * (|C| + 1) / e with hKdef
   have hK : 0 < K := by positivity
-  refine ⟨A, min c₀ (1 / (2 * (1 + A) + 2 + K)), e / 8, hA, lt_min hc₀ (by positivity),
-    by positivity, ?_⟩
+  refine ⟨
+    A,
+    min c₀ (1 / (2 * (1 + A) + 2 + K)),
+    e / 8,
+    hA,
+    lt_min hc₀ (by positivity),
+    by positivity,
+    ?_
+  ⟩
   intro d M X h hd hd4 hd100 hM hX hB hh hh1
   obtain ⟨𝓕, hFB, hN⟩ := GlobalTheory.T.exists_lFam_normOne_of_mod_four_eq_three d M hd hd4 hd100 hM
   rw [← hFB] at hB ⊢
@@ -127,8 +147,9 @@ theorem normPrimes_short_interval_lower : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 
   have hsq : Real.sqrt (X * (1 + h)) ≤ 2 * Real.sqrt X := by
     rw [Real.sqrt_le_left (by positivity), mul_pow, Real.sq_sqrt (by linarith)]
     linarith
-  have H3 : Chebyshev.psi (X * (1 + h)) - Chebyshev.theta (X * (1 + h)) ≤
-      (|C| + 1) * (2 * Real.sqrt X) := by
+  have H3
+      : Chebyshev.psi (X * (1 + h)) - Chebyshev.theta (X * (1 + h))
+        ≤ (|C| + 1) * (2 * Real.sqrt X) := by
     refine (hC _).trans ?_
     have := le_abs_self C
     have := abs_nonneg C
@@ -139,9 +160,9 @@ theorem normPrimes_short_interval_lower : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 
   set N : ℝ := ((GlobalTheory.Mem.An.normPrimes d M X (X * (1 + h))).card : ℝ) with hNdef
   have hN0 : 0 ≤ N := Nat.cast_nonneg _
   have H4 : 8 * (|C| + 1) * Real.sqrt X ≤ e * (h * X / 𝓕.B ^ A) := by
-    have : 8 * (|C| + 1) * Real.sqrt X = e * (K * Real.sqrt X) := by
-      rw [hKdef]; field_simp
-    rw [this]; gcongr
+    have : 8 * (|C| + 1) * Real.sqrt X = e * (K * Real.sqrt X) := by rw [hKdef]; field_simp
+    rw [this]
+    gcongr
   have H5 : e * h * X / 𝓕.B ^ A = e * (h * X / 𝓕.B ^ A) := by ring
   have H6 : 2 * Real.log (X * (1 + h)) * N ≤ 4 * Real.log X * N := by
     apply mul_le_mul_of_nonneg_right _ hN0

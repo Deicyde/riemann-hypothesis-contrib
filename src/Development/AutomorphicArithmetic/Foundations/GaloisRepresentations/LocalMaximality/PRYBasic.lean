@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteCoverR
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -103,8 +104,11 @@ private lemma omB_stab {L : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ 
     exact Submodule.smul_mem _ _ ha
 
 section
-variable {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K'] [Algebra F K]
-  [IsScalarTower ℂ F K] {d : ℕ} (x : Fin (d + 1) → F) (j2 : K →ₐ[ℂ] K')
+variable
+  {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K']
+  [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ} (x : Fin (d + 1) → F)
+  (j2 : K →ₐ[ℂ] K')
 
 private lemma rA_mono' {I I' : Finset (Fin (d + 1))} (h : I ⊆ I') : rA ℂ x I ≤ rA ℂ x I' :=
   Algebra.adjoin_mono fun _ ⟨i, hi, j, e⟩ => ⟨i, h hi, j, e⟩
@@ -165,30 +169,45 @@ private lemma integralClosure_shift_power (h : IsFinCover ℂ K x) {J : Finset (
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.rYBasic_of :
-    RYBasic := by
+theorem UpperTheory.Gal.productCup_of_system.rYBasic_of : RYBasic := by
   intro F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 hY
   have hpull : ∀ I, ∀ b ∈ rB ℂ K (xv x) I, algebraMap K K' b ∈ rB ℂ K' (xv x) I := by
     intro I b hb
     have hb' : IsIntegral (rA ℂ (xv x) I) b := hb
     exact (IsIntegral.algebraMap hb' : IsIntegral (rA ℂ (xv x) I) (algebraMap K K' b))
   have hmono : ∀ I I' J J', I ⊆ I' → J ⊆ J' → RY (xv x) j2 I J ≤ RY (xv x) j2 I' J' :=
-    fun I I' J J' hI hJ => sup_le_sup (rB_mono' (xv x) hI) (integralClosure_mono_subset (xv x) j2 hJ)
-  refine ⟨fun I => ?_, fun a => ?_, hmono, fun I b hb => ⟨hpull I b hb, j2_mem_R2_of_mem_rB (xv x) j2 hb⟩, ?_⟩
+    fun I I' J J' hI hJ =>
+      sup_le_sup (rB_mono' (xv x) hI) (integralClosure_mono_subset (xv x) j2 hJ)
+  refine ⟨
+    fun I => ?_,
+    fun a => ?_,
+    hmono,
+    fun I b hb => ⟨hpull I b hb, j2_mem_R2_of_mem_rB (xv x) j2 hb⟩,
+    ?_
+  ⟩
   · refine sup_eq_left.2 fun y hy => ?_
     obtain ⟨c, rfl⟩ := integralClosure_empty_const (xv x) j2 hy
     exact (rB ℂ K' (xv x) I).algebraMap_mem c
-  · refine ⟨fun I I' J J' _ _ hI hJ => hmono I I' J J' hI hJ,
+  · refine ⟨
+      fun I I' J J' _ _ hI hJ => hmono I I' J J' hI hJ,
       fun I I' J J' _ _ hI hJ => omB_mono' (hmono I I' J J' hI hJ) a,
-      fun I J _ _ => omB_stab _ a, fun I J _ i hi b => ?_, fun I J _ j hj b => ?_⟩
-    · have e : (((sysY x j2 a).X b * ((sysY x j2 a).X i)⁻¹ : K'ˣ) : K') = algebraMap F K' (xv x b / xv x i) := by
+      fun I J _ _ => omB_stab _ a,
+      fun I J _ i hi b => ?_,
+      fun I J _ j hj b => ?_
+    ⟩
+    · have e
+          : (((sysY x j2 a).X b * ((sysY x j2 a).X i)⁻¹ : K'ˣ) : K')
+            = algebraMap F K' (xv x b / xv x i) := by
         simp [sysY, map_div₀, div_eq_mul_inv]
       rw [e]
-      exact (le_sup_left : rB ℂ K' (xv x) I ≤ RY (xv x) j2 I J) (rA_mem_rB (xv x) (ratio_mem (xv x) hi b))
-    · have e : (((sysY x j2 a).Y b * ((sysY x j2 a).Y j)⁻¹ : K'ˣ) : K') = j2 (algebraMap F K (xv x b / xv x j)) := by
+      exact (le_sup_left : rB ℂ K' (xv x) I ≤ RY (xv x) j2 I J) (rA_mem_rB (xv x)
+        (ratio_mem (xv x) hi b))
+    · have e
+          : (((sysY x j2 a).Y b * ((sysY x j2 a).Y j)⁻¹ : K'ˣ) : K')
+            = j2 (algebraMap F K (xv x b / xv x j)) := by
         simp [sysY, map_div₀, div_eq_mul_inv]
       rw [e]
-      exact (le_sup_right : R2 (xv x) j2 J ≤ RY (xv x) j2 I J)
-        (j2_mem_R2_of_mem_rB (xv x) j2 (rA_mem_rB (xv x) (ratio_mem (xv x) hj b)))
+      exact (le_sup_right : R2 (xv x) j2 J ≤ RY (xv x) j2 I J) (j2_mem_R2_of_mem_rB (xv x) j2
+        (rA_mem_rB (xv x) (ratio_mem (xv x) hj b)))
   · intro J j hj j' y hy
     exact integralClosure_shift_power (xv x) j2 hY.covZ hj hy

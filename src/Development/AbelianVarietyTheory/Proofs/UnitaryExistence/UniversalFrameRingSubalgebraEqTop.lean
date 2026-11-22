@@ -13,17 +13,28 @@ public import Development.AbelianVarietyTheory.Statements.HyperbolicHypotheses.H
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem frameRing_subalgebra_eq_top : ∀ (K : Type) [Field K] (J : Type) (m : J → ℕ) (R A : Type) [CommRing R] [Algebra K R] [CommRing A] [Algebra K A] (π : R →ₐ[K] A) (X : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A) (s : Aˣ), FrameRing m π X s → ∀ A' : Subalgebra K A, (∀ t, π t ∈ A') → (∀ τ i j, X τ i j ∈ A') → (s : A) ∈ A' → ((s⁻¹ : Aˣ) : A) ∈ A' → (∀ τ, ∃ d ∈ A', d * (X τ).det = 1) → A' = ⊤ := by
+theorem frameRing_subalgebra_eq_top
+    : ∀ (K : Type) [Field K] (J : Type) (m : J → ℕ) (R A : Type) [CommRing R] [Algebra K R]
+        [CommRing A] [Algebra K A] (π : R →ₐ[K] A) (X : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A)
+        (s : Aˣ),
+      FrameRing m π X s
+        → ∀ A' : Subalgebra K A,
+          (∀ t, π t ∈ A') → (∀ τ i j, X τ i j ∈ A') → (s : A) ∈ A' → ((s⁻¹ : Aˣ) : A) ∈ A'
+            → (∀ τ, ∃ d ∈ A', d * (X τ).det = 1)
+            → A' = ⊤ := by
   intro K _ J m R A _ _ _ _ π X s hF A' hπ hX hs hsi hd
   obtain ⟨hdet, huniv⟩ := hF
   let ψ : R →ₐ[K] A' := π.codRestrict A' hπ
-  let g : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A' := fun τ => Matrix.of fun i j => ⟨X τ i j, hX τ i j⟩
+  let g : ∀ τ, Matrix (Fin (m τ)) (Fin (m τ)) A' := fun τ =>
+    Matrix.of fun i j => ⟨X τ i j, hX τ i j⟩
   have hg : ∀ τ, (g τ).map A'.val = X τ := fun τ => by ext i j; rfl
   let a : (A')ˣ := ⟨⟨s, hs⟩, ⟨_, hsi⟩, Subtype.ext s.mul_inv, Subtype.ext s.inv_mul⟩
   have hgu : ∀ τ, IsUnit (g τ).det := by
@@ -44,9 +55,11 @@ theorem frameRing_subalgebra_eq_top : ∀ (K : Type) [Field K] (J : Type) (m : J
     · rw [AlgHom.comp_assoc, hk1]; ext t; rfl
     · rw [← hg τ, ← hk2 τ]
       conv_lhs => rw [hk2 τ, hg τ]
-      ext i j; rfl
+      ext i j
+      rfl
     · change A'.val (k s) = s
-      rw [hk3]; rfl
+      rw [hk3]
+      rfl
   have e2 : AlgHom.id K A = k₀ := by
     apply huq
     refine ⟨by ext t; rfl, fun τ => by ext i j; rfl, rfl⟩

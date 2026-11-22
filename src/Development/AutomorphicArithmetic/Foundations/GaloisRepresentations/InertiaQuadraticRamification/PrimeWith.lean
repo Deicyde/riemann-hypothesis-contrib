@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published GlobalTheory.RealGal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+  GlobalTheory.RealGal GlobalTheory.UnitaryBC
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 open scoped Pointwise
 
@@ -16,9 +18,11 @@ private theorem pw_normV (v : HeightOneSpectrum (𝓞 ℚ)) : normV v = Ideal.ab
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   rfl
 
-private theorem eq_of_pow_eq_one_of_valuation_sub_lt_one' {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (M : ℕ) (hM0 : 0 < M)
-    (hMv : ¬ A.valuation (M : Ω) < 1) (a b : Ω) (ha : a ^ M = 1) (hb : b ^ M = 1)
-    (hab : A.valuation (a - b) < 1) : a = b := by
+private theorem eq_of_pow_eq_one_of_valuation_sub_lt_one'
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω) (M : ℕ) (hM0 : 0 < M) (hMv : ¬ A.valuation (M : Ω) < 1)
+    (a b : Ω) (ha : a ^ M = 1) (hb : b ^ M = 1) (hab : A.valuation (a - b) < 1)
+    : a = b := by
   by_contra hne
   have hb0 : b ≠ 0 := by
     rintro rfl
@@ -58,13 +62,15 @@ private theorem eq_of_pow_eq_one_of_valuation_sub_lt_one' {Ω : Type} [Field Ω]
   rw [mul_comm]
   exact mul_lt_one_of_lt_of_le hsub hle
 
-private theorem valuation_intCast_le_one' {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (z : ℤ) :
-    A.valuation (z : Ω) ≤ 1 := by
+private theorem valuation_intCast_le_one' {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (z : ℤ)
+    : A.valuation (z : Ω) ≤ 1 := by
   have := A.valuation_le_one (z : A)
   simpa using this
 
-private theorem not_valuation_natCast_lt_one_of_not_dvd {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (p m : ℕ) (hp : p.Prime)
-    (hpA : A.valuation (p : Ω) < 1) (hm : ¬ p ∣ m) : ¬ A.valuation (m : Ω) < 1 := by
+private theorem not_valuation_natCast_lt_one_of_not_dvd
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω) (p m : ℕ) (hp : p.Prime) (hpA : A.valuation (p : Ω) < 1) (hm : ¬ p ∣ m)
+    : ¬ A.valuation (m : Ω) < 1 := by
   intro hm1
   have hcop : Nat.gcd p m = 1 := (Nat.Prime.coprime_iff_not_dvd hp).2 hm
   have h := Nat.gcd_eq_gcd_ab p m
@@ -82,8 +88,11 @@ private theorem not_valuation_natCast_lt_one_of_not_dvd {Ω : Type} [Field Ω] (
       exact mul_lt_one_of_lt_of_le hm1 (valuation_intCast_le_one' A _)
   simp at this
 
-private theorem valuation_intCast_lt_one_iff_dvd {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (p : ℕ) (hp : p.Prime)
-    (hpA : A.valuation (p : Ω) < 1) (n : ℤ) : A.valuation (n : Ω) < 1 ↔ (p : ℤ) ∣ n := by
+private theorem valuation_intCast_lt_one_iff_dvd
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω) (p : ℕ) (hp : p.Prime) (hpA : A.valuation (p : Ω) < 1)
+    (n : ℤ)
+    : A.valuation (n : Ω) < 1 ↔ (p : ℤ) ∣ n := by
   constructor
   · intro hn
     by_contra hnd
@@ -101,8 +110,9 @@ private theorem valuation_intCast_lt_one_iff_dvd {Ω : Type} [Field Ω] (A : Val
     rw [map_mul]
     exact mul_lt_one_of_lt_of_le hpA (valuation_intCast_le_one' A _)
 
-private theorem algebraMap_ratInt_eq_intCast_ringOfIntegersEquiv {Ω : Type} [Field Ω] [CharZero Ω] (x : 𝓞 ℚ) :
-    algebraMap ℚ Ω (x : ℚ) = ((Rat.ringOfIntegersEquiv x : ℤ) : Ω) := by
+private theorem algebraMap_ratInt_eq_intCast_ringOfIntegersEquiv
+    {Ω : Type} [Field Ω] [CharZero Ω] (x : 𝓞 ℚ)
+    : algebraMap ℚ Ω (x : ℚ) = ((Rat.ringOfIntegersEquiv x : ℤ) : Ω) := by
   obtain ⟨n, hn⟩ : ∃ n : ℤ, Rat.ringOfIntegersEquiv x = n := ⟨_, rfl⟩
   have h1 : x = (n : 𝓞 ℚ) := by
     rw [← hn, ← map_intCast Rat.ringOfIntegersEquiv.symm, Int.cast_id, RingEquiv.symm_apply_apply]
@@ -110,8 +120,7 @@ private theorem algebraMap_ratInt_eq_intCast_ringOfIntegersEquiv {Ω : Type} [Fi
   subst h1
   simp
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith :
-    DecGen → PrimeWith := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith : DecGen → PrimeWith := by
   intro hDec Y Ω _ _ _ _ _ δ q hq hδ g hg hgg M ζ hM hζ B
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap Y Ω).injective
   haveI : Algebra.IsAlgebraic ℚ Ω := Algebra.IsAlgebraic.trans ℚ Y Ω
@@ -134,8 +143,9 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith :
   have hgAapp : ∀ z, gA z = g z := fun z => rfl
   set S : Set (HeightOneSpectrum (𝓞 ℚ)) := {v | normV v ≤ B + M} with hSdef
   have hS : S.Finite := by
-    have hfin : (⋃ n ∈ Finset.range (B + M + 1),
-        {I : Ideal (𝓞 ℚ) | Ideal.absNorm I = n}).Finite :=
+    have hfin
+        : (⋃ n ∈ Finset.range (B + M + 1),
+            {I : Ideal (𝓞 ℚ) | Ideal.absNorm I = n}).Finite :=
       Set.Finite.biUnion (Finset.finite_toSet _) (fun n _ => Ideal.finite_setOf_absNorm_eq n)
     refine (hfin.preimage (f := fun v : HeightOneSpectrum (𝓞 ℚ) => v.asIdeal) ?_).subset ?_
     · intro a _ b _ hab
@@ -174,14 +184,18 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith :
   have hB0p : B0.valuation (p : Ω) < 1 := by
     have := (hB0 ((p : ℕ) : 𝓞 ℚ)).2 hpv
     simpa using this
-  have hcrit : ∀ (A' : ValuationSubring Ω), A'.valuation (p : Ω) < 1 → ∀ x : 𝓞 ℚ,
-      (A'.valuation (algebraMap ℚ Ω (x : ℚ)) < 1 ↔ (p : ℤ) ∣ Rat.ringOfIntegersEquiv x) := by
+  have hcrit
+      : ∀ (A' : ValuationSubring Ω),
+        A'.valuation (p : Ω) < 1
+          → ∀ x : 𝓞 ℚ,
+            (A'.valuation (algebraMap ℚ Ω (x : ℚ)) < 1 ↔ (p : ℤ) ∣ Rat.ringOfIntegersEquiv x) := by
     intro A' hA' x
     rw [algebraMap_ratInt_eq_intCast_ringOfIntegersEquiv]
     exact valuation_intCast_lt_one_iff_dvd A' p hp hA' _
-  have hM0 : ¬ B0.valuation (M : Ω) < 1 := not_valuation_natCast_lt_one_of_not_dvd B0 p M hp hB0p (fun hd => by
-    have := Nat.le_of_dvd hM hd
-    omega)
+  have hM0 : ¬ B0.valuation (M : Ω) < 1 :=
+    not_valuation_natCast_lt_one_of_not_dvd B0 p M hp hB0p (fun hd => by
+      have := Nat.le_of_dvd hM hd
+      omega)
   refine ⟨p, hp, by omega, ?_, ?_⟩
   · rw [← hφL ζ (hXL ζ (by simp [hXdef]))]
     refine eq_of_pow_eq_one_of_valuation_sub_lt_one' B0 M hM hM0 _ _ ?_ ?_ ?_
@@ -209,9 +223,10 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith :
     have hh'mem : h' ∈ Dec B0 := by
       refine MulAction.mem_stabilizer_iff.2 ?_
       rw [hh', mul_smul, mul_smul, hσ, hfixA, ← hσ, inv_smul_smul]
-    obtain ⟨k, hk⟩ := hDec ℚ Ω B0 v hB0 φ hφ X hXfin
-      (fun τ hτ x hx => ((IntermediateField.mem_fixingSubgroup_iff _ _).1 (hIne hτ)) x (hXL x hx))
-      h' hh'mem
+    obtain ⟨k, hk⟩ :=
+      hDec ℚ Ω B0 v hB0 φ hφ X hXfin
+        (fun τ hτ x hx => ((IntermediateField.mem_fixingSubgroup_iff _ _).1 (hIne hτ)) x (hXL x hx))
+        h' hh'mem
     have hpowL : ∀ x ∈ L, (φ ^ k) x = (gA ^ k) x := by
       intro x hx
       have h1 := congrArg (fun τ => ((τ ^ k) ⟨x, hx⟩ : Ω)) hφg
@@ -273,10 +288,12 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.primeWith :
       have h6 : σ (h' (j' α)) = σ (j' α) := by rw [hh'j]
       rw [e3, e2] at h6
       exact h6
-    have hext : (hA'.toAlgHom.comp (IsScalarTower.toAlgHom ℚ Y Ω)) = IsScalarTower.toAlgHom ℚ Y Ω := by
+    have hext
+        : (hA'.toAlgHom.comp (IsScalarTower.toAlgHom ℚ Y Ω)) = IsScalarTower.toAlgHom ℚ Y Ω := by
       apply AlgHom.ext_of_adjoin_eq_top (s := {α})
       · rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-          (Algebra.IsAlgebraic.isAlgebraic α), hα]
+            (Algebra.IsAlgebraic.isAlgebraic α),
+          hα]
         exact IntermediateField.top_toSubalgebra
       · intro z hz
         rw [Set.mem_singleton_iff] at hz

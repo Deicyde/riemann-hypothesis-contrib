@@ -11,14 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnipotentRadi
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.Dec.TorusModulus
 
-theorem linear_of_le (L : ℝ →+ ℝ) (A K : ℝ) (h : ∀ s, L s ≤ A + K * |s|) :
-    ∃ κ : ℝ, |κ| ≤ K ∧ ∀ s, L s = κ * s := by
-
+theorem linear_of_le (L : ℝ →+ ℝ) (A K : ℝ) (h : ∀ s, L s ≤ A + K * |s|)
+    : ∃ κ : ℝ, |κ| ≤ K ∧ ∀ s, L s = κ * s := by
   have hup : ∀ s, L s ≤ K * |s| := by
     intro s
     by_contra hlt
@@ -39,7 +39,8 @@ theorem linear_of_le (L : ℝ →+ ℝ) (A K : ℝ) (h : ∀ s, L s ≤ A + K * 
     rw [map_neg, abs_neg] at this
     linarith
   have hcont : Continuous L :=
-    AddMonoidHomClass.continuous_of_bound L K (fun s => by simpa only [Real.norm_eq_abs] using habs s)
+    AddMonoidHomClass.continuous_of_bound L K
+      (fun s => by simpa only [Real.norm_eq_abs] using habs s)
   refine ⟨L 1, by simpa using habs 1, fun s => ?_⟩
   have hs := map_real_smul L hcont s 1
   rw [smul_eq_mul, mul_one, smul_eq_mul] at hs
@@ -47,14 +48,18 @@ theorem linear_of_le (L : ℝ →+ ℝ) (A K : ℝ) (h : ∀ s, L s ≤ A + K * 
 
 section General
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
   [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem eq_smul_map (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G}
-    (h : IsHaarSub (N : Set G) ν) (μ : Measure N) [μ.IsHaarMeasure] :
-    ∃ c : NNReal, ν = c • μ.map Subtype.val := by
+theorem eq_smul_map
+    (N : Subgroup G) (hN : IsClosed (N : Set G))
+    {ν : Measure G} (h : IsHaarSub (N : Set G) ν)
+    (μ : Measure N) [μ.IsHaarMeasure]
+    : ∃ c : NNReal, ν = c • μ.map Subtype.val := by
   obtain ⟨hne, hfin, hnull, hinv⟩ := h
-  have hemb : MeasurableEmbedding (Subtype.val : N → G) := MeasurableEmbedding.subtype_coe hN.measurableSet
+  have hemb : MeasurableEmbedding (Subtype.val : N → G) :=
+    MeasurableEmbedding.subtype_coe hN.measurableSet
   haveI : LocallyCompactSpace N := hN.locallyCompactSpace
   haveI : SecondCountableTopology N := TopologicalSpace.Subtype.secondCountableTopology (N : Set G)
   haveI : BorelSpace N := Subtype.borelSpace (fun x => x ∈ (N : Set G))
@@ -65,7 +70,8 @@ theorem eq_smul_map (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G
     refine Measure.restrict_eq_self_of_ae_mem (ae_iff.2 (measure_mono_null (fun x hx => ?_) hnull))
     intro hxN
     exact hx ⟨⟨x, hxN⟩, rfl⟩
-  have hcomap : ∀ ρ : Measure N, (ρ.map Subtype.val).comap Subtype.val = ρ := fun ρ => hemb.comap_map ρ
+  have hcomap : ∀ ρ : Measure N, (ρ.map Subtype.val).comap Subtype.val = ρ := fun ρ =>
+    hemb.comap_map ρ
   haveI : Measure.IsMulLeftInvariant ν₀ := ⟨fun g => by
     rw [← hcomap (ν₀.map (g * ·)), Measure.map_map hemb.measurable (measurable_const_mul g)]
     have hfun : (Subtype.val ∘ fun x : N => g * x) = (fun y : G => (g : G) * y) ∘ Subtype.val := rfl
@@ -77,13 +83,17 @@ theorem eq_smul_map (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G
     exact (hK.image continuous_subtype_val).measure_lt_top⟩
   refine ⟨Measure.haarScalarFactor ν₀ μ, ?_⟩
   have hsm := Measure.isMulLeftInvariant_eq_smul ν₀ μ
-  calc ν = ν₀.map Subtype.val := hback.symm
-    _ = (Measure.haarScalarFactor ν₀ μ • μ).map Subtype.val := congrArg (Measure.map Subtype.val) hsm
-    _ = Measure.haarScalarFactor ν₀ μ • μ.map Subtype.val := Measure.map_smul _ hemb.measurable.aemeasurable
+  calc
+    ν = ν₀.map Subtype.val := hback.symm
+    _ = (Measure.haarScalarFactor ν₀ μ • μ).map Subtype.val :=
+      congrArg (Measure.map Subtype.val) hsm
+    _ = Measure.haarScalarFactor ν₀ μ • μ.map Subtype.val :=
+      Measure.map_smul _ hemb.measurable.aemeasurable
 
-theorem exists_exp_smul (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν ν' : Measure G}
-    (h : IsHaarSub (N : Set G) ν) (h' : IsHaarSub (N : Set G) ν') :
-    ∃ t : ℝ, ν' = ENNReal.ofReal (Real.exp t) • ν := by
+theorem exists_exp_smul
+    (N : Subgroup G) (hN : IsClosed (N : Set G))
+    {ν ν' : Measure G} (h : IsHaarSub (N : Set G) ν) (h' : IsHaarSub (N : Set G) ν')
+    : ∃ t : ℝ, ν' = ENNReal.ofReal (Real.exp t) • ν := by
   haveI : LocallyCompactSpace N := hN.locallyCompactSpace
   obtain ⟨c, hc⟩ := eq_smul_map N hN h (Measure.haar)
   obtain ⟨c', hc'⟩ := eq_smul_map N hN h' (Measure.haar)
@@ -101,11 +111,11 @@ theorem exists_exp_smul (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν ν' : M
   simp only [ENNReal.smul_def, Measure.smul_apply, smul_eq_mul]
   rw [← mul_assoc, ← ENNReal.coe_mul, div_mul_cancel₀ _ hc0]
 
-
 omit [LocallyCompactSpace G] [SecondCountableTopology G] in
-theorem isHaarSub_conj {N : Set G} {ν : Measure G} (hν : IsHaarSub N ν) (g : G)
-    (h1 : ∀ m ∈ N, g * m * g⁻¹ ∈ N) (h2 : ∀ m ∈ N, g⁻¹ * m * g ∈ N) :
-    IsHaarSub N (ν.map fun m => g * m * g⁻¹) := by
+theorem isHaarSub_conj
+    {N : Set G} {ν : Measure G} (hν : IsHaarSub N ν)
+    (g : G) (h1 : ∀ m ∈ N, g * m * g⁻¹ ∈ N) (h2 : ∀ m ∈ N, g⁻¹ * m * g ∈ N)
+    : IsHaarSub N (ν.map fun m => g * m * g⁻¹) := by
   obtain ⟨hne, hfin, hnull, hinv⟩ := hν
   let e : G ≃ᵐ G := (MeasurableEquiv.mulLeft g).trans (MeasurableEquiv.mulRight g⁻¹)
   have he : (fun m => g * m * g⁻¹) = (e : G → G) := rfl
@@ -133,20 +143,27 @@ theorem isHaarSub_conj {N : Set G} {ν : Measure G} (hν : IsHaarSub N ν) (g : 
       group
     rw [hcomp, ← Measure.map_map e.measurable (measurable_const_mul _), hinv _ (h2 m hm)]
 
-private theorem eq_of_exp_smul_measure_eq {X : Type} [MeasurableSpace X] {ν : Measure X} {S : Set X} (h0 : ν S ≠ 0)
-    (htop : ν S ≠ ⊤) {t t' : ℝ} (h : ENNReal.ofReal (Real.exp t) • ν = ENNReal.ofReal (Real.exp t') • ν) :
-    t = t' := by
+private theorem eq_of_exp_smul_measure_eq
+    {X : Type} [MeasurableSpace X]
+    {ν : Measure X} {S : Set X} (h0 : ν S ≠ 0) (htop : ν S ≠ ⊤)
+    {t t' : ℝ} (h : ENNReal.ofReal (Real.exp t) • ν = ENNReal.ofReal (Real.exp t') • ν)
+    : t = t' := by
   have h1 := congrArg (fun ρ : Measure X => (ρ S).toReal) h
   simp only [Measure.smul_apply, smul_eq_mul, ENNReal.toReal_mul,
-    ENNReal.toReal_ofReal (Real.exp_pos _).le] at h1
+      ENNReal.toReal_ofReal (Real.exp_pos _).le]
+    at h1
   exact Real.exp_injective (mul_right_cancel₀ (ENNReal.toReal_pos h0 htop).ne' h1)
 
-theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (hν : IsHaarSub (N : Set G) ν)
-    (a : ℝ → G) (ha : ∀ s t, a (s + t) = a s * a t) (hn : ∀ s, ∀ m ∈ (N : Set G), a s * m * (a s)⁻¹ ∈ (N : Set G))
+theorem modulus
+    (N : Subgroup G) (hN : IsClosed (N : Set G))
+    {ν : Measure G} (hν : IsHaarSub (N : Set G) ν)
+    (a : ℝ → G) (ha : ∀ s t, a (s + t) = a s * a t)
+    (hn : ∀ s, ∀ m ∈ (N : Set G), a s * m * (a s)⁻¹ ∈ (N : Set G))
     (d : G → ℝ) (hmul : ∀ x y, d (x * y) ≤ d x + d y) (hd : ∀ s, d (a s) ≤ |s|)
-    (C c : ℝ) (hv : ∀ r : ℝ, 0 ≤ r → ν {m | d m ≤ r} ≤ ENNReal.ofReal (C * Real.exp (c * r))) :
-    ∃ κ : ℝ, |κ| ≤ 2 * c ∧ ∀ s, ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν := by
-
+    (C c : ℝ) (hv : ∀ r : ℝ, 0 ≤ r → ν {m | d m ≤ r} ≤ ENNReal.ofReal (C * Real.exp (c * r)))
+    : ∃ κ : ℝ,
+      |κ| ≤ 2 * c
+        ∧ ∀ s, ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν := by
   have a0 : a 0 = 1 := by
     have h := ha 0 0
     rw [add_zero] at h
@@ -157,7 +174,8 @@ theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (h
     rw [add_neg_cancel, a0] at h
     exact eq_inv_of_mul_eq_one_right h.symm
 
-  let e : ℝ → G ≃ᵐ G := fun s => (MeasurableEquiv.mulLeft (a s)).trans (MeasurableEquiv.mulRight (a s)⁻¹)
+  let e : ℝ → G ≃ᵐ G := fun s =>
+    (MeasurableEquiv.mulLeft (a s)).trans (MeasurableEquiv.mulRight (a s)⁻¹)
   have he : ∀ s, (e s : G → G) = fun m => a s * m * (a s)⁻¹ := fun s => rfl
   have hconj : ∀ s, IsHaarSub (N : Set G) (ν.map (e s)) := by
     intro s
@@ -190,8 +208,9 @@ theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (h
   have hadd : ∀ s t, T (s + t) = T s + T t := by
     intro s t
     apply eq_of_exp_smul_measure_eq hr0 hStop
-    rw [← hT (s + t), hcomp, ← Measure.map_map (e s).measurable (e t).measurable, hT t, Measure.map_smul _ (e s).measurable.aemeasurable, hT s,
-      smul_smul, ← ENNReal.ofReal_mul (Real.exp_pos _).le, ← Real.exp_add, add_comm (T t) (T s)]
+    rw [← hT (s + t), hcomp, ← Measure.map_map (e s).measurable (e t).measurable, hT t,
+      Measure.map_smul _ (e s).measurable.aemeasurable, hT s, smul_smul,
+      ← ENNReal.ofReal_mul (Real.exp_pos _).le, ← Real.exp_add, add_comm (T t) (T s)]
 
   have hm0 : 0 < (ν S).toReal := ENNReal.toReal_pos hr0 hStop
   have hbound : ∀ s, T s ≤ (Real.log C + c * r0 - Real.log (ν S).toReal) + 2 * c * |s| := by
@@ -214,7 +233,8 @@ theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (h
       rw [(e s).map_apply]
       exact (measure_mono hsub).trans (hv _ (by positivity))
     rw [hT s, Measure.smul_apply, smul_eq_mul, ← ENNReal.ofReal_toReal hStop,
-      ← ENNReal.ofReal_mul (Real.exp_pos _).le] at hle
+        ← ENNReal.ofReal_mul (Real.exp_pos _).le]
+      at hle
     have hpos : 0 < Real.exp (T s) * (ν S).toReal := mul_pos (Real.exp_pos _) hm0
     have hle' : Real.exp (T s) * (ν S).toReal ≤ C * Real.exp (c * ((r0 : ℝ) + 2 * |s|)) := by
       rcases (ENNReal.ofReal_le_ofReal_iff').1 hle with h | h
@@ -225,8 +245,9 @@ theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (h
       push_neg at hC
       nlinarith [Real.exp_pos (c * ((r0 : ℝ) + 2 * |s|))]
     have hlog := Real.log_le_log hpos hle'
-    rw [Real.log_mul (Real.exp_pos _).ne' hm0.ne', Real.log_mul hC.ne' (Real.exp_pos _).ne', Real.log_exp,
-      Real.log_exp] at hlog
+    rw [Real.log_mul (Real.exp_pos _).ne' hm0.ne', Real.log_mul hC.ne' (Real.exp_pos _).ne',
+        Real.log_exp, Real.log_exp]
+      at hlog
     have hexp : c * ((r0 : ℝ) + 2 * |s|) = c * r0 + 2 * c * |s| := by ring
     rw [hexp] at hlog
     linarith
@@ -240,7 +261,16 @@ theorem modulus (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (h
 
 end General
 
-theorem torus_modulus : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (Fin n → ℂ)) (ν : Measure (UJ ε)), IsIsoC ε W → IsHaarSub (NW ε W) ν → ∀ (a : ℝ → UJ ε) (Hm : Matrix (Fin n) (Fin n) ℂ), inP ε Hm → (∀ s : ℝ, umat (a s) = NormedSpace.exp ((s : ℂ) • Hm)) → (∀ s, dOp (umat (a s)) ≤ |s|) → (∀ s, ∀ m ∈ NW ε W, a s * m * (a s)⁻¹ ∈ NW ε W) → ∃ κ : ℝ, |κ| ≤ 8 * n * rkR ε ∧ ∀ s, ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν := by
+theorem torus_modulus
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (Fin n → ℂ)) (ν : Measure (UJ ε)),
+      IsIsoC ε W → IsHaarSub (NW ε W) ν
+        → ∀ (a : ℝ → UJ ε) (Hm : Matrix (Fin n) (Fin n) ℂ),
+          inP ε Hm → (∀ s : ℝ, umat (a s) = NormedSpace.exp ((s : ℂ) • Hm))
+            → (∀ s, dOp (umat (a s)) ≤ |s|) → (∀ s, ∀ m ∈ NW ε W, a s * m * (a s)⁻¹ ∈ NW ε W)
+            → ∃ κ : ℝ,
+              |κ| ≤ 8 * n * rkR ε
+                ∧ ∀ s,
+                  ν.map (fun m => a s * m * (a s)⁻¹) = ENNReal.ofReal (Real.exp (κ * s)) • ν := by
   intro n ε W ν hW hν a Hm hP ha hd hn
   have hN : IsClosed ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)) := by
     rw [coe_nwSub]
@@ -248,8 +278,9 @@ theorem torus_modulus : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (
   have hν' : IsHaarSub ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)) ν := by
     rw [coe_nwSub]
     exact hν
-  have hn' : ∀ s, ∀ m ∈ ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)),
-      a s * m * (a s)⁻¹ ∈ ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)) := by
+  have hn'
+      : ∀ s, ∀ m ∈ ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)),
+        a s * m * (a s)⁻¹ ∈ ((nwSub ε W : Subgroup (UJ ε)) : Set (UJ ε)) := by
     rw [coe_nwSub]
     exact hn
 
@@ -275,10 +306,12 @@ theorem torus_modulus : ∀ (n : ℕ) (ε : Fin n → Bool) (W : Submodule ℂ (
       rw [e]
       exact GlobalTheory.Count.Cartan.dOp_mul_le hpos (Units.isUnit _) (Units.isUnit _)
   obtain ⟨⟨C, hC⟩, -⟩ := GlobalTheory.RadVol.radical_volume_growth n ε W ν hW hν
-  obtain ⟨κ, hκ, hmod⟩ := modulus (nwSub ε W) hN hν' a hadd hn' (fun g => dOp (umat g)) hmul hd C
-    (4 * n * rkR ε) hC
+  obtain ⟨κ, hκ, hmod⟩ :=
+    modulus (nwSub ε W) hN hν' a hadd hn' (fun g => dOp (umat g)) hmul hd C (4 * n * rkR ε) hC
   refine ⟨κ, ?_, hmod⟩
-  calc |κ| ≤ 2 * (4 * n * rkR ε) := hκ
+  calc
+    |κ|
+      ≤ 2 * (4 * n * rkR ε) := hκ
     _ = 8 * n * rkR ε := by ring
 
 end GlobalTheory.Dec.TorusModulus

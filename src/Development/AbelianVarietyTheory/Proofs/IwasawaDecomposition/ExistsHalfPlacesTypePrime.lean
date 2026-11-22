@@ -10,13 +10,17 @@ noncomputable section
 
 namespace GlobalTheory.MemN.HalfPlaces
 
-open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 open GlobalTheory.Mem.GaloisStage
 open scoped Pointwise
 
-theorem exists_transversal_cover {S : Type} [Fintype S] (c : S → S) (hc : ∀ x, c (c x) = x)
-    (hne : ∀ x, c x ≠ x) {n : ℕ} (hn : Fintype.card S = 2 * n) :
-    ∃ e : Fin n → S, Function.Injective e ∧ (∀ i j, c (e i) ≠ e j) ∧ ∀ x, ∃ i, x = e i ∨ x = c (e i) := by
+theorem exists_transversal_cover
+    {S : Type} [Fintype S]
+    (c : S → S) (hc : ∀ x, c (c x) = x) (hne : ∀ x, c x ≠ x)
+    {n : ℕ} (hn : Fintype.card S = 2 * n)
+    : ∃ e : Fin n → S,
+      Function.Injective e ∧ (∀ i j, c (e i) ≠ e j) ∧ ∀ x, ∃ i, x = e i ∨ x = c (e i) := by
   classical
   obtain ⟨e, he, he'⟩ := exists_transversal c hc hne hn
   refine ⟨e, he, he', fun x => ?_⟩
@@ -35,12 +39,14 @@ theorem exists_transversal_cover {S : Type} [Fintype S] (c : S → S) (hc : ∀ 
 
 variable {R : Ranks}
 
-theorem isConjPl_iff (H : Host R) (w w' : PlE H) :
-    IsConjPl H w w' ↔ H.conj • w.asIdeal = w'.asIdeal := by
+theorem isConjPl_iff (H : Host R) (w w' : PlE H)
+    : IsConjPl H w w' ↔ H.conj • w.asIdeal = w'.asIdeal := by
   constructor
   · intro h
     ext y
-    have := h (H.conj⁻¹ • y) y (by rw [← Formalism.TwoAdicCyclotomicDecomposition.odd_coe_smul, smul_inv_smul])
+    have :=
+      h (H.conj⁻¹ • y) y
+        (by rw [← Formalism.TwoAdicCyclotomicDecomposition.odd_coe_smul, smul_inv_smul])
     rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem]
     exact this
   · intro h x y hxy
@@ -49,10 +55,11 @@ theorem isConjPl_iff (H : Host R) (w w' : PlE H) :
       exact hxy
     rw [← h, hy, Ideal.smul_mem_pointwise_smul_iff]
 
-theorem exists_places_cover (H : Host R) {p : ℕ} (hp : p.Prime)
-    (hs : (placesOver H.E p).ncard = Module.finrank ℚ H.E) :
-    ∃ e : Fin R.f → PlE H, (∀ i, e i ∈ placesOver H.E p) ∧ Function.Injective e ∧
-      (∀ i j, ¬ IsConjPl H (e i) (e j)) ∧ ∀ w ∈ placesOver H.E p, ∃ v, w = e v ∨ IsConjPl H (e v) w := by
+theorem exists_places_cover
+    (H : Host R) {p : ℕ} (hp : p.Prime) (hs : (placesOver H.E p).ncard = Module.finrank ℚ H.E)
+    : ∃ e : Fin R.f → PlE H,
+      (∀ i, e i ∈ placesOver H.E p) ∧ Function.Injective e ∧ (∀ i j, ¬ IsConjPl H (e i) (e j))
+        ∧ ∀ w ∈ placesOver H.E p, ∃ v, w = e v ∨ IsConjPl H (e v) w := by
   classical
   have : Fact p.Prime := ⟨hp⟩
   have hG : IsGalois ℚ H.E := H.galois
@@ -61,8 +68,11 @@ theorem exists_places_cover (H : Host R) {p : ℕ} (hp : p.Prime)
   have hp0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp.ne_zero
-  obtain ⟨⟨P, hP1, hP2⟩⟩ := (inferInstance : Nonempty (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E)))
-  have hr : Set.range (fun σ : H.E ≃ₐ[ℚ] H.E => σ • P) = Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E) := by
+  obtain ⟨⟨P, hP1, hP2⟩⟩ :=
+    (inferInstance : Nonempty (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E)))
+  have hr
+      : Set.range (fun σ : H.E ≃ₐ[ℚ] H.E => σ • P)
+        = Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E) := by
     ext Q
     constructor
     · rintro ⟨σ, rfl⟩
@@ -70,19 +80,27 @@ theorem exists_places_cover (H : Host R) {p : ℕ} (hp : p.Prime)
     · rintro ⟨hQ1, hQ2⟩
       exact Ideal.exists_smul_eq_of_isGaloisGroup (Ideal.span {(p : ℤ)}) P Q (H.E ≃ₐ[ℚ] H.E)
   have hinj : Function.Injective (fun σ : H.E ≃ₐ[ℚ] H.E => σ • P) := by
-    rw [GlobalTheory.HostSplit.ncard_placesOver H.E hp, ← hr, ← IsGalois.card_aut_eq_finrank, ← Set.image_univ,
-      ← Set.ncard_univ] at hs
+    rw [GlobalTheory.HostSplit.ncard_placesOver H.E hp, ← hr, ← IsGalois.card_aut_eq_finrank,
+        ← Set.image_univ, ← Set.ncard_univ]
+      at hs
     exact Set.injOn_univ.1 (Set.injOn_of_ncard_image_eq hs)
   have hcard : Fintype.card (H.E ≃ₐ[ℚ] H.E) = 2 * R.f := by
-    rw [← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank,
-      H.finrank_cmField, Ranks.f, Ranks.n]
+    rw [← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank, H.finrank_cmField, Ranks.f,
+      Ranks.n]
     ring
-  obtain ⟨e, he, he', hcov⟩ := exists_transversal_cover (fun σ => H.conj * σ)
-    (fun σ => by rw [← mul_assoc, conj_mul_conj, one_mul])
-    (fun σ h => conj_ne_one H (mul_eq_right.1 h)) hcard
-  refine ⟨fun i => ⟨e i • P, inferInstance, Ideal.ne_bot_of_liesOver_of_ne_bot hp0 _⟩, fun i => ?_,
-    fun i j h => he (hinj (congrArg HeightOneSpectrum.asIdeal h)), fun i j h => he' i j (hinj ?_),
-    fun w hw => ?_⟩
+  obtain ⟨e, he, he', hcov⟩ :=
+    exists_transversal_cover
+      (fun σ => H.conj * σ)
+      (fun σ => by rw [← mul_assoc, conj_mul_conj, one_mul])
+      (fun σ h => conj_ne_one H (mul_eq_right.1 h))
+      hcard
+  refine ⟨
+    fun i => ⟨e i • P, inferInstance, Ideal.ne_bot_of_liesOver_of_ne_bot hp0 _⟩,
+    fun i => ?_,
+    fun i j h => he (hinj (congrArg HeightOneSpectrum.asIdeal h)),
+    fun i j h => he' i j (hinj ?_),
+    fun w hw => ?_
+  ⟩
   · have h3 : (p : ℤ) ∈ (e i • P).under ℤ := by
       rw [← Ideal.over_def (e i • P) (Ideal.span {(p : ℤ)})]
       exact Ideal.mem_span_singleton_self _

@@ -8,13 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DualWeylE
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.DefPt MvPolynomial
+open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.DefPt MvPolynomial
 open scoped Matrix
 
 namespace GlobalTheory.DualWeyl.EvBound
 
-theorem sum_sq_norm_evalAt_onBasis_eq_one (n : ℕ) (la : Fin n → ℕ) (hla : Antitone la) (g : UN n) :
-    ∑ i, ‖evalAt g.1 (((toSpace la).symm (onBasis la i) : nabla la ℂ) : Pol n ℂ)‖ ^ 2 = 1 := by
+theorem sum_sq_norm_evalAt_onBasis_eq_one (n : ℕ) (la : Fin n → ℕ) (hla : Antitone la) (g : UN n)
+    : ∑ i, ‖evalAt g.1 (((toSpace la).symm (onBasis la i) : nabla la ℂ) : Pol n ℂ)‖ ^ 2 = 1 := by
   obtain ⟨k, hk⟩ := GlobalTheory.DualWeyl.Repro.exists_repr la
   have h1 := GlobalTheory.DualWeyl.Repro.normSq_repr hla hk
   let e : Idx la → nabla la ℂ := fun i => (toSpace la).symm (onBasis la i)
@@ -25,8 +26,11 @@ theorem sum_sq_norm_evalAt_onBasis_eq_one (n : ℕ) (la : Fin n → ℕ) (hla : 
   rw [← he, inner_toSpace, GlobalTheory.DualWeyl.Repro.form_rhoU_repr hk]
   rfl
 
-theorem sum_sq_norm_evalAt_onBasis_le_one : ∀ (n : ℕ) (la : Fin n → ℕ), Antitone la → ∀ u : UN n,
-    ∑ i, ‖evalAt u.1 (((toSpace la).symm (onBasis la i) : nabla la ℂ) : Pol n ℂ)‖ ^ 2 ≤ 1 :=
+theorem sum_sq_norm_evalAt_onBasis_le_one
+    : ∀ (n : ℕ) (la : Fin n → ℕ),
+      Antitone la
+        → ∀ u : UN n,
+          ∑ i, ‖evalAt u.1 (((toSpace la).symm (onBasis la i) : nabla la ℂ) : Pol n ℂ)‖ ^ 2 ≤ 1 :=
   fun n la hla u => (sum_sq_norm_evalAt_onBasis_eq_one n la hla u).le
 
 end GlobalTheory.DualWeyl.EvBound

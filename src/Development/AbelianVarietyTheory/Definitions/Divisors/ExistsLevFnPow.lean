@@ -19,7 +19,8 @@ namespace GlobalTheory.AdeleEv
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem norm_int_le {E : Type} [Field E] [NumberField E] (τ : E →+* PadicAlgCl l) (x : 𝓞 E) : ‖τ x‖ ≤ 1 := by
+theorem norm_int_le {E : Type} [Field E] [NumberField E] (τ : E →+* PadicAlgCl l) (x : 𝓞 E)
+    : ‖τ x‖ ≤ 1 := by
   obtain ⟨v, hv⟩ := GlobalTheory.LadicPlace.exists_place_of_embedding E l τ
   by_contra h
   have h0 : (x : E) ≠ 0 := by

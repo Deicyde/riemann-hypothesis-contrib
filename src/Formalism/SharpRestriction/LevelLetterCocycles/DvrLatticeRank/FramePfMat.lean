@@ -13,8 +13,8 @@ open PowerSeries DualFramesAlt.FrameAbs
 
 variable {O : Type} [CommRing O] [IsDomain O] {d : ℕ}
 
-theorem framepf_cc_subst (Fs g : PowerSeries O) :
-    constantCoeff (subst ((X : PowerSeries O) * Fs) g) = constantCoeff g := by
+theorem framepf_cc_subst (Fs g : PowerSeries O)
+    : constantCoeff (subst ((X : PowerSeries O) * Fs) g) = constantCoeff g := by
   have h0 : PowerSeries.constantCoeff ((X : PowerSeries O) * Fs) = 0 := by simp
   have ha : PowerSeries.HasSubst ((X : PowerSeries O) * Fs) :=
     PowerSeries.HasSubst.of_constantCoeff_zero h0
@@ -26,27 +26,31 @@ theorem framepf_cc_subst (Fs g : PowerSeries O) :
     change coeff n g • (PowerSeries.constantCoeff ((X : PowerSeries O) * Fs)) ^ n = 0
     rw [h0, zero_pow hn, smul_zero]
 
-theorem framepf_mem_span_X (a : PowerSeries O) :
-    a ∈ Ideal.span {(X : PowerSeries O)} ↔ constantCoeff a = 0 := by
+theorem framepf_mem_span_X (a : PowerSeries O)
+    : a ∈ Ideal.span {(X : PowerSeries O)} ↔ constantCoeff a = 0 := by
   rw [Ideal.mem_span_singleton, PowerSeries.X_dvd_iff]
 
-theorem framepf_mats (c₀ : O) (hc : ∀ y : ℕ, 1 ≤ y → c₀ ^ y ≠ 1) (Fs : PowerSeries O)
-    (hF : constantCoeff Fs = c₀) (R : Matrix (Fin d) (Fin d) (PowerSeries O)) (M : ℕ) (hM : 1 ≤ M)
-    (aσ lσ : O) (hl : lσ = aσ * ∏ y ∈ Finset.Ico 1 M, (c₀ ^ y - 1)) :
-    ∃ H H' : Matrix (Fin d) (Fin d) (PowerSeries O),
-      (∃ K, H = C lσ • 1 + (X : PowerSeries O) • K) ∧
-      (∃ K, (1 + (X : PowerSeries O) • R) * H.map (subst ((X : PowerSeries O) * Fs)) - H =
-        (X : PowerSeries O) ^ M • K) ∧
-      (∃ K, H' = C lσ • 1 + (X : PowerSeries O) • K) ∧
-      (∃ K, H' * (1 + (X : PowerSeries O) • R) - H'.map (subst ((X : PowerSeries O) * Fs)) =
-        (X : PowerSeries O) ^ M • K) ∧
-      (∃ K, H' * H = C (lσ ^ 2) • 1 + (X : PowerSeries O) ^ M • K) ∧
-      (∃ K, H * H' = C (lσ ^ 2) • 1 + (X : PowerSeries O) ^ M • K) := by
+theorem framepf_mats
+    (c₀ : O) (hc : ∀ y : ℕ, 1 ≤ y → c₀ ^ y ≠ 1)
+    (Fs : PowerSeries O) (hF : constantCoeff Fs = c₀)
+    (R : Matrix (Fin d) (Fin d) (PowerSeries O))
+    (M : ℕ) (hM : 1 ≤ M)
+    (aσ lσ : O) (hl : lσ = aσ * ∏ y ∈ Finset.Ico 1 M, (c₀ ^ y - 1))
+    : ∃ H H' : Matrix (Fin d) (Fin d) (PowerSeries O),
+      (∃ K, H = C lσ • 1 + (X : PowerSeries O) • K)
+        ∧ (∃ K,
+          (1 + (X : PowerSeries O) • R) * H.map (subst ((X : PowerSeries O) * Fs)) - H
+            = (X : PowerSeries O) ^ M • K)
+        ∧ (∃ K, H' = C lσ • 1 + (X : PowerSeries O) • K)
+        ∧ (∃ K,
+          H' * (1 + (X : PowerSeries O) • R) - H'.map (subst ((X : PowerSeries O) * Fs))
+            = (X : PowerSeries O) ^ M • K)
+        ∧ (∃ K, H' * H = C (lσ ^ 2) • 1 + (X : PowerSeries O) ^ M • K)
+        ∧ (∃ K, H * H' = C (lσ ^ 2) • 1 + (X : PowerSeries O) ^ M • K) := by
   classical
   have hG : HasSubst ((X : PowerSeries O) * Fs) := HasSubst.of_constantCoeff_zero' (by simp)
   set σr : PowerSeries O →+* PowerSeries O := (substAlgHom hG).toRingHom with hσr
-  have hσ : ∀ g, σr g = subst ((X : PowerSeries O) * Fs) g := fun g => by
-    simp [σr, coe_substAlgHom]
+  have hσ : ∀ g, σr g = subst ((X : PowerSeries O) * Fs) g := fun g => by simp [σr, coe_substAlgHom]
   set Γ : Matrix (Fin d) (Fin d) (PowerSeries O) := 1 + (X : PowerSeries O) • R with hΓ
   set ev : ℕ → PowerSeries O := fun y => C (c₀ ^ y - 1) with hev
   have hAC : ∀ o : O, algebraMap O (PowerSeries O) o = C o := fun o => by
@@ -94,8 +98,10 @@ theorem framepf_mats (c₀ : O) (hc : ∀ y : ℕ, 1 ≤ y → c₀ ^ y ≠ 1) (
       exact ⟨c₀ ^ y - 1, by rw [hAC]⟩
   have hD : ∏ y ∈ Finset.Ico 1 M, ev y = C (∏ y ∈ Finset.Ico 1 M, (c₀ ^ y - 1)) := by
     rw [hev, map_prod]
-  have hc' : ∀ a : PowerSeries O, (∏ y ∈ Finset.Ico 1 M, ev y) * a ∈ Ideal.span {(X : PowerSeries O) ^ M} →
-      a ∈ Ideal.span {(X : PowerSeries O) ^ M} := by
+  have hc'
+      : ∀ a : PowerSeries O,
+        (∏ y ∈ Finset.Ico 1 M, ev y) * a ∈ Ideal.span {(X : PowerSeries O) ^ M}
+          → a ∈ Ideal.span {(X : PowerSeries O) ^ M} := by
     intro a h
     rw [Ideal.mem_span_singleton, X_pow_dvd_iff] at h ⊢
     intro j hj
@@ -106,7 +112,9 @@ theorem framepf_mats (c₀ : O) (hc : ∀ y : ℕ, 1 ≤ y → c₀ ^ y ≠ 1) (
   obtain ⟨⟨H, hH⟩, -⟩ := exists_frame hyp M hM
   obtain ⟨F, hF'⟩ := exists_dualFrame hyp M hM
   obtain ⟨hFH, hHF⟩ := frame_products hyp M hM H F hH hF' hc'
-  have hmap : ∀ Z : Matrix (Fin d) (Fin d) (PowerSeries O), Z.map σr = Z.map (subst ((X : PowerSeries O) * Fs)) := by
+  have hmap
+      : ∀ Z : Matrix (Fin d) (Fin d) (PowerSeries O),
+        Z.map σr = Z.map (subst ((X : PowerSeries O) * Fs)) := by
     intro Z; ext p q; simp [hσ]
   obtain ⟨K1, hK1⟩ := hH.1.exists_smul
   obtain ⟨K2, hK2⟩ := hH.2.exists_smul
@@ -124,8 +132,16 @@ theorem framepf_mats (c₀ : O) (hc : ∀ y : ℕ, 1 ≤ y → c₀ ^ y ≠ 1) (
     intro Z; ext p q; simp [hσa]
   have hsq : C aσ * C aσ * C (∏ y ∈ Finset.Ico 1 M, (c₀ ^ y - 1)) ^ 2 = C (lσ ^ 2) := by
     rw [hl, ← map_mul, ← map_pow, ← map_mul]; ring_nf
-  refine ⟨C aσ • H, C aσ • F, ⟨C aσ • K1, ?_⟩, ⟨C aσ • K2, ?_⟩, ⟨C aσ • K3, ?_⟩, ⟨C aσ • K4, ?_⟩,
-    ⟨(C aσ * C aσ) • K5, ?_⟩, ⟨(C aσ * C aσ) • K6, ?_⟩⟩
+  refine ⟨
+    C aσ • H,
+    C aσ • F,
+    ⟨C aσ • K1, ?_⟩,
+    ⟨C aσ • K2, ?_⟩,
+    ⟨C aσ • K3, ?_⟩,
+    ⟨C aσ • K4, ?_⟩,
+    ⟨(C aσ * C aσ) • K5, ?_⟩,
+    ⟨(C aσ * C aσ) • K6, ?_⟩
+  ⟩
   · rw [e1, smul_add, smul_smul, ← map_mul, ← hl, smul_comm (C aσ) (X : PowerSeries O) K1]
   · rw [← hmap, hsc, Matrix.mul_smul, ← smul_sub, hK2, smul_comm]
   · rw [e3, smul_add, smul_smul, ← map_mul, ← hl, smul_comm (C aσ) (X : PowerSeries O) K3]

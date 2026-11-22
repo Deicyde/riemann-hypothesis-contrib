@@ -8,11 +8,14 @@ open NumberField IsDedekindDomain TensorProduct
 
 namespace GlobalTheory
 
-theorem integral_of_sq_sub_integral (E E' : Type) [Field E] [NumberField E] [Field E'] [NumberField E'] [Algebra E E']
-    {ι : Type} [Fintype ι] (b : Module.Basis ι E E') (hbi : ∀ i, IsIntegral ℤ (b i))
+theorem integral_of_sq_sub_integral
+    (E E' : Type) [Field E] [NumberField E] [Field E'] [NumberField E'] [Algebra E E']
+    {ι : Type} [Fintype ι]
+    (b : Module.Basis ι E E') (hbi : ∀ i, IsIntegral ℤ (b i))
     (w : HeightOneSpectrum (𝓞 E)) (w'' : HeightOneSpectrum (𝓞 E'))
-    (hw : w''.asIdeal.comap (algebraMap (𝓞 E) (𝓞 E')) = w.asIdeal) (ε : E')
-    (hε : ∀ i, w.valuation E (b.repr (ε * ε - ε) i) ≤ 1) : w''.valuation E' ε ≤ 1 := by
+    (hw : w''.asIdeal.comap (algebraMap (𝓞 E) (𝓞 E')) = w.asIdeal)
+    (ε : E') (hε : ∀ i, w.valuation E (b.repr (ε * ε - ε) i) ≤ 1)
+    : w''.valuation E' ε ≤ 1 := by
   have hunder : w''.under (𝓞 E) = w := HeightOneSpectrum.ext hw
   have hc : ∀ c : E, w.valuation E c ≤ 1 → w''.valuation E' (algebraMap E E' c) ≤ 1 := by
     intro c hc
@@ -22,7 +25,8 @@ theorem integral_of_sq_sub_integral (E E' : Type) [Field E] [NumberField E] [Fie
     exact pow_le_one' hc _
   have hb : ∀ i, w''.valuation E' (b i) ≤ 1 := by
     intro i
-    have : b i = algebraMap (𝓞 E') E' (⟨b i, (mem_integralClosure_iff ℤ E').2 (hbi i)⟩ : 𝓞 E') := rfl
+    have : b i = algebraMap (𝓞 E') E' (⟨b i, (mem_integralClosure_iff ℤ E').2 (hbi i)⟩ : 𝓞 E') :=
+      rfl
     rw [this]
     exact w''.valuation_le_one _
   have hu : w''.valuation E' (ε * ε - ε) ≤ 1 := by

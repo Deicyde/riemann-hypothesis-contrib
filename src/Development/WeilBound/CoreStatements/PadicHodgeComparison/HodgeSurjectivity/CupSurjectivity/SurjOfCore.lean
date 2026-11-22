@@ -17,20 +17,23 @@ open Pb HT
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
-theorem surj_of_core (hC : CupLaws) (P : HTPre l K) (M : Model l K) (n : ℕ)
-    (h : ∀ a' (x : Hdg M.q a' n), ∃ N : ℚ_[l], N ≠ 0 ∧ tgt hC x N ∈ Sp P M n) : Surj P M n := by
+theorem surj_of_core
+    (hC : CupLaws) (P : HTPre l K) (M : Model l K) (n : ℕ)
+    (h : ∀ a' (x : Hdg M.q a' n), ∃ N : ℚ_[l], N ≠ 0 ∧ tgt hC x N ∈ Sp P M n)
+    : Surj P M n := by
   intro m b z hz a' ha'
   funext s0
-  let L : GF M n →ₗ[ℂ_[l]] ℂ_[l] :=
-    { toFun := fun g => ∑ a ∈ Finset.range (n + 1), ∑ s, z a s * g a ((b a).coord s)
-      map_add' := by
-        intro f g
-        simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
-      map_smul' := by
-        intro c f
-        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun s _ => ?_
-        ring }
+  let L : GF M n →ₗ[ℂ_[l]] ℂ_[l] := {
+    toFun := fun g => ∑ a ∈ Finset.range (n + 1), ∑ s, z a s * g a ((b a).coord s)
+    map_add' := by
+      intro f g
+      simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
+    map_smul' := by
+      intro c f
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun s _ => ?_
+      ring
+  }
   have hL : Sp P M n ≤ LinearMap.ker L := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨v, rfl⟩

@@ -11,8 +11,8 @@ open Finset MvPolynomial
 
 namespace UpperTheory.Gal.Schur
 
-private def latt {O K ι : Type} [CommRing O] [Field K] (τ : ι → (O →+* K)) (N : O) (k : ℕ) :
-    AddSubgroup (ι × Fin k → K) where
+private def latt {O K ι : Type} [CommRing O] [Field K] (τ : ι → (O →+* K)) (N : O) (k : ℕ)
+    : AddSubgroup (ι × Fin k → K) where
   carrier := {x | ∃ β : Fin k → O, x = pt τ (fun s => N * β s)}
   add_mem' := by
     rintro _ _ ⟨β, rfl⟩ ⟨β', rfl⟩
@@ -31,7 +31,8 @@ private def latt {O K ι : Type} [CommRing O] [Field K] (τ : ι → (O →+* K)
 
 theorem denseCoset_of : DenseSub → SpanTop → DenseOff → DenseCoset := by
   intro hS hT hO O K ι _ _ _ _ τ hτ N hN k a Q hQ
-  have hspan : Submodule.span K ((latt τ N k : AddSubgroup (ι × Fin k → K)) : Set (ι × Fin k → K)) = ⊤ :=
+  have hspan
+      : Submodule.span K ((latt τ N k : AddSubgroup (ι × Fin k → K)) : Set (ι × Fin k → K)) = ⊤ :=
     hT O K ι τ hτ N hN k
   have hd := hS K (ι × Fin k) (latt τ N k) (pt τ a) hspan
   have hd2 := hO K (ι × Fin k) _ hd Q hQ

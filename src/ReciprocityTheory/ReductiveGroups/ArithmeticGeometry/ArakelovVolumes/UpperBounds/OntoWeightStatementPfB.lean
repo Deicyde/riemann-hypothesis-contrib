@@ -9,18 +9,20 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.OW
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Filter
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Filter
 open scoped ContDiff ENNReal
 
 noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {X : Data E r}
 
-theorem sumP_contOn {N : ℕ} (L : Wt X.Ψ r) (P : Fin N → Frame X.Ψ r → ℂ)
-    (hP : ∀ k, ContinuousOn (P k) X.dom) :
-    ContinuousOn (fun x => ∑ k, X.pnorm L (P k) x ^ 2) X.dom := by
+theorem sumP_contOn
+    {N : ℕ} (L : Wt X.Ψ r) (P : Fin N → Frame X.Ψ r → ℂ) (hP : ∀ k, ContinuousOn (P k) X.dom)
+    : ContinuousOn (fun x => ∑ k, X.pnorm L (P k) x ^ 2) X.dom := by
   have hphl := IW.phla_contOn X L
-  have hc : ContinuousOn (fun x => (∑ k, Complex.normSq (P k x)) * Real.exp (-phla X L x)) X.dom :=
+  have hc : ContinuousOn (fun x => (∑ k, Complex.normSq (P k x)) * Real.exp (- phla X L x)) X.dom :=
     (continuousOn_finsetSum _ fun k _ => Complex.continuous_normSq.comp_continuousOn (hP k)).mul
       (Real.continuous_exp.comp_continuousOn hphl.neg)
   exact hc.congr fun x hx => sum_pnorm_sq X L P hx
@@ -35,31 +37,38 @@ theorem WSk_meas (Xa : ArchInM X) (Fl : FlatM X Xa) : Measurable (WSk X Xa Fl) :
   have hSw0 : ∀ x ∈ X.dom, ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 ≠ 0 := fun x hx => by
     rw [sum_pnorm_sq X _ _ hx]
     exact (mul_pos (sumw_pos Xa hx) (Real.exp_pos _)).ne'
-  have h1 : Measurable (X.dom.piecewise
-      (fun x => ENNReal.ofReal (Real.exp (-phla X (Xa.Fp + Xa.T • Xa.L) x))) 0) :=
+  have h1 : Measurable
+      (X.dom.piecewise (fun x => ENNReal.ofReal (Real.exp (- phla X (Xa.Fp + Xa.T • Xa.L) x))) 0) :=
     ContinuousOn.measurable_piecewise
-      (ENNReal.continuous_ofReal.comp_continuousOn
-        (Real.continuous_exp.comp_continuousOn (IW.phla_contOn X _).neg))
+      (ENNReal.continuous_ofReal.comp_continuousOn (Real.continuous_exp.comp_continuousOn
+        (IW.phla_contOn X _).neg))
       continuousOn_const hdo.measurableSet
   have h2 : Measurable (X.dom.piecewise
-      (fun x => ENNReal.ofReal (∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-(Xa.T : ℝ))) 0) :=
+      (fun x => ENNReal.ofReal (∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-(Xa.T : ℝ)))
+      0) :=
     ContinuousOn.measurable_piecewise
       ((ENNReal.continuous_rpow_const.comp ENNReal.continuous_ofReal).comp_continuousOn hSw)
       continuousOn_const hdo.measurableSet
   have h3 : Measurable (X.dom.piecewise
-      (fun x => ENNReal.ofReal ((∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2) /
-        ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-((Xa.T : ℝ) - 1 / 2))) 0) :=
+      (fun x =>
+        ENNReal.ofReal ((∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2) / ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2)
+          ^ (-((Xa.T : ℝ) - 1 / 2)))
+      0) :=
     ContinuousOn.measurable_piecewise
       ((ENNReal.continuous_rpow_const.comp ENNReal.continuous_ofReal).comp_continuousOn
         (hSs.div hSw hSw0))
       continuousOn_const hdo.measurableSet
-  have key : WSk X Xa Fl = X.dom.piecewise
-      (fun x => ENNReal.ofReal (Real.exp (-phla X (Xa.Fp + Xa.T • Xa.L) x))) 0 *
-      X.dom.piecewise
-        (fun x => ENNReal.ofReal (∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-(Xa.T : ℝ))) 0 *
-      X.dom.piecewise
-        (fun x => ENNReal.ofReal ((∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2) /
-          ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-((Xa.T : ℝ) - 1 / 2))) 0 := by
+  have key
+      : WSk X Xa Fl
+        = X.dom.piecewise (fun x => ENNReal.ofReal (Real.exp (- phla X (Xa.Fp + Xa.T • Xa.L) x))) 0
+          * X.dom.piecewise
+            (fun x => ENNReal.ofReal (∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2) ^ (-(Xa.T : ℝ)))
+            0
+          * X.dom.piecewise
+            (fun x =>
+              ENNReal.ofReal ((∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2) / ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2)
+                ^ (-((Xa.T : ℝ) - 1 / 2)))
+            0 := by
     funext x
     by_cases hx : x ∈ X.dom
     · simp only [WSk, if_pos hx, Pi.mul_apply, Set.piecewise_eq_of_mem _ _ _ hx]
@@ -68,18 +77,23 @@ theorem WSk_meas (Xa : ArchInM X) (Fl : FlatM X Xa) : Measurable (WSk X Xa Fl) :
   rw [key]
   exact (h1.mul h2).mul h3
 
-theorem pnorm_lact (L : Wt X.Ψ r) {P : Frame X.Ψ r → ℂ} (hP : X.IsSec L P) {γ : GL (Fin r) E}
-    (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r} (hx : x ∈ X.dom) : X.pnorm L P (lact γ x) = X.pnorm L P x := by
+theorem pnorm_lact
+    (L : Wt X.Ψ r)
+    {P : Frame X.Ψ r → ℂ} (hP : X.IsSec L P)
+    {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : X.pnorm L P (lact γ x) = X.pnorm L P x := by
   rw [pnorm_eq X, pnorm_eq X, hP.2.2 γ hγ x hx, norm_mul, OntoE.chi_norm X L hγ, one_mul,
     normFactor_leftAction_holds r X L γ hγ x hx]
 
-theorem phla_lact (la : Wt X.Ψ r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r} (hx : x ∈ X.dom) :
-    phla X la (lact γ x) = phla X la x := by
+theorem phla_lact
+    (la : Wt X.Ψ r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : phla X la (lact γ x) = phla X la x := by
   unfold phla
   rw [normFactor_leftAction_holds r X la γ hγ x hx]
 
-theorem WSk_metric (Xa : ArchInM X) (Fl : FlatM X Xa) :
-    IsMetricW X (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) := by
+theorem WSk_metric (Xa : ArchInM X) (Fl : FlatM X Xa)
+    : IsMetricW X (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) := by
   have hwS : ∀ k, X.IsSec Xa.L (Xa.w k) := fun k => (Xa.w_van k).1.1.1
   have hsS : ∀ k, X.IsSec Xa.L (Fl.s k) := fun k => (Fl.s_van k).1.1.1
   refine ⟨WSk_meas Xa Fl, fun x hx b hb => ?_, fun γ hγ x hx => ?_⟩
@@ -108,7 +122,9 @@ end ReciprocityTheory.ChartRestriction.G.AR.Up.OW
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.OW
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Filter
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Filter
 open scoped ContDiff ENNReal
 
 noncomputable section
@@ -117,14 +133,16 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {X : Data 
 
 theorem nfac_nonneg (la : Wt X.Ψ r) (x : Frame X.Ψ r) : 0 ≤ X.nfac la x := by
   unfold Data.nfac
-  exact Finset.prod_nonneg fun τ _ => Finset.prod_nonneg fun i _ => Real.rpow_nonneg (norm_nonneg _) _
+  exact Finset.prod_nonneg fun τ _ =>
+    Finset.prod_nonneg fun i _ => Real.rpow_nonneg (norm_nonneg _) _
 
-theorem pnorm_nonneg (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (x : Frame X.Ψ r) : 0 ≤ X.pnorm la P x := by
+theorem pnorm_nonneg (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (x : Frame X.Ψ r)
+    : 0 ≤ X.pnorm la P x := by
   rw [pnorm_eq X]
   exact mul_nonneg (norm_nonneg _) (nfac_nonneg la x)
 
-theorem WSk_lower (Xa : ArchInM X) (Fl : FlatM X Xa) :
-    WLower X (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) := by
+theorem WSk_lower (Xa : ArchInM X) (Fl : FlatM X Xa)
+    : WLower X (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) := by
   have hT1 : (1 : ℝ) ≤ Xa.T := by
     have h1 := Xa.T_ge
     have h2 := Xa.n_ge
@@ -140,19 +158,18 @@ theorem WSk_lower (Xa : ArchInM X) (Fl : FlatM X Xa) :
   refine ⟨Mw ^ (-(1 / 2 : ℝ)) * (Ms ^ u)⁻¹, by positivity, fun x hx => ?_⟩
   have hSwM : ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 ≤ Mw := by
     have : ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 ≤ ∑ k, max (Cw k) 0 ^ 2 :=
-      Finset.sum_le_sum fun k _ => pow_le_pow_left₀ (pnorm_nonneg _ _ _)
-        ((hCw k x hx).trans (le_max_left _ _)) 2
+      Finset.sum_le_sum fun k _ =>
+        pow_le_pow_left₀ (pnorm_nonneg _ _ _) ((hCw k x hx).trans (le_max_left _ _)) 2
     linarith
   have hSsM : ∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2 ≤ Ms := by
     have : ∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2 ≤ ∑ k, max (Cs k) 0 ^ 2 :=
-      Finset.sum_le_sum fun k _ => pow_le_pow_left₀ (pnorm_nonneg _ _ _)
-        ((hCs k x hx).trans (le_max_left _ _)) 2
+      Finset.sum_le_sum fun k _ =>
+        pow_le_pow_left₀ (pnorm_nonneg _ _ _) ((hCs k x hx).trans (le_max_left _ _)) 2
     linarith
   have hSw : 0 < ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 := by
     rw [sum_pnorm_sq X _ _ hx]
     exact mul_pos (sumw_pos Xa hx) (Real.exp_pos _)
-  have hSs0 : 0 ≤ ∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2 :=
-    Finset.sum_nonneg fun k _ => sq_nonneg _
+  have hSs0 : 0 ≤ ∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2 := Finset.sum_nonneg fun k _ => sq_nonneg _
   set Sw := ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 with hSwd
   set Ss := ∑ k, X.pnorm Xa.L (Fl.s k) x ^ 2 with hSsd
   set e := Real.exp (-phla X (Xa.Fp + Xa.T • Xa.L) x) with he
@@ -183,8 +200,9 @@ theorem WSk_lower (Xa : ArchInM X) (Fl : FlatM X Xa) :
       inv_anti₀ (Real.rpow_pos_of_pos hS _) (Real.rpow_le_rpow hS.le hSsM hu0.le)
     have hC : Mw ^ (-(1 / 2 : ℝ)) * (Ms ^ u)⁻¹ ≤ Sw ^ (-(1 / 2 : ℝ)) * (Ss ^ u)⁻¹ :=
       mul_le_mul hA hB (by positivity) (by positivity)
-    calc Mw ^ (-(1 / 2 : ℝ)) * (Ms ^ u)⁻¹ * e ≤ Sw ^ (-(1 / 2 : ℝ)) * (Ss ^ u)⁻¹ * e :=
-          mul_le_mul_of_nonneg_right hC he0.le
+    calc
+      Mw ^ (-(1 / 2 : ℝ)) * (Ms ^ u)⁻¹ * e
+        ≤ Sw ^ (-(1 / 2 : ℝ)) * (Ss ^ u)⁻¹ * e := mul_le_mul_of_nonneg_right hC he0.le
       _ = e * Sw ^ (-(Xa.T : ℝ)) * (Ss / Sw) ^ (-u) := by rw [mul_assoc e, eq]; ring
 
 end

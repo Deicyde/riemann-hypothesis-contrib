@@ -13,19 +13,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContD
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-theorem GlobalTheory.Core.Mi.multT_eq_zero_of_evS_ae : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D) (S : D.what₂.Tau → SPar) (M : DSModel (D.sp.Y 0) S) (J : Set (GA D (D.sp.Y 0))) (χ : GA D (D.sp.Y 0) → ℂ) (t : GA D (D.sp.Y 0)) (v₀ : M.Vec), IsInfFam θ → (∀ τ, (v₀ τ : M.H τ) ≠ 0) → ∀ T ∈ MultT θ M J χ, evS X h t (T (PiTensorProduct.tprod ℂ v₀)) =ᵐ[muX X] 0 → T = 0 := by
+theorem GlobalTheory.Core.Mi.multT_eq_zero_of_evS_ae
+    : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D) (S : D.what₂.Tau → SPar)
+        (M : DSModel (D.sp.Y 0) S) (J : Set (GA D (D.sp.Y 0))) (χ : GA D (D.sp.Y 0) → ℂ)
+        (t : GA D (D.sp.Y 0)) (v₀ : M.Vec),
+      IsInfFam θ → (∀ τ, (v₀ τ : M.H τ) ≠ 0)
+        → ∀ T ∈ MultT θ M J χ, evS X h t (T (PiTensorProduct.tprod ℂ v₀)) =ᵐ[muX X] 0 → T = 0 := by
   intro D X h θ S M J χ t v₀ _ hv₀ T hTm hae
   let T' : MMap M := PiTensorProduct.lift.symm T
   have hT'm : T' ∈ Mult θ M J χ := (mem_multT θ M J χ T).1 hTm
   have hT := (GlobalTheory.MultMem.mem_mult_iff D θ _ _ M J χ T').1 hT'm
-  have hval : T' v₀ = T (PiTensorProduct.tprod ℂ v₀) := by
-    simp [T', PiTensorProduct.lift_symm]
+  have hval : T' v₀ = T (PiTensorProduct.tprod ℂ v₀) := by simp [T', PiTensorProduct.lift_symm]
   have hf := (hT.aut v₀).cont
   have hleft := (hT.aut v₀).left
   let ι : GA D (D.sp.Y 0) ≃ₜ* X.B.I.GA := iotaX X h
@@ -50,8 +62,10 @@ theorem GlobalTheory.Core.Mi.multT_eq_zero_of_evS_ae : ∀ (D : D7) (X : Formali
   have hae' : φ =ᵐ[(X.B.I.muA X.B.μf).restrict X.B.fund] 0 := by
     have e : φ = evS X h t (T (PiTensorProduct.tprod ℂ v₀)) := by
       funext x; simp only [φ, evS, hval]; rfl
-    rw [e]; exact hae
-  have hz := GlobalTheory.TranslatedEvalInj.eq_zero_of_ae_fund X.B.I X.B.μf X.B.fund_spec hφc hφi hae'
+    rw [e]
+    exact hae
+  have hz :=
+    GlobalTheory.TranslatedEvalInj.eq_zero_of_ae_fund X.B.I X.B.μf X.B.fund_spec hφc hφi hae'
   have hv : T' v₀ = 0 := by
     funext g
     have e := hz (ι (g * t⁻¹))

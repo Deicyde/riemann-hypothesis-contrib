@@ -10,16 +10,19 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem norm_coeff_minpoly_le_one_of_norm_le_one (K : Type) [NontriviallyNormedField K]
-    [IsUltrametricDist K] [CompleteSpace K] (L : Type) [Field L] [Algebra K L]
-    [FiniteDimensional K L] (x : L) (h : ‖Algebra.norm K x‖ ≤ 1) (n : ℕ) :
-    ‖(minpoly K x).coeff n‖ ≤ 1 := by
+theorem norm_coeff_minpoly_le_one_of_norm_le_one
+    (K : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+    (L : Type) [Field L] [Algebra K L] [FiniteDimensional K L]
+    (x : L) (h : ‖Algebra.norm K x‖ ≤ 1)
+    (n : ℕ)
+    : ‖(minpoly K x).coeff n‖ ≤ 1 := by
   have hx : IsIntegral K x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖(minpoly K x).coeff 0‖ ≤ 1 := by
     rw [Algebra.norm_eq_norm_adjoin K x, ← IntermediateField.adjoin.powerBasis_gen hx,
-      Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly, IntermediateField.adjoin.powerBasis_gen hx,
-      IntermediateField.minpoly_gen, norm_pow, norm_mul, norm_pow, norm_neg, norm_one, one_pow,
-      one_mul] at h
+        Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly,
+        IntermediateField.adjoin.powerBasis_gen hx, IntermediateField.minpoly_gen, norm_pow,
+        norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul]
+      at h
     exact (pow_le_one_iff_of_nonneg (norm_nonneg _) (Module.finrank_pos).ne').1 h
   have h1 : spectralNorm K L x ≤ 1 := by
     rw [spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow K L x]
@@ -27,12 +30,14 @@ theorem norm_coeff_minpoly_le_one_of_norm_le_one (K : Type) [NontriviallyNormedF
   rw [spectralNorm, spectralValue_le_one_iff (minpoly.monic hx)] at h1
   exact h1 n
 
-theorem isIntegral_iff_valued_norm_le_one (F : Type) [Field F] [NumberField F]
+theorem isIntegral_iff_valued_norm_le_one
+    (F : Type) [Field F] [NumberField F]
     (v : HeightOneSpectrum (𝓞 F)) (L : Type) [Field L] [Algebra (v.adicCompletion F) L]
     [FiniteDimensional (v.adicCompletion F) L] [Algebra (v.adicCompletionIntegers F) L]
-    [IsScalarTower (v.adicCompletionIntegers F) (v.adicCompletion F) L] (x : L) :
-    IsIntegral (v.adicCompletionIntegers F) x ↔
-      Valued.v (Algebra.norm (v.adicCompletion F) x) ≤ 1 := by
+    [IsScalarTower (v.adicCompletionIntegers F) (v.adicCompletion F) L]
+    (x : L)
+    : IsIntegral (v.adicCompletionIntegers F) x
+      ↔ Valued.v (Algebra.norm (v.adicCompletion F) x) ≤ 1 := by
   constructor
   · intro h
     have h1 : IsIntegral (v.adicCompletionIntegers F) (Algebra.norm (v.adicCompletion F) x) :=
@@ -47,12 +52,12 @@ theorem isIntegral_iff_valued_norm_le_one (F : Type) [Field F] [NumberField F]
       inferInstanceAs (@IsUltrametricDist (v.adicCompletion F)
         (Valued.toNormedField (v.adicCompletion F) ℤᵐ⁰).toDist)
     have hc : ∀ n, Valued.v ((minpoly (v.adicCompletion F) x).coeff n) ≤ 1 := fun n =>
-      Valued.toNormedField.norm_le_one_iff.1
-        (norm_coeff_minpoly_le_one_of_norm_le_one (v.adicCompletion F) L x
-          (Valued.toNormedField.norm_le_one_iff.2 h) n)
+      Valued.toNormedField.norm_le_one_iff.1 (norm_coeff_minpoly_le_one_of_norm_le_one
+        (v.adicCompletion F) L x (Valued.toNormedField.norm_le_one_iff.2 h) n)
     have hx : IsIntegral (v.adicCompletion F) x := Algebra.IsIntegral.isIntegral x
-    have hl : minpoly (v.adicCompletion F) x ∈
-        Polynomial.lifts (algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F)) := by
+    have hl
+        : minpoly (v.adicCompletion F) x
+          ∈ Polynomial.lifts (algebraMap (v.adicCompletionIntegers F) (v.adicCompletion F)) := by
       rw [Polynomial.lifts_iff_coeff_lifts]
       intro n
       exact ⟨⟨_, hc n⟩, rfl⟩

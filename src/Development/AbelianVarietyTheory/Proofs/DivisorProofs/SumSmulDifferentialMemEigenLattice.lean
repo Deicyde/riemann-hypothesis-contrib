@@ -9,20 +9,29 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Integra
 open NumberField
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CM GlobalTheory.CM.IntCoord
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CM GlobalTheory.CM.IntCoord
 
 set_option autoImplicit false
 
 namespace GlobalTheory.FlatCM.HomLat
 
-theorem sum_smul_diff_mem_eigLat : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E),
-    GlobalTheory.IndefiniteRowSideFullHecke.EigenvectorLieDegree.IsHostField H → ∀ (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (p : ℕ)
-    (X : GlobalTheory.CM.CMObj H K ρ σ₁ p 0), ∀ (FP : GlobalTheory.CM.GenFib (X.A true).pol) (FB : GlobalTheory.CM.GenFib X.B.pol)
-        (MP : Fin p → ((Fin FP.P₀.g → K) →ₗ[K] (Fin FB.P₀.g → K))),
-        (∀ a, FP.IsDiffOf FB (GlobalTheory.FlatCM.phiP X a) (MP a)) →
-        ∀ τ : 𝓞 E →+* 𝓞 K, τ H.rt = ρ → ∀ τE : E →+* K, (∀ x : 𝓞 E, τE x = ((τ x : 𝓞 K) : K)) →
-          ∀ c ∈ GlobalTheory.FlatCM.HomLat.coords X, ∀ e ∈ FP.eigLat (X.A true).t.act τ,
-            ∑ a, τE (c a) • MP a e ∈ FB.eigLat X.B.t.act τ := by
+theorem sum_smul_diff_mem_eigLat
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E),
+      GlobalTheory.IndefiniteRowSideFullHecke.EigenvectorLieDegree.IsHostField H
+        → ∀ (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (p : ℕ)
+            (X : GlobalTheory.CM.CMObj H K ρ σ₁ p 0),
+          ∀ (FP : GlobalTheory.CM.GenFib (X.A true).pol) (FB : GlobalTheory.CM.GenFib X.B.pol)
+              (MP : Fin p → ((Fin FP.P₀.g → K) →ₗ[K] (Fin FB.P₀.g → K))),
+            (∀ a, FP.IsDiffOf FB (GlobalTheory.FlatCM.phiP X a) (MP a))
+              → ∀ τ : 𝓞 E →+* 𝓞 K,
+                τ H.rt = ρ
+                  → ∀ τE : E →+* K,
+                    (∀ x : 𝓞 E, τE x = ((τ x : 𝓞 K) : K))
+                      → ∀ c ∈ GlobalTheory.FlatCM.HomLat.coords X,
+                        ∀ e ∈ FP.eigLat (X.A true).t.act τ,
+                          ∑ a, τE (c a) • MP a e ∈ FB.eigLat X.B.t.act τ := by
   intro E _ _ _ H _ K _ _ ρ σ₁ p X FP FB MP hMP τ _ τE hτE c hc e he
   obtain ⟨n, hn, x, hx, f, hf, hfn⟩ := hc
   have hcA := integral_tangent_coordinates K _ FP
@@ -38,8 +47,10 @@ theorem sum_smul_diff_mem_eigLat : ∀ (E : Type) [Field E] [NumberField E] [IsC
     intro a
     rw [← Category.assoc]
     exact hMP a _ _ (isCoord_smul FP hu (heig (x a)))
-  have hprod : ∀ s : Finset (Fin p), FB.IsCoord (u ≫ ∏ a ∈ s, ((X.A true).t.act.act (x a) ≫ phiP X a))
-      (∑ a ∈ s, MP a (τ (x a) • e)) := by
+  have hprod
+      : ∀ s : Finset (Fin p),
+        FB.IsCoord (u ≫ ∏ a ∈ s, ((X.A true).t.act.act (x a) ≫ phiP X a))
+          (∑ a ∈ s, MP a (τ (x a) • e)) := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -73,7 +84,7 @@ theorem sum_smul_diff_mem_eigLat : ∀ (E : Type) [Field E] [NumberField E] [IsC
     rw [← hτE, hx a, map_mul, map_natCast]
   rw [← hdval]
   refine (hcB.2.2.2.2.2 _ _ τ _).2 ⟨u ≫ f, hd, fun s => ?_⟩
-  rw [isLieComb_one_iff, Category.assoc, ← hf.comm s, ← Category.assoc, (isLieComb_one_iff _ _ _).1 (heig s),
-    Category.assoc]
+  rw [isLieComb_one_iff, Category.assoc, ← hf.comm s, ← Category.assoc,
+    (isLieComb_one_iff _ _ _).1 (heig s), Category.assoc]
 
 end GlobalTheory.FlatCM.HomLat

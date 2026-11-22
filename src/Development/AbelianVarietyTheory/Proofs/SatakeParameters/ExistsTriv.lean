@@ -25,25 +25,33 @@ open Formalism.L2.Pj GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongr
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
 
-theorem exists_triv (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)) {n : ℕ} (hn : 0 < n)
-    (Λ : GenLat E N) (hU : Λ.Unimod) :
-    ∃ γ : Matrix (Fin N) (Fin N) E, IsUnitaryM γ ∧ ∃ k : ℕ, Nat.Coprime k n ∧
-      (∀ v ∈ Λ.La, k • (γ *ᵥ v) ∈ Formalism.L2.Pj.stdLat E N) ∧
-      ∀ x ∈ Formalism.L2.Pj.stdLat E N, ∃ v ∈ Λ.La, γ *ᵥ v = k • x := by
+theorem exists_triv
+    (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E))
+    {n : ℕ} (hn : 0 < n)
+    (Λ : GenLat E N) (hU : Λ.Unimod)
+    : ∃ γ : Matrix (Fin N) (Fin N) E,
+      IsUnitaryM γ
+        ∧ ∃ k : ℕ,
+          Nat.Coprime k n ∧ (∀ v ∈ Λ.La, k • (γ *ᵥ v) ∈ Formalism.L2.Pj.stdLat E N)
+            ∧ ∀ x ∈ Formalism.L2.Pj.stdLat E N, ∃ v ∈ Λ.La, γ *ᵥ v = k • x := by
   have hsub : ∀ a b : 𝓞 E ⧸ Ideal.span {((1 : ℕ) : 𝓞 E)}, a = b := fun a b => by
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b
     exact Ideal.Quotient.eq.2 (Ideal.mem_span_singleton'.2 ⟨a - b, by simp⟩)
   have hiso : IsIsomMod Λ 1 0 := by
-    refine ⟨fun y => ⟨0, funext fun j => hsub _ _⟩, fun v => ⟨fun _ => ⟨v, v.2, by simp⟩, fun _ => rfl⟩,
-      fun v w x y _ _ => ?_⟩
+    refine ⟨
+      fun y => ⟨0, funext fun j => hsub _ _⟩,
+      fun v => ⟨fun _ => ⟨v, v.2, by simp⟩, fun _ => rfl⟩,
+      fun v w x y _ _ => ?_
+    ⟩
     obtain ⟨a, ha⟩ := (hU w).1 w.2 v v.2
     refine ⟨a - ∑ j, x j * IsCMField.ringOfIntegersComplexConj E (y j), ?_⟩
     have e1 : ∑ j, (v : Fin N → E) j * IsCMField.complexConj E ((w : Fin N → E) j) = (a : E) := by
       refine Eq.trans ?_ ha.symm
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-    have e2 : ∑ j, (x j : E) * IsCMField.complexConj E (y j : E) =
-        ((∑ j, x j * IsCMField.ringOfIntegersComplexConj E (y j) : 𝓞 E) : E) := by
+    have e2
+        : ∑ j, (x j : E) * IsCMField.complexConj E (y j : E)
+          = ((∑ j, x j * IsCMField.ringOfIntegersComplexConj E (y j) : 𝓞 E) : E) := by
       change _ = algebraMap (𝓞 E) E _
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -63,29 +71,42 @@ theorem repExS (D : D7) : GL3Theta.repExS D := by
   intro n hn N L L₀
   have hur := Formalism.L2.Pj.unramBridge D.host.E (Formalism.L2.Pj.cmUnram_conj D)
   have hst : ∀ x : D.host.E, star x = IsCMField.complexConj D.host.E x := fun _ => rfl
-  have hU : ∀ M : SDLat D.host.E N, (⟨M.1⟩ : Formalism.L2.Pj.GenLat D.host.E N).Unimod := fun M v => by
+  have hU
+      : ∀ M : SDLat D.host.E N, (⟨M.1⟩ : Formalism.L2.Pj.GenLat D.host.E N).Unimod := fun M v => by
     refine (M.2.2.2 v).trans (forall₂_congr fun w _ => ?_)
-    have e : ∀ x y : Fin N → D.host.E, IsCMField.complexConj D.host.E (stdH D.host.E N x y) =
-        stdH D.host.E N y x := fun x y => by
+    have e
+        : ∀ x y : Fin N → D.host.E,
+          IsCMField.complexConj D.host.E (stdH D.host.E N x y)
+            = stdH D.host.E N y x := fun x y => by
       rw [← hst]
       simp [stdH, mul_comm]
-    have c : ∀ x y : Fin N → D.host.E, stdH D.host.E N x y ∈ (algebraMap (𝓞 D.host.E) D.host.E).range →
-        stdH D.host.E N y x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
+    have c
+        : ∀ x y : Fin N → D.host.E,
+          stdH D.host.E N x y ∈ (algebraMap (𝓞 D.host.E) D.host.E).range
+            → stdH D.host.E N y x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
       rintro x y ⟨a, ha⟩
       refine ⟨IsCMField.ringOfIntegersComplexConj D.host.E a, ?_⟩
       rw [← e, ← ha]
       exact IsCMField.coe_ringOfIntegersComplexConj D.host.E a
     exact ⟨c w v, c v w⟩
-  have hun : ∀ γ : Matrix (Fin N) (Fin N) D.host.E, GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence.IsUnitaryM γ →
-      γ ∈ Matrix.unitaryGroup (Fin N) D.host.E := fun γ h => Matrix.mem_unitaryGroup_iff'.2 h
+  have hun
+      : ∀ γ : Matrix (Fin N) (Fin N) D.host.E,
+        GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence.IsUnitaryM γ
+          → γ ∈ Matrix.unitaryGroup (Fin N) D.host.E := fun γ h =>
+    Matrix.mem_unitaryGroup_iff'.2 h
   obtain ⟨γ, hγ, k, hk, h1, h2⟩ := exists_triv hur hn _ (hU L)
   obtain ⟨δ, hδ, l, hl, h3, h4⟩ := exists_triv hur hn _ (hU L₀)
   have hδ1 : star δ * δ = 1 := Matrix.mem_unitaryGroup_iff'.1 (hun δ hδ)
   have hγ1 : star γ * γ = 1 := Matrix.mem_unitaryGroup_iff'.1 (hun γ hγ)
   have hinv : ∀ v, star δ *ᵥ (δ *ᵥ v) = v := fun v => by
     rw [Matrix.mulVec_mulVec, hδ1, Matrix.one_mulVec]
-  refine ⟨⟨star δ * γ, mul_mem (Unitary.star_mem (hun δ hδ)) (hun γ hγ)⟩, k * l,
-    Nat.Coprime.mul_left hk hl, ?_, fun x hx => ?_⟩
+  refine ⟨
+    ⟨star δ * γ, mul_mem (Unitary.star_mem (hun δ hδ)) (hun γ hγ)⟩,
+    k * l,
+    Nat.Coprime.mul_left hk hl,
+    ?_,
+    fun x hx => ?_
+  ⟩
   · rintro _ ⟨v, hv, rfl⟩
     obtain ⟨u, hu, e⟩ := h4 _ (h1 v hv)
     have : ((k * l : ℕ) : D.host.E) • ((star δ * γ) *ᵥ v) = u := by

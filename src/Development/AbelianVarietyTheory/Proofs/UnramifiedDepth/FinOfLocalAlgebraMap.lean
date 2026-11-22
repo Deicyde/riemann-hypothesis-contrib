@@ -10,7 +10,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -43,8 +45,7 @@ lemma finOf_local_algebraMap {O Q : Type} [CommRing O] [CommRing Q] [IsLocalRing
 
 variable {R₀ : Type} [CommRing R₀]
 
-def finOf_fst (C : Type) [Field C] [Algebra R₀ C] :
-    LHom (R₀ := R₀) ⟨DualNumber C⟩ ⟨C⟩ :=
+def finOf_fst (C : Type) [Field C] [Algebra R₀ C] : LHom (R₀ := R₀) ⟨DualNumber C⟩ ⟨C⟩ :=
   ⟨TrivSqZeroExt.fstHom R₀ C C, ⟨fun a h => TrivSqZeroExt.isUnit_iff_isUnit_fst.2 h⟩⟩
 
 lemma finOf_fst_sqZero (C : Type) [Field C] [Algebra R₀ C] : (finOf_fst (R₀ := R₀) C).SqZero := by
@@ -104,11 +105,11 @@ lemma finOf_free {O A : Type} [CommRing O] [IsLocalRing O] [CommRing A] [Algebra
 
 section Split
 
-variable (O : LAlg R₀) {A : Type} [CommRing A] [Algebra (O : Type) A] [Algebra R₀ A]
-  [IsScalarTower R₀ (O : Type) A]
+variable
+  (O : LAlg R₀)
+  {A : Type} [CommRing A] [Algebra (O : Type) A] [Algebra R₀ A] [IsScalarTower R₀ (O : Type) A]
 
-def finOf_sO [Module.Finite (O : Type) A] (I : Ideal A) [IsLocalRing (A ⧸ I)] :
-    LHom O ⟨A ⧸ I⟩ :=
+def finOf_sO [Module.Finite (O : Type) A] (I : Ideal A) [IsLocalRing (A ⧸ I)] : LHom O ⟨A ⧸ I⟩ :=
   ⟨IsScalarTower.toAlgHom R₀ (O : Type) (A ⧸ I), finOf_local_algebraMap (O := O) (Q := A ⧸ I)⟩
 
 lemma finOf_algOf [Module.Finite (O : Type) A] (I : Ideal A) [IsLocalRing (A ⧸ I)] :
@@ -237,24 +238,39 @@ lemma finOf_unram (B : BX R₀) (p : ℕ) (hp : p ≠ 0)
 
 end Split
 
-theorem main :
-  (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G] (O : LAlg R₀) (p : ℕ), IsFinite ((𝟙 G) ^ p : G ⟶ G).left → Flat ((𝟙 G) ^ p : G ⟶ G).left → Smooth G.hom →
-    ∃ (A : Type) (_ : CommRing A) (_ : Algebra (O : Type) A) (_ : Algebra R₀ A) (_ : IsScalarTower R₀ (O : Type) A),
-      Module.Free (O : Type) A ∧ Module.Finite (O : Type) A ∧ ∃ y : sp (R₀ := R₀) A ⟶ G, y ^ p = 1 ∧
-      ∀ (S : Type) [CommRing S] [Algebra (O : Type) S] [Algebra R₀ S] [IsScalarTower R₀ (O : Type) S] (z : sp (R₀ := R₀) S ⟶ G), z ^ p = 1 →
-        ∃! φ : A →ₐ[(O : Type)] S, spMap (φ.restrictScalars R₀) ≫ y = z) →
-  (∀ (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Module.Finite O A] [Finite (A →ₐ[O] O)],
-    (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0) →
-    ∃ (n : ℕ) (ε : Fin n → A), CompleteOrthogonalIdempotents ε ∧ ∀ i, IsLocalRing (A ⧸ Ideal.span {1 - ε i})) →
-  (∀ (C O A : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) [CommRing O] [Algebra O C], v.Integers O →
-    ∀ [CommRing A] [Algebra O A] [Module.Free O A] [Module.Finite O A],
-    (∀ φ φ' : A →ₐ[O] DualNumber C, (∀ a, (φ a).fst = (φ' a).fst) → φ = φ') →
-    Finite (A →ₐ[O] O) ∧ (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0) ∧ Module.finrank O A = Nat.card (A →ₐ[O] O)) →
-  (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G] (O : LAlg R₀) (p : ℕ) (B : BX R₀) (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)), (∀ R, Function.Bijective (e R)) → (∀ R x y, e R (x + y) = e R x * e R y) →
-    (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R), e S (B.map f x) = spMap f.1 ≫ e R x) →
-    IsFinite ((𝟙 G) ^ p : G ⟶ G).left → Flat ((𝟙 G) ^ p : G ⟶ G).left → Smooth G.hom →
-    ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) [Algebra (O : Type) C], v.Integers (O : Type) → p ≠ 0 →
-    Nonempty (FIN B O p)) := by
+theorem main
+    : (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G]
+          (O : LAlg R₀) (p : ℕ),
+        IsFinite ((𝟙 G) ^ p : G ⟶ G).left → Flat ((𝟙 G) ^ p : G ⟶ G).left → Smooth G.hom
+          → ∃ (A : Type) (_ : CommRing A) (_ : Algebra (O : Type) A) (_ : Algebra R₀ A)
+              (_ : IsScalarTower R₀ (O : Type) A),
+            Module.Free (O : Type) A ∧ Module.Finite (O : Type) A
+              ∧ ∃ y : sp (R₀ := R₀) A ⟶ G,
+                y ^ p = 1
+                  ∧ ∀ (S : Type) [CommRing S] [Algebra (O : Type) S] [Algebra R₀ S]
+                      [IsScalarTower R₀ (O : Type) S] (z : sp (R₀ := R₀) S ⟶ G),
+                    z ^ p = 1 → ∃! φ : A →ₐ[(O : Type)] S, spMap (φ.restrictScalars R₀) ≫ y = z)
+      → (∀ (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [Module.Finite O A]
+          [Finite (A →ₐ[O] O)],
+        (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0)
+          → ∃ (n : ℕ) (ε : Fin n → A),
+            CompleteOrthogonalIdempotents ε ∧ ∀ i, IsLocalRing (A ⧸ Ideal.span {1 - ε i}))
+      → (∀ (C O A : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) [CommRing O]
+          [Algebra O C],
+        v.Integers O
+          → ∀ [CommRing A] [Algebra O A] [Module.Free O A] [Module.Finite O A],
+            (∀ φ φ' : A →ₐ[O] DualNumber C, (∀ a, (φ a).fst = (φ' a).fst) → φ = φ')
+              → Finite (A →ₐ[O] O) ∧ (∀ f : A, (∀ φ : A →ₐ[O] O, φ f = 0) → f = 0)
+                ∧ Module.finrank O A = Nat.card (A →ₐ[O] O))
+      → (∀ {R₀ : Type} [CommRing R₀] (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G]
+          [IsCommMonObj G] (O : LAlg R₀) (p : ℕ) (B : BX R₀)
+          (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)),
+        (∀ R, Function.Bijective (e R)) → (∀ R x y, e R (x + y) = e R x * e R y)
+          → (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R), e S (B.map f x) = spMap f.1 ≫ e R x)
+          → IsFinite ((𝟙 G) ^ p : G ⟶ G).left → Flat ((𝟙 G) ^ p : G ⟶ G).left → Smooth G.hom
+          → ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal)
+              [Algebra (O : Type) C],
+            v.Integers (O : Type) → p ≠ 0 → Nonempty (FIN B O p)) := by
   intro REP SPLIT ETA R₀ _ G _ _ O p B e hbij hadd hnat hfin hflat hsm C _ _ _ v _ hv hp
   obtain ⟨A, _, _, _, _, hAfree, hAfin, y, hy, huniv⟩ := REP G O p hfin hflat hsm
   have he0 : ∀ R, e R 0 = 1 := fun R => by
@@ -271,26 +287,33 @@ theorem main :
     (Equiv.ofBijective _ (hbij S)).symm (spMap φ ≫ y)
   have hpt : ∀ S φ, e S (pt S φ) = spMap φ ≫ y := fun S φ =>
     (Equiv.ofBijective _ (hbij S)).apply_symm_apply _
-  have pt_nat : ∀ {S S' : LAlg R₀} (f : LHom S S') (φ : A →ₐ[R₀] S),
-      B.map f (pt S φ) = pt S' (f.1.comp φ) := fun {S S'} f φ => (hbij S').1 (by
-    rw [hnat, hpt, hpt, ← Category.assoc, spMap_comp])
+  have pt_nat
+      : ∀ {S S' : LAlg R₀} (f : LHom S S') (φ : A →ₐ[R₀] S),
+        B.map f (pt S φ) = pt S' (f.1.comp φ) := fun {S S'} f φ =>
+    (hbij S').1 (by rw [hnat, hpt, hpt, ← Category.assoc, spMap_comp])
   have pt_p : ∀ S φ, p • pt S φ = 0 := fun S φ => by
     rw [htor, hpt, ← MonObj.comp_pow, hy, MonObj.comp_one]
-  have pt_univ : ∀ (S : LAlg R₀) (s : O →ₐ[R₀] S) (z : B.G S), p • z = 0 →
-      ∃! φ : A →ₐ[R₀] S, φ.comp (IsScalarTower.toAlgHom R₀ (O : Type) A) = s ∧ pt S φ = z := by
-    intro S s z hz
-    letI : Algebra (O : Type) S := s.toRingHom.toAlgebra
-    haveI : IsScalarTower R₀ (O : Type) S :=
-      IsScalarTower.of_algebraMap_eq fun r => (s.commutes r).symm
-    obtain ⟨φ, hφ, hu⟩ := huniv S (e S z) ((htor S z).1 hz)
-    refine ⟨φ.restrictScalars R₀, ⟨by ext r; exact φ.commutes r, (hbij S).1 (by rw [hpt, hφ])⟩,
-      fun φ' ⟨h1, h2⟩ => ?_⟩
-    have h3 := hu ⟨φ'.toRingHom, fun r => AlgHom.congr_fun h1 r⟩ (by rw [← h2, hpt]; rfl)
-    rw [← h3]; rfl
+  have pt_univ
+      : ∀ (S : LAlg R₀) (s : O →ₐ[R₀] S) (z : B.G S),
+        p • z = 0
+          → ∃! φ : A →ₐ[R₀] S, φ.comp (IsScalarTower.toAlgHom R₀ (O : Type) A) = s ∧ pt S φ = z :=
+    by
+      intro S s z hz
+      letI : Algebra (O : Type) S := s.toRingHom.toAlgebra
+      haveI : IsScalarTower R₀ (O : Type) S :=
+        IsScalarTower.of_algebraMap_eq fun r => (s.commutes r).symm
+      obtain ⟨φ, hφ, hu⟩ := huniv S (e S z) ((htor S z).1 hz)
+      refine ⟨
+        φ.restrictScalars R₀,
+        ⟨by ext r; exact φ.commutes r, (hbij S).1 (by rw [hpt, hφ])⟩,
+        fun φ' ⟨h1, h2⟩ => ?_
+      ⟩
+      have h3 := hu ⟨φ'.toRingHom, fun r => AlgHom.congr_fun h1 r⟩ (by rw [← h2, hpt]; rfl)
+      rw [← h3]
+      rfl
   letI : Algebra R₀ C := ((algebraMap (O : Type) C).comp (algebraMap R₀ (O : Type))).toAlgebra
   haveI : IsScalarTower R₀ (O : Type) C := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  obtain ⟨hfinite, hsep, hrank⟩ := ETA C O A v hv
-    (finOf_unram O B p hp pt pt_nat pt_p pt_univ C)
+  obtain ⟨hfinite, hsep, hrank⟩ := ETA C O A v hv (finOf_unram O B p hp pt pt_nat pt_p pt_univ C)
   obtain ⟨n, ε, hε, hloc⟩ := SPLIT O A hsep
   exact finOf_split O B p pt pt_nat pt_p pt_univ hsep hrank ε hε
 

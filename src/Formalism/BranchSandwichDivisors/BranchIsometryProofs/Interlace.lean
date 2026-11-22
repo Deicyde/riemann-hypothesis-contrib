@@ -12,9 +12,9 @@ namespace Formalism.BranchingDeterminantCap
 theorem interlaceIdentities : InterlaceIdent := by
   intro n lam sg h
   have hsum : ∑ i, lam i = lam 0 + ∑ i : Fin n, lam i.succ := Fin.sum_univ_succ lam
-  have hsum' : ∑ i, lam i = ∑ i : Fin n, lam i.castSucc + lam (Fin.last n) := Fin.sum_univ_castSucc lam
-  have hd0 : d0 lam sg = ∑ i, sg i - ∑ i : Fin n, lam i.succ := by
-    rw [d0, Finset.sum_sub_distrib]
+  have hsum' : ∑ i, lam i = ∑ i : Fin n, lam i.castSucc + lam (Fin.last n) :=
+    Fin.sum_univ_castSucc lam
+  have hd0 : d0 lam sg = ∑ i, sg i - ∑ i : Fin n, lam i.succ := by rw [d0, Finset.sum_sub_distrib]
   have hnn : ∀ i, 0 ≤ sg i - lam i.succ := fun i => by linarith [(h i).2]
   have h3 : 0 ≤ d0 lam sg := Finset.sum_nonneg fun i _ => hnn i
   have hle : ∀ i, sg i - lam i.succ ≤ d0 lam sg := fun i =>
@@ -38,8 +38,10 @@ theorem interlaceIdentities : InterlaceIdent := by
     rw [rset, Finset.mem_Icc] at hmem
     rw [rset, Int.card_Icc]
     have hc : 0 ≤ min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ := by omega
-    have ht : ((min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ).toNat : ℤ) =
-        min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ := Int.toNat_of_nonneg hc
+    have ht
+        : ((min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ).toNat : ℤ)
+          = min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ :=
+      Int.toNat_of_nonneg hc
     have h1 : 1 ≤ (min (lam i.castSucc) (lam i.succ + d0 lam sg) + 1 - lam i.succ).toNat := by omega
     rw [Nat.cast_sub h1, ht]
     push_cast

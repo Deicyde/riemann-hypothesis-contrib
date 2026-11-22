@@ -21,8 +21,7 @@ section Local
 
 variable {n : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem Rd_germ (X : Mat n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0) :
-    Rd X f =ᶠ[𝓝 x] 0 := by
+theorem Rd_germ (X : Mat n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0) : Rd X f =ᶠ[𝓝 x] 0 := by
   filter_upwards [h.eventuallyEq_nhds] with y hy
   simp only [Rd, Pi.zero_apply]
   rw [hy.fderiv_eq]
@@ -31,14 +30,14 @@ theorem Rd_germ (X : Mat n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0)
   rw [this]
   rfl
 
-theorem Eu_germ (s : Bool) (a b : Fin n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0) :
-    Eu s a b f =ᶠ[𝓝 x] 0 := by
+theorem Eu_germ (s : Bool) (a b : Fin n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0)
+    : Eu s a b f =ᶠ[𝓝 x] 0 := by
   filter_upwards [Rd_germ (Matrix.single a b 1) h, Rd_germ (Matrix.single a b Complex.I) h]
     with y h1 h2
   simp only [Eu, Pi.smul_apply, Pi.add_apply, h1, h2, Pi.zero_apply, smul_zero, add_zero]
 
-theorem Epow_germ (s : Bool) (m : ℕ) (a b : Fin n) {f : Mat n → V} {x : Mat n}
-    (h : f =ᶠ[𝓝 x] 0) : Epow s m a b f =ᶠ[𝓝 x] 0 := by
+theorem Epow_germ (s : Bool) (m : ℕ) (a b : Fin n) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0)
+    : Epow s m a b f =ᶠ[𝓝 x] 0 := by
   induction m generalizing a b with
   | zero =>
     by_cases hab : a = b
@@ -50,15 +49,14 @@ theorem Epow_germ (s : Bool) (m : ℕ) (a b : Fin n) {f : Mat n → V} {x : Mat 
     filter_upwards [this] with y hy
     simp [Epow, Finset.sum_apply, hy]
 
-theorem gel_germ (s : Bool) (m : ℕ) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0) :
-    gel s m f =ᶠ[𝓝 x] 0 := by
-  have : ∀ᶠ y in 𝓝 x, ∀ a, Epow s m a a f y = 0 :=
-    eventually_all.2 fun a => Epow_germ s m a a h
+theorem gel_germ (s : Bool) (m : ℕ) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0)
+    : gel s m f =ᶠ[𝓝 x] 0 := by
+  have : ∀ᶠ y in 𝓝 x, ∀ a, Epow s m a a f y = 0 := eventually_all.2 fun a => Epow_germ s m a a h
   filter_upwards [this] with y hy
   simp [gel, Finset.sum_apply, hy]
 
-theorem zOp_germ (w : List (Bool × ℕ)) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0) :
-    zOp w f =ᶠ[𝓝 x] 0 := by
+theorem zOp_germ (w : List (Bool × ℕ)) {f : Mat n → V} {x : Mat n} (h : f =ᶠ[𝓝 x] 0)
+    : zOp w f =ᶠ[𝓝 x] 0 := by
   induction w with
   | nil => simpa [zOp] using h
   | cons p w ih => exact gel_germ p.1 p.2 ih
@@ -89,14 +87,19 @@ theorem lg_one_nonneg (hL : LgFacts) (n : ℕ) : 0 ≤ lg (1 : Mat n) := by
   rw [one_mul] at h
   linarith
 
-theorem ker_support (hL : LgFacts) (hE : WaveEx) (hU : KerUniq) {n : ℕ}
-    [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (E : KMod n)
-    (c₀ : ℝ)
-    (hc : ∀ (E : KMod n) (u : ℝ → Mat n → E.V), IsWave E u → ∀ (t : ℝ), ∀ x ∈ GLs n,
-      (∀ y ∈ GLs n, lg y ≤ c₀ * (1 + |t|) → u 0 (x * y) = 0) → u t x = 0)
-    {w : List (Bool × ℕ)} {g : ℝ → ℝ} {T : ℝ} {k : Mat n → (E.V →L[ℂ] E.V)} (hT : 0 ≤ T)
-    (hg : IsBump g T) (hk : IsKer μ E w g k) {y : Mat n} (hy : y ∈ GLs n)
-    (hlt : (max c₀ 0 + lg (1 : Mat n) + 1) * (1 + T) < lg y) : k y = 0 := by
+theorem ker_support
+    (hL : LgFacts) (hE : WaveEx) (hU : KerUniq)
+    {n : ℕ} [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    (E : KMod n) (c₀ : ℝ)
+    (hc : ∀ (E : KMod n) (u : ℝ → Mat n → E.V),
+      IsWave E u
+        → ∀ (t : ℝ), ∀ x ∈ GLs n,
+          (∀ y ∈ GLs n, lg y ≤ c₀ * (1 + |t|) → u 0 (x * y) = 0) → u t x = 0)
+    {w : List (Bool × ℕ)} {g : ℝ → ℝ} {T : ℝ} {k : Mat n → (E.V →L[ℂ] E.V)}
+    (hT : 0 ≤ T) (hg : IsBump g T) (hk : IsKer μ E w g k)
+    {y : Mat n} (hy : y ∈ GLs n) (hlt : (max c₀ 0 + lg (1 : Mat n) + 1) * (1 + T) < lg y)
+    : k y = 0 := by
   obtain ⟨hsub, -, hinv, hsm, -, -, -⟩ := hL n
   have hL0 := lg_one_nonneg hL n
   have hM0 : 0 ≤ max c₀ 0 := le_max_right _ _
@@ -104,8 +107,8 @@ theorem ker_support (hL : LgFacts) (hE : WaveEx) (hU : KerUniq) {n : ℕ}
   set A : ℝ := (max c₀ 0 + lg (1 : Mat n) + 1) * (1 + T) with hA
   have hUo : IsOpen (GLs n ∩ lg ⁻¹' Set.Ioi A) :=
     hsm.continuousOn.isOpen_inter_preimage hGo isOpen_Ioi
-  refine hU n μ E k (GLs n ∩ lg ⁻¹' Set.Ioi A) hUo Set.inter_subset_left ?_
-    hk.1.continuousOn ?_ ?_ y ⟨hy, hlt⟩
+  refine hU n μ E k (GLs n ∩ lg ⁻¹' Set.Ioi A) hUo Set.inter_subset_left ?_ hk.1.continuousOn ?_ ?_
+    y ⟨hy, hlt⟩
   · intro z hz k₂
     refine ⟨mul_mem_GLs hz.1 (unitary_mem_GLs k₂), ?_⟩
     have h := hinv z hz.1 1 k₂

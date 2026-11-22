@@ -7,9 +7,12 @@ public import Mathlib
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.cardsep :
-    ∀ (M : Type) [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M] (q : ℕ), q ≠ 0 → ∀ S : Set M,
-    (∀ a ∈ S, ∀ b ∈ S, ∀ x : M, a - b = q • x → a = b) → S.Finite ∧ S.ncard ≤ q ^ Module.finrank ℤ M := by
+theorem UpperTheory.V.KT.cardsep
+    : ∀ (M : Type) [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M] (q : ℕ),
+      q ≠ 0
+        → ∀ S : Set M,
+          (∀ a ∈ S, ∀ b ∈ S, ∀ x : M, a - b = q • x → a = b)
+            → S.Finite ∧ S.ncard ≤ q ^ Module.finrank ℤ M := by
   intro M _ _ _ q hq S hS
   haveI : NeZero q := ⟨hq⟩
   set r := Module.finrank ℤ M
@@ -34,7 +37,8 @@ theorem UpperTheory.V.KT.cardsep :
   have hfin : S.Finite := Set.Finite.of_finite_image himg hinj
   refine ⟨hfin, ?_⟩
   rw [← hinj.ncard_image]
-  calc (f '' S).ncard ≤ (Set.univ : Set (Fin r → ZMod q)).ncard :=
-        Set.ncard_le_ncard (Set.subset_univ _) (Set.toFinite _)
+  calc
+    (f '' S).ncard ≤ (Set.univ : Set (Fin r → ZMod q)).ncard :=
+      Set.ncard_le_ncard (Set.subset_univ _) (Set.toFinite _)
     _ = q ^ r := by
       rw [Set.ncard_univ, Nat.card_eq_fintype_card, Fintype.card_fun, ZMod.card, Fintype.card_fin]

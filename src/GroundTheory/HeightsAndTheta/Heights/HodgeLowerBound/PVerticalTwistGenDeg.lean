@@ -11,18 +11,21 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 GroundTheory.Heights₂.Heights.HilbertSamuel
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 GroundTheory.Heights₂.Heights.HilbertSamuel
 
 namespace VerticalTwistGenDeg
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem intNum_snoc_eq_zero {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} {n p : ℕ} {b : K → ℤ} {f g : MRing ι}
-    (hP : IsArithVar P (n + 1 + 1)) (hp : p.Prime) (hV : IsVerticalDivisorAt P p b f g)
-    (L : Fin n → K → ℤ) :
-    NumbersDVR.intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ)))
-      (Fin.snoc (α := fun _ => K → ℤ) L b) = 0 := by
+theorem intNum_snoc_eq_zero
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {n p : ℕ} {b : K → ℤ} {f g : MRing ι} (hP : IsArithVar P (n + 1 + 1))
+    (hp : p.Prime) (hV : IsVerticalDivisorAt P p b f g) (L : Fin n → K → ℤ)
+    : NumbersDVR.intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ)))
+        (Fin.snoc (α := fun _ => K → ℤ) L b)
+      = 0 := by
   set φ : MRing ι →+* MRingOver ℚ ι := MvPolynomial.map (Int.castRingHom ℚ) with hφ
   have hPN : NumbersDVR.IsMultiProjPrime P := (Bridge.isMultiProjPrime_iff P).mpr hP.2.1
   have : P.IsPrime := hPN.isPrime
@@ -39,10 +42,13 @@ theorem intNum_snoc_eq_zero {K : Type} [Fintype K] [DecidableEq K] {ι : K → T
 
   obtain ⟨u, v, hu, hv, huv⟩ := hV.unit_off_fibre P ‹_› le_rfl hP.2.1.2.2 hpP
   obtain ⟨u', v', e, e', hu', hv', hdeg, hu'P, hv'P, huv'⟩ :=
-    NumbersDVR.exists_form_pair hPN.multiHomog le_rfl hfN hgN hV.num_not_mem hV.den_not_mem hu hv huv
+    NumbersDVR.exists_form_pair hPN.multiHomog le_rfl hfN hgN hV.num_not_mem hV.den_not_mem hu hv
+      huv
 
-  have hkey : ∀ W' : Ideal (MRingOver ℚ ι), W'.IsPrime → P.map φ ≤ W' → NumbersDVR.IsRelevant W' →
-      NumbersDVR.divCycle (P.map φ) (φ v') W' = NumbersDVR.divCycle (P.map φ) (φ u') W' := by
+  have hkey
+      : ∀ W' : Ideal (MRingOver ℚ ι),
+        W'.IsPrime → P.map φ ≤ W' → NumbersDVR.IsRelevant W'
+          → NumbersDVR.divCycle (P.map φ) (φ v') W' = NumbersDVR.divCycle (P.map φ) (φ u') W' := by
     intro W' hW' hle hrel
     have hPle : P ≤ W'.comap φ := fun x hx => hle (Ideal.mem_map_of_mem φ hx)
     have hrel' : IsRelevant (W'.comap φ) := by
@@ -82,17 +88,20 @@ theorem intNum_snoc_eq_zero {K : Type} [Fintype K] [DecidableEq K] {ι : K → T
 
   have hX : IsProjVarF (P.map φ) (n + 1) := isProjVarF_map_of_isArithVar hP
   have hXN : NumbersDVR.IsMultiProjPrime (P.map φ) := (Bridge.isMultiProjPrime_iff _).mpr hX.1
-  have hv'Q : φ v' ∉ P.map φ := fun h => hv'P ((NineStatements.VerticalGenericDeg.map_mem_map_iff ‹_› hPh v').mp h)
-  have hu'Q : φ u' ∉ P.map φ := fun h => hu'P ((NineStatements.VerticalGenericDeg.map_mem_map_iff ‹_› hPh u').mp h)
+  have hv'Q : φ v' ∉ P.map φ := fun h =>
+    hv'P ((NineStatements.VerticalGenericDeg.map_mem_map_iff ‹_› hPh v').mp h)
+  have hu'Q : φ u' ∉ P.map φ := fun h =>
+    hu'P ((NineStatements.VerticalGenericDeg.map_mem_map_iff ‹_› hPh u').mp h)
   have hab : ∀ k, (e' k : ℤ) - e k = b k := by
     intro k
     have h1 : (e' k : ℤ) + bg k = e k + bf k := by exact_mod_cast congrFun hdeg k
     have h2 : (bf k : ℤ) - bg k = b k := congrFun hb k
     rw [← h2]
     linarith
-  have hR := NumbersDVR.IntNumRatSection.proof FieldNumbers.CutRational.full ℚ K ι n (P.map φ) hXN hX.2
-    L b (φ v') (φ u') e' e (NineStatements.VerticalGenericDeg.isMultiHomog_map hv')
-    (NineStatements.VerticalGenericDeg.isMultiHomog_map hu') hv'Q hu'Q hab
+  have hR :=
+    NumbersDVR.IntNumRatSection.proof FieldNumbers.CutRational.full ℚ K ι n (P.map φ) hXN hX.2 L b
+      (φ v') (φ u') e' e (NineStatements.VerticalGenericDeg.isMultiHomog_map hv')
+      (NineStatements.VerticalGenericDeg.isMultiHomog_map hu') hv'Q hu'Q hab
   rw [hrat] at hR
   rw [hR]
   simp [NumbersDVR.cycEval]
@@ -116,13 +125,18 @@ theorem VerticalTwistGenDeg.proof : VerticalTwistGenDeg.Statement := by
     rfl
   set F := intNumMultilinear (P.map φ) (n + 1) hXN.multiHomog hXN.relevant hd with hF
 
-  have hposition : ∀ p ∈ s, ∀ (bs : Fin (n + 1) → K → ℤ) (i : Fin (n + 1)), bs i = b p → F bs = 0 := by
+  have hposition
+      : ∀ p ∈ s, ∀ (bs : Fin (n + 1) → K → ℤ) (i : Fin (n + 1)), bs i = b p → F bs = 0 := by
     intro p hps bs i hi
     obtain ⟨hp, hV⟩ := hs p hps
     have h := FieldNumbers.IntNumSymm.full ℚ K ι (P.map φ) (n + 1) bs (Equiv.swap i (Fin.last n))
     rw [hF, intNumMultilinear_apply, ← h]
-    have e1 : bs ∘ Equiv.swap i (Fin.last n) = Fin.snoc (α := fun _ => K → ℤ)
-        (fun j => bs (Equiv.swap i (Fin.last n) (Fin.castSucc j))) (b p) := by
+    have e1
+        : bs ∘ Equiv.swap i (Fin.last n)
+          = Fin.snoc
+            (α := fun _ => K → ℤ)
+            (fun j => bs (Equiv.swap i (Fin.last n) (Fin.castSucc j)))
+            (b p) := by
       funext j
       induction j using Fin.lastCases with
       | last => simp [hi]
@@ -140,9 +154,10 @@ theorem VerticalTwistGenDeg.proof : VerticalTwistGenDeg.Statement := by
     exact hposition p hp _ i (Function.update_self _ _ _)
   have hg : ∀ c, genDeg P (n + 1) c = F (fun _ => c) := fun c => by
     rw [hF, intNumMultilinear_apply, genDeg]
-  rw [hg, hg, show (fun _ : Fin (n + 1) => a + ∑ p ∈ s, b p) =
-    (fun _ => a) + (fun _ => ∑ p ∈ s, b p) from rfl, F.map_add_univ,
-    Finset.sum_eq_single Finset.univ]
+  rw [hg, hg,
+    show (fun _ : Fin (n + 1) => a + ∑ p ∈ s, b p) = (fun _ => a) + (fun _ => ∑ p ∈ s, b p) from
+      rfl,
+    F.map_add_univ, Finset.sum_eq_single Finset.univ]
   · rw [Finset.piecewise_univ]
   · intro S _ hS
     obtain ⟨i, hi⟩ : ∃ i, i ∉ S := by

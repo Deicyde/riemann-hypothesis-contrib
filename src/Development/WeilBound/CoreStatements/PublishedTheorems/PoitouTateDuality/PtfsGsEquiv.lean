@@ -9,19 +9,23 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.NSEqFixingSubg
 
 noncomputable section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal
+  Formalism.ConjugateSelfDual
 
 namespace PositivityTheory.Lit1.PTN
 
-theorem gsEquiv_toGS' (K : IntermediateField ℚ (AlgebraicClosure ℚ)) [NumberField K]
-    [IsAlgClosure K (AlgebraicClosure ℚ)] (S : Set (HeightOneSpectrum (𝓞 K))) :
-    ∃ e : GS (AlgebraicClosure ℚ) S ≃ₜ*
-        GroundTheory.ProfCoh.galUnramifiedOutside K (AlgebraicClosure ℚ) S,
+theorem gsEquiv_toGS'
+    (K : IntermediateField ℚ (AlgebraicClosure ℚ))
+    [NumberField K] [IsAlgClosure K (AlgebraicClosure ℚ)]
+    (S : Set (HeightOneSpectrum (𝓞 K)))
+    : ∃ e : GS (AlgebraicClosure ℚ) S
+        ≃ₜ* GroundTheory.ProfCoh.galUnramifiedOutside K (AlgebraicClosure ℚ) S,
       ∀ (σ : G K (AlgebraicClosure ℚ))
-        (y : GroundTheory.ProfCoh.maxUnramifiedOutside K (AlgebraicClosure ℚ) S),
-        ((e (toGS (AlgebraicClosure ℚ) S σ) y :
-          GroundTheory.ProfCoh.maxUnramifiedOutside K (AlgebraicClosure ℚ) S) : AlgebraicClosure ℚ) =
-          σ (y : AlgebraicClosure ℚ) := by
+          (y : GroundTheory.ProfCoh.maxUnramifiedOutside K (AlgebraicClosure ℚ) S),
+        ((e (toGS (AlgebraicClosure ℚ) S σ) y
+              : GroundTheory.ProfCoh.maxUnramifiedOutside K (AlgebraicClosure ℚ) S)
+            : AlgebraicClosure ℚ)
+          = σ (y : AlgebraicClosure ℚ) := by
   have : IsGalois K (AlgebraicClosure ℚ) := IsAlgClosure.isGalois K (AlgebraicClosure ℚ)
   let E := maxUnramifiedOutside K (AlgebraicClosure ℚ) S
   let φ : G K (AlgebraicClosure ℚ) →* Gal(E/K) := AlgEquiv.restrictNormalHom E
@@ -48,10 +52,14 @@ theorem gsEquiv_toGS' (K : IntermediateField ℚ (AlgebraicClosure ℚ)) [Number
   have hq : Continuous q := continuous_coinduced_dom.2 hφc
   have : CompactSpace (G K (AlgebraicClosure ℚ)) := inferInstance
   have : CompactSpace (GS (AlgebraicClosure ℚ) S) := Quotient.compactSpace
-  refine ⟨{ q with
-    continuous_toFun := hq
-    continuous_invFun := Continuous.continuous_symm_of_equiv_compact_to_t2 (f := q.toEquiv) hq },
-    fun σ y => ?_⟩
+  refine ⟨
+    {
+      q with
+      continuous_toFun := hq
+      continuous_invFun := Continuous.continuous_symm_of_equiv_compact_to_t2 (f := q.toEquiv) hq
+    },
+    fun σ y => ?_
+  ⟩
   exact AlgEquiv.restrictNormal_commutes σ E y
 
 end PositivityTheory.Lit1.PTN

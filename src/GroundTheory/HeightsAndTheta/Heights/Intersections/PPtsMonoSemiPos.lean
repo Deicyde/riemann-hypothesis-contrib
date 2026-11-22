@@ -17,8 +17,8 @@ namespace GroundTheory.Heights₂.Heights.Inter
 
 open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem PtsMonoSemiPos.proof (hInt : PtsIntegrableStatement) (hHess : SheetHessPSD.Statement) :
-    PtsMonoSemiPos.Statement := by
+theorem PtsMonoSemiPos.proof (hInt : PtsIntegrableStatement) (hHess : SheetHessPSD.Statement)
+    : PtsMonoSemiPos.Statement := by
   intro K _ ι _ Q e M E D t hQ hMs hMp hE ht hD hDa hle
   classical
   unfold ptsIntegral
@@ -30,19 +30,26 @@ theorem PtsMonoSemiPos.proof (hInt : PtsIntegrableStatement) (hHess : SheetHessP
   have hΨg : IsGoodProj Q Ψ := hΨ.choose_spec
   unfold ptsIntegralAt
   have hD1 : IsSectionOn Q D 1 := by
-    refine ⟨0, fun k => by simp [hDa], fun m hm k => ?_,
-      fun h => hQ.2.1.1.ne_top ((Ideal.eq_top_iff_one Q).2 h)⟩
+    refine ⟨
+      0,
+      fun k => by simp [hDa],
+      fun m hm k => ?_,
+      fun h => hQ.2.1.1.ne_top ((Ideal.eq_top_iff_one Q).2 h)
+    ⟩
     rw [MvPolynomial.support_one, Finset.mem_singleton] at hm
     subst hm
     simp
-  have key : ∀ y w, sheetDensity Q Ψ (pot M) (fun z => Real.log (D.h z)) y w =
-      -sheetDensity Q Ψ (pot M) (logNorm D 1) y w := by
+  have key
+      : ∀ y w,
+        sheetDensity Q Ψ (pot M) (fun z => Real.log (D.h z)) y w
+          = - sheetDensity Q Ψ (pot M) (logNorm D 1) y w := by
     intro y w
     unfold sheetDensity
     split_ifs <;> simp [logNorm, Real.log_inv]
   have h1 := hInt K ι Q e Ψ M E t hQ hΨg hMs hE ht
-  have h2 : Integrable (fun y => ∑ᶠ w ∈ fibre Q Ψ y,
-      sheetDensity Q Ψ (pot M) (fun z => Real.log (D.h z)) y w) := by
+  have h2 : Integrable (fun y =>
+      ∑ᶠ w ∈ fibre Q Ψ y,
+        sheetDensity Q Ψ (pot M) (fun z => Real.log (D.h z)) y w) := by
     simp only [key, finsum_neg_distrib]
     exact (hInt K ι Q e Ψ M D 1 hQ hΨg hMs hD hD1).neg
   obtain ⟨a, -, hta, htQ⟩ := ht

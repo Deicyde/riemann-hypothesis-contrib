@@ -8,13 +8,16 @@ open Formalism.MainNotions.N
 
 namespace GlobalTheory.ConjugateIrreducibility
 
-private theorem isIrrSub_of_conj {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (H H' : Subgroup Γ)
-    (hHH : ∀ s ∈ H, s ∈ H') (r r' : Γ →* GL (Fin n) k) (g : GL (Fin n) k)
+private theorem isIrrSub_of_conj
+    {Γ k : Type} [Group Γ] [Field k]
+    {n : ℕ}
+    (H H' : Subgroup Γ) (hHH : ∀ s ∈ H, s ∈ H')
+    (r r' : Γ →* GL (Fin n) k) (g : GL (Fin n) k)
     (hconj : ∀ s : Γ, (r' : Γ → GL (Fin n) k) s = g * (r : Γ → GL (Fin n) k) s * g⁻¹)
     (hne : (⊤ : Submodule k (Fin n → k)) ≠ ⊥)
-    (hmin : ∀ W : Submodule k (Fin n → k), W ≤ ⊤ → IsInv (MonoidHom.comp r (Subgroup.subtype H)) W →
-      W = ⊥ ∨ W = ⊤) :
-    IsIrrSub (MonoidHom.comp r' (Subgroup.subtype H')) ⊤ := by
+    (hmin : ∀ W : Submodule k (Fin n → k),
+      W ≤ ⊤ → IsInv (MonoidHom.comp r (Subgroup.subtype H)) W → W = ⊥ ∨ W = ⊤)
+    : IsIrrSub (MonoidHom.comp r' (Subgroup.subtype H')) ⊤ := by
   refine ⟨hne, fun _ _ _ => Submodule.mem_top, fun W _ hinv => ?_⟩
 
   let W₀ : Submodule k (Fin n → k) := W.comap (Matrix.toLin' (g : Matrix (Fin n) (Fin n) k))
@@ -23,14 +26,17 @@ private theorem isIrrSub_of_conj {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (H
   have hinv₀ : IsInv (MonoidHom.comp r (Subgroup.subtype H)) W₀ := by
     intro s v hv
     rw [hmem] at hv ⊢
-    have key : (g : Matrix (Fin n) (Fin n) k).mulVec ((r s.1 : Matrix (Fin n) (Fin n) k).mulVec v) =
-        (r' s.1 : Matrix (Fin n) (Fin n) k).mulVec ((g : Matrix (Fin n) (Fin n) k).mulVec v) := by
+    have key
+        : (g : Matrix (Fin n) (Fin n) k).mulVec ((r s.1 : Matrix (Fin n) (Fin n) k).mulVec v)
+          = (r' s.1 : Matrix (Fin n) (Fin n) k).mulVec
+            ((g : Matrix (Fin n) (Fin n) k).mulVec v) := by
       simp [hconj, Matrix.mulVec_mulVec, mul_assoc]
     have h1 := hinv ⟨s, hHH s s.2⟩ _ hv
     simp only [MonoidHom.comp_apply, Subgroup.coe_subtype] at h1 ⊢
     rw [key]
     exact h1
-  have hback : ∀ w, ((g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).mulVec w ∈ W₀ ↔ w ∈ W := fun w => by
+  have hback
+      : ∀ w, ((g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).mulVec w ∈ W₀ ↔ w ∈ W := fun w => by
     rw [hmem, Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec]
   rcases hmin W₀ le_top hinv₀ with h0 | htop
   · left
@@ -47,7 +53,13 @@ private theorem isIrrSub_of_conj {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (H
     intro w _
     exact (hback w).mp (htop ▸ Submodule.mem_top)
 
-theorem target : ∀ {Γ k : Type} [inst : Group Γ] [inst_1 : Field k] {n : ℕ} (H H' : Subgroup Γ), (∀ s ∈ H, s ∈ H') → ∀ (r r' : Γ →* GL (Fin n) k) (g : GL (Fin n) k), (∀ (s : Γ), (r' : Γ → GL (Fin n) k) s = g * (r : Γ → GL (Fin n) k) s * g⁻¹) → Formalism.MainNotions.N.IsIrrSub (MonoidHom.comp r (Subgroup.subtype H)) ⊤ → Formalism.MainNotions.N.IsIrrSub (MonoidHom.comp r' (Subgroup.subtype H')) ⊤ := by
+theorem target
+    : ∀ {Γ k : Type} [inst : Group Γ] [inst_1 : Field k] {n : ℕ} (H H' : Subgroup Γ),
+      (∀ s ∈ H, s ∈ H')
+        → ∀ (r r' : Γ →* GL (Fin n) k) (g : GL (Fin n) k),
+          (∀ (s : Γ), (r' : Γ → GL (Fin n) k) s = g * (r : Γ → GL (Fin n) k) s * g⁻¹)
+            → Formalism.MainNotions.N.IsIrrSub (MonoidHom.comp r (Subgroup.subtype H)) ⊤
+            → Formalism.MainNotions.N.IsIrrSub (MonoidHom.comp r' (Subgroup.subtype H')) ⊤ := by
   intro Γ k _ _ n H H' hHH r r' g hconj hirr
   obtain ⟨hne, -, hmin⟩ := hirr
   exact isIrrSub_of_conj H H' hHH r r' g hconj hne hmin

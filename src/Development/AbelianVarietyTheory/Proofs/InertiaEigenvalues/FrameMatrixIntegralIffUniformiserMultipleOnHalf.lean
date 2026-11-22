@@ -11,7 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrameMa
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
+  Formalism.L2.Pj
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
@@ -22,7 +26,19 @@ set_option synthInstance.maxHeartbeats 400000
 
 namespace GlobalTheory.HalfUniInt
 
-theorem half_int_iff : ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D)) (Q : Finset (Pl D.host.E)) (e : AE D), IsIdemSum e Q → ∀ ϖ : 𝓞 D.host.E, ϖ ≠ 0 → (∀ PP ∈ Q, ϖ ∈ PP.asIdeal ∧ ϖ ∉ PP.asIdeal ^ 2) → ∀ x : WO S T, IsHalf e x → (IsIntM (frMapO S T βS βT x) ↔ IsIntM (frMapO S T βS βT (x.map fun w => incA D (ϖ : D.host.E) * w)) ∧ ∀ PP ∈ Q, redM PP (frMapO S T βS βT (x.map fun w => incA D (ϖ : D.host.E) * w)) = 0) := by
+theorem half_int_iff
+    : ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)) (βT : GL (Fin T.rank) (EAf D))
+        (Q : Finset (Pl D.host.E)) (e : AE D),
+      IsIdemSum e Q
+        → ∀ ϖ : 𝓞 D.host.E,
+          ϖ ≠ 0 → (∀ PP ∈ Q, ϖ ∈ PP.asIdeal ∧ ϖ ∉ PP.asIdeal ^ 2)
+            → ∀ x : WO S T,
+              IsHalf e x
+                → (IsIntM (frMapO S T βS βT x)
+                  ↔ IsIntM (frMapO S T βS βT (x.map fun w => incA D (ϖ : D.host.E) * w))
+                    ∧ ∀ PP ∈ Q,
+                      redM PP (frMapO S T βS βT (x.map fun w => incA D (ϖ : D.host.E) * w))
+                        = 0) := by
   intro D S T βS βT Q e he ϖ hϖ hQ x hx
   obtain ⟨⟨es, hes, rfl⟩, hc⟩ := he
   set M := frMapO S T βS βT x with hM
@@ -46,11 +62,13 @@ theorem half_int_iff : ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)
     exact h2.symm
   have ha : a ∈ Formalism.L2.Herm.intAf D.host.F D.host.E :=
     Subring.subset_closure (Or.inl ⟨⟨(ϖ : D.host.E), ⟨ϖ, rfl⟩⟩, rfl⟩)
-  have hϖ' : (ϖ : D.host.E) ≠ 0 := by
-    intro h; exact hϖ (Subtype.ext h)
-  have hsum : (∑ PP ∈ Q, es PP * incA D ((ϖ : D.host.E)⁻¹)) = (∑ PP ∈ Q, es PP) * incA D ((ϖ : D.host.E)⁻¹) :=
+  have hϖ' : (ϖ : D.host.E) ≠ 0 := by intro h; exact hϖ (Subtype.ext h)
+  have hsum
+      : (∑ PP ∈ Q, es PP * incA D ((ϖ : D.host.E)⁻¹))
+        = (∑ PP ∈ Q, es PP) * incA D ((ϖ : D.host.E)⁻¹) :=
     (Finset.sum_mul _ _ _).symm
-  have hinv : ∀ i j, toEAf D (∑ PP ∈ Q, es PP * incA D ((ϖ : D.host.E)⁻¹)) * (a * M i j) = M i j := by
+  have hinv
+      : ∀ i j, toEAf D (∑ PP ∈ Q, es PP * incA D ((ϖ : D.host.E)⁻¹)) * (a * M i j) = M i j := by
     intro i j
     have hu : toEAf D (incA D ((ϖ : D.host.E)⁻¹)) * a = 1 := by
       rw [ha_def, ← map_mul, ← map_mul, inv_mul_cancel₀ hϖ', map_one, map_one]
@@ -67,16 +85,20 @@ theorem half_int_iff : ∀ (D : D7) (S T : HSp D) (βS : GL (Fin S.rank) (EAf D)
     ext i j
     have hN' : a * M i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
       have := hN i j; rwa [Matrix.smul_apply, smul_eq_mul] at this
-    have key := (GlobalTheory.T.idempotentSum_integral_div_uniformisers_iff_reduction_zero D Q es (fun _ => ϖ) hes hc hQ' (a * M i j) hN' (hNe i j)).1
-      (by rw [hinv]; exact hI i j) PP hPP
+    have key :=
+      (GlobalTheory.T.idempotentSum_integral_div_uniformisers_iff_reduction_zero D Q es
+        (fun _ => ϖ)
+        hes hc hQ' (a * M i j) hN' (hNe i j)).1 (by rw [hinv]; exact hI i j) PP hPP
     unfold redM
     rw [dite_eq_left (hN i j), Matrix.zero_apply]
     convert key using 3
   · rintro ⟨hN, hR⟩ i j
     have hN' : a * M i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
       have := hN i j; rwa [Matrix.smul_apply, smul_eq_mul] at this
-    have key := (GlobalTheory.T.idempotentSum_integral_div_uniformisers_iff_reduction_zero D Q es (fun _ => ϖ) hes hc hQ' (a * M i j) hN' (hNe i j)).2
-      (fun PP hPP => by
+    have key :=
+      (GlobalTheory.T.idempotentSum_integral_div_uniformisers_iff_reduction_zero D Q es
+          (fun _ => ϖ)
+          hes hc hQ' (a * M i j) hN' (hNe i j)).2 (fun PP hPP => by
         have h3 := congrFun (congrFun (hR PP hPP) i) j
         unfold redM at h3
         rw [dite_eq_left (hN i j), Matrix.zero_apply] at h3

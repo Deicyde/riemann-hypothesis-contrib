@@ -4,25 +4,30 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-private theorem hop_summand {B : Scheme.{0}} {G : Type} [Group G] (X : Tower B G) {R : Type} [Field R]
-    (T : Th.{u} B R) {m j : X.ι} {f : G → R} (hf : X.IsFn j f) (had : ∀ g, f g ≠ 0 → X.admitted m j g⁻¹) (g : G)
-    (x : T.H (X.q j)) :
-    f (g : G ⧸ X.K j).out • X.pl T m j (g : G ⧸ X.K j).out⁻¹ x = f g • X.pl T m j g⁻¹ x := by
+private theorem hop_summand
+    {B : Scheme.{0}} {G : Type} [Group G]
+    (X : Tower B G)
+    {R : Type} [Field R]
+    (T : Th.{u} B R)
+    {m j : X.ι} {f : G → R} (hf : X.IsFn j f) (had : ∀ g, f g ≠ 0 → X.admitted m j g⁻¹)
+    (g : G) (x : T.H (X.q j))
+    : f (g : G ⧸ X.K j).out • X.pl T m j (g : G ⧸ X.K j).out⁻¹ x = f g • X.pl T m j g⁻¹ x := by
   obtain ⟨⟨k, hk⟩, hkeq⟩ := QuotientGroup.mk_out_eq_mul (X.K j) g
   rw [hkeq, (hf.1 k hk g).2]
   by_cases h0 : f g = 0
   · simp [h0]
   · rw [mul_inv_rev, X.pl_left T (had g h0) (inv_mem hk)]
 
-theorem UpperTheory.Gal.G3.pHopEx :
-    PlInv.{u} → HopDeep.{u} → HopEx.{u} := by
+theorem UpperTheory.Gal.G3.pHopEx : PlInv.{u} → HopDeep.{u} → HopEx.{u} := by
   intro hPl hD B G _ X R _ _ T hT j f hf
   obtain ⟨⟨m0, hm0j, had0⟩, hiso⟩ := hD X T hT j f hf
-  have huniq : ∀ A A' : Module.End R (T.H (X.q j)), X.IsHop T j f A → X.IsHop T j f A' → A = A' := by
+  have huniq
+      : ∀ A A' : Module.End R (T.H (X.q j)), X.IsHop T j f A → X.IsHop T j f A' → A = A' := by
     intro A A' hA hA'
     ext x
     apply (hPl X T hT m0 j hm0j).1
@@ -32,8 +37,9 @@ theorem UpperTheory.Gal.G3.pHopEx :
   have had : ∀ g, f g ≠ 0 → X.admitted m j g⁻¹ := fun g hg => by
     simpa using (X.isAdmissibleIntegralBasisChange_one hmm0).mul (had0 g hg)
   set S := hf.2.2.toFinset with hSdef
-  have hsub : ∀ (w : G ⧸ X.K j → T.H (X.q m)),
-      Function.support (fun z => f z.out • w z) ⊆ (S : Set (G ⧸ X.K j)) := by
+  have hsub
+      : ∀ (w : G ⧸ X.K j → T.H (X.q m)),
+        Function.support (fun z => f z.out • w z) ⊆ (S : Set (G ⧸ X.K j)) := by
     intro w z hz
     simp only [S, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
     intro h0
@@ -48,8 +54,10 @@ theorem UpperTheory.Gal.G3.pHopEx :
   have hinv : ∀ x, ∀ k ∈ X.K j, X.pl T m m k (Y x) = Y x := by
     intro x k hk
     have hadk : X.admitted m m k := ⟨X.K_le j k hk, fun u hu => hnorm k hk u hu⟩
-    have key : ∀ z : G ⧸ X.K j, X.pl T m m k (f z.out • X.pl T m j z.out⁻¹ x) =
-        f (k⁻¹ • z).out • X.pl T m j (k⁻¹ • z).out⁻¹ x := by
+    have key
+        : ∀ z : G ⧸ X.K j,
+          X.pl T m m k (f z.out • X.pl T m j z.out⁻¹ x)
+            = f (k⁻¹ • z).out • X.pl T m j (k⁻¹ • z).out⁻¹ x := by
       intro z
       have hz : k⁻¹ • z = ((k⁻¹ * z.out : G) : G ⧸ X.K j) := by
         conv_lhs => rw [← QuotientGroup.out_eq' z]
@@ -58,8 +66,9 @@ theorem UpperTheory.Gal.G3.pHopEx :
       by_cases h0 : f z.out = 0
       · simp [h0]
       · rw [X.pl_pl T hadk (had _ h0), mul_inv_rev, inv_inv]
-    have hsub2 : Function.support (fun z : G ⧸ X.K j => X.pl T m m k (f z.out • X.pl T m j z.out⁻¹ x))
-        ⊆ (S : Set (G ⧸ X.K j)) := by
+    have hsub2
+        : Function.support (fun z : G ⧸ X.K j => X.pl T m m k (f z.out • X.pl T m j z.out⁻¹ x))
+          ⊆ (S : Set (G ⧸ X.K j)) := by
       intro z hz
       simp only [S, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
       intro h0
@@ -78,8 +87,9 @@ theorem UpperTheory.Gal.G3.pHopEx :
     (LinearEquiv.ofInjective (X.pl T m j 1) hinj).symm.toLinearMap ∘ₗ Y.codRestrict _ hrange
   have hA : ∀ x, X.pl T m j 1 (A x) = Y x := by
     intro x
-    have h := congrArg Subtype.val
-      ((LinearEquiv.ofInjective (X.pl T m j 1) hinj).apply_symm_apply ⟨Y x, hrange x⟩)
+    have h :=
+      congrArg Subtype.val
+        ((LinearEquiv.ofInjective (X.pl T m j 1) hinj).apply_symm_apply ⟨Y x, hrange x⟩)
     rw [LinearEquiv.ofInjective_apply] at h
     exact h
   have hex : ∃ A, X.IsHop T j f A := ⟨A, hiso A m hmj had (fun x => by rw [hA, hY])⟩

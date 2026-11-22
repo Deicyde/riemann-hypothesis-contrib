@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiltGraded
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -17,24 +19,32 @@ namespace GlobalTheory.LowDat.Uniq
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem ev_zsmul {D : Datum H} {k : Type} [Field k] {Q : Type} [Group Q] {act : 𝓞 E → Q → Q}
-    {e : ℕ → Q → Q → kˣ → Prop} (J : TateIso D k Q act e) (n : ℕ) (m : ℤ) (x : D.La) :
-    J.ev n (m • x) = J.ev n x ^ m := by
+theorem ev_zsmul
+    {D : Datum H} {k : Type} [Field k]
+    {Q : Type} [Group Q]
+    {act : 𝓞 E → Q → Q} {e : ℕ → Q → Q → kˣ → Prop} (J : TateIso D k Q act e)
+    (n : ℕ) (m : ℤ) (x : D.La)
+    : J.ev n (m • x) = J.ev n x ^ m := by
   let f : Multiplicative D.La →* Q :=
     MonoidHom.mk' (fun y => J.ev n (Multiplicative.toAdd y)) (fun a b => J.add n _ _)
   have h := map_zpow f (Multiplicative.ofAdd x) m
   rw [← ofAdd_zsmul] at h
   exact h
 
-theorem mul_mem_M (l : Level H) {x y : 𝓞 E} (hx : x ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)) (hy : y ∈ l.Mb) :
-    ∃ r : 𝓞 E, x * y = r * (l.M : 𝓞 E) := by
+theorem mul_mem_M
+    (l : Level H) {x y : 𝓞 E} (hx : x ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)) (hy : y ∈ l.Mb)
+    : ∃ r : 𝓞 E, x * y = r * (l.M : 𝓞 E) := by
   have h : y * x ∈ l.Mb * l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := Ideal.mul_mem_mul hy hx
   rw [l.prod, Ideal.mem_span_singleton'] at h
   obtain ⟨r, hr⟩ := h
   exact ⟨r, by rw [mul_comm, ← hr]⟩
 
-theorem smul_mem_M {D : Datum H} (l : Level H) {x : 𝓞 E} (hx : x ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E))
-    {b : D.La} (hb : b ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La)) : ∃ c : D.La, x • b = l.M • c := by
+theorem smul_mem_M
+    {D : Datum H}
+    (l : Level H)
+    {x : 𝓞 E} (hx : x ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E))
+    {b : D.La} (hb : b ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La))
+    : ∃ c : D.La, x • b = l.M • c := by
   refine Submodule.smul_induction_on (p := fun b => ∃ c : D.La, x • b = l.M • c) hb ?_ ?_
   · intro y hy t _
     obtain ⟨r, hr⟩ := mul_mem_M l hx hy
@@ -43,13 +53,17 @@ theorem smul_mem_M {D : Datum H} (l : Level H) {x : 𝓞 E} (hx : x ∈ l.Mb.map
   · rintro b1 b2 ⟨c1, hc1⟩ ⟨c2, hc2⟩
     exact ⟨c1 + c2, by rw [smul_add, hc1, hc2, smul_add]⟩
 
-theorem dvd_EF (D : Datum H) (l : Level H) {a c : D.La} (ha : a ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La))
-    (hc : c ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La)) : (l.M : ℤ) ∣ D.EF a c := by
+theorem dvd_EF
+    (D : Datum H) (l : Level H)
+    {a c : D.La}
+    (ha : a ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La)) (hc : c ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La))
+    : (l.M : ℤ) ∣ D.EF a c := by
   refine Submodule.smul_induction_on (p := fun a => (l.M : ℤ) ∣ D.EF a c) ha ?_ ?_
   · intro y hy t _
     show (l.M : ℤ) ∣ D.EF (y • t) c
     rw [D.adj]
-    have hy' : H.bar y ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) hy
+    have hy' : H.bar y ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) :=
+      Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) hy
     obtain ⟨c', hc'⟩ := smul_mem_M l hy' hc
     rw [hc', map_nsmul, nsmul_eq_mul]
     exact dvd_mul_right _ _
@@ -62,14 +76,16 @@ end GlobalTheory.LowDat.Uniq
 
 namespace GlobalTheory.LowDat
 
-
 open GlobalTheory.LowDat.Uniq in
-theorem tateIso_ev_lcm_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H) (l : Level H)
-    (k : Type) [Field k] (Q : Type) [Group Q] (act : 𝓞 E → Q → Q) (e : ℕ → Q → Q → kˣ → Prop),
-    (∀ n, 0 < n → ∀ x y c c', e n x y c → e n x y c' → c = c') → ∀ J J' : TateIso D k Q act e, J.ζ l.M' = J'.ζ l.M' →
-    (∀ a, J.ev l.A a = J'.ev l.A a) →
-    (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), J.ev l.M a = J'.ev l.M a) →
-    ∀ a, J.ev l.M' a = J'.ev l.M' a := by
+theorem tateIso_ev_lcm_eq
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H) (l : Level H)
+        (k : Type) [Field k] (Q : Type) [Group Q] (act : 𝓞 E → Q → Q) (e : ℕ → Q → Q → kˣ → Prop),
+      (∀ n, 0 < n → ∀ x y c c', e n x y c → e n x y c' → c = c')
+        → ∀ J J' : TateIso D k Q act e,
+          J.ζ l.M' = J'.ζ l.M' → (∀ a, J.ev l.A a = J'.ev l.A a)
+            → (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La),
+              J.ev l.M a = J'.ev l.M a)
+            → ∀ a, J.ev l.M' a = J'.ev l.M' a := by
   intro E _ _ _ H D l k _ Q _ act e huniq J J' hζ hA hM
   have hM0 : 0 < l.M := by have := l.three_le; omega
   have hA0 := l.A_pos
@@ -93,7 +109,8 @@ theorem tateIso_ev_lcm_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField 
   have hcop : Nat.Coprime j kk := by
     have e1 : l.M / G = j := by rw [hj]; exact Nat.mul_div_cancel_left j hg0
     have e2 : l.A / G = kk := by rw [hkk]; exact Nat.mul_div_cancel_left kk hg0
-    rw [e1, e2] at hcop0; exact hcop0
+    rw [e1, e2] at hcop0
+    exact hcop0
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.mpr hcop
 
   have hζM : J.ζ l.M = J'.ζ l.M := by
@@ -110,12 +127,14 @@ theorem tateIso_ev_lcm_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField 
     have h2 : J.ev l.M (g2 • b') = 1 := by
       rw [J.lin, hb', ← J'.lin]
       obtain ⟨c, hc⟩ := smul_mem_M (D := D) l hg2 hb
-      rw [hc]; exact (J'.ker l.M hM0 _).mpr ⟨c, rfl⟩
+      rw [hc]
+      exact (J'.ker l.M hM0 _).mpr ⟨c, rfl⟩
     have hb'' : J.ev l.M (f • b') = J'.ev l.M b := by
       have h := J.add l.M (f • b') (g2 • b')
       rw [← decomp b', h2, _root_.mul_one] at h
       rw [← hb', h]
-    have hf' : f • b' ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := Submodule.smul_mem_smul hf Submodule.mem_top
+    have hf' : f • b' ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) :=
+      Submodule.smul_mem_smul hf Submodule.mem_top
     set c := b - f • b' with hcdef
     have hcm : c ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La) := Submodule.sub_mem _ hb hf'
     have hdiv : ∀ a, (l.M : ℤ) ∣ D.EF a c := by
@@ -133,17 +152,19 @@ theorem tateIso_ev_lcm_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField 
       have h := D.alt (a + c)
       simp only [map_add (f := _), LinearMap.add_apply, D.alt a, D.alt c, zero_add, add_zero] at h
       have h' : D.EF c a = - D.EF a c := by linarith
-      rw [h']; exact (hdiv a).neg_right
+      rw [h']
+      exact (hdiv a).neg_right
     choose q hq using hdiv'
     have hMne : (l.M : ℤ) ≠ 0 := by exact_mod_cast hM0.ne'
-    let φ : D.La →ₗ[ℤ] ℤ :=
-      { toFun := q
-        map_add' := fun x y => by
-          apply mul_left_cancel₀ hMne
-          rw [← hq, mul_add, ← hq, ← hq, map_add (f := _)]
-        map_smul' := fun m x => by
-          apply mul_left_cancel₀ hMne
-          rw [← hq, RingHom.id_apply, smul_eq_mul, mul_left_comm, ← hq, map_zsmul, smul_eq_mul] }
+    let φ : D.La →ₗ[ℤ] ℤ := {
+      toFun := q
+      map_add' := fun x y => by
+        apply mul_left_cancel₀ hMne
+        rw [← hq, mul_add, ← hq, ← hq, map_add (f := _)]
+      map_smul' := fun m x => by
+        apply mul_left_cancel₀ hMne
+        rw [← hq, RingHom.id_apply, smul_eq_mul, mul_left_comm, ← hq, map_zsmul, smul_eq_mul]
+    }
     obtain ⟨c0, hc0⟩ := D.unimod.2 φ
     have hc : c = l.M • c0 := by
       apply D.unimod.1
@@ -158,13 +179,15 @@ theorem tateIso_ev_lcm_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField 
     rw [decomp a, J.add, J'.add, key _ (Submodule.smul_mem_smul hf Submodule.mem_top),
       hM _ (Submodule.smul_mem_smul hg2 Submodule.mem_top)]
 
-  have expand : ∀ (K : TateIso D k Q act e) (a : D.La),
-      K.ev l.M' a = K.ev l.A (u • a) * K.ev l.M (v • a) := by
+  have expand
+      : ∀ (K : TateIso D k Q act e) (a : D.La),
+        K.ev l.M' a = K.ev l.A (u • a) * K.ev l.M (v • a) := by
     intro K a
     have ha : a = (j : ℤ) • (u • a) + (kk : ℤ) • (v • a) := by
       rw [smul_smul, smul_smul, ← add_smul, mul_comm (j : ℤ), mul_comm (kk : ℤ), huv, one_smul]
     conv_lhs => rw [ha]
-    rw [K.add, ev_zsmul K l.M' (j : ℤ) (u • a), ev_zsmul K l.M' (kk : ℤ) (v • a), zpow_natCast, zpow_natCast]
+    rw [K.add, ev_zsmul K l.M' (j : ℤ) (u • a), ev_zsmul K l.M' (kk : ℤ) (v • a), zpow_natCast,
+      zpow_natCast]
     congr 1
     · have h := K.tower l.A j hA0 hj0 (u • a); rw [← hAj] at h; exact h
     · have h := K.tower l.M kk hM0 hk0 (v • a); rw [← hMk] at h; exact h

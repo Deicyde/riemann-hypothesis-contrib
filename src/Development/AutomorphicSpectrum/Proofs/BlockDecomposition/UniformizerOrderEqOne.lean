@@ -15,20 +15,22 @@ public import GroundTheory.LocalFields.UnitsBasic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 open GroundTheory.ProfCoh GroundTheory.LocalField ValuativeRel CategoryTheory
 
 namespace GlobalTheory.CompanionTheory.Completion
 
-theorem valuation_eq_exp_neg_one_of_mem_of_notMem (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (ϖ : 𝓞 F) (h1 : ϖ ∈ v.asIdeal) (h2 : ϖ ∉ v.asIdeal ^ 2) :
-    v.valuation F (ϖ : F) = WithZero.exp (-1 : ℤ) := by
+theorem valuation_eq_exp_neg_one_of_mem_of_notMem
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (ϖ : 𝓞 F) (h1 : ϖ ∈ v.asIdeal) (h2 : ϖ ∉ v.asIdeal ^ 2)
+    : v.valuation F (ϖ : F) = WithZero.exp (-1 : ℤ) := by
   have hval : v.valuation F (ϖ : F) = v.intValuation ϖ := v.valuation_of_algebraMap ϖ
   rw [hval]
   have hle : v.intValuation ϖ ≤ WithZero.exp (-((1 : ℕ) : ℤ)) :=
     (v.intValuation_le_pow_iff_mem ϖ 1).2 (by simpa using h1)
-  have hnle : ¬ v.intValuation ϖ ≤ WithZero.exp (-((2 : ℕ) : ℤ)) :=
-    fun h => h2 ((v.intValuation_le_pow_iff_mem ϖ 2).1 h)
+  have hnle : ¬ v.intValuation ϖ ≤ WithZero.exp (-((2 : ℕ) : ℤ)) := fun h =>
+    h2 ((v.intValuation_le_pow_iff_mem ϖ 2).1 h)
   have hne : v.intValuation ϖ ≠ 0 := by
     intro h
     apply hnle
@@ -40,19 +42,24 @@ theorem valuation_eq_exp_neg_one_of_mem_of_notMem (F : Type) [Field F] [NumberFi
   push_cast at hle hnle
   omega
 
-theorem ord_algebraMap_eq_one : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (ϖ : 𝓞 F), ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2 → ord (algebraMap F (v.adicCompletion F) (ϖ : F)) = 1 := by
+theorem ord_algebraMap_eq_one
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (ϖ : 𝓞 F),
+      ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2 → ord (algebraMap F (v.adicCompletion F) (ϖ : F)) = 1 := by
   intro F _ _ v ϖ h1 h2
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[v.adicCompletion F]
   have hv : Valued.v (π : v.adicCompletion F) = WithZero.exp (-1 : ℤ) :=
-    GlobalTheory.adicCompletion_valuation_map_uniformiser F v (v.adicCompletion F) (RingEquiv.refl _)
+    GlobalTheory.adicCompletion_valuation_map_uniformiser F v (v.adicCompletion F)
+      (RingEquiv.refl _)
       (fun a => by
         rw [GroundTheory.Global.mem_valuationInteger_iff]
-        exact Iff.rfl) π hπ
+        exact Iff.rfl)
+      π hπ
   have hx : Valued.v (algebraMap F (v.adicCompletion F) (ϖ : F)) = WithZero.exp (-1 : ℤ) := by
     exact (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (ϖ : F)).trans
       (valuation_eq_exp_neg_one_of_mem_of_notMem F v ϖ h1 h2)
-  have heq : valuation (v.adicCompletion F) (algebraMap F (v.adicCompletion F) (ϖ : F)) =
-      valuation (v.adicCompletion F) (π : v.adicCompletion F) :=
+  have heq
+      : valuation (v.adicCompletion F) (algebraMap F (v.adicCompletion F) (ϖ : F))
+        = valuation (v.adicCompletion F) (π : v.adicCompletion F) :=
     le_antisymm
       ((ValuativeRel.isEquiv (valuation (v.adicCompletion F)) Valued.v _ _).2
         (le_of_eq (hx.trans hv.symm)))

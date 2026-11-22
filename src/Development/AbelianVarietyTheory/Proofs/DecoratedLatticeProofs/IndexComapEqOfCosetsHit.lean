@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.IndexComapCosets
 
-theorem index_comap_eq_of_cosets_hit {A B : Type} [Group A] [Group B] (f : A →* B)
-    (H : Subgroup B) (h : ∀ b : B, ∃ a : A, (f a)⁻¹ * b ∈ H) :
-    (H.comap f).index = H.index := by
+theorem index_comap_eq_of_cosets_hit
+    {A B : Type} [Group A] [Group B]
+    (f : A →* B) (H : Subgroup B) (h : ∀ b : B, ∃ a : A, (f a)⁻¹ * b ∈ H)
+    : (H.comap f).index = H.index := by
   rw [Subgroup.index_eq_card, Subgroup.index_eq_card]
   let φ : A ⧸ H.comap f → B ⧸ H :=
     Quotient.map' f (fun a a' hr => by

@@ -13,25 +13,28 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology Filter
 
-theorem isClosed_zeroSetIn_of_ideal {σ : Type*} (I : Ideal (MvPolynomial σ ℂ)) :
-    IsClosed (zeroSetIn I) := by
-  have h : zeroSetIn I = ⋂ q ∈ I, {z : σ → ℂ | eval z q = 0} := by
-    ext z; simp [zeroSetIn]
+theorem isClosed_zeroSetIn_of_ideal {σ : Type*} (I : Ideal (MvPolynomial σ ℂ))
+    : IsClosed (zeroSetIn I) := by
+  have h : zeroSetIn I = ⋂ q ∈ I, {z : σ → ℂ | eval z q = 0} := by ext z; simp [zeroSetIn]
   rw [h]
   exact isClosed_biInter fun q _ => isClosed_eq (MvPolynomial.continuous_eval q) continuous_const
 
-theorem HolomorphicOnSubset.continuousWithinAt_trace {σ : Type*} [Fintype σ] {g : (σ → ℂ) → ℂ}
-    {S : Set (σ → ℂ)} (hg : HolomorphicOnSubset g S) {z : σ → ℂ} (hz : z ∈ S) :
-    ContinuousWithinAt g S z := by
+theorem HolomorphicOnSubset.continuousWithinAt_trace
+    {σ : Type*} [Fintype σ]
+    {g : (σ → ℂ) → ℂ} {S : Set (σ → ℂ)} (hg : HolomorphicOnSubset g S)
+    {z : σ → ℂ} (hz : z ∈ S)
+    : ContinuousWithinAt g S z := by
   obtain ⟨V, hV, hzV, F, hF, hgF⟩ := hg z hz
   have hFc : ContinuousAt F z := (hF.differentiableAt (hV.mem_nhds hzV)).continuousAt
   refine hFc.continuousWithinAt.congr_of_eventuallyEq ?_ (hgF ⟨hz, hzV⟩)
   filter_upwards [inter_mem_nhdsWithin S (hV.mem_nhds hzV)] with x hx using hgF hx
 
-theorem HolomorphicOnSubset.differentiableAt_comp {σ : Type*} [Fintype σ] {k : ℕ}
-    {g : (σ → ℂ) → ℂ} {S : Set (σ → ℂ)} (hg : HolomorphicOnSubset g S)
-    {s : (Fin k → ℂ) → σ → ℂ} {y : Fin k → ℂ} (hs : DifferentiableAt ℂ s y)
-    (hS : ∀ᶠ y' in 𝓝 y, s y' ∈ S) : DifferentiableAt ℂ (fun y' => g (s y')) y := by
+theorem HolomorphicOnSubset.differentiableAt_comp
+    {σ : Type*} [Fintype σ]
+    {k : ℕ} {g : (σ → ℂ) → ℂ} {S : Set (σ → ℂ)} (hg : HolomorphicOnSubset g S)
+    {s : (Fin k → ℂ) → σ → ℂ} {y : Fin k → ℂ}
+    (hs : DifferentiableAt ℂ s y) (hS : ∀ᶠ y' in 𝓝 y, s y' ∈ S)
+    : DifferentiableAt ℂ (fun y' => g (s y')) y := by
   obtain ⟨V, hV, hzV, F, hF, hgF⟩ := hg (s y) hS.self_of_nhds
   have hFd : DifferentiableAt ℂ F (s y) := hF.differentiableAt (hV.mem_nhds hzV)
   have hev : ∀ᶠ y' in 𝓝 y, s y' ∈ V := hs.continuousAt.preimage_mem_nhds (hV.mem_nhds hzV)
@@ -40,19 +43,23 @@ theorem HolomorphicOnSubset.differentiableAt_comp {σ : Type*} [Fintype σ] {k :
 
 theorem LocalTrace.proof (hbc : LocalBranchedCovering.Statement) : LocalTrace.Statement := by
   intro σ _ I w U g hI hw hU hg
-  obtain ⟨k, A, W, D, m, δ, hWo, hwW, hWc, hWU, hDo, hAwD, hwonly, hprop, hδd, hδne, hsheets,
-    hopen⟩ := hbc σ I w U hI hw hU
+  obtain
+      ⟨k, A, W, D, m, δ, hWo, hwW, hWc, hWU, hDo, hAwD, hwonly, hprop, hδd, hδne, hsheets, hopen⟩ :=
+    hbc σ I w U hI hw hU
   have hZc : IsClosed (zeroSetIn I) := isClosed_zeroSetIn_of_ideal I
   have hKc : IsCompact (zeroSetIn I ∩ closure W) := hWc.inter_left hZc
   have hgc : ContinuousOn g (zeroSetIn I ∩ U) := fun z hz => hg.continuousWithinAt_trace hz
   obtain ⟨M, hM⟩ : ∃ M, ∀ z ∈ zeroSetIn I ∩ closure W, ‖g z‖ ≤ M :=
     hKc.exists_bound_of_continuousOn (hgc.mono (Set.inter_subset_inter_right _ hWU))
 
-  obtain ⟨f, hf⟩ : ∃ f : (Fin k → ℂ) → ℂ,
-      ∀ y, f y = ∑ᶠ z ∈ {z | z ∈ zeroSetIn I ∩ W ∧ A z = y}, g z := ⟨_, fun _ => rfl⟩
-  have hfsum : ∀ (s : Fin m → σ → ℂ) (y : Fin k → ℂ),
-      (∀ j, s j ∈ zeroSetIn I ∩ W ∧ A (s j) = y) → Function.Injective s →
-      (∀ z ∈ zeroSetIn I ∩ W, A z = y → z ∈ Set.range s) → f y = ∑ j, g (s j) := by
+  obtain ⟨f, hf⟩
+      : ∃ f : (Fin k → ℂ) → ℂ, ∀ y, f y = ∑ᶠ z ∈ {z | z ∈ zeroSetIn I ∩ W ∧ A z = y}, g z :=
+    ⟨_, fun _ => rfl⟩
+  have hfsum
+      : ∀ (s : Fin m → σ → ℂ) (y : Fin k → ℂ),
+        (∀ j, s j ∈ zeroSetIn I ∩ W ∧ A (s j) = y) → Function.Injective s
+          → (∀ z ∈ zeroSetIn I ∩ W, A z = y → z ∈ Set.range s)
+          → f y = ∑ j, g (s j) := by
     intro s y hs hinj hcov
     have hset : {z | z ∈ zeroSetIn I ∩ W ∧ A z = y} = Set.range s := by
       ext z
@@ -78,17 +85,40 @@ theorem LocalTrace.proof (hbc : LocalBranchedCovering.Statement) : LocalTrace.St
     rintro y ⟨hyD, hyδ⟩
     obtain ⟨O, s, hOo, hyO, hsd, hsO⟩ := hsheets y hyD hyδ
     rw [hfsum (fun j => s j y) y (hsO y hyO).1 (hsO y hyO).2.1 (hsO y hyO).2.2]
-    calc ‖∑ j, g (s j y)‖ ≤ ∑ j : Fin m, ‖g (s j y)‖ := norm_sum_le _ _
-      _ ≤ ∑ _j : Fin m, M := Finset.sum_le_sum fun j _ =>
+    calc
+      ‖∑ j, g (s j y)‖
+        ≤ ∑ j : Fin m, ‖g (s j y)‖ := norm_sum_le _ _
+      _ ≤ ∑ _j : Fin m, M :=
+        Finset.sum_le_sum fun j _ =>
           hM _ ⟨((hsO y hyO).1 j).1.1, subset_closure ((hsO y hyO).1 j).1.2⟩
       _ = m * M := by simp
-  obtain ⟨T, hTd, hTf⟩ := RiemannExtensionAnalytic.proof k D δ f hDo hδd hδne hfd (fun τ _ =>
-    ⟨Set.univ, Filter.univ_mem, isBounded_iff_forall_norm_le.2 ⟨m * M, by
-      rintro _ ⟨y, ⟨⟨_, hyD⟩, hyδ⟩, rfl⟩
-      exact hfb y ⟨hyD, hyδ⟩⟩⟩)
-  refine ⟨k, A, W ∩ A ⁻¹' D, D, m, T, hWo.inter (hDo.preimage A.continuous), ⟨hwW, hAwD⟩,
-    fun z hz => hWU (subset_closure hz.1), hDo, hAwD,
-    fun z hz hAz => hwonly z ⟨hz.1, hz.2.1⟩ hAz, hTd, ?_⟩
+  obtain ⟨T, hTd, hTf⟩ :=
+    RiemannExtensionAnalytic.proof k D δ f hDo hδd hδne hfd (fun τ _ => ⟨
+      Set.univ,
+      Filter.univ_mem,
+      isBounded_iff_forall_norm_le.2 ⟨
+        m * M,
+        by
+          rintro _ ⟨y, ⟨⟨_, hyD⟩, hyδ⟩, rfl⟩
+          exact hfb y ⟨hyD, hyδ⟩
+      ⟩
+    ⟩)
+  refine ⟨
+    k,
+    A,
+    W ∩ A ⁻¹' D,
+    D,
+    m,
+    T,
+    hWo.inter (hDo.preimage A.continuous),
+    ⟨hwW, hAwD⟩,
+    fun z hz => hWU (subset_closure hz.1),
+    hDo,
+    hAwD,
+    fun z hz hAz => hwonly z ⟨hz.1, hz.2.1⟩ hAz,
+    hTd,
+    ?_
+  ⟩
   intro y hyD
 
   have hseq : ∀ n : ℕ, ∃ t ∈ D ∩ Metric.ball y (1 / ((n : ℝ) + 1)), δ t ≠ 0 := fun n =>
@@ -98,11 +128,15 @@ theorem LocalTrace.proof (hbc : LocalBranchedCovering.Statement) : LocalTrace.St
   have htD : ∀ n, t n ∈ D := fun n => (ht n).1
   have httend : Tendsto t atTop (𝓝 y) := by
     rw [tendsto_iff_dist_tendsto_zero]
-    exact squeeze_zero (fun n => dist_nonneg) (fun n => le_of_lt (ht n).2)
+    exact squeeze_zero
+      (fun n => dist_nonneg)
+      (fun n => le_of_lt (ht n).2)
       tendsto_one_div_add_atTop_nhds_zero_nat
 
-  have hX : ∀ n, ∃ X : Fin m → σ → ℂ, (∀ j, X j ∈ zeroSetIn I ∩ W ∧ A (X j) = t n) ∧
-      (∀ z ∈ zeroSetIn I ∩ W, A z = t n → z ∈ Set.range X) ∧ T (t n) = ∑ j, g (X j) := by
+  have hX
+      : ∀ n, ∃ X : Fin m → σ → ℂ,
+        (∀ j, X j ∈ zeroSetIn I ∩ W ∧ A (X j) = t n)
+          ∧ (∀ z ∈ zeroSetIn I ∩ W, A z = t n → z ∈ Set.range X) ∧ T (t n) = ∑ j, g (X j) := by
     intro n
     obtain ⟨O, s, hOo, hyO, hsd, hsO⟩ := hsheets (t n) (htD n) (htδ n)
     obtain ⟨h1, h2, h3⟩ := hsO (t n) hyO
@@ -111,8 +145,9 @@ theorem LocalTrace.proof (hbc : LocalBranchedCovering.Statement) : LocalTrace.St
 
   have hKm : IsCompact (Set.univ.pi fun _ : Fin m => zeroSetIn I ∩ closure W) :=
     isCompact_univ_pi fun _ => hKc
-  obtain ⟨x, hxK, φ, hφ, hXφ⟩ := hKm.tendsto_subseq (x := X) (fun n => Set.mem_univ_pi.2 fun j =>
-    ⟨(hXmem n j).1.1, subset_closure (hXmem n j).1.2⟩)
+  obtain ⟨x, hxK, φ, hφ, hXφ⟩ :=
+    hKm.tendsto_subseq (x := X)
+      (fun n => Set.mem_univ_pi.2 fun j => ⟨(hXmem n j).1.1, subset_closure (hXmem n j).1.2⟩)
   have hxK' : ∀ j, x j ∈ zeroSetIn I ∩ closure W := fun j => Set.mem_univ_pi.1 hxK j
   have hxj : ∀ j, Tendsto (fun n => X (φ n) j) atTop (𝓝 (x j)) := fun j => tendsto_pi_nhds.1 hXφ j
   have htφ : Tendsto (fun n => t (φ n)) atTop (𝓝 y) := httend.comp hφ.tendsto_atTop
@@ -126,19 +161,24 @@ theorem LocalTrace.proof (hbc : LocalBranchedCovering.Statement) : LocalTrace.St
     have hs : Tendsto (fun n => ∑ j, g (X (φ n) j)) atTop (𝓝 (∑ j, g (x j))) := by
       refine tendsto_finsetSum _ fun j _ => ?_
       exact (hgc (x j) ⟨(hxK' j).1, hWU (hxK' j).2⟩).tendsto.comp
-        (tendsto_nhdsWithin_iff.2 ⟨hxj j, Filter.Eventually.of_forall fun n =>
-          hmemU _ (hXmem (φ n) j).1⟩)
+        (tendsto_nhdsWithin_iff.2
+          ⟨hxj j, Filter.Eventually.of_forall fun n => hmemU _ (hXmem (φ n) j).1⟩)
     exact Tendsto.congr (fun n => (hXT (φ n)).symm) hs
-  refine ⟨x, fun j => ⟨⟨(hxK' j).1, hxW j, by show A (x j) ∈ D; rw [hAx j]; exact hyD⟩, hAx j⟩,
-    ?_, tendsto_nhds_unique hT1 hT2⟩
+  refine ⟨
+    x,
+    fun j => ⟨⟨(hxK' j).1, hxW j, by show A (x j) ∈ D; rw [hAx j]; exact hyD⟩, hAx j⟩,
+    ?_,
+    tendsto_nhds_unique hT1 hT2
+  ⟩
 
   rintro z ⟨hzZ, hzW, -⟩ hAz
   by_contra hz
   have hne : ∀ j, 0 < dist z (x j) := fun j => dist_pos.2 fun h => hz ⟨j, h.symm⟩
   obtain ⟨r, hr, hrW⟩ := Metric.isOpen_iff.1 hWo z hzW
   have hε : ∀ᶠ ε in 𝓝[>] (0 : ℝ), 0 < ε ∧ ε ≤ r ∧ ∀ j, 2 * ε < dist z (x j) := by
-    refine Filter.Eventually.and (self_mem_nhdsWithin : ∀ᶠ ε in 𝓝[>] (0 : ℝ), 0 < ε) (Filter.Eventually.and (nhdsWithin_le_nhds (Iic_mem_nhds hr) : ∀ᶠ ε in 𝓝[>] (0 : ℝ), ε ≤ r)
-      (Filter.eventually_all.2 fun j => nhdsWithin_le_nhds ?_))
+    refine Filter.Eventually.and (self_mem_nhdsWithin : ∀ᶠ ε in 𝓝[>] (0 : ℝ), 0 < ε)
+      (Filter.Eventually.and (nhdsWithin_le_nhds (Iic_mem_nhds hr) : ∀ᶠ ε in 𝓝[>] (0 : ℝ), ε ≤ r)
+        (Filter.eventually_all.2 fun j => nhdsWithin_le_nhds ?_))
     have h2 : Tendsto (fun ε : ℝ => 2 * ε) (𝓝 0) (𝓝 0) := by
       simpa using (continuous_const_mul (2 : ℝ)).tendsto 0
     exact h2.eventually (gt_mem_nhds (hne j))

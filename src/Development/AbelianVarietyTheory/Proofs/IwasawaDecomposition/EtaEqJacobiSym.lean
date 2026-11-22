@@ -7,13 +7,14 @@ public import Formalism.FrobeniusOrbits.HostCorollaries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
 open scoped Pointwise
 
 namespace GlobalTheory.EtaJacobi
 
-theorem jacobi_flip {p d : ℕ} (hp : Odd p) (hd : d % 4 = 3) :
-    jacobiSym (p : ℤ) d = jacobiSym (-(d : ℤ)) p := by
+theorem jacobi_flip {p d : ℕ} (hp : Odd p) (hd : d % 4 = 3)
+    : jacobiSym (p : ℤ) d = jacobiSym (-(d : ℤ)) p := by
   have hdo : Odd d := Nat.odd_iff.mpr (by omega)
   rw [jacobiSym.neg _ hp]
   rcases Nat.odd_mod_four_iff.mp (Nat.odd_iff.mp hp) with h | h
@@ -21,9 +22,13 @@ theorem jacobi_flip {p d : ℕ} (hp : Odd p) (hd : d % 4 = 3) :
   · rw [ZMod.χ₄_nat_three_mod_four h, jacobiSym.quadratic_reciprocity_three_mod_four h hd]
     ring
 
-theorem pow_prime_pow {k : Type*} [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (hp : p ≠ 2)
-    (m : ℤ) (x : k) (hx : x ^ 2 = (m : k)) (f : ℕ) :
-    x ^ (p ^ f) = ((legendreSym p m ^ f : ℤ) : k) * x := by
+theorem pow_prime_pow
+    {k : Type*} [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (hp : p ≠ 2)
+    (m : ℤ) (x : k) (hx : x ^ 2 = (m : k))
+    (f : ℕ)
+    : x ^ (p ^ f) = ((legendreSym p m ^ f : ℤ) : k) * x := by
   have hodd : p % 2 = 1 := Nat.odd_iff.mp ((Fact.out : p.Prime).odd_of_ne_two hp)
   have h1 : x ^ p = ((legendreSym p m : ℤ) : k) * x := by
     have h := congrArg (ZMod.castHom (dvd_refl p) k) (legendreSym.eq_pow p m)
@@ -48,11 +53,15 @@ variable (K : Type) [Field K] [NumberField K] [IsCMField K]
 local notation3 "K⁺" => maximalRealSubfield K
 
 theorem frob_eq
-    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ →
-      ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
-    (P : Ideal (𝓞 K)) [P.IsPrime] (hP0 : P ≠ ⊥) (x : 𝓞 K) :
-    (if (Ideal.primesOver (P.under (𝓞 K⁺)) (𝓞 K)).ncard = 1 then IsCMField.complexConj K • x else x)
-      - x ^ Ideal.absNorm (P.under (𝓞 K⁺)) ∈ P := by
+    (hunr : ∀ P : Ideal (𝓞 K), P.IsPrime → P ≠ ⊥ → ¬ ∀ x : 𝓞 K, IsCMField.complexConj K • x - x ∈ P)
+    (P : Ideal (𝓞 K)) [P.IsPrime]
+    (hP0 : P ≠ ⊥) (x : 𝓞 K)
+    : (if (Ideal.primesOver (P.under (𝓞 K⁺)) (𝓞 K)).ncard = 1 then
+         IsCMField.complexConj K • x
+       else
+         x)
+        - x ^ Ideal.absNorm (P.under (𝓞 K⁺))
+      ∈ P := by
   have h𝔭 : P.under (𝓞 K⁺) ≠ ⊥ := Ideal.under_ne_bot (𝓞 K⁺) hP0
   have hmax : P.IsMaximal := Ideal.IsPrime.isMaximal inferInstance hP0
   have hfin : Finite (𝓞 K ⧸ P) := Ideal.finiteQuotientOfFreeOfNeBot P hP0
@@ -105,11 +114,14 @@ theorem frob_eq
 
 end CM
 
-theorem card_aboveF {L : Type} [Field L] [NumberField L] (F : Type) [Field F] [NumberField F]
-    [Algebra F L] (v : HeightOneSpectrum (𝓞 F)) :
-    (aboveF (L := L) F v).card = (Ideal.primesOver v.asIdeal (𝓞 L)).ncard := by
-  rw [← Set.ncard_coe_finset, ← Set.ncard_image_of_injective _
-    (f := HeightOneSpectrum.asIdeal) (fun _ _ h => HeightOneSpectrum.ext h)]
+theorem card_aboveF
+    {L : Type} [Field L] [NumberField L]
+    (F : Type) [Field F] [NumberField F] [Algebra F L]
+    (v : HeightOneSpectrum (𝓞 F))
+    : (aboveF (L := L) F v).card = (Ideal.primesOver v.asIdeal (𝓞 L)).ncard := by
+  rw [← Set.ncard_coe_finset,
+    ← Set.ncard_image_of_injective _ (f := HeightOneSpectrum.asIdeal)
+      (fun _ _ h => HeightOneSpectrum.ext h)]
   congr 1
   ext Q
   simp only [aboveF, Set.Finite.coe_toFinset, Set.mem_image, Set.mem_setOf_eq]
@@ -117,15 +129,18 @@ theorem card_aboveF {L : Type} [Field L] [NumberField L] (F : Type) [Field F] [N
   · rintro ⟨P, rfl, rfl⟩
     exact ⟨P.isPrime, ⟨rfl⟩⟩
   · rintro ⟨h1, h2⟩
-    exact ⟨⟨Q, h1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
-      HeightOneSpectrum.ext h2.over.symm, rfl⟩
-
+    exact ⟨
+      ⟨Q, h1, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
+      HeightOneSpectrum.ext h2.over.symm,
+      rfl
+    ⟩
 
 open Classical in
-theorem eta_eq_jacobiSym : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (v : HeightOneSpectrum (𝓞 H.F)),
-    ((H.d : ℕ) : 𝓞 H.F) ∉ v.asIdeal →
-    (if (aboveF (L := H.E) H.F v).card = 1 then (-1 : ℤ) else 1) =
-      jacobiSym (Ideal.absNorm v.asIdeal : ℕ) H.d := by
+theorem eta_eq_jacobiSym
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (v : HeightOneSpectrum (𝓞 H.F)),
+      ((H.d : ℕ) : 𝓞 H.F) ∉ v.asIdeal
+        → (if (aboveF (L := H.E) H.F v).card = 1 then (-1 : ℤ) else 1)
+          = jacobiSym (Ideal.absNorm v.asIdeal : ℕ) H.d := by
   intro R H v hv
   have hCM : IsCMField H.E := H.isCMField_hostE
   have hcc : ∀ x : H.E, IsCMField.complexConj H.E x = H.conj x := fun x => by
@@ -154,8 +169,7 @@ theorem eta_eq_jacobiSym : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (
     refine ⟨hm.eq_of_le (Ideal.IsPrime.ne_top inferInstance) ?_⟩
     rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap, map_natCast]
     exact hpP
-  have hvZ : v.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) :=
-    Ideal.LiesOver.tower_bot P v.asIdeal _
+  have hvZ : v.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) := Ideal.LiesOver.tower_bot P v.asIdeal _
   have hN := Ideal.pow_inertiaDeg p v.asIdeal
   set f := v.asIdeal.inertiaDeg ℤ
   rw [← hN, Nat.cast_pow, jacobiSym.pow_left]
@@ -166,7 +180,8 @@ theorem eta_eq_jacobiSym : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (
         (Dvd.dvd.mul_right (dvd_mul_right _ _) _)
     have he := H.der.eta.2.2 p h2N P
     unfold Formalism.HC.HostRaw.etaF at he
-    change (if (Ideal.primesOver (P.under (𝓞 H.F)) (𝓞 H.E)).ncard = 2 then (1 : ℤ) else -1) = 1 at he
+    change (if (Ideal.primesOver (P.under (𝓞 H.F)) (𝓞 H.E)).ncard = 2 then (1 : ℤ) else -1) = 1
+      at he
     rw [hunder] at he
     have h2 : (Ideal.primesOver v.asIdeal (𝓞 H.E)).ncard = 2 := by
       by_contra hc
@@ -176,8 +191,9 @@ theorem eta_eq_jacobiSym : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (
       rw [hp2, Nat.cast_ofNat, jacobiSym.at_two (Nat.odd_iff.mpr (by omega)),
         ZMod.χ₈_nat_eq_if_mod_eight, if_neg (by omega), if_pos (by omega)]
     rw [h2, hj, if_neg (by decide), one_pow]
-  · have hunr : ∀ P : Ideal (𝓞 H.E), P.IsPrime → P ≠ ⊥ →
-        ¬ ∀ x : 𝓞 H.E, IsCMField.complexConj H.E • x - x ∈ P :=
+  · have hunr
+        : ∀ P : Ideal (𝓞 H.E),
+          P.IsPrime → P ≠ ⊥ → ¬ ∀ x : 𝓞 H.E, IsCMField.complexConj H.E • x - x ∈ P :=
       fun P hP hP0 hx => H.der.unramEF P hP hP0 (fun x => hsm x ▸ hx x)
     have hsq := H.sqd_sq
     have hint : IsIntegral ℤ (H.sqd) := by
@@ -225,7 +241,7 @@ theorem eta_eq_jacobiSym : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (
       intro h0
       have : p ∣ 2 := (CharP.cast_eq_zero_iff (𝓞 H.E ⧸ P) p 2).mp (by simpa using h0)
       exact hp2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp this)
-    have hneg : Ideal.Quotient.mk P β ≠ -Ideal.Quotient.mk P β := by
+    have hneg : Ideal.Quotient.mk P β ≠ - Ideal.Quotient.mk P β := by
       intro h0
       have : 2 * Ideal.Quotient.mk P β = 0 := by linear_combination h0
       exact (mul_ne_zero h2 hx0) this

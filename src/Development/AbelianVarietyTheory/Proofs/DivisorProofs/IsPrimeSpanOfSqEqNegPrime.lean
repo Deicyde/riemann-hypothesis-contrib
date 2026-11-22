@@ -8,9 +8,9 @@ open NumberField
 
 namespace GlobalTheory.CMModel
 
-theorem isPrime_span_of_sq_eq_neg_prime :
-    ∀ (p : ℕ) (K : Type) [Field K] [NumberField K] (y : 𝓞 K), p.Prime → Module.finrank ℚ K = 2 →
-      y ^ 2 = -(p : 𝓞 K) → (Ideal.span {y}).IsPrime := by
+theorem isPrime_span_of_sq_eq_neg_prime
+    : ∀ (p : ℕ) (K : Type) [Field K] [NumberField K] (y : 𝓞 K),
+      p.Prime → Module.finrank ℚ K = 2 → y ^ 2 = -(p : 𝓞 K) → (Ideal.span {y}).IsPrime := by
   intro p K _ _ y hp hK hy
   have hr : Module.finrank ℤ (𝓞 K) = 2 := by rw [RingOfIntegers.rank, hK]
   have h1 : Ideal.absNorm (Ideal.span {y}) ^ 2 = p ^ 2 := by

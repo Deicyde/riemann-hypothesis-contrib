@@ -16,12 +16,18 @@ variable (k : Type) [Field k] [CharZero k]
 
 theorem jc : JC k := by
   intro n x
-  obtain ⟨N, -, S, hS, hN, hSs, hx⟩ := Module.End.exists_isNilpotent_isSemisimple (K := k) (f := Matrix.toLin' x)
-  have hsx : Matrix.toLinAlgEquiv' (Matrix.toLinAlgEquiv'.symm S) = S := AlgEquiv.apply_symm_apply _ _
+  obtain ⟨N, -, S, hS, hN, hSs, hx⟩ :=
+    Module.End.exists_isNilpotent_isSemisimple (K := k) (f := Matrix.toLin' x)
+  have hsx : Matrix.toLinAlgEquiv' (Matrix.toLinAlgEquiv'.symm S) = S :=
+    AlgEquiv.apply_symm_apply _ _
   refine ⟨Matrix.toLinAlgEquiv'.symm S, ?_, ?_, ?_⟩
-  · have hmap := AlgHom.map_adjoin (Matrix.toLinAlgEquiv'.symm : _ ≃ₐ[k] Matrix (Fin n) (Fin n) k).toAlgHom {Matrix.toLin' x}
+  · have hmap :=
+      AlgHom.map_adjoin (Matrix.toLinAlgEquiv'.symm : _ ≃ₐ[k] Matrix (Fin n) (Fin n) k).toAlgHom
+        {Matrix.toLin' x}
     rw [Set.image_singleton] at hmap
-    have hx' : (Matrix.toLinAlgEquiv'.symm : _ ≃ₐ[k] Matrix (Fin n) (Fin n) k).toAlgHom (Matrix.toLin' x) = x :=
+    have hx'
+        : (Matrix.toLinAlgEquiv'.symm : _ ≃ₐ[k] Matrix (Fin n) (Fin n) k).toAlgHom (Matrix.toLin' x)
+          = x :=
       Matrix.toLinAlgEquiv'.symm_apply_apply x
     rw [hx'] at hmap
     rw [← hmap]

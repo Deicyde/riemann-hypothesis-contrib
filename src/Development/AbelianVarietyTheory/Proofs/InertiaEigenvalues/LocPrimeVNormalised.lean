@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
 namespace GlobalTheory.HWL.NormVal
 
@@ -55,16 +56,31 @@ private lemma addValuation_eq_of_nonneg_iff {F : Type*} [Field F] (v w : AddValu
   have h2 := le_of_nonneg_imp_nonneg w v hw hv (fun y => (h y).mpr) hs.symm ht.symm
   exact congrArg _ (le_antisymm h1 h2)
 
-
 open TensorProduct in
-theorem _root_.GlobalTheory.HWL.NormVal.locPrime_v_normalised : ∀ (l : ℕ) [Fact l.Prime] (P : _root_.Formalism.BasicNotions.LocPrime l) (LL : _root_.Formalism.BasicNotions.Loc.FinExt l), (∀ (x : ↥LL.1) (q : ℚ), P.v LL x = (q : WithTop ℚ) ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ = (l : ℝ) ^ (-(q : ℝ))) ∧ (∀ (x : ↥LL.1) (q : ℚ), (q : WithTop ℚ) ≤ P.v LL x ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ ≤ (l : ℝ) ^ (-(q : ℝ))) ∧ ∀ x : ↥LL.1, x ∈ _root_.Formalism.BasicNotions.Loc.OL LL ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ ≤ 1 := by
+theorem _root_.GlobalTheory.HWL.NormVal.locPrime_v_normalised
+    : ∀ (l : ℕ) [Fact l.Prime] (P : _root_.Formalism.BasicNotions.LocPrime l)
+        (LL : _root_.Formalism.BasicNotions.Loc.FinExt l),
+      (∀ (x : ↥LL.1) (q : ℚ),
+          P.v LL x = (q : WithTop ℚ)
+            ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ = (l : ℝ) ^ (-(q : ℝ)))
+        ∧ (∀ (x : ↥LL.1) (q : ℚ),
+          (q : WithTop ℚ) ≤ P.v LL x
+            ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ ≤ (l : ℝ) ^ (-(q : ℝ)))
+        ∧ ∀ x : ↥LL.1,
+          x ∈ _root_.Formalism.BasicNotions.Loc.OL LL
+            ↔ ‖(x : _root_.Formalism.BasicNotions.Loc.Om l)‖ ≤ 1 := by
   intro l _ P LL
   set w : AddValuation (↥LL.1) (WithTop ℚ) :=
     (_root_.GlobalTheory.Per.Val.vOm l).comap (algebraMap (↥LL.1) (_root_.Formalism.BasicNotions.Loc.Om l)) with hwdef
-  have hwx : ∀ x : ↥LL.1, w x = _root_.GlobalTheory.Per.Val.vf (x : _root_.Formalism.BasicNotions.Loc.Om l) := fun x => rfl
+  have hwx
+      : ∀ x : ↥LL.1,
+        w x = _root_.GlobalTheory.Per.Val.vf (x : _root_.Formalism.BasicNotions.Loc.Om l) :=
+    fun x => rfl
   have hw : w (l : ↥LL.1) = 1 := by
     rw [hwx]
-    have : ((l : ↥LL.1) : _root_.Formalism.BasicNotions.Loc.Om l) = (l : _root_.Formalism.BasicNotions.Loc.Om l) := by simp
+    have : ((l : ↥LL.1) : _root_.Formalism.BasicNotions.Loc.Om l)
+        = (l : _root_.Formalism.BasicNotions.Loc.Om l) := by
+      simp
     rw [this]
     exact _root_.GlobalTheory.Per.Val.vf_l
   have hnn : ∀ y : ↥LL.1, 0 ≤ P.v LL y ↔ 0 ≤ w y := by
@@ -73,8 +89,10 @@ theorem _root_.GlobalTheory.HWL.NormVal.locPrime_v_normalised : ∀ (l : ℕ) [F
     have := _root_.GlobalTheory.Per.Val.le_vf_iff (y : _root_.Formalism.BasicNotions.Loc.Om l) 0
     simp only [Rat.cast_zero, neg_zero, Real.rpow_zero, WithTop.coe_zero] at this
     exact this.symm
-  have key : ∀ x : ↥LL.1, P.v LL x = _root_.GlobalTheory.Per.Val.vf (x : _root_.Formalism.BasicNotions.Loc.Om l) := fun x =>
-    (addValuation_eq_of_nonneg_iff (P.v LL) w (P.v_l LL) hw hnn x).trans (hwx x)
+  have key
+      : ∀ x : ↥LL.1,
+        P.v LL x = _root_.GlobalTheory.Per.Val.vf (x : _root_.Formalism.BasicNotions.Loc.Om l) :=
+    fun x => (addValuation_eq_of_nonneg_iff (P.v LL) w (P.v_l LL) hw hnn x).trans (hwx x)
   refine ⟨fun x q => ?_, fun x q => ?_, fun x => _root_.GlobalTheory.Per.Val.mem_OL_iff LL x⟩
   · rw [key]; exact _root_.GlobalTheory.Per.Val.vf_eq_iff _ q
   · rw [key]; exact _root_.GlobalTheory.Per.Val.le_vf_iff _ q

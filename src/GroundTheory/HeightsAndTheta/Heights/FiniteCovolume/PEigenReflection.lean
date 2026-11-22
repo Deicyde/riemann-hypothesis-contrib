@@ -22,8 +22,8 @@ private lemma expand_sandwich {ι : Type*} [Fintype ι] [DecidableEq ι] (M X X'
   simp only [smul_smul, sub_smul]
   abel
 
-theorem EigenReflection.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
-    EigenReflection.Statement ι := by
+theorem EigenReflection.proof (ι : Type*) [Fintype ι] [DecidableEq ι]
+    : EigenReflection.Statement ι := by
   intro H P hmaj ε hε v hv hAv
   obtain ⟨hP, hH, -, hPHP⟩ := hmaj
   have hPh : Pᴴ = P := hP.isHermitian
@@ -44,8 +44,7 @@ theorem EigenReflection.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
   have hHv : H *ᵥ v = ε • y := by
     have : H *ᵥ v = P *ᵥ ((H⁻¹ * P) *ᵥ v) := by rw [mulVec_mulVec, ← Matrix.mul_assoc, hPHP]
     rw [this, show (H⁻¹ * P) *ᵥ v = ε • v from hAv, mulVec_smul]
-  have hvH : star v ᵥ* H = ε • star y := by
-    rw [← hHh, ← star_mulVec, hHv, star_smul, hεstar]
+  have hvH : star v ᵥ* H = ε • star y := by rw [← hHh, ← star_mulVec, hHv, star_smul, hεstar]
 
   have hR : pReflection P v = 1 - c • vecMulVec v (star y) := by
     rw [pReflection, ← hqdef, ← hc, vecMulVec_mul, hwy]
@@ -61,8 +60,7 @@ theorem EigenReflection.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
     have h3 : vecMulVec y (star v) * P * vecMulVec v (star y) = q • vecMulVec y (star y) := by
       rw [vecMulVec_mul, hwy, vecMulVec_mul_vecMulVec, hyv, vecMulVec_smul]
     rw [expand_sandwich P _ _ _ c 1 1 q h1 h2 h3]
-    have : c * c * q - c * 1 - c * 1 = 0 := by
-      rw [mul_assoc, hcq]; ring
+    have : c * c * q - c * 1 - c * 1 = 0 := by rw [mul_assoc, hcq]; ring
     rw [this, zero_smul, add_zero]
   · rw [hRh, hR]
     have h1 : vecMulVec y (star v) * H = ε • vecMulVec y (star y) := by
@@ -77,10 +75,12 @@ theorem EigenReflection.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
     rw [expand_sandwich H _ _ _ c ε ε (ε * q) h1 h2 h3]
     have : c * c * (ε * q) - c * ε - c * ε = 0 := by
       have : c * c * (ε * q) = (c * q) * c * ε := by ring
-      rw [this, hcq]; ring
+      rw [this, hcq]
+      ring
     rw [this, zero_smul, add_zero]
   · rw [hR, sub_mulVec, one_mulVec, smul_mulVec, vecMulVec_mulVec, hyv]
-    rw [op_smul_eq_smul, smul_smul, hcq, two_smul]; abel
+    rw [op_smul_eq_smul, smul_smul, hcq, two_smul]
+    abel
   · intro u hu
     have hyu : star y ⬝ᵥ u = 0 := by rw [← hwy, ← dotProduct_mulVec, hu]
     rw [hR, sub_mulVec, one_mulVec, smul_mulVec, vecMulVec_mulVec, hyu]

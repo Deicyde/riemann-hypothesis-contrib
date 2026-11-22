@@ -22,9 +22,10 @@ theorem annDrop : AnnDrop := by
       rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply, ← ih]
       exact hφ _
   let Φ : V₀ ⊗[F] B ≃ₗ[F] V ⊗[F] C := TensorProduct.congr i.symm e.toLinearEquiv
-  have hcomm : ∀ (a : End F V₀) (a' : End F V) (b : End F B) (b' : End F C),
-      (∀ v, i.symm (a v) = a' (i.symm v)) → (∀ y, e (b y) = b' (e y)) →
-      ∀ z, Φ (AlgebraTensorModule.map a b z) = TensorProduct.map a' b' (Φ z) := by
+  have hcomm
+      : ∀ (a : End F V₀) (a' : End F V) (b : End F B) (b' : End F C),
+        (∀ v, i.symm (a v) = a' (i.symm v)) → (∀ y, e (b y) = b' (e y))
+          → ∀ z, Φ (AlgebraTensorModule.map a b z) = TensorProduct.map a' b' (Φ z) := by
     intro a a' b b' ha hb z
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -42,21 +43,24 @@ theorem annDrop : AnnDrop := by
     rw [LinearEquiv.apply_symm_apply] at h
     rw [h, LinearEquiv.symm_apply_apply]
   have hsum := hrel (Φ x) hinv
-  have hinj : Function.Injective (TensorProduct.map (LinearMap.id : V →ₗ[F] V) (ψ.toLinearMap ^ (f * N))) := by
+  have hinj : Function.Injective (TensorProduct.map (LinearMap.id : V →ₗ[F] V)
+      (ψ.toLinearMap ^ (f * N))) := by
     have h0 : Function.Injective (ψ.toLinearMap ^ (f * N)) := by
       rw [Module.End.coe_pow]
       exact Function.Injective.iterate hψ _
     exact Module.Flat.lTensor_preserves_injective_linearMap (M := V) _ h0
-  have hz : ∑ j : Fin (n + 1), ((-1) ^ (j : ℕ) * (q : ℤ) ^ ((j : ℕ).choose 2)) •
-      TensorProduct.map (A j) (ψ.toLinearMap ^ (f * (n - j))) (Φ x) = 0 := by
+  have hz
+      : ∑ j : Fin (n + 1), ((-1) ^ (j : ℕ) * (q : ℤ) ^ ((j : ℕ).choose 2)) •
+          TensorProduct.map (A j) (ψ.toLinearMap ^ (f * (n - j))) (Φ x)
+        = 0 := by
     apply hinj
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_zero, map_sum, ← hsum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_zsmul]
     congr 1
-    rw [← LinearMap.comp_apply, ← TensorProduct.map_comp, LinearMap.id_comp, ← Module.End.mul_eq_comp,
-      ← pow_add]
+    rw [← LinearMap.comp_apply, ← TensorProduct.map_comp, LinearMap.id_comp,
+      ← Module.End.mul_eq_comp, ← pow_add]
     congr 3
     ring
   apply Φ.injective
@@ -65,7 +69,8 @@ theorem annDrop : AnnDrop := by
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_zsmul]
   congr 1
-  rw [hcomm (T j) (A j) ((φ.toLinearMap ^ f) ^ (n - (j : ℕ))) (ψ.toLinearMap ^ (f * (n - j))) ?_ ?_ x]
+  rw [hcomm (T j) (A j) ((φ.toLinearMap ^ f) ^ (n - (j : ℕ))) (ψ.toLinearMap ^ (f * (n - j))) ?_ ?_
+    x]
   · intro v
     have h := hT j (i.symm v)
     rw [LinearEquiv.apply_symm_apply] at h

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.CrisLoc
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.TiedMu
@@ -59,21 +60,28 @@ theorem eps_root_pow (AI : LocAinf l P) (s : ℕ) : AI.εroot s ^ l ^ s = AI.ε 
     rw [LocAinf.εroot, Function.iterate_succ_apply', pow_succ', pow_mul, frobeniusEquiv_symm_pow_p]
     exact ih
 
-theorem isUnit_aB (e : Per.Fl l) (he : e.untilt = 1) (hne : e ≠ 1) :
-    IsUnit (Per.aB l (Per.tm e - 1)) :=
+theorem isUnit_aB (e : Per.Fl l) (he : e.untilt = 1) (hne : e ≠ 1)
+    : IsUnit (Per.aB l (Per.tm e - 1)) :=
   GlobalTheory.CrisLoc.unit_of_root_aB l e he hne
 
-theorem isUnit_of_aB {AI : LocAinf l P} (T : LocTied l P AI) (a : Ainf l) (h : IsUnit (Per.aB l a)) :
-    IsUnit (AI.ιA a) := by
+theorem isUnit_of_aB {AI : LocAinf l P} (T : LocTied l P AI) (a : Ainf l) (h : IsUnit (Per.aB l a))
+    : IsUnit (AI.ιA a) := by
   rw [← T.ιA] at h
   have h' := h.map T.eB.symm
   rwa [RingEquiv.symm_apply_apply] at h'
 
-theorem tied_mu_units : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → (∀ s : ℕ, IsUnit (AI.ιA (WittVector.teichmuller l (AI.εroot s) - 1))) ∧ (∀ j : ℕ, IsUnit (AI.ιA (WittVector.teichmuller l (AI.ε ^ l ^ j) - 1))) ∧ IsUnit (AI.ιA AI.ξ) ∧ ∀ z : ℤ_[l], AI.ιA (algebraMap ℤ_[l] (Ainf l) z) = algebraMap ℚ_[l] P.R.B (z : ℚ_[l]) := by
+theorem tied_mu_units
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → (∀ s : ℕ, IsUnit (AI.ιA (WittVector.teichmuller l (AI.εroot s) - 1)))
+          ∧ (∀ j : ℕ, IsUnit (AI.ιA (WittVector.teichmuller l (AI.ε ^ l ^ j) - 1)))
+          ∧ IsUnit (AI.ιA AI.ξ)
+          ∧ ∀ z : ℤ_[l],
+            AI.ιA (algebraMap ℤ_[l] (Ainf l) z) = algebraMap ℚ_[l] P.R.B (z : ℚ_[l]) := by
   intro l _ P AI T
   have hj : ∀ j : ℕ, IsUnit (AI.ιA (WittVector.teichmuller l (AI.ε ^ l ^ j) - 1)) := fun j =>
-    isUnit_of_aB T _ (isUnit_aB (AI.ε ^ l ^ j)
-      (by rw [map_pow, untilt_eps, one_pow]) (eps_pow_ne_one AI j))
+    isUnit_of_aB T _
+      (isUnit_aB (AI.ε ^ l ^ j) (by rw [map_pow, untilt_eps, one_pow]) (eps_pow_ne_one AI j))
   have hμ : IsUnit (AI.ιA AI.μ) := by simpa [LocAinf.μ] using hj 0
   refine ⟨fun s => ?_, hj, ?_, fun z => ?_⟩
   · have h := geom_sum_mul (WittVector.teichmuller l (AI.εroot s)) (l ^ s)

@@ -16,20 +16,23 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.IdealResProd
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 variable {p : HeightOneSpectrum (𝓞 F)}
 
-theorem val_le_iff (A : LocAt F E sig p) (x y : F) :
-    valuation A.Fp (A.ιF x) ≤ valuation A.Fp (A.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
+theorem val_le_iff (A : LocAt F E sig p) (x y : F)
+    : valuation A.Fp (A.ιF x) ≤ valuation A.Fp (A.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
   rw [← A.val, (valuation A.Fp).vle_iff_le]
 
-theorem val_unit {K : Type} [Field K] [ValuativeRel K] (u : (𝒪[K])ˣ) :
-    valuation K ((u : 𝒪[K]) : K) = 1 :=
+theorem val_unit {K : Type} [Field K] [ValuativeRel K] (u : (𝒪[K])ˣ)
+    : valuation K ((u : 𝒪[K]) : K) = 1 :=
   (Valuation.integer.integers (valuation K)).valuation_unit u
 
-theorem val_unif (A : LocAt F E sig p) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ) {π : F}
-    (hπ : p.valuation F π = WithZero.exp (-1)) :
-    valuation A.Fp (A.ιF π) = valuation A.Fp ϖ := by
+theorem val_unif
+    (A : LocAt F E sig p)
+    {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ)
+    {π : F} (hπ : p.valuation F π = WithZero.exp (-1))
+    : valuation A.Fp (A.ιF π) = valuation A.Fp ϖ := by
   haveI := A.lf
   have h0 : (ϖ : A.Fp) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   have hv0 : valuation A.Fp ϖ ≠ 0 := by simpa using h0
@@ -45,7 +48,8 @@ theorem val_unif (A : LocAt F E sig p) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ) 
   · obtain ⟨k, u, hk⟩ := GlobalTheory.UnramVal.exists_eq_zpow_mul_unit hϖ ((map_ne_zero A.ιF).2 hπ0)
     rw [hk, map_mul, val_unit, mul_one, map_zpow₀] at hπ1 ⊢
     have hk1 : 0 < k := (zpow_lt_one_iff_right_of_lt_one₀ (zero_lt_iff.2 hv0) hlt).1 hπ1
-    calc _ ≤ valuation A.Fp ϖ ^ (1 : ℤ) := zpow_le_zpow_right_of_le_one₀ (zero_lt_iff.2 hv0) hlt.le hk1
+    calc
+      _ ≤ valuation A.Fp ϖ ^ (1 : ℤ) := zpow_le_zpow_right_of_le_one₀ (zero_lt_iff.2 hv0) hlt.le hk1
       _ = _ := zpow_one _
   · have hn : {z : A.Fp | valuation A.Fp z = valuation A.Fp ϖ} ∈ nhds (ϖ : A.Fp) := by
       rw [IsValuativeTopology.mem_nhds_iff]
@@ -62,29 +66,31 @@ theorem val_unif (A : LocAt F E sig p) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ) 
     · rw [hz]; exact zero_le
     · rw [← WithZero.exp_log hz] at h1 ⊢
       rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at h1
-      rw [WithZero.exp_le_exp]; omega
+      rw [WithZero.exp_le_exp]
+      omega
 
-theorem mem_pow_iff (A : LocAt F E sig p) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ) (x : 𝓞 F) (n : ℕ) :
-    x ∈ p.asIdeal ^ n ↔ valuation A.Fp (A.ιF x) ≤ valuation A.Fp ϖ ^ n := by
+theorem mem_pow_iff (A : LocAt F E sig p) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ) (x : 𝓞 F) (n : ℕ)
+    : x ∈ p.asIdeal ^ n ↔ valuation A.Fp (A.ιF x) ≤ valuation A.Fp ϖ ^ n := by
   obtain ⟨π, hπ⟩ := p.valuation_exists_uniformizer F
   rw [← val_unif A hϖ hπ, ← map_pow, ← map_pow, val_le_iff, map_pow, hπ, ← WithZero.exp_nsmul,
-    ← HeightOneSpectrum.intValuation_le_pow_iff_mem, ← HeightOneSpectrum.valuation_of_algebraMap (K := F)]
+    ← HeightOneSpectrum.intValuation_le_pow_iff_mem,
+    ← HeightOneSpectrum.valuation_of_algebraMap (K := F)]
   simp
 
-theorem le_pow_iff (I : Ideal (𝓞 F)) (hI : I ≠ 0) (n : ℕ) :
-    I ≤ p.asIdeal ^ n ↔ n ≤ (Associates.mk p.asIdeal).count (Associates.mk I).factors := by
+theorem le_pow_iff (I : Ideal (𝓞 F)) (hI : I ≠ 0) (n : ℕ)
+    : I ≤ p.asIdeal ^ n ↔ n ≤ (Associates.mk p.asIdeal).count (Associates.mk I).factors := by
   rw [← Associates.prime_pow_dvd_iff_le (Associates.mk_ne_zero.2 hI) p.associates_irreducible,
     ← Associates.mk_pow, Associates.mk_le_mk_iff_dvd, Ideal.dvd_iff_le]
 
-theorem val_lt_one {K : Type} [Field K] [ValuativeRel K] {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) :
-    0 < valuation K ϖ ∧ valuation K ϖ < 1 := by
+theorem val_lt_one {K : Type} [Field K] [ValuativeRel K] {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ)
+    : 0 < valuation K ϖ ∧ valuation K ϖ < 1 := by
   have h0 : (ϖ : K) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   refine ⟨zero_lt_iff.2 (by simpa using h0), lt_of_le_of_ne ϖ.2 fun h => hϖ.not_isUnit ?_⟩
   exact ((Valuation.integer.integers (valuation K)).isUnit_iff_valuation_eq_one).2 h
 
-theorem mem_span_iff (A : LocAt F E sig p) (L : LocE A.Fp A.Ep) {c : A.Fp} (hc : c ≠ 0) (x : A.Fp) :
-    algebraMap A.Fp A.Ep x ∈ Submodule.span L.O {algebraMap A.Fp A.Ep c} ↔
-      valuation A.Fp x ≤ valuation A.Fp c := by
+theorem mem_span_iff (A : LocAt F E sig p) (L : LocE A.Fp A.Ep) {c : A.Fp} (hc : c ≠ 0) (x : A.Fp)
+    : algebraMap A.Fp A.Ep x ∈ Submodule.span L.O {algebraMap A.Fp A.Ep c}
+      ↔ valuation A.Fp x ≤ valuation A.Fp c := by
   have hun : IsUnit (algebraMap A.Fp A.Ep c) := (IsUnit.mk0 _ hc).map _
   have hx : algebraMap A.Fp A.Ep x = algebraMap A.Fp A.Ep (x / c) * algebraMap A.Fp A.Ep c := by
     rw [← map_mul, div_mul_cancel₀ _ hc]
@@ -95,28 +101,36 @@ theorem mem_span_iff (A : LocAt F E sig p) (L : LocE A.Fp A.Ep) {c : A.Fp} (hc :
   · rintro ⟨o, ho⟩
     rw [hx] at ho
     have : (o : A.Ep) = algebraMap A.Fp A.Ep (x / c) := hun.mul_right_cancel ho
-    rw [← this]; exact o.2
+    rw [← this]
+    exact o.2
   · intro h
     exact ⟨⟨_, h⟩, hx.symm⟩
 
-theorem vE_eq_count (A : LocAt F E sig p) (L : LocE A.Fp A.Ep) {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ)
-    (I : Ideal (𝓞 F)) (hI : I ≠ 0) {c : A.Fp} (hc : c ≠ 0)
-    (h : Submodule.span L.O ((fun x : 𝓞 F => A.ιE (algebraMap F E x)) '' (I : Set (𝓞 F))) =
-      Submodule.span L.O {algebraMap A.Fp A.Ep c}) :
-    vE L ϖ (algebraMap A.Fp A.Ep c) =
-      ((Associates.mk p.asIdeal).count (Associates.mk I).factors : ℕ) := by
+theorem vE_eq_count
+    (A : LocAt F E sig p) (L : LocE A.Fp A.Ep)
+    {ϖ : 𝒪[A.Fp]} (hϖ : Irreducible ϖ)
+    (I : Ideal (𝓞 F)) (hI : I ≠ 0)
+    {c : A.Fp} (hc : c ≠ 0)
+    (h : Submodule.span L.O ((fun x : 𝓞 F => A.ιE (algebraMap F E x)) '' (I : Set (𝓞 F)))
+      = Submodule.span L.O {algebraMap A.Fp A.Ep c})
+    : vE L ϖ (algebraMap A.Fp A.Ep c)
+      = ((Associates.mk p.asIdeal).count (Associates.mk I).factors : ℕ) := by
   haveI := A.lf
   obtain ⟨h0, h1⟩ := val_lt_one hϖ
   have hϖ0 : (ϖ : A.Fp) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   obtain ⟨k, u, rfl⟩ := GlobalTheory.UnramVal.exists_eq_zpow_mul_unit hϖ hc
   rw [GlobalTheory.UnramVal.vE_zpow_mul_unit L hϖ]
-  have key : ∀ n : ℕ, n ≤ (Associates.mk p.asIdeal).count (Associates.mk I).factors ↔ (n : ℤ) ≤ k := by
+  have key
+      : ∀ n : ℕ, n ≤ (Associates.mk p.asIdeal).count (Associates.mk I).factors ↔ (n : ℤ) ≤ k := by
     intro n
     rw [← le_pow_iff I hI]
-    have e1 : (n : ℤ) ≤ k ↔ Submodule.span L.O {algebraMap A.Fp A.Ep ((ϖ : A.Fp) ^ k * ((u : 𝒪[A.Fp]) : A.Fp))}
-        ≤ Submodule.span L.O {algebraMap A.Fp A.Ep ((ϖ : A.Fp) ^ n)} := by
-      rw [Submodule.span_singleton_le_iff_mem, mem_span_iff A L (pow_ne_zero n hϖ0), map_mul, val_unit,
-        mul_one, map_zpow₀, map_pow, ← zpow_natCast, zpow_le_zpow_iff_right_of_lt_one₀ h0 h1]
+    have e1
+        : (n : ℤ) ≤ k
+          ↔ Submodule.span L.O {algebraMap A.Fp A.Ep ((ϖ : A.Fp) ^ k * ((u : 𝒪[A.Fp]) : A.Fp))}
+            ≤ Submodule.span L.O {algebraMap A.Fp A.Ep ((ϖ : A.Fp) ^ n)} := by
+      rw [Submodule.span_singleton_le_iff_mem, mem_span_iff A L (pow_ne_zero n hϖ0), map_mul,
+        val_unit, mul_one, map_zpow₀, map_pow, ← zpow_natCast,
+        zpow_le_zpow_iff_right_of_lt_one₀ h0 h1]
     rw [e1, ← h, Submodule.span_le, Set.image_subset_iff]
     refine forall₂_congr fun x _ => ?_
     rw [mem_pow_iff A hϖ, Set.mem_preimage, A.compat, SetLike.mem_coe,
@@ -127,17 +141,41 @@ theorem vE_eq_count (A : LocAt F E sig p) (L : LocE A.Fp A.Ep) {ϖ : 𝒪[A.Fp]}
   have b := (key _).1 le_rfl
   omega
 
-theorem absNorm_eq_finprod (I : Ideal (𝓞 F)) (hI : I ≠ 0) :
-    ∏ᶠ p : HeightOneSpectrum (𝓞 F), (Ideal.absNorm p.asIdeal : ℝ) ^
-      (Associates.mk p.asIdeal).count (Associates.mk I).factors = (Ideal.absNorm I : ℝ) := by
-  have := map_finprod ((Nat.castRingHom ℝ).toMonoidHom.comp (Ideal.absNorm (S := 𝓞 F)).toMonoidHom)
-    (Ideal.hasFiniteMulSupport hI)
+theorem absNorm_eq_finprod (I : Ideal (𝓞 F)) (hI : I ≠ 0)
+    : ∏ᶠ p : HeightOneSpectrum (𝓞 F), (Ideal.absNorm p.asIdeal : ℝ) ^
+        (Associates.mk p.asIdeal).count (Associates.mk I).factors
+      = (Ideal.absNorm I : ℝ) := by
+  have :=
+    map_finprod ((Nat.castRingHom ℝ).toMonoidHom.comp (Ideal.absNorm (S := 𝓞 F)).toMonoidHom)
+      (Ideal.hasFiniteMulSupport hI)
   rw [Ideal.finprod_heightOneSpectrum_factorization hI] at this
   simpa [HeightOneSpectrum.maxPowDividing] using this.symm
 
-theorem discr_and_level : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig), ∀ ϖ : ∀ p, 𝒪[(A.loc p).Fp], (∀ p, Irreducible (ϖ p)) → (∀ c : ∀ p, ((A.loc p).Fp)ˣ, (∀ p, Submodule.span (A.L p).O ((fun x : 𝓞 F => (A.loc p).ιE (algebraMap F E x)) '' (differentIdeal ℤ (𝓞 F) : Set (𝓞 F))) = Submodule.span (A.L p).O {algebraMap (A.loc p).Fp (A.loc p).Ep (c p)}) → ∏ᶠ p, (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep (c p)) = |(NumberField.discr F : ℝ)|) ∧ ∀ g : ℕ, g ≠ 0 → (∀ p : HeightOneSpectrum (𝓞 F), (g : 𝓞 F) ∈ p.asIdeal → ∃ u : (𝒪[(A.loc p).Fp])ˣ, (g : (A.loc p).Fp) = ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) * (ϖ p : (A.loc p).Fp)) → ∏ᶠ p : HeightOneSpectrum (𝓞 F), (if (g : 𝓞 F) ∈ p.asIdeal then (resQ (ϖ p) : ℝ) else 1) = (g : ℝ) ^ Module.finrank ℚ F := by
+theorem discr_and_level
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ ϖ : ∀ p, 𝒪[(A.loc p).Fp],
+        (∀ p, Irreducible (ϖ p))
+          → (∀ c : ∀ p, ((A.loc p).Fp)ˣ,
+              (∀ p,
+                  Submodule.span (A.L p).O
+                      ((fun x : 𝓞 F => (A.loc p).ιE (algebraMap F E x))
+                        '' (differentIdeal ℤ (𝓞 F) : Set (𝓞 F)))
+                    = Submodule.span (A.L p).O {algebraMap (A.loc p).Fp (A.loc p).Ep (c p)})
+                → ∏ᶠ p, (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep (c p))
+                  = |(NumberField.discr F : ℝ)|)
+            ∧ ∀ g : ℕ,
+              g ≠ 0
+                → (∀ p : HeightOneSpectrum (𝓞 F),
+                  (g : 𝓞 F) ∈ p.asIdeal
+                    → ∃ u : (𝒪[(A.loc p).Fp])ˣ,
+                      (g : (A.loc p).Fp)
+                        = ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) * (ϖ p : (A.loc p).Fp))
+                → ∏ᶠ p : HeightOneSpectrum (𝓞 F), (if (g : 𝓞 F) ∈ p.asIdeal then (resQ (ϖ p) : ℝ) else 1)
+                  = (g : ℝ) ^ Module.finrank ℚ F := by
   intro F E _ _ _ _ _ sig A ϖ hϖ
-  have hq : ∀ p, resQ (ϖ p) = Ideal.absNorm p.asIdeal := fun p => (GlobalTheory.HL.PlacesInt.integers_local A).2.2.2 p _ (hϖ p)
+  have hq : ∀ p, resQ (ϖ p) = Ideal.absNorm p.asIdeal := fun p =>
+    (GlobalTheory.HL.PlacesInt.integers_local A).2.2.2 p _ (hϖ p)
   refine ⟨fun c hc => ?_, fun g hg hu => ?_⟩
   · have hI : differentIdeal ℤ (𝓞 F) ≠ 0 := by
       intro h
@@ -165,14 +203,19 @@ theorem discr_and_level : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [
         rw [mem_pow_iff (A.loc p) (hϖ p)]
         have e : (A.loc p).ιF ((g : 𝓞 F) : F) = (g : (A.loc p).Fp) := by simp
         rw [e, hu, map_mul, val_unit, one_mul, not_le]
-        calc _ < valuation (A.loc p).Fp (ϖ p) ^ 1 := pow_lt_pow_right_of_lt_one₀ h0 h1 (by norm_num)
+        calc
+          _ < valuation (A.loc p).Fp (ϖ p) ^ 1 := pow_lt_pow_right_of_lt_one₀ h0 h1 (by norm_num)
           _ = _ := pow_one _
       rw [key] at b
-      have : (Associates.mk p.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 F)})).factors = 1 := by omega
+      have : (Associates.mk p.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 F)})).factors
+          = 1 := by
+        omega
       rw [this, pow_one, hq]
     · have b : ¬ (g : 𝓞 F) ∈ p.asIdeal ^ 1 := by simpa using h
       rw [key] at b
-      have : (Associates.mk p.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 F)})).factors = 0 := by omega
+      have : (Associates.mk p.asIdeal).count (Associates.mk (Ideal.span {(g : 𝓞 F)})).factors
+          = 0 := by
+        omega
       rw [this, pow_zero]
 
 end GlobalTheory.IdealResProd

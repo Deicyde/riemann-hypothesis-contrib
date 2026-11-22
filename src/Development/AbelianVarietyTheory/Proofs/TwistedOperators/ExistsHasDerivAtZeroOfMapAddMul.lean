@@ -8,8 +8,9 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem continuous_of_map_add_mul_of_continuousAt_zero (ν : ℝ → ℂ)
-    (hm : ∀ s t, ν (s + t) = ν s * ν t) (hc : ContinuousAt ν 0) : Continuous ν := by
+theorem continuous_of_map_add_mul_of_continuousAt_zero
+    (ν : ℝ → ℂ) (hm : ∀ s t, ν (s + t) = ν s * ν t) (hc : ContinuousAt ν 0)
+    : Continuous ν := by
   rw [continuous_iff_continuousAt]
   intro x
   have h1 : ν = fun y => ν x * ν (y - x) := by
@@ -22,21 +23,22 @@ theorem continuous_of_map_add_mul_of_continuousAt_zero (ν : ℝ → ℂ)
   have h2 : ContinuousAt (fun y : ℝ => y - x) x := by fun_prop
   exact ContinuousAt.comp (f := fun y : ℝ => y - x) (by simpa using hc) h2
 
-theorem exists_hasDerivAt_zero_of_map_add_mul :
-    ∀ ν : ℝ → ℂ, ν 0 = 1 → (∀ s t, ν (s + t) = ν s * ν t) → ContinuousAt ν 0 →
-      ∃ a : ℂ, HasDerivAt ν a 0 := by
+theorem exists_hasDerivAt_zero_of_map_add_mul
+    : ∀ ν : ℝ → ℂ,
+      ν 0 = 1 → (∀ s t, ν (s + t) = ν s * ν t) → ContinuousAt ν 0 → ∃ a : ℂ, HasDerivAt ν a 0 := by
   intro ν h0 hm hc0
   have hc := continuous_of_map_add_mul_of_continuousAt_zero ν hm hc0
   set F : ℝ → ℂ := fun u => ∫ x in (0:ℝ)..u, ν x with hF
-  have hd : ∀ u, HasDerivAt F (ν u) u := fun u => (hc.deriv_integral ν 0 u ▸
-    (hc.integral_hasStrictDerivAt 0 u).hasDerivAt.differentiableAt.hasDerivAt)
+  have hd : ∀ u, HasDerivAt F (ν u) u := fun u =>
+    (hc.deriv_integral ν 0 u
+      ▸ (hc.integral_hasStrictDerivAt 0 u).hasDerivAt.differentiableAt.hasDerivAt)
   have hex : ∃ δ, F δ ≠ 0 := by
     by_contra hne
     push_neg at hne
     have hz : F = fun _ => 0 := funext hne
     have h1 := hd 0
     rw [hz, h0] at h1
-    exact one_ne_zero (h1.unique (hasDerivAt_const (0:ℝ) (0:ℂ)))
+    exact one_ne_zero (h1.unique (hasDerivAt_const (0 : ℝ) (0 : ℂ)))
   obtain ⟨δ, hδ⟩ := hex
   have key : ∀ t, ν t = (F (t + δ) - F t) / F δ := by
     intro t

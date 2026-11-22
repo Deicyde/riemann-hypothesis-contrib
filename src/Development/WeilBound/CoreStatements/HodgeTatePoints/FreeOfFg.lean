@@ -12,9 +12,13 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Gd
 
-theorem free_of_fg {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-    (hv : v.Integers O) {Ω : Type} [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
-    (L : Submodule O Ω) (hL : L.FG) : Module.Free O L := by
+theorem free_of_fg
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {Ω : Type} [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
+    (L : Submodule O Ω) (hL : L.FG)
+    : Module.Free O L := by
   haveI : IsDomain O := Function.Injective.isDomain (algebraMap O C) hv.hom_inj
   haveI : ValuationRing O := ValuationRing.of_integers v hv
   haveI : Module.Finite O L := Module.Finite.iff_fg.mpr hL

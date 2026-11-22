@@ -18,9 +18,7 @@ variable {E : Type} [Field E] [NumberField E] (Ψ : Finset (E →+* ℂ)) {n N :
 def cons0 (x : Matrix (Fin n) (Fin N) E) : Matrix (Fin n) (Fin (N + 1)) E :=
   Matrix.of fun k => Fin.cons 0 (x k)
 
-
-noncomputable def col (x : Matrix (Fin n) (Fin (N + 1)) E) : ℝ :=
-  ∑ τ : Ψ, ∑ k, normSq (τ.1 (x k 0))
+noncomputable def col (x : Matrix (Fin n) (Fin (N + 1)) E) : ℝ := ∑ τ : Ψ, ∑ k, normSq (τ.1 (x k 0))
 
 end GlobalTheory.SW.SiegelOp
 
@@ -186,25 +184,39 @@ private lemma expo_cons0' (y : Matrix (Fin n) (Fin N) E)
   unfold _root_.GlobalTheory.SW.expo _root_.GlobalTheory.SW.dropZ _root_.GlobalTheory.SW.SiegelOp.cons0
   simp [dotProduct, mulVec, Fin.sum_univ_succ]
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
-theorem _root_.GlobalTheory.SW.thH_siegel_operator : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (Ψ : Finset (E →+* ℂ)), _root_.GlobalTheory.SW.IsType Ψ → ∀ (n N : ℕ)
-    (φ : Matrix (Fin n) (Fin (N + 1)) E → ℂ), _root_.GlobalTheory.SW.IsSB φ →
-    _root_.GlobalTheory.SW.IsSB (_root_.GlobalTheory.SW.dropF φ) ∧
-    ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ (N + 1),
-    _root_.GlobalTheory.SW.dropZ Ψ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N ∧
-    (∀ t : ℝ, 0 ≤ t → _root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t ∈
-      _root_.GlobalTheory.SW.Hn Ψ (N + 1)) ∧
-    ∀ z z' : _root_.GlobalTheory.SW.CM Ψ n (N + 1),
-    Tendsto (fun t : ℝ => _root_.GlobalTheory.SW.thH Ψ φ (_root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t)
-      z z') atTop
-      (𝓝 (_root_.GlobalTheory.SW.thH Ψ (_root_.GlobalTheory.SW.dropF φ) (_root_.GlobalTheory.SW.dropZ Ψ Z)
-        (fun τ => (z τ).submatrix id Fin.succ) (fun τ => (z' τ).submatrix id Fin.succ))) := by
+theorem _root_.GlobalTheory.SW.thH_siegel_operator
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)),
+      _root_.GlobalTheory.SW.IsType Ψ
+        → ∀ (n N : ℕ) (φ : Matrix (Fin n) (Fin (N + 1)) E → ℂ),
+          _root_.GlobalTheory.SW.IsSB φ
+            → _root_.GlobalTheory.SW.IsSB (_root_.GlobalTheory.SW.dropF φ)
+              ∧ ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ (N + 1),
+                _root_.GlobalTheory.SW.dropZ Ψ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N
+                  ∧ (∀ t : ℝ,
+                    0 ≤ t
+                      → _root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t
+                        ∈ _root_.GlobalTheory.SW.Hn Ψ (N + 1))
+                  ∧ ∀ z z' : _root_.GlobalTheory.SW.CM Ψ n (N + 1),
+                    Tendsto
+                      (fun t : ℝ =>
+                        _root_.GlobalTheory.SW.thH Ψ φ
+                          (_root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t) z z')
+                      atTop
+                      (𝓝 (_root_.GlobalTheory.SW.thH Ψ (_root_.GlobalTheory.SW.dropF φ)
+                        (_root_.GlobalTheory.SW.dropZ Ψ Z)
+                        (fun τ => (z τ).submatrix id Fin.succ)
+                        (fun τ => (z' τ).submatrix id Fin.succ))) := by
   intro E _ _ _ Ψ hΨ n N φ hφ
-  refine ⟨isSB_dropF' φ hφ, fun Z hZ =>
-    ⟨dropZ_mem_Hn Ψ Z hZ, fun t ht => pushZ_single_zero_mem_Hn_of_nonneg Ψ Z hZ t ht, fun z z' => ?_⟩⟩
+  refine ⟨
+    isSB_dropF' φ hφ,
+    fun Z hZ => ⟨
+      dropZ_mem_Hn Ψ Z hZ,
+      fun t ht => pushZ_single_zero_mem_Hn_of_nonneg Ψ Z hZ t ht,
+      fun z z' => ?_
+    ⟩
+  ⟩
   have hne : Ψ.Nonempty := by
     let σ : E →+* ℂ := (IsAlgClosed.lift (R := ℚ) (S := E) (M := ℂ)).toRingHom
     by_cases h : σ ∈ Ψ
@@ -214,24 +226,32 @@ theorem _root_.GlobalTheory.SW.thH_siegel_operator : ∀ (E : Type) [Field E] [N
   have hsum := (_root_.GlobalTheory.SW.thH_summable_and_inj E Ψ hΨ n (N + 1) φ hφ Z hZ).1 z z'
   let g : Matrix (Fin n) (Fin (N + 1)) E → ℂ := fun x =>
     if _root_.GlobalTheory.SW.SiegelOp.col Ψ x = 0 then
-      φ x * cexp (2 * ↑Real.pi * I * _root_.GlobalTheory.SW.expo Ψ x Z z z') else 0
-  have hlim : Tendsto (fun t : ℝ => ∑' x, φ x * cexp (2 * ↑Real.pi * I *
-      _root_.GlobalTheory.SW.expo Ψ x (_root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t) z z')) atTop
-      (𝓝 (∑' x, g x)) := by
+      φ x * cexp (2 * ↑Real.pi * I * _root_.GlobalTheory.SW.expo Ψ x Z z z')
+    else
+      0
+  have hlim : Tendsto
+      (fun t : ℝ =>
+        ∑' x, φ x * cexp (2 * ↑Real.pi * I *
+          _root_.GlobalTheory.SW.expo Ψ x (_root_.GlobalTheory.SW.pushZ Ψ Z (Pi.single 0 1) t) z z'))
+      atTop (𝓝 (∑' x, g x)) := by
     refine tendsto_tsum_of_dominated_convergence hsum (fun x => ?_) ?_
     · simp_rw [mul_cexp_expo_pushZ_single_zero]
       by_cases hc : _root_.GlobalTheory.SW.SiegelOp.col Ψ x = 0
       · simp [g, hc]
       · have hpos : 0 < _root_.GlobalTheory.SW.SiegelOp.col Ψ x :=
           lt_of_le_of_ne (col_nonneg' Ψ x) (Ne.symm hc)
-        have h1 : Tendsto (fun t : ℝ => 2 * Real.pi * t * _root_.GlobalTheory.SW.SiegelOp.col Ψ x) atTop
-            atTop :=
+        have h1 : Tendsto
+            (fun t : ℝ => 2 * Real.pi * t * _root_.GlobalTheory.SW.SiegelOp.col Ψ x)
+            atTop atTop :=
           (tendsto_id.const_mul_atTop (by positivity : (0 : ℝ) < 2 * Real.pi)).atTop_mul_const hpos
-        have h2 : Tendsto (fun t : ℝ => Real.exp (-(2 * Real.pi * t * _root_.GlobalTheory.SW.SiegelOp.col Ψ x)))
-            atTop (𝓝 0) := Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp h1)
+        have h2 : Tendsto
+            (fun t : ℝ => Real.exp (-(2 * Real.pi * t * _root_.GlobalTheory.SW.SiegelOp.col Ψ x)))
+            atTop (𝓝 0) :=
+          Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp h1)
         have h3 := (Complex.continuous_ofReal.tendsto 0).comp h2
-        have h4 := (tendsto_const_nhds
-          (x := φ x * cexp (2 * ↑Real.pi * I * _root_.GlobalTheory.SW.expo Ψ x Z z z'))).mul h3
+        have h4 :=
+          (tendsto_const_nhds
+            (x := φ x * cexp (2 * ↑Real.pi * I * _root_.GlobalTheory.SW.expo Ψ x Z z z'))).mul h3
         simpa [g, hc] using h4
     · filter_upwards [eventually_ge_atTop 0] with t ht x
       rw [mul_cexp_expo_pushZ_single_zero, norm_mul, Complex.norm_real, Real.norm_eq_abs,
@@ -245,9 +265,11 @@ theorem _root_.GlobalTheory.SW.thH_siegel_operator : ∀ (E : Type) [Field E] [N
     have hc : _root_.GlobalTheory.SW.SiegelOp.col Ψ x ≠ 0 := fun h =>
       hr ((col_eq_zero_iff_exists_eq_cons0 Ψ hne x).mp h |>.elim fun y hy => ⟨y, hy.symm⟩)
     simp [g, hc]
-  have key : ∑' x, g x = ∑' y, _root_.GlobalTheory.SW.dropF φ y * cexp (2 * ↑Real.pi * I *
-      _root_.GlobalTheory.SW.expo Ψ y (_root_.GlobalTheory.SW.dropZ Ψ Z)
-        (fun τ => (z τ).submatrix id Fin.succ) (fun τ => (z' τ).submatrix id Fin.succ)) := by
+  have key
+      : ∑' x, g x
+        = ∑' y, _root_.GlobalTheory.SW.dropF φ y * cexp (2 * ↑Real.pi * I *
+          _root_.GlobalTheory.SW.expo Ψ y (_root_.GlobalTheory.SW.dropZ Ψ Z)
+            (fun τ => (z τ).submatrix id Fin.succ) (fun τ => (z' τ).submatrix id Fin.succ)) := by
     rw [← cons0_injective.tsum_eq hsupp]
     refine tsum_congr fun y => ?_
     have hc : _root_.GlobalTheory.SW.SiegelOp.col Ψ (_root_.GlobalTheory.SW.SiegelOp.cons0 y) = 0 :=

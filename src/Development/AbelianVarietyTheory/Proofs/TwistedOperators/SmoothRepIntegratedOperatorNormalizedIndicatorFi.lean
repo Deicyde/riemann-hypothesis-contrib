@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LevelFamO
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -22,14 +25,24 @@ noncomputable section
 
 namespace GlobalTheory.TrIdem
 
-theorem smoothOp_normInd_of_fixed : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (H : Subgroup G), IsOpen (H : Set G) → IsCompact (H : Set G) → ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G W), GlobalTheory.PRep.IsSmooth ρ → ∀ x : W, (∀ h ∈ H, ρ h x = x) → smoothOp ρ μ (normInd μ (H : Set G)) x = x := by
+theorem smoothOp_normInd_of_fixed
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (H : Subgroup G),
+      IsOpen (H : Set G) → IsCompact (H : Set G)
+        → ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G W),
+          GlobalTheory.PRep.IsSmooth ρ
+            → ∀ x : W, (∀ h ∈ H, ρ h x = x) → smoothOp ρ μ (normInd μ (H : Set G)) x = x := by
   intro G _ _ _ _ _ _ μ _ H ho hK W _ _ ρ hρ x hx
   have hf : IsLocallyConstant ((H : Set G).indicator (1 : G → ℂ)) := by
     refine (IsLocallyConstant.iff_exists_open _).2 fun g => ?_
     by_cases hg : g ∈ (H : Set G)
     · exact ⟨H, ho, hg, fun y hy => by simp [Set.indicator_of_mem hy, Set.indicator_of_mem hg]⟩
-    · exact ⟨(H : Set G)ᶜ, (H.isClosed_of_isOpen ho).isOpen_compl, hg, fun y hy => by
-        rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hg]⟩
+    · exact ⟨
+        (H : Set G)ᶜ,
+        (H.isClosed_of_isOpen ho).isOpen_compl,
+        hg,
+        fun y hy => by rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hg]
+      ⟩
   have hc : HasCompactSupport ((H : Set G).indicator (1 : G → ℂ)) :=
     HasCompactSupport.intro hK fun y hy => Set.indicator_of_notMem hy _
   have h0 : (μ.real H : ℂ) ≠ 0 := by
@@ -40,8 +53,9 @@ theorem smoothOp_normInd_of_fixed : ∀ (G : Type) [Group G] [TopologicalSpace G
   have hc' : HasCompactSupport (normInd μ (H : Set G)) := by
     unfold normInd; exact hc.comp_left (g := ((μ.real H : ℂ)⁻¹ • ·)) (smul_zero _)
   refine eq_of_forall_dual fun l => ?_
-  have h1 : (fun g => normInd μ (H : Set G) g • l (ρ g x)) =
-      (H : Set G).indicator fun _ => (μ.real H : ℂ)⁻¹ * l x := by
+  have h1
+      : (fun g => normInd μ (H : Set G) g • l (ρ g x))
+        = (H : Set G).indicator fun _ => (μ.real H : ℂ)⁻¹ * l x := by
     ext g
     by_cases hg : g ∈ (H : Set G)
     · have : ρ g x = x := hx g hg

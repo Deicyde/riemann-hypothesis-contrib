@@ -16,24 +16,25 @@ namespace CentredRingNormal
 
 variable {L : Type} [Field L] [NumberField L]
 
-
 omit [NumberField L] in
-theorem isIntegral_of_comp {R R' : Type*} [CommRing R] [CommRing R'] [Algebra R L] [Algebra R' L]
-    (f : R →+* R') (hf : (algebraMap R' L).comp f = algebraMap R L) {x : L}
-    (hx : IsIntegral R x) : IsIntegral R' x := by
+theorem isIntegral_of_comp
+    {R R' : Type*} [CommRing R] [CommRing R'] [Algebra R L] [Algebra R' L]
+    (f : R →+* R') (hf : (algebraMap R' L).comp f = algebraMap R L)
+    {x : L} (hx : IsIntegral R x)
+    : IsIntegral R' x := by
   obtain ⟨p, hp, hpx⟩ := hx
   exact ⟨p.map f, hp.map f, by rw [Polynomial.eval₂_map, hf]; exact hpx⟩
 
-theorem mem_valuationSubring_iff_place (v : HeightOneSpectrum (𝓞 L)) (x : L) :
-    x ∈ (v.valuation L).valuationSubring ↔ FinitePlace.mk v x ≤ 1 := by
+theorem mem_valuationSubring_iff_place (v : HeightOneSpectrum (𝓞 L)) (x : L)
+    : x ∈ (v.valuation L).valuationSubring ↔ FinitePlace.mk v x ≤ 1 := by
   rw [Valuation.mem_valuationSubring_iff, FinitePlace.mk_apply, FinitePlace.norm_embedding',
     NNReal.coe_le_one,
     ← map_one (WithZeroMulInt.toNNReal (NumberField.HeightOneSpectrum.absNorm_ne_zero v)),
-    (WithZeroMulInt.toNNReal_strictMono
-      (NumberField.HeightOneSpectrum.one_lt_absNorm_nnreal v)).le_iff_le]
+    (WithZeroMulInt.toNNReal_strictMono (NumberField.HeightOneSpectrum.one_lt_absNorm_nnreal
+      v)).le_iff_le]
 
-theorem exists_place_of_valuationSubring (V : ValuationSubring L) (hV : V ≠ ⊤) :
-    ∃ w : FinitePlace L, ∀ x : L, x ∈ V ↔ w x ≤ 1 := by
+theorem exists_place_of_valuationSubring (V : ValuationSubring L) (hV : V ≠ ⊤)
+    : ∃ w : FinitePlace L, ∀ x : L, x ∈ V ↔ w x ≤ 1 := by
   have hint : ∀ a : 𝓞 L, algebraMap (𝓞 L) L a ∈ V := fun a ↦ by
     have h : IsIntegral V (algebraMap (𝓞 L) L a) :=
       isIntegral_of_comp (Int.castRingHom V) (RingHom.ext_int _ _) (RingOfIntegers.isIntegral_coe a)
@@ -70,22 +71,26 @@ theorem exists_place_of_valuationSubring (V : ValuationSubring L) (hV : V ≠ �
     ← HeightOneSpectrum.valuationSubringAtPrime_eq_valuationSubring (K := L) v,
     ValuationSubring.eq_of_le_of_ne_top _ hle hV]
 
-theorem absCentredAt_of_le_one (O : Subalgebra ℤ L) [IsFractionRing O L] (m : Ideal O) [m.IsMaximal]
+theorem absCentredAt_of_le_one
+    (O : Subalgebra ℤ L) [IsFractionRing O L]
+    (m : Ideal O) [m.IsMaximal]
     (w : FinitePlace L)
     (hA : ∀ y ∈ Localization.subalgebra.ofField L m.primeCompl m.primeCompl_le_nonZeroDivisors,
       w y ≤ 1)
-    (x : L) (hx : 1 < w x) : AbsCentredAt O m fun t ↦ w t := by
+    (x : L) (hx : 1 < w x)
+    : AbsCentredAt O m fun t ↦ w t := by
   have hO : ∀ u : O, w u ≤ 1 := fun u ↦ hA _ (Subalgebra.algebraMap_mem _ u)
-  let q : Ideal O :=
-    { carrier := {u | w u < 1}
-      zero_mem' := by simp
-      add_mem' := fun {a b} ha hb ↦ by
-        change w ((a : L) + b) < 1
-        exact (FinitePlace.add_le w _ _).trans_lt (max_lt ha hb)
-      smul_mem' := fun c a ha ↦ by
-        change w ((c : L) * a) < 1
-        rw [map_mul]
-        exact (mul_le_of_le_one_left (apply_nonneg w _) (hO c)).trans_lt ha }
+  let q : Ideal O := {
+    carrier := {u | w u < 1}
+    zero_mem' := by simp
+    add_mem' := fun {a b} ha hb ↦ by
+      change w ((a : L) + b) < 1
+      exact (FinitePlace.add_le w _ _).trans_lt (max_lt ha hb)
+    smul_mem' := fun c a ha ↦ by
+      change w ((c : L) * a) < 1
+      rw [map_mul]
+      exact (mul_le_of_le_one_left (apply_nonneg w _) (hO c)).trans_lt ha
+  }
   have hmem : ∀ u : O, u ∈ q ↔ w u < 1 := fun _ ↦ Iff.rfl
   have hq_prime : q.IsPrime := by
     refine ⟨fun h ↦ ?_, fun {a b} hab ↦ ?_⟩
@@ -143,7 +148,9 @@ theorem proof : CentredRingNormal.Statement := by
       have hc := absCentredAt_of_le_one O m w (fun y hy ↦ (hw y).mp (hAV hy)) x hwx
       exact hxV ((hw x).mpr (hx w hc))
     rw [iInf_valuationSubring_superset, Subalgebra.mem_toSubring, mem_integralClosure_iff] at hall
-    refine isIntegral_of_comp ((algebraMap (Subring.closure (A : Set L)) L).codRestrict A fun y ↦ ?_) (RingHom.ext fun _ ↦ rfl) hall
+    refine isIntegral_of_comp
+      ((algebraMap (Subring.closure (A : Set L)) L).codRestrict A fun y ↦ ?_)
+      (RingHom.ext fun _ ↦ rfl) hall
     exact (Subring.closure_le (t := A.toSubring)).mpr (fun z hz ↦ hz) y.2
   · intro hx w hw
     let v := FinitePlace.maximalIdeal w

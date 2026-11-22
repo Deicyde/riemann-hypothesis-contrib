@@ -18,38 +18,39 @@ namespace GlobalTheory.PointGeometry
 variable (F : Type) [Field F] [NumberField F]
 
 structure AdelicLine where
-
   inf : InfinitePlace F → ℝ
-
   fin : HeightOneSpectrum (𝓞 F) → ℝ
   fin_finite : (Function.mulSupport fin).Finite
 
 variable {F}
 
-
 open Classical in
 def AdelicLine.of (a : InfinitePlace F → ℝ) (b : HeightOneSpectrum (𝓞 F) → ℝ) : AdelicLine F :=
   if h : (Function.mulSupport b).Finite then ⟨a, b, h⟩ else ⟨a, 1, by simp⟩
 
-@[simp] theorem AdelicLine.of_inf (a : InfinitePlace F → ℝ) (b : HeightOneSpectrum (𝓞 F) → ℝ) :
-    (AdelicLine.of a b).inf = a := by
+@[simp]
+theorem AdelicLine.of_inf (a : InfinitePlace F → ℝ) (b : HeightOneSpectrum (𝓞 F) → ℝ)
+    : (AdelicLine.of a b).inf = a := by
   unfold AdelicLine.of; split_ifs <;> rfl
 
-theorem AdelicLine.of_fin (a : InfinitePlace F → ℝ) {b : HeightOneSpectrum (𝓞 F) → ℝ}
-    (h : (Function.mulSupport b).Finite) : (AdelicLine.of a b).fin = b := by
+theorem AdelicLine.of_fin
+    (a : InfinitePlace F → ℝ) {b : HeightOneSpectrum (𝓞 F) → ℝ} (h : (Function.mulSupport b).Finite)
+    : (AdelicLine.of a b).fin = b := by
   unfold AdelicLine.of; rw [dite_eq_left h]
 
 def AdelicLine.deg (L : AdelicLine F) : ℝ :=
-  -((∑ v : InfinitePlace F, (v.mult : ℝ) * Real.log (L.inf v)) + ∑ᶠ w, Real.log (L.fin w)) /
-    (Module.finrank ℚ F : ℝ)
+  -((∑ v : InfinitePlace F, (v.mult : ℝ) * Real.log (L.inf v)) + ∑ᶠ w, Real.log (L.fin w))
+    / (Module.finrank ℚ F : ℝ)
 
-def AdelicLine.twist (L : AdelicLine F) (ci : InfinitePlace F → ℝ)
-    (cf : HeightOneSpectrum (𝓞 F) → ℝ) : AdelicLine F :=
-  AdelicLine.of (fun v => Real.exp (-ci v) * L.inf v) (fun w => Real.exp (-cf w) * L.fin w)
+def AdelicLine.twist
+    (L : AdelicLine F) (ci : InfinitePlace F → ℝ) (cf : HeightOneSpectrum (𝓞 F) → ℝ)
+    : AdelicLine F :=
+  AdelicLine.of (fun v => Real.exp (- ci v) * L.inf v) (fun w => Real.exp (- cf w) * L.fin w)
 
-theorem AdelicLine.twist_fin (L : AdelicLine F) (ci : InfinitePlace F → ℝ)
-    {cf : HeightOneSpectrum (𝓞 F) → ℝ} (h : (Function.support cf).Finite) :
-    (L.twist ci cf).fin = fun w => Real.exp (-cf w) * L.fin w := by
+theorem AdelicLine.twist_fin
+    (L : AdelicLine F) (ci : InfinitePlace F → ℝ)
+    {cf : HeightOneSpectrum (𝓞 F) → ℝ} (h : (Function.support cf).Finite)
+    : (L.twist ci cf).fin = fun w => Real.exp (- cf w) * L.fin w := by
   refine AdelicLine.of_fin _ ((h.union L.fin_finite).subset fun w hw => ?_)
   by_contra hn
   simp only [Set.mem_union, Function.mem_support, Function.mem_mulSupport, not_or, not_not] at hn
@@ -126,8 +127,8 @@ def pointGeo : DV.Geo F where
   resDeg _ _ _ _ _ _ _ _ M ι L := (AdelicLine.of L.inf (latticeNorm M ι)).deg
   supInf_ofW _ _ W ι v τ f := by
     rw [ciSup_unique]
-    change v f * (ofLattice W ι).inf v ^ τ =
-      Real.sqrt (‖v.embedding f‖ ^ 2 / ((frameSq W ι v ^ τ : ℝ≥0) : ℝ))
+    change v f * (ofLattice W ι).inf v ^ τ
+      = Real.sqrt (‖v.embedding f‖ ^ 2 / ((frameSq W ι v ^ τ : ℝ≥0) : ℝ))
     rw [ofLattice, AdelicLine.of_inf, Real.sqrt_div (sq_nonneg _), Real.sqrt_sq (norm_nonneg _),
       InfinitePlace.norm_embedding_eq, inv_pow, div_eq_mul_inv]
     congr 2
@@ -144,8 +145,9 @@ def pointGeo : DV.Geo F where
 theorem point_global_sections_ne_bot (Y : (pointGeo F).Var) : (pointGeo F).H0 Y 0 ≠ ⊥ :=
   (top_ne_bot : (⊤ : Submodule F F) ≠ ⊥)
 
-theorem exists_geo : ∀ (F : Type) [Field F] [NumberField F] [StarRing F],
-    ∃ G : DV.Geo F, ∃ Y : G.Var, G.H0 Y 0 ≠ ⊥ :=
-  fun F _ _ _ => ⟨pointGeo F, (), point_global_sections_ne_bot F _⟩
+theorem exists_geo
+    : ∀ (F : Type) [Field F] [NumberField F] [StarRing F], ∃ G : DV.Geo F, ∃ Y : G.Var,
+      G.H0 Y 0 ≠ ⊥ := fun F _ _ _ =>
+  ⟨pointGeo F, (), point_global_sections_ne_bot F _⟩
 
 end GlobalTheory.PointGeometry

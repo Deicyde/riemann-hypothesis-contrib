@@ -12,8 +12,9 @@ namespace GlobalTheory.LKResNrmConj
 
 variable (p : ℕ) [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p))
 
-theorem coe_frobQ_iterate (r k : ℕ) (b : Qr p r) :
-    (((⇑(frobQ p r))^[k] b : Qr p r) : PadicAlgCl p) = (frobK p (Q0 p) ^ k) (b : PadicAlgCl p) := by
+theorem coe_frobQ_iterate (r k : ℕ) (b : Qr p r)
+    : (((⇑(frobQ p r))^[k] b : Qr p r) : PadicAlgCl p)
+      = (frobK p (Q0 p) ^ k) (b : PadicAlgCl p) := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -27,8 +28,10 @@ theorem frobQ_iterate_self (r : ℕ) (hr : 0 < r) (b : Qr p r) : (⇑(frobQ p r)
   exact (IsFrobOn.pow_fixes_iff p (Q0 p) hK hr ((isFrob_frobK hK).isFrobOn r) r).2 dvd_rfl _ b.2
 
 theorem sigKQ_iterate_self (r : ℕ) (hr : 0 < r) (y : KQ p K r) : (⇑(sigKQ p K r))^[r] y = y := by
-  have ht : ∀ (k : ℕ) (a : K) (b : Qr p r), (⇑(sigKQ p K r))^[k] (inclK p K r a * inclQ p K r b) =
-      inclK p K r a * inclQ p K r ((⇑(frobQ p r))^[k] b) := by
+  have ht
+      : ∀ (k : ℕ) (a : K) (b : Qr p r),
+        (⇑(sigKQ p K r))^[k] (inclK p K r a * inclQ p K r b)
+          = inclK p K r a * inclQ p K r ((⇑(frobQ p r))^[k] b) := by
     intro k a b
     induction k with
     | zero => rfl
@@ -47,12 +50,15 @@ theorem sigKQ_iterate_self (r : ℕ) (hr : 0 < r) (y : KQ p K r) : (⇑(sigKQ p 
       rw [frobQ_iterate_self p r hr, e] at h
       exact h
     | add z w hz hw =>
-      exact (iterate_map_add (sigKQ p K r) r (z : KQ p K r) (w : KQ p K r)).trans (congrArg₂ (· + ·) hz hw)
+      exact (iterate_map_add (sigKQ p K r) r (z : KQ p K r) (w : KQ p K r)).trans
+        (congrArg₂ (· + ·) hz hw)
   exact key y
 
-theorem sigRes_iterate_self (n r : ℕ) (hr : 0 < r) (g : GL (Fin n) (KQ p K r)) :
-    (⇑(sigRes p K n r))^[r] g = g := by
-  have h : ∀ (k : ℕ) (i j : Fin n), ((⇑(sigRes p K n r))^[k] g).val i j = (⇑(sigKQ p K r))^[k] (g.val i j) := by
+theorem sigRes_iterate_self (n r : ℕ) (hr : 0 < r) (g : GL (Fin n) (KQ p K r))
+    : (⇑(sigRes p K n r))^[r] g = g := by
+  have h
+      : ∀ (k : ℕ) (i j : Fin n),
+        ((⇑(sigRes p K n r))^[k] g).val i j = (⇑(sigKQ p K r))^[k] (g.val i j) := by
     intro k i j
     induction k with
     | zero => rfl

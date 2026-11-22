@@ -20,7 +20,8 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 

@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
@@ -92,18 +94,21 @@ private lemma hermite1_zero (x : ℝ) :
   congr 2
   ring
 
-theorem UpperTheory.ConvolutionTheory.R2.G.hermite1 :
-    ∀ n : ℕ, Integrable (fun s : ℝ => (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2)) ∧ ∃ P : Polynomial ℂ, ∀ x : ℝ,
-    ∫ s : ℝ, (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x)) =
-    P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2) := by
+theorem UpperTheory.ConvolutionTheory.R2.G.hermite1
+    : ∀ n : ℕ,
+      Integrable (fun s : ℝ => (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2))
+        ∧ ∃ P : Polynomial ℂ, ∀ x : ℝ,
+          ∫ s : ℝ, (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x))
+            = P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2) := by
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
-  have two : ∀ n : ℕ,
-      (∃ P : Polynomial ℂ, ∀ x : ℝ,
-        ∫ s : ℝ, (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x)) =
-        P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2)) ∧
-      (∃ P : Polynomial ℂ, ∀ x : ℝ,
-        ∫ s : ℝ, (s : ℂ) ^ (n + 1) * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x)) =
-        P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2)) := by
+  have two
+      : ∀ n : ℕ,
+        (∃ P : Polynomial ℂ, ∀ x : ℝ,
+            ∫ s : ℝ, (s : ℂ) ^ n * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x))
+              = P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2))
+          ∧ (∃ P : Polynomial ℂ, ∀ x : ℝ,
+            ∫ s : ℝ, (s : ℂ) ^ (n + 1) * Complex.exp (-(Real.pi : ℂ) * (s : ℂ) ^ 2) * Complex.exp (2 * Real.pi * Complex.I * (s * x))
+              = P.eval (x : ℂ) * Complex.exp (-(Real.pi : ℂ) * (x : ℂ) ^ 2)) := by
     intro n
     induction n with
     | zero =>
@@ -119,9 +124,15 @@ theorem UpperTheory.ConvolutionTheory.R2.G.hermite1 :
         ring
     | succ n ih =>
       obtain ⟨⟨P, hP⟩, ⟨Q, hQ⟩⟩ := ih
-      refine ⟨⟨Q, hQ⟩, ⟨Polynomial.C (1 / (2 * (Real.pi : ℂ))) *
-        (Polynomial.C ((n + 1 : ℕ) : ℂ) * P +
-          Polynomial.C (2 * Real.pi * Complex.I) * Polynomial.X * Q), fun x => ?_⟩⟩
+      refine ⟨
+        ⟨Q, hQ⟩,
+        ⟨
+          Polynomial.C (1 / (2 * (Real.pi : ℂ)))
+            * (Polynomial.C ((n + 1 : ℕ) : ℂ) * P
+              + Polynomial.C (2 * Real.pi * Complex.I) * Polynomial.X * Q),
+          fun x => ?_
+        ⟩
+      ⟩
       have h := hermite1_rec (n + 1) x
       simp only [Nat.add_sub_cancel] at h
       rw [hP x, hQ x] at h

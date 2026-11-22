@@ -23,7 +23,8 @@ def hTransAB (a b : ℕ) (σ : ℂ) (ν y : ℝ) : ℂ :=
 
 theorem hTransAB_two_zero (σ : ℂ) (ν y : ℝ) : hTransAB 2 0 σ ν y = hTrans σ ν y := by
   unfold hTransAB hTrans phi
-  congr 1; funext t
+  congr 1
+  funext t
   simp only [pow_zero, mul_one]
 
 variable {F : Type} [Field F] [NumberField F]

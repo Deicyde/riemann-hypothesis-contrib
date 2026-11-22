@@ -9,11 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open IsLocalRing Polynomial Matrix UpperTheory.V
 
-theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restriction :
-    ∀ (K G : Type) [Field K] [IsAlgClosed K] [Group G] (n : ℕ) (r : G →* Matrix (Fin n) (Fin n) K), U3.MatIrr ⊤ r →
-      ∀ N : Subgroup G, commutator G ≤ N → (∃ u ∈ N, (r u).charpoly.Separable) → ¬ U3.MatIrr N r →
-      ∃ (W : Submodule K (Fin n → K)) (S : Subgroup G), W ≠ ⊥ ∧ W ≠ ⊤ ∧ N ≤ S ∧ (∀ g, g ∈ S ↔ ∀ v ∈ W, r g *ᵥ v ∈ W) ∧
-        S.index ∣ n := by
+theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restriction
+    : ∀ (K G : Type) [Field K] [IsAlgClosed K] [Group G] (n : ℕ)
+        (r : G →* Matrix (Fin n) (Fin n) K),
+      U3.MatIrr ⊤ r
+        → ∀ N : Subgroup G,
+          commutator G ≤ N → (∃ u ∈ N, (r u).charpoly.Separable) → ¬ U3.MatIrr N r
+            → ∃ (W : Submodule K (Fin n → K)) (S : Subgroup G),
+              W ≠ ⊥ ∧ W ≠ ⊤ ∧ N ≤ S ∧ (∀ g, g ∈ S ↔ ∀ v ∈ W, r g *ᵥ v ∈ W) ∧ S.index ∣ n := by
   intro K G _ _ _ n r hirr N hN hu hnot
   classical
   obtain ⟨u, huN, hsep⟩ := hu
@@ -21,8 +24,7 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
     intro g h hh
     have hc : h⁻¹ * g⁻¹ * h⁻¹⁻¹ * g⁻¹⁻¹ ∈ N :=
       hN (Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _))
-    have e : g⁻¹ * h * g = h * (h⁻¹ * g⁻¹ * h⁻¹⁻¹ * g⁻¹⁻¹) := by
-      group
+    have e : g⁻¹ * h * g = h * (h⁻¹ * g⁻¹ * h⁻¹⁻¹ * g⁻¹⁻¹) := by group
     rw [e]
     exact N.mul_mem hh hc
   have hr1 : ∀ g : G, r g * r g⁻¹ = 1 := by
@@ -32,8 +34,8 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
     intro g
     rw [← map_mul, inv_mul_cancel, map_one]
   let Inv : Submodule K (Fin n → K) → Prop := fun X => ∀ g ∈ N, ∀ v ∈ X, r g *ᵥ v ∈ X
-  let tr : G → Submodule K (Fin n → K) → Submodule K (Fin n → K) :=
-    fun g X => X.map (Matrix.toLin' (r g))
+  let tr : G → Submodule K (Fin n → K) → Submodule K (Fin n → K) := fun g X =>
+    X.map (Matrix.toLin' (r g))
   have mem_tr : ∀ g X v, v ∈ tr g X ↔ r g⁻¹ *ᵥ v ∈ X := by
     intro g X v
     constructor
@@ -60,19 +62,20 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
     ext v
     rw [mem_tr, inv_one, map_one, Matrix.one_mulVec]
   obtain ⟨b, hb⟩ := Ws.invariant_submodule_eq_span_eigenbasis_of_separable K n (r u) hsep
-  have hspan : ∀ X, Inv X → X = Submodule.span K (b '' {i | b i ∈ X}) :=
-    fun X hX => hb X (hX u huN)
+  have hspan : ∀ X, Inv X → X = Submodule.span K (b '' {i | b i ∈ X}) := fun X hX => hb X (hX u huN)
   have hrank : ∀ X, Inv X → Module.finrank K X = {i | b i ∈ X}.ncard := by
     intro X hX
     have e := hspan X hX
-    calc Module.finrank K X = Module.finrank K (Submodule.span K (b '' {i | b i ∈ X})) := by
-          rw [← e]
+    calc
+      Module.finrank K X
+        = Module.finrank K (Submodule.span K (b '' {i | b i ∈ X})) := by rw [← e]
       _ = {i | b i ∈ X}.ncard := by
-          have hli := b.linearIndependent.comp
-            (Subtype.val : {i // i ∈ {i | b i ∈ X}} → Fin n) Subtype.val_injective
-          rw [Set.image_eq_range]
-          rw [finrank_span_eq_card (R := K) (b := fun x : {i // i ∈ {i | b i ∈ X}} => b x) hli,
-            ← Nat.card_coe_set_eq, Nat.card_eq_fintype_card]
+        have hli :=
+          b.linearIndependent.comp (Subtype.val : {i // i ∈ {i | b i ∈ X}} → Fin n)
+            Subtype.val_injective
+        rw [Set.image_eq_range]
+        rw [finrank_span_eq_card (R := K) (b := fun x : {i // i ∈ {i | b i ∈ X}} => b x) hli,
+          ← Nat.card_coe_set_eq, Nat.card_eq_fintype_card]
   obtain ⟨W0, hW0i, hW0b, hW0t⟩ : ∃ W, Inv W ∧ W ≠ ⊥ ∧ W ≠ ⊤ := by
     unfold U3.MatIrr at hnot
     push_neg at hnot
@@ -109,23 +112,23 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
     apply Submodule.eq_of_le_of_finrank_le
     · intro v hv
       rw [mem_tr] at hv
-      have e : v = r g *ᵥ (r g⁻¹ *ᵥ v) := by
-        rw [Matrix.mulVec_mulVec, hr1, Matrix.one_mulVec]
+      have e : v = r g *ᵥ (r g⁻¹ *ᵥ v) := by rw [Matrix.mulVec_mulVec, hr1, Matrix.one_mulVec]
       rw [e]
       exact hg _ hv
     · rw [trW_rank]
-  let S : Subgroup G :=
-    { carrier := {g | tr g W = W}
-      mul_mem' := by
-        intro a c ha hc
-        simp only [Set.mem_setOf_eq] at ha hc ⊢
-        rw [htr_mul, hc, ha]
-      one_mem' := htr_one W
-      inv_mem' := by
-        intro a ha
-        simp only [Set.mem_setOf_eq] at ha ⊢
-        conv_lhs => rw [← ha]
-        rw [← htr_mul, inv_mul_cancel, htr_one] }
+  let S : Subgroup G := {
+    carrier := {g | tr g W = W}
+    mul_mem' := by
+      intro a c ha hc
+      simp only [Set.mem_setOf_eq] at ha hc ⊢
+      rw [htr_mul, hc, ha]
+    one_mem' := htr_one W
+    inv_mem' := by
+      intro a ha
+      simp only [Set.mem_setOf_eq] at ha ⊢
+      conv_lhs => rw [← ha]
+      rw [← htr_mul, inv_mul_cancel, htr_one]
+  }
   have hS : ∀ g, g ∈ S ↔ ∀ v ∈ W, r g *ᵥ v ∈ W := by
     intro g
     constructor
@@ -159,8 +162,10 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
     obtain ⟨i, hi⟩ := hc
     have hUi : ∀ g ∈ (⊤ : Subgroup G), ∀ v ∈ ⨆ h, tr h W, r g *ᵥ v ∈ ⨆ h, tr h W := by
       intro g _ v hv
-      refine Submodule.iSup_induction (fun h => tr h W)
-        (motive := fun v => r g *ᵥ v ∈ ⨆ h, tr h W) hv ?_ ?_ ?_
+      refine Submodule.iSup_induction
+        (fun h => tr h W)
+        (motive := fun v => r g *ᵥ v ∈ ⨆ h, tr h W)
+        hv ?_ ?_ ?_
       · intro h x hx
         refine Submodule.mem_iSup_of_mem (g * h) ?_
         rw [htr_mul, mem_tr, Matrix.mulVec_mulVec, hr2, Matrix.one_mulVec]
@@ -186,8 +191,8 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
       exact Submodule.mem_top
     have hz : ∀ v ∈ ⨆ h, tr h W, b.repr v i = 0 := by
       intro v hv
-      refine Submodule.iSup_induction (fun h => tr h W)
-        (motive := fun v => b.repr v i = 0) hv ?_ ?_ ?_
+      refine
+        Submodule.iSup_induction (fun h => tr h W) (motive := fun v => b.repr v i = 0) hv ?_ ?_ ?_
       · intro g x hx
         have hx' : x ∈ tr g W := hx
         rw [hspan _ (tr_inv g W hWi), Module.Basis.mem_span_image] at hx'
@@ -214,8 +219,7 @@ theorem UpperTheory.V.Ws.exists_stabilizer_index_dvd_of_not_irreducible_restrict
         rw [ha]
         exact QuotientGroup.eq.mp (QuotientGroup.out_eq' (g : G ⧸ S))
       have hm' : tr (a⁻¹ * g) W = W := hm
-      have e : tr (a * (a⁻¹ * g)) W = tr a W := by
-        rw [htr_mul, hm']
+      have e : tr (a * (a⁻¹ * g)) W = tr a W := by rw [htr_mul, hm']
       rw [mul_inv_cancel_left] at e
       rw [← e]
       exact hg

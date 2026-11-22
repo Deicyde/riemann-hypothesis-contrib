@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LayeredIsom
 
 @[expose] public section
 
-open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
+open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
 
-theorem UpperTheory.V.Win.kmono :
-    ∀ C C' : ℝ, C ≤ C' → LemmaK C → LemmaK C' := by
+theorem UpperTheory.V.Win.kmono : ∀ C C' : ℝ, C ≤ C' → LemmaK C → LemmaK C' := by
   intro C C' hCC hK
   unfold LemmaK at hK ⊢
   intro l _ L Ω _ _ _ _ _ D hL hMu e he

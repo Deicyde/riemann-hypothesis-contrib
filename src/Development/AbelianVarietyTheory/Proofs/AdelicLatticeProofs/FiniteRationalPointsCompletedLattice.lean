@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCom
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff ComplexOrder nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -18,19 +20,21 @@ section General
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_denom {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG) :
-    ∃ d : E, d ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ (d * x i) := by
+theorem exists_denom {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG)
+    : ∃ d : E, d ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ (d * x i) := by
   classical
   obtain ⟨s, rfl⟩ := hL
-  obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ
-    ((s ×ˢ (Finset.univ : Finset (Fin n))).image fun p => p.1 p.2)
+  obtain ⟨y, hy0, hy⟩ :=
+    exists_integral_multiples ℤ ℚ ((s ×ˢ (Finset.univ : Finset (Fin n))).image fun p => p.1 p.2)
   refine ⟨(y : E), by exact_mod_cast hy0, fun x hx i => ?_⟩
   induction hx using Submodule.span_induction with
   | mem x hx =>
     have := hy (x i) (Finset.mem_image.2 ⟨(x, i), by simpa using hx, rfl⟩)
     simpa [zsmul_eq_mul] using this
-  | zero => simpa using isIntegral_zero
-  | add x z _ _ hx hz => rw [Pi.add_apply, mul_add]; exact hx.add hz
+  | zero =>
+    simpa using isIntegral_zero
+  | add x z _ _ hx hz =>
+    rw [Pi.add_apply, mul_add]; exact hx.add hz
   | smul c x _ hx =>
     have : (y : E) * (c • x) i = (c : E) * ((y : E) * x i) := by
       change (y : E) * ((c : E) * x i) = _
@@ -38,18 +42,22 @@ theorem exists_denom {n : ℕ} (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG
     rw [this]
     exact c.isIntegral_coe.mul hx
 
-theorem finite_of_denom (d : E) (hd : d ≠ 0) (R : ℝ) :
-    {x : E | IsIntegral ℤ (d * x) ∧ ∀ φ : E →+* ℂ, ‖φ x‖ ≤ R}.Finite := by
+theorem finite_of_denom (d : E) (hd : d ≠ 0) (R : ℝ)
+    : {x : E | IsIntegral ℤ (d * x) ∧ ∀ φ : E →+* ℂ, ‖φ x‖ ≤ R}.Finite := by
   have h := NumberField.Embeddings.finite_of_norm_le E ℂ ((∑ φ : E →+* ℂ, ‖φ d‖) * R)
   refine (h.preimage (f := fun x => d * x) (mul_right_injective₀ hd).injOn).subset ?_
   rintro x ⟨hx, hb⟩
   refine ⟨hx, fun φ => ?_⟩
   rw [map_mul, norm_mul]
-  exact mul_le_mul (Finset.single_le_sum (f := fun φ : E →+* ℂ => ‖φ d‖) (fun _ _ => norm_nonneg _)
-    (Finset.mem_univ φ)) (hb φ) (norm_nonneg _) (Finset.sum_nonneg fun _ _ => norm_nonneg _)
+  exact mul_le_mul
+    (Finset.single_le_sum
+      (f := fun φ : E →+* ℂ => ‖φ d‖)
+      (fun _ _ => norm_nonneg _)
+      (Finset.mem_univ φ))
+    (hb φ) (norm_nonneg _) (Finset.sum_nonneg fun _ _ => norm_nonneg _)
 
-theorem mem_spanSingleton_inv (d : E) (hd : d ≠ 0) (x : E) :
-    x ∈ FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ ↔ IsIntegral ℤ (d * x) := by
+theorem mem_spanSingleton_inv (d : E) (hd : d ≠ 0) (x : E)
+    : x ∈ FractionalIdeal.spanSingleton (𝓞 E)⁰ d⁻¹ ↔ IsIntegral ℤ (d * x) := by
   rw [FractionalIdeal.mem_spanSingleton]
   constructor
   · rintro ⟨z, rfl⟩
@@ -68,8 +76,8 @@ end General
 theorem isIntegral_star (D : D7) {x : D.host.E} (hx : IsIntegral ℤ x) : IsIntegral ℤ (star x) :=
   hx.map (starRingEnd D.host.E).toIntAlgHom
 
-theorem norm_emb_le (D : D7) {x : D.host.E} {R : ℝ} (h : ∀ τ, ‖tauE D τ x‖ ≤ R) (φ : D.host.E →+* ℂ) :
-    ‖φ x‖ ≤ R := by
+theorem norm_emb_le (D : D7) {x : D.host.E} {R : ℝ} (h : ∀ τ, ‖tauE D τ x‖ ≤ R) (φ : D.host.E →+* ℂ)
+    : ‖φ x‖ ≤ R := by
   obtain ⟨τ, hτ⟩ := (GlobalTheory.CMTypePlaces.mk_tauE_bijective D).2 (InfinitePlace.mk φ)
   have := h τ
   rw [← InfinitePlace.apply] at this ⊢

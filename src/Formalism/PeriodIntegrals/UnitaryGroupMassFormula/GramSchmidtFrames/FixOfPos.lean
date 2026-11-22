@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSchmidtFrame
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open Matrix
 
 noncomputable section
@@ -83,13 +84,18 @@ lemma xcofL_fix {z z' : Fin (2 * r + k + 1) → ℂ} {α : B.Mat k r} (hα : α 
   rw [mv_sum]
   exact Finset.sum_congr rfl fun a _ => by rw [mulVec_smul, uw_fvec hα]
 
-theorem omW_UW {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {α β : B.Mat k r} (hα : α ∈ UWset k r z)
-    (hβ : β ∈ UWset k r z') (y : B.Mat k r) : omW k r z z' (α * y * β) = α *ᵥ omW k r z z' y := by
+theorem omW_UW
+    {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z)
+    {α β : B.Mat k r} (hα : α ∈ UWset k r z) (hβ : β ∈ UWset k r z')
+    (y : B.Mat k r)
+    : omW k r z z' (α * y * β) = α *ᵥ omW k r z z' y := by
   unfold omW; rw [xcof_UW hα hβ, prW_UW hz hα]
 
-theorem omW'_UW {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hz' : C2.StdZ k r z') {α β : B.Mat k r}
-    (hα : α ∈ UWset k r z) (hβ : β ∈ UWset k r z') (y : B.Mat k r) :
-    omW' k r z z' (α * y * β) = β⁻¹ *ᵥ omW' k r z z' y := by
+theorem omW'_UW
+    {z z' : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) (hz' : C2.StdZ k r z')
+    {α β : B.Mat k r} (hα : α ∈ UWset k r z) (hβ : β ∈ UWset k r z')
+    (y : B.Mat k r)
+    : omW' k r z z' (α * y * β) = β⁻¹ *ᵥ omW' k r z z' y := by
   have Wz := Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r z
   have Wz' := Formalism.FourierDecayAlt.P.weyl_subgroup_closed k r z'
   unfold omW'

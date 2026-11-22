@@ -9,7 +9,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MongeAmpereCha
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.PB
@@ -18,19 +20,22 @@ section
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X]
 
-
 omit [CompactSpace X] [T2Space X] in
-theorem chartPartition_norm_le_one (A : FinHolAtlas e X) (Q : ChartPartition A) (j : Fin A.n)
-    (x : X) : ‖Q.χ j x‖ ≤ 1 := by
+theorem chartPartition_norm_le_one
+    (A : FinHolAtlas e X) (Q : ChartPartition A) (j : Fin A.n) (x : X)
+    : ‖Q.χ j x‖ ≤ 1 := by
   have h : Q.χ j x ≤ ∑ k, Q.χ k x :=
     Finset.single_le_sum (f := fun k => Q.χ k x) (fun k _ => Q.nonneg k x) (Finset.mem_univ j)
   rw [Q.sum_eq_one] at h
   rw [Real.norm_eq_abs, abs_of_nonneg (Q.nonneg j x)]
   exact h
 
-theorem chartTerm_integrableOn (A : FinHolAtlas e X) (Q : ChartPartition A) (P : Fin e → LocPot X)
-    (g : X → ℝ) (hg : MIntegrable A P g) (j : Fin A.n) :
-    IntegrableOn (fun y => Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y)
+theorem chartTerm_integrableOn
+    (A : FinHolAtlas e X) (Q : ChartPartition A)
+    (P : Fin e → LocPot X) (g : X → ℝ) (hg : MIntegrable A P g)
+    (j : Fin A.n)
+    : IntegrableOn
+      (fun y => Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y)
       (A.chart j).target := by
   have hK : IsCompact (A.chart j '' tsupport (Q.χ j)) :=
     (isClosed_tsupport _).isCompact.image_of_continuousOn
@@ -42,7 +47,8 @@ theorem chartTerm_integrableOn (A : FinHolAtlas e X) (Q : ChartPartition A) (P :
   have hcont : ContinuousOn (fun y => Q.χ j ((A.chart j).symm y)) (A.chart j).target := by
     have h := (Q.smooth j j).continuousOn
     simpa [Function.comp_def] using h
-  have hm : AEStronglyMeasurable (fun y => Q.χ j ((A.chart j).symm y))
+  have hm : AEStronglyMeasurable
+      (fun y => Q.χ j ((A.chart j).symm y))
       (volume.restrict (A.chart j '' tsupport (Q.χ j))) :=
     (hcont.mono hKt).aestronglyMeasurable hK.measurableSet
   have h1 : IntegrableOn
@@ -60,14 +66,15 @@ theorem chartTerm_integrableOn (A : FinHolAtlas e X) (Q : ChartPartition A) (P :
   rw [image_eq_zero_of_notMem_tsupport hn]
   ring
 
-theorem chartTerm_hasSum (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ))
-    (Φ : ℕ → (Fin e → ℂ) → X) (P : Fin e → LocPot X) (g : X → ℝ) (Q : ChartPartition A)
-    (hc : IsParamCover A V B Φ) (hC2 : ∀ n, ∀ z ∈ B n, ∀ i, IsTwiceDifferentiableAt A (P i) (Φ n z))
-    (hg : MIntegrable A P g) (j : Fin A.n) :
-    (∀ n, IntegrableOn (fun z => Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z) (B n)) ∧
-      HasSum (fun n => ∫ z in B n, Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z)
-        (∫ y in (A.chart j).target,
-          Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y) := by
+theorem chartTerm_hasSum
+    (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ)) (Φ : ℕ → (Fin e → ℂ) → X)
+    (P : Fin e → LocPot X) (g : X → ℝ) (Q : ChartPartition A) (hc : IsParamCover A V B Φ)
+    (hC2 : ∀ n, ∀ z ∈ B n, ∀ i, IsTwiceDifferentiableAt A (P i) (Φ n z)) (hg : MIntegrable A P g)
+    (j : Fin A.n)
+    : (∀ n, IntegrableOn (fun z => Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z) (B n)) ∧ HasSum
+      (fun n => ∫ z in B n, Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z)
+      (∫ y in (A.chart j).target,
+        Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y) := by
   obtain ⟨hpar, hB, hdisj, hnull⟩ := hc
   have hf := chartTerm_integrableOn A Q P g hg j
   have hCm : ∀ n, MeasurableSet (B n ∩ Φ n ⁻¹' (A.chart j).source) := by
@@ -83,18 +90,23 @@ theorem chartTerm_hasSum (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ
         exact ⟨h1, h2⟩
     rw [hEq]
     exact (hB n).1.inter hO.measurableSet
-  have key := fun n => GlobalTheory.T.monge_ampere_chart_density_integral e X A (V n) (B n ∩ Φ n ⁻¹' (A.chart j).source) (Φ n) P
-    (fun x => Q.χ j x * g x) j (hpar n) (hCm n) (fun z hz => (hB n).2 hz.1) (fun z hz => hz.2)
-    (fun z hz => hC2 n z hz.1)
-  have hsub : ∀ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source) ⊆
-      (A.chart j).target := by
+  have key := fun n =>
+    GlobalTheory.T.monge_ampere_chart_density_integral e X A (V n)
+      (B n ∩ Φ n ⁻¹' (A.chart j).source) (Φ n) P
+      (fun x => Q.χ j x * g x)
+      j (hpar n) (hCm n)
+      (fun z hz => (hB n).2 hz.1)
+      (fun z hz => hz.2)
+      (fun z hz => hC2 n z hz.1)
+  have hsub
+      : ∀ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source) ⊆ (A.chart j).target := by
     rintro n _ ⟨z, hz, rfl⟩
     exact (A.chart j).map_source hz.2
-  have hzero : ∀ n, ∀ z ∈ B n \ (B n ∩ Φ n ⁻¹' (A.chart j).source),
-      Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z = 0 := by
+  have hzero
+      : ∀ n, ∀ z ∈ B n \ (B n ∩ Φ n ⁻¹' (A.chart j).source),
+        Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z = 0 := by
     rintro n z ⟨hz, hz'⟩
-    have hn : Φ n z ∉ tsupport (Q.χ j) := fun hmem =>
-      hz' ⟨hz, Q.tsupport_subset j hmem⟩
+    have hn : Φ n z ∉ tsupport (Q.χ j) := fun hmem => hz' ⟨hz, Q.tsupport_subset j hmem⟩
     rw [image_eq_zero_of_notMem_tsupport hn]
     ring
   have hdis : Pairwise (Function.onFun Disjoint fun n =>
@@ -106,11 +118,13 @@ theorem chartTerm_hasSum (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ
       refine (A.chart j).injOn hz.2 hw.2 ?_
       exact hzw.symm
     exact Set.disjoint_left.1 (hdisj hnm) ⟨z, hz.1, rfl⟩ ⟨w, hw.1, hEq.symm⟩
-  have hUsub : (⋃ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source)) ⊆
-      (A.chart j).target := Set.iUnion_subset hsub
+  have hUsub
+      : (⋃ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source)) ⊆ (A.chart j).target :=
+    Set.iUnion_subset hsub
   have hsum := hasSum_integral_iUnion (fun n => (key n).1) hdis (hf.mono_set hUsub)
-  have hUeq : (⋃ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source)) =ᵐ[volume]
-      (A.chart j).target := by
+  have hUeq
+      : (⋃ n, (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source)) =ᵐ[volume]
+        (A.chart j).target := by
     refine ae_eq_set.2 ⟨?_, ?_⟩
     · rw [Set.sdiff_eq_empty.2 hUsub]
       exact measure_empty
@@ -129,40 +143,54 @@ theorem chartTerm_hasSum (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ
   rw [setIntegral_congr_set hUeq] at hsum
   constructor
   · intro n
-    refine IntegrableOn.of_forall_sdiff_eq_zero
-      ((key n).2.1.1 (hf.mono_set (hsub n))) (hB n).1 (hzero n)
-  · have hEq : (fun n => ∫ z in B n, Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z) =
-        fun n => ∫ y in (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source),
-          Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y := by
+    refine IntegrableOn.of_forall_sdiff_eq_zero ((key n).2.1.1 (hf.mono_set (hsub n))) (hB n).1
+      (hzero n)
+  · have hEq
+        : (fun n => ∫ z in B n, Q.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z)
+          = fun n =>
+            ∫ y in (A.chart j ∘ Φ n) '' (B n ∩ Φ n ⁻¹' (A.chart j).source),
+              Q.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y := by
       funext n
-      rw [setIntegral_eq_of_subset_of_forall_sdiff_eq_zero (hB n).1 Set.inter_subset_left
-        (hzero n)]
+      rw [setIntegral_eq_of_subset_of_forall_sdiff_eq_zero (hB n).1 Set.inter_subset_left (hzero n)]
       exact ((key n).2.2).symm
     rw [hEq]
     exact hsum
 
-theorem integrableOn_hasSum_paramCover : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X) (V B : ℕ → Set (Fin e → ℂ)) (Φ : ℕ → (Fin e → ℂ) → X) (P : Fin e → LocPot X) (g : X → ℝ), IsParamCover A V B Φ → (∀ n, ∀ z ∈ B n, ∀ i, IsTwiceDifferentiableAt A (P i) (Φ n z)) → MIntegrable A P g → (∀ n, IntegrableOn (fun z => g (Φ n z) * paramDens P (Φ n) z) (B n)) ∧ HasSum (fun n => ∫ z in B n, g (Φ n z) * paramDens P (Φ n) z) (mInt A P g) := by
+theorem integrableOn_hasSum_paramCover
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (V B : ℕ → Set (Fin e → ℂ)) (Φ : ℕ → (Fin e → ℂ) → X) (P : Fin e → LocPot X) (g : X → ℝ),
+      IsParamCover A V B Φ → (∀ n, ∀ z ∈ B n, ∀ i, IsTwiceDifferentiableAt A (P i) (Φ n z))
+        → MIntegrable A P g
+        → (∀ n, IntegrableOn (fun z => g (Φ n z) * paramDens P (Φ n) z) (B n))
+          ∧ HasSum (fun n => ∫ z in B n, g (Φ n z) * paramDens P (Φ n) z) (mInt A P g) := by
   intro e X _ _ _ A V B Φ P g hc hC2 hg
   have hne : Nonempty (ChartPartition A) := existsPartition A
-  have hm : mInt A P g = ∑ j, ∫ y in (A.chart j).target,
-      hne.some.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y := by
+  have hm
+      : mInt A P g
+        = ∑ j, ∫ y in (A.chart j).target,
+          hne.some.χ j ((A.chart j).symm y) * g ((A.chart j).symm y) * locDens A P j y := by
     rw [mInt, dite_eq_left hne, integralWith]
   have hj := fun j => chartTerm_hasSum A V B Φ P g hne.some hc hC2 hg j
-  have hpt : ∀ n z, g (Φ n z) * paramDens P (Φ n) z =
-      ∑ j, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z := by
+  have hpt
+      : ∀ n z,
+        g (Φ n z) * paramDens P (Φ n) z
+          = ∑ j, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z := by
     intro n z
     rw [← Finset.sum_mul, ← Finset.sum_mul, hne.some.sum_eq_one, one_mul]
-  have hfun : ∀ n, (fun z => g (Φ n z) * paramDens P (Φ n) z) =
-      fun z => ∑ j, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z :=
-    fun n => funext (hpt n)
+  have hfun
+      : ∀ n,
+        (fun z => g (Φ n z) * paramDens P (Φ n) z)
+          = fun z => ∑ j, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z := fun n =>
+    funext (hpt n)
   constructor
   · intro n
     rw [hfun n]
     exact integrable_finsetSum _ fun j _ => (hj j).1 n
   · rw [hm]
     have hs := hasSum_sum (s := Finset.univ) fun j _ => (hj j).2
-    have hEq : (fun n => ∫ z in B n, g (Φ n z) * paramDens P (Φ n) z) =
-        fun n => ∑ j, ∫ z in B n, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z := by
+    have hEq
+        : (fun n => ∫ z in B n, g (Φ n z) * paramDens P (Φ n) z)
+          = fun n => ∑ j, ∫ z in B n, hne.some.χ j (Φ n z) * g (Φ n z) * paramDens P (Φ n) z := by
       funext n
       rw [hfun n]
       exact integral_finsetSum _ fun j _ => (hj j).1 n

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsK
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -19,26 +21,34 @@ theorem perfectRing_tilt_fraction_field (l : ℕ) [Fact l.Prime] : PerfectRing (
   obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := OCb l) x
   obtain ⟨a', rfl⟩ := surjective_frobenius (OCb l) l a
   obtain ⟨b', rfl⟩ := surjective_frobenius (OCb l) l b
-  exact ⟨algebraMap (OCb l) (Cb l) a' / algebraMap (OCb l) (Cb l) b', by
-    simp [frobenius_def, div_pow, map_pow]⟩
+  exact ⟨
+    algebraMap (OCb l) (Cb l) a' / algebraMap (OCb l) (Cb l) b',
+    by simp [frobenius_def, div_pow, map_pow]
+  ⟩
 
-theorem constantCoeff_frobW (l : ℕ) [Fact l.Prime] (x : WCb l) :
-    WittVector.constantCoeff (frobW l x) = frobenius (Cb l) l (WittVector.constantCoeff x) :=
+theorem constantCoeff_frobW (l : ℕ) [Fact l.Prime] (x : WCb l)
+    : WittVector.constantCoeff (frobW l x) = frobenius (Cb l) l (WittVector.constantCoeff x) :=
   WittVector.map_coeff (frobenius (Cb l) l) x 0
 
-theorem constantCoeff_galW (l : ℕ) [Fact l.Prime] (g : GQ l) (x : WCb l) :
-    WittVector.constantCoeff (galW l g x) = autCb l (galTilt l g) (WittVector.constantCoeff x) :=
+theorem constantCoeff_galW (l : ℕ) [Fact l.Prime] (g : GQ l) (x : WCb l)
+    : WittVector.constantCoeff (galW l g x) = autCb l (galTilt l g) (WittVector.constantCoeff x) :=
   WittVector.map_coeff (autCb l (galTilt l g)).toRingHom x 0
 
 end GlobalTheory.SatInvUnit
 
 namespace GlobalTheory.SatInvUnit
 
-theorem isUnit_of_saturated : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ)
-    (Y A : Matrix (Fin d) (Fin d) (WCb l)), Y.det ≠ 0 → (∀ i j, A i j ∈ bk.OE) → Y.map (frobW l) = Y * A →
-    (∀ g : ↥(GK K), bk.FixFlat g → ∃ R : Matrix (Fin d) (Fin d) (WCb l), IsUnit R ∧ R * Y.map (galW l (g : GQ l)) = Y) →
-    (∀ v : Fin d → WCb l, (∀ i, v i ∈ bk.OE) → (∀ i, ((l : ℕ) : WCb l) ∣ Y.mulVec v i) → ∀ i, ((l : ℕ) : WCb l) ∣ v i) →
-    IsUnit Y := by
+theorem isUnit_of_saturated
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ)
+        (Y A : Matrix (Fin d) (Fin d) (WCb l)),
+      Y.det ≠ 0 → (∀ i j, A i j ∈ bk.OE) → Y.map (frobW l) = Y * A
+        → (∀ g : ↥(GK K),
+          bk.FixFlat g
+            → ∃ R : Matrix (Fin d) (Fin d) (WCb l), IsUnit R ∧ R * Y.map (galW l (g : GQ l)) = Y)
+        → (∀ v : Fin d → WCb l,
+          (∀ i, v i ∈ bk.OE) → (∀ i, ((l : ℕ) : WCb l) ∣ Y.mulVec v i)
+            → ∀ i, ((l : ℕ) : WCb l) ∣ v i)
+        → IsUnit Y := by
   intro l _ K bk d Y A hY hA hφ hg hsat
   haveI : PerfectRing (Cb l) l := perfectRing_tilt_fraction_field l
   set c : WCb l →+* Cb l := WittVector.constantCoeff (p := l) (R := Cb l) with hc
@@ -66,16 +76,22 @@ theorem isUnit_of_saturated : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : 
         ext i j
         exact constantCoeff_frobW l (Y i j)
       rw [← this, hφ, Matrix.map_mul]
-    have hg' : ∀ g : ↥(GK K), bk.FixFlat g → ∃ R : Matrix (Fin d) (Fin d) (Cb l), IsUnit R ∧
-        R * (Y.map c).map (autCb l (galTilt l (g : GQ l))) = Y.map c := by
+    have hg'
+        : ∀ g : ↥(GK K),
+          bk.FixFlat g
+            → ∃ R : Matrix (Fin d) (Fin d) (Cb l),
+              IsUnit R ∧ R * (Y.map c).map (autCb l (galTilt l (g : GQ l))) = Y.map c := by
       intro g hfix
       obtain ⟨R, hR, hRY⟩ := hg g hfix
       refine ⟨R.map c, hR.map c.mapMatrix, ?_⟩
-      have : (Y.map (galW l (g : GQ l))).map c = (Y.map c).map (autCb l (galTilt l (g : GQ l))) := by
+      have : (Y.map (galW l (g : GQ l))).map c
+          = (Y.map c).map (autCb l (galTilt l (g : GQ l))) := by
         ext i j
         exact constantCoeff_galW l (g : GQ l) (Y i j)
       rw [← this, ← Matrix.map_mul, hRY]
-    obtain ⟨vb, hv0, hvm, hYv⟩ := GlobalTheory.T.exists_kernel_vector_mem_OE_of_frobenius_stable l K bk d (Y.map c) (A.map c) hcA hAm hφ' hg' h0
+    obtain ⟨vb, hv0, hvm, hYv⟩ :=
+      GlobalTheory.T.exists_kernel_vector_mem_OE_of_frobenius_stable l K bk d (Y.map c) (A.map c)
+        hcA hAm hφ' hg' h0
     choose v hv hvc using fun i => Subring.mem_map.1 (hvm i)
     have hdiv : ∀ i, ((l : ℕ) : WCb l) ∣ Y.mulVec v i := by
       intro i

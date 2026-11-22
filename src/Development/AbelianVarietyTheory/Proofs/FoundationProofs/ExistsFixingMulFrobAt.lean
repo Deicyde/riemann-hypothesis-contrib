@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ Matrix
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ
+  Matrix
 
 namespace GlobalTheory.KZ
 
-theorem exists_fixing_mul_frobAt :
-    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (s : Ω ≃ₐ[ℚ] Ω) (E0 : Finset Ω) (S : Finset ℕ),
-      ∃ (s' : Ω ≃ₐ[ℚ] Ω) (q : ℕ), (∀ x ∈ E0, s' x = x) ∧ q.Prime ∧ q ∉ S ∧ FrobAt q (s * s') := by
+theorem exists_fixing_mul_frobAt
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (s : Ω ≃ₐ[ℚ] Ω) (E0 : Finset Ω)
+        (S : Finset ℕ),
+      ∃ (s' : Ω ≃ₐ[ℚ] Ω) (q : ℕ),
+        (∀ x ∈ E0, s' x = x) ∧ q.Prime ∧ q ∉ S ∧ FrobAt q (s * s') := by
   intro Ω _ _ _ s E0 S
   have : IsGalois ℚ Ω := {}
   let K : IntermediateField ℚ Ω := IntermediateField.adjoin ℚ (E0 : Set Ω)
@@ -28,11 +31,11 @@ theorem exists_fixing_mul_frobAt :
   let T : ℕ := ∏ p ∈ S.filter (· ≠ 0), p
   have hT : T ≠ 0 := Finset.prod_ne_zero_iff.2 fun p hp => (Finset.mem_filter.1 hp).2
   have hS : {v : HeightOneSpectrum (𝓞 ℚ) | (T : 𝓞 ℚ) ∈ v.asIdeal}.Finite :=
-    (Ideal.finite_factors (I := Ideal.span {(T : 𝓞 ℚ)}) (by simpa using hT)).subset
-      fun _ hv => Ideal.dvd_span_singleton.2 hv
+    (Ideal.finite_factors (I := Ideal.span {(T : 𝓞 ℚ)}) (by simpa using hT)).subset fun _ hv =>
+      Ideal.dvd_span_singleton.2 hv
   obtain ⟨φ, hφV, v, hv, hd, B, hB, hφ⟩ :=
-    (GlobalTheory.Published.ChebotarevDegreeOne.dense (F := ℚ) (Ω := Ω) GlobalTheory.Published.chebotarevDegreeOne' hS).inter_open_nonempty
-      V hVo hVne
+    (GlobalTheory.Published.ChebotarevDegreeOne.dense (F := ℚ) (Ω := Ω)
+      GlobalTheory.Published.chebotarevDegreeOne' hS).inter_open_nonempty V hVo hVne
   have h2 : Ideal.absNorm v.asIdeal = normV v := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
   have hmem : ((normV v : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := h2 ▸ Ideal.absNorm_mem v.asIdeal
@@ -41,7 +44,8 @@ theorem exists_fixing_mul_frobAt :
     exact ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified ℚ).1 v).2 hd
   refine ⟨s⁻¹ * φ, normV v, ?_, hq, ?_, ?_⟩
   · intro x hx
-    exact (mem_fixingSubgroup_iff _).1 hφV x (IntermediateField.subset_adjoin ℚ _ (by simpa using hx))
+    exact (mem_fixingSubgroup_iff _).1 hφV x
+      (IntermediateField.subset_adjoin ℚ _ (by simpa using hx))
   · intro hqS
     apply hv
     show (T : 𝓞 ℚ) ∈ v.asIdeal

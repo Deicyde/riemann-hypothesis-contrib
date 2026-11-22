@@ -77,8 +77,10 @@ structure RowsRest (B : Base) (C : Cols B) where
   [instMtL : ∀ μ j, AddCommGroup (MtL μ j)]
   [instMtLm : ∀ μ j, Module B.LL (MtL μ j)]
   jMt : ∀ μ j, MtL μ j →ₛₗ[B.embLL] Mt μ j
-  jMt_basis : ∀ μ j, ∀ b : Module.Basis (Module.Free.ChooseBasisIndex B.LL (MtL μ j)) B.LL (MtL μ j),
-    LinearIndependent ℂ (fun i => jMt μ j (b i)) ∧ Submodule.span ℂ (Set.range (fun i => jMt μ j (b i))) = ⊤
+  jMt_basis
+    : ∀ μ j, ∀ b : Module.Basis (Module.Free.ChooseBasisIndex B.LL (MtL μ j)) B.LL (MtL μ j),
+      LinearIndependent ℂ (fun i => jMt μ j (b i))
+        ∧ Submodule.span ℂ (Set.range (fun i => jMt μ j (b i))) = ⊤
   MtLat_sub : ∀ μ j, ∀ x ∈ (MtLat μ j).gen, x ∈ Set.range (jMt μ j)
   eMt : ∀ μ j, Mt μ j →ₗ[ℂ] Mt μ j
   eMt_idem : ∀ μ j, eMt μ j ∘ₗ eMt μ j = eMt μ j
@@ -95,22 +97,37 @@ structure RowsRest (B : Base) (C : Cols B) where
   shaLen_nonneg : ∀ l e, 0 ≤ shaLen l e
   eMu : ∀ u, Mu u ≃ₗ[ℂ] (C.mem u).A.Mram
   eMt0 : ∀ u, (C.mem u).P.Mt ≃ₗ[ℂ] Amb C.mu0
-  perCol_base_eq_PtilCol : ∀ u (φ : Mu u) (F : Amb C.mu0),
-    perCol u C.mu0 φ F = (C.mem u).P.PtilCol ((eMu u φ : (C.mem u).A.Mram) :
-      (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ) ((eMt0 u).symm F)
+  perCol_base_eq_PtilCol
+    : ∀ u (φ : Mu u) (F : Amb C.mu0),
+      perCol u C.mu0 φ F
+        = (C.mem u).P.PtilCol
+          ((eMu u φ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ) ((eMt0 u).symm F)
   Bu_linL : ∀ u (F : EE), IsLinearMap ℂ (fun φ : Mu u => Bu u φ F)
   Bu_linR : ∀ u (φ : Mu u), IsLinearMap ℂ (fun F : EE => Bu u φ F)
   eMtTw : ∀ u μ, (C.PTw u μ).Mt ≃ₗ[ℂ] Amb μ
-  perCol_tie : ∀ u μ, μ ≠ C.mu0 → ∀ (φ : Mu u) (F : Amb μ), perCol u μ φ F =
-    (C.PTw u μ).PtilCol (C.e0Tw u μ ((eMu u φ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ))
-      ((eMtTw u μ).symm F)
-  eMu_isom : ∀ u (φ ψ : Mu u), inner ℂ φ ψ =
-    (C.fm u).ipC 0 ((eMu u φ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ)
-      ((eMu u ψ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ)
+  perCol_tie
+    : ∀ u μ,
+      μ ≠ C.mu0
+        → ∀ (φ : Mu u) (F : Amb μ),
+          perCol u μ φ F
+            = (C.PTw u μ).PtilCol
+              (C.e0Tw u μ ((eMu u φ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ))
+              ((eMtTw u μ).symm F)
+  eMu_isom
+    : ∀ u (φ ψ : Mu u),
+      inner ℂ φ ψ
+        = (C.fm u).ipC 0 ((eMu u φ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ)
+          ((eMu u ψ : (C.mem u).A.Mram) : (C.mem u).C.cls 0 → (C.mem u).C.Y 0 → ℂ)
 
-attribute [instance] RowsRest.instEE RowsRest.instEEi RowsRest.instEEf RowsRest.instEE0 RowsRest.instEE0i RowsRest.instEE0f RowsRest.instFT RowsRest.instFTd RowsRest.instAmb RowsRest.instAmbi RowsRest.instAmbf RowsRest.instMult RowsRest.instMulti RowsRest.instMultf RowsRest.instMu RowsRest.instMui RowsRest.instMuf RowsRest.instMj RowsRest.instMji RowsRest.instMjf RowsRest.instMt RowsRest.instMti RowsRest.instMtf RowsRest.instMtL RowsRest.instMtLm
+attribute [instance]
+  RowsRest.instEE RowsRest.instEEi RowsRest.instEEf RowsRest.instEE0 RowsRest.instEE0i
+  RowsRest.instEE0f RowsRest.instFT RowsRest.instFTd RowsRest.instAmb RowsRest.instAmbi
+  RowsRest.instAmbf RowsRest.instMult RowsRest.instMulti RowsRest.instMultf RowsRest.instMu
+  RowsRest.instMui RowsRest.instMuf RowsRest.instMj RowsRest.instMji RowsRest.instMjf
+  RowsRest.instMt RowsRest.instMti RowsRest.instMtf RowsRest.instMtL RowsRest.instMtLm
 
-@[reducible] def RowsRest.what₂ {B : Base} {C : Cols B} (W : RowsRest B C) : Rows.Data B.R where
+@[reducible]
+def RowsRest.what₂ {B : Base} {C : Cols B} (W : RowsRest B C) : Rows.Data B.R where
   LL := B.LL
   embLL := B.embLL
   places := B.places

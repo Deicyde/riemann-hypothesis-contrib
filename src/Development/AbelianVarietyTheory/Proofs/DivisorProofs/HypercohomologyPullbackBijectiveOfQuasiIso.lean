@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSheafCo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 namespace GlobalTheory.EtC.KInjPull
 
 variable {C : Type*} [Category C] [Abelian C]
 
-theorem cls_eq_zero_of_acyclic {A I : CochainComplex C ℤ} (hA : A.Acyclic) [I.IsKInjective] {n : ℤ}
-    (z : Cocycle A I n) : CohomologyClass.mk z = 0 := by
+theorem cls_eq_zero_of_acyclic
+    {A I : CochainComplex C ℤ} (hA : A.Acyclic) [I.IsKInjective] {n : ℤ} (z : Cocycle A I n)
+    : CohomologyClass.mk z = 0 := by
   let g : A ⟶ I⟦n⟧ := Cocycle.homOf (z.rightShift n 0 (zero_add n))
   let H := IsKInjective.homotopyZero g hA
   have h1 : δ (-1) 0 (Cochain.ofHomotopy H) = (z.1.rightShift n 0 (zero_add n)) := by
@@ -29,7 +31,10 @@ theorem cls_eq_zero_of_acyclic {A I : CochainComplex C ℤ} (hA : A.Acyclic) [I.
 
 end GlobalTheory.EtC.KInjPull
 
-theorem GlobalTheory.EtC.cpull_bijective_of_quasiIso : ∀ (R : Type) [CommRing R] {K L : Cx R} (f : K ⟶ L) [QuasiIso f] (I : Cx R) [I.IsKInjective] (n : ℤ), Function.Bijective (cpull f I n) := by
+theorem GlobalTheory.EtC.cpull_bijective_of_quasiIso
+    : ∀ (R : Type) [CommRing R] {K L : Cx R} (f : K ⟶ L) [QuasiIso f] (I : Cx R) [I.IsKInjective]
+        (n : ℤ),
+      Function.Bijective (cpull f I n) := by
   intro R _ K L f _ I _ n
   have hA := GlobalTheory.EtC.mappingCone_acyclic R f
   have hz : ∀ m (x : CohomologyClass (mappingCone f) I m), x = 0 := by

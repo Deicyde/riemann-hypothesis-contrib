@@ -21,21 +21,30 @@ namespace GlobalTheory.CompanionTheory.HalfIntegral
 theorem pOf_eq_prime (v : Pl) : pOf v = prime v := by
   show Ideal.absNorm v.asIdeal = prime v
   rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-  have h : ((prime v : ℕ) : NumberField.RingOfIntegers ℚ) =
-      algebraMap ℤ (NumberField.RingOfIntegers ℚ) ((prime v : ℕ) : ℤ) := by
+  have h
+      : ((prime v : ℕ) : NumberField.RingOfIntegers ℚ)
+        = algebraMap ℤ (NumberField.RingOfIntegers ℚ) ((prime v : ℕ) : ℤ) := by
     simp
   rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
   simp
 
-theorem ord_uniformizer_eq_one (v : Pl) :
-    ord ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v) = 1 := by
-  have h1 : Valued.v ((DirichletHecke.uniformizer v : (IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)ˣ) :
-      IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v) = WithZero.exp (-1) :=
+theorem ord_uniformizer_eq_one (v : Pl)
+    : ord ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v) = 1 := by
+  have h1
+      : Valued.v
+          ((DirichletHecke.uniformizer v : (IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)ˣ)
+            : IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)
+        = WithZero.exp (-1) :=
     DirichletHecke.valued_uniformizer v
-  have h2 := GroundTheory.Global.valued_eq_exp_neg_ord (K := ℚ) (v := v)
-    (x := ((DirichletHecke.uniformizer v : (IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)ˣ) :
-      IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)) (Units.ne_zero _)
-  have h3 : WithZero.exp (-ord ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v)) = WithZero.exp (-1) :=
+  have h2 :=
+    GroundTheory.Global.valued_eq_exp_neg_ord (K := ℚ) (v := v)
+      (x :=
+        ((DirichletHecke.uniformizer v : (IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v)ˣ)
+          : IsDedekindDomain.HeightOneSpectrum.adicCompletion ℚ v))
+      (Units.ne_zero _)
+  have h3
+      : WithZero.exp (- ord ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v))
+        = WithZero.exp (-1) :=
     h2.symm.trans h1
   have h4 := WithZero.exp_injective h3
   omega

@@ -4,17 +4,22 @@ public import Development.WeilBound.CoreStatements.AmpleLineBundles.NormDegreeLe
 
 @[expose] public section
 
-open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt GlobalTheory.CompanionTheory.Ar Matrix
+open GroundTheory.Heights₂.Heights NumberField TensorProduct ComplexAt
+  GlobalTheory.CompanionTheory.Ar Matrix
 open scoped BigOperators ComplexOrder
 
 namespace CoverDenseAlt
 
-private theorem card_quotient_span_eq_relIndex {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
-    (G : Submodule R M) {ι : Type*} (s : ι → G) :
-    Nat.card (G ⧸ Submodule.span R (Set.range s)) =
-      (Submodule.span R (Set.range fun i => (s i : M))).toAddSubgroup.relIndex G.toAddSubgroup := by
-  have h : Submodule.span R (Set.range s) =
-      (Submodule.span R (Set.range fun i => (s i : M))).comap G.subtype := by
+private theorem card_quotient_span_eq_relIndex
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    (G : Submodule R M)
+    {ι : Type*} (s : ι → G)
+    : Nat.card (G ⧸ Submodule.span R (Set.range s))
+      = (Submodule.span R (Set.range fun i => (s i : M))).toAddSubgroup.relIndex
+        G.toAddSubgroup := by
+  have h
+      : Submodule.span R (Set.range s)
+        = (Submodule.span R (Set.range fun i => (s i : M))).comap G.subtype := by
     have hr : (Set.range fun i => (s i : M)) = G.subtype '' Set.range s := by
       rw [← Set.range_comp]
       rfl
@@ -22,10 +27,12 @@ private theorem card_quotient_span_eq_relIndex {R M : Type*} [CommRing R] [AddCo
   rw [h]
   rfl
 
-private theorem index_span_ne_zero_of_linearIndependent {K : Type} [Field K] [NumberField K] (E : HermitianBundle.{0} K)
+private theorem index_span_ne_zero_of_linearIndependent
+    {K : Type} [Field K] [NumberField K]
+    (E : HermitianBundle.{0} K)
     {n : ℕ} (hn : Module.finrank (𝓞 K) E.carrier = n) (v : Fin n → E.carrier)
-    (hv : LinearIndependent (𝓞 K) v) :
-    (Submodule.span (𝓞 K) (Set.range v)).toAddSubgroup.index ≠ 0 := by
+    (hv : LinearIndependent (𝓞 K) v)
+    : (Submodule.span (𝓞 K) (Set.range v)).toAddSubgroup.index ≠ 0 := by
   classical
   have hfinZ : Module.Finite ℤ E.carrier := Module.Finite.trans (𝓞 K) E.carrier
   set S := Submodule.span (𝓞 K) (Set.range v) with hSdef
@@ -60,7 +67,13 @@ private theorem index_span_ne_zero_of_linearIndependent {K : Type} [Field K] [Nu
       rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
       exact ha0
     obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp (Ideal.absNorm_mem (Ideal.span {a}))
-    refine ⟨⟨(Ideal.absNorm (Ideal.span {a}) : ℤ), mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hN0)⟩, ?_⟩
+    refine ⟨
+      ⟨
+        (Ideal.absNorm (Ideal.span {a}) : ℤ),
+        mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hN0)
+      ⟩,
+      ?_
+    ⟩
     rw [Submonoid.smul_def]
     show ((Ideal.absNorm (Ideal.span {a}) : ℤ)) • (QuotientAddGroup.mk' S.toAddSubgroup y) = 0
     rw [← map_zsmul, QuotientAddGroup.mk'_apply, QuotientAddGroup.eq_zero_iff]
@@ -71,12 +84,14 @@ private theorem index_span_ne_zero_of_linearIndependent {K : Type} [Field K] [Nu
   haveI := Module.finite_of_fg_torsion _ htor
   exact AddSubgroup.index_ne_zero_of_finite
 
-private theorem index_ne_zero_and_le_of_smul_mem {K : Type} [Field K] [NumberField K] (E : HermitianBundle.{0} K)
-    (F : Submodule (𝓞 K) E.carrier) {n : ℕ} (v : Fin n → E.carrier)
-    (hS : (Submodule.span (𝓞 K) (Set.range v)).toAddSubgroup.index ≠ 0)
-    (d : ℤ) (hd : d ≠ 0) (hdF : ∀ x : E.carrier, d • x ∈ F) :
-    F.toAddSubgroup.index ≠ 0 ∧
-      (F.toAddSubgroup.index : ℝ) ≤ (|(d : ℝ)| ^ Module.finrank ℚ K) ^ n := by
+private theorem index_ne_zero_and_le_of_smul_mem
+    {K : Type} [Field K] [NumberField K]
+    (E : HermitianBundle.{0} K) (F : Submodule (𝓞 K) E.carrier)
+    {n : ℕ}
+    (v : Fin n → E.carrier) (hS : (Submodule.span (𝓞 K) (Set.range v)).toAddSubgroup.index ≠ 0)
+    (d : ℤ) (hd : d ≠ 0) (hdF : ∀ x : E.carrier, d • x ∈ F)
+    : F.toAddSubgroup.index ≠ 0
+      ∧ (F.toAddSubgroup.index : ℝ) ≤ (|(d : ℝ)| ^ Module.finrank ℚ K) ^ n := by
   classical
   set S := Submodule.span (𝓞 K) (Set.range v) with hSdef
   have hd' : (d : 𝓞 K) ≠ 0 := by exact_mod_cast hd
@@ -108,24 +123,30 @@ private theorem index_ne_zero_and_le_of_smul_mem {K : Type} [Field K] [NumberFie
   have hmapS : (I • S).toAddSubgroup = S.toAddSubgroup.map f.toAddMonoidHom := by
     rw [hIdef, Submodule.ideal_span_singleton_smul, Submodule.pointwise_smul_toAddSubgroup]
     rfl
-  have hmapT : (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup =
-      (⊤ : AddSubgroup E.carrier).map f.toAddMonoidHom := by
+  have hmapT
+      : (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup
+        = (⊤ : AddSubgroup E.carrier).map f.toAddMonoidHom := by
     rw [hIdef, Submodule.ideal_span_singleton_smul, Submodule.pointwise_smul_toAddSubgroup,
       Submodule.top_toAddSubgroup]
     rfl
-  have hrel : (I • S).toAddSubgroup.relIndex (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup =
-      S.toAddSubgroup.index := by
+  have hrel
+      : (I • S).toAddSubgroup.relIndex (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup
+        = S.toAddSubgroup.index := by
     rw [hmapS, hmapT, AddSubgroup.relIndex_map_map_of_injective _ _ hfinj,
       AddSubgroup.relIndex_top_right]
-  have hT := Submodule.index_smul_le I (Finset.univ.image v) (N := S)
-    (by rw [Finset.coe_image, Finset.coe_univ, Set.image_univ])
+  have hT :=
+    Submodule.index_smul_le I (Finset.univ.image v) (N := S)
+      (by rw [Finset.coe_image, Finset.coe_univ, Set.image_univ])
   have hcard : (Finset.univ.image v).card ≤ n := Finset.card_image_le.trans (by simp)
-  have hmul2 := AddSubgroup.relIndex_mul_index
-    (show (I • S).toAddSubgroup ≤ (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup from hTU)
+  have hmul2 :=
+    AddSubgroup.relIndex_mul_index
+      (show (I • S).toAddSubgroup ≤ (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup from hTU)
   rw [hrel] at hmul2
-  have hUle : (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index ≤ I.toAddSubgroup.index ^ n := by
-    have h1 : S.toAddSubgroup.index * (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index ≤
-        S.toAddSubgroup.index * I.toAddSubgroup.index ^ (Finset.univ.image v).card := by
+  have hUle
+      : (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index ≤ I.toAddSubgroup.index ^ n := by
+    have h1
+        : S.toAddSubgroup.index * (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index
+          ≤ S.toAddSubgroup.index * I.toAddSubgroup.index ^ (Finset.univ.image v).card := by
       rw [hmul2, mul_comm]
       exact hT
     have h2 := Nat.le_of_mul_le_mul_left h1 (Nat.pos_of_ne_zero hS)
@@ -134,27 +155,38 @@ private theorem index_ne_zero_and_le_of_smul_mem {K : Type} [Field K] [NumberFie
     Nat.le_of_dvd (Nat.pos_of_ne_zero hUne) (AddSubgroup.index_dvd_of_le hUF)
   have hFne : F.toAddSubgroup.index ≠ 0 := by
     intro h
-    have hdv := AddSubgroup.index_dvd_of_le
-      (show (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup ≤ F.toAddSubgroup from hUF)
+    have hdv :=
+      AddSubgroup.index_dvd_of_le
+        (show (I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup ≤ F.toAddSubgroup from hUF)
     rw [h] at hdv
     exact hUne (Nat.eq_zero_of_zero_dvd hdv)
   refine ⟨hFne, ?_⟩
   have hIr : (I.toAddSubgroup.index : ℝ) = |(d : ℝ)| ^ Module.finrank ℚ K := by
     rw [hIidx, Nat.cast_natAbs, Int.cast_abs, Int.cast_pow, abs_pow]
-  calc (F.toAddSubgroup.index : ℝ) ≤ ((I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index : ℝ) := by
-        exact_mod_cast hFU
+  calc
+    (F.toAddSubgroup.index : ℝ)
+      ≤ ((I • (⊤ : Submodule (𝓞 K) E.carrier)).toAddSubgroup.index : ℝ) := by exact_mod_cast hFU
     _ ≤ (I.toAddSubgroup.index : ℝ) ^ n := by exact_mod_cast hUle
     _ = _ := by rw [hIr]
 
-theorem normDegree_full_rank_submodule_bounds : ∀ (K : Type) [Field K] [NumberField K] (E : HermitianBundle.{0} K) (F : Submodule (𝓞 K) E.carrier), E.rank F = Module.finrank (𝓞 K) E.carrier → E.normDegree F ≤ E.normDegree ⊤ ∧ ∀ d : ℤ, d ≠ 0 → (∀ x : E.carrier, d • x ∈ F) → E.normDegree ⊤ ≤ E.normDegree F + Module.finrank (𝓞 K) E.carrier * Real.log |(d : ℝ)| := by
+theorem normDegree_full_rank_submodule_bounds
+    : ∀ (K : Type) [Field K] [NumberField K] (E : HermitianBundle.{0} K)
+        (F : Submodule (𝓞 K) E.carrier),
+      E.rank F = Module.finrank (𝓞 K) E.carrier
+        → E.normDegree F ≤ E.normDegree ⊤
+          ∧ ∀ d : ℤ,
+            d ≠ 0 → (∀ x : E.carrier, d • x ∈ F)
+              → E.normDegree ⊤
+                ≤ E.normDegree F + Module.finrank (𝓞 K) E.carrier * Real.log |(d : ℝ)| := by
   intro K _ _ E F hF
   classical
   have hrF : Module.finrank (𝓞 K) F = Module.finrank (𝓞 K) E.carrier := hF
-  obtain ⟨s, hs⟩ := exists_linearIndependent_of_le_finrank (R := 𝓞 K) (M := F)
-    (n := Module.finrank (𝓞 K) E.carrier) hrF.symm.le
+  obtain ⟨s, hs⟩ :=
+    exists_linearIndependent_of_le_finrank (R := 𝓞 K) (M := F) (n := Module.finrank (𝓞 K) E.carrier)
+      hrF.symm.le
   have hv : LinearIndependent (𝓞 K) (fun i => (s i : E.carrier)) := hs.map' F.subtype F.ker_subtype
-  let t : Fin (Module.finrank (𝓞 K) E.carrier) → (⊤ : Submodule (𝓞 K) E.carrier) :=
-    fun i => ⟨(s i : E.carrier), Submodule.mem_top⟩
+  let t : Fin (Module.finrank (𝓞 K) E.carrier) → (⊤ : Submodule (𝓞 K) E.carrier) := fun i =>
+    ⟨(s i : E.carrier), Submodule.mem_top⟩
   have ht : LinearIndependent (𝓞 K) t :=
     LinearIndependent.of_comp (⊤ : Submodule (𝓞 K) E.carrier).subtype hv
   have hSidx := index_span_ne_zero_of_linearIndependent E rfl _ hv
@@ -163,15 +195,20 @@ theorem normDegree_full_rank_submodule_bounds : ∀ (K : Type) [Field K] [Number
     rintro _ ⟨j, rfl⟩
     exact (s j).2
   have hcF := card_quotient_span_eq_relIndex F s
-  have hcT : Nat.card ((⊤ : Submodule (𝓞 K) E.carrier) ⧸ Submodule.span (𝓞 K) (Set.range t)) =
-      (Submodule.span (𝓞 K) (Set.range fun i => (s i : E.carrier))).toAddSubgroup.index := by
-    rw [card_quotient_span_eq_relIndex (⊤ : Submodule (𝓞 K) E.carrier) t, Submodule.top_toAddSubgroup,
-      AddSubgroup.relIndex_top_right]
-  have hmul := AddSubgroup.relIndex_mul_index
-    (show (Submodule.span (𝓞 K) (Set.range fun i => (s i : E.carrier))).toAddSubgroup ≤
-      F.toAddSubgroup from hSF)
-  have hrelne : (Submodule.span (𝓞 K) (Set.range fun i => (s i : E.carrier))).toAddSubgroup.relIndex
-      F.toAddSubgroup ≠ 0 := by
+  have hcT
+      : Nat.card ((⊤ : Submodule (𝓞 K) E.carrier) ⧸ Submodule.span (𝓞 K) (Set.range t))
+        = (Submodule.span (𝓞 K) (Set.range fun i => (s i : E.carrier))).toAddSubgroup.index := by
+    rw [card_quotient_span_eq_relIndex (⊤ : Submodule (𝓞 K) E.carrier) t,
+      Submodule.top_toAddSubgroup, AddSubgroup.relIndex_top_right]
+  have hmul :=
+    AddSubgroup.relIndex_mul_index (show (Submodule.span (𝓞 K)
+          (Set.range fun i => (s i : E.carrier))).toAddSubgroup
+        ≤ F.toAddSubgroup from
+      hSF)
+  have hrelne
+      : (Submodule.span (𝓞 K) (Set.range fun i => (s i : E.carrier))).toAddSubgroup.relIndex
+          F.toAddSubgroup
+        ≠ 0 := by
     intro h
     rw [h, zero_mul] at hmul
     exact hSidx hmul.symm
@@ -180,9 +217,12 @@ theorem normDegree_full_rank_submodule_bounds : ∀ (K : Type) [Field K] [Number
     rw [h, mul_zero] at hmul
     exact hSidx hmul.symm
   have hdF := E.degree_eq_of_linearIndependent F hs (by rw [Fintype.card_fin]; exact hF.symm)
-  have hdT : E.degree ⊤ = Real.log (Nat.card ((⊤ : Submodule (𝓞 K) E.carrier) ⧸
-      Submodule.span (𝓞 K) (Set.range t))) -
-      1 / 2 * ∑ σ : K →+* ℂ, Real.log (gramDet E.metric σ fun i => ((s i : F) : E.carrier)) :=
+  have hdT
+      : E.degree ⊤
+        = Real.log (Nat.card
+            ((⊤ : Submodule (𝓞 K) E.carrier) ⧸
+              Submodule.span (𝓞 K) (Set.range t)))
+          - 1 / 2 * ∑ σ : K →+* ℂ, Real.log (gramDet E.metric σ fun i => ((s i : F) : E.carrier)) :=
     E.degree_eq_of_linearIndependent (⊤ : Submodule (𝓞 K) E.carrier) ht
       (by rw [Fintype.card_fin]; exact (finrank_top (𝓞 K) E.carrier).symm)
   have hdiff : E.degree ⊤ = E.degree F + Real.log (F.toAddSubgroup.index : ℝ) := by
@@ -199,11 +239,13 @@ theorem normDegree_full_rank_submodule_bounds : ∀ (K : Type) [Field K] [Number
   · intro d hd hdmem
     obtain ⟨-, hbound⟩ := index_ne_zero_and_le_of_smul_mem E F _ hSidx d hd hdmem
     have hpos : (0 : ℝ) < F.toAddSubgroup.index := by exact_mod_cast Nat.pos_of_ne_zero hFne
-    have hlogb : Real.log (F.toAddSubgroup.index : ℝ) ≤
-        (Module.finrank (𝓞 K) E.carrier : ℝ) * (Module.finrank ℚ K * Real.log |(d : ℝ)|) := by
-      calc Real.log (F.toAddSubgroup.index : ℝ)
-          ≤ Real.log ((|(d : ℝ)| ^ Module.finrank ℚ K) ^ Module.finrank (𝓞 K) E.carrier) :=
-            Real.log_le_log hpos hbound
+    have hlogb
+        : Real.log (F.toAddSubgroup.index : ℝ)
+          ≤ (Module.finrank (𝓞 K) E.carrier : ℝ) * (Module.finrank ℚ K * Real.log |(d : ℝ)|) := by
+      calc
+        Real.log (F.toAddSubgroup.index : ℝ)
+            ≤ Real.log ((|(d : ℝ)| ^ Module.finrank ℚ K) ^ Module.finrank (𝓞 K) E.carrier) :=
+          Real.log_le_log hpos hbound
         _ = _ := by rw [Real.log_pow, Real.log_pow]
     unfold HermitianBundle.normDegree
     rw [hdiff, add_div, add_le_add_iff_left, div_le_iff₀ hq]

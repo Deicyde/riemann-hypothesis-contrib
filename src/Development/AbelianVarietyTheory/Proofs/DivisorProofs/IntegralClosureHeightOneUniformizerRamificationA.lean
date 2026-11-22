@@ -10,11 +10,14 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 namespace GlobalTheory
 
-theorem exists_localUniformizer_and_order {B : Type} [CommRing B] [IsDomain B]
-    [IsNoetherianRing B] [IsIntegrallyClosed B] (Q : Ideal B) [Q.IsPrime] (hQ : Q.height = 1)
-    (x : B) (hx0 : x ≠ 0) (hxQ : x ∈ Q) :
-    ∃ (s : B) (e : ℕ), 1 ≤ e ∧ s ∈ Q ∧ (∀ y ∈ Q, ∃ c r : B, r ∉ Q ∧ r * y = c * s) ∧
-      (∃ a r : B, a ∉ Q ∧ r ∉ Q ∧ r * x = a * s ^ e) := by
+theorem exists_localUniformizer_and_order
+    {B : Type} [CommRing B] [IsDomain B] [IsNoetherianRing B] [IsIntegrallyClosed B]
+    (Q : Ideal B) [Q.IsPrime]
+    (hQ : Q.height = 1)
+    (x : B) (hx0 : x ≠ 0) (hxQ : x ∈ Q)
+    : ∃ (s : B) (e : ℕ),
+      1 ≤ e ∧ s ∈ Q ∧ (∀ y ∈ Q, ∃ c r : B, r ∉ Q ∧ r * y = c * s)
+        ∧ (∃ a r : B, a ∉ Q ∧ r ∉ Q ∧ r * x = a * s ^ e) := by
   let L := Localization.AtPrime Q
   haveI : IsDiscreteValuationRing L := isDiscreteValuationRing_of_height_eq_one Q hQ L
   have hle : Q.primeCompl ≤ nonZeroDivisors B := Q.primeCompl_le_nonZeroDivisors
@@ -28,8 +31,7 @@ theorem exists_localUniformizer_and_order {B : Type} [CommRing B] [IsDomain B]
   have hsirr : Irreducible (algebraMap B L s) := by
     rw [← hs]; exact (irreducible_mul_isUnit hu0).mpr hϖ
   have hmax := (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mp hsirr
-  have hsQ : s ∈ Q := by
-    rw [← hcomap, Ideal.mem_comap, hmax]; exact Ideal.subset_span rfl
+  have hsQ : s ∈ Q := by rw [← hcomap, Ideal.mem_comap, hmax]; exact Ideal.subset_span rfl
   refine ⟨s, ?_⟩
   have hxL : algebraMap B L x ≠ 0 := by
     rw [Ne, ← map_zero (algebraMap B L)]; exact fun h => hx0 (hinj h)
@@ -49,7 +51,8 @@ theorem exists_localUniformizer_and_order {B : Type} [CommRing B] [IsDomain B]
     obtain ⟨⟨c, r⟩, hcr⟩ := IsLocalization.surj Q.primeCompl z
     simp only at hcr
     refine ⟨c, r, r.2, hinj ?_⟩
-    rw [map_mul, map_mul, ← hz, ← hcr]; ring
+    rw [map_mul, map_mul, ← hz, ← hcr]
+    ring
   · obtain ⟨⟨a, r⟩, har⟩ := IsLocalization.surj Q.primeCompl (w : L)
     simp only at har
     have hau : IsUnit (algebraMap B L a) := by
@@ -61,8 +64,25 @@ theorem exists_localUniformizer_and_order {B : Type} [CommRing B] [IsDomain B]
       exact (IsLocalRing.mem_maximalIdeal _).mp this hau
     · rw [map_mul, map_mul, map_pow, ← har, hw]; ring
 
-theorem integralClosure_height_one_uniformizer_ramification :
-    ∀ (k F K : Type) [Field k] [CharZero k] [Field F] [Field K] [Algebra k F] [Algebra k K] [Algebra F K] [IsScalarTower k F K] [FiniteDimensional F K] (d : ℕ) (u : Fin d → F), AlgebraicIndependent k u → ∀ (A : Subalgebra k F) [IsFractionRing A F], A = Algebra.adjoin k (Set.range u) → ∀ (B : Subalgebra k K), B = (integralClosure A K).restrictScalars k → ∀ (p : Ideal A), p.IsPrime → ∀ t : A, Irreducible t → p = Ideal.span {t} → ∀ Q : Ideal B, Q.IsPrime → Q.height = 1 → (∀ a : A, ∀ b : B, (b : K) = algebraMap F K a → (b ∈ Q ↔ a ∈ p)) → ∃ (s : B) (e : ℕ), 1 ≤ e ∧ s ∈ Q ∧ (∀ y ∈ Q, ∃ c r : B, r ∉ Q ∧ r * y = c * s) ∧ (∃ a r : B, a ∉ Q ∧ r ∉ Q ∧ (r : K) * algebraMap F K t = a * s ^ e) := by
+theorem integralClosure_height_one_uniformizer_ramification
+    : ∀ (k F K : Type) [Field k] [CharZero k] [Field F] [Field K] [Algebra k F] [Algebra k K]
+        [Algebra F K] [IsScalarTower k F K] [FiniteDimensional F K] (d : ℕ) (u : Fin d → F),
+      AlgebraicIndependent k u
+        → ∀ (A : Subalgebra k F) [IsFractionRing A F],
+          A = Algebra.adjoin k (Set.range u)
+            → ∀ (B : Subalgebra k K),
+              B = (integralClosure A K).restrictScalars k
+                → ∀ (p : Ideal A),
+                  p.IsPrime
+                    → ∀ t : A,
+                      Irreducible t → p = Ideal.span {t}
+                        → ∀ Q : Ideal B,
+                          Q.IsPrime → Q.height = 1
+                            → (∀ a : A, ∀ b : B, (b : K) = algebraMap F K a → (b ∈ Q ↔ a ∈ p))
+                            → ∃ (s : B) (e : ℕ),
+                              1 ≤ e ∧ s ∈ Q ∧ (∀ y ∈ Q, ∃ c r : B, r ∉ Q ∧ r * y = c * s)
+                                ∧ (∃ a r : B,
+                                  a ∉ Q ∧ r ∉ Q ∧ (r : K) * algebraMap F K t = a * s ^ e) := by
   intro k F K _ _ _ _ _ _ _ _ _ d u hu A _ hA B hB p _ t ht hpt Q _ hQ hlie
   have hN : IsNoetherianRing A := by
     subst hA

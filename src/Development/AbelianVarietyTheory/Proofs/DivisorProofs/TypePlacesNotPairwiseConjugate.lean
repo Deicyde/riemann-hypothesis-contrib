@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Compl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Polynomial
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CuspMult
@@ -24,7 +27,9 @@ theorem star_eq_conj (D : D7) (x : D.host.E) : star x = D.host.conj x := by
   show D.host.φ₀ (IsCMField.complexConj D.host.E x) = _
   rw [NumberField.IsCMField.complexEmbedding_complexConj, Formalism.HC.HostAx.conjE_apply]
 
-theorem not_isConjPl : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg : Finset (Pl D.host.E)), (∀ PP, PP ∈ Pg ↔ ∃ k, Pb.Div k PP) → ∀ PP ∈ Pg, ∀ PP' ∈ Pg, ¬ IsConjPl PP PP' := by
+theorem not_isConjPl
+    : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg : Finset (Pl D.host.E)),
+      (∀ PP, PP ∈ Pg ↔ ∃ k, Pb.Div k PP) → ∀ PP ∈ Pg, ∀ PP' ∈ Pg, ¬ IsConjPl PP PP' := by
   intro D Pb Pg hPg PP hP PP' hP' hc
   obtain ⟨k, hk⟩ := (hPg PP).1 hP
   obtain ⟨k', hk'⟩ := (hPg PP').1 hP'
@@ -32,8 +37,9 @@ theorem not_isConjPl : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg : 
     intro y hy
     rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem] at hy
     obtain ⟨z, hzv, hz⟩ := hc _ hy
-    have e : z = y := RingOfIntegers.ext
-      ((hz.trans (star_eq_conj D _)).trans (D.host.conj.apply_symm_apply (y : D.host.E)))
+    have e : z = y :=
+      RingOfIntegers.ext ((hz.trans (star_eq_conj D _)).trans
+        (D.host.conj.apply_symm_apply (y : D.host.E)))
     exact e ▸ hzv
   have hmax : (D.host.conj • PP.asIdeal).IsMaximal := by
     have := PP.isPrime
@@ -41,8 +47,10 @@ theorem not_isConjPl : ∀ {D : D7} (Pb : Formalism.L2.Host.PiBar D.host) (Pg : 
     have := congrArg (fun I : Ideal (𝓞 D.host.E) => D.host.conj⁻¹ • I) h0
     simpa using this
   have heq : D.host.conj • PP.asIdeal = PP'.asIdeal := hmax.eq_of_le PP'.isPrime.ne_top hle
-  obtain ⟨ho, hm⟩ := (GlobalTheory.Mem.Chr.splitsC_main D.R D.host (D.host.g k) (D.host.g_prime k) (D.nd.g_split k) PP
-    (Pb.overP hk)).2.2.2 (Pb.pb k) (Pb.pb_over k) PP' ((GlobalTheory.Mem.Chr.conjPl_iff_smul D.host.conj PP PP').2 heq)
+  obtain ⟨ho, hm⟩ :=
+    (GlobalTheory.Mem.Chr.splitsC_main D.R D.host (D.host.g k) (D.host.g_prime k) (D.nd.g_split k)
+        PP (Pb.overP hk)).2.2.2 (Pb.pb k) (Pb.pb_over k) PP'
+      ((GlobalTheory.Mem.Chr.conjPl_iff_smul D.host.conj PP PP').2 heq)
   have hkk : k ≠ k' := by
     rintro rfl
     exact hm.1 hk hk'

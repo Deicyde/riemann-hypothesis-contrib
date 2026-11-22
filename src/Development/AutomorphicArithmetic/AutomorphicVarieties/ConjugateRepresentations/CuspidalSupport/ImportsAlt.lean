@@ -4,14 +4,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
-open GroundTheory.Automorphic.AutomorphicForm (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG
+  Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
+open GroundTheory.Automorphic.AutomorphicForm
+  (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
 open UpperTheory.V.Af.Fin (emb e1 e2 blk Bdd)
 open GlobalTheory.PRep (fixed)
 open scoped TensorProduct
 
-theorem UpperTheory.V.Cj.S.step :
-    UpperTheory.V.Cj.S.PairEig → UpperTheory.V.Cj.S.SliceBdd → UpperTheory.V.Cj.S.Iwa → UpperTheory.V.Cj.S.CtCap → UpperTheory.V.Cj.S.CtSat → UpperTheory.V.Cj.S.CapRel → UpperTheory.V.Cj.S.HkRel → UpperTheory.V.Cj.S.CapArith → UpperTheory.V.Cj.S.SatArith → UpperTheory.V.Cj.S.Step := by
+theorem UpperTheory.V.Cj.S.step
+    : UpperTheory.V.Cj.S.PairEig → UpperTheory.V.Cj.S.SliceBdd → UpperTheory.V.Cj.S.Iwa
+      → UpperTheory.V.Cj.S.CtCap → UpperTheory.V.Cj.S.CtSat → UpperTheory.V.Cj.S.CapRel
+      → UpperTheory.V.Cj.S.HkRel → UpperTheory.V.Cj.S.CapArith → UpperTheory.V.Cj.S.SatArith
+      → UpperTheory.V.Cj.S.Step := by
   intro hPair hSlice hIwa hCtCap hCtSat hCapRel hHkRel hCapA hSatA E _ _ _ r s φ₀ m B h₀ hne₀
   obtain ⟨φ, hφ, hne⟩ := hIwa E r s φ₀ m B h₀ hne₀
   obtain ⟨S₁, S₂, hS₁, hS₂, hs₁, hs₂⟩ := hSlice E r s φ hφ.aut
@@ -34,7 +39,9 @@ theorem UpperTheory.V.Cj.S.step :
   · filter_upwards [hφ.sat, h₁.sat, h₂.sat, hs] with w hw hw₁ hw₂ hw₃
     have hv := hCtSat E (r + s) r φ ψ hφ.aut hψ hψ0 w (B w) hw
     obtain ⟨ϖ, hu⟩ := exists_isUnifV w
-    refine hSatA (qV E w) r s (qV_ne_zero w) (B w) (B₁ w) (B₂ w) hw.2.2.1 hw₁.2.2.1 hw₂.2.2.1 (fun j hj => ?_) _ _ ?_ ?_
+    refine hSatA (qV E w) r s (qV_ne_zero w) (B w) (B₁ w) (B₂ w) hw.2.2.1 hw₁.2.2.1 hw₂.2.2.1
+      (fun j hj => ?_)
+      _ _ ?_ ?_
     · obtain ⟨G, hG, hsum⟩ := hHkRel E r s ψ hNI w hv.2.1 ϖ hu j hj
       refine hw₃ ϖ hu _ G _ hG fun x y => ?_
       rw [hsum x y]
@@ -43,7 +50,9 @@ theorem UpperTheory.V.Cj.S.step :
       rfl
     · rw [hν.2.1 w]
       congr 1
-      push_cast; ring
+      push_cast
+      ring
     · rw [hν'.2.1 w]
       congr 1
-      push_cast; ring
+      push_cast
+      ring

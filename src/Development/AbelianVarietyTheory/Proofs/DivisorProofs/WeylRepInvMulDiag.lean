@@ -11,20 +11,25 @@ namespace GlobalTheory.GKFactor
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem weylRep_inv_mul_diag {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (p : Fin n) :
-    (x⁻¹).val p (w p) * x.val (w p) p = 1 := by
+theorem weylRep_inv_mul_diag
+    {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (p : Fin n)
+    : (x⁻¹).val p (w p) * x.val (w p) p = 1 := by
   have h : (x⁻¹ * x).val p p = (1 : GL (Fin n) k).val p p := by rw [inv_mul_cancel]
   rw [Units.val_mul, Matrix.mul_apply, Units.val_one, Matrix.one_apply_eq] at h
   rwa [Finset.sum_eq_single (w p) (fun b _ hb => by rw [hx b p hb, mul_zero]) (by simp)] at h
 
-theorem weylRep_mul_inv_diag {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (p : Fin n) :
-    x.val (w p) p * (x⁻¹).val p (w p) = 1 := by
+theorem weylRep_mul_inv_diag
+    {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (p : Fin n)
+    : x.val (w p) p * (x⁻¹).val p (w p) = 1 := by
   have h : (x * x⁻¹).val (w p) (w p) = (1 : GL (Fin n) k).val (w p) (w p) := by rw [mul_inv_cancel]
   rw [Units.val_mul, Matrix.mul_apply, Units.val_one, Matrix.one_apply_eq] at h
-  rwa [Finset.sum_eq_single p (fun b _ hb => by
-      rw [hx (w p) b (fun e => hb (w.injective e).symm), zero_mul]) (by simp)] at h
+  rwa [Finset.sum_eq_single p
+      (fun b _ hb => by rw [hx (w p) b (fun e => hb (w.injective e).symm), zero_mul])
+      (by simp)]
+    at h
 
-theorem weylRep_inv {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) : IsWeylRep w⁻¹ x⁻¹ := by
+theorem weylRep_inv {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x)
+    : IsWeylRep w⁻¹ x⁻¹ := by
   intro p a hpa
   have hne : x.val a (w⁻¹ a) ≠ 0 := by
     intro h0
@@ -34,19 +39,26 @@ theorem weylRep_inv {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep 
     exact zero_ne_one this
   have h : (x⁻¹ * x).val p (w⁻¹ a) = (1 : GL (Fin n) k).val p (w⁻¹ a) := by rw [inv_mul_cancel]
   rw [Units.val_mul, Matrix.mul_apply, Units.val_one, Matrix.one_apply_ne hpa] at h
-  rw [Finset.sum_eq_single a (fun b _ hb => by
-      rw [hx b (w⁻¹ a) (by simpa using hb), mul_zero]) (by simp)] at h
+  rw [Finset.sum_eq_single a (fun b _ hb => by rw [hx b (w⁻¹ a) (by simpa using hb), mul_zero]) (by
+      simp)]
+    at h
   exact (mul_eq_zero.1 h).resolve_right hne
 
-theorem weylRep_conj_apply {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (u : GL (Fin n) k)
-    (p q : Fin n) : (x⁻¹ * u * x).val p q = (x⁻¹).val p (w p) * u.val (w p) (w q) * x.val (w q) q := by
+theorem weylRep_conj_apply
+    {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x)
+    (u : GL (Fin n) k) (p q : Fin n)
+    : (x⁻¹ * u * x).val p q = (x⁻¹).val p (w p) * u.val (w p) (w q) * x.val (w q) q := by
   have hi := weylRep_inv hx
-  rw [Units.val_mul, Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single (w q)
-    (fun b _ hb => by rw [hx b q hb, mul_zero]) (by simp), Matrix.mul_apply,
-    Finset.sum_eq_single (w p) (fun b _ hb => by rw [hi p b (fun e => hb (by rw [e]; simp)), zero_mul]) (by simp)]
+  rw [Units.val_mul, Units.val_mul, Matrix.mul_apply,
+    Finset.sum_eq_single (w q) (fun b _ hb => by rw [hx b q hb, mul_zero]) (by simp),
+    Matrix.mul_apply,
+    Finset.sum_eq_single (w p)
+      (fun b _ hb => by rw [hi p b (fun e => hb (by rw [e]; simp)), zero_mul])
+      (by simp)]
 
-theorem mem_cell_iff {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (u : GL (Fin n) k) :
-    u ∈ cell x ↔ u ∈ unipB k (Fin n) ∧ ∀ a b, a < b → w⁻¹ a < w⁻¹ b → u.val a b = 0 := by
+theorem mem_cell_iff
+    {w : Equiv.Perm (Fin n)} {x : GL (Fin n) k} (hx : IsWeylRep w x) (u : GL (Fin n) k)
+    : u ∈ cell x ↔ u ∈ unipB k (Fin n) ∧ ∀ a b, a < b → w⁻¹ a < w⁻¹ b → u.val a b = 0 := by
   rw [mem_cell, mem_unipBLower]
   refine and_congr_right fun hu => ?_
   rw [mem_unipB] at hu

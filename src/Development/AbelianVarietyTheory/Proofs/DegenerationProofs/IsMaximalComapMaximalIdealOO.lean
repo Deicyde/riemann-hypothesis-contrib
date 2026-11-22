@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscret
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH
@@ -23,7 +24,8 @@ noncomputable def padicIntToOO (p : ℕ) [Fact p.Prime] : ℤ_[p] →+* OO p :=
 
 theorem isIntegral_padicIntToOO : (padicIntToOO p).IsIntegral := by
   intro x
-  obtain ⟨q, hq, h⟩ := (GlobalTheory.isIntegral_padicInt_iff_norm_le_one (x : PadicAlgCl p)).2 ((mem_OO_iff _).1 x.2)
+  obtain ⟨q, hq, h⟩ :=
+    (GlobalTheory.isIntegral_padicInt_iff_norm_le_one (x : PadicAlgCl p)).2 ((mem_OO_iff _).1 x.2)
   refine ⟨q, hq, Subtype.ext ?_⟩
   exact (Polynomial.hom_eval₂ q (padicIntToOO p) (OO p).subtype x).trans h
 
@@ -49,14 +51,15 @@ theorem isIntegral_int_residueField_OO : (Int.castRingHom (ResidueField (OO p)))
     rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton] at h1
     obtain ⟨c, hc⟩ := h1
     have h2 := congrArg ψ hc
-    rw [map_sub, map_mul, map_natCast, map_natCast, natCast_residueField_OO, zero_mul, sub_eq_zero] at h2
+    rw [map_sub, map_mul, map_natCast, map_natCast, natCast_residueField_OO, zero_mul, sub_eq_zero]
+      at h2
     exact ⟨((q.coeff n).zmodRepr : ℤ), by rw [h2]; simp⟩
   obtain ⟨r, hr, -, hrm⟩ := Polynomial.lifts_and_degree_eq_and_monic hl (hq.map ψ)
   refine ⟨r, hrm, ?_⟩
   rw [← Polynomial.eval_map, hr, Polynomial.eval_map, h]
 
-theorem isMaximal_comap_maximalIdeal_OO {A : Type*} [CommRing A] (φ : A →+* OO p) :
-    ((maximalIdeal (OO p)).comap φ).IsMaximal := by
+theorem isMaximal_comap_maximalIdeal_OO {A : Type*} [CommRing A] (φ : A →+* OO p)
+    : ((maximalIdeal (OO p)).comap φ).IsMaximal := by
   have h : ((residue (OO p)).comp φ).IsIntegral := by
     refine RingHom.IsIntegral.tower_top (Int.castRingHom A) _ ?_
     rw [RingHom.ext_int (RingHom.comp _ _) (Int.castRingHom _)]
@@ -64,15 +67,18 @@ theorem isMaximal_comap_maximalIdeal_OO {A : Type*} [CommRing A] (φ : A →+* O
   have := Ideal.isMaximal_comap_of_isIntegral_of_isMaximal' _ h ⊥
   rwa [← Ideal.comap_comap, ← RingHom.ker_eq_comap_bot, ker_residue] at this
 
-theorem isClosed_singleton_cPt {X : Scheme.{0}} (y : Sp (OO p) ⟶ X) : IsClosed ({y (cPt p)} : Set X) := by
+theorem isClosed_singleton_cPt {X : Scheme.{0}} (y : Sp (OO p) ⟶ X)
+    : IsClosed ({y (cPt p)} : Set X) := by
   rw [← closure_subset_iff_isClosed]
   intro w hw
   have hs : y (cPt p) ⤳ w := specializes_iff_mem_closure.2 hw
   obtain ⟨U, hU, hwU, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := w) trivial
   have hzU : y (cPt p) ∈ U := hs.mem_open U.isOpen hwU
   have hle : ⊤ ≤ y ⁻¹ᵁ U := (le_preimage_iff y U).2 hzU
-  have key : ∀ f : Γ(X, U), y (cPt p) ∈ X.basicOpen f ↔
-      f ∉ (maximalIdeal (OO p)).comap (valMap y U hle).hom := fun f => by
+  have key
+      : ∀ f : Γ(X, U),
+        y (cPt p) ∈ X.basicOpen f
+          ↔ f ∉ (maximalIdeal (OO p)).comap (valMap y U hle).hom := fun f => by
     rw [Ideal.mem_comap, mem_maximalIdeal, mem_nonunits_iff, not_not, ← le_preimage_iff,
       le_preimage_basicOpen_iff y hle, valR_eq y U hle]
   have hm := isMaximal_comap_maximalIdeal_OO (valMap y U hle).hom
@@ -92,9 +98,10 @@ theorem isClosed_singleton_cPt {X : Scheme.{0}} (y : Sp (OO p) ⟶ X) : IsClosed
   · exact isUnit_of_mul_isUnit_right h
   · exact absurd h hwc
 
-theorem isClosed_centre : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [Algebra.FiniteType ℤ o]
-    (M : RatModel o Ω) (U : Set M.Z) (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z),
-    M.Cen U z y → IsClosed ({z} : Set M.Z) :=
-  fun _ _ _ _ _ _ _ _ _ _ _ y h => h.1 ▸ isClosed_singleton_cPt y
+theorem isClosed_centre
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [Algebra.FiniteType ℤ o]
+        (M : RatModel o Ω) (U : Set M.Z) (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z),
+      M.Cen U z y → IsClosed ({z} : Set M.Z) := fun _ _ _ _ _ _ _ _ _ _ _ y h =>
+  h.1 ▸ isClosed_singleton_cPt y
 
 end GlobalTheory.ZH

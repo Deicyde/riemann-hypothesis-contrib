@@ -10,8 +10,8 @@ open Formalism.BasicNotions.TH
 
 namespace GlobalTheory
 
-theorem cayley_two_injective :
-    Function.Injective (fun x : ℝ => (1 + 2 * Complex.I * x) / (1 - 2 * Complex.I * x)) := by
+theorem cayley_two_injective
+    : Function.Injective (fun x : ℝ => (1 + 2 * Complex.I * x) / (1 - 2 * Complex.I * x)) := by
   have hne : ∀ x : ℝ, (1 - 2 * Complex.I * x) ≠ 0 := by
     intro x h
     have := congrArg Complex.re h
@@ -24,8 +24,8 @@ theorem cayley_two_injective :
   · exact_mod_cast sub_eq_zero.1 h
   · exfalso; have := Complex.I_ne_zero; apply this; linear_combination h / 4
 
-theorem zpow_cayley_two_eq_one_forall :
-    ∀ m : ℤ, (∀ x : ℝ, ((1 + 2 * Complex.I * x) / (1 - 2 * Complex.I * x)) ^ m = 1) → m = 0 := by
+theorem zpow_cayley_two_eq_one_forall
+    : ∀ m : ℤ, (∀ x : ℝ, ((1 + 2 * Complex.I * x) / (1 - 2 * Complex.I * x)) ^ m = 1) → m = 0 := by
   intro m hm
   by_contra hm0
   set f : ℝ → ℂ := fun x => (1 + 2 * Complex.I * x) / (1 - 2 * Complex.I * x) with hf

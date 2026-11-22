@@ -9,7 +9,8 @@ open GlobalTheory.LeviCut
 
 namespace GlobalTheory.LeviCut
 
-theorem adj_sub_of_adjBdd {A : Type} [Ring A] [Algebra ℚ A] (x y : A) : adj (x - y) = adj x - adj y := by
+theorem adj_sub_of_adjBdd {A : Type} [Ring A] [Algebra ℚ A] (x y : A)
+    : adj (x - y) = adj x - adj y := by
   ext T
   simp only [adj, LinearMap.sub_apply, LinearMap.mulLeft_apply, LinearMap.mulRight_apply]
   noncomm_ring
@@ -18,11 +19,11 @@ theorem adj_zero_of_adjBdd {A : Type} [Ring A] [Algebra ℚ A] : adj (0 : A) = 0
   ext T
   simp [adj]
 
-theorem adj_commutator_of_adjBdd {A : Type} [Ring A] [Algebra ℚ A] (x y : A) :
-    adj x * adj y - adj y * adj x = adj (x * y - y * x) := by
+theorem adj_commutator_of_adjBdd {A : Type} [Ring A] [Algebra ℚ A] (x y : A)
+    : adj x * adj y - adj y * adj x = adj (x * y - y * x) := by
   ext T
-  simp only [adj, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.mulLeft_apply, LinearMap.mulRight_apply,
-    map_sub]
+  simp only [adj, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.mulLeft_apply,
+    LinearMap.mulRight_apply, map_sub]
   noncomm_ring
 
 theorem adjBdd_holds : AdjBdd := by
@@ -48,7 +49,8 @@ theorem adjBdd_holds : AdjBdd := by
       apply hbdd a ha b hb (μ a - μ b + n) (T x) _ (by push_cast at hn h1 ⊢; omega)
       have eq := LinearMap.congr_fun hT x
       simp only [adj, LinearMap.sub_apply, LinearMap.mulLeft_apply, LinearMap.mulRight_apply,
-        Module.End.mul_apply, LinearMap.smul_apply, hμ a ha, hμ b hb, map_smul] at eq
+          Module.End.mul_apply, LinearMap.smul_apply, hμ a ha, hμ b hb, map_smul]
+        at eq
       push_cast
       rw [add_smul, sub_smul, ← eq]
       abel

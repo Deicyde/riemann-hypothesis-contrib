@@ -8,9 +8,10 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem valuation_of_generator_of_pow (K : Type) [Field K] [NumberField K]
-    (𝔭 : HeightOneSpectrum (𝓞 K)) (n : ℕ) (π : 𝓞 K) (h : 𝔭.asIdeal ^ n = Ideal.span {π}) :
-    𝔭.valuation K (π : K) = WithZero.exp (-(n : ℤ)) := by
+theorem valuation_of_generator_of_pow
+    (K : Type) [Field K] [NumberField K]
+    (𝔭 : HeightOneSpectrum (𝓞 K)) (n : ℕ) (π : 𝓞 K) (h : 𝔭.asIdeal ^ n = Ideal.span {π})
+    : 𝔭.valuation K (π : K) = WithZero.exp (-(n : ℤ)) := by
   have hπ : π ≠ 0 := by
     rintro rfl
     rw [Ideal.span_singleton_eq_bot.mpr rfl] at h

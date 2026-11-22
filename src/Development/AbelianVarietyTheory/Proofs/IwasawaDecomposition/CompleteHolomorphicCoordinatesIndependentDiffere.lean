@@ -7,18 +7,24 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 noncomputable section
 
 namespace GlobalTheory.CompleteCoords
 
-theorem exists_linearIndependent_extend {M : Type*} [AddCommGroup M] [Module ℂ M]
-    [FiniteDimensional ℂ M] {a : ℕ} (ℓ : Fin a → M) (hℓ : LinearIndependent ℂ ℓ) :
-    ∀ m : ℕ, a + m ≤ Module.finrank ℂ M → ∃ f : Fin (a + m) → M, LinearIndependent ℂ f ∧
-      ∀ i : Fin a, f (Fin.castAdd m i) = ℓ i := by
+theorem exists_linearIndependent_extend
+    {M : Type*} [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M]
+    {a : ℕ} (ℓ : Fin a → M) (hℓ : LinearIndependent ℂ ℓ)
+    : ∀ m : ℕ,
+      a + m ≤ Module.finrank ℂ M
+        → ∃ f : Fin (a + m) → M,
+          LinearIndependent ℂ f ∧ ∀ i : Fin a, f (Fin.castAdd m i) = ℓ i := by
   intro m
   induction m with
   | zero => intro _; exact ⟨ℓ, hℓ, fun i => rfl⟩
@@ -30,7 +36,16 @@ theorem exists_linearIndependent_extend {M : Type*} [AddCommGroup M] [Module ℂ
     have e : (Fin.castAdd (m + 1) i : Fin (a + (m + 1))) = Fin.castSucc (Fin.castAdd m i) := rfl
     rw [e, Fin.snoc_castSucc, hfℓ]
 
-theorem complete_coords : ∀ (n a : ℕ) (v₀ : ReciprocityTheory.L2DbarEstimates.V n) (O : Set (ReciprocityTheory.L2DbarEstimates.V n)) (G : Fin a → ReciprocityTheory.L2DbarEstimates.V n → ℂ), IsOpen O → v₀ ∈ O → (∀ i, DifferentiableOn ℂ (G i) O) → (∀ i, G i v₀ = 0) → LinearIndependent ℂ (fun i => fderiv ℂ (G i) v₀) → ∃ ψ : OpenPartialHomeomorph (ReciprocityTheory.L2DbarEstimates.V n) (Fin n → ℂ), v₀ ∈ ψ.source ∧ ψ.source ⊆ O ∧ ψ v₀ = 0 ∧ DifferentiableOn ℂ ψ ψ.source ∧ DifferentiableOn ℂ ψ.symm ψ.target ∧ ∀ v ∈ ψ.source, ∀ (j : Fin n) (hj : (j : ℕ) < a), ψ v j = G ⟨j, hj⟩ v := by
+theorem complete_coords
+    : ∀ (n a : ℕ) (v₀ : ReciprocityTheory.L2DbarEstimates.V n)
+        (O : Set (ReciprocityTheory.L2DbarEstimates.V n))
+        (G : Fin a → ReciprocityTheory.L2DbarEstimates.V n → ℂ),
+      IsOpen O → v₀ ∈ O → (∀ i, DifferentiableOn ℂ (G i) O) → (∀ i, G i v₀ = 0)
+        → LinearIndependent ℂ (fun i => fderiv ℂ (G i) v₀)
+        → ∃ ψ : OpenPartialHomeomorph (ReciprocityTheory.L2DbarEstimates.V n) (Fin n → ℂ),
+          v₀ ∈ ψ.source ∧ ψ.source ⊆ O ∧ ψ v₀ = 0 ∧ DifferentiableOn ℂ ψ ψ.source
+            ∧ DifferentiableOn ℂ ψ.symm ψ.target
+            ∧ ∀ v ∈ ψ.source, ∀ (j : Fin n) (hj : (j : ℕ) < a), ψ v j = G ⟨j, hj⟩ v := by
   intro n a v₀ O G hO hv₀ hG hG0 hli
   classical
   set ℓ : Fin a → (ReciprocityTheory.L2DbarEstimates.V n →L[ℂ] ℂ) := fun i => fderiv ℂ (G i) v₀ with hℓdef
@@ -69,12 +84,12 @@ theorem complete_coords : ∀ (n a : ℕ) (v₀ : ReciprocityTheory.L2DbarEstima
       rw [hfa j h]
       exact ((hGan ⟨j, h⟩ v₀ hv₀).differentiableAt).hasFDerivAt
     · simp only [hΦ, h, dite_false]
-      have e : (fun x => f j (x - v₀)) = fun x => f j x - f j v₀ := by
-        funext x; simp [map_sub]
+      have e : (fun x => f j (x - v₀)) = fun x => f j x - f j v₀ := by funext x; simp [map_sub]
       rw [e]
       exact (f j).hasFDerivAt.sub_const _
   have hinj : Function.Injective D := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     have hv' : ∀ j, f j v = 0 := fun j => by
       have := congrFun hv j
@@ -97,15 +112,17 @@ theorem complete_coords : ∀ (n a : ℕ) (v₀ : ReciprocityTheory.L2DbarEstima
     obtain ⟨φ, hφ⟩ := SeparatingDual.exists_ne_zero (R := ℂ) hne
     exact hφ (hall φ)
   have hsurj : Function.Surjective D := by
-    have := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-      (f := (D : ReciprocityTheory.L2DbarEstimates.V n →ₗ[ℂ] (Fin n → ℂ)))
-      (by simp [finrank_euclideanSpace_fin])).1 hinj
+    have :=
+      (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+        (f := (D : ReciprocityTheory.L2DbarEstimates.V n →ₗ[ℂ] (Fin n → ℂ)))
+        (by simp [finrank_euclideanSpace_fin])).1 hinj
     exact this
   set e : ReciprocityTheory.L2DbarEstimates.V n ≃L[ℂ] (Fin n → ℂ) := ContinuousLinearEquiv.ofBijective D
     (LinearMap.ker_eq_bot.2 hinj) (LinearMap.range_eq_top.2 hsurj) with he
   have heD : (e : ReciprocityTheory.L2DbarEstimates.V n →L[ℂ] (Fin n → ℂ)) = D := by
     rw [he, ContinuousLinearEquiv.coe_ofBijective]
-  have hs : HasStrictFDerivAt Φ (e : ReciprocityTheory.L2DbarEstimates.V n →L[ℂ] (Fin n → ℂ)) v₀ := by
+  have hs
+      : HasStrictFDerivAt Φ (e : ReciprocityTheory.L2DbarEstimates.V n →L[ℂ] (Fin n → ℂ)) v₀ := by
     have h1 := ((hΦan v₀ hv₀).contDiffAt (n := 1)).hasStrictFDerivAt_fderiv one_ne_zero
     rwa [hΦD.fderiv, ← heD] at h1
 

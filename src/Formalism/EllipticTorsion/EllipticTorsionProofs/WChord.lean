@@ -22,8 +22,7 @@ def G (a1 a2 a3 a4 a6 z v : R) : R :=
 def c3 (a2 a4 a6 l : R) : R := 1 + a2 * l + a4 * l ^ 2 + a6 * l ^ 3
 def c2 (a1 a2 a3 a4 a6 l n : R) : R :=
   a1 * l + a2 * n + a3 * l ^ 2 + 2 * a4 * l * n + 3 * a6 * l ^ 2 * n
-def c1 (a1 a3 a4 a6 l n : R) : R :=
-  a1 * n + 2 * a3 * l * n + a4 * n ^ 2 + 3 * a6 * l * n ^ 2 - l
+def c1 (a1 a3 a4 a6 l n : R) : R := a1 * n + 2 * a3 * l * n + a4 * n ^ 2 + 3 * a6 * l * n ^ 2 - l
 def c0 (a3 a6 n : R) : R := a3 * n ^ 2 + a6 * n ^ 3 - n
 
 lemma G_line (a1 a2 a3 a4 a6 l n z : R) :
@@ -181,8 +180,7 @@ section Wser
 variable {K : Type u} [Field K] (W : WeierstrassCurve K)
 
 def fw (v : PowerSeries K) : PowerSeries K :=
-  X ^ 3 + C W.a₁ * X * v + C W.a₂ * X ^ 2 * v + C W.a₃ * v ^ 2 + C W.a₄ * X * v ^ 2
-    + C W.a₆ * v ^ 3
+  X ^ 3 + C W.a₁ * X * v + C W.a₂ * X ^ 2 * v + C W.a₃ * v ^ 2 + C W.a₄ * X * v ^ 2 + C W.a₆ * v ^ 3
 
 lemma fw_cong {n : ℕ} {v v' : PowerSeries K} (h : X ^ n ∣ v - v') (hv : X ∣ v) (hv' : X ∣ v') :
     X ^ (n + 1) ∣ fw W v - fw W v' := by
@@ -331,29 +329,36 @@ lemma coeff_Wi (w : PowerSeries K) (i : Fin 2) (e : Fin 2 →₀ ℕ) :
       simp
     simp only [hz, finsum_zero]
 
-private theorem coeff_mul_X_fin_two (φ : MvPowerSeries (Fin 2) K) (j : Fin 2) (e : Fin 2 →₀ ℕ) :
-    MvPowerSeries.coeff e (φ * MvPowerSeries.X j) =
-      if Finsupp.single j 1 ≤ e then MvPowerSeries.coeff (e - Finsupp.single j 1) φ else 0 := by
-  rw [show (MvPowerSeries.X j : MvPowerSeries (Fin 2) K) =
-      MvPowerSeries.monomial (Finsupp.single j 1) 1 from rfl, MvPowerSeries.coeff_mul_monomial]
+private theorem coeff_mul_X_fin_two (φ : MvPowerSeries (Fin 2) K) (j : Fin 2) (e : Fin 2 →₀ ℕ)
+    : MvPowerSeries.coeff e (φ * MvPowerSeries.X j)
+      = if Finsupp.single j 1 ≤ e then MvPowerSeries.coeff (e - Finsupp.single j 1) φ else 0 := by
+  rw [show (MvPowerSeries.X j : MvPowerSeries (Fin 2) K)
+        = MvPowerSeries.monomial (Finsupp.single j 1) 1 from
+      rfl,
+    MvPowerSeries.coeff_mul_monomial]
   try simp only [mul_one]
 
-private theorem single_one_le_iff_ne_zero (j : Fin 2) (e : Fin 2 →₀ ℕ) : Finsupp.single j 1 ≤ e ↔ e j ≠ 0 := by
+private theorem single_one_le_iff_ne_zero (j : Fin 2) (e : Fin 2 →₀ ℕ)
+    : Finsupp.single j 1 ≤ e ↔ e j ≠ 0 := by
   first
-    | (rw [Finsupp.single_le_iff]
-       exact Nat.one_le_iff_ne_zero)
-    | (rw [Finsupp.le_def]
-       constructor
-       · intro h
-         have := h j
-         simp at this
-         omega
-       · intro h k
-         by_cases hk : j = k
-         · subst hk
-           simp
-           omega
-         · simp [Finsupp.single_apply, hk])
+  | (
+      rw [Finsupp.single_le_iff]
+      exact Nat.one_le_iff_ne_zero
+    )
+  | (
+      rw [Finsupp.le_def]
+      constructor
+      · intro h
+        have := h j
+        simp at this
+        omega
+      · intro h k
+        by_cases hk : j = k
+        · subst hk
+          simp
+          omega
+        · simp [Finsupp.single_apply, hk]
+    )
 
 lemma lam_mul (w : PowerSeries K) :
     (MvPowerSeries.X 1 - MvPowerSeries.X 0) * lam w = Wi w 1 - Wi w 0 := by
@@ -452,8 +457,7 @@ def C3 : MvPowerSeries (Fin 2) K := c3 (ca W.a₂) (ca W.a₄) (ca W.a₆) (lam 
 def C2 : MvPowerSeries (Fin 2) K :=
   c2 (ca W.a₁) (ca W.a₂) (ca W.a₃) (ca W.a₄) (ca W.a₆) (lam w) (nu w)
 
-def z3 : MvPowerSeries (Fin 2) K :=
-  -MvPowerSeries.X 0 - MvPowerSeries.X 1 - C2 W w * (C3 W w)⁻¹
+def z3 : MvPowerSeries (Fin 2) K := - MvPowerSeries.X 0 - MvPowerSeries.X 1 - C2 W w * (C3 W w)⁻¹
 def w3 : MvPowerSeries (Fin 2) K := lam w * z3 W w + nu w
 def dd : MvPowerSeries (Fin 2) K := -1 + ca W.a₁ * z3 W w + ca W.a₃ * w3 W w
 
@@ -506,8 +510,10 @@ lemma constantCoeff_chordCoeffCubic (hw : WFixed W w) : cc (C3 W w) = 1 := by
 lemma constantCoeff_chordCoeffQuadratic (hw : WFixed W w) : cc (C2 W w) = 0 := by
   simp [C2, c2, lam_cc hw, nu_cc hw]
 
-private theorem cc_L_mul_eq_zero_of_vanishing {φ : MvPowerSeries (Fin 2) K} (h0 : cc φ = 0) (h1 : ∀ i, (L i) φ = 0)
-    (ψ : MvPowerSeries (Fin 2) K) : cc (ψ * φ) = 0 ∧ ∀ i, (L i) (ψ * φ) = 0 := by
+private theorem cc_L_mul_eq_zero_of_vanishing
+    {φ : MvPowerSeries (Fin 2) K} (h0 : cc φ = 0) (h1 : ∀ i, (L i) φ = 0)
+    (ψ : MvPowerSeries (Fin 2) K)
+    : cc (ψ * φ) = 0 ∧ ∀ i, (L i) (ψ * φ) = 0 := by
   rw [mul_comm]
   exact mul_vanishing_order_two h0 h1 ψ
 
@@ -780,6 +786,13 @@ end WeierstrassChordSeries
 open WeierstrassChordSeries in
 theorem wChordSeries_of (hU : WSubstUnique.{u}) : WChordSeries.{u} := by
   intro K _ W w hw
-  exact ⟨Formalism.ELL.WeierstrassChordSeries.F2 W w, Formalism.ELL.WeierstrassChordSeries.mem_T.mp (Formalism.ELL.WeierstrassChordSeries.formalSum_mem_integralSeries hw), Formalism.ELL.WeierstrassChordSeries.constantCoeff_formalSum hw,
-    Formalism.ELL.WeierstrassChordSeries.linearCoeff_formalSum hw 0, Formalism.ELL.WeierstrassChordSeries.linearCoeff_formalSum hw 1, Formalism.ELL.WeierstrassChordSeries.chord hU hw⟩
+  exact ⟨
+    Formalism.ELL.WeierstrassChordSeries.F2 W w,
+    Formalism.ELL.WeierstrassChordSeries.mem_T.mp
+      (Formalism.ELL.WeierstrassChordSeries.formalSum_mem_integralSeries hw),
+    Formalism.ELL.WeierstrassChordSeries.constantCoeff_formalSum hw,
+    Formalism.ELL.WeierstrassChordSeries.linearCoeff_formalSum hw 0,
+    Formalism.ELL.WeierstrassChordSeries.linearCoeff_formalSum hw 1,
+    Formalism.ELL.WeierstrassChordSeries.chord hU hw
+  ⟩
 end Formalism.ELL

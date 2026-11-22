@@ -12,11 +12,15 @@ namespace PI.GoodTwo.ChainBetweenPairs
 open Formalism.L2.Th1.CM (HasCMBy omegaK)
 open Formalism.L2.Th1.F (scalePair MulStable)
 
-theorem chain_core (d : ℕ) (L : PeriodPair) (hd : d % 8 = 7) (hL : HasCMBy d L) (h : ℕ) (X Y : ℤ)
-    (hY : Odd Y) (hN : X ^ 2 + X * Y + (((d + 1) / 4 : ℕ) : ℤ) * Y ^ 2 = 2 ^ h) (π : ℂ)
-    (hπ : π = X + Y * omegaK d) :
-    ∃ M : ℕ → PeriodPair, M 0 = L ∧ (∀ i, HasCMBy d (M i)) ∧
-      (∀ i, i < h → IsIdxTwo (M i) (M (i + 1))) ∧ ∀ z, z ∈ (M h).lattice ↔ π * z ∈ L.lattice := by
+theorem chain_core
+    (d : ℕ)
+    (L : PeriodPair)
+    (hd : d % 8 = 7) (hL : HasCMBy d L)
+    (h : ℕ) (X Y : ℤ) (hY : Odd Y) (hN : X ^ 2 + X * Y + (((d + 1) / 4 : ℕ) : ℤ) * Y ^ 2 = 2 ^ h)
+    (π : ℂ) (hπ : π = X + Y * omegaK d)
+    : ∃ M : ℕ → PeriodPair,
+      M 0 = L ∧ (∀ i, HasCMBy d (M i)) ∧ (∀ i, i < h → IsIdxTwo (M i) (M (i + 1)))
+        ∧ ∀ z, z ∈ (M h).lattice ↔ π * z ∈ L.lattice := by
   have hω2 := omega_sq d (by omega)
   set πb : ℂ := ((X + Y : ℤ) : ℂ) + ((-Y : ℤ) : ℂ) * omegaK d with hπb
   have hNc : (X : ℂ) ^ 2 + X * Y + (((d + 1) / 4 : ℕ) : ℂ) * Y ^ 2 = 2 ^ h := by
@@ -49,17 +53,21 @@ theorem chain_core (d : ℕ) (L : PeriodPair) (hd : d % 8 = 7) (hL : HasCMBy d L
     · simp only [M, if_neg hi]
       exact hP i z
 
-  have claimA : ∀ i u v, u ∈ S L π (i + 1) → v ∈ S L π (i + 1) → u ∉ S L π i → v ∉ S L π i →
-      u - v ∈ S L π i := by
+  have claimA
+      : ∀ i u v,
+        u ∈ S L π (i + 1) → v ∈ S L π (i + 1) → u ∉ S L π i → v ∉ S L π i → u - v ∈ S L π i := by
     intro i u v hu hv hu3 hv3
     have hnh : ¬ MulStable L (π / 2) := by
       rw [hπ]
       exact not_half d L X Y hY
-    have key := two_tors L π hnh stπ (u := (2 : ℂ) ^ i * u) (v := (2 : ℂ) ^ i * v)
-      (by rw [mul_left_comm]; exact pow_two_mul_mem L i hu.1)
-      (by rw [← mul_assoc, ← pow_succ']; exact hu.2) (fun h' => hu3 ⟨hu.1, h'⟩)
-      (by rw [mul_left_comm]; exact pow_two_mul_mem L i hv.1)
-      (by rw [← mul_assoc, ← pow_succ']; exact hv.2) (fun h' => hv3 ⟨hv.1, h'⟩)
+    have key :=
+      two_tors L π hnh stπ (u := (2 : ℂ) ^ i * u) (v := (2 : ℂ) ^ i * v)
+        (by rw [mul_left_comm]; exact pow_two_mul_mem L i hu.1)
+        (by rw [← mul_assoc, ← pow_succ']; exact hu.2)
+        (fun h' => hu3 ⟨hu.1, h'⟩)
+        (by rw [mul_left_comm]; exact pow_two_mul_mem L i hv.1)
+        (by rw [← mul_assoc, ← pow_succ']; exact hv.2)
+        (fun h' => hv3 ⟨hv.1, h'⟩)
     refine ⟨?_, ?_⟩
     · rw [mul_sub]
       exact sub_mem hu.1 hv.1
@@ -93,7 +101,8 @@ theorem chain_core (d : ℕ) (L : PeriodPair) (hd : d % 8 = 7) (hL : HasCMBy d L
       rw [pow_succ, mul_comm ((2 : ℂ) ^ i) 2, mul_assoc]
       have := pow_two_mul_mem L 1 hz.2
       simpa using this
-    have htS1 : t ∈ S L π (i + 1) := ⟨by rw [htπ]; exact pow_two_mul_mem L j hw, by rw [ht3]; exact stπb _ hw⟩
+    have htS1 : t ∈ S L π (i + 1) :=
+      ⟨by rw [htπ]; exact pow_two_mul_mem L j hw, by rw [ht3]; exact stπb _ hw⟩
     have htS0 : t ∉ S L π i := fun h' => hw2 (by rw [← ht2]; exact h'.2)
     refine ⟨t, ?_, ?_, ?_⟩
     · rw [hM]

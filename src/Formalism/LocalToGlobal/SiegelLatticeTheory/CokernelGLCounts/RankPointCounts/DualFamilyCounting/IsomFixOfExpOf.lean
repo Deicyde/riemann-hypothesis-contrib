@@ -13,24 +13,27 @@ namespace Formalism.L2.SG.Pf.G8
 
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-  [Algebra F K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def extU {U W : Submodule K V} (hUc : IsCompl U W) (g : W ≃ₗ[K] W) : V ≃ₗ[K] V :=
   ((Submodule.prodEquivOfIsCompl U W hUc).symm.trans ((LinearEquiv.refl K U).prodCongr g)).trans
     (Submodule.prodEquivOfIsCompl U W hUc)
 
-theorem extU_apply {U W : Submodule K V} (hUc : IsCompl U W) (g : W ≃ₗ[K] W) (x : U) (y : W) :
-    extU hUc g ((x : V) + y) = x + g y := by
+theorem extU_apply {U W : Submodule K V} (hUc : IsCompl U W) (g : W ≃ₗ[K] W) (x : U) (y : W)
+    : extU hUc g ((x : V) + y) = x + g y := by
   have e : (Submodule.prodEquivOfIsCompl U W hUc).symm ((x : V) + y) = (x, y) := by
     rw [LinearEquiv.symm_apply_eq, Submodule.coe_prodEquivOfIsCompl']
   simp only [extU, LinearEquiv.trans_apply, e, LinearEquiv.prodCongr_apply, LinearEquiv.refl_apply,
     Submodule.coe_prodEquivOfIsCompl']
 
-theorem extU_mem {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {U : Submodule K V}
-    (hUc : IsCompl U (orthK h U)) {g : orthK h U ≃ₗ[K] orthK h U} (hg : g ∈ Formalism.HermitianLatticesTheory.isom (resF h (orthK h U))) :
-    extU hUc g ∈ isomFix h U := by
+theorem extU_mem
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
+    {U : Submodule K V} (hUc : IsCompl U (orthK h U))
+    {g : orthK h U ≃ₗ[K] orthK h U}
+    (hg : g ∈ Formalism.HermitianLatticesTheory.isom (resF h (orthK h U)))
+    : extU hUc g ∈ isomFix h U := by
   have horth : ∀ u ∈ U, ∀ w ∈ orthK h U, h u w = 0 := by
     intro u hu w hw
     simp only [orthK, Submodule.mem_iInf, LinearMap.mem_ker] at hw
@@ -60,14 +63,16 @@ theorem extU_mem {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {U : Submodu
     have := extU_apply hUc g ⟨u, hu⟩ 0
     simpa using this
 
-theorem gmap_extU {U W : Submodule K V} (hUc : IsCompl U W) (g : W ≃ₗ[K] W) (X : Submodule (𝓞 K) W) :
-    Formalism.HermitianLatticesTheory.gmap (extU hUc g) (X.map (incO W)) = (Formalism.HermitianLatticesTheory.gmap g X).map (incO W) := by
+theorem gmap_extU {U W : Submodule K V} (hUc : IsCompl U W) (g : W ≃ₗ[K] W) (X : Submodule (𝓞 K) W)
+    : Formalism.HermitianLatticesTheory.gmap (extU hUc g) (X.map (incO W))
+      = (Formalism.HermitianLatticesTheory.gmap g X).map (incO W) := by
   have key : ∀ w : W, extU hUc g (w : V) = (g w : V) := by
     intro w
     have := extU_apply hUc g 0 w
     simpa using this
   ext v
-  simp only [Formalism.HermitianLatticesTheory.gmap, Submodule.mem_map, LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
+  simp only [Formalism.HermitianLatticesTheory.gmap, Submodule.mem_map,
+    LinearMap.coe_restrictScalars, LinearEquiv.coe_coe]
   constructor
   · rintro ⟨y, ⟨x, hx, rfl⟩, rfl⟩
     exact ⟨g x, ⟨x, hx, rfl⟩, (key x).symm⟩
@@ -83,10 +88,10 @@ theorem isomFixOfExp_of (hJ : JordanIsom) : IsomFixOfExp := by
     intro x hx φ
     rw [resF_apply]
     exact hpos x x.2 (by simpa using hx) φ
-  obtain ⟨g, hg, hgL⟩ := hJ K F (orthK h U) hK hF (resF h (orthK h U)) hs' hd'
-    (latW (orthK h U) T) (latW (orthK h U) T') (isLattice_latW hT).toIsLattice
-    (isLattice_latW hT').toIsLattice 𝔭 h𝔭 _ _ _ _
-    (isJordanIn_res hT hb) (isJordanIn_res hT' hb') (fun i => hv _)
+  obtain ⟨g, hg, hgL⟩ :=
+    hJ K F (orthK h U) hK hF (resF h (orthK h U)) hs' hd' (latW (orthK h U) T) (latW (orthK h U) T')
+      (isLattice_latW hT).toIsLattice (isLattice_latW hT').toIsLattice 𝔭 h𝔭 _ _ _ _
+      (isJordanIn_res hT hb) (isJordanIn_res hT' hb') (fun i => hv _)
   refine ⟨extU hUc g, extU_mem hs hUc hg, ?_⟩
   rw [← locF_latW hT 𝔭, gmap_extU, hgL, locF_latW hT' 𝔭]
 

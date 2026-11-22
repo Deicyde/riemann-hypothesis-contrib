@@ -75,8 +75,7 @@ private lemma tendsto_mat_of_v_le {E : Type} [Field E] [NumberField E] {n : ℕ}
   refine tendsto_pi_nhds.2 fun i => tendsto_pi_nhds.2 fun k => ?_
   exact tendsto_of_v_le w _ _ fun e => h e i k
 
-theorem UpperTheory.Gal.Int.Geo.Pl.nearNbhd_holds :
-    UpperTheory.Gal.Int.Geo.Pl.NearNbhd := by
+theorem UpperTheory.Gal.Int.Geo.Pl.nearNbhd_holds : UpperTheory.Gal.Int.Geo.Pl.NearNbhd := by
   intro E _ _ n w O hO h1
   by_contra hcon
   push_neg at hcon

@@ -17,20 +17,27 @@ open CompanionTheory.D.DSIC
 open Formalism.REAL (KHighest IsWeight)
 open PI.UpqRep (lowK)
 
-theorem kRel_map {n : ℕ} {A B : Type} [Ring A] [Ring B] (ε : Fin n → Bool) (f : A →+* B)
-    (F : Fin n → Fin n → A) (h : KRel ε F) : KRel ε (fun a b => f (F a b)) := by
+theorem kRel_map
+    {n : ℕ} {A B : Type} [Ring A] [Ring B]
+    (ε : Fin n → Bool)
+    (f : A →+* B)
+    (F : Fin n → Fin n → A) (h : KRel ε F)
+    : KRel ε (fun a b => f (F a b)) := by
   intro a b c d hab hcd
   have := congrArg f (h a b c d hab hcd)
   simp only [map_sub, map_mul] at this
   rw [this]
   congr 1 <;> split_ifs <;> simp
 
-theorem fdual_single {n : ℕ} {ε : Fin n → Bool} {U : Type} [AddCommGroup U] [Module ℂ U]
-    (EU : Fin n → Fin n → Module.End ℂ U) (g : Fin n → Fin n → Finset (NC ε) → Finset (NC ε) → ℝ)
-    (hg : ∀ (c d : Fin n) (x : Ch ε U) (A : Finset (NC ε)), Gop ε c d x A = ∑ B, (g c d A B : ℂ) • x B)
-    (a b : Fin n) (A B : Finset (NC ε)) (u : U) :
-    Fdual ε EU a b (Pi.single A u) B =
-      (Pi.single A (EU a b u) : Ch ε U) B - (g b a B A : ℂ) • u := by
+theorem fdual_single
+    {n : ℕ} {ε : Fin n → Bool} {U : Type} [AddCommGroup U] [Module ℂ U]
+    (EU : Fin n → Fin n → Module.End ℂ U)
+    (g : Fin n → Fin n → Finset (NC ε) → Finset (NC ε) → ℝ)
+    (hg : ∀ (c d : Fin n) (x : Ch ε U) (A : Finset (NC ε)),
+      Gop ε c d x A = ∑ B, (g c d A B : ℂ) • x B)
+    (a b : Fin n) (A B : Finset (NC ε)) (u : U)
+    : Fdual ε EU a b (Pi.single A u) B
+      = (Pi.single A (EU a b u) : Ch ε U) B - (g b a B A : ℂ) • u := by
   unfold Fdual
   rw [LinearMap.sub_apply, Pi.sub_apply, lift_apply, hg]
   congr 1
@@ -97,16 +104,22 @@ theorem aux₃ : FRel → GFacts → GamDom → KHWExists → HWMap → PRV := b
       simp
   obtain ⟨φ, hφ1, hφ2⟩ := hM n ε T V ET E (lowK ε lam) _ v S hTrel hTu hE hEu ht0 ht hv hS hSt hvS
   let c : Ch ε V := fun A => if A.card = (A1 ε).card then φ (e (Pi.single A u)) else 0
-  have key : ∀ a b, ε a = ε b → ∀ A, Fop ε E a b c A =
-      if A.card = (A1 ε).card then φ (e (Pi.single A (EU a b u))) else 0 := by
+  have key
+      : ∀ a b,
+        ε a = ε b
+          → ∀ A,
+            Fop ε E a b c A
+              = if A.card = (A1 ε).card then φ (e (Pi.single A (EU a b u))) else 0 := by
     intro a b hab A
     unfold Fop
     rw [LinearMap.add_apply, Pi.add_apply, lift_apply, hg]
     by_cases hA : A.card = (A1 ε).card
-    · have h1 : Fdual ε EU a b (Pi.single A u) =
-          Pi.single A (EU a b u) - ∑ B, (g a b A B : ℂ) • (Pi.single B u : Ch ε U) := by
+    · have h1
+          : Fdual ε EU a b (Pi.single A u)
+            = Pi.single A (EU a b u) - ∑ B, (g a b A B : ℂ) • (Pi.single B u : Ch ε U) := by
         funext B
-        rw [fdual_single EU g (hg U), Pi.sub_apply, Finset.sum_apply, Finset.sum_eq_single B, hgs b a B A]
+        rw [fdual_single EU g (hg U), Pi.sub_apply, Finset.sum_apply, Finset.sum_eq_single B,
+          hgs b a B A]
         · simp
         · intro C _ hC; simp [hC.symm]
         · simp

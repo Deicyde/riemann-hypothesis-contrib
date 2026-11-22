@@ -7,7 +7,9 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.
 
 set_option autoImplicit false
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
@@ -17,9 +19,12 @@ theorem int_eq_zero_of_forall_two_pow_dvd (n : ℤ) (h : ∀ k : ℕ, (2 : ℤ) 
   rw [Int.abs_eq_natAbs]
   exact_mod_cast h1
 
-theorem exists_two_pow_smul_of_covers2 {X : Type} [AddCommGroup X] {ι : Type} {a : ι → X}
-    (ha : Covers2 a) (d : X →+ X) (hd : ∀ i, d (a i) = 0) (k : ℕ) :
-    ∀ y : X, ∃ z : X, d y = ((2 : ℤ) ^ k) • z := by
+theorem exists_two_pow_smul_of_covers2
+    {X : Type} [AddCommGroup X]
+    {ι : Type} {a : ι → X} (ha : Covers2 a)
+    (d : X →+ X) (hd : ∀ i, d (a i) = 0)
+    (k : ℕ)
+    : ∀ y : X, ∃ z : X, d y = ((2 : ℤ) ^ k) • z := by
   induction k with
   | zero => exact fun y => ⟨d y, by simp⟩
   | succ k ih =>
@@ -30,8 +35,11 @@ theorem exists_two_pow_smul_of_covers2 {X : Type} [AddCommGroup X] {ι : Type} {
     rw [map_add (f := _), map_add (f := _), hd, hz, zero_add, pow_succ, mul_smul, two_smul]
     simp only [two_smul, smul_add]
 
-theorem addHom_eq_zero_of_covers2 {X : Type} [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
-    {ι : Type} {a : ι → X} (ha : Covers2 a) (d : X →+ X) (hd : ∀ i, d (a i) = 0) : d = 0 := by
+theorem addHom_eq_zero_of_covers2
+    {X : Type} [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
+    {ι : Type} {a : ι → X} (ha : Covers2 a)
+    (d : X →+ X) (hd : ∀ i, d (a i) = 0)
+    : d = 0 := by
   ext y
   let b := Module.Free.chooseBasis ℤ X
   refine b.repr.injective (Finsupp.ext fun j => ?_)
@@ -41,13 +49,18 @@ theorem addHom_eq_zero_of_covers2 {X : Type} [AddCommGroup X] [Module.Finite ℤ
     exact ⟨b.repr z j, by rw [hz]; simp⟩
   simpa using this
 
-theorem addHom_ext_of_covers2 {X : Type} [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
-    {ι : Type} {a : ι → X} (ha : Covers2 a) {f g : X →+ X} (h : ∀ i, f (a i) = g (a i)) : f = g := by
+theorem addHom_ext_of_covers2
+    {X : Type} [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
+    {ι : Type} {a : ι → X} (ha : Covers2 a)
+    {f g : X →+ X} (h : ∀ i, f (a i) = g (a i))
+    : f = g := by
   have := addHom_eq_zero_of_covers2 ha (f - g) (fun i => by simp [h i])
   exact sub_eq_zero.mp this
 
-theorem finite_addHom_of_covers2 : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X] (ι : Type)
-    [Finite ι] (a : ι → X), Covers2 a → ∀ F : Set X, F.Finite → {f : X →+ X | ∀ i, f (a i) ∈ F}.Finite := by
+theorem finite_addHom_of_covers2
+    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X] (ι : Type) [Finite ι]
+        (a : ι → X),
+      Covers2 a → ∀ F : Set X, F.Finite → {f : X →+ X | ∀ i, f (a i) ∈ F}.Finite := by
   intro X _ _ _ ι _ a ha F hF
   have hT : (Set.pi Set.univ fun _ : ι => F).Finite := Set.Finite.pi fun _ => hF
   refine Set.Finite.of_injOn (f := fun (f : X →+ X) (i : ι) => f (a i)) ?_ ?_ hT

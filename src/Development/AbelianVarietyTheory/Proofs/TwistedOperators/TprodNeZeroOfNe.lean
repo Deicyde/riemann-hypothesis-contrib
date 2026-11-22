@@ -15,22 +15,22 @@ open GlobalTheory.IndefiniteRowSideFullHecke.ContractionTensorModels
 
 section Hilbert
 
-variable {H₁ H₂ FF : Type}
-  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
-  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
-  [NormedAddCommGroup FF] [InnerProductSpace ℂ FF] [CompleteSpace FF]
-
+variable
+  {H₁ H₂ FF : Type}
+  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁] [NormedAddCommGroup H₂]
+  [InnerProductSpace ℂ H₂] [NormedAddCommGroup FF] [InnerProductSpace ℂ FF] [CompleteSpace FF]
 
 omit [CompleteSpace H₁] [CompleteSpace FF] in
-theorem norm_isoBilin {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (x : H₁) (y : H₂) :
-    ‖Tm x y‖ = ‖x‖ * ‖y‖ := by
+theorem norm_isoBilin {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) (x : H₁) (y : H₂)
+    : ‖Tm x y‖ = ‖x‖ * ‖y‖ := by
   have h := hI x x y y
-  rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, ← mul_pow] at h
+  rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, ← mul_pow]
+    at h
   have h2 : ‖Tm x y‖ ^ 2 = (‖x‖ * ‖y‖) ^ 2 := by exact_mod_cast h
   exact (pow_left_inj₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h2
 
-theorem exists_isContr {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm) :
-    ∃ It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It := by
+theorem exists_isContr {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBilin Tm)
+    : ∃ It : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁, IsContr Tm It := by
   let L : H₂ → (H₁ →L[ℂ] FF) := fun y =>
     (Tm.flip y).mkContinuous ‖y‖ fun x => by simp [norm_isoBilin hI, mul_comm]
   let f : FF → H₂ → H₁ := fun φ y => ContinuousLinearMap.adjoint (L y) φ
@@ -43,14 +43,16 @@ theorem exists_isContr {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} (hI : IsIsoBi
   · intro c a y
     exact ext_inner_left ℂ fun x => by simp only [inner_smul_right, hf, RingHom.id_apply]
   · intro a y z
-    exact ext_inner_left ℂ fun x => by simp only [inner_add_right, hf, map_add (f := _), inner_add_left]
+    exact ext_inner_left ℂ fun x => by
+      simp only [inner_add_right, hf, map_add (f := _), inner_add_left]
   · intro c a y
     exact ext_inner_left ℂ fun x => by simp only [inner_smul_right, hf, map_smul, inner_smul_left]
 
-
 omit [CompleteSpace H₁] [CompleteSpace FF] in
-theorem isContr_unique {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} {It It' : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁}
-    (h : IsContr Tm It) (h' : IsContr Tm It') : It = It' := by
+theorem isContr_unique
+    {Tm : H₁ →ₗ[ℂ] H₂ →ₗ[ℂ] FF} {It It' : FF →ₗ[ℂ] H₂ →ₛₗ[starRingEnd ℂ] H₁}
+    (h : IsContr Tm It) (h' : IsContr Tm It')
+    : It = It' := by
   ext φ y
   exact ext_inner_left ℂ fun x => by rw [h, h']
 
@@ -61,8 +63,11 @@ theorem contrHilbert : ContrHilbert := by
   obtain ⟨It, hIt⟩ := exists_isContr hI
   exact ⟨⟨It, hIt, fun It' h' => isContr_unique h' hIt⟩, fun It' h' => contrProps_of hI hE h'⟩
 
-theorem tprod_ne_zero_of_ne {ι : Type} [Fintype ι] {B : ι → Type} [∀ τ, AddCommGroup (B τ)]
-    [∀ τ, Module ℂ (B τ)] (w : ∀ τ, B τ) (hw : ∀ τ, w τ ≠ 0) : PiTensorProduct.tprod ℂ w ≠ 0 := by
+theorem tprod_ne_zero_of_ne
+    {ι : Type} [Fintype ι]
+    {B : ι → Type} [∀ τ, AddCommGroup (B τ)] [∀ τ, Module ℂ (B τ)]
+    (w : ∀ τ, B τ) (hw : ∀ τ, w τ ≠ 0)
+    : PiTensorProduct.tprod ℂ w ≠ 0 := by
   classical
   have : ∀ τ, ∃ f : Module.Dual ℂ (B τ), f (w τ) ≠ 0 := fun τ => by
     by_contra hc
@@ -94,18 +99,20 @@ theorem contrTensor : ContrTensor := by
       rintro ⟨s', hs'⟩
       exact hne (congrArg Sigma.fst (e.injective hs'))
     · simp
-  have key : It.compMultilinearMap ((MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial Var ℂ)).compLinearMap
-      fun τ => (MvPolynomial.rename (fun s : σ τ => e ⟨τ, s⟩)).toLinearMap) =
-      (PiTensorProduct.mapMultilinear ℂ A B).compLinearMap Itl := by
+  have key
+      : It.compMultilinearMap ((MultilinearMap.mkPiAlgebra ℂ ι (MvPolynomial Var ℂ)).compLinearMap
+          fun τ => (MvPolynomial.rename (fun s : σ τ => e ⟨τ, s⟩)).toLinearMap)
+        = (PiTensorProduct.mapMultilinear ℂ A B).compLinearMap Itl := by
     apply Module.Basis.ext_multilinear fun τ => MvPolynomial.basisMonomials (σ τ) ℂ
     intro m
     simp only [LinearMap.compMultilinearMap_apply, MultilinearMap.compLinearMap_apply,
       MultilinearMap.mkPiAlgebra_apply, AlgHom.toLinearMap_apply, MvPolynomial.coe_basisMonomials,
       MvPolynomial.rename_monomial, PiTensorProduct.mapMultilinear_apply]
     rw [← MvPolynomial.monomial_sum_one]
-    have := (MvPolynomial.basisMonomials Var ℂ).constr_basis ℂ (fun m =>
-      PiTensorProduct.map fun τ => Itl τ (MvPolynomial.monomial (r m τ) 1))
-      (∑ τ, (m τ).mapDomain fun s => e ⟨τ, s⟩)
+    have :=
+      (MvPolynomial.basisMonomials Var ℂ).constr_basis ℂ
+        (fun m => PiTensorProduct.map fun τ => Itl τ (MvPolynomial.monomial (r m τ) 1))
+        (∑ τ, (m τ).mapDomain fun s => e ⟨τ, s⟩)
     rw [hr] at this
     simpa [It] using this
   have hT : IsTensorIt e Itl It := by

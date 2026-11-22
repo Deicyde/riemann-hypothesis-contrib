@@ -19,8 +19,8 @@ variable {Ω : Type*} [Field Ω] {v : AddValuation Ω (WithTop ℤ)}
 
 theorem normDiscrete_mem_vRing_iff (x : Ω) : x ∈ vRing v ↔ 0 ≤ v x := Iff.rfl
 
-theorem normDiscrete_map_inv {x : Ω} {n : ℤ} (hx : v x = (n : WithTop ℤ)) :
-    v x⁻¹ = ((-n : ℤ) : WithTop ℤ) := by
+theorem normDiscrete_map_inv {x : Ω} {n : ℤ} (hx : v x = (n : WithTop ℤ))
+    : v x⁻¹ = ((-n : ℤ) : WithTop ℤ) := by
   rw [AddValuation.map_inv, hx]
   rfl
 
@@ -43,8 +43,11 @@ theorem normDiscrete_isUnit_iff (x : vRing v) : IsUnit x ↔ v (x : Ω) = 0 := b
     exact isUnit_iff_exists_inv.mpr
       ⟨⟨(x : Ω)⁻¹, (normDiscrete_mem_vRing_iff _).mpr h1.ge⟩, Subtype.ext (mul_inv_cancel₀ hx0)⟩
 
-theorem normDiscrete_associated_pow {π : vRing v} (hπ : v (π : Ω) = 1) (x : vRing v) {n : ℕ}
-    (hx : v (x : Ω) = ((n : ℤ) : WithTop ℤ)) : Associated (π ^ n) x := by
+theorem normDiscrete_associated_pow
+    {π : vRing v} (hπ : v (π : Ω) = 1)
+    (x : vRing v)
+    {n : ℕ} (hx : v (x : Ω) = ((n : ℤ) : WithTop ℤ))
+    : Associated (π ^ n) x := by
   have hπ0 : (π : Ω) ≠ 0 := by
     intro h0
     rw [h0, AddValuation.map_zero] at hπ
@@ -62,8 +65,8 @@ theorem normDiscrete_associated_pow {π : vRing v} (hπ : v (π : Ω) = 1) (x : 
   simp only [IsUnit.unit_spec, MulMemClass.coe_mul, SubmonoidClass.coe_pow, u]
   field_simp
 
-theorem normDiscrete_exists_nat (hv : IsNormDiscrete v) (x : vRing v) (hx : x ≠ 0) :
-    ∃ n : ℕ, v (x : Ω) = ((n : ℤ) : WithTop ℤ) := by
+theorem normDiscrete_exists_nat (hv : IsNormDiscrete v) (x : vRing v) (hx : x ≠ 0)
+    : ∃ n : ℕ, v (x : Ω) = ((n : ℤ) : WithTop ℤ) := by
   obtain ⟨m, hm⟩ := WithTop.ne_top_iff_exists.mp (hv.1 x fun h => hx (Subtype.ext h))
   have h0 : 0 ≤ v (x : Ω) := x.2
   rw [← hm] at h0 ⊢
@@ -90,8 +93,8 @@ theorem normDiscrete_irreducible {π : vRing v} (hπ : v (π : Ω) = 1) : Irredu
         norm_cast at h1 ha hb ⊢
         omega
 
-theorem normDiscrete_isDiscreteValuationRing (hv : IsNormDiscrete v) :
-    IsDiscreteValuationRing (vRing v) := by
+theorem normDiscrete_isDiscreteValuationRing (hv : IsNormDiscrete v)
+    : IsDiscreteValuationRing (vRing v) := by
   obtain ⟨π, hπ⟩ := hv.2
   have hπm : π ∈ vRing v := by
     rw [normDiscrete_mem_vRing_iff, hπ]
@@ -103,16 +106,18 @@ theorem normDiscrete_isDiscreteValuationRing (hv : IsNormDiscrete v) :
 
 end NormDiscrete
 
-theorem exists_complete_discreteValuationRing_of_isNormDiscrete :
-    ∀ (Ω : Type) [Field Ω] (v : AddValuation Ω (WithTop ℤ)), IsNormDiscrete v →
-      ∃ (V K' : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
-        (_ : Field K') (_ : Algebra V K') (_ : IsFractionRing V K') (f : Ω →+* K'),
-        IsAdicComplete (IsLocalRing.maximalIdeal V) V ∧
-        (∀ a : Ω, (∃ x : V, algebraMap V K' x = f a) ↔ 0 ≤ v a) ∧
-        (∀ (n : ℕ) (a : Ω) (x : V), algebraMap V K' x = f a →
-          (IsDiscreteValuationRing.addVal V x = n ↔ v a = ((n : ℤ) : WithTop ℤ))) ∧
-        ∀ x : V, ∃ (a : Ω) (x' : V), algebraMap V K' x' = f a ∧
-          x - x' ∈ IsLocalRing.maximalIdeal V := by
+theorem exists_complete_discreteValuationRing_of_isNormDiscrete
+    : ∀ (Ω : Type) [Field Ω] (v : AddValuation Ω (WithTop ℤ)),
+      IsNormDiscrete v
+        → ∃ (V K' : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsDiscreteValuationRing V)
+            (_ : Field K') (_ : Algebra V K') (_ : IsFractionRing V K') (f : Ω →+* K'),
+          IsAdicComplete (IsLocalRing.maximalIdeal V) V
+            ∧ (∀ a : Ω, (∃ x : V, algebraMap V K' x = f a) ↔ 0 ≤ v a)
+            ∧ (∀ (n : ℕ) (a : Ω) (x : V),
+              algebraMap V K' x = f a
+                → (IsDiscreteValuationRing.addVal V x = n ↔ v a = ((n : ℤ) : WithTop ℤ)))
+            ∧ ∀ x : V, ∃ (a : Ω) (x' : V),
+              algebraMap V K' x' = f a ∧ x - x' ∈ IsLocalRing.maximalIdeal V := by
   intro Ω _ v hv
   have hR := normDiscrete_isDiscreteValuationRing hv
   let R := vRing v
@@ -144,12 +149,24 @@ theorem exists_complete_discreteValuationRing_of_isNormDiscrete :
       field_simp at h3
       exact h3
     exact ha (h4 ▸ y.2)
-  refine ⟨V, K', inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    inferInstance, f, inferInstance, hmem, ?_, ?_⟩
+  refine ⟨
+    V,
+    K',
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    f,
+    inferInstance,
+    hmem,
+    ?_,
+    ?_
+  ⟩
   · intro n a x hx
     have ha : a ∈ vRing v := (hmem a).mp ⟨x, hx⟩
-    obtain rfl : x = algebraMap R V ⟨a, ha⟩ :=
-      IsFractionRing.injective V K' (hx.trans (hf ⟨a, ha⟩))
+    obtain rfl : x = algebraMap R V ⟨a, ha⟩ := IsFractionRing.injective V K' (hx.trans (hf ⟨a, ha⟩))
     by_cases h0 : (⟨a, ha⟩ : R) = 0
     · have h1 : a = 0 := congrArg Subtype.val h0
       rw [h0, map_zero, IsDiscreteValuationRing.addVal_zero, h1, AddValuation.map_zero]
@@ -160,8 +177,8 @@ theorem exists_complete_discreteValuationRing_of_isNormDiscrete :
         exact zero_le_one
       obtain ⟨m, hm⟩ := normDiscrete_exists_nat hv ⟨a, ha⟩ h0
       obtain ⟨u, hu⟩ := normDiscrete_associated_pow (π := ⟨π, hπm⟩) hπ ⟨a, ha⟩ hm
-      have hirr := irreducible_algebraMap_adicCompletion_of_dvr
-        (normDiscrete_irreducible (π := ⟨π, hπm⟩) hπ)
+      have hirr :=
+        irreducible_algebraMap_adicCompletion_of_dvr (normDiscrete_irreducible (π := ⟨π, hπm⟩) hπ)
       have h2 : IsDiscreteValuationRing.addVal V (algebraMap R V ⟨a, ha⟩) = m :=
         IsDiscreteValuationRing.addVal_def _ (Units.map (algebraMap R V : R →* V) u) hirr m
           (by rw [← hu, map_mul, map_pow, mul_comm]; rfl)

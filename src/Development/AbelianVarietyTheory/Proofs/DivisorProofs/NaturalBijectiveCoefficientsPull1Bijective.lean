@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -20,11 +22,14 @@ noncomputable section
 
 namespace GlobalTheory.Obs.BC
 
-theorem natCoef_pull1_bijective (R : Type) [CommRing R] (C : Type) [Category.{0} C] (F F' : C ⥤ CommAlgCat.{0} R)
-    (α : ∀ T, F.obj T →+* F'.obj T)
+theorem natCoef_pull1_bijective
+    (R : Type) [CommRing R]
+    (C : Type) [Category.{0} C]
+    (F F' : C ⥤ CommAlgCat.{0} R) (α : ∀ T, F.obj T →+* F'.obj T)
     (nat : ∀ {T T' : C} (a : T ⟶ T') (b : F.obj T), α T' (mp F a b) = mp F' a (α T b))
-    (smul : ∀ T (r : R) (b : F.obj T), α T (r • b) = r • α T b) :
-    (∀ T, Function.Bijective (α T)) → Function.Bijective (GlobalTheory.Obs.BC.natCoef α nat smul).pull1 := by
+    (smul : ∀ T (r : R) (b : F.obj T), α T (r • b) = r • α T b)
+    : (∀ T, Function.Bijective (α T))
+      → Function.Bijective (GlobalTheory.Obs.BC.natCoef α nat smul).pull1 := by
   intro hb
   let β : ∀ T, F'.obj T →+* F.obj T := fun T ↦ (RingEquiv.ofBijective (α T) (hb T)).symm.toRingHom
   have hαβ : ∀ T (b : F'.obj T), α T (β T b) = b := fun T b ↦

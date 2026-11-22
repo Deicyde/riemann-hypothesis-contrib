@@ -10,22 +10,26 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-private theorem mem_span_variables_of_coeff {O σ : Type} [CommRing O] (s : Finset σ) :
-    ∀ f : MvPowerSeries σ O, (∀ n : σ →₀ ℕ, (∀ i ∈ s, n i = 0) → MvPowerSeries.coeff n f = 0) →
-      f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
+private theorem mem_span_variables_of_coeff {O σ : Type} [CommRing O] (s : Finset σ)
+    : ∀ f : MvPowerSeries σ O,
+      (∀ n : σ →₀ ℕ, (∀ i ∈ s, n i = 0) → MvPowerSeries.coeff n f = 0)
+        → f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
   _root_.UpperTheory.Reformulated.B.PowerSeriesMemSpanAllVariables.pi_span_X s
 
-theorem UpperTheory.V.AlgebraTools.mvPowerSeries_cotInd :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ →
-      ∀ (σ : Type) [Fintype σ], IsRegularLocalRing (MvPowerSeries σ O) ∧
-        ringKrullDim (MvPowerSeries σ O) = ((Fintype.card σ + 1 : ℕ) : WithBot ℕ∞) ∧
-        CotInd (MvPowerSeries σ O) (fun o : Option σ => o.elim (MvPowerSeries.C ϖ) MvPowerSeries.X) := by
+theorem UpperTheory.V.AlgebraTools.mvPowerSeries_cotInd
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (σ : Type) [Fintype σ],
+          IsRegularLocalRing (MvPowerSeries σ O)
+            ∧ ringKrullDim (MvPowerSeries σ O) = ((Fintype.card σ + 1 : ℕ) : WithBot ℕ∞)
+            ∧ CotInd (MvPowerSeries σ O)
+              (fun o : Option σ => o.elim (MvPowerSeries.C ϖ) MvPowerSeries.X) := by
   intro O _ _ _ ϖ hϖ σ _
   have hreg : IsRegularLocalRing (MvPowerSeries σ O) :=
     GlobalTheory.FormalIsogeny.isRegularLocalRing_mvPowerSeries O σ
   have hdim : ringKrullDim (MvPowerSeries σ O) = ((Fintype.card σ + 1 : ℕ) : WithBot ℕ∞) := by
-    rw [GlobalTheory.FormalIsogeny.ringKrullDim_mvPowerSeries, IsDiscreteValuationRing.ringKrullDim_eq_one,
-      Nat.card_eq_fintype_card, add_comm]
+    rw [GlobalTheory.FormalIsogeny.ringKrullDim_mvPowerSeries,
+      IsDiscreteValuationRing.ringKrullDim_eq_one, Nat.card_eq_fintype_card, add_comm]
     push_cast
     rfl
   have hm : maximalIdeal O = Ideal.span {ϖ} :=
@@ -42,8 +46,9 @@ theorem UpperTheory.V.AlgebraTools.mvPowerSeries_cotInd :
       have h0 := GlobalTheory.FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.1 hf
       rw [hm, Ideal.mem_span_singleton] at h0
       obtain ⟨c, hc⟩ := h0
-      have h1 : f - MvPowerSeries.C (ϖ * c) ∈
-          Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) := by
+      have h1
+          : f - MvPowerSeries.C (ϖ * c)
+            ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) := by
         refine mem_span_variables_of_coeff Finset.univ _ fun n hn => ?_
         have : n = 0 := Finsupp.ext fun i => hn i (Finset.mem_univ i)
         subst this

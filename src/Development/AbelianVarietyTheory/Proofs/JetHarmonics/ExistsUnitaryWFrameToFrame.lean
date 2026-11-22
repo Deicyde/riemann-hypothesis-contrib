@@ -14,8 +14,10 @@ namespace GlobalTheory.FrameTrans
 
 variable {k r : ℕ}
 
-noncomputable def swapMat (H : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (B B' : Fin k → Fin (2 * r + k + 1) → ℂ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
+noncomputable def swapMat
+    (H : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (B B' : Fin k → Fin (2 * r + k + 1) → ℂ)
+    : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
   1 + Matrix.of fun p q => ∑ c, (B' c p - B c p) * herm H (bvec q) (B c)
 
 end GlobalTheory.FrameTrans

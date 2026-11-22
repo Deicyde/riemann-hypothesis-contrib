@@ -9,27 +9,36 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.T0
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.T0
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)]
 
 abbrev WtR (E : Type) [Field E] : Type := ((E →+* ℂ) × ℕ → ℕ) × ℕ
 
-abbrev valG (h : GenFrEx Xo c) (u : WtR E) (f : Rul Xo c) : ∀ Z : Comp Xo c, AC Z := valC h u.1 u.2 f
+abbrev valG (h : GenFrEx Xo c) (u : WtR E) (f : Rul Xo c) : ∀ Z : Comp Xo c, AC Z :=
+  valC h u.1 u.2 f
 
-def dataOf (h : GenFrEx Xo c)
-    (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
+def dataOf
+    (h : GenFrEx Xo c) (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
     (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
     (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
-    (Dd N T i g0 : ℕ) (cc : ℝ) (uL uF uka ude uet uta1 uta2 : WtR E)
-    (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
-    (np : ℕ) (thpR : Fin np → Rul Xo c) (n0 : ℕ) (th0R : Fin n0 → Rul Xo c) (uF0 : WtR E)
-    (nk : ℕ) (thkR : Fin nk → Rul Xo c) (MR : Set (Rul Xo c)) (etR ta1R ta2R : Rul Xo c)
+    (Dd N T i g0 : ℕ)
+    (cc : ℝ) (uL uF uka ude uet uta1 uta2 : WtR E) (wR : Fin (N + 1) → Rul Xo c)
+    (jc : Comp Xo c → Fin (N + 1))
+    (np : ℕ) (thpR : Fin np → Rul Xo c)
+    (n0 : ℕ) (th0R : Fin n0 → Rul Xo c)
+    (uF0 : WtR E)
+    (nk : ℕ) (thkR : Fin nk → Rul Xo c)
+    (MR : Set (Rul Xo c)) (etR ta1R ta2R : Rul Xo c)
     (nu : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F) → ℝ)
-    (ip : (c.F →+* ℂ) → (∀ Z : Comp Xo c, AC Z) → (∀ Z : Comp Xo c, AC Z) → ℂ)
-    (wsize : WTZ E → ℝ) (DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r : ℝ) :
-    Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z) where
+    (ip : (c.F →+* ℂ) → (∀ Z : Comp Xo c, AC Z) → (∀ Z : Comp Xo c, AC Z) → ℂ) (wsize : WTZ E → ℝ)
+    (DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO
+      f r
+      : ℝ)
+    : Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z) where
   D := Dd
   N := N
   T := T
@@ -41,15 +50,20 @@ def dataOf (h : GenFrEx Xo c)
   wde := wtZ ude.1 ude.2
   ord Z v := ordC (δ Z v) v
   nrm Z := nrmC fn (yP Z)
-  M := letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+  M :=
+    letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
     Submodule.span (𝓞 c.F) (valG h uka '' MR)
-  WW := letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+  WW :=
+    letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
     Submodule.span (𝓞 c.F) (Set.range fun k => valG h uL (wR k))
-  Thp := letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+  Thp :=
+    letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
     Submodule.span (𝓞 c.F) (Set.range fun k => valG h uF (thpR k))
-  Th0 := letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+  Th0 :=
+    letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
     Submodule.span (𝓞 c.F) (Set.range fun k => valG h uF0 (th0R k))
-  Thk := letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
+  Thk :=
+    letI : ∀ Z : Comp Xo c, Module (𝓞 c.F) (AC Z) := fun Z => Algebra.toModule
     Submodule.span (𝓞 c.F) (Set.range fun k => valG h uka (thkR k))
   w k := valG h uL (wR k)
   jc := jc
@@ -85,18 +99,14 @@ section Laws
 
 variable (d : Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z))
 
-
 variable (Xo c) in
 def CompNe : Prop := Nonempty (Comp Xo c)
-
 
 variable (Xo c) in
 def FnFG : Prop := ∀ Z : Comp Xo c, (⊤ : IntermediateField c.F (Om Z)).FG
 
-
 variable (Xo c) in
 def FnTrdeg (Dd : ℕ) : Prop := ∀ Z : Comp Xo c, Algebra.trdeg c.F (Om Z) = Dd
-
 
 variable (Xo c) in
 def FnAlgClosed : Prop :=
@@ -106,50 +116,64 @@ def NZAt (h : GenFrEx Xo c) (f : Rul Xo c) : Prop := ∀ Z, evC h Z f ≠ 0
 
 def LawBdd : Prop :=
   ∀ (sg : c.F →+* ℂ) (G : WTZ E) (f : ∀ Z, AC Z),
-    ((f ∈ d.WW ∧ G = d.wL) ∨ (f ∈ d.Thp ∧ G = d.wF) ∨ (f = d.et ∧ G = d.n1 • d.wde) ∨
-      (f = d.ta1 ∧ G = (2 : ℕ) • d.G1) ∨ (f = d.ta2 ∧ G = d.G2)) →
-    BddAbove (Set.range fun p : (Σ Z, PT (Ω := Om Z) sg) => d.nrm p.1 G (f p.1) p.2)
+    ((f ∈ d.WW ∧ G = d.wL) ∨ (f ∈ d.Thp ∧ G = d.wF) ∨ (f = d.et ∧ G = d.n1 • d.wde)
+        ∨ (f = d.ta1 ∧ G = (2 : ℕ) • d.G1) ∨ (f = d.ta2 ∧ G = d.G2))
+      → BddAbove (Set.range fun p : (Σ Z, PT (Ω := Om Z) sg) => d.nrm p.1 G (f p.1) p.2)
 
-def A1Bigness : Prop := ∀ Z, ∃ J : Fin d.D → Fin d.N,
+def A1Bigness : Prop :=
+  ∀ Z, ∃ J : Fin d.D → Fin d.N,
     LinearIndependent (Om Z) fun k => KaehlerDifferential.D c.F (Om Z) (d.x Z (J k))
 
 def A2RegularityOrders : Prop :=
-  (∀ Z v, d.admitted Z v → ∀ f ∈ d.WW, f Z ≠ 0 → 0 ≤ d.ord Z v d.wL (f Z)) ∧
-  (∀ Z v, d.admitted Z v → ∀ f ∈ d.Thp, f Z ≠ 0 → 0 ≤ d.ord Z v d.wF (f Z)) ∧
-  (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v (d.n1 • d.wde) (d.et Z)) ∧
-  (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v ((2 : ℕ) • d.G1) (d.ta1 Z)) ∧
-  (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v d.G2 (d.ta2 Z))
+  (∀ Z v, d.admitted Z v → ∀ f ∈ d.WW, f Z ≠ 0 → 0 ≤ d.ord Z v d.wL (f Z))
+    ∧ (∀ Z v, d.admitted Z v → ∀ f ∈ d.Thp, f Z ≠ 0 → 0 ≤ d.ord Z v d.wF (f Z))
+    ∧ (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v (d.n1 • d.wde) (d.et Z))
+    ∧ (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v ((2 : ℕ) • d.G1) (d.ta1 Z))
+    ∧ (∀ Z v, d.admitted Z v → 0 ≤ d.ord Z v d.G2 (d.ta2 Z))
 
-def LawA3' : Prop := ∀ Z {G : WTZ E} {f : AC Z}, f ∈ AG Z G → f ≠ 0 → {v | d.admitted Z v ∧ d.ord Z v G f ≠ 0}.Finite
+def LawA3' : Prop :=
+  ∀ Z {G : WTZ E} {f : AC Z}, f ∈ AG Z G → f ≠ 0 → {v | d.admitted Z v ∧ d.ord Z v G f ≠ 0}.Finite
 
 def A4Selection (sel : Fin d.del → Fin d.np) : Prop :=
-  ∃ e : ∀ Z, AC Z, (∀ Z, e Z ∈ AG Z d.wF ∧ e Z ≠ 0) ∧
-    (∀ p : Fin d.del → MvPolynomial (TVar d.D d.N) c.F,
-      (∀ Z, ∑ k, d.sH Z (p k) *
-        algebraMap (Om Z) (OmS (Om Z) d.D d.N) (ratio (Ω := Om Z) (d.thp (sel k) Z) (e Z)) = 0) →
-      ∀ k, p k = 0) ∧
-    (∀ y : ∀ Z, OmS (Om Z) d.D d.N, ∃ q : MvPolynomial (TVar d.D d.N) c.F, (∀ Z, d.sH Z q ≠ 0) ∧
-      ∃ p : Fin d.del → MvPolynomial (TVar d.D d.N) c.F, ∀ Z, d.sH Z q * y Z = ∑ k, d.sH Z (p k) *
-        algebraMap (Om Z) (OmS (Om Z) d.D d.N) (ratio (Ω := Om Z) (d.thp (sel k) Z) (e Z)))
+  ∃ e : ∀ Z, AC Z,
+    (∀ Z, e Z ∈ AG Z d.wF ∧ e Z ≠ 0)
+      ∧ (∀ p : Fin d.del → MvPolynomial (TVar d.D d.N) c.F,
+        (∀ Z,
+            ∑ k, d.sH Z (p k) *
+                algebraMap (Om Z) (OmS (Om Z) d.D d.N) (ratio (Ω := Om Z) (d.thp (sel k) Z) (e Z))
+              = 0)
+          → ∀ k, p k = 0)
+      ∧ (∀ y : ∀ Z, OmS (Om Z) d.D d.N, ∃ q : MvPolynomial (TVar d.D d.N) c.F,
+        (∀ Z, d.sH Z q ≠ 0)
+          ∧ ∃ p : Fin d.del → MvPolynomial (TVar d.D d.N) c.F, ∀ Z,
+            d.sH Z q * y Z
+              = ∑ k, d.sH Z (p k) *
+                algebraMap (Om Z) (OmS (Om Z) d.D d.N) (ratio (Ω := Om Z) (d.thp (sel k) Z) (e Z)))
 
 def A13Measurable : Prop :=
-  ∀ Z (sg : c.F →+* ℂ) {G : WTZ E} {f : AC Z}, f ∈ AG Z G → f ≠ 0 →
-    AEMeasurable (fun t : Fin d.D → Metric.sphere (0 : EuclideanSpace ℂ (Fin (d.N + 1))) 1 =>
-      ∑ᶠ P ∈ d.ST Z sg (fun i j => (t i : EuclideanSpace ℂ (Fin (d.N + 1))) j),
-        Real.log (d.nrm Z G f P)) d.sphMeasure
+  ∀ Z (sg : c.F →+* ℂ) {G : WTZ E} {f : AC Z},
+    f ∈ AG Z G → f ≠ 0
+      → AEMeasurable
+        (fun t : Fin d.D → Metric.sphere (0 : EuclideanSpace ℂ (Fin (d.N + 1))) 1 =>
+          ∑ᶠ P ∈ d.ST Z sg (fun i j => (t i : EuclideanSpace ℂ (Fin (d.N + 1))) j),
+            Real.log (d.nrm Z G f P))
+        d.sphMeasure
 
 def NumOK : Prop :=
-  3 ≤ d.D ∧ 1 ≤ d.i ∧ 1 ≤ d.g0 ∧ 0 ≤ d.cc ∧ d.cc ≤ 1 ∧ d.cc * d.g0 ≤ 1 / 2 ∧ 1 ≤ d.wsize d.wL ∧
-  d.DF ≤ d.wsize d.wL ∧ Real.log (d.N + 1 : ℕ) + 1 / 2 ≤ d.Prw * (d.wsize d.wL - 1) ∧
-  Real.log (Module.finrank ℚ c.F) ≤ d.PO ∧
-  Real.log (|(NumberField.discr c.F : ℝ)| ^ (1 / (Module.finrank ℚ c.F : ℝ))) ≤ d.PO ∧
-  (1 ≤ d.PN ∧ 1 ≤ d.PQ ∧ 1 ≤ d.tableDegreeThreeBase ∧ 1 ≤ d.PP0' ∧ 1 ≤ d.Pd ∧ 1 ≤ d.Gc ∧ 1 ≤ d.PI4 ∧
-    1 ≤ d.Pet ∧ 1 ≤ d.tableLineDegreeFive ∧ 1 ≤ d.tableLineDegreeTwo ∧ 1 ≤ d.Prw ∧ 1 ≤ d.PO)
+  3 ≤ d.D ∧ 1 ≤ d.i ∧ 1 ≤ d.g0 ∧ 0 ≤ d.cc ∧ d.cc ≤ 1 ∧ d.cc * d.g0 ≤ 1 / 2 ∧ 1 ≤ d.wsize d.wL
+    ∧ d.DF ≤ d.wsize d.wL ∧ Real.log (d.N + 1 : ℕ) + 1 / 2 ≤ d.Prw * (d.wsize d.wL - 1)
+    ∧ Real.log (Module.finrank ℚ c.F) ≤ d.PO
+    ∧ Real.log (|(NumberField.discr c.F : ℝ)| ^ (1 / (Module.finrank ℚ c.F : ℝ))) ≤ d.PO
+    ∧ (1 ≤ d.PN ∧ 1 ≤ d.PQ ∧ 1 ≤ d.tableDegreeThreeBase ∧ 1 ≤ d.PP0' ∧ 1 ≤ d.Pd ∧ 1 ≤ d.Gc
+      ∧ 1 ≤ d.PI4 ∧ 1 ≤ d.Pet ∧ 1 ≤ d.tableLineDegreeFive ∧ 1 ≤ d.tableLineDegreeTwo ∧ 1 ≤ d.Prw
+      ∧ 1 ≤ d.PO)
 
 end Laws
 
-theorem valC_ne_zero {h : GenFrEx Xo c} {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c} {Z : Comp Xo c}
-    (hf : evC h Z f ≠ 0) : valC h a n f Z ≠ 0 := by
+theorem valC_ne_zero
+    {h : GenFrEx Xo c} {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c} {Z : Comp Xo c}
+    (hf : evC h Z f ≠ 0)
+    : valC h a n f Z ≠ 0 := by
   intro hz
   apply hf
   have := congrArg (fun x : AC Z => x.coeff (wtZ a n)) hz
@@ -157,36 +181,64 @@ theorem valC_ne_zero {h : GenFrEx Xo c} {a : (E →+* ℂ) × ℕ → ℕ} {n : 
 
 section AxHOf
 
-variable (h : GenFrEx Xo c)
-    (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
-    (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
-    (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
-    (Dd N T i g0 : ℕ) (cc : ℝ) (uL uF uka ude uet uta1 uta2 : WtR E)
-    (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
-    (np : ℕ) (thpR : Fin np → Rul Xo c) (n0 : ℕ) (th0R : Fin n0 → Rul Xo c) (uF0 : WtR E)
-    (nk : ℕ) (thkR : Fin nk → Rul Xo c) (MR : Set (Rul Xo c)) (etR ta1R ta2R : Rul Xo c)
-    (nu : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F) → ℝ)
-    (ip : (c.F →+* ℂ) → (∀ Z : Comp Xo c, AC Z) → (∀ Z : Comp Xo c, AC Z) → ℂ)
-    (wsize : WTZ E → ℝ) (DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r : ℝ)
+variable
+  (h : GenFrEx Xo c) (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
+  (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
+  (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
+  (Dd N T i g0 : ℕ)
+  (cc : ℝ) (uL uF uka ude uet uta1 uta2 : WtR E) (wR : Fin (N + 1) → Rul Xo c)
+  (jc : Comp Xo c → Fin (N + 1))
+  (np : ℕ) (thpR : Fin np → Rul Xo c)
+  (n0 : ℕ) (th0R : Fin n0 → Rul Xo c)
+  (uF0 : WtR E)
+  (nk : ℕ) (thkR : Fin nk → Rul Xo c)
+  (MR : Set (Rul Xo c)) (etR ta1R ta2R : Rul Xo c)
+  (nu : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F) → ℝ)
+  (ip : (c.F →+* ℂ) → (∀ Z : Comp Xo c, AC Z) → (∀ Z : Comp Xo c, AC Z) → ℂ) (wsize : WTZ E → ℝ)
+  (DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f
+    r
+    : ℝ)
 
-def axHOf (hne : CompNe Xo c) (hfg : FnFG Xo c) (htr : FnTrdeg Xo c Dd) (hac : FnAlgClosed (Xo := Xo) (c := c))
-    (hwb : ∀ Z, evC h Z (wR (jc Z)) ≠ 0) (het : NZAt h etR) (hta1 : NZAt h ta1R) (hta2 : NZAt h ta2R)
-    (huet : wtZ uet.1 uet.2 = (i * g0) • wtZ ude.1 ude.2)
+def axHOf
+    (hne : CompNe Xo c) (hfg : FnFG Xo c) (htr : FnTrdeg Xo c Dd)
+    (hac : FnAlgClosed (Xo := Xo) (c := c)) (hwb : ∀ Z, evC h Z (wR (jc Z)) ≠ 0) (het : NZAt h etR)
+    (hta1 : NZAt h ta1R) (hta2 : NZAt h ta2R) (huet : wtZ uet.1 uet.2 = (i * g0) • wtZ ude.1 ude.2)
     (huta1 : wtZ uta1.1 uta1.2 = (2 : ℕ) • (wtZ uL.1 uL.2 - wtZ ude.1 ude.2))
-    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
-    (hfn : FnNe Xo c fn) (hconj : FnConj Xo c fn yP)
-    (hbdd : LawBdd (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
-    (ha1 : A1Bigness (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
-    (ha2 : A2RegularityOrders (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
-    (ha3' : LawA3' (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
-    (sel : Fin (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r).del → Fin np)
-    (ha4 : A4Selection (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r) sel)
-    (hnum : NumOK (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
-    (ha13 : A13Measurable (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r)) :
-    (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r).AxH (fun Z => AG Z) := by
+    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2) (hfn : FnNe Xo c fn)
+    (hconj : FnConj Xo c fn yP)
+    (hbdd : LawBdd (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0
+      th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    (ha1 : A1Bigness (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0
+      th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    (ha2 : A2RegularityOrders (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np
+      thpR n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc
+      PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    (ha3' : LawA3' (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0
+      th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    (sel : Fin (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R
+        uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO f r).del
+      → Fin np)
+    (ha4 : A4Selection
+      (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR
+        MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO f r)
+      sel)
+    (hnum : NumOK (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R
+      uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    (ha13 : A13Measurable (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR
+      n0 th0R uF0 nk thkR MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4
+      Pet tableLineDegreeFive tableLineDegreeTwo Prw PO f r))
+    : (dataOf h δ fn yP Dd N T i g0 cc uL uF uka ude uet uta1 uta2 wR jc np thpR n0 th0R uF0 nk thkR
+      MR etR ta1R ta2R nu ip wsize DF PN PQ tableDegreeThreeBase PP0' Pd Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO f r).AxH (fun Z => AG Z) := by
   obtain ⟨hD, hi, hg, hc0, hc1, hcg, hL, hDF, hrw, hnK, hrd, hP⟩ := hnum
-  exact
-  { nonempty := hne
+  exact {
+    nonempty := hne
     tower := fun _ => inferInstance
     towerO := fun _ => inferInstance
     D_ge := hD
@@ -244,7 +296,8 @@ def axHOf (hne : CompNe Xo c) (hfg : FnFG Xo c) (htr : FnTrdeg Xo c Dd) (hac : F
     nK_le := hnK
     rd_le := hrd
     P_ge := hP
-    a13 := ha13 }
+    a13 := ha13
+  }
 
 end AxHOf
 

@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InLat2
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -26,8 +28,10 @@ def wM (b : GL (Fin d) K) : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) K :=
   fromBlocks (b : Matrix (Fin d) (Fin d) K) b b (-(b : Matrix (Fin d) (Fin d) K))
 
 def wMi (b : GL (Fin d) K) : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) K :=
-  (2 : K)⁻¹ • fromBlocks ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K) ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K)
-    ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K) (-((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K))
+  (2 : K)⁻¹ • fromBlocks ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K)
+    ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K)
+    ((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K)
+    (-((b⁻¹ : GL (Fin d) K) : Matrix (Fin d) (Fin d) K))
 
 lemma two_blocks (h2 : (2 : K) ≠ 0) :
     (2 : K)⁻¹ • fromBlocks (1 + 1 : Matrix (Fin d) (Fin d) K) (0 : Matrix (Fin d) (Fin d) K) (0 : Matrix (Fin d) (Fin d) K) (1 + 1 : Matrix (Fin d) (Fin d) K) = 1 := by

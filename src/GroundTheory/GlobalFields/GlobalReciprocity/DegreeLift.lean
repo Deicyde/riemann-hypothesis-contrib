@@ -9,15 +9,17 @@ namespace GroundTheory.Global
 
 namespace Cyclotomic
 
-open IsDedekindDomain NumberField IntermediateField GroundTheory.LocalField.Abstract ProfiniteInteger
+open IsDedekindDomain NumberField IntermediateField GroundTheory.LocalField.Abstract
+  ProfiniteInteger
 open scoped Pointwise GroundTheory.LocalField.Abstract
 
 noncomputable section
 
 section FiniteLevel
 
-theorem exists_pnat_forall_dvd (t : ℤ̂) (ht : ∀ q : Nat.Primes, toPadicInt q t ≠ 0) {g : ℕ}
-    (hg : 0 < g) : ∃ m : ℕ+, ∀ k : ℤ, proj m ((k : ℤ̂) * t) = 0 → (g : ℤ) ∣ k := by
+theorem exists_pnat_forall_dvd
+    (t : ℤ̂) (ht : ∀ q : Nat.Primes, toPadicInt q t ≠ 0) {g : ℕ} (hg : 0 < g)
+    : ∃ m : ℕ+, ∀ k : ℤ, proj m ((k : ℤ̂) * t) = 0 → (g : ℤ) ∣ k := by
   have hs : ∀ q : Nat.Primes, ∃ s : ℕ, ‖((q : ℕ) : ℤ_[q]) ^ s‖ < ‖toPadicInt q t‖ := fun q ↦ by
     have h1 : ‖((q : ℕ) : ℤ_[q])‖ < 1 := by
       rw [PadicInt.norm_p]
@@ -27,10 +29,13 @@ theorem exists_pnat_forall_dvd (t : ℤ̂) (ht : ∀ q : Nat.Primes, toPadicInt 
   choose s hs using hs
   let c : ℕ → ℕ := fun p ↦ if hp : p.Prime then p ^ s ⟨p, hp⟩ else 1
   set m : ℕ := g * ∏ p ∈ g.primeFactors, c p with hm
-  have hm0 : 0 < m := Nat.mul_pos hg (Finset.prod_pos fun p _ ↦ by
-    unfold c; split_ifs with hp
-    · exact pow_pos hp.pos _
-    · exact one_pos)
+  have hm0 : 0 < m :=
+    Nat.mul_pos hg
+      (Finset.prod_pos fun p _ ↦ by
+        unfold c
+        split_ifs with hp
+        · exact pow_pos hp.pos _
+        · exact one_pos)
   refine ⟨⟨m, hm0⟩, fun k hk ↦ ?_⟩
   obtain ⟨z, hz⟩ := exists_eq_nsmul_of_proj_eq_zero hk
   rw [Int.natCast_dvd]
@@ -58,11 +63,12 @@ theorem exists_pnat_forall_dvd (t : ℤ̂) (ht : ∀ q : Nat.Primes, toPadicInt 
   have hk : ‖((k : ℤ) : ℤ_[q])‖ ≤ ‖((p ^ j : ℕ) : ℤ_[q])‖ := by
     have h1 : ‖((k : ℤ) : ℤ_[q])‖ * ‖toPadicInt q t‖ ≤ ‖((g : ℕ) : ℤ_[q])‖ * ‖toPadicInt q t‖ := by
       rw [← norm_mul, hq, norm_mul, hm, Nat.cast_mul, norm_mul]
-      calc ‖((g : ℕ) : ℤ_[q])‖ * ‖((∏ p ∈ g.primeFactors, c p : ℕ) : ℤ_[q])‖ * ‖toPadicInt q z‖
-          ≤ ‖((g : ℕ) : ℤ_[q])‖ * ‖((∏ p ∈ g.primeFactors, c p : ℕ) : ℤ_[q])‖ :=
-            mul_le_of_le_one_right (by positivity) (PadicInt.norm_le_one _)
+      calc
+        ‖((g : ℕ) : ℤ_[q])‖ * ‖((∏ p ∈ g.primeFactors, c p : ℕ) : ℤ_[q])‖ * ‖toPadicInt q z‖
+            ≤ ‖((g : ℕ) : ℤ_[q])‖ * ‖((∏ p ∈ g.primeFactors, c p : ℕ) : ℤ_[q])‖ :=
+          mul_le_of_le_one_right (by positivity) (PadicInt.norm_le_one _)
         _ ≤ ‖((g : ℕ) : ℤ_[q])‖ * ‖toPadicInt q t‖ :=
-            mul_le_mul_of_nonneg_left (hprod.trans (hs q).le) (norm_nonneg _)
+          mul_le_mul_of_nonneg_left (hprod.trans (hs q).le) (norm_nonneg _)
     exact (le_of_mul_le_mul_right h1 htq).trans hgp
   rw [Nat.cast_pow, norm_pow, PadicInt.norm_p] at hk
   have hk' : ‖((k : ℤ) : ℤ_[q])‖ ≤ (p : ℝ) ^ (-(j : ℤ)) := by
@@ -79,8 +85,10 @@ local notation "ℚ̄" => AlgebraicClosure ℚ
 variable (P : Ideal (𝓞 ℚ̄))
 
 def decompositionDegreeImageIn (L : IntermediateField ℚ ℚ̄) : AddSubgroup ℤ̂ where
-  carrier := (fun σ ↦ Multiplicative.toAdd (degree σ)) ''
-    ((MulAction.stabilizer Gal(ℚ̄/ℚ) P ⊓ L.fixingSubgroup : Subgroup Gal(ℚ̄/ℚ)) : Set Gal(ℚ̄/ℚ))
+  carrier :=
+    (fun σ ↦ Multiplicative.toAdd (degree σ))
+      '' ((MulAction.stabilizer Gal(ℚ̄/ℚ) P ⊓ L.fixingSubgroup : Subgroup Gal(ℚ̄/ℚ))
+        : Set Gal(ℚ̄/ℚ))
   add_mem' := by
     rintro _ _ ⟨σ, hσ, rfl⟩ ⟨τ, hτ, rfl⟩
     exact ⟨σ * τ, mul_mem hσ hτ, by simp⟩
@@ -89,29 +97,46 @@ def decompositionDegreeImageIn (L : IntermediateField ℚ ℚ̄) : AddSubgroup �
     rintro _ ⟨σ, hσ, rfl⟩
     exact ⟨σ⁻¹, inv_mem hσ, by simp⟩
 
-theorem isClosed_decompositionDegreeImageIn (L : IntermediateField ℚ ℚ̄) :
-    IsClosed (decompositionDegreeImageIn P L : Set ℤ̂) :=
+theorem isClosed_decompositionDegreeImageIn (L : IntermediateField ℚ ℚ̄)
+    : IsClosed (decompositionDegreeImageIn P L : Set ℤ̂) :=
   (((isClosed_stabilizer P).inter (InfiniteGalois.fixingSubgroup_isClosed L)).isCompact.image
     (continuous_toAdd.comp continuous_degree)).isClosed
 
-theorem exists_mem_decompositionDegreeImageIn_ne_zero [P.IsPrime] (p : ℕ) [Fact p.Prime]
-    [P.LiesOver (Ideal.span {(p : ℤ)})] (L : GroundTheory.Global.FiniteSubfield) (q : Nat.Primes) : ∃ e ∈ decompositionDegreeImageIn P L.1, toPadicInt q e ≠ 0 := by
+theorem exists_mem_decompositionDegreeImageIn_ne_zero
+    [P.IsPrime]
+    (p : ℕ) [Fact p.Prime] [P.LiesOver (Ideal.span {(p : ℤ)})]
+    (L : GroundTheory.Global.FiniteSubfield) (q : Nat.Primes)
+    : ∃ e ∈ decompositionDegreeImageIn P L.1, toPadicInt q e ≠ 0 := by
   obtain ⟨σ, hσP, hσq⟩ := exists_mem_stabilizer_degreeComponent_ne_one (p := p) P q
   set N := (FiniteSubfield.galoisClosure L).1.fixingSubgroup
   have : N.Normal := CyclotomicSymbol.fixingSubgroup_normal (FiniteSubfield.galoisClosure L)
   have hn : N.index ≠ 0 := Subgroup.FiniteIndex.index_ne_zero
-  refine ⟨_, ⟨σ ^ N.index, ⟨pow_mem hσP _, IntermediateField.fixingSubgroup_le
-    (show L.1 ≤ (FiniteSubfield.galoisClosure L).1 from FiniteSubfield.le_galoisClosure L)
-    (N.pow_index_mem σ)⟩, rfl⟩, ?_⟩
+  refine ⟨
+    _,
+    ⟨
+      σ ^ N.index,
+      ⟨
+        pow_mem hσP _,
+        IntermediateField.fixingSubgroup_le
+          (show L.1 ≤ (FiniteSubfield.galoisClosure L).1 from FiniteSubfield.le_galoisClosure L)
+          (N.pow_index_mem σ)
+      ⟩,
+      rfl
+    ⟩,
+    ?_
+  ⟩
   show toPadicInt q (Multiplicative.toAdd (degree (σ ^ N.index))) ≠ 0
   rw [map_pow, toAdd_pow, map_nsmul, toPadicInt_degree, nsmul_eq_mul]
   refine mul_ne_zero (Nat.cast_ne_zero (R := ℤ_[q]).2 hn) fun h ↦ hσq ?_
   rw [← ofAdd_toAdd (degreeComponent q σ), h, ofAdd_zero]
 
-theorem exists_mem_stabilizer_toPadicInt_ne_zero [P.IsPrime] (p : ℕ) [Fact p.Prime]
-    [P.LiesOver (Ideal.span {(p : ℤ)})] (L : GroundTheory.Global.FiniteSubfield) (σ₀ : Gal(ℚ̄/ℚ)) :
-    ∃ h ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P, h ∈ L.1.fixingSubgroup ∧
-      ∀ q : Nat.Primes, toPadicInt q (Multiplicative.toAdd (degree (σ₀ * h))) ≠ 0 := by
+theorem exists_mem_stabilizer_toPadicInt_ne_zero
+    [P.IsPrime]
+    (p : ℕ) [Fact p.Prime] [P.LiesOver (Ideal.span {(p : ℤ)})]
+    (L : GroundTheory.Global.FiniteSubfield) (σ₀ : Gal(ℚ̄/ℚ))
+    : ∃ h ∈ MulAction.stabilizer Gal(ℚ̄/ℚ) P,
+      h ∈ L.1.fixingSubgroup
+        ∧ ∀ q : Nat.Primes, toPadicInt q (Multiplicative.toAdd (degree (σ₀ * h))) ≠ 0 := by
   classical
   choose e he he0 using exists_mem_decompositionDegreeImageIn_ne_zero P p L
   set t₀ := Multiplicative.toAdd (degree σ₀)

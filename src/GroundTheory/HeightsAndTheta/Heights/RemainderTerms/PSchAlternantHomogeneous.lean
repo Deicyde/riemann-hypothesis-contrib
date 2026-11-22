@@ -20,8 +20,8 @@ theorem SchAlternantHomogeneous.proof : SchAlternantHomogeneous.Statement := by
   intro σ _
   have h : IsHomogeneous (∏ i, (X (σ i) : MvPolynomial ι ℚ) ^ e i) (∑ i, e i) :=
     IsHomogeneous.prod _ _ _ (fun i _ => isHomogeneous_X_pow _ _)
-  rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with hs | hs <;>
-    simp only [hs, Matrix.of_apply, one_smul, Units.neg_smul]
+  rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with hs | hs
+    <;> simp only [hs, Matrix.of_apply, one_smul, Units.neg_smul]
   · exact h
   · exact h.neg
 

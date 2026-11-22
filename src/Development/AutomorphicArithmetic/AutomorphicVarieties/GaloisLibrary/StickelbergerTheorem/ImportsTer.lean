@@ -7,10 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.Stick.teich :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) [Fact p.Prime] (π : R →+* ZMod p) (M d : ℕ) (ζ : R),
-    IsPrimitiveRoot ζ M → IsPrimitiveRoot (π ζ) M → M * d = p - 1 →
-    ∃ χ : MulChar (ZMod p) R, (∀ x : ZMod p, x ≠ 0 → χ x ^ M = 1 ∧ π (χ x) = x ^ d) ∧ orderOf χ = M := by
+theorem UpperTheory.V.Stick.teich
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) [Fact p.Prime] (π : R →+* ZMod p) (M d : ℕ)
+        (ζ : R),
+      IsPrimitiveRoot ζ M → IsPrimitiveRoot (π ζ) M → M * d = p - 1
+        → ∃ χ : MulChar (ZMod p) R,
+          (∀ x : ZMod p, x ≠ 0 → χ x ^ M = 1 ∧ π (χ x) = x ^ d) ∧ orderOf χ = M := by
   intro R _ _ p hp π M d ζ hζ hv hMd
   have hpp : p.Prime := hp.out
   have hM : M ≠ 0 := by
@@ -46,29 +48,30 @@ theorem UpperTheory.V.Stick.teich :
     simp only [L, dif_neg h]
     exact (E _ (P x h)).choose_spec
   have L0 : L 0 = 0 := by simp [L]
-  let χ : MulChar (ZMod p) R :=
-    { toFun := L
-      map_one' := by
-        have h1 := L1 1 one_ne_zero
-        exact U _ _ h1.1 (one_pow M) (by rw [h1.2, one_pow, map_one])
-      map_mul' := by
-        intro x y
-        by_cases hx : x = 0
-        · rw [hx, zero_mul, L0, zero_mul]
-        by_cases hy : y = 0
-        · rw [hy, mul_zero, L0, mul_zero]
-        have hxy := L1 (x * y) (mul_ne_zero hx hy)
-        have h1 := L1 x hx
-        have h2 := L1 y hy
-        refine U _ _ hxy.1 (by rw [mul_pow, h1.1, h2.1, one_mul]) ?_
-        rw [hxy.2, map_mul, h1.2, h2.2, mul_pow]
-      map_nonunit' := by
-        intro a ha
-        have : a = 0 := by
-          by_contra h
-          exact ha (isUnit_iff_ne_zero.mpr h)
-        rw [this]
-        exact L0 }
+  let χ : MulChar (ZMod p) R := {
+    toFun := L
+    map_one' := by
+      have h1 := L1 1 one_ne_zero
+      exact U _ _ h1.1 (one_pow M) (by rw [h1.2, one_pow, map_one])
+    map_mul' := by
+      intro x y
+      by_cases hx : x = 0
+      · rw [hx, zero_mul, L0, zero_mul]
+      by_cases hy : y = 0
+      · rw [hy, mul_zero, L0, mul_zero]
+      have hxy := L1 (x * y) (mul_ne_zero hx hy)
+      have h1 := L1 x hx
+      have h2 := L1 y hy
+      refine U _ _ hxy.1 (by rw [mul_pow, h1.1, h2.1, one_mul]) ?_
+      rw [hxy.2, map_mul, h1.2, h2.2, mul_pow]
+    map_nonunit' := by
+      intro a ha
+      have : a = 0 := by
+        by_contra h
+        exact ha (isUnit_iff_ne_zero.mpr h)
+      rw [this]
+      exact L0
+  }
   have hχ : ∀ x : ZMod p, x ≠ 0 → χ x ^ M = 1 ∧ π (χ x) = x ^ d := L1
   refine ⟨χ, hχ, ?_⟩
   have hpow : χ ^ M = 1 := by
@@ -81,8 +84,7 @@ theorem UpperTheory.V.Stick.teich :
     rw [orderOf_eq_card_of_forall_mem_zpowers hg, Nat.card_eq_fintype_card, ZMod.card_units]
   set k := orderOf χ with hk
   have hk1 : χ ^ k = 1 := pow_orderOf_eq_one χ
-  have hgk : (χ g) ^ k = 1 := by
-    rw [← MulChar.pow_apply_coe, hk1, MulChar.one_apply_coe]
+  have hgk : (χ g) ^ k = 1 := by rw [← MulChar.pow_apply_coe, hk1, MulChar.one_apply_coe]
   have hgdk : g ^ (d * k) = 1 := by
     apply Units.ext
     rw [Units.val_pow_eq_pow_val, Units.val_one, pow_mul, ← (hχ g g.ne_zero).2, ← map_pow, hgk,

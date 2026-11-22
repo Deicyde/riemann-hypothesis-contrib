@@ -18,7 +18,6 @@ instance fact_prime_ringChar : Fact (ringChar 𝓀[K]).Prime :=
 
 variable (p : ℕ) [CharP 𝓀[K] p]
 
-
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
 theorem valuation_intCast_le_one (n : ℤ) : valuation K (n : K) ≤ 1 :=
   (Valuation.mem_integer_iff _ _).mp (intCast_mem _ n)
@@ -36,7 +35,6 @@ theorem valuation_intCast_eq_one_iff (n : ℤ) : valuation K (n : K) = 1 ↔ ¬ 
     exact le_antisymm (valuation_intCast_le_one K n) (not_lt.mp h)
 
 variable [Fact p.Prime]
-
 
 omit [Fact p.Prime] in
 theorem valuation_p_lt_one : valuation K (p : K) < 1 := by
@@ -62,10 +60,10 @@ theorem valuation_ratCast_le_one_iff (q : ℚ) : valuation K (q : K) ≤ 1 ↔ �
     obtain ⟨m, hm⟩ := hp
     have h2 : valuation K (q.den : K) < 1 := by
       rw [hm, Nat.cast_mul, map_mul]
-      calc valuation K (p : K) * valuation K (m : K)
-          ≤ valuation K (p : K) * 1 := by
-            gcongr
-            exact_mod_cast valuation_intCast_le_one K m
+      calc
+        valuation K (p : K) * valuation K (m : K) ≤ valuation K (p : K) * 1 := by
+          gcongr
+          exact_mod_cast valuation_intCast_le_one K m
         _ < 1 := by simp [valuation_p_lt_one K p]
     rw [h1] at h
     exact absurd h (not_le.mpr h2)
@@ -76,8 +74,8 @@ theorem valuation_ratCast_le_one_iff (q : ℚ) : valuation K (q : K) ≤ 1 ↔ �
     rw [h1]
     exact valuation_intCast_le_one K q.num
 
-theorem isEquiv_comap_ratCast :
-    ((valuation K).comap (Rat.castHom K)).IsEquiv (Rat.padicValuation p) :=
+theorem isEquiv_comap_ratCast
+    : ((valuation K).comap (Rat.castHom K)).IsEquiv (Rat.padicValuation p) :=
   Valuation.isEquiv_of_val_le_one fun q => by
     simp [valuation_ratCast_le_one_iff K p, Rat.padicValuation_le_one_iff]
 
@@ -100,7 +98,9 @@ theorem continuousAt_ratHom : ContinuousAt (ratHom K p) 0 := by
     have h2 : v (WithVal.equiv v x) < v ((p : ℚ) ^ n) := by simpa [t] using h1
     have h3 := (isEquiv_comap_ratCast K p).lt_iff_lt.mpr h2
     simp only [Valuation.comap_apply, Rat.coe_castHom] at h3
-    calc valuation K (ratHom K p x) = valuation K ((WithVal.equiv v x : ℚ) : K) := rfl
+    calc
+      valuation K (ratHom K p x)
+        = valuation K ((WithVal.equiv v x : ℚ) : K) := rfl
       _ < valuation K (((p : ℚ) ^ n : ℚ) : K) := h3
       _ = valuation K (p : K) ^ n := by simp
       _ < γ := hn
@@ -124,15 +124,14 @@ theorem continuous_padicHom : Continuous (padicHom K p) :=
 
 end Uniform
 
-theorem valuation_padicHom_padicInt_le_one (x : ℤ_[p]) :
-    valuation K (padicHom K p (x : ℚ_[p])) ≤ 1 := by
+theorem valuation_padicHom_padicInt_le_one (x : ℤ_[p])
+    : valuation K (padicHom K p (x : ℚ_[p])) ≤ 1 := by
   refine PadicInt.denseRange_intCast.induction_on x ?_ fun n => ?_
   · exact (Valuation.isClosed_integer (v := valuation K)).preimage
       ((continuous_padicHom K p).comp continuous_subtype_val)
   · simpa using valuation_intCast_le_one K n
 
-theorem valuation_padicHom_le_one_iff (x : ℚ_[p]) :
-    valuation K (padicHom K p x) ≤ 1 ↔ ‖x‖ ≤ 1 := by
+theorem valuation_padicHom_le_one_iff (x : ℚ_[p]) : valuation K (padicHom K p x) ≤ 1 ↔ ‖x‖ ≤ 1 := by
   refine ⟨fun hv => ?_, fun hx => valuation_padicHom_padicInt_le_one K p ⟨x, hx⟩⟩
   by_contra hx
   have hx0 : x ≠ 0 := by
@@ -149,24 +148,23 @@ theorem valuation_padicHom_le_one_iff (x : ℚ_[p]) :
     have hp : (0 : ℝ) < p := by exact_mod_cast (Nat.Prime.pos Fact.out)
     simp only [y, mul_inv, norm_mul, norm_inv, Padic.norm_p, inv_inv] at hxinv ⊢
     rw [zpow_neg_one] at hxinv
-    calc (p : ℝ) * ‖x‖⁻¹ ≤ p * (p : ℝ)⁻¹ := by gcongr
+    calc
+      (p : ℝ) * ‖x‖⁻¹
+        ≤ p * (p : ℝ)⁻¹ := by gcongr
       _ = 1 := mul_inv_cancel₀ hp.ne'
   have hvy := valuation_padicHom_padicInt_le_one K p ⟨y, hy⟩
   simp only at hvy
   have hone : padicHom K p x * padicHom K p y * padicHom K p p = 1 := by
     rw [← map_mul, ← map_mul]
     simp [y, hx0, hp0]
-  have hvp : valuation K (padicHom K p p) < 1 := by
-    simpa using valuation_p_lt_one K p
+  have hvp : valuation K (padicHom K p p) < 1 := by simpa using valuation_p_lt_one K p
   have := congrArg (valuation K) hone
   rw [map_mul, map_mul, map_one] at this
-  have h1 : valuation K (padicHom K p x) * valuation K (padicHom K p y) ≤ 1 :=
-    mul_le_one' hv hvy
+  have h1 : valuation K (padicHom K p x) * valuation K (padicHom K p y) ≤ 1 := mul_le_one' hv hvy
   have h2 := (mul_le_of_le_one_left' h1 : _ ≤ valuation K (padicHom K p p))
   exact absurd (this ▸ h2) (not_le.mpr hvp)
 
-theorem isEquiv_comap_padicHom :
-    ((valuation K).comap (padicHom K p)).IsEquiv Padic.mulValuation :=
+theorem isEquiv_comap_padicHom : ((valuation K).comap (padicHom K p)).IsEquiv Padic.mulValuation :=
   Valuation.isEquiv_of_val_le_one fun x => by
     rw [Valuation.comap_apply, valuation_padicHom_le_one_iff]
     simpa using (GroundTheory.LocalField.Padic.mulValuation_le_iff_norm_le p x 1).symm
@@ -176,9 +174,9 @@ theorem padicHom_vle_iff (a b : ℚ_[p]) : padicHom K p a ≤ᵥ padicHom K p b 
     Valuation.Compatible.vle_iff_le (v := Padic.mulValuation)]
   simpa using (isEquiv_comap_padicHom K p).le_iff_le (x := a) (y := b)
 
-theorem finiteDimensional_padicHom :
-    letI := (padicHom K p).toAlgebra
-    FiniteDimensional ℚ_[p] K := by
+theorem finiteDimensional_padicHom
+    : letI := (padicHom K p).toAlgebra
+      FiniteDimensional ℚ_[p] K := by
   let := (padicHom K p).toAlgebra
   have : T2Space K := by
     let := IsTopologicalAddGroup.rightUniformSpace K

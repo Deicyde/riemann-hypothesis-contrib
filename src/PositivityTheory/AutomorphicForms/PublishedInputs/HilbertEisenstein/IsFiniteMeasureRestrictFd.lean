@@ -7,10 +7,13 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.HilbertEisenstei
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af
+  UpperTheory.V.Base
 open scoped Matrix SchwartzMap ContDiff
-open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd UpperTheory.V.Published
+open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd
+  UpperTheory.V.Published
 
 namespace UpperTheory.HilbertEisensteinWeightOne.EisensteinSmoothness
 
@@ -18,7 +21,8 @@ set_option linter.unusedSectionVars false
 
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-theorem integral_count_Xi (f : Xi F → ℂ) : ∫ ξ, f ξ ∂(Measure.count : Measure (Xi F)) = ∑' ξ, f ξ := by
+theorem integral_count_Xi (f : Xi F → ℂ)
+    : ∫ ξ, f ξ ∂(Measure.count : Measure (Xi F)) = ∑' ξ, f ξ := by
   by_cases hf : Summable f
   · have hi : Integrable f (Measure.count : Measure (Xi F)) := by
       rw [integrable_count_iff]
@@ -30,16 +34,21 @@ theorem integral_count_Xi (f : Xi F → ℂ) : ∫ ξ, f ξ ∂(Measure.count : 
     rw [integrable_count_iff] at hi
     exact hf (summable_norm_iff.mp hi)
 
-theorem integral_iter_eq (S : Set {r : ℝ // 0 < r}) (hS : MeasurableSet S) {h : Pp F × Xi F → ℂ}
-    (hh : Integrable h (μS F S)) :
-    IntegrableOn (fun t => ∫ u in normOneFundamentalDomain F, ∑' ξ : Xi F, h ((t, u), ξ) ∂normOneMeasure F)
-        S posRealMeasure ∧
-      ∫ t in S, ∫ u in normOneFundamentalDomain F, ∑' ξ : Xi F, h ((t, u), ξ) ∂normOneMeasure F
-          ∂posRealMeasure = ∫ q, h q ∂μS F S := by
+theorem integral_iter_eq
+    (S : Set {r : ℝ // 0 < r}) (hS : MeasurableSet S)
+    {h : Pp F × Xi F → ℂ} (hh : Integrable h (μS F S))
+    : IntegrableOn
+        (fun t => ∫ u in normOneFundamentalDomain F, ∑' ξ : Xi F, h ((t, u), ξ) ∂normOneMeasure F)
+        S posRealMeasure
+      ∧ ∫ t in S, ∫ u in normOneFundamentalDomain F, ∑' ξ : Xi F, h ((t, u), ξ) ∂normOneMeasure F
+            ∂posRealMeasure
+        = ∫ q, h q ∂μS F S := by
   have e1 : ∀ p : Pp F, ∫ ξ, h (p, ξ) ∂(Measure.count : Measure (Xi F)) = ∑' ξ : Xi F, h (p, ξ) :=
     fun p => integral_count_Xi _
-  have hG : Integrable (fun p : Pp F => ∑' ξ : Xi F, h (p, ξ))
-      ((posRealMeasure.restrict S).prod ((normOneMeasure F).restrict (normOneFundamentalDomain F))) := by
+  have hG : Integrable
+      (fun p : Pp F => ∑' ξ : Xi F, h (p, ξ))
+      ((posRealMeasure.restrict S).prod
+        ((normOneMeasure F).restrict (normOneFundamentalDomain F))) := by
     have := hh.integral_prod_left
     simp only [e1] at this
     exact this

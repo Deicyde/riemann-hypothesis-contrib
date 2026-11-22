@@ -9,8 +9,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V UpperTheory.V.PropA Formalism.GaloisCohomology
 
-theorem UpperTheory.V.PropA.qzInj :
-    ∀ (l : ℕ) [Fact l.Prime], Module.Injective ℤ_[l] (QZ l) := by
+theorem UpperTheory.V.PropA.qzInj : ∀ (l : ℕ) [Fact l.Prime], Module.Injective ℤ_[l] (QZ l) := by
   intro l _
   refine Module.Baer.injective ?_
   intro I g

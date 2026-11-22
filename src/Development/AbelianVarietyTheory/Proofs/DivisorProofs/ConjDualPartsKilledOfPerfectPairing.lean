@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.DualParts
 
-theorem card_le_of_injective_chars (G H : Type) [CommGroup G] [Finite G] (U : Type) [CommRing U]
-    [IsDomain U] (f : H → (G →* Uˣ)) (hf : Function.Injective f) :
-    Finite H ∧ Nat.card H ≤ Nat.card G := by
+theorem card_le_of_injective_chars
+    (G H : Type) [CommGroup G] [Finite G]
+    (U : Type) [CommRing U] [IsDomain U]
+    (f : H → (G →* Uˣ)) (hf : Function.Injective f)
+    : Finite H ∧ Nat.card H ≤ Nat.card G := by
   classical
   haveI := Fintype.ofFinite G
   let g : H → (G →* U) := fun h => (Units.coeHom U).comp (f h)
@@ -27,9 +29,26 @@ theorem card_le_of_injective_chars (G H : Type) [CommGroup G] [Finite G] (U : Ty
   rw [Module.finrank_fintype_fun_eq_card] at this
   simpa [Nat.card_eq_fintype_card] using this
 
-theorem conj_dual_parts : ∀ (O : Type) [CommRing O] (bar : O →+* O) (U : Type) [CommRing U] [IsDomain U] (M M' : Type) [CommGroup M] [CommGroup M'] (α : O → M →* M) (α' : O → M' →* M'), (∀ y, α 1 y = y) → (∀ a b y, α (a * b) y = α a (α b y)) → (∀ a b y, α (a + b) y = α a y * α b y) → (∀ x, α' 1 x = x) → (∀ a b x, α' (a * b) x = α' a (α' b x)) → (∀ a b x, α' (a + b) x = α' a x * α' b x) → (∀ a, bar (bar a) = a) → ∀ (e : M' →* M →* Uˣ) (e' : M →* M' →* Uˣ), Function.Injective e → Function.Injective e' → (∀ a x y, e (α' a x) y = e x (α (bar a) y)) → (∀ a y x, e' (α a y) x = e' y (α' (bar a) x)) → ∀ (u w : Ideal O) (n : ℕ), u ≤ w → u ⊔ u.map bar = ⊤ → (∀ a ∈ (u * u.map bar) ^ n, (∀ y, α a y = 1) ∧ ∀ x, α' a x = 1) → (∀ y, (∃ m : ℕ, ∀ a ∈ u ^ m, α a y = 1) → ∀ a ∈ w, α a y = 1) → Finite {y : M // ∀ a ∈ w, α a y = 1} → (∀ x, (∃ m : ℕ, ∀ a ∈ (u.map bar) ^ m, α' a x = 1) → ∀ a ∈ w.map bar, α' a x = 1) ∧ Nat.card {x : M' // ∀ a ∈ w.map bar, α' a x = 1} = Nat.card {y : M // ∀ a ∈ w, α a y = 1} := by
-  intro O _ bar U _ _ M M' _ _ α α' h1 hmul hadd h1' hmul' hadd' hbb e e' he he' hee hee' u w n huw hcop
-    hkill hw hfin
+theorem conj_dual_parts
+    : ∀ (O : Type) [CommRing O] (bar : O →+* O) (U : Type) [CommRing U] [IsDomain U] (M M' : Type)
+        [CommGroup M] [CommGroup M'] (α : O → M →* M) (α' : O → M' →* M'),
+      (∀ y, α 1 y = y) → (∀ a b y, α (a * b) y = α a (α b y))
+        → (∀ a b y, α (a + b) y = α a y * α b y) → (∀ x, α' 1 x = x)
+        → (∀ a b x, α' (a * b) x = α' a (α' b x)) → (∀ a b x, α' (a + b) x = α' a x * α' b x)
+        → (∀ a, bar (bar a) = a)
+        → ∀ (e : M' →* M →* Uˣ) (e' : M →* M' →* Uˣ),
+          Function.Injective e → Function.Injective e' → (∀ a x y, e (α' a x) y = e x (α (bar a) y))
+            → (∀ a y x, e' (α a y) x = e' y (α' (bar a) x))
+            → ∀ (u w : Ideal O) (n : ℕ),
+              u ≤ w → u ⊔ u.map bar = ⊤
+                → (∀ a ∈ (u * u.map bar) ^ n, (∀ y, α a y = 1) ∧ ∀ x, α' a x = 1)
+                → (∀ y, (∃ m : ℕ, ∀ a ∈ u ^ m, α a y = 1) → ∀ a ∈ w, α a y = 1)
+                → Finite {y : M // ∀ a ∈ w, α a y = 1}
+                → (∀ x, (∃ m : ℕ, ∀ a ∈ (u.map bar) ^ m, α' a x = 1) → ∀ a ∈ w.map bar, α' a x = 1)
+                  ∧ Nat.card {x : M' // ∀ a ∈ w.map bar, α' a x = 1}
+                    = Nat.card {y : M // ∀ a ∈ w, α a y = 1} := by
+  intro O _ bar U _ _ M M' _ _ α α' h1 hmul hadd h1' hmul' hadd' hbb e e' he he' hee hee' u w n huw
+    hcop hkill hw hfin
   have hsurj : Function.Surjective bar := fun a => ⟨bar a, hbb a⟩
   have hbarbar : (u.map bar).map bar = u := by
     rw [Ideal.map_map]
@@ -44,7 +63,8 @@ theorem conj_dual_parts : ∀ (O : Type) [CommRing O] (bar : O →+* O) (U : Typ
     exact ⟨a, ha, b, hb, hab⟩
   have hbar1 : ∀ k, ∀ a ∈ u ^ k, bar a ∈ (u.map bar) ^ k := by
     intro k a ha
-    rw [← Ideal.map_pow]; exact Ideal.mem_map_of_mem bar ha
+    rw [← Ideal.map_pow]
+    exact Ideal.mem_map_of_mem bar ha
   have hbar2 : ∀ k, ∀ b ∈ (u.map bar) ^ k, bar b ∈ u ^ k := by
     intro k b hb
     have := Ideal.mem_map_of_mem bar hb
@@ -72,34 +92,37 @@ theorem conj_dual_parts : ∀ (O : Type) [CommRing O] (bar : O →+* O) (U : Typ
       simp
     have t2 : α a (α b₀ y) = 1 := by
       refine hw (α b₀ y) ⟨m + n, fun c hc => ?_⟩ a ha
-      rw [← hmul]; exact (hkill _ (hprod (m + n) (by omega) c hc b₀ hb₀)).1 y
+      rw [← hmul]
+      exact (hkill _ (hprod (m + n) (by omega) c hc b₀ hb₀)).1 y
     rw [t1, t2, map_one, one_mul]
   refine ⟨part1, ?_⟩
 
   obtain ⟨a₀, ha₀, b₀, hb₀, hab⟩ := hsplit (n + 1)
-  let A : Subgroup M :=
-    { carrier := {y | ∀ a ∈ w, α a y = 1}
-      one_mem' := fun a _ => map_one (α a)
-      mul_mem' := fun {y z} hy hz a ha => by
-        rw [map_mul, (show ∀ a ∈ w, α a y = 1 from hy) a ha,
-          (show ∀ a ∈ w, α a z = 1 from hz) a ha, one_mul]
-      inv_mem' := fun {y} hy a ha => by
-        rw [map_inv, (show ∀ a ∈ w, α a y = 1 from hy) a ha, inv_one] }
-  let B : Subgroup M' :=
-    { carrier := {x | ∀ a ∈ w.map bar, α' a x = 1}
-      one_mem' := fun a _ => map_one (α' a)
-      mul_mem' := fun {y z} hy hz a ha => by
-        rw [map_mul, (show ∀ a ∈ w.map bar, α' a y = 1 from hy) a ha,
-          (show ∀ a ∈ w.map bar, α' a z = 1 from hz) a ha, one_mul]
-      inv_mem' := fun {y} hy a ha => by
-        rw [map_inv, (show ∀ a ∈ w.map bar, α' a y = 1 from hy) a ha, inv_one] }
+  let A : Subgroup M := {
+    carrier := {y | ∀ a ∈ w, α a y = 1}
+    one_mem' := fun a _ => map_one (α a)
+    mul_mem' := fun {y z} hy hz a ha => by
+      rw [map_mul, (show ∀ a ∈ w, α a y = 1 from hy) a ha, (show ∀ a ∈ w, α a z = 1 from hz) a ha,
+        one_mul]
+    inv_mem' := fun {y} hy a ha => by rw [map_inv, (show ∀ a ∈ w, α a y = 1 from hy) a ha, inv_one]
+  }
+  let B : Subgroup M' := {
+    carrier := {x | ∀ a ∈ w.map bar, α' a x = 1}
+    one_mem' := fun a _ => map_one (α' a)
+    mul_mem' := fun {y z} hy hz a ha => by
+      rw [map_mul, (show ∀ a ∈ w.map bar, α' a y = 1 from hy) a ha,
+        (show ∀ a ∈ w.map bar, α' a z = 1 from hz) a ha, one_mul]
+    inv_mem' := fun {y} hy a ha => by
+      rw [map_inv, (show ∀ a ∈ w.map bar, α' a y = 1 from hy) a ha, inv_one]
+  }
   have hu1 : u ^ (n + 1) ≤ u := Ideal.pow_le_self (by omega)
   have hub1 : (u.map bar) ^ (n + 1) ≤ u.map bar := Ideal.pow_le_self (by omega)
 
   have F1 : ∀ y, α b₀ y ∈ A := by
     intro y
     refine hw (α b₀ y) ⟨n + 1, fun c hc => ?_⟩
-    rw [← hmul]; exact (hkill _ (hprod (n + 1) (by omega) c hc b₀ hb₀)).1 y
+    rw [← hmul]
+    exact (hkill _ (hprod (n + 1) (by omega) c hc b₀ hb₀)).1 y
   have F2 : ∀ x ∈ B, α' (bar a₀) x = 1 := fun x hx =>
     hx _ (Ideal.map_mono huw (hub1 (hbar1 _ a₀ ha₀)))
   have E1 : ∀ x ∈ B, ∀ y, e x y = e x (α b₀ y) := by
@@ -110,7 +133,8 @@ theorem conj_dual_parts : ∀ (O : Type) [CommRing O] (bar : O →+* O) (U : Typ
   have F3 : ∀ x, α' a₀ x ∈ B := by
     intro x
     refine part1 (α' a₀ x) ⟨n + 1, fun c hc => ?_⟩
-    rw [← hmul', mul_comm]; exact (hkill _ (hprod (n + 1) (by omega) a₀ ha₀ c hc)).2 x
+    rw [← hmul', mul_comm]
+    exact (hkill _ (hprod (n + 1) (by omega) a₀ ha₀ c hc)).2 x
   have F4 : ∀ y ∈ A, α (bar b₀) y = 1 := fun y hy => hy _ (huw (hu1 (hbar2 _ b₀ hb₀)))
   have E2 : ∀ y ∈ A, ∀ x, e' y x = e' y (α' a₀ x) := by
     intro y hy x

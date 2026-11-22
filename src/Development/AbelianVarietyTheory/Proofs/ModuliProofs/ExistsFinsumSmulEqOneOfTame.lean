@@ -10,19 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSumSmul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct Pointwise in
-theorem _root_.GlobalTheory.exists_finsum_smul_eq_one_of_tame :
-    ∀ (Γ : Type) [Group Γ] [Finite Γ] (B : Type) [CommRing B] [MulSemiringAction Γ B],
-      (∀ q : Ideal B, q.IsPrime → (Nat.card (q.inertia Γ) : B) ∉ q) →
-        ∃ b : B, ∑ᶠ g : Γ, g • b = 1 := by
+theorem _root_.GlobalTheory.exists_finsum_smul_eq_one_of_tame
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (B : Type) [CommRing B] [MulSemiringAction Γ B],
+      (∀ q : Ideal B, q.IsPrime → (Nat.card (q.inertia Γ) : B) ∉ q)
+        → ∃ b : B, ∑ᶠ g : Γ, g • b = 1 := by
   intro Γ _ _ B _ _ htame
   classical
   haveI := Fintype.ofFinite Γ
@@ -61,11 +63,11 @@ theorem _root_.GlobalTheory.exists_finsum_smul_eq_one_of_tame :
     rw [this]
     exact m.zero_mem
   obtain ⟨Q, hQ, hQm⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral m hker
-  obtain ⟨n, c, d, s, hs, hsep⟩ := _root_.GlobalTheory.exists_sum_smul_separating_inertia Γ B Q hQ.isPrime
+  obtain ⟨n, c, d, s, hs, hsep⟩ :=
+    _root_.GlobalTheory.exists_sum_smul_separating_inertia Γ B Q hQ.isPrime
   have trace_mem : ∀ j, ∑ g : Γ, g • c j ∈ Q := by
     intro j
-    have hmemT : (⟨∑ g : Γ, g • c j, tr_inv (c j)⟩ : A) ∈ T :=
-      Ideal.subset_span ⟨c j, rfl⟩
+    have hmemT : (⟨∑ g : Γ, g • c j, tr_inv (c j)⟩ : A) ∈ T := Ideal.subset_span ⟨c j, rfl⟩
     have := hTm hmemT
     rw [← hQm, Ideal.mem_comap] at this
     exact this
@@ -79,8 +81,9 @@ theorem _root_.GlobalTheory.exists_finsum_smul_eq_one_of_tame :
     split_ifs with hg
     · exact (hsep g).1 hg
     · simpa using (hsep g).2 hg
-  rw [Finset.sum_sub_distrib, Finset.sum_ite, Finset.sum_const_zero, add_zero,
-    Finset.sum_const, nsmul_eq_mul] at hdiff
+  rw [Finset.sum_sub_distrib, Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
+      nsmul_eq_mul]
+    at hdiff
   have hcs := Q.sub_mem hz hdiff
   rw [sub_sub_cancel] at hcs
   rcases hQ.isPrime.mem_or_mem hcs with hc | hc

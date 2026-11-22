@@ -8,11 +8,13 @@ namespace Formalism.InvariantFactorPaths.L4
 
 open Finset
 
-theorem eArith_ge : ∀ (s : ℕ) (ka : ℕ → ℤ) (β : ℕ → ℕ) (c : ℤ),
-    (∀ i, i + 1 < s → ka (i + 1) + β (i + 1) ≤ ka i) → (0 < s → ka 0 + β 0 ≤ c) →
-    (∑ a ∈ range s, (β a : ℤ)) ≤
-      (c - (∑ a ∈ range s, (β a : ℤ)) + 1) * (∑ a ∈ range s, (β a : ℤ)) - (∑ a ∈ range s, (β a : ℤ) * ka a) +
-        ∑ b ∈ range s, ∑ a ∈ range b, ((β a : ℤ) + 1) * (β b : ℤ) := by
+theorem eArith_ge
+    : ∀ (s : ℕ) (ka : ℕ → ℤ) (β : ℕ → ℕ) (c : ℤ),
+      (∀ i, i + 1 < s → ka (i + 1) + β (i + 1) ≤ ka i) → (0 < s → ka 0 + β 0 ≤ c)
+        → (∑ a ∈ range s, (β a : ℤ))
+          ≤ (c - (∑ a ∈ range s, (β a : ℤ)) + 1) * (∑ a ∈ range s, (β a : ℤ))
+            - (∑ a ∈ range s, (β a : ℤ) * ka a)
+            + ∑ b ∈ range s, ∑ a ∈ range b, ((β a : ℤ) + 1) * (β b : ℤ) := by
   intro s ka β c h1 h2
   have key : ∀ a, a < s → ka a + ∑ a' ∈ range (a + 1), (β a' : ℤ) ≤ c := by
     intro a
@@ -33,7 +35,8 @@ theorem eArith_ge : ∀ (s : ℕ) (ka : ℕ → ℤ) (β : ℕ → ℕ) (c : ℤ
     have IH := ihs (fun i hi => h1 i (by omega)) (fun a ha => key a (by omega))
     have hk := key s (by omega)
     rw [Finset.sum_range_succ] at hk
-    have hinner : ∑ a ∈ range s, ((β a : ℤ) + 1) * (β s : ℤ) = (∑ a ∈ range s, (β a : ℤ) + s) * β s := by
+    have hinner
+        : ∑ a ∈ range s, ((β a : ℤ) + 1) * (β s : ℤ) = (∑ a ∈ range s, (β a : ℤ) + s) * β s := by
       rw [← Finset.sum_mul, Finset.sum_add_distrib]
       simp
     simp only [Finset.sum_range_succ, hinner]

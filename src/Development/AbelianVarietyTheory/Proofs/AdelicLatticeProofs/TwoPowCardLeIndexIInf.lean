@@ -10,10 +10,10 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem two_pow_card_le_index_iInf :
-    ∀ (G ι : Type) [CommGroup G] [Fintype ι] (K : ι → Subgroup G),
-      (∀ i, ∃ x, x ∉ K i ∧ ∀ j, j ≠ i → x ∈ K j) → (⨅ i, K i).index ≠ 0 →
-        2 ^ Fintype.card ι ≤ (⨅ i, K i).index := by
+theorem two_pow_card_le_index_iInf
+    : ∀ (G ι : Type) [CommGroup G] [Fintype ι] (K : ι → Subgroup G),
+      (∀ i, ∃ x, x ∉ K i ∧ ∀ j, j ≠ i → x ∈ K j) → (⨅ i, K i).index ≠ 0
+        → 2 ^ Fintype.card ι ≤ (⨅ i, K i).index := by
   intro G ι _ _ K h hidx
   classical
   choose x hx hx' using h
@@ -28,8 +28,7 @@ theorem two_pow_card_le_index_iInf :
     · intro hj
       exact Subgroup.prod_mem _ fun i hi => hx' i j (fun e => hj (e ▸ hi))
   haveI : Finite (G ⧸ ⨅ i, K i) := Nat.finite_of_card_ne_zero hidx
-  have inj : Function.Injective
-      (fun A : Finset ι => ((∏ i ∈ A, x i : G) : G ⧸ ⨅ i, K i)) := by
+  have inj : Function.Injective (fun A : Finset ι => ((∏ i ∈ A, x i : G) : G ⧸ ⨅ i, K i)) := by
     intro A B hAB
     have hm : (∏ i ∈ A, x i)⁻¹ * (∏ i ∈ B, x i) ∈ ⨅ i, K i := QuotientGroup.eq.1 hAB
     ext j

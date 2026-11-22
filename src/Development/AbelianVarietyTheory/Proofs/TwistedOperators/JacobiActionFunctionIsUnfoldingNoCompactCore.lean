@@ -18,8 +18,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
@@ -27,15 +31,29 @@ open GlobalTheory.Unf.FB
 
 noncomputable section
 
-
 open GlobalTheory.ThLaws in
-theorem GlobalTheory.th_isTh_lev : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (σ : ℕ) (J : JacL D (σ + 1)) (B : BesL D σ) (y : WO J.W₀ B.L → ℂ), GlobalTheory.Unf.FB.Quasi ψ J.W₀ B.L y → ∀ x₀ : Matrix (Fin B.V.rank) (Fin (σ + 1)) D.host.E, (rat x₀ : Mx D B.V.rank (σ + 1)) = xLast B.d (vecB B.o B.ζ) → IsTh ψ J.d B.V x₀ (fun n => star (jacS ψ J.d B.L (zEll B.L (σ + 1) B.ζ) n y 0) * star (psiFlag ψ J.d n)) := by
+theorem GlobalTheory.th_isTh_lev
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (σ : ℕ) (J : JacL D (σ + 1)) (B : BesL D σ) (y : WO J.W₀ B.L → ℂ),
+          GlobalTheory.Unf.FB.Quasi ψ J.W₀ B.L y
+            → ∀ x₀ : Matrix (Fin B.V.rank) (Fin (σ + 1)) D.host.E,
+              (rat x₀ : Mx D B.V.rank (σ + 1)) = xLast B.d (vecB B.o B.ζ)
+                → IsTh ψ J.d B.V x₀ (fun n =>
+                  star (jacS ψ J.d B.L (zEll B.L (σ + 1) B.ζ) n y 0) * star (psiFlag ψ J.d n)) := by
   intro D ψ hψ σ J B y hy x₀ hx₀
-  obtain ⟨hcont, -, hleft, hcen, -, -⟩ := GlobalTheory.T.jacobiActionUnipotent_laws D ψ hψ σ J B y hy
+  obtain ⟨hcont, -, hleft, hcen, -, -⟩ :=
+    GlobalTheory.T.jacobiActionUnipotent_laws D ψ hψ σ J B y hy
   beta_reduce at hcen hleft
-  obtain ⟨x₁, hx₁, -, -, hlast, hq⟩ := GlobalTheory.T.besselBasePoint_isUnfoldingBasePoint_spec D σ B
+  obtain ⟨x₁, hx₁, -, -, hlast, hq⟩ :=
+    GlobalTheory.T.besselBasePoint_isUnfoldingBasePoint_spec D σ B
   have e : x₁ = x₀ := rat_injective (hx₁.trans hx₀.symm)
-  refine ⟨hcont.comp continuous_subtype_val, fun γ hγQ hγN n hn => hleft γ hγN hγQ n hn, fun c n hn => ?_, ?_⟩
+  refine ⟨
+    hcont.comp continuous_subtype_val,
+    fun γ hγQ hγN n hn => hleft γ hγN hγQ n hn,
+    fun c n hn => ?_,
+    ?_
+  ⟩
   · rw [hcen c n hn, hx₀, hq]
   intro j a ha1 ha0 hg
   have hl : a (Fin.last σ) = 0 := hlast a (by rw [e]; exact hg)
@@ -89,8 +107,16 @@ theorem GlobalTheory.th_isTh_lev : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ)
         exact Fin.ext (by simp [j'] at h; omega)
       · rw [tvN_apply, hB0 k hk, map_zero, mul_zero, ite_self]
     · intro h; exact absurd (Finset.mem_univ _) h
-  refine ⟨J.d.jY *ᵥ Bv, J.d.levi (tvGL A Bv hAB), star (psiE ψ t), ?_, levi_isTransv J.d A Bv hAB,
-    Subgroup.mem_inf.2 ⟨hu, Subgroup.mem_iInf.2 fun i => ?_⟩, ?_, ?_⟩
+  refine ⟨
+    J.d.jY *ᵥ Bv,
+    J.d.levi (tvGL A Bv hAB),
+    star (psiE ψ t),
+    ?_,
+    levi_isTransv J.d A Bv hAB,
+    Subgroup.mem_inf.2 ⟨hu, Subgroup.mem_iInf.2 fun i => ?_⟩,
+    ?_,
+    ?_
+  ⟩
   · show GlobalTheory.IndefiniteRowSideFullHecke.TransvectionAction.form J.W (J.d.jX *ᵥ A) (J.d.jY *ᵥ Bv) = 0
     rw [form_mulVec, ← J.d.pX_eq, Matrix.mulVec_mulVec, J.d.pX_jX, Matrix.one_mulVec, hAB]
   · rw [mem_fixer]
@@ -101,20 +127,23 @@ theorem GlobalTheory.th_isTh_lev : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ)
     have h1 := congrFun (congrFun (J.d.levi_jX (tvGL A Bv hAB)) k) i.1
     simp only [Matrix.mul_apply, Matrix.submatrix_apply, id] at h1 ⊢
     rw [h1]
-    simp only [hcol, Matrix.one_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [hcol, Matrix.one_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true]
   · intro h1
     apply ht
     rw [← star_star (psiE ψ t), h1, star_one]
   · intro n hn n' hn'
-    have hx : ∀ u ∈ UX D (σ + 1), zEll B.L (σ + 1) B.ζ ⬝ u.1 = zEll B.L (σ + 1) B.ζ := fun u hu => zEll_mul B.L B.ζ hu
+    have hx : ∀ u ∈ UX D (σ + 1), zEll B.L (σ + 1) B.ζ ⬝ u.1 = zEll B.L (σ + 1) B.ζ := fun u hu =>
+      zEll_mul B.L B.ζ hu
     have hJu : jacS ψ J.d B.L (zEll B.L (σ + 1) B.ζ) (J.d.levi (tvGL A Bv hAB)) = id := by
       have := jacS_levi_mul ψ J.d B.L (zEll B.L (σ + 1) B.ζ) (hx _ hUX) 1
       rwa [mul_one, jacS_one] at this
     have hpu : psiFlag ψ J.d (J.d.levi (tvGL A Bv hAB)) = psiE ψ t := by
       rw [psiFlag, blockX_levi, tvGL_val, upSum_add, upSum_one, zero_add, hup]
     beta_reduce
-    rw [GlobalTheory.JacHom.jacS_mul J.d hx ψ (mul_mem hn hu) hn', GlobalTheory.JacHom.jacS_mul J.d hx ψ hn hu, hJu,
-      GlobalTheory.JacHom.jacS_mul J.d hx ψ hn hn', psiFlag_mul J.d ψ (mul_mem hn hu) hn', psiFlag_mul J.d ψ hn hu,
-      psiFlag_mul J.d ψ hn hn', hpu]
+    rw [GlobalTheory.JacHom.jacS_mul J.d hx ψ (mul_mem hn hu) hn',
+      GlobalTheory.JacHom.jacS_mul J.d hx ψ hn hu, hJu,
+      GlobalTheory.JacHom.jacS_mul J.d hx ψ hn hn', psiFlag_mul J.d ψ (mul_mem hn hu) hn',
+      psiFlag_mul J.d ψ hn hu, psiFlag_mul J.d ψ hn hn', hpu]
     simp only [id, star_mul']
     ring

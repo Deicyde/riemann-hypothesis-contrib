@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Subobjec
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
@@ -19,9 +20,11 @@ namespace GlobalTheory.CompanionTheory.GE.ArtinRees
 
 variable {X : Scheme.{0}}
 
-theorem hom_eq_zero_of_basis {M N : X.Modules} (φ : M ⟶ N) (P : X.Opens → Prop)
-    (hP : ∀ (W : X.Opens) (x : X), x ∈ W → ∃ B, P B ∧ B ≤ W ∧ x ∈ B)
-    (h : ∀ B, P B → ∀ s : Γ(M, B), φ.app B s = 0) : φ = 0 := by
+theorem hom_eq_zero_of_basis
+    {M N : X.Modules} (φ : M ⟶ N)
+    (P : X.Opens → Prop) (hP : ∀ (W : X.Opens) (x : X), x ∈ W → ∃ B, P B ∧ B ≤ W ∧ x ∈ B)
+    (h : ∀ B, P B → ∀ s : Γ(M, B), φ.app B s = 0)
+    : φ = 0 := by
   refine Scheme.Modules.hom_ext _ _ fun W ↦ ?_
   ext s
   have hcov : W ≤ ⨆ B : {B : X.Opens // P B ∧ B ≤ W}, B.1 := by
@@ -29,8 +32,11 @@ theorem hom_eq_zero_of_basis {M N : X.Modules} (φ : M ⟶ N) (P : X.Opens → P
     obtain ⟨B, hB, hBW, hxB⟩ := hP W x hx
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨⟨B, hB, hBW⟩, hxB⟩
   refine TopCat.Sheaf.eq_of_locally_eq' (⟨N.presheaf, N.isSheaf⟩ : TopCat.Sheaf Ab X)
-    (fun B : {B : X.Opens // P B ∧ B ≤ W} ↦ B.1) W
-    (fun B ↦ homOfLE B.2.2) hcov _ _ fun B ↦ ?_
+    (fun B : {B : X.Opens // P B ∧ B ≤ W} ↦ B.1)
+    W
+    (fun B ↦ homOfLE B.2.2)
+    hcov _ _
+    fun B ↦ ?_
   have nat := ConcreteCategory.congr_hom (φ.mapPresheaf.naturality (homOfLE B.2.2).op) s
   have e1 : (ConcreteCategory.hom (N.presheaf.map (homOfLE B.2.2).op)) (φ.app W s) = 0 :=
     nat.symm.trans (h B.1 B.2.1 _)
@@ -38,13 +44,14 @@ theorem hom_eq_zero_of_basis {M N : X.Modules} (φ : M ⟶ N) (P : X.Opens → P
   rw [Scheme.Modules.Hom.zero_app]
   simp
 
-theorem le_of_secs_basicOpen {E : X.Modules} (S T : Subobject E) (t : Set X.affineOpens)
-    (ht : ∀ x : X, ∃ U ∈ t, x ∈ (U : X.Opens))
-    (h : ∀ U ∈ t, ∀ f : Γ(X, (U : X.Opens)), secs S (X.basicOpen f) ⊆ secs T (X.basicOpen f)) :
-    S ≤ T := by
+theorem le_of_secs_basicOpen
+    {E : X.Modules} (S T : Subobject E)
+    (t : Set X.affineOpens) (ht : ∀ x : X, ∃ U ∈ t, x ∈ (U : X.Opens))
+    (h : ∀ U ∈ t, ∀ f : Γ(X, (U : X.Opens)), secs S (X.basicOpen f) ⊆ secs T (X.basicOpen f))
+    : S ≤ T := by
   have h0 : S.arrow ≫ cokernel.π T.arrow = 0 := by
-    refine hom_eq_zero_of_basis _
-      (fun B ↦ ∃ U ∈ t, ∃ f : Γ(X, (U : X.Opens)), B = X.basicOpen f) ?_ ?_
+    refine
+      hom_eq_zero_of_basis _ (fun B ↦ ∃ U ∈ t, ∃ f : Γ(X, (U : X.Opens)), B = X.basicOpen f) ?_ ?_
     · intro W x hx
       obtain ⟨U, hU, hxU⟩ := ht x
       obtain ⟨f, hfW, hxf⟩ := U.2.exists_basicOpen_le (V := W) ⟨x, hx⟩ hxU
@@ -89,7 +96,10 @@ end GlobalTheory.CompanionTheory.GE.ArtinRees
 
 namespace GlobalTheory.CompanionTheory.GE.ArtinRees
 
-variable {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) [X.Over (Spec (.of A))]
+variable
+  {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  [X.Over (Spec (.of A))]
 
 lemma sat_add (F : X.Modules) {V : X.Opens} (f : Γ(X, V)) (P : Submodule Γ(X, V) Γ(F, V))
     (y₁ y₂ : Γ(F, X.basicOpen f))
@@ -145,22 +155,32 @@ end GlobalTheory.CompanionTheory.GE.ArtinRees
 
 namespace GlobalTheory.CompanionTheory.GE.ArtinRees
 
-variable {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) [X.Over (Spec (.of A))]
+variable
+  {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  [X.Over (Spec (.of A))]
 
 lemma isUnit_resO_basicOpen {V : X.Opens} (f : Γ(X, V)) : IsUnit (resO (X.basicOpen_le f) f) :=
   X.toRingedSpace.isUnit_res_basicOpen f
 
-theorem local_step {E : X.Modules} [E.IsQuasicoherent] (D : Subobject E)
-    [(D : X.Modules).IsQuasicoherent] {V : X.Opens} (hV : IsAffineOpen V) (k : ℕ)
-    (hk : ∀ (n : ℕ) (x : Γ((D : X.Modules), V)), D.arrow.app V x ∈
-        (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V)) →
-      x ∈ (Ideal.map (toFunctions (A := A) V) (I ^ n) • ⊤ :
-        Submodule Γ(X, V) Γ((D : X.Modules), V)))
+theorem local_step
+    {E : X.Modules} [E.IsQuasicoherent]
+    (D : Subobject E) [(D : X.Modules).IsQuasicoherent]
+    {V : X.Opens} (hV : IsAffineOpen V)
+    (k : ℕ)
+    (hk : ∀ (n : ℕ) (x : Γ((D : X.Modules), V)),
+      D.arrow.app V x
+          ∈ (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V))
+        → x
+          ∈ (Ideal.map (toFunctions (A := A) V) (I ^ n) • ⊤
+            : Submodule Γ(X, V) Γ((D : X.Modules), V)))
     (f : Γ(X, V)) (n : ℕ) (x : Γ((D : X.Modules), X.basicOpen f))
-    (hx : D.arrow.app _ x ∈ (Ideal.map (toFunctions (A := A) (X.basicOpen f)) (I ^ (n + k)) • ⊤ :
-      Submodule Γ(X, X.basicOpen f) Γ(E, X.basicOpen f))) :
-    x ∈ (Ideal.map (toFunctions (A := A) (X.basicOpen f)) (I ^ n) • ⊤ :
-      Submodule Γ(X, X.basicOpen f) Γ((D : X.Modules), X.basicOpen f)) := by
+    (hx : D.arrow.app _ x
+      ∈ (Ideal.map (toFunctions (A := A) (X.basicOpen f)) (I ^ (n + k)) • ⊤
+        : Submodule Γ(X, X.basicOpen f) Γ(E, X.basicOpen f)))
+    : x
+      ∈ (Ideal.map (toFunctions (A := A) (X.basicOpen f)) (I ^ n) • ⊤
+        : Submodule Γ(X, X.basicOpen f) Γ((D : X.Modules), X.basicOpen f)) := by
   set u := resO (X.basicOpen_le f) f with hu
   obtain ⟨e₁, y', hy', hr₁⟩ := exists_res_eq_of_mem_pow I E hV f (n + k) _ hx
   obtain ⟨e₂, d', hd'⟩ := qcoh_exists_res_eq (D : X.Modules) hV f x
@@ -169,8 +189,9 @@ theorem local_step {E : X.Modules} [E.IsQuasicoherent] (D : Subobject E)
       map_pow, ← hu, smul_smul, smul_smul, mul_comm, sub_self]
   obtain ⟨e₃, he₃⟩ := qcoh_exists_pow_smul_eq_zero E hV f _ h0
   rw [smul_sub, sub_eq_zero] at he₃
-  have hmem : D.arrow.app V (f ^ e₃ • f ^ e₁ • d') ∈
-      (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V)) := by
+  have hmem
+      : D.arrow.app V (f ^ e₃ • f ^ e₁ • d')
+        ∈ (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V)) := by
     rw [Scheme.Modules.Hom.app_smul, Scheme.Modules.Hom.app_smul, he₃]
     exact Submodule.smul_mem _ _ (Submodule.smul_mem _ _ hy')
   have h2 := resF_mem_pow I (D : X.Modules) (X.basicOpen_le f) n _ (hk n _ hmem)
@@ -185,28 +206,41 @@ end GlobalTheory.CompanionTheory.GE.ArtinRees
 
 namespace GlobalTheory.CompanionTheory.GE.ArtinRees
 
-variable {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) [X.Over (Spec (.of A))]
+variable
+  {X : Scheme.{0}} {A : Type} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  [X.Over (Spec (.of A))]
 
-theorem exists_const_of_finite {E : X.Modules} (D : Subobject E) (V : X.Opens)
-    [IsNoetherianRing Γ(X, V)] [Module.Finite Γ(X, V) Γ(E, V)] :
-    ∃ k : ℕ, ∀ (n : ℕ) (x : Γ((D : X.Modules), V)), D.arrow.app V x ∈
-        (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V)) →
-      x ∈ (Ideal.map (toFunctions (A := A) V) (I ^ n) • ⊤ :
-        Submodule Γ(X, V) Γ((D : X.Modules), V)) := by
-  let φ : Γ((D : X.Modules), V) →ₗ[Γ(X, V)] Γ(E, V) :=
-    { toFun := D.arrow.app V
-      map_add' := map_add _
-      map_smul' := Scheme.Modules.Hom.app_smul D.arrow }
-  obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul (Ideal.map (toFunctions (A := A) V) I)
-    (LinearMap.range φ)
+theorem exists_const_of_finite
+    {E : X.Modules} (D : Subobject E)
+    (V : X.Opens) [IsNoetherianRing Γ(X, V)] [Module.Finite Γ(X, V) Γ(E, V)]
+    : ∃ k : ℕ, ∀ (n : ℕ) (x : Γ((D : X.Modules), V)),
+      D.arrow.app V x
+          ∈ (Ideal.map (toFunctions (A := A) V) (I ^ (n + k)) • ⊤ : Submodule Γ(X, V) Γ(E, V))
+        → x
+          ∈ (Ideal.map (toFunctions (A := A) V) (I ^ n) • ⊤
+            : Submodule Γ(X, V) Γ((D : X.Modules), V)) := by
+  let φ : Γ((D : X.Modules), V) →ₗ[Γ(X, V)] Γ(E, V) := {
+    toFun := D.arrow.app V
+    map_add' := map_add _
+    map_smul' := Scheme.Modules.Hom.app_smul D.arrow
+  }
+  obtain ⟨k, hk⟩ :=
+    Ideal.exists_pow_inf_eq_pow_smul (Ideal.map (toFunctions (A := A) V) I) (LinearMap.range φ)
   refine ⟨k, fun n x hx ↦ ?_⟩
   rw [Ideal.map_pow] at hx ⊢
-  have h1 : φ x ∈ (Ideal.map (toFunctions (A := A) V) I) ^ (n + k) • (⊤ : Submodule Γ(X, V) Γ(E, V)) ⊓
-      LinearMap.range φ := ⟨hx, ⟨x, rfl⟩⟩
+  have h1
+      : φ x
+        ∈ (Ideal.map (toFunctions (A := A) V) I) ^ (n + k) • (⊤ : Submodule Γ(X, V) Γ(E, V))
+          ⊓ LinearMap.range φ :=
+    ⟨hx, ⟨x, rfl⟩⟩
   rw [hk (n + k) (by omega), Nat.add_sub_cancel] at h1
-  have h2 : (Ideal.map (toFunctions (A := A) V) I) ^ n •
-      ((Ideal.map (toFunctions (A := A) V) I) ^ k • (⊤ : Submodule Γ(X, V) Γ(E, V)) ⊓ LinearMap.range φ) ≤
-      ((Ideal.map (toFunctions (A := A) V) I) ^ n • (⊤ : Submodule Γ(X, V) Γ((D : X.Modules), V))).map φ := by
+  have h2
+      : (Ideal.map (toFunctions (A := A) V) I) ^ n
+          • ((Ideal.map (toFunctions (A := A) V) I) ^ k • (⊤ : Submodule Γ(X, V) Γ(E, V))
+            ⊓ LinearMap.range φ)
+        ≤ ((Ideal.map (toFunctions (A := A) V) I) ^ n
+          • (⊤ : Submodule Γ(X, V) Γ((D : X.Modules), V))).map φ := by
     rw [Submodule.map_smul'', Submodule.map_top]
     exact Submodule.smul_mono le_rfl inf_le_right
   obtain ⟨y, hy, hyx⟩ := h2 h1
@@ -229,18 +263,23 @@ end GlobalTheory.CompanionTheory.GE.ArtinRees
 
 namespace GlobalTheory.CompanionTheory.GE
 
-
 open GlobalTheory.CompanionTheory.GE.ArtinRees in
-theorem artinRees_uniform {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
-    [X.Over (Spec (.of A))] [IsLocallyNoetherian X] [CompactSpace X] {E : X.Modules}
-    (hE : IsCoherent E) (D : Subobject E) (hD : (D : X.Modules).IsQuasicoherent) :
-    ∃ k : ℕ, ∀ n : ℕ, D ⊓ powSub I E (n + k) ≤ (Subobject.map D.arrow).obj (powSub I (D : X.Modules) n) := by
+theorem artinRees_uniform
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A)
+    {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsLocallyNoetherian X] [CompactSpace X]
+    {E : X.Modules} (hE : IsCoherent E) (D : Subobject E) (hD : (D : X.Modules).IsQuasicoherent)
+    : ∃ k : ℕ, ∀ n : ℕ,
+      D ⊓ powSub I E (n + k) ≤ (Subobject.map D.arrow).obj (powSub I (D : X.Modules) n) := by
   haveI : E.IsQuasicoherent := hE.1
-  have hc : ∀ U : X.affineOpens, ∃ k : ℕ, ∀ (n : ℕ) (x : Γ((D : X.Modules), (U : X.Opens))),
-      D.arrow.app (U : X.Opens) x ∈ (Ideal.map (toFunctions (A := A) (U : X.Opens)) (I ^ (n + k)) • ⊤ :
-        Submodule Γ(X, (U : X.Opens)) Γ(E, (U : X.Opens))) →
-      x ∈ (Ideal.map (toFunctions (A := A) (U : X.Opens)) (I ^ n) • ⊤ :
-        Submodule Γ(X, (U : X.Opens)) Γ((D : X.Modules), (U : X.Opens))) := fun U ↦ by
+  have hc
+      : ∀ U : X.affineOpens, ∃ k : ℕ, ∀ (n : ℕ) (x : Γ((D : X.Modules), (U : X.Opens))),
+        D.arrow.app (U : X.Opens) x
+            ∈ (Ideal.map (toFunctions (A := A) (U : X.Opens)) (I ^ (n + k)) • ⊤
+              : Submodule Γ(X, (U : X.Opens)) Γ(E, (U : X.Opens)))
+          → x
+            ∈ (Ideal.map (toFunctions (A := A) (U : X.Opens)) (I ^ n) • ⊤
+              : Submodule Γ(X, (U : X.Opens)) Γ((D : X.Modules), (U : X.Opens))) := fun U ↦ by
     haveI := hE.2 (U : X.Opens) U.2
     haveI := IsLocallyNoetherian.component_noetherian U
     exact exists_const_of_finite I D (U : X.Opens)
@@ -250,8 +289,11 @@ theorem artinRees_uniform {A : Type} [CommRing A] [IsNoetherianRing A] (I : Idea
     obtain ⟨U, ⟨V, hV, rfl⟩, hxU, -⟩ :=
       X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
     exact Set.mem_iUnion.2 ⟨⟨V, hV⟩, hxU⟩
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover
-    (fun U : X.affineOpens ↦ ((U : X.Opens) : Set X)) (fun U ↦ (U : X.Opens).isOpen) hcov
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun U : X.affineOpens ↦ ((U : X.Opens) : Set X))
+      (fun U ↦ (U : X.Opens).isOpen)
+      hcov
   refine ⟨t.sup c, fun n ↦ ?_⟩
   rw [Subobject.inf_eq_map_pullback]
   refine leOfHom ((Subobject.map D.arrow).map (homOfLE ?_))

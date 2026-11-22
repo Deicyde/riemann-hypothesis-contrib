@@ -14,13 +14,15 @@ section Snake
 
 variable {O : Type} [CommRing O]
 
-theorem len_coker_add {A B C : Type} [AddCommGroup A] [Module O A] [AddCommGroup B] [Module O B]
-    [AddCommGroup C] [Module O C] (f : A →ₗ[O] B) (g : B →ₗ[O] C) (hf : Function.Injective f)
-    (hg : Function.Surjective g) (hfg : Function.Exact f g)
+theorem len_coker_add
+    {A B C : Type}
+    [AddCommGroup A] [Module O A] [AddCommGroup B] [Module O B] [AddCommGroup C] [Module O C]
+    (f : A →ₗ[O] B) (g : B →ₗ[O] C)
+    (hf : Function.Injective f) (hg : Function.Surjective g) (hfg : Function.Exact f g)
     (a : Module.End O A) (b : Module.End O B) (c : Module.End O C)
-    (h1 : ∀ x, b (f x) = f (a x)) (h2 : ∀ y, c (g y) = g (b y)) (hc : Function.Injective c) :
-    Module.length O (B ⧸ LinearMap.range b) =
-      Module.length O (A ⧸ LinearMap.range a) + Module.length O (C ⧸ LinearMap.range c) := by
+    (h1 : ∀ x, b (f x) = f (a x)) (h2 : ∀ y, c (g y) = g (b y)) (hc : Function.Injective c)
+    : Module.length O (B ⧸ LinearMap.range b)
+      = Module.length O (A ⧸ LinearMap.range a) + Module.length O (C ⧸ LinearMap.range c) := by
   have hF : LinearMap.range a ≤ (LinearMap.range b).comap f := by
     rintro _ ⟨x, rfl⟩
     exact ⟨f x, h1 x⟩
@@ -73,9 +75,11 @@ section Main
 
 variable {O : Type} [CommRing O] [IsDomain O]
 
-theorem sub_smul_one_injective {M : Type} [AddCommGroup M] [Module O M] [IsTorsionFree O M]
-    (ℓ : O) (hℓ : ℓ ≠ 0) (q : Module.End O M) (n : ℕ) (hq : q ^ n = 0) :
-    Function.Injective (q - ℓ • (1 : Module.End O M)) := by
+theorem sub_smul_one_injective
+    {M : Type} [AddCommGroup M] [Module O M] [IsTorsionFree O M]
+    (ℓ : O) (hℓ : ℓ ≠ 0)
+    (q : Module.End O M) (n : ℕ) (hq : q ^ n = 0)
+    : Function.Injective (q - ℓ • (1 : Module.End O M)) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro x hx
   have h1 : q x = ℓ • x := by
@@ -90,35 +94,37 @@ theorem sub_smul_one_injective {M : Type} [AddCommGroup M] [Module O M] [IsTorsi
   rw [hq, LinearMap.zero_apply] at h3
   exact (smul_eq_zero.mp h3.symm).resolve_left (pow_ne_zero n hℓ)
 
-theorem len_base (R : Type) [AddCommGroup R] [Module O R] [Module.Free O R] [Module.Finite O R]
-    (ℓ : O) :
-    Module.length O (R ⧸ LinearMap.range ((0 : Module.End O R) - ℓ • (1 : Module.End O R))) =
-      (Module.finrank O R : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
+theorem len_base
+    (R : Type) [AddCommGroup R] [Module O R] [Module.Free O R] [Module.Finite O R] (ℓ : O)
+    : Module.length O (R ⧸ LinearMap.range ((0 : Module.End O R) - ℓ • (1 : Module.End O R)))
+      = (Module.finrank O R : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
   let e := (Module.finBasis O R).equivFun
-  have hmap : (LinearMap.range ((0 : Module.End O R) - ℓ • (1 : Module.End O R))).map
-      (e : R →ₗ[O] (Fin (finrank O R) → O)) =
-      Submodule.pi Set.univ (fun _ => Ideal.span {ℓ}) := by
+  have hmap
+      : (LinearMap.range ((0 : Module.End O R) - ℓ • (1 : Module.End O R))).map
+          (e : R →ₗ[O] (Fin (finrank O R) → O))
+        = Submodule.pi Set.univ (fun _ => Ideal.span {ℓ}) := by
     ext v
-    simp only [Submodule.mem_map, LinearMap.mem_range, Submodule.mem_pi, Set.mem_univ,
-      true_implies, Ideal.mem_span_singleton']
+    simp only [Submodule.mem_map, LinearMap.mem_range, Submodule.mem_pi, Set.mem_univ, true_implies,
+      Ideal.mem_span_singleton']
     constructor
     · rintro ⟨_, ⟨y, rfl⟩, rfl⟩ i
       exact ⟨-(e y i), by simp [mul_comm]⟩
     · intro h
       choose c hc using h
-      refine ⟨_, ⟨e.symm (fun i => -c i), rfl⟩, ?_⟩
+      refine ⟨_, ⟨e.symm (fun i => - c i), rfl⟩, ?_⟩
       ext i
-      change e (((0 : Module.End O R) - ℓ • (1 : Module.End O R)) (e.symm fun i => -c i)) i = v i
+      change e (((0 : Module.End O R) - ℓ • (1 : Module.End O R)) (e.symm fun i => - c i)) i = v i
       simp [← hc, mul_comm]
   rw [(Submodule.Quotient.equiv _ _ e hmap).length_eq, (Submodule.quotientPi _).length_eq,
     Module.length_pi_of_fintype]
   simp [Finset.sum_const, nsmul_eq_mul]
 
-theorem len_main [IsPrincipalIdealRing O] (ℓ : O) (hℓ : ℓ ≠ 0) (n : ℕ) :
-    ∀ (R : Type) [AddCommGroup R] [Module O R] [Module.Free O R] [Module.Finite O R]
-      (q : Module.End O R), q ^ (n + 1) = 0 →
-      Module.length O (R ⧸ LinearMap.range (q - ℓ • (1 : Module.End O R))) =
-        (Module.finrank O R : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
+theorem len_main [IsPrincipalIdealRing O] (ℓ : O) (hℓ : ℓ ≠ 0) (n : ℕ)
+    : ∀ (R : Type) [AddCommGroup R] [Module O R] [Module.Free O R] [Module.Finite O R]
+        (q : Module.End O R),
+      q ^ (n + 1) = 0
+        → Module.length O (R ⧸ LinearMap.range (q - ℓ • (1 : Module.End O R)))
+          = (Module.finrank O R : ℕ∞) * Module.length O (O ⧸ Ideal.span {ℓ}) := by
   induction n with
   | zero =>
     intro R _ _ _ _ q hq
@@ -129,15 +135,16 @@ theorem len_main [IsPrincipalIdealRing O] (ℓ : O) (hℓ : ℓ ≠ 0) (n : ℕ)
     intro R _ _ _ _ q hq
     have hK : ∀ x ∈ LinearMap.ker q, q x ∈ LinearMap.ker q := fun x hx => by
       rw [LinearMap.mem_ker.mp hx]; exact Submodule.zero_mem _
-    have hQ : ∀ x ∈ LinearMap.range q, q x ∈ LinearMap.range q :=
-      fun x _ => LinearMap.mem_range_self q x
+    have hQ : ∀ x ∈ LinearMap.range q, q x ∈ LinearMap.range q := fun x _ =>
+      LinearMap.mem_range_self q x
     let qK := q.restrict hK
     let qQ := q.restrict hQ
     have hqK : qK = 0 := by
       ext ⟨x, hx⟩
       simpa [qK] using hx
-    have key : ∀ (k : ℕ) (x : LinearMap.range q), (((qQ ^ k) x : LinearMap.range q) : R) =
-        (q ^ k) (x : R) := by
+    have key
+        : ∀ (k : ℕ) (x : LinearMap.range q),
+          (((qQ ^ k) x : LinearMap.range q) : R) = (q ^ k) (x : R) := by
       intro k
       induction k with
       | zero => intro x; simp
@@ -151,12 +158,13 @@ theorem len_main [IsPrincipalIdealRing O] (ℓ : O) (hℓ : ℓ ≠ 0) (n : ℕ)
         LinearMap.zero_apply]
     have hex : Function.Exact (LinearMap.ker q).subtype q.rangeRestrict :=
       LinearMap.exact_iff.mpr (by rw [LinearMap.ker_rangeRestrict, Submodule.range_subtype])
-    have hsn := len_coker_add (LinearMap.ker q).subtype q.rangeRestrict
-      (LinearMap.ker q).injective_subtype q.surjective_rangeRestrict hex
-      (qK - ℓ • (1 : Module.End O _)) (q - ℓ • (1 : Module.End O R))
-      (qQ - ℓ • (1 : Module.End O _))
-      (fun x => by simp [qK]) (fun y => by ext; simp [qQ])
-      (sub_smul_one_injective ℓ hℓ qQ (n + 1) hqQ)
+    have hsn :=
+      len_coker_add (LinearMap.ker q).subtype q.rangeRestrict (LinearMap.ker q).injective_subtype
+        q.surjective_rangeRestrict hex (qK - ℓ • (1 : Module.End O _))
+        (q - ℓ • (1 : Module.End O R)) (qQ - ℓ • (1 : Module.End O _))
+        (fun x => by simp [qK])
+        (fun y => by ext; simp [qQ])
+        (sub_smul_one_injective ℓ hℓ qQ (n + 1) hqQ)
     rw [hsn, ih _ qK (by rw [hqK, zero_pow (Nat.succ_ne_zero _)]), ih _ qQ hqQ, ← add_mul,
       ← Nat.cast_add]
     congr 2

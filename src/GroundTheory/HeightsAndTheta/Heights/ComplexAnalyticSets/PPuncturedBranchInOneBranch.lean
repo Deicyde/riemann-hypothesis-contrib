@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem isPreconnected_punctured_ball {R : ℝ} (hR : 0 < R) :
-    IsPreconnected (Metric.ball (0 : ℂ) R \ {0}) := by
+theorem isPreconnected_punctured_ball {R : ℝ} (hR : 0 < R)
+    : IsPreconnected (Metric.ball (0 : ℂ) R \ {0}) := by
   have hH : IsPreconnected {z : ℂ | z.re < Real.log R} := (convex_halfSpace_re_lt _).isPreconnected
   have himage : Complex.exp '' {z : ℂ | z.re < Real.log R} = Metric.ball (0 : ℂ) R \ {0} := by
     ext w
@@ -31,26 +31,33 @@ theorem isPreconnected_punctured_ball {R : ℝ} (hR : 0 < R) :
   rw [← himage]
   exact hH.image _ Complex.continuous_exp.continuousOn
 
-theorem PuncturedBranchInOneBranch.proof (h₁ : BranchImageNhdOffCentre.Statement) :
-    PuncturedBranchInOneBranch.Statement := by
+theorem PuncturedBranchInOneBranch.proof (h₁ : BranchImageNhdOffCentre.Statement)
+    : PuncturedBranchInOneBranch.Statement := by
   intro n I q m c ν ρ _ hdim hρ hcov hdisj
   obtain ⟨N, hN, hNc⟩ := h₁ n I q hdim
   have hnorm : ∀ τ : ℂ, ‖(fun _ ↦ τ : Fin 1 → ℂ)‖ = ‖τ‖ := fun τ ↦ by simp [pi_norm_const]
-  have hball : ∀ τ : ℂ, ‖τ‖ < ν.radius → (fun _ ↦ τ : Fin 1 → ℂ) ∈ Metric.ball 0 ν.radius := fun τ hτ ↦ by
+  have hball
+      : ∀ τ : ℂ, ‖τ‖ < ν.radius → (fun _ ↦ τ : Fin 1 → ℂ) ∈ Metric.ball 0 ν.radius := fun τ hτ ↦ by
     rwa [Metric.mem_ball, dist_zero_right, hnorm]
   have h0r : ‖(0 : ℂ)‖ < ν.radius := by simpa using ν.radius_pos
 
-  have hcont : ∀ τ : ℂ, ‖τ‖ < ν.radius → ContinuousAt (fun τ : ℂ ↦ ν.toFun (fun _ ↦ τ)) τ := fun τ hτ ↦
+  have hcont
+      : ∀ τ : ℂ, ‖τ‖ < ν.radius → ContinuousAt (fun τ : ℂ ↦ ν.toFun (fun _ ↦ τ)) τ := fun τ hτ ↦
     (ν.differentiableOn.continuousOn.continuousAt (Metric.isOpen_ball.mem_nhds (hball τ hτ))).comp
-      (f := fun τ : ℂ ↦ (fun _ ↦ τ : Fin 1 → ℂ)) (continuous_pi fun _ ↦ continuous_id).continuousAt
+      (f := fun τ : ℂ ↦ (fun _ ↦ τ : Fin 1 → ℂ))
+      (continuous_pi fun _ ↦ continuous_id).continuousAt
   have hq : ν.toFun (fun _ ↦ (0 : ℂ)) = q := ν.map_zero
   have hev : ∀ᶠ τ in 𝓝 (0 : ℂ), ν.toFun (fun _ ↦ τ) ∈ N :=
     (hcont 0 h0r).preimage_mem_nhds (by show N ∈ 𝓝 (ν.toFun fun _ ↦ (0 : ℂ)); rw [hq]; exact hN)
   obtain ⟨ε, hε, hεN⟩ := Metric.eventually_nhds_iff.1 hev
 
-  obtain ⟨R, hR0, hRρ, hRε, hRν⟩ : ∃ R, 0 < R ∧ R ≤ ρ ∧ R ≤ ε ∧ R ≤ ν.radius :=
-    ⟨min ρ (min ε ν.radius), lt_min hρ (lt_min hε ν.radius_pos), min_le_left _ _,
-      (min_le_right _ _).trans (min_le_left _ _), (min_le_right _ _).trans (min_le_right _ _)⟩
+  obtain ⟨R, hR0, hRρ, hRε, hRν⟩ : ∃ R, 0 < R ∧ R ≤ ρ ∧ R ≤ ε ∧ R ≤ ν.radius := ⟨
+    min ρ (min ε ν.radius),
+    lt_min hρ (lt_min hε ν.radius_pos),
+    min_le_left _ _,
+    (min_le_right _ _).trans (min_le_left _ _),
+    (min_le_right _ _).trans (min_le_right _ _)
+  ⟩
   let D : Set ℂ := Metric.ball 0 R \ {0}
   have hD : ∀ τ ∈ D, 0 < ‖τ‖ ∧ ‖τ‖ < R := fun τ hτ ↦
     ⟨norm_pos_iff.2 (by simpa using hτ.2), by simpa using hτ.1⟩
@@ -65,7 +72,8 @@ theorem PuncturedBranchInOneBranch.proof (h₁ : BranchImageNhdOffCentre.Stateme
     intro b
     rw [isOpen_iff_mem_nhds]
     rintro τ ⟨hτD, hτb⟩
-    have hτN : ν.toFun (fun _ ↦ τ) ∈ N := hεN (by rw [dist_zero_right]; exact (hD τ hτD).2.trans_le hRε)
+    have hτN : ν.toFun (fun _ ↦ τ) ∈ N :=
+      hεN (by rw [dist_zero_right]; exact (hD τ hτD).2.trans_le hRε)
     obtain ⟨U, hU, hUc⟩ := hNc (c b) _ ⟨hτb, hτN⟩ (hne τ hτD)
     filter_upwards [hDo.mem_nhds hτD, (hcont τ ((hD τ hτD).2.trans_le hRν)).preimage_mem_nhds hU]
       with σ hσD hσU
@@ -85,7 +93,8 @@ theorem PuncturedBranchInOneBranch.proof (h₁ : BranchImageNhdOffCentre.Stateme
   have hsub : D ⊆ Vb b := by
     refine (isPreconnected_punctured_ball hR0).subset_left_of_subset_union (hVo b)
       (isOpen_iUnion fun b' ↦ isOpen_iUnion fun (_ : b' ≠ b) ↦ hVo b') ?_ ?_ ⟨_, hτ₀, hb⟩
-    · exact Set.disjoint_iUnion_right.2 fun b' ↦ Set.disjoint_iUnion_right.2 fun hb' ↦ hVd b b' (Ne.symm hb')
+    · exact Set.disjoint_iUnion_right.2 fun b' ↦
+        Set.disjoint_iUnion_right.2 fun hb' ↦ hVd b b' (Ne.symm hb')
     · intro τ hτ
       obtain ⟨b', hb'⟩ := hcovD τ hτ
       by_cases h : b' = b

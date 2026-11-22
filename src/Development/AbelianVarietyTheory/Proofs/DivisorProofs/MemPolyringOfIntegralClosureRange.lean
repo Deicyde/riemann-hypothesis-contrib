@@ -8,11 +8,22 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem mem_polyring_of_integral_closure_range : ∀ {K : Type} [Field K] {D : ℕ} (y : Fin D → K), AlgebraicIndependent ℤ y → ∀ (t : K), t ∈ Subfield.closure (Set.range y) → ∀ {ι : Type} (z : ι → K), (∀ i, ∃ p : MvPolynomial (Fin D) ℤ, aeval y p = z i) → ∀ (f : Polynomial (MvPolynomial ι ℤ)), f.Monic → f.eval₂ (aeval z).toRingHom t = 0 → ∃ T₀ : MvPolynomial (Fin D) ℤ, t = aeval y T₀ := by
+theorem mem_polyring_of_integral_closure_range
+    : ∀ {K : Type} [Field K] {D : ℕ} (y : Fin D → K),
+      AlgebraicIndependent ℤ y
+        → ∀ (t : K),
+          t ∈ Subfield.closure (Set.range y)
+            → ∀ {ι : Type} (z : ι → K),
+              (∀ i, ∃ p : MvPolynomial (Fin D) ℤ, aeval y p = z i)
+                → ∀ (f : Polynomial (MvPolynomial ι ℤ)),
+                  f.Monic → f.eval₂ (aeval z).toRingHom t = 0
+                    → ∃ T₀ : MvPolynomial (Fin D) ℤ, t = aeval y T₀ := by
   intro K _ D y hy t ht ι z hz f hf hft
   choose p hp using hz
   set F := Subfield.closure (Set.range y) with hF
-  have hsub : ∀ u : K, u ∈ Subring.closure (Set.range y) ↔ ∃ q : MvPolynomial (Fin D) ℤ, aeval y q = u := by
+  have hsub
+      : ∀ u : K,
+        u ∈ Subring.closure (Set.range y) ↔ ∃ q : MvPolynomial (Fin D) ℤ, aeval y q = u := by
     intro u
     have e1 : u ∈ Subring.closure (Set.range y) ↔ u ∈ Algebra.adjoin ℤ (Set.range y) := by
       rw [Algebra.adjoin_int]; rfl
@@ -44,14 +55,17 @@ theorem mem_polyring_of_integral_closure_range : ∀ {K : Type} [Field K] {D : �
     UniqueFactorizationMonoid.instIsIntegrallyClosed
   have hcomp : (aeval y).toRingHom.comp (bind₁ p).toRingHom = (aeval z).toRingHom := by
     refine RingHom.ext fun q => ?_
-    simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, aeval_bind₁]
+    simp only [RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+      aeval_bind₁]
     have : (fun i => aeval y (p i)) = z := funext hp
     rw [this]
   let t' : F := ⟨t, ht⟩
   have hint : IsIntegral (MvPolynomial (Fin D) ℤ) t' := by
     refine ⟨f.map (bind₁ p).toRingHom, hf.map _, ?_⟩
     apply Subtype.val_injective
-    have h1 := Polynomial.hom_eval₂ (f.map (bind₁ p).toRingHom) (algebraMap (MvPolynomial (Fin D) ℤ) F) F.subtype t'
+    have h1 :=
+      Polynomial.hom_eval₂ (f.map (bind₁ p).toRingHom) (algebraMap (MvPolynomial (Fin D) ℤ) F)
+        F.subtype t'
     show F.subtype (Polynomial.eval₂ _ t' _) = F.subtype 0
     rw [h1, map_zero]
     have h2 : F.subtype.comp (algebraMap (MvPolynomial (Fin D) ℤ) F) = (aeval y).toRingHom := by

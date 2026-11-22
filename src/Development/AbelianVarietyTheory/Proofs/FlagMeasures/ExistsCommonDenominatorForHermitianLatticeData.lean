@@ -20,27 +20,32 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DenClear
 
-theorem ringOfIntegers_smul_eq {E : Type} [Field E] [NumberField E] (o : 𝓞 E) (x : E) :
-    o • x = (o : E) * x := rfl
-
-theorem coeO_mul {E : Type} [Field E] [NumberField E] (a b : 𝓞 E) :
-    ((a * b : 𝓞 E) : E) = (a : E) * b := rfl
-
-theorem coeO_add {E : Type} [Field E] [NumberField E] (a b : 𝓞 E) :
-    ((a + b : 𝓞 E) : E) = (a : E) + b := rfl
-
-theorem coeO_int {E : Type} [Field E] [NumberField E] (k : ℤ) : ((k : 𝓞 E) : E) = (k : E) := by
+theorem ringOfIntegers_smul_eq {E : Type} [Field E] [NumberField E] (o : 𝓞 E) (x : E)
+    : o • x = (o : E) * x :=
   rfl
 
-theorem exists_int_mul_eq {E : Type} [Field E] [NumberField E] (e : E) :
-    ∃ m : ℤ, m ≠ 0 ∧ ∃ o : 𝓞 E, (m : E) * e = o := by
+theorem coeO_mul {E : Type} [Field E] [NumberField E] (a b : 𝓞 E)
+    : ((a * b : 𝓞 E) : E) = (a : E) * b :=
+  rfl
+
+theorem coeO_add {E : Type} [Field E] [NumberField E] (a b : 𝓞 E)
+    : ((a + b : 𝓞 E) : E) = (a : E) + b :=
+  rfl
+
+theorem coeO_int {E : Type} [Field E] [NumberField E] (k : ℤ) : ((k : 𝓞 E) : E) = (k : E) := by rfl
+
+theorem exists_int_mul_eq {E : Type} [Field E] [NumberField E] (e : E)
+    : ∃ m : ℤ, m ≠ 0 ∧ ∃ o : 𝓞 E, (m : E) * e = o := by
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (L := E) {e}
   have h := hy e (Finset.mem_singleton_self e)
   rw [zsmul_eq_mul] at h
   exact ⟨y, hy0, ⟨(y : E) * e, h⟩, rfl⟩
 
-theorem clear_of_dvd {E : Type} [Field E] [NumberField E] {m D : ℤ} (h : m ∣ D) {e : E}
-    (he : ∃ o : 𝓞 E, (m : E) * e = o) : ∃ o : 𝓞 E, (D : E) * e = o := by
+theorem clear_of_dvd
+    {E : Type} [Field E] [NumberField E]
+    {m D : ℤ} (h : m ∣ D)
+    {e : E} (he : ∃ o : 𝓞 E, (m : E) * e = o)
+    : ∃ o : 𝓞 E, (D : E) * e = o := by
   obtain ⟨k, rfl⟩ := h
   obtain ⟨o, ho⟩ := he
   refine ⟨(k : 𝓞 E) * o, ?_⟩
@@ -48,12 +53,21 @@ theorem clear_of_dvd {E : Type} [Field E] [NumberField E] {m D : ℤ} (h : m ∣
   push_cast
   ring
 
-theorem exists_int_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (Λ : Submodule (𝓞 E) (Fin n → E)) (hΛ : Submodule.IsFullLattice E Λ) (w : Fin n → E) :
-    ∃ m : ℤ, m ≠ 0 ∧ (m : 𝓞 E) • w ∈ Λ := by
+theorem exists_int_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E)) (hΛ : Submodule.IsFullLattice E Λ) (w : Fin n → E)
+    : ∃ m : ℤ, m ≠ 0 ∧ (m : 𝓞 E) • w ∈ Λ := by
   exact _root_.GlobalTheory.IntMulIntegerSmulMemLattice.exists_int_smul_mem_lattice Λ hΛ w
 
-theorem den_clear : ∀ {E : Type} [Field E] [NumberField E] {n : ℕ} {ι κ : Type} [Fintype ι] [Fintype κ] (v : ι → E) (g : κ → Fin n → E) (Hm : Matrix (Fin n) (Fin n) E) (sg : E →+* E) (Λ : Submodule (𝓞 E) (Fin n → E)), Submodule.IsFullLattice E Λ → ∃ D : ℤ, D ≠ 0 ∧ (∀ i, ∃ o : 𝓞 E, (D : E) * v i = o) ∧ (∀ x ∈ Λ, ∀ l, ∃ o : 𝓞 E, (D : E) * ∑ a, ∑ b, x a * Hm a b * sg (g l b) = o) ∧ ∀ l, (D : 𝓞 E) • g l ∈ Λ := by
+theorem den_clear
+    : ∀ {E : Type} [Field E] [NumberField E] {n : ℕ} {ι κ : Type} [Fintype ι] [Fintype κ]
+        (v : ι → E) (g : κ → Fin n → E) (Hm : Matrix (Fin n) (Fin n) E) (sg : E →+* E)
+        (Λ : Submodule (𝓞 E) (Fin n → E)),
+      Submodule.IsFullLattice E Λ
+        → ∃ D : ℤ,
+          D ≠ 0 ∧ (∀ i, ∃ o : 𝓞 E, (D : E) * v i = o)
+            ∧ (∀ x ∈ Λ, ∀ l, ∃ o : 𝓞 E, (D : E) * ∑ a, ∑ b, x a * Hm a b * sg (g l b) = o)
+            ∧ ∀ l, (D : 𝓞 E) • g l ∈ Λ := by
   intro E _ _ n ι κ _ _ v g Hm sg Λ hΛ
   choose mv hmv0 hmv using fun i => exists_int_mul_eq (v i)
   choose mg hmg0 hmg using fun l => exists_int_smul_mem Λ hΛ (g l)
@@ -71,16 +85,16 @@ theorem den_clear : ∀ {E : Type} [Field E] [NumberField E] {n : ℕ} {ι κ : 
     ((Finset.dvd_prod_of_mem mv (Finset.mem_univ i)).mul_right B).mul_right C
   have dB : ∀ l, mg l ∣ A * B * C := fun l =>
     ((Finset.dvd_prod_of_mem mg (Finset.mem_univ l)).mul_left A).mul_right C
-  have dC : ∀ p ∈ T, mp p ∣ A * B * C := fun p hp =>
-    (Finset.dvd_prod_of_mem mp hp).mul_left _
-  refine ⟨A * B * C, mul_ne_zero (mul_ne_zero hA hB) hC, fun i => clear_of_dvd (dA i) (hmv i),
-    ?_, ?_⟩
+  have dC : ∀ p ∈ T, mp p ∣ A * B * C := fun p hp => (Finset.dvd_prod_of_mem mp hp).mul_left _
+  refine
+    ⟨A * B * C, mul_ne_zero (mul_ne_zero hA hB) hC, fun i => clear_of_dvd (dA i) (hmv i), ?_, ?_⟩
   · intro x hx l
     rw [← hs] at hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       exact clear_of_dvd (dC (l, x) (Finset.mem_product.2 ⟨Finset.mem_univ l, hx⟩)) (hmp (l, x))
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨o₁, h₁⟩ := hx
       obtain ⟨o₂, h₂⟩ := hy

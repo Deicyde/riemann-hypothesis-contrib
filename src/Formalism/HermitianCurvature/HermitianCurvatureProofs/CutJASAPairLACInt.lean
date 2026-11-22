@@ -17,8 +17,8 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 theorem aCInt_of_proper (hP : ACProper) : ACInt := by
   intro k r Wp Wq _ _ _ _ D φ₀ hφ hφc g hg
-  obtain ⟨P, hPc, hPm⟩ := hP k r Wp Wq D (tsupport φ₀) {g} hφc isCompact_singleton
-    (Set.singleton_subset_iff.2 hg)
+  obtain ⟨P, hPc, hPm⟩ :=
+    hP k r Wp Wq D (tsupport φ₀) {g} hφc isCompact_singleton (Set.singleton_subset_iff.2 hg)
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarW
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarN
   have := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite D.haarW'
@@ -30,11 +30,14 @@ theorem aCInt_of_proper (hP : ACProper) : ACInt := by
     exact hPc.measure_lt_top
   obtain ⟨M, hM⟩ := hφ.bounded_above_of_compact_support hφc
   have hφ' : Continuous (fun x : Mt k r => φ₀ (Matrix.of x)) :=
-    hφ.comp (continuous_pi fun i => continuous_pi fun j => (continuous_apply j).comp (continuous_apply i))
+    hφ.comp (continuous_pi fun i =>
+      continuous_pi fun j => (continuous_apply j).comp (continuous_apply i))
   have hmeasφ : Measurable (fun x : Mt k r => φ₀ (Matrix.of x)) := hφ'.measurable
   have hmeas : Measurable (fun p : B.SS k r => φ₀ (B.sgs p g)) := by
-    have h1 : Measurable (fun p : B.SS k r => Formalism.FourierDecayAlt.P.RankOneEmbeddings.In.sgF (p, (g : Mt k r))) :=
-      Formalism.FourierDecayAlt.P.RankOneEmbeddings.In.sgF_meas.comp (measurable_id.prodMk measurable_const)
+    have h1 : Measurable (fun p : B.SS k r =>
+        Formalism.FourierDecayAlt.P.RankOneEmbeddings.In.sgF (p, (g : Mt k r))) :=
+      Formalism.FourierDecayAlt.P.RankOneEmbeddings.In.sgF_meas.comp (measurable_id.prodMk
+        measurable_const)
     exact hmeasφ.comp h1
   have hind : Integrable (P.indicator fun _ : B.SS k r => M) D.μSS :=
     (integrable_indicator_iff hPc.isClosed.measurableSet).2 (integrableOn_const hfin.ne)

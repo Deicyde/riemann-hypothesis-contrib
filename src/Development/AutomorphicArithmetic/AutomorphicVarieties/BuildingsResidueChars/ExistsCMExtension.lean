@@ -7,9 +7,12 @@ public import Mathlib.Algebra.QuadraticAlgebra.Basic
 
 open NumberField QuadraticAlgebra
 
-private theorem real_val {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (ψ : F →+* ℂ) (x : F) :
-    starRingEnd ℂ (ψ x) = ψ x := by
-  have hr := ComplexEmbedding.isReal_iff.mp (InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal (InfinitePlace.mk ψ)))
+private theorem real_val
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (ψ : F →+* ℂ) (x : F)
+    : starRingEnd ℂ (ψ x) = ψ x := by
+  have hr :=
+    ComplexEmbedding.isReal_iff.mp (InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal
+      (InfinitePlace.mk ψ)))
   have := RingHom.congr_fun hr x
   rw [ComplexEmbedding.conjugate_coe_eq] at this
   exact this
@@ -18,7 +21,8 @@ private theorem sq_neg_one {z : ℂ} (h : z * z = -1) : starRingEnd ℂ z = -z :
   have h1 := congrArg Complex.re h
   have h2 := congrArg Complex.im h
   simp only [Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im, Complex.one_re,
-    Complex.one_im] at h1 h2
+      Complex.one_im]
+    at h1 h2
   have hre : z.re = 0 := by
     rcases mul_eq_zero.mp (show z.re * z.im = 0 by linarith) with h3 | h3
     · exact h3
@@ -26,8 +30,7 @@ private theorem sq_neg_one {z : ℂ} (h : z * z = -1) : starRingEnd ℂ z = -z :
       nlinarith [mul_self_nonneg z.re]
   apply Complex.ext <;> simp [hre]
 
-theorem UpperTheory.exists_CM_extension :
-    UpperTheory.V.Af.BA.ExCM := by
+theorem UpperTheory.exists_CM_extension : UpperTheory.V.Af.BA.ExCM := by
   intro F _ _ _
   let ψ : F →+* ℂ := (IsAlgClosed.lift : F →ₐ[ℚ] ℂ).toRingHom
   haveI hfact : Fact (∀ r : F, r ^ 2 ≠ -1 + 0 * r) := by
@@ -62,23 +65,36 @@ theorem UpperTheory.exists_CM_extension :
     have h0 : v.embedding ω = 0 := by
       have : (2 : ℂ) * v.embedding ω = 0 := by linear_combination -h1
       simpa using this
-    have h5 : v.embedding ω * v.embedding ω = -1 := by
-      rw [← map_mul, hωω, map_neg, map_one]
+    have h5 : v.embedding ω * v.embedding ω = -1 := by rw [← map_mul, hωω, map_neg, map_one]
     rw [h0] at h5
     norm_num at h5
-  refine ⟨QuadraticAlgebra F (-1) 0, inferInstance, hNF, hTC, algebraMap F (QuadraticAlgebra F (-1) 0),
-    starRingEnd (QuadraticAlgebra F (-1) 0), ?_, ?_⟩
+  refine ⟨
+    QuadraticAlgebra F (-1) 0,
+    inferInstance,
+    hNF,
+    hTC,
+    algebraMap F (QuadraticAlgebra F (-1) 0),
+    starRingEnd (QuadraticAlgebra F (-1) 0),
+    ?_,
+    ?_
+  ⟩
   · intro φ x
-    have hx : x = algebraMap F (QuadraticAlgebra F (-1) 0) x.re +
-        algebraMap F (QuadraticAlgebra F (-1) 0) x.im * ω := by
+    have hx
+        : x
+          = algebraMap F (QuadraticAlgebra F (-1) 0) x.re
+            + algebraMap F (QuadraticAlgebra F (-1) 0) x.im * ω := by
       ext <;> simp
-    have hsx : starRingEnd (QuadraticAlgebra F (-1) 0) x = algebraMap F (QuadraticAlgebra F (-1) 0) x.re -
-        algebraMap F (QuadraticAlgebra F (-1) 0) x.im * ω := by
+    have hsx
+        : starRingEnd (QuadraticAlgebra F (-1) 0) x
+          = algebraMap F (QuadraticAlgebra F (-1) 0) x.re
+            - algebraMap F (QuadraticAlgebra F (-1) 0) x.im * ω := by
       show star x = _
       ext <;> simp
-    have hreal : ∀ y : F, starRingEnd ℂ (φ (algebraMap F (QuadraticAlgebra F (-1) 0) y)) =
-        φ (algebraMap F (QuadraticAlgebra F (-1) 0) y) :=
-      fun y => real_val (φ.comp (algebraMap F (QuadraticAlgebra F (-1) 0))) y
+    have hreal
+        : ∀ y : F,
+          starRingEnd ℂ (φ (algebraMap F (QuadraticAlgebra F (-1) 0) y))
+            = φ (algebraMap F (QuadraticAlgebra F (-1) 0) y) := fun y =>
+      real_val (φ.comp (algebraMap F (QuadraticAlgebra F (-1) 0))) y
     rw [hsx]
     conv_rhs => rw [hx]
     simp only [map_add (f := _), map_sub, map_mul, hreal, hφω]

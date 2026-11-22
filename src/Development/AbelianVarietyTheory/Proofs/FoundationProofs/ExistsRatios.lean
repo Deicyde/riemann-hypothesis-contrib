@@ -17,15 +17,20 @@ namespace GlobalTheory.Square.Ratio
 
 open Formalism.DivisionValues.ValuationRepresentative (vw_mul vw_inv)
 
-theorem away {K : Type} [Field K] [NumberField K] [StarRing K] {w : Pl K} {Qn : ℕ}
-    (hQ : (Qn : 𝓞 K) ∉ w.asIdeal) {x : K} (h : IsAwayUnit Qn x) : x ≠ 0 ∧ vw w x = 0 := by
+theorem away
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {w : Pl K} {Qn : ℕ} (hQ : (Qn : 𝓞 K) ∉ w.asIdeal)
+    {x : K} (h : IsAwayUnit Qn x)
+    : x ≠ 0 ∧ vw w x = 0 := by
   obtain ⟨a, k, k', hd, hx⟩ := h
   have hQk : ∀ k, (Qn : 𝓞 K) ^ k ∉ w.asIdeal := fun k h => hQ (w.isPrime.mem_of_pow_mem k h)
   have ha : a ∉ w.asIdeal := fun h => hQk k' (Ideal.mem_of_dvd _ hd h)
   have ha0 : (a : K) ≠ 0 := by
-    intro h; apply ha
+    intro h
+    apply ha
     have : a = 0 := by exact_mod_cast h
-    rw [this]; exact zero_mem _
+    rw [this]
+    exact zero_mem _
   rw [← hx] at ha0
   have h1 := Formalism.DivisionValues.ReductionFirst.vw_unit w a ha
   have h2 := Formalism.DivisionValues.ReductionFirst.vw_unit w _ (hQk k)
@@ -34,11 +39,34 @@ theorem away {K : Type} [Field K] [NumberField K] [StarRing K] {w : Pl K} {Qn : 
   rw [← hx, vw_mul w _ _ (left_ne_zero_of_mul ha0) (right_ne_zero_of_mul ha0), h2] at h1
   exact ⟨left_ne_zero_of_mul ha0, by simpa using h1⟩
 
-theorem exists_ratios : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (σ₀ : K →+* ℂ) (w : Pl K) (Qn : ℕ), (Qn : 𝓞 K) ∉ w.asIdeal → ∀ (e0 h : ℕ), e0 ≤ h → ∀ (L0 L1 : ℤ → ℂ) (zT zTd zψ Ep : ℤ → K) (gT : ℤ → ℤ) (n0 : ℤ → ℝ) (er : ℝ), (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ h → L0 s ≠ 0 ∧ L1 s ≠ 0) → (∀ s : ℤ, 1 ≤ s → s ≤ h → zT s ≠ 0 ∧ zTd s ≠ 0 ∧ σ₀ (zψ s) * L0 s = σ₀ (zT s) * L1 s ∧ -(n0 s) ≤ ((vw w (zψ s) + gT s : ℤ) : ℝ) ∧ (vw w (zψ s) : ℝ) ≤ (vw w (zTd s) : ℝ) + er) → (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ 0 → IsAwayUnit Qn (Ep s) ∧ L1 s * L0 (1 - s) = σ₀ (Ep s) * (L1 (1 - s) * L0 s)) → ∃ ρ : ℤ → K, (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ h → ρ s ≠ 0 ∧ σ₀ (ρ s) * L0 s = L1 s) ∧ (∀ s : ℤ, 1 ≤ s → s ≤ h → (vw w (ρ s) : ℝ) ≤ |((vw w (zT s) + gT s : ℤ) : ℝ)| + |((vw w (zTd s) + gT s : ℤ) : ℝ)| + er ∧ -(vw w (ρ s) : ℝ) ≤ |((vw w (zT s) + gT s : ℤ) : ℝ)| + n0 s) ∧ (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ 0 → vw w (ρ s) = vw w (ρ (1 - s))) := by
+theorem exists_ratios
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (σ₀ : K →+* ℂ) (w : Pl K) (Qn : ℕ),
+      (Qn : 𝓞 K) ∉ w.asIdeal
+        → ∀ (e0 h : ℕ),
+          e0 ≤ h
+            → ∀ (L0 L1 : ℤ → ℂ) (zT zTd zψ Ep : ℤ → K) (gT : ℤ → ℤ) (n0 : ℤ → ℝ) (er : ℝ),
+              (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ h → L0 s ≠ 0 ∧ L1 s ≠ 0)
+                → (∀ s : ℤ,
+                  1 ≤ s → s ≤ h
+                    → zT s ≠ 0 ∧ zTd s ≠ 0 ∧ σ₀ (zψ s) * L0 s = σ₀ (zT s) * L1 s
+                      ∧ -(n0 s) ≤ ((vw w (zψ s) + gT s : ℤ) : ℝ)
+                      ∧ (vw w (zψ s) : ℝ) ≤ (vw w (zTd s) : ℝ) + er)
+                → (∀ s : ℤ,
+                  1 - (e0 : ℤ) ≤ s → s ≤ 0
+                    → IsAwayUnit Qn (Ep s) ∧ L1 s * L0 (1 - s) = σ₀ (Ep s) * (L1 (1 - s) * L0 s))
+                → ∃ ρ : ℤ → K,
+                  (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ h → ρ s ≠ 0 ∧ σ₀ (ρ s) * L0 s = L1 s)
+                    ∧ (∀ s : ℤ,
+                      1 ≤ s → s ≤ h
+                        → (vw w (ρ s) : ℝ)
+                            ≤ |((vw w (zT s) + gT s : ℤ) : ℝ)| + |((vw w (zTd s) + gT s : ℤ) : ℝ)|
+                              + er
+                          ∧ -(vw w (ρ s) : ℝ) ≤ |((vw w (zT s) + gT s : ℤ) : ℝ)| + n0 s)
+                    ∧ (∀ s : ℤ, 1 - (e0 : ℤ) ≤ s → s ≤ 0 → vw w (ρ s) = vw w (ρ (1 - s))) := by
   intro K _ _ _ σ₀ w Qn hQ e0 h he L0 L1 zT zTd zψ Ep gT n0 er hL hpos hneg
   have he' : (e0 : ℤ) ≤ h := by exact_mod_cast he
-  have key : ∀ s : ℤ, 1 ≤ s → s ≤ h → zψ s ≠ 0 ∧ zψ s / zT s ≠ 0 ∧
-      σ₀ (zψ s / zT s) * L0 s = L1 s := by
+  have key
+      : ∀ s : ℤ, 1 ≤ s → s ≤ h → zψ s ≠ 0 ∧ zψ s / zT s ≠ 0 ∧ σ₀ (zψ s / zT s) * L0 s = L1 s := by
     intro s h1 h2
     obtain ⟨hT, -, hrel, -, -⟩ := hpos s h1 h2
     obtain ⟨-, hL1⟩ := hL s (by omega) h2

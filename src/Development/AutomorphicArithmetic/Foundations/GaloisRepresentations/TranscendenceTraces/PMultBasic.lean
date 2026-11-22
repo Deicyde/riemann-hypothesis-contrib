@@ -5,9 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.multBasic_of :
-    MultBC → MultOpen → MultEt → MultBasic := by
+theorem UpperTheory.Gal.TranscendenceTraces.multBasic_of
+    : MultBC → MultOpen → MultEt → MultBasic := by
   intro h1 h2 h3
   exact ⟨h1, h2, h3⟩

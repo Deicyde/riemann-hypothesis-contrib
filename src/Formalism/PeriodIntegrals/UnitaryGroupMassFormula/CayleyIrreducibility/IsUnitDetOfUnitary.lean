@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.ColDictValCPf
 
-open Formalism.BasicNotions Formalism.GradedWeylDivisibility Formalism.L2.SG.Pf.ColDictPf Matrix MvPolynomial
+open Formalism.BasicNotions Formalism.GradedWeylDivisibility Formalism.L2.SG.Pf.ColDictPf Matrix
+  MvPolynomial
 open scoped ComplexOrder
 
 section Transfer
@@ -106,14 +107,18 @@ theorem transfer_holds : Transfer := by
     obtain ⟨F', hF'W, hF'⟩ := hinv g hg (φ P) hPW'
     have hdet : ∀ τ, IsUnit (g τ).det := fun τ => isUnit_det_of_unitary (hG τ) (hg τ)
     set cst : ℂ := ∏ τ, (g τ).det ^ (shiftOfV lam τ) with hcst
-    have hcst0 : cst ≠ 0 :=
-      Finset.prod_ne_zero_iff.mpr fun τ _ => zpow_ne_zero _ (hdet τ).ne_zero
+    have hcst0 : cst ≠ 0 := Finset.prod_ne_zero_iff.mpr fun τ _ => zpow_ne_zero _ (hdet τ).ne_zero
     have key : φ (famAct g P) = cst⁻¹ • F' := by
       funext y
-      obtain ⟨y', hy'0⟩ : ∃ y' : FramesV G, ∀ τ, y'.1 τ = g τ * y.1 τ :=
-        ⟨⟨fun τ => g τ * y.1 τ, fun τ => by
-          rw [Matrix.det_mul]
-          exact (hdet τ).mul (y.2 τ)⟩, fun _ => rfl⟩
+      obtain ⟨y', hy'0⟩ : ∃ y' : FramesV G, ∀ τ, y'.1 τ = g τ * y.1 τ := ⟨
+        ⟨
+          fun τ => g τ * y.1 τ,
+          fun τ => by
+            rw [Matrix.det_mul]
+            exact (hdet τ).mul (y.2 τ)
+        ⟩,
+        fun _ => rfl
+      ⟩
       have hy' := hF' y y' hy'0
       show _ = cst⁻¹ * F' y
       rw [hy', hφ, fnOfV_one_apply, fnOfV_one_apply, eval_famAct]

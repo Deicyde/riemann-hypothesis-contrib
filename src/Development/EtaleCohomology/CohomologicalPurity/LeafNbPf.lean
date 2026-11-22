@@ -11,8 +11,10 @@ namespace LateralTheory.CohomologicalPurity.NbPf
 
 variable {A B : Type} [CommRing A] [CommRing B]
 
-def psi (φ : A →+* B) (I : Ideal A) (hb : Function.Bijective (Ideal.quotientMap (I.map φ) φ Ideal.le_comap_map)) :
-    B →+* A ⧸ I :=
+def psi
+    (φ : A →+* B) (I : Ideal A)
+    (hb : Function.Bijective (Ideal.quotientMap (I.map φ) φ Ideal.le_comap_map))
+    : B →+* A ⧸ I :=
   (RingEquiv.ofBijective _ hb).symm.toRingHom.comp (Ideal.Quotient.mk (I.map φ))
 
 theorem psi_comp (φ : A →+* B) (I : Ideal A) (hb) : (psi φ I hb).comp φ = Ideal.Quotient.mk I := by
@@ -21,11 +23,13 @@ theorem psi_comp (φ : A →+* B) (I : Ideal A) (hb) : (psi φ I hb).comp φ = I
   rw [RingEquiv.symm_apply_eq]
   simp [RingEquiv.ofBijective_apply, Ideal.quotientMap_mk]
 
-theorem isPushout_psi (φ : A →+* B) (I : Ideal A) (hb) :
-    IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom (Ideal.Quotient.mk I))
+theorem isPushout_psi (φ : A →+* B) (I : Ideal A) (hb)
+    : IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom (Ideal.Quotient.mk I))
       (CommRingCat.ofHom (psi φ I hb)) (𝟙 (CommRingCat.of (A ⧸ I))) := by
-  refine ⟨⟨by ext a; simpa using congrArg (fun f => f a) (psi_comp φ I hb)⟩, ⟨PushoutCocone.IsColimit.mk _
-    (fun s => s.inr) ?_ ?_ ?_⟩⟩
+  refine ⟨
+    ⟨by ext a; simpa using congrArg (fun f => f a) (psi_comp φ I hb)⟩,
+    ⟨PushoutCocone.IsColimit.mk _ (fun s => s.inr) ?_ ?_ ?_⟩
+  ⟩
   · intro s
     have hk : I.map φ ≤ RingHom.ker s.inl.hom := by
       rw [Ideal.map_le_iff_le_comap]
@@ -38,7 +42,8 @@ theorem isPushout_psi (φ : A →+* B) (I : Ideal A) (hb) :
     have e1 : Ideal.Quotient.mk (I.map φ) (φ a) = Ideal.Quotient.mk (I.map φ) b := by
       have : (RingEquiv.ofBijective _ hb) (psi φ I hb b) = Ideal.Quotient.mk (I.map φ) b := by
         simp [psi]
-      rw [← this, ← ha]; simp [RingEquiv.ofBijective_apply, Ideal.quotientMap_mk]
+      rw [← this, ← ha]
+      simp [RingEquiv.ofBijective_apply, Ideal.quotientMap_mk]
     rw [Ideal.Quotient.eq] at e1
     have e2 : s.inl.hom (φ a) = s.inl.hom b := by
       have := hk e1; rw [RingHom.mem_ker, map_sub, sub_eq_zero] at this; exact this
@@ -59,11 +64,13 @@ theorem nb (hE : LeafExc) : Cl.LeafNb := by
   have hP := isPullback_SpecMap_of_isPushout _ _ _ _ (isPushout_psi φ I hb)
   rw [Spec.map_id] at hP
   refine hE hA1 q (Spec.map (CommRingCat.ofHom φ)) (Spec.map (CommRingCat.ofHom (psi φ I hb)))
-    (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I))) hP (off B (I.map φ)) (off A I) ?_ (Cl.off_map φ I)
+    (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I))) hP (off B (I.map φ)) (off A I) ?_
+    (Cl.off_map φ I)
   change (PrimeSpectrum.zeroLocus (I : Set A))ᶜ = _
   congr 1
   have hr := range_comap_of_surjective _ (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
   rw [Ideal.mk_ker] at hr
-  rw [← hr]; rfl
+  rw [← hr]
+  rfl
 
 end LateralTheory.CohomologicalPurity.NbPf

@@ -8,8 +8,12 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GSplit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.Grow
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.Grow
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup (coefPlus Cols SizeRows)
 open GlobalTheory.ChainFr GlobalTheory.SepRows GlobalTheory.SepPer Matrix
 open scoped TensorProduct InnerProductSpace nonZeroDivisors Pointwise
@@ -19,16 +23,18 @@ namespace GlobalTheory.ModulConj
 
 open Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit
 
-theorem le_of_le_primes {R : Type} [CommRing R] [IsDedekindDomain R] {I J : Ideal R} (hJ : Squarefree J)
-    (h : ∀ P : Ideal R, P.IsPrime → J ≤ P → I ≤ P) : I ≤ J := by
+theorem le_of_le_primes
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    {I J : Ideal R} (hJ : Squarefree J) (h : ∀ P : Ideal R, P.IsPrime → J ≤ P → I ≤ P)
+    : I ≤ J := by
   have hrad : I ≤ J.radical := by
     rw [Ideal.radical_eq_sInf]
     exact le_sInf fun P hP => h P hP.2 hP.1
   obtain ⟨n, hn⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hrad (IsNoetherian.noetherian I)
   exact Ideal.le_of_dvd (hJ.isRadical n I (Ideal.dvd_iff_le.2 hn))
 
-theorem squarefree_span_g (D : D7) (k : Fin 2) :
-    Squarefree (Ideal.span {((D.host.g k : ℕ) : 𝓞 D.host.E)}) := by
+theorem squarefree_span_g (D : D7) (k : Fin 2)
+    : Squarefree (Ideal.span {((D.host.g k : ℕ) : 𝓞 D.host.E)}) := by
   have h0 : Ideal.span {((D.host.g k : ℕ) : 𝓞 D.host.E)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast (D.host.g_prime k).ne_zero
@@ -40,9 +46,11 @@ namespace GlobalTheory.ModulConj
 
 open Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit
 
-theorem inf_le_place {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc) (k : Fin 2)
-    (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal) :
-    G.modul ⊓ D.host.conj • G.modul ≤ P.asIdeal := by
+theorem inf_le_place
+    {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc)
+    (k : Fin 2) (P : HeightOneSpectrum (𝓞 D.host.E))
+    (hP : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal)
+    : G.modul ⊓ D.host.conj • G.modul ≤ P.asIdeal := by
   have hv : ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ (P.under (𝓞 D.host.F)).asIdeal := by
     show algebraMap (𝓞 D.host.F) (𝓞 D.host.E) ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ P.asIdeal
     rwa [map_natCast]
@@ -56,7 +64,8 @@ theorem inf_le_place {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : Grid
   have hmod : G.modul ≤ (G.pl.w v).asIdeal := by
     have hd : (G.pl.w v).asIdeal ^ G.pl.depth sc v ∣ G.modul := Finset.dvd_prod_of_mem _ hS
     exact (Ideal.le_of_dvd hd).trans (Ideal.pow_le_self (G.pl.depth_pos sc v).ne')
-  rcases GlobalTheory.GoodPrimes.eq_or_conj_of_under_eq (P := G.pl.w v) (Q := P) (by rw [hw]) with h | h
+  rcases GlobalTheory.GoodPrimes.eq_or_conj_of_under_eq (P := G.pl.w v) (Q := P) (by rw [hw]) with
+    h | h
   · rw [h]
     exact inf_le_left.trans hmod
   · rw [h]
@@ -72,10 +81,14 @@ theorem inf_le_place {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : Grid
     rw [← e]
     exact Ideal.mem_map_of_mem _ hy
 
-theorem modul_inf_conj_le : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc),
-    G.modul ⊓ D.host.conj • G.modul ≤ Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E)} := by
+theorem modul_inf_conj_le
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} (G : GridData L sc),
+      G.modul ⊓ D.host.conj • G.modul
+        ≤ Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E)} := by
   intro D T L sc G
-  have hk : ∀ k : Fin 2, G.modul ⊓ D.host.conj • G.modul ≤ Ideal.span {((D.host.g k : ℕ) : 𝓞 D.host.E)} := by
+  have hk
+      : ∀ k : Fin 2,
+        G.modul ⊓ D.host.conj • G.modul ≤ Ideal.span {((D.host.g k : ℕ) : 𝓞 D.host.E)} := by
     intro k
     refine le_of_le_primes (squarefree_span_g D k) fun Q hQ hle => ?_
     have hg : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ Q := hle (Ideal.subset_span rfl)

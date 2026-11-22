@@ -32,10 +32,13 @@ def kgH : Herm E a →ₗ[ℝ] Lie E a where
   map_smul' _ _ := rfl
 
 theorem kgT_comm (X Y : Matrix (Fin a) (Fin a) (Cinf E)) : kgT (toL (X * Y - Y * X)) = 0 := by
-  have h : ∀ τ : E →+* ℂ, ∑ i, coord τ ((X * Y - Y * X) i i) = coord τ (Matrix.trace (X * Y - Y * X)) := by
+  have h
+      : ∀ τ : E →+* ℂ,
+        ∑ i, coord τ ((X * Y - Y * X) i i) = coord τ (Matrix.trace (X * Y - Y * X)) := by
     intro τ; simp only [Matrix.trace, Matrix.diag, map_sum]
   change ∑ τ : E →+* ℂ, ∑ i, coord τ ((X * Y - Y * X) i i) = 0
-  simp only [h, Matrix.trace_sub, Matrix.trace_mul_comm X Y, sub_self, map_zero, Finset.sum_const_zero]
+  simp only [h, Matrix.trace_sub, Matrix.trace_mul_comm X Y, sub_self, map_zero,
+    Finset.sum_const_zero]
 
 variable [_root_.NumberField.IsTotallyComplex E]
 
@@ -51,21 +54,22 @@ theorem kg_coord_atEmb_self (τ : E →+* ℂ) (z : ℂ) : coord τ (atEmb τ z)
   split_ifs <;> simp_all
 
 omit [NumberField E] [_root_.NumberField.IsTotallyComplex E] in
-theorem kg_coord_atEmb_of_ne {τ τ' : E →+* ℂ} (h : InfinitePlace.mk τ' ≠ InfinitePlace.mk τ) (z : ℂ) :
-    coord τ' (atEmb τ z) = 0 := by
+theorem kg_coord_atEmb_of_ne {τ τ' : E →+* ℂ} (h : InfinitePlace.mk τ' ≠ InfinitePlace.mk τ) (z : ℂ)
+    : coord τ' (atEmb τ z) = 0 := by
   classical
   rw [J.coord_eq]
   unfold atEmb
   split_ifs <;> simp only [Pi.single_eq_of_ne h, map_zero]
 
-theorem kg_sum_coord_atEmb (τ : E →+* ℂ) (z : ℂ) :
-    ∑ τ' : E →+* ℂ, coord τ' (atEmb τ z) = z + starRingEnd ℂ z := by
+theorem kg_sum_coord_atEmb (τ : E →+* ℂ) (z : ℂ)
+    : ∑ τ' : E →+* ℂ, coord τ' (atEmb τ z) = z + starRingEnd ℂ z := by
   have hne : ComplexEmbedding.conjugate τ ≠ τ := by
     intro h
     have h1 : (InfinitePlace.mk τ).IsReal :=
       InfinitePlace.isReal_mk_iff.2 (ComplexEmbedding.isReal_iff.2 h)
     exact (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex _)) h1
-  rw [Fintype.sum_eq_add τ (ComplexEmbedding.conjugate τ) hne.symm, J.coord_conjugate, kg_coord_atEmb_self]
+  rw [Fintype.sum_eq_add τ (ComplexEmbedding.conjugate τ) hne.symm, J.coord_conjugate,
+    kg_coord_atEmb_self]
   · rfl
   · rintro τ' ⟨h1, h2⟩
     refine kg_coord_atEmb_of_ne (fun h => ?_) z
@@ -73,8 +77,11 @@ theorem kg_sum_coord_atEmb (τ : E →+* ℂ) (z : ℂ) :
     · exact h1 h
     · exact h2 (by rw [← h]; exact (star_star τ').symm)
 
-theorem cx_kgT (τ : E →+* ℂ) (i j : Fin a) : cx τ (kgT (E := E) (a := a)) i j = if i = j then 1 else 0 := by
-  have h : ∀ z : ℂ, kgT (toL (Matrix.single i j (atEmb τ z))) = if i = j then z + starRingEnd ℂ z else 0 := by
+theorem cx_kgT (τ : E →+* ℂ) (i j : Fin a)
+    : cx τ (kgT (E := E) (a := a)) i j = if i = j then 1 else 0 := by
+  have h
+      : ∀ z : ℂ,
+        kgT (toL (Matrix.single i j (atEmb τ z))) = if i = j then z + starRingEnd ℂ z else 0 := by
     intro z
     rw [kgT_apply]
     split_ifs with hij

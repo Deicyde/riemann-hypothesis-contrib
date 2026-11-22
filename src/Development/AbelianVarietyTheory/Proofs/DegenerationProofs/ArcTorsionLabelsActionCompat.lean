@@ -7,18 +7,24 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsPow
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Relabel
 
 namespace GlobalTheory.Relabel
 open GlobalTheory.TorusExt
 
-theorem b_eq_of_equiv {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F]
-    [Algebra (FractionRing R) F] (hB : D.TauBimult) {j : ℕ} (hj : 0 < j) {p p' : QkPt D F j}
-    (h : QkPt.Equiv D F p p') (hy : p.y = 0) (hy' : p'.y = 0) : p'.g.b = p.g.b := by
+theorem b_eq_of_equiv
+    {R : Type} [CommRing R] [IsDomain R]
+    {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+    (hB : D.TauBimult)
+    {j : ℕ} (hj : 0 < j)
+    {p p' : QkPt D F j} (h : QkPt.Equiv D F p p') (hy : p.y = 0) (hy' : p'.y = 0)
+    : p'.g.b = p.g.b := by
   letI := gtGroup D F
   obtain ⟨z, h₁, t, ht, h₂⟩ := h
   rw [hy, hy', zero_add] at h₁
@@ -37,7 +43,23 @@ theorem b_eq_of_equiv {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : T
   have he := (isAdd_iff_eq _ _ _).1 h₂
   rw [he, htzero, add_zero]
 
-theorem act_compat_on_torsion : Laws → BrGtSt → AllD fun {E} _ _ _ {H} D => letI := H.starRing; ∀ (R : Type) [CommRing R] [IsDomain R] (C : Type) [NormedField C] [IsAlgClosed C] [Algebra (FractionRing R) C] (A : ArcF D R C) (o : Full D C) (M : Mdl o), M.P.TorsionIso → ∀ (N' : NumD C) (ν' : NumOf M.P.D.toPre C N') (k : ℕ) (β : A.N.Form k) (u r : Cˣ) (J : NumD.Iso (A.N.twist β u) N') (j : ℕ), 0 < j → r ^ j = u → (∀ x (p : (A.N.twist β u).QT j) (q' : N'.QT j) p' z, TwRel β u r (A.q _ x) p → q'.1.1.toAdd = J.e p.1.1.toAdd → J.Rel p.1.2 q'.1.2 → ν'.QPt p' q' → z.left = (o.I.ev j x).left ≫ M.φ → M.P.ToA C j p' z) → ∀ (x : 𝓞 E) (b : A.N.A), b ^ j = 1 → J.φ (actV (N := A.N) A.ν A.oa.onB x b) = actV ν' M.P.oD.onB x (J.φ b) := by
+theorem act_compat_on_torsion
+    : Laws → BrGtSt
+      → AllD fun {E} _ _ _ {H} D =>
+        letI := H.starRing
+        ∀ (R : Type) [CommRing R] [IsDomain R] (C : Type) [NormedField C] [IsAlgClosed C]
+            [Algebra (FractionRing R) C] (A : ArcF D R C) (o : Full D C) (M : Mdl o),
+          M.P.TorsionIso
+            → ∀ (N' : NumD C) (ν' : NumOf M.P.D.toPre C N') (k : ℕ) (β : A.N.Form k) (u r : Cˣ)
+                (J : NumD.Iso (A.N.twist β u) N') (j : ℕ),
+              0 < j → r ^ j = u
+                → (∀ x (p : (A.N.twist β u).QT j) (q' : N'.QT j) p' z,
+                  TwRel β u r (A.q _ x) p → q'.1.1.toAdd = J.e p.1.1.toAdd → J.Rel p.1.2 q'.1.2
+                    → ν'.QPt p' q' → z.left = (o.I.ev j x).left ≫ M.φ
+                    → M.P.ToA C j p' z)
+                → ∀ (x : 𝓞 E) (b : A.N.A),
+                  b ^ j = 1
+                    → J.φ (actV (N := A.N) A.ν A.oa.onB x b) = actV ν' M.P.oD.onB x (J.φ b) := by
   intro hL hBr E _ _ _ H D R _ _ C _ _ _ A o M hT N' ν' k β u r J j hj hr hlab x b hb
   letI := H.starRing
   have hG := hL.globalFns
@@ -50,11 +72,11 @@ theorem act_compat_on_torsion : Laws → BrGtSt → AllD fun {E} _ _ _ {H} D => 
   obtain ⟨τ, hτ, hQ, -⟩ := (twJ_mulEquiv C A.N N' k β u J).1 r j hr
   obtain ⟨f, f1, -, f3, -, f5, -⟩ := hT C j hj
 
-  have actzero : ∀ {V : Type} [CommRing V] [IsDomain V] {D₁ : DegPre V}
-      {O : Type} [CommRing O] [StarRing O] [Module O D₁.X]
-      [Algebra (FractionRing V) C] (hB₁ : D₁.TauBimult) (oa : D₁.OAct O)
-      (a : O) (p : QkPt D₁ C j), p.y = 0 →
-      ∃ q : QkPt D₁ C j, q.y = 0 ∧ q.g.b = p.g.b ≫ oa.onB.act a ∧ QkAct oa a p q := by
+  have actzero
+      : ∀ {V : Type} [CommRing V] [IsDomain V] {D₁ : DegPre V} {O : Type} [CommRing O] [StarRing O]
+          [Module O D₁.X] [Algebra (FractionRing V) C] (hB₁ : D₁.TauBimult) (oa : D₁.OAct O) (a : O)
+          (p : QkPt D₁ C j),
+        p.y = 0 → ∃ q : QkPt D₁ C j, q.y = 0 ∧ q.g.b = p.g.b ≫ oa.onB.act a ∧ QkAct oa a p q := by
     intro V _ _ D₁ O _ _ _ _ hB₁ oa a p hy
     letI := gtGroup D₁ C
     obtain ⟨z, hz, t, ht, ha⟩ := qk_equiv_refl hB₁ p
@@ -74,23 +96,32 @@ theorem act_compat_on_torsion : Laws → BrGtSt → AllD fun {E} _ _ _ {H} D => 
     have hq : j • gtSmul hG oa a p.g = 0 := by
       change j • (gtSmulHom hG oa C a) p.g = 0
       rw [← map_nsmul (gtSmulHom hG oa C a), hp, map_zero]
-    let q : QkPt D₁ C j := ⟨0, gtSmul hG oa a p.g, 0,
-      (isNsmul_iff_eq _ _ _).2 hq.symm, iz⟩
-    exact ⟨q, rfl, gtSmul_b hG oa a p.g, ⟨q, by simp [q, hy], gtAct_gtSmul hG oa a p.g, qk_equiv_refl hB₁ q⟩⟩
+    let q : QkPt D₁ C j := ⟨0, gtSmul hG oa a p.g, 0, (isNsmul_iff_eq _ _ _).2 hq.symm, iz⟩
+    exact ⟨
+      q,
+      rfl,
+      gtSmul_b hG oa a p.g,
+      ⟨q, by simp [q, hy], gtAct_gtSmul hG oa a p.g, qk_equiv_refl hB₁ q⟩
+    ⟩
 
-  have key : ∀ (v : D.La) (p : QkPt A.D₀ C j), QkPt.Equiv A.D₀ C (A.I.ev j v) p → p.y = 0 →
-      ∃ p' : QkPt M.P.D.toPre C j, p'.y = 0 ∧ p'.g.b = ν'.eA (J.φ (A.ν.eA.symm p.g.b)) ∧
-        (f p').left = (o.I.ev j v).left ≫ M.φ := by
+  have key
+      : ∀ (v : D.La) (p : QkPt A.D₀ C j),
+        QkPt.Equiv A.D₀ C (A.I.ev j v) p → p.y = 0
+          → ∃ p' : QkPt M.P.D.toPre C j,
+            p'.y = 0 ∧ p'.g.b = ν'.eA (J.φ (A.ν.eA.symm p.g.b))
+              ∧ (f p').left = (o.I.ev j v).left ≫ M.φ := by
     intro v p hp hy
     obtain ⟨q, hq, -⟩ := e1 p
     obtain ⟨p', hp'⟩ := e2' (τ q)
     obtain ⟨pv, hpv⟩ := e2' (τ (A.q j v))
-    have hE : QkPt.Equiv _ C pv p' := (e3' _ _ _ _ hpv hp').2 ((hQ _ _).1 ((e3 _ _ _ _ (A.hq j v) hq).1 hp))
+    have hE : QkPt.Equiv _ C pv p' :=
+      (e3' _ _ _ _ hpv hp').2 ((hQ _ _).1 ((e3 _ _ _ _ (A.hq j v) hq).1 hp))
     obtain ⟨t, t1, t2, t3⟩ := (hτ q _).1 rfl
     obtain ⟨s, s1, s2, s3⟩ := (hτ (A.q j v) _).1 rfl
-    let z : TFK (R := M.W) C ⟶ M.P.A.A := Over.homMk ((o.I.ev j v).left ≫ M.φ) (by
-      rw [Category.assoc, M.cart.1.w, ← Category.assoc, Over.w]
-      exact Category.id_comp _)
+    let z : TFK (R := M.W) C ⟶ M.P.A.A :=
+      Over.homMk ((o.I.ev j v).left ≫ M.φ) (by
+        rw [Category.assoc, M.cart.1.w, ← Category.assoc, Over.w]
+        exact Category.id_comp _)
     have hz := (f1 _ _).1 (hlab v s _ pv z s1 s2 s3 hpv rfl)
     refine ⟨p', ?_, ?_, ?_⟩
     · have h0 : q.1.1.toAdd = 0 := A.ν.eX.injective (hq.1.trans (hy.trans (map_zero _).symm))
@@ -99,7 +130,8 @@ theorem act_compat_on_torsion : Laws → BrGtSt → AllD fun {E} _ _ _ {H} D => 
     · rw [← hp'.2.1, t3.1, t1.2.1, ← hq.2.1, MulEquiv.symm_apply_apply]
     · rw [← (f3 _ _).2 hE, ← hz]
       rfl
-  obtain ⟨p₀, y₀, b₀⟩ := exists_qkPt_of_torsion (F := C) hB hj.ne' (b := A.ν.eA b) (by rw [← map_pow, hb, map_one])
+  obtain ⟨p₀, y₀, b₀⟩ :=
+    exists_qkPt_of_torsion (F := C) hB hj.ne' (b := A.ν.eA b) (by rw [← map_pow, hb, map_one])
   obtain ⟨v, hv⟩ := A.I.onto j hj p₀
   obtain ⟨p₁, y₁, a₀, hact₀⟩ := actzero hB A.oa x p₀ y₀
   have hv₁ : QkPt.Equiv A.D₀ C (A.I.ev j (x • v)) p₁ :=

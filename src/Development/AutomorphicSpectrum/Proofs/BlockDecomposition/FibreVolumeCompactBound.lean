@@ -6,13 +6,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalGra
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Free.FibreBound
 
-theorem compactOpen_mass_le : ∀ (V K : Type) [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [T2Space V] [TopologicalSpace K] [MeasurableSpace K] [BorelSpace K] [T2Space K] (μ : Measure V) (lam : Measure K) (Q : V → K) (Z : Set V) (m : K → Measure V), Continuous Q → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ Q id Z lam Set.univ m → ∀ P : Set V, IsCompact P → IsOpen P → P ⊆ Z → ∃ c : ℝ≥0, ∀ S : Set K, MeasurableSet S → μ (P ∩ Q ⁻¹' S) ≤ (c : ℝ≥0∞) * lam S := by
+theorem compactOpen_mass_le
+    : ∀ (V K : Type) [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [T2Space V]
+        [TopologicalSpace K] [MeasurableSpace K] [BorelSpace K] [T2Space K] (μ : Measure V)
+        (lam : Measure K) (Q : V → K) (Z : Set V) (m : K → Measure V),
+      Continuous Q
+        → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ Q id Z lam
+          Set.univ m
+        → ∀ P : Set V,
+          IsCompact P → IsOpen P → P ⊆ Z
+            → ∃ c : ℝ≥0, ∀ S : Set K, MeasurableSet S → μ (P ∩ Q ⁻¹' S) ≤ (c : ℝ≥0∞) * lam S := by
   intro V K _ _ _ _ _ _ _ _ μ lam Q Z m hQ h P hPc hPo hPZ
   have hPm : MeasurableSet P := hPo.measurableSet
   let φ : V → ℝ := P.indicator fun _ => 1
@@ -36,12 +46,14 @@ theorem compactOpen_mass_le : ∀ (V K : Type) [TopologicalSpace V] [MeasurableS
     · simp at h
     · exact h.ne
   have hcont : ContinuousOn (fun s => (m s P).toReal) (Q '' P) := by
-    have h' : ContinuousOn (fun s => (m s P).toReal) Set.univ := by
-      simpa only [hint] using hC
+    have h' : ContinuousOn (fun s => (m s P).toReal) Set.univ := by simpa only [hint] using hC
     exact h'.mono (Set.subset_univ _)
   obtain ⟨C, hCb⟩ := (hPc.image hQ).exists_bound_of_continuousOn hcont
   have hoff : ∀ s, s ∉ Q '' P → m s P = 0 := fun s hs => by
-    have hae := GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV.ae_lift_eq h (g := Q) (fun _ => rfl) Function.injective_id s
+    have hae :=
+      GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV.ae_lift_eq h (g := Q)
+        (fun _ => rfl)
+        Function.injective_id s
     refine measure_mono_null (t := {x | ¬ Q x = s}) ?_ hae
     intro x hx hxs
     exact hs ⟨x, hx, hxs⟩
@@ -53,9 +65,13 @@ theorem compactOpen_mass_le : ∀ (V K : Type) [TopologicalSpace V] [MeasurableS
     · rw [hoff s hs]
       exact bot_le
   refine ⟨C.toNNReal, fun S hS => ?_⟩
-  rw [GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV.fibre_mass_on h (g := Q) (fun _ => rfl) Function.injective_id hQ.measurable hPm hS
+  rw [GlobalTheory.CompanionTheory.SiegelND.Coef.AvgV.fibre_mass_on h (g := Q)
+    (fun _ => rfl)
+    Function.injective_id hQ.measurable hPm hS
     (fun x hx => hPZ hx.1)]
-  calc ∫⁻ s in S, m s P ∂lam ≤ ∫⁻ _ in S, (C.toNNReal : ℝ≥0∞) ∂lam := lintegral_mono hbd
+  calc
+    ∫⁻ s in S, m s P ∂lam
+      ≤ ∫⁻ _ in S, (C.toNNReal : ℝ≥0∞) ∂lam := lintegral_mono hbd
     _ = (C.toNNReal : ℝ≥0∞) * lam S := by rw [setLIntegral_const]
 
 end GlobalTheory.CompanionTheory.WeilSiegel.Free.FibreBound

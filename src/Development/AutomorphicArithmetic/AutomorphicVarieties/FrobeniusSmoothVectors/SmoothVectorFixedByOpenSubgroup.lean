@@ -7,8 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.smooth_vector_fixed_by_open_subgroup :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}, F.Ok C₀ → ∀ χ : F.Γ →* kˣ, χ F.c = -1 → (∀ v, ∃ s, χ (F.loc v s) ≠ 1) → Nontrivial (H1C F.loc (chRep χ) fun _ => ⊥) → ∃ x : F.Γ → k, IsLocallyConstant x ∧ (∀ g h, x (g * h) = x g + χ g * x h) ∧ x F.c = 0 ∧ (∀ v, ∃ Y : k, ∀ s, x (F.loc v s) = χ (F.loc v s) * Y - Y) ∧ ∃ g : F.G0, x g ≠ 0 := by
+theorem UpperTheory.smooth_vector_fixed_by_open_subgroup
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ},
+      F.Ok C₀
+        → ∀ χ : F.Γ →* kˣ,
+          χ F.c = -1 → (∀ v, ∃ s, χ (F.loc v s) ≠ 1) → Nontrivial (H1C F.loc (chRep χ) fun _ => ⊥)
+            → ∃ x : F.Γ → k,
+              IsLocallyConstant x ∧ (∀ g h, x (g * h) = x g + χ g * x h) ∧ x F.c = 0
+                ∧ (∀ v, ∃ Y : k, ∀ s, x (F.loc v s) = χ (F.loc v s) * Y - Y)
+                ∧ ∃ g : F.G0, x g ≠ 0 := by
   intro l _ k _ _ F C₀ hok χ hc hloc hnt
   obtain ⟨q, hq⟩ := exists_ne (0 : H1C F.loc (chRep χ) fun _ => ⊥)
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ q
@@ -66,8 +73,7 @@ theorem UpperTheory.smooth_vector_fixed_by_open_subgroup :
       · have hm : γ * F.c ∈ F.del.ker := by
           rw [MonoidHom.mem_ker, map_mul, hd, hok.del_c]
           rfl
-        have e : γ = (γ * F.c) * F.c := by
-          rw [mul_assoc, hok.c_sq, mul_one]
+        have e : γ = (γ * F.c) * F.c := by rw [mul_assoc, hok.c_sq, mul_one]
         rw [e, hcoc', hc', mul_zero, add_zero]
         exact hall ⟨_, hm⟩
     have hy : ∀ v, y v - X = 0 := by
@@ -75,12 +81,13 @@ theorem UpperTheory.smooth_vector_fixed_by_open_subgroup :
       obtain ⟨s, hs⟩ := hloc v
       have e := hloc' v s
       rw [hzero] at e
-      have e' : ((χ (F.loc v s) : k) - 1) * (y v - X) = 0 := by
-        linear_combination -e
+      have e' : ((χ (F.loc v s) : k) - 1) * (y v - X) = 0 := by linear_combination -e
       rcases mul_eq_zero.1 e' with h | h
-      · exact absurd (by
-          have : (χ (F.loc v s) : k) = 1 := sub_eq_zero.1 h
-          exact Units.val_eq_one.1 this) hs
+      · exact absurd
+          (by
+            have : (χ (F.loc v s) : k) = 1 := sub_eq_zero.1 h
+            exact Units.val_eq_one.1 this)
+          hs
       · exact h
     apply hq
     refine ⟨X, fun s => ?_, fun v => ?_⟩

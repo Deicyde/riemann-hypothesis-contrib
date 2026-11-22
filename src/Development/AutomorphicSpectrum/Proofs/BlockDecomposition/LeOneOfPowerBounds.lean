@@ -8,9 +8,9 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Casselman
 
-theorem le_one_of_forall_sqrt_mul_rpow_lt :
-    ∀ (δ r : ℝ), 0 < δ → δ < 1 → 0 ≤ r →
-      (∀ ε : ℝ, 0 < ε → δ⁻¹ * (Real.sqrt δ * r) ^ (2 + ε) < 1) → r ≤ 1 := by
+theorem le_one_of_forall_sqrt_mul_rpow_lt
+    : ∀ (δ r : ℝ),
+      0 < δ → δ < 1 → 0 ≤ r → (∀ ε : ℝ, 0 < ε → δ⁻¹ * (Real.sqrt δ * r) ^ (2 + ε) < 1) → r ≤ 1 := by
   intro δ r hδ hδ1 hr h
   by_contra hlt
   rw [not_le] at hlt
@@ -26,8 +26,9 @@ theorem le_one_of_forall_sqrt_mul_rpow_lt :
     nlinarith
   have hev : ∀ᶠ ε in 𝓝 (0 : ℝ), 1 < δ⁻¹ * (Real.sqrt δ * r) ^ (2 + ε) :=
     hcont.eventually (lt_mem_nhds h1)
-  obtain ⟨ε, hε1, hε0⟩ := ((hev.filter_mono nhdsWithin_le_nhds).and
-    (eventually_mem_nhdsWithin : ∀ᶠ x in 𝓝[Set.Ioi (0 : ℝ)] 0, x ∈ Set.Ioi (0 : ℝ))).exists
+  obtain ⟨ε, hε1, hε0⟩ :=
+    ((hev.filter_mono nhdsWithin_le_nhds).and
+      (eventually_mem_nhdsWithin : ∀ᶠ x in 𝓝[Set.Ioi (0 : ℝ)] 0, x ∈ Set.Ioi (0 : ℝ))).exists
   exact lt_asymm (h ε hε0) hε1
 
 end GlobalTheory.CompanionTheory.Casselman

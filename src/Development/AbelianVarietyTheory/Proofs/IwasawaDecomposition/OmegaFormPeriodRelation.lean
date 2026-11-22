@@ -15,9 +15,13 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr
+  GlobalTheory.Dict GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate
@@ -35,19 +39,20 @@ theorem fmt_mul_inv (V : HSp D) (g : GA D V) : fmt V g * fmt V g⁻¹ = 1 := by
   rw [← Matrix.map_mul, ← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one]
   exact Matrix.map_one _ (map_zero _) (map_one _)
 
-theorem isMov_hLat (V : HSp D) (hL : Bridge.hLat V 1 = stdL D.host.E V.rank) (g : GA D V) :
-    IsMov (fmt V g) (stdL D.host.E V.rank) (Bridge.hLat V (fin V g)) := by
+theorem isMov_hLat (V : HSp D) (hL : Bridge.hLat V 1 = stdL D.host.E V.rank) (g : GA D V)
+    : IsMov (fmt V g) (stdL D.host.E V.rank) (Bridge.hLat V (fin V g)) := by
   have hs : Submodule.span D.host.E (stdL D.host.E V.rank : Set (Fin V.rank → D.host.E)) = ⊤ := by
     rw [eq_top_iff, ← (Pi.basisFun D.host.E (Fin V.rank)).span_eq]
     refine Submodule.span_mono ?_
     rintro _ ⟨i, rfl⟩
     exact Submodule.subset_span ⟨i, (Pi.basisFun_apply _ _ i).symm⟩
-  obtain ⟨⟨L, hL', hm⟩, h2⟩ := (isMov_laws D V.rank _ ⟨Submodule.fg_span (Set.finite_range _), hs⟩).2.2.2 _ _
-    (fmt_mul_inv V g)
+  obtain ⟨⟨L, hL', hm⟩, h2⟩ :=
+    (isMov_laws D V.rank _ ⟨Submodule.fg_span (Set.finite_range _), hs⟩).2.2.2 _ _ (fmt_mul_inv V g)
   have h3 := (isMov_laws D V.rank L hL').1
   have h4 : fmt V g⁻¹ * fmt V g = 1 := mul_eq_one_comm.1 (fmt_mul_inv V g)
   have key : Bridge.hLat V (fin V g) = L := by
-    rw [Bridge.hLat, ← GlobalTheory.Equiv.StdSpace.identityClassLattice_eq_selfDualFrameLattice, hL, ← Submodule.span_eq L]
+    rw [Bridge.hLat, ← GlobalTheory.Equiv.StdSpace.identityClassLattice_eq_selfDualFrameLattice, hL,
+      ← Submodule.span_eq L]
     congr 1
     ext x
     change fmt V g⁻¹ *ᵥ toAf x ∈ hatV (stdL D.host.E V.rank) ↔ x ∈ L
@@ -71,10 +76,14 @@ theorem finPart_cA (x : AE D) : finPart D (cA D x) = cf D (finPart D x) := by
   induction x using TensorProduct.induction_on with
   | zero => rw [RingHom.map_zero, RingHom.map_zero, RingHom.map_zero]
   | tmul a x => rfl
-  | add x y hx hy => rw [RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _), hx, hy]
+  | add x y hx hy =>
+    rw [RingHom.map_add (f := _), RingHom.map_add (f := _), RingHom.map_add (f := _),
+      RingHom.map_add (f := _), hx, hy]
 
-theorem conj_mem_hatV {k : ℕ} {L L' : Lt D.host.E k} (h : ∀ v ∈ L, (fun j => cc (v j)) ∈ L') {u : Fin k → AfE D}
-    (hu : u ∈ hatV L) : cf D ∘ u ∈ hatV L' := by
+theorem conj_mem_hatV
+    {k : ℕ} {L L' : Lt D.host.E k} (h : ∀ v ∈ L, (fun j => cc (v j)) ∈ L')
+    {u : Fin k → AfE D} (hu : u ∈ hatV L)
+    : cf D ∘ u ∈ hatV L' := by
   induction hu using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨a, ha, x, hx, rfl⟩ := hy
@@ -83,8 +92,10 @@ theorem conj_mem_hatV {k : ℕ} {L L' : Lt D.host.E k} (h : ∀ v ∈ L, (fun j 
   | add a b _ _ ha hb => convert add_mem ha hb; funext i; exact RingHom.map_add _ _ _
   | neg a _ ha => convert neg_mem ha; funext i; exact RingHom.map_neg _ _
 
-theorem isMov_conj {V : HSp D} {g : GA D V} {L L' : Lt D.host.E V.rank} (h : IsMov (fmt V g) (stdL D.host.E V.rank) L)
-    (hc : ∀ v, v ∈ L' ↔ (fun j => cc (v j)) ∈ L) : IsMov (fmtC V g) (stdL D.host.E V.rank) L' := by
+theorem isMov_conj
+    {V : HSp D} {g : GA D V} {L L' : Lt D.host.E V.rank}
+    (h : IsMov (fmt V g) (stdL D.host.E V.rank) L) (hc : ∀ v, v ∈ L' ↔ (fun j => cc (v j)) ∈ L)
+    : IsMov (fmtC V g) (stdL D.host.E V.rank) L' := by
   have c4 : fmtC V g = (fmt V g).map (cf D) := by ext i j; exact finPart_cA _
   have c5 : ∀ v ∈ stdL D.host.E V.rank, (fun j => cc (v j)) ∈ stdL D.host.E V.rank := fun v hv => by
     rw [← GenLatCmp.std_eq, GenLatCmp.mem_std] at hv ⊢
@@ -102,10 +113,14 @@ theorem isMov_conj {V : HSp D} {g : GA D V} {L L' : Lt D.host.E V.rank} (h : IsM
     refine conj_mem_hatV (fun v hv => (hc _).2 ?_) ((h _).2 ⟨_, conj_mem_hatV c5 h0, rfl⟩)
     simpa [cc] using hv
 
-theorem exists_isDetAt {e : AE D} (he : e * e = e) (V : HSp D) (g : GA D V) : ∃ y, IsDetAt e V g y :=
-  ⟨Units.mkOfMulEqOne (e * (Formalism.L2.Theta.mt V g).det + (1 - e)) (e * cA D (Formalism.L2.Theta.mt V g).det + (1 - e)) (by
-    linear_combination (e * e) * det_conj_mul V g +
-      (2 - (Formalism.L2.Theta.mt V g).det - cA D (Formalism.L2.Theta.mt V g).det) * he), Units.val_mkOfMulEqOne _⟩
-
+theorem exists_isDetAt {e : AE D} (he : e * e = e) (V : HSp D) (g : GA D V)
+    : ∃ y, IsDetAt e V g y := ⟨
+  Units.mkOfMulEqOne (e * (Formalism.L2.Theta.mt V g).det + (1 - e))
+    (e * cA D (Formalism.L2.Theta.mt V g).det + (1 - e))
+    (by
+      linear_combination (e * e) * det_conj_mul V g +
+        (2 - (Formalism.L2.Theta.mt V g).det - cA D (Formalism.L2.Theta.mt V g).det) * he),
+  Units.val_mkOfMulEqOne _
+⟩
 
 end GlobalTheory.OneMapRef.ClassScalar

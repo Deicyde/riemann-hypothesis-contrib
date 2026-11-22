@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.UTor
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
@@ -23,34 +24,40 @@ noncomputable section
 namespace GlobalTheory.ZH.ToImm
 open GlobalTheory.ZH.CrdCalc GlobalTheory.ZH.ImmSep
 
-theorem ext_local {T X : Scheme.{0}} (f g : T ⟶ X)
-    (h : ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ T), y ≫ f = y ≫ g) : f = g :=
+theorem ext_local
+    {T X : Scheme.{0}}
+    (f g : T ⟶ X) (h : ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ T), y ≫ f = y ≫ g)
+    : f = g :=
   ReciprocityTheory.ChartRestriction.G.TB.JGPf.ext_of_fromSpecStalk f g fun t =>
     @h (T.presheaf.stalk t) _ (T.toLocallyRingedSpace.isLocalRing t) (T.fromSpecStalk t)
 
-theorem exists_hom_of_ringHom {X Y : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (V : Y.Opens)
-    (φ : Γ(X, U) →+* Γ(Y, V)) : ∃ g : V.toScheme ⟶ X, ∀ (R : Type) [CommRing R] (y : Sp R ⟶ V.toScheme)
-      (h : ⊤ ≤ (y ≫ V.ι) ⁻¹ᵁ V), ∃ h' : ⊤ ≤ (y ≫ g) ⁻¹ᵁ U,
-        ∀ f, valHom (y ≫ g) U h' f = valHom (y ≫ V.ι) V h (φ f) := by
+theorem exists_hom_of_ringHom
+    {X Y : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (V : Y.Opens) (φ : Γ(X, U) →+* Γ(Y, V))
+    : ∃ g : V.toScheme ⟶ X,
+      ∀ (R : Type) [CommRing R] (y : Sp R ⟶ V.toScheme) (h : ⊤ ≤ (y ≫ V.ι) ⁻¹ᵁ V),
+        ∃ h' : ⊤ ≤ (y ≫ g) ⁻¹ᵁ U, ∀ f,
+          valHom (y ≫ g) U h' f = valHom (y ≫ V.ι) V h (φ f) := by
   refine ⟨V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec, fun R _ y h => ?_⟩
   have h0 : ⊤ ≤ hU.fromSpec ⁻¹ᵁ U := hU.fromSpec_preimage_self.ge
-  have h' : ⊤ ≤ (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec) ⁻¹ᵁ U :=
-    fun z _ => h0 (Set.mem_univ ((y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)) z))
+  have h' : ⊤ ≤ (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec) ⁻¹ᵁ U := fun z _ =>
+    h0 (Set.mem_univ ((y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)) z))
   refine ⟨h', fun f => ?_⟩
   have h1 : hU.fromSpec.appLE U ⊤ h0 = (Scheme.ΓSpecIso _).inv := by
     rw [Scheme.Hom.appLE, IsAffineOpen.fromSpec_app_self, Category.assoc, ← Functor.map_comp]
     exact Category.comp_id _
-  have h2 : (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec).appLE U ⊤ h' =
-      hU.fromSpec.appLE U ⊤ h0 ≫ (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)).appTop :=
-    (Scheme.Hom.appLE_comp_appLE (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)) hU.fromSpec
-      U ⊤ ⊤ h0 le_rfl).symm
+  have h2
+      : (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec).appLE U ⊤ h'
+        = hU.fromSpec.appLE U ⊤ h0 ≫ (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)).appTop :=
+    (Scheme.Hom.appLE_comp_appLE (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ)) hU.fromSpec U ⊤ ⊤
+      h0 le_rfl).symm
   have h3 : (y ≫ V.ι).appLE V ⊤ h = V.topIso.inv ≫ y.appTop := by
     rw [← Scheme.Hom.appLE_comp_appLE y V.ι V ⊤ ⊤ (fun x _ => x.2) le_rfl]
     erw [Scheme.Opens.ι_appLE]
     simp only [Scheme.Opens.topIso_inv]
     congr 1
-  have h4 : (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec).appLE U ⊤ h' =
-      CommRingCat.ofHom φ ≫ (y ≫ V.ι).appLE V ⊤ h := by
+  have h4
+      : (y ≫ V.toSpecΓ ≫ Spec.map (CommRingCat.ofHom φ) ≫ hU.fromSpec).appLE U ⊤ h'
+        = CommRingCat.ofHom φ ≫ (y ≫ V.ι).appLE V ⊤ h := by
     rw [h2, h1, h3, Scheme.Hom.comp_appTop, Scheme.Hom.comp_appTop, Scheme.Opens.toSpecΓ_appTop]
     simp only [Category.assoc]
     rw [Scheme.ΓSpecIso_naturality_assoc]
@@ -59,15 +66,20 @@ theorem exists_hom_of_ringHom {X Y : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpe
   rw [h4]
   rfl
 
-def constHom {k : Type} [CommRing k] {X : Scheme.{0}} (p : X ⟶ Sp k) (U : X.Opens) : k →+* Γ(X, U) :=
+def constHom {k : Type} [CommRing k] {X : Scheme.{0}} (p : X ⟶ Sp k) (U : X.Opens)
+    : k →+* Γ(X, U) :=
   (p.appLE ⊤ U (fun _ _ => trivial)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom
 
-theorem constHom_apply {k : Type} [CommRing k] {X : Scheme.{0}} (p : X ⟶ Sp k) (U : X.Opens) (a : k) :
-    constHom p U a = constFn p U a := rfl
+theorem constHom_apply {k : Type} [CommRing k] {X : Scheme.{0}} (p : X ⟶ Sp k) (U : X.Opens) (a : k)
+    : constHom p U a = constFn p U a :=
+  rfl
 
-theorem eq_zero_of_dense {Y : Scheme.{0}} [IsReduced Y] {K : Type} [Field K] {A : Type}
-    (x : A → (Sp K ⟶ Y)) (hd : Dense (⋃ a, Set.range (x a))) (V : Y.Opens) (f : Γ(Y, V))
-    (hf : ∀ a (h : ⊤ ≤ x a ⁻¹ᵁ V), valHom (x a) V h f = 0) : f = 0 := by
+theorem eq_zero_of_dense
+    {Y : Scheme.{0}} [IsReduced Y]
+    {K : Type} [Field K]
+    {A : Type} (x : A → (Sp K ⟶ Y)) (hd : Dense (⋃ a, Set.range (x a)))
+    (V : Y.Opens) (f : Γ(Y, V)) (hf : ∀ a (h : ⊤ ≤ x a ⁻¹ᵁ V), valHom (x a) V h f = 0)
+    : f = 0 := by
   rw [← basicOpen_eq_bot_iff, eq_bot_iff]
   intro z hz
   obtain ⟨w, hw, hw'⟩ := hd.inter_open_nonempty _ (Y.basicOpen f).isOpen ⟨z, hz⟩
@@ -81,27 +93,35 @@ theorem eq_zero_of_dense {Y : Scheme.{0}} [IsReduced Y] {K : Type} [Field K] {A 
   rw [valR_eq _ _ h2, hf a h2] at this
   exact (not_isUnit_zero this).elim
 
-theorem comp_eq_of_const {k R : Type} [CommRing k] [CommRing R] {X Y : Scheme.{0}} (p : X ⟶ Sp k)
-    (p' : Y ⟶ Sp k) (x : Sp R ⟶ X) (y : Sp R ⟶ Y) {U : X.Opens} {V : Y.Opens} (h : ⊤ ≤ x ⁻¹ᵁ U)
-    (h' : ⊤ ≤ y ⁻¹ᵁ V) (e : ∀ a, valHom x U h (constFn p U a) = valHom y V h' (constFn p' V a)) :
-    x ≫ p = y ≫ p' := by
+theorem comp_eq_of_const
+    {k R : Type} [CommRing k] [CommRing R]
+    {X Y : Scheme.{0}} (p : X ⟶ Sp k) (p' : Y ⟶ Sp k) (x : Sp R ⟶ X) (y : Sp R ⟶ Y)
+    {U : X.Opens} {V : Y.Opens} (h : ⊤ ≤ x ⁻¹ᵁ U) (h' : ⊤ ≤ y ⁻¹ᵁ V)
+    (e : ∀ a, valHom x U h (constFn p U a) = valHom y V h' (constFn p' V a))
+    : x ≫ p = y ≫ p' := by
   refine eq_of_valHom_eq _ _ ⊤ (isAffineOpen_top _) le_top le_top (RingHom.ext fun f => ?_)
-  obtain ⟨a, rfl⟩ := (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv.surjective f
+  obtain ⟨a, rfl⟩ :=
+    (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv.surjective f
   have := e a
   rw [valHom_constFn, valHom_constFn] at this
   exact this
 
-variable {k : Type} [CommRing k] {X Y : Scheme.{0}} {p : X ⟶ Sp k} {p' : Y ⟶ Sp k} {H : LB X} {H' : LB Y}
-  {J : Type} {s : J → H.Sec} {s' : J → H'.Sec}
+variable
+  {k : Type} [CommRing k]
+  {X Y : Scheme.{0}} {p : X ⟶ Sp k} {p' : Y ⟶ Sp k} {H : LB X} {H' : LB Y} {J : Type}
+  {s : J → H.Sec} {s' : J → H'.Sec}
 
-theorem exists_chart [IsReduced Y] (hH : H.IsLB) (hH' : H'.IsLB) (hI : ImmBy p H s Set.univ)
-    {K : Type} [Field K] {A : Type} (x : A → (Sp K ⟶ Y)) (x' : A → (Sp K ⟶ X))
-    (hd : Dense (⋃ a, Set.range (x a)))
-    (hx : ∀ a, x' a ≫ p = x a ≫ p' ∧ ∃ v, Crd H' s' (x a) v ∧ Crd H s (x' a) v) (i : J) :
-    ∃ g : (nonzeroLocus (s' i)).toScheme ⟶ X, ∀ (R : Type) [CommRing R] [IsLocalRing R]
-      (y : Sp R ⟶ (nonzeroLocus (s' i)).toScheme),
-      (y ≫ g) ≫ p = (y ≫ (nonzeroLocus (s' i)).ι) ≫ p' ∧
-        ∀ v, Crd H' s' (y ≫ (nonzeroLocus (s' i)).ι) v → Crd H s (y ≫ g) v := by
+theorem exists_chart
+    [IsReduced Y]
+    (hH : H.IsLB) (hH' : H'.IsLB) (hI : ImmBy p H s Set.univ)
+    {K : Type} [Field K]
+    {A : Type} (x : A → (Sp K ⟶ Y)) (x' : A → (Sp K ⟶ X)) (hd : Dense (⋃ a, Set.range (x a)))
+    (hx : ∀ a, x' a ≫ p = x a ≫ p' ∧ ∃ v, Crd H' s' (x a) v ∧ Crd H s (x' a) v)
+    (i : J)
+    : ∃ g : (nonzeroLocus (s' i)).toScheme ⟶ X,
+      ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ (nonzeroLocus (s' i)).toScheme),
+        (y ≫ g) ≫ p = (y ≫ (nonzeroLocus (s' i)).ι) ≫ p'
+          ∧ ∀ v, Crd H' s' (y ≫ (nonzeroLocus (s' i)).ι) v → Crd H s (y ≫ g) v := by
   obtain ⟨hA, r, hr, hc⟩ := hI.2 i (Set.mem_univ i)
   choose r' hr' using fun j =>
     (GlobalTheory.SecRatio.existsUnique_isRatio hH' (s' j) (s' i) (nonzeroLocus (s' i)) le_rfl).exists
@@ -148,29 +168,44 @@ theorem exists_chart [IsReduced Y] (hH : H.IsLB) (hH' : H'.IsLB) (hI : ImmBy p H
   have := crd_smul (hu.unit * hu'.unit⁻¹) hw
   convert this using 2 with j
   rw [crd_ratio hv' (hr' j) h, crd_ratio hw (hr j) h', valR_eq _ _ h, valR_eq _ _ h', hv, hφr,
-    mul_left_comm, Units.val_mul, _root_.mul_assoc, IsUnit.val_inv_mul, _root_.mul_one, IsUnit.unit_spec]
+    mul_left_comm, Units.val_mul, _root_.mul_assoc, IsUnit.val_inv_mul, _root_.mul_one,
+    IsUnit.unit_spec]
 
-theorem exists_factor : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) [IsReduced Y] (p : X ⟶ Sp k) (p' : Y ⟶ Sp k) (H : LB X) (H' : LB Y) (J : Type) [Fintype J] (s : J → H.Sec) (s' : J → H'.Sec), H.IsLB → H'.IsLB → ImmBy p H s Set.univ → ⨆ j, nonzeroLocus (s' j) = ⊤ → ∀ (K : Type) [Field K] (A : Type) (x : A → (Sp K ⟶ Y)) (x' : A → (Sp K ⟶ X)), Dense (⋃ a, Set.range (x a)) → (∀ a, x' a ≫ p = x a ≫ p' ∧ ∃ v, Crd H' s' (x a) v ∧ Crd H s (x' a) v) → ∃ g : Y ⟶ X, g ≫ p = p' ∧ (∀ a, x a ≫ g = x' a) ∧ ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ Y) (v : J → R), Crd H' s' y v → Crd H s (y ≫ g) v := by
+theorem exists_factor
+    : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) [IsReduced Y] (p : X ⟶ Sp k) (p' : Y ⟶ Sp k)
+        (H : LB X) (H' : LB Y) (J : Type) [Fintype J] (s : J → H.Sec) (s' : J → H'.Sec),
+      H.IsLB → H'.IsLB → ImmBy p H s Set.univ → ⨆ j, nonzeroLocus (s' j) = ⊤
+        → ∀ (K : Type) [Field K] (A : Type) (x : A → (Sp K ⟶ Y)) (x' : A → (Sp K ⟶ X)),
+          Dense (⋃ a, Set.range (x a))
+            → (∀ a, x' a ≫ p = x a ≫ p' ∧ ∃ v, Crd H' s' (x a) v ∧ Crd H s (x' a) v)
+            → ∃ g : Y ⟶ X,
+              g ≫ p = p' ∧ (∀ a, x a ≫ g = x' a)
+                ∧ ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ Y) (v : J → R),
+                  Crd H' s' y v → Crd H s (y ≫ g) v := by
   intro k _ X Y _ p p' H H' J _ s s' hH hH' hI hc K _ A x x' hd hx
   choose g hg using exists_chart hH hH' hI x x' hd hx
   let 𝒰 := Y.openCoverOfIsOpenCover (fun j => nonzeroLocus (s' j)) hc
-  have hcomp : ∀ i j : J, pullback.fst (nonzeroLocus (s' i)).ι (nonzeroLocus (s' j)).ι ≫ g i =
-      pullback.snd (nonzeroLocus (s' i)).ι (nonzeroLocus (s' j)).ι ≫ g j := by
+  have hcomp
+      : ∀ i j : J,
+        pullback.fst (nonzeroLocus (s' i)).ι (nonzeroLocus (s' j)).ι ≫ g i
+          = pullback.snd (nonzeroLocus (s' i)).ι (nonzeroLocus (s' j)).ι ≫ g j := by
     intro i j
     refine ext_local _ _ fun R _ _ y => ?_
-    have e : (y ≫ pullback.fst _ _) ≫ (nonzeroLocus (s' i)).ι =
-        (y ≫ pullback.snd _ _) ≫ (nonzeroLocus (s' j)).ι := by
+    have e
+        : (y ≫ pullback.fst _ _) ≫ (nonzeroLocus (s' i)).ι
+          = (y ≫ pullback.snd _ _) ≫ (nonzeroLocus (s' j)).ι := by
       rw [Category.assoc, Category.assoc, pullback.condition]
     obtain ⟨a₁, b₁⟩ := hg i R (y ≫ pullback.fst _ _)
     obtain ⟨a₂, b₂⟩ := hg j R (y ≫ pullback.snd _ _)
     obtain ⟨v, hv⟩ := crd_exists hH' s' ((y ≫ pullback.fst _ _) ≫ (nonzeroLocus (s' i)).ι)
     rw [← Category.assoc, ← Category.assoc]
     exact eq_of_crd_eq k X p H J s _ hH hI R _ _ v (by rw [a₁, a₂, e]) (b₁ v hv) (b₂ v (e ▸ hv))
-  have hG : ∀ i, (nonzeroLocus (s' i)).ι ≫ 𝒰.glueMorphisms g hcomp = g i :=
-    fun i => 𝒰.ι_glueMorphisms g hcomp i
-  have key : ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ Y),
-      (y ≫ 𝒰.glueMorphisms g hcomp) ≫ p = y ≫ p' ∧
-        ∀ v, Crd H' s' y v → Crd H s (y ≫ 𝒰.glueMorphisms g hcomp) v := by
+  have hG : ∀ i, (nonzeroLocus (s' i)).ι ≫ 𝒰.glueMorphisms g hcomp = g i := fun i =>
+    𝒰.ι_glueMorphisms g hcomp i
+  have key
+      : ∀ (R : Type) [CommRing R] [IsLocalRing R] (y : Sp R ⟶ Y),
+        (y ≫ 𝒰.glueMorphisms g hcomp) ≫ p = y ≫ p'
+          ∧ ∀ v, Crd H' s' y v → Crd H s (y ≫ 𝒰.glueMorphisms g hcomp) v := by
     intro R _ _ y
     have : y (IsLocalRing.closedPoint R) ∈ ⨆ j, nonzeroLocus (s' j) := by rw [hc]; trivial
     obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 this
@@ -182,11 +217,16 @@ theorem exists_factor : ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) [IsReduce
     have e := IsOpenImmersion.lift_fac (nonzeroLocus (s' i)).ι y hr
     have := hg i R (IsOpenImmersion.lift (nonzeroLocus (s' i)).ι y hr)
     rwa [← hG i, ← Category.assoc, e] at this
-  refine ⟨𝒰.glueMorphisms g hcomp, ext_local _ _ fun R _ _ y => ?_, fun a => ?_,
-    fun R _ _ y => (key R y).2⟩
+  refine ⟨
+    𝒰.glueMorphisms g hcomp,
+    ext_local _ _ fun R _ _ y => ?_,
+    fun a => ?_,
+    fun R _ _ y => (key R y).2
+  ⟩
   · rw [← Category.assoc, (key R y).1]
   · obtain ⟨e, v, hv', hv⟩ := hx a
-    exact eq_of_crd_eq k X p H J s _ hH hI K _ _ v (by rw [(key K (x a)).1, e]) ((key K (x a)).2 v hv') hv
+    exact eq_of_crd_eq k X p H J s _ hH hI K _ _ v (by rw [(key K (x a)).1, e])
+      ((key K (x a)).2 v hv') hv
 
 end GlobalTheory.ZH.ToImm
 end

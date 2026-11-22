@@ -32,13 +32,15 @@ theorem ModelLocalizationMaximalPoint.proof : ModelLocalizationMaximalPoint.Stat
     | C c =>
       have h : algebraMap A R' (C c) = Ideal.Quotient.mk M.ideal (C c) := by rw [hφ, rename_C]
       exact h ▸ isIntegral_algebraMap
-    | add p r hp hr => rw [map_add (f := _)]; exact hp.add hr
+    | add p r hp hr =>
+      rw [map_add (f := _)]; exact hp.add hr
     | mul_X p s hp =>
       rw [map_mul]
       refine hp.mul ?_
       cases s with
       | inl i =>
-        have h : algebraMap A R' (X i) = Ideal.Quotient.mk M.ideal (X (Sum.inl i)) := by rw [hφ, rename_X]
+        have h : algebraMap A R' (X i) = Ideal.Quotient.mk M.ideal (X (Sum.inl i)) := by
+          rw [hφ, rename_X]
         exact h ▸ isIntegral_algebraMap
       | inr i =>
         obtain ⟨F, hmon, hF⟩ := M.integral i
@@ -67,7 +69,8 @@ theorem ModelLocalizationMaximalPoint.proof : ModelLocalizationMaximalPoint.Stat
     exact h
   have hPQ' : P = Q'.map (algebraMap R' L) := by
     have hne : Q'.map (algebraMap R' L) ≠ ⊤ :=
-      (IsLocalization.isPrime_of_isPrime_disjoint (normalModelSubmonoid M q) L Q' hQ'prime hdisj).ne_top
+      (IsLocalization.isPrime_of_isPrime_disjoint (normalModelSubmonoid M q) L Q' hQ'prime
+        hdisj).ne_top
     refine hP.eq_of_le hne ?_
     rw [← IsLocalization.map_under (normalModelSubmonoid M q) L P]
     exact Ideal.map_mono hQQ'

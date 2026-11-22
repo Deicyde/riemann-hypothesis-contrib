@@ -17,9 +17,11 @@ open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
 noncomputable section
 
-variable {O : Type} [CommRing O] [IsLocalRing O]
-  {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι] {rbar : Γ →* Matrix ι ι (ResidueField O)}
-  {σ : Type} (s : σ → Γ) {A A' : Type} [CommRing A] [Algebra O A] [IsCO O A] [CommRing A'] [Algebra O A'] [IsCO O A']
+variable
+  {O : Type} [CommRing O] [IsLocalRing O]
+  {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι]
+  {rbar : Γ →* Matrix ι ι (ResidueField O)} {σ : Type} (s : σ → Γ)
+  {A A' : Type} [CommRing A] [Algebra O A] [IsCO O A] [CommRing A'] [Algebra O A'] [IsCO O A']
 
 private def cst (x : ResidueField O) : O := (residue_surjective x).choose
 
@@ -27,23 +29,27 @@ private theorem cst_spec (x : ResidueField O) : algebraMap O (ResidueField O) (c
   (residue_surjective x).choose_spec
 
 private def IsEv (r : Lift O rbar A) (F : MvPowerSeries (σ × ι × ι) O →ₐ[O] A) : Prop :=
-  ∀ t : σ × ι × ι, F (X t) = r.hom (s t.1) t.2.1 t.2.2 - algebraMap O A (cst (rbar (s t.1) t.2.1 t.2.2))
+  ∀ t : σ × ι × ι,
+    F (X t) = r.hom (s t.1) t.2.1 t.2.2 - algebraMap O A (cst (rbar (s t.1) t.2.1 t.2.2))
 
-private def Gen (r : Lift O rbar A) : Prop := Algebra.adjoin O {x : A | ∃ g a b, x = r.hom g a b} = ⊤
+private def Gen (r : Lift O rbar A) : Prop :=
+  Algebra.adjoin O {x : A | ∃ g a b, x = r.hom g a b} = ⊤
 
-private theorem sub_cst_mem (r : Lift O rbar A) (g : Γ) (a b : ι) :
-    r.hom g a b - algebraMap O A (cst (rbar g a b)) ∈ maximalIdeal A := by
+private theorem sub_cst_mem (r : Lift O rbar A) (g : Γ) (a b : ι)
+    : r.hom g a b - algebraMap O A (cst (rbar g a b)) ∈ maximalIdeal A := by
   rw [← res_eq_zero_iff O, map_sub, r.red, AlgHom.commutes, cst_spec, sub_self]
 
-private theorem IsEv.map {r : Lift O rbar A} {F : MvPowerSeries (σ × ι × ι) O →ₐ[O] A} (h : IsEv s r F)
-    (f : A →ₐ[O] A') : IsEv s (r.map f) (f.comp F) := fun t => by
+private theorem IsEv.map
+    {r : Lift O rbar A} {F : MvPowerSeries (σ × ι × ι) O →ₐ[O] A} (h : IsEv s r F) (f : A →ₐ[O] A')
+    : IsEv s (r.map f) (f.comp F) := fun t => by
   rw [AlgHom.comp_apply, h t, map_sub, AlgHom.commutes, Lift.map_hom]
 
-private theorem mem_max_map (f : A →ₐ[O] A') {x : A} : f x ∈ maximalIdeal A' ↔ x ∈ maximalIdeal A := by
+private theorem mem_max_map (f : A →ₐ[O] A') {x : A}
+    : f x ∈ maximalIdeal A' ↔ x ∈ maximalIdeal A := by
   rw [← res_eq_zero_iff O, res_map, res_eq_zero_iff]
 
-private theorem mem_pow_map (f : A →ₐ[O] A') (n : ℕ) {x : A} (hx : x ∈ maximalIdeal A ^ n) :
-    f x ∈ maximalIdeal A' ^ n := by
+private theorem mem_pow_map (f : A →ₐ[O] A') (n : ℕ) {x : A} (hx : x ∈ maximalIdeal A ^ n)
+    : f x ∈ maximalIdeal A' ^ n := by
   have h1 : Ideal.map (f : A →+* A') (maximalIdeal A) ≤ maximalIdeal A' := by
     rw [Ideal.map_le_iff_le_comap]
     intro y hy
@@ -52,8 +58,8 @@ private theorem mem_pow_map (f : A →ₐ[O] A') (n : ℕ) {x : A} (hx : x ∈ m
   rw [Ideal.map_pow] at h2
   exact Ideal.pow_right_mono h1 n h2
 
-private theorem map_pow_max (f : A →ₐ[O] A') (hf : Function.Surjective f) (n : ℕ) :
-    (maximalIdeal A ^ n).map (f : A →+* A') = maximalIdeal A' ^ n := by
+private theorem map_pow_max (f : A →ₐ[O] A') (hf : Function.Surjective f) (n : ℕ)
+    : (maximalIdeal A ^ n).map (f : A →+* A') = maximalIdeal A' ^ n := by
   rw [Ideal.map_pow]
   congr 1
   apply le_antisymm
@@ -64,15 +70,19 @@ private theorem map_pow_max (f : A →ₐ[O] A') (hf : Function.Surjective f) (n
     obtain ⟨x, rfl⟩ := hf y
     exact Ideal.mem_map_of_mem _ ((mem_max_map f).1 hy)
 
-private theorem fin_quot (O A : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)] [CommRing A]
-    [Algebra O A] [IsCO O A] (n : ℕ) : Finite (A ⧸ maximalIdeal A ^ n) := by
+private theorem fin_quot
+    (O A : Type)
+    [CommRing O] [IsLocalRing O] [Finite (ResidueField O)] [CommRing A] [Algebra O A] [IsCO O A]
+    (n : ℕ)
+    : Finite (A ⧸ maximalIdeal A ^ n) := by
   have hk : Finite (ResidueField A) :=
     Finite.of_injective _ (Equiv.ofBijective _ (resMap_bijective O A)).symm.injective
   have hk' : Finite (A ⧸ maximalIdeal A) := hk
   exact Ideal.finite_quotient_pow (IsNoetherian.noetherian _) n
 
-private theorem co_trunc (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A]
-    [Algebra O A] [IsCO O A] (n : ℕ) : IsCO O (A ⧸ maximalIdeal A ^ (n + 1)) := by
+private theorem co_trunc
+    (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A] [Algebra O A] [IsCO O A] (n : ℕ)
+    : IsCO O (A ⧸ maximalIdeal A ^ (n + 1)) := by
   haveI : Nontrivial (A ⧸ maximalIdeal A ^ (n + 1)) := Ideal.Quotient.nontrivial_iff.mpr (by
     intro h
     have hle : maximalIdeal A ^ (n + 1) ≤ maximalIdeal A := Ideal.pow_le_self (Nat.succ_ne_zero n)
@@ -80,12 +90,13 @@ private theorem co_trunc (O A : Type) [CommRing O] [IsLocalRing O] [CommRing A]
     exact (maximalIdeal.isMaximal A).ne_top (top_le_iff.1 hle))
   exact co_quot O A _ (Ideal.Quotient.mkₐ O _) (Ideal.Quotient.mkₐ_surjective O _)
 
-private theorem trunc_pow (n : ℕ) [IsCO O (A ⧸ maximalIdeal A ^ n)] :
-    maximalIdeal (A ⧸ maximalIdeal A ^ n) ^ n = ⊥ := by
+private theorem trunc_pow (n : ℕ) [IsCO O (A ⧸ maximalIdeal A ^ n)]
+    : maximalIdeal (A ⧸ maximalIdeal A ^ n) ^ n = ⊥ := by
   rw [← map_pow_max (Ideal.Quotient.mkₐ O (maximalIdeal A ^ n)) (Ideal.Quotient.mkₐ_surjective O _)]
   exact Ideal.map_quotient_self _
 
-private theorem Gen.surj {r : Lift O rbar A} (f : A →ₐ[O] A') (h : Gen (r.map f)) : Function.Surjective f := by
+private theorem Gen.surj {r : Lift O rbar A} (f : A →ₐ[O] A') (h : Gen (r.map f))
+    : Function.Surjective f := by
   have h' : Algebra.adjoin O {x : A' | ∃ g a b, x = (r.map f).hom g a b} = ⊤ := h
   have hle : Algebra.adjoin O {x : A' | ∃ g a b, x = (r.map f).hom g a b} ≤ f.range := by
     rw [Algebra.adjoin_le_iff]
@@ -98,7 +109,8 @@ private theorem Gen.surj {r : Lift O rbar A} (f : A →ₐ[O] A') (h : Gen (r.ma
     exact Algebra.mem_top
   exact (AlgHom.mem_range f).1 (hle hy)
 
-private theorem Gen.ext {r : Lift O rbar A} (h : Gen r) {f f' : A →ₐ[O] A'} (e : r.map f = r.map f') : f = f' := by
+private theorem Gen.ext {r : Lift O rbar A} (h : Gen r) {f f' : A →ₐ[O] A'} (e : r.map f = r.map f')
+    : f = f' := by
   apply AlgHom.ext_of_adjoin_eq_top h
   rintro x ⟨g, a, b, rfl⟩
   have hc := congrArg (fun q => q.hom g a b) e
@@ -107,38 +119,47 @@ private theorem Gen.ext {r : Lift O rbar A} (h : Gen r) {f f' : A →ₐ[O] A'} 
 variable [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [Finite σ]
 
 private theorem ev_exu (r : Lift O rbar A) : ∃! F, IsEv s r F := by
-  obtain ⟨F, ⟨-, h⟩, hu⟩ := co_ev O O A (σ × ι × ι) (Algebra.ofId O A) _
-    fun t => sub_cst_mem r (s t.1) t.2.1 t.2.2
+  obtain ⟨F, ⟨-, h⟩, hu⟩ :=
+    co_ev O O A (σ × ι × ι) (Algebra.ofId O A) _ fun t => sub_cst_mem r (s t.1) t.2.1 t.2.2
   exact ⟨F, h, fun G hG => hu G ⟨fun x => G.commutes x, hG⟩⟩
 
 private instance : IsCO O (MvPowerSeries (σ × ι × ι) O) := co_mvps O O _
 
-private def Seps (rbar : Γ →* Matrix ι ι (ResidueField O)) [IsCO O (DualNumber (ResidueField O))] (s : σ → Γ) : Prop :=
+private def Seps
+    (rbar : Γ →* Matrix ι ι (ResidueField O)) [IsCO O (DualNumber (ResidueField O))] (s : σ → Γ)
+    : Prop :=
   ∀ r r' : Lift O rbar (DualNumber (ResidueField O)), (∀ t, r.hom (s t) = r'.hom (s t)) → r = r'
 
 variable [IsCO O (DualNumber (ResidueField O))]
 
-private theorem ev_surj (hs : Seps rbar s) {r : Lift O rbar A} (hr : Gen r)
-    {F : MvPowerSeries (σ × ι × ι) O →ₐ[O] A} (h : IsEv s r F) : Function.Surjective F := by
-  have hXm : ∀ t, (X t : MvPowerSeries (σ × ι × ι) O) ∈ maximalIdeal (MvPowerSeries (σ × ι × ι) O) := by
+private theorem ev_surj
+    (hs : Seps rbar s)
+    {r : Lift O rbar A} (hr : Gen r)
+    {F : MvPowerSeries (σ × ι × ι) O →ₐ[O] A} (h : IsEv s r F)
+    : Function.Surjective F := by
+  have hXm
+      : ∀ t, (X t : MvPowerSeries (σ × ι × ι) O) ∈ maximalIdeal (MvPowerSeries (σ × ι × ι) O) := by
     intro t
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff,
       MvPowerSeries.constantCoeff_X]
     exact not_isUnit_zero
   apply co_surj O (MvPowerSeries (σ × ι × ι) O) A F
-  have hspan := co_span O A O (Algebra.ofId O A) (Set.range fun t => F (X t)) (by
-      rintro _ ⟨t, rfl⟩
-      show F (X t) ∈ maximalIdeal A
-      rw [h t]
-      exact sub_cst_mem r _ _ _) (by
-      intro f f' _ hff
-      apply Gen.ext hr
-      refine hs _ _ (fun t => ?_)
-      refine Matrix.ext fun a b => ?_
-      rw [Lift.map_hom, Lift.map_hom]
-      have e1 := hff (F (X (t, a, b))) ⟨(t, a, b), rfl⟩
-      rw [h (t, a, b), map_sub, map_sub, AlgHom.commutes, AlgHom.commutes] at e1
-      exact sub_left_inj.1 e1)
+  have hspan :=
+    co_span O A O (Algebra.ofId O A) (Set.range fun t => F (X t))
+      (by
+        rintro _ ⟨t, rfl⟩
+        show F (X t) ∈ maximalIdeal A
+        rw [h t]
+        exact sub_cst_mem r _ _ _)
+      (by
+        intro f f' _ hff
+        apply Gen.ext hr
+        refine hs _ _ (fun t => ?_)
+        refine Matrix.ext fun a b => ?_
+        rw [Lift.map_hom, Lift.map_hom]
+        have e1 := hff (F (X (t, a, b))) ⟨(t, a, b), rfl⟩
+        rw [h (t, a, b), map_sub, map_sub, AlgHom.commutes, AlgHom.commutes] at e1
+        exact sub_left_inj.1 e1)
   refine hspan.trans (sup_le (sup_le ?_ ?_) le_sup_right)
   · refine le_sup_of_le_left ?_
     rw [Ideal.span_le]
@@ -154,20 +175,24 @@ private theorem ev_surj (hs : Seps rbar s) {r : Lift O rbar A} (hr : Gen r)
     rw [e2]
     exact Ideal.mem_map_of_mem _ ((mem_max_map (Algebra.ofId O (MvPowerSeries (σ × ι × ι) O))).2 hm)
 
-private theorem level [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocallyConstant rbar) (N : ℕ) :
-    ∃ (A : Type) (_ : CommRing A) (_ : Algebra O A) (_ : IsCO O A) (r : Lift O rbar A),
-      maximalIdeal A ^ (N + 1) = ⊥ ∧ Gen r ∧ ∀ (A' : Type) [CommRing A'] [Algebra O A'] [IsCO O A']
-        (r' : Lift O rbar A'), maximalIdeal A' ^ (N + 1) = ⊥ → ∃ f : A →ₐ[O] A', r.map f = r' := by
+private theorem level
+    [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocallyConstant rbar) (N : ℕ)
+    : ∃ (A : Type) (_ : CommRing A) (_ : Algebra O A) (_ : IsCO O A) (r : Lift O rbar A),
+      maximalIdeal A ^ (N + 1) = ⊥ ∧ Gen r
+        ∧ ∀ (A' : Type) [CommRing A'] [Algebra O A'] [IsCO O A'] (r' : Lift O rbar A'),
+          maximalIdeal A' ^ (N + 1) = ⊥ → ∃ f : A →ₐ[O] A', r.map f = r' := by
   classical
   haveI hk : IsCO O (ResidueField O) := (co_res O).1
   have hres0 : ∀ x : ResidueField O, res O (ResidueField O) x = x := by
     intro x
     obtain ⟨c, rfl⟩ := residue_surjective x
     exact AlgHom.commutes _ c
-  let r0 : Lift O rbar (ResidueField O) :=
-    { hom := rbar
-      cont := fun a b M => hc.comp (fun Mx => Ideal.Quotient.mk (maximalIdeal (ResidueField O) ^ M) (Mx a b))
-      red := fun g a b => hres0 _ }
+  let r0 : Lift O rbar (ResidueField O) := {
+    hom := rbar
+    cont := fun a b M =>
+      hc.comp (fun Mx => Ideal.Quotient.mk (maximalIdeal (ResidueField O) ^ M) (Mx a b))
+    red := fun g a b => hres0 _
+  }
   have g0 : Gen r0 := by
     refine eq_top_iff.2 fun x _ => ?_
     obtain ⟨c, rfl⟩ := residue_surjective x
@@ -175,9 +200,10 @@ private theorem level [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocal
   obtain ⟨F0, hF0, -⟩ := ev_exu s r0
   have hm0 : maximalIdeal (ResidueField O) ^ (N + 1) = ⊥ :=
     eq_bot_iff.2 ((Ideal.pow_le_self (Nat.succ_ne_zero N)).trans IsLocalRing.maximalIdeal_eq_bot.le)
-  let S : Set (Ideal (MvPowerSeries (σ × ι × ι) O)) := {J | ∃ (B : Type) (_ : CommRing B) (_ : Algebra O B)
-    (_ : IsCO O B) (rB : Lift O rbar B) (F : MvPowerSeries (σ × ι × ι) O →ₐ[O] B),
-    maximalIdeal B ^ (N + 1) = ⊥ ∧ Gen rB ∧ IsEv s rB F ∧ RingHom.ker F = J}
+  let S : Set (Ideal (MvPowerSeries (σ × ι × ι) O)) :=
+    {J | ∃ (B : Type) (_ : CommRing B) (_ : Algebra O B)
+      (_ : IsCO O B) (rB : Lift O rbar B) (F : MvPowerSeries (σ × ι × ι) O →ₐ[O] B),
+      maximalIdeal B ^ (N + 1) = ⊥ ∧ Gen rB ∧ IsEv s rB F ∧ RingHom.ker F = J}
   have hSsub : S ⊆ {J | maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) ≤ J} := by
     rintro J ⟨B, iB, aB, cB, rB, F, hB, -, -, rfl⟩
     intro y hy
@@ -185,26 +211,35 @@ private theorem level [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocal
     have := mem_pow_map F (N + 1) hy
     rw [hB] at this
     exact this
-  have hfinT : Set.Finite {J : Ideal (MvPowerSeries (σ × ι × ι) O) |
-      maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) ≤ J} := by
+  have hfinT : Set.Finite
+      {J : Ideal (MvPowerSeries (σ × ι × ι) O) |
+        maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) ≤ J} := by
     haveI := fin_quot O (MvPowerSeries (σ × ι × ι) O) (N + 1)
-    have hQ : Finite (Ideal (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1))) :=
+    have hQ : Finite (Ideal
+        (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1))) :=
       Finite.of_injective
-        (fun J : Ideal (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1)) =>
-          (J : Set (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1))))
+        (fun J : Ideal
+            (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1)) =>
+          (J : Set
+            (MvPowerSeries (σ × ι × ι) O ⧸ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1))))
         SetLike.coe_injective
-    have hE := Finite.of_equiv _ (Ideal.relIsoOfSurjective
-      (Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1)))
-      Ideal.Quotient.mk_surjective).toEquiv
+    have hE :=
+      Finite.of_equiv _
+        (Ideal.relIsoOfSurjective
+          (Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1)))
+          Ideal.Quotient.mk_surjective).toEquiv
     rw [← RingHom.ker_eq_comap_bot, Ideal.mk_ker] at hE
     exact Set.finite_coe_iff.mp hE
   have hfin : S.Finite := hfinT.subset hSsub
-  have hne : S.Nonempty := ⟨_, ResidueField O, inferInstance, inferInstance, hk, r0, F0, hm0, g0, hF0, rfl⟩
+  have hne : S.Nonempty :=
+    ⟨_, ResidueField O, inferInstance, inferInstance, hk, r0, F0, hm0, g0, hF0, rfl⟩
   obtain ⟨J, hJmin⟩ := hfin.exists_minimal hne
   obtain ⟨B, iB, aB, cB, rB, FB, hB, gB, eB, kB⟩ := hJmin.1
   refine ⟨B, iB, aB, cB, rB, hB, gB, ?_⟩
   intro A' _ _ _ r' hA'
-  obtain ⟨C, iC, aC, cC, rC, p1, p2, hC, gC, e1, e2⟩ := UpperTheory.exists_lift_dominating_pair_of_maximalIdeal_pow_eq_bot O Γ ι rbar (N + 1) B A' rB r' hB hA'
+  obtain ⟨C, iC, aC, cC, rC, p1, p2, hC, gC, e1, e2⟩ :=
+    UpperTheory.exists_lift_dominating_pair_of_maximalIdeal_pow_eq_bot O Γ ι rbar (N + 1) B A' rB r'
+      hB hA'
   obtain ⟨FC, hFC, -⟩ := ev_exu s rC
   have hcomp : p1.comp FC = FB := by
     obtain ⟨F1, -, hu⟩ := ev_exu s rB
@@ -219,11 +254,11 @@ private theorem level [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocal
     rw [AlgHom.comp_apply, hy, map_zero]
   have heq : J ≤ RingHom.ker FC := hJmin.2 hkC hle
   have hinj : Function.Injective p1 := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨y, rfl⟩ := hFCs x
-    have hy : y ∈ RingHom.ker FB := by
-      rw [RingHom.mem_ker, ← hcomp, AlgHom.comp_apply, hx]
+    have hy : y ∈ RingHom.ker FB := by rw [RingHom.mem_ker, ← hcomp, AlgHom.comp_apply, hx]
     rw [kB] at hy
     exact (RingHom.mem_ker).1 (heq hy)
   have hsurj : Function.Surjective p1 := Gen.surj (r := rC) p1 (by rw [e1]; exact gB)
@@ -238,22 +273,30 @@ private theorem level [Finite (ResidueField O)] (hs : Seps rbar s) (hc : IsLocal
   rw [← e1, Lift.map_hom]
   exact (AlgEquiv.ofBijective p1 ⟨hinj, hsurj⟩).symm_apply_apply _
 
-private theorem lift_map_comp {B : Type} [CommRing B] [Algebra O B] [IsCO O B] (r : Lift O rbar A)
-    (h : A →ₐ[O] A') (g : A' →ₐ[O] B) : r.map (g.comp h) = (r.map h).map g :=
-  Lift.ext (MonoidHom.ext fun x => Matrix.ext fun a b => by simp only [Lift.map_hom, AlgHom.comp_apply])
+private theorem lift_map_comp
+    {B : Type} [CommRing B] [Algebra O B] [IsCO O B]
+    (r : Lift O rbar A) (h : A →ₐ[O] A') (g : A' →ₐ[O] B)
+    : r.map (g.comp h) = (r.map h).map g :=
+  Lift.ext (MonoidHom.ext fun x =>
+    Matrix.ext fun a b => by simp only [Lift.map_hom, AlgHom.comp_apply])
 
-private theorem eq_zero_of_mem_all_maximalIdeal_pow (x : A) (hx : ∀ N : ℕ, x ∈ maximalIdeal A ^ (N + 1)) : x = 0 := by
+private theorem eq_zero_of_mem_all_maximalIdeal_pow
+    (x : A) (hx : ∀ N : ℕ, x ∈ maximalIdeal A ^ (N + 1))
+    : x = 0 := by
   have hc : IsAdicComplete (maximalIdeal A) A := IsCO.complete (O := O)
   apply IsHausdorff.haus hc.toIsHausdorff x
   intro n
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
   exact Ideal.pow_le_pow_right (Nat.le_succ n) (hx n)
 
-private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing (A N)] [∀ N, Algebra O (A N)]
-    [∀ N, IsCO O (A N)] (r : ∀ N, Lift O rbar (A N)) (h1 : ∀ N, maximalIdeal (A N) ^ (N + 1) = ⊥)
-    (h2 : ∀ N, Gen (r N)) (h3 : ∀ N (A' : Type) [CommRing A'] [Algebra O A'] [IsCO O A']
-        (r' : Lift O rbar A'), maximalIdeal A' ^ (N + 1) = ⊥ → ∃ f : A N →ₐ[O] A', (r N).map f = r') :
-    ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (r : Lift O rbar R),
+private theorem assemble
+    (hs : Seps rbar s)
+    (A : ℕ → Type) [∀ N, CommRing (A N)] [∀ N, Algebra O (A N)] [∀ N, IsCO O (A N)]
+    (r : ∀ N, Lift O rbar (A N))
+    (h1 : ∀ N, maximalIdeal (A N) ^ (N + 1) = ⊥) (h2 : ∀ N, Gen (r N))
+    (h3 : ∀ N (A' : Type) [CommRing A'] [Algebra O A'] [IsCO O A'] (r' : Lift O rbar A'),
+      maximalIdeal A' ^ (N + 1) = ⊥ → ∃ f : A N →ₐ[O] A', (r N).map f = r')
+    : ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (r : Lift O rbar R),
       Represents (fun _ _ _ _ _ => True) r := by
   haveI hPc : IsAdicComplete (maximalIdeal (MvPowerSeries (σ × ι × ι) O)) (MvPowerSeries (σ × ι × ι) O) :=
     IsCO.complete (O := O)
@@ -270,19 +313,23 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
     have := mem_pow_map (F N) (N + 1) hx
     rw [h1 N] at this
     exact (Ideal.mem_bot).1 this
-  have hJ2 : ∀ N, RingHom.ker (F N) ≤
-      RingHom.ker (F (N + 1)) ⊔ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) := by
+  have hJ2
+      : ∀ N,
+        RingHom.ker (F N)
+          ≤ RingHom.ker (F (N + 1)) ⊔ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) := by
     intro N y hy
     haveI : IsCO O (A (N + 1) ⧸ maximalIdeal (A (N + 1)) ^ (N + 1)) := co_trunc O (A (N + 1)) N
-    obtain ⟨f, hf⟩ := h3 N _ ((r (N + 1)).map (Ideal.Quotient.mkₐ O (maximalIdeal (A (N + 1)) ^ (N + 1))))
-      (trunc_pow (O := O) (A := A (N + 1)) (N + 1))
+    obtain ⟨f, hf⟩ :=
+      h3 N _ ((r (N + 1)).map (Ideal.Quotient.mkₐ O (maximalIdeal (A (N + 1)) ^ (N + 1))))
+        (trunc_pow (O := O) (A := A (N + 1)) (N + 1))
     have hfc : f.comp (π N) = Ideal.Quotient.mkₐ O (maximalIdeal (A (N + 1)) ^ (N + 1)) := by
       apply Gen.ext (h2 (N + 1))
       rw [lift_map_comp, hπ N, hf]
     rw [RingHom.mem_ker] at hy
     have e : π N (F (N + 1) y) = 0 := by rw [← AlgHom.comp_apply, hFπ N]; exact hy
     have hy' : F (N + 1) y ∈ maximalIdeal (A (N + 1)) ^ (N + 1) := by
-      rw [← Ideal.Quotient.eq_zero_iff_mem, ← Ideal.Quotient.mkₐ_eq_mk O, ← hfc, AlgHom.comp_apply, e, map_zero]
+      rw [← Ideal.Quotient.eq_zero_iff_mem, ← Ideal.Quotient.mkₐ_eq_mk O, ← hfc, AlgHom.comp_apply,
+        e, map_zero]
     rw [← map_pow_max (F (N + 1)) (hsurj (N + 1)) (N + 1)] at hy'
     obtain ⟨z, hz, hzy⟩ := (Ideal.mem_map_iff_of_surjective _ (hsurj (N + 1))).1 hy'
     have hyz : y = (y - z) + z := by ring
@@ -290,15 +337,21 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
     refine Ideal.add_mem _ (Ideal.mem_sup_left ?_) (Ideal.mem_sup_right hz)
     rw [RingHom.mem_ker, map_sub, sub_eq_zero]
     exact hzy.symm
-  have hlim : ∀ y : (N : ℕ) → A N, (∀ N, π N (y (N + 1)) = y N) →
-      ∃ x : MvPowerSeries (σ × ι × ι) O, ∀ N, F N x = y N := by
+  have hlim
+      : ∀ y : (N : ℕ) → A N,
+        (∀ N, π N (y (N + 1)) = y N) → ∃ x : MvPowerSeries (σ × ι × ι) O, ∀ N, F N x = y N := by
     intro y hy
-    obtain ⟨x, hx, -⟩ := UpperTheory.exists_limit_of_successive_diff_mem_filtration _ (maximalIdeal (MvPowerSeries (σ × ι × ι) O))
-      (fun N => RingHom.ker (F N)) hJ1 hJ2 0 (fun N => Function.surjInv (hsurj N) (y N)) (by
-        intro N _
-        show Function.surjInv (hsurj (N + 1)) (y (N + 1)) - Function.surjInv (hsurj N) (y N) ∈ RingHom.ker (F N)
-        rw [RingHom.mem_ker, map_sub, Function.surjInv_eq (hsurj N), ← hFπ N, AlgHom.comp_apply,
-          Function.surjInv_eq (hsurj (N + 1)), hy, sub_self])
+    obtain ⟨x, hx, -⟩ :=
+      UpperTheory.exists_limit_of_successive_diff_mem_filtration _
+        (maximalIdeal (MvPowerSeries (σ × ι × ι) O))
+        (fun N => RingHom.ker (F N))
+        hJ1 hJ2 0
+        (fun N => Function.surjInv (hsurj N) (y N))
+        (by
+          intro N _
+          show Function.surjInv (hsurj (N + 1)) (y (N + 1)) - Function.surjInv (hsurj N) (y N) ∈ RingHom.ker (F N)
+          rw [RingHom.mem_ker, map_sub, Function.surjInv_eq (hsurj N), ← hFπ N, AlgHom.comp_apply,
+            Function.surjInv_eq (hsurj (N + 1)), hy, sub_self])
     refine ⟨x, fun N => ?_⟩
     have hxN : x - Function.surjInv (hsurj N) (y N) ∈ RingHom.ker (F N) := hx N (Nat.zero_le N)
     rw [RingHom.mem_ker, map_sub, Function.surjInv_eq (hsurj N), sub_eq_zero] at hxN
@@ -312,8 +365,9 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
     intro x
     rw [hJdef, Ideal.mem_iInf]
     simp only [RingHom.mem_ker]
-  have hq : ∀ x y : MvPowerSeries (σ × ι × ι) O,
-      Ideal.Quotient.mk J x = Ideal.Quotient.mk J y ↔ ∀ N, F N x = F N y := by
+  have hq
+      : ∀ x y : MvPowerSeries (σ × ι × ι) O,
+        Ideal.Quotient.mk J x = Ideal.Quotient.mk J y ↔ ∀ N, F N x = F N y := by
     intro x y
     rw [Ideal.Quotient.eq, hmemJ]
     simp only [map_sub, sub_eq_zero]
@@ -334,8 +388,11 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
       intro z hz
       rw [RingHom.mem_ker] at hz ⊢
       rw [← hFπ K, AlgHom.comp_apply, hz, map_zero]
-  have hnxt : ∀ N (z : MvPowerSeries (σ × ι × ι) O), ∃ j, z ∈ RingHom.ker (F N) →
-      j ∈ RingHom.ker (F (N + 1)) ∧ z - j ∈ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) := by
+  have hnxt
+      : ∀ N (z : MvPowerSeries (σ × ι × ι) O), ∃ j,
+        z ∈ RingHom.ker (F N)
+          → j ∈ RingHom.ker (F (N + 1))
+            ∧ z - j ∈ maximalIdeal (MvPowerSeries (σ × ι × ι) O) ^ (N + 1) := by
     intro N z
     by_cases hz : z ∈ RingHom.ker (F N)
     · obtain ⟨j, hj, m, hm, hjm⟩ := Submodule.mem_sup.1 (hJ2 N hz)
@@ -353,14 +410,19 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
       induction k with
       | zero => exact hy
       | succ k ih => rw [hqs]; exact (hnxt _ _ ih).1
-    obtain ⟨x, hx, hxM⟩ := UpperTheory.exists_limit_of_successive_diff_mem_filtration _ (maximalIdeal (MvPowerSeries (σ × ι × ι) O))
-      (fun N => RingHom.ker (F N)) hJ1 hJ2 M (fun N => q (N - M)) (by
-        intro N hN
-        obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hN
-        show q (M + k + 1 - M) - q (M + k - M) ∈ RingHom.ker (F (M + k))
-        rw [show M + k + 1 - M = k + 1 by omega, show M + k - M = k by omega, hqs]
-        have hm := (hnxt _ _ (hqk k)).2
-        exact hJ1 _ (by rw [← neg_sub]; exact (Ideal.neg_mem_iff _).2 hm))
+    obtain ⟨x, hx, hxM⟩ :=
+      UpperTheory.exists_limit_of_successive_diff_mem_filtration _
+        (maximalIdeal (MvPowerSeries (σ × ι × ι) O))
+        (fun N => RingHom.ker (F N))
+        hJ1 hJ2 M
+        (fun N => q (N - M))
+        (by
+          intro N hN
+          obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hN
+          show q (M + k + 1 - M) - q (M + k - M) ∈ RingHom.ker (F (M + k))
+          rw [show M + k + 1 - M = k + 1 by omega, show M + k - M = k by omega, hqs]
+          have hm := (hnxt _ _ (hqk k)).2
+          exact hJ1 _ (by rw [← neg_sub]; exact (Ideal.neg_mem_iff _).2 hm))
     have hbig : ∀ k, F (M + k) x = 0 := by
       intro k
       have h1' : x - q (M + k - M) ∈ RingHom.ker (F (M + k)) := hx (M + k) (Nat.le_add_right M k)
@@ -380,33 +442,34 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
     have hyx : y = x - (x - q 0) := by simp [q]
     rw [hyx]
     exact Ideal.sub_mem _ (Ideal.mem_sup_left hxJ) (Ideal.mem_sup_right hxM')
-  let hom : Γ →* Matrix ι ι (MvPowerSeries (σ × ι × ι) O ⧸ J) :=
-    { toFun := fun g => Matrix.of fun a b => Ideal.Quotient.mk J (xe (g, a, b))
-      map_one' := by
-        refine Matrix.ext fun a b => ?_
-        show Ideal.Quotient.mk J (xe (1, a, b)) = (1 : Matrix ι ι _) a b
-        rw [Matrix.one_apply]
-        split_ifs with hab
-        · subst hab
-          rw [← map_one (Ideal.Quotient.mk J), hq]
-          intro N
-          simp only [hxe', map_one, Matrix.one_apply_eq]
-        · rw [← map_zero (Ideal.Quotient.mk J), hq]
-          intro N
-          simp only [hxe', map_zero, map_one, Matrix.one_apply_ne hab]
-      map_mul' := by
-        intro g h
-        refine Matrix.ext fun a b => ?_
-        show Ideal.Quotient.mk J (xe (g * h, a, b)) =
-          (Matrix.of (fun a b => Ideal.Quotient.mk J (xe (g, a, b))) *
-            Matrix.of (fun a b => Ideal.Quotient.mk J (xe (h, a, b)))) a b
-        rw [Matrix.mul_apply]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Matrix.of_apply, ← map_mul, ← map_sum]
-        rw [hq]
+  let hom : Γ →* Matrix ι ι (MvPowerSeries (σ × ι × ι) O ⧸ J) := {
+    toFun := fun g => Matrix.of fun a b => Ideal.Quotient.mk J (xe (g, a, b))
+    map_one' := by
+      refine Matrix.ext fun a b => ?_
+      show Ideal.Quotient.mk J (xe (1, a, b)) = (1 : Matrix ι ι _) a b
+      rw [Matrix.one_apply]
+      split_ifs with hab
+      · subst hab
+        rw [← map_one (Ideal.Quotient.mk J), hq]
         intro N
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_mul, hxe', Matrix.mul_apply] }
+        simp only [hxe', map_one, Matrix.one_apply_eq]
+      · rw [← map_zero (Ideal.Quotient.mk J), hq]
+        intro N
+        simp only [hxe', map_zero, map_one, Matrix.one_apply_ne hab]
+    map_mul' := by
+      intro g h
+      refine Matrix.ext fun a b => ?_
+      show Ideal.Quotient.mk J (xe (g * h, a, b)) =
+        (Matrix.of (fun a b => Ideal.Quotient.mk J (xe (g, a, b))) *
+          Matrix.of (fun a b => Ideal.Quotient.mk J (xe (h, a, b)))) a b
+      rw [Matrix.mul_apply]
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [Matrix.of_apply, ← map_mul, ← map_sum]
+      rw [hq]
+      intro N
+      set_option synthInstance.maxHeartbeats 100000 in
+      simp only [map_sum, map_mul, hxe', Matrix.mul_apply]
+  }
   have hhom : ∀ g a b, hom g a b = Ideal.Quotient.mk J (xe (g, a, b)) := fun g a b => rfl
   have hJ0 : ∀ x ∈ J, F 0 x = 0 := fun x hx => (hmemJ x).1 hx 0
   have hred : ∀ g a b, res O (MvPowerSeries (σ × ι × ι) O ⧸ J) (hom g a b) = rbar g a b := by
@@ -415,25 +478,35 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
       rw [hhom, Ideal.Quotient.liftₐ_apply]
       exact hxe' g a b 0
     rw [← res_map (O := O) (R := MvPowerSeries (σ × ι × ι) O ⧸ J)
-      (Ideal.Quotient.liftₐ J (F 0) hJ0), e0, (r 0).red]
-  have hcont : ∀ a b, AdicCont (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J)) fun g => hom g a b := by
+        (Ideal.Quotient.liftₐ J (F 0) hJ0),
+      e0, (r 0).red]
+  have hcont
+      : ∀ a b, AdicCont (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J)) fun g => hom g a b := by
     intro a b K
     have hloc : IsLocallyConstant fun g => (r K).hom g a b := by
-      refine IsLocallyConstant.desc _ (Ideal.Quotient.mk (maximalIdeal (A K) ^ (K + 1))) ((r K).cont a b (K + 1)) ?_
+      refine IsLocallyConstant.desc _ (Ideal.Quotient.mk (maximalIdeal (A K) ^ (K + 1)))
+        ((r K).cont a b (K + 1)) ?_
       intro u v huv
       rw [Ideal.Quotient.eq, h1 K, Ideal.mem_bot, sub_eq_zero] at huv
       exact huv
-    have key : (fun g => Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K) (hom g a b)) =
-        (fun u => Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K)
-          (Ideal.Quotient.mk J (Function.surjInv (hsurj K) u))) ∘ (fun g => (r K).hom g a b) := by
+    have key
+        : (fun g =>
+            Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K) (hom g a b))
+          = (fun u =>
+              Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K)
+                (Ideal.Quotient.mk J (Function.surjInv (hsurj K) u)))
+            ∘ (fun g => (r K).hom g a b) := by
       funext g
       rw [Function.comp_apply, hhom, Ideal.Quotient.eq, ← map_sub]
-      have hd : xe (g, a, b) - Function.surjInv (hsurj K) ((r K).hom g a b) ∈ RingHom.ker (F K) := by
+      have hd
+          : xe (g, a, b) - Function.surjInv (hsurj K) ((r K).hom g a b) ∈ RingHom.ker (F K) := by
         rw [RingHom.mem_ker, map_sub, Function.surjInv_eq (hsurj K), hxe', sub_self]
       obtain ⟨j, hj, m, hm, hjm⟩ := Submodule.mem_sup.1 (hJ3 K hd)
       rw [← hjm, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 hj, zero_add]
       exact Ideal.pow_le_pow_right (Nat.le_succ K) (mem_pow_map (Ideal.Quotient.mkₐ O J) (K + 1) hm)
-    have hfin := hloc.comp (fun u => Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K)
+    have hfin :=
+      hloc.comp (fun u =>
+        Ideal.Quotient.mk (maximalIdeal (MvPowerSeries (σ × ι × ι) O ⧸ J) ^ K)
           (Ideal.Quotient.mk J (Function.surjInv (hsurj K) u)))
     rw [← key] at hfin
     exact hfin
@@ -452,7 +525,8 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
   haveI : ∀ N, IsCO O (R' ⧸ maximalIdeal R' ^ (N + 1)) := fun N => co_trunc O R' N
   choose fT hfT using fun N => h3 N (R' ⧸ maximalIdeal R' ^ (N + 1))
     (r'.map (Ideal.Quotient.mkₐ O (maximalIdeal R' ^ (N + 1)))) (trunc_pow (O := O) (A := R') (N + 1))
-  have hcomm : ∀ N, (Ideal.Quotient.mkₐ O (maximalIdeal R' ^ (N + 1))).comp F' = (fT N).comp (F N) := by
+  have hcomm
+      : ∀ N, (Ideal.Quotient.mkₐ O (maximalIdeal R' ^ (N + 1))).comp F' = (fT N).comp (F N) := by
     intro N
     have e1 := IsEv.map s hF' (Ideal.Quotient.mkₐ O (maximalIdeal R' ^ (N + 1)))
     have e2 := IsEv.map s (hF N) (fT N)
@@ -480,8 +554,8 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
     rw [← sub_eq_zero]
     apply hsep
     intro N
-    rw [map_sub, ← AlgHom.comp_apply, hcomm N, AlgHom.comp_apply, hxe', ← Lift.map_hom, hfT N, Lift.map_hom,
-      sub_self]
+    rw [map_sub, ← AlgHom.comp_apply, hcomm N, AlgHom.comp_apply, hxe', ← Lift.map_hom, hfT N,
+      Lift.map_hom, sub_self]
   refine ⟨Ideal.Quotient.liftₐ J F' hJF', hfr, fun f1 hf1 => ?_⟩
   apply Ideal.Quotient.algHom_ext
   have e1 := IsEv.map s hE f1
@@ -492,14 +566,26 @@ private theorem assemble (hs : Seps rbar s) (A : ℕ → Type) [∀ N, CommRing 
 
 end
 
-theorem UpperTheory.V.Alg.univ_lift :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] (Γ ι : Type) [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] [T2Space Γ], PhiCond (Γ := Γ) l → IsLocallyConstant rbar →
-      ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (r : Lift O rbar R), Represents (fun _ _ _ _ _ => True) r := by
+theorem UpperTheory.V.Alg.univ_lift
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l]
+        (Γ ι : Type) [Group Γ] [TopologicalSpace Γ] [Fintype ι] [DecidableEq ι]
+        (rbar : Γ →* Matrix ι ι (ResidueField O)) [IsTopologicalGroup Γ] [CompactSpace Γ]
+        [TotallyDisconnectedSpace Γ] [T2Space Γ],
+      PhiCond (Γ := Γ) l → IsLocallyConstant rbar
+        → ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (r : Lift O rbar R),
+          Represents (fun _ _ _ _ _ => True) r := by
   intro l _ O _ _ _ _ _ _ Γ ι _ _ _ _ rbar _ _ _ _ hphi hc
   haveI hD : IsCO O (DualNumber (ResidueField O)) := (co_res O).2
   haveI : Finite (Lift O rbar (DualNumber (ResidueField O))) := UpperTheory.finite_lift_dualNumber_of_phiCond l O Γ ι rbar hphi hc
-  have hne : ∀ p : {p : Lift O rbar (DualNumber (ResidueField O)) × Lift O rbar (DualNumber (ResidueField O)) //
-      p.1 ≠ p.2}, ∃ g, p.1.1.hom g ≠ p.1.2.hom g := by
+  have hne
+      : ∀ p
+          : {p
+              : Lift O rbar (DualNumber (ResidueField O))
+                × Lift O rbar (DualNumber (ResidueField O))
+            // p.1 ≠ p.2},
+        ∃ g,
+          p.1.1.hom g ≠ p.1.2.hom g := by
     intro p
     by_contra hcon
     push_neg at hcon

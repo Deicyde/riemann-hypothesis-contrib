@@ -16,11 +16,13 @@ theorem CovolumeLeGram.proof : CovolumeLeGram.Statement := by
   intro n L _ _ ι _ _ x hxL hx hcard
   have hcard' : Fintype.card ι = finrank ℝ (EuclideanSpace ℝ (Fin n)) := by
     rw [hcard, finrank_euclideanSpace_fin]
-  let B : Basis ι ℝ (EuclideanSpace ℝ (Fin n)) := basisOfLinearIndependentOfCardEqFinrank' x hx hcard'
+  let B : Basis ι ℝ (EuclideanSpace ℝ (Fin n)) :=
+    basisOfLinearIndependentOfCardEqFinrank' x hx hcard'
   have hB : ⇑B = x := coe_basisOfLinearIndependentOfCardEqFinrank' _ _ _
   have hML : Submodule.span ℤ (Set.range B) ≤ L :=
     Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; rw [hB]; exact hxL i)
-  have hcovM : ZLattice.covolume (Submodule.span ℤ (Set.range B)) = Real.sqrt (Matrix.gram ℝ x).det := by
+  have hcovM
+      : ZLattice.covolume (Submodule.span ℤ (Set.range B)) = Real.sqrt (Matrix.gram ℝ x).det := by
     rw [GroundTheory.Heights₂.Heights.covolume_eq_sqrt_det_gram _ (B.restrictScalars ℤ)]
     congr 3
     funext i

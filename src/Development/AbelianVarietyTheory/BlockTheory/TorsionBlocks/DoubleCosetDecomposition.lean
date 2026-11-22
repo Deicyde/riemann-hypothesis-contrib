@@ -11,13 +11,16 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.LevelSubgroupStabilizers
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+open NumberField Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice
 open scoped TensorProduct
 
 section Level
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
 
 theorem finMat_one : finMat σ J (1 : HA (AF F) σ J) = 1 := by
   show (((1 : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E))).map _ = 1
@@ -55,7 +58,6 @@ def latCoord (W : HSpace E) : Set (Fin W.rank → E) := {x | ∑ i, x i • W.fr
 
 def levelW (hc : CMData F E) (W : HSpace E) : Subgroup (HA (AF F) hc.sig W.gram) :=
   levelK hc.sig W.gram (latCoord W)
-
 
 end Space
 

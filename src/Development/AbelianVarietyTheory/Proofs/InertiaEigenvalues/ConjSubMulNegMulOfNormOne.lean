@@ -8,34 +8,35 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem conj_sub_mul_neg_mul_of_norm_one {x y : ℂ} (hx : ‖x‖ = 1) (hy : ‖y‖ = 1) :
-    (starRingEnd ℂ) (x - y) * (-(x * y)) = x - y := by
+theorem conj_sub_mul_neg_mul_of_norm_one {x y : ℂ} (hx : ‖x‖ = 1) (hy : ‖y‖ = 1)
+    : (starRingEnd ℂ) (x - y) * (-(x * y)) = x - y := by
   have hx0 : x ≠ 0 := by intro h; simp [h] at hx
   have hy0 : y ≠ 0 := by intro h; simp [h] at hy
-  have cx : (starRingEnd ℂ) x = x⁻¹ := by
-    rw [Complex.inv_def, Complex.normSq_eq_norm_sq, hx]; simp
-  have cy : (starRingEnd ℂ) y = y⁻¹ := by
-    rw [Complex.inv_def, Complex.normSq_eq_norm_sq, hy]; simp
+  have cx : (starRingEnd ℂ) x = x⁻¹ := by rw [Complex.inv_def, Complex.normSq_eq_norm_sq, hx]; simp
+  have cy : (starRingEnd ℂ) y = y⁻¹ := by rw [Complex.inv_def, Complex.normSq_eq_norm_sq, hy]; simp
   rw [map_sub, cx, cy]
   field_simp
   ring
 
-theorem resultant_phase_unit_circle :
-    ∀ (a b : ℕ) (α : Fin a → ℂ) (β : Fin b → ℂ), (∀ i, ‖α i‖ = 1) → (∀ j, ‖β j‖ = 1) →
-      (∀ i j, α i ≠ β j) → ∀ k : ℤ,
-        let R : ℂ := ∏ i, ∏ j, (α i - β j)
-        (R / (‖R‖ : ℂ)) ^ (2 * k - 1) * (‖R‖ : ℂ) =
-          (starRingEnd ℂ) R * ((-1 : ℂ) ^ (a * b) * (∏ i, α i) ^ b * (∏ j, β j) ^ a) ^ k := by
+theorem resultant_phase_unit_circle
+    : ∀ (a b : ℕ) (α : Fin a → ℂ) (β : Fin b → ℂ),
+      (∀ i, ‖α i‖ = 1) → (∀ j, ‖β j‖ = 1) → (∀ i j, α i ≠ β j)
+        → ∀ k : ℤ,
+          let R : ℂ := ∏ i, ∏ j, (α i - β j)
+          (R / (‖R‖ : ℂ)) ^ (2 * k - 1) * (‖R‖ : ℂ)
+            = (starRingEnd ℂ) R * ((-1 : ℂ) ^ (a * b) * (∏ i, α i) ^ b * (∏ j, β j) ^ a) ^ k := by
   intro a b α β hα hβ hne k R
   set D : ℂ := (-1 : ℂ) ^ (a * b) * (∏ i, α i) ^ b * (∏ j, β j) ^ a with hD
   have hR : R ≠ 0 := by
     simp only [R]
-    rw [Finset.prod_ne_zero_iff]; intro i _
-    rw [Finset.prod_ne_zero_iff]; intro j _
+    rw [Finset.prod_ne_zero_iff]
+    intro i _
+    rw [Finset.prod_ne_zero_iff]
+    intro j _
     exact sub_ne_zero.mpr (hne i j)
   have hDprod : D = ∏ i, ∏ j, (-(α i * β j)) := by
-    simp only [hD, Finset.prod_neg, Finset.prod_mul_distrib, Finset.prod_const,
-      Finset.card_univ, Fintype.card_fin, Finset.prod_pow, pow_mul]
+    simp only [hD, Finset.prod_neg, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ,
+      Fintype.card_fin, Finset.prod_pow, pow_mul]
     ring
   have hconj : (starRingEnd ℂ) R * D = R := by
     rw [hDprod]

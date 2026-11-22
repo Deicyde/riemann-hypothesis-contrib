@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.SmallBallProd
 
@@ -298,7 +299,25 @@ lemma two_sided_of_tendsto {X : Type*} [MeasurableSpace X] (ν : Measure X) [IsF
       _ = t * ν {x | Real.sqrt (ρ x) ≤ s} := by
           rw [mul_comm _ t, mul_assoc, ENNReal.div_mul_cancel hX0 hXt]
 
-theorem tendsto_prod_smallBall : ∀ (X Y : Type) [MeasurableSpace X] [MeasurableSpace Y] (ν₁ : Measure X) (ν₂ : Measure Y) [IsFiniteMeasure ν₁] [IsFiniteMeasure ν₂] (ρ₁ : X → ℝ) (ρ₂ : Y → ℝ) (d₁ d₂ : ℕ) (C₁ C₂ : ℝ), Measurable ρ₁ → Measurable ρ₂ → (∀ x, 0 ≤ ρ₁ x) → (∀ y, 0 ≤ ρ₂ y) → 0 < C₁ → 0 < C₂ → Filter.Tendsto (fun r : ℝ => ν₁ {x | Real.sqrt (ρ₁ x) ≤ r} / ENNReal.ofReal (r ^ (d₁))) (nhdsWithin 0 (Set.Ioi 0)) (nhds (ENNReal.ofReal (C₁) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁))) 1))) → Filter.Tendsto (fun r : ℝ => ν₂ {x | Real.sqrt (ρ₂ x) ≤ r} / ENNReal.ofReal (r ^ (d₂))) (nhdsWithin 0 (Set.Ioi 0)) (nhds (ENNReal.ofReal (C₂) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₂))) 1))) → Filter.Tendsto (fun r : ℝ => (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r} / ENNReal.ofReal (r ^ (d₁ + d₂))) (nhdsWithin 0 (Set.Ioi 0)) (nhds (ENNReal.ofReal (C₁ * C₂) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1))) := by
+theorem tendsto_prod_smallBall
+    : ∀ (X Y : Type) [MeasurableSpace X] [MeasurableSpace Y] (ν₁ : Measure X) (ν₂ : Measure Y)
+        [IsFiniteMeasure ν₁] [IsFiniteMeasure ν₂] (ρ₁ : X → ℝ) (ρ₂ : Y → ℝ) (d₁ d₂ : ℕ) (C₁ C₂ : ℝ),
+      Measurable ρ₁ → Measurable ρ₂ → (∀ x, 0 ≤ ρ₁ x) → (∀ y, 0 ≤ ρ₂ y) → 0 < C₁ → 0 < C₂
+        → Filter.Tendsto
+          (fun r : ℝ => ν₁ {x | Real.sqrt (ρ₁ x) ≤ r} / ENNReal.ofReal (r ^ (d₁)))
+          (nhdsWithin 0 (Set.Ioi 0))
+          (nhds (ENNReal.ofReal (C₁) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁))) 1)))
+        → Filter.Tendsto
+          (fun r : ℝ => ν₂ {x | Real.sqrt (ρ₂ x) ≤ r} / ENNReal.ofReal (r ^ (d₂)))
+          (nhdsWithin 0 (Set.Ioi 0))
+          (nhds (ENNReal.ofReal (C₂) * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₂))) 1)))
+        → Filter.Tendsto
+          (fun r : ℝ =>
+            (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r} / ENNReal.ofReal (r ^ (d₁ + d₂)))
+          (nhdsWithin 0 (Set.Ioi 0))
+          (nhds
+            (ENNReal.ofReal (C₁ * C₂)
+              * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1))) := by
   intro X Y _ _ ν₁ ν₂ _ _ ρ₁ ρ₂ d₁ d₂ C₁ C₂ hρ₁ hρ₂ h0₁ h0₂ hC₁ hC₂ h₁ h₂
   apply tendsto_of_two_sided
   intro t ht ht'
@@ -312,14 +331,27 @@ theorem tendsto_prod_smallBall : ∀ (X Y : Type) [MeasurableSpace X] [Measurabl
   have hr0 : 0 ≤ r := hr.1.le
   have hr1 : r ≤ r₁ := hr.2.le.trans (min_le_left _ _)
   have hr2 : r ≤ r₂ := hr.2.le.trans (min_le_right _ _)
-  have hup := cmp_both ν₁ volume ν₂ volume ρ₁ (fun y => ‖y‖ ^ 2) ρ₂ (fun y => ‖y‖ ^ 2)
-    hρ₁ hm₁ hρ₂ hm₂ h0₁ h0₂ (fun y => sq_nonneg _) 1 (t * ENNReal.ofReal C₂) 1
-    (t * ENNReal.ofReal C₁) r hr0
-    (fun s hs hsr => u₁ s hs (hsr.trans hr1)) (fun s hs hsr => u₂ s hs (hsr.trans hr2))
-  have hlow := cmp_both volume ν₁ volume ν₂ (fun y => ‖y‖ ^ 2) ρ₁ (fun y => ‖y‖ ^ 2) ρ₂
-    hm₁ hρ₁ hm₂ hρ₂ (fun y => sq_nonneg _) (fun y => sq_nonneg _) h0₂ (ENNReal.ofReal C₂) t
-    (ENNReal.ofReal C₁) t r hr0
-    (fun s hs hsr => l₁ s hs (hsr.trans hr1)) (fun s hs hsr => l₂ s hs (hsr.trans hr2))
+  have hup :=
+    cmp_both ν₁ volume ν₂ volume ρ₁
+      (fun y => ‖y‖ ^ 2)
+      ρ₂
+      (fun y => ‖y‖ ^ 2)
+      hρ₁ hm₁ hρ₂ hm₂ h0₁ h0₂
+      (fun y => sq_nonneg _)
+      1 (t * ENNReal.ofReal C₂) 1 (t * ENNReal.ofReal C₁) r hr0
+      (fun s hs hsr => u₁ s hs (hsr.trans hr1))
+      (fun s hs hsr => u₂ s hs (hsr.trans hr2))
+  have hlow :=
+    cmp_both volume ν₁ volume ν₂
+      (fun y => ‖y‖ ^ 2)
+      ρ₁
+      (fun y => ‖y‖ ^ 2)
+      ρ₂ hm₁ hρ₁ hm₂ hρ₂
+      (fun y => sq_nonneg _)
+      (fun y => sq_nonneg _)
+      h0₂ (ENNReal.ofReal C₂) t (ENNReal.ofReal C₁) t r hr0
+      (fun s hs hsr => l₁ s hs (hsr.trans hr1))
+      (fun s hs hsr => l₂ s hs (hsr.trans hr2))
   beta_reduce at hup hlow
   rw [vol_prod_level d₁ d₂ r hr0] at hup hlow
   have hX0 : ENNReal.ofReal (r ^ (d₁ + d₂)) ≠ 0 := (ENNReal.ofReal_pos.2 (pow_pos hr.1 _)).ne'
@@ -327,19 +359,27 @@ theorem tendsto_prod_smallBall : ∀ (X Y : Type) [MeasurableSpace X] [Measurabl
   rw [ENNReal.ofReal_mul hC₁.le]
   constructor
   · apply ENNReal.div_le_of_le_mul
-    calc (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r}
+    calc
+      (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r}
         = 1 * 1 * (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r} := by ring
-      _ ≤ t * ENNReal.ofReal C₁ * (t * ENNReal.ofReal C₂) * (ENNReal.ofReal (r ^ (d₁ + d₂)) *
-            volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)) := hup
-      _ = t * t * (ENNReal.ofReal C₁ * ENNReal.ofReal C₂ *
-            volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)) *
-            ENNReal.ofReal (r ^ (d₁ + d₂)) := by ring
+      _ ≤ t * ENNReal.ofReal C₁ * (t * ENNReal.ofReal C₂)
+          * (ENNReal.ofReal (r ^ (d₁ + d₂))
+            * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)) :=
+        hup
+      _ = t * t
+          * (ENNReal.ofReal C₁ * ENNReal.ofReal C₂
+            * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1))
+          * ENNReal.ofReal (r ^ (d₁ + d₂)) := by
+        ring
   · rw [← mul_div_assoc, ENNReal.le_div_iff_mul_le (Or.inl hX0) (Or.inl hXt)]
-    calc ENNReal.ofReal C₁ * ENNReal.ofReal C₂ *
-            volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1) *
-            ENNReal.ofReal (r ^ (d₁ + d₂))
-        = ENNReal.ofReal C₁ * ENNReal.ofReal C₂ * (ENNReal.ofReal (r ^ (d₁ + d₂)) *
-            volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)) := by ring
+    calc
+      ENNReal.ofReal C₁ * ENNReal.ofReal C₂
+            * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)
+            * ENNReal.ofReal (r ^ (d₁ + d₂))
+          = ENNReal.ofReal C₁ * ENNReal.ofReal C₂
+            * (ENNReal.ofReal (r ^ (d₁ + d₂))
+              * volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (d₁ + d₂))) 1)) := by
+        ring
       _ ≤ t * t * (ν₁.prod ν₂) {x | Real.sqrt (ρ₁ x.1 + ρ₂ x.2) ≤ r} := hlow
 
 end GlobalTheory.SmallBallProd

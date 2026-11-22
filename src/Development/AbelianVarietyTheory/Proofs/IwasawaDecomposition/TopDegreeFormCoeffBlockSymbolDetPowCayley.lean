@@ -20,8 +20,9 @@ open MvPolynomial ReciprocityTheory.PGsh
 
 namespace GlobalTheory.CayleyBlock
 
-theorem det_pow_eq {p q : ℕ} (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q) :
-    (GlobalTheory.DomainDens.blockSym h1 ()).det ^ q = rename (blockEmb h1) (sumMap p q (cayDet p ℂ ^ q)) := by
+theorem det_pow_eq {p q : ℕ} (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q)
+    : (GlobalTheory.DomainDens.blockSym h1 ()).det ^ q
+      = rename (blockEmb h1) (sumMap p q (cayDet p ℂ ^ q)) := by
   rw [map_pow, map_pow, cayDet, AlgHom.map_det, AlgHom.map_det]
   congr 2
   ext i j
@@ -29,7 +30,10 @@ theorem det_pow_eq {p q : ℕ} (h1 : Fintype.card (Unit × Fin p × Fin q) = p *
 
 theorem bigList_nodup {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p)) : (bigList τ).Nodup := by
   rw [bigList, List.nodup_flatMap]
-  refine ⟨fun b _ => (List.nodup_finRange p).map fun j k h => by simpa using congrArg (fun x => x.2.2) h, ?_⟩
+  refine ⟨
+    fun b _ => (List.nodup_finRange p).map fun j k h => by simpa using congrArg (fun x => x.2.2) h,
+    ?_
+  ⟩
   refine (List.nodup_finRange q).imp fun {a b} hab => ?_
   show List.Disjoint _ _
   rw [List.disjoint_left]
@@ -39,13 +43,13 @@ theorem bigList_nodup {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p)) : (bigList
   obtain ⟨k, hk⟩ := hy
   exact hab (congrArg Prod.fst hk).symm
 
-theorem bigList_sum {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p)) :
-    ((bigList τ).map fun v => Finsupp.single v 1).sum = blockGraph τ := by
+theorem bigList_sum {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p))
+    : ((bigList τ).map fun v => Finsupp.single v 1).sum = blockGraph τ := by
   simp [bigList, blockGraph, List.map_flatMap, Fin.sum_univ_def, List.map_map, Function.comp_def]
   simp [List.flatMap, List.sum_flatten, List.map_map, Function.comp_def]
 
-theorem pderiv_sumMap {p q : ℕ} (v : Fin q × Fin p × Fin p) (P : MvPolynomial (Fin p × Fin p) ℂ) :
-    pderiv v (sumMap p q P) = sumMap p q (pderiv v.2 P) := by
+theorem pderiv_sumMap {p q : ℕ} (v : Fin q × Fin p × Fin p) (P : MvPolynomial (Fin p × Fin p) ℂ)
+    : pderiv v (sumMap p q P) = sumMap p q (pderiv v.2 P) := by
   induction P using MvPolynomial.induction_on with
   | C a => simp [sumMap]
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
@@ -55,8 +59,9 @@ theorem pderiv_sumMap {p q : ℕ} (v : Fin q × Fin p × Fin p) (P : MvPolynomia
     simp [sumMap, pderiv_X, Pi.single_apply, Prod.ext_iff]
     by_cases h : w.1 = v.2.1 ∧ w.2 = v.2.2 <;> simp [h, Finset.filter_eq']
 
-theorem dList_sumMap {p q : ℕ} (l : List (Fin q × Fin p × Fin p)) (P : MvPolynomial (Fin p × Fin p) ℂ) :
-    dList l (sumMap p q P) = sumMap p q (dList (l.map fun v => v.2) P) := by
+theorem dList_sumMap
+    {p q : ℕ} (l : List (Fin q × Fin p × Fin p)) (P : MvPolynomial (Fin p × Fin p) ℂ)
+    : dList l (sumMap p q P) = sumMap p q (dList (l.map fun v => v.2) P) := by
   induction l with
   | nil => simp [dList]
   | cons v l ih =>
@@ -64,11 +69,12 @@ theorem dList_sumMap {p q : ℕ} (l : List (Fin q × Fin p × Fin p)) (P : MvPol
     rw [ih]
     exact pderiv_sumMap v _
 
-theorem bigList_map {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p)) : (bigList τ).map (fun v => v.2) = smallList τ := by
+theorem bigList_map {p q : ℕ} (τ : Fin q → Equiv.Perm (Fin p))
+    : (bigList τ).map (fun v => v.2) = smallList τ := by
   simp [bigList, smallList, List.map_flatMap, List.map_map, Function.comp_def]
 
-theorem constantCoeff_sumMap (p q : ℕ) (P : MvPolynomial (Fin p × Fin p) ℂ) :
-    constantCoeff (sumMap p q P) = constantCoeff P := by
+theorem constantCoeff_sumMap (p q : ℕ) (P : MvPolynomial (Fin p × Fin p) ℂ)
+    : constantCoeff (sumMap p q P) = constantCoeff P := by
   induction P using MvPolynomial.induction_on with
   | C a => simp [sumMap]
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
@@ -76,18 +82,25 @@ theorem constantCoeff_sumMap (p q : ℕ) (P : MvPolynomial (Fin p × Fin p) ℂ)
 
 end GlobalTheory.CayleyBlock
 
-
 open GlobalTheory.CayleyBlock ReciprocityTheory.PGsh MvPolynomial in
-theorem GlobalTheory.topCoeff_blockSym_det_pow : ∀ (p q : ℕ) (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q),
-    GlobalTheory.GoodMetric.topCoeff ((GlobalTheory.DomainDens.blockSym h1 ()).det ^ q) =
-      ∏ i ∈ Finset.range p, (((q + i).factorial : ℂ) / i.factorial) := by
+theorem GlobalTheory.topCoeff_blockSym_det_pow
+    : ∀ (p q : ℕ) (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q),
+      GlobalTheory.GoodMetric.topCoeff ((GlobalTheory.DomainDens.blockSym h1 ()).det ^ q)
+        = ∏ i ∈ Finset.range p, (((q + i).factorial : ℂ) / i.factorial) := by
   intro p q h1
-  rw [det_pow_eq, GlobalTheory.T.topDegreeFormCoeff_rename_cayleyBlockSymbolEmbedding, ← GlobalTheory.T.constantCoeff_cayleyOperator_pow_determinant_pow, GlobalTheory.T.cayleyOperator_pow_eq_signed_sum_partialDerivs, LinearMap.sum_apply]
-  have key : ∀ τ : Fin q → Equiv.Perm (Fin p), (sgnProd τ : ℂ) * AddMonoidAlgebra.coeff (sumMap p q (cayDet p ℂ ^ q)) (blockGraph τ) =
-      constantCoeff (sgnProd τ • dList (smallList τ) (cayDet p ℂ ^ q)) := by
+  rw [det_pow_eq, GlobalTheory.T.topDegreeFormCoeff_rename_cayleyBlockSymbolEmbedding,
+    ← GlobalTheory.T.constantCoeff_cayleyOperator_pow_determinant_pow,
+    GlobalTheory.T.cayleyOperator_pow_eq_signed_sum_partialDerivs, LinearMap.sum_apply]
+  have key
+      : ∀ τ : Fin q → Equiv.Perm (Fin p),
+        (sgnProd τ : ℂ) * AddMonoidAlgebra.coeff (sumMap p q (cayDet p ℂ ^ q)) (blockGraph τ)
+          = constantCoeff (sgnProd τ • dList (smallList τ) (cayDet p ℂ ^ q)) := by
     intro τ
-    rw [← bigList_sum, ← zero_add ((bigList τ).map _).sum, ← GlobalTheory.T.coeff_composedPartialDerivList_of_nodup _ (bigList_nodup τ) 0 (fun _ _ => rfl),
+    rw [← bigList_sum, ← zero_add ((bigList τ).map _).sum,
+      ← GlobalTheory.T.coeff_composedPartialDerivList_of_nodup _ (bigList_nodup τ) 0
+        (fun _ _ => rfl),
       dList_sumMap, bigList_map, ← constantCoeff_sumMap p q, map_zsmul, zsmul_eq_mul,
-      ← map_intCast (C : ℂ →+* MvPolynomial (Fin q × Fin p × Fin p) ℂ), map_mul, constantCoeff_C, constantCoeff_eq]
+      ← map_intCast (C : ℂ →+* MvPolynomial (Fin q × Fin p × Fin p) ℂ), map_mul, constantCoeff_C,
+      constantCoeff_eq]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [LinearMap.smul_apply, key, map_sum]
+  simp_rw [LinearMap.smul_apply, key, map_sum]

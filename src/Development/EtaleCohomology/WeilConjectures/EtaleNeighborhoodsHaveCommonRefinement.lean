@@ -19,17 +19,27 @@ theorem etaleNeighborhoods_have_common_refinement : LateralTheory.EWeil.AbsorbPf
   let φB' : B →ₐ[A] Ω := { φB with commutes' := fun a => RingHom.congr_fun hφB a }
   let φC' : C →ₐ[A] Ω := { φC with commutes' := fun a => RingHom.congr_fun hφC a }
   let L := Algebra.TensorProduct.lift φB' φC' (fun _ _ => Commute.all _ _)
-  refine ⟨CommRingCat.of (B ⊗[A] C), CommRingCat.ofHom (algebraMap A (B ⊗[A] C)), L.toRingHom,
+  refine ⟨
+    CommRingCat.of (B ⊗[A] C),
+    CommRingCat.ofHom (algebraMap A (B ⊗[A] C)),
+    L.toRingHom,
     CommRingCat.ofHom Algebra.TensorProduct.includeLeftRingHom,
     CommRingCat.ofHom (Algebra.TensorProduct.includeRight (R := A) (A := B) (B := C)).toRingHom,
-    ?_, ?_, ?_, ?_, ?_, ?_⟩
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · haveI : Algebra.Etale B (B ⊗[A] C) := inferInstance
     haveI : Algebra.Etale A (B ⊗[A] C) := Algebra.Etale.comp A B (B ⊗[A] C)
     exact (RingHom.etale_algebraMap (R := A) (S := B ⊗[A] C)).mpr inferInstance
   · ext a; exact L.commutes a
   · ext a
     show (gB.hom a) ⊗ₜ[A] (1 : C) = algebraMap A (B ⊗[A] C) a
-    rw [Algebra.TensorProduct.algebraMap_apply]; rfl
+    rw [Algebra.TensorProduct.algebraMap_apply]
+    rfl
   · ext a
     show (1 : B) ⊗ₜ[A] (gC.hom a) = algebraMap A (B ⊗[A] C) a
     rw [Algebra.TensorProduct.algebraMap_apply]

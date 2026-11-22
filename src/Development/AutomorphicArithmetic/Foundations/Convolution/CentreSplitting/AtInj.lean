@@ -10,13 +10,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-theorem UpperTheory.ConvolutionTheory.Dp.atInj :
-    UpperTheory.ConvolutionTheory.Dp.AtInj := by
+theorem UpperTheory.ConvolutionTheory.Dp.atInj : UpperTheory.ConvolutionTheory.Dp.AtInj := by
   intro E _ _ _ n μ _ V V' hV hV' S hS t h h'
   obtain ⟨π, hπ, -⟩ := exCusp E n μ V hV
   obtain ⟨π', hπ', -⟩ := exCusp E n μ V' hV'

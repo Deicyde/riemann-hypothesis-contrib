@@ -8,15 +8,17 @@ noncomputable section
 
 namespace Formalism.ZeroFreeDirichlet
 
-private theorem one_add_rpow_le_one_add_mul {s p : ℝ} (hs : 0 ≤ s) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    (1 + s) ^ p ≤ 1 + p * s := by
-  have t := Real.geom_mean_le_arith_mean2_weighted hp0 (sub_nonneg.2 hp1)
-    (by linarith : (0:ℝ) ≤ 1 + s) zero_le_one (by ring : p + (1 - p) = 1)
+private theorem one_add_rpow_le_one_add_mul {s p : ℝ} (hs : 0 ≤ s) (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
+    : (1 + s) ^ p ≤ 1 + p * s := by
+  have t :=
+    Real.geom_mean_le_arith_mean2_weighted hp0 (sub_nonneg.2 hp1) (by linarith : (0 : ℝ) ≤ 1 + s)
+      zero_le_one (by ring : p + (1 - p) = 1)
   rw [Real.one_rpow, mul_one] at t
   nlinarith [t]
 
-private theorem le_one_add_mul_log_one_add {h : ℝ} (hh : 0 ≤ h) : h ≤ (1 + h) * Real.log (1 + h) := by
-  have h1 : (0:ℝ) < 1 + h := by linarith
+private theorem le_one_add_mul_log_one_add {h : ℝ} (hh : 0 ≤ h)
+    : h ≤ (1 + h) * Real.log (1 + h) := by
+  have h1 : (0 : ℝ) < 1 + h := by linarith
   have t := Real.log_le_sub_one_of_pos (inv_pos.2 h1)
   rw [Real.log_inv] at t
   have e : (1 + h) * (1 + h)⁻¹ = 1 := mul_inv_cancel₀ h1.ne'

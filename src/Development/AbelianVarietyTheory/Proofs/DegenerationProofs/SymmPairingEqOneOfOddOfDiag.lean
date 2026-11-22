@@ -33,8 +33,15 @@ private lemma eq_one_of_hom_eq_one_on_basis {X U : Type} [AddCommGroup X] [CommG
   have hx := LinearMap.congr_fun hg x
   simpa [g] using hx
 
-theorem symm_pairing_eq_one_of_odd_of_diag :
-    ∀ (X U : Type) [AddCommGroup X] [CommGroup U] (d k : ℕ) (e : Module.Basis (Fin d) ℤ X) (b : ℤ), Odd k → (k : ℤ) ∣ 2 * b - 1 → ∀ δ : X → X → U, (∀ x x' y, δ (x + x') y = δ x y * δ x' y) → (∀ x y, δ x y = δ y x) → (∀ x y, δ x y ^ k = 1) → (∀ i, δ (e i) (e i) ^ b = 1) → (∀ i j, δ (e i + e j) (e i + e j) ^ b = 1) → ∀ x y, δ x y = 1 := by
+theorem symm_pairing_eq_one_of_odd_of_diag
+    : ∀ (X U : Type) [AddCommGroup X] [CommGroup U] (d k : ℕ) (e : Module.Basis (Fin d) ℤ X)
+        (b : ℤ),
+      Odd k → (k : ℤ) ∣ 2 * b - 1
+        → ∀ δ : X → X → U,
+          (∀ x x' y, δ (x + x') y = δ x y * δ x' y) → (∀ x y, δ x y = δ y x)
+            → (∀ x y, δ x y ^ k = 1) → (∀ i, δ (e i) (e i) ^ b = 1)
+            → (∀ i j, δ (e i + e j) (e i + e j) ^ b = 1)
+            → ∀ x y, δ x y = 1 := by
   intro X U _ _ d k e b _ hb δ hadd hsymm hk1 hdiag hdiag2
   have hadd2 : ∀ x y y', δ x (y + y') = δ x y * δ x y' := by
     intro x y y'
@@ -42,12 +49,15 @@ theorem symm_pairing_eq_one_of_odd_of_diag :
   have hoff : ∀ i j, δ (e i) (e j) = 1 := by
     intro i j
     have h := hdiag2 i j
-    rw [hadd, hadd2, hadd2, hsymm (e j) (e i), _root_.mul_zpow, _root_.mul_zpow, _root_.mul_zpow, hdiag i, hdiag j] at h
+    rw [hadd, hadd2, hadd2, hsymm (e j) (e i), _root_.mul_zpow, _root_.mul_zpow, _root_.mul_zpow,
+        hdiag i, hdiag j]
+      at h
     apply eq_one_of_pow_eq_one_of_dvd_two_mul_sub_one k b hb _ (hk1 _ _)
     simpa using h
   have hrow : ∀ i y, δ (e i) y = 1 := fun i =>
     eq_one_of_hom_eq_one_on_basis e (δ (e i)) (hadd2 (e i)) (hoff i)
   intro x y
-  exact eq_one_of_hom_eq_one_on_basis e (fun x => δ x y) (fun x x' => hadd x x' y) (fun i => hrow i y) x
+  exact
+    eq_one_of_hom_eq_one_on_basis e (fun x => δ x y) (fun x x' => hadd x x' y) (fun i => hrow i y) x
 
 end GlobalTheory

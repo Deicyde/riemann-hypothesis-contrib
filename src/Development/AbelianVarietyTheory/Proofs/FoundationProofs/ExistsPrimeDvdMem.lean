@@ -8,7 +8,11 @@ universe u_1
 
 namespace GlobalTheory.PrimeDivisorMembership
 
-theorem exists_prime_dvd_mem : ∀ {R : Type u_1} [inst : CommRing R] (P : Ideal R), Ideal.IsPrime P → ∀ (n : ℕ), n ≠ (0 : ℕ) → (↑n : R) ∈ P → ∃ (q : ℕ), Nat.Prime q ∧ q ∣ n ∧ (↑q : R) ∈ P := by
+theorem exists_prime_dvd_mem
+    : ∀ {R : Type u_1} [inst : CommRing R] (P : Ideal R),
+      Ideal.IsPrime P
+        → ∀ (n : ℕ),
+          n ≠ (0 : ℕ) → (↑n : R) ∈ P → ∃ (q : ℕ), Nat.Prime q ∧ q ∣ n ∧ (↑q : R) ∈ P := by
   intro R _ P hP n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -29,7 +33,8 @@ theorem exists_prime_dvd_mem : ∀ {R : Type u_1} [inst : CommRing R] (P : Ideal
           rw [mul_zero] at hm
           exact hn hm
         have hlt : m < n := by
-          calc m < 2 * m := by omega
+          calc
+            m < 2 * m := by omega
             _ ≤ n.minFac * m := Nat.mul_le_mul_right _ hmin.two_le
             _ = n := hm.symm
         obtain ⟨q, hq1, hq2, hq3⟩ := ih m hlt hm0 hq

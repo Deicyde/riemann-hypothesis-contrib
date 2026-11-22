@@ -17,7 +17,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIsDetR
 
 open NumberField IsDedekindDomain
 open scoped TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.IndefR.FWT Formalism.L2.Pj GlobalTheory.CoverRead
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
@@ -34,13 +37,14 @@ def quotC (D : D7) : (AE D)ˣ →* (AE D)ˣ :=
 def finQuot (D : D7) : (AE D)ˣ →* (GlobalTheory.FinalJoin.AfE D)ˣ :=
   (Units.map (finPart D).toMonoidHom).comp (quotC D)
 
-theorem finPart_mul_inv (x : (AE D)ˣ) :
-    finPart D (x : AE D) * finPart D ((x⁻¹ : (AE D)ˣ) : AE D) = 1 := by
+theorem finPart_mul_inv (x : (AE D)ˣ)
+    : finPart D (x : AE D) * finPart D ((x⁻¹ : (AE D)ˣ) : AE D) = 1 := by
   rw [← RingHom.map_mul, Units.mul_inv, RingHom.map_one]
 
-theorem finQuot_val (x : (AE D)ˣ) :
-    ((finQuot D x : (GlobalTheory.FinalJoin.AfE D)ˣ) : Af D.host.F ⊗[D.host.F] D.host.E) =
-      finPart D (x : AE D) * sigR (Af D.host.F) D.sp.cm.sig (finPart D ((x⁻¹ : (AE D)ˣ) : AE D)) := by
+theorem finQuot_val (x : (AE D)ˣ)
+    : ((finQuot D x : (GlobalTheory.FinalJoin.AfE D)ˣ) : Af D.host.F ⊗[D.host.F] D.host.E)
+      = finPart D (x : AE D)
+        * sigR (Af D.host.F) D.sp.cm.sig (finPart D ((x⁻¹ : (AE D)ˣ) : AE D)) := by
   show finPart D ((x : AE D) * sigR (AF D.host.F) D.sp.cm.sig ((x⁻¹ : (AE D)ˣ) : AE D)) = _
   rw [RingHom.map_mul, GlobalTheory.DetRootChar.finPart_sigR]
 
@@ -49,17 +53,18 @@ theorem normOne_finQuot (x : (AE D)ˣ) : GlobalTheory.FinalJoin.NormOne (finQuot
   rw [finQuot_val]
   exact GlobalTheory.DetOnto.norm_one _ (GlobalTheory.DetOnto.sigR_sigR D) (finPart_mul_inv x)
 
-theorem finQuot_of_isDetRoot {V : HSp D} {g : GA D V} {x : (AE D)ˣ} (hx : IsDetRoot V g x) :
-    finQuot D x = Matrix.GeneralLinearGroup.det (finHom V g) := by
+theorem finQuot_of_isDetRoot {V : HSp D} {g : GA D V} {x : (AE D)ˣ} (hx : IsDetRoot V g x)
+    : finQuot D x = Matrix.GeneralLinearGroup.det (finHom V g) := by
   apply Units.ext
   have h1 := congrArg (finPart D) hx
   rw [RingHom.map_mul, GlobalTheory.DetRootChar.finPart_sigR] at h1
   rw [finQuot_val, h1, mul_assoc, ← RingHom.map_mul, finPart_mul_inv x, RingHom.map_one, mul_one,
     GlobalTheory.DetRootChar.finPart_det]
 
-theorem finQuot_incA (e : D.host.Eˣ) :
-    ((finQuot D (Units.map (incA D).toMonoidHom e) : (GlobalTheory.FinalJoin.AfE D)ˣ) : GlobalTheory.FinalJoin.AfE D) =
-      (1 : Af D.host.F) ⊗ₜ[D.host.F] ((e : D.host.E) * D.sp.cm.sig ((e⁻¹ : D.host.Eˣ) : D.host.E)) := by
+theorem finQuot_incA (e : D.host.Eˣ)
+    : ((finQuot D (Units.map (incA D).toMonoidHom e) : (GlobalTheory.FinalJoin.AfE D)ˣ)
+        : GlobalTheory.FinalJoin.AfE D)
+      = (1 : Af D.host.F) ⊗ₜ[D.host.F] ((e : D.host.E) * D.sp.cm.sig ((e⁻¹ : D.host.Eˣ) : D.host.E)) := by
   rw [finQuot_val]
   show finPart D (incA D (e : D.host.E)) * sigR (Af D.host.F) D.sp.cm.sig (finPart D (incA D ((e⁻¹ : D.host.Eˣ) : D.host.E))) = _
   show ((1 : Af D.host.F) ⊗ₜ[D.host.F] (e : D.host.E)) *

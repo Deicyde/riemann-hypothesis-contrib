@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAdel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped TensorProduct NNReal Matrix
 open scoped Classical
 
@@ -15,10 +17,16 @@ namespace PositivityTheory.ThKF0
 
 open Grow
 
-theorem exists_dual_den (F : Type) [Field F] [NumberField F] : ∃ D : ℕ, 1 ≤ D ∧ ∀ ξ : F,
-    (∀ y : 𝓞 F, ∃ z : ℤ, Algebra.trace ℚ F (ξ * y) = z) → IsIntegral ℤ ((D : F) * ξ) := by
-  refine ⟨(NumberField.discr F).natAbs,
-    Nat.one_le_iff_ne_zero.mpr (Int.natAbs_ne_zero.mpr (NumberField.discr_ne_zero F)), ?_⟩
+theorem exists_dual_den (F : Type) [Field F] [NumberField F]
+    : ∃ D : ℕ,
+      1 ≤ D
+        ∧ ∀ ξ : F,
+          (∀ y : 𝓞 F, ∃ z : ℤ, Algebra.trace ℚ F (ξ * y) = z) → IsIntegral ℤ ((D : F) * ξ) := by
+  refine ⟨
+    (NumberField.discr F).natAbs,
+    Nat.one_le_iff_ne_zero.mpr (Int.natAbs_ne_zero.mpr (NumberField.discr_ne_zero F)),
+    ?_
+  ⟩
   intro ξ hξ
   have h10 : (1 : FractionalIdeal (nonZeroDivisors (𝓞 F)) F) ≠ 0 := by
     rw [← FractionalIdeal.coeIdeal_top]
@@ -34,8 +42,9 @@ theorem exists_dual_den (F : Type) [Field F] [NumberField F] : ∃ D : ℕ, 1 �
   have hD : ((NumberField.discr F).natAbs : 𝓞 F) ∈ differentIdeal ℤ (𝓞 F) := by
     rw [← NumberField.absNorm_differentIdeal F (𝓞 F)]
     exact Ideal.absNorm_mem _
-  have hD' : ((NumberField.discr F).natAbs : F) ∈
-      ((differentIdeal ℤ (𝓞 F) : Ideal (𝓞 F)) : FractionalIdeal (nonZeroDivisors (𝓞 F)) F) := by
+  have hD'
+      : ((NumberField.discr F).natAbs : F)
+        ∈ ((differentIdeal ℤ (𝓞 F) : Ideal (𝓞 F)) : FractionalIdeal (nonZeroDivisors (𝓞 F)) F) := by
     rw [FractionalIdeal.mem_coeIdeal]
     exact ⟨_, hD, by simp⟩
   rw [coeIdeal_differentIdeal ℤ ℚ F (𝓞 F)] at hD'
@@ -45,15 +54,21 @@ theorem exists_dual_den (F : Type) [Field F] [NumberField F] : ∃ D : ℕ, 1 �
   rw [← hy]
   exact NumberField.RingOfIntegers.isIntegral_coe y
 
-theorem trace_int {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (a : F)
-    (h : ψ (0, (algebraMap F (AF F) a).2) = 1) : ∃ z : ℤ, Algebra.trace ℚ F a = z := by
+theorem trace_int
+    {F : Type} [Field F] [NumberField F]
+    {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
+    (a : F) (h : ψ (0, (algebraMap F (AF F) a).2) = 1)
+    : ∃ z : ℤ, Algebra.trace ℚ F a = z := by
   have e := GlobalTheory.PsiNontriv.isStd_fin_rat hψ a
-  have e2 : ψ (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA F 0 ((algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F)) a)) = 1 := h
+  have e2
+      : ψ (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA F 0
+          ((algebraMap F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F)) a))
+        = 1 :=
+    h
   rw [e2] at e
   obtain ⟨n, hn⟩ := Complex.exp_eq_one_iff.mp e.symm
   refine ⟨n, ?_⟩
-  have hpi : (2 * ↑Real.pi * Complex.I : ℂ) ≠ 0 := by
-    simp [Real.pi_ne_zero, Complex.I_ne_zero]
+  have hpi : (2 * ↑Real.pi * Complex.I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
   have hq : ((Algebra.trace ℚ F a : ℚ) : ℂ) = ((n : ℚ) : ℂ) := by
     apply mul_left_cancel₀ hpi
     rw [hn]
@@ -61,8 +76,16 @@ theorem trace_int {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ}
     ring
   exact_mod_cast hq
 
-theorem weil_rep_bounded_denominator : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E) (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (M : Model σ X W) (χX χW : Chr F E) (om : Rep σ X W) (r s r' s' : ℕ), IsPair B M χX χW om r s r' s' → ∀ Φ ∈ schA F (Fin n × Fin d), ∃ (C : ℝ) (k : ℕ), ∀ g h, ∃ m : ℕ, 1 ≤ m ∧ (m : ℝ) ≤ C * ((ht g : ℝ) * ht h) ^ k ∧
-    ∀ ξ : Fin n × Fin d → F, om (g, h) Φ (fun i => algebraMap F (AF F) (ξ i)) ≠ 0 → ∀ i, IsIntegral ℤ ((m : F) * ξ i) := by
+theorem weil_rep_bounded_denominator
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E) (n d : ℕ) (X : Spc F E n) (W : Spc F E d) (M : Model σ X W)
+        (χX χW : Chr F E) (om : Rep σ X W) (r s r' s' : ℕ),
+      IsPair B M χX χW om r s r' s'
+        → ∀ Φ ∈ schA F (Fin n × Fin d), ∃ (C : ℝ) (k : ℕ), ∀ g h, ∃ m : ℕ,
+          1 ≤ m ∧ (m : ℝ) ≤ C * ((ht g : ℝ) * ht h) ^ k
+            ∧ ∀ ξ : Fin n × Fin d → F,
+              om (g, h) Φ (fun i => algebraMap F (AF F) (ξ i)) ≠ 0
+                → ∀ i, IsIntegral ℤ ((m : F) * ξ i) := by
   intro F E _ _ _ _ _ σ B n d X W M χX χW om r s r' s' hP Φ hΦ
   obtain ⟨C, -, hC⟩ := htBd F E σ n d X W M
   obtain ⟨m₀, hm₀, h₀⟩ := finInv F _ B.ψ hP.base.std Φ hΦ
@@ -78,12 +101,19 @@ theorem weil_rep_bounded_denominator : ∀ (F E : Type) [Field F] [NumberField F
     let u : AF F := (0, (algebraMap F (AF F) (y : F)).2)
     have hu : IntF u := ⟨rfl, fun v => HeightOneSpectrum.coe_mem_adicCompletionIntegers v y⟩
     have h0 : IntF (0 : AF F) := ⟨rfl, fun v => by rw [map_zero]; exact zero_mem _⟩
-    have key := congrFun (h₀ _ _ _ _ (impl_sOf hP.weil g h) hb (0, Pi.single i u) ⟨fun _ => h0, fun j => by
-      by_cases e : j = i
-      · subst e; simpa using hu
-      · simpa [e] using h0⟩) fun i => algebraMap F (AF F) (ξ i)
-    simp only [schr, Prod.smul_mk, smul_zero, add_zero, Pi.zero_apply, zero_mul, mul_zero, dotProduct_smul,
-      dotProduct_single] at key
+    have key :=
+      congrFun
+        (h₀ _ _ _ _ (impl_sOf hP.weil g h) hb (0, Pi.single i u) ⟨
+          fun _ => h0,
+          fun j => by
+            by_cases e : j = i
+            · subst e; simpa using hu
+            · simpa [e] using h0
+        ⟩)
+        fun i => algebraMap F (AF F) (ξ i)
+    simp only [schr, Prod.smul_mk, smul_zero, add_zero, Pi.zero_apply, zero_mul, mul_zero,
+        dotProduct_smul, dotProduct_single]
+      at key
     rw [← mul_right_cancel₀ hξ (key.trans (one_mul _).symm)]
     refine congrArg B.ψ (Prod.ext ?_ ?_)
     · change (0 : Ainf F) = ((m₀ * m : ℕ) : AF F).1 * ((algebraMap F (AF F) (ξ i)).1 * 0)

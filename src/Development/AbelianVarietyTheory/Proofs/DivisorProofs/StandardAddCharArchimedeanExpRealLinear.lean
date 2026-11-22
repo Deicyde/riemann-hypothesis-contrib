@@ -5,9 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IteratedL
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField MeasureTheory
-open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal Classical
+open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix ENNReal
+  Classical
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -16,31 +18,44 @@ noncomputable section
 
 namespace GlobalTheory.StdCharLin
 
-theorem continuous_ofMixed (F : Type) [Field F] [NumberField F] :
-    Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm := by
+theorem continuous_ofMixed (F : Type) [Field F] [NumberField F]
+    : Continuous (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm := by
   refine continuous_pi fun v => ?_
   rcases v.isReal_or_isComplex with hv | hv
-  · rw [(InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal hv).isEmbedding.continuous_iff]
+  · rw [(InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal
+      hv).isEmbedding.continuous_iff]
     exact ((continuous_apply _).comp continuous_fst).congr fun y =>
-      (congrFun (congrArg Prod.fst ((InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply y)) ⟨v, hv⟩).symm
+      (congrFun (congrArg Prod.fst ((InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply y))
+        ⟨v, hv⟩).symm
   · rw [(InfinitePlace.Completion.isometry_extensionEmbedding v).isEmbedding.continuous_iff]
     exact ((continuous_apply _).comp continuous_snd).congr fun y =>
-      (congrFun (congrArg Prod.snd ((InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply y)) ⟨v, hv⟩).symm
+      (congrFun (congrArg Prod.snd ((InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply y))
+        ⟨v, hv⟩).symm
 
-theorem stdChar_mixed_linear : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ)
-    (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)), IsStdChar D ψ (-1) → IsInfFam θ →
-    ∃ β : mixedEmbedding.mixedSpace D.host.F →ₗ[ℝ] ℝ,
-      (∀ a, ψ (((InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F).symm a, 0) : AdeleRing (𝓞 D.host.F) D.host.F) =
-        Complex.exp (2 * Real.pi * Complex.I * β a)) ∧
-      ∀ a, β a = -(∑ ρ, θ ρ (((InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F).symm a) ⊗ₜ[D.host.F]
-        (1 : D.host.E))).re := by
+theorem stdChar_mixed_linear
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ)
+        (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)),
+      IsStdChar D ψ (-1) → IsInfFam θ
+        → ∃ β : mixedEmbedding.mixedSpace D.host.F →ₗ[ℝ] ℝ,
+          (∀ a,
+              ψ
+                  (((InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F).symm a, 0)
+                    : AdeleRing (𝓞 D.host.F) D.host.F)
+                = Complex.exp (2 * Real.pi * Complex.I * β a))
+            ∧ ∀ a,
+              β a
+                = -(∑ ρ, θ ρ (((InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F).symm a) ⊗ₜ[D.host.F]
+                     (1 : D.host.E))).re := by
   intro D ψ θ hψ hθ
   obtain ⟨hc, hall⟩ := hψ
   have key := hall.2 θ hθ
   set e := InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F with he
   let z : Ainf D.host.F → ℂ := fun x => ∑ ρ, θ ρ (x ⊗ₜ[D.host.F] (1 : D.host.E))
-  have hkey : ∀ x, ψ ((x, 0) : AdeleRing (𝓞 D.host.F) D.host.F) =
-      Complex.exp (2 * Real.pi * Complex.I * ((-1 : ℤ) : ℂ) * z x) := fun x => key x
+  have hkey
+      : ∀ x,
+        ψ ((x, 0) : AdeleRing (𝓞 D.host.F) D.host.F)
+          = Complex.exp (2 * Real.pi * Complex.I * ((-1 : ℤ) : ℂ) * z x) := fun x =>
+    key x
   have him : ∀ x, (z x).im = 0 := by
     intro x
     have h1 := hc.2.1 ((x, 0) : AdeleRing (𝓞 D.host.F) D.host.F)
@@ -55,13 +70,13 @@ theorem stdChar_mixed_linear : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ)
   have hzadd : ∀ x y, z (x + y) = z x + z y := by
     intro x y
     simp only [z, TensorProduct.add_tmul, map_add (f := _), Finset.sum_add_distrib]
-  let g : mixedEmbedding.mixedSpace D.host.F →+ ℝ :=
-    { toFun := fun a => -(z (e.symm a)).re
-      map_zero' := by simp [z]
-      map_add' := by intro a b; simp only [map_add (f := _), hzadd, Complex.add_re, neg_add] }
+  let g : mixedEmbedding.mixedSpace D.host.F →+ ℝ := {
+    toFun := fun a => -(z (e.symm a)).re
+    map_zero' := by simp [z]
+    map_add' := by intro a b; simp only [map_add (f := _), hzadd, Complex.add_re, neg_add]
+  }
   have hg : Continuous g := by
-    have : Continuous fun x : Ainf D.host.F => z x :=
-      continuous_finsetSum _ fun ρ _ => (hθ ρ).2
+    have : Continuous fun x : Ainf D.host.F => z x := continuous_finsetSum _ fun ρ _ => (hθ ρ).2
     exact (Complex.continuous_re.comp (this.comp (continuous_ofMixed D.host.F))).neg
   refine ⟨(g.toRealLinearMap hg : mixedEmbedding.mixedSpace D.host.F →ₗ[ℝ] ℝ), ?_, fun a => rfl⟩
   intro a

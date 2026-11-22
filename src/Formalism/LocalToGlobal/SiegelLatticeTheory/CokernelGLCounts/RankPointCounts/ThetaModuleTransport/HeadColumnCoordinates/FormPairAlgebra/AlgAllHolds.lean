@@ -10,6 +10,7 @@ namespace Formalism.L2.SG.LocalCountModules.UnramifiedPairingAlgebraic
 
 theorem stepPairG_holds : StepPairG := stepPairG_of_fwd_bwd fwdEx bwdEx
 
-theorem algAll_holds : Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.ThetaMbeU.AlgAll := algAll_of stepPairG_holds
+theorem algAll_holds : Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.ThetaMbeU.AlgAll :=
+  algAll_of stepPairG_holds
 
 end Formalism.L2.SG.LocalCountModules.UnramifiedPairingAlgebraic

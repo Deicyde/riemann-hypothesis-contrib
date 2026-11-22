@@ -72,24 +72,27 @@ lemma ev_algebraMap (r : (R : Type)) : ev R (algebraMap (R : Type) (DN R) r) = r
   rw [← Ideal.Quotient.mk_algebraMap, ev_mk]
   simp
 
-def evAlg : DN R →ₐ[R₀] (R : Type) :=
-  { ev R with
-    commutes' := fun r => by
-      show ev R (algebraMap R₀ (DN R) r) = _
-      rw [← Ideal.Quotient.mk_algebraMap, ev_mk, Polynomial.algebraMap_apply, eval_C] }
+def evAlg : DN R →ₐ[R₀] (R : Type) := {
+  ev R with
+  commutes' := fun r => by
+    show ev R (algebraMap R₀ (DN R) r) = _
+    rw [← Ideal.Quotient.mk_algebraMap, ev_mk, Polynomial.algebraMap_apply, eval_C]
+}
 
 def D : LAlg R₀ := { carrier := DN R, loc := isLocal R }
 
 def dualPair : DualPair R where
   D := D R
   π := ⟨evAlg R, TowerExample.isLocalHom_of_surj _ (ev_surj R)⟩
-  σ := ⟨IsScalarTower.toAlgHom R₀ (R : Type) (DN R),
+  σ := ⟨
+    IsScalarTower.toAlgHom R₀ (R : Type) (DN R),
     ⟨fun r hr => by
       have h := hr.map (ev R)
       have e : ev R ((IsScalarTower.toAlgHom R₀ (R : Type) (DN R) : (R : Type) →+* DN R) r) = r :=
         ev_algebraMap R r
       convert h using 1
-      exact e.symm⟩⟩
+      exact e.symm⟩
+  ⟩
   η := eta R
   sect r := ev_algebraMap R r
   η_sq := eta_sq R
@@ -97,7 +100,8 @@ def dualPair : DualPair R where
   free r h := by
     change algebraMap (R : Type) (DN R) r * eta R = 0 at h
     rw [← Ideal.Quotient.mk_algebraMap, eta, ← map_mul, Ideal.Quotient.eq_zero_iff_mem,
-      Ideal.mem_span_singleton, X_pow_dvd_iff] at h
+        Ideal.mem_span_singleton, X_pow_dvd_iff]
+      at h
     have h1 := h 1 (by norm_num)
     simpa [Polynomial.algebraMap_apply] using h1
 

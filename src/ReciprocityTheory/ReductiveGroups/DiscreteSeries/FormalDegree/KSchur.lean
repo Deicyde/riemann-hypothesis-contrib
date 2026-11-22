@@ -61,14 +61,17 @@ lemma dk_inv (ε : Fin n → Bool) : Measure.map (fun x : KG ε => x⁻¹) (dk �
 
 end CompactHaarProbability
 
-
 open CompactHaarProbability in
-theorem dk_props (ε : Fin n → Bool) :
-    IsProbabilityMeasure (dk ε) ∧ (∀ k : KG ε, Measure.map (fun x => k * x) (dk ε) = dk ε) ∧
-      (∀ k : KG ε, Measure.map (fun x => x * k) (dk ε) = dk ε) ∧
-      Measure.map (fun x : KG ε => x⁻¹) (dk ε) = dk ε := by
-  refine ⟨inferInstance, fun k => map_mul_left_eq_self (dk ε) k, fun k => map_mul_right_eq_self (dk ε) k,
-    dk_inv ε⟩
+theorem dk_props (ε : Fin n → Bool)
+    : IsProbabilityMeasure (dk ε) ∧ (∀ k : KG ε, Measure.map (fun x => k * x) (dk ε) = dk ε)
+      ∧ (∀ k : KG ε, Measure.map (fun x => x * k) (dk ε) = dk ε)
+      ∧ Measure.map (fun x : KG ε => x⁻¹) (dk ε) = dk ε := by
+  refine ⟨
+    inferInstance,
+    fun k => map_mul_left_eq_self (dk ε) k,
+    fun k => map_mul_right_eq_self (dk ε) k,
+    dk_inv ε
+  ⟩
 
 namespace CompactHaarProbability
 
@@ -156,18 +159,18 @@ lemma int_conj (T : KType ε Λ) (P : T.V →L[ℂ] T.V) (k : KG ε) :
 
 end CompactHaarProbability
 
-
 open CompactHaarProbability in
-theorem kschur_op {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (v : T.V) :
-    ((Module.finrank ℂ T.V : ℝ) : ℂ) •
-        ∫ k, T.op k * (innerSL ℂ v).smulRight v * T.op k⁻¹ ∂(dk ε) =
-      ((‖v‖ ^ 2 : ℝ) : ℂ) • (1 : T.V →L[ℂ] T.V) := by
+theorem kschur_op {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (v : T.V)
+    : ((Module.finrank ℂ T.V : ℝ) : ℂ) • ∫ k, T.op k * (innerSL ℂ v).smulRight v * T.op k⁻¹ ∂(dk ε)
+      = ((‖v‖ ^ 2 : ℝ) : ℂ) • (1 : T.V →L[ℂ] T.V) := by
   set P : T.V →L[ℂ] T.V := (innerSL ℂ v).smulRight v with hP
   set I := ∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε) with hI
   have hcomm : ∀ k, T.op k * I = I * T.op k := by
     intro k
     have h := int_conj T P k
-    calc T.op k * I = T.op k * I * (T.op k⁻¹ * T.op k) := by rw [op_inv_mul, mul_one]
+    calc
+      T.op k * I
+        = T.op k * I * (T.op k⁻¹ * T.op k) := by rw [op_inv_mul, mul_one]
       _ = (T.op k * I * T.op k⁻¹) * T.op k := by simp only [mul_assoc]
       _ = I * T.op k := by rw [h]
   obtain ⟨c, hc⟩ := schur T I hcomm
@@ -181,8 +184,8 @@ theorem kschur_op {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (
     simp
   have htrP : trL P = ((‖v‖ ^ 2 : ℝ) : ℂ) := by
     rw [htr, LinearMap.trace_eq_sum_inner _ (stdOrthonormalBasis ℂ T.V)]
-    simp only [ContinuousLinearMap.coe_coe, hP, ContinuousLinearMap.smulRight_apply, innerSL_apply_apply,
-      inner_smul_right]
+    simp only [ContinuousLinearMap.coe_coe, hP, ContinuousLinearMap.smulRight_apply,
+      innerSL_apply_apply, inner_smul_right]
     rw [OrthonormalBasis.sum_inner_mul_inner, inner_self_eq_norm_sq_to_K]
     push_cast
     rfl
@@ -201,10 +204,9 @@ theorem kschur_op {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (
     ring
   rw [hc, smul_smul, key]
 
-
 open CompactHaarProbability in
-theorem kschur_coef {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (u v : T.V) :
-    (Module.finrank ℂ T.V : ℝ) * ∫ k, ‖⟪u, T.op k v⟫_ℂ‖ ^ 2 ∂(dk ε) = ‖v‖ ^ 2 * ‖u‖ ^ 2 := by
+theorem kschur_coef {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (u v : T.V)
+    : (Module.finrank ℂ T.V : ℝ) * ∫ k, ‖⟪u, T.op k v⟫_ℂ‖ ^ 2 ∂(dk ε) = ‖v‖ ^ 2 * ‖u‖ ^ 2 := by
   set P : T.V →L[ℂ] T.V := (innerSL ℂ v).smulRight v with hP
   have hop := kschur_op T v
   rw [← hP] at hop
@@ -215,31 +217,36 @@ theorem kschur_coef {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ)
     rfl
   have hpt : ∀ k : KG ε, ⟪u, (T.op k * P * T.op k⁻¹) u⟫_ℂ = ((‖⟪u, T.op k v⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by
     intro k
-    simp only [ContinuousLinearMap.mul_apply, hP, ContinuousLinearMap.smulRight_apply, innerSL_apply_apply]
-    rw [hadj, ContinuousLinearMap.adjoint_inner_right, map_smul, inner_smul_right, ← inner_conj_symm,
-      RCLike.conj_mul]
+    simp only [ContinuousLinearMap.mul_apply, hP, ContinuousLinearMap.smulRight_apply,
+      innerSL_apply_apply]
+    rw [hadj, ContinuousLinearMap.adjoint_inner_right, map_smul, inner_smul_right,
+      ← inner_conj_symm, RCLike.conj_mul]
     push_cast
     rfl
   let E : (T.V →L[ℂ] T.V) →L[ℂ] ℂ := (innerSL ℂ u).comp (ContinuousLinearMap.apply ℂ T.V u)
   have hE : ∀ A : T.V →L[ℂ] T.V, E A = ⟪u, A u⟫_ℂ := fun A => rfl
-  have hint : ((∫ k, ‖⟪u, T.op k v⟫_ℂ‖ ^ 2 ∂(dk ε) : ℝ) : ℂ) =
-      ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ := by
-    rw [← integral_complex_ofReal, ← hE, ← ContinuousLinearMap.integral_comp_comm E (integrable_conj T P)]
+  have hint
+      : ((∫ k, ‖⟪u, T.op k v⟫_ℂ‖ ^ 2 ∂(dk ε) : ℝ) : ℂ)
+        = ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ := by
+    rw [← integral_complex_ofReal, ← hE,
+      ← ContinuousLinearMap.integral_comp_comm E (integrable_conj T P)]
     simp_rw [hE, hpt]
-  have hfin : ((Module.finrank ℂ T.V : ℝ) : ℂ) * ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ =
-      ((‖v‖ ^ 2 * ‖u‖ ^ 2 : ℝ) : ℂ) := by
-    calc ((Module.finrank ℂ T.V : ℝ) : ℂ) * ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ
-        = ⟪u, (((Module.finrank ℂ T.V : ℝ) : ℂ) • ∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ := by
-          rw [ContinuousLinearMap.smul_apply, inner_smul_right]
+  have hfin
+      : ((Module.finrank ℂ T.V : ℝ) : ℂ) * ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ
+        = ((‖v‖ ^ 2 * ‖u‖ ^ 2 : ℝ) : ℂ) := by
+    calc
+      ((Module.finrank ℂ T.V : ℝ) : ℂ) * ⟪u, (∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ
+          = ⟪u, (((Module.finrank ℂ T.V : ℝ) : ℂ) • ∫ k, T.op k * P * T.op k⁻¹ ∂(dk ε)) u⟫_ℂ := by
+        rw [ContinuousLinearMap.smul_apply, inner_smul_right]
       _ = ⟪u, (((‖v‖ ^ 2 : ℝ) : ℂ) • (1 : T.V →L[ℂ] T.V)) u⟫_ℂ := by rw [hop]
       _ = ((‖v‖ ^ 2 : ℝ) : ℂ) * ⟪u, u⟫_ℂ := by
-          rw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply, inner_smul_right]
+        rw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply, inner_smul_right]
       _ = _ := by
-          have h : ⟪u, u⟫_ℂ = ((‖u‖ ^ 2 : ℝ) : ℂ) := by
-            apply Complex.ext
-            · simpa using inner_self_eq_norm_sq (𝕜 := ℂ) u
-            · simpa using inner_self_im (𝕜 := ℂ) u
-          rw [h, ← Complex.ofReal_mul]
+        have h : ⟪u, u⟫_ℂ = ((‖u‖ ^ 2 : ℝ) : ℂ) := by
+          apply Complex.ext
+          · simpa using inner_self_eq_norm_sq (𝕜 := ℂ) u
+          · simpa using inner_self_im (𝕜 := ℂ) u
+        rw [h, ← Complex.ofReal_mul]
   rw [← hint] at hfin
   exact_mod_cast hfin
 

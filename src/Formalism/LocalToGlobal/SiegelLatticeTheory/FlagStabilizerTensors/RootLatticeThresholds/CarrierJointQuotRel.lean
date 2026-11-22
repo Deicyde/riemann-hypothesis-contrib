@@ -19,28 +19,40 @@ section Alg
 
 variable {r : ℕ}
 
-theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) → Fin (r + 1)) (hπ : ∀ a, π (π a) = a)
-    (hP1 : ∀ c b, Z c b ≠ 0 ↔ c = π b)
-    (hP2 : ∀ k : Fin r, ((π k.succ).val + 1 = (π k.castSucc).val ∧
-        Z (π k.succ) k.succ = - Z (π k.castSucc) k.castSucc) ∨ (π k.castSucc).val < (π k.succ).val)
+theorem relAlg
+    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) → Fin (r + 1))
+    (hπ : ∀ a, π (π a) = a) (hP1 : ∀ c b, Z c b ≠ 0 ↔ c = π b)
+    (hP2 : ∀ k : Fin r,
+      ((π k.succ).val + 1 = (π k.castSucc).val
+          ∧ Z (π k.succ) k.succ = - Z (π k.castSucc) k.castSucc)
+        ∨ (π k.castSucc).val < (π k.succ).val)
     (m U : Fin r → Fin (r + 1) → ℂ)
-    (hA : ∀ a b, (∑ c : Fin r, if c.castSucc < a then conj (m c a) * Z c.castSucc b else 0) =
-      ∑ c : Fin r, if c.castSucc < b then U c b * Z a c.castSucc else 0) :
-    ∑ k : Fin r, (U k k.succ).re = - ∑ k : Fin r, (m k k.succ).re := by
+    (hA : ∀ a b,
+      (∑ c : Fin r, if c.castSucc < a then conj (m c a) * Z c.castSucc b else 0)
+        = ∑ c : Fin r, if c.castSucc < b then U c b * Z a c.castSucc else 0)
+    : ∑ k : Fin r, (U k k.succ).re = - ∑ k : Fin r, (m k k.succ).re := by
   have hπinj : Function.Injective π := Function.Involutive.injective hπ
   have hZ0 : ∀ c b, c ≠ π b → Z c b = 0 := fun c b h => by
     by_contra h'
     exact h ((hP1 c b).1 h')
   have hzne : ∀ b, Z (π b) b ≠ 0 := fun b => (hP1 _ b).2 rfl
-  have hcond : ∀ k : Fin r, (π k.succ).val + 1 = (π k.castSucc).val → (π k.succ).val < r :=
-    fun k h => by have := (π k.castSucc).isLt; omega
-  obtain ⟨ψ, hψdef⟩ : ∃ ψ : Fin r → Fin r, ∀ k, ψ k =
-      if h : (π k.succ).val + 1 = (π k.castSucc).val then ⟨(π k.succ).val, hcond k h⟩ else k :=
+  have hcond
+      : ∀ k : Fin r, (π k.succ).val + 1 = (π k.castSucc).val → (π k.succ).val < r := fun k h => by
+    have := (π k.castSucc).isLt; omega
+  obtain ⟨ψ, hψdef⟩
+      : ∃ ψ : Fin r → Fin r, ∀ k,
+        ψ k
+          = if h : (π k.succ).val + 1 = (π k.castSucc).val then
+              ⟨(π k.succ).val, hcond k h⟩
+            else
+              k :=
     ⟨_, fun k => rfl⟩
 
-  have hR1 : ∀ k : Fin r, (∑ c : Fin r, if c.castSucc < π k.castSucc then
-        conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0) =
-      U k k.succ * Z (π k.castSucc) k.castSucc := by
+  have hR1
+      : ∀ k : Fin r,
+        (∑ c : Fin r, if c.castSucc < π k.castSucc then
+          conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0)
+          = U k k.succ * Z (π k.castSucc) k.castSucc := by
     intro k
     rw [hA, Finset.sum_eq_single k]
     · rw [if_pos (Fin.castSucc_lt_succ : k.castSucc < k.succ)]
@@ -51,9 +63,11 @@ theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) �
     · intro h
       exact absurd (Finset.mem_univ k) h
 
-  have hR2 : ∀ j : Fin r, (∑ c : Fin r, if c.castSucc < π j.castSucc then
-        U c (π j.castSucc) * Z j.succ c.castSucc else 0) =
-      conj (m j j.succ) * Z j.castSucc (π j.castSucc) := by
+  have hR2
+      : ∀ j : Fin r,
+        (∑ c : Fin r, if c.castSucc < π j.castSucc then
+          U c (π j.castSucc) * Z j.succ c.castSucc else 0)
+          = conj (m j j.succ) * Z j.castSucc (π j.castSucc) := by
     intro j
     rw [← hA, Finset.sum_eq_single j]
     · rw [if_pos (Fin.castSucc_lt_succ : j.castSucc < j.succ)]
@@ -94,9 +108,10 @@ theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) �
         · exact hz
         · omega
       have hlt1 : π k.succ < π k.castSucc := Fin.lt_iff_val_lt_val.2 (by omega)
-      have eL : (∑ c : Fin r, if c.castSucc < π k.castSucc then
-          conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0) =
-          conj (m j j.succ) * Z (π k.succ) k.succ := by
+      have eL
+          : (∑ c : Fin r, if c.castSucc < π k.castSucc then
+              conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0)
+            = conj (m j j.succ) * Z (π k.succ) k.succ := by
         rw [Finset.sum_eq_single j]
         · rw [hjs, hjc, if_pos hlt1]
         · intro c _ hcj
@@ -107,7 +122,7 @@ theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) �
           exact absurd (Finset.mem_univ j) hj
       have key := eL.symm.trans (hR1 k)
       rw [hz] at key
-      have hU : U k k.succ = -conj (m j j.succ) := by
+      have hU : U k k.succ = - conj (m j j.succ) := by
         apply mul_right_cancel₀ (hzne k.castSucc)
         rw [← key]
         ring
@@ -117,8 +132,10 @@ theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) �
         · exact absurd h' h
         · exact hlt
       have hψk : ψ k = k := by rw [hψdef, dite_eq_right h]
-      have eL : (∑ c : Fin r, if c.castSucc < π k.castSucc then
-          conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0) = 0 :=
+      have eL
+          : (∑ c : Fin r, if c.castSucc < π k.castSucc then
+              conj (m c (π k.castSucc)) * Z c.castSucc k.succ else 0)
+            = 0 :=
         Finset.sum_eq_zero fun c _ => by
           split_ifs with hc
           · rw [hZ0 _ _ (fun e => by rw [e, Fin.lt_iff_val_lt_val] at hc; omega), mul_zero]
@@ -126,15 +143,18 @@ theorem relAlg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (π : Fin (r + 1) �
       have hU : U k k.succ = 0 := by
         have key := eL.symm.trans (hR1 k)
         exact (mul_eq_zero.1 key.symm).resolve_right (hzne _)
-      have eR2 : (∑ c : Fin r, if c.castSucc < π k.castSucc then
-          U c (π k.castSucc) * Z k.succ c.castSucc else 0) = 0 :=
+      have eR2
+          : (∑ c : Fin r, if c.castSucc < π k.castSucc then
+              U c (π k.castSucc) * Z k.succ c.castSucc else 0)
+            = 0 :=
         Finset.sum_eq_zero fun c _ => by
           split_ifs with hc
           · rw [hZ0 _ _ (fun e => by
                 have e2 := congrArg π e
                 rw [hπ] at e2
                 rw [← e2, Fin.lt_iff_val_lt_val] at hc
-                omega), mul_zero]
+                omega),
+              mul_zero]
           · rfl
       have hm : conj (m k k.succ) = 0 := by
         have key := eR2.symm.trans (hR2 k)
@@ -159,18 +179,27 @@ def ptSc : List (K × ℕ) → ℕ → K
   | [], _ => 0
   | (t, s) :: bs, a => if a < s then t else ptSc bs (a - s)
 
-theorem ptPar_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (a : ℕ) :
-    ptPar ((t, s) :: bs) a = if a < s then s - 1 - a else s + ptPar bs (a - s) := rfl
+theorem ptPar_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (a : ℕ)
+    : ptPar ((t, s) :: bs) a = if a < s then s - 1 - a else s + ptPar bs (a - s) :=
+  rfl
 
-theorem ptSc_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (a : ℕ) :
-    ptSc ((t, s) :: bs) a = if a < s then t else ptSc bs (a - s) := rfl
+theorem ptSc_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (a : ℕ)
+    : ptSc ((t, s) :: bs) a = if a < s then t else ptSc bs (a - s) :=
+  rfl
 
-theorem ptEntry_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (i j : ℕ) :
-    ptEntry ((t, s) :: bs) i j = if i < s ∧ j < s then (if i + j + 1 = s then t else 0)
-      else if s ≤ i ∧ s ≤ j then ptEntry bs (i - s) (j - s) else 0 := rfl
+theorem ptEntry_cons (t : K) (s : ℕ) (bs : List (K × ℕ)) (i j : ℕ)
+    : ptEntry ((t, s) :: bs) i j
+      = if i < s ∧ j < s then
+          (if i + j + 1 = s then t else 0)
+        else if s ≤ i ∧ s ≤ j then
+          ptEntry bs (i - s) (j - s)
+        else
+          0 :=
+  rfl
 
-theorem ptEntry_eq : ∀ (bs : List (K × ℕ)) (c b : ℕ), b < (bs.map Prod.snd).sum →
-    ptEntry bs c b = if c = ptPar bs b then ptSc bs b else 0
+theorem ptEntry_eq
+    : ∀ (bs : List (K × ℕ)) (c b : ℕ),
+      b < (bs.map Prod.snd).sum → ptEntry bs c b = if c = ptPar bs b then ptSc bs b else 0
   | [], _, b, hb => by simp at hb
   | (t, s) :: bs, c, b, hb => by
     simp only [List.map_cons, List.sum_cons] at hb
@@ -195,8 +224,8 @@ theorem ptEntry_eq : ∀ (bs : List (K × ℕ)) (c b : ℕ), b < (bs.map Prod.sn
         · rw [if_neg h, if_neg (by omega)]
       · rw [if_neg (fun h => hcs h.1), if_neg (by omega)]
 
-theorem ptPar_lt : ∀ (bs : List (K × ℕ)) (b : ℕ), b < (bs.map Prod.snd).sum →
-    ptPar bs b < (bs.map Prod.snd).sum
+theorem ptPar_lt
+    : ∀ (bs : List (K × ℕ)) (b : ℕ), b < (bs.map Prod.snd).sum → ptPar bs b < (bs.map Prod.snd).sum
   | [], b, hb => by simp at hb
   | (t, s) :: bs, b, hb => by
     simp only [List.map_cons, List.sum_cons] at hb ⊢
@@ -205,21 +234,24 @@ theorem ptPar_lt : ∀ (bs : List (K × ℕ)) (b : ℕ), b < (bs.map Prod.snd).s
     · rw [if_pos hbs]; omega
     · rw [if_neg hbs]; have := ptPar_lt bs (b - s) (by omega); omega
 
-theorem ptPar_invol : ∀ (bs : List (K × ℕ)) (b : ℕ), b < (bs.map Prod.snd).sum →
-    ptPar bs (ptPar bs b) = b
+theorem ptPar_invol
+    : ∀ (bs : List (K × ℕ)) (b : ℕ), b < (bs.map Prod.snd).sum → ptPar bs (ptPar bs b) = b
   | [], b, hb => by simp at hb
   | (t, s) :: bs, b, hb => by
     simp only [List.map_cons, List.sum_cons] at hb
     by_cases hbs : b < s
     · have hp : ptPar ((t, s) :: bs) b = s - 1 - b := by rw [ptPar_cons, if_pos hbs]
-      rw [hp, ptPar_cons, if_pos (by omega)]; omega
+      rw [hp, ptPar_cons, if_pos (by omega)]
+      omega
     · have hp : ptPar ((t, s) :: bs) b = s + ptPar bs (b - s) := by rw [ptPar_cons, if_neg hbs]
       rw [hp, ptPar_cons, if_neg (by omega)]
       have : s + ptPar bs (b - s) - s = ptPar bs (b - s) := by omega
-      rw [this, ptPar_invol bs (b - s) (by omega)]; omega
+      rw [this, ptPar_invol bs (b - s) (by omega)]
+      omega
 
-theorem ptSc_ne : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ b : ℕ,
-    b < (bs.map Prod.snd).sum → ptSc bs b ≠ 0
+theorem ptSc_ne
+    : ∀ (bs : List (K × ℕ)),
+      (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ b : ℕ, b < (bs.map Prod.snd).sum → ptSc bs b ≠ 0
   | [], _, b, hb => by simp at hb
   | (t, s) :: bs, h, b, hb => by
     simp only [List.map_cons, List.sum_cons] at hb
@@ -228,9 +260,13 @@ theorem ptSc_ne : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤
     · rw [if_pos hbs]; exact (h (t, s) (by simp)).1
     · rw [if_neg hbs]; exact ptSc_ne bs (fun b hb => h b (by simp [hb])) (b - s) (by omega)
 
-theorem ptPar_consec : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, 1 ≤ b.2) → ∀ k : ℕ,
-    k + 1 < (bs.map Prod.snd).sum →
-    (ptPar bs (k + 1) + 1 = ptPar bs k ∧ ptSc bs (k + 1) = ptSc bs k) ∨ ptPar bs k < ptPar bs (k + 1)
+theorem ptPar_consec
+    : ∀ (bs : List (K × ℕ)),
+      (∀ b ∈ bs, 1 ≤ b.2)
+        → ∀ k : ℕ,
+          k + 1 < (bs.map Prod.snd).sum
+            → (ptPar bs (k + 1) + 1 = ptPar bs k ∧ ptSc bs (k + 1) = ptSc bs k)
+              ∨ ptPar bs k < ptPar bs (k + 1)
   | [], _, k, hk => by simp at hk
   | (t, s) :: bs, h, k, hk => by
     simp only [List.map_cons, List.sum_cons] at hk
@@ -242,7 +278,8 @@ theorem ptPar_consec : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, 1 ≤ b.2) →
       exact ⟨by omega, rfl⟩
     · by_cases h2 : k < s
       · right
-        rw [if_neg h1, if_pos h2]; omega
+        rw [if_neg h1, if_pos h2]
+        omega
       · rw [if_neg h1, if_neg h2, if_neg h1, if_neg h2]
         have e : k + 1 - s = k - s + 1 := by omega
         rw [e]
@@ -261,28 +298,32 @@ variable {n r : ℕ} (ε : Fin n → Bool)
 theorem hJ_add_r' (x y y' : Fin n → ℂ) : hJ ε x (y + y') = hJ ε x y + hJ ε x y' := by
   simp only [hJ, Matrix.mulVec_add, dotProduct_add]
 
-theorem hJ_sum_r' {ι : Type*} [Fintype ι] (x : Fin n → ℂ) (a : ι → ℂ) (y : ι → Fin n → ℂ) :
-    hJ ε x (∑ c, a c • y c) = ∑ c, a c * hJ ε x (y c) := by
-  simp only [hJ, Matrix.mulVec_sum, Matrix.mulVec_smul, dotProduct_sum, dotProduct_smul, smul_eq_mul]
+theorem hJ_sum_r' {ι : Type*} [Fintype ι] (x : Fin n → ℂ) (a : ι → ℂ) (y : ι → Fin n → ℂ)
+    : hJ ε x (∑ c, a c • y c) = ∑ c, a c * hJ ε x (y c) := by
+  simp only [hJ, Matrix.mulVec_sum, Matrix.mulVec_smul, dotProduct_sum, dotProduct_smul,
+    smul_eq_mul]
 
 theorem hJ_cj' (x y : Fin n → ℂ) : hJ ε x y = conj (hJ ε y x) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hJ, Formalism.REAL.Jm, Matrix.mulVec_diagonal, dotProduct, Pi.star_apply, RCLike.star_def, map_sum,
-    map_mul, Complex.conj_conj]
+    simp only [hJ, Formalism.REAL.Jm, Matrix.mulVec_diagonal, dotProduct, Pi.star_apply,
+      RCLike.star_def, map_sum, map_mul, Complex.conj_conj]
   refine Finset.sum_congr rfl fun a _ => ?_
   split_ifs <;> simp <;> ring
 
-theorem hJ_sum_l' {ι : Type*} [Fintype ι] (x : Fin n → ℂ) (a : ι → ℂ) (y : ι → Fin n → ℂ) (w : Fin n → ℂ) :
-    hJ ε (x + ∑ c, a c • y c) w = hJ ε x w + ∑ c, conj (a c) * hJ ε (y c) w := by
+theorem hJ_sum_l'
+    {ι : Type*} [Fintype ι] (x : Fin n → ℂ) (a : ι → ℂ) (y : ι → Fin n → ℂ) (w : Fin n → ℂ)
+    : hJ ε (x + ∑ c, a c • y c) w = hJ ε x w + ∑ c, conj (a c) * hJ ε (y c) w := by
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [hJ_cj' ε (x + ∑ c, a c • y c) w, hJ_add_r', hJ_sum_r', map_add (f := _), map_sum, ← hJ_cj' ε x w]
+    rw [hJ_cj' ε (x + ∑ c, a c • y c) w, hJ_add_r', hJ_sum_r', map_add (f := _), map_sum,
+      ← hJ_cj' ε x w]
   congr 1
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [map_mul, ← hJ_cj' ε (y c) w]
 
-theorem span_expand (e f : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0)
-    (k : ℕ) (y : Fin n → ℂ) (hy : y ∈ spanLt e k) :
-    y = ∑ c : Fin r, (if c.val < k then hJ ε (f c) y else 0) • e c := by
+theorem span_expand
+    (e f : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0)
+    (k : ℕ) (y : Fin n → ℂ) (hy : y ∈ spanLt e k)
+    : y = ∑ c : Fin r, (if c.val < k then hJ ε (f c) y else 0) • e c := by
   have hsm : ∀ (x : Fin n → ℂ) (t : ℂ) (v : Fin n → ℂ), hJ ε x (t • v) = t * hJ ε x v := by
     intro x t v
     simp only [hJ, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
@@ -298,7 +339,8 @@ theorem span_expand (e f : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (f a) 
       simp [Ne.symm hcb]
     · intro h
       exact absurd (Finset.mem_univ b) h
-  | zero => simp [hJ]
+  | zero =>
+    simp [hJ]
   | add x y' _ _ hx hy =>
     conv_lhs => rw [hx, hy]
     rw [← Finset.sum_add_distrib]
@@ -312,13 +354,14 @@ theorem span_expand (e f : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (f a) 
     rw [hsm]
     split_ifs <;> simp [mul_smul]
 
-theorem fam_castSucc (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (c : Fin r) : fam e z c.castSucc = e c := by
+theorem fam_castSucc (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (c : Fin r)
+    : fam e z c.castSucc = e c := by
   simp [fam]
 
-theorem fam_last (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) : fam e z (Fin.last r) = z := by
-  simp [fam]
+theorem fam_last (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) : fam e z (Fin.last r) = z := by simp [fam]
 
-theorem nxt_eq_fam (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (k : Fin r) : nxt e z k = fam e z k.succ := by
+theorem nxt_eq_fam (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (k : Fin r)
+    : nxt e z k = fam e z k.succ := by
   unfold nxt
   have hk := k.isLt
   split_ifs with h
@@ -327,11 +370,15 @@ theorem nxt_eq_fam (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (k : Fin r)
   · have e1 : k.succ = Fin.last r := Fin.ext (by simp only [Fin.val_succ, Fin.val_last]; omega)
     rw [e1, fam_last]
 
-theorem flag_expand (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+theorem flag_expand
+    (e f : Fin r → Fin n → ℂ)
+    (z : Fin n → ℂ)
     (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0) (hfz : ∀ a, hJ ε (f a) z = 0)
-    (g : Matrix (Fin n) (Fin n) ℂ) (hg : InS e z g) (a : Fin (r + 1)) :
-    g *ᵥ fam e z a = fam e z a +
-      ∑ c : Fin r, (if c.castSucc < a then hJ ε (f c) (g *ᵥ fam e z a) else 0) • e c := by
+    (g : Matrix (Fin n) (Fin n) ℂ) (hg : InS e z g)
+    (a : Fin (r + 1))
+    : g *ᵥ fam e z a
+      = fam e z a
+        + ∑ c : Fin r, (if c.castSucc < a then hJ ε (f c) (g *ᵥ fam e z a) else 0) • e c := by
   have hmem : (g - 1) *ᵥ fam e z a ∈ spanLt e a.val := by
     induction a using Fin.lastCases with
     | last =>
@@ -356,8 +403,9 @@ theorem flag_expand (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
     simp only [hJ, Matrix.mulVec_sub, dotProduct_sub]
   have hexp := span_expand ε e f hfe a.val _ hmem
   rw [Matrix.sub_mulVec, Matrix.one_mulVec] at hexp
-  have hS : (∑ c : Fin r, (if c.val < a.val then hJ ε (f c) (g *ᵥ fam e z a - fam e z a) else 0) • e c) =
-      ∑ c : Fin r, (if c.castSucc < a then hJ ε (f c) (g *ᵥ fam e z a) else 0) • e c := by
+  have hS
+      : (∑ c : Fin r, (if c.val < a.val then hJ ε (f c) (g *ᵥ fam e z a - fam e z a) else 0) • e c)
+        = ∑ c : Fin r, (if c.castSucc < a then hJ ε (f c) (g *ᵥ fam e z a) else 0) • e c := by
     refine Finset.sum_congr rfl fun c _ => ?_
     by_cases hc : c.castSucc < a
     · have hc' : c.val < a.val := by

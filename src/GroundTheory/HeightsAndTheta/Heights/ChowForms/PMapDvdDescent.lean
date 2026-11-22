@@ -14,10 +14,10 @@ open MvPolynomial
 theorem MapDvdDescent.proof : MapDvdDescent.Statement := by
   classical
   intro K Ω _ _ _ σ f g ⟨G, hG⟩
-  obtain ⟨π, hπ⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
-    (LinearMap.ker_eq_bot.mpr (algebraMap K Ω).injective)
-  have hπa : ∀ a : K, π (algebraMap K Ω a) = a := fun a => by
-    simpa using LinearMap.congr_fun hπ a
+  obtain ⟨π, hπ⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
+      (LinearMap.ker_eq_bot.mpr (algebraMap K Ω).injective)
+  have hπa : ∀ a : K, π (algebraMap K Ω a) = a := fun a => by simpa using LinearMap.congr_fun hπ a
   have hπm : ∀ (a : K) (y : Ω), π (algebraMap K Ω a * y) = a * π y := fun a y => by
     rw [← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul]
 

@@ -301,27 +301,40 @@ private lemma clear_den {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
   obtain ⟨G0, h0⟩ := hr
   exact ⟨G0, h0⟩
 
-theorem goal1 :
-  ∀ {O K : Type} [inst : CommRing.{0} O] [inst_1 : IsDomain.{0} O] [IsDiscreteValuationRing.{0} O] [inst_3 : Field.{0} K]
-  [inst_4 : Algebra.{0, 0} O K] [IsFractionRing.{0, 0} O K] (w : O),
-  Irreducible.{0} w →
-    ∀ (m : Nat) (mu : Fin (HAdd.hAdd.{0, 0, 0} m 1) → Int),
-      Antitone.{0, 0} mu →
-        ∀ (g : Matrix.{0, 0, 0} (Fin (HAdd.hAdd.{0, 0, 0} m 1)) (Fin (HAdd.hAdd.{0, 0, 0} m 1)) K),
-          IsUnit.{0} (Matrix.det.{0, 0} g) →
-            ∀ (F : MvPolynomial.{0, 0} (Prod.{0, 0} (Fin (HAdd.hAdd.{0, 0, 0} m 1)) (Fin (HAdd.hAdd.{0, 0, 0} m 1))) K),
-              Membership.mem.{0, 0}
-                  (Formalism.GradedWeylDivisibility.dualWeyl.{0} K (HAdd.hAdd.{0, 0, 0} m 1) (HAdd.hAdd.{0, 0, 0} m 1) (Formalism.MainNotions.G.nuOf mu)) F →
-                Exists.{1} fun (n : Nat) ↦
-                  Membership.mem.{0, 0} (Formalism.MainNotions.G.H0.{0, 0} O m mu (Formalism.MainNotions.G.colSpan.{0, 0} O g))
-                    (HSMul.hSMul.{0, 0, 0} (HPow.hPow.{0, 0, 0} w n) F) := by
+theorem goal1
+    : ∀ {O K : Type} [inst : CommRing.{0} O] [inst_1 : IsDomain.{0} O]
+        [IsDiscreteValuationRing.{0} O] [inst_3 : Field.{0} K] [inst_4 : Algebra.{0, 0} O K]
+        [IsFractionRing.{0, 0} O K] (w : O),
+      Irreducible.{0} w
+        → ∀ (m : Nat) (mu : Fin (HAdd.hAdd.{0, 0, 0} m 1) → Int),
+          Antitone.{0, 0} mu
+            → ∀ (g : Matrix.{0, 0, 0} (Fin (HAdd.hAdd.{0, 0, 0} m 1))
+                (Fin (HAdd.hAdd.{0, 0, 0} m 1)) K),
+              IsUnit.{0} (Matrix.det.{0, 0} g)
+                → ∀ (F : MvPolynomial.{0, 0}
+                    (Prod.{0, 0} (Fin (HAdd.hAdd.{0, 0, 0} m 1)) (Fin (HAdd.hAdd.{0, 0, 0} m 1)))
+                    K),
+                  Membership.mem.{0, 0}
+                      (Formalism.GradedWeylDivisibility.dualWeyl.{0} K (HAdd.hAdd.{0, 0, 0} m 1)
+                        (HAdd.hAdd.{0, 0, 0} m 1) (Formalism.MainNotions.G.nuOf mu))
+                      F
+                    → Exists.{1} fun (n : Nat) ↦
+                      Membership.mem.{0, 0}
+                        (Formalism.MainNotions.G.H0.{0, 0} O m mu
+                          (Formalism.MainNotions.G.colSpan.{0, 0} O g))
+                        (HSMul.hSMul.{0, 0, 0} (HPow.hPow.{0, 0, 0} w n) F) := by
   intro O K _ _ _ _ _ _ w hw m mu hmu g hg F hF
   have hinj : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
-  have hG : g.det ^ mu (Fin.last m) • Formalism.GradedWeylDivisibility.rowAct K g F ∈
-      Formalism.GradedWeylDivisibility.dualWeyl K (m + 1) (m + 1) (Formalism.MainNotions.G.nuOf mu) :=
+  have hG
+      : g.det ^ mu (Fin.last m) • Formalism.GradedWeylDivisibility.rowAct K g F
+        ∈ Formalism.GradedWeylDivisibility.dualWeyl K (m + 1) (m + 1)
+          (Formalism.MainNotions.G.nuOf mu) :=
     Submodule.smul_mem _ _ (Formalism.GradedWeylDivisibility.dualWeylRowStable K _ _ _ g F hF)
-  obtain ⟨n, G0, hG0⟩ := clear_den w hw (g.det ^ mu (Fin.last m) • Formalism.GradedWeylDivisibility.rowAct K g F)
-  have hG0m : G0 ∈ Formalism.GradedWeylDivisibility.dualWeyl O (m + 1) (m + 1) (Formalism.MainNotions.G.nuOf mu) :=
+  obtain ⟨n, G0, hG0⟩ :=
+    clear_den w hw (g.det ^ mu (Fin.last m) • Formalism.GradedWeylDivisibility.rowAct K g F)
+  have hG0m
+      : G0 ∈ Formalism.GradedWeylDivisibility.dualWeyl O (m + 1) (m + 1)
+        (Formalism.MainNotions.G.nuOf mu) :=
     dualWeyl_pull _ hinj _ G0 (by rw [hG0]; exact Submodule.smul_mem _ _ hG)
   refine ⟨n, ?_⟩
   unfold Formalism.MainNotions.G.H0
@@ -331,12 +344,19 @@ theorem goal1 :
   obtain ⟨A, hA, rfl⟩ := span_unit hinj g g' hg hspan
   rw [Formalism.GradedWeylDivisibility.nablaLTwMem O K m mu _ hg']
   obtain ⟨U, hU⟩ := hA
-  refine ⟨(↑(U ^ mu (Fin.last m)) : O) • Formalism.GradedWeylDivisibility.rowAct O A G0,
-    Submodule.smul_mem _ _ (Formalism.GradedWeylDivisibility.dualWeylRowStable O _ _ _ A G0 hG0m), ?_⟩
-  change MvPolynomial.map (algebraMap O K) ((↑(U ^ mu (Fin.last m)) : O) • Formalism.GradedWeylDivisibility.rowAct O A G0) = _
+  refine ⟨
+    (↑(U ^ mu (Fin.last m)) : O) • Formalism.GradedWeylDivisibility.rowAct O A G0,
+    Submodule.smul_mem _ _ (Formalism.GradedWeylDivisibility.dualWeylRowStable O _ _ _ A G0 hG0m),
+    ?_
+  ⟩
+  change MvPolynomial.map (algebraMap O K)
+      ((↑(U ^ mu (Fin.last m)) : O) • Formalism.GradedWeylDivisibility.rowAct O A G0)
+    = _
   have hz : algebraMap O K ↑(U ^ mu (Fin.last m)) = (algebraMap O K ↑U) ^ mu (Fin.last m) := by
-    have h5 : ((Units.map (algebraMap O K).toMonoidHom (U ^ mu (Fin.last m)) : Kˣ) : K) =
-        algebraMap O K ↑(U ^ mu (Fin.last m)) := rfl
+    have h5
+        : ((Units.map (algebraMap O K).toMonoidHom (U ^ mu (Fin.last m)) : Kˣ) : K)
+          = algebraMap O K ↑(U ^ mu (Fin.last m)) :=
+      rfl
     rw [← h5, map_zpow, Units.val_zpow_eq_zpow_val]
     rfl
   have hdet : (A.map (algebraMap O K)).det = algebraMap O K A.det := by
@@ -344,8 +364,8 @@ theorem goal1 :
     rfl
   rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, ← MvPolynomial.smul_eq_C_mul,
     rowAct_map, hG0, Matrix.det_mul, hdet, ← hU, hz,
-    ← Formalism.GradedWeylDivisibility.rowActMul K (m + 1) (m + 1) (A.map (algebraMap O K)) g, AlgHom.comp_apply,
-    ← algebraMap_smul K (w ^ n) F]
+    ← Formalism.GradedWeylDivisibility.rowActMul K (m + 1) (m + 1) (A.map (algebraMap O K)) g,
+    AlgHom.comp_apply, ← algebraMap_smul K (w ^ n) F]
   simp only [map_smul, smul_smul]
   congr 1
   rw [mul_zpow]

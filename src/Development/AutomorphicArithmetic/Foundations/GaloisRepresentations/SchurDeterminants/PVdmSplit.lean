@@ -7,12 +7,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open Finset MvPolynomial UpperTheory.Gal.Schur
 
-theorem UpperTheory.Gal.Schur.vdmSplit_of :
-    PairSplit → VdmSplit := by
+theorem UpperTheory.Gal.Schur.vdmSplit_of : PairSplit → VdmSplit := by
   intro h R _ n g i
   have key := h R n (fun a b => g a - g b) i
-  have h1 : ∀ k ∈ univ.erase i, (if k < i then g k - g i else g i - g k) =
-      (if k < i then (-1 : R) else 1) * (g i - g k) := by
+  have h1
+      : ∀ k ∈ univ.erase i,
+        (if k < i then g k - g i else g i - g k)
+          = (if k < i then (-1 : R) else 1) * (g i - g k) := by
     intro k _
     split_ifs <;> ring
   have h2 : ∏ k ∈ univ.erase i, (if k < i then (-1 : R) else 1) = (-1) ^ (i : ℕ) := by

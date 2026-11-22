@@ -8,7 +8,16 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem ker_aeval_truncated : ∀ (n : ℕ), 0 < n → ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra B A] (d : ℕ) (x : Fin d → A) (b : Fin d → B), (∀ i, x i ^ n = algebraMap B A (b i)) → LinearIndependent B (fun a : Fin d → Fin n => ∏ i, x i ^ (a i : ℕ)) → RingHom.ker (MvPolynomial.aeval x : MvPolynomial (Fin d) B →ₐ[B] A) = Ideal.span (Set.range fun i : Fin d => (MvPolynomial.X i ^ n - MvPolynomial.C (b i) : MvPolynomial (Fin d) B)) := by
+theorem ker_aeval_truncated
+    : ∀ (n : ℕ),
+      0 < n
+        → ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra B A] (d : ℕ) (x : Fin d → A)
+            (b : Fin d → B),
+          (∀ i, x i ^ n = algebraMap B A (b i))
+            → LinearIndependent B (fun a : Fin d → Fin n => ∏ i, x i ^ (a i : ℕ))
+            → RingHom.ker (MvPolynomial.aeval x : MvPolynomial (Fin d) B →ₐ[B] A)
+              = Ideal.span (Set.range fun i : Fin d =>
+                (MvPolynomial.X i ^ n - MvPolynomial.C (b i) : MvPolynomial (Fin d) B)) := by
   intro n hn B A _ _ _ d x b hx hli
   set J : Ideal (MvPolynomial (Fin d) B) := Ideal.span (Set.range fun i : Fin d =>
     (MvPolynomial.X i ^ n - MvPolynomial.C (b i) : MvPolynomial (Fin d) B)) with hJ
@@ -30,16 +39,18 @@ theorem ker_aeval_truncated : ∀ (n : ℕ), 0 < n → ∀ (B A : Type) [CommRin
       (hq _ _).mpr (Ideal.subset_span ⟨i, rfl⟩)
     simp only [y]
     rw [← map_pow, h1, ← MvPolynomial.algebraMap_eq, q.commutes]
-  have hsplit : ∀ (a : Fin d → Fin n) (i : Fin d) (k : Fin n),
-      v (Function.update a i k) = y i ^ (k : ℕ) * ∏ j ∈ Finset.univ.erase i, y j ^ (a j : ℕ) := by
+  have hsplit
+      : ∀ (a : Fin d → Fin n) (i : Fin d) (k : Fin n),
+        v (Function.update a i k) = y i ^ (k : ℕ) * ∏ j ∈ Finset.univ.erase i, y j ^ (a j : ℕ) := by
     intro a i k
     simp only [v]
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i)]
     congr 1
     · simp
     · exact Finset.prod_congr rfl fun j hj => by simp [Finset.ne_of_mem_erase hj]
-  have hsplit0 : ∀ (a : Fin d → Fin n) (i : Fin d),
-      v a = y i ^ (a i : ℕ) * ∏ j ∈ Finset.univ.erase i, y j ^ (a j : ℕ) := by
+  have hsplit0
+      : ∀ (a : Fin d → Fin n) (i : Fin d),
+        v a = y i ^ (a i : ℕ) * ∏ j ∈ Finset.univ.erase i, y j ^ (a j : ℕ) := by
     intro a i
     have := hsplit a i (a i)
     rwa [Function.update_eq_self] at this
@@ -49,12 +60,16 @@ theorem ker_aeval_truncated : ∀ (n : ℕ), 0 < n → ∀ (B A : Type) [CommRin
     by_cases h : (a i : ℕ) + 1 < n
     · have : v a * y i = v (Function.update a i ⟨a i + 1, h⟩) := by
         rw [hsplit, hsplit0 a i, pow_succ]; ring
-      rw [this]; exact Submodule.subset_span ⟨_, rfl⟩
+      rw [this]
+      exact Submodule.subset_span ⟨_, rfl⟩
     · have h' : (a i : ℕ) + 1 = n := by have := (a i).isLt; omega
       have : v a * y i = b i • v (Function.update a i ⟨0, hn⟩) := by
         have hp : y i ^ n = y i ^ ((a i : ℕ) + 1) := by rw [h']
-        rw [hsplit, hsplit0 a i, Algebra.smul_def, ← hyn, hp, pow_succ]; simp; ring
-      rw [this]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+        rw [hsplit, hsplit0 a i, Algebra.smul_def, ← hyn, hp, pow_succ]
+        simp
+        ring
+      rw [this]
+      exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
   have hmulX : ∀ i, ∀ s ∈ S, s * y i ∈ S := by
     intro i s hs
     induction hs using Submodule.span_induction with
@@ -69,7 +84,8 @@ theorem ker_aeval_truncated : ∀ (n : ℕ), 0 < n → ∀ (B A : Type) [CommRin
       have : q (MvPolynomial.C c) = c • v (fun _ => ⟨0, hn⟩) := by
         rw [← MvPolynomial.algebraMap_eq, q.commutes, Algebra.algebraMap_eq_smul_one]
         simp [v]
-      rw [this]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+      rw [this]
+      exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
     | add p r hp hr => rw [map_add]; exact add_mem hp hr
     | mul_X p i hp => rw [map_mul]; exact hmulX i _ hp
   intro F hF

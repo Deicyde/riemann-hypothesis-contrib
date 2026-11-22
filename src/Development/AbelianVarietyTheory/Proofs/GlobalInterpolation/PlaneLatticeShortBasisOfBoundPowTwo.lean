@@ -8,11 +8,11 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem plane_lattice_reduction_step (e₁ e₂ : ℂ)
-    (h : 2 * |((starRingEnd ℂ) e₁ * e₂).im| < ‖e₁‖ ^ 2) :
-    ∃ f₁ f₂ : ℂ, Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂} ∧
-      |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im| ∧
-      2 * ‖f₁‖ ^ 2 ≤ ‖e₁‖ ^ 2 := by
+theorem plane_lattice_reduction_step (e₁ e₂ : ℂ) (h : 2 * |((starRingEnd ℂ) e₁ * e₂).im| < ‖e₁‖ ^ 2)
+    : ∃ f₁ f₂ : ℂ,
+      Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂}
+        ∧ |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im|
+        ∧ 2 * ‖f₁‖ ^ 2 ≤ ‖e₁‖ ^ 2 := by
   have hN : 0 < ‖e₁‖ ^ 2 := lt_of_le_of_lt (by positivity) h
   set k : ℤ := round (((starRingEnd ℂ) e₁ * e₂).re / ‖e₁‖ ^ 2) with hk
   refine ⟨e₂ - k • e₁, e₁, ?_, ?_, ?_⟩
@@ -40,9 +40,10 @@ theorem plane_lattice_reduction_step (e₁ e₂ : ℂ)
     rw [this, abs_neg]
   · have hr := abs_sub_round (((starRingEnd ℂ) e₁ * e₂).re / ‖e₁‖ ^ 2)
     rw [← hk] at hr
-    have key : ‖e₁‖ ^ 2 * ‖e₂ - k • e₁‖ ^ 2 =
-        (((starRingEnd ℂ) e₁ * e₂).re - k * ‖e₁‖ ^ 2) ^ 2 +
-          ((starRingEnd ℂ) e₁ * e₂).im ^ 2 := by
+    have key
+        : ‖e₁‖ ^ 2 * ‖e₂ - k • e₁‖ ^ 2
+          = (((starRingEnd ℂ) e₁ * e₂).re - k * ‖e₁‖ ^ 2) ^ 2
+            + ((starRingEnd ℂ) e₁ * e₂).im ^ 2 := by
       simp only [Complex.sq_norm, Complex.normSq_apply]
       simp
       ring
@@ -63,11 +64,13 @@ theorem plane_lattice_reduction_step (e₁ e₂ : ℂ)
     have h4 : N * (2 * M) ≤ N * N := by nlinarith
     exact le_of_mul_le_mul_left h4 hN
 
-theorem plane_lattice_short_basis_of_bound_pow_two (n : ℕ) : ∀ e₁ e₂ : ℂ,
-    ‖e₁‖ ^ 2 ≤ 2 ^ n * (2 * |((starRingEnd ℂ) e₁ * e₂).im|) →
-    ∃ f₁ f₂ : ℂ, Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂} ∧
-      |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im| ∧
-      ‖f₁‖ ^ 2 ≤ 2 * |((starRingEnd ℂ) e₁ * e₂).im| := by
+theorem plane_lattice_short_basis_of_bound_pow_two (n : ℕ)
+    : ∀ e₁ e₂ : ℂ,
+      ‖e₁‖ ^ 2 ≤ 2 ^ n * (2 * |((starRingEnd ℂ) e₁ * e₂).im|)
+        → ∃ f₁ f₂ : ℂ,
+          Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂}
+            ∧ |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im|
+            ∧ ‖f₁‖ ^ 2 ≤ 2 * |((starRingEnd ℂ) e₁ * e₂).im| := by
   induction n with
   | zero =>
     intro e₁ e₂ h
@@ -77,20 +80,24 @@ theorem plane_lattice_short_basis_of_bound_pow_two (n : ℕ) : ∀ e₁ e₂ : �
     by_cases hc : ‖e₁‖ ^ 2 ≤ 2 * |((starRingEnd ℂ) e₁ * e₂).im|
     · exact ⟨e₁, e₂, rfl, rfl, hc⟩
     · obtain ⟨g₁, g₂, hs, hi, hn⟩ := plane_lattice_reduction_step e₁ e₂ (not_le.mp hc)
-      obtain ⟨f₁, f₂, hs', hi', hn'⟩ := ih g₁ g₂ (by
-        rw [hi]
-        rw [pow_succ (2 : ℝ) n] at h
-        linarith)
+      obtain ⟨f₁, f₂, hs', hi', hn'⟩ :=
+        ih g₁ g₂ (by
+          rw [hi]
+          rw [pow_succ (2 : ℝ) n] at h
+          linarith)
       exact ⟨f₁, f₂, hs'.trans hs, hi'.trans hi, hi ▸ hn'⟩
 
-theorem plane_lattice_short_basis : ∀ e₁ e₂ : ℂ, ((starRingEnd ℂ) e₁ * e₂).im ≠ 0 →
-    ∃ f₁ f₂ : ℂ, Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂} ∧
-      |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im| ∧
-      ‖f₁‖ ^ 2 ≤ 2 * |((starRingEnd ℂ) e₁ * e₂).im| := by
+theorem plane_lattice_short_basis
+    : ∀ e₁ e₂ : ℂ,
+      ((starRingEnd ℂ) e₁ * e₂).im ≠ 0
+        → ∃ f₁ f₂ : ℂ,
+          Submodule.span ℤ {f₁, f₂} = Submodule.span ℤ {e₁, e₂}
+            ∧ |((starRingEnd ℂ) f₁ * f₂).im| = |((starRingEnd ℂ) e₁ * e₂).im|
+            ∧ ‖f₁‖ ^ 2 ≤ 2 * |((starRingEnd ℂ) e₁ * e₂).im| := by
   intro e₁ e₂ h
   have hD : 0 < 2 * |((starRingEnd ℂ) e₁ * e₂).im| := by positivity
-  obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt
-    (‖e₁‖ ^ 2 / (2 * |((starRingEnd ℂ) e₁ * e₂).im|)) (one_lt_two (α := ℝ))
+  obtain ⟨n, hn⟩ :=
+    pow_unbounded_of_one_lt (‖e₁‖ ^ 2 / (2 * |((starRingEnd ℂ) e₁ * e₂).im|)) (one_lt_two (α := ℝ))
   exact plane_lattice_short_basis_of_bound_pow_two n e₁ e₂ ((div_lt_iff₀ hD).mp hn).le
 
 end GlobalTheory

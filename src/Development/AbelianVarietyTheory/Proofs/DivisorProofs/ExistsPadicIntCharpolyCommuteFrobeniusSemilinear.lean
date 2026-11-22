@@ -7,22 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 namespace GlobalTheory.DieuCharpoly
 
 open Polynomial
 
-theorem mem_range_zmod_of_pow_eq_self (p : ℕ) [Fact p.Prime] {k : Type} [Field k] [CharP k p]
-    (c : k) (hc : c ^ p = c) : c ∈ Set.range ((ZMod.castHom (dvd_refl p) k)) := by
+theorem mem_range_zmod_of_pow_eq_self
+    (p : ℕ) [Fact p.Prime] {k : Type} [Field k] [CharP k p] (c : k) (hc : c ^ p = c)
+    : c ∈ Set.range ((ZMod.castHom (dvd_refl p) k)) := by
   have hp : 1 < p := (Fact.out : p.Prime).one_lt
   have hroots := FiniteField.roots_X_pow_card_sub_X (ZMod p)
   rw [ZMod.card p] at hroots
   have hdeg : (X ^ p - X : (ZMod p)[X]).natDegree = p := Polynomial.natDegree_X_pow_sub_X hp
-  have hcard : Multiset.card (X ^ p - X : (ZMod p)[X]).roots = (X ^ p - X : (ZMod p)[X]).natDegree := by
+  have hcard
+      : Multiset.card (X ^ p - X : (ZMod p)[X]).roots = (X ^ p - X : (ZMod p)[X]).natDegree := by
     rw [hroots, hdeg, Finset.card_val, Finset.card_univ, ZMod.card]
-  have hmap := Polynomial.roots_map_of_injective_of_card_eq_natDegree
-    ((ZMod.castHom (dvd_refl p) k)).injective hcard
+  have hmap :=
+    Polynomial.roots_map_of_injective_of_card_eq_natDegree ((ZMod.castHom (dvd_refl p) k)).injective
+      hcard
   have hmem : c ∈ ((X ^ p - X : (ZMod p)[X]).map ((ZMod.castHom (dvd_refl p) k))).roots := by
     rw [Polynomial.mem_roots]
     · simp [hc]
@@ -31,9 +35,11 @@ theorem mem_range_zmod_of_pow_eq_self (p : ℕ) [Fact p.Prime] {k : Type} [Field
   obtain ⟨a, -, ha⟩ := hmem
   exact ⟨a, ha⟩
 
-theorem exists_map_eq_of_frobenius_eq (p : ℕ) [Fact p.Prime] {k : Type} [Field k] [CharP k p]
-    (x : WittVector p k) (hx : WittVector.frobenius x = x) :
-    ∃ y : WittVector p (ZMod p), WittVector.map ((ZMod.castHom (dvd_refl p) k)) y = x := by
+theorem exists_map_eq_of_frobenius_eq
+    (p : ℕ) [Fact p.Prime]
+    {k : Type} [Field k] [CharP k p]
+    (x : WittVector p k) (hx : WittVector.frobenius x = x)
+    : ∃ y : WittVector p (ZMod p), WittVector.map ((ZMod.castHom (dvd_refl p) k)) y = x := by
   have hc : ∀ n, ∃ a : ZMod p, (ZMod.castHom (dvd_refl p) k) a = x.coeff n := by
     intro n
     have h := congrArg (fun z => z.coeff n) hx
@@ -44,8 +50,11 @@ theorem exists_map_eq_of_frobenius_eq (p : ℕ) [Fact p.Prime] {k : Type} [Field
   ext n
   simp [WittVector.map_coeff, ha]
 
-theorem padicInt_ringHom_ext (p : ℕ) [Fact p.Prime] {k : Type} [Field k] [CharP k p]
-    [PerfectRing k p] (f g : ℤ_[p] →+* WittVector p k) : f = g := by
+theorem padicInt_ringHom_ext
+    (p : ℕ) [Fact p.Prime]
+    {k : Type} [Field k] [CharP k p] [PerfectRing k p]
+    (f g : ℤ_[p] →+* WittVector p k)
+    : f = g := by
   refine RingHom.ext fun x => ?_
   rw [← sub_eq_zero]
   have hI : Ideal.span {(p : WittVector p k)} ≠ ⊤ := by
@@ -67,11 +76,12 @@ namespace GlobalTheory.DieuCharpoly
 
 open Polynomial
 
-theorem charpoly_map_eq_of_commute_semilinear {R : Type} [CommRing R] [IsDomain R]
-    (σ : R →+* R) (hσ : Function.Surjective σ) (N : Type) [AddCommGroup N] [Module R N]
-    [Module.Free R N] [Module.Finite R N] (F : N →ₛₗ[σ] N) (u : N →ₗ[R] N)
-    (hF : Function.Injective F) (hu : ∀ x, u (F x) = F (u x)) :
-    u.charpoly.map σ = u.charpoly := by
+theorem charpoly_map_eq_of_commute_semilinear
+    {R : Type} [CommRing R] [IsDomain R]
+    (σ : R →+* R) (hσ : Function.Surjective σ)
+    (N : Type) [AddCommGroup N] [Module R N] [Module.Free R N] [Module.Finite R N]
+    (F : N →ₛₗ[σ] N) (u : N →ₗ[R] N) (hF : Function.Injective F) (hu : ∀ x, u (F x) = F (u x))
+    : u.charpoly.map σ = u.charpoly := by
   classical
   let b := Module.Free.chooseBasis R N
   let U := LinearMap.toMatrix b b u
@@ -80,8 +90,8 @@ theorem charpoly_map_eq_of_commute_semilinear {R : Type} [CommRing R] [IsDomain 
     intro x i
     conv_lhs => rw [← b.sum_repr x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smulₛₗ, Finset.sum_apply',
-      map_smul, Finsupp.smul_apply, smul_eq_mul]
+      simp only [map_sum, LinearMap.map_smulₛₗ, Finset.sum_apply', map_smul, Finsupp.smul_apply,
+        smul_eq_mul]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   have hurepr : ∀ y i, b.repr (u y) i = ∑ l, U i l * b.repr y l := by
     intro y i
@@ -113,8 +123,9 @@ theorem charpoly_map_eq_of_commute_semilinear {R : Type} [CommRing R] [IsDomain 
     funext j
     rw [← hw j, Pi.zero_apply, ← hx j, hx0, map_zero, Finsupp.coe_zero, Pi.zero_apply, map_zero]
   rw [← LinearMap.charpoly_toMatrix u b, ← Matrix.charpoly_map]
-  have hm : U.charmatrix * (Polynomial.C : R →+* _).mapMatrix Φ =
-      (Polynomial.C : R →+* _).mapMatrix Φ * (U.map σ).charmatrix := by
+  have hm
+      : U.charmatrix * (Polynomial.C : R →+* _).mapMatrix Φ
+        = (Polynomial.C : R →+* _).mapMatrix Φ * (U.map σ).charmatrix := by
     rw [Matrix.charmatrix, Matrix.charmatrix, sub_mul, mul_sub, ← map_mul, hcomm, map_mul,
       (Matrix.scalar_commute _ (fun _ => Commute.all _ _) _).eq]
   have hd := congrArg Matrix.det hm
@@ -129,18 +140,22 @@ namespace GlobalTheory.DieuCharpoly
 
 open Polynomial
 
-theorem exists_monic_map_eq_charpoly : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p]
-    [PerfectRing k p] (N : Type) [AddCommGroup N] [Module (WittVector p k) N]
-    [Module.Free (WittVector p k) N] [Module.Finite (WittVector p k) N]
-    (F : N →ₛₗ[(WittVector.frobenius : WittVector p k →+* WittVector p k)] N)
-    (ψ : ℤ_[p] →+* (WittVector p k)) (u : N →ₗ[(WittVector p k)] N),
-    Function.Injective F → (∀ x, u (F x) = F (u x)) →
-      ∃ P : Polynomial ℤ_[p], P.Monic ∧ P.map ψ = u.charpoly := by
+theorem exists_monic_map_eq_charpoly
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (N : Type)
+        [AddCommGroup N] [Module (WittVector p k) N] [Module.Free (WittVector p k) N]
+        [Module.Finite (WittVector p k) N]
+        (F : N →ₛₗ[(WittVector.frobenius : WittVector p k →+* WittVector p k)] N)
+        (ψ : ℤ_[p] →+* (WittVector p k)) (u : N →ₗ[(WittVector p k)] N),
+      Function.Injective F → (∀ x, u (F x) = F (u x))
+        → ∃ P : Polynomial ℤ_[p], P.Monic ∧ P.map ψ = u.charpoly := by
   intro p _ k _ _ _ N _ _ _ _ F ψ u hF hu
-  have hfix := charpoly_map_eq_of_commute_semilinear _
-    (WittVector.frobenius_bijective p k).surjective N F u hF hu
-  have hψ : ψ = (WittVector.map (ZMod.castHom (dvd_refl p) k)).comp
-      (WittVector.equiv p).symm.toRingHom := padicInt_ringHom_ext p _ _
+  have hfix :=
+    charpoly_map_eq_of_commute_semilinear _ (WittVector.frobenius_bijective p k).surjective N F u hF
+      hu
+  have hψ
+      : ψ
+        = (WittVector.map (ZMod.castHom (dvd_refl p) k)).comp (WittVector.equiv p).symm.toRingHom :=
+    padicInt_ringHom_ext p _ _
   have hl : u.charpoly ∈ Polynomial.lifts ψ := by
     rw [Polynomial.lifts_iff_coeff_lifts]
     intro n
@@ -151,7 +166,8 @@ theorem exists_monic_map_eq_charpoly : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [
     refine ⟨WittVector.equiv p y, ?_⟩
     rw [hψ, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom,
       RingEquiv.symm_apply_apply, hy]
-  obtain ⟨P, hP, -, hPm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic hl (LinearMap.charpoly_monic u)
+  obtain ⟨P, hP, -, hPm⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic hl (LinearMap.charpoly_monic u)
   exact ⟨P, hPm, hP⟩
 
 end GlobalTheory.DieuCharpoly

@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -20,7 +22,14 @@ noncomputable section
 
 namespace GlobalTheory.Obs
 
-theorem idemLift : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀) (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (B' B₀' : Type) [CommRing B'] [Algebra R B'] [CommRing B₀'] [Algebra R₀ B₀'] (p' : B' →+* B₀') (hs' : SemiHom π p') (hp' : Function.Surjective p') (hker' : ∀ b, p' b = 0 ↔ b ∈ I.map (algebraMap R B')) [Algebra.FormallySmooth R B'] (e₀ : B₀' →ₐ[R₀] B₀'), (∀ x, e₀ (e₀ x) = e₀ x) → ∃ e : B' →ₐ[R] B', (∀ b, e (e b) = e b) ∧ ∀ b, p' (e b) = e₀ (p' b) := by
+theorem idemLift
+    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R) (hI : I ^ 2 = 0) (π : R →+* R₀)
+        (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (B' B₀' : Type) [CommRing B']
+        [Algebra R B'] [CommRing B₀'] [Algebra R₀ B₀'] (p' : B' →+* B₀') (hs' : SemiHom π p')
+        (hp' : Function.Surjective p') (hker' : ∀ b, p' b = 0 ↔ b ∈ I.map (algebraMap R B'))
+        [Algebra.FormallySmooth R B'] (e₀ : B₀' →ₐ[R₀] B₀'),
+      (∀ x, e₀ (e₀ x) = e₀ x)
+        → ∃ e : B' →ₐ[R] B', (∀ b, e (e b) = e b) ∧ ∀ b, p' (e b) = e₀ (p' b) := by
   intro R R₀ _ _ I hI π hπ hk B' B₀' _ _ _ _ p' hs' hp' hker' _ e₀ he₀
   obtain ⟨e, he⟩ := homLift R R₀ I hI π hπ hk B' B₀' p' hs' hp' hker' B' B₀' p' hs' hp' hker' e₀
   set J : Ideal B' := I.map (algebraMap R B') with hJ
@@ -46,7 +55,8 @@ theorem idemLift : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R
         rw [map_mul, AlgHom.commutes]
       rw [h1, h2, ← sub_mul]
       exact hJ2 _ (hu c) _ (Ideal.mem_map_of_mem _ hr)
-    | zero => intro c; simp
+    | zero =>
+      intro c; simp
     | add x y _ _ hx hy =>
       intro c
       have := hx c
@@ -62,17 +72,18 @@ theorem idemLift : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R
     have := hkill _ (hu c) 1
     simp only [_root_.one_mul, map_sub] at this
     linear_combination this
-  let e' : B' →ₐ[R] B' :=
-    { toFun := fun b => 3 * e (e b) - 2 * e (e (e b))
-      map_one' := by simp; norm_num
-      map_mul' := by
-        intro x y
-        have h := hJ2 _ (hu (e x)) _ (hu (e y))
-        simp only [map_mul]
-        linear_combination (-6 : B') * h
-      map_zero' := by simp
-      map_add' := by intro x y; simp only [map_add (f := _)]; ring
-      commutes' := by intro r; simp only [AlgHom.commutes]; ring }
+  let e' : B' →ₐ[R] B' := {
+    toFun := fun b => 3 * e (e b) - 2 * e (e (e b))
+    map_one' := by simp; norm_num
+    map_mul' := by
+      intro x y
+      have h := hJ2 _ (hu (e x)) _ (hu (e y))
+      simp only [map_mul]
+      linear_combination (-6 : B') * h
+    map_zero' := by simp
+    map_add' := by intro x y; simp only [map_add (f := _)]; ring
+    commutes' := by intro r; simp only [AlgHom.commutes]; ring
+  }
   refine ⟨e', ?_, ?_⟩
   · intro b
     show 3 * e (e (3 * e (e b) - 2 * e (e (e b)))) - 2 * e (e (e (3 * e (e b) - 2 * e (e (e b))))) = 3 * e (e b) - 2 * e (e (e b))

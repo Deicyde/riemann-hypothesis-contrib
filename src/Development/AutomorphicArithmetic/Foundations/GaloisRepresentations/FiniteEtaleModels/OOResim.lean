@@ -10,25 +10,33 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 
 namespace UpperTheory.Gal.FiniteEtaleModels.O
 
-private def reObj {G : GDatum} {R : Type} [CommRing R] [Algebra ℚ R] {gb : GBase G R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R}
-    (o : GObj gb N s) (g : ℕ → G.La →+ G.La) (hg : IsSys g) (hpos : 0 < N) : GObj gb N s :=
-  { o with
-    eta := fun y => o.eta (g N y)
-    eta_add := fun x y => by rw [map_add (f := _), o.eta_add]
-    eta_lin := fun a x => by
-      obtain ⟨z, hz⟩ := hg.lin N hpos a x
-      rw [hz, o.eta_add, o.eta_ker, _root_.mul_one, o.eta_lin]
-    eta_ker := fun x => by rw [map_nsmul, o.eta_ker]
-    geom := fun k _ _ x β hx => by
-      obtain ⟨I, hI⟩ := o.geom k x β hx
-      obtain ⟨I', hI'⟩ := tResim G k _ _ _ I g hg
-      exact ⟨I', fun y => by rw [hI' N hpos y]; exact hI (g N y)⟩ }
+private def reObj
+    {G : GDatum} {R : Type} [CommRing R] [Algebra ℚ R]
+    {gb : GBase G R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R} (o : GObj gb N s)
+    (g : ℕ → G.La →+ G.La) (hg : IsSys g)
+    (hpos : 0 < N)
+    : GObj gb N s := {
+  o with
+  eta := fun y => o.eta (g N y)
+  eta_add := fun x y => by rw [map_add (f := _), o.eta_add]
+  eta_lin := fun a x => by
+    obtain ⟨z, hz⟩ := hg.lin N hpos a x
+    rw [hz, o.eta_add, o.eta_ker, _root_.mul_one, o.eta_lin]
+  eta_ker := fun x => by rw [map_nsmul, o.eta_ker]
+  geom := fun k _ _ x β hx => by
+    obtain ⟨I, hI⟩ := o.geom k x β hx
+    obtain ⟨I', hI'⟩ := tResim G k _ _ _ I g hg
+    exact ⟨I', fun y => by rw [hI' N hpos y]; exact hI (g N y)⟩
+}
 
 theorem oResim : OResim := by
   intro q _ D R R' _ _ _ b gb N N₀ c hN hpos X X₁ s s₁ o u f n g hg hg0

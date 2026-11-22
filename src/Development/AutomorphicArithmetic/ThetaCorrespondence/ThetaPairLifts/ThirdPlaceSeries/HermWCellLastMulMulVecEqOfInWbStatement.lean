@@ -43,8 +43,8 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 open GlobalTheory.Mem.Top.Bl
 
-theorem GlobalTheory.T.linkedAt_hPA_prmR :
-    ∀ (hL : UpperTheory.Zero.LLC.RecTExists) (N : NormChoiceExtension hL) (S : SExt) (Γ : GeoP),
+theorem GlobalTheory.T.linkedAt_hPA_prmR
+    : ∀ (hL : UpperTheory.Zero.LLC.RecTExists) (N : NormChoiceExtension hL) (S : SExt) (Γ : GeoP),
       GlobalTheory.Fc.RL.LinkedAt (parametersOfExtension N S Γ)
         GlobalTheory.Fc.R1.SlotPrimitivityCondition :=
   GlobalTheory.Fc.RL.PrimAt.linkedAt_hPA

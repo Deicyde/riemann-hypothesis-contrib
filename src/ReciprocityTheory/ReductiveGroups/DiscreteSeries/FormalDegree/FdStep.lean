@@ -15,14 +15,14 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem fdS_strictAnti {lam : Fin n → ℝ} (hlam : StrictAnti lam) {c : Fin n → ℕ} (hc : Antitone c) :
-    StrictAnti (lam + fun i => (c i : ℝ)) := by
+theorem fdS_strictAnti {lam : Fin n → ℝ} (hlam : StrictAnti lam) {c : Fin n → ℕ} (hc : Antitone c)
+    : StrictAnti (lam + fun i => (c i : ℝ)) := by
   intro i j hij
   simp only [Pi.add_apply]
   exact add_lt_add_of_lt_of_le (hlam hij) (by exact_mod_cast hc hij.le)
 
-theorem fdS_hc {lam : Fin n → ℝ} (hlam : IsHCParam lam) {c : Fin n → ℕ} (hc : Antitone c) :
-    IsHCParam (lam + fun i => (c i : ℝ)) := by
+theorem fdS_hc {lam : Fin n → ℝ} (hlam : IsHCParam lam) {c : Fin n → ℕ} (hc : Antitone c)
+    : IsHCParam (lam + fun i => (c i : ℝ)) := by
   unfold IsHCParam at hlam ⊢
   refine ⟨fdS_strictAnti hlam.1 hc, fun a => ?_⟩
   obtain ⟨m, hm⟩ := hlam.2 a
@@ -31,9 +31,10 @@ theorem fdS_hc {lam : Fin n → ℝ} (hlam : IsHCParam lam) {c : Fin n → ℕ} 
   push_cast
   linarith
 
-theorem fdS_gap {ε : Fin n → Bool} {h : ℝ} {lam : Fin n → ℝ} (hlam : StrictAnti lam)
-    (hgap : GapAtLeast ε lam h) {c : Fin n → ℕ} (hc : Antitone c) :
-    GapAtLeast ε (lam + fun i => (c i : ℝ)) h := by
+theorem fdS_gap
+    {ε : Fin n → Bool} {h : ℝ} {lam : Fin n → ℝ} (hlam : StrictAnti lam) (hgap : GapAtLeast ε lam h)
+    {c : Fin n → ℕ} (hc : Antitone c)
+    : GapAtLeast ε (lam + fun i => (c i : ℝ)) h := by
   unfold GapAtLeast at hgap ⊢
   intro a b hab
   have h0 := hgap a b hab
@@ -57,24 +58,34 @@ private theorem vand_ne_zero_of_strictAnti {μ : Fin n → ℝ} (hμ : StrictAnt
   have hab : a < b := (Finset.mem_filter.mp hb).2
   exact sub_ne_zero.mpr (hμ hab).ne'
 
-theorem fdS_stepQ {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ)
-    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n), IsHCParam μ → GapAtLeast ε μ h → GapAtLeast ε (μ + Pi.single s 1) h →
-      StrictAnti (μ + Pi.single s 1) → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
-    {μ : Fin n → ℝ} (hμ : IsHCParam μ) (hg : GapAtLeast ε μ h) (s : Fin n)
-    (hg' : GapAtLeast ε (μ + Pi.single s 1) h) (hs : StrictAnti (μ + Pi.single s 1)) :
-    dfun (μ + Pi.single s 1) / Vand (μ + Pi.single s 1) = dfun μ / Vand μ := by
+theorem fdS_stepQ
+    {ε : Fin n → Bool} {h : ℝ}
+    (dfun : (Fin n → ℝ) → ℝ)
+    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n),
+      IsHCParam μ → GapAtLeast ε μ h → GapAtLeast ε (μ + Pi.single s 1) h
+        → StrictAnti (μ + Pi.single s 1)
+        → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
+    {μ : Fin n → ℝ} (hμ : IsHCParam μ) (hg : GapAtLeast ε μ h)
+    (s : Fin n) (hg' : GapAtLeast ε (μ + Pi.single s 1) h) (hs : StrictAnti (μ + Pi.single s 1))
+    : dfun (μ + Pi.single s 1) / Vand (μ + Pi.single s 1) = dfun μ / Vand μ := by
   have hμ1 : StrictAnti μ := by unfold IsHCParam at hμ; exact hμ.1
   rw [hstep μ s hμ hg hg' hs, ratioV_eq_vand hμ1 s]
   have h1 := vand_ne_zero_of_strictAnti hμ1
   have h2 := vand_ne_zero_of_strictAnti hs
   field_simp
 
-theorem fdS_main {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ)
-    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n), IsHCParam μ → GapAtLeast ε μ h → GapAtLeast ε (μ + Pi.single s 1) h →
-      StrictAnti (μ + Pi.single s 1) → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
-    {lam : Fin n → ℝ} (hlam : IsHCParam lam) (hgap : GapAtLeast ε lam h) :
-    ∀ (N : ℕ) (c : Fin n → ℕ), Antitone c → ∑ i, c i = N →
-      dfun (lam + fun i => (c i : ℝ)) / Vand (lam + fun i => (c i : ℝ)) = dfun lam / Vand lam := by
+theorem fdS_main
+    {ε : Fin n → Bool} {h : ℝ}
+    (dfun : (Fin n → ℝ) → ℝ)
+    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n),
+      IsHCParam μ → GapAtLeast ε μ h → GapAtLeast ε (μ + Pi.single s 1) h
+        → StrictAnti (μ + Pi.single s 1)
+        → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
+    {lam : Fin n → ℝ} (hlam : IsHCParam lam) (hgap : GapAtLeast ε lam h)
+    : ∀ (N : ℕ) (c : Fin n → ℕ),
+      Antitone c → ∑ i, c i = N
+        → dfun (lam + fun i => (c i : ℝ)) / Vand (lam + fun i => (c i : ℝ))
+          = dfun lam / Vand lam := by
   have hlam1 : StrictAnti lam := by unfold IsHCParam at hlam; exact hlam.1
   intro N
   induction N with
@@ -92,7 +103,8 @@ theorem fdS_main {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ
       rw [Finset.not_nonempty_iff_eq_empty, Finset.filter_eq_empty_iff] at hemp
       have h0 : ∑ i, c i = 0 := Finset.sum_eq_zero (fun i hi => by simpa using hemp hi)
       omega
-    obtain ⟨s, hs_mem, hs_max⟩ : ∃ s ∈ univ.filter (fun i => c i ≠ 0), ∀ j ∈ univ.filter (fun i => c i ≠ 0), j ≤ s :=
+    obtain ⟨s, hs_mem, hs_max⟩
+        : ∃ s ∈ univ.filter (fun i => c i ≠ 0), ∀ j ∈ univ.filter (fun i => c i ≠ 0), j ≤ s :=
       ⟨_, Finset.max'_mem _ hne, fun j hj => Finset.le_max' _ j hj⟩
     have hcs : c s ≠ 0 := (Finset.mem_filter.mp hs_mem).2
     have hbig : ∀ j, s < j → c j = 0 := by
@@ -130,16 +142,22 @@ theorem fdS_main {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ
       rw [hcc i]
       push_cast
       split_ifs <;> ring
-    have hQ := fdS_stepQ dfun hstep (fdS_hc hlam hc') (fdS_gap hlam1 hgap hc') s
-      (by rw [hfun]; exact fdS_gap hlam1 hgap hc) (by rw [hfun]; exact fdS_strictAnti hlam1 hc)
+    have hQ :=
+      fdS_stepQ dfun hstep (fdS_hc hlam hc') (fdS_gap hlam1 hgap hc') s
+        (by rw [hfun]; exact fdS_gap hlam1 hgap hc) (by rw [hfun]; exact fdS_strictAnti hlam1 hc)
     rw [hfun] at hQ
     rw [hQ, ih c' hc' hsum']
 
-theorem fd_step {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ)
-    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n), IsHCParam μ → GapAtLeast ε μ h →
-      GapAtLeast ε (μ + Pi.single s 1) h → StrictAnti (μ + Pi.single s 1) → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
-    {lam : Fin n → ℝ} (hlam : IsHCParam lam) (hgap : GapAtLeast ε lam h) (t : ℕ) :
-    dfun (lamT lam t) / Vand (lamT lam t) = dfun lam / Vand lam := by
+theorem fd_step
+    {ε : Fin n → Bool} {h : ℝ}
+    (dfun : (Fin n → ℝ) → ℝ)
+    (hstep : ∀ (μ : Fin n → ℝ) (s : Fin n),
+      IsHCParam μ → GapAtLeast ε μ h → GapAtLeast ε (μ + Pi.single s 1) h
+        → StrictAnti (μ + Pi.single s 1)
+        → dfun (μ + Pi.single s 1) = dfun μ * ratioV μ s)
+    {lam : Fin n → ℝ} (hlam : IsHCParam lam) (hgap : GapAtLeast ε lam h)
+    (t : ℕ)
+    : dfun (lamT lam t) / Vand (lamT lam t) = dfun lam / Vand lam := by
   have hD : ∀ a : Fin n, ((n : ℝ) - 1) - ((a : ℕ) : ℝ) = ((n - 1 - (a : ℕ) : ℕ) : ℝ) := by
     intro a
     have ha := a.2
@@ -148,7 +166,8 @@ theorem fd_step {ε : Fin n → Bool} {h : ℝ} (dfun : (Fin n → ℝ) → ℝ)
     intro i j hij
     have h' := Fin.le_iff_val_le_val.mp hij
     exact Nat.mul_le_mul le_rfl (by omega)
-  have hfun : lamT lam t = lam + fun i => (((fun a : Fin n => t * (n - 1 - (a : ℕ))) i : ℕ) : ℝ) := by
+  have hfun
+      : lamT lam t = lam + fun i => (((fun a : Fin n => t * (n - 1 - (a : ℕ))) i : ℕ) : ℝ) := by
     funext i
     simp only [lamT, Pi.add_apply, Pi.smul_apply, Dvec, smul_eq_mul]
     rw [hD i]

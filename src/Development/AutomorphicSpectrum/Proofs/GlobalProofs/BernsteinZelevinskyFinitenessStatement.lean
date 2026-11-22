@@ -7,5 +7,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 @[expose] public section
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.bernstein_zelevinsky_finiteness : GlobalTheory.Published.BernsteinZelevinskyFiniteness := by
-  first | exact @GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness | exact GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness | (intros; apply GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness <;> assumption)
+theorem _root_.GlobalTheory.T.bernstein_zelevinsky_finiteness
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness := by
+  first
+  | exact @GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness
+  | exact GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness
+  | (
+      intros
+      apply GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness <;> assumption
+    )

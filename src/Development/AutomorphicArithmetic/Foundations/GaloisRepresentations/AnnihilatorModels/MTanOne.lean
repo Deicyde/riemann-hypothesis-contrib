@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EpsZeroPtEps
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -66,18 +69,19 @@ private lemma tan_pow {κ : Type} [Field κ] (p : ℕ) [CharP κ p] {S : Scheme.
   have h2 := congrArg (fun w => ((Additive.toMul w : GlobalTheory.TanPtMod.tanSub x G) : epsPtR x ⟶ G)) hv
   simpa using h2
 
-private theorem left_one_eq_hom_comp_eta {S : Scheme.{0}} {T A : Over S} [GrpObj A] :
-    Over.Hom.left (1 : T ⟶ A) = T.hom ≫ Over.Hom.left (η[A] : 𝟙_ (Over S) ⟶ A) := by
+private theorem left_one_eq_hom_comp_eta {S : Scheme.{0}} {T A : Over S} [GrpObj A]
+    : Over.Hom.left (1 : T ⟶ A) = T.hom ≫ Over.Hom.left (η[A] : 𝟙_ (Over S) ⟶ A) := by
   rw [Hom.one_def, Over.comp_left]
   congr 1
 
-private theorem left_one_algPt_dualNumber_eq_epsPtR {κ : Type} [Field κ] {A : Over (Sp κ)} [GrpObj A] :
-    Over.Hom.left (1 : algPt κ (DualNumber κ) ⟶ A) = Over.Hom.left (1 : epsPtR (𝟙 (Sp κ)) ⟶ A) := by
+private theorem left_one_algPt_dualNumber_eq_epsPtR
+    {κ : Type} [Field κ] {A : Over (Sp κ)} [GrpObj A]
+    : Over.Hom.left (1 : algPt κ (DualNumber κ) ⟶ A)
+      = Over.Hom.left (1 : epsPtR (𝟙 (Sp κ)) ⟶ A) := by
   rw [left_one_eq_hom_comp_eta, left_one_eq_hom_comp_eta]
   simp
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of :
-    UElt → TanOne := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of : UElt → TanOne := by
   intro hU p _ D R _ b N hm ha r w hw κ _ _ _ β hβ o e
   have i0 : Fin D.a := ⟨0, by omega⟩
   have j0 : Fin D.m := ⟨0, by omega⟩
@@ -95,13 +99,14 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of :
     exact h0
   let Tm : 𝓞 D.F →+* Module.End κ (GlobalTheory.TanPtMod.Tan (𝟙 (Sp κ)) o.A) :=
     (GlobalTheory.TanPtMod.actEnd o.act).comp (algebraMap (𝓞 D.F) D.O)
-  let toE : (algPt κ (DualNumber κ) ⟶ o.A) → (epsPtR (𝟙 (Sp κ)) ⟶ o.A) :=
-    fun v => Over.homMk v.left (by simp)
-  let frE : (epsPtR (𝟙 (Sp κ)) ⟶ o.A) → (algPt κ (DualNumber κ) ⟶ o.A) :=
-    fun v => Over.homMk v.left (by simp)
-  have eig : ∀ v : algPt κ (DualNumber κ) ⟶ o.A, Inf (TrivSqZeroExt.fstHom κ κ κ) v →
-      (∃ e', KilledBy o (uIdeal D r ^ e') v) →
-      IsLieEigen (OActN.toF D o.act) (𝟙 (Sp κ)) (β.comp (b.t i0)) (toE v) := by
+  let toE : (algPt κ (DualNumber κ) ⟶ o.A) → (epsPtR (𝟙 (Sp κ)) ⟶ o.A) := fun v =>
+    Over.homMk v.left (by simp)
+  let frE : (epsPtR (𝟙 (Sp κ)) ⟶ o.A) → (algPt κ (DualNumber κ) ⟶ o.A) := fun v =>
+    Over.homMk v.left (by simp)
+  have eig
+      : ∀ v : algPt κ (DualNumber κ) ⟶ o.A,
+        Inf (TrivSqZeroExt.fstHom κ κ κ) v → (∃ e', KilledBy o (uIdeal D r ^ e') v)
+          → IsLieEigen (OActN.toF D o.act) (𝟙 (Sp κ)) (β.comp (b.t i0)) (toE v) := by
     intro v hinf ⟨e', hk⟩
     have hmem : toE v ∈ GlobalTheory.TanPtMod.tanSub (𝟙 (Sp κ)) o.A := by
       exact (GlobalTheory.TanPtMod.mem_tanSub_iff _ _ _).2 hinf
@@ -122,7 +127,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of :
       · have hz := hu _ (sub_mem_uIdeal D r)
         rw [map_sub, LinearMap.sub_apply, sub_eq_zero, map_intCast] at hz
         have hz2 := congrArg GlobalTheory.TanPtMod.Tan.hom hz
-        rw [intCast_apply_eq_smul, ← Int.cast_smul_eq_zsmul κ, GlobalTheory.TanPtMod.Tan.hom_smul] at hz2
+        rw [intCast_apply_eq_smul, ← Int.cast_smul_eq_zsmul κ, GlobalTheory.TanPtMod.Tan.hom_smul]
+          at hz2
         rw [hρ]
         exact congrArg Over.Hom.left hz2
     obtain ⟨w', hw', hprod⟩ := o.lie κ β (𝟙 (Sp κ)) (Category.id_comp _) (toE v) hsc
@@ -138,7 +144,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of :
     have hm0 : vs j0 ∈ GlobalTheory.TanPtMod.tanSub (𝟙 (Sp κ)) o.A := by
       rw [GlobalTheory.TanPtMod.mem_tanSub_iff]
       exact (hvs j0).1
-    have h6 := tan_pow p (𝟙 (Sp κ)) o.A (vs j0) hm0 (p ^ (e + 1)) (dvd_pow_self p (Nat.succ_ne_zero e))
+    have h6 :=
+      tan_pow p (𝟙 (Sp κ)) o.A (vs j0) hm0 (p ^ (e + 1)) (dvd_pow_self p (Nat.succ_ne_zero e))
     rw [← comp_idpow] at h6
     exact congrArg Over.Hom.left h6
   · intro a ha'
@@ -148,7 +155,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.tanOne_of :
     have hz : β (b.t i0 a) = 0 := hβ i0 a (hw ha')
     have h7 := (hvs j0).2 a
     rw [RingHom.comp_apply, hz] at h7
-    have h0 := congrArg Over.Hom.left (GlobalTheory.GrpTangentPt.epsScalePt_zero_comp (𝟙 (Sp κ)) (hvs j0).1)
+    have h0 :=
+      congrArg Over.Hom.left (GlobalTheory.GrpTangentPt.epsScalePt_zero_comp (𝟙 (Sp κ)) (hvs j0).1)
     rw [← h0]
     exact h7
   · exact (hvs j0).1

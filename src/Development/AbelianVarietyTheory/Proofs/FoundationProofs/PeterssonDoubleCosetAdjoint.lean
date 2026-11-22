@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlashIntM
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -17,7 +18,10 @@ noncomputable section
 namespace GlobalTheory.EisM.PetAdj
 
 def toG (δ : M2) : GL (Fin 2) ℝ :=
-  if hd : ((Int.castRingHom ℝ).mapMatrix δ).det ≠ 0 then Matrix.GeneralLinearGroup.mkOfDetNeZero _ hd else 1
+  if hd : ((Int.castRingHom ℝ).mapMatrix δ).det ≠ 0 then
+    Matrix.GeneralLinearGroup.mkOfDetNeZero _ hd
+  else
+    1
 
 lemma toG_val (δ : M2) (hδ : δ.det ≠ 0) :
     (toG δ : Matrix (Fin 2) (Fin 2) ℝ) = (Int.castRingHom ℝ).mapMatrix δ := by
@@ -146,51 +150,70 @@ lemma K_adj (k N : ℕ) (ε : DirichletCharacter ℂ N) (h f : ℍ → ℂ) (α 
 
 end GlobalTheory.EisM.PetAdj
 
-
 open GlobalTheory.EisM.PetAdj in
-theorem GlobalTheory.EisM.pet_hsum_adjoint : ∀ (k L N q : ℕ) (ε : DirichletCharacter ℂ N) (ρ : ℍ → ℝ) (Δ : Set M2) (ι κ : Type) [Fintype ι] [Fintype κ] (β : ι → M2) (α : κ → M2) (h f : ℍ → ℂ), 1 ≤ k → 0 < N → N ∣ L → 0 < q → q.Coprime N → Wt L ρ → (∀ δ ∈ Δ, δ.det = q ∧ (N : ℤ) ∣ δ 1 0) → LRep L Δ β → RRep L Δ α → Inv k L (ch ε) h → Inv k L (ch ε) f → Continuous h → Continuous f → (∀ i, Integrable (fun τ : ℍ => (ρ τ : ℂ) * (conj (h τ) * slz k (β i) f τ * (τ.im : ℂ) ^ k))) → pet k ρ h (hsum k (ch ε) β f) = pet k ρ (fun τ => ∑ j, ch ε⁻¹ (α j 0 0) * slz k (α j).adjugate h τ) f := by
+theorem GlobalTheory.EisM.pet_hsum_adjoint
+    : ∀ (k L N q : ℕ) (ε : DirichletCharacter ℂ N) (ρ : ℍ → ℝ) (Δ : Set M2) (ι κ : Type) [Fintype ι]
+        [Fintype κ] (β : ι → M2) (α : κ → M2) (h f : ℍ → ℂ),
+      1 ≤ k → 0 < N → N ∣ L → 0 < q → q.Coprime N → Wt L ρ → (∀ δ ∈ Δ, δ.det = q ∧ (N : ℤ) ∣ δ 1 0)
+        → LRep L Δ β → RRep L Δ α → Inv k L (ch ε) h → Inv k L (ch ε) f → Continuous h
+        → Continuous f
+        → (∀ i,
+          Integrable (fun τ : ℍ => (ρ τ : ℂ) * (conj (h τ) * slz k (β i) f τ * (τ.im : ℂ) ^ k)))
+        → pet k ρ h (hsum k (ch ε) β f)
+          = pet k ρ (fun τ => ∑ j, ch ε⁻¹ (α j 0 0) * slz k (α j).adjugate h τ) f := by
   intro k L N q ε ρ Δ ι κ _ _ β α h f hk _ hNL hq _ hρ hΔ hL hR hh hf hhc hfc hint
   have hcont := (GlobalTheory.T.slashIntMatrixPosDet_properties k f hk).2.2.2.1
-  have hβ : ∀ i, β i ∈ Δ := fun i => by
-    simpa using hL.mapsTo (Set.mem_univ ((1 : Gamma0 L), i))
-  have hα : ∀ j, α j ∈ Δ := fun j => by
-    simpa using hR.mapsTo (Set.mem_univ (j, (1 : Gamma0 L)))
+  have hβ : ∀ i, β i ∈ Δ := fun i => by simpa using hL.mapsTo (Set.mem_univ ((1 : Gamma0 L), i))
+  have hα : ∀ j, α j ∈ Δ := fun j => by simpa using hR.mapsTo (Set.mem_univ (j, (1 : Gamma0 L)))
   have hdet : ∀ δ ∈ Δ, 0 < δ.det := fun δ hδ => by rw [(hΔ δ hδ).1]; exact_mod_cast hq
   have hΓ : ∀ γ : Gamma0 L, (L : ℤ) ∣ (γ : SL(2, ℤ)) 1 0 := fun γ =>
     (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp (Gamma0_mem.mp γ.2)
   let eL : Gamma0 L × ι ≃ Δ := (Equiv.Set.univ _).symm.trans (Set.BijOn.equiv _ hL)
   let eR : κ × Gamma0 L ≃ Δ := (Equiv.Set.univ _).symm.trans (Set.BijOn.equiv _ hR)
-  obtain ⟨e, he⟩ : ∃ e : Gamma0 L × ι ≃ κ × Gamma0 L, ∀ p : Gamma0 L × ι,
-      ((p.1 : SL(2, ℤ)) : M2) * β p.2 = α (e p).1 * (((e p).2 : SL(2, ℤ)) : M2) :=
+  obtain ⟨e, he⟩
+      : ∃ e : Gamma0 L × ι ≃ κ × Gamma0 L, ∀ p : Gamma0 L × ι,
+        ((p.1 : SL(2, ℤ)) : M2) * β p.2 = α (e p).1 * (((e p).2 : SL(2, ℤ)) : M2) :=
     ⟨eL.trans eR.symm, fun p => (congrArg Subtype.val (eR.apply_symm_apply (eL p))).symm⟩
   let φ : Gamma0 L →* GL (Fin 2) ℝ := (Matrix.SpecialLinearGroup.mapGL ℝ).comp (Gamma0 L).subtype
-  have hφv : ∀ γ : Gamma0 L, (φ γ : Matrix (Fin 2) (Fin 2) ℝ)
-      = (Int.castRingHom ℝ).mapMatrix ((γ : SL(2, ℤ)) : M2) := fun γ => rfl
+  have hφv
+      : ∀ γ : Gamma0 L,
+        (φ γ : Matrix (Fin 2) (Fin 2) ℝ) = (Int.castRingHom ℝ).mapMatrix ((γ : SL(2, ℤ)) : M2) :=
+    fun γ => rfl
   have hP : ∀ i, Integrable (fun x : ℍ => (ρ x : ℂ) * K k N ε h f (β i) x) := fun i => by
     refine ((hint i).const_mul (ch ε (β i 0 0))).congr (Eventually.of_forall fun x => ?_)
-    simp only [K]; ring
+    simp only [K]
+    ring
   haveI : Countable SL(2, ℤ) := by
     unfold Matrix.SpecialLinearGroup Matrix; infer_instance
-  obtain ⟨hQ, key⟩ := GlobalTheory.T.double_coset_adjoint_of_invariant_weight (GL (Fin 2) ℝ) ℍ (Gamma0 L) ι κ volume φ ρ (fun i => toG (β i))
-    (fun j => toG (α j)) e (fun i => K k N ε h f (β i)) (fun j => K k N ε h f (α j))
-    hρ.meas hρ.nonneg hρ.sum
-    (fun p => by
-      apply Units.ext
-      rw [Units.val_mul, Units.val_mul, hφv, hφv, toG_val _ (hdet _ (hβ _)).ne',
-        toG_val _ (hdet _ (hα _)).ne', ← map_mul, ← map_mul, he])
-    (fun p x => by
-      rw [← K_left k L N ε h f hk hNL hf p.1 (hΓ _) _ (hdet _ (hβ _)) (hΔ _ (hβ _)).2, he,
-        K_right k L N ε h f hk hNL hh _ (hΓ _) _ (hdet _ (hα _))]
-      rfl)
-    hP
-    (fun j => by
-      refine Continuous.aestronglyMeasurable ?_
-      have := hcont _ (hdet _ (hα j)) hfc
-      have him : Continuous fun τ : ℍ => (τ.im : ℂ) :=
-        Complex.continuous_ofReal.comp UpperHalfPlane.continuous_im
-      exact continuous_const.mul (((Complex.continuous_conj.comp hhc).mul this).mul (him.pow k)))
-  have hC : ∀ j (x : ℍ), K k N ε h f (α j) ((toG (α j))⁻¹ • x) =
-      conj (ch ε⁻¹ (α j 0 0) * slz k (α j).adjugate h x) * f x * (x.im : ℂ) ^ k := fun j x => by
+  obtain ⟨hQ, key⟩ :=
+    GlobalTheory.T.double_coset_adjoint_of_invariant_weight (GL (Fin 2) ℝ) ℍ (Gamma0 L) ι κ volume φ
+      ρ
+      (fun i => toG (β i))
+      (fun j => toG (α j))
+      e
+      (fun i => K k N ε h f (β i))
+      (fun j => K k N ε h f (α j))
+      hρ.meas hρ.nonneg hρ.sum
+      (fun p => by
+        apply Units.ext
+        rw [Units.val_mul, Units.val_mul, hφv, hφv, toG_val _ (hdet _ (hβ _)).ne',
+          toG_val _ (hdet _ (hα _)).ne', ← map_mul, ← map_mul, he])
+      (fun p x => by
+        rw [← K_left k L N ε h f hk hNL hf p.1 (hΓ _) _ (hdet _ (hβ _)) (hΔ _ (hβ _)).2, he,
+          K_right k L N ε h f hk hNL hh _ (hΓ _) _ (hdet _ (hα _))]
+        rfl)
+      hP
+      (fun j => by
+        refine Continuous.aestronglyMeasurable ?_
+        have := hcont _ (hdet _ (hα j)) hfc
+        have him : Continuous fun τ : ℍ => (τ.im : ℂ) :=
+          Complex.continuous_ofReal.comp UpperHalfPlane.continuous_im
+        exact continuous_const.mul (((Complex.continuous_conj.comp hhc).mul this).mul (him.pow k)))
+  have hC
+      : ∀ j (x : ℍ),
+        K k N ε h f (α j) ((toG (α j))⁻¹ • x)
+          = conj (ch ε⁻¹ (α j 0 0) * slz k (α j).adjugate h x) * f x
+            * (x.im : ℂ) ^ k := fun j x => by
     rw [K_adj k N ε h f _ (hdet _ (hα j)), smul_inv_smul]
   rw [← integral_finsetSum _ fun i _ => hP i, ← integral_finsetSum _ fun j _ => hQ j] at key
   simp only [hC] at key
@@ -201,6 +224,6 @@ theorem GlobalTheory.EisM.pet_hsum_adjoint : ∀ (k L N q : ℕ) (ε : Dirichlet
     exact Finset.sum_congr rfl fun i _ => by ring
   · refine integral_congr_ae (Eventually.of_forall fun x => ?_)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.mul_sum, Finset.sum_mul]
+    simp only [map_sum, Finset.mul_sum, Finset.sum_mul]
 
 end

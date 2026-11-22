@@ -14,9 +14,11 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.JHM
 
 namespace GlobalTheory
 
-theorem zelevinskyPolynomialRing_of_parts :
-    GlobalTheory.Published.BernsteinZelevinskyFiniteness → GlobalTheory.Published.SegmentRepresentation →
-      GlobalTheory.Published.GrothendieckRingPolynomial → GlobalTheory.Published.ZelevinskyPolynomialRing := by
+theorem zelevinskyPolynomialRing_of_parts
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → GlobalTheory.Published.SegmentRepresentation
+      → GlobalTheory.Published.GrothendieckRingPolynomial
+      → GlobalTheory.Published.ZelevinskyPolynomialRing := by
   intro hBZ hSeg hRing k _ _ _ _
   obtain ⟨Z, hZ⟩ := GlobalTheory.T.zelevinskySegmentClass_exists_for_every_placing hSeg k
   obtain ⟨Ψ, h1, hmul, hX⟩ := hRing k Z hZ

@@ -8,9 +8,9 @@ open Complex Filter Topology
 
 namespace GlobalTheory
 
-theorem lseries_shift_twist (e : ℕ) (ψ g : ℕ → ℂ) (s : ℝ) (he : 1 ≤ e) :
-    LSeries (fun n : ℕ => ψ n * (n : ℂ) ^ (e - 1) * g n) (((2 * (e : ℝ) + s : ℝ)) : ℂ) =
-      LSeries (fun n => ψ n * g n) ((e + 1 : ℝ) + s : ℝ) := by
+theorem lseries_shift_twist (e : ℕ) (ψ g : ℕ → ℂ) (s : ℝ) (he : 1 ≤ e)
+    : LSeries (fun n : ℕ => ψ n * (n : ℂ) ^ (e - 1) * g n) (((2 * (e : ℝ) + s : ℝ)) : ℂ)
+      = LSeries (fun n => ψ n * g n) ((e + 1 : ℝ) + s : ℝ) := by
   unfold LSeries
   congr 1
   funext n
@@ -18,8 +18,9 @@ theorem lseries_shift_twist (e : ℕ) (ψ g : ℕ → ℂ) (s : ℝ) (he : 1 ≤
   split_ifs with hn
   · rfl
   have hn' : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hn
-  have key : (n : ℂ) ^ (((2 * (e : ℝ) + s : ℝ)) : ℂ) =
-      (n : ℂ) ^ (e - 1) * (n : ℂ) ^ ((((e + 1 : ℝ) + s : ℝ)) : ℂ) := by
+  have key
+      : (n : ℂ) ^ (((2 * (e : ℝ) + s : ℝ)) : ℂ)
+        = (n : ℂ) ^ (e - 1) * (n : ℂ) ^ ((((e + 1 : ℝ) + s : ℝ)) : ℂ) := by
     rw [← Complex.cpow_natCast, ← Complex.cpow_add _ _ hn']
     congr 1
     push_cast [Nat.cast_sub he]

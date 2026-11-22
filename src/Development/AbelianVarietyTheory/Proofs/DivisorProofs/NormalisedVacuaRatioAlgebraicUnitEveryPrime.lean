@@ -14,8 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Spherical
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open Formalism.DivisionValues (vw)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
@@ -29,19 +33,28 @@ noncomputable section
 
 namespace GlobalTheory.VacRatio
 
-theorem det_int {D : D7} {N N' r : ℕ} (p : ℕ) {b₁ b₂ : Fin r → Matrix (Fin N') (Fin N) D.host.E}
+theorem det_int
+    {D : D7} {N N' r : ℕ}
+    (p : ℕ)
+    {b₁ b₂ : Fin r → Matrix (Fin N') (Fin N) D.host.E}
     (hb₁ : OnB D b₁) (h₁ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₁)
-    (h₂ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₂) :
-    ∃ S : ℕ, Nat.Coprime S p ∧
-      IsIntegral ℤ ((S : D.host.E) * (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E)) := by
-  have key : ∀ j, ∃ t : ℕ, Nat.Coprime t p ∧ ∃ c : Fin r → 𝓞 D.host.K,
-      ∀ i, (t : D.host.K) * hYY D (b₂ j) (b₁ i) = (c i : D.host.K) := by
+    (h₂ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₂)
+    : ∃ S : ℕ,
+      Nat.Coprime S p ∧ IsIntegral ℤ
+        ((S : D.host.E)
+          * (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E)) := by
+  have key
+      : ∀ j, ∃ t : ℕ,
+        Nat.Coprime t p
+          ∧ ∃ c : Fin r → 𝓞 D.host.K, ∀ i,
+            (t : D.host.K) * hYY D (b₂ j) (b₁ i) = (c i : D.host.K) := by
     intro j
     obtain ⟨s, hs, hmem⟩ := h₂.2.1 j
     obtain ⟨s', hs', c, hc⟩ := h₁.2.2 _ hmem
     refine ⟨s' * s, Nat.Coprime.mul_left hs' hs, c, fun i => ?_⟩
-    have e1 : hYY D ((s' : D.host.E) • (s : D.host.E) • b₂ j) (b₁ i) =
-        ((s' * s : ℕ) : D.host.K) * hYY D (b₂ j) (b₁ i) := by
+    have e1
+        : hYY D ((s' : D.host.E) • (s : D.host.E) • b₂ j) (b₁ i)
+          = ((s' * s : ℕ) : D.host.K) * hYY D (b₂ j) (b₁ i) := by
       rw [smul_smul, ← Nat.cast_mul, Nat.cast_smul_eq_nsmul]
       change GlobalTheory.NormSum.hYYLeft D (b₁ i) _ = _
       rw [map_nsmul, nsmul_eq_mul]
@@ -50,11 +63,13 @@ theorem det_int {D : D7} {N N' r : ℕ} (p : ℕ) {b₁ b₂ : Fin r → Matrix 
       change GlobalTheory.NormSum.hYYLeft D (b₁ i) _ = _
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
-      have : ∀ k, GlobalTheory.NormSum.hYYLeft D (b₁ i) ((((c k : D.host.K) : D.host.E)) • b₁ k) =
-          if k = i then (c i : D.host.K) else 0 := by
+      have : ∀ k,
+          GlobalTheory.NormSum.hYYLeft D (b₁ i) ((((c k : D.host.K) : D.host.E)) • b₁ k)
+            = if k = i then (c i : D.host.K) else 0 := by
         intro k
         rw [show (((c k : D.host.K) : D.host.E)) • b₁ k = (c k : D.host.K) • b₁ k from
-          algebraMap_smul D.host.E (c k : D.host.K) (b₁ k), map_smul]
+            algebraMap_smul D.host.E (c k : D.host.K) (b₁ k),
+          map_smul]
         change (c k : D.host.K) • hYY D (b₁ k) (b₁ i) = _
         rw [hb₁.1 k i]
         split_ifs with h
@@ -66,27 +81,39 @@ theorem det_int {D : D7} {N N' r : ℕ} (p : ℕ) {b₁ b₂ : Fin r → Matrix 
   choose t ht c hc using key
   refine ⟨∏ j, t j, Nat.Coprime.prod_left fun j _ => ht j, ?_⟩
   let M' : Matrix (Fin r) (Fin r) (𝓞 D.host.K) := Matrix.of fun i j => c j i
-  have hM : (algebraMap (𝓞 D.host.K) D.host.K).mapMatrix M' =
-      Matrix.of fun i j => (t j : D.host.K) * hYY D (b₂ j) (b₁ i) := by
+  have hM
+      : (algebraMap (𝓞 D.host.K) D.host.K).mapMatrix M'
+        = Matrix.of fun i j => (t j : D.host.K) * hYY D (b₂ j) (b₁ i) := by
     ext i j
     simp [M', hc]
-  have hdet : ((∏ j, t j : ℕ) : D.host.K) * (Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det =
-      algebraMap (𝓞 D.host.K) D.host.K M'.det := by
+  have hdet
+      : ((∏ j, t j : ℕ) : D.host.K) * (Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det
+        = algebraMap (𝓞 D.host.K) D.host.K M'.det := by
     rw [RingHom.map_det, hM]
-    have h := Matrix.det_mul_row (fun j => ((t j : ℕ) : D.host.K)) (Matrix.of fun i j => hYY D (b₂ j) (b₁ i))
+    have h :=
+      Matrix.det_mul_row
+        (fun j => ((t j : ℕ) : D.host.K))
+        (Matrix.of fun i j => hYY D (b₂ j) (b₁ i))
     simp only [Matrix.of_apply] at h
     rw [h, Nat.cast_prod]
-  have hint : IsIntegral ℤ (((∏ j, t j : ℕ) : D.host.K) * (Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det) := by
+  have hint : IsIntegral ℤ
+      (((∏ j, t j : ℕ) : D.host.K) * (Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det) := by
     rw [hdet]
     exact M'.det.isIntegral_coe
   have := hint.algebraMap (B := D.host.E)
   simpa using this
 
-theorem det_unit {D : D7} (hG : admG1 D) {N N' r : ℕ} (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
-    {b₁ b₂ : Fin r → Matrix (Fin N') (Fin N) D.host.E} (hb₁ : OnB D b₁) (hb₂ : OnB D b₂)
-    (h₁ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₁) (h₂ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₂) :
-    D.host.φ₀ (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E) ∈ Qbar ∧
-      ‖lamC lam (D.host.φ₀ (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E))‖ = 1 := by
+theorem det_unit
+    {D : D7} (hG : admG1 D)
+    {N N' r : ℕ}
+    (p : ℕ) [Fact p.Prime]
+    (lam : Qbar →+* ℂ_[p])
+    {b₁ b₂ : Fin r → Matrix (Fin N') (Fin N) D.host.E}
+    (hb₁ : OnB D b₁) (hb₂ : OnB D b₂) (h₁ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₁)
+    (h₂ : LocBasis D p (YYl D (stdL D N) (stdL D N')) b₂)
+    : D.host.φ₀ (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E) ∈ Qbar
+      ∧ ‖lamC lam (D.host.φ₀ (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E))‖
+        = 1 := by
   have hc : ∀ (φ : D.host.E →+* ℂ) (z : D.host.E), φ (D.host.conj z) = starRingEnd ℂ (φ z) :=
     fun φ z => D.host.conjE_apply φ z
   set y : D.host.E := (((Matrix.of fun i j => hYY D (b₂ j) (b₁ i)).det : D.host.K) : D.host.E) with hy
@@ -111,10 +138,14 @@ theorem det_unit {D : D7} (hG : admG1 D) {N N' r : ℕ} (p : ℕ) [Fact p.Prime]
       omega
     exact_mod_cast this
   have a1 : GlobalTheory.ProductJets.AlgLe lam x 1 := by
-    have := (GlobalTheory.ProductJets.AlgLe.inv_natCast (lam := lam) hS).mul (GlobalTheory.ProductJets.AlgLe.of_isIntegral (lam := lam) hi1)
+    have :=
+      (GlobalTheory.ProductJets.AlgLe.inv_natCast (lam := lam) hS).mul
+        (GlobalTheory.ProductJets.AlgLe.of_isIntegral (lam := lam) hi1)
     rwa [← mul_assoc, inv_mul_cancel₀ hS0, one_mul, one_mul] at this
   have a2 : GlobalTheory.ProductJets.AlgLe lam (starRingEnd ℂ x) 1 := by
-    have := (GlobalTheory.ProductJets.AlgLe.inv_natCast (lam := lam) hS).mul (GlobalTheory.ProductJets.AlgLe.of_isIntegral (lam := lam) hi2)
+    have :=
+      (GlobalTheory.ProductJets.AlgLe.inv_natCast (lam := lam) hS).mul
+        (GlobalTheory.ProductJets.AlgLe.of_isIntegral (lam := lam) hi2)
     rwa [← mul_assoc, inv_mul_cancel₀ hS0, one_mul, one_mul] at this
   refine ⟨a1.1, ?_⟩
   have hprod : lamC lam x * lamC lam (starRingEnd ℂ x) = 1 := by
@@ -132,27 +163,41 @@ theorem det_unit {D : D7} (hG : admG1 D) {N N' r : ℕ} (p : ℕ) [Fact p.Prime]
 theorem qbar_of_pow {x : ℂ} {n : ℕ} (hn : 0 < n) (h : x ^ n ∈ Qbar) : x ∈ Qbar :=
   mem_algebraicClosure_iff.2 (IsAlgebraic.of_pow hn (mem_algebraicClosure_iff.1 h))
 
-theorem ratio_local {D : D7} (hI : GlobalTheory.NormSum.Inp D) {δ t0 : ℂ} (hC : Crv D ⊤ δ)
-    (ht : GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0) {a d : ℕ} {e₁ e₂ : VC D a d → ℂ}
-    (h₁ : oddE0 D ⊤ δ t0 a d e₁) (h₂ : oddE0 D ⊤ δ t0 a d e₂) (hne : e₁ ≠ 0) {κ : ℂ} (hκ : e₂ = κ • e₁)
-    (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) : κ ∈ Qbar ∧ ‖lamC lam κ‖ = 1 := by
+theorem ratio_local
+    {D : D7} (hI : GlobalTheory.NormSum.Inp D)
+    {δ t0 : ℂ} (hC : Crv D ⊤ δ) (ht : GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0)
+    {a d : ℕ} {e₁ e₂ : VC D a d → ℂ}
+    (h₁ : oddE0 D ⊤ δ t0 a d e₁) (h₂ : oddE0 D ⊤ δ t0 a d e₂) (hne : e₁ ≠ 0)
+    {κ : ℂ} (hκ : e₂ = κ • e₁)
+    (p : ℕ) [Fact p.Prime]
+    (lam : Qbar →+* ℂ_[p])
+    : κ ∈ Qbar ∧ ‖lamC lam κ‖ = 1 := by
   have hG : admG1 D := hI.g1
   have hcop : Nat.Coprime (Ideal.absNorm (⊤ : Ideal (𝓞 D.host.K))) p := by simp
   obtain ⟨b₁, ε₁, hb₁, hl₁, hε₁, hn₁, -, he₁⟩ := h₁.2.2.2.2 p lam hcop
   obtain ⟨b₂, ε₂, hb₂, hl₂, hε₂, hn₂, -, he₂⟩ := h₂.2.2.2.2 p lam hcop
-  have hP : pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0) ∈
-      ThSp D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) := by
+  have hP
+      : pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0)
+        ∈ ThSp D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) := by
     obtain ⟨hd, hth⟩ := GlobalTheory.RatEquiv.theta_signed_translation D hG ⊤ δ hC t0 ht
-    obtain ⟨-, -, hpar, hmem, -⟩ := GlobalTheory.OnCoord.coords_of_orthonormal_basis D hG ⊤ δ a d _ b₁ hb₁
+    obtain ⟨-, -, hpar, hmem, -⟩ :=
+      GlobalTheory.OnCoord.coords_of_orthonormal_basis D hG ⊤ δ a d _ b₁ hb₁
     exact GlobalTheory.ProdTheta.pullB_mem_ThSp D _ a d _ b₁ _ hpar hmem hd hth
   have hK1 : KLat D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) := Or.inl ⟨_, b₁, hb₁, rfl⟩
   have hK2 : KLat D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₂) := Or.inl ⟨_, b₂, hb₂, rfl⟩
   have hK0 : KLat D (tor0 D ⊤ δ) (La0 D (tor0 D ⊤ δ) a d) :=
-    Or.inr ⟨_, _, GlobalTheory.NormSum.VacInt.sd_std D a, GlobalTheory.NormSum.VacInt.sd_std D d, rfl⟩
-  obtain ⟨c, ζ, m, hm, hζ, hc, hpull⟩ := GlobalTheory.UnitaryTheta.const_sq_eq_det D ⊤ δ hC t0 ht a d _ b₁ b₂ hb₁ hb₂
+    Or.inr
+      ⟨_, _, GlobalTheory.NormSum.VacInt.sd_std D a, GlobalTheory.NormSum.VacInt.sd_std D d, rfl⟩
+  obtain ⟨c, ζ, m, hm, hζ, hc, hpull⟩ :=
+    GlobalTheory.UnitaryTheta.const_sq_eq_det D ⊤ δ hC t0 ht a d _ b₁ b₂ hb₁ hb₂
   obtain ⟨μ, hμ, hIμ⟩ := hI.mu ⊤ δ hC a d _ _ _ hK1 hK2 hK0 _ hP
-  have E2 : e₂ = fun z => ε₂ * (c * (μ * Iop D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) (La0 D (tor0 D ⊤ δ) a d)
-      (pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0)) z)) := by
+  have E2
+      : e₂
+        = fun z =>
+          ε₂
+            * (c
+              * (μ * Iop D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) (La0 D (tor0 D ⊤ δ) a d)
+                (pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0)) z)) := by
     rw [he₂, hpull, GlobalTheory.RatEquiv.Iop_smul, hIμ]
   obtain ⟨z, hz⟩ : ∃ z, e₁ z ≠ 0 := by
     by_contra h
@@ -160,8 +205,11 @@ theorem ratio_local {D : D7} (hI : GlobalTheory.NormSum.Inp D) {δ t0 : ℂ} (hC
     exact hne (funext h)
   have hz' := hz
   rw [he₁] at hz'
-  have hJ : Iop D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) (La0 D (tor0 D ⊤ δ) a d)
-      (pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0)) z ≠ 0 := right_ne_zero_of_mul hz'
+  have hJ
+      : Iop D (tor0 D ⊤ δ) (LaB D (tor0 D ⊤ δ) b₁) (La0 D (tor0 D ⊤ δ) a d)
+          (pullB D (tor0 D ⊤ δ) b₁ (GL3Theta.th0 (lamOf D ⊤ δ) t0)) z
+        ≠ 0 :=
+    right_ne_zero_of_mul hz'
   have hε0 : ε₁ ≠ 0 := left_ne_zero_of_mul hz'
   have key : κ * ε₁ = ε₂ * c * μ := by
     have h := congrFun hκ z
@@ -177,7 +225,8 @@ theorem ratio_local {D : D7} (hI : GlobalTheory.NormSum.Inp D) {δ t0 : ℂ} (hC
   have hκQ : κ ∈ Qbar := by rw [hκe]; exact div_mem (mul_mem (mul_mem hε₂ hcQ) hμQ) hε₁
   refine ⟨hκQ, ?_⟩
 
-  have L := fun {u v : ℂ} (hu : u ∈ Qbar) (hv : v ∈ Qbar) => GlobalTheory.BotFormula.lamC_mul lam hu hv
+  have L := fun {u v : ℂ} (hu : u ∈ Qbar) (hv : v ∈ Qbar) =>
+    GlobalTheory.BotFormula.lamC_mul lam hu hv
   have one : lamC lam 1 = 1 := by
     have := GlobalTheory.ProductJets.lamC_coe (lam := lam) (1 : Qbar)
     simpa using this
@@ -199,21 +248,29 @@ theorem ratio_local {D : D7} (hI : GlobalTheory.NormSum.Inp D) {δ t0 : ℂ} (hC
     rw [hc, L hζQ hxQ, norm_mul, nζ, hx1, one_mul, norm_pow] at this
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 this.symm
   have hk : ‖lamC lam (κ * ε₁)‖ = ‖lamC lam (ε₂ * c * μ)‖ := by rw [key]
-  rw [L hκQ hε₁, L (mul_mem hε₂ hcQ) hμQ, L hε₂ hcQ, norm_mul, norm_mul, norm_mul, hn₁, hn₂, nc, nμ] at hk
+  rw [L hκQ hε₁, L (mul_mem hε₂ hcQ) hμQ, L hε₂ hcQ, norm_mul, norm_mul, norm_mul, hn₁, hn₂, nc, nμ]
+    at hk
   simpa using hk
 
-theorem vacuum_ratio_isAlgUnit : ∀ {D : D7}, GlobalTheory.NormSum.Inp D → ∀ {δ t0 : ℂ}, Crv D ⊤ δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0 →
-    ∀ {a d : ℕ} {e₁ e₂ : VC D a d → ℂ},
-    oddE0 D ⊤ δ t0 a d e₁ → oddE0 D ⊤ δ t0 a d e₂ → ∃ ζ : ℂ, IsAlgUnit ζ ∧ e₂ = ζ • e₁ := by
+theorem vacuum_ratio_isAlgUnit
+    : ∀ {D : D7},
+      GlobalTheory.NormSum.Inp D
+        → ∀ {δ t0 : ℂ},
+          Crv D ⊤ δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D ⊤ δ) t0
+            → ∀ {a d : ℕ} {e₁ e₂ : VC D a d → ℂ},
+              oddE0 D ⊤ δ t0 a d e₁ → oddE0 D ⊤ δ t0 a d e₂
+                → ∃ ζ : ℂ, IsAlgUnit ζ ∧ e₂ = ζ • e₁ := by
   intro D hI δ t0 hC ht a d e₁ e₂ h₁ h₂
   have hG : admG1 D := hI.g1
   have hne : e₁ ≠ 0 := by
     intro h
     have hn := h₁.2.2.1
     rw [h] at hn
-    have h0 : TaylorLogMetric.normSq D (tor0 D ⊤ δ) (La0 D (tor0 D ⊤ δ) a d) 0 = 0 := by simp [TaylorLogMetric.normSq]
+    have h0 : TaylorLogMetric.normSq D (tor0 D ⊤ δ) (La0 D (tor0 D ⊤ δ) a d) 0 = 0 := by
+      simp [TaylorLogMetric.normSq]
     rw [h0] at hn
-    exact pow_ne_zero _ (GlobalTheory.ConjJet.thetaZeroNormSq_ne_zero_cmLattice D hG ⊤ δ t0 hC ht) hn.symm
+    exact pow_ne_zero _ (GlobalTheory.ConjJet.thetaZeroNormSq_ne_zero_cmLattice D hG ⊤ δ t0 hC ht)
+      hn.symm
   obtain ⟨κ, hκ1, hκ⟩ := GlobalTheory.VacuumUnique.vacuum_unique hI hC h₁ h₂ hne
   have hκ0 : κ ≠ 0 := by
     rintro rfl

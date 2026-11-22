@@ -7,13 +7,14 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
 
-theorem periodic_comp_ofComplex_of_vadd' {f : ℍ → ℂ} {M : ℝ} (hper : ∀ τ : ℍ, f (M +ᵥ τ) = f τ) :
-    Function.Periodic (f ∘ ofComplex) M := by
+theorem periodic_comp_ofComplex_of_vadd' {f : ℍ → ℂ} {M : ℝ} (hper : ∀ τ : ℍ, f (M +ᵥ τ) = f τ)
+    : Function.Periodic (f ∘ ofComplex) M := by
   intro w
   by_cases hw : 0 < w.im
   · have hw' : 0 < (w + M).im := by simpa using hw
@@ -26,17 +27,19 @@ theorem periodic_comp_ofComplex_of_vadd' {f : ℍ → ℂ} {M : ℝ} (hper : ∀
     have hw' : (w + M).im ≤ 0 := by simpa using hw
     simp [ofComplex_apply_of_im_nonpos hw', ofComplex_apply_of_im_nonpos hw]
 
-theorem qParam_add_period {M : ℝ} (hM : M ≠ 0) (z : ℂ) :
-    Function.Periodic.qParam M (z + M) = Function.Periodic.qParam M z := by
+theorem qParam_add_period {M : ℝ} (hM : M ≠ 0) (z : ℂ)
+    : Function.Periodic.qParam M (z + M) = Function.Periodic.qParam M z := by
   unfold Function.Periodic.qParam
   have hM' : (M : ℂ) ≠ 0 := by exact_mod_cast hM
-  rw [show 2 * π * Complex.I * (z + M) / M = 2 * π * Complex.I * z / M + 2 * π * Complex.I by field_simp,
+  rw [show 2 * π * Complex.I * (z + M) / M = 2 * π * Complex.I * z / M + 2 * π * Complex.I by
+      field_simp,
     Complex.exp_add, Complex.exp_two_pi_mul_I, mul_one]
 
-theorem isBoundedAtImInfty_of_periodic_of_polyBound :
-    ∀ (f : ℍ → ℂ) (h : ℕ) (C : ℝ) (A : ℕ), 0 < h → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f →
-      (∀ τ : ℍ, f ((h : ℝ) +ᵥ τ) = f τ) →
-      (∀ τ : ℍ, 1 ≤ τ.im → |τ.re| ≤ h → ‖f τ‖ ≤ C * τ.im ^ A) → IsBoundedAtImInfty f := by
+theorem isBoundedAtImInfty_of_periodic_of_polyBound
+    : ∀ (f : ℍ → ℂ) (h : ℕ) (C : ℝ) (A : ℕ),
+      0 < h → MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f → (∀ τ : ℍ, f ((h : ℝ) +ᵥ τ) = f τ)
+        → (∀ τ : ℍ, 1 ≤ τ.im → |τ.re| ≤ h → ‖f τ‖ ≤ C * τ.im ^ A)
+        → IsBoundedAtImInfty f := by
   intro f h C A hh hf hper hbd
   set M : ℝ := (h : ℝ) with hMdef
   have hM : 0 < M := by simp [hMdef, hh]
@@ -81,15 +84,20 @@ theorem isBoundedAtImInfty_of_periodic_of_polyBound :
   have hgzero : IsZeroAtImInfty g := by
     set c : ℝ := 2 * π / M with hc
     have hcpos : 0 < c := by positivity
-    have hT : Tendsto (fun y : ℝ ↦ C * (c⁻¹) ^ A * ((c * y) ^ A * Real.exp (-(c * y)))) atTop (𝓝 0) := by
-      simpa using ((Real.tendsto_pow_mul_exp_neg_atTop_nhds_zero A).comp
-        (tendsto_id.const_mul_atTop hcpos)).const_mul (C * (c⁻¹) ^ A)
-    have heq : ∀ y : ℝ, C * (c⁻¹) ^ A * ((c * y) ^ A * Real.exp (-(c * y))) =
-        C * y ^ A * Real.exp (-2 * π * y / M) := by
+    have hT : Tendsto
+        (fun y : ℝ ↦ C * (c⁻¹) ^ A * ((c * y) ^ A * Real.exp (-(c * y))))
+        atTop (𝓝 0) := by
+      simpa using
+        ((Real.tendsto_pow_mul_exp_neg_atTop_nhds_zero A).comp
+          (tendsto_id.const_mul_atTop hcpos)).const_mul (C * (c⁻¹) ^ A)
+    have heq
+        : ∀ y : ℝ,
+          C * (c⁻¹) ^ A * ((c * y) ^ A * Real.exp (-(c * y)))
+            = C * y ^ A * Real.exp (-2 * π * y / M) := by
       intro y
       have : -(c * y) = -2 * π * y / M := by rw [hc]; ring
-      rw [this, mul_pow, ← mul_assoc, ← mul_assoc, mul_assoc C, ← mul_pow, inv_mul_cancel₀ hcpos.ne',
-        one_pow, mul_one]
+      rw [this, mul_pow, ← mul_assoc, ← mul_assoc, mul_assoc C, ← mul_pow,
+        inv_mul_cancel₀ hcpos.ne', one_pow, mul_one]
     simp_rw [heq] at hT
     have hT' : Tendsto (fun τ : ℍ ↦ C * τ.im ^ A * Real.exp (-2 * π * τ.im / M)) atImInfty (𝓝 0) :=
       hT.comp tendsto_comap

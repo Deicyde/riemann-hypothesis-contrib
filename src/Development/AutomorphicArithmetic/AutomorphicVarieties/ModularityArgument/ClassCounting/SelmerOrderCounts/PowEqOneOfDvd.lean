@@ -10,17 +10,20 @@ open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.Z
 
 section
 
-variable {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] {l c ν : ℕ} {ζ : (𝓞 F)ˣ}
-  {γ : F ≃ₐ[L] F}
+variable
+  {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+  {l c ν : ℕ} {ζ : (𝓞 F)ˣ} {γ : F ≃ₐ[L] F}
 
-theorem UpperTheory.V.ZK.Ct.pow_act (h : Lay l c ν ζ γ) (j : ℕ) :
-    (γ ^ j) ((ζ : 𝓞 F) : F) = ((ζ : 𝓞 F) : F) ^ (1 + l ^ c) ^ j := by
+theorem UpperTheory.V.ZK.Ct.pow_act (h : Lay l c ν ζ γ) (j : ℕ)
+    : (γ ^ j) ((ζ : 𝓞 F) : F) = ((ζ : 𝓞 F) : F) ^ (1 + l ^ c) ^ j := by
   induction j with
   | zero => simp
   | succ j ih => rw [pow_succ, AlgEquiv.mul_apply, h.act, map_pow, ih, ← pow_mul, ← pow_succ]
 
-private theorem pow_sub_dvd_of_pow_dvd_one_add_pow_pow_sub_one (l c ν j : ℕ) (hl : l.Prime) (h1 : 1 ≤ c) (h2 : l = 2 → 2 ≤ c)
-    (hcν : c ≤ ν) (hj : l ^ ν ∣ (1 + l ^ c) ^ j - 1) : l ^ (ν - c) ∣ j := by
+private theorem pow_sub_dvd_of_pow_dvd_one_add_pow_pow_sub_one
+    (l c ν j : ℕ) (hl : l.Prime) (h1 : 1 ≤ c) (h2 : l = 2 → 2 ≤ c) (hcν : c ≤ ν)
+    (hj : l ^ ν ∣ (1 + l ^ c) ^ j - 1)
+    : l ^ (ν - c) ∣ j := by
   have hpl : Prime l := hl.prime
   have hndvd : ¬ l ∣ 1 + l ^ c := fun h =>
     hl.one_lt.ne' (Nat.dvd_one.mp ((Nat.dvd_add_left (dvd_pow_self l (by omega))).mp h))
@@ -34,12 +37,13 @@ private theorem pow_sub_dvd_of_pow_dvd_one_add_pow_pow_sub_one (l c ν j : ℕ) 
         push_cast
         rw [this, emultiplicity_pow_self_of_prime Int.prime_two]
       · rw [add_sub_cancel_left]
-        exact (pow_dvd_pow 2 hc2 : (2:ℤ) ^ 2 ∣ 2 ^ c)
+        exact (pow_dvd_pow 2 hc2 : (2 : ℤ) ^ 2 ∣ 2 ^ c)
       · intro h
         apply hndvd
         exact_mod_cast h
-    · have := Nat.emultiplicity_pow_sub_pow hl hodd (x := 1 + l ^ c) (y := 1)
-        (by rw [Nat.add_sub_cancel_left]; exact dvd_pow_self l (by omega)) hndvd j
+    · have :=
+        Nat.emultiplicity_pow_sub_pow hl hodd (x := 1 + l ^ c) (y := 1)
+          (by rw [Nat.add_sub_cancel_left]; exact dvd_pow_self l (by omega)) hndvd j
       rw [one_pow, Nat.add_sub_cancel_left, emultiplicity_pow_self_of_prime hpl] at this
       exact this
   have hν := (pow_dvd_iff_le_emultiplicity.mp hj)
@@ -50,13 +54,15 @@ private theorem pow_sub_dvd_of_pow_dvd_one_add_pow_pow_sub_one (l c ν j : ℕ) 
   rw [e] at hν
   exact (WithTop.add_le_add_iff_left (ENat.coe_ne_top c)).mp hν
 
-theorem UpperTheory.V.ZK.Ct.pow_eq_one_of_dvd (hl : l.Prime) (h : Lay l c ν ζ γ) (j : ℕ)
-    (hj : l ^ ν ∣ (1 + l ^ c) ^ j - 1) : γ ^ j = 1 := by
+theorem UpperTheory.V.ZK.Ct.pow_eq_one_of_dvd
+    (hl : l.Prime) (h : Lay l c ν ζ γ) (j : ℕ) (hj : l ^ ν ∣ (1 + l ^ c) ^ j - 1)
+    : γ ^ j = 1 := by
   rw [← orderOf_dvd_iff_pow_eq_one, h.ord]
   exact pow_sub_dvd_of_pow_dvd_one_add_pow_pow_sub_one l c ν j hl h.c_pos h.c_two h.c_le hj
 
-theorem UpperTheory.V.ZK.Ct.inertia_eq_bot (hl : l.Prime) (h : Lay l c ν ζ γ) (P : HeightOneSpectrum (𝓞 F))
-    (hP : (l : 𝓞 F) ∉ P.asIdeal) : P.asIdeal.inertia (F ≃ₐ[L] F) = ⊥ := by
+theorem UpperTheory.V.ZK.Ct.inertia_eq_bot
+    (hl : l.Prime) (h : Lay l c ν ζ γ) (P : HeightOneSpectrum (𝓞 F)) (hP : (l : 𝓞 F) ∉ P.asIdeal)
+    : P.asIdeal.inertia (F ≃ₐ[L] F) = ⊥ := by
   have hG := h.gal
   have : FiniteDimensional L F := Module.Finite.of_restrictScalars_finite ℚ L F
   haveI : NeZero (l ^ ν) := ⟨pow_ne_zero _ hl.ne_zero⟩
@@ -87,8 +93,9 @@ theorem UpperTheory.V.ZK.Ct.inertia_eq_bot (hl : l.Prime) (h : Lay l c ν ζ γ)
     apply RingOfIntegers.coe_injective
     exact UpperTheory.V.ZK.Ct.pow_act h j
   rw [hact] at hm
-  have hq : Ideal.Quotient.mk P.asIdeal (ζ : 𝓞 F) ^ (1 + l ^ c) ^ j =
-      Ideal.Quotient.mk P.asIdeal (ζ : 𝓞 F) := by
+  have hq
+      : Ideal.Quotient.mk P.asIdeal (ζ : 𝓞 F) ^ (1 + l ^ c) ^ j
+        = Ideal.Quotient.mk P.asIdeal (ζ : 𝓞 F) := by
     rw [← map_pow, ← sub_eq_zero, ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
     exact hm
   have hpos : 1 ≤ (1 + l ^ c) ^ j := Nat.one_le_pow _ _ (by positivity)
@@ -99,8 +106,13 @@ theorem UpperTheory.V.ZK.Ct.inertia_eq_bot (hl : l.Prime) (h : Lay l c ν ζ γ)
 
 end
 
-theorem UpperTheory.V.ZK.Ct.unram :
-    ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (l c ν : ℕ) (ζ : (𝓞 F)ˣ) (γ : F ≃ₐ[L] F), l.Prime → Lay l c ν ζ γ → ∀ (x : Lˣ) (P : HeightOneSpectrum (𝓞 F)) (p : HeightOneSpectrum (𝓞 L)), (l : 𝓞 L) ∉ p.asIdeal → P.asIdeal.LiesOver p.asIdeal → ordP P (Units.map (algebraMap L F : L →* F) x) = ordP p x := by
+theorem UpperTheory.V.ZK.Ct.unram
+    : ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (l c ν : ℕ)
+        (ζ : (𝓞 F)ˣ) (γ : F ≃ₐ[L] F),
+      l.Prime → Lay l c ν ζ γ
+        → ∀ (x : Lˣ) (P : HeightOneSpectrum (𝓞 F)) (p : HeightOneSpectrum (𝓞 L)),
+          (l : 𝓞 L) ∉ p.asIdeal → P.asIdeal.LiesOver p.asIdeal
+            → ordP P (Units.map (algebraMap L F : L →* F) x) = ordP p x := by
   intro L F _ _ _ _ _ l c ν ζ γ hl h x P p hlp hlies
   have hG := h.gal
   have : FiniteDimensional L F := Module.Finite.of_restrictScalars_finite ℚ L F

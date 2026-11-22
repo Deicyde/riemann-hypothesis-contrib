@@ -16,8 +16,8 @@ noncomputable section
 
 namespace PointDegreeComplexPositive
 
-theorem card_algHom_pos {K' : Type} [Field K'] [NumberField K'] (E : IntermediateField ℚ K') :
-    0 < Nat.card (E →ₐ[ℚ] ℂ) := by
+theorem card_algHom_pos {K' : Type} [Field K'] [NumberField K'] (E : IntermediateField ℚ K')
+    : 0 < Nat.card (E →ₐ[ℚ] ℂ) := by
   have : FiniteDimensional ℚ E := inferInstance
   have : Algebra.IsAlgebraic ℚ E := Algebra.IsAlgebraic.of_finite ℚ E
   have : Nonempty (E →ₐ[ℚ] ℂ) := ⟨IsAlgClosed.lift⟩

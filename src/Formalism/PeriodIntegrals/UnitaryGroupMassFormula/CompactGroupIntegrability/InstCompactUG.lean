@@ -39,8 +39,8 @@ instance instBorelUG (N : ℕ) : BorelSpace (UG N) := ⟨rfl⟩
 def ent {N : ℕ} (g : UG N) : Fin N × Fin N → ℂ := fun ij => (g : Matrix (Fin N) (Fin N) ℂ) ij.1 ij.2
 
 def IsPD {N : ℕ} (f : UG N → ℂ) : Prop :=
-  ∃ (k : ℕ) (P : MvPolynomial (Fin N × Fin N) ℂ),
-    ∀ g : UG N, f g * (g : Matrix (Fin N) (Fin N) ℂ).det ^ k = MvPolynomial.eval (ent g) P
+  ∃ (k : ℕ) (P : MvPolynomial (Fin N × Fin N) ℂ), ∀ g : UG N,
+    f g * (g : Matrix (Fin N) (Fin N) ℂ).det ^ k = MvPolynomial.eval (ent g) P
 
 def detP (N : ℕ) : MvPolynomial (Fin N × Fin N) ℂ := (Matrix.mvPolynomialX (Fin N) (Fin N) ℂ).det
 
@@ -105,9 +105,10 @@ lemma IsPD.conjEntry {N : ℕ} (i j : Fin N) :
   show star ((g : Matrix (Fin N) (Fin N) ℂ) i j) * (g : Matrix (Fin N) (Fin N) ℂ).det ^ 1 = _
   simp [Matrix.star_apply, mul_comm]
 
-def coordC {N : ℕ} (i j : Fin N) : C(UG N, ℂ) :=
-  ⟨fun g => (g : Matrix (Fin N) (Fin N) ℂ) i j,
-    (continuous_apply j).comp ((continuous_apply i).comp continuous_subtype_val)⟩
+def coordC {N : ℕ} (i j : Fin N) : C(UG N, ℂ) := ⟨
+  fun g => (g : Matrix (Fin N) (Fin N) ℂ) i j,
+  (continuous_apply j).comp ((continuous_apply i).comp continuous_subtype_val)
+⟩
 
 def algA (N : ℕ) : StarSubalgebra ℂ C(UG N, ℂ) :=
   StarAlgebra.adjoin ℂ (Set.range fun ij : Fin N × Fin N => coordC ij.1 ij.2)
@@ -128,8 +129,8 @@ lemma algA_dense (N : ℕ) (F : C(UG N, ℂ)) {ε : ℝ} (hε : 0 < ε) : ∃ f 
   exact ⟨f, hf, by rwa [dist_eq_norm] at hd⟩
 
 def Sep {N : ℕ} (f : UG N → ℂ) : Prop :=
-  ∃ (ι : Type) (_ : Fintype ι) (a b : ι → UG N → ℂ), (∀ i, IsPD (a i)) ∧ (∀ i, Continuous (b i)) ∧
-    ∀ h y : UG N, f (h⁻¹ * y) = ∑ i, a i h * b i y
+  ∃ (ι : Type) (_ : Fintype ι) (a b : ι → UG N → ℂ),
+    (∀ i, IsPD (a i)) ∧ (∀ i, Continuous (b i)) ∧ ∀ h y : UG N, f (h⁻¹ * y) = ∑ i, a i h * b i y
 
 lemma Sep.const {N : ℕ} (c : ℂ) : Sep (fun _ : UG N => c) :=
   ⟨Unit, inferInstance, fun _ _ => c, fun _ _ => 1, fun _ => IsPD.const c, fun _ => continuous_const,

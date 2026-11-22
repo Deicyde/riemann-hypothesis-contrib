@@ -12,34 +12,40 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open MvPolynomial
 
-theorem mem_valuationRing {E : Type} [Field E] (v : AddValuation E (WithTop ℤ)) (x : E) :
-    x ∈ vRing v ↔ 0 ≤ v x :=
-  (Valuation.mem_valuationSubring_iff (v : Valuation E (Multiplicative (WithTop ℤ)ᵒᵈ)) x).trans Iff.rfl
+theorem mem_valuationRing {E : Type} [Field E] (v : AddValuation E (WithTop ℤ)) (x : E)
+    : x ∈ vRing v ↔ 0 ≤ v x :=
+  (Valuation.mem_valuationSubring_iff (v : Valuation E (Multiplicative (WithTop ℤ)ᵒᵈ)) x).trans
+    Iff.rfl
 
-theorem algebraicIndependent_residue_of_isUnit {A R E : Type} [CommRing A] [Field R] [Field E] (V : ValuationSubring E)
-    [Algebra R (IsLocalRing.ResidueField V)] (φ : A →+* V) (ψ : A →+* R)
-    (hψ : Function.Surjective ψ)
+theorem algebraicIndependent_residue_of_isUnit
+    {A R E : Type} [CommRing A] [Field R] [Field E]
+    (V : ValuationSubring E) [Algebra R (IsLocalRing.ResidueField V)]
+    (φ : A →+* V) (ψ : A →+* R) (hψ : Function.Surjective ψ)
     (hc : ∀ a, algebraMap R (IsLocalRing.ResidueField V) (ψ a) = IsLocalRing.residue V (φ a))
-    {τ : Type} (t : τ → V) (h : ∀ q : MvPolynomial τ A, q.map ψ ≠ 0 → IsUnit (eval₂ φ t q)) :
-    AlgebraicIndependent R (fun j => IsLocalRing.residue V (t j)) := by
+    {τ : Type} (t : τ → V) (h : ∀ q : MvPolynomial τ A, q.map ψ ≠ 0 → IsUnit (eval₂ φ t q))
+    : AlgebraicIndependent R (fun j => IsLocalRing.residue V (t j)) := by
   rw [algebraicIndependent_iff]
   intro P hP
   by_contra hne
   obtain ⟨q, rfl⟩ := MvPolynomial.map_surjective ψ hψ P
   have hu := (h q hne).map (IsLocalRing.residue V)
-  have key : IsLocalRing.residue V (eval₂ φ t q) =
-      MvPolynomial.aeval (fun j => IsLocalRing.residue V (t j)) (q.map ψ) := by
+  have key
+      : IsLocalRing.residue V (eval₂ φ t q)
+        = MvPolynomial.aeval (fun j => IsLocalRing.residue V (t j)) (q.map ψ) := by
     rw [MvPolynomial.hom_eval₂, MvPolynomial.aeval_def, MvPolynomial.eval₂_map]
     congr 1
     exact RingHom.ext fun a => (hc a).symm
   rw [key, hP] at hu
   exact not_isUnit_zero hu
 
-theorem trdeg_residue_le {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D : ℕ)
-    (hD : Algebra.trdeg K Ω = D) (v : AddValuation Ω (WithTop ℤ))
-    (hK : ∀ a : K, a ≠ 0 → v (algebraMap K Ω a) = 0) (a0 : Ω) (ha0 : a0 ≠ 0) (hva0 : v a0 ≠ 0) :
-    @Algebra.trdeg (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K Ω)))
-      (IsLocalRing.ResidueField (vRing v)) _ _ (resAlg (F := K) v) ≤ ((D - 1 : ℕ) : Cardinal) := by
+theorem trdeg_residue_le
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
+    (D : ℕ) (hD : Algebra.trdeg K Ω = D)
+    (v : AddValuation Ω (WithTop ℤ)) (hK : ∀ a : K, a ≠ 0 → v (algebraMap K Ω a) = 0)
+    (a0 : Ω) (ha0 : a0 ≠ 0) (hva0 : v a0 ≠ 0)
+    : @Algebra.trdeg (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K Ω)))
+        (IsLocalRing.ResidueField (vRing v)) _ _ (resAlg (F := K) v)
+      ≤ ((D - 1 : ℕ) : Cardinal) := by
   set V := vRing v with hV
   set k := IsLocalRing.ResidueField (V.comap (algebraMap K Ω)) with hk
   set κ := IsLocalRing.ResidueField V with hκ
@@ -53,7 +59,8 @@ theorem trdeg_residue_le {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D : 
     · exact le_of_eq (hK a ha).symm
   let jK : K →+* V := (algebraMap K Ω).codRestrict V hKV
   let jW : K →+* V.comap (algebraMap K Ω) :=
-    (RingHom.id K).codRestrict (V.comap (algebraMap K Ω)) fun a => ValuationSubring.mem_comap.mpr (hKV a)
+    (RingHom.id K).codRestrict (V.comap (algebraMap K Ω)) fun a =>
+      ValuationSubring.mem_comap.mpr (hKV a)
   let ιK : K →+* k := (IsLocalRing.residue _).comp jW
   have hcompat : ∀ a : K, algebraMap k κ (ιK a) = IsLocalRing.residue V (jK a) := by
     intro a
@@ -137,8 +144,10 @@ theorem trdeg_residue_le {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D : 
       rw [← hp]
       exact hG p hp0
     rw [Polynomial.aeval_eq_sum_range] at hq
-    obtain ⟨j0, hj0, hmin⟩ := Finset.exists_min_image q.support (fun j => (j : ℤ) * m)
-      (Polynomial.nonempty_support_iff.mpr hq0)
+    obtain ⟨j0, hj0, hmin⟩ :=
+      Finset.exists_min_image q.support
+        (fun j => (j : ℤ) * m)
+        (Polynomial.nonempty_support_iff.mpr hq0)
     have hj0S : j0 ∈ Finset.range (q.natDegree + 1) :=
       Finset.mem_range.mpr (Nat.lt_succ_of_le (Polynomial.le_natDegree_of_mem_supp j0 hj0))
     have hterm : ∀ j, q.coeff j ≠ 0 → v (q.coeff j • a0 ^ j) = (((j : ℤ) * m : ℤ) : WithTop ℤ) := by
@@ -148,8 +157,9 @@ theorem trdeg_residue_le {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D : 
       rw [e1, hcv j hj, zero_add, ← WithTop.coe_nsmul, nsmul_eq_mul]
     have hg : v (q.coeff j0 • a0 ^ j0) = (((j0 : ℤ) * m : ℤ) : WithTop ℤ) :=
       hterm j0 (Polynomial.mem_support_iff.mp hj0)
-    have hrest : v (q.coeff j0 • a0 ^ j0) <
-        v (∑ j ∈ (Finset.range (q.natDegree + 1)).erase j0, q.coeff j • a0 ^ j) := by
+    have hrest
+        : v (q.coeff j0 • a0 ^ j0)
+          < v (∑ j ∈ (Finset.range (q.natDegree + 1)).erase j0, q.coeff j • a0 ^ j) := by
       rw [hg]
       apply AddValuation.map_lt_sum _ WithTop.coe_ne_top
       intro j hj
@@ -178,13 +188,14 @@ theorem trdeg_residue_le {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D : 
     exact_mod_cast (by omega : r ≤ D - 1)
   exact hfin
 
-theorem trdeg_eq_of_card {F E C : Type} [Field F] [Field E] [Field C] [Algebra F E] [Algebra E C]
-    [Algebra F C] {σ τ : Type} [Fintype σ] [Fintype τ] (tb : σ → C)
-    (ub : τ → C) (hu : AlgebraicIndependent F ub)
-    (hmem : ∀ j, ub j ∈ Algebra.adjoin E (Set.range tb)) (n : ℕ)
-    (hE : Algebra.trdeg F E ≤ n) (hcard : Fintype.card τ = Fintype.card σ + n)
-    (hT : ∀ x : F, algebraMap F C x = algebraMap E C (algebraMap F E x)) :
-    Algebra.trdeg F E = n ∧ AlgebraicIndependent E tb := by
+theorem trdeg_eq_of_card
+    {F E C : Type} [Field F] [Field E] [Field C] [Algebra F E] [Algebra E C] [Algebra F C]
+    {σ τ : Type} [Fintype σ] [Fintype τ]
+    (tb : σ → C) (ub : τ → C)
+    (hu : AlgebraicIndependent F ub) (hmem : ∀ j, ub j ∈ Algebra.adjoin E (Set.range tb))
+    (n : ℕ) (hE : Algebra.trdeg F E ≤ n) (hcard : Fintype.card τ = Fintype.card σ + n)
+    (hT : ∀ x : F, algebraMap F C x = algebraMap E C (algebraMap F E x))
+    : Algebra.trdeg F E = n ∧ AlgebraicIndependent E tb := by
   haveI : IsScalarTower F E C := IsScalarTower.of_algebraMap_eq hT
   have h1 := ReciprocityTheory.MultiplicativeHeights.gauss_card_le_trdeg_add tb ub hu hmem
   have h2 := ReciprocityTheory.MultiplicativeHeights.gauss_trdeg_adjoin_le (E := E) tb
@@ -204,18 +215,21 @@ theorem trdeg_eq_of_card {F E C : Type} [Field F] [Field E] [Field C] [Algebra F
   refine ⟨by rw [ha, han], ReciprocityTheory.MultiplicativeHeights.gauss_indep_of_le_trdeg tb ?_⟩
   rw [hb, hbs, Cardinal.mk_fintype]
 
-theorem isUnit_of_val_eq_zero' {E : Type} [Field E] (v : AddValuation E (WithTop ℤ)) {z : E}
-    (h : z ∈ vRing v) (hz : v z = 0) : IsUnit (⟨z, h⟩ : vRing v) := by
+theorem isUnit_of_val_eq_zero'
+    {E : Type} [Field E] (v : AddValuation E (WithTop ℤ)) {z : E} (h : z ∈ vRing v) (hz : v z = 0)
+    : IsUnit (⟨z, h⟩ : vRing v) := by
   have hz0 : z ≠ 0 := by
     rintro rfl
     rw [AddValuation.map_zero] at hz
     exact WithTop.top_ne_coe hz
-  have hinv : z⁻¹ ∈ vRing v := by
-    rw [mem_valuationRing, AddValuation.map_inv, hz, neg_zero]
+  have hinv : z⁻¹ ∈ vRing v := by rw [mem_valuationRing, AddValuation.map_inv, hz, neg_zero]
   exact IsUnit.of_mul_eq_one (⟨z⁻¹, hinv⟩ : vRing v) (Subtype.ext (mul_inv_cancel₀ hz0))
 
-theorem val_eq_zero_of_isUnit' {E : Type} [Field E] (v : AddValuation E (WithTop ℤ)) {z : E}
-    (h : z ∈ vRing v) (hu : IsUnit (⟨z, h⟩ : vRing v)) : v z = 0 := by
+theorem val_eq_zero_of_isUnit'
+    {E : Type} [Field E]
+    (v : AddValuation E (WithTop ℤ))
+    {z : E} (h : z ∈ vRing v) (hu : IsUnit (⟨z, h⟩ : vRing v))
+    : v z = 0 := by
   obtain ⟨u, hu⟩ := hu
   have hmul : z * ((↑u⁻¹ : vRing v) : E) = 1 := by
     have h1 := u.mul_inv
@@ -226,23 +240,28 @@ theorem val_eq_zero_of_isUnit' {E : Type} [Field E] (v : AddValuation E (WithTop
   exact ((add_eq_zero_iff_of_nonneg ((mem_valuationRing v z).mp h)
     ((mem_valuationRing v _).mp (↑u⁻¹ : vRing v).2)).mp hsum).1
 
-theorem scalarRatio_eq {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V] {f g : V} {a : Ω}
-    (hg : g ≠ 0) (h : f = a • g) : ratio f g = a := by
+theorem scalarRatio_eq
+    {Ω V : Type} [Field Ω] [AddCommGroup V] [Module Ω V]
+    {f g : V} {a : Ω} (hg : g ≠ 0) (h : f = a • g)
+    : ratio f g = a := by
   have he : ∃ b : Ω, f = b • g := ⟨a, h⟩
   rw [ratio, dite_eq_left he]
   exact smul_left_injective Ω hg (he.choose_spec.symm.trans h)
 
-theorem genericImage_base {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω)
-    (i : Fin (D + 1)) :
-    sImg j₀ x (i, j₀) = algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N)
-      (if i = 0 then MvPolynomial.X (Sum.inl ())
-        else -∑ k, MvPolynomial.X (Sum.inr (i, k)) * MvPolynomial.C (x k)) := by
+theorem genericImage_base
+    {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω) (i : Fin (D + 1))
+    : sImg j₀ x (i, j₀)
+      = algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N)
+        (if i = 0 then
+           MvPolynomial.X (Sum.inl ())
+         else
+           - ∑ k, MvPolynomial.X (Sum.inr (i, k)) * MvPolynomial.C (x k)) := by
   rw [sImg, Fin.succAbove_cases_eq_insertNth, Fin.insertNth_apply_same]
 
-theorem genericImage_succAbove {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω)
-    (i : Fin (D + 1)) (k : Fin N) :
-    sImg j₀ x (i, j₀.succAbove k) =
-      algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N) (MvPolynomial.X (Sum.inr (i, k))) := by
+theorem genericImage_succAbove
+    {Ω : Type} [Field Ω] {D N : ℕ} (j₀ : Fin (N + 1)) (x : Fin N → Ω) (i : Fin (D + 1)) (k : Fin N)
+    : sImg j₀ x (i, j₀.succAbove k)
+      = algebraMap (MvPolynomial (SVar D N) Ω) (OmS Ω D N) (MvPolynomial.X (Sum.inr (i, k))) := by
   rw [sImg, Fin.succAbove_cases_eq_insertNth, Fin.insertNth_apply_succAbove]
 
 end ReciprocityTheory.ChartRestriction.G.T0

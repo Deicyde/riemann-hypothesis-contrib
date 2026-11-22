@@ -8,26 +8,33 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HermitianPer
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.Ratio
 
 open Matrix
 
-theorem hf_sum_left {g : ℕ} {κ : Type*} [Fintype κ] (Hm : Matrix (Fin g) (Fin g) ℂ)
-    (c : κ → ℂ) (V : κ → Fin g → ℂ) (w : Fin g → ℂ) :
-    hermForm Hm (∑ i, c i • V i) w = ∑ i, c i * hermForm Hm (V i) w := by
+theorem hf_sum_left
+    {g : ℕ} {κ : Type*} [Fintype κ]
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (c : κ → ℂ) (V : κ → Fin g → ℂ) (w : Fin g → ℂ)
+    : hermForm Hm (∑ i, c i • V i) w = ∑ i, c i * hermForm Hm (V i) w := by
   simp [ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm, sum_dotProduct, smul_dotProduct]
 
-theorem hf_sum_right {g : ℕ} {κ : Type*} [Fintype κ] (Hm : Matrix (Fin g) (Fin g) ℂ)
-    (c : κ → ℂ) (V : κ → Fin g → ℂ) (z : Fin g → ℂ) :
-    hermForm Hm z (∑ i, c i • V i) = ∑ i, star (c i) * hermForm Hm z (V i) := by
-  simp [ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm, star_sum, Matrix.mulVec_sum, dotProduct_sum,
-    Matrix.mulVec_smul, dotProduct_smul]
+theorem hf_sum_right
+    {g : ℕ} {κ : Type*} [Fintype κ]
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (c : κ → ℂ) (V : κ → Fin g → ℂ) (z : Fin g → ℂ)
+    : hermForm Hm z (∑ i, c i • V i) = ∑ i, star (c i) * hermForm Hm z (V i) := by
+  simp [ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm, star_sum, Matrix.mulVec_sum,
+    dotProduct_sum, Matrix.mulVec_smul, dotProduct_smul]
 
-theorem exists_row {R M I : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [Module.Finite R M] [Fintype I]
-    (e : I → M) (he : LinearIndependent R e) (hc : Fintype.card I = Module.finrank R M) (x : M) :
-    ∃ (n : R) (c : I → R), n ≠ 0 ∧ n • x = ∑ m, c m • e m := by
+theorem exists_row
+    {R M I : Type}
+    [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [Module.Finite R M] [Fintype I]
+    (e : I → M) (he : LinearIndependent R e)
+    (hc : Fintype.card I = Module.finrank R M) (x : M)
+    : ∃ (n : R) (c : I → R), n ≠ 0 ∧ n • x = ∑ m, c m • e m := by
   classical
   have hnot : ¬ LinearIndependent R (fun o : Option I => o.elim x e) := by
     intro h
@@ -48,27 +55,42 @@ theorem exists_row {R M I : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Mo
   simp only [neg_smul, Finset.sum_neg_distrib]
   exact eq_neg_of_add_eq_zero_left hsum
 
-theorem lifts_change {p q g : ℕ} (T T' : (Fin g → ℂ) → (Fin g → ℂ)) (V : Fin p → Fin g → ℂ) (W : Fin q → Fin g → ℂ)
+theorem lifts_change
+    {p q g : ℕ} (T T' : (Fin g → ℂ) → (Fin g → ℂ)) (V : Fin p → Fin g → ℂ) (W : Fin q → Fin g → ℂ)
     (π π₀ : Fin p ⊕ Fin q → Fin g → ℂ) (S S₀ Tm : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ)
     (Hm : Matrix (Fin g) (Fin g) ℂ) (hT : IsLinearMap ℂ T) (hH : Hm.IsHermitian)
     (hHp : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) (hS : S.det ≠ 0) (hS₀ : S₀.det ≠ 0)
     (hV : LinearIndependent ℂ V) (hW : LinearIndependent ℂ W)
-    (hVs : ∀ n, T (π n) ∈ Submodule.span ℂ (Set.range V)) (hWs : ∀ n, T' (π n) ∈ Submodule.span ℂ (Set.range W))
-    (hVs₀ : ∀ n, T (π₀ n) ∈ Submodule.span ℂ (Set.range V)) (hWs₀ : ∀ n, T' (π₀ n) ∈ Submodule.span ℂ (Set.range W))
-    (hF : ∀ m n, hermForm Hm (T (π m)) (T (π n)) - star (hermForm Hm (T' (π m)) (T' (π n))) = 2 * Complex.I * S m n)
-    (hF₀ : ∀ m n, hermForm Hm (T (π₀ m)) (T (π₀ n)) - star (hermForm Hm (T' (π₀ m)) (T' (π₀ n))) = 2 * Complex.I * S₀ m n)
-    (hc : ∀ m, T (π m) = ∑ k, Tm m k • T (π₀ k)) (hc' : ∀ m, T' (π m) = ∑ k, star (Tm m k) • T' (π₀ k)) :
-    Tm.det ≠ 0 ∧ ∃ (C C₀ : Matrix (Fin p) (Fin p ⊕ Fin q) ℂ) (Fm B Fm₀ B₀ : Matrix (Fin q) (Fin p ⊕ Fin q) ℂ),
-      (∀ a, T (∑ m, C a m • π m) = V a) ∧ (∀ n, T' (π n) = ∑ j, B j n • W j) ∧ (∀ j n, ∑ m, Fm j m * S m n = B j n) ∧
-      (∀ a, T (∑ m, C₀ a m • π₀ m) = V a) ∧ (∀ n, T' (π₀ n) = ∑ j, B₀ j n • W j) ∧
-      (∀ j n, ∑ m, Fm₀ j m * S₀ m n = B₀ j n) ∧ (Matrix.fromRows C Fm).det ≠ 0 ∧
-      (Matrix.fromRows C₀ Fm₀).det = (Matrix.fromRows C Fm).det * Tm.det := by
+    (hVs : ∀ n, T (π n) ∈ Submodule.span ℂ (Set.range V))
+    (hWs : ∀ n, T' (π n) ∈ Submodule.span ℂ (Set.range W))
+    (hVs₀ : ∀ n, T (π₀ n) ∈ Submodule.span ℂ (Set.range V))
+    (hWs₀ : ∀ n, T' (π₀ n) ∈ Submodule.span ℂ (Set.range W))
+    (hF : ∀ m n,
+      hermForm Hm (T (π m)) (T (π n)) - star (hermForm Hm (T' (π m)) (T' (π n)))
+        = 2 * Complex.I * S m n)
+    (hF₀ : ∀ m n,
+      hermForm Hm (T (π₀ m)) (T (π₀ n)) - star (hermForm Hm (T' (π₀ m)) (T' (π₀ n)))
+        = 2 * Complex.I * S₀ m n)
+    (hc : ∀ m, T (π m) = ∑ k, Tm m k • T (π₀ k))
+    (hc' : ∀ m, T' (π m) = ∑ k, star (Tm m k) • T' (π₀ k))
+    : Tm.det ≠ 0
+      ∧ ∃ (C C₀ : Matrix (Fin p) (Fin p ⊕ Fin q) ℂ)
+          (Fm B Fm₀ B₀ : Matrix (Fin q) (Fin p ⊕ Fin q) ℂ),
+        (∀ a, T (∑ m, C a m • π m) = V a) ∧ (∀ n, T' (π n) = ∑ j, B j n • W j)
+          ∧ (∀ j n, ∑ m, Fm j m * S m n = B j n) ∧ (∀ a, T (∑ m, C₀ a m • π₀ m) = V a)
+          ∧ (∀ n, T' (π₀ n) = ∑ j, B₀ j n • W j) ∧ (∀ j n, ∑ m, Fm₀ j m * S₀ m n = B₀ j n)
+          ∧ (Matrix.fromRows C Fm).det ≠ 0
+          ∧ (Matrix.fromRows C₀ Fm₀).det = (Matrix.fromRows C Fm).det * Tm.det := by
   obtain ⟨⟨Fm, B, d⟩, ⟨h1, h2, h3, ⟨C, hC⟩, h5⟩, -⟩ :=
-    GlobalTheory.T.hermitian_period_linear_algebra p q g T T' V W π S Hm hT hH hHp hS hV hW hVs hWs hF
+    GlobalTheory.T.hermitian_period_linear_algebra p q g T T' V W π S Hm hT hH hHp hS hV hW hVs hWs
+      hF
   obtain ⟨⟨Fm₀, B₀, d₀⟩, ⟨k1, k2, k3, -, k5⟩, -⟩ :=
-    GlobalTheory.T.hermitian_period_linear_algebra p q g T T' V W π₀ S₀ Hm hT hH hHp hS₀ hV hW hVs₀ hWs₀ hF₀
+    GlobalTheory.T.hermitian_period_linear_algebra p q g T T' V W π₀ S₀ Hm hT hH hHp hS₀ hV hW hVs₀
+      hWs₀ hF₀
   simp only at h1 h2 h3 hC h5 k1 k2 k3 k5
-  have lin : ∀ (c : Fin p ⊕ Fin q → ℂ) (x : Fin p ⊕ Fin q → Fin g → ℂ), T (∑ m, c m • x m) = ∑ m, c m • T (x m) := by
+  have lin
+      : ∀ (c : Fin p ⊕ Fin q → ℂ) (x : Fin p ⊕ Fin q → Fin g → ℂ),
+        T (∑ m, c m • x m) = ∑ m, c m • T (x m) := by
     intro c x
     have := map_sum (hT.mk' T) (fun m => c m • x m) Finset.univ
     simpa using this
@@ -94,8 +116,7 @@ theorem lifts_change {p q g : ℕ} (T T' : (Fin g → ℂ) → (Fin g → ℂ)) 
     apply hS
     rw [hmat, Matrix.det_mul, Matrix.det_mul, h0]
     simp
-  have hTH : Tmᴴ.det ≠ 0 := by
-    rw [hdetH]; simpa using hTdet
+  have hTH : Tmᴴ.det ≠ 0 := by rw [hdetH]; simpa using hTdet
   have hBm : B = B₀ * Tmᴴ := by
     ext j n
     have e0 : ∑ j, (B j n - (B₀ * Tmᴴ) j n) • W j = 0 := by
@@ -141,15 +162,18 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.Ratio
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem tyPart_add {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) : IsLinearMap ℂ (tyPart ty σ) := by
+theorem tyPart_add {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ)
+    : IsLinearMap ℂ (tyPart ty σ) := by
   constructor
   · intro a b; funext k; simp only [tyPart, Pi.add_apply]; split_ifs <;> simp
   · intro a b; funext k; simp only [tyPart, Pi.smul_apply]; split_ifs <;> simp
 
-theorem tyPart_row {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} {P : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty P)
-    (σ : E →+* ℂ) {I : Type} [Fintype I] (e : I → D.La) (x : D.La) (n : 𝓞 E) (c : I → 𝓞 E) (hn : n ≠ 0)
-    (h : n • x = ∑ m, c m • e m) :
-    tyPart ty σ (P x) = ∑ m, (σ (c m : E) / σ (n : E)) • tyPart ty σ (P (e m)) := by
+theorem tyPart_row
+    {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} {P : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty P)
+    (σ : E →+* ℂ)
+    {I : Type} [Fintype I]
+    (e : I → D.La) (x : D.La) (n : 𝓞 E) (c : I → 𝓞 E) (hn : n ≠ 0) (h : n • x = ∑ m, c m • e m)
+    : tyPart ty σ (P x) = ∑ m, (σ (c m : E) / σ (n : E)) • tyPart ty σ (P (e m)) := by
   have hσ : σ (n : E) ≠ 0 := by
     rw [map_ne_zero]
     exact_mod_cast hn
@@ -167,9 +191,17 @@ theorem tyPart_row {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} {P : D
 
 end GlobalTheory.CompanionTheory.Ar.Flat.Ratio
 
-
 open GlobalTheory.CompanionTheory.Ar.Flat.Ratio in
-theorem GlobalTheory.CompanionTheory.Ar.Flat.flatGen_ratio_complex : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ φ₀ : FrameFn Xo c) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty) (i : Fin FU.n), IsTypeFn H D.p D.q ty → IsFlatGen U τ φ FU i → IsFlatGen U τ φ₀ FU i → (∀ y : Sp ℂ ⟶ Xo.XF c, y ≫ pullback.snd _ _ = spMap (algebraMap c.F ℂ) → Set.range y ⊆ U → ∃ P, IsPeriod (FU.Di i) ty P ∧ under y = FU.u i P) → ∃ a : ℂ, ∀ y v w, IsFramed U τ (algebraMap c.F ℂ) y v w → φ ℂ y v w = a * φ₀ ℂ y v w := by
+theorem GlobalTheory.CompanionTheory.Ar.Flat.flatGen_ratio_complex
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ φ₀ : FrameFn Xo c)
+        (g : ℕ) (ty : Fin g → (E →+* ℂ)) (FU : FamilyUnif Xo (algebraMap (KA l) ℂ) ty)
+        (i : Fin FU.n),
+      IsTypeFn H D.p D.q ty → IsFlatGen U τ φ FU i → IsFlatGen U τ φ₀ FU i
+        → (∀ y : Sp ℂ ⟶ Xo.XF c,
+          y ≫ pullback.snd _ _ = spMap (algebraMap c.F ℂ) → Set.range y ⊆ U
+            → ∃ P, IsPeriod (FU.Di i) ty P ∧ under y = FU.u i P)
+        → ∃ a : ℂ, ∀ y v w, IsFramed U τ (algebraMap c.F ℂ) y v w → φ ℂ y v w = a * φ₀ ℂ y v w := by
   intro E _ _ _ H D l Xo c U τ φ φ₀ g ty FU i _ h1 h2 hU
   obtain ⟨e, ρ, he, hc⟩ := h1.flat
   obtain ⟨e₀, ρ₀, he₀, hc₀⟩ := h2.flat
@@ -185,30 +217,53 @@ theorem GlobalTheory.CompanionTheory.Ar.Flat.flatGen_ratio_complex : ∀ (E : Ty
   obtain ⟨P, hP, hy⟩ := hU y hfr.1 hfr.2.1
   have hfv := hfr.2.2.1
   have hfw := hfr.2.2.2
-  obtain ⟨V, hVd, hVl, hVs⟩ := GlobalTheory.T.period_eigen_frame E H D l Xo _ g ty FU i P (under y) _ τ D.p v hP hy (fun a => rfl) hfv
-  obtain ⟨W, hWd, hWl, hWs⟩ := GlobalTheory.T.period_eigen_frame E H D l Xo _ g ty FU i P (under y) _ (ComplexEmbedding.conjugate τ) D.q w hP hy
-    (fun a => rfl) hfw
+  obtain ⟨V, hVd, hVl, hVs⟩ :=
+    GlobalTheory.T.period_eigen_frame E H D l Xo _ g ty FU i P (under y) _ τ D.p v hP hy
+      (fun a => rfl)
+      hfv
+  obtain ⟨W, hWd, hWl, hWs⟩ :=
+    GlobalTheory.T.period_eigen_frame E H D l Xo _ g ty FU i P (under y) _
+      (ComplexEmbedding.conjugate τ) D.q w hP hy
+      (fun a => rfl)
+      hfw
   obtain ⟨Hm, hHh, hHp, hHi⟩ := id hP.2.2.2.2
-  obtain ⟨-, hs, hd⟩ := GlobalTheory.T.period_hermitian_type_compatibility E H (FU.Di i) g ty P Hm hP hHh hHi
-  have hSdet : ∀ e' : Fin D.p ⊕ Fin D.q → (FU.Di i).La, LinearIndependent (𝓞 E) e' →
-      (Matrix.of fun m n => τ (sesq (FU.Di i) (e' m) (e' n))).det ≠ 0 := by
+  obtain ⟨-, hs, hd⟩ :=
+    GlobalTheory.T.period_hermitian_type_compatibility E H (FU.Di i) g ty P Hm hP hHh hHi
+  have hSdet
+      : ∀ e' : Fin D.p ⊕ Fin D.q → (FU.Di i).La,
+        LinearIndependent (𝓞 E) e'
+          → (Matrix.of fun m n => τ (sesq (FU.Di i) (e' m) (e' n))).det ≠ 0 := by
     intro e' he'
     have := hd 0 _ e' hcard he'
-    have h2 : (Matrix.of fun m n => τ (sesq (FU.Di i) (e' m) (e' n))) =
-        (Matrix.of fun m n => sesq (FU.Di i) (e' m) (e' n)).map τ := rfl
+    have h2
+        : (Matrix.of fun m n => τ (sesq (FU.Di i) (e' m) (e' n)))
+          = (Matrix.of fun m n => sesq (FU.Di i) (e' m) (e' n)).map τ :=
+      rfl
     rw [h2, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact (map_ne_zero τ).2 this
   obtain ⟨hTdet, C, C₀, Fm, B, Fm₀, B₀, a1, a2, a3, b1, b2, b3, hdet, hrel⟩ :=
-    lifts_change (tyPart ty τ) (tyPart ty (ComplexEmbedding.conjugate τ)) V W (fun m => P (e m)) (fun m => P (e₀ m)) _ _ Tm Hm
-      (tyPart_add ty τ) hHh hHp (hSdet e he) (hSdet e₀ he₀) hVl hWl (fun _ => hVs _) (fun _ => hWs _) (fun _ => hVs _)
-      (fun _ => hWs _) (fun m n => hs τ _ _) (fun m n => hs τ _ _)
+    lifts_change (tyPart ty τ) (tyPart ty (ComplexEmbedding.conjugate τ)) V W
+      (fun m => P (e m))
+      (fun m => P (e₀ m))
+      _ _ Tm Hm (tyPart_add ty τ) hHh hHp (hSdet e he) (hSdet e₀ he₀) hVl hWl
+      (fun _ => hVs _)
+      (fun _ => hWs _)
+      (fun _ => hVs _)
+      (fun _ => hWs _)
+      (fun m n => hs τ _ _)
+      (fun m n => hs τ _ _)
       (fun m => tyPart_row hP τ e₀ (e m) (n m) (cf m) (hn m) (hrow m))
       (fun m => by
         rw [tyPart_row hP (ComplexEmbedding.conjugate τ) e₀ (e m) (n m) (cf m) (hn m) (hrow m)]
         refine Finset.sum_congr rfl fun k _ => ?_
         simp [hTm, ComplexEmbedding.conjugate_coe_eq])
-  have c1 := hc P y v w V W C Fm B hP hy hfr (fun a => (hVd a _).2 rfl) (fun j => (hWd j _).2 rfl) a1 a2 a3
-  have c2 := hc₀ P y v w V W C₀ Fm₀ B₀ hP hy hfr (fun a => (hVd a _).2 rfl) (fun j => (hWd j _).2 rfl) b1 b2 b3
+  have c1 :=
+    hc P y v w V W C Fm B hP hy hfr (fun a => (hVd a _).2 rfl) (fun j => (hWd j _).2 rfl) a1 a2 a3
+  have c2 :=
+    hc₀ P y v w V W C₀ Fm₀ B₀ hP hy hfr
+      (fun a => (hVd a _).2 rfl)
+      (fun j => (hWd j _).2 rfl)
+      b1 b2 b3
   have hφ₀ : φ₀ ℂ y v w ≠ 0 := h2.line.ne ℂ _ y v w hfr
   have hρ₀ : ρ₀ ≠ 0 := by
     rw [← c2, hrel]

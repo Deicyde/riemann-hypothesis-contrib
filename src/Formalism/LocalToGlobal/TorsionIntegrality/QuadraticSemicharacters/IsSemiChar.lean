@@ -41,8 +41,9 @@ def dualLat (H : Sesq V) (Λ : AddSubgroup V) : AddSubgroup V where
 def IsSelfDual (H : Sesq V) (Λ : AddSubgroup V) : Prop := dualLat H Λ = Λ
 
 def IsSemiChar (H : Sesq V) (Λ : AddSubgroup V) (α : V → ℂ) : Prop :=
-  (∀ x ∈ Λ, α x = 1 ∨ α x = -1) ∧
-  ∀ x ∈ Λ, ∀ y ∈ Λ, α (x + y) = α x * α y * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ))
+  (∀ x ∈ Λ, α x = 1 ∨ α x = -1)
+    ∧ ∀ x ∈ Λ, ∀ y ∈ Λ,
+      α (x + y) = α x * α y * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H x y : ℂ))
 
 def fixedBy (H : Sesq V) (α : V → ℂ) (Λ : AddSubgroup V) : Submodule ℂ (V → ℂ) where
   carrier := {F | ∀ x ∈ Λ, ∀ z, α x * opU H x F z = F z}
@@ -52,14 +53,17 @@ def fixedBy (H : Sesq V) (α : V → ℂ) (Λ : AddSubgroup V) : Submodule ℂ (
     have h1 := hF x hx z
     have h2 := hG x hx z
     simp only [opU, Pi.add_apply] at h1 h2 ⊢
-    rw [← h1, ← h2]; ring
+    rw [← h1, ← h2]
+    ring
   smul_mem' := by
     intro c F hF x hx z
     have h1 := hF x hx z
     simp only [opU, Pi.smul_apply, smul_eq_mul] at h1 ⊢
-    rw [← h1]; ring
+    rw [← h1]
+    ring
 
-def sumU (H : Sesq V) (α : V → ℂ) (S : Finset V) (F : V → ℂ) (z : V) : ℂ := ∑ x ∈ S, α x * opU H x F z
+def sumU (H : Sesq V) (α : V → ℂ) (S : Finset V) (F : V → ℂ) (z : V) : ℂ :=
+  ∑ x ∈ S, α x * opU H x F z
 
 def IsReps (Λ₁ Λ₂ : AddSubgroup V) (S : Finset V) : Prop :=
   (∀ x ∈ S, x ∈ Λ₂) ∧ (∀ x ∈ S, ∀ y ∈ S, x - y ∈ Λ₁ → x = y) ∧ ∀ y ∈ Λ₂, ∃ x ∈ S, y - x ∈ Λ₁
@@ -67,15 +71,17 @@ def IsReps (Λ₁ Λ₂ : AddSubgroup V) (S : Finset V) : Prop :=
 def relIdx (Λ₁ Λ₂ : AddSubgroup V) : ℕ := Λ₁.relIndex Λ₂
 
 def inter (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ : AddSubgroup V) (F : V → ℂ) (z : V) : ℂ :=
-  ((Real.sqrt (relIdx Λ₁ Λ₂) : ℝ) : ℂ)⁻¹ *
-    ∑ᶠ c : Λ₂ ⧸ Λ₁.addSubgroupOf Λ₂, α ((Quotient.out c : Λ₂) : V) * opU H ((Quotient.out c : Λ₂) : V) F z
+  ((Real.sqrt (relIdx Λ₁ Λ₂) : ℝ) : ℂ)⁻¹
+    * ∑ᶠ c : Λ₂ ⧸ Λ₁.addSubgroupOf Λ₂, α ((Quotient.out c : Λ₂) : V) * opU H ((Quotient.out c : Λ₂) : V) F z
 
 def pullInv (δ : V ≃ₗ[ℂ] V) (F : V → ℂ) (z : V) : ℂ := F (δ.symm z)
 
-def IsIsom {W : Type*} [AddCommGroup W] [Module ℂ W] (H : Sesq V) (H' : Sesq W) (g : V →ₗ[ℂ] W) : Prop :=
+def IsIsom {W : Type*} [AddCommGroup W] [Module ℂ W] (H : Sesq V) (H' : Sesq W) (g : V →ₗ[ℂ] W)
+    : Prop :=
   ∀ x y, H' (g x) (g y) = H x y
 
-def imgLat {W : Type*} [AddCommGroup W] [Module ℂ W] (g : V →ₗ[ℂ] W) (Λ : AddSubgroup V) : AddSubgroup W :=
+def imgLat {W : Type*} [AddCommGroup W] [Module ℂ W] (g : V →ₗ[ℂ] W) (Λ : AddSubgroup V)
+    : AddSubgroup W :=
   Λ.map g.toAddMonoidHom
 
 end General
@@ -88,10 +94,10 @@ def Th (H : Sesq V) (α : V → ℂ) (Λ : AddSubgroup V) : Submodule ℂ (V →
   carrier := {F | AnalyticOnNhd ℂ F Set.univ ∧ F ∈ fixedBy H α Λ}
   zero_mem' := ⟨fun _ _ => analyticAt_const, (fixedBy H α Λ).zero_mem⟩
   add_mem' := fun hF hG => ⟨hF.1.add hG.1, (fixedBy H α Λ).add_mem hF.2 hG.2⟩
-  smul_mem' := fun c _ hF => ⟨fun z hz => analyticAt_const.smul (hF.1 z hz), (fixedBy H α Λ).smul_mem c hF.2⟩
+  smul_mem' := fun c _ hF =>
+    ⟨fun z hz => analyticAt_const.smul (hF.1 z hz), (fixedBy H α Λ).smul_mem c hF.2⟩
 
-def IsLat (Λ : AddSubgroup V) : Prop :=
-  DiscreteTopology Λ ∧ Submodule.span ℝ (Λ : Set V) = ⊤
+def IsLat (Λ : AddSubgroup V) : Prop := DiscreteTopology Λ ∧ Submodule.span ℝ (Λ : Set V) = ⊤
 
 end Analytic
 
@@ -100,9 +106,12 @@ section Coordinates
 variable {n : Type*} [Fintype n]
 
 def matH (h : Matrix n n ℂ) : Sesq (n → ℂ) :=
-  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun z w => ∑ i, ∑ j, z i * h i j * conj (w j))
+  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+    (fun z w => ∑ i, ∑ j, z i * h i j * conj (w j))
     (by intro a b c; simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib])
-    (by intro c a b; simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc])
+    (by
+      intro c a b
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum, mul_assoc])
     (by intro a b c; simp only [Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib])
     (by
       intro c a b
@@ -122,8 +131,8 @@ def slice (a : Fin 4) (z : Fin 4 × n → ℂ) : n → ℂ := fun i => z (a, i)
 
 def tens4 (θ : (n → ℂ) → ℂ) (z : Fin 4 × n → ℂ) : ℂ := ∏ a : Fin 4, θ (slice a z)
 
-def blk4 (h : Matrix n n ℂ) : Matrix (Fin 4 × n) (Fin 4 × n) ℂ :=
-  fun w w' => if w.1 = w'.1 then h w.2 w'.2 else 0
+def blk4 (h : Matrix n n ℂ) : Matrix (Fin 4 × n) (Fin 4 × n) ℂ := fun w w' =>
+  if w.1 = w'.1 then h w.2 w'.2 else 0
 
 def pow4 (Λ : AddSubgroup (n → ℂ)) : AddSubgroup (Fin 4 × n → ℂ) where
   carrier := {z | ∀ a, slice a z ∈ Λ}

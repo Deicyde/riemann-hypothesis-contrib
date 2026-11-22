@@ -6,11 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem hermite_reduction_column {R : Type} [CommRing R] {n : ℕ} (b : Matrix (Fin n) (Fin n) R)
-    (r : Fin n → R → R) (hb : ∀ i j, j < i → b i j = 0) (hr : ∀ i y, b i i ∣ y - r i y)
-    (j : Fin n) (m : ℕ) :
-    ∃ x : Fin n → R, x j = 1 ∧ (∀ l, j < l → x l = 0) ∧
-      ∀ i : Fin n, i < j → (j : ℕ) ≤ i + m → ∃ y, b.mulVec x i = r i y := by
+theorem hermite_reduction_column
+    {R : Type} [CommRing R]
+    {n : ℕ} (b : Matrix (Fin n) (Fin n) R) (r : Fin n → R → R) (hb : ∀ i j, j < i → b i j = 0)
+    (hr : ∀ i y, b i i ∣ y - r i y) (j : Fin n)
+    (m : ℕ)
+    : ∃ x : Fin n → R,
+      x j = 1 ∧ (∀ l, j < l → x l = 0)
+        ∧ ∀ i : Fin n, i < j → (j : ℕ) ≤ i + m → ∃ y, b.mulVec x i = r i y := by
   induction m with
   | zero =>
     refine ⟨Pi.single j 1, by simp, fun l hl => by simp [hl.ne'], fun i hi hj => ?_⟩
@@ -41,11 +44,12 @@ theorem hermite_reduction_column {R : Type} [CommRing R] {n : ℕ} (b : Matrix (
       by_contra hc
       exact h ⟨i, by omega⟩
 
-theorem hermite_reduction_unipotent :
-    ∀ (R : Type) [CommRing R] (n : ℕ) (b : Matrix (Fin n) (Fin n) R) (r : Fin n → R → R),
-      (∀ i j, j < i → b i j = 0) → (∀ i y, b i i ∣ y - r i y) →
-      ∃ u : Matrix (Fin n) (Fin n) R, (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1) ∧
-        ∀ i j, i < j → ∃ y, (b * u) i j = r i y := by
+theorem hermite_reduction_unipotent
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (b : Matrix (Fin n) (Fin n) R) (r : Fin n → R → R),
+      (∀ i j, j < i → b i j = 0) → (∀ i y, b i i ∣ y - r i y)
+        → ∃ u : Matrix (Fin n) (Fin n) R,
+          (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1)
+            ∧ ∀ i j, i < j → ∃ y, (b * u) i j = r i y := by
   intro R _ n b r hb hr
   choose x hx1 hx0 hx using fun j : Fin n => hermite_reduction_column b r hb hr j n
   refine ⟨Matrix.of fun i j => x j i, fun i j h => hx0 j i h, fun i => hx1 i, fun i j h => ?_⟩

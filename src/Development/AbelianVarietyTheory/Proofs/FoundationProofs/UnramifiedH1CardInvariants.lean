@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisCocha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.UrCard
@@ -22,12 +24,19 @@ def affPairs (N : Type) [AddCommGroup N] : Subgroup (Equiv.Perm N × Equiv.Perm 
     rw [ha]
     simp
 
-theorem zhat_lift :
-    ∀ {D E E' : Type} [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [Group E] [Finite E] [Group E'] (I : Subgroup D) (φ : D),
-      (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤ →
-      (∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1) →
-      ∀ (q : E →* E') (w' : D →* E') (e : E), IsLocallyConstant w' → (∀ s ∈ I, w' s = 1) → q e = w' φ →
-      ∃ w : D →* E, IsLocallyConstant w ∧ (∀ s ∈ I, w s = 1) ∧ q.comp w = w' ∧ w φ = e ∧ ∀ g, w g ∈ Subgroup.zpowers e := by
+theorem zhat_lift
+    : ∀ {D E E' : Type} [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [Group E] [Finite E]
+        [Group E'] (I : Subgroup D) (φ : D),
+      (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤
+        → (∀ n : ℕ,
+          0 < n
+            → ∃ d : D →* Multiplicative (ZMod n),
+              IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+        → ∀ (q : E →* E') (w' : D →* E') (e : E),
+          IsLocallyConstant w' → (∀ s ∈ I, w' s = 1) → q e = w' φ
+            → ∃ w : D →* E,
+              IsLocallyConstant w ∧ (∀ s ∈ I, w s = 1) ∧ q.comp w = w' ∧ w φ = e
+                ∧ ∀ g, w g ∈ Subgroup.zpowers e := by
   intro D E E' _ _ _ _ _ _ I φ hcl hd q w' e hw' hI hq
   have hn : 0 < orderOf e := orderOf_pos e
   haveI : NeZero (orderOf e) := ⟨hn.ne'⟩
@@ -69,8 +78,9 @@ theorem zhat_lift :
   · intro g
     exact Subgroup.npow_mem_zpowers e _
 
-variable {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D]
-  [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
+variable
+  {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [AddCommGroup M]
+  [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
 
 def invI (ρ : Representation R D M) (I : Subgroup D) : Submodule R M where
   carrier := {m | ∀ s ∈ I, ρ s m = m}
@@ -81,21 +91,28 @@ def invI (ρ : Representation R D M) (I : Subgroup D) : Submodule R M where
 def vanI (ρ : Representation R D M) (I : Subgroup D) : Submodule R (D → M) where
   carrier := {y | y ∈ Z1 ρ ∧ ∀ s ∈ I, y s = 0}
   zero_mem' := ⟨(Z1 ρ).zero_mem, fun _ _ => rfl⟩
-  add_mem' := fun {a b} ha hb => ⟨(Z1 ρ).add_mem ha.1 hb.1, fun s hs => by simp [ha.2 s hs, hb.2 s hs]⟩
+  add_mem' := fun {a b} ha hb =>
+    ⟨(Z1 ρ).add_mem ha.1 hb.1, fun s hs => by simp [ha.2 s hs, hb.2 s hs]⟩
   smul_mem' := fun c a ha => ⟨(Z1 ρ).smul_mem c ha.1, fun s hs => by simp [ha.2 s hs]⟩
 
 end GlobalTheory.Ord2.UrCard
 
 namespace GlobalTheory.Ord2.UrCard
 
-variable {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D]
-  [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
+variable
+  {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [AddCommGroup M]
+  [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
 
-theorem card_vanI (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (hρ : ContAction ρ) (φ : D)
-    (hcl : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
-    (hd : ∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧
-      d φ = Multiplicative.ofAdd 1) :
-    Nat.card (vanI ρ I) = Nat.card (invI ρ I) := by
+theorem card_vanI
+    (ρ : Representation R D M)
+    (I : Subgroup D) [hI : I.Normal]
+    (hρ : ContAction ρ)
+    (φ : D) (hcl : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
+    (hd : ∀ n : ℕ,
+      0 < n
+        → ∃ d : D →* Multiplicative (ZMod n),
+          IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+    : Nat.card (vanI ρ I) = Nat.card (invI ρ I) := by
   set N : Submodule R M := invI ρ I with hNdef
   have hN : ∀ m, m ∈ N ↔ ∀ s ∈ I, ρ s m = m := fun m => Iff.rfl
   have hW : ∀ y, y ∈ vanI ρ I ↔ y ∈ Z1 ρ ∧ ∀ s ∈ I, y s = 0 := fun y => Iff.rfl
@@ -122,16 +139,17 @@ theorem card_vanI (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
     obtain ⟨⟨hcont, hc⟩, h0⟩ := (hW _).1 hmem
     set z := y.1 - y'.1 with hz
     have h1 : z 1 = 0 := h0 1 I.one_mem
-    let Z : Subgroup D :=
-      { carrier := {g | z g = 0}
-        one_mem' := h1
-        mul_mem' := fun {a b} ha hb => by
-          show z (a * b) = 0
-          rw [hc, show z a = 0 from ha, show z b = 0 from hb, map_zero, add_zero]
-        inv_mem' := fun {a} ha => by
-          have := hc a⁻¹ a
-          rw [inv_mul_cancel, h1, show z a = 0 from ha, map_zero, add_zero] at this
-          exact this.symm }
+    let Z : Subgroup D := {
+      carrier := {g | z g = 0}
+      one_mem' := h1
+      mul_mem' := fun {a b} ha hb => by
+        show z (a * b) = 0
+        rw [hc, show z a = 0 from ha, show z b = 0 from hb, map_zero, add_zero]
+      inv_mem' := fun {a} ha => by
+        have := hc a⁻¹ a
+        rw [inv_mul_cancel, h1, show z a = 0 from ha, map_zero, add_zero] at this
+        exact this.symm
+    }
     have hZ : IsClosed (Z : Set D) := isClosed_eq hcont continuous_const
     have hle : I ⊔ Subgroup.zpowers φ ≤ Z := sup_le h0 (by rw [Subgroup.zpowers_le]; exact hyφ)
     have := Subgroup.topologicalClosure_minimal _ hle hZ
@@ -146,23 +164,25 @@ theorem card_vanI (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
     rw [hN]
     intro s hs
     have h := (hN m).1 m.2 _ (hI.conj_mem' s hs g)
-    calc ρ s (ρ g m) = ρ g (ρ (g⁻¹ * s * g) m) := by
-          rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
-          congr 2
-          group
+    calc
+      ρ s (ρ g m) = ρ g (ρ (g⁻¹ * s * g) m) := by
+        rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
+        congr 2
+        group
       _ = ρ g m := by rw [h]
-  let a0 : D →* Function.End N :=
-    { toFun := fun g m => ⟨ρ g m, hst g m⟩
-      map_one' := by
-        funext m
-        apply Subtype.ext
-        show ρ 1 m = m
-        simp
-      map_mul' := fun g h => by
-        funext m
-        apply Subtype.ext
-        show ρ (g * h) m = ρ g (ρ h m)
-        simp }
+  let a0 : D →* Function.End N := {
+    toFun := fun g m => ⟨ρ g m, hst g m⟩
+    map_one' := by
+      funext m
+      apply Subtype.ext
+      show ρ 1 m = m
+      simp
+    map_mul' := fun g h => by
+      funext m
+      apply Subtype.ext
+      show ρ (g * h) m = ρ g (ρ h m)
+      simp
+  }
   let a : D →* Equiv.Perm N := a0.toHomPerm
   have ha : ∀ g m, (a g m : M) = ρ g m := fun _ _ => rfl
   have hal : IsLocallyConstant a := by
@@ -179,8 +199,9 @@ theorem card_vanI (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
     exact (hN m).1 m.2 s hs
   have hsurj : Function.Surjective ev := by
     intro m
-    obtain ⟨w, hwl, hwI, hq, hwφ, hw⟩ := zhat_lift I φ hcl hd (MonoidHom.fst _ (Equiv.Perm N)) a
-      (a φ, Equiv.addRight m * a φ) hal haI rfl
+    obtain ⟨w, hwl, hwI, hq, hwφ, hw⟩ :=
+      zhat_lift I φ hcl hd (MonoidHom.fst _ (Equiv.Perm N)) a (a φ, Equiv.addRight m * a φ) hal haI
+        rfl
     have hP : ∀ g, w g ∈ affPairs N := by
       intro g
       refine (Subgroup.zpowers_le.2 ?_ : _ ≤ affPairs N) (hw g)
@@ -211,14 +232,20 @@ end GlobalTheory.Ord2.UrCard
 
 namespace GlobalTheory.Ord2.UrCard
 
-variable {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D]
-  [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
+variable
+  {R D M : Type} [CommRing R] [Group D] [TopologicalSpace D] [IsTopologicalGroup D] [AddCommGroup M]
+  [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
 
-theorem card_H1ur (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (hρ : ContAction ρ) (φ : D)
-    (hcl : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
-    (hd : ∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧
-      d φ = Multiplicative.ofAdd 1) :
-    Nat.card (H1ur ρ I) = Nat.card (H0 ρ) := by
+theorem card_H1ur
+    (ρ : Representation R D M)
+    (I : Subgroup D) [hI : I.Normal]
+    (hρ : ContAction ρ)
+    (φ : D) (hcl : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
+    (hd : ∀ n : ℕ,
+      0 < n
+        → ∃ d : D →* Multiplicative (ZMod n),
+          IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+    : Nat.card (H1ur ρ I) = Nat.card (H0 ρ) := by
   have hVZ : vanI ρ I ≤ Z1 ρ := fun y hy => hy.1
   have hBZ : B1 ρ ≤ Z1 ρ := coboundaries_le_cocycles ρ hρ
   set Q := (B1 ρ).comap (Z1 ρ).subtype with hQ
@@ -263,7 +290,8 @@ theorem card_H1ur (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
     rfl
   have hgm : ∀ m : invI ρ I, d0 ρ m.1 ∈ vanI ρ I := fun m =>
     ⟨hBZ ⟨m.1, rfl⟩, fun s hs => by simp [amitsur_d0_apply, m.2 s hs]⟩
-  let g : invI ρ I →ₗ[R] vanI ρ I := LinearMap.codRestrict (vanI ρ I) ((d0 ρ) ∘ₗ (invI ρ I).subtype) hgm
+  let g : invI ρ I →ₗ[R] vanI ρ I :=
+    LinearMap.codRestrict (vanI ρ I) ((d0 ρ) ∘ₗ (invI ρ I).subtype) hgm
   have hrange : LinearMap.range g = LinearMap.ker f := by
     ext y
     rw [hker, LinearMap.mem_range]
@@ -280,11 +308,12 @@ theorem card_H1ur (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
       refine ⟨⟨m, hmI⟩, Subtype.ext (funext fun s => ?_)⟩
       exact (hm s).symm
   have hkg : Nat.card (LinearMap.ker g) = Nat.card (H0 ρ) := by
-    refine Nat.card_congr
-      { toFun := fun m => ⟨m.1.1, fun s => ?_⟩
-        invFun := fun m => ⟨⟨m.1, fun s _ => m.2 s⟩, ?_⟩
-        left_inv := fun m => rfl
-        right_inv := fun m => rfl }
+    refine Nat.card_congr {
+      toFun := fun m => ⟨m.1.1, fun s => ?_⟩
+      invFun := fun m => ⟨⟨m.1, fun s _ => m.2 s⟩, ?_⟩
+      left_inv := fun m => rfl
+      right_inv := fun m => rfl
+    }
     · have h := congrArg (fun y : vanI ρ I => y.1 s) (LinearMap.mem_ker.1 m.2)
       have h' : ρ s m.1.1 - m.1.1 = 0 := h
       exact sub_eq_zero.1 h'
@@ -297,7 +326,8 @@ theorem card_H1ur (ρ : Representation R D M) (I : Subgroup D) [hI : I.Normal] (
   rw [Nat.card_congr (f.quotKerEquivOfSurjective hfs).toEquiv] at e1
   have e2 := (LinearMap.ker g).card_eq_card_quotient_mul_card
   rw [Nat.card_congr (g.quotKerEquivRange).toEquiv, hkg,
-    Nat.card_congr (LinearEquiv.ofEq _ _ hrange).toEquiv] at e2
+      Nat.card_congr (LinearEquiv.ofEq _ _ hrange).toEquiv]
+    at e2
   have e3 := card_vanI ρ I hρ φ hcl hd
   have hpos : Nat.card (invI ρ I) ≠ 0 := Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   rw [e1, e2] at e3
@@ -310,7 +340,14 @@ end GlobalTheory.Ord2.UrCard
 
 namespace GlobalTheory.Ord2.UrCard
 
-theorem card_unramified_h1_eq_card_h0 : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (r : ℕ) (M : Type) [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (ρ : Representation (ZMod (l ^ r)) (Dec (F := F) A) M) (hρ : ContAction ρ), IsPlaceOver A v → Nat.card (H1ur ρ ((Ine (F := F) A).subgroupOf (Dec (F := F) A))) = Nat.card (H0 ρ) := by
+theorem card_unramified_h1_eq_card_h0
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (r : ℕ) (M : Type) [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M]
+        [TopologicalSpace M] [DiscreteTopology M] (A : ValuationSubring Ω)
+        (v : HeightOneSpectrum (𝓞 F)) (ρ : Representation (ZMod (l ^ r)) (Dec (F := F) A) M)
+        (hρ : ContAction ρ),
+      IsPlaceOver A v
+        → Nat.card (H1ur ρ ((Ine (F := F) A).subgroupOf (Dec (F := F) A))) = Nat.card (H0 ρ) := by
   intro F Ω _ _ _ _ _ l _ r M _ _ _ _ _ A v ρ hρ hv
   obtain ⟨φ, -, hcl, hd⟩ := UpperTheory.V.GC.decZhat F Ω v A hv
   exact card_H1ur ρ _ hρ φ hcl hd

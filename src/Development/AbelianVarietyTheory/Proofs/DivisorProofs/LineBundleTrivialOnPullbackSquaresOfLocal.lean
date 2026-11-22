@@ -12,13 +12,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc GlobalTheory.TrivLocus
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.TrivLocus
 
-theorem trivCond_of_local : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (N : LB A.left), IsAbelianScheme A → N.IsLB → Out.Rigidified A N → ∀ (T : Scheme.{0}) (t : T ⟶ S), (∀ τ : T, ∃ V : T.Opens, τ ∈ V ∧ TrivCond A N V (V.ι ≫ t)) → TrivCond A N T t := by
+theorem trivCond_of_local
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (N : LB A.left),
+      IsAbelianScheme A → N.IsLB → Out.Rigidified A N
+        → ∀ (T : Scheme.{0}) (t : T ⟶ S),
+          (∀ τ : T, ∃ V : T.Opens, τ ∈ V ∧ TrivCond A N V (V.ι ≫ t)) → TrivCond A N T t := by
   intro S A _ N hA hN hR T t hloc Y φ y hY
   haveI := hA.comm
   letI : GrpObj ((Over.pullback t).obj A) := Functor.grpObjObj
@@ -30,9 +35,12 @@ theorem trivCond_of_local : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (N : LB
     ((isGrpPullback_of_iso e).comp (isGrpPullback_pullback A t)).congr (Category.id_comp _)
       (by simp [e])
   have hA' : IsAbelianScheme (Over.mk y) := by
-    refine ⟨?_, MorphismProperty.of_isPullback (P := @Smooth) hP.1 hA.smooth,
+    refine ⟨
+      ?_,
+      MorphismProperty.of_isPullback (P := @Smooth) hP.1 hA.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) hP.1 hA.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) hP.1 hA.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) hP.1 hA.geomConnected
+    ⟩
     rw [isCommMonObj_iff_isMulCommutative]
     intro U
     refine ⟨⟨fun x z => Over.OverMorphism.ext (hP.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
@@ -43,7 +51,8 @@ theorem trivCond_of_local : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (N : LB
   have he : eSec (Over.mk y) ≫ φ = t ≫ eSec A := (cubeMapOf hP).e_comm
   have g := rigPullOf_isGen (G' := Over.mk y) (G := A) φ t he N r hr
   have hR' : Out.Rigidified (Over.mk y) (N.pull φ) := ⟨_, g⟩
-  refine GlobalTheory.T.exists_generator_rigidified_locally_trivial T (Over.mk y) (N.pull φ) hA' (pull_isLB hN φ) hR' (fun τ => ?_)
+  refine GlobalTheory.T.exists_generator_rigidified_locally_trivial T (Over.mk y) (N.pull φ) hA'
+    (pull_isLB hN φ) hR' (fun τ => ?_)
   obtain ⟨V, hτ, hV⟩ := hloc τ
   refine ⟨V, hτ, ?_⟩
   have H : IsPullback ((y ⁻¹ᵁ V).ι ≫ φ) (y ∣_ V) A.hom (V.ι ≫ t) :=

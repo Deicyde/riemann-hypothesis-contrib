@@ -24,8 +24,7 @@ theorem ext (n : ℕ) : EXTStatement n := by
     exact (hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun z => by positivity)).2 hL
   exact C.ext n (Metric.ball c r) F u Metric.isOpen_ball hF hu hint
 
-theorem extNull (n : ℕ) : EXTNullStatement n :=
-  fun c r F hF h => C.extNull n c r F hF h
+theorem extNull (n : ℕ) : EXTNullStatement n := fun c r F hF h => C.extNull n c r F hF h
 
 theorem mv (n : ℕ) : MVStatement n := by
   intro R u ρ hu hρ hR
@@ -42,8 +41,8 @@ theorem mv (n : ℕ) : MVStatement n := by
     intro y hy
     by_contra hb
     exact hy (hz y hb)
-  have e2 : ∫⁻ y in Metric.ball (0 : V n) R, ‖u y‖ₑ ^ 2 * ρ ‖y‖ =
-      ∫⁻ y : V n, ‖u y‖ₑ ^ 2 * ρ ‖y‖ := by
+  have e2
+      : ∫⁻ y in Metric.ball (0 : V n) R, ‖u y‖ₑ ^ 2 * ρ ‖y‖ = ∫⁻ y : V n, ‖u y‖ₑ ^ 2 * ρ ‖y‖ := by
     apply setLIntegral_eq_of_support_subset
     intro y hy
     by_contra hb
@@ -69,14 +68,16 @@ theorem mvInt (n : ℕ) : MVIntStatement n := by
     simp only [Set.mem_singleton_iff] at hz
     subst hz
     simp
-  have hae : ∀ᵐ z ∂(volume.restrict (Metric.ball (0 : V n) 1)),
-      ENNReal.ofReal ‖z‖ ^ (-2 * s) = ENNReal.ofReal (‖z‖ ^ (-2 * s)) := by
+  have hae
+      : ∀ᵐ z ∂(volume.restrict (Metric.ball (0 : V n) 1)),
+        ENNReal.ofReal ‖z‖ ^ (-2 * s) = ENNReal.ofReal (‖z‖ ^ (-2 * s)) := by
     refine ae_restrict_of_ae ?_
     filter_upwards [compl_mem_ae_iff.2 h0] with z hz
     have hz' : z ≠ 0 := by simpa using hz
     exact ENNReal.ofReal_rpow_of_pos (norm_pos_iff.2 hz')
   rw [lintegral_congr_ae hae]
-  have hm : AEStronglyMeasurable (fun z : V n => ‖z‖ ^ (-2 * s))
+  have hm : AEStronglyMeasurable
+      (fun z : V n => ‖z‖ ^ (-2 * s))
       (volume.restrict (Metric.ball (0 : V n) 1)) :=
     (continuous_norm.measurable.pow_const _).aestronglyMeasurable
   have hnn : 0 ≤ᵐ[volume.restrict (Metric.ball (0 : V n) 1)] fun z : V n => ‖z‖ ^ (-2 * s) :=

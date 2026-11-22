@@ -6,13 +6,17 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.PendOf GlobalTheory.LevelType
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.PendOf GlobalTheory.LevelType
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.LevelType
 
-theorem reix_eq_conj (R : Type) [CommRing R] {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
-    (φ φ' : m ≃ n) : ∃ w : GL n R, ∀ g : GL m R, reix R φ g * w = w * reix R φ' g := by
+theorem reix_eq_conj
+    (R : Type) [CommRing R]
+    {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (φ φ' : m ≃ n)
+    : ∃ w : GL n R, ∀ g : GL m R, reix R φ g * w = w * reix R φ' g := by
   let e : n ≃ n := φ'.symm.trans φ
   have h1 : ((e.symm.toPEquiv.toMatrix : Matrix n n R) * e.toPEquiv.toMatrix) = 1 := by
     rw [← PEquiv.toMatrix_trans, ← Equiv.toPEquiv_trans, Equiv.symm_trans_self, Equiv.toPEquiv_refl,
@@ -30,9 +34,14 @@ theorem reix_eq_conj (R : Type) [CommRing R] {m n : Type} [Fintype m] [Decidable
   apply Units.ext
   rw [Units.val_mul, key, mul_assoc, Units.inv_mul, mul_one, Units.val_mul]
 
-theorem subquotient_reix (R : Type) [CommRing R] (m n : Type) [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
-    (φ φ' : m ≃ n) (V : Type) [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ (GL n R) V) :
-    IsSubquotient (σ.comp (reix R φ) : Representation ℂ (GL m R) V) (σ.comp (reix R φ') : Representation ℂ (GL m R) V) := by
+theorem subquotient_reix
+    (R : Type) [CommRing R]
+    (m n : Type) [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
+    (φ φ' : m ≃ n)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (σ : Representation ℂ (GL n R) V)
+    : IsSubquotient (σ.comp (reix R φ) : Representation ℂ (GL m R) V)
+      (σ.comp (reix R φ') : Representation ℂ (GL m R) V) := by
   obtain ⟨w, hw⟩ := reix_eq_conj R φ φ'
   refine IsSubquotient.of_surjective ⟨σ w, fun g => ?_⟩ fun v => ⟨σ w⁻¹ v, ?_⟩
   · change σ w * σ (reix R φ' g) = σ (reix R φ g) * σ w

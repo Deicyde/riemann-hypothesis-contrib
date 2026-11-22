@@ -11,7 +11,9 @@ namespace PIW.HCFdeg
 
 open PI.UpqRep
 
-theorem formal_degree_of_schur_unimodular (hSchur : StSchur) (hBdd : StBdd) (hOrthOf : StOrthOf) (hUni : StUnimod) : StableSubspaceMobius :=
+theorem formal_degree_of_schur_unimodular
+    (hSchur : StSchur) (hBdd : StBdd) (hOrthOf : StOrthOf) (hUni : StUnimod)
+    : StableSubspaceMobius :=
   formal_degree_orthogonality (hOrthOf hSchur hBdd) hUni
 
 end PIW.HCFdeg

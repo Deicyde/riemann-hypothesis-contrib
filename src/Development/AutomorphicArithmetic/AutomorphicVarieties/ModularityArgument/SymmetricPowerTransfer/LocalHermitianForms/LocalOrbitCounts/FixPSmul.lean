@@ -29,27 +29,35 @@ private theorem cmb_ex {s : K} (hs : s ≠ 0) (x : EL Δ τ) : ∃ a b, x = cmb 
 private theorem cmb_zero (s : K) (a : Etau K τ) : cmb Δ s a 0 = ofE Δ a := by
   ext <;> simp [cmb, ofE]
 
-private theorem cmb_inj {s : K} {a a' b b' : Etau K τ} (h : cmb Δ s a b = cmb Δ s a' b') : a = a' := by
+private theorem cmb_inj {s : K} {a a' b b' : Etau K τ} (h : cmb Δ s a b = cmb Δ s a' b')
+    : a = a' := by
   have h1 := congrArg (fun x : EL Δ τ => x.re.re) h
   have h2 := congrArg (fun x : EL Δ τ => x.im.re) h
   exact QuadraticAlgebra.ext h1 h2
 
-private theorem ofE_cmb (s : K) (v a b : Etau K τ) : ofE Δ v * cmb Δ s a b = cmb Δ s (v * a) (v * b) := by
+private theorem ofE_cmb (s : K) (v a b : Etau K τ)
+    : ofE Δ v * cmb Δ s a b = cmb Δ s (v * a) (v * b) := by
   ext <;> simp [cmb, ofE] <;> ring
 
-private theorem herm_cmb (c s t : K) (x y : Lsq K Δ) (a b a' b' : Etau K τ) :
-    herm c ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (x, cmb Δ s a b) (y, cmb Δ s a' b') =
-      c • (x * star y) + ⟨Δ * s ^ 2 * (t * (τ ^ 2 - 4) * (b * star a').im - t * (τ ^ 2 - 4) * (a * star b').im),
-        s * (t * (τ ^ 2 - 4) * (a * star a').im - Δ * s ^ 2 * (t * (τ ^ 2 - 4) * (b * star b').im))⟩ := by
+private theorem herm_cmb (c s t : K) (x y : Lsq K Δ) (a b a' b' : Etau K τ)
+    : herm c ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (x, cmb Δ s a b)
+        (y, cmb Δ s a' b')
+      = c • (x * star y) + ⟨
+        Δ * s ^ 2 * (t * (τ ^ 2 - 4) * (b * star a').im - t * (τ ^ 2 - 4) * (a * star b').im),
+        s * (t * (τ ^ 2 - 4) * (a * star a').im - Δ * s ^ 2 * (t * (τ ^ 2 - 4) * (b * star b').im))
+      ⟩ := by
   ext <;> simp [herm, cmb, ofE, sigL, QuadraticAlgebra.trace, Algebra.smul_def] <;> ring
 
-private theorem semi_cmb (s p q : K) (v a b : Etau K τ) (x : Lsq K Δ) :
-    semi ((⟨p, s * q⟩ : Lsq K Δ) • ofE Δ v) (x, cmb Δ s a b) =
-      (star x, cmb Δ s (p • (v * a) - (Δ * s ^ 2 * q) • (v * b)) (q • (v * a) - p • (v * b))) := by
+private theorem semi_cmb (s p q : K) (v a b : Etau K τ) (x : Lsq K Δ)
+    : semi ((⟨p, s * q⟩ : Lsq K Δ) • ofE Δ v) (x, cmb Δ s a b)
+      = (
+        star x,
+        cmb Δ s (p • (v * a) - (Δ * s ^ 2 * q) • (v * b)) (q • (v * a) - p • (v * b))
+      ) := by
   ext <;> simp [cmb, ofE, semi, sigL] <;> ring
 
-private theorem phi_act (g s : K) (S : Set (Etau K τ)) (z : (Etau K τ)ˣ) :
-    tor Δ z '' Phi O Δ g s S = Phi O Δ g s ((quo z * ·) '' S) := by
+private theorem phi_act (g s : K) (S : Set (Etau K τ)) (z : (Etau K τ)ˣ)
+    : tor Δ z '' Phi O Δ g s S = Phi O Δ g s ((quo z * ·) '' S) := by
   ext x
   constructor
   · rintro ⟨y, ⟨hy1, a, ha, b, hb, hy2⟩, rfl⟩
@@ -59,8 +67,11 @@ private theorem phi_act (g s : K) (S : Set (Etau K τ)) (z : (Etau K τ)ˣ) :
     refine ⟨(x.1, cmb Δ s a b), ⟨hx1, a, ha, b, hb, rfl⟩, ?_⟩
     simp only [tor, ofE_cmb, ← hx2]
 
-private theorem semi_inv {u : Etau K τ} (hu : QuadraticAlgebra.norm u = 1) {ν : Lsq K Δ} (hν : QuadraticAlgebra.norm ν = -1)
-    (x : Sp Δ τ) : semi (ν • ofE Δ u) (semi ((-ν) • ofE Δ (star u)) x) = x := by
+private theorem semi_inv
+    {u : Etau K τ} (hu : QuadraticAlgebra.norm u = 1)
+    {ν : Lsq K Δ} (hν : QuadraticAlgebra.norm ν = -1)
+    (x : Sp Δ τ)
+    : semi (ν • ofE Δ u) (semi ((-ν) • ofE Δ (star u)) x) = x := by
   obtain ⟨x1, x2⟩ := x
   have hν2 : ν.re ^ 2 - Δ * ν.im ^ 2 = -1 := by
     simp [QuadraticAlgebra.norm] at hν
@@ -69,15 +80,19 @@ private theorem semi_inv {u : Etau K τ} (hu : QuadraticAlgebra.norm u = 1) {ν 
     simp [QuadraticAlgebra.norm] at hu
     linear_combination hu
   ext <;> simp [semi, ofE, sigL, Algebra.smul_def] <;> ring_nf
-  all_goals first
+  all_goals
+    first
     | linear_combination (-(u.re ^ 2 + τ * u.re * u.im + u.im ^ 2) * x2.re.re) * hν2 + x2.re.re * hu2
     | linear_combination (-(u.re ^ 2 + τ * u.re * u.im + u.im ^ 2) * x2.re.im) * hν2 + x2.re.im * hu2
     | linear_combination (-(u.re ^ 2 + τ * u.re * u.im + u.im ^ 2) * x2.im.re) * hν2 + x2.im.re * hu2
     | linear_combination (-(u.re ^ 2 + τ * u.re * u.im + u.im ^ 2) * x2.im.im) * hν2 + x2.im.im * hu2
 
-private theorem isDat_M {c s t : K} (hτ : τ ^ 2 - 4 ≠ 0) (hc : c ≠ 0) (hs : Δ * s ^ 2 ≠ 0) (ht : t ≠ 0) {u : Etau K τ} (hu2 : u ^ 2 = -ω)
-    (hu : QuadraticAlgebra.norm u = 1) {ν : Lsq K Δ} (hν : QuadraticAlgebra.norm ν = -1) :
-    IsDat c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) := by
+private theorem isDat_M
+    {c s t : K}
+    (hτ : τ ^ 2 - 4 ≠ 0) (hc : c ≠ 0) (hs : Δ * s ^ 2 ≠ 0) (ht : t ≠ 0)
+    {u : Etau K τ} (hu2 : u ^ 2 = -ω) (hu : QuadraticAlgebra.norm u = 1)
+    {ν : Lsq K Δ} (hν : QuadraticAlgebra.norm ν = -1)
+    : IsDat c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) := by
   have e1 := congrArg QuadraticAlgebra.re hu2
   have e2 := congrArg QuadraticAlgebra.im hu2
   simp [pow_two] at e1 e2
@@ -88,12 +103,15 @@ private theorem isDat_M {c s t : K} (hτ : τ ^ 2 - 4 ≠ 0) (hc : c ≠ 0) (hs 
     ext <;> simp [sigL, ofE]
     · linear_combination (u.re * u.re + τ * u.re * u.im + u.im * u.im) * hν - hu
     all_goals ring
-  have hsm : sigL ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) =
-      -((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) := by
+  have hsm
+      : sigL ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))
+        = -((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) := by
     ext <;> simp [sigL, ofE] <;> ring
-  have hmm : ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) *
-      ((algebraMap K (Lsq K Δ) (t ^ 2 * (Δ * s ^ 2) * (τ ^ 2 - 4))⁻¹) •
-        ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))) = 1 := by
+  have hmm
+      : ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))
+          * ((algebraMap K (Lsq K Δ) (t ^ 2 * (Δ * s ^ 2) * (τ ^ 2 - 4))⁻¹)
+            • ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)))
+        = 1 := by
     ext <;> simp [ofE]
     · field_simp
       ring
@@ -108,8 +126,11 @@ private theorem isDat_M {c s t : K} (hτ : τ ^ 2 - 4 ≠ 0) (hc : c ≠ 0) (hs 
   · rw [hsm, mul_assoc, hdd]
     simp
 
-private theorem fixP_smul {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S) {k : K} (hk : k ∈ (algebraMap O K).range)
-    {a : Etau K τ} (ha : a ∈ S) : k • a ∈ S := by
+private theorem fixP_smul
+    {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S)
+    {k : K} (hk : k ∈ (algebraMap O K).range)
+    {a : Etau K τ} (ha : a ∈ S)
+    : k • a ∈ S := by
   obtain ⟨o, rfl⟩ := hk
   rw [h.dual] at ha ⊢
   intro x hx
@@ -121,8 +142,9 @@ private theorem fixP_smul {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S) {k
   rw [map_mul, hr, e]
   ring
 
-private theorem fixP_sub {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S)
-    {a b : Etau K τ} (ha : a ∈ S) (hb : b ∈ S) : a - b ∈ S := by
+private theorem fixP_sub
+    {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S) {a b : Etau K τ} (ha : a ∈ S) (hb : b ∈ S)
+    : a - b ∈ S := by
   rw [h.dual] at ha hb ⊢
   intro x hx
   obtain ⟨r, hr⟩ := ha x hx
@@ -134,26 +156,32 @@ private theorem fixP_sub {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S)
   rw [map_sub, hr, hr', e]
   ring
 
-private theorem fixP_zero {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S) : (0 : Etau K τ) ∈ S := by
+private theorem fixP_zero {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S)
+    : (0 : Etau K τ) ∈ S := by
   rw [h.dual]
   intro x _
   exact ⟨0, by simp⟩
 
-private theorem fixP_mul {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S) {v : Etau K τ} (h1 : v.re ∈ (algebraMap O K).range)
-    (h2 : v.im ∈ (algebraMap O K).range) {a : Etau K τ} (ha : a ∈ S) : v * a ∈ S := by
+private theorem fixP_mul
+    {T : K} {S : Set (Etau K τ)} (h : IsFixP O τ T S)
+    {v : Etau K τ} (h1 : v.re ∈ (algebraMap O K).range) (h2 : v.im ∈ (algebraMap O K).range)
+    {a : Etau K τ} (ha : a ∈ S)
+    : v * a ∈ S := by
   have add : ∀ {p q : Etau K τ}, p ∈ S → q ∈ S → p + q ∈ S := by
     intro p q hp hq
     have := fixP_sub h hp (fixP_sub h (fixP_zero h) hq)
     simpa using this
-  have e : v * a = v.re • a + v.im • (ω * a) := by
-    ext <;> simp <;> ring
+  have e : v * a = v.re • a + v.im • (ω * a) := by ext <;> simp <;> ring
   rw [e]
   exact add (fixP_smul h h1 ha) (fixP_smul h h2 (h.stab a ha))
 
-private theorem phi_inj {g s T T' : K} {S S' : Set (Etau K τ)} (h : IsFixP O τ T S) (h' : IsFixP O τ T' S')
-    (e : Phi O Δ g s S = Phi O Δ g s S') : S = S' := by
-  have key : ∀ {A B : Set (Etau K τ)} {TA TB : K}, IsFixP O τ TA A → IsFixP O τ TB B →
-      Phi O Δ g s A = Phi O Δ g s B → A ⊆ B := by
+private theorem phi_inj
+    {g s T T' : K} {S S' : Set (Etau K τ)}
+    (h : IsFixP O τ T S) (h' : IsFixP O τ T' S') (e : Phi O Δ g s S = Phi O Δ g s S')
+    : S = S' := by
+  have key
+      : ∀ {A B : Set (Etau K τ)} {TA TB : K},
+        IsFixP O τ TA A → IsFixP O τ TB B → Phi O Δ g s A = Phi O Δ g s B → A ⊆ B := by
     intro A B TA TB hA hB e a ha
     have hmem : ((0 : Lsq K Δ), cmb Δ s a 0) ∈ Phi O Δ g s A :=
       ⟨by simp [IsInt, isIntegral_zero], a, ha, 0, fixP_zero hA, rfl⟩
@@ -165,8 +193,10 @@ private theorem phi_inj {g s T T' : K} {S S' : Set (Etau K τ)} (h : IsFixP O τ
 
 variable [IsDomain O] [IsDiscreteValuationRing O]
 
-private theorem u_int (L : IsLoc O Δ) (h2 : ∃ u : Oˣ, algebraMap O K u = 2 - τ) {u : Etau K τ} (hu2 : u ^ 2 = -ω)
-    (hu : QuadraticAlgebra.norm u = 1) : u.re ∈ (algebraMap O K).range ∧ u.im ∈ (algebraMap O K).range := by
+private theorem u_int
+    (L : IsLoc O Δ) (h2 : ∃ u : Oˣ, algebraMap O K u = 2 - τ)
+    {u : Etau K τ} (hu2 : u ^ 2 = -ω) (hu : QuadraticAlgebra.norm u = 1)
+    : u.re ∈ (algebraMap O K).range ∧ u.im ∈ (algebraMap O K).range := by
   haveI := L.frac
   have e1 := congrArg QuadraticAlgebra.re hu2
   have e2 := congrArg QuadraticAlgebra.im hu2
@@ -200,9 +230,13 @@ private theorem u_int (L : IsLoc O Δ) (h2 : ∃ u : Oˣ, algebraMap O K u = 2 -
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := O) (K := K)).1 hint
   exact ⟨⟨-y, by rw [map_neg, hy, hre]⟩, ⟨y, hy⟩⟩
 
-private theorem phi_semi (L : IsLoc O Δ) {g s T : K} {ε : Oˣ} (hs : Δ * s ^ 2 = algebraMap O K ε) {S : Set (Etau K τ)}
-    (h : IsFixP O τ T S) {v : Etau K τ} (h1 : v.re ∈ (algebraMap O K).range) (h2 : v.im ∈ (algebraMap O K).range)
-    {ν : Lsq K Δ} (hν : IsInt O ν) : ∀ x ∈ Phi O Δ g s S, semi (ν • ofE Δ v) x ∈ Phi O Δ g s S := by
+private theorem phi_semi
+    (L : IsLoc O Δ)
+    {g s T : K} {ε : Oˣ} (hs : Δ * s ^ 2 = algebraMap O K ε)
+    {S : Set (Etau K τ)} (h : IsFixP O τ T S)
+    {v : Etau K τ} (h1 : v.re ∈ (algebraMap O K).range) (h2 : v.im ∈ (algebraMap O K).range)
+    {ν : Lsq K Δ} (hν : IsInt O ν)
+    : ∀ x ∈ Phi O Δ g s S, semi (ν • ofE Δ v) x ∈ Phi O Δ g s S := by
   rintro ⟨x1, x2⟩ ⟨hx1, a, ha, b, hb, hx2⟩
   obtain ⟨hp, q, hq⟩ := ((descent O K Δ L s ε hs ν).1).1 hν
   have hνe : ν = ⟨ν.re, s * algebraMap O K q⟩ := by
@@ -217,27 +251,35 @@ private theorem phi_semi (L : IsLoc O Δ) {g s T : K} {ε : Oˣ} (hs : Δ * s ^ 
   have hq' : algebraMap O K q ∈ (algebraMap O K).range := ⟨q, rfl⟩
   have hD : Δ * s ^ 2 * algebraMap O K q ∈ (algebraMap O K).range := ⟨ε * q, by rw [map_mul, hs]⟩
   simp only [Phi, Set.mem_setOf_eq]
-  refine ⟨?_, _, fixP_sub h (fixP_smul h hp hva) (fixP_smul h hD hvb), _,
-    fixP_sub h (fixP_smul h hq' hva) (fixP_smul h hp hvb), rfl⟩
+  refine ⟨
+    ?_,
+    _,
+    fixP_sub h (fixP_smul h hp hva) (fixP_smul h hD hvb),
+    _,
+    fixP_sub h (fixP_smul h hq' hva) (fixP_smul h hp hvb),
+    rfl
+  ⟩
   have hst := (descent O K Δ L s ε hs (g • x1)).2 hx1
-  have e : star (g • x1) = g • star x1 := by
-    ext <;> simp
+  have e : star (g • x1) = g • star x1 := by ext <;> simp
   rw [e] at hst
   exact hst
 
-private theorem cmb_add' (s : K) (a b a' b' : Etau K τ) :
-    cmb Δ s a b + cmb Δ s a' b' = cmb Δ s (a + a') (b + b') := by
+private theorem cmb_add' (s : K) (a b a' b' : Etau K τ)
+    : cmb Δ s a b + cmb Δ s a' b' = cmb Δ s (a + a') (b + b') := by
   ext <;> simp [cmb] <;> ring
 
-private theorem smul_cmb (r : O) (s : K) (a b : Etau K τ) :
-    r • cmb Δ s a b = cmb Δ s (r • a) (r • b) := by
+private theorem smul_cmb (r : O) (s : K) (a b : Etau K τ)
+    : r • cmb Δ s a b = cmb Δ s (r • a) (r • b) := by
   ext <;> simp [cmb] <;> simp only [Algebra.smul_def] <;> ring
 
-private theorem cmb_zero' (s : K) : cmb Δ s (0 : Etau K τ) 0 = 0 := by
-  ext <;> simp [cmb]
+private theorem cmb_zero' (s : K) : cmb Δ s (0 : Etau K τ) 0 = 0 := by ext <;> simp [cmb]
 
-private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (hs : Δ * s ^ 2 = algebraMap O K ε) {S : Set (Etau K τ)}
-    (h : IsFixP O τ T S) : ∃ F : Finset (Sp Δ τ), Phi O Δ g s S = Submodule.span O (F : Set (Sp Δ τ)) := by
+private theorem phi_fg
+    (L : IsLoc O Δ)
+    {g s T : K} (hg : g ≠ 0)
+    {ε : Oˣ} (hs : Δ * s ^ 2 = algebraMap O K ε)
+    {S : Set (Etau K τ)} (h : IsFixP O τ T S)
+    : ∃ F : Finset (Sp Δ τ), Phi O Δ g s S = Submodule.span O (F : Set (Sp Δ τ)) := by
   classical
   obtain ⟨F0, hF0⟩ := h.fg
   have hmS : ∀ {a : Etau K τ}, a ∈ S ↔ a ∈ Submodule.span O (F0 : Set (Etau K τ)) := by
@@ -248,47 +290,55 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
     rintro rfl
     have hne : (algebraMap O K ε : K) ≠ 0 := (ε.isUnit.map (algebraMap O K)).ne_zero
     exact hne (by simpa using hs.symm)
-  let P : Submodule O (Sp Δ τ) :=
-    { carrier := Phi O Δ g s S
-      add_mem' := by
-        rintro x y ⟨hx1, a, ha, b, hb, hx2⟩ ⟨hy1, a', ha', b', hb', hy2⟩
-        refine ⟨?_, a + a', ?_, b + b', ?_, ?_⟩
-        · show IsIntegral O (g • (x.1 + y.1))
-          rw [smul_add]
-          exact IsIntegral.add hx1 hy1
-        · exact hmS.2 (add_mem (hmS.1 ha) (hmS.1 ha'))
-        · exact hmS.2 (add_mem (hmS.1 hb) (hmS.1 hb'))
-        · show x.2 + y.2 = _
-          rw [hx2, hy2, cmb_add']
-      zero_mem' := by
-        refine ⟨?_, 0, hmS.2 (zero_mem _), 0, hmS.2 (zero_mem _), ?_⟩
-        · show IsIntegral O (g • (0 : Lsq K Δ))
-          rw [smul_zero]
-          exact isIntegral_zero
-        · show (0 : EL Δ τ) = _
-          rw [cmb_zero']
-      smul_mem' := by
-        rintro r x ⟨hx1, a, ha, b, hb, hx2⟩
-        refine ⟨?_, r • a, hmS.2 (Submodule.smul_mem _ r (hmS.1 ha)), r • b,
-          hmS.2 (Submodule.smul_mem _ r (hmS.1 hb)), ?_⟩
-        · show IsIntegral O (g • (r • x.1))
-          have e : g • (r • x.1) = algebraMap O (Lsq K Δ) r * (g • x.1) := by
-            rw [Algebra.smul_def r x.1, Algebra.smul_def g, Algebra.smul_def g]
-            ring
-          rw [e]
-          exact isIntegral_algebraMap.mul hx1
-        · show r • x.2 = _
-          rw [hx2, smul_cmb] }
+  let P : Submodule O (Sp Δ τ) := {
+    carrier := Phi O Δ g s S
+    add_mem' := by
+      rintro x y ⟨hx1, a, ha, b, hb, hx2⟩ ⟨hy1, a', ha', b', hb', hy2⟩
+      refine ⟨?_, a + a', ?_, b + b', ?_, ?_⟩
+      · show IsIntegral O (g • (x.1 + y.1))
+        rw [smul_add]
+        exact IsIntegral.add hx1 hy1
+      · exact hmS.2 (add_mem (hmS.1 ha) (hmS.1 ha'))
+      · exact hmS.2 (add_mem (hmS.1 hb) (hmS.1 hb'))
+      · show x.2 + y.2 = _
+        rw [hx2, hy2, cmb_add']
+    zero_mem' := by
+      refine ⟨?_, 0, hmS.2 (zero_mem _), 0, hmS.2 (zero_mem _), ?_⟩
+      · show IsIntegral O (g • (0 : Lsq K Δ))
+        rw [smul_zero]
+        exact isIntegral_zero
+      · show (0 : EL Δ τ) = _
+        rw [cmb_zero']
+    smul_mem' := by
+      rintro r x ⟨hx1, a, ha, b, hb, hx2⟩
+      refine ⟨
+        ?_,
+        r • a,
+        hmS.2 (Submodule.smul_mem _ r (hmS.1 ha)),
+        r • b,
+        hmS.2 (Submodule.smul_mem _ r (hmS.1 hb)),
+        ?_
+      ⟩
+      · show IsIntegral O (g • (r • x.1))
+        have e : g • (r • x.1) = algebraMap O (Lsq K Δ) r * (g • x.1) := by
+          rw [Algebra.smul_def r x.1, Algebra.smul_def g, Algebra.smul_def g]
+          ring
+        rw [e]
+        exact isIntegral_algebraMap.mul hx1
+      · show r • x.2 = _
+        rw [hx2, smul_cmb]
+  }
   let F : Finset (Sp Δ τ) :=
-    ({(algebraMap K (Lsq K Δ) g⁻¹, 0), (⟨0, g⁻¹ * s⟩, 0)} : Finset (Sp Δ τ)) ∪
-      F0.image (fun a => ((0 : Lsq K Δ), cmb Δ s a 0)) ∪
-      F0.image (fun b => ((0 : Lsq K Δ), cmb Δ s 0 b))
+    ({(algebraMap K (Lsq K Δ) g⁻¹, 0), (⟨0, g⁻¹ * s⟩, 0)} : Finset (Sp Δ τ))
+      ∪ F0.image (fun a => ((0 : Lsq K Δ), cmb Δ s a 0))
+      ∪ F0.image (fun b => ((0 : Lsq K Δ), cmb Δ s 0 b))
   refine ⟨F, ?_⟩
   have key : P = Submodule.span O (F : Set (Sp Δ τ)) := by
     apply le_antisymm
     · rintro x ⟨hx1, a, ha, b, hb, hx2⟩
-      have hA : ∀ a ∈ Submodule.span O (F0 : Set (Etau K τ)),
-          ((0 : Lsq K Δ), cmb Δ s a 0) ∈ Submodule.span O (F : Set (Sp Δ τ)) := by
+      have hA
+          : ∀ a ∈ Submodule.span O (F0 : Set (Etau K τ)),
+            ((0 : Lsq K Δ), cmb Δ s a 0) ∈ Submodule.span O (F : Set (Sp Δ τ)) := by
         intro a ha
         induction ha using Submodule.span_induction with
         | mem y hy =>
@@ -299,7 +349,9 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
           rw [cmb_zero']
           exact zero_mem _
         | add y z _ _ hy hz =>
-          have e : ((0 : Lsq K Δ), cmb Δ s (y + z) 0) = ((0 : Lsq K Δ), cmb Δ s y 0) + ((0 : Lsq K Δ), cmb Δ s z 0) := by
+          have e
+              : ((0 : Lsq K Δ), cmb Δ s (y + z) 0)
+                = ((0 : Lsq K Δ), cmb Δ s y 0) + ((0 : Lsq K Δ), cmb Δ s z 0) := by
             rw [Prod.mk_add_mk, cmb_add', add_zero, add_zero]
           rw [e]
           exact add_mem hy hz
@@ -308,8 +360,9 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
             rw [Prod.smul_mk, smul_cmb, smul_zero, smul_zero]
           rw [e]
           exact Submodule.smul_mem _ r hy
-      have hB : ∀ b ∈ Submodule.span O (F0 : Set (Etau K τ)),
-          ((0 : Lsq K Δ), cmb Δ s 0 b) ∈ Submodule.span O (F : Set (Sp Δ τ)) := by
+      have hB
+          : ∀ b ∈ Submodule.span O (F0 : Set (Etau K τ)),
+            ((0 : Lsq K Δ), cmb Δ s 0 b) ∈ Submodule.span O (F : Set (Sp Δ τ)) := by
         intro b hb
         induction hb using Submodule.span_induction with
         | mem y hy =>
@@ -320,7 +373,9 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
           rw [cmb_zero']
           exact zero_mem _
         | add y z _ _ hy hz =>
-          have e : ((0 : Lsq K Δ), cmb Δ s 0 (y + z)) = ((0 : Lsq K Δ), cmb Δ s 0 y) + ((0 : Lsq K Δ), cmb Δ s 0 z) := by
+          have e
+              : ((0 : Lsq K Δ), cmb Δ s 0 (y + z))
+                = ((0 : Lsq K Δ), cmb Δ s 0 y) + ((0 : Lsq K Δ), cmb Δ s 0 z) := by
             rw [Prod.mk_add_mk, cmb_add', add_zero, add_zero]
           rw [e]
           exact add_mem hy hz
@@ -330,8 +385,10 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
           rw [e]
           exact Submodule.smul_mem _ r hy
       obtain ⟨⟨r, hr⟩, b', hb'⟩ := ((descent O K Δ L s ε hs (g • x.1)).1).1 hx1
-      have hx : x = (r • ((algebraMap K (Lsq K Δ) g⁻¹, 0) : Sp Δ τ) + b' • ((⟨0, g⁻¹ * s⟩, 0) : Sp Δ τ)) +
-          (((0 : Lsq K Δ), cmb Δ s a 0) + ((0 : Lsq K Δ), cmb Δ s 0 b)) := by
+      have hx
+          : x
+            = (r • ((algebraMap K (Lsq K Δ) g⁻¹, 0) : Sp Δ τ) + b' • ((⟨0, g⁻¹ * s⟩, 0) : Sp Δ τ))
+              + (((0 : Lsq K Δ), cmb Δ s a 0) + ((0 : Lsq K Δ), cmb Δ s 0 b)) := by
         obtain ⟨x1, x2⟩ := x
         simp only at hx2 hr hb'
         have hr' : x1.re = g⁻¹ * algebraMap O K r := by
@@ -356,14 +413,17 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
         · simp only [Prod.snd_add, Prod.smul_snd, smul_zero, zero_add]
           rw [hx2, cmb_add', add_zero, zero_add]
       rw [hx]
-      refine add_mem (add_mem (Submodule.smul_mem _ r (Submodule.subset_span ?_))
-        (Submodule.smul_mem _ b' (Submodule.subset_span ?_))) (add_mem (hA a (hmS.1 ha)) (hB b (hmS.1 hb)))
+      refine add_mem
+        (add_mem (Submodule.smul_mem _ r (Submodule.subset_span ?_))
+          (Submodule.smul_mem _ b' (Submodule.subset_span ?_)))
+        (add_mem (hA a (hmS.1 ha)) (hB b (hmS.1 hb)))
       · simp [F]
       · simp [F]
     · rw [Submodule.span_le]
       intro x hx
       simp only [F, Finset.coe_union, Finset.coe_image, Finset.coe_insert, Finset.coe_singleton,
-        Set.mem_union, Set.mem_image, Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+          Set.mem_union, Set.mem_image, Set.mem_insert_iff, Set.mem_singleton_iff]
+        at hx
       rcases hx with ((rfl | rfl) | ⟨a, ha, rfl⟩) | ⟨b, hb, rfl⟩
       · refine ⟨?_, 0, hmS.2 (zero_mem _), 0, hmS.2 (zero_mem _), (cmb_zero' s).symm⟩
         show IsIntegral O (g • algebraMap K (Lsq K Δ) g⁻¹)
@@ -373,17 +433,34 @@ private theorem phi_fg (L : IsLoc O Δ) {g s T : K} (hg : g ≠ 0) {ε : Oˣ} (h
         refine ((descent O K Δ L s ε hs _).1).2 ⟨⟨0, by simp⟩, 1, ?_⟩
         simp
         field_simp
-      · exact ⟨by show IsIntegral O (g • (0 : Lsq K Δ)); rw [smul_zero]; exact isIntegral_zero,
-          a, hmS.2 (Submodule.subset_span ha), 0, hmS.2 (zero_mem _), rfl⟩
-      · exact ⟨by show IsIntegral O (g • (0 : Lsq K Δ)); rw [smul_zero]; exact isIntegral_zero,
-          0, hmS.2 (zero_mem _), b, hmS.2 (Submodule.subset_span hb), rfl⟩
+      · exact ⟨
+          by show IsIntegral O (g • (0 : Lsq K Δ)); rw [smul_zero]; exact isIntegral_zero,
+          a,
+          hmS.2 (Submodule.subset_span ha),
+          0,
+          hmS.2 (zero_mem _),
+          rfl
+        ⟩
+      · exact ⟨
+          by show IsIntegral O (g • (0 : Lsq K Δ)); rw [smul_zero]; exact isIntegral_zero,
+          0,
+          hmS.2 (zero_mem _),
+          b,
+          hmS.2 (Submodule.subset_span hb),
+          rfl
+        ⟩
   exact congrArg (fun Q : Submodule O (Sp Δ τ) => (Q : Set (Sp Δ τ))) key
 
-private theorem phi_fix (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : Oˣ} (hc : c = algebraMap O K η * g ^ 2)
-    (hs : Δ * s ^ 2 = algebraMap O K ε) {u : Etau K τ} (h1 : u.re ∈ (algebraMap O K).range) (h2 : u.im ∈ (algebraMap O K).range)
-    (hτ : τ ∈ (algebraMap O K).range) (hu : QuadraticAlgebra.norm u = 1) {ν : Lsq K Δ} (hν : IsInt O ν)
-    (hν' : QuadraticAlgebra.norm ν = -1) {S : Set (Etau K τ)} (h : IsFixP O τ (t * (τ ^ 2 - 4)) S) :
-    IsFix O c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (Phi O Δ g s S) := by
+private theorem phi_fix
+    (L : IsLoc O Δ)
+    {c g s t : K} (hg : g ≠ 0)
+    {η ε : Oˣ} (hc : c = algebraMap O K η * g ^ 2) (hs : Δ * s ^ 2 = algebraMap O K ε)
+    {u : Etau K τ} (h1 : u.re ∈ (algebraMap O K).range) (h2 : u.im ∈ (algebraMap O K).range)
+    (hτ : τ ∈ (algebraMap O K).range) (hu : QuadraticAlgebra.norm u = 1)
+    {ν : Lsq K Δ} (hν : IsInt O ν) (hν' : QuadraticAlgebra.norm ν = -1)
+    {S : Set (Etau K τ)} (h : IsFixP O τ (t * (τ ^ 2 - 4)) S)
+    : IsFix O c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))
+      (Phi O Δ g s S) := by
   have hε0 : algebraMap O K (ε : O) ≠ 0 := (ε.isUnit.map (algebraMap O K)).ne_zero
   have hη0 : algebraMap O K (η : O) ≠ 0 := (η.isUnit.map (algebraMap O K)).ne_zero
   have hs0 : s ≠ 0 := by
@@ -415,8 +492,15 @@ private theorem phi_fix (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     · intro H
       obtain ⟨a', b', rfl⟩ := cmb_ex hs0 y2
       refine ⟨?_, a', ?_, b', ?_, rfl⟩
-      · have hw := H ((g⁻¹ • (1 : Lsq K Δ)), cmb Δ s 0 0)
-          ⟨by simpa [hg] using (isIntegral_one : IsIntegral O (1 : Lsq K Δ)), 0, fixP_zero h, 0, fixP_zero h, rfl⟩
+      · have hw :=
+          H ((g⁻¹ • (1 : Lsq K Δ)), cmb Δ s 0 0) ⟨
+            by simpa [hg] using (isIntegral_one : IsIntegral O (1 : Lsq K Δ)),
+            0,
+            fixP_zero h,
+            0,
+            fixP_zero h,
+            rfl
+          ⟩
         rw [herm_cmb] at hw
         generalize hW : c • (g⁻¹ • (1 : Lsq K Δ) * star y1) + _ = W at hw
         have e : g • y1 = ((η⁻¹ : Oˣ) : O) • star W := by
@@ -426,7 +510,15 @@ private theorem phi_fix (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
         exact IsIntegral.smul _ ((D _).2 hw)
       · rw [h.dual]
         intro a ha
-        have hw := H (0, cmb Δ s a 0) ⟨by simpa using (isIntegral_zero : IsIntegral O (0 : Lsq K Δ)), a, ha, 0, fixP_zero h, rfl⟩
+        have hw :=
+          H (0, cmb Δ s a 0) ⟨
+            by simpa using (isIntegral_zero : IsIntegral O (0 : Lsq K Δ)),
+            a,
+            ha,
+            0,
+            fixP_zero h,
+            rfl
+          ⟩
         rw [herm_cmb] at hw
         obtain ⟨_, o, ho⟩ := (D _).1.1 hw
         refine ⟨o, ?_⟩
@@ -435,13 +527,23 @@ private theorem phi_fix (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
         simp <;> ring
       · rw [h.dual]
         intro b hb
-        have hw := H (0, cmb Δ s b 0) ⟨by simpa using (isIntegral_zero : IsIntegral O (0 : Lsq K Δ)), b, hb, 0, fixP_zero h, rfl⟩
+        have hw :=
+          H (0, cmb Δ s b 0) ⟨
+            by simpa using (isIntegral_zero : IsIntegral O (0 : Lsq K Δ)),
+            b,
+            hb,
+            0,
+            fixP_zero h,
+            rfl
+          ⟩
         rw [herm_cmb] at hw
         obtain ⟨⟨o, ho⟩, _⟩ := (D _).1.1 hw
         simp at ho
         refine ⟨-(((ε⁻¹ : Oˣ) : O) * o), ?_⟩
         rw [map_neg, map_mul, ho, hs, map_units_inv]
-        have hX : (b * star b').im = -(b.re * b'.im) + b.im * (b'.re + τ * b'.im) + -(τ * b.im * b'.im) := by
+        have hX
+            : (b * star b').im
+              = -(b.re * b'.im) + b.im * (b'.re + τ * b'.im) + -(τ * b.im * b'.im) := by
           simp <;> ring
         rw [hX]
         field_simp
@@ -456,13 +558,18 @@ private theorem phi_fix (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     · intro x hx
       exact ⟨_, phi_semi L hs h hsu.1 hsu.2 hν.neg x hx, semi_inv hu hν' x⟩
 
-private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : Oˣ} (hc : c = algebraMap O K η * g ^ 2)
-    (hs : Δ * s ^ 2 = algebraMap O K ε) {u : Etau K τ} (h1 : u.re ∈ (algebraMap O K).range) (h2 : u.im ∈ (algebraMap O K).range)
-    (hτ : τ ∈ (algebraMap O K).range) (hτ' : ∃ u : Oˣ, algebraMap O K u = 2 - τ) (hu : QuadraticAlgebra.norm u = 1)
+private theorem fix_phi
+    (L : IsLoc O Δ)
+    {c g s t : K} (hg : g ≠ 0)
+    {η ε : Oˣ} (hc : c = algebraMap O K η * g ^ 2) (hs : Δ * s ^ 2 = algebraMap O K ε)
+    {u : Etau K τ} (h1 : u.re ∈ (algebraMap O K).range) (h2 : u.im ∈ (algebraMap O K).range)
+    (hτ : τ ∈ (algebraMap O K).range) (hτ' : ∃ u : Oˣ, algebraMap O K u = 2 - τ)
+    (hu : QuadraticAlgebra.norm u = 1)
     {ν : Lsq K Δ} (hν : IsInt O ν) (hν' : QuadraticAlgebra.norm ν = -1)
-    (hd : IsDat c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))) {S : Set (Sp Δ τ)}
-    (h : IsFix O c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S) :
-    ∃ S₀, IsFixP O τ (t * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀ := by
+    (hd : IsDat c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)))
+    {S : Set (Sp Δ τ)}
+    (h : IsFix O c (ν • ofE Δ u) ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S)
+    : ∃ S₀, IsFixP O τ (t * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀ := by
   have hε0 : algebraMap O K ↑ε ≠ 0 := (ε.isUnit.map (algebraMap O K)).ne_zero
   have hs0 : s ≠ 0 := by
     rintro rfl
@@ -472,8 +579,9 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
   have hεε : algebraMap O K ↑ε * algebraMap O K ↑ε⁻¹ = 1 := by
     rw [← map_mul, Units.mul_inv, map_one]
   have D := descent O K Δ L s ε hs
-  have hint : ∀ r : Lsq K Δ, r.re ∈ (algebraMap O K).range →
-      (∃ b, r.im = s * algebraMap O K b) → IsInt O r :=
+  have hint
+      : ∀ r : Lsq K Δ,
+        r.re ∈ (algebraMap O K).range → (∃ b, r.im = s * algebraMap O K b) → IsInt O r :=
     fun r e1 e2 => ((D r).1).2 ⟨e1, e2⟩
   obtain ⟨hadd, hsm, hfst, hmulv⟩ := One.splitS O K Δ τ L hτ hτ' c _ _ hd S h
   have hofE : ∀ v a : Etau K τ, ofE Δ v * ofE Δ a = ofE Δ (v * a) := by
@@ -481,13 +589,15 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     have := ofE_cmb (Δ := Δ) 1 v a 0
     rw [cmb_zero, mul_zero, cmb_zero] at this
     exact this
-  have hz : ∀ r : Lsq K Δ, IsInt O r → ∀ y : EL Δ τ, ((0 : Lsq K Δ), y) ∈ S →
-      ((0 : Lsq K Δ), r • y) ∈ S := by
+  have hz
+      : ∀ r : Lsq K Δ,
+        IsInt O r → ∀ y : EL Δ τ, ((0 : Lsq K Δ), y) ∈ S → ((0 : Lsq K Δ), r • y) ∈ S := by
     intro r hr y hy
     have := hsm _ hy r hr
     simpa using this
-  have hzadd : ∀ y y' : EL Δ τ, ((0 : Lsq K Δ), y) ∈ S → ((0 : Lsq K Δ), y') ∈ S →
-      ((0 : Lsq K Δ), y + y') ∈ S := by
+  have hzadd
+      : ∀ y y' : EL Δ τ,
+        ((0 : Lsq K Δ), y) ∈ S → ((0 : Lsq K Δ), y') ∈ S → ((0 : Lsq K Δ), y + y') ∈ S := by
     intro y y' hy hy'
     have := hadd _ hy _ hy'
     simpa using this
@@ -509,13 +619,13 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     obtain ⟨b1, hb1⟩ := h2
     obtain ⟨t1, ht1⟩ := hτ
     exact ⟨⟨a1 + t1 * b1, by simp [ha1, hb1, ht1]⟩, ⟨-b1, by simp [hb1]⟩⟩
-  have hνs : IsInt O (-star ν) := ((D ν).2 hν).neg
-  have hid : ∀ w : EL Δ τ, (-star ν) • (ofE Δ (star u) * ((ν • ofE Δ u) * w)) = w := by
+  have hνs : IsInt O (- star ν) := ((D ν).2 hν).neg
+  have hid : ∀ w : EL Δ τ, (- star ν) • (ofE Δ (star u) * ((ν • ofE Δ u) * w)) = w := by
     intro w
     have e1 : ofE Δ (star u) * ofE Δ u = 1 := by
       rw [hofE, mul_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, hu, map_one]
       ext <;> simp [ofE]
-    have e2 : (-star ν) * ν = 1 := by
+    have e2 : (- star ν) * ν = 1 := by
       rw [neg_mul, mul_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, hν']
       simp
     rw [smul_mul_assoc, mul_smul_comm, smul_smul, ← mul_assoc, e1, one_mul, e2, one_smul]
@@ -557,8 +667,10 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
   have hhalf3 : algebraMap O K ↑t2⁻¹ = 2⁻¹ := eq_inv_of_mul_eq_one_left hhalf2
   have hhalf : IsInt O (algebraMap K (Lsq K Δ) (algebraMap O K ↑t2⁻¹)) :=
     hint _ ⟨↑t2⁻¹, by simp⟩ ⟨0, by simp⟩
-  have hdec : ∀ a b : Etau K τ, ((0 : Lsq K Δ), cmb Δ s a b) ∈ S ↔
-      ((0 : Lsq K Δ), ofE Δ a) ∈ S ∧ ((0 : Lsq K Δ), ofE Δ b) ∈ S := by
+  have hdec
+      : ∀ a b : Etau K τ,
+        ((0 : Lsq K Δ), cmb Δ s a b) ∈ S
+          ↔ ((0 : Lsq K Δ), ofE Δ a) ∈ S ∧ ((0 : Lsq K Δ), ofE Δ b) ∈ S := by
     intro a b
     constructor
     · intro hy
@@ -576,19 +688,24 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     · rintro ⟨hA, hB⟩
       rw [hcmbW]
       exact hzadd _ _ hA (hz _ hw _ hB)
-  have hherm : ∀ (x1 : Lsq K Δ) (a b y : Etau K τ),
-      herm c ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (x1, cmb Δ s a b)
-        ((0 : Lsq K Δ), ofE Δ y) =
-      ⟨algebraMap O K ↑ε * (t * (τ ^ 2 - 4) * (b * star y).im),
-        s * (t * (τ ^ 2 - 4) * (a * star y).im)⟩ := by
+  have hherm
+      : ∀ (x1 : Lsq K Δ) (a b y : Etau K τ),
+        herm c ((t • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (x1, cmb Δ s a b)
+            ((0 : Lsq K Δ), ofE Δ y)
+          = ⟨
+            algebraMap O K ↑ε * (t * (τ ^ 2 - 4) * (b * star y).im),
+            s * (t * (τ ^ 2 - 4) * (a * star y).im)
+          ⟩ := by
     intro x1 a b y
     rw [← cmb_zero s y, herm_cmb]
     ext
     · simp
       exact Or.inl hs
     · simp
-  have hII : ∀ α β : K, IsInt O (⟨algebraMap O K ↑ε * α, s * β⟩ : Lsq K Δ) ↔
-      α ∈ (algebraMap O K).range ∧ β ∈ (algebraMap O K).range := by
+  have hII
+      : ∀ α β : K,
+        IsInt O (⟨algebraMap O K ↑ε * α, s * β⟩ : Lsq K Δ)
+          ↔ α ∈ (algebraMap O K).range ∧ β ∈ (algebraMap O K).range := by
     intro α β
     rw [(D _).1]
     constructor
@@ -633,7 +750,10 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
     rw [hab, hdec] at hB
     exact ⟨hA'.1, a, hB.1, b, hB.2, hab⟩
   · rintro ⟨hg', a, ha, b, hb, hab⟩
-    refine ⟨One.fst O K Δ τ L hτ hτ' c _ _ hd _ S hΦ h x.1 ⟨hg', 0, fixP_zero hP, 0, fixP_zero hP, ?_⟩, ?_⟩
+    refine ⟨
+      One.fst O K Δ τ L hτ hτ' c _ _ hd _ S hΦ h x.1 ⟨hg', 0, fixP_zero hP, 0, fixP_zero hP, ?_⟩,
+      ?_
+    ⟩
     · show (0 : EL Δ τ) = cmb Δ s 0 0
       ext <;> simp [cmb]
     · rw [hab, hdec]
@@ -641,8 +761,7 @@ private theorem fix_phi (L : IsLoc O Δ) {c g s t : K} (hg : g ≠ 0) {η ε : O
 
 end
 
-theorem UpperTheory.V.Z.Sym.Loc.caseM :
-    UpperTheory.V.Z.Sym.Loc.CaseM := by
+theorem UpperTheory.V.Z.Sym.Loc.caseM : UpperTheory.V.Z.Sym.Loc.CaseM := by
   intro O K _ _ _ _ _ Δ τ L hτ τ₀ hτ₀ hmax c hc u hu2 hu ν hν hν' s ε hs t
   obtain ⟨η, g, hg, hcg⟩ := hc
   have h2 : IsUnit (2 : O) := L.two
@@ -666,14 +785,19 @@ theorem UpperTheory.V.Z.Sym.Loc.caseM :
     rw [hs]
     exact (ε.isUnit.map (algebraMap O K)).ne_zero
   have hd := isDat_M (c := c) (s := s) (t := (t : K)) hτ hc0 hs0 t.ne_zero hu2 hu hν'
-  have hPinv : ∀ (z : (Etau K τ)ˣ) (S : Set (Etau K τ)), IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S →
-      IsFixP O τ ((t : K) * (τ ^ 2 - 4)) ((quo z * ·) '' S) := by
+  have hPinv
+      : ∀ (z : (Etau K τ)ˣ) (S : Set (Etau K τ)),
+        IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S
+          → IsFixP O τ ((t : K) * (τ ^ 2 - 4)) ((quo z * ·) '' S) := by
     intro z S hS
-    have := PS.fix_ml (PS.qU z) (t := (t : K) * (τ ^ 2 - 4)) (S := S)
-      (by rw [PS.nU_qU, Units.val_one, mul_one]; exact hS)
+    have :=
+      PS.fix_ml (PS.qU z) (t := (t : K) * (τ ^ 2 - 4)) (S := S)
+        (by rw [PS.nU_qU, Units.val_one, mul_one]; exact hS)
     simpa [PS.ml, PS.qU_val] using this
-  have hFix : ∀ S, IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S ↔
-      ∃ S₀, IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀ := by
+  have hFix
+      : ∀ S,
+        IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S
+          ↔ ∃ S₀, IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀ := by
     intro S
     constructor
     · intro h
@@ -683,25 +807,33 @@ theorem UpperTheory.V.Z.Sym.Loc.caseM :
   letI := torAct Δ τ
   letI := quoAct τ
   unfold lcount pcount
-  refine wTrans _ _ _ _ _ _ (fun S S₀ => IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀)
+  refine wTrans _ _ _ _ _ _
+    (fun S S₀ => IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S₀ ∧ S = Phi O Δ g s S₀)
     ?_ ?_ ?_ ?_ ?_ ?_
   · intro z S
-    have key : ∀ (z : (Etau K τ)ˣ) (S : Set (Sp Δ τ)),
-        IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S →
-        IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (z • S) := by
+    have key
+        : ∀ (z : (Etau K τ)ˣ) (S : Set (Sp Δ τ)),
+          IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S
+            → IsFix O c (ν • ofE Δ u)
+              (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (z • S) := by
       intro z S hS
       obtain ⟨S₀, h0, rfl⟩ := (hFix S).1 hS
       exact (hFix _).2 ⟨_, hPinv z S₀ h0, phi_act g s S₀ z⟩
-    have e : IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) (z • S) ↔
-        IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S :=
+    have e
+        : IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))
+            (z • S)
+          ↔ IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ))
+            S :=
       ⟨fun h => by simpa using key z⁻¹ _ h, key z S⟩
     trace_state
     rw [e]
   · intro z S
-    have e : IsFixP O τ ((t : K) * (τ ^ 2 - 4)) (z • S) ↔ IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S :=
-      ⟨fun h => by
+    have e : IsFixP O τ ((t : K) * (τ ^ 2 - 4)) (z • S) ↔ IsFixP O τ ((t : K) * (τ ^ 2 - 4)) S := ⟨
+      fun h => by
         have h' := hPinv z⁻¹ _ h
-        rwa [show ((quo z⁻¹ * ·) '' (z • S)) = z⁻¹ • z • S from rfl, inv_smul_smul] at h', hPinv z S⟩
+        rwa [show ((quo z⁻¹ * ·) '' (z • S)) = z⁻¹ • z • S from rfl, inv_smul_smul] at h',
+      hPinv z S
+    ⟩
     trace_state
     rw [e]
   · rintro z S S₀ ⟨h0, rfl⟩
@@ -709,7 +841,8 @@ theorem UpperTheory.V.Z.Sym.Loc.caseM :
   · rintro S S₀ ⟨h0, e⟩
     rw [if_pos ((hFix S).2 ⟨S₀, h0, e⟩), if_pos h0]
   · intro S hS
-    have hS' : IsFix O c (ν • ofE Δ u) (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S := by
+    have hS' : IsFix O c (ν • ofE Δ u)
+        (((t : K) • s • (ω : Lsq K Δ)) • ofE Δ (ω - star ω : Etau K τ)) S := by
       by_contra hn
       rw [if_neg hn] at hS
       exact hS rfl

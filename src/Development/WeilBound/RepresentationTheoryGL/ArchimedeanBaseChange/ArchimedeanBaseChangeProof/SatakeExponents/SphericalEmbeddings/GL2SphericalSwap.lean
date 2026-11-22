@@ -21,7 +21,8 @@ theorem GL2_spherical_swap : GL2SphericalSwap k := fun a b hab => by
   · exact unl a b hL hab
 
 theorem sphEmb : SphEmb k :=
-  sphEmb_of k (GL2_spherical_swap k) (PositivityTheory.Rg.BcB.N3.PseStage.stageLift k) PositivityTheory.Rg.BcB.N3.PseExp.expSph
-    PositivityTheory.Rg.BcB.N3.PseSat.satPerm PositivityTheory.Rg.BcB.N3.PseBub.bubble
+  sphEmb_of k (GL2_spherical_swap k) (PositivityTheory.Rg.BcB.N3.PseStage.stageLift k)
+    PositivityTheory.Rg.BcB.N3.PseExp.expSph PositivityTheory.Rg.BcB.N3.PseSat.satPerm
+    PositivityTheory.Rg.BcB.N3.PseBub.bubble
 
 end PositivityTheory.Rg.BcB.N3.Pse

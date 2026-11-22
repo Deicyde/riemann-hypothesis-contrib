@@ -10,9 +10,11 @@ noncomputable section
 
 open MeasureTheory GroundTheory.LocalField
 
-namespace UpperTheory.HilbertEisensteinWeightOne.FourierExpansionEisenstein.MultiplicativeHaarInverse
+namespace
+  UpperTheory.HilbertEisensteinWeightOne.FourierExpansionEisenstein.MultiplicativeHaarInverse
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [MeasurableSpace K] [BorelSpace K]
 
 instance secondCountableTopology_units : SecondCountableTopology Kˣ :=
@@ -26,9 +28,9 @@ instance regular_multHaar : (multHaar K).Regular :=
 instance isInvInvariant_multHaar : (multHaar K).IsInvInvariant :=
   Measure.IsHaarMeasure.isInvInvariant_of_regular (multHaar K)
 
-theorem inv_subst (f : Kˣ → ℂ) (t : Kˣ) :
-    (Integrable f (multHaar K) ↔ Integrable (fun x => f (t * x⁻¹)) (multHaar K)) ∧
-    ∫ a, f a ∂multHaar K = ∫ x, f (t * x⁻¹) ∂multHaar K := by
+theorem inv_subst (f : Kˣ → ℂ) (t : Kˣ)
+    : (Integrable f (multHaar K) ↔ Integrable (fun x => f (t * x⁻¹)) (multHaar K))
+      ∧ ∫ a, f a ∂multHaar K = ∫ x, f (t * x⁻¹) ∂multHaar K := by
   have h1 : (fun x => f (t * x⁻¹)) = fun x => f (t / x) := by
     funext x
     rw [div_eq_mul_inv]

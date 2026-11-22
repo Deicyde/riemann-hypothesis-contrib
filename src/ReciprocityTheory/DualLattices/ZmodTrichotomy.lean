@@ -96,9 +96,10 @@ private lemma zmod_ideal (J : Ideal (ZMod (p ^ 2))) :
           exact J.mul_mem_right _ hgJ
         · exact absurd rfl hg0
 
-theorem flat_of_ann {M : Type*} [AddCommGroup M] [Module (ZMod (p ^ 2)) M]
-    (h : ∀ m : M, (p : ZMod (p ^ 2)) • m = 0 → ∃ y : M, m = (p : ZMod (p ^ 2)) • y) :
-    Module.Flat (ZMod (p ^ 2)) M := by
+theorem flat_of_ann
+    {M : Type*} [AddCommGroup M] [Module (ZMod (p ^ 2)) M]
+    (h : ∀ m : M, (p : ZMod (p ^ 2)) • m = 0 → ∃ y : M, m = (p : ZMod (p ^ 2)) • y)
+    : Module.Flat (ZMod (p ^ 2)) M := by
   rw [Module.Flat.iff_lift_lsmul_comp_subtype_injective]
   intro J _
   rcases zmod_ideal p J with rfl | rfl | rfl
@@ -110,7 +111,8 @@ theorem flat_of_ann {M : Type*} [AddCommGroup M] [Module (ZMod (p ^ 2)) M]
     intro m hm
     obtain ⟨y, rfl⟩ := h m hm
     rw [← smul_tmul]
-    have : (p : ZMod (p ^ 2)) • (⟨p, mem_span_singleton_self _⟩ : span {(p : ZMod (p ^ 2))}) = 0 := by
+    have : (p : ZMod (p ^ 2)) • (⟨p, mem_span_singleton_self _⟩ : span {(p : ZMod (p ^ 2))})
+        = 0 := by
       apply Subtype.ext
       show (p : ZMod (p ^ 2)) * p = 0
       rw [← sq, p_sq_zero]
@@ -124,19 +126,23 @@ end ZModSq
 
 section Main
 
-variable (p : ℕ) [hp : Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 theorem flatW' : FlatW'Statement p O := by
   intro pflat _
   set T : WittVector p (PreTilt O p) := teichmuller p pflat with hT
   set I : Ideal (WittVector p (PreTilt O p)) := span {(p : WittVector p (PreTilt O p)) ^ 2, T} with hI
-  have hpc : ((p : ℕ) : WittVector p (PreTilt O p) ⧸ I) = Ideal.Quotient.mk I (p : WittVector p (PreTilt O p)) :=
+  have hpc
+      : ((p : ℕ) : WittVector p (PreTilt O p) ⧸ I)
+        = Ideal.Quotient.mk I (p : WittVector p (PreTilt O p)) :=
     (map_natCast _ p).symm
-  have hTI : Ideal.Quotient.mk I T = 0 :=
-    Ideal.Quotient.eq_zero_iff_mem.2 (subset_span (by simp))
-  have hann : ∀ x : WittVector p (PreTilt O p) ⧸ I, (p : WittVector p (PreTilt O p) ⧸ I) * x = 0 →
-      ∃ y, x = (p : WittVector p (PreTilt O p) ⧸ I) * y := by
+  have hTI : Ideal.Quotient.mk I T = 0 := Ideal.Quotient.eq_zero_iff_mem.2 (subset_span (by simp))
+  have hann
+      : ∀ x : WittVector p (PreTilt O p) ⧸ I,
+        (p : WittVector p (PreTilt O p) ⧸ I) * x = 0
+          → ∃ y, x = (p : WittVector p (PreTilt O p) ⧸ I) * y := by
     intro x hx
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [hpc, ← map_mul, Ideal.Quotient.eq_zero_iff_mem, hI, mem_span_pair] at hx

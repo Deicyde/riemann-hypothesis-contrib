@@ -16,13 +16,13 @@ private theorem eN_val_eq_single {N : ℕ} (s : Fin N) : eN k N s.1 = Pi.single 
   funext l
   simp only [eN, Pi.single_apply, Fin.ext_iff]
 
-private theorem inX_apply' {n c : ℕ} (v : Fin n → k) (l : Fin (n + c)) :
-    inX k n c v l = if h : l.1 < n then v ⟨l.1, h⟩ else 0 := by
+private theorem inX_apply' {n c : ℕ} (v : Fin n → k) (l : Fin (n + c))
+    : inX k n c v l = if h : l.1 < n then v ⟨l.1, h⟩ else 0 := by
   simp only [inX, LinearMap.pi_apply]
   split_ifs <;> simp
 
-private theorem inX_single' {n c : ℕ} (s : Fin n) :
-    inX k n c (Pi.single s 1) = Pi.single ⟨s.1, by have := s.2; omega⟩ 1 := by
+private theorem inX_single' {n c : ℕ} (s : Fin n)
+    : inX k n c (Pi.single s 1) = Pi.single ⟨s.1, by have := s.2; omega⟩ 1 := by
   funext l
   rw [inX_apply']
   by_cases h : l.1 < n
@@ -35,26 +35,32 @@ private theorem inX_single' {n c : ℕ} (s : Fin n) :
     simp only at e
     omega
 
-private theorem mem_Ufl_iff' {n c i : ℕ} (v : Fin (n + c) → k) :
-    v ∈ Ufl k n c i ↔ ∀ l : Fin (n + c), ¬ l.1 < n + i → v l = 0 := Iff.rfl
+private theorem mem_Ufl_iff' {n c i : ℕ} (v : Fin (n + c) → k)
+    : v ∈ Ufl k n c i ↔ ∀ l : Fin (n + c), ¬ l.1 < n + i → v l = 0 :=
+  Iff.rfl
 
-theorem Q_iff {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k)) :
-    Q xj x ↔ ∀ (l : Fin (n + c)) (s : Fin (n' + (c + 1))), ¬ IsFree n' n c l.1 s.1 → x (Pi.single s 1) l = base xj l s := by
+theorem Q_iff
+    {n' n c : ℕ}
+    (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k))
+    : Q xj x
+      ↔ ∀ (l : Fin (n + c)) (s : Fin (n' + (c + 1))),
+        ¬ IsFree n' n c l.1 s.1 → x (Pi.single s 1) l = base xj l s := by
   constructor
   · rintro ⟨h1, h2, h3⟩ l s hnf
     simp only [IsFree, not_and, not_or] at hnf
     unfold base
     by_cases hs : s.1 < n'
     · rw [dite_eq_left hs]
-      have e : (Pi.single s 1 : Fin (n' + (c + 1)) → k) =
-          inX k n' (c + 1) (Pi.single ⟨s.1, hs⟩ 1) := by
+      have e
+          : (Pi.single s 1 : Fin (n' + (c + 1)) → k)
+            = inX k n' (c + 1) (Pi.single ⟨s.1, hs⟩ 1) := by
         rw [inX_single']
       rw [e, h1, inX_apply']
       split_ifs with hl
       · first
-          | rfl
-          | (rw [LinearMap.toMatrix'_apply])
-          | (rw [LinearMap.toMatrix'_apply]; congr 1; funext j'; simp [Pi.single_apply, Fin.ext_iff])
+        | rfl
+        | (rw [LinearMap.toMatrix'_apply])
+        | (rw [LinearMap.toMatrix'_apply]; congr 1; funext j'; simp [Pi.single_apply, Fin.ext_iff])
       · rfl
     · rw [dite_eq_right hs]
       obtain ⟨j, hj⟩ : ∃ j, s.1 = n' + j := ⟨s.1 - n', by omega⟩
@@ -75,8 +81,9 @@ theorem Q_iff {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (x : 
         rw [k4]
         simp only [eN]
   · intro H
-    have Hs : ∀ (l : Fin (n + c)) (s : ℕ) (hs : s < n' + (c + 1)), ¬ IsFree n' n c l.1 s →
-        x (eN k (n' + (c + 1)) s) l = base xj l ⟨s, hs⟩ := by
+    have Hs
+        : ∀ (l : Fin (n + c)) (s : ℕ) (hs : s < n' + (c + 1)),
+          ¬ IsFree n' n c l.1 s → x (eN k (n' + (c + 1)) s) l = base xj l ⟨s, hs⟩ := by
       intro l s hs h
       have k5 := H l ⟨s, hs⟩ h
       rw [← eN_val_eq_single] at k5
@@ -93,9 +100,14 @@ theorem Q_iff {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (x : 
         rw [dite_eq_left hs']
         split_ifs with hl
         · first
-            | rfl
-            | (rw [LinearMap.toMatrix'_apply])
-            | (rw [LinearMap.toMatrix'_apply]; congr 1; funext j'; simp [Pi.single_apply, Fin.ext_iff])
+          | rfl
+          | (rw [LinearMap.toMatrix'_apply])
+          | (
+              rw [LinearMap.toMatrix'_apply]
+              congr 1
+              funext j'
+              simp [Pi.single_apply, Fin.ext_iff]
+            )
         · rfl
       exact LinearMap.congr_fun e v
     · intro hc
@@ -109,13 +121,17 @@ theorem Q_iff {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (x : 
       rw [Pi.sub_apply, Hs l (n' + j) (by omega) (by simp only [IsFree]; omega)]
       simp [base, eN, hnl]
 
-theorem isFillOf_fillMatrix {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' (c + 1) n c → k) : Q xj (xx1 xj t) := by
+theorem isFillOf_fillMatrix
+    {n' n c : ℕ} (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' (c + 1) n c → k)
+    : Q xj (xx1 xj t) := by
   rw [Q_iff]
   intro l s h
   rw [fillMatrix_single, dite_eq_right h]
 
-theorem fillMatrix_extractFree {n' n c : ℕ} {xj : (Fin n' → k) →ₗ[k] (Fin n → k)} {x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k)}
-    (h : Q xj x) : xx1 xj (fe x) = x := by
+theorem fillMatrix_extractFree
+    {n' n c : ℕ} {xj : (Fin n' → k) →ₗ[k] (Fin n → k)}
+    {x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k)} (h : Q xj x)
+    : xx1 xj (fe x) = x := by
   ext s l
   simp only [LinearMap.comp_apply, LinearMap.single_apply]
   rw [fillMatrix_single]
@@ -123,10 +139,12 @@ theorem fillMatrix_extractFree {n' n c : ℕ} {xj : (Fin n' → k) →ₗ[k] (Fi
   · rfl
   · exact ((Q_iff xj x).1 h l s hf).symm
 
-theorem Q_map {n' n c : ℕ} {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} {g : (Fin n → k) ≃ₗ[k] (Fin n → k)}
-    (hr : R1cond k n c r) (hg : ∀ x, r (inX k n c x) = inX k n c (g x)) {xj : (Fin n' → k) →ₗ[k] (Fin n → k)}
-    {x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k)} (h : Q xj x) :
-    Q (g.toLinearMap ∘ₗ xj) (r.toLinearMap ∘ₗ x) := by
+theorem Q_map
+    {n' n c : ℕ} {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} {g : (Fin n → k) ≃ₗ[k] (Fin n → k)}
+    (hr : R1cond k n c r) (hg : ∀ x, r (inX k n c x) = inX k n c (g x))
+    {xj : (Fin n' → k) →ₗ[k] (Fin n → k)} {x : (Fin (n' + (c + 1)) → k) →ₗ[k] (Fin (n + c) → k)}
+    (h : Q xj x)
+    : Q (g.toLinearMap ∘ₗ xj) (r.toLinearMap ∘ₗ x) := by
   obtain ⟨h1, h2, h3⟩ := h
   refine ⟨fun v => ?_, fun hc => ?_, fun j hj1 hjc => ?_⟩
   · show r (x (inX k n' (c + 1) v)) = inX k n c (g (xj v))
@@ -134,9 +152,10 @@ theorem Q_map {n' n c : ℕ} {r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) →
   · show r (x (eN k (n' + (c + 1)) n')) = eN k (n + c) n
     rw [h2 hc, hr.2.1]
   · show r (x (eN k (n' + (c + 1)) (n' + j))) - eN k (n + c) (n + j) ∈ Ufl k n c j
-    have e : r (x (eN k (n' + (c + 1)) (n' + j))) - eN k (n + c) (n + j) =
-        r (x (eN k (n' + (c + 1)) (n' + j)) - eN k (n + c) (n + j)) +
-          (r (eN k (n + c) (n + j)) - eN k (n + c) (n + j)) := by
+    have e
+        : r (x (eN k (n' + (c + 1)) (n' + j))) - eN k (n + c) (n + j)
+          = r (x (eN k (n' + (c + 1)) (n' + j)) - eN k (n + c) (n + j))
+            + (r (eN k (n + c) (n + j)) - eN k (n + c) (n + j)) := by
       rw [map_sub]
       abel
     rw [e]

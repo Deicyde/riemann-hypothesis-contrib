@@ -10,10 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Exi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
+open GlobalTheory.FinPl
+  (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
 open GlobalTheory.SeeSaw (idV dI FI)
 open ValuativeRel
 open GlobalTheory.Core.Mi.LatMatch
@@ -24,14 +32,17 @@ namespace GlobalTheory.Core.Mi.LatGlue
 
 variable {D : D7}
 
-theorem mt_mul (S : HSp D) (a b : GA D S) : Formalism.L2.Theta.mt S (a * b) = Formalism.L2.Theta.mt S a * Formalism.L2.Theta.mt S b := by
+theorem mt_mul (S : HSp D) (a b : GA D S)
+    : Formalism.L2.Theta.mt S (a * b) = Formalism.L2.Theta.mt S a * Formalism.L2.Theta.mt S b := by
   first | rfl | simp [Formalism.L2.Theta.mt, map_mul]
 
 theorem mt_one (S : HSp D) : Formalism.L2.Theta.mt S 1 = 1 := by
   first | rfl | simp [Formalism.L2.Theta.mt]
 
-theorem mem_congGrp {V : HSp D} {I : Ideal (AE D)} {g : GA D V} :
-    g ∈ GlobalTheory.FinPl.congGrp V I ↔ ∀ i j, Formalism.L2.Theta.mt V g i j - (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) i j ∈ I := by
+theorem mem_congGrp {V : HSp D} {I : Ideal (AE D)} {g : GA D V}
+    : g ∈ GlobalTheory.FinPl.congGrp V I
+      ↔ ∀ i j,
+        Formalism.L2.Theta.mt V g i j - (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) i j ∈ I := by
   unfold GlobalTheory.FinPl.congGrp
   rw [MonoidHom.mem_ker]
   constructor
@@ -47,7 +58,8 @@ theorem mem_congGrp {V : HSp D} {I : Ideal (AE D)} {g : GA D V} :
     simp [Formalism.L2.Theta.mt, Matrix.one_apply] at this ⊢
     exact this
 
-theorem idAt_le_idOff {v w : GlobalTheory.FinPl.Pl D} (h : v ≠ w) : idAt D (· = w) ≤ GlobalTheory.FinPl.idOff D (· = v) := by
+theorem idAt_le_idOff {v w : GlobalTheory.FinPl.Pl D} (h : v ≠ w)
+    : idAt D (· = w) ≤ GlobalTheory.FinPl.idOff D (· = v) := by
   intro a ha
   unfold idAt at ha
   unfold GlobalTheory.FinPl.idOff
@@ -56,15 +68,20 @@ theorem idAt_le_idOff {v w : GlobalTheory.FinPl.Pl D} (h : v ≠ w) : idAt D (·
   have hu : u.1 = v := u.2
   exact ha.2 ⟨u.1, fun e => h (hu.symm.trans e)⟩
 
-theorem mulVec_fix {S : HSp D} {v w : GlobalTheory.FinPl.Pl D} (hvw : v ≠ w) {h : GA D S} (hh : h ∈ grpAt S (· = w))
-    {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D (· = v)) : Formalism.L2.Theta.mt S h *ᵥ y = y := by
-  obtain ⟨ε, -, -, -, hA, hO⟩ := (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D (· = v)).1
+theorem mulVec_fix
+    {S : HSp D} {v w : GlobalTheory.FinPl.Pl D} (hvw : v ≠ w)
+    {h : GA D S} (hh : h ∈ grpAt S (· = w))
+    {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D (· = v))
+    : Formalism.L2.Theta.mt S h *ᵥ y = y := by
+  obtain ⟨ε, -, -, -, hA, hO⟩ :=
+    (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D (· = v)).1
   have hh' := (mem_congGrp).1 hh
   have key : (Formalism.L2.Theta.mt S h - 1) *ᵥ y = 0 := by
     funext i
     simp only [Matrix.mulVec, dotProduct, Pi.zero_apply]
     refine Finset.sum_eq_zero fun j _ => ?_
-    have h1 : (Formalism.L2.Theta.mt S h - 1) i j * y j ∈ idAt D (· = v) := Ideal.mul_mem_left _ _ (hy j)
+    have h1 : (Formalism.L2.Theta.mt S h - 1) i j * y j ∈ idAt D (· = v) :=
+      Ideal.mul_mem_left _ _ (hy j)
     have h2 : (Formalism.L2.Theta.mt S h - 1) i j * y j ∈ GlobalTheory.FinPl.idOff D (· = v) :=
       Ideal.mul_mem_right _ _ (idAt_le_idOff hvw (by simpa using hh' i j))
     rw [← (hA _).1 h1]
@@ -72,8 +89,12 @@ theorem mulVec_fix {S : HSp D} {v w : GlobalTheory.FinPl.Pl D} (hvw : v ≠ w) {
   rw [Matrix.sub_mulVec, sub_eq_zero, Matrix.one_mulVec] at key
   exact key
 
-theorem scal_mulVec {n : ℕ} (c : AE D) (y : Fin n → AE D) : (c • (1 : Matrix (Fin n) (Fin n) (AE D))) *ᵥ y = c • y := by
-  first | rw [Matrix.smul_mulVec, Matrix.one_mulVec] | simp [Matrix.smul_mulVec] | (ext i; simp [Matrix.mulVec, dotProduct, Matrix.one_apply])
+theorem scal_mulVec {n : ℕ} (c : AE D) (y : Fin n → AE D)
+    : (c • (1 : Matrix (Fin n) (Fin n) (AE D))) *ᵥ y = c • y := by
+  first
+  | rw [Matrix.smul_mulVec, Matrix.one_mulVec]
+  | simp [Matrix.smul_mulVec]
+  | (ext i; simp [Matrix.mulVec, dotProduct, Matrix.one_apply])
 
 end GlobalTheory.Core.Mi.LatGlue
 
@@ -81,22 +102,37 @@ namespace GlobalTheory.Core.Mi.LatGlue
 
 variable {D : D7}
 
-
 set_option maxHeartbeats 800000 in
-theorem glue_finset {V A : HSp D} (e : GA D A →* GA D V)
+theorem glue_finset
+    {V A : HSp D} (e : GA D A →* GA D V)
     (he : ∀ v : GlobalTheory.FinPl.Pl D, ∀ a ∈ grpAt A (· = v), e a ∈ grpAt V (· = v))
-    (a : GlobalTheory.FinPl.Pl D → GA D A) (c : GlobalTheory.FinPl.Pl D → AE D) (z : GlobalTheory.FinPl.Pl D → GA D V)
+    (a : GlobalTheory.FinPl.Pl D → GA D A)
+    (c : GlobalTheory.FinPl.Pl D → AE D) (z : GlobalTheory.FinPl.Pl D → GA D V)
     (ha : ∀ v, CenAt A v (a v)) (hz : ∀ v, CenAt V v (z v))
-    (hzm : ∀ v, Formalism.L2.Theta.mt V (z v) = c v • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D))) (s : Finset (GlobalTheory.FinPl.Pl D)) :
-    ∃ α ∈ GfC A, α ∈ Subgroup.center (GA D A) ∧ ∃ ζ ∈ Subgroup.center (GA D V),
-      (∀ v ∈ s, ∀ y : Fin V.rank → AE D, (∀ i, y i ∈ idAt D (· = v)) →
-        Formalism.L2.Theta.mt V (e α) *ᵥ y = Formalism.L2.Theta.mt V (e (a v)) *ᵥ y ∧ Formalism.L2.Theta.mt V ζ *ᵥ y = c v • y) ∧
-      (∀ v ∉ s, ∀ y : Fin V.rank → AE D, (∀ i, y i ∈ idAt D (· = v)) →
-        Formalism.L2.Theta.mt V (e α) *ᵥ y = y ∧ Formalism.L2.Theta.mt V ζ *ᵥ y = y) := by
+    (hzm : ∀ v, Formalism.L2.Theta.mt V (z v) = c v • (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)))
+    (s : Finset (GlobalTheory.FinPl.Pl D))
+    : ∃ α ∈ GfC A,
+      α ∈ Subgroup.center (GA D A)
+        ∧ ∃ ζ ∈ Subgroup.center (GA D V),
+          (∀ v ∈ s, ∀ y : Fin V.rank → AE D,
+              (∀ i, y i ∈ idAt D (· = v))
+                → Formalism.L2.Theta.mt V (e α) *ᵥ y = Formalism.L2.Theta.mt V (e (a v)) *ᵥ y
+                  ∧ Formalism.L2.Theta.mt V ζ *ᵥ y = c v • y)
+            ∧ (∀ v ∉ s, ∀ y : Fin V.rank → AE D,
+              (∀ i, y i ∈ idAt D (· = v))
+                → Formalism.L2.Theta.mt V (e α) *ᵥ y = y ∧ Formalism.L2.Theta.mt V ζ *ᵥ y = y) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
-    refine ⟨1, one_mem _, one_mem _, 1, one_mem _, fun v hv => absurd hv (Finset.notMem_empty v), fun v _ y _ => ?_⟩
+    refine ⟨
+      1,
+      one_mem _,
+      one_mem _,
+      1,
+      one_mem _,
+      fun v hv => absurd hv (Finset.notMem_empty v),
+      fun v _ y _ => ?_
+    ⟩
     rw [map_one, mt_one, Matrix.one_mulVec]
     exact ⟨rfl, rfl⟩
   | insert w s hws ih =>
@@ -124,24 +160,31 @@ theorem glue_finset {V A : HSp D} (e : GA D A →* GA D V)
       · rw [map_mul, mt_mul, ← Matrix.mulVec_mulVec, h1, mulVec_fix hvw (he w _ (ha w).1) hy]
       · rw [mt_mul, ← Matrix.mulVec_mulVec, h2, mulVec_fix hvw (hz w).1 hy]
 
-
 set_option maxHeartbeats 800000 in
-theorem glue : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) (L M : Lat V), IsSelfDualC V L → IsSelfDualC V M → (∀ v : GlobalTheory.FinPl.Pl D, ∀ a ∈ grpAt A (· = v), e a ∈ grpAt V (· = v)) → (∀ v : GlobalTheory.FinPl.Pl D, ∃ (a : GA D A) (c : AE D), CenAt A v a ∧ NormOneAt v c ∧ SMoves V c (g * e a) L M v) → ∃ a ∈ GfC A, a ∈ Subgroup.center (GA D A) ∧ ∃ z ∈ Subgroup.center (GA D V), Moves V (z * (g * e a)) L M (fun _ => True) := by
+theorem glue
+    : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) (L M : Lat V),
+      IsSelfDualC V L → IsSelfDualC V M
+        → (∀ v : GlobalTheory.FinPl.Pl D, ∀ a ∈ grpAt A (· = v), e a ∈ grpAt V (· = v))
+        → (∀ v : GlobalTheory.FinPl.Pl D, ∃ (a : GA D A) (c : AE D),
+          CenAt A v a ∧ NormOneAt v c ∧ SMoves V c (g * e a) L M v)
+        → ∃ a ∈ GfC A,
+          a ∈ Subgroup.center (GA D A)
+            ∧ ∃ z ∈ Subgroup.center (GA D V), Moves V (z * (g * e a)) L M (fun _ => True) := by
   intro D V A e g L M hL hM he hloc
   classical
   choose a c ha hc hs using hloc
   choose z hz hzm using fun v => GlobalTheory.T.exists_centralUnitary_scalar_of_normOneIdele D V v (c v) (hc v)
   obtain ⟨M', hM'sd, hgM'⟩ := (GlobalTheory.T.selfDual_image_adelicPoint_wittCore D V L hL).1 g
-  have hfull : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
-      IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
+  have hfull
+      : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
+        IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
     intro V Λ hΛ
     haveI : Submodule.IsLattice D.host.E Λ := hΛ.1
     refine ⟨?_⟩
     obtain ⟨s, hs⟩ := hΛ.1.fg
     apply eq_top_iff.mpr
     intro y _
-    let f : (Fin V.rank → D.host.E) → D.host.E := fun x =>
-      ∑ i, ∑ j, star (x i) * V.gram i j * y j
+    let f : (Fin V.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * V.gram i j * y j
     obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) s f
     have ha0 : (algebraMap (𝓞 D.host.E) D.host.E a) ≠ 0 := by
       exact (FaithfulSMul.algebraMap_injective _ _).ne (mem_nonZeroDivisors_iff_ne_zero.mp a.2)
@@ -157,14 +200,16 @@ theorem glue : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) 
       smul_mem' := by
         rintro c x ⟨b, hb⟩
         refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
-        simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul, RingOfIntegers.mapRingHom_apply, star_mul]
+        simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul,
+          RingOfIntegers.mapRingHom_apply, star_mul]
         simp only [Finset.mul_sum]
         apply Finset.sum_congr rfl
         intro i _
         apply Finset.sum_congr rfl
         intro j _
         change star (c : D.host.E) * _ = _
-        ring }
+        ring
+    }
     have hsP : (s : Set (Fin V.rank → D.host.E)) ⊆ P := by
       intro x hx
       obtain ⟨b, hb⟩ := ha x hx
@@ -183,12 +228,15 @@ theorem glue : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) 
       apply Finset.sum_congr rfl
       intro j _
       ring
-    have hy' : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
+    have hy'
+        : (algebraMap (𝓞 D.host.E) D.host.E a) • y
+          ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
       Submodule.subset_span hy
-    have := (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy' 
-    change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ •
-      ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _ at this
+    have :=
+      (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
+        (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
+    change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ • ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _
+      at this
     rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
     exact this
   have hcompare := by
@@ -196,13 +244,15 @@ theorem glue : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) 
     | exact GlobalTheory.FinPl.latV_eq_off_finite D V M' M (hfull V M' hM'sd) (hfull V M hM)
     | exact GlobalTheory.FinPl.latV_eq_off_finite D V M' M (hfull V M' hM'sd) hM.1
   obtain ⟨T, hT⟩ := hcompare
-  have hoff : ∀ v ∉ T, Moves V g L M (· = v) := fun v hv y hy => by
-    rw [hgM' _ y hy, hT v hv]
+  have hoff : ∀ v ∉ T, Moves V g L M (· = v) := fun v hv y hy => by rw [hgM' _ y hy, hT v hv]
   obtain ⟨α, hαG, hαC, ζ, hζC, hin, hout⟩ := glue_finset e he a c z ha hz hzm T
   refine ⟨α, hαG, hαC, ζ, hζC, ?_⟩
   have comm : ζ * (g * e α) = g * e α * ζ := ((Subgroup.mem_center_iff.1 hζC) _).symm
-  have hmt : ∀ y : Fin V.rank → AE D, Formalism.L2.Theta.mt V (ζ * (g * e α)) *ᵥ y =
-      Formalism.L2.Theta.mt V g *ᵥ (Formalism.L2.Theta.mt V (e α) *ᵥ (Formalism.L2.Theta.mt V ζ *ᵥ y)) := fun y => by
+  have hmt
+      : ∀ y : Fin V.rank → AE D,
+        Formalism.L2.Theta.mt V (ζ * (g * e α)) *ᵥ y
+          = Formalism.L2.Theta.mt V g
+            *ᵥ (Formalism.L2.Theta.mt V (e α) *ᵥ (Formalism.L2.Theta.mt V ζ *ᵥ y)) := fun y => by
     rw [comm, mt_mul, mt_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
   have loc : ∀ v, Moves V (ζ * (g * e α)) L M (· = v) := by
     intro v y hy
@@ -216,11 +266,14 @@ theorem glue : ∀ (D : D7) (V A : HSp D) (e : GA D A →* GA D V) (g : GA D V) 
       exact hoff v hv y hy
   intro y hy
   rw [GlobalTheory.FinPlLoc.part_lat _ V L y hL.1, GlobalTheory.FinPlLoc.part_lat _ V M _ hM.1]
-  have hsupp : ∀ i, (Formalism.L2.Theta.mt V (ζ * (g * e α)) *ᵥ y) i ∈ idAt D (fun _ => True) := fun i => by
+  have hsupp
+      : ∀ i,
+        (Formalism.L2.Theta.mt V (ζ * (g * e α)) *ᵥ y) i ∈ idAt D (fun _ => True) := fun i => by
     simp only [Matrix.mulVec, dotProduct]
     exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (hy j)
-  refine and_congr (iff_of_true hy hsupp) (forall_congr' fun v => imp_congr_right fun _ =>
-    forall_congr' fun x => forall_congr' fun hx => ?_)
+  refine and_congr (iff_of_true hy hsupp)
+    (forall_congr' fun v =>
+      imp_congr_right fun _ => forall_congr' fun x => forall_congr' fun hx => ?_)
   have hxy : ∀ i, (x • y) i ∈ idAt D (· = v) := fun i => by
     rw [Pi.smul_apply, smul_eq_mul]
     exact Ideal.mul_mem_right _ _ hx.1

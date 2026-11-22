@@ -5,13 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PosPa
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.WignerGL GlobalTheory.WigAlg Formalism.REAL
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.WignerGL
+  GlobalTheory.WigAlg Formalism.REAL
 open scoped TensorProduct
 
 namespace GlobalTheory.WigAlg
 
-theorem mul_embeddingScalar_eq_coord_mul {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E) (z : ℂ) :
-    c * atEmb τ z = atEmb τ (coord τ c * z) := by
+theorem mul_embeddingScalar_eq_coord_mul {E : Type} [Field E] (τ : E →+* ℂ) (c : Cinf E) (z : ℂ)
+    : c * atEmb τ z = atEmb τ (coord τ c * z) := by
   classical
   unfold coord atEmb
   funext w

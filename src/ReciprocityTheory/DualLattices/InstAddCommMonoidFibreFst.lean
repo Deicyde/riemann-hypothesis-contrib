@@ -100,7 +100,8 @@ instance instAddCommMonoidFibreFst (R : LAlg R₀) (y : B.G R) : AddCommMonoid (
 
 def S1mk {x y : B.G R} (u : B.P R x y) : B.S1 R y := ⟨x, u⟩
 
-def PrimaryComponentScale {y : B.G R} (l : (R : Type u)ˣ) (a : B.S1 R y) : B.S1 R y := ⟨a.1, B.smul l a.2⟩
+def PrimaryComponentScale {y : B.G R} (l : (R : Type u)ˣ) (a : B.S1 R y) : B.S1 R y :=
+  ⟨a.1, B.smul l a.2⟩
 
 lemma S1smul_add {y : B.G R} (l l' : (R : Type u)ˣ) (a b : B.S1 R y) :
     B.PrimaryComponentScale l a + B.PrimaryComponentScale l' b = B.PrimaryComponentScale (l * l') (a + b) :=
@@ -140,7 +141,8 @@ lemma fibreFst_idem {y : B.G R} (a : B.S1 R y) (h : a + a = a) : a = 0 := by
   have h3 : μ * μ = μ * 1 := by rw [B.smul_inj h2, mul_one]
   rw [mul_left_cancel h3, S1smul_one]
 
-def PrimaryComponentMap {S : LAlg R₀} (f : LHom R S) (y : B.G R) : B.S1 R y →+ B.S1 S (B.map f y) where
+def PrimaryComponentMap {S : LAlg R₀} (f : LHom R S) (y : B.G R)
+    : B.S1 R y →+ B.S1 S (B.map f y) where
   toFun a := ⟨B.map f a.1, B.pmap f a.2⟩
   map_zero' := Sigma.ext (map_zero _) (B.zeroFst_nat f y)
   map_add' a b := Sigma.ext (map_add _ _ _) (B.addFst_nat f a.2 b.2)
@@ -174,7 +176,8 @@ instance instAddCommMonoidFibreSnd (R : LAlg R₀) (x : B.G R) : AddCommMonoid (
 
 def S2mk {x y : B.G R} (u : B.P R x y) : B.S2 R x := ⟨y, u⟩
 
-def SecondaryComponentScale {x : B.G R} (l : (R : Type u)ˣ) (a : B.S2 R x) : B.S2 R x := ⟨a.1, B.smul l a.2⟩
+def SecondaryComponentScale {x : B.G R} (l : (R : Type u)ˣ) (a : B.S2 R x) : B.S2 R x :=
+  ⟨a.1, B.smul l a.2⟩
 
 lemma S2smul_add {x : B.G R} (l l' : (R : Type u)ˣ) (a b : B.S2 R x) :
     B.SecondaryComponentScale l a + B.SecondaryComponentScale l' b = B.SecondaryComponentScale (l * l') (a + b) :=
@@ -214,7 +217,8 @@ lemma fibreSnd_idem {x : B.G R} (a : B.S2 R x) (h : a + a = a) : a = 0 := by
   have h3 : μ * μ = μ * 1 := by rw [B.smul_inj h2, mul_one]
   rw [mul_left_cancel h3, S2smul_one]
 
-def SecondaryComponentMap {S : LAlg R₀} (f : LHom R S) (x : B.G R) : B.S2 R x →+ B.S2 S (B.map f x) where
+def SecondaryComponentMap {S : LAlg R₀} (f : LHom R S) (x : B.G R)
+    : B.S2 R x →+ B.S2 S (B.map f x) where
   toFun a := ⟨B.map f a.1, B.pmap f a.2⟩
   map_zero' := Sigma.ext (map_zero _) (B.zeroSnd_nat f x)
   map_add' a b := Sigma.ext (map_add _ _ _) (B.addSnd_nat f a.2 b.2)

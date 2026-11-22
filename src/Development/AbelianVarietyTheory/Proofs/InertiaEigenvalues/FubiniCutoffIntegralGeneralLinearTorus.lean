@@ -10,16 +10,31 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.LinDesc
 
-theorem sigmaFinite_comap_of_measurable {X Y : Type} [MeasurableSpace X] [MeasurableSpace Y] (f : X → Y)
-    (hf : Measurable f) (μ : Measure Y) [SigmaFinite μ] : SigmaFinite (μ.comap f) := by
+theorem sigmaFinite_comap_of_measurable
+    {X Y : Type} [MeasurableSpace X] [MeasurableSpace Y]
+    (f : X → Y) (hf : Measurable f)
+    (μ : Measure Y) [SigmaFinite μ]
+    : SigmaFinite (μ.comap f) := by
   by_cases h : Function.Injective f ∧ ∀ s, MeasurableSet s → NullMeasurableSet (f '' s) μ
   · refine ⟨⟨⟨fun n => f ⁻¹' spanningSets μ n, fun _ => trivial, fun n => ?_, ?_⟩⟩⟩
-    · rw [Measure.comap_apply₀ f μ h.1 h.2 ((measurableSet_spanningSets μ n).preimage hf).nullMeasurableSet]
-      exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _)) (measure_spanningSets_lt_top μ n)
+    · rw [Measure.comap_apply₀ f μ h.1 h.2
+        ((measurableSet_spanningSets μ n).preimage hf).nullMeasurableSet]
+      exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _))
+        (measure_spanningSets_lt_top μ n)
     · rw [← Set.preimage_iUnion, iUnion_spanningSets, Set.preimage_univ]
   · rw [Measure.comap, dite_eq_right h]; infer_instance
 
-theorem fubini_cutoff : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (hG : A.IsGen τ p) (M : Meas r F E) (μK : Measure A.K), μK.IsAddHaarMeasure → ∀ (α : GL (Fin r) F → ℝ) (Φ : GL (Fin r) F → ℂ), IsTest Φ → IsLocallyConstant α → HasCompactSupport α → (∀ g, 0 ≤ α g) → ∀ c : GL (Fin r) F, (∀ g, Φ g ≠ 0 → ∫ s, α (g * c * LinDesc.tm A hG s) ∂(LinDesc.unitsMeas A μK) = 1) → ∫ s, (letI := M.mG; ∫ g, Φ g * (α (g * c * LinDesc.tm A hG s) : ℂ) ∂M.μG) ∂(LinDesc.unitsMeas A μK) = (letI := M.mG; ∫ g, Φ g ∂M.μG) := by
+theorem fubini_cutoff
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (hG : A.IsGen τ p)
+        (M : Meas r F E) (μK : Measure A.K),
+      μK.IsAddHaarMeasure
+        → ∀ (α : GL (Fin r) F → ℝ) (Φ : GL (Fin r) F → ℂ),
+          IsTest Φ → IsLocallyConstant α → HasCompactSupport α → (∀ g, 0 ≤ α g)
+            → ∀ c : GL (Fin r) F,
+              (∀ g, Φ g ≠ 0 → ∫ s, α (g * c * LinDesc.tm A hG s) ∂(LinDesc.unitsMeas A μK) = 1)
+                → ∫ s, (letI := M.mG; ∫ g, Φ g * (α (g * c * LinDesc.tm A hG s) : ℂ) ∂M.μG) ∂(LinDesc.unitsMeas A μK)
+                  = (letI := M.mG; ∫ g, Φ g ∂M.μG) := by
   intro F E _ _ _ _ _ A r τ p hG M μK hμK α Φ hΦ hαlc hαcs hα0 c h1
   letI := M.mG
   haveI := M.bG
@@ -45,8 +60,10 @@ theorem fubini_cutoff : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivial
     haveI : SigmaFinite (μK.withDensity fun t => ENNReal.ofReal (A.absK t)⁻¹) :=
       SigmaFinite.withDensity_ofReal _
     exact sigmaFinite_comap_of_measurable _ (measurable_iff_comap_le.2 le_rfl) _
-  have htm : Continuous (LinDesc.tm A hG) := Continuous.units_map _
-    (IsModuleTopology.continuous_of_linearMap (Algebra.leftMulMatrix (LinDesc.bas A hG)).toLinearMap)
+  have htm : Continuous (LinDesc.tm A hG) :=
+    Continuous.units_map _
+      (IsModuleTopology.continuous_of_linearMap (Algebra.leftMulMatrix (LinDesc.bas A
+        hG)).toLinearMap)
   have hΦc : Continuous Φ := hΦ.1.continuous
   have hαc : Continuous α := hαlc.continuous
   have hC : IsCompact (tsupport Φ) := hΦ.2
@@ -74,7 +91,8 @@ theorem fubini_cutoff : ∀ (F E : Type) [NontriviallyNormedField F] [Nontrivial
   have hint : Integrable (Function.uncurry f) (ν.prod (M.μG.restrict (tsupport Φ))) := by
     rw [integrable_prod_iff' hfc.aestronglyMeasurable]
     refine ⟨Eventually.of_forall hin, ?_⟩
-    exact (hΦc.norm.continuousOn.integrableOn_compact hC).congr (Eventually.of_forall fun g => (hnorm g).symm)
+    exact (hΦc.norm.continuousOn.integrableOn_compact hC).congr
+      (Eventually.of_forall fun g => (hnorm g).symm)
   have eL : ∀ s, ∫ g, f s g ∂M.μG = ∫ g in tsupport Φ, f s g ∂M.μG := fun s =>
     (setIntegral_eq_integral_of_forall_compl_eq_zero fun g hg => by simp [hf, hz g hg]).symm
   have eR : ∫ g, Φ g ∂M.μG = ∫ g in tsupport Φ, Φ g ∂M.μG :=

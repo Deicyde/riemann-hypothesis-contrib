@@ -11,18 +11,21 @@ open PositivityTheory.Rg.BcB.E1
 
 namespace GlobalTheory.CompanionTheory.SchurKernel
 
-theorem lintegral_enorm_rpow_two_ne_top {α : Type} [MeasurableSpace α] {ν : Measure α} {g : α → ℂ}
-    (hg : MemLp g 2 ν) : ∫⁻ x, ‖g x‖ₑ ^ (2 : ℝ) ∂ν ≠ ⊤ := by
-  have h := lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top (p := 2) (by norm_num) (by norm_num)
-    hg.eLpNorm_lt_top
+theorem lintegral_enorm_rpow_two_ne_top
+    {α : Type} [MeasurableSpace α] {ν : Measure α} {g : α → ℂ} (hg : MemLp g 2 ν)
+    : ∫⁻ x, ‖g x‖ₑ ^ (2 : ℝ) ∂ν ≠ ⊤ := by
+  have h :=
+    lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top (p := 2) (by norm_num) (by norm_num)
+      hg.eLpNorm_lt_top
   simpa using h.ne
 
 theorem schurInt_of_schurL : SchurL → SchurInt := by
   intro hS α _ ν _ k A hk hA hrow hcol g f hg hf
-  have hkm : AEStronglyMeasurable (fun p : α × α => k p.1 p.2) (ν.prod ν) :=
-    hk.aestronglyMeasurable
-  have hgm : AEStronglyMeasurable (fun p : α × α => g p.1) (ν.prod ν) := hg.aestronglyMeasurable.comp_fst
-  have hfm : AEStronglyMeasurable (fun p : α × α => f p.2) (ν.prod ν) := hf.aestronglyMeasurable.comp_snd
+  have hkm : AEStronglyMeasurable (fun p : α × α => k p.1 p.2) (ν.prod ν) := hk.aestronglyMeasurable
+  have hgm : AEStronglyMeasurable (fun p : α × α => g p.1) (ν.prod ν) :=
+    hg.aestronglyMeasurable.comp_fst
+  have hfm : AEStronglyMeasurable (fun p : α × α => f p.2) (ν.prod ν) :=
+    hf.aestronglyMeasurable.comp_snd
   have hm : AEStronglyMeasurable (fun p : α × α => g p.1 * k p.1 p.2 * f p.2) (ν.prod ν) :=
     (hgm.mul hkm).mul hfm
   refine ⟨hm, ?_⟩
@@ -42,8 +45,9 @@ theorem schurInt_of_schurL : SchurL → SchurInt := by
     rw [← lintegral_const_mul' _ _ enorm_ne_top]
     refine lintegral_congr fun y => ?_
     simp only [enorm_mul, mul_assoc]
-  have hhold := ENNReal.lintegral_mul_le_Lp_mul_Lq ν (Real.HolderConjugate.two_two)
-    hg.aestronglyMeasurable.aemeasurable.enorm hhm
+  have hhold :=
+    ENNReal.lintegral_mul_le_Lp_mul_Lq ν (Real.HolderConjugate.two_two)
+      hg.aestronglyMeasurable.aemeasurable.enorm hhm
   have hG : ∫⁻ x, ‖g x‖ₑ ^ (2 : ℝ) ∂ν ≠ ⊤ := lintegral_enorm_rpow_two_ne_top hg
   have hF : ∫⁻ x, ‖f x‖ₑ ^ (2 : ℝ) ∂ν ≠ ⊤ := lintegral_enorm_rpow_two_ne_top hf
   have hH : ∫⁻ x, h x ^ (2 : ℝ) ∂ν ≠ ⊤ := by

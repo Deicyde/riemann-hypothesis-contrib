@@ -14,11 +14,11 @@ open MvPolynomial
 noncomputable section
 
 def NefGenericDVR.Statement : Prop :=
-  ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (F : Type) [Field F] [Algebra O F]
-    [IsFractionRing O F] (Ω : Type) [Field Ω] [Algebra O Ω] [Algebra F Ω] [IsScalarTower O F Ω]
-    (N : ℕ) (x : Fin (N + 1) → Ω) (M : Kleiman.LineBundle O x),
-    Kleiman.NefAbove M.toSubSystem ((IsLocalRing.maximalIdeal O).map (C : O →+* Kleiman.Poly O N)) →
-    Kleiman.Nef (M.toSubSystem.extend F)
+  ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (F : Type) [Field F]
+      [Algebra O F] [IsFractionRing O F] (Ω : Type) [Field Ω] [Algebra O Ω] [Algebra F Ω]
+      [IsScalarTower O F Ω] (N : ℕ) (x : Fin (N + 1) → Ω) (M : Kleiman.LineBundle O x),
+    Kleiman.NefAbove M.toSubSystem ((IsLocalRing.maximalIdeal O).map (C : O →+* Kleiman.Poly O N))
+      → Kleiman.Nef (M.toSubSystem.extend F)
 
 abbrev exO : Type := PowerSeries ℚ
 
@@ -26,14 +26,15 @@ abbrev exF : Type := FractionRing exO
 
 abbrev exΩ : Type := RatFunc exF
 
-theorem NefGenericDVR.hyps :
-    Kleiman.NefAbove (Kleiman.twistBundle exO (Kleiman.lineX exF) 0).toSubSystem
-      ((IsLocalRing.maximalIdeal exO).map (C : exO →+* Kleiman.Poly exO 1)) :=
-  by
-    unfold Kleiman.NefAbove
-    intro pp _ _
-    rw [show (Kleiman.twistBundle exO (Kleiman.lineX exF) 0).toSubSystem =
-      Kleiman.twistSys exO (Kleiman.lineX exF) 0 from rfl, Kleiman.interNum_twistSys_zero]
+theorem NefGenericDVR.hyps
+    : Kleiman.NefAbove (Kleiman.twistBundle exO (Kleiman.lineX exF) 0).toSubSystem
+      ((IsLocalRing.maximalIdeal exO).map (C : exO →+* Kleiman.Poly exO 1)) := by
+  unfold Kleiman.NefAbove
+  intro pp _ _
+  rw [show (Kleiman.twistBundle exO (Kleiman.lineX exF) 0).toSubSystem
+        = Kleiman.twistSys exO (Kleiman.lineX exF) 0 from
+      rfl,
+    Kleiman.interNum_twistSys_zero]
 
 end
 

@@ -19,41 +19,50 @@ local instance measurableSpaceThirdLift : MeasurableSpace k := borel k
 local instance borelSpaceThirdLift : BorelSpace k := ⟨rfl⟩
 local instance instSCK3 : SecondCountableTopology k := GlobalTheory.SplitWeil.secondCountable k
 
-variable {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
-  {col : (Fin (m + 1) → k) → V →ₗ[ℂ] V} {gl : GL (Fin (m + 1)) k →* (V →ₗ[ℂ] V)} (hS : Setup col gl) {s : ℝ}
-  {B B' C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} {A₀ : AddSubgroup (Fin (m + 1) → k)} (hA₀ : Lat A₀)
-  (hBp : Psd B) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
-  (hBg : ∀ g v w, B (gl g v) (gl g w) = ((md g ^ s : ℝ) : ℂ) * B v w)
-  (hD : IsD ψ col A₀ B B') (hCp : Psd C) (hCc : ∀ x v w, C (col x v) w = ((ψ (xz m ⬝ᵥ x) : Circle) : ℂ) * C v w)
+variable
+  {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+  {m : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+  {col : (Fin (m + 1) → k) → V →ₗ[ℂ] V} {gl : GL (Fin (m + 1)) k →* (V →ₗ[ℂ] V)} (hS : Setup col gl)
+  {s : ℝ} {B B' C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} {A₀ : AddSubgroup (Fin (m + 1) → k)}
+  (hA₀ : Lat A₀) (hBp : Psd B) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
+  (hBg : ∀ g v w, B (gl g v) (gl g w) = ((md g ^ s : ℝ) : ℂ) * B v w) (hD : IsD ψ col A₀ B B')
+  (hCp : Psd C) (hCc : ∀ x v w, C (col x v) w = ((ψ (xz m ⬝ᵥ x) : Circle) : ℂ) * C v w)
   (hC : ∀ p ∈ Mir k m, ∀ v w, C (gl p v) (gl p w) = ((md p ^ (s + 1) : ℝ) : ℂ) * C v w)
   (hCB : ∀ v, (C v v).re ≤ (B' v v).re)
-  {ν : Measure (Fin (m + 1) → k)} [ν.IsAddHaarMeasure] (hν : ν (perp ψ A₀) = 1)
-
+  {ν : Measure (Fin (m + 1) → k)} [ν.IsAddHaarMeasure]
+  (hν : ν (perp ψ A₀) = 1)
 
 include hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC hCB hν in
-theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m + 1) → k) ∉ K) (v : V) :
-    ∫⁻ ξ in K, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν ≤ ENNReal.ofReal (B v v).re := by
+theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m + 1) → k) ∉ K) (v : V)
+    : ∫⁻ ξ in K, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν ≤ ENNReal.ofReal (B v v).re := by
   classical
-  have hloc : ∀ ζ ∈ K, ∃ M₀ : AddSubgroup (Fin (m + 1) → k), Lat M₀ ∧
-      ∀ ξ, ξ - ζ ∈ perp ψ M₀ → Df gl s C ξ v v = Df gl s C ζ v v ∧
-        ∀ M : AddSubgroup (Fin (m + 1) → k), Lat M → M₀ ≤ M →
-          (Df gl s C ζ v v).re * (ν (perp ψ M)).toReal ≤ (B (av ψ col ξ M v) v).re :=
+  have hloc
+      : ∀ ζ ∈ K, ∃ M₀ : AddSubgroup (Fin (m + 1) → k),
+        Lat M₀
+          ∧ ∀ ξ,
+            ξ - ζ ∈ perp ψ M₀
+              → Df gl s C ξ v v = Df gl s C ζ v v
+                ∧ ∀ M : AddSubgroup (Fin (m + 1) → k),
+                  Lat M → M₀ ≤ M
+                    → (Df gl s C ζ v v).re * (ν (perp ψ M)).toReal ≤ (B (av ψ col ξ M v) v).re :=
     fun ζ hζ => locB hψ hψ1 hS hA₀ hBg hD hCp hC hCB hν (fun h => h0 (h ▸ hζ)) v
   choose! M₀ hM₀L hM₀ using hloc
-  obtain ⟨F, hFK, hFfin, hFcov⟩ := hK.elim_finite_subcover_image (b := K)
-    (c := fun ζ => (fun ξ => ξ - ζ) ⁻¹' (perp ψ (M₀ ζ) : Set (Fin (m + 1) → k)))
-    (fun ζ hζ => (perp_open ψ hψ hψ1 (hM₀L ζ hζ)).preimage (continuous_sub_right ζ))
-    (fun ζ hζ => Set.mem_biUnion hζ (by simp))
+  obtain ⟨F, hFK, hFfin, hFcov⟩ :=
+    hK.elim_finite_subcover_image (b := K)
+      (c := fun ζ => (fun ξ => ξ - ζ) ⁻¹' (perp ψ (M₀ ζ) : Set (Fin (m + 1) → k)))
+      (fun ζ hζ => (perp_open ψ hψ hψ1 (hM₀L ζ hζ)).preimage (continuous_sub_right ζ))
+      (fun ζ hζ => Set.mem_biUnion hζ (by simp))
   have hcomp : IsCompact (⋃ ζ ∈ F, (M₀ ζ : Set (Fin (m + 1) → k))) :=
     hFfin.isCompact_biUnion fun ζ hζ => (hM₀L ζ (hFK hζ)).1
   obtain ⟨M, hML, hMsub⟩ := lat_over hcomp
   have hMle : ∀ ζ ∈ F, M₀ ζ ≤ M := fun ζ hζ x hx => hMsub (Set.mem_biUnion hζ hx)
   have hPle : ∀ ζ ∈ F, perp ψ M ≤ perp ψ (M₀ ζ) := fun ζ hζ => perp_anti ψ (hMle ζ hζ)
   have hPo : IsOpen (perp ψ M : Set (Fin (m + 1) → k)) := perp_open ψ hψ hψ1 hML
-  obtain ⟨T, hTK, hTfin, hTcov⟩ := hK.elim_finite_subcover_image (b := K)
-    (c := fun t => (fun ξ => ξ - t) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)))
-    (fun t _ => hPo.preimage (continuous_sub_right t))
-    (fun ξ hξ => Set.mem_biUnion hξ (by simp))
+  obtain ⟨T, hTK, hTfin, hTcov⟩ :=
+    hK.elim_finite_subcover_image (b := K)
+      (c := fun t => (fun ξ => ξ - t) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)))
+      (fun t _ => hPo.preimage (continuous_sub_right t))
+      (fun ξ hξ => Set.mem_biUnion hξ (by simp))
   let q : (Fin (m + 1) → k) → (Fin (m + 1) → k) ⧸ perp ψ M := QuotientAddGroup.mk
   have hq : ∀ a b, q a = q b → a - b ∈ perp ψ M := fun a b h => by
     have h1 := (perp ψ M).neg_mem (QuotientAddGroup.eq.mp h)
@@ -84,7 +93,8 @@ theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m +
   have hKS : K ⊆ ⋃ η ∈ S, (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)) := by
     intro ξ hξ
     obtain ⟨t, ht, hξt⟩ := Set.mem_iUnion₂.mp (hTcov hξ)
-    refine Set.mem_iUnion₂.mpr ⟨(q t).out, Finset.mem_image.mpr ⟨t, hTfin.mem_toFinset.mpr ht, rfl⟩, ?_⟩
+    refine Set.mem_iUnion₂.mpr
+      ⟨(q t).out, Finset.mem_image.mpr ⟨t, hTfin.mem_toFinset.mpr ht, rfl⟩, ?_⟩
     have h1 : t - (q t).out ∈ perp ψ M := hq _ _ (hout t).symm
     show ξ - (q t).out ∈ perp ψ M
     rw [show ξ - (q t).out = (ξ - t) + (t - (q t).out) by abel]
@@ -96,9 +106,12 @@ theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m +
     rw [show η - η' = (ξ - η') - (ξ - η) by abel]
     exact sub_mem (show ξ - η' ∈ perp ψ M from h2) (show ξ - η ∈ perp ψ M from h1)
   have hPfin : ν (perp ψ M) < ∞ := meas_perp_lt_top ψ ν hψ hψ1 hML
-  have hbd : ∀ η ∈ S, (Df gl s C η v v).re * (ν (perp ψ M)).toReal ≤ (B (av ψ col η M v) v).re ∧
-      ∃ ζ ∈ F, Df gl s C η v v = Df gl s C ζ v v ∧
-        ∀ ξ, ξ - η ∈ perp ψ M → Df gl s C ξ v v = Df gl s C η v v := by
+  have hbd
+      : ∀ η ∈ S,
+        (Df gl s C η v v).re * (ν (perp ψ M)).toReal ≤ (B (av ψ col η M v) v).re
+          ∧ ∃ ζ ∈ F,
+            Df gl s C η v v = Df gl s C ζ v v
+              ∧ ∀ ξ, ξ - η ∈ perp ψ M → Df gl s C ξ v v = Df gl s C η v v := by
     intro η hη
     obtain ⟨ζ, hζ, hζη⟩ := hSF η hη
     have hζK := hFK hζ
@@ -107,13 +120,18 @@ theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m +
     refine ⟨by rw [e0]; exact hb, ζ, hζ, e0, fun ξ hξ => ?_⟩
     rw [e0]
     exact ((hM₀ ζ hζK) ξ (hζη ξ hξ)).1
-  have step : ∀ η ∈ S, ∫⁻ ξ in (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)),
-      ENNReal.ofReal (Df gl s C ξ v v).re ∂ν ≤ ENNReal.ofReal (B (av ψ col η M v) v).re := by
+  have step
+      : ∀ η ∈ S,
+        ∫⁻ ξ in (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)),
+            ENNReal.ofReal (Df gl s C ξ v v).re ∂ν
+          ≤ ENNReal.ofReal (B (av ψ col η M v) v).re := by
     intro η hη
     obtain ⟨hb, -, -, -, hc⟩ := hbd η hη
-    rw [setLIntegral_congr_fun (g := fun _ => ENNReal.ofReal (Df gl s C η v v).re)
-      (hPo.preimage (continuous_sub_right η)).measurableSet
-      (fun ξ hξ => by simp only; rw [hc ξ hξ]), setLIntegral_const]
+    rw [setLIntegral_congr_fun
+        (g := fun _ => ENNReal.ofReal (Df gl s C η v v).re)
+        (hPo.preimage (continuous_sub_right η)).measurableSet
+        (fun ξ hξ => by simp only; rw [hc ξ hξ]),
+      setLIntegral_const]
     have hmeas : ν ((fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k))) = ν (perp ψ M) := by
       simp only [sub_eq_add_neg]
       exact measure_preimage_add_right ν (-η) _
@@ -122,26 +140,31 @@ theorem cov {K : Set (Fin (m + 1) → k)} (hK : IsCompact K) (h0 : (0 : Fin (m +
   have hnn : ∀ η ∈ S, 0 ≤ (B (av ψ col η M v) v).re := fun η hη =>
     le_trans (mul_nonneg (Df_re_nonneg hCp η v) ENNReal.toReal_nonneg) (hbd η hη).1
   have hbes := av_bessel ψ hψ col hS.col_zero hS.col_add hS.smooth_col B hBp hBc M hML S hSd v
-  calc ∫⁻ ξ in K, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν
-      ≤ ∫⁻ ξ in ⋃ η ∈ S, (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)),
-          ENNReal.ofReal (Df gl s C ξ v v).re ∂ν := lintegral_mono_set hKS
+  calc
+    ∫⁻ ξ in K, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν
+        ≤ ∫⁻ ξ in ⋃ η ∈ S, (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)),
+            ENNReal.ofReal (Df gl s C ξ v v).re ∂ν :=
+      lintegral_mono_set hKS
     _ = ∑ η ∈ S, ∫⁻ ξ in (fun ξ => ξ - η) ⁻¹' (perp ψ M : Set (Fin (m + 1) → k)),
           ENNReal.ofReal (Df gl s C ξ v v).re ∂ν :=
-        lintegral_biUnion_finset hdisj (fun η _ => (hPo.preimage (continuous_sub_right η)).measurableSet) _
+      lintegral_biUnion_finset hdisj
+        (fun η _ => (hPo.preimage (continuous_sub_right η)).measurableSet)
+        _
     _ ≤ ∑ η ∈ S, ENNReal.ofReal (B (av ψ col η M v) v).re := Finset.sum_le_sum step
-    _ = ENNReal.ofReal (∑ η ∈ S, (B (av ψ col η M v) v).re) := (ENNReal.ofReal_sum_of_nonneg hnn).symm
+    _ = ENNReal.ofReal (∑ η ∈ S, (B (av ψ col η M v) v).re) :=
+      (ENNReal.ofReal_sum_of_nonneg hnn).symm
     _ ≤ ENNReal.ofReal (B v v).re := ENNReal.ofReal_le_ofReal hbes
 
-
 include hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC hCB hν in
-theorem bessel (v : V) : ∫⁻ ξ, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν ≤ ENNReal.ofReal (B v v).re := by
+theorem bessel (v : V)
+    : ∫⁻ ξ, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν ≤ ENNReal.ofReal (B v v).re := by
   classical
   let f : (Fin (m + 1) → k) → ℝ≥0∞ := fun ξ => ENNReal.ofReal (Df gl s C ξ v v).re
   have hDm : Measurable fun ξ => Df gl s C ξ v v := by
     apply measurable_of_continuousOn_compl_singleton 0
     intro ζ hζ
-    exact (continuousAt_const.congr
-      ((Df_loc hS hC hζ v v).mono fun ξ hξ => hξ.symm)).continuousWithinAt
+    exact (continuousAt_const.congr ((Df_loc hS hC hζ v v).mono fun ξ hξ =>
+      hξ.symm)).continuousWithinAt
   have hfm : Measurable f := ENNReal.measurable_ofReal.comp (Complex.measurable_re.comp hDm)
   obtain ⟨W, hWp, hW⟩ := (nhds_basis_opens (0 : Fin (m + 1) → k)).exists_antitone_subbasis
   let E := CompactExhaustion.choice (Fin (m + 1) → k)
@@ -166,12 +189,16 @@ theorem bessel (v : V) : ∫⁻ ξ, ENNReal.ofReal (Df gl s C ξ v v).re ∂ν �
       have hmem : ξ ∈ K (max n₁ i) := by
         refine ⟨E.subset (le_max_left _ _) hn₁, fun h => ?_⟩
         exact hi (hW.antitone (le_max_right _ _) h) rfl
-      refine le_antisymm (le_iSup_of_le (max n₁ i) ?_) (iSup_le fun n => Set.indicator_le_self _ _ ξ)
+      refine le_antisymm (le_iSup_of_le (max n₁ i) ?_)
+        (iSup_le fun n => Set.indicator_le_self _ _ ξ)
       simp [g, Set.indicator_apply, hmem]
   show ∫⁻ ξ, f ξ ∂ν ≤ _
-  calc ∫⁻ ξ, f ξ ∂ν = ∫⁻ ξ, ⨆ n, g n ξ ∂ν := lintegral_congr hsup
+  calc
+    ∫⁻ ξ, f ξ ∂ν
+      = ∫⁻ ξ, ⨆ n, g n ξ ∂ν := lintegral_congr hsup
     _ = ⨆ n, ∫⁻ ξ, g n ξ ∂ν := lintegral_iSup hgm hgmono
-    _ ≤ ENNReal.ofReal (B v v).re := iSup_le fun n => by
+    _ ≤ ENNReal.ofReal (B v v).re :=
+      iSup_le fun n => by
         simp only [g]
         rw [lintegral_indicator (hKc n).measurableSet]
         exact cov hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC hCB hν (hKc n) (h0K n) v
@@ -181,8 +208,8 @@ include hS hC in
 theorem Df_meas (v w : V) : Measurable fun ξ => Df gl s C ξ v w := by
   apply measurable_of_continuousOn_compl_singleton 0
   intro ζ hζ
-  exact (continuousAt_const.congr
-    ((Df_loc hS hC hζ v w).mono fun ξ hξ => hξ.symm)).continuousWithinAt
+  exact (continuousAt_const.congr ((Df_loc hS hC hζ v w).mono fun ξ hξ =>
+    hξ.symm)).continuousWithinAt
 
 include hψ hψ1 hS hA₀ hBp hBc hBg hD hCp hC hCB hν in
 theorem integrable_re (v : V) : Integrable (fun ξ => (Df gl s C ξ v v).re) ν := by

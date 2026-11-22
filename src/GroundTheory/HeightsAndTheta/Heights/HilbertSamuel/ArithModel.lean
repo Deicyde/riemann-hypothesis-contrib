@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -35,23 +36,23 @@ theorem mhNeg {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) : IsMultiHo
   rw [support_neg] at hm
   exact hf m hm
 
-theorem mhAdd {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f + g) a := by
+theorem mhAdd {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f + g) a := by
   intro m hm
   classical
   rcases Finset.mem_union.mp (support_add hm) with h | h
   · exact hf m h
   · exact hg m h
 
-theorem mhMul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem mhMul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   intro m hm k
   classical
   obtain ⟨m₁, hm₁, m₂, hm₂, rfl⟩ := Finset.mem_add.mp (support_mul f g hm)
   simp only [Finsupp.coe_add, Pi.add_apply, Finset.sum_add_distrib, hf m₁ hm₁ k, hg m₂ hm₂ k]
 
-theorem isMultiHomog_X (p : Σ k, ι k) [DecidableEq K] :
-    IsMultiHomog (X p : MRing ι) (fun k => if k = p.1 then 1 else 0) := by
+theorem isMultiHomog_X (p : Σ k, ι k) [DecidableEq K]
+    : IsMultiHomog (X p : MRing ι) (fun k => if k = p.1 then 1 else 0) := by
   intro m hm k
   classical
   rw [support_X, Finset.mem_singleton] at hm
@@ -109,20 +110,22 @@ theorem hasFDerivAt_normSqE (z : J → ℂ) : HasFDerivAt normSqE (2 • reInner
 
 theorem normSqE_pos {z : J → ℂ} (hz : z ≠ 0) : 0 < normSqE z := by
   unfold normSqE
-  have : eL z ≠ 0 := fun h => hz (by
-    have := congrArg (fun v : EuclideanSpace ℂ J => v.ofLp) h
-    simpa [eL_apply] using this)
+  have : eL z ≠ 0 := fun h =>
+    hz (by
+      have := congrArg (fun v : EuclideanSpace ℂ J => v.ofLp) h
+      simpa [eL_apply] using this)
   positivity
 
-theorem log_fs_eq : (fun z => Real.log ((fsMetric (ι := J)).ρ z)) = fun z => (1 / 2) * Real.log (normSqE z) := by
+theorem log_fs_eq
+    : (fun z => Real.log ((fsMetric (ι := J)).ρ z)) = fun z => (1 / 2) * Real.log (normSqE z) := by
   funext z
   change Real.log ‖WithLp.toLp 2 z‖ = _
   rw [normSqE, eL_apply, Real.log_pow]
   push_cast
   ring
 
-theorem hasFDerivAt_log_fs {y : J → ℂ} (hy : y ≠ 0) :
-    HasFDerivAt (fun z => Real.log ((fsMetric (ι := J)).ρ z)) ((normSqE y)⁻¹ • reInner y) y := by
+theorem hasFDerivAt_log_fs {y : J → ℂ} (hy : y ≠ 0)
+    : HasFDerivAt (fun z => Real.log ((fsMetric (ι := J)).ρ z)) ((normSqE y)⁻¹ • reInner y) y := by
   rw [log_fs_eq]
   have h := ((hasFDerivAt_normSqE y).log (normSqE_pos hy).ne').const_mul (1 / 2 : ℝ)
   refine h.congr_fderiv ?_
@@ -130,8 +133,8 @@ theorem hasFDerivAt_log_fs {y : J → ℂ} (hy : y ≠ 0) :
   simp
   ring
 
-theorem leviForm_log_fs_nonneg {z : J → ℂ} (hz : z ≠ 0) (w : J → ℂ) :
-    0 ≤ leviForm (fun z => Real.log ((fsMetric (ι := J)).ρ z)) z w := by
+theorem leviForm_log_fs_nonneg {z : J → ℂ} (hz : z ≠ 0) (w : J → ℂ)
+    : 0 ≤ leviForm (fun z => Real.log ((fsMetric (ι := J)).ρ z)) z w := by
   set G : (J → ℂ) → ((J → ℂ) →L[ℝ] ℝ) := fun y => (normSqE y)⁻¹ • reInner y with hG
   have hev : fderiv ℝ (fun z => Real.log ((fsMetric (ι := J)).ρ z)) =ᶠ[𝓝 z] G := by
     filter_upwards [isOpen_ne.mem_nhds hz] with y hy
@@ -139,10 +142,15 @@ theorem leviForm_log_fs_nonneg {z : J → ℂ} (hz : z ≠ 0) (w : J → ℂ) :
   have hq := normSqE_pos hz
   have hc : HasFDerivAt (fun y => (normSqE y)⁻¹) ((-(normSqE z ^ 2)⁻¹) • (2 • reInner z)) z :=
     (hasDerivAt_inv hq.ne').comp_hasFDerivAt z (hasFDerivAt_normSqE z)
-  have hGd : HasFDerivAt G ((normSqE z)⁻¹ • reInner + ((-(normSqE z ^ 2)⁻¹) • (2 • reInner z)).smulRight (reInner z)) z :=
+  have hGd : HasFDerivAt G
+      ((normSqE z)⁻¹ • reInner + ((-(normSqE z ^ 2)⁻¹) • (2 • reInner z)).smulRight (reInner z))
+      z :=
     hc.smul reInner.hasFDerivAt
-  have hD : ∀ v, fderiv ℝ (fderiv ℝ (fun z => Real.log ((fsMetric (ι := J)).ρ z))) z v v =
-      (normSqE z)⁻¹ * inner ℝ (eL v) (eL v) - 2 * (normSqE z ^ 2)⁻¹ * inner ℝ (eL z) (eL v) ^ 2 := by
+  have hD
+      : ∀ v,
+        fderiv ℝ (fderiv ℝ (fun z => Real.log ((fsMetric (ι := J)).ρ z))) z v v
+          = (normSqE z)⁻¹ * inner ℝ (eL v) (eL v)
+            - 2 * (normSqE z ^ 2)⁻¹ * inner ℝ (eL z) (eL v) ^ 2 := by
     intro v
     rw [hev.fderiv_eq, hGd.fderiv]
     simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,
@@ -151,8 +159,7 @@ theorem leviForm_log_fs_nonneg {z : J → ℂ} (hz : z ≠ 0) (w : J → ℂ) :
     ring
   unfold leviForm
   rw [hD, hD]
-  have hI : eL (Complex.I • w) = Complex.I • eL w := by
-    rw [eL_apply, eL_apply, WithLp.toLp_smul]
+  have hI : eL (Complex.I • w) = Complex.I • eL w := by rw [eL_apply, eL_apply, WithLp.toLp_smul]
   rw [hI]
   set q := normSqE z
   have hq' : q = ‖eL z‖ ^ 2 := rfl
@@ -172,11 +179,14 @@ theorem leviForm_log_fs_nonneg {z : J → ℂ} (hz : z ≠ 0) (w : J → ℂ) :
     simp only [RCLike.re_to_complex, Complex.mul_re, Complex.I_re, Complex.I_im, zero_mul, one_mul,
       zero_sub]
     ring
-  have key : 0 ≤ q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re c ^ 2 +
-      (q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re (Complex.I * c) ^ 2) := by
-    have h2 : q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re c ^ 2 +
-        (q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re (Complex.I * c) ^ 2) =
-        2 * (q ^ 2)⁻¹ * (q * ‖eL w‖ ^ 2 - ‖c‖ ^ 2) := by
+  have key
+      : 0
+        ≤ q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re c ^ 2
+          + (q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re (Complex.I * c) ^ 2) := by
+    have h2
+        : q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re c ^ 2
+            + (q⁻¹ * ‖eL w‖ ^ 2 - 2 * (q ^ 2)⁻¹ * RCLike.re (Complex.I * c) ^ 2)
+          = 2 * (q ^ 2)⁻¹ * (q * ‖eL w‖ ^ 2 - ‖c‖ ^ 2) := by
       rw [← hre]
       field_simp
       ring
@@ -190,10 +200,12 @@ theorem isSmoothMetric_fs : IsSmoothMetric (fsMetric (ι := J)) := by
   intro z hz
   have h : (fsMetric (ι := J)).ρ = fun z => ‖eL z‖ := rfl
   rw [h]
-  have hne : eL z ≠ 0 := fun h0 => hz (by
-    have := congrArg (fun v : EuclideanSpace ℂ J => v.ofLp) h0
-    simpa [eL_apply] using this)
-  exact ((contDiffAt_norm ℝ hne).comp z (ContinuousLinearMap.contDiff (eL (J := J))).contDiffAt).contDiffWithinAt
+  have hne : eL z ≠ 0 := fun h0 =>
+    hz (by
+      have := congrArg (fun v : EuclideanSpace ℂ J => v.ofLp) h0
+      simpa [eL_apply] using this)
+  exact ((contDiffAt_norm ℝ hne).comp z
+    (ContinuousLinearMap.contDiff (eL (J := J))).contDiffAt).contDiffWithinAt
 
 theorem isConjInvariant_fs : IsConjInvariant (fsMetric (ι := J)) := by
   intro z

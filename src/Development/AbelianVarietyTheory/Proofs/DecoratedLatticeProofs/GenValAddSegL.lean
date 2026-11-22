@@ -9,18 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Normalize
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound GlobalTheory.ParHecke
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+  GlobalTheory.SatakeBound GlobalTheory.ParHecke
 
 noncomputable section
 
 namespace GlobalTheory.ParHecke.StringEig
 
-open GlobalTheory.ChainOnto (esymm_add_C esymm_map_mul_C esymm_string esymm_eq_zero_of_lt sqrt_sq_C natCast_cpow_half)
+open GlobalTheory.ChainOnto
+  (esymm_add_C esymm_map_mul_C esymm_string esymm_eq_zero_of_lt sqrt_sq_C natCast_cpow_half)
 
-theorem map_coe_segL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (ϖ : kˣ) (hϖ : valuation k (ϖ : k) = uniformizer k) (z : ℂˣ) (t : ℕ) :
-    (segL ϖ z t).map (fun b : ℂˣ => (b : ℂ)) =
-      (Finset.range t).val.map fun i : ℕ => (z : ℂ) * ((Real.sqrt (resCard k) : ℝ) : ℂ) ^ ((t : ℤ) - 1 - 2 * i) := by
+theorem map_coe_segL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ϖ : kˣ) (hϖ : valuation k (ϖ : k) = uniformizer k)
+    (z : ℂˣ) (t : ℕ)
+    : (segL ϖ z t).map (fun b : ℂˣ => (b : ℂ))
+      = (Finset.range t).val.map fun i : ℕ =>
+        (z : ℂ) * ((Real.sqrt (resCard k) : ℝ) : ℂ) ^ ((t : ℤ) - 1 - 2 * i) := by
   rw [segL, Multiset.map_map, Finset.range_val]
   refine Multiset.map_congr rfl fun i _ => ?_
   simp only [Function.comp_apply, Units.val_mul]

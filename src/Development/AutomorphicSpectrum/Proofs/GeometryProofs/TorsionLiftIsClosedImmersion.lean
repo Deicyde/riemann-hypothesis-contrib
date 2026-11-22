@@ -5,15 +5,18 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT
 
 namespace GlobalTheory.CompanionTheory.Ar.BT
 
-theorem isClosedImmersion_torsion_lift {X : Scheme.{0}} (G : Over X) [GrpObj G] [IsSeparated G.hom]
-    (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] (Γ : QFGroup R T)
-    (x : Spec (CommRingCat.of R) ⟶ X) (N : ℕ) (i : Γ.G.left ⟶ G.left)
-    (h : Γ.IsTorsionAlong G x N i) :
-    IsClosedImmersion (pullback.lift i Γ.G.hom h.isOver : Γ.G.left ⟶ pullback G.hom x) := by
+theorem isClosedImmersion_torsion_lift
+    {X : Scheme.{0}} (G : Over X) [GrpObj G] [IsSeparated G.hom]
+    (R : Type) [CommRing R] [IsDomain R]
+    (T : Type) [CommGroup T]
+    (Γ : QFGroup R T) (x : Spec (CommRingCat.of R) ⟶ X) (N : ℕ)
+    (i : Γ.G.left ⟶ G.left) (h : Γ.IsTorsionAlong G x N i)
+    : IsClosedImmersion (pullback.lift i Γ.G.hom h.isOver : Γ.G.left ⟶ pullback G.hom x) := by
   obtain ⟨i', hi'⟩ : ∃ i' : Γ.G.left ⟶ pullback G.hom x, i' = pullback.lift i Γ.G.hom h.isOver :=
     ⟨_, rfl⟩
   rw [← hi']
@@ -46,8 +49,7 @@ theorem isClosedImmersion_torsion_lift {X : Scheme.{0}} (G : Over X) [GrpObj G] 
   have key : i' ≫ f = i' ≫ g := by
     let g₀ : Over.mk (Γ.G.hom ≫ x) ⟶ G := Over.homMk i h.isOver
     have h0 : g₀ ^ N = 1 := (h.kernel Γ.G g₀).2 ⟨𝟙 _, by simp [g₀]⟩
-    let ψ : Over.mk (Γ.G.hom ≫ x) ⟶ PO :=
-      Over.homMk i' (by simp [PO, reassoc_of% i'snd])
+    let ψ : Over.mk (Γ.G.hom ≫ x) ⟶ PO := Over.homMk i' (by simp [PO, reassoc_of% i'snd])
     have h1 : ψ ≫ u = g₀ := by
       ext1
       simpa [ψ, u, g₀] using i'fst
@@ -63,8 +65,8 @@ theorem isClosedImmersion_torsion_lift {X : Scheme.{0}} (G : Over X) [GrpObj G] 
   have bjq : b ≫ jq = i' := pullback.lift_snd _ _ _
 
   let Qs : Over (Spec (CommRingCat.of R)) := Over.mk (jq ≫ pullback.snd G.hom x)
-  let g' : Over.mk (Qs.hom ≫ x) ⟶ G := Over.homMk (jq ≫ pullback.fst G.hom x)
-    (by simp [Qs, pullback.condition])
+  let g' : Over.mk (Qs.hom ≫ x) ⟶ G :=
+    Over.homMk (jq ≫ pullback.fst G.hom x) (by simp [Qs, pullback.condition])
   have hg' : g' ^ N = 1 := by
     let φ : Over.mk (Qs.hom ≫ x) ⟶ PO := Over.homMk jq (by simp [PO, Qs])
     have h1 : φ ≫ u = g' := by
@@ -87,9 +89,12 @@ theorem isClosedImmersion_torsion_lift {X : Scheme.{0}} (G : Over X) [GrpObj G] 
     rw [← cancel_mono jq]
     simp [bjq, yi']
   have ba : b ≫ y.left = 𝟙 _ := by
-    have e : (Over.homMk (b ≫ y.left) (by
-        change (b ≫ y.left) ≫ Γ.G.hom = Γ.G.hom
-        rw [Category.assoc, hys, ← Category.assoc, bjq, i'snd]) : Γ.G ⟶ Γ.G) = 𝟙 Γ.G := by
+    have e
+        : (Over.homMk (b ≫ y.left) (by
+              change (b ≫ y.left) ≫ Γ.G.hom = Γ.G.hom
+              rw [Category.assoc, hys, ← Category.assoc, bjq, i'snd])
+            : Γ.G ⟶ Γ.G)
+          = 𝟙 Γ.G := by
       apply h.inj Γ.G
       change (b ≫ y.left) ≫ i = 𝟙 _ ≫ i
       rw [Category.assoc, hyl, ← Category.assoc, bjq, i'fst, Category.id_comp]

@@ -81,12 +81,14 @@ theorem determinant_cauchy_schwarz : DetCS := by
     have hPinv : (P⁻¹).PosSemidef := hPpd.inv.posSemidef
     have hPih : (P⁻¹)ᴴ = P⁻¹ := hPinv.1
     have hQh : Qᴴ = B * Hc * Aᴴ := by
-      rw [hQ, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose, hHh, Matrix.mul_assoc]
+      rw [hQ, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose, hHh,
+        Matrix.mul_assoc]
     set K := B - Qᴴ * P⁻¹ * A with hK
     have hKpsd : (K * Hc * Kᴴ).PosSemidef := hHc.posSemidef.mul_mul_conjTranspose_same K
     have hXpsd : (Qᴴ * P⁻¹ * Q).PosSemidef := hPinv.conjTranspose_mul_mul_same Q
     have hKh : Kᴴ = Bᴴ - Aᴴ * P⁻¹ * Q := by
-      rw [hK, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose, hPih]
+      rw [hK, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose,
+        hPih]
       simp only [Matrix.mul_assoc]
     have r1 : B * (Hc * Bᴴ) = R := by rw [hR, Matrix.mul_assoc]
     have r2 : ∀ X : Matrix (Fin D) (Fin D) ℂ, B * (Hc * (Aᴴ * X)) = Qᴴ * X := by
@@ -103,7 +105,8 @@ theorem determinant_cauchy_schwarz : DetCS := by
       abel
     have hsplit : R = Qᴴ * P⁻¹ * Q + K * Hc * Kᴴ := by rw [hKK]; abel
     have hle := det_le_det_add hXpsd hKpsd
-    rw [← hsplit, det_mul, det_mul, det_conjTranspose, Matrix.det_nonsing_inv, Ring.inverse_eq_inv'] at hle
+    rw [← hsplit, det_mul, det_mul, det_conjTranspose, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
+      at hle
     obtain ⟨hpre, hpim⟩ := Complex.lt_def.mp hPpd.det_pos
     have key : ∀ pr : ℝ, star Q.det * (pr : ℂ)⁻¹ * Q.det = ((‖Q.det‖ ^ 2 / pr : ℝ) : ℂ) := by
       intro pr
@@ -130,8 +133,9 @@ theorem determinant_cauchy_schwarz : DetCS := by
       have h0 : star (star (v ᵥ* A)) ⬝ᵥ (Hc *ᵥ star (v ᵥ* A)) = 0 := by
         rw [star_star]
         have h00 : (v ᵥ* P) ⬝ᵥ star v = 0 := by rw [hv, zero_dotProduct]
-        rw [hP, ← vecMul_vecMul, ← vecMul_vecMul, ← dotProduct_mulVec, mulVec_conjTranspose, star_star,
-          ← dotProduct_mulVec] at h00
+        rw [hP, ← vecMul_vecMul, ← vecMul_vecMul, ← dotProduct_mulVec, mulVec_conjTranspose,
+            star_star, ← dotProduct_mulVec]
+          at h00
         exact h00
       rw [h0] at hpos
       exact lt_irrefl _ hpos

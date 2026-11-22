@@ -5,33 +5,45 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Galo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
 open scoped TensorProduct
 
 namespace GlobalTheory.TwSys.TameScalar
 
-theorem not_mem_placesOver {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (h : p ≠ q)
-    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E p) : v ∉ placesOver E q := by
+theorem not_mem_placesOver
+    {E : Type} [Field E] [NumberField E]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (h : p ≠ q)
+    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E p)
+    : v ∉ placesOver E q := by
   intro hv'
-  have hc : IsCoprime ((p : ℕ) : 𝓞 E) ((q : ℕ) : 𝓞 E) := Nat.Coprime.cast ((Nat.coprime_primes hp hq).2 h)
+  have hc : IsCoprime ((p : ℕ) : 𝓞 E) ((q : ℕ) : 𝓞 E) :=
+    Nat.Coprime.cast ((Nat.coprime_primes hp hq).2 h)
   obtain ⟨a, b, hab⟩ := hc
   apply v.isPrime.ne_top
   rw [Ideal.eq_top_iff_one, ← hab]
   exact v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ hv) (v.asIdeal.mul_mem_left _ hv')
 
-theorem isUnit_inv_sq_sub_one {O : Type} [CommRing O] (u : Oˣ) (h : IsUnit ((u : O) ^ 2 - 1)) :
-    IsUnit (((u⁻¹ : Oˣ) : O) ^ 2 - 1) := by
+theorem isUnit_inv_sq_sub_one {O : Type} [CommRing O] (u : Oˣ) (h : IsUnit ((u : O) ^ 2 - 1))
+    : IsUnit (((u⁻¹ : Oˣ) : O) ^ 2 - 1) := by
   have e : ((u⁻¹ : Oˣ) : O) ^ 2 - 1 = -(((u⁻¹ : Oˣ) : O) ^ 2 * ((u : O) ^ 2 - 1)) := by
     rw [mul_sub, ← mul_pow, Units.inv_mul]; ring
   rw [e]
   exact (((u⁻¹).isUnit.pow 2).mul h).neg
 
-theorem isUnit_sub_one {O : Type} [CommRing O] (x : O) (h : IsUnit (x ^ 2 - 1)) : IsUnit (x - 1) := by
+theorem isUnit_sub_one {O : Type} [CommRing O] (x : O) (h : IsUnit (x ^ 2 - 1))
+    : IsUnit (x - 1) := by
   have e : x ^ 2 - 1 = (x - 1) * (x + 1) := by ring
   rw [e] at h
   exact isUnit_of_mul_isUnit_left h
 
-theorem exists_scalar_tmat_of_tame_inertia : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂) (X : NTw D.R D.host D.what₂ D.LL0 N) (bkP : BKPh X) (i : X.Tw) (s : X.Sig i) (z : GE N), IsotypicValuationAtRing bkP i s → IsTameInertiaElementAtTwistPrime X i z → ∃ d : (X.O0 i)ˣ, Tmat i s z = (d : X.O0 i) • (1 : Matrix (Fin D.R.r) (Fin D.R.r) (X.O0 i)) ∧ IsUnit ((d : X.O0 i) ^ 2 - 1) ∧ IsUnit ((d : X.O0 i) - 1) ∧ eps0 X i z = 1 := by
+theorem exists_scalar_tmat_of_tame_inertia
+    : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂)
+        (X : NTw D.R D.host D.what₂ D.LL0 N) (bkP : BKPh X) (i : X.Tw) (s : X.Sig i) (z : GE N),
+      IsotypicValuationAtRing bkP i s → IsTameInertiaElementAtTwistPrime X i z
+        → ∃ d : (X.O0 i)ˣ,
+          Tmat i s z = (d : X.O0 i) • (1 : Matrix (Fin D.R.r) (Fin D.R.r) (X.O0 i))
+            ∧ IsUnit ((d : X.O0 i) ^ 2 - 1) ∧ IsUnit ((d : X.O0 i) - 1) ∧ eps0 X i z = 1 := by
   intro D N X bkP i s z h hz
   obtain ⟨v, hv, A, hA, hzA, hu, -⟩ := hz
   have hlp : (X.l i).Prime := (X.lPrime i).out

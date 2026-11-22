@@ -10,9 +10,15 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 namespace LateralTheory.KummerTheory.AffPf
 open LateralTheory.KummerTheory.ContCut
 
-theorem lim_of_iso {J : Type} [SmallCategory J] {K : Type 1} [Category.{0} K] {G G' : K ⥤ AddCommGrpCat.{1}}
-    (e : G ≅ G') {D : J ⥤ K} (c : Cocone D) (h : Lim G c) : Lim G' c := by
-  have nat : ∀ {a b : K} (f : a ⟶ b) (z : G.obj a), (G'.map f).hom ((e.hom.app a).hom z) = (e.hom.app b).hom ((G.map f).hom z) := by
+theorem lim_of_iso
+    {J : Type} [SmallCategory J]
+    {K : Type 1} [Category.{0} K]
+    {G G' : K ⥤ AddCommGrpCat.{1}} (e : G ≅ G')
+    {D : J ⥤ K} (c : Cocone D) (h : Lim G c)
+    : Lim G' c := by
+  have nat
+      : ∀ {a b : K} (f : a ⟶ b) (z : G.obj a),
+        (G'.map f).hom ((e.hom.app a).hom z) = (e.hom.app b).hom ((G.map f).hom z) := by
     intro a b f z
     have := congrArg (fun φ => φ.hom z) (e.hom.naturality f)
     simpa using this.symm
@@ -24,8 +30,11 @@ theorem lim_of_iso {J : Type} [SmallCategory J] {K : Type 1} [Category.{0} K] {G
     intro a z
     have := congrArg (fun φ => φ.hom z) (e.hom_inv_id_app a)
     simpa using this
-  have natc : ∀ (j : J) (z : G.obj (D.obj j)), (G'.map (c.ι.app j)).hom ((e.hom.app (D.obj j)).hom z) =
-      (e.hom.app c.pt).hom ((G.map (c.ι.app j)).hom z) := fun j z => nat (c.ι.app j) z
+  have natc
+      : ∀ (j : J) (z : G.obj (D.obj j)),
+        (G'.map (c.ι.app j)).hom ((e.hom.app (D.obj j)).hom z)
+          = (e.hom.app c.pt).hom ((G.map (c.ι.app j)).hom z) := fun j z =>
+    nat (c.ι.app j) z
   refine ⟨fun x => ?_, fun j y hy => ?_⟩
   · obtain ⟨j, y, hy⟩ := h.1 ((e.inv.app c.pt).hom x)
     refine ⟨j, (e.hom.app (D.obj j)).hom y, ?_⟩

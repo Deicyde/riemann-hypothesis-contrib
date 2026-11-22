@@ -14,7 +14,15 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberFiel
 
 namespace PositivityTheory.HtPt.Mb.LPulllocCentre
 
-theorem pullLoc_eq_span_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat M.ξ E) (X' : Scheme.{0}) (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (F : Type) [AddCommGroup F] [Module Ω' F] (j : E →+ F) (p₀ : Cpt M.ξ) (p' : Cpt ξ'), L.IsCohOn Set.univ → ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p') ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a) → L.pullLoc ξ' i j p' = Submodule.span (regAt ξ' p') (j '' (L p₀ : Set E)) := by
+theorem pullLoc_eq_span_centre
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat M.ξ E) (X' : Scheme.{0})
+        (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (F : Type)
+        [AddCommGroup F] [Module Ω' F] (j : E →+ F) (p₀ : Cpt M.ξ) (p' : Cpt ξ'),
+      L.IsCohOn Set.univ
+        → ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p')
+          ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a)
+        → L.pullLoc ξ' i j p' = Submodule.span (regAt ξ' p') (j '' (L p₀ : Set E)) := by
   intro o _ Ω _ _ κ _ x M E _ _ L X' Ω' _ ξ' i F _ _ j p₀ p' hcoh hdom
   obtain ⟨hd1, hd2⟩ := hdom
   obtain ⟨c, hc⟩ := M.tie.cover p₀
@@ -25,7 +33,8 @@ theorem pullLoc_eq_span_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field 
   have hp1c : InChart M.ξ x c p₁ := h14 c hcx fun k => hd1 _ (hc.2 k)
   have hle : regAt M.ξ p₁ ≤ regAt M.ξ p₀ := by
     intro a ha
-    obtain ⟨u, hu, v, hv, hvu, rfl⟩ := ((PositivityTheory.HtPt.Ma.regat_loc o Ω κ x M c p₁ hp1c).2 a).1 ha
+    obtain ⟨u, hu, v, hv, hvu, rfl⟩ :=
+      ((PositivityTheory.HtPt.Ma.regat_loc o Ω κ x M c p₁ hp1c).2 a).1 ha
     have hiv : unitAt ξ' p' (i v) :=
       ⟨(map_ne_zero i).2 hvu.1, h11 _ hvu.2.1, by rw [← map_inv₀]; exact h11 _ hvu.2.2⟩
     have hv0 : unitAt M.ξ p₀ v := hd2 v (hch0 v hv) hiv
@@ -37,7 +46,8 @@ theorem pullLoc_eq_span_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field 
     have hs : p₀.1 ⤳ p.1 := hsp.trans (h13 p hp)
     obtain ⟨U, hU, n, b, hb⟩ := hcoh p (Set.mem_univ p)
     have h0U : p₀.1 ∈ U := hs.mem_open U.isOpen hU
-    have hreg : regAt M.ξ p ≤ regAt M.ξ p₀ := (PositivityTheory.HtPt.Ma.reg_le_spec o Ω κ x M p p₀).2 hs
+    have hreg : regAt M.ξ p ≤ regAt M.ξ p₀ :=
+      (PositivityTheory.HtPt.Ma.reg_le_spec o Ω κ x M p p₀).2 hs
     rw [hb p (Set.mem_univ p) hU] at he
     rw [hb p₀ (Set.mem_univ p₀) h0U]
     induction he using Submodule.span_induction with
@@ -49,7 +59,14 @@ theorem pullLoc_eq_span_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field 
 
 end PositivityTheory.HtPt.Mb.LPulllocCentre
 
-
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberField in
-theorem PositivityTheory.HtPt.Mb.pullloc_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat M.ξ E) (X' : Scheme.{0}) (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (F : Type) [AddCommGroup F] [Module Ω' F] (j : E →+ F) (p₀ : Cpt M.ξ) (p' : Cpt ξ'), L.IsCohOn Set.univ → ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p') ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a) → L.pullLoc ξ' i j p' = Submodule.span (regAt ξ' p') (j '' (L p₀ : Set E)) :=
+theorem PositivityTheory.HtPt.Mb.pullloc_centre
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat M.ξ E) (X' : Scheme.{0})
+        (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (F : Type)
+        [AddCommGroup F] [Module Ω' F] (j : E →+ F) (p₀ : Cpt M.ξ) (p' : Cpt ξ'),
+      L.IsCohOn Set.univ
+        → ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p')
+          ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a)
+        → L.pullLoc ξ' i j p' = Submodule.span (regAt ξ' p') (j '' (L p₀ : Set E)) :=
   @PositivityTheory.HtPt.Mb.LPulllocCentre.pullLoc_eq_span_centre

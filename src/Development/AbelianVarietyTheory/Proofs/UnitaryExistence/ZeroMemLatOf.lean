@@ -12,15 +12,14 @@ namespace GlobalTheory.AdLat.Scale
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ}
 
-
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-theorem _root_.GlobalTheory.AdLat.Scale.smul_mem_hat {L L' : Set (Fin n → E)} {a : E}
-    (h : ∀ x ∈ L, a • x ∈ L')
-    {z : Fin n → _root_.GlobalTheory.AdLat.RA F E} (hz : z ∈ _root_.GlobalTheory.AdLat.hat F L) :
-    ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] a : _root_.GlobalTheory.AdLat.RA F E) • z ∈
-      _root_.GlobalTheory.AdLat.hat F L' := by
+theorem _root_.GlobalTheory.AdLat.Scale.smul_mem_hat
+    {L L' : Set (Fin n → E)} {a : E} (h : ∀ x ∈ L, a • x ∈ L')
+    {z : Fin n → _root_.GlobalTheory.AdLat.RA F E} (hz : z ∈ _root_.GlobalTheory.AdLat.hat F L)
+    : ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] a : _root_.GlobalTheory.AdLat.RA F E) • z
+      ∈ _root_.GlobalTheory.AdLat.hat F L' := by
   unfold _root_.GlobalTheory.AdLat.hat at hz ⊢
   induction hz using AddSubgroup.closure_induction with
   | mem z hz =>
@@ -42,22 +41,23 @@ open Scale
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem fv_smul' (c : E) (v : Fin n → E) :
-    _root_.GlobalTheory.AdLat.fv F (c • v) =
-      ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] c : _root_.GlobalTheory.AdLat.RA F E) •
-        _root_.GlobalTheory.AdLat.fv F v := by
+private theorem fv_smul' (c : E) (v : Fin n → E)
+    : _root_.GlobalTheory.AdLat.fv F (c • v)
+      = ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] c : _root_.GlobalTheory.AdLat.RA F E)
+        • _root_.GlobalTheory.AdLat.fv F v := by
   funext i
-  change (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] (c * v i) =
-    ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] c) * ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] v i)
+  change (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] (c * v i)
+    = ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] c) * ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] v i)
   rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul]
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem smul_mem_latOf_of_smul_mem {L L' : Set (Fin n → E)} {c : E}
-    (h : ∀ x ∈ L, c • x ∈ L') (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E))
-    {v : Fin n → E} (hv : v ∈ _root_.GlobalTheory.AdLat.latOf F g L) :
-    c • v ∈ _root_.GlobalTheory.AdLat.latOf F g L' := by
+private theorem smul_mem_latOf_of_smul_mem
+    {L L' : Set (Fin n → E)} {c : E} (h : ∀ x ∈ L, c • x ∈ L')
+    (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E))
+    {v : Fin n → E} (hv : v ∈ _root_.GlobalTheory.AdLat.latOf F g L)
+    : c • v ∈ _root_.GlobalTheory.AdLat.latOf F g L' := by
   obtain ⟨z, hz, hzv⟩ := hv
   refine ⟨_, _root_.GlobalTheory.AdLat.Scale.smul_mem_hat h hz, ?_⟩
   rw [Matrix.mulVec_smul, hzv, fv_smul']
@@ -65,8 +65,7 @@ private theorem smul_mem_latOf_of_smul_mem {L L' : Set (Fin n → E)} {c : E}
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem fv_zero' :
-    _root_.GlobalTheory.AdLat.fv F (0 : Fin n → E) = 0 := by
+private theorem fv_zero' : _root_.GlobalTheory.AdLat.fv F (0 : Fin n → E) = 0 := by
   funext i
   change (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] (0 : E) = 0
   rw [TensorProduct.tmul_zero]
@@ -74,17 +73,17 @@ private theorem fv_zero' :
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem zero_mem_latOf' {L : Set (Fin n → E)}
-    (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E)) :
-    (0 : Fin n → E) ∈ _root_.GlobalTheory.AdLat.latOf F g L :=
+private theorem zero_mem_latOf'
+    {L : Set (Fin n → E)} (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E))
+    : (0 : Fin n → E) ∈ _root_.GlobalTheory.AdLat.latOf F g L :=
   ⟨0, zero_mem _, by rw [Matrix.mulVec_zero, fv_zero']⟩
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem fv_add' (v w : Fin n → E) :
-    _root_.GlobalTheory.AdLat.fv F (v + w) =
-      _root_.GlobalTheory.AdLat.fv F v + _root_.GlobalTheory.AdLat.fv F w := by
+private theorem fv_add' (v w : Fin n → E)
+    : _root_.GlobalTheory.AdLat.fv F (v + w)
+      = _root_.GlobalTheory.AdLat.fv F v + _root_.GlobalTheory.AdLat.fv F w := by
   funext i
   change (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] (v i + w i) = _ ⊗ₜ[F] v i + _ ⊗ₜ[F] w i
   rw [TensorProduct.tmul_add]
@@ -92,15 +91,15 @@ private theorem fv_add' (v w : Fin n → E) :
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-private theorem add_mem_latOf' {L : Set (Fin n → E)}
-    (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E)) {v w : Fin n → E}
-    (hv : v ∈ _root_.GlobalTheory.AdLat.latOf F g L)
-    (hw : w ∈ _root_.GlobalTheory.AdLat.latOf F g L) :
-    v + w ∈ _root_.GlobalTheory.AdLat.latOf F g L := by
+private theorem add_mem_latOf'
+    {L : Set (Fin n → E)}
+    (g : Matrix (Fin n) (Fin n) (_root_.GlobalTheory.AdLat.RA F E))
+    {v w : Fin n → E} (hv : v ∈ _root_.GlobalTheory.AdLat.latOf F g L)
+    (hw : w ∈ _root_.GlobalTheory.AdLat.latOf F g L)
+    : v + w ∈ _root_.GlobalTheory.AdLat.latOf F g L := by
   obtain ⟨z, hz, hzv⟩ := hv
   obtain ⟨y, hy, hyw⟩ := hw
   exact ⟨z + y, add_mem hz hy, by rw [Matrix.mulVec_add, hzv, hyw, fv_add']⟩
-
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in

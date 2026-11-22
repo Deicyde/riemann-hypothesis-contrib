@@ -6,7 +6,9 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.FactorFieldP
@@ -35,20 +37,22 @@ instance nfL : NumberField (AdjoinRoot Q) := NumberField.of_module_finite E (Adj
 
 theorem root_norm (h : Good Q) (ψ : AdjoinRoot Q →+* ℂ) : ‖ψ (AdjoinRoot.root Q)‖ = 1 := by
   apply h (ψ.comp (AdjoinRoot.of Q))
-  rw [Polynomial.mem_roots (Polynomial.map_ne_zero (Fact.out : Irreducible Q).ne_zero), Polynomial.IsRoot,
-    Polynomial.eval_map, ← Polynomial.hom_eval₂, AdjoinRoot.eval₂_root, map_zero]
+  rw [Polynomial.mem_roots (Polynomial.map_ne_zero (Fact.out : Irreducible Q).ne_zero),
+    Polynomial.IsRoot, Polynomial.eval_map, ← Polynomial.hom_eval₂, AdjoinRoot.eval₂_root, map_zero]
 
-theorem csr (h : Good Q) :
-    Polynomial.eval₂ ((AdjoinRoot.of Q).comp (cj E)) (AdjoinRoot.root Q)⁻¹ Q = 0 := by
+theorem csr (h : Good Q)
+    : Polynomial.eval₂ ((AdjoinRoot.of Q).comp (cj E)) (AdjoinRoot.root Q)⁻¹ Q = 0 := by
   let ψ : AdjoinRoot Q →+* ℂ := Classical.choice (inferInstance : Nonempty _)
   apply ψ.injective
-  rw [Polynomial.hom_eval₂, map_zero, map_inv₀, ← conj_eq_inv (root_norm Q h ψ), ← RingHom.comp_assoc, emb_cj,
-    ← Polynomial.hom_eval₂, ← Polynomial.hom_eval₂, AdjoinRoot.eval₂_root, map_zero, map_zero]
+  rw [Polynomial.hom_eval₂, map_zero, map_inv₀, ← conj_eq_inv (root_norm Q h ψ),
+    ← RingHom.comp_assoc, emb_cj, ← Polynomial.hom_eval₂, ← Polynomial.hom_eval₂,
+    AdjoinRoot.eval₂_root, map_zero, map_zero]
 
 def sig (h : Good Q) : AdjoinRoot Q →+* AdjoinRoot Q :=
   AdjoinRoot.lift ((AdjoinRoot.of Q).comp (cj E)) (AdjoinRoot.root Q)⁻¹ (csr Q h)
 
-theorem sig_of (h : Good Q) (x : E) : sig Q h (AdjoinRoot.of Q x) = AdjoinRoot.of Q (IsCMField.complexConj E x) := by
+theorem sig_of (h : Good Q) (x : E)
+    : sig Q h (AdjoinRoot.of Q x) = AdjoinRoot.of Q (IsCMField.complexConj E x) := by
   unfold sig
   erw [AdjoinRoot.lift_of]
   rfl
@@ -57,8 +61,8 @@ theorem sig_root (h : Good Q) : sig Q h (AdjoinRoot.root Q) = (AdjoinRoot.root Q
   unfold sig
   exact AdjoinRoot.lift_root _
 
-theorem emb_sig (h : Good Q) (ψ : AdjoinRoot Q →+* ℂ) (x : AdjoinRoot Q) :
-    ψ (sig Q h x) = starRingEnd ℂ (ψ x) := by
+theorem emb_sig (h : Good Q) (ψ : AdjoinRoot Q →+* ℂ) (x : AdjoinRoot Q)
+    : ψ (sig Q h x) = starRingEnd ℂ (ψ x) := by
   have e : ψ.comp (sig Q h) = (starRingEnd ℂ).comp ψ := by
     apply AdjoinRoot.ringHom_ext
     · ext y
@@ -73,9 +77,9 @@ theorem sig_sig (h : Good Q) (x : AdjoinRoot Q) : sig Q h (sig Q h x) = x := by
   apply ψ.injective
   rw [emb_sig, emb_sig, Complex.conj_conj]
 
-theorem sig_alg (h : Good Q) (x : maximalRealSubfield E) :
-    sig Q h (algebraMap (maximalRealSubfield E) (AdjoinRoot Q) x) =
-      algebraMap (maximalRealSubfield E) (AdjoinRoot Q) x := by
+theorem sig_alg (h : Good Q) (x : maximalRealSubfield E)
+    : sig Q h (algebraMap (maximalRealSubfield E) (AdjoinRoot Q) x)
+      = algebraMap (maximalRealSubfield E) (AdjoinRoot Q) x := by
   show sig Q h (AdjoinRoot.of Q (algebraMap (maximalRealSubfield E) E x)) =
     AdjoinRoot.of Q (algebraMap (maximalRealSubfield E) E x)
   rw [sig_of]
@@ -93,15 +97,15 @@ theorem totReal (h : Good Q) : IsTotallyReal (Kf Q h) := by
   letI : Algebra (Kf Q h) ℂ := w.embedding.toAlgebra
   let ψ : AdjoinRoot Q →ₐ[Kf Q h] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   ext x
   have hx : w.embedding x = ψ.toRingHom (x : AdjoinRoot Q) := (ψ.commutes x).symm
   rw [ComplexEmbedding.conjugate_coe_eq, hx, ← emb_sig Q h ψ.toRingHom, (mem_Kf Q h).1 x.2]
 
-theorem decomp (h : Good Q) {S : AdjoinRoot Q} (hS : S ≠ 0) (hσS : sig Q h S = -S) (z : AdjoinRoot Q) :
-    ∃ a b : Kf Q h, z = (a : AdjoinRoot Q) + S * (b : AdjoinRoot Q) := by
+theorem decomp
+    (h : Good Q) {S : AdjoinRoot Q} (hS : S ≠ 0) (hσS : sig Q h S = -S) (z : AdjoinRoot Q)
+    : ∃ a b : Kf Q h, z = (a : AdjoinRoot Q) + S * (b : AdjoinRoot Q) := by
   have h2 : (2 : AdjoinRoot Q) ≠ 0 := two_ne_zero
   refine ⟨⟨(z + sig Q h z) / 2, ?_⟩, ⟨(z - sig Q h z) / (2 * S), ?_⟩, ?_⟩
   · rw [mem_Kf, map_div₀, map_add (f := _), sig_sig, map_ofNat]
@@ -113,13 +117,13 @@ theorem decomp (h : Good Q) {S : AdjoinRoot Q} (hS : S ≠ 0) (hσS : sig Q h S 
     field_simp
     ring
 
-theorem finrank_KL (h : Good Q) {s : E} (hs : s ≠ 0) (hsc : IsCMField.complexConj E s = -s) :
-    Module.finrank (Kf Q h) (AdjoinRoot Q) = 2 := by
+theorem finrank_KL (h : Good Q) {s : E} (hs : s ≠ 0) (hsc : IsCMField.complexConj E s = -s)
+    : Module.finrank (Kf Q h) (AdjoinRoot Q) = 2 := by
   have hS : AdjoinRoot.of Q s ≠ 0 := (_root_.map_ne_zero _).2 hs
-  have hσS : sig Q h (AdjoinRoot.of Q s) = -AdjoinRoot.of Q s := by
-    rw [sig_of, hsc, map_neg]
+  have hσS : sig Q h (AdjoinRoot.of Q s) = - AdjoinRoot.of Q s := by rw [sig_of, hsc, map_neg]
   have hle : Module.finrank (Kf Q h) (AdjoinRoot Q) ≤ 2 := by
-    have hspan : Submodule.span (Kf Q h) (Set.range ![(1 : AdjoinRoot Q), AdjoinRoot.of Q s]) = ⊤ := by
+    have hspan
+        : Submodule.span (Kf Q h) (Set.range ![(1 : AdjoinRoot Q), AdjoinRoot.of Q s]) = ⊤ := by
       refine eq_top_iff.2 fun z _ => ?_
       obtain ⟨a, b, hz⟩ := decomp Q h hS hσS z
       have e : z = a • (1 : AdjoinRoot Q) + b • AdjoinRoot.of Q s := by
@@ -133,25 +137,30 @@ theorem finrank_KL (h : Good Q) {s : E} (hs : s ≠ 0) (hsc : IsCMField.complexC
     exact this
   have hne1 : Module.finrank (Kf Q h) (AdjoinRoot Q) ≠ 1 := by
     intro h1
-    obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' (1 : AdjoinRoot Q) one_ne_zero).1 h1 (AdjoinRoot.of Q s)
+    obtain ⟨c, hc⟩ :=
+      (finrank_eq_one_iff_of_nonzero' (1 : AdjoinRoot Q) one_ne_zero).1 h1 (AdjoinRoot.of Q s)
     rw [Algebra.smul_def, mul_one] at hc
     have hm : AdjoinRoot.of Q s ∈ Kf Q h := hc ▸ c.2
     rw [mem_Kf, hσS] at hm
-    have h2 : (2 : AdjoinRoot Q) * AdjoinRoot.of Q s = 0 := by linear_combination (-1 : AdjoinRoot Q) * hm
+    have h2 : (2 : AdjoinRoot Q) * AdjoinRoot.of Q s = 0 := by
+      linear_combination (-1 : AdjoinRoot Q) * hm
     rcases mul_eq_zero.1 h2 with h3 | h3
     · exact two_ne_zero h3
     · exact hS h3
   have hpos : 0 < Module.finrank (Kf Q h) (AdjoinRoot Q) := Module.finrank_pos
   omega
 
-theorem finrank_Kf (h : Good Q) {s : E} (hs : s ≠ 0) (hsc : IsCMField.complexConj E s = -s) :
-    Module.finrank (maximalRealSubfield E) (Kf Q h) = Q.natDegree := by
+theorem finrank_Kf (h : Good Q) {s : E} (hs : s ≠ 0) (hsc : IsCMField.complexConj E s = -s)
+    : Module.finrank (maximalRealSubfield E) (Kf Q h) = Q.natDegree := by
   have h1 := Module.finrank_mul_finrank (maximalRealSubfield E) E (AdjoinRoot Q)
   haveI : IsScalarTower (maximalRealSubfield E) (Kf Q h) (AdjoinRoot Q) := IsScalarTower.of_algebraMap_eq fun _ => rfl
   haveI : Module.Free (maximalRealSubfield E) (Kf Q h) := Module.Free.of_divisionRing _ _
-  have h2 := (letI : Module.Free (Kf Q h) (AdjoinRoot Q) := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank (maximalRealSubfield E) (Kf Q h) (AdjoinRoot Q))
+  have h2 :=
+    (letI : Module.Free (Kf Q h) (AdjoinRoot Q) := Module.Free.of_divisionRing _ _
+     Module.finrank_mul_finrank (maximalRealSubfield E) (Kf Q h) (AdjoinRoot Q))
   rw [Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield E) E,
-    (AdjoinRoot.powerBasis (Fact.out : Irreducible Q).ne_zero).finrank, AdjoinRoot.powerBasis_dim] at h1
+      (AdjoinRoot.powerBasis (Fact.out : Irreducible Q).ne_zero).finrank, AdjoinRoot.powerBasis_dim]
+    at h1
   rw [finrank_KL Q h hs hsc] at h2
   omega
 
@@ -161,10 +170,22 @@ open PositivityTheory.Rg.BcB.G3.FactorFieldP in
 theorem PositivityTheory.Rg.BcB.G3.factorField_pf : FactorField := by
   intro E _ _ _ s d hs hsc hd Q _ hmon hQ
   have hS : AdjoinRoot.of Q s ≠ 0 := (_root_.map_ne_zero _).2 hs
-  have hσS : sig Q hQ (AdjoinRoot.of Q s) = -AdjoinRoot.of Q s := by
-    rw [sig_of, hsc, map_neg]
-  refine ⟨Kf Q hQ, inferInstance, inferInstance, inferInstance, (Kf Q hQ).val.toRingHom, sig Q hQ,
-    totReal Q hQ, finrank_Kf Q hQ hs hsc, fun x => rfl, fun x => sig_of Q hQ x, ?_, fun a => a.2, ?_⟩
+  have hσS : sig Q hQ (AdjoinRoot.of Q s) = - AdjoinRoot.of Q s := by rw [sig_of, hsc, map_neg]
+  refine ⟨
+    Kf Q hQ,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    (Kf Q hQ).val.toRingHom,
+    sig Q hQ,
+    totReal Q hQ,
+    finrank_Kf Q hQ hs hsc,
+    fun x => rfl,
+    fun x => sig_of Q hQ x,
+    ?_,
+    fun a => a.2,
+    ?_
+  ⟩
   · rw [sig_root, inv_mul_cancel₀]
     intro h0
     let ψ : AdjoinRoot Q →+* ℂ := Classical.choice (inferInstance : Nonempty _)

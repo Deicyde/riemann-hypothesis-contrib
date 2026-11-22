@@ -18,8 +18,8 @@ class IsLocallyFactorial (X : Scheme.{u}) : Prop where
 
 variable {X : Scheme.{u}}
 
-instance (priority := 100) IsLocallyFactorial.isNormalScheme [IsIntegral X]
-    [IsLocallyFactorial X] : IsNormalScheme X where
+instance (priority := 100) IsLocallyFactorial.isNormalScheme [IsIntegral X] [IsLocallyFactorial X]
+    : IsNormalScheme X where
   isDomain_stalk _ := inferInstance
   isIntegrallyClosed_stalk x := by
     have := IsLocallyFactorial.ufm_stalk (X := X) x
@@ -28,7 +28,6 @@ instance (priority := 100) IsLocallyFactorial.isNormalScheme [IsIntegral X]
 namespace PrimeDivisor
 
 variable [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
-
 
 omit [IsLocallyNoetherian X] [IsNormalScheme X] in
 lemma heightOneSpectrum_eq (x : PrimeDivisor X)
@@ -73,7 +72,6 @@ end Hartogs
 section Affine
 
 variable {U : X.Opens} (hU : IsAffineOpen U)
-
 
 variable [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
 

@@ -10,13 +10,19 @@ namespace UpperTheory.V.Z.J.D
 
 section SlopeTestRemainingChoices
 
-variable {G H W W' : Type} [Group G] [Group H] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {G H W W' : Type}
+  [Group G] [Group H] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
-private theorem box_apply (ρ : Representation ℂ G W) (τ : Representation ℂ H W') (g : G) (h : H) :
-    box ρ τ (g, h) = TensorProduct.map (ρ g) (τ h) := rfl
+private theorem box_apply (ρ : Representation ℂ G W) (τ : Representation ℂ H W') (g : G) (h : H)
+    : box ρ τ (g, h) = TensorProduct.map (ρ g) (τ h) :=
+  rfl
 
-private theorem irr_eq {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) (S : Submodule ℂ W)
-    (hS : ∀ g, ∀ v ∈ S, ρ g v ∈ S) {v : W} (hv : v ∈ S) (h0 : v ≠ 0) : S = ⊤ := by
+private theorem irr_eq
+    {ρ : Representation ℂ G W} (h : ρ.IsIrreducible)
+    (S : Submodule ℂ W) (hS : ∀ g, ∀ v ∈ S, ρ g v ∈ S)
+    {v : W} (hv : v ∈ S) (h0 : v ≠ 0)
+    : S = ⊤ := by
   haveI := h
   rcases eq_bot_or_eq_top (⟨S, fun g _ hx => hS g _ hx⟩ : Subrepresentation ρ) with h1 | h1
   · exfalso
@@ -37,8 +43,8 @@ private theorem exists_ne {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) :
   subst hx
   exact ⟨fun _ => Submodule.zero_mem _, fun _ => Submodule.zero_mem _⟩
 
-private theorem span_orbit {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) {v : W} (hv : v ≠ 0) :
-    Submodule.span ℂ (Set.range fun g => ρ g v) = ⊤ := by
+private theorem span_orbit {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) {v : W} (hv : v ≠ 0)
+    : Submodule.span ℂ (Set.range fun g => ρ g v) = ⊤ := by
   refine irr_eq h _ (fun g x hx => ?_) (Submodule.subset_span ⟨1, by simp⟩) hv
   induction hx using Submodule.span_induction with
   | mem x hx =>
@@ -47,7 +53,8 @@ private theorem span_orbit {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) 
     show ρ (g * g') v = _
     rw [map_mul]
     rfl
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [map_add (f := _)]
     exact add_mem hx hy
@@ -55,12 +62,13 @@ private theorem span_orbit {ρ : Representation ℂ G W} (h : ρ.IsIrreducible) 
     rw [map_smul]
     exact Submodule.smul_mem _ _ hx
 
-private theorem sep {ρ : Representation ℂ G W} (h : AbsIrr ρ) {v₁ v₂ : W} (h1 : v₁ ≠ 0)
-    (hn : ∀ c : ℂ, v₂ ≠ c • v₁) :
-    ∃ a : MonoidAlgebra ℂ G, ρ.asAlgebraHom a v₁ = 0 ∧ ρ.asAlgebraHom a v₂ ≠ 0 := by
+private theorem sep
+    {ρ : Representation ℂ G W} (h : AbsIrr ρ) {v₁ v₂ : W} (h1 : v₁ ≠ 0) (hn : ∀ c : ℂ, v₂ ≠ c • v₁)
+    : ∃ a : MonoidAlgebra ℂ G, ρ.asAlgebraHom a v₁ = 0 ∧ ρ.asAlgebraHom a v₂ ≠ 0 := by
   by_contra hc
   push Not at hc
-  let e : W → (MonoidAlgebra ℂ G →ₗ[ℂ] W) := fun v => (LinearMap.applyₗ v).comp ρ.asAlgebraHom.toLinearMap
+  let e : W → (MonoidAlgebra ℂ G →ₗ[ℂ] W) := fun v =>
+    (LinearMap.applyₗ v).comp ρ.asAlgebraHom.toLinearMap
   have he : ∀ v a, e v a = ρ.asAlgebraHom a v := fun _ _ => rfl
   have hs : Function.Surjective (e v₁) := by
     rw [← LinearMap.range_eq_top, eq_top_iff, ← span_orbit h.1 h1, Submodule.span_le]
@@ -85,21 +93,27 @@ private theorem sep {ρ : Representation ℂ G W} (h : AbsIrr ρ) {v₁ v₂ : W
   rw [hc'] at h3
   simpa [he] using h3.symm
 
-private theorem E_tmul {ι : Type} [DecidableEq ι] (b : Module.Basis ι ℂ W') (v : W) (cf : ι →₀ ℂ) (j : ι) :
-    TensorProduct.equivFinsuppOfBasisRight (M := W) b (v ⊗ₜ[ℂ] b.repr.symm cf) j = cf j • v := by
+private theorem E_tmul
+    {ι : Type} [DecidableEq ι] (b : Module.Basis ι ℂ W') (v : W) (cf : ι →₀ ℂ) (j : ι)
+    : TensorProduct.equivFinsuppOfBasisRight (M := W) b (v ⊗ₜ[ℂ] b.repr.symm cf) j = cf j • v := by
   simp
 
-private theorem E_map {ι : Type} [DecidableEq ι] (b : Module.Basis ι ℂ W') (T : Module.End ℂ W) (x : W ⊗[ℂ] W') (j : ι) :
-    TensorProduct.equivFinsuppOfBasisRight (M := W) b (TensorProduct.map T LinearMap.id x) j =
-      T (TensorProduct.equivFinsuppOfBasisRight (M := W) b x j) := by
+private theorem E_map
+    {ι : Type} [DecidableEq ι]
+    (b : Module.Basis ι ℂ W') (T : Module.End ℂ W) (x : W ⊗[ℂ] W') (j : ι)
+    : TensorProduct.equivFinsuppOfBasisRight (M := W) b (TensorProduct.map T LinearMap.id x) j
+      = T (TensorProduct.equivFinsuppOfBasisRight (M := W) b x j) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v u => simp
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
 
-private theorem exists_pure {ρ : Representation ℂ G W} (h : AbsIrr ρ) (U : Submodule ℂ (W ⊗[ℂ] W'))
+private theorem exists_pure
+    {ρ : Representation ℂ G W} (h : AbsIrr ρ)
+    (U : Submodule ℂ (W ⊗[ℂ] W'))
     (hU : ∀ a : MonoidAlgebra ℂ G, ∀ x ∈ U, TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x ∈ U)
-    (hne : U ≠ ⊥) : ∃ (v : W) (u : W'), v ≠ 0 ∧ u ≠ 0 ∧ v ⊗ₜ[ℂ] u ∈ U := by
+    (hne : U ≠ ⊥)
+    : ∃ (v : W) (u : W'), v ≠ 0 ∧ u ≠ 0 ∧ v ⊗ₜ[ℂ] u ∈ U := by
   classical
   let b := Module.Basis.ofVectorSpace ℂ W'
   let E := TensorProduct.equivFinsuppOfBasisRight (M := W) b
@@ -121,10 +135,12 @@ private theorem exists_pure {ρ : Representation ℂ G W} (h : AbsIrr ρ) (U : S
     push Not at hc
     obtain ⟨a, ha1, ha2⟩ := sep h hv hc
     have hyU := hU a x hxU
-    have hy0 : TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x ≠ 0 := fun h0 => ha2 (by
-      rw [← hE, h0]
-      simp)
-    have hsub : (E (TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x)).support ⊂ (E x).support := by
+    have hy0 : TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x ≠ 0 := fun h0 =>
+      ha2 (by
+        rw [← hE, h0]
+        simp)
+    have hsub
+        : (E (TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x)).support ⊂ (E x).support := by
       refine (Finset.ssubset_iff_of_subset ?_).2 ⟨j₀, hj₀, ?_⟩
       · intro i hi
         rw [Finsupp.mem_support_iff] at hi ⊢
@@ -135,9 +151,10 @@ private theorem exists_pure {ρ : Representation ℂ G W} (h : AbsIrr ρ) (U : S
         exact ha1
     exact absurd (hmin _ hyU hy0) (not_le.2 (Finset.card_lt_card hsub))
   choose c hc using hline
-  let cf : _ →₀ ℂ := Finsupp.onFinset (E x).support c (fun j hj => by
-    rw [Finsupp.mem_support_iff, hc j]
-    exact smul_ne_zero hj hv)
+  let cf : _ →₀ ℂ :=
+    Finsupp.onFinset (E x).support c (fun j hj => by
+      rw [Finsupp.mem_support_iff, hc j]
+      exact smul_ne_zero hj hv)
   have hx : E x j₀ ⊗ₜ[ℂ] b.repr.symm cf = x := by
     apply E.injective
     ext1 j
@@ -146,9 +163,10 @@ private theorem exists_pure {ρ : Representation ℂ G W} (h : AbsIrr ρ) (U : S
   refine ⟨E x j₀, b.repr.symm cf, hv, fun h0 => hx0 ?_, by rw [hx]; exact hxU⟩
   rw [← hx, h0, TensorProduct.tmul_zero]
 
-private theorem line_of {ρ : Representation ℂ G W} (h : AbsIrr ρ) (Φ : W →ₗ[ℂ] W ⊗[ℂ] W')
-    (hΦ : ∀ g w, Φ (ρ g w) = TensorProduct.map (ρ g) LinearMap.id (Φ w)) :
-    ∃ u : W', ∀ w, Φ w = w ⊗ₜ[ℂ] u := by
+private theorem line_of
+    {ρ : Representation ℂ G W} (h : AbsIrr ρ)
+    (Φ : W →ₗ[ℂ] W ⊗[ℂ] W') (hΦ : ∀ g w, Φ (ρ g w) = TensorProduct.map (ρ g) LinearMap.id (Φ w))
+    : ∃ u : W', ∀ w, Φ w = w ⊗ₜ[ℂ] u := by
   classical
   let b := Module.Basis.ofVectorSpace ℂ W'
   let E := TensorProduct.equivFinsuppOfBasisRight (M := W) b
@@ -156,15 +174,17 @@ private theorem line_of {ρ : Representation ℂ G W} (h : AbsIrr ρ) (Φ : W �
     fun T x j => E_map b T x j
   have hc : ∀ j, ∃ c : ℂ, ∀ w, E (Φ w) j = c • w := by
     intro j
-    obtain ⟨c, hc⟩ := h.2 ((Finsupp.lapply j).comp (E.toLinearMap.comp Φ)) (fun g v => by
-      show E (Φ (ρ g v)) j = ρ g (E (Φ v) j)
-      rw [hΦ, hE])
+    obtain ⟨c, hc⟩ :=
+      h.2 ((Finsupp.lapply j).comp (E.toLinearMap.comp Φ)) (fun g v => by
+        show E (Φ (ρ g v)) j = ρ g (E (Φ v) j)
+        rw [hΦ, hE])
     exact ⟨c, fun w => LinearMap.congr_fun hc w⟩
   choose c hc using hc
   obtain ⟨w₀, hw₀⟩ := exists_ne h.1
-  let cf : _ →₀ ℂ := Finsupp.onFinset (E (Φ w₀)).support c (fun j hj => by
-    rw [Finsupp.mem_support_iff, hc j]
-    exact smul_ne_zero hj hw₀)
+  let cf : _ →₀ ℂ :=
+    Finsupp.onFinset (E (Φ w₀)).support c (fun j hj => by
+      rw [Finsupp.mem_support_iff, hc j]
+      exact smul_ne_zero hj hw₀)
   refine ⟨b.repr.symm cf, fun w => E.injective ?_⟩
   ext1 j
   rw [show E (w ⊗ₜ[ℂ] b.repr.symm cf) j = cf j • w from E_tmul b _ cf j]
@@ -182,7 +202,8 @@ theorem boxIrr : BoxIrr := by
       push Not at hc
       exact hw₀ ((Module.forall_dual_apply_eq_zero_iff ℂ w₀).1 hc)
     exact ⟨(φ w₀)⁻¹ • φ, by simp [hφ]⟩
-  let ct : W ⊗[ℂ] W' →ₗ[ℂ] W' := (TensorProduct.lid ℂ W').toLinearMap.comp (TensorProduct.map φ₀ LinearMap.id)
+  let ct : W ⊗[ℂ] W' →ₗ[ℂ] W' :=
+    (TensorProduct.lid ℂ W').toLinearMap.comp (TensorProduct.map φ₀ LinearMap.id)
   have hct : ∀ v u, ct (v ⊗ₜ[ℂ] u) = φ₀ v • u := fun v u => by simp [ct]
   have hct₀ : ∀ u, ct (w₀ ⊗ₜ[ℂ] u) = u := fun u => by rw [hct, hφ₀, one_smul]
   have hne : w₀ ⊗ₜ[ℂ] u₀ ≠ 0 := fun h0 => hu₀ (by rw [← hct₀ u₀, h0, map_zero])
@@ -197,8 +218,9 @@ theorem boxIrr : BoxIrr := by
     by_cases hS : S.toSubmodule = ⊥
     · exact Or.inl (Subrepresentation.toSubmodule_injective hS)
     refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
-    have hU : ∀ a : MonoidAlgebra ℂ G, ∀ x ∈ S.toSubmodule,
-        TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x ∈ S.toSubmodule := by
+    have hU
+        : ∀ a : MonoidAlgebra ℂ G, ∀ x ∈ S.toSubmodule,
+          TensorProduct.map (ρ.asAlgebraHom a) LinearMap.id x ∈ S.toSubmodule := by
       intro a
       induction a using MonoidAlgebra.induction_linear with
       | zero =>

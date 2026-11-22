@@ -9,16 +9,17 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_pow_mul_one_sub_mem_map_maximalIdeal (O H : Type) [CommRing O] [IsLocalRing O]
-    [CommRing H] [Algebra O H] [Module.Finite O H] (u : H) :
-    ∃ (N : ℕ) (y : H), u ^ N * (1 - y * u) ∈ (IsLocalRing.maximalIdeal O).map (algebraMap O H) := by
+theorem exists_pow_mul_one_sub_mem_map_maximalIdeal
+    (O H : Type) [CommRing O] [IsLocalRing O] [CommRing H] [Algebra O H] [Module.Finite O H] (u : H)
+    : ∃ (N : ℕ) (y : H),
+      u ^ N * (1 - y * u) ∈ (IsLocalRing.maximalIdeal O).map (algebraMap O H) := by
   set m := IsLocalRing.maximalIdeal O
   set J := m.map (algebraMap O H)
   letI : Field (O ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite (O ⧸ m) (H ⧸ J) := Module.Finite.of_restrictScalars_finite O _ _
   haveI : IsArtinianRing (H ⧸ J) := IsArtinianRing.of_finite (O ⧸ m) _
-  obtain ⟨N, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd (R := H ⧸ J) (M := H ⧸ J)
-    (Ideal.Quotient.mk J u) 1
+  obtain ⟨N, y, hy⟩ :=
+    IsArtinian.exists_pow_succ_smul_dvd (R := H ⧸ J) (M := H ⧸ J) (Ideal.Quotient.mk J u) 1
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
   refine ⟨N, y, ?_⟩
   rw [← Ideal.Quotient.eq_zero_iff_mem]
@@ -26,10 +27,12 @@ theorem exists_pow_mul_one_sub_mem_map_maximalIdeal (O H : Type) [CommRing O] [I
   simp only [map_mul, map_pow, map_sub, map_one]
   linear_combination -hy
 
-theorem exists_mul_kills_ker_of_localization (O H : Type) [CommRing O] [CommRing H] [Algebra O H]
-    [Module.Finite O H] (ε : H →ₐ[O] O) (M : Submonoid H) (T : Type) [CommRing T] [Algebra H T]
-    [IsLocalization M T] (u : H) (hu : ∀ h, ε h = 0 → algebraMap H T (h * u) = 0) :
-    ∃ s : M, ∀ h, ε h = 0 → h * (s * u) = 0 := by
+theorem exists_mul_kills_ker_of_localization
+    (O H : Type) [CommRing O] [CommRing H] [Algebra O H] [Module.Finite O H]
+    (ε : H →ₐ[O] O)
+    (M : Submonoid H) (T : Type) [CommRing T] [Algebra H T] [IsLocalization M T]
+    (u : H) (hu : ∀ h, ε h = 0 → algebraMap H T (h * u) = 0)
+    : ∃ s : M, ∀ h, ε h = 0 → h * (s * u) = 0 := by
   classical
   obtain ⟨G, hG⟩ := Module.Finite.fg_top (R := O) (M := H)
   have h1 : ∀ b : H, ∃ s : M, (s : H) * ((b - algebraMap O H (ε b)) * u) = 0 := fun b =>
@@ -43,7 +46,8 @@ theorem exists_mul_kills_ker_of_localization (O H : Type) [CommRing O] [CommRing
     | mem b hb =>
       rw [← Finset.mul_prod_erase G s hb, Submonoid.coe_mul]
       linear_combination ((∏ x ∈ G.erase b, s x : M) : H) * hs b
-    | zero => simp
+    | zero =>
+      simp
     | add a b _ _ ha hb =>
       rw [map_add (f := _), map_add (f := _)]
       linear_combination ha + hb
@@ -52,8 +56,23 @@ theorem exists_mul_kills_ker_of_localization (O H : Type) [CommRing O] [CommRing
       linear_combination algebraMap O H c * ha
   simpa [hh] using key h
 
-theorem exists_integral_of_local_presentation :
-    ∀ (O H : Type) [CommRing O] [IsLocalRing O] [CommRing H] [Algebra O H] [Module.Finite O H] (ε : H →ₐ[O] O) (g n : ℕ) (T : Type) [CommRing T] [Algebra H T] [Algebra O T] [IsScalarTower O H T] [IsLocalization.AtPrime T ((IsLocalRing.maximalIdeal O).comap ε)] (εT : T →ₐ[O] O), (∀ h, εT (algebraMap H T h) = ε h) → ∀ (S : Type) [CommRing S] [Algebra O S] (π : S →ₐ[O] T) (x : Fin g → S) (a : Matrix (Fin g) (Fin g) S) (ρ : S →+* MvPowerSeries (Fin g) (IsLocalRing.ResidueField O)), Function.Surjective π → RingHom.ker π = Ideal.span (Set.range (a.mulVec x)) → RingHom.ker εT = Ideal.span (Set.range fun i => π (x i)) → (∀ i j, εT (π (a i j)) = if i = j then (n : O) else 0) → (∀ i, ρ (x i) = MvPowerSeries.X i) → (∀ c ∈ IsLocalRing.maximalIdeal O, ρ (algebraMap O S c) = 0) → ∃ l : H, (∀ h, ε h = 0 → h * l = 0) ∧ (n : O) ^ g ∣ ε l ∧ l ∉ (IsLocalRing.maximalIdeal O).map (algebraMap O H) := by
+theorem exists_integral_of_local_presentation
+    : ∀ (O H : Type) [CommRing O] [IsLocalRing O] [CommRing H] [Algebra O H] [Module.Finite O H]
+        (ε : H →ₐ[O] O) (g n : ℕ) (T : Type) [CommRing T] [Algebra H T] [Algebra O T]
+        [IsScalarTower O H T] [IsLocalization.AtPrime T ((IsLocalRing.maximalIdeal O).comap ε)]
+        (εT : T →ₐ[O] O),
+      (∀ h, εT (algebraMap H T h) = ε h)
+        → ∀ (S : Type) [CommRing S] [Algebra O S] (π : S →ₐ[O] T) (x : Fin g → S)
+            (a : Matrix (Fin g) (Fin g) S)
+            (ρ : S →+* MvPowerSeries (Fin g) (IsLocalRing.ResidueField O)),
+          Function.Surjective π → RingHom.ker π = Ideal.span (Set.range (a.mulVec x))
+            → RingHom.ker εT = Ideal.span (Set.range fun i => π (x i))
+            → (∀ i j, εT (π (a i j)) = if i = j then (n : O) else 0)
+            → (∀ i, ρ (x i) = MvPowerSeries.X i)
+            → (∀ c ∈ IsLocalRing.maximalIdeal O, ρ (algebraMap O S c) = 0)
+            → ∃ l : H,
+              (∀ h, ε h = 0 → h * l = 0) ∧ (n : O) ^ g ∣ ε l
+                ∧ l ∉ (IsLocalRing.maximalIdeal O).map (algebraMap O H) := by
   intro O H _ _ _ _ _ ε g n T _ _ _ _ _ εT hε S _ _ π x a ρ hπ hker hkerT ha hρx hρm
   classical
   set m := IsLocalRing.maximalIdeal O with hm
@@ -64,8 +83,9 @@ theorem exists_integral_of_local_presentation :
     rw [Ideal.map_map, AlgHom.comp_algebraMap]
   set A : Matrix (Fin g) (Fin g) (MvPowerSeries (Fin g) (IsLocalRing.ResidueField O)) :=
     ρ.mapMatrix a with hA
-  have hred : ∀ z : S, π z ∈ m.map (algebraMap O T) →
-      ρ z ∈ Ideal.span (Set.range (A.mulVec MvPowerSeries.X)) := by
+  have hred
+      : ∀ z : S,
+        π z ∈ m.map (algebraMap O T) → ρ z ∈ Ideal.span (Set.range (A.mulVec MvPowerSeries.X)) := by
     intro z hz
     rw [← hmS] at hz
     have hz' : z ∈ m.map (algebraMap O S) ⊔ RingHom.ker π := by
@@ -73,8 +93,9 @@ theorem exists_integral_of_local_presentation :
       have h2 : z ∈ ((m.map (algebraMap O S)).map (π : S →+* T)).comap (π : S →+* T) := hz
       rw [this] at h2
       exact h2
-    have hle : m.map (algebraMap O S) ⊔ RingHom.ker π ≤
-        (Ideal.span (Set.range (A.mulVec MvPowerSeries.X))).comap ρ := by
+    have hle
+        : m.map (algebraMap O S) ⊔ RingHom.ker π
+          ≤ (Ideal.span (Set.range (A.mulVec MvPowerSeries.X))).comap ρ := by
       refine sup_le ?_ ?_
       · rw [Ideal.map_le_iff_le_comap]
         intro c hc
@@ -105,8 +126,7 @@ theorem exists_integral_of_local_presentation :
       exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).2 hc')
     rw [Ideal.mul_unit_mem_iff_mem _ hunit] at hy'
     simp only at hut
-    rw [← hut, mul_pow,
-      Ideal.mul_unit_mem_iff_mem _ ((IsLocalization.map_units T t).pow N)] at hy'
+    rw [← hut, mul_pow, Ideal.mul_unit_mem_iff_mem _ ((IsLocalization.map_units T t).pow N)] at hy'
     exact ⟨N, hy'⟩
   choose N hN using hnil
   have hdet : π a.det ∉ m.map (algebraMap O T) := by
@@ -122,8 +142,9 @@ theorem exists_integral_of_local_presentation :
     intro w hw
     have hw' : w ∈ RingHom.ker εT := hw
     rw [hkerT] at hw'
-    have hle : Ideal.span (Set.range fun i => π (x i)) ≤
-        LinearMap.ker (LinearMap.mulRight T (π a.det)) := by
+    have hle
+        : Ideal.span (Set.range fun i => π (x i))
+          ≤ LinearMap.ker (LinearMap.mulRight T (π a.det)) := by
       rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       change π (x i) * π a.det = 0
@@ -138,8 +159,7 @@ theorem exists_integral_of_local_presentation :
         Ideal.mul_mem_left _ _ (Ideal.subset_span (Set.mem_range_self j))
     exact hle hw'
   have hval : εT (π a.det) = (n : O) ^ g := by
-    have h1 : εT (π a.det) = ((εT.comp π).mapMatrix a).det := by
-      rw [← AlgHom.map_det]; rfl
+    have h1 : εT (π a.det) = ((εT.comp π).mapMatrix a).det := by rw [← AlgHom.map_det]; rfl
     have h2 : (εT.comp π).mapMatrix a = Matrix.diagonal fun _ => (n : O) := by
       ext i j
       simp [Matrix.diagonal_apply, ha]
@@ -147,8 +167,9 @@ theorem exists_integral_of_local_presentation :
     simp
   obtain ⟨⟨u, t⟩, hut⟩ := IsLocalization.surj p.primeCompl (π a.det)
   simp only at hut
-  obtain ⟨s, hs⟩ := exists_mul_kills_ker_of_localization O H ε p.primeCompl T u (fun h hh => by
-    rw [map_mul, ← hut, ← mul_assoc, hkill _ (by rw [hε, hh]), zero_mul])
+  obtain ⟨s, hs⟩ :=
+    exists_mul_kills_ker_of_localization O H ε p.primeCompl T u
+      (fun h hh => by rw [map_mul, ← hut, ← mul_assoc, hkill _ (by rw [hε, hh]), zero_mul])
   refine ⟨s * u, hs, ?_, fun hc => hdet ?_⟩
   · have := congrArg εT hut
     rw [map_mul, hval, hε, hε] at this
@@ -156,7 +177,8 @@ theorem exists_integral_of_local_presentation :
     exact Dvd.dvd.mul_left (dvd_mul_right _ _) _
   · have hc' := Ideal.mem_map_of_mem (algebraMap H T) hc
     rw [hmT, map_mul, Ideal.unit_mul_mem_iff_mem _ (IsLocalization.map_units T s), ← hut,
-      Ideal.mul_unit_mem_iff_mem _ (IsLocalization.map_units T t)] at hc'
+        Ideal.mul_unit_mem_iff_mem _ (IsLocalization.map_units T t)]
+      at hc'
     exact hc'
 
 end GlobalTheory

@@ -19,55 +19,62 @@ section Ambient
 
 variable {K Ω : Type*} [Field K] [Field Ω] [ValuativeRel Ω] [Algebra K Ω]
 
-theorem valuation_le_valuation_iff_coe (E : IntermediateField K Ω) (x y : E) :
-    valuation E x ≤ valuation E y ↔ valuation Ω (x : Ω) ≤ valuation Ω (y : Ω) := by
+theorem valuation_le_valuation_iff_coe (E : IntermediateField K Ω) (x y : E)
+    : valuation E x ≤ valuation E y ↔ valuation Ω (x : Ω) ≤ valuation Ω (y : Ω) := by
   rw [← Valuation.vle_iff_le, ← Valuation.vle_iff_le, IntermediateField.coe_vle_coe_iff]
 
-theorem valuation_eq_valuation_iff_coe (E : IntermediateField K Ω) (x y : E) :
-    valuation E x = valuation E y ↔ valuation Ω (x : Ω) = valuation Ω (y : Ω) := by
+theorem valuation_eq_valuation_iff_coe (E : IntermediateField K Ω) (x y : E)
+    : valuation E x = valuation E y ↔ valuation Ω (x : Ω) = valuation Ω (y : Ω) := by
   rw [le_antisymm_iff, le_antisymm_iff, valuation_le_valuation_iff_coe,
     valuation_le_valuation_iff_coe]
 
-theorem mem_integer_intermediateField_iff (E : IntermediateField K Ω) (x : E) :
-    x ∈ 𝒪[E] ↔ valuation Ω (x : Ω) ≤ 1 := by
+theorem mem_integer_intermediateField_iff (E : IntermediateField K Ω) (x : E)
+    : x ∈ 𝒪[E] ↔ valuation Ω (x : Ω) ≤ 1 := by
   rw [Valuation.mem_integer_iff, ← map_one (valuation E), valuation_le_valuation_iff_coe]
   simp
 
-theorem isUnit_integer_intermediateField_iff (E : IntermediateField K Ω) (x : 𝒪[E]) :
-    IsUnit x ↔ valuation Ω ((x : E) : Ω) = 1 := by
-  rw [(Valuation.integer.integers (valuation E)).isUnit_iff_valuation_eq_one, ← map_one (valuation E)]
+theorem isUnit_integer_intermediateField_iff (E : IntermediateField K Ω) (x : 𝒪[E])
+    : IsUnit x ↔ valuation Ω ((x : E) : Ω) = 1 := by
+  rw [(Valuation.integer.integers (valuation E)).isUnit_iff_valuation_eq_one,
+    ← map_one (valuation E)]
   exact (valuation_eq_valuation_iff_coe E _ _).trans (by simp; rfl)
 
-theorem mem_maximalIdeal_intermediateField_iff (E : IntermediateField K Ω) (x : 𝒪[E]) :
-    x ∈ 𝓂[E] ↔ valuation Ω ((x : E) : Ω) < 1 := by
+theorem mem_maximalIdeal_intermediateField_iff (E : IntermediateField K Ω) (x : 𝒪[E])
+    : x ∈ 𝓂[E] ↔ valuation Ω ((x : E) : Ω) < 1 := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_integer_intermediateField_iff]
   have : valuation Ω ((x : E) : Ω) ≤ 1 := (mem_integer_intermediateField_iff E x).mp x.2
   exact ⟨fun h ↦ lt_of_le_of_ne this h, fun h ↦ h.ne⟩
 
-theorem dvd_integer_intermediateField_iff (E : IntermediateField K Ω) (x y : 𝒪[E]) :
-    x ∣ y ↔ valuation Ω ((y : E) : Ω) ≤ valuation Ω ((x : E) : Ω) := by
+theorem dvd_integer_intermediateField_iff (E : IntermediateField K Ω) (x y : 𝒪[E])
+    : x ∣ y ↔ valuation Ω ((y : E) : Ω) ≤ valuation Ω ((x : E) : Ω) := by
   rw [(Valuation.integer.integers (valuation E)).dvd_iff_le]
   exact valuation_le_valuation_iff_coe E _ _
 
-def integerInclusion [ValuativeRel K] [ValuativeExtension K Ω] {E F : IntermediateField K Ω}
-    (h : E ≤ F) : 𝒪[E] →ₐ[𝒪[K]] 𝒪[F] where
-  toFun x := ⟨IntermediateField.inclusion h x, by
-    rw [mem_integer_intermediateField_iff]
-    exact (mem_integer_intermediateField_iff E x).mp x.2⟩
+def integerInclusion
+    [ValuativeRel K] [ValuativeExtension K Ω] {E F : IntermediateField K Ω} (h : E ≤ F)
+    : 𝒪[E] →ₐ[𝒪[K]] 𝒪[F] where
+  toFun x := ⟨
+    IntermediateField.inclusion h x,
+    by
+      rw [mem_integer_intermediateField_iff]
+      exact (mem_integer_intermediateField_iff E x).mp x.2
+  ⟩
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
   commutes' _ := rfl
 
-theorem integerInclusion_injective [ValuativeRel K] [ValuativeExtension K Ω]
-    {E F : IntermediateField K Ω} (h : E ≤ F) : Function.Injective (integerInclusion h) := by
+theorem integerInclusion_injective
+    [ValuativeRel K] [ValuativeExtension K Ω] {E F : IntermediateField K Ω} (h : E ≤ F)
+    : Function.Injective (integerInclusion h) := by
   intro x y hxy
   have := congrArg (fun z : 𝒪[F] ↦ ((z : F) : Ω)) hxy
   exact Subtype.ext (Subtype.ext this)
 
-instance isLocalHom_integerInclusion [ValuativeRel K] [ValuativeExtension K Ω]
-    {E F : IntermediateField K Ω} (h : E ≤ F) : IsLocalHom (integerInclusion h) :=
+instance isLocalHom_integerInclusion
+    [ValuativeRel K] [ValuativeExtension K Ω] {E F : IntermediateField K Ω} (h : E ≤ F)
+    : IsLocalHom (integerInclusion h) :=
   ⟨fun x hx ↦ by
     rw [isUnit_integer_intermediateField_iff] at hx ⊢
     exact hx⟩
@@ -76,51 +83,56 @@ end Ambient
 
 section Discrete
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
 
 local notation "𝔼" => maximalUnramifiedExtension K Ω
 
-theorem exists_valuation_eq_algebraMap {x : Ω} (hx : x ∈ 𝔼) (hx0 : x ≠ 0) :
-    ∃ a : K, a ≠ 0 ∧ valuation Ω x = valuation Ω (algebraMap K Ω a) := by
+theorem exists_valuation_eq_algebraMap {x : Ω} (hx : x ∈ 𝔼) (hx0 : x ≠ 0)
+    : ∃ a : K, a ≠ 0 ∧ valuation Ω x = valuation Ω (algebraMap K Ω a) := by
   obtain ⟨L, hL, hxL⟩ := mem_maximalUnramifiedExtension_iff.mp hx
   have := hL.1
-  have he : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = 1 := hL.ramificationIndex_eq_one
+  have he
+      : (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+        = 1 :=
+    hL.ramificationIndex_eq_one
   set y : L := ⟨x, hxL⟩
   obtain ⟨a, ha, hay⟩ := exists_ord_eq K (ord y)
   refine ⟨a, ha, ?_⟩
   have h1 := ordRat_algebraMap_of_finite (K := K) (Ω := Ω) y
   rw [he, Nat.cast_one, div_one] at h1
-  rw [← ordRat_eq_ordRat_iff (K := K) hx0 ((_root_.map_ne_zero _).mpr ha), ordRat_algebraMap,
-    hay]
+  rw [← ordRat_eq_ordRat_iff (K := K) hx0 ((_root_.map_ne_zero _).mpr ha), ordRat_algebraMap, hay]
   exact h1
 
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace Ω]
   [IsValuativeTopology Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω] in
 @[simp]
-theorem coe_algebraMap_integer_intermediateField (E : IntermediateField K Ω) (a : 𝒪[K]) :
-    (((algebraMap 𝒪[K] 𝒪[E] a : 𝒪[E]) : E) : Ω) = algebraMap K Ω (a : K) :=
+theorem coe_algebraMap_integer_intermediateField (E : IntermediateField K Ω) (a : 𝒪[K])
+    : (((algebraMap 𝒪[K] 𝒪[E] a : 𝒪[E]) : E) : Ω) = algebraMap K Ω (a : K) :=
   rfl
 
-
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace Ω]
   [IsValuativeTopology Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω] in
-theorem valuation_algebraMap_eq_one_iff (x : K) :
-    valuation Ω (algebraMap K Ω x) = 1 ↔ valuation K x = 1 := by
+theorem valuation_algebraMap_eq_one_iff (x : K)
+    : valuation Ω (algebraMap K Ω x) = 1 ↔ valuation K x = 1 := by
   simpa using valuation_algebraMap_eq_iff (G := Ω) x 1
 
-
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace Ω]
   [IsValuativeTopology Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω] in
-theorem not_isUnit_algebraMap_uniformizer (E : IntermediateField K Ω) {ϖ : 𝒪[K]}
-    (hϖ : Irreducible ϖ) : ¬ IsUnit (algebraMap 𝒪[K] 𝒪[E] ϖ) := by
+theorem not_isUnit_algebraMap_uniformizer
+    (E : IntermediateField K Ω) {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ)
+    : ¬ IsUnit (algebraMap 𝒪[K] 𝒪[E] ϖ) := by
   rw [isUnit_integer_intermediateField_iff, coe_algebraMap_integer_intermediateField,
     valuation_algebraMap_eq_one_iff]
   exact ((Valuation.integer.integers (valuation K)).valuation_irreducible_lt_one hϖ).ne
 
-theorem exists_associated_pow {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) {r : 𝒪[𝔼]} (hr : r ≠ 0) :
-    ∃ n : ℕ, Associated (algebraMap 𝒪[K] 𝒪[𝔼] ϖ ^ n) r := by
+theorem exists_associated_pow {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) {r : 𝒪[𝔼]} (hr : r ≠ 0)
+    : ∃ n : ℕ, Associated (algebraMap 𝒪[K] 𝒪[𝔼] ϖ ^ n) r := by
   have hx0 : ((r : 𝔼) : Ω) ≠ 0 := by
     intro h
     exact hr (Subtype.ext (Subtype.ext h))
@@ -140,21 +152,23 @@ theorem exists_associated_pow {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) {r : 𝒪[�
       have := congrArg Subtype.val hu
       simpa [a'] using this
     rw [hva, h2, map_mul, map_mul, hu1, one_mul, map_pow, map_pow]
-  have hv' : valuation Ω (((algebraMap 𝒪[K] 𝒪[𝔼] ϖ ^ n : 𝒪[𝔼]) : 𝔼) : Ω) =
-      valuation Ω (algebraMap K Ω (ϖ : K)) ^ n := by
+  have hv'
+      : valuation Ω (((algebraMap 𝒪[K] 𝒪[𝔼] ϖ ^ n : 𝒪[𝔼]) : 𝔼) : Ω)
+        = valuation Ω (algebraMap K Ω (ϖ : K)) ^ n := by
     rw [← map_pow]
     simp
   refine ⟨n, associated_of_dvd_dvd ?_ ?_⟩ <;> rw [dvd_integer_intermediateField_iff, hv, hv']
 
-theorem irreducible_algebraMap_uniformizer {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) :
-    Irreducible (algebraMap 𝒪[K] 𝒪[𝔼] ϖ) := by
+theorem irreducible_algebraMap_uniformizer {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ)
+    : Irreducible (algebraMap 𝒪[K] 𝒪[𝔼] ϖ) := by
   set p := algebraMap 𝒪[K] 𝒪[𝔼] ϖ
   have hp := not_isUnit_algebraMap_uniformizer 𝔼 hϖ
   have hp0 : p ≠ 0 := by
     intro h
     have h' := congrArg (fun z : 𝒪[𝔼] ↦ ((z : 𝔼) : Ω)) h
     simp only [p, coe_algebraMap_integer_intermediateField] at h'
-    rw [ZeroMemClass.coe_zero, ZeroMemClass.coe_zero, map_eq_zero_iff _ (algebraMap K Ω).injective] at h'
+    rw [ZeroMemClass.coe_zero, ZeroMemClass.coe_zero, map_eq_zero_iff _ (algebraMap K Ω).injective]
+      at h'
     exact hϖ.ne_zero (Subtype.ext h')
   have hdvd : ∀ x : 𝒪[𝔼], ¬ IsUnit x → p ∣ x := by
     intro x hx
@@ -188,49 +202,56 @@ end Discrete
 
 section Automorphism
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  {L : Type*} [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtension K L]
-  [Algebra.IsAlgebraic K L]
-
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  {L : Type*}
+  [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtension K L] [Algebra.IsAlgebraic K L]
 
 variable (K L) in
 def integerAlgEquivOfIsAlgebraic : (L ≃ₐ[K] L) →* (𝒪[L] ≃ₐ[𝒪[K]] 𝒪[L]) where
-  toFun ρ :=
-    { toFun x := ⟨ρ x, by
+  toFun ρ := {
+    toFun x := ⟨
+      ρ x,
+      by
         rw [Valuation.mem_integer_iff, valuation_algEquiv_apply_of_isAlgebraic]
-        exact x.2⟩
-      invFun x := ⟨ρ.symm x, by
+        exact x.2
+    ⟩
+    invFun x := ⟨
+      ρ.symm x,
+      by
         rw [Valuation.mem_integer_iff, valuation_algEquiv_apply_of_isAlgebraic]
-        exact x.2⟩
-      left_inv x := Subtype.ext (ρ.symm_apply_apply _)
-      right_inv x := Subtype.ext (ρ.apply_symm_apply _)
-      map_mul' x y := Subtype.ext (map_mul ρ _ _)
-      map_add' x y := Subtype.ext (map_add ρ _ _)
-      commutes' a := Subtype.ext (ρ.commutes _) }
+        exact x.2
+    ⟩
+    left_inv x := Subtype.ext (ρ.symm_apply_apply _)
+    right_inv x := Subtype.ext (ρ.apply_symm_apply _)
+    map_mul' x y := Subtype.ext (map_mul ρ _ _)
+    map_add' x y := Subtype.ext (map_add ρ _ _)
+    commutes' a := Subtype.ext (ρ.commutes _)
+  }
   map_one' := by ext; rfl
   map_mul' _ _ := by ext; rfl
 
 @[simp]
-theorem coe_integerAlgEquivOfIsAlgebraic_apply (ρ : L ≃ₐ[K] L) (x : 𝒪[L]) :
-    (integerAlgEquivOfIsAlgebraic K L ρ x : L) = ρ x :=
+theorem coe_integerAlgEquivOfIsAlgebraic_apply (ρ : L ≃ₐ[K] L) (x : 𝒪[L])
+    : (integerAlgEquivOfIsAlgebraic K L ρ x : L) = ρ x :=
   rfl
 
 end Automorphism
 
 section Frobenius
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
 
 local notation "𝔼" => maximalUnramifiedExtension K Ω
 
 omit [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra.IsAlgebraic K Ω] in
-instance isAlgebraic_maximalUnramifiedExtension : Algebra.IsAlgebraic K 𝔼 :=
-  inferInstance
+instance isAlgebraic_maximalUnramifiedExtension : Algebra.IsAlgebraic K 𝔼 := inferInstance
 
-theorem exists_pow_card_pow_sub_mem_maximalIdeal (x : 𝒪[𝔼]) :
-    ∃ n : ℕ, n ≠ 0 ∧ x ^ (Nat.card 𝓀[K] ^ n) - x ∈ 𝓂[𝔼] := by
+theorem exists_pow_card_pow_sub_mem_maximalIdeal (x : 𝒪[𝔼])
+    : ∃ n : ℕ, n ≠ 0 ∧ x ^ (Nat.card 𝓀[K] ^ n) - x ∈ 𝓂[𝔼] := by
   obtain ⟨L, hL, hxL⟩ := mem_maximalUnramifiedExtension_iff.mp (x : 𝔼).2
   have := hL.1
   have h := hL.ramificationIndex_eq_one
@@ -241,14 +262,15 @@ theorem exists_pow_card_pow_sub_mem_maximalIdeal (x : 𝒪[𝔼]) :
   refine ⟨Module.finrank K L, Module.finrank_pos.ne', ?_⟩
   have := Fintype.ofFinite 𝓀[L]
   have hz : z ^ (Nat.card 𝓀[K] ^ Module.finrank K L) - z ∈ 𝓂[L] := by
-    rw [← IsLocalRing.residue_eq_zero_iff, map_sub, map_pow, ← card_residueField_of_unramified K L h,
-      Nat.card_eq_fintype_card, FiniteField.pow_card, sub_self]
+    rw [← IsLocalRing.residue_eq_zero_iff, map_sub, map_pow,
+      ← card_residueField_of_unramified K L h, Nat.card_eq_fintype_card, FiniteField.pow_card,
+      sub_self]
   rw [mem_maximalIdeal_intermediateField_iff] at hz ⊢
   rw [← hxz]
   simpa using! hz
 
-theorem exists_isPrimitiveRoot_residue {n : ℕ} (hn : n ≠ 0) :
-    ∃ ζ : ResidueField 𝒪[𝔼], IsPrimitiveRoot ζ (Nat.card 𝓀[K] ^ n - 1) := by
+theorem exists_isPrimitiveRoot_residue {n : ℕ} (hn : n ≠ 0)
+    : ∃ ζ : ResidueField 𝒪[𝔼], IsPrimitiveRoot ζ (Nat.card 𝓀[K] ^ n - 1) := by
   obtain ⟨ζ, hζ⟩ := HasUnramifiedRoots.exists_isPrimitiveRoot (K := K) (Ω := Ω) n hn
   obtain ⟨hL, -⟩ := isUnramifiedSubextension_adjoin hn hζ
   set L := IntermediateField.adjoin K {ζ}
@@ -274,14 +296,16 @@ theorem exists_isPrimitiveRoot_residue {n : ℕ} (hn : n ≠ 0) :
   rw [← map_pow, ← map_one (residue 𝒪[L]), ← sub_eq_zero, ← map_sub, residue_eq_zero_iff,
     mem_maximalIdeal_intermediateField_iff]
   rw [← map_one (residue 𝒪[𝔼]), ← sub_eq_zero, ← map_sub, residue_eq_zero_iff,
-    mem_maximalIdeal_intermediateField_iff] at hl
+      mem_maximalIdeal_intermediateField_iff]
+    at hl
   simpa using! hl
 
 variable [IsGalois K Ω]
 
-theorem frobenius_integer_sub_pow_mem_maximalIdeal (x : 𝒪[𝔼]) :
-    integerAlgEquivOfIsAlgebraic K 𝔼 (maximalUnramifiedExtensionFrobenius K Ω) x -
-      x ^ Nat.card 𝓀[K] ∈ 𝓂[𝔼] := by
+theorem frobenius_integer_sub_pow_mem_maximalIdeal (x : 𝒪[𝔼])
+    : integerAlgEquivOfIsAlgebraic K 𝔼 (maximalUnramifiedExtensionFrobenius K Ω) x
+        - x ^ Nat.card 𝓀[K]
+      ∈ 𝓂[𝔼] := by
   obtain ⟨L, hL, hxL⟩ := mem_maximalUnramifiedExtension_iff.mp (x : 𝔼).2
   have := hL.1
   have h := hL.ramificationIndex_eq_one
@@ -290,14 +314,17 @@ theorem frobenius_integer_sub_pow_mem_maximalIdeal (x : 𝒪[𝔼]) :
   have hn : Module.finrank K L ≠ 0 := Module.finrank_pos.ne'
   rw [card_residueField_of_unramified K L h] at hξ
   have hm := natCast_card_pow_sub_one_ne_zero (K := K) hn
-  have key : (maximalUnramifiedExtension K Ω).val.comp
-      ((maximalUnramifiedExtensionFrobenius K Ω).toAlgHom.comp (IntermediateField.inclusion hle)) =
-      L.val.comp (frobenius K L h).toAlgHom := by
+  have key
+      : (maximalUnramifiedExtension K Ω).val.comp
+          ((maximalUnramifiedExtensionFrobenius K Ω).toAlgHom.comp
+            (IntermediateField.inclusion hle))
+        = L.val.comp (frobenius K L h).toAlgHom := by
     refine AlgHom.ext_of_adjoin_eq_top (algebra_adjoin_eq_top_of_adjoin_eq_top htop) ?_
     intro y hy
     rw [Set.mem_singleton_iff] at hy
     rw [hy]
-    have h1 : (IntermediateField.inclusion hle ξ) ^ (Nat.card 𝓀[K] ^ Module.finrank K L - 1) = 1 := by
+    have h1
+        : (IntermediateField.inclusion hle ξ) ^ (Nat.card 𝓀[K] ^ Module.finrank K L - 1) = 1 := by
       rw [← map_pow, hξ.pow_eq_one, map_one]
     simp only [AlgHom.comp_apply, IntermediateField.coe_val, AlgEquiv.coe_toAlgHom]
     rw [maximalUnramifiedExtensionFrobenius_apply_of_pow_eq_one hm h1,
@@ -310,8 +337,11 @@ theorem frobenius_integer_sub_pow_mem_maximalIdeal (x : 𝒪[𝔼]) :
   have hk := congrArg (fun f : L →ₐ[K] Ω ↦ f ⟨(x : 𝔼), hxL⟩) key
   simp only [AlgHom.comp_apply, IntermediateField.coe_val, AlgEquiv.coe_toAlgHom] at hk
   convert hz using 2
-  change ((maximalUnramifiedExtensionFrobenius K Ω (IntermediateField.inclusion hle ⟨(x : 𝔼), hxL⟩) :
-      𝔼) : Ω) - _ = ((frobenius K L h ⟨(x : 𝔼), hxL⟩ : L) : Ω) - _
+  change ((maximalUnramifiedExtensionFrobenius K Ω (IntermediateField.inclusion hle ⟨(x : 𝔼), hxL⟩)
+          : 𝔼)
+        : Ω)
+      - _
+    = ((frobenius K L h ⟨(x : 𝔼), hxL⟩ : L) : Ω) - _
   rw [hk]
   rfl
 
@@ -323,16 +353,18 @@ open Polynomial
 
 variable {k k' : Type*} [Field k] [Finite k] [Field k'] [Algebra k k']
 
-theorem isAlgebraic_of_pow_card_pow_eq_self {y : k'} {n : ℕ} (hn : n ≠ 0)
-    (hy : y ^ (Nat.card k ^ n) = y) : IsAlgebraic k y :=
-  ⟨X ^ (Nat.card k ^ n) - X, X_pow_sub_X_ne_zero (Nat.one_lt_pow hn Finite.one_lt_card),
-    by simp [hy]⟩
-
+theorem isAlgebraic_of_pow_card_pow_eq_self
+    {y : k'} {n : ℕ} (hn : n ≠ 0) (hy : y ^ (Nat.card k ^ n) = y)
+    : IsAlgebraic k y := ⟨
+  X ^ (Nat.card k ^ n) - X,
+  X_pow_sub_X_ne_zero (Nat.one_lt_pow hn Finite.one_lt_card),
+  by simp [hy]
+⟩
 
 omit [Algebra k k'] in
-theorem splits_X_pow_card_pow_sub_X_of_isPrimitiveRoot {m : ℕ} {ζ : k'}
-    (hζ : IsPrimitiveRoot ζ (Nat.card k ^ m - 1)) :
-    Splits (X ^ (Nat.card k ^ m) - X : k'[X]) := by
+theorem splits_X_pow_card_pow_sub_X_of_isPrimitiveRoot
+    {m : ℕ} {ζ : k'} (hζ : IsPrimitiveRoot ζ (Nat.card k ^ m - 1))
+    : Splits (X ^ (Nat.card k ^ m) - X : k'[X]) := by
   have h1 : 1 ≤ Nat.card k ^ m := Nat.one_le_pow _ _ Nat.card_pos
   have : (X ^ (Nat.card k ^ m) - X : k'[X]) = X * (X ^ (Nat.card k ^ m - 1) - C 1) := by
     conv_lhs => rw [← Nat.sub_add_cancel h1, pow_succ]
@@ -341,8 +373,10 @@ theorem splits_X_pow_card_pow_sub_X_of_isPrimitiveRoot {m : ℕ} {ζ : k'}
   rw [this]
   exact Splits.X.mul (X_pow_sub_one_splits hζ)
 
-theorem isAlgClosed_of_isPrimitiveRoot [Algebra.IsAlgebraic k k']
-    (h : ∀ m : ℕ, m ≠ 0 → ∃ ζ : k', IsPrimitiveRoot ζ (Nat.card k ^ m - 1)) : IsAlgClosed k' := by
+theorem isAlgClosed_of_isPrimitiveRoot
+    [Algebra.IsAlgebraic k k']
+    (h : ∀ m : ℕ, m ≠ 0 → ∃ ζ : k', IsPrimitiveRoot ζ (Nat.card k ^ m - 1))
+    : IsAlgClosed k' := by
   refine IsAlgClosed.of_exists_root _ fun p _ hirr ↦ ?_
   have := Fact.mk hirr
   let A := AdjoinRoot p
@@ -368,8 +402,9 @@ theorem isAlgClosed_of_isPrimitiveRoot [Algebra.IsAlgebraic k k']
   have hroot : ((X ^ (Nat.card k ^ m) - X : k'[X]).map (algebraMap k' A)).IsRoot α := by
     simp only [Polynomial.map_sub, Polynomial.map_pow, map_X, IsRoot.def, eval_sub, eval_pow,
       eval_X, hα, sub_self]
-  obtain ⟨β, hβ⟩ := (splits_X_pow_card_pow_sub_X_of_isPrimitiveRoot hζ).mem_range_of_isRoot
-    (X_pow_sub_X_ne_zero (Nat.one_lt_pow hm Finite.one_lt_card)) hroot
+  obtain ⟨β, hβ⟩ :=
+    (splits_X_pow_card_pow_sub_X_of_isPrimitiveRoot hζ).mem_range_of_isRoot
+      (X_pow_sub_X_ne_zero (Nat.one_lt_pow hm Finite.one_lt_card)) hroot
   refine ⟨β, ?_⟩
   have h0 : aeval α p = 0 := by rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_self]
   rw [← hβ, aeval_algebraMap_apply_eq_algebraMap_eval] at h0
@@ -379,14 +414,14 @@ end FiniteFieldClosure
 
 section Residue
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω] [HasUnramifiedRoots K Ω]
 
 local notation "𝔼" => maximalUnramifiedExtension K Ω
 
-theorem exists_pow_card_pow_eq_self (y : 𝓀[𝔼]) :
-    ∃ n : ℕ, n ≠ 0 ∧ y ^ (Nat.card 𝓀[K] ^ n) = y := by
+theorem exists_pow_card_pow_eq_self (y : 𝓀[𝔼]) : ∃ n : ℕ, n ≠ 0 ∧ y ^ (Nat.card 𝓀[K] ^ n) = y := by
   obtain ⟨x, rfl⟩ := residue_surjective y
   obtain ⟨n, hn, hx⟩ := exists_pow_card_pow_sub_mem_maximalIdeal x
   refine ⟨n, hn, ?_⟩

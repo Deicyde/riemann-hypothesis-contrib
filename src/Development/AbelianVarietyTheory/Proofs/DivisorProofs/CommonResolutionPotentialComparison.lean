@@ -13,8 +13,9 @@ open scoped Classical
 
 namespace GlobalTheory.Shin
 
-theorem torusPair_pow_eq_one_iff {F : Type} [Field F] [Finite F] (n : ℕ) (α : AlgebraicClosure F) (h0 : α ≠ 0) :
-    α ^ (Nat.card F ^ n - 1) = 1 ↔ (minpoly F α).natDegree ∣ n := by
+theorem torusPair_pow_eq_one_iff
+    {F : Type} [Field F] [Finite F] (n : ℕ) (α : AlgebraicClosure F) (h0 : α ≠ 0)
+    : α ^ (Nat.card F ^ n - 1) = 1 ↔ (minpoly F α).natDegree ∣ n := by
   have hi : IsIntegral F α := Algebra.IsIntegral.isIntegral α
   rw [(minpoly.irreducible hi).natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X, minpoly.dvd_iff]
   have hq : 0 < Nat.card F ^ n := pow_pos Nat.card_pos _
@@ -25,23 +26,29 @@ theorem torusPair_pow_eq_one_iff {F : Type} [Field F] [Finite F] (n : ℕ) (α :
   · intro h; rw [h, one_mul]
   · intro h; exact mul_right_cancel₀ h0 (h.trans (one_mul α).symm)
 
-theorem torusPair_finite_monic {F : Type} [Field F] [Finite F] (n : ℕ) :
-    {P : F[X] | P.Monic ∧ P.natDegree = n ∧ P.coeff 0 ≠ 0}.Finite := by
-  have : Finite (Polynomial.degreeLT F (n + 1)) := Finite.of_equiv _ (degreeLTEquiv F (n + 1)).symm.toEquiv
+theorem torusPair_finite_monic {F : Type} [Field F] [Finite F] (n : ℕ)
+    : {P : F[X] | P.Monic ∧ P.natDegree = n ∧ P.coeff 0 ≠ 0}.Finite := by
+  have : Finite (Polynomial.degreeLT F (n + 1)) :=
+    Finite.of_equiv _ (degreeLTEquiv F (n + 1)).symm.toEquiv
   have h : (Polynomial.degreeLT F (n + 1) : Set F[X]).Finite := Set.toFinite _
   refine h.subset fun P hP => ?_
   simp only [SetLike.mem_coe, mem_degreeLT]
   exact (degree_le_of_natDegree_le hP.2.1.le).trans_lt (by exact_mod_cast Nat.lt_succ_self n)
 
-theorem torusPair_finite_torus {F : Type} [Field F] [Finite F] (n : ℕ) (hn : 0 < n) :
-    {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}.Finite := by
+theorem torusPair_finite_torus {F : Type} [Field F] [Finite F] (n : ℕ) (hn : 0 < n)
+    : {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1}.Finite := by
   have hq : 1 < Nat.card F ^ n := Nat.one_lt_pow hn.ne' Finite.one_lt_card
-  refine (Polynomial.nthRootsFinset (Nat.card F ^ n - 1) (1 : AlgebraicClosure F)).finite_toSet.subset
-    fun α hα => ?_
+  refine
+    (Polynomial.nthRootsFinset (Nat.card F ^ n - 1) (1 : AlgebraicClosure F)).finite_toSet.subset
+      fun α hα => ?_
   exact Finset.mem_coe.2 ((Polynomial.mem_nthRootsFinset (by omega) _).2 hα)
 
-theorem torusPair_mangoldt_pow {F : Type} [Field F] (s : F[X] → ℂ) (f : F[X]) (hf : f.Monic)
-    (hirr : Irreducible f) (r : ℕ) (hr : 0 < r) : mangoldt s (f ^ r) = s f := by
+theorem torusPair_mangoldt_pow
+    {F : Type} [Field F]
+    (s : F[X] → ℂ)
+    (f : F[X]) (hf : f.Monic) (hirr : Irreducible f)
+    (r : ℕ) (hr : 0 < r)
+    : mangoldt s (f ^ r) = s f := by
   have hset : {g : F[X] | g.Monic ∧ Irreducible g ∧ ∃ r' : ℕ, 0 < r' ∧ f ^ r = g ^ r'} = {f} := by
     ext g
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
@@ -54,11 +61,14 @@ theorem torusPair_mangoldt_pow {F : Type} [Field F] (s : F[X] → ℂ) (f : F[X]
       exact ⟨hf, hirr, r, hr, rfl⟩
   rw [mangoldt, hset, finsum_mem_singleton]
 
-theorem torusPair_mangoldt_sum (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ) (n k : ℕ)
-    (S : F[X] → ℂ) (hn : 0 < n) :
-    ∑ᶠ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = n ∧ P.coeff 0 ≠ 0}, mangoldt (rootSum θ k) P * star (S P) =
-      ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1},
-        θ α ^ k * star (S (minpoly F α ^ (n / (minpoly F α).natDegree))) := by
+theorem torusPair_mangoldt_sum
+    (F : Type) [Field F] [Finite F]
+    (θ : AlgebraicClosure F →* ℂ)
+    (n k : ℕ)
+    (S : F[X] → ℂ) (hn : 0 < n)
+    : ∑ᶠ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = n ∧ P.coeff 0 ≠ 0}, mangoldt (rootSum θ k) P * star (S P)
+      = ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ n - 1) = 1},
+          θ α ^ k * star (S (minpoly F α ^ (n / (minpoly F α).natDegree))) := by
   have hq : 1 < Nat.card F ^ n := Nat.one_lt_pow hn.ne' Finite.one_lt_card
   have hi : ∀ α : AlgebraicClosure F, IsIntegral F α := fun α => Algebra.IsIntegral.isIntegral α
   have hne : ∀ α : AlgebraicClosure F, α ^ (Nat.card F ^ n - 1) = 1 → α ≠ 0 := by
@@ -94,16 +104,24 @@ theorem torusPair_mangoldt_sum (F : Type) [Field F] [Finite F] (θ : AlgebraicCl
     obtain ⟨hα1, hα2⟩ := Finset.mem_filter.1 hα
     simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hα1
     have hdv := (torusPair_pow_eq_one_iff n α (hne α hα1)).1 hα1
-    exact hex ⟨minpoly F α, n / (minpoly F α).natDegree, minpoly.monic (hi α), minpoly.irreducible (hi α),
-      Nat.div_pos (Nat.le_of_dvd hn hdv) (minpoly.natDegree_pos (hi α)), hα2.symm⟩
+    exact hex ⟨
+      minpoly F α,
+      n / (minpoly F α).natDegree,
+      minpoly.monic (hi α),
+      minpoly.irreducible (hi α),
+      Nat.div_pos (Nat.le_of_dvd hn hdv) (minpoly.natDegree_pos (hi α)),
+      hα2.symm
+    ⟩
   obtain ⟨f, m, hf, hirr, hm, rfl⟩ := hex
   rw [hf.natDegree_pow] at hd
-  have hdiv : n / f.natDegree = m := by
-    rw [← hd, Nat.mul_div_cancel _ hirr.natDegree_pos]
+  have hdiv : n / f.natDegree = m := by rw [← hd, Nat.mul_div_cancel _ hirr.natDegree_pos]
   have hmp : ∀ α : AlgebraicClosure F, aeval α f = 0 → minpoly F α = f := fun α h =>
     (minpoly.eq_of_irreducible_of_monic hirr h hf).symm
-  have hfib : Finset.filter (fun α : AlgebraicClosure F => minpoly F α ^ (n / (minpoly F α).natDegree) = f ^ m)
-      (torusPair_finite_torus (F := F) n hn).toFinset = (f.map (algebraMap F (AlgebraicClosure F))).roots.toFinset := by
+  have hfib
+      : Finset.filter
+          (fun α : AlgebraicClosure F => minpoly F α ^ (n / (minpoly F α).natDegree) = f ^ m)
+          (torusPair_finite_torus (F := F) n hn).toFinset
+        = (f.map (algebraMap F (AlgebraicClosure F))).roots.toFinset := by
     ext α
     simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_setOf_eq, Multiset.mem_toFinset]
     rw [mem_roots (hf.map _).ne_zero, IsRoot.def, eval_map_algebraMap]
@@ -126,22 +144,24 @@ theorem torusPair_mangoldt_sum (F : Type) [Field F] [Finite F] (θ : AlgebraicCl
       exact ⟨Dvd.intro_left _ hd, rfl⟩
   have hsep : f.Separable := PerfectField.separable_of_irreducible hirr
   have hnd : (f.map (algebraMap F (AlgebraicClosure F))).roots.Nodup := nodup_roots hsep.map
-  rw [hfib, torusPair_mangoldt_pow _ f hf hirr m hm, rootSum,
-    ← Multiset.dedup_eq_self.2 hnd, ← Multiset.toFinset_val, ← Finset.sum_eq_multiset_sum,
-    Finset.val_toFinset, Finset.sum_mul]
+  rw [hfib, torusPair_mangoldt_pow _ f hf hirr m hm, rootSum, ← Multiset.dedup_eq_self.2 hnd,
+    ← Multiset.toFinset_val, ← Finset.sum_eq_multiset_sum, Finset.val_toFinset, Finset.sum_mul]
   refine Finset.sum_congr rfl fun α hα => ?_
   rw [Multiset.mem_toFinset, mem_roots (hf.map _).ne_zero, IsRoot.def, eval_map_algebraMap] at hα
   rw [hmp α hα, hdiv]
 
-theorem torusPair_finsum_GL_eq_ipGL (F : Type) [Field F] [Finite F] (m : ℕ) (s S : F[X] → ℂ) :
-    ∑ᶠ x : GL (Fin m) F, psiG s m x * star (chG S m x) =
-      ipGL (psi s (Fin m → F)) (fun g => S (LinearMap.charpoly g)) := by
-  have h : ∀ x : GL (Fin m) F, psiG s m x * star (chG S m x) =
-      (fun g => psi s (Fin m → F) g * star (S (LinearMap.charpoly g)))
-        (Matrix.toLin' (x : Matrix (Fin m) (Fin m) F)) := by
+theorem torusPair_finsum_GL_eq_ipGL (F : Type) [Field F] [Finite F] (m : ℕ) (s S : F[X] → ℂ)
+    : ∑ᶠ x : GL (Fin m) F, psiG s m x * star (chG S m x)
+      = ipGL (psi s (Fin m → F)) (fun g => S (LinearMap.charpoly g)) := by
+  have h
+      : ∀ x : GL (Fin m) F,
+        psiG s m x * star (chG S m x)
+          = (fun g => psi s (Fin m → F) g * star (S (LinearMap.charpoly g))) (Matrix.toLin'
+            (x : Matrix (Fin m) (Fin m) F)) := by
     intro x; simp [psiG, chG, Matrix.charpoly_toLin']
   rw [finsum_congr h, ipGL, ← finsum_mem_univ]
-  apply finsum_mem_eq_of_bijOn (fun x : GL (Fin m) F => Matrix.toLin' (x : Matrix (Fin m) (Fin m) F))
+  apply finsum_mem_eq_of_bijOn (fun x : GL (Fin m) F =>
+    Matrix.toLin' (x : Matrix (Fin m) (Fin m) F))
   · refine ⟨fun x _ => ?_, fun x _ y _ hxy => ?_, fun g hg => ?_⟩
     · have := x.isUnit.map (Matrix.toLinAlgEquiv' (R := F) (n := Fin m))
       simpa using this
@@ -152,10 +172,13 @@ theorem torusPair_finsum_GL_eq_ipGL (F : Type) [Field F] [Finite F] (m : ℕ) (s
       exact ⟨hu.unit, Set.mem_univ _, by simp⟩
   · intro x _; rfl
 
-theorem psiG_rootSum_pair_chG_eq_sum_torus : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ)
-    (m k : ℕ) (S : F[X] → ℂ), 0 < m → ((Nat.card F : ℂ) ^ m - 1) * ∑ᶠ x, psiG (rootSum θ k) m x * star (chG S m x) =
-      (Nat.card (GL (Fin m) F) : ℂ) * ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ m - 1) = 1},
-        θ α ^ k * star (S (minpoly F α ^ (m / (minpoly F α).natDegree))) := by
+theorem psiG_rootSum_pair_chG_eq_sum_torus
+    : ∀ (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ) (m k : ℕ) (S : F[X] → ℂ),
+      0 < m
+        → ((Nat.card F : ℂ) ^ m - 1) * ∑ᶠ x, psiG (rootSum θ k) m x * star (chG S m x)
+          = (Nat.card (GL (Fin m) F) : ℂ)
+            * ∑ᶠ α ∈ {α : AlgebraicClosure F | α ^ (Nat.card F ^ m - 1) = 1},
+              θ α ^ k * star (S (minpoly F α ^ (m / (minpoly F α).natDegree))) := by
   intro F _ _ θ m k S hm
   have hadd := (rootSum_isAdditive_and_pow_X_sub_one F θ k).1
   have hq1 : 1 < Nat.card F ^ m := Nat.one_lt_pow hm.ne' Finite.one_lt_card
@@ -164,16 +187,19 @@ theorem psiG_rootSum_pair_chG_eq_sum_torus : ∀ (F : Type) [Field F] [Finite F]
     exact_mod_cast hq1.ne'
   rw [torusPair_finsum_GL_eq_ipGL, ipGL_charpoly_eq_finsum_mass, Module.finrank_fin_fun,
     ← torusPair_mangoldt_sum F θ m k S hm]
-  have hterm : ∀ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = m ∧ P.coeff 0 ≠ 0},
-      mass (psi (rootSum θ k) (Fin m → F)) P * star (S P) =
-        (Nat.card (GL (Fin m) F) : ℂ) * (mangoldt (rootSum θ k) P * star (S P)) / ((Nat.card F : ℂ) ^ m - 1) := by
+  have hterm
+      : ∀ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = m ∧ P.coeff 0 ≠ 0},
+        mass (psi (rootSum θ k) (Fin m → F)) P * star (S P)
+          = (Nat.card (GL (Fin m) F) : ℂ) * (mangoldt (rootSum θ k) P * star (S P))
+            / ((Nat.card F : ℂ) ^ m - 1) := by
     intro P hP
     obtain ⟨hPm, hPd, -⟩ := hP
-    rw [mass_psi_eq_glCard_mul_mangoldt_div F (Fin m → F) (rootSum θ k) hadd P hPm (by simpa using hPd), hPd,
-      glCard]
+    rw [mass_psi_eq_glCard_mul_mangoldt_div F (Fin m → F) (rootSum θ k) hadd P hPm
+        (by simpa using hPd),
+      hPd, glCard]
     ring
   rw [finsum_mem_congr rfl hterm, finsum_mem_eq_finite_toFinset_sum _ (torusPair_finite_monic m),
-    finsum_mem_eq_finite_toFinset_sum _ (torusPair_finite_monic m), ← Finset.sum_div, ← Finset.mul_sum,
-    mul_div_cancel₀ _ hq]
+    finsum_mem_eq_finite_toFinset_sum _ (torusPair_finite_monic m), ← Finset.sum_div,
+    ← Finset.mul_sum, mul_div_cancel₀ _ hq]
 
 end GlobalTheory.Shin

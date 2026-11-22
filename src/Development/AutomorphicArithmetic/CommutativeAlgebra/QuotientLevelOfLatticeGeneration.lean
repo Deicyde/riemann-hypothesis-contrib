@@ -9,35 +9,50 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev
 open UpperTheory.Gal.Int.Geo
 
 namespace UpperTheory.LevelActionGenerator
 
 variable {X : Scheme.{0}}
 
-private theorem pb_mul {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.left ⟶ B.left}
-    (h : IsGrpPullback A B (𝟙 X) φ) (f : A ⟶ B) (hf : f.left = φ) {T : Over X} (x y : T ⟶ A) :
-    (x * y) ≫ f = (x ≫ f) * (y ≫ f) := by
+private theorem pb_mul
+    {A B : Over X} [GrpObj A] [GrpObj B]
+    {φ : A.left ⟶ B.left} (h : IsGrpPullback A B (𝟙 X) φ)
+    (f : A ⟶ B) (hf : f.left = φ)
+    {T : Over X} (x y : T ⟶ A)
+    : (x * y) ≫ f = (x ≫ f) * (y ≫ f) := by
   let e : Over.mk (T.hom ≫ 𝟙 X) ≅ T := Over.isoMk (Iso.refl _) (by simp)
   have he : e.hom.left = 𝟙 _ := rfl
-  have key := h.2 T x y (e.hom ≫ x ≫ f) (e.hom ≫ y ≫ f)
-    (by rw [Over.comp_left, Over.comp_left, he, Category.id_comp, hf])
-    (by rw [Over.comp_left, Over.comp_left, he, Category.id_comp, hf])
+  have key :=
+    h.2 T x y (e.hom ≫ x ≫ f) (e.hom ≫ y ≫ f)
+      (by rw [Over.comp_left, Over.comp_left, he, Category.id_comp, hf])
+      (by rw [Over.comp_left, Over.comp_left, he, Category.id_comp, hf])
   rw [← MonObj.comp_mul, Over.comp_left, he, Category.id_comp] at key
   apply Over.OverMorphism.ext
   rw [key, Over.comp_left, hf]
 
-private theorem pb_one {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.left ⟶ B.left}
-    (h : IsGrpPullback A B (𝟙 X) φ) (f : A ⟶ B) (hf : f.left = φ) {T : Over X} :
-    (1 : T ⟶ A) ≫ f = 1 := by
+private theorem pb_one
+    {A B : Over X} [GrpObj A] [GrpObj B]
+    {φ : A.left ⟶ B.left} (h : IsGrpPullback A B (𝟙 X) φ)
+    (f : A ⟶ B) (hf : f.left = φ)
+    {T : Over X}
+    : (1 : T ⟶ A) ≫ f = 1 := by
   have h1 := pb_mul h f hf (1 : T ⟶ A) 1
   rw [_root_.mul_one] at h1
   simpa using h1
 
-private theorem act_nat {O : Type} [Ring O] {A : Over X} [GrpObj A] [IsCommMonObj A] (act : OActN O A) {T : Over X}
-    (u : T ⟶ A) (m : ℕ) : u ≫ act.act (m : O) = u ^ m := by
+private theorem act_nat
+    {O : Type} [Ring O]
+    {A : Over X} [GrpObj A] [IsCommMonObj A]
+    (act : OActN O A)
+    {T : Over X} (u : T ⟶ A)
+    (m : ℕ)
+    : u ≫ act.act (m : O) = u ^ m := by
   induction m with
   | zero =>
     have h0 : act.act (0 : O) = 1 := by
@@ -48,7 +63,8 @@ private theorem act_nat {O : Type} [Ring O] {A : Over X} [GrpObj A] [IsCommMonOb
   | succ m ih =>
     rw [Nat.cast_succ, act.add, act.one, MonObj.comp_mul, ih, Category.comp_id, pow_succ]
 
-private theorem gen_mem {A : Type} [CommRing A] {a : A} {N : ℕ} {𝔞 : Ideal A} (h : IsGen a N 𝔞) : (N : A) ∈ 𝔞 := by
+private theorem gen_mem {A : Type} [CommRing A] {a : A} {N : ℕ} {𝔞 : Ideal A} (h : IsGen a N 𝔞)
+    : (N : A) ∈ 𝔞 := by
   have h' : (Ideal.span {a} ⊔ Ideal.span {(N : A)}) * 𝔞 = Ideal.span {(N : A)} := h
   have hm : (N : A) ∈ (Ideal.span {a} ⊔ Ideal.span {(N : A)}) * 𝔞 := by
     rw [h']
@@ -58,8 +74,7 @@ private theorem gen_mem {A : Type} [CommRing A] {a : A} {N : ℕ} {𝔞 : Ideal 
 end UpperTheory.LevelActionGenerator
 
 open UpperTheory.LevelActionGenerator in
-theorem UpperTheory.quotient_level_of_lattice_generation :
-    LatGen → QLev := by
+theorem UpperTheory.quotient_level_of_lattice_generation : LatGen → QLev := by
   intro hLat q _ D R R' _ _ _ b gb N N₀ c a 𝔞 hN hgen X s s₀ o o₀ n
   have hw : n.φ ≫ o₀.A.hom = o.A.hom := by simpa using n.cart.1.w
   haveI : IsIso n.φ := n.cart.1.isIso_fst_of_isIso
@@ -76,8 +91,8 @@ theorem UpperTheory.quotient_level_of_lattice_generation :
     intro T u v huv
     have := congrArg (· ≫ g) huv
     simpa [Category.assoc, hfg] using this
-  have hmul : ∀ {T : Over X} (u v : T ⟶ o.A), (u * v) ≫ f = (u ≫ f) * (v ≫ f) :=
-    fun u v => pb_mul n.cart f hfl u v
+  have hmul : ∀ {T : Over X} (u v : T ⟶ o.A), (u * v) ≫ f = (u ≫ f) * (v ≫ f) := fun u v =>
+    pb_mul n.cart f hfl u v
   have hone : ∀ {T : Over X}, (1 : T ⟶ o.A) ≫ f = 1 := pb_one n.cart f hfl
   have hone' : ∀ {T : Over X}, (1 : T ⟶ o₀.A) ≫ g = 1 := by
     intro T
@@ -89,8 +104,8 @@ theorem UpperTheory.quotient_level_of_lattice_generation :
     simp only [Over.comp_left]
     exact n.act c'
   have e_add : ∀ u v : D.La, o.eta (u + v) = o.eta u * o.eta v := fun u v => o.eta_add u v
-  have e_lin : ∀ (c' : D.O) (u : D.La), o.eta (c' • u) = o.eta u ≫ o.act.act c' :=
-    fun c' u => o.eta_lin c' u
+  have e_lin : ∀ (c' : D.O) (u : D.La), o.eta (c' • u) = o.eta u ≫ o.act.act c' := fun c' u =>
+    o.eta_lin c' u
   have e_ker : ∀ u : D.La, o.eta (N • u) = 1 := fun u => o.eta_ker u
   obtain ⟨hL1, hL2⟩ := hLat q D a N 𝔞 hN hgen
   refine ⟨fun y => o.eta (algebraMap (𝓞 D.F) D.O a • y) ≫ f, ⟨?_, ?_, ?_, ?_⟩, ?_⟩
@@ -112,11 +127,11 @@ theorem UpperTheory.quotient_level_of_lattice_generation :
     obtain ⟨I, hI⟩ := o.geom k x _ hβ
     have hI' : ∀ y : D.La, toUnit (Over.mk x) ≫ o.eta y = I.ev N y := fun y => hI y
     have I_add : ∀ u v : D.La, I.ev N (u + v) = I.ev N u * I.ev N v := fun u v => I.add N u v
-    have I_lin : ∀ (c' : D.O) (u : D.La), I.ev N (c' • u) = I.ev N u ≫ o.act.act c' :=
-      fun c' u => I.lin N c' u
+    have I_lin : ∀ (c' : D.O) (u : D.La), I.ev N (c' • u) = I.ev N u ≫ o.act.act c' := fun c' u =>
+      I.lin N c' u
     have I_ker : ∀ u : D.La, I.ev N u = 1 ↔ ∃ v : D.La, u = N • v := fun u => I.ker N hN u
-    have I_onto : ∀ r : Over.mk x ⟶ o.A, r ^ N = 1 ↔ ∃ u : D.La, I.ev N u = r :=
-      fun r => I.onto N hN r
+    have I_onto : ∀ r : Over.mk x ⟶ o.A, r ^ N = 1 ↔ ∃ u : D.La, I.ev N u = r := fun r =>
+      I.onto N hN r
     constructor
     · intro y hy
       simp only at hy

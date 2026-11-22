@@ -43,10 +43,11 @@ def expandable (K : Type) [DecidableEq K] : AddSubgroup (K → ℤ) where
     simp only [diffStep] at h1 h2 ⊢
     rw [expand_apply] at h1 h2
     rw [expand_apply, List.map_append, List.sum_append, List.map_map, ← h1]
-    have h3 : (lc.map ((fun t : (K × (K → ℤ)) × ℤ =>
-          t.2 * diffStep (Pi.single t.1.1 1) f (m - t.1.2)) ∘
-          fun t => ((t.1.1, t.1.2 + a), t.2))).sum =
-        (lc.map fun t => t.2 * diffStep (Pi.single t.1.1 1) f (m - a - t.1.2)).sum := by
+    have h3
+        : (lc.map
+            ((fun t : (K × (K → ℤ)) × ℤ => t.2 * diffStep (Pi.single t.1.1 1) f (m - t.1.2))
+              ∘ fun t => ((t.1.1, t.1.2 + a), t.2))).sum
+          = (lc.map fun t => t.2 * diffStep (Pi.single t.1.1 1) f (m - a - t.1.2)).sum := by
       congr 1
       apply List.map_congr_left
       intro t _
@@ -65,10 +66,11 @@ def expandable (K : Type) [DecidableEq K] : AddSubgroup (K → ℤ) where
     simp only [diffStep] at h2 ⊢
     rw [expand_apply] at h2
     rw [expand_apply, List.map_map]
-    have h3 : (lc.map ((fun t : (K × (K → ℤ)) × ℤ =>
-          t.2 * diffStep (Pi.single t.1.1 1) f (m - t.1.2)) ∘
-          fun t => ((t.1.1, t.1.2 - c), -t.2))).sum =
-        -(lc.map fun t => t.2 * diffStep (Pi.single t.1.1 1) f (m + c - t.1.2)).sum := by
+    have h3
+        : (lc.map
+            ((fun t : (K × (K → ℤ)) × ℤ => t.2 * diffStep (Pi.single t.1.1 1) f (m - t.1.2))
+              ∘ fun t => ((t.1.1, t.1.2 - c), -t.2))).sum
+          = -(lc.map fun t => t.2 * diffStep (Pi.single t.1.1 1) f (m + c - t.1.2)).sum := by
       clear hc h2
       induction lc with
       | nil => simp

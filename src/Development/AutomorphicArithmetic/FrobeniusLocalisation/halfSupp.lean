@@ -11,8 +11,15 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-theorem UpperTheory.HF.half_supp :
-    ∀ {φ : Frame} (H : HostAx φ) (𝔟 : Ideal (𝓞 H.E)), differentIdeal (𝓞 H.K) (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) → 𝔟 ⊔ H.conj • 𝔟 = ⊤ → (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime], ((P ∣ 𝔟 ∨ H.conj • P ∣ 𝔟) ↔ ∃ l ∈ H.ramI, P.LiesOver (span {(l : ℤ)})) ∧ ¬ (P ∣ 𝔟 ∧ H.conj • P ∣ 𝔟) ∧ (P ∣ 𝔟 → multiplicity P 𝔟 = multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E)))) ∧ ∃ s : 𝓞 H.E, (s : H.E) = H.sqd ∧ differentIdeal ℤ (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) * span {s} := by
+theorem UpperTheory.HF.half_supp
+    : ∀ {φ : Frame} (H : HostAx φ) (𝔟 : Ideal (𝓞 H.E)),
+      differentIdeal (𝓞 H.K) (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) → 𝔟 ⊔ H.conj • 𝔟 = ⊤
+        → (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime],
+            ((P ∣ 𝔟 ∨ H.conj • P ∣ 𝔟) ↔ ∃ l ∈ H.ramI, P.LiesOver (span {(l : ℤ)}))
+              ∧ ¬(P ∣ 𝔟 ∧ H.conj • P ∣ 𝔟)
+              ∧ (P ∣ 𝔟 → multiplicity P 𝔟 = multiplicity P (differentIdeal (𝓞 H.K) (𝓞 H.E))))
+          ∧ ∃ s : 𝓞 H.E,
+            (s : H.E) = H.sqd ∧ differentIdeal ℤ (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) * span {s} := by
   intro φ H B hD hcop
   have mono : ∀ {I J : Ideal (𝓞 H.E)}, I ≤ J → H.conj • I ≤ H.conj • J := by
     intro I J h
@@ -30,7 +37,7 @@ theorem UpperTheory.HF.half_supp :
       simpa only [inv] using mono h
   refine ⟨fun P hP => ?_, ?_⟩
   · have hsupp := (UpperTheory.HF.diff_EK_supp H).2.1 P
-    have notboth : ¬ (B ≤ P ∧ B ≤ H.conj • P) := by
+    have notboth : ¬(B ≤ P ∧ B ≤ H.conj • P) := by
       rintro ⟨h1, h2⟩
       apply hP.ne_top
       rw [eq_top_iff, ← hcop]

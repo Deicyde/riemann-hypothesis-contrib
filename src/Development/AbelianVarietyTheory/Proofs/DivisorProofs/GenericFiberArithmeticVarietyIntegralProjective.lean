@@ -35,14 +35,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChernPartOve
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 
 namespace GlobalTheory.Mix
 
-theorem genericFibre_facts : ∀ (k K : Type) [CommRing k] [Field K] [Algebra k K] [IsFractionRing k K] (X G : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (q : G ⟶ Sp K) (j : G ⟶ X) (hp : IsPullback j q p (spMap (algebraMap k K))) (D : ℕ), IsArithVar p D → ∃ (_ : IsIntegral G) (_ : IsLocallyNoetherian G), IsProjOver q ∧ topologicalKrullDim G = D ∧ j (genericPoint G) = genericPoint X ∧ Function.Injective j ∧ (∀ x, IsIso (j.stalkMap x)) ∧ (∀ x, Order.coheight (j x) = Order.coheight x) ∧ ∀ z : X, z ∉ Set.range j → ∀ σ : k →+* ℂ, IsEmpty (CxPts (closι z ≫ p) σ) := by
+theorem genericFibre_facts
+    : ∀ (k K : Type) [CommRing k] [Field K] [Algebra k K] [IsFractionRing k K] (X G : Scheme.{0})
+        [IsIntegral X] (p : X ⟶ Sp k) (q : G ⟶ Sp K) (j : G ⟶ X)
+        (hp : IsPullback j q p (spMap (algebraMap k K))) (D : ℕ),
+      IsArithVar p D
+        → ∃ (_ : IsIntegral G) (_ : IsLocallyNoetherian G),
+          IsProjOver q ∧ topologicalKrullDim G = D ∧ j (genericPoint G) = genericPoint X
+            ∧ Function.Injective j ∧ (∀ x, IsIso (j.stalkMap x))
+            ∧ (∀ x, Order.coheight (j x) = Order.coheight x)
+            ∧ ∀ z : X, z ∉ Set.range j → ∀ σ : k →+* ℂ, IsEmpty (CxPts (closι z ≫ p) σ) := by
   intro k K _ _ _ _ X G _ p q j hp D h
   obtain ⟨hG, hd, hη⟩ := GenSmoothCover.genericFibre h hp
   have hq : IsProjOver q := ProjSpace.isProjOver_of_isPullback_spMap _ hp h.isProjOver
@@ -53,18 +64,28 @@ theorem genericFibre_facts : ∀ (k K : Type) [CommRing k] [Field K] [Algebra k 
   have := flat_specMap_localization (nonZeroDivisors k) K
   have : Flat j := MorphismProperty.of_isPullback hp.flip this
   have hs (x : G) : IsIso (j.stalkMap x) := GenSpread.isIso_stalkMap_of_flat j x
-  refine ⟨hG, LocallyOfFiniteType.isLocallyNoetherian q, hq, hd, hη, j.isEmbedding.injective, hs,
-    fun x => ?_, fun z hz σ => ⟨fun y => hz ?_⟩⟩
+  refine ⟨
+    hG,
+    LocallyOfFiniteType.isLocallyNoetherian q,
+    hq,
+    hd,
+    hη,
+    j.isEmbedding.injective,
+    hs,
+    fun x => ?_,
+    fun z hz σ => ⟨fun y => hz ?_⟩
+  ⟩
   · have := hs x
     have e := ringKrullDim_eq_of_ringEquiv (asIso (j.stalkMap x)).commRingCatIsoToRingEquiv
     rw [ringKrullDim_stalk_eq_coheight, ringKrullDim_stalk_eq_coheight] at e
     exact_mod_cast e
   · have hr : Set.range j = p ⁻¹' Set.range (spMap (algebraMap k K)) := by
-      rw [← Scheme.Pullback.range_fst, ← hp.isoPullback_hom_fst, Scheme.Hom.comp_base, TopCat.coe_comp,
-        Function.Surjective.range_comp hp.isoPullback.hom.surjective]
+      rw [← Scheme.Pullback.range_fst, ← hp.isoPullback_hom_fst, Scheme.Hom.comp_base,
+        TopCat.coe_comp, Function.Surjective.range_comp hp.isoPullback.hom.surjective]
     let c : Sp ℂ := IsLocalRing.closedPoint ℂ
     have hw : closι z (y.1 c) ∈ closure {z} := by
-      have : closι z (y.1 c) ∈ Set.range (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z})).subschemeι :=
+      have : closι z (y.1 c)
+          ∈ Set.range (Scheme.IdealSheafData.vanishingIdeal (Closeds.closure {z})).subschemeι :=
         ⟨_, rfl⟩
       rw [Scheme.IdealSheafData.range_subschemeι] at this
       simpa using this

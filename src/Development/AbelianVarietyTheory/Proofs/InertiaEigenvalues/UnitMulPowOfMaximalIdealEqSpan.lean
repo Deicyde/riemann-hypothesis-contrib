@@ -10,20 +10,27 @@ open IsLocalRing GlobalTheory.Pat
 
 namespace GlobalTheory.Pat
 
-theorem unit_mul_pow_of_maximalIdeal_eq_span {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
-    {π : S} (hm : maximalIdeal S = Ideal.span {π}) {x : S} (hx : x ≠ 0) :
-    ∃ (k : ℕ) (u : S), IsUnit u ∧ x = π ^ k * u := by
+theorem unit_mul_pow_of_maximalIdeal_eq_span
+    {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
+    {π : S} (hm : maximalIdeal S = Ideal.span {π})
+    {x : S} (hx : x ≠ 0)
+    : ∃ (k : ℕ) (u : S), IsUnit u ∧ x = π ^ k * u := by
   first
   | exact @_root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit
   | exact _root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit
   | (apply _root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit <;> assumption)
   | (intros; apply _root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PowMulUnit.exists_eq_pow_mul_unit ..)
 
-theorem dvr_of_maximalIdeal_eq_span {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
-    {π : S} (hm : maximalIdeal S = Ideal.span {π}) (hreg : ∀ a : S, π * a = 0 → a = 0) :
-    ∃ _ : IsDomain S, IsDiscreteValuationRing S ∧ Irreducible π := by
+theorem dvr_of_maximalIdeal_eq_span
+    {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
+    {π : S} (hm : maximalIdeal S = Ideal.span {π}) (hreg : ∀ a : S, π * a = 0 → a = 0)
+    : ∃ _ : IsDomain S, IsDiscreteValuationRing S ∧ Irreducible π := by
   have hpow : ∀ (k : ℕ) (a : S), π ^ k * a = 0 → a = 0 := by
     intro k
     induction k with
@@ -43,8 +50,7 @@ theorem dvr_of_maximalIdeal_eq_span {S : Type} [CommRing S] [IsLocalRing S] [IsN
     rw [isField_iff_maximalIdeal_eq, hm, Ideal.span_singleton_eq_bot]
     exact hπ0
   have hpr : (maximalIdeal S).IsPrincipal := ⟨⟨π, hm⟩⟩
-  have hdvr : IsDiscreteValuationRing S :=
-    ((IsDiscreteValuationRing.TFAE S hnf).out 1 5).2 hpr
+  have hdvr : IsDiscreteValuationRing S := ((IsDiscreteValuationRing.TFAE S hnf).out 1 5).2 hpr
   exact ⟨inferInstance, hdvr, (IsDiscreteValuationRing.irreducible_iff_uniformizer π).2 hm⟩
 
 end GlobalTheory.Pat

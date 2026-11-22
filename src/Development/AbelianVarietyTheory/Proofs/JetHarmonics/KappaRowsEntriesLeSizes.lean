@@ -6,21 +6,33 @@ public import Development.AbelianVarietyTheory.Definitions.Jets.TwoPlaces
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
 
 namespace GlobalTheory.WeightRows
 
-theorem kappa_entries_le : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D) (j : ℕ), InR D j → ∀ τ : D.what₂.Tau, (∀ i, i.1 < D.R.k - 1 → ((kaR Tp hK j).aP τ i : ℝ) ≤ wj D j τ + L.Sc) ∧ (∀ i, D.R.k - 1 ≤ i.1 → ((kaR Tp hK j).aP τ i : ℝ) ≤ L.etaSz) ∧ ∀ i, ((kaR Tp hK j).aM τ i : ℝ) ≤ L.etaSz := by
+theorem kappa_entries_le
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D) (j : ℕ),
+      InR D j
+        → ∀ τ : D.what₂.Tau,
+          (∀ i, i.1 < D.R.k - 1 → ((kaR Tp hK j).aP τ i : ℝ) ≤ wj D j τ + L.Sc)
+            ∧ (∀ i, D.R.k - 1 ≤ i.1 → ((kaR Tp hK j).aP τ i : ℝ) ≤ L.etaSz)
+            ∧ ∀ i, ((kaR Tp hK j).aM τ i : ℝ) ≤ L.etaSz := by
   intro D L Pm Tp hK j hj τ
   have h1 := hj.1
   have h2 := hj.2
   have hk : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
   have a9 : (0 : ℝ) ≤ D.R.t := Nat.cast_nonneg _
-  have big : ∀ i : Fin (D.R.sigW j).1, ((kaR Tp hK j).aP τ i : ℝ) ≤
-      ((DV.sigPar D τ i : ℚ) : ℝ) + (((D.hc τ).e ⟨j - 1, by omega⟩ : ℚ) : ℝ) := by
+  have big
+      : ∀ i : Fin (D.R.sigW j).1,
+        ((kaR Tp hK j).aP τ i : ℝ)
+          ≤ ((DV.sigPar D τ i : ℚ) : ℝ) + (((D.hc τ).e ⟨j - 1, by omega⟩ : ℚ) : ℝ) := by
     intro i
     have hi : i.1 < D.R.k + j - 1 := i.2
     have hi' : i.1 + 2 ≤ D.R.k + j := by omega

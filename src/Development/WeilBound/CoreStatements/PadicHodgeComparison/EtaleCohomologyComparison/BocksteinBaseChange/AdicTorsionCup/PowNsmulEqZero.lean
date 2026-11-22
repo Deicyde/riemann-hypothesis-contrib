@@ -10,26 +10,35 @@ open CategoryTheory
 
 namespace CrystallineSemistableComparison.Adic
 
-structure IsSys (l : ℕ) [Fact l.Prime] (A : ℕ → Type*) [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)]
-    (ρ : ∀ m n : ℕ, A m →+ A n) : Prop where
+structure IsSys
+    (l : ℕ) [Fact l.Prime]
+    (A : ℕ → Type*) [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)]
+    (ρ : ∀ m n : ℕ, A m →+ A n)
+    : Prop where
   smul : ∀ k (r : ℤ_[l]) (x : A k), r • x = (PadicInt.toZModPow k r).val • x
   id : ∀ m (x : A m), ρ m m x = x
   trans : ∀ m n p (x : A m), p ≤ n → n ≤ m → ρ n p (ρ m n x) = ρ m p x
-  bock : ∀ a b (z : A (a + b)), ρ (a + b) b z = 0 → l ^ a • z = 0 ∧ ∃ w : A a, ρ (a + b) a z = l ^ b • w
+  bock
+    : ∀ a b (z : A (a + b)),
+      ρ (a + b) b z = 0 → l ^ a • z = 0 ∧ ∃ w : A a, ρ (a + b) a z = l ^ b • w
   fin : ∀ k, Finite (A k)
 
-def konigF {B : ℕ → Type*} (π : ∀ m n, B m → B n) (hid : ∀ m w, π m m w = w)
-    (htr : ∀ m n p w, p ≤ n → n ≤ m → π n p (π m n w) = π m p w)
-    (P : ∀ m, B m → Prop) (hP : ∀ m n w, n ≤ m → P m w → P n (π m n w)) : ℕᵒᵖ ⥤ Type _ where
+def konigF
+    {B : ℕ → Type*} (π : ∀ m n, B m → B n) (hid : ∀ m w, π m m w = w)
+    (htr : ∀ m n p w, p ≤ n → n ≤ m → π n p (π m n w) = π m p w) (P : ∀ m, B m → Prop)
+    (hP : ∀ m n w, n ≤ m → P m w → P n (π m n w))
+    : ℕᵒᵖ ⥤ Type _ where
   obj m := {w : B m.unop // P m.unop w}
   map {m n} f := TypeCat.ofHom fun w => ⟨π m.unop n.unop w.1, hP _ _ _ (leOfHom f.unop) w.2⟩
   map_id m := by ext w; exact hid _ _
   map_comp {m n p} f g := by ext w; exact (htr _ _ _ _ (leOfHom g.unop) (leOfHom f.unop)).symm
 
-theorem konig {B : ℕ → Type*} [∀ m, Finite (B m)] (π : ∀ m n, B m → B n) (hid : ∀ m w, π m m w = w)
-    (htr : ∀ m n p w, p ≤ n → n ≤ m → π n p (π m n w) = π m p w)
-    (P : ∀ m, B m → Prop) (hP : ∀ m n w, n ≤ m → P m w → P n (π m n w)) (hne : ∀ m, ∃ w, P m w) :
-    ∃ y : ∀ m, B m, (∀ m, P m (y m)) ∧ ∀ m n, n ≤ m → π m n (y m) = y n := by
+theorem konig
+    {B : ℕ → Type*} [∀ m, Finite (B m)]
+    (π : ∀ m n, B m → B n)
+    (hid : ∀ m w, π m m w = w) (htr : ∀ m n p w, p ≤ n → n ≤ m → π n p (π m n w) = π m p w)
+    (P : ∀ m, B m → Prop) (hP : ∀ m n w, n ≤ m → P m w → P n (π m n w)) (hne : ∀ m, ∃ w, P m w)
+    : ∃ y : ∀ m, B m, (∀ m, P m (y m)) ∧ ∀ m n, n ≤ m → π m n (y m) = y n := by
   have : ∀ j, Finite ((konigF π hid htr P hP).obj j) := fun j => Subtype.finite
   have : ∀ j, Nonempty ((konigF π hid htr P hP).obj j) := fun j =>
     let ⟨w, hw⟩ := hne j.unop
@@ -38,7 +47,9 @@ theorem konig {B : ℕ → Type*} [∀ m, Finite (B m)] (π : ∀ m n, B m → B
   refine ⟨fun m => (s (Opposite.op m)).1, fun m => (s _).2, fun m n h => ?_⟩
   exact congrArg Subtype.val (hs (homOfLE h).op)
 
-variable {l : ℕ} [Fact l.Prime] {A : ℕ → Type*} [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {A : ℕ → Type*} [∀ k, AddCommGroup (A k)] [∀ k, Module ℤ_[l] (A k)]
   {ρ : ∀ m n : ℕ, A m →+ A n} {S : Submodule ℤ_[l] (∀ k, A k)}
 
 namespace IsSys
@@ -59,8 +70,9 @@ theorem nsmul_mod {n : ℕ} (a : ℕ) (y : A n) : a • y = (a % l ^ n) • y :=
   rw [add_nsmul, mul_comm, mul_nsmul, hA.pow_nsmul_eq_zero]
   simp
 
-theorem exists_sec (P : ∀ m, A m → Prop) (hP : ∀ m n w, n ≤ m → P m w → P n (ρ m n w)) (hne : ∀ m, ∃ w, P m w) :
-    ∃ y : ∀ m, A m, (∀ m, P m (y m)) ∧ ∀ m, ρ (m + 1) m (y (m + 1)) = y m := by
+theorem exists_sec
+    (P : ∀ m, A m → Prop) (hP : ∀ m n w, n ≤ m → P m w → P n (ρ m n w)) (hne : ∀ m, ∃ w, P m w)
+    : ∃ y : ∀ m, A m, (∀ m, P m (y m)) ∧ ∀ m, ρ (m + 1) m (y (m + 1)) = y m := by
   have := hA.fin
   obtain ⟨y, hy, hy'⟩ := konig (fun m n => ρ m n) hA.id hA.trans P hP hne
   exact ⟨y, hy, fun m => hy' _ _ (Nat.le_succ m)⟩
@@ -75,19 +87,25 @@ theorem compat {x : ∀ k, A k} (hx : x ∈ S) {m n : ℕ} (h : n ≤ m) : ρ m 
   | base => exact hA.id _ _
   | succ m hnm ih => rw [← hA.trans (m + 1) m n _ hnm (Nat.le_succ m), (hS x).1 hx m, ih]
 
-theorem ker {x : ∀ k, A k} (hx : x ∈ S) (k : ℕ) (h0 : x k = 0) : ∃ y ∈ S, x = ((l : ℤ_[l]) ^ k) • y := by
-  obtain ⟨y, hy, hy'⟩ := hA.exists_sec (fun m w => l ^ k • w = x m)
-    (fun m n w h hw => by
-      rw [← map_nsmul, hw, hA.compat hS hx h])
-    (fun m => by
-      obtain ⟨-, w, hw⟩ := hA.bock m k (x (m + k)) (by rw [hA.compat hS hx (Nat.le_add_left k m), h0])
-      exact ⟨w, by rw [← hw, hA.compat hS hx (Nat.le_add_right m k)]⟩)
+theorem ker {x : ∀ k, A k} (hx : x ∈ S) (k : ℕ) (h0 : x k = 0)
+    : ∃ y ∈ S, x = ((l : ℤ_[l]) ^ k) • y := by
+  obtain ⟨y, hy, hy'⟩ :=
+    hA.exists_sec
+      (fun m w => l ^ k • w = x m)
+      (fun m n w h hw => by rw [← map_nsmul, hw, hA.compat hS hx h])
+      (fun m => by
+        obtain ⟨-, w, hw⟩ :=
+          hA.bock m k (x (m + k)) (by rw [hA.compat hS hx (Nat.le_add_left k m), h0])
+        exact ⟨w, by rw [← hw, hA.compat hS hx (Nat.le_add_right m k)]⟩)
   refine ⟨y, (hS y).2 hy', funext fun m => ?_⟩
   rw [Pi.smul_apply, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul, hy m]
 
-theorem mem_span_of {I : Type*} [Fintype I] (g : I → ∀ k, A k) (hg : ∀ i, g i ∈ S)
-    (h1 : ∀ x ∈ S, ∃ n ∈ Submodule.span ℤ_[l] (Set.range g), x 1 = n 1) {x : ∀ k, A k} (hx : x ∈ S) :
-    x ∈ Submodule.span ℤ_[l] (Set.range g) := by
+theorem mem_span_of
+    {I : Type*} [Fintype I]
+    (g : I → ∀ k, A k)
+    (hg : ∀ i, g i ∈ S) (h1 : ∀ x ∈ S, ∃ n ∈ Submodule.span ℤ_[l] (Set.range g), x 1 = n 1)
+    {x : ∀ k, A k} (hx : x ∈ S)
+    : x ∈ Submodule.span ℤ_[l] (Set.range g) := by
   set N := Submodule.span ℤ_[l] (Set.range g) with hN
   have hNS : N ≤ S := Submodule.span_le.2 (Set.range_subset_iff.2 hg)
   have step : ∀ x ∈ S, ∃ n ∈ N, ∃ y ∈ S, x = n + (l : ℤ_[l]) • y := by
@@ -109,26 +127,29 @@ theorem mem_span_of {I : Type*} [Fintype I] (g : I → ∀ k, A k) (hg : ∀ i, 
       refine ⟨n + ((l : ℤ_[l]) ^ m) • n', N.add_mem hn (N.smul_mem _ hn'), y', hy', ?_⟩
       rw [smul_add, smul_smul, ← pow_succ, add_assoc]
   have : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
-  obtain ⟨c, hc, hc'⟩ := konig (B := fun m => I → ZMod (l ^ m))
-    (fun m n c i => ((c i).val : ZMod (l ^ n)))
-    (fun m c => funext fun i => ZMod.natCast_zmod_val _)
-    (fun m n p c hpn hnm => funext fun i => by
-      rw [ZMod.val_natCast]
-      exact (ZMod.natCast_eq_natCast_iff' _ _ _).2 (Nat.mod_mod_of_dvd _ (pow_dvd_pow l hpn)))
-    (fun m c => ∑ i, (c i).val • g i m = x m)
-    (fun m n c hnm hc => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hA.compat hS hx hnm, ← hc, map_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [map_nsmul, hA.compat hS (hg i) hnm, ZMod.val_natCast, ← hA.nsmul_mod])
-    (fun m => by
-      obtain ⟨n, hn, y, hy, hxy⟩ := iter m x hx
-      obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ_[l]).1 hn
-      refine ⟨fun i => PadicInt.toZModPow m (a i), ?_⟩
-      rw [hxy, Pi.add_apply, Pi.smul_apply, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul, hA.pow_nsmul_eq_zero, add_zero,
-        ← ha, Finset.sum_apply]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Pi.smul_apply, hA.smul])
+  obtain ⟨c, hc, hc'⟩ :=
+    konig
+      (B := fun m => I → ZMod (l ^ m))
+      (fun m n c i => ((c i).val : ZMod (l ^ n)))
+      (fun m c => funext fun i => ZMod.natCast_zmod_val _)
+      (fun m n p c hpn hnm =>
+        funext fun i => by
+          rw [ZMod.val_natCast]
+          exact (ZMod.natCast_eq_natCast_iff' _ _ _).2 (Nat.mod_mod_of_dvd _ (pow_dvd_pow l hpn)))
+      (fun m c => ∑ i, (c i).val • g i m = x m)
+      (fun m n c hnm hc => by
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [← hA.compat hS hx hnm, ← hc, map_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [map_nsmul, hA.compat hS (hg i) hnm, ZMod.val_natCast, ← hA.nsmul_mod])
+      (fun m => by
+        obtain ⟨n, hn, y, hy, hxy⟩ := iter m x hx
+        obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ_[l]).1 hn
+        refine ⟨fun i => PadicInt.toZModPow m (a i), ?_⟩
+        rw [hxy, Pi.add_apply, Pi.smul_apply, ← Nat.cast_pow, Nat.cast_smul_eq_nsmul,
+          hA.pow_nsmul_eq_zero, add_zero, ← ha, Finset.sum_apply]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [Pi.smul_apply, hA.smul])
   have hdiv : ∀ i m, (l : ℤ) ^ m ∣ ((c (m + 1) i).val : ℤ) - ((c m i).val : ℤ) := by
     intro i m
     have e := congrFun (hc' (m + 1) m (Nat.le_succ m)) i
@@ -140,7 +161,8 @@ theorem mem_span_of {I : Type*} [Fintype I] (g : I → ∀ k, A k) (hg : ∀ i, 
     push_cast at h' ⊢
     linarith
   let a : I → ℤ_[l] := fun i =>
-    PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun m => ((c m i).val : ℤ)) l (hdiv i))
+    PadicInt.ofIntSeq _
+      (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun m => ((c m i).val : ℤ)) l (hdiv i))
   have ha : ∀ i m, PadicInt.toZModPow m (a i) = c m i := by
     intro i m
     rw [PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub, Int.cast_natCast, ZMod.natCast_zmod_val]
@@ -161,7 +183,9 @@ theorem finite : Module.Finite ℤ_[l] S := by
     · exact h.choose_spec.1
     · exact S.zero_mem
   have hS' : S = Submodule.span ℤ_[l] (Set.range g) := by
-    refine le_antisymm (fun x hx => hA.mem_span_of hS g hg (fun x hx => ⟨g (x 1), Submodule.subset_span ⟨_, rfl⟩, ?_⟩) hx)
+    refine le_antisymm
+      (fun x hx =>
+        hA.mem_span_of hS g hg (fun x hx => ⟨g (x 1), Submodule.subset_span ⟨_, rfl⟩, ?_⟩) hx)
       (Submodule.span_le.2 (Set.range_subset_iff.2 hg))
     have h : ∃ y ∈ S, y 1 = x 1 := ⟨x, hx, rfl⟩
     simp only [g, dif_pos h]
@@ -187,19 +211,21 @@ theorem ml (k : ℕ) : ∃ a, ∀ z : A (k + a), ∃ y ∈ S, y k = ρ (k + a) k
       rwa [show k + (m - k) = m by omega] at this
     rw [Set.eq_of_subset_of_ncard_le h1 h2]
   refine ⟨a, fun z => ?_⟩
-  obtain ⟨y, hy, hy'⟩ := hA.exists_sec (fun m w => k ≤ m → ρ m k w = ρ (k + a) k z)
-    (fun m n w h hw hk => by
-      rw [hA.trans _ _ _ _ hk h, hw (hk.trans h)])
-    (fun m => by
-      rcases le_total m (k + a) with h | h
-      · exact ⟨ρ (k + a) m z, fun hk => hA.trans _ _ _ _ hk h⟩
-      · obtain ⟨w, hw⟩ := stab m h ⟨z, rfl⟩
-        exact ⟨w, fun _ => hw⟩)
+  obtain ⟨y, hy, hy'⟩ :=
+    hA.exists_sec
+      (fun m w => k ≤ m → ρ m k w = ρ (k + a) k z)
+      (fun m n w h hw hk => by rw [hA.trans _ _ _ _ hk h, hw (hk.trans h)])
+      (fun m => by
+        rcases le_total m (k + a) with h | h
+        · exact ⟨ρ (k + a) m z, fun hk => hA.trans _ _ _ _ hk h⟩
+        · obtain ⟨w, hw⟩ := stab m h ⟨z, rfl⟩
+          exact ⟨w, fun _ => hw⟩)
   refine ⟨y, (hS y).2 hy', ?_⟩
   have := hy k le_rfl
   rwa [hA.id] at this
 
-theorem cyclic (h1 : ∃ g : A 1, ∀ x : A 1, ∃ n : ℤ, x = n • g) : ∃ g ∈ S, ∀ x ∈ S, ∃ c : ℤ_[l], x = c • g := by
+theorem cyclic (h1 : ∃ g : A 1, ∀ x : A 1, ∃ n : ℤ, x = n • g)
+    : ∃ g ∈ S, ∀ x ∈ S, ∃ c : ℤ_[l], x = c • g := by
   obtain ⟨g0, hg0⟩ := h1
   have : IsAddCyclic (A 1) := ⟨⟨g0, fun x => let ⟨n, hn⟩ := hg0 x; ⟨n, hn.symm⟩⟩⟩
   let φ : S →+ A 1 := { toFun := fun x => x.1 1, map_zero' := rfl, map_add' := fun _ _ => rfl }

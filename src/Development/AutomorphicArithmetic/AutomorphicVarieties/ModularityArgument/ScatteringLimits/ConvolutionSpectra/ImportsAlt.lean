@@ -11,19 +11,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter Topology UpperTheory.V.Z.IntegralApplyAeEq
+open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter
+  Topology UpperTheory.V.Z.IntegralApplyAeEq
 open scoped InnerProductSpace FourierTransform ComplexConjugate
 
-theorem UpperTheory.V.Z.IntegralApplyAeEq.main :
-    PositivityTheory.Rg.Tf.IntegralApplyAeEq.Main := by
+theorem UpperTheory.V.Z.IntegralApplyAeEq.main : PositivityTheory.Rg.Tf.IntegralApplyAeEq.Main := by
   intro H V W _ _ _ _ _ _ _ _ _ D
   haveI := FiniteDimensional.complete ℂ V
   haveI := FiniteDimensional.complete ℂ W
   obtain ⟨M, hT, hJ, hJ', hL⟩ := model D
-  have act : ∀ Y β β', Ker β → Ker β' → Conv D.J D.J Y β → Conv D.J' D.J' Y β' → M.Acts Y β β' := fun Y β β' k k' c c' =>
-    ⟨fun u => by rw [hJ, hJ]; exact c u _ (convSpec β k u).1, fun v => by rw [hJ', hJ']; exact c' v _ (convSpec β' k' v).1⟩
-  obtain ⟨N, hN⟩ := nUnit M D.B D.β D.β' D.β_ker D.β'_ker D.β_unit D.β'_unit (act _ _ _ D.β_ker D.β'_ker D.B_J D.B_J')
-    (hT ▸ D.compact D.T₀ _ le_rfl ((hL _ _ le_rfl).2 rfl))
+  have act : ∀ Y β β', Ker β → Ker β' → Conv D.J D.J Y β → Conv D.J' D.J' Y β' → M.Acts Y β β' :=
+    fun Y β β' k k' c c' => ⟨
+      fun u => by rw [hJ, hJ]; exact c u _ (convSpec β k u).1,
+      fun v => by rw [hJ', hJ']; exact c' v _ (convSpec β' k' v).1
+    ⟩
+  obtain ⟨N, hN⟩ :=
+    nUnit M D.B D.β D.β' D.β_ker D.β'_ker D.β_unit D.β'_unit
+      (act _ _ _ D.β_ker D.β'_ker D.B_J D.B_J')
+      (hT ▸ D.compact D.T₀ _ le_rfl ((hL _ _ le_rfl).2 rfl))
   refine ⟨N, fun Y β β' k k' c c' => nInt M _ hN Y β β' k k' (act _ _ _ k k' c c'), ?_⟩
   intro X Λ κ T K hk hc hT' hΛ htc hb
   obtain rfl := (hL T Λ hT').1 hΛ

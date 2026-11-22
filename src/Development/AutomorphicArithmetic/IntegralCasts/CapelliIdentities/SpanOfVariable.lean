@@ -4,14 +4,14 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.SpanOfVariable.span_X :
-    ∀ {O σ : Type} [inst : CommRing O] (I : Ideal (MvPowerSeries σ O))
-    (s : Finset σ),
-    (∀ i ∈ s, MvPowerSeries.X i ∈ I) →
-      ∀ (f : MvPowerSeries σ O),
-        (∀ (n : σ →₀ ℕ),
-            (∀ i ∈ s, (n : σ → ℕ) i = (0 : ℕ)) → (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f = (0 : O)) →
-          f ∈ I := by
+theorem UpperTheory.Reformulated.B.SpanOfVariable.span_X
+    : ∀ {O σ : Type} [inst : CommRing O] (I : Ideal (MvPowerSeries σ O)) (s : Finset σ),
+      (∀ i ∈ s, MvPowerSeries.X i ∈ I)
+        → ∀ (f : MvPowerSeries σ O),
+          (∀ (n : σ →₀ ℕ),
+              (∀ i ∈ s, (n : σ → ℕ) i = (0 : ℕ))
+                → (MvPowerSeries.coeff n : MvPowerSeries σ O → O) f = (0 : O))
+            → f ∈ I := by
   intro O σ inst I s
   classical
   induction s using Finset.induction_on with
@@ -25,8 +25,9 @@ theorem UpperTheory.Reformulated.B.SpanOfVariable.span_X :
   | insert a s ha ih =>
     intro hX f hf
     let g : MvPowerSeries σ O := fun n => if n a = 0 then MvPowerSeries.coeff n f else 0
-    have hg : ∀ n : σ →₀ ℕ, MvPowerSeries.coeff n g =
-        if n a = 0 then MvPowerSeries.coeff n f else 0 := fun n => rfl
+    have hg
+        : ∀ n : σ →₀ ℕ, MvPowerSeries.coeff n g = if n a = 0 then MvPowerSeries.coeff n f else 0 :=
+      fun n => rfl
     have hgI : g ∈ I := by
       refine ih (fun i hi => hX i (Finset.mem_insert_of_mem hi)) g ?_
       intro n hn

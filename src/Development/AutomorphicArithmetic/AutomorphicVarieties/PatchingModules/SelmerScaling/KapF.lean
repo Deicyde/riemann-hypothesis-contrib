@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.indF :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ) (x : NP G0.frame n), ∀ (k : Kap x), ∀ c : Fin k.g → x.Fr, ∑ j, c j • kapF h k j ∈ BdM h x x.Fr → c = 0 := by
+theorem UpperTheory.V.Pa.indF
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G0 : Glob l L) (h : G.Hom G0) (n : ℕ)
+        (x : NP G0.frame n),
+      ∀ (k : Kap x), ∀ c : Fin k.g → x.Fr,
+        ∑ j, c j • kapF h k j ∈ BdM h x x.Fr → c = 0 := by
   intro l _ L G G0 h n x k c hc
   classical
   obtain ⟨Y, hY, hYt, hcY⟩ := hc
@@ -19,8 +23,9 @@ theorem UpperTheory.V.Pa.indF :
     show G.η γ = 1
     rw [← h.η, hγ]
     exact hg'
-  have hb : ∃ b : nonZeroDivisors x.A, ∀ i : Fin k.g ⊕ (Fin n × Fin n),
-      ∃ r : x.A, algebraMap x.A x.Fr r = (b : x.A) • Sum.elim c (fun p => Y p.1 p.2) i :=
+  have hb
+      : ∃ b : nonZeroDivisors x.A, ∀ i : Fin k.g ⊕ (Fin n × Fin n), ∃ r : x.A,
+        algebraMap x.A x.Fr r = (b : x.A) • Sum.elim c (fun p => Y p.1 p.2) i :=
     IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors x.A) _
   obtain ⟨b, hb⟩ := hb
   choose a ha using hb
@@ -71,7 +76,7 @@ theorem UpperTheory.V.Pa.indF :
       apply hψinj
       have hL : ψ ((∑ j, cA j • k.κ j) (h.p₀ γ)) = (b : x.A) • (∑ j, c j • kapF h k j) γ := by
         set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, hκ, hcj, Finset.smul_sum]
+        simp only [Finset.sum_apply, Pi.smul_apply, map_sum, map_smul, hκ, hcj, Finset.smul_sum]
       rw [hL, hcY]
       simp only [dY, map_sub, map_mul, hρ, hψY, Matrix.mul_smul, Matrix.smul_mul, smul_sub, map_inv]
   have hzero := k.indep cA hmem

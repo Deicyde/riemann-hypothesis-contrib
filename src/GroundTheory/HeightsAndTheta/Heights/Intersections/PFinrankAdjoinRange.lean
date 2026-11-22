@@ -16,11 +16,11 @@ theorem FinrankAdjoinRange.proof : FinrankAdjoinRange.Statement := by
   set f := IsScalarTower.toAlgHom F Φ Ω
   set Φ₁ : IntermediateField F Ω := f.fieldRange
   let i : Φ ≃ₐ[F] Φ₁ := AlgEquiv.ofInjectiveField f
-  have hi : (algebraMap Φ Ω : Φ → Ω) = (algebraMap Φ₁ Ω) ∘ i := by
-    funext x; rfl
+  have hi : (algebraMap Φ Ω : Φ → Ω) = (algebraMap Φ₁ Ω) ∘ i := by funext x; rfl
 
-  have hres : (IntermediateField.adjoin Φ S).restrictScalars F =
-      (IntermediateField.adjoin Φ₁ S).restrictScalars F :=
+  have hres
+      : (IntermediateField.adjoin Φ S).restrictScalars F
+        = (IntermediateField.adjoin Φ₁ S).restrictScalars F :=
     IntermediateField.restrictScalars_adjoin_of_algEquiv i hi S
 
   have hle : Φ₁ ≤ Φ₁ ⊔ IntermediateField.adjoin F S := le_sup_left

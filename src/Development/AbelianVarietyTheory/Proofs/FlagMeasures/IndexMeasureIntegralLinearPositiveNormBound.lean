@@ -67,43 +67,76 @@ private lemma finite_support_quotient_out_of_finite_image {W : Type} [AddCommGro
     (support fun c : W ⧸ B => φ (Quotient.out c)).Finite := by
   refine hφ.subset fun c hc => ⟨Quotient.out c, hc, QuotientAddGroup.out_eq' c⟩
 
-
 open scoped Pointwise Classical in
 variable {W : Type} [AddCommGroup W] in
-theorem _root_.GlobalTheory.IdxInt.Lin.main : ∀ {W : Type} [AddCommGroup W] (A : AddSubgroup W), (∀ φ ψ : W → ℂ, _root_.GlobalTheory.IdxInt.Nice A φ → _root_.GlobalTheory.IdxInt.Nice A ψ → _root_.GlobalTheory.IdxInt.Nice A (φ + ψ) ∧ _root_.GlobalTheory.IdxInt.cint A (φ + ψ) = _root_.GlobalTheory.IdxInt.cint A φ + _root_.GlobalTheory.IdxInt.cint A ψ ∧ ((∀ w, ‖φ w‖ ≤ (ψ w).re) → ‖_root_.GlobalTheory.IdxInt.cint A φ‖ ≤ (_root_.GlobalTheory.IdxInt.cint A ψ).re)) ∧ (∀ (c : ℂ) (φ : W → ℂ), _root_.GlobalTheory.IdxInt.Nice A φ → _root_.GlobalTheory.IdxInt.Nice A (fun w => c * φ w) ∧ _root_.GlobalTheory.IdxInt.cint A (fun w => c * φ w) = c * _root_.GlobalTheory.IdxInt.cint A φ) ∧ (∀ P : W → Prop, 0 ≤ (_root_.GlobalTheory.IdxInt.cint A (_root_.GlobalTheory.IdxInt.ind P)).re ∧ (_root_.GlobalTheory.IdxInt.cint A (_root_.GlobalTheory.IdxInt.ind P)).im = 0) ∧ ∀ (ι : Type) (s : Finset ι) (φ : ι → W → ℂ), (∀ i ∈ s, _root_.GlobalTheory.IdxInt.Nice A (φ i)) → _root_.GlobalTheory.IdxInt.Nice A (fun w => ∑ i ∈ s, φ i w) ∧ _root_.GlobalTheory.IdxInt.cint A (fun w => ∑ i ∈ s, φ i w) = ∑ i ∈ s, _root_.GlobalTheory.IdxInt.cint A (φ i) := by
+theorem _root_.GlobalTheory.IdxInt.Lin.main
+    : ∀ {W : Type} [AddCommGroup W] (A : AddSubgroup W),
+      (∀ φ ψ : W → ℂ,
+          _root_.GlobalTheory.IdxInt.Nice A φ → _root_.GlobalTheory.IdxInt.Nice A ψ
+            → _root_.GlobalTheory.IdxInt.Nice A (φ + ψ)
+              ∧ _root_.GlobalTheory.IdxInt.cint A (φ + ψ)
+                = _root_.GlobalTheory.IdxInt.cint A φ + _root_.GlobalTheory.IdxInt.cint A ψ
+              ∧ ((∀ w, ‖φ w‖ ≤ (ψ w).re)
+                → ‖_root_.GlobalTheory.IdxInt.cint A φ‖ ≤ (_root_.GlobalTheory.IdxInt.cint A ψ).re))
+        ∧ (∀ (c : ℂ) (φ : W → ℂ),
+          _root_.GlobalTheory.IdxInt.Nice A φ
+            → _root_.GlobalTheory.IdxInt.Nice A (fun w => c * φ w)
+              ∧ _root_.GlobalTheory.IdxInt.cint A (fun w => c * φ w)
+                = c * _root_.GlobalTheory.IdxInt.cint A φ)
+        ∧ (∀ P : W → Prop,
+          0 ≤ (_root_.GlobalTheory.IdxInt.cint A (_root_.GlobalTheory.IdxInt.ind P)).re
+            ∧ (_root_.GlobalTheory.IdxInt.cint A (_root_.GlobalTheory.IdxInt.ind P)).im = 0)
+        ∧ ∀ (ι : Type) (s : Finset ι) (φ : ι → W → ℂ),
+          (∀ i ∈ s, _root_.GlobalTheory.IdxInt.Nice A (φ i))
+            → _root_.GlobalTheory.IdxInt.Nice A (fun w => ∑ i ∈ s, φ i w)
+              ∧ _root_.GlobalTheory.IdxInt.cint A (fun w => ∑ i ∈ s, φ i w)
+                = ∑ i ∈ s, _root_.GlobalTheory.IdxInt.cint A (φ i) := by
   intro W _ A
-  have hadd : ∀ φ ψ : W → ℂ, _root_.GlobalTheory.IdxInt.Nice A φ → _root_.GlobalTheory.IdxInt.Nice A ψ → _root_.GlobalTheory.IdxInt.Nice A (φ + ψ) ∧ _root_.GlobalTheory.IdxInt.cint A (φ + ψ) = _root_.GlobalTheory.IdxInt.cint A φ + _root_.GlobalTheory.IdxInt.cint A ψ ∧ ((∀ w, ‖φ w‖ ≤ (ψ w).re) → ‖_root_.GlobalTheory.IdxInt.cint A φ‖ ≤ (_root_.GlobalTheory.IdxInt.cint A ψ).re) := by
+  have hadd
+      : ∀ φ ψ : W → ℂ,
+        _root_.GlobalTheory.IdxInt.Nice A φ → _root_.GlobalTheory.IdxInt.Nice A ψ
+          → _root_.GlobalTheory.IdxInt.Nice A (φ + ψ)
+            ∧ _root_.GlobalTheory.IdxInt.cint A (φ + ψ)
+              = _root_.GlobalTheory.IdxInt.cint A φ + _root_.GlobalTheory.IdxInt.cint A ψ
+            ∧ ((∀ w, ‖φ w‖ ≤ (ψ w).re)
+              → ‖_root_.GlobalTheory.IdxInt.cint A φ‖
+                ≤ (_root_.GlobalTheory.IdxInt.cint A ψ).re) := by
     intro φ ψ hφ hψ
     obtain ⟨C, hφC, hψC⟩ := exists_fine_fine_of_nice_nice hφ hψ
     have hsum := Fine_add hφC hψC
     have hfφ := finite_support_quotient_out_of_finite_image φ hφC.2.2.2
     have hfψ := finite_support_quotient_out_of_finite_image ψ hψC.2.2.2
     refine ⟨⟨C, hsum⟩, ?_, fun hle => ?_⟩
-    · rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hsum, _root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hφC,
+    · rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hsum,
+        _root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hφC,
         _root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hψC, ← add_div]
       simp only [Pi.add_apply]
       rw [finsum_add_distrib hfφ hfψ]
-    · rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hφC, _root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hψC,
+    · rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hφC,
+        _root_.GlobalTheory.IdxInt.cint_eq_of_fine A C _ hψC,
         finsum_eq_sum_of_support_subset (s := (hfφ.union hfψ).toFinset) _ (by simp),
-        finsum_eq_sum_of_support_subset (s := (hfφ.union hfψ).toFinset) _ (by simp),
-        norm_div, Complex.norm_natCast, Complex.div_natCast_re, Complex.re_sum]
+        finsum_eq_sum_of_support_subset (s := (hfφ.union hfψ).toFinset) _ (by simp), norm_div,
+        Complex.norm_natCast, Complex.div_natCast_re, Complex.re_sum]
       gcongr
       exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => hle _)
   refine ⟨hadd, ?_, ?_, ?_⟩
   · intro c φ hφ
     obtain ⟨B, hB⟩ := hφ
-    have hc : _root_.GlobalTheory.IdxInt.Fine A (fun w => c * φ w) B :=
-      ⟨hB.1, hB.2.1, fun w b hb => by simp only [hB.2.2.1 w b hb],
-        hB.2.2.2.subset (Set.image_mono (Function.support_mul_subset_right _ _))⟩
+    have hc : _root_.GlobalTheory.IdxInt.Fine A (fun w => c * φ w) B := ⟨
+      hB.1,
+      hB.2.1,
+      fun w b hb => by simp only [hB.2.2.1 w b hb],
+      hB.2.2.2.subset (Set.image_mono (Function.support_mul_subset_right _ _))
+    ⟩
     refine ⟨⟨B, hc⟩, ?_⟩
-    rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A B _ hc, _root_.GlobalTheory.IdxInt.cint_eq_of_fine A B _ hB,
-      ← mul_finsum, mul_div_assoc]
+    rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A B _ hc,
+      _root_.GlobalTheory.IdxInt.cint_eq_of_fine A B _ hB, ← mul_finsum, mul_div_assoc]
   · intro P
     by_cases h : _root_.GlobalTheory.IdxInt.Nice A (_root_.GlobalTheory.IdxInt.ind P)
     · obtain ⟨B, hB⟩ := h
       rw [_root_.GlobalTheory.IdxInt.cint_eq_of_fine A B _ hB,
-        finsum_eq_sum _ (finite_support_quotient_out_of_finite_image _ hB.2.2.2), Complex.div_natCast_re, Complex.div_natCast_im,
-        Complex.re_sum, Complex.im_sum]
+        finsum_eq_sum _ (finite_support_quotient_out_of_finite_image _ hB.2.2.2),
+        Complex.div_natCast_re, Complex.div_natCast_im, Complex.re_sum, Complex.im_sum]
       refine ⟨div_nonneg (Finset.sum_nonneg fun i _ => ?_) (Nat.cast_nonneg _), ?_⟩
       · unfold _root_.GlobalTheory.IdxInt.ind
         split_ifs <;> simp

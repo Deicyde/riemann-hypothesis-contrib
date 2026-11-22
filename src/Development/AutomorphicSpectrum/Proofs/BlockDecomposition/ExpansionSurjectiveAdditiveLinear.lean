@@ -11,25 +11,23 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.PerfFil.Expand
 
 variable {l : ℕ} [Fact l.Prime] (A : PAlg l)
 
-theorem natCast_l_acr : (l : A.Acr 1) = 0 := by
-  simpa using A.pow_l_acr 1
+theorem natCast_l_acr : (l : A.Acr 1) = 0 := by simpa using A.pow_l_acr 1
 
-theorem dxi_zero : A.dxi 1 0 = 1 := by
-  rw [PAlg.dxi, divided_power_xi_zero, map_one]
+theorem dxi_zero : A.dxi 1 0 = 1 := by rw [PAlg.dxi, divided_power_xi_zero, map_one]
 
-theorem dxi_mul (i j : ℕ) :
-    A.dxi 1 i * A.dxi 1 j = (((i + j).choose i : ℕ) : A.Acr 1) * A.dxi 1 (i + j) := by
+theorem dxi_mul (i j : ℕ)
+    : A.dxi 1 i * A.dxi 1 j = (((i + j).choose i : ℕ) : A.Acr 1) * A.dxi 1 (i + j) := by
   simp only [PAlg.dxi]
   rw [← map_mul, divided_power_xi_mul, map_mul, map_natCast]
 
-theorem dxi_succ (m : ℕ) :
-    A.dxi 1 m * A.dxi 1 1 = ((m + 1 : ℕ) : A.Acr 1) * A.dxi 1 (m + 1) := by
+theorem dxi_succ (m : ℕ) : A.dxi 1 m * A.dxi 1 1 = ((m + 1 : ℕ) : A.Acr 1) * A.dxi 1 (m + 1) := by
   rw [dxi_mul, Nat.choose_succ_self_right]
 
 theorem dxi_one_pow (n : ℕ) : A.dxi 1 1 ^ n = (n.factorial : A.Acr 1) * A.dxi 1 n := by
@@ -40,7 +38,7 @@ theorem dxi_one_pow (n : ℕ) : A.dxi 1 1 ^ n = (n.factorial : A.Acr 1) * A.dxi 
     push_cast
     ring
 
-theorem aTo1_pi : A.aTo1 A.pi = -A.dxi 1 1 := by
+theorem aTo1_pi : A.aTo1 A.pi = - A.dxi 1 1 := by
   have h := A.aTo1_coeff A.xi
   rw [xi_coeff_zero, toAcr_xi, map_neg] at h
   rw [← h, neg_neg]
@@ -66,8 +64,8 @@ theorem exists_inv {a : ℕ} (h : ¬ l ∣ a) : ∃ m : ℕ, (m : A.Acr 1) * (a 
   rw [mul_comm]
   exact e'.symm
 
-theorem dxi_lq_add (q j : ℕ) (hj : j < l) :
-    ∃ n : ℕ, A.dxi 1 (l * q + j) = (n : A.Acr 1) * A.dxi 1 1 ^ j * A.dxi 1 (l * q) := by
+theorem dxi_lq_add (q j : ℕ) (hj : j < l)
+    : ∃ n : ℕ, A.dxi 1 (l * q + j) = (n : A.Acr 1) * A.dxi 1 1 ^ j * A.dxi 1 (l * q) := by
   induction j with
   | zero => exact ⟨1, by simp⟩
   | succ j ih =>
@@ -81,14 +79,15 @@ theorem dxi_lq_add (q j : ℕ) (hj : j < l) :
     obtain ⟨m, hm⟩ := exists_inv A hnd
     refine ⟨m * n, ?_⟩
     have e := dxi_succ A (l * q + j)
-    calc A.dxi 1 (l * q + (j + 1))
-        = (m : A.Acr 1) * ((l * q + j + 1 : ℕ) : A.Acr 1) * A.dxi 1 (l * q + j + 1) := by
-          rw [hm, one_mul]; rfl
+    calc
+      A.dxi 1 (l * q + (j + 1))
+          = (m : A.Acr 1) * ((l * q + j + 1 : ℕ) : A.Acr 1) * A.dxi 1 (l * q + j + 1) := by
+        rw [hm, one_mul]; rfl
       _ = (m : A.Acr 1) * (A.dxi 1 (l * q + j) * A.dxi 1 1) := by rw [e]; ring
       _ = _ := by rw [hn]; push_cast; ring
 
-theorem expand_single (q : ℕ) (b : A.A) :
-    A.expand (Finsupp.single q b) = A.aTo1 b * A.dxi 1 (l * q) := by
+theorem expand_single (q : ℕ) (b : A.A)
+    : A.expand (Finsupp.single q b) = A.aTo1 b * A.dxi 1 (l * q) := by
   simp [PAlg.expand]
 
 theorem exists_dxi_eq (k : ℕ) : ∃ (b : A.A) (q : ℕ), A.dxi 1 k = A.aTo1 b * A.dxi 1 (l * q) := by
@@ -119,7 +118,8 @@ theorem expand_surjective : Function.Surjective A.expand := by
     obtain ⟨k, -, rfl⟩ := hx
     obtain ⟨b, q, h⟩ := exists_dxi_eq A k
     exact ⟨Finsupp.single q b, by rw [expand_single, ← h]; rfl⟩
-  | zero => exact ⟨0, by simp [PAlg.expand]⟩
+  | zero =>
+    exact ⟨0, by simp [PAlg.expand]⟩
   | add x y _ _ hx hy =>
     obtain ⟨c, h⟩ := hx
     obtain ⟨c', h'⟩ := hy
@@ -130,11 +130,16 @@ theorem expand_surjective : Function.Surjective A.expand := by
     rw [expand_smul, h, aTo1_coeff, Algebra.smul_def, map_mul]
     rfl
 
-theorem main : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), Function.Surjective A.expand ∧
-    (∀ c c' : ℕ →₀ A.A, A.expand (c + c') = A.expand c + A.expand c') ∧
-    (∀ (a : A.A) (c : ℕ →₀ A.A), A.expand (a • c) = A.aTo1 a * A.expand c) ∧
-    ∀ k, A.aTo1 (A.pi ^ l) * A.dxi 1 k = 0 := fun A =>
-  ⟨expand_surjective A, expand_add A, expand_smul A, fun k => by
-    rw [map_pow, aTo1_pi_pow, zero_mul]⟩
+theorem main
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l),
+      Function.Surjective A.expand
+        ∧ (∀ c c' : ℕ →₀ A.A, A.expand (c + c') = A.expand c + A.expand c')
+        ∧ (∀ (a : A.A) (c : ℕ →₀ A.A), A.expand (a • c) = A.aTo1 a * A.expand c)
+        ∧ ∀ k, A.aTo1 (A.pi ^ l) * A.dxi 1 k = 0 := fun A => ⟨
+  expand_surjective A,
+  expand_add A,
+  expand_smul A,
+  fun k => by rw [map_pow, aTo1_pi_pow, zero_mul]
+⟩
 
 end GlobalTheory.CompanionTheory.PerfFil.Expand

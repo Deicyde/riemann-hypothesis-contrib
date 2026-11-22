@@ -21,15 +21,18 @@ lemma discPresheaf_isSheaf (A : X → AddCommGrpCat.{u}) :
   have := (TopCat.Presheaf.isSheaf_iff_isSheaf_comp (forget AddCommGrpCat.{u}) (discPresheaf A)).2
   exact this h
 
-noncomputable def germSheaf (F : TopCat.Sheaf AddCommGrpCat.{u} X) : TopCat.Sheaf AddCommGrpCat.{u} X :=
+noncomputable def germSheaf (F : TopCat.Sheaf AddCommGrpCat.{u} X)
+    : TopCat.Sheaf AddCommGrpCat.{u} X :=
   ⟨discPresheaf (fun x => F.presheaf.stalk x), discPresheaf_isSheaf _⟩
 
-noncomputable def toGerms (F : TopCat.Sheaf AddCommGrpCat.{u} X) :
-    F.presheaf ⟶ discPresheaf (fun x => F.presheaf.stalk x) where
-  app W := AddCommGrpCat.ofHom
-    { toFun := fun s x => F.presheaf.germ W.unop x.1 x.2 s
+noncomputable def toGerms (F : TopCat.Sheaf AddCommGrpCat.{u} X)
+    : F.presheaf ⟶ discPresheaf (fun x => F.presheaf.stalk x) where
+  app W :=
+    AddCommGrpCat.ofHom {
+      toFun := fun s x => F.presheaf.germ W.unop x.1 x.2 s
       map_zero' := by funext x; simp
-      map_add' := fun s t => by funext x; simp }
+      map_add' := fun s t => by funext x; simp
+    }
   naturality W W' h := by
     ext s
     funext x
@@ -51,8 +54,9 @@ instance (F : TopCat.Sheaf AddCommGrpCat.{u} X) : Mono (toGermSheaf F) := by
   have : Mono (toGermSheaf F).hom := NatTrans.mono_of_mono_app (toGerms F)
   exact Sheaf.Hom.mono_of_presheaf_mono (f := toGermSheaf F)
 
-theorem cechAcyclic_of_injective (I : TopCat.Sheaf AddCommGrpCat.{u} X) [Injective I]
-    {ι : Type w} (U : ι → Opens X) : CechAcyclic I.obj U := by
+theorem cechAcyclic_of_injective
+    (I : TopCat.Sheaf AddCommGrpCat.{u} X) [Injective I] {ι : Type w} (U : ι → Opens X)
+    : CechAcyclic I.obj U := by
   let r := Injective.factorThru (𝟙 I) (toGermSheaf I)
   have hr : toGermSheaf I ≫ r = 𝟙 I := Injective.comp_factorThru _ _
   have hr' : toGerms I ≫ r.hom = 𝟙 I.obj := congrArg (fun f => f.hom) hr

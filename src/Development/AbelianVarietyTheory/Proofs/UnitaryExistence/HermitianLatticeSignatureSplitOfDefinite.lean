@@ -7,15 +7,21 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.UnFree
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType GlobalTheory.CompRat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.PureType
+  GlobalTheory.CompRat
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.CompRat
 
 open NumberField in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-private theorem rt0_im_ne_zero (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) : H.rt0.im ≠ 0 := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+private theorem rt0_im_ne_zero (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    : H.rt0.im ≠ 0 := by
   intro h
   have hd : H.d ≠ 0 := by
     have := H.2
@@ -26,9 +32,12 @@ private theorem rt0_im_ne_zero (H : _root_.ReciprocityTheory.ChartRestriction.G.
   nlinarith [mul_self_nonneg H.rt0.re]
 
 open NumberField in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-private theorem embedding_rt_eq_or_eq_neg (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (τ : E →+* ℂ) :
-    τ H.rt = H.rt0 ∨ τ H.rt = -H.rt0 := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+private theorem embedding_rt_eq_or_eq_neg
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (τ : E →+* ℂ)
+    : τ H.rt = H.rt0 ∨ τ H.rt = -H.rt0 := by
   have hsq : ((H.rt : E)) ^ 2 = -(H.d : E) := by
     have := congrArg (fun x : 𝓞 E => (x : E)) H.rt_sq
     push_cast at this
@@ -39,27 +48,40 @@ private theorem embedding_rt_eq_or_eq_neg (H : _root_.ReciprocityTheory.ChartRes
   exact sq_eq_sq_iff_eq_or_eq_neg.1 h2
 
 open NumberField in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-private theorem exists_pos_form_rt_eq_im_mul {D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H} {g : ℕ} {ty : Fin g → E →+* ℂ}
-    {P : D.La →+ (Fin g → ℂ)} (hP : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D ty P) (c : ℂ)
-    (hc : ∀ x, P (H.rt • x) = c • P x) {a : D.La} (ha : a ≠ 0) :
-    ∃ r : ℝ, 0 < r ∧ (((D.EF (H.rt • a)) a : ℤ) : ℝ) = c.im * r := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+private theorem exists_pos_form_rt_eq_im_mul
+    {D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H} {g : ℕ} {ty : Fin g → E →+* ℂ}
+    {P : D.La →+ (Fin g → ℂ)}
+    (hP : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsPeriod D ty P)
+    (c : ℂ) (hc : ∀ x, P (H.rt • x) = c • P x)
+    {a : D.La} (ha : a ≠ 0)
+    : ∃ r : ℝ, 0 < r ∧ (((D.EF (H.rt • a)) a : ℤ) : ℝ) = c.im * r := by
   obtain ⟨-, hinj, -, -, Hm, -, hpos, hform⟩ := hP
   have hPa : P a ≠ 0 := fun h => ha (hinj (h.trans (map_zero P).symm))
-  refine ⟨(_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm Hm (P a) (P a)).re, hpos _ hPa, ?_⟩
-  have h0 : (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm Hm (P a) (P a)).im = 0 := by
+  refine ⟨
+    (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm Hm (P a) (P a)).re,
+    hpos _ hPa,
+    ?_
+  ⟩
+  have h0
+      : (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm Hm (P a) (P a)).im = 0 := by
     rw [hform, D.alt, Int.cast_zero]
   rw [← hform, hc]
   simp only [_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.hermForm] at h0 ⊢
   rw [smul_dotProduct, smul_eq_mul, Complex.mul_im, h0]
   ring
 
-
 open NumberField in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
-theorem _root_.GlobalTheory.CompRat.splitLat_of_definite : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H),
-    D.p = 0 ∨ D.q = 0 → _root_.GlobalTheory.CompRat.SplitLat D := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} in
+theorem _root_.GlobalTheory.CompRat.splitLat_of_definite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H),
+      D.p = 0 ∨ D.q = 0 → _root_.GlobalTheory.CompRat.SplitLat D := by
   intro E _ _ _ H D hpq
   obtain ⟨g, ty, hty⟩ := _root_.GlobalTheory.PureTypeModel.exists_isTypeFn H D.p D.q
   obtain ⟨P, hP⟩ := _root_.GlobalTheory.PeriodNonempty.exists_isPeriod E H D g ty hty

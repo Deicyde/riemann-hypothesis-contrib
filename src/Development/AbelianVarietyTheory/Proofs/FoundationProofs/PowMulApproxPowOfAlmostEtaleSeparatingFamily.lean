@@ -12,8 +12,19 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem cpow_mul_approx_pow_of_isSep :
-    ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ), p.Prime → ∀ (G : Type) [Group G] [MulSemiringAction G L], (∀ (g : G) (x : L), v (g • x) = v x) → ∀ (N : Subgroup G) [Fintype (G ⧸ N)] (θ : ℝ≥0), θ ≤ 1 → (∀ u ∈ Fix L (⊤ : Subgroup G), ∃ w ∈ Fix L (⊤ : Subgroup G), v (u - w ^ p) ≤ θ * v u) → ∀ (n : ℕ) (a b : Fin n → L) (c : L), IsSep v N a b c → ∀ x ∈ Fix L N, v x ≤ 1 → ∃ w ∈ Fix L N, v (c ^ p * x - w ^ p) ≤ max θ (v (p : L)) := by
+theorem cpow_mul_approx_pow_of_isSep
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
+      p.Prime
+        → ∀ (G : Type) [Group G] [MulSemiringAction G L],
+          (∀ (g : G) (x : L), v (g • x) = v x)
+            → ∀ (N : Subgroup G) [Fintype (G ⧸ N)] (θ : ℝ≥0),
+              θ ≤ 1
+                → (∀ u ∈ Fix L (⊤ : Subgroup G), ∃ w ∈ Fix L (⊤ : Subgroup G),
+                  v (u - w ^ p) ≤ θ * v u)
+                → ∀ (n : ℕ) (a b : Fin n → L) (c : L),
+                  IsSep v N a b c
+                    → ∀ x ∈ Fix L N,
+                      v x ≤ 1 → ∃ w ∈ Fix L N, v (c ^ p * x - w ^ p) ≤ max θ (v (p : L)) := by
   intro L _ v p hp G _ _ hv N _ θ hθ hroot n a b c hs x hx hx1
   have frob := GlobalTheory.T.valuation_frobenius_sum_sub_le_natCast_prime L v p hp
   have trfix := GlobalTheory.T.cosetRepresentativeTrace_fixed_properties L v G hv N
@@ -73,25 +84,34 @@ theorem cpow_mul_approx_pow_of_isSep :
     intro q _
     rw [← sub_mul, map_mul]
     have h1 : v (q.out • x) ≤ 1 := by rw [hv]; exact hx1
-    have h2 := frob (Fin n) Finset.univ (fun i => a i * q.out • b i)
-      (fun i _ => by rw [map_mul, hv]; exact mul_le_one' (hs.a_le i) (hs.b_le i))
-    calc _ ≤ v (p : L) * 1 := mul_le_mul' h2 h1
+    have h2 :=
+      frob (Fin n) Finset.univ
+        (fun i => a i * q.out • b i)
+        (fun i _ => by rw [map_mul, hv]; exact mul_le_one' (hs.a_le i) (hs.b_le i))
+    calc
+      _ ≤ v (p : L) * 1 := mul_le_mul' h2 h1
       _ = _ := mul_one _
   have bound2 : v (∑ i, a i ^ p * T i - ∑ i, a i ^ p * w i ^ p) ≤ θ := by
     rw [← Finset.sum_sub_distrib]
     apply Valuation.map_sum_le
     intro i _
     rw [← mul_sub, map_mul]
-    calc _ ≤ 1 * θ := mul_le_mul' (by rw [map_pow]; exact pow_le_one' (hs.a_le i) p) (hwθ i)
+    calc
+      _ ≤ 1 * θ := mul_le_mul' (by rw [map_pow]; exact pow_le_one' (hs.a_le i) p) (hwθ i)
       _ = θ := one_mul θ
   have bound3 : v (∑ i, a i ^ p * w i ^ p - W ^ p) ≤ v (p : L) := by
-    have h := frob (Fin n) Finset.univ (fun i => a i * w i)
-      (fun i _ => by rw [map_mul]; exact mul_le_one' (hs.a_le i) (hw1 i))
+    have h :=
+      frob (Fin n) Finset.univ
+        (fun i => a i * w i)
+        (fun i _ => by rw [map_mul]; exact mul_le_one' (hs.a_le i) (hw1 i))
     simp only [mul_pow] at h
     rw [Valuation.map_sub_swap]
     exact h
-  have e : c ^ p * x - W ^ p = (c ^ p * x - ∑ i, a i ^ p * T i)
-      + (∑ i, a i ^ p * T i - ∑ i, a i ^ p * w i ^ p) + (∑ i, a i ^ p * w i ^ p - W ^ p) := by ring
+  have e
+      : c ^ p * x - W ^ p
+        = (c ^ p * x - ∑ i, a i ^ p * T i) + (∑ i, a i ^ p * T i - ∑ i, a i ^ p * w i ^ p)
+          + (∑ i, a i ^ p * w i ^ p - W ^ p) := by
+    ring
   rw [e]
   refine Valuation.map_add_le v (Valuation.map_add_le v ?_ ?_) ?_
   · exact le_trans bound1 (le_max_right _ _)

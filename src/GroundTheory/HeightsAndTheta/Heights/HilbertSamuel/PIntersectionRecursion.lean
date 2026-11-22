@@ -17,12 +17,11 @@ noncomputable section
 
 universe u
 
-theorem blockWeight_cast_eq_unitDeg {K : Type} [DecidableEq K] (ι : K → Type) (b : K) (i : ι b) :
-    (fun k => ((blockWeight ι ⟨b, i⟩ k : ℕ) : ℤ)) = unitDeg b := by
+theorem blockWeight_cast_eq_unitDeg {K : Type} [DecidableEq K] (ι : K → Type) (b : K) (i : ι b)
+    : (fun k => ((blockWeight ι ⟨b, i⟩ k : ℕ) : ℤ)) = unitDeg b := by
   funext k
   simp only [blockWeight, unitDeg, Pi.single_apply]
   split_ifs <;> rfl
-
 
 open Classical in
 theorem IntersectionRecursion.proof : IntersectionRecursion.Statement.{u} := by
@@ -35,7 +34,8 @@ theorem IntersectionRecursion.proof : IntersectionRecursion.Statement.{u} := by
   have hlt : ringKrullDim (MRing ι F ⧸ q) < ((d + 2 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
     rw [hdim]
     exact_mod_cast (by omega : d + 1 + Fintype.card K < d + 2 + Fintype.card K)
-  have hcut := CutByForm.full F K ι d q hq.isPrime hq.multiHomog hlt x (blockWeight ι ⟨b, i⟩) hx hX bs
+  have hcut :=
+    CutByForm.full F K ι d q hq.isPrime hq.multiHomog hlt x (blockWeight ι ⟨b, i⟩) hx hX bs
   rw [blockWeight_cast_eq_unitDeg] at hcut
   rw [hcut, cycEval]
 
@@ -44,7 +44,8 @@ theorem IntersectionRecursion.proof : IntersectionRecursion.Statement.{u} := by
     mem_nonZeroDivisors_of_ne_zero fun h => hX (Ideal.Quotient.eq_zero_iff_mem.mp h)
   have hsucc : ringKrullDim (MRing ι F ⧸ J) + 1 ≤ ringKrullDim (MRing ι F ⧸ q) :=
     ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hle)
-      (Ideal.Quotient.factor_surjective hle) hr (by
+      (Ideal.Quotient.factor_surjective hle) hr
+      (by
         rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]
         exact Ideal.mem_sup_right (Ideal.subset_span rfl))
   rw [hdim] at hsucc
@@ -66,8 +67,8 @@ theorem IntersectionRecursion.proof : IntersectionRecursion.Statement.{u} := by
     · rw [dite_eq_left ⟨⟨hWp, hWh, hW.2⟩, hW.1.1.2, hWd⟩]
     · rw [dite_eq_right fun h => hWd h.2.2]
       have hWlt : ringKrullDim (MRing ι F ⧸ W) < ((d + Fintype.card K : ℕ) : WithBot ℕ∞) := by
-        exact lt_of_le_of_ne
-          (HilbDegBound.le_natCast_of_lt_natCast_succ (lt_of_le_of_lt hWle hJlt)) hWd
+        exact lt_of_le_of_ne (HilbDegBound.le_natCast_of_lt_natCast_succ (lt_of_le_of_lt hWle hJlt))
+          hWd
       rw [IntNumVanish.full F K ι d W hWp hWh (Or.inr hWlt) bs, mul_zero]
   · rw [dite_eq_right hW, zero_mul, dite_eq_right]
     rintro ⟨hWq, hJW, hWd⟩

@@ -18,9 +18,11 @@ noncomputable section
 
 universe u
 
-theorem ringKrullDim_eq_of_relDim {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-    {F : Type u} [Field F] {Q : Ideal (MRing ι F)} {m : ℕ} (h : relDim Q = (m : ℕ)) :
-    ringKrullDim (MRing ι F ⧸ Q) = ((m + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+theorem ringKrullDim_eq_of_relDim
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {F : Type u} [Field F]
+    {Q : Ideal (MRing ι F)} {m : ℕ} (h : relDim Q = (m : ℕ))
+    : ringKrullDim (MRing ι F ⧸ Q) = ((m + Fintype.card K : ℕ) : WithBot ℕ∞) := by
   have hm : ((m : ℕ) : WithBot (WithTop ℤ)) = (((m : ℤ) : WithTop ℤ) : WithBot (WithTop ℤ)) := rfl
   unfold relDim at h
   rw [hm] at h
@@ -43,9 +45,10 @@ theorem ringKrullDim_eq_of_relDim {K : Type} [Fintype K] [DecidableEq K] {ι : K
       rw [this]
       rfl
 
-theorem DegZeroLocalRing.proof (h1 : DegZeroLocLocal.Statement.{u})
-    (h2 : DegZeroLocNoetherian.Statement.{u}) (h3 : DegZeroLocDim.Statement.{u}) :
-    DegZeroLocalRing.Statement.{u} := by
+theorem DegZeroLocalRing.proof
+    (h1 : DegZeroLocLocal.Statement.{u}) (h2 : DegZeroLocNoetherian.Statement.{u})
+    (h3 : DegZeroLocDim.Statement.{u})
+    : DegZeroLocalRing.Statement.{u} := by
   intro F _ K _ _ ι _ P hP W hW hPW
   have := hP.isPrime
   refine ⟨⟨h2 F K ι P hP W hW hPW, h1 F K ι P hP W hW hPW⟩, fun n hn1 hn => ?_⟩

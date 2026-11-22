@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLocalDe
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -24,59 +27,87 @@ noncomputable section
 
 namespace GlobalTheory.DerFieldExt
 
-theorem cover' (X : Scheme.{0}) {W₀ : X.Opens} (hW : IsAffineOpen W₀) {W : X.Opens} (h : W ≤ W₀) :
-    W ≤ ⨆ i : {f : Γ(X, W₀) // X.basicOpen f ≤ W}, X.basicOpen i.1 := by
+theorem cover' (X : Scheme.{0}) {W₀ : X.Opens} (hW : IsAffineOpen W₀) {W : X.Opens} (h : W ≤ W₀)
+    : W ≤ ⨆ i : {f : Γ(X, W₀) // X.basicOpen f ≤ W}, X.basicOpen i.1 := by
   intro y hy
   obtain ⟨f, hf, hx⟩ := hW.exists_basicOpen_le (V := W) ⟨y, hy⟩ (h hy)
   exact TopologicalSpace.Opens.mem_iSup.2 ⟨⟨f, hf⟩, hx⟩
 
-theorem sep' (X : Scheme.{0}) {W₀ : X.Opens} (hW : IsAffineOpen W₀) {W : X.Opens} (h : W ≤ W₀) (s t : Γ(X, W))
-    (e : ∀ (f : Γ(X, W₀)) (k : X.basicOpen f ≤ W), resG X k s = resG X k t) : s = t :=
-  X.sheaf.eq_of_locally_eq' (fun i : {f : Γ(X, W₀) // X.basicOpen f ≤ W} => X.basicOpen i.1)
-    W (fun i => homOfLE i.2) (cover' X hW h) s t (fun i => e i.1 i.2)
+theorem sep'
+    (X : Scheme.{0})
+    {W₀ : X.Opens} (hW : IsAffineOpen W₀)
+    {W : X.Opens} (h : W ≤ W₀) (s t : Γ(X, W))
+    (e : ∀ (f : Γ(X, W₀)) (k : X.basicOpen f ≤ W), resG X k s = resG X k t)
+    : s = t :=
+  X.sheaf.eq_of_locally_eq'
+    (fun i : {f : Γ(X, W₀) // X.basicOpen f ≤ W} => X.basicOpen i.1)
+    W
+    (fun i => homOfLE i.2)
+    (cover' X hW h) s t
+    (fun i => e i.1 i.2)
 
-theorem exists_field : ∀ (Z : Scheme.{0}) (U : Z.Opens), IsAffineOpen U → ∀ δ : Γ(Z, U) → Γ(Z, U),
-    (∀ a b, δ (a + b) = δ a + δ b) → (∀ a b, δ (a * b) = a * δ b + b * δ a) →
-    ∃ d : Fld Z, IsField U d ∧ d U = δ := by
+theorem exists_field
+    : ∀ (Z : Scheme.{0}) (U : Z.Opens),
+      IsAffineOpen U
+        → ∀ δ : Γ(Z, U) → Γ(Z, U),
+          (∀ a b, δ (a + b) = δ a + δ b) → (∀ a b, δ (a * b) = a * δ b + b * δ a)
+            → ∃ d : Fld Z, IsField U d ∧ d U = δ := by
   intro X W₀ hW d₀ hadd hmul
-  have H : ∀ f : Γ(X, W₀), ∃ δ : Γ(X, X.basicOpen f) → Γ(X, X.basicOpen f),
-      (∀ a b, δ (a + b) = δ a + δ b) ∧ (∀ a b, δ (a * b) = a * δ b + b * δ a) ∧
-      ∀ a, δ (resG X (X.basicOpen_le f) a) = resG X (X.basicOpen_le f) (d₀ a) := by
+  have H
+      : ∀ f : Γ(X, W₀), ∃ δ : Γ(X, X.basicOpen f) → Γ(X, X.basicOpen f),
+        (∀ a b, δ (a + b) = δ a + δ b) ∧ (∀ a b, δ (a * b) = a * δ b + b * δ a)
+          ∧ ∀ a, δ (resG X (X.basicOpen_le f) a) = resG X (X.basicOpen_le f) (d₀ a) := by
     intro f
     haveI := hW.isLocalization_basicOpen f
-    obtain ⟨δ, h1, h2, h3⟩ := GlobalTheory.LocDerExt.der_exists f (RingHom.id _)
-      (fun a => resG X (X.basicOpen_le f) (d₀ a)) (fun a b => by simp only [hadd, map_add (f := _)])
-      (fun a b => by simp only [hmul, map_add (f := _), map_mul, RingHom.id_apply]; rfl)
+    obtain ⟨δ, h1, h2, h3⟩ :=
+      GlobalTheory.LocDerExt.der_exists f (RingHom.id _)
+        (fun a => resG X (X.basicOpen_le f) (d₀ a))
+        (fun a b => by simp only [hadd, map_add (f := _)])
+        (fun a b => by simp only [hmul, map_add (f := _), map_mul, RingHom.id_apply]; rfl)
     exact ⟨δ, h1, fun a b => by simpa using h2 a b, h3⟩
   choose δ δadd δmul δres using H
-  have compat : ∀ (f g : Γ(X, W₀)) (k : X.basicOpen g ≤ X.basicOpen f) (s : Γ(X, X.basicOpen f)),
-      resG X k (δ f s) = δ g (resG X k s) := by
+  have compat
+      : ∀ (f g : Γ(X, W₀)) (k : X.basicOpen g ≤ X.basicOpen f) (s : Γ(X, X.basicOpen f)),
+        resG X k (δ f s) = δ g (resG X k s) := by
     intro f g k s
     haveI := hW.isLocalization_basicOpen f
     refine GlobalTheory.LocDerExt.der_unique f (resG X k)
-      (fun s => resG X k (δ f s)) (fun s => δ g (resG X k s)) (fun a b => ?_)
-      (fun a b => ?_) (fun a => ?_) s
+      (fun s => resG X k (δ f s))
+      (fun s => δ g (resG X k s))
+      (fun a b => ?_)
+      (fun a b => ?_)
+      (fun a => ?_)
+      s
     · simp only [δmul, map_add (f := _), map_mul]
     · simp only [δmul, map_mul]
-    · change resG X k (δ f (resG X (X.basicOpen_le f) a)) =
-        δ g (resG X k (resG X (X.basicOpen_le f) a))
+    · change resG X k (δ f (resG X (X.basicOpen_le f) a))
+        = δ g (resG X k (resG X (X.basicOpen_le f) a))
       rw [GlobalTheory.LocDerExt.res_res X, δres, δres, GlobalTheory.LocDerExt.res_res X]
-  have G : ∀ (W : X.Opens), W ≤ W₀ → ∀ s : Γ(X, W), ∃ t : Γ(X, W),
-      ∀ (f : Γ(X, W₀)) (k : X.basicOpen f ≤ W), resG X k t = δ f (resG X k s) := by
+  have G
+      : ∀ (W : X.Opens),
+        W ≤ W₀
+          → ∀ s : Γ(X, W), ∃ t : Γ(X, W), ∀ (f : Γ(X, W₀)) (k : X.basicOpen f ≤ W),
+            resG X k t = δ f (resG X k s) := by
     intro W h s
-    obtain ⟨t, ht, -⟩ := X.sheaf.existsUnique_gluing'
-      (fun i : {f : Γ(X, W₀) // X.basicOpen f ≤ W} => X.basicOpen i.1)
-      W (fun i => homOfLE i.2) (cover' X hW h)
-      (fun i => δ i.1 (resG X i.2 s)) (fun i j => by
-        have e : X.basicOpen (i.1 * j.1) = X.basicOpen i.1 ⊓ X.basicOpen j.1 := X.basicOpen_mul _ _
-        have ki : X.basicOpen (i.1 * j.1) ≤ X.basicOpen i.1 := e.le.trans inf_le_left
-        have kj : X.basicOpen (i.1 * j.1) ≤ X.basicOpen j.1 := e.le.trans inf_le_right
-        have k : X.basicOpen i.1 ⊓ X.basicOpen j.1 ≤ X.basicOpen (i.1 * j.1) := e.ge
-        have e' : resG X ki (δ i.1 (resG X i.2 s)) = resG X kj (δ j.1 (resG X j.2 s)) := by
-          rw [compat _ _ ki, compat _ _ kj, GlobalTheory.LocDerExt.res_res X, GlobalTheory.LocDerExt.res_res X]
-        have e'' := congrArg (resG X k) e'
-        rw [GlobalTheory.LocDerExt.res_res X, GlobalTheory.LocDerExt.res_res X] at e''
-        exact e'')
+    obtain ⟨t, ht, -⟩ :=
+      X.sheaf.existsUnique_gluing'
+        (fun i : {f : Γ(X, W₀) // X.basicOpen f ≤ W} => X.basicOpen i.1)
+        W
+        (fun i => homOfLE i.2)
+        (cover' X hW h)
+        (fun i => δ i.1 (resG X i.2 s))
+        (fun i j => by
+          have e : X.basicOpen (i.1 * j.1) = X.basicOpen i.1 ⊓ X.basicOpen j.1 :=
+            X.basicOpen_mul _ _
+          have ki : X.basicOpen (i.1 * j.1) ≤ X.basicOpen i.1 := e.le.trans inf_le_left
+          have kj : X.basicOpen (i.1 * j.1) ≤ X.basicOpen j.1 := e.le.trans inf_le_right
+          have k : X.basicOpen i.1 ⊓ X.basicOpen j.1 ≤ X.basicOpen (i.1 * j.1) := e.ge
+          have e' : resG X ki (δ i.1 (resG X i.2 s)) = resG X kj (δ j.1 (resG X j.2 s)) := by
+            rw [compat _ _ ki, compat _ _ kj, GlobalTheory.LocDerExt.res_res X,
+              GlobalTheory.LocDerExt.res_res X]
+          have e'' := congrArg (resG X k) e'
+          rw [GlobalTheory.LocDerExt.res_res X, GlobalTheory.LocDerExt.res_res X] at e''
+          exact e'')
     exact ⟨t, fun f k => ht ⟨f, k⟩⟩
   choose t ht using G
   classical

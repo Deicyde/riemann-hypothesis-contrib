@@ -35,13 +35,13 @@ theorem sFin_of : SBridge → SFin := by
     rw [← Submodule.map_span] at hw
     obtain ⟨u, hu, hθ⟩ := hw
     refine ⟨(u : Chn (Gm L N) (k + 1)), ?_, ?_⟩
-    · have hmem : (u : Chn (Gm L N) (k + 1)) ∈
-          Submodule.map (LinearMap.ker (bd (Gm L N) k)).subtype (Submodule.span ℝ (pre '' (t : Set _))) :=
+    · have hmem
+          : (u : Chn (Gm L N) (k + 1)) ∈ Submodule.map (LinearMap.ker (bd (Gm L N) k)).subtype
+            (Submodule.span ℝ (pre '' (t : Set _))) :=
         ⟨u, hu, rfl⟩
       rw [Submodule.map_span, Set.image_image] at hmem
       simpa [Finset.coe_image] using hmem
-    · have h0 : θ (Gm L N) (⟨z, hz'⟩ - u) = 0 := by
-        rw [map_sub, hθ, sub_self]
+    · have h0 : θ (Gm L N) (⟨z, hz'⟩ - u) = 0 := by rw [map_sub, hθ, sub_self]
       exact (hker (Gm L N) _).mp h0
 
 end PositivityTheory.KB

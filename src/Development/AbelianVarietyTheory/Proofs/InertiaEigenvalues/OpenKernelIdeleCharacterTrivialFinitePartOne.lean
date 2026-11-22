@@ -15,17 +15,21 @@ public import Formalism.LocalToGlobal.GlobalTheory.GL5.FamilyMassVolumeIdentityO
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links Formalism.L2.JoinChr Formalism.L2.Host
-open ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.Member GlobalTheory.CoverHalf Formalism.IndefR.FWT Formalism.L2.DIV
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links
+  Formalism.L2.JoinChr Formalism.L2.Host
+open ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.Member GlobalTheory.CoverHalf
+  Formalism.IndefR.FWT Formalism.L2.DIV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.UnivCover.OpenKerChar
 
-
 set_option maxHeartbeats 400000 in
-theorem map_eq_one_of_finPart_eq_one : ∀ (D : D7) {A : Type} [Group A] (χ : (AE D)ˣ →* A),
-    IsOpen (χ.ker : Set (AE D)ˣ) → ∀ x : (AE D)ˣ, finPart D (x : AE D) = 1 → χ x = 1 := by
+theorem map_eq_one_of_finPart_eq_one
+    : ∀ (D : D7) {A : Type} [Group A] (χ : (AE D)ˣ →* A),
+      IsOpen (χ.ker : Set (AE D)ˣ) → ∀ x : (AE D)ˣ, finPart D (x : AE D) = 1 → χ x = 1 := by
   intro D A _ χ hχ x hx
   obtain ⟨hcm, -⟩ := GlobalTheory.Mem.Vol.cmData_isCMExt_and_gram_isHermND D.host.F D.host.E D.sp.cm
   have hfam : GlobalTheory.Mem.Vol.IsCMFam (fun w : InfinitePlace D.host.E => w.embedding) := by
@@ -35,7 +39,8 @@ theorem map_eq_one_of_finPart_eq_one : ∀ (D : D7) {A : Type} [Group A] (χ : (
   choose θ hθ using fun w : InfinitePlace D.host.E =>
     (GlobalTheory.Mem.VolEmb.existsUnique_infEmb D.host.F D.host.E D.sp.cm.sig hcm w.embedding).exists
   obtain ⟨e2, -, hc2, hc2', -⟩ :=
-    GlobalTheory.Mem.VolInfIso.exists_infAdele_equiv D.host.F D.host.E D.sp.cm.sig (InfinitePlace D.host.E) _ θ hcm hfam hθ
+    GlobalTheory.Mem.VolInfIso.exists_infAdele_equiv D.host.F D.host.E D.sp.cm.sig
+      (InfinitePlace D.host.E) _ θ hcm hfam hθ
   obtain ⟨e1, he1, hc1, hc1'⟩ := GlobalTheory.AdSplit.exists_adele_equiv D.host.F D.host.E
   have h2 : (e1 (x : AE D)).2 = 1 := (he1 _).2.trans hx
   set c : InfinitePlace D.host.E → ℂ := e2 (e1 (x : AE D)).1 with hcdef
@@ -45,8 +50,9 @@ theorem map_eq_one_of_finPart_eq_one : ∀ (D : D7) {A : Type} [Group A] (χ : (
   have hc0 : ∀ w, c w ≠ 0 := fun w => (Pi.isUnit_iff.1 hcu w).ne_zero
   let p : ℝ → (InfinitePlace D.host.E → ℂ) := fun t w => Complex.exp (t * Complex.log (c w))
   let γ : ℝ → AE D := fun t => e1.symm (e2.symm (p t), 1)
-  have hpc : Continuous p := continuous_pi fun w =>
-    Complex.continuous_exp.comp (Complex.continuous_ofReal.mul continuous_const)
+  have hpc : Continuous p :=
+    continuous_pi fun w =>
+      Complex.continuous_exp.comp (Complex.continuous_ofReal.mul continuous_const)
   have hγc : Continuous γ := hc1'.comp ((hc2'.comp hpc).prodMk continuous_const)
   have hpmul : ∀ s t, p s * p t = p (s + t) := fun s t => by
     funext w

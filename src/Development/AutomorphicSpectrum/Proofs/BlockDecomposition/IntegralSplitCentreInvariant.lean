@@ -7,18 +7,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HaarMeas
 
 @[expose] public section
 
-open NumberField MeasureTheory Topology GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.OpTrace GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.CompanionTheory.CuspTransfer
+open NumberField MeasureTheory Topology GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum
+  GlobalTheory.OpTrace GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.UnitaryBC
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.CompanionTheory.CuspTransfer
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.CuspTransfer
 
-theorem lintegral_image_prod_Ico_of_invariant {X Z : Type*} [TopologicalSpace X] [MeasurableSpace X]
-    [BorelSpace X] [SecondCountableTopology X] [TopologicalSpace Z] [MeasurableSpace Z] [BorelSpace Z]
-    (e : X × ℝ ≃ₜ Z) (ν : Measure X) [SFinite ν] {h : Z → ENNReal} (hh : Measurable h)
-    {k : X → ENNReal} (hk : ∀ x t, h (e (x, t)) = k x) (D : Set X) :
-    ∫⁻ g in e '' (D ×ˢ Set.Ico (0 : ℝ) 1), h g ∂(Measure.map e (ν.prod volume)) =
-      ∫⁻ x in D, k x ∂ν := by
+theorem lintegral_image_prod_Ico_of_invariant
+    {X Z : Type*} [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
+    [SecondCountableTopology X] [TopologicalSpace Z] [MeasurableSpace Z] [BorelSpace Z]
+    (e : X × ℝ ≃ₜ Z)
+    (ν : Measure X) [SFinite ν]
+    {h : Z → ENNReal} (hh : Measurable h)
+    {k : X → ENNReal} (hk : ∀ x t, h (e (x, t)) = k x)
+    (D : Set X)
+    : ∫⁻ g in e '' (D ×ˢ Set.Ico (0 : ℝ) 1), h g ∂(Measure.map e (ν.prod volume))
+      = ∫⁻ x in D, k x ∂ν := by
   have hemb : MeasurableEmbedding e := e.toMeasurableEquiv.measurableEmbedding
   rw [hemb.restrict_map, e.injective.preimage_image, hemb.lintegral_map, ← Measure.prod_restrict,
     lintegral_prod (fun p => h (e p)) (hh.comp e.measurable).aemeasurable]

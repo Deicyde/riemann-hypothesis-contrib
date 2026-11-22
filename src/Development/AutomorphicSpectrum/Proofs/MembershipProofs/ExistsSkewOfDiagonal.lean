@@ -5,15 +5,19 @@ public import Development.AutomorphicSpectrum.Definitions.MembershipCriteria.Goo
 
 @[expose] public section
 
-open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM MeasureTheory Matrix
+open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM
+  MeasureTheory Matrix
 
 namespace GlobalTheory.CompanionTheory.CommonTransversal
 
-theorem exists_skew_isUnit_det {F : Type} [Field F] (σ : F →+* F) {β : Type} [Fintype β]
-    [DecidableEq β] (a b : Matrix β β F) (hσ : ∀ z, σ (σ z) = z) (hz : ∃ z, σ z ≠ z)
-    (h : a * (b.map σ)ᵀ + b * (a.map σ)ᵀ = 0)
-    (hv : ∀ v : β → F, Matrix.vecMul v a = 0 → Matrix.vecMul v b = 0 → v = 0) :
-    ∃ s : Matrix β β F, (s.map σ)ᵀ = -s ∧ IsUnit (a + b * s).det := by
+theorem exists_skew_isUnit_det
+    {F : Type} [Field F]
+    (σ : F →+* F)
+    {β : Type} [Fintype β] [DecidableEq β]
+    (a b : Matrix β β F)
+    (hσ : ∀ z, σ (σ z) = z) (hz : ∃ z, σ z ≠ z) (h : a * (b.map σ)ᵀ + b * (a.map σ)ᵀ = 0)
+    (hv : ∀ v : β → F, Matrix.vecMul v a = 0 → Matrix.vecMul v b = 0 → v = 0)
+    : ∃ s : Matrix β β F, (s.map σ)ᵀ = -s ∧ IsUnit (a + b * s).det := by
   classical
   obtain ⟨L, L', D, hD⟩ := Matrix.Pivot.exists_list_transvec_mul_diagonal_mul_list_transvec a
   obtain ⟨P, hP⟩ : ∃ P, P = (L.map Matrix.TransvectionStruct.toMatrix).prod := ⟨_, rfl⟩
@@ -29,7 +33,8 @@ theorem exists_skew_isUnit_det {F : Type} [Field F] (σ : F →+* F) {β : Type}
   have cancel : ∀ (M : Matrix β β F) (x : β → F), M.det = 1 → x ᵥ* M = 0 → x = 0 := by
     intro M x hM hx
     have hu : IsUnit M.det := by rw [hM]; exact isUnit_one
-    calc x = x ᵥ* (M * M⁻¹) := by rw [Matrix.mul_nonsing_inv (A := M) hu, Matrix.vecMul_one]
+    calc
+      x = x ᵥ* (M * M⁻¹) := by rw [Matrix.mul_nonsing_inv (A := M) hu, Matrix.vecMul_one]
       _ = 0 := by rw [← Matrix.vecMul_vecMul, hx, Matrix.zero_vecMul]
   obtain ⟨z, hz⟩ := hz
   obtain ⟨c, hcdef⟩ : ∃ c, c = z - σ z := ⟨_, rfl⟩
@@ -62,8 +67,8 @@ theorem exists_skew_isUnit_det {F : Type} [Field F] (σ : F →+* F) {β : Type}
       cancel Q _ hQ1 (by rw [Matrix.vecMul_vecMul, ← e1]; exact hvM)
     have h0' : (v ᵥ* P) ᵥ* diagonal D + ((v ᵥ* b) ᵥ* (Q.map σ)ᵀ) ᵥ* s0 = 0 := by
       simpa only [Matrix.vecMul_vecMul, Matrix.vecMul_add] using h0
-    have hE : ∀ j, (v ᵥ* P) j * D j +
-        ((v ᵥ* b) ᵥ* (Q.map σ)ᵀ) j * (if D j = 0 then c else 0) = 0 := by
+    have hE
+        : ∀ j, (v ᵥ* P) j * D j + ((v ᵥ* b) ᵥ* (Q.map σ)ᵀ) j * (if D j = 0 then c else 0) = 0 := by
       intro j
       have e := congr_fun h0' j
       rw [Pi.add_apply, Matrix.vecMul_diagonal, hs0, Matrix.vecMul_diagonal] at e
@@ -80,7 +85,8 @@ theorem exists_skew_isUnit_det {F : Type} [Field F] (σ : F →+* F) {β : Type}
       rw [hD, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul, hwD, Matrix.zero_vecMul]
     have hc1 : v ᵥ* (a * (b.map σ)ᵀ + b * (a.map σ)ᵀ) = 0 := by rw [h, Matrix.vecMul_zero]
     rw [Matrix.vecMul_add, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul, hva, Matrix.zero_vecMul,
-      zero_add, hsta, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul] at hc1
+        zero_add, hsta, ← Matrix.vecMul_vecMul, ← Matrix.vecMul_vecMul]
+      at hc1
     have hud : ((v ᵥ* b) ᵥ* (Q.map σ)ᵀ) ᵥ* diagonal (fun i => σ (D i)) = 0 :=
       cancel _ _ (hst1 P hP1) hc1
     have hu : (v ᵥ* b) ᵥ* (Q.map σ)ᵀ = 0 := by

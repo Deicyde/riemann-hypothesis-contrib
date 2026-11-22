@@ -28,7 +28,6 @@ lemma LFocks_subAdj {σ : Type*} [Fintype σ] [DecidableEq σ] (U : Matrix σ σ
       mul_comm (sub U p), mul_assoc, LFocks_C_mul_left,
       Formalism.REAL.fischerInner_X_mul_left]
 
-theorem fischerInnerSubstitutionAdjoint : FockSubAdj :=
-  fun _ _ _ U f g => LFocks_subAdj U f g
+theorem fischerInnerSubstitutionAdjoint : FockSubAdj := fun _ _ _ U f g => LFocks_subAdj U f g
 
 end Formalism.GradedWeylDivisibility

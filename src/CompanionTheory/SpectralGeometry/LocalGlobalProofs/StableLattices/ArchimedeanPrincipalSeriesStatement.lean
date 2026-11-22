@@ -9,4 +9,7 @@ public import CompanionTheory.RealGroups.UnitaryAdmissibility.ArchimedeanUnitary
 open CompanionTheory.Rg.Fl
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.ArchimedeanPrincipalSeries : StArchPI := by
-  first | exact @GlobalTheory.CompanionTheory.ArchPI.archPI | exact GlobalTheory.CompanionTheory.ArchPI.archPI | (intros; apply GlobalTheory.CompanionTheory.ArchPI.archPI <;> assumption)
+  first
+  | exact @GlobalTheory.CompanionTheory.ArchPI.archPI
+  | exact GlobalTheory.CompanionTheory.ArchPI.archPI
+  | (intros; apply GlobalTheory.CompanionTheory.ArchPI.archPI <;> assumption)

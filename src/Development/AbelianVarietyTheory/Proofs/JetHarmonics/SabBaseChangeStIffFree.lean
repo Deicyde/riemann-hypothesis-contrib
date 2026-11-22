@@ -11,8 +11,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -23,12 +25,19 @@ variable {S S' : Scheme.{0}}
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem lbIso_cubeLB {G T : Over S} [GrpObj G] [IsCommMonObj G] {n : ℕ} (x : Fin n → (T ⟶ G))
-    {L M : LB G.left} (h : LBIso L M) : LBIso (cubeLB G x L) (cubeLB G x M) := by
+theorem lbIso_cubeLB
+    {G T : Over S} [GrpObj G] [IsCommMonObj G]
+    {n : ℕ} (x : Fin n → (T ⟶ G))
+    {L M : LB G.left} (h : LBIso L M)
+    : LBIso (cubeLB G x L) (cubeLB G x M) := by
   obtain ⟨w, hw⟩ := h
   exact ⟨_, DVR.linCombIso_isGen w hw _ _⟩
 
-theorem cubeLB_isLB {G T : Over S} [GrpObj G] [IsCommMonObj G] {n : ℕ} (x : Fin n → (T ⟶ G))
-    {L : LB G.left} (h : L.IsLB) : (cubeLB G x L).IsLB := DVR.linComb_isLB _ h _ _
+theorem cubeLB_isLB
+    {G T : Over S} [GrpObj G] [IsCommMonObj G]
+    {n : ℕ} (x : Fin n → (T ⟶ G))
+    {L : LB G.left} (h : L.IsLB)
+    : (cubeLB G x L).IsLB :=
+  DVR.linComb_isLB _ h _ _
 
 end GlobalTheory.SabPullCompare

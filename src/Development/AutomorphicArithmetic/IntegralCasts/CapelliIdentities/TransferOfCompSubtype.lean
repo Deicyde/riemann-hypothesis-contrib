@@ -4,11 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qe30.transfer_of_comp_subtype.{u_1} :
-    ∀ {Γ : Type u_1} [inst : Group Γ] (H : Subgroup Γ)
-    [inst_1 : H.FiniteIndex] (g : Γ),
-    ((Abelianization.of.comp H.subtype).transfer : Γ → Abelianization Γ) g =
-      (Abelianization.of : Γ → Abelianization Γ) g ^ H.index := by
+theorem UpperTheory.Reformulated.B.Qe30.transfer_of_comp_subtype.{u_1}
+    : ∀ {Γ : Type u_1} [inst : Group Γ] (H : Subgroup Γ) [inst_1 : H.FiniteIndex] (g : Γ),
+      ((Abelianization.of.comp H.subtype).transfer : Γ → Abelianization Γ) g
+        = (Abelianization.of : Γ → Abelianization Γ) g ^ H.index := by
   intro Γ _ H _ g
   classical
   let _ := H.fintypeQuotientOfFiniteIndex

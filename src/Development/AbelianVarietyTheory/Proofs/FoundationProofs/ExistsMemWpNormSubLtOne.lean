@@ -18,7 +18,8 @@ def ball (p : ℕ) [Fact p.Prime] : Subring ℂ_[p] where
   carrier := {x | ‖x‖ ≤ 1}
   mul_mem' := fun {a b} ha hb => by
     show ‖a * b‖ ≤ 1
-    rw [norm_mul]; exact mul_le_one₀ ha (norm_nonneg _) hb
+    rw [norm_mul]
+    exact mul_le_one₀ ha (norm_nonneg _) hb
   one_mem' := by show ‖(1 : ℂ_[p])‖ ≤ 1; simp
   add_mem' := fun {a b} ha hb => (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
   zero_mem' := by show ‖(0 : ℂ_[p])‖ ≤ 1; simp
@@ -44,7 +45,8 @@ theorem sub_one_lt_of_pow_p {y : ℂ_[p]} (hy : ‖y‖ ≤ 1) (h : ‖y ^ p - 1
   have e : (y - 1) ^ p = (y ^ p - 1) + -((p : ℂ_[p]) * (y - 1) * r) := by
     have : (Y : ℂ_[p]) = y := rfl
     rw [this] at hr'
-    rw [hr']; ring
+    rw [hr']
+    ring
   have h2 : ‖(y - 1) ^ p‖ < 1 := by
     rw [e]
     refine norm_add_lt_one h ?_
@@ -54,8 +56,8 @@ theorem sub_one_lt_of_pow_p {y : ℂ_[p]} (hy : ‖y‖ ≤ 1) (h : ‖y ^ p - 1
   rw [norm_pow] at h2
   exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) hp.out.ne_zero).1 h2
 
-theorem sub_one_lt_of_pow_p_pow (k : ℕ) {y : ℂ_[p]} (hy : ‖y‖ ≤ 1) (h : ‖y ^ p ^ k - 1‖ < 1) :
-    ‖y - 1‖ < 1 := by
+theorem sub_one_lt_of_pow_p_pow (k : ℕ) {y : ℂ_[p]} (hy : ‖y‖ ≤ 1) (h : ‖y ^ p ^ k - 1‖ < 1)
+    : ‖y - 1‖ < 1 := by
   induction k with
   | zero => simpa using h
   | succ k ih =>
@@ -64,8 +66,8 @@ theorem sub_one_lt_of_pow_p_pow (k : ℕ) {y : ℂ_[p]} (hy : ‖y‖ ≤ 1) (h 
     · rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hy
     · rwa [← pow_mul, ← pow_succ]
 
-theorem exists_root {x : ℂ_[p]} {m : ℕ} (hm : 0 < m) (h : ‖x ^ m - 1‖ < 1) :
-    ∃ ζ : ℂ_[p], ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 := by
+theorem exists_root {x : ℂ_[p]} {m : ℕ} (hm : 0 < m) (h : ‖x ^ m - 1‖ < 1)
+    : ∃ ζ : ℂ_[p], ζ ^ m = 1 ∧ ‖x - ζ‖ < 1 := by
   haveI : NeZero m := ⟨hm.ne'⟩
   obtain ⟨ξ, hξ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] m
   have e := congrArg (eval x) (X_pow_sub_one_eq_prod hm hξ)
@@ -74,16 +76,26 @@ theorem exists_root {x : ℂ_[p]} {m : ℕ} (hm : 0 < m) (h : ‖x ^ m - 1‖ < 
   by_contra hc
   push Not at hc
   refine absurd h (not_lt.2 ?_)
-  exact Finset.prod_induction _ (fun r : ℝ => 1 ≤ r) (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
-    le_rfl fun ζ hζ => hc ζ ((mem_nthRootsFinset hm _).1 hζ)
+  exact Finset.prod_induction _
+    (fun r : ℝ => 1 ≤ r)
+    (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
+    le_rfl
+    fun ζ hζ => hc ζ ((mem_nthRootsFinset hm _).1 hζ)
 
 theorem exists_pow_alg (x : PadicAlgCl p) (hx : ‖x‖ = 1) : ∃ n, 0 < n ∧ ‖x ^ n - 1‖ < 1 := by
   first
   | exact @_root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one
   | exact _root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one
   | (apply _root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one <;> assumption)
-  | (intros; apply _root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PowerNearOneNorm.exists_pow_sub_one_norm_lt_one ..)
 
 end GlobalTheory.ResidueRoot
@@ -92,10 +104,10 @@ namespace GlobalTheory
 
 open ResidueRoot
 
-theorem exists_mem_Wp_norm_sub_lt_one (p : ℕ) [hp : Fact p.Prime] (x : ℂ_[p]) (hx : ‖x‖ ≤ 1) :
-    ∃ w ∈ GL3Theta.Wp p, ‖x - w‖ < 1 := by
-  obtain ⟨y, hy⟩ := Metric.denseRange_iff.1
-    (UniformSpace.Completion.denseRange_coe (α := PadicAlgCl p)) x 1 one_pos
+theorem exists_mem_Wp_norm_sub_lt_one (p : ℕ) [hp : Fact p.Prime] (x : ℂ_[p]) (hx : ‖x‖ ≤ 1)
+    : ∃ w ∈ GL3Theta.Wp p, ‖x - w‖ < 1 := by
+  obtain ⟨y, hy⟩ :=
+    Metric.denseRange_iff.1 (UniformSpace.Completion.denseRange_coe (α := PadicAlgCl p)) x 1 one_pos
   rw [dist_eq_norm] at hy
   have hy1 : ‖(y : ℂ_[p])‖ ≤ 1 := by
     have : (y : ℂ_[p]) = x + -(x - y) := by ring
@@ -110,13 +122,18 @@ theorem exists_mem_Wp_norm_sub_lt_one (p : ℕ) [hp : Fact p.Prime] (x : ℂ_[p]
     have hm0 : 0 < m := Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero p))
     have h3 : ‖((y : ℂ_[p]) ^ m) ^ p ^ k - 1‖ < 1 := by
       rw [← PadicComplex.norm_extends, PadicComplex.coe_eq, map_sub, map_pow, map_one,
-        ← PadicComplex.coe_eq] at hyn
+          ← PadicComplex.coe_eq]
+        at hyn
       rwa [← pow_mul, mul_comm]
-    have h4 := sub_one_lt_of_pow_p_pow k
-      (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hy1) h3
+    have h4 :=
+      sub_one_lt_of_pow_p_pow k (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hy1) h3
     obtain ⟨ζ, hζ, h5⟩ := exists_root hm0 h4
-    refine ⟨ζ, Subring.le_topologicalClosure _ (Subring.subset_closure
-      ⟨m, hm0, ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hm).symm, hζ⟩), ?_⟩
+    refine ⟨
+      ζ,
+      Subring.le_topologicalClosure _
+        (Subring.subset_closure ⟨m, hm0, ((Nat.Prime.coprime_iff_not_dvd hp.out).2 hm).symm, hζ⟩),
+      ?_
+    ⟩
     have := norm_add_lt_one hy h5
     simpa using this
 

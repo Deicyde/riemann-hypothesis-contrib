@@ -16,8 +16,10 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem kType_exists_of_dom (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : ∀ a, ∃ m : ℤ, Λ a = m)
-    (hdom : ∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a) : Nonempty (KType ε Λ) := by
+theorem kType_exists_of_dom
+    (ε : Fin n → Bool) (Λ : Fin n → ℝ)
+    (hint : ∀ a, ∃ m : ℤ, Λ a = m) (hdom : ∀ a b, a < b → ε a = ε b → Λ b ≤ Λ a)
+    : Nonempty (KType ε Λ) := by
   choose m hm using hint
   set C : ℤ := ∑ a, |m a| with hC
   have hle : ∀ a, -C ≤ m a := by
@@ -43,7 +45,8 @@ theorem kType_exists_of_dom (ε : Fin n → Bool) (Λ : Fin n → ℝ) (hint : �
   rw [← e]
   exact ⟨T'⟩
 
-theorem kType_exists (ε : Fin n → Bool) (lam : Fin n → ℝ) (hlam : IsHCParam lam) :
-    Nonempty (KType ε (lowK ε lam)) := kType_exists_of_dom ε _ (lowK_int_dom ε lam hlam).1 (lowK_int_dom ε lam hlam).2
+theorem kType_exists (ε : Fin n → Bool) (lam : Fin n → ℝ) (hlam : IsHCParam lam)
+    : Nonempty (KType ε (lowK ε lam)) :=
+  kType_exists_of_dom ε _ (lowK_int_dom ε lam hlam).1 (lowK_int_dom ε lam hlam).2
 
 end ReciprocityTheory.ChartRestriction.DS.HW

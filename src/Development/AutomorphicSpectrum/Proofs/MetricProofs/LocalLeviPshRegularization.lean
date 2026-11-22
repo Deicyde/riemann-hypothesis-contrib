@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MollifyConverg
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
@@ -131,32 +132,73 @@ lemma oc_grad {r C₅ Q a b : ℝ} (hr : 1 ≤ r) (hC₅ : 0 ≤ C₅) (hQ : 0 �
 
 end OneChart
 
-theorem regularise_one_chart :
-    ∀ (D : ℕ) (S : Finset (Fin D)) (m : Fin D → ℕ) (q ph : (Fin D → ℂ) → ℝ) (C₅ K : ℝ), (∀ i ∈ S, 1 ≤ m i) → ContDiffOn ℝ ∞ q (ball (0 : Fin D → ℂ) (2)) → ContDiffOn ℝ ∞ ph (ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S) → ReciprocityTheory.AnForm.A.IsLeviPsh (ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S) (fun z => q z + ph z) → (∀ z ∈ ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S, -C₅ * Real.log (rLoc S m z) ≤ ph z ∧ ph z ≤ C₅) → (∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S, ‖fderiv ℝ ph z‖ ≤ C₅ * rLoc S m z ^ C₅ * Real.exp (rLoc S m z / 2)) → ∃ (C t₀ : ℝ) (phT : ℝ → (Fin D → ℂ) → ℝ), 1 ≤ C ∧ 0 < t₀ ∧ t₀ ≤ Real.exp (-Real.exp 1) ∧ (∀ t, 0 < t → t ≤ t₀ → ContDiffOn ℝ ∞ (phT t) (ball (0 : Fin D → ℂ) (5 / 4)) ∧ ReciprocityTheory.AnForm.A.IsLeviPsh (ball (0 : Fin D → ℂ) (5 / 4)) (fun z => q z + phT t z) ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), phT t z ≤ C ∧ -C * Real.log (Real.log (1 / t)) ≤ phT t z) ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S, ph z ≤ phT t z ∧ (rLoc S m z ≤ Real.log (1 / t) + K → phT t z ≤ ph z + t ^ ((1 : ℝ) / 3))) ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), polyMaxOff S (fun x => q x + ph x) z t - epsT C t ≤ q z + phT t z ∧ q z + phT t z ≤ polyMaxOff S (fun x => q x + ph x) z t) ∧ ∀ t', t ≤ t' → t' ≤ t₀ → ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), phT t z ≤ phT t' z + epsT C t') ∧ ∀ K' ⊆ ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S, IsCompact K' → TendstoUniformlyOn (fun t => phT t) (ph) (𝓝[>] 0) K' ∧ TendstoUniformlyOn (fun t => fderiv ℝ (phT t)) (fderiv ℝ (ph)) (𝓝[>] 0) K' ∧ TendstoUniformlyOn (fun t => fderiv ℝ (fderiv ℝ (phT t))) (fderiv ℝ (fderiv ℝ (ph))) (𝓝[>] 0) K' ∧ ∃ M : ℝ, ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ z ∈ K', ‖fderiv ℝ (phT t) z - fderiv ℝ (ph) z‖ ≤ M * t := by
+theorem regularise_one_chart
+    : ∀ (D : ℕ) (S : Finset (Fin D)) (m : Fin D → ℕ) (q ph : (Fin D → ℂ) → ℝ) (C₅ K : ℝ),
+      (∀ i ∈ S, 1 ≤ m i) → ContDiffOn ℝ ∞ q (ball (0 : Fin D → ℂ) (2))
+        → ContDiffOn ℝ ∞ ph (ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S)
+        → ReciprocityTheory.AnForm.A.IsLeviPsh
+          (ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S) (fun z => q z + ph z)
+        → (∀ z ∈ ball (0 : Fin D → ℂ) (2) \ ReciprocityTheory.AnForm.A.coordDiv S,
+          -C₅ * Real.log (rLoc S m z) ≤ ph z ∧ ph z ≤ C₅)
+        → (∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S,
+          ‖fderiv ℝ ph z‖ ≤ C₅ * rLoc S m z ^ C₅ * Real.exp (rLoc S m z / 2))
+        → ∃ (C t₀ : ℝ) (phT : ℝ → (Fin D → ℂ) → ℝ),
+          1 ≤ C ∧ 0 < t₀ ∧ t₀ ≤ Real.exp (- Real.exp 1)
+            ∧ (∀ t,
+              0 < t → t ≤ t₀
+                → ContDiffOn ℝ ∞ (phT t) (ball (0 : Fin D → ℂ) (5 / 4))
+                  ∧ ReciprocityTheory.AnForm.A.IsLeviPsh (ball (0 : Fin D → ℂ) (5 / 4))
+                    (fun z => q z + phT t z)
+                  ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4),
+                    phT t z ≤ C ∧ -C * Real.log (Real.log (1 / t)) ≤ phT t z)
+                  ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S,
+                    ph z ≤ phT t z
+                      ∧ (rLoc S m z ≤ Real.log (1 / t) + K → phT t z ≤ ph z + t ^ ((1 : ℝ) / 3)))
+                  ∧ (∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4),
+                    polyMaxOff S (fun x => q x + ph x) z t - epsT C t ≤ q z + phT t z
+                      ∧ q z + phT t z ≤ polyMaxOff S (fun x => q x + ph x) z t)
+                  ∧ ∀ t',
+                    t ≤ t' → t' ≤ t₀
+                      → ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), phT t z ≤ phT t' z + epsT C t')
+            ∧ ∀ K' ⊆ ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S,
+              IsCompact K'
+                → TendstoUniformlyOn (fun t => phT t) (ph) (𝓝[>] 0) K'
+                  ∧ TendstoUniformlyOn (fun t => fderiv ℝ (phT t)) (fderiv ℝ (ph)) (𝓝[>] 0) K'
+                  ∧ TendstoUniformlyOn
+                    (fun t => fderiv ℝ (fderiv ℝ (phT t)))
+                    (fderiv ℝ (fderiv ℝ (ph))) (𝓝[>] 0) K'
+                  ∧ ∃ M : ℝ,
+                    ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ z ∈ K', ‖fderiv ℝ (phT t) z - fderiv ℝ (ph) z‖ ≤ M * t := by
   intro D S m q ph C₅ K hm hq hph hL hb hg
   have hAc := oc_isClosed_coordDiv S
   have hC₅ : 0 ≤ C₅ := RegularChartScaling.fifth_volume_constant_nonneg m le_rfl (by norm_num) hb
   obtain ⟨Q, hQ0, hQ⟩ := oc_q_bounds hq
-  have hsub : ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S ⊆
-      ball 0 2 \ ReciprocityTheory.AnForm.A.coordDiv S :=
+  have hsub
+      : ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S
+        ⊆ ball 0 2 \ ReciprocityTheory.AnForm.A.coordDiv S :=
     Set.diff_subset_diff_left (ball_subset_ball (by norm_num))
   have hqA : ContDiffOn ℝ ∞ q (ball (0 : Fin D → ℂ) 2 \ ReciprocityTheory.AnForm.A.coordDiv S) :=
     hq.mono Set.diff_subset
-  have huS : ContDiffOn ℝ ∞ (fun z => q z + ph z)
-      (ball (0 : Fin D → ℂ) 2 \ ReciprocityTheory.AnForm.A.coordDiv S) := hqA.add hph
+  have huS : ContDiffOn ℝ ∞
+      (fun z => q z + ph z)
+      (ball (0 : Fin D → ℂ) 2 \ ReciprocityTheory.AnForm.A.coordDiv S) :=
+    hqA.add hph
   have hO2 : IsOpen (ball (0 : Fin D → ℂ) 2 \ ReciprocityTheory.AnForm.A.coordDiv S) :=
     isOpen_ball.sdiff hAc
   have hO3 : IsOpen (ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S) :=
     isOpen_ball.sdiff hAc
-  have hucont : ContinuousOn (fun z => q z + ph z)
+  have hucont : ContinuousOn
+      (fun z => q z + ph z)
       (ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S) :=
     huS.continuousOn.mono hsub
-  have hupsh : ReciprocityTheory.AnForm.A.IsPsh (ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S)
+  have hupsh : ReciprocityTheory.AnForm.A.IsPsh
+      (ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S)
       (fun z => q z + ph z) :=
     (ReciprocityTheory.AnForm.A.isPsh_iff_isLeviPsh_thm D _ _ hO3 (hL.1.mono hsub)).2
       ⟨hL.1.mono hsub, fun z hz w => hL.2 z (hsub hz) w⟩
-  have hubd : ∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S,
-      -(C₅ + Q) * Real.log (rLoc S m z) ≤ q z + ph z ∧ q z + ph z ≤ C₅ + Q := by
+  have hubd
+      : ∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S,
+        -(C₅ + Q) * Real.log (rLoc S m z) ≤ q z + ph z ∧ q z + ph z ≤ C₅ + Q := by
     intro z hz
     obtain ⟨h1, h2⟩ := hb z (hsub hz)
     have h3 := abs_le.1 (hQ z hz.1).1
@@ -164,26 +206,32 @@ theorem regularise_one_chart :
     constructor
     · nlinarith
     · linarith
-  have hugrad : ∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S,
-      ‖fderiv ℝ (fun z => q z + ph z) z‖ ≤
-        (C₅ + Q) * rLoc S m z ^ (C₅ + Q) * Real.exp (rLoc S m z / 2) := by
+  have hugrad
+      : ∀ z ∈ ball (0 : Fin D → ℂ) (3 / 2) \ ReciprocityTheory.AnForm.A.coordDiv S,
+        ‖fderiv ℝ (fun z => q z + ph z) z‖
+          ≤ (C₅ + Q) * rLoc S m z ^ (C₅ + Q) * Real.exp (rLoc S m z / 2) := by
     intro z hz
     rw [(fderiv_add_and_second_fderiv_add hO2 hqA hph (hsub hz)).1]
-    exact (norm_add_le _ _).trans
-      (oc_grad (oc_rLoc_ge S m hz.1).1 hC₅ hQ0 (hQ z hz.1).2 (hg z hz))
+    exact (norm_add_le _ _).trans (oc_grad (oc_rLoc_ge S m hz.1).1 hC₅ hQ0 (hQ z hz.1).2 (hg z hz))
   obtain ⟨ρ⟩ := ReciprocityTheory.AnForm.A.mollifierInhabit_thm D
   obtain ⟨C₁, t₁, w, hC₁, ht₁, ht₁e, ht₁8, hW⟩ :=
-    GlobalTheory.T.local_psh_regularization_log_bound D S m (fun z => q z + ph z) (C₅ + Q) ρ hucont hupsh hubd
-  obtain ⟨t₂, ht₂, hN⟩ := GlobalTheory.T.local_regularization_gradient_bound D S m (fun z => q z + ph z) (C₅ + Q) K hm
-    ((huS.differentiableOn (by simp)).mono hsub) hugrad
-  obtain ⟨phT, hphT⟩ : ∃ phT : ℝ → (Fin D → ℂ) → ℝ,
-      ∀ t z, phT t z = ReciprocityTheory.AnForm.A.molli ρ t (w t) z - q z := ⟨_, fun _ _ => rfl⟩
-  have hphF : ∀ t, phT t = fun z => ReciprocityTheory.AnForm.A.molli ρ t (w t) z - q z :=
-    fun t => funext (hphT t)
+    GlobalTheory.T.local_psh_regularization_log_bound D S m
+      (fun z => q z + ph z)
+      (C₅ + Q) ρ hucont hupsh hubd
+  obtain ⟨t₂, ht₂, hN⟩ :=
+    GlobalTheory.T.local_regularization_gradient_bound D S m
+      (fun z => q z + ph z)
+      (C₅ + Q) K hm ((huS.differentiableOn (by simp)).mono hsub) hugrad
+  obtain ⟨phT, hphT⟩
+      : ∃ phT : ℝ → (Fin D → ℂ) → ℝ, ∀ t z,
+        phT t z = ReciprocityTheory.AnForm.A.molli ρ t (w t) z - q z :=
+    ⟨_, fun _ _ => rfl⟩
+  have hphF : ∀ t, phT t = fun z => ReciprocityTheory.AnForm.A.molli ρ t (w t) z - q z := fun t =>
+    funext (hphT t)
   have hgF : ∀ t, ReciprocityTheory.AnForm.A.molli ρ t (w t) = fun z => q z + phT t z := by
     intro t; funext z; rw [hphT]; ring
-  have hq54 : ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), z ∈ ball (0 : Fin D → ℂ) (3 / 2) :=
-    fun z hz => ball_subset_ball (by norm_num) hz
+  have hq54 : ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), z ∈ ball (0 : Fin D → ℂ) (3 / 2) := fun z hz =>
+    ball_subset_ball (by norm_num) hz
   have hqs : ContDiffOn ℝ ∞ q (ball (0 : Fin D → ℂ) (5 / 4)) :=
     hq.mono (ball_subset_ball (by norm_num))
   have hsmooth : ∀ t, 0 < t → t ≤ t₁ → ContDiffOn ℝ ∞ (phT t) (ball (0 : Fin D → ℂ) (5 / 4)) := by
@@ -191,8 +239,16 @@ theorem regularise_one_chart :
     rw [hphF]
     exact (hW t ht htt).2.1.sub hqs
   have hC1 : C₁ ≤ 2 * C₁ + 2 * Q + C₅ + 1 := by linarith
-  refine ⟨2 * C₁ + 2 * Q + C₅ + 1, min t₁ t₂, phT, by linarith, lt_min ht₁ ht₂,
-    (min_le_left _ _).trans ht₁e, fun t ht htt => ?_, fun K' hK' hcK' => ?_⟩
+  refine ⟨
+    2 * C₁ + 2 * Q + C₅ + 1,
+    min t₁ t₂,
+    phT,
+    by linarith,
+    lt_min ht₁ ht₂,
+    (min_le_left _ _).trans ht₁e,
+    fun t ht htt => ?_,
+    fun K' hK' hcK' => ?_
+  ⟩
   · have ht1 : t ≤ t₁ := htt.trans (min_le_left _ _)
     have ht2 : t ≤ t₂ := htt.trans (min_le_right _ _)
     have hte := ht1.trans ht₁e
@@ -201,8 +257,14 @@ theorem regularise_one_chart :
     obtain ⟨he1, he2⟩ := oc_eps ht hte hC₁ hC1
     have hcb : ∀ s, s ≤ t₁ → ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4), closedBall z s ⊆ ball 0 (3 / 2) :=
       fun s hs z hz => RegularChartScaling.closedBall_sub_of hz (by linarith)
-    refine ⟨hsmooth t ht ht1, ?_, fun z hz => ?_, fun z hz => ?_, fun z hz => ?_,
-      fun t' htt' ht' z hz => ?_⟩
+    refine ⟨
+      hsmooth t ht ht1,
+      ?_,
+      fun z hz => ?_,
+      fun z hz => ?_,
+      fun z hz => ?_,
+      fun t' htt' ht' z hz => ?_
+    ⟩
     · rw [← hgF]; exact hl
     · obtain ⟨h1, h2, h3⟩ := hM z hz
       have hup : polyMaxOff S (fun z => q z + ph z) z t ≤ C₅ + Q :=
@@ -229,15 +291,17 @@ theorem regularise_one_chart :
       obtain ⟨h1, h2, h3⟩ := hM z hz
       obtain ⟨h1', h2', h3'⟩ := hM' z hz
       obtain ⟨he1', -⟩ := oc_eps ht'0 ht'e hC₁ hC1
-      have hmono : polyMaxOff S (fun z => q z + ph z) z t ≤
-          polyMaxOff S (fun z => q z + ph z) z t' :=
+      have hmono
+          : polyMaxOff S (fun z => q z + ph z) z t ≤ polyMaxOff S (fun z => q z + ph z) z t' :=
         RegularChartScaling.pmo_mono (fun x hx => (hubd x hx).2) ht htt' (hcb t' ht'1 z hz)
       rw [hphT, hphT]
       linarith
   · have hK2 : K' ⊆ (ReciprocityTheory.AnForm.A.coordDiv S)ᶜ := fun z hz => (hK' hz).2
     obtain ⟨B, hB⟩ := (hcK'.image_of_continuousOn ((oc_rLoc_cont S m).mono hK2)).bddAbove
-    obtain ⟨V, hVdef⟩ : ∃ V : Set (Fin D → ℂ),
-        V = (ReciprocityTheory.AnForm.A.coordDiv S)ᶜ ∩ rLoc S m ⁻¹' Set.Iio (B + 1) ∩ ball 0 (5 / 4) :=
+    obtain ⟨V, hVdef⟩
+        : ∃ V : Set (Fin D → ℂ),
+          V = (ReciprocityTheory.AnForm.A.coordDiv S)ᶜ ∩ rLoc S m ⁻¹' Set.Iio (B + 1)
+            ∩ ball 0 (5 / 4) :=
       ⟨_, rfl⟩
     have hV : IsOpen V := by
       rw [hVdef]
@@ -270,39 +334,48 @@ theorem regularise_one_chart :
       refine max_eq_left ?_
       have hr := oc_rLoc_ge S m hz3
       have hr2 : rLoc S m z < B + 1 := hz.1.2
-      have hl : Real.log (rLoc S m z) ≤ Real.log (B + 1) :=
-        Real.log_le_log (by linarith) hr2.le
+      have hl : Real.log (rLoc S m z) ≤ Real.log (B + 1) := Real.log_le_log (by linarith) hr2.le
       have h1 := (hubd z hzB).1
       have hC₁0 : 0 < C₁ := by linarith
       rw [div_le_iff₀ hC₁0] at hbig
       have hCQ : 0 ≤ C₅ + Q := by linarith
       nlinarith
     have huV : ContDiffOn ℝ ∞ (fun z => q z + ph z) V := huS.mono hVsub
-    obtain ⟨h1, h2, h3, M, h4⟩ := mollify_converges_C2_rate D ρ V K' (fun z => q z + ph z)
-      (fun t => w t) hV hcK' hKV huV hev
+    obtain ⟨h1, h2, h3, M, h4⟩ :=
+      mollify_converges_C2_rate D ρ V K' (fun z => q z + ph z) (fun t => w t) hV hcK' hKV huV hev
     have hO : IsOpen (ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S) :=
       isOpen_ball.sdiff hAc
-    have hOsub : ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S ⊆
-        ball 0 2 \ ReciprocityTheory.AnForm.A.coordDiv S :=
+    have hOsub
+        : ball (0 : Fin D → ℂ) (5 / 4) \ ReciprocityTheory.AnForm.A.coordDiv S
+          ⊆ ball 0 2 \ ReciprocityTheory.AnForm.A.coordDiv S :=
       Set.diff_subset_diff_left (ball_subset_ball (by norm_num))
-    have hd : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ z ∈ K',
-        fderiv ℝ (phT t) z - fderiv ℝ ph z =
-          fderiv ℝ (ReciprocityTheory.AnForm.A.molli ρ t (w t)) z - fderiv ℝ (fun z => q z + ph z) z ∧
-        fderiv ℝ (fderiv ℝ (phT t)) z - fderiv ℝ (fderiv ℝ ph) z =
-          fderiv ℝ (fderiv ℝ (ReciprocityTheory.AnForm.A.molli ρ t (w t))) z -
-            fderiv ℝ (fderiv ℝ (fun z => q z + ph z)) z := by
+    have hd
+        : ∀ᶠ t in 𝓝[>] (0 : ℝ), ∀ z ∈ K',
+          fderiv ℝ (phT t) z - fderiv ℝ ph z =
+            fderiv ℝ (ReciprocityTheory.AnForm.A.molli ρ t (w t)) z - fderiv ℝ (fun z => q z + ph z) z ∧
+          fderiv ℝ (fderiv ℝ (phT t)) z - fderiv ℝ (fderiv ℝ ph) z =
+            fderiv ℝ (fderiv ℝ (ReciprocityTheory.AnForm.A.molli ρ t (w t))) z -
+              fderiv ℝ (fderiv ℝ (fun z => q z + ph z)) z := by
       filter_upwards [self_mem_nhdsWithin, hsmall] with t ht htt z hz
       have ht0 : 0 < t := ht
       have hs := hsmooth t ht0 (htt.le.trans (min_le_left _ _))
       have hzO := hK' hz
-      obtain ⟨a1, a2⟩ := fderiv_add_and_second_fderiv_add hO (hqs.mono Set.diff_subset) (hs.mono Set.diff_subset) hzO
-      obtain ⟨b1, b2⟩ := fderiv_add_and_second_fderiv_add hO (hqs.mono Set.diff_subset) (hph.mono hOsub) hzO
+      obtain ⟨a1, a2⟩ :=
+        fderiv_add_and_second_fderiv_add hO (hqs.mono Set.diff_subset) (hs.mono Set.diff_subset) hzO
+      obtain ⟨b1, b2⟩ :=
+        fderiv_add_and_second_fderiv_add hO (hqs.mono Set.diff_subset) (hph.mono hOsub) hzO
       rw [hgF t, a1, a2, b1, b2]
       constructor <;> abel
-    refine ⟨oc_tuo h1 ?_, oc_tuo h2 (hd.mono fun t ht z hz => (ht z hz).1),
-      oc_tuo h3 (hd.mono fun t ht z hz => (ht z hz).2), M, ?_⟩
+    refine ⟨
+      oc_tuo h1 ?_,
+      oc_tuo h2 (hd.mono fun t ht z hz => (ht z hz).1),
+      oc_tuo h3 (hd.mono fun t ht z hz => (ht z hz).2),
+      M,
+      ?_
+    ⟩
     · refine Filter.Eventually.of_forall fun t z _ => ?_
-      rw [hphT]; ring
+      rw [hphT]
+      ring
     · filter_upwards [h4, hd] with t ht htd z hz
       rw [(htd z hz).1]
       exact ht z hz

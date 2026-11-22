@@ -10,25 +10,33 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Formally
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.LatticeTorsion
 
 variable {S : Scheme.{0}}
 
-theorem prop_powObj (P : MorphismProperty Scheme.{0}) [P.IsMultiplicative]
-    [P.IsStableUnderBaseChange] (X : Over S) (hX : P X.hom) : ∀ k, P (Out.powObj X k).hom
+theorem prop_powObj
+    (P : MorphismProperty Scheme.{0}) [P.IsMultiplicative] [P.IsStableUnderBaseChange]
+    (X : Over S) (hX : P X.hom)
+    : ∀ k, P (Out.powObj X k).hom
   | 0 => P.id_mem S
   | k + 1 => by
     change P (pullback.fst X.hom (Out.powObj X k).hom ≫ X.hom)
     exact P.comp_mem _ _ (P.pullback_fst _ _ (prop_powObj P X hX k)) hX
 
-theorem existsUnique_torsion (G : Over S) [GrpObj G] (n : ℕ) {T : Over S} (x : T ⟶ G)
-    (hx : x ^ n = 1) : ∃! y : T ⟶ torsion G n, y ≫ torsion.ι G n = x := by
-  refine ⟨pullback.lift x (toUnit T) ((GrpTangent.comp_mulN x n).trans hx),
-    pullback.lift_fst _ _ _, fun y hy => ?_⟩
+theorem existsUnique_torsion
+    (G : Over S) [GrpObj G] (n : ℕ) {T : Over S} (x : T ⟶ G) (hx : x ^ n = 1)
+    : ∃! y : T ⟶ torsion G n, y ≫ torsion.ι G n = x := by
+  refine ⟨
+    pullback.lift x (toUnit T) ((GrpTangent.comp_mulN x n).trans hx),
+    pullback.lift_fst _ _ _,
+    fun y hy => ?_
+  ⟩
   exact pullback.hom_ext (hy.trans (pullback.lift_fst _ _ _).symm) (toUnit_unique _ _)
 
 theorem torsionι_pow_eq_one (G : Over S) [GrpObj G] (n : ℕ) : torsion.ι G n ^ n = 1 := by
@@ -37,9 +45,12 @@ theorem torsionι_pow_eq_one (G : Over S) [GrpObj G] (n : ℕ) : torsion.ι G n 
   rw [toUnit_unique (pullback.snd _ _) (toUnit _)]
   rfl
 
-theorem eq_prod_zpow {La I A : Type} [AddCommGroup La] [Fintype I] [CommGroup A]
-    (b : Module.Basis I ℤ La) (f : La → A) (hf : ∀ a c, f (a + c) = f a * f c) (a : La) :
-    f a = ∏ i, f (b i) ^ (b.repr a i) := by
+theorem eq_prod_zpow
+    {La I A : Type} [AddCommGroup La] [Fintype I] [CommGroup A]
+    (b : Module.Basis I ℤ La)
+    (f : La → A) (hf : ∀ a c, f (a + c) = f a * f c)
+    (a : La)
+    : f a = ∏ i, f (b i) ^ (b.repr a i) := by
   let φ : Multiplicative La →* A := MonoidHom.mk' (fun x => f x.toAdd) fun x y => hf _ _
   have h : ∀ x, f x = φ (Multiplicative.ofAdd x) := fun _ => rfl
   conv_lhs => rw [← b.sum_repr a]
@@ -49,10 +60,16 @@ end GlobalTheory.LatticeTorsion
 
 namespace GlobalTheory
 
-
 open LatticeTorsion in
-theorem exists_finiteEtale_latticeTorsionHom :
-    ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ) (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La], IsAbelianScheme G → IsUnit (n : Γ(S, ⊤)) → ∃ (Z : Over S) (et : La → (Z ⟶ G)), IsFinite Z.hom ∧ Etale Z.hom ∧ (∀ a c, et (a + c) = et a * et c) ∧ (∀ a, et a ^ n = 1) ∧ ∀ (T : Over S) (et' : La → (T ⟶ G)), (∀ a c, et' (a + c) = et' a * et' c) → (∀ a, et' a ^ n = 1) → ∃! h : T ⟶ Z, ∀ a, h ≫ et a = et' a := by
+theorem exists_finiteEtale_latticeTorsionHom
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ) (La : Type)
+        [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La],
+      IsAbelianScheme G → IsUnit (n : Γ(S, ⊤))
+        → ∃ (Z : Over S) (et : La → (Z ⟶ G)),
+          IsFinite Z.hom ∧ Etale Z.hom ∧ (∀ a c, et (a + c) = et a * et c) ∧ (∀ a, et a ^ n = 1)
+            ∧ ∀ (T : Over S) (et' : La → (T ⟶ G)),
+              (∀ a c, et' (a + c) = et' a * et' c) → (∀ a, et' a ^ n = 1)
+                → ∃! h : T ⟶ Z, ∀ a, h ≫ et a = et' a := by
   intro S G _ _ n La _ _ _ hG hn
   obtain ⟨-, hfin, het⟩ := GrpTangent.finiteEtale_mulN_torsion G hn
   let b := Module.finBasis ℤ La
@@ -68,8 +85,15 @@ theorem exists_finiteEtale_latticeTorsionHom :
     simp only [et, Module.Basis.repr_self]
     rw [Finset.prod_eq_single i (fun j _ hj => by simp [Finsupp.single_eq_of_ne hj]) (by simp)]
     simp
-  refine ⟨Z, et, prop_powObj @IsFinite _ hfin r, prop_powObj @Etale _ het r, hadd, fun a => ?_,
-    fun T et' hadd' hpow' => ?_⟩
+  refine ⟨
+    Z,
+    et,
+    prop_powObj @IsFinite _ hfin r,
+    prop_powObj @Etale _ het r,
+    hadd,
+    fun a => ?_,
+    fun T et' hadd' hpow' => ?_
+  ⟩
   · simp only [et, ← Finset.prod_pow]
     refine Finset.prod_eq_one fun i _ => ?_
     rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hx, one_zpow]

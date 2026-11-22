@@ -9,16 +9,23 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem vorFun_value_le : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O) (g : ℕ)
-    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (n : ℕ) (r : (Fin n → ℤ) →ₗ[ℤ] X)
-    (a : (Fin n → ZMod (1 + 1)) → Fin n → ℤ), Function.Surjective r → (∀ y, redV 1 (a y) = y) →
-    Covers2 (fun y => r (a y)) ∧ ∀ B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ, (∀ y, 0 ≤ B y y) →
-      (2 : ℝ) ^ n * evalR (vorFun O g) B ≤ 2 ^ g * ∑ y, B (r (a y)) (r (a y)) ∧
-      ((2 : ℝ) ^ n * evalR (vorFun O g) B = 2 ^ g * ∑ y, B (r (a y)) (r (a y)) ↔ ∀ y, IsMin2 B (r (a y))) := by
+theorem vorFun_value_le
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O)
+        (g : ℕ) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (n : ℕ)
+        (r : (Fin n → ℤ) →ₗ[ℤ] X) (a : (Fin n → ZMod (1 + 1)) → Fin n → ℤ),
+      Function.Surjective r → (∀ y, redV 1 (a y) = y)
+        → Covers2 (fun y => r (a y))
+          ∧ ∀ B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ,
+            (∀ y, 0 ≤ B y y)
+              → (2 : ℝ) ^ n * evalR (vorFun O g) B ≤ 2 ^ g * ∑ y, B (r (a y)) (r (a y))
+                ∧ ((2 : ℝ) ^ n * evalR (vorFun O g) B = 2 ^ g * ∑ y, B (r (a y)) (r (a y))
+                  ↔ ∀ y, IsMin2 B (r (a y))) := by
   intro O _ _ _ _ bar g X _ _ _ n r a hr ha
   have hfin : Module.Finite ℤ X := Module.Finite.of_surjective r hr
   have hs : ∀ c d : Fin n → ℤ, r (c + (((1 : ℕ) : ℤ) + 1) • d) = r c + (r d + r d) := fun c d => by
@@ -29,10 +36,10 @@ theorem vorFun_value_le : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [Char
     exact ⟨redV 1 b, r d, by rw [← hs, ← hd]⟩
   set Br : (Fin n → ℤ) → (Fin n → ℤ) → ℝ := fun c d => B (r c) (r d) with hBr
   have hval : (2 : ℝ) ^ n * evalR (vorFun O g) B = 2 ^ g * ∑ y, classMin 1 Br y := by
-    have h0 : zeroFun.eval X (fun c d => B c d) = 0 := by
-      rw [zeroFun.eval_eq hr]; rfl
-    have h1 : (fineMean 1).eval X (fun c d => B c d) =
-        (((((1 : ℕ) : ℝ) + 1) ^ n)⁻¹ * ∑ y, classMin 1 Br y - Br 0 0) := by
+    have h0 : zeroFun.eval X (fun c d => B c d) = 0 := by rw [zeroFun.eval_eq hr]; rfl
+    have h1
+        : (fineMean 1).eval X (fun c d => B c d)
+          = (((((1 : ℕ) : ℝ) + 1) ^ n)⁻¹ * ∑ y, classMin 1 Br y - Br 0 0) := by
       rw [(fineMean 1).eval_eq hr]; rfl
     have h2 : Br 0 0 = 0 := by simp [hBr]
     have h3 : ((fineDen g {1} : ℕ) : ℝ) = 2 ^ g := by

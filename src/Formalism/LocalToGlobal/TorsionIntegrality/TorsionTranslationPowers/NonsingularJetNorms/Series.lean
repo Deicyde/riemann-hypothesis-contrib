@@ -14,12 +14,12 @@ namespace Ser
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
-theorem norm_sum_le_one {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, ‖f i‖ ≤ 1) :
-    ‖∑ i ∈ s, f i‖ ≤ 1 :=
+theorem norm_sum_le_one {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, ‖f i‖ ≤ 1)
+    : ‖∑ i ∈ s, f i‖ ≤ 1 :=
   IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one h
 
-theorem norm_sum_lt_one {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, ‖f i‖ < 1) :
-    ‖∑ i ∈ s, f i‖ < 1 := by
+theorem norm_sum_lt_one {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, ‖f i‖ < 1)
+    : ‖∑ i ∈ s, f i‖ < 1 := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -89,8 +89,7 @@ theorem oneUnit_of_mul_eq_one {f g : K⟦X⟧} (hf : OneUnit f) (h : f * g = 1) 
   | _ n ih =>
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · rw [coeff_zero_eq_constantCoeff_apply, h0]; simp
-    · have h1 : coeff n (f * g) = 0 := by
-        rw [h, coeff_one, if_neg hn.ne']
+    · have h1 : coeff n (f * g) = 0 := by rw [h, coeff_one, if_neg hn.ne']
       rw [coeff_mul, ← Finset.add_sum_erase _ _ (show (0, n) ∈ antidiagonal n by simp)] at h1
       simp only [coeff_zero_eq_constantCoeff_apply, hf.1, one_mul] at h1
       rw [eq_neg_of_add_eq_zero_left h1, norm_neg]
@@ -105,7 +104,8 @@ theorem oneUnit_of_mul_eq_one {f g : K⟦X⟧} (hf : OneUnit f) (h : f * g = 1) 
         · simp only; omega
       omega
 
-theorem intS_iff_integral (f : K⟦X⟧) : IntS f ↔ Formalism.DworkPowerSeriesWeights.Integral (ι := Unit) f := by
+theorem intS_iff_integral (f : K⟦X⟧)
+    : IntS f ↔ Formalism.DworkPowerSeriesWeights.Integral (ι := Unit) f := by
   constructor
   · intro h n
     have := h (n ())
@@ -113,8 +113,8 @@ theorem intS_iff_integral (f : K⟦X⟧) : IntS f ↔ Formalism.DworkPowerSeries
   · intro h n
     exact h (Finsupp.single () n)
 
-theorem unitAt_mul {j k : ℕ} {f g : K⟦X⟧} (hf : UnitAt j f) (hg : UnitAt k g) :
-    UnitAt (j + k) (f * g) := by
+theorem unitAt_mul {j k : ℕ} {f g : K⟦X⟧} (hf : UnitAt j f) (hg : UnitAt k g)
+    : UnitAt (j + k) (f * g) := by
   obtain ⟨a, V, ha, hV, rfl⟩ := hf
   obtain ⟨b, W, hb, hW, rfl⟩ := hg
   refine ⟨a * b, V * W, by rw [norm_mul, ha, hb, one_mul], oneUnit_mul hV hW, ?_⟩
@@ -126,8 +126,9 @@ theorem unitAt_pow {k : ℕ} {f : K⟦X⟧} (hf : UnitAt k f) (n : ℕ) : UnitAt
   refine ⟨a ^ n, V ^ n, by rw [norm_pow, ha, one_pow], oneUnit_pow hV n, ?_⟩
   rw [map_pow, pow_mul, mul_pow, mul_pow]
 
-theorem unitAt_of_coeff {k : ℕ} {f : K⟦X⟧} (hf : IntS f) (h0 : ∀ i, i < k → coeff i f = 0)
-    (hk : ‖coeff k f‖ = 1) : UnitAt k f := by
+theorem unitAt_of_coeff
+    {k : ℕ} {f : K⟦X⟧} (hf : IntS f) (h0 : ∀ i, i < k → coeff i f = 0) (hk : ‖coeff k f‖ = 1)
+    : UnitAt k f := by
   obtain ⟨h, rfl⟩ := X_pow_dvd_iff.mpr h0
   have hc : ∀ d, coeff (d + k) (X ^ k * h) = coeff d h := fun d => coeff_X_pow_mul h k d
   have hk' : coeff k (X ^ k * h) = constantCoeff h := by
@@ -147,8 +148,9 @@ theorem unitAt_of_coeff {k : ℕ} {f : K⟦X⟧} (hf : IntS f) (h0 : ∀ i, i < 
       exact hf _
   · have : C (constantCoeff h) * C (constantCoeff h)⁻¹ = (1 : K⟦X⟧) := by
       rw [← map_mul, mul_inv_cancel₀ hne, map_one]
-    calc X ^ k * h = (C (constantCoeff h) * C (constantCoeff h)⁻¹) * (X ^ k * h) := by
-          rw [this, one_mul]
+    calc
+      X ^ k * h
+        = (C (constantCoeff h) * C (constantCoeff h)⁻¹) * (X ^ k * h) := by rw [this, one_mul]
       _ = _ := by ring
 
 theorem unitAt_intS {k : ℕ} {f : K⟦X⟧} (hf : UnitAt k f) : IntS f := by
@@ -163,15 +165,16 @@ theorem unitAt_gaussOne {k : ℕ} {f : K⟦X⟧} (hf : UnitAt k f) : GaussOne f 
   rw [zero_add, coeff_zero_eq_constantCoeff_apply, hV.1] at this
   rw [this, norm_one]
 
-theorem unitAt_C_mul {k : ℕ} {f : K⟦X⟧} {a : K} (ha : ‖a‖ = 1) (hf : UnitAt k f) :
-    UnitAt k (C a * f) := by
+theorem unitAt_C_mul {k : ℕ} {f : K⟦X⟧} {a : K} (ha : ‖a‖ = 1) (hf : UnitAt k f)
+    : UnitAt k (C a * f) := by
   obtain ⟨b, V, hb, hV, rfl⟩ := hf
   refine ⟨a * b, V, by rw [norm_mul, ha, hb, one_mul], hV, ?_⟩
   rw [map_mul]
   ring
 
-theorem rootInt {N : ℕ} {g : K⟦X⟧} (hN : ‖(N : K)‖ = 1) (h0 : constantCoeff g = 1)
-    (hg : IntS (g ^ N)) : IntS g := by
+theorem rootInt
+    {N : ℕ} {g : K⟦X⟧} (hN : ‖(N : K)‖ = 1) (h0 : constantCoeff g = 1) (hg : IntS (g ^ N))
+    : IntS g := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -195,7 +198,8 @@ theorem rootInt {N : ℕ} {g : K⟦X⟧} (hN : ‖(N : K)‖ = 1) (h0 : constant
       have hB0 : constantCoeff B = coeff n g := by
         have h1 : coeff (0 + n) (X ^ n * B) = coeff 0 B := coeff_X_pow_mul B n 0
         rw [← hB, zero_add, map_sub, hA, coeff_mk, if_neg (lt_irrefl n), sub_zero,
-          coeff_zero_eq_constantCoeff_apply] at h1
+            coeff_zero_eq_constantCoeff_apply]
+          at h1
         exact h1.symm
       set S : K⟦X⟧ := ∑ i ∈ range N, g ^ i * A ^ (N - 1 - i) with hS
       have hS0 : constantCoeff S = (N : K) := by
@@ -241,11 +245,13 @@ theorem gaussMul {f g : K⟦X⟧} (hf : GaussOne f) (hg : GaussOne g) : GaussOne
       · simp only; omega
       · simp only; omega
     rcases hcase with hc | hc
-    · calc ‖coeff p.1 f‖ * ‖coeff p.2 g‖ ≤ ‖coeff p.1 f‖ * 1 :=
-            mul_le_mul_of_nonneg_left (hgi _) (norm_nonneg _)
+    · calc
+        ‖coeff p.1 f‖ * ‖coeff p.2 g‖
+          ≤ ‖coeff p.1 f‖ * 1 := mul_le_mul_of_nonneg_left (hgi _) (norm_nonneg _)
         _ < 1 := by rw [mul_one]; exact hilt _ hc
-    · calc ‖coeff p.1 f‖ * ‖coeff p.2 g‖ ≤ 1 * ‖coeff p.2 g‖ :=
-            mul_le_mul_of_nonneg_right (hfi _) (norm_nonneg _)
+    · calc
+        ‖coeff p.1 f‖ * ‖coeff p.2 g‖
+          ≤ 1 * ‖coeff p.2 g‖ := mul_le_mul_of_nonneg_right (hfi _) (norm_nonneg _)
         _ < 1 := by rw [one_mul]; exact hjlt _ hc
   rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hmain]; exact hrest.ne'), hmain]
   exact max_eq_left hrest.le
@@ -254,16 +260,28 @@ end Ser
 
 theorem integrality_rules : IntRules := by
   intro K _ _
-  exact ⟨fun _ ha => Ser.intS_C ha, Ser.intS_X, fun _ _ => Ser.intS_add, fun _ => Ser.intS_neg,
-    fun _ _ => Ser.intS_mul, fun _ n hf => Ser.intS_pow hf n, fun _ _ => Ser.oneUnit_mul,
-    fun _ n hf => Ser.oneUnit_pow hf n, fun _ _ => Ser.oneUnit_of_mul_eq_one,
-    Ser.intS_iff_integral⟩
+  exact ⟨
+    fun _ ha => Ser.intS_C ha,
+    Ser.intS_X,
+    fun _ _ => Ser.intS_add,
+    fun _ => Ser.intS_neg,
+    fun _ _ => Ser.intS_mul,
+    fun _ n hf => Ser.intS_pow hf n,
+    fun _ _ => Ser.oneUnit_mul,
+    fun _ n hf => Ser.oneUnit_pow hf n,
+    fun _ _ => Ser.oneUnit_of_mul_eq_one,
+    Ser.intS_iff_integral
+  ⟩
 
 theorem unit_at_rules : UnitAtRules := by
   intro K _ _
-  exact ⟨fun _ _ _ _ => Ser.unitAt_mul, fun _ n _ hf => Ser.unitAt_pow hf n,
-    fun _ _ => Ser.unitAt_of_coeff, fun _ _ => Ser.unitAt_gaussOne,
-    fun _ _ _ => Ser.unitAt_C_mul⟩
+  exact ⟨
+    fun _ _ _ _ => Ser.unitAt_mul,
+    fun _ n _ hf => Ser.unitAt_pow hf n,
+    fun _ _ => Ser.unitAt_of_coeff,
+    fun _ _ => Ser.unitAt_gaussOne,
+    fun _ _ _ => Ser.unitAt_C_mul
+  ⟩
 
 theorem root_integral_alt : RootInt := by
   intro K _ _ N g hN h0 hg

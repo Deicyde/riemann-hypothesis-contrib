@@ -8,10 +8,11 @@ namespace ReciprocityTheory.GeometryOfNumbersTheory.LinearIndependentExtension
 
 open Matrix
 
-private theorem exists_linearIndependent_append_of_codim {r : ℕ} (w : Fin r → (Fin r → ℚ))
-    (hw : LinearIndependent ℚ w) :
-    ∀ d a (u0 : Fin a → (Fin r → ℚ)), LinearIndependent ℚ u0 → r - a = d → a ≤ r →
-      ∃ m, ∃ f : Fin m → Fin r, a + m = r ∧ LinearIndependent ℚ (Fin.append u0 (w ∘ f)) := by
+private theorem exists_linearIndependent_append_of_codim
+    {r : ℕ} (w : Fin r → (Fin r → ℚ)) (hw : LinearIndependent ℚ w)
+    : ∀ d a (u0 : Fin a → (Fin r → ℚ)),
+      LinearIndependent ℚ u0 → r - a = d → a ≤ r
+        → ∃ m, ∃ f : Fin m → Fin r, a + m = r ∧ LinearIndependent ℚ (Fin.append u0 (w ∘ f)) := by
   intro d
   induction d with
   | zero =>
@@ -25,8 +26,7 @@ private theorem exists_linearIndependent_append_of_codim {r : ℕ} (w : Fin r �
       by_contra hcon
       push_neg at hcon
       haveI : Nonempty (Fin r) := ⟨⟨0, by omega⟩⟩
-      have htop : Submodule.span ℚ (Set.range w) = ⊤ :=
-        hw.span_eq_top_of_card_eq_finrank (by simp)
+      have htop : Submodule.span ℚ (Set.range w) = ⊤ := hw.span_eq_top_of_card_eq_finrank (by simp)
       have hle : Submodule.span ℚ (Set.range w) ≤ Submodule.span ℚ (Set.range u0) :=
         Submodule.span_le.mpr (Set.range_subset_iff.mpr hcon)
       rw [htop, top_le_iff] at hle
@@ -42,9 +42,10 @@ private theorem exists_linearIndependent_append_of_codim {r : ℕ} (w : Fin r �
     rw [Fin.comp_cons, Fin.append_right_cons]
     exact hli.comp _ (Fin.cast_injective _)
 
-theorem exists_append_li {a r : ℕ} (u0 : Fin a → (Fin r → ℚ)) (hu0 : LinearIndependent ℚ u0)
-    (w : Fin r → (Fin r → ℚ)) (hw : LinearIndependent ℚ w) :
-    ∃ m, ∃ f : Fin m → Fin r, a + m = r ∧ LinearIndependent ℚ (Fin.append u0 (w ∘ f)) := by
+theorem exists_append_li
+    {a r : ℕ} (u0 : Fin a → (Fin r → ℚ)) (hu0 : LinearIndependent ℚ u0) (w : Fin r → (Fin r → ℚ))
+    (hw : LinearIndependent ℚ w)
+    : ∃ m, ∃ f : Fin m → Fin r, a + m = r ∧ LinearIndependent ℚ (Fin.append u0 (w ∘ f)) := by
   have har : a ≤ r := by
     have h := hu0.fintype_card_le_finrank
     simpa using h

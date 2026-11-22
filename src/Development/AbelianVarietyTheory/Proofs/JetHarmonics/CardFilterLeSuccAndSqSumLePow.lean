@@ -9,7 +9,12 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem card_filter_le_succ_and_sq_sum_le_pow : ∀ (n kk : ℕ) (bv : ℝ), 1 ≤ kk → kk + 1 ≤ n → (n : ℝ) ≤ bv → (univ.filter fun a : Fin n => kk ≤ a.val + 1).card = n + 1 - kk ∧ (18 / 13 : ℝ) ^ 2 + ((n + 1 - kk : ℕ) : ℝ) * (3 * (6 * bv) ^ (n - kk)) ^ 2 ≤ (6 * bv) ^ (2 * (n + 1 - kk)) := by
+theorem card_filter_le_succ_and_sq_sum_le_pow
+    : ∀ (n kk : ℕ) (bv : ℝ),
+      1 ≤ kk → kk + 1 ≤ n → (n : ℝ) ≤ bv
+        → (univ.filter fun a : Fin n => kk ≤ a.val + 1).card = n + 1 - kk
+          ∧ (18 / 13 : ℝ) ^ 2 + ((n + 1 - kk : ℕ) : ℝ) * (3 * (6 * bv) ^ (n - kk)) ^ 2
+            ≤ (6 * bv) ^ (2 * (n + 1 - kk)) := by
   intro n kk bv h1 h2 h3
   refine ⟨?_, ?_⟩
   · have hlt : kk - 1 < n := by omega

@@ -8,27 +8,35 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.DivSheafA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory IsLocalRing ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory IsLocalRing ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Poinc
 
 namespace GlobalTheory.SpreadIdeal
 
-theorem exists_open_nhds_mem_stalkId (P : Scheme.{0}) (I : P.IdealSheafData) (s : Γ(P, ⊤)) (v : P)
-    (hv : (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v) :
-    ∃ O : P.Opens, v ∈ O ∧ ∀ y ∈ O, (P.presheaf.germ ⊤ y trivial).hom s ∈ FinalTheorems.stalkId I y := by
+theorem exists_open_nhds_mem_stalkId
+    (P : Scheme.{0}) (I : P.IdealSheafData) (s : Γ(P, ⊤)) (v : P)
+    (hv : (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v)
+    : ∃ O : P.Opens,
+      v ∈ O ∧ ∀ y ∈ O, (P.presheaf.germ ⊤ y trivial).hom s ∈ FinalTheorems.stalkId I y := by
   obtain ⟨U, hU, hvU, -⟩ := exists_isAffineOpen_mem_and_subset (x := v) (U := ⊤) trivial
   letI : Algebra Γ(P, U) (P.presheaf.stalk v) := P.presheaf.algebra_section_stalk ⟨v, hvU⟩
   haveI hlocv := hU.isLocalization_stalk ⟨v, hvU⟩
   set t : Γ(P, U) := P.presheaf.map (homOfLE le_top).op s with ht
-  have hgerm : ∀ (y : P) (hy : y ∈ U), (P.presheaf.germ ⊤ y trivial).hom s =
-      (P.presheaf.germ U y hy).hom t := fun y hy => by
+  have hgerm
+      : ∀ (y : P) (hy : y ∈ U),
+        (P.presheaf.germ ⊤ y trivial).hom s = (P.presheaf.germ U y hy).hom t := fun y hy => by
     rw [ht, ← CommRingCat.comp_apply, P.presheaf.germ_res]
   rw [hgerm v hvU, ds_stalkId_eq_map I ⟨U, hU⟩ v hvU] at hv
-  change algebraMap Γ(P, U) (P.presheaf.stalk v) t ∈
-    Ideal.map (algebraMap Γ(P, U) (P.presheaf.stalk v)) (I.ideal ⟨U, hU⟩) at hv
-  obtain ⟨⟨a, w⟩, e⟩ := (IsLocalization.mem_map_algebraMap_iff
-    (hU.primeIdealOf ⟨v, hvU⟩).asIdeal.primeCompl _).mp hv
+  change algebraMap Γ(P, U) (P.presheaf.stalk v) t
+      ∈ Ideal.map (algebraMap Γ(P, U) (P.presheaf.stalk v)) (I.ideal ⟨U, hU⟩)
+    at hv
+  obtain ⟨⟨a, w⟩, e⟩ :=
+    (IsLocalization.mem_map_algebraMap_iff (hU.primeIdealOf ⟨v, hvU⟩).asIdeal.primeCompl _).mp hv
   rw [← map_mul] at e
-  obtain ⟨c, hc⟩ := IsLocalization.exists_of_eq (M := (hU.primeIdealOf ⟨v, hvU⟩).asIdeal.primeCompl) e
+  obtain ⟨c, hc⟩ :=
+    IsLocalization.exists_of_eq (M := (hU.primeIdealOf ⟨v, hvU⟩).asIdeal.primeCompl) e
   set σ : Γ(P, U) := (c : Γ(P, U)) * w with hσ
   have hσt : σ * t ∈ I.ideal ⟨U, hU⟩ := by
     rw [hσ, show (c : Γ(P, U)) * w * t = c * (t * w) by ring, hc]
@@ -48,7 +56,12 @@ end GlobalTheory.SpreadIdeal
 
 namespace GlobalTheory.SpreadIdeal
 
-theorem mem_stalkId_of_closedFibre : ∀ (P : Scheme.{0}) (R : Type) [CommRing R] [IsLocalRing R] (p : P ⟶ Sp R) [UniversallyClosed p] (I : P.IdealSheafData) (s : Γ(P, ⊤)), (∀ v : P, p v = closedPoint R → (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v) → ∀ v : P, (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v := by
+theorem mem_stalkId_of_closedFibre
+    : ∀ (P : Scheme.{0}) (R : Type) [CommRing R] [IsLocalRing R] (p : P ⟶ Sp R)
+        [UniversallyClosed p] (I : P.IdealSheafData) (s : Γ(P, ⊤)),
+      (∀ v : P,
+          p v = closedPoint R → (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v)
+        → ∀ v : P, (P.presheaf.germ ⊤ v trivial).hom s ∈ FinalTheorems.stalkId I v := by
   intro P R _ _ p _ I s hs v
   by_contra hv
   set Z : Set P := {y | (P.presheaf.germ ⊤ y trivial).hom s ∉ FinalTheorems.stalkId I y} with hZ

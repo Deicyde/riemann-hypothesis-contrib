@@ -45,36 +45,36 @@ theorem expG_cont : Continuous C.expG := by
   rw [h]
   have hc : Continuous (fun Z : 𝔸 => exp Z) := by
     first
-      | exact NormedSpace.exp_continuous (𝕂 := ℝ)
-      | exact (NormedSpace.exp_continuous (𝕂 := ℝ) (𝔸 := 𝔸))
-      | exact continuous_iff_continuousAt.2 fun Z => (NormedSpace.exp_analytic (𝕂 := ℝ) Z).continuousAt
-      | exact NormedSpace.exp_continuous
+    | exact NormedSpace.exp_continuous (𝕂 := ℝ)
+    | exact (NormedSpace.exp_continuous (𝕂 := ℝ) (𝔸 := 𝔸))
+    | exact continuous_iff_continuousAt.2 fun Z =>
+        (NormedSpace.exp_analytic (𝕂 := ℝ) Z).continuousAt
+    | exact NormedSpace.exp_continuous
   exact hc.comp continuous_subtype_val
 
-theorem exists_rho : ∃ ρ > 0, ∀ Z : 𝔸, ‖Z‖ < ρ →
-    logA (𝔸 := 𝔸) (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V) := by
-  obtain ⟨ε, hε, h⟩ := Metric.eventually_nhds_iff.1
-    ((logA_exp (𝔸 := 𝔸)).and C.H2)
+theorem exists_rho
+    : ∃ ρ > 0, ∀ Z : 𝔸, ‖Z‖ < ρ → logA (𝔸 := 𝔸) (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V) := by
+  obtain ⟨ε, hε, h⟩ := Metric.eventually_nhds_iff.1 ((logA_exp (𝔸 := 𝔸)).and C.H2)
   exact ⟨ε, hε, fun Z hZ => h (by simpa [dist_zero_right] using hZ)⟩
 
-variable {ρ : ℝ} (hR : ∀ Z : 𝔸, ‖Z‖ < ρ → logA (𝔸 := 𝔸) (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V))
+variable
+  {ρ : ℝ} (hR : ∀ Z : 𝔸, ‖Z‖ < ρ → logA (𝔸 := 𝔸) (exp Z) = Z ∧ ((∃ g, C.mat g = exp Z) → Z ∈ V))
 
 include hR in
 theorem injOn : InjOn C.expG (ball (0 : V) ρ) := by
   intro X hX Y hY hXY
-  have h1 : exp (X : 𝔸) = exp (Y : 𝔸) := by
-    rw [← C.mat_expG, ← C.mat_expG, hXY]
+  have h1 : exp (X : 𝔸) = exp (Y : 𝔸) := by rw [← C.mat_expG, ← C.mat_expG, hXY]
   have hXn : ‖(X : 𝔸)‖ < ρ := by simpa using hX
   have hYn : ‖(Y : 𝔸)‖ < ρ := by simpa using hY
   apply Subtype.ext
   rw [← (hR _ hXn).1, ← (hR _ hYn).1, h1]
 
-variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-  [MeasurableSpace G] [BorelSpace G]
+variable
+  [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] [MeasurableSpace G] [BorelSpace G]
 
 include hR in
-theorem meas_image {s : Set V} (hs : MeasurableSet s) (hsub : s ⊆ ball 0 ρ) :
-    MeasurableSet (C.expG '' s) := by
+theorem meas_image {s : Set V} (hs : MeasurableSet s) (hsub : s ⊆ ball 0 ρ)
+    : MeasurableSet (C.expG '' s) := by
   haveI : T2Space G := C.emb.t2Space
   haveI : CompleteSpace V := FiniteDimensional.complete ℝ V
   exact hs.image_of_continuousOn_injOn C.expG_cont.continuousOn ((C.injOn hR).mono hsub)
@@ -85,14 +85,15 @@ def nu (ρ : ℝ) (μ : Measure G) : Measure V :=
 variable (μ : Measure G)
 
 include hR in
-theorem nu_apply {s : Set V} (hs : MeasurableSet s) :
-    C.nu ρ μ s = μ (C.expG '' (s ∩ ball 0 ρ)) := by
+theorem nu_apply {s : Set V} (hs : MeasurableSet s)
+    : C.nu ρ μ s = μ (C.expG '' (s ∩ ball 0 ρ)) := by
   unfold nu
   rw [Measure.map_apply measurable_subtype_coe hs]
-  have hf : Function.Injective (fun x : ball (0 : V) ρ => C.expG x.1) :=
-    fun a b h => Subtype.ext (C.injOn hR a.2 b.2 h)
-  have hfm : ∀ t : Set (ball (0 : V) ρ), MeasurableSet t →
-      MeasurableSet ((fun x : ball (0 : V) ρ => C.expG x.1) '' t) := by
+  have hf : Function.Injective (fun x : ball (0 : V) ρ => C.expG x.1) := fun a b h =>
+    Subtype.ext (C.injOn hR a.2 b.2 h)
+  have hfm
+      : ∀ t : Set (ball (0 : V) ρ),
+        MeasurableSet t → MeasurableSet ((fun x : ball (0 : V) ρ => C.expG x.1) '' t) := by
     intro t ht
     have h1 : (fun x : ball (0 : V) ρ => C.expG x.1) '' t = C.expG '' (Subtype.val '' t) := by
       rw [Set.image_image]
@@ -114,14 +115,14 @@ include hR in
 theorem nu_finite : IsFiniteMeasure (C.nu ρ μ) := by
   constructor
   rw [C.nu_apply hR μ MeasurableSet.univ, Set.univ_inter]
-  have hK : IsCompact (C.expG '' closedBall (0 : V) ρ) := (isCompact_closedBall 0 ρ).image C.expG_cont
+  have hK : IsCompact (C.expG '' closedBall (0 : V) ρ) :=
+    (isCompact_closedBall 0 ρ).image C.expG_cont
   exact lt_of_le_of_lt (measure_mono (Set.image_mono ball_subset_closedBall)) hK.measure_lt_top
 
 include hR in
 theorem nu_pos (hρ : 0 < ρ) (r : ℝ) (hr : 0 < r) : 0 < C.nu ρ μ (closedBall (0 : V) r) := by
   have ht : 0 < min r ρ := lt_min hr hρ
-  have hcont : ContinuousAt (logA (𝔸 := 𝔸)) 1 :=
-    (hasStrict_logA (𝔸 := 𝔸)).hasFDerivAt.continuousAt
+  have hcont : ContinuousAt (logA (𝔸 := 𝔸)) 1 := (hasStrict_logA (𝔸 := 𝔸)).hasFDerivAt.continuousAt
   have hlim : Tendsto (logA (𝔸 := 𝔸)) (𝓝 1) (𝓝 0) := by
     have h := hcont.tendsto
     rwa [logA_one] at h
@@ -152,7 +153,8 @@ theorem nu_pos (hρ : 0 < ρ) (r : ℝ) (hr : 0 < r) : 0 < C.nu ρ μ (closedBal
   exact lt_of_lt_of_le (hUo.measure_pos μ ⟨1, hU1⟩) (measure_mono hsub)
 
 include hR in
-theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ δ > 0, QInv (C.nu ρ μ) ε δ := by
+theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1)
+    : ∃ δ > 0, QInv (C.nu ρ μ) ε δ := by
   obtain ⟨κ, hκ, hd⟩ := distortion (𝔸 := 𝔸) (half_pos hε0)
   refine ⟨min κ ρ / 3, by positivity, ?_⟩
   intro X hX r hr0 hrδ
@@ -205,7 +207,9 @@ theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ 
     have hp : ε / 2 * ‖(Z : 𝔸)‖ ≤ ε / 2 * r := mul_le_mul_of_nonneg_left hZ (by linarith)
     have hq : ε * r ≤ r := by nlinarith [mul_pos hε0 hr0]
     have hYX : ‖F2 ((X : 𝔸), (Z : 𝔸)) - X‖ ≤ (1 + ε) * r := by
-      calc ‖F2 ((X : 𝔸), (Z : 𝔸)) - X‖ ≤ ‖F2 ((X : 𝔸), (Z : 𝔸)) - X - Z‖ + ‖(Z : 𝔸)‖ := by linarith [h1]
+      calc
+        ‖F2 ((X : 𝔸), (Z : 𝔸)) - X‖
+          ≤ ‖F2 ((X : 𝔸), (Z : 𝔸)) - X - Z‖ + ‖(Z : 𝔸)‖ := by linarith [h1]
         _ ≤ ε / 2 * ‖(Z : 𝔸)‖ + r := add_le_add hn hZ
         _ ≤ ε / 2 * r + r := by linarith [hp]
         _ ≤ (1 + ε) * r := by nlinarith [mul_pos hε0 hr0]
@@ -223,18 +227,24 @@ theorem nu_qinv (hρ : 0 < ρ) (ε : ℝ) (hε0 : 0 < ε) (hε1 : ε < 1) : ∃ 
       rw [C.mat_expG]
       exact hex
 
-theorem exists_density (lam : Measure V) [lam.IsAddHaarMeasure] :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ S : ℝ → Set V, (∀ r, MeasurableSet (S r)) →
-      (∀ δ > 0, ∀ᶠ r in 𝓝[>] (0 : ℝ), S r ⊆ ball 0 δ) →
-      (∀ᶠ r in 𝓝[>] (0 : ℝ), lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤) →
-      Tendsto (fun r => μ (C.img (S r)) / lam (S r)) (𝓝[>] 0) (𝓝 c) := by
+theorem exists_density (lam : Measure V) [lam.IsAddHaarMeasure]
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ ∀ S : ℝ → Set V,
+          (∀ r, MeasurableSet (S r)) → (∀ δ > 0, ∀ᶠ r in 𝓝[>] (0 : ℝ), S r ⊆ ball 0 δ)
+            → (∀ᶠ r in 𝓝[>] (0 : ℝ), lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤)
+            → Tendsto (fun r => μ (C.img (S r)) / lam (S r)) (𝓝[>] 0) (𝓝 c) := by
   obtain ⟨ρ, hρ, hR⟩ := C.exists_rho
   haveI := C.nu_finite hR μ
-  obtain ⟨c, hc0, hctop, hup, hdown⟩ := Formalism.BasicNotions.Examples₂.CD.exists_density (nu := C.nu ρ μ) (lam := lam)
-    (fun ε h0 h1 => C.nu_qinv hR μ hρ ε h0 h1) (fun r hr => C.nu_pos hR μ hρ r hr)
+  obtain ⟨c, hc0, hctop, hup, hdown⟩ :=
+    Formalism.BasicNotions.Examples₂.CD.exists_density (nu := C.nu ρ μ) (lam := lam)
+      (fun ε h0 h1 => C.nu_qinv hR μ hρ ε h0 h1)
+      (fun r hr => C.nu_pos hR μ hρ r hr)
   refine ⟨c, hc0, hctop, fun S hS hsmall hlam => ?_⟩
-  have key : ∀ δ > 0, ∀ᶠ r in 𝓝[>] (0 : ℝ),
-      S r ⊆ ball 0 δ ∧ S r ⊆ ball 0 ρ ∧ lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤ := fun δ hδ =>
+  have key
+      : ∀ δ > 0,
+        ∀ᶠ r in 𝓝[>] (0 : ℝ),
+          S r ⊆ ball 0 δ ∧ S r ⊆ ball 0 ρ ∧ lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤ := fun δ hδ =>
     (((hsmall δ hδ).and (hsmall ρ hρ)).and hlam).mono fun r h => ⟨h.1.1, h.1.2, h.2.1, h.2.2⟩
   have heq : ∀ r, S r ⊆ ball 0 ρ → μ (C.img (S r)) = C.nu ρ μ (S r) := by
     intro r hr
@@ -255,14 +265,20 @@ theorem exists_density (lam : Measure V) [lam.IsAddHaarMeasure] :
 
 end Chart
 
-theorem Chart.exists_density' {V : Submodule ℝ 𝔸} {G : Type*} [Group G] [TopologicalSpace G]
+theorem Chart.exists_density'
+    {V : Submodule ℝ 𝔸} {G : Type*} [Group G] [TopologicalSpace G]
     (C : Chart V G) (_hfd : FiniteDimensional ℝ V) (mV : MeasurableSpace V) (_hbV : BorelSpace V)
     (mG : MeasurableSpace G) (_hbG : BorelSpace G) (_hG : IsTopologicalGroup G)
-    (μ : Measure G) (_hμ : μ.IsHaarMeasure) (lam : Measure V) (_hlam : lam.IsAddHaarMeasure) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ S : ℝ → Set V, (∀ r, MeasurableSet (S r)) →
-      (∀ δ > 0, ∀ᶠ r in 𝓝[>] (0 : ℝ), ∀ X ∈ S r, ‖(X : 𝔸)‖ < δ) →
-      (∀ᶠ r in 𝓝[>] (0 : ℝ), lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤) →
-      Tendsto (fun r => μ {g | ∃ X ∈ S r, C.mat g = exp ((X : V) : 𝔸)} / lam (S r)) (𝓝[>] 0) (𝓝 c) := by
+    (μ : Measure G) (_hμ : μ.IsHaarMeasure)
+    (lam : Measure V) (_hlam : lam.IsAddHaarMeasure)
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ ∀ S : ℝ → Set V,
+          (∀ r, MeasurableSet (S r)) → (∀ δ > 0, ∀ᶠ r in 𝓝[>] (0 : ℝ), ∀ X ∈ S r, ‖(X : 𝔸)‖ < δ)
+            → (∀ᶠ r in 𝓝[>] (0 : ℝ), lam (S r) ≠ 0 ∧ lam (S r) ≠ ⊤)
+            → Tendsto
+              (fun r => μ {g | ∃ X ∈ S r, C.mat g = exp ((X : V) : 𝔸)} / lam (S r))
+              (𝓝[>] 0) (𝓝 c) := by
   letI := mV
   letI := mG
   haveI := _hfd

@@ -5,14 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C
 
 theorem UpperTheory.ConvolutionTheory.C.occursIff
-    (K : Type) [Field K] [NumberField K] (n : ℕ)
-    (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
-    (V : Submodule ℂ (LL μ)) (hV : IsSummand μ V) (w : Pl K) (σ : SmIrr (Gw n w)) :
-    Occurs μ V w σ ↔ ∃ f : σ.V →ₗ[ℂ] V, f ≠ 0 ∧ ∀ g x, f (σ.ρ g x) = Dp.locOn hV w g (f x) := by
+    (K : Type) [Field K] [NumberField K]
+    (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+    (V : Submodule ℂ (LL μ)) (hV : IsSummand μ V)
+    (w : Pl K) (σ : SmIrr (Gw n w))
+    : Occurs μ V w σ ↔ ∃ f : σ.V →ₗ[ℂ] V, f ≠ 0 ∧ ∀ g x, f (σ.ρ g x) = Dp.locOn hV w g (f x) := by
   constructor
   · rintro ⟨f, hf0, hfV, hf⟩
     refine ⟨f.codRestrict V hfV, ?_, ?_⟩

@@ -9,7 +9,8 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.SingleLe
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.TaylorLogMetric GlobalTheory.KerStd UpperTheory.G2 Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
+  Formalism.MainNotions.TaylorLogMetric GlobalTheory.KerStd UpperTheory.G2 Classical
 open Formalism.L2.Th1.CM (MaximalUnramifiedExtension)
 open Formalism.L2.Th1.D (OwOK TrDual)
 open Formalism.InvariantFactorPaths.G7 (UnrOK)
@@ -28,7 +29,9 @@ private lemma sum_even {M : Type} [AddCommMonoid M] (i : ℕ) [NeZero i] (F : �
   rw [Formalism.L2.Th1.D.TraceDualSums.sum_zmod (2 * i) (fun k => if k % 2 = 0 then F k else 0),
     Formalism.L2.Th1.D.TraceDualSums.sum_range_even i F, Finset.sum_range]
 
-private noncomputable def gam (σ : K →+* K) (i : ℕ) (pos : Lt → ℕ → Lt) (c : K) (g : Lt → K) (r : Lt) : K :=
+private noncomputable def gam
+    (σ : K →+* K) (i : ℕ) (pos : Lt → ℕ → Lt) (c : K) (g : Lt → K) (r : Lt)
+    : K :=
   ∑ m : Fin i, (σ ^ (2 * m.val)) c * g (pos r (2 * m.val))
 
 private lemma move_even (hp : IsPos i pos) {g : Lt → K} (hg : ∀ z, σ (σ (g z)) = g (pos z 2)) (j : ℕ) (z : Lt) :
@@ -223,35 +226,61 @@ private lemma subst_atLin {p : ℕ} [Fact p.Prime] {ν ι s : Type} [Fintype ν]
 end UpperTheory.EvenLinearSubstitution
 
 open UpperTheory.EvenLinearSubstitution in
-theorem UpperTheory.stdSeries_orbit_coordinate_change_of_odd_inert :
-    ∀ (D : D7) (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (σ : MaximalUnramifiedExtension p →+* MaximalUnramifiedExtension p), UnrOK (MaximalUnramifiedExtension p) p σ → 5 ≤ p → IsResidueClassZero D p →
-    ∀ [NeZero (nP D p)], Odd (nP D p) → ∀ om : Fin (nP D p) → MaximalUnramifiedExtension p,
-    OwOK (2 * nP D p) σ om (fun r => σ^[nP D p] (om r)) → TrDual (2 * nP D p) σ om (fun r => σ^[nP D p] (om r)) →
-    ∀ R : Finset ((Bool × HH D)), (∀ z, ∃! r, r ∈ R ∧ ∃ e : ℕ, posPl D p r e = z) →
-    ∀ (N N' : ℕ) (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) (L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E))
-    (P : D.what₂.Tau → Matrix (Fin N) (Fin N) D.host.E) (P' : D.what₂.Tau → Matrix (Fin N') (Fin N') D.host.E),
-    admitted D N N' L L' → StdBases D lam L P → StdBases D lam L' P' →
-    ∀ (r : ℕ) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E), LocBasis D p (YYl D L L') b → TaylorLogMetric.Orthonormal D b →
-    ∃ γ : Fin r → (({z // z ∈ R} × Fin (nP D p)) × Fin N × Fin N') → MaximalUnramifiedExtension p,
-      (∀ k e, ‖γ k e‖ ≤ 1 ∧ σ (σ (γ k e)) = γ k e) ∧ (∀ e e', ∑ k, σ (γ k e) * γ k e' = if e = e' then 1 else 0) ∧
-      ∀ (c : ℂ_[p]) (G : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p]),
-        (MvPowerSeries.subst (fun v : (Bool × HH D) × Fin N × Fin N' => (MvPowerSeries.C c * MvPowerSeries.X v : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p]))
-          (stdSer D lam (fun _ => 1) P P' G) : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p]) =
-        MvPowerSeries.subst (fun k => (∑ e, MvPowerSeries.C (γ k e : ℂ_[p]) *
-          linS (MaximalUnramifiedExtension p).subtype σ (nP D p) (posPl D p) (σ^[nP D p] (om e.1.2)) e.1.1.1 e.2 : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p]))
-          (MvPowerSeries.subst (fun k : D.what₂.Tau × Fin N' × Fin N =>
-            (∑ i, MvPowerSeries.C (c * lamC lam (embT D k.1 (b i k.2.1 k.2.2))) * MvPowerSeries.X i : MvPowerSeries (Fin r) ℂ_[p])) G :
-            MvPowerSeries (Fin r) ℂ_[p]) := by
+theorem UpperTheory.stdSeries_orbit_coordinate_change_of_odd_inert
+    : ∀ (D : D7) (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
+        (σ : MaximalUnramifiedExtension p →+* MaximalUnramifiedExtension p),
+      UnrOK (MaximalUnramifiedExtension p) p σ → 5 ≤ p → IsResidueClassZero D p
+        → ∀ [NeZero (nP D p)],
+          Odd (nP D p)
+            → ∀ om : Fin (nP D p) → MaximalUnramifiedExtension p,
+              OwOK (2 * nP D p) σ om (fun r => σ^[nP D p] (om r))
+                → TrDual (2 * nP D p) σ om (fun r => σ^[nP D p] (om r))
+                → ∀ R : Finset ((Bool × HH D)),
+                  (∀ z, ∃! r, r ∈ R ∧ ∃ e : ℕ, posPl D p r e = z)
+                    → ∀ (N N' : ℕ) (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+                        (L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E))
+                        (P : D.what₂.Tau → Matrix (Fin N) (Fin N) D.host.E)
+                        (P' : D.what₂.Tau → Matrix (Fin N') (Fin N') D.host.E),
+                      admitted D N N' L L' → StdBases D lam L P → StdBases D lam L' P'
+                        → ∀ (r : ℕ) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E),
+                          LocBasis D p (YYl D L L') b → TaylorLogMetric.Orthonormal D b
+                            → ∃ γ : Fin r → (({z // z ∈ R} × Fin (nP D p)) × Fin N × Fin N')
+                                → MaximalUnramifiedExtension p,
+                              (∀ k e, ‖γ k e‖ ≤ 1 ∧ σ (σ (γ k e)) = γ k e)
+                                ∧ (∀ e e', ∑ k, σ (γ k e) * γ k e' = if e = e' then 1 else 0)
+                                ∧ ∀ (c : ℂ_[p])
+                                    (G : MvPowerSeries (D.what₂.Tau × Fin N' × Fin N) ℂ_[p]),
+                                  (MvPowerSeries.subst
+                                        (fun v : (Bool × HH D) × Fin N × Fin N' =>
+                                          (MvPowerSeries.C c * MvPowerSeries.X v
+                                            : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p]))
+                                        (stdSer D lam (fun _ => 1) P P' G)
+                                      : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p])
+                                    = MvPowerSeries.subst
+                                      (fun k =>
+                                        (∑ e, MvPowerSeries.C (γ k e : ℂ_[p]) *
+                                            linS (MaximalUnramifiedExtension p).subtype σ (nP D p) (posPl D p) (σ^[nP D p] (om e.1.2)) e.1.1.1 e.2
+                                          : MvPowerSeries ((Bool × HH D) × Fin N × Fin N') ℂ_[p]))
+                                      (MvPowerSeries.subst
+                                          (fun k : D.what₂.Tau × Fin N' × Fin N =>
+                                            (∑ i, MvPowerSeries.C (c * lamC lam (embT D k.1 (b i k.2.1 k.2.2))) * MvPowerSeries.X i
+                                              : MvPowerSeries (Fin r) ℂ_[p]))
+                                          G
+                                        : MvPowerSeries (Fin r) ℂ_[p]) := by
   intro D p _ lam σ hσ _ hc _ hi om hOw hTr R hR N N' L L' P P' hA hP hP' r b hb ho
   obtain ⟨g, h, hg, hh, hpair, hint, hlin⟩ :=
-    UpperTheory.exists_frobenius_equivariant_localBasis_coordinates D p lam σ hσ (Or.inl hc) N N' L L' P P' hA hP hP' r b hb ho
+    UpperTheory.exists_frobenius_equivariant_localBasis_coordinates D p lam σ hσ (Or.inl hc) N N' L
+      L' P P' hA hP hP' r b hb ho
   have hp : IsPos (nP D p) (posPl D p) := ⟨posPl_zero D p, posPl_add D p, posPl_period D p⟩
   have hB := bij_even D p hi R hR
   have hg2 : ∀ z a b₀ i, σ (σ (g z a b₀ i)) = g (posPl D p z 2) a b₀ i := fun z a b₀ i => by
     rw [hg, hh, posPl_add]
   have hfix : ∀ ρ, (σ ^ (2 * nP D p)) (om ρ) = om ρ := fun ρ => by
     rw [RingHom.coe_pow]; exact (hOw.2 ρ).1
-  have hd : ∀ ρ ρ', ∑ m : Fin (nP D p), (σ ^ (2 * m.val)) (om ρ * σ^[nP D p] (om ρ')) = if ρ = ρ' then 1 else 0 := by
+  have hd
+      : ∀ ρ ρ',
+        ∑ m : Fin (nP D p), (σ ^ (2 * m.val)) (om ρ * σ^[nP D p] (om ρ'))
+          = if ρ = ρ' then 1 else 0 := by
     intro ρ ρ'
     have h1 := hTr.2 ρ ρ'
     rw [sum_even (nP D p) (fun s => σ^[s] (om ρ * σ^[nP D p] (om ρ')))] at h1
@@ -260,19 +289,31 @@ theorem UpperTheory.stdSeries_orbit_coordinate_change_of_odd_inert :
   have hiso : ∀ (n : ℕ) (x : MaximalUnramifiedExtension p), ‖(σ ^ n) x‖ = ‖x‖ := fun n x => by
     induction n with
     | zero => rfl
-    | succ n ih => rw [pow_succ', RingHom.coe_mul, Function.comp_apply, Formalism.L2.Th1.D.sigmaIsom (MaximalUnramifiedExtension p) p σ hσ, ih]
-  refine ⟨fun k e => gam σ (nP D p) (posPl D p) (om e.1.2) (fun z => g z e.2.1 e.2.2 k) e.1.1.1,
-    fun k e => ⟨?_, gam_fix hp (fun z => hg2 z _ _ _) (hfix _) _⟩, ?_, fun c G => ?_⟩
+    | succ n ih =>
+      rw [pow_succ', RingHom.coe_mul, Function.comp_apply,
+        Formalism.L2.Th1.D.sigmaIsom (MaximalUnramifiedExtension p) p σ hσ, ih]
+  refine ⟨
+    fun k e => gam σ (nP D p) (posPl D p) (om e.1.2) (fun z => g z e.2.1 e.2.2 k) e.1.1.1,
+    fun k e => ⟨?_, gam_fix hp (fun z => hg2 z _ _ _) (hfix _) _⟩,
+    ?_,
+    fun c G => ?_
+  ⟩
   · refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun m _ => ?_
     rw [norm_mul, hiso]
     exact mul_le_one₀ (hOw.1 _).1 (norm_nonneg _) (hint _ _ _ _)
   · rintro ⟨⟨r₁, ρ₁⟩, a₁, b₁⟩ ⟨⟨r₂, ρ₂⟩, a₂, b₂⟩
-    have e1 : ∀ k, σ (gam σ (nP D p) (posPl D p) (om ρ₁) (fun z => g z a₁ b₁ k) r₁.1) =
-        gam σ (nP D p) (posPl D p) ((σ ^ nP D p) (om ρ₁)) (fun z => h z a₁ b₁ k) r₁.1 := fun k =>
-      gam_conj hp hi (fun z => hg z _ _ _) (fun z => hg2 z _ _ _) (hfix _) _
+    have e1
+        : ∀ k,
+          σ (gam σ (nP D p) (posPl D p) (om ρ₁) (fun z => g z a₁ b₁ k) r₁.1)
+            = gam σ (nP D p) (posPl D p) ((σ ^ nP D p) (om ρ₁)) (fun z => h z a₁ b₁ k) r₁.1 :=
+      fun k => gam_conj hp hi (fun z => hg z _ _ _) (fun z => hg2 z _ _ _) (hfix _) _
     simp only [e1]
-    rw [gam_pair hB.1 (g := fun z k => g z a₂ b₂ k) (h := fun z k => h z a₁ b₁ k) (q := a₁ = a₂ ∧ b₁ = b₂)
-      (fun w z => by convert hpair w z a₁ b₁ a₂ b₂), RingHom.coe_pow σ (nP D p), hd]
+    rw [gam_pair hB.1
+        (g := fun z k => g z a₂ b₂ k)
+        (h := fun z k => h z a₁ b₁ k)
+        (q := a₁ = a₂ ∧ b₁ = b₂)
+        (fun w z => by convert hpair w z a₁ b₁ a₂ b₂),
+      RingHom.coe_pow σ (nP D p), hd]
     by_cases h1 : r₁ = r₂ ∧ a₁ = a₂ ∧ b₁ = b₂
     · obtain ⟨rfl, rfl, rfl⟩ := h1
       simp [eq_comm]
@@ -280,10 +321,19 @@ theorem UpperTheory.stdSeries_orbit_coordinate_change_of_odd_inert :
       intro h2
       simp only [Prod.mk.injEq] at h2
       exact h1 ⟨h2.1.1, h2.2⟩
-  · have e1 := fun k => gam_lin (MaximalUnramifiedExtension p).subtype hB (om := om) (oms := fun ρ => σ^[nP D p] (om ρ)) hd
-      (fun z (y : Fin N × Fin N') => g z y.1 y.2 k)
-    refine Eq.trans (subst_atLin _ (fun k i => c * lamC lam (embT D k.1 (b i k.2.1 k.2.2)))
-      (fun i j => (g j.1 j.2.1 j.2.2 i : ℂ_[p])) c (fun k j => ?_) G) ?_
+  · have e1 := fun k =>
+      gam_lin (MaximalUnramifiedExtension p).subtype hB (om := om)
+        (oms := fun ρ => σ^[nP D p] (om ρ))
+        hd
+        (fun z (y : Fin N × Fin N') => g z y.1 y.2 k)
+    refine Eq.trans
+      (subst_atLin _
+        (fun k i => c * lamC lam (embT D k.1 (b i k.2.1 k.2.2)))
+        (fun i j => (g j.1 j.2.1 j.2.2 i : ℂ_[p]))
+        c
+        (fun k j => ?_)
+        G)
+      ?_
     · rw [one_mul, ← hlin k j.1 j.2.1 j.2.2, Finset.sum_mul]
       exact Finset.sum_congr rfl fun i _ => by ring
     · congr 1

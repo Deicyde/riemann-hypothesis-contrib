@@ -4,15 +4,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem frob_ne_one {F F' : Type} [Field F] [Field F'] [Algebra F F'] [Finite F']
-    (s : F' ≃ₐ[F] F') (hp : (Module.finrank F F').Prime) (hs : ∀ z, s z = z ^ Nat.card F) :
-    s ≠ 1 := by
+private theorem frob_ne_one
+    {F F' : Type} [Field F] [Field F'] [Algebra F F'] [Finite F']
+    (s : F' ≃ₐ[F] F')
+    (hp : (Module.finrank F F').Prime) (hs : ∀ z, s z = z ^ Nat.card F)
+    : s ≠ 1 := by
   rintro rfl
   haveI : Finite F := Finite.of_injective (algebraMap F F') (algebraMap F F').injective
   haveI : Fintype F' := Fintype.ofFinite F'
@@ -29,7 +34,8 @@ private theorem frob_ne_one {F F' : Type} [Field F] [Field F'] [Algebra F F'] [F
     simp [IsRoot, ← this]
   have h1 : Nat.card F' ≤ q := by
     rw [Nat.card_eq_fintype_card, ← Finset.card_univ]
-    calc _ ≤ _ := Finset.card_le_card hsub
+    calc
+      _ ≤ _ := Finset.card_le_card hsub
       _ ≤ Multiset.card (X ^ q - X : F'[X]).roots := Multiset.toFinset_card_le _
       _ ≤ (X ^ q - X : F'[X]).natDegree := card_roots' _
       _ = q := hdeg
@@ -37,8 +43,7 @@ private theorem frob_ne_one {F F' : Type} [Field F] [Field F'] [Algebra F F'] [F
   have h2 : q ^ 2 ≤ q ^ Module.finrank F F' := Nat.pow_le_pow_right (by omega) hp.two_le
   nlinarith
 
-theorem UpperTheory.Gal.InertialTypesAlt.killsNil :
-    KillsAll → KillsOn fun a => a.D = [] := by
+theorem UpperTheory.Gal.InertialTypesAlt.killsNil : KillsAll → KillsOn fun a => a.D = [] := by
   intro h F F' _ _ _ _ s hp hs ι θ hθ a hD hok hq
   obtain ⟨q, D, L⟩ := a
   simp only at hD hq

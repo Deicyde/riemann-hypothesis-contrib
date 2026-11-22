@@ -12,12 +12,16 @@ noncomputable section
 
 namespace Formalism.HC
 
-theorem dvd_discr_of_mem_sq (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (h : ∀ P : Ideal (𝓞 E), P.IsPrime → (p : 𝓞 E) ∈ P → (p : 𝓞 E) ∈ P ^ 2) : (p : ℤ) ∣ discr E := by
+theorem dvd_discr_of_mem_sq
+    (E : Type) [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime) (h : ∀ P : Ideal (𝓞 E), P.IsPrime → (p : 𝓞 E) ∈ P → (p : 𝓞 E) ∈ P ^ 2)
+    : (p : ℤ) ∣ discr E := by
   by_contra hd
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
-  have hmax : (span {(p : ℤ)}).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hpz.irreducible
-  obtain ⟨P, hPm, hlo⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) (span {(p : ℤ)})
+  have hmax : (span {(p : ℤ)}).IsMaximal :=
+    PrincipalIdealRing.isMaximal_of_irreducible hpz.irreducible
+  obtain ⟨P, hPm, hlo⟩ :=
+    Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 E) (span {(p : ℤ)})
   have hP := hPm.isPrime
   have hb : span {(p : ℤ)} ≠ ⊥ := by simpa using hp.ne_zero
   have hv : (p : 𝓞 E) ∈ P := by simpa using (Ideal.liesOver_span_iff hP.ne_top hpz).1 hlo
@@ -36,19 +40,24 @@ theorem dvd_discr_of_mem_sq (E : Type) [Field E] [NumberField E] {p : ℕ} (hp :
   rw [hmap, Ideal.span_le]
   simpa using h P hP hv
 
-theorem dvd_discr_of_sqrt (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) {a : E} (ha : a ^ 2 = -(p : E)) :
-    (p : ℤ) ∣ discr E := by
+theorem dvd_discr_of_sqrt
+    (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) {a : E} (ha : a ^ 2 = -(p : E))
+    : (p : ℤ) ∣ discr E := by
   have hi : IsIntegral ℤ a := IsIntegral.of_pow two_pos (ha ▸ (isIntegral_natCast p).neg)
   let b : 𝓞 E := ⟨a, hi⟩
-  have hb : b ^ 2 = -(p : 𝓞 E) := RingOfIntegers.ext (by
-    rw [RingOfIntegers.coe_eq_algebraMap, RingOfIntegers.coe_eq_algebraMap, map_pow, map_neg, map_natCast]; exact ha)
+  have hb : b ^ 2 = -(p : 𝓞 E) :=
+    RingOfIntegers.ext (by
+      rw [RingOfIntegers.coe_eq_algebraMap, RingOfIntegers.coe_eq_algebraMap, map_pow, map_neg,
+        map_natCast]
+      exact ha)
   refine dvd_discr_of_mem_sq E hp fun P hP hv => ?_
   have h1 : b ∈ P := hP.mem_of_pow_mem 2 (hb ▸ P.neg_mem hv)
   have h2 := (P ^ 2).neg_mem (Ideal.pow_mem_pow h1 2)
   rwa [hb, neg_neg] at h2
 
-theorem HostAx.dvd_discr_of_dvd_QS {φ : Frame} (H : HostAx φ) (hE : H.toHostRaw.Exact) {l : ℕ} (hl : l.Prime) (hd : l ∣ H.QS) :
-    (l : ℤ) ∣ discr H.E :=
+theorem HostAx.dvd_discr_of_dvd_QS
+    {φ : Frame} (H : HostAx φ) (hE : H.toHostRaw.Exact) {l : ℕ} (hl : l.Prime) (hd : l ∣ H.QS)
+    : (l : ℤ) ∣ discr H.E :=
   dvd_discr_of_mem_sq H.E hl fun P _ hv => H.mem_sq_of_dvd_QS hE hl hd P hv
 
 end Formalism.HC

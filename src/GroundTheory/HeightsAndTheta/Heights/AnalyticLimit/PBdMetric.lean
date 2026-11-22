@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 noncomputable section
 
-theorem BdMetric.proof (hCC : ChartCont.Statement) (hT : BdTransition.Statement)
-    (hC : BdCocycle.Statement) (hL : LogNormHolo.Statement) (hW : BdWeight.Statement) :
-    BdMetric.Statement := by
+theorem BdMetric.proof
+    (hCC : ChartCont.Statement) (hT : BdTransition.Statement) (hC : BdCocycle.Statement)
+    (hL : LogNormHolo.Statement) (hW : BdWeight.Statement)
+    : BdMetric.Statement := by
   intro X _ _ _ D A R
   choose g hgH hg using fun j k => hT D A R j k
   have hO : ∀ j k, IsOpen (bdDom R j ∩ bdDom R k) := fun j k =>
@@ -23,8 +24,9 @@ theorem BdMetric.proof (hCC : ChartCont.Statement) (hT : BdTransition.Statement)
   have hcoc := hC D A R g hgC fun j k y hy => (hg j k y hy).2
   obtain ⟨w, hwS, hwP, hwE⟩ := hW D A R g hgH (fun j k y hy => (hg j k y hy).1) hcoc
 
-  have hd : ∀ j k, ∀ y ∈ bdDom R j ∩ bdDom R k,
-      Real.log (w j y) / 2 = Real.log ‖g j k y‖ + Real.log (w k y) / 2 := by
+  have hd
+      : ∀ j k, ∀ y ∈ bdDom R j ∩ bdDom R k,
+        Real.log (w j y) / 2 = Real.log ‖g j k y‖ + Real.log (w k y) / 2 := by
     intro j k y hy
     have hg0 : ‖g j k y‖ ≠ 0 := norm_ne_zero_iff.mpr (hg j k y hy).1
     rw [hwE j k y hy, Real.log_mul (pow_ne_zero 2 hg0) (hwP k y hy.2).ne', Real.log_pow]

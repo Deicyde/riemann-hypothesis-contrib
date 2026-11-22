@@ -18,9 +18,13 @@ open scoped IntermediateField
 
 namespace GlobalTheory.WeberSplit
 
-theorem isCyclotomic_of_root {k K : Type} [Field k] [Field K] [Algebra k K] (h2 : Module.finrank k K = 2) {n : ℕ}
-    [NeZero n] (hirr : Irreducible (cyclotomic n k))
-    (hn : n.totient = 2) {ζ : K} (hζ : IsPrimitiveRoot ζ n) : IsCyclotomicExtension {n} k K := by
+theorem isCyclotomic_of_root
+    {k K : Type} [Field k] [Field K] [Algebra k K]
+    (h2 : Module.finrank k K = 2)
+    {n : ℕ} [NeZero n]
+    (hirr : Irreducible (cyclotomic n k)) (hn : n.totient = 2)
+    {ζ : K} (hζ : IsPrimitiveRoot ζ n)
+    : IsCyclotomicExtension {n} k K := by
   haveI : NeZero ((n : ℕ) : K) := hζ.neZero'
   haveI : NeZero ((n : ℕ) : k) := ⟨fun h => NeZero.ne ((n : ℕ) : K) (by rw [← map_natCast (algebraMap k K), h, map_zero])⟩
   haveI : FiniteDimensional k K := Module.finite_of_finrank_eq_succ h2
@@ -29,7 +33,8 @@ theorem isCyclotomic_of_root {k K : Type} [Field k] [Field K] [Algebra k K] (h2 
   have hfr : Module.finrank k k⟮ζ⟯ = 2 := by
     rw [IntermediateField.adjoin.finrank hint, ← hmin, natDegree_cyclotomic, hn]
   have htop : k⟮ζ⟯ = ⊤ :=
-    IntermediateField.eq_of_le_of_finrank_eq le_top (by rw [hfr, IntermediateField.finrank_top', h2])
+    IntermediateField.eq_of_le_of_finrank_eq le_top
+      (by rw [hfr, IntermediateField.finrank_top', h2])
   have h1 : Algebra.adjoin k {ζ} = ⊤ := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic, htop,
       IntermediateField.top_toSubalgebra]
@@ -43,17 +48,23 @@ theorem isCyclotomic_of_root {k K : Type} [Field k] [Field K] [Algebra k K] (h2 
 
 section Lattice
 
-variable (K : IntermediateField ℚ ℂ) [NumberField K] (h2 : Module.finrank ℚ K = 2) (L : PeriodPair)
-  (hL : ∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z)
-
+variable
+  (K : IntermediateField ℚ ℂ) [NumberField K]
+  (h2 : Module.finrank ℚ K = 2)
+  (L : PeriodPair) (hL : ∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z)
 
 include hL in
-theorem mem_of_invariant (m : ℂ) (hm0 : m ≠ 0) (e2 : (m ^ 4)⁻¹ * L.g₂ = L.g₂) (e3 : (m ^ 6)⁻¹ * L.g₃ = L.g₃) :
-    ∃ a : K, (a : ℂ) = m := by
-  have hh : GlobalTheory.IsHomothetic m L (GlobalTheory.scalePeriods L m hm0) := GlobalTheory.isHomothetic_scalePeriods L m hm0
-  have h2' : (GlobalTheory.scalePeriods L m hm0).g₂ = L.g₂ := by rw [GlobalTheory.IsHomothetic.g₂_eq hh]; exact e2
-  have h3' : (GlobalTheory.scalePeriods L m hm0).g₃ = L.g₃ := by rw [GlobalTheory.IsHomothetic.g₃_eq hh]; exact e3
-  have hlat : (GlobalTheory.scalePeriods L m hm0).lattice = L.lattice := GlobalTheory.lattice_eq_of_g₂_eq_of_g₃_eq h2' h3'
+theorem mem_of_invariant
+    (m : ℂ) (hm0 : m ≠ 0) (e2 : (m ^ 4)⁻¹ * L.g₂ = L.g₂) (e3 : (m ^ 6)⁻¹ * L.g₃ = L.g₃)
+    : ∃ a : K, (a : ℂ) = m := by
+  have hh : GlobalTheory.IsHomothetic m L (GlobalTheory.scalePeriods L m hm0) :=
+    GlobalTheory.isHomothetic_scalePeriods L m hm0
+  have h2' : (GlobalTheory.scalePeriods L m hm0).g₂ = L.g₂ := by
+    rw [GlobalTheory.IsHomothetic.g₂_eq hh]; exact e2
+  have h3' : (GlobalTheory.scalePeriods L m hm0).g₃ = L.g₃ := by
+    rw [GlobalTheory.IsHomothetic.g₃_eq hh]; exact e3
+  have hlat : (GlobalTheory.scalePeriods L m hm0).lattice = L.lattice :=
+    GlobalTheory.lattice_eq_of_g₂_eq_of_g₃_eq h2' h3'
   have h1 : (1 : ℂ) ∈ L.lattice := (hL 1).2 ⟨1, by simp⟩
   have hm : m ∈ L.lattice := by
     have := (hh 1).2 h1
@@ -69,8 +80,8 @@ theorem g₂_ne_zero (hd : discr K < -4) : L.g₂ ≠ 0 := by
   have hm0 : Complex.exp (2 * Real.pi * Complex.I / (3 : ℕ)) ≠ 0 := Complex.exp_ne_zero _
   have hm6 : Complex.exp (2 * Real.pi * Complex.I / (3 : ℕ)) ^ 6 = 1 := by
     rw [show (6 : ℕ) = 3 * 2 by norm_num, pow_mul, hm.pow_eq_one, one_pow]
-  obtain ⟨a, ha⟩ := mem_of_invariant K L hL _ hm0 (by rw [h0, mul_zero])
-    (by rw [hm6, inv_one, one_mul])
+  obtain ⟨a, ha⟩ :=
+    mem_of_invariant K L hL _ hm0 (by rw [h0, mul_zero]) (by rw [hm6, inv_one, one_mul])
   have haK : IsPrimitiveRoot a 3 := by
     rw [← ha] at hm
     exact IsPrimitiveRoot.coe_submonoidClass_iff.mp hm
@@ -89,8 +100,8 @@ theorem g₃_ne_zero (hd : discr K < -4) : L.g₃ ≠ 0 := by
   have hm : IsPrimitiveRoot (Complex.exp (2 * Real.pi * Complex.I / (4 : ℕ))) 4 :=
     Complex.isPrimitiveRoot_exp 4 (by norm_num)
   have hm0 : Complex.exp (2 * Real.pi * Complex.I / (4 : ℕ)) ≠ 0 := Complex.exp_ne_zero _
-  obtain ⟨a, ha⟩ := mem_of_invariant K L hL _ hm0 (by rw [hm.pow_eq_one, inv_one, one_mul])
-    (by rw [h0, mul_zero])
+  obtain ⟨a, ha⟩ :=
+    mem_of_invariant K L hL _ hm0 (by rw [hm.pow_eq_one, inv_one, one_mul]) (by rw [h0, mul_zero])
   have haK4 : IsPrimitiveRoot a 4 := by
     rw [← ha] at hm
     exact IsPrimitiveRoot.coe_submonoidClass_iff.mp hm
@@ -109,8 +120,9 @@ theorem invariant_isAlgebraic : IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 *
   obtain ⟨a, τ, ha, hlat⟩ := (GlobalTheory.weierstrass_uniformisation.2.2.1 L).1
   have hj := GlobalTheory.g₂_cube_div_eq_modularJ ha hlat
   have hΔ := GlobalTheory.g₂_cube_sub_g₃_sq_ne_zero L
-  have hstab : ∀ α : 𝓞 K, ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1},
-      (algebraMap K ℂ) (α : K) * x ∈ Submodule.span ℤ {(τ : ℂ), 1} := by
+  have hstab
+      : ∀ α : 𝓞 K, ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1},
+        (algebraMap K ℂ) (α : K) * x ∈ Submodule.span ℤ {(τ : ℂ), 1} := by
     intro α x hx
     rw [Submodule.mem_span_pair] at hx ⊢
     obtain ⟨c, d, rfl⟩ := hx
@@ -128,7 +140,9 @@ theorem invariant_isAlgebraic : IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 *
     rw [h', e1]
     ring
   have hint := GlobalTheory.isIntegral_modularJ_of_ringOfIntegers (K := K) h2 (algebraMap K ℂ) hstab
-  have e : L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) = GlobalTheory.modularJ τ * algebraMap ℚ ℂ (1728 : ℚ)⁻¹ := by
+  have e
+      : L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)
+        = GlobalTheory.modularJ τ * algebraMap ℚ ℂ (1728 : ℚ)⁻¹ := by
     rw [← hj]
     simp only [map_inv₀, map_ofNat]
     field_simp
@@ -181,26 +195,32 @@ private lemma ncard_primes_over_eq_of_ringEquiv_comp {A B C : Type} [CommRing A]
 
 end Lattice
 
-theorem ncard_eq_of_tower (K M N : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field N] [NumberField N]
-    [Algebra K M] [Algebra M N] [Algebra K N] [IsScalarTower K M N] [IsGalois K N] (𝔭 : HeightOneSpectrum (𝓞 K))
-    (h : ∀ σ : N ≃ₐ[K] N, GlobalTheory.NT.IsFrob N 𝔭 σ → ∀ x : M, σ (algebraMap M N x) = algebraMap M N x) :
-    {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal}.ncard =
-      Module.finrank K M := by
+theorem ncard_eq_of_tower
+    (K M N : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field N] [NumberField N]
+    [Algebra K M] [Algebra M N] [Algebra K N] [IsScalarTower K M N] [IsGalois K N]
+    (𝔭 : HeightOneSpectrum (𝓞 K))
+    (h : ∀ σ : N ≃ₐ[K] N,
+      GlobalTheory.NT.IsFrob N 𝔭 σ → ∀ x : M, σ (algebraMap M N x) = algebraMap M N x)
+    : {Q : HeightOneSpectrum (𝓞 M) | Q.asIdeal.comap (algebraMap (𝓞 K) (𝓞 M)) = 𝔭.asIdeal}.ncard
+      = Module.finrank K M := by
   let φ : M →ₐ[K] N := IsScalarTower.toAlgHom K M N
   let e : M ≃ₐ[K] φ.fieldRange := φ.equivFieldRange
-  have h1 := GlobalTheory.T.ncard_primes_eq_finrank_of_frobenius_fixes K N φ.fieldRange 𝔭 (fun σ hσ x hx => by
-    obtain ⟨y, rfl⟩ := hx
-    exact h σ hσ y)
+  have h1 :=
+    GlobalTheory.T.ncard_primes_eq_finrank_of_frobenius_fixes K N φ.fieldRange 𝔭
+      (fun σ hσ x hx => by
+        obtain ⟨y, rfl⟩ := hx
+        exact h σ hσ y)
   rw [ncard_primes_over_eq_of_ringEquiv_comp (NumberField.RingOfIntegers.mapRingEquiv e.toRingEquiv)
-    (algebraMap (𝓞 K) (𝓞 M)) (algebraMap (𝓞 K) (𝓞 φ.fieldRange)) ?_ 𝔭.asIdeal, h1]
+      (algebraMap (𝓞 K) (𝓞 M)) (algebraMap (𝓞 K) (𝓞 φ.fieldRange)) ?_ 𝔭.asIdeal,
+    h1]
   · exact e.toLinearEquiv.finrank_eq.symm
   · intro a
     apply NumberField.RingOfIntegers.ext
     simp only [NumberField.RingOfIntegers.mapRingEquiv_apply]
     exact e.commutes (a : K)
 
-theorem exists_valuationSubring {N : Type} [Field N] (ι : N →+* ℂ) (P : Ideal (𝓞 N)) (hP : P ≠ ⊤) :
-    ∃ W : ValuationSubring ℂ, ∀ x ∈ P, W.valuation (ι x) < 1 := by
+theorem exists_valuationSubring {N : Type} [Field N] (ι : N →+* ℂ) (P : Ideal (𝓞 N)) (hP : P ≠ ⊤)
+    : ∃ W : ValuationSubring ℂ, ∀ x ∈ P, W.valuation (ι x) < 1 := by
   set f : 𝓞 N →+* ℂ := ι.comp (algebraMap (𝓞 N) N) with hf
   have hinj : Function.Injective f := ι.injective.comp RingOfIntegers.coe_injective
   have hbij : Function.Bijective f.rangeRestrict :=
@@ -213,14 +233,17 @@ theorem exists_valuationSubring {N : Type} [Field N] (ι : N →+* ℂ) (P : Ide
     hW ⟨_, Ideal.mem_map_of_mem _ hx, rfl⟩
   exact (ValuationSubring.mem_nonunits_iff W).mp h1
 
-theorem valuation_le_one_of_isIntegral (W : ValuationSubring ℂ) {x : ℂ} (hx : IsIntegral ℤ x) :
-    W.valuation x ≤ 1 := by
+theorem valuation_le_one_of_isIntegral (W : ValuationSubring ℂ) {x : ℂ} (hx : IsIntegral ℤ x)
+    : W.valuation x ≤ 1 := by
   have h1 : IsIntegral W.toLocalSubring.toSubring x := hx.tower_top
   exact (W.valuation_le_one_iff x).mpr
     (LocalSubring.mem_of_isMax_of_isIntegral W.isMax_toLocalSubring h1)
 
-theorem valuation_intCast_eq_one (W : ValuationSubring ℂ) {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1) {d : ℤ}
-    (hd : ¬ (p : ℤ) ∣ d) : W.valuation d = 1 := by
+theorem valuation_intCast_eq_one
+    (W : ValuationSubring ℂ)
+    {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1)
+    {d : ℤ} (hd : ¬ (p : ℤ) ∣ d)
+    : W.valuation d = 1 := by
   have hle : ∀ m : ℤ, W.valuation (m : ℂ) ≤ 1 := fun m =>
     (W.valuation_le_one_iff _).mpr (intCast_mem W m)
   refine le_antisymm (hle d) (not_lt.mp fun hlt => ?_)
@@ -229,20 +252,26 @@ theorem valuation_intCast_eq_one (W : ValuationSubring ℂ) {p : ℕ} (hp : p.Pr
   have h2 : W.valuation ((u : ℂ) * (p : ℂ) + (w : ℂ) * (d : ℂ)) < 1 := by
     apply Valuation.map_add_lt
     · rw [map_mul]
-      calc W.valuation (u : ℂ) * W.valuation (p : ℂ) ≤ 1 * W.valuation (p : ℂ) := by
-            gcongr; exact hle u
+      calc
+        W.valuation (u : ℂ) * W.valuation (p : ℂ)
+          ≤ 1 * W.valuation (p : ℂ) := by gcongr; exact hle u
         _ < 1 := by rwa [one_mul]
     · rw [map_mul]
-      calc W.valuation (w : ℂ) * W.valuation (d : ℂ) ≤ 1 * W.valuation (d : ℂ) := by
-            gcongr; exact hle w
+      calc
+        W.valuation (w : ℂ) * W.valuation (d : ℂ)
+          ≤ 1 * W.valuation (d : ℂ) := by gcongr; exact hle w
         _ < 1 := by rwa [one_mul]
   rw [h, map_one] at h2
   exact lt_irrefl _ h2
 
-theorem frob_congr {K N : Type} [Field K] [Field N] [Algebra K N] (ι : N →+* ℂ) (σ : N ≃ₐ[K] N)
-    (W : ValuationSubring ℂ) {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1)
-    (hσ : ∀ x : 𝓞 N, W.valuation (ι (σ • x - x ^ p : 𝓞 N)) < 1) {d : ℤ} (hd : ¬ (p : ℤ) ∣ d) {x : N}
-    (hx : IsIntegral ℤ (d • x)) : W.valuation (ι (σ x) - ι x ^ p) < 1 := by
+theorem frob_congr
+    {K N : Type} [Field K] [Field N] [Algebra K N]
+    (ι : N →+* ℂ) (σ : N ≃ₐ[K] N) (W : ValuationSubring ℂ)
+    {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1)
+    (hσ : ∀ x : 𝓞 N, W.valuation (ι (σ • x - x ^ p : 𝓞 N)) < 1)
+    {d : ℤ} (hd : ¬ (p : ℤ) ∣ d)
+    {x : N} (hx : IsIntegral ℤ (d • x))
+    : W.valuation (ι (σ x) - ι x ^ p) < 1 := by
   have hd1 : W.valuation (d : ℂ) = 1 := valuation_intCast_eq_one W hp hW hd
   have hle : ∀ m : ℤ, W.valuation (m : ℂ) ≤ 1 := fun m =>
     (W.valuation_le_one_iff _).mpr (intCast_mem W m)
@@ -261,39 +290,47 @@ theorem frob_congr {K N : Type} [Field K] [Field N] [Algebra K N] (ι : N →+* 
     rw [ZMod.pow_card, sub_self]
   obtain ⟨k, hk⟩ := hdvd
   have hk' : ((d : ℂ) ^ p - d) = (p : ℂ) * k := by exact_mod_cast hk
-  have hsum : (d : ℂ) * (ι (σ x) - ι x ^ p) =
-      ((d : ℂ) * ι (σ x) - ((d : ℂ) * ι x) ^ p) + ((d : ℂ) ^ p - d) * ι x ^ p := by ring
+  have hsum
+      : (d : ℂ) * (ι (σ x) - ι x ^ p)
+        = ((d : ℂ) * ι (σ x) - ((d : ℂ) * ι x) ^ p) + ((d : ℂ) ^ p - d) * ι x ^ p := by
+    ring
   have h2 : W.valuation ((d : ℂ) * (ι (σ x) - ι x ^ p)) < 1 := by
     rw [hsum]
     apply Valuation.map_add_lt _ hy
     rw [hk', map_mul, map_mul, map_pow]
-    calc W.valuation (p : ℂ) * W.valuation (k : ℂ) * W.valuation (ι x) ^ p
-        ≤ W.valuation (p : ℂ) * 1 * 1 := by
-          gcongr
-          · exact hle k
-          · exact pow_le_one' hX p
+    calc
+      W.valuation (p : ℂ) * W.valuation (k : ℂ) * W.valuation (ι x) ^ p
+          ≤ W.valuation (p : ℂ) * 1 * 1 := by
+        gcongr
+        · exact hle k
+        · exact pow_le_one' hX p
       _ < 1 := by rwa [mul_one, mul_one]
   rwa [map_mul, hd1, one_mul] at h2
 
-theorem eq_zero_of_valuation_lt_one {N : Type} [Field N] (ι : N →+* ℂ)
-    (W : ValuationSubring ℂ) {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1) {d : ℤ} (hd : ¬ (p : ℤ) ∣ d) {x : N}
-    (hx : IsIntegral ℤ (d • x⁻¹)) (h : W.valuation (ι x) < 1) : x = 0 := by
+theorem eq_zero_of_valuation_lt_one
+    {N : Type} [Field N]
+    (ι : N →+* ℂ)
+    (W : ValuationSubring ℂ)
+    {p : ℕ} (hp : p.Prime) (hW : W.valuation p < 1)
+    {d : ℤ} (hd : ¬ (p : ℤ) ∣ d)
+    {x : N} (hx : IsIntegral ℤ (d • x⁻¹)) (h : W.valuation (ι x) < 1)
+    : x = 0 := by
   by_contra hx0
   have hd1 : W.valuation (d : ℂ) = 1 := valuation_intCast_eq_one W hp hW hd
   have h1 := valuation_le_one_of_isIntegral W (hx.map ι.toIntAlgHom)
   have e : ι.toIntAlgHom (d • x⁻¹) = (d : ℂ) * (ι x)⁻¹ := by
     simp [RingHom.toIntAlgHom, map_zsmul, zsmul_eq_mul, map_inv₀]
   rw [e, map_mul, hd1, one_mul, map_inv₀] at h1
-  have hne : W.valuation (ι x) ≠ 0 :=
-    (Valuation.ne_zero_iff _).mpr ((map_ne_zero ι).mpr hx0)
-  have h3 : W.valuation (ι x) * (W.valuation (ι x))⁻¹ ≤ W.valuation (ι x) * 1 := by
-    gcongr
+  have hne : W.valuation (ι x) ≠ 0 := (Valuation.ne_zero_iff _).mpr ((map_ne_zero ι).mpr hx0)
+  have h3 : W.valuation (ι x) * (W.valuation (ι x))⁻¹ ≤ W.valuation (ι x) * 1 := by gcongr
   rw [mul_inv_cancel₀ hne, mul_one] at h3
   exact absurd h (not_lt.mpr h3)
 
-theorem exists_isGalois (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] [Algebra M ℂ] :
-    ∃ (N : Type) (_ : Field N) (_ : NumberField N) (_ : Algebra K N) (_ : Algebra M N),
-      IsScalarTower K M N ∧ IsGalois K N ∧ ∃ ι : N →+* ℂ, ∀ x : M, ι (algebraMap M N x) = algebraMap M ℂ x := by
+theorem exists_isGalois
+    (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] [Algebra M ℂ]
+    : ∃ (N : Type) (_ : Field N) (_ : NumberField N) (_ : Algebra K N) (_ : Algebra M N),
+      IsScalarTower K M N ∧ IsGalois K N
+        ∧ ∃ ι : N →+* ℂ, ∀ x : M, ι (algebraMap M N x) = algebraMap M ℂ x := by
   letI : Algebra K ℂ := ((algebraMap M ℂ).comp (algebraMap K M)).toAlgebra
   haveI : IsScalarTower K M ℂ := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   obtain ⟨α, hα⟩ := Field.exists_primitive_element K M
@@ -312,13 +349,22 @@ theorem exists_isGalois (K M : Type) [Field K] [NumberField K] [Field M] [Number
     rw [Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
   have hle : (⊤ : IntermediateField K M).map φ ≤ N := by
     rw [← hα, IntermediateField.adjoin_map, Set.image_singleton]
-    exact IntermediateField.adjoin_le_iff.mpr
-      (Set.singleton_subset_iff.mpr (IntermediateField.subset_adjoin K _ hroot))
+    exact IntermediateField.adjoin_le_iff.mpr (Set.singleton_subset_iff.mpr
+      (IntermediateField.subset_adjoin K _ hroot))
   have hmem : ∀ x : M, φ x ∈ N := fun x => hle ⟨x, trivial, rfl⟩
   let ψ : M →+* N := (φ : M →+* ℂ).codRestrict N hmem
   letI : Algebra M N := ψ.toAlgebra
   haveI : IsScalarTower K M N := IsScalarTower.of_algebraMap_eq (fun k => Subtype.ext rfl)
-  exact ⟨N, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    (N.val : N →+* ℂ), fun x => rfl⟩
+  exact ⟨
+    N,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    (N.val : N →+* ℂ),
+    fun x => rfl
+  ⟩
 
 end GlobalTheory.WeberSplit

@@ -38,22 +38,27 @@ def Cells : Set G := {x | x ∈ N' ∧ ∃ k ∈ K, x • W = k • (g • W)}
 
 def cellRel : Setoid (Cells W N' K g) where
   r x y := (y : G) * (x : G)⁻¹ ∈ K ⊓ N'
-  iseqv := ⟨fun x => by simp [(K ⊓ N').one_mem], fun {x y} h => by
-      have := (K ⊓ N').inv_mem h; simpa [mul_inv_rev] using this,
-    fun {x y z} h1 h2 => by
-      have := (K ⊓ N').mul_mem h2 h1; simpa [mul_assoc] using this⟩
+  iseqv := ⟨
+    fun x => by simp [(K ⊓ N').one_mem],
+    fun {x y} h => by have := (K ⊓ N').inv_mem h; simpa [mul_inv_rev] using this,
+    fun {x y z} h1 h2 => by have := (K ⊓ N').mul_mem h2 h1; simpa [mul_assoc] using this
+  ⟩
 
 def Hs : Subgroup G := K ⊓ MulAction.stabilizer G (g • W)
 
-def toCell (hD : Data W S N' K π) (k : K) : Cells W N' K g :=
-  ⟨cell π ((k : G) * g), cell_mem W S N' K π hD _, k, k.2, by rw [cell_smul W S N' K π hD, mul_smul]⟩
+def toCell (hD : Data W S N' K π) (k : K) : Cells W N' K g := ⟨
+  cell π ((k : G) * g),
+  cell_mem W S N' K π hD _,
+  k,
+  k.2,
+  by rw [cell_smul W S N' K π hD, mul_smul]
+⟩
 
 theorem toCell_surj (hD : Data W S N' K π) : Function.Surjective (toCell W S N' K π g hD) := by
   rintro ⟨c, hcN, k, hk, hc⟩
   refine ⟨⟨k, hk⟩, Subtype.ext ?_⟩
   show cell π (k * g) = c
-  have hs : (k * g)⁻¹ * c ∈ S := by
-    rw [← hD.stab, mul_smul, hc, ← mul_smul k g W, inv_smul_smul]
+  have hs : (k * g)⁻¹ * c ∈ S := by rw [← hD.stab, mul_smul, hc, ← mul_smul k g W, inv_smul_smul]
   obtain ⟨s, hsS, hc'⟩ : ∃ s ∈ S, c = k * g * s := ⟨_, hs, by group⟩
   have hπc : π c = 1 := (hD.ker c).mp hcN
   have hπ : π (k * g) = s⁻¹ := by

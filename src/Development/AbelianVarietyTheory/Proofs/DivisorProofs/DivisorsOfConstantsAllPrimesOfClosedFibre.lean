@@ -10,7 +10,6 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.VertUnits
 
-
 open GlobalTheory.LocAcyc in
 open CategoryTheory in
 theorem divConstAll_of_divConstLocal : DivConstLocal → DivConstAll := by
@@ -27,8 +26,8 @@ theorem divConstAll_of_divConstLocal : DivConstLocal → DivConstAll := by
   have hunit : ∀ s : p.primeCompl, IsUnit (algebraMap T O s) := by
     intro s
     have hs : C (s : T) ∈ P.primeCompl := s.2
-    have hu := (IsLocalization.map_units (Localization.AtPrime P)
-      (⟨C (s : T), hs⟩ : P.primeCompl)).map φ
+    have hu :=
+      (IsLocalization.map_units (Localization.AtPrime P) (⟨C (s : T), hs⟩ : P.primeCompl)).map φ
     rw [← RingHom.comp_apply, hφ] at hu
     rwa [hTO]
   letI : Algebra T' O := (IsLocalization.lift (M := p.primeCompl) (S := T') hunit).toAlgebra
@@ -85,7 +84,8 @@ theorem divConstAll_of_divConstLocal : DivConstLocal → DivConstAll := by
     refine RingHom.ext fun f => ?_
     change φ (e.symm (algebraMap T[X] _ f)) = _
     rw [AlgEquiv.commutes, ← RingHom.comp_apply, hφ]
-  have hSH' : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ' := by
+  have hSH' : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation
+      φ' := by
     obtain ⟨h1, h2, h3, h4⟩ := hSH
     refine ⟨h1, h2, ?_, ?_⟩
     · refine ⟨fun a ha => ?_⟩

@@ -7,15 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Explic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem factor_products_le_rpow_three_hundred_seventy_seven (x c W Dy k f m d : ℝ) (hx : 1 ≤ x) (hc0 : 0 ≤ c) (hc : c ^ 4 ≤ x)
-    (hW0 : 0 ≤ W) (hW : W ^ 4 ≤ x ^ 330) (hD0 : 0 ≤ Dy) (hD : Dy ≤ x ^ 12)
-    (hk0 : 0 ≤ k) (hk : k ≤ x ^ 5) (hf0 : 0 ≤ f) (hm : 1 ≤ m) (hkf : k * f / m ≤ x ^ 7)
-    (hd : 1 / x ≤ d) :
-    (c * W) ^ 4 * Dy ^ 3 * k * f * x / (m * d) ≤ x ^ 377 ∧ Dy * k / m ≤ x ^ 377 := by
+theorem factor_products_le_rpow_three_hundred_seventy_seven
+    (x c W Dy k f m d : ℝ) (hx : 1 ≤ x) (hc0 : 0 ≤ c) (hc : c ^ 4 ≤ x) (hW0 : 0 ≤ W)
+    (hW : W ^ 4 ≤ x ^ 330) (hD0 : 0 ≤ Dy) (hD : Dy ≤ x ^ 12) (hk0 : 0 ≤ k) (hk : k ≤ x ^ 5)
+    (hf0 : 0 ≤ f) (hm : 1 ≤ m) (hkf : k * f / m ≤ x ^ 7) (hd : 1 / x ≤ d)
+    : (c * W) ^ 4 * Dy ^ 3 * k * f * x / (m * d) ≤ x ^ 377 ∧ Dy * k / m ≤ x ^ 377 := by
   have hx0 : 0 < x := by linarith
   have hm0 : 0 < m := by linarith
   have hd0 : 0 < d := lt_of_lt_of_le (by positivity) hd
@@ -24,17 +25,25 @@ theorem factor_products_le_rpow_three_hundred_seventy_seven (x c W Dy k f m d : 
     rw [div_le_iff₀ hx0] at hd
     linarith
   refine ⟨?_, ?_⟩
-  · calc (c * W) ^ 4 * Dy ^ 3 * k * f * x / (m * d)
+  · calc
+      (c * W) ^ 4 * Dy ^ 3 * k * f * x / (m * d)
         = c ^ 4 * W ^ 4 * Dy ^ 3 * (k * f / m) * x * (1 / d) := by field_simp
       _ ≤ x * x ^ 330 * (x ^ 12) ^ 3 * x ^ 7 * x * x := by gcongr
       _ = x ^ 376 := by ring
       _ ≤ x ^ 377 := pow_le_pow_right₀ hx (by norm_num)
-  · calc Dy * k / m ≤ Dy * k := div_le_self (by positivity) hm
+  · calc
+      Dy * k / m
+        ≤ Dy * k := div_le_self (by positivity) hm
       _ ≤ x ^ 12 * x ^ 5 := by gcongr
       _ = x ^ 17 := by ring
       _ ≤ x ^ 377 := pow_le_pow_right₀ hx (by norm_num)
 
-theorem szRow_TO_lower : SzRow (fun C D L => ((C.T.CP * zBase L ^ C.T.eP) ^ 4 * ((D.R.f * D.R.r.choose 2 : ℕ) : ℝ) ^ 3 * D.R.k * D.R.f * L.sc.x ^ C.T.Cp / ((D.R.m : ℝ) * L.de2) ≤ ((TOv L.sc : ℕ) : ℝ)) ∧ (((D.R.f * D.R.r.choose 2 : ℕ) : ℝ) * D.R.k / D.R.m ≤ ((TOv L.sc : ℕ) : ℝ))) := by
+theorem szRow_TO_lower
+    : SzRow (fun C D L =>
+      ((C.T.CP * zBase L ^ C.T.eP) ^ 4 * ((D.R.f * D.R.r.choose 2 : ℕ) : ℝ) ^ 3 * D.R.k * D.R.f
+            * L.sc.x ^ C.T.Cp / ((D.R.m : ℝ) * L.de2)
+          ≤ ((TOv L.sc : ℕ) : ℝ))
+        ∧ (((D.R.f * D.R.r.choose 2 : ℕ) : ℝ) * D.R.k / D.R.m ≤ ((TOv L.sc : ℕ) : ℝ))) := by
   intro eps he he' C hC
   obtain ⟨x1, hx1⟩ := GlobalTheory.T.explicitRanks_basic_bounds_large_scale eps he he'
   have hCp : C.T.Cp = 1 := hC.2.2.2.2.2.2.2.1
@@ -60,7 +69,7 @@ theorem szRow_TO_lower : SzRow (fun C D L => ((C.T.CP * zBase L ^ C.T.eP) ^ 4 * 
   have hm : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
   have hZ0 : 0 ≤ zBase L := by
     unfold zBase
-    have : (0:ℝ) ≤ L.sc.L := by linarith
+    have : (0 : ℝ) ≤ L.sc.L := by linarith
     positivity
   have hZ' : zBase L ≤ L.sc.x ^ ((687 : ℝ) / 100) := hZ
   set x := L.sc.x with hxdef
@@ -74,7 +83,9 @@ theorem szRow_TO_lower : SzRow (fun C D L => ((C.T.CP * zBase L ^ C.T.eP) ^ 4 * 
     rw [one_div, ← Real.rpow_neg_one]
     exact Real.rpow_le_rpow_of_exponent_le hx1' (by rw [hLe]; linarith)
   have hW : (zBase L ^ (12 : ℕ)) ^ 4 ≤ x ^ 330 := by
-    calc (zBase L ^ (12 : ℕ)) ^ 4 = zBase L ^ 48 := by ring
+    calc
+      (zBase L ^ (12 : ℕ)) ^ 4
+        = zBase L ^ 48 := by ring
       _ ≤ (x ^ ((687 : ℝ) / 100)) ^ 48 := by gcongr
       _ = x ^ ((687 : ℝ) / 100 * ((48 : ℕ) : ℝ)) := (Real.rpow_mul_natCast hx0.le _ _).symm
       _ ≤ x ^ ((330 : ℕ) : ℝ) := Real.rpow_le_rpow_of_exponent_le hx1' (by norm_num)
@@ -83,14 +94,13 @@ theorem szRow_TO_lower : SzRow (fun C D L => ((C.T.CP * zBase L ^ C.T.eP) ^ 4 * 
     have : (D.R.k : ℝ) ≤ D.R.r := by exact_mod_cast hkr
     exact this.trans (by exact_mod_cast hr)
   have hT' : x ^ 377 ≤ ((TOv L.sc : ℕ) : ℝ) := by exact_mod_cast hT
-  obtain ⟨a, b⟩ := factor_products_le_rpow_three_hundred_seventy_seven x C.T.CP (zBase L ^ (12 : ℕ)) ((D.R.f * D.R.r.choose 2 : ℕ) : ℝ)
-    D.R.k D.R.f D.R.m L.de2 hx1' (by linarith) hxP (by positivity) hW (Nat.cast_nonneg _)
-    (by exact_mod_cast hD) (Nat.cast_nonneg _) hk (Nat.cast_nonneg _) (by linarith)
-    (by exact_mod_cast hkf) hd'
+  obtain ⟨a, b⟩ :=
+    factor_products_le_rpow_three_hundred_seventy_seven x C.T.CP (zBase L ^ (12 : ℕ))
+      ((D.R.f * D.R.r.choose 2 : ℕ) : ℝ) D.R.k D.R.f D.R.m L.de2 hx1' (by linarith) hxP
+      (by positivity) hW (Nat.cast_nonneg _) (by exact_mod_cast hD) (Nat.cast_nonneg _) hk
+      (Nat.cast_nonneg _) (by linarith) (by exact_mod_cast hkf) hd'
   refine ⟨?_, b.trans hT'⟩
   rw [hPe, hCp]
-  first
-    | (rw [Real.rpow_one]; exact a.trans hT')
-    | (rw [pow_one]; exact a.trans hT')
+  first | (rw [Real.rpow_one]; exact a.trans hT') | (rw [pow_one]; exact a.trans hT')
 
 end GlobalTheory.EX

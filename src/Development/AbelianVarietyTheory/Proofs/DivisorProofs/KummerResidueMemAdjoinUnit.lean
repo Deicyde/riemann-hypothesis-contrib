@@ -8,19 +8,23 @@ open Polynomial IsLocalRing
 
 namespace GlobalTheory
 
-theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T]
-    [CommRing V] [IsDomain V]
+theorem kummer_residue_mem_adjoin
+    (T V : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [CommRing V] [IsDomain V]
     [IsDiscreteValuationRing V] [Algebra T V] [IsLocalHom (algebraMap T V)]
     (hinj : Function.Injective (algebraMap T V))
-    (α γ : V) (ϖ : T) (m : ℕ) (hϖ : Irreducible ϖ) (hm : 0 < m) (hγ : IsUnit γ)
-    (hα : α ^ m = γ * algebraMap T V ϖ)
-    (hpol : ∀ h : Polynomial T, Polynomial.aeval γ h = 0 ∨
-      ∃ (a : ℕ) (h' c : Polynomial T), IsUnit (Polynomial.aeval γ c) ∧ IsUnit (Polynomial.aeval γ h') ∧
-        Polynomial.aeval γ c * Polynomial.aeval γ h = algebraMap T V ϖ ^ a * Polynomial.aeval γ h')
-    (hgen : ∀ v : V, ∃ f g : Polynomial T, Polynomial.aeval α g ≠ 0 ∧
-      Polynomial.aeval α g * v = Polynomial.aeval α f)
-    (v : V) : IsLocalRing.residue V v ∈
-      IntermediateField.adjoin (IsLocalRing.ResidueField T) {IsLocalRing.residue V γ} := by
+    (α γ : V) (ϖ : T) (m : ℕ)
+    (hϖ : Irreducible ϖ) (hm : 0 < m) (hγ : IsUnit γ) (hα : α ^ m = γ * algebraMap T V ϖ)
+    (hpol : ∀ h : Polynomial T,
+      Polynomial.aeval γ h = 0
+        ∨ ∃ (a : ℕ) (h' c : Polynomial T),
+          IsUnit (Polynomial.aeval γ c) ∧ IsUnit (Polynomial.aeval γ h')
+            ∧ Polynomial.aeval γ c * Polynomial.aeval γ h
+              = algebraMap T V ϖ ^ a * Polynomial.aeval γ h')
+    (hgen : ∀ v : V, ∃ f g : Polynomial T,
+      Polynomial.aeval α g ≠ 0 ∧ Polynomial.aeval α g * v = Polynomial.aeval α f)
+    (v : V)
+    : IsLocalRing.residue V v
+      ∈ IntermediateField.adjoin (IsLocalRing.ResidueField T) {IsLocalRing.residue V γ} := by
   set K := IntermediateField.adjoin (IsLocalRing.ResidueField T) {IsLocalRing.residue V γ} with hK
   have hγK : residue V γ ∈ K := IntermediateField.subset_adjoin _ _ (Set.mem_singleton _)
   have hres : ∀ p : T[X], residue V (aeval γ p) ∈ K := by
@@ -28,11 +32,13 @@ theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDisc
     induction p using Polynomial.induction_on with
     | C a =>
       rw [aeval_C]
-      have : residue V (algebraMap T V a) =
-          algebraMap (ResidueField T) (ResidueField V) (residue T a) :=
+      have : residue V (algebraMap T V a)
+          = algebraMap (ResidueField T) (ResidueField V) (residue T a) :=
         (ResidueField.map_residue _ a).symm
-      rw [this]; exact K.algebraMap_mem _
-    | add p q hp hq => rw [map_add (f := _), map_add (f := _)]; exact K.add_mem hp hq
+      rw [this]
+      exact K.algebraMap_mem _
+    | add p q hp hq =>
+      rw [map_add (f := _), map_add (f := _)]; exact K.add_mem hp hq
     | monomial n a ih =>
       rw [pow_succ, ← mul_assoc, map_mul, aeval_X, map_mul]
       exact K.mul_mem ih hγK
@@ -50,21 +56,29 @@ theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDisc
     intro k hk x
     rw [residue_eq_zero_iff]
     exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_of_mem _ ((mem_maximalIdeal _).2 hαnu) k hk)
-  have hcomb : ∀ (u u' : V) (k : ℕ), 0 < k → IsUnit u → residue V u ∈ K →
-      IsUnit (u + α ^ k * u') ∧ residue V (u + α ^ k * u') ∈ K := by
+  have hcomb
+      : ∀ (u u' : V) (k : ℕ),
+        0 < k → IsUnit u → residue V u ∈ K
+          → IsUnit (u + α ^ k * u') ∧ residue V (u + α ^ k * u') ∈ K := by
     intro u u' k hk hu huK
-    have e : residue V (u + α ^ k * u') = residue V u := by rw [map_add (f := _), hsmall k hk, add_zero]
+    have e : residue V (u + α ^ k * u') = residue V u := by
+      rw [map_add (f := _), hsmall k hk, add_zero]
     refine ⟨?_, e ▸ huK⟩
-    rw [← residue_ne_zero_iff_isUnit, e, residue_ne_zero_iff_isUnit]; exact hu
+    rw [← residue_ne_zero_iff_isUnit, e, residue_ne_zero_iff_isUnit]
+    exact hu
   let Good : Finset ℕ → V → Prop := fun s x =>
     x = 0 ∨ ∃ n u, IsUnit u ∧ residue V u ∈ K ∧ n % m ∈ s ∧ x = α ^ n * u
-  have hdec : ∀ p : T[X], ∃ a : ℕ → T[X],
-      aeval α p = ∑ j ∈ Finset.range m, aeval γ (a j) * α ^ j := by
+  have hdec
+      : ∀ p : T[X], ∃ a : ℕ → T[X], aeval α p = ∑ j ∈ Finset.range m, aeval γ (a j) * α ^ j := by
     intro p
     induction p using Polynomial.induction_on' with
     | add p q hp hq =>
-      obtain ⟨a, ha⟩ := hp; obtain ⟨b, hb⟩ := hq
-      exact ⟨a + b, by simp only [map_add (f := _), ha, hb, Pi.add_apply, add_mul, Finset.sum_add_distrib]⟩
+      obtain ⟨a, ha⟩ := hp
+      obtain ⟨b, hb⟩ := hq
+      exact ⟨
+        a + b,
+        by simp only [map_add (f := _), ha, hb, Pi.add_apply, add_mul, Finset.sum_add_distrib]
+      ⟩
     | monomial n t =>
       refine ⟨fun j => if j = n % m then C t * (C ϖ * X) ^ (n / m) else 0, ?_⟩
       simp only [apply_ite (aeval γ), ite_mul, map_zero, zero_mul, Finset.sum_ite_eq',
@@ -77,21 +91,26 @@ theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDisc
     rcases hpol a with h0 | ⟨b, h', c, hc, hh', hrel⟩
     · left; rw [h0, zero_mul]
     · right
-      refine ⟨m * b + j, ((hγ.unit⁻¹ ^ b * hc.unit⁻¹ : Vˣ) : V) * aeval γ h',
-        (Units.isUnit _).mul hh', ?_, ?_, ?_⟩
+      refine ⟨
+        m * b + j,
+        ((hγ.unit⁻¹ ^ b * hc.unit⁻¹ : Vˣ) : V) * aeval γ h',
+        (Units.isUnit _).mul hh',
+        ?_,
+        ?_,
+        ?_
+      ⟩
       · rw [map_mul, Units.val_mul, map_mul, Units.val_pow_eq_pow_val, map_pow, map_units_inv,
           map_units_inv, IsUnit.unit_spec, IsUnit.unit_spec]
         exact K.mul_mem (K.mul_mem (pow_mem (K.inv_mem hγK) b) (K.inv_mem (hres c))) (hres h')
       · rw [Finset.mem_singleton, Nat.mul_add_mod, Nat.mod_eq_of_lt hj]
-      · have e1 : (γ * ((hγ.unit⁻¹ : Vˣ) : V)) ^ b = 1 := by
-          rw [IsUnit.mul_val_inv hγ, one_pow]
-        have e2 : aeval γ c * ((hc.unit⁻¹ : Vˣ) : V) = 1 := by
-          exact IsUnit.mul_val_inv hc
+      · have e1 : (γ * ((hγ.unit⁻¹ : Vˣ) : V)) ^ b = 1 := by rw [IsUnit.mul_val_inv hγ, one_pow]
+        have e2 : aeval γ c * ((hc.unit⁻¹ : Vˣ) : V) = 1 := by exact IsUnit.mul_val_inv hc
         rw [pow_add, pow_mul, hα, Units.val_mul, Units.val_pow_eq_pow_val]
         linear_combination (-(aeval γ a * α ^ j)) * e2 + (((hc.unit⁻¹ : Vˣ) : V) * α ^ j) * hrel
           + (-(algebraMap T V ϖ ^ b * aeval γ h' * ((hc.unit⁻¹ : Vˣ) : V) * α ^ j)) * e1
-  have hsum : ∀ (a : ℕ → T[X]) (s : Finset ℕ), s ⊆ Finset.range m →
-      Good s (∑ j ∈ s, aeval γ (a j) * α ^ j) := by
+  have hsum
+      : ∀ (a : ℕ → T[X]) (s : Finset ℕ),
+        s ⊆ Finset.range m → Good s (∑ j ∈ s, aeval γ (a j) * α ^ j) := by
     intro a s
     induction s using Finset.induction_on with
     | empty => intro _; left; simp
@@ -107,7 +126,8 @@ theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDisc
         · right; exact ⟨n', u', hu', hu'K, Finset.mem_insert_of_mem hn', he'⟩
       · rw [Finset.mem_singleton] at hn
         rcases ih' with h | ⟨n', u', hu', hu'K, hn', he'⟩
-        · right; rw [h, add_zero]
+        · right
+          rw [h, add_zero]
           exact ⟨n, u, hu, huK, hn ▸ Finset.mem_insert_self _ _, he⟩
         · right
           have hne : n ≠ n' := by rintro rfl; exact hjs (hn ▸ hn')
@@ -152,9 +172,9 @@ theorem kummer_residue_mem_adjoin (T V : Type) [CommRing T] [IsDomain T] [IsDisc
     have huv : u * v = u' := mul_left_cancel₀ (pow_ne_zero n hα0) (by rw [← mul_assoc, hfg])
     have hr : residue V u * residue V v = residue V u' := by rw [← map_mul, huv]
     have hru : residue V u ≠ 0 := (residue_ne_zero_iff_isUnit _).2 hu
-    have : residue V v = residue V u' / residue V u := by
-      rw [← hr]; field_simp
-    rw [this]; exact K.div_mem hu'K huK
+    have : residue V v = residue V u' / residue V u := by rw [← hr]; field_simp
+    rw [this]
+    exact K.div_mem hu'K huK
   · rw [(residue_eq_zero_iff v).2 ((mem_maximalIdeal _).2 hv)]; exact K.zero_mem
 
 end GlobalTheory

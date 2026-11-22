@@ -17,8 +17,9 @@ theorem valLift_of : ValLift := by
     Set.disjoint_left.mp (Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes hq) h hl
   haveI : q.IsPrime := hq.1.1
   let K := AlgebraicClosure (FractionRing (R ⧸ q))
-  let ι : R →+* K := (algebraMap (FractionRing (R ⧸ q)) K).comp
-    ((algebraMap (R ⧸ q) (FractionRing (R ⧸ q))).comp (Ideal.Quotient.mk q))
+  let ι : R →+* K :=
+    (algebraMap (FractionRing (R ⧸ q)) K).comp
+      ((algebraMap (R ⧸ q) (FractionRing (R ⧸ q))).comp (Ideal.Quotient.mk q))
   have hι : ∀ r, ι r = 0 ↔ r ∈ q := by
     intro r
     constructor
@@ -53,7 +54,9 @@ theorem valLift_of : ValLift := by
       by_contra hr
       exact h ((IsLocalization.map_units (Localization.AtPrime 𝔭) (⟨r, hr⟩ : 𝔭.primeCompl)).map ψ')
     · intro hr hu
-      have hxm : algebraMap R (Localization.AtPrime 𝔭) r ∈ IsLocalRing.maximalIdeal (Localization.AtPrime 𝔭) :=
+      have hxm
+          : algebraMap R (Localization.AtPrime 𝔭) r
+            ∈ IsLocalRing.maximalIdeal (Localization.AtPrime 𝔭) :=
         (IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime 𝔭) 𝔭 r).mpr hr
       let y : (LocalSubring.range φ).toSubring :=
         ⟨φ (algebraMap R (Localization.AtPrime 𝔭) r), hmemL _⟩

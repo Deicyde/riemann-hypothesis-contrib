@@ -92,39 +92,50 @@ private lemma A_sum (W : WPres O X R) (g : MvPowerSeries W.σ O) (hx : W.π g �
 
 end
 
-theorem UpperTheory.V.Alg.ker_pow :
-    ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (W : WPres O X R) (h : W.HasOrigin) (n : ℕ),
-      (RingHom.ker (W.origin h) ^ n).comap W.A.val = RingHom.ker (W.originA h) ^ n ∧ ∀ x : R, ∃ y : W.A, x - y ∈ RingHom.ker (W.origin h) ^ n := by
+theorem UpperTheory.V.Alg.ker_pow
+    : ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X]
+        [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (W : WPres O X R) (h : W.HasOrigin)
+        (n : ℕ),
+      (RingHom.ker (W.origin h) ^ n).comap W.A.val = RingHom.ker (W.originA h) ^ n
+        ∧ ∀ x : R, ∃ y : W.A, x - y ∈ RingHom.ker (W.origin h) ^ n := by
   intro O R _ _ _ X _ _ _ _ W h n
   classical
   refine ⟨le_antisymm (fun x hx => ?_) ?_, fun x => ?_⟩
   · obtain ⟨g, hg, hgn⟩ := exists_order W h n _ hx
     have hg' : W.π g = (x : R) := hg
     obtain ⟨T, hT⟩ := A_sum W g (hg' ▸ x.2)
-    have hx' : x = ∑ j ∈ T, (⟨W.π (wcomp O W.wt j g), W.part_le_A ⟨_, wcomp_mem O W.wt j g, rfl⟩⟩ : W.A) := by
-      apply Subtype.ext
-      rw [← hg', hT]
-      simp
+    have hx'
+        : x
+          = ∑ j ∈ T, (⟨W.π (wcomp O W.wt j g), W.part_le_A ⟨_, wcomp_mem O W.wt j g, rfl⟩⟩ : W.A) :=
+      by
+        apply Subtype.ext
+        rw [← hg', hT]
+        simp
     rw [hx']
     refine Ideal.sum_mem _ fun j _ => ?_
-    obtain ⟨μ, hμ, hs⟩ := part_span O R X W {m | Finsupp.weight W.wt m = j ∧ n ≤ m.degree} j (fun _ hm => hm.1)
-    obtain ⟨b, hb, hbs⟩ := hs (wcomp O W.wt j g) (fun m hm => by
-      rw [coeff_wcomp]
-      split_ifs with h1
-      · refine coeff_of_lt_order (lt_of_lt_of_le ?_ hgn)
-        have : ¬ n ≤ m.degree := fun h2 => hm ⟨h1, h2⟩
-        exact_mod_cast not_le.1 this
-      · rfl)
-    have h3 : (⟨W.π (wcomp O W.wt j g), W.part_le_A ⟨_, wcomp_mem O W.wt j g, rfl⟩⟩ : W.A) =
-        ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A ⟨_, hb m, rfl⟩⟩ : W.A) * m.prod fun i k => W.zA i ^ k := by
-      apply Subtype.ext
-      show W.π (wcomp O W.wt j g) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hbs, map_sum]
-      simp [π_monomial, Finsupp.prod, WPres.zA]
+    obtain ⟨μ, hμ, hs⟩ :=
+      part_span O R X W {m | Finsupp.weight W.wt m = j ∧ n ≤ m.degree} j (fun _ hm => hm.1)
+    obtain ⟨b, hb, hbs⟩ :=
+      hs (wcomp O W.wt j g) (fun m hm => by
+        rw [coeff_wcomp]
+        split_ifs with h1
+        · refine coeff_of_lt_order (lt_of_lt_of_le ?_ hgn)
+          have : ¬ n ≤ m.degree := fun h2 => hm ⟨h1, h2⟩
+          exact_mod_cast not_le.1 this
+        · rfl)
+    have h3
+        : (⟨W.π (wcomp O W.wt j g), W.part_le_A ⟨_, wcomp_mem O W.wt j g, rfl⟩⟩ : W.A)
+          = ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A ⟨_, hb m, rfl⟩⟩ : W.A) * m.prod fun i k => W.zA i ^ k :=
+      by
+        apply Subtype.ext
+        show W.π (wcomp O W.wt j g) = _
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [hbs, map_sum]
+        simp [π_monomial, Finsupp.prod, WPres.zA]
     rw [h3]
-    exact Ideal.sum_mem _ fun m hm => Ideal.mul_mem_left _ _
-      (prod_pow_mem (RingHom.ker (W.originA h)) W.zA (fun i => z_mem_ker W h i) m (hμ hm).2)
+    exact Ideal.sum_mem _ fun m hm =>
+      Ideal.mul_mem_left _ _
+        (prod_pow_mem (RingHom.ker (W.originA h)) W.zA (fun i => z_mem_ker W h i) m (hμ hm).2)
   · exact Ideal.le_comap_pow (K := RingHom.ker (W.origin h)) W.A.val n
   · obtain ⟨f, rfl⟩ := W.surj x
     have hfin : {m : W.σ →₀ ℕ | m.degree < n}.Finite :=
@@ -135,22 +146,28 @@ theorem UpperTheory.V.Alg.ker_pow :
         rw [ht, map_sum]
       exact Subalgebra.sum_mem _ fun m _ => W.part_le_A ⟨_, monomial_mem W.wt m _, rfl⟩
     refine ⟨⟨_, htA⟩, ?_⟩
-    have key : ∃ μ : Finset (W.σ →₀ ℕ), (μ : Set _) ⊆ {m : W.σ →₀ ℕ | n ≤ m.degree} ∧
-        ∀ f : MvPowerSeries W.σ O, (∀ m, m ∉ {m : W.σ →₀ ℕ | n ≤ m.degree} → coeff m f = 0) →
-        ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, (∀ m, b m ∈ wtPart O (fun _ : W.σ => (0 : X)) 0) ∧
-          f = ∑ m ∈ μ, b m * monomial m 1 :=
+    have key
+        : ∃ μ : Finset (W.σ →₀ ℕ),
+          (μ : Set _) ⊆ {m : W.σ →₀ ℕ | n ≤ m.degree}
+            ∧ ∀ f : MvPowerSeries W.σ O,
+              (∀ m, m ∉ {m : W.σ →₀ ℕ | n ≤ m.degree} → coeff m f = 0)
+                → ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O,
+                  (∀ m, b m ∈ wtPart O (fun _ : W.σ => (0 : X)) 0)
+                    ∧ f = ∑ m ∈ μ, b m * monomial m 1 :=
       part_span O (MvPowerSeries W.σ O) X (WPres.free O fun _ : W.σ => (0 : X))
-        {m : W.σ →₀ ℕ | n ≤ m.degree} 0 (fun (m : W.σ →₀ ℕ) _ => by
+        {m : W.σ →₀ ℕ | n ≤ m.degree} 0
+        (fun (m : W.σ →₀ ℕ) _ => by
           show Finsupp.weight (fun _ : W.σ => (0 : X)) m = 0
           simp [Finsupp.weight_apply, Finsupp.sum])
     obtain ⟨μ, hμ, hs⟩ := key
-    obtain ⟨b, -, hbs'⟩ := hs (f - t) (fun m hm => by
-      have hm0 : m.degree < n := not_le.1 hm
-      have hm' : m ∈ hfin.toFinset := hfin.mem_toFinset.2 hm0
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, ht, map_sum]
-      simp only [coeff_monomial]
-      rw [Finset.sum_ite_eq, if_pos hm', sub_self])
+    obtain ⟨b, -, hbs'⟩ :=
+      hs (f - t) (fun m hm => by
+        have hm0 : m.degree < n := not_le.1 hm
+        have hm' : m ∈ hfin.toFinset := hfin.mem_toFinset.2 hm0
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sub, ht, map_sum]
+        simp only [coeff_monomial]
+        rw [Finset.sum_ite_eq, if_pos hm', sub_self])
     show W.π f - W.π t ∈ _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_sub, hbs', map_sum]

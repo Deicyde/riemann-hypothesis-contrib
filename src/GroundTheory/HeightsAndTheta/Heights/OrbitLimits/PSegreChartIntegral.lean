@@ -17,33 +17,41 @@ noncomputable section
 namespace GroundTheory.Heights₂.Heights
 
 open Filter Topology
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing HermLine IsSmoothHerm IsArithVar IsGoodProj IsSheet ptsIntegral
-  ptsIntegralAt sheetDensity fibre maDensity mixedDisc cxHessian pot segre mcPts goodProjExists)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing HermLine IsSmoothHerm IsArithVar IsGoodProj IsSheet ptsIntegral ptsIntegralAt sheetDensity
+    fibre maDensity mixedDisc cxHessian pot segre mcPts goodProjExists)
 
-theorem maDensity_eq_zero_of_eventuallyEq_zero {D : ℕ} (φ : Fin (D + 1) → (Fin (D + 1) → ℂ) → ℝ)
-    (y : Fin (D + 1) → ℂ) (h : φ 0 =ᶠ[𝓝 y] 0) : maDensity φ y = 0 := by
+theorem maDensity_eq_zero_of_eventuallyEq_zero
+    {D : ℕ} (φ : Fin (D + 1) → (Fin (D + 1) → ℂ) → ℝ) (y : Fin (D + 1) → ℂ) (h : φ 0 =ᶠ[𝓝 y] 0)
+    : maDensity φ y = 0 := by
   have hH : fderiv ℝ (fderiv ℝ (φ 0)) y = 0 := by
     rw [(h.fderiv (𝕜 := ℝ)).fderiv_eq]
     simp
   have hC : cxHessian (φ 0) y = 0 := by
     ext a b
     simp [cxHessian, hH]
-  have hU : (fun k => cxHessian (φ k) y) =
-      Function.update (fun k => cxHessian (φ k) y) 0 ((0 : ℂ) • (0 : Matrix (Fin (D + 1)) (Fin (D + 1)) ℂ)) := by
+  have hU
+      : (fun k => cxHessian (φ k) y)
+        = Function.update
+          (fun k => cxHessian (φ k) y)
+          0 ((0 : ℂ) • (0 : Matrix (Fin (D + 1)) (Fin (D + 1)) ℂ)) := by
     funext k
     by_cases hk : k = 0
     · subst hk
       simp [hC]
     · simp [Function.update_of_ne hk]
   have hM : mixedDisc (fun k => cxHessian (φ k) y) = 0 := by
-    have hdef : mixedDisc (fun k => cxHessian (φ k) y) = ReciprocityTheory.AnForm.mdisc (fun k => cxHessian (φ k) y) :=
+    have hdef
+        : mixedDisc (fun k => cxHessian (φ k) y)
+          = ReciprocityTheory.AnForm.mdisc (fun k => cxHessian (φ k) y) :=
       rfl
     rw [hdef, hU, ReciprocityTheory.AnForm.A.mdisc_update_smul, zero_mul]
   simp [maDensity, hM]
 
-theorem SegreChartIntegral.proof (hGood : SegreCoordGoodProj.Statement)
-    (hIndep : PtsIntegralProjIndep.Statement) (hChart : PtsIntegralSegreChartProj.Statement) :
-    SegreChartIntegral.Statement := by
+theorem SegreChartIntegral.proof
+    (hGood : SegreCoordGoodProj.Statement) (hIndep : PtsIntegralProjIndep.Statement)
+    (hChart : PtsIntegralSegreChartProj.Statement)
+    : SegreChartIntegral.Statement := by
   classical
   intro K _ _ ι _ P e m σ i L g δ G Φ hP hL hg hδ hsupp hgerm
   have hex : ∃ Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1 + 1) → ℂ), IsGoodProj P Ψ :=

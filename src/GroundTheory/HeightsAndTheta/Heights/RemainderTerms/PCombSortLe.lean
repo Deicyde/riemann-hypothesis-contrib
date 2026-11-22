@@ -23,7 +23,9 @@ theorem CombSortLe.proof : CombSortLe.Statement := by
       exact h j hj
     rw [Fin.card_Iic, Fin.card_Iio] at hcard
     omega
-  calc u (σ k) ≤ u (σ j) := hu hjk
+  calc
+    u (σ k)
+      ≤ u (σ j) := hu hjk
     _ ≤ l (σ j) := hul _
     _ ≤ l k := hl hkj
 

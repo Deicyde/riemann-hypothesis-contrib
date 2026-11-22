@@ -13,10 +13,12 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem ex_add' {n : ℕ} (x y : Wt n) : ex (x + y) = ex x * ex y := (UpperTheory.RealTr.cfBasic n).1 x y
+private theorem ex_add' {n : ℕ} (x y : Wt n) : ex (x + y) = ex x * ex y :=
+  (UpperTheory.RealTr.cfBasic n).1 x y
 
 private theorem ex_zero' {n : ℕ} : ex (0 : Wt n) = 1 := (UpperTheory.RealTr.cfBasic n).2.1
 
@@ -33,8 +35,8 @@ private theorem cf_zero' {n : ℕ} (x : Wt n) : cf (0 : FR n) x = 0 := by
   have := cf_smul' (0 : ℂ) (0 : FR n) x
   simpa using this
 
-private theorem cf_sum' {n : ℕ} {ι : Type} (s : Finset ι) (f : ι → FR n) (x : Wt n) :
-    cf (∑ i ∈ s, f i) x = ∑ i ∈ s, cf (f i) x := by
+private theorem cf_sum' {n : ℕ} {ι : Type} (s : Finset ι) (f : ι → FR n) (x : Wt n)
+    : cf (∑ i ∈ s, f i) x = ∑ i ∈ s, cf (f i) x := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [cf_zero']
@@ -44,8 +46,8 @@ private theorem cf_ex {n : ℕ} (y x : Wt n) : cf (ex y) x = if y = x then 1 els
   classical
   simp [cf, ex, AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
 
-private theorem ex_sum {n : ℕ} {ι : Type} (s : Finset ι) (f : ι → Wt n) :
-    ∏ i ∈ s, ex (f i) = ex (∑ i ∈ s, f i) := by
+private theorem ex_sum {n : ℕ} {ι : Type} (s : Finset ι) (f : ι → Wt n)
+    : ∏ i ∈ s, ex (f i) = ex (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [ex_zero']
@@ -86,16 +88,17 @@ private theorem chR_eq (n : ℕ) : chR n = ∑ B ∈ (posP n).powerset, ex (rhoV
   rw [ex_sum, ← ex_add', wtB_sum, Finset.sum_neg_distrib, sub_eq_add_neg]
 
 private def tw {n : ℕ} (w : Equiv.Perm (Fin n)) : FR n →ₐ[ℂ] FR n :=
-  AddMonoidAlgebra.lift ℂ (FR n) (Wt n)
-    { toFun := fun x => ex (x.toAdd ∘ w)
-      map_one' := ex_zero'
-      map_mul' := fun x y => by rw [← ex_add']; rfl }
+  AddMonoidAlgebra.lift ℂ (FR n) (Wt n) {
+    toFun := fun x => ex (x.toAdd ∘ w)
+    map_one' := ex_zero'
+    map_mul' := fun x y => by rw [← ex_add']; rfl
+  }
 
 private theorem tw_ex {n : ℕ} (w : Equiv.Perm (Fin n)) (y : Wt n) : tw w (ex y) = ex (y ∘ w) := by
   simp [tw, ex, AddMonoidAlgebra.lift_single]
 
-private theorem cf_tw {n : ℕ} (w : Equiv.Perm (Fin n)) (f : FR n) (x : Wt n) :
-    cf (tw w f) (x ∘ w) = cf f x := by
+private theorem cf_tw {n : ℕ} (w : Equiv.Perm (Fin n)) (f : FR n) (x : Wt n)
+    : cf (tw w f) (x ∘ w) = cf f x := by
   induction f using AddMonoidAlgebra.induction_linear with
   | zero => simp [cf_zero']
   | add f g hf hg => rw [map_add (f := _), cf_add', cf_add', hf, hg]
@@ -107,8 +110,8 @@ private theorem cf_tw {n : ℕ} (w : Equiv.Perm (Fin n)) (f : FR n) (x : Wt n) :
 private theorem sg_ne {n : ℕ} (w : Equiv.Perm (Fin n)) : sg w ≠ 0 := by
   rcases Int.units_eq_one_or (Equiv.Perm.sign w) with h | h <;> simp [sg, h]
 
-private theorem tw_asym {n : ℕ} (w : Equiv.Perm (Fin n)) (g : FR n) (hg : ASym g) :
-    tw w g = sg w⁻¹ • g := by
+private theorem tw_asym {n : ℕ} (w : Equiv.Perm (Fin n)) (g : FR n) (hg : ASym g)
+    : tw w g = sg w⁻¹ • g := by
   refine fr_ext _ _ fun x => ?_
   have h1 := cf_tw w g (x ∘ (w⁻¹ : Equiv.Perm (Fin n)))
   have h2 := hg w⁻¹ x
@@ -116,8 +119,9 @@ private theorem tw_asym {n : ℕ} (w : Equiv.Perm (Fin n)) (g : FR n) (hg : ASym
   rw [h3] at h1
   rw [h1, cf_smul', h2]
 
-private theorem sym_of_mul {n : ℕ} (d e h : FR n) (hd : ASym d) (he : ASym e) (hd0 : d ≠ 0)
-    (hm : e = d * h) : Sym h := by
+private theorem sym_of_mul
+    {n : ℕ} (d e h : FR n) (hd : ASym d) (he : ASym e) (hd0 : d ≠ 0) (hm : e = d * h)
+    : Sym h := by
   intro w x
   have h1 : tw w e = tw w d * tw w h := by rw [hm, map_mul]
   rw [tw_asym w e he, tw_asym w d hd, hm, smul_mul_assoc] at h1
@@ -137,14 +141,16 @@ private theorem denom_mul (n : ℕ) : alt ((2 : ℝ) • rhoV n) = alt (rhoV n) 
   have h1 := UpperTheory.RealTr.denom n 1
   simp only [one_smul] at h1
   rw [h2, h1, chR]
-  have e : ex ((2 : ℝ) • rhoV n) = ex (rhoV n) * ex (rhoV n) := by
-    rw [← ex_add', two_smul]
-  have f : ∀ p ∈ posP n, (1 - ex (-((2 : ℝ) • rt p.1 p.2)) : FR n) =
-      (1 - ex (-rt p.1 p.2)) * (1 + ex (-rt p.1 p.2)) := by
+  have e : ex ((2 : ℝ) • rhoV n) = ex (rhoV n) * ex (rhoV n) := by rw [← ex_add', two_smul]
+  have f
+      : ∀ p ∈ posP n,
+        (1 - ex (-((2 : ℝ) • rt p.1 p.2)) : FR n)
+          = (1 - ex (- rt p.1 p.2)) * (1 + ex (- rt p.1 p.2)) := by
     intro p _
-    have : ex (-((2 : ℝ) • rt p.1 p.2)) = ex (-rt p.1 p.2) * ex (-rt p.1 p.2) := by
+    have : ex (-((2 : ℝ) • rt p.1 p.2)) = ex (- rt p.1 p.2) * ex (- rt p.1 p.2) := by
       rw [← ex_add', two_smul, neg_add]
-    rw [this]; ring
+    rw [this]
+    ring
   rw [Finset.prod_congr rfl f, Finset.prod_mul_distrib, e]
   ring
 
@@ -162,14 +168,15 @@ private theorem even_chR (n : ℕ) (x : Wt n) : cf (chR n) (-x) = cf (chR n) x :
       exact Finset.sum_sdiff (Finset.mem_powerset.1 hB)
     have hy : rhoV n - wtB (posP n \ B) = -(rhoV n - wtB B) := by
       have : wtB (posP n \ B) = (2 : ℝ) • rhoV n - wtB B := eq_sub_of_add_eq hs
-      rw [this, two_smul]; abel
+      rw [this, two_smul]
+      abel
     have hi : (rhoV n - wtB B = -x) ↔ (-(rhoV n - wtB B) = x) :=
       ⟨fun e => by rw [e, neg_neg], fun e => by rw [← e, neg_neg]⟩
     rw [hy, cf_ex, cf_ex]
     simp only [hi]
 
-private theorem supp_chR (n : ℕ) (x : Wt n) (h : cf (chR n) x ≠ 0) :
-    ∃ B ⊆ posP n, x = rhoV n - wtB B := by
+private theorem supp_chR (n : ℕ) (x : Wt n) (h : cf (chR n) x ≠ 0)
+    : ∃ B ⊆ posP n, x = rhoV n - wtB B := by
   rw [chR_eq, cf_sum'] at h
   obtain ⟨B, hB, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
   refine ⟨B, Finset.mem_powerset.1 hB, ?_⟩
@@ -179,20 +186,21 @@ private theorem supp_chR (n : ℕ) (x : Wt n) (h : cf (chR n) x ≠ 0) :
 
 private theorem rt_self {n : ℕ} (a : Fin n) : rt a a = 0 := by simp [rt]
 
-private theorem rt_swap {n : ℕ} (a b : Fin n) : rt b a = -rt a b := by simp [rt]
+private theorem rt_swap {n : ℕ} (a b : Fin n) : rt b a = - rt a b := by simp [rt]
 
-private theorem prod_all (n : ℕ) :
-    ∏ a, ∏ b, (1 + ex (rt a b)) = (2 : ℂ) ^ n • (chR n * chR n) := by
+private theorem prod_all (n : ℕ) : ∏ a, ∏ b, (1 + ex (rt a b)) = (2 : ℂ) ^ n • (chR n * chR n) := by
   classical
   set g : Fin n × Fin n → FR n := fun p => 1 + ex (rt p.1 p.2) with hg
-  have h0 : ∏ a, ∏ b, (1 + ex (rt a b)) = ∏ p : Fin n × Fin n, g p := by
-    rw [Fintype.prod_prod_type]
-  have hsplit : ∏ p : Fin n × Fin n, g p =
-      (∏ p ∈ posP n, g p) * ((∏ a : Fin n, g (a, a)) * ∏ p ∈ posP n, g (p.2, p.1)) := by
+  have h0 : ∏ a, ∏ b, (1 + ex (rt a b)) = ∏ p : Fin n × Fin n, g p := by rw [Fintype.prod_prod_type]
+  have hsplit
+      : ∏ p : Fin n × Fin n, g p
+        = (∏ p ∈ posP n, g p) * ((∏ a : Fin n, g (a, a)) * ∏ p ∈ posP n, g (p.2, p.1)) := by
     rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun p : Fin n × Fin n => p.1 < p.2) g]
     congr 1
     rw [← Finset.prod_filter_mul_prod_filter_not
-      (Finset.univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2) (fun p => p.1 = p.2) g]
+      (Finset.univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2)
+      (fun p => p.1 = p.2)
+      g]
     congr 1
     · refine Finset.prod_nbij' (fun p => p.1) (fun a => (a, a)) ?_ ?_ ?_ ?_ ?_
       · intro p _; simp
@@ -217,12 +225,12 @@ private theorem prod_all (n : ℕ) :
       · intro p _; rfl
   have hd : ∏ a : Fin n, g (a, a) = (2 : FR n) ^ n := by
     simp [hg, rt_self, ex_zero', one_add_one_eq_two]
-  have hs : ∀ p ∈ posP n, g (p.2, p.1) = 1 + ex (-rt p.1 p.2) := by
+  have hs : ∀ p ∈ posP n, g (p.2, p.1) = 1 + ex (- rt p.1 p.2) := by
     intro p _
     simp only [hg]
     rw [rt_swap p.1 p.2]
   have hq : ∏ p ∈ posP n, g p = ex ((2 : ℝ) • rhoV n) * ∏ p ∈ posP n, (1 + ex (-rt p.1 p.2)) := by
-    have : ∀ p ∈ posP n, g p = ex (rt p.1 p.2) * (1 + ex (-rt p.1 p.2)) := by
+    have : ∀ p ∈ posP n, g p = ex (rt p.1 p.2) * (1 + ex (- rt p.1 p.2)) := by
       intro p _
       rw [mul_add, mul_one, ← ex_add', add_neg_cancel, ex_zero', add_comm]
     rw [Finset.prod_congr rfl this, Finset.prod_mul_distrib, ex_sum, ← wtB_sum, wtB_pos]
@@ -231,11 +239,14 @@ private theorem prod_all (n : ℕ) :
   simp only [map_pow, map_ofNat]
   ring
 
-theorem UpperTheory.RealTr.chRF :
-    ∀ n : ℕ, alt ((2 : ℝ) • rhoV n) = alt (rhoV n) * chR n ∧ alt (rhoV n) ≠ 0 ∧ chR n ≠ 0 ∧ Sym (chR n) ∧ (∀ x, cf (chR n) (-x) = cf (chR n) x) ∧
-      (∀ x, cf (chR n) x ≠ 0 → ∃ B ⊆ posP n, x = rhoV n - wtB B) ∧
-      ∏ a, ∏ b, (1 + ex (rt a b)) = (2 : ℂ) ^ n • (chR n * chR n) ∧ wtB (posP n) = (2 : ℝ) • rhoV n ∧
-      ∀ B : Finset (Fin n × Fin n), wtB B = ∑ p ∈ B, rt p.1 p.2 := by
+theorem UpperTheory.RealTr.chRF
+    : ∀ n : ℕ,
+      alt ((2 : ℝ) • rhoV n) = alt (rhoV n) * chR n ∧ alt (rhoV n) ≠ 0 ∧ chR n ≠ 0 ∧ Sym (chR n)
+        ∧ (∀ x, cf (chR n) (-x) = cf (chR n) x)
+        ∧ (∀ x, cf (chR n) x ≠ 0 → ∃ B ⊆ posP n, x = rhoV n - wtB B)
+        ∧ ∏ a, ∏ b, (1 + ex (rt a b)) = (2 : ℂ) ^ n • (chR n * chR n)
+        ∧ wtB (posP n) = (2 : ℝ) • rhoV n
+        ∧ ∀ B : Finset (Fin n × Fin n), wtB B = ∑ p ∈ B, rt p.1 p.2 := by
   intro n
   have hρ : StrictAnti (rhoV n) := (UpperTheory.RealTr.rearr n).2.2.1
   have h2ρ : StrictAnti ((2 : ℝ) • rhoV n) := fun a b h => by
@@ -245,7 +256,17 @@ theorem UpperTheory.RealTr.chRF :
   have hA := (UpperTheory.RealTr.cfBasic n).2.2.2.2.2.2.2.2.1
   have hm := denom_mul n
   have hd := alt_ne _ hρ
-  refine ⟨hm, hd, ?_, sym_of_mul _ _ _ (hA _) (hA _) hd hm, even_chR n, supp_chR n, prod_all n, wtB_pos n, wtB_sum⟩
+  refine ⟨
+    hm,
+    hd,
+    ?_,
+    sym_of_mul _ _ _ (hA _) (hA _) hd hm,
+    even_chR n,
+    supp_chR n,
+    prod_all n,
+    wtB_pos n,
+    wtB_sum
+  ⟩
   intro h0
   rw [h0, mul_zero] at hm
   exact alt_ne _ h2ρ hm

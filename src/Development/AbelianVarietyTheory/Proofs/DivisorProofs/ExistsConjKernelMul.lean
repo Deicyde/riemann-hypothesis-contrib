@@ -9,14 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SqrtNegPrime
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory.CMModel
 
-
 open GlobalTheory.ConjPoint PeriodPair in
-theorem exists_conj_kernel_mul : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ), p.Prime → p % 4 = 3 → 3 < p → Datum p F L t → ∀ σ : ℂ ≃+* ℂ, (∀ x ∈ F, σ x = x) → ∃ c : ℕ, ¬ p ∣ c ∧ ∀ k : ℕ, GlobalTheory.ConjPoint.IsConj L L σ ((k : ℂ) * t) ((k : ℂ) * ((c : ℂ) * t)) := by
+theorem exists_conj_kernel_mul
+    : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (L : PeriodPair) (t : ℂ),
+      p.Prime → p % 4 = 3 → 3 < p → Datum p F L t
+        → ∀ σ : ℂ ≃+* ℂ,
+          (∀ x ∈ F, σ x = x)
+            → ∃ c : ℕ,
+              ¬ p ∣ c
+                ∧ ∀ k : ℕ,
+                  GlobalTheory.ConjPoint.IsConj L L σ ((k : ℂ) * t) ((k : ℂ) * ((c : ℂ) * t)) := by
   intro p F L t hp h4 h3 hD σ hσ
   have h₂ : L.g₂ = σ L.g₂ := (hσ _ hD.g₂_mem).symm
   have h₃ : L.g₃ = σ L.g₃ := (hσ _ hD.g₃_mem).symm
@@ -46,8 +54,8 @@ theorem exists_conj_kernel_mul : ∀ (p : ℕ) (F : IntermediateField ℚ ℂ) (
   · have hc0 : c = 0 := Nat.eq_zero_of_dvd_of_lt hdvd hcp
     subst hc0
     exact ht'n (by simpa using hcl)
-  · have hk := IsConj.mul h₂ h₃ (α := (k : ℂ))
-      (fun l hl => by rw [← nsmul_eq_mul]; exact nsmul_mem hl k) hct
+  · have hk :=
+      IsConj.mul h₂ h₃ (α := (k : ℂ)) (fun l hl => by rw [← nsmul_eq_mul]; exact nsmul_mem hl k) hct
     rw [map_natCast] at hk
     have h0 : IsConj L L σ 0 ((k : ℂ) * ((c : ℂ) * t) - (k : ℂ) * t') := by
       left

@@ -265,15 +265,20 @@ private lemma linExt_map_algebraMap {R : Type} [CommRing R] [Algebra ℚ R] (c :
   set_option synthInstance.maxHeartbeats 100000 in
     simp [_root_.GlobalTheory.ClassFin.linExt, map_sum, map_mul]
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
 variable {ι : Type} [Fintype ι] [DecidableEq ι] in
-theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ) (R : Type) [CommRing R] [Algebra ℚ R] (R₀ : Subring R), _root_.GlobalTheory.ClassFin.IsQGroup Γ → e * e = e → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0) → _root_.GlobalTheory.ClassFin.AdelicPair R R₀ → _root_.GlobalTheory.ClassFin.CF (_root_.GlobalTheory.ClassFin.blk e '' Γ) R R₀ → _root_.GlobalTheory.ClassFin.CF Γ R R₀ := by
+theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ)
+        (R : Type) [CommRing R] [Algebra ℚ R] (R₀ : Subring R),
+      _root_.GlobalTheory.ClassFin.IsQGroup Γ → e * e = e
+        → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0)
+        → _root_.GlobalTheory.ClassFin.AdelicPair R R₀
+        → _root_.GlobalTheory.ClassFin.CF (_root_.GlobalTheory.ClassFin.blk e '' Γ) R R₀
+        → _root_.GlobalTheory.ClassFin.CF Γ R R₀ := by
   intro ι _ _ Γ e R _ _ R₀ hΓ he hblock hR hCF
   classical
-  obtain ⟨hone, hmul, hadj, hdet⟩ :=
-    _root_.GlobalTheory.ClassFin.pts_group ι Γ hΓ.toIsPre R
+  obtain ⟨hone, hmul, hadj, hdet⟩ := _root_.GlobalTheory.ClassFin.pts_group ι Γ hΓ.toIsPre R
   obtain ⟨-, hmulq, -, -⟩ := _root_.GlobalTheory.ClassFin.pts_group ι Γ hΓ.toIsPre ℚ
   obtain ⟨c, b, hsec⟩ := _root_.GlobalTheory.ClassFin.PolySection.exists_section ι Γ e hΓ he hblock
   obtain ⟨hU, hcc, hker, htri, hσ⟩ := hsec R
@@ -284,10 +289,10 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
     rwa [map_natCast] at h
   obtain ⟨N, hN, hNb⟩ := exists_nat_mul_ev_section_mem (R := R) R₀ b
   obtain ⟨Kc, hKc, hcK⟩ := exists_nat_mul_linExt_mem (R := R) R₀ c
-  obtain ⟨F, hFS, hF⟩ :=
-    exists_finset_integral_classes R₀ _ hone hmul hadj hdet hi hunit N hN
+  obtain ⟨F, hFS, hF⟩ := exists_finset_integral_classes R₀ _ hone hmul hadj hdet hi hunit N hN
   obtain ⟨TQ, hTQ, hTQd⟩ := hCF
-  let σ : Matrix ι ι R → Matrix ι ι R := fun y => Matrix.of fun i j => _root_.GlobalTheory.ClassFin.ev (b i j) y
+  let σ : Matrix ι ι R → Matrix ι ι R := fun y =>
+    Matrix.of fun i j => _root_.GlobalTheory.ClassFin.ev (b i j) y
   refine ⟨(TQ ×ˢ F).image (fun p => σ p.1 * p.2), ?_, ?_⟩
   · intro s hs
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hs
@@ -298,28 +303,37 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
     rw [Matrix.adjugate_mul, hdet a ha, one_smul]
   have hinvr : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R, a * a.adjugate = 1 := fun a ha => by
     rw [Matrix.mul_adjugate, hdet a ha, one_smul]
-  have hbm : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R, ∀ a' ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
-      _root_.GlobalTheory.ClassFin.blk e (a * a') =
-        _root_.GlobalTheory.ClassFin.blk e a * _root_.GlobalTheory.ClassFin.blk e a' :=
+  have hbm
+      : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R, ∀ a' ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
+        _root_.GlobalTheory.ClassFin.blk e (a * a')
+          = _root_.GlobalTheory.ClassFin.blk e a * _root_.GlobalTheory.ClassFin.blk e a' :=
     fun a ha a' ha' => blk_mul_of_upper e he a a' (htri a ha).1 (htri a' ha').1
-  have hbinv : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
-      _root_.GlobalTheory.ClassFin.blk e a.adjugate * _root_.GlobalTheory.ClassFin.blk e a = 1 :=
-    fun a ha => by rw [← hbm _ (hadj a ha) _ ha, hinvl a ha, blk_one_of_idempotent e he]
-  have hbinv' : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
-      _root_.GlobalTheory.ClassFin.blk e a * _root_.GlobalTheory.ClassFin.blk e a.adjugate = 1 :=
-    fun a ha => by rw [← hbm _ ha _ (hadj a ha), hinvr a ha, blk_one_of_idempotent e he]
+  have hbinv
+      : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
+        _root_.GlobalTheory.ClassFin.blk e a.adjugate * _root_.GlobalTheory.ClassFin.blk e a
+          = 1 := fun a ha => by
+    rw [← hbm _ (hadj a ha) _ ha, hinvl a ha, blk_one_of_idempotent e he]
+  have hbinv'
+      : ∀ a ∈ _root_.GlobalTheory.ClassFin.pts Γ R,
+        _root_.GlobalTheory.ClassFin.blk e a * _root_.GlobalTheory.ClassFin.blk e a.adjugate
+          = 1 := fun a ha => by
+    rw [← hbm _ ha _ (hadj a ha), hinvr a ha, blk_one_of_idempotent e he]
   obtain ⟨γQ, hγQ, s, hs, u, hu, huint, hy⟩ := hTQd _ (htri x hx).2
-  obtain ⟨γ', hγ'def⟩ : ∃ γ' : Matrix ι ι ℚ, γ' = Matrix.of fun i j =>
-    _root_.GlobalTheory.ClassFin.ev (b i j) γQ := ⟨_, rfl⟩
+  obtain ⟨γ', hγ'def⟩
+      : ∃ γ' : Matrix ι ι ℚ, γ' = Matrix.of fun i j => _root_.GlobalTheory.ClassFin.ev (b i j) γQ :=
+    ⟨_, rfl⟩
   obtain ⟨hγ'P, hγ'b⟩ := hσq γQ hγQ
   rw [← hγ'def] at hγ'P hγ'b
   have hγR : γ'.map (algebraMap ℚ R) ∈ _root_.GlobalTheory.ClassFin.pts Γ R :=
     (_root_.GlobalTheory.ClassFin.RatPts.rat_mem_pts ι Γ).2 R _ hγ'P
-  have hγRb : _root_.GlobalTheory.ClassFin.blk e (γ'.map (algebraMap ℚ R)) =
-      γQ.map (algebraMap ℚ R) := by rw [blk_map_algebraMap_eq_map_blk, hγ'b]
-  obtain ⟨hsP, hsb⟩ : σ s ∈ _root_.GlobalTheory.ClassFin.pts Γ R ∧ _root_.GlobalTheory.ClassFin.blk e (σ s) = s :=
+  have hγRb
+      : _root_.GlobalTheory.ClassFin.blk e (γ'.map (algebraMap ℚ R)) = γQ.map (algebraMap ℚ R) := by
+    rw [blk_map_algebraMap_eq_map_blk, hγ'b]
+  obtain ⟨hsP, hsb⟩
+      : σ s ∈ _root_.GlobalTheory.ClassFin.pts Γ R ∧ _root_.GlobalTheory.ClassFin.blk e (σ s) = s :=
     hσ s (hTQ s hs)
-  obtain ⟨huP, hub⟩ : σ u ∈ _root_.GlobalTheory.ClassFin.pts Γ R ∧ _root_.GlobalTheory.ClassFin.blk e (σ u) = u :=
+  obtain ⟨huP, hub⟩
+      : σ u ∈ _root_.GlobalTheory.ClassFin.pts Γ R ∧ _root_.GlobalTheory.ClassFin.blk e (σ u) = u :=
     hσ u hu
   obtain ⟨g, hgdef⟩ : ∃ g, g = γ'.map (algebraMap ℚ R) * σ s := ⟨_, rfl⟩
   have hgP : g ∈ _root_.GlobalTheory.ClassFin.pts Γ R := hgdef ▸ hmul _ hγR _ hsP
@@ -337,7 +351,8 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
     rw [hndef, hbm _ hrP _ (hadj _ huP), hrb]
     exact h
   obtain ⟨m, hmdef⟩ : ∃ m, m = σ s * n * (σ s).adjugate := ⟨_, rfl⟩
-  have hmP : m ∈ _root_.GlobalTheory.ClassFin.pts Γ R := hmdef ▸ hmul _ (hmul _ hsP _ hnP) _ (hadj _ hsP)
+  have hmP : m ∈ _root_.GlobalTheory.ClassFin.pts Γ R :=
+    hmdef ▸ hmul _ (hmul _ hsP _ hnP) _ (hadj _ hsP)
   have hmb : _root_.GlobalTheory.ClassFin.blk e m = 1 := by
     rw [hmdef, hbm _ (hmul _ hsP _ hnP) _ (hadj _ hsP), hbm _ hsP _ hnP, hnb, Matrix.mul_one,
       hbinv' _ hsP]
@@ -346,23 +361,25 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
   obtain ⟨K2, hK2, hK2s⟩ := hii (ι × ι) (fun p => (σ s).adjugate p.1 p.2)
   have hM : 0 < K2 * Kc * K1 := Nat.mul_pos (Nat.mul_pos hK2 hKc) hK1
   choose q a ha hqa using fun i j => hR.approx (K2 * Kc * K1) hM (Y i j)
-  have hYsplit : Y = (Matrix.of q).map (algebraMap ℚ R) + ((K2 * Kc * K1 : ℕ) : R) • Matrix.of a := by
+  have hYsplit
+      : Y = (Matrix.of q).map (algebraMap ℚ R) + ((K2 * Kc * K1 : ℕ) : R) • Matrix.of a := by
     ext i j
     simp only [Matrix.add_apply, Matrix.map_apply, Matrix.of_apply, Matrix.smul_apply, smul_eq_mul]
     exact hqa i j
-  obtain ⟨A, hAdef⟩ : ∃ A, A = _root_.GlobalTheory.ClassFin.linExt c ((Matrix.of q).map (algebraMap ℚ R)) :=
+  obtain ⟨A, hAdef⟩
+      : ∃ A, A = _root_.GlobalTheory.ClassFin.linExt c ((Matrix.of q).map (algebraMap ℚ R)) :=
     ⟨_, rfl⟩
   obtain ⟨C, hCdef⟩ : ∃ C, C = _root_.GlobalTheory.ClassFin.linExt c (Matrix.of a) := ⟨_, rfl⟩
   have hm : m = (1 + A) * (1 + ((K2 * Kc * K1 : ℕ) : R) • C) := by
-    rw [hY, hYsplit, linExt_add, linExt_smul, ← hAdef, ← hCdef, mul_add, mul_one, add_mul,
-      one_mul, Matrix.mul_smul, hAdef, hCdef, hcc, smul_zero, add_zero, add_assoc]
-  obtain ⟨γ, hγdef⟩ : ∃ γ, γ = γ' * (1 + _root_.GlobalTheory.ClassFin.linExt c (Matrix.of q)) := ⟨_, rfl⟩
+    rw [hY, hYsplit, linExt_add, linExt_smul, ← hAdef, ← hCdef, mul_add, mul_one, add_mul, one_mul,
+      Matrix.mul_smul, hAdef, hCdef, hcc, smul_zero, add_zero, add_assoc]
+  obtain ⟨γ, hγdef⟩ : ∃ γ, γ = γ' * (1 + _root_.GlobalTheory.ClassFin.linExt c (Matrix.of q)) :=
+    ⟨_, rfl⟩
   have hγ : γ ∈ _root_.GlobalTheory.ClassFin.pts Γ ℚ := hγdef ▸ hmulq _ hγ'P _ (hUq _)
   have hγmap : γ.map (algebraMap ℚ R) = γ'.map (algebraMap ℚ R) * (1 + A) := by
     rw [hγdef, Matrix.map_mul, hAdef, ← linExt_map_algebraMap, Matrix.map_add _ (map_add _),
       Matrix.map_one _ (map_zero _) (map_one _)]
-  obtain ⟨v, hvdef⟩ : ∃ v, v = (σ s).adjugate * (1 + ((K2 * Kc * K1 : ℕ) : R) • C) * σ s :=
-    ⟨_, rfl⟩
+  obtain ⟨v, hvdef⟩ : ∃ v, v = (σ s).adjugate * (1 + ((K2 * Kc * K1 : ℕ) : R) • C) * σ s := ⟨_, rfl⟩
   have hvP : v ∈ _root_.GlobalTheory.ClassFin.pts Γ R := by
     have h1 : 1 + ((K2 * Kc * K1 : ℕ) : R) • C ∈ _root_.GlobalTheory.ClassFin.pts Γ R := by
       rw [hCdef, ← linExt_smul]
@@ -382,7 +399,8 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
     have h3 : ∀ i j, ((K1 : R) • σ s) i j ∈ R₀ := fun i j => hK1s (i, j)
     intro i j
     rw [hv, Matrix.add_apply]
-    refine R₀.add_mem ?_ (matrix_mul_mem_subring_of_mem R₀ (matrix_mul_mem_subring_of_mem R₀ h2 hCint) h3 i j)
+    refine R₀.add_mem ?_
+      (matrix_mul_mem_subring_of_mem R₀ (matrix_mul_mem_subring_of_mem R₀ h2 hCint) h3 i j)
     rw [Matrix.one_apply]
     split_ifs
     · exact R₀.one_mem
@@ -392,8 +410,16 @@ theorem _root_.GlobalTheory.ClassFin.cf_of_cf_blk_image : ∀ (ι : Type) [Finty
     rw [← smul_eq_mul, ← Matrix.smul_apply, ← Matrix.mul_smul]
     exact matrix_mul_mem_subring_of_mem R₀ hvint (fun i j => hNb u huint i j) i j
   obtain ⟨t, ht, p, hpP, hpint, hp0⟩ := hF _ hp0P hp0N
-  refine ⟨γ, hγ, σ s * t, Finset.mem_image.2 ⟨(s, t), Finset.mem_product.2 ⟨hs, ht⟩, rfl⟩,
-    p, hpP, hpint, ?_⟩
+  refine ⟨
+    γ,
+    hγ,
+    σ s * t,
+    Finset.mem_image.2 ⟨(s, t), Finset.mem_product.2 ⟨hs, ht⟩, rfl⟩,
+    p,
+    hpP,
+    hpint,
+    ?_
+  ⟩
   have e1 : x = g * r := by rw [hrdef, ← Matrix.mul_assoc, hinvr g hgP, Matrix.one_mul]
   have e2 : r = n * σ u := by rw [hndef, Matrix.mul_assoc, hinvl _ huP, Matrix.mul_one]
   have e3 : σ s * n = m * σ s := by

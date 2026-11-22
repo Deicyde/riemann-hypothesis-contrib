@@ -96,8 +96,9 @@ theorem isogenyWeierstrassP_of_ellipticNoPole (hN : EllipticNoPole) : IsogenyP :
     intro z₀ hz₀
     by_cases hm : z₀ ∈ L.lattice
     · exact ⟨0, Finset.mem_insert_self _ _, by simpa using hm⟩
-    · obtain ⟨P, hP, hPz⟩ := hS3 (-z₀) (by simpa using L.lattice.neg_mem hz₀)
-        (fun h => hm (by simpa using L.lattice.neg_mem h))
+    · obtain ⟨P, hP, hPz⟩ :=
+        hS3 (-z₀) (by simpa using L.lattice.neg_mem hz₀)
+          (fun h => hm (by simpa using L.lattice.neg_mem h))
       refine ⟨P, Finset.mem_insert_of_mem hP, ?_⟩
       have := L.lattice.neg_mem hPz
       have e : -(-z₀ - P) = z₀ + P := by ring
@@ -109,13 +110,14 @@ theorem isogenyWeierstrassP_of_ellipticNoPole (hN : EllipticNoPole) : IsogenyP :
     have a1 : AnalyticAt ℂ (fun w => L.weierstrassP (α * w)) z₀ := by
       simpa using analyticAt_P L α 0 z₀ (by simpa using hz₀)
     refine (analyticAt_const.mul a1).sub (Finset.analyticAt_fun_sum _ fun P hP => ?_)
-    have := analyticAt_P L 1 P z₀ (by
-      intro hmem
-      rw [one_mul] at hmem
-      apply hz₀
-      have := L.lattice.sub_mem (hst _ hmem) (h1 P hP)
-      have e : α * (z₀ + P) - α * P = α * z₀ := by ring
-      rwa [e] at this)
+    have :=
+      analyticAt_P L 1 P z₀ (by
+        intro hmem
+        rw [one_mul] at hmem
+        apply hz₀
+        have := L.lattice.sub_mem (hst _ hmem) (h1 P hP)
+        have e : α * (z₀ + P) - α * P = α * z₀ := by ring
+        rwa [e] at this)
     simpa using this
   have hext : ∀ z₀, ∃ g : ℂ → ℂ, AnalyticAt ℂ g z₀ ∧ f =ᶠ[𝓝[≠] z₀] g := by
     intro z₀
@@ -140,7 +142,7 @@ theorem isogenyWeierstrassP_of_ellipticNoPole (hN : EllipticNoPole) : IsogenyP :
     rw [e2, L.weierstrassP_add_coe (w + P) ⟨ω, hω⟩]
   obtain ⟨c, hc⟩ := hN L f hmer hper hord
 
-  have hc0 : c = -∑ P ∈ S, L.weierstrassP P := by
+  have hc0 : c = - ∑ P ∈ S, L.weierstrassP P := by
     obtain ⟨ha, he⟩ := ext_at L α T hα hst h1 h2 0 0 (Finset.mem_insert_self _ _) (by simp)
     have hev : (fun _ : ℂ => c) =ᶠ[𝓝[≠] 0] f := by
       filter_upwards [eventually_notMem L α 0 hα] with w hw

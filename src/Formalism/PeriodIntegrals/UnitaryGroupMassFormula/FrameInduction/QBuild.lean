@@ -23,8 +23,10 @@ theorem signStep_of (hP : PosCount) (hN : NonposCount) : SignStep := by
   have h1 : Fintype.card {i // 0 < ev i} ≤ r + 1 := hP k r z z' γ hs hp hdet
   have h2 : Fintype.card {i // ¬ 0 < ev i} ≤ r + 1 := hN k r z z' γ hs hp hdet
   have h3 := Fintype.card_subtype_compl (fun i : Fin (r + 1) ⊕ Fin (r + 1) => 0 < ev i)
-  have h4 : Fintype.card {i : Fin (r + 1) ⊕ Fin (r + 1) // 0 < ev i} ≤
-      Fintype.card (Fin (r + 1) ⊕ Fin (r + 1)) := Fintype.card_subtype_le _
+  have h4
+      : Fintype.card {i : Fin (r + 1) ⊕ Fin (r + 1) // 0 < ev i}
+        ≤ Fintype.card (Fin (r + 1) ⊕ Fin (r + 1)) :=
+    Fintype.card_subtype_le _
   simp only [Fintype.card_sum, Fintype.card_fin] at h3 h4
   have hcP : Fintype.card {i // 0 < ev i} = r + 1 := by omega
   have hcN : Fintype.card {i // ¬ 0 < ev i} = r + 1 := by omega
@@ -43,8 +45,10 @@ theorem signStep_of (hP : PosCount) (hN : NonposCount) : SignStep := by
   have hW : (U * diagonal s)ᴴ * gramM k r z z' γ * (U * diagonal s) = diagonal f := by
     have hd : Uᴴ * gramM k r z z' γ * U = diagonal (fun i => ((ev i : ℝ) : ℂ)) := CountsW.diag_eq hA
     rw [conjTranspose_mul, diagonal_conjTranspose]
-    calc (star s |> diagonal) * Uᴴ * gramM k r z z' γ * (U * diagonal s)
-        = diagonal (star s) * (Uᴴ * gramM k r z z' γ * U) * diagonal s := by simp only [Matrix.mul_assoc]
+    calc
+      (star s |> diagonal) * Uᴴ * gramM k r z z' γ * (U * diagonal s)
+          = diagonal (star s) * (Uᴴ * gramM k r z z' γ * U) * diagonal s := by
+        simp only [Matrix.mul_assoc]
       _ = diagonal f := by
         rw [hd, diagonal_mul_diagonal, diagonal_mul_diagonal]
         congr 1
@@ -60,14 +64,16 @@ theorem signStep_of (hP : PosCount) (hN : NonposCount) : SignStep := by
           · rw [abs_of_pos h, inv_mul_cancel₀ (hne i)]
           · rw [abs_of_neg (lt_of_le_of_ne (not_lt.1 h) (hne i)), inv_neg, neg_mul,
               inv_mul_cancel₀ (hne i)]
-        rw [this]; split_ifs <;> simp
+        rw [this]
+        split_ifs <;> simp
   have hfe : f ∘ e = Sum.elim (fun _ => 1) (fun _ => -1) := by
     funext i
     rcases i with a | a
     · simp [f, e, Equiv.sumCompl_apply_inl, (eP.symm a).2]
     · simp [f, e, Equiv.sumCompl_apply_inr, (eN.symm a).2]
-  have hD : ((U * diagonal s).submatrix id e)ᴴ * gramM k r z z' γ * (U * diagonal s).submatrix id e =
-      diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => -1)) := by
+  have hD
+      : ((U * diagonal s).submatrix id e)ᴴ * gramM k r z z' γ * (U * diagonal s).submatrix id e
+        = diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => -1)) := by
     rw [submatrix_conj, hW, submatrix_diagonal_equiv, hfe]
   refine ⟨(U * diagonal s).submatrix id e, ?_, ?_⟩
   · rw [isUnit_iff_ne_zero]
@@ -78,7 +84,8 @@ theorem signStep_of (hP : PosCount) (hN : NonposCount) : SignStep := by
     rcases i with a | a <;> simp
   · rw [hD]
     ext i j
-    rcases i with a | a <;> rcases j with b | b <;> simp [diagonal_apply, Matrix.one_apply] <;> split_ifs <;> simp
+    rcases i with a | a <;> rcases j with b | b <;> simp [diagonal_apply, Matrix.one_apply]
+      <;> split_ifs <;> simp
 
 theorem signStep : SignStep :=
   signStep_of PI.FrameInd.CountsW.positive_count (PI.FrameInd.CountsW.nonposCount_of negative_bound)

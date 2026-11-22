@@ -11,29 +11,27 @@ namespace GroundTheory.LocalField
 
 open ValuativeRel Polynomial IsDiscreteValuationRing IsLocalRing
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
-theorem residue_aeval_integer (p : 𝒪[K][X]) (x : 𝒪[L]) :
-    residue 𝒪[L] (aeval x p) = aeval (residue 𝒪[L] x) (p.map (residue 𝒪[K])) := by
+theorem residue_aeval_integer (p : 𝒪[K][X]) (x : 𝒪[L])
+    : residue 𝒪[L] (aeval x p) = aeval (residue 𝒪[L] x) (p.map (residue 𝒪[K])) := by
   rw [aeval_def, aeval_def, eval₂_map, hom_eval₂]
   congr 1
 
-
 variable (K) in
-theorem adjoin_eq_top_of_residue_of_addVal_eq_one {x : 𝒪[L]}
-    (hx : Algebra.adjoin 𝓀[K] {residue 𝒪[L] x} = ⊤) {π : 𝒪[L]}
-    (hπA : π ∈ Algebra.adjoin 𝒪[K] {x}) (hπ : addVal 𝒪[L] π = 1) :
-    Algebra.adjoin 𝒪[K] {x} = ⊤ := by
+theorem adjoin_eq_top_of_residue_of_addVal_eq_one
+    {x : 𝒪[L]} (hx : Algebra.adjoin 𝓀[K] {residue 𝒪[L] x} = ⊤)
+    {π : 𝒪[L]} (hπA : π ∈ Algebra.adjoin 𝒪[K] {x}) (hπ : addVal 𝒪[L] π = 1)
+    : Algebra.adjoin 𝒪[K] {x} = ⊤ := by
   set A := Algebra.adjoin 𝒪[K] {x}
   set e := (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
 
   have hres : ∀ w : 𝒪[L], ∃ a ∈ A, ∃ w', w = a + π * w' := by
     intro w
-    have hw : residue 𝒪[L] w ∈ Algebra.adjoin 𝓀[K] {residue 𝒪[L] x} := by
-      rw [hx]; trivial
+    have hw : residue 𝒪[L] w ∈ Algebra.adjoin 𝓀[K] {residue 𝒪[L] x} := by rw [hx]; trivial
     rw [Algebra.adjoin_singleton_eq_range_aeval] at hw
     obtain ⟨p, hp⟩ := hw
     obtain ⟨p₀, rfl⟩ := Polynomial.map_surjective (residue 𝒪[K]) residue_surjective p
@@ -43,8 +41,9 @@ theorem adjoin_eq_top_of_residue_of_addVal_eq_one {x : 𝒪[L]}
       rw [← residue_eq_zero_iff, map_sub, residue_aeval_integer]
       simp only [AlgHom.toRingHom_eq_coe, RingHom.coe_coe] at hp
       rw [hp, sub_self]
-    rw [← pow_one (IsLocalRing.maximalIdeal 𝒪[L]), mem_maximalIdeal_pow_iff_le_addVal, Nat.cast_one, ← hπ,
-      addVal_le_iff_dvd] at hm
+    rw [← pow_one (IsLocalRing.maximalIdeal 𝒪[L]), mem_maximalIdeal_pow_iff_le_addVal, Nat.cast_one,
+        ← hπ, addVal_le_iff_dvd]
+      at hm
     obtain ⟨w', hw'⟩ := hm
     exact ⟨w', by rw [← hw']; ring⟩
   have step : ∀ k : ℕ, ∀ z : 𝒪[L], ∃ a ∈ A, ∃ w, z = a + π ^ k * w := by
@@ -59,11 +58,12 @@ theorem adjoin_eq_top_of_residue_of_addVal_eq_one {x : 𝒪[L]}
       ring
   obtain ⟨ϖK, hϖK⟩ := exists_irreducible 𝒪[K]
   have hassoc : Associated (algebraMap 𝒪[K] 𝒪[L] ϖK) (π ^ e) := by
-    rw [← addVal_eq_iff_associated, addVal_algebraMap_integer, addVal_uniformizer hϖK,
-      addVal_pow, hπ, mul_one, nsmul_eq_mul, mul_one]
+    rw [← addVal_eq_iff_associated, addVal_algebraMap_integer, addVal_uniformizer hϖK, addVal_pow,
+      hπ, mul_one, nsmul_eq_mul, mul_one]
   obtain ⟨u, hu⟩ := hassoc
-  have hle : (⊤ : Submodule 𝒪[K] 𝒪[L]) ≤
-      Subalgebra.toSubmodule A ⊔ IsLocalRing.maximalIdeal 𝒪[K] • ⊤ := by
+  have hle
+      : (⊤ : Submodule 𝒪[K] 𝒪[L])
+        ≤ Subalgebra.toSubmodule A ⊔ IsLocalRing.maximalIdeal 𝒪[K] • ⊤ := by
     intro z _
     obtain ⟨a, ha, w, rfl⟩ := step e z
     refine Submodule.add_mem_sup ha ?_
@@ -71,12 +71,12 @@ theorem adjoin_eq_top_of_residue_of_addVal_eq_one {x : 𝒪[L]}
     refine Submodule.smul_mem_smul ?_ Submodule.mem_top
     rw [hϖK.maximalIdeal_eq]
     exact Ideal.subset_span rfl
-  have hnak := Submodule.le_of_le_smul_of_le_jacobson_bot (Module.Finite.fg_top)
-    (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle
+  have hnak :=
+    Submodule.le_of_le_smul_of_le_jacobson_bot (Module.Finite.fg_top)
+      (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle
   rw [eq_top_iff]
   intro z _
   exact hnak Submodule.mem_top
-
 
 variable (K L) in
 theorem exists_integer_adjoin_eq_top : ∃ x : 𝒪[L], Algebra.adjoin 𝒪[K] {x} = ⊤ := by
@@ -113,8 +113,8 @@ theorem exists_integer_adjoin_eq_top : ∃ x : 𝒪[L], Algebra.adjoin 𝒪[K] {
         exact Ideal.mul_mem_left _ _ (Ideal.pow_le_self two_ne_zero hϖsq)
       · intro hmem
         have h1 : aeval x₀ (derivative P₀) * ϖ ∈ IsLocalRing.maximalIdeal 𝒪[L] ^ 2 := by
-          have : aeval x₀ (derivative P₀) * ϖ =
-              aeval (x₀ + ϖ) P₀ - aeval x₀ P₀ - k * ϖ ^ 2 := by rw [hk]; ring
+          have : aeval x₀ (derivative P₀) * ϖ = aeval (x₀ + ϖ) P₀ - aeval x₀ P₀ - k * ϖ ^ 2 := by
+            rw [hk]; ring
           rw [this]
           exact sub_mem (sub_mem hmem hsq) (Ideal.mul_mem_left _ _ hϖsq)
         obtain ⟨v, hv⟩ := hd₀

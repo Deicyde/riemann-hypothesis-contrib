@@ -10,10 +10,14 @@ namespace GlobalTheory.CompanionTheory.Ar.HT
 
 open Module NumberField
 
-theorem exists_smul_mem_of_mem_span_val {C : Type} [Field C] {v : Valuation C NNReal} {O : Type}
-    [CommRing O] [Algebra O C] (hv : v.Integers O) {V : Type} [AddCommGroup V] [Module C V]
-    [Module O V] [IsScalarTower O C V] (L : Submodule O V) {u : V}
-    (hu : u ∈ Submodule.span C (L : Set V)) : ∃ c : C, c ≠ 0 ∧ c • u ∈ L := by
+theorem exists_smul_mem_of_mem_span_val
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {V : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
+    (L : Submodule O V)
+    {u : V} (hu : u ∈ Submodule.span C (L : Set V))
+    : ∃ c : C, c ≠ 0 ∧ c • u ∈ L := by
   have key : ∀ (a b : C) (x : V), b ≠ 0 → v a ≤ v b → b • x ∈ L → a • x ∈ L := by
     intro a b x hb hab hx
     have hvb : 0 < v b := (Valuation.pos_iff v).2 hb
@@ -40,9 +44,14 @@ theorem exists_smul_mem_of_mem_span_val {C : Type} [Field C] {v : Valuation C NN
     · exact ⟨1, one_ne_zero, by simp [hd]⟩
     · exact ⟨a / d, div_ne_zero ha hd, by rw [smul_smul, div_mul_cancel₀ _ hd]; exact hx⟩
 
-theorem latIn_isLattice : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) (V : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V] (L : Submodule O V) (U : Submodule C V), L.FG → U ≤ Submodule.span C (L : Set V) → (latIn L U).IsLattice C := by
+theorem latIn_isLattice
+    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
+        (hv : v.Integers O) (V : Type) [AddCommGroup V] [Module C V] [Module O V]
+        [IsScalarTower O C V] (L : Submodule O V) (U : Submodule C V),
+      L.FG → U ≤ Submodule.span C (L : Set V) → (latIn L U).IsLattice C := by
   intro C _ v O _ _ hv V _ _ _ _ L U hL hU
-  have hfg := GlobalTheory.CompanionTheory.Ar.HT.fg_inf_restrictScalars_of_integers C v O hv V L U hL
+  have hfg :=
+    GlobalTheory.CompanionTheory.Ar.HT.fg_inf_restrictScalars_of_integers C v O hv V L U hL
   refine ⟨?_, ?_⟩
   · have hinj : Function.Injective (U.subtype.restrictScalars O) := Subtype.val_injective
     apply Submodule.fg_of_fg_map_injective (U.subtype.restrictScalars O) hinj

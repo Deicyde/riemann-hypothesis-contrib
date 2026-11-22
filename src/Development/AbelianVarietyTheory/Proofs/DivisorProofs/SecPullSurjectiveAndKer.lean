@@ -9,24 +9,27 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CechDR
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CechDR
 
 namespace GlobalTheory.CechDR
 
-private theorem spc {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B)
-    (g : B →+* C) : spMap (g.comp f) = spMap g ≫ spMap f :=
+private theorem spc
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap (g.comp f) = spMap g ≫ spMap f :=
   Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)
 
-private theorem spi {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B}
-    (h : spMap f = spMap g) : f = g :=
+private theorem spi {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g)
+    : f = g :=
   congrArg CommRingCat.Hom.hom (Spec.map_injective h)
 
-theorem secPull_surjective_and_ker (R R₀ : Type) [CommRing R] [CommRing R₀] (I : Ideal R)
-    (π : R →+* R₀) (hπ : Function.Surjective π) (hk : RingHom.ker π = I) (X₀ X : Scheme.{0})
-    (s₀ : X₀ ⟶ Sp R₀) (s : X ⟶ Sp R) (i : X₀ ⟶ X) (hpb : IsPullback i s₀ s (spMap π))
-    (p : Pair i) (hp : i ⁻¹ᵁ p.1.2.1 = p.1.1.1) :
-    Function.Surjective (secPull s s₀ p) ∧
-      ∀ b, secPull s s₀ p b = 0 ↔ b ∈ I.map (algebraMap R (Sec s p.1.2.1)) := by
+theorem secPull_surjective_and_ker
+    (R R₀ : Type) [CommRing R] [CommRing R₀]
+    (I : Ideal R) (π : R →+* R₀) (hπ : Function.Surjective π) (hk : RingHom.ker π = I)
+    (X₀ X : Scheme.{0}) (s₀ : X₀ ⟶ Sp R₀) (s : X ⟶ Sp R) (i : X₀ ⟶ X)
+    (hpb : IsPullback i s₀ s (spMap π)) (p : Pair i) (hp : i ⁻¹ᵁ p.1.2.1 = p.1.1.1)
+    : Function.Surjective (secPull s s₀ p)
+      ∧ ∀ b, secPull s s₀ p b = 0 ↔ b ∈ I.map (algebraMap R (Sec s p.1.2.1)) := by
   set J : Ideal (Sec s p.1.2.1) := I.map (algebraMap R (Sec s p.1.2.1)) with hJ
   let q := Ideal.Quotient.mk J
   have hφ : ∀ r, secPull s s₀ p (algebraMap R _ r) = algebraMap R₀ _ (π r) :=
@@ -38,10 +41,13 @@ theorem secPull_surjective_and_ker (R R₀ : Type) [CommRing R] [CommRing R₀] 
       rw [← hk, RingHom.mem_ker] at hr
       rw [Ideal.mem_comap, RingHom.mem_ker, hφ, hr, map_zero]
     exact fun a ha ↦ this ha
-  let τ : R₀ →+* (Sec s p.1.2.1 ⧸ J) := π.liftOfSurjective hπ
-    ⟨q.comp (algebraMap R _), fun r hr ↦ by
-      rw [hk] at hr
-      exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem _ hr)⟩
+  let τ : R₀ →+* (Sec s p.1.2.1 ⧸ J) :=
+    π.liftOfSurjective hπ ⟨
+      q.comp (algebraMap R _),
+      fun r hr ↦ by
+        rw [hk] at hr
+        exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_map_of_mem _ hr)
+    ⟩
   have hτ : τ.comp π = q.comp (algebraMap R _) := RingHom.liftOfSurjective_comp _ _ _
   have hz : (spMap q ≫ affPt s p.1.2) ≫ s = spMap τ ≫ spMap π := by
     rw [Category.assoc, affPt_w, ← spc, ← spc, hτ]

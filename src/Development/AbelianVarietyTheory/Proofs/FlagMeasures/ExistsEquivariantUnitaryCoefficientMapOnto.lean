@@ -9,13 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HcParamEqWeig
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St
+open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+  Formalism.L2.SG.ColDict GlobalTheory.St
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.St
 
-theorem coefficient_map_exists_onto : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (F : Formalism.L2.Forms.Forms0 D u) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V), WittX X u wt → ∃ J : X.Vpi u →ₗ⋆[ℂ] (Formalism.L2.Forms.Fr D 0 (Nat.zero_le _) → ℂ), JOK X u F wt J ∧ ∀ p ∈ Formalism.L2.Forms.ValC (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)) (Formalism.L2.Forms.embT D)) (Formalism.L2.Forms.lamT u 0), ∃ ξ, J ξ = p := by
+theorem coefficient_map_exists_onto
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (F : Formalism.L2.Forms.Forms0 D u)
+        (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V),
+      WittX X u wt
+        → ∃ J : X.Vpi u →ₗ⋆[ℂ] (Formalism.L2.Forms.Fr D 0 (Nat.zero_le _) → ℂ),
+          JOK X u F wt J
+            ∧ ∀ p
+                ∈ Formalism.L2.Forms.ValC
+                  (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+                    (Formalism.L2.Forms.embT D))
+                  (Formalism.L2.Forms.lamT u 0),
+              ∃ ξ,
+                J ξ = p := by
   intro D X u F wt hw
   obtain ⟨o, ho, hfr⟩ := GlobalTheory.T.exists_orthonormalFrame_complement_realPlaces D X u wt hw
   let e := Equiv.piCongrLeft (X.Vloc u) X.pl.symm
@@ -29,29 +43,46 @@ theorem coefficient_map_exists_onto : ∀ (D : D7) (X : HidaSetting D) (u : D.wh
     exact Finset.prod_congr rfl fun τ _ => by rw [he, he]
   have hsp : Submodule.span ℂ (Set.range tens) = ⊤ := by
     have : Set.range tens = Set.range (X.tensU u) := e.surjective.range_comp _
-    rw [this]; exact X.tensU_span u
-  have hty : ∀ τ, IsHCTypeU D.R.k (fun i => (((D.hcW u τ).u i : ℚ) : ℝ)) (X.piLoc u (X.pl.symm τ)) := by
+    rw [this]
+    exact X.tensU_span u
+  have hty
+      : ∀ τ, IsHCTypeU D.R.k (fun i => (((D.hcW u τ).u i : ℚ) : ℝ)) (X.piLoc u (X.pl.symm τ)) := by
     intro τ
     have h := X.piLoc_type u (X.pl.symm τ)
     rwa [X.pl.apply_symm_apply] at h
-  obtain ⟨Jp, hJv, hJs, hJi, hJe⟩ := GlobalTheory.T.tensor_types_realPlaces_equiv_span_weylModules D.what₂.Tau D.R.k (D.R.N 0) D.R.N_zero.symm
-    (Formalism.L2.Forms.lamT u 0) (fun τ i => (((D.hcW u τ).u i : ℚ) : ℝ))
-    (fun τ i => GlobalTheory.hcParam_eq_weight_step_zero_add_rho D u τ i)
-    (fun τ => X.Vloc u (X.pl.symm τ)) (fun τ => X.piLoc u (X.pl.symm τ)) hty (X.Vpi u) tens hin hsp
+  obtain ⟨Jp, hJv, hJs, hJi, hJe⟩ :=
+    GlobalTheory.T.tensor_types_realPlaces_equiv_span_weylModules D.what₂.Tau D.R.k (D.R.N 0)
+      D.R.N_zero.symm (Formalism.L2.Forms.lamT u 0)
+      (fun τ i => (((D.hcW u τ).u i : ℚ) : ℝ))
+      (fun τ i => GlobalTheory.hcParam_eq_weight_step_zero_add_rho D u τ i)
+      (fun τ => X.Vloc u (X.pl.symm τ))
+      (fun τ => X.piLoc u (X.pl.symm τ))
+      hty (X.Vpi u) tens hin hsp
   have hoinv : ∀ τ, IsUnit ((o.1 τ)⁻¹).det := fun τ => by
     have h := o.2 τ
     rw [Matrix.det_nonsing_inv]
     exact (Ring.inverse_unit h.unit ▸ (h.unit⁻¹).isUnit)
-  have hmap := GlobalTheory.ValueSpaceCoordinates.map_fnOf_eq_ValC D.what₂.Tau (D.R.N 0) (Formalism.L2.Forms.lamT u 0)
-    (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)) (Formalism.L2.Forms.embT D))
-    (fun τ => (o.1 τ)⁻¹) hoinv
-  let fo := Formalism.L2.Forms.fnOf (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)) (Formalism.L2.Forms.embT D))
-    (Formalism.L2.Forms.shiftOf (Formalism.L2.Forms.lamT u 0)) (fun τ => (o.1 τ)⁻¹)
+  have hmap :=
+    GlobalTheory.ValueSpaceCoordinates.map_fnOf_eq_ValC D.what₂.Tau (D.R.N 0)
+      (Formalism.L2.Forms.lamT u 0)
+      (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+        (Formalism.L2.Forms.embT D))
+      (fun τ => (o.1 τ)⁻¹)
+      hoinv
+  let fo :=
+    Formalism.L2.Forms.fnOf
+      (Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+        (Formalism.L2.Forms.embT D))
+      (Formalism.L2.Forms.shiftOf (Formalism.L2.Forms.lamT u 0)) (fun τ => (o.1 τ)⁻¹)
   refine ⟨fo.comp Jp, ⟨?_, ?_, ?_⟩, ?_⟩
   · intro s hs ξ y y' hyy
     obtain ⟨m, hm⟩ := hfr s hs
-    have hA : ∀ x, X.piU u s (tens x) = tens (fun τ =>
-        X.piLoc u (X.pl.symm τ) ((m τ).submatrix (Fin.cast D.R.N_zero.symm) (Fin.cast D.R.N_zero.symm)) (x τ)) := by
+    have hA
+        : ∀ x,
+          X.piU u s (tens x)
+            = tens (fun τ =>
+              X.piLoc u (X.pl.symm τ)
+                ((m τ).submatrix (Fin.cast D.R.N_zero.symm) (Fin.cast D.R.N_zero.symm)) (x τ)) := by
       intro x
       show X.piU u s (X.tensU u (e x)) = X.tensU u (e _)
       rw [X.tensU_equiv u s hs (e x)]

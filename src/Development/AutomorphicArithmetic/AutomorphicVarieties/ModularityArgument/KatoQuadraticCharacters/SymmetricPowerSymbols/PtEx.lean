@@ -11,8 +11,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.ptEx :
-    UpperTheory.V.Z.Kato.Sym.PtEx := by
+theorem UpperTheory.V.Z.Kato.Sym.ptEx : UpperTheory.V.Z.Kato.Sym.PtEx := by
   intro Ω _ _ _ ε X m hm u v hu hv
   have LG := lgB Ω ε X m hm
   have KU := PE.kaU Ω ε X m hm
@@ -25,7 +24,8 @@ theorem UpperTheory.V.Z.Kato.Sym.ptEx :
     exact hu0 ((map_eq_zero_iff _ (io X).injective).mp ha.symm)
   obtain ⟨η, hη, hlc, hunr⟩ := PE.etaEx Ω ε X m hm u v a b hu hv ha hb
   have hinU : ∀ g, InD X g → PE.InU X u v g := fun g hg => ⟨fun c => hg _, hg _, hg _, hg _⟩
-  refine ⟨⟨a, b, η⟩, ⟨hu, hv, ha, hb, fun g h hg hh => hη g h (hinU g hg) (hinU h hh), hlc, hunr⟩, ?_⟩
+  refine
+    ⟨⟨a, b, η⟩, ⟨hu, hv, ha, hb, fun g h hg hh => hη g h (hinU g hg) (hinU h hh), hlc, hunr⟩, ?_⟩
   intro γ hu' hv'
   obtain ⟨σ, hσ⟩ := (admB Ω ε X).2.2.2.2.2.2.1 (slR X (ofSL γ))
   have hfix : ∀ f, X.sl (ofSL γ) f = f → σ (io X f) = io X f := fun f hf => by
@@ -58,12 +58,26 @@ theorem UpperTheory.V.Z.Kato.Sym.ptEx :
   simp only [IsKum, dif, Pt.mv]
   refine ⟨1, by simp, fun h hh => ?_⟩
   have hhU := hinU h hh
-  have E1 := hη σ⁻¹ (h * σ) hσiU ⟨fun c => by show h (σ _) = _; rw [hσU.1 c, hhU.1 c], by show h (σ _) = _; rw [hσU.2.1, hhU.2.1], by show h (σ _) = _; rw [hσU.2.2.1, hhU.2.2.1], by show h (σ _) = _; rw [hσU.2.2.2, hhU.2.2.2]⟩
+  have E1 :=
+    hη σ⁻¹ (h * σ) hσiU ⟨
+      fun c => by show h (σ _) = _; rw [hσU.1 c, hhU.1 c],
+      by show h (σ _) = _; rw [hσU.2.1, hhU.2.1],
+      by show h (σ _) = _; rw [hσU.2.2.1, hhU.2.2.1],
+      by show h (σ _) = _; rw [hσU.2.2.2, hhU.2.2.2]
+    ⟩
   have E2 := hη h σ hhU hσU
   have E3 := hη σ⁻¹ σ hσiU hσU
   rw [inv_mul_cancel, hη1] at E3
-  have K1 := (KU b (by rintro rfl; rw [zero_pow hm.ne'] at hb; exact hv.1 ((map_eq_zero_iff _ (io X).injective).mp hb.symm)) h σ (hz h hhU) (hz σ hσU) (by rw [hb]; exact hhU.2.2.2) (by rw [hb]; exact hσU.2.2.2)).1
-  have K2 := (KU a ha0 σ⁻¹ σ (hz _ hσiU) (hz σ hσU) (by rw [ha]; exact hσiU.2.2.1) (by rw [ha]; exact hσU.2.2.1)).1
+  have K1 :=
+    (KU b
+      (by
+        rintro rfl
+        rw [zero_pow hm.ne'] at hb
+        exact hv.1 ((map_eq_zero_iff _ (io X).injective).mp hb.symm))
+      h σ (hz h hhU) (hz σ hσU) (by rw [hb]; exact hhU.2.2.2) (by rw [hb]; exact hσU.2.2.2)).1
+  have K2 :=
+    (KU a ha0 σ⁻¹ σ (hz _ hσiU) (hz σ hσU) (by rw [ha]; exact hσiU.2.2.1)
+      (by rw [ha]; exact hσU.2.2.1)).1
   rw [inv_mul_cancel, hka1] at K2
   rw [hk1, hcyc, mul_assoc]
   show 0 = 1 ^ 2 * η (σ⁻¹ * (h * σ)) - η h + ka X m a h * ka X m b σ - ka X m a σ * ka X m b h

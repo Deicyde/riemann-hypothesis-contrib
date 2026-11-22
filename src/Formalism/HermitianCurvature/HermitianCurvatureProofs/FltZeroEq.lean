@@ -12,14 +12,19 @@ noncomputable section
 
 variable {k r : ℕ}
 
-theorem colN {ζ : B.Mat k r} (hζ : B.inLie k r ζ) (z : Fin (2 * r + k + 1) → ℂ)
-    (hN : ∀ X ∈ lieOf (Sset k r z), (Matrix.trace (ζ * X)).re = 0) (a : Fin r) :
-    ∀ i : Fin (2 * r + k + 1), a.val < i.val → (ζ *ᵥ bvec (eI k r a)) i = 0 := by
-  have orth : ∀ v : Fin (2 * r + k + 1) → ℂ, (∀ b : Fin r, b.val ≤ a.val → v (esI k r b) = 0) →
-      herm (Hpk k r) (ζ *ᵥ bvec (eI k r a)) v = 0 := by
+theorem colN
+    {ζ : B.Mat k r} (hζ : B.inLie k r ζ)
+    (z : Fin (2 * r + k + 1) → ℂ) (hN : ∀ X ∈ lieOf (Sset k r z), (Matrix.trace (ζ * X)).re = 0)
+    (a : Fin r)
+    : ∀ i : Fin (2 * r + k + 1), a.val < i.val → (ζ *ᵥ bvec (eI k r a)) i = 0 := by
+  have orth
+      : ∀ v : Fin (2 * r + k + 1) → ℂ,
+        (∀ b : Fin r, b.val ≤ a.val → v (esI k r b) = 0)
+          → herm (Hpk k r) (ζ *ᵥ bvec (eI k r a)) v = 0 := by
     intro v hv
     refine herm_zero_of_trace hζ _ v (hN _ (xuv_lieN z a v hv)) (hN _ (xuv_lieN z a _ ?_))
-    intro b hb; simp [hv b hb]
+    intro b hb
+    simp [hv b hb]
   intro i hi
   by_cases h1 : i.val < r
   · have e := herm_es (ζ *ᵥ bvec (eI k r a)) ⟨i.val, h1⟩
@@ -33,15 +38,13 @@ theorem colN {ζ : B.Mat k r} (hζ : B.inLie k r ζ) (z : Fin (2 * r + k + 1) �
     · have hw := herm_w (ζ *ᵥ bvec (eI k r a)) i (by omega) h2
       have h0 : herm (Hpk k r) (ζ *ᵥ bvec (eI k r a)) (bvec i) = 0 := by
         refine orth _ (fun b hb => ?_)
-        have : esI k r b ≠ i := by
-          intro h; have := congrArg Fin.val h; simp [esI] at this; omega
+        have : esI k r b ≠ i := by intro h; have := congrArg Fin.val h; simp [esI] at this; omega
         simp [bvec, this]
       rw [hw] at h0
       split_ifs at h0 with h3
       · exact neg_eq_zero.1 h0
       · exact h0
-    · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by
-        apply Fin.ext; simp [esI]; omega
+    · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by apply Fin.ext; simp [esI]; omega
       have e2 := herm_e (ζ *ᵥ bvec (eI k r a)) ⟨2 * r + k - i.val, by omega⟩
       rw [← e] at e2
       rw [← e2]
@@ -58,9 +61,11 @@ theorem flt_bvec (a : ℕ) (c : Fin r) (hc : c.val < a) : Flt (k := k) a (bvec (
 theorem flt_zero_eq (y : Fin (2 * r + k + 1) → ℂ) (hy : Flt 0 y) : y = 0 := by
   funext i; exact hy i (Nat.zero_le _)
 
-theorem stepNil (ζ : B.Mat k r) (N : ℕ) (hζN : ζ ^ N = 0) (a : Fin r)
-    (hcol : ∀ i : Fin (2 * r + k + 1), a.val < i.val → (ζ *ᵥ bvec (eI k r a)) i = 0)
-    (hkill : ∀ y, Flt a.val y → ζ *ᵥ y = 0) : Flt a.val (ζ *ᵥ bvec (eI k r a)) := by
+theorem stepNil
+    (ζ : B.Mat k r) (N : ℕ) (hζN : ζ ^ N = 0)
+    (a : Fin r) (hcol : ∀ i : Fin (2 * r + k + 1), a.val < i.val → (ζ *ᵥ bvec (eI k r a)) i = 0)
+    (hkill : ∀ y, Flt a.val y → ζ *ᵥ y = 0)
+    : Flt a.val (ζ *ᵥ bvec (eI k r a)) := by
   set ea := bvec (eI k r a) with hea
   set x := ζ *ᵥ ea with hx
   set xa := x (eI k r a)
@@ -95,15 +100,18 @@ theorem stepNil (ζ : B.Mat k r) (N : ℕ) (hζN : ζ ^ N = 0) (a : Fin r)
       have h2 : xa ^ (m + 1) = 0 := by rw [pow_succ]; exact this.symm
       exact (pow_eq_zero_iff'.1 h2).1
   have : x = x - xa • ea := by rw [hxa, zero_smul, sub_zero]
-  rw [this]; exact hy
+  rw [this]
+  exact hy
 
-theorem killX (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
+theorem killX
+    (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
     (hD : ∀ a (ha : a ≤ r), Dmin k r z z' g ⟨a, by omega⟩ ≠ 0)
-    (ξ η : B.Mat k r) (hξ : B.inLie k r ξ) (N : ℕ) (hξN : ξ ^ N = 0) (hηN : η ^ N = 0)
+    (ξ η : B.Mat k r) (hξ : B.inLie k r ξ)
+    (N : ℕ) (hξN : ξ ^ N = 0) (hηN : η ^ N = 0)
     (hgη : g * η = ξ * g)
     (colξ : ∀ a : Fin r, ∀ i : Fin (2 * r + k + 1), a.val < i.val → (ξ *ᵥ bvec (eI k r a)) i = 0)
-    (colη : ∀ a : Fin r, ∀ i : Fin (2 * r + k + 1), a.val < i.val → (η *ᵥ bvec (eI k r a)) i = 0) :
-    ∀ a, a ≤ r → ∀ y, Flt a y → ξ *ᵥ y = 0 ∧ η *ᵥ y = 0 := by
+    (colη : ∀ a : Fin r, ∀ i : Fin (2 * r + k + 1), a.val < i.val → (η *ᵥ bvec (eI k r a)) i = 0)
+    : ∀ a, a ≤ r → ∀ y, Flt a y → ξ *ᵥ y = 0 ∧ η *ᵥ y = 0 := by
   have hξg : ∀ y, ξ *ᵥ (g *ᵥ y) = g *ᵥ (η *ᵥ y) := by
     intro y; rw [mulVec_mulVec, mulVec_mulVec, hgη]
   intro a
@@ -116,8 +124,10 @@ theorem killX (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
     intro ha y hy
     have IH := ih (by omega)
     set a' : Fin r := ⟨a, by omega⟩
-    have hxξ : Flt a (ξ *ᵥ bvec (eI k r a')) := stepNil ξ N hξN a' (colξ a') (fun y hy => (IH y hy).1)
-    have hxη : Flt a (η *ᵥ bvec (eI k r a')) := stepNil η N hηN a' (colη a') (fun y hy => (IH y hy).2)
+    have hxξ : Flt a (ξ *ᵥ bvec (eI k r a')) :=
+      stepNil ξ N hξN a' (colξ a') (fun y hy => (IH y hy).1)
+    have hxη : Flt a (η *ᵥ bvec (eI k r a')) :=
+      stepNil η N hηN a' (colη a') (fun y hy => (IH y hy).2)
     have hξa : ξ *ᵥ bvec (eI k r a') = 0 := by
       refine dlem_ii z z' g a (by omega) (hD a (by omega)) _ hxξ (fun c hc => ?_)
       rw [herm_skew hξ, hξg, (IH _ (flt_bvec a c hc)).2, mulVec_zero, herm_zero_right, neg_zero]
@@ -134,7 +144,8 @@ theorem killX (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
           omega
         simp [hy i hi', bvec, he]
     have e : y = ya • bvec (eI k r a') + (y - ya • bvec (eI k r a')) := by abel
-    rw [e, mulVec_add, mulVec_smul, mulVec_add, mulVec_smul, hξa, hηa, (IH _ hrest).1, (IH _ hrest).2]
+    rw [e, mulVec_add, mulVec_smul, mulVec_add, mulVec_smul, hξa, hηa, (IH _ hrest).1,
+      (IH _ hrest).2]
     simp
 
 end

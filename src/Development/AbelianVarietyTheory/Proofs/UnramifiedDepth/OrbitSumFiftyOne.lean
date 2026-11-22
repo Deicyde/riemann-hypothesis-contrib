@@ -14,8 +14,8 @@ open Formalism.IncomingBounds Formalism.UnitaryBoundIntegral Formalism.L2.Formal
 
 namespace GlobalTheory.OrbitPlan
 
-theorem exists_good {S : ℕ} {G : Set ℕ} (h : Windows S G) {r : ℝ} (hr : 0 ≤ r) :
-    ∃ y ∈ G, (y : ℝ) ≤ r ∧ r - y ≤ S := by
+theorem exists_good {S : ℕ} {G : Set ℕ} (h : Windows S G) {r : ℝ} (hr : 0 ≤ r)
+    : ∃ y ∈ G, (y : ℝ) ≤ r ∧ r - y ≤ S := by
   have h1 := Nat.floor_le hr
   have h2 := Nat.lt_floor_add_one r
   by_cases hS : S ≤ ⌊r⌋₊ + 1
@@ -29,8 +29,7 @@ theorem exists_good {S : ℕ} {G : Set ℕ} (h : Windows S G) {r : ℝ} (hr : 0 
     have b2 : (⌊r⌋₊ : ℝ) + 1 ≤ S := by exact_mod_cast a2
     exact ⟨0, h.1, by simpa using hr, by simp only [Nat.cast_zero]; linarith⟩
 
-theorem logTerm_nonneg {l n : ℕ} (hl : 5 ≤ l) (hn : 1 ≤ n) :
-    0 ≤ (n : ℝ) * (Real.logb l n + 1) := by
+theorem logTerm_nonneg {l n : ℕ} (hl : 5 ≤ l) (hn : 1 ≤ n) : 0 ≤ (n : ℝ) * (Real.logb l n + 1) := by
   have h1 : (1 : ℝ) < l := by exact_mod_cast (by omega : 1 < l)
   have h2 : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have := Real.logb_nonneg h1 h2

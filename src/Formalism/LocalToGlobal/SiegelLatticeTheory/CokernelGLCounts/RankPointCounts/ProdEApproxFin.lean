@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open IsDedekindDomain NumberField ValuativeRel Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.StabShape
+open IsDedekindDomain NumberField ValuativeRel Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.Pf.StabShape
 
 namespace Formalism.L2.SG.Pf.ProdEApprox
 
@@ -15,12 +16,18 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Code
 
-theorem relIndex_ne_zero_of_code {G : Type*} [Group G] (H A : Subgroup G) {Q : Type*} [Finite Q] (φ : A → Q)
-    (hφ : ∀ k k' : A, φ k = φ k' → ((k⁻¹ * k' : A) : G) ∈ H) : H.relIndex A ≠ 0 := by
+theorem relIndex_ne_zero_of_code
+    {G : Type*} [Group G]
+    (H A : Subgroup G)
+    {Q : Type*} [Finite Q]
+    (φ : A → Q) (hφ : ∀ k k' : A, φ k = φ k' → ((k⁻¹ * k' : A) : G) ∈ H)
+    : H.relIndex A ≠ 0 := by
   classical
   have hfin : Finite (A ⧸ H.subgroupOf A) := by
     choose rep hrep using fun v : Set.range φ => v.2
-    refine Finite.of_surjective (fun v : Set.range φ => (QuotientGroup.mk (rep v) : A ⧸ H.subgroupOf A)) ?_
+    refine Finite.of_surjective
+      (fun v : Set.range φ => (QuotientGroup.mk (rep v) : A ⧸ H.subgroupOf A))
+      ?_
     intro q
     induction q using QuotientGroup.induction_on with
     | H k =>
@@ -35,10 +42,12 @@ end Code
 
 section Fin
 
-variable {D : D7} (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
+variable
+  {D : D7} (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
   (δ : ∀ p : PlF D, (D.s.atP p).Fp) (u u' : D.what₂.Word) (w : Point D.host.E (D.R.rS + 1))
 
-theorem R_sub_O {p : PlF D} (hA : Agree δ M p) {x : (D.s.atP p).Ep} (hx : x ∈ (M p).R) : x ∈ (D.s.atP p).O := by
+theorem R_sub_O {p : PlF D} (hA : Agree δ M p) {x : (D.s.atP p).Ep} (hx : x ∈ (M p).R)
+    : x ∈ (D.s.atP p).O := by
   obtain ⟨-, -, -, hO, -, hsp⟩ := hA
   revert hx
   show x ∈ (⟨(M p).L, (M p).split, (M p).mu⟩ : Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep).R → _
@@ -57,8 +66,9 @@ theorem R_sub_O {p : PlF D} (hA : Agree δ M p) {x : (D.s.atP p).Ep} (hx : x ∈
 def dO {p : PlF D} (c : (D.s.atP p).Fp) (hc : c ∈ 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).O :=
   ⟨algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c, alg_mem_O hc⟩
 
-theorem finite_quot {p : PlF D} (hA : Agree δ M p) (c : (D.s.atP p).Fp) (hc0 : c ≠ 0) (hc : c ∈ 𝒪[(D.s.atP p).Fp]) :
-    Finite ((D.s.atP p).O ⧸ (Ideal.span {dO c hc}).toAddSubgroup) := by
+theorem finite_quot
+    {p : PlF D} (hA : Agree δ M p) (c : (D.s.atP p).Fp) (hc0 : c ≠ 0) (hc : c ∈ 𝒪[(D.s.atP p).Fp])
+    : Finite ((D.s.atP p).O ⧸ (Ideal.span {dO c hc}).toAddSubgroup) := by
   obtain ⟨hOK, -, -, hO, -, -⟩ := hA
   have := hOK.loc
   have := hOK.char0
@@ -66,12 +76,17 @@ theorem finite_quot {p : PlF D} (hA : Agree δ M p) (c : (D.s.atP p).Fp) (hc0 : 
   obtain ⟨hOo, hOc, -⟩ := Formalism.MainNotions.LocalModelPeriodLattices.O_top (M p).L
   rw [hO] at hOo hOc
   have : CompactSpace (D.s.atP p).O := isCompact_iff_compactSpace.1 hOc
-  have hc' : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c⁻¹ * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c = 1 := by
+  have hc'
+      : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c⁻¹ * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c
+        = 1 := by
     rw [← map_mul, inv_mul_cancel₀ hc0, map_one]
-  have hopen : IsOpen (((Ideal.span {dO c hc}).toAddSubgroup : AddSubgroup (D.s.atP p).O) : Set (D.s.atP p).O) := by
-    have h1 : (((Ideal.span {dO c hc}).toAddSubgroup : AddSubgroup (D.s.atP p).O) : Set (D.s.atP p).O) =
-        (fun y : (D.s.atP p).O => algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c⁻¹ * (y : (D.s.atP p).Ep)) ⁻¹'
-          ((D.s.atP p).O : Set (D.s.atP p).Ep) := by
+  have hopen : IsOpen
+      (((Ideal.span {dO c hc}).toAddSubgroup : AddSubgroup (D.s.atP p).O) : Set (D.s.atP p).O) := by
+    have h1
+        : (((Ideal.span {dO c hc}).toAddSubgroup : AddSubgroup (D.s.atP p).O) : Set (D.s.atP p).O)
+          = (fun y : (D.s.atP p).O =>
+              algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c⁻¹ * (y : (D.s.atP p).Ep))
+            ⁻¹' ((D.s.atP p).O : Set (D.s.atP p).Ep) := by
       ext y
       simp only [Submodule.coe_toAddSubgroup, SetLike.mem_coe, Set.mem_preimage]
       rw [Ideal.mem_span_singleton']
@@ -88,9 +103,11 @@ theorem finite_quot {p : PlF D} (hA : Agree δ M p) (c : (D.s.atP p).Fp) (hc0 : 
     exact hOo.preimage (by fun_prop)
   exact AddSubgroup.quotient_finite_of_isOpen _ hopen
 
-theorem quot_eq {p : PlF D} {c : (D.s.atP p).Fp} {hc : c ∈ 𝒪[(D.s.atP p).Fp]} {x y : (D.s.atP p).O}
-    (h : (QuotientAddGroup.mk x : (D.s.atP p).O ⧸ (Ideal.span {dO c hc}).toAddSubgroup) = QuotientAddGroup.mk y) :
-    (y : (D.s.atP p).Ep) - x ∈ latS (D.s.atP p) c := by
+theorem quot_eq
+    {p : PlF D} {c : (D.s.atP p).Fp} {hc : c ∈ 𝒪[(D.s.atP p).Fp]} {x y : (D.s.atP p).O}
+    (h : (QuotientAddGroup.mk x : (D.s.atP p).O ⧸ (Ideal.span {dO c hc}).toAddSubgroup)
+      = QuotientAddGroup.mk y)
+    : (y : (D.s.atP p).Ep) - x ∈ latS (D.s.atP p) c := by
   rw [QuotientAddGroup.eq] at h
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 h
   refine mem_latS.2 ⟨z, z.2, ?_⟩
@@ -100,13 +117,22 @@ theorem quot_eq {p : PlF D} {c : (D.s.atP p).Fp} {hc : c ∈ 𝒪[(D.s.atP p).Fp
   show (z : (D.s.atP p).Ep) * algebraMap _ _ c = _
   ring
 
-theorem entIn_int_mul {p : PlF D} {c : (D.s.atP p).Fp} {B X : ProdE.MP p} (hB : ∀ i j, B i j ∈ (D.s.atP p).O)
-    (hX : EntIn (latS (D.s.atP p) c) X) : EntIn (latS (D.s.atP p) c) (B * X) :=
-  entIn_mul (J1 := (D.s.atP p).O.toAddSubgroup) (fun x hx y hy => O_mul_latS hx hy) (fun i j => hB i j) hX
+theorem entIn_int_mul
+    {p : PlF D} {c : (D.s.atP p).Fp} {B X : ProdE.MP p}
+    (hB : ∀ i j, B i j ∈ (D.s.atP p).O) (hX : EntIn (latS (D.s.atP p) c) X)
+    : EntIn (latS (D.s.atP p) c) (B * X) :=
+  entIn_mul (J1 := (D.s.atP p).O.toAddSubgroup)
+    (fun x hx y hy => O_mul_latS hx hy)
+    (fun i j => hB i j)
+    hX
 
-theorem entIn_mul_int {p : PlF D} {c : (D.s.atP p).Fp} {B X : ProdE.MP p} (hB : ∀ i j, B i j ∈ (D.s.atP p).O)
-    (hX : EntIn (latS (D.s.atP p) c) X) : EntIn (latS (D.s.atP p) c) (X * B) :=
-  entIn_mul (J2 := (D.s.atP p).O.toAddSubgroup) (fun x hx y hy => by rw [mul_comm]; exact O_mul_latS hy hx) hX
+theorem entIn_mul_int
+    {p : PlF D} {c : (D.s.atP p).Fp} {B X : ProdE.MP p}
+    (hB : ∀ i j, B i j ∈ (D.s.atP p).O) (hX : EntIn (latS (D.s.atP p) c) X)
+    : EntIn (latS (D.s.atP p) c) (X * B) :=
+  entIn_mul (J2 := (D.s.atP p).O.toAddSubgroup)
+    (fun x hx y hy => by rw [mul_comm]; exact O_mul_latS hy hx)
+    hX
     (fun i j => hB i j)
 
 end Fin

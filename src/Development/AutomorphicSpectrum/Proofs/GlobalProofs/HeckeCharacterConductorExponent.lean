@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ContinuousIdel
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.CompletedLStripBounds GlobalTheory.HeckeEps GlobalTheory.CompanionTheory.HeckeBridge GroundTheory.Global GroundTheory.LocalField GroundTheory.Global.IdeleGroup
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.CompletedLStripBounds GlobalTheory.HeckeEps
+  GlobalTheory.CompanionTheory.HeckeBridge GroundTheory.Global GroundTheory.LocalField
+  GroundTheory.Global.IdeleGroup
 open GroundTheory.Automorphic.GodementSection (localChar)
 open Formalism.L2.Host (unif atFin unif_spec)
 
@@ -18,16 +21,18 @@ namespace GlobalTheory.CompanionTheory.HeckeBridge
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem comp_finiteUnitsSingle (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) :
-    (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v)) =
-      ((toHecke χ hu).localComponent v : (v.adicCompletion E)ˣ →* Circle) := by
+theorem comp_finiteUnitsSingle (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E))
+    : (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v))
+      = ((toHecke χ hu).localComponent v : (v.adicCompletion E)ˣ →* Circle) := by
   refine MonoidHom.ext fun a => ?_
   show (toHecke χ hu).toIdele (ofFinite (finiteUnitsSingle v a)) = (toHecke χ hu).localComponent v a
-  rw [GroundTheory.Global.IdeleGroup.ofFinite_finiteUnitsSingle, GroundTheory.Global.HeckeCharacter.localComponent_apply]
+  rw [GroundTheory.Global.IdeleGroup.ofFinite_finiteUnitsSingle,
+    GroundTheory.Global.HeckeCharacter.localComponent_apply]
 
-private theorem toHecke_local_eq_one_iff (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E))
-    (x : (v.adicCompletion E)ˣ) :
-    (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v)) x = 1 ↔ χ.loc v x = 1 := by
+private theorem toHecke_local_eq_one_iff
+    (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ)
+    : (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v)) x = 1
+      ↔ χ.loc v x = 1 := by
   rw [comp_finiteUnitsSingle χ hu v]
   have h := coe_localComponent χ hu v x
   constructor
@@ -42,9 +47,11 @@ private theorem toHecke_local_eq_one_iff (χ : HChar E) (hu : IsUnitary χ) (v :
       rw [h, h1, Units.val_one, Circle.coe_one]
     exact h1'
 
-theorem levelLe_iff_unitsLevel_le_ker (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) (n : ℕ) :
-    χ.LevelLe v n ↔
-      unitsLevel v n ≤ (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v)).ker := by
+theorem levelLe_iff_unitsLevel_le_ker
+    (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+    : χ.LevelLe v n
+      ↔ unitsLevel v n
+        ≤ (((toHecke χ hu).toIdele.comp ofFinite).comp (finiteUnitsSingle v)).ker := by
   unfold Formalism.L2.Host.HChar.LevelLe
   constructor
   · intro h x hx
@@ -55,16 +62,20 @@ theorem levelLe_iff_unitsLevel_le_ker (χ : HChar E) (hu : IsUnitary χ) (v : He
     rw [← toHecke_local_eq_one_iff χ hu v x]
     exact h (GroundTheory.Global.mem_unitsLevel.mpr ⟨hux, hx⟩)
 
-theorem levelLe_iff_conductorExponentAt (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) (n : ℕ) :
-    χ.LevelLe v n ↔ conductorExponentAt ((toHecke χ hu).toIdele.comp ofFinite) v ≤ n := by
+theorem levelLe_iff_conductorExponentAt
+    (χ : HChar E) (hu : IsUnitary χ) (v : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+    : χ.LevelLe v n ↔ conductorExponentAt ((toHecke χ hu).toIdele.comp ofFinite) v ≤ n := by
   rw [levelLe_iff_unitsLevel_le_ker χ hu v n]
   exact GroundTheory.Global.unitsLevel_le_ker_iff v GroundTheory.Global.Circle.noSmallSubgroups _
-    (((toHecke χ hu).continuous_toIdele.comp GroundTheory.Global.IdeleGroup.continuous_ofFinite).comp
+    (((toHecke χ hu).continuous_toIdele.comp
+        GroundTheory.Global.IdeleGroup.continuous_ofFinite).comp
       (GroundTheory.Global.IdeleGroup.continuous_finiteUnitsSingle v))
 
-private theorem asIdeal_pow_dvd_finprod_iff {R : Type*} [CommRing R] [IsDedekindDomain R]
-    {a : HeightOneSpectrum R → ℕ} (ha : (Function.support a).Finite) (v : HeightOneSpectrum R) (k : ℕ) :
-    v.asIdeal ^ k ∣ ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ a w ↔ k ≤ a v := by
+private theorem asIdeal_pow_dvd_finprod_iff
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    {a : HeightOneSpectrum R → ℕ} (ha : (Function.support a).Finite)
+    (v : HeightOneSpectrum R) (k : ℕ)
+    : v.asIdeal ^ k ∣ ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ a w ↔ k ≤ a v := by
   classical
   have hfin : (Function.mulSupport fun w : HeightOneSpectrum R => w.asIdeal ^ a w).Finite := by
     rw [GroundTheory.Global.mulSupport_asIdeal_pow]; exact ha
@@ -87,11 +98,13 @@ private theorem asIdeal_pow_dvd_finprod_iff {R : Type*} [CommRing R] [IsDedekind
       exact hw (by simp [hwv])
     have hbfin' : (Function.mulSupport fun w : HeightOneSpectrum R => w.asIdeal ^ b w).Finite := by
       rw [GroundTheory.Global.mulSupport_asIdeal_pow]; exact hbfin
-    have hsingle : ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ (if w = v then a v else 0) = v.asIdeal ^ a v := by
+    have hsingle
+        : ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ (if w = v then a v else 0) = v.asIdeal ^ a v := by
       rw [finprod_eq_single _ v (fun w hw => by simp [hw])]
       simp
-    have hsplit : ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ a w =
-        v.asIdeal ^ a v * ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ b w := by
+    have hsplit
+        : ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ a w
+          = v.asIdeal ^ a v * ∏ᶠ w : HeightOneSpectrum R, w.asIdeal ^ b w := by
       rw [← hsingle, ← finprod_mul_distrib hcfin hbfin']
       refine finprod_congr fun w => ?_
       by_cases hwv : w = v
@@ -114,23 +127,29 @@ private theorem asIdeal_pow_dvd_finprod_iff {R : Type*} [CommRing R] [IsDedekind
     exact (pow_dvd_pow _ hk).trans
       (finprod_mem_dvd (f := fun w : HeightOneSpectrum R => w.asIdeal ^ a w) v hfin)
 
-theorem multiplicity_conductor_toHecke (E : Type) [Field E] [NumberField E] (χ : HChar E) (hu : IsUnitary χ)
-    (v : HeightOneSpectrum (𝓞 E)) (m : ℕ) (h : ExpAt χ v m) :
-    multiplicity v.asIdeal (toHecke χ hu).conductor = m := by
+theorem multiplicity_conductor_toHecke
+    (E : Type) [Field E] [NumberField E]
+    (χ : HChar E) (hu : IsUnitary χ)
+    (v : HeightOneSpectrum (𝓞 E)) (m : ℕ) (h : ExpAt χ v m)
+    : multiplicity v.asIdeal (toHecke χ hu).conductor = m := by
   have hcont : Continuous ((toHecke χ hu).toIdele.comp ofFinite) :=
     (toHecke χ hu).continuous_toIdele.comp GroundTheory.Global.IdeleGroup.continuous_ofFinite
-  have hfin := GroundTheory.Global.IdeleGroup.finite_support_conductorExponentAt
-    GroundTheory.Global.Circle.noSmallSubgroups _ hcont
+  have hfin :=
+    GroundTheory.Global.IdeleGroup.finite_support_conductorExponentAt
+      GroundTheory.Global.Circle.noSmallSubgroups _ hcont
   have hne := (toHecke χ hu).conductor_ne_bot
   have hcond : χ.IsCond (toHecke χ hu).conductor := by
     unfold Formalism.L2.Host.HChar.IsCond
     refine ⟨hne, fun w n => ?_⟩
     rw [levelLe_iff_conductorExponentAt χ hu w n]
     have h1 := asIdeal_pow_dvd_finprod_iff hfin w (n + 1)
-    change _ ↔ ¬ w.asIdeal ^ (n + 1) ∣ ∏ᶠ u : HeightOneSpectrum (𝓞 E),
-      u.asIdeal ^ conductorExponentAt ((toHecke χ hu).toIdele.comp ofFinite) u
+    change _
+      ↔ ¬ w.asIdeal ^ (n + 1)
+        ∣ ∏ᶠ u : HeightOneSpectrum (𝓞 E),
+          u.asIdeal ^ conductorExponentAt ((toHecke χ hu).toIdele.comp ofFinite) u
     rw [h1]
     constructor <;> intro h2 <;> omega
-  exact (GlobalTheory.CMVal.ExpAt.unique h ((GlobalTheory.CMVal.isCond_iff_expAt χ hne).mp hcond v)).symm
+  exact (GlobalTheory.CMVal.ExpAt.unique h
+    ((GlobalTheory.CMVal.isCond_iff_expAt χ hne).mp hcond v)).symm
 
 end GlobalTheory.CompanionTheory.HeckeBridge

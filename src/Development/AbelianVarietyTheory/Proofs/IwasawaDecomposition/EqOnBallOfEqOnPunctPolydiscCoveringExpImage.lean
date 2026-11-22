@@ -10,7 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsExponentia
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -20,7 +23,12 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem eq_on_ball_of_eq_on_logExp_image : ∀ (n a : ℕ) (ρ₁ : ℝ) (X : Type) [TopologicalSpace X] [T2Space X] (f h : (Fin n → ℂ) → X), ρ₁ ≤ 1 → ContinuousOn f (Metric.ball 0 ρ₁) → ContinuousOn h (Metric.ball 0 ρ₁) → (∀ s ∈ logDom n a, logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁ → f (logExp a s) = h (logExp a s)) → ∀ z ∈ Metric.ball (0 : Fin n → ℂ) ρ₁, f z = h z := by
+theorem eq_on_ball_of_eq_on_logExp_image
+    : ∀ (n a : ℕ) (ρ₁ : ℝ) (X : Type) [TopologicalSpace X] [T2Space X] (f h : (Fin n → ℂ) → X),
+      ρ₁ ≤ 1 → ContinuousOn f (Metric.ball 0 ρ₁) → ContinuousOn h (Metric.ball 0 ρ₁)
+        → (∀ s ∈ logDom n a,
+          logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁ → f (logExp a s) = h (logExp a s))
+        → ∀ z ∈ Metric.ball (0 : Fin n → ℂ) ρ₁, f z = h z := by
   intro n a ρ₁ X _ _ f h hρ hf hh hagree
   set U := Metric.ball (0 : Fin n → ℂ) ρ₁ with hUdef
   set D : Set (Fin n → ℂ) := {z | z ∈ U ∧ ∀ k : Fin n, (k:ℕ) < a → z k ≠ 0} with hDdef
@@ -47,10 +55,10 @@ theorem eq_on_ball_of_eq_on_logExp_image : ∀ (n a : ℕ) (ρ₁ : ℝ) (X : Ty
     rwa [hexp] at this
   have hsub : U ⊆ closure D := by
     intro z hz
-    let g : ℂ → (Fin n → ℂ) := fun t k => if (k:ℕ) < a then z k + t else z k
+    let g : ℂ → (Fin n → ℂ) := fun t k => if (k : ℕ) < a then z k + t else z k
     have hg : Continuous g := by
       refine continuous_pi fun k => ?_
-      by_cases hk : (k:ℕ) < a
+      by_cases hk : (k : ℕ) < a
       · simp only [g, hk, if_true]; fun_prop
       · simp only [g, hk, if_false]; fun_prop
     let T : Set ℂ := Set.range (fun k : Fin n => - z k)

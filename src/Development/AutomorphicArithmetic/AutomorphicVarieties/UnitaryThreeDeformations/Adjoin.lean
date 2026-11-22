@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-private theorem exists_min_basis {σ : Type} [Finite σ] (S : Set (σ →₀ ℕ)) :
-    ∃ B : Finset (σ →₀ ℕ), (∀ b ∈ B, b ∈ S) ∧ ∀ n ∈ S, ∃ b ∈ B, b ≤ n := by
+private theorem exists_min_basis {σ : Type} [Finite σ] (S : Set (σ →₀ ℕ))
+    : ∃ B : Finset (σ →₀ ℕ), (∀ b ∈ B, b ∈ S) ∧ ∀ n ∈ S, ∃ b ∈ B, b ≤ n := by
   classical
   have hP : ∀ t : Set (σ →₀ ℕ), t.IsPWO := fun t => Set.isPWO_of_wellQuasiOrderedLE t
   have hfin : {b | Minimal (· ∈ S) b}.Finite :=
@@ -18,11 +19,15 @@ private theorem exists_min_basis {σ : Type} [Finite σ] (S : Set (σ →₀ ℕ
   · obtain ⟨b, hbn, hb⟩ := (hP S).exists_le_minimal hn
     exact ⟨b, (Set.Finite.mem_toFinset hfin).2 hb, hbn⟩
 
-private theorem exists_decomp {O σ : Type} [CommRing O] [Finite σ] (w : σ → ℤ) (j : ℤ) (S : Set (σ →₀ ℕ))
-    (hS : ∀ n ∈ S, Finsupp.weight w n = j) :
-    ∃ B : Finset (σ →₀ ℕ), (∀ b ∈ B, b ∈ S) ∧ ∀ f : MvPowerSeries σ O, (∀ n ∉ S, MvPowerSeries.coeff n f = 0) →
-      ∃ g : (σ →₀ ℕ) → MvPowerSeries σ O, (∀ b ∈ B, g b ∈ wtPart O w 0) ∧
-        f = ∑ b ∈ B, MvPowerSeries.monomial b 1 * g b := by
+private theorem exists_decomp
+    {O σ : Type} [CommRing O] [Finite σ]
+    (w : σ → ℤ) (j : ℤ) (S : Set (σ →₀ ℕ)) (hS : ∀ n ∈ S, Finsupp.weight w n = j)
+    : ∃ B : Finset (σ →₀ ℕ),
+      (∀ b ∈ B, b ∈ S)
+        ∧ ∀ f : MvPowerSeries σ O,
+          (∀ n ∉ S, MvPowerSeries.coeff n f = 0)
+            → ∃ g : (σ →₀ ℕ) → MvPowerSeries σ O,
+              (∀ b ∈ B, g b ∈ wtPart O w 0) ∧ f = ∑ b ∈ B, MvPowerSeries.monomial b 1 * g b := by
   classical
   obtain ⟨B, hBS, hB⟩ := exists_min_basis S
   let c : (σ →₀ ℕ) → (σ →₀ ℕ) := fun n => if h : n ∈ S then Classical.choose (hB n h) else 0
@@ -33,8 +38,11 @@ private theorem exists_decomp {O σ : Type} [CommRing O] [Finite σ] (w : σ →
   refine ⟨B, hBS, fun f hf => ?_⟩
   let g : (σ →₀ ℕ) → MvPowerSeries σ O := fun b m =>
     if m + b ∈ S ∧ c (m + b) = b then MvPowerSeries.coeff (m + b) f else 0
-  have hg : ∀ b n, b ≤ n → MvPowerSeries.coeff (n - b) (g b) =
-      if n ∈ S ∧ c n = b then MvPowerSeries.coeff n f else 0 := by
+  have hg
+      : ∀ b n,
+        b ≤ n
+          → MvPowerSeries.coeff (n - b) (g b)
+            = if n ∈ S ∧ c n = b then MvPowerSeries.coeff n f else 0 := by
     intro b n hbn
     rw [MvPowerSeries.coeff_apply]
     simp only [g, tsub_add_cancel_of_le hbn]
@@ -74,8 +82,11 @@ private theorem exists_decomp {O σ : Type} [CommRing O] [Finite σ] (w : σ →
         exact hn h
       · rfl
 
-private theorem inv_mem_wtPart {O σ : Type} [CommRing O] (w : σ → ℤ) {f g : MvPowerSeries σ O}
-    (hf : f ∈ wtPart O w 0) (hfg : f * g = 1) : g ∈ wtPart O w 0 := by
+private theorem inv_mem_wtPart
+    {O σ : Type} [CommRing O]
+    (w : σ → ℤ)
+    {f g : MvPowerSeries σ O} (hf : f ∈ wtPart O w 0) (hfg : f * g = 1)
+    : g ∈ wtPart O w 0 := by
   classical
   set g0 := wcomp O w 0 g with hg0
   have h0 : ∀ n, Finsupp.weight w n = 0 → MvPowerSeries.coeff n (g - g0) = 0 := by
@@ -107,21 +118,25 @@ private theorem inv_mem_wtPart {O σ : Type} [CommRing O] (w : σ → ℤ) {f g 
     · exact hprod n hn
     · exact hmem n hn
   have hgg : g - g0 = 0 := by
-    calc g - g0 = g * (f * (g - g0)) := by rw [← mul_assoc, mul_comm g f, hfg, one_mul]
+    calc
+      g - g0
+        = g * (f * (g - g0)) := by rw [← mul_assoc, mul_comm g f, hfg, one_mul]
       _ = 0 := by rw [hz, mul_zero]
   have hg : g = g0 := sub_eq_zero.mp hgg
   rw [hg]
   exact wcomp_mem O w 0 g
 
-private theorem monomial_mem_wtPart {O σ : Type} [CommRing O] (w : σ → ℤ) (b : σ →₀ ℕ) :
-    (MvPowerSeries.monomial b 1 : MvPowerSeries σ O) ∈ wtPart O w (Finsupp.weight w b) := fun n hn => by
+private theorem monomial_mem_wtPart {O σ : Type} [CommRing O] (w : σ → ℤ) (b : σ →₀ ℕ)
+    : (MvPowerSeries.monomial b 1 : MvPowerSeries σ O)
+      ∈ wtPart O w (Finsupp.weight w b) := fun n hn => by
   classical
   rw [MvPowerSeries.coeff_monomial, if_neg]
   rintro rfl
   exact hn rfl
 
-private theorem monomial_mem_adjoin {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (W : WPres O ℤ R)
-    (b : W.σ →₀ ℕ) : W.π (MvPowerSeries.monomial b 1) ∈ Algebra.adjoin O (Set.range W.z) := by
+private theorem monomial_mem_adjoin
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (W : WPres O ℤ R) (b : W.σ →₀ ℕ)
+    : W.π (MvPowerSeries.monomial b 1) ∈ Algebra.adjoin O (Set.range W.z) := by
   classical
   induction b using Finsupp.induction with
   | zero =>
@@ -129,14 +144,17 @@ private theorem monomial_mem_adjoin {O R : Type} [CommRing O] [CommRing R] [Alge
     rw [e, map_one]
     exact Subalgebra.one_mem _
   | single_add i k b _ _ ih =>
-    rw [← mul_one (1 : O), ← MvPowerSeries.monomial_mul_monomial, map_mul, ← MvPowerSeries.X_pow_eq, map_pow]
+    rw [← mul_one (1 : O), ← MvPowerSeries.monomial_mul_monomial, map_mul, ← MvPowerSeries.X_pow_eq,
+      map_pow]
     have hi : W.π (MvPowerSeries.X i) ∈ Algebra.adjoin O (Set.range W.z) :=
       Algebra.subset_adjoin (Set.mem_range.mpr ⟨i, rfl⟩)
     exact Subalgebra.mul_mem _ (Subalgebra.pow_mem _ hi _) ih
 
-private theorem part_decomp {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (W : WPres O ℤ R) (j : ℤ) :
-    ∃ B : Finset (W.σ →₀ ℕ), W.part j =
-      ⨆ b ∈ B, (W.part 0).map (LinearMap.mulLeft O (W.π (MvPowerSeries.monomial b 1))) := by
+private theorem part_decomp
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (W : WPres O ℤ R) (j : ℤ)
+    : ∃ B : Finset (W.σ →₀ ℕ),
+      W.part j
+        = ⨆ b ∈ B, (W.part 0).map (LinearMap.mulLeft O (W.π (MvPowerSeries.monomial b 1))) := by
   obtain ⟨B, hB, hd⟩ := exists_decomp (O := O) W.wt j {n | Finsupp.weight W.wt n = j} fun _ h => h
   refine ⟨B, le_antisymm ?_ (iSup₂_le fun b hb => ?_)⟩
   · rintro _ ⟨f, hf, rfl⟩
@@ -144,15 +162,18 @@ private theorem part_decomp {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine sum_mem fun b hb => ?_
-    refine Submodule.mem_iSup_of_mem b (Submodule.mem_iSup_of_mem hb ⟨W.π (g b), ⟨g b, hg b hb, rfl⟩, ?_⟩)
+    refine Submodule.mem_iSup_of_mem b
+      (Submodule.mem_iSup_of_mem hb ⟨W.π (g b), ⟨g b, hg b hb, rfl⟩, ?_⟩)
     simp
   · rintro _ ⟨_, ⟨g, hg, rfl⟩, rfl⟩
     refine ⟨MvPowerSeries.monomial b 1 * g, ?_, by simp⟩
     have := mul_mem_wtPart O W.wt (monomial_mem_wtPart W.wt b) hg
     rwa [add_zero, hB b hb] at this
 
-private theorem mem_adjoin_of_mul_eq_one_of_isIntegral' {O R : Type} [CommRing O] [CommRing R] [Algebra O R] {u v : R}
-    (huv : u * v = 1) (hv : IsIntegral O v) : v ∈ Algebra.adjoin O {u} := by
+private theorem mem_adjoin_of_mul_eq_one_of_isIntegral'
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    {u v : R} (huv : u * v = 1) (hv : IsIntegral O v)
+    : v ∈ Algebra.adjoin O {u} := by
   obtain ⟨p, hpm, hp⟩ := hv
   letI : Invertible v := ⟨u, huv, by rw [mul_comm]; exact huv⟩
   have h1 : Polynomial.eval₂ (algebraMap O R) u p.reverse = 0 := by
@@ -165,20 +186,23 @@ private theorem mem_adjoin_of_mul_eq_one_of_isIntegral' {O R : Type} [CommRing O
   obtain ⟨q, hq⟩ := Polynomial.X_dvd_sub_C (p := p.reverse)
   rw [Polynomial.coeff_zero_reverse, hpm.leadingCoeff, map_one] at hq
   have h2 : p.reverse = 1 + Polynomial.X * q := by rw [← hq]; ring
-  rw [h2, Polynomial.eval₂_add, Polynomial.eval₂_mul, Polynomial.eval₂_X, Polynomial.eval₂_one] at h1
-  have h3 : v = -Polynomial.aeval u q := by
+  rw [h2, Polynomial.eval₂_add, Polynomial.eval₂_mul, Polynomial.eval₂_X, Polynomial.eval₂_one]
+    at h1
+  have h3 : v = - Polynomial.aeval u q := by
     have h4 : v * (1 + u * Polynomial.eval₂ (algebraMap O R) u q) = 0 := by rw [h1, mul_zero]
     rw [Polynomial.aeval_def]
     linear_combination h4 - (Polynomial.eval₂ (algebraMap O R) u q) * huv
   rw [h3]
   exact Subalgebra.neg_mem _ (Polynomial.aeval_mem_adjoin_singleton O u)
 
-private theorem part_zero_le {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R]
-    (W : WPres O ℤ R) (hfin : (W.part 0).FG) : ∀ x ∈ W.part 0, x ∈ Algebra.adjoin O (Set.range W.z) := by
+private theorem part_zero_le
+    {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [IsLocalRing R] [Algebra O R]
+    (W : WPres O ℤ R) (hfin : (W.part 0).FG)
+    : ∀ x ∈ W.part 0, x ∈ Algebra.adjoin O (Set.range W.z) := by
   classical
   haveI := W.fin
-  obtain ⟨B, hBS, hB⟩ := exists_decomp (O := O) W.wt 0 {n | Finsupp.weight W.wt n = 0 ∧ n ≠ 0}
-    (fun n hn => hn.1)
+  obtain ⟨B, hBS, hB⟩ :=
+    exists_decomp (O := O) W.wt 0 {n | Finsupp.weight W.wt n = 0 ∧ n ≠ 0} (fun n hn => hn.1)
   have hone : (1 : R) ∈ W.part 0 := ⟨1, one_mem_wtPart O W.wt, map_one W.π⟩
   have hmul : ∀ x y, x ∈ W.part 0 → y ∈ W.part 0 → x * y ∈ W.part 0 := by
     rintro _ _ ⟨f, hf, rfl⟩ ⟨g, hg, rfl⟩
@@ -201,7 +225,8 @@ private theorem part_zero_le {O R : Type} [CommRing O] [IsLocalRing O] [CommRing
   have hAT : A ≤ Algebra.adjoin O (Set.range W.z) :=
     Algebra.adjoin_le (by rintro _ ⟨b, _, rfl⟩; exact monomial_mem_adjoin W b)
   let I : Ideal A := Ideal.span {a : A | ∃ b ∈ B, (a : R) = zz b}
-  have hJ : ∀ x ∈ I, ∃ h ∈ wtPart O W.wt 0, MvPowerSeries.constantCoeff h = 0 ∧ W.π h = (x : R) := by
+  have hJ
+      : ∀ x ∈ I, ∃ h ∈ wtPart O W.wt 0, MvPowerSeries.constantCoeff h = 0 ∧ W.π h = (x : R) := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
@@ -209,7 +234,8 @@ private theorem part_zero_le {O R : Type} [CommRing O] [IsLocalRing O] [CommRing
       refine ⟨MvPowerSeries.monomial b 1, hmono b hb, ?_, hxb.symm⟩
       rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_monomial,
         if_neg (Ne.symm (hBS b hb).2)]
-    | zero => exact ⟨0, Submodule.zero_mem _, map_zero _, by simp⟩
+    | zero =>
+      exact ⟨0, Submodule.zero_mem _, map_zero _, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨h1, m1, c1, e1⟩ := hx
       obtain ⟨h2, m2, c2, e2⟩ := hy
@@ -259,14 +285,15 @@ private theorem part_zero_le {O R : Type} [CommRing O] [IsLocalRing O] [CommRing
       exact Submodule.subset_span hx
     obtain ⟨f, hf, rfl⟩ := hx0
     set c := MvPowerSeries.constantCoeff f with hcdef
-    have hf' : ∀ n ∉ {n | Finsupp.weight W.wt n = 0 ∧ n ≠ 0},
-        MvPowerSeries.coeff n (f - MvPowerSeries.C c) = 0 := by
+    have hf'
+        : ∀ n ∉ {n | Finsupp.weight W.wt n = 0 ∧ n ≠ 0},
+          MvPowerSeries.coeff n (f - MvPowerSeries.C c) = 0 := by
       intro n hn
       simp only [Set.mem_setOf_eq, not_and, not_not] at hn
       by_cases h0 : n = 0
       · subst h0
-        rw [map_sub, MvPowerSeries.coeff_C, if_pos rfl, MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
-          sub_self]
+        rw [map_sub, MvPowerSeries.coeff_C, if_pos rfl,
+          MvPowerSeries.coeff_zero_eq_constantCoeff_apply, sub_self]
       · rw [map_sub, MvPowerSeries.coeff_C, if_neg h0, sub_zero]
         by_cases hw : Finsupp.weight W.wt n = 0
         · exact absurd (hn hw) h0
@@ -294,20 +321,27 @@ private theorem part_zero_le {O R : Type} [CommRing O] [IsLocalRing O] [CommRing
       have hmemI : (⟨zz b, hzA⟩ : A) ∈ I := Ideal.subset_span ⟨b, hb, rfl⟩
       have hgN : W.π (g b) ∈ N' := hsub _ ⟨g b, hg b hb, rfl⟩
       exact Submodule.smul_mem_smul hmemI hgN
-  have hfinal := Submodule.le_of_le_smul_of_le_jacobson_bot (Submodule.fg_span s.finite_toSet) hjac hle
+  have hfinal :=
+    Submodule.le_of_le_smul_of_le_jacobson_bot (Submodule.fg_span s.finite_toSet) hjac hle
   intro x hx
   have hxN : x ∈ N := hfinal (hsub x hx)
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hxN
   rw [Subalgebra.smul_def, smul_eq_mul, mul_one]
   exact hAT a.2
 
-theorem UpperTheory.V.UnitaryThreeInertia.sring_eq_adjoin :
-    ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O] [Finite (ResidueField O)]
-      {G Γ ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
-      [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι] (F : Frame O G Γ ι), F.Ok →
-    ∀ (g₁ : Γ), F.Marked g₁ → ∀ {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
-      (u : Γ →* GG (m := 3) (R := R)), F.IsUniv g₁ u →
-    Module.Finite O (wpart O u 0) → Sring (O := O) u = Algebra.adjoin O {x | ∃ g a b, F.η g = 1 ∧ x = (u g).mat a b} ∧ ∀ j, Module.Finite O (wpart O u j) := by
+theorem UpperTheory.V.UnitaryThreeInertia.sring_eq_adjoin
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] [Finite (ResidueField O)] {G Γ ι : Type}
+        [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [T2Space G]
+        [TotallyDisconnectedSpace G] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι] (F : Frame O G Γ ι),
+      F.Ok
+        → ∀ (g₁ : Γ),
+          F.Marked g₁
+            → ∀ {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (u : Γ →* GG (m := 3) (R := R)),
+              F.IsUniv g₁ u → Module.Finite O (wpart O u 0)
+                → Sring (O := O) u = Algebra.adjoin O {x | ∃ g a b, F.η g = 1 ∧ x = (u g).mat a b}
+                  ∧ ∀ j, Module.Finite O (wpart O u j) := by
   intro O _ _ _ _ _ _ G Γ ι _ _ _ _ _ _ _ _ _ _ _ _ _ F hOk g₁ hg₁ R _ _ _ u hu hfin
   classical
   obtain ⟨W, hW, -⟩ := exists_adapted F hOk g₁ hg₁ u hu
@@ -330,8 +364,9 @@ theorem UpperTheory.V.UnitaryThreeInertia.sring_eq_adjoin :
     intro j x hx
     obtain ⟨B, hB⟩ := part_decomp W j
     rw [hB] at hx
-    have hle : (⨆ b ∈ B, (W.part 0).map (LinearMap.mulLeft O (W.π (MvPowerSeries.monomial b 1)))) ≤
-        Subalgebra.toSubmodule (Algebra.adjoin O E) := by
+    have hle
+        : (⨆ b ∈ B, (W.part 0).map (LinearMap.mulLeft O (W.π (MvPowerSeries.monomial b 1))))
+          ≤ Subalgebra.toSubmodule (Algebra.adjoin O E) := by
       refine iSup₂_le fun b _ => ?_
       rintro _ ⟨y, hy, rfl⟩
       exact Subalgebra.mul_mem _ (hzE (monomial_mem_adjoin W b)) (hzE (hadj y hy))

@@ -12,10 +12,14 @@ open NumberField
 
 namespace GlobalTheory.InverseHalfDifferent
 
-theorem exists_single_mem_span {E M ι : Type} [Field E] [NumberField E] [Field M] [NumberField M]
-    [Finite ι] [DecidableEq ι] (f : ι → E →+* M) (hf : Function.Injective f) (i : ι) :
-    ∃ s : M, s ≠ 0 ∧ (Pi.single i s : ι → M) ∈
-      Submodule.span (𝓞 M) (Set.range fun a : 𝓞 E => fun j => f j (a : E)) := by
+theorem exists_single_mem_span
+    {E M ι : Type} [Field E] [NumberField E] [Field M] [NumberField M] [Finite ι] [DecidableEq ι]
+    (f : ι → E →+* M) (hf : Function.Injective f)
+    (i : ι)
+    : ∃ s : M,
+      s ≠ 0
+        ∧ (Pi.single i s : ι → M)
+          ∈ Submodule.span (𝓞 M) (Set.range fun a : 𝓞 E => fun j => f j (a : E)) := by
   classical
   cases nonempty_fintype ι
 
@@ -44,7 +48,9 @@ theorem exists_single_mem_span {E M ι : Type} [Field E] [NumberField E] [Field 
     rw [LinearMap.pi_apply_eq_sum_univ]
     simp [hc]
 
-  have h1 : (Pi.single i 1 : ι → M) ∈ Submodule.span M (Set.range fun a : 𝓞 E => fun j => f j (a : E)) := by
+  have h1
+      : (Pi.single i 1 : ι → M)
+        ∈ Submodule.span M (Set.range fun a : 𝓞 E => fun j => f j (a : E)) := by
     rw [htop]; exact Submodule.mem_top
   obtain ⟨y, hy, z, hz⟩ := (IsLocalization.mem_span_iff (nonZeroDivisors (𝓞 M))).mp h1
   refine ⟨algebraMap (𝓞 M) M z, IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors z.2, ?_⟩
@@ -61,14 +67,14 @@ theorem exists_single_mem_span {E M ι : Type} [Field E] [NumberField E] [Field 
 
 open Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
 
-theorem integers_mem_inverse_half_different {R : Ranks} (H : Host R) (a : 𝓞 H.E) :
-    (a : H.E) ∈ (H.AA0 : Submodule (𝓞 H.E) H.E) := by
-
+theorem integers_mem_inverse_half_different {R : Ranks} (H : Host R) (a : 𝓞 H.E)
+    : (a : H.E) ∈ (H.AA0 : Submodule (𝓞 H.E) H.E) := by
   have hb : H.𝔟 ≠ ⊥ := by
     intro h
     have h2 := H.𝔟_spec.2
     simp [h] at h2
-  have hle : (H.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≤ 1 := FractionalIdeal.coeIdeal_le_one
+  have hle : (H.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≤ 1 :=
+    FractionalIdeal.coeIdeal_le_one
   have hne : (H.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≠ 0 :=
     FractionalIdeal.coeIdeal_ne_zero.mpr hb
 
@@ -90,11 +96,11 @@ theorem embT_injective (D : D7) : Function.Injective (embT D) := by
   intro τ τ' h
   exact D.eTau.injective (Subtype.ext (emb_injective D.host h))
 
-theorem ellT_ne_bot {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
-    (hM : ∀ (τ : D.what₂.Tau) (x : D.host.E), (embT D τ : D.host.E → ℂ) x ∈ M)
-    (τ : D.what₂.Tau) : ellT D M τ ≠ ⊥ := by
+theorem ellT_ne_bot
+    {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
+    (hM : ∀ (τ : D.what₂.Tau) (x : D.host.E), (embT D τ : D.host.E → ℂ) x ∈ M) (τ : D.what₂.Tau)
+    : ellT D M τ ≠ ⊥ := by
   classical
-
   let f : D.what₂.Tau → D.host.E →+* M := fun σ => (embT D σ).codRestrict M (hM σ)
   have hf : Function.Injective f := by
     intro σ σ' h
@@ -103,7 +109,9 @@ theorem ellT_ne_bot {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
     exact congrArg Subtype.val (DFunLike.congr_fun h x)
   obtain ⟨s, hs0, hs⟩ := exists_single_mem_span f hf τ
 
-  have hle : Submodule.span (𝓞 M) (Set.range fun a : 𝓞 D.host.E => fun j => f j (a : D.host.E)) ≤ mmM D M := by
+  have hle
+      : Submodule.span (𝓞 M) (Set.range fun a : 𝓞 D.host.E => fun j => f j (a : D.host.E))
+        ≤ mmM D M := by
     rw [Submodule.span_le]
     rintro _ ⟨a, rfl⟩
     refine Submodule.subset_span ⟨(a : D.host.E), integers_mem_inverse_half_different D.host a, ?_⟩

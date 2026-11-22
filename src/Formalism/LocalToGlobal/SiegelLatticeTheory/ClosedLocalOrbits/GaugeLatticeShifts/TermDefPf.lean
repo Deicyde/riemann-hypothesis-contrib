@@ -10,28 +10,30 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef
 
 section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem frame_castSucc_td {T : E} (F : LFlag S r T) (i : Fin r) : frame F i.castSucc = F.fl.e i := by
+theorem frame_castSucc_td {T : E} (F : LFlag S r T) (i : Fin r)
+    : frame F i.castSucc = F.fl.e i := by
   simp [frame, FlagG.fvec]
 
 theorem frame_last_td {T : E} (F : LFlag S r T) : frame F (Fin.last r) = F.fl.z := by
   simp [frame, FlagG.fvec]
 
-theorem mem_gmap_iff {Λ : Submodule (𝓞 E) S.V} (g : S.V ≃ₗ[E] S.V) (x : S.V) :
-    x ∈ Formalism.HermitianLatticesTheory.gmap g Λ ↔ g.symm x ∈ Λ := by
+theorem mem_gmap_iff {Λ : Submodule (𝓞 E) S.V} (g : S.V ≃ₗ[E] S.V) (x : S.V)
+    : x ∈ Formalism.HermitianLatticesTheory.gmap g Λ ↔ g.symm x ∈ Λ := by
   constructor
   · rintro ⟨y, hy, rfl⟩
     simpa using hy
   · intro h
     exact ⟨g.symm x, h, by simp⟩
 
-theorem gmap_eq_iff {Λ : Submodule (𝓞 E) S.V} (g : S.V ≃ₗ[E] S.V) :
-    Formalism.HermitianLatticesTheory.gmap g Λ = Λ ↔ ∀ x, g x ∈ Λ ↔ x ∈ Λ := by
+theorem gmap_eq_iff {Λ : Submodule (𝓞 E) S.V} (g : S.V ≃ₗ[E] S.V)
+    : Formalism.HermitianLatticesTheory.gmap g Λ = Λ ↔ ∀ x, g x ∈ Λ ↔ x ∈ Λ := by
   constructor
   · intro h x
     have := (mem_gmap_iff (Λ := Λ) g (g x))
@@ -43,14 +45,15 @@ theorem gmap_eq_iff {Λ : Submodule (𝓞 E) S.V} (g : S.V ≃ₗ[E] S.V) :
     have := h (g.symm x)
     simpa using this.symm
 
-theorem isAutLam_iff (Λ : Submodule (𝓞 E) S.V) (g : S.V ≃ₗ[E] S.V) :
-    IsAutLam S Λ g ↔ (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ ∀ x, g x ∈ Λ ↔ x ∈ Λ := by
+theorem isAutLam_iff (Λ : Submodule (𝓞 E) S.V) (g : S.V ≃ₗ[E] S.V)
+    : IsAutLam S Λ g ↔ (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ ∀ x, g x ∈ Λ ↔ x ∈ Λ := by
   unfold IsAutLam
   rw [gmap_eq_iff]
   rfl
 
-theorem isAutLam_mul {Λ : Submodule (𝓞 E) S.V} {g h : S.V ≃ₗ[E] S.V} (hg : IsAutLam S Λ g)
-    (hh : IsAutLam S Λ h) : IsAutLam S Λ (g * h) := by
+theorem isAutLam_mul
+    {Λ : Submodule (𝓞 E) S.V} {g h : S.V ≃ₗ[E] S.V} (hg : IsAutLam S Λ g) (hh : IsAutLam S Λ h)
+    : IsAutLam S Λ (g * h) := by
   rw [isAutLam_iff] at *
   refine ⟨fun x y => ?_, fun x => ?_⟩
   · simp only [LinearEquiv.mul_apply]
@@ -58,8 +61,8 @@ theorem isAutLam_mul {Λ : Submodule (𝓞 E) S.V} {g h : S.V ≃ₗ[E] S.V} (hg
   · simp only [LinearEquiv.mul_apply]
     rw [hg.2, hh.2]
 
-theorem isAutLam_inv {Λ : Submodule (𝓞 E) S.V} {g : S.V ≃ₗ[E] S.V} (hg : IsAutLam S Λ g) :
-    IsAutLam S Λ g⁻¹ := by
+theorem isAutLam_inv {Λ : Submodule (𝓞 E) S.V} {g : S.V ≃ₗ[E] S.V} (hg : IsAutLam S Λ g)
+    : IsAutLam S Λ g⁻¹ := by
   rw [isAutLam_iff] at *
   refine ⟨fun x y => ?_, fun x => ?_⟩
   · have := hg.1 (g⁻¹ x) (g⁻¹ y)
@@ -73,8 +76,7 @@ theorem xflag_mono_td {T : E} (F : LFlag S r T) {j k : ℕ} (h : j ≤ k) : Xfla
   intro i hi
   exact lt_of_lt_of_le hi h
 
-theorem xflag_zero_td {T : E} (F : LFlag S r T) : Xflag F 0 = ⊥ := by
-  simp [Xflag, FlagG.Xa]
+theorem xflag_zero_td {T : E} (F : LFlag S r T) : Xflag F 0 = ⊥ := by simp [Xflag, FlagG.Xa]
 
 theorem xflag_r {T : E} (F : LFlag S r T) : Xflag F r = Xsp F := by
   simp only [Xflag, FlagG.Xa, Xsp, FlagG.X]
@@ -82,8 +84,10 @@ theorem xflag_r {T : E} (F : LFlag S r T) : Xflag F r = Xsp F := by
   ext x
   simp
 
-theorem nlam_mapsTo {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) (j : ℕ) : ∀ x ∈ Xflag F j, n x ∈ Xflag F j := by
+theorem nlam_mapsTo
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    (j : ℕ)
+    : ∀ x ∈ Xflag F j, n x ∈ Xflag F j := by
   intro x hx
   cases j with
   | zero =>
@@ -96,8 +100,10 @@ theorem nlam_mapsTo {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n :
     rw [h2]
     exact Submodule.add_mem _ hx (xflag_mono_td F (Nat.le_succ k) h1)
 
-theorem nlam_map_eq {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) (j : ℕ) : (Xflag F j).map (n : S.V →ₗ[E] S.V) = Xflag F j := by
+theorem nlam_map_eq
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    (j : ℕ)
+    : (Xflag F j).map (n : S.V →ₗ[E] S.V) = Xflag F j := by
   apply Submodule.eq_of_le_of_finrank_eq
   · rintro _ ⟨x, hx, rfl⟩
     exact nlam_mapsTo hn j x hx
@@ -106,8 +112,9 @@ theorem nlam_map_eq {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n :
 theorem mem_orth_iff_td {U : Submodule E S.V} {v : S.V} : v ∈ orth S U ↔ ∀ y ∈ U, S.hT y v = 0 := by
   simp [orth, Submodule.mem_iInf]
 
-theorem nlam_orth_mapsTo {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) : ∀ x ∈ orth S (Xsp F), n x ∈ orth S (Xsp F) := by
+theorem nlam_orth_mapsTo
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : ∀ x ∈ orth S (Xsp F), n x ∈ orth S (Xsp F) := by
   intro x hx
   rw [mem_orth_iff_td] at hx ⊢
   intro y hy
@@ -120,15 +127,18 @@ theorem nlam_orth_mapsTo {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T}
   rw [hiso]
   exact hx y' hy'X
 
-theorem nlam_orth_map_eq {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) : (orth S (Xsp F)).map (n : S.V →ₗ[E] S.V) = orth S (Xsp F) := by
+theorem nlam_orth_map_eq
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : (orth S (Xsp F)).map (n : S.V →ₗ[E] S.V) = orth S (Xsp F) := by
   apply Submodule.eq_of_le_of_finrank_eq
   · rintro _ ⟨x, hx, rfl⟩
     exact nlam_orth_mapsTo hn x hx
   · exact LinearEquiv.finrank_map_eq n _
 
-theorem nlamPf_mul {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n p : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) (hp : p ∈ NLam Λ F) : n * p ∈ NLam Λ F := by
+theorem nlamPf_mul
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n p : S.V ≃ₗ[E] S.V}
+    (hn : n ∈ NLam Λ F) (hp : p ∈ NLam Λ F)
+    : n * p ∈ NLam Λ F := by
   refine ⟨isAutLam_mul hn.1 hp.1, ?_, ?_⟩
   · intro j x hx
     have e : (n * p) x - x = (n (p x) - p x) + (p x - x) := by
@@ -141,27 +151,28 @@ theorem nlamPf_mul {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n p 
     rw [e]
     exact Submodule.add_mem _ (hn.2.2 _ (nlam_orth_mapsTo hp x hx)) (hp.2.2 x hx)
 
-theorem nlamPf_inv {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V}
-    (hn : n ∈ NLam Λ F) : n⁻¹ ∈ NLam Λ F := by
+theorem nlamPf_inv
+    {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : n⁻¹ ∈ NLam Λ F := by
   refine ⟨isAutLam_inv hn.1, ?_, ?_⟩
   · intro j x hx
     rw [← nlam_map_eq hn (j + 1)] at hx
     obtain ⟨y, hy, rfl⟩ := hx
-    have e : n⁻¹ ((n : S.V →ₗ[E] S.V) y) - (n : S.V →ₗ[E] S.V) y = -(n y - y) := by
-      simp
+    have e : n⁻¹ ((n : S.V →ₗ[E] S.V) y) - (n : S.V →ₗ[E] S.V) y = -(n y - y) := by simp
     rw [e]
     exact Submodule.neg_mem _ (hn.2.1 j y hy)
   · intro x hx
     rw [← nlam_orth_map_eq hn] at hx
     obtain ⟨y, hy, rfl⟩ := hx
-    have e : n⁻¹ ((n : S.V →ₗ[E] S.V) y) - (n : S.V →ₗ[E] S.V) y = -(n y - y) := by
-      simp
+    have e : n⁻¹ ((n : S.V →ₗ[E] S.V) y) - (n : S.V →ₗ[E] S.V) y = -(n y - y) := by simp
     rw [e]
     exact Submodule.neg_mem _ (hn.2.2 y hy)
 
-theorem mem_xflag_of_frame {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
-    (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (j : ℕ) (x : S.V) :
-    x ∈ Xflag F₂ j ↔ γ.symm x ∈ Xflag F₁ j := by
+theorem mem_xflag_of_frame
+    {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
+    (hF : ∀ a, frame F₂ a = γ (frame F₁ a))
+    (j : ℕ) (x : S.V)
+    : x ∈ Xflag F₂ j ↔ γ.symm x ∈ Xflag F₁ j := by
   have he : ∀ i, F₂.fl.e i = γ (F₁.fl.e i) := by
     intro i
     have := hF i.castSucc
@@ -178,15 +189,19 @@ theorem mem_xflag_of_frame {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag
   · intro h
     exact ⟨γ.symm x, h, by simp⟩
 
-theorem mem_xsp_of_frame {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
-    (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (x : S.V) :
-    x ∈ Xsp F₂ ↔ γ.symm x ∈ Xsp F₁ := by
+theorem mem_xsp_of_frame
+    {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
+    (hF : ∀ a, frame F₂ a = γ (frame F₁ a))
+    (x : S.V)
+    : x ∈ Xsp F₂ ↔ γ.symm x ∈ Xsp F₁ := by
   rw [← xflag_r, ← xflag_r]
   exact mem_xflag_of_frame hF r x
 
-theorem mem_orth_of_frame {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
-    (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (hγ : ∀ x y, S.hT (γ x) (γ y) = S.hT x y) (x : S.V) :
-    x ∈ orth S (Xsp F₂) ↔ γ.symm x ∈ orth S (Xsp F₁) := by
+theorem mem_orth_of_frame
+    {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ : S.V ≃ₗ[E] S.V}
+    (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (hγ : ∀ x y, S.hT (γ x) (γ y) = S.hT x y)
+    (x : S.V)
+    : x ∈ orth S (Xsp F₂) ↔ γ.symm x ∈ orth S (Xsp F₁) := by
   rw [mem_orth_iff_td, mem_orth_iff_td]
   constructor
   · intro h y hy
@@ -198,9 +213,11 @@ theorem mem_orth_of_frame {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag 
     rw [← hγ (γ.symm y) (γ.symm x)] at this
     simpa using this
 
-theorem nlam_conj {Λ : Submodule (𝓞 E) S.V} {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂} {γ p : S.V ≃ₗ[E] S.V}
-    (hγ : IsAutLam S Λ γ) (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (hp : p ∈ NLam Λ F₁) :
-    γ * p * γ⁻¹ ∈ NLam Λ F₂ := by
+theorem nlam_conj
+    {Λ : Submodule (𝓞 E) S.V} {T₁ T₂ : E} {F₁ : LFlag S r T₁} {F₂ : LFlag S r T₂}
+    {γ p : S.V ≃ₗ[E] S.V}
+    (hγ : IsAutLam S Λ γ) (hF : ∀ a, frame F₂ a = γ (frame F₁ a)) (hp : p ∈ NLam Λ F₁)
+    : γ * p * γ⁻¹ ∈ NLam Λ F₂ := by
   have hiso := ((isAutLam_iff Λ γ).1 hγ).1
   refine ⟨isAutLam_mul (isAutLam_mul hγ hp.1) (isAutLam_inv hγ), ?_, ?_⟩
   · intro j x hx
@@ -240,15 +257,22 @@ theorem dcrel_symm {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂) : DCRel
     rw [hzt]
     simpa using this.symm
 
-theorem dcrel_trans {F₁ F₂ F₃ : LFlag S r T'} (h : DCRel Λ F F₁ F₂) (h' : DCRel Λ F F₂ F₃) :
-    DCRel Λ F F₁ F₃ := by
+theorem dcrel_trans {F₁ F₂ F₃ : LFlag S r T'} (h : DCRel Λ F F₁ F₂) (h' : DCRel Λ F F₂ F₃)
+    : DCRel Λ F F₁ F₃ := by
   obtain ⟨n, hn, m, hm, hfr, hzt⟩ := h
   obtain ⟨n', hn', m', hm', hfr', hzt'⟩ := h'
   have hγ : IsAutLam S Λ (n * m)⁻¹ := isAutLam_inv (isAutLam_mul hn.1 hm.1)
   have hF : ∀ a, frame F₁ a = (n * m)⁻¹ (frame F₂ a) := fun a => by
     rw [hfr a]; simp [LinearEquiv.coe_inv]
   have hm'' := nlam_conj hγ hF hm'
-  refine ⟨n' * n, nlamPf_mul hn' hn, m * ((n * m)⁻¹ * m' * (n * m)⁻¹⁻¹), nlamPf_mul hm hm'', fun a => ?_, ?_⟩
+  refine ⟨
+    n' * n,
+    nlamPf_mul hn' hn,
+    m * ((n * m)⁻¹ * m' * (n * m)⁻¹⁻¹),
+    nlamPf_mul hm hm'',
+    fun a => ?_,
+    ?_
+  ⟩
   · have key : (n' * n) * (m * ((n * m)⁻¹ * m' * (n * m)⁻¹⁻¹)) = n' * m' * (n * m) := by group
     have := congrArg (fun q : S.V ≃ₗ[E] S.V => q (frame F₁ a)) key
     rw [hfr' a, hfr a]
@@ -280,8 +304,9 @@ section Zhat
 
 variable {Λ : Submodule (𝓞 E) S.V}
 
-theorem frame_sub_mem_span {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
-    (a : Fin (r + 1)) : n (frame F a) - frame F a ∈ Submodule.span E (frame F '' {c | c < a}) := by
+theorem frame_sub_mem_span
+    {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (a : Fin (r + 1))
+    : n (frame F a) - frame F a ∈ Submodule.span E (frame F '' {c | c < a}) := by
   induction a using Fin.lastCases with
   | last =>
     rw [frame_last_td]
@@ -308,9 +333,10 @@ theorem frame_sub_mem_span {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn
     rintro _ ⟨i', hi', rfl⟩
     exact ⟨i'.castSucc, Fin.castSucc_lt_castSucc_iff.mpr hi', frame_castSucc_td F i'⟩
 
-theorem nlam_coef {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) :
-    ∃ α : Matrix (Fin (r + 1)) (Fin (r + 1)) E, (∀ a c, a < c → α a c = 0) ∧ (∀ a, α a a = 1) ∧
-      ∀ a, n (frame F a) = ∑ c, α a c • frame F c := by
+theorem nlam_coef {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : ∃ α : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+      (∀ a c, a < c → α a c = 0) ∧ (∀ a, α a a = 1)
+        ∧ ∀ a, n (frame F a) = ∑ c, α a c • frame F c := by
   have h := fun a => (Finsupp.mem_span_image_iff_linearCombination E).1 (frame_sub_mem_span hn a)
   choose l hl hsum using h
   have hz : ∀ a c, ¬ c < a → l a c = 0 := fun a c hc => (Finsupp.mem_supported' _ _).1 (hl a) c hc
@@ -327,9 +353,10 @@ theorem nlam_coef {T : E} {F : LFlag S r T} {n : S.V ≃ₗ[E] S.V} (hn : n ∈ 
     rw [e]
     abel
 
-theorem zhat_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂) :
-    ∃ A B : Matrix (Fin (r + 1)) (Fin (r + 1)) E, (∀ a c, a < c → A a c = 0) ∧ (∀ a, A a a = 1) ∧
-      (∀ d b, b < d → B d b = 0) ∧ (∀ b, B b b = 1) ∧ ZhatL F F₂ = A * ZhatL F F₁ * B := by
+theorem zhat_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂)
+    : ∃ A B : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+      (∀ a c, a < c → A a c = 0) ∧ (∀ a, A a a = 1) ∧ (∀ d b, b < d → B d b = 0) ∧ (∀ b, B b b = 1)
+        ∧ ZhatL F F₂ = A * ZhatL F F₁ * B := by
   obtain ⟨n, hn, m, hm, hfr, -⟩ := h
   obtain ⟨α, hα0, hα1, hα⟩ := nlam_coef (nlamPf_inv hn)
   obtain ⟨β, hβ0, hβ1, hβ⟩ := nlam_coef hm
@@ -351,27 +378,32 @@ theorem zhat_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DC
     rw [e1, hα a, hβ b]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.mul_apply, ZhatL, Zhat, brS, map_sum, map_smulₛₗ, LinearMap.sum_apply,
-      LinearMap.smul_apply, smul_eq_mul, Matrix.map_apply, Matrix.transpose_apply, starRingEnd_apply]
+        LinearMap.smul_apply, smul_eq_mul, Matrix.map_apply, Matrix.transpose_apply,
+        starRingEnd_apply]
     simp only [Finset.mul_sum, Finset.sum_mul, RingHom.id_apply]
     refine Finset.sum_congr rfl (fun _ _ => Finset.sum_congr rfl (fun _ _ => ?_))
     ring
 
-theorem sum_castLE_td {N l : ℕ} (h : l ≤ N) (g : Fin N → E) (hg : ∀ d : Fin N, l ≤ d.1 → g d = 0) :
-    ∑ d, g d = ∑ d' : Fin l, g (Fin.castLE h d') := by
-  refine (Fintype.sum_of_injective (Fin.castLE h) (Fin.castLE_injective h) _ g ?_ (fun _ => rfl)).symm
+theorem sum_castLE_td {N l : ℕ} (h : l ≤ N) (g : Fin N → E) (hg : ∀ d : Fin N, l ≤ d.1 → g d = 0)
+    : ∑ d, g d = ∑ d' : Fin l, g (Fin.castLE h d') := by
+  refine (Fintype.sum_of_injective (Fin.castLE h) (Fin.castLE_injective h) _ g ?_
+    (fun _ => rfl)).symm
   intro d hd
   apply hg
   by_contra hlt
   exact hd ⟨⟨d.1, by omega⟩, Fin.ext (by simp)⟩
 
-theorem leadMinor_uni {N : ℕ} (A Z B : Matrix (Fin N) (Fin N) E) (hA0 : ∀ a c, a < c → A a c = 0)
-    (hA1 : ∀ a, A a a = 1) (hB0 : ∀ d b, b < d → B d b = 0) (hB1 : ∀ b, B b b = 1) (l : ℕ) :
-    leadMinorE (A * Z * B) l = leadMinorE Z l := by
+theorem leadMinor_uni
+    {N : ℕ} (A Z B : Matrix (Fin N) (Fin N) E) (hA0 : ∀ a c, a < c → A a c = 0)
+    (hA1 : ∀ a, A a a = 1) (hB0 : ∀ d b, b < d → B d b = 0) (hB1 : ∀ b, B b b = 1)
+    (l : ℕ)
+    : leadMinorE (A * Z * B) l = leadMinorE Z l := by
   unfold leadMinorE
   split_ifs with h
-  · have hsub : (A * Z * B).submatrix (Fin.castLE h) (Fin.castLE h) =
-        A.submatrix (Fin.castLE h) (Fin.castLE h) * Z.submatrix (Fin.castLE h) (Fin.castLE h) *
-          B.submatrix (Fin.castLE h) (Fin.castLE h) := by
+  · have hsub
+        : (A * Z * B).submatrix (Fin.castLE h) (Fin.castLE h)
+          = A.submatrix (Fin.castLE h) (Fin.castLE h) * Z.submatrix (Fin.castLE h) (Fin.castLE h)
+            * B.submatrix (Fin.castLE h) (Fin.castLE h) := by
       ext i j
       simp only [Matrix.submatrix_apply, Matrix.mul_apply]
       rw [sum_castLE_td h]
@@ -402,8 +434,8 @@ theorem leadMinor_uni {N : ℕ} (A Z B : Matrix (Fin N) (Fin N) E) (hA0 : ∀ a 
     rw [hA, hB, one_mul, mul_one]
   · rfl
 
-theorem gval_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂) :
-    Gval F F₂ = Gval F F₁ := by
+theorem gval_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂)
+    : Gval F F₂ = Gval F F₁ := by
   obtain ⟨A, B, hA0, hA1, hB0, hB1, hZ⟩ := zhat_rel F h
   have hD : ∀ l, Dl F.fl F₂.fl l = Dl F.fl F₁.fl l := by
     intro l
@@ -412,8 +444,8 @@ theorem gval_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DC
     exact this
   simp only [Gval, Gflag, hD]
 
-theorem isLoUni_mul {N : ℕ} {A L : Matrix (Fin N) (Fin N) E} (hA : IsLoUni A) (hL : IsLoUni L) :
-    IsLoUni (A * L) := by
+theorem isLoUni_mul {N : ℕ} {A L : Matrix (Fin N) (Fin N) E} (hA : IsLoUni A) (hL : IsLoUni L)
+    : IsLoUni (A * L) := by
   intro i j
   constructor
   · intro hij
@@ -433,8 +465,8 @@ theorem isLoUni_mul {N : ℕ} {A L : Matrix (Fin N) (Fin N) E} (hA : IsLoUni A) 
       · simp [(hA i k).1 h]
     · simp
 
-theorem isUpUni_mul {N : ℕ} {U V : Matrix (Fin N) (Fin N) E} (hU : IsUpUni U) (hV : IsUpUni V) :
-    IsUpUni (U * V) := by
+theorem isUpUni_mul {N : ℕ} {U V : Matrix (Fin N) (Fin N) E} (hU : IsUpUni U) (hV : IsUpUni V)
+    : IsUpUni (U * V) := by
   intro i j
   constructor
   · intro hij
@@ -454,9 +486,10 @@ theorem isUpUni_mul {N : ℕ} {U V : Matrix (Fin N) (Fin N) E} (hU : IsUpUni U) 
       · simp [(hV k i).1 h]
     · simp
 
-theorem zhatOM_mul (A Z B : Matrix (Fin (r + 1)) (Fin (r + 1)) E) :
-    ZhatOM (A * Z * B) =
-      A * ZhatOM Z * Matrix.of (fun d b => (-1 : E) ^ (r - d.val) * B d b * (-1) ^ (r - b.val)) := by
+theorem zhatOM_mul (A Z B : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : ZhatOM (A * Z * B)
+      = A * ZhatOM Z
+        * Matrix.of (fun d b => (-1 : E) ^ (r - d.val) * B d b * (-1) ^ (r - b.val)) := by
   have hs : ∀ k : ℕ, (-1 : E) ^ k * (-1) ^ k = 1 := fun k => by
     rw [← pow_add, ← two_mul, pow_mul]; simp
   ext a b
@@ -464,13 +497,20 @@ theorem zhatOM_mul (A Z B : Matrix (Fin (r + 1)) (Fin (r + 1)) E) :
   refine Finset.sum_congr rfl (fun d _ => Finset.sum_congr rfl (fun c _ => ?_))
   linear_combination (-(A a c * Z c d * B d b * (-1) ^ (r - b.val))) * hs (r - d.val)
 
-theorem cell_rel {T T' : E} (F : LFlag S r T) {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂)
-    (w : Point E (r + 1)) (hc : IsInCell (ZhatOM (ZhatL F F₁)) w) :
-    IsInCell (ZhatOM (ZhatL F F₂)) w := by
+theorem cell_rel
+    {T T' : E} (F : LFlag S r T)
+    {F₁ F₂ : LFlag S r T'} (h : DCRel Λ F F₁ F₂)
+    (w : Point E (r + 1)) (hc : IsInCell (ZhatOM (ZhatL F F₁)) w)
+    : IsInCell (ZhatOM (ZhatL F F₂)) w := by
   obtain ⟨A, B, hA0, hA1, hB0, hB1, hZ⟩ := zhat_rel F h
   obtain ⟨L, U, hL, hU, hLU⟩ := hc
-  refine ⟨A * L, U * Matrix.of (fun d b => (-1 : E) ^ (r - d.val) * B d b * (-1) ^ (r - b.val)),
-    isLoUni_mul (fun i j => ⟨hA0 i j, fun e => e ▸ hA1 i⟩) hL, isUpUni_mul hU ?_, ?_⟩
+  refine ⟨
+    A * L,
+    U * Matrix.of (fun d b => (-1 : E) ^ (r - d.val) * B d b * (-1) ^ (r - b.val)),
+    isLoUni_mul (fun i j => ⟨hA0 i j, fun e => e ▸ hA1 i⟩) hL,
+    isUpUni_mul hU ?_,
+    ?_
+  ⟩
   · intro i j
     constructor
     · intro hij
@@ -502,8 +542,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable (D : D7)
 
-theorem term_equivalence_iff (u u' : D.what₂.Word) : TermEqIff D u u' :=
-  fun F0 Λ _ => double_coset_equivalence Λ (lf D F0) _
+theorem term_equivalence_iff (u u' : D.what₂.Word) : TermEqIff D u u' := fun F0 Λ _ =>
+  double_coset_equivalence Λ (lf D F0) _
 
 end D7
 

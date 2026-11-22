@@ -50,8 +50,9 @@ theorem hS_pf : HS := by
     intro i
     rw [← EuclideanSpace.norm_sq_eq, hf.1 i]
     simp
-  calc (Module.finrank ℂ V : ℝ) = ∑ i : Fin (Module.finrank ℂ V'), ∑ x, ‖f i x‖ ^ 2 := by
-        simp [hone, hfr]
+  calc
+    (Module.finrank ℂ V : ℝ)
+      = ∑ i : Fin (Module.finrank ℂ V'), ∑ x, ‖f i x‖ ^ 2 := by simp [hone, hfr]
     _ = ∑ x, ∑ i, ‖f i x‖ ^ 2 := Finset.sum_comm
     _ ≤ ∑ x, ∑ y, ‖B x y‖ ^ 2 := Finset.sum_le_sum fun x _ => hbessel x
 

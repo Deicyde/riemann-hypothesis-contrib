@@ -8,18 +8,21 @@ open scoped Matrix
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem exists_corner_unit_of_right_inverse :
-    ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] (e : R), e * e = e →
-      (∀ ψ : Polynomial R, (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0) →
-        ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e))) →
-      ∀ {n : ℕ} (D C P Q : Matrix (Fin n) (Fin n) R), D * P + C * Q = 1 →
-        ∃ x : Matrix (Fin n) (Fin n) R, IsUnit (e * (D + C * x).det + (1 - e)) := by
+theorem exists_corner_unit_of_right_inverse
+    : ∀ {F R : Type} [Field F] [CommRing R] [Algebra F R] (e : R),
+      e * e = e
+        → (∀ ψ : Polynomial R,
+          (∀ (Ω : Type) [Field Ω] (φ : R →+* Ω), φ e = 1 → ψ.map φ ≠ 0)
+            → ∃ t : F, IsUnit (e * ψ.eval (algebraMap F R t) + (1 - e)))
+        → ∀ {n : ℕ} (D C P Q : Matrix (Fin n) (Fin n) R),
+          D * P + C * Q = 1
+            → ∃ x : Matrix (Fin n) (Fin n) R, IsUnit (e * (D + C * x).det + (1 - e)) := by
   intro F R _ _ _ e he hψ n D C P Q hDPCQ
 
-  have hev : ∀ (s : R) (M : Matrix (Fin n) (Fin n) R[X]),
-      M.det.eval s = (M.map (Polynomial.eval s)).det := by
+  have hev
+      : ∀ (s : R) (M : Matrix (Fin n) (Fin n) R[X]),
+        M.det.eval s = (M.map (Polynomial.eval s)).det := by
     intro s M
     rw [← Polynomial.coe_evalRingHom, RingHom.map_det]
     rfl
@@ -57,10 +60,8 @@ theorem exists_corner_unit_of_right_inverse :
   rw [hψs] at ht
   obtain ⟨w, hw⟩ := ht.exists_right_inv
 
-  have hp : p * (e * q * w) = e := by
-    linear_combination (w - p * q * w) * he + e * hw
-  have hq : q * (e * p * w) = e := by
-    linear_combination (w - p * q * w) * he + e * hw
+  have hp : p * (e * q * w) = e := by linear_combination (w - p * q * w) * he + e * hw
+  have hq : q * (e * p * w) = e := by linear_combination (w - p * q * w) * he + e * hw
   have hpow : ∀ k : ℕ, e ^ k * e = e := by
     intro k
     induction k with
@@ -69,15 +70,17 @@ theorem exists_corner_unit_of_right_inverse :
   refine ⟨(e * q * w) • (Q * P'.adjugate), ?_⟩
   set M : Matrix (Fin n) (Fin n) R := D + C * ((e * q * w) • (Q * P'.adjugate)) with hM
   have hxP : ((e * q * w) • (Q * P'.adjugate)) * P' = e • Q := by
-    rw [Matrix.smul_mul, Matrix.mul_assoc, Matrix.adjugate_mul, ← hpdef, Matrix.mul_smul, Matrix.mul_one,
-      smul_smul, mul_comm (e * q * w) p, hp]
+    rw [Matrix.smul_mul, Matrix.mul_assoc, Matrix.adjugate_mul, ← hpdef, Matrix.mul_smul,
+      Matrix.mul_one, smul_smul, mul_comm (e * q * w) p, hp]
   have hMP : e • (M * P') = e • (1 + s • D) := by
     rw [hM, Matrix.add_mul, Matrix.mul_assoc, hxP, Matrix.mul_smul, smul_add, smul_smul, he, hP2,
       Matrix.mul_add, Matrix.mul_smul, Matrix.mul_one, ← smul_add, add_assoc, hDPCQ, add_comm]
   have hdet := congrArg Matrix.det hMP
   rw [Matrix.det_smul, Matrix.det_smul, Matrix.det_mul, Fintype.card_fin, ← hpdef, ← hqdef] at hdet
   have hab : M.det * (e ^ n * p * (e * p * w)) = e := by
-    calc M.det * (e ^ n * p * (e * p * w)) = (e ^ n * (M.det * p)) * (e * p * w) := by ring
+    calc
+      M.det * (e ^ n * p * (e * p * w))
+        = (e ^ n * (M.det * p)) * (e * p * w) := by ring
       _ = (e ^ n * q) * (e * p * w) := by rw [hdet]
       _ = e ^ n * e := by rw [mul_assoc, hq]
       _ = e := hpow n

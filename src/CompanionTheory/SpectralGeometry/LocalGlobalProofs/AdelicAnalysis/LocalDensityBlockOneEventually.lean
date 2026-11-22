@@ -13,17 +13,21 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.GoodMass
 
-theorem continuous_act_consTup {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R]
-    [Algebra F R] [TopologicalSpace R] (hring : IsTopologicalRing (R ⊗[F] E)) (σ : E →ₐ[F] E) {M n : ℕ}
-    (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E) (h : HA R σ J) :
-    Continuous fun X : Fin n → Fin M → R ⊗[F] E => actW R σ J h (consTup X) := by
+theorem continuous_act_consTup
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
+    (hring : IsTopologicalRing (R ⊗[F] E))
+    (σ : E →ₐ[F] E)
+    {M n : ℕ} (J : Matrix (Fin (M + 1)) (Fin (M + 1)) E) (h : HA R σ J)
+    : Continuous fun X : Fin n → Fin M → R ⊗[F] E => actW R σ J h (consTup X) := by
   refine continuous_pi fun a => continuous_pi fun i => ?_
   simp only [actW, actTup, Matrix.mulVec, dotProduct]
   refine continuous_finsetSum _ fun j _ => continuous_const.mul ?_

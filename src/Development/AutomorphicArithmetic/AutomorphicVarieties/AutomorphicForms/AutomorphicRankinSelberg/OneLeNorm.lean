@@ -79,8 +79,9 @@ private lemma diff_le (hB : KerBd) (hD : KerDiff) : ∃ C : ℝ, 0 ≤ C ∧ ∀
 end UpperTheory.V.Af.Rs
 
 open UpperTheory.V.Af.Rs in
-theorem UpperTheory.V.Af.Rs.zDiff :
-    UpperTheory.V.Af.Rs.KerBd → UpperTheory.V.Af.Rs.KerDiff → UpperTheory.V.Af.Rs.WTop → UpperTheory.V.Af.Rs.ZDiff := by
+theorem UpperTheory.V.Af.Rs.zDiff
+    : UpperTheory.V.Af.Rs.KerBd → UpperTheory.V.Af.Rs.KerDiff → UpperTheory.V.Af.Rs.WTop
+      → UpperTheory.V.Af.Rs.ZDiff := by
   intro hB hD hW L _
   obtain ⟨C, hC0, hC⟩ := diff_le hB hD
   have hS : Summable fun x : Fin 2 → ℤ => ‖x‖ ^ (-3 : ℝ) := hW.1 3 (by norm_num)
@@ -146,29 +147,32 @@ theorem UpperTheory.V.Af.Rs.zDiff :
     simp only [hg, hg']
     split_ifs
     · have e : ‖x - (x + a)‖ = ‖a‖ := by simp
-      calc |ker s x z - ker s (x + a) z|
-          ≤ C * ‖x - (x + a)‖ * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) :=
-            hC s hs' x (x + a) z hz
+      calc
+        |ker s x z - ker s (x + a) z|
+            ≤ C * ‖x - (x + a)‖ * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) :=
+          hC s hs' x (x + a) z hz
         _ ≤ C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) := by
-            rw [e]
-            gcongr
+          rw [e]
+          gcongr
     · simpa using hnn
-  have hh : Summable fun x : Fin 2 → ℤ =>
-      C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) :=
+  have hh
+      : Summable fun x : Fin 2 → ℤ => C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) :=
     (hS.add hS').mul_left _
   have hshift : ∑' x : Fin 2 → ℤ, ‖x + a‖ ^ (-3 : ℝ) = S :=
     (Equiv.addRight a).tsum_eq (fun x => ‖x‖ ^ (-3 : ℝ))
-  have hsum : ∑' x : Fin 2 → ℤ, C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ))
-      = C * L * z.im ^ 3 * (2 * S) := by
+  have hsum
+      : ∑' x : Fin 2 → ℤ, C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ))
+        = C * L * z.im ^ 3 * (2 * S) := by
     rw [tsum_mul_left, hS.tsum_add hS', hshift]
     ring
   rw [hZ, hZ', ← hgs.tsum_sub hgs']
-  calc |∑' x, (g x - g' x)|
-      ≤ ∑' x : Fin 2 → ℤ, C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) := by
-        rw [abs_le]
-        constructor
-        · rw [← tsum_neg]
-          exact Summable.tsum_le_tsum (fun x => neg_le_of_abs_le (hd x)) hh.neg (hgs.sub hgs')
-        · exact Summable.tsum_le_tsum (fun x => le_of_abs_le (hd x)) (hgs.sub hgs') hh
+  calc
+    |∑' x, (g x - g' x)|
+        ≤ ∑' x : Fin 2 → ℤ, C * L * z.im ^ 3 * (‖x‖ ^ (-3 : ℝ) + ‖x + a‖ ^ (-3 : ℝ)) := by
+      rw [abs_le]
+      constructor
+      · rw [← tsum_neg]
+        exact Summable.tsum_le_tsum (fun x => neg_le_of_abs_le (hd x)) hh.neg (hgs.sub hgs')
+      · exact Summable.tsum_le_tsum (fun x => le_of_abs_le (hd x)) (hgs.sub hgs') hh
     _ = C * L * z.im ^ 3 * (2 * S) := hsum
     _ = C * L * (2 * S) * z.im ^ 3 := by ring

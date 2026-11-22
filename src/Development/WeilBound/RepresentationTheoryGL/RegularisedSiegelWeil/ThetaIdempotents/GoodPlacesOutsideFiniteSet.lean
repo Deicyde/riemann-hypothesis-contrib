@@ -8,17 +8,24 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 open IsDedekindDomain NumberField
 open PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.Jp
 
-theorem PositivityTheory.Rg.Rsw.exists_tau {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] (v : HeightOneSpectrum (𝓞 F))
-    (σ : E →ₐ[F] E) (π : Fv F v ⊗[F] E ≃ₐ[Fv F v] Fv F v × Fv F v) (hs : ∀ y, π (sigR (Fv F v) σ y) = (π y).swap) :
-    ∃ τ : E →ₐ[F] Fv F v, (∀ y, splitProj τ y = (π y).1) ∧ ∀ y, splitProj (τ.comp σ) y = (π y).2 := by
+theorem PositivityTheory.Rg.Rsw.exists_tau
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    (v : HeightOneSpectrum (𝓞 F)) (σ : E →ₐ[F] E)
+    (π : Fv F v ⊗[F] E ≃ₐ[Fv F v] Fv F v × Fv F v) (hs : ∀ y, π (sigR (Fv F v) σ y) = (π y).swap)
+    : ∃ τ : E →ₐ[F] Fv F v,
+      (∀ y, splitProj τ y = (π y).1) ∧ ∀ y, splitProj (τ.comp σ) y = (π y).2 := by
   let τ : E →ₐ[F] Fv F v :=
     ((AlgHom.fst (Fv F v) (Fv F v) (Fv F v)).restrictScalars F).comp
       (((π : Fv F v ⊗[F] E →ₐ[Fv F v] Fv F v × Fv F v).restrictScalars F).comp
@@ -68,8 +75,10 @@ theorem PositivityTheory.Rg.Rsw.jacquet_piatetski_first_bound : GoodPlacesOutsid
     refine ⟨⟨b, hb⟩, ?_⟩
     rwa [div_eq_inv_mul]
   · rw [hτ1, hτ2] at hnorm
-    have hprod : P.π (a : Fv D.host.F v ⊗[D.host.F] D.host.E) *
-        P.π ((a⁻¹ : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ) : Fv D.host.F v ⊗[D.host.F] D.host.E) = 1 := by
+    have hprod
+        : P.π (a : Fv D.host.F v ⊗[D.host.F] D.host.E) * P.π
+            ((a⁻¹ : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ) : Fv D.host.F v ⊗[D.host.F] D.host.E)
+          = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
     have h1 : (P.π a).1 * (P.π ((a⁻¹ : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ) : _)).1 = 1 := by
       have := congrArg Prod.fst hprod
@@ -84,22 +93,26 @@ theorem PositivityTheory.Rg.Rsw.jacquet_piatetski_first_bound : GoodPlacesOutsid
       rw [coe_nnnorm, coe_nnnorm]
       exact hnorm
     have hq1 : (P.π a).1 / (P.π a).2 ∈ v.adicCompletionIntegers D.host.F :=
-      nnnorm_le_one_iff_mem.1 (le_of_eq (by rw [nnnorm_div, hn, div_self (nnnorm_ne_zero_iff.2 hβ)]))
+      nnnorm_le_one_iff_mem.1 (le_of_eq (by
+        rw [nnnorm_div, hn, div_self (nnnorm_ne_zero_iff.2 hβ)]))
     have hq2 : (P.π a).2 / (P.π a).1 ∈ v.adicCompletionIntegers D.host.F :=
-      nnnorm_le_one_iff_mem.1 (le_of_eq (by rw [nnnorm_div, hn, div_self (nnnorm_ne_zero_iff.2 hβ)]))
-    let u : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ :=
-      { val := P.π.symm ((P.π a).1 / (P.π a).2, 1)
-        inv := P.π.symm ((P.π a).2 / (P.π a).1, 1)
-        val_inv := by
-          rw [← map_mul, Prod.mk_mul_mk, div_mul_div_comm, mul_comm ((P.π a).1), div_self (mul_ne_zero hβ hα),
-            mul_one, Prod.mk_one_one, map_one]
-        inv_val := by
-          rw [← map_mul, Prod.mk_mul_mk, div_mul_div_comm, mul_comm ((P.π a).2), div_self (mul_ne_zero hα hβ),
-            mul_one, Prod.mk_one_one, map_one] }
+      nnnorm_le_one_iff_mem.1 (le_of_eq (by
+        rw [nnnorm_div, hn, div_self (nnnorm_ne_zero_iff.2 hβ)]))
+    let u : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ := {
+      val := P.π.symm ((P.π a).1 / (P.π a).2, 1)
+      inv := P.π.symm ((P.π a).2 / (P.π a).1, 1)
+      val_inv := by
+        rw [← map_mul, Prod.mk_mul_mk, div_mul_div_comm, mul_comm ((P.π a).1),
+          div_self (mul_ne_zero hβ hα), mul_one, Prod.mk_one_one, map_one]
+      inv_val := by
+        rw [← map_mul, Prod.mk_mul_mk, div_mul_div_comm, mul_comm ((P.π a).2),
+          div_self (mul_ne_zero hα hβ), mul_one, Prod.mk_one_one, map_one]
+    }
     have hu : P.π (u : Fv D.host.F v ⊗[D.host.F] D.host.E) = ((P.π a).1 / (P.π a).2, 1) :=
       P.π.apply_symm_apply _
-    have hu' : P.π ((u⁻¹ : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ) : Fv D.host.F v ⊗[D.host.F] D.host.E) =
-        ((P.π a).2 / (P.π a).1, 1) :=
+    have hu'
+        : P.π ((u⁻¹ : (Fv D.host.F v ⊗[D.host.F] D.host.E)ˣ) : Fv D.host.F v ⊗[D.host.F] D.host.E)
+          = ((P.π a).2 / (P.π a).1, 1) :=
       P.π.apply_symm_apply _
     have hχu : χ (ideleAt D.host.F D.host.E v u) = 1 := by
       refine hP2 u ?_ ?_ ?_

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsInvari
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.BCT.TrKer
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.BCT.TrKer
 open scoped Classical TensorProduct Topology
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -15,20 +17,24 @@ namespace GlobalTheory.FrameAut.VecSemis
 
 open GlobalTheory.UnitarySemisimple
 
-theorem exists_irred_le_orbSpan {H V : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ H V) (B : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ) (hh : ∀ u v, star (B u v) = B v u)
-    (hp : ∀ v, 0 ≤ (B v v).re) (hd : ∀ v, B v v = 0 → v = 0) (hi : ∀ g u v, B (ρ g u) (ρ g v) = B u v)
+theorem exists_irred_le_orbSpan
+    {H V : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ H V) (B : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ)
+    (hh : ∀ u v, star (B u v) = B v u) (hp : ∀ v, 0 ≤ (B v v).re) (hd : ∀ v, B v v = 0 → v = 0)
+    (hi : ∀ g u v, B (ρ g u) (ρ g v) = B u v)
     (hK0 : ∃ K : Subgroup H, IsOpen (K : Set H) ∧ IsCompact (K : Set H))
     (hsm : ∀ w, IsOpen {k : H | ρ k w = w})
     (hfd : ∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K))
-    (y : V) (hy : y ≠ 0) :
-    ∃ U : Submodule ℂ V, U ≠ ⊥ ∧ U ≤ (orbSpan ρ y).toSubmodule ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧
-      (∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U) := by
+    (y : V) (hy : y ≠ 0)
+    : ∃ U : Submodule ℂ V,
+      U ≠ ⊥ ∧ U ≤ (orbSpan ρ y).toSubmodule ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U)
+        ∧ (∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U) := by
   classical
   set O := orbSpan ρ y with hO
   let ρO := O.toRepresentation
   have hρO : ∀ g (w : O.toSubmodule), (ρO g w : V) = ρ g w := fun _ _ => rfl
-  let BO : O.toSubmodule →ₗ⋆[ℂ] O.toSubmodule →ₗ[ℂ] ℂ := (B.comp O.toSubmodule.subtype).compl₂ O.toSubmodule.subtype
+  let BO : O.toSubmodule →ₗ⋆[ℂ] O.toSubmodule →ₗ[ℂ] ℂ :=
+    (B.comp O.toSubmodule.subtype).compl₂ O.toSubmodule.subtype
   have hBO : ∀ u w : O.toSubmodule, BO u w = B u w := fun _ _ => rfl
   have hsmO : ∀ w : O.toSubmodule, IsOpen {k : H | ρO k w = w} := by
     intro w
@@ -36,10 +42,14 @@ theorem exists_irred_le_orbSpan {H V : Type} [Group H] [TopologicalSpace H] [IsT
     ext k
     simp only [Set.mem_setOf_eq]
     exact ⟨fun h => by rw [← hρO, h], fun h => Subtype.ext (by rw [hρO, h])⟩
-  have hfdO : ∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρO K) := by
+  have hfdO
+      : ∀ K : Subgroup H,
+        IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρO K) := by
     intro K hK
     haveI := hfd K hK
-    have hle : (GlobalTheory.PRep.fixed ρO K).map O.toSubmodule.subtype ≤ GlobalTheory.PRep.fixed ρ K := by
+    have hle
+        : (GlobalTheory.PRep.fixed ρO K).map O.toSubmodule.subtype
+          ≤ GlobalTheory.PRep.fixed ρ K := by
       rintro _ ⟨w, hw, rfl⟩ k
       have h1 := hw k
       show ρ k w.1 = ((1 : K →* ℂˣ) k : ℂ) • w.1
@@ -47,12 +57,16 @@ theorem exists_irred_le_orbSpan {H V : Type} [Group H] [TopologicalSpace H] [IsT
       rw [← hρO, h1]
     haveI : FiniteDimensional ℂ ((GlobalTheory.PRep.fixed ρO K).map O.toSubmodule.subtype) :=
       Submodule.finiteDimensional_of_le hle
-    exact LinearEquiv.finiteDimensional
-      (Submodule.equivMapOfInjective _ O.toSubmodule.injective_subtype _).symm
+    exact LinearEquiv.finiteDimensional (Submodule.equivMapOfInjective _
+      O.toSubmodule.injective_subtype _).symm
   have hy0 : (⟨y, mem_orbSpan ρ y⟩ : O.toSubmodule) ≠ 0 := fun h => hy (congrArg Subtype.val h)
   obtain ⟨U', P, hU0, hUst, hUirr, -, -, -⟩ :=
-    GlobalTheory.AdmissibleProjection.exists_irreducible_equivariant_projection H O.toSubmodule ρO BO
-      (fun u w => hh u w) (fun v => hp v) (fun v h => Subtype.ext (hd v h)) (fun g u w => hi g u w)
+    GlobalTheory.AdmissibleProjection.exists_irreducible_equivariant_projection H O.toSubmodule ρO
+      BO
+      (fun u w => hh u w)
+      (fun v => hp v)
+      (fun v h => Subtype.ext (hd v h))
+      (fun g u w => hi g u w)
       hK0 hsmO hfdO _ hy0
   refine ⟨U'.map O.toSubmodule.subtype, ?_, ?_, ?_, ?_⟩
   · intro h
@@ -87,26 +101,32 @@ namespace GlobalTheory.FrameAut.VecSemis
 
 open GlobalTheory.UnitarySemisimple GlobalTheory.DefU GlobalTheory.FrameAut.VecProj
 
-theorem mem_iSup_of_form (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ)
-    (B : autU E n →ₗ⋆[ℂ] autU E n →ₗ[ℂ] ℂ) (hh : ∀ u v, star (B u v) = B v u) (hp : ∀ v, 0 ≤ (B v v).re)
-    (hd : ∀ v, B v v = 0 → v = 0) (hi : ∀ g u v, B (autRep E n g u) (autRep E n g v) = B u v)
-    (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] (ρ : Representation ℂ (infU E n) W)
-    (hsp : Submodule.span ℂ (Set.range ρ) = ⊤) (K : Subgroup (finU (E := E) (n := n))) (hK : IsOpen (K : Set (finU (E := E) (n := n))))
-    (f : W →ₗ[ℂ] (UA E n → ℂ)) (hfa : ∀ u, IsAutFormU (f u)) (hfe : ∀ (x : infU E n) u, f (ρ x u) = RU E n x (f u))
-    (hfK : ∀ u, f u ∈ fixed (RF E n) K) :
-    ∀ u, f u ∈ ⨆ (π : Submodule ℂ (UA E n → ℂ)) (_ : IsAutRepU π ∧ ∃ f' : W →ₗ[ℂ] (UA E n → ℂ), f' ≠ 0 ∧
-      (∀ u, f' u ∈ π) ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u)), π ⊓ fixed (RF E n) K := by
+theorem mem_iSup_of_form
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (n : ℕ) (B : autU E n →ₗ⋆[ℂ] autU E n →ₗ[ℂ] ℂ)
+    (hh : ∀ u v, star (B u v) = B v u) (hp : ∀ v, 0 ≤ (B v v).re) (hd : ∀ v, B v v = 0 → v = 0)
+    (hi : ∀ g u v, B (autRep E n g u) (autRep E n g v) = B u v)
+    (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ (infU E n) W) (hsp : Submodule.span ℂ (Set.range ρ) = ⊤)
+    (K : Subgroup (finU (E := E) (n := n))) (hK : IsOpen (K : Set (finU (E := E) (n := n))))
+    (f : W →ₗ[ℂ] (UA E n → ℂ)) (hfa : ∀ u, IsAutFormU (f u))
+    (hfe : ∀ (x : infU E n) u, f (ρ x u) = RU E n x (f u)) (hfK : ∀ u, f u ∈ fixed (RF E n) K)
+    : ∀ u,
+      f u
+        ∈ ⨆ (π : Submodule ℂ (UA E n → ℂ)) (_ : IsAutRepU π ∧ ∃ f' : W →ₗ[ℂ] (UA E n → ℂ), f' ≠ 0 ∧
+          (∀ u, f' u ∈ π) ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u)), π ⊓ fixed (RF E n) K := by
   classical
   set T : Submodule ℂ (UA E n → ℂ) := ⨆ (π : Submodule ℂ (UA E n → ℂ)) (_ : IsAutRepU π ∧
     ∃ f' : W →ₗ[ℂ] (UA E n → ℂ), f' ≠ 0 ∧ (∀ u, f' u ∈ π) ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u)),
     π ⊓ fixed (RF E n) K with hT
-  let Y : Submodule ℂ (forms ρ) :=
-    { carrier := {g | ∀ u, g.1 u ∈ T}
-      add_mem' := fun ha hb u => by
-        rw [Submodule.coe_add, LinearMap.add_apply]; exact add_mem (ha u) (hb u)
-      zero_mem' := fun u => by simp
-      smul_mem' := fun c g hg u => by
-        rw [Submodule.coe_smul, LinearMap.smul_apply]; exact T.smul_mem c (hg u) }
+  let Y : Submodule ℂ (forms ρ) := {
+    carrier := {g | ∀ u, g.1 u ∈ T}
+    add_mem' := fun ha hb u => by
+      rw [Submodule.coe_add, LinearMap.add_apply]; exact add_mem (ha u) (hb u)
+    zero_mem' := fun u => by simp
+    smul_mem' := fun c g hg u => by
+      rw [Submodule.coe_smul, LinearMap.smul_apply]; exact T.smul_mem c (hg u)
+  }
   let X := GlobalTheory.PRep.fixed (rep ρ) K
   haveI : FiniteDimensional ℂ X := rep_fd ρ K hK
   haveI : FiniteDimensional ℂ (X ⊓ Y : Submodule ℂ (forms ρ)) := Submodule.finiteDimensional_of_le inf_le_left
@@ -143,11 +163,16 @@ theorem mem_iSup_of_form (E : Type) [Field E] [NumberField E] [IsCMField E] (n :
     rw [hy, sub_eq_zero] at h
     rw [h]
     exact (Submodule.mem_inf.1 hm).2
-  obtain ⟨U, hU0, hUO, hUst, hUirr⟩ := exists_irred_le_orbSpan (rep ρ) Bf hBh hBp hBd hBi (GlobalTheory.T.definiteUnitaryFinitePoints_exists_openCompact E n)
-    (rep_smooth ρ) (rep_fd ρ) y hy0
-  have hadm := GlobalTheory.AdmissibleProjection.hadm_of (rep ρ) (GlobalTheory.T.definiteUnitaryFinitePoints_exists_openCompact E n) (rep_smooth ρ) (rep_fd ρ)
+  obtain ⟨U, hU0, hUO, hUst, hUirr⟩ :=
+    exists_irred_le_orbSpan (rep ρ) Bf hBh hBp hBd hBi
+      (GlobalTheory.T.definiteUnitaryFinitePoints_exists_openCompact E n) (rep_smooth ρ) (rep_fd ρ)
+      y hy0
+  have hadm :=
+    GlobalTheory.AdmissibleProjection.hadm_of (rep ρ)
+      (GlobalTheory.T.definiteUnitaryFinitePoints_exists_openCompact E n) (rep_smooth ρ) (rep_fd ρ)
   let Z : Subrepresentation (rep ρ) := ⟨U, fun g _ hv => hUst g _ hv⟩
-  obtain ⟨P, hP1, hP2, hP3⟩ := GlobalTheory.AdmissibleProjection.exists_proj (rep ρ) Bf hBd hBi hadm Z
+  obtain ⟨P, hP1, hP2, hP3⟩ :=
+    GlobalTheory.AdmissibleProjection.exists_proj (rep ρ) Bf hBd hBi hadm Z
   obtain ⟨z, hz⟩ : ∃ z, z = P y := ⟨_, rfl⟩
   have hzU : z ∈ U := hz ▸ hP1 y
   have hzX : z ∈ X := memX z fun k hk => by rw [hz, ← hP3, ofX y hyX k hk]
@@ -181,7 +206,8 @@ theorem mem_iSup_of_form (E : Type) [Field E] [NumberField E] [IsCMField E] (n :
   have hMk : ∀ k ∈ finU (E := E) (n := n), ∀ g ∈ M, (RU E n k) ∘ₗ g ∈ M := by
     rintro k hk _ ⟨u, hu, rfl⟩
     exact ⟨rep ρ ⟨k, hk⟩ u, hUst _ u hu, rfl⟩
-  have hMirr : ∀ N ≤ M, (∀ k ∈ finU (E := E) (n := n), ∀ g ∈ N, (RU E n k) ∘ₗ g ∈ N) → N = ⊥ ∨ N = M := by
+  have hMirr
+      : ∀ N ≤ M, (∀ k ∈ finU (E := E) (n := n), ∀ g ∈ N, (RU E n k) ∘ₗ g ∈ N) → N = ⊥ ∨ N = M := by
     intro N hNM hN
     let N' : Submodule ℂ (forms ρ) := N.comap (forms ρ).subtype
     have hN'U : N' ≤ U := by
@@ -206,13 +232,27 @@ theorem mem_iSup_of_form (E : Type) [Field E] [NumberField E] [IsCMField E] (n :
       rw [MonoidHom.one_apply, Units.val_one, one_smul]
       have h1 := congrArg (fun g : forms ρ => g.1 u) (ofX z hzX k k.2)
       exact h1
-    have hidx : IsAutRepU (Submodule.span ℂ {φ | ∃ f ∈ M, ∃ v, f v = φ}) ∧
-        ∃ f' : W →ₗ[ℂ] (UA E n → ℂ), f' ≠ 0 ∧ (∀ u, f' u ∈ Submodule.span ℂ {φ | ∃ f ∈ M, ∃ v, f v = φ}) ∧
-          ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u) :=
-      ⟨hπ, z.1, fun h => hz0 (Subtype.ext h), fun v => Submodule.subset_span ⟨z.1, ⟨z, hzU, rfl⟩, v, rfl⟩, z.2.2⟩
-    exact (le_iSup₂ (f := fun (π : Submodule ℂ (UA E n → ℂ)) (_ : IsAutRepU π ∧
-      ∃ f' : W →ₗ[ℂ] (UA E n → ℂ), f' ≠ 0 ∧ (∀ u, f' u ∈ π) ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u)) =>
-      π ⊓ fixed (RF E n) K) _ hidx) ⟨hmemπ, hfixu⟩
+    have hidx
+        : IsAutRepU (Submodule.span ℂ {φ | ∃ f ∈ M, ∃ v, f v = φ})
+          ∧ ∃ f' : W →ₗ[ℂ] (UA E n → ℂ),
+            f' ≠ 0 ∧ (∀ u, f' u ∈ Submodule.span ℂ {φ | ∃ f ∈ M, ∃ v, f v = φ})
+              ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u) := ⟨
+      hπ,
+      z.1,
+      fun h => hz0 (Subtype.ext h),
+      fun v => Submodule.subset_span ⟨z.1, ⟨z, hzU, rfl⟩, v, rfl⟩,
+      z.2.2
+    ⟩
+    exact (le_iSup₂
+        (f :=
+          fun (π : Submodule ℂ (UA E n → ℂ))
+              (_
+                : IsAutRepU π
+                  ∧ ∃ f' : W →ₗ[ℂ] (UA E n → ℂ),
+                    f' ≠ 0 ∧ (∀ u, f' u ∈ π) ∧ ∀ (x : infU E n) u, f' (ρ x u) = RU E n x (f' u)) =>
+            π ⊓ fixed (RF E n) K)
+        _ hidx)
+      ⟨hmemπ, hfixu⟩
   have hzm : Bf z y = 0 := hy ▸ hmo z ⟨hzX, hzY⟩
   have hzz : Bf z z = 0 := by
     have h2 := hP2 y z hzU

@@ -8,14 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.EqZeroOfFora
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 open GlobalTheory GlobalTheory.CxPts
 
 namespace GlobalTheory
 
-theorem eq_of_ev_eq_of_smoothOfRelativeDimension :
-    ∀ (Y : Scheme.{0}) (p : Y ⟶ Sp ℂ) (D : ℕ), SmoothOfRelativeDimension D p → ∀ (W : Y.Opens) (a b : Γ(Y, W)), (∀ y ∈ ptsIn p (RingHom.id ℂ) W, ev p (RingHom.id ℂ) W a y = ev p (RingHom.id ℂ) W b y) → a = b := by
+theorem eq_of_ev_eq_of_smoothOfRelativeDimension
+    : ∀ (Y : Scheme.{0}) (p : Y ⟶ Sp ℂ) (D : ℕ),
+      SmoothOfRelativeDimension D p
+        → ∀ (W : Y.Opens) (a b : Γ(Y, W)),
+          (∀ y ∈ ptsIn p (RingHom.id ℂ) W, ev p (RingHom.id ℂ) W a y = ev p (RingHom.id ℂ) W b y)
+            → a = b := by
   intro Y p D hp W a b hab
   have hsm : Smooth p := SmoothOfRelativeDimension.smooth D p
   have hred : IsReduced Y :=
@@ -26,7 +31,8 @@ theorem eq_of_ev_eq_of_smoothOfRelativeDimension :
   refine ⟨U, hUW, hxU, ?_⟩
   have hc : (algX p U).FiniteType := by
     have h1 : (p.appLE ⊤ U (fun _ _ => trivial)).hom.FiniteType :=
-      HasRingHomProperty.appLE @LocallyOfFiniteType p inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩ _
+      HasRingHomProperty.appLE @LocallyOfFiniteType p inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩
+        _
     exact h1.comp (RingHom.FiniteType.of_surjective _
       (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv).2)
   let : Algebra ℂ Γ(Y, U) := (algX p U).toAlgebra

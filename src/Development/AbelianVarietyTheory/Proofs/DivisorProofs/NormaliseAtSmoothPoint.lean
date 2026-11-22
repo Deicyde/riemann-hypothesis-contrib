@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsEtaleC
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,15 +24,19 @@ noncomputable section
 
 namespace GlobalTheory.SmoothNormalise
 
-theorem inv_mem_of_isField {κ' : Type} [Field κ'] {O : Subring κ'} (hF : IsField O) {f : κ'}
-    (hf : f ∈ O) (h0 : f ≠ 0) : f⁻¹ ∈ O := by
+theorem inv_mem_of_isField
+    {κ' : Type} [Field κ'] {O : Subring κ'} (hF : IsField O) {f : κ'} (hf : f ∈ O) (h0 : f ≠ 0)
+    : f⁻¹ ∈ O := by
   obtain ⟨y, hy⟩ := hF.mul_inv_cancel (a := (⟨f, hf⟩ : O)) (fun e => h0 (congrArg Subtype.val e))
   have : f * (y : κ') = 1 := congrArg Subtype.val hy
-  rw [inv_eq_of_mul_eq_one_right this]; exact y.2
+  rw [inv_eq_of_mul_eq_one_right this]
+  exact y.2
 
-theorem const_of_isField {κ' : Type} [Field κ'] [Algebra ℂ κ'] {O : Subring κ'}
-    (hO : IsLocModel (algebraMap ℂ κ') O) (hR : RatRes (algebraMap ℂ κ') O) (hF : IsField O) :
-    ∀ x : κ', ∃ α : ℂ, x = algebraMap ℂ κ' α := by
+theorem const_of_isField
+    {κ' : Type} [Field κ'] [Algebra ℂ κ']
+    {O : Subring κ'}
+    (hO : IsLocModel (algebraMap ℂ κ') O) (hR : RatRes (algebraMap ℂ κ') O) (hF : IsField O)
+    : ∀ x : κ', ∃ α : ℂ, x = algebraMap ℂ κ' α := by
   have hc : ∀ f ∈ O, ∃ α : ℂ, f = algebraMap ℂ κ' α := by
     intro f hf
     obtain ⟨α, hα, h⟩ := hR f hf
@@ -46,19 +52,25 @@ theorem const_of_isField {κ' : Type} [Field κ'] [Algebra ℂ κ'] {O : Subring
   refine ⟨α / β, ?_⟩
   rw [map_div₀, eq_div_iff hb0, e]
 
-theorem top_model_of_const {κ' : Type} [Field κ'] [Algebra ℂ κ']
-    (hc : ∀ x : κ', ∃ α : ℂ, x = algebraMap ℂ κ' α) :
-    ∃ (hB : IsLocModel (algebraMap ℂ κ') ⊤), RatRes (algebraMap ℂ κ') ⊤ ∧
-    (letI := hB.isLocalRing; IsLocalRing.maximalIdeal (⊤ : Subring κ') = Ideal.span (Set.range (Fin.elim0 : Fin 0 → (⊤ : Subring κ')))) ∧
-    (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict ⊤ hB.const_mem) (Fin.elim0 : Fin 0 → (⊤ : Subring κ'))).FormallyEtale ∧
-    TrBasis (algebraMap ℂ κ') (fun i => ((Fin.elim0 i : (⊤ : Subring κ')) : κ')) := by
-  have hsurj : Function.Surjective ((algebraMap ℂ κ').codRestrict (⊤ : Subring κ') (fun _ => trivial)) :=
-    fun x => by obtain ⟨α, hα⟩ := hc x; exact ⟨α, Subtype.ext hα.symm⟩
-  let hB : IsLocModel (algebraMap ℂ κ') ⊤ :=
-    { const_mem := fun _ => trivial
-      isLocalRing := (Subring.topEquiv (R := κ')).symm.isLocalRing
-      essFiniteType := (RingHom.FiniteType.of_surjective _ hsurj).essFiniteType
-      frac := fun f => ⟨f, trivial, 1, trivial, one_ne_zero, mul_one f⟩ }
+theorem top_model_of_const
+    {κ' : Type} [Field κ'] [Algebra ℂ κ'] (hc : ∀ x : κ', ∃ α : ℂ, x = algebraMap ℂ κ' α)
+    : ∃ (hB : IsLocModel (algebraMap ℂ κ') ⊤),
+      RatRes (algebraMap ℂ κ') ⊤
+        ∧ (letI := hB.isLocalRing
+           IsLocalRing.maximalIdeal (⊤ : Subring κ')
+             = Ideal.span (Set.range (Fin.elim0 : Fin 0 → (⊤ : Subring κ'))))
+        ∧ (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict ⊤ hB.const_mem)
+          (Fin.elim0 : Fin 0 → (⊤ : Subring κ'))).FormallyEtale
+        ∧ TrBasis (algebraMap ℂ κ') (fun i => ((Fin.elim0 i : (⊤ : Subring κ')) : κ')) := by
+  have hsurj : Function.Surjective ((algebraMap ℂ κ').codRestrict (⊤ : Subring κ')
+      (fun _ => trivial)) := fun x => by
+    obtain ⟨α, hα⟩ := hc x; exact ⟨α, Subtype.ext hα.symm⟩
+  let hB : IsLocModel (algebraMap ℂ κ') ⊤ := {
+    const_mem := fun _ => trivial
+    isLocalRing := (Subring.topEquiv (R := κ')).symm.isLocalRing
+    essFiniteType := (RingHom.FiniteType.of_surjective _ hsurj).essFiniteType
+    frac := fun f => ⟨f, trivial, 1, trivial, one_ne_zero, mul_one f⟩
+  }
   refine ⟨hB, ?_, ?_, ?_, ?_⟩
   · intro r _
     obtain ⟨α, hα⟩ := hc r
@@ -70,7 +82,8 @@ theorem top_model_of_const {κ' : Type} [Field κ'] [Algebra ℂ κ']
       exact ⟨⟨(a : κ')⁻¹, trivial⟩, Subtype.ext (mul_inv_cancel₀ ha')⟩
     rw [Set.range_eq_empty, Ideal.span_empty]
     exact IsLocalRing.isField_iff_maximalIdeal_eq.1 hfield
-  · have hb : Function.Bijective (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict ⊤ hB.const_mem) (Fin.elim0 : Fin 0 → (⊤ : Subring κ'))) := by
+  · have hb : Function.Bijective (MvPolynomial.eval₂Hom
+        ((algebraMap ℂ κ').codRestrict ⊤ hB.const_mem) (Fin.elim0 : Fin 0 → (⊤ : Subring κ'))) := by
       refine ⟨fun P Q e => ?_, fun x => ?_⟩
       · rw [MvPolynomial.eq_C_of_isEmpty P, MvPolynomial.eq_C_of_isEmpty Q] at e ⊢
         simp only [MvPolynomial.eval₂Hom_C] at e
@@ -85,39 +98,61 @@ theorem top_model_of_const {κ' : Type} [Field κ'] [Algebra ℂ κ']
     rw [e, isTranscendenceBasis_iff_algebraicIndependent_isAlgebraic]
     refine ⟨algebraicIndependent_empty_type, ⟨fun x => ?_⟩⟩
     obtain ⟨α, rfl⟩ := hc x
-    exact isAlgebraic_algebraMap (algebraMap ℂ (Algebra.adjoin ℂ (Set.range (fun i : Fin 0 => ((Fin.elim0 i : (⊤ : Subring κ')) : κ')))) α)
+    exact isAlgebraic_algebraMap (algebraMap ℂ
+      (Algebra.adjoin ℂ (Set.range (fun i : Fin 0 => ((Fin.elim0 i : (⊤ : Subring κ')) : κ')))) α)
 
-theorem inv_not_mem {κ' : Type} [Field κ'] [Algebra ℂ κ'] (F : Place (algebraMap ℂ κ'))
-    {B : Subring κ'} (hBF : B ≤ F.ring.toSubring) {f : κ'} (hf : f ≠ 0) (hp : 0 < F.ord f) :
-    f⁻¹ ∉ B := by
+theorem inv_not_mem
+    {κ' : Type} [Field κ'] [Algebra ℂ κ']
+    (F : Place (algebraMap ℂ κ'))
+    {B : Subring κ'} (hBF : B ≤ F.ring.toSubring)
+    {f : κ'} (hf : f ≠ 0) (hp : 0 < F.ord f)
+    : f⁻¹ ∉ B := by
   intro h
   have := (F.ord_nonneg_iff (inv_ne_zero hf)).2 (hBF h)
   rw [F.ord_inv] at this
   omega
 
-theorem nonUnit_sub {κ' : Type} [Field κ'] {B : Subring κ'} [IsLocalRing B] {x y : κ'}
-    (hx : NonUnit B x) (hy : NonUnit B y) : NonUnit B (x - y) := by
+theorem nonUnit_sub
+    {κ' : Type} [Field κ']
+    {B : Subring κ'} [IsLocalRing B]
+    {x y : κ'} (hx : NonUnit B x) (hy : NonUnit B y)
+    : NonUnit B (x - y) := by
   have hx' := (nonUnit_iff (R := B) ⟨x, hx.1⟩).1 hx
   have hy' := (nonUnit_iff (R := B) ⟨y, hy.1⟩).1 hy
   have h := (nonUnit_iff (R := B) (⟨x, hx.1⟩ - ⟨y, hy.1⟩)).2
-  exact h ((IsLocalRing.mem_maximalIdeal _).1 (Ideal.sub_mem _
-    ((IsLocalRing.mem_maximalIdeal _).2 hx') ((IsLocalRing.mem_maximalIdeal _).2 hy')))
+  exact h ((IsLocalRing.mem_maximalIdeal _).1
+    (Ideal.sub_mem _ ((IsLocalRing.mem_maximalIdeal _).2 hx')
+      ((IsLocalRing.mem_maximalIdeal _).2 hy')))
 
-theorem normalise_at_smooth_point : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (O : Subring κ') (l : ℕ) (a : Fin l → κ'),
-  IsLocModel (algebraMap ℂ κ') O → RatRes (algebraMap ℂ κ') O → a ≠ 0 →
-  ∃ (B : Subring κ') (hB : IsLocModel (algebraMap ℂ κ') B) (r : ℕ) (τ : Fin r → B),
-    RatRes (algebraMap ℂ κ') B ∧ Dominates (RingHom.id κ') B O ∧
-    (letI := hB.isLocalRing; IsLocalRing.maximalIdeal B = Ideal.span (Set.range τ)) ∧
-    (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict B hB.const_mem) τ).FormallyEtale ∧
-    TrBasis (algebraMap ℂ κ') (fun i => (τ i : κ')) ∧ ∃ j₀, a j₀ ≠ 0 ∧ ∀ i, a i / a j₀ ∈ B := by
+theorem normalise_at_smooth_point
+    : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ'] (O : Subring κ') (l : ℕ) (a : Fin l → κ'),
+      IsLocModel (algebraMap ℂ κ') O → RatRes (algebraMap ℂ κ') O → a ≠ 0
+        → ∃ (B : Subring κ') (hB : IsLocModel (algebraMap ℂ κ') B) (r : ℕ) (τ : Fin r → B),
+          RatRes (algebraMap ℂ κ') B ∧ Dominates (RingHom.id κ') B O
+            ∧ (letI := hB.isLocalRing; IsLocalRing.maximalIdeal B = Ideal.span (Set.range τ))
+            ∧ (MvPolynomial.eval₂Hom ((algebraMap ℂ κ').codRestrict B hB.const_mem) τ).FormallyEtale
+            ∧ TrBasis (algebraMap ℂ κ') (fun i => (τ i : κ'))
+            ∧ ∃ j₀, a j₀ ≠ 0 ∧ ∀ i, a i / a j₀ ∈ B := by
   classical
   intro κ' _ _ O l a hO hR ha
   obtain ⟨j, hj⟩ := Function.ne_iff.1 ha
   by_cases hF : IsField O
   · have hc := const_of_isField hO hR hF
     obtain ⟨hB, h1, h2, h3, h4⟩ := top_model_of_const hc
-    refine ⟨⊤, hB, 0, Fin.elim0, h1, fun f hf => ⟨trivial, fun hn => ?_⟩, h2, h3, h4, j, hj,
-      fun _ => trivial⟩
+    refine ⟨
+      ⊤,
+      hB,
+      0,
+      Fin.elim0,
+      h1,
+      fun f hf => ⟨trivial, fun hn => ?_⟩,
+      h2,
+      h3,
+      h4,
+      j,
+      hj,
+      fun _ => trivial
+    ⟩
     refine ⟨trivial, Or.inl ?_⟩
     by_contra h0
     rcases hn.2 with h | h
@@ -125,8 +160,10 @@ theorem normalise_at_smooth_point : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ
     · exact h (inv_mem_of_isField hF hf h0)
   · obtain ⟨F, hFO, hpos⟩ := GlobalTheory.T.exists_place_dominating_local_domain_complex O hO hF
     obtain ⟨j₀, hj₀, hdiv⟩ : ∃ j₀, a j₀ ≠ 0 ∧ ∀ i, a i / a j₀ ∈ F.ring := by
-      obtain ⟨j₀, hj₀s, hmin⟩ := (Finset.univ.filter (fun i => a i ≠ 0)).exists_min_image
-        (fun i => F.ord (a i)) ⟨j, by simpa using hj⟩
+      obtain ⟨j₀, hj₀s, hmin⟩ :=
+        (Finset.univ.filter (fun i => a i ≠ 0)).exists_min_image
+          (fun i => F.ord (a i))
+          ⟨j, by simpa using hj⟩
       have hj₀ : a j₀ ≠ 0 := (Finset.mem_filter.1 hj₀s).2
       refine ⟨j₀, hj₀, fun i => ?_⟩
       by_cases hi : a i = 0
@@ -146,9 +183,12 @@ theorem normalise_at_smooth_point : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ
         exact hFO _ y.2
       · obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hx
         exact hdiv i
-    obtain ⟨A, hAs, hAF, hSA, hAfrac⟩ := GlobalTheory.T.exists_smooth_finiteType_subalgebra_in_ring F S hS
-    obtain ⟨B, hB, hRB, hAB, hBF, hsm⟩ := GlobalTheory.T.exists_pointLocalRing_closedPoint_centre_of_place F A hAs hAF hAfrac
-    obtain ⟨r, τ, hm, het, htr⟩ := GlobalTheory.T.exists_etaleCoords_localRingOfVarietyPoint_residueComplex B hB hRB hsm
+    obtain ⟨A, hAs, hAF, hSA, hAfrac⟩ :=
+      GlobalTheory.T.exists_smooth_finiteType_subalgebra_in_ring F S hS
+    obtain ⟨B, hB, hRB, hAB, hBF, hsm⟩ :=
+      GlobalTheory.T.exists_pointLocalRing_closedPoint_centre_of_place F A hAs hAF hAfrac
+    obtain ⟨r, τ, hm, het, htr⟩ :=
+      GlobalTheory.T.exists_etaleCoords_localRingOfVarietyPoint_residueComplex B hB hRB hsm
     have hSB : ∀ x ∈ S, x ∈ B := fun x hx => hAB (hSA x hx)
     letI := hB.isLocalRing
     letI := hO.isLocalRing
@@ -176,8 +216,7 @@ theorem normalise_at_smooth_point : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ
       obtain ⟨α, hα⟩ := hR t t.2
       have hαB : algebraMap ℂ κ' α ∈ B := hB.const_mem α
       have hu : NonUnit B ((t : κ') - algebraMap ℂ κ' α) := hnon _ (B.sub_mem htB hαB) hα
-      have hc : NonUnit B (algebraMap ℂ κ' α) := by
-        simpa using nonUnit_sub htn hu
+      have hc : NonUnit B (algebraMap ℂ κ' α) := by simpa using nonUnit_sub htn hu
       by_cases hα0 : α = 0
       · subst hα0
         simp only [map_zero, sub_zero] at hα
@@ -185,8 +224,20 @@ theorem normalise_at_smooth_point : ∀ {κ' : Type} [Field κ'] [Algebra ℂ κ
       · rcases hc.2 with h | h
         · exact hα0 ((map_eq_zero_iff _ (algebraMap ℂ κ').injective).1 h)
         · exact h (by rw [← map_inv₀]; exact hB.const_mem _)
-    refine ⟨B, hB, r, τ, hRB, fun f hf => ?_, hm, het, htr, j₀, hj₀,
-      fun i => hSB _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))⟩
+    refine ⟨
+      B,
+      hB,
+      r,
+      τ,
+      hRB,
+      fun f hf => ?_,
+      hm,
+      het,
+      htr,
+      j₀,
+      hj₀,
+      fun i => hSB _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
+    ⟩
     obtain ⟨t, htA, htu, hft⟩ := hσ ⟨f, hf⟩
     have htB := hadj t htA
     have hfB : f ∈ B := by

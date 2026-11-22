@@ -10,8 +10,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.BlockHec
 
 open NumberField
 
-theorem UpperTheory.ConvolutionTheory.BW.funKill :
-    ∀ (E : Type) [Field E] [NumberField E] [IsTotallyComplex E], UpperTheory.ConvolutionTheory.BW.FunKill E := by
+theorem UpperTheory.ConvolutionTheory.BW.funKill
+    : ∀ (E : Type) [Field E] [NumberField E] [IsTotallyComplex E],
+      UpperTheory.ConvolutionTheory.BW.FunKill E := by
   intro E _ _ _ S n ρ C hC
   obtain ⟨B, hB⟩ := far E n C hC
   obtain ⟨D₀, hfin, hD₀⟩ := nearDat E S n ρ B

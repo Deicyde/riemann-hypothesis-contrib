@@ -13,15 +13,20 @@ set_option linter.unusedVariables false
 set_option linter.style.longLine false
 set_option linter.unusedSimpArgs false
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.Whittaker
+  Matrix
 
 namespace DiscreteGroups.sglob.LConvGenM
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem conj_colU (j : ℕ) (hj : j < n) (x : GL (Fin n) k) (hx : TopLeft j (x : Matrix (Fin n) (Fin n) k))
-    (hy : TopLeft j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) (c : Fin n → k) :
-    x⁻¹ * colU j c * x = colU j (colMul j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c) := by
+theorem conj_colU
+    (j : ℕ) (hj : j < n)
+    (x : GL (Fin n) k) (hx : TopLeft j (x : Matrix (Fin n) (Fin n) k))
+    (hy : TopLeft j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
+    (c : Fin n → k)
+    : x⁻¹ * colU j c * x
+      = colU j (colMul j ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) c) := by
   set X := (x : Matrix (Fin n) (Fin n) k)
   set Y := ((x⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
   have hYX : Y * X = 1 := by rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
@@ -51,7 +56,8 @@ theorem conj_colU (j : ℕ) (hj : j < n) (x : GL (Fin n) k) (hx : TopLeft j (x :
       rw [colM_apply, if_neg (fun h => hb (Fin.ext h.2)), zero_mul]
     · simp
   ext : 1
-  rw [Units.val_mul, Units.val_mul, val_colU, val_colU, Matrix.mul_add, Matrix.mul_one, Matrix.add_mul, hYX, hYC, hCX]
+  rw [Units.val_mul, Units.val_mul, val_colU, val_colU, Matrix.mul_add, Matrix.mul_one,
+    Matrix.add_mul, hYX, hYC, hCX]
 
 def i0 (j : ℕ) (hj : j < n) (hj1 : 1 ≤ j) : Fin n := ⟨j - 1, by omega⟩
 
@@ -61,9 +67,11 @@ variable (j : ℕ) (hj : j < n) (hj1 : 1 ≤ j) (ξ : Fin n → k)
 
 def vrow : Fin n → k := fun l => if l.val < j then ξ l - (if l = i0 j hj hj1 then 1 else 0) else 0
 
-def R1 : Matrix (Fin n) (Fin n) k := Matrix.of fun i l => if i = i0 j hj hj1 then vrow j hj hj1 ξ l else 0
+def R1 : Matrix (Fin n) (Fin n) k :=
+  Matrix.of fun i l => if i = i0 j hj hj1 then vrow j hj hj1 ξ l else 0
 
-theorem rankOne_mul_self : R1 j hj hj1 ξ * R1 j hj hj1 ξ = (vrow j hj hj1 ξ (i0 j hj hj1)) • R1 j hj hj1 ξ := by
+theorem rankOne_mul_self
+    : R1 j hj hj1 ξ * R1 j hj hj1 ξ = (vrow j hj hj1 ξ (i0 j hj hj1)) • R1 j hj hj1 ξ := by
   ext i l
   rw [Matrix.mul_apply, Finset.sum_eq_single (i0 j hj hj1)]
   · simp only [R1, of_apply, Matrix.smul_apply, smul_eq_mul, if_true]

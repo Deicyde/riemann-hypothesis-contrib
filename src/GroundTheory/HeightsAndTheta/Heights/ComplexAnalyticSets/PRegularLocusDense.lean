@@ -17,9 +17,10 @@ section Germs
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-theorem eventually_zero_of_iteratedFDeriv_diag {ψ : E → ℂ} {y₀ : E} (hψ : AnalyticAt ℂ ψ y₀)
-    (h0 : ∀ (n : ℕ) (v : E), iteratedFDeriv ℂ n ψ y₀ (fun _ => v) = 0) :
-    ∀ᶠ u in 𝓝 y₀, ψ u = 0 := by
+theorem eventually_zero_of_iteratedFDeriv_diag
+    {ψ : E → ℂ} {y₀ : E}
+    (hψ : AnalyticAt ℂ ψ y₀) (h0 : ∀ (n : ℕ) (v : E), iteratedFDeriv ℂ n ψ y₀ (fun _ => v) = 0)
+    : ∀ᶠ u in 𝓝 y₀, ψ u = 0 := by
   obtain ⟨p, r, hp⟩ := hψ
   filter_upwards [Metric.eball_mem_nhds y₀ hp.r_pos] with u hu
   have hmem : u - y₀ ∈ Metric.eball (0 : E) r := by
@@ -28,9 +29,9 @@ theorem eventually_zero_of_iteratedFDeriv_diag {ψ : E → ℂ} {y₀ : E} (hψ 
   simp only [h0, smul_zero, add_sub_cancel] at hs
   exact hs.unique hasSum_zero
 
-theorem iteratedFDeriv_succ_diag_eq {ψ : E → ℂ} {y₀ : E} (hψ : AnalyticAt ℂ ψ y₀) (n : ℕ) (v : E) :
-    iteratedFDeriv ℂ (n + 1) ψ y₀ (fun _ => v) =
-      iteratedFDeriv ℂ n (fun y => fderiv ℂ ψ y v) y₀ (fun _ => v) := by
+theorem iteratedFDeriv_succ_diag_eq {ψ : E → ℂ} {y₀ : E} (hψ : AnalyticAt ℂ ψ y₀) (n : ℕ) (v : E)
+    : iteratedFDeriv ℂ (n + 1) ψ y₀ (fun _ => v)
+      = iteratedFDeriv ℂ n (fun y => fderiv ℂ ψ y v) y₀ (fun _ => v) := by
   rw [iteratedFDeriv_succ_apply_right]
   have hc : ContDiffAt ℂ ω (fderiv ℂ ψ) y₀ := hψ.fderiv.contDiffAt
   have h1 := (ContinuousLinearMap.apply ℂ ℂ v).iteratedFDeriv_comp_left hc (i := n) le_top
@@ -38,20 +39,28 @@ theorem iteratedFDeriv_succ_diag_eq {ψ : E → ℂ} {y₀ : E} (hψ : AnalyticA
   rw [h2, h1]
   rfl
 
-theorem eventually_zero_of_conormal_zero {C : Set E} {y₀ : E} (hy₀ : y₀ ∈ C) {U : Set E} (hU : U ∈ 𝓝 y₀)
-    (hC : ∀ c ∈ C ∩ U, ∀ ψ : E → ℂ, AnalyticAt ℂ ψ c → (∀ᶠ u in 𝓝 c, u ∈ C → ψ u = 0) →
-      fderiv ℂ ψ c = 0)
-    {ψ : E → ℂ} (hψ : AnalyticAt ℂ ψ y₀) (hψC : ∀ᶠ u in 𝓝 y₀, u ∈ C → ψ u = 0) :
-    ∀ᶠ u in 𝓝 y₀, ψ u = 0 := by
-  have step : ∀ φ : E → ℂ, AnalyticAt ℂ φ y₀ → (∀ᶠ u in 𝓝 y₀, u ∈ C → φ u = 0) → ∀ v : E,
-      AnalyticAt ℂ (fun y => fderiv ℂ φ y v) y₀ ∧ ∀ᶠ u in 𝓝 y₀, u ∈ C → fderiv ℂ φ u v = 0 := by
+theorem eventually_zero_of_conormal_zero
+    {C : Set E} {y₀ : E} (hy₀ : y₀ ∈ C)
+    {U : Set E} (hU : U ∈ 𝓝 y₀)
+    (hC : ∀ c ∈ C ∩ U, ∀ ψ : E → ℂ,
+      AnalyticAt ℂ ψ c → (∀ᶠ u in 𝓝 c, u ∈ C → ψ u = 0) → fderiv ℂ ψ c = 0)
+    {ψ : E → ℂ} (hψ : AnalyticAt ℂ ψ y₀) (hψC : ∀ᶠ u in 𝓝 y₀, u ∈ C → ψ u = 0)
+    : ∀ᶠ u in 𝓝 y₀, ψ u = 0 := by
+  have step
+      : ∀ φ : E → ℂ,
+        AnalyticAt ℂ φ y₀ → (∀ᶠ u in 𝓝 y₀, u ∈ C → φ u = 0)
+          → ∀ v : E,
+            AnalyticAt ℂ (fun y => fderiv ℂ φ y v) y₀
+              ∧ ∀ᶠ u in 𝓝 y₀, u ∈ C → fderiv ℂ φ u v = 0 := by
     intro φ hφ hφC v
     refine ⟨((ContinuousLinearMap.apply ℂ ℂ v).analyticAt _).comp hφ.fderiv, ?_⟩
     filter_upwards [hφ.eventually_analyticAt, hφC.eventually_nhds, hU] with c hca hcC hcU hc
     rw [hC c ⟨hc, hcU⟩ φ hca hcC]
     rfl
-  have key : ∀ n : ℕ, ∀ φ : E → ℂ, AnalyticAt ℂ φ y₀ → (∀ᶠ u in 𝓝 y₀, u ∈ C → φ u = 0) →
-      ∀ v : E, iteratedFDeriv ℂ n φ y₀ (fun _ => v) = 0 := by
+  have key
+      : ∀ n : ℕ, ∀ φ : E → ℂ,
+        AnalyticAt ℂ φ y₀ → (∀ᶠ u in 𝓝 y₀, u ∈ C → φ u = 0)
+          → ∀ v : E, iteratedFDeriv ℂ n φ y₀ (fun _ => v) = 0 := by
     intro n
     induction n with
     | zero => intro φ _ hφC v; simpa using hφC.self_of_nhds hy₀
@@ -64,31 +73,38 @@ theorem eventually_zero_of_conormal_zero {C : Set E} {y₀ : E} (hy₀ : y₀ �
 
 end Germs
 
-noncomputable def conormalSpan {σ : Type} [Fintype σ] (Y : Set (σ → ℂ)) (z : σ → ℂ) :
-    Submodule ℂ ((σ → ℂ) →L[ℂ] ℂ) :=
-  Submodule.span ℂ {ℓ | ∃ h : (σ → ℂ) → ℂ, AnalyticAt ℂ h z ∧ (∀ᶠ u in 𝓝 z, u ∈ Y → h u = 0) ∧
-    fderiv ℂ h z = ℓ}
+noncomputable def conormalSpan {σ : Type} [Fintype σ] (Y : Set (σ → ℂ)) (z : σ → ℂ)
+    : Submodule ℂ ((σ → ℂ) →L[ℂ] ℂ) :=
+  Submodule.span ℂ
+    {ℓ | ∃ h : (σ → ℂ) → ℂ, AnalyticAt ℂ h z ∧ (∀ᶠ u in 𝓝 z, u ∈ Y → h u = 0) ∧
+      fderiv ℂ h z = ℓ}
 
-theorem exists_maxRank_equations {σ : Type} [Fintype σ] (Y : Set (σ → ℂ)) {U : Set (σ → ℂ)}
-    (hU : IsOpen U) (hne : (Y ∩ U).Nonempty) :
-    ∃ a ∈ Y, ∃ (ι : Type) (_ : Fintype ι) (h : ι → (σ → ℂ) → ℂ) (W : Set (σ → ℂ)),
-      IsOpen W ∧ a ∈ W ∧ W ⊆ U ∧ (∀ j, ∀ z ∈ W, AnalyticAt ℂ (h j) z) ∧
-      (∀ j, ∀ z ∈ W, z ∈ Y → h j z = 0) ∧ LinearIndependent ℂ (fun j => fderiv ℂ (h j) a) ∧
-      ∀ z ∈ W ∩ Y, ∀ ψ : (σ → ℂ) → ℂ, AnalyticAt ℂ ψ z → (∀ᶠ u in 𝓝 z, u ∈ Y → ψ u = 0) →
-        fderiv ℂ ψ z ∈ Submodule.span ℂ (Set.range fun j => fderiv ℂ (h j) z) := by
+theorem exists_maxRank_equations
+    {σ : Type} [Fintype σ]
+    (Y : Set (σ → ℂ))
+    {U : Set (σ → ℂ)} (hU : IsOpen U) (hne : (Y ∩ U).Nonempty)
+    : ∃ a ∈ Y, ∃ (ι : Type) (_ : Fintype ι) (h : ι → (σ → ℂ) → ℂ) (W : Set (σ → ℂ)),
+      IsOpen W ∧ a ∈ W ∧ W ⊆ U ∧ (∀ j, ∀ z ∈ W, AnalyticAt ℂ (h j) z)
+        ∧ (∀ j, ∀ z ∈ W, z ∈ Y → h j z = 0) ∧ LinearIndependent ℂ (fun j => fderiv ℂ (h j) a)
+        ∧ ∀ z ∈ W ∩ Y, ∀ ψ : (σ → ℂ) → ℂ,
+          AnalyticAt ℂ ψ z → (∀ᶠ u in 𝓝 z, u ∈ Y → ψ u = 0)
+            → fderiv ℂ ψ z ∈ Submodule.span ℂ (Set.range fun j => fderiv ℂ (h j) z) := by
   classical
   set rk : (σ → ℂ) → ℕ := fun z => finrank ℂ (conormalSpan Y z) with hrk
   have hbdd : BddAbove (rk '' (Y ∩ U)) :=
     ⟨finrank ℂ ((σ → ℂ) →L[ℂ] ℂ), by rintro _ ⟨z, -, rfl⟩; exact Submodule.finrank_le _⟩
   obtain ⟨a, haYU, har⟩ := Nat.sSup_mem (hne.image rk) hbdd
   have hmax : ∀ z ∈ Y ∩ U, rk z ≤ rk a := fun z hz => har ▸ le_csSup hbdd ⟨z, hz, rfl⟩
-  obtain ⟨b, hbS, hbspan, hbli⟩ := exists_linearIndependent ℂ
-    {ℓ : (σ → ℂ) →L[ℂ] ℂ | ∃ h : (σ → ℂ) → ℂ, AnalyticAt ℂ h a ∧ (∀ᶠ u in 𝓝 a, u ∈ Y → h u = 0) ∧
-      fderiv ℂ h a = ℓ}
+  obtain ⟨b, hbS, hbspan, hbli⟩ :=
+    exists_linearIndependent ℂ
+      {ℓ : (σ → ℂ) →L[ℂ] ℂ | ∃ h : (σ → ℂ) → ℂ, AnalyticAt ℂ h a ∧ (∀ᶠ u in 𝓝 a, u ∈ Y → h u = 0) ∧
+        fderiv ℂ h a = ℓ}
   have : Finite b := hbli.finite
   let _ : Fintype b := Fintype.ofFinite b
-  have hb' : ∀ ℓ : b, ∃ h : (σ → ℂ) → ℂ, AnalyticAt ℂ h a ∧ (∀ᶠ u in 𝓝 a, u ∈ Y → h u = 0) ∧
-      fderiv ℂ h a = ℓ := fun ℓ => hbS ℓ.2
+  have hb'
+      : ∀ ℓ : b, ∃ h : (σ → ℂ) → ℂ,
+        AnalyticAt ℂ h a ∧ (∀ᶠ u in 𝓝 a, u ∈ Y → h u = 0) ∧ fderiv ℂ h a = ℓ := fun ℓ =>
+    hbS ℓ.2
   choose h hha hhY hhd using hb'
   have hfun : (fun j : b => fderiv ℂ (h j) a) = ((↑) : b → (σ → ℂ) →L[ℂ] ℂ) := funext hhd
   have hli_a : LinearIndependent ℂ (fun j => fderiv ℂ (h j) a) := hfun ▸ hbli
@@ -103,13 +119,28 @@ theorem exists_maxRank_equations {σ : Type} [Fintype σ] (Y : Set (σ → ℂ))
     have ht : Tendsto (fun z => fun j => fderiv ℂ (h j) z) (𝓝 a) (𝓝 fun j => fderiv ℂ (h j) a) :=
       tendsto_pi_nhds.2 fun j => (hha j).fderiv.continuousAt.tendsto
     exact ht.eventually hli_a.eventually
-  have E : ∀ᶠ z in 𝓝 a, z ∈ U ∧ (∀ j, AnalyticAt ℂ (h j) z) ∧ (∀ j, z ∈ Y → h j z = 0) ∧
-      LinearIndependent ℂ (fun j => fderiv ℂ (h j) z) :=
-    (show ∀ᶠ z in 𝓝 a, z ∈ U from hU.mem_nhds haYU.2).and ((eventually_all.2 fun j => (hha j).eventually_analyticAt).and
-      ((eventually_all.2 hhY).and E3))
+  have E
+      : ∀ᶠ z in 𝓝 a, z ∈ U ∧ (∀ j, AnalyticAt ℂ (h j) z) ∧ (∀ j, z ∈ Y → h j z = 0) ∧
+        LinearIndependent ℂ (fun j => fderiv ℂ (h j) z) :=
+    (show ∀ᶠ z in 𝓝 a, z ∈ U from hU.mem_nhds haYU.2).and
+      ((eventually_all.2 fun j => (hha j).eventually_analyticAt).and
+        ((eventually_all.2 hhY).and E3))
   obtain ⟨W, hWP, hWo, haW⟩ := eventually_nhds_iff.1 E
-  refine ⟨a, haYU.1, b, inferInstance, h, W, hWo, haW, fun z hz => (hWP z hz).1,
-    fun j z hz => (hWP z hz).2.1 j, fun j z hz => (hWP z hz).2.2.1 j, hli_a, ?_⟩
+  refine ⟨
+    a,
+    haYU.1,
+    b,
+    inferInstance,
+    h,
+    W,
+    hWo,
+    haW,
+    fun z hz => (hWP z hz).1,
+    fun j z hz => (hWP z hz).2.1 j,
+    fun j z hz => (hWP z hz).2.2.1 j,
+    hli_a,
+    ?_
+  ⟩
   rintro z ⟨hzW, hzY⟩ ψ hψ hψY
   obtain ⟨hzU, hza, -, hzli⟩ := hWP z hzW
   have hle : Submodule.span ℂ (Set.range fun j => fderiv ℂ (h j) z) ≤ conormalSpan Y z := by
@@ -123,7 +154,8 @@ theorem exists_maxRank_equations {σ : Type} [Fintype σ] (Y : Set (σ → ℂ))
   rw [heq]
   exact Submodule.subset_span ⟨ψ, hψ, hψY, rfl⟩
 
-theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : RegularLocusDense.Statement := by
+theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement)
+    : RegularLocusDense.Statement := by
   intro σ _ X w hX
   obtain ⟨N, k, f, hNo, hwN, hf, hXN⟩ := hX
   refine ⟨N, hNo, hwN, fun B hBo hBN x hx => ?_⟩
@@ -139,7 +171,8 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
     (show g y ∈ {z | z ∈ V ∧ ∀ j, h j z = 0} from hVO ▸ Set.mem_image_of_mem g hy)
   have hYV : ∀ z ∈ X ∩ B, z ∈ V → g (A z) = z ∧ A z ∈ O := by
     intro z hzY hzV
-    have hz : z ∈ g '' O := hVO ▸ (⟨hzV, fun j => hhY j z (hVW hzV) hzY⟩ : z ∈ {z | z ∈ V ∧ ∀ j, h j z = 0})
+    have hz : z ∈ g '' O :=
+      hVO ▸ (⟨hzV, fun j => hhY j z (hVW hzV) hzY⟩ : z ∈ {z | z ∈ V ∧ ∀ j, h j z = 0})
     obtain ⟨y, hy, rfl⟩ := hz
     rw [hAg y hy]
     exact ⟨rfl, hy⟩
@@ -150,7 +183,8 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
     have h3 : HasFDerivAt (fun y => A (g y)) (A.comp (fderiv ℂ g y)) y :=
       A.hasFDerivAt.comp y (hg y hy).differentiableAt.hasFDerivAt
     have h4 : HasFDerivAt (fun y => A (g y)) (ContinuousLinearMap.id ℂ (Fin d → ℂ)) y :=
-      (hasFDerivAt_id y).congr_of_eventuallyEq (by filter_upwards [hOo.mem_nhds hy] with u hu using hAg u hu)
+      (hasFDerivAt_id y).congr_of_eventuallyEq
+        (by filter_upwards [hOo.mem_nhds hy] with u hu using hAg u hu)
     exact h3.unique h4
   have hhD : ∀ y ∈ O, ∀ j, (fderiv ℂ (h j) (g y)).comp (fderiv ℂ g y) = 0 := by
     intro y hy j
@@ -162,8 +196,10 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
         (by filter_upwards [hOo.mem_nhds hy] with u hu using (hgV u hu).2 j)
     exact h3.unique h4
 
-  have hC : ∀ c ∈ {y | y ∈ O ∧ g y ∈ X ∩ B} ∩ O, ∀ ψ : (Fin d → ℂ) → ℂ, AnalyticAt ℂ ψ c →
-      (∀ᶠ u in 𝓝 c, u ∈ {y | y ∈ O ∧ g y ∈ X ∩ B} → ψ u = 0) → fderiv ℂ ψ c = 0 := by
+  have hC
+      : ∀ c ∈ {y | y ∈ O ∧ g y ∈ X ∩ B} ∩ O, ∀ ψ : (Fin d → ℂ) → ℂ,
+        AnalyticAt ℂ ψ c → (∀ᶠ u in 𝓝 c, u ∈ {y | y ∈ O ∧ g y ∈ X ∩ B} → ψ u = 0)
+          → fderiv ℂ ψ c = 0 := by
     rintro c ⟨⟨hcO, hcY⟩, -⟩ ψ hψ hψC
     have hzV := (hgV c hcO).1
     have hAz : A (g c) = c := hAg c hcO
@@ -181,8 +217,9 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
       have hψd : HasFDerivAt ψ (fderiv ℂ ψ c) (A (g c)) := by
         rw [hAz]; exact hψ.differentiableAt.hasFDerivAt
       exact (hψd.comp (g c) A.hasFDerivAt).fderiv
-    have hkill : ∀ ℓ ∈ Submodule.span ℂ (Set.range fun j => fderiv ℂ (h j) (g c)),
-        ℓ.comp (fderiv ℂ g c) = 0 := by
+    have hkill
+        : ∀ ℓ ∈ Submodule.span ℂ (Set.range fun j => fderiv ℂ (h j) (g c)),
+          ℓ.comp (fderiv ℂ g c) = 0 := by
       intro ℓ hℓ
       induction hℓ using Submodule.span_induction with
       | mem x hx => obtain ⟨j, rfl⟩ := hx; exact hhD c hcO j
@@ -198,8 +235,8 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
 
   have hvan : ∀ i, ∀ᶠ y in 𝓝 (A a), f i (g y) = 0 := by
     intro i
-    refine eventually_zero_of_conormal_zero (C := {y | y ∈ O ∧ g y ∈ X ∩ B})
-      ⟨hy₀O, hga.symm ▸ haY⟩ (hOo.mem_nhds hy₀O) hC ?_ ?_
+    refine eventually_zero_of_conormal_zero (C := {y | y ∈ O ∧ g y ∈ X ∩ B}) ⟨hy₀O, hga.symm ▸ haY⟩
+      (hOo.mem_nhds hy₀O) hC ?_ ?_
     · have hfa : AnalyticAt ℂ (f i) (g (A a)) := hga.symm ▸ hf i a (hBN haY.2)
       exact hfa.comp (hg (A a) hy₀O)
     · refine Eventually.of_forall fun y hy => ?_
@@ -208,9 +245,22 @@ theorem RegularLocusDense.proof (hIFT : AnalyticImplicitChart.Statement) : Regul
       exact hgy.2 i
   obtain ⟨O', hO'P, hO'o, hy₀O'⟩ :=
     eventually_nhds_iff.1 ((eventually_all.2 hvan).and (hOo.mem_nhds hy₀O))
-  refine ⟨a, interior_subset (hWU haW).1, haY, d, A, O', V ∩ A ⁻¹' O', g, hO'o,
-    hVo.inter (hO'o.preimage A.continuous), ⟨haV, hy₀O'⟩, hg.mono fun y hy => (hO'P y hy).2,
-    fun y hy => hAg y (hO'P y hy).2, ?_⟩
+  refine ⟨
+    a,
+    interior_subset (hWU haW).1,
+    haY,
+    d,
+    A,
+    O',
+    V ∩ A ⁻¹' O',
+    g,
+    hO'o,
+    hVo.inter (hO'o.preimage A.continuous),
+    ⟨haV, hy₀O'⟩,
+    hg.mono fun y hy => (hO'P y hy).2,
+    fun y hy => hAg y (hO'P y hy).2,
+    ?_
+  ⟩
   ext z
   constructor
   · rintro ⟨hzY, hzV, hzO'⟩

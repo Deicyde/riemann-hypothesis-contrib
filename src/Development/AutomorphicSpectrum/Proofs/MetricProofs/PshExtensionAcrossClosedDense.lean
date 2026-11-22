@@ -11,7 +11,11 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.AnForm
 
-theorem isPsh_of_dense_compl : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (B : Set X) (Q Q' : LocPot X), IsClosed B → Dense Bᶜ → (∀ x, Q'.U x = Q.U x) → (∀ x, A.SmoothOn (Q'.U x) (Q'.φ x)) → (∀ x, ∀ y ∈ Q.U x, y ∉ B → Q'.φ x y = Q.φ x y) → IsPshOn A Bᶜ Q → IsPsh A Q' := by
+theorem isPsh_of_dense_compl
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (B : Set X) (Q Q' : LocPot X),
+      IsClosed B → Dense Bᶜ → (∀ x, Q'.U x = Q.U x) → (∀ x, A.SmoothOn (Q'.U x) (Q'.φ x))
+        → (∀ x, ∀ y ∈ Q.U x, y ∉ B → Q'.φ x y = Q.φ x y) → IsPshOn A Bᶜ Q
+        → IsPsh A Q' := by
   intro e X _ A B Q Q' hB hD hU hS hE hP x j y hy w
   by_contra hneg
   have hneg' : levi (Q'.φ x ∘ (A.chart j).symm) y w < 0 := not_le.mp hneg
@@ -21,21 +25,20 @@ theorem isPsh_of_dense_compl : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A 
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Q'.U x) :=
     (hS x j).of_le ENat.LEInfty.out
   have hc := continuousOn_levi hO hf
-  have hc' : ContinuousOn (fun y' => levi (Q'.φ x ∘ (A.chart j).symm) y' w)
+  have hc' : ContinuousOn
+      (fun y' => levi (Q'.φ x ∘ (A.chart j).symm) y' w)
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Q'.U x) :=
     hc.comp (f := fun y' => (y', w)) (by fun_prop) (fun y' hy' => ⟨hy', Set.mem_univ _⟩)
   have hV := hc'.isOpen_inter_preimage hO (isOpen_Iio (a := (0 : ℝ)))
   set V := ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Q'.U x) ∩
     (fun y' => levi (Q'.φ x ∘ (A.chart j).symm) y' w) ⁻¹' Set.Iio 0 with hVdef
   have hVt : V ⊆ (A.chart j).target := fun z hz => hz.1.1
-  have hVi : IsOpen ((A.chart j).symm '' V) :=
-    (A.chart j).symm.isOpen_image_of_subset_source hV hVt
+  have hVi : IsOpen ((A.chart j).symm '' V) := (A.chart j).symm.isOpen_image_of_subset_source hV hVt
   have hne : ((A.chart j).symm '' V).Nonempty := ⟨_, y, ⟨hy, hneg'⟩, rfl⟩
   obtain ⟨z, ⟨y', hy'V, rfl⟩, hzB⟩ := hD.inter_open_nonempty _ hVi hne
   have hW : IsOpen (V ∩ (A.chart j).symm ⁻¹' Bᶜ) := by
     have h1 := (A.chart j).isOpen_inter_preimage_symm hB.isOpen_compl
-    have : V ∩ (A.chart j).symm ⁻¹' Bᶜ =
-        V ∩ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Bᶜ) := by
+    have : V ∩ (A.chart j).symm ⁻¹' Bᶜ = V ∩ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Bᶜ) := by
       ext u
       exact ⟨fun h => ⟨h.1, hVt h.1, h.2⟩, fun h => ⟨h.1, h.2.2⟩⟩
     rw [this]

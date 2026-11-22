@@ -13,7 +13,8 @@ namespace UpperTheory.V.Fr
 
 section Cone
 
-variable {k G W V : Type} [CommRing k] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module k W]
+variable
+  {k G W V : Type} [CommRing k] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module k W]
   {Gv : V → Type} [∀ v, Group (Gv v)] [∀ v, TopologicalSpace (Gv v)]
   (loc : ∀ v, Gv v →* G) (ρ : Representation k G W) (b : V → Submodule k W)
 
@@ -28,14 +29,16 @@ def coneH0 : Submodule k W where
     exact ⟨fun g => by rw [map_smul, a1], fun v => Submodule.smul_mem _ c (a2 v)⟩
 
 def Z1C : Submodule k ((G → W) × (V → W)) where
-  carrier := {x | IsLocallyConstant x.1 ∧ (∀ s t, x.1 (s * t) = x.1 s + ρ s (x.1 t)) ∧
-    ∀ v s, x.1 (loc v s) - (ρ (loc v s) (x.2 v) - x.2 v) ∈ b v}
+  carrier :=
+    {x | IsLocallyConstant x.1 ∧ (∀ s t, x.1 (s * t) = x.1 s + ρ s (x.1 t)) ∧
+      ∀ v s, x.1 (loc v s) - (ρ (loc v s) (x.2 v) - x.2 v) ∈ b v}
   add_mem' := by
     rintro x y ⟨a1, a2, a3⟩ ⟨b1, b2, b3⟩
     refine ⟨a1.add b1, fun s t => ?_, fun v s => ?_⟩
     · simp only [Prod.fst_add, Pi.add_apply, a2, b2, map_add (f := _)]; abel
     · convert add_mem (a3 v s) (b3 v s) using 1
-      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _)]; abel
+      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add (f := _)]
+      abel
   zero_mem' := ⟨IsLocallyConstant.const 0, by simp, by simp⟩
   smul_mem' := by
     rintro c x ⟨a1, a2, a3⟩
@@ -50,7 +53,8 @@ def continuousCoboundaries1 : Submodule k ((G → W) × (V → W)) where
     refine ⟨X + Y, fun s => ?_, fun v => ?_⟩
     · simp only [Prod.fst_add, Pi.add_apply, a1, b1, map_add (f := _)]; abel
     · convert add_mem (a2 v) (b2 v) using 1
-      simp only [Prod.snd_add, Pi.add_apply]; abel
+      simp only [Prod.snd_add, Pi.add_apply]
+      abel
   zero_mem' := ⟨0, by simp, by simp⟩
   smul_mem' := by
     rintro c x ⟨X, a1, a2⟩
@@ -61,17 +65,20 @@ def continuousCoboundaries1 : Submodule k ((G → W) × (V → W)) where
 abbrev H1C : Type := Z1C loc ρ b ⧸ (continuousCoboundaries1 ρ b).comap (Z1C loc ρ b).subtype
 
 def continuousCocycles2 : Submodule k ((G × G → W) × (∀ v, Gv v → W)) where
-  carrier := {x | IsLocallyConstant x.1 ∧ (∀ v, IsLocallyConstant (x.2 v)) ∧
-    (∀ s t u, ρ s (x.1 (t, u)) + x.1 (s, t * u) = x.1 (s * t, u) + x.1 (s, t)) ∧
-    ∀ v s t, x.1 (loc v s, loc v t) - dOne (ρ.comp (loc v)) (x.2 v) (s, t) ∈ b v}
+  carrier :=
+    {x | IsLocallyConstant x.1 ∧ (∀ v, IsLocallyConstant (x.2 v)) ∧
+      (∀ s t u, ρ s (x.1 (t, u)) + x.1 (s, t * u) = x.1 (s * t, u) + x.1 (s, t)) ∧
+      ∀ v s t, x.1 (loc v s, loc v t) - dOne (ρ.comp (loc v)) (x.2 v) (s, t) ∈ b v}
   add_mem' := by
     rintro x y ⟨a1, a2, a3, a4⟩ ⟨b1, b2, b3, b4⟩
     refine ⟨a1.add b1, fun v => (a2 v).add (b2 v), fun s t u => ?_, fun v s t => ?_⟩
     · simp only [Prod.fst_add, Pi.add_apply, map_add (f := _)]
       rw [add_add_add_comm, a3, b3, add_add_add_comm]
     · convert add_mem (a4 v s t) (b4 v s t) using 1
-      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, dOne, map_add (f := _)]; abel
-  zero_mem' := ⟨IsLocallyConstant.const 0, fun _ => IsLocallyConstant.const 0, by simp, by simp [dOne]⟩
+      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, dOne, map_add (f := _)]
+      abel
+  zero_mem' :=
+    ⟨IsLocallyConstant.const 0, fun _ => IsLocallyConstant.const 0, by simp, by simp [dOne]⟩
   smul_mem' := by
     rintro c x ⟨a1, a2, a3, a4⟩
     refine ⟨a1.comp (c • ·), fun v => (a2 v).comp (c • ·), fun s t u => ?_, fun v s t => ?_⟩
@@ -80,15 +87,18 @@ def continuousCocycles2 : Submodule k ((G × G → W) × (∀ v, Gv v → W)) wh
       simp [dOne, smul_sub]
 
 def continuousCoboundaries2 : Submodule k ((G × G → W) × (∀ v, Gv v → W)) where
-  carrier := {x | ∃ (β : G → W) (Y : V → W), IsLocallyConstant β ∧ x.1 = dOne ρ β ∧
-    ∀ v s, x.2 v s - (β (loc v s) - (ρ (loc v s) (Y v) - Y v)) ∈ b v}
+  carrier :=
+    {x | ∃ (β : G → W) (Y : V → W), IsLocallyConstant β ∧ x.1 = dOne ρ β ∧
+      ∀ v s, x.2 v s - (β (loc v s) - (ρ (loc v s) (Y v) - Y v)) ∈ b v}
   add_mem' := by
     rintro x y ⟨β, Y, a1, a2, a3⟩ ⟨β', Y', b1, b2, b3⟩
     refine ⟨β + β', Y + Y', a1.add b1, ?_, fun v s => ?_⟩
     · funext p
-      simp only [Prod.fst_add, Pi.add_apply, a2, b2, dOne, map_add (f := _)]; abel
+      simp only [Prod.fst_add, Pi.add_apply, a2, b2, dOne, map_add (f := _)]
+      abel
     · convert add_mem (a3 v s) (b3 v s) using 1
-      simp only [Prod.snd_add, Pi.add_apply, map_add (f := _)]; abel
+      simp only [Prod.snd_add, Pi.add_apply, map_add (f := _)]
+      abel
   zero_mem' := ⟨0, 0, IsLocallyConstant.const 0, by funext p; simp [dOne], by simp⟩
   smul_mem' := by
     rintro c x ⟨β, Y, a1, a2, a3⟩
@@ -98,7 +108,8 @@ def continuousCoboundaries2 : Submodule k ((G × G → W) × (∀ v, Gv v → W)
     · convert Submodule.smul_mem _ c (a3 v s) using 1
       simp [smul_sub]
 
-abbrev coneH2 : Type := continuousCocycles2 loc ρ b ⧸ (continuousCoboundaries2 loc ρ b).comap (continuousCocycles2 loc ρ b).subtype
+abbrev coneH2 : Type :=
+  continuousCocycles2 loc ρ b ⧸ (continuousCoboundaries2 loc ρ b).comap (continuousCocycles2 loc ρ b).subtype
 
 end Cone
 
@@ -107,8 +118,10 @@ def chRep {k G : Type} [CommRing k] [Group G] (χ : G →* kˣ) : Representation
   map_one' := by ext; simp
   map_mul' g h := by ext; simp [mul_comm]
 
-@[simp] theorem chRep_apply {k G : Type} [CommRing k] [Group G] (χ : G →* kˣ) (g : G) (x : k) :
-    chRep χ g x = χ g * x := rfl
+@[simp]
+theorem chRep_apply {k G : Type} [CommRing k] [Group G] (χ : G →* kˣ) (g : G) (x : k)
+    : chRep χ g x = χ g * x :=
+  rfl
 
 structure Frame (l : ℕ) [Fact l.Prime] (k : Type) [Field k] : Type 1 where
   Γ : Type
@@ -139,7 +152,8 @@ structure Frame (l : ℕ) [Fact l.Prime] (k : Type) [Field k] : Type 1 where
   Ψ : Γ →* kˣ
   g0 : del.ker
 
-attribute [instance] Frame.grp Frame.top Frame.tg Frame.cpt Frame.t2 Frame.td Frame.fV Frame.gv Frame.tv Frame.tgv
+attribute [instance]
+  Frame.grp Frame.top Frame.tg Frame.cpt Frame.t2 Frame.td Frame.fV Frame.gv Frame.tv Frame.tgv
   Frame.cv Frame.t2v Frame.tdv Frame.fI
 
 namespace Frame
@@ -161,21 +175,26 @@ def d : ℕ := ∑ v, F.dv v
 def om (K : Type) [CommRing K] [CharP K l] : F.Γ →* Kˣ :=
   (Units.map ((ZMod.castHom (dvd_refl l) K).comp PadicInt.toZMod).toMonoidHom).comp F.eps
 
-def delK (K : Type) [CommRing K] : F.Γ →* Kˣ := (Units.map (Int.castRingHom K).toMonoidHom).comp F.del
+def delK (K : Type) [CommRing K] : F.Γ →* Kˣ :=
+  (Units.map (Int.castRingHom K).toMonoidHom).comp F.del
 
 def Nv (v : F.V) : Subgroup (F.Gv v) := F.Iv v ⊓ (F.eps.comp (F.loc v)).ker
 
-def ext {k' : Type} [Field k'] (f : k →+* k') : Frame l k' :=
-  { F with Ψ := (Units.map f.toMonoidHom).comp F.Ψ }
+def ext {k' : Type} [Field k'] (f : k →+* k') : Frame l k' := {
+  F with
+  Ψ := (Units.map f.toMonoidHom).comp F.Ψ
+}
 
 def EC : Prop :=
   ∀ (K W : Type) [Field K] [Finite K] [CharP K l] [AddCommGroup W] [Module K W] [Module.Finite K W]
-    (ρ : Representation K F.Γ W) (b : F.V → Submodule K W), IsOpen (ρ.ker : Set F.Γ) →
-    (∀ v s, ∀ X ∈ b v, ρ (F.loc v s) X ∈ b v) →
-    (∀ f : W →ₗ[K] K, (∀ g X, f (ρ g X) = F.om K g * f X) → f = 0) →
-    Module.Finite K (coneH2 F.loc ρ b) ∧
-    Module.finrank K (coneH2 F.loc ρ b) + Module.finrank K (coneH0 ρ b) + ∑ v, F.dv v * Module.finrank K (b v) ≤
-      Module.finrank K (H1C F.loc ρ b) + ∑ w, Module.finrank K (LinearMap.ker (ρ (F.cw w) - 1))
+      (ρ : Representation K F.Γ W) (b : F.V → Submodule K W),
+    IsOpen (ρ.ker : Set F.Γ) → (∀ v s, ∀ X ∈ b v, ρ (F.loc v s) X ∈ b v)
+      → (∀ f : W →ₗ[K] K, (∀ g X, f (ρ g X) = F.om K g * f X) → f = 0)
+      → Module.Finite K (coneH2 F.loc ρ b)
+        ∧ Module.finrank K (coneH2 F.loc ρ b) + Module.finrank K (coneH0 ρ b)
+            + ∑ v, F.dv v * Module.finrank K (b v)
+          ≤ Module.finrank K (H1C F.loc ρ b)
+            + ∑ w, Module.finrank K (LinearMap.ker (ρ (F.cw w) - 1))
 
 structure Ok [CharP k l] (C₀ : ℕ) : Prop where
   l_odd : l ≠ 2
@@ -200,14 +219,21 @@ structure Ok [CharP k l] (C₀ : ℕ) : Prop where
   f4' : Nontrivial (H1C F.loc (chRep (F.Ψ⁻¹ ^ 2 * F.delK k)) fun _ => ⊥)
   f5 : ¬ ∃ j : ℤ, ∀ g : F.G0, F.om k g = F.Ψ g ^ j
   Ψ_N : ∀ v, ∀ g ∈ F.Nv v, F.Ψ (F.loc v g) = 1
-
-  gen : ∀ v, ∃ (u : Fin (F.dv v) → F.Gv v) (a₀ : Fin (F.dv v)), (∀ a, u a ∈ F.Iv v ∧ F.Ψ (F.loc v (u a)) = 1) ∧
-    (∀ a, a ≠ a₀ → u a ∈ F.Nv v) ∧
-    ∀ (A : Type) [CommGroup A] [Finite A], IsPGroup l A → ∀ χ : F.Gv v →* A, IsOpen (χ.ker : Set (F.Gv v)) →
-      (∀ a, χ (u a) = 1) → ∀ g ∈ F.Iv v, χ g = 1
-
-  cl : ∃ h : ℕ, h ≠ 0 ∧ ∀ (A : Type) [CommGroup A] [Finite A], IsPGroup l A → ∀ χ : F.G0 →* A,
-    IsOpen (χ.ker : Set F.G0) → (∀ p : F.V × Bool, ∀ g ∈ F.Iv p.1, χ (F.loc2 p g) = 1) → ∀ g, χ g ^ h = 1
+  gen
+    : ∀ v, ∃ (u : Fin (F.dv v) → F.Gv v) (a₀ : Fin (F.dv v)),
+      (∀ a, u a ∈ F.Iv v ∧ F.Ψ (F.loc v (u a)) = 1) ∧ (∀ a, a ≠ a₀ → u a ∈ F.Nv v)
+        ∧ ∀ (A : Type) [CommGroup A] [Finite A],
+          IsPGroup l A
+            → ∀ χ : F.Gv v →* A,
+              IsOpen (χ.ker : Set (F.Gv v)) → (∀ a, χ (u a) = 1) → ∀ g ∈ F.Iv v, χ g = 1
+  cl
+    : ∃ h : ℕ,
+      h ≠ 0
+        ∧ ∀ (A : Type) [CommGroup A] [Finite A],
+          IsPGroup l A
+            → ∀ χ : F.G0 →* A,
+              IsOpen (χ.ker : Set F.G0) → (∀ p : F.V × Bool, ∀ g ∈ F.Iv p.1, χ (F.loc2 p g) = 1)
+                → ∀ g, χ g ^ h = 1
   ec : F.EC
   b1p : Module.rank k (H1C F.loc (chRep (F.Ψ⁻¹ ^ 2 * F.delK k)) fun _ => ⊥) ≤ C₀
   b1 : Module.rank k (H1C F.loc2 (chRep (F.Ψ⁻¹.comp F.del.ker.subtype)) fun _ => ⊥) ≤ C₀

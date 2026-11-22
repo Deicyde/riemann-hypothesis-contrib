@@ -6,19 +6,22 @@ public import Mathlib
 
 namespace GlobalTheory.IntSmulIntegerEq
 
-theorem exists_int_smul_eq_integer {E : Type} [Field E] [NumberField E] (c : E) :
-    ∃ M : ℤ, M ≠ 0 ∧ ∃ a : NumberField.RingOfIntegers E,
-      algebraMap (NumberField.RingOfIntegers E) E a = M • c := by
+theorem exists_int_smul_eq_integer {E : Type} [Field E] [NumberField E] (c : E)
+    : ∃ M : ℤ,
+      M ≠ 0
+        ∧ ∃ a : NumberField.RingOfIntegers E,
+          algebraMap (NumberField.RingOfIntegers E) E a = M • c := by
   have hQ : IsAlgebraic ℚ c := Algebra.IsAlgebraic.isAlgebraic c
   have hZ : IsAlgebraic ℤ c := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr hQ
   obtain ⟨M, hM, hint⟩ := hZ.exists_integral_multiple
   exact ⟨M, hM, ⟨M • c, hint⟩, rfl⟩
 
-theorem exists_int_smul_mem {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.IsFullLattice E L)
-    (w : Fin n → E) : ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ N • w ∈ L := by
-  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by
-    rw [hL.span_eq_top]; trivial
+theorem exists_int_smul_mem
+    {E : Type} [inst : Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (NumberField.RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.IsFullLattice E L) (w : Fin n → E)
+    : ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ N • w ∈ L := by
+  have hw : w ∈ Submodule.span E (L : Set (Fin n → E)) := by rw [hL.span_eq_top]; trivial
   induction hw using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩

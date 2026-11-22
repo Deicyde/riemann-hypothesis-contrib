@@ -19,14 +19,20 @@ section Inj
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem hermSp_W0_eq_perp_span_range_MMfam {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ}
-    (f f' : Fin (r + 1) → V) : H.W0 f f' = H.perp (Submodule.span E (Set.range (Sum.elim f f'))) := by
+theorem hermSp_W0_eq_perp_span_range_MMfam
+    {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V)
+    {r : ℕ} (f f' : Fin (r + 1) → V)
+    : H.W0 f f' = H.perp (Submodule.span E (Set.range (Sum.elim f f'))) := by
   rw [Set.Sum.elim_range, Submodule.span_union]
   rfl
 
-theorem span_frames_le_MM {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ}
-    (t : Term V M r) :
-    Submodule.span E (Set.range (Sum.elim t.f t.f')) ≤ Submodule.span E (Set.range (H.MMfam t)) := by
+theorem span_frames_le_MM
+    {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V)
+    {r : ℕ} (t : Term V M r)
+    : Submodule.span E (Set.range (Sum.elim t.f t.f'))
+      ≤ Submodule.span E (Set.range (H.MMfam t)) := by
   apply Submodule.span_le.mpr
   rintro _ ⟨i, rfl⟩
   unfold HermSp.MMfam
@@ -44,7 +50,9 @@ theorem span_frames_le_MM {M : Model F E} {V : Type} [AddCommGroup V] [Module E 
     · exact Submodule.subset_span ⟨Sum.inl a, rfl⟩
     · have h1 : t.f a ∈ Submodule.span E (Set.range (Sum.elim t.f fun b => c • (t.f' b - t.f b))) :=
         Submodule.subset_span ⟨Sum.inl a, rfl⟩
-      have h2 : c • (t.f' a - t.f a) ∈ Submodule.span E (Set.range (Sum.elim t.f fun b => c • (t.f' b - t.f b))) :=
+      have h2
+          : c • (t.f' a - t.f a)
+            ∈ Submodule.span E (Set.range (Sum.elim t.f fun b => c • (t.f' b - t.f b))) :=
         Submodule.subset_span ⟨Sum.inr a, rfl⟩
       have h3 : t.f' a = t.f a + (((hcu.unit)⁻¹ : Eˣ) : E) • (c • (t.f' a - t.f a)) := by
         rw [smul_smul, IsUnit.val_inv_mul, one_smul]
@@ -53,9 +61,12 @@ theorem span_frames_le_MM {M : Model F E} {V : Type} [AddCommGroup V] [Module E 
       rw [h3]
       exact Submodule.add_mem _ h1 (Submodule.smul_mem _ _ h2)
 
-private theorem span_MMfam_eq_span_f_f' {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ}
-    (t : Term V M r) :
-    Submodule.span E (Set.range (H.MMfam t)) = Submodule.span E (Set.range (Sum.elim t.f t.f')) := by
+private theorem span_MMfam_eq_span_f_f'
+    {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V)
+    {r : ℕ} (t : Term V M r)
+    : Submodule.span E (Set.range (H.MMfam t))
+      = Submodule.span E (Set.range (Sum.elim t.f t.f')) := by
   refine le_antisymm ?_ (span_frames_le_MM H t)
   apply Submodule.span_le.mpr
   rintro _ ⟨i, rfl⟩
@@ -64,19 +75,25 @@ private theorem span_MMfam_eq_span_f_f' {M : Model F E} {V : Type} [AddCommGroup
   · exact Submodule.span_mono (by rintro _ ⟨a, rfl⟩; exact ⟨Sum.inl a, rfl⟩)
   · exact Submodule.span_mono (by rintro _ ⟨a, rfl⟩; exact ⟨Sum.inr a, rfl⟩)
 
-private theorem isCompl_span_perp_of_isGeneric {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ}
-    (t : Term V M r) (ht : H.IsGeneric t) :
-    IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f')))
+private theorem isCompl_span_perp_of_isGeneric
+    {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V)
+    {r : ℕ} (t : Term V M r) (ht : H.IsGeneric t)
+    : IsCompl (Submodule.span E (Set.range (Sum.elim t.f t.f')))
       (H.perp (Submodule.span E (Set.range (Sum.elim t.f t.f')))) := by
-  have h := isCompl_span_frames_W0 H t.f t.f' t.T t.T' ⟨ht.1.2.1.2.1, ht.1.2.1.2.2.1⟩
-    ⟨ht.1.2.2.1.2.1, ht.1.2.2.1.2.2.1⟩ ht.1.2.2.2.1 (isUnit_Gdet H _ _ _ _ ht.1.2.2.2.2.1)
+  have h :=
+    isCompl_span_frames_W0 H t.f t.f' t.T t.T' ⟨ht.1.2.1.2.1, ht.1.2.1.2.2.1⟩
+      ⟨ht.1.2.2.1.2.1, ht.1.2.2.1.2.2.1⟩ ht.1.2.2.2.1 (isUnit_Gdet H _ _ _ _ ht.1.2.2.2.2.1)
   rwa [hermSp_W0_eq_perp_span_range_MMfam] at h
 
-private theorem mem_MMsharp_of_integral_pairing {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ}
-    (t : Term V M r) (abelian₂ : Submodule (↥M.L.O) V) (hmem : ∀ a, H.MMfam t a ∈ abelian₂) (u : V)
-    (hu : u ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')))
-    (hint : ∀ y ∈ abelian₂, y ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')) → H.h u y ∈ M.L.O) :
-    u ∈ MMsharp H t := by
+private theorem mem_MMsharp_of_integral_pairing
+    {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V)
+    {r : ℕ} (t : Term V M r)
+    (abelian₂ : Submodule (↥M.L.O) V) (hmem : ∀ a, H.MMfam t a ∈ abelian₂)
+    (u : V) (hu : u ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')))
+    (hint : ∀ y ∈ abelian₂, y ∈ Submodule.span E (Set.range (Sum.elim t.f t.f')) → H.h u y ∈ M.L.O)
+    : u ∈ MMsharp H t := by
   refine ⟨by rw [span_MMfam_eq_span_f_f']; exact hu, ?_⟩
   intro m hm
   apply hint m
@@ -90,37 +107,48 @@ theorem glueInj_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
   have hW₁ := hermSp_W0_eq_perp_span_range_MMfam H t₁.f t₁.f'
   have hW₂ := hermSp_W0_eq_perp_span_range_MMfam H f₂ f₂'
   have hU₁ := isCompl_span_perp_of_isGeneric H t₁ hT.1
-  have key : ∀ A B : Submodule (↥M.L.O) V,
-      H.IsGeneric { abelian₂ := A, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } →
-      ThCond H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } A φ φ' →
-      ThCond H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } B φ φ' →
-      (∀ (m₁ : ↥(MMsharp H t₁))
-          (m₂ : ↥(MMsharp H { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' })),
-          GlueRel H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } A φ φ' m₁ m₂ →
-          GlueRel H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } B φ φ' m₁ m₂) →
-      A ≤ B := by
+  have key
+      : ∀ A B : Submodule (↥M.L.O) V,
+        H.IsGeneric { abelian₂ := A, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' }
+          → ThCond H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } A φ φ'
+          → ThCond H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } B φ φ'
+          → (∀ (m₁ : ↥(MMsharp H t₁))
+              (m₂ : ↥(MMsharp H { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' })),
+            GlueRel H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } A φ φ' m₁ m₂
+              → GlueRel H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } B φ φ' m₁
+                m₂)
+          → A ≤ B := by
     intro A B hGA hThA hThB hAB x hx
     let U₂ : Submodule E V := Submodule.span E (Set.range (Sum.elim f₂ f₂'))
     let U₁ : Submodule E V := Submodule.span E (Set.range (Sum.elim t₁.f t₁.f'))
     have hU₂ : IsCompl U₂ (H.perp U₂) := isCompl_span_perp_of_isGeneric H _ hGA
     have gA := local_hermitian_glue F E M hM V H A hGA.1.1 U₂ hU₂
     have g₁ := local_hermitian_glue F E M hM V H t₁.abelian₂ hT.1.1.1 U₁ hU₁
-    obtain ⟨p, hp, hpint, q, hq, hqint, hxpq⟩ : ∃ p ∈ U₂, (∀ y ∈ A, y ∈ U₂ → H.h p y ∈ M.L.O) ∧
-        ∃ q ∈ H.perp U₂, (∀ y ∈ A, y ∈ H.perp U₂ → H.h q y ∈ M.L.O) ∧ p + q = x :=
-      ⟨_, Submodule.coe_mem _, (gA.1 _ (Submodule.coe_mem _)).mp ⟨x, hx, rfl⟩,
-       _, Submodule.coe_mem _, (gA.2 _ (Submodule.coe_mem _)).mp ⟨x, hx, rfl⟩,
-       Submodule.projection_add_projection_eq_self hU₂ x⟩
+    obtain ⟨p, hp, hpint, q, hq, hqint, hxpq⟩
+        : ∃ p ∈ U₂,
+          (∀ y ∈ A, y ∈ U₂ → H.h p y ∈ M.L.O)
+            ∧ ∃ q ∈ H.perp U₂, (∀ y ∈ A, y ∈ H.perp U₂ → H.h q y ∈ M.L.O) ∧ p + q = x := ⟨
+      _,
+      Submodule.coe_mem _,
+      (gA.1 _ (Submodule.coe_mem _)).mp ⟨x, hx, rfl⟩,
+      _,
+      Submodule.coe_mem _,
+      (gA.2 _ (Submodule.coe_mem _)).mp ⟨x, hx, rfl⟩,
+      Submodule.projection_add_projection_eq_self hU₂ x
+    ⟩
     have hpS : p ∈ MMsharp H { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } :=
       mem_MMsharp_of_integral_pairing H _ A hGA.2.1 p hp hpint
     have hqW : q ∈ H.W0 f₂ f₂' := hW₂.ge hq
     obtain ⟨n₁, hψn₁⟩ : ∃ n₁ : ↥(H.W0 t₁.f t₁.f'), (ψ n₁ : V) = q := ⟨ψ.symm ⟨q, hqW⟩, by simp⟩
-    have hcorr₁ : Corr H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } φ φ' (n₁ : V) q :=
+    have hcorr₁
+        : Corr H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } φ φ' (n₁ : V) q :=
       (hψ _ _).mpr ⟨n₁.2, hψn₁⟩
     have hn₁int : ∀ y ∈ t₁.abelian₂, y ∈ H.perp U₁ → H.h (n₁ : V) y ∈ M.L.O := by
       intro y hy hyp
       have hyW : y ∈ H.W0 t₁.f t₁.f' := hW₁.ge hyp
       have hc : Corr H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } φ φ' y
-          (ψ ⟨y, hyW⟩ : V) := (hψ _ _).mpr ⟨hyW, rfl⟩
+          (ψ ⟨y, hyW⟩ : V) :=
+        (hψ _ _).mpr ⟨hyW, rfl⟩
       have hyA : (ψ ⟨y, hyW⟩ : V) ∈ A := (hThA _ _ hc).mp hy
       have hyp2 : (ψ ⟨y, hyW⟩ : V) ∈ H.perp U₂ := hW₂.le (ψ ⟨y, hyW⟩).2
       have e : H.h (n₁ : V) y = H.h q (ψ ⟨y, hyW⟩ : V) := by
@@ -152,7 +180,8 @@ theorem glueInj_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) 
       have e : (⟨n₁' - n₁, hdW⟩ : ↥(H.W0 t₁.f t₁.f')) = ⟨n₁', hn₁'W⟩ - n₁ := rfl
       rw [e, map_sub, Submodule.coe_sub, hψ', hψn₁]
     have hcd : Corr H t₁ { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' } φ φ'
-        (n₁' - n₁) (n₂' - q) := (hψ _ _).mpr ⟨hdW, hψd⟩
+        (n₁' - n₁) (n₂' - q) :=
+      (hψ _ _).mpr ⟨hdW, hψd⟩
     have hB : n₂' - q ∈ B := (hThB _ _ hcd).mp hd
     have h2'' : p + n₂' ∈ B := h2'
     have h0 := B.sub_mem h2'' hB

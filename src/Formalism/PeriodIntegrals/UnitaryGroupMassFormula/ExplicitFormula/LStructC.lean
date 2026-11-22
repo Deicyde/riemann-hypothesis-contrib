@@ -23,7 +23,8 @@ lemma mem_rect {x₀ x₁ y₀ y₁ : ℝ} {s : ℂ} :
 variable {N : ℕ} [NeZero N]
 
 def Lent (χ : DirichletCharacter ℂ N) : ℂ → ℂ :=
-  open Classical in if χ = 1 then LFunctionTrivChar₁ N else LFunction χ
+  open Classical in
+  if χ = 1 then LFunctionTrivChar₁ N else LFunction χ
 
 lemma differentiable_Lent (χ : DirichletCharacter ℂ N) : Differentiable ℂ (Lent χ) := by
   unfold Lent
@@ -112,8 +113,8 @@ lemma logDeriv_Lent (χ : DirichletCharacter ℂ N) {s : ℂ} (hs : s ≠ 1) (h0
 
 theorem zerosFinite : ZerosFinite := by
   intro N _ χ hχ T
-  have h := finite_zeros_of_compact (differentiable_Lent χ) (Lent_two_ne_zero χ)
-    (isCompact_rect 0 1 (-T) T)
+  have h :=
+    finite_zeros_of_compact (differentiable_Lent χ) (Lent_two_ne_zero χ) (isCompact_rect 0 1 (-T) T)
   refine h.subset ?_
   intro ρ hρ
   obtain ⟨hre0, hre1, him, hL⟩ := hρ
@@ -179,8 +180,9 @@ theorem regularPart : RegularPart := by
     have h1' := (hSfin.mem_toFinset.mp h1).1
     rw [((hE0mem ρ).mp h2).1] at h1'
     simp at h1'
-  have hS : ∑ ρ ∈ hSfin.toFinset, (analyticOrderNatAt (Lent χ) ρ : ℂ) / (s - ρ) =
-      ∑ ρ ∈ hSfin.toFinset, (mult χ ρ : ℂ) / (s - ρ) := by
+  have hS
+      : ∑ ρ ∈ hSfin.toFinset, (analyticOrderNatAt (Lent χ) ρ : ℂ) / (s - ρ)
+        = ∑ ρ ∈ hSfin.toFinset, (mult χ ρ : ℂ) / (s - ρ) := by
     refine Finset.sum_congr rfl fun ρ hρ => ?_
     rw [order_Lent χ (hre1 ρ (hSfin.mem_toFinset.mp hρ))]
   have hE : ∑ ρ ∈ E0, (analyticOrderNatAt (Lent χ) ρ : ℂ) / (s - ρ) = eps0 χ / s := by

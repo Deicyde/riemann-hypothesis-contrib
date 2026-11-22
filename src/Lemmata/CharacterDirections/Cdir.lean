@@ -104,18 +104,21 @@ private lemma key {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
       _ = C * 2 ^ (k + 1 + 1) * ‖v - x‖ ^ (k + 1) := by
         rw [mul_pow]; field_simp; ring
 
-theorem goal1 :
-  ∀ {n : Nat} {F : Type u_1} [inst : NormedAddCommGroup.{u_1} F] [inst_1 : NormedSpace.{0, u_1} Complex F]
-  {f : ReciprocityTheory.L2DbarEstimates.V n → F} {U : Set.{0} (ReciprocityTheory.L2DbarEstimates.V n)} {x : ReciprocityTheory.L2DbarEstimates.V n},
-  IsOpen.{0} U →
-    Membership.mem.{0, 0} U x →
-      DifferentiableOn.{0, 0, u_1} Complex f U →
-        ∀ {m : Nat},
-          (Asymptotics.IsBigO.{0, u_1, 0} (nhds.{0} x) f fun (v : ReciprocityTheory.L2DbarEstimates.V n) ↦
-              HPow.hPow.{0, 0, 0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} v x))
-                (HAdd.hAdd.{0, 0, 0} (HAdd.hAdd.{0, 0, 0} m 1) 1)) →
-            Asymptotics.IsBigO.{0, u_1, 0} (nhds.{0} x) (fderiv.{0, 0, u_1} Complex f) fun (v : ReciprocityTheory.L2DbarEstimates.V n) ↦
-              HPow.hPow.{0, 0, 0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} v x)) (HAdd.hAdd.{0, 0, 0} m 1) := by
+theorem goal1
+    : ∀ {n : Nat} {F : Type u_1} [inst : NormedAddCommGroup.{u_1} F]
+        [inst_1 : NormedSpace.{0, u_1} Complex F] {f : ReciprocityTheory.L2DbarEstimates.V n → F}
+        {U : Set.{0} (ReciprocityTheory.L2DbarEstimates.V n)}
+        {x : ReciprocityTheory.L2DbarEstimates.V n},
+      IsOpen.{0} U → Membership.mem.{0, 0} U x → DifferentiableOn.{0, 0, u_1} Complex f U
+        → ∀ {m : Nat},
+          (Asymptotics.IsBigO.{0, u_1, 0} (nhds.{0} x) f
+              fun (v : ReciprocityTheory.L2DbarEstimates.V n) ↦
+                HPow.hPow.{0, 0, 0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} v x))
+                  (HAdd.hAdd.{0, 0, 0} (HAdd.hAdd.{0, 0, 0} m 1) 1))
+            → Asymptotics.IsBigO.{0, u_1, 0} (nhds.{0} x) (fderiv.{0, 0, u_1} Complex f)
+              fun (v : ReciprocityTheory.L2DbarEstimates.V n) ↦
+                HPow.hPow.{0, 0, 0} (Norm.norm.{0} (HSub.hSub.{0, 0, 0} v x))
+                  (HAdd.hAdd.{0, 0, 0} m 1) := by
   intro n F _ _ f U x hU hx hf m hO
   exact key hU hx hf hO
 

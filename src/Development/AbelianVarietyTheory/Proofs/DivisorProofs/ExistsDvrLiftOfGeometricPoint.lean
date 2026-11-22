@@ -23,19 +23,22 @@ section Algebra
 
 open IsLocalRing
 
-theorem dimensionLEOne_of_forall_mem {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
-    {f : R} (hf : f ≠ 0) (h : ∀ q : Ideal R, q.IsPrime → q ≠ ⊥ → f ∈ q) : Ring.DimensionLEOne R := by
+theorem dimensionLEOne_of_forall_mem
+    {R : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
+    {f : R} (hf : f ≠ 0) (h : ∀ q : Ideal R, q.IsPrime → q ≠ ⊥ → f ∈ q)
+    : Ring.DimensionLEOne R := by
   classical
   refine ⟨fun {q} hq0 hq => ?_⟩
   by_contra hqm
   have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing R (Ideal.span {f})
   have hle : q ≤ maximalIdeal R := le_maximalIdeal hq.ne_top
-  have hns : ¬ ((maximalIdeal R : Set R) ⊆ ⋃ i ∈ (hfin.toFinset : Set (Ideal R)), (id i : Ideal R)) := by
+  have hns
+      : ¬((maximalIdeal R : Set R) ⊆ ⋃ i ∈ (hfin.toFinset : Set (Ideal R)), (id i : Ideal R)) := by
     rw [Ideal.subset_union_prime (f := id) ⊥ ⊥ (fun i hi _ _ => (hfin.mem_toFinset.1 hi).1.1)]
     rintro ⟨p, hp, hmp⟩
     have hp' := hfin.mem_toFinset.1 hp
-    have h1 : p ≤ q := hp'.2 ⟨hq, (Ideal.span_singleton_le_iff_mem _).2 (h q hq hq0)⟩
-      (hle.trans hmp)
+    have h1 : p ≤ q :=
+      hp'.2 ⟨hq, (Ideal.span_singleton_le_iff_mem _).2 (h q hq hq0)⟩ (hle.trans hmp)
     exact hqm (le_antisymm hle (le_trans hmp h1) ▸ maximalIdeal.isMaximal R)
   obtain ⟨g, hgm, hg⟩ := Set.not_subset.1 hns
   have hne : Ideal.span {g} ≠ ⊤ := fun e => hgm (Ideal.span_singleton_eq_top.1 e)
@@ -50,7 +53,8 @@ theorem dimensionLEOne_of_forall_mem {R : Type*} [CommRing R] [IsDomain R] [IsNo
     obtain ⟨⟨p', hp'⟩⟩ := Ideal.nonempty_minimalPrimes hfm
     exact hg (Set.mem_iUnion₂.2 ⟨p', hfin.mem_toFinset.2 hp', p'.zero_mem⟩)
   have hp0 : p ≠ ⊥ := fun e => hg0 (by simpa [e] using hgp)
-  obtain ⟨p', hp', hp'p⟩ := Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).2 (h p hpp hp0))
+  obtain ⟨p', hp', hp'p⟩ :=
+    Ideal.exists_minimalPrimes_le ((Ideal.span_singleton_le_iff_mem _).2 (h p hpp hp0))
   have hp'p' : p'.IsPrime := hp'.1.1
   have hp'0 : p' ≠ ⊥ := fun e => hf (by simpa [e] using hp'.1.2 (Ideal.subset_span rfl))
   have e : p' = p := by
@@ -62,16 +66,25 @@ theorem dimensionLEOne_of_forall_mem {R : Type*} [CommRing R] [IsDomain R] [IsNo
     exact absurd h4 (by decide)
   exact hg (Set.mem_iUnion₂.2 ⟨p', hfin.mem_toFinset.2 hp', e ▸ hgp⟩)
 
-theorem exists_prime_dimensionLEOne {O : Type*} [CommRing O] [IsNoetherianRing O] [IsLocalRing O] {f : O}
-    (p₀ : Ideal O) (hp₀ : p₀.IsPrime) (hf : f ∉ p₀) :
-    ∃ (P : Ideal O) (_ : P.IsPrime), f ∉ P ∧ Ring.DimensionLEOne (O ⧸ P) := by
-  obtain ⟨P, ⟨hP, hfP⟩, hmax⟩ := set_has_maximal_iff_noetherian.2 (inferInstance : IsNoetherian O O)
-    {P : Ideal O | P.IsPrime ∧ f ∉ P} ⟨p₀, hp₀, hf⟩
+theorem exists_prime_dimensionLEOne
+    {O : Type*} [CommRing O] [IsNoetherianRing O] [IsLocalRing O]
+    {f : O} (p₀ : Ideal O) (hp₀ : p₀.IsPrime) (hf : f ∉ p₀)
+    : ∃ (P : Ideal O) (_ : P.IsPrime), f ∉ P ∧ Ring.DimensionLEOne (O ⧸ P) := by
+  obtain ⟨P, ⟨hP, hfP⟩, hmax⟩ :=
+    set_has_maximal_iff_noetherian.2 (inferInstance : IsNoetherian O O)
+      {P : Ideal O | P.IsPrime ∧ f ∉ P} ⟨p₀, hp₀, hf⟩
   have hl : IsLocalRing (O ⧸ P) := .of_surjective' _ Ideal.Quotient.mk_surjective
-  refine ⟨P, hP, hfP, dimensionLEOne_of_forall_mem (f := Ideal.Quotient.mk P f)
-    (fun e => hfP (Ideal.Quotient.eq_zero_iff_mem.1 e)) fun q hq hq0 => ?_⟩
+  refine ⟨
+    P,
+    hP,
+    hfP,
+    dimensionLEOne_of_forall_mem (f := Ideal.Quotient.mk P f)
+      (fun e => hfP (Ideal.Quotient.eq_zero_iff_mem.1 e))
+      fun q hq hq0 => ?_
+  ⟩
   by_contra hn
-  refine hmax (q.comap (Ideal.Quotient.mk P)) ⟨inferInstance, hn⟩ (lt_of_le_of_ne ?_ fun e => hq0 ?_)
+  refine hmax (q.comap (Ideal.Quotient.mk P)) ⟨inferInstance, hn⟩
+    (lt_of_le_of_ne ?_ fun e => hq0 ?_)
   · intro a ha
     simp [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.2 ha]
   · rw [eq_bot_iff]
@@ -80,51 +93,75 @@ theorem exists_prime_dimensionLEOne {O : Type*} [CommRing O] [IsNoetherianRing O
     have : a ∈ P := e ▸ ha
     exact Ideal.Quotient.eq_zero_iff_mem.2 this
 
-theorem exists_dvr_of_dimensionLEOne {R Ω : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R]
-    [Ring.DimensionLEOne R] (hR : ¬ IsField R) [Field Ω] [IsAlgClosed Ω] (φ : R →+* Ω) [IsLocalHom φ] :
-    ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
-      (_ : IsAdicComplete (maximalIdeal W) W) (ψ : R →+* W) (ι : ResidueField W →+* Ω),
+theorem exists_dvr_of_dimensionLEOne
+    {R Ω : Type}
+    [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsLocalRing R] [Ring.DimensionLEOne R]
+    (hR : ¬ IsField R)
+    [Field Ω] [IsAlgClosed Ω]
+    (φ : R →+* Ω) [IsLocalHom φ]
+    : ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
+        (_ : IsAdicComplete (maximalIdeal W) W) (ψ : R →+* W) (ι : ResidueField W →+* Ω),
       Function.Injective ψ ∧ (ι.comp (residue W)).comp ψ = φ := by
-  obtain ⟨V, hV, h⟩ := exists_discreteValuationSubring_dominating R (FractionRing R) (FractionRing R) hR
+  obtain ⟨V, hV, h⟩ :=
+    exists_discreteValuationSubring_dominating R (FractionRing R) (FractionRing R) hR
   obtain ⟨h1, h2⟩ := (localSubring_range_le_valuationSubring_iff_isLocalHom _ _).mp h
-  have hi : Function.Injective ((algebraMap R (FractionRing R)).codRestrict V h1) :=
-    fun a b hab => IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val hab)
+  have hi : Function.Injective ((algebraMap R (FractionRing R)).codRestrict V h1) := fun a b hab =>
+    IsFractionRing.injective R (FractionRing R) (congrArg Subtype.val hab)
   letI : Algebra R V := ((algebraMap R (FractionRing R)).codRestrict V h1).toAlgebra
   have : FaithfulSMul R V := (faithfulSMul_iff_algebraMap_injective _ _).2 hi
   have hloc : IsLocalHom (algebraMap R V) := h2
-  obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot (isField_iff_maximalIdeal_eq.not.mp hR)
-  have hfin := finite_quotient_span_of_birational (A := R) (B := V) (fun x => by
-    obtain ⟨y, c, hc, hx⟩ := IsFractionRing.div_surjective (A := R) (x : FractionRing R)
-    refine ⟨c, nonZeroDivisors.ne_zero hc, y, Subtype.ext ?_⟩
-    change algebraMap R (FractionRing R) c * x = algebraMap R (FractionRing R) y
-    rw [← hx]
-    exact mul_div_cancel₀ _ (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hc)) ha0
+  obtain ⟨a, ha, ha0⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot (isField_iff_maximalIdeal_eq.not.mp hR)
+  have hfin :=
+    finite_quotient_span_of_birational (A := R) (B := V)
+      (fun x => by
+        obtain ⟨y, c, hc, hx⟩ := IsFractionRing.div_surjective (A := R) (x : FractionRing R)
+        refine ⟨c, nonZeroDivisors.ne_zero hc, y, Subtype.ext ?_⟩
+        change algebraMap R (FractionRing R) c * x = algebraMap R (FractionRing R) y
+        rw [← hx]
+        exact mul_div_cancel₀ _ (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hc))
+      ha0
   have hle : Ideal.span {algebraMap R V a} ≤ maximalIdeal V :=
     (Ideal.span_singleton_le_iff_mem _).2 (map_nonunit _ a ha)
   have hf2 : Module.Finite R (ResidueField V) :=
-    Module.Finite.of_surjective (Ideal.Quotient.factorₐ R hle).toLinearMap (Ideal.Quotient.factor_surjective hle)
-  have hf3 : Module.Finite (ResidueField R) (ResidueField V) := Module.Finite.of_restrictScalars_finite R _ _
+    Module.Finite.of_surjective (Ideal.Quotient.factorₐ R hle).toLinearMap
+      (Ideal.Quotient.factor_surjective hle)
+  have hf3 : Module.Finite (ResidueField R) (ResidueField V) :=
+    Module.Finite.of_restrictScalars_finite R _ _
   letI : Algebra (ResidueField R) Ω := (ResidueField.lift φ).toAlgebra
   let ι₀ : ResidueField V →ₐ[ResidueField R] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let W := AdicCompletion (maximalIdeal V) V
   let e : ResidueField V ≃+* ResidueField W :=
-    RingEquiv.ofBijective (ResidueField.map (algebraMap V W)) (AdicCompletion.residueField_map_bijective V)
-  refine ⟨W, inferInstance, inferInstance, inferInstance, inferInstance, (algebraMap V W).comp (algebraMap R V),
-    ι₀.toRingHom.comp e.symm.toRingHom, (algebraMap_adicCompletion_injective_of_dvr V).comp hi, ?_⟩
+    RingEquiv.ofBijective (ResidueField.map (algebraMap V W))
+      (AdicCompletion.residueField_map_bijective V)
+  refine ⟨
+    W,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    (algebraMap V W).comp (algebraMap R V),
+    ι₀.toRingHom.comp e.symm.toRingHom,
+    (algebraMap_adicCompletion_injective_of_dvr V).comp hi,
+    ?_
+  ⟩
   ext r
   have h3 : residue W (algebraMap V W (algebraMap R V r)) = e (residue V (algebraMap R V r)) := rfl
   change ι₀ (e.symm (residue W (algebraMap V W (algebraMap R V r)))) = φ r
   rw [h3, e.symm_apply_apply]
   exact ι₀.commutes (residue R r)
 
-theorem exists_dvr {O Ω : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O] {f : O} (hfm : f ∈ maximalIdeal O)
-    (p₀ : Ideal O) (hp₀ : p₀.IsPrime) (hf : f ∉ p₀) [Field Ω] [IsAlgClosed Ω] (φ : O →+* Ω) [IsLocalHom φ] :
-    ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
-      (_ : IsAdicComplete (maximalIdeal W) W) (ψ : O →+* W) (ι : ResidueField W →+* Ω),
+theorem exists_dvr
+    {O Ω : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing O]
+    {f : O} (hfm : f ∈ maximalIdeal O)
+    (p₀ : Ideal O) (hp₀ : p₀.IsPrime) (hf : f ∉ p₀)
+    [Field Ω] [IsAlgClosed Ω]
+    (φ : O →+* Ω) [IsLocalHom φ]
+    : ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
+        (_ : IsAdicComplete (maximalIdeal W) W) (ψ : O →+* W) (ι : ResidueField W →+* Ω),
       ψ f ≠ 0 ∧ (ι.comp (residue W)).comp ψ = φ := by
   obtain ⟨P, hP, hfP, hd⟩ := exists_prime_dimensionLEOne p₀ hp₀ hf
   have hl : IsLocalRing (O ⧸ P) := .of_surjective' _ Ideal.Quotient.mk_surjective
@@ -133,21 +170,34 @@ theorem exists_dvr {O Ω : Type} [CommRing O] [IsNoetherianRing O] [IsLocalRing 
   have hk : ∀ a ∈ P, φ a = 0 := fun a ha => by
     by_contra h
     exact hP.ne_top (P.eq_top_of_isUnit_mem ha (isUnit_of_map_unit φ a (IsUnit.mk0 _ h)))
-  have : IsLocalHom (Ideal.Quotient.lift P φ hk) := ⟨fun a ha => by
-    obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
-    exact (isUnit_of_map_unit φ a ha).map _⟩
-  obtain ⟨W, _, _, _, _, ψ, ι, h1, h2⟩ := exists_dvr_of_dimensionLEOne hF (Ideal.Quotient.lift P φ hk)
-  refine ⟨W, inferInstance, inferInstance, inferInstance, inferInstance, ψ.comp (Ideal.Quotient.mk P), ι,
-    fun e => hfP (Ideal.Quotient.eq_zero_iff_mem.1 (h1 (e.trans (map_zero ψ).symm))), ?_⟩
+  have : IsLocalHom (Ideal.Quotient.lift P φ hk) :=
+    ⟨fun a ha => by
+      obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
+      exact (isUnit_of_map_unit φ a ha).map _⟩
+  obtain ⟨W, _, _, _, _, ψ, ι, h1, h2⟩ :=
+    exists_dvr_of_dimensionLEOne hF (Ideal.Quotient.lift P φ hk)
+  refine ⟨
+    W,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ψ.comp (Ideal.Quotient.mk P),
+    ι,
+    fun e => hfP (Ideal.Quotient.eq_zero_iff_mem.1 (h1 (e.trans (map_zero ψ).symm))),
+    ?_
+  ⟩
   rw [← RingHom.comp_assoc, h2]
   rfl
 
 end Algebra
 
 open CategoryTheory AlgebraicGeometry Limits NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l}
 
 end GlobalTheory.GeomTrait

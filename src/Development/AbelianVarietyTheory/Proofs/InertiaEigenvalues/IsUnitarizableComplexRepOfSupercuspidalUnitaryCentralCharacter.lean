@@ -35,48 +35,54 @@ def scal (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) : Subgroup G wher
 def term (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (g : G) : ℂ :=
   l (ρ g⁻¹ v) * starRingEnd ℂ (l (ρ g⁻¹ w))
 
-theorem term_mul {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (v w : V) (g : G) {h : G}
-    (hh : h ∈ scal ρ l) : term ρ l v w (g * h) = term ρ l v w g := by
+theorem term_mul
+    {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (v w : V) (g : G) {h : G} (hh : h ∈ scal ρ l)
+    : term ρ l v w (g * h) = term ρ l v w g := by
   obtain ⟨c, hc, hl⟩ := (scal ρ l).inv_mem hh
-  have h1 : c * starRingEnd ℂ c = 1 := by
-    rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, hc]; simp
+  have h1 : c * starRingEnd ℂ c = 1 := by rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, hc]; simp
   simp only [term, mul_inv_rev, map_mul, Module.End.mul_apply, hl]
   linear_combination (l (ρ g⁻¹ v) * starRingEnd ℂ (l (ρ g⁻¹ w))) * h1
 
-theorem term_inv_mul (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (x g : G) :
-    term ρ l v w (x⁻¹ * g) = term ρ l (ρ x v) (ρ x w) g := by
+theorem term_inv_mul (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (x g : G)
+    : term ρ l v w (x⁻¹ * g) = term ρ l (ρ x v) (ρ x w) g := by
   simp only [term, mul_inv_rev, inv_inv, map_mul, Module.End.mul_apply]
 
 def qterm (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (q : G ⧸ scal ρ l) : ℂ :=
   term ρ l v w q.out
 
-theorem qterm_mk (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (g : G) :
-    qterm ρ l v w (g : G ⧸ scal ρ l) = term ρ l v w g := by
+theorem qterm_mk (ρ : Representation ℂ G V) (l : Module.Dual ℂ V) (v w : V) (g : G)
+    : qterm ρ l v w (g : G ⧸ scal ρ l) = term ρ l v w g := by
   obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (scal ρ l) g
   rw [qterm, hh, term_mul v w g h.2]
 
-theorem center_le_scal {ρ : Representation ℂ G V} (l : Module.Dual ℂ V)
-    (hz : ∀ z ∈ Subgroup.center G, ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, ρ z v = c • v) :
-    Subgroup.center G ≤ scal ρ l := fun z hz' => by
+theorem center_le_scal
+    {ρ : Representation ℂ G V}
+    (l : Module.Dual ℂ V) (hz : ∀ z ∈ Subgroup.center G, ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, ρ z v = c • v)
+    : Subgroup.center G ≤ scal ρ l := fun z hz' => by
   obtain ⟨c, hc, h⟩ := hz z hz'
   exact ⟨c, hc, fun y => by rw [h, map_smul, smul_eq_mul]⟩
 
 variable [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem isOpen_scal {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (hl : l ∈ smoothPart ρ.dual) :
-    IsOpen (scal ρ l : Set G) := by
-  refine (scal ρ l).isOpen_of_mem_nhds (g := 1) (Filter.mem_of_superset ((show IsOpen
-    {g : G | ρ.dual g l = l} from hl).mem_nhds (by
-      simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply])) fun g hg => ⟨1, by simp, fun y => ?_⟩)
+theorem isOpen_scal {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (hl : l ∈ smoothPart ρ.dual)
+    : IsOpen (scal ρ l : Set G) := by
+  refine (scal ρ l).isOpen_of_mem_nhds (g := 1)
+    (Filter.mem_of_superset
+      ((show IsOpen {g : G | ρ.dual g l = l} from hl).mem_nhds
+        (by simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply]))
+      fun g hg => ⟨1, by simp, fun y => ?_⟩)
   have h1 : (ρ.dual g l) (ρ g y) = l (ρ g y) := by rw [show ρ.dual g l = l from hg]
   rw [Representation.dual_apply] at h1
   simp only [Module.Dual.transpose_apply, LinearMap.comp_apply, ← Module.End.mul_apply, ← map_mul,
-    inv_mul_cancel, map_one, Module.End.one_apply] at h1
+      inv_mul_cancel, map_one, Module.End.one_apply]
+    at h1
   rw [one_mul, h1]
 
-theorem exists_finset {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (hl : l ∈ smoothPart ρ.dual)
+theorem exists_finset
+    {ρ : Representation ℂ G V} {l : Module.Dual ℂ V} (hl : l ∈ smoothPart ρ.dual)
     (hsc : IsSupercuspidal ρ) (hz : ∀ z ∈ Subgroup.center G, ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, ρ z v = c • v)
-    (v : V) : ∃ s : Finset (G ⧸ scal ρ l), ∀ g : G, l (ρ g⁻¹ v) ≠ 0 → (g : G ⧸ scal ρ l) ∈ s := by
+    (v : V)
+    : ∃ s : Finset (G ⧸ scal ρ l), ∀ g : G, l (ρ g⁻¹ v) ≠ 0 → (g : G ⧸ scal ρ l) ∈ s := by
   obtain ⟨C, hC, hCz⟩ := hsc.2 v l hl
   haveI := QuotientGroup.discreteTopology (isOpen_scal hl)
   have hD : ((fun c : G => ((c⁻¹ : G) : G ⧸ scal ρ l)) '' C).Finite :=
@@ -93,12 +99,13 @@ end GlobalTheory.SupercuspUnitary
 
 namespace GlobalTheory
 
-
 open GlobalTheory.SupercuspUnitary in
-theorem isUnitarisable_of_isSupercuspidal : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (l : Module.Dual ℂ V), l ∈ smoothPart ρ.dual →
-    l ≠ 0 → ρ.IsIrreducible → IsSupercuspidal ρ →
-    (∀ z ∈ Subgroup.center G, ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, ρ z v = c • v) → IsUnitarisable ρ := by
+theorem isUnitarisable_of_isSupercuspidal
+    : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V) (l : Module.Dual ℂ V),
+      l ∈ smoothPart ρ.dual → l ≠ 0 → ρ.IsIrreducible → IsSupercuspidal ρ
+        → (∀ z ∈ Subgroup.center G, ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, ρ z v = c • v)
+        → IsUnitarisable ρ := by
   intro G V _ _ _ _ _ ρ l hl hl0 hirr hsc hz
   have hfin : ∀ v w, (Function.support (qterm ρ l v w)).Finite := fun v w => by
     obtain ⟨s, hs⟩ := exists_finset hl hsc hz v
@@ -136,25 +143,27 @@ theorem isUnitarisable_of_isSupercuspidal : ∀ (G V : Type) [Group G] [Topologi
     intro x v w q
     induction q using QuotientGroup.induction_on with
     | H g => rw [MulAction.Quotient.smul_mk, smul_eq_mul, qterm_mk, qterm_mk, term_inv_mul]
-  let B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ := LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun v w => ∑ᶠ q, qterm ρ l v w q)
-    (fun v v' w => by simp only [hadd1]; exact finsum_add_distrib (hfin v w) (hfin v' w))
-    (fun a v w => by simp only [hsmul1, RingHom.id_apply, smul_eq_mul, mul_finsum])
-    (fun v w w' => by simp only [hadd2]; exact finsum_add_distrib (hfin v w) (hfin v w'))
-    (fun a v w => by simp only [hsmul2, smul_eq_mul, mul_finsum])
+  let B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ :=
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun v w => ∑ᶠ q, qterm ρ l v w q)
+      (fun v v' w => by simp only [hadd1]; exact finsum_add_distrib (hfin v w) (hfin v' w))
+      (fun a v w => by simp only [hsmul1, RingHom.id_apply, smul_eq_mul, mul_finsum])
+      (fun v w w' => by simp only [hadd2]; exact finsum_add_distrib (hfin v w) (hfin v w'))
+      (fun a v w => by simp only [hsmul2, smul_eq_mul, mul_finsum])
   have hB : ∀ v w, B v w = ∑ᶠ q, qterm ρ l v w q := fun v w => LinearMap.mk₂'ₛₗ_apply _ _ _
   refine ⟨B, fun v w => ?_, fun v hv => ?_, fun x v w => ?_⟩
   · rw [hB, hB, map_finsum _ (hfin v w)]
     exact finsum_congr fun q => hconj v w q
   · have hex : ∃ g : G, l (ρ g v) ≠ 0 := by
       by_contra! h0
-      let U : Subrepresentation ρ :=
-        { toSubmodule := ⨅ g : G, LinearMap.ker (l ∘ₗ (ρ g : V →ₗ[ℂ] V))
-          apply_mem_toSubmodule := fun g y hy => by
-            simp only [Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.comp_apply] at hy ⊢
-            intro g'
-            rw [← Module.End.mul_apply, ← map_mul]
-            exact hy _ }
+      let U : Subrepresentation ρ := {
+        toSubmodule := ⨅ g : G, LinearMap.ker (l ∘ₗ (ρ g : V →ₗ[ℂ] V))
+        apply_mem_toSubmodule := fun g y hy => by
+          simp only [Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.comp_apply] at hy ⊢
+          intro g'
+          rw [← Module.End.mul_apply, ← map_mul]
+          exact hy _
+      }
       haveI := hirr
       rcases eq_bot_or_eq_top U with hU | hU
       · have hvU : v ∈ U.toSubmodule := by

@@ -129,8 +129,10 @@ lemma weight_colW {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (s : Fin N) :
 
 section
 
-variable {N : ℕ} {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-  {P : Matrix (Fin N) (Fin N) ℂ → (V →ₗ[ℂ] V)} (hP : IsPolyMon P) (v0 : V)
+variable
+  {N : ℕ} {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+  {P : Matrix (Fin N) (Fin N) ℂ → (V →ₗ[ℂ] V)} (hP : IsPolyMon P)
+  (v0 : V)
 
 def Fq (x : V) : MvPolynomial (Fin N × Fin N) ℂ :=
   rename Prod.swap (Classical.choose (hP.poly x v0))
@@ -142,10 +144,10 @@ lemma evM_Fq (x : V) (A : Matrix (Fin N) (Fin N) ℂ) : evM A (Fq hP v0 x) = ⟪
 
 def Fl : V →ₗ[ℂ] MvPolynomial (Fin N × Fin N) ℂ where
   toFun := Fq hP v0
-  map_add' x y := poly_ext fun A => by
-    rw [evM_add, evM_Fq, evM_Fq, evM_Fq, map_add (f := _), inner_add_right]
-  map_smul' c x := poly_ext fun A => by
-    rw [RingHom.id_apply, evM_smul, evM_Fq, evM_Fq, map_smul, inner_smul_right]
+  map_add' x y :=
+    poly_ext fun A => by rw [evM_add, evM_Fq, evM_Fq, evM_Fq, map_add (f := _), inner_add_right]
+  map_smul' c x :=
+    poly_ext fun A => by rw [RingHom.id_apply, evM_smul, evM_Fq, evM_Fq, map_smul, inner_smul_right]
 
 lemma Fl_apply (x : V) : Fl hP v0 x = Fq hP v0 x := rfl
 
@@ -207,7 +209,8 @@ theorem model_map_equivariance : ModelMap := by
     intro h
     have h1 := evM_Fq hP v0 v0 1
     rw [h, Matrix.transpose_one, hP.one, LinearMap.id_apply] at h1
-    have h2 : evM (1 : Matrix (Fin N) (Fin N) ℂ) (0 : MvPolynomial (Fin N × Fin N) ℂ) = 0 := by simp [evM]
+    have h2 : evM (1 : Matrix (Fin N) (Fin N) ℂ) (0 : MvPolynomial (Fin N × Fin N) ℂ) = 0 := by
+      simp [evM]
     rw [h2] at h1
     exact hv0 (inner_self_eq_zero.mp h1.symm)
   obtain ⟨m0, hm0⟩ := MvPolynomial.ne_zero_iff.mp hF0

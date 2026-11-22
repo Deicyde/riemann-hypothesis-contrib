@@ -9,14 +9,17 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR.FundGen
 
-theorem ringHom_eq_frob_pow (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [Fintype F] [CharP F p]
-    (f : ℕ) (hc : Fintype.card F = p ^ f) (α : F →+* F) :
-    ∃ n < f, ∀ a, α a = a ^ p ^ n := by
+theorem ringHom_eq_frob_pow
+    (p : ℕ) [Fact p.Prime]
+    (F : Type) [Field F] [Fintype F] [CharP F p]
+    (f : ℕ) (hc : Fintype.card F = p ^ f)
+    (α : F →+* F)
+    : ∃ n < f, ∀ a, α a = a ^ p ^ n := by
   have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   let _ : Algebra (ZMod p) F := ZMod.algebra F p
   have hcomm : ∀ r : ZMod p, α (algebraMap (ZMod p) F r) = algebraMap (ZMod p) F r := fun r =>
-    DFunLike.congr_fun
-      (Subsingleton.elim (α.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) F)) r
+    DFunLike.congr_fun (Subsingleton.elim (α.comp (algebraMap (ZMod p) F)) (algebraMap (ZMod p) F))
+      r
   let β : F →ₐ[ZMod p] F := { α with commutes' := hcomm }
   obtain ⟨n, hn⟩ := (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) F).2 β
   have hrank : Module.finrank (ZMod p) F = f := by
@@ -36,8 +39,12 @@ theorem ringHom_eq_frob_pow (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [Finty
   rw [key] at h2
   exact h2.symm
 
-def mIdeal {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C]
-    (hv : v.Integers R) : Ideal R where
+def mIdeal
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    : Ideal R where
   carrier := {r | v (algebraMap R C r) < 1}
   add_mem' := by
     intro a b ha hb
@@ -49,22 +56,34 @@ def mIdeal {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
     simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at *
     exact lt_of_le_of_lt (mul_le_of_le_one_left' (hv.map_le_one c)) hx
 
-theorem mem_mIdeal {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) (r : R) :
-    r ∈ mIdeal v R hv ↔ v (algebraMap R C r) < 1 := by
+theorem mem_mIdeal
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R) (r : R)
+    : r ∈ mIdeal v R hv ↔ v (algebraMap R C r) < 1 := by
   exact Iff.rfl
 
-theorem mIdeal_ne_top {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) : mIdeal v R hv ≠ ⊤ := by
+theorem mIdeal_ne_top
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    : mIdeal v R hv ≠ ⊤ := by
   intro h
   have h1 : (1 : R) ∈ mIdeal v R hv := by rw [h]; exact Submodule.mem_top
   rw [mem_mIdeal, map_one, map_one] at h1
   exact lt_irrefl _ h1
 
-def toHom {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C]
-    (hv : v.Integers R) {p : ℕ} (hp : v (p : C) < 1) (F : Type) [Field F]
-    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) :
-    F →+* R ⧸ mIdeal v R hv where
+def toHom
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {p : ℕ} (hp : v (p : C) < 1)
+    (F : Type) [Field F]
+    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)})
+    : F →+* R ⧸ mIdeal v R hv where
   toFun a := Ideal.Quotient.mk _ (σ a)
   map_one' := by rw [map_one, map_one]
   map_mul' a b := by rw [map_mul, map_mul]
@@ -77,37 +96,69 @@ def toHom {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R] 
     rw [map_sub, map_sub, sub_sub, sub_eq_zero] at this
     exact this
 
-theorem toHom_apply {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) {p : ℕ} (hp : v (p : C) < 1) (F : Type) [Field F]
-    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) (a : F) :
-    toHom v R hv hp F σ hσ a = Ideal.Quotient.mk _ (σ a) := rfl
+theorem toHom_apply
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {p : ℕ} (hp : v (p : C) < 1)
+    (F : Type) [Field F]
+    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)})
+    (a : F)
+    : toHom v R hv hp F σ hσ a = Ideal.Quotient.mk _ (σ a) :=
+  rfl
 
-theorem toHom_injective {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) {p : ℕ} (hp : v (p : C) < 1) (F : Type) [Field F]
-    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) :
-    Function.Injective (toHom v R hv hp F σ hσ) := by
+theorem toHom_injective
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {p : ℕ} (hp : v (p : C) < 1)
+    (F : Type) [Field F]
+    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)})
+    : Function.Injective (toHom v R hv hp F σ hσ) := by
   have : Nontrivial (R ⧸ mIdeal v R hv) := Ideal.Quotient.nontrivial_iff.2 (mIdeal_ne_top v R hv)
   exact (toHom v R hv hp F σ hσ).injective
 
-theorem mulChar_eq_of_gen {F R : Type} [Field F] [CommRing R] (g : Fˣ)
-    (hg : ∀ y : Fˣ, y ∈ Submonoid.powers g) (χ χ' : MulChar F R)
-    (h : χ (g : F) = χ' (g : F)) : χ = χ' := by
+theorem mulChar_eq_of_gen
+    {F R : Type} [Field F] [CommRing R]
+    (g : Fˣ) (hg : ∀ y : Fˣ, y ∈ Submonoid.powers g)
+    (χ χ' : MulChar F R) (h : χ (g : F) = χ' (g : F))
+    : χ = χ' := by
   apply MulChar.ext
   intro a
   obtain ⟨k, rfl⟩ := (Submonoid.mem_powers_iff _ _).1 (hg a)
   rw [Units.val_pow_eq_pow_val, map_pow, map_pow, h]
 
-theorem frob_pow_additive {R : Type} [CommRing R] (p : ℕ) [Fact p.Prime] (F : Type) [Field F]
-    [CharP F p] (σ : MulChar F R)
-    (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) (n : ℕ) (a b : F) :
-    (σ ^ p ^ n) (a + b) - (σ ^ p ^ n) a - (σ ^ p ^ n) b ∈ Ideal.span {(p : R)} := by
+theorem frob_pow_additive
+    {R : Type} [CommRing R]
+    (p : ℕ) [Fact p.Prime]
+    (F : Type) [Field F] [CharP F p]
+    (σ : MulChar F R) (hσ : ∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)})
+    (n : ℕ) (a b : F)
+    : (σ ^ p ^ n) (a + b) - (σ ^ p ^ n) a - (σ ^ p ^ n) b ∈ Ideal.span {(p : R)} := by
   have hpn : p ^ n ≠ 0 := pow_ne_zero _ (Fact.out : p.Prime).ne_zero
   have e : ∀ x : F, (σ ^ p ^ n) x = σ (x ^ p ^ n) := fun x => by
     rw [MulChar.pow_apply' σ hpn, map_pow]
   rw [e, e, e, add_pow_char_pow]
   exact hσ _ _
 
-theorem main : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ σ : MulChar F R, (∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)}) → orderOf σ = p ^ f - 1 ∧ (∀ χ : MulChar F R, ∃ m, 1 ≤ m ∧ m ≤ p ^ f - 1 ∧ χ = σ ^ m) ∧ (∀ n, (∀ a b, (σ ^ p ^ n) (a + b) - (σ ^ p ^ n) a - (σ ^ p ^ n) b ∈ Ideal.span {(p : R)})) ∧ (∀ τ : MulChar F R, (∀ a b, τ (a + b) - τ a - τ b ∈ Ideal.span {(p : R)}) → ∃ n < f, τ = σ ^ p ^ n) ∧ (∀ a b : F, a ≠ b → v (algebraMap R C (σ a - σ b)) = 1) := by
+theorem main
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ σ : MulChar F R,
+              (∀ a b, σ (a + b) - σ a - σ b ∈ Ideal.span {(p : R)})
+                → orderOf σ = p ^ f - 1
+                  ∧ (∀ χ : MulChar F R, ∃ m, 1 ≤ m ∧ m ≤ p ^ f - 1 ∧ χ = σ ^ m)
+                  ∧ (∀ n,
+                    (∀ a b,
+                      (σ ^ p ^ n) (a + b) - (σ ^ p ^ n) a - (σ ^ p ^ n) b ∈ Ideal.span {(p : R)}))
+                  ∧ (∀ τ : MulChar F R,
+                    (∀ a b, τ (a + b) - τ a - τ b ∈ Ideal.span {(p : R)}) → ∃ n < f, τ = σ ^ p ^ n)
+                  ∧ (∀ a b : F, a ≠ b → v (algebraMap R C (σ a - σ b)) = 1) := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hc σ hσ
   have : IsDomain R := Function.Injective.isDomain (algebraMap R C) hv.hom_inj
   have hinj : Function.Injective σ := fun a b hab =>
@@ -162,12 +213,13 @@ theorem main : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
       have h3 := map_add (toHom v R hv hp F (σ ^ m) hτ) a b
       rw [toHom_apply, toHom_apply, toHom_apply, e, e, e] at h3
       rw [map_add (f := _), toHom_apply, toHom_apply, toHom_apply, h3]
-    let α : F →+* F :=
-      { toFun := fun x => x ^ m
-        map_one' := one_pow m
-        map_mul' := fun a b => mul_pow a b m
-        map_zero' := zero_pow (by omega)
-        map_add' := hadd }
+    let α : F →+* F := {
+      toFun := fun x => x ^ m
+      map_one' := one_pow m
+      map_mul' := fun a b => mul_pow a b m
+      map_zero' := zero_pow (by omega)
+      map_add' := hadd
+    }
     obtain ⟨n, hn, hα⟩ := ringHom_eq_frob_pow p F f hc α
     refine ⟨n, hn, ?_⟩
     apply MulChar.ext

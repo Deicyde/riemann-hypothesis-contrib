@@ -10,10 +10,12 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_under_eq_of_mem_associatedPrimes_of_surjective {A A' M : Type*} [CommRing A]
-    [CommRing A'] [Algebra A A'] [AddCommGroup M] [Module A M] [Module A' M]
-    [IsScalarTower A A' M] (hs : Function.Surjective (algebraMap A A')) {q : Ideal A}
-    (hq : q ∈ associatedPrimes A M) : ∃ q' ∈ associatedPrimes A' M, q'.under A = q := by
+theorem exists_under_eq_of_mem_associatedPrimes_of_surjective
+    {A A' M : Type*} [CommRing A] [CommRing A'] [Algebra A A'] [AddCommGroup M] [Module A M]
+    [Module A' M] [IsScalarTower A A' M]
+    (hs : Function.Surjective (algebraMap A A'))
+    {q : Ideal A} (hq : q ∈ associatedPrimes A M)
+    : ∃ q' ∈ associatedPrimes A' M, q'.under A = q := by
   obtain ⟨hp, v, hv⟩ := hq
   set q' : Ideal A' := ((⊥ : Submodule A' M).colon {v}).radical with hq'
   have hunder : q'.under A = q := by
@@ -32,9 +34,10 @@ theorem exists_under_eq_of_mem_associatedPrimes_of_surjective {A A' M : Type*} [
   have hprime : q'.IsPrime := hmap ▸ Ideal.map_isPrime_of_surjective hs hker
   exact ⟨q', ⟨hprime, v, rfl⟩, hunder⟩
 
-theorem exists_isDomain_isDiscreteValuationRing_of_maximalIdeal_eq_span {S : Type*} [CommRing S]
-    [IsLocalRing S] [IsNoetherianRing S] {t : S} (ht : maximalIdeal S = Ideal.span {t})
-    (hreg : IsSMulRegular S t) : ∃ _ : IsDomain S, IsDiscreteValuationRing S := by
+theorem exists_isDomain_isDiscreteValuationRing_of_maximalIdeal_eq_span
+    {S : Type*} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
+    {t : S} (ht : maximalIdeal S = Ideal.span {t}) (hreg : IsSMulRegular S t)
+    : ∃ _ : IsDomain S, IsDiscreteValuationRing S := by
   have hfac : ∀ y : S, y ≠ 0 → ∃ (n : ℕ) (u : S), IsUnit u ∧ y = t ^ n * u := by
     intro y hy
     have hinf : (⨅ i : ℕ, maximalIdeal S ^ i) = ⊥ :=
@@ -84,12 +87,14 @@ theorem exists_isDomain_isDiscreteValuationRing_of_maximalIdeal_eq_span {S : Typ
   refine ((IsDiscreteValuationRing.TFAE S hf).out 5 1).mp ?_
   exact ⟨t, ht⟩
 
-theorem exists_isDiscreteValuationRing_of_mem_associatedPrimes_quotient :
-    ∀ (A R : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-      [CommRing R] [IsNoetherianRing R] [Algebra A R] [Module.Flat A R] (x : A), x ≠ 0 →
-      (∀ q : Ideal A, q.IsPrime → x ∈ q → IsReduced (R ⧸ q.map (algebraMap A R))) →
-      ∀ (P : Ideal R) [P.IsPrime], P ∈ associatedPrimes R (R ⧸ Ideal.span {algebraMap A R x}) →
-        ∃ _ : IsDomain (Localization.AtPrime P), IsDiscreteValuationRing (Localization.AtPrime P) := by
+theorem exists_isDiscreteValuationRing_of_mem_associatedPrimes_quotient
+    : ∀ (A R : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+        [CommRing R] [IsNoetherianRing R] [Algebra A R] [Module.Flat A R] (x : A),
+      x ≠ 0 → (∀ q : Ideal A, q.IsPrime → x ∈ q → IsReduced (R ⧸ q.map (algebraMap A R)))
+        → ∀ (P : Ideal R) [P.IsPrime],
+          P ∈ associatedPrimes R (R ⧸ Ideal.span {algebraMap A R x})
+            → ∃ _ : IsDomain (Localization.AtPrime P),
+              IsDiscreteValuationRing (Localization.AtPrime P) := by
   intro A R _ _ _ _ _ _ _ _ x hx hred P _ hP
   set I : Ideal A := Ideal.span {x} with hI
   have hIR : Ideal.span {algebraMap A R x} = I.map (algebraMap A R) := by
@@ -107,21 +112,23 @@ theorem exists_isDiscreteValuationRing_of_mem_associatedPrimes_quotient :
     have h0 : q ∈ associatedPrimes A (R ⧸ I.map (algebraMap A R)) :=
       under_mem_associatedPrimes (A := A) hP
     let e : (R ⧸ I.map (algebraMap A R)) ≃ₗ[A] (A ⧸ I) ⊗[A] R :=
-      ((Algebra.TensorProduct.quotIdealMapEquivTensorQuot R I).toLinearEquiv.restrictScalars A) ≪≫ₗ
-        TensorProduct.comm A R (A ⧸ I)
+      ((Algebra.TensorProduct.quotIdealMapEquivTensorQuot R I).toLinearEquiv.restrictScalars A)
+        ≪≫ₗ TensorProduct.comm A R (A ⧸ I)
     rw [LinearEquiv.AssociatedPrimes.eq e] at h0
-    obtain ⟨q', hq', hu⟩ := exists_under_eq_of_mem_associatedPrimes_of_surjective (A' := A ⧸ I)
-      Ideal.Quotient.mk_surjective h0
+    obtain ⟨q', hq', hu⟩ :=
+      exists_under_eq_of_mem_associatedPrimes_of_surjective (A' := A ⧸ I)
+        Ideal.Quotient.mk_surjective h0
     have h2 : q' ∈ associatedPrimes (A ⧸ I) (A ⧸ I) := associatedPrimes_subset_of_flat hq'
     rw [← hu]
     exact under_mem_associatedPrimes (A := A) h2
   have hheight : q.height = 1 := height_eq_one_of_mem_associatedPrimes hx hqA
 
   have hPq : P ∈ associatedPrimes R (R ⧸ q.map (algebraMap A R)) := by
-    rw [LinearEquiv.AssociatedPrimes.eq
-      (Algebra.TensorProduct.quotIdealMapEquivTensorQuot R I).toLinearEquiv] at hP
-    rw [LinearEquiv.AssociatedPrimes.eq
-      (Algebra.TensorProduct.quotIdealMapEquivTensorQuot R q).toLinearEquiv]
+    rw [LinearEquiv.AssociatedPrimes.eq (Algebra.TensorProduct.quotIdealMapEquivTensorQuot R
+        I).toLinearEquiv]
+      at hP
+    rw [LinearEquiv.AssociatedPrimes.eq (Algebra.TensorProduct.quotIdealMapEquivTensorQuot R
+      q).toLinearEquiv]
     exact mem_associatedPrimes_tensor_quotient_under (A := A) hP
 
   obtain ⟨z, hzP, hz⟩ : ∃ z ∉ P, ∀ p ∈ P, p * z ∈ q.map (algebraMap A R) := by

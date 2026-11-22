@@ -10,18 +10,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ImportsB
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.FA
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT
+  GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail
+  PositivityTheory.Rg.BcB.F.FA
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
 namespace GlobalTheory.CompanionTheory.FinActS
 
-theorem map_list_prod_embed_of_nodup {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)]
+theorem map_list_prod_embed_of_nodup
+    {ι Γ : Type} [Group Γ]
+    {Hl : ι → Type} [∀ i, Group (Hl i)]
     (p : ∀ i, Γ →* Hl i) (e : ∀ i, Hl i →* Γ)
     (hpe : ∀ i m, p i (e i m) = m) (hpe' : ∀ i j m, i ≠ j → p j (e i m) = 1)
-    (f : ∀ i, Hl i) (j : ι) (l : List ι) (hl : l.Nodup) :
-    p j (l.map fun i => e i (f i)).prod = if j ∈ l then f j else 1 := by
+    (f : ∀ i, Hl i) (j : ι)
+    (l : List ι) (hl : l.Nodup)
+    : p j (l.map fun i => e i (f i)).prod = if j ∈ l then f j else 1 := by
   induction l with
   | nil => simp
   | cons a l ih =>
@@ -35,15 +41,17 @@ theorem map_list_prod_embed_of_nodup {ι Γ : Type} [Group Γ] {Hl : ι → Type
       rw [hpe' a j _ hja, one_mul]
       simp [hne]
 
-theorem exists_local_levels_le_open : ∀ {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [∀ i, TopologicalSpace (Hl i)] [∀ i, T2Space (Hl i)]
-    (p : ∀ i, Γ →* Hl i) (e : ∀ i, Hl i →* Γ) (K : Subgroup Γ) (KH : ∀ i, Subgroup (Hl i))
-    (hpc : ∀ i, Continuous (p i)) (hec : ∀ i, Continuous (e i))
-    (hpe : ∀ i m, p i (e i m) = m) (hpe' : ∀ i j m, i ≠ j → p j (e i m) = 1)
-    (hsep : ∀ x y : Γ, (∀ i, p i x = p i y) → x = y)
-    (hK : ∀ x, x ∈ K ↔ ∀ i, p i x ∈ KH i) (hKc : IsCompact (K : Set Γ))
-    (hKo : ∀ i, IsOpen (KH i : Set (Hl i))) (U : Subgroup Γ) (hU : IsOpen (U : Set Γ)),
-    ∃ V : ∀ i, Subgroup (Hl i), (∀ i, IsOpen (V i : Set (Hl i))) ∧ (∀ i, V i ≤ KH i) ∧
-      (∀ᶠ i in cofinite, V i = KH i) ∧ ∀ u, (∀ i, p i u ∈ V i) → u ∈ U := by
+theorem exists_local_levels_le_open
+    : ∀ {ι Γ : Type} [Group Γ] {Hl : ι → Type} [∀ i, Group (Hl i)] [TopologicalSpace Γ]
+        [IsTopologicalGroup Γ] [∀ i, TopologicalSpace (Hl i)] [∀ i, T2Space (Hl i)]
+        (p : ∀ i, Γ →* Hl i) (e : ∀ i, Hl i →* Γ) (K : Subgroup Γ) (KH : ∀ i, Subgroup (Hl i))
+        (hpc : ∀ i, Continuous (p i)) (hec : ∀ i, Continuous (e i)) (hpe : ∀ i m, p i (e i m) = m)
+        (hpe' : ∀ i j m, i ≠ j → p j (e i m) = 1) (hsep : ∀ x y : Γ, (∀ i, p i x = p i y) → x = y)
+        (hK : ∀ x, x ∈ K ↔ ∀ i, p i x ∈ KH i) (hKc : IsCompact (K : Set Γ))
+        (hKo : ∀ i, IsOpen (KH i : Set (Hl i))) (U : Subgroup Γ) (hU : IsOpen (U : Set Γ)),
+      ∃ V : ∀ i, Subgroup (Hl i),
+        (∀ i, IsOpen (V i : Set (Hl i))) ∧ (∀ i, V i ≤ KH i) ∧ (∀ᶠ i in cofinite, V i = KH i)
+          ∧ ∀ u, (∀ i, p i u ∈ V i) → u ∈ U := by
   intro ι Γ _ Hl _ _ _ _ _ p e K KH hpc hec hpe hpe' hsep hK hKc hKo U hU
   classical
   have hcomp : IsCompact ((K : Set Γ) \ (U : Set Γ)) := hKc.diff hU

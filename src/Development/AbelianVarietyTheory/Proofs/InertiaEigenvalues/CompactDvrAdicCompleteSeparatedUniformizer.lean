@@ -6,7 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem compact_dvr_complete_separated : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O] [IsTopologicalRing O] [CompactSpace O] [T2Space O], IsAdic (IsLocalRing.maximalIdeal O) → ∀ (ϖ : O), Irreducible ϖ → (∀ x : ℕ → O, ∃ a : O, ∀ n : ℕ, ∃ b : O, a - ∑ j ∈ Finset.range n, ϖ ^ j * x j = ϖ ^ n * b) ∧ (∀ a : O, (∀ n : ℕ, ∃ b : O, a = ϖ ^ n * b) → a = 0) := by
+theorem compact_dvr_complete_separated
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+        [IsTopologicalRing O] [CompactSpace O] [T2Space O],
+      IsAdic (IsLocalRing.maximalIdeal O)
+        → ∀ (ϖ : O),
+          Irreducible ϖ
+            → (∀ x : ℕ → O, ∃ a : O, ∀ n : ℕ, ∃ b : O,
+                a - ∑ j ∈ Finset.range n, ϖ ^ j * x j = ϖ ^ n * b)
+              ∧ (∀ a : O, (∀ n : ℕ, ∃ b : O, a = ϖ ^ n * b) → a = 0) := by
   intro O _ _ _ _ _ _ _ _ ϖ hϖ
   refine ⟨fun x => ?_, fun a ha => ?_⟩
   · set s : ℕ → O := fun n => ∑ j ∈ Finset.range n, ϖ ^ j * x j with hs
@@ -20,8 +28,9 @@ theorem compact_dvr_complete_separated : ∀ {O : Type} [CommRing O] [IsDomain O
       simp only [hs, Finset.sum_range_succ, pow_succ]
       ring
     have hne : ∀ n, (C n).Nonempty := fun n => ⟨_, ⟨0, rfl⟩⟩
-    obtain ⟨a, ha⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C hdec hne
-      (hcpt 0) (fun n => (hcpt n).isClosed)
+    obtain ⟨a, ha⟩ :=
+      IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed C hdec hne (hcpt 0)
+        (fun n => (hcpt n).isClosed)
     refine ⟨a, fun n => ?_⟩
     obtain ⟨b, hb⟩ := Set.mem_iInter.mp ha n
     exact ⟨b, by rw [← hb]; simp [hs]⟩

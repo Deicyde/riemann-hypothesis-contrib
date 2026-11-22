@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDeriv
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,8 +20,9 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem isUnit_of_sub_mem_maximalIdeal' {A : Type*} [CommRing A] [IsLocalRing A] {x y : A}
-    (h : x - y ∈ maximalIdeal A) (hy : IsUnit y) : IsUnit x := by
+theorem isUnit_of_sub_mem_maximalIdeal'
+    {A : Type*} [CommRing A] [IsLocalRing A] {x y : A} (h : x - y ∈ maximalIdeal A) (hy : IsUnit y)
+    : IsUnit x := by
   by_contra hx
   have hx' : x ∈ maximalIdeal A := (mem_maximalIdeal x).2 hx
   have hy' : y ∈ maximalIdeal A := by
@@ -28,9 +30,11 @@ theorem isUnit_of_sub_mem_maximalIdeal' {A : Type*} [CommRing A] [IsLocalRing A]
     simpa using this
   exact (mem_maximalIdeal y).1 hy' hy
 
-theorem eq_of_isRoot_of_sub_mem_maximalIdeal {A : Type*} [CommRing A] [IsDomain A] [IsLocalRing A]
-    {f : A[X]} {a₀ b b' : A} (hu : IsUnit (f.derivative.eval a₀)) (hb : f.IsRoot b) (hb' : f.IsRoot b')
-    (h1 : b - a₀ ∈ maximalIdeal A) (h2 : b' - a₀ ∈ maximalIdeal A) : b' = b := by
+theorem eq_of_isRoot_of_sub_mem_maximalIdeal
+    {A : Type*} [CommRing A] [IsDomain A] [IsLocalRing A]
+    {f : A[X]} {a₀ b b' : A} (hu : IsUnit (f.derivative.eval a₀)) (hb : f.IsRoot b)
+    (hb' : f.IsRoot b') (h1 : b - a₀ ∈ maximalIdeal A) (h2 : b' - a₀ ∈ maximalIdeal A)
+    : b' = b := by
   set h := f /ₘ (X - C b) with hh
   have hf : f = (X - C b) * h := (mul_divByMonic_eq_iff_isRoot.2 hb).symm
   have hd : f.derivative.eval b = h.eval b := by
@@ -61,8 +65,9 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem henselianLocalRing_of_isSepClosed {Ω : Type} [Field Ω] [IsSepClosed Ω] (V : ValuationSubring Ω) :
-    HenselianLocalRing V := by
+theorem henselianLocalRing_of_isSepClosed
+    {Ω : Type} [Field Ω] [IsSepClosed Ω] (V : ValuationSubring Ω)
+    : HenselianLocalRing V := by
   classical
   obtain ⟨W, rfl⟩ := exists_valuationSubring_comap_eq V (algebraMap Ω (AlgebraicClosure Ω))
   refine @HenselianLocalRing.mk _ _ inferInstance ?_
@@ -74,9 +79,13 @@ theorem henselianLocalRing_of_isSepClosed {Ω : Type} [Field Ω] [IsSepClosed Ω
   have hFm : F.Monic := (hf.map ψ).map ιW
   have hint : ∀ r ∈ F.roots, ∃ r' : W, ιW r' = r := by
     intro r hr
-    have hi : IsIntegral W r := ⟨G, hf.map ψ, by
-      rw [← Polynomial.eval_map]
-      exact (mem_roots hFm.ne_zero).1 hr⟩
+    have hi : IsIntegral W r := ⟨
+      G,
+      hf.map ψ,
+      by
+        rw [← Polynomial.eval_map]
+        exact (mem_roots hFm.ne_zero).1 hr
+    ⟩
     exact IsIntegrallyClosed.isIntegral_iff.1 hi
   have hψm : ψ (f.eval a₀) ∈ maximalIdeal W :=
     (mem_maximalIdeal _).2 fun hu => (mem_maximalIdeal _).1 h₁ (IsUnit.of_map ψ _ hu)
@@ -117,7 +126,9 @@ theorem henselianLocalRing_of_isSepClosed {Ω : Type} [Field Ω] [IsSepClosed Ω
       exact h₂.map ψ
   have hFd : F.derivative.eval (ιW r') ≠ 0 := by
     rw [hF, derivative_map, Polynomial.eval_map, eval₂_at_apply]
-    exact fun e => hGd.ne_zero ((injective_iff_map_eq_zero ιW).1 (FaithfulSMul.algebraMap_injective W (AlgebraicClosure Ω)) _ e)
+    exact fun e =>
+      hGd.ne_zero ((injective_iff_map_eq_zero ιW).1
+        (FaithfulSMul.algebraMap_injective W (AlgebraicClosure Ω)) _ e)
   have hιinj : Function.Injective ιW := FaithfulSMul.algebraMap_injective W (AlgebraicClosure Ω)
   have hψinj : Function.Injective ψ := fun x y e =>
     Subtype.ext ((algebraMap Ω (AlgebraicClosure Ω)).injective (congrArg Subtype.val e))
@@ -140,7 +151,8 @@ theorem henselianLocalRing_of_isSepClosed {Ω : Type} [Field Ω] [IsSepClosed Ω
     rw [aeval_def, ← Polynomial.eval_map, ← Polynomial.derivative_map, hF₀F] at this
     exact this
   have hsep : (minpoly Ω (ιW r')).Separable :=
-    (Polynomial.separable_iff_derivative_ne_zero (minpoly.irreducible hintΩ)).2 (fun e => hq (by rw [e, map_zero]))
+    (Polynomial.separable_iff_derivative_ne_zero (minpoly.irreducible hintΩ)).2
+      (fun e => hq (by rw [e, map_zero]))
   have hdeg := IsSepClosed.degree_eq_one_of_irreducible Ω (minpoly.irreducible hintΩ) hsep
   obtain ⟨b, hb⟩ := minpoly.natDegree_eq_one_iff.1 (natDegree_eq_of_degree_eq_some hdeg)
   have hbW : b ∈ W.comap (algebraMap Ω (AlgebraicClosure Ω)) := by
@@ -163,9 +175,9 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem henselianLocalRing_comap_fixedField_inertia (K : Type) {Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
-    [IsSepClosed Ω] (V : ValuationSubring Ω) :
-    HenselianLocalRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V)) Ω)) := by
+theorem henselianLocalRing_comap_fixedField_inertia
+    (K : Type) {Ω : Type} [Field K] [Field Ω] [Algebra K Ω] [IsSepClosed Ω] (V : ValuationSubring Ω)
+    : HenselianLocalRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V)) Ω)) := by
   classical
   haveI := henselianLocalRing_of_isSepClosed V
   set K' := IntermediateField.fixedField (inertia K V)
@@ -221,10 +233,13 @@ theorem henselianLocalRing_comap_fixedField_inertia (K : Type) {Ω : Type} [Fiel
     have := hu.map j
     rwa [map_sub, hjb] at this
 
-theorem henselianLocalRing_fixedField_inertia : ∀ (R K Ω : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K]
-    [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring →
-    HenselianLocalRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V)) Ω)) := by
+theorem henselianLocalRing_fixedField_inertia
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → HenselianLocalRing (V.comap (algebraMap (IntermediateField.fixedField (inertia K V))
+          Ω)) := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V _
   haveI : IsSepClosed Ω := IsSepClosure.sep_closed K
   exact henselianLocalRing_comap_fixedField_inertia K V

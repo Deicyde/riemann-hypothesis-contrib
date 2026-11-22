@@ -14,8 +14,8 @@ namespace GroundTheory.Global
 namespace Elliptic
 
 theorem tendsto_E₄_atImInfty : Tendsto (fun τ : ℍ ↦ E₄ τ) atImInfty (𝓝 1) := by
-  have ha := ModularFormClass.analyticAt_cuspFunction_zero (f := E₄) one_pos
-    one_mem_strictPeriods_SL
+  have ha :=
+    ModularFormClass.analyticAt_cuspFunction_zero (f := E₄) one_pos one_mem_strictPeriods_SL
   have h0 : cuspFunction 1 E₄ 0 = 1 := by
     have := EisensteinSeries.E_qExpansion_coeff_zero (k := 4) (by norm_num) ⟨2, rfl⟩
     simpa [qExpansion_coeff] using this
@@ -25,8 +25,8 @@ theorem tendsto_E₄_atImInfty : Tendsto (fun τ : ℍ ↦ E₄ τ) atImInfty (�
   rw [h0] at this
   exact this.congr hcomp
 
-theorem tendsto_discriminant_atImInfty :
-    Tendsto (fun τ : ℍ ↦ ModularForm.discriminant τ) atImInfty (𝓝 0) :=
+theorem tendsto_discriminant_atImInfty
+    : Tendsto (fun τ : ℍ ↦ ModularForm.discriminant τ) atImInfty (𝓝 0) :=
   ModularForm.discriminant_isZeroAtImInfty
 
 theorem eventually_le_norm_modularJ (R : ℝ) : ∀ᶠ τ in atImInfty, R ≤ ‖modularJ τ‖ := by
@@ -86,8 +86,7 @@ lemma not_exists_modularJC_const : ¬ ∃ w, ∀ z ∈ {z : ℂ | 0 < z.im}, mod
   rw [← modularJC_coe, hw _ τ.im_pos] at h1
   linarith
 
-def fdBelow (A : ℝ) : Set ℂ :=
-  {z | 1 ≤ normSq z ∧ |z.re| ≤ 1 / 2 ∧ 0 ≤ z.im ∧ z.im ≤ A}
+def fdBelow (A : ℝ) : Set ℂ := {z | 1 ≤ normSq z ∧ |z.re| ≤ 1 / 2 ∧ 0 ≤ z.im ∧ z.im ≤ A}
 
 lemma im_pos_of_mem_fdBelow {A : ℝ} {z : ℂ} (hz : z ∈ fdBelow A) : 0 < z.im := by
   obtain ⟨h1, h2, h3, -⟩ := hz
@@ -147,15 +146,16 @@ theorem modularJ_surjective : Function.Surjective modularJ := by
     IsClopen.eq_univ ⟨isClosed_range_modularJ, isOpen_range_modularJ⟩ (range_nonempty _)
   exact Set.range_eq_univ.1 h
 
-theorem exists_variableChange_eq_weierstrassCurve_latticeOfTau (W : WeierstrassCurve ℂ)
-    [W.IsElliptic] :
-    ∃ τ : ℍ, ∃ C : WeierstrassCurve.VariableChange ℂ, C • W = weierstrassCurve (latticeOfTau τ) := by
+theorem exists_variableChange_eq_weierstrassCurve_latticeOfTau
+    (W : WeierstrassCurve ℂ) [W.IsElliptic]
+    : ∃ τ : ℍ, ∃ C : WeierstrassCurve.VariableChange ℂ,
+      C • W = weierstrassCurve (latticeOfTau τ) := by
   obtain ⟨τ, hτ⟩ := modularJ_surjective W.j
   refine ⟨τ, W.exists_variableChange_of_j_eq _ ?_⟩
   rw [weierstrassCurve_latticeOfTau_j, hτ]
 
-theorem exists_variableChange_eq_weierstrassCurve (W : WeierstrassCurve ℂ) [W.IsElliptic] :
-    ∃ L : PeriodPair, ∃ C : WeierstrassCurve.VariableChange ℂ, C • W = weierstrassCurve L := by
+theorem exists_variableChange_eq_weierstrassCurve (W : WeierstrassCurve ℂ) [W.IsElliptic]
+    : ∃ L : PeriodPair, ∃ C : WeierstrassCurve.VariableChange ℂ, C • W = weierstrassCurve L := by
   obtain ⟨τ, C, hC⟩ := exists_variableChange_eq_weierstrassCurve_latticeOfTau W
   exact ⟨latticeOfTau τ, C, hC⟩
 

@@ -22,30 +22,39 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements
 noncomputable section
 
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR.Links
+  Formalism.IndefR.Cx
 
 namespace Formalism.IndefR
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC} {ex : Extra D L hT Gi Gl K Y cX}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+  {ex : Extra D L hT Gi Gl K Y cX}
 
-def faceT (P : RowSideFamily ex) (Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs))
-    (Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)) (Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3) :
-    Face3 D P.A3 :=
+def faceT
+    (P : RowSideFamily ex) (Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs))
+    (Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs))
+    (Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3)
+    : Face3 D P.A3 :=
   ⟨P.P0, P.ψ0, P.Ps, P.ψs, Dcf, Spf, Zscf⟩
 
-def TrISepWith {G Pl0 I0 T : Type} [Group G] [Fintype G] (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m)
-    (tr : Fin D.R.m → (I0 × List ℕ → D.what₂.LL) → I0 × List ℕ → D.what₂.LL) : Prop :=
+def TrISepWith
+    {G Pl0 I0 T : Type} [Group G] [Fintype G]
+    (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m)
+    (tr : Fin D.R.m → (I0 × List ℕ → D.what₂.LL) → I0 × List ℕ → D.what₂.LL)
+    : Prop :=
   ∀ (j : Fin D.R.m), ∀ p ∈ (A3.fam3.RI A3.fam3.F.μ0).ixFin3 A3.fam3.F.X,
     ∀ p' ∈ (A3.fam3.RI A3.fam3.F.μ0).ixFin3 A3.fam3.F.X,
-    (∃ k : A3.okI A3.A.μ0 × List ℕ, p.2 (k.1.1, k.2) ≠ p'.2 (k.1.1, k.2)) →
-      ∃ k : A3.okI A3.A.μ0 × List ℕ, tr j p.2 (k.1.1, k.2) ≠ tr j p'.2 (k.1.1, k.2)
-
+      (∃ k : A3.okI A3.A.μ0 × List ℕ, p.2 (k.1.1, k.2) ≠ p'.2 (k.1.1, k.2))
+        → ∃ k : A3.okI A3.A.μ0 × List ℕ, tr j p.2 (k.1.1, k.2) ≠ tr j p'.2 (k.1.1, k.2)
 
 open Classical in
-def hkCan {G Pl0 I0 T : Type} [Group G] [Fintype G] (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) : HkDat3 A3 where
+def hkCan
+    {G Pl0 I0 T : Type} [Group G] [Fintype G] (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m)
+    : HkDat3 A3 where
   Hk := A3.fam3.base3.Ix
   ev p q := if p = q then 1 else 0
   ev_inj p p' h := by
@@ -56,14 +65,24 @@ def hkCan {G Pl0 I0 T : Type} [Group G] [Fintype G] (A3 : FamIn3 D.what₂.LL G 
     rw [if_neg (fun h' => hne h'.symm)] at h2
     exact one_ne_zero h2
 
-def errCan {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {Df : DefSide Bs} (S : IndefData Df)
-    (F0 : HeightOneSpectrum (𝓞 K) → Bs.J → ℝ) (w : HeightOneSpectrum (𝓞 K)) : ℝ :=
-  max 0 ((∑ j', ((S.Iw j' (S.μ w) w : ℝ) + (S.Iw j' (S.μ w) (Formalism.DivisionValues.conjPl w) : ℝ))) / (S.D : ℝ) -
-      ∑ j', 2 * ((Formalism.EigenvalueLevelCeiling.ramw w : ℝ) * F0 w j') - (Formalism.EigenvalueLevelCeiling.ramw w : ℝ) * (2 / (Formalism.EigenvalueLevelCeiling.plc w : ℝ) ^ 2)) /
-    ((Formalism.EigenvalueLevelCeiling.ramw w : ℝ) * (Fintype.card Bs.J : ℝ))
+def errCan
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    {Bs : DefBase K} {Df : DefSide Bs} (S : IndefData Df) (F0 : HeightOneSpectrum (𝓞 K) → Bs.J → ℝ)
+    (w : HeightOneSpectrum (𝓞 K))
+    : ℝ :=
+  max 0
+      ((∑ j', ((S.Iw j' (S.μ w) w : ℝ) + (S.Iw j' (S.μ w) (Formalism.DivisionValues.conjPl w) : ℝ)))
+          / (S.D : ℝ)
+        - ∑ j', 2 * ((Formalism.EigenvalueLevelCeiling.ramw w : ℝ) * F0 w j')
+        - (Formalism.EigenvalueLevelCeiling.ramw w : ℝ)
+          * (2 / (Formalism.EigenvalueLevelCeiling.plc w : ℝ) ^ 2))
+    / ((Formalism.EigenvalueLevelCeiling.ramw w : ℝ) * (Fintype.card Bs.J : ℝ))
 
-def pwOf {Rc : Formalism.L2.RecT ex} (S : Formalism.L2.SG.SpectralTiesReal.STiesR Rc)
-    (hin : ∀ u, Formalism.L2.SG.PoincareInHH.PoincareSetting.InHH S.X u S.Y.hK) (u : D.what₂.Word) : Formalism.IndefR.Cx.PerW S.X S.Y.hK u where
+def pwOf
+    {Rc : Formalism.L2.RecT ex} (S : Formalism.L2.SG.SpectralTiesReal.STiesR Rc)
+    (hin : ∀ u, Formalism.L2.SG.PoincareInHH.PoincareSetting.InHH S.X u S.Y.hK)
+    (u : D.what₂.Word)
+    : Formalism.IndefR.Cx.PerW S.X S.Y.hK u where
   Dt := S.Y.Dt u
   hD := S.Y.reps u
   hin := hin u
@@ -73,10 +92,11 @@ def pwOf {Rc : Formalism.L2.RecT ex} (S : Formalism.L2.SG.SpectralTiesReal.STies
   hI := S.into u
   hB := S.bij u
 
-def seeKS (X : Formalism.L2.SG.HidaSetting.HidaSetting D) : Set X.B.I.GA := {x | x.1 = 1 ∧ x.2 ∈ X.K2}
+def seeKS (X : Formalism.L2.SG.HidaSetting.HidaSetting D) : Set X.B.I.GA :=
+  {x | x.1 = 1 ∧ x.2 ∈ X.K2}
 
-def seeChiS (X : Formalism.L2.SG.HidaSetting.HidaSetting D) : X.B.I.GA → ℂ := fun x => star (X.chi2 x.2)
-
+def seeChiS (X : Formalism.L2.SG.HidaSetting.HidaSetting D) : X.B.I.GA → ℂ := fun x =>
+  star (X.chi2 x.2)
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
@@ -185,9 +205,13 @@ structure RealT (Rc : Formalism.L2.RecT ex) (P : RowSideFamily ex) (Dcf : ∀ Zs
 
 namespace RealT
 
-variable {Rc : Formalism.L2.RecT ex} {P : RowSideFamily ex} {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
-  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)} {Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3}
-  {S : Formalism.L2.SG.SpectralTiesReal.STiesR Rc} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {Rc : Formalism.L2.RecT ex} {P : RowSideFamily ex}
+  {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
+  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)}
+  {Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3}
+  {S : Formalism.L2.SG.SpectralTiesReal.STiesR Rc} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   (R : RealT Rc P Dcf Spf Zscf S Ks)
 
 abbrev F (_R : RealT Rc P Dcf Spf Zscf S Ks) : Face3 D P.A3 := faceT P Dcf Spf Zscf

@@ -11,15 +11,18 @@ open scoped Classical
 
 namespace PI.UnitaryGroupMassFormula.InSRelevantW
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef Formalism.L2.SG.FourParts
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef Formalism.L2.SG.FourParts
 
 section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem xa_mono {T : E} (G : FlagG S r T) {a b : ℕ} (h : a ≤ b) : G.Xa a ≤ G.Xa b := Submodule.span_mono (Set.image_mono fun i hi => lt_of_lt_of_le hi h)
+theorem xa_mono {T : E} (G : FlagG S r T) {a b : ℕ} (h : a ≤ b) : G.Xa a ≤ G.Xa b :=
+  Submodule.span_mono (Set.image_mono fun i hi => lt_of_lt_of_le hi h)
 
-theorem e_mem_xa {T : E} (G : FlagG S r T) (i : Fin r) : G.e i ∈ G.Xa (i.val + 1) := Submodule.subset_span ⟨i, Nat.lt_succ_self _, rfl⟩
+theorem e_mem_xa {T : E} (G : FlagG S r T) (i : Fin r) : G.e i ∈ G.Xa (i.val + 1) :=
+  Submodule.subset_span ⟨i, Nat.lt_succ_self _, rfl⟩
 
 theorem xa_r {T : E} (G : FlagG S r T) : G.Xa r = G.X := by
   have hset : {i : Fin r | i.1 < r} = Set.univ := Set.eq_univ_of_forall fun i => i.2
@@ -37,8 +40,9 @@ theorem z_mem_perp {T : E} (G : FlagG S r T) : G.z ∈ perpS S G.X := by
   | add x y _ _ hx hy => simp [hx, hy]
   | smul c x _ hx => simp [hx]
 
-theorem coefX_single_add {T : E} (G : FlagG S r T) (i : Fin r) (c : E) {w : S.V}
-    (hw : w ∈ G.Xa i.val) : G.coefX (c • G.e i + w) i = c := by
+theorem coefX_single_add
+    {T : E} (G : FlagG S r T) (i : Fin r) (c : E) {w : S.V} (hw : w ∈ G.Xa i.val)
+    : G.coefX (c • G.e i + w) i = c := by
   classical
   have hw' := hw
   unfold FlagG.Xa at hw'
@@ -58,8 +62,8 @@ theorem coefX_single_add {T : E} (G : FlagG S r T) (i : Fin r) (c : E) {w : S.V}
     exact lt_irrefl (i.1) h1
   rw [hli, add_zero]
 
-theorem xa_succ_decomp {T : E} (G : FlagG S r T) (i : Fin r) {v : S.V} (hv : v ∈ G.Xa (i.val + 1)) :
-    ∃ c : E, ∃ w ∈ G.Xa i.val, v = c • G.e i + w := by
+theorem xa_succ_decomp {T : E} (G : FlagG S r T) (i : Fin r) {v : S.V} (hv : v ∈ G.Xa (i.val + 1))
+    : ∃ c : E, ∃ w ∈ G.Xa i.val, v = c • G.e i + w := by
   have hset : G.e '' {j : Fin r | j.1 < i.1 + 1} = insert (G.e i) (G.e '' {j | j.1 < i.1}) := by
     rw [← Set.image_insert_eq]
     congr 1
@@ -70,13 +74,18 @@ theorem xa_succ_decomp {T : E} (G : FlagG S r T) (i : Fin r) {v : S.V} (hv : v �
   rw [hset, Submodule.mem_span_insert] at hv
   exact hv
 
-theorem coefX_add_low {T : E} (G : FlagG S r T) (i : Fin r) {a b : S.V} (ha : a ∈ G.Xa (i.val + 1))
-    (hb : b ∈ G.Xa i.val) : G.coefX (a + b) i = G.coefX a i := by
+theorem coefX_add_low
+    {T : E} (G : FlagG S r T)
+    (i : Fin r)
+    {a b : S.V} (ha : a ∈ G.Xa (i.val + 1)) (hb : b ∈ G.Xa i.val)
+    : G.coefX (a + b) i = G.coefX a i := by
   obtain ⟨c, w, hw, rfl⟩ := xa_succ_decomp G i ha
   rw [add_assoc, coefX_single_add G i c (Submodule.add_mem _ hw hb), coefX_single_add G i c hw]
 
-theorem xa_le_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
-    (h : ∀ a : Fin r, G'.e a - G.e a ∈ G.Xa a.val) (k : ℕ) : G.Xa k ≤ G'.Xa k := by
+theorem xa_le_of
+    {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'} (h : ∀ a : Fin r, G'.e a - G.e a ∈ G.Xa a.val)
+    (k : ℕ)
+    : G.Xa k ≤ G'.Xa k := by
   induction k with
   | zero =>
     rw [FlagG.Xa, Submodule.span_le]
@@ -93,9 +102,11 @@ theorem xa_le_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
     rw [sub_sub_cancel] at h3
     exact h3
 
-theorem coefX_eq_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
-    (h : ∀ a : Fin r, G'.e a - G.e a ∈ G.Xa a.val) (i : Fin r) {v : S.V} (hv : v ∈ G.Xa (i.val + 1)) :
-    G'.coefX v i = G.coefX v i := by
+theorem coefX_eq_of
+    {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'} (h : ∀ a : Fin r, G'.e a - G.e a ∈ G.Xa a.val)
+    (i : Fin r)
+    {v : S.V} (hv : v ∈ G.Xa (i.val + 1))
+    : G'.coefX v i = G.coefX v i := by
   obtain ⟨c, w, hw, rfl⟩ := xa_succ_decomp G i hv
   have hle := xa_le_of h i.val
   have h1 : c • G.e i + w = c • G'.e i + (w - c • (G'.e i - G.e i)) := by
@@ -104,8 +115,9 @@ theorem coefX_eq_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
   rw [coefX_single_add G i c hw, h1,
     coefX_single_add G' i c (hle (Submodule.sub_mem _ hw (Submodule.smul_mem _ _ (h i))))]
 
-theorem fvec_succ_image_mem {T : E} {G : FlagG S r T} {Y : S.V →ₗ[E] S.V} (hY : Y ∈ G.LieN) (i : Fin r) :
-    Y (G.fvec i.succ) ∈ G.Xa (i.val + 1) := by
+theorem fvec_succ_image_mem
+    {T : E} {G : FlagG S r T} {Y : S.V →ₗ[E] S.V} (hY : Y ∈ G.LieN) (i : Fin r)
+    : Y (G.fvec i.succ) ∈ G.Xa (i.val + 1) := by
   obtain ⟨_, hflag, hperp⟩ := hY
   by_cases hi : i.val + 1 < r
   · have hfv : G.fvec i.succ = G.e ⟨i.val + 1, hi⟩ := by
@@ -123,9 +135,11 @@ theorem fvec_succ_image_mem {T : E} {G : FlagG S r T} {Y : S.V →ₗ[E] S.V} (h
     rw [hfv, hir, xa_r]
     exact hperp _ (z_mem_perp G)
 
-theorem ell_eq_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
-    (h : ∀ i : Fin (r + 1), G'.fvec i - G.fvec i ∈ G.Xa i.val) {Y : S.V →ₗ[E] S.V} (hY : Y ∈ G.LieN) :
-    G'.ell Y = G.ell Y := by
+theorem ell_eq_of
+    {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
+    (h : ∀ i : Fin (r + 1), G'.fvec i - G.fvec i ∈ G.Xa i.val)
+    {Y : S.V →ₗ[E] S.V} (hY : Y ∈ G.LieN)
+    : G'.ell Y = G.ell Y := by
   obtain ⟨hU, hflag, hperp⟩ := hY
   have he : ∀ a : Fin r, G'.e a - G.e a ∈ G.Xa a.val := by
     intro a
@@ -143,8 +157,10 @@ theorem ell_eq_of {T T' : E} {G : FlagG S r T} {G' : FlagG S r T'}
   rw [h3, coefX_eq_of he i (Submodule.add_mem _ h1 (xa_mono G (Nat.le_succ _) h2)),
     coefX_add_low G i h1 h2]
 
-theorem relevant_of_inSF (K : Type) [Field K] [Algebra K E] {T T' : E} {F : LFlag S r T}
-    {F' : LFlag S r T'} (h : InSF F F') : Relevant K F.fl F'.fl := by
+theorem relevant_of_inSF
+    (K : Type) [Field K] [Algebra K E]
+    {T T' : E} {F : LFlag S r T} {F' : LFlag S r T'} (h : InSF F F')
+    : Relevant K F.fl F'.fl := by
   intro Y hY
   have hfv : ∀ i : Fin (r + 1), F'.fl.fvec i - F.fl.fvec i ∈ F.fl.Xa i.val := by
     intro i

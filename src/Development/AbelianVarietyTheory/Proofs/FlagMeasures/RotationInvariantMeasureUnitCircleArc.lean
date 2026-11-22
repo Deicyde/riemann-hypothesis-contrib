@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BlkExt
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.Tube
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.Tube
 open scoped InnerProductSpace ENNReal ComplexConjugate NNReal
 
 noncomputable section
@@ -16,8 +17,7 @@ local instance factTwoPiPos : Fact (0 < 2 * Real.pi) := ⟨Real.two_pi_pos⟩
 
 def par (x : AddCircle (2 * Real.pi)) : ℂ := (AddCircle.toCircle x : Circle)
 
-theorem continuous_par : Continuous par :=
-  continuous_subtype_val.comp AddCircle.continuous_toCircle
+theorem continuous_par : Continuous par := continuous_subtype_val.comp AddCircle.continuous_toCircle
 
 theorem par_injective : Function.Injective par := fun _ _ h =>
   AddCircle.injective_toCircle Real.two_pi_pos.ne' (Circle.ext h)
@@ -42,8 +42,8 @@ theorem range_par : Set.range par = {z | ‖z‖ = 1} := by
     rw [show ‖z‖ = 1 from hz] at this
     simpa using this
 
-theorem image_ball (r : ℝ) :
-    par '' Metric.ball 0 r = (fun θ : ℝ => Complex.exp (θ * Complex.I)) '' Metric.ball 0 r := by
+theorem image_ball (r : ℝ)
+    : par '' Metric.ball 0 r = (fun θ : ℝ => Complex.exp (θ * Complex.I)) '' Metric.ball 0 r := by
   ext z
   constructor
   · rintro ⟨x, hx, rfl⟩
@@ -55,10 +55,12 @@ theorem image_ball (r : ℝ) :
     rw [mem_ball_zero_iff, QuotientAddGroup.norm_lt_iff]
     exact ⟨s, rfl, mem_ball_zero_iff.1 hs⟩
 
-theorem measure_arc : ∀ (τ : Measure ℂ) (ρ : ℝ), τ Set.univ < ⊤ → τ {z | ‖z‖ ≠ 1} = 0 →
-    (∀ u : ℂ, ‖u‖ = 1 → τ.map (fun z => u * z) = τ) → 0 < ρ → ρ ≤ Real.pi →
-    τ ((fun θ : ℝ => Complex.exp (θ * Complex.I)) '' Metric.ball 0 ρ) =
-      τ Set.univ * ENNReal.ofReal (ρ / Real.pi) := by
+theorem measure_arc
+    : ∀ (τ : Measure ℂ) (ρ : ℝ),
+      τ Set.univ < ⊤ → τ {z | ‖z‖ ≠ 1} = 0 → (∀ u : ℂ, ‖u‖ = 1 → τ.map (fun z => u * z) = τ) → 0 < ρ
+        → ρ ≤ Real.pi
+        → τ ((fun θ : ℝ => Complex.exp (θ * Complex.I)) '' Metric.ball 0 ρ)
+          = τ Set.univ * ENNReal.ofReal (ρ / Real.pi) := by
   intro τ ρ hfin hsupp hinv hρ hρπ
   haveI : IsFiniteMeasure τ := ⟨hfin⟩
   have hm : MeasurableEmbedding par :=
@@ -92,8 +94,9 @@ theorem measure_arc : ∀ (τ : Measure ℂ) (ρ : ℝ), τ Set.univ < ⊤ → �
     ⟨_, Measure.isAddLeftInvariant_eq_smul ν volume⟩
   have hu : τ Set.univ = t * ENNReal.ofReal (2 * Real.pi) := by
     have h1 := hνa Set.univ
-    rw [ht, Measure.smul_apply, AddCircle.measure_univ, Set.image_univ, range_par,
-      ENNReal.smul_def, smul_eq_mul] at h1
+    rw [ht, Measure.smul_apply, AddCircle.measure_univ, Set.image_univ, range_par, ENNReal.smul_def,
+        smul_eq_mul]
+      at h1
     rw [h1]
     apply measure_congr
     exact (ae_eq_univ.2 hsupp).symm

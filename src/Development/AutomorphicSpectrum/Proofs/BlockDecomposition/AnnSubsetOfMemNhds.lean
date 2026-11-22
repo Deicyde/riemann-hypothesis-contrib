@@ -9,15 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTr
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil GlobalTheory.CompanionTheory.MirFourier ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil
+  GlobalTheory.CompanionTheory.MirFourier ValuativeRel
 open scoped Topology
 
 namespace GlobalTheory.CompanionTheory.MirFourier
 
-theorem ann_subset_of_mem_nhds {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle) (hψ : ψ ≠ 1) (n : ℕ)
-    {S : Set (Multiplicative (Fin n → k))} (hS : S ∈ 𝓝 (1 : Multiplicative (Fin n → k))) :
-    ∃ t : kˣ, (ann ψ n t : Set (Multiplicative (Fin n → k))) ⊆ S := by
+theorem ann_subset_of_mem_nhds
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ψ : AddChar k Circle) (hψ : ψ ≠ 1)
+    (n : ℕ)
+    {S : Set (Multiplicative (Fin n → k))} (hS : S ∈ 𝓝 (1 : Multiplicative (Fin n → k)))
+    : ∃ t : kˣ, (ann ψ n t : Set (Multiplicative (Fin n → k))) ⊆ S := by
   obtain ⟨y, hy⟩ : ∃ y, ψ y ≠ 1 := by
     by_contra h
     push Not at h
@@ -37,8 +40,9 @@ theorem ann_subset_of_mem_nhds {k : Type} [Field k] [ValuativeRel k] [Topologica
       intro h0
       rw [h0, map_zero] at hlt'
       exact not_lt_zero hlt'
-    have hmem : Multiplicative.ofAdd (Pi.single i (y / x.toAdd i) : Fin n → k) ∈ polyBall n
-        (Units.mk0 y hy0 * s⁻¹) := by
+    have hmem
+        : Multiplicative.ofAdd (Pi.single i (y / x.toAdd i) : Fin n → k)
+          ∈ polyBall n (Units.mk0 y hy0 * s⁻¹) := by
       intro j
       by_cases hj : j = i
       · subst hj

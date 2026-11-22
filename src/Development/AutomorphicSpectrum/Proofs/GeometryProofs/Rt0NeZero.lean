@@ -7,19 +7,24 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsOver
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.FamEx
 
-theorem rt0_conj_neg_ne_zero {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) : starRingEnd ℂ H.rt0 = -H.rt0 := by
+theorem rt0_conj_neg_ne_zero {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : starRingEnd ℂ H.rt0 = -H.rt0 := by
   have hsq := H.sqrt_neg_disc_sq
   have hd : (H.d : ℝ) ≠ 0 := by exact_mod_cast H.d_prime.ne_zero
   have him := congrArg Complex.im hsq
   have hre := congrArg Complex.re hsq
   simp only [sq, Complex.mul_im, Complex.mul_re, Complex.neg_im, Complex.neg_re, Complex.natCast_im,
-    Complex.natCast_re] at him hre
+      Complex.natCast_re]
+    at him hre
   have h0 : H.rt0.re = 0 := by
     by_contra h
     have hi : H.rt0.im = 0 := by
@@ -30,7 +35,8 @@ theorem rt0_conj_neg_ne_zero {E : Type} [Field E] [NumberField E] [IsCMField E] 
     nlinarith [mul_self_nonneg H.rt0.re]
   apply Complex.ext <;> simp [h0]
 
-theorem rt0_ne_zero {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) : H.rt0 ≠ 0 := by
+theorem rt0_ne_zero {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.rt0 ≠ 0 := by
   intro h
   have hsq := H.sqrt_neg_disc_sq
   rw [h] at hsq

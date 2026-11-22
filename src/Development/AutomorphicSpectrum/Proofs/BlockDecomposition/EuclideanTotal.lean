@@ -11,8 +11,9 @@ open scoped NNReal ENNReal ComplexConjugate
 
 namespace GlobalTheory.CompanionTheory.ThTot.EucT
 
-variable {Z : Type} [NormedAddCommGroup Z] [NormedSpace ℝ Z] [FiniteDimensional ℝ Z]
-  [MeasurableSpace Z] [BorelSpace Z]
+variable
+  {Z : Type} [NormedAddCommGroup Z] [NormedSpace ℝ Z] [FiniteDimensional ℝ Z] [MeasurableSpace Z]
+  [BorelSpace Z]
 
 lemma exp_bound (a b : ℝ) (ha : 0 < a) (n : ℕ) (r : ℝ) (hr : 0 ≤ r) :
     Real.exp (b * r - a * r ^ 2) ≤
@@ -264,17 +265,25 @@ theorem eucTotal : EucTotal := by
     rw [norm_mul, hgz, mul_assoc]
     exact mul_le_mul (hB z) (hg z) (gpos z).le hB0
   have hre : ∀ z, (w z * (g z : ℂ)).re = 0 := by
-    refine real_zero lam (fun z => (w z * (g z : ℂ)).re) (by fun_prop) (B * C) a ha hK
-      (fun z => (show ‖(w z * (g z : ℂ)).re‖ ≤ ‖w z * (g z : ℂ)‖ by
-        rw [Real.norm_eq_abs]; exact Complex.abs_re_le_norm _).trans (hFb z)) ?_
+    refine real_zero lam
+      (fun z => (w z * (g z : ℂ)).re)
+      (by fun_prop) (B * C) a ha hK
+      (fun z =>
+        (show ‖(w z * (g z : ℂ)).re‖ ≤ ‖w z * (g z : ℂ)‖ by
+          rw [Real.norm_eq_abs]; exact Complex.abs_re_le_norm _).trans (hFb z))
+      ?_
     intro ℓ n
     have := Complex.reCLM.integral_comp_comm (int_mom lam _ hF (B * C) a ha hK hFb ℓ n)
     rw [hmom ℓ n] at this
     simpa only [Complex.reCLM_apply, Complex.smul_re, smul_eq_mul, Complex.zero_re] using this
   have him : ∀ z, (w z * (g z : ℂ)).im = 0 := by
-    refine real_zero lam (fun z => (w z * (g z : ℂ)).im) (by fun_prop) (B * C) a ha hK
-      (fun z => (show ‖(w z * (g z : ℂ)).im‖ ≤ ‖w z * (g z : ℂ)‖ by
-        rw [Real.norm_eq_abs]; exact Complex.abs_im_le_norm _).trans (hFb z)) ?_
+    refine real_zero lam
+      (fun z => (w z * (g z : ℂ)).im)
+      (by fun_prop) (B * C) a ha hK
+      (fun z =>
+        (show ‖(w z * (g z : ℂ)).im‖ ≤ ‖w z * (g z : ℂ)‖ by
+          rw [Real.norm_eq_abs]; exact Complex.abs_im_le_norm _).trans (hFb z))
+      ?_
     intro ℓ n
     have := Complex.imCLM.integral_comp_comm (int_mom lam _ hF (B * C) a ha hK hFb ℓ n)
     rw [hmom ℓ n] at this

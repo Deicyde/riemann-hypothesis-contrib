@@ -6,11 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Loc.PK
 
-theorem UpperTheory.isSquare_sq_sub_four_iff_isSquare_unit :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 → ∀ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ), Cond π n e h x → (IsSquare (τ ^ 2 - 4) ↔ IsSquare (e : O)) := by
+theorem UpperTheory.isSquare_sq_sub_four_iff_isSquare_unit
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0
+        → ∀ (π : O) (n : ℕ) (e : Oˣ) (h : O) (x : Etau K τ),
+          Cond π n e h x → (IsSquare (τ ^ 2 - 4) ↔ IsSquare (e : O)) := by
   intro O K _ _ _ _ _ Δ τ L hD π n e h x hc
   haveI := L.frac
-  have E : (ω - algebraMap O (Etau K τ) h) * (ω - algebraMap O (Etau K τ) h) = algebraMap O (Etau K τ) (π ^ n * π ^ n * e) := by
+  have E
+      : (ω - algebraMap O (Etau K τ) h) * (ω - algebraMap O (Etau K τ) h)
+        = algebraMap O (Etau K τ) (π ^ n * π ^ n * e) := by
     rw [hc.om, add_sub_cancel_left]
     simp only [yy, smul_mul_smul_comm, hc.sq]
     simp only [algebraMap_etau (O := O), Algebra.smul_def, map_mul]

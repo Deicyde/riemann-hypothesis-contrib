@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.LevelPointCoordinates
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 theorem kapJ_eq (P : M.Par) (j : ℕ) : kapJ P j = levelZeroKernel P.k P.r j := rfl
 
@@ -22,7 +23,8 @@ theorem headJ_of (hW : WordInd) (hB : HeadBridge) : HeadJ := by
   rw [hL, hRt]
   congr 1
   funext x
-  rw [hW P.k P.r j hj _ _ (Wq →L[ℂ] Wp) Dm (Fx x) p.T.base.z_mem p.T.base.z'_mem hDm hDmsub (hR x) (Zx x) γ
-    (hZ x).1 hγ (hZ x).2 w (φx x) (hφx x) t ht0 e, kapJ_eq]
+  rw [hW P.k P.r j hj _ _ (Wq →L[ℂ] Wp) Dm (Fx x) p.T.base.z_mem p.T.base.z'_mem hDm hDmsub (hR x)
+      (Zx x) γ (hZ x).1 hγ (hZ x).2 w (φx x) (hφx x) t ht0 e,
+    kapJ_eq]
 
 end Formalism.FourierDecayAlt.P.LevelPointCoordinates

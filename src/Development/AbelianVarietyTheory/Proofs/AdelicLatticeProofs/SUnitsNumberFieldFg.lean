@@ -34,45 +34,50 @@ private lemma exists_unit_of_valuation_eq_one {F : Type} [Field F] [NumberField 
     rw [map_mul, ha, hb, map_one, Units.mul_inv]
   exact ⟨⟨a, b, hab, by rw [mul_comm, hab]⟩, ha⟩
 
-
 open NumberField IsDedekindDomain in
 open scoped WithZero in
-theorem _root_.GlobalTheory.QNorm.sUnits_fg :
-    ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))),
+theorem _root_.GlobalTheory.QNorm.sUnits_fg
+    : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))),
       Group.FG (_root_.GlobalTheory.QNorm.sUnits F S) := by
   intro F _ _ S
   set G := _root_.GlobalTheory.QNorm.sUnits F S
   let val : HeightOneSpectrum (𝓞 F) → G →* Multiplicative ℤ := fun v =>
-    (WithZero.unitsWithZeroEquiv.toMonoidHom.comp
-      (Units.map (v.valuation F : F →* ℤᵐ⁰))).comp G.subtype
+    (WithZero.unitsWithZeroEquiv.toMonoidHom.comp (Units.map (v.valuation F : F →* ℤᵐ⁰))).comp
+      G.subtype
   have hval : ∀ v x, val v x = 1 ↔ v.valuation F ((x : Fˣ) : F) = 1 := by
     intro v x
     simp only [val, MonoidHom.comp_apply, Subgroup.coe_subtype, MulEquiv.coe_toMonoidHom,
       MulEquiv.map_eq_one_iff, Units.ext_iff, Units.coe_map, Units.val_one]
     rfl
-  let f : Additive G →+ (S → ℤ) :=
-    { toFun := fun x v => Multiplicative.toAdd (val v.1 x.toMul)
-      map_zero' := by ext v; simp
-      map_add' := fun x y => by ext v; simp }
-  let ψ : (𝓞 F)ˣ →* G :=
-    { toFun := fun u => ⟨Units.map (algebraMap (𝓞 F) F : (𝓞 F) →* F) u, by
+  let f : Additive G →+ (S → ℤ) := {
+    toFun := fun x v => Multiplicative.toAdd (val v.1 x.toMul)
+    map_zero' := by ext v; simp
+    map_add' := fun x y => by ext v; simp
+  }
+  let ψ : (𝓞 F)ˣ →* G := {
+    toFun := fun u => ⟨
+      Units.map (algebraMap (𝓞 F) F : (𝓞 F) →* F) u,
+      by
         rw [_root_.GlobalTheory.QNorm.mem_sUnits]
         intro v _
-        exact valuation_algebraMap_unit_eq_one v u⟩
-      map_one' := by ext; simp
-      map_mul' := fun u w => by ext; simp }
+        exact valuation_algebraMap_unit_eq_one v u
+    ⟩
+    map_one' := by ext; simp
+    map_mul' := fun u w => by ext; simp
+  }
   let g : Additive (𝓞 F)ˣ →+ Additive G := MonoidHom.toAdditive ψ
   have hker : f.toIntLinearMap.ker = LinearMap.range g.toIntLinearMap := by
     ext x
     simp only [LinearMap.mem_ker, LinearMap.mem_range, AddMonoidHom.coe_toIntLinearMap]
     constructor
     · intro hx
-      obtain ⟨u, hu⟩ := exists_unit_of_valuation_eq_one ((x.toMul : G) : Fˣ) fun v => by
-        by_cases hv : v ∈ S
-        · rw [← hval]
-          have := congrFun hx ⟨v, hv⟩
-          simpa [f] using this
-        · exact (_root_.GlobalTheory.QNorm.mem_sUnits F S _).mp x.toMul.2 v hv
+      obtain ⟨u, hu⟩ :=
+        exists_unit_of_valuation_eq_one ((x.toMul : G) : Fˣ) fun v => by
+          by_cases hv : v ∈ S
+          · rw [← hval]
+            have := congrFun hx ⟨v, hv⟩
+            simpa [f] using this
+          · exact (_root_.GlobalTheory.QNorm.mem_sUnits F S _).mp x.toMul.2 v hv
       refine ⟨Additive.ofMul u, ?_⟩
       apply Additive.toMul.injective
       ext

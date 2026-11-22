@@ -12,16 +12,19 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 section General
 
-variable {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] {K : Type} [Fintype K] {ι : K → Type}
-  [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)]
-  [∀ τ, Module Ω (E τ)]
+variable
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+  {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
 
 structure AdaptedBasis {D : ComponentData II Ψ K ι Ω E} (H : HodgeData D) where
-
   e : ∀ τ, Fin D.N → E τ
   e_indep : ∀ τ, LinearIndependent Ω (e τ)
   e_span : ∀ τ, Submodule.span Ω (Set.range (e τ)) = ⊤
@@ -44,8 +47,7 @@ theorem isBlockMap_xV : IsBlockMap (Sum.inl : K → K ⊕ (Ψ × Fin (D.N - 1)))
   · rintro ⟨k', i⟩ ⟨k, rfl⟩
     exact ⟨⟨k, i⟩, rfl⟩
 
-def ofΩHom : Ω →+* Pl.ΩY :=
-  (algebraMap (MvPolynomial (Ψ × Fin D.N × Fin D.N) Ω) Pl.ΩY).comp C
+def ofΩHom : Ω →+* Pl.ΩY := (algebraMap (MvPolynomial (Ψ × Fin D.N × Fin D.N) Ω) Pl.ΩY).comp C
 
 theorem ofΩHom_apply (x : Ω) : Pl.ofΩHom x = Pl.ofΩ x := rfl
 
@@ -67,9 +69,10 @@ def flagGenericPoint : (Σ k, Pl.ιY k) → Pl.ΩY
 
 def flagPrime : Ideal (MRing Pl.ιY) := mCoordIdeal (Pl.flagGenericPoint B)
 
-theorem mConeMap_flagGenericPoint_rename (f : MRing ι) :
-    mConeMap (Pl.flagGenericPoint B) (rename Pl.xV f) =
-      rename (Sum.inl : K → K ⊕ (Ψ × Fin (D.N - 1))) (MvPolynomial.map Pl.ofΩHom (mConeMap D.y f)) := by
+theorem mConeMap_flagGenericPoint_rename (f : MRing ι)
+    : mConeMap (Pl.flagGenericPoint B) (rename Pl.xV f)
+      = rename (Sum.inl : K → K ⊕ (Ψ × Fin (D.N - 1)))
+        (MvPolynomial.map Pl.ofΩHom (mConeMap D.y f)) := by
   induction f using MvPolynomial.induction_on with
   | C a => simp [mConeMap]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -92,10 +95,10 @@ end PlueckerData
 end General
 
 def HodgeFlagArith.Statement : Prop :=
-  ∀ (II : IntersectionSystem) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (K : Type) [Fintype K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (E : Ψ → Type) [∀ τ, AddCommGroup (E τ)]
-    [∀ τ, Module Ω (E τ)] (D : ComponentData II Ψ K ι Ω E) (Pl : PlueckerData D) (H : HodgeData D)
-    (B : AdaptedBasis H),
+  ∀ (II : IntersectionSystem) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (K : Type) [Fintype K]
+      (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (E : Ψ → Type)
+      [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)] (D : ComponentData II Ψ K ι Ω E)
+      (Pl : PlueckerData D) (H : HodgeData D) (B : AdaptedBasis H),
     IsArithVar (Pl.flagPrime B) (D.n + 1 + D.flagDim0)
 
 namespace Line

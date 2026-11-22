@@ -28,14 +28,16 @@ theorem level_zero_iff (g : B.Mat k r) : g ∈ Q.Glev k r 0 ↔ g ∈ B.GV k r :
   · exact fun h => h.1
   · exact fun h => ⟨h, fun a ha => absurd ha (Nat.not_lt_zero _)⟩
 
-theorem mat_inv_one : (1 : B.Mat k r)⁻¹ = 1 := by
-  simp
+theorem mat_inv_one : (1 : B.Mat k r)⁻¹ = 1 := by simp
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem rho_pOf (D : B.RealPlaceData k r Wp Wq) (a b c d : B.Mat k r) (F : B.Mat k r → (Wq →L[ℂ] Wp)) :
-    B.rho D (pOf a b c d) F = fun x => (D.π a).comp ((F (a⁻¹ * b⁻¹ * x * d * c)).comp (D.π' c⁻¹)) := by
+theorem rho_pOf
+    (D : B.RealPlaceData k r Wp Wq) (a b c d : B.Mat k r) (F : B.Mat k r → (Wq →L[ℂ] Wp))
+    : B.rho D (pOf a b c d) F
+      = fun x => (D.π a).comp ((F (a⁻¹ * b⁻¹ * x * d * c)).comp (D.π' c⁻¹)) := by
   funext x
   simp only [B.rho, B.sgs, pOf, Equiv.apply_symm_apply]
 
@@ -44,18 +46,20 @@ end aux
 theorem equivariant_operators_holds : EquivOps := by
   intro hE k r Wp Wq _ _ _ _ _ D O P hDom hloc hsmul hsm hcomm J hJ
   obtain ⟨hS, hL, hR, hU⟩ := hJ
-  have hext : ∀ g₀ ∈ B.GV k r, g₀ ∈ O → ∃ (f : B.Mat k r → (Wq →L[ℂ] Wp)) (U : Set (B.Mat k r)),
-      B.CkOn ⊤ (B.GV k r) f ∧ HasCompactSupport f ∧ tsupport f ⊆ O ∧ IsOpen U ∧ g₀ ∈ U ∧
-        ∀ x ∈ U, x ∈ B.GV k r → f x = J x :=
-    fun g₀ hg hO => hE k r (Wq →L[ℂ] Wp) O J hDom.1 hS g₀ hg hO
+  have hext
+      : ∀ g₀ ∈ B.GV k r,
+        g₀ ∈ O
+          → ∃ (f : B.Mat k r → (Wq →L[ℂ] Wp)) (U : Set (B.Mat k r)),
+            B.CkOn ⊤ (B.GV k r) f ∧ HasCompactSupport f ∧ tsupport f ⊆ O ∧ IsOpen U ∧ g₀ ∈ U
+              ∧ ∀ x ∈ U, x ∈ B.GV k r → f x = J x := fun g₀ hg hO =>
+    hE k r (Wq →L[ℂ] Wp) O J hDom.1 hS g₀ hg hO
   have one_N : (1 : B.Mat k r) ∈ Q.Nlev k r 0 := ⟨mem_n_one, (level_zero_iff _).2 uh_one⟩
-  have one_S : ∀ z, (1 : B.Mat k r) ∈ Q.Slev k r z 0 :=
-    fun z => ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r z, 1, one_N, by simp⟩
+  have one_S : ∀ z, (1 : B.Mat k r) ∈ Q.Slev k r z 0 := fun z =>
+    ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r z, 1, one_N, by simp⟩
   have hπ1 : D.π 1 = 1 := D.π_rep.1
   have hπ'1 : D.π' 1 = 1 := D.π'_rep.1
   refine ⟨?_, ?_, ?_, ?_⟩
-  ·
-    intro g₀ hg₀
+  · intro g₀ hg₀
     have hgG := (level_zero_iff g₀).1 hg₀.1
     obtain ⟨f, U, hf, _, hfO, hUo, hgU, hfJ⟩ := hext g₀ hgG hg₀.2
     obtain ⟨U', F, hU', hgU', hF, hFe⟩ := hsm f hf hfO g₀ hg₀
@@ -63,13 +67,14 @@ theorem equivariant_operators_holds : EquivOps := by
     intro x hx hxG
     rw [← hFe x hx.2 hxG]
     exact hloc U J f hUo (fun y hy hyG => (hfJ y hy hyG).symm) x hx.1 ((level_zero_iff x).1 hxG)
-  ·
-    intro g hg n hn
+  · intro g hg n hn
     have hgG := (level_zero_iff g).1 hg.1
     have hnN : n ∈ Formalism.QuantumDeterminants.Nset k r := hn.1
     have hnG : n ∈ B.GV k r := hnN.1
     have hng : n * g ∈ O := by
-      have := hDom.2 g hg n ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r D.z, n, hn, by simp⟩ 1 (one_S D.z')
+      have :=
+        hDom.2 g hg n ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r D.z, n, hn, by simp⟩ 1
+          (one_S D.z')
       simpa using this
     have hngG : n * g ∈ B.GV k r := uh_mul hnG hgG
     obtain ⟨f1, U1, hf1, hf1c, hf1O, hU1, hngU1, hf1J⟩ := hext (n * g) hngG hng
@@ -79,7 +84,8 @@ theorem equivariant_operators_holds : EquivOps := by
       · exact mem_n_inv hnN
       · exact Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r D.z'
       · exact mem_n_one
-    have hrho : ∀ F : B.Mat k r → (Wq →L[ℂ] Wp), B.rho D (pOf 1 n⁻¹ 1 1) F = fun x => F (n * x) := by
+    have hrho
+        : ∀ F : B.Mat k r → (Wq →L[ℂ] Wp), B.rho D (pOf 1 n⁻¹ 1 1) F = fun x => F (n * x) := by
       intro F
       rw [rho_pOf]
       funext x
@@ -92,19 +98,23 @@ theorem equivariant_operators_holds : EquivOps := by
     have e1 : P f1 (n * g) = P J (n * g) := hloc U1 f1 J hU1 hf1J (n * g) hngU1 hngG
     have hV : IsOpen ((fun x : B.Mat k r => n * x) ⁻¹' U1 ∩ O) :=
       (hU1.preimage (continuous_const.matrix_mul continuous_id)).inter hDom.1
-    have e2 : P (fun x => f1 (n * x)) g = P (Formalism.QuantumDeterminants.psi k r D.z Formalism.QuantumDeterminants.cStd n • J) g := by
+    have e2
+        : P (fun x => f1 (n * x)) g
+          = P (Formalism.QuantumDeterminants.psi k r D.z Formalism.QuantumDeterminants.cStd n • J)
+            g := by
       refine hloc _ _ _ hV ?_ g ⟨hngU1, hg.2⟩ hgG
       intro x hx hxG
       rw [hf1J (n * x) hx.1 (uh_mul hnG hxG), Pi.smul_apply]
       exact hL x ⟨(level_zero_iff x).2 hxG, hx.2⟩ n hn
     rw [← e1, ← hc, e2, hsmul _ J g hgG]
-  ·
-    intro g hg n hn
+  · intro g hg n hn
     have hgG := (level_zero_iff g).1 hg.1
     have hnN : n ∈ Formalism.QuantumDeterminants.Nset k r := hn.1
     have hnG : n ∈ B.GV k r := hnN.1
     have hgn : g * n ∈ O := by
-      have := hDom.2 g hg 1 (one_S D.z) n ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r D.z', n, hn, by simp⟩
+      have :=
+        hDom.2 g hg 1 (one_S D.z) n
+          ⟨1, Formalism.FourierDecayAlt.P.TBBx2.one_mem_UW k r D.z', n, hn, by simp⟩
       simpa using this
     have hgnG : g * n ∈ B.GV k r := uh_mul hgG hnG
     obtain ⟨f1, U1, hf1, hf1c, hf1O, hU1, hgnU1, hf1J⟩ := hext (g * n) hgnG hgn
@@ -127,14 +137,16 @@ theorem equivariant_operators_holds : EquivOps := by
     have e1 : P f1 (g * n) = P J (g * n) := hloc U1 f1 J hU1 hf1J (g * n) hgnU1 hgnG
     have hV : IsOpen ((fun x : B.Mat k r => x * n) ⁻¹' U1 ∩ O) :=
       (hU1.preimage (continuous_id.matrix_mul continuous_const)).inter hDom.1
-    have e2 : P (fun x => f1 (x * n)) g = P (Formalism.QuantumDeterminants.psi k r D.z' Formalism.QuantumDeterminants.cStd n • J) g := by
+    have e2
+        : P (fun x => f1 (x * n)) g
+          = P (Formalism.QuantumDeterminants.psi k r D.z' Formalism.QuantumDeterminants.cStd n • J)
+            g := by
       refine hloc _ _ _ hV ?_ g ⟨hgnU1, hg.2⟩ hgG
       intro x hx hxG
       rw [hf1J (x * n) hx.1 (uh_mul hxG hnG), Pi.smul_apply]
       exact hR x ⟨(level_zero_iff x).2 hxG, hx.2⟩ n hn
     rw [← e1, ← hc, e2, hsmul _ J g hgG]
-  ·
-    intro g hg h hh h' hh'
+  · intro g hg h hh h' hh'
     have hgG := (level_zero_iff g).1 hg.1
     have hhG : h ∈ B.GV k r := hh.1
     have hh'G : h' ∈ B.GV k r := hh'.1
@@ -151,8 +163,10 @@ theorem equivariant_operators_holds : EquivOps := by
       · exact mem_n_one
       · exact hh'
       · exact mem_n_one
-    have hrho : ∀ F : B.Mat k r → (Wq →L[ℂ] Wp), B.rho D (pOf h⁻¹ 1 h' 1) F =
-        fun x => (D.π h⁻¹).comp ((F (h * x * h')).comp (D.π' h'⁻¹)) := by
+    have hrho
+        : ∀ F : B.Mat k r → (Wq →L[ℂ] Wp),
+          B.rho D (pOf h⁻¹ 1 h' 1) F
+            = fun x => (D.π h⁻¹).comp ((F (h * x * h')).comp (D.π' h'⁻¹)) := by
       intro F
       rw [rho_pOf]
       funext x
@@ -170,16 +184,19 @@ theorem equivariant_operators_holds : EquivOps := by
     have eLv : ∀ w, D.π h⁻¹ (D.π h w) = w := fun w => by simpa using congrArg (fun L => L w) eL
     have eL'v : ∀ w, D.π h (D.π h⁻¹ w) = w := fun w => by simpa using congrArg (fun L => L w) eL'
     have eRv : ∀ w, D.π' h' (D.π' h'⁻¹ w) = w := fun w => by simpa using congrArg (fun L => L w) eR
-    have eR'v : ∀ w, D.π' h'⁻¹ (D.π' h' w) = w := fun w => by simpa using congrArg (fun L => L w) eR'
+    have eR'v : ∀ w, D.π' h'⁻¹ (D.π' h' w) = w := fun w => by
+      simpa using congrArg (fun L => L w) eR'
     have hc := hcomm f1 hf1 hf1c hf1O _ hp g hg.2 hgG
     rw [hrho, hrho] at hc
     have e1 : P f1 (h * g * h') = P J (h * g * h') := hloc U1 f1 J hU1 hf1J _ hhgU1 hhgG
     have hV : IsOpen ((fun x : B.Mat k r => h * x * h') ⁻¹' U1 ∩ O) :=
-      (hU1.preimage ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const)).inter hDom.1
+      (hU1.preimage ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const)).inter
+        hDom.1
     have e2 : P (fun x => (D.π h⁻¹).comp ((f1 (h * x * h')).comp (D.π' h'⁻¹))) g = P J g := by
       refine hloc _ _ _ hV ?_ g ⟨hhgU1, hg.2⟩ hgG
       intro x hx hxG
-      rw [hf1J _ hx.1 (uh_mul (uh_mul hhG hxG) hh'G), hU x ⟨(level_zero_iff x).2 hxG, hx.2⟩ h hh h' hh']
+      rw [hf1J _ hx.1 (uh_mul (uh_mul hhG hxG) hh'G),
+        hU x ⟨(level_zero_iff x).2 hxG, hx.2⟩ h hh h' hh']
       ext v
       simp [eLv, eRv]
     rw [e2] at hc

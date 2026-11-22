@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
+open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic
+  GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
 
 namespace GlobalTheory.IsotypicFactors
 
@@ -16,9 +17,11 @@ section One
 
 variable {H W V : Type} [Group H] [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V]
 
-theorem finiteDimensional_of_isotypic [FiniteDimensional ℂ V] [Nontrivial V]
-    (τ : Representation ℂ H V) (ρ : Representation ℂ H W) (hρ : ρ.IsIrreducible)
-    (h : IsIsotypicOf τ ρ) : FiniteDimensional ℂ W := by
+theorem finiteDimensional_of_isotypic
+    [FiniteDimensional ℂ V] [Nontrivial V]
+    (τ : Representation ℂ H V) (ρ : Representation ℂ H W)
+    (hρ : ρ.IsIrreducible) (h : IsIsotypicOf τ ρ)
+    : FiniteDimensional ℂ W := by
   have : ∃ g : IntertwiningMap ρ τ, g ≠ 0 := by
     by_contra hc
     push Not at hc
@@ -31,8 +34,9 @@ theorem finiteDimensional_of_isotypic [FiniteDimensional ℂ V] [Nontrivial V]
   have hi := (IsIrreducible.injective_or_eq_zero g).resolve_right hg
   exact FiniteDimensional.of_injective g.toLinearMap hi
 
-theorem classSum_scalar [Fintype H] [FiniteDimensional ℂ W] (ρ : Representation ℂ H W)
-    (hρ : ρ.IsIrreducible) (h : H) : ∃ s : ℂ, ∀ w, (∑ k, ρ (k * h * k⁻¹)) w = s • w := by
+theorem classSum_scalar
+    [Fintype H] [FiniteDimensional ℂ W] (ρ : Representation ℂ H W) (hρ : ρ.IsIrreducible) (h : H)
+    : ∃ s : ℂ, ∀ w, (∑ k, ρ (k * h * k⁻¹)) w = s • w := by
   have hT : ∀ g v, (∑ k, ρ (k * h * k⁻¹)) (ρ g v) = ρ g ((∑ k, ρ (k * h * k⁻¹)) v) := by
     intro g v
     set_option synthInstance.maxHeartbeats 100000 in
@@ -41,16 +45,20 @@ theorem classSum_scalar [Fintype H] [FiniteDimensional ℂ W] (ρ : Representati
     refine Finset.sum_congr rfl fun s _ => ?_
     rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
     simp [mul_assoc]
-  obtain ⟨c, hc⟩ := (IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed (ρ := ρ)).2
-    ((∑ k, ρ (k * h * k⁻¹)).intertwiningMap_of_isIntertwiningMap ρ ρ hT)
+  obtain ⟨c, hc⟩ :=
+    (IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed (ρ := ρ)).2
+      ((∑ k, ρ (k * h * k⁻¹)).intertwiningMap_of_isIntertwiningMap ρ ρ hT)
   refine ⟨c, fun v => ?_⟩
   have := congrArg (fun f : IntertwiningMap ρ ρ => f v) hc
   simpa using this.symm
 
-theorem classSum_of_isotypic [Fintype H] (τ : Representation ℂ H V) (ρ : Representation ℂ H W)
-    (hi : IsIsotypicOf τ ρ) (h : H) (s : ℂ) (hs : ∀ w, (∑ k, ρ (k * h * k⁻¹)) w = s • w) :
-    (∑ k, τ (k * h * k⁻¹)) = s • (1 : Module.End ℂ V) := by
-  have : (⊤ : Submodule ℂ V) ≤ LinearMap.eqLocus (∑ k, τ (k * h * k⁻¹)) (s • (1 : Module.End ℂ V)) := by
+theorem classSum_of_isotypic
+    [Fintype H]
+    (τ : Representation ℂ H V) (ρ : Representation ℂ H W) (hi : IsIsotypicOf τ ρ)
+    (h : H) (s : ℂ) (hs : ∀ w, (∑ k, ρ (k * h * k⁻¹)) w = s • w)
+    : (∑ k, τ (k * h * k⁻¹)) = s • (1 : Module.End ℂ V) := by
+  have : (⊤ : Submodule ℂ V)
+      ≤ LinearMap.eqLocus (∑ k, τ (k * h * k⁻¹)) (s • (1 : Module.End ℂ V)) := by
     rw [← (show _ = ⊤ from hi)]
     refine iSup_le fun f => ?_
     rintro _ ⟨w, rfl⟩
@@ -62,10 +70,12 @@ theorem classSum_of_isotypic [Fintype H] (τ : Representation ℂ H V) (ρ : Rep
     exact Finset.sum_congr rfl fun k _ => (f.isIntertwining _ _ _ w).symm
   exact LinearMap.ext fun v => this Submodule.mem_top
 
-theorem card_mul_character {M : Type} [Group M] [Fintype H] (τ : Representation ℂ M V) (f : H →* M)
-    (h : H) (s : ℂ) (hs : (∑ k, τ (f (k * h * k⁻¹))) = s • (1 : Module.End ℂ V)) (a : M)
-    (ha : ∀ k, Commute (f k) a) :
-    (Fintype.card H : ℂ) * τ.character (f h * a) = s * τ.character a := by
+theorem card_mul_character
+    {M : Type} [Group M] [Fintype H]
+    (τ : Representation ℂ M V) (f : H →* M) (h : H) (s : ℂ)
+    (hs : (∑ k, τ (f (k * h * k⁻¹))) = s • (1 : Module.End ℂ V))
+    (a : M) (ha : ∀ k, Commute (f k) a)
+    : (Fintype.card H : ℂ) * τ.character (f h * a) = s * τ.character a := by
   have e := congrArg (fun T => LinearMap.trace ℂ V (T * τ a)) hs
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Finset.sum_mul, map_sum, smul_mul_assoc, one_mul, map_smul, smul_eq_mul] at e
@@ -82,18 +92,19 @@ theorem card_mul_character {M : Type} [Group M] [Fintype H] (τ : Representation
 
 end One
 
-theorem exists_ne_zero {G V W : Type} [Group G] [Finite G] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ V] [FiniteDimensional ℂ W] [Nontrivial V]
-    [Nontrivial W] (ρ : Representation ℂ G V) (σ : Representation ℂ G W)
-    (h : ∀ g, (finrank ℂ W : ℂ) * ρ.character g = (finrank ℂ V : ℂ) * σ.character g) :
-    ∃ f : IntertwiningMap ρ σ, f ≠ 0 := by
+theorem exists_ne_zero
+    {G V W : Type} [Group G] [Finite G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ V] [FiniteDimensional ℂ W] [Nontrivial V] [Nontrivial W]
+    (ρ : Representation ℂ G V) (σ : Representation ℂ G W)
+    (h : ∀ g, (finrank ℂ W : ℂ) * ρ.character g = (finrank ℂ V : ℂ) * σ.character g)
+    : ∃ f : IntertwiningMap ρ σ, f ≠ 0 := by
   have := Fintype.ofFinite G
-  have : Invertible (Nat.card G : ℂ) :=
-    invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  have : Invertible (Nat.card G : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
   have h1 := card_inv_mul_sum_char_mul_char_eq_finrank ρ ρ
   have h2 := card_inv_mul_sum_char_mul_char_eq_finrank ρ σ
-  have h4 : (finrank ℂ W : ℂ) * finrank ℂ (IntertwiningMap ρ ρ)
-      = (finrank ℂ V : ℂ) * finrank ℂ (IntertwiningMap ρ σ) := by
+  have h4
+      : (finrank ℂ W : ℂ) * finrank ℂ (IntertwiningMap ρ ρ)
+        = (finrank ℂ V : ℂ) * finrank ℂ (IntertwiningMap ρ σ) := by
     rw [← h1, ← h2, mul_left_comm, mul_left_comm (finrank ℂ V : ℂ),
       Finset.mul_sum _ _ (finrank ℂ V : ℂ), Finset.mul_sum _ _ (finrank ℂ W : ℂ)]
     congr 1
@@ -102,8 +113,10 @@ theorem exists_ne_zero {G V W : Type} [Group G] [Finite G] [AddCommGroup V] [Mod
   have : Nontrivial (IntertwiningMap ρ ρ) := by
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
     exact ⟨⟨IntertwiningMap.id ρ, 0, fun e => hv (congrArg (fun f : IntertwiningMap ρ ρ => f v) e)⟩⟩
-  have h5 : finrank ℂ W * finrank ℂ (IntertwiningMap ρ ρ)
-      = finrank ℂ V * finrank ℂ (IntertwiningMap ρ σ) := by exact_mod_cast h4
+  have h5
+      : finrank ℂ W * finrank ℂ (IntertwiningMap ρ ρ)
+        = finrank ℂ V * finrank ℂ (IntertwiningMap ρ σ) := by
+    exact_mod_cast h4
   have h3 : 0 < finrank ℂ (IntertwiningMap ρ σ) := by
     have : 0 < finrank ℂ W * finrank ℂ (IntertwiningMap ρ ρ) :=
       Nat.mul_pos Module.finrank_pos Module.finrank_pos
@@ -112,7 +125,19 @@ theorem exists_ne_zero {G V W : Type} [Group G] [Finite G] [AddCommGroup V] [Mod
   have := Module.nontrivial_of_finrank_pos h3
   exact exists_ne 0
 
-theorem exists_intertwining_ne_zero : ∀ (M : Type) [Group M] [Finite M] (ι : Type) [Finite ι] (H : ι → Type) [∀ c, Group (H c)] [∀ c, Finite (H c)] (f : ∀ c, H c →* M), (⨆ c, (f c).range) = ⊤ → (∀ c c', c ≠ c' → ∀ (x : H c) (y : H c'), Commute (f c x) (f c' y)) → ∀ (W : ι → Type) [∀ c, AddCommGroup (W c)] [∀ c, Module ℂ (W c)] (ρ : ∀ c, Representation ℂ (H c) (W c)), (∀ c, (ρ c).IsIrreducible) → ∀ (V V' : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V] [AddCommGroup V'] [Module ℂ V'] [FiniteDimensional ℂ V'] [Nontrivial V'] (τ : Representation ℂ M V) (τ' : Representation ℂ M V'), (∀ c, IsIsotypicOf (show Representation ℂ (H c) V from τ.comp (f c)) (ρ c)) → (∀ c, IsIsotypicOf (show Representation ℂ (H c) V' from τ'.comp (f c)) (ρ c)) → ∃ T : Representation.IntertwiningMap τ τ', T ≠ 0 := by
+theorem exists_intertwining_ne_zero
+    : ∀ (M : Type) [Group M] [Finite M] (ι : Type) [Finite ι] (H : ι → Type) [∀ c, Group (H c)]
+        [∀ c, Finite (H c)] (f : ∀ c, H c →* M),
+      (⨆ c, (f c).range) = ⊤ → (∀ c c', c ≠ c' → ∀ (x : H c) (y : H c'), Commute (f c x) (f c' y))
+        → ∀ (W : ι → Type) [∀ c, AddCommGroup (W c)] [∀ c, Module ℂ (W c)]
+            (ρ : ∀ c, Representation ℂ (H c) (W c)),
+          (∀ c, (ρ c).IsIrreducible)
+            → ∀ (V V' : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]
+                [AddCommGroup V'] [Module ℂ V'] [FiniteDimensional ℂ V'] [Nontrivial V']
+                (τ : Representation ℂ M V) (τ' : Representation ℂ M V'),
+              (∀ c, IsIsotypicOf (show Representation ℂ (H c) V from τ.comp (f c)) (ρ c))
+                → (∀ c, IsIsotypicOf (show Representation ℂ (H c) V' from τ'.comp (f c)) (ρ c))
+                → ∃ T : Representation.IntertwiningMap τ τ', T ≠ 0 := by
   intro M _ _ ι _ H _ _ f htop hcomm W _ _ ρ hρ V V' _ _ _ _ _ _ _ _ τ τ' hτ hτ'
   classical
   have := Fintype.ofFinite ι
@@ -122,9 +147,10 @@ theorem exists_intertwining_ne_zero : ∀ (M : Type) [Group M] [Finite M] (ι : 
   obtain ⟨h, rfl⟩ : m ∈ (MonoidHom.noncommPiCoprod f hcomm').range := by
     rw [MonoidHom.noncommPiCoprod_range, htop]
     exact Subgroup.mem_top m
-  have key : ∀ (S : Finset ι) (comm : (S : Set ι).Pairwise (Function.onFun Commute fun i => f i (h i))),
-      (finrank ℂ V' : ℂ) * τ.character (S.noncommProd (fun i => f i (h i)) comm)
-        = (finrank ℂ V : ℂ) * τ'.character (S.noncommProd (fun i => f i (h i)) comm) := by
+  have key
+      : ∀ (S : Finset ι) (comm : (S : Set ι).Pairwise (Function.onFun Commute fun i => f i (h i))),
+        (finrank ℂ V' : ℂ) * τ.character (S.noncommProd (fun i => f i (h i)) comm)
+          = (finrank ℂ V : ℂ) * τ'.character (S.noncommProd (fun i => f i (h i)) comm) := by
     intro S
     induction S using Finset.induction_on with
     | empty => intro comm; simp [mul_comm]
@@ -138,7 +164,8 @@ theorem exists_intertwining_ne_zero : ∀ (M : Type) [Group M] [Finite M] (ι : 
         Finset.noncommProd_commute _ _ _ _ fun i hi => hcomm c i (fun e => hc (e ▸ hi)) _ _
       have hcard : (Fintype.card (H c) : ℂ) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
       refine mul_left_cancel₀ hcard ?_
-      rw [mul_left_comm, card_mul_character τ (f c) (h c) s (classSum_of_isotypic _ _ (hτ c) _ _ hs) _ (ha _),
+      rw [mul_left_comm,
+        card_mul_character τ (f c) (h c) s (classSum_of_isotypic _ _ (hτ c) _ _ hs) _ (ha _),
         mul_left_comm (Fintype.card (H c) : ℂ),
         card_mul_character τ' (f c) (h c) s (classSum_of_isotypic _ _ (hτ' c) _ _ hs) _ (ha _),
         mul_left_comm, ih, mul_left_comm]

@@ -10,7 +10,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8 (K2)
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
@@ -72,7 +73,8 @@ def unif (w : Pl E) : w.adicCompletion E := Classical.epsilon (IsUnifV E w)
 def fn1 (n : ℕ) (w : Pl E) (e : Ex (Fin (n + 1))) : GLw n w → ℂ :=
   e.fn (KGL w (n := n)) fun j : Fin (n + 1) => Tj ℂ n (Ov E w) (unif w) j
 
-def ev1 (n : ℕ) (w : Pl E) (e : Ex (Fin (n + 1))) (B : Multiset ℂˣ) : ℂ := e.ev fun j : Fin (n + 1) => satEig (qV E w) n B j
+def ev1 (n : ℕ) (w : Pl E) (e : Ex (Fin (n + 1))) (B : Multiset ℂˣ) : ℂ :=
+  e.ev fun j : Fin (n + 1) => satEig (qV E w) n B j
 
 def fn2 (a b : ℕ) (w : Pl E) (e : Ex (Fin (a + 1) × Fin (b + 1))) : GLw a w × GLw b w → ℂ :=
   e.fn (K2 a b w) fun p y => Tj ℂ a (Ov E w) (unif w) p.1 y.1 * Tj ℂ b (Ov E w) (unif w) p.2 y.2
@@ -89,12 +91,14 @@ structure CD (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) where
   pos : ∀ i, 1 ≤ N i
   sum : ∑ i, N i = n
 
-def CD.nil (E : Type) [Field E] [NumberField E] [IsCMField E] : CD E 0 := ⟨0, Fin.elim0, fun i => i.elim0, fun i => i.elim0, rfl⟩
+def CD.nil (E : Type) [Field E] [NumberField E] [IsCMField E] : CD E 0 :=
+  ⟨0, Fin.elim0, fun i => i.elim0, fun i => i.elim0, rfl⟩
 
 def CD.Sat (D : CD E n) (w : Pl E) (B : Multiset ℂˣ) : Prop :=
   ∃ b : Fin D.c → Multiset ℂˣ, (∀ i, (D.P i).HasSat w (b i)) ∧ ∑ i, b i = B
 
-def CD.Has {m : ℕ} (D : CD E n) (π : CuspSub E m) : Prop := ∃ i, (⟨D.N i, D.P i⟩ : Σ k, CG E k) = ⟨m, CG.mk π⟩
+def CD.Has {m : ℕ} (D : CD E n) (π : CuspSub E m) : Prop :=
+  ∃ i, (⟨D.N i, D.P i⟩ : Σ k, CG E k) = ⟨m, CG.mk π⟩
 
 def Off (Z : Finset (Pl E)) (w : Pl E) : Prop := w ∉ Z ∧ cPl w ∉ Z
 
@@ -103,14 +107,26 @@ def SplitIn (S : Set (Pl E)) (Z : Finset (Pl E)) : Prop := ∀ w ∈ Z, w ∈ S 
 def Lc {G : Type} [Group G] [TopologicalSpace G] (K : Subgroup G) (f : G → ℂ) : Prop :=
   ∃ K' : Subgroup G, IsOpen (K' : Set G) ∧ K' ≤ K ∧ IsHecke K' f
 
-def trc {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K : Subgroup G) (f : G → ℂ) : ℂ :=
+def trc
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (K : Subgroup G) (f : G → ℂ)
+    : ℂ :=
   twTr ρ K (K ⊓ rStab f ⊓ rStab fun y => f y⁻¹) f LinearMap.id
 
-def fam (Z T : Finset (Pl E)) (φ : ∀ w : Pl E, GLw a w × GLw b w → ℂ) (e₁ e₂ : Pl E → Ex (Fin (a + 1) × Fin (b + 1)))
-    (k : ℕ) (w : Pl E) : GLw a w × GLw b w → ℂ :=
-  if w ∈ Z then φ w else if w ∈ T then fn2 a b w (((e₁ w).pow k).mul ((e₂ w).pow k)) else (K2 a b w : Set _).indicator 1
+def fam
+    (Z T : Finset (Pl E)) (φ : ∀ w : Pl E, GLw a w × GLw b w → ℂ)
+    (e₁ e₂ : Pl E → Ex (Fin (a + 1) × Fin (b + 1))) (k : ℕ) (w : Pl E)
+    : GLw a w × GLw b w → ℂ :=
+  if w ∈ Z then
+    φ w
+  else if w ∈ T then
+    fn2 a b w (((e₁ w).pow k).mul ((e₂ w).pow k))
+  else
+    (K2 a b w : Set _).indicator 1
 
-def val (T : Finset (Pl E)) (e₁ e₂ : Pl E → Ex (Fin (a + 1) × Fin (b + 1))) (B₁ B₂ : Pl E → Multiset ℂˣ) : ℂ :=
+def val
+    (T : Finset (Pl E)) (e₁ e₂ : Pl E → Ex (Fin (a + 1) × Fin (b + 1))) (B₁ B₂ : Pl E → Multiset ℂˣ)
+    : ℂ :=
   ∏ w ∈ T, ev2 a b w (e₁ w) (B₁ w) (B₂ w) * ev2 a b w (e₂ w) (inv (B₁ (cPl w))) (inv (B₂ (cPl w)))
 
 def Small (ρ : ℝ) (x : ℕ → ℂ) : Prop := ∃ (C : ℝ) (N : ℕ), ∀ k, ‖x k‖ ≤ C * (1 + k) ^ N * ρ ^ k

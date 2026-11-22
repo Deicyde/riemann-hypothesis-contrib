@@ -8,17 +8,43 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TowerRestrictChar
 
-theorem continuous_char : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E) (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E), GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.IsIsoSplit V V' C B → ∀ (ψ : AddChar (AF D.host.F) ℂ) (χS χT χS' χT' : (AE D)ˣ →* Circle) (ω : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)) (ω' : GA D V' × GA D W →* Module.End ℂ (WO V' W → ℂ)), IsWeilDatumO ψ V W χS χT ω → IsWeilDatumO ψ V' W χS' χT' ω' → ∀ (μ : Measure (Mx D W.rank r)) (𝓨 : Set (Mx D W.rank r)), IsCovolOne (GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.ratMx D W.rank r) μ 𝓨 → ∀ c : GA D W →* Circle, (∀ h f, IsThetaFunO ψ V W f → GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.res V V' W C B μ 𝓨 (ω (1, h) f) = (c h : ℂ) • ω' (1, h) (GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.res V V' W C B μ 𝓨 f)) → Continuous c := by
+theorem continuous_char
+    : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
+        (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E),
+      GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.IsIsoSplit V V' C B
+        → ∀ (ψ : AddChar (AF D.host.F) ℂ) (χS χT χS' χT' : (AE D)ˣ →* Circle)
+            (ω : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ))
+            (ω' : GA D V' × GA D W →* Module.End ℂ (WO V' W → ℂ)),
+          IsWeilDatumO ψ V W χS χT ω → IsWeilDatumO ψ V' W χS' χT' ω'
+            → ∀ (μ : Measure (Mx D W.rank r)) (𝓨 : Set (Mx D W.rank r)),
+              IsCovolOne
+                  (GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.ratMx D
+                    W.rank r)
+                  μ 𝓨
+                → ∀ c : GA D W →* Circle,
+                  (∀ h f,
+                      IsThetaFunO ψ V W f
+                        → GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.res
+                            V V' W C B μ 𝓨 (ω (1, h) f)
+                          = (c h : ℂ) • ω' (1, h)
+                            (GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.res
+                              V V' W C B μ 𝓨 f))
+                    → Continuous c := by
   intro D V V' W r C B hs ψ χS χT χS' χT' ω ω' hω hω' μ 𝓨 hμ c hc
   have hg4 : SecondCountableTopology (GA D W) := by
     obtain ⟨h1, h2, h3⟩ := Formalism.IndefR.Eqv.G5.af_facts D.host.F
     exact (Formalism.IndefR.Eqv.G5.ha_facts (AF D.host.F) D.sp.cm.deg2 D.sp.cm.sig W.gram).2.2.2.1
-  have hres := GlobalTheory.T.thetaRestrictIsotropicQuotient_wittTower_properties D V V' W r C B hs ψ hω.std μ 𝓨 hμ
+  have hres :=
+    GlobalTheory.T.thetaRestrictIsotropicQuotient_wittTower_properties D V V' W r C B hs ψ hω.std μ
+      𝓨 hμ
   obtain ⟨f₀, hf₀, hne⟩ := hres.2
   haveI : IsFiniteMeasure (μ.restrict 𝓨) :=
     ⟨by rw [Measure.restrict_apply_univ, hμ.2.2]; exact ENNReal.one_lt_top⟩
@@ -50,17 +76,16 @@ theorem continuous_char : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (F
   have hNc : ContinuousAt Nu h₀ := by
     haveI : SecondCountableTopology (GA D W) := hg4
     obtain ⟨K, hK, hKn⟩ := exists_compact_mem_nhds h₀
-    obtain ⟨c₀, hc₀⟩ := GlobalTheory.WeilSupBound.exists_sup_bound D ψ V W χS χT ω hω f₀ hf₀
-      ({(1 : GA D V)} ×ˢ K) (isCompact_singleton.prod hK)
+    obtain ⟨c₀, hc₀⟩ :=
+      GlobalTheory.WeilSupBound.exists_sup_bound D ψ V W χS χT ω hω f₀ hf₀ ({(1 : GA D V)} ×ˢ K)
+        (isCompact_singleton.prod hK)
     refine MeasureTheory.continuousAt_of_dominated (bound := fun _ => c₀) ?_ ?_ ?_ ?_
     · exact Filter.Eventually.of_forall fun h =>
         ((hres.1 _ (hω.om_pres _ _ hf₀)).1 x).aestronglyMeasurable
     · filter_upwards [hKn] with h hh
-      exact Filter.Eventually.of_forall fun y =>
-        hc₀ ((1 : GA D V), h) ⟨rfl, hh⟩ _
+      exact Filter.Eventually.of_forall fun y => hc₀ ((1 : GA D V), h) ⟨rfl, hh⟩ _
     · exact integrable_const c₀
-    · exact Filter.Eventually.of_forall fun y =>
-        ((hω.om_cont f₀ hf₀ _).comp hcont1).continuousAt
+    · exact Filter.Eventually.of_forall fun y => ((hω.om_cont f₀ hf₀ _).comp hcont1).continuousAt
 
   have hq : ∀ h, Nu h = (c h : ℂ) * Dn h := fun h => by
     have := congrFun (hc h f₀ hf₀) x

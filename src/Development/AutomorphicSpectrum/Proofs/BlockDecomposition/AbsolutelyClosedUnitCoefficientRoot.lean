@@ -6,15 +6,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Absolute
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.UnitRoot
 
 open Polynomial
 
-theorem coeff_prod_mem {S : Type} [CommRing S] (m : Ideal S) (s : Multiset S)
-    (h : ∀ b ∈ s, b ∈ m) :
-    ∀ k < Multiset.card s, ((s.map fun b => (X : S[X]) - C b).prod).coeff k ∈ m := by
+theorem coeff_prod_mem {S : Type} [CommRing S] (m : Ideal S) (s : Multiset S) (h : ∀ b ∈ s, b ∈ m)
+    : ∀ k < Multiset.card s, ((s.map fun b => (X : S[X]) - C b).prod).coeff k ∈ m := by
   induction s using Multiset.induction_on with
   | empty => intro k hk; simp at hk
   | cons a s ih =>
@@ -31,20 +31,19 @@ theorem coeff_prod_mem {S : Type} [CommRing S] (m : Ideal S) (s : Multiset S)
       simp only [coeff_sub, coeff_X_mul, coeff_C_mul]
       exact m.sub_mem (ih' k (by omega)) (m.mul_mem_right _ ha)
 
-theorem exists_root : ∀ {S : Type} [CommRing S] , Aic (S := S) →
-    (∀ a b : S, IsUnit (a + b) → IsUnit a ∨ IsUnit b) →
-    ∀ (Q : Polynomial S) (i : ℕ), Q.coeff 0 = 1 → 0 < i → IsUnit (Q.coeff i) →
-      ∃ y, Q.eval y = 0 := by
+theorem exists_root
+    : ∀ {S : Type} [CommRing S],
+      Aic (S := S) → (∀ a b : S, IsUnit (a + b) → IsUnit a ∨ IsUnit b)
+        → ∀ (Q : Polynomial S) (i : ℕ),
+          Q.coeff 0 = 1 → 0 < i → IsUnit (Q.coeff i) → ∃ y, Q.eval y = 0 := by
   intro S _ hA hL Q i h0 hi hu
   rcases subsingleton_or_nontrivial S with hs | hn
   · exact ⟨0, Subsingleton.elim _ _⟩
   haveI : IsLocalRing S := IsLocalRing.of_isUnit_or_isUnit_of_isUnit_add hL
   have htd : Q.natTrailingDegree = 0 :=
     Nat.le_zero.mp (natTrailingDegree_le_of_ne_zero (by rw [h0]; exact one_ne_zero))
-  have hmon : Q.reverse.Monic := by
-    rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, h0]
-  have hdeg : Q.reverse.natDegree = Q.natDegree := by
-    rw [reverse_natDegree, htd]; rfl
+  have hmon : Q.reverse.Monic := by rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, h0]
+  have hdeg : Q.reverse.natDegree = Q.natDegree := by rw [reverse_natDegree, htd]; rfl
   have hid : i ≤ Q.natDegree := le_natDegree_of_ne_zero hu.ne_zero
   obtain ⟨s, hs⟩ := GlobalTheory.T.absolutely_closed_polynomial_splits hA _ hmon
   have hcard : Multiset.card s = Q.natDegree := by
@@ -70,8 +69,7 @@ theorem exists_root : ∀ {S : Type} [CommRing S] , Aic (S := S) →
   · exfalso
     have hall : ∀ b ∈ s, b ∈ IsLocalRing.maximalIdeal S := fun b hb =>
       (IsLocalRing.mem_maximalIdeal b).mpr fun hbu => hex ⟨b, hb, hbu⟩
-    have hmem := coeff_prod_mem (IsLocalRing.maximalIdeal S) s hall (Q.natDegree - i)
-      (by omega)
+    have hmem := coeff_prod_mem (IsLocalRing.maximalIdeal S) s hall (Q.natDegree - i) (by omega)
     rw [← hs, hcoeff] at hmem
     exact (IsLocalRing.mem_maximalIdeal _).mp hmem hu
 

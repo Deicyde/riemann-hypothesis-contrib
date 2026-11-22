@@ -4,10 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 
-theorem UpperTheory.V.Ws.Lk.noMu :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c}, D.Good → ∀ (L : IntermediateField ℚ Ω) (g : G L Ω), Raw.bar D.om (resQ L g) ≠ 1 → ¬ ∃ ζ : L, IsPrimitiveRoot ζ l := by
+theorem UpperTheory.V.Ws.Lk.noMu
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c},
+      D.Good
+        → ∀ (L : IntermediateField ℚ Ω) (g : G L Ω),
+          Raw.bar D.om (resQ L g) ≠ 1 → ¬ ∃ ζ : L, IsPrimitiveRoot ζ l := by
   intro Ω _ _ _ l _ c D hD L g hbar hroot
   obtain ⟨ζ, hζ⟩ := hroot
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -18,8 +25,9 @@ theorem UpperTheory.V.Ws.Lk.noMu :
   set σ : G ℚ Ω := resQ L g with hσ
   set χ : ℤ_[l] := ((cycZ ℚ Ω l σ : ℤ_[l]ˣ) : ℤ_[l]) with hχ
   have hfix : (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) (ζ : Ω) = (ζ : Ω) := g.commutes ζ
-  have hspec := cyclotomicCharacter.spec (L := Ω) l (n := 1)
-    (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) (ζ : Ω) (by rw [pow_one]; exact hζΩ.pow_eq_one)
+  have hspec :=
+    cyclotomicCharacter.spec (L := Ω) l (n := 1) (MulSemiringAction.toRingAut (G ℚ Ω) Ω σ) (ζ : Ω)
+      (by rw [pow_one]; exact hζΩ.pow_eq_one)
   rw [hfix] at hspec
   have hmod : PadicInt.toZModPow 1 χ = 1 := by
     haveI : Fact (1 < l ^ 1) := ⟨by rw [pow_one]; exact hl⟩

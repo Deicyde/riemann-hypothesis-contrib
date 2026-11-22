@@ -13,8 +13,8 @@ open MvPolynomial Coinv
 
 noncomputable section
 
-theorem CoinvStaircaseComponent.proof (h1 : CoinvStaircaseDegree.Statement) :
-    CoinvStaircaseComponent.Statement := by
+theorem CoinvStaircaseComponent.proof (h1 : CoinvStaircaseDegree.Statement)
+    : CoinvStaircaseComponent.Statement := by
   intro K _ f n v hv
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -29,7 +29,8 @@ theorem CoinvStaircaseComponent.proof (h1 : CoinvStaircaseDegree.Statement) :
       · refine ⟨1, ?_⟩
         rw [if_pos h, heq h.symm, C_1, one_mul]
       · exact ⟨0, by rw [if_neg h, C_0, zero_mul]⟩
-  | zero => exact ⟨fun d _ => map_zero _, 0, by simp⟩
+  | zero =>
+    exact ⟨fun d _ => map_zero _, 0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨hx1, cx, hx2⟩ := hx
     obtain ⟨hy1, cy, hy2⟩ := hy

@@ -15,33 +15,43 @@ open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-def cr_quot (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z) : GLOps n K (V ⧸ Z) :=
-  fun a b => Z.mapQ Z (E a b) (fun x hx => hZ a b x hx)
+def cr_quot (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z)
+    : GLOps n K (V ⧸ Z) := fun a b =>
+  Z.mapQ Z (E a b) (fun x hx => hZ a b x hx)
 
-theorem cr_quot_mk (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z) (a b : Fin n) (x : V) :
-    cr_quot E Z hZ a b (Z.mkQ x) = Z.mkQ (E a b x) := rfl
+theorem cr_quot_mk
+    (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z) (a b : Fin n) (x : V)
+    : cr_quot E Z hZ a b (Z.mkQ x) = Z.mkQ (E a b x) :=
+  rfl
 
-theorem cr_quot_rel (E : GLOps n K V) (hR : SatisfiesGLRelations E) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z) :
-    SatisfiesGLRelations (cr_quot E Z hZ) := by
+theorem cr_quot_rel
+    (E : GLOps n K V) (hR : SatisfiesGLRelations E)
+    (Z : Submodule K V) (hZ : IsStableUnderOperators E Z)
+    : SatisfiesGLRelations (cr_quot E Z hZ) := by
   intro a b c d
   refine LinearMap.ext fun y => ?_
   obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective Z y
   have h := congrArg (fun f : Module.End K V => Z.mkQ (f x)) (hR a b c d)
   split_ifs at h ⊢ <;> simpa [cr_quot] using h
 
-theorem cr_quot_wt (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z) (ν : Fin n → ℤ) (x : V)
-    (hx : x ∈ weightSp E ν) : Z.mkQ x ∈ weightSp (cr_quot E Z hZ) ν := by
+theorem cr_quot_wt
+    (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z)
+    (ν : Fin n → ℤ) (x : V) (hx : x ∈ weightSp E ν)
+    : Z.mkQ x ∈ weightSp (cr_quot E Z hZ) ν := by
   rw [weightSp, Submodule.mem_iInf] at hx ⊢
   intro a
   have h := LinearMap.mem_ker.mp (hx a)
   rw [LinearMap.mem_ker]
-  have e : (cr_quot E Z hZ a a - (ν a : K) • (1 : Module.End K (V ⧸ Z))) (Z.mkQ x)
-      = Z.mkQ ((E a a - (ν a : K) • (1 : Module.End K V)) x) := by
+  have e
+      : (cr_quot E Z hZ a a - (ν a : K) • (1 : Module.End K (V ⧸ Z))) (Z.mkQ x)
+        = Z.mkQ ((E a a - (ν a : K) • (1 : Module.End K V)) x) := by
     simp [cr_quot]
   rw [e, h, map_zero]
 
-theorem cr_quot_top (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z)
-    (hT : (⨆ ν, weightSp E ν) = ⊤) : (⊤ : Submodule K (V ⧸ Z)) ≤ ⨆ ν, weightSp (cr_quot E Z hZ) ν := by
+theorem cr_quot_top
+    (E : GLOps n K V) (Z : Submodule K V) (hZ : IsStableUnderOperators E Z)
+    (hT : (⨆ ν, weightSp E ν) = ⊤)
+    : (⊤ : Submodule K (V ⧸ Z)) ≤ ⨆ ν, weightSp (cr_quot E Z hZ) ν := by
   intro y _
   obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective Z y
   have hx : x ∈ ⨆ ν, weightSp E ν := by rw [hT]; exact Submodule.mem_top
@@ -179,12 +189,19 @@ private lemma casimir_apply_eq_smul_of_mem_iSup_isotypic (E : GLOps n K V) (hR :
   have h := LinearMap.mem_ker.mp (hle hz)
   simpa [sub_eq_zero] using h
 
-theorem casimir_polynomial_isolates_level [CharZero K] (E : GLOps n K V) (hR : SatisfiesGLRelations E) (Wx : (Fin n → ℤ) → Submodule K V) (z : V)
-    (hz : z ∈ ⨆ ν, isotypicPartIn E (Wx ν) ν) (c0 : ℤ) : ∃ r : K[X], r.eval (c0 : K) = 1 ∧
-      aeval (cr_C E) r z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν := by
-  have hK2 : ∀ t ∈ (⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν), ∀ p : K[X],
-      aeval (cr_C E) p t = p.eval (c0 : K) • t := fun t ht p =>
-    aeval_apply_eq_eval_smul_of_eigenvector _ _ t (casimir_apply_eq_smul_of_mem_iSup_isotypic E hR Wx c0 t ht) p
+theorem casimir_polynomial_isolates_level
+    [CharZero K]
+    (E : GLOps n K V) (hR : SatisfiesGLRelations E)
+    (Wx : (Fin n → ℤ) → Submodule K V) (z : V) (hz : z ∈ ⨆ ν, isotypicPartIn E (Wx ν) ν)
+    (c0 : ℤ)
+    : ∃ r : K[X],
+      r.eval (c0 : K) = 1
+        ∧ aeval (cr_C E) r z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν := by
+  have hK2
+      : ∀ t ∈ (⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν), ∀ p : K[X],
+        aeval (cr_C E) p t = p.eval (c0 : K) • t := fun t ht p =>
+    aeval_apply_eq_eval_smul_of_eigenvector _ _ t
+      (casimir_apply_eq_smul_of_mem_iSup_isotypic E hR Wx c0 t ht) p
   refine Submodule.iSup_induction (x := z) (fun ν => isotypicPartIn E (Wx ν) ν) hz ?_ ?_ ?_
   · intro ν x hx
     have hxC := casimir_apply_eq_smul_of_mem_isotypicPartIn E hR (Wx ν) ν x hx
@@ -218,8 +235,11 @@ theorem casimir_polynomial_isolates_level [CharZero K] (E : GLOps n K V) (hR : S
       rw [hK2 _ m2]
       exact Submodule.smul_mem _ _ m2
 
-theorem casimir_acts_scalar_on_level (E : GLOps n K V) (hR : SatisfiesGLRelations E) (Wx : (Fin n → ℤ) → Submodule K V) (c0 : ℤ) (z : V)
-    (hz : z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν) : cr_C E z = (c0 : K) • z := by
+theorem casimir_acts_scalar_on_level
+    (E : GLOps n K V) (hR : SatisfiesGLRelations E)
+    (Wx : (Fin n → ℤ) → Submodule K V) (c0 : ℤ) (z : V)
+    (hz : z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = c0}, isotypicPartIn E (Wx ν) ν)
+    : cr_C E z = (c0 : K) • z := by
   exact casimir_apply_eq_smul_of_mem_iSup_isotypic E hR Wx c0 z hz
 
 theorem cr_Pos_zero_or {β : Fin n → ℤ} (h : β ∈ cr_Pos n) : β = 0 ∨ 0 < weightHeight' β := by
@@ -233,7 +253,8 @@ theorem cr_Pos_zero_or {β : Fin n → ℤ} (h : β ∈ cr_Pos n) : β = 0 ∨ 0
     rw [e]
     have hab' : (a : ℕ) < (b : ℕ) := hab
     omega
-  | zero => left; rfl
+  | zero =>
+    left; rfl
   | add x y _ _ hx hy =>
     rcases hx with rfl | hx <;> rcases hy with rfl | hy
     · left
@@ -246,13 +267,19 @@ theorem cr_Pos_zero_or {β : Fin n → ℤ} (h : β ∈ cr_Pos n) : β = 0 ∨ 0
       simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib, neg_add]
       linarith
 
-theorem casimir_isotypic_no_higher_weight [CharZero K] [FiniteDimensional K V] (E : GLOps n K V) (hR : SatisfiesGLRelations E)
-    (Wx : (Fin n → ℤ) → Submodule K V) (mu : Fin n → ℤ) (hmu : Dominant mu) (ν' : Fin n → ℤ)
-    (hν' : ν' - mu ∈ cr_Pos n) (hpos : 0 < weightHeight' (ν' - mu)) (z : V)
-    (hz : z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = cr_c mu}, isotypicPartIn E (Wx ν) ν) (hzw : z ∈ weightSp E ν') : z = 0 := by
+theorem casimir_isotypic_no_higher_weight
+    [CharZero K] [FiniteDimensional K V]
+    (E : GLOps n K V) (hR : SatisfiesGLRelations E)
+    (Wx : (Fin n → ℤ) → Submodule K V)
+    (mu : Fin n → ℤ) (hmu : Dominant mu)
+    (ν' : Fin n → ℤ) (hν' : ν' - mu ∈ cr_Pos n) (hpos : 0 < weightHeight' (ν' - mu))
+    (z : V) (hz : z ∈ ⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = cr_c mu}, isotypicPartIn E (Wx ν) ν)
+    (hzw : z ∈ weightSp E ν')
+    : z = 0 := by
   by_contra hne
-  have hle : (⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = cr_c mu}, isotypicPartIn E (Wx ν) ν) ≤
-      cr_WS E {τ | ∃ ν, Dominant ν ∧ cr_c ν = cr_c mu ∧ ν - τ ∈ cr_Pos n} := by
+  have hle
+      : (⨆ ν ∈ {ν : Fin n → ℤ | cr_c ν = cr_c mu}, isotypicPartIn E (Wx ν) ν)
+        ≤ cr_WS E {τ | ∃ ν, Dominant ν ∧ cr_c ν = cr_c mu ∧ ν - τ ∈ cr_Pos n} := by
     refine iSup₂_le fun ν hν x hx => ?_
     by_cases hx0 : x = 0
     · rw [hx0]; exact zero_mem _

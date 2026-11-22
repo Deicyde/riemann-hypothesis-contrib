@@ -14,8 +14,9 @@ namespace GlobalTheory.LamF
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem isLocGen_iff_valuation_eq (p : HeightOneSpectrum (𝓞 K)) (c : K) (I : FractionalIdeal (𝓞 K)⁰ K) :
-    IsLocGen p c I ↔ p.valuation K c = exp (-FractionalIdeal.count K p I) := by
+theorem isLocGen_iff_valuation_eq
+    (p : HeightOneSpectrum (𝓞 K)) (c : K) (I : FractionalIdeal (𝓞 K)⁰ K)
+    : IsLocGen p c I ↔ p.valuation K c = exp (- FractionalIdeal.count K p I) := by
   constructor
   · rintro ⟨h0, h⟩
     rw [GlobalTheory.Idele.valuation_eq_exp_neg_count p h0, h]
@@ -28,9 +29,10 @@ theorem isLocGen_iff_valuation_eq (p : HeightOneSpectrum (𝓞 K)) (c : K) (I : 
     rw [GlobalTheory.Idele.valuation_eq_exp_neg_count p h0, exp_inj] at h
     exact neg_injective h
 
-theorem valuation_le_iff_exists_smul_mem (p : HeightOneSpectrum (𝓞 K)) {I : FractionalIdeal (𝓞 K)⁰ K}
-    (hI : I ≠ 0) (c : K) :
-    p.valuation K c ≤ exp (-FractionalIdeal.count K p I) ↔ ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • c ∈ I := by
+theorem valuation_le_iff_exists_smul_mem
+    (p : HeightOneSpectrum (𝓞 K)) {I : FractionalIdeal (𝓞 K)⁰ K} (hI : I ≠ 0) (c : K)
+    : p.valuation K c ≤ exp (- FractionalIdeal.count K p I)
+      ↔ ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • c ∈ I := by
   constructor
   · intro h
     obtain ⟨y, hy, hv⟩ := GlobalTheory.Idele.exists_mem_valuation_eq hI p
@@ -52,9 +54,9 @@ theorem valuation_le_iff_exists_smul_mem (p : HeightOneSpectrum (𝓞 K)) {I : F
       exact (p.valuation_lt_one_iff_mem s).1 hlt
     rwa [Algebra.smul_def, map_mul, h1, one_mul] at h
 
-theorem mem_iff_forall_exists_smul_mem {V : Type} [AddCommGroup V] [Module (𝓞 K) V]
-    (Λ : Submodule (𝓞 K) V) (z : V) :
-    z ∈ Λ ↔ ∀ p : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • z ∈ Λ := by
+theorem mem_iff_forall_exists_smul_mem
+    {V : Type} [AddCommGroup V] [Module (𝓞 K) V] (Λ : Submodule (𝓞 K) V) (z : V)
+    : z ∈ Λ ↔ ∀ p : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • z ∈ Λ := by
   constructor
   · intro hz p
     exact ⟨1, fun h => p.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h), by simpa using hz⟩
@@ -69,18 +71,28 @@ theorem mem_iff_forall_exists_smul_mem {V : Type} [AddCommGroup V] [Module (𝓞
     have : (1 : 𝓞 K) ∈ A := hA ▸ Submodule.mem_top
     simpa [A] using this
 
-theorem local_global_ideal_lattice : ∀ (K : Type) [Field K] [NumberField K],
-    (∀ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (cl : HeightOneSpectrum (𝓞 K) → K), I ≠ 0 →
-      (∀ p, IsLocGen p (cl p) I) → ∀ c : K,
-        c ∈ I ↔ ∀ p : HeightOneSpectrum (𝓞 K), p.valuation K c ≤ p.valuation K (cl p)) ∧
-    (∀ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (p : HeightOneSpectrum (𝓞 K)), I ≠ 0 →
-      (∃ cl ∈ I, IsLocGen p cl I) ∧ ∀ cl, IsLocGen p cl I ↔ cl ≠ 0 ∧ ∀ c : K,
-        p.valuation K c ≤ p.valuation K cl ↔ ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • c ∈ I) ∧
-    ∀ (V : Type) [AddCommGroup V] [Module (𝓞 K) V] (Λ : Submodule (𝓞 K) V) (z : V),
-      z ∈ Λ ↔ ∀ p : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • z ∈ Λ := by
+theorem local_global_ideal_lattice
+    : ∀ (K : Type) [Field K] [NumberField K],
+      (∀ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (cl : HeightOneSpectrum (𝓞 K) → K),
+          I ≠ 0 → (∀ p, IsLocGen p (cl p) I)
+            → ∀ c : K,
+              c ∈ I ↔ ∀ p : HeightOneSpectrum (𝓞 K), p.valuation K c ≤ p.valuation K (cl p))
+        ∧ (∀ (I : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (p : HeightOneSpectrum (𝓞 K)),
+          I ≠ 0
+            → (∃ cl ∈ I, IsLocGen p cl I)
+              ∧ ∀ cl,
+                IsLocGen p cl I
+                  ↔ cl ≠ 0
+                    ∧ ∀ c : K,
+                      p.valuation K c ≤ p.valuation K cl ↔ ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • c ∈ I)
+        ∧ ∀ (V : Type) [AddCommGroup V] [Module (𝓞 K) V] (Λ : Submodule (𝓞 K) V) (z : V),
+          z ∈ Λ ↔ ∀ p : HeightOneSpectrum (𝓞 K), ∃ s : 𝓞 K, s ∉ p.asIdeal ∧ s • z ∈ Λ := by
   intro K _ _
-  refine ⟨fun I cl hI hcl c => ?_, fun I p hI => ⟨?_, fun cl => ?_⟩,
-    fun V _ _ Λ z => mem_iff_forall_exists_smul_mem Λ z⟩
+  refine ⟨
+    fun I cl hI hcl c => ?_,
+    fun I p hI => ⟨?_, fun cl => ?_⟩,
+    fun V _ _ Λ z => mem_iff_forall_exists_smul_mem Λ z
+  ⟩
   · rw [GlobalTheory.Idele.mem_iff_valuation_le hI]
     refine forall_congr' fun p => ?_
     rw [(isLocGen_iff_valuation_eq p _ I).1 (hcl p)]

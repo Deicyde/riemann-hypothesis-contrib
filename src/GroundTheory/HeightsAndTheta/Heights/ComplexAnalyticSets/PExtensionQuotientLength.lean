@@ -30,22 +30,26 @@ theorem ExtensionQuotientLength.proof : ExtensionQuotientLength.Statement := by
   let g₁ := rP.mapQ P LinearMap.id hrPP
   have hf₁ : Function.Injective f₁ := by
     refine (injective_iff_map_eq_zero _).2 fun q hq ↦ ?_
-    induction q using Submodule.Quotient.induction_on with | _ x => ?_
+    induction q using Submodule.Quotient.induction_on with
+    | _ x => ?_
     simp only [f₁, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero] at hq ⊢
     obtain ⟨y, hy, hyx⟩ := hq
     rwa [← hinj hyx]
   have hg₁ : Function.Surjective g₁ := fun q ↦ by
-    induction q using Submodule.Quotient.induction_on with | _ b => exact ⟨Submodule.Quotient.mk b, rfl⟩
+    induction q using Submodule.Quotient.induction_on with
+    | _ b => exact ⟨Submodule.Quotient.mk b, rfl⟩
   have he₁ : Function.Exact f₁ g₁ := by
     intro q
-    induction q using Submodule.Quotient.induction_on with | _ b => ?_
+    induction q using Submodule.Quotient.induction_on with
+    | _ b => ?_
     simp only [g₁, f₁, Submodule.mapQ_apply, LinearMap.id_apply, Submodule.Quotient.mk_eq_zero,
       Set.mem_range]
     constructor
     · rintro ⟨x, rfl⟩
       exact ⟨Submodule.Quotient.mk x, rfl⟩
     · rintro ⟨q, hq⟩
-      induction q using Submodule.Quotient.induction_on with | _ x => ?_
+      induction q using Submodule.Quotient.induction_on with
+      | _ x => ?_
       rw [Submodule.mapQ_apply, Submodule.Quotient.eq] at hq
       simpa using P.sub_mem (hrPP hq) ⟨x, rfl⟩
 
@@ -53,26 +57,32 @@ theorem ExtensionQuotientLength.proof : ExtensionQuotientLength.Statement := by
   let g₂ := rP.mapQ rB LinearMap.id hrPrB
   have hf₂ : Function.Injective f₂ := by
     refine (injective_iff_map_eq_zero _).2 fun q hq ↦ ?_
-    induction q using Submodule.Quotient.induction_on with | _ b => ?_
+    induction q using Submodule.Quotient.induction_on with
+    | _ b => ?_
     simp only [f₂, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero, LinearMap.smul_apply,
-      LinearMap.id_apply] at hq ⊢
+        LinearMap.id_apply]
+      at hq ⊢
     obtain ⟨y, hy, hyb⟩ := hq
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hy
     refine ⟨c, (mul_cancel_left_mem_nonZeroDivisors hr).1 ?_⟩
     simpa [a, Algebra.smul_def, mul_comm] using hyb
   have hg₂ : Function.Surjective g₂ := fun q ↦ by
-    induction q using Submodule.Quotient.induction_on with | _ b => exact ⟨Submodule.Quotient.mk b, rfl⟩
+    induction q using Submodule.Quotient.induction_on with
+    | _ b => exact ⟨Submodule.Quotient.mk b, rfl⟩
   have he₂ : Function.Exact f₂ g₂ := by
     intro q
-    induction q using Submodule.Quotient.induction_on with | _ b => ?_
+    induction q using Submodule.Quotient.induction_on with
+    | _ b => ?_
     simp only [g₂, f₂, Submodule.mapQ_apply, LinearMap.id_apply, Submodule.Quotient.mk_eq_zero,
       Set.mem_range]
     constructor
     · intro hb
-      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 (show b ∈ Ideal.span {algebraMap R B r} from hb)
+      obtain ⟨c, rfl⟩ :=
+        Ideal.mem_span_singleton'.1 (show b ∈ Ideal.span {algebraMap R B r} from hb)
       exact ⟨Submodule.Quotient.mk c, by simp [Algebra.smul_def, mul_comm]⟩
     · rintro ⟨q, hq⟩
-      induction q using Submodule.Quotient.induction_on with | _ c => ?_
+      induction q using Submodule.Quotient.induction_on with
+      | _ c => ?_
       rw [Submodule.mapQ_apply, Submodule.Quotient.eq] at hq
       have hc : r • c ∈ rB := Ideal.mem_span_singleton'.2 ⟨c, by simp [Algebra.smul_def, mul_comm]⟩
       simpa using rB.sub_mem hc (hrPrB hq)

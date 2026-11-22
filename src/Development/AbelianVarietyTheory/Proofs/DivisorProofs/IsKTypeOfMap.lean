@@ -20,15 +20,15 @@ namespace GlobalTheory.KTypeUnderMaps
 
 open Formalism.MainNotions.S
 
-theorem isKTypeOf_map {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {Λ : Fin n → ℝ}
-    {S : Submodule ℂ H} (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S) (L : H →ₗ[ℂ] H)
-    (hL : ∀ k ∈ Formalism.REAL.Kset ε, ∀ (w : H), σ k (L w) = L (σ k w))
-    {v : H} (hv : v ∈ S) (hLv : L v ≠ 0) :
-    Formalism.MainNotions.S.IsKTypeOf ε σ Λ (Submodule.map L S) := by
+theorem isKTypeOf_map
+    {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Matrix (Fin n) (Fin n) ℂ → H →L[ℂ] H} {Λ : Fin n → ℝ} {S : Submodule ℂ H}
+    (hS : Formalism.MainNotions.S.IsKTypeOf ε σ Λ S)
+    (L : H →ₗ[ℂ] H) (hL : ∀ k ∈ Formalism.REAL.Kset ε, ∀ (w : H), σ k (L w) = L (σ k w))
+    {v : H} (hv : v ∈ S) (hLv : L v ≠ 0)
+    : Formalism.MainNotions.S.IsKTypeOf ε σ Λ (Submodule.map L S) := by
   obtain ⟨hfd, hst, hirr, ⟨u, huS, hu0, huw⟩, hdom⟩ := hS
-  have hpull : ∀ T : Submodule ℂ H, IsKStableOn ε σ T →
-      S ⊓ T.comap L = ⊥ ∨ S ⊓ T.comap L = S := by
+  have hpull : ∀ T : Submodule ℂ H, IsKStableOn ε σ T → S ⊓ T.comap L = ⊥ ∨ S ⊓ T.comap L = S := by
     intro T hT
     refine hirr _ inf_le_left ?_
     intro g hg x hx

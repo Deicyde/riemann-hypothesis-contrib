@@ -16,13 +16,15 @@ namespace Formalism.L2.SG.Pf.G7
 
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-  [Algebra F K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+  [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem mem_dual_iff (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) (x : V) :
-    x ∈ Formalism.HermitianLatticesTheory.dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule (𝓞 K) K) := by
-  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-    LinearMap.restrictScalars_apply]
+theorem mem_dual_iff (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V) (x : V)
+    : x ∈ Formalism.HermitianLatticesTheory.dual h L
+      ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule (𝓞 K) K) := by
+  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_comap, LinearMap.restrictScalars_apply]
 
 private lemma mem_locF_lemma {W : Type} [AddCommGroup W] [Module (𝓞 K) W] (𝔭 : Ideal (𝓞 F))
     (L : Submodule (𝓞 K) W) (x : W) :
@@ -47,8 +49,10 @@ private lemma smul_smul_lemma_3 (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K
   rw [star_fix_lemma_2 hF ht, Algebra.smul_def, map_mul]
   ring
 
-theorem locF_dual_le (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V)
-    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) : locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) ≤ dualF h 𝔭 (locF 𝔭 L) := by
+theorem locF_dual_le
+    (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule (𝓞 K) V)
+    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime)
+    : locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) ≤ dualF h 𝔭 (locF 𝔭 L) := by
   intro x hx
   change ∀ y ∈ locF 𝔭 L, h y x ∈ locF 𝔭 (1 : Submodule (𝓞 K) K)
   intro y hy
@@ -58,41 +62,51 @@ theorem locF_dual_le (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K) (L : S
   rw [← smul_smul_lemma_3 hF h ht x y]
   exact (mem_dual_iff h L (s • x)).mp hsx (t • y) hty
 
-theorem dualF_locF_le (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V} (hL : L.FG)
-    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) : dualF h 𝔭 (locF 𝔭 L) ≤ locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) := by
+theorem dualF_locF_le
+    (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V} (hL : L.FG) {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime)
+    : dualF h 𝔭 (locF 𝔭 L) ≤ locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) := by
   classical
   intro x hx
   have hx' : ∀ y ∈ locF 𝔭 L, h y x ∈ locF 𝔭 (1 : Submodule (𝓞 K) K) := hx
   obtain ⟨G, rfl⟩ := hL
-  have hg : ∀ g ∈ G, ∃ s ∈ Submonoid.closure
-      {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s},
-      s • h g x ∈ (1 : Submodule (𝓞 K) K) := fun g hg =>
-    (mem_locF_lemma 𝔭 _ _).mp (hx' g ((mem_locF_lemma 𝔭 _ g).mpr
-      ⟨1, Submonoid.one_mem _, by rw [one_smul]; exact Submodule.subset_span hg⟩))
+  have hg
+      : ∀ g ∈ G,
+        ∃ s ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s},
+          s • h g x ∈ (1 : Submodule (𝓞 K) K) := fun g hg =>
+    (mem_locF_lemma 𝔭 _ _).mp
+      (hx' g
+        ((mem_locF_lemma 𝔭 _ g).mpr
+          ⟨1, Submonoid.one_mem _, by rw [one_smul]; exact Submodule.subset_span hg⟩))
   choose! sg hsg hsgx using hg
-  refine (mem_locF_lemma 𝔭 _ _).mpr
-    ⟨∏ g ∈ G, sg g, Submonoid.prod_mem _ fun g hg => hsg g hg, ?_⟩
+  refine (mem_locF_lemma 𝔭 _ _).mpr ⟨∏ g ∈ G, sg g, Submonoid.prod_mem _ fun g hg => hsg g hg, ?_⟩
   rw [mem_dual_iff]
   intro y hy
   induction hy using Submodule.span_induction with
   | mem y hy =>
     rw [← algebraMap_smul K (∏ g ∈ G, sg g) x, LinearMap.map_smul, smul_eq_mul]
-    have e : algebraMap (𝓞 K) K (∏ g ∈ G, sg g) * h y x =
-        (∏ g ∈ G.erase y, sg g) • (sg y • h y x) := by
+    have e
+        : algebraMap (𝓞 K) K (∏ g ∈ G, sg g) * h y x
+          = (∏ g ∈ G.erase y, sg g) • (sg y • h y x) := by
       rw [← Finset.mul_prod_erase G sg hy, Algebra.smul_def, Algebra.smul_def, map_mul]
       ring
     rw [e]
     exact Submodule.smul_mem _ _ (hsgx y hy)
-  | zero => rw [map_zero, LinearMap.zero_apply]; exact Submodule.zero_mem _
-  | add y z _ _ hy hz => rw [map_add (f := _), LinearMap.add_apply]; exact Submodule.add_mem _ hy hz
+  | zero =>
+    rw [map_zero, LinearMap.zero_apply]; exact Submodule.zero_mem _
+  | add y z _ _ hy hz =>
+    rw [map_add (f := _), LinearMap.add_apply]; exact Submodule.add_mem _ hy hz
   | smul c y _ hy =>
     obtain ⟨r, hr⟩ := Formalism.HermitianLatticesTheory.star_algebraMap_ringOfIntegers_mem_range c
     rw [← algebraMap_smul K c y, map_smulₛₗ h (algebraMap (𝓞 K) K c) y, LinearMap.smul_apply,
       smul_eq_mul, starRingEnd_apply, ← hr, ← smul_eq_mul, algebraMap_smul]
     exact Submodule.smul_mem _ r hy
 
-theorem locF_dual (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V} (hL : L.FG)
-    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) : locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) = dualF h 𝔭 (locF 𝔭 L) := le_antisymm (locF_dual_le hF h L hp) (dualF_locF_le h hL hp)
+theorem locF_dual
+    (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K)
+    {L : Submodule (𝓞 K) V} (hL : L.FG)
+    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime)
+    : locF 𝔭 (Formalism.HermitianLatticesTheory.dual h L) = dualF h 𝔭 (locF 𝔭 L) :=
+  le_antisymm (locF_dual_le hF h L hp) (dualF_locF_le h hL hp)
 
 private lemma ne_zero_lemma_4 {𝔭 : Ideal (𝓞 F)} {s : 𝓞 K}
     (hs : s ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s}) :
@@ -107,8 +121,8 @@ private lemma ne_zero_lemma_4 {𝔭 : Ideal (𝓞 F)} {s : 𝓞 K}
   | one => simp
   | mul x y _ _ hx hy => rw [map_mul]; exact mul_ne_zero hx hy
 
-theorem locF_subspace (U : Submodule K V) {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) :
-    locF 𝔭 (U.restrictScalars (𝓞 K)) = U.restrictScalars (𝓞 K) := by
+theorem locF_subspace (U : Submodule K V) {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime)
+    : locF 𝔭 (U.restrictScalars (𝓞 K)) = U.restrictScalars (𝓞 K) := by
   ext x
   rw [mem_locF_lemma]
   constructor
@@ -149,7 +163,9 @@ private lemma le_of_locF_lemma_6 (A B : Submodule (𝓞 K) V)
   have h1 : (1 : 𝓞 F) ∈ J := by rw [hJ]; exact Submodule.mem_top
   simpa [J] using h1
 
-theorem eq_of_locF (A B : Submodule (𝓞 K) V)
-    (hAB : ∀ 𝔭 : Ideal (𝓞 F), 𝔭.IsMaximal → locF 𝔭 A = locF 𝔭 B) : A = B := le_antisymm (le_of_locF_lemma_6 A B hAB) (le_of_locF_lemma_6 B A fun 𝔭 h => (hAB 𝔭 h).symm)
+theorem eq_of_locF
+    (A B : Submodule (𝓞 K) V) (hAB : ∀ 𝔭 : Ideal (𝓞 F), 𝔭.IsMaximal → locF 𝔭 A = locF 𝔭 B)
+    : A = B :=
+  le_antisymm (le_of_locF_lemma_6 A B hAB) (le_of_locF_lemma_6 B A fun 𝔭 h => (hAB 𝔭 h).symm)
 
 end Formalism.L2.SG.Pf.G7

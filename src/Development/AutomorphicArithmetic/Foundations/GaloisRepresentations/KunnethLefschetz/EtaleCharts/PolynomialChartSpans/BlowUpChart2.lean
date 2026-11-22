@@ -22,8 +22,9 @@ theorem blChart : BlowUpChart₂ := by
   haveI : QuasiCompact (Over.Hom.left (dg Z)) := by
     change QuasiCompact (pullback.diagonal (Over.hom Z))
     infer_instance
-  have hI : (Scheme.Hom.ker (Over.Hom.left (dg Z))).ideal ⟨c.N, c.aff⟩
-      = Ideal.span (Set.range fun k => φ (MvPolynomial.X k)) := by
+  have hI
+      : (Scheme.Hom.ker (Over.Hom.left (dg Z))).ideal ⟨c.N, c.aff⟩
+        = Ideal.span (Set.range fun k => φ (MvPolynomial.X k)) := by
     rw [Scheme.Hom.ker_apply, hs, Scheme.Hom.app_eq_appLE]
     exact c.ker
   have key := bChartEx R π _ hπ ⟨c.N, c.aff⟩ D (Sec Z c.U) φ hflat hI

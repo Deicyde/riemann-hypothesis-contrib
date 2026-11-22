@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Inert
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open scoped TensorProduct
 open Classical
@@ -20,8 +23,12 @@ noncomputable section
 
 namespace GlobalTheory.LocInteg
 
-theorem kappa_mem_int {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (F : FinIso L n)
-    (w : HeightOneSpectrum (𝓞 L)) {z : AL L} (hz : z ∈ ALint L) : F.κ z w ∈ w.adicCompletionIntegers L := by
+theorem kappa_mem_int
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} (F : FinIso L n)
+    (w : HeightOneSpectrum (𝓞 L))
+    {z : AL L} (hz : z ∈ ALint L)
+    : F.κ z w ∈ w.adicCompletionIntegers L := by
   induction hz using Subring.closure_induction with
   | mem x hx =>
     rcases hx with ⟨y, rfl⟩ | ⟨a, ha, rfl⟩
@@ -38,7 +45,10 @@ theorem kappa_mem_int {L : Type} [Field L] [NumberField L] [IsCMField L] {n : �
   | neg a _ ha => rw [map_neg]; exact neg_mem ha
   | mul a b _ _ ha hb => rw [map_mul]; exact mul_mem ha hb
 
-theorem cLoc_mem_KGL_iff : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (F : FinIso L n) (w : HeightOneSpectrum (𝓞 L)) (y : GAf L n), F.j y ∈ locU n w → (cLoc w (F.j y) ∈ GlobalTheory.LFun.KGL w (n := n) ↔ y ∈ Umax L n) := by
+theorem cLoc_mem_KGL_iff
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (F : FinIso L n)
+        (w : HeightOneSpectrum (𝓞 L)) (y : GAf L n),
+      F.j y ∈ locU n w → (cLoc w (F.j y) ∈ GlobalTheory.LFun.KGL w (n := n) ↔ y ∈ Umax L n) := by
   intro L _ _ _ n F w y hy
   constructor
   · intro hK i j

@@ -10,12 +10,12 @@ noncomputable section
 
 namespace Formalism.HadamardInequality
 
-def succMin {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (M : Submodule ℤ E)
-    (i : ℕ) : ℝ :=
+def succMin {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (M : Submodule ℤ E) (i : ℕ)
+    : ℝ :=
   sInf {r : ℝ | 0 ≤ r ∧ ∃ v : Fin i → E, (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ r}
 
-def zdual {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (M : Submodule ℤ E) :
-    Submodule ℤ E where
+def zdual {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (M : Submodule ℤ E)
+    : Submodule ℤ E where
   carrier := {y | ∀ x ∈ M, ∃ z : ℤ, inner ℝ x y = (z : ℝ)}
   add_mem' := by
     intro a b ha hb x hx
@@ -30,9 +30,11 @@ def zdual {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] (M : Submo
 
 def Transference : Prop :=
   ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
-    (M : Submodule ℤ E), DiscreteTopology M → Submodule.span ℝ (M : Set E) = ⊤ →
-    ∀ i : ℕ, 1 ≤ i → i ≤ Module.finrank ℝ E →
-      succMin (zdual M) i * succMin M (Module.finrank ℝ E + 1 - i) ≤
-        (Module.finrank ℝ E : ℝ) ^ 2
+      (M : Submodule ℤ E),
+    DiscreteTopology M → Submodule.span ℝ (M : Set E) = ⊤
+      → ∀ i : ℕ,
+        1 ≤ i → i ≤ Module.finrank ℝ E
+          → succMin (zdual M) i * succMin M (Module.finrank ℝ E + 1 - i)
+            ≤ (Module.finrank ℝ E : ℝ) ^ 2
 
 end Formalism.HadamardInequality

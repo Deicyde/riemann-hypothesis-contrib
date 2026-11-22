@@ -27,8 +27,8 @@ theorem LL_irrefl (e : σ →₀ ℕ) : ¬ LL κ e e := by
 
 variable {κ}
 
-theorem LL_trans (hκ : Function.Injective κ) {e e' e'' : σ →₀ ℕ} (h : LL κ e e') (h' : LL κ e' e'') :
-    LL κ e e'' := by
+theorem LL_trans (hκ : Function.Injective κ) {e e' e'' : σ →₀ ℕ} (h : LL κ e e') (h' : LL κ e' e'')
+    : LL κ e e'' := by
   obtain ⟨x, hx, hxy⟩ := h
   obtain ⟨x', hx', hxy'⟩ := h'
   rcases lt_trichotomy (κ x) (κ x') with hlt | heq | hgt
@@ -51,8 +51,8 @@ theorem LL_add_right {e e' : σ →₀ ℕ} (h : LL κ e e') (f : σ →₀ ℕ)
 theorem LL_add_left {e e' : σ →₀ ℕ} (h : LL κ e e') (f : σ →₀ ℕ) : LL κ (f + e) (f + e') := by
   rw [add_comm f e, add_comm f e']; exact LL_add_right h f
 
-theorem LL_add (hκ : Function.Injective κ) {e e' f f' : σ →₀ ℕ} (h : LL κ e e') (h' : LL κ f f') :
-    LL κ (e + f) (e' + f') :=
+theorem LL_add (hκ : Function.Injective κ) {e e' f f' : σ →₀ ℕ} (h : LL κ e e') (h' : LL κ f f')
+    : LL κ (e + f) (e' + f') :=
   LL_trans hκ (LL_add_right h f) (LL_add_left h' e')
 
 theorem LL_total {e e' : σ →₀ ℕ} (h : e ≠ e') : LL κ e e' ∨ LL κ e' e := by
@@ -88,8 +88,10 @@ theorem LL_total {e e' : σ →₀ ℕ} (h : e ≠ e') : LL κ e e' ∨ LL κ e'
   · exact Or.inl ⟨x, hlt, hbefore⟩
   · exact Or.inr ⟨x, hgt, fun y hy => (hbefore y hy).symm⟩
 
-theorem exists_LL_max (hκ : Function.Injective κ) {ι : Type*} (d : ι → σ →₀ ℕ) (hd : Function.Injective d)
-    (s : Finset ι) (hs : s.Nonempty) : ∃ i ∈ s, ∀ j ∈ s, j ≠ i → LL κ (d j) (d i) := by
+theorem exists_LL_max
+    (hκ : Function.Injective κ)
+    {ι : Type*} (d : ι → σ →₀ ℕ) (hd : Function.Injective d) (s : Finset ι) (hs : s.Nonempty)
+    : ∃ i ∈ s, ∀ j ∈ s, j ≠ i → LL κ (d j) (d i) := by
   classical
   induction hs using Finset.Nonempty.cons_induction with
   | singleton a =>
@@ -122,11 +124,14 @@ theorem Lead_one : Lead κ (1 : MvPolynomial σ R) 0 := by
   rw [MvPolynomial.mem_support_iff, MvPolynomial.coeff_one, if_neg (Ne.symm hne)] at he
   exact absurd rfl he
 
-theorem Lead_mul (hκ : Function.Injective κ) {f g : MvPolynomial σ R} {d d' : σ →₀ ℕ}
-    (hf : Lead κ f d) (hg : Lead κ g d') : Lead κ (f * g) (d + d') := by
+theorem Lead_mul
+    (hκ : Function.Injective κ)
+    {f g : MvPolynomial σ R} {d d' : σ →₀ ℕ} (hf : Lead κ f d) (hg : Lead κ g d')
+    : Lead κ (f * g) (d + d') := by
   classical
-  have key : ∀ e e' : σ →₀ ℕ, e ∈ f.support → e' ∈ g.support → (e ≠ d ∨ e' ≠ d') →
-      LL κ (e + e') (d + d') := by
+  have key
+      : ∀ e e' : σ →₀ ℕ,
+        e ∈ f.support → e' ∈ g.support → (e ≠ d ∨ e' ≠ d') → LL κ (e + e') (d + d') := by
     intro e e' he he' hne
     by_cases h1 : e = d
     · subst h1
@@ -158,7 +163,8 @@ theorem Lead_mul (hκ : Function.Injective κ) {f g : MvPolynomial σ R} {d d' :
       rw [hmem] at this
       exact LL_irrefl κ _ this
     · intro h
-      exact absurd (Finset.HasAntidiagonal.mem_antidiagonal.2 (show (d, d').1 + (d, d').2 = d + d' from rfl)) h
+      exact absurd
+        (Finset.HasAntidiagonal.mem_antidiagonal.2 (show (d, d').1 + (d, d').2 = d + d' from rfl)) h
   · intro e he hne
     obtain ⟨a, ha, b, hb, rfl⟩ := Finset.mem_add.1 (MvPolynomial.support_mul f g he)
     apply key a b ha hb
@@ -166,8 +172,11 @@ theorem Lead_mul (hκ : Function.Injective κ) {f g : MvPolynomial σ R} {d d' :
     push Not at hcc
     exact hne (by rw [hcc.1, hcc.2])
 
-theorem Lead_prod (hκ : Function.Injective κ) {ι : Type*} (s : Finset ι) (f : ι → MvPolynomial σ R)
-    (d : ι → σ →₀ ℕ) (h : ∀ c ∈ s, Lead κ (f c) (d c)) : Lead κ (∏ c ∈ s, f c) (∑ c ∈ s, d c) := by
+theorem Lead_prod
+    (hκ : Function.Injective κ)
+    {ι : Type*}
+    (s : Finset ι) (f : ι → MvPolynomial σ R) (d : ι → σ →₀ ℕ) (h : ∀ c ∈ s, Lead κ (f c) (d c))
+    : Lead κ (∏ c ∈ s, f c) (∑ c ∈ s, d c) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using (Lead_one : Lead κ (1 : MvPolynomial σ R) 0)
@@ -176,9 +185,12 @@ theorem Lead_prod (hκ : Function.Injective κ) {ι : Type*} (s : Finset ι) (f 
     exact Lead_mul hκ (h a (Finset.mem_insert_self a s))
       (ih fun c hc => h c (Finset.mem_insert_of_mem hc))
 
-theorem linearIndependent_of_Lead (hκ : Function.Injective κ) {k : Type*} [Field k] {ι : Type*}
-    (v : ι → MvPolynomial σ k) (d : ι → σ →₀ ℕ) (hd : Function.Injective d)
-    (hv : ∀ i, Lead κ (v i) (d i)) : LinearIndependent k v := by
+theorem linearIndependent_of_Lead
+    (hκ : Function.Injective κ)
+    {k : Type*} [Field k]
+    {ι : Type*} (v : ι → MvPolynomial σ k) (d : ι → σ →₀ ℕ) (hd : Function.Injective d)
+    (hv : ∀ i, Lead κ (v i) (d i))
+    : LinearIndependent k v := by
   classical
   rw [linearIndependent_iff']
   intro s g hsum
@@ -214,14 +226,14 @@ def key (x : Fin n × Fin n) : Fin n ×ₗ Fin n := toLex x
 
 theorem key_inj : Function.Injective (key (n := n)) := toLex.injective
 
-theorem key_lt {x y : Fin n × Fin n} :
-    key y < key x ↔ (y.1 < x.1 ∨ (y.1 = x.1 ∧ y.2 < x.2)) := Prod.Lex.toLex_lt_toLex
+theorem key_lt {x y : Fin n × Fin n} : key y < key x ↔ (y.1 < x.1 ∨ (y.1 = x.1 ∧ y.2 < x.2)) :=
+  Prod.Lex.toLex_lt_toLex
 
 def mon {m : ℕ} (r c : Fin m → Fin n) (π : Equiv.Perm (Fin m)) : Fin n × Fin n →₀ ℕ :=
   ∑ i, Finsupp.single (r i, c (π i)) 1
 
-theorem mon_apply {m : ℕ} (r c : Fin m → Fin n) (π : Equiv.Perm (Fin m)) (x : Fin n × Fin n) :
-    mon r c π x = ∑ i, if (r i = x.1 ∧ c (π i) = x.2) then 1 else 0 := by
+theorem mon_apply {m : ℕ} (r c : Fin m → Fin n) (π : Equiv.Perm (Fin m)) (x : Fin n × Fin n)
+    : mon r c π x = ∑ i, if (r i = x.1 ∧ c (π i) = x.2) then 1 else 0 := by
   classical
   unfold mon
   rw [Finsupp.finsetSum_apply]
@@ -229,8 +241,10 @@ theorem mon_apply {m : ℕ} (r c : Fin m → Fin n) (π : Equiv.Perm (Fin m)) (x
   rw [Finsupp.single_apply]
   exact if_congr Prod.ext_iff rfl rfl
 
-theorem mon_LL {m : ℕ} {r c : Fin m → Fin n} (hr : StrictMono r) (hc : StrictMono c)
-    (π : Equiv.Perm (Fin m)) (hπ : π ≠ 1) : LL key (mon r c π) (mon r c 1) := by
+theorem mon_LL
+    {m : ℕ} {r c : Fin m → Fin n}
+    (hr : StrictMono r) (hc : StrictMono c) (π : Equiv.Perm (Fin m)) (hπ : π ≠ 1)
+    : LL key (mon r c π) (mon r c 1) := by
   classical
   obtain ⟨a, ha, hmin⟩ : ∃ a, π a ≠ a ∧ ∀ i, i < a → π i = i := by
     have hne : (univ.filter fun a => π a ≠ a).Nonempty := by
@@ -261,9 +275,12 @@ theorem mon_LL {m : ℕ} {r c : Fin m → Fin n} (hr : StrictMono r) (hc : Stric
       subst this
       exact ha (hc.injective h2)
     rw [h0]
-    have h1 := Finset.single_le_sum
-      (f := fun i => if (r i = (r a, c a).1 ∧ c ((1 : Equiv.Perm (Fin m)) i) = (r a, c a).2) then 1 else 0)
-      (fun _ _ => Nat.zero_le _) (Finset.mem_univ a)
+    have h1 :=
+      Finset.single_le_sum
+        (f := fun i =>
+          if (r i = (r a, c a).1 ∧ c ((1 : Equiv.Perm (Fin m)) i) = (r a, c a).2) then 1 else 0)
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ a)
     simp only [Equiv.Perm.coe_one, id_eq, and_self, if_true] at h1
     simp only [Equiv.Perm.coe_one, id_eq]
     omega
@@ -294,25 +311,31 @@ theorem mon_LL {m : ℕ} {r c : Fin m → Fin n} (hr : StrictMono r) (hc : Stric
         · rw [hy]; exact hr h
       constructor <;> rintro ⟨h1, _⟩ <;> exact absurd h1 hlt.ne'
 
-theorem Lead_det (k : Type*) [CommRing k] {m : ℕ} (r c : Fin m → Fin n) (hr : StrictMono r)
-    (hc : StrictMono c) : Lead key (((genX k n).submatrix r c).det) (mon r c 1) := by
+theorem Lead_det
+    (k : Type*) [CommRing k] {m : ℕ} (r c : Fin m → Fin n) (hr : StrictMono r) (hc : StrictMono c)
+    : Lead key (((genX k n).submatrix r c).det) (mon r c 1) := by
   classical
-  have hdet : ((genX k n).submatrix r c).det =
-      ∑ π : Equiv.Perm (Fin m), C (((Equiv.Perm.sign π : ℤ) : k)) * monomial (mon r c π) (1 : k) := by
-    rw [← Matrix.det_transpose, Matrix.det_apply']
-    refine Finset.sum_congr rfl fun π _ => ?_
-    rw [map_intCast]
-    congr 1
-    unfold mon
-    rw [MvPolynomial.monomial_sum_one]
-    refine Finset.prod_congr rfl fun i _ => ?_
-    simp [genX, Matrix.transpose_apply, Matrix.submatrix_apply, MvPolynomial.X]
-  have hcoeff : ∀ e, AddMonoidAlgebra.coeff (((genX k n).submatrix r c).det) e =
-      ∑ π : Equiv.Perm (Fin m), ((Equiv.Perm.sign π : ℤ) : k) * (if mon r c π = e then (1 : k) else 0) := by
-    intro e
-    rw [hdet, MvPolynomial.coeff_sum]
-    refine Finset.sum_congr rfl fun π _ => ?_
-    rw [MvPolynomial.coeff_C_mul, MvPolynomial.coeff_monomial]
+  have hdet
+      : ((genX k n).submatrix r c).det
+        = ∑ π : Equiv.Perm (Fin m), C (((Equiv.Perm.sign π : ℤ) : k)) * monomial (mon r c π) (1 : k) :=
+    by
+      rw [← Matrix.det_transpose, Matrix.det_apply']
+      refine Finset.sum_congr rfl fun π _ => ?_
+      rw [map_intCast]
+      congr 1
+      unfold mon
+      rw [MvPolynomial.monomial_sum_one]
+      refine Finset.prod_congr rfl fun i _ => ?_
+      simp [genX, Matrix.transpose_apply, Matrix.submatrix_apply, MvPolynomial.X]
+  have hcoeff
+      : ∀ e,
+        AddMonoidAlgebra.coeff (((genX k n).submatrix r c).det) e
+          = ∑ π : Equiv.Perm (Fin m), ((Equiv.Perm.sign π : ℤ) : k) * (if mon r c π = e then (1 : k) else 0) :=
+    by
+      intro e
+      rw [hdet, MvPolynomial.coeff_sum]
+      refine Finset.sum_congr rfl fun π _ => ?_
+      rw [MvPolynomial.coeff_C_mul, MvPolynomial.coeff_monomial]
   constructor
   · rw [hcoeff, Finset.sum_eq_single 1]
     · simp
@@ -340,20 +363,22 @@ theorem card_initSeg {h : ℕ} (hh : h ≤ n) : (initSeg n h).card = h := by
   rw [Fin.card_filter_val_lt]
   exact min_eq_right hh
 
-theorem initSeg_emb {h k : ℕ} (hh : h ≤ n) (hk : (initSeg n h).card = k) (i : Fin k) :
-    ((initSeg n h).orderEmbOfFin hk i).val = i.val := by
+theorem initSeg_emb {h k : ℕ} (hh : h ≤ n) (hk : (initSeg n h).card = k) (i : Fin k)
+    : ((initSeg n h).orderEmbOfFin hk i).val = i.val := by
   have hkh : k = h := by rw [← hk, card_initSeg hh]
   have hlt : ∀ j : Fin k, j.val < n := fun j => by have := j.2; omega
-  have := Finset.orderEmbOfFin_unique hk (f := fun j : Fin k => (⟨j.val, hlt j⟩ : Fin n))
-    (fun j => by
-      unfold initSeg
-      rw [Finset.mem_filter]
-      exact ⟨Finset.mem_univ _, by have := j.2; simp only; omega⟩)
-    (fun j j' hjj => hjj)
+  have :=
+    Finset.orderEmbOfFin_unique hk
+      (f := fun j : Fin k => (⟨j.val, hlt j⟩ : Fin n))
+      (fun j => by
+        unfold initSeg
+        rw [Finset.mem_filter]
+        exact ⟨Finset.mem_univ _, by have := j.2; simp only; omega⟩)
+      (fun j j' hjj => hjj)
   rw [← congr_fun this i]
 
-theorem nthElt_emb {J : Finset (Fin n)} {k : ℕ} (h : J.card = k) (i : Fin k) :
-    nthElt J i.val = (J.orderEmbOfFin h i).val := by
+theorem nthElt_emb {J : Finset (Fin n)} {k : ℕ} (h : J.card = k) (i : Fin k)
+    : nthElt J i.val = (J.orderEmbOfFin h i).val := by
   unfold nthElt
   rw [Finset.orderEmbOfFin_apply, List.getD_eq_getElem _ _ (by simp [h])]
   simp
@@ -373,7 +398,8 @@ theorem lt_card_of_nthElt {J : Finset (Fin n)} {a : ℕ} (h : nthElt J a < n) : 
   rw [nthElt_ge (not_lt.1 hc)] at h
   exact lt_irrefl _ h
 
-theorem mem_iff_nthElt (J : Finset (Fin n)) (b : Fin n) : b ∈ J ↔ ∃ a : Fin n, nthElt J a.val = b.val := by
+theorem mem_iff_nthElt (J : Finset (Fin n)) (b : Fin n)
+    : b ∈ J ↔ ∃ a : Fin n, nthElt J a.val = b.val := by
   have hle : J.card ≤ n := by simpa using Finset.card_le_univ J
   constructor
   · intro hb
@@ -393,18 +419,31 @@ theorem mem_iff_nthElt (J : Finset (Fin n)) (b : Fin n) : b ∈ J ↔ ∃ a : Fi
 def colDiag (J : Finset (Fin n)) : Fin n × Fin n →₀ ℕ :=
   ∑ b ∈ J, ∑ a : Fin n, if a.val = (J.filter (· < b)).card then Finsupp.single (a, b) 1 else 0
 
-theorem sum_emb {M : Type*} [AddCommMonoid M] (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (F : Fin n → M) :
-    ∑ b ∈ J, F b = ∑ i : Fin k, F (J.orderEmbOfFin h i) := by
+theorem sum_emb
+    {M : Type*} [AddCommMonoid M] (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (F : Fin n → M)
+    : ∑ b ∈ J, F b = ∑ i : Fin k, F (J.orderEmbOfFin h i) := by
   conv_lhs => rw [← Finset.map_orderEmbOfFin_univ J h]
   rw [Finset.sum_map]
   rfl
 
-theorem card_filter_lt_emb (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (i : Fin k) :
-    (J.filter (· < J.orderEmbOfFin h i)).card = i.val := by
-  first | exact Bl.general_b_fact_right_further.goal1 .. | (apply Bl.general_b_fact_right_further.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_right_further.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_further.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_right_further.goal1 <;> assumption) | (apply @Bl.general_b_fact_right_further.goal1 <;> first | assumption | infer_instance) | exact @Bl.general_b_fact_right_further.goal1 n J k h i | exact @Bl.general_b_fact_right_further.goal1 n J k h | exact @Bl.general_b_fact_right_further.goal1 n J k | exact @Bl.general_b_fact_right_further.goal1 n J | exact @Bl.general_b_fact_right_further.goal1 n
+theorem card_filter_lt_emb (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (i : Fin k)
+    : (J.filter (· < J.orderEmbOfFin h i)).card = i.val := by
+  first
+  | exact Bl.general_b_fact_right_further.goal1 ..
+  | (apply Bl.general_b_fact_right_further.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_right_further.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_further.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_right_further.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_right_further.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.general_b_fact_right_further.goal1 n J k h i
+  | exact @Bl.general_b_fact_right_further.goal1 n J k h
+  | exact @Bl.general_b_fact_right_further.goal1 n J k
+  | exact @Bl.general_b_fact_right_further.goal1 n J
+  | exact @Bl.general_b_fact_right_further.goal1 n
 
-theorem colDiag_eq (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (r : Fin k → Fin n)
-    (hr : ∀ i, (r i).val = i.val) : colDiag J = mon r (J.orderEmbOfFin h) 1 := by
+theorem colDiag_eq
+    (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (r : Fin k → Fin n) (hr : ∀ i, (r i).val = i.val)
+    : colDiag J = mon r (J.orderEmbOfFin h) 1 := by
   unfold colDiag mon
   rw [sum_emb J h]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -417,10 +456,11 @@ theorem colDiag_eq (J : Finset (Fin n)) {k : ℕ} (h : J.card = k) (r : Fin k �
   · intro hc
     exact absurd (Finset.mem_univ _) hc
 
-theorem colDiag_apply (J : Finset (Fin n)) (a b : Fin n) :
-    colDiag J (a, b) = if nthElt J a.val = b.val then 1 else 0 := by
+theorem colDiag_apply (J : Finset (Fin n)) (a b : Fin n)
+    : colDiag J (a, b) = if nthElt J a.val = b.val then 1 else 0 := by
   have hle : J.card ≤ n := by simpa using Finset.card_le_univ J
-  rw [colDiag_eq J rfl (fun i => (⟨i.val, lt_of_lt_of_le i.2 hle⟩ : Fin n)) (fun _ => rfl), mon_apply]
+  rw [colDiag_eq J rfl (fun i => (⟨i.val, lt_of_lt_of_le i.2 hle⟩ : Fin n)) (fun _ => rfl),
+    mon_apply]
   by_cases hab : nthElt J a.val = b.val
   · rw [if_pos hab]
     have ha : a.val < J.card := lt_card_of_nthElt (by rw [hab]; exact b.2)
@@ -449,13 +489,13 @@ theorem colDiag_apply (J : Finset (Fin n)) (a b : Fin n) :
     rw [h3, nthElt_emb rfl i]
     exact congrArg Fin.val h2
 
-theorem Lead_minor (k : Type*) [CommRing k] (J : Finset (Fin n)) :
-    Lead key (minorF (genX k n) (initSeg n J.card) J) (colDiag J) := by
+theorem Lead_minor (k : Type*) [CommRing k] (J : Finset (Fin n))
+    : Lead key (minorF (genX k n) (initSeg n J.card) J) (colDiag J) := by
   have hle : J.card ≤ n := by simpa using Finset.card_le_univ J
   have hcard : J.card = (initSeg n J.card).card := (card_initSeg hle).symm
   unfold minorF
-  rw [dite_eq_left hcard, colDiag_eq J hcard ((initSeg n J.card).orderEmbOfFin rfl)
-    (fun i => initSeg_emb hle rfl i)]
+  rw [dite_eq_left hcard,
+    colDiag_eq J hcard ((initSeg n J.card).orderEmbOfFin rfl) (fun i => initSeg_emb hle rfl i)]
   exact Lead_det k _ _ (OrderEmbedding.strictMono _) (OrderEmbedding.strictMono _)
 
 end Det
@@ -466,13 +506,13 @@ variable {n C : ℕ}
 
 theorem tabDiag_eq (T : Fin C → Finset (Fin n)) : tabDiag T = ∑ c, colDiag (T c) := rfl
 
-theorem tabDiag_apply (T : Fin C → Finset (Fin n)) (a b : Fin n) :
-    tabDiag T (a, b) = (univ.filter fun c => nthElt (T c) a.val = b.val).card := by
+theorem tabDiag_apply (T : Fin C → Finset (Fin n)) (a b : Fin n)
+    : tabDiag T (a, b) = (univ.filter fun c => nthElt (T c) a.val = b.val).card := by
   rw [tabDiag_eq, Finsupp.finsetSum_apply, Finset.card_filter]
   exact Finset.sum_congr rfl fun c _ => colDiag_apply _ _ _
 
-theorem semi_mono {T : Fin C → Finset (Fin n)} (hT : SemiStd T) (a : ℕ) :
-    Monotone fun c => nthElt (T c) a := by
+theorem semi_mono {T : Fin C → Finset (Fin n)} (hT : SemiStd T) (a : ℕ)
+    : Monotone fun c => nthElt (T c) a := by
   have step : ∀ c c' : Fin C, c.val + 1 = c'.val → nthElt (T c) a ≤ nthElt (T c') a := by
     intro c c' h
     by_cases ha : a < (T c').card
@@ -493,8 +533,8 @@ theorem semi_mono {T : Fin C → Finset (Fin n)} (hT : SemiStd T) (a : ℕ) :
   have hle : c.val ≤ c'.val := hcc
   exact all (c'.val - c.val) c c' (by omega)
 
-theorem lower_card (S : Finset (Fin C)) (hS : ∀ c ∈ S, ∀ c' ≤ c, c' ∈ S) (c : Fin C) :
-    c ∈ S ↔ c.val < S.card := by
+theorem lower_card (S : Finset (Fin C)) (hS : ∀ c ∈ S, ∀ c' ≤ c, c' ∈ S) (c : Fin C)
+    : c ∈ S ↔ c.val < S.card := by
   constructor
   · intro hc
     have : Finset.Iic c ⊆ S := fun c' hc' => hS c hc c' (Finset.mem_Iic.1 hc')
@@ -512,11 +552,12 @@ theorem lower_card (S : Finset (Fin C)) (hS : ∀ c ∈ S, ∀ c' ≤ c, c' ∈ 
     rw [Fin.card_Iio] at this
     omega
 
-theorem mono_le_iff (f : Fin C → ℕ) (hf : Monotone f) (v : ℕ) (c : Fin C) :
-    f c ≤ v ↔ c.val < ∑ w ∈ Finset.range (v + 1), (univ.filter fun c => f c = w).card := by
+theorem mono_le_iff (f : Fin C → ℕ) (hf : Monotone f) (v : ℕ) (c : Fin C)
+    : f c ≤ v ↔ c.val < ∑ w ∈ Finset.range (v + 1), (univ.filter fun c => f c = w).card := by
   classical
-  have h1 : (univ.filter fun c => f c ≤ v).card =
-      ∑ w ∈ Finset.range (v + 1), (univ.filter fun c => f c = w).card := by
+  have h1
+      : (univ.filter fun c => f c ≤ v).card
+        = ∑ w ∈ Finset.range (v + 1), (univ.filter fun c => f c = w).card := by
     rw [Finset.card_eq_sum_card_fiberwise (f := f) (t := Finset.range (v + 1))]
     · refine Finset.sum_congr rfl fun w hw => ?_
       congr 1
@@ -536,9 +577,10 @@ theorem mono_le_iff (f : Fin C → ℕ) (hf : Monotone f) (v : ℕ) (c : Fin C) 
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hc ⊢
     exact (hf hcc).trans hc
 
-theorem mono_eq_of_counts (f g : Fin C → ℕ) (hf : Monotone f) (hg : Monotone g) (hfn : ∀ c, f c ≤ n)
-    (hgn : ∀ c, g c ≤ n)
-    (h : ∀ v < n, (univ.filter fun c => f c = v).card = (univ.filter fun c => g c = v).card) : f = g := by
+theorem mono_eq_of_counts
+    (f g : Fin C → ℕ) (hf : Monotone f) (hg : Monotone g) (hfn : ∀ c, f c ≤ n) (hgn : ∀ c, g c ≤ n)
+    (h : ∀ v < n, (univ.filter fun c => f c = v).card = (univ.filter fun c => g c = v).card)
+    : f = g := by
   have hiff : ∀ v < n, ∀ c, f c ≤ v ↔ g c ≤ v := by
     intro v hv c
     rw [mono_le_iff f hf, mono_le_iff g hg]
@@ -555,12 +597,14 @@ theorem mono_eq_of_counts (f g : Fin C → ℕ) (hf : Monotone f) (hg : Monotone
       omega
     · omega
 
-theorem tab_inj {T T' : Fin C → Finset (Fin n)} (hT : SemiStd T) (hT' : SemiStd T')
-    (h : tabDiag T = tabDiag T') : T = T' := by
+theorem tab_inj
+    {T T' : Fin C → Finset (Fin n)} (hT : SemiStd T) (hT' : SemiStd T') (h : tabDiag T = tabDiag T')
+    : T = T' := by
   have hrow : ∀ a : Fin n, (fun c => nthElt (T c) a.val) = fun c => nthElt (T' c) a.val := by
     intro a
     apply mono_eq_of_counts (n := n) _ _ (semi_mono hT a.val) (semi_mono hT' a.val)
-      (fun c => nthElt_le _ _) (fun c => nthElt_le _ _)
+      (fun c => nthElt_le _ _)
+      (fun c => nthElt_le _ _)
     intro v hv
     have h1 := tabDiag_apply T a ⟨v, hv⟩
     have h2 := tabDiag_apply T' a ⟨v, hv⟩
@@ -575,8 +619,8 @@ theorem tab_inj {T T' : Fin C → Finset (Fin n)} (hT : SemiStd T) (hT' : SemiSt
   · rintro ⟨a, ha⟩
     exact ⟨a, by rw [← ha]; exact congr_fun (hrow a) c⟩
 
-theorem Lead_tab (k : Type*) [CommRing k] (T : Fin C → Finset (Fin n)) :
-    Lead key (tabMinors k T) (tabDiag T) := by
+theorem Lead_tab (k : Type*) [CommRing k] (T : Fin C → Finset (Fin n))
+    : Lead key (tabMinors k T) (tabDiag T) := by
   rw [tabDiag_eq]
   unfold tabMinors
   exact Lead_prod key_inj _ _ _ fun c _ => Lead_minor k (T c)

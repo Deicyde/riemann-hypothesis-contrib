@@ -10,13 +10,16 @@ open MvPolynomial Finset
 
 variable {p : ℕ} [Fact p.Prime] {N r : ℕ}
 
-noncomputable def evVal (p : ℕ) [Fact p.Prime] {N r : ℕ} (ρ : Fin r) :
-    Fin (N + 1) × Fin r → MvPolynomial (Fin N × Fin r) ℚ_[p] :=
-  fun v => Fin.lastCases (motive := fun _ => MvPolynomial (Fin N × Fin r) ℚ_[p])
-    (if v.2 = ρ then 1 else 0) (fun i => X (i, v.2)) v.1
+noncomputable def evVal (p : ℕ) [Fact p.Prime] {N r : ℕ} (ρ : Fin r)
+    : Fin (N + 1) × Fin r → MvPolynomial (Fin N × Fin r) ℚ_[p] := fun v =>
+  Fin.lastCases
+    (motive := fun _ => MvPolynomial (Fin N × Fin r) ℚ_[p])
+    (if v.2 = ρ then 1 else 0)
+    (fun i => X (i, v.2))
+    v.1
 
-noncomputable def ev (p : ℕ) [Fact p.Prime] {N r : ℕ} (ρ : Fin r) :
-    MvPolynomial (Fin (N + 1) × Fin r) ℚ_[p] →ₐ[ℚ_[p]] MvPolynomial (Fin N × Fin r) ℚ_[p] :=
+noncomputable def ev (p : ℕ) [Fact p.Prime] {N r : ℕ} (ρ : Fin r)
+    : MvPolynomial (Fin (N + 1) × Fin r) ℚ_[p] →ₐ[ℚ_[p]] MvPolynomial (Fin N × Fin r) ℚ_[p] :=
   aeval (evVal p ρ)
 
 @[simp] lemma evVal_last (ρ c : Fin r) :
@@ -51,8 +54,8 @@ noncomputable def res (m : Fin (N + 1) × Fin r →₀ ℕ) : Fin N × Fin r →
   simp [res]
 
 noncomputable def ext (n : ℕ) (ρ : Fin r) (m : Fin N × Fin r →₀ ℕ) : Fin (N + 1) × Fin r →₀ ℕ :=
-  Finsupp.equivFunOnFinite.symm (fun v => Fin.lastCases (motive := fun _ => ℕ)
-    (if v.2 = ρ then n else 0) (fun i => m (i, v.2)) v.1)
+  Finsupp.equivFunOnFinite.symm (fun v =>
+    Fin.lastCases (motive := fun _ => ℕ) (if v.2 = ρ then n else 0) (fun i => m (i, v.2)) v.1)
 
 @[simp] lemma ext_last (n : ℕ) (ρ c : Fin r) (m : Fin N × Fin r →₀ ℕ) :
     ext n ρ m (Fin.last N, c) = if c = ρ then n else 0 := by
@@ -310,8 +313,10 @@ lemma coeff_X_pderiv_castSucc (ρ : Fin r) (G : MvPolynomial (Fin (N + 1) × Fin
     simp [Finsupp.single_apply, Fin.castSucc_ne_last]
   · rfl
 
-theorem vanish (LL : Letters N) (n : ℕ) (ρ : Fin r) (G : MvPolynomial (Fin (N + 1) × Fin r) ℚ_[p])
-    (hinv : IsFrozenInv p LL ρ n G) (h0 : ∀ m, kk ρ m = 0 → AddMonoidAlgebra.coeff G m = 0) : G = 0 := by
+theorem vanish
+    (LL : Letters N) (n : ℕ) (ρ : Fin r) (G : MvPolynomial (Fin (N + 1) × Fin r) ℚ_[p])
+    (hinv : IsFrozenInv p LL ρ n G) (h0 : ∀ m, kk ρ m = 0 → AddMonoidAlgebra.coeff G m = 0)
+    : G = 0 := by
   classical
   by_contra hne
   have hex : ∃ k, ∃ m, kk ρ m = k ∧ AddMonoidAlgebra.coeff G m ≠ 0 := by
@@ -329,7 +334,8 @@ theorem vanish (LL : Letters N) (n : ℕ) (ρ : Fin r) (G : MvPolynomial (Fin (N
     simp only [kk]
     exact Finset.sum_eq_zero fun c' hc' => hcon c' (Finset.ne_of_mem_erase hc')
   set m' := m - Finsupp.single (Fin.last N, c) 1 + Finsupp.single (Fin.last N, ρ) 1 with hm'
-  have hval : ∀ c', c' ≠ ρ → m' (Fin.last N, c') = m (Fin.last N, c') - (if c = c' then 1 else 0) := by
+  have hval
+      : ∀ c', c' ≠ ρ → m' (Fin.last N, c') = m (Fin.last N, c') - (if c = c' then 1 else 0) := by
     intro c' hc'
     simp [hm', Finsupp.single_apply, Ne.symm hc']
   have hlt : kk ρ m' < kk ρ m := by
@@ -339,27 +345,35 @@ theorem vanish (LL : Letters N) (n : ℕ) (ρ : Fin r) (G : MvPolynomial (Fin (N
       exact Nat.sub_le _ _
     · rw [hval c hcρ, if_pos rfl]
       omega
-  have hG' : ∀ ν, kk ρ ν = kk ρ m' → AddMonoidAlgebra.coeff G ν = 0 := fun ν hν => hmin ν (hν ▸ hmk ▸ hlt)
+  have hG' : ∀ ν, kk ρ ν = kk ρ m' → AddMonoidAlgebra.coeff G ν = 0 := fun ν hν =>
+    hmin ν (hν ▸ hmk ▸ hlt)
   have hc0 := congrArg (AddMonoidAlgebra.coeff · m') (hinv c hcρ)
   simp only [glAct, LinearMap.sum_apply, MvPolynomial.coeff_sum, AddMonoidAlgebra.coeff_zero,
-    Finsupp.zero_apply] at hc0
+      Finsupp.zero_apply]
+    at hc0
   rw [Fin.sum_univ_castSucc, Finset.sum_eq_zero (fun i _ => ?_), zero_add] at hc0
   · have hl : ((Fin.last N : Fin (N + 1)) : ℕ) < N + 1 := (Fin.last N).isLt
     rw [if_pos hl] at hc0
-    simp only [snoc_vec_last, Bool.false_eq_true, ↓reduceIte, LinearMap.neg_apply, LinearMap.comp_apply,
-      LinearMap.mulLeft_apply, coeff_neg, neg_eq_zero] at hc0
+    simp only [snoc_vec_last, Bool.false_eq_true, ↓ reduceIte, LinearMap.neg_apply,
+        LinearMap.comp_apply, LinearMap.mulLeft_apply, coeff_neg, neg_eq_zero]
+      at hc0
     rw [MvPolynomial.coeff_X_mul', if_pos (by simp [hm'])] at hc0
     erw [MvPolynomial.coeff_pderiv] at hc0
     have e1 : m' - Finsupp.single (Fin.last N, ρ) 1 + Finsupp.single (Fin.last N, c) 1 = m := by
       rw [hm', add_tsub_cancel_right,
         tsub_add_cancel_of_le (Finsupp.single_le_iff.2 (Nat.one_le_iff_ne_zero.2 hc))]
-    have e2 : ((m' - Finsupp.single (Fin.last N, ρ) 1 : Fin (N + 1) × Fin r →₀ ℕ) (Fin.last N, c)) + 1 =
-        m (Fin.last N, c) := by
+    have e2
+        : ((m' - Finsupp.single (Fin.last N, ρ) 1 : Fin (N + 1) × Fin r →₀ ℕ) (Fin.last N, c)) + 1
+          = m (Fin.last N, c) := by
       rw [hm', add_tsub_cancel_right, Finsupp.tsub_apply, Finsupp.single_eq_same]
       omega
     rw [e1] at hc0
-    have e3 : ((((m' - Finsupp.single (Fin.last N, ρ) 1 : Fin (N + 1) × Fin r →₀ ℕ) (Fin.last N, c) : ℕ) :
-        ℚ_[p]) + 1) = ((m (Fin.last N, c) : ℕ) : ℚ_[p]) := by exact_mod_cast e2
+    have e3
+        : ((((m' - Finsupp.single (Fin.last N, ρ) 1 : Fin (N + 1) × Fin r →₀ ℕ) (Fin.last N, c) : ℕ)
+              : ℚ_[p])
+            + 1)
+          = ((m (Fin.last N, c) : ℕ) : ℚ_[p]) := by
+      exact_mod_cast e2
     rw [e3] at hc0
     rcases mul_eq_zero.1 hc0 with h | h
     · exact hm h
@@ -369,7 +383,8 @@ theorem vanish (LL : Letters N) (n : ℕ) (ρ : Fin r) (G : MvPolynomial (Fin (N
     split_ifs
     · simp only [LinearMap.comp_apply, LinearMap.mulLeft_apply]
       exact coeff_X_pderiv_castSucc ρ G m' hG' i c ρ
-    · simp only [LinearMap.neg_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply, coeff_neg, neg_eq_zero]
+    · simp only [LinearMap.neg_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply, coeff_neg,
+        neg_eq_zero]
       exact coeff_X_pderiv_castSucc ρ G m' hG' i ρ c
 
 end Formalism.GM.M.FB
@@ -411,7 +426,8 @@ open MvPolynomial Finset M.FB
 theorem extendBijOn : M.FreezeBij := by
   intro p _ N r LL ρ n hS
   refine ⟨fun f _ g _ h => ?_, fun F hF hinv => ?_⟩
-  · calc f = ev p ρ (M.freeze p LL ρ n f) := (ev_freeze LL ρ n f).symm
+  · calc
+      f = ev p ρ (M.freeze p LL ρ n f) := (ev_freeze LL ρ n f).symm
       _ = ev p ρ (M.freeze p LL ρ n g) := by rw [h]
       _ = g := ev_freeze LL ρ n g
   · obtain ⟨hFpol, hFint⟩ := Submodule.mem_inf.1 hF
@@ -420,7 +436,9 @@ theorem extendBijOn : M.FreezeBij := by
       have := (hFsupp (Finset.mem_coe.2 hm)) (Fin.last N)
       rwa [snoc_deg_last] at this
     obtain ⟨f, hf⟩ : ∃ f, f = ev p ρ F := ⟨_, rfl⟩
-    have hcf : ∀ m', AddMonoidAlgebra.coeff f m' = AddMonoidAlgebra.coeff F (ext n ρ m') := fun m' => by rw [hf]; exact coeff_ev ρ n F hFn m'
+    have hcf
+        : ∀ m', AddMonoidAlgebra.coeff f m' = AddMonoidAlgebra.coeff F (ext n ρ m') := fun m' => by
+      rw [hf]; exact coeff_ev ρ n F hFn m'
     have hfpol : f ∈ M.Pol p r LL := by
       rw [M.Pol, MvPolynomial.mem_restrictSupport_iff]
       intro m' hm'
@@ -437,14 +455,17 @@ theorem extendBijOn : M.FreezeBij := by
       obtain ⟨m', hm', rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hx
       rw [hcf]
       apply hFint
-      exact MvPolynomial.coeff_mem_coeffs _ (by rw [← hcf]; exact MvPolynomial.mem_support_iff.1 hm')
+      exact MvPolynomial.coeff_mem_coeffs _
+        (by rw [← hcf]; exact MvPolynomial.mem_support_iff.1 hm')
     refine ⟨f, Submodule.mem_inf.2 ⟨hfpol, hfint⟩, ?_⟩
     have hfz : ∀ m ∈ (M.freeze p LL ρ n f).support, ∑ c, m (Fin.last N, c) = n := by
       intro m hm
       have := hom_freeze LL ρ n hS f hfpol (MvPolynomial.mem_support_iff.1 hm)
       rwa [weight_wL] at this
-    have hG := vanish LL n ρ (M.freeze p LL ρ n f - F)
-      (fun c hc => by rw [map_sub, freeze_inv LL ρ n f c hc, hinv c hc, sub_zero]) (fun m hkk => ?_)
+    have hG :=
+      vanish LL n ρ (M.freeze p LL ρ n f - F)
+        (fun c hc => by rw [map_sub, freeze_inv LL ρ n f c hc, hinv c hc, sub_zero])
+        (fun m hkk => ?_)
     · exact sub_eq_zero.1 hG
     · rw [MvPolynomial.coeff_sub, sub_eq_zero]
       by_cases hrow : ∑ c, m (Fin.last N, c) = n

@@ -17,8 +17,8 @@ noncomputable section
 
 universe u
 
-theorem MultigradedHilbertPolynomial.proof (h : EventualPolynomial.Statement) :
-    MultigradedHilbertPolynomial.Statement.{u} := by
+theorem MultigradedHilbertPolynomial.proof (h : EventualPolynomial.Statement)
+    : MultigradedHilbertPolynomial.Statement.{u} := by
   intro F _ K _ _ ι _ q d hq hdim
   have hlt : ringKrullDim (MRing ι F ⧸ q) < (((d + 1) + Fintype.card K : ℕ) : WithBot ℕ∞) := by
     rw [hdim]

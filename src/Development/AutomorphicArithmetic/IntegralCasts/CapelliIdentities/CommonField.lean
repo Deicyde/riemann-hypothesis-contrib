@@ -5,28 +5,30 @@ public import Mathlib
 @[expose] public section
 
 open TensorProduct in
-private theorem UpperTheory.Reformulated.B.Qe15.compositum (K κ₁ κ₂ : Type) [Field K] [Field κ₁] [Field κ₂]
-    [Algebra K κ₁] [Algebra K κ₂] :
-    ∃ (κ : Type) (_ : Field κ) (j₁ : κ₁ →+* κ) (j₂ : κ₂ →+* κ),
-      ∀ x : K, j₁ (algebraMap K κ₁ x) = j₂ (algebraMap K κ₂ x) := by
+private theorem UpperTheory.Reformulated.B.Qe15.compositum
+    (K κ₁ κ₂ : Type) [Field K] [Field κ₁] [Field κ₂] [Algebra K κ₁] [Algebra K κ₂]
+    : ∃ (κ : Type) (_ : Field κ) (j₁ : κ₁ →+* κ) (j₂ : κ₂ →+* κ), ∀ x : K,
+      j₁ (algebraMap K κ₁ x) = j₂ (algebraMap K κ₂ x) := by
   haveI : Nontrivial (κ₁ ⊗[K] κ₂) := inferInstance
   obtain ⟨m, hm⟩ := Ideal.exists_maximal (κ₁ ⊗[K] κ₂)
-  refine ⟨(κ₁ ⊗[K] κ₂) ⧸ m, Ideal.Quotient.field m,
-    (Ideal.Quotient.mk m).comp
-      (Algebra.TensorProduct.includeLeft : κ₁ →ₐ[K] κ₁ ⊗[K] κ₂).toRingHom,
-    (Ideal.Quotient.mk m).comp
-      (Algebra.TensorProduct.includeRight : κ₂ →ₐ[K] κ₁ ⊗[K] κ₂).toRingHom, fun x => ?_⟩
+  refine ⟨
+    (κ₁ ⊗[K] κ₂) ⧸ m,
+    Ideal.Quotient.field m,
+    (Ideal.Quotient.mk m).comp (Algebra.TensorProduct.includeLeft : κ₁ →ₐ[K] κ₁ ⊗[K] κ₂).toRingHom,
+    (Ideal.Quotient.mk m).comp (Algebra.TensorProduct.includeRight : κ₂ →ₐ[K] κ₁ ⊗[K] κ₂).toRingHom,
+    fun x => ?_
+  ⟩
   change Ideal.Quotient.mk m
-      ((Algebra.TensorProduct.includeLeft : κ₁ →ₐ[K] κ₁ ⊗[K] κ₂) (algebraMap K κ₁ x)) =
-    Ideal.Quotient.mk m
+      ((Algebra.TensorProduct.includeLeft : κ₁ →ₐ[K] κ₁ ⊗[K] κ₂) (algebraMap K κ₁ x))
+    = Ideal.Quotient.mk m
       ((Algebra.TensorProduct.includeRight : κ₂ →ₐ[K] κ₁ ⊗[K] κ₂) (algebraMap K κ₂ x))
   rw [AlgHom.commutes, AlgHom.commutes]
 
-theorem UpperTheory.Reformulated.B.Qe15.common_field :
-    ∀ (B κ₁ κ₂ : Type) [inst : CommRing B] [inst_1 : Field κ₁] [inst_2 : Field κ₂]
-    (f₁ : B →+* κ₁) (f₂ : B →+* κ₂),
-    RingHom.ker f₁ = RingHom.ker f₂ →
-      ∃ (κ : Type) (x : Field κ) (j₁ : κ₁ →+* κ) (j₂ : κ₂ →+* κ), j₁.comp f₁ = j₂.comp f₂ := by
+theorem UpperTheory.Reformulated.B.Qe15.common_field
+    : ∀ (B κ₁ κ₂ : Type) [inst : CommRing B] [inst_1 : Field κ₁] [inst_2 : Field κ₂] (f₁ : B →+* κ₁)
+        (f₂ : B →+* κ₂),
+      RingHom.ker f₁ = RingHom.ker f₂
+        → ∃ (κ : Type) (x : Field κ) (j₁ : κ₁ →+* κ) (j₂ : κ₂ →+* κ), j₁.comp f₁ = j₂.comp f₂ := by
   intro B κ₁ κ₂ _ _ _ f₁ f₂ h
   let D := B ⧸ RingHom.ker f₁
   haveI : (RingHom.ker f₁).IsPrime := RingHom.ker_isPrime f₁

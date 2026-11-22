@@ -18,12 +18,13 @@ variable {R : Type} [CommRing R]
 def ev0 (F : MvPowerSeries (Fin 2) R) : PowerSeries R :=
   MvPowerSeries.subst ![(X : PowerSeries R), 0] F
 
-theorem coeff_evalYZero (F : MvPowerSeries (Fin 2) R) (n : ℕ) :
-    coeff n (ev0 F) = MvPowerSeries.coeff (Finsupp.single 0 n) F := by
+theorem coeff_evalYZero (F : MvPowerSeries (Fin 2) R) (n : ℕ)
+    : coeff n (ev0 F) = MvPowerSeries.coeff (Finsupp.single 0 n) F := by
   have ha : MvPowerSeries.HasSubst ![(X : PowerSeries R), 0] :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero
-      (fun i => by fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
-  have hc : ∀ f : PowerSeries R, MvPowerSeries.coeff (Finsupp.single () n) f = coeff n f := fun f => rfl
+    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by
+      fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
+  have hc : ∀ f : PowerSeries R, MvPowerSeries.coeff (Finsupp.single () n) f = coeff n f := fun f =>
+    rfl
   have h := MvPowerSeries.coeff_subst ha F (Finsupp.single () n)
   unfold ev0
   rw [← hc, h, finsum_eq_single _ (Finsupp.single 0 n)]
@@ -44,31 +45,34 @@ theorem coeff_evalYZero (F : MvPowerSeries (Fin 2) R) (n : ℕ) :
 
 theorem evalYZero_add (F G : MvPowerSeries (Fin 2) R) : ev0 (F + G) = ev0 F + ev0 G := by
   have ha : MvPowerSeries.HasSubst ![(X : PowerSeries R), 0] :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
+    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by
+      fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
   unfold ev0
   rw [MvPowerSeries.subst_add ha]
 
 theorem evalYZero_mul (F G : MvPowerSeries (Fin 2) R) : ev0 (F * G) = ev0 F * ev0 G := by
   have ha : MvPowerSeries.HasSubst ![(X : PowerSeries R), 0] :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
+    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by
+      fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
   unfold ev0
   rw [MvPowerSeries.subst_mul ha]
 
-theorem evalYZero_subst (φ : PowerSeries R) {P : MvPowerSeries (Fin 2) R}
-    (hP : MvPowerSeries.constantCoeff P = 0) : ev0 (φ.subst P) = φ.subst (ev0 P) := by
+theorem evalYZero_subst
+    (φ : PowerSeries R) {P : MvPowerSeries (Fin 2) R} (hP : MvPowerSeries.constantCoeff P = 0)
+    : ev0 (φ.subst P) = φ.subst (ev0 P) := by
   have ha : MvPowerSeries.HasSubst ![(X : PowerSeries R), 0] :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero
-      (fun i => by fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
+    MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by
+      fin_cases i <;> first | exact PowerSeries.constantCoeff_X | simp)
   have hP' : MvPowerSeries.HasSubst (fun _ : Unit => P) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => hP)
   unfold ev0
   unfold PowerSeries.subst
   exact MvPowerSeries.subst_comp_subst_apply hP' ha φ
 
-private theorem mvPowerSeries_coeff_subst_X_eq_ite_single {S : Type} [CommRing S] {ι : Type} [DecidableEq ι] (i : ι) (f : PowerSeries S)
-    (e : ι →₀ ℕ) :
-    MvPowerSeries.coeff e (f.subst (MvPowerSeries.X i : MvPowerSeries ι S)) =
-      if e = Finsupp.single i (e i) then coeff (e i) f else 0 := by
+private theorem mvPowerSeries_coeff_subst_X_eq_ite_single
+    {S : Type} [CommRing S] {ι : Type} [DecidableEq ι] (i : ι) (f : PowerSeries S) (e : ι →₀ ℕ)
+    : MvPowerSeries.coeff e (f.subst (MvPowerSeries.X i : MvPowerSeries ι S))
+      = if e = Finsupp.single i (e i) then coeff (e i) f else 0 := by
   have ha : HasSubst (MvPowerSeries.X i : MvPowerSeries ι S) :=
     HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X i)
   rw [PowerSeries.coeff_subst ha]
@@ -113,7 +117,8 @@ variable {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] {l : ℕ}
 
 variable {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K}
 
-theorem partialYAtZero_eq (F : MvPowerSeries (Fin 2) K) : d2 F = ev0 (MvPowerSeries.pderiv (R := K) 1 F) := by
+theorem partialYAtZero_eq (F : MvPowerSeries (Fin 2) K)
+    : d2 F = ev0 (MvPowerSeries.pderiv (R := K) 1 F) := by
   ext n
   rw [coeff_evalYZero, MvPowerSeries.coeff_pderiv]
   simp [d2]
@@ -125,17 +130,19 @@ theorem integralPS_partialYAtZero (hΦ : IntegralMv Φ) : IntegralPS (d2 Φ) := 
   rw [coeff_mk]
   exact hΦ _
 
-theorem divBy_partialYAtZero {x : K} {F : MvPowerSeries (Fin 2) K} (hF : DivByMv x F) : DivBy x (d2 F) := by
+theorem divBy_partialYAtZero {x : K} {F : MvPowerSeries (Fin 2) K} (hF : DivByMv x F)
+    : DivBy x (d2 F) := by
   unfold DivByMv at hF
   unfold DivBy d2
   intro n
   rw [coeff_mk]
   exact hF _
 
-theorem partialYAtZero_subst (D : PowerSeries K) {P : MvPowerSeries (Fin 2) K}
-    (hP : MvPowerSeries.constantCoeff P = 0) :
-    d2 (D.subst P) = (derivative D).subst (ev0 P) * d2 P := by
-  rw [partialYAtZero_eq, Formalism.G.LogCR.pderiv_psubst hP, evalYZero_mul, evalYZero_subst _ hP, partialYAtZero_eq]
+theorem partialYAtZero_subst
+    (D : PowerSeries K) {P : MvPowerSeries (Fin 2) K} (hP : MvPowerSeries.constantCoeff P = 0)
+    : d2 (D.subst P) = (derivative D).subst (ev0 P) * d2 P := by
+  rw [partialYAtZero_eq, Formalism.G.LogCR.pderiv_psubst hP, evalYZero_mul, evalYZero_subst _ hP,
+    partialYAtZero_eq]
 
 theorem partialYAtZero_atX (D : PowerSeries K) : d2 (atX D) = 0 := by
   ext n
@@ -171,30 +178,36 @@ theorem LawD.evalYZero_eq (h : LawD lam Φ) : ev0 Φ = X := by
       MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
     exact h.Φ0
   have h1 := congrArg ev0 h.log
-  rw [evalYZero_subst lam h.Φ0, evalYZero_add, evalYZero_atX, evalYZero_atY, h.lam0, map_zero, add_zero] at h1
+  rw [evalYZero_subst lam h.Φ0, evalYZero_add, evalYZero_atX, evalYZero_atY, h.lam0, map_zero,
+      add_zero]
+    at h1
   have hu : IsUnit (coeff 1 lam) := by rw [h.lam1]; exact isUnit_one
   have hl : HasSubst lam := HasSubst.of_constantCoeff_zero h.lam0
   have he : HasSubst (ev0 Φ) := HasSubst.of_constantCoeff_zero hc
   have h2 := PowerSeries.subst_comp_subst_apply hl he (lam.substInvOfIsUnit hu)
   rw [PowerSeries.subst_substInvOfIsUnit_left lam h.lam0 hu, PowerSeries.subst_X he, h1,
-    PowerSeries.subst_substInvOfIsUnit_left lam h.lam0 hu] at h2
+      PowerSeries.subst_substInvOfIsUnit_left lam h.lam0 hu]
+    at h2
   exact h2
 
-private theorem powerSeries_subst_X_self_commRing {S : Type} [CommRing S] (t : PowerSeries S) :
-    t.subst (X : PowerSeries S) = t := by
+private theorem powerSeries_subst_X_self_commRing {S : Type} [CommRing S] (t : PowerSeries S)
+    : t.subst (X : PowerSeries S) = t := by
   ext n
-  rw [PowerSeries.coeff_subst' (HasSubst.of_constantCoeff_zero constantCoeff_X), finsum_eq_single _ n]
+  rw [PowerSeries.coeff_subst' (HasSubst.of_constantCoeff_zero constantCoeff_X),
+    finsum_eq_single _ n]
   · simp
   · intro d hd
     simp [coeff_X_pow, Ne.symm hd]
 
-theorem LawD.coeffY_subst (h : LawD lam Φ) (D : PowerSeries K) :
-    d2 (D.subst Φ) = derivative D * d2 Φ := by
+theorem LawD.coeffY_subst (h : LawD lam Φ) (D : PowerSeries K)
+    : d2 (D.subst Φ) = derivative D * d2 Φ := by
   rw [partialYAtZero_subst D h.Φ0, h.evalYZero_eq, powerSeries_subst_X_self_commRing]
 
 theorem LawD.deriv_mul (h : LawD lam Φ) : derivative lam * d2 Φ = 1 := by
   have h1 := congrArg d2 h.log
-  rw [h.coeffY_subst, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY, h.lam1, zero_add, map_one] at h1
+  rw [h.coeffY_subst, partialYAtZero_add, partialYAtZero_atX, partialYAtZero_atY, h.lam1, zero_add,
+      map_one]
+    at h1
   exact h1
 
 theorem LawD.deriv_const (h : LawD lam Φ) : constantCoeff (derivative lam) = 1 := by
@@ -218,28 +231,36 @@ theorem LawD.deriv_integral (h : LawD lam Φ) : IntegralPS (derivative lam) := b
     · simp [h.deriv_const]
     · have hc := congrArg (coeff n) hm
       simp only [coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_range_succ,
-        Nat.sub_self, coeff_zero_eq_constantCoeff_apply, h0, mul_one, coeff_one,
-        if_neg (show n ≠ 0 by omega)] at hc
-      have e : coeff n (derivative lam) =
-          -∑ k ∈ Finset.range n, coeff k (derivative lam) * coeff (n - k) (d2 Φ) := by
+          Nat.sub_self, coeff_zero_eq_constantCoeff_apply, h0, mul_one, coeff_one,
+          if_neg (show n ≠ 0 by omega)]
+        at hc
+      have e
+          : coeff n (derivative lam)
+            = - ∑ k ∈ Finset.range n, coeff k (derivative lam) * coeff (n - k) (d2 Φ) := by
         linear_combination hc
       rw [e, norm_neg]
-      refine Finset.sum_induction _ (fun x => ‖x‖ ≤ 1)
+      refine Finset.sum_induction _
+        (fun x => ‖x‖ ≤ 1)
         (fun x y hx hy => (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy))
-        (by simp) fun k hk => ?_
+        (by simp)
+        fun k hk => ?_
       rw [norm_mul]
       have hk' := Finset.mem_range.mp hk
-      calc ‖coeff k (derivative lam)‖ * ‖coeff (n - k) (d2 Φ)‖ ≤ 1 * 1 :=
-            mul_le_mul (ih k hk') (ha _) (norm_nonneg _) zero_le_one
+      calc
+        ‖coeff k (derivative lam)‖ * ‖coeff (n - k) (d2 Φ)‖
+          ≤ 1 * 1 := mul_le_mul (ih k hk') (ha _) (norm_nonneg _) zero_le_one
         _ = 1 := one_mul 1
 
-theorem hon_deriv (h : LawD lam Φ) (x : K) (D : PowerSeries K)
-    (hadd : DivByMv x (D.subst Φ - atX D - atY D)) :
-    DivBy x (derivative D - C (coeff 1 D) * derivative lam) := by
+theorem hon_deriv
+    (h : LawD lam Φ) (x : K) (D : PowerSeries K) (hadd : DivByMv x (D.subst Φ - atX D - atY D))
+    : DivBy x (derivative D - C (coeff 1 D) * derivative lam) := by
   have h1 := divBy_partialYAtZero hadd
-  rw [partialYAtZero_sub, partialYAtZero_sub, h.coeffY_subst, partialYAtZero_atX, partialYAtZero_atY, sub_zero] at h1
-  have e : derivative D - C (coeff 1 D) * derivative lam =
-      derivative lam * (derivative D * d2 Φ - C (coeff 1 D)) := by
+  rw [partialYAtZero_sub, partialYAtZero_sub, h.coeffY_subst, partialYAtZero_atX,
+      partialYAtZero_atY, sub_zero]
+    at h1
+  have e
+      : derivative D - C (coeff 1 D) * derivative lam
+        = derivative lam * (derivative D * d2 Φ - C (coeff 1 D)) := by
     linear_combination (-derivative D) * h.deriv_mul
   rw [e]
   have hl := h.deriv_integral
@@ -247,12 +268,15 @@ theorem hon_deriv (h : LawD lam Φ) (x : K) (D : PowerSeries K)
   unfold IntegralPS at hl
   intro n
   rw [coeff_mul]
-  refine Finset.sum_induction _ (fun y => ‖y‖ ≤ ‖x‖)
+  refine Finset.sum_induction _
+    (fun y => ‖y‖ ≤ ‖x‖)
     (fun a b ha hb => (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb))
-    (by simp) fun p _ => ?_
+    (by simp)
+    fun p _ => ?_
   rw [norm_mul]
-  calc ‖coeff p.1 (derivative lam)‖ * ‖coeff p.2 (derivative D * d2 Φ - C (coeff 1 D))‖
-        ≤ 1 * ‖x‖ := mul_le_mul (hl _) (h1 _) (norm_nonneg _) zero_le_one
+  calc
+    ‖coeff p.1 (derivative lam)‖ * ‖coeff p.2 (derivative D * d2 Φ - C (coeff 1 D))‖
+      ≤ 1 * ‖x‖ := mul_le_mul (hl _) (h1 _) (norm_nonneg _) zero_le_one
     _ = ‖x‖ := one_mul _
 
 end ReciprocityTheory.ChartRestriction.L1

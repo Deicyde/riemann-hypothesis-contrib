@@ -8,13 +8,17 @@ open CategoryTheory AlgebraicGeometry
 
 namespace GlobalTheory
 
-theorem preimage_eq_of_finite_appLE : ∀ {X Y : Scheme.{0}} [IsIntegral Y] (π : Y ⟶ X) [IsSeparated π] {U : X.Opens} {V : Y.Opens}, IsAffineOpen U → IsAffineOpen V → (V : Set Y).Nonempty → ∀ h : V ≤ π ⁻¹ᵁ U, (π.appLE U V h).hom.Finite → π ⁻¹ᵁ U = V := by
+theorem preimage_eq_of_finite_appLE
+    : ∀ {X Y : Scheme.{0}} [IsIntegral Y] (π : Y ⟶ X) [IsSeparated π] {U : X.Opens} {V : Y.Opens},
+      IsAffineOpen U → IsAffineOpen V → (V : Set Y).Nonempty
+        → ∀ h : V ≤ π ⁻¹ᵁ U, (π.appLE U V h).hom.Finite → π ⁻¹ᵁ U = V := by
   intro X Y _ π _ U V hU hV hne h hfin
   have : IsAffine U := hU
   have : IsAffine V := hV
   have hf : IsFinite (π.resLE U V h) := by
-    have hS : IsFinite (Spec.map (π.resLE U V h).appTop) := (IsFinite.SpecMap_iff _).mpr
-      ((RingHom.finite_respectsIso.arrow_mk_iso_iff (arrowResLEAppIso π U V h)).mpr hfin)
+    have hS : IsFinite (Spec.map (π.resLE U V h).appTop) :=
+      (IsFinite.SpecMap_iff _).mpr
+        ((RingHom.finite_respectsIso.arrow_mk_iso_iff (arrowResLEAppIso π U V h)).mpr hfin)
     rw [Arrow.iso_w' (arrowIsoSpecΓOfIsAffine (π.resLE U V h)).symm]
     infer_instance
   have : UniversallyClosed (Y.homOfLE h ≫ π ∣_ U) := by
@@ -24,11 +28,9 @@ theorem preimage_eq_of_finite_appLE : ∀ {X Y : Scheme.{0}} [IsIntegral Y] (π 
   obtain ⟨y, hy⟩ := hne
   have : Nonempty (π ⁻¹ᵁ U) := ⟨⟨y, h hy⟩⟩
   have hcl : IsClopen (Set.range (Y.homOfLE h).base) :=
-    ⟨(Y.homOfLE h).isClosedMap.isClosed_range,
-      (Y.homOfLE h).isOpenEmbedding.isOpenMap.isOpen_range⟩
+    ⟨(Y.homOfLE h).isClosedMap.isClosed_range, (Y.homOfLE h).isOpenEmbedding.isOpenMap.isOpen_range⟩
   have huniv : Set.range (Y.homOfLE h).base = Set.univ :=
-    (isClopen_iff.mp hcl).resolve_left
-      (Set.nonempty_iff_ne_empty.mp ⟨_, ⟨⟨y, hy⟩, rfl⟩⟩)
+    (isClopen_iff.mp hcl).resolve_left (Set.nonempty_iff_ne_empty.mp ⟨_, ⟨⟨y, hy⟩, rfl⟩⟩)
   refine le_antisymm (fun x hx => ?_) h
   obtain ⟨⟨w, hw⟩, hz⟩ : (⟨x, hx⟩ : π ⁻¹ᵁ U) ∈ Set.range (Y.homOfLE h).base := by
     rw [huniv]; trivial

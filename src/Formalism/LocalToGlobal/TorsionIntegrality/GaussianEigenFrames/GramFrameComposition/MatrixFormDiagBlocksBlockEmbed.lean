@@ -142,7 +142,8 @@ theorem IotaOK_proof : IotaOK := by
       rw [norm_mul]
       exact mul_le_one₀ (hint n) (norm_nonneg _) hx
     · rw [← map_sub]
-      have h1 : ((m : ℂ) + (n : ℂ) * omegaK d) - conj ((m : ℂ) + (n : ℂ) * omegaK d) = s * (n : ℂ) := by
+      have h1
+          : ((m : ℂ) + (n : ℂ) * omegaK d) - conj ((m : ℂ) + (n : ℂ) * omegaK d) = s * (n : ℂ) := by
         rw [map_add (f := _), map_mul, conj_omega, map_intCast, map_intCast, hω]
         ring
       rw [h1, map_mul, map_intCast]
@@ -174,16 +175,20 @@ theorem GramTransfer_of (hM : MulRing) (hI : IotaOK) : GramTransfer := by
     · simpa using hnat j
   obtain ⟨Y, hY⟩ : ∃ Y : Fin 4 × J → Fin 4 × n → ℂ, ∀ x, Y x = g (emb x.1 (v x.2)) :=
     ⟨_, fun _ => rfl⟩
-  have hkey : ∀ y ∈ imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ),
-      N • y ∈ stdLat L (Fin 4 × n) := by
+  have hkey
+      : ∀ y ∈ imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ),
+        N • y ∈ stdLat L (Fin 4 × n) := by
     intro y hy
-    have h1 := AddSubgroup.nsmul_index_mem
-      ((stdLat L (Fin 4 × n)).addSubgroupOf
-        (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ))) ⟨y, hy⟩
+    have h1 :=
+      AddSubgroup.nsmul_index_mem
+        ((stdLat L (Fin 4 × n)).addSubgroupOf
+          (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ)))
+        ⟨y, hy⟩
     rw [AddSubgroup.mem_addSubgroupOf] at h1
     simpa [hNdef, relIdx, AddSubgroup.relIndex] using h1
-  have hmemimg : ∀ (x : Fin 4 × J) (ω : ℂ), ω ∈ L.lattice →
-      ω • Y x ∈ imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := by
+  have hmemimg
+      : ∀ (x : Fin 4 × J) (ω : ℂ),
+        ω ∈ L.lattice → ω • Y x ∈ imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 Λ) := by
     intro x ω hω
     refine AddSubgroup.mem_map.mpr ⟨ω • emb x.1 (v x.2), smul_emb_mem (hv x.2) x.1 hω, ?_⟩
     rw [hY]
@@ -210,44 +215,58 @@ theorem GramTransfer_of (hM : MulRing) (hI : IotaOK) : GramTransfer := by
     rw [norm_mul, hNn1, mul_one] at h2
     rw [h2]
     exact (hI.2 (M x w) (Nn x w)).1
-  have hconj : ∀ y w, ι (Y y w) = ι (conj (Y y w)) +
-      ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]) := by
+  have hconj
+      : ∀ y w,
+        ι (Y y w)
+          = ι (conj (Y y w))
+            + ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]) := by
     intro y w
     have h3 := (hI.2 (M y w) (Nn y w)).2
     rw [← hMN y w, map_mul ι, map_mul (starRingEnd ℂ), map_mul ι, map_natCast (starRingEnd ℂ),
-      map_natCast ι] at h3
-    have h4 : ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]) =
-        ι (Y y w) - ι (conj (Y y w)) := by
+        map_natCast ι]
+      at h3
+    have h4
+        : ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (Nn y w : ℂ_[p]) / (N : ℂ_[p])
+          = ι (Y y w) - ι (conj (Y y w)) := by
       rw [div_eq_iff hN0]
       linear_combination -h3
     rw [h4]
     ring
   have harea : ((Formalism.L2.Th1.F.area L : ℝ) : ℂ) ≠ 0 := by
     exact_mod_cast (Formalism.L2.Th1.F.PeriodAreaSignLemmas.area_pos L).ne'
-  have hgram : ∀ x y : Fin 4 × J, ∑ w, Y x w * conj (Y y w) =
-      if x.1 = y.1 then hOK L h (v x.2) (v y.2) else 0 := by
+  have hgram
+      : ∀ x y : Fin 4 × J,
+        ∑ w, Y x w * conj (Y y w) = if x.1 = y.1 then hOK L h (v x.2) (v y.2) else 0 := by
     intro x y
     have h1 := hiso (emb x.1 (v x.2)) (emb y.1 (v y.2))
     rw [stdH_apply', matrixForm_diagBlocks_blockEmbed] at h1
     simp only [LinearEquiv.coe_coe] at h1
     rw [← hY x, ← hY y] at h1
-    calc ∑ w, Y x w * conj (Y y w)
-        = ((Formalism.L2.Th1.F.area L : ℝ) : ℂ) *
-          (((Formalism.L2.Th1.F.area L : ℝ) : ℂ)⁻¹ * ∑ w, Y x w * conj (Y y w)) := by
-          rw [← mul_assoc, mul_inv_cancel₀ harea, one_mul]
+    calc
+      ∑ w, Y x w * conj (Y y w)
+          = ((Formalism.L2.Th1.F.area L : ℝ) : ℂ)
+            * (((Formalism.L2.Th1.F.area L : ℝ) : ℂ)⁻¹ * ∑ w, Y x w * conj (Y y w)) := by
+        rw [← mul_assoc, mul_inv_cancel₀ harea, one_mul]
       _ = _ := by
-          rw [h1]
-          by_cases hxy : x.1 = y.1 <;> simp [hxy, hOK]
-  have hsum : ∀ (z : Fin 4 × n → ℂ) (q : Fin 4 × n),
-      ∑ w, g.symm (Pi.single w 1) q * z w = g.symm z q := by
+        rw [h1]
+        by_cases hxy : x.1 = y.1 <;> simp [hxy, hOK]
+  have hsum
+      : ∀ (z : Fin 4 × n → ℂ) (q : Fin 4 × n),
+        ∑ w, g.symm (Pi.single w 1) q * z w = g.symm z q := by
     intro z q
     conv_rhs => rw [eq_sum_single z]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
-  refine ⟨fun w x => ι (Y x w),
-    fun x y => ∑ w, ι (Y x w) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]), ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    fun w x => ι (Y x w),
+    fun x y => ∑ w, ι (Y x w) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]),
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact hD
   · intro x y
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one
@@ -262,8 +281,11 @@ theorem GramTransfer_of (hM : MulRing) (hI : IotaOK) : GramTransfer := by
     by_cases hab : a' = b' <;> simp [emb, hab]
   · intro x y
     show ∑ w, ι (Y x w) * ι (Y y w) = _
-    have e1 : ∑ w, ι (Y x w) * ι (Y y w) = ∑ w, ι (Y x w * conj (Y y w)) +
-        ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * ∑ w, ι (Y x w) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]) := by
+    have e1
+        : ∑ w, ι (Y x w) * ι (Y y w)
+          = ∑ w, ι (Y x w * conj (Y y w))
+            + ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ))
+              * ∑ w, ι (Y x w) * (Nn y w : ℂ_[p]) / (N : ℂ_[p]) := by
       rw [Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun w _ => ?_
       rw [hconj y w, map_mul ι (Y x w)]

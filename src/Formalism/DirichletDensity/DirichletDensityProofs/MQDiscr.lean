@@ -12,12 +12,14 @@ noncomputable section
 
 namespace Formalism.HF.P
 
-theorem not_isSquare_prod {k : ℕ} (q : Fin k → ℕ) (hq : ∀ i, (q i).Prime)
-    (hinj : Function.Injective q) (S : Finset (Fin k)) (hS : S.Nonempty) :
-    ¬ IsSquare (∏ i ∈ S, (((fun i => -(q i : ℤ)) i : ℤ) : ℚ)) := by
+theorem not_isSquare_prod
+    {k : ℕ} (q : Fin k → ℕ) (hq : ∀ i, (q i).Prime) (hinj : Function.Injective q)
+    (S : Finset (Fin k)) (hS : S.Nonempty)
+    : ¬ IsSquare (∏ i ∈ S, (((fun i => -(q i : ℤ)) i : ℤ) : ℚ)) := by
   classical
-  have hcast : (∏ i ∈ S, (((fun i => -(q i : ℤ)) i : ℤ) : ℚ)) =
-      ((∏ i ∈ S, (-(q i : ℤ)) : ℤ) : ℚ) := by push_cast; rfl
+  have hcast
+      : (∏ i ∈ S, (((fun i => -(q i : ℤ)) i : ℤ) : ℚ)) = ((∏ i ∈ S, (-(q i : ℤ)) : ℤ) : ℚ) := by
+    push_cast; rfl
   rw [hcast, Rat.isSquare_intCast_iff]
   rintro ⟨m, hm⟩
   obtain ⟨j, hj⟩ := hS
@@ -27,10 +29,8 @@ theorem not_isSquare_prod {k : ℕ} (q : Fin k → ℕ) (hq : ∀ i, (q i).Prime
   have hdn : (q j : ℤ) ∣ ∏ i ∈ S, (-(q i : ℤ)) := by
     rw [hsplit]; exact Dvd.dvd.mul_right (dvd_neg.mpr dvd_rfl) _
   rw [hm] at hdn
-  have hdm : (q j : ℤ) ∣ m := by
-    rcases hp.dvd_or_dvd hdn with h | h <;> exact h
-  have hsq : (q j : ℤ) * q j ∣ ∏ i ∈ S, (-(q i : ℤ)) := by
-    rw [hm]; exact mul_dvd_mul hdm hdm
+  have hdm : (q j : ℤ) ∣ m := by rcases hp.dvd_or_dvd hdn with h | h <;> exact h
+  have hsq : (q j : ℤ) * q j ∣ ∏ i ∈ S, (-(q i : ℤ)) := by rw [hm]; exact mul_dvd_mul hdm hdm
   rw [hsplit] at hsq
   obtain ⟨c, hc⟩ := hsq
   have hne : (q j : ℤ) ≠ 0 := by exact_mod_cast (hq j).ne_zero
@@ -46,19 +46,23 @@ theorem not_isSquare_prod {k : ℕ} (q : Fin k → ℕ) (hq : ∀ i, (q i).Prime
   have heq : q j = q i := (Nat.prime_dvd_prime_iff_eq (hq j) (hq i)).mp hdi'
   exact (Finset.ne_of_mem_erase hi) (hinj heq).symm
 
-theorem adjoin_top_of_lift {E : Type} [Field E] [Algebra ℚ E] (K : IntermediateField ℚ E) (S : Set K)
-    (h : adjoin ℚ (Subtype.val '' S) = K) : adjoin ℚ S = ⊤ := by
+theorem adjoin_top_of_lift
+    {E : Type} [Field E] [Algebra ℚ E]
+    (K : IntermediateField ℚ E) (S : Set K) (h : adjoin ℚ (Subtype.val '' S) = K)
+    : adjoin ℚ S = ⊤ := by
   have key : @IntermediateField.adjoin ℚ _ K _ K.algebra' S = ⊤ := by
     apply IntermediateField.lift_injective K
     rw [IntermediateField.lift_adjoin, h, IntermediateField.lift_top]
-  have gen : ∀ (inst : Algebra ℚ K), inst = K.algebra' →
-      @IntermediateField.adjoin ℚ _ K _ inst S = ⊤ := by
+  have gen
+      : ∀ (inst : Algebra ℚ K),
+        inst = K.algebra' → @IntermediateField.adjoin ℚ _ K _ inst S = ⊤ := by
     rintro inst rfl
     exact key
   exact gen _ (Subsingleton.elim _ _)
 
-theorem nrRealPlaces_zero {E : Type} [Field E] [NumberField E] (x : E) (c : ℤ) (hc : c < 0)
-    (hx : x ^ 2 = (c : E)) : nrRealPlaces E = 0 := by
+theorem nrRealPlaces_zero
+    {E : Type} [Field E] [NumberField E] (x : E) (c : ℤ) (hc : c < 0) (hx : x ^ 2 = (c : E))
+    : nrRealPlaces E = 0 := by
   haveI : IsEmpty {w : InfinitePlace E // w.IsReal} := ⟨fun ⟨w, hw⟩ => by
     have h1 := congrArg (embedding_of_isReal hw) hx
     rw [map_pow, map_intCast] at h1
@@ -71,10 +75,11 @@ theorem nrRealPlaces_zero {E : Type} [Field E] [NumberField E] (x : E) (c : ℤ)
 theorem sqf_neg (p : ℕ) (hp : p.Prime) : Squarefree (-(p : ℤ)) :=
   (Nat.prime_iff_prime_int.mp hp).neg.squarefree
 
-theorem natAbs_discr (hQ : QuadDiscr) : ∀ (m : ℕ) (q : Fin (m + 1) → ℕ),
-    (∀ i, (q i).Prime ∧ q i % 4 = 3) → Function.Injective q →
-    ∀ (E : Type) [Field E] [NumberField E] (α : Fin (m + 1) → E),
-      IsMQ (fun i => -(q i : ℤ)) α → (discr E).natAbs = ∏ i, q i ^ (2 ^ m) := by
+theorem natAbs_discr (hQ : QuadDiscr)
+    : ∀ (m : ℕ) (q : Fin (m + 1) → ℕ),
+      (∀ i, (q i).Prime ∧ q i % 4 = 3) → Function.Injective q
+        → ∀ (E : Type) [Field E] [NumberField E] (α : Fin (m + 1) → E),
+          IsMQ (fun i => -(q i : ℤ)) α → (discr E).natAbs = ∏ i, q i ^ (2 ^ m) := by
   intro m
   induction m with
   | zero =>
@@ -85,8 +90,8 @@ theorem natAbs_discr (hQ : QuadDiscr) : ∀ (m : ℕ) (q : Fin (m + 1) → ℕ),
         exact ⟨fun ⟨i, hi⟩ => by rw [← hi, Fin.fin_one_eq_zero i]; rfl, fun h => ⟨0, h.symm⟩⟩
       rw [← hr]
       exact hMQ.2
-    have h := hQ E (-(q 0 : ℤ)) (α 0) (hMQ.1 0) htop (sqf_neg _ (hq 0).1)
-      (by have := (hq 0).2; omega)
+    have h :=
+      hQ E (-(q 0 : ℤ)) (α 0) (hMQ.1 0) htop (sqf_neg _ (hq 0).1) (by have := (hq 0).2; omega)
     rw [h]
     simp
   | succ m ih =>
@@ -114,18 +119,21 @@ theorem natAbs_discr (hQ : QuadDiscr) : ∀ (m : ℕ) (q : Fin (m + 1) → ℕ),
     have hd₂ : discr K₂ = -(q (Fin.last _) : ℤ) :=
       hQ K₂ _ γ hγsq hγtop (sqf_neg _ (hq _).1) (by have := (hq (Fin.last _)).2; omega)
     have hf₁ : Module.finrank ℚ K₁ = 2 ^ (m + 1) :=
-      (mqKummer (m + 1) K₁ _ β hβ
-        (not_isSquare_prod _ (fun i => (hq' i).1) hinj')).1
+      (mqKummer (m + 1) K₁ _ β hβ (not_isSquare_prod _ (fun i => (hq' i).1) hinj')).1
     have hγMQ : IsMQ (fun _ : Fin 1 => -(q (Fin.last (m + 1)) : ℤ)) (fun _ => γ) := by
       refine ⟨fun _ => hγsq, ?_⟩
       rw [Set.range_const]
       exact hγtop
     have hf₂ : Module.finrank ℚ K₂ = 2 :=
-      (mqKummer 1 K₂ _ (fun _ => γ) hγMQ
-        (not_isSquare_prod (fun _ : Fin 1 => q (Fin.last (m + 1))) (fun _ => (hq _).1)
+      (mqKummer 1 K₂ _
+        (fun _ => γ)
+        hγMQ
+        (not_isSquare_prod
+          (fun _ : Fin 1 => q (Fin.last (m + 1)))
+          (fun _ => (hq _).1)
           (fun a b _ => Subsingleton.elim a b))).1
-    have : IsGalois ℚ K₁ := (mqGalois _ K₁ _ β hβ
-      (fun i => neg_ne_zero.2 (Nat.cast_ne_zero.2 (hq' i).1.ne_zero))).1
+    have : IsGalois ℚ K₁ :=
+      (mqGalois _ K₁ _ β hβ (fun i => neg_ne_zero.2 (Nat.cast_ne_zero.2 (hq' i).1.ne_zero))).1
     have hcop : IsCoprime (discr K₁) (discr K₂) := by
       rw [hd₂, IsCoprime.neg_right_iff, isCoprime_comm]
       have hp : Prime (q (Fin.last _) : ℤ) := Nat.prime_iff_prime_int.1 (hq _).1
@@ -147,8 +155,9 @@ theorem natAbs_discr (hQ : QuadDiscr) : ∀ (m : ℕ) (q : Fin (m + 1) → ℕ),
         induction i using Fin.lastCases with
         | last => exact Or.inr rfl
         | cast j => exact Or.inl ⟨j, rfl⟩
-    have hnat := natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow E K₁ K₂ hld hsup
-      (isCoprime_differentIdeal_of_isCoprime_discr E hcop)
+    have hnat :=
+      natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow E K₁ K₂ hld hsup
+        (isCoprime_differentIdeal_of_isCoprime_discr E hcop)
     rw [hnat, hd₁, hd₂, hf₁, hf₂,
       Fin.prod_univ_castSucc (n := m + 1) (f := fun i => q i ^ 2 ^ (m + 1)), ← Finset.prod_pow]
     simp only [← pow_mul, Int.natAbs_neg, Int.natAbs_natCast]

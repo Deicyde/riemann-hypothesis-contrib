@@ -4,13 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.weilDeligne_monodromy_upperTriangular :
-    UpperTheory.V.Af.Wd.TriMono := by
+theorem UpperTheory.weilDeligne_monodromy_upperTriangular : UpperTheory.V.Af.Wd.TriMono := by
   intro k W Γ _ _ _ n N ρ c μ hcomm hT hN
   obtain ⟨b, hb⟩ := hT
   set B := LinearMap.toMatrix b b N with hBdef
-  have hAlow : ∀ σ (i j : Fin n), j < i → LinearMap.toMatrix b b (ρ σ) i j = 0 := fun σ => (hb (some σ)).1
-  have hAdiag : ∀ σ (i : Fin n), LinearMap.toMatrix b b (ρ σ) i i = μ σ i := fun σ => (hb (some σ)).2
+  have hAlow : ∀ σ (i j : Fin n), j < i → LinearMap.toMatrix b b (ρ σ) i j = 0 := fun σ =>
+    (hb (some σ)).1
+  have hAdiag : ∀ σ (i : Fin n), LinearMap.toMatrix b b (ρ σ) i i = μ σ i := fun σ =>
+    (hb (some σ)).2
   have hB0 : B ≠ 0 := by
     intro h
     apply hN
@@ -31,7 +32,8 @@ theorem UpperTheory.weilDeligne_monodromy_upperTriangular :
   have hjmin : ∀ i l, l < j → B i l = 0 := by
     intro i l hl
     by_contra h
-    have : j ≤ l := Finset.min'_le _ l (by simp only [Finset.mem_filter, Finset.mem_univ, true_and]; exact ⟨i, h⟩)
+    have : j ≤ l :=
+      Finset.min'_le _ l (by simp only [Finset.mem_filter, Finset.mem_univ, true_and]; exact ⟨i, h⟩)
     exact absurd hl (not_lt.mpr this)
   have hI : (Finset.univ.filter fun i => B i j ≠ 0).Nonempty := by
     obtain ⟨i, h⟩ := hjmem
@@ -43,7 +45,8 @@ theorem UpperTheory.weilDeligne_monodromy_upperTriangular :
   have himax : ∀ l, i < l → B l j = 0 := by
     intro l hl
     by_contra h
-    have : l ≤ i := Finset.le_max' _ l (by simp only [Finset.mem_filter, Finset.mem_univ, true_and]; exact h)
+    have : l ≤ i :=
+      Finset.le_max' _ l (by simp only [Finset.mem_filter, Finset.mem_univ, true_and]; exact h)
     exact absurd hl (not_lt.mpr this)
   refine ⟨i, j, fun σ => ?_⟩
   set A := LinearMap.toMatrix b b (ρ σ) with hAdef

@@ -13,20 +13,27 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField Matrix
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField Matrix
 open IsDedekindDomain
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct Classical ComplexOrder
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKCx GlobalTheory.PELU
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo
+  GlobalTheory.LKCx GlobalTheory.PELU
 attribute [local instance] Over.cartesianMonoidalCategory
 open UpperTheory.ComplexUniformization
 
 private def Pz {R : Type} [Ring R] [Algebra ℝ R] (t : R) : Prop :=
-  ∃ s : Finset ℝ, (∀ l ∈ s, 0 < l) ∧
-    Polynomial.aeval t (∏ l ∈ s, (Polynomial.X - Polynomial.C l)) = 0
+  ∃ s : Finset ℝ,
+    (∀ l ∈ s, 0 < l) ∧ Polynomial.aeval t (∏ l ∈ s, (Polynomial.X - Polynomial.C l)) = 0
 
-private theorem Pz_map_iff {R R' : Type} [Ring R] [Algebra ℝ R] [Ring R'] [Algebra ℝ R']
-    (f : R →ₐ[ℝ] R') (hf : Function.Injective f) (t : R) : Pz (f t) ↔ Pz t := by
+private theorem Pz_map_iff
+    {R R' : Type} [Ring R] [Algebra ℝ R] [Ring R'] [Algebra ℝ R']
+    (f : R →ₐ[ℝ] R') (hf : Function.Injective f)
+    (t : R)
+    : Pz (f t) ↔ Pz t := by
   constructor
   · rintro ⟨s, hs, h⟩
     refine ⟨s, hs, hf ?_⟩
@@ -35,13 +42,14 @@ private theorem Pz_map_iff {R R' : Type} [Ring R] [Algebra ℝ R] [Ring R'] [Alg
     refine ⟨s, hs, ?_⟩
     rw [Polynomial.aeval_algHom_apply, h, map_zero]
 
-private theorem Pz_pi {I M : Type} [Fintype I] [Ring M] [Algebra ℝ M] (t : I → M) :
-    Pz t ↔ ∀ i, Pz (t i) := by
+private theorem Pz_pi {I M : Type} [Fintype I] [Ring M] [Algebra ℝ M] (t : I → M)
+    : Pz t ↔ ∀ i, Pz (t i) := by
   constructor
   · rintro ⟨s, hs, h⟩ i
     refine ⟨s, hs, ?_⟩
-    have := Polynomial.aeval_algHom_apply (Pi.evalAlgHom ℝ (fun _ : I => M) i) t
-      (∏ l ∈ s, (Polynomial.X - Polynomial.C l))
+    have :=
+      Polynomial.aeval_algHom_apply (Pi.evalAlgHom ℝ (fun _ : I => M) i) t
+        (∏ l ∈ s, (Polynomial.X - Polynomial.C l))
     rw [h, map_zero] at this
     exact this
   · intro h
@@ -52,30 +60,37 @@ private theorem Pz_pi {I M : Type} [Fintype I] [Ring M] [Algebra ℝ M] (t : I �
       exact hs i l hi
     · funext i
       have hsub : s i ⊆ Finset.univ.biUnion s := Finset.subset_biUnion_of_mem s (Finset.mem_univ i)
-      have := Polynomial.aeval_algHom_apply (Pi.evalAlgHom ℝ (fun _ : I => M) i) t
-        (∏ l ∈ Finset.univ.biUnion s, (Polynomial.X - Polynomial.C l))
-      have e : Polynomial.aeval (t i) (∏ l ∈ Finset.univ.biUnion s, (Polynomial.X - Polynomial.C l)) = 0 := by
+      have :=
+        Polynomial.aeval_algHom_apply (Pi.evalAlgHom ℝ (fun _ : I => M) i) t
+          (∏ l ∈ Finset.univ.biUnion s, (Polynomial.X - Polynomial.C l))
+      have e
+          : Polynomial.aeval (t i) (∏ l ∈ Finset.univ.biUnion s, (Polynomial.X - Polynomial.C l))
+            = 0 := by
         rw [← Finset.prod_sdiff hsub, map_mul, h0 i, mul_zero]
       exact this.symm.trans e
 
-private theorem Pz_iff_pos {W : Type} [AddCommGroup W] [Module ℝ W] [FiniteDimensional ℝ W]
+private theorem Pz_iff_pos
+    {W : Type} [AddCommGroup W] [Module ℝ W] [FiniteDimensional ℝ W]
     (Q : W →ₗ[ℝ] W →ₗ[ℝ] ℝ) (hsym : ∀ x y, Q x y = Q y x) (hpos : ∀ x, x ≠ 0 → 0 < Q x x)
-    (T : Module.End ℝ W) (hT : ∀ x y, Q (T x) y = Q x (T y)) :
-    Pz T ↔ ∀ x, x ≠ 0 → 0 < Q (T x) x :=
+    (T : Module.End ℝ W) (hT : ∀ x y, Q (T x) y = Q x (T y))
+    : Pz T ↔ ∀ x, x ≠ 0 → 0 < Q (T x) x :=
   _root_.UpperTheory.Reformulated.B.Qh60.Pz_iff_pos Q hsym hpos T hT
 
-private theorem actOn_tmul {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
-    (rep : C →ₐ[ℚ] Module.End ℚ V) (r s : ℝ) (c : C) (v : V) :
-    actOn rep ℝ (r ⊗ₜ c) (s ⊗ₜ v) = (r * s) ⊗ₜ rep c v := by
+private theorem actOn_tmul
+    {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
+    (rep : C →ₐ[ℚ] Module.End ℚ V) (r s : ℝ) (c : C) (v : V)
+    : actOn rep ℝ (r ⊗ₜ c) (s ⊗ₜ v) = (r * s) ⊗ₜ rep c v := by
   simp only [actOn, Algebra.TensorProduct.lift_tmul, Algebra.ofId_apply, Module.End.mul_apply,
     Algebra.algebraMap_eq_smul_one]
   change r • (((1 : Module.End ℝ (ℝ ⊗[ℚ] V))) ((rep c).baseChange ℝ (s ⊗ₜ v))) = _
   rw [LinearMap.baseChange_tmul, Module.End.one_apply, TensorProduct.smul_tmul', smul_eq_mul]
 
-private theorem actOn_inj {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
-    (rep : C →ₐ[ℚ] Module.End ℚ V) (hrep : Function.Injective rep) :
-    Function.Injective (actOn rep ℝ) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem actOn_inj
+    {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
+    (rep : C →ₐ[ℚ] Module.End ℚ V) (hrep : Function.Injective rep)
+    : Function.Injective (actOn rep ℝ) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   let B := Module.Free.chooseBasis ℚ ℝ
   obtain ⟨c, rfl⟩ := TensorProduct.eq_repr_basis_left B x
@@ -95,9 +110,11 @@ private theorem actOn_inj {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V]
     simpa using DFunLike.congr_fun h3 i
   simp [hc]
 
-private theorem bc_anti {R A M : Type} [CommRing R] [CommRing A] [AddCommGroup M] [Algebra R A]
-    [Module R M] (B : LinearMap.BilinForm R M) (h : ∀ x y, B x y = -B y x) (x y : A ⊗[R] M) :
-    B.baseChange A x y = -B.baseChange A y x := by
+private theorem bc_anti
+    {R A M : Type} [CommRing R] [CommRing A] [AddCommGroup M] [Algebra R A] [Module R M]
+    (B : LinearMap.BilinForm R M) (h : ∀ x y, B x y = - B y x)
+    (x y : A ⊗[R] M)
+    : B.baseChange A x y = - B.baseChange A y x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb]; ring
@@ -106,22 +123,23 @@ private theorem bc_anti {R A M : Type} [CommRing R] [CommRing A] [AddCommGroup M
     | zero => simp
     | add c d hc hd => simp only [map_add (f := _), LinearMap.add_apply, hc, hd]; ring
     | tmul a' m' =>
-      rw [LinearMap.BilinForm.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul, h m m', neg_smul,
-        mul_comm]
+      rw [LinearMap.BilinForm.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul, h m m',
+        neg_smul, mul_comm]
 
-private theorem E_anti {p : ℕ} [Fact p.Prime] (D : Datum p) (x y : ℝ ⊗[ℚ] VQ D) :
-    (D.EF.baseChange ℚ).baseChange ℝ x y = -(D.EF.baseChange ℚ).baseChange ℝ y x := by
-  have h0 : ∀ x y, D.EF x y = -D.EF y x := by
+private theorem E_anti {p : ℕ} [Fact p.Prime] (D : Datum p) (x y : ℝ ⊗[ℚ] VQ D)
+    : (D.EF.baseChange ℚ).baseChange ℝ x y = - (D.EF.baseChange ℚ).baseChange ℝ y x := by
+  have h0 : ∀ x y, D.EF x y = - D.EF y x := by
     intro x y
     have := D.alt (x + y)
     simp only [map_add (f := _), LinearMap.add_apply, D.alt] at this
     linarith
   exact bc_anti _ (bc_anti _ h0) x y
 
-private theorem E_adj {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G)
-    (b : ℝ ⊗[ℚ] G.C) (x y : ℝ ⊗[ℚ] VQ D) :
-    (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) y =
-      (D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ (starT G.star ℝ b).unop y) := by
+private theorem E_adj
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (b : ℝ ⊗[ℚ] G.C) (x y : ℝ ⊗[ℚ] VQ D)
+    : (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) y
+      = (D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ (starT G.star ℝ b).unop y) := by
   induction b using TensorProduct.induction_on with
   | zero => simp
   | add b b' h h' => simp only [map_add (f := _), LinearMap.add_apply, MulOpposite.unop_add, h, h']
@@ -142,27 +160,33 @@ private theorem E_adj {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L 
         congr 1
         ring
 
-private theorem herm_conj {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian)
-    (x y : Fin n → ℂ) : star (star x ⬝ᵥ A *ᵥ y) = star y ⬝ᵥ A *ᵥ x := by
+private theorem herm_conj
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian) (x y : Fin n → ℂ)
+    : star (star x ⬝ᵥ A *ᵥ y) = star y ⬝ᵥ A *ᵥ x := by
   rw [Matrix.star_dotProduct, star_star, Matrix.star_mulVec, hA.eq, Matrix.dotProduct_mulVec]
 
-private theorem Pz_matrix {n : ℕ} (H M : Matrix (Fin n) (Fin n) ℂ) (hH : H.PosDef)
-    (hS : (H * M).IsHermitian) : Pz M ↔ (H * M).PosDef := by
+private theorem Pz_matrix
+    {n : ℕ} (H M : Matrix (Fin n) (Fin n) ℂ) (hH : H.PosDef) (hS : (H * M).IsHermitian)
+    : Pz M ↔ (H * M).PosDef := by
   let π : Matrix (Fin n) (Fin n) ℂ →ₐ[ℝ] Module.End ℝ (Fin n → ℂ) :=
     AlgHom.ofLinearMap
-      { toFun := fun m => (Matrix.mulVecLin m).restrictScalars ℝ
+      {
+        toFun := fun m => (Matrix.mulVecLin m).restrictScalars ℝ
         map_add' := fun a b => LinearMap.ext fun x => by simp [Matrix.add_mulVec]
-        map_smul' := fun r a => LinearMap.ext fun x => by simp [Matrix.smul_mulVec] }
+        map_smul' := fun r a => LinearMap.ext fun x => by simp [Matrix.smul_mulVec]
+      }
       (LinearMap.ext fun x => by simp)
-      (fun a b => LinearMap.ext fun x => by
-        change (a * b) *ᵥ x = a *ᵥ (b *ᵥ x)
-        rw [Matrix.mulVec_mulVec])
+      (fun a b =>
+        LinearMap.ext fun x => by
+          change (a * b) *ᵥ x = a *ᵥ (b *ᵥ x)
+          rw [Matrix.mulVec_mulVec])
   have hπ : ∀ m x, π m x = m *ᵥ x := fun _ _ => rfl
   have hπi : Function.Injective π := fun a b hab =>
     Matrix.mulVec_injective (funext fun x => by rw [← hπ, ← hπ, hab])
   have hHh : H.IsHermitian := (Matrix.posDef_iff_dotProduct_mulVec.1 hH).1
   let Q : (Fin n → ℂ) →ₗ[ℝ] (Fin n → ℂ) →ₗ[ℝ] ℝ :=
-    LinearMap.mk₂ ℝ (fun x y => (star x ⬝ᵥ (H *ᵥ y)).re)
+    LinearMap.mk₂ ℝ
+      (fun x y => (star x ⬝ᵥ (H *ᵥ y)).re)
       (fun x x' y => by simp [star_add, add_dotProduct])
       (fun r x y => by simp [smul_dotProduct, star_smul])
       (fun x y y' => by simp [Matrix.mulVec_add, dotProduct_add])
@@ -193,8 +217,13 @@ private theorem Pz_matrix {n : ℕ} (H M : Matrix (Fin n) (Fin n) ℂ) (hH : H.P
     rw [hsym, hQ, hπ, Matrix.mulVec_mulVec]
     simpa using (Complex.lt_def.1 (h hx)).1
 
-theorem UpperTheory.positivity_iff_gram_posDef :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (b : ℝ ⊗[ℚ] G.C), (starT G.star ℝ b).unop = -b → ((∀ x : ℝ ⊗[ℚ] VQ D, x ≠ 0 → 0 < (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) x) ↔ ∀ v' : InfinitePlace G.F, ((if v'.embedding (L.e D.ω) = D.ρc then -Complex.I else Complex.I) • (G.gram v' * G.psiR v' b)).PosDef) := by
+theorem UpperTheory.positivity_iff_gram_posDef
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (b : ℝ ⊗[ℚ] G.C),
+      (starT G.star ℝ b).unop = -b
+        → ((∀ x : ℝ ⊗[ℚ] VQ D, x ≠ 0 → 0 < (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) x)
+          ↔ ∀ v' : InfinitePlace G.F,
+            ((if v'.embedding (L.e D.ω) = D.ρc then -Complex.I else Complex.I)
+              • (G.gram v' * G.psiR v' b)).PosDef) := by
   intro p _ D G L b hb
   obtain ⟨J, hJJ, hJs, hJp, hJv⟩ := L.orient
   haveI : Module.Finite ℤ D.La := D.finLa
@@ -203,23 +232,29 @@ theorem UpperTheory.positivity_iff_gram_posDef :
   have hJa : J * a = b := by
     change J * -(J * b) = b
     rw [_root_.mul_neg, ← _root_.mul_assoc, hJJ, neg_mul, _root_.one_mul, neg_neg]
-  have adjJ : ∀ x y, (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ J x) y =
-      -(D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ J y) := fun x y => by
+  have adjJ
+      : ∀ x y,
+        (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ J x) y
+          = - (D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ J y) := fun x y => by
     rw [E_adj, hJs, map_neg, LinearMap.neg_apply, map_neg]
-  have adjb : ∀ x y, (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) y =
-      -(D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ b y) := fun x y => by
+  have adjb
+      : ∀ x y,
+        (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) y
+          = - (D.EF.baseChange ℚ).baseChange ℝ x (actOn L.rep ℝ b y) := fun x y => by
     rw [E_adj, hb, map_neg, LinearMap.neg_apply, map_neg]
   have hJaX : ∀ x, actOn L.rep ℝ J (actOn L.rep ℝ a x) = actOn L.rep ℝ b x := fun x => by
     rw [← Module.End.mul_apply, ← map_mul, hJa]
   let Q : (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] ℝ :=
-    LinearMap.comp (show (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] ℝ from (D.EF.baseChange ℚ).baseChange ℝ)
+    LinearMap.comp
+      (show (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] (ℝ ⊗[ℚ] VQ D) →ₗ[ℝ] ℝ from (D.EF.baseChange ℚ).baseChange ℝ)
       (actOn L.rep ℝ J)
   have hQ : ∀ x y, Q x y = (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ J x) y := fun _ _ => rfl
-  have hsym : ∀ x y, Q x y = Q y x := fun x y => by
-    rw [hQ, hQ, adjJ, E_anti D x, neg_neg]
+  have hsym : ∀ x y, Q x y = Q y x := fun x y => by rw [hQ, hQ, adjJ, E_anti D x, neg_neg]
   have hT : ∀ x y, Q (actOn L.rep ℝ a x) y = Q x (actOn L.rep ℝ a y) := fun x y => by
     rw [hQ, hQ, hJaX, adjJ, hJaX, adjb]
-  have hL : (∀ x : ℝ ⊗[ℚ] VQ D, x ≠ 0 → 0 < (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) x) ↔ Pz a := by
+  have hL
+      : (∀ x : ℝ ⊗[ℚ] VQ D, x ≠ 0 → 0 < (D.EF.baseChange ℚ).baseChange ℝ (actOn L.rep ℝ b x) x)
+        ↔ Pz a := by
     rw [← Pz_map_iff (actOn L.rep ℝ) (actOn_inj L.rep L.rep_inj) a, Pz_iff_pos Q hsym hJp _ hT]
     simp only [hQ, hJaX]
   let Ψ : ℝ ⊗[ℚ] G.C →ₐ[ℝ] (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) :=
@@ -234,8 +269,7 @@ theorem UpperTheory.positivity_iff_gram_posDef :
   set h := G.gram v with hh
   set X := G.psiR v J with hX
   set Y := G.psiR v b with hY
-  have hXX : X * X = -1 := by
-    rw [hX, ← map_mul, hJJ, map_neg, map_one]
+  have hXX : X * X = -1 := by rw [hX, ← map_mul, hJJ, map_neg, map_one]
   have hM : Ψ a v = -(X * Y) := by
     change G.psiR v (-(J * b)) = _
     rw [map_neg, map_mul]

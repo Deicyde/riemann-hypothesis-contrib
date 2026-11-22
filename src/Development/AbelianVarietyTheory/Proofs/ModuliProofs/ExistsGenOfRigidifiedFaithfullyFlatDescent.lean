@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CubeDescendsA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -43,47 +45,60 @@ private lemma res_self_moduli {X : Scheme.{0}} {U : X.Opens} (h : U ≤ U) (a : 
   ext
   simp
 
-theorem exists_gen_of_pull_id {X : Scheme.{0}} (N : LB X) (t : (N.pull (𝟙 X)).Gen) (ht : t.IsGen) :
-    ∃ t : N.Gen, t.IsGen := by
+theorem exists_gen_of_pull_id {X : Scheme.{0}} (N : LB X) (t : (N.pull (𝟙 X)).Gen) (ht : t.IsGen)
+    : ∃ t : N.Gen, t.IsGen := by
   refine ⟨⟨fun i => res (U_le_pull_id_U N i) (t.s (fun _ => i))⟩, ?_⟩
   intro i j
-  have key := congrArg (res (inf_le_inf (U_le_pull_id_U N i) (U_le_pull_id_U N j))) (ht (fun _ => i) (fun _ => j))
+  have key :=
+    congrArg (res (inf_le_inf (U_le_pull_id_U N i) (U_le_pull_id_U N j)))
+      (ht (fun _ => i) (fun _ => j))
   rw [map_mul, res_res_lemma, res_res_lemma] at key
   simp only [res_res_lemma]
   refine key.trans ?_
   congr 1
-  have hle : (N.pull (𝟙 X)).U (fun _ => i) ⊓ (N.pull (𝟙 X)).U (fun _ => j) ≤ (𝟙 X) ⁻¹ᵁ (N.U i ⊓ N.U j) := by
+  have hle
+      : (N.pull (𝟙 X)).U (fun _ => i) ⊓ (N.pull (𝟙 X)).U (fun _ => j)
+        ≤ (𝟙 X) ⁻¹ᵁ (N.U i ⊓ N.U j) := by
     intro x hx
     obtain ⟨h1, h2⟩ := hx
     simp only [LB.pull, LB.LinComb, LB.wchart] at h1 h2
     have a : x ∈ N.U i := by simpa using h1
     have b : x ∈ N.U j := by simpa using h2
     exact ⟨a, b⟩
-  have hG : (N.pull (𝟙 X)).g (fun _ => i) (fun _ => j) = res hle (pullU (𝟙 X) (N.U i ⊓ N.U j) (N.g i j)) := by
+  have hG
+      : (N.pull (𝟙 X)).g (fun _ => i) (fun _ => j)
+        = res hle (pullU (𝟙 X) (N.U i ⊓ N.U j) (N.g i j)) := by
     show ∏ _k : PUnit, (res hle (pullU (𝟙 X) (N.U i ⊓ N.U j) (N.g i j))) ^ (1 : ℤ) = _
     rw [Fintype.prod_unique, zpow_one]
   rw [hG, res_res_lemma]
   exact (res_pullU_id_moduli _ le_rfl _).trans (res_self_moduli _ _)
 
-private theorem val_mul_val_comm_of_fst_eq (hG : Out.GlobalFnsSt) {S S' : Scheme.{0}} (π : S' ⟶ S) (A : Over S) [GrpObj A]
-    (N : LB A.left) (hA : IsAbelianScheme A) (hN : N.IsLB)
-    (w : (N.LinComb (fun _ : PUnit.{1} => pullback.fst A.hom π) (fun _ => (1 : ℤ))).Gen) (hw : w.IsGen)
-    (e' : S' ⟶ pullback A.hom π) (he'p : e' ≫ pullback.fst A.hom π = π ≫ eSec A)
-    (he'q : e' ≫ pullback.snd A.hom π = 𝟙 S')
-    {Z : Scheme.{0}} (g₁ g₂ : Z ⟶ pullback A.hom π)
-    (hg : g₁ ≫ pullback.fst A.hom π = g₂ ≫ pullback.fst A.hom π) (z : Z) (J : (Z ⟶ A.left) → N.ι)
-    (hJ : Good N z J) :
-    val w g₁ z J * val w (g₂ ≫ pullback.snd A.hom π ≫ e') z J =
-      val w g₂ z J * val w (g₁ ≫ pullback.snd A.hom π ≫ e') z J := by
+private theorem val_mul_val_comm_of_fst_eq
+    (hG : Out.GlobalFnsSt)
+    {S S' : Scheme.{0}} (π : S' ⟶ S) (A : Over S) [GrpObj A]
+    (N : LB A.left)
+    (hA : IsAbelianScheme A) (hN : N.IsLB)
+    (w : (N.LinComb (fun _ : PUnit.{1} => pullback.fst A.hom π) (fun _ => (1 : ℤ))).Gen)
+    (hw : w.IsGen)
+    (e' : S' ⟶ pullback A.hom π)
+    (he'p : e' ≫ pullback.fst A.hom π = π ≫ eSec A) (he'q : e' ≫ pullback.snd A.hom π = 𝟙 S')
+    {Z : Scheme.{0}}
+    (g₁ g₂ : Z ⟶ pullback A.hom π) (hg : g₁ ≫ pullback.fst A.hom π = g₂ ≫ pullback.fst A.hom π)
+    (z : Z) (J : (Z ⟶ A.left) → N.ι) (hJ : Good N z J)
+    : val w g₁ z J * val w (g₂ ≫ pullback.snd A.hom π ≫ e') z J
+      = val w g₂ z J * val w (g₁ ≫ pullback.snd A.hom π ≫ e') z J := by
   have hπ : g₁ ≫ pullback.snd A.hom π ≫ π = g₂ ≫ pullback.snd A.hom π ≫ π := by
     rw [← pullback.condition, ← Category.assoc, ← Category.assoc, hg]
   let FinalForm : Over S := Over.mk (g₁ ≫ pullback.snd A.hom π ≫ π)
-  have hw1 : (fst A FinalForm).left ≫ A.hom = (snd A FinalForm).left ≫ (g₁ ≫ pullback.snd A.hom π ≫ π) :=
+  have hw1
+      : (fst A FinalForm).left ≫ A.hom = (snd A FinalForm).left ≫ (g₁ ≫ pullback.snd A.hom π ≫ π) :=
     (Over.w (fst A FinalForm)).trans (Over.w (snd A FinalForm)).symm
   let a : (A ⊗ FinalForm).left ⟶ pullback A.hom π :=
-    pullback.lift (fst A FinalForm).left ((snd A FinalForm).left ≫ g₁ ≫ pullback.snd A.hom π) (by rw [hw1]; simp)
+    pullback.lift (fst A FinalForm).left ((snd A FinalForm).left ≫ g₁ ≫ pullback.snd A.hom π)
+      (by rw [hw1]; simp)
   let a' : (A ⊗ FinalForm).left ⟶ pullback A.hom π :=
-    pullback.lift (fst A FinalForm).left ((snd A FinalForm).left ≫ g₂ ≫ pullback.snd A.hom π) (by rw [hw1, hπ]; simp)
+    pullback.lift (fst A FinalForm).left ((snd A FinalForm).left ≫ g₂ ≫ pullback.snd A.hom π)
+      (by rw [hw1, hπ]; simp)
   let p0 : (A ⊗ FinalForm).left ⟶ Z := (snd A FinalForm).left
   let e : Z ⟶ (A ⊗ FinalForm).left := (lift (toUnit FinalForm ≫ η[A]) (𝟙 FinalForm)).left
   have he : e ≫ p0 = 𝟙 Z := by
@@ -110,7 +125,8 @@ private theorem val_mul_val_comm_of_fst_eq (hG : Out.GlobalFnsSt) {S S' : Scheme
     · simp only [a', e, Category.assoc, pullback.lift_snd, he'q, Category.comp_id]
       rw [← Category.assoc, ← Over.comp_left, lift_snd]
       rfl
-  let x : FinalForm ⟶ A := Over.homMk (g₁ ≫ pullback.fst A.hom π) (by simp [FinalForm, pullback.condition])
+  let x : FinalForm ⟶ A :=
+    Over.homMk (g₁ ≫ pullback.fst A.hom π) (by simp [FinalForm, pullback.condition])
   let ρ : Z ⟶ (A ⊗ FinalForm).left := (lift x (𝟙 FinalForm)).left
   have hρp : ρ ≫ p0 = 𝟙 Z := by
     simp only [ρ, p0]
@@ -132,18 +148,28 @@ private theorem val_mul_val_comm_of_fst_eq (hG : Out.GlobalFnsSt) {S S' : Scheme
       rw [← Category.assoc, hρp, Category.id_comp]
   let u := LB.mulGen N _ _ _ _ (LB.pullGen N _ _ w a) (LB.pullGen N _ _ w (p0 ≫ e ≫ a'))
   let u' := LB.mulGen N _ _ _ _ (LB.pullGen N _ _ w a') (LB.pullGen N _ _ w (p0 ≫ e ≫ a))
-  have hu : u.IsGen := ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _
-    (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw a) (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw _)
-  have hu' : u'.IsGen := ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _
-    (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw a') (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw _)
-  have hF : FormEq (Sum.elim (fun _ : PUnit.{1} => a' ≫ pullback.fst A.hom π)
-        (fun _ : PUnit.{1} => (p0 ≫ e ≫ a) ≫ pullback.fst A.hom π)) (Sum.elim (fun _ => (1 : ℤ)) (fun _ => 1))
-      (Sum.elim (fun _ : PUnit.{1} => a ≫ pullback.fst A.hom π)
-        (fun _ : PUnit.{1} => (p0 ≫ e ≫ a') ≫ pullback.fst A.hom π)) (Sum.elim (fun _ => (1 : ℤ)) (fun _ => 1)) := by
+  have hu : u.IsGen :=
+    ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _
+      (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw a)
+      (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw _)
+  have hu' : u'.IsGen :=
+    ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _
+      (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw a')
+      (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w hw _)
+  have hF : FormEq
+      (Sum.elim
+        (fun _ : PUnit.{1} => a' ≫ pullback.fst A.hom π)
+        (fun _ : PUnit.{1} => (p0 ≫ e ≫ a) ≫ pullback.fst A.hom π))
+      (Sum.elim (fun _ => (1 : ℤ)) (fun _ => 1))
+      (Sum.elim
+        (fun _ : PUnit.{1} => a ≫ pullback.fst A.hom π)
+        (fun _ : PUnit.{1} => (p0 ≫ e ≫ a') ≫ pullback.fst A.hom π))
+      (Sum.elim (fun _ => (1 : ℤ)) (fun _ => 1)) := by
     intro U _ h
     simp [Fintype.prod_sum_type, hap]
-  have key := ReciprocityTheory.ChartRestriction.G.Geo.Tor.gen_unique' hN hF p0 e he
-    (ReciprocityTheory.ChartRestriction.G.Geo.Tor.surj_snd hG hA FinalForm) hu hu' ?_ Z ρ z J hJ
+  have key :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.gen_unique' hN hF p0 e he
+      (ReciprocityTheory.ChartRestriction.G.Geo.Tor.surj_snd hG hA FinalForm) hu hu' ?_ Z ρ z J hJ
   · simp only [u, u'] at key
     rw [val_mul hJ, val_mul hJ, val_pull hJ, val_pull hJ, val_pull hJ, val_pull hJ] at key
     have hρp' : ∀ {W : Scheme.{0}} (h : Z ⟶ W), ρ ≫ p0 ≫ h = h := fun h => by
@@ -157,8 +183,13 @@ private theorem val_mul_val_comm_of_fst_eq (hG : Out.GlobalFnsSt) {S S' : Scheme
       rw [← Category.assoc, he, Category.id_comp]
     rw [he', he', mul_comm]
 
-theorem exists_gen_of_rigidified_of_flat_baseChange :
-    Out.GlobalFnsSt → ∀ (S S' : Scheme.{0}) (π : S' ⟶ S) (A : Over S) [GrpObj A] (N : LB A.left), IsAbelianScheme A → N.IsLB → Flat π → Surjective π → QuasiCompact π → (∃ t : (N.pull (eSec A)).Gen, t.IsGen) → (∃ t : (N.pull (pullback.fst A.hom π)).Gen, t.IsGen) → ∃ t : N.Gen, t.IsGen := by
+theorem exists_gen_of_rigidified_of_flat_baseChange
+    : Out.GlobalFnsSt
+      → ∀ (S S' : Scheme.{0}) (π : S' ⟶ S) (A : Over S) [GrpObj A] (N : LB A.left),
+        IsAbelianScheme A → N.IsLB → Flat π → Surjective π → QuasiCompact π
+          → (∃ t : (N.pull (eSec A)).Gen, t.IsGen)
+          → (∃ t : (N.pull (pullback.fst A.hom π)).Gen, t.IsGen)
+          → ∃ t : N.Gen, t.IsGen := by
   intro hG S S' π A _ N hA hN hfl hsu hqc hr hw
   obtain ⟨r, hr⟩ := hr
   obtain ⟨w, hw⟩ := hw
@@ -177,16 +208,27 @@ theorem exists_gen_of_rigidified_of_flat_baseChange :
   have hw' : w'.IsGen := hw
   let r' : (N.LinComb (fun _ : PUnit.{1} => eSec A) (fun _ => (1 : ℤ))).Gen := r
   have hr' : r'.IsGen := hr
-  let v := LB.mulGen N _ _ _ _ w' (LB.mulGen N _ _ _ _ (LB.pullGen N _ _ r' (pullback.snd A.hom π ≫ π))
-    (LB.invGen N _ _ (LB.pullGen N _ _ w' (pullback.snd A.hom π ≫ e'))))
-  have hv : v.IsGen := ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _ hw'
-    (ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _ (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ r' hr' _)
-      (ReciprocityTheory.ChartRestriction.G.DVR.invGen_isGen N _ _ _ (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w' hw' _)))
-  obtain ⟨t', ht', hvv⟩ := ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_gen hN
-    (φ' := fun _ : PUnit.{1} => pullback.fst A.hom π ≫ 𝟙 A.left) (ε' := fun _ => (1 : ℤ))
-    (by intro U _ h; simp [Fintype.prod_sum_type, he'p]) v hv
-  refine Exists.elim (GlobalTheory.CubeDescent.exists_gen_descend hN (pullback.fst A.hom π)
-    (fun _ : PUnit.{1} => 𝟙 A.left) (fun _ => (1 : ℤ)) t' ht' ?_) (fun t ht => exists_gen_of_pull_id N t ht)
+  let v :=
+    LB.mulGen N _ _ _ _ w'
+      (LB.mulGen N _ _ _ _ (LB.pullGen N _ _ r' (pullback.snd A.hom π ≫ π))
+        (LB.invGen N _ _ (LB.pullGen N _ _ w' (pullback.snd A.hom π ≫ e'))))
+  have hv : v.IsGen :=
+    ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _ hw'
+      (ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen N _ _ _ _ _ _
+        (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ r' hr' _)
+        (ReciprocityTheory.ChartRestriction.G.DVR.invGen_isGen N _ _ _
+          (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen N _ _ w' hw' _)))
+  obtain ⟨t', ht', hvv⟩ :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_gen hN
+      (φ' := fun _ : PUnit.{1} => pullback.fst A.hom π ≫ 𝟙 A.left)
+      (ε' := fun _ => (1 : ℤ))
+      (by intro U _ h; simp [Fintype.prod_sum_type, he'p]) v hv
+  refine Exists.elim
+    (GlobalTheory.CubeDescent.exists_gen_descend hN (pullback.fst A.hom π)
+      (fun _ : PUnit.{1} => 𝟙 A.left)
+      (fun _ => (1 : ℤ))
+      t' ht' ?_)
+    (fun t ht => exists_gen_of_pull_id N t ht)
   · intro Z g₁ g₂ z J hJ hg
     rw [hvv Z g₁ z J hJ, hvv Z g₂ z J hJ]
     simp only [v, val_mul hJ, val_pull hJ, val_inv]

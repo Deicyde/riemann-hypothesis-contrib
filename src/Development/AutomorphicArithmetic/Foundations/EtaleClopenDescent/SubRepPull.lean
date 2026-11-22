@@ -6,15 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsQuasiI
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 namespace UpperTheory.SubRep
 
-variable {S T : Scheme.{0}} {A : Over S} [GrpObj A] {x : T ⟶ S} {A₁ : Over T} [GrpObj A₁]
+variable
+  {S T : Scheme.{0}} {A : Over S} [GrpObj A]
+  {x : T ⟶ S} {A₁ : Over T} [GrpObj A₁]
   {φ₁ : A₁.left ⟶ A.left}
 
-theorem pull_existsUnique (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T)
-    (ht : t ≫ x = T'.hom) (a : T' ⟶ A) :
-    ∃! g : Over.mk t ⟶ A₁, g.left ≫ φ₁ = a.left := by
+theorem pull_existsUnique
+    (hP : IsGrpPullback A₁ A x φ₁)
+    (T' : Over S) (t : T'.left ⟶ T) (ht : t ≫ x = T'.hom) (a : T' ⟶ A)
+    : ∃! g : Over.mk t ⟶ A₁, g.left ≫ φ₁ = a.left := by
   have hP' := hP
   unfold IsGrpPullback at hP'
   obtain ⟨hPb, -⟩ := hP'
@@ -27,29 +31,32 @@ theorem pull_existsUnique (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t :
     exact (hPb.lift_fst _ _ _).symm
   · exact (Over.w g').trans (hPb.lift_snd _ _ _).symm
 
-theorem pull_ext (hP : IsGrpPullback A₁ A x φ₁) {T' : Over T} {g g' : T' ⟶ A₁}
-    (h : g.left ≫ φ₁ = g'.left ≫ φ₁) : g = g' := by
+theorem pull_ext
+    (hP : IsGrpPullback A₁ A x φ₁) {T' : Over T} {g g' : T' ⟶ A₁} (h : g.left ≫ φ₁ = g'.left ≫ φ₁)
+    : g = g' := by
   apply Over.OverMorphism.ext
   apply hP.1.hom_ext h
   rw [Over.w g, Over.w g']
 
-theorem pull_mul (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T)
-    (ht : t ≫ x = T'.hom) {g g' : Over.mk t ⟶ A₁} {a a' : T' ⟶ A}
-    (h : g.left ≫ φ₁ = a.left) (h' : g'.left ≫ φ₁ = a'.left) :
-    (g * g').left ≫ φ₁ = (a * a').left := by
+theorem pull_mul
+    (hP : IsGrpPullback A₁ A x φ₁)
+    (T' : Over S) (t : T'.left ⟶ T) (ht : t ≫ x = T'.hom)
+    {g g' : Over.mk t ⟶ A₁} {a a' : T' ⟶ A} (h : g.left ≫ φ₁ = a.left) (h' : g'.left ≫ φ₁ = a'.left)
+    : (g * g').left ≫ φ₁ = (a * a').left := by
   have hP' := hP
   unfold IsGrpPullback at hP'
   obtain ⟨-, hPm⟩ := hP'
   let e : Over.mk (t ≫ x) ⟶ T' := Over.homMk (𝟙 _) (by rw [Category.id_comp]; exact ht.symm)
-  have key := hPm (Over.mk t) g g' (e ≫ a) (e ≫ a')
-    (by rw [Over.comp_left, ← h]; exact Category.id_comp _)
-    (by rw [Over.comp_left, ← h']; exact Category.id_comp _)
+  have key :=
+    hPm (Over.mk t) g g' (e ≫ a) (e ≫ a') (by rw [Over.comp_left, ← h]; exact Category.id_comp _)
+      (by rw [Over.comp_left, ← h']; exact Category.id_comp _)
   rw [← MonObj.comp_mul, Over.comp_left] at key
   rw [← key]
   exact (Category.id_comp _).symm
 
-theorem pull_one (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T)
-    (ht : t ≫ x = T'.hom) : (1 : Over.mk t ⟶ A₁).left ≫ φ₁ = (1 : T' ⟶ A).left := by
+theorem pull_one
+    (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T) (ht : t ≫ x = T'.hom)
+    : (1 : Over.mk t ⟶ A₁).left ≫ φ₁ = (1 : T' ⟶ A).left := by
   have hP' := hP
   unfold IsGrpPullback at hP'
   obtain ⟨hPb, -⟩ := hP'
@@ -66,9 +73,11 @@ theorem pull_one (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left 
   show c.left = _
   rw [h1]
 
-theorem pull_inv (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T)
-    (ht : t ≫ x = T'.hom) {g : Over.mk t ⟶ A₁} {a : T' ⟶ A}
-    (h : g.left ≫ φ₁ = a.left) : (g⁻¹).left ≫ φ₁ = (a⁻¹).left := by
+theorem pull_inv
+    (hP : IsGrpPullback A₁ A x φ₁)
+    (T' : Over S) (t : T'.left ⟶ T) (ht : t ≫ x = T'.hom)
+    {g : Over.mk t ⟶ A₁} {a : T' ⟶ A} (h : g.left ≫ φ₁ = a.left)
+    : (g⁻¹).left ≫ φ₁ = (a⁻¹).left := by
   have hP' := hP
   unfold IsGrpPullback at hP'
   obtain ⟨hPb, -⟩ := hP'
@@ -85,9 +94,12 @@ theorem pull_inv (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left 
   show c.left = _
   rw [h1]
 
-theorem pull_pow (hP : IsGrpPullback A₁ A x φ₁) (T' : Over S) (t : T'.left ⟶ T)
-    (ht : t ≫ x = T'.hom) {g : Over.mk t ⟶ A₁} {a : T' ⟶ A}
-    (h : g.left ≫ φ₁ = a.left) (n : ℕ) : (g ^ n).left ≫ φ₁ = (a ^ n).left := by
+theorem pull_pow
+    (hP : IsGrpPullback A₁ A x φ₁)
+    (T' : Over S) (t : T'.left ⟶ T) (ht : t ≫ x = T'.hom)
+    {g : Over.mk t ⟶ A₁} {a : T' ⟶ A} (h : g.left ≫ φ₁ = a.left)
+    (n : ℕ)
+    : (g ^ n).left ≫ φ₁ = (a ^ n).left := by
   induction n with
   | zero => simpa using pull_one hP T' t ht
   | succ n ih => rw [pow_succ, pow_succ]; exact pull_mul hP T' t ht ih h

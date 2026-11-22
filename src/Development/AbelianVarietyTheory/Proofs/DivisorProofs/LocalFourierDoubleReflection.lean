@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTr
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.WeylFour
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.WeylFour
 open scoped GlobalTheory.VacAny
 
 noncomputable section
@@ -24,8 +26,9 @@ local instance borelFvLoc (v : Pl (F := F)) : BorelSpace (Fv F v) := ⟨rfl⟩
 
 open GlobalTheory.SplitWeil
 
-theorem norm_addChar_eq_one {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (hχ : Continuous χ) (x : Fv F v) :
-    ‖χ x‖ = 1 := by
+theorem norm_addChar_eq_one
+    {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (hχ : Continuous χ) (x : Fv F v)
+    : ‖χ x‖ = 1 := by
   have hb : ∀ y : Fv F v, ‖χ y‖ ≤ 1 := by
     intro y
     obtain ⟨s, hs⟩ : ∃ s : (Fv F v)ˣ, y ∈ cball s := by
@@ -53,7 +56,8 @@ theorem norm_addChar_eq_one {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (hχ :
   refine le_antisymm h1 ?_
   nlinarith [norm_nonneg (χ x), norm_nonneg (χ (-x))]
 
-def toCirc {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (h : ∀ x, ‖χ x‖ = 1) : AddChar (Fv F v) Circle where
+def toCirc {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (h : ∀ x, ‖χ x‖ = 1)
+    : AddChar (Fv F v) Circle where
   toFun x := ⟨χ x, by simpa [Submonoid.unitSphere, mem_sphere_zero_iff_norm] using h x⟩
   map_zero_eq_one' := by
     apply Circle.ext
@@ -62,18 +66,20 @@ def toCirc {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (h : ∀ x, ‖χ x‖ 
     apply Circle.ext
     exact χ.map_add_eq_mul a b
 
-theorem coe_toCirc {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (h : ∀ x, ‖χ x‖ = 1) (x : Fv F v) :
-    ((toCirc χ h x : Circle) : ℂ) = χ x := rfl
+theorem coe_toCirc {v : Pl (F := F)} (χ : AddChar (Fv F v) ℂ) (h : ∀ x, ‖χ x‖ = 1) (x : Fv F v)
+    : ((toCirc χ h x : Circle) : ℂ) = χ x :=
+  rfl
 
-theorem continuous_psiAt' (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) (v : Pl (F := F)) :
-    Continuous (GlobalTheory.LatVac.psiAt ψ v) := by
+theorem continuous_psiAt' (ψ : AddChar (AF F) ℂ) (hψ : Continuous ψ) (v : Pl (F := F))
+    : Continuous (GlobalTheory.LatVac.psiAt ψ v) := by
   have hj : Continuous (GlobalTheory.LatVac.liftV (F := F) v) := by
     change Continuous fun a => ((0 : Ainf F), GlobalTheory.AdelicU.singleFin v a)
     exact continuous_const.prodMk (GlobalTheory.AdelicU.continuous_singleFin v)
   exact hψ.comp hj
 
-theorem measV_selfDual (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (v : Pl (F := F)) (hne : ∃ x, psiLoc ψ v x ≠ 1) :
-    ∃ (h : ∀ x, ‖GlobalTheory.LatVac.psiAt ψ v x‖ = 1) (c : (Fv F v)ˣ),
+theorem measV_selfDual
+    (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (v : Pl (F := F)) (hne : ∃ x, psiLoc ψ v x ≠ 1)
+    : ∃ (h : ∀ x, ‖GlobalTheory.LatVac.psiAt ψ v x‖ = 1) (c : (Fv F v)ˣ),
       HasConductor (toCirc _ h) c ∧ IsSelfDual (toCirc _ h) (measV ψ v) := by
   have hc := continuous_psiAt' ψ hψ.1 v
   have hn : ∀ x, ‖GlobalTheory.LatVac.psiAt ψ v x‖ = 1 := norm_addChar_eq_one _ hc
@@ -86,7 +92,8 @@ theorem measV_selfDual (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (v : Pl (F := 
     simpa [coe_toCirc, GlobalTheory.LatVac.psiAt_apply] using this
   obtain ⟨c, hcond⟩ := exists_hasConductor_of_continuous _ hcc hne1
   obtain ⟨ν, hν⟩ := exists_isSelfDual_of_hasConductor hcond
-  have hex : ∃ ν, IsSelfDualFor (GlobalTheory.LatVac.psiAt ψ v) ν := ⟨ν, hν.1, fun f hf => hν.2 f hf⟩
+  have hex : ∃ ν, IsSelfDualFor (GlobalTheory.LatVac.psiAt ψ v) ν :=
+    ⟨ν, hν.1, fun f hf => hν.2 f hf⟩
   refine ⟨hn, c, hcond, ?_⟩
   have hm : measV ψ v = hex.choose := by
     unfold measV
@@ -100,9 +107,13 @@ namespace GlobalTheory.WeylFour.LocInv
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem fourV_fourV : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsStd ψ → ∀ v : Pl (F := F),
-    (∃ x, psiLoc ψ v x ≠ 1) →
-    ∀ (κ : Type) [Fintype κ], ∀ φ ∈ SB (κ → Fv F v), fourV ψ v (fourV ψ v φ) = fun x => φ (-x) := by
+theorem fourV_fourV
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      IsStd ψ
+        → ∀ v : Pl (F := F),
+          (∃ x, psiLoc ψ v x ≠ 1)
+            → ∀ (κ : Type) [Fintype κ], ∀ φ ∈ SB (κ → Fv F v),
+              fourV ψ v (fourV ψ v φ) = fun x => φ (-x) := by
   intro F _ _ ψ hψ v hne κ _ φ hφ
   classical
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
@@ -111,23 +122,30 @@ theorem fourV_fourV : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF
   haveI := GlobalTheory.SplitWeil.secondCountable (Fv F v)
   haveI := GlobalTheory.SplitWeil.t2Space (Fv F v)
   funext z
-  have hinner : ∀ y, fourV ψ v φ y * GlobalTheory.LatVac.psiAt ψ v (y ⬝ᵥ z) =
-      ∫ x, φ (x - z) * ((toCirc _ hn (x ⬝ᵥ y) : Circle) : ℂ) ∂(Measure.pi fun _ : κ => measV ψ v) := by
-    intro y
-    unfold fourV
-    rw [← integral_mul_const]
-    have h1 : ∀ x : κ → Fv F v, φ x * GlobalTheory.LatVac.psiAt ψ v (x ⬝ᵥ y) * GlobalTheory.LatVac.psiAt ψ v (y ⬝ᵥ z) =
-        φ x * GlobalTheory.LatVac.psiAt ψ v ((x + z) ⬝ᵥ y) := by
-      intro x
-      rw [add_dotProduct, AddChar.map_add_eq_mul, dotProduct_comm z y, mul_assoc]
-    simp only [h1]
-    rw [← integral_sub_right_eq_self (μ := Measure.pi fun _ : κ => measV ψ v)
-      (fun x => φ x * GlobalTheory.LatVac.psiAt ψ v ((x + z) ⬝ᵥ y)) z]
-    refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-    simp only [sub_add_cancel, coe_toCirc]
-  have hg : (fun x : κ → Fv F v => φ (x - z)) ∈ GlobalTheory.SplitWeil.SB (κ → Fv F v) :=
-    ⟨hφ.1.comp_continuous (continuous_id.sub continuous_const),
-      hφ.2.comp_homeomorph (Homeomorph.subRight z)⟩
+  have hinner
+      : ∀ y,
+        fourV ψ v φ y * GlobalTheory.LatVac.psiAt ψ v (y ⬝ᵥ z)
+          = ∫ x, φ (x - z) * ((toCirc _ hn (x ⬝ᵥ y) : Circle) : ℂ) ∂(Measure.pi fun _ : κ => measV ψ v) :=
+    by
+      intro y
+      unfold fourV
+      rw [← integral_mul_const]
+      have h1
+          : ∀ x : κ → Fv F v,
+            φ x * GlobalTheory.LatVac.psiAt ψ v (x ⬝ᵥ y) * GlobalTheory.LatVac.psiAt ψ v (y ⬝ᵥ z)
+              = φ x * GlobalTheory.LatVac.psiAt ψ v ((x + z) ⬝ᵥ y) := by
+        intro x
+        rw [add_dotProduct, AddChar.map_add_eq_mul, dotProduct_comm z y, mul_assoc]
+      simp only [h1]
+      rw [← integral_sub_right_eq_self (μ := Measure.pi fun _ : κ => measV ψ v)
+        (fun x => φ x * GlobalTheory.LatVac.psiAt ψ v ((x + z) ⬝ᵥ y))
+        z]
+      refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
+      simp only [sub_add_cancel, coe_toCirc]
+  have hg : (fun x : κ → Fv F v => φ (x - z)) ∈ GlobalTheory.SplitWeil.SB (κ → Fv F v) := ⟨
+    hφ.1.comp_continuous (continuous_id.sub continuous_const),
+    hφ.2.comp_homeomorph (Homeomorph.subRight z)
+  ⟩
   have h2 := (GlobalTheory.SplitWeil.FourierPi.fourier_pi_of_conductor hcond hself hg).2
   show ∫ y, fourV ψ v φ y * GlobalTheory.LatVac.psiAt ψ v (y ⬝ᵥ z) ∂(Measure.pi fun _ : κ => measV ψ v) = φ (-z)
   simp only [hinner]

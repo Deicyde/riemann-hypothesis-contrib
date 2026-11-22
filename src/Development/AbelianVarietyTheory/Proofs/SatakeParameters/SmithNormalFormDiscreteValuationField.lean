@@ -14,13 +14,15 @@ namespace GlobalTheory.SmithValued
 variable (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
 noncomputable def vNN : Valuation L NNReal :=
-  (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).map
-    { toMonoidWithZeroHom := WithZeroMulInt.toNNReal (e := 2) (by norm_num)
-      monotone' := (WithZeroMulInt.toNNReal_strictMono (e := 2) (by norm_num)).monotone }
+  (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).map {
+    toMonoidWithZeroHom := WithZeroMulInt.toNNReal (e := 2) (by norm_num)
+    monotone' := (WithZeroMulInt.toNNReal_strictMono (e := 2) (by norm_num)).monotone
+  }
 
 theorem vNN_le_one_iff (x : L) : vNN L x ≤ 1 ↔ x ∈ Formalism.UG.intL L := by
-  have h := (WithZeroMulInt.toNNReal_strictMono (e := 2) (by norm_num)).le_iff_le
-    (a := (Valued.v x : WithZero (Multiplicative ℤ))) (b := 1)
+  have h :=
+    (WithZeroMulInt.toNNReal_strictMono (e := 2) (by norm_num)).le_iff_le
+      (a := (Valued.v x : WithZero (Multiplicative ℤ))) (b := 1)
   rw [map_one] at h
   exact h
 
@@ -31,8 +33,8 @@ theorem vNN_integers : (vNN L).Integers ↥(Formalism.UG.intL L) := by
   · intro r hr
     exact ⟨⟨r, (vNN_le_one_iff L _).1 hr⟩, rfl⟩
 
-theorem exists_clear {ι : Type} (s : Finset ι) (f : ι → L) :
-    ∃ c : L, c ≠ 0 ∧ c ∈ Formalism.UG.intL L ∧ ∀ i ∈ s, c * f i ∈ Formalism.UG.intL L := by
+theorem exists_clear {ι : Type} (s : Finset ι) (f : ι → L)
+    : ∃ c : L, c ≠ 0 ∧ c ∈ Formalism.UG.intL L ∧ ∀ i ∈ s, c * f i ∈ Formalism.UG.intL L := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨1, one_ne_zero, one_mem _, by simp⟩
@@ -43,8 +45,7 @@ theorem exists_clear {ι : Type} (s : Finset ι) (f : ι → L) :
       rcases Finset.mem_insert.1 hi with rfl | hi
       · exact mul_mem hc ha
       · exact hs i hi
-    · have h0 : f a ≠ 0 := by
-        intro h; exact ha (h ▸ zero_mem _)
+    · have h0 : f a ≠ 0 := by intro h; exact ha (h ▸ zero_mem _)
       have hinv : (f a)⁻¹ ∈ Formalism.UG.intL L := by
         rw [← vNN_le_one_iff] at ha ⊢
         rw [map_inv₀]
@@ -52,25 +53,33 @@ theorem exists_clear {ι : Type} (s : Finset ι) (f : ι → L) :
       refine ⟨(f a)⁻¹ * c, mul_ne_zero (inv_ne_zero h0) hc0, mul_mem hinv hc, fun i hi => ?_⟩
       rcases Finset.mem_insert.1 hi with rfl | hi
       · have : (f i)⁻¹ * c * f i = c := by field_simp
-        rw [this]; exact hc
+        rw [this]
+        exact hc
       · rw [mul_assoc]; exact mul_mem hinv (hs i hi)
 
-theorem smith_valued : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (m n : ℕ) (M : Matrix (Fin m) (Fin n) L),
-    ∃ (P P' : Matrix (Fin m) (Fin m) L) (Q Q' : Matrix (Fin n) (Fin n) L) (d : Fin m → L),
-      (∀ i j, P i j ∈ Formalism.UG.intL L) ∧ (∀ i j, P' i j ∈ Formalism.UG.intL L) ∧
-      (∀ i j, Q i j ∈ Formalism.UG.intL L) ∧ (∀ i j, Q' i j ∈ Formalism.UG.intL L) ∧ P * P' = 1 ∧ Q * Q' = 1 ∧
-      M = P * Matrix.of (fun (j : Fin m) (k : Fin n) => if (k : ℕ) = (j : ℕ) then d j else 0) * Q := by
+theorem smith_valued
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (m n : ℕ)
+        (M : Matrix (Fin m) (Fin n) L),
+      ∃ (P P' : Matrix (Fin m) (Fin m) L) (Q Q' : Matrix (Fin n) (Fin n) L) (d : Fin m → L),
+        (∀ i j, P i j ∈ Formalism.UG.intL L) ∧ (∀ i j, P' i j ∈ Formalism.UG.intL L)
+          ∧ (∀ i j, Q i j ∈ Formalism.UG.intL L) ∧ (∀ i j, Q' i j ∈ Formalism.UG.intL L)
+          ∧ P * P' = 1 ∧ Q * Q' = 1
+          ∧ M
+            = P * Matrix.of (fun (j : Fin m) (k : Fin n) => if (k : ℕ) = (j : ℕ) then d j else 0)
+              * Q := by
   intro L _ _ m n M
   classical
-  obtain ⟨c, hc0, -, hc⟩ := exists_clear L (Finset.univ : Finset (Fin m × Fin n))
-    (fun p => M p.1 p.2)
+  obtain ⟨c, hc0, -, hc⟩ :=
+    exists_clear L (Finset.univ : Finset (Fin m × Fin n)) (fun p => M p.1 p.2)
   let A : Matrix (Fin m) (Fin n) ↥(Formalism.UG.intL L) :=
     Matrix.of fun i j => ⟨c * M i j, hc (i, j) (Finset.mem_univ _)⟩
-  have diagonalize : ∀ (d n : ℕ) (X : Matrix (Fin d) (Fin n) ↥(Formalism.UG.intL L)),
-      ∃ (P : Matrix (Fin d) (Fin d) ↥(Formalism.UG.intL L))
-        (Q : Matrix (Fin n) (Fin n) ↥(Formalism.UG.intL L)) (a : Fin d → ↥(Formalism.UG.intL L)),
-        IsUnit P.det ∧ IsUnit Q.det ∧
-          ∀ j k, (P * X * Q) j k = if (k : ℕ) = (j : ℕ) then a j else 0 := by
+  have diagonalize
+      : ∀ (d n : ℕ) (X : Matrix (Fin d) (Fin n) ↥(Formalism.UG.intL L)),
+        ∃ (P : Matrix (Fin d) (Fin d) ↥(Formalism.UG.intL L))
+            (Q : Matrix (Fin n) (Fin n) ↥(Formalism.UG.intL L))
+            (a : Fin d → ↥(Formalism.UG.intL L)),
+          IsUnit P.det ∧ IsUnit Q.det
+            ∧ ∀ j k, (P * X * Q) j k = if (k : ℕ) = (j : ℕ) then a j else 0 := by
     open ReciprocityTheory.PGsh.Up.Smith in
     intro d
     induction d with
@@ -94,8 +103,14 @@ theorem smith_valued : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicat
         have hcol : ∀ i, X i j₀ = a * u i := fun i => congrFun hj₀ i
         have hrow : ∀ j, X i₀ j = a * s j := hs
         let B := (Vm i₀ u)ᵀ * X * Vm j₀ s
-        have hB (i j) : B i j = if i = i₀ then (if j = j₀ then a else 0) else
-            if j = j₀ then 0 else X i j - s j * (a * u i) := by
+        have hB (i j)
+            : B i j
+              = if i = i₀ then
+                  (if j = j₀ then a else 0)
+                else if j = j₀ then
+                  0
+                else
+                  X i j - s j * (a * u i) := by
           dsimp only [B]
           rw [Matrix.mul_assoc, VmT_mul, mul_Vm, mul_Vm]
           by_cases hi : i = i₀ <;> by_cases hj : j = j₀
@@ -127,12 +142,12 @@ theorem smith_valued : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicat
           simp [C, piv_zero, piv_succ, hB, Fin.succAbove_ne]
         obtain ⟨h00, h0j, hi0, hij⟩ := blockOne_mul_mul_blockOne P C Q hrow₀ hcol₀
         refine ⟨bd1 P * U * (Vm i₀ u)ᵀ, Vm j₀ s * V * bd1 Q, Fin.cons a b, ?_, ?_, ?_⟩
-        · rw [Matrix.det_mul, Matrix.det_mul, det_blockOne_alt, Matrix.det_transpose, det_Vm, mul_one]
+        · rw [Matrix.det_mul, Matrix.det_mul, det_blockOne_alt, Matrix.det_transpose, det_Vm,
+            mul_one]
           exact hP.mul (isUnit_det_perm _)
         · rw [Matrix.det_mul, Matrix.det_mul, det_blockOne_alt, det_Vm, one_mul]
           exact (isUnit_det_perm _).mul hQ
-        · have hfull : bd1 P * U * (Vm i₀ u)ᵀ * X * (Vm j₀ s * V * bd1 Q) =
-              bd1 P * C * bd1 Q := by
+        · have hfull : bd1 P * U * (Vm i₀ u)ᵀ * X * (Vm j₀ s * V * bd1 Q) = bd1 P * C * bd1 Q := by
             rw [← hC]
             simp only [B, Matrix.mul_assoc]
           intro i j
@@ -154,13 +169,24 @@ theorem smith_valued : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicat
     rw [← Matrix.map_mul, Matrix.nonsing_inv_mul _ hQ, Matrix.map_one _ (map_zero φ) (map_one φ)]
   have hQ2 : Q.map φ * Q⁻¹.map φ = 1 := by
     rw [← Matrix.map_mul, Matrix.mul_nonsing_inv _ hQ, Matrix.map_one _ (map_zero φ) (map_one φ)]
-  refine ⟨P⁻¹.map φ, P.map φ, Q⁻¹.map φ, Q.map φ, fun j => c⁻¹ * (a j : L),
-    fun i j => (P⁻¹ i j).2, fun i j => (P i j).2, fun i j => (Q⁻¹ i j).2, fun i j => (Q i j).2,
-    hP1, hQ1, ?_⟩
-  have hA : A.map φ = c • M := by
-    ext i j; simp [A, φ]
-  have hD' : Matrix.of (fun (j : Fin m) (k : Fin n) =>
-      if (k : ℕ) = (j : ℕ) then c⁻¹ * (a j : L) else 0) = P.map φ * M * Q.map φ := by
+  refine ⟨
+    P⁻¹.map φ,
+    P.map φ,
+    Q⁻¹.map φ,
+    Q.map φ,
+    fun j => c⁻¹ * (a j : L),
+    fun i j => (P⁻¹ i j).2,
+    fun i j => (P i j).2,
+    fun i j => (Q⁻¹ i j).2,
+    fun i j => (Q i j).2,
+    hP1,
+    hQ1,
+    ?_
+  ⟩
+  have hA : A.map φ = c • M := by ext i j; simp [A, φ]
+  have hD'
+      : Matrix.of (fun (j : Fin m) (k : Fin n) => if (k : ℕ) = (j : ℕ) then c⁻¹ * (a j : L) else 0)
+        = P.map φ * M * Q.map φ := by
     have h1 : (P * A * Q).map φ = c • (P.map φ * M * Q.map φ) := by
       rw [Matrix.map_mul, Matrix.map_mul, hA, Matrix.mul_smul, Matrix.smul_mul]
     have h2 : P.map φ * M * Q.map φ = c⁻¹ • (P * A * Q).map φ := by

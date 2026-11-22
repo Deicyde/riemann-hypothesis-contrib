@@ -39,10 +39,11 @@ lemma isPullback_rees :
 instance : (reesScheme I X).Over (Spec (.of (reesAlgebra I))) := ⟨reesSnd I X⟩
 
 instance : IsAffineHom (reesPr I X) :=
-  isAffineHom_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _).flip inferInstance
+  isAffineHom_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _).flip
+    inferInstance
 
-instance [IsProper (X ↘ Spec (.of A))] :
-    IsProper (reesScheme I X ↘ Spec (.of (reesAlgebra I))) := by
+instance [IsProper (X ↘ Spec (.of A))]
+    : IsProper (reesScheme I X ↘ Spec (.of (reesAlgebra I))) := by
   change IsProper (pullback.snd (X ↘ Spec (.of A)) (reesStructure I))
   infer_instance
 
@@ -57,14 +58,14 @@ lemma isPullback_reesPoly :
   IsPullback.of_hasPullback _ _
 
 instance : IsAffineHom (reesPolyMap I X) :=
-  isAffineHom_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _).flip inferInstance
+  isAffineHom_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _).flip
+    inferInstance
 
 end Schemes
 
 section Rings
 
 variable {A : Type u} [CommRing A] {I : Ideal A} {X : Scheme.{u}} [X.Over (Spec (.of A))]
-
 
 variable (X) in
 def algV (V : X.Opens) : A →+* Γ(X, V) :=
@@ -74,27 +75,24 @@ variable (I) in
 def reesInr (V : X.Opens) : CommRingCat.of (reesAlgebra I) ⟶ Γ(reesScheme I X, reesPr I X ⁻¹ᵁ V) :=
   (Scheme.ΓSpecIso (.of (reesAlgebra I))).inv ≫ (reesSnd I X).appLE ⊤ _ le_top
 
-
 variable (I) in
-def polyInr (V : X.Opens) : CommRingCat.of (Polynomial A) ⟶
-    Γ(reesPolyScheme I X, reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V)) :=
+def polyInr (V : X.Opens)
+    : CommRingCat.of (Polynomial A)
+      ⟶ Γ(reesPolyScheme I X, reesPolyMap I X ⁻¹ᵁ (reesPr I X ⁻¹ᵁ V)) :=
   (Scheme.ΓSpecIso (.of (Polynomial A))).inv ≫ (reesPolySnd I X).appLE ⊤ _ le_top
 
-
-theorem isPushout_rees {V : X.Opens} (hV : IsAffineOpen V) :
-    IsPushout (CommRingCat.ofHom (algV X V)) (CommRingCat.ofHom (algebraMap A (reesAlgebra I)))
+theorem isPushout_rees {V : X.Opens} (hV : IsAffineOpen V)
+    : IsPushout (CommRingCat.ofHom (algV X V)) (CommRingCat.ofHom (algebraMap A (reesAlgebra I)))
       ((reesPr I X).app V) (reesInr I V) := by
-  refine (isPushout_app_of_isPullback (isPullback_rees I X) hV).of_iso
-    (Scheme.ΓSpecIso (.of A)) (Iso.refl _) (Scheme.ΓSpecIso (.of (reesAlgebra I))) (Iso.refl _)
-    ?_ ?_ ?_ ?_
+  refine (isPushout_app_of_isPullback (isPullback_rees I X) hV).of_iso (Scheme.ΓSpecIso (.of A))
+    (Iso.refl _) (Scheme.ΓSpecIso (.of (reesAlgebra I))) (Iso.refl _) ?_ ?_ ?_ ?_
   · simp [algV]
   · exact Scheme.ΓSpecIso_naturality _
   · simp
   · simp [reesInr]
 
-
-theorem isPushout_reesPoly {V : X.Opens} (hV : IsAffineOpen V) :
-    IsPushout (CommRingCat.ofHom (algV X V)) (CommRingCat.ofHom (Polynomial.C))
+theorem isPushout_reesPoly {V : X.Opens} (hV : IsAffineOpen V)
+    : IsPushout (CommRingCat.ofHom (algV X V)) (CommRingCat.ofHom (Polynomial.C))
       ((reesPr I X).app V ≫ (reesPolyMap I X).app _) (polyInr I V) := by
   have h1 := (isPushout_app_of_isPullback (isPullback_rees I X) hV).flip
   have h2 := (isPushout_app_of_isPullback (isPullback_reesPoly I X) (hV.preimage (reesPr I X))).flip

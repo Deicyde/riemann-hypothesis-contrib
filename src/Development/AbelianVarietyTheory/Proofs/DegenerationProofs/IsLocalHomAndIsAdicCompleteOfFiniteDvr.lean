@@ -42,14 +42,13 @@ private lemma mem_span_pow_iff_repr {V V' : Type} [CommRing V] [CommRing V'] [Al
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← hc i, smul_smul, mul_comm (ϖ ^ j)]
 
-
 open IsLocalRing in
-theorem _root_.GlobalTheory.isLocalHom_and_isAdicComplete_of_finite_dvr :
-    ∀ (V V' : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-      [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [CommRing V'] [IsDomain V']
-      [IsDiscreteValuationRing V'] [Algebra V V'], Module.Finite V V' →
-      Function.Injective (algebraMap V V') →
-      IsLocalHom (algebraMap V V') ∧ IsAdicComplete (IsLocalRing.maximalIdeal V') V' := by
+theorem _root_.GlobalTheory.isLocalHom_and_isAdicComplete_of_finite_dvr
+    : ∀ (V V' : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [CommRing V'] [IsDomain V']
+        [IsDiscreteValuationRing V'] [Algebra V V'],
+      Module.Finite V V' → Function.Injective (algebraMap V V')
+        → IsLocalHom (algebraMap V V') ∧ IsAdicComplete (IsLocalRing.maximalIdeal V') V' := by
   intro V V' _ _ _ _ _ _ _ _ hfin hinj
   have hloc : IsLocalHom (algebraMap V V') :=
     RingHom.IsIntegral.isLocalHom (fun x => Algebra.IsIntegral.isIntegral x) hinj
@@ -69,9 +68,11 @@ theorem _root_.GlobalTheory.isLocalHom_and_isAdicComplete_of_finite_dvr :
   have hP : IsPrecomplete (maximalIdeal V') V' := by
     rw [isPrecomplete_iff]
     intro f hf
-    have hcoord : ∀ i : Module.Free.ChooseBasisIndex V V', ∀ {m n : ℕ}, m ≤ n →
-        b.repr (f (e * m)) i ≡ b.repr (f (e * n)) i
-          [SMOD maximalIdeal V ^ m • (⊤ : Submodule V V)] := by
+    have hcoord
+        : ∀ i : Module.Free.ChooseBasisIndex V V', ∀ {m n : ℕ},
+          m ≤ n
+            → b.repr (f (e * m)) i ≡ b.repr (f (e * n)) i
+                [SMOD maximalIdeal V ^ m • (⊤ : Submodule V V)] := by
       intro i m n hmn
       have h := hf (Nat.mul_le_mul_left e hmn)
       rw [hV', SModEq.sub_mem, hpow, mem_span_pow_iff_repr b] at h

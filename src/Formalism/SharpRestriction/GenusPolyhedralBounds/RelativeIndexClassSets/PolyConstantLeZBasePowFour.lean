@@ -16,12 +16,15 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscrim
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents NumberField IsDedekindDomain Module
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions
+  Formalism.BasicNotions.LevelStarExponents NumberField IsDedekindDomain Module
 
 namespace Formalism.MainNotions.Gaps.EtaleWeightGaps.Num.Pm
 
-theorem mono3 {f r l : ℝ} (hf : 1 ≤ f) (hr : 1 ≤ r) (hl : 1 ≤ l) (a b c n : ℕ) (ha : a ≤ n) (hb : b ≤ n)
-    (hc : c ≤ n) : f ^ a * r ^ b * l ^ c ≤ (f * r * l) ^ n := by
+theorem mono3
+    {f r l : ℝ} (hf : 1 ≤ f) (hr : 1 ≤ r) (hl : 1 ≤ l)
+    (a b c n : ℕ) (ha : a ≤ n) (hb : b ≤ n) (hc : c ≤ n)
+    : f ^ a * r ^ b * l ^ c ≤ (f * r * l) ^ n := by
   have h1 : f ^ a ≤ f ^ n := pow_le_pow_right₀ hf ha
   have h2 : r ^ b ≤ r ^ n := pow_le_pow_right₀ hr hb
   have h3 : l ^ c ≤ l ^ n := pow_le_pow_right₀ hl hc
@@ -80,28 +83,25 @@ theorem r_le_alt_alt (D : D7) : (D.R.r : ℝ) ≤ D.R.t := by
   have h : D.R.r ≤ D.R.t := by simp only [Ranks.r]; omega
   exact_mod_cast h
 
-theorem two_le_m (D : D7) : (2 : ℝ) ≤ D.R.m := by
-  exact_mod_cast D.R.two_le_m
+theorem two_le_m (D : D7) : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
 
 theorem one_le_L (L : SizeData₂ D) : 1 ≤ L.sc.L := by
   simp only [Scale.L]
   exact Real.one_le_rpow L.sc.one_lt_alt.le L.sc.eps_pos.le
 
-theorem log_b (L : SizeData₂ D) : Real.log L.sc.b = L.sc.L := by
-  simp only [Scale.b, Real.log_exp]
+theorem log_b (L : SizeData₂ D) : Real.log L.sc.b = L.sc.L := by simp only [Scale.b, Real.log_exp]
 
 theorem condE_cast (D : D7) : ((condE D : ℕ) : ℝ) = (D.host.QS : ℝ) * D.host.q * D.host.d := by
   simp only [condE]
   push_cast
   ring
 
-theorem one_le_q (D : D7) : (1 : ℝ) ≤ D.host.q := by
-  exact_mod_cast D.host.hyp.1.one_lt.le
+theorem one_le_q (D : D7) : (1 : ℝ) ≤ D.host.q := by exact_mod_cast D.host.hyp.1.one_lt.le
 
-theorem one_le_d (D : D7) : (1 : ℝ) ≤ D.host.d := by
-  exact_mod_cast D.host.hyp.2.1.one_lt.le
+theorem one_le_d (D : D7) : (1 : ℝ) ≤ D.host.d := by exact_mod_cast D.host.hyp.2.1.one_lt.le
 
-theorem one_le_qd (D : D7) : (1 : ℝ) ≤ (D.host.q : ℝ) * D.host.d := one_le_mul_of_one_le_of_one_le (one_le_q D) (one_le_d D)
+theorem one_le_qd (D : D7) : (1 : ℝ) ≤ (D.host.q : ℝ) * D.host.d :=
+  one_le_mul_of_one_le_of_one_le (one_le_q D) (one_le_d D)
 
 theorem f_le_condE (D : D7) : (D.R.f : ℝ) ≤ (condE D : ℝ) := by
   have h : Module.finrank ℚ D.host.E = 4 * D.R.ord := D.host.der.finrank_E
@@ -110,8 +110,9 @@ theorem f_le_condE (D : D7) : (D.R.f : ℝ) ≤ (condE D : ℝ) := by
   haveI : NeZero (D.host.QS * D.host.q * D.host.d) := ⟨hN.ne'⟩
   have hinj : Function.Injective D.host.cycEmb.toLinearMap := D.host.cycEmb.toRingHom.injective
   have h1 := LinearMap.finrank_le_finrank_of_injective hinj
-  have h2 : Module.finrank ℚ (CyclotomicField (D.host.QS * D.host.q * D.host.d) ℚ) =
-      Nat.totient (D.host.QS * D.host.q * D.host.d) :=
+  have h2
+      : Module.finrank ℚ (CyclotomicField (D.host.QS * D.host.q * D.host.d) ℚ)
+        = Nat.totient (D.host.QS * D.host.q * D.host.d) :=
     IsCyclotomicExtension.finrank (CyclotomicField (D.host.QS * D.host.q * D.host.d) ℚ)
       (Polynomial.cyclotomic.irreducible_rat hN)
   have h3 := Nat.totient_le (D.host.QS * D.host.q * D.host.d)
@@ -126,8 +127,8 @@ theorem one_le_condE (D : D7) : (1 : ℝ) ≤ (condE D : ℝ) := by
     exact Nat.mul_pos (Nat.mul_pos D.host.QS_pos D.host.hyp.1.pos) D.host.hyp.2.1.pos
   exact Nat.one_le_cast.mpr h
 
-theorem log_cond_le (P : ParameterChoice' D L) :
-    Real.log (condE D : ℝ) ≤ L.sc.L / 72 ∧ Real.log (D.R.t : ℝ) ≤ L.sc.L / 300 := by
+theorem log_cond_le (P : ParameterChoice' D L)
+    : Real.log (condE D : ℝ) ≤ L.sc.L / 72 ∧ Real.log (D.R.t : ℝ) ≤ L.sc.L / 300 := by
   have hc := P.condE_le
   have h1 : (1 : ℝ) ≤ condE D := one_le_condE D
   have ht : (1 : ℝ) ≤ D.R.t := by
@@ -145,9 +146,11 @@ theorem log_cond_le (P : ParameterChoice' D L) :
   push_cast at hlog
   constructor <;> linarith
 
-theorem log_f_le (P : ParameterChoice' D L) : Real.log (D.R.f : ℝ) ≤ L.sc.L / 72 := (Real.log_le_log (by linarith [two_le_f D]) (f_le_condE D)).trans (log_cond_le P).1
+theorem log_f_le (P : ParameterChoice' D L) : Real.log (D.R.f : ℝ) ≤ L.sc.L / 72 :=
+  (Real.log_le_log (by linarith [two_le_f D]) (f_le_condE D)).trans (log_cond_le P).1
 
-theorem log_r_le (P : ParameterChoice' D L) : Real.log (D.R.r : ℝ) ≤ L.sc.L / 300 := (Real.log_le_log (by linarith [six_le_r D]) (r_le_alt_alt D)).trans (log_cond_le P).2
+theorem log_r_le (P : ParameterChoice' D L) : Real.log (D.R.r : ℝ) ≤ L.sc.L / 300 :=
+  (Real.log_le_log (by linarith [six_le_r D]) (r_le_alt_alt D)).trans (log_cond_le P).2
 
 theorem one_le_rdE (D : D7) : 1 ≤ D.host.rdE := by
   simp only [Host.rdE]
@@ -162,7 +165,9 @@ theorem x_le_fr (S : SizesAt L) : L.sc.x ≤ (D.R.f : ℝ) * D.R.r := by
   have hx1 := L.sc.one_lt_alt.le
   have he := L.sc.eps_pos
   have h1 : L.sc.x ≤ L.sc.x ^ (2 + 8 * L.sc.eps - szTh L) := by
-    calc L.sc.x = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
+    calc
+      L.sc.x
+        = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
       _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hx1 (by unfold szTh; linarith)
   have h2 : L.sc.x ≤ (D.R.n : ℝ) := h1.trans S.1.1
   have h3 := six_le_r D
@@ -186,15 +191,18 @@ theorem L_le_Z (L : SizeData₂ D) : L.sc.L ≤ zBase L := by
   show L.sc.L ≤ (D.R.f : ℝ) * D.R.r * L.sc.L
   nlinarith
 
-theorem Z_ge (S : SizesAt L) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : (10 : ℝ) ^ 60 ≤ zBase L := le_trans hx (le_trans (x_le_fr S) (fr_le_Z L))
+theorem Z_ge (S : SizesAt L) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : (10 : ℝ) ^ 60 ≤ zBase L :=
+  le_trans hx (le_trans (x_le_fr S) (fr_le_Z L))
 
-theorem mono (L : SizeData₂ D) (a b c n : ℕ) (ha : a ≤ n) (hb : b ≤ n) (hc : c ≤ n) :
-    (D.R.f : ℝ) ^ a * (D.R.r : ℝ) ^ b * L.sc.L ^ c ≤ zBase L ^ n := by
-  have h := mono3 (f := (D.R.f : ℝ)) (r := (D.R.r : ℝ)) (l := L.sc.L) (by linarith [two_le_f D])
-    (by linarith [six_le_r D]) (one_le_L L) a b c n ha hb hc
+theorem mono (L : SizeData₂ D) (a b c n : ℕ) (ha : a ≤ n) (hb : b ≤ n) (hc : c ≤ n)
+    : (D.R.f : ℝ) ^ a * (D.R.r : ℝ) ^ b * L.sc.L ^ c ≤ zBase L ^ n := by
+  have h :=
+    mono3 (f := (D.R.f : ℝ)) (r := (D.R.r : ℝ)) (l := L.sc.L) (by linarith [two_le_f D])
+      (by linarith [six_le_r D]) (one_le_L L) a b c n ha hb hc
   exact h
 
-theorem fr_le_pow (S : SizesAt L) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : (D.R.f : ℝ) * D.R.r ≤ L.sc.x ^ (20 : ℝ) := by
+theorem fr_le_pow (S : SizesAt L) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x)
+    : (D.R.f : ℝ) * D.R.r ≤ L.sc.x ^ (20 : ℝ) := by
   have hx1 := L.sc.one_lt_alt.le
   have he := L.sc.eps_pos
   have he' := L.sc.eps_lt
@@ -210,12 +218,14 @@ theorem fr_le_pow (S : SizesAt L) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : (D.R.f : �
     exact S.2.2.1.2.trans (Real.rpow_le_rpow_of_exponent_le hx1 (by unfold szTh; linarith))
   have hx0 : 0 ≤ L.sc.x := by linarith
   rw [e20, f_eq]
-  calc 2 * (D.R.n : ℝ) * D.R.r ≤ 2 * (D.R.n : ℝ) * (2 * D.R.k) :=
-        mul_le_mul_of_nonneg_left (r_le_two_k D) (by positivity)
+  calc
+    2 * (D.R.n : ℝ) * D.R.r
+      ≤ 2 * (D.R.n : ℝ) * (2 * D.R.k) := mul_le_mul_of_nonneg_left (r_le_two_k D) (by positivity)
     _ = 4 * ((D.R.n : ℝ) * D.R.k) := by ring
     _ ≤ 4 * (L.sc.x ^ (3 : ℕ) * L.sc.x ^ (5 : ℕ)) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul hn hk (by positivity) (by positivity)) (by norm_num)
-    _ ≤ L.sc.x * (L.sc.x ^ (3 : ℕ) * L.sc.x ^ (5 : ℕ)) := mul_le_mul_of_nonneg_right hx4 (by positivity)
+      mul_le_mul_of_nonneg_left (mul_le_mul hn hk (by positivity) (by positivity)) (by norm_num)
+    _ ≤ L.sc.x * (L.sc.x ^ (3 : ℕ) * L.sc.x ^ (5 : ℕ)) :=
+      mul_le_mul_of_nonneg_right hx4 (by positivity)
     _ = L.sc.x ^ (9 : ℕ) := by ring
     _ ≤ L.sc.x ^ (20 : ℕ) := pow_le_pow_right₀ hx1 (by norm_num)
 
@@ -251,23 +261,38 @@ theorem logOm_le (P : ParameterChoice' D L) : |L.logOm| ≤ 6 * L.sc.L := by
 theorem two_fm_le_rdE (D : D7) : 2 * (D.R.f : ℝ) * D.R.m ≤ D.host.rdE :=
   (UpperTheory.Ram.two_fm_le_rdE D.R D.host).1
 
-theorem parA_of (P : ParameterChoice' D L) (S : SizesAt L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
-    (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) : ParA L 20 := by
+theorem parA_of
+    (P : ParameterChoice' D L) (S : SizesAt L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
+    (hx : (10 : ℝ) ^ 60 ≤ L.sc.x)
+    : ParA L 20 := by
   have hL := one_le_L L
-  refine ⟨x_le_fr S, fr_le_pow S hx, ?_, S.2.2.2.2.2.2.2.2.2.2.2.1, hg, P.logDerivative_le_power, ?_, P.pde_log.1, P.pde_log.2,
-    two_fm_le_rdE D⟩
+  refine ⟨
+    x_le_fr S,
+    fr_le_pow S hx,
+    ?_,
+    S.2.2.2.2.2.2.2.2.2.2.2.1,
+    hg,
+    P.logDerivative_le_power,
+    ?_,
+    P.pde_log.1,
+    P.pde_log.2,
+    two_fm_le_rdE D
+  ⟩
   · have h := logdE_le_two_f_L P
     have h6 := six_le_r D
     have hf : (0 : ℝ) ≤ (D.R.f : ℝ) * L.sc.L := by positivity
-    have e : (20 : ℝ) * ((D.R.f : ℝ) * D.R.r * L.sc.L) = 20 * D.R.r * ((D.R.f : ℝ) * L.sc.L) := by ring
+    have e : (20 : ℝ) * ((D.R.f : ℝ) * D.R.r * L.sc.L) = 20 * D.R.r * ((D.R.f : ℝ) * L.sc.L) := by
+      ring
     show logdE D ≤ _
     rw [e]
     nlinarith
   · exact (logOm_le P).trans (by linarith)
 
-theorem one_le_Z (L : SizeData₂ D) : 1 ≤ zBase L := one_le_mul_of_one_le_of_one_le (one_le_fr D) (one_le_L L)
+theorem one_le_Z (L : SizeData₂ D) : 1 ≤ zBase L :=
+  one_le_mul_of_one_le_of_one_le (one_le_fr D) (one_le_L L)
 
-theorem Zpow_le (L : SizeData₂ D) {a n : ℕ} (h : a ≤ n) : zBase L ^ a ≤ zBase L ^ n := pow_le_pow_right₀ (one_le_Z L) h
+theorem Zpow_le (L : SizeData₂ D) {a n : ℕ} (h : a ≤ n) : zBase L ^ a ≤ zBase L ^ n :=
+  pow_le_pow_right₀ (one_le_Z L) h
 
 theorem PO_le (L : SizeData₂ D) : PO D L ≤ 217 * zBase L ^ 2 := by
   have hf : (2 : ℝ) ≤ D.R.f := two_le_f D
@@ -278,11 +303,14 @@ theorem PO_le (L : SizeData₂ D) : PO D L ≤ 217 * zBase L ^ 2 := by
   have hA : 0 ≤ (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L := by positivity
   have hB : 0 ≤ (D.R.f : ℝ) ^ 2 * L.sc.L := by positivity
   have h1 : (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L ≤ ((D.R.f : ℝ) * D.R.r * L.sc.L) ^ 2 :=
-    calc (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L
-        ≤ (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L * ((D.R.f : ℝ) * L.sc.L) := le_mul_of_one_le_right hA hfL
+    calc
+      (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L
+          ≤ (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * L.sc.L * ((D.R.f : ℝ) * L.sc.L) :=
+        le_mul_of_one_le_right hA hfL
       _ = ((D.R.f : ℝ) * D.R.r * L.sc.L) ^ 2 := by ring
   have h2 : (D.R.f : ℝ) ^ 2 * L.sc.L ≤ ((D.R.f : ℝ) * D.R.r * L.sc.L) ^ 2 :=
-    calc (D.R.f : ℝ) ^ 2 * L.sc.L
+    calc
+      (D.R.f : ℝ) ^ 2 * L.sc.L
         ≤ (D.R.f : ℝ) ^ 2 * L.sc.L * ((D.R.r : ℝ) ^ 2 * L.sc.L) := le_mul_of_one_le_right hB hrL
       _ = ((D.R.f : ℝ) * D.R.r * L.sc.L) ^ 2 := by ring
   simp only [WeightAlgebra.PO]
@@ -290,8 +318,8 @@ theorem PO_le (L : SizeData₂ D) : PO D L ≤ 217 * zBase L ^ 2 := by
     217 * ((D.R.f : ℝ) * D.R.r * L.sc.L) ^ 2
   linarith
 
-theorem log_g_sum (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) :
-    Real.log ((D.host.g 0 : ℝ) * D.host.g 1) ≤ 18 * L.sc.L + 2 := by
+theorem log_g_sum (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
+    : Real.log ((D.host.g 0 : ℝ) * D.host.g 1) ≤ 18 * L.sc.L + 2 := by
   have hL := one_le_L L
   have h0 := hg 0
   have h1 := hg 1
@@ -304,15 +332,17 @@ theorem log_g_sum (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) :
   rw [Real.log_mul ha hb]
   linarith
 
-theorem lamStar_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) :
-    lamStar D ≤ 21 * L.sc.L := by
+theorem lamStar_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
+    : lamStar D ≤ 21 * L.sc.L := by
   have hL := one_le_L L
   have hn := one_le_n D
   have hq := one_le_q D
   have hd := one_le_d D
   have hqd := one_le_qd D
   have hc0 : (0 : ℝ) < (condE D : ℝ) := by linarith [one_le_condE D]
-  have e1 : 4 * ((D.R.f : ℝ) / 2) ^ 2 * D.host.q * D.host.d = 4 * (D.R.n : ℝ) ^ 2 * D.host.q * D.host.d := by
+  have e1
+      : 4 * ((D.R.f : ℝ) / 2) ^ 2 * D.host.q * D.host.d
+        = 4 * (D.R.n : ℝ) ^ 2 * D.host.q * D.host.d := by
     rw [f_eq]; ring
   have hpos : 0 < 4 * (D.R.n : ℝ) ^ 2 * D.host.q * D.host.d := by positivity
   have h2 : 4 * (D.R.n : ℝ) ^ 2 * D.host.q * D.host.d ≤ (condE D : ℝ) ^ 2 := by
@@ -327,8 +357,8 @@ theorem lamStar_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i)
   push_cast at h3
   linarith
 
-theorem log_qdg_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) :
-    Real.log (D.host.QS * (D.host.q : ℝ) * D.host.d * D.host.g 0 * D.host.g 1) ≤ 21 * L.sc.L := by
+theorem log_qdg_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
+    : Real.log (D.host.QS * (D.host.q : ℝ) * D.host.d * D.host.g 0 * D.host.g 1) ≤ 21 * L.sc.L := by
   have hL := one_le_L L
   have hn := one_le_n D
   have hq := one_le_q D
@@ -338,8 +368,10 @@ theorem log_qdg_le (P : ParameterChoice' D L) (hg : ∀ i, Real.log (D.host.g i)
   have g1 : (0 : ℝ) < (D.host.g 1 : ℝ) := by exact_mod_cast (D.host.g_prime 1).pos
   have hQ := UpperTheory.Ram.Rd.one_le_QS_real D.host
   have hpos : 0 < D.host.QS * (D.host.q : ℝ) * D.host.d := by positivity
-  have e : D.host.QS * (D.host.q : ℝ) * D.host.d * D.host.g 0 * D.host.g 1 =
-      (D.host.QS * (D.host.q : ℝ) * D.host.d) * ((D.host.g 0 : ℝ) * D.host.g 1) := by ring
+  have e
+      : D.host.QS * (D.host.q : ℝ) * D.host.d * D.host.g 0 * D.host.g 1
+        = (D.host.QS * (D.host.q : ℝ) * D.host.d) * ((D.host.g 0 : ℝ) * D.host.g 1) := by
+    ring
   have h2 : D.host.QS * (D.host.q : ℝ) * D.host.d ≤ (condE D : ℝ) := (condE_cast D).ge
   have h3 := Real.log_le_log hpos h2
   have h4 := (log_cond_le P).1
@@ -369,8 +401,13 @@ theorem PU_le (P : ParameterChoice' D L) : PU D ≤ 7 * zBase L := by
   have h3 := log_r_le P
   unfold PU zBase
   rw [lrd_eq, Real.log_mul hf0.ne' hr0.ne']
-  have h4 : 2 * Real.log D.host.rdE + 2 * (Real.log (D.R.f : ℝ) + Real.log (D.R.r : ℝ)) + 3 ≤ 7 * L.sc.L := by linarith
-  calc (D.R.f : ℝ) * D.R.r * (2 * Real.log D.host.rdE + 2 * (Real.log (D.R.f : ℝ) + Real.log (D.R.r : ℝ)) + 3)
+  have h4
+      : 2 * Real.log D.host.rdE + 2 * (Real.log (D.R.f : ℝ) + Real.log (D.R.r : ℝ)) + 3
+        ≤ 7 * L.sc.L := by
+    linarith
+  calc
+    (D.R.f : ℝ) * D.R.r
+        * (2 * Real.log D.host.rdE + 2 * (Real.log (D.R.f : ℝ) + Real.log (D.R.r : ℝ)) + 3)
       ≤ (D.R.f : ℝ) * D.R.r * (7 * L.sc.L) := mul_le_mul_of_nonneg_left h4 (by positivity)
     _ = _ := by ring
 
@@ -380,7 +417,8 @@ theorem sigW_m (D : D7) : D.R.sigW D.R.m = (D.R.r, 0) := by
 theorem baseDegree_at_lift_index (D : D7) : n0 D D.R.m = D.R.r + 2 * g0 D := by
   unfold n0; rw [sigW_m]; simp
 
-theorem genusConstant_cast (D : D7) : (g0 D : ℝ) = 1250 * (D.R.r : ℝ) := by unfold g0; push_cast; ring
+theorem genusConstant_cast (D : D7) : (g0 D : ℝ) = 1250 * (D.R.r : ℝ) := by
+  unfold g0; push_cast; ring
 
 theorem dimY_m_le (D : D7) : (WeightFamilies.dimY D D.R.m : ℝ) ≤ (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 := by
   have h : WeightFamilies.dimY D D.R.m ≤ D.R.f * D.R.r ^ 2 := by
@@ -388,12 +426,15 @@ theorem dimY_m_le (D : D7) : (WeightFamilies.dimY D D.R.m : ℝ) ≤ (D.R.f : �
     rw [sigW_m]
     apply Nat.mul_le_mul_left
     simp only [mul_zero, zero_mul, Nat.zero_div, add_zero, zero_add]
-    calc D.R.r * (D.R.r - 1) / 2 ≤ D.R.r * (D.R.r - 1) := Nat.div_le_self _ _
+    calc
+      D.R.r * (D.R.r - 1) / 2
+        ≤ D.R.r * (D.R.r - 1) := Nat.div_le_self _ _
       _ ≤ D.R.r * D.R.r := Nat.mul_le_mul_left _ (Nat.sub_le _ _)
       _ = D.R.r ^ 2 := (sq _).symm
   exact_mod_cast h
 
-theorem nW_le_Z (P : ParameterChoice' D L) (T : ParamsT D L P) (hCnW : P.CnW = 10) : (T.nWn : ℝ) ≤ 28 * zBase L ^ 4 := by
+theorem nW_le_Z (P : ParameterChoice' D L) (T : ParamsT D L P) (hCnW : P.CnW = 10)
+    : (T.nWn : ℝ) ≤ 28 * zBase L ^ 4 := by
   have hL := one_le_L L
   have hf := two_le_f D
   have hr := six_le_r D
@@ -407,24 +448,30 @@ theorem nW_le_Z (P : ParameterChoice' D L) (T : ParamsT D L P) (hCnW : P.CnW = 1
   have h := T.nW_win.2.le
   rw [hCnW] at h
   unfold nW at h
-  have a1 : (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m ≤
-      (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2 := by
+  have a1
+      : (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m
+        ≤ (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2 := by
     refine (div_le_self (by positivity) (by linarith)).trans ?_
     exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hk3 (by positivity)) (by positivity)
-  have a2 : 10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m) ≤
-      10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2) :=
+  have a2
+      : 10 * (D.R.r : ℝ)
+          * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * ((D.R.k : ℝ) - 1) ^ 3 * L.sc.L ^ 2 / D.R.m)
+        ≤ 10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2) :=
     mul_le_mul_of_nonneg_left (by linarith) (by positivity)
   have m1 := mono L 1 1 0 4 (by norm_num) (by norm_num) (by norm_num)
   have m2 := mono L 2 4 2 4 (by norm_num) (by norm_num) (by norm_num)
   have m3 := mono L 0 0 0 4 (by norm_num) (by norm_num) (by norm_num)
   simp only [pow_one, pow_zero, mul_one] at m1 m2 m3
-  have e : 10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2) =
-      10 * ((D.R.f : ℝ) * D.R.r) + 10 * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 4 * L.sc.L ^ 2) := by ring
+  have e
+      : 10 * (D.R.r : ℝ) * ((D.R.f : ℝ) + (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 3 * L.sc.L ^ 2)
+        = 10 * ((D.R.f : ℝ) * D.R.r) + 10 * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 4 * L.sc.L ^ 2) := by
+    ring
   rw [e] at a2
   linarith
 
-theorem polyConstant_le_zBase_pow_four (P : ParameterChoice' D L) (T : ParamsT D L P) (hCnW : P.CnW = 10) :
-    sizeConstantAtParamsWeight D T.nWn ≤ 1000 * zBase L ^ 4 := by
+theorem polyConstant_le_zBase_pow_four
+    (P : ParameterChoice' D L) (T : ParamsT D L P) (hCnW : P.CnW = 10)
+    : sizeConstantAtParamsWeight D T.nWn ≤ 1000 * zBase L ^ 4 := by
   have hL := one_le_L L
   have hf := two_le_f D
   have hr := six_le_r D
@@ -455,36 +502,48 @@ theorem polyConstant_le_zBase_pow_four (P : ParameterChoice' D L) (T : ParamsT D
   · linarith
   · linarith
 
-theorem liftConstant_le_zBase_pow_ten (L : SizeData₂ D) : DivisibilityWeightConstant D D.R.m ≤ 1000 * zBase L ^ 10 := by
+theorem liftConstant_le_zBase_pow_ten (L : SizeData₂ D)
+    : DivisibilityWeightConstant D D.R.m ≤ 1000 * zBase L ^ 10 := by
   have hf := two_le_f D
   have hr := six_le_r D
   have hm0 : (0 : ℝ) ≤ D.R.m := Nat.cast_nonneg _
   have hD0 : (0 : ℝ) ≤ (WeightFamilies.dimY D D.R.m : ℝ) := Nat.cast_nonneg _
-  have h1 : (WeightFamilies.dimY D D.R.m : ℝ) ^ 2 ≤ ((D.R.f : ℝ) * (D.R.r : ℝ) ^ 2) ^ 2 := pow_le_pow_left₀ hD0 (dimY_m_le D) 2
+  have h1 : (WeightFamilies.dimY D D.R.m : ℝ) ^ 2 ≤ ((D.R.f : ℝ) * (D.R.r : ℝ) ^ 2) ^ 2 :=
+    pow_le_pow_left₀ hD0 (dimY_m_le D) 2
   have h2 : (D.R.m : ℝ) ^ 4 ≤ (D.R.r : ℝ) ^ 4 := pow_le_pow_left₀ hm0 (m_le_r D) 4
   have h6 : (64 : ℝ) ≤ (D.R.f : ℝ) ^ 6 := by
-    calc (64 : ℝ) = 2 ^ 6 := by norm_num
+    calc
+      (64 : ℝ)
+        = 2 ^ 6 := by norm_num
       _ ≤ _ := pow_le_pow_left₀ (by norm_num) hf 6
   have m1 := mono L 10 10 0 10 (by norm_num) (by norm_num) (by norm_num)
   simp only [pow_zero, mul_one] at m1
   unfold DivisibilityWeightConstant
-  calc 72 * 5 ^ 4 * (WeightFamilies.dimY D D.R.m : ℝ) ^ 2 * (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2 * (D.R.m : ℝ) ^ 4
-      = 45000 * ((WeightFamilies.dimY D D.R.m : ℝ) ^ 2 * (D.R.m : ℝ) ^ 4) * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2) := by ring
-    _ ≤ 45000 * (((D.R.f : ℝ) * (D.R.r : ℝ) ^ 2) ^ 2 * (D.R.r : ℝ) ^ 4) * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2) :=
-        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (mul_le_mul h1 h2 (by positivity) (by positivity))
-          (by norm_num)) (by positivity)
+  calc
+    72 * 5 ^ 4 * (WeightFamilies.dimY D D.R.m : ℝ) ^ 2 * (D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2
+          * (D.R.m : ℝ) ^ 4
+        = 45000 * ((WeightFamilies.dimY D D.R.m : ℝ) ^ 2 * (D.R.m : ℝ) ^ 4)
+          * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2) := by
+      ring
+    _ ≤ 45000 * (((D.R.f : ℝ) * (D.R.r : ℝ) ^ 2) ^ 2 * (D.R.r : ℝ) ^ 4)
+        * ((D.R.f : ℝ) ^ 2 * (D.R.r : ℝ) ^ 2) :=
+      mul_le_mul_of_nonneg_right
+        (mul_le_mul_of_nonneg_left (mul_le_mul h1 h2 (by positivity) (by positivity)) (by norm_num))
+        (by positivity)
     _ = 45000 * ((D.R.f : ℝ) ^ 4 * (D.R.r : ℝ) ^ 10) := by ring
     _ ≤ 1000 * (64 * ((D.R.f : ℝ) ^ 4 * (D.R.r : ℝ) ^ 10)) := by
-        have : 0 ≤ (D.R.f : ℝ) ^ 4 * (D.R.r : ℝ) ^ 10 := by positivity
-        linarith
+      have : 0 ≤ (D.R.f : ℝ) ^ 4 * (D.R.r : ℝ) ^ 10 := by positivity
+      linarith
     _ ≤ 1000 * ((D.R.f : ℝ) ^ 6 * ((D.R.f : ℝ) ^ 4 * (D.R.r : ℝ) ^ 10)) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h6 (by positivity)) (by norm_num)
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h6 (by positivity)) (by norm_num)
     _ = 1000 * ((D.R.f : ℝ) ^ 10 * (D.R.r : ℝ) ^ 10) := by ring
     _ ≤ _ := mul_le_mul_of_nonneg_left m1 (by norm_num)
 
-theorem domAt_of (P : ParameterChoice' D L) (T : ParamsT D L P) (S : SizesAt L) (hCnW : P.CnW = 10)
-    (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) (hx : (10 : ℝ) ^ 60 ≤ L.sc.x) :
-    DomAt D L D.R.m T.nWn 1000 := by
+theorem domAt_of
+    (P : ParameterChoice' D L) (T : ParamsT D L P)
+    (S : SizesAt L) (hCnW : P.CnW = 10) (hg : ∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1)
+    (hx : (10 : ℝ) ^ 60 ≤ L.sc.x)
+    : DomAt D L D.R.m T.nWn 1000 := by
   have hL := one_le_L L
   have hLZ := L_le_Z L
   have hZ := Z_ge S hx
@@ -492,8 +551,21 @@ theorem domAt_of (P : ParameterChoice' D L) (T : ParamsT D L P) (S : SizesAt L) 
   have eZ : Zb D L = zBase L := rfl
   unfold DomAt
   rw [eZ]
-  refine ⟨le_rfl, ?_, ?_, ?_, ?_, ?_, ?_, ?_, polyConstant_le_zBase_pow_four P T hCnW, liftConstant_le_zBase_pow_ten L⟩
-  · calc (1000 : ℝ) ^ 20 = 10 ^ 60 := by norm_num
+  refine ⟨
+    le_rfl,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    polyConstant_le_zBase_pow_four P T hCnW,
+    liftConstant_le_zBase_pow_ten L
+  ⟩
+  · calc
+      (1000 : ℝ) ^ 20
+        = 10 ^ 60 := by norm_num
       _ ≤ _ := hZ
   · linarith [lamStar_le P hg]
   · unfold PN; linarith [lamStar_le P hg]
@@ -533,7 +605,8 @@ theorem log_two_f_le (L : SizeData₂ D) : Real.log (2 * (D.R.f : ℝ)) ≤ zBas
   show Real.log (2 * (D.R.f : ℝ)) ≤ (D.R.f : ℝ) * D.R.r * L.sc.L
   linarith
 
-theorem growthZero_le_thirty_zBase (P : ParameterChoice' D L) : WeightFamilies.PP0v D L 1 1 ≤ 30 * zBase L := by
+theorem growthZero_le_thirty_zBase (P : ParameterChoice' D L)
+    : WeightFamilies.PP0v D L 1 1 ≤ 30 * zBase L := by
   have hL := one_le_L L
   have hr := six_le_r D
   have h1 := fr_le_Z L
@@ -549,8 +622,7 @@ theorem growthZero_le_thirty_zBase (P : ParameterChoice' D L) : WeightFamilies.P
   linarith
 
 theorem growthZero_nonneg (L : SizeData₂ D) : 0 ≤ WeightFamilies.PP0v D L 1 1 := by
-  have h3 : 0 ≤ logdE D := by
-    rw [logdE_eq_rd]; have := log_rdE_nonneg D; positivity
+  have h3 : 0 ≤ logdE D := by rw [logdE_eq_rd]; have := log_rdE_nonneg D; positivity
   have hL := one_le_L L
   unfold WeightFamilies.PP0v
   rw [Real.rpow_one, one_mul]

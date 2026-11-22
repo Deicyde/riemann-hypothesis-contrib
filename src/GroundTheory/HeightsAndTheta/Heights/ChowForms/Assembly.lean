@@ -24,8 +24,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem FGNullstellensatz.full : FGNullstellensatz.Statement :=
-  FGNullstellensatz.proof
+theorem FGNullstellensatz.full : FGNullstellensatz.Statement := FGNullstellensatz.proof
 
 theorem ProjNullstellensatz.full : ProjNullstellensatz.Statement :=
   ProjNullstellensatz.proof FGNullstellensatz.full
@@ -33,23 +32,19 @@ theorem ProjNullstellensatz.full : ProjNullstellensatz.Statement :=
 theorem IncidenceGeneric.full : IncidenceGeneric.Statement :=
   IncidenceGeneric.proof FGNullstellensatz.full
 
-theorem IncIdealPrime.full : IncIdealPrime.Statement :=
-  IncIdealPrime.proof IncidenceGeneric.full
+theorem IncIdealPrime.full : IncIdealPrime.Statement := IncIdealPrime.proof IncidenceGeneric.full
 
 theorem ChowFormMultiHomog.full : ChowFormMultiHomog.Statement :=
   ChowFormMultiHomog.proof ProjNullstellensatz.full
 
-theorem GenericLinearTrdeg.full : GenericLinearTrdeg.Statement :=
-  GenericLinearTrdeg.proof
+theorem GenericLinearTrdeg.full : GenericLinearTrdeg.Statement := GenericLinearTrdeg.proof
 
-theorem MinimalPrimeHomog.full : MinimalPrimeHomog.Statement :=
-  MinimalPrimeHomog.proof
+theorem MinimalPrimeHomog.full : MinimalPrimeHomog.Statement := MinimalPrimeHomog.proof
 
 theorem ConeDimComponent.full : ConeDimComponent.Statement :=
   ConeDimComponent.proof MinimalPrimeHomog.full
 
-theorem LengthQuotientDet.full : LengthQuotientDet.Statement :=
-  LengthQuotientDet.proof
+theorem LengthQuotientDet.full : LengthQuotientDet.Statement := LengthQuotientDet.proof
 
 theorem OrdPolynomialLocalization.full : OrdPolynomialLocalization.Statement :=
   OrdPolynomialLocalization.proof
@@ -57,16 +52,15 @@ theorem OrdPolynomialLocalization.full : OrdPolynomialLocalization.Statement :=
 theorem ChowFormBirational.full : ChowFormBirational.Statement :=
   ChowFormBirational.proof IncidenceGeneric.full ChowFormMultiHomog.full
 
-theorem IncIdealDim.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement) :
-    IncIdealDim.Statement :=
+theorem IncIdealDim.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement) : IncIdealDim.Statement :=
   IncIdealDim.proof IncidenceGeneric.full GenericLinearTrdeg.full hA
 
-theorem ConeDimOfChowForm.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement) :
-    ConeDimOfChowForm.Statement :=
+theorem ConeDimOfChowForm.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement)
+    : ConeDimOfChowForm.Statement :=
   ConeDimOfChowForm.proof (IncIdealDim.of_affineChartTrdeg hA) IncIdealPrime.full
 
-theorem ChowFormExists.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement) :
-    ChowFormExists.Statement :=
+theorem ChowFormExists.of_affineChartTrdeg (hA : AffineChartTrdeg.Statement)
+    : ChowFormExists.Statement :=
   ChowFormExists.proof (IncIdealDim.of_affineChartTrdeg hA) IncIdealPrime.full
 
 end GroundTheory.Heights₂.Heights

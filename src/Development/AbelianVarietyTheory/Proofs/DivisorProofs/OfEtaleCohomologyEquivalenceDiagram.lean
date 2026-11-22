@@ -5,20 +5,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
-theorem ContCone.iff_of_eqv (R : Type) [CommRing R] (F : Shv R) (I : Type) [SmallCategory I] [IsCofiltered I]
+theorem ContCone.iff_of_eqv
+    (R : Type) [CommRing R]
+    (F : Shv R)
+    (I : Type) [SmallCategory I] [IsCofiltered I]
     (G G' : I ⥤ Spc) (c : Cone G) (c' : Cone G') (α : G ⟶ G') (β : c.pt ⟶ c'.pt)
-    (h : ∀ i, c.π.app i ≫ α.app i = β ≫ c'.π.app i) (hα : ∀ i, Eqv R (α.app i) F) (hβ : Eqv R β F) :
-    ContCone R F c ↔ ContCone R F c' := by
-  have hsq : ∀ n i (y' : H R (G'.obj i) F n),
-      pull R (c.π.app i) F n (pull R (α.app i) F n y') = pull R β F n (pull R (c'.π.app i) F n y') := by
+    (h : ∀ i, c.π.app i ≫ α.app i = β ≫ c'.π.app i) (hα : ∀ i, Eqv R (α.app i) F) (hβ : Eqv R β F)
+    : ContCone R F c ↔ ContCone R F c' := by
+  have hsq
+      : ∀ n i (y' : H R (G'.obj i) F n),
+        pull R (c.π.app i) F n (pull R (α.app i) F n y')
+          = pull R β F n (pull R (c'.π.app i) F n y') := by
     intro n i y'
     rw [← pull_comp, ← pull_comp, h i]
-  have hnat : ∀ n {k i : I} (f : k ⟶ i) (y' : H R (G'.obj i) F n),
-      pull R (G.map f) F n (pull R (α.app i) F n y') = pull R (α.app k) F n (pull R (G'.map f) F n y') := by
+  have hnat
+      : ∀ n {k i : I} (f : k ⟶ i) (y' : H R (G'.obj i) F n),
+        pull R (G.map f) F n (pull R (α.app i) F n y')
+          = pull R (α.app k) F n (pull R (G'.map f) F n y') := by
     intro n k i f y'
     rw [← pull_comp, ← pull_comp, α.naturality f]
   constructor

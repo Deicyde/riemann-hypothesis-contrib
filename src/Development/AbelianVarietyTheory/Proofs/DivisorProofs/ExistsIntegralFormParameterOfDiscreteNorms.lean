@@ -7,15 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffTopMonE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.MBLow
 
-theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClosed C] (N : NumD C) (q : QuadraticMap ℤ N.X ℝ) (t : C), N.Int q → t ≠ 0 → ‖t‖ < 1 → (∀ χ, ∃ n : ℤ, ‖(N.ψ χ : C)‖ = ‖t‖ ^ n) → ∀ m : ℕ, 1 ≤ m → ∃ (β : N.Form (m ^ 2)) (π : C), π ≠ 0 ∧ ‖π‖ < 1 ∧ (∀ n : ℕ, {α | (β.be α α / (2 * m ^ 2)).toNat = n}.Finite) ∧ ∀ α, Real.exp (-(q α / (m : ℝ) ^ 2)) = ‖π‖ ^ (β.be α α / (2 * m ^ 2)).toNat := by
+theorem exists_form_of_discrete_norms
+    : ∀ (C : Type) [NormedField C] [IsAlgClosed C] (N : NumD C) (q : QuadraticMap ℤ N.X ℝ) (t : C),
+      N.Int q → t ≠ 0 → ‖t‖ < 1 → (∀ χ, ∃ n : ℤ, ‖(N.ψ χ : C)‖ = ‖t‖ ^ n)
+        → ∀ m : ℕ,
+          1 ≤ m
+            → ∃ (β : N.Form (m ^ 2)) (π : C),
+              π ≠ 0 ∧ ‖π‖ < 1 ∧ (∀ n : ℕ, {α | (β.be α α / (2 * m ^ 2)).toNat = n}.Finite)
+                ∧ ∀ α, Real.exp (-(q α / (m : ℝ) ^ 2)) = ‖π‖ ^ (β.be α α / (2 * m ^ 2)).toNat := by
   intro C _ _ N q t hI ht0 ht1 hψ m hm
   have htpos : 0 < ‖t‖ := norm_pos_iff.2 ht0
   set L : ℝ := -Real.log ‖t‖ with hL
@@ -28,21 +39,32 @@ theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClo
     intro χ
     have h1 := hI.ψ χ
     rw [hQ χ] at h1
-    have h2 : Real.log (‖t‖ ^ Q χ) = -q χ := by rw [h1, Real.log_exp]
+    have h2 : Real.log (‖t‖ ^ Q χ) = - q χ := by rw [h1, Real.log_exp]
     rw [Real.log_zpow] at h2
-    rw [hL]; linarith
+    rw [hL]
+    linarith
   set Bf : N.X → N.X → ℤ := fun x y => Q (x + y) - Q x - Q y with hBf
   have hB : ∀ x y, (Bf x y : ℝ) = QuadraticMap.polar q x y / L := by
     intro x y
     rw [eq_div_iff hLpos.ne']
     simp only [hBf, QuadraticMap.polar, hq]
-    push_cast; ring
+    push_cast
+    ring
   have inj : ∀ a b : ℤ, (a : ℝ) = b → a = b := fun a b h => Int.cast_inj.1 h
-  let Bm : LinearMap.BilinForm ℤ N.X := LinearMap.mk₂ ℤ Bf
-    (fun x x' y => inj _ _ (by rw [Int.cast_add, hB, hB, hB, QuadraticMap.polar_add_left, add_div]))
-    (fun c x y => inj _ _ (by rw [smul_eq_mul, Int.cast_mul, hB, hB, QuadraticMap.polar_smul_left, zsmul_eq_mul, mul_div_assoc]))
-    (fun x y y' => inj _ _ (by rw [Int.cast_add, hB, hB, hB, QuadraticMap.polar_add_right, add_div]))
-    (fun c x y => inj _ _ (by rw [smul_eq_mul, Int.cast_mul, hB, hB, QuadraticMap.polar_smul_right, zsmul_eq_mul, mul_div_assoc]))
+  let Bm : LinearMap.BilinForm ℤ N.X :=
+    LinearMap.mk₂ ℤ Bf
+      (fun x x' y =>
+        inj _ _ (by rw [Int.cast_add, hB, hB, hB, QuadraticMap.polar_add_left, add_div]))
+      (fun c x y =>
+        inj _ _ (by
+          rw [smul_eq_mul, Int.cast_mul, hB, hB, QuadraticMap.polar_smul_left, zsmul_eq_mul,
+            mul_div_assoc]))
+      (fun x y y' =>
+        inj _ _ (by rw [Int.cast_add, hB, hB, hB, QuadraticMap.polar_add_right, add_div]))
+      (fun c x y =>
+        inj _ _ (by
+          rw [smul_eq_mul, Int.cast_mul, hB, hB, QuadraticMap.polar_smul_right, zsmul_eq_mul,
+            mul_div_assoc]))
   have hBm : ∀ x y, Bm x y = Bf x y := fun x y => rfl
   have hdiag : ∀ x, Bf x x = 2 * Q x := by
     intro x
@@ -51,8 +73,7 @@ theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClo
     push_cast
     field_simp
     try ring
-  have hsymm : ∀ x y, Bf x y = Bf y x := by
-    intro x y; simp only [hBf, add_comm x y]; ring
+  have hsymm : ∀ x y, Bf x y = Bf y x := by intro x y; simp only [hBf, add_comm x y]; ring
   have hpos : ∀ y, y ≠ 0 → 0 < q y := by
     intro y hy
     by_contra hn
@@ -88,19 +109,20 @@ theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClo
     have : (0 : ℝ) < Q y := pos_of_mul_pos_left this hLpos.le
     exact_mod_cast this
   have hm0 : (2 * (m : ℤ) ^ 2) ≠ 0 := by positivity
-  let β : N.Form (m ^ 2) :=
-    { be := (2 * (m : ℤ) ^ 2) • Bm
-      symm := fun y z => by
-        simp only [LinearMap.smul_apply, hBm, hsymm y z]
-      pos := fun y hy => by
-        simp only [LinearMap.smul_apply, hBm, hdiag, smul_eq_mul]
-        have := hQpos y hy
-        positivity
-      dvd := fun y z => ⟨Bf y z, by simp [LinearMap.smul_apply, hBm, smul_eq_mul]⟩ }
+  let β : N.Form (m ^ 2) := {
+    be := (2 * (m : ℤ) ^ 2) • Bm
+    symm := fun y z => by simp only [LinearMap.smul_apply, hBm, hsymm y z]
+    pos := fun y hy => by
+      simp only [LinearMap.smul_apply, hBm, hdiag, smul_eq_mul]
+      have := hQpos y hy
+      positivity
+    dvd := fun y z => ⟨Bf y z, by simp [LinearMap.smul_apply, hBm, smul_eq_mul]⟩
+  }
   have hβ : ∀ α, β.be α α / (2 * m ^ 2) = 2 * Q α := by
     intro α
     show ((2 * (m : ℤ) ^ 2) • Bm) α α / (2 * m ^ 2) = 2 * Q α
-    rw [LinearMap.smul_apply, LinearMap.smul_apply, smul_eq_mul, hBm, hdiag, Int.mul_ediv_cancel_left _ hm0]
+    rw [LinearMap.smul_apply, LinearMap.smul_apply, smul_eq_mul, hBm, hdiag,
+      Int.mul_ediv_cancel_left _ hm0]
   have hn : 0 < 2 * m ^ 2 := by positivity
   obtain ⟨π, hπ⟩ := IsAlgClosed.exists_pow_nat_eq t hn
   have hπ0 : π ≠ 0 := by rintro rfl; exact ht0 (by rw [← hπ, zero_pow hn.ne'])
@@ -120,8 +142,7 @@ theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClo
     refine hfin.subset fun α hα => ?_
     simp only [Set.mem_setOf_eq, hβ] at hα ⊢
     rw [not_lt, hq]
-    have h1 : (2 * Q α) = (n : ℤ) := by
-      rw [← hα, Int.toNat_of_nonneg (by linarith [hQnn α])]
+    have h1 : (2 * Q α) = (n : ℤ) := by rw [← hα, Int.toNat_of_nonneg (by linarith [hQnn α])]
     have h2 : (Q α : ℝ) ≤ n := by
       have : Q α ≤ (n : ℤ) := by linarith [hQnn α]
       exact_mod_cast this
@@ -134,8 +155,7 @@ theorem exists_form_of_discrete_norms : ∀ (C : Type) [NormedField C] [IsAlgClo
     have hm2 : (0 : ℝ) < (m : ℝ) ^ 2 := by
       have : (0 : ℝ) < m := by exact_mod_cast hm
       positivity
-    have e : Real.log ‖π‖ = -L / (2 * (m : ℝ) ^ 2) := by
-      rw [eq_div_iff (by positivity)]; exact hlp
+    have e : Real.log ‖π‖ = -L / (2 * (m : ℝ) ^ 2) := by rw [eq_div_iff (by positivity)]; exact hlp
     rw [e]
     field_simp
 

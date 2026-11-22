@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Counterexamples.PlaceInjectivity.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal
+  GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
 
 namespace GlobalTheory.CharVal.DetFrame
 
-theorem maxV_detLat (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) (N : Submodule (𝓞 E) (Sp E n))
+theorem maxV_detLat
+    (E : Type) [Field E] [NumberField E] [StarRing E]
+    (n : ℕ) (N : Submodule (𝓞 E) (Sp E n))
     (P : HeightOneSpectrum (𝓞 E)) (f : Sp E n ≃ₗ[E] Sp E n)
-    (hf : ∀ x, f x ∈ localization₂ P.asIdeal N ↔ x ∈ stdAt E n P) :
-    MaxV P (detLat N) (P.valuation E ((LinearEquiv.det f : Eˣ) : E)) := by
+    (hf : ∀ x, f x ∈ localization₂ P.asIdeal N ↔ x ∈ stdAt E n P)
+    : MaxV P (detLat N) (P.valuation E ((LinearEquiv.det f : Eˣ) : E)) := by
   classical
   rw [LinearEquiv.coe_det]
   refine ⟨val_le_of_span ?_, ?_⟩
@@ -31,8 +35,10 @@ theorem maxV_detLat (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) 
         rfl
       rwa [h2] at h1
     have h := GlobalTheory.Survey.StandardDeterminantUnits.val_det_le_one _ hg
-    have h3 : LinearMap.det (f : Sp E n →ₗ[E] Sp E n) *
-        LinearMap.det ((f.symm : Sp E n →ₗ[E] Sp E n) ∘ₗ g) = A.det := by
+    have h3
+        : LinearMap.det (f : Sp E n →ₗ[E] Sp E n)
+            * LinearMap.det ((f.symm : Sp E n →ₗ[E] Sp E n) ∘ₗ g)
+          = A.det := by
       rw [LinearMap.det_comp, ← mul_assoc, LinearEquiv.det_mul_det_symm, one_mul]
       exact LinearMap.det_toLin' A
     rw [← h3, map_mul]
@@ -62,8 +68,10 @@ theorem maxV_detLat (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) 
       | mem x hx =>
         obtain ⟨i, rfl⟩ := hx
         exact ht' i
-      | zero => simp
-      | add x y _ _ hx hy => rw [map_add (f := _), smul_add]; exact N.add_mem hx hy
+      | zero =>
+        simp
+      | add x y _ _ hx hy =>
+        rw [map_add (f := _), smul_add]; exact N.add_mem hx hy
       | smul r x _ hx =>
         rw [← algebraMap_smul E r x, map_smul, algebraMap_smul, smul_comm]
         exact N.smul_mem r hx

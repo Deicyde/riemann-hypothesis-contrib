@@ -5,16 +5,20 @@ public import ReciprocityTheory.GroupCohomology.ImportsAlt
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private noncomputable def redMap {l : ℕ} [Fact l.Prime] {X Y : Type} [AddCommGroup X] [Module ℤ_[l] X] [AddCommGroup Y]
-    [Module ℤ_[l] Y] (f : X →ₗ[ℤ_[l]] Y) (m : ℕ) : (X ⧸ lSub l X m) →ₗ[ℤ_[l]] (Y ⧸ lSub l Y m) :=
+private noncomputable def redMap
+    {l : ℕ} [Fact l.Prime]
+    {X Y : Type} [AddCommGroup X] [Module ℤ_[l] X] [AddCommGroup Y] [Module ℤ_[l] Y]
+    (f : X →ₗ[ℤ_[l]] Y) (m : ℕ)
+    : (X ⧸ lSub l X m) →ₗ[ℤ_[l]] (Y ⧸ lSub l Y m) :=
   Submodule.mapQ _ _ f fun x hx => by
     obtain ⟨y, rfl⟩ := mem_lSub.1 hx
     exact mem_lSub.2 ⟨f y, (map_smul _ _ _).symm⟩
 
-private theorem card_quotient_eq_card_of_isReps (l : ℕ) [Fact l.Prime] (k : ℕ) :
-    Nat.card (ℤ_[l] ⧸ Ideal.span {(l : ℤ_[l]) ^ k}) = l ^ k := by
+private theorem card_quotient_eq_card_of_isReps (l : ℕ) [Fact l.Prime] (k : ℕ)
+    : Nat.card (ℤ_[l] ⧸ Ideal.span {(l : ℤ_[l]) ^ k}) = l ^ k := by
   haveI : NeZero (l ^ k) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   have hs : Function.Surjective (PadicInt.toZModPow (p := l) k) := fun z => by
     obtain ⟨a, rfl⟩ := ZMod.natCast_zmod_surjective z
@@ -22,8 +26,8 @@ private theorem card_quotient_eq_card_of_isReps (l : ℕ) [Fact l.Prime] (k : �
   rw [← PadicInt.ker_toZModPow, Nat.card_congr (RingHom.quotientKerEquivOfSurjective hs).toEquiv,
     Nat.card_zmod]
 
-private theorem finite_padicInt_quot_span_of_ne_zero (l : ℕ) [Fact l.Prime] {q : ℤ_[l]} (hq : q ≠ 0) :
-    Finite (ℤ_[l] ⧸ Ideal.span {q}) := by
+private theorem finite_padicInt_quot_span_of_ne_zero (l : ℕ) [Fact l.Prime] {q : ℤ_[l]} (hq : q ≠ 0)
+    : Finite (ℤ_[l] ⧸ Ideal.span {q}) := by
   have h : Ideal.span {q} = Ideal.span {(l : ℤ_[l]) ^ q.valuation} := by
     rw [Ideal.span_singleton_eq_span_singleton]
     refine Associated.symm ⟨PadicInt.unitCoeff hq, ?_⟩
@@ -34,8 +38,8 @@ private theorem finite_padicInt_quot_span_of_ne_zero (l : ℕ) [Fact l.Prime] {q
   rw [card_quotient_eq_card_of_isReps]
   exact pow_ne_zero _ (Fact.out : l.Prime).ne_zero
 
-private theorem card_pi_padicInt_quot_lSub (l : ℕ) [Fact l.Prime] (n m : ℕ) :
-    Nat.card ((Fin n → ℤ_[l]) ⧸ lSub l (Fin n → ℤ_[l]) m) = l ^ (m * n) := by
+private theorem card_pi_padicInt_quot_lSub (l : ℕ) [Fact l.Prime] (n m : ℕ)
+    : Nat.card ((Fin n → ℤ_[l]) ⧸ lSub l (Fin n → ℤ_[l]) m) = l ^ (m * n) := by
   let I : Ideal ℤ_[l] := Ideal.span {(l : ℤ_[l]) ^ m}
   let φ : (Fin n → ℤ_[l]) →ₗ[ℤ_[l]] (Fin n → ℤ_[l] ⧸ I) :=
     LinearMap.pi (fun i => (Submodule.mkQ I) ∘ₗ LinearMap.proj i)
@@ -63,8 +67,9 @@ private theorem card_pi_padicInt_quot_lSub (l : ℕ) [Fact l.Prime] (n m : ℕ) 
   rw [← hker, Nat.card_congr (φ.quotKerEquivOfSurjective hsurj).toEquiv, Nat.card_fun,
     card_quotient_eq_card_of_isReps, Nat.card_eq_fintype_card, Fintype.card_fin, ← pow_mul]
 
-theorem UpperTheory.card_quotient_powSubmodule_grows_finrank :
-    ∀ (l : ℕ) [Fact l.Prime] (N : Type) [AddCommGroup N] [Module ℤ_[l] N] [Module.Finite ℤ_[l] N], Grows l (fun m => Nat.card (N ⧸ lSub l N m)) (finrank ℤ_[l] N) := by
+theorem UpperTheory.card_quotient_powSubmodule_grows_finrank
+    : ∀ (l : ℕ) [Fact l.Prime] (N : Type) [AddCommGroup N] [Module ℤ_[l] N] [Module.Finite ℤ_[l] N],
+      Grows l (fun m => Nat.card (N ⧸ lSub l N m)) (finrank ℤ_[l] N) := by
   intro l _ N _ _ _
   classical
   obtain ⟨n, ι, _, p, hp, e, ⟨f⟩⟩ := Module.equiv_free_prod_directSum ℤ_[l] N
@@ -119,12 +124,14 @@ theorem UpperTheory.card_quotient_powSubmodule_grows_finrank :
   constructor
   · rw [← hF]
     exact Nat.card_le_card_of_surjective _ hsurj
-  · calc Nat.card (N ⧸ lSub l N m)
-        ≤ Nat.card (((Fin n → ℤ_[l]) ⧸ lSub l (Fin n → ℤ_[l]) m) × (D ⧸ lSub l D m)) :=
-          Nat.card_le_card_of_injective _ hinj
+  · calc
+      Nat.card (N ⧸ lSub l N m)
+          ≤ Nat.card (((Fin n → ℤ_[l]) ⧸ lSub l (Fin n → ℤ_[l]) m) × (D ⧸ lSub l D m)) :=
+        Nat.card_le_card_of_injective _ hinj
       _ = l ^ (m * n) * Nat.card (D ⧸ lSub l D m) := by rw [Nat.card_prod, hF]
       _ ≤ l ^ (m * n) * Nat.card D :=
-          Nat.mul_le_mul_left _ (Nat.card_le_card_of_surjective _ (Submodule.Quotient.mk_surjective _))
+        Nat.mul_le_mul_left _
+          (Nat.card_le_card_of_surjective _ (Submodule.Quotient.mk_surjective _))
       _ ≤ l ^ (m * n) * l ^ (Nat.card D) :=
-          Nat.mul_le_mul_left _ (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le
+        Nat.mul_le_mul_left _ (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le
       _ = l ^ (m * n + Nat.card D) := (pow_add _ _ _).symm

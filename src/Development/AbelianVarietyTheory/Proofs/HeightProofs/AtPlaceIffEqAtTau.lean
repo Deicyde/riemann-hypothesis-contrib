@@ -14,20 +14,22 @@ public import Development.AbelianVarietyTheory.Counterexamples.LevelGroupExample
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.RealPar Matrix MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.RealPar Matrix MeasureTheory
 open scoped TensorProduct
 
 namespace GlobalTheory.PointAtPlace
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  NumberField
 
 variable {D : D7}
 
 theorem tauE_injective : Function.Injective (tauE D) := fun _ _ h =>
   D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
 
-theorem tauE_cm (σ : D.host.E →+* ℂ) :
-    (∃ ρ, tauE D ρ = σ) ↔ ¬ ∃ ρ, tauE D ρ = ComplexEmbedding.conjugate σ := by
+theorem tauE_cm (σ : D.host.E →+* ℂ)
+    : (∃ ρ, tauE D ρ = σ) ↔ ¬ ∃ ρ, tauE D ρ = ComplexEmbedding.conjugate σ := by
   obtain ⟨g, rfl⟩ := (factEmb D.R D.host).1.2 σ
   have hc : ComplexEmbedding.conjugate (D.host.emb g) = D.host.emb (g * D.R.cc) := by
     rw [Formalism.L2.Geo.emb_mul_cc_comp]
@@ -45,13 +47,14 @@ theorem tauE_cm (σ : D.host.E →+* ℂ) :
   rw [hc, key, key]
   exact Formalism.L2.Geo.mem_Psi_iff_mul_cc_notMem g
 
-theorem archM_mul (V : HSp D) (θ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) (a b : GA D V) :
-    Formalism.L2.Pj.archM V θ (a * b) = Formalism.L2.Pj.archM V θ a * Formalism.L2.Pj.archM V θ b := by
+theorem archM_mul (V : HSp D) (θ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) (a b : GA D V)
+    : Formalism.L2.Pj.archM V θ (a * b)
+      = Formalism.L2.Pj.archM V θ a * Formalism.L2.Pj.archM V θ b := by
   unfold Formalism.L2.Pj.archM
   rw [map_mul, Units.val_mul, Matrix.map_mul]
 
-theorem archM_one (V : HSp D) (θ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) :
-    Formalism.L2.Pj.archM V θ 1 = 1 := by
+theorem archM_one (V : HSp D) (θ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)
+    : Formalism.L2.Pj.archM V θ 1 = 1 := by
   unfold Formalism.L2.Pj.archM
   rw [map_one, Units.val_one, Matrix.map_one _ (map_zero _) (map_one _)]
 
@@ -63,28 +66,37 @@ theorem eq_one_of_mem (V : HSp D) (k : GA D V) (h1 : k ∈ GfC V) (h2 : k ∈ Gi
   · rw [(he _).1, (he _).1]; exact congrFun (congrFun a1 a) b
   · rw [(he _).2, (he _).2]; exact congrFun (congrFun a2 a) b
 
-theorem existsUnique_isAtTau (V : HSp D) (τ : D.what₂.Tau)
+theorem existsUnique_isAtTau
+    (V : HSp D) (τ : D.what₂.Tau)
     (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (hθ : IsInfFam θ)
-    (g : Matrix (Fin V.rank) (Fin V.rank) ℂ) (hg : g ∈ Formalism.QuantumDeterminants.UH (Formalism.BasicNotions.TH.gramAt D V τ)) :
-    ∃! h : GA D V, IsAtTau θ V τ g h := by
+    (g : Matrix (Fin V.rank) (Fin V.rank) ℂ)
+    (hg : g ∈ Formalism.QuantumDeterminants.UH (Formalism.BasicNotions.TH.gramAt D V τ))
+    : ∃! h : GA D V, IsAtTau θ V τ g h := by
   classical
   let Ψ : Finset (D.host.E →+* ℂ) := Finset.univ.filter fun σ => ∃ ρ, tauE D ρ = σ
   have hmem : ∀ σ, σ ∈ Ψ ↔ ∃ ρ, tauE D ρ = σ := fun σ => by simp [Ψ]
   choose r hr using fun σ : Ψ => (hmem σ.1).1 σ.2
   have hsurj : ∀ ρ, r ⟨tauE D ρ, (hmem _).2 ⟨ρ, rfl⟩⟩ = ρ := fun ρ => tauE_injective (hr _)
-  obtain ⟨h1, -, -, h2⟩ := (GlobalTheory.UnitaryGlue.adelic_glue D V).2 Ψ (fun σ => θ (r σ))
-    (fun σ => by rw [hmem, hmem]; exact tauE_cm σ) (fun σ => by rw [← hr σ]; exact hθ _)
-  obtain ⟨h, hh, hu⟩ := h2 (fun σ => if r σ = τ then g else 1) (fun σ => by
-    by_cases c : r σ = τ
-    · rw [if_pos c, ← hr σ, c]
-      exact hg
-    · rw [if_neg c, Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one, Matrix.one_mul,
-        Matrix.mul_one])
+  obtain ⟨h1, -, -, h2⟩ :=
+    (GlobalTheory.UnitaryGlue.adelic_glue D V).2 Ψ
+      (fun σ => θ (r σ))
+      (fun σ => by rw [hmem, hmem]; exact tauE_cm σ)
+      (fun σ => by rw [← hr σ]; exact hθ _)
+  obtain ⟨h, hh, hu⟩ :=
+    h2
+      (fun σ => if r σ = τ then g else 1)
+      (fun σ => by
+        by_cases c : r σ = τ
+        · rw [if_pos c, ← hr σ, c]
+          exact hg
+        · rw [if_neg c, Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one,
+            Matrix.one_mul, Matrix.mul_one])
   have hu' : ∀ ρ, Formalism.L2.Pj.archM V (θ ρ) h = if ρ = τ then g else 1 := fun ρ => by
     have := hu ⟨tauE D ρ, (hmem _).2 ⟨ρ, rfl⟩⟩
     simp only [hsurj] at this
     exact this
-  refine ⟨h, ⟨hh, (hu' τ).trans (if_pos rfl), fun ρ c => (hu' ρ).trans (if_neg c)⟩, fun h' hh' => ?_⟩
+  refine
+    ⟨h, ⟨hh, (hu' τ).trans (if_pos rfl), fun ρ c => (hu' ρ).trans (if_neg c)⟩, fun h' hh' => ?_⟩
   have e : ∀ ρ, Formalism.L2.Pj.archM V (θ ρ) h' = Formalism.L2.Pj.archM V (θ ρ) h := fun ρ => by
     rw [hu']
     by_cases c : ρ = τ

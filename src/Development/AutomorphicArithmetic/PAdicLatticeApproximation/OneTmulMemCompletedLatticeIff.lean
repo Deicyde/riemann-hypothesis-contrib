@@ -7,14 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLevelE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open GlobalTheory.AdelicSim
 
-private theorem val_p_eq_one {p : ℕ} [Fact p.Prime] (v : AwayP p) :
-    v.1.valuation ℚ (algebraMap ℤ ℚ (p : ℤ)) = 1 := by
+private theorem val_p_eq_one {p : ℕ} [Fact p.Prime] (v : AwayP p)
+    : v.1.valuation ℚ (algebraMap ℤ ℚ (p : ℤ)) = 1 := by
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
     IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff]
   intro hp
@@ -24,12 +27,12 @@ private theorem val_p_eq_one {p : ℕ} [Fact p.Prime] (v : AwayP p) :
     PrincipalIdealRing.isMaximal_of_irreducible hprime.irreducible
   exact (hmax.eq_of_le v.1.isPrime.ne_top ((Ideal.span_singleton_le_iff_mem _).2 hp)).symm
 
-private theorem isIntAf_of_pow_mul {p : ℕ} [Fact p.Prime] (q : ℚ) (r : ℕ) (c : ℤ)
-    (h : ((p ^ r : ℕ) : ℚ) * q = c) : IsIntAf (algebraMap ℚ (AfP p) q) := by
+private theorem isIntAf_of_pow_mul
+    {p : ℕ} [Fact p.Prime] (q : ℚ) (r : ℕ) (c : ℤ) (h : ((p ^ r : ℕ) : ℚ) * q = c)
+    : IsIntAf (algebraMap ℚ (AfP p) q) := by
   intro v
   rw [AlgHom.commutes, IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers]
-  have hc : v.1.valuation ℚ (c : ℚ) ≤ 1 := by
-    simpa using v.1.valuation_le_one (K := ℚ) c
+  have hc : v.1.valuation ℚ (c : ℚ) ≤ 1 := by simpa using v.1.valuation_le_one (K := ℚ) c
   have hp : v.1.valuation ℚ ((p ^ r : ℕ) : ℚ) = 1 := by
     have h1 := val_p_eq_one v
     rw [eq_intCast] at h1
@@ -41,18 +44,21 @@ private theorem isIntAf_of_pow_mul {p : ℕ} [Fact p.Prime] (q : ℚ) (r : ℕ) 
     rw [h2]
     exact hc
   rw [IsDedekindDomain.HeightOneSpectrum.algebraMap_adicCompletion, Function.comp_apply,
-    Algebra.algebraMap_self, RingHom.id_apply, IsDedekindDomain.HeightOneSpectrum.adicCompletion.valued_coe]
+    Algebra.algebraMap_self, RingHom.id_apply,
+    IsDedekindDomain.HeightOneSpectrum.adicCompletion.valued_coe]
   exact hq
 
-theorem UpperTheory.one_tmul_mem_completedLattice_iff :
-    ∀ {p : ℕ} [Fact p.Prime] {D : Datum p} (z : VQ D), (1 : AfP p) ⊗ₜ[ℚ] z ∈ LaHat D ↔ ∃ (r : ℕ) (x : D.La), p ^ r • z = (1 : ℚ) ⊗ₜ[ℤ] x := by
+theorem UpperTheory.one_tmul_mem_completedLattice_iff
+    : ∀ {p : ℕ} [Fact p.Prime] {D : Datum p} (z : VQ D),
+      (1 : AfP p) ⊗ₜ[ℚ] z ∈ LaHat D ↔ ∃ (r : ℕ) (x : D.La), p ^ r • z = (1 : ℚ) ⊗ₜ[ℤ] x := by
   intro p _ D z
   classical
   haveI := D.freeLa
   haveI := D.finLa
   let b := Module.Free.chooseBasis ℤ D.La
   let bQ := Algebra.TensorProduct.basis ℚ b
-  have key : ∀ i, (KNLevel.bA b).repr ((1 : AfP p) ⊗ₜ[ℚ] z) i = algebraMap ℚ (AfP p) (bQ.repr z i) := by
+  have key
+      : ∀ i, (KNLevel.bA b).repr ((1 : AfP p) ⊗ₜ[ℚ] z) i = algebraMap ℚ (AfP p) (bQ.repr z i) := by
     intro i
     simp [KNLevel.bA, Algebra.TensorProduct.basis_repr_tmul, bQ]
   have hsm : ∀ (r : ℕ) i, bQ.repr (p ^ r • z) i = ((p ^ r : ℕ) : ℚ) * bQ.repr z i := by

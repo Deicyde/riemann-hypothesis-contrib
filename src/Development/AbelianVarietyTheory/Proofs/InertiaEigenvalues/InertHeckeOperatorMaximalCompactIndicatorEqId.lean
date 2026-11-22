@@ -20,27 +20,41 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeFu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 open Formalism.UG
 
 namespace GlobalTheory.InertHeckeOne
 
-
 open Classical in
-theorem heckeFunI_one : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L)) (Dv : InertDatum L n v w) (U : Subgroup (GAf L n)), (∀ κ, TrivOutside {v} κ → (κ ∈ U ↔ κ ∈ Umax L n)) → ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (f : GAf L n → W), (∀ κ ∈ U, NG.rt L n κ f = f) → heckeFunI L n U Dv (Formalism.UG.dosetInd ℂ (Formalism.UG.KU Dv.σw n) 1) f = f := by
+theorem heckeFunI_one
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+        (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (w : HeightOneSpectrum (𝓞 L))
+        (Dv : InertDatum L n v w) (U : Subgroup (GAf L n)),
+      (∀ κ, TrivOutside {v} κ → (κ ∈ U ↔ κ ∈ Umax L n))
+        → ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (f : GAf L n → W),
+          (∀ κ ∈ U, NG.rt L n κ f = f)
+            → heckeFunI L n U Dv (Formalism.UG.dosetInd ℂ (Formalism.UG.KU Dv.σw n) 1) f = f := by
   intro L _ _ _ n v w Dv U hU W _ _ f hf
   have hfU : ∀ κ ∈ U, ∀ g, f (g * κ) = f g := fun κ hκ g => congrFun (hf κ hκ) g
-  have key : ∀ x : GAf L n, TrivOutside {v} x →
-      Dv.hval (Formalism.UG.dosetInd ℂ (Formalism.UG.KU Dv.σw n) 1) (Dv.loc x) = if x ∈ U then 1 else 0 := by
+  have key
+      : ∀ x : GAf L n,
+        TrivOutside {v} x
+          → Dv.hval (Formalism.UG.dosetInd ℂ (Formalism.UG.KU Dv.σw n) 1) (Dv.loc x)
+            = if x ∈ U then 1 else 0 := by
     intro x hx
     have hg := GlobalTheory.T.inertLocal_mem_unitaryGroup_antidiagonalForm L n v w Dv x
     unfold InertDatum.hval
     rw [dite_eq_left hg]
     by_cases hxU : x ∈ U
     · rw [if_pos hxU]
-      have hK := GlobalTheory.T.inertLocal_mem_integralPoints_of_latticeStabilizer L n v w Dv x ((hU x hx).1 hxU) hg
+      have hK :=
+        GlobalTheory.T.inertLocal_mem_integralPoints_of_latticeStabilizer L n v w Dv x
+          ((hU x hx).1 hxU) hg
       unfold Formalism.UG.dosetInd
       rw [Set.indicator_of_mem]
       · rfl
@@ -55,9 +69,11 @@ theorem heckeFunI_one : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (
       have hK : (⟨Dv.loc x, hg⟩ : Formalism.UG.GU Dv.σw n) ∈ Formalism.UG.KU Dv.σw n := by
         rw [e, mul_one]; exact mul_mem ha hb
       have hK' := hK
-      simp only [Formalism.UG.KU, Subgroup.mem_subgroupOf, Formalism.UG.intPts, Subgroup.mem_inf] at hK'
+      simp only [Formalism.UG.KU, Subgroup.mem_subgroupOf, Formalism.UG.intPts, Subgroup.mem_inf]
+        at hK'
       apply hxU
-      refine (hU x hx).2 (GlobalTheory.InertUmax.mem_Umax_of_trivOutside_of_loc_integral L n v w Dv x hx ?_)
+      refine (hU x hx).2
+        (GlobalTheory.InertUmax.mem_Umax_of_trivOutside_of_loc_integral L n v w Dv x hx ?_)
       intro i j
       exact GlobalTheory.InertUmax.entries_mem_of_range _ _ hK'.2 i j
   funext g
@@ -66,7 +82,9 @@ theorem heckeFunI_one : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (
     intro u _
     simp
   rw [finsum_eq_single _ ((1 : GAf L n) : GAf L n ⧸ U)]
-  · have hc : ∃ x : GAf L n, (x : GAf L n ⧸ U) = ((1 : GAf L n) : GAf L n ⧸ U) ∧ TrivOutside {v} x := ⟨1, rfl, h1⟩
+  · have hc
+        : ∃ x : GAf L n, (x : GAf L n ⧸ U) = ((1 : GAf L n) : GAf L n ⧸ U) ∧ TrivOutside {v} x :=
+      ⟨1, rfl, h1⟩
     rw [dite_eq_left hc]
     have hmem : hc.choose ∈ U := by
       have := QuotientGroup.eq.1 hc.choose_spec.1.symm

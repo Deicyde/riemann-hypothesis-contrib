@@ -5,56 +5,80 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Split
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL Formalism.BasicNotions
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  Formalism.BasicNotions
 open UpperTheory.V.W (Plc Lp)
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.V.Z.Sym.Al
 
-private theorem exists_finPart {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} :
-    ∃ p : UA L n → finU (E := L) (n := n), Continuous p ∧ p 1 = 1 ∧ ∀ x, (p x : UA L n)⁻¹ * x ∈ infU L n := by
+private theorem exists_finPart {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
+    : ∃ p : UA L n → finU (E := L) (n := n),
+      Continuous p ∧ p 1 = 1 ∧ ∀ x, (p x : UA L n)⁻¹ * x ∈ infU L n := by
   have hfin : Continuous (finGL L n) :=
-    Continuous.units_map _ (continuous_const.add (continuous_id.matrix_map
-      (continuous_const.prodMk continuous_id : Continuous fun x : Af L => ((0, x) : InfiniteAdeleRing L × Af L))))
-  refine ⟨fun x => ⟨⟨finGL L n (Matrix.GeneralLinearGroup.map (pFin L) x.1),
-    GlobalTheory.SplitPts.finGL_mem_UA _ fun u => GlobalTheory.SplitPts.comp_eq x u⟩, MonoidHom.mem_ker.2 (pInf_finGL _)⟩,
-    Continuous.subtype_mk (Continuous.subtype_mk
-      (hfin.comp (GlobalTheory.DefU.continuous_map_pFin.comp continuous_subtype_val)) _) _, ?_, fun x => ?_⟩
+    Continuous.units_map _
+      (continuous_const.add (continuous_id.matrix_map
+        (continuous_const.prodMk continuous_id
+          : Continuous fun x : Af L => ((0, x) : InfiniteAdeleRing L × Af L))))
+  refine ⟨
+    fun x => ⟨
+      ⟨
+        finGL L n (Matrix.GeneralLinearGroup.map (pFin L) x.1),
+        GlobalTheory.SplitPts.finGL_mem_UA _ fun u => GlobalTheory.SplitPts.comp_eq x u
+      ⟩,
+      MonoidHom.mem_ker.2 (pInf_finGL _)
+    ⟩,
+    Continuous.subtype_mk
+      (Continuous.subtype_mk
+        (hfin.comp (GlobalTheory.DefU.continuous_map_pFin.comp continuous_subtype_val)) _)
+      _,
+    ?_,
+    fun x => ?_
+  ⟩
   · refine Subtype.ext (Subtype.ext ?_)
     change finGL L n (Matrix.GeneralLinearGroup.map (pFin L) 1) = 1
     rw [map_one, map_one]
   · change Matrix.GeneralLinearGroup.map (pFin L)
-      ((finGL L n (Matrix.GeneralLinearGroup.map (pFin L) x.1))⁻¹ * x.1) = 1
+        ((finGL L n (Matrix.GeneralLinearGroup.map (pFin L) x.1))⁻¹ * x.1)
+      = 1
     rw [map_mul, map_inv, pFin_finGL, inv_mul_cancel]
 
-private theorem continuous_infC {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} :
-    Continuous (infC L n) := by
+private theorem continuous_infC {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
+    : Continuous (infC L n) := by
   have hτ : ∀ τ : L →+* ℂ, Continuous (cEmb (E := L) (n := n) τ) := fun τ => by
     have h1 : Continuous (coord (E := L) τ) := by
       unfold coord
       split_ifs
       · exact continuous_apply _
       · exact Complex.continuous_conj.comp (continuous_apply _)
-    have h2 : Continuous (pInf L) := continuous_pi fun w =>
-      (InfinitePlace.Completion.isometryEquivComplexOfIsComplex (IsTotallyComplex.isComplex w)).continuous.comp
-        ((continuous_apply w).comp continuous_fst)
+    have h2 : Continuous (pInf L) :=
+      continuous_pi fun w =>
+        (InfinitePlace.Completion.isometryEquivComplexOfIsComplex (IsTotallyComplex.isComplex
+          w)).continuous.comp ((continuous_apply w).comp continuous_fst)
     exact (Continuous.units_map _ (continuous_id.matrix_map h1)).comp
       ((Continuous.units_map _ (continuous_id.matrix_map h2)).comp continuous_subtype_val)
   exact continuous_pi fun v => hτ v.embedding
 
-private theorem infC_of_fin {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {k : UA L n}
-    (hk : k ∈ finU (E := L) (n := n)) : infC L n k = 1 :=
+private theorem infC_of_fin
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} {k : UA L n} (hk : k ∈ finU (E := L) (n := n))
+    : infC L n k = 1 :=
   funext fun v => by
     change Matrix.GeneralLinearGroup.map (coord v.embedding) (cInf k) = 1
     rw [MonoidHom.mem_ker.1 hk, map_one]
 
-theorem UpperTheory.V.Z.Sym.Al.coefAut :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (R : Representation ℂ (InfinitePlace L → GL (Fin n) ℂ) V), ContCoef R → ∀ U, IsLevel U → ∀ φ : UA L n → V, IsAF R U φ →
-        ∀ f : V →ₗ[ℂ] ℂ, IsAutFormU (f ∘ φ) := by
+theorem UpperTheory.V.Z.Sym.Al.coefAut
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (V : Type) [AddCommGroup V]
+        [Module ℂ V] [FiniteDimensional ℂ V]
+        (R : Representation ℂ (InfinitePlace L → GL (Fin n) ℂ) V),
+      ContCoef R
+        → ∀ U, IsLevel U → ∀ φ : UA L n → V, IsAF R U φ → ∀ f : V →ₗ[ℂ] ℂ, IsAutFormU (f ∘ φ) := by
   intro L _ _ _ n V _ _ _ R hR U hU φ hφ f
   obtain ⟨p, hp, hp1, hp2⟩ := exists_finPart (L := L) (n := n)
-  have hU1 : {x : finU (E := L) (n := n) | (x : UA L n) ∈ U} ∈ nhds (1 : finU (E := L) (n := n)) := hU.2.mem_nhds U.one_mem
+  have hU1 : {x : finU (E := L) (n := n) | (x : UA L n) ∈ U} ∈ nhds (1 : finU (E := L) (n := n)) :=
+    hU.2.mem_nhds U.one_mem
 
   have hsm : ∀ᶠ z in nhds (1 : UA L n), ∀ g, φ (g * z) = R (infC L n z⁻¹) (φ g) := by
     have hUp : {x : finU (E := L) (n := n) | (x : UA L n) ∈ U} ∈ nhds (p 1) := by rwa [hp1]
@@ -80,10 +104,11 @@ theorem UpperTheory.V.Z.Sym.Al.coefAut :
     filter_upwards [hU1] with k hk
     funext g
     exact congrArg f (hφ.level _ hk g)
-  · let C : Module.Dual ℂ V →ₗ[ℂ] (UA L n → ℂ) :=
-      { toFun := fun μ g => μ (φ g)
-        map_add' := fun _ _ => rfl
-        map_smul' := fun _ _ => rfl }
+  · let C : Module.Dual ℂ V →ₗ[ℂ] (UA L n → ℂ) := {
+      toFun := fun μ g => μ (φ g)
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
     refine Submodule.finiteDimensional_of_le (S₂ := LinearMap.range C) (Submodule.span_le.2 ?_)
     rintro _ ⟨k, rfl⟩
     refine ⟨f ∘ₗ R (infC L n (k : UA L n)⁻¹), ?_⟩

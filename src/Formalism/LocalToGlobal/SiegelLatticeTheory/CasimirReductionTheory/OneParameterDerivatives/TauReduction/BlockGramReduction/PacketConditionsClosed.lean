@@ -15,12 +15,15 @@ namespace Formalism.L2.SG.Pf.Tau
 
 open Size Formalism.MainNotions.S
 
-theorem mulVec_injective_map {E : Type*} [Field E] {n j : ℕ} (f : E →+* ℂ)
-    (Bm : Matrix (Fin n) (Fin j) E) (hB : Function.Injective Bm.mulVec) :
-    Function.Injective (Bm.map f).mulVec := by
+theorem mulVec_injective_map
+    {E : Type*} [Field E]
+    {n j : ℕ}
+    (f : E →+* ℂ)
+    (Bm : Matrix (Fin n) (Fin j) E) (hB : Function.Injective Bm.mulVec)
+    : Function.Injective (Bm.map f).mulVec := by
   classical
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.toLin' Bm)
-    (by
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Matrix.toLin' Bm) (by
       rw [LinearMap.ker_eq_bot]
       intro x y hxy
       apply hB
@@ -36,8 +39,10 @@ theorem mulVec_injective_map {E : Type*} [Field E] {n j : ℕ} (f : E →+* ℂ)
   simp only [Matrix.mulVec_mulVec, h2, Matrix.one_mulVec] at h3
   exact h3
 
-theorem gram_det_re_pos (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : ℕ}
-    (b : Fin j → Fin I.n → I.E) (hb : LinearIndependent I.E b) : 0 < (gramV I x v b).det.re := by
+theorem gram_det_re_pos
+    (I : AutInst) (x : I.GA) (v : InfinitePlace I.F)
+    {j : ℕ} (b : Fin j → Fin I.n → I.E) (hb : LinearIndependent I.E b)
+    : 0 < (gramV I x v b).det.re := by
   classical
   set A : Matrix (Fin I.n) (Fin I.n) ℂ := uMat (x.1 v)⁻¹ * (I.P v)⁻¹ with hA
   set Bm : Matrix (Fin I.n) (Fin j) I.E := Matrix.of fun i a => b a i with hBm
@@ -68,7 +73,8 @@ theorem gram_det_re_pos (I : AutInst) (x : I.GA) (v : InfinitePlace I.F) {j : �
   rw [hgram]
   exact (Complex.pos_iff.1 hpos).1
 
-theorem packet_conditions_closed (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis) : HeightsPositive := by
+theorem packet_conditions_closed (h1 : LatticeFinitelyGenerated) (h2 : ExistsBoundedBasis)
+    : HeightsPositive := by
   unfold HeightsPositive
   intro I x s
   unfold ht
@@ -81,9 +87,6 @@ theorem packet_conditions_closed (h1 : LatticeFinitelyGenerated) (h2 : ExistsBou
     assumption
   · rw [Nat.cast_pos]
     refine @Nat.card_pos _ _ (h2 _ _ _ M _ _ hMfg ?_ ?_ ?_ ?_)
-    all_goals first
-      | assumption
-      | (intro y hy; rw [← SetLike.mem_coe, hM]; aesop)
-      | aesop
+    all_goals first | assumption | (intro y hy; rw [← SetLike.mem_coe, hM]; aesop) | aesop
 
 end Formalism.L2.SG.Pf.Tau

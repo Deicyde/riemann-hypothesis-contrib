@@ -76,37 +76,42 @@ lemma norm_det_first_cayley_block_unitary {g : M2 n} (h1 : g * gᴴ = 1) (h2 : g
   simp only [det_mul, det_conjTranspose, det_one, norm_mul, norm_star, norm_one] at h
   nlinarith [norm_nonneg (u1 g).det]
 
-theorem hLoc_mul (q k₀ : GR n) (hq : (mR q).toBlocks₂₁ = 0) (hk : InK (mR k₀)) :
-    hLoc (q * k₀) = ‖(mR q).toBlocks₁₁.det‖ ^ 2 := by
+theorem hLoc_mul (q k₀ : GR n) (hq : (mR q).toBlocks₂₁ = 0) (hk : InK (mR k₀))
+    : hLoc (q * k₀) = ‖(mR q).toBlocks₁₁.det‖ ^ 2 := by
   have hm : mR (q * k₀) = mR q * mR k₀ := rfl
   have hQG : InG (mR q) := q.2
-  obtain ⟨A, B, Dd, hQ⟩ : ∃ A B Dd : Matrix (Fin n) (Fin n) ℂ, mR q = fromBlocks A B 0 Dd :=
-    ⟨(mR q).toBlocks₁₁, (mR q).toBlocks₁₂, (mR q).toBlocks₂₂, by
+  obtain ⟨A, B, Dd, hQ⟩ : ∃ A B Dd : Matrix (Fin n) (Fin n) ℂ, mR q = fromBlocks A B 0 Dd := ⟨
+    (mR q).toBlocks₁₁,
+    (mR q).toBlocks₁₂,
+    (mR q).toBlocks₂₂,
+    by
       conv_lhs => rw [← fromBlocks_toBlocks (mR q)]
-      rw [hq]⟩
+      rw [hq]
+  ⟩
   have hAD : Aᴴ * Dd = 1 := by
     have h := hQG
     unfold InG at h
     rw [hQ] at h
-    simp only [JJ, fromBlocks_conjTranspose, fromBlocks_multiply, Matrix.mul_zero, Matrix.zero_mul, add_zero,
-      zero_add, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul, conjTranspose_zero, neg_zero] at h
+    simp only [JJ, fromBlocks_conjTranspose, fromBlocks_multiply, Matrix.mul_zero, Matrix.zero_mul,
+        add_zero, zero_add, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul, conjTranspose_zero,
+        neg_zero]
+      at h
     exact (fromBlocks_inj.mp h).2.1
   have hK1 : mR k₀ * (mR k₀)ᴴ = 1 := mul_eq_one_comm.mp hk.2
   have hK2 : mR k₀ * JJ n * (mR k₀)ᴴ = JJ n := conj_jj k₀.1.isUnit hk.1
   have hu : u1 (mR q * mR k₀) = Dd * u1 (mR k₀) := by
     rw [hQ]
     conv_lhs => rw [← fromBlocks_toBlocks (mR k₀)]
-    simp only [u1, fromBlocks_multiply, toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₂₂, Matrix.zero_mul, zero_add,
-      Matrix.mul_add, Matrix.mul_smul]
+    simp only [u1, fromBlocks_multiply, toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₂₂,
+      Matrix.zero_mul, zero_add, Matrix.mul_add, Matrix.mul_smul]
   have hdet : ‖A.det‖ * ‖Dd.det‖ = 1 := by
     have h := congrArg (fun M => ‖Matrix.det M‖) hAD
     simpa only [det_mul, det_conjTranspose, norm_mul, norm_star, det_one, norm_one] using h
-  have hA0 : ‖A.det‖ ≠ 0 := by
-    intro h0; rw [h0, zero_mul] at hdet; exact zero_ne_one hdet
+  have hA0 : ‖A.det‖ ≠ 0 := by intro h0; rw [h0, zero_mul] at hdet; exact zero_ne_one hdet
   have hDd : ‖Dd.det‖ = 1 / ‖A.det‖ := eq_one_div_of_mul_eq_one_right hdet
   unfold hLoc
-  rw [hm, hu, det_mul, norm_mul, norm_det_first_cayley_block_unitary hK1 hK2, mul_one, hQ, toBlocks_fromBlocks₁₁, hDd, one_div, inv_pow,
-    inv_inv]
+  rw [hm, hu, det_mul, norm_mul, norm_det_first_cayley_block_unitary hK1 hK2, mul_one, hQ,
+    toBlocks_fromBlocks₁₁, hDd, one_div, inv_pow, inv_inv]
 
 lemma exists_normalizer {S : Matrix (Fin n) (Fin n) ℂ} (hH : S.IsHermitian) (hP : S.PosSemidef)
     (hd : S.det ≠ 0) : ∃ T : Matrix (Fin n) (Fin n) ℂ, T * S * Tᴴ = 1 := by
@@ -153,8 +158,9 @@ lemma exists_normalizer {S : Matrix (Fin n) (Fin n) ℂ} (hH : S.IsHermitian) (h
       rw [mul_comm ((Real.sqrt (hH.eigenvalues i))⁻¹) (hH.eigenvalues i), mul_assoc, ← sq, inv_pow, hs,
         mul_inv_cancel₀ hl.ne']
 
-theorem locIwasawa (y : GR n) : ∃ q k₀ : GR n, y = q * k₀ ∧ (mR q).toBlocks₂₁ = 0 ∧ InK (mR k₀) ∧
-    hLoc y = ‖(mR q).toBlocks₁₁.det‖ ^ 2 := by
+theorem locIwasawa (y : GR n)
+    : ∃ q k₀ : GR n,
+      y = q * k₀ ∧ (mR q).toBlocks₂₁ = 0 ∧ InK (mR k₀) ∧ hLoc y = ‖(mR q).toBlocks₁₁.det‖ ^ 2 := by
   classical
   obtain ⟨A, B, C, Dm, hY⟩ : ∃ A B C Dm : Matrix (Fin n) (Fin n) ℂ, mR y = fromBlocks A B C Dm :=
     ⟨_, _, _, _, (fromBlocks_toBlocks _).symm⟩
@@ -184,7 +190,12 @@ theorem locIwasawa (y : GR n) : ∃ q k₀ : GR n, y = q * k₀ ∧ (mR q).toBlo
     rw [hK0, fromBlocks_conjTranspose, fromBlocks_multiply, ← fromBlocks_one]
     simp only [conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg, neg_neg]
     rw [fromBlocks_inj]
-    refine ⟨by rw [add_comm]; exact hN, by rw [hI']; exact add_neg_cancel _, by rw [hI']; exact add_neg_cancel _, hN⟩
+    refine ⟨
+      by rw [add_comm]; exact hN,
+      by rw [hI']; exact add_neg_cancel _,
+      by rw [hI']; exact add_neg_cancel _,
+      hN
+    ⟩
   have hKK' : K0ᴴ * K0 = 1 := mul_eq_one_comm.mp hKK
   have hJK : JJ n * K0 = K0 * JJ n := by
     rw [hK0]
@@ -198,8 +209,8 @@ theorem locIwasawa (y : GR n) : ∃ q k₀ : GR n, y = q * k₀ ∧ (mR q).toBlo
   have hyq : y = q * kG := by rw [hq, inv_mul_cancel_right]
   have hmq : mR q = mR y * K0ᴴ := by rw [hq]; rfl
   have h21 : (mR q).toBlocks₂₁ = 0 := by
-    rw [hmq, hY, hK0, fromBlocks_conjTranspose, fromBlocks_multiply, toBlocks_fromBlocks₂₁, conjTranspose_neg,
-      Matrix.mul_neg, hBL, add_neg_cancel]
+    rw [hmq, hY, hK0, fromBlocks_conjTranspose, fromBlocks_multiply, toBlocks_fromBlocks₂₁,
+      conjTranspose_neg, Matrix.mul_neg, hBL, add_neg_cancel]
   refine ⟨q, kG, hyq, h21, hkK, ?_⟩
   rw [hyq]
   exact hLoc_mul q kG h21 hkK

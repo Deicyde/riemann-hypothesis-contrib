@@ -16,63 +16,106 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.How
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.SqTop GlobalTheory.SquareComm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.SqTop GlobalTheory.SquareComm
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 namespace GlobalTheory.DefIrred
-theorem theta_vanish_all_of_irreducible : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → GlobalTheory.SquareSt.ThetaIntegralsAgree → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ → ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁) (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle), IsTriple W W₁ X α β → (∀ τ, Formalism.UG.HasSignature (gramAt D W τ) W.rank 0) → (∀ τ, Formalism.UG.HasSignature (gramAt D W₁ τ) W₁.rank 0) → (∀ τ, Formalism.UG.HasSignature (gramAt D X τ) X.rank 0) → ∀ (ν : Measure (GA D W)) (𝓕 : Set (GA D W)) (ν₁ : Measure (GA D W₁)) (𝓕₁ : Set (GA D W₁)), IsHaarFD W ν 𝓕 → IsHaarFD W₁ ν₁ 𝓕₁ → ∀ ωA ωB Pi rf rl p p', IsMatch ψ θ A A₁ B α β ωA ωB Pi rf rl p p' → ∀ Φ' ∈ algF ψ θ false A₁ B, p' Φ' ≠ 0 → thetaInt ωB ν₁ 𝓕₁ Φ' = 0 → ∀ Φ'' ∈ algF ψ θ false A₁ B, thetaInt ωB ν₁ 𝓕₁ Φ'' = 0 := by
-  intro _ hP _ _ hTA D ψ θ hψ hθ W W₁ X A A₁ B α β hT _ hs₁ _ ν 𝓕 ν₁ 𝓕₁ hν hν₁ ωA ωB Pm rf rl p p' hm Φ₁ hΦ₁ hp₁ hz₁ Φ₂ hΦ₂
+theorem theta_vanish_all_of_irreducible
+    : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → GlobalTheory.SquareSt.ThetaIntegralsAgree
+      → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
+        IsStdChar D ψ (-1) → IsInfFam θ
+          → ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁)
+              (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle),
+            IsTriple W W₁ X α β → (∀ τ, Formalism.UG.HasSignature (gramAt D W τ) W.rank 0)
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D W₁ τ) W₁.rank 0)
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D X τ) X.rank 0)
+              → ∀ (ν : Measure (GA D W)) (𝓕 : Set (GA D W)) (ν₁ : Measure (GA D W₁))
+                  (𝓕₁ : Set (GA D W₁)),
+                IsHaarFD W ν 𝓕 → IsHaarFD W₁ ν₁ 𝓕₁
+                  → ∀ ωA ωB Pi rf rl p p',
+                    IsMatch ψ θ A A₁ B α β ωA ωB Pi rf rl p p'
+                      → ∀ Φ' ∈ algF ψ θ false A₁ B,
+                        p' Φ' ≠ 0 → thetaInt ωB ν₁ 𝓕₁ Φ' = 0
+                          → ∀ Φ'' ∈ algF ψ θ false A₁ B, thetaInt ωB ν₁ 𝓕₁ Φ'' = 0 := by
+  intro _ hP _ _ hTA D ψ θ hψ hθ W W₁ X A A₁ B α β hT _ hs₁ _ ν 𝓕 ν₁ 𝓕₁ hν hν₁ ωA ωB Pm rf rl p p'
+    hm Φ₁ hΦ₁ hp₁ hz₁ Φ₂ hΦ₂
   set S := algF ψ θ false A₁ B with hSdef
   have hint := integrable_algF hψ hθ A₁ B hm.weilB hs₁ hν₁
-  have tr : ∀ (Φ : WO W₁ X → ℂ) (g : GA D W₁) (h k : GA D X), thetaKO ωB g h (ωB (1, k) Φ) = thetaKO ωB g (h * k) Φ := by
+  have tr
+      : ∀ (Φ : WO W₁ X → ℂ) (g : GA D W₁) (h k : GA D X),
+        thetaKO ωB g h (ωB (1, k) Φ) = thetaKO ωB g (h * k) Φ := by
     intro Φ g h k
     show (ωB (g, h) * ωB (1, k)) Φ 0 = _
     rw [← map_mul, Prod.mk_mul_mk, mul_one]
     rfl
-  have tsub : ∀ Φ Ψ, (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁) →
-      (∀ h, IntegrableOn (fun g => thetaKO ωB g h Ψ) 𝓕₁ ν₁) →
-      thetaInt ωB ν₁ 𝓕₁ (Φ - Ψ) = thetaInt ωB ν₁ 𝓕₁ Φ - thetaInt ωB ν₁ 𝓕₁ Ψ := by
-    intro Φ Ψ hΦ hΨ; funext h
+  have tsub
+      : ∀ Φ Ψ,
+        (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁)
+          → (∀ h, IntegrableOn (fun g => thetaKO ωB g h Ψ) 𝓕₁ ν₁)
+          → thetaInt ωB ν₁ 𝓕₁ (Φ - Ψ) = thetaInt ωB ν₁ 𝓕₁ Φ - thetaInt ωB ν₁ 𝓕₁ Ψ := by
+    intro Φ Ψ hΦ hΨ
+    funext h
     have e : (fun g => thetaKO ωB g h (Φ - Ψ)) = fun g => thetaKO ωB g h Φ - thetaKO ωB g h Ψ := by
       funext g; simp [thetaKO, map_sub]
     simp only [thetaInt, Pi.sub_apply]
     rw [e]
     exact integral_sub (hΦ h) (hΨ h)
-  have tadd : ∀ Φ Ψ, (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁) →
-      (∀ h, IntegrableOn (fun g => thetaKO ωB g h Ψ) 𝓕₁ ν₁) →
-      thetaInt ωB ν₁ 𝓕₁ (Φ + Ψ) = thetaInt ωB ν₁ 𝓕₁ Φ + thetaInt ωB ν₁ 𝓕₁ Ψ := by
-    intro Φ Ψ hΦ hΨ; funext h
+  have tadd
+      : ∀ Φ Ψ,
+        (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁)
+          → (∀ h, IntegrableOn (fun g => thetaKO ωB g h Ψ) 𝓕₁ ν₁)
+          → thetaInt ωB ν₁ 𝓕₁ (Φ + Ψ) = thetaInt ωB ν₁ 𝓕₁ Φ + thetaInt ωB ν₁ 𝓕₁ Ψ := by
+    intro Φ Ψ hΦ hΨ
+    funext h
     have e : (fun g => thetaKO ωB g h (Φ + Ψ)) = fun g => thetaKO ωB g h Φ + thetaKO ωB g h Ψ := by
       funext g; simp [thetaKO, map_add (f := _)]
     simp only [thetaInt, Pi.add_apply]
     rw [e]
     exact integral_add (hΦ h) (hΨ h)
   have tsmul : ∀ (c : ℂ) Φ, thetaInt ωB ν₁ 𝓕₁ (c • Φ) = c • thetaInt ωB ν₁ 𝓕₁ Φ := by
-    intro c Φ; funext h
+    intro c Φ
+    funext h
     have e : (fun g => thetaKO ωB g h (c • Φ)) = fun g => c * thetaKO ωB g h Φ := by
       funext g; simp [thetaKO, map_smul]
     simp only [thetaInt, Pi.smul_apply, smul_eq_mul]
     rw [e]
     exact integral_const_mul c _
-  let Kint : Submodule ℂ (WO W₁ X → ℂ) :=
-    { carrier := {Φ | (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁) ∧ thetaInt ωB ν₁ 𝓕₁ Φ = 0}
-      add_mem' := fun {a b} ha hb => ⟨fun h => by
-          have e : (fun g => thetaKO ωB g h (a + b)) = fun g => thetaKO ωB g h a + thetaKO ωB g h b := by
-            funext g; simp [thetaKO, map_add (f := _)]
-          rw [e]; exact (ha.1 h).add (hb.1 h),
-        by rw [tadd a b ha.1 hb.1, ha.2, hb.2, add_zero]⟩
-      zero_mem' := ⟨fun h => by simp [thetaKO], by funext h; simp [thetaInt, thetaKO]⟩
-      smul_mem' := fun c a ha => ⟨fun h => by
-          have e : (fun g => thetaKO ωB g h (c • a)) = fun g => c * thetaKO ωB g h a := by
-            funext g; simp [thetaKO, map_smul]
-          rw [e]; exact (ha.1 h).const_mul c,
-        by rw [tsmul, ha.2, smul_zero]⟩ }
+  let Kint : Submodule ℂ (WO W₁ X → ℂ) := {
+    carrier := {Φ | (∀ h, IntegrableOn (fun g => thetaKO ωB g h Φ) 𝓕₁ ν₁) ∧ thetaInt ωB ν₁ 𝓕₁ Φ = 0}
+    add_mem' := fun {a b} ha hb => ⟨
+      fun h => by
+        have e
+            : (fun g => thetaKO ωB g h (a + b)) = fun g => thetaKO ωB g h a + thetaKO ωB g h b := by
+          funext g; simp [thetaKO, map_add (f := _)]
+        rw [e]
+        exact (ha.1 h).add (hb.1 h),
+      by rw [tadd a b ha.1 hb.1, ha.2, hb.2, add_zero]
+    ⟩
+    zero_mem' := ⟨fun h => by simp [thetaKO], by funext h; simp [thetaInt, thetaKO]⟩
+    smul_mem' := fun c a ha => ⟨
+      fun h => by
+        have e : (fun g => thetaKO ωB g h (c • a)) = fun g => c * thetaKO ωB g h a := by
+          funext g; simp [thetaKO, map_smul]
+        rw [e]
+        exact (ha.1 h).const_mul c,
+      by rw [tsmul, ha.2, smul_zero]
+    ⟩
+  }
   let K : Submodule ℂ (WO W₁ X → ℂ) := S ⊓ Kint
   obtain ⟨c, hc0, hc⟩ := hTA D ψ θ hθ W W₁ X A A₁ B α β hT ν 𝓕 ν₁ 𝓕₁ hν hν₁ ωA ωB Pm rf rl p p' hm
-  have hrel := _root_.GlobalTheory.T.theta_integral_vanishes_on_finite_relations hP D ψ θ hψ hθ W₁ X A₁ B α (α / β) ωB hm.weilB hs₁ ν₁ 𝓕₁ hν₁
+  have hrel :=
+    _root_.GlobalTheory.T.theta_integral_vanishes_on_finite_relations hP D ψ θ hψ hθ W₁ X A₁ B α
+      (α / β) ωB hm.weilB hs₁ ν₁ 𝓕₁ hν₁
   have kerp' : finRel ωB S ≤ LinearMap.ker p' := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨u, hu, Ψ, hΨ, rfl⟩
@@ -102,10 +145,14 @@ theorem theta_vanish_all_of_irreducible : GlobalTheory.Published.HoweDualityReal
     rintro τ Y hY _ ⟨Ψ, ⟨hΨS, hΨi, hΨ0⟩, rfl⟩
     obtain ⟨Φ', hΦ'S, hder⟩ := hm.mapB.stabX.2 τ Y hY Ψ hΨS
     refine ⟨Φ', ⟨hΦ'S, ?_⟩, hm.mapB.eql τ Y hY Ψ hΨS Φ' hΦ'S hder⟩
-    obtain ⟨V, hVfd, hV⟩ := GlobalTheory.T.oneParamSubgroup_fockOrbit_finiteDimensional D ψ θ hψ hθ W₁ X A₁ B α (α / β) ωB hm.weilB (fun τ => by
-        obtain ⟨a, b, ha, hb, -⟩ := hT.gap τ
-        exact ⟨a, a - b, ha, by rw [div_eq_mul_inv]; exact GlobalTheory.Chain.hasInfExp_div ha hb⟩)
-      ‹_› τ Y hY Ψ hΨS
+    obtain ⟨V, hVfd, hV⟩ :=
+      GlobalTheory.T.oneParamSubgroup_fockOrbit_finiteDimensional D ψ θ hψ hθ W₁ X A₁ B α (α / β) ωB
+        hm.weilB
+        (fun τ => by
+          obtain ⟨a, b, ha, hb, -⟩ := hT.gap τ
+          exact
+            ⟨a, a - b, ha, by rw [div_eq_mul_inv]; exact GlobalTheory.Chain.hasInfExp_div ha hb⟩)
+        ‹_› τ Y hY Ψ hΨS
     set F : ℝ → (WO W₁ X → ℂ) := fun t => ωB (1, oneP θ X τ Y t) Ψ with hF
     set V' := Submodule.span ℂ (Set.range F) with hV'
     have hV'le : V' ≤ V := Submodule.span_le.2 (by rintro _ ⟨t, rfl⟩; exact hV t)
@@ -118,15 +165,18 @@ theorem theta_vanish_all_of_irreducible : GlobalTheory.Published.HoweDualityReal
       · funext h
         simp only [thetaInt, hF, tr]
         exact congrFun hΨ0 (h * oneP θ X τ Y t)
-    have hlim : Filter.Tendsto (fun s : ℝ => s⁻¹ • (F (0 + s) - F 0)) (nhdsWithin 0 {0}ᶜ) (nhds Φ') := by
+    have hlim
+        : Filter.Tendsto (fun s : ℝ => s⁻¹ • (F (0 + s) - F 0)) (nhdsWithin 0 {0}ᶜ) (nhds Φ') := by
       rw [tendsto_pi_nhds]
       intro z
       have := (hder z).tendsto_slope_zero
       simpa [hF] using this
     have hmem : ∀ s : ℝ, s⁻¹ • (F (0 + s) - F 0) ∈ V' := fun s =>
-      V'.smul_of_tower_mem _ (V'.sub_mem (Submodule.subset_span ⟨0 + s, rfl⟩) (Submodule.subset_span ⟨0, rfl⟩))
+      V'.smul_of_tower_mem _
+        (V'.sub_mem (Submodule.subset_span ⟨0 + s, rfl⟩) (Submodule.subset_span ⟨0, rfl⟩))
     have hΦ'V : Φ' ∈ V' :=
-      (Submodule.closed_of_finiteDimensional V').mem_of_tendsto hlim (Filter.Eventually.of_forall hmem)
+      (Submodule.closed_of_finiteDimensional V').mem_of_tendsto hlim
+        (Filter.Eventually.of_forall hmem)
     exact hV'K hΦ'V
   rcases hm.irred.2 (K.map p') stf stl with hbot | htop
   · exfalso
@@ -143,12 +193,38 @@ end
 end
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.SqTop GlobalTheory.SquareComm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
+  GlobalTheory.SqTop GlobalTheory.SquareComm
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.theta_lift_vanishes_of_irreducible_defect : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → GlobalTheory.SquareSt.ThetaIntegralsAgree → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ → ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁) (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle), IsTriple W W₁ X α β → (∀ τ, Formalism.UG.HasSignature (gramAt D W τ) W.rank 0) → (∀ τ, Formalism.UG.HasSignature (gramAt D W₁ τ) W₁.rank 0) → (∀ τ, Formalism.UG.HasSignature (gramAt D X τ) X.rank 0) → ∀ (ν : Measure (GA D W)) (𝓕 : Set (GA D W)) (ν₁ : Measure (GA D W₁)) (𝓕₁ : Set (GA D W₁)), IsHaarFD W ν 𝓕 → IsHaarFD W₁ ν₁ 𝓕₁ → ∀ ωA ωB Pi rf rl p p', IsMatch ψ θ A A₁ B α β ωA ωB Pi rf rl p p' → ∀ Φ' ∈ algF ψ θ false A₁ B, p' Φ' ≠ 0 → thetaInt ωB ν₁ 𝓕₁ Φ' = 0 → ∀ Φ'' ∈ algF ψ θ false A₁ B, thetaInt ωB ν₁ 𝓕₁ Φ'' = 0 := by
-  first | exact @_root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible | exact _root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible | (intros; apply _root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible <;> assumption)
+theorem _root_.GlobalTheory.T.theta_lift_vanishes_of_irreducible_defect
+    : GlobalTheory.Published.HoweDualityReal → _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree
+      → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching
+      → GlobalTheory.SquareSt.ThetaIntegralsAgree
+      → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D),
+        IsStdChar D ψ (-1) → IsInfFam θ
+          → ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁)
+              (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle),
+            IsTriple W W₁ X α β → (∀ τ, Formalism.UG.HasSignature (gramAt D W τ) W.rank 0)
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D W₁ τ) W₁.rank 0)
+              → (∀ τ, Formalism.UG.HasSignature (gramAt D X τ) X.rank 0)
+              → ∀ (ν : Measure (GA D W)) (𝓕 : Set (GA D W)) (ν₁ : Measure (GA D W₁))
+                  (𝓕₁ : Set (GA D W₁)),
+                IsHaarFD W ν 𝓕 → IsHaarFD W₁ ν₁ 𝓕₁
+                  → ∀ ωA ωB Pi rf rl p p',
+                    IsMatch ψ θ A A₁ B α β ωA ωB Pi rf rl p p'
+                      → ∀ Φ' ∈ algF ψ θ false A₁ B,
+                        p' Φ' ≠ 0 → thetaInt ωB ν₁ 𝓕₁ Φ' = 0
+                          → ∀ Φ'' ∈ algF ψ θ false A₁ B, thetaInt ωB ν₁ 𝓕₁ Φ'' = 0 := by
+  first
+  | exact @_root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible
+  | exact _root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible
+  | (intros; apply _root_.GlobalTheory.DefIrred.theta_vanish_all_of_irreducible <;> assumption)
 end

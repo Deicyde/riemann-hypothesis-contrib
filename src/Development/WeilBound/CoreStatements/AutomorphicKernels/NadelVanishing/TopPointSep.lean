@@ -8,6 +8,7 @@ public import Development.WeilBound.CoreStatements.ResolutionCharZero.Principali
 namespace NadelVanishingSeparation.NSI
 
 theorem pointSeparationPair : GlobalTheory.Published.PointSeparationPair :=
-  GlobalTheory.pointSeparationPair_of_principalisation PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
+  GlobalTheory.pointSeparationPair_of_principalisation
+    PositivityTheory.ResPlug.WeightsCompactStabilizer.principalisation_closed
 
 end NadelVanishingSeparation.NSI

@@ -22,17 +22,27 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.GoodPlace
 
-theorem equality : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), 4 * r + 7 ≤ k → S.gg = false → vE L S.ϖ S.G = 0 → (∀ l, S.D l ≠ 0 → vE L S.ϖ (S.D l * L.cj (S.D l)) = 0) → (∀ d Λ, S.IsTerm d Λ → S.BBzero d Λ) ∧ S.Hp = 1 ∧ (S.ampSq fun _ _ => True) = S.nn ∧ ∀ d, (S.mass d fun _ => True) = 0 ∨ (S.mass d fun _ => True) = 1 := by
+theorem equality
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k),
+        4 * r + 7 ≤ k → S.gg = false → vE L S.ϖ S.G = 0
+          → (∀ l, S.D l ≠ 0 → vE L S.ϖ (S.D l * L.cj (S.D l)) = 0)
+          → (∀ d Λ, S.IsTerm d Λ → S.BBzero d Λ) ∧ S.Hp = 1 ∧ (S.ampSq fun _ _ => True) = S.nn
+            ∧ ∀ d, (S.mass d fun _ => True) = 0 ∨ (S.mass d fun _ => True) = 1 := by
   intro F _ _ _ _ _ E _ _ _ L r k S _ hgg hG hD
   have hvth : S.vth = 0 := by simp [Frames.vth, hgg]
   have ha : S.a = 0 := by simp [Frames.a, hvth, hG]
-  have hvD : S.vD = 0 := Finset.sum_eq_zero fun l _ => by
-    split_ifs with h
-    · exact hD l h.2
-    · rfl
+  have hvD : S.vD = 0 :=
+    Finset.sum_eq_zero fun l _ => by
+      split_ifs with h
+      · exact hD l h.2
+      · rfl
   have huniq := fun d Λ h => GlobalTheory.HL.UnimodTerm.term_unique L r k S d Λ h ha
-  have key : ∀ d, ((S.mass d fun _ => True) = 0 ∨ (S.mass d fun _ => True) = 1) ∧
-      ENNReal.ofReal (‖S.amp d fun _ => True‖ ^ 2) = S.mass d fun _ => True := by
+  have key
+      : ∀ d,
+        ((S.mass d fun _ => True) = 0 ∨ (S.mass d fun _ => True) = 1)
+          ∧ ENNReal.ofReal (‖S.amp d fun _ => True‖ ^ 2) = S.mass d fun _ => True := by
     intro d
     by_cases hex : ∃ Λ, S.IsTerm d Λ
     swap
@@ -52,9 +62,12 @@ theorem equality : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F
         rw [← L.cj_cj (S.D l), (hDu l hl).mul_right_eq_zero.1 he, map_zero]
       obtain ⟨u, hu⟩ := hvu _ he0
       rw [← he, hD l hl, zpow_zero, one_mul] at hu
-      refine ⟨L.cj (S.D l) * algebraMap F E (((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) : F),
+      refine ⟨
+        L.cj (S.D l) * algebraMap F E (((u⁻¹ : (𝒪[F])ˣ) : 𝒪[F]) : F),
         L.O.mul_mem (GlobalTheory.UnramOrder.cj_mem L (hDO l))
-          ((GlobalTheory.UnramOrder.algebraMap_mem_iff L _).2 (Subtype.property _)), ?_⟩
+          ((GlobalTheory.UnramOrder.algebraMap_mem_iff L _).2 (Subtype.property _)),
+        ?_
+      ⟩
       rw [← mul_assoc, he, ← map_mul, hu, ← Subring.coe_mul, Units.mul_inv]
       simp
     obtain ⟨hC0, hw0, hall⟩ := GlobalTheory.HL.GoodClass.one_class L r k S hgg hunit
@@ -67,19 +80,22 @@ theorem equality : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F
       rw [mass_eq_sumCls L r k S d _ (fun _ _ _ _ _ => trivial)]
       unfold Frames.sumCls
       let o₀ : MulAction.orbitRel.Quotient S.St (Set S.FrP) := Quotient.mk _ C0
-      rw [tsum_eq_single o₀ (fun o ho => if_neg fun hI => ho (by
-        obtain ⟨h, hh, e⟩ := hall _ hI
-        rw [← Quotient.out_eq o]
-        exact Quotient.sound ⟨⟨h, hh⟩, e.symm⟩))]
+      rw [tsum_eq_single o₀ (fun o ho =>
+        if_neg fun hI =>
+          ho (by
+            obtain ⟨h, hh, e⟩ := hall _ hI
+            rw [← Quotient.out_eq o]
+            exact Quotient.sound ⟨⟨h, hh⟩, e.symm⟩))]
       split_ifs with hI
       swap
       · exact Or.inl rfl
       obtain ⟨h, hh, e⟩ := hall _ hI
-      have hw : S.wC o₀.out = 1 := by
-        rw [e, ((volSt L r k S).2 C0 hC0.1).2.2.2 h hh, hw0]
+      have hw : S.wC o₀.out = 1 := by rw [e, ((volSt L r k S).2 C0 hC0.1).2.2.2 h hh, hw0]
       rw [hw, ENNReal.ofReal_one, one_mul]
-      have hs : ({Λ | S.IsTerm d Λ ∧ True ∧ S.Fr d Λ = o₀.out} : Set (Submodule L.O S.V)).Subsingleton :=
-        fun Λ hΛ Λ' hΛ' => (huniq d Λ' hΛ'.1).2 Λ hΛ.1 (hΛ.2.2.trans hΛ'.2.2.symm)
+      have hs
+          : ({Λ | S.IsTerm d Λ ∧ True ∧ S.Fr d Λ = o₀.out}
+            : Set (Submodule L.O S.V)).Subsingleton := fun Λ hΛ Λ' hΛ' =>
+        (huniq d Λ' hΛ'.1).2 Λ hΛ.1 (hΛ.2.2.trans hΛ'.2.2.symm)
       unfold Frames.nT
       beta_reduce
       rcases hs.eq_empty_or_singleton with h1 | ⟨x, h1⟩
@@ -88,26 +104,29 @@ theorem equality : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F
     refine ⟨hm, ?_⟩
 
     let o₁ : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) := Quotient.mk _ Λ₀
-    have hone : ∀ o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V), o ≠ o₁ →
-        ¬ (S.IsTerm d o.out ∧ True) := by
+    have hone
+        : ∀ o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V),
+          o ≠ o₁ → ¬(S.IsTerm d o.out ∧ True) := by
       intro o ho hT
       apply ho
       obtain ⟨h, hh, e⟩ := hall _ (hint _ hT.1)
       obtain ⟨h', hh', e'⟩ := hall _ (hint _ h₀)
       have hmem : h * h'⁻¹ ∈ S.St := S.St.mul_mem hh (S.St.inv_mem hh')
       have hA := hact Λ₀ h₀ _ hmem
-      have e2 : (h * h'⁻¹) • Λ₀ = o.out := (huniq d _ hT.1).2 _ hA.1 (by
-        rw [hA.2.2.2.2.1, e', e, smul_smul, inv_mul_cancel_right])
+      have e2 : (h * h'⁻¹) • Λ₀ = o.out :=
+        (huniq d _ hT.1).2 _ hA.1 (by rw [hA.2.2.2.2.1, e', e, smul_smul, inv_mul_cancel_right])
       rw [← Quotient.out_eq o]
       exact Quotient.sound ⟨⟨_, hmem⟩, e2⟩
-    have e1 : (S.mass d fun _ => True) =
-        if S.IsTerm d o₁.out ∧ True then ENNReal.ofReal (S.mu o₁.out) else 0 := by
+    have e1
+        : (S.mass d fun _ => True)
+          = if S.IsTerm d o₁.out ∧ True then ENNReal.ofReal (S.mu o₁.out) else 0 := by
       unfold Frames.mass
       rw [tsum_eq_single o₁]
       · congr
       · exact fun o ho => if_neg (hone o ho)
-    have e2 : (S.amp d fun _ => True) =
-        if S.IsTerm d o₁.out ∧ True then (S.mu o₁.out : ℂ) * S.om d o₁.out else 0 := by
+    have e2
+        : (S.amp d fun _ => True)
+          = if S.IsTerm d o₁.out ∧ True then (S.mu o₁.out : ℂ) * S.om d o₁.out else 0 := by
       unfold Frames.amp
       rw [tsum_eq_single o₁]
       · congr

@@ -16,13 +16,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueDegre
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm
+open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm
 
 namespace GlobalTheory.CoverDeg
 
-theorem residueDegree_eq_one_of_surjectiveOnStalks {X Y : Scheme} (f : X ⟶ Y) [SurjectiveOnStalks f]
-    (x : X) : f.residueDegree x = 1 := by
+theorem residueDegree_eq_one_of_surjectiveOnStalks
+    {X Y : Scheme} (f : X ⟶ Y) [SurjectiveOnStalks f] (x : X)
+    : f.residueDegree x = 1 := by
   have hs : Function.Surjective (f.residueFieldMap x).hom := by
     intro y
     obtain ⟨s, rfl⟩ := Scheme.residue_surjective X x y
@@ -31,7 +35,8 @@ theorem residueDegree_eq_one_of_surjectiveOnStalks {X Y : Scheme} (f : X ⟶ Y) 
   letI : Algebra (Y.residueField (f x)) (X.residueField x) := (f.residueFieldMap x).hom.toAlgebra
   have hb : Function.Bijective (algebraMap (Y.residueField (f x)) (X.residueField x)) :=
     ⟨RingHom.injective (algebraMap (Y.residueField (f x)) (X.residueField x)), hs⟩
-  have e := (AlgEquiv.ofBijective (Algebra.ofId (Y.residueField (f x)) (X.residueField x)) hb).toLinearEquiv
+  have e :=
+    (AlgEquiv.ofBijective (Algebra.ofId (Y.residueField (f x)) (X.residueField x)) hb).toLinearEquiv
   unfold Scheme.Hom.residueDegree
   rw [← e.finrank_eq, Module.finrank_self]
 
@@ -39,8 +44,8 @@ end GlobalTheory.CoverDeg
 
 namespace GlobalTheory.CoverDeg
 
-theorem j_genericPoint {F : Type} [Field F] [NumberField F] {Y : Var F} (V : Cover Y) :
-    V.j (genericPoint V.G) = genericPoint V.X := by
+theorem j_genericPoint {F : Type} [Field F] [NumberField F] {Y : Var F} (V : Cover Y)
+    : V.j (genericPoint V.G) = genericPoint V.X := by
   haveI := V.int
   haveI := V.intG
 
@@ -66,7 +71,8 @@ theorem j_genericPoint {F : Type} [Field F] [NumberField F] {Y : Var F} (V : Cov
     have hs : genericPoint V.X ⤳ V.j (genericPoint V.G) := genericPoint_specializes _
     have := (PrimeSpectrum.le_iff_specializes _ _).mpr (hs.map V.p.continuous)
     exact le_bot_iff.mp ((hpj _) ▸ this)
-  obtain ⟨w, hw'⟩ : genericPoint V.X ∈ Set.range (Limits.pullback.fst V.p (spMap (algebraMap (𝓞 F) F))) := by
+  obtain ⟨w, hw'⟩
+      : genericPoint V.X ∈ Set.range (Limits.pullback.fst V.p (spMap (algebraMap (𝓞 F) F))) := by
     rw [Scheme.Pullback.range_fst]
     exact ⟨η, hpX.symm⟩
   have hz : V.j (V.pb.isoPullback.inv w) = genericPoint V.X := by
@@ -81,18 +87,21 @@ end GlobalTheory.CoverDeg
 
 namespace GlobalTheory.CoverDeg
 
-theorem j_residueDegree {F : Type} [Field F] [NumberField F] {Y : Var F} (V : Cover Y) (x : V.G) :
-    V.j.residueDegree x = 1 := by
+theorem j_residueDegree {F : Type} [Field F] [NumberField F] {Y : Var F} (V : Cover Y) (x : V.G)
+    : V.j.residueDegree x = 1 := by
   haveI := CoverHt.isPreimmersion_j V
   exact residueDegree_eq_one_of_surjectiveOnStalks V.j x
 
-theorem map_genericPoint_and_deg : ∀ (F : Type) [Field F] [NumberField F] (Y : Var F) (V : Cover Y)
-    (V' : Cover Y) (b : V'.X ⟶ V.X) (hb : b ≫ V.p = V'.p) (g : V'.G ⟶ V.G),
-    V'.j ≫ b = g ≫ V.j → g ≫ V.π = V'.π → g (genericPoint V'.G) = genericPoint V.G →
-    b (genericPoint V'.X) = genericPoint V.X ∧ b.residueDegree (genericPoint V'.X) * V.deg = V'.deg := by
+theorem map_genericPoint_and_deg
+    : ∀ (F : Type) [Field F] [NumberField F] (Y : Var F) (V : Cover Y) (V' : Cover Y)
+        (b : V'.X ⟶ V.X) (hb : b ≫ V.p = V'.p) (g : V'.G ⟶ V.G),
+      V'.j ≫ b = g ≫ V.j → g ≫ V.π = V'.π → g (genericPoint V'.G) = genericPoint V.G
+        → b (genericPoint V'.X) = genericPoint V.X
+          ∧ b.residueDegree (genericPoint V'.X) * V.deg = V'.deg := by
   intro F _ _ Y V V' b _ g hjb hπ hg
   have hpt : b (genericPoint V'.X) = genericPoint V.X := by
-    rw [← j_genericPoint V', ← Scheme.Hom.comp_apply, hjb, Scheme.Hom.comp_apply, hg, j_genericPoint V]
+    rw [← j_genericPoint V', ← Scheme.Hom.comp_apply, hjb, Scheme.Hom.comp_apply, hg,
+      j_genericPoint V]
   refine ⟨hpt, ?_⟩
   have h1 := CurveDegreesCompare.residueDegree_comp V'.j b (genericPoint V'.G)
   have h2 := CurveDegreesCompare.residueDegree_comp g V.j (genericPoint V'.G)

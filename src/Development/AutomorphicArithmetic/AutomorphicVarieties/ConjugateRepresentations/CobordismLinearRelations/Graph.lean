@@ -4,12 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.LFun
-open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Cj
+open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh
+  GlobalTheory.LFun
+open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo
+  UpperTheory.V.Lit.Bor UpperTheory.V.Cj
 open scoped TensorProduct
 
-theorem UpperTheory.V.Cj.graph :
-    UpperTheory.V.Cj.Graph := by
+theorem UpperTheory.V.Cj.graph : UpperTheory.V.Cj.Graph := by
   intro G V V' W _ _ _ _ _ _ _ ρ ρ' ρW σ T hTs hTg M hM R hlin hg hex hiff
   have huniq : ∀ v w1 w2, w1 ∈ M → w2 ∈ M → R v w1 → R v w2 → w1 = w2 := by
     intro v w1 w2 m1 m2 r1 r2
@@ -32,18 +33,19 @@ theorem UpperTheory.V.Cj.graph :
     intro g v'
     apply T.injective
     rw [hTg, AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply]
-  let J : V' →ₗ[ℂ] W :=
-    { toFun := j
-      map_add' := by
-        intro a b
-        apply huniq (T.symm (a + b)) _ _ (hjM _) (M.add_mem (hjM a) (hjM b)) (hjR _)
-        have h := hlin 1 _ _ _ _ (hjR a) (hjR b)
-        simpa [map_add (f := _)] using h
-      map_smul' := by
-        intro c a
-        apply huniq (T.symm (c • a)) _ _ (hjM _) (M.smul_mem c (hjM a)) (hjR _)
-        have h := hlin (σ.symm c) _ _ _ _ (hjR a) hR0
-        simpa [hTsymm_smul] using h }
+  let J : V' →ₗ[ℂ] W := {
+    toFun := j
+    map_add' := by
+      intro a b
+      apply huniq (T.symm (a + b)) _ _ (hjM _) (M.add_mem (hjM a) (hjM b)) (hjR _)
+      have h := hlin 1 _ _ _ _ (hjR a) (hjR b)
+      simpa [map_add (f := _)] using h
+    map_smul' := by
+      intro c a
+      apply huniq (T.symm (c • a)) _ _ (hjM _) (M.smul_mem c (hjM a)) (hjR _)
+      have h := hlin (σ.symm c) _ _ _ _ (hjR a) hR0
+      simpa [hTsymm_smul] using h
+  }
   refine ⟨J, ?_, hjM, ?_⟩
   · rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro v' hv'

@@ -12,8 +12,9 @@ open Polynomial WeierstrassCurve WeierstrassCurve.Affine IntermediateField
 
 universe u
 
-variable {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F] {E E' E'' : WeierstrassCurve F}
-  [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
+variable
+  {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F]
+  {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
 
 namespace Isogeny
 
@@ -24,10 +25,11 @@ end Isogeny
 section Hom
 
 noncomputable def homPt (Q : isogHom E E') : E.toAffine.Point →+ E'.toAffine.Point :=
-  open Classical in if h : Q = 0 then 0 else (isogOfHom Q h).pointHom
+  open Classical in
+  if h : Q = 0 then 0 else (isogOfHom Q h).pointHom
 
-theorem map_translate_hom (Q : isogHom E E') (R : E.toAffine.Point) :
-    Point.map (translate E R) Q.1 = Q.1 + constMap E' E.toAffine.FunctionField (homPt Q R) := by
+theorem map_translate_hom (Q : isogHom E E') (R : E.toAffine.Point)
+    : Point.map (translate E R) Q.1 = Q.1 + constMap E' E.toAffine.FunctionField (homPt Q R) := by
   by_cases h : Q = 0
   · subst h
     rw [homPt, dite_eq_left rfl, AddMonoidHom.zero_apply, map_zero, add_zero, ZeroMemClass.coe_zero,
@@ -35,9 +37,11 @@ theorem map_translate_hom (Q : isogHom E E') (R : E.toAffine.Point) :
   · rw [homPt, dite_eq_right h]
     exact (isogOfHom Q h).map_translate R
 
-theorem homPt_eq_of (Q : isogHom E E') {R : E.toAffine.Point} {c : E'.toAffine.Point}
-    (h : Point.map (translate E R) Q.1 = Q.1 + constMap E' E.toAffine.FunctionField c) :
-    homPt Q R = c := by
+theorem homPt_eq_of
+    (Q : isogHom E E')
+    {R : E.toAffine.Point} {c : E'.toAffine.Point}
+    (h : Point.map (translate E R) Q.1 = Q.1 + constMap E' E.toAffine.FunctionField c)
+    : homPt Q R = c := by
   rw [map_translate_hom, add_right_inj] at h
   exact constMap_injective _ _ h
 

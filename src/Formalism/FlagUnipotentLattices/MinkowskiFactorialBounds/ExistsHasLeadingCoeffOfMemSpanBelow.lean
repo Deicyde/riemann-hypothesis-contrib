@@ -12,7 +12,9 @@ namespace Formalism.HermitianLatticeCounting.P
 
 section Base
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V]
   {H : HermSpace K V} {r : ℕ}
 
 lemma B_swap0 (H : HermSpace K V) {x y : V} (h : H.B x y = 0) : H.B y x = 0 := by rw [← H.herm x y, h, star_zero]
@@ -140,8 +142,11 @@ lemma level_unique (F : FlagD H r) {x : V} {a b : Fin r} {al bl : K} (h : F.HasL
     abel
   exact (e_notMem_Xa F) a ((Submodule.smul_mem_iff _ (sub_ne_zero.2 (Ne.symm hne))).1 h1)
 
-private theorem FlagD_exists_level_lt_of_mem_Xa_of_ne_zero (F : Formalism.HermitianLatticeCounting.S6.FlagD H r) : ∀ n : ℕ, n ≤ r → ∀ x : V, x ∈ F.Xa n → x ≠ 0 →
-    ∃ (a : Fin r) (al : K), a.val < n ∧ F.HasLevel x a al := by
+private theorem FlagD_exists_level_lt_of_mem_Xa_of_ne_zero
+    (F : Formalism.HermitianLatticeCounting.S6.FlagD H r)
+    : ∀ n : ℕ,
+      n ≤ r
+        → ∀ x : V, x ∈ F.Xa n → x ≠ 0 → ∃ (a : Fin r) (al : K), a.val < n ∧ F.HasLevel x a al := by
   intro n
   induction n with
   | zero =>
@@ -151,8 +156,7 @@ private theorem FlagD_exists_level_lt_of_mem_Xa_of_ne_zero (F : Formalism.Hermit
   | succ n ih =>
     intro hn x hx h0
     have hnr : n < r := by omega
-    have hsb : F.Xa (n + 1) = F.Xa n ⊔ K ∙ F.e (⟨n, hnr⟩ : Fin r).castSucc :=
-      (Xa_succ F) ⟨n, hnr⟩
+    have hsb : F.Xa (n + 1) = F.Xa n ⊔ K ∙ F.e (⟨n, hnr⟩ : Fin r).castSucc := (Xa_succ F) ⟨n, hnr⟩
     rw [hsb] at hx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hz
@@ -177,38 +181,59 @@ lemma level_lt_of_mem (F : FlagD H r) {x : V} {a : Fin r} {al : K} (h : F.HasLev
   push_neg at hlt
   exact (level_notMem F) h ((Xa_mono F) hlt hx)
 
-private theorem HermSpace_B_add_left (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V) : H.B (x + y) z = H.B x z + H.B y z := by
+private theorem HermSpace_B_add_left
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V)
+    : H.B (x + y) z = H.B x z + H.B y z := by
   rw [map_add (f := _), LinearMap.add_apply]
 
-private theorem HermSpace_B_sub_left (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V) : H.B (x - y) z = H.B x z - H.B y z := by
+private theorem HermSpace_B_sub_left
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V)
+    : H.B (x - y) z = H.B x z - H.B y z := by
   rw [map_sub, LinearMap.sub_apply]
 
-private theorem HermSpace_B_smul_left (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (c : K) (x y : V) : H.B (c • x) y = c * H.B x y := by
+private theorem HermSpace_B_smul_left
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (c : K) (x y : V)
+    : H.B (c • x) y = c * H.B x y := by
   rw [map_smul, LinearMap.smul_apply, smul_eq_mul]
 
-private theorem HermSpace_B_zero_left (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (y : V) : H.B 0 y = 0 := by
+private theorem HermSpace_B_zero_left
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (y : V)
+    : H.B 0 y = 0 := by
   rw [map_zero, LinearMap.zero_apply]
 
-private theorem HermSpace_B_neg_left (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y : V) : H.B (-x) y = -H.B x y := by
+private theorem HermSpace_B_neg_left
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y : V)
+    : H.B (-x) y = - H.B x y := by
   rw [map_neg, LinearMap.neg_apply]
 
-private theorem HermSpace_B_add_right (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V) : H.B x (y + z) = H.B x y + H.B x z :=
+private theorem HermSpace_B_add_right
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V)
+    : H.B x (y + z) = H.B x y + H.B x z :=
   map_add _ _ _
 
-private theorem HermSpace_B_sub_right (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V) : H.B x (y - z) = H.B x y - H.B x z :=
+private theorem HermSpace_B_sub_right
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x y z : V)
+    : H.B x (y - z) = H.B x y - H.B x z :=
   map_sub _ _ _
 
-private theorem HermSpace_B_smul_right_eq_star_mul (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (c : K) (x y : V) : H.B x (c • y) = star c * H.B x y := by
+private theorem HermSpace_B_smul_right_eq_star_mul
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (c : K) (x y : V)
+    : H.B x (c • y) = star c * H.B x y := by
   rw [LinearMap.map_smulₛₗ, smul_eq_mul, starRingEnd_apply]
 
-private theorem xv_apply_eq_B_smul_sub_B_smul (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x v y : V) :
-    Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x - H.B y x • v := by
-  simp only [Formalism.HermitianLatticeCounting.S6.xv, LinearMap.sub_apply, LinearMap.smulRight_apply, LinearMap.flip_apply]
+private theorem xv_apply_eq_B_smul_sub_B_smul
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x v y : V)
+    : Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x - H.B y x • v := by
+  simp only [Formalism.HermitianLatticeCounting.S6.xv, LinearMap.sub_apply,
+    LinearMap.smulRight_apply, LinearMap.flip_apply]
 
-private theorem eich_apply_eq_add_wedge_add_smul (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x v : V) (c : K) (y : V) :
-    Formalism.HermitianLatticeCounting.S6.eich H x v c y = y + (H.B y v • x - H.B y x • v) + c • H.B y x • x := by
-  simp only [Formalism.HermitianLatticeCounting.S6.eich, LinearMap.add_apply, LinearMap.id_apply, LinearMap.smul_apply, LinearMap.smulRight_apply,
-    LinearMap.flip_apply, xv_apply_eq_B_smul_sub_B_smul]
+private theorem eich_apply_eq_add_wedge_add_smul
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (x v : V) (c : K) (y : V)
+    : Formalism.HermitianLatticeCounting.S6.eich H x v c y
+      = y + (H.B y v • x - H.B y x • v) + c • H.B y x • x := by
+  simp only [Formalism.HermitianLatticeCounting.S6.eich, LinearMap.add_apply, LinearMap.id_apply,
+    LinearMap.smul_apply, LinearMap.smulRight_apply, LinearMap.flip_apply,
+    xv_apply_eq_B_smul_sub_B_smul]
 
 lemma e_level (F : FlagD H r) (a : Fin r) : F.HasLevel (F.e a.castSucc) a 1 := by
   unfold Formalism.HermitianLatticeCounting.S6.FlagD.HasLevel
@@ -222,17 +247,22 @@ theorem wedgeMapInLieAlgebra : Formalism.HermitianLatticeCounting.S6.Y1 := by
   have hxI : x ∈ F.X := (level_mem_X F) hx
   have hx1 : x ∈ F.Xa (a.val + 1) := (level_mem F) hx
   have hex : ∀ i : Fin (r + 1), H.B (F.e i) x = 0 := fun i => (e_X F) i hxI
-  have hY : ∀ y, Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x - H.B y x • v := xv_apply_eq_B_smul_sub_B_smul H x v
-  have hYe : ∀ i : Fin (r + 1), Formalism.HermitianLatticeCounting.S6.xv H x v (F.e i) = H.B (F.e i) v • x := by
+  have hY : ∀ y, Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x - H.B y x • v :=
+    xv_apply_eq_B_smul_sub_B_smul H x v
+  have hYe
+      : ∀ i : Fin (r + 1),
+        Formalism.HermitianLatticeCounting.S6.xv H x v (F.e i) = H.B (F.e i) v • x := by
     intro i
     rw [hY, hex i, zero_smul, sub_zero]
   have hv' : ∀ y ∈ F.Xa (a.val + 1), H.B y v = 0 := by
     apply (perp_Xa F)
     intro b hb
     exact hv b (Fin.le_iff_val_le_val.2 (by omega))
-  have hx' : ∀ y ∈ F.Xa (a.val + 1), H.B y x = 0 := fun y hy =>
-    (X_iso F) ((Xa_le_X F) _ hy) hxI
-  have hperp : ∀ y : V, (∀ b : Fin r, H.B (F.e b.castSucc) y = 0) → Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x := by
+  have hx' : ∀ y ∈ F.Xa (a.val + 1), H.B y x = 0 := fun y hy => (X_iso F) ((Xa_le_X F) _ hy) hxI
+  have hperp
+      : ∀ y : V,
+        (∀ b : Fin r, H.B (F.e b.castSucc) y = 0)
+          → Formalism.HermitianLatticeCounting.S6.xv H x v y = H.B y v • x := by
     intro y hy
     have h1 : H.B x y = 0 := (perp_X F) hy x hxI
     rw [hY, B_swap0 H h1, zero_smul, sub_zero]
@@ -242,7 +272,8 @@ theorem wedgeMapInLieAlgebra : Formalism.HermitianLatticeCounting.S6.Y1 := by
     exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x)
   · unfold Formalism.HermitianLatticeCounting.S6.FlagD.LieN
     refine ⟨fun y y' => ?_, fun b => ?_, fun y hy => ?_⟩
-    · simp only [hY, HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_sub_right, HermSpace_B_smul_right_eq_star_mul]
+    · simp only [hY, HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_sub_right,
+        HermSpace_B_smul_right_eq_star_mul]
       rw [H.herm y' v, H.herm y' x]
       ring
     · rw [hYe]
@@ -250,7 +281,8 @@ theorem wedgeMapInLieAlgebra : Formalism.HermitianLatticeCounting.S6.Y1 := by
       · rw [hv b hba, zero_smul]
         exact Submodule.zero_mem _
       · push_neg at hba
-        exact Submodule.smul_mem _ _ ((Xa_mono F) (by have := Fin.lt_iff_val_lt_val.1 hba; omega) hx1)
+        exact Submodule.smul_mem _ _
+          ((Xa_mono F) (by have := Fin.lt_iff_val_lt_val.1 hba; omega) hx1)
     · rw [hperp y hy]
       exact Submodule.smul_mem _ _ hxI
   · unfold Formalism.HermitianLatticeCounting.S6.FlagD.DPsi
@@ -292,8 +324,10 @@ theorem lastVectorNotMemSup : Formalism.HermitianLatticeCounting.S6.LastVectorNo
   rw [e1, h4] at h5
   exact F.hT (neg_eq_zero.1 h5.symm)
 
-private theorem HermSpace_exists_B_right_eq_linearForm {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (f : V →ₗ[K] K) : ∃ v : V, ∀ u : V, H.B u v = f u := by
+private theorem HermSpace_exists_B_right_eq_linearForm
+    {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (H : Formalism.HermitianLatticeCounting.S6.HermSpace K V) (f : V →ₗ[K] K)
+    : ∃ v : V, ∀ u : V, H.B u v = f u := by
   let b := Module.finBasis K V
   let Ψ : V →ₗ[K] (Fin (Module.finrank K V) → K) := LinearMap.pi fun i => H.B.flip (b i)
   have hΨ : Function.Injective Ψ := by
@@ -308,10 +342,11 @@ private theorem HermSpace_exists_B_right_eq_linearForm {K V : Type} [Field K] [S
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).1 hΨ
   obtain ⟨v, hv⟩ := hsurj (fun i => star (f (b i)))
   refine ⟨v, fun u => ?_⟩
-  have hfl : H.B.flip v = f := b.ext fun i => by
-    have h1 := congrFun hv i
-    simp only [Ψ, LinearMap.pi_apply, LinearMap.flip_apply] at h1
-    rw [LinearMap.flip_apply, ← H.herm v (b i), h1, star_star]
+  have hfl : H.B.flip v = f :=
+    b.ext fun i => by
+      have h1 := congrFun hv i
+      simp only [Ψ, LinearMap.pi_apply, LinearMap.flip_apply] at h1
+      rw [LinearMap.flip_apply, ← H.herm v (b i), h1, star_star]
   have := LinearMap.congr_fun hfl u
   simpa using this
 
@@ -327,8 +362,10 @@ theorem memOfOrthogonalOrthogonal : Formalism.HermitianLatticeCounting.S6.PerpPe
     exact hq ((Module.forall_dual_apply_eq_zero_iff K _).1 h)
   obtain ⟨v, hv⟩ := HermSpace_exists_B_right_eq_linearForm H (φ.comp S.mkQ)
   apply hφ
-  have h1 := hw v (fun s hs => by
-    rw [hv s, LinearMap.comp_apply, Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero S).2 hs, map_zero])
+  have h1 :=
+    hw v (fun s hs => by
+      rw [hv s, LinearMap.comp_apply, Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero S).2 hs,
+        map_zero])
   rw [hv w, LinearMap.comp_apply] at h1
   exact h1
 
@@ -367,11 +404,14 @@ lemma nFStep_of (hY1 : Formalism.HermitianLatticeCounting.S6.Y1) (hPP : Formalis
       · exact h4
   rw [HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_smul_left, ← hd_def, hd]
 
-theorem normalFormStep : Formalism.HermitianLatticeCounting.S6.NFStep := nFStep_of wedgeMapInLieAlgebra memOfOrthogonalOrthogonal
+theorem normalFormStep : Formalism.HermitianLatticeCounting.S6.NFStep :=
+  nFStep_of wedgeMapInLieAlgebra memOfOrthogonalOrthogonal
 
 section Base2
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V]
   {H : HermSpace K V} {r : ℕ}
 
 lemma Xa_eq_range (F : FlagD H r) {j : ℕ} (hj : j ≤ r) :
@@ -446,12 +486,15 @@ theorem scalarUnique : Formalism.HermitianLatticeCounting.S6.NFCUnique := by
     convert this using 1
     rw [sub_smul]
     abel
-  exact lastVectorNotMemSup K V H r F F' ((Submodule.smul_mem_iff _ (sub_ne_zero.2 (Ne.symm hne))).1 h3)
+  exact lastVectorNotMemSup K V H r F F'
+    ((Submodule.smul_mem_iff _ (sub_ne_zero.2 (Ne.symm hne))).1 h3)
 
 section CaseA
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
-  [FiniteDimensional K V] {H : HermSpace K V} {r : ℕ}
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  {H : HermSpace K V} {r : ℕ}
 
 lemma succ_eq_castSucc {r : ℕ} (a : Fin r) (h : a.val + 1 < r) :
     a.succ = (⟨a.val + 1, h⟩ : Fin r).castSucc := Fin.ext (by simp)
@@ -636,11 +679,14 @@ lemma nFCaseA_of_lastVectorNotMemSup (hStep : Formalism.HermitianLatticeCounting
   unfold Formalism.HermitianLatticeCounting.S6.NFShape
   exact ⟨div_ne_zero hal₀ hal₀', hfin, hlead, hall', hb, hb', hI, hI', hz⟩
 
-theorem normalFormMeetNeBot : Formalism.HermitianLatticeCounting.S6.NFCaseA := nFCaseA_of_lastVectorNotMemSup normalFormStep lastVectorNotMemSup
+theorem normalFormMeetNeBot : Formalism.HermitianLatticeCounting.S6.NFCaseA :=
+  nFCaseA_of_lastVectorNotMemSup normalFormStep lastVectorNotMemSup
 
 section Gram
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V]
   {H : HermSpace K V} {r : ℕ}
 
 lemma B_sum_left (H : HermSpace K V) {n : ℕ} (c : Fin n → K) (u : Fin n → V) (y : V) :
@@ -757,11 +803,14 @@ lemma lastVector_mem_jointSpan_right (F F' : FlagD H r) : F'.z ∈ V0 F F' := by
   unfold Formalism.HermitianLatticeCounting.S6.V0
   exact Submodule.mem_sup_right (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 
-private theorem det_eq_last_mul_det_submatrix_of_last_row_eq_zero {R : Type} [CommRing R] {m : ℕ}
-    (A : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (h : ∀ j : Fin m, A (Fin.last m) j.castSucc = 0) :
-    A.det = A (Fin.last m) (Fin.last m) * (A.submatrix Fin.castSucc Fin.castSucc).det := by
+private theorem det_eq_last_mul_det_submatrix_of_last_row_eq_zero
+    {R : Type} [CommRing R]
+    {m : ℕ}
+    (A : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (h : ∀ j : Fin m, A (Fin.last m) j.castSucc = 0)
+    : A.det = A (Fin.last m) (Fin.last m) * (A.submatrix Fin.castSucc Fin.castSucc).det := by
   rw [Matrix.det_succ_row A (Fin.last m), Fin.sum_univ_castSucc]
-  simp only [h, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, Fin.succAbove_last, Fin.val_last]
+  simp only [h, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, Fin.succAbove_last,
+    Fin.val_last]
   rw [show ((-1 : R) ^ (m + m)) = 1 from Even.neg_one_pow ⟨m, rfl⟩, one_mul]
 
 lemma pairing_lastVector_right_eq_zero (F F' : FlagD H r) {c : K} (hz : F'.z - c • F.z ∈ F.X ⊔ F'.X) {v : V}
@@ -778,10 +827,8 @@ theorem normalFormMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFCaseB :=
   have hD' : Formalism.HermitianLatticeCounting.S6.Dl F' F r (Nat.le_succ r) ≠ 0 := by
     rw [Dl_swap]
     exact fun h => hD (star_eq_zero.1 h)
-  obtain ⟨x, hx, hxe⟩ := Dl_solveL F F' (le_refl r) hD
-    (fun b => H.B F.z (F'.e b.castSucc))
-  obtain ⟨x', hx', hxe'⟩ := Dl_solveL F' F (le_refl r) hD'
-    (fun a => H.B F'.z (F.e a.castSucc))
+  obtain ⟨x, hx, hxe⟩ := Dl_solveL F F' (le_refl r) hD (fun b => H.B F.z (F'.e b.castSucc))
+  obtain ⟨x', hx', hxe'⟩ := Dl_solveL F' F (le_refl r) hD' (fun a => H.B F'.z (F.e a.castSucc))
   have hxI : x ∈ F.X := hx
   have hxI' : x' ∈ F'.X := hx'
   have hxe2 : ∀ b : Fin r, H.B x (F'.e b.castSucc) = H.B F.z (F'.e b.castSucc) := fun b => hxe b
@@ -789,15 +836,15 @@ theorem normalFormMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFCaseB :=
   have h1 : ∀ w ∈ F.X ⊔ F'.X, H.B w (F.z - x) = 0 := by
     apply perp_sup H
     · intro s hs
-      rw [HermSpace_B_sub_right, (pairing_isotropicSpan_lastVector F) hs, (X_iso F) hs hxI, sub_zero]
-    · exact (perp_X F')
-        (fun b => B_swap0 H (by rw [HermSpace_B_sub_left, hxe2 b, sub_self]))
+      rw [HermSpace_B_sub_right, (pairing_isotropicSpan_lastVector F) hs, (X_iso F) hs hxI,
+        sub_zero]
+    · exact (perp_X F') (fun b => B_swap0 H (by rw [HermSpace_B_sub_left, hxe2 b, sub_self]))
   have h2 : ∀ w ∈ F.X ⊔ F'.X, H.B w (F'.z - x') = 0 := by
     apply perp_sup H
-    · exact (perp_X F)
-        (fun a => B_swap0 H (by rw [HermSpace_B_sub_left, hxe2' a, sub_self]))
+    · exact (perp_X F) (fun a => B_swap0 H (by rw [HermSpace_B_sub_left, hxe2' a, sub_self]))
     · intro s hs
-      rw [HermSpace_B_sub_right, (pairing_isotropicSpan_lastVector F') hs, (X_iso F') hs hxI', sub_zero]
+      rw [HermSpace_B_sub_right, (pairing_isotropicSpan_lastVector F') hs, (X_iso F') hs hxI',
+        sub_zero]
   have h3 : H.B (F.z - x) (F.z - x) = -F.T := by
     rw [HermSpace_B_sub_left, h1 x (Submodule.mem_sup_left hxI), sub_zero, HermSpace_B_sub_right,
       (z_X F) hxI, sub_zero]
@@ -806,17 +853,21 @@ theorem normalFormMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFCaseB :=
     rw [HermSpace_B_sub_left, h2 x' (Submodule.mem_sup_right hxI'), sub_zero, HermSpace_B_sub_right,
       (z_X F') hxI', sub_zero]
     exact (pairing_lastVector_lastVector F')
-  obtain ⟨P, hPdef⟩ : ∃ P : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
-      P = Matrix.of fun a b => H.B (F.e a) (F'.e b) := ⟨_, rfl⟩
+  obtain ⟨P, hPdef⟩
+      : ∃ P : Matrix (Fin (r + 1)) (Fin (r + 1)) K, P = Matrix.of fun a b => H.B (F.e a) (F'.e b) :=
+    ⟨_, rfl⟩
   have hrowdet : ∀ y ∈ F.X, (P.updateRow (Fin.last r) (fun b => H.B y (F'.e b))).det = 0 := by
-    let f : V →ₗ[K] K :=
-      { toFun := fun y => (P.updateRow (Fin.last r) (fun b => H.B y (F'.e b))).det
-        map_add' := fun y y' => by
-          simp only [HermSpace_B_add_left]
-          exact Matrix.det_updateRow_add P (Fin.last r) (fun b => H.B y (F'.e b)) (fun b => H.B y' (F'.e b))
-        map_smul' := fun c y => by
-          simp only [HermSpace_B_smul_left, RingHom.id_apply, smul_eq_mul]
-          exact Matrix.det_updateRow_smul P (Fin.last r) c (fun b => H.B y (F'.e b)) }
+    let f : V →ₗ[K] K := {
+      toFun := fun y => (P.updateRow (Fin.last r) (fun b => H.B y (F'.e b))).det
+      map_add' := fun y y' => by
+        simp only [HermSpace_B_add_left]
+        exact Matrix.det_updateRow_add P (Fin.last r)
+          (fun b => H.B y (F'.e b))
+          (fun b => H.B y' (F'.e b))
+      map_smul' := fun c y => by
+        simp only [HermSpace_B_smul_left, RingHom.id_apply, smul_eq_mul]
+        exact Matrix.det_updateRow_smul P (Fin.last r) c (fun b => H.B y (F'.e b))
+    }
     have hle : F.X ≤ LinearMap.ker f := by
       show Submodule.span K ((fun b : Fin r => F.e b.castSucc) '' {b | b.val < r}) ≤ LinearMap.ker f
       rw [Submodule.span_le]
@@ -833,20 +884,26 @@ theorem normalFormMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFCaseB :=
     funext b
     simp [hPdef, Formalism.HermitianLatticeCounting.S6.FlagD.z]
   have hQ : (P.updateRow (Fin.last r) (fun b => H.B (F.z - x) (F'.e b))).det = P.det := by
-    have e1 : (fun b => H.B (F.z - x) (F'.e b)) =
-        (fun b => H.B F.z (F'.e b)) + (-1 : K) • (fun b => H.B x (F'.e b)) := by
+    have e1
+        : (fun b => H.B (F.z - x) (F'.e b))
+          = (fun b => H.B F.z (F'.e b)) + (-1 : K) • (fun b => H.B x (F'.e b)) := by
       funext b
       simp only [HermSpace_B_sub_left, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       ring
-    rw [e1, Matrix.det_updateRow_add, Matrix.det_updateRow_smul, hrowdet x hxI, mul_zero, add_zero, hzrow,
-      Matrix.updateRow_eq_self]
-  have hlast : ∀ j : Fin r,
-      (P.updateRow (Fin.last r) (fun b => H.B (F.z - x) (F'.e b))) (Fin.last r) j.castSucc = 0 := by
+    rw [e1, Matrix.det_updateRow_add, Matrix.det_updateRow_smul, hrowdet x hxI, mul_zero, add_zero,
+      hzrow, Matrix.updateRow_eq_self]
+  have hlast
+      : ∀ j : Fin r,
+        (P.updateRow (Fin.last r) (fun b => H.B (F.z - x) (F'.e b))) (Fin.last r) j.castSucc
+          = 0 := by
     intro j
     rw [Matrix.updateRow_self]
     exact B_swap0 H (h1 _ (Submodule.mem_sup_right ((e_mem_X F') j)))
-  have hsub : (P.updateRow (Fin.last r) (fun b => H.B (F.z - x) (F'.e b))).submatrix Fin.castSucc Fin.castSucc =
-      Matrix.of fun a b : Fin r => H.B (F.e (Fin.castLE (Nat.le_succ r) a)) (F'.e (Fin.castLE (Nat.le_succ r) b)) := by
+  have hsub
+      : (P.updateRow (Fin.last r) (fun b => H.B (F.z - x) (F'.e b))).submatrix Fin.castSucc
+          Fin.castSucc
+        = Matrix.of fun a b : Fin r =>
+          H.B (F.e (Fin.castLE (Nat.le_succ r) a)) (F'.e (Fin.castLE (Nat.le_succ r) b)) := by
     ext a b
     simp [hPdef, Matrix.updateRow_ne (Fin.castSucc_ne_last a)] <;> rfl
   have hP : Formalism.HermitianLatticeCounting.S6.Dl F F' (r + 1) le_rfl = P.det := by
@@ -854,12 +911,15 @@ theorem normalFormMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFCaseB :=
     exact Dl_eq F F' (r + 1) le_rfl
   have hLr := Dl_eq F F' r (Nat.le_succ r)
   have hbb : H.B (F.z - x) (F'.e (Fin.last r)) = H.B (F.z - x) (F'.z - x') := by
-    rw [HermSpace_B_sub_right H (F.z - x) F'.z x',
-      B_swap0 H (h1 x' (Submodule.mem_sup_right hxI')), sub_zero]
+    rw [HermSpace_B_sub_right H (F.z - x) F'.z x', B_swap0 H (h1 x' (Submodule.mem_sup_right hxI')),
+      sub_zero]
     rfl
-  have hlm : Formalism.HermitianLatticeCounting.S6.Dl F F' (r + 1) le_rfl =
-      Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r) * H.B (F.z - x) (F'.z - x') := by
-    rw [hP, ← hQ, det_eq_last_mul_det_submatrix_of_last_row_eq_zero _ hlast, hsub, ← hLr, Matrix.updateRow_self, ← hbb]
+  have hlm
+      : Formalism.HermitianLatticeCounting.S6.Dl F F' (r + 1) le_rfl
+        = Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r)
+          * H.B (F.z - x) (F'.z - x') := by
+    rw [hP, ← hQ, det_eq_last_mul_det_submatrix_of_last_row_eq_zero _ hlast, hsub, ← hLr,
+      Matrix.updateRow_self, ← hbb]
     exact mul_comm _ _
   refine ⟨x, hxI, x', hxI', h1, h2, h3, h4, hlm, ?_⟩
   unfold Formalism.HermitianLatticeCounting.S6.Gval
@@ -874,12 +934,18 @@ theorem normalFormDegenerateImpossible : Formalism.HermitianLatticeCounting.S6.N
     rcases mul_eq_zero.1 hg with h | h
     · exact h
     · exact star_eq_zero.1 h
-  have hD' : (Matrix.of fun a b : Fin (r + 1) =>
-      H.B (F'.e (Fin.castLE le_rfl a)) (F.e (Fin.castLE le_rfl b))).det = 0 := by
+  have hD'
+      : (Matrix.of fun a b : Fin (r + 1) =>
+          H.B (F'.e (Fin.castLE le_rfl a)) (F.e (Fin.castLE le_rfl b))).det
+        = 0 := by
     rw [← Dl_eq, Dl_swap, hD, star_zero]
-  obtain ⟨c, hc, hcb⟩ := gram_zero H
-    (fun a : Fin (r + 1) => F'.e (Fin.castLE le_rfl a)) (fun b : Fin (r + 1) => F.e (Fin.castLE le_rfl b)) hD'
-  obtain ⟨y', hy'def⟩ : ∃ y' : V, y' = ∑ a : Fin (r + 1), c a • F'.e (Fin.castLE le_rfl a) := ⟨_, rfl⟩
+  obtain ⟨c, hc, hcb⟩ :=
+    gram_zero H
+      (fun a : Fin (r + 1) => F'.e (Fin.castLE le_rfl a))
+      (fun b : Fin (r + 1) => F.e (Fin.castLE le_rfl b))
+      hD'
+  obtain ⟨y', hy'def⟩ : ∃ y' : V, y' = ∑ a : Fin (r + 1), c a • F'.e (Fin.castLE le_rfl a) :=
+    ⟨_, rfl⟩
   have hy' : ∀ a : Fin (r + 1), H.B (F.e a) y' = 0 := fun a => by
     rw [hy'def]
     exact B_swap0 H (hcb a)
@@ -894,11 +960,13 @@ theorem normalFormDegenerateImpossible : Formalism.HermitianLatticeCounting.S6.N
     have hyI' : y' ∈ F'.X := by rw [hsplit]; exact hx₀'
     have hyI : y' ∈ F.X := hA y' hy' ((X_iso F') hyI' hyI')
     have hy0 : y' = 0 := by
-      have hmem : y' ∈ Formalism.HermitianLatticeCounting.S6.II F F' := Submodule.mem_inf.2 ⟨hyI, hyI'⟩
+      have hmem : y' ∈ Formalism.HermitianLatticeCounting.S6.II F F' :=
+        Submodule.mem_inf.2 ⟨hyI, hyI'⟩
       rw [hm] at hmem
       exact (Submodule.mem_bot K).1 hmem
-    have hind := Fintype.linearIndependent_iff.1 F'.indep (fun a => c a.castSucc)
-      (by have h5 := hsplit.symm.trans hy0; simpa using h5)
+    have hind :=
+      Fintype.linearIndependent_iff.1 F'.indep (fun a => c a.castSucc) (by
+        have h5 := hsplit.symm.trans hy0; simpa using h5)
     apply hc
     funext a
     induction a using Fin.lastCases with
@@ -939,7 +1007,9 @@ theorem leadingMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFDj := by
       exact B_swap0 H (hxI' u hu)
   have hxz' : H.B x F'.z = 0 := by
     have h1 := B_swap0 H (hxS _ hz)
-    rw [HermSpace_B_sub_right, HermSpace_B_smul_right_eq_star_mul, (pairing_isotropicSpan_lastVector F) hxI, mul_zero, sub_zero] at h1
+    rw [HermSpace_B_sub_right, HermSpace_B_smul_right_eq_star_mul,
+        (pairing_isotropicSpan_lastVector F) hxI, mul_zero, sub_zero]
+      at h1
     exact h1
   have hxF' : x ∈ F'.X := by
     apply hA' x
@@ -949,7 +1019,8 @@ theorem leadingMinorNeZero : Formalism.HermitianLatticeCounting.S6.NFDj := by
       | last => exact hxz'
       | cast b => exact hxI' _ ((e_mem_X F') b)
     · exact (X_iso F) hxI hxI
-  have hmem : x ∈ Formalism.HermitianLatticeCounting.S6.II F F' ⊓ F.Xa j := Submodule.mem_inf.2 ⟨Submodule.mem_inf.2 ⟨hxI, hxF'⟩, hx⟩
+  have hmem : x ∈ Formalism.HermitianLatticeCounting.S6.II F F' ⊓ F.Xa j :=
+    Submodule.mem_inf.2 ⟨Submodule.mem_inf.2 ⟨hxI, hxF'⟩, hx⟩
   rw [hb] at hmem
   exact hx0 ((Submodule.mem_bot K).1 hmem)
 
@@ -962,9 +1033,9 @@ theorem normSqScalarMulEq : Formalism.HermitianLatticeCounting.S6.NFAbsC := by
     abel
   have hpp : H.B p p = -(c * star c * F.T) := by
     rw [hp]
-    simp only [HermSpace_B_add_left, HermSpace_B_add_right, HermSpace_B_smul_left, HermSpace_B_smul_right_eq_star_mul, (pairing_lastVector_lastVector F),
-      (z_X F) hu, (pairing_isotropicSpan_lastVector F) hu,
-      (X_iso F) hu hu]
+    simp only [HermSpace_B_add_left, HermSpace_B_add_right, HermSpace_B_smul_left,
+      HermSpace_B_smul_right_eq_star_mul, (pairing_lastVector_lastVector F), (z_X F) hu,
+      (pairing_isotropicSpan_lastVector F) hu, (X_iso F) hu hu]
     ring
   have hu'z' : H.B u' F'.z = 0 := (pairing_isotropicSpan_lastVector F') hu'
   have hu'u' : H.B u' u' = 0 := (X_iso F') hu' hu'
@@ -975,12 +1046,16 @@ theorem normSqScalarMulEq : Formalism.HermitianLatticeCounting.S6.NFAbsC := by
     rw [hp', HermSpace_B_sub_right, hu'z', hu'u', sub_zero]
   have hpu' : H.B p u' = 0 := B_swap0 H hu'p
   have h1 : H.B F'.z F'.z = -F'.T := (pairing_lastVector_lastVector F')
-  rw [hz', HermSpace_B_add_left, HermSpace_B_add_right, HermSpace_B_add_right, hpp, hpu', hu'p, hu'u'] at h1
+  rw [hz', HermSpace_B_add_left, HermSpace_B_add_right, HermSpace_B_add_right, hpp, hpu', hu'p,
+      hu'u']
+    at h1
   linear_combination -h1
 
 section V0
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V]
   {H : HermSpace K V} {r : ℕ}
 
 lemma jointSpan_eq (F F' : FlagD H r) {c : K} (hz : F'.z - c • F.z ∈ F.X ⊔ F'.X) :
@@ -1016,7 +1091,10 @@ theorem jointSpanRadical : Formalism.HermitianLatticeCounting.S6.JointSpanRadica
   intro K V _ _ _ _ _ H r F F' j hj c hA' hb hb' hI hI' hz hD
   have hJ := jointSpan_eq F F' hz
   have hmI : Formalism.HermitianLatticeCounting.S6.II F F' ≤ F.X := inf_le_left
-  have hc3 : ∀ x ∈ F.X, (∀ w ∈ Formalism.HermitianLatticeCounting.S6.V0 F F', H.B w x = 0) ↔ x ∈ Formalism.HermitianLatticeCounting.S6.II F F' := by
+  have hc3
+      : ∀ x ∈ F.X,
+        (∀ w ∈ Formalism.HermitianLatticeCounting.S6.V0 F F', H.B w x = 0)
+          ↔ x ∈ Formalism.HermitianLatticeCounting.S6.II F F' := by
     intro x hx
     constructor
     · intro hw
@@ -1030,9 +1108,14 @@ theorem jointSpanRadical : Formalism.HermitianLatticeCounting.S6.JointSpanRadica
       exact Submodule.mem_inf.2 ⟨hx, hxF'⟩
     · intro hm w hw
       exact pairing_jointSpan_isotropicMeet F F' hm w hw
-  refine ⟨fun v hv => ⟨fun hvw => ?_, fun hm w hw => B_swap0 H (pairing_jointSpan_isotropicMeet F F' hm w hw)⟩,
-    ?_, hc3⟩
-  · have hw' : ∀ w ∈ Formalism.HermitianLatticeCounting.S6.V0 F F', H.B w v = 0 := fun w hw => B_swap0 H (hvw w hw)
+  refine ⟨
+    fun v hv =>
+      ⟨fun hvw => ?_, fun hm w hw => B_swap0 H (pairing_jointSpan_isotropicMeet F F' hm w hw)⟩,
+    ?_,
+    hc3
+  ⟩
+  · have hw' : ∀ w ∈ Formalism.HermitianLatticeCounting.S6.V0 F F', H.B w v = 0 := fun w hw =>
+      B_swap0 H (hvw w hw)
     rw [hJ] at hv
     obtain ⟨y, hy, t, ht, rfl⟩ := Submodule.mem_sup.1 hv
     obtain ⟨β, rfl⟩ := Submodule.mem_span_singleton.1 ht
@@ -1047,14 +1130,18 @@ theorem jointSpanRadical : Formalism.HermitianLatticeCounting.S6.JointSpanRadica
       intro x hx
       have hxI : x ∈ F.X := (Xa_le_X F) j hx
       have h1 := hw' x (isotropicSpan_le_jointSpan_left F F' hxI)
-      rw [HermSpace_B_add_right, HermSpace_B_add_right, HermSpace_B_add_right, HermSpace_B_smul_right_eq_star_mul, (X_iso F) hxI hu,
-        (X_iso F) hxI (hmI hm), (pairing_isotropicSpan_lastVector F) hxI] at h1
+      rw [HermSpace_B_add_right, HermSpace_B_add_right, HermSpace_B_add_right,
+          HermSpace_B_smul_right_eq_star_mul, (X_iso F) hxI hu, (X_iso F) hxI (hmI hm),
+          (pairing_isotropicSpan_lastVector F) hxI]
+        at h1
       exact B_swap0 H (by simpa using h1)
     subst hs'0
     have hβ : β = 0 := by
       have h1 := hw' F.z (lastVector_mem_jointSpan_left F F')
-      rw [zero_add, HermSpace_B_add_right, HermSpace_B_add_right, HermSpace_B_smul_right_eq_star_mul, (z_X F) hu,
-        (z_X F) (hmI hm), (pairing_lastVector_lastVector F)] at h1
+      rw [zero_add, HermSpace_B_add_right, HermSpace_B_add_right,
+          HermSpace_B_smul_right_eq_star_mul, (z_X F) hu, (z_X F) (hmI hm),
+          (pairing_lastVector_lastVector F)]
+        at h1
       have h2 : star β * F.T = 0 := by linear_combination -h1
       rcases mul_eq_zero.1 h2 with h3 | h3
       · exact star_eq_zero.1 h3
@@ -1095,8 +1182,8 @@ theorem jointSpanRadical : Formalism.HermitianLatticeCounting.S6.JointSpanRadica
 
 theorem jointSpanComplement : Formalism.HermitianLatticeCounting.S6.JointSpanComplement := by
   intro K V _ _ _ _ H r F F' j hj c hI' hz hD w hw
-  obtain ⟨x, hx, hxt⟩ := Dl_solveL F F' hj hD
-    (fun b => H.B w (F'.e (Fin.castLE (hj.trans (Nat.le_succ r)) b)))
+  obtain ⟨x, hx, hxt⟩ :=
+    Dl_solveL F F' hj hD (fun b => H.B w (F'.e (Fin.castLE (hj.trans (Nat.le_succ r)) b)))
   have hxI : x ∈ F.X := (Xa_le_X F) j hx
   refine ⟨x, hxI, ?_⟩
   have hwI : ∀ u ∈ F.X, H.B u w = 0 := (perp_X F) (fun b => hw b.castSucc)
@@ -1114,7 +1201,8 @@ theorem jointSpanComplement : Formalism.HermitianLatticeCounting.S6.JointSpanCom
       rw [HermSpace_B_sub_right, ← H.herm x, h4, H.herm, sub_self]
     · intro u hu
       exact h1 u (Submodule.mem_inf.1 hu).1
-  exact pairing_eq_zero_of_mem_jointSpan F F' h1 h2 h3 (pairing_lastVector_right_eq_zero F F' hz h1 h2 h3)
+  exact pairing_eq_zero_of_mem_jointSpan F F' h1 h2 h3
+    (pairing_lastVector_right_eq_zero F F' hz h1 h2 h3)
 
 theorem normalFormZero : Formalism.HermitianLatticeCounting.S6.NFJZero := by
   intro K V _ _ _ _ H r F F' c hS
@@ -1157,8 +1245,7 @@ theorem normalFormZero : Formalism.HermitianLatticeCounting.S6.NFJZero := by
           rw [sub_sub_cancel] at h3
           exact (Submodule.smul_mem_iff _ hal).1 h3
       · push_neg at hnr
-        rw [Xa_of_ge F (a := n + 1) (by omega),
-          Xa_of_ge F' (a := n + 1) (by omega), hII]
+        rw [Xa_of_ge F (a := n + 1) (by omega), Xa_of_ge F' (a := n + 1) (by omega), hII]
   have hstep : ∀ a : Fin r, F'.e a.castSucc - c • F.e a.castSucc ∈ F.Xa a.val := by
     intro a
     obtain ⟨x, hxm, al, al', hF, hF'⟩ := hex a (Nat.zero_le _)
@@ -1364,23 +1451,25 @@ theorem existsScalarOfGramDefectZero : Formalism.HermitianLatticeCounting.S6.NFC
   intro K V _ _ _ _ σ H r F F' hσ hT hT' hsig hD hg
   obtain ⟨x, hx, x', hx', h1, h2, h3, h4, -, h6⟩ := normalFormMinorNeZero K V H r F F' hD
   obtain ⟨z₀, hz₀, hz₀n, hpos⟩ := id hsig
-  have hDD : Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r) * star (Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r)) ≠ 0 :=
+  have hDD
+      : Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r)
+          * star (Formalism.HermitianLatticeCounting.S6.Dl F F' r (Nat.le_succ r))
+        ≠ 0 :=
     mul_ne_zero hD (star_ne_zero.2 hD)
-  have hβ : H.B (F.z - x) (F'.z - x') * star (H.B (F.z - x) (F'.z - x')) =
-      F.T * F'.T := by
+  have hβ : H.B (F.z - x) (F'.z - x') * star (H.B (F.z - x) (F'.z - x')) = F.T * F'.T := by
     rw [hg] at h6
     have h7 := (mul_eq_zero.1 h6.symm).resolve_left hDD
     linear_combination h7
-  have hmemA : ∀ y : V, (∀ w ∈ F.X ⊔ F'.X, H.B w y = 0) →
-      y ∈ perpS H (F.X ⊔ F'.X) :=
-    fun y hy => (mem_perpS H _ y).2 hy
-  obtain ⟨-, heq⟩ := reverseCS_gen σ H.B hσ H.herm
-    (perpS H (F.X ⊔ F'.X)) ⊥
-    (fun n hn u _ => by rw [(Submodule.mem_bot K).1 hn, HermSpace_B_zero_left]) z₀ (hmemA _ hz₀)
-    (fun w hw h5 h7 => hpos w ((mem_perpS H _ w).1 hw) h5
-      (fun h0 => h7 (by rw [h0]; exact Submodule.zero_mem _)))
-    (F.z - x) (hmemA _ h1) (by rw [h3, map_neg, Complex.neg_re]; linarith)
-    (F'.z - x') (hmemA _ h2)
+  have hmemA : ∀ y : V, (∀ w ∈ F.X ⊔ F'.X, H.B w y = 0) → y ∈ perpS H (F.X ⊔ F'.X) := fun y hy =>
+    (mem_perpS H _ y).2 hy
+  obtain ⟨-, heq⟩ :=
+    reverseCS_gen σ H.B hσ H.herm (perpS H (F.X ⊔ F'.X)) ⊥
+      (fun n hn u _ => by rw [(Submodule.mem_bot K).1 hn, HermSpace_B_zero_left])
+      z₀ (hmemA _ hz₀)
+      (fun w hw h5 h7 =>
+        hpos w ((mem_perpS H _ w).1 hw) h5 (fun h0 => h7 (by rw [h0]; exact Submodule.zero_mem _)))
+      (F.z - x) (hmemA _ h1) (by rw [h3, map_neg, Complex.neg_re]; linarith) (F'.z - x')
+      (hmemA _ h2)
   obtain ⟨c, hc⟩ := heq (by rw [h3, h4, hβ]; ring)
   refine ⟨c, ?_⟩
   have hc0 : F'.z - x' - c • (F.z - x) = 0 := (Submodule.mem_bot K).1 hc
@@ -1388,7 +1477,8 @@ theorem existsScalarOfGramDefectZero : Formalism.HermitianLatticeCounting.S6.NFC
     rw [smul_sub]
     abel
   rw [e, hc0, zero_add]
-  exact Submodule.sub_mem _ (Submodule.mem_sup_right hx') (Submodule.mem_sup_left (Submodule.smul_mem _ _ hx))
+  exact Submodule.sub_mem _ (Submodule.mem_sup_right hx')
+    (Submodule.mem_sup_left (Submodule.smul_mem _ _ hx))
 
 lemma nf_full {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
     {H : HermSpace K V} {r : ℕ} (F F' : FlagD H r) (hA : F.Aniso) (hA' : F'.Aniso) (j : ℕ) (hj : j ≤ r)
@@ -1466,21 +1556,26 @@ end DetBlocks
 theorem eichlerMapIsometry : Formalism.HermitianLatticeCounting.S6.EichlerIsom := by
   intro K V _ _ _ _ H x v c hxx hxv hc
   have hvx : H.B v x = 0 := B_swap0 H hxv
-  have hcs : star c = -H.B v v - c := by linear_combination hc
+  have hcs : star c = - H.B v v - c := by linear_combination hc
   refine ⟨fun y y' => ?_, fun y => ?_, fun y => ?_⟩
-  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_add_right, HermSpace_B_sub_right, HermSpace_B_smul_right_eq_star_mul,
-      H.herm, hxx, hxv, hvx]
+  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left,
+      HermSpace_B_smul_left, HermSpace_B_add_right, HermSpace_B_sub_right,
+      HermSpace_B_smul_right_eq_star_mul, H.herm, hxx, hxv, hvx]
     linear_combination (H.B y x * H.B x y') * hc
-  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_neg_left, map_neg, LinearMap.neg_apply, hxx, hxv, hvx]
+  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left,
+      HermSpace_B_smul_left, HermSpace_B_neg_left, map_neg, LinearMap.neg_apply, hxx, hxv, hvx]
     rw [hcs]
     module
-  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left, HermSpace_B_smul_left, HermSpace_B_neg_left, map_neg, LinearMap.neg_apply, hxx, hxv, hvx]
+  · simp only [eich_apply_eq_add_wedge_add_smul, HermSpace_B_add_left, HermSpace_B_sub_left,
+      HermSpace_B_smul_left, HermSpace_B_neg_left, map_neg, LinearMap.neg_apply, hxx, hxv, hvx]
     rw [hcs]
     module
 
 section Lift
 
-variable {K : Type} [Field K] [StarRing K] {V : Type} [AddCommGroup V] [Module K V]
+variable
+  {K : Type} [Field K] [StarRing K]
+  {V : Type} [AddCommGroup V] [Module K V]
   {H : HermSpace K V} {r : ℕ}
 
 lemma eich_apply (H : HermSpace K V) (x v : V) (c : K) (y : V) :
@@ -1489,8 +1584,8 @@ lemma eich_apply (H : HermSpace K V) (x v : V) (c : K) (y : V) :
     LinearMap.flip_apply, xv_apply_eq_B_smul_sub_B_smul]
 
 def GoodMap (F F' : FlagD H r) (g : V →ₗ[K] V) : Prop :=
-  (∀ x y : V, H.B (g x) (g y) = H.B x y) ∧ Function.Bijective g ∧ (∀ y ∈ V0 F F', g y = y) ∧
-  (∀ y : V, (∀ u ∈ II F F', H.B u y = 0) → g y - y ∈ II F F')
+  (∀ x y : V, H.B (g x) (g y) = H.B x y) ∧ Function.Bijective g ∧ (∀ y ∈ V0 F F', g y = y)
+    ∧ (∀ y : V, (∀ u ∈ II F F', H.B u y = 0) → g y - y ∈ II F F')
 
 lemma isotropicMeet_le_jointSpan (F F' : FlagD H r) : II F F' ≤ V0 F F' := inf_le_left.trans (isotropicSpan_le_jointSpan_left F F')
 
@@ -1708,6 +1803,7 @@ lemma liftTransitive_of (hE : Formalism.HermitianLatticeCounting.S6.EichlerIsom)
   exact Submodule.eq_of_le_of_finrank_eq hle
     (by rw [← (Submodule.equivMapOfInjective g hbij.1 W₁).finrank_eq, hfr])
 
-theorem complementLiftTransitive : Formalism.HermitianLatticeCounting.S6.LiftTransitive := liftTransitive_of eichlerMapIsometry eichlerMapFixesJointSpan
+theorem complementLiftTransitive : Formalism.HermitianLatticeCounting.S6.LiftTransitive :=
+  liftTransitive_of eichlerMapIsometry eichlerMapFixesJointSpan
 
 end Formalism.HermitianLatticeCounting.P

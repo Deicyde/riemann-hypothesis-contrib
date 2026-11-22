@@ -11,7 +11,15 @@ open scoped BigOperators
 
 namespace GlobalTheory.FinWeil
 
-theorem sumOp_comp_of_between : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, IsHeis σ w γ W → ∀ (A B C : Submodule R X), SelfDual γ A → SelfDual γ B → SelfDual γ C → idx A B ≠ 0 → idx B C ≠ 0 → B ≤ (B ⊓ A) ⊔ (B ⊓ C) → idx A C = idx A B * idx B C ∧ ∀ v, Fixes W A v → sumOp W B C (sumOp W A B v) = sumOp W A C v := by
+theorem sumOp_comp_of_between
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      IsHeis σ w γ W
+        → ∀ (A B C : Submodule R X),
+          SelfDual γ A → SelfDual γ B → SelfDual γ C → idx A B ≠ 0 → idx B C ≠ 0
+            → B ≤ (B ⊓ A) ⊔ (B ⊓ C)
+            → idx A C = idx A B * idx B C
+              ∧ ∀ v, Fixes W A v → sumOp W B C (sumOp W A B v) = sumOp W A C v := by
   intro R X M _ _ _ _ _ σ w γ W h A B C hA hB hC hAB hBC hle
   have hdec : ∀ b ∈ B, ∃ c, c ∈ B ∧ c ∈ C ∧ b - c ∈ A := by
     intro b hb
@@ -56,8 +64,8 @@ theorem sumOp_comp_of_between : ∀ {R X M : Type} [CommRing R] [AddCommGroup X]
     rfl
   have z : ∀ D : Submodule R X, Fixes W D 0 := fun D a _ => map_zero _
   refine ⟨?_, fun v hv => ?_⟩
-  · rw [(tAC 0 (z A) _ (fun p : Fin m × Fin n => g p.1 + f p.2) hkC hk).2, (tAB 0 (z A) _ f hfB hf).2,
-      (tBC 0 (z B) _ g hgC hg).2, Fintype.card_prod, mul_comm]
+  · rw [(tAC 0 (z A) _ (fun p : Fin m × Fin n => g p.1 + f p.2) hkC hk).2,
+      (tAB 0 (z A) _ f hfB hf).2, (tBC 0 (z B) _ g hgC hg).2, Fintype.card_prod, mul_comm]
   · rw [(tBC _ (hfix v hv) _ g hgC hg).1, (tAB v hv _ f hfB hf).1,
       (tAC v hv _ (fun p : Fin m × Fin n => g p.1 + f p.2) hkC hk).1, Fintype.sum_prod_type]
     refine Finset.sum_congr rfl fun j _ => ?_

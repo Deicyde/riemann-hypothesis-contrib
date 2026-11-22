@@ -14,6 +14,10 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 namespace CompanionTheory.RgExh.Dec.N.S
 
 theorem exhaustion_start : CompanionTheory.RgExh.Dec.Start :=
-  GlobalTheory.T.InitialStatement GlobalTheory.T.rgExh_flagFacts GlobalTheory.T.ParabolicSubgroupEquality GlobalTheory.T.rgExh_lineFacts GlobalTheory.T.SlabStatement (GlobalTheory.T.fubini_of_parabolic_haar_multiple GlobalTheory.T.FubiniParabolicMultiple) GlobalTheory.T.MaximalCompactStatement
+  GlobalTheory.T.InitialStatement GlobalTheory.T.rgExh_flagFacts
+    GlobalTheory.T.ParabolicSubgroupEquality GlobalTheory.T.rgExh_lineFacts
+    GlobalTheory.T.SlabStatement
+    (GlobalTheory.T.fubini_of_parabolic_haar_multiple GlobalTheory.T.FubiniParabolicMultiple)
+    GlobalTheory.T.MaximalCompactStatement
 
 end CompanionTheory.RgExh.Dec.N.S

@@ -16,10 +16,13 @@ variable {ι : Type*} {R : ι → Type*} [∀ i, TopologicalSpace (R i)] {A : (i
 
 variable {F : Type} [Field F] [NumberField F]
 
-def loc {a b : F} (v : HeightOneSpectrum (𝓞 F))
-    (x : ℍ[FiniteAdeleRing (𝓞 F) F, algebraMap F (FiniteAdeleRing (𝓞 F) F) a,
-      algebraMap F (FiniteAdeleRing (𝓞 F) F) b]) :
-    ℍ[v.adicCompletion F, algebraMap F (v.adicCompletion F) a, algebraMap F (v.adicCompletion F) b] :=
+def loc
+    {a b : F}
+    (v : HeightOneSpectrum (𝓞 F))
+    (x
+      : ℍ[FiniteAdeleRing (𝓞 F) F, algebraMap F (FiniteAdeleRing (𝓞 F) F) a,
+        algebraMap F (FiniteAdeleRing (𝓞 F) F) b])
+    : ℍ[v.adicCompletion F, algebraMap F (v.adicCompletion F) a, algebraMap F (v.adicCompletion F) b] :=
   ⟨x.re v, x.imI v, x.imJ v, x.imK v⟩
 
 open NumberField IsDedekindDomain in
@@ -123,7 +126,6 @@ private lemma nrm_apply_eq_nrm_finAdele_loc {a b : F}
   change φ (_root_.GlobalTheory.QSA.nrm x) = _
   simp only [_root_.GlobalTheory.QSA.nrm, map_sub, map_add (f := _), map_mul, map_pow]
   rfl
-
 
 open NumberField IsDedekindDomain in
 open scoped Quaternion Topology RestrictedProduct in

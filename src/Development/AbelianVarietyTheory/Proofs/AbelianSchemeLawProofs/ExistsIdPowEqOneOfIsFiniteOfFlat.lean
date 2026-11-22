@@ -23,51 +23,61 @@ section Coalg
 
 variable [AddCommGroup B] [Module R B] [Coalgebra R B] [IsCocomm R B]
 
-
 variable (B) in
 def postcomp (h : C →ₐ[R] F) : WithConv (B →ₗ[R] C) →+* WithConv (B →ₗ[R] F) where
   toFun f := toConv (h.toLinearMap ∘ₗ f.ofConv)
   map_one' := by ext c; simp
-  map_mul' f g := by
-    rw [LinearMap.algHom_comp_convMul_distrib]
+  map_mul' f g := by rw [LinearMap.algHom_comp_convMul_distrib]
   map_zero' := by ext c; simp
   map_add' f g := by ext c; simp
 
 variable [Algebra C F] [IsScalarTower R C F]
 
-theorem pow_card_eq_one {ι : Type*} [Fintype ι] (b : Module.Basis ι C F) (τ : F ≃ₐ[C] F)
-    (x : WithConv (B →ₗ[R] F)) (hx : IsUnit x) (u : WithConv (B →ₗ[R] C))
-    (h : postcomp B (τ.toAlgHom.restrictScalars R) x =
-      x * postcomp B (IsScalarTower.toAlgHom R C F) u) :
-    u ^ Fintype.card ι = 1 := by
+theorem pow_card_eq_one
+    {ι : Type*} [Fintype ι]
+    (b : Module.Basis ι C F)
+    (τ : F ≃ₐ[C] F)
+    (x : WithConv (B →ₗ[R] F)) (hx : IsUnit x)
+    (u : WithConv (B →ₗ[R] C))
+    (h : postcomp B (τ.toAlgHom.restrictScalars R) x
+      = x * postcomp B (IsScalarTower.toAlgHom R C F) u)
+    : u ^ Fintype.card ι = 1 := by
   classical
   letI : Algebra (WithConv (B →ₗ[R] C)) (WithConv (B →ₗ[R] F)) :=
     (postcomp B (IsScalarTower.toAlgHom R C F)).toAlgebra
-  have hsmul : ∀ (g : WithConv (B →ₗ[R] C)) (f : WithConv (B →ₗ[R] F)),
-      g • f = postcomp B (IsScalarTower.toAlgHom R C F) g * f := fun _ _ => rfl
-  let e : WithConv (B →ₗ[R] F) ≃ₗ[WithConv (B →ₗ[R] C)] (ι → WithConv (B →ₗ[R] C)) :=
-    { toFun := fun f i => toConv ((b.coord i).restrictScalars R ∘ₗ f.ofConv)
-      invFun := fun g => toConv (∑ i,
-        (LinearMap.toSpanSingleton C F (b i)).restrictScalars R ∘ₗ (g i).ofConv)
-      map_add' := fun f g => by ext i c; simp
-      map_smul' := fun g f => by
-        ext i c
-        rw [hsmul]
-        simp only [RingHom.id_apply, Pi.smul_apply, smul_eq_mul]
-        rw [(ℛ R c).convMul_apply]
-        simp only [LinearMap.comp_apply]
-        rw [(ℛ R c).convMul_apply]
-        simp [postcomp, ← Algebra.smul_def]
-      left_inv := fun f => by
-        ext c
-        simp
-      right_inv := fun g => by
-        ext i c
-        simp [Finsupp.single_apply] }
+  have hsmul
+      : ∀ (g : WithConv (B →ₗ[R] C)) (f : WithConv (B →ₗ[R] F)),
+        g • f = postcomp B (IsScalarTower.toAlgHom R C F) g * f := fun _ _ =>
+    rfl
+  let e : WithConv (B →ₗ[R] F) ≃ₗ[WithConv (B →ₗ[R] C)] (ι → WithConv (B →ₗ[R] C)) := {
+    toFun := fun f i => toConv ((b.coord i).restrictScalars R ∘ₗ f.ofConv)
+    invFun := fun g =>
+      toConv
+        (∑ i,
+          (LinearMap.toSpanSingleton C F (b i)).restrictScalars R ∘ₗ (g i).ofConv)
+    map_add' := fun f g => by ext i c; simp
+    map_smul' := fun g f => by
+      ext i c
+      rw [hsmul]
+      simp only [RingHom.id_apply, Pi.smul_apply, smul_eq_mul]
+      rw [(ℛ R c).convMul_apply]
+      simp only [LinearMap.comp_apply]
+      rw [(ℛ R c).convMul_apply]
+      simp [postcomp, ← Algebra.smul_def]
+    left_inv := fun f => by
+      ext c
+      simp
+    right_inv := fun g => by
+      ext i c
+      simp [Finsupp.single_apply]
+  }
   let b' := Module.Basis.ofEquivFun e
   let τ' : WithConv (B →ₗ[R] F) ≃ₐ[WithConv (B →ₗ[R] C)] WithConv (B →ₗ[R] F) :=
-    AlgEquiv.ofRingEquiv (f := RingEquiv.ofRingHom (postcomp B (τ.toAlgHom.restrictScalars R))
-      (postcomp B (τ.symm.toAlgHom.restrictScalars R)) (by ext f c; simp [postcomp]) (by ext f c; simp [postcomp]))
+    AlgEquiv.ofRingEquiv
+      (f :=
+        RingEquiv.ofRingHom (postcomp B (τ.toAlgHom.restrictScalars R))
+          (postcomp B (τ.symm.toAlgHom.restrictScalars R)) (by ext f c; simp [postcomp])
+          (by ext f c; simp [postcomp]))
       (fun g => by
         ext c
         exact τ.commutes (g c))
@@ -80,12 +90,12 @@ end Coalg
 
 variable [CommRing B] [HopfAlgebra R B]
 
-theorem mul_comp_antipode (u : B →ₐ[R] C) :
-    toConv u * toConv (u.comp (HopfAlgebra.antipodeAlgHom R B)) = 1 := by
+theorem mul_comp_antipode (u : B →ₐ[R] C)
+    : toConv u * toConv (u.comp (HopfAlgebra.antipodeAlgHom R B)) = 1 := by
   have h : toConv (AlgHom.id R B) * toConv (HopfAlgebra.antipodeAlgHom R B) = 1 :=
     mul_inv_cancel (toConv (AlgHom.id R B))
-  have h2 := AlgHom.comp_convMul_distrib u (toConv (AlgHom.id R B))
-    (toConv (HopfAlgebra.antipodeAlgHom R B))
+  have h2 :=
+    AlgHom.comp_convMul_distrib u (toConv (AlgHom.id R B)) (toConv (HopfAlgebra.antipodeAlgHom R B))
   rw [h] at h2
   apply ofConv_injective
   refine h2.symm.trans ?_
@@ -94,30 +104,34 @@ theorem mul_comp_antipode (u : B →ₐ[R] C) :
 
 variable [IsCocomm R B]
 
-theorem point_pow_card {ι : Type*} [Fintype ι] (b : Module.Basis ι C (C ⊗[R] B))
-    (u : B →ₐ[R] C) : toConv u ^ Fintype.card ι = 1 := by
+theorem point_pow_card {ι : Type*} [Fintype ι] (b : Module.Basis ι C (C ⊗[R] B)) (u : B →ₐ[R] C)
+    : toConv u ^ Fintype.card ι = 1 := by
   let x : WithConv (B →ₐ[R] C ⊗[R] B) := toConv Algebra.TensorProduct.includeRight
   let T : (B →ₐ[R] C) → (C ⊗[R] B →ₐ[C] C ⊗[R] B) := fun v =>
     Algebra.TensorProduct.lift (Algebra.ofId C _)
       (x * toConv ((IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp v)).ofConv
       fun _ _ => Commute.all _ _
-  have hTx : ∀ v, ((T v).restrictScalars R).comp x.ofConv =
-      (x * toConv ((IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp v)).ofConv := fun v => by
+  have hTx
+      : ∀ v,
+        ((T v).restrictScalars R).comp x.ofConv
+          = (x * toConv ((IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp v)).ofConv := fun v => by
     ext c
     simp [T, x]
-  have hTy : ∀ v w : B →ₐ[R] C, ((T v).restrictScalars R).comp
-      ((IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp w) =
-      (IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp w := fun v w => by
+  have hTy
+      : ∀ v w : B →ₐ[R] C,
+        ((T v).restrictScalars R).comp ((IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp w)
+          = (IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp w := fun v w => by
     ext c
     exact (T v).commutes (w c)
   have hTT : ∀ v w : B →ₐ[R] C, toConv v * toConv w = 1 → (T v).comp (T w) = AlgHom.id _ _ := by
     intro v w hvw
     refine Algebra.TensorProduct.ext (Subsingleton.elim _ _) ?_
     change ((T v).restrictScalars R).comp (((T w).restrictScalars R).comp x.ofConv) = x.ofConv
-    have h3 := AlgHom.comp_convMul_distrib (IsScalarTower.toAlgHom R C (C ⊗[R] B))
-      (toConv v) (toConv w)
-    have h4 : (IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp
-        (1 : WithConv (B →ₐ[R] C)).ofConv = (1 : WithConv (B →ₐ[R] C ⊗[R] B)).ofConv := by
+    have h3 :=
+      AlgHom.comp_convMul_distrib (IsScalarTower.toAlgHom R C (C ⊗[R] B)) (toConv v) (toConv w)
+    have h4
+        : (IsScalarTower.toAlgHom R C (C ⊗[R] B)).comp (1 : WithConv (B →ₐ[R] C)).ofConv
+          = (1 : WithConv (B →ₐ[R] C ⊗[R] B)).ofConv := by
       ext c
       simp
     rw [hvw, h4] at h3
@@ -129,30 +143,35 @@ theorem point_pow_card {ι : Type*} [Fintype ι] (b : Module.Basis ι C (C ⊗[R
   have hx : IsUnit (toConv x.ofConv.toLinearMap) := by
     refine IsUnit.of_mul_eq_one
       (toConv (x.ofConv.comp (HopfAlgebra.antipodeAlgHom R B)).toLinearMap) ?_
-    exact congrArg (fun f : WithConv (B →ₐ[R] C ⊗[R] B) => toConv f.ofConv.toLinearMap)
+    exact congrArg
+      (fun f : WithConv (B →ₐ[R] C ⊗[R] B) => toConv f.ofConv.toLinearMap)
       (mul_comp_antipode x.ofConv)
-  have key := pow_card_eq_one b τ _ hx (toConv u.toLinearMap)
-    (congrArg (fun f : B →ₐ[R] C ⊗[R] B => toConv f.toLinearMap) (hTx u))
+  have key :=
+    pow_card_eq_one b τ _ hx (toConv u.toLinearMap)
+      (congrArg (fun f : B →ₐ[R] C ⊗[R] B => toConv f.toLinearMap) (hTx u))
   apply ofConv_injective
   apply AlgHom.toLinearMap_injective
   apply toConv_injective
   rw [AlgHom.toLinearMap_convPow, AlgHom.toLinearMap_convOne]
   exact key
 
-theorem comp_convPow (h : C →ₐ[R] F) (f : WithConv (B →ₐ[R] C)) (n : ℕ) :
-    h.comp (f ^ n).ofConv = (toConv (h.comp f.ofConv) ^ n).ofConv := by
+theorem comp_convPow (h : C →ₐ[R] F) (f : WithConv (B →ₐ[R] C)) (n : ℕ)
+    : h.comp (f ^ n).ofConv = (toConv (h.comp f.ofConv) ^ n).ofConv := by
   induction n with
   | zero => ext c; simp
   | succ n ih => rw [pow_succ, pow_succ, AlgHom.comp_convMul_distrib, ih]
 
-theorem exists_id_pow_eq_one [Module.Finite R B] [Module.Flat R B] :
-    ∃ N : ℕ, 1 ≤ N ∧ toConv (AlgHom.id R B) ^ N = 1 := by
+theorem exists_id_pow_eq_one [Module.Finite R B] [Module.Flat R B]
+    : ∃ N : ℕ, 1 ≤ N ∧ toConv (AlgHom.id R B) ^ N = 1 := by
   obtain ⟨d, s, hs⟩ := Module.Finite.exists_fin (R := R) (M := B)
   refine ⟨d.factorial, d.factorial_pos, ?_⟩
   apply ofConv_injective
   ext c
-  refine Module.eq_of_localization_maximal (R := B) (fun P _ => Localization.AtPrime P)
-    (fun P _ => Algebra.linearMap B (Localization.AtPrime P)) _ _ (fun m hm => ?_)
+  refine Module.eq_of_localization_maximal (R := B)
+    (fun P _ => Localization.AtPrime P)
+    (fun P _ => Algebra.linearMap B (Localization.AtPrime P))
+    _ _
+    (fun m hm => ?_)
   let C := Localization.AtPrime m
   let u : B →ₐ[R] C := IsScalarTower.toAlgHom R B C
   haveI : Module.Free C (C ⊗[R] B) := Module.free_of_flat_of_isLocalRing
@@ -184,24 +203,31 @@ open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCate
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem isCocomm_of_mul_comm {R B : Type*} [CommRing R] [CommRing B] [Bialgebra R B]
-    (h : ∀ f g : WithConv (B →ₐ[R] B ⊗[R] B), f * g = g * f) : Coalgebra.IsCocomm R B := by
+theorem isCocomm_of_mul_comm
+    {R B : Type*} [CommRing R] [CommRing B] [Bialgebra R B]
+    (h : ∀ f g : WithConv (B →ₐ[R] B ⊗[R] B), f * g = g * f)
+    : Coalgebra.IsCocomm R B := by
   let l : WithConv (B →ₐ[R] B ⊗[R] B) := toConv Algebra.TensorProduct.includeLeft
   let r : WithConv (B →ₐ[R] B ⊗[R] B) := toConv Algebra.TensorProduct.includeRight
-  have h1 : (Algebra.TensorProduct.lmul' R).comp (Algebra.TensorProduct.map l.ofConv r.ofConv) =
-      AlgHom.id R (B ⊗[R] B) := by
+  have h1
+      : (Algebra.TensorProduct.lmul' R).comp (Algebra.TensorProduct.map l.ofConv r.ofConv)
+        = AlgHom.id R (B ⊗[R] B) := by
     ext <;> simp [l, r, ← Algebra.TensorProduct.one_def]
-  have h2 : (Algebra.TensorProduct.lmul' R).comp (Algebra.TensorProduct.map r.ofConv l.ofConv) =
-      (Algebra.TensorProduct.comm R B B).toAlgHom := by
+  have h2
+      : (Algebra.TensorProduct.lmul' R).comp (Algebra.TensorProduct.map r.ofConv l.ofConv)
+        = (Algebra.TensorProduct.comm R B B).toAlgHom := by
     ext <;> simp [l, r, ← Algebra.TensorProduct.one_def]
   have h3 := congrArg ofConv (h r l)
   rw [AlgHom.convMul_def, AlgHom.convMul_def, ofConv_toConv, ofConv_toConv, ← AlgHom.comp_assoc,
-    ← AlgHom.comp_assoc, h1, h2] at h3
+      ← AlgHom.comp_assoc, h1, h2]
+    at h3
   exact ⟨LinearMap.ext fun c => congr($h3 c)⟩
 
-theorem exists_id_pow_eq_one_of_isFinite_of_flat (R : Type) [CommRing R]
-    (H : Over (Spec (CommRingCat.of R))) [GrpObj H] [IsCommMonObj H] (hf : IsFinite H.hom)
-    (hfl : Flat H.hom) : ∃ N : ℕ, 1 ≤ N ∧ 𝟙 H ^ N = 1 := by
+theorem exists_id_pow_eq_one_of_isFinite_of_flat
+    (R : Type) [CommRing R]
+    (H : Over (Spec (CommRingCat.of R))) [GrpObj H] [IsCommMonObj H]
+    (hf : IsFinite H.hom) (hfl : Flat H.hom)
+    : ∃ N : ℕ, 1 ≤ N ∧ 𝟙 H ^ N = 1 := by
   have haff : IsAffine H.left := isAffine_of_isAffineHom H.hom
   obtain ⟨A, ⟨e⟩⟩ := (essImage_hopfSpec (G := Grp.mk H)).2 haff
   let B : Type := A.unop
@@ -211,8 +237,9 @@ theorem exists_id_pow_eq_one_of_isFinite_of_flat (R : Type) [CommRing R]
   letI : GrpObj G := instGrpObjSpecAsOverSpec (R := CommRingCat.of R) (A := CommRingCat.of B)
   let i : G ≅ H := (Grp.forget _).mapIso e
   haveI : IsMonHom i.hom := e.hom.hom.isMonHom_hom
-  obtain ⟨j, hj, hw⟩ : ∃ j : Spec (CommRingCat.of B) ⟶ H.left, IsIso j ∧
-      Spec.map (CommRingCat.ofHom (algebraMap R B)) = j ≫ H.hom :=
+  obtain ⟨j, hj, hw⟩
+      : ∃ j : Spec (CommRingCat.of B) ⟶ H.left,
+        IsIso j ∧ Spec.map (CommRingCat.ofHom (algebraMap R B)) = j ≫ H.hom :=
     ⟨i.hom.left, inferInstanceAs (IsIso ((Over.forget _).map i.hom)), (Over.w i.hom).symm⟩
   haveI : Module.Finite R B := by
     have h1 : IsFinite (Spec.map (CommRingCat.ofHom (algebraMap R B))) := by
@@ -240,9 +267,11 @@ theorem exists_id_pow_eq_one_of_isFinite_of_flat (R : Type) [CommRing R]
   rw [← cancel_epi i.hom, MonObj.comp_pow, MonObj.comp_one, Category.comp_id,
     ← Category.id_comp i.hom, ← MonObj.pow_comp, h3, MonObj.one_comp]
 
-theorem main : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (H : Over (Spec (CommRingCat.of R)))
-    [GrpObj H] [IsCommMonObj H], IsFinite H.hom → Flat H.hom → ∃ N : ℕ, 1 ≤ N ∧ 𝟙 H ^ N = 1 :=
-  fun R _ _ H _ _ hf hfl => exists_id_pow_eq_one_of_isFinite_of_flat R H hf hfl
+theorem main
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (H : Over (Spec (CommRingCat.of R))) [GrpObj H]
+        [IsCommMonObj H],
+      IsFinite H.hom → Flat H.hom → ∃ N : ℕ, 1 ≤ N ∧ 𝟙 H ^ N = 1 := fun R _ _ H _ _ hf hfl =>
+  exists_id_pow_eq_one_of_isFinite_of_flat R H hf hfl
 
 end Scheme
 

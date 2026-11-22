@@ -17,25 +17,27 @@ open IsLocalRing KaehlerDifferential TensorProduct
 
 theorem PolyDerivationsDetectSquare.of_perfectField
     (h₁ : PerfectFieldExtensionFormallySmooth.Statement) (h₂ : PolyKaehlerFree.Statement)
-    (F k : Type) [Field F] [Field k] [Algebra F k] [PerfectField F] (n : ℕ)
-    (p : Ideal (MvPolynomial (Fin n) k)) [p.IsPrime] (g : MvPolynomial (Fin n) k) (hg : g ∈ p)
-    (hD : ∀ D : Derivation ℤ (MvPolynomial (Fin n) k) (MvPolynomial (Fin n) k), D g ∈ p) :
-    algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g ∈
-      maximalIdeal (Localization.AtPrime p) ^ 2 := by
+    (F k : Type) [Field F] [Field k] [Algebra F k] [PerfectField F]
+    (n : ℕ) (p : Ideal (MvPolynomial (Fin n) k)) [p.IsPrime]
+    (g : MvPolynomial (Fin n) k) (hg : g ∈ p)
+    (hD : ∀ D : Derivation ℤ (MvPolynomial (Fin n) k) (MvPolynomial (Fin n) k), D g ∈ p)
+    : algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g
+      ∈ maximalIdeal (Localization.AtPrime p) ^ 2 := by
   classical
-
   have : Algebra.FormallySmooth F k := h₁ F k
   have : Algebra.FormallySmooth F p.ResidueField := h₁ F p.ResidueField
   have : Algebra.FormallySmooth F (MvPolynomial (Fin n) k) :=
     Algebra.FormallySmooth.comp F k (MvPolynomial (Fin n) k)
   have hsurj : Function.Surjective (algebraMap (Localization.AtPrime p) p.ResidueField) :=
     IsLocalRing.residue_surjective
-  obtain ⟨ret, hret⟩ := (Algebra.FormallySmooth.iff_split_injection (R := F)
-    (P := Localization.AtPrime p) hsurj).mp inferInstance
+  obtain ⟨ret, hret⟩ :=
+    (Algebra.FormallySmooth.iff_split_injection (R := F) (P := Localization.AtPrime p) hsurj).mp
+      inferInstance
   have hinj : Function.Injective (kerCotangentToTensor F (Localization.AtPrime p) p.ResidueField) :=
     Function.LeftInverse.injective (g := ret) fun x => LinearMap.congr_fun hret x
-  have hgI : algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g ∈
-      RingHom.ker (algebraMap (Localization.AtPrime p) p.ResidueField) := by
+  have hgI
+      : algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g
+        ∈ RingHom.ker (algebraMap (Localization.AtPrime p) p.ResidueField) := by
     rw [RingHom.mem_ker, ← IsScalarTower.algebraMap_apply]
     exact Ideal.algebraMap_residueField_eq_zero.mpr hg
 
@@ -44,10 +46,14 @@ theorem PolyDerivationsDetectSquare.of_perfectField
   have hc : ∀ α, b.repr (D F (MvPolynomial (Fin n) k) g) α ∈ p := fun α =>
     hD (((b.coord α).compDer (D F (MvPolynomial (Fin n) k))).restrictScalars ℤ)
 
-  have hzero : kerCotangentToTensor F (Localization.AtPrime p) p.ResidueField
-      (Ideal.toCotangent _ ⟨_, hgI⟩) = 0 := by
-    change (1 : p.ResidueField) ⊗ₜ[Localization.AtPrime p]
-      D F (Localization.AtPrime p) (algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g) = 0
+  have hzero
+      : kerCotangentToTensor F (Localization.AtPrime p) p.ResidueField
+          (Ideal.toCotangent _ ⟨_, hgI⟩)
+        = 0 := by
+    change
+      (1 : p.ResidueField) ⊗ₜ[Localization.AtPrime p]
+          D F (Localization.AtPrime p) (algebraMap (MvPolynomial (Fin n) k) (Localization.AtPrime p) g)
+        = 0
     rw [← map_D F F (MvPolynomial (Fin n) k) (Localization.AtPrime p),
       ← b.linearCombination_repr (D F (MvPolynomial (Fin n) k) g), Finsupp.linearCombination_apply,
       map_finsuppSum, Finsupp.sum, tmul_sum]
@@ -56,14 +62,17 @@ theorem PolyDerivationsDetectSquare.of_perfectField
       ← algebraMap_smul p.ResidueField, ← IsScalarTower.algebraMap_apply,
       Ideal.algebraMap_residueField_eq_zero.mpr (hc α), zero_smul]
   have h0 := hinj (hzero.trans (map_zero _).symm)
-  have hker : RingHom.ker (algebraMap (Localization.AtPrime p) p.ResidueField) =
-      maximalIdeal (Localization.AtPrime p) := IsLocalRing.ker_residue
+  have hker
+      : RingHom.ker (algebraMap (Localization.AtPrime p) p.ResidueField)
+        = maximalIdeal (Localization.AtPrime p) :=
+    IsLocalRing.ker_residue
   rw [Ideal.toCotangent_eq_zero] at h0
   rw [← hker]
   exact h0
 
-theorem PolyDerivationsDetectSquare.proof (h₁ : PerfectFieldExtensionFormallySmooth.Statement)
-    (h₂ : PolyKaehlerFree.Statement) : PolyDerivationsDetectSquare.Statement := by
+theorem PolyDerivationsDetectSquare.proof
+    (h₁ : PerfectFieldExtensionFormallySmooth.Statement) (h₂ : PolyKaehlerFree.Statement)
+    : PolyDerivationsDetectSquare.Statement := by
   intro k _ n p _ g hg hD
   obtain ⟨q, hq⟩ := CharP.exists k
   rcases CharP.char_is_prime_or_zero k q with hqp | rfl

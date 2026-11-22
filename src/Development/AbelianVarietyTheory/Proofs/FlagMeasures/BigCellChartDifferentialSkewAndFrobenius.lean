@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LieEntriesUni
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.CellDens
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.CellDens.DNorm
@@ -181,45 +182,57 @@ lemma norm_torD (x : Fin r → ℂ) : ∑ i, ∑ j, ‖torD k r x i j‖ ^ 2 = 2
   rw [hsw, hG]
   ring
 
-theorem dchart_skew_norm : ∀ (k r : ℕ) (v : EE k r),
-    ((dchart k r v)ᴴ * Hpk k r + Hpk k r * dchart k r v = 0) ∧
-    (∑ i, ∑ j, ‖dchart k r v i j‖ ^ 2) =
-      ‖v.1.1‖ ^ 2 + ‖v.1.2‖ ^ 2 + 2 * (∑ a, ‖v.2.1 a‖ ^ 2) + ‖v.2.2‖ ^ 2 := by
+theorem dchart_skew_norm
+    : ∀ (k r : ℕ) (v : EE k r),
+      ((dchart k r v)ᴴ * Hpk k r + Hpk k r * dchart k r v = 0)
+        ∧ (∑ i, ∑ j, ‖dchart k r v i j‖ ^ 2)
+          = ‖v.1.1‖ ^ 2 + ‖v.1.2‖ ^ 2 + 2 * (∑ a, ‖v.2.1 a‖ ^ 2) + ‖v.2.2‖ ^ 2 := by
   intro k r v
   obtain ⟨⟨X, X'⟩, ⟨x, Y⟩⟩ := v
   have hX := (GlobalTheory.CellDens.LieN.lieE_Nset k r (X : EuclideanSpace ℝ _)).1.1 X.2
   have hX' := (GlobalTheory.CellDens.LieN.lieE_Nset k r (X' : EuclideanSpace ℝ _)).1.1 X'.2
   have hY := (GlobalTheory.CellLieAlg.lie_entries k r (Y : EuclideanSpace ℝ _)).2.1.1 Y.2
-  change (um X)ᴴ * Hpk k r + Hpk k r * um X = 0 ∧
-    ∀ i j : Fin (2 * r + k + 1), lev k r j ≤ lev k r i → um X i j = 0 at hX
-  change (um X')ᴴ * Hpk k r + Hpk k r * um X' = 0 ∧
-    ∀ i j : Fin (2 * r + k + 1), lev k r j ≤ lev k r i → um X' i j = 0 at hX'
-  change (um Y)ᴴ * Hpk k r + Hpk k r * um Y = 0 ∧ ∀ i j : Fin (2 * r + k + 1),
-    ¬ ((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) → um Y i j = 0 at hY
+  change (um X)ᴴ * Hpk k r + Hpk k r * um X = 0
+      ∧ ∀ i j : Fin (2 * r + k + 1), lev k r j ≤ lev k r i → um X i j = 0
+    at hX
+  change (um X')ᴴ * Hpk k r + Hpk k r * um X' = 0
+      ∧ ∀ i j : Fin (2 * r + k + 1), lev k r j ≤ lev k r i → um X' i j = 0
+    at hX'
+  change (um Y)ᴴ * Hpk k r + Hpk k r * um Y = 0
+      ∧ ∀ i j : Fin (2 * r + k + 1),
+        ¬((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) → um Y i j = 0
+    at hY
   show (-(wC k r * um X * wC k r) + torD k r x + um Y + um X')ᴴ * Hpk k r +
       Hpk k r * (-(wC k r * um X * wC k r) + torD k r x + um Y + um X') = 0 ∧
     (∑ i, ∑ j, ‖(-(wC k r * um X * wC k r) + torD k r x + um Y + um X') i j‖ ^ 2) =
       ‖X‖ ^ 2 + ‖X'‖ ^ 2 + 2 * (∑ a, ‖x a‖ ^ 2) + ‖Y‖ ^ 2
   refine ⟨?_, ?_⟩
-  · have e : ∀ A T B C : Mat k r, (-A + T + B + C)ᴴ * Hpk k r + Hpk k r * (-A + T + B + C) =
-        -(Aᴴ * Hpk k r + Hpk k r * A) + (Tᴴ * Hpk k r + Hpk k r * T) + (Bᴴ * Hpk k r + Hpk k r * B) +
-          (Cᴴ * Hpk k r + Hpk k r * C) := by
+  · have e
+        : ∀ A T B C : Mat k r,
+          (-A + T + B + C)ᴴ * Hpk k r + Hpk k r * (-A + T + B + C)
+            = -(Aᴴ * Hpk k r + Hpk k r * A) + (Tᴴ * Hpk k r + Hpk k r * T)
+              + (Bᴴ * Hpk k r + Hpk k r * B) + (Cᴴ * Hpk k r + Hpk k r * C) := by
       intro A T B C
       simp only [conjTranspose_add, conjTranspose_neg, add_mul, mul_add, neg_mul, mul_neg]
       abel
     rw [e, skew_conj hX.1, skew_torD x, hY.1, hX'.1]
     simp
-  · have hmid : ∀ i : Fin (2 * r + k + 1), r ≤ i.val ∧ i.val ≤ r + k → lev k r i = r := fun i h => by
+  · have hmid
+        : ∀ i : Fin (2 * r + k + 1), r ≤ i.val ∧ i.val ≤ r + k → lev k r i = r := fun i h => by
       unfold lev
       rw [if_neg (by omega), if_pos h.2]
     have hToff : ∀ i j : Fin (2 * r + k + 1), i ≠ j → torD k r x i j = 0 := fun i j h => by
       unfold torD
       exact Matrix.diagonal_apply_ne _ h
-    have hTmid : ∀ i : Fin (2 * r + k + 1), r ≤ i.val ∧ i.val ≤ r + k → torD k r x i i = 0 := fun i h => by
+    have hTmid
+        : ∀ i : Fin (2 * r + k + 1), r ≤ i.val ∧ i.val ≤ r + k → torD k r x i i = 0 := fun i h => by
       unfold torD
       rw [Matrix.diagonal_apply_eq, dif_neg (by omega), dif_neg (by omega)]
-    have hentry : ∀ i j, ‖(-(wC k r * um X * wC k r) + torD k r x + um Y + um X') i j‖ ^ 2 =
-        ‖um X (sw k r i) (sw k r j)‖ ^ 2 + ‖um X' i j‖ ^ 2 + ‖torD k r x i j‖ ^ 2 + ‖um Y i j‖ ^ 2 := by
+    have hentry
+        : ∀ i j,
+          ‖(-(wC k r * um X * wC k r) + torD k r x + um Y + um X') i j‖ ^ 2
+            = ‖um X (sw k r i) (sw k r j)‖ ^ 2 + ‖um X' i j‖ ^ 2 + ‖torD k r x i j‖ ^ 2
+              + ‖um Y i j‖ ^ 2 := by
       intro i j
       simp only [Matrix.add_apply, Matrix.neg_apply, conj_apply]
       have li := lev_sw (k := k) (r := r) i
@@ -227,10 +240,11 @@ theorem dchart_skew_norm : ∀ (k r : ℕ) (v : EE k r),
       rcases lt_trichotomy (lev k r j) (lev k r i) with h | h | h
       · have h1 : um X' i j = 0 := hX'.2 i j h.le
         have h2 : torD k r x i j = 0 := hToff i j (by rintro rfl; omega)
-        have h3 : um Y i j = 0 := hY.2 i j (by
-          rintro ⟨hi, hj⟩
-          rw [hmid i hi, hmid j hj] at h
-          omega)
+        have h3 : um Y i j = 0 :=
+          hY.2 i j (by
+            rintro ⟨hi, hj⟩
+            rw [hmid i hi, hmid j hj] at h
+            omega)
         rw [h1, h2, h3]
         simp
       · have h0 : um X (sw k r i) (sw k r j) = 0 := hX.2 _ _ (by omega)
@@ -248,15 +262,17 @@ theorem dchart_skew_norm : ∀ (k r : ℕ) (v : EE k r),
           simp
       · have h0 : um X (sw k r i) (sw k r j) = 0 := hX.2 _ _ (by omega)
         have h2 : torD k r x i j = 0 := hToff i j (by rintro rfl; omega)
-        have h3 : um Y i j = 0 := hY.2 i j (by
-          rintro ⟨hi, hj⟩
-          rw [hmid i hi, hmid j hj] at h
-          omega)
+        have h3 : um Y i j = 0 :=
+          hY.2 i j (by
+            rintro ⟨hi, hj⟩
+            rw [hmid i hi, hmid j hj] at h
+            omega)
         rw [h0, h2, h3]
         simp
     have hswX : ∑ i, ∑ j, ‖um X (sw k r i) (sw k r j)‖ ^ 2 = ∑ i, ∑ j, ‖um X i j‖ ^ 2 := by
       have h1 : ∀ i, ∑ j, ‖um X i (sw k r j)‖ ^ 2 = ∑ j, ‖um X i j‖ ^ 2 := fun i =>
-        Equiv.sum_comp (Function.Involutive.toPerm (sw k r) (fun j => sw_sw j)) (fun j => ‖um X i j‖ ^ 2)
+        Equiv.sum_comp (Function.Involutive.toPerm (sw k r) (fun j => sw_sw j))
+          (fun j => ‖um X i j‖ ^ 2)
       simp only [h1]
       exact Equiv.sum_comp (Function.Involutive.toPerm (sw k r) (fun j => sw_sw j))
         (fun i => ∑ j, ‖um X i j‖ ^ 2)

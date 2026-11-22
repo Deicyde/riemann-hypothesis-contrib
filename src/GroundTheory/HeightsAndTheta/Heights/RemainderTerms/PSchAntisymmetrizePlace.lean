@@ -18,21 +18,24 @@ def smallBlockPlaceEquiv (r a : ℕ) (c : SmallBlock) : Fin r ⊕ Fin a ≃ Fin 
   toFun x := (smallBlockPlace r a c x).2
   invFun := smallBlockOf r a c
   left_inv x := by
-    cases c <;> rcases x with i | j <;>
-      simp [smallBlockPlace, smallBlockOf, yIndex, zIndex]
+    cases c <;> rcases x with i | j <;> simp [smallBlockPlace, smallBlockOf, yIndex, zIndex]
   right_inv p := by
     cases c
     · by_cases h : (p : ℕ) < a
       · simp [smallBlockPlace, smallBlockOf, zIndex, h]
       · simp only [smallBlockOf, h, dite_false, smallBlockPlace, Sum.elim_inl, yIndex]
-        ext; simp; omega
+        ext
+        simp
+        omega
     · by_cases h : (p : ℕ) < r
       · simp [smallBlockPlace, smallBlockOf, yIndex, h]
       · simp only [smallBlockOf, h, dite_false, smallBlockPlace, Sum.elim_inr, zIndex]
-        ext; simp; omega
+        ext
+        simp
+        omega
 
-theorem smallBlockPlace_eq (r a : ℕ) (c : SmallBlock) (x : Fin r ⊕ Fin a) :
-    smallBlockPlace r a c x = (0, smallBlockPlaceEquiv r a c x) := by
+theorem smallBlockPlace_eq (r a : ℕ) (c : SmallBlock) (x : Fin r ⊕ Fin a)
+    : smallBlockPlace r a c x = (0, smallBlockPlaceEquiv r a c x) := by
   exact Prod.ext (Subsingleton.elim _ _) rfl
 
 theorem SchAntisymmetrizePlace.proof : SchAntisymmetrizePlace.Statement := by

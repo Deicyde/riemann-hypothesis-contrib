@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLin
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.SplitHecke
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+  GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -15,11 +18,13 @@ namespace GlobalTheory.SplitHecke.Cosets
 
 open IsLocalRing
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-  [IsFractionRing O K] {p : O}
+variable
+  {O K : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  {p : O}
 
-theorem map_res_eq_zero_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m) (Fin n) O) :
-    X.map (residue O) = 0 ↔ ∃ C : Matrix (Fin m) (Fin n) O, X = p • C := by
+theorem map_res_eq_zero_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m) (Fin n) O)
+    : X.map (residue O) = 0 ↔ ∃ C : Matrix (Fin m) (Fin n) O, X = p • C := by
   have hm : maximalIdeal O = Ideal.span {p} := hp.maximalIdeal_eq
   constructor
   · intro h
@@ -37,19 +42,20 @@ theorem map_res_eq_zero_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m)
       exact dvd_mul_right _ _
     exact this
 
-theorem map_inj {m n : ℕ} {X Y : Matrix (Fin m) (Fin n) O}
-    (h : X.map (algebraMap O K) = Y.map (algebraMap O K)) : X = Y := by
+theorem map_inj
+    {m n : ℕ} {X Y : Matrix (Fin m) (Fin n) O} (h : X.map (algebraMap O K) = Y.map (algebraMap O K))
+    : X = Y := by
   ext i j
   exact IsFractionRing.injective O K (congrFun (congrFun h i) j)
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem map_smul' {m n : ℕ} (c : O) (X : Matrix (Fin m) (Fin n) O) :
-    (c • X).map (algebraMap O K) = algebraMap O K c • X.map (algebraMap O K) := by
+theorem map_smul' {m n : ℕ} (c : O) (X : Matrix (Fin m) (Fin n) O)
+    : (c • X).map (algebraMap O K) = algebraMap O K c • X.map (algebraMap O K) := by
   ext i j
   simp
 
-theorem intM_inv_smul_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m) (Fin n) O) :
-    IntM O ((algebraMap O K p)⁻¹ • X.map (algebraMap O K)) ↔ X.map (residue O) = 0 := by
+theorem intM_inv_smul_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m) (Fin n) O)
+    : IntM O ((algebraMap O K p)⁻¹ • X.map (algebraMap O K)) ↔ X.map (residue O) = 0 := by
   have h0 : algebraMap O K p ≠ 0 := by
     intro h
     exact hp.ne_zero (IsFractionRing.injective O K (by rw [h, map_zero]))
@@ -62,11 +68,16 @@ theorem intM_inv_smul_iff (hp : Irreducible p) {m n : ℕ} (X : Matrix (Fin m) (
     refine ⟨C, ?_⟩
     rw [map_smul', smul_smul, inv_mul_cancel₀ h0, one_smul]
 
-theorem exists_of_range_le (hp : Irreducible p) {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O}
-    (h : LinearMap.range (A'.map (residue O)).mulVecLin ≤ LinearMap.range (A.map (residue O)).mulVecLin) :
-    ∃ B C : Matrix (Fin n) (Fin n) O, A' = A * B + p • C := by
-  have h1 : ∀ j, ∃ b : Fin n → O, (A.map (residue O)) *ᵥ (fun i => residue O (b i)) =
-      (A'.map (residue O)) *ᵥ Pi.single j 1 := by
+theorem exists_of_range_le
+    (hp : Irreducible p)
+    {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O}
+    (h : LinearMap.range (A'.map (residue O)).mulVecLin
+      ≤ LinearMap.range (A.map (residue O)).mulVecLin)
+    : ∃ B C : Matrix (Fin n) (Fin n) O, A' = A * B + p • C := by
+  have h1
+      : ∀ j, ∃ b : Fin n → O,
+        (A.map (residue O)) *ᵥ (fun i => residue O (b i))
+          = (A'.map (residue O)) *ᵥ Pi.single j 1 := by
     intro j
     obtain ⟨y, hy⟩ := h ⟨Pi.single j 1, rfl⟩
     choose b hb using fun i => residue_surjective (R := O) (y i)
@@ -75,17 +86,21 @@ theorem exists_of_range_le (hp : Irreducible p) {n : ℕ} {A A' : Matrix (Fin n)
     rw [this]
     exact hy
   choose b hb using h1
-  obtain ⟨C, hC⟩ := (map_res_eq_zero_iff hp (A' - A * Matrix.of fun i j => b j i)).1 (by
-    ext i j
-    have := congrFun (hb j) i
-    rw [Matrix.mulVec_single_one] at this
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.col_apply] at this
-    simp [Matrix.mul_apply, ← this])
+  obtain ⟨C, hC⟩ :=
+    (map_res_eq_zero_iff hp (A' - A * Matrix.of fun i j => b j i)).1 (by
+      ext i j
+      have := congrFun (hb j) i
+      rw [Matrix.mulVec_single_one] at this
+      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.col_apply] at this
+      simp [Matrix.mul_apply, ← this])
   exact ⟨_, C, by rw [← hC]; abel⟩
 
-theorem range_le_of_mul {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O} {a a' : GL (Fin n) K}
-    (hA : A.map (algebraMap O K) = a.1) (hA' : A'.map (algebraMap O K) = a'.1) (h : IntM O (a⁻¹ * a').1) :
-    LinearMap.range (A'.map (residue O)).mulVecLin ≤ LinearMap.range (A.map (residue O)).mulVecLin := by
+theorem range_le_of_mul
+    {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O} {a a' : GL (Fin n) K}
+    (hA : A.map (algebraMap O K) = a.1) (hA' : A'.map (algebraMap O K) = a'.1)
+    (h : IntM O (a⁻¹ * a').1)
+    : LinearMap.range (A'.map (residue O)).mulVecLin
+      ≤ LinearMap.range (A.map (residue O)).mulVecLin := by
   obtain ⟨B, hB⟩ := intM_iff.1 h
   have : A' = A * B := by
     refine map_inj (K := K) ?_
@@ -93,20 +108,25 @@ theorem range_le_of_mul {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O} {a a' : GL (
   rw [this, Matrix.map_mul, Matrix.mulVecLin_mul]
   exact LinearMap.range_comp_le_range _ _
 
-theorem intM_of_range_le (hp : Irreducible p) {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O} {a a' : GL (Fin n) K}
+theorem intM_of_range_le
+    (hp : Irreducible p)
+    {n : ℕ} {A A' : Matrix (Fin n) (Fin n) O} {a a' : GL (Fin n) K}
     (hA : A.map (algebraMap O K) = a.1) (hA' : A'.map (algebraMap O K) = a'.1)
     (ha : IntM O (algebraMap O K p • (a⁻¹).1))
-    (h : LinearMap.range (A'.map (residue O)).mulVecLin ≤ LinearMap.range (A.map (residue O)).mulVecLin) :
-    IntM O (a⁻¹ * a').1 := by
+    (h : LinearMap.range (A'.map (residue O)).mulVecLin
+      ≤ LinearMap.range (A.map (residue O)).mulVecLin)
+    : IntM O (a⁻¹ * a').1 := by
   obtain ⟨B, C, hBC⟩ := exists_of_range_le hp h
-  have : (a⁻¹ * a').1 = B.map (algebraMap O K) + (algebraMap O K p • (a⁻¹).1) * C.map (algebraMap O K) := by
-    rw [Units.val_mul, ← hA', hBC, Matrix.map_add _ (map_add _), Matrix.map_mul, map_smul', hA, Matrix.mul_add,
-      ← Matrix.mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mul, Matrix.mul_smul,
-      Matrix.smul_mul]
+  have : (a⁻¹ * a').1
+      = B.map (algebraMap O K) + (algebraMap O K p • (a⁻¹).1) * C.map (algebraMap O K) := by
+    rw [Units.val_mul, ← hA', hBC, Matrix.map_add _ (map_add _), Matrix.map_mul, map_smul', hA,
+      Matrix.mul_add, ← Matrix.mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+      Matrix.one_mul, Matrix.mul_smul, Matrix.smul_mul]
   rw [this]
   exact (intM_iff.2 ⟨B, rfl⟩).add (ha.mul (intM_iff.2 ⟨C, rfl⟩))
 
-theorem GInt.exists_det {n : ℕ} {k : GL (Fin n) K} (hk : GInt O k) : ∃ u : Oˣ, k.1.det = algebraMap O K u := by
+theorem GInt.exists_det {n : ℕ} {k : GL (Fin n) K} (hk : GInt O k)
+    : ∃ u : Oˣ, k.1.det = algebraMap O K u := by
   obtain ⟨A, hA⟩ := intM_iff.1 hk.1
   obtain ⟨B, hB⟩ := intM_iff.1 hk.2
   have : A * B = 1 := by
@@ -118,8 +138,9 @@ theorem GInt.exists_det {n : ℕ} {k : GL (Fin n) K} (hk : GInt O k) : ∃ u : O
   rw [← hA, IsUnit.unit_spec, RingHom.map_det]
   rfl
 
-theorem hk_mul {n j : ℕ} {α k₁ k₂ : GL (Fin n) K} (hα : Hk O p j α) (h₁ : GInt O k₁) (h₂ : GInt O k₂) :
-    Hk O p j (k₁ * α * k₂) := by
+theorem hk_mul
+    {n j : ℕ} {α k₁ k₂ : GL (Fin n) K} (hα : Hk O p j α) (h₁ : GInt O k₁) (h₂ : GInt O k₂)
+    : Hk O p j (k₁ * α * k₂) := by
   refine ⟨(h₁.1.mul hα.1).mul h₂.1, ?_, ?_⟩
   · have := (h₂.2.mul hα.2.1).mul h₁.2
     rw [_root_.mul_inv_rev, _root_.mul_inv_rev, Units.val_mul, Units.val_mul]
@@ -128,19 +149,24 @@ theorem hk_mul {n j : ℕ} {α k₁ k₂ : GL (Fin n) K} (hα : Hk O p j α) (h�
     obtain ⟨u₁, hu₁⟩ := GInt.exists_det h₁
     obtain ⟨u₂, hu₂⟩ := GInt.exists_det h₂
     refine ⟨u₁ * u * u₂, ?_⟩
-    rw [Units.val_mul, Units.val_mul, Matrix.det_mul, Matrix.det_mul, hu, hu₁, hu₂, ← map_mul, ← map_mul]
+    rw [Units.val_mul, Units.val_mul, Matrix.det_mul, Matrix.det_mul, hu, hu₁, hu₂, ← map_mul,
+      ← map_mul]
     congr 1
     push_cast
     ring
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-theorem gInt_map {n : ℕ} (g : GL (Fin n) O) : GInt O (Matrix.GeneralLinearGroup.map (algebraMap O K) g) :=
+theorem gInt_map {n : ℕ} (g : GL (Fin n) O)
+    : GInt O (Matrix.GeneralLinearGroup.map (algebraMap O K) g) :=
   ⟨intM_iff.2 ⟨g.1, rfl⟩, by rw [← map_inv]; exact intM_iff.2 ⟨(g⁻¹).1, rfl⟩⟩
 
-theorem cond_iff (hp : Irreducible p) {m n : ℕ} (z : Matrix (Fin m) (Fin n) O) {A : Matrix (Fin n) (Fin n) O}
-    {a : Matrix (Fin n) (Fin n) K} (hA : A.map (algebraMap O K) = a) :
-    IntM O (((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) * a) ↔
-      LinearMap.range (A.map (residue O)).mulVecLin ≤ LinearMap.ker (z.map (residue O)).mulVecLin := by
+theorem cond_iff
+    (hp : Irreducible p)
+    {m n : ℕ} (z : Matrix (Fin m) (Fin n) O)
+    {A : Matrix (Fin n) (Fin n) O} {a : Matrix (Fin n) (Fin n) K} (hA : A.map (algebraMap O K) = a)
+    : IntM O (((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) * a)
+      ↔ LinearMap.range (A.map (residue O)).mulVecLin
+        ≤ LinearMap.ker (z.map (residue O)).mulVecLin := by
   rw [← hA, Matrix.smul_mul, ← Matrix.map_mul, intM_inv_smul_iff hp, LinearMap.range_le_ker_iff,
     ← Matrix.mulVecLin_mul, Matrix.map_mul]
   constructor
@@ -151,7 +177,20 @@ theorem cond_iff (hp : Irreducible p) {m n : ℕ} (z : Matrix (Fin m) (Fin n) O)
     rw [map_zero]
     exact h
 
-theorem card_cosets : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K] (p : O), Irreducible p → ∀ (m n j : ℕ) (ι : Type) (α : GL (Fin n) K) (R : Finset ι) (ρ : ι → GL (Fin n) K) (z : Matrix (Fin m) (Fin n) O), j ≤ n → Hk O p j α → Reps O α R ρ → Nat.card {γ : ι // γ ∈ R ∧ IntM O (((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) * (ρ γ).1)} = Nat.card {W : Submodule (IsLocalRing.ResidueField O) (Fin n → IsLocalRing.ResidueField O) // Module.finrank (IsLocalRing.ResidueField O) W + j = n ∧ W ≤ LinearMap.ker (z.map (IsLocalRing.residue O)).mulVecLin} := by
+theorem card_cosets
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        [IsFractionRing O K] (p : O),
+      Irreducible p
+        → ∀ (m n j : ℕ) (ι : Type) (α : GL (Fin n) K) (R : Finset ι) (ρ : ι → GL (Fin n) K)
+            (z : Matrix (Fin m) (Fin n) O),
+          j ≤ n → Hk O p j α → Reps O α R ρ
+            → Nat.card
+                {γ : ι
+                  // γ ∈ R ∧ IntM O (((algebraMap O K p)⁻¹ • z.map (algebraMap O K)) * (ρ γ).1)}
+              = Nat.card
+                {W : Submodule (IsLocalRing.ResidueField O) (Fin n → IsLocalRing.ResidueField O)
+                  // Module.finrank (IsLocalRing.ResidueField O) W + j = n
+                    ∧ W ≤ LinearMap.ker (z.map (IsLocalRing.residue O)).mulVecLin} := by
   intro O K _ _ _ _ _ _ p hp m n j ι α R ρ z hj hα hR
   have hH : ∀ γ ∈ R, Hk O p j (ρ γ) := by
     intro γ hγ
@@ -159,11 +198,18 @@ theorem card_cosets : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValu
     rw [h]
     exact hk_mul hα h₁ h₂
   choose A hA using fun γ (hγ : γ ∈ R) => intM_iff.1 (hH γ hγ).1
-  refine Nat.card_eq_of_bijective (fun γ => ⟨LinearMap.range ((A γ.1 γ.2.1).map (residue O)).mulVecLin,
-    GlobalTheory.SplitHecke.finrank_range_reduction O K p hp n j _ _ hj (hH _ γ.2.1) (hA _ γ.2.1), (cond_iff hp z (hA _ γ.2.1)).1 γ.2.2⟩) ⟨?_, ?_⟩
+  refine Nat.card_eq_of_bijective
+    (fun γ => ⟨
+      LinearMap.range ((A γ.1 γ.2.1).map (residue O)).mulVecLin,
+      GlobalTheory.SplitHecke.finrank_range_reduction O K p hp n j _ _ hj (hH _ γ.2.1) (hA _ γ.2.1),
+      (cond_iff hp z (hA _ γ.2.1)).1 γ.2.2
+    ⟩)
+    ⟨?_, ?_⟩
   · rintro ⟨γ, hγ, hγ1⟩ ⟨γ', hγ', hγ2⟩ h
-    have h' : LinearMap.range ((A γ hγ).map (residue O)).mulVecLin =
-        LinearMap.range ((A γ' hγ').map (residue O)).mulVecLin := congrArg Subtype.val h
+    have h'
+        : LinearMap.range ((A γ hγ).map (residue O)).mulVecLin
+          = LinearMap.range ((A γ' hγ').map (residue O)).mulVecLin :=
+      congrArg Subtype.val h
     have hG : GInt O ((ρ γ)⁻¹ * ρ γ') := by
       refine ⟨intM_of_range_le hp (hA γ hγ) (hA γ' hγ') (hH γ hγ).2.1 h'.ge, ?_⟩
       rw [_root_.mul_inv_rev, inv_inv]
@@ -175,11 +221,14 @@ theorem card_cosets : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValu
   · rintro ⟨W, hW, hWz⟩
     obtain ⟨A₀, hA₀⟩ := intM_iff.1 hα.1
     have h0 := GlobalTheory.SplitHecke.finrank_range_reduction O K p hp n j _ _ hj hα hA₀
-    obtain ⟨g, hg⟩ := GlobalTheory.SplitHecke.exists_gl_map_residue_eq O n (LinearMap.range (A₀.map (residue O)).mulVecLin) W (by omega)
+    obtain ⟨g, hg⟩ :=
+      GlobalTheory.SplitHecke.exists_gl_map_residue_eq O n
+        (LinearMap.range (A₀.map (residue O)).mulVecLin) W (by omega)
     obtain ⟨γ, ⟨hγ, hG⟩, -⟩ := hR.2 _ 1 (gInt_map g) gInt_one
     rw [mul_one] at hG
-    have hgA : (g.1 * A₀).map (algebraMap O K) =
-        (Matrix.GeneralLinearGroup.map (algebraMap O K) g * α).1 := by
+    have hgA
+        : (g.1 * A₀).map (algebraMap O K)
+          = (Matrix.GeneralLinearGroup.map (algebraMap O K) g * α).1 := by
       rw [Matrix.map_mul, hA₀]
       rfl
     have hr : LinearMap.range ((A γ hγ).map (residue O)).mulVecLin = W := by

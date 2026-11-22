@@ -18,12 +18,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
 
-theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)), 𝔣 ≠ ⊥ →
-    ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F), IsConeDomain 𝔣 r v := by
+theorem exists_coneDomain
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (𝔣 : Ideal (𝓞 F)),
+      𝔣 ≠ ⊥
+        → ∃ (ι : Type) (_ : Fintype ι) (r : ι → ℕ) (v : ∀ c, Fin (r c) → F),
+          IsConeDomain 𝔣 r v := by
   intro F _ _ _ 𝔣 h𝔣
   classical
   obtain ⟨M, hM⟩ := GlobalTheory.T.exists_congruence_unit_balancing_embeddings F 𝔣 h𝔣
@@ -35,7 +40,9 @@ theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyR
     exact ⟨w.embedding_of_isReal (IsTotallyReal.isReal w)⟩
 
   let G := ↥(congSubgroup 𝔣)
-  let φ : G →* F := ((algebraMap (𝓞 F) F : 𝓞 F →+* F) : 𝓞 F →* F).comp ((Units.coeHom (𝓞 F)).comp (congSubgroup 𝔣).subtype)
+  let φ : G →* F :=
+    ((algebraMap (𝓞 F) F : 𝓞 F →+* F) : 𝓞 F →* F).comp
+      ((Units.coeHom (𝓞 F)).comp (congSubgroup 𝔣).subtype)
   have hφ : ∀ g : G, φ g = (((g : (𝓞 F)ˣ) : 𝓞 F) : F) := fun g => rfl
   have hgpos : ∀ g : G, TotPos F (φ g) := fun g => g.2.2
   let f : G →* ℝ := (σ₁ : F →* ℝ).comp φ
@@ -59,7 +66,9 @@ theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyR
     exact mul_pos (by exact_mod_cast hx i) (hbpos i σ)
   have hfin : {g : G | ∃ x ∈ D, φ g * x ∈ D}.Finite := by
     have hfin0 := GlobalTheory.T.finite_units_bounded_embedding_ratio F (R * R)
-    refine Set.Finite.of_finite_image (f := fun g : G => (g : (𝓞 F)ˣ)) (hfin0.subset ?_) (Subtype.val_injective.injOn)
+    refine Set.Finite.of_finite_image
+      (f := fun g : G => (g : (𝓞 F)ˣ))
+      (hfin0.subset ?_) (Subtype.val_injective.injOn)
     rintro _ ⟨g, ⟨x, hx, hgx⟩, rfl⟩
     refine ⟨hgpos g, fun σ τ => ?_⟩
     have h1 := hR _ hgx σ τ
@@ -68,20 +77,24 @@ theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyR
     have hgτ := hgpos g τ
     rw [map_mul, map_mul] at h1
     have h3 : σ (φ g) * σ x ≤ (R * R * τ (φ g)) * σ x := by
-      calc σ (φ g) * σ x ≤ R * (τ (φ g) * τ x) := h1
+      calc
+        σ (φ g) * σ x
+          ≤ R * (τ (φ g) * τ x) := h1
         _ ≤ R * (τ (φ g) * (R * σ x)) := by gcongr
         _ = _ := by ring
     exact le_of_mul_le_mul_right h3 hxσ
   let E : Set F := {y ∈ D | ∀ g' : G, f g' < 1 → φ g' * y ∉ D}
   let T := {g : G | ∃ x ∈ D, φ g * x ∈ D}
-  let Λ : Set (F →ₗ[ℚ] ℚ) := (fun p : G × κ => (b.coord p.2).comp (LinearMap.mulLeft ℚ (φ p.1))) '' (T ×ˢ Set.univ)
+  let Λ : Set (F →ₗ[ℚ] ℚ) :=
+    (fun p : G × κ => (b.coord p.2).comp (LinearMap.mulLeft ℚ (φ p.1))) '' (T ×ˢ Set.univ)
   have hΛ : Λ.Finite := (hfin.prod Set.finite_univ).image _
   have hsign : ∀ (p q : ℚ), SignType.sign p = SignType.sign q → 0 < p → 0 < q := by
     intro p q h hp
     rw [sign_pos hp] at h
     exact sign_eq_one_iff.mp h.symm
   have htile : Tile ((posCone F : ConvexCone ℚ F) : Set F) (fun _ => True) E := by
-    refine GlobalTheory.T.cone_tiling_by_sign_regions (posCone F) b hbpos Λ hΛ E (fun x hx => hx.1) ?_
+    refine
+      GlobalTheory.T.cone_tiling_by_sign_regions (posCone F) b hbpos Λ hΛ E (fun x hx => hx.1) ?_
     intro x y hx hy hs hxE
     refine ⟨hy, fun g' hg' hyD => ?_⟩
     refine hxE.2 g' hg' ?_
@@ -94,7 +107,8 @@ theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyR
     intro h
     have := hDpos 0 h.1 σ₁
     simp at this
-  obtain ⟨ι, hι, r, v, hr, hli, hvP, hsub, hun⟩ := GlobalTheory.T.shintani_cone_decomposition _ _ E htile h0
+  obtain ⟨ι, hι, r, v, hr, hli, hvP, hsub, hun⟩ :=
+    GlobalTheory.T.shintani_cone_decomposition _ _ E htile h0
   refine ⟨ι, hι, r, v, hr, hli, hvP, ?_⟩
   intro x hx
 
@@ -104,7 +118,8 @@ theorem exists_coneDomain : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyR
     intro σ
     rw [map_mul]
     exact mul_pos (hu.2 σ) (hx σ)
-  obtain ⟨g, hg, hguniq⟩ := GlobalTheory.T.unique_reduced_orbit_representative φ f hfpos hfinj D hfin x hxD
+  obtain ⟨g, hg, hguniq⟩ :=
+    GlobalTheory.T.unique_reduced_orbit_representative φ f hfpos hfinj D hfin x hxD
   obtain ⟨c, hc, hcuniq⟩ := hun _ hg
   refine ⟨(⟨g.1, g.2⟩, c), hc, ?_⟩
   rintro ⟨⟨u', hu'⟩, c'⟩ hp

@@ -6,7 +6,16 @@ public import Mathlib
 
 open Matrix Polynomial
 
-theorem GlobalTheory.gram_det_ne_zero_of_ker_orth {K : Type} [Field K] (σ : K →+* K) {n : ℕ} (A : Matrix (Fin n) (Fin n) K) {ι : Type} [Fintype ι] [DecidableEq ι] (u : ι → Fin n → K) (hli : LinearIndependent K u) (hsp : Submodule.span K (Set.range u) = LinearMap.ker (Matrix.toLin' A)) (horth : ∀ x z, A *ᵥ x = 0 → ∑ k, σ ((A *ᵥ z) k) * x k = 0) (hdec : ∀ v, ∃ z y, A *ᵥ y = 0 ∧ v = A *ᵥ z + y) : (Matrix.of fun i j => ∑ k, σ (u i k) * u j k).det ≠ 0 := by
+theorem GlobalTheory.gram_det_ne_zero_of_ker_orth
+    {K : Type} [Field K]
+    (σ : K →+* K)
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) K)
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (u : ι → Fin n → K) (hli : LinearIndependent K u)
+    (hsp : Submodule.span K (Set.range u) = LinearMap.ker (Matrix.toLin' A))
+    (horth : ∀ x z, A *ᵥ x = 0 → ∑ k, σ ((A *ᵥ z) k) * x k = 0)
+    (hdec : ∀ v, ∃ z y, A *ᵥ y = 0 ∧ v = A *ᵥ z + y)
+    : (Matrix.of fun i j => ∑ k, σ (u i k) * u j k).det ≠ 0 := by
   intro hdet
   obtain ⟨c, hc0, hGc⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
   set x : Fin n → K := ∑ j, c j • u j with hxdef

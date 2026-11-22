@@ -10,16 +10,15 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.BI
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.BI.char_coset_sum_eq_zero :
-    ∀ (G : Type) [Group G] [Finite G] (χ : G → ℂ), _root_.GlobalTheory.BI.IsChar ℂ ℂ χ → ∀ H : Subgroup G,
-      ∑ᶠ u : H, χ u = 0 → ∀ g : G, ∑ᶠ u : H, χ (g * u) = 0 := by
+theorem _root_.GlobalTheory.BI.char_coset_sum_eq_zero
+    : ∀ (G : Type) [Group G] [Finite G] (χ : G → ℂ),
+      _root_.GlobalTheory.BI.IsChar ℂ ℂ χ
+        → ∀ H : Subgroup G, ∑ᶠ u : H, χ u = 0 → ∀ g : G, ∑ᶠ u : H, χ (g * u) = 0 := by
   intro G _ _ χ hχc H hH g
   obtain ⟨n, ρ, hρ⟩ := hχc
   have := Fintype.ofFinite H
-  have hχ : ∀ x, χ x = LinearMap.trace ℂ _ (ρ x) := fun x => by
-    simp [hρ, Representation.character]
+  have hχ : ∀ x, χ x = LinearMap.trace ℂ _ (ρ x) := fun x => by simp [hρ, Representation.character]
   rw [finsum_eq_sum_of_fintype] at hH ⊢
   simp only [hχ] at hH ⊢
   set_option synthInstance.maxHeartbeats 100000 in

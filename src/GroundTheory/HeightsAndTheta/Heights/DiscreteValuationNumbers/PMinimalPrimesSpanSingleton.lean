@@ -31,7 +31,8 @@ theorem MinimalPrimesSpanSingleton.proof : MinimalPrimesSpanSingleton.Statement.
     rintro Q ⟨hQp, hxQ⟩ hQW
     by_contra hWQ
     have hlt : Q < W := lt_of_le_of_ne hQW (fun h => hWQ (h ▸ le_refl Q))
-    have hfin : W.FiniteHeight := W.finiteHeight_iff.mpr (Or.inr (by rw [hh]; exact ENat.one_ne_top))
+    have hfin : W.FiniteHeight :=
+      W.finiteHeight_iff.mpr (Or.inr (by rw [hh]; exact ENat.one_ne_top))
     have hQh : Q.height < 1 := hh ▸ Ideal.height_strict_mono_of_isPrime_of_isPrime hlt
     have hQ0 : Q.height = 0 := Order.lt_one_iff.mp hQh
     rw [Ideal.height_eq_zero_iff_eq_bot] at hQ0

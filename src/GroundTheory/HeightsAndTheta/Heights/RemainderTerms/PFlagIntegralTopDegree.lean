@@ -15,12 +15,13 @@ namespace RestTerms
 
 open MvPolynomial
 
-theorem FlagIntegralTopDegree.proof (h1 : FlagAltTopDegree.Statement)
-    (h2 : FlagAntisymHomogeneous.Statement) (h3 : FlagIntegralViaQuotient.Statement) :
-    FlagIntegralTopDegree.Statement := by
+theorem FlagIntegralTopDegree.proof
+    (h1 : FlagAltTopDegree.Statement) (h2 : FlagAntisymHomogeneous.Statement)
+    (h3 : FlagIntegralViaQuotient.Statement)
+    : FlagIntegralTopDegree.Statement := by
   intro f N H hH
-  obtain ⟨e, he⟩ := h1 f N (antisymmetrize f N H) (isBlockAlternating_antisymmetrize f N H)
-    (h2 f N H _ hH)
+  obtain ⟨e, he⟩ :=
+    h1 f N (antisymmetrize f N H) (isBlockAlternating_antisymmetrize f N H) (h2 f N H _ hH)
   have hI := h3 f N H (C e) (by rw [he, mul_comm])
   rw [constantCoeff_C] at hI
   have hΔ : algebraMap (RootRing f N) (FractionRing (RootRing f N)) (blockVandermonde f N) ≠ 0 :=

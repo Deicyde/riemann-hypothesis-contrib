@@ -83,10 +83,51 @@ structure Facts (P : Par) (e K z u E X S sb v w8 : ℝ) : Prop where
   hu : u = P.x ^ (P.ε / 3)
   hz : z = P.x ^ P.ε
 
-theorem facts {P : Par} {e K : ℝ} (hW : Windows P e K) (hL : LargeX P.x P.ε e K) :
-    ∃ z u E X S sb v w8 : ℝ, Facts P e K z u E X S sb v w8 := by
-  obtain ⟨hε, hε1, he, hK, ⟨n2x, n2n⟩, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-    ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, β0, βK, Co0, CoK, Y1, YX, s0, sx, bo0, bosb⟩ := hW
+theorem facts {P : Par} {e K : ℝ} (hW : Windows P e K) (hL : LargeX P.x P.ε e K)
+    : ∃ z u E X S sb v w8 : ℝ, Facts P e K z u E X S sb v w8 := by
+  obtain ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      ⟨n2x, n2n⟩,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      β0,
+      βK,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      s0,
+      sx,
+      bo0,
+      bosb
+    ⟩ :=
+    hW
   have nx := n2x.trans n2n
   obtain ⟨x1, hC, hB, hA⟩ := hL
   have xpos : 0 < P.x := by linarith
@@ -107,7 +148,8 @@ theorem facts {P : Par} {e K : ℝ} (hW : Windows P e K) (hL : LargeX P.x P.ε e
   have hx : 100 ≤ P.x := by
     have h1 : 1 ≤ K * (P.x ^ P.ε) ^ 4 := one_le_mul_of_one_le_of_one_le hK z41
     linarith only [h1, hC]
-  have hM1 : 1 ≤ (P.x ^ e) ^ 4 * P.x ^ 4 := one_le_mul_of_one_le_of_one_le (one_le_pow₀ E1) (one_le_pow₀ x1)
+  have hM1 : 1 ≤ (P.x ^ e) ^ 4 * P.x ^ 4 :=
+    one_le_mul_of_one_le_of_one_le (one_le_pow₀ E1) (one_le_pow₀ x1)
   have lx0 : 0 ≤ Real.log P.x := Real.log_nonneg x1
   have hlog : Real.log P.x * (4 * e + 4) ≤ P.x ^ (P.ε / 3) := by
     have h1 : P.x ^ (4 * e + 4) ≤ Real.exp (P.x ^ (P.ε / 3)) := by
@@ -123,10 +165,27 @@ theorem facts {P : Par} {e K : ℝ} (hW : Windows P e K) (hL : LargeX P.x P.ε e
   have Xpos : 0 < Real.exp (P.x ^ (P.ε / 3)) := Real.exp_pos _
   have bpos : 0 < Real.exp (P.x ^ P.ε) := Real.exp_pos _
   have npos : 0 < P.n := lt_of_lt_of_le (by positivity) n2n
-  refine ⟨P.x ^ P.ε, P.x ^ (P.ε / 3), P.x ^ e, Real.exp (P.x ^ (P.ε / 3)), Real.exp (P.x ^ (P.ε / 4)),
-    Real.exp (P.x ^ P.ε / 2), Real.exp (P.x ^ P.ε) / Real.exp (P.x ^ (P.ε / 3)), P.x ^ (P.ε / 8), ?_⟩
-  exact
-  { hx := hx, he := he, hK := hK, z1 := z1, hz4 := hC, u1 := u1, uz := uz, E1 := E1, hXB := hB
+  refine ⟨
+    P.x ^ P.ε,
+    P.x ^ (P.ε / 3),
+    P.x ^ e,
+    Real.exp (P.x ^ (P.ε / 3)),
+    Real.exp (P.x ^ (P.ε / 4)),
+    Real.exp (P.x ^ P.ε / 2),
+    Real.exp (P.x ^ P.ε) / Real.exp (P.x ^ (P.ε / 3)),
+    P.x ^ (P.ε / 8),
+    ?_
+  ⟩
+  exact {
+    hx := hx
+    he := he
+    hK := hK
+    z1 := z1
+    hz4 := hC
+    u1 := u1
+    uz := uz
+    E1 := E1
+    hXB := hB
     S1 := Real.one_le_exp (Real.rpow_nonneg xpos.le _)
     hsb := hA
     hb := by
@@ -150,20 +209,56 @@ theorem facts {P : Par} {e K : ℝ} (hW : Windows P e K) (hL : LargeX P.x P.ε e
     loga := by
       unfold Par.a aTx bTx Par.lx
       rw [Real.log_mul xpos.ne' bpos.ne', Real.log_exp]
-    nx := nx, n2x := n2x, n2n := n2n, nE := nE, kx := kx, kE := kE, N0 := N0, NE := NE, t0 := t0, tE := tE, px := px, pE := pE
-    La0 := La0, Laz := Laz, r0 := r0, rE := rE, Sc0 := Sc0, ScS := ScS, η0 := η0, ηS := ηS, ρ0 := ρ0
-    ρx := ρx, th0 := th0, thx := thx, x_sq_le_threshold := x_sq_le_threshold, dx := dx, C0 := C0, CK := CK, β0 := β0, βK := βK
-    Co0 := Co0, CoK := CoK, Y1 := Y1, YX := YX, s0 := s0, sx := sx, bo0 := bo0, bosb := bosb
+    nx := nx
+    n2x := n2x
+    n2n := n2n
+    nE := nE
+    kx := kx
+    kE := kE
+    N0 := N0
+    NE := NE
+    t0 := t0
+    tE := tE
+    px := px
+    pE := pE
+    La0 := La0
+    Laz := Laz
+    r0 := r0
+    rE := rE
+    Sc0 := Sc0
+    ScS := ScS
+    η0 := η0
+    ηS := ηS
+    ρ0 := ρ0
+    ρx := ρx
+    th0 := th0
+    thx := thx
+    x_sq_le_threshold := x_sq_le_threshold
+    dx := dx
+    C0 := C0
+    CK := CK
+    β0 := β0
+    βK := βK
+    Co0 := Co0
+    CoK := CoK
+    Y1 := Y1
+    YX := YX
+    s0 := s0
+    sx := sx
+    bo0 := bo0
+    bosb := bosb
     hδ := by unfold Par.δ₁; rw [Real.rpow_neg xpos.le]
     w81 := Real.one_le_rpow x1 (by positivity)
     w8z := Real.rpow_le_rpow_of_exponent_le x1 (by linarith)
     hθ := by unfold Par.θ; rw [Real.rpow_neg xpos.le]
-    Joz := (Nat.floor_le (Real.rpow_nonneg xpos.le _)).trans
-      (Real.rpow_le_rpow_of_exponent_le x1 (by linarith))
+    Joz :=
+      (Nat.floor_le (Real.rpow_nonneg xpos.le _)).trans
+        (Real.rpow_le_rpow_of_exponent_le x1 (by linarith))
     Ibu := Nat.floor_le (Real.rpow_nonneg xpos.le _)
     hE := rfl
     hu := rfl
-    hz := rfl }
+    hz := rfl
+  }
 
 lemma scale1' {m T q c b : ℝ} (hm : 0 ≤ m) (hT : 1 ≤ T) (hcb : 0 ≤ c * b) (h : q ≤ c * b) :
     m * q ≤ c * (T * m * b) := by
@@ -387,16 +482,26 @@ theorem size_floors_bound : SizeFloors := by
   apply scale1' hm hT (mul_nonneg F.sg0 F.b0)
   rw [F.hXpp, F.loga]
   unfold Par.f
-  have h1 := F.C0; have h2 := F.CK; have h3 := F.npos; have h4 := F.nE; have h5 := F.N0
-  have h6 := F.NE; have h7 := F.la0; have h8 := F.lax; have h9 := F.xpos; have h10 := F.Xpos
-  have h11 := F.Kpos; have h12 := F.Epos
-  calc 2 * P.C * (2 * P.n) * (P.x * P.n * X) * (P.N ^ 2 * (P.lx + z) + 2 * (P.lx + z) ^ 2)
+  have h1 := F.C0
+  have h2 := F.CK
+  have h3 := F.npos
+  have h4 := F.nE
+  have h5 := F.N0
+  have h6 := F.NE
+  have h7 := F.la0
+  have h8 := F.lax
+  have h9 := F.xpos
+  have h10 := F.Xpos
+  have h11 := F.Kpos
+  have h12 := F.Epos
+  calc
+    2 * P.C * (2 * P.n) * (P.x * P.n * X) * (P.N ^ 2 * (P.lx + z) + 2 * (P.lx + z) ^ 2)
       ≤ 2 * K * (2 * E) * (P.x * E * X) * (E ^ 2 * P.x + 2 * P.x ^ 2) := by gcongr
     _ = 4 * K * (E ^ 4 * P.x ^ 2) * X + 8 * K * (E ^ 2 * P.x ^ 3) * X := by ring
     _ ≤ 4 * K * (E ^ 4 * P.x ^ 3) * X + 8 * K * (E ^ 4 * P.x ^ 3) * X := by
-        have a1 := F.monoG (i := 4) (j := 2) (i' := 4) (j' := 3) (by norm_num) (by norm_num)
-        have a2 := F.monoG (i := 2) (j := 3) (i' := 4) (j' := 3) (by norm_num) (by norm_num)
-        gcongr
+      have a1 := F.monoG (i := 4) (j := 2) (i' := 4) (j' := 3) (by norm_num) (by norm_num)
+      have a2 := F.monoG (i := 2) (j := 3) (i' := 4) (j' := 3) (by norm_num) (by norm_num)
+      gcongr
     _ = 12 * K * (E ^ 4 * P.x ^ 3) * X := by ring
     _ ≤ sg P K * P.b := F.polyX' (le_refl _) (le_refl _) (by norm_num) (by norm_num)
 
@@ -417,9 +522,17 @@ theorem size_cp_bucket_bound : SizeCp := by
     linarith [F.ScS, F.ηS, F.kE]
   have key : 2 * P.C * P.Sk * Real.log (2 * P.a) * P.Xpp ≤ sg P K * P.b := by
     rw [F.hXpp]
-    have h1 := F.C0; have h2 := F.CK; have h3 := F.npos; have h4 := F.nE
-    have h9 := F.xpos; have h10 := F.Xpos; have h11 := F.Kpos; have h12 := F.Epos; have h13 := F.Spos
-    calc 2 * P.C * P.Sk * Real.log (2 * P.a) * (P.x * P.n * X)
+    have h1 := F.C0
+    have h2 := F.CK
+    have h3 := F.npos
+    have h4 := F.nE
+    have h9 := F.xpos
+    have h10 := F.Xpos
+    have h11 := F.Kpos
+    have h12 := F.Epos
+    have h13 := F.Spos
+    calc
+      2 * P.C * P.Sk * Real.log (2 * P.a) * (P.x * P.n * X)
         ≤ 2 * K * (3 * (E * S)) * P.x * (P.x * E * X) := by gcongr
       _ = 6 * K * (E ^ 2 * P.x ^ 2) * (X * S) := by ring
       _ ≤ sg P K * P.b := F.polyXS' (by norm_num) (by norm_num) (by norm_num)
@@ -433,12 +546,22 @@ theorem size_prime_low_bound : SizePrLow := by
   have key : 2 * Real.log 4 * (P.p₀ * P.Q₁) ≤ sg P K * P.b := by
     unfold Par.Q₁
     rw [F.hbp]
-    have h1 := F.C0; have h2 := F.CK; have h3 := F.r0; have h4 := F.rE; have h5 := F.pE
-    have h6 := F.lx0; have h7 : P.lx ≤ P.x := by linarith [F.lxz, F.hundred_z_le_x, F.zpos]
-    have h8 := F.v0; have h9 := F.xpos; have h11 := F.Kpos; have h12 := F.Epos
-    have h13 := log_four_le_three_halves; have h14 := log_four_nonneg
+    have h1 := F.C0
+    have h2 := F.CK
+    have h3 := F.r0
+    have h4 := F.rE
+    have h5 := F.pE
+    have h6 := F.lx0
+    have h7 : P.lx ≤ P.x := by linarith [F.lxz, F.hundred_z_le_x, F.zpos]
+    have h8 := F.v0
+    have h9 := F.xpos
+    have h11 := F.Kpos
+    have h12 := F.Epos
+    have h13 := log_four_le_three_halves
+    have h14 := log_four_nonneg
     have h15 : (0 : ℝ) ≤ P.p₀ := Nat.cast_nonneg _
-    calc 2 * Real.log 4 * (P.p₀ * (P.C * P.rG * (P.x * v) * P.lx))
+    calc
+      2 * Real.log 4 * (P.p₀ * (P.C * P.rG * (P.x * v) * P.lx))
         ≤ 2 * (3 / 2) * (E * (K * E * (P.x * v) * P.x)) := by gcongr
       _ = 3 * K * (E ^ 2 * P.x ^ 2) * v := by ring
       _ ≤ sg P K * P.b := F.polyv' (by norm_num) (by norm_num) (by norm_num)
@@ -459,13 +582,25 @@ theorem size_prime_high_bound : SizePrHigh := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tPrHigh unitU
-  have h1 := F.C0; have h2 := F.CK; have h9 := F.xpos; have h10 := F.Xpos; have h11 := F.Kpos
-  have h12 := F.Epos; have h13 := F.Spos; have hb := F.b0; have hz := F.zpos
-  have hlx0 := F.lx0; have hlx := F.lxz; have hw0 : 0 ≤ w8 := by linarith [F.w81]
+  have h1 := F.C0
+  have h2 := F.CK
+  have h9 := F.xpos
+  have h10 := F.Xpos
+  have h11 := F.Kpos
+  have h12 := F.Epos
+  have h13 := F.Spos
+  have hb := F.b0
+  have hz := F.zpos
+  have hlx0 := F.lx0
+  have hlx := F.lxz
+  have hw0 : 0 ≤ w8 := by linarith [F.w81]
   have hw := F.w8z
   have hr0 := F.rpos
   have p2 : 4 * (P.C * X * (P.η + P.Sc)) ≤ sg P K * P.b := by
-    have a1 := F.η0; have a2 := F.ηS; have a3 := F.Sc0; have a4 := F.ScS
+    have a1 := F.η0
+    have a2 := F.ηS
+    have a3 := F.Sc0
+    have a4 := F.ScS
     have a5 : 8 * K * (E ^ 0 * P.x ^ 0) * (X * S) ≤ sg P K * P.b :=
       F.polyXS' (by norm_num) (by norm_num) (by norm_num)
     have a6 : P.C * X * (P.η + P.Sc) ≤ K * X * (S + S) := by gcongr
@@ -475,15 +610,18 @@ theorem size_prime_high_bound : SizePrHigh := by
     have a1 : P.b / P.n ≤ P.b * P.x⁻¹ ^ 2 := F.div_le_div_sq_of_le (le_refl _) hb F.nx
     have a0 : 0 ≤ P.b / P.n := div_nonneg hb F.npos.le
     have a2 : P.C * (P.b / P.n) * P.lx * w8 ≤ K * (P.b * P.x⁻¹ ^ 2) * z * z := by gcongr
-    have a3 : 4 * (K * (P.b * P.x⁻¹ ^ 2) * z * z)
-        = P.b * (4 / 100 * (100 * K * z ^ 2 * P.x⁻¹)) * P.x⁻¹ := by ring
+    have a3
+        : 4 * (K * (P.b * P.x⁻¹ ^ 2) * z * z)
+          = P.b * (4 / 100 * (100 * K * z ^ 2 * P.x⁻¹)) * P.x⁻¹ := by
+      ring
     have b1 := F.Kzr (i := 2) (by norm_num)
     have b0 := F.Kzr0 2
     have a4 : P.b * (4 / 100 * (100 * K * z ^ 2 * P.x⁻¹)) * P.x⁻¹ ≤ sg P K * P.b :=
       F.close_sg (by linarith) (by linarith) hr0.le F.r_sg
     linarith
   have p4 : 4 * (P.C * X * P.t * P.lx * w8) ≤ sg P K * P.b := by
-    have a1 := F.t0; have a2 := F.tE
+    have a1 := F.t0
+    have a2 := F.tE
     have a3 : z * z ≤ P.x := by
       have := F.zpow_le (i := 2) (by norm_num)
       have b1 : 1 * z ^ 2 ≤ 100 * K * z ^ 2 := by
@@ -493,19 +631,26 @@ theorem size_prime_high_bound : SizePrHigh := by
     have a4 : P.C * X * P.t * P.lx * w8 ≤ K * X * E * z * z := by gcongr
     have a5 : K * X * E * z * z ≤ K * X * E * P.x := by
       have : K * X * E * z * z = K * X * E * (z * z) := by ring
-      rw [this]; gcongr
+      rw [this]
+      gcongr
     have a6 : 4 * K * (E ^ 1 * P.x ^ 1) * X ≤ sg P K * P.b :=
       F.polyX' (by norm_num) (by norm_num) (by norm_num) (by norm_num)
     have a7 : 4 * (K * X * E * P.x) = 4 * K * (E ^ 1 * P.x ^ 1) * X := by ring
     linarith
   have p5 : 4 * (X * P.bo) ≤ sg P K * P.b := by
-    have a1 := F.bo0; have a2 := F.bosb; have a3 := F.hbsb; have a4 := F.sb1
+    have a1 := F.bo0
+    have a2 := F.bosb
+    have a3 := F.hbsb
+    have a4 := F.sb1
     have a5 : X * P.bo ≤ X * sb := by gcongr
     have a6 : 4 * 1 * (1 * P.x) * (X * 1) * sb ≤ 100 * K * (E ^ 4 * P.x ^ 4) * (X * S) * sb := by
-      have c1 := F.hK; have c2 := F.S1
+      have c1 := F.hK
+      have c2 := F.S1
       have c3 : 1 ≤ E ^ 4 := one_le_pow₀ F.E1
       have c4 : P.x ≤ P.x ^ 4 := by
-        calc P.x = P.x ^ 1 := (pow_one _).symm
+        calc
+          P.x
+            = P.x ^ 1 := (pow_one _).symm
           _ ≤ P.x ^ 4 := pow_le_pow_right₀ F.x1 (by norm_num)
       gcongr
       norm_num
@@ -516,8 +661,7 @@ theorem size_prime_high_bound : SizePrHigh := by
       mul_le_mul_of_nonneg_right (a6.trans a3) hr0.le
     have a9 := F.br_sg
     linarith
-  have hXQ : P.Xp * P.Q₂ ≤ (P.C + sg P K) * P.b := by
-    rw [xprime_q_two_expand F]; linarith
+  have hXQ : P.Xp * P.Q₂ ≤ (P.C + sg P K) * P.b := by rw [xprime_q_two_expand F]; linarith
   have hsb0 : 0 ≤ sg P K * P.b := mul_nonneg F.sg0 hb
   have key : 2 * Real.log 4 * (P.Xp * P.Q₂) ≤ (2 * Real.log 4 * P.C + 3 * sg P K) * P.b := by
     have a1 : 2 * Real.log 4 * (P.Xp * P.Q₂) ≤ 2 * Real.log 4 * ((P.C + sg P K) * P.b) :=
@@ -531,15 +675,23 @@ theorem size_or_bucket_bound : SizeOr := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tOr unitU
-  have h1 := F.C0; have h2 := F.CK; have h9 := F.xpos; have h11 := F.Kpos
-  have hb := F.b0; have hz := F.zpos; have hz1 := F.z1; have hlx0 := F.lx0; have hlx := F.lxz
+  have h1 := F.C0
+  have h2 := F.CK
+  have h9 := F.xpos
+  have h11 := F.Kpos
+  have hb := F.b0
+  have hz := F.zpos
+  have hz1 := F.z1
+  have hlx0 := F.lx0
+  have hlx := F.lxz
   have hr0 := F.rpos
   have hx2 : 1 ≤ P.x ^ 2 := one_le_pow₀ F.x1
   have hp1 : P.x ^ 4 ≤ (P.p₀ : ℝ) - 1 := by linarith [F.px]
   have hx24 : P.x ^ 2 ≤ P.x ^ 4 := pow_le_pow_right₀ F.x1 (by norm_num)
   have hp0 : 0 < (P.p₀ : ℝ) - 1 := by linarith
   have c1 : P.La / P.k ≤ z ^ 2 * P.x⁻¹ ^ 2 := F.div_le_div_sq_of_le F.Laz (by positivity) F.kx
-  have c2 : 1 / P.K₀ ≤ 1 * P.x⁻¹ ^ 2 := F.div_le_div_sq_of_le (le_refl _) (by norm_num) F.x_sq_le_threshold
+  have c2 : 1 / P.K₀ ≤ 1 * P.x⁻¹ ^ 2 :=
+    F.div_le_div_sq_of_le (le_refl _) (by norm_num) F.x_sq_le_threshold
   have c3 : Real.log P.Xp + Real.log 4 ≤ 3 * z := by
     rw [F.hXp, F.logX]; linarith [F.uz, log_four_le_three_halves]
   have c30 : 0 ≤ Real.log P.Xp + Real.log 4 := by
@@ -553,30 +705,42 @@ theorem size_or_bucket_bound : SizeOr := by
     have : 0 < P.K₀ := by linarith [F.x_sq_le_threshold]
     positivity
   have z3 : z ≤ z ^ 3 := by
-    calc z = z ^ 1 := (pow_one z).symm
+    calc
+      z = z ^ 1 := (pow_one z).symm
       _ ≤ z ^ 3 := pow_le_pow_right₀ hz1 (by norm_num)
-  have br : (P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4) +
-      2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1) ≤ 10 * z ^ 3 * P.x⁻¹ ^ 2 := by
-    have d1 : (P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4)
-        ≤ (z ^ 2 * P.x⁻¹ ^ 2 + 1 * P.x⁻¹ ^ 2) * (3 * z) := by gcongr
-    have d2 : (z ^ 2 * P.x⁻¹ ^ 2 + 1 * P.x⁻¹ ^ 2) * (3 * z) + 4 * z * P.x⁻¹ ^ 2
-        = (3 * z ^ 3 + 7 * z) * P.x⁻¹ ^ 2 := by ring
+  have br
+      : (P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4)
+          + 2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1)
+        ≤ 10 * z ^ 3 * P.x⁻¹ ^ 2 := by
+    have d1
+        : (P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4)
+          ≤ (z ^ 2 * P.x⁻¹ ^ 2 + 1 * P.x⁻¹ ^ 2) * (3 * z) := by
+      gcongr
+    have d2
+        : (z ^ 2 * P.x⁻¹ ^ 2 + 1 * P.x⁻¹ ^ 2) * (3 * z) + 4 * z * P.x⁻¹ ^ 2
+          = (3 * z ^ 3 + 7 * z) * P.x⁻¹ ^ 2 := by
+      ring
     have d3 : (3 * z ^ 3 + 7 * z) * P.x⁻¹ ^ 2 ≤ (10 * z ^ 3) * P.x⁻¹ ^ 2 := by
       gcongr
       linarith
     linarith
-  have key : 2 * P.C * P.lx * P.a * ((P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4) +
-      2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1)) ≤ sg P K * P.b := by
+  have key
+      : 2 * P.C * P.lx * P.a
+          * ((P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4)
+            + 2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1))
+        ≤ sg P K * P.b := by
     rw [F.ha]
-    calc 2 * P.C * P.lx * (P.x * P.b) * ((P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4) +
-          2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1))
-        ≤ 2 * P.C * P.lx * (P.x * P.b) * (10 * z ^ 3 * P.x⁻¹ ^ 2) :=
-          mul_le_mul_of_nonneg_left br (by positivity)
+    calc
+      2 * P.C * P.lx * (P.x * P.b)
+            * ((P.La / P.k + 1 / P.K₀) * (Real.log P.Xp + Real.log 4)
+              + 2 * (Real.log ((P.p₀ : ℝ) - 1) + 1) / ((P.p₀ : ℝ) - 1))
+          ≤ 2 * P.C * P.lx * (P.x * P.b) * (10 * z ^ 3 * P.x⁻¹ ^ 2) :=
+        mul_le_mul_of_nonneg_left br (by positivity)
       _ ≤ 2 * K * z * (P.x * P.b) * (10 * z ^ 3 * P.x⁻¹ ^ 2) := by gcongr
       _ = P.b * (1 / 5 * (P.x * P.x⁻¹)) * (100 * K * z ^ 4 * P.x⁻¹) := by ring
       _ ≤ sg P K * P.b := by
-          rw [F.xr]
-          exact F.close_sg (by norm_num) (by norm_num) (F.Kzr0 4) (F.Kzr_sg (le_refl _))
+        rw [F.xr]
+        exact F.close_sg (by norm_num) (by norm_num) (F.Kzr0 4) (F.Kzr_sg (le_refl _))
   have := scale2 hm hT key
   linarith
 
@@ -584,7 +748,11 @@ theorem size_orders_bucket_bound : SizeOrders := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tOrders unitU
-  have h9 := F.xpos; have h11 := F.Kpos; have hb := F.b0; have hz := F.zpos; have hr0 := F.rpos
+  have h9 := F.xpos
+  have h11 := F.Kpos
+  have hb := F.b0
+  have hz := F.zpos
+  have hr0 := F.rpos
   have hM1 : 1 ≤ max P.Y P.Xpp := F.Y1.trans (le_max_left _ _)
   have hlM : Real.log (max P.Y P.Xpp) ≤ 3 * z := by
     rcases max_choice P.Y P.Xpp with h | h <;> rw [h]
@@ -592,12 +760,14 @@ theorem size_orders_bucket_bound : SizeOrders := by
       have a2 : Real.log P.Y ≤ Real.log (2 * X) := Real.log_le_log hY0 F.YX
       rw [Real.log_mul (by norm_num) F.Xpos.ne', F.logX] at a2
       linarith [log_two_le_one_alt, F.uz, F.z1]
-    · rw [F.hXpp, Real.log_mul (mul_pos h9 F.npos).ne' F.Xpos.ne', Real.log_mul h9.ne' F.npos.ne', F.logX]
+    · rw [F.hXpp, Real.log_mul (mul_pos h9 F.npos).ne' F.Xpos.ne', Real.log_mul h9.ne' F.npos.ne',
+        F.logX]
       have a1 : Real.log P.n ≤ z := F.log_le_alt F.npos F.nE
       have a2 : Real.log P.x ≤ z := F.lxz
       linarith [F.uz]
   generalize max P.Y P.Xpp = M at hM1 hlM ⊢
-  have q1 := F.n2x; have q2 := F.n2n
+  have q1 := F.n2x
+  have q2 := F.n2n
   have q0 : (1 : ℝ) ≤ 2 ^ P.e₂ := one_le_pow₀ (by norm_num)
   generalize (2 : ℝ) ^ P.e₂ = n at q0 q1 q2 ⊢
   have qp : 0 < n := by linarith
@@ -609,18 +779,20 @@ theorem size_orders_bucket_bound : SizeOrders := by
     linarith
   have hJ0 : (0 : ℝ) ≤ P.Jo := Nat.cast_nonneg _
   have hJ := F.Joz
-  have hC0 := F.Co0; have hCK := F.CoK
+  have hC0 := F.Co0
+  have hCK := F.CoK
   have c1 : P.Cord * P.Jo * Real.log (n * M) ^ 2 / n ≤ K * z * (4 * z) ^ 2 * P.x⁻¹ ^ 2 := by
     refine F.div_le_div_sq_of_le ?_ (by positivity) q1
     gcongr
   have key : 4 * P.a * (P.Cord * P.Jo * Real.log (n * M) ^ 2 / n) ≤ sg P K * P.b := by
     rw [F.ha]
-    calc 4 * (P.x * P.b) * (P.Cord * P.Jo * Real.log (n * M) ^ 2 / n)
+    calc
+      4 * (P.x * P.b) * (P.Cord * P.Jo * Real.log (n * M) ^ 2 / n)
         ≤ 4 * (P.x * P.b) * (K * z * (4 * z) ^ 2 * P.x⁻¹ ^ 2) := by gcongr
       _ = P.b * (64 / 100 * (P.x * P.x⁻¹)) * (100 * K * z ^ 3 * P.x⁻¹) := by ring
       _ ≤ sg P K * P.b := by
-          rw [F.xr]
-          exact F.close_sg (by norm_num) (by norm_num) (F.Kzr0 3) (F.Kzr_sg (by norm_num))
+        rw [F.xr]
+        exact F.close_sg (by norm_num) (by norm_num) (F.Kzr0 3) (F.Kzr_sg (by norm_num))
   have := scale2 hm hT key
   linarith
 
@@ -628,7 +800,10 @@ theorem size_band_bound : SizeBand := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tBand unitU
-  have h9 := F.xpos; have hb := F.b0; have hz := F.zpos; have hr0 := F.rpos
+  have h9 := F.xpos
+  have hb := F.b0
+  have hz := F.zpos
+  have hr0 := F.rpos
   have hI0 : (0 : ℝ) ≤ P.Ib := Nat.cast_nonneg _
   have hI : (P.Ib : ℝ) ≤ z := F.Ibu.trans F.uz
   have hx24 : P.x ^ 2 ≤ P.x ^ 4 := pow_le_pow_right₀ F.x1 (by norm_num)
@@ -638,17 +813,19 @@ theorem size_band_bound : SizeBand := by
   have c2 : P.ρ ≤ P.x⁻¹ ^ 2 := by rw [← F.r2]; exact F.ρx
   have c20 := F.ρ0
   have c3 : Real.log (2 * P.Xp) ≤ 2 * z := by
-    rw [F.hXp, Real.log_mul (by norm_num) F.Xpos.ne', F.logX]; linarith [log_two_le_one_alt, F.uz, F.z1]
-  have c30 : 0 ≤ Real.log (2 * P.Xp) := by
-    rw [F.hXp]; exact Real.log_nonneg (by linarith [F.X1])
-  have key : 4 * P.a * (P.Ib * ((4 * P.ρ + 1 / (P.p₀ : ℝ)) * Real.log (2 * P.Xp))) ≤ sg P K * P.b := by
+    rw [F.hXp, Real.log_mul (by norm_num) F.Xpos.ne', F.logX]
+    linarith [log_two_le_one_alt, F.uz, F.z1]
+  have c30 : 0 ≤ Real.log (2 * P.Xp) := by rw [F.hXp]; exact Real.log_nonneg (by linarith [F.X1])
+  have key
+      : 4 * P.a * (P.Ib * ((4 * P.ρ + 1 / (P.p₀ : ℝ)) * Real.log (2 * P.Xp))) ≤ sg P K * P.b := by
     rw [F.ha]
-    calc 4 * (P.x * P.b) * (P.Ib * ((4 * P.ρ + 1 / (P.p₀ : ℝ)) * Real.log (2 * P.Xp)))
+    calc
+      4 * (P.x * P.b) * (P.Ib * ((4 * P.ρ + 1 / (P.p₀ : ℝ)) * Real.log (2 * P.Xp)))
         ≤ 4 * (P.x * P.b) * (z * ((4 * P.x⁻¹ ^ 2 + 1 * P.x⁻¹ ^ 2) * (2 * z))) := by gcongr
       _ = P.b * (40 / 100 * (P.x * P.x⁻¹)) * (100 * z ^ 2 * P.x⁻¹) := by ring
       _ ≤ sg P K * P.b := by
-          rw [F.xr]
-          exact F.close_sg (by norm_num) (by norm_num) (F.zr0 2) (F.zr_sg (by norm_num))
+        rw [F.xr]
+        exact F.close_sg (by norm_num) (by norm_num) (F.zr0 2) (F.zr_sg (by norm_num))
   have := scale2 hm hT key
   linarith
 
@@ -656,7 +833,10 @@ theorem size_high_bucket_bound : SizeHigh := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tHigh unitU
-  have h9 := F.xpos; have hb := F.b0; have hz := F.zpos; have hr0 := F.rpos
+  have h9 := F.xpos
+  have hb := F.b0
+  have hz := F.zpos
+  have hr0 := F.rpos
   have hXpp1 : 1 ≤ P.x * P.n * X :=
     one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le F.x1 F.n1) F.X1
   have c3 : Real.log (2 * P.Xpp) ≤ 4 * z := by
@@ -665,12 +845,14 @@ theorem size_high_bucket_bound : SizeHigh := by
     have a1 : Real.log P.n ≤ z := F.log_le_alt F.npos F.nE
     have a2 : Real.log P.x ≤ z := F.lxz
     linarith [log_two_le_one_alt, F.uz, F.z1]
-  have c30 : 0 ≤ Real.log (2 * P.Xpp) := by
-    rw [F.hXpp]; exact Real.log_nonneg (by linarith)
-  have ht0 := F.th0; have ht := F.thx
+  have c30 : 0 ≤ Real.log (2 * P.Xpp) := by rw [F.hXpp]; exact Real.log_nonneg (by linarith)
+  have ht0 := F.th0
+  have ht := F.thx
   have c4 : P.a * P.th ^ 2 ≤ P.b * P.x⁻¹ := by
     rw [F.ha]
-    calc P.x * P.b * P.th ^ 2 ≤ P.x * P.b * P.x⁻¹ ^ 2 := by gcongr
+    calc
+      P.x * P.b * P.th ^ 2
+        ≤ P.x * P.b * P.x⁻¹ ^ 2 := by gcongr
       _ = P.b * P.x⁻¹ * (P.x * P.x⁻¹) := by ring
       _ = P.b * P.x⁻¹ := by rw [F.xr, mul_one]
   have c5 : P.wpp * P.th ≤ P.b * P.x⁻¹ := by
@@ -683,7 +865,8 @@ theorem size_high_bucket_bound : SizeHigh := by
     have : 0 ≤ P.wpp := by rw [F.hwpp]; exact div_nonneg F.v0 F.npos.le
     positivity
   have key : 2 * Real.log (2 * P.Xpp) * (P.a * P.th ^ 2 + P.wpp * P.th) ≤ sg P K * P.b := by
-    calc 2 * Real.log (2 * P.Xpp) * (P.a * P.th ^ 2 + P.wpp * P.th)
+    calc
+      2 * Real.log (2 * P.Xpp) * (P.a * P.th ^ 2 + P.wpp * P.th)
         ≤ 2 * (4 * z) * (P.b * P.x⁻¹ + P.b * P.x⁻¹) := by gcongr
       _ = P.b * (16 / 100) * (100 * z ^ 1 * P.x⁻¹) := by ring
       _ ≤ sg P K * P.b := F.close_sg (by norm_num) (by norm_num) (F.zr0 1) (F.zr_sg (by norm_num))
@@ -694,7 +877,10 @@ theorem size_discriminant_bound : SizeD := by
   intro P e K m T hW hL hm hT
   obtain ⟨z, u, E, X, S, sb, v, w8, F⟩ := facts hW hL
   unfold tD unitU
-  have h9 := F.xpos; have hb := F.b0; have hz := F.zpos; have hr0 := F.rpos
+  have h9 := F.xpos
+  have hb := F.b0
+  have hz := F.zpos
+  have hr0 := F.rpos
   have hx2 : Real.exp 1 ≤ P.x ^ 2 := by
     have a1 := Real.exp_one_lt_d9
     have a2 : (100 : ℝ) ^ 2 ≤ P.x ^ 2 := by
@@ -708,16 +894,16 @@ theorem size_discriminant_bound : SizeD := by
   have hlx := F.lxz
   have key : 2 * P.a * Real.log P.d / P.d ≤ sg P K * P.b := by
     rw [F.ha, mul_div_assoc]
-    calc 2 * (P.x * P.b) * (Real.log P.d / P.d)
-        ≤ 2 * (P.x * P.b) * (2 * z * P.x⁻¹ ^ 2) := by
-          rw [c2] at c1
-          have : 2 * P.lx * P.x⁻¹ ^ 2 ≤ 2 * z * P.x⁻¹ ^ 2 := by gcongr
-          gcongr
-          linarith
+    calc
+      2 * (P.x * P.b) * (Real.log P.d / P.d) ≤ 2 * (P.x * P.b) * (2 * z * P.x⁻¹ ^ 2) := by
+        rw [c2] at c1
+        have : 2 * P.lx * P.x⁻¹ ^ 2 ≤ 2 * z * P.x⁻¹ ^ 2 := by gcongr
+        gcongr
+        linarith
       _ = P.b * (4 / 100 * (P.x * P.x⁻¹)) * (100 * z ^ 1 * P.x⁻¹) := by ring
       _ ≤ sg P K * P.b := by
-          rw [F.xr]
-          exact F.close_sg (by norm_num) (by norm_num) (F.zr0 1) (F.zr_sg (by norm_num))
+        rw [F.xr]
+        exact F.close_sg (by norm_num) (by norm_num) (F.zr0 1) (F.zr_sg (by norm_num))
   have := scale2 hm hT key
   linarith
 
@@ -735,16 +921,40 @@ theorem side_condition_of_windows : SideConditionsOfWindows := by
     have h : 0 < v * X := by rw [F.hvX]; exact F.bpos
     exact (pos_iff_pos_of_mul_pos h).2 F.Xpos
   have hx2 : P.x ≤ P.x ^ 2 := by
-    calc P.x = P.x ^ 1 := (pow_one _).symm
+    calc
+      P.x
+        = P.x ^ 1 := (pow_one _).symm
       _ ≤ P.x ^ 2 := pow_le_pow_right₀ F.x1 (by norm_num)
   have hx4 : P.x ≤ P.x ^ 4 := by
-    calc P.x = P.x ^ 1 := (pow_one _).symm
+    calc
+      P.x
+        = P.x ^ 1 := (pow_one _).symm
       _ ≤ P.x ^ 4 := pow_le_pow_right₀ F.x1 (by norm_num)
   have hw0 : 0 < P.wpp := by rw [F.hwpp]; exact div_pos hvpos F.npos
   have hb1 : 1 ≤ P.b := F.sb1.trans F.sb_le_b
   have hw8 : 0 < w8 := by linarith [F.w81]
   have hbp0 : 0 ≤ P.bp := by rw [F.hbp]; exact mul_nonneg F.xpos.le F.v0
-  refine ⟨hw0, F.th0, ?_, ?_, ?_, ?_, ?_, ?_, ?_, F.C0, ?_, ?_, ?_, ?_, F.lx0, F.La0, ?_, ?_, by rw [F.hXp]; exact F.hXpp⟩
+  refine ⟨
+    hw0,
+    F.th0,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    F.C0,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    F.lx0,
+    F.La0,
+    ?_,
+    ?_,
+    by rw [F.hXp]; exact F.hXpp
+  ⟩
   · have h1 : P.x⁻¹ ≤ (100 : ℝ)⁻¹ := inv_anti₀ (by norm_num) hx
     have := F.thx
     norm_num at h1
@@ -766,11 +976,18 @@ theorem side_condition_of_windows : SideConditionsOfWindows := by
   · unfold Par.f; linarith [F.npos]
   · unfold Par.Sk; linarith [F.Sc0, F.η0, F.kx]
   · unfold Par.Q₁
-    have := F.C0; have := F.r0; have := F.lx0
+    have := F.C0
+    have := F.r0
+    have := F.lx0
     positivity
   · unfold Par.Q₂
     rw [F.hδ, div_inv_eq_mul]
-    have := F.C0; have := F.lx0; have := F.η0; have := F.Sc0; have := F.t0; have := F.bo0
+    have := F.C0
+    have := F.lx0
+    have := F.η0
+    have := F.Sc0
+    have := F.t0
+    have := F.bo0
     have := F.xpos
     positivity
   · linarith [F.kx]
@@ -783,25 +1000,29 @@ theorem large_x_eventually : LargeXEv := by
     have h := (tendsto_rpow_atTop (show 0 < 1 - 4 * ε by linarith)).eventually_ge_atTop (100 * K)
     filter_upwards [h, Filter.eventually_ge_atTop (1 : ℝ)] with x hx hx1
     have xpos : 0 < x := by linarith
-    calc 100 * K * x ^ (4 * ε) ≤ x ^ (1 - 4 * ε) * x ^ (4 * ε) :=
-          mul_le_mul_of_nonneg_right hx (Real.rpow_nonneg xpos.le _)
+    calc
+      100 * K * x ^ (4 * ε) ≤ x ^ (1 - 4 * ε) * x ^ (4 * ε) :=
+        mul_le_mul_of_nonneg_right hx (Real.rpow_nonneg xpos.le _)
       _ = x := by
-          rw [← Real.rpow_add xpos]
-          have : 1 - 4 * ε + 4 * ε = 1 := by ring
-          rw [this, Real.rpow_one]
+        rw [← Real.rpow_add xpos]
+        have : 1 - 4 * ε + 4 * ε = 1 := by ring
+        rw [this, Real.rpow_one]
   have hB : ∀ᶠ x : ℝ in Filter.atTop, 100 * K * x ^ (4 * e + 4) ≤ Real.exp (x ^ (ε / 3)) := by
     have hc : 0 < (2 * (|4 * e + 4| + 1))⁻¹ := by positivity
     have hb := (isLittleO_log_rpow_atTop hε3).bound hc
     have hA := (tendsto_rpow_atTop hε3).eventually_ge_atTop (2 * Real.log (100 * (|K| + 1)))
     filter_upwards [hb, hA, Filter.eventually_ge_atTop (1 : ℝ)] with x hx hxA hx1
     have xpos : 0 < x := by linarith
-    rw [Real.norm_of_nonneg (Real.rpow_nonneg xpos.le _),
-      Real.norm_of_nonneg (Real.log_nonneg hx1)] at hx
+    rw [Real.norm_of_nonneg (Real.rpow_nonneg xpos.le _), Real.norm_of_nonneg (Real.log_nonneg hx1)]
+      at hx
     have hlog0 := Real.log_nonneg hx1
     have h1 : (|4 * e + 4| + 1) * Real.log x ≤ x ^ (ε / 3) / 2 := by
-      have h2 : (|4 * e + 4| + 1) * Real.log x
-          ≤ (|4 * e + 4| + 1) * ((2 * (|4 * e + 4| + 1))⁻¹ * x ^ (ε / 3)) := by gcongr
-      have h3 : (|4 * e + 4| + 1) * ((2 * (|4 * e + 4| + 1))⁻¹ * x ^ (ε / 3)) = x ^ (ε / 3) / 2 := by
+      have h2
+          : (|4 * e + 4| + 1) * Real.log x
+            ≤ (|4 * e + 4| + 1) * ((2 * (|4 * e + 4| + 1))⁻¹ * x ^ (ε / 3)) := by
+        gcongr
+      have h3
+          : (|4 * e + 4| + 1) * ((2 * (|4 * e + 4| + 1))⁻¹ * x ^ (ε / 3)) = x ^ (ε / 3) / 2 := by
         have : |4 * e + 4| + 1 ≠ 0 := by positivity
         field_simp
       linarith
@@ -811,13 +1032,14 @@ theorem large_x_eventually : LargeXEv := by
         exact mul_le_mul_of_nonneg_left (by linarith) hlog0
       linarith
     have hKpos : 0 < 100 * (|K| + 1) := by positivity
-    calc 100 * K * x ^ (4 * e + 4) ≤ 100 * (|K| + 1) * x ^ (4 * e + 4) := by
-          have := le_abs_self K
-          have := Real.rpow_nonneg xpos.le (4 * e + 4)
-          gcongr
-          linarith
+    calc
+      100 * K * x ^ (4 * e + 4) ≤ 100 * (|K| + 1) * x ^ (4 * e + 4) := by
+        have := le_abs_self K
+        have := Real.rpow_nonneg xpos.le (4 * e + 4)
+        gcongr
+        linarith
       _ = Real.exp (Real.log (100 * (|K| + 1)) + Real.log x * (4 * e + 4)) := by
-          rw [Real.exp_add, Real.exp_log hKpos, Real.rpow_def_of_pos xpos]
+        rw [Real.exp_add, Real.exp_log hKpos, Real.rpow_def_of_pos xpos]
       _ ≤ Real.exp (x ^ (ε / 3)) := Real.exp_le_exp.2 (by linarith)
   have h6 : ∀ᶠ x : ℝ in Filter.atTop, (6 : ℝ) ≤ x ^ (2 * ε / 3) :=
     (tendsto_rpow_atTop (by positivity)).eventually_ge_atTop _
@@ -829,12 +1051,12 @@ theorem large_x_eventually : LargeXEv := by
   refine ⟨c4, c1, c2, ?_⟩
   have hw0 : 0 ≤ x ^ (ε / 3) := Real.rpow_nonneg xpos.le _
   have h43 : x ^ (ε / 4) ≤ x ^ (ε / 3) := Real.rpow_le_rpow_of_exponent_le c4 (by linarith)
-  have hz : x ^ ε = x ^ (2 * ε / 3) * x ^ (ε / 3) := by
-    rw [← Real.rpow_add xpos]; congr 1; ring
+  have hz : x ^ ε = x ^ (2 * ε / 3) * x ^ (ε / 3) := by rw [← Real.rpow_add xpos]; congr 1; ring
   have hz6 : 6 * x ^ (ε / 3) ≤ x ^ ε := by rw [hz]; gcongr
-  calc 100 * K * x ^ (4 * e + 4) * Real.exp (x ^ (ε / 3) + x ^ (ε / 4))
-      ≤ Real.exp (x ^ (ε / 3)) * Real.exp (x ^ (ε / 3) + x ^ (ε / 4)) :=
-        mul_le_mul_of_nonneg_right c2 (Real.exp_pos _).le
+  calc
+    100 * K * x ^ (4 * e + 4) * Real.exp (x ^ (ε / 3) + x ^ (ε / 4))
+        ≤ Real.exp (x ^ (ε / 3)) * Real.exp (x ^ (ε / 3) + x ^ (ε / 4)) :=
+      mul_le_mul_of_nonneg_right c2 (Real.exp_pos _).le
     _ = Real.exp (x ^ (ε / 3) + (x ^ (ε / 3) + x ^ (ε / 4))) := (Real.exp_add _ _).symm
     _ ≤ Real.exp (x ^ ε / 2) := Real.exp_le_exp.2 (by linarith)
 
@@ -845,19 +1067,21 @@ theorem second_term_le : SecondLe := by
     intro p hp
     rw [Finset.mem_filter] at hp ⊢
     exact hcl p hp.1 hp.2
-  calc ∑ p ∈ Ps.filter (fun p => cl p = PClass.second), 4 * m * T * a * (Real.log p / p)
-      ≤ ∑ p ∈ s.filter (fun p => θ < Sg p), 4 * m * T * a * (Real.log p / p) := by
-        refine Finset.sum_le_sum_of_subset_of_nonneg hsub (fun p _ _ => ?_)
-        have : 0 ≤ Real.log p / p := div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p)
-        positivity
+  calc
+    ∑ p ∈ Ps.filter (fun p => cl p = PClass.second), 4 * m * T * a * (Real.log p / p)
+        ≤ ∑ p ∈ s.filter (fun p => θ < Sg p), 4 * m * T * a * (Real.log p / p) := by
+      refine Finset.sum_le_sum_of_subset_of_nonneg hsub (fun p _ _ => ?_)
+      have : 0 ≤ Real.log p / p := div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p)
+      positivity
     _ = _ := Finset.sum_congr rfl (fun p _ => by ring)
 
 theorem first_kind_bound : FirstKind := by
   obtain ⟨C, hC⟩ := first_kind_bucket_bound
   refine ⟨C, ?_⟩
   intro e J Y X' ρ p₀ s h1 h2 h3 h4 h5 h6 h7 h8
-  refine hC e J ⌊Real.log X'⌋₊ Y X' ρ p₀ (fun i => X' ^ ((1 : ℝ) / ((i + 1 : ℕ) : ℝ))) s h1 h2 h3 h4 h5
-    (by linarith) ?_ ?_
+  refine hC e J ⌊Real.log X'⌋₊ Y X' ρ p₀
+    (fun i => X' ^ ((1 : ℝ) / ((i + 1 : ℕ) : ℝ)))
+    s h1 h2 h3 h4 h5 (by linarith) ?_ ?_
   · intro i _
     have hx : (1 : ℝ) ≤ X' := by linarith
     have hpos : (0 : ℝ) < ((i + 1 : ℕ) : ℝ) := by positivity
@@ -865,7 +1089,9 @@ theorem first_kind_bound : FirstKind := by
     have h1' : (1 : ℝ) / ((i + 1 : ℕ) : ℝ) ≤ 1 := by
       rw [div_le_one hpos]; push_cast; linarith [(Nat.cast_nonneg i : (0 : ℝ) ≤ i)]
     refine ⟨Real.one_le_rpow hx h0, ?_⟩
-    calc X' ^ ((1 : ℝ) / ((i + 1 : ℕ) : ℝ)) ≤ X' ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hx h1'
+    calc
+      X' ^ ((1 : ℝ) / ((i + 1 : ℕ) : ℝ))
+        ≤ X' ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hx h1'
       _ = X' := Real.rpow_one X'
   · intro p hp
     obtain ⟨a1, a2, a3⟩ := h8 p hp
@@ -878,12 +1104,15 @@ theorem first_kind_bound : FirstKind := by
         exact_mod_cast this
       have hi := band_exponent_bound X' ρ p i h7 (by linarith) hp8 b4
       have hi' : i ≤ ⌊Real.log X'⌋₊ := Nat.le_floor hi
-      obtain ⟨c1, c2⟩ := band_root_bound X' ρ p i (by linarith) h4 (by linarith) (Nat.cast_nonneg p) b2 b3 b4
+      obtain ⟨c1, c2⟩ :=
+        band_root_bound X' ρ p i (by linarith) h4 (by linarith) (Nat.cast_nonneg p) b2 b3 b4
       refine ⟨i - 1, by omega, b1, ?_, ?_⟩
       · have : i - 1 + 1 = i := Nat.sub_add_cancel b2
-        simp only [this]; exact c1
+        simp only [this]
+        exact c1
       · have : i - 1 + 1 = i := Nat.sub_add_cancel b2
-        simp only [this]; exact c2
+        simp only [this]
+        exact c2
 
 lemma first_le {C₁ : ℝ}
     (hC₁ : ∀ (e J : ℕ) (Y X' ρ p₀ : ℝ) (s : Finset ℕ), 1 ≤ e → 1 ≤ J → 1 ≤ Y →
@@ -950,6 +1179,5 @@ lemma first_le {C₁ : ℝ}
   have h3 := mul_le_mul_of_nonneg_left (h.trans (add_le_add_left h2 _)) hco
   unfold tOrders tBand
   linarith
-
 
 end Formalism.LFunctionChainParameters.PrimeWindowSizeBounds

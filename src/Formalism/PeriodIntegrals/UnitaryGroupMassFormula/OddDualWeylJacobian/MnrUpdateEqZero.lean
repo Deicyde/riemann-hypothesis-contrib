@@ -13,8 +13,8 @@ namespace PI.OddDualWeyl.Low
 
 variable {R : Type*} [CommRing R]
 
-def mnr (R : Type*) [CommRing R] {k n : ℕ} (h : n ≤ k) (ρ : Fin n → Fin k) :
-    MvPolynomial (Fin k × Fin k) R :=
+def mnr (R : Type*) [CommRing R] {k n : ℕ} (h : n ≤ k) (ρ : Fin n → Fin k)
+    : MvPolynomial (Fin k × Fin k) R :=
   (Matrix.of fun p q : Fin n => (X (ρ p, Fin.castLE h q) : MvPolynomial (Fin k × Fin k) R)).det
 
 lemma pMinor_eq {k : ℕ} (σ : Equiv.Perm (Fin k)) (n : ℕ) (h : n ≤ k) :
@@ -204,18 +204,23 @@ namespace PI.OddDualWeyl.Low
 
 variable {R : Type*} [CommRing R]
 
-theorem step {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) (i : Fin n) (ν : Fin (n + 1) → ℕ) :
-    ∃ c : R, pw R (σ * Equiv.swap i.castSucc i.succ) ν =
-      c • rowDiv R (σ i.succ) (σ i.castSucc) (ν i.castSucc - nuNext ν i.castSucc) (pw R σ ν) := by
+theorem step {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) (i : Fin n) (ν : Fin (n + 1) → ℕ)
+    : ∃ c : R,
+      pw R (σ * Equiv.swap i.castSucc i.succ) ν
+        = c
+          • rowDiv R (σ i.succ) (σ i.castSucc) (ν i.castSucc - nuNext ν i.castSucc) (pw R σ ν) := by
   classical
-  let m : Fin (n + 1) → MvPolynomial (Fin (n + 1) × Fin (n + 1)) R :=
-    fun s => pMinor R σ (s.val + 1) s.isLt
-  let m' : Fin (n + 1) → MvPolynomial (Fin (n + 1) × Fin (n + 1)) R :=
-    fun s => pMinor R (σ * Equiv.swap i.castSucc i.succ) (s.val + 1) s.isLt
+  let m : Fin (n + 1) → MvPolynomial (Fin (n + 1) × Fin (n + 1)) R := fun s =>
+    pMinor R σ (s.val + 1) s.isLt
+  let m' : Fin (n + 1) → MvPolynomial (Fin (n + 1) × Fin (n + 1)) R := fun s =>
+    pMinor R (σ * Equiv.swap i.castSucc i.succ) (s.val + 1) s.isLt
   let c : Fin (n + 1) → ℕ := fun s => ν s - nuNext ν s
   let ε : Fin (n + 1) → R := fun s => if i.val < s.val then -1 else 1
-  have hne : ∀ s, s ≠ i.castSucc → rowGen R (σ i.succ) (σ i.castSucc) (m s) = Polynomial.C (m s) ∧
-      m' s = MvPolynomial.C (ε s) * m s := by
+  have hne
+      : ∀ s,
+        s ≠ i.castSucc
+          → rowGen R (σ i.succ) (σ i.castSucc) (m s) = Polynomial.C (m s)
+            ∧ m' s = MvPolynomial.C (ε s) * m s := by
     intro s hs
     have : s.val ≠ i.val := fun e => hs (Fin.ext (by simp [e]))
     rcases Nat.lt_or_gt_of_ne this with h | h
@@ -225,17 +230,20 @@ theorem step {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) (i : Fin n) (ν : Fin (n 
     · obtain ⟨h1, h2⟩ := stepC (R := R) σ i s h
       refine ⟨h1, ?_⟩
       simp only [m', m, ε, h2, ite_eq_left h, map_neg, map_one, neg_one_mul]
-  have hI : rowGen R (σ i.succ) (σ i.castSucc) (m i.castSucc) =
-      Polynomial.C (m i.castSucc) + Polynomial.X * Polynomial.C (m' i.castSucc) :=
+  have hI
+      : rowGen R (σ i.succ) (σ i.castSucc) (m i.castSucc)
+        = Polynomial.C (m i.castSucc) + Polynomial.X * Polynomial.C (m' i.castSucc) :=
     stepB (R := R) σ i i.castSucc (by simp)
-  have hrd : rowDiv R (σ i.succ) (σ i.castSucc) (c i.castSucc) (pw R σ ν) =
-      m' i.castSucc ^ c i.castSucc * ∏ s ∈ Finset.univ.erase i.castSucc, m s ^ c s := by
+  have hrd
+      : rowDiv R (σ i.succ) (σ i.castSucc) (c i.castSucc) (pw R σ ν)
+        = m' i.castSucc ^ c i.castSucc * ∏ s ∈ Finset.univ.erase i.castSucc, m s ^ c s := by
     show (rowGen R (σ i.succ) (σ i.castSucc) (∏ s, m s ^ c s)).coeff (c i.castSucc) = _
     rw [map_prod, ← Finset.mul_prod_erase _ _ (Finset.mem_univ i.castSucc)]
-    rw [Finset.prod_congr rfl (fun s hs => by
-      rw [map_pow, (hne s (Finset.ne_of_mem_erase hs)).1])]
-    rw [map_pow, hI, show ∏ s ∈ Finset.univ.erase i.castSucc, (Polynomial.C (m s)) ^ c s =
-      Polynomial.C (∏ s ∈ Finset.univ.erase i.castSucc, m s ^ c s) by simp [map_prod, map_pow],
+    rw [Finset.prod_congr rfl (fun s hs => by rw [map_pow, (hne s (Finset.ne_of_mem_erase hs)).1])]
+    rw [map_pow, hI,
+      show ∏ s ∈ Finset.univ.erase i.castSucc, (Polynomial.C (m s)) ^ c s
+          = Polynomial.C (∏ s ∈ Finset.univ.erase i.castSucc, m s ^ c s) by
+        simp [map_prod, map_pow],
       Polynomial.coeff_mul_C, coeff_lin_pow]
   refine ⟨∏ s ∈ Finset.univ.erase i.castSucc, ε s ^ c s, ?_⟩
   rw [show ν i.castSucc - nuNext ν i.castSucc = c i.castSucc from rfl, hrd, ← MvPolynomial.C_mul']
@@ -245,12 +253,13 @@ theorem step {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) (i : Fin n) (ν : Fin (n 
   simp only [mul_pow, Finset.prod_mul_distrib, map_prod, map_pow]
   ring
 
-theorem pw_mem {n : ℕ} (ν : Fin (n + 1) → ℕ) (σ : Equiv.Perm (Fin (n + 1))) :
-    pw R σ ν ∈ weyl R (n + 1) (n + 1) le_rfl ν := by
+theorem pw_mem {n : ℕ} (ν : Fin (n + 1) → ℕ) (σ : Equiv.Perm (Fin (n + 1)))
+    : pw R σ ν ∈ weyl R (n + 1) (n + 1) le_rfl ν := by
   have hσ : σ ∈ Submonoid.closure (Set.range fun i : Fin n => Equiv.swap i.castSucc i.succ) := by
     rw [Equiv.Perm.mclosure_swap_castSucc_succ]; trivial
   refine Submonoid.closure_induction_right
-    (motive := fun x _ => pw R x ν ∈ weyl R (n + 1) (n + 1) le_rfl ν) ?_ ?_ hσ
+    (motive := fun x _ => pw R x ν ∈ weyl R (n + 1) (n + 1) le_rfl ν)
+    ?_ ?_ hσ
   · rw [pw_one]; exact hw_mem _ _
   · intro x _ y hy ih
     obtain ⟨i, rfl⟩ := hy
@@ -267,7 +276,8 @@ theorem lowestWeightMem : LowMem := by
   cases k with
   | zero =>
     have : low R ν = hw R (le_refl 0) ν := by simp [low, pw, hw]
-    rw [this]; exact Low.hw_mem _ _
+    rw [this]
+    exact Low.hw_mem _ _
   | succ n => exact Low.pw_mem ν _
 
 end PI.OddDualWeyl

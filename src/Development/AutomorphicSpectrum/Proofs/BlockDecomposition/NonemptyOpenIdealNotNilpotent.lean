@@ -5,21 +5,26 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PowIdeal
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE TensorProduct
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE TensorProduct
 
 set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.GE.NonIso
 
-theorem exists_ideal_not_pow_le {X : Scheme.{0}} (J : X.IdealSheafData) (W : J.subscheme.Opens)
-    (hW : (W : Set J.subscheme).Nonempty) :
-    ∃ J₀ : X.IdealSheafData, (∀ (V : X.affineOpens) (f : Γ(X, V)), f ∈ J₀.ideal V →
-      J.subschemeι ⁻¹ᵁ X.basicOpen f ≤ W) ∧ ∀ m, ¬ powIdeal J₀ m ≤ J := by
+theorem exists_ideal_not_pow_le
+    {X : Scheme.{0}}
+    (J : X.IdealSheafData) (W : J.subscheme.Opens) (hW : (W : Set J.subscheme).Nonempty)
+    : ∃ J₀ : X.IdealSheafData,
+      (∀ (V : X.affineOpens) (f : Γ(X, V)), f ∈ J₀.ideal V → J.subschemeι ⁻¹ᵁ X.basicOpen f ≤ W)
+        ∧ ∀ m, ¬ powIdeal J₀ m ≤ J := by
   have hC : IsClosed (J.subschemeι '' (W : Set J.subscheme)ᶜ) :=
     J.subschemeι.isClosedEmbedding.isClosedMap _ W.isOpen.isClosed_compl
   let C : TopologicalSpace.Closeds X := ⟨_, hC⟩
-  have hsupp : ∀ x : X, x ∈ (Scheme.IdealSheafData.vanishingIdeal C).support ↔
-      x ∈ J.subschemeι '' (W : Set J.subscheme)ᶜ := by
+  have hsupp
+      : ∀ x : X,
+        x ∈ (Scheme.IdealSheafData.vanishingIdeal C).support
+          ↔ x ∈ J.subschemeι '' (W : Set J.subscheme)ᶜ := by
     intro x
     rw [← SetLike.mem_coe, Scheme.IdealSheafData.coe_support_vanishingIdeal]
     rfl
@@ -33,8 +38,9 @@ theorem exists_ideal_not_pow_le {X : Scheme.{0}} (J : X.IdealSheafData) (W : J.s
     exact h1 f hf hy
   · intro m hm
     obtain ⟨w, hw⟩ := hW
-    obtain ⟨V, hV, hxV, -⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens)
-      (show J.subschemeι w ∈ (⊤ : X.Opens) from trivial)
+    obtain ⟨V, hV, hxV, -⟩ :=
+      (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens)
+        (show J.subschemeι w ∈ (⊤ : X.Opens) from trivial)
     let V' : X.affineOpens := ⟨V, hV⟩
     have hxV' : J.subschemeι w ∈ (V' : X.Opens) := hxV
     have hnC : J.subschemeι w ∉ (Scheme.IdealSheafData.vanishingIdeal C).support := by

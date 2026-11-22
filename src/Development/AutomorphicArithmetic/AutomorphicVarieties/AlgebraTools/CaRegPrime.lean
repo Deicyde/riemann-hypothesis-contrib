@@ -10,10 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.regular_localization_of_regular_quotient :
-    ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (p : Ideal R) [p.IsPrime] [IsRegularLocalRing (R ⧸ p)],
-      IsRegularLocalRing (Localization.AtPrime p) ∧
-      ringKrullDim (Localization.AtPrime p) + ringKrullDim (R ⧸ p) = ringKrullDim R := by
+theorem UpperTheory.V.AlgebraTools.regular_localization_of_regular_quotient
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] (p : Ideal R) [p.IsPrime]
+        [IsRegularLocalRing (R ⧸ p)],
+      IsRegularLocalRing (Localization.AtPrime p)
+        ∧ ringKrullDim (Localization.AtPrime p) + ringKrullDim (R ⧸ p) = ringKrullDim R := by
   intro R _ _ p _ _
   obtain ⟨r, x, hx, hsp⟩ := exists_cotInd_of_regular_quotient R p
   obtain ⟨-, hdim, -⟩ := regular_quotient_cotInd R _ x hx

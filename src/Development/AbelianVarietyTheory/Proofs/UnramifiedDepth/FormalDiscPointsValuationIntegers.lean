@@ -7,10 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.MvPowerS
 
 namespace GlobalTheory.ChF
 
-private theorem exists_pow_mem_span_of_not_isUnit {p : ℕ} [Fact p.Prime] {C : Type} [Field C]
-    [CharZero C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-    (hv : v.Integers O) {x : O} (hx : ¬ IsUnit x) :
-    ∃ M : ℕ, x ^ M ∈ Ideal.span {(p : O)} := by
+private theorem exists_pow_mem_span_of_not_isUnit
+    {p : ℕ} [Fact p.Prime]
+    {C : Type} [Field C] [CharZero C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {x : O} (hx : ¬ IsUnit x)
+    : ∃ M : ℕ, x ^ M ∈ Ideal.span {(p : O)} := by
   have h1 : v (algebraMap O C x) < 1 :=
     lt_of_le_of_ne (hv.map_le_one x) fun h => hx (hv.isUnit_of_one' h)
   have hp : (0 : NNReal) < v (algebraMap O C (p : O)) := by
@@ -21,9 +24,11 @@ private theorem exists_pow_mem_span_of_not_isUnit {p : ℕ} [Fact p.Prime] {C : 
   rw [map_pow, map_pow]
   exact hM.le
 
-private theorem not_isUnit_algHom_of_constantCoeff_eq_zero {O : Type} [CommRing O] [Nontrivial O]
-    {κ : Type} (Φ : MvPowerSeries κ O →ₐ[O] O) (f : MvPowerSeries κ O)
-    (hf : MvPowerSeries.constantCoeff f = 0) : ¬ IsUnit (Φ f) := by
+private theorem not_isUnit_algHom_of_constantCoeff_eq_zero
+    {O : Type} [CommRing O] [Nontrivial O]
+    {κ : Type}
+    (Φ : MvPowerSeries κ O →ₐ[O] O) (f : MvPowerSeries κ O) (hf : MvPowerSeries.constantCoeff f = 0)
+    : ¬ IsUnit (Φ f) := by
   rintro ⟨u, hu⟩
   have h1 : IsUnit (1 - ((u⁻¹ : Oˣ) : O) • f) := by
     rw [MvPowerSeries.isUnit_iff_constantCoeff, map_sub, map_one, Algebra.smul_def, map_mul, hf,
@@ -33,23 +38,44 @@ private theorem not_isUnit_algHom_of_constantCoeff_eq_zero {O : Type} [CommRing 
   rw [map_sub, map_one, map_smul, ← hu, smul_eq_mul, Units.inv_mul, sub_self] at h2
   exact not_isUnit_zero h2
 
-theorem formalDisc_points_integers : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (κ : Type) [Finite κ], (∀ c : κ → O, (∀ q, ¬ IsUnit (c q)) → ∃! Φ : MvPowerSeries κ O →ₐ[O] O, ∀ q, Φ (MvPowerSeries.X q) = c q) ∧ (∀ (Φ : MvPowerSeries κ O →ₐ[O] O) (f : MvPowerSeries κ O), MvPowerSeries.constantCoeff f = 0 → ¬ IsUnit (Φ f)) ∧ ∀ (Φ : MvPowerSeries κ O →ₐ[O] O) (n : ℕ), ∃ N : ℕ, ∀ f ∈ ((Ideal.span {(p : O)}).map (MvPowerSeries.C : O →+* MvPowerSeries κ O) ⊔ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ O))) ^ N, Φ f ∈ Ideal.span {(p : O) ^ n} := by
+theorem formalDisc_points_integers
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (κ : Type) [Finite κ],
+          (∀ c : κ → O,
+              (∀ q, ¬ IsUnit (c q))
+                → ∃! Φ : MvPowerSeries κ O →ₐ[O] O, ∀ q, Φ (MvPowerSeries.X q) = c q)
+            ∧ (∀ (Φ : MvPowerSeries κ O →ₐ[O] O) (f : MvPowerSeries κ O),
+              MvPowerSeries.constantCoeff f = 0 → ¬ IsUnit (Φ f))
+            ∧ ∀ (Φ : MvPowerSeries κ O →ₐ[O] O) (n : ℕ), ∃ N : ℕ,
+              ∀ f
+                  ∈ ((Ideal.span {(p : O)}).map (MvPowerSeries.C : O →+* MvPowerSeries κ O)
+                      ⊔ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ O)))
+                    ^ N,
+                Φ f ∈ Ideal.span {(p : O) ^ n} := by
   intro p _ C _ _ _ v O _ _ hv hp hc κ _
   haveI : Nontrivial O := by
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
     exact hp.out (isUnit_of_subsingleton _)
   refine ⟨fun c hcu => ?_, not_isUnit_algHom_of_constantCoeff_eq_zero, fun Φ n => ?_⟩
-  · obtain ⟨hex, huniq⟩ := GlobalTheory.mvPowerSeries_eval_of_pow_mem O (Ideal.span {(p : O)}) κ c
-      fun j => exists_pow_mem_span_of_not_isUnit hv (hcu j)
+  · obtain ⟨hex, huniq⟩ :=
+      GlobalTheory.mvPowerSeries_eval_of_pow_mem O (Ideal.span {(p : O)}) κ c fun j =>
+        exists_pow_mem_span_of_not_isUnit hv (hcu j)
     obtain ⟨Φ, hΦ⟩ := hex hc O
     refine ⟨Φ, hΦ, fun Ψ hΨ => ?_⟩
-    have := huniq inferInstance O Ψ.toRingHom Φ.toRingHom
-      (fun t => (Ψ.commutes t).trans (Φ.commutes t).symm) hΨ hΦ
+    have :=
+      huniq inferInstance O Ψ.toRingHom Φ.toRingHom
+        (fun t => (Ψ.commutes t).trans (Φ.commutes t).symm)
+        hΨ hΦ
     exact AlgHom.ext fun g => DFunLike.congr_fun this g
-  · obtain ⟨N, hN⟩ := GlobalTheory.NilpotentEval.exists_pow_sup_span_le (Ideal.span {(p : O)})
-      (fun q => Φ (MvPowerSeries.X q)) fun q => exists_pow_mem_span_of_not_isUnit hv
-        (not_isUnit_algHom_of_constantCoeff_eq_zero Φ _ (MvPowerSeries.constantCoeff_X q))
+  · obtain ⟨N, hN⟩ :=
+      GlobalTheory.NilpotentEval.exists_pow_sup_span_le (Ideal.span {(p : O)})
+        (fun q => Φ (MvPowerSeries.X q))
+        fun q =>
+          exists_pow_mem_span_of_not_isUnit hv
+            (not_isUnit_algHom_of_constantCoeff_eq_zero Φ _ (MvPowerSeries.constantCoeff_X q))
     refine ⟨N * n, fun f hf => ?_⟩
     rw [← Ideal.span_singleton_pow]
     refine GlobalTheory.NilpotentEval.pow_mul_le hN n ?_

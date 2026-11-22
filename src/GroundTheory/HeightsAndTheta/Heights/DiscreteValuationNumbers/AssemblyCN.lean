@@ -67,7 +67,8 @@ theorem GradedPieceQuot.full : GradedPieceQuot.Statement.{u} := GradedPieceQuot.
 
 theorem CutPieces.full : CutPieces.Statement.{u} := CutPieces.proof
 
-theorem HilbFnCut.full : HilbFnCut.Statement.{u} := HilbFnCut.proof GradedPieceQuot.full CutPieces.full
+theorem HilbFnCut.full : HilbFnCut.Statement.{u} :=
+  HilbFnCut.proof GradedPieceQuot.full CutPieces.full
 
 theorem MultiHomogPrimeCriterion.full : MultiHomogPrimeCriterion.Statement.{u} :=
   MultiHomogPrimeCriterion.proof
@@ -91,7 +92,8 @@ theorem DimStrictDrop.full : DimStrictDrop.Statement.{u} := DimStrictDrop.proof
 
 theorem BlockAdjoinPrime.full : BlockAdjoinPrime.Statement.{u} := BlockAdjoinPrime.proof
 
-theorem RelevantDimGe.full : RelevantDimGe.Statement.{u} := RelevantDimGe.proof BlockAdjoinPrime.full
+theorem RelevantDimGe.full : RelevantDimGe.Statement.{u} :=
+  RelevantDimGe.proof BlockAdjoinPrime.full
 
 theorem HilbDegBound.full : HilbDegBound.Statement.{u} :=
   HilbDegBound.proof HilbFnVanishBlock.full HilbFnCut.full PrimeFiltration.full DimStrictDrop.full
@@ -124,7 +126,8 @@ theorem SpecialCycleEval.full : SpecialCycleEval.Statement.{u} :=
 theorem SpecialDimBound.full : SpecialDimBound.Statement.{u} := SpecialDimBound.proof
 
 theorem IntNumVanish.full : IntNumVanish.Statement.{u} :=
-  IntNumVanish.proof HilbDegBound.full HilbFnVanishBlock.full DegLTClosure.full EventualValueFacts.full
+  IntNumVanish.proof HilbDegBound.full HilbFnVanishBlock.full DegLTClosure.full
+    EventualValueFacts.full
 
 theorem IntNumAssoc.full : IntNumAssoc.Statement.{u} :=
   IntNumAssoc.proof PrimeFiltration.full IntNumOfFiltration.full MultAtPrimeAtMinimal.full

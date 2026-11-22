@@ -12,8 +12,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-private theorem base_exists_prime {R : Type} [CommRing R] (b : Ideal R)
-    (h : 0 < ringKrullDim (R ⧸ b)) : ∃ P : Ideal R, P.IsPrime ∧ b ≤ P ∧ ¬ P.IsMaximal := by
+private theorem base_exists_prime
+    {R : Type} [CommRing R] (b : Ideal R) (h : 0 < ringKrullDim (R ⧸ b))
+    : ∃ P : Ideal R, P.IsPrime ∧ b ≤ P ∧ ¬P.IsMaximal := by
   by_contra hc
   push Not at hc
   have hk : Ring.KrullDimLE 0 (R ⧸ b) := by
@@ -31,9 +32,10 @@ private theorem base_exists_prime {R : Type} [CommRing R] (b : Ideal R)
   rw [Ring.krullDimLE_iff] at hk
   exact absurd h (not_lt.2 (by simpa using hk))
 
-private theorem base_exists_out {A R : Type} [CommRing A] [IsLocalRing A] [CommRing R]
-    [Algebra A R] [Module.Finite A R] (P : Ideal R) (hP : P.IsPrime) (hm : ¬ P.IsMaximal) :
-    ∃ y ∈ maximalIdeal A, algebraMap A R y ∉ P := by
+private theorem base_exists_out
+    {A R : Type} [CommRing A] [IsLocalRing A] [CommRing R] [Algebra A R] [Module.Finite A R]
+    (P : Ideal R) (hP : P.IsPrime) (hm : ¬P.IsMaximal)
+    : ∃ y ∈ maximalIdeal A, algebraMap A R y ∉ P := by
   by_contra hcon
   push_neg at hcon
   haveI := hP
@@ -47,20 +49,27 @@ private theorem base_exists_out {A R : Type} [CommRing A] [IsLocalRing A] [CommR
   exact hm (Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap A R)
     (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) P hmax)
 
-private theorem base_ofList_le {A : Type} [CommRing A] {xs : List A} {I : Ideal A}
-    (h : ∀ x ∈ xs, x ∈ I) : Ideal.ofList xs ≤ I :=
+private theorem base_ofList_le
+    {A : Type} [CommRing A] {xs : List A} {I : Ideal A} (h : ∀ x ∈ xs, x ∈ I)
+    : Ideal.ofList xs ≤ I :=
   Ideal.span_le.2 fun x hx => h x hx
 
-private theorem base_mem_ofList {A : Type} [CommRing A] {xs : List A} {x : A}
-    (h : x ∈ xs) : x ∈ Ideal.ofList xs :=
+private theorem base_mem_ofList {A : Type} [CommRing A] {xs : List A} {x : A} (h : x ∈ xs)
+    : x ∈ Ideal.ofList xs :=
   Ideal.subset_span h
 
-theorem UpperTheory.V.AlgebraTools.Conn.base :
-    ∀ {A R : Type} [CommRing A] [IsLocalRing A] [IsDomain A] [CommRing R] [IsLocalRing R] [IsDomain R] [Algebra A R] [Module.Finite A R] [FaithfulSMul A R] [IsAdicComplete (maximalIdeal A) A], ReciprocityTheory.CA.IsCM A → ∀ (xs : List A) (b c : Ideal R),
-      (∀ x ∈ xs, x ∈ maximalIdeal A) → ringKrullDim (A ⧸ Ideal.ofList xs) + xs.length = ringKrullDim A →
-      2 ≤ ringKrullDim (A ⧸ Ideal.ofList xs) →
-      (b ⊓ c).radical = ((Ideal.ofList xs).map (algebraMap A R)).radical → (b ⊔ c).radical = maximalIdeal R →
-      0 < ringKrullDim (R ⧸ b) → 0 < ringKrullDim (R ⧸ c) → False := by
+theorem UpperTheory.V.AlgebraTools.Conn.base
+    : ∀ {A R : Type} [CommRing A] [IsLocalRing A] [IsDomain A] [CommRing R] [IsLocalRing R]
+        [IsDomain R] [Algebra A R] [Module.Finite A R] [FaithfulSMul A R]
+        [IsAdicComplete (maximalIdeal A) A],
+      ReciprocityTheory.CA.IsCM A
+        → ∀ (xs : List A) (b c : Ideal R),
+          (∀ x ∈ xs, x ∈ maximalIdeal A)
+            → ringKrullDim (A ⧸ Ideal.ofList xs) + xs.length = ringKrullDim A
+            → 2 ≤ ringKrullDim (A ⧸ Ideal.ofList xs)
+            → (b ⊓ c).radical = ((Ideal.ofList xs).map (algebraMap A R)).radical
+            → (b ⊔ c).radical = maximalIdeal R → 0 < ringKrullDim (R ⧸ b) → 0 < ringKrullDim (R ⧸ c)
+            → False := by
   intro A R _ _ _ _ _ _ _ _ _ _ hCM xs b c hxs hdim h2 hrad hsup hb hc
   haveI : IsNoetherianRing A := hCM.1
   have hIm : Ideal.ofList xs ≤ maximalIdeal A := base_ofList_le hxs
@@ -78,18 +87,22 @@ theorem UpperTheory.V.AlgebraTools.Conn.base :
     intro a ha
     rw [hsup, ← Ideal.mem_comap, hcom]
     exact ha
-  have hmapI : ∀ {X : Ideal R}, X.IsPrime → b ⊓ c ≤ X →
-      Ideal.map (algebraMap A R) (Ideal.ofList xs) ≤ X := by
+  have hmapI
+      : ∀ {X : Ideal R},
+        X.IsPrime → b ⊓ c ≤ X → Ideal.map (algebraMap A R) (Ideal.ofList xs) ≤ X := by
     intro X hX hbc
-    calc Ideal.map (algebraMap A R) (Ideal.ofList xs)
+    calc
+      Ideal.map (algebraMap A R) (Ideal.ofList xs)
         ≤ (Ideal.map (algebraMap A R) (Ideal.ofList xs)).radical := Ideal.le_radical
       _ = (b ⊓ c).radical := hrad.symm
       _ ≤ X.radical := Ideal.radical_mono hbc
       _ = X := hX.radical
-  refine core (Ideal.ofList xs) (fun m => Ideal.ofList (xs.map (fun x => x ^ (m + 1)))) u v b c P Q y z
-    ?_ ?_ (fun m K => hreg m K) ?_ ?_ (hmem u hu) (hmem v hv) hP hQ hbP hcQ
-    (hmapI hP (inf_le_left.trans hbP)) (hmapI hQ (inf_le_right.trans hcQ))
-    (hmem y hy) (hmem z hz) hyP hzQ
+  refine core (Ideal.ofList xs)
+    (fun m => Ideal.ofList (xs.map (fun x => x ^ (m + 1))))
+    u v b c P Q y z ?_ ?_
+    (fun m K => hreg m K)
+    ?_ ?_ (hmem u hu) (hmem v hv) hP hQ hbP hcQ (hmapI hP (inf_le_left.trans hbP))
+    (hmapI hQ (inf_le_right.trans hcQ)) (hmem y hy) (hmem z hz) hyP hzQ
   · intro m n hmn
     apply base_ofList_le
     intro w hw

@@ -9,20 +9,23 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 set_option autoImplicit false
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
 open Polynomial
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
 
-theorem exists_large_prime_dvd_eval (f : ℤ[X]) (hf : 0 < f.natDegree) (N : ℕ) :
-    ∃ (p : ℕ) (m : ℤ), p.Prime ∧ N < p ∧ (p : ℤ) ∣ f.eval m :=
-  _root_.UpperTheory.Reformulated.B.P6.LargePrimeDivisors.GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.exists_large_prime_dvd_eval f hf N
+theorem exists_large_prime_dvd_eval (f : ℤ[X]) (hf : 0 < f.natDegree) (N : ℕ)
+    : ∃ (p : ℕ) (m : ℤ), p.Prime ∧ N < p ∧ (p : ℤ) ∣ f.eval m :=
+  _root_.UpperTheory.Reformulated.B.P6.LargePrimeDivisors.GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.exists_large_prime_dvd_eval
+    f hf N
 
-theorem exists_exponent_ne_zero (F : Type) [Field F] [NumberField F] :
-    ∃ θ : 𝓞 F, RingOfIntegers.exponent θ ≠ 0 := by
+theorem exists_exponent_ne_zero (F : Type) [Field F] [NumberField F]
+    : ∃ θ : 𝓞 F, RingOfIntegers.exponent θ ≠ 0 := by
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ F
-  obtain ⟨y, hy, hint⟩ := IsAlgebraic.exists_integral_multiple (R := ℤ)
-    ((IsFractionRing.isAlgebraic_iff ℤ ℚ F).2 (Algebra.IsAlgebraic.isAlgebraic α))
+  obtain ⟨y, hy, hint⟩ :=
+    IsAlgebraic.exists_integral_multiple (R := ℤ)
+      ((IsFractionRing.isAlgebraic_iff ℤ ℚ F).2 (Algebra.IsAlgebraic.isAlgebraic α))
   obtain ⟨θ, hθ⟩ := (IsIntegralClosure.isIntegral_iff (A := 𝓞 F)).1 hint
   refine ⟨θ, ?_⟩
   have hθ' : (θ : F) = y • α := hθ
@@ -44,9 +47,10 @@ theorem exists_exponent_ne_zero (F : Type) [Field F] [NumberField F] :
   let B := PowerBasis.ofAdjoinEqTop hintQ htop
   have hgen : B.gen = θ := PowerBasis.ofAdjoinEqTop_gen hintQ htop
   have hintB : IsIntegral ℤ B.gen := hgen ▸ hintZ
-  have hdi : IsIntegral ℤ (Algebra.discr ℚ B.basis) := Algebra.discr_isIntegral ℚ (fun i => by
-    rw [PowerBasis.coe_basis]
-    exact hintB.pow _)
+  have hdi : IsIntegral ℤ (Algebra.discr ℚ B.basis) :=
+    Algebra.discr_isIntegral ℚ (fun i => by
+      rw [PowerBasis.coe_basis]
+      exact hintB.pow _)
   obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.1 hdi
   have hn0 : n ≠ 0 := by
     rintro rfl
@@ -58,8 +62,9 @@ theorem exists_exponent_ne_zero (F : Type) [Field F] [NumberField F] :
     rw [hgen, ← hn] at h1
     have h2 : ((n : F) * (b : F)) ∈ Algebra.adjoin ℤ {(θ : F)} := by
       simpa [Algebra.smul_def] using h1
-    have h3 : Algebra.adjoin ℤ {(θ : F)} =
-        (Algebra.adjoin ℤ {θ}).map (IsScalarTower.toAlgHom ℤ (𝓞 F) F) := by
+    have h3
+        : Algebra.adjoin ℤ {(θ : F)}
+          = (Algebra.adjoin ℤ {θ}).map (IsScalarTower.toAlgHom ℤ (𝓞 F) F) := by
       rw [AlgHom.map_adjoin, Set.image_singleton]
       rfl
     rw [h3] at h2
@@ -75,9 +80,13 @@ theorem exists_exponent_ne_zero (F : Type) [Field F] [NumberField F] :
   rw [h0] at hm
   exact hn0 (by simpa using hm)
 
-theorem exists_isPrime_absNorm_eq {F : Type} [Field F] [NumberField F] (θ : 𝓞 F) (p : ℕ) [Fact p.Prime]
-    (hp : ¬ p ∣ RingOfIntegers.exponent θ) (m : ℤ) (hm : (p : ℤ) ∣ (minpoly ℤ θ).eval m) :
-    ∃ 𝔠 : Ideal (𝓞 F), 𝔠.IsPrime ∧ Ideal.absNorm 𝔠 = p := by
+theorem exists_isPrime_absNorm_eq
+    {F : Type} [Field F] [NumberField F]
+    (θ : 𝓞 F)
+    (p : ℕ) [Fact p.Prime]
+    (hp : ¬ p ∣ RingOfIntegers.exponent θ)
+    (m : ℤ) (hm : (p : ℤ) ∣ (minpoly ℤ θ).eval m)
+    : ∃ 𝔠 : Ideal (𝓞 F), 𝔠.IsPrime ∧ Ideal.absNorm 𝔠 = p := by
   have h₀ : map (Int.castRingHom (ZMod p)) (minpoly ℤ θ) ≠ 0 :=
     map_monic_ne_zero (minpoly.monic θ.isIntegral)
   have hQ : (X - C ((m : ℤ) : ZMod p)) ∈ RingOfIntegers.monicFactorsMod θ p := by
@@ -92,14 +101,19 @@ theorem exists_isPrime_absNorm_eq {F : Type} [Field F] [NumberField F] (θ : �
   refine ⟨P, hPp, ?_⟩
   rw [← Ideal.pow_inertiaDeg p (P : Ideal (𝓞 F)), hf, natDegree_X_sub_C, pow_one]
 
-theorem exists_prime_absNorm_avoiding : ∀ (F : Type) [Field F] [NumberField F] (𝔣 : Ideal (𝓞 F)), 𝔣 ≠ ⊥ →
-    ∀ (W : Finset (𝓞 F)) (B : ℕ), (∀ x ∈ W, x ≠ 0) →
-    ∃ 𝔠 : Ideal (𝓞 F), 𝔠.IsPrime ∧ (Ideal.absNorm 𝔠).Prime ∧ B < Ideal.absNorm 𝔠 ∧ 𝔠 ⊔ 𝔣 = ⊤ ∧ ∀ x ∈ W, x ∉ 𝔠 := by
+theorem exists_prime_absNorm_avoiding
+    : ∀ (F : Type) [Field F] [NumberField F] (𝔣 : Ideal (𝓞 F)),
+      𝔣 ≠ ⊥
+        → ∀ (W : Finset (𝓞 F)) (B : ℕ),
+          (∀ x ∈ W, x ≠ 0)
+            → ∃ 𝔠 : Ideal (𝓞 F),
+              𝔠.IsPrime ∧ (Ideal.absNorm 𝔠).Prime ∧ B < Ideal.absNorm 𝔠 ∧ 𝔠 ⊔ 𝔣 = ⊤
+                ∧ ∀ x ∈ W, x ∉ 𝔠 := by
   intro F _ _ 𝔣 h𝔣 W B hW
   obtain ⟨θ, hθ⟩ := exists_exponent_ne_zero F
-  obtain ⟨p, m, hp, hN, hdvd⟩ := exists_large_prime_dvd_eval (minpoly ℤ θ)
-    (minpoly.natDegree_pos θ.isIntegral)
-    (B + RingOfIntegers.exponent θ + Ideal.absNorm 𝔣 + ∑ x ∈ W, Ideal.absNorm (Ideal.span {x}))
+  obtain ⟨p, m, hp, hN, hdvd⟩ :=
+    exists_large_prime_dvd_eval (minpoly ℤ θ) (minpoly.natDegree_pos θ.isIntegral)
+      (B + RingOfIntegers.exponent θ + Ideal.absNorm 𝔣 + ∑ x ∈ W, Ideal.absNorm (Ideal.span {x}))
   have := Fact.mk hp
   have hexp : ¬ p ∣ RingOfIntegers.exponent θ := fun h => by
     have := Nat.le_of_dvd (Nat.pos_of_ne_zero hθ) h
@@ -119,7 +133,10 @@ theorem exists_prime_absNorm_avoiding : ∀ (F : Type) [Field F] [NumberField F]
     exact small 𝔣 h𝔣 (by omega) (sup_eq_left.1 (hmax.eq_of_le h le_sup_left).symm)
   · intro x hx hxc
     have hle : Ideal.absNorm (Ideal.span {x}) ≤ ∑ x ∈ W, Ideal.absNorm (Ideal.span {x}) :=
-      Finset.single_le_sum (f := fun x => Ideal.absNorm (Ideal.span {x})) (fun _ _ => Nat.zero_le _) hx
+      Finset.single_le_sum
+        (f := fun x => Ideal.absNorm (Ideal.span {x}))
+        (fun _ _ => Nat.zero_le _)
+        hx
     exact small (Ideal.span {x}) (by simpa using hW x hx) (by omega)
       ((Ideal.span_singleton_le_iff_mem _).2 hxc)
 

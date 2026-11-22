@@ -10,16 +10,23 @@ namespace UpperTheory.V.Z.Sym.Loc.CP
 
 open QuadraticAlgebra
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ τ : K}
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+  {Δ τ : K}
 
-theorem lat_basis (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) {Λ : Set (Etau K τ)} (h : IsLat O τ Λ) :
-    ∃ y₁ y₂ : Etau K τ, (y₂ * star y₁).im ≠ 0 ∧ ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂ := by
+theorem lat_basis (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) {Λ : Set (Etau K τ)} (h : IsLat O τ Λ)
+    : ∃ y₁ y₂ : Etau K τ,
+      (y₂ * star y₁).im ≠ 0
+        ∧ ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂ := by
   obtain ⟨y, x, hx, -, -, rfl⟩ := latCls O K Δ τ L hD Λ h
-  have hs : ∀ (p : O) (z : Etau K τ), p • z = algebraMap O K p • z := fun p z => (algebraMap_smul K p z).symm
+  have hs : ∀ (p : O) (z : Etau K τ), p • z = algebraMap O K p • z := fun p z =>
+    (algebraMap_smul K p z).symm
   have hn : QuadraticAlgebra.norm (y : Etau K τ) ≠ 0 :=
     (QuadraticAlgebra.isUnit_iff_norm_isUnit.mp y.isUnit).ne_zero
   refine ⟨y, y * x, ?_, ?_⟩
-  · have e : (y : Etau K τ) * x * star (y : Etau K τ) = x * algebraMap K _ (QuadraticAlgebra.norm (y : Etau K τ)) := by
+  · have e
+        : (y : Etau K τ) * x * star (y : Etau K τ)
+          = x * algebraMap K _ (QuadraticAlgebra.norm (y : Etau K τ)) := by
       rw [QuadraticAlgebra.algebraMap_norm_eq_mul_star]
       ring
     rw [e, QuadraticAlgebra.im_mul]
@@ -36,8 +43,11 @@ theorem lat_basis (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) {Λ : Set (Etau K τ)
       rw [hs, hs, mul_add, mul_smul_comm, mul_smul_comm, mul_one]
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem mem_S0_of_sum_eq {s : K} {β y₁ y₂ : Etau K τ} {Λ : Set (Etau K τ)} (h : ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂)
-    {v : K × Etau K τ} : v ∈ S0 s β Λ ↔ psi s β v y₁ ∈ Λ ∧ psi s β v y₂ ∈ Λ := by
+theorem mem_S0_of_sum_eq
+    {s : K} {β y₁ y₂ : Etau K τ} {Λ : Set (Etau K τ)}
+    (h : ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂)
+    {v : K × Etau K τ}
+    : v ∈ S0 s β Λ ↔ psi s β v y₁ ∈ Λ ∧ psi s β v y₂ ∈ Λ := by
   simp only [S0, Set.mem_setOf_eq]
   constructor
   · intro hv
@@ -54,10 +64,14 @@ theorem mem_S0_of_sum_eq {s : K} {β y₁ y₂ : Etau K τ} {Λ : Set (Etau K τ
 variable {c t s : K} {ε : Oˣ} {β : Etau K τ}
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-theorem Bf_int (L2 : IsUnit (2 : O)) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2) (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t)
-    {y₁ y₂ : Etau K τ} (hg : (y₂ * star y₁).im ≠ 0) {Λ : Set (Etau K τ)}
-    (h : ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂) {v w : K × Etau K τ} (hv : v ∈ S0 s β Λ) (hw : w ∈ S0 s β Λ) :
-    Bf τ c t v w ∈ (algebraMap O K).range := by
+theorem Bf_int
+    (L2 : IsUnit (2 : O)) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2)
+    (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t)
+    {y₁ y₂ : Etau K τ} (hg : (y₂ * star y₁).im ≠ 0)
+    {Λ : Set (Etau K τ)}
+    (h : ∀ b, b ∈ Λ ↔ ∃ p q : O, b = algebraMap O K p • y₁ + algebraMap O K q • y₂)
+    {v w : K × Etau K τ} (hv : v ∈ S0 s β Λ) (hw : w ∈ S0 s β Λ)
+    : Bf τ c t v w ∈ (algebraMap O K).range := by
   have hadd : ∀ a b, a ∈ Λ → b ∈ Λ → a + b ∈ Λ := by
     intro a b ha hb
     obtain ⟨p, q, rfl⟩ := (h _).1 ha
@@ -75,7 +89,8 @@ theorem Bf_int (L2 : IsUnit (2 : O)) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε 
     rw [← psi_anti hc hβ v w y₁]
     exact hsm ε _ (hadd _ _ (hv _ (hw _ h1)) (hw _ (hv _ h1)))
   obtain ⟨p, q, e⟩ := (h _).1 key
-  have e' : (2 * Bf τ c t v w) • y₁ + (0 : K) • y₂ = algebraMap O K p • y₁ + algebraMap O K q • y₂ := by
+  have e'
+      : (2 * Bf τ c t v w) • y₁ + (0 : K) • y₂ = algebraMap O K p • y₁ + algebraMap O K q • y₂ := by
     rw [zero_smul, add_zero]
     exact e
   obtain ⟨e1, -⟩ := coord_uniq hg e'
@@ -84,8 +99,12 @@ theorem Bf_int (L2 : IsUnit (2 : O)) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε 
     rw [← map_ofNat (algebraMap O K) 2, ← map_mul, IsUnit.val_inv_mul, map_one]
   rw [map_mul, ← e1, ← mul_assoc, h2, one_mul]
 
-theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) (hs : s ≠ 0) (hu : IsUnit β) (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2)
-    (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t) {Λ : Set (Etau K τ)} (hΛ : IsLat O τ Λ) : Uni O c t (S0 s β Λ) := by
+theorem isUnimodular_cliffordLatticeStabilizer
+    (L : IsLoc O Δ) (hD : τ ^ 2 - 4 ≠ 0) (hs : s ≠ 0) (hu : IsUnit β)
+    (hc : c = (τ ^ 2 - 4) * algebraMap O K ε * s ^ 2)
+    (hβ : QuadraticAlgebra.norm β * algebraMap O K ε * s ^ 2 = 2 * t)
+    {Λ : Set (Etau K τ)} (hΛ : IsLat O τ Λ)
+    : Uni O c t (S0 s β Λ) := by
   obtain ⟨y₁, y₂, hg, hΛ'⟩ := lat_basis L hD hΛ
   have h2K : (2 : K) ≠ 0 := by
     have := (L.two.map (algebraMap O K)).ne_zero
@@ -107,10 +126,14 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
     have A1 := psi_anti hc hβ v k y₁
     have A2 := psi_anti hc hβ v k y₂
     simp only [hk1, hk2, map_neg, h1, h2, map_add (f := _), map_smul] at A1 A2
-    have E1 : (algebraMap O K ε * (-2 * α)) • y₁ + (0 : K) • y₂ = (2 * Bf τ c t v k) • y₁ + (0 : K) • y₂ := by
+    have E1
+        : (algebraMap O K ε * (-2 * α)) • y₁ + (0 : K) • y₂
+          = (2 * Bf τ c t v k) • y₁ + (0 : K) • y₂ := by
       rw [← A1]
       module
-    have E2 : (0 : K) • y₁ + (algebraMap O K ε * (2 * δ)) • y₂ = (0 : K) • y₁ + (2 * Bf τ c t v k) • y₂ := by
+    have E2
+        : (0 : K) • y₁ + (algebraMap O K ε * (2 * δ)) • y₂
+          = (0 : K) • y₁ + (2 * Bf τ c t v k) • y₂ := by
       rw [← A2]
       module
     obtain ⟨r1, -⟩ := coord_uniq hg E1
@@ -122,11 +145,13 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
     rw [← sub_eq_zero]
     refine psi_inj hD hs hu (fun y => ?_)
     rw [coord hg y]
-    simp only [map_sub, LinearMap.sub_apply, map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply,
-      h1, h2, he1, he2, hf1, hf2, hk1, hk2, hδ]
+    simp only [map_sub, LinearMap.sub_apply, map_add (f := _), map_smul, LinearMap.add_apply,
+      LinearMap.smul_apply, h1, h2, he1, he2, hf1, hf2, hk1, hk2, hδ]
     module
-  have pair : ∀ x z : K, (∃ p q : O, x • y₁ + z • y₂ = algebraMap O K p • y₁ + algebraMap O K q • y₂) ↔
-      x ∈ (algebraMap O K).range ∧ z ∈ (algebraMap O K).range := by
+  have pair
+      : ∀ x z : K,
+        (∃ p q : O, x • y₁ + z • y₂ = algebraMap O K p • y₁ + algebraMap O K q • y₂)
+          ↔ x ∈ (algebraMap O K).range ∧ z ∈ (algebraMap O K).range := by
     intro x z
     constructor
     · rintro ⟨p, q, hpq⟩
@@ -136,12 +161,17 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
       obtain ⟨p, rfl⟩ := RingHom.mem_range.mp hx
       obtain ⟨q, rfl⟩ := RingHom.mem_range.mp hz
       exact ⟨p, q, rfl⟩
-  have memc : ∀ a b d : K, a • e + b • f + d • k ∈ S0 s β Λ ↔
-      a ∈ (algebraMap O K).range ∧ b ∈ (algebraMap O K).range ∧ d ∈ (algebraMap O K).range := by
+  have memc
+      : ∀ a b d : K,
+        a • e + b • f + d • k ∈ S0 s β Λ
+          ↔ a ∈ (algebraMap O K).range ∧ b ∈ (algebraMap O K).range
+            ∧ d ∈ (algebraMap O K).range := by
     intro a b d
     rw [mem_S0_of_sum_eq hΛ', ev1, ev2, hΛ', hΛ', pair, pair, neg_mem_iff]
     tauto
-  have ind : ∀ a b d a' b' d' : K, a • e + b • f + d • k = a' • e + b' • f + d' • k → a = a' ∧ b = b' ∧ d = d' := by
+  have ind
+      : ∀ a b d a' b' d' : K,
+        a • e + b • f + d • k = a' • e + b' • f + d' • k → a = a' ∧ b = b' ∧ d = d' := by
     intro a b d a' b' d' hv
     have q1 := congrArg (fun v => psi s β v y₁) hv
     have q2 := congrArg (fun v => psi s β v y₂) hv
@@ -149,9 +179,11 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
     obtain ⟨u1, u2⟩ := coord_uniq hg q1
     obtain ⟨u3, -⟩ := coord_uniq hg q2
     exact ⟨u3, u2, neg_inj.mp u1⟩
-  have gram : ∀ a b d : K, 2 * Bf τ c t e (a • e + b • f + d • k) = algebraMap O K ε * b ∧
-      2 * Bf τ c t f (a • e + b • f + d • k) = algebraMap O K ε * a ∧
-      Bf τ c t k (a • e + b • f + d • k) = algebraMap O K ε * d := by
+  have gram
+      : ∀ a b d : K,
+        2 * Bf τ c t e (a • e + b • f + d • k) = algebraMap O K ε * b
+          ∧ 2 * Bf τ c t f (a • e + b • f + d • k) = algebraMap O K ε * a
+          ∧ Bf τ c t k (a • e + b • f + d • k) = algebraMap O K ε * d := by
     intro a b d
     have Ae := psi_anti hc hβ e (a • e + b • f + d • k) y₂
     have Af := psi_anti hc hβ f (a • e + b • f + d • k) y₁
@@ -159,16 +191,26 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
     rw [ev2, he2, ev1, map_add (f := _), map_smul, map_smul, he1, he2] at Ae
     rw [ev1, hf1, ev2, map_add (f := _), map_smul, map_smul, hf1, hf2] at Af
     rw [ev1, hk1, map_neg, ev1, map_add (f := _), map_smul, map_smul, hk1, hk2] at Ak
-    have Ee : (0 : K) • y₁ + (algebraMap O K ε * b) • y₂ = (0 : K) • y₁ + (2 * Bf τ c t e (a • e + b • f + d • k)) • y₂ := by
+    have Ee
+        : (0 : K) • y₁ + (algebraMap O K ε * b) • y₂
+          = (0 : K) • y₁ + (2 * Bf τ c t e (a • e + b • f + d • k)) • y₂ := by
       rw [← Ae]
       module
-    have Ef : (algebraMap O K ε * a) • y₁ + (0 : K) • y₂ = (2 * Bf τ c t f (a • e + b • f + d • k)) • y₁ + (0 : K) • y₂ := by
+    have Ef
+        : (algebraMap O K ε * a) • y₁ + (0 : K) • y₂
+          = (2 * Bf τ c t f (a • e + b • f + d • k)) • y₁ + (0 : K) • y₂ := by
       rw [← Af]
       module
-    have Ek : (2 * (algebraMap O K ε * d)) • y₁ + (0 : K) • y₂ = (2 * Bf τ c t k (a • e + b • f + d • k)) • y₁ + (0 : K) • y₂ := by
+    have Ek
+        : (2 * (algebraMap O K ε * d)) • y₁ + (0 : K) • y₂
+          = (2 * Bf τ c t k (a • e + b • f + d • k)) • y₁ + (0 : K) • y₂ := by
       rw [← Ak]
       module
-    exact ⟨(coord_uniq hg Ee).2.symm, (coord_uniq hg Ef).1.symm, (mul_left_cancel₀ h2K (coord_uniq hg Ek).1).symm⟩
+    exact ⟨
+      (coord_uniq hg Ee).2.symm,
+      (coord_uniq hg Ef).1.symm,
+      (mul_left_cancel₀ h2K (coord_uniq hg Ek).1).symm
+    ⟩
   refine ⟨?_, ?_⟩
   · classical
     refine ⟨{e, f, k}, ?_⟩
@@ -185,9 +227,14 @@ theorem isUnimodular_cliffordLatticeStabilizer (L : IsLoc O Δ) (hD : τ ^ 2 - 4
       refine ⟨p, q • f + r • k, ⟨q, r • k, ⟨r, rfl⟩, rfl⟩, ?_⟩
       all_goals rw [algebraMap_smul, algebraMap_smul, algebraMap_smul, add_assoc]
     · rintro ⟨p, _, ⟨q, _, ⟨r, rfl⟩, rfl⟩, hv⟩
-      rw [← algebraMap_smul K p e, ← algebraMap_smul K q f, ← algebraMap_smul K r k, ← add_assoc] at hv
+      rw [← algebraMap_smul K p e, ← algebraMap_smul K q f, ← algebraMap_smul K r k, ← add_assoc]
+        at hv
       obtain ⟨u1, u2, u3⟩ := ind _ _ _ _ _ _ hv
-      exact ⟨RingHom.mem_range.mpr ⟨p, u1.symm⟩, RingHom.mem_range.mpr ⟨q, u2.symm⟩, RingHom.mem_range.mpr ⟨r, u3.symm⟩⟩
+      exact ⟨
+        RingHom.mem_range.mpr ⟨p, u1.symm⟩,
+        RingHom.mem_range.mpr ⟨q, u2.symm⟩,
+        RingHom.mem_range.mpr ⟨r, u3.symm⟩
+      ⟩
   · intro y
     constructor
     · intro hy x hx

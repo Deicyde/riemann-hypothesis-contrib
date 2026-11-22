@@ -6,28 +6,38 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Filter Topology Matrix
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 open scoped ComplexConjugate Classical InnerProductSpace
 
-private theorem chi_mul_neg (ν : Fin (2 + 2) → ℤ) (θ : Fin (2 + 2) → ℝ) : chi ν θ * chi ν (-θ) = 1 := by
+private theorem chi_mul_neg (ν : Fin (2 + 2) → ℤ) (θ : Fin (2 + 2) → ℝ)
+    : chi ν θ * chi ν (-θ) = 1 := by
   unfold chi
   rw [← Complex.exp_add, ← mul_add, ← Finset.sum_add_distrib]
   simp
 
-private theorem chi_mul_conj (ν : Fin (2 + 2) → ℤ) (θ : Fin (2 + 2) → ℝ) : chi ν θ * conj (chi ν θ) = 1 := by
+private theorem chi_mul_conj (ν : Fin (2 + 2) → ℤ) (θ : Fin (2 + 2) → ℝ)
+    : chi ν θ * conj (chi ν θ) = 1 := by
   have h : conj (chi ν θ) = chi ν (-θ) := by
     unfold chi
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← Complex.exp_conj, map_mul, map_sum, Complex.conj_I]
     congr 1
-    simp only [map_mul, map_intCast, Complex.conj_ofReal, Pi.neg_apply, Complex.ofReal_neg, mul_neg, neg_mul,
-      Finset.sum_neg_distrib]
+    simp only [map_mul, map_intCast, Complex.conj_ofReal, Pi.neg_apply, Complex.ofReal_neg, mul_neg,
+      neg_mul, Finset.sum_neg_distrib]
   rw [h, chi_mul_neg]
 
-private theorem int_zero {μ : Measure U4} (hH : Haar4 μ) {ν ν' : Fin (2 + 2) → ℤ} (hne : ν ≠ ν') (F : U4 → ℂ)
-    (hF : ∀ θ h, chi ν' θ * F (dg θ * h) = chi ν θ * F h) : ∫ h, F h ∂μ = 0 := by
+private theorem int_zero
+    {μ : Measure U4} (hH : Haar4 μ)
+    {ν ν' : Fin (2 + 2) → ℤ} (hne : ν ≠ ν')
+    (F : U4 → ℂ) (hF : ∀ θ h, chi ν' θ * F (dg θ * h) = chi ν θ * F h)
+    : ∫ h, F h ∂μ = 0 := by
   obtain ⟨θ, hθ⟩ : ∃ θ, chi ν θ ≠ chi ν' θ := by
     by_contra hc
     push_neg at hc
@@ -35,15 +45,19 @@ private theorem int_zero {μ : Measure U4} (hH : Haar4 μ) {ν ν' : Fin (2 + 2)
   have hT : ∫ h, F (dg θ * h) ∂μ = ∫ h, F h ∂μ :=
     (hH.left (dg θ)).integral_comp (Homeomorph.mulLeft (dg θ)).measurableEmbedding F
   have h1 : chi ν' θ * ∫ h, F h ∂μ = chi ν θ * ∫ h, F h ∂μ :=
-    calc chi ν' θ * ∫ h, F h ∂μ = chi ν' θ * ∫ h, F (dg θ * h) ∂μ := by rw [hT]
+    calc
+      chi ν' θ * ∫ h, F h ∂μ
+        = chi ν' θ * ∫ h, F (dg θ * h) ∂μ := by rw [hT]
       _ = ∫ h, chi ν' θ * F (dg θ * h) ∂μ := (integral_const_mul _ _).symm
       _ = ∫ h, chi ν θ * F h ∂μ := integral_congr_ae (Eventually.of_forall fun h => hF θ h)
       _ = chi ν θ * ∫ h, F h ∂μ := integral_const_mul _ _
   have h2 : (chi ν θ - chi ν' θ) * ∫ h, F h ∂μ = 0 := by rw [sub_mul, h1, sub_self]
   exact (mul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr hθ)
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem :
-    ∀ (μ : Measure U4) ψ n q n' q', Haar4 μ → μ.IsOpenPosMeasure → Coef ψ n q n' q' → Continuous ψ ∧ ψ 1 = 1 ∧ Idem μ (eOf μ ψ) ∧ RFix μ (eOf μ ψ) ψ := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem
+    : ∀ (μ : Measure U4) ψ n q n' q',
+      Haar4 μ → μ.IsOpenPosMeasure → Coef ψ n q n' q'
+        → Continuous ψ ∧ ψ 1 = 1 ∧ Idem μ (eOf μ ψ) ∧ RFix μ (eOf μ ψ) ψ := by
   intro μ ψ n q n' q' hH hO hC
   haveI : CompactSpace U4 := u4.2.2.2.2.2.2.2.2.2.2.2.1
   haveI : IsProbabilityMeasure μ := hH.prob
@@ -62,7 +76,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem :
   set c : ℝ := ∫ h, ‖ψ h‖ ^ 2 ∂μ with hc
   have hcpos : 0 < c := by
     refine Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero (x := (1 : U4)) (by fun_prop)
-      (HasCompactSupport.of_compactSpace _) (fun _ => by positivity) ?_
+      (HasCompactSupport.of_compactSpace _)
+      (fun _ => by positivity)
+      ?_
     simp [hψ1]
   have hc0 : (c : ℂ) ≠ 0 := by exact_mod_cast hcpos.ne'
   have hmc : ∀ h, ψ h * conj (ψ h) = ((‖ψ h‖ ^ 2 : ℝ) : ℂ) := fun h => by
@@ -75,8 +91,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem :
       rw [hexp, Finset.mul_sum]
       exact Finset.sum_congr rfl fun j _ => (mul_assoc _ _ _).symm
     simp_rw [e1]
-    rw [integral_finsetSum (μ := μ) Finset.univ (f := fun j h => ψ h * a j h⁻¹ * b j k) fun j _ =>
-      hint _ ((hψc.mul ((hcont j).1.comp hinv)).mul continuous_const)]
+    rw [integral_finsetSum (μ := μ) Finset.univ
+      (f := fun j h => ψ h * a j h⁻¹ * b j k)
+      fun j _ => hint _ ((hψc.mul ((hcont j).1.comp hinv)).mul continuous_const)]
     simp_rw [integral_mul_const]
     rw [Finset.sum_eq_single j₀]
     · rw [ha0, hb0]
@@ -98,8 +115,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem :
       rw [hexp, Finset.mul_sum]
       exact Finset.sum_congr rfl fun j _ => by ring
     simp_rw [e1]
-    rw [integral_finsetSum (μ := μ) Finset.univ (f := fun j k => a j g * (conj (ψ k) * b j k)) fun j _ =>
-      hint _ (continuous_const.mul ((Complex.continuous_conj.comp hψc).mul (hcont j).2))]
+    rw [integral_finsetSum (μ := μ) Finset.univ
+      (f := fun j k => a j g * (conj (ψ k) * b j k))
+      fun j _ => hint _ (continuous_const.mul ((Complex.continuous_conj.comp hψc).mul (hcont j).2))]
     simp_rw [integral_const_mul]
     rw [Finset.sum_eq_single j₀]
     · rw [ha0, hb0, mul_comm]
@@ -120,7 +138,10 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.coefIdem :
   · intro k
     rw [heOf, heOf, hC.star, map_mul, map_inv₀, Complex.conj_ofReal]
   · intro k
-    have e1 : ∀ h, eOf μ ψ h * eOf μ ψ (h⁻¹ * k) = ((c : ℂ)⁻¹ * (c : ℂ)⁻¹) * conj (ψ h * ψ (h⁻¹ * k)) := fun h => by
+    have e1
+        : ∀ h,
+          eOf μ ψ h * eOf μ ψ (h⁻¹ * k)
+            = ((c : ℂ)⁻¹ * (c : ℂ)⁻¹) * conj (ψ h * ψ (h⁻¹ * k)) := fun h => by
       rw [heOf, heOf, map_mul]
       ring
     simp_rw [e1]

@@ -8,7 +8,10 @@ open Module NumberField
 
 namespace Bl.RankOneOrbitForms
 
-variable {K : Type} [Field K] {G : Type} [Group G] {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
+variable
+  {K : Type} [Field K]
+  {G : Type} [Group G]
+  {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
 
 private lemma rank_one_form (f : T →ₗ[K] T) (h1 : finrank K (LinearMap.range f) = 1) :
     ∃ (φ : T →ₗ[K] K) (v : T), v ≠ 0 ∧ φ ≠ 0 ∧ f = φ.smulRight v := by
@@ -89,20 +92,19 @@ private lemma select {ι M : Type} [AddCommGroup M] [Module K M] [FiniteDimensio
   let e : Fin r ≃ κ := (Fintype.equivFinOfCardEq hc).symm
   exact ⟨a ∘ e, hli.comp e e.injective⟩
 
-theorem goal1 (τ : Representation K G T)
+theorem goal1
+    (τ : Representation K G T)
     (hirr : ∀ W : Submodule K T, (∀ g : G, ∀ w ∈ W, τ g w ∈ W) → W = ⊥ ∨ W = ⊤)
-    (ε₀ ε : T →ₗ[K] T) (h1 : finrank K (LinearMap.range ε₀) = 1) :
-    ∃ (γ δ : Fin (finrank K (LinearMap.range ε)) → G)
-      (c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K),
-      c.det ≠ 0 ∧
-      (∀ i j, c i j = LinearMap.trace K T (ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j))) ∧
-      (∀ i j, ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j) ∘ₗ ε₀ = c i j • ε₀) ∧
-      ∑ j, ∑ i, c⁻¹ j i • (ε ∘ₗ τ (γ j) ∘ₗ ε₀ ∘ₗ τ (δ i) ∘ₗ ε) = ε := by
+    (ε₀ ε : T →ₗ[K] T) (h1 : finrank K (LinearMap.range ε₀) = 1)
+    : ∃ (γ δ : Fin (finrank K (LinearMap.range ε)) → G)
+        (c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K),
+      c.det ≠ 0 ∧ (∀ i j, c i j = LinearMap.trace K T (ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)))
+        ∧ (∀ i j, ε₀ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j) ∘ₗ ε₀ = c i j • ε₀)
+        ∧ ∑ j, ∑ i, c⁻¹ j i • (ε ∘ₗ τ (γ j) ∘ₗ ε₀ ∘ₗ τ (δ i) ∘ₗ ε) = ε := by
   obtain ⟨φ, v, hv, hφ, rfl⟩ := rank_one_form ε₀ h1
   have hspanT := span_orbit τ hirr v hv
   have hspanR : Submodule.span K (Set.range fun g => ε (τ g v)) = LinearMap.range ε := by
-    have : (Set.range fun g => ε (τ g v)) = ε '' (Set.range fun g => τ g v) := by
-      ext y; simp
+    have : (Set.range fun g => ε (τ g v)) = ε '' (Set.range fun g => τ g v) := by ext y; simp
     rw [this, ← Submodule.map_span, hspanT, Submodule.map_top]
   obtain ⟨γ, hγ⟩ := select (fun g => ε (τ g v)) (finrank K (LinearMap.range ε)) (by rw [hspanR])
   have hle : Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) ≤ LinearMap.range ε := by
@@ -137,8 +139,8 @@ theorem goal1 (τ : Representation K G T)
     exact Finset.sum_eq_zero fun j _ => by
       have : ℓ (fun k => if j = k then 1 else 0) = 0 := hz j
       rw [this, smul_zero]
-  obtain ⟨δ, hδ⟩ := select w (finrank K (LinearMap.range ε))
-    (by rw [hw, finrank_top, Module.finrank_fin_fun])
+  obtain ⟨δ, hδ⟩ :=
+    select w (finrank K (LinearMap.range ε)) (by rw [hw, finrank_top, Module.finrank_fin_fun])
   let c : Matrix (Fin (finrank K (LinearMap.range ε))) (Fin (finrank K (LinearMap.range ε))) K :=
     Matrix.of fun i j => φ (τ (δ i) (ε (τ (γ j) v)))
   have hc : IsUnit c := Matrix.linearIndependent_rows_iff_isUnit.mp hδ
@@ -146,26 +148,30 @@ theorem goal1 (τ : Representation K G T)
   refine ⟨γ, δ, c, hcd.ne_zero, ?_, ?_, ?_⟩
   · intro i j
     rw [show (φ.smulRight v) ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)
-        = (φ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)).smulRight v from LinearMap.ext fun _ => rfl,
+          = (φ ∘ₗ τ (δ i) ∘ₗ ε ∘ₗ τ (γ j)).smulRight v from
+        LinearMap.ext fun _ => rfl,
       LinearMap.trace_smulRight]
     rfl
   · intro i j
     ext x
     simp [c, smul_smul, mul_comm]
   · ext x
-    have hx : ε x ∈ Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) :=
-      by rw [hueq]; exact LinearMap.mem_range_self ε x
+    have hx : ε x ∈ Submodule.span K (Set.range ((fun g => ε (τ g v)) ∘ γ)) := by
+      rw [hueq]; exact LinearMap.mem_range_self ε x
     obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun K).mp hx
     simp only [Function.comp_apply] at ha
     have hcoef : ∀ i, φ (τ (δ i) (ε x)) = ∑ k, c i k * a k := by
       intro i
       rw [← ha]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [c, map_sum, map_smul, mul_comm]
+      simp [c, map_sum, map_smul, mul_comm]
     have hinv : ∀ j, ∑ i, c⁻¹ j i * ∑ k, c i k * a k = a j := by
       intro j
-      have := congrFun (show Matrix.mulVec c⁻¹ (Matrix.mulVec c a) = a by
-        rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul c hcd, Matrix.one_mulVec]) j
+      have :=
+        congrFun
+          (show Matrix.mulVec c⁻¹ (Matrix.mulVec c a) = a by
+            rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul c hcd, Matrix.one_mulVec])
+          j
       simpa [Matrix.mulVec, dotProduct] using this
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply,
       LinearMap.smulRight_apply, map_smul, hcoef]

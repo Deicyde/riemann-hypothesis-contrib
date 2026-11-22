@@ -15,7 +15,6 @@ section Generated
 variable {K : Type*} [Field K] {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
 variable {L : Type*} [Field L] [Algebra K L]
 
-
 omit [NeZero n] [HasEnoughRootsOfUnity K n] in
 lemma eq_one_of_forall_mem_fixed {T : Set L} (hT : adjoin K T = ⊤) {σ : Gal(L/K)}
     (h : ∀ α ∈ T, σ α = α) : σ = 1 := by
@@ -58,9 +57,9 @@ lemma exists_eq_algebraMap_mul {a b : Kˣ} (h : (a : UnitsModPow K n) = b) {α �
 
 variable (K n L)
 
-theorem kummerPairingLeft_injective_of_adjoin_eq_top {T : Set L} (hT : adjoin K T = ⊤)
-    (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a) :
-    Function.Injective (kummerPairingLeft K n L) := by
+theorem kummerPairingLeft_injective_of_adjoin_eq_top
+    {T : Set L} (hT : adjoin K T = ⊤) (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a)
+    : Function.Injective (kummerPairingLeft K n L) := by
   rw [injective_iff_map_eq_one]
   intro σ hσ
   apply eq_one_of_forall_mem_fixed hT
@@ -69,15 +68,15 @@ theorem kummerPairingLeft_injective_of_adjoin_eq_top {T : Set L} (hT : adjoin K 
   have hx : (a : UnitsModPow K n) ∈ kummerGroup K n L := mk_mem_kummerGroup.mpr ⟨α, ha⟩
   exact (kummerPairing_eq_one_iff σ ⟨_, hx⟩ rfl ha).mp (DFunLike.congr_fun hσ ⟨_, hx⟩)
 
-theorem isMulCommutative_of_adjoin_eq_top {T : Set L} (hT : adjoin K T = ⊤)
-    (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a) :
-    IsMulCommutative Gal(L/K) :=
-  ⟨⟨fun σ τ => kummerPairingLeft_injective_of_adjoin_eq_top K n L hT hTn (by
-    rw [map_mul, map_mul, mul_comm])⟩⟩
+theorem isMulCommutative_of_adjoin_eq_top
+    {T : Set L} (hT : adjoin K T = ⊤) (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a)
+    : IsMulCommutative Gal(L/K) :=
+  ⟨⟨fun σ τ =>
+    kummerPairingLeft_injective_of_adjoin_eq_top K n L hT hTn (by rw [map_mul, map_mul, mul_comm])⟩⟩
 
-theorem exponent_dvd_of_adjoin_eq_top {T : Set L} (hT : adjoin K T = ⊤)
-    (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a) :
-    Monoid.exponent Gal(L/K) ∣ n := by
+theorem exponent_dvd_of_adjoin_eq_top
+    {T : Set L} (hT : adjoin K T = ⊤) (hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a)
+    : Monoid.exponent Gal(L/K) ∣ n := by
   refine Monoid.exponent_dvd_of_forall_pow_eq_one fun σ =>
     kummerPairingLeft_injective_of_adjoin_eq_top K n L hT hTn ?_
   rw [map_pow, map_one]
@@ -86,10 +85,12 @@ theorem exponent_dvd_of_adjoin_eq_top {T : Set L} (hT : adjoin K T = ⊤)
   simp only [MonoidHom.pow_apply, MonoidHom.one_apply]
   exact congrArg Units.val (by rw [SubmonoidClass.coe_pow, this, OneMemClass.coe_one])
 
-theorem kummerGroup_le_of_adjoin_eq_top [FiniteDimensional K L] [IsGalois K L] {T : Set L}
-    (hT : adjoin K T = ⊤) (Δ : Subgroup (UnitsModPow K n))
-    (hTΔ : ∀ α ∈ T, ∃ a : Kˣ, (a : UnitsModPow K n) ∈ Δ ∧ α ^ n = algebraMap K L a) :
-    kummerGroup K n L ≤ Δ := by
+theorem kummerGroup_le_of_adjoin_eq_top
+    [FiniteDimensional K L] [IsGalois K L]
+    {T : Set L} (hT : adjoin K T = ⊤)
+    (Δ : Subgroup (UnitsModPow K n))
+    (hTΔ : ∀ α ∈ T, ∃ a : Kˣ, (a : UnitsModPow K n) ∈ Δ ∧ α ^ n = algebraMap K L a)
+    : kummerGroup K n L ≤ Δ := by
   have hTn : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K L a := fun α hα =>
     let ⟨a, _, h⟩ := hTΔ α hα; ⟨a, h⟩
   have : IsMulCommutative Gal(L/K) := isMulCommutative_of_adjoin_eq_top K n L hT hTn
@@ -98,7 +99,8 @@ theorem kummerGroup_le_of_adjoin_eq_top [FiniteDimensional K L] [IsGalois K L] {
   let H : Subgroup (kummerGroup K n L) := Δ.comap (kummerGroup K n L).subtype
   have := finite_monoidHom_rootsOfUnity (K := K) (n := n) H
 
-  let res : Gal(L/K) → (H →* rootsOfUnity n K) := fun σ => (kummerPairingLeft K n L σ).comp H.subtype
+  let res : Gal(L/K) → (H →* rootsOfUnity n K) := fun σ =>
+    (kummerPairingLeft K n L σ).comp H.subtype
   have hres : Function.Injective res := by
     intro σ τ hστ
     have hfix : ∀ α ∈ T, (τ⁻¹ * σ) α = α := by
@@ -113,11 +115,12 @@ theorem kummerGroup_le_of_adjoin_eq_top [FiniteDimensional K L] [IsGalois K L] {
     exact (inv_mul_eq_one.mp (eq_one_of_forall_mem_fixed hT hfix)).symm
   have hH : Nat.card H = Nat.card (kummerGroup K n L) := by
     apply le_antisymm (Nat.card_le_card_of_injective _ Subtype.val_injective)
-    calc Nat.card (kummerGroup K n L) = Nat.card Gal(L/K) := by
-          rw [card_kummerGroup K n L hexp, IsGalois.card_aut_eq_finrank]
+    calc
+      Nat.card (kummerGroup K n L)
+        = Nat.card Gal(L/K) := by rw [card_kummerGroup K n L hexp, IsGalois.card_aut_eq_finrank]
       _ ≤ Nat.card (H →* rootsOfUnity n K) := Nat.card_le_card_of_injective _ hres
-      _ = Nat.card H := card_monoidHom_rootsOfUnity H fun x =>
-          Subtype.ext (kummerGroup_pow_eq_one K n L x.1)
+      _ = Nat.card H :=
+        card_monoidHom_rootsOfUnity H fun x => Subtype.ext (kummerGroup_pow_eq_one K n L x.1)
   have htop := Subgroup.eq_top_of_card_eq H hH
   intro x hx
   have : (⟨x, hx⟩ : kummerGroup K n L) ∈ H := htop ▸ Subgroup.mem_top _
@@ -130,8 +133,8 @@ section Galois
 variable {K : Type*} [Field K] {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
 variable {Ω : Type*} [Field Ω] [Algebra K Ω]
 
-theorem isGalois_adjoin_nthRoots {T : Set Ω} (hT : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K Ω a) :
-    IsGalois K (adjoin K T) := by
+theorem isGalois_adjoin_nthRoots {T : Set Ω} (hT : ∀ α ∈ T, ∃ a : Kˣ, α ^ n = algebraMap K Ω a)
+    : IsGalois K (adjoin K T) := by
   classical
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot K n
   have hnK : (n : K) ≠ 0 := (hζ.neZero').out
@@ -143,8 +146,8 @@ theorem isGalois_adjoin_nthRoots {T : Set Ω} (hT : ∀ α ∈ T, ∃ a : Kˣ, �
   have hsplit : ∀ α : T, ((p α).map (algebraMap K Ω)).Splits := by
     intro α
     simp only [p, Polynomial.map_sub, Polynomial.map_pow, map_X, map_C]
-    exact X_pow_sub_C_splits_of_isPrimitiveRoot
-      (hζ.map_of_injective (algebraMap K Ω).injective) (ha α)
+    exact X_pow_sub_C_splits_of_isPrimitiveRoot (hζ.map_of_injective (algebraMap K Ω).injective)
+      (ha α)
   have hgal : ∀ α : T, IsGalois K (adjoin K ((p α).rootSet Ω)) := fun α =>
     haveI := adjoin_rootSet_isSplittingField (hsplit α)
     IsGalois.of_separable_splitting_field (hsep α)
@@ -169,8 +172,8 @@ theorem isGalois_adjoin_nthRoots {T : Set Ω} (hT : ∀ α ∈ T, ∃ a : Kˣ, �
       rw [SetLike.mem_coe, hc]
       exact mul_mem (IntermediateField.algebraMap_mem _ _) (subset_adjoin _ _ α.2)
   have : ∀ α : T, Normal K (adjoin K ((p α).rootSet Ω)) := fun α => (hgal α).to_normal
-  have : ∀ α : T, Algebra.IsSeparable K (adjoin K ((p α).rootSet Ω)) :=
-    fun α => (hgal α).to_isSeparable
+  have : ∀ α : T, Algebra.IsSeparable K (adjoin K ((p α).rootSet Ω)) := fun α =>
+    (hgal α).to_isSeparable
   rw [heq]
   constructor
 
@@ -181,13 +184,11 @@ section Correspondence
 variable (K : Type*) [Field K] (n : ℕ) [NeZero n] [HasEnoughRootsOfUnity K n]
 variable (Ω : Type*) [Field Ω] [Algebra K Ω]
 
-
 omit [NeZero n] [HasEnoughRootsOfUnity K n] in
 lemma pow_eq_algebraMap_iff (E : IntermediateField K Ω) (x : E) (a : K) :
     x ^ n = algebraMap K E a ↔ (x : Ω) ^ n = algebraMap K Ω a := by
   rw [← Subtype.val_inj, IntermediateField.coe_pow]
   rfl
-
 
 omit [NeZero n] [HasEnoughRootsOfUnity K n] in
 lemma adjoin_preimage_eq_top (S : Set Ω) :
@@ -202,8 +203,6 @@ lemma adjoin_preimage_eq_top (S : Set Ω) :
   · intro hx
     exact ⟨⟨x, subset_adjoin K S hx⟩, hx, rfl⟩
 
-
-
 omit [NeZero n] [HasEnoughRootsOfUnity K n] in
 lemma kummerField_generators (Δ : Subgroup (UnitsModPow K n)) :
     adjoin K {x : kummerField K n Ω Δ |
@@ -214,19 +213,16 @@ lemma kummerField_generators (Δ : Subgroup (UnitsModPow K n)) :
   ext x
   simp only [Set.mem_ofPred_eq, Set.mem_preimage, pow_eq_algebraMap_iff]
 
-theorem kummerField_isGalois (Δ : Subgroup (UnitsModPow K n)) :
-    IsGalois K (kummerField K n Ω Δ) :=
+theorem kummerField_isGalois (Δ : Subgroup (UnitsModPow K n)) : IsGalois K (kummerField K n Ω Δ) :=
   isGalois_adjoin_nthRoots fun _ ⟨a, _, h⟩ => ⟨a, h⟩
 
-theorem kummerField_isMulCommutative (Δ : Subgroup (UnitsModPow K n)) :
-    IsMulCommutative Gal(kummerField K n Ω Δ/K) :=
-  isMulCommutative_of_adjoin_eq_top K n _ (kummerField_generators K n Ω Δ)
-    fun _ ⟨a, _, h⟩ => ⟨a, h⟩
+theorem kummerField_isMulCommutative (Δ : Subgroup (UnitsModPow K n))
+    : IsMulCommutative Gal(kummerField K n Ω Δ/K) :=
+  isMulCommutative_of_adjoin_eq_top K n _ (kummerField_generators K n Ω Δ) fun _ ⟨a, _, h⟩ => ⟨a, h⟩
 
-theorem kummerField_exponent_dvd (Δ : Subgroup (UnitsModPow K n)) :
-    Monoid.exponent Gal(kummerField K n Ω Δ/K) ∣ n :=
-  exponent_dvd_of_adjoin_eq_top K n _ (kummerField_generators K n Ω Δ)
-    fun _ ⟨a, _, h⟩ => ⟨a, h⟩
+theorem kummerField_exponent_dvd (Δ : Subgroup (UnitsModPow K n))
+    : Monoid.exponent Gal(kummerField K n Ω Δ/K) ∣ n :=
+  exponent_dvd_of_adjoin_eq_top K n _ (kummerField_generators K n Ω Δ) fun _ ⟨a, _, h⟩ => ⟨a, h⟩
 
 omit [HasEnoughRootsOfUnity K n] in
 lemma isIntegral_of_pow_eq_algebraMap {α : Ω} {a : K} (hα : α ^ n = algebraMap K Ω a) :
@@ -244,8 +240,8 @@ lemma exists_pow_eq_algebraMap [IsSepClosed Ω] (a : Kˣ) : ∃ α : Ω, α ^ n 
   refine ⟨α, ?_⟩
   simpa [sub_eq_zero] using hα
 
-theorem kummerGroup_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n)) :
-    kummerGroup K n (kummerField K n Ω Δ) = Δ := by
+theorem kummerGroup_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n))
+    : kummerGroup K n (kummerField K n Ω Δ) = Δ := by
   apply le_antisymm
   · intro y hy
     induction y using QuotientGroup.induction_on with
@@ -253,25 +249,27 @@ theorem kummerGroup_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n
       obtain ⟨β, hβ⟩ := mk_mem_kummerGroup.mp hy
       rw [pow_eq_algebraMap_iff] at hβ
       obtain ⟨T, hTS, hβT⟩ := exists_finset_of_mem_adjoin β.2
-      have hTn : ∀ α ∈ (T : Set Ω), ∃ a : Kˣ, (a : UnitsModPow K n) ∈ Δ ∧
-          α ^ n = algebraMap K Ω a := fun α hα => hTS hα
+      have hTn
+          : ∀ α ∈ (T : Set Ω), ∃ a : Kˣ, (a : UnitsModPow K n) ∈ Δ ∧ α ^ n = algebraMap K Ω a :=
+        fun α hα => hTS hα
       have : FiniteDimensional K (adjoin K (T : Set Ω)) :=
         finiteDimensional_adjoin fun α hα =>
           let ⟨_, _, h⟩ := hTn α hα; isIntegral_of_pow_eq_algebraMap K n Ω h
       have : IsGalois K (adjoin K (T : Set Ω)) :=
         isGalois_adjoin_nthRoots fun α hα => let ⟨a, _, h⟩ := hTn α hα; ⟨a, h⟩
-      have hle := kummerGroup_le_of_adjoin_eq_top K n (adjoin K (T : Set Ω))
-        (adjoin_preimage_eq_top K Ω _) Δ (fun α hα => by
-          obtain ⟨a, haΔ, ha⟩ := hTn α hα
-          exact ⟨a, haΔ, (pow_eq_algebraMap_iff K n Ω _ α a).mpr ha⟩)
+      have hle :=
+        kummerGroup_le_of_adjoin_eq_top K n (adjoin K (T : Set Ω)) (adjoin_preimage_eq_top K Ω _) Δ
+          (fun α hα => by
+            obtain ⟨a, haΔ, ha⟩ := hTn α hα
+            exact ⟨a, haΔ, (pow_eq_algebraMap_iff K n Ω _ α a).mpr ha⟩)
       apply hle
       exact mk_mem_kummerGroup.mpr ⟨⟨β, hβT⟩, (pow_eq_algebraMap_iff K n Ω _ _ _).mpr hβ⟩
   · intro y hy
     induction y using QuotientGroup.induction_on with
     | H b =>
       obtain ⟨α, hα⟩ := exists_pow_eq_algebraMap K n Ω b
-      exact mk_mem_kummerGroup.mpr ⟨⟨α, subset_adjoin _ _ ⟨b, hy, hα⟩⟩,
-        (pow_eq_algebraMap_iff K n Ω _ _ _).mpr hα⟩
+      exact mk_mem_kummerGroup.mpr
+        ⟨⟨α, subset_adjoin _ _ ⟨b, hy, hα⟩⟩, (pow_eq_algebraMap_iff K n Ω _ _ _).mpr hα⟩
 
 lemma exists_finite_generators_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n)) :
     ∃ r : Δ → Ω, (∀ x : Δ, ∃ a : Kˣ, (a : UnitsModPow K n) = x ∧ r x ^ n = algebraMap K Ω a) ∧
@@ -290,16 +288,16 @@ lemma exists_finite_generators_kummerField [IsSepClosed Ω] (Δ : Subgroup (Unit
     rw [QuotientGroup.out_eq']
     exact x.2
 
-theorem finiteDimensional_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n))
-    [Finite Δ] : FiniteDimensional K (kummerField K n Ω Δ) := by
+theorem finiteDimensional_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n)) [Finite Δ]
+    : FiniteDimensional K (kummerField K n Ω Δ) := by
   obtain ⟨r, hr, heq⟩ := exists_finite_generators_kummerField K n Ω Δ
   rw [heq]
   exact finiteDimensional_adjoin fun α ⟨x, hx⟩ => by
     obtain ⟨a, -, ha⟩ := hr x
     exact isIntegral_of_pow_eq_algebraMap K n Ω (hx ▸ ha)
 
-theorem finrank_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n)) [Finite Δ] :
-    Module.finrank K (kummerField K n Ω Δ) = Nat.card Δ := by
+theorem finrank_kummerField [IsSepClosed Ω] (Δ : Subgroup (UnitsModPow K n)) [Finite Δ]
+    : Module.finrank K (kummerField K n Ω Δ) = Nat.card Δ := by
   have := finiteDimensional_kummerField K n Ω Δ
   have := kummerField_isGalois K n Ω Δ
   have := kummerField_isMulCommutative K n Ω Δ

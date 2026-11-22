@@ -9,7 +9,11 @@ open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory
 
 namespace GlobalTheory
 
-theorem dualBasis_coord_mem_maximalIdeal : ∀ (O : Type) [CommRing O] [IsLocalRing O] (M : Type) [AddCommGroup M] [Module O M] [Module.Finite O M] [Module.Projective O M] (k : ℕ) (lb : Module.Basis (Fin k) O (Module.Dual O M)) (l : Module.Dual O M), (∀ w, l w ∈ IsLocalRing.maximalIdeal O) → ∀ j, lb.repr l j ∈ IsLocalRing.maximalIdeal O := by
+theorem dualBasis_coord_mem_maximalIdeal
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (M : Type) [AddCommGroup M] [Module O M]
+        [Module.Finite O M] [Module.Projective O M] (k : ℕ)
+        (lb : Module.Basis (Fin k) O (Module.Dual O M)) (l : Module.Dual O M),
+      (∀ w, l w ∈ IsLocalRing.maximalIdeal O) → ∀ j, lb.repr l j ∈ IsLocalRing.maximalIdeal O := by
   intro O _ _ M _ _ _ _ k lb l hl j
   haveI : Module.Free O M := Module.free_of_flat_of_isLocalRing
   let ε := Module.Free.chooseBasis O M

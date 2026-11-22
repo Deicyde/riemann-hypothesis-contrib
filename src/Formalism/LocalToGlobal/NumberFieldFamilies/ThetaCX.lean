@@ -8,7 +8,9 @@ public import Formalism.LocalToGlobal.JointCharacters.SameChr
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct ContDiff
 
 namespace Formalism.L2.Fam.ThC
@@ -23,11 +25,12 @@ variable {D : D7}
 
 def plE (τ : D.what₂.Tau) : InfinitePlace D.host.E := InfinitePlace.mk (tauE D τ)
 
-
 open Classical in
 def embAt (τ : D.what₂.Tau) : (plE τ).Completion →+* ℂ :=
-  if (plE τ).embedding = tauE D τ then InfinitePlace.Completion.extensionEmbedding (plE τ)
-  else (starRingEnd ℂ).comp (InfinitePlace.Completion.extensionEmbedding (plE τ))
+  if (plE τ).embedding = tauE D τ then
+    InfinitePlace.Completion.extensionEmbedding (plE τ)
+  else
+    (starRingEnd ℂ).comp (InfinitePlace.Completion.extensionEmbedding (plE τ))
 
 theorem conj_tauE_ne (τ τ' : D.what₂.Tau) : ComplexEmbedding.conjugate (tauE D τ) ≠ tauE D τ' := by
   intro h
@@ -58,19 +61,20 @@ structure AdBC (D : D7) where
   cont : Continuous Φ
   cont' : Continuous Φ.symm
   inc : ∀ k : D.host.E, Φ (incA D k) = algebraMap D.host.E (AdeleRing (𝓞 D.host.E) D.host.E) k
-
   fin : ∀ x, finPart D x = 1 ↔ (Φ x).2 = 1
-
   inf : ∀ τ x, embAt τ ((Φ x).1 (plE τ)) = cmpAt D τ x
-
   idem : ∀ P e, IsPlIdem D e P ↔ Φ e = pairA D.host.E 0 (singleV D.host.E P 1)
-
   int : ∀ x, finPart D x ∈ intAE D ↔ ∀ P, (Φ x).2 P ∈ P.adicCompletionIntegers D.host.E
-
-  idemF : ∀ v, (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).1 = 0 ∧
-    ∀ P : HeightOneSpectrum (𝓞 D.host.E), (P.under (𝓞 D.host.F) = v →
-      (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).2 P = 1) ∧
-      (P.under (𝓞 D.host.F) ≠ v → (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).2 P = 0)
+  idemF
+    : ∀ v,
+      (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).1 = 0
+        ∧ ∀ P : HeightOneSpectrum (𝓞 D.host.E),
+          (P.under (𝓞 D.host.F) = v
+              → (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).2 P
+                = 1)
+            ∧ (P.under (𝓞 D.host.F) ≠ v
+              → (Φ (algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 (singleV D.host.F v 1)))).2 P
+                = 0)
 
 namespace AdBC
 
@@ -82,16 +86,20 @@ def dn : Ideles D.host.E →* (AE D)ˣ := Units.map B.Φ.symm.toMonoidHom
 
 theorem dn_up (x : (AE D)ˣ) : B.dn (B.up x) = x := Units.ext (by simp [up, dn])
 
-theorem up_inc (k : D.host.Eˣ) : B.up (Units.map (incA D).toMonoidHom k) = diagUnits D.host.E k := Units.ext (by simp [up, B.inc]; rfl)
+theorem up_inc (k : D.host.Eˣ) : B.up (Units.map (incA D).toMonoidHom k) = diagUnits D.host.E k :=
+  Units.ext (by simp [up, B.inc]; rfl)
 
 theorem toUnits_cont : Continuous Circle.toUnits := by
   refine Units.continuous_iff.2 ⟨continuous_subtype_val, ?_⟩
   exact continuous_subtype_val.comp (continuous_inv : Continuous fun z : Circle => z⁻¹)
 
 def toH : chrA D →* HChar D.host.E where
-  toFun χ := ⟨(Circle.toUnits.comp χ.1).comp B.dn,
-    (toUnits_cont.comp χ.2.1.1).comp (Continuous.units_map _ B.cont'), fun k => by
-      rw [← B.up_inc, MonoidHom.comp_apply, B.dn_up, MonoidHom.comp_apply, χ.2.1.2, map_one]⟩
+  toFun χ := ⟨
+    (Circle.toUnits.comp χ.1).comp B.dn,
+    (toUnits_cont.comp χ.2.1.1).comp (Continuous.units_map _ B.cont'),
+    fun k => by
+      rw [← B.up_inc, MonoidHom.comp_apply, B.dn_up, MonoidHom.comp_apply, χ.2.1.2, map_one]
+  ⟩
   map_one' := Subtype.ext (MonoidHom.ext fun _ => map_one Circle.toUnits)
   map_mul' _ _ := Subtype.ext (MonoidHom.ext fun _ => map_mul Circle.toUnits _ _)
 
@@ -129,8 +137,10 @@ variable {C : CharFrame D} {nch : NChoice D} (Tp : TupTied D C nch)
 
 variable (B : AdBC D)
 
-variable {ψ : AddChar (AF D.host.F) ℂ} (Gc : ChrGaps B) (G : FormGaps D) (P : PerGaps ψ) (hE : ExpU D) (Om : WeilC ψ)
-  (f : Free Om)
+variable
+  {ψ : AddChar (AF D.host.F) ℂ}
+  (Gc : ChrGaps B) (G : FormGaps D) (P : PerGaps ψ) (hE : ExpU D)
+  (Om : WeilC ψ) (f : Free Om)
 
 end Frame
 

@@ -25,8 +25,9 @@ def latSet (x : I.GA) : Set (Fin I.n → I.E) :=
 def coordV (x : I.GA) (v : InfinitePlace I.F) (u : Fin I.n → I.E) : Fin I.n → ℂ :=
   (Formalism.MainNotions.S.uMat (x.1 v)⁻¹ * (I.P v)⁻¹) *ᵥ (fun i => I.φ v (u i))
 
-def gramV (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E) : Matrix (Fin j) (Fin j) ℂ :=
-  fun a c => ∑ i, star (coordV I x v (b a) i) * coordV I x v (b c) i
+def gramV (x : I.GA) (v : InfinitePlace I.F) {j : ℕ} (b : Fin j → Fin I.n → I.E)
+    : Matrix (Fin j) (Fin j) ℂ := fun a c =>
+  ∑ i, star (coordV I x v (b a) i) * coordV I x v (b c) i
 
 structure Sub (x : I.GA) where
   j : ℕ
@@ -39,8 +40,8 @@ structure Sub (x : I.GA) where
   B_span : (B : Set (Fin I.n → I.E)) ⊆ Submodule.span I.E (Set.range b)
 
 def ht {x : I.GA} (s : Sub I x) : ℝ :=
-  (∏ v, (gramV I x v s.b).det.re) /
-    (Nat.card (s.B ⧸ (Submodule.span (𝓞 I.E) (Set.range s.b)).comap s.B.subtype) : ℝ)
+  (∏ v, (gramV I x v s.b).det.re)
+    / (Nat.card (s.B ⧸ (Submodule.span (𝓞 I.E) (Set.range s.b)).comap s.B.subtype) : ℝ)
 
 def size {x : I.GA} (s : Sub I x) : ℝ := ht I s ^ ((1 : ℝ) / (2 * (I.f : ℝ) * (s.j : ℝ)))
 
@@ -53,11 +54,17 @@ section Lat
 variable (I : Formalism.MainNotions.S.AutInst)
 
 def LatCount : Prop :=
-  ∀ x y : I.GA, 0 < tau1 I x → 0 < tau1 I y →
-    ∀ r : InfinitePlace I.F → ℝ, (∀ v, 0 ≤ r v) → ∀ S : Finset I.GFset,
-      (∀ γ ∈ S, (x⁻¹ * (γ : I.GA) * y).2 ∈ I.Kset ∧ ∀ v, PI.symD (I.ε v) ((x⁻¹ * (γ : I.GA) * y).1 v) ≤ r v) →
-      (S.card : ℝ) ≤ (3 * Real.sqrt (I.n : ℝ) / (tau1 I x * tau1 I y)) ^ (2 * I.n ^ 2 * I.f) *
-        Real.exp (2 * (I.n : ℝ) ^ 2 * ∑ v, r v)
+  ∀ x y : I.GA,
+    0 < tau1 I x → 0 < tau1 I y
+      → ∀ r : InfinitePlace I.F → ℝ,
+        (∀ v, 0 ≤ r v)
+          → ∀ S : Finset I.GFset,
+            (∀ γ ∈ S,
+                (x⁻¹ * (γ : I.GA) * y).2 ∈ I.Kset
+                  ∧ ∀ v, PI.symD (I.ε v) ((x⁻¹ * (γ : I.GA) * y).1 v) ≤ r v)
+              → (S.card : ℝ)
+                ≤ (3 * Real.sqrt (I.n : ℝ) / (tau1 I x * tau1 I y)) ^ (2 * I.n ^ 2 * I.f)
+                  * Real.exp (2 * (I.n : ℝ) ^ 2 * ∑ v, r v)
 
 end Lat
 

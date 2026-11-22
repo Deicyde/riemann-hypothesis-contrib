@@ -23,13 +23,18 @@ open scoped ComplexConjugate Topology Real
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem herm_eq_zero (X : DataX E r) {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom) {v : Fin r → E}
-    (hv : v ∈ X.L') (hsmall : ∀ τ : X.Ψ, X.maj z0 τ (Data.emb τ.1 v) < 1) : herm X.Gm v v = 0 := by
+theorem herm_eq_zero
+    (X : DataX E r)
+    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
+    {v : Fin r → E} (hv : v ∈ X.L') (hsmall : ∀ τ : X.Ψ, X.maj z0 τ (Data.emb τ.1 v) < 1)
+    : herm X.Gm v v = 0 := by
   apply UnipotentCoefficientShift.eq_zero_of_conj_lt_one (X.L'_int v hv v hv)
   have key : ∀ τ : X.Ψ, ‖τ.1 (herm X.Gm v v)‖ < 1 := by
     intro τ
-    have h := lt_of_le_of_lt
-      (UnipotentCoefficientShift.norm_hermC_le_maj (hz := hz0) (τ := τ) (v := Data.emb τ.1 v)) (hsmall τ)
+    have h :=
+      lt_of_le_of_lt
+        (UnipotentCoefficientShift.norm_hermC_le_maj (hz := hz0) (τ := τ) (v := Data.emb τ.1 v))
+        (hsmall τ)
     have e : hermC τ.1 X.Gm (Data.emb τ.1 v) (Data.emb τ.1 v) = τ.1 (herm X.Gm v v) :=
       EmbeddingHermitianPairs.hermC_emb (x := v) (y := v) ..
     rwa [e] at h
@@ -42,8 +47,8 @@ theorem herm_eq_zero (X : DataX E r) {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom) {v
     have h := key ⟨_, hc⟩
     simpa [NumberField.ComplexEmbedding.conjugate_coe_eq] using h
 
-theorem herm_nsmul (G : Matrix (Fin r) (Fin r) E) (n : ℕ) (v : Fin r → E) :
-    herm G ((n : E) • v) ((n : E) • v) = (n : E) * n * herm G v v := by
+theorem herm_nsmul (G : Matrix (Fin r) (Fin r) E) (n : ℕ) (v : Fin r → E)
+    : herm G ((n : E) • v) ((n : E) • v) = (n : E) * n * herm G v v := by
   unfold herm cc
   simp only [Pi.smul_apply, smul_eq_mul, map_mul, map_natCast]
   rw [Finset.mul_sum]
@@ -52,15 +57,15 @@ theorem herm_nsmul (G : Matrix (Fin r) (Fin r) E) (n : ℕ) (v : Fin r → E) :
   refine Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem flowMat_nsmul (X : Data E r) (v : Fin r → E) (n : ℕ) (τ : X.Ψ) (s : ℂ) :
-    X.flowMat ((n : E) • v) τ s = X.flowMat v τ ((n : ℂ) ^ 2 * s) := by
+theorem flowMat_nsmul (X : Data E r) (v : Fin r → E) (n : ℕ) (τ : X.Ψ) (s : ℂ)
+    : X.flowMat ((n : E) • v) τ s = X.flowMat v τ ((n : ℂ) ^ 2 * s) := by
   ext a b
   simp only [Data.flowMat, Matrix.of_apply, Pi.smul_apply, smul_eq_mul, map_mul, map_natCast]
   simp only [mul_left_comm _ (n : ℂ), ← Finset.mul_sum]
   ring
 
-theorem nfac_pos (X : Data E r) (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) :
-    0 < X.nfac la x := by
+theorem nfac_pos (X : Data E r) (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : 0 < X.nfac la x := by
   unfold Data.nfac
   refine Finset.prod_pos fun τ _ => Finset.prod_pos fun i _ => Real.rpow_pos_of_pos ?_ _
   have hne : ∀ j : Fin (r + 1), dmin X.Gm x τ j ≠ 0 := fun j h => by
@@ -69,11 +74,12 @@ theorem nfac_pos (X : Data E r) (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ 
     exact lt_irrefl 0 this
   exact norm_pos_iff.mpr (div_ne_zero (hne _) (hne _))
 
-theorem term_norm {ι : Type*} [Fintype ι] (c : ℂ) (ν : ι → ℝ) (ζ : ℂ) (n : ℕ) :
-    ‖c * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))‖ =
-      ‖c‖ * Real.exp (-(4 * π * (∑ τ, ν τ) / (n : ℝ) ^ 2 * ζ.im)) := by
-  have h : (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2)) =
-      I * (((4 * π * (∑ τ, ν τ) / (n : ℝ) ^ 2 : ℝ)) : ℂ) * ζ := by
+theorem term_norm {ι : Type*} [Fintype ι] (c : ℂ) (ν : ι → ℝ) (ζ : ℂ) (n : ℕ)
+    : ‖c * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))‖
+      = ‖c‖ * Real.exp (-(4 * π * (∑ τ, ν τ) / (n : ℝ) ^ 2 * ζ.im)) := by
+  have h
+      : (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))
+        = I * (((4 * π * (∑ τ, ν τ) / (n : ℝ) ^ 2 : ℝ)) : ℂ) * ζ := by
     rw [← Finset.sum_mul]
     push_cast
     ring
@@ -83,12 +89,13 @@ theorem term_norm {ι : Type*} [Fintype ι] (c : ℂ) (ν : ι → ℝ) (ζ : �
     Complex.ofReal_im]
   ring
 
-theorem tendsto_zero (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : P ∈ X.SS la)
-    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom) {v : Fin r → E} (hv : v ∈ X.L')
-    (hvv : herm X.Gm v v = 0) (hv0 : v ≠ 0)
-    (hdom : ∀ ζ : ℂ, 0 ≤ ζ.im → X.flow v (fun _ => ζ) z0 ∈ X.dom) (G : ℂ → ℂ)
-    (hG : ∀ ζ : ℂ, 0 < ζ.im → G ζ = P (X.flow v (fun _ => ζ) z0)) :
-    Tendsto G (comap im atTop) (𝓝 0) := by
+theorem tendsto_zero
+    (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : P ∈ X.SS la)
+    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
+    {v : Fin r → E} (hv : v ∈ X.L') (hvv : herm X.Gm v v = 0) (hv0 : v ≠ 0)
+    (hdom : ∀ ζ : ℂ, 0 ≤ ζ.im → X.flow v (fun _ => ζ) z0 ∈ X.dom)
+    (G : ℂ → ℂ) (hG : ∀ ζ : ℂ, 0 < ζ.im → G ζ = P (X.flow v (fun _ => ζ) z0))
+    : Tendsto G (comap im atTop) (𝓝 0) := by
   classical
   set n := X.NC with hn
   have hn0 : (n : ℂ) ≠ 0 := by exact_mod_cast X.NC_pos.ne'
@@ -105,14 +112,20 @@ theorem tendsto_zero (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
     congr 2
     field_simp
   set a : (X.Ψ → ℝ) → ℂ := fun ν => X.fj la ξ ν P z0 with ha
-  have hexp : ∀ ζ : ℂ, 0 ≤ ζ.im → HasSum (fun ν : X.Ψ → ℝ =>
-      a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))) (P (X.flow v (fun _ => ζ) z0)) := by
+  have hexp
+      : ∀ ζ : ℂ,
+        0 ≤ ζ.im
+          → HasSum
+            (fun ν : X.Ψ → ℝ => a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2)))
+            (P (X.flow v (fun _ => ζ) z0)) := by
     intro ζ hζ
     rw [hflow]
-    exact m3bExp_holds r X.toData la P hP.1.1 ξ hξ z0 hz0 (fun _ => ζ / (n : ℂ) ^ 2)
-      (by rw [← hflow]; exact hdom ζ hζ)
+    exact m3bExp_holds r X.toData la P hP.1.1 ξ hξ z0 hz0 (fun _ => ζ / (n : ℂ) ^ 2) (by
+      rw [← hflow]; exact hdom ζ hζ)
   obtain ⟨C, hC⟩ := hP.1.2
-  have hpos := (moderateCoefficientPositivity_holds r X.toData la P C 0 hP.1.1 (fun x hx => by simpa using hC x hx)).1
+  have hpos :=
+    (moderateCoefficientPositivity_holds r X.toData la P C 0 hP.1.1
+      (fun x hx => by simpa using hC x hx)).1
   have ha0 : a 0 = 0 := hP.2 ξ hξ z0 hz0
   have hS : ∀ ν, a ν ≠ 0 → 0 < ∑ τ, ν τ := by
     intro ν hν
@@ -124,13 +137,17 @@ theorem tendsto_zero (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
       by_contra h
       push Not at h
       exact hne (funext h)
-    exact Finset.sum_pos' (fun τ _ => hnn τ) ⟨τ, Finset.mem_univ _, lt_of_le_of_ne (hnn τ) (Ne.symm hτ)⟩
+    exact
+      Finset.sum_pos' (fun τ _ => hnn τ) ⟨τ, Finset.mem_univ _, lt_of_le_of_ne (hnn τ) (Ne.symm hτ)⟩
   have hsum : Summable fun ν => ‖a ν‖ := by
     have h0 := (hexp 0 (le_refl _)).summable
     simp only [zero_div, mul_zero, Finset.sum_const_zero, Complex.exp_zero, mul_one] at h0
     exact summable_norm_iff.2 h0
-  have hab : ∀ ν : X.Ψ → ℝ, Tendsto (fun ζ : ℂ =>
-      a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))) (comap im atTop) (𝓝 0) := by
+  have hab
+      : ∀ ν : X.Ψ → ℝ,
+        Tendsto
+          (fun ζ : ℂ => a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2)))
+          (comap im atTop) (𝓝 0) := by
     intro ν
     by_cases hν : a ν = 0
     · simp only [hν, zero_mul]
@@ -145,8 +162,9 @@ theorem tendsto_zero (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
     have h2 := Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp (h1.const_mul_atTop hk))
     have h3 := h2.const_mul ‖a ν‖
     simpa using h3
-  have hbound : ∀ᶠ ζ in comap im atTop, ∀ ν : X.Ψ → ℝ,
-      ‖a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))‖ ≤ ‖a ν‖ := by
+  have hbound
+      : ∀ᶠ ζ in comap im atTop, ∀ ν : X.Ψ → ℝ,
+        ‖a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * (ζ / (n : ℂ) ^ 2))‖ ≤ ‖a ν‖ := by
     have hev : ∀ᶠ ζ in comap im atTop, (0 : ℝ) ≤ ζ.im :=
       tendsto_comap.eventually (eventually_ge_atTop 0)
     filter_upwards [hev] with ζ hζ ν

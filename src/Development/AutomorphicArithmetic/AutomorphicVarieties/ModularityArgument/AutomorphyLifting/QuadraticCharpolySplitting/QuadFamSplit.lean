@@ -4,19 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Z.Bc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.HeckeGal
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Z.Bc
 
 namespace UpperTheory.V.Z.Win
 
-private theorem fix_root {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω) {l p c : ℕ} (hc : p + 1 = 4 * l * c)
-    (hl : A.valuation (l : Ω) < 1) {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) A) {δ : Ω} (hδ : δ ^ 2 = -(p : Ω)) : g δ = δ := by
+private theorem fix_root
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω)
+    {l p c : ℕ} (hc : p + 1 = 4 * l * c) (hl : A.valuation (l : Ω) < 1)
+    {g : G ℚ Ω} (hg : g ∈ Dec (F := ℚ) A)
+    {δ : Ω} (hδ : δ ^ 2 = -(p : Ω))
+    : g δ = δ := by
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have hcast : (p : Ω) + 1 = 4 * (l : Ω) * (c : Ω) := by
     have := congrArg (Nat.cast : ℕ → Ω) hc
     push_cast at this
     exact this
-  have hsq : (g δ) ^ 2 = δ ^ 2 := by
-    rw [← map_pow, hδ, map_neg, map_natCast]
+  have hsq : (g δ) ^ 2 = δ ^ 2 := by rw [← map_pow, hδ, map_neg, map_natCast]
   rcases sq_eq_sq_iff_eq_or_eq_neg.mp hsq with h | h
   · exact h
   exfalso
@@ -56,9 +62,14 @@ private theorem fix_root {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationS
     lt_of_le_of_lt (Valuation.map_add _ _ _) (max_lt both.1 both.2)
   simp at h1
 
-private theorem fix_field {Ω K : Type} [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω]
-    (h2 : Module.finrank ℚ K = 2) {δ : K} {p : ℕ} (hp : 0 < p) (hδ : δ ^ 2 = -(p : K)) (g : G ℚ Ω)
-    (hg : g (algebraMap K Ω δ) = algebraMap K Ω δ) (x : K) : g (algebraMap K Ω x) = algebraMap K Ω x := by
+private theorem fix_field
+    {Ω K : Type}
+    [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω]
+    (h2 : Module.finrank ℚ K = 2)
+    {δ : K} {p : ℕ} (hp : 0 < p) (hδ : δ ^ 2 = -(p : K))
+    (g : G ℚ Ω) (hg : g (algebraMap K Ω δ) = algebraMap K Ω δ)
+    (x : K)
+    : g (algebraMap K Ω x) = algebraMap K Ω x := by
   have hli : LinearIndependent ℚ ![(1 : K), δ] := by
     rw [LinearIndependent.pair_iff]
     intro a b hab
@@ -87,18 +98,19 @@ private theorem fix_field {Ω K : Type} [Field K] [NumberField K] [Field Ω] [Al
   rw [← hf]
   simp [Fin.sum_univ_two, Algebra.smul_def, ← IsScalarTower.algebraMap_apply, hg]
 
-private theorem fam_one (p : ℕ) (hp : p.Prime) (h4 : p % 4 = 3) :
-    ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K),
+private theorem fam_one (p : ℕ) (hp : p.Prime) (h4 : p % 4 = 3)
+    : ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K),
       Module.finrank ℚ K = 2 ∧ discr K = -(p : ℤ) ∧ ∃ δ : K, δ ^ 2 = -(p : K) := by
   obtain ⟨K, _, _, h2, hd⟩ := KStar.Consta.exists_quadField hp h4
   obtain ⟨⟨δ, hδ⟩, htc⟩ := KStar.Choice.exists_sq_eq_neg_of_discr h2 hp.ne_zero hd
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h2⟩
   exact ⟨K, _, _, IsCMField.ofCMExtension ℚ K, h2, hd, δ, hδ⟩
 
-theorem quadFamSplit (l : ℕ) [hl : Fact l.Prime] (N : ℕ) :
-    ∃ (K : Fin N → Type) (_ : ∀ i, Field (K i)) (_ : ∀ i, NumberField (K i)) (_ : ∀ i, IsCMField (K i)),
-      (∀ i, Module.finrank ℚ (K i) = 2) ∧ (∀ i j, i ≠ j → IsCoprime (discr (K i)) (discr (K j))) ∧
-      ∀ i, ∃ (p c : ℕ) (δ : K i), 0 < p ∧ p + 1 = 4 * l * c ∧ δ ^ 2 = -(p : K i) := by
+theorem quadFamSplit (l : ℕ) [hl : Fact l.Prime] (N : ℕ)
+    : ∃ (K : Fin N → Type) (_ : ∀ i, Field (K i)) (_ : ∀ i, NumberField (K i))
+        (_ : ∀ i, IsCMField (K i)),
+      (∀ i, Module.finrank ℚ (K i) = 2) ∧ (∀ i j, i ≠ j → IsCoprime (discr (K i)) (discr (K j)))
+        ∧ ∀ i, ∃ (p c : ℕ) (δ : K i), 0 < p ∧ p + 1 = 4 * l * c ∧ δ ^ 2 = -(p : K i) := by
   haveI : NeZero (4 * l) := ⟨by have := hl.out.pos; omega⟩
   have hS := Nat.infinite_setOfPred_prime_and_eq_mod (q := 4 * l) (a := -1) isUnit_one.neg
   let e := hS.natEmbedding
@@ -115,8 +127,9 @@ theorem quadFamSplit (l : ℕ) [hl : Fact l.Prime] (N : ℕ) :
       rw [hPm i]
       ring
     exact (ZMod.natCast_eq_zero_iff _ _).mp h0
-  have hF : ∀ i : Fin N, ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K),
-      Module.finrank ℚ K = 2 ∧ discr K = -(P i : ℤ) ∧ ∃ δ : K, δ ^ 2 = -(P i : K) := by
+  have hF
+      : ∀ i : Fin N, ∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K),
+        Module.finrank ℚ K = 2 ∧ discr K = -(P i : ℤ) ∧ ∃ δ : K, δ ^ 2 = -(P i : K) := by
     intro i
     obtain ⟨c, hc⟩ := hdvd i
     have h4 : 4 ∣ P i + 1 := ⟨l * c, by rw [hc, mul_assoc]⟩
@@ -132,27 +145,35 @@ theorem quadFamSplit (l : ℕ) [hl : Fact l.Prime] (N : ℕ) :
     exact ⟨P i, c, δ, (hPp i).pos, hc, hδ⟩
 
 def SplitIn (l : ℕ) (K Ω : Type) [Field K] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] : Prop :=
-  ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ g ∈ Dec (F := ℚ) A, ∀ x : K, g (algebraMap K Ω x) = algebraMap K Ω x
+  ∀ A : ValuationSubring Ω,
+    A.valuation (l : Ω) < 1 → ∀ g ∈ Dec (F := ℚ) A, ∀ x : K, g (algebraMap K Ω x) = algebraMap K Ω x
 
-theorem thirdSplit (K K' Ω : Type) [Field K] [NumberField K] [IsCMField K] [Field K'] [NumberField K'] [IsCMField K'] [Field Ω]
-    [Algebra ℚ Ω] [Algebra K Ω] [Algebra K' Ω] [IsScalarTower ℚ K Ω] [IsScalarTower ℚ K' Ω] [IsAlgClosure ℚ Ω]
-    (hK : Module.finrank ℚ K = 2) (hK' : Module.finrank ℚ K' = 2) (l : ℕ) [Fact l.Prime] (n : ℕ) (r : G ℚ Ω →* GL (Fin n) (Qbar l))
-    (hr : IsIrr (r.comp (resG ℚ K Ω))) (hr' : IsIrr (r.comp (resG ℚ K' Ω))) :
-    ∃ (K'' : Type) (_ : Field K'') (_ : NumberField K'') (_ : IsCMField K'') (_ : Algebra K'' Ω) (_ : IsScalarTower ℚ K'' Ω),
-      Module.finrank ℚ K'' = 2 ∧ SplitIn l K'' Ω ∧ IsIrr (r.comp ((resG ℚ K Ω).range ⊓ (resG ℚ K'' Ω).range).subtype) ∧
-        IsIrr (r.comp ((resG ℚ K' Ω).range ⊓ (resG ℚ K'' Ω).range).subtype) := by
+theorem thirdSplit
+    (K K' Ω : Type) [Field K] [NumberField K] [IsCMField K] [Field K'] [NumberField K']
+    [IsCMField K'] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [Algebra K' Ω] [IsScalarTower ℚ K Ω]
+    [IsScalarTower ℚ K' Ω] [IsAlgClosure ℚ Ω]
+    (hK : Module.finrank ℚ K = 2) (hK' : Module.finrank ℚ K' = 2)
+    (l : ℕ) [Fact l.Prime]
+    (n : ℕ) (r : G ℚ Ω →* GL (Fin n) (Qbar l))
+    (hr : IsIrr (r.comp (resG ℚ K Ω))) (hr' : IsIrr (r.comp (resG ℚ K' Ω)))
+    : ∃ (K'' : Type) (_ : Field K'') (_ : NumberField K'') (_ : IsCMField K'') (_ : Algebra K'' Ω)
+        (_ : IsScalarTower ℚ K'' Ω),
+      Module.finrank ℚ K'' = 2 ∧ SplitIn l K'' Ω
+        ∧ IsIrr (r.comp ((resG ℚ K Ω).range ⊓ (resG ℚ K'' Ω).range).subtype)
+        ∧ IsIrr (r.comp ((resG ℚ K' Ω).range ⊓ (resG ℚ K'' Ω).range).subtype) := by
   classical
   haveI hAC : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI hAlg : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
-  have hclos : ∀ (E : Type) [Field E] [Algebra ℚ E] [Algebra E Ω] [IsScalarTower ℚ E Ω], IsAlgClosure E Ω :=
-    fun E _ _ _ _ => ⟨hAC, Algebra.IsAlgebraic.tower_top (K := ℚ) E⟩
+  have hclos
+      : ∀ (E : Type) [Field E] [Algebra ℚ E] [Algebra E Ω] [IsScalarTower ℚ E Ω],
+        IsAlgClosure E Ω := fun E _ _ _ _ =>
+    ⟨hAC, Algebra.IsAlgebraic.tower_top (K := ℚ) E⟩
   obtain ⟨Kf, hF, hN, hC, h2f, hcop, hsplit⟩ := quadFamSplit l (4 * n ^ 2 + 1)
   have hemb : ∀ i, ∃ (_ : Algebra (Kf i) Ω), IsScalarTower ℚ (Kf i) Ω := by
     intro i
     let f : Kf i →ₐ[ℚ] Ω := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     letI : Algebra (Kf i) Ω := f.toRingHom.toAlgebra
     exact ⟨inferInstance, IsScalarTower.of_algebraMap_eq (fun x => (f.commutes x).symm)⟩
@@ -173,10 +194,13 @@ theorem thirdSplit (K K' Ω : Type) [Field K] [NumberField K] [IsCMField K] [Fie
     apply UpperTheory.V.Br.signNe (Kf i) (Kf j) Ω (h2f i) (hcop i j hne)
     ext s
     rw [← (hδs i).1 s, ← (hδs j).1 s, hij]
-  have card_bad {Γ' : Type} [Group Γ'] (φ : Γ' →* G ℚ Ω) (η : G ℚ Ω →* (Qbar l)ˣ)
-      (hker : ∀ s, η s = 1 ↔ s ∈ φ.range) (hsign : ∀ s, η s = 1 ∨ η s = -1)
-      (hne : η ≠ 1) (hirr : IsIrr (r.comp φ)) :
-      (Finset.univ.filter fun i => RepIso (r.comp φ) (tw (r.comp φ) ((δf i).comp φ))).card ≤ 2 * n ^ 2 := by
+  have card_bad
+      {Γ' : Type} [Group Γ']
+      (φ : Γ' →* G ℚ Ω) (η : G ℚ Ω →* (Qbar l)ˣ)
+      (hker : ∀ s, η s = 1 ↔ s ∈ φ.range) (hsign : ∀ s, η s = 1 ∨ η s = -1) (hne : η ≠ 1)
+      (hirr : IsIrr (r.comp φ))
+      : (Finset.univ.filter fun i => RepIso (r.comp φ) (tw (r.comp φ) ((δf i).comp φ))).card
+        ≤ 2 * n ^ 2 := by
     obtain ⟨t, ht⟩ : ∃ t, η t ≠ 1 := by
       by_contra h
       exact hne (MonoidHom.ext fun s => by_contra fun hs => h ⟨s, hs⟩)
@@ -200,36 +224,44 @@ theorem thirdSplit (K K' Ω : Type) [Field K] [NumberField K] [IsCMField K] [Fie
           rw [map_mul, map_mul, map_inv, map_inv, hat] at h
           exact mul_left_cancel h
     change bad.card ≤ _
-    refine (Finset.card_le_card (t := _ ∪ _) ?_).trans ((Finset.card_union_le _ _).trans
-      ((add_le_add (key 1) (key (-1))).trans (two_mul _).ge))
+    refine (Finset.card_le_card (t := _ ∪ _) ?_).trans
+      ((Finset.card_union_le _ _).trans ((add_le_add (key 1) (key (-1))).trans (two_mul _).ge))
     intro i hi
-    exact Finset.mem_union.2 ((hδs i).2 t |>.imp
-      (fun h => Finset.mem_filter.2 ⟨hi, h⟩) (fun h => Finset.mem_filter.2 ⟨hi, h⟩))
+    exact Finset.mem_union.2 ((hδs i).2 t
+      |>.imp (fun h => Finset.mem_filter.2 ⟨hi, h⟩) (fun h => Finset.mem_filter.2 ⟨hi, h⟩))
   have hbadK := card_bad (resG ℚ K Ω) ε hεs.1 hεs.2 hεne hr
   have hbadK' := card_bad (resG ℚ K' Ω) ε' hεs'.1 hεs'.2 hεne' hr'
-  obtain ⟨i, hi⟩ : ∃ i, i ∉ (Finset.univ.filter fun i => RepIso (r.comp (resG ℚ K Ω))
-      (tw (r.comp (resG ℚ K Ω)) ((δf i).comp (resG ℚ K Ω)))) ∪
-      (Finset.univ.filter fun i => RepIso (r.comp (resG ℚ K' Ω))
-      (tw (r.comp (resG ℚ K' Ω)) ((δf i).comp (resG ℚ K' Ω)))) := by
+  obtain ⟨i, hi⟩
+      : ∃ i,
+        i ∉ (Finset.univ.filter fun i =>
+            RepIso (r.comp (resG ℚ K Ω)) (tw (r.comp (resG ℚ K Ω)) ((δf i).comp (resG ℚ K Ω))))
+          ∪ (Finset.univ.filter fun i =>
+            RepIso (r.comp (resG ℚ K' Ω))
+              (tw (r.comp (resG ℚ K' Ω)) ((δf i).comp (resG ℚ K' Ω)))) := by
     by_contra hall
     push_neg at hall
     have h1 : (Finset.univ : Finset (Fin (4 * n ^ 2 + 1))) ⊆ _ := fun i _ => hall i
-    have h2 := (Finset.card_le_card h1).trans ((Finset.card_union_le _ _).trans (add_le_add hbadK hbadK'))
+    have h2 :=
+      (Finset.card_le_card h1).trans ((Finset.card_union_le _ _).trans (add_le_add hbadK hbadK'))
     simp at h2
     linarith
   simp only [Finset.mem_union, Finset.mem_filter, Finset.mem_univ, true_and, not_or] at hi
-  have irr_inf {Γ' : Type} [Group Γ'] (φ : Γ' →* G ℚ Ω) (hirr : IsIrr (r.comp φ))
-      (hn : ¬ RepIso (r.comp φ) (tw (r.comp φ) ((δf i).comp φ))) :
-      IsIrr (r.comp (φ.range ⊓ (resG ℚ (Kf i) Ω).range).subtype) := by
-    have h := (Br.resTwo _ _ (Qbar l) n ((δf i).comp φ).ker.subtype ((δf i).comp φ)
-      (fun s => by rw [Subgroup.range_subtype]; rfl) (fun s => (hδs i).2 (φ s)) (r.comp φ)).1 hirr hn
+  have irr_inf
+      {Γ' : Type} [Group Γ']
+      (φ : Γ' →* G ℚ Ω)
+      (hirr : IsIrr (r.comp φ)) (hn : ¬ RepIso (r.comp φ) (tw (r.comp φ) ((δf i).comp φ)))
+      : IsIrr (r.comp (φ.range ⊓ (resG ℚ (Kf i) Ω).range).subtype) := by
+    have h :=
+      (Br.resTwo _ _ (Qbar l) n ((δf i).comp φ).ker.subtype ((δf i).comp φ)
+        (fun s => by rw [Subgroup.range_subtype]; rfl)
+        (fun s => (hδs i).2 (φ s))
+        (r.comp φ)).1 hirr hn
     refine ⟨h.1, fun _ _ _ => trivial, fun W hW hst => h.2.2 W hW fun s v hv => ?_⟩
     exact hst ⟨φ s, ⟨s, rfl⟩, ((hδs i).1 _).1 s.2⟩ v hv
   refine ⟨Kf i, hF i, hN i, hC i, algI i, towI i, h2f i, ?_, ?_, ?_⟩
   · intro A hA g hg x
     obtain ⟨p, c, δ, hp, hpc, hδ⟩ := hsplit i
-    have hδΩ : (algebraMap (Kf i) Ω δ) ^ 2 = -(p : Ω) := by
-      rw [← map_pow, hδ, map_neg, map_natCast]
+    have hδΩ : (algebraMap (Kf i) Ω δ) ^ 2 = -(p : Ω) := by rw [← map_pow, hδ, map_neg, map_natCast]
     exact fix_field (h2f i) hp hδ g (fix_root A hpc hA hg hδΩ) x
   · exact irr_inf (resG ℚ K Ω) hr hi.1
   · exact irr_inf (resG ℚ K' Ω) hr' hi.2

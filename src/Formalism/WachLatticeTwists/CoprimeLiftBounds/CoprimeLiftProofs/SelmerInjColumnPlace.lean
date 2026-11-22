@@ -14,8 +14,8 @@ namespace Formalism.RepresentationBoundsCohomology.BR
 open Formalism.NG
 
 theorem selmer_inj_tensor_form : SelmerInjTensorForm := by
-  intro O _ _ _ D _ L V M _ _ _ _ _ _ _ _ ρL ρV ρM i q tens htens hi hq hker hsat hiρ hqρ Ff j κ
-    hF1 hF2 hF3 hF4 x m hx a
+  intro O _ _ _ D _ L V M _ _ _ _ _ _ _ _ ρL ρV ρM i q tens htens hi hq hker hsat hiρ hqρ Ff j κ hF1
+    hF2 hF3 hF4 x m hx a
   choose y hy using fun b => Submodule.Quotient.mk_surjective (1 : Submodule O (FractionRing O)) (x b)
   have hsum : ∀ g, q (∑ b, y b • i ((κ b : D → L) g)) = ρM g m - m := by
     intro g

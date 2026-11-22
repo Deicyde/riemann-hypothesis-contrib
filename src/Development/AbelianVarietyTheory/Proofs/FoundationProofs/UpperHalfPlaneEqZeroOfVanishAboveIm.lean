@@ -14,9 +14,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory
 
-theorem upperHalfPlane_eq_zero_of_vanish_high :
-    ∀ (f : ℍ → ℂ) (C : ℝ), MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f →
-      (∀ τ : ℍ, C < τ.im → f τ = 0) → f = 0 := by
+theorem upperHalfPlane_eq_zero_of_vanish_high
+    : ∀ (f : ℍ → ℂ) (C : ℝ),
+      MDifferentiable 𝓘(ℂ) 𝓘(ℂ) f → (∀ τ : ℍ, C < τ.im → f τ = 0) → f = 0 := by
   intro f C hf hC
   have hd : DifferentiableOn ℂ (f ∘ UpperHalfPlane.ofComplex) {z : ℂ | 0 < z.im} :=
     UpperHalfPlane.mdifferentiable_iff.mp hf
@@ -27,9 +27,11 @@ theorem upperHalfPlane_eq_zero_of_vanish_high :
   have hz₀im : z₀.im = |C| + 1 := by simp [hz₀]
   have hmem : z₀ ∈ {z : ℂ | 0 < z.im} := by
     show 0 < z₀.im
-    rw [hz₀im]; positivity
+    rw [hz₀im]
+    positivity
   have hev : (f ∘ UpperHalfPlane.ofComplex) =ᶠ[nhds z₀] 0 := by
-    have hopen2 : IsOpen {z : ℂ | max C 0 < z.im} := isOpen_lt continuous_const Complex.continuous_im
+    have hopen2 : IsOpen {z : ℂ | max C 0 < z.im} :=
+      isOpen_lt continuous_const Complex.continuous_im
     have hin : z₀ ∈ {z : ℂ | max C 0 < z.im} := by
       show max C 0 < z₀.im
       rw [hz₀im]

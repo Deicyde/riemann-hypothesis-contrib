@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.yLoc_pf :
-    PfHecke → ProdOp → YLoc := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.yLoc_pf : PfHecke → ProdOp → YLoc := by
   intro hP hO E _ _ _ n S Z N hS hZ hG π y i hi f hf x hx
   classical
   obtain ⟨w, b⟩ := i
@@ -21,7 +21,7 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.yLoc_pf :
       obtain rfl := Finset.mem_singleton.mp hj
       exact ⟨hi, by simpa [hFi] using hf⟩
     · rintro ⟨w', b'⟩ _ hj
-      have hne : ¬ (w' = w ∧ b' = b) := by
+      have hne : ¬(w' = w ∧ b' = b) := by
         rintro ⟨rfl, rfl⟩
         exact hj (Finset.mem_singleton_self _)
       simp [F, hne]

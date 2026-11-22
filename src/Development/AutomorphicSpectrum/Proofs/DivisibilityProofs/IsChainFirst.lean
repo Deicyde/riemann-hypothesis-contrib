@@ -14,7 +14,8 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 open GroundTheory.Heights₂.Heights.LowerBoundFree
 
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ} {K : Type}
@@ -36,7 +37,8 @@ def cellDim [Fintype K] (j : K → FlBlock Ψ N) : ℕ := ∑ k, (N - 1 - ((j k)
 
 def dropJ (j : K → FlBlock Ψ N) (k₀ : K) : {k // k ≠ k₀} → FlBlock Ψ N := fun k => j k.1
 
-def dropV (j : K → FlBlock Ψ N) (k₀ : K) : (Σ k, PIdx (dropJ j k₀) k) → Σ k, PIdx j k := fun p => ⟨p.1.1, p.2⟩
+def dropV (j : K → FlBlock Ψ N) (k₀ : K) : (Σ k, PIdx (dropJ j k₀) k) → Σ k, PIdx j k := fun p =>
+  ⟨p.1.1, p.2⟩
 
 def constLine {K : Type} [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] : HermLine ι :=
   HermLine.ofWeight (fun _ => -1) fun _ _ _ => rfl

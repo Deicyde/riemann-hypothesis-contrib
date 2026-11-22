@@ -8,19 +8,20 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.LocPrincipalSp
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
-
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+  GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
 
 open TensorProduct in
-theorem GlobalTheory.CompanionTheory.Hypotheses₂.Conormal.finite_projective_cotangent :
-    ∀ {k A : Type} [Field k] [CommRing A] (φ : k →+* A) (I : Ideal A), φ.Smooth →
-      ((Ideal.Quotient.mk I).comp φ).Smooth →
-        Module.Finite (A ⧸ I) I.Cotangent ∧ Module.Projective (A ⧸ I) I.Cotangent := by
+theorem GlobalTheory.CompanionTheory.Hypotheses₂.Conormal.finite_projective_cotangent
+    : ∀ {k A : Type} [Field k] [CommRing A] (φ : k →+* A) (I : Ideal A),
+      φ.Smooth → ((Ideal.Quotient.mk I).comp φ).Smooth
+        → Module.Finite (A ⧸ I) I.Cotangent ∧ Module.Projective (A ⧸ I) I.Cotangent := by
   intro k A _ _ φ I h1 h2
   letI := φ.toAlgebra
   haveI hA : Algebra.Smooth k A := h1
-  have halg : (Ideal.Quotient.algebra k : Algebra k (A ⧸ I)) =
-      ((Ideal.Quotient.mk I).comp φ).toAlgebra := Algebra.algebra_ext _ _ fun _ => rfl
+  have halg
+      : (Ideal.Quotient.algebra k : Algebra k (A ⧸ I)) = ((Ideal.Quotient.mk I).comp φ).toAlgebra :=
+    Algebra.algebra_ext _ _ fun _ => rfl
   have hQ : Algebra.FormallySmooth k (A ⧸ I) := by
     have hs : @Algebra.Smooth k _ (A ⧸ I) _ ((Ideal.Quotient.mk I).comp φ).toAlgebra := h2
     rw [← halg] at hs
@@ -38,8 +39,9 @@ theorem GlobalTheory.CompanionTheory.Hypotheses₂.Conormal.finite_projective_co
     first
     | infer_instance
     | exact IsScalarTower.of_algebraMap_smul fun _ _ => rfl
-  obtain ⟨l, hl⟩ := (Algebra.FormallySmooth.iff_split_injection (R := k) (P := A) (A := A ⧸ I)
-    Ideal.Quotient.mk_surjective).mp hQ
+  obtain ⟨l, hl⟩ :=
+    (Algebra.FormallySmooth.iff_split_injection (R := k) (P := A) (A := A ⧸ I)
+      Ideal.Quotient.mk_surjective).mp hQ
   have hsurj : Function.Surjective (algebraMap A (A ⧸ I)) := Ideal.Quotient.mk_surjective
   let e := Ideal.Cotangent.equivOfEq _ _ (Ideal.mk_ker (I := I))
   let i : I.Cotangent →ₗ[A ⧸ I] (A ⧸ I) ⊗[A] KaehlerDifferential k A :=
@@ -52,9 +54,14 @@ theorem GlobalTheory.CompanionTheory.Hypotheses₂.Conormal.finite_projective_co
     have h := LinearMap.congr_fun hl (e.symm x)
     simp only [LinearMap.comp_apply, LinearMap.id_apply] at h
     first
-    | (simp only [s, i, LinearMap.comp_apply, LinearMap.extendScalarsOfSurjective_apply,
-        LinearEquiv.coe_coe, LinearMap.id_apply, h, LinearEquiv.apply_symm_apply]; done)
-    | (show e (l (KaehlerDifferential.kerCotangentToTensor k A (A ⧸ I) (e.symm x))) = x
-       rw [h, LinearEquiv.apply_symm_apply])
+    | (
+        simp only [s, i, LinearMap.comp_apply, LinearMap.extendScalarsOfSurjective_apply,
+          LinearEquiv.coe_coe, LinearMap.id_apply, h, LinearEquiv.apply_symm_apply]
+        done
+      )
+    | (
+        show e (l (KaehlerDifferential.kerCotangentToTensor k A (A ⧸ I) (e.symm x))) = x
+        rw [h, LinearEquiv.apply_symm_apply]
+      )
   refine ⟨Module.Finite.of_surjective s fun x => ⟨i x, ?_⟩, Module.Projective.of_split i s hsi⟩
   simpa only [LinearMap.comp_apply, LinearMap.id_apply] using LinearMap.congr_fun hsi x

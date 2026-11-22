@@ -7,17 +7,23 @@ public import GroundTheory.GlobalFields.ComplexMultiplication.AutCFixed
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Poinc.Sep
 
-theorem mem_of_finite_conj {K : Type} [Field K] [IsAlgClosed K] (k₀ : Subfield K) (hk : IsAlgClosed k₀)
-    (a : K) (h : Set.Finite {b : K | ∃ σ : K ≃+* K, (∀ c ∈ k₀, σ c = c) ∧ b = σ a}) : a ∈ k₀ := by
+theorem mem_of_finite_conj
+    {K : Type} [Field K] [IsAlgClosed K]
+    (k₀ : Subfield K) (hk : IsAlgClosed k₀)
+    (a : K) (h : Set.Finite {b : K | ∃ σ : K ≃+* K, (∀ c ∈ k₀, σ c = c) ∧ b = σ a})
+    : a ∈ k₀ := by
   haveI := hk
   by_contra ha
   have htr : Transcendental k₀ a := by
@@ -37,18 +43,21 @@ theorem mem_of_finite_conj {K : Type} [Field K] [IsAlgClosed K] (k₀ : Subfield
     obtain ⟨σ, hσ⟩ := hc c
     exact ⟨σ.toRingEquiv, fun b hb => σ.commutes ⟨b, hb⟩, hσ.symm⟩
 
-theorem defOver_of_finite_orbit : ∀ (K : Type) [Field K] [IsAlgClosed K] (k₀ : Subfield K), IsAlgClosed k₀ →
-    ∀ (Y : Scheme.{0}) (P : Sp K ⟶ Y),
-    Set.Finite {P' : Sp K ⟶ Y | ∃ σ : K ≃+* K, (∀ a ∈ k₀, σ a = a) ∧ P' = spMap σ.toRingHom ≫ P} →
-    DefOver k₀ P := by
+theorem defOver_of_finite_orbit
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (k₀ : Subfield K),
+      IsAlgClosed k₀
+        → ∀ (Y : Scheme.{0}) (P : Sp K ⟶ Y),
+          Set.Finite
+              {P' : Sp K ⟶ Y | ∃ σ : K ≃+* K, (∀ a ∈ k₀, σ a = a) ∧ P' = spMap σ.toRingHom ≫ P}
+            → DefOver k₀ P := by
   intro K _ _ k₀ hk Y P hfin
   classical
   let e := SpecToEquivOfLocalRing Y (CommRingCat.of K)
   let x := (e P).1
   let f := (e P).2.1
   have hP : P = Spec.map f ≫ Y.fromSpecStalk x := (e.left_inv P).symm
-  let Φ : {g : Y.presheaf.stalk x ⟶ CommRingCat.of K // IsLocalHom g.hom} → (Sp K ⟶ Y) :=
-    fun g => e.symm ⟨x, g⟩
+  let Φ : {g : Y.presheaf.stalk x ⟶ CommRingCat.of K // IsLocalHom g.hom} → (Sp K ⟶ Y) := fun g =>
+    e.symm ⟨x, g⟩
   have hΦ : Function.Injective Φ := by
     intro g₁ g₂ h
     have := e.symm.injective h

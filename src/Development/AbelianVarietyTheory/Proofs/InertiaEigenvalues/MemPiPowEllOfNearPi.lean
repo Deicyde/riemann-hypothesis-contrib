@@ -11,15 +11,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Frobeni
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Decompl
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Decompl
 open scoped TensorProduct
 
 namespace GlobalTheory.Decompl
 section Gen
 variable {O A R : Type} [CommRing O] [CommRing A] [CommRing R] [Algebra O R] {n : ℕ}
 
-theorem letφ_smul_letE (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (o : O) (i : ZMod n) :
-    letφ φ₀ (o • letE i : LetA O n) = o • letE (i + 1) := by
+theorem letφ_smul_letE (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (o : O) (i : ZMod n)
+    : letφ φ₀ (o • letE i : LetA O n) = o • letE (i + 1) := by
   rw [map_smul]
   congr 1
   funext k
@@ -30,17 +31,21 @@ theorem letφ_smul_letE (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (o : O) 
   · have : k - 1 ≠ i := fun h => hk (by rw [← h]; ring)
     simp [letE, hk, this]
 
-theorem near_one_split [NeZero n] {ι : A →+* R} {p : ℕ} (j : LetA O n →ₐ[O] R)
-    (hj : ∀ a, ∃ b, j a = ι b) (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (φR : R → R)
-    (hφj : ∀ b, φR (j b) = j (letφ φ₀ b))
+theorem near_one_split
+    [NeZero n]
+    {ι : A →+* R} {p : ℕ}
+    (j : LetA O n →ₐ[O] R) (hj : ∀ a, ∃ b, j a = ι b)
+    (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (φR : R → R) (hφj : ∀ b, φR (j b) = j (letφ φ₀ b))
     (hφ : ∀ x, Near ι p (j letπ) 1 x → Near ι p (j letπ) 1 (φR x))
     (hO : ∀ o : O, Near ι p (j letπ) 1 (algebraMap O R o) → ∃ o' : O, o = (p : O) * o')
-    (a : LetA O n) (ha : Near ι p (j letπ) 1 (j a)) :
-    ∃ a1 a2 : LetA O n, a = letπ * a1 + (p : LetA O n) * a2 := by
-  obtain ⟨a', ha'⟩ : ∃ a' : LetA O n,
-      a = letπ * a' + fun i => PowerSeries.C (PowerSeries.constantCoeff (a i)) :=
-    ⟨fun i => PowerSeries.mk fun k => PowerSeries.coeff (k + 1) (a i),
-      funext fun i => PowerSeries.eq_X_mul_shift_add_const (a i)⟩
+    (a : LetA O n) (ha : Near ι p (j letπ) 1 (j a))
+    : ∃ a1 a2 : LetA O n, a = letπ * a1 + (p : LetA O n) * a2 := by
+  obtain ⟨a', ha'⟩
+      : ∃ a' : LetA O n,
+        a = letπ * a' + fun i => PowerSeries.C (PowerSeries.constantCoeff (a i)) := ⟨
+    fun i => PowerSeries.mk fun k => PowerSeries.coeff (k + 1) (a i),
+    funext fun i => PowerSeries.eq_X_mul_shift_add_const (a i)
+  ⟩
   set c : LetA O n := fun i => PowerSeries.C (PowerSeries.constantCoeff (a i)) with hc
   have h1 : Near ι p (j letπ) 1 (j c) := by
     obtain ⟨b, hb⟩ := hj a'
@@ -80,7 +85,7 @@ theorem near_one_split [NeZero n] {ι : A →+* R} {p : ℕ} (j : LetA O n →�
       simp [letE, Finset.sum_apply, Pi.single_apply]
     have h9 : algebraMap O R o = ∑ k : ZMod n, j (o • letE k) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, ← Finset.smul_sum, h8, map_smul, map_one, Algebra.algebraMap_eq_smul_one]
+      rw [← map_sum, ← Finset.smul_sum, h8, map_smul, map_one, Algebra.algebraMap_eq_smul_one]
     rw [h9]
     exact Near.sum _ fun k _ => h7 k
   choose o' ho' using h3
@@ -89,14 +94,16 @@ theorem near_one_split [NeZero n] {ι : A →+* R} {p : ℕ} (j : LetA O n →�
   funext i
   simp [hc, ho']
 
-theorem near_split [NeZero n] {ι : A →+* R} {p : ℕ} {t : R} (j : LetA O n →ₐ[O] R)
-    (hj : ∀ a, ∃ b, j a = ι b) (ht : j letπ = t) (hu : IsUnit t)
+theorem near_split
+    [NeZero n]
+    {ι : A →+* R} {p : ℕ} {t : R}
+    (j : LetA O n →ₐ[O] R) (hj : ∀ a, ∃ b, j a = ι b) (ht : j letπ = t)
+    (hu : IsUnit t)
     (φ₀ : PowerSeries O →ₐ[O] PowerSeries O) (φR : R → R)
-    (hφj : ∀ b, φR (j b) = j (letφ φ₀ b))
-    (hφ : ∀ x, Near ι p t 1 x → Near ι p t 1 (φR x))
+    (hφj : ∀ b, φR (j b) = j (letφ φ₀ b)) (hφ : ∀ x, Near ι p t 1 x → Near ι p t 1 (φR x))
     (hO : ∀ o : O, Near ι p t 1 (algebraMap O R o) → ∃ o' : O, o = (p : O) * o')
-    (m : ℕ) (a : LetA O n) (ha : Near ι p t m (j a)) :
-    ∃ a1 a2 : LetA O n, a = letπ ^ m * a1 + (p : LetA O n) * a2 := by
+    (m : ℕ) (a : LetA O n) (ha : Near ι p t m (j a))
+    : ∃ a1 a2 : LetA O n, a = letπ ^ m * a1 + (p : LetA O n) * a2 := by
   subst ht
   induction m with
   | zero => exact ⟨a, 0, by simp⟩
@@ -112,9 +119,14 @@ theorem near_split [NeZero n] {ι : A →+* R} {p : ℕ} {t : R} (j : LetA O n �
     exact ⟨b1, letπ ^ m * b2 + a2, by rw [h, hb]; ring⟩
 end Gen
 
-
 set_option maxHeartbeats 1000000 in
-theorem mem_pow_pi_of_nearPi : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (W : Wach P K LL) (E : EtSit P AI K s LL h W) (m : ℕ) (a : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K))), NearPi AI LL s m (inclR LL (E.tie.io a)) → ∃ a1 a2 : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)), a = letπ ^ m * a1 + (l : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K))) * a2 := by
+theorem mem_pow_pi_of_nearPi
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ)
+        (LL : FinExt l) (h : Good K s LL) (W : Wach P K LL) (E : EtSit P AI K s LL h W) (m : ℕ)
+        (a : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K))),
+      NearPi AI LL s m (inclR LL (E.tie.io a))
+        → ∃ a1 a2 : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)),
+          a = letπ ^ m * a1 + (l : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K))) * a2 := by
   intro l _ P AI K s LL h W E m a ha
   obtain ⟨c1, -, c3, -⟩ := GlobalTheory.T.etaleEmbedding_frobenius_galois_compat l P AI K s LL h W E
   obtain ⟨-, -, p3, p4⟩ := GlobalTheory.DecomplFrob.frobenius_and_constants l P AI LL s
@@ -122,10 +134,13 @@ theorem mem_pow_pi_of_nearPi : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI
   have : NeZero (Module.finrank ℚ_[l] ↥(K0 K)) := ⟨Module.finrank_pos.ne'⟩
   have hu : IsUnit (piR AI LL s) := c3 ▸ W.EE_π.map E.tie.ioE
   refine near_split (ι := (inclR LL : RA LL →+* RW LL)) ((inclR LL).comp E.tie.io)
-    (fun b => ⟨E.tie.io b, rfl⟩) ((E.tie.ioE_ext letπ).symm.trans c3) hu W.φ₀ (fun x => φRW LL x)
-    (fun b => ?_) (p3 1) p4 m a ha
+    (fun b => ⟨E.tie.io b, rfl⟩)
+    ((E.tie.ioE_ext letπ).symm.trans c3) hu W.φ₀
+    (fun x => φRW LL x)
+    (fun b => ?_)
+    (p3 1) p4 m a ha
   have h1 := c1 (algebraMap _ W.EE b)
-  exact (congrArg (fun x => φRW LL x) (E.tie.ioE_ext b)).symm.trans (h1.symm.trans
-    ((congrArg (fun e => E.tie.ioE e) (W.φE_ext b)).trans (E.tie.ioE_ext _)))
+  exact (congrArg (fun x => φRW LL x) (E.tie.ioE_ext b)).symm.trans
+    (h1.symm.trans ((congrArg (fun e => E.tie.ioE e) (W.φE_ext b)).trans (E.tie.ioE_ext _)))
 
 end GlobalTheory.Decompl

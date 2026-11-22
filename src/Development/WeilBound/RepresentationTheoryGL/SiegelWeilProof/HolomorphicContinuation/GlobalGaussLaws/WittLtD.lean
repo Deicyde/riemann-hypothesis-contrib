@@ -19,17 +19,20 @@ theorem hyp_map (τ : E →+* ℂ) : (hyp : Matrix (Fin 2) (Fin 2) E).map τ = !
   ext i j
   fin_cases i <;> fin_cases j <;> simp [hyp]
 
-theorem index_hyp (τ : E →+* ℂ) :
-    posIndex ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) = 1 ∧ negIndex ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) = 1 := by
+theorem index_hyp (τ : E →+* ℂ)
+    : posIndex ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) = 1
+      ∧ negIndex ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) = 1 := by
   rw [hyp_map]
   have hP : (!![1, 1; 1, -1] : Matrix (Fin 2) (Fin 2) ℂ).det ≠ 0 := by
     rw [Matrix.det_fin_two_of]
     norm_num
-  have hD : (!![1, 1; 1, -1] : Matrix (Fin 2) (Fin 2) ℂ)ᵀ * !![0, 1; 1, 0] *
-      (!![1, 1; 1, -1] : Matrix (Fin 2) (Fin 2) ℂ).map (starRingEnd ℂ) = diagonal ![2, -2] := by
+  have hD
+      : (!![1, 1; 1, -1] : Matrix (Fin 2) (Fin 2) ℂ)ᵀ * !![0, 1; 1, 0]
+          * (!![1, 1; 1, -1] : Matrix (Fin 2) (Fin 2) ℂ).map (starRingEnd ℂ)
+        = diagonal ![2, -2] := by
     ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal] <;> norm_num
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal]
+      <;> norm_num
   refine ⟨?_, ?_⟩
   · rw [posIndex_eq_card_of_congr_diagonal hP hD, Finset.card_eq_one]
     refine ⟨0, ?_⟩
@@ -40,22 +43,28 @@ theorem index_hyp (τ : E →+* ℂ) :
     ext k
     fin_cases k <;> simp
 
-theorem hf_blocks {m : ℕ} (G2 : Matrix (Fin m) (Fin m) E) (u u' : Fin 2 ⊕ Fin m → E) :
-    hf (fromBlocks hyp 0 0 G2) u u' = hf hyp (u ∘ Sum.inl) (u' ∘ Sum.inl) + hf G2 (u ∘ Sum.inr) (u' ∘ Sum.inr) := by
+theorem hf_blocks {m : ℕ} (G2 : Matrix (Fin m) (Fin m) E) (u u' : Fin 2 ⊕ Fin m → E)
+    : hf (fromBlocks hyp 0 0 G2) u u'
+      = hf hyp (u ∘ Sum.inl) (u' ∘ Sum.inl) + hf G2 (u ∘ Sum.inr) (u' ∘ Sum.inr) := by
   simp only [hf]
   rw [fromBlocks_mulVec]
   simp [dotProduct, Fintype.sum_sum_type, Function.comp_def]
 
-private theorem posIndex_negIndex_eq_one_add_of_hyperbolic_split {n : Type} [Fintype n] [DecidableEq n] {m : ℕ} {G : Matrix n n E}
-    {G2 : Matrix (Fin m) (Fin m) E} {P : Matrix n n E} (e : Fin 2 ⊕ Fin m ≃ n) (hP : P.det ≠ 0)
+private theorem posIndex_negIndex_eq_one_add_of_hyperbolic_split
+    {n : Type} [Fintype n] [DecidableEq n]
+    {m : ℕ} {G : Matrix n n E} {G2 : Matrix (Fin m) (Fin m) E} {P : Matrix n n E}
+    (e : Fin 2 ⊕ Fin m ≃ n) (hP : P.det ≠ 0)
     (hPG : Pᵀ * G * P.map FD.cc = (fromBlocks hyp 0 0 G2).submatrix e.symm e.symm)
-    (hG2 : ∀ a b, FD.cc (G2 a b) = G2 b a) (τ : E →+* ℂ) :
-    posIndex (G.map τ) = 1 + posIndex (G2.map τ) ∧ negIndex (G.map τ) = 1 + negIndex (G2.map τ) := by
+    (hG2 : ∀ a b, FD.cc (G2 a b) = G2 b a)
+    (τ : E →+* ℂ)
+    : posIndex (G.map τ) = 1 + posIndex (G2.map τ)
+      ∧ negIndex (G.map τ) = 1 + negIndex (G2.map τ) := by
   have hQ : (P.map τ).det ≠ 0 := by
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact (map_ne_zero τ).2 hP
-  have hmap : (P.map τ)ᵀ * G.map τ * (P.map τ).map (starRingEnd ℂ) =
-      ((fromBlocks hyp 0 0 G2).submatrix e.symm e.symm).map τ := by
+  have hmap
+      : (P.map τ)ᵀ * G.map τ * (P.map τ).map (starRingEnd ℂ)
+        = ((fromBlocks hyp 0 0 G2).submatrix e.symm e.symm).map τ := by
     rw [← hPG, Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map]
     congr 1
     ext i j
@@ -70,8 +79,10 @@ private theorem posIndex_negIndex_eq_one_add_of_hyperbolic_split {n : Type} [Fin
     intro i j
     simp only [Matrix.map_apply]
     rw [← starRingEnd_apply, ← emb_cc, hG2]
-  have hblk : ((fromBlocks hyp 0 0 G2).submatrix e.symm e.symm).map τ =
-      (fromBlocks ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) 0 0 (G2.map τ)).submatrix e.symm e.symm := by
+  have hblk
+      : ((fromBlocks hyp 0 0 G2).submatrix e.symm e.symm).map τ
+        = (fromBlocks ((hyp : Matrix (Fin 2) (Fin 2) E).map τ) 0 0 (G2.map τ)).submatrix e.symm
+          e.symm := by
     rw [← Matrix.submatrix_map, Matrix.fromBlocks_map]
     simp
   obtain ⟨h1, h2⟩ := index_hyp (E := E) τ
@@ -81,12 +92,12 @@ private theorem posIndex_negIndex_eq_one_add_of_hyperbolic_split {n : Type} [Fin
   · rw [← negIndex_congr (G.map τ) hQ, hmap, hblk, negIndex_submatrix_equiv,
       negIndex_fromBlocks hH1 hH2, h2]
 
-
 set_option maxHeartbeats 1600000 in
-theorem main_iso : ∀ (k : ℕ) {n : Type} [Fintype n] [DecidableEq n] (G : Matrix n n E),
-    (∀ a b, FD.cc (G a b) = G b a) → G.det ≠ 0 → 2 * k < Fintype.card n →
-    (∀ τ : E →+* ℂ, k ≤ posIndex (G.map τ) ∧ k ≤ negIndex (G.map τ)) →
-    ∃ W : Submodule E (n → E), Module.finrank E W = k ∧ ∀ x ∈ W, ∀ y ∈ W, hf G x y = 0 := fun
+theorem main_iso
+    : ∀ (k : ℕ) {n : Type} [Fintype n] [DecidableEq n] (G : Matrix n n E),
+      (∀ a b, FD.cc (G a b) = G b a) → G.det ≠ 0 → 2 * k < Fintype.card n
+        → (∀ τ : E →+* ℂ, k ≤ posIndex (G.map τ) ∧ k ≤ negIndex (G.map τ))
+        → ∃ W : Submodule E (n → E), Module.finrank E W = k ∧ ∀ x ∈ W, ∀ y ∈ W, hf G x y = 0 := fun
   | 0 => by
     intro G _ _ _ _
     refine ⟨⊥, by simp, ?_⟩
@@ -98,27 +109,30 @@ theorem main_iso : ∀ (k : ℕ) {n : Type} [Fintype n] [DecidableEq n] (G : Mat
     rename_i n _ _
     intro G hG hdet hcard hidx
     have h3 : 3 ≤ Fintype.card n := by omega
-    obtain ⟨z, hz, hzz⟩ := iso_gen G hG hdet h3 (fun τ =>
-      ⟨le_trans (Nat.le_add_left 1 k) (hidx τ).1, le_trans (Nat.le_add_left 1 k) (hidx τ).2⟩)
+    obtain ⟨z, hz, hzz⟩ :=
+      iso_gen G hG hdet h3 (fun τ =>
+        ⟨le_trans (Nat.le_add_left 1 k) (hidx τ).1, le_trans (Nat.le_add_left 1 k) (hidx τ).2⟩)
     obtain ⟨m, e, G2, P, hP, hPG, hG2, hdet2⟩ := split hG hdet hz hzz
     have hm := Fintype.card_congr e
     simp at hm
-    obtain ⟨W2, hW2r, hW2⟩ := main_iso k G2 hG2 hdet2 (by simp; omega) (fun τ => by
-      obtain ⟨h1, h2⟩ := posIndex_negIndex_eq_one_add_of_hyperbolic_split e hP hPG hG2 τ
-      obtain ⟨h4, h5⟩ := hidx τ
-      exact ⟨by omega, by omega⟩)
-    let ψ : E × W2 →ₗ[E] (Fin 2 ⊕ Fin m → E) :=
-      { toFun := fun p => Sum.elim ![p.1, 0] (p.2 : Fin m → E)
-        map_add' := by
-          intro p q
-          ext (i | i)
-          · fin_cases i <;> simp
-          · simp
-        map_smul' := by
-          intro c p
-          ext (i | i)
-          · fin_cases i <;> simp
-          · simp }
+    obtain ⟨W2, hW2r, hW2⟩ :=
+      main_iso k G2 hG2 hdet2 (by simp; omega) (fun τ => by
+        obtain ⟨h1, h2⟩ := posIndex_negIndex_eq_one_add_of_hyperbolic_split e hP hPG hG2 τ
+        obtain ⟨h4, h5⟩ := hidx τ
+        exact ⟨by omega, by omega⟩)
+    let ψ : E × W2 →ₗ[E] (Fin 2 ⊕ Fin m → E) := {
+      toFun := fun p => Sum.elim ![p.1, 0] (p.2 : Fin m → E)
+      map_add' := by
+        intro p q
+        ext (i | i)
+        · fin_cases i <;> simp
+        · simp
+      map_smul' := by
+        intro c p
+        ext (i | i)
+        · fin_cases i <;> simp
+        · simp
+    }
     let L : (Fin 2 ⊕ Fin m → E) →ₗ[E] (n → E) := P.mulVecLin ∘ₗ LinearMap.funLeft E E e.symm
     have hLapp : ∀ u, L u = P *ᵥ (u ∘ e.symm) := fun u => rfl
     have hψ : Function.Injective ψ := by
@@ -129,7 +143,8 @@ theorem main_iso : ∀ (k : ℕ) {n : Type} [Fintype n] [DecidableEq n] (G : Mat
       exact Prod.ext h1 (Subtype.ext (funext h2))
     have hL : Function.Injective L := by
       have hu : Function.Injective P.mulVec :=
-        Matrix.mulVec_injective_iff_isUnit.2 ((Matrix.isUnit_iff_isUnit_det P).2 (isUnit_iff_ne_zero.2 hP))
+        Matrix.mulVec_injective_iff_isUnit.2 ((Matrix.isUnit_iff_isUnit_det P).2
+          (isUnit_iff_ne_zero.2 hP))
       exact hu.comp (LinearMap.funLeft_injective_of_surjective E E _ e.symm.surjective)
     have hinj : Function.Injective (L ∘ₗ ψ) := by
       rw [LinearMap.coe_comp]

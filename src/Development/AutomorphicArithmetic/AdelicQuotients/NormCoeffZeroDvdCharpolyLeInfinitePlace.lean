@@ -7,7 +7,8 @@ public import GroundTheory.GlobalFields.IdeleGroups.GaloisOnAdeles.Places
 @[expose] public section
 
 open NumberField IsDedekindDomain Polynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
 open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.Tf.Geo
 open scoped NumberField.AdeleRing
 
@@ -65,15 +66,18 @@ private lemma norm_coeff_zero_le_complex {n : ℕ} (M : Matrix (Fin n) (Fin n) �
   have h := natDegree_le_of_dvd hd hc
   simpa [Matrix.charpoly_natDegree_eq_dim] using h
 
-theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_infinitePlace :
-    ∀ (E : Type) [Field E] [NumberField E] (w : InfinitePlace E) (n : ℕ) (M : Matrix (Fin n) (Fin n) w.Completion) (R : ℝ), 1 ≤ R →
-        (∀ i j, ‖M i j‖ ≤ R) → ∀ p : w.Completion[X], p.Monic → p ∣ M.charpoly → ‖p.coeff 0‖ ≤ (max 1 (n : ℝ) * R) ^ n := by
+theorem UpperTheory.norm_coeff_zero_dvd_charpoly_le_infinitePlace
+    : ∀ (E : Type) [Field E] [NumberField E] (w : InfinitePlace E) (n : ℕ)
+        (M : Matrix (Fin n) (Fin n) w.Completion) (R : ℝ),
+      1 ≤ R → (∀ i j, ‖M i j‖ ≤ R)
+        → ∀ p : w.Completion[X],
+          p.Monic → p ∣ M.charpoly → ‖p.coeff 0‖ ≤ (max 1 (n : ℝ) * R) ^ n := by
   intro E _ _ w n M R hR hM p hp hd
   have hn : ∀ x, ‖InfinitePlace.Completion.extensionEmbedding w x‖ = ‖x‖ :=
     (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _)
-  have h := norm_coeff_zero_le_complex (M.map (InfinitePlace.Completion.extensionEmbedding w)) R hR
-    (fun i j => by simpa [hn] using hM i j)
-    (p.map (InfinitePlace.Completion.extensionEmbedding w))
-    (hp.map _)
-    (by rw [Matrix.charpoly_map]; exact Polynomial.map_dvd _ hd)
+  have h :=
+    norm_coeff_zero_le_complex (M.map (InfinitePlace.Completion.extensionEmbedding w)) R hR
+      (fun i j => by simpa [hn] using hM i j)
+      (p.map (InfinitePlace.Completion.extensionEmbedding w)) (hp.map _)
+      (by rw [Matrix.charpoly_map]; exact Polynomial.map_dvd _ hd)
   rwa [coeff_map, hn] at h

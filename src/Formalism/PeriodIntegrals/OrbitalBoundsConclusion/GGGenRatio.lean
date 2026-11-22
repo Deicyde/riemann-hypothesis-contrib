@@ -29,8 +29,9 @@ theorem generic_ratio_bound : Formalism.L2.SG.GGMirabolic.GenericRatioOfBound :=
       simp
   have hP : 0 < ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) :=
     Finset.prod_pos fun i hi => sub_pos.mpr (hx i hi)
-  have hcast : ((∏ i ∈ Finset.Ico 1 k, (Fintype.card F ^ i - 1) : ℕ) : ℝ)
-      = ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) := by
+  have hcast
+      : ((∏ i ∈ Finset.Ico 1 k, (Fintype.card F ^ i - 1) : ℕ) : ℝ)
+        = ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) := by
     rw [Nat.cast_prod]
     apply Finset.prod_congr rfl
     intro i _
@@ -38,8 +39,10 @@ theorem generic_ratio_bound : Formalism.L2.SG.GGMirabolic.GenericRatioOfBound :=
   have hPD : ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) ≤ (Module.finrank ℂ V : ℝ) := by
     rw [← hcast]
     exact_mod_cast hb
-  have hR : ∏ i ∈ Finset.Ico 1 k, (1 - ((Fintype.card F : ℝ) ^ i)⁻¹)⁻¹
-      = (Fintype.card F : ℝ) ^ (k * (k - 1) / 2) / ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) := by
+  have hR
+      : ∏ i ∈ Finset.Ico 1 k, (1 - ((Fintype.card F : ℝ) ^ i)⁻¹)⁻¹
+        = (Fintype.card F : ℝ) ^ (k * (k - 1) / 2)
+          / ∏ i ∈ Finset.Ico 1 k, ((Fintype.card F : ℝ) ^ i - 1) := by
     rw [← hsum, ← Finset.prod_pow_eq_pow_sum, ← Finset.prod_div_distrib]
     apply Finset.prod_congr rfl
     intro i hi
@@ -49,8 +52,4 @@ theorem generic_ratio_bound : Formalism.L2.SG.GGMirabolic.GenericRatioOfBound :=
     field_simp
   rw [hR, Nat.cast_pow]
   gcongr
-  all_goals first
-    | exact hPD
-    | exact hP.le
-    | exact hP
-    | positivity
+  all_goals first | exact hPD | exact hP.le | exact hP | positivity

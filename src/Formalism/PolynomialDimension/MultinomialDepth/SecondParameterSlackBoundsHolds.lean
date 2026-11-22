@@ -33,7 +33,8 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
   intro p r N N₁ Nₛ J k n' L₁ G' Y a c₀ c'' D cStar h
   obtain ⟨hp, hr, hrN1, hN1sq, hrY, hk1, hk2, hL, hD, hcS, ha, hL1, hL1G, hNs1, hNs2, hJ, hJr⟩ := h
   have hN2 : 2 ≤ N := by
-    calc 2 ≤ r := hr
+    calc
+      2 ≤ r := hr
       _ = 1 * r := (one_mul _).symm
       _ ≤ J * r := Nat.mul_le_mul_right _ hJ
       _ ≤ N := hJr
@@ -58,7 +59,9 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
   rw [hQ, hc']
   have hQp : (p : ℝ) ≤ Q := by
     rw [← hQ, QII]
-    calc (p : ℝ) = (p : ℝ) ^ 1 := (pow_one _).symm
+    calc
+      (p : ℝ)
+        = (p : ℝ) ^ 1 := (pow_one _).symm
       _ ≤ (p : ℝ) ^ G' := pow_le_pow_right₀ hp1.le (by omega)
   have hQ1 : (1 : ℝ) ≤ Q := by linarith
   have hQ0 : (0 : ℝ) < Q := by linarith
@@ -84,16 +87,18 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
       have e4 : (1 : ℝ) ≤ (r : ℝ) ^ 2 * N := one_le_mul_of_one_le_of_one_le e1 e3
       exact one_le_mul_of_one_le_of_one_le e4 e2
     have h2 : (0 : ℝ) ≤ 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) := by positivity
-    calc 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)
-        ≤ 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) * ((r : ℝ) ^ 2 * N * Q ^ 3) :=
-          le_mul_of_one_le_right h2 h1
+    calc
+      100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)
+          ≤ 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) * ((r : ℝ) ^ 2 * N * Q ^ 3) :=
+        le_mul_of_one_le_right h2 h1
       _ = 100 * (k : ℝ) ^ 3 * (r : ℝ) ^ 2 * N * Q ^ 5 * c' * Y := by ring
       _ ≤ a := ha
   have hkc : (1 : ℝ) ≤ k * c' := one_le_mul_of_one_le_of_one_le (by linarith) (by linarith)
   have hQQ : (1 : ℝ) ≤ Q ^ 2 := one_le_pow₀ hQ1
   have h2M : 2 * (Y * (k : ℝ) ^ 2) * (Q * Q) ≤ a := by
-    calc 2 * (Y * (k : ℝ) ^ 2) * (Q * Q) ≤ 2 * (Y * (k : ℝ) ^ 2) * (Q * Q) * (50 * (k * c')) :=
-          le_mul_of_one_le_right (by positivity) (by linarith)
+    calc
+      2 * (Y * (k : ℝ) ^ 2) * (Q * Q) ≤ 2 * (Y * (k : ℝ) ^ 2) * (Q * Q) * (50 * (k * c')) :=
+        le_mul_of_one_le_right (by positivity) (by linarith)
       _ = 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) := by ring
       _ ≤ a := hbig
   have hpa : (p : ℝ) ≤ a := by
@@ -105,8 +110,9 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
   have hka : (k : ℝ) ≤ a := by
     have e1 : (1 : ℝ) ≤ c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) :=
       one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le (by linarith) hQQ) hM1
-    calc (k : ℝ) ≤ k * (100 * (c' * Q ^ 2 * (Y * (k : ℝ) ^ 2))) :=
-          le_mul_of_one_le_right hk0.le (by linarith)
+    calc
+      (k : ℝ) ≤ k * (100 * (c' * Q ^ 2 * (Y * (k : ℝ) ^ 2))) :=
+        le_mul_of_one_le_right hk0.le (by linarith)
       _ = 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) := by ring
       _ ≤ a := hbig
   have hPa : (p : ℝ) ^ (L₁ - 1) ≤ (p : ℝ) ^ L₁ := pow_le_pow_right₀ hp1.le (by omega)
@@ -117,7 +123,8 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
     have e2 : 256 * (k : ℝ) ^ 2 * N * Y ^ 2 = 256 * (Y * (k : ℝ) ^ 2 * (N * Y)) := by ring
     linarith
   have h48r : 16 * (3 * r) * (Y * (k : ℝ) ^ 2) ≤ (p : ℝ) ^ (L₁ + 1) := by
-    have e1 : (r : ℝ) * (Y * (k : ℝ) ^ 2) ≤ Y * (Y * (k : ℝ) ^ 2) := mul_le_mul_of_nonneg_right hrY hM.le
+    have e1 : (r : ℝ) * (Y * (k : ℝ) ^ 2) ≤ Y * (Y * (k : ℝ) ^ 2) :=
+      mul_le_mul_of_nonneg_right hrY hM.le
     have e0 : 0 ≤ Y * (Y * (k : ℝ) ^ 2) := by positivity
     have e2 : Y * (Y * (k : ℝ) ^ 2) ≤ Y * (Y * (k : ℝ) ^ 2) * N :=
       le_mul_of_one_le_right e0 (by linarith)
@@ -134,11 +141,15 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
     rw [div_div, div_div, le_div_iff₀ (by positivity)]
     have e0 : (0 : ℝ) ≤ 24 * k * c' * (Q * (Y * (k : ℝ) ^ 2) * 2) := by positivity
     have e1 := le_mul_of_one_le_right e0 hQ1
-    have e2 : 24 * k * c' * (Q * (Y * (k : ℝ) ^ 2) * 2) * Q
-        = 48 * (k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)) := by ring
+    have e2
+        : 24 * k * c' * (Q * (Y * (k : ℝ) ^ 2) * 2) * Q
+          = 48 * (k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)) := by
+      ring
     have e3 : (0 : ℝ) ≤ k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2) := by positivity
-    have e4 : 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)
-        = 100 * (k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)) := by ring
+    have e4
+        : 100 * k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)
+          = 100 * (k * c' * Q ^ 2 * (Y * (k : ℝ) ^ 2)) := by
+      ring
     linarith
   have hslQ : ∀ B : ℝ, a / Q ≤ B → 24 * k * c' ≤ slII Y k B := by
     intro B hB
@@ -166,8 +177,9 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
     linarith
   have hNk0 : (0 : ℝ) ≤ N * (k : ℝ) ^ 2 := by positivity
   have hD1 : degreeLoss p a k N r J ≤ 15 * (N * (k : ℝ) ^ 2 * lA) := by
-    have e : degreeLoss p a k N r J
-        = lg * (N * (k : ℝ) ^ 2 + 2 * (N * (r : ℝ) ^ 2) + J * r * (r : ℝ) ^ 2 + N * (2 * k)) := by
+    have e
+        : degreeLoss p a k N r J
+          = lg * (N * (k : ℝ) ^ 2 + 2 * (N * (r : ℝ) ^ 2) + J * r * (r : ℝ) ^ 2 + N * (2 * k)) := by
       rw [degreeLoss, hlg]; ring
     have f1 : (r : ℝ) ^ 2 ≤ (k : ℝ) ^ 2 := pow_le_pow_left₀ (by linarith) hrkR 2
     have f2 : (N : ℝ) * (r : ℝ) ^ 2 ≤ N * (k : ℝ) ^ 2 := mul_le_mul_of_nonneg_left f1 (by linarith)
@@ -176,22 +188,28 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
     have f4 : (2 : ℝ) * k ≤ (k : ℝ) ^ 2 := by
       rw [pow_two]; exact mul_le_mul_of_nonneg_right (by linarith) hk0.le
     have f5 : (N : ℝ) * (2 * k) ≤ N * (k : ℝ) ^ 2 := mul_le_mul_of_nonneg_left f4 (by linarith)
-    have f6 : lg * (N * (k : ℝ) ^ 2 + 2 * (N * (r : ℝ) ^ 2) + J * r * (r : ℝ) ^ 2 + N * (2 * k))
-        ≤ lg * (5 * (N * (k : ℝ) ^ 2)) := mul_le_mul_of_nonneg_left (by linarith) hlg0
+    have f6
+        : lg * (N * (k : ℝ) ^ 2 + 2 * (N * (r : ℝ) ^ 2) + J * r * (r : ℝ) ^ 2 + N * (2 * k))
+          ≤ lg * (5 * (N * (k : ℝ) ^ 2)) :=
+      mul_le_mul_of_nonneg_left (by linarith) hlg0
     have f7 : lg * (5 * (N * (k : ℝ) ^ 2)) ≤ 3 * lA * (5 * (N * (k : ℝ) ^ 2)) :=
       mul_le_mul_of_nonneg_right hlg3 (by positivity)
     rw [e]
-    calc _ ≤ _ := f6
+    calc
+      _ ≤ _ := f6
       _ ≤ _ := f7
       _ = 15 * (N * (k : ℝ) ^ 2 * lA) := by ring
   have hk1' : kappaSecondRegime p a k N ≤ 3 * (N * (k : ℝ) ^ 2 * lA) := by
     rw [kappaSecondRegime, hlg]
-    calc (N : ℝ) * (k : ℝ) ^ 2 * lg ≤ N * (k : ℝ) ^ 2 * (3 * lA) := mul_le_mul_of_nonneg_left hlg3 hNk0
+    calc
+      (N : ℝ) * (k : ℝ) ^ 2 * lg
+        ≤ N * (k : ℝ) ^ 2 * (3 * lA) := mul_le_mul_of_nonneg_left hlg3 hNk0
       _ = 3 * (N * (k : ℝ) ^ 2 * lA) := by ring
   have hXl : 0 ≤ N * (k : ℝ) ^ 2 * lA := mul_nonneg hNk0 (by linarith)
   have hD' : 100 * (N * (k : ℝ) ^ 2 * lA) ≤ D := by
     have e : 100 * (N * (k : ℝ) ^ 2 * lA) = 100 * N * (k : ℝ) ^ 2 * lA := by ring
-    rw [e]; exact hD
+    rw [e]
+    exact hD
   have hkap0 : 0 ≤ kappaSecondRegime p a k N := by
     rw [kappaSecondRegime, hlg]; exact mul_nonneg hNk0 hlg0
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -208,7 +226,9 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
       have e2 : (p : ℝ) ^ L₁ * a / Q' = (p : ℝ) ^ L₁ * (a / Q') := mul_div_assoc _ _ _
       linarith
     constructor
-    · calc dw ≤ 3 * a / Q' := hdw
+    · calc
+        dw
+          ≤ 3 * a / Q' := hdw
         _ = 3 * ((p : ℝ) ^ L₁)⁻¹ * ((p : ℝ) ^ L₁ * a / Q') := by field_simp
         _ ≤ 3 * ((p : ℝ) ^ L₁)⁻¹ * B := mul_le_mul_of_nonneg_left hB (by positivity)
     · have e1 := slack_ge_half hM (le_trans haQ' hB1)
@@ -229,8 +249,9 @@ theorem secondParameterSlackBounds_holds : ParamsII5 := by
     have haX : 2 * (Y * (k : ℝ) ^ 2) ≤ a / ((p : ℝ) ^ Dd * Qj) := hdivX _ (by positivity) hX
     have hr0 : (0 : ℝ) < r := by linarith
     constructor
-    · calc (r : ℝ) * dj / Qj ≤ r * (3 * a * ((p : ℝ) ^ Dd * (p : ℝ) ^ (L₁ + 1))⁻¹) / Qj :=
-            div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_left hdj hr0.le) hQj0.le
+    · calc
+        (r : ℝ) * dj / Qj ≤ r * (3 * a * ((p : ℝ) ^ Dd * (p : ℝ) ^ (L₁ + 1))⁻¹) / Qj :=
+          div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_left hdj hr0.le) hQj0.le
         _ = 3 * r * ((p : ℝ) ^ (L₁ + 1))⁻¹ * (a / ((p : ℝ) ^ Dd * Qj)) := by field_simp
         _ ≤ 3 * r * ((p : ℝ) ^ (L₁ + 1))⁻¹ * B := mul_le_mul_of_nonneg_left hB (by positivity)
     · have e1 := slack_ge_half hM (le_trans haX hB)

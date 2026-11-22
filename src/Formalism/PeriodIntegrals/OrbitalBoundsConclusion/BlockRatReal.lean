@@ -9,4 +9,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RationalRealBloc
 @[expose] public section
 
 theorem blockRatReal : PI.BlockRatReal.Stmt :=
-  PI.BlockRatReal.stmt_of PI.BlockRatReal.UnitaryGroupMassFormula.evenStep PI.BlockRatReal.UnitaryGroupMassFormula.Odd.oddStep
+  PI.BlockRatReal.stmt_of PI.BlockRatReal.UnitaryGroupMassFormula.evenStep
+    PI.BlockRatReal.UnitaryGroupMassFormula.Odd.oddStep

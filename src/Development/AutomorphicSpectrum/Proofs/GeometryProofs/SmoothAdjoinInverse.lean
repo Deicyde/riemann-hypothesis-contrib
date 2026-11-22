@@ -10,10 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UnitAtOfMulR
 
 namespace GlobalTheory.CompanionTheory.Ar.SncBase.Mdl
 
-theorem isLocalizationAway_invAdj {Ω : Type} [Field Ω] [Algebra ℚ Ω] {A : Subalgebra ℚ Ω} {g : Ω}
-    (hg : g ∈ A) (h0 : g ≠ 0) :
-    letI : Algebra A (invAdj A g) := (Subalgebra.inclusion (le_invAdj A g)).toRingHom.toAlgebra
-    IsLocalization.Away (⟨g, hg⟩ : A) (invAdj A g) := by
+theorem isLocalizationAway_invAdj
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] {A : Subalgebra ℚ Ω} {g : Ω} (hg : g ∈ A) (h0 : g ≠ 0)
+    : letI : Algebra A (invAdj A g) := (Subalgebra.inclusion (le_invAdj A g)).toRingHom.toAlgebra
+      IsLocalization.Away (⟨g, hg⟩ : A) (invAdj A g) := by
   letI : Algebra A (invAdj A g) := (Subalgebra.inclusion (le_invAdj A g)).toRingHom.toAlgebra
   have hmap : ∀ a : A, ((algebraMap A (invAdj A g) a : invAdj A g) : Ω) = a := fun _ => rfl
   refine IsLocalization.Away.mk (⟨g, hg⟩ : A) ?_ ?_ ?_
@@ -27,8 +27,9 @@ theorem isLocalizationAway_invAdj {Ω : Type} [Field Ω] [Algebra ℚ Ω] {A : S
     have hab' : a = b := Subtype.ext (by simpa [hmap] using congrArg Subtype.val hab)
     exact ⟨0, by rw [hab']⟩
 
-theorem smooth_invAdj : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A : Subalgebra ℚ Ω) (g : Ω), g ∈ A → g ≠ 0 →
-    Algebra.Smooth ℚ A → Algebra.Smooth ℚ (invAdj A g) := by
+theorem smooth_invAdj
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A : Subalgebra ℚ Ω) (g : Ω),
+      g ∈ A → g ≠ 0 → Algebra.Smooth ℚ A → Algebra.Smooth ℚ (invAdj A g) := by
   intro Ω _ _ A g hg h0 hA
   letI : Algebra A (invAdj A g) := (Subalgebra.inclusion (le_invAdj A g)).toRingHom.toAlgebra
   haveI : IsScalarTower ℚ A (invAdj A g) := IsScalarTower.of_algebraMap_eq fun _ => rfl

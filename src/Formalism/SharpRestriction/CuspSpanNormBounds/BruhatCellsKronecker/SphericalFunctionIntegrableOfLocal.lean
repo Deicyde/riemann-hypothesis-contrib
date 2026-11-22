@@ -48,7 +48,6 @@ variable (X : CData)
 
 abbrev L2 : Type := X.I.L2 X.μf X.fund
 
-
 end CData
 
 namespace CData
@@ -60,22 +59,13 @@ end CData
 namespace CData
 
 variable (X : CData)
-
 
 end CData
 
 def cartanDistance {n : ℕ} (ε : Fin n → Bool) (g : Formalism.REAL.UJ ε) : ℝ :=
-  sInf {t | ∃ k X : Matrix (Fin n) (Fin n) ℂ, k ∈ Formalism.REAL.Kset ε ∧ Formalism.REAL.inP ε X ∧
-    umat g = k * NormedSpace.exp X ∧ t = Real.sqrt (Formalism.REAL.hs X)}
-
-namespace CData
-
-variable (X : CData)
-
-
-
-
-end CData
+  sInf
+    {t | ∃ k X : Matrix (Fin n) (Fin n) ℂ, k ∈ Formalism.REAL.Kset ε ∧ Formalism.REAL.inP ε X ∧
+      umat g = k * NormedSpace.exp X ∧ t = Real.sqrt (Formalism.REAL.hs X)}
 
 namespace CData
 
@@ -87,6 +77,11 @@ namespace CData
 
 variable (X : CData)
 
+end CData
+
+namespace CData
+
+variable (X : CData)
 
 end CData
 
@@ -101,7 +96,6 @@ namespace CData
 variable (X : CData)
 
 end CData
-
 
 namespace CData
 

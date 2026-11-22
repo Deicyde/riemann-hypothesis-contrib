@@ -7,15 +7,17 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.IsobaricBa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem finprod_mem_eq_zero_of_factor {ι : Type} (f : ι → ℂ) (S : Set ι)
-    (hfin : {w | f w ≠ 1}.Finite) {w₀ : ι} (hw₀ : w₀ ∈ S) (h0 : f w₀ = 0) :
-    ∏ᶠ w ∈ S, f w = 0 := by
+theorem finprod_mem_eq_zero_of_factor
+    {ι : Type} (f : ι → ℂ) (S : Set ι) (hfin : {w | f w ≠ 1}.Finite)
+    {w₀ : ι} (hw₀ : w₀ ∈ S) (h0 : f w₀ = 0)
+    : ∏ᶠ w ∈ S, f w = 0 := by
   have hs : (S ∩ Function.mulSupport f).Finite := hfin.subset fun w hw => hw.2
   rw [finprod_mem_eq_prod f hs]
   refine Finset.prod_eq_zero (i := w₀) ?_ h0
@@ -24,25 +26,51 @@ theorem finprod_mem_eq_zero_of_factor {ι : Type} (f : ι → ℂ) (S : Set ι)
   rw [Function.mem_mulSupport, h0]
   exact zero_ne_one
 
-theorem finsum_finprod_local_sums_expand : ∀ (ι : Type) (S : Set ι) (Cl : ι → Type) [∀ w, Finite (Cl w)] (D R : Type) [Finite D] (loc : R → ∀ w, Cl w) (O : ∀ w, Cl w → ℂ) (s : D → ∀ w, Cl w → ℂ) (good : ∀ w, Cl w → Prop) (N : ℂ), (∀ᶠ w in (cofinite : Filter ι), (∃! c, good w c) ∧ ∀ c, (O w c = if good w c then 1 else 0) ∧ (good w c → ∀ d, s d w c = 1)) → (∀ w, w ∉ S → Nonempty (Cl w)) → (∀ r, ∀ᶠ w in (cofinite : Filter ι), good w (loc r w)) → (∀ r r', (∀ w ∈ S, loc r w = loc r' w) → r = r') → (∀ x : ∀ w, Cl w, (∀ᶠ w in (cofinite : Filter ι), good w (x w)) → ∑ᶠ d : D, ∏ᶠ w ∈ S, s d w (x w) = if ∃ r, ∀ w ∈ S, loc r w = x w then N else 0) → (Function.support fun r : R => ∏ᶠ w ∈ S, O w (loc r w)).Finite ∧ (∑ᶠ r : R, ∏ᶠ w ∈ S, O w (loc r w)) * N = ∑ᶠ d : D, ∏ᶠ w ∈ S, ∑ᶠ c : Cl w, s d w c * O w c := by
+theorem finsum_finprod_local_sums_expand
+    : ∀ (ι : Type) (S : Set ι) (Cl : ι → Type) [∀ w, Finite (Cl w)] (D R : Type) [Finite D]
+        (loc : R → ∀ w, Cl w) (O : ∀ w, Cl w → ℂ) (s : D → ∀ w, Cl w → ℂ) (good : ∀ w, Cl w → Prop)
+        (N : ℂ),
+      (∀ᶠ w in (cofinite : Filter ι), (∃! c, good w c) ∧ ∀ c, (O w c = if good w c then 1 else 0) ∧ (good w c → ∀ d, s d w c = 1))
+        → (∀ w, w ∉ S → Nonempty (Cl w)) → (∀ r, ∀ᶠ w in (cofinite : Filter ι), good w (loc r w))
+        → (∀ r r', (∀ w ∈ S, loc r w = loc r' w) → r = r')
+        → (∀ x : ∀ w, Cl w,
+          (∀ᶠ w in (cofinite : Filter ι), good w (x w))
+            → ∑ᶠ d : D, ∏ᶠ w ∈ S, s d w (x w) = if ∃ r, ∀ w ∈ S, loc r w = x w then N else 0)
+        → (Function.support fun r : R => ∏ᶠ w ∈ S, O w (loc r w)).Finite
+          ∧ (∑ᶠ r : R, ∏ᶠ w ∈ S, O w (loc r w)) * N
+            = ∑ᶠ d : D, ∏ᶠ w ∈ S, ∑ᶠ c : Cl w, s d w c * O w c := by
   intro ι S Cl _ D R _ loc O s good N hA hB hC hD hE
   classical
   haveI : ∀ w, Fintype (Cl w) := fun w => Fintype.ofFinite _
   haveI : Fintype D := Fintype.ofFinite D
-  obtain ⟨T, hTfin, hTA⟩ : ∃ T : Set ι, T.Finite ∧ ∀ w, w ∉ T →
-      ((∃! c, good w c) ∧ ∀ c, (O w c = if good w c then 1 else 0) ∧ (good w c → ∀ d, s d w c = 1)) :=
+  obtain ⟨T, hTfin, hTA⟩
+      : ∃ T : Set ι,
+        T.Finite
+          ∧ ∀ w,
+            w ∉ T
+              → ((∃! c, good w c)
+                ∧ ∀ c, (O w c = if good w c then 1 else 0) ∧ (good w c → ∀ d, s d w c = 1)) :=
     ⟨_, Filter.eventually_cofinite.1 hA, fun w hw => not_not.1 hw⟩
   have hO : ∀ w, w ∉ T → ∀ c, O w c = if good w c then 1 else 0 := fun w hw c => ((hTA w hw).2 c).1
   have hs1 : ∀ w, w ∉ T → ∀ c, good w c → ∀ d, s d w c = 1 := fun w hw c => ((hTA w hw).2 c).2
-  have huniq : ∀ w, w ∉ T → ∀ c c', good w c → good w c' → c = c' :=
-    fun w hw c c' hc hc' => (hTA w hw).1.unique hc hc'
+  have huniq : ∀ w, w ∉ T → ∀ c c', good w c → good w c' → c = c' := fun w hw c c' hc hc' =>
+    (hTA w hw).1.unique hc hc'
   obtain ⟨F, hF⟩ : ∃ F : Finset ι, ∀ w, w ∈ F ↔ w ∈ S ∧ w ∈ T :=
     ⟨hTfin.toFinset.filter (· ∈ S), fun w => by simp [and_comm]⟩
-  obtain ⟨ext, ext_F, ext_good⟩ : ∃ ext : (∀ w : F, Cl w) → ∀ w, Cl w,
-      (∀ x (w : F), ext x w = x w) ∧ ∀ x w, w ∉ T → good w (ext x w) := by
-    refine ⟨fun x w => if h : w ∈ F then x ⟨w, h⟩ else if hw : w ∈ T then
-      (hB w (fun hS => h ((hF w).2 ⟨hS, hw⟩))).some else (hTA w hw).1.exists.choose,
-      fun x w => dif_pos w.2, fun x w hw => ?_⟩
+  obtain ⟨ext, ext_F, ext_good⟩
+      : ∃ ext : (∀ w : F, Cl w) → ∀ w, Cl w,
+        (∀ x (w : F), ext x w = x w) ∧ ∀ x w, w ∉ T → good w (ext x w) := by
+    refine ⟨
+      fun x w =>
+        if h : w ∈ F then
+          x ⟨w, h⟩
+        else if hw : w ∈ T then
+          (hB w (fun hS => h ((hF w).2 ⟨hS, hw⟩))).some
+        else
+          (hTA w hw).1.exists.choose,
+      fun x w => dif_pos w.2,
+      fun x w hw => ?_
+    ⟩
     have hwF : w ∉ F := fun h => hw ((hF w).1 h).2
     simp only [dif_neg hwF, dif_neg hw]
     exact (hTA w hw).1.exists.choose_spec
@@ -58,8 +86,10 @@ theorem finsum_finprod_local_sums_expand : ∀ (ι : Type) (S : Set ι) (Cl : ι
       exact hw1 (hφ w hwS fun hT => hwF (Finset.mem_coe.2 ((hF w).2 ⟨hwS, hT⟩)))
     have h2 : (F : Set ι) ⊆ S := fun w hw => ((hF w).1 (Finset.mem_coe.1 hw)).1
     rw [finprod_mem_eq_prod_of_subset φ h1 h2, ← Finset.prod_coe_sort]
-  have hR : ∀ d, ∏ᶠ w ∈ S, ∑ᶠ c, s d w c * O w c =
-      ∑ x : (∀ w : F, Cl w), (∏ w : F, s d w (x w)) * ∏ w : F, O w (x w) := by
+  have hR
+      : ∀ d,
+        ∏ᶠ w ∈ S, ∑ᶠ c, s d w c * O w c
+          = ∑ x : (∀ w : F, Cl w), (∏ w : F, s d w (x w)) * ∏ w : F, O w (x w) := by
     intro d
     rw [prodS]
     · simp only [finsum_eq_sum_of_fintype]
@@ -83,7 +113,8 @@ theorem finsum_finprod_local_sums_expand : ∀ (ι : Type) (S : Set ι) (Cl : ι
     intro x
     rw [← hE (ext x) ?_, finsum_eq_sum_of_fintype]
     · exact Finset.sum_congr rfl fun d _ => (hs_ext d x).symm
-    · exact Filter.eventually_cofinite.2 (hTfin.subset fun w hw => by_contra fun hwT => hw (ext_good x w hwT))
+    · exact Filter.eventually_cofinite.2 (hTfin.subset fun w hw =>
+        by_contra fun hwT => hw (ext_good x w hwT))
   have hρ : ∀ r ∈ G, ∀ w ∈ S, loc r w = ext (ρ r) w := by
     intro r hr w hwS
     by_cases hwF : w ∈ F
@@ -128,9 +159,12 @@ theorem finsum_finprod_local_sums_expand : ∀ (ι : Type) (S : Set ι) (Cl : ι
         exact ext_good x w hwT
       · funext w
         rw [hρdef, hr w ((hF w).1 w.2).1, ext_F]
-  have hsum : ∑ᶠ r, ∏ᶠ w ∈ S, O w (loc r w) =
-      ∑ x : (∀ w : F, Cl w), if ∃ r, ∀ w ∈ S, loc r w = ext x w then ∏ w : F, O w (x w) else 0 := by
-    calc ∑ᶠ r, ∏ᶠ w ∈ S, O w (loc r w) = ∑ᶠ r ∈ G, ∏ w : F, O w (ρ r w) := by
+  have hsum
+      : ∑ᶠ r, ∏ᶠ w ∈ S, O w (loc r w)
+        = ∑ x : (∀ w : F, Cl w), if ∃ r, ∀ w ∈ S, loc r w = ext x w then ∏ w : F, O w (x w) else 0 :=
+    by
+      calc
+        ∑ᶠ r, ∏ᶠ w ∈ S, O w (loc r w) = ∑ᶠ r ∈ G, ∏ w : F, O w (ρ r w) := by
           rw [finsum_mem_def]
           apply finsum_congr
           intro r
@@ -139,9 +173,9 @@ theorem finsum_finprod_local_sums_expand : ∀ (ι : Type) (S : Set ι) (Cl : ι
             exact hP1 r hr
           · simp only [Set.indicator_apply, hr, if_false]
             exact hP0 r hr
-      _ = ∑ᶠ x ∈ ρ '' G, ∏ w : F, O w (x w) :=
+        _ = ∑ᶠ x ∈ ρ '' G, ∏ w : F, O w (x w) :=
           (finsum_mem_image (f := fun x : (∀ w : F, Cl w) => ∏ w : F, O w (x w)) hρinj).symm
-      _ = _ := by
+        _ = _ := by
           rw [finsum_mem_def, finsum_eq_sum_of_fintype]
           refine Finset.sum_congr rfl fun x _ => ?_
           simp only [Set.indicator_apply, hmem]

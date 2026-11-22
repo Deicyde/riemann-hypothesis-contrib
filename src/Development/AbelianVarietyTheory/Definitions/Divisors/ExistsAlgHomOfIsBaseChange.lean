@@ -17,11 +17,12 @@ namespace TopForm
 
 section BaseChange
 
-variable {A B M N : Type*} [CommRing A] [CommRing B] [Algebra A B]
-  [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N] [Module B N] [IsScalarTower A B N]
+variable
+  {A B M N : Type*} [CommRing A] [CommRing B] [Algebra A B] [AddCommGroup M] [Module A M]
+  [AddCommGroup N] [Module A N] [Module B N] [IsScalarTower A B N]
 
-def extProj (A M : Type*) [CommRing A] [AddCommGroup M] [Module A M] (D : ℕ) :
-    ExteriorAlgebra A M →ₗ[A] ⋀[A]^D M :=
+def extProj (A M : Type*) [CommRing A] [AddCommGroup M] [Module A M] (D : ℕ)
+    : ExteriorAlgebra A M →ₗ[A] ⋀[A]^D M :=
   (DirectSum.component A ℕ (fun i => ⋀[A]^i M) D).comp
     (DirectSum.decomposeLinearEquiv (fun i => ⋀[A]^i M)).toLinearMap
 
@@ -29,9 +30,9 @@ theorem extProj_coe (D : ℕ) (x : ⋀[A]^D M) : extProj A M D x = x := by
   change (DirectSum.decompose (fun i => ⋀[A]^i M) (x : ExteriorAlgebra A M)) D = x
   rw [DirectSum.decompose_coe, DirectSum.of_eq_same]
 
-theorem exists_algHom_of_isBaseChange {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ) :
-    ∃ F : ExteriorAlgebra B N →ₐ[B] B ⊗[A] ExteriorAlgebra A M,
-      ∀ m, F (ExteriorAlgebra.ι B (φ m)) = 1 ⊗ₜ ExteriorAlgebra.ι A m := by
+theorem exists_algHom_of_isBaseChange {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ)
+    : ∃ F : ExteriorAlgebra B N →ₐ[B] B ⊗[A] ExteriorAlgebra A M, ∀ m,
+      F (ExteriorAlgebra.ι B (φ m)) = 1 ⊗ₜ ExteriorAlgebra.ι A m := by
   let f : N →ₗ[B] B ⊗[A] ExteriorAlgebra A M :=
     hφ.lift ((TensorProduct.mk A B _ 1).comp (ExteriorAlgebra.ι A))
   have hf (m : M) : f (φ m) = 1 ⊗ₜ ExteriorAlgebra.ι A m := hφ.lift_eq _ m
@@ -56,24 +57,27 @@ theorem exists_algHom_of_isBaseChange {φ : M →ₗ[A] N} (hφ : IsBaseChange B
         TensorProduct.tmul_zero]
   exact ⟨ExteriorAlgebra.lift B ⟨f, sq⟩, fun m => by rw [ExteriorAlgebra.lift_ι_apply, hf]⟩
 
-theorem isBaseChange_exteriorPower {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ) (D : ℕ) :
-    IsBaseChange B (exteriorPowerMapOver (B := B) (D := D) φ) := by
+theorem isBaseChange_exteriorPower {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ) (D : ℕ)
+    : IsBaseChange B (exteriorPowerMapOver (B := B) (D := D) φ) := by
   obtain ⟨F, hF⟩ := exists_algHom_of_isBaseChange hφ
   let G : (⋀[B]^D N) →ₗ[B] B ⊗[A] (⋀[A]^D M) :=
     ((extProj A M D).baseChange B) ∘ₗ F.toLinearMap ∘ₗ (⋀[B]^D N).subtype
   let H : B ⊗[A] (⋀[A]^D M) →ₗ[B] ⋀[B]^D N :=
     (exteriorPowerMapOver (B := B) (D := D) φ).liftBaseChange B
   have hG (x : ⋀[A]^D M) : G (exteriorPowerMapOver (B := B) (D := D) φ x) = 1 ⊗ₜ x := by
-    have : (G.restrictScalars A) ∘ₗ (exteriorPowerMapOver (B := B) (D := D) φ) =
-        TensorProduct.mk A B _ 1 := by
+    have : (G.restrictScalars A) ∘ₗ (exteriorPowerMapOver (B := B) (D := D) φ)
+        = TensorProduct.mk A B _ 1 := by
       apply exteriorPower.linearMap_ext
       ext1 v
-      have e : F (ExteriorAlgebra.ιMulti B D fun k => φ (v k)) =
-          1 ⊗ₜ ExteriorAlgebra.ιMulti A D v := by
+      have e
+          : F (ExteriorAlgebra.ιMulti B D fun k => φ (v k))
+            = 1 ⊗ₜ ExteriorAlgebra.ιMulti A D v := by
         rw [ExteriorAlgebra.ιMulti_apply, ExteriorAlgebra.ιMulti_apply, map_list_prod,
           List.map_ofFn]
-        have := map_list_prod (Algebra.TensorProduct.includeRight (R := A) (A := B)
-          (B := ExteriorAlgebra A M)) (List.ofFn fun i => ExteriorAlgebra.ι A (v i))
+        have :=
+          map_list_prod
+            (Algebra.TensorProduct.includeRight (R := A) (A := B) (B := ExteriorAlgebra A M))
+            (List.ofFn fun i => ExteriorAlgebra.ι A (v i))
         rw [Algebra.TensorProduct.includeRight_apply, List.map_ofFn] at this
         rw [this]
         congr 2
@@ -96,7 +100,8 @@ theorem isBaseChange_exteriorPower {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ
         induction n using hφ.inductionOn with
         | smul s n h => exact Submodule.smul_mem _ _ h
         | add a b ha hb => exact add_mem ha hb
-        | tmul m => exact Submodule.subset_span ⟨m, rfl⟩), Submodule.span_le]
+        | tmul m => exact Submodule.subset_span ⟨m, rfl⟩),
+      Submodule.span_le]
     rintro _ ⟨w, hw, rfl⟩
     choose v hv using fun k => hw (Set.mem_range_self k)
     refine ⟨1 ⊗ₜ exteriorPower.ιMulti A D v, ?_⟩
@@ -110,11 +115,12 @@ theorem isBaseChange_exteriorPower {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ
 def IsFreeGen (A : Type*) {M : Type*} [CommRing A] [AddCommGroup M] [Module A M] (ω : M) : Prop :=
   Function.Bijective fun a : A => a • ω
 
-theorem IsFreeGen.of_isBaseChange {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ) {ω : M}
-    (h : IsFreeGen A ω) : IsFreeGen B (φ ω) := by
+theorem IsFreeGen.of_isBaseChange
+    {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ) {ω : M} (h : IsFreeGen A ω)
+    : IsFreeGen B (φ ω) := by
   let e : A ≃ₗ[A] M := LinearEquiv.ofBijective (LinearMap.toSpanSingleton A M ω) h
-  let e' : B ≃ₗ[B] N := (Algebra.TensorProduct.rid A B B).symm.toLinearEquiv ≪≫ₗ
-    (e.baseChange A B A M) ≪≫ₗ hφ.equiv
+  let e' : B ≃ₗ[B] N :=
+    (Algebra.TensorProduct.rid A B B).symm.toLinearEquiv ≪≫ₗ (e.baseChange A B A M) ≪≫ₗ hφ.equiv
   have : (fun b : B => b • φ ω) = e' := by
     funext b
     have he : e 1 = ω := one_smul A ω
@@ -122,10 +128,12 @@ theorem IsFreeGen.of_isBaseChange {φ : M →ₗ[A] N} (hφ : IsBaseChange B φ)
   rw [IsFreeGen, this]
   exact e'.bijective
 
-theorem isFreeGen_ιMulti {D : ℕ} (b : Module.Basis (Fin D) A M) :
-    IsFreeGen A (exteriorPower.ιMulti A D b) := by
-  have key : (LinearMap.toSpanSingleton A _ (exteriorPower.ιMulti A D b)) ∘ₗ
-      exteriorPower.alternatingMapLinearEquiv b.det = LinearMap.id := by
+theorem isFreeGen_ιMulti {D : ℕ} (b : Module.Basis (Fin D) A M)
+    : IsFreeGen A (exteriorPower.ιMulti A D b) := by
+  have key
+      : (LinearMap.toSpanSingleton A _ (exteriorPower.ιMulti A D b))
+          ∘ₗ exteriorPower.alternatingMapLinearEquiv b.det
+        = LinearMap.id := by
     apply exteriorPower.linearMap_ext
     refine Module.Basis.ext_alternating b fun v hv => ?_
     have hb : Function.Bijective v := Finite.injective_iff_bijective.mp hv
@@ -177,16 +185,17 @@ variable {D : ℕ}
 
 def dForm (α : k →+* A) (f : Fin D → A) : Forms α D := letI := α.toAlgebra; dWedge k f
 
-theorem dForm_eq (α : k →+* A) (f : Fin D → A) :
-    dForm α f = exteriorPower.ιMulti A D fun i => dFun α (f i) := rfl
+theorem dForm_eq (α : k →+* A) (f : Fin D → A)
+    : dForm α f = exteriorPower.ιMulti A D fun i => dFun α (f i) :=
+  rfl
 
 variable {α : k →+* A} {β : k →+* B} {γ : k →+* C}
 
-theorem span_dForm (α : k →+* A) (D : ℕ) :
-    Submodule.span A (Set.range (dForm α (D := D))) = ⊤ := by
+theorem span_dForm (α : k →+* A) (D : ℕ) : Submodule.span A (Set.range (dForm α (D := D))) = ⊤ := by
   letI := α.toAlgebra
-  rw [eq_top_iff, ← exteriorPower.ιMulti_span_of_span A D (Omega α)
-    (KaehlerDifferential.span_range_derivation k A)]
+  rw [eq_top_iff,
+    ← exteriorPower.ιMulti_span_of_span A D (Omega α)
+      (KaehlerDifferential.span_range_derivation k A)]
   refine Submodule.span_mono ?_
   rintro _ ⟨w, hw, rfl⟩
   choose v hv using fun i => hw (Set.mem_range_self i)
@@ -198,45 +207,52 @@ def formMap (ρ : A →+* B) (h : ρ.comp α = β) : Forms α D →ₛₗ[ρ] Fo
   letI := β.toAlgebra
   letI := ρ.toAlgebra
   haveI : IsScalarTower k A B := IsScalarTower.of_algebraMap_eq' h.symm
-  { toFun := exteriorPowerMapOver (B := B) (D := D) (KaehlerDifferential.map k k A B)
+  {
+    toFun := exteriorPowerMapOver (B := B) (D := D) (KaehlerDifferential.map k k A B)
     map_add' := map_add _
     map_smul' := fun a x => by
       rw [map_smul, ← algebraMap_smul B]
-      rfl }
+      rfl
+  }
 
-@[simp] theorem formMap_dForm (ρ : A →+* B) (h : ρ.comp α = β) (f : Fin D → A) :
-    formMap D ρ h (dForm α f) = dForm β fun i => ρ (f i) := by
+@[simp]
+theorem formMap_dForm (ρ : A →+* B) (h : ρ.comp α = β) (f : Fin D → A)
+    : formMap D ρ h (dForm α f) = dForm β fun i => ρ (f i) := by
   letI := α.toAlgebra
   letI := β.toAlgebra
   letI := ρ.toAlgebra
   haveI : IsScalarTower k A B := IsScalarTower.of_algebraMap_eq' h.symm
   change exteriorPowerMapOver (B := B) (D := D) (KaehlerDifferential.map k k A B)
-    (exteriorPower.ιMulti A D _) = _
+      (exteriorPower.ιMulti A D _)
+    = _
   rw [exteriorPowerMapOver_ιMulti, dForm_eq]
   simp only [KaehlerDifferential.map_D]
   rfl
 
-theorem forms_ext {M : Type*} [AddCommGroup M] [Module B M] {ρ : A →+* B}
-    {φ ψ : Forms α D →ₛₗ[ρ] M} (h : ∀ f, φ (dForm α f) = ψ (dForm α f)) : φ = ψ :=
+theorem forms_ext
+    {M : Type*} [AddCommGroup M] [Module B M]
+    {ρ : A →+* B} {φ ψ : Forms α D →ₛₗ[ρ] M} (h : ∀ f, φ (dForm α f) = ψ (dForm α f))
+    : φ = ψ :=
   LinearMap.ext_on_range (span_dForm α D) h
 
-theorem formMap_formMap (ρ : A →+* B) (σ : B →+* C) (τ : A →+* C) (e : σ.comp ρ = τ)
-    (h : ρ.comp α = β) (h' : σ.comp β = γ) (h'' : τ.comp α = γ) (x : Forms α D) :
-    formMap D σ h' (formMap D ρ h x) = formMap D τ h'' x := by
+theorem formMap_formMap
+    (ρ : A →+* B) (σ : B →+* C) (τ : A →+* C) (e : σ.comp ρ = τ)
+    (h : ρ.comp α = β) (h' : σ.comp β = γ) (h'' : τ.comp α = γ) (x : Forms α D)
+    : formMap D σ h' (formMap D ρ h x) = formMap D τ h'' x := by
   haveI : RingHomCompTriple ρ σ τ := ⟨e⟩
-  refine LinearMap.congr_fun (forms_ext (φ := (formMap D σ h').comp (formMap D ρ h))
-    (ψ := formMap D τ h'') fun f => ?_) x
+  refine LinearMap.congr_fun
+    (forms_ext (φ := (formMap D σ h').comp (formMap D ρ h)) (ψ := formMap D τ h'') fun f => ?_) x
   rw [LinearMap.comp_apply, formMap_dForm, formMap_dForm, formMap_dForm, ← e]
   rfl
 
-theorem formMap_of_eq_id (ρ : A →+* A) (e : ρ = RingHom.id A) (h : ρ.comp α = α) (x : Forms α D) :
-    formMap D ρ h x = x := by
+theorem formMap_of_eq_id (ρ : A →+* A) (e : ρ = RingHom.id A) (h : ρ.comp α = α) (x : Forms α D)
+    : formMap D ρ h x = x := by
   subst e
-  exact LinearMap.congr_fun (forms_ext (φ := formMap D _ h) (ψ := LinearMap.id)
-    fun f => by simp) x
+  exact LinearMap.congr_fun (forms_ext (φ := formMap D _ h) (ψ := LinearMap.id) fun f => by simp) x
 
-theorem IsFreeGen.formMap {ρ : A →+* B} (hρ : ρ.Etale) (h : ρ.comp α = β) {ω : Forms α D}
-    (hω : IsFreeGen A ω) : IsFreeGen B (formMap D ρ h ω) := by
+theorem IsFreeGen.formMap
+    {ρ : A →+* B} (hρ : ρ.Etale) (h : ρ.comp α = β) {ω : Forms α D} (hω : IsFreeGen A ω)
+    : IsFreeGen B (formMap D ρ h ω) := by
   letI := α.toAlgebra
   letI := β.toAlgebra
   letI := ρ.toAlgebra
@@ -245,13 +261,14 @@ theorem IsFreeGen.formMap {ρ : A →+* B} (hρ : ρ.Etale) (h : ρ.comp α = β
   exact hω.of_isBaseChange (isBaseChange_exteriorPower
     (KaehlerDifferential.isBaseChange_of_formallyEtale k A B) D)
 
-theorem isFreeGen_dForm (x : Fin D → A) (b : Module.Basis (Fin D) A (Omega α))
-    (hb : ∀ i, b i = dFun α (x i)) : IsFreeGen A (dForm α x) := by
+theorem isFreeGen_dForm
+    (x : Fin D → A) (b : Module.Basis (Fin D) A (Omega α)) (hb : ∀ i, b i = dFun α (x i))
+    : IsFreeGen A (dForm α x) := by
   have := isFreeGen_ιMulti b
   rwa [show (b : Fin D → Omega α) = fun i => dFun α (x i) from funext hb] at this
 
-theorem exists_isFreeGen (h : α.IsStandardSmoothOfRelativeDimension D) :
-    ∃ ω : Forms α D, IsFreeGen A ω := by
+theorem exists_isFreeGen (h : α.IsStandardSmoothOfRelativeDimension D)
+    : ∃ ω : Forms α D, IsFreeGen A ω := by
   letI := α.toAlgebra
   haveI : Algebra.IsStandardSmoothOfRelativeDimension D k A := h
   cases subsingleton_or_nontrivial A with
@@ -262,20 +279,23 @@ theorem exists_isFreeGen (h : α.IsStandardSmoothOfRelativeDimension D) :
     haveI := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth D (R := k) (S := A)
     haveI : Module.Free A (Omega α) := inferInstanceAs (Module.Free A Ω[A⁄k])
     haveI : Module.Finite A (Omega α) := inferInstanceAs (Module.Finite A Ω[A⁄k])
-    have hr : Module.finrank A (Omega α) = D := Module.finrank_eq_of_rank_eq
-      (Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := k) (S := A) D)
+    have hr : Module.finrank A (Omega α) = D :=
+      Module.finrank_eq_of_rank_eq
+        (Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := k) (S := A) D)
     exact ⟨_, isFreeGen_ιMulti (Module.finBasisOfFinrankEq A (Omega α) hr)⟩
 
-theorem map_dForm_mul_sub_mem (c : Forms α D →ₗ[A] A) (I : Ideal A) (h : A) (g : Fin D → A)
-    (hg : ∀ i, g i ∈ I) : c (dForm α fun i => h * g i) - h ^ D * c (dForm α g) ∈ I := by
+theorem map_dForm_mul_sub_mem
+    (c : Forms α D →ₗ[A] A) (I : Ideal A) (h : A) (g : Fin D → A) (hg : ∀ i, g i ∈ I)
+    : c (dForm α fun i => h * g i) - h ^ D * c (dForm α g) ∈ I := by
   letI := α.toAlgebra
   have := Submodule.mem_map_of_mem (f := c) (dWedge_mul_sub_mem k I h g hg)
   rw [Submodule.map_smul'', map_sub, map_smul] at this
-  exact (Submodule.smul_mono le_rfl le_top).trans
-    (by rw [smul_eq_mul, Ideal.mul_top]) this
+  exact (Submodule.smul_mono le_rfl le_top).trans (by rw [smul_eq_mul, Ideal.mul_top]) this
 
-theorem dForm_eq_det_smul (f x : Fin D → A) (a : Matrix (Fin D) (Fin D) A)
-    (h : ∀ i, dFun α (f i) = ∑ j, a i j • dFun α (x j)) : dForm α f = a.det • dForm α x := by
+theorem dForm_eq_det_smul
+    (f x : Fin D → A) (a : Matrix (Fin D) (Fin D) A)
+    (h : ∀ i, dFun α (f i) = ∑ j, a i j • dFun α (x j))
+    : dForm α f = a.det • dForm α x := by
   rw [dForm_eq, dForm_eq, ← alternating_map_sum_smul_eq_det_smul]
   exact congrArg _ (funext h)
 

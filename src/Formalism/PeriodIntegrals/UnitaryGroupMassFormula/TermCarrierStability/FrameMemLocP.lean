@@ -11,14 +11,14 @@ open scoped Classical
 
 namespace PI.TCS
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
 
 section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem osmul (o : 𝓞 E) (v : S.V) : o • v = (o : E) • v :=
-  (algebraMap_smul E o v).symm
+theorem osmul (o : 𝓞 E) (v : S.V) : o • v = (o : E) • v := (algebraMap_smul E o v).symm
 
 theorem one_nmem (p : Ideal (𝓞 E)) [hp : p.IsPrime] : (1 : 𝓞 E) ∉ p :=
   (Ideal.ne_top_iff_one p).mp hp.ne_top
@@ -44,19 +44,22 @@ def locInt (p : Ideal (𝓞 E)) [hp : p.IsPrime] : Subring E where
 theorem coe_mem_locInt (p : Ideal (𝓞 E)) [p.IsPrime] (a : 𝓞 E) : (a : E) ∈ locInt p :=
   ⟨1, one_nmem p, a, by simp⟩
 
-theorem approx (G : 𝓞 E) (μ : E)
-    (h : ∀ P : HeightOneSpectrum (𝓞 E), G ∈ P.asIdeal → (haveI := P.isPrime; μ ∈ locInt P.asIdeal)) :
-    ∃ c : 𝓞 E, ∀ P : HeightOneSpectrum (𝓞 E), G ∈ P.asIdeal →
-      ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ ∃ w : 𝓞 E, (s : E) * ((c : E) - μ) = (G : E) * w := by
-  let J : Ideal (𝓞 E) :=
-    { carrier := {s | ∃ a : 𝓞 E, (s : E) * μ = a}
-      add_mem' := by
-        rintro s t ⟨a, ha⟩ ⟨b, hb⟩
-        exact ⟨a + b, by push_cast; linear_combination ha + hb⟩
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c s ⟨a, ha⟩
-        exact ⟨c * a, by simp only [smul_eq_mul]; push_cast; linear_combination (c : E) * ha⟩ }
+theorem approx
+    (G : 𝓞 E) (μ : E)
+    (h : ∀ P : HeightOneSpectrum (𝓞 E), G ∈ P.asIdeal → (haveI := P.isPrime; μ ∈ locInt P.asIdeal))
+    : ∃ c : 𝓞 E, ∀ P : HeightOneSpectrum (𝓞 E),
+      G ∈ P.asIdeal
+        → ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ ∃ w : 𝓞 E, (s : E) * ((c : E) - μ) = (G : E) * w := by
+  let J : Ideal (𝓞 E) := {
+    carrier := {s | ∃ a : 𝓞 E, (s : E) * μ = a}
+    add_mem' := by
+      rintro s t ⟨a, ha⟩ ⟨b, hb⟩
+      exact ⟨a + b, by push_cast; linear_combination ha + hb⟩
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c s ⟨a, ha⟩
+      exact ⟨c * a, by simp only [smul_eq_mul]; push_cast; linear_combination (c : E) * ha⟩
+  }
   have hJ : J ⊔ Ideal.span {G} = ⊤ := by
     by_contra hne
     obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal _ hne
@@ -80,19 +83,25 @@ theorem approx (G : 𝓞 E) (μ : E)
   push_cast
   linear_combination (-(s : E)) * ha + ((s : E) * μ) * hy - (G : E) * (w : E) * hb
 
-theorem mem_locP {p : Ideal (𝓞 E)} [p.IsPrime] {L : Submodule (𝓞 E) S.V} {v : S.V} :
-    v ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s : 𝓞 E, s ∉ p ∧ s • v ∈ L := by
+theorem mem_locP {p : Ideal (𝓞 E)} [p.IsPrime] {L : Submodule (𝓞 E) S.V} {v : S.V}
+    : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L ↔ ∃ s : 𝓞 E, s ∉ p ∧ s • v ∈ L := by
   constructor
   · rintro ⟨s, hs, h⟩; exact ⟨s, hs, h⟩
   · rintro ⟨s, hs, h⟩; exact ⟨s, hs, h⟩
 
-theorem localization_mono {p : Ideal (𝓞 E)} [p.IsPrime] {L L' : Submodule (𝓞 E) S.V} (h : L ≤ L') {v : S.V}
-    (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L) : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L' := by
+theorem localization_mono
+    {p : Ideal (𝓞 E)} [p.IsPrime]
+    {L L' : Submodule (𝓞 E) S.V} (h : L ≤ L')
+    {v : S.V} (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L)
+    : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L' := by
   obtain ⟨s, hs, hv⟩ := mem_locP.mp hv
   exact mem_locP.mpr ⟨s, hs, h hv⟩
 
-theorem smul_mem_locP {p : Ideal (𝓞 E)} [hp : p.IsPrime] {L : Submodule (𝓞 E) S.V} {c : E} {v : S.V}
-    (hc : c ∈ locInt p) (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L) : c • v ∈ Formalism.HermitianLatticesTheory.localization₂ p L := by
+theorem smul_mem_locP
+    {p : Ideal (𝓞 E)} [hp : p.IsPrime]
+    {L : Submodule (𝓞 E) S.V} {c : E} {v : S.V}
+    (hc : c ∈ locInt p) (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L)
+    : c • v ∈ Formalism.HermitianLatticesTheory.localization₂ p L := by
   obtain ⟨s, hs, a, ha⟩ := hc
   obtain ⟨t, ht, hv⟩ := mem_locP.mp hv
   refine mem_locP.mpr ⟨s * t, fun h => (hp.mem_or_mem h).elim hs ht, ?_⟩
@@ -100,30 +109,37 @@ theorem smul_mem_locP {p : Ideal (𝓞 E)} [hp : p.IsPrime] {L : Submodule (𝓞
     simp only [osmul, smul_smul]
     congr 1
     push_cast
-    rw [← ha]; ring
-  rw [this]; exact L.smul_mem a hv
+    rw [← ha]
+    ring
+  rw [this]
+  exact L.smul_mem a hv
 
 theorem lin_osmul (β : S.V ≃ₗ[E] S.V) (s : 𝓞 E) (v : S.V) : β (s • v) = s • β v := by
   simp only [osmul, map_smul]
 
-theorem localization_map₂ {p : Ideal (𝓞 E)} [p.IsPrime] {L : Submodule (𝓞 E) S.V} (β : S.V ≃ₗ[E] S.V)
-    (hβ : ∀ y ∈ L, β y ∈ L) {v : S.V} (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L) : β v ∈ Formalism.HermitianLatticesTheory.localization₂ p L := by
+theorem localization_map₂
+    {p : Ideal (𝓞 E)} [p.IsPrime]
+    {L : Submodule (𝓞 E) S.V} (β : S.V ≃ₗ[E] S.V) (hβ : ∀ y ∈ L, β y ∈ L)
+    {v : S.V} (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p L)
+    : β v ∈ Formalism.HermitianLatticesTheory.localization₂ p L := by
   obtain ⟨s, hs, hv⟩ := mem_locP.mp hv
   exact mem_locP.mpr ⟨s, hs, by rw [← lin_osmul]; exact hβ _ hv⟩
 
-theorem mem_gsmul {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} {v : S.V} :
-    v ∈ Ideal.span {G} • Λ ↔ ∃ w ∈ Λ, G • w = v := by
+theorem mem_gsmul {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} {v : S.V}
+    : v ∈ Ideal.span {G} • Λ ↔ ∃ w ∈ Λ, G • w = v := by
   rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists]
 
-theorem gsmul_map {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} (β : S.V ≃ₗ[E] S.V) (hβ : ∀ y ∈ Λ, β y ∈ Λ) :
-    ∀ y ∈ Ideal.span {G} • Λ, β y ∈ Ideal.span {G} • Λ := by
+theorem gsmul_map {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} (β : S.V ≃ₗ[E] S.V) (hβ : ∀ y ∈ Λ, β y ∈ Λ)
+    : ∀ y ∈ Ideal.span {G} • Λ, β y ∈ Ideal.span {G} • Λ := by
   intro y hy
   obtain ⟨w, hw, rfl⟩ := mem_gsmul.mp hy
   exact mem_gsmul.mpr ⟨β w, hβ w hw, (lin_osmul β G w).symm⟩
 
-theorem gsmem {p : Ideal (𝓞 E)} [hp : p.IsPrime] {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} {d : E} {v : S.V}
-    {s w : 𝓞 E} (hs : s ∉ p) (hd : (s : E) * d = (G : E) * w) (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p Λ) :
-    d • v ∈ Formalism.HermitianLatticesTheory.localization₂ p (Ideal.span {G} • Λ) := by
+theorem gsmem
+    {p : Ideal (𝓞 E)} [hp : p.IsPrime]
+    {G : 𝓞 E} {Λ : Submodule (𝓞 E) S.V} {d : E} {v : S.V} {s w : 𝓞 E} (hs : s ∉ p)
+    (hd : (s : E) * d = (G : E) * w) (hv : v ∈ Formalism.HermitianLatticesTheory.localization₂ p Λ)
+    : d • v ∈ Formalism.HermitianLatticesTheory.localization₂ p (Ideal.span {G} • Λ) := by
   obtain ⟨t, ht, hv⟩ := mem_locP.mp hv
   refine mem_locP.mpr ⟨s * t, fun h => (hp.mem_or_mem h).elim hs ht, ?_⟩
   have : (s * t) • (d • v) = G • (w • (t • v)) := by
@@ -134,25 +150,26 @@ theorem gsmem {p : Ideal (𝓞 E)} [hp : p.IsPrime] {G : 𝓞 E} {Λ : Submodule
   rw [this]
   exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self G) (Λ.smul_mem w hv)
 
-def frE {n : ℕ} (f : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) : Fin n → S.V :=
-  fun b => ∑ a, A a b • f a
+def frE {n : ℕ} (f : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) : Fin n → S.V := fun b =>
+  ∑ a, A a b • f a
 
-theorem frE_mul {n : ℕ} (f : Fin n → S.V) (A B : Matrix (Fin n) (Fin n) E) :
-    frE (frE f A) B = frE f (A * B) := by
+theorem frE_mul {n : ℕ} (f : Fin n → S.V) (A B : Matrix (Fin n) (Fin n) E)
+    : frE (frE f A) B = frE f (A * B) := by
   funext b
   simp only [frE, Matrix.mul_apply, Finset.smul_sum, smul_smul, Finset.sum_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => ?_
   rw [mul_comm]
 
-theorem frE_add {n : ℕ} (f h : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) (b : Fin n) :
-    frE (fun a => f a + h a) A b = frE f A b + frE h A b := by
+theorem frE_add {n : ℕ} (f h : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) (b : Fin n)
+    : frE (fun a => f a + h a) A b = frE f A b + frE h A b := by
   simp only [frE, smul_add, Finset.sum_add_distrib]
 
-theorem frE_map {n : ℕ} (β : S.V ≃ₗ[E] S.V) (f : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) (b : Fin n) :
-    β (frE f A b) = frE (fun a => β (f a)) A b := by
+theorem frE_map
+    {n : ℕ} (β : S.V ≃ₗ[E] S.V) (f : Fin n → S.V) (A : Matrix (Fin n) (Fin n) E) (b : Fin n)
+    : β (frE f A b) = frE (fun a => β (f a)) A b := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [frE, map_sum, map_smul]
+  simp only [frE, map_sum, map_smul]
 
 def UT {n : ℕ} (A : Matrix (Fin n) (Fin n) E) : Prop := (∀ a b, b < a → A a b = 0) ∧ ∀ a, A a a = 1
 
@@ -171,8 +188,11 @@ theorem UT.mul {n : ℕ} {A B : Matrix (Fin n) (Fin n) E} (hA : UT A) (hB : UT B
       · rw [hB.1 c a h, mul_zero]
     · intro h; exact absurd (Finset.mem_univ a) h
 
-theorem mul_mem_locInt {p : Ideal (𝓞 E)} [p.IsPrime] {n : ℕ} {A B : Matrix (Fin n) (Fin n) E}
-    (hA : ∀ a b, A a b ∈ locInt p) (hB : ∀ a b, B a b ∈ locInt p) : ∀ a b, (A * B) a b ∈ locInt p := by
+theorem mul_mem_locInt
+    {p : Ideal (𝓞 E)} [p.IsPrime]
+    {n : ℕ} {A B : Matrix (Fin n) (Fin n) E}
+    (hA : ∀ a b, A a b ∈ locInt p) (hB : ∀ a b, B a b ∈ locInt p)
+    : ∀ a b, (A * B) a b ∈ locInt p := by
   intro a b
   rw [Matrix.mul_apply]
   exact Subring.sum_mem _ fun c _ => Subring.mul_mem _ (hA a c) (hB c b)
@@ -183,9 +203,13 @@ theorem frame_castSucc {T : E} (F : LFlag S r T) (k : Fin r) : frame F k.castSuc
 theorem frame_last {T : E} (F : LFlag S r T) : frame F (Fin.last r) = F.fl.z := by
   simp [frame, FlagG.fvec]
 
-theorem frame_mem_locP {T : E} (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F : LFlag S r T) (hz : F.fl.z ∈ Λ)
-    (hc : IsFixedConv Λ g F) (P : HeightOneSpectrum (𝓞 E)) (hP : (g : 𝓞 E) ∈ P.asIdeal) (a : Fin (r + 1)) :
-    (haveI := P.isPrime; frame F a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal Λ) := by
+theorem frame_mem_locP
+    {T : E}
+    (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F : LFlag S r T) (hz : F.fl.z ∈ Λ) (hc : IsFixedConv Λ g F)
+    (P : HeightOneSpectrum (𝓞 E)) (hP : (g : 𝓞 E) ∈ P.asIdeal)
+    (a : Fin (r + 1))
+    : (haveI := P.isPrime
+       frame F a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal Λ) := by
   haveI := P.isPrime
   induction a using Fin.lastCases with
   | last => rw [frame_last]; exact mem_locP.mpr ⟨1, one_nmem _, by rw [one_smul]; exact hz⟩

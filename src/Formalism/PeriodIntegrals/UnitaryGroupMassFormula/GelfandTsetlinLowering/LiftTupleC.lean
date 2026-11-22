@@ -24,12 +24,14 @@ theorem eRow_ne_last {n N : ℕ} (h : n + 1 = N) (b : Fin n) : eRow h b ≠ ⟨N
   simp [eRow] at h1
   omega
 
-theorem exp_bidet {n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (k : Fin K) :
-    Exp (id : Fin n → Fin n) (fun ρ : Fin (sz k) → Fin n => initMinor ℤ (n := n) ρ (hsz k)) := exp_gmin id Function.injective_id (Fin.castLE (hsz k))
+theorem exp_bidet {n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (k : Fin K)
+    : Exp (id : Fin n → Fin n) (fun ρ : Fin (sz k) → Fin n => initMinor ℤ (n := n) ρ (hsz k)) :=
+  exp_gmin id Function.injective_id (Fin.castLE (hsz k))
 
-theorem exp_M {n N : ℕ} (h : n + 1 = N) {K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (L : Finset (Fin K))
-    (k : Fin K) :
-    Exp (eRow h) (fun ρ : Fin (sz k) → Fin n =>
+theorem exp_M
+    {n N : ℕ} (h : n + 1 = N)
+    {K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (L : Finset (Fin K)) (k : Fin K)
+    : Exp (eRow h) (fun ρ : Fin (sz k) → Fin n =>
       if k ∈ L then lif h ρ (by have := hsz k; omega) else unl h ρ (by have := hsz k; omega)) := by
   intro a b ρ
   by_cases hk : k ∈ L
@@ -39,9 +41,10 @@ theorem exp_M {n N : ℕ} (h : n + 1 = N) {K : ℕ} (sz : Fin K → ℕ) (hsz : 
   · simp only [hk, if_false, ite_false]
     exact exp_gmin (eRow h) (eRow_inj h) (Fin.castLE (by have := hsz k; omega)) a b ρ
 
-theorem rowGen_gmin_inv {r c m : ℕ} (a b : Fin r) (hab : a ≠ b) (ρ : Fin m → Fin r) (κ : Fin m → Fin c)
-    (hρ : (∃ pa, ρ pa = a) ∨ ∀ p, ρ p ≠ b) :
-    rowGen ℤ a b (gmin ρ κ) = Polynomial.C (gmin ρ κ) := by
+theorem rowGen_gmin_inv
+    {r c m : ℕ} (a b : Fin r) (hab : a ≠ b) (ρ : Fin m → Fin r) (κ : Fin m → Fin c)
+    (hρ : (∃ pa, ρ pa = a) ∨ ∀ p, ρ p ≠ b)
+    : rowGen ℤ a b (gmin ρ κ) = Polynomial.C (gmin ρ κ) := by
   classical
   rw [rowGen_gmin, Finset.sum_eq_single ∅]
   · have hu : upd ρ ∅ a = ρ := by
@@ -68,17 +71,26 @@ theorem rowGen_gmin_inv {r c m : ℕ} (a b : Fin r) (hab : a ≠ b) (ρ : Fin m 
     · rfl
   · simp
 
-theorem polarization_of_constant {n N : ℕ} (h : n + 1 = N) (lam : DomWeight N) (sg : DomWeight n) (a b : Fin n) (hab : a ≠ b) :
-    rowGen ℤ (eRow h a) (eRow h b) (C0 h lam sg) = Polynomial.C (C0 h lam sg) := by
+theorem polarization_of_constant
+    {n N : ℕ} (h : n + 1 = N) (lam : DomWeight N) (sg : DomWeight n) (a b : Fin n) (hab : a ≠ b)
+    : rowGen ℤ (eRow h a) (eRow h b) (C0 h lam sg) = Polynomial.C (C0 h lam sg) := by
   have hab' : eRow h a ≠ eRow h b := fun h' => hab (eRow_inj h h')
-  have hlp : ∀ i : Fin n, i.1 + 1 = n → ∀ (hr : i.1 + 1 ≤ N) (hc : i.1 + 1 ≤ N),
-      rowGen ℤ (eRow h a) (eRow h b) (lpMinor ℤ (i.1 + 1) hr hc) = Polynomial.C (lpMinor ℤ (i.1 + 1) hr hc) := by
+  have hlp
+      : ∀ i : Fin n,
+        i.1 + 1 = n
+          → ∀ (hr : i.1 + 1 ≤ N) (hc : i.1 + 1 ≤ N),
+            rowGen ℤ (eRow h a) (eRow h b) (lpMinor ℤ (i.1 + 1) hr hc)
+              = Polynomial.C (lpMinor ℤ (i.1 + 1) hr hc) := by
     intro i hi hr hc
     have ha := a.2
     exact rowGen_gmin_inv _ _ hab' (Fin.castLE hr) (Fin.castLE hc)
       (Or.inl ⟨⟨a.1, by omega⟩, Fin.ext (by simp [eRow])⟩)
-  have hrz : ∀ i : Fin n, i.1 = 0 → ∀ (hs : i.1 + 1 ≤ N),
-      rowGen ℤ (eRow h a) (eRow h b) (initMinor ℤ (rowsZ h i) hs) = Polynomial.C (initMinor ℤ (rowsZ h i) hs) := by
+  have hrz
+      : ∀ i : Fin n,
+        i.1 = 0
+          → ∀ (hs : i.1 + 1 ≤ N),
+            rowGen ℤ (eRow h a) (eRow h b) (initMinor ℤ (rowsZ h i) hs)
+              = Polynomial.C (initMinor ℤ (rowsZ h i) hs) := by
     intro i hi hs
     refine rowGen_gmin_inv _ _ hab' (rowsZ h i) (Fin.castLE hs) (Or.inr fun p hp => ?_)
     have hp0 : p.1 = i.1 := by have := p.2; omega
@@ -96,28 +108,38 @@ theorem polarization_of_constant {n N : ℕ} (h : n + 1 = N) (lam : DomWeight N)
     · rw [map_pow, map_pow, hrz i hi]
     · simp
 
-theorem word_clause {n N : ℕ} (h : n + 1 = N) (lam : DomWeight N) (sg : DomWeight n) {K : ℕ} (sz : Fin K → ℕ)
-    (hsz : ∀ k, sz k ≤ n) (L : Finset (Fin K)) (I : ∀ k, Fin (sz k) → Fin n)
-    (w : List (Fin n × Fin n × ℕ)) (hw : OffDiag w) :
-    ∃ d : (∀ k, Fin (sz k) → Fin n) →₀ ℤ,
-      applyWord ℤ w (bideterminant ℤ sz hsz I) = d.sum (fun J c => c • bideterminant ℤ sz hsz J) ∧
-      applyWord ℤ (liftWord h w) (Mlift h lam sg sz hsz L I) =
-        d.sum (fun J c => c • Mlift h lam sg sz hsz L J) := by
+theorem word_clause
+    {n N : ℕ} (h : n + 1 = N) (lam : DomWeight N) (sg : DomWeight n)
+    {K : ℕ}
+    (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (L : Finset (Fin K)) (I : ∀ k, Fin (sz k) → Fin n)
+    (w : List (Fin n × Fin n × ℕ)) (hw : OffDiag w)
+    : ∃ d : (∀ k, Fin (sz k) → Fin n) →₀ ℤ,
+      applyWord ℤ w (bideterminant ℤ sz hsz I) = d.sum (fun J c => c • bideterminant ℤ sz hsz J)
+        ∧ applyWord ℤ (liftWord h w) (Mlift h lam sg sz hsz L I)
+          = d.sum (fun J c => c • Mlift h lam sg sz hsz L J) := by
   classical
   refine ⟨twd sz w (Finsupp.single I 1), ?_, ?_⟩
   · have hmap : w.map (fun x => (id x.1, id x.2.1, x.2.2)) = w := by
       induction w with
       | nil => rfl
       | cons x w ih => simp
-    have h1 := applyWord_comb id sz (fun k ρ => initMinor ℤ (n := n) ρ (hsz k)) (exp_bidet sz hsz) 1
-      (fun a b _ => by simp) w hw (Finsupp.single I 1)
+    have h1 :=
+      applyWord_comb id sz
+        (fun k ρ => initMinor ℤ (n := n) ρ (hsz k))
+        (exp_bidet sz hsz) 1
+        (fun a b _ => by simp)
+        w hw (Finsupp.single I 1)
     rw [hmap, Finsupp.linearCombination_single, one_smul] at h1
     simp only [one_mul, Finsupp.linearCombination_apply] at h1
     unfold bideterminant
     exact h1
-  · have h2 := applyWord_comb (eRow h) sz
-      (fun k ρ => if k ∈ L then lif h ρ (by have := hsz k; omega) else unl h ρ (by have := hsz k; omega))
-      (exp_M h sz hsz L) (C0 h lam sg) (fun a b hab => polarization_of_constant h lam sg a b hab) w hw (Finsupp.single I 1)
+  · have h2 :=
+      applyWord_comb (eRow h) sz
+        (fun k ρ =>
+          if k ∈ L then lif h ρ (by have := hsz k; omega) else unl h ρ (by have := hsz k; omega))
+        (exp_M h sz hsz L) (C0 h lam sg)
+        (fun a b hab => polarization_of_constant h lam sg a b hab)
+        w hw (Finsupp.single I 1)
     rw [Finsupp.linearCombination_single, one_smul] at h2
     simp only [Finsupp.linearCombination_apply] at h2
     unfold Mlift

@@ -13,20 +13,24 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.MeasWCore
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct
 
 section Gen
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
   (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
-  [LocallyCompactSpace R] [T2Space R] (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  [LocallyCompactSpace R] [T2Space R]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
-theorem isClosed_uniFlag {m : ℕ} (Y : Fin m → Fin n → E) :
-    IsClosed (uniFlag R σ J Y : Set (HA R σ J)) := by
-  have : (uniFlag R σ J Y : Set (HA R σ J)) =
-      ⋂ b, (fun g => lin R σ J g (ratV (F := F) R (Y b)) - ratV (F := F) R (Y b)) ⁻¹'
-        (spanR (F := F) R Y {a | a < b} : Set (Fin n → R ⊗[F] E)) := by
+theorem isClosed_uniFlag {m : ℕ} (Y : Fin m → Fin n → E)
+    : IsClosed (uniFlag R σ J Y : Set (HA R σ J)) := by
+  have : (uniFlag R σ J Y : Set (HA R σ J))
+      = ⋂ b, (fun g => lin R σ J g (ratV (F := F) R (Y b)) - ratV (F := F) R (Y b)) ⁻¹'
+          (spanR (F := F) R Y {a | a < b} : Set (Fin n → R ⊗[F] E)) := by
     ext g
     simp only [Set.mem_iInter, Set.mem_preimage, SetLike.mem_coe]
     rfl
@@ -39,12 +43,15 @@ theorem isClosed_Hsub {r : ℕ} (P : Frame E n r) : IsClosed (Hsub R σ J P : Se
   PI.VolSemiDirect.W.isClosed_stabT (R := R) (σ := σ) (J := J) _
 
 theorem isClosed_Nsub {r : ℕ} (P : Frame E n r) : IsClosed (Nsub R σ J P : Set (HA R σ J)) := by
-  have hset : (Nsub R σ J P : Set (HA R σ J)) = (uniFlag R σ J P.e : Set (HA R σ J)) ∩
-      ⋂ v ∈ {v : Fin n → R ⊗[F] E | InXperp R σ J P v},
-        (fun g : HA R σ J => lin R σ J g v - v) ⁻¹'
-          (spanR (F := F) R P.e Set.univ : Set (Fin n → R ⊗[F] E)) := by
+  have hset
+      : (Nsub R σ J P : Set (HA R σ J))
+        = (uniFlag R σ J P.e : Set (HA R σ J))
+          ∩ ⋂ v ∈ {v : Fin n → R ⊗[F] E | InXperp R σ J P v},
+              (fun g : HA R σ J => lin R σ J g v - v) ⁻¹'
+                (spanR (F := F) R P.e Set.univ : Set (Fin n → R ⊗[F] E)) := by
     ext g
-    simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage, Set.mem_setOf_eq, SetLike.mem_coe]
+    simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_preimage, Set.mem_setOf_eq,
+      SetLike.mem_coe]
     rfl
   rw [hset]
   refine (isClosed_uniFlag R σ J P.e).inter (isClosed_biInter fun v _ => ?_)
@@ -63,7 +70,8 @@ instance lc_Nsub {r : ℕ} (P : Frame E n r) : LocallyCompactSpace (Nsub R σ J 
 instance lc_Ssub {r : ℕ} (P : Frame E n r) : LocallyCompactSpace (Ssub R σ J P) :=
   (isClosed_Ssub R σ J P).isClosedEmbedding_subtypeVal.locallyCompactSpace
 
-instance t2Space_general_linear_group : T2Space (GL (Fin n) (R ⊗[F] E)) := Units.isEmbedding_embedProduct.t2Space
+instance t2Space_general_linear_group : T2Space (GL (Fin n) (R ⊗[F] E)) :=
+  Units.isEmbedding_embedProduct.t2Space
 
 instance t2Space_hermitian_adeles : T2Space (HA R σ J) := inferInstanceAs (T2Space (HR R σ J))
 
@@ -74,11 +82,14 @@ section NF
 variable (F : Type) [Field F] [NumberField F]
 
 instance lc_Fv (v : HeightOneSpectrum (𝓞 F)) : LocallyCompactSpace (Fv F v) :=
-  (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v).locallyCompactSpace_of_mem_nhds_of_addGroup
+  (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F
+      v).locallyCompactSpace_of_mem_nhds_of_addGroup
     ((PI.VolStabSW.TopoAF.isOpen_integers F v).mem_nhds (zero_mem _))
 
-variable {F} {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E] (σ : E →ₐ[F] E) {n : ℕ}
-  (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F} {E : Type} [Field E] [Algebra F E] [FiniteDimensional F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 instance sc_HAinf : SecondCountableTopology (HA (Ainf F) σ J) :=
   PI.VolStabSW.TopoAF.secondCountable_HA_of (Ainf F) σ J

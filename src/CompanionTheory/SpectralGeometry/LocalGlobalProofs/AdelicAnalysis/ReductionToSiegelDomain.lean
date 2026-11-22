@@ -14,33 +14,38 @@ open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.Red
 
-theorem prod_sq_embedding {F : Type} [Field F] [NumberField F] (hF : IsTotallyReal F)
-    (ρ : InfinitePlace F → (F →+* ℝ))
-    (hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) (x : F) :
-    ∏ w, (ρ w x) ^ 2 = ((Algebra.norm ℚ x : ℚ) : ℝ) ^ 2 := by
+theorem prod_sq_embedding
+    {F : Type} [Field F] [NumberField F]
+    (hF : IsTotallyReal F)
+    (ρ : InfinitePlace F → (F →+* ℝ)) (hρ : ∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x)
+    (x : F)
+    : ∏ w, (ρ w x) ^ 2 = ((Algebra.norm ℚ x : ℚ) : ℝ) ^ 2 := by
   have h1 := InfinitePlace.prod_eq_abs_norm x
   have h2 : ∀ w : InfinitePlace F, w x ^ w.mult = |ρ w x| := by
     intro w
-    have hm : w.mult = 1 := by
-      simp [InfinitePlace.mult, hF.isReal w]
+    have hm : w.mult = 1 := by simp [InfinitePlace.mult, hF.isReal w]
     rw [hm, pow_one, ← InfinitePlace.norm_embedding_eq, ← hρ]
     simp
   have h3 : ∏ w : InfinitePlace F, |ρ w x| = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
     rw [← Finset.prod_congr rfl (fun w _ => h2 w), h1]
     simp
-  calc ∏ w, (ρ w x) ^ 2 = ∏ w, |ρ w x| ^ 2 := by simp
+  calc
+    ∏ w, (ρ w x) ^ 2
+      = ∏ w, |ρ w x| ^ 2 := by simp
     _ = (∏ w, |ρ w x|) ^ 2 := by rw [Finset.prod_pow]
     _ = _ := by rw [h3, sq_abs]
 
-theorem balanced_lower {ι : Type} [Fintype ι] (z : ι → ℝ) (hz : ∀ i, 0 < z i) (κ P : ℝ)
-    (hκ : 0 < κ) (hbal : ∀ v w, κ * z w ≤ z v) (hprod : P ≤ ∏ i, z i) (w : ι) :
-    κ * min 1 P ≤ z w := by
+theorem balanced_lower
+    {ι : Type} [Fintype ι]
+    (z : ι → ℝ) (hz : ∀ i, 0 < z i)
+    (κ P : ℝ) (hκ : 0 < κ) (hbal : ∀ v w, κ * z w ≤ z v) (hprod : P ≤ ∏ i, z i)
+    (w : ι)
+    : κ * min 1 P ≤ z w := by
   by_contra h
   push_neg at h
   set q := z w / κ with hq
   have hqpos : 0 < q := div_pos (hz w) hκ
-  have hqlt : q < min 1 P := by
-    rw [hq, div_lt_iff₀ hκ]; linarith
+  have hqlt : q < min 1 P := by rw [hq, div_lt_iff₀ hκ]; linarith
   have hq1 : q ≤ 1 := (hqlt.trans_le (min_le_left _ _)).le
   have hqP : q < P := hqlt.trans_le (min_le_right _ _)
   have hle : ∀ v, z v ≤ q := by
@@ -51,13 +56,25 @@ theorem balanced_lower {ι : Type} [Fintype ι] (z : ι → ℝ) (hz : ∀ i, 0 
   haveI : Nonempty ι := ⟨w⟩
   have hcard : Fintype.card ι ≠ 0 := Fintype.card_ne_zero
   have hp : ∏ i, z i ≤ q ^ Fintype.card ι := by
-    calc ∏ i, z i ≤ ∏ _i : ι, q :=
-          Finset.prod_le_prod₀ (fun i _ => (hz i).le) (fun i _ => hle i)
+    calc
+      ∏ i, z i
+        ≤ ∏ _i : ι, q := Finset.prod_le_prod₀ (fun i _ => (hz i).le) (fun i _ => hle i)
       _ = q ^ Fintype.card ι := by simp
   have := pow_le_of_le_one hqpos.le hq1 hcard
   linarith
 
-theorem reduction : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F → ∀ ρ : InfinitePlace F → (F →+* ℝ), (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → ∃ (s : Finset SL(2, F)) (κ t : ℝ), 0 < κ ∧ 0 < t ∧ ∀ τ : InfinitePlace F → ℂ, (∀ w, 0 < (τ w).im) → ∃ r ∈ s, ∃ k : SL(2, F), (∀ i j, ∃ z : 𝓞 F, (z : F) = k i j) ∧ (∀ w, t ≤ (mob ρ (r * k) τ w).im) ∧ ∀ v w, κ * (mob ρ (r * k) τ w).im ≤ (mob ρ (r * k) τ v).im := by
+theorem reduction
+    : ∀ (F : Type) [Field F] [NumberField F],
+      IsTotallyReal F
+        → ∀ ρ : InfinitePlace F → (F →+* ℝ),
+          (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x)
+            → ∃ (s : Finset SL(2, F)) (κ t : ℝ),
+              0 < κ ∧ 0 < t
+                ∧ ∀ τ : InfinitePlace F → ℂ,
+                  (∀ w, 0 < (τ w).im)
+                    → ∃ r ∈ s, ∃ k : SL(2, F),
+                      (∀ i j, ∃ z : 𝓞 F, (z : F) = k i j) ∧ (∀ w, t ≤ (mob ρ (r * k) τ w).im)
+                        ∧ ∀ v w, κ * (mob ρ (r * k) τ w).im ≤ (mob ρ (r * k) τ v).im := by
   intro F _ _ hF ρ hρ
   obtain ⟨C₁, hC₁⟩ := GlobalTheory.T.exists_cusp_reduction_bound F hF ρ hρ
   obtain ⟨s, C₂, hrow⟩ := GlobalTheory.T.cusp_representatives_finite F
@@ -108,11 +125,13 @@ theorem reduction : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F �
     intro w
     have hw := (him (r * k) w).1
     rw [h0, h1] at hw
-    have hnorm : ‖((ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) * l * c) : ℝ) : ℂ) * τ w
-        + (ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) * l * d) : ℝ)‖ ^ 2
-        = ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) ^ 2 * N w := by
+    have hnorm
+        : ‖((ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) * l * c) : ℝ) : ℂ) * τ w
+              + (ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) * l * d) : ℝ)‖
+            ^ 2
+          = ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) ^ 2 * N w := by
       have : ((ρ w ((((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) * l * c) : ℝ) : ℂ) * τ w
-          + (ρ w ((((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) * l * d) : ℝ)
+            + (ρ w ((((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) * l * d) : ℝ)
           = ((ρ w (((u⁻¹ : (𝓞 F)ˣ) : 𝓞 F) : F) : ℝ) : ℂ)
             * (((ρ w (l * c) : ℝ) : ℂ) * τ w + (ρ w (l * d) : ℝ)) := by
         simp only [map_mul, Complex.ofReal_mul]
@@ -163,9 +182,11 @@ theorem reduction : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F �
   have hprod : P ≤ ∏ w, (mob ρ (r * k) τ w).im := by
     rw [Finset.prod_congr rfl (fun w _ => hz w), Finset.prod_mul_distrib, hprodu, one_mul]
     have h1' : ∏ w, 1 / (A * ρ w l ^ 2) ≤ ∏ w, y' w :=
-      Finset.prod_le_prod₀ (fun w _ => by
-        have hlw : ρ w l ≠ 0 := (map_ne_zero _).2 hl0
-        positivity) (fun w _ => hlow w)
+      Finset.prod_le_prod₀
+        (fun w _ => by
+          have hlw : ρ w l ≠ 0 := (map_ne_zero _).2 hl0
+          positivity)
+        (fun w _ => hlow w)
     refine le_trans ?_ h1'
     have h2' : ∏ w, 1 / (A * ρ w l ^ 2) = 1 / (A ^ n * ((Algebra.norm ℚ l : ℚ) : ℝ) ^ 2) := by
       rw [Finset.prod_div_distrib, Finset.prod_mul_distrib, prod_sq_embedding hF ρ hρ]

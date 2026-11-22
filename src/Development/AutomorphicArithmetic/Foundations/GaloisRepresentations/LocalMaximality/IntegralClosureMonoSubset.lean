@@ -5,28 +5,29 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section ValuationRepresentative
 variable {L : Type} [Field L] [Algebra ℂ L] {B : Subalgebra ℂ L} {e : B →ₐ[ℂ] ℂ}
 
-private theorem val_add (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b) :
-    Val B e (v + w) (a + b) := by
+private theorem val_add (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b)
+    : Val B e (v + w) (a + b) := by
   obtain ⟨ev, hev⟩ := (hV L B e).2.1
   obtain ⟨h1, rfl⟩ := (hev _ _).1 h
   obtain ⟨h2, rfl⟩ := (hev _ _).1 h'
   exact (hev _ _).2 ⟨add_mem h1 h2, map_add ev ⟨v, h1⟩ ⟨w, h2⟩⟩
 
-private theorem val_sub (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b) :
-    Val B e (v - w) (a - b) := by
+private theorem val_sub (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b)
+    : Val B e (v - w) (a - b) := by
   obtain ⟨ev, hev⟩ := (hV L B e).2.1
   obtain ⟨h1, rfl⟩ := (hev _ _).1 h
   obtain ⟨h2, rfl⟩ := (hev _ _).1 h'
   exact (hev _ _).2 ⟨sub_mem h1 h2, map_sub ev ⟨v, h1⟩ ⟨w, h2⟩⟩
 
-private theorem val_mul (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b) :
-    Val B e (v * w) (a * b) := by
+private theorem val_mul (hV : ValBasic) {v w : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e w b)
+    : Val B e (v * w) (a * b) := by
   obtain ⟨ev, hev⟩ := (hV L B e).2.1
   obtain ⟨h1, rfl⟩ := (hev _ _).1 h
   obtain ⟨h2, rfl⟩ := (hev _ _).1 h'
@@ -39,13 +40,15 @@ private theorem val_const (hV : ValBasic) (c : ℂ) : Val B e (algebraMap ℂ L 
 private theorem val_one (hV : ValBasic) : Val B e 1 1 := by
   simpa using val_const (B := B) (e := e) hV 1
 
-private theorem val_unique (hV : ValBasic) {v : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e v b) : a = b := by
+private theorem val_unique (hV : ValBasic) {v : L} {a b : ℂ} (h : Val B e v a) (h' : Val B e v b)
+    : a = b := by
   obtain ⟨ev, hev⟩ := (hV L B e).2.1
   obtain ⟨h1, rfl⟩ := (hev _ _).1 h
   obtain ⟨h2, rfl⟩ := (hev _ _).1 h'
   rfl
 
-private theorem val_pow (hV : ValBasic) {v : L} {a : ℂ} (h : Val B e v a) (N : ℕ) : Val B e (v ^ N) (a ^ N) := by
+private theorem val_pow (hV : ValBasic) {v : L} {a : ℂ} (h : Val B e v a) (N : ℕ)
+    : Val B e (v ^ N) (a ^ N) := by
   induction N with
   | zero => simpa using val_one hV
   | succ N ih => simpa [pow_succ] using val_mul hV ih h
@@ -53,7 +56,8 @@ private theorem val_pow (hV : ValBasic) {v : L} {a : ℂ} (h : Val B e v a) (N :
 private theorem val_mem (hV : ValBasic) {b : L} (hb : b ∈ B) : Val B e b (e ⟨b, hb⟩) :=
   (hV L B e).2.2.1 ⟨b, hb⟩
 
-private theorem val_inv (hV : ValBasic) {v : L} {c : ℂ} (h : Val B e v c) (hc : c ≠ 0) : Val B e v⁻¹ c⁻¹ := by
+private theorem val_inv (hV : ValBasic) {v : L} {c : ℂ} (h : Val B e v c) (hc : c ≠ 0)
+    : Val B e v⁻¹ c⁻¹ := by
   obtain ⟨hv0, hv⟩ := (hV L B e).2.2.2 v c h hc
   obtain ⟨ev, hev⟩ := (hV L B e).2.1
   have h1 : Val B e v⁻¹ (ev ⟨v⁻¹, hv⟩) := (hev _ _).2 ⟨hv, rfl⟩
@@ -70,29 +74,37 @@ private theorem val_loc (hV : ValBasic) {v : L} {c : ℂ} (h : Val B e v c) : v 
 end ValuationRepresentative
 
 section Mono
-variable {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K'] [Algebra F K]
-  [IsScalarTower ℂ F K] {d : ℕ}
+variable
+  {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K']
+  [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ}
 
-private theorem rB_mono' (x : Fin (d + 1) → F) {J J' : Finset (Fin (d + 1))} (h : J ⊆ J') :
-    rB ℂ K x J ≤ rB ℂ K x J' := by
+private theorem rB_mono' (x : Fin (d + 1) → F) {J J' : Finset (Fin (d + 1))} (h : J ⊆ J')
+    : rB ℂ K x J ≤ rB ℂ K x J' := by
   have hA : rA ℂ x J ≤ rA ℂ x J' := Algebra.adjoin_mono fun y ⟨i, hi, j, hy⟩ => ⟨i, h hi, j, hy⟩
   intro y hy
   have hy' : IsIntegral (rA ℂ x J) y := hy
-  exact IsIntegral.map_of_comp_eq (Subalgebra.inclusion hA).toRingHom (RingHom.id K) (by ext; rfl) hy'
+  exact IsIntegral.map_of_comp_eq (Subalgebra.inclusion hA).toRingHom (RingHom.id K) (by ext; rfl)
+    hy'
 
-private theorem integralClosure_mono_subset (x : Fin (d + 1) → F) (j2 : K →ₐ[ℂ] K') {J J' : Finset (Fin (d + 1))} (h : J ⊆ J') :
-    R2 x j2 J ≤ R2 x j2 J' := by
+private theorem integralClosure_mono_subset
+    (x : Fin (d + 1) → F) (j2 : K →ₐ[ℂ] K') {J J' : Finset (Fin (d + 1))} (h : J ⊆ J')
+    : R2 x j2 J ≤ R2 x j2 J' := by
   have hA : (rB ℂ K x J).map j2 ≤ (rB ℂ K x J').map j2 := Subalgebra.map_mono (rB_mono' x h)
   intro y hy
   have hy' : IsIntegral ((rB ℂ K x J).map j2) y := hy
-  exact IsIntegral.map_of_comp_eq (Subalgebra.inclusion hA).toRingHom (RingHom.id K') (by ext; rfl) hy'
+  exact IsIntegral.map_of_comp_eq (Subalgebra.inclusion hA).toRingHom (RingHom.id K') (by ext; rfl)
+    hy'
 
 end Mono
 
 section Main
-variable {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K'] [Algebra F K]
-  [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K'] [IsScalarTower F K K'] [IsScalarTower ℂ F K']
-  {d : ℕ} (x : Fin (d + 1) → Fˣ) (j2 : K →ₐ[ℂ] K')
+variable
+  {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K']
+  [Algebra F K] [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K']
+  [IsScalarTower F K K'] [IsScalarTower ℂ F K']
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
+  (j2 : K →ₐ[ℂ] K')
 
 private abbrev Xv (a : Fin (d + 1)) : K' := algebraMap F K' (x a)
 
@@ -103,53 +115,71 @@ private theorem Xv_ne (a : Fin (d + 1)) : (Xv (K' := K') x a) ≠ 0 :=
 
 private theorem Yv_ne (a : Fin (d + 1)) : Yv x j2 a ≠ 0 := Units.ne_zero ((sysY x j2 d).Y a)
 
-private theorem memX' (hG : (sysY x j2 d).Good) {I J : Finset (Fin (d + 1))} (hJ : J.Nonempty) {i : Fin (d + 1)}
-    (hi : i ∈ I) (a : Fin (d + 1)) : Xv x a * (Xv x i)⁻¹ ∈ RY (xv x) j2 I J := by
+private theorem memX'
+    (hG : (sysY x j2 d).Good)
+    {I J : Finset (Fin (d + 1))} (hJ : J.Nonempty)
+    {i : Fin (d + 1)} (hi : i ∈ I)
+    (a : Fin (d + 1))
+    : Xv x a * (Xv x i)⁻¹ ∈ RY (xv x) j2 I J := by
   have := hG.memX I J hJ i hi a
   rw [Units.val_mul, Units.val_inv_eq_inv_val] at this
   exact this
 
-private theorem memY' (hG : (sysY x j2 d).Good) {I J : Finset (Fin (d + 1))} (hI : I.Nonempty) {j : Fin (d + 1)}
-    (hj : j ∈ J) (a : Fin (d + 1)) : Yv x j2 a * (Yv x j2 j)⁻¹ ∈ RY (xv x) j2 I J := by
+private theorem memY'
+    (hG : (sysY x j2 d).Good)
+    {I J : Finset (Fin (d + 1))} (hI : I.Nonempty)
+    {j : Fin (d + 1)} (hj : j ∈ J)
+    (a : Fin (d + 1))
+    : Yv x j2 a * (Yv x j2 j)⁻¹ ∈ RY (xv x) j2 I J := by
   have := hG.memY I J hI j hj a
   rw [Units.val_mul, Units.val_inv_eq_inv_val] at this
   exact this
 
-private theorem r_inl {κ : Type} [LinearOrder κ] (n : κ → ℕ × ℕ) (z : κ → K ⊗[ℂ] K) (i j : Fin (d + 1)) (m : Mi d) :
-    (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inl m)) =
-      (Xv x (ofLex m).1 * Yv x j2 (ofLex m).2 - Xv x (ofLex m).2 * Yv x j2 (ofLex m).1) * (Xv x i * Yv x j2 j)⁻¹ := by
+private theorem r_inl
+    {κ : Type} [LinearOrder κ] (n : κ → ℕ × ℕ) (z : κ → K ⊗[ℂ] K) (i j : Fin (d + 1)) (m : Mi d)
+    : (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inl m))
+      = (Xv x (ofLex m).1 * Yv x j2 (ofLex m).2 - Xv x (ofLex m).2 * Yv x j2 (ofLex m).1)
+        * (Xv x i * Yv x j2 j)⁻¹ := by
   show (sysY x j2 d).mu m * (((((sysY x j2 d).X i ^ 1 * (sysY x j2 d).Y j ^ 1)⁻¹ : K'ˣ)) : K') = _
   rw [Units.val_inv_eq_inv_val, pow_one, pow_one, Units.val_mul]
   rfl
 
-private theorem r_inr {κ : Type} [LinearOrder κ] (n : κ → ℕ × ℕ) (z : κ → K ⊗[ℂ] K) (i j : Fin (d + 1)) (l : κ) :
-    (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inr l)) =
-      gS j2 (z l) * (Xv x i ^ (n l).1 * Yv x j2 j ^ (n l).2)⁻¹ := by
+private theorem r_inr
+    {κ : Type} [LinearOrder κ] (n : κ → ℕ × ℕ) (z : κ → K ⊗[ℂ] K) (i j : Fin (d + 1)) (l : κ)
+    : (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inr l))
+      = gS j2 (z l) * (Xv x i ^ (n l).1 * Yv x j2 j ^ (n l).2)⁻¹ := by
   show gS j2 (z l) * (((((sysY x j2 d).X i ^ (n l).1 * (sysY x j2 d).Y j ^ (n l).2)⁻¹ : K'ˣ)) : K') = _
   rw [Units.val_inv_eq_inv_val, Units.val_mul, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val]
   rfl
 
-private theorem gS_gen (i : Fin (d + 1)) (N : ℕ) (b : K) :
-    gS j2 ((((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (b ⊗ₜ 1 - 1 ⊗ₜ b)) =
-      Xv x i ^ N * Yv x j2 i ^ N * (algebraMap K K' b - j2 b) := by
+private theorem gS_gen (i : Fin (d + 1)) (N : ℕ) (b : K)
+    : gS j2
+        ((((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K)
+          * (b ⊗ₜ 1 - 1 ⊗ₜ b))
+      = Xv x i ^ N * Yv x j2 i ^ N * (algebraMap K K' b - j2 b) := by
   have hX : gS j2 (((sysZ K x 0).X i : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) = Xv x i := by
     show gS j2 ((algebraMap F K (x i)) ⊗ₜ 1) = _
     simp [gS, Algebra.TensorProduct.productMap_apply_tmul, IsScalarTower.algebraMap_apply F K K']
   have hY : gS j2 (((sysZ K x 0).Y i : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) = Yv x j2 i := by
     show gS j2 (1 ⊗ₜ (algebraMap F K (x i))) = _
     simp [gS, Algebra.TensorProduct.productMap_apply_tmul]
-  rw [map_mul, Units.val_mul, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, map_mul, map_pow, map_pow, hX, hY,
-    map_sub]
+  rw [map_mul, Units.val_mul, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, map_mul, map_pow,
+    map_pow, hX, hY, map_sub]
   simp [gS, Algebra.TensorProduct.productMap_apply_tmul]
 
-private theorem core (hL : LocEq) (hV : ValBasic) (hR : RYBasic)
-    {Fx : Finset (fib ℂ K' (xv x))} {A : fib ℂ K' (xv x) → Matrix (Fin d) (Fin d) ℂ} (hY : Y1 x j2 Fx A)
-    {κ : Type} [LinearOrder κ] [Fintype κ] {n : κ → ℕ × ℕ} {z : κ → K ⊗[ℂ] K} (hZ : ZF K x n z)
-    {I J : Finset (Fin (d + 1))} {i j : Fin (d + 1)} (hi : i ∈ I) (hj : j ∈ J) (e : RY (xv x) j2 I J →ₐ[ℂ] ℂ)
-    (h : ∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r (app n11 n) (gG x j2 z) i j l) 0) :
-    ∃ e0 : rB ℂ K' (xv x) {i} →ₐ[ℂ] ℂ, loc (RY (xv x) j2 I J) e = loc (rB ℂ K' (xv x) {i}) e0 ∧
-      (∀ v c, Val (RY (xv x) j2 I J) e v c ↔ Val (rB ℂ K' (xv x) {i}) e0 v c) ∧
-      IsFix (rB ℂ K' (xv x) {i}) e0 j2 (rB ℂ K (xv x) {i}) := by
+private theorem core
+    (hL : LocEq) (hV : ValBasic) (hR : RYBasic)
+    {Fx : Finset (fib ℂ K' (xv x))} {A : fib ℂ K' (xv x) → Matrix (Fin d) (Fin d) ℂ}
+    (hY : Y1 x j2 Fx A)
+    {κ : Type} [LinearOrder κ] [Fintype κ]
+    {n : κ → ℕ × ℕ} {z : κ → K ⊗[ℂ] K} (hZ : ZF K x n z)
+    {I J : Finset (Fin (d + 1))} {i j : Fin (d + 1)}
+    (hi : i ∈ I) (hj : j ∈ J) (e : RY (xv x) j2 I J →ₐ[ℂ] ℂ)
+    (h : ∀ l, Val (RY (xv x) j2 I J) e ((sysY x j2 d).r (app n11 n) (gG x j2 z) i j l) 0)
+    : ∃ e0 : rB ℂ K' (xv x) {i} →ₐ[ℂ] ℂ,
+      loc (RY (xv x) j2 I J) e = loc (rB ℂ K' (xv x) {i}) e0
+        ∧ (∀ v c, Val (RY (xv x) j2 I J) e v c ↔ Val (rB ℂ K' (xv x) {i}) e0 v c)
+        ∧ IsFix (rB ℂ K' (xv x) {i}) e0 j2 (rB ℂ K (xv x) {i}) := by
   obtain ⟨hR1, hGood, hR3, hR4, hR5⟩ := hR F K K' d x j2 hY.toY0
   have hG := hGood d
   have hIne : I.Nonempty := ⟨i, hi⟩
@@ -166,9 +196,12 @@ private theorem core (hL : LocEq) (hV : ValBasic) (hR : RYBasic)
     have hr := h (toLex (Sum.inl (toLex (i, j))))
     rw [r_inl] at hr
     have h1 := val_sub hV (val_one (B := RY (xv x) j2 I J) (e := e) hV) hr
-    have heq : (1 : K') - (Xv x (ofLex (toLex (i, j))).1 * Yv x j2 (ofLex (toLex (i, j))).2 -
-        Xv x (ofLex (toLex (i, j))).2 * Yv x j2 (ofLex (toLex (i, j))).1) * (Xv x i * Yv x j2 j)⁻¹ =
-        Xv x j * (Xv x i)⁻¹ * (Yv x j2 i * (Yv x j2 j)⁻¹) := by
+    have heq
+        : (1 : K')
+            - (Xv x (ofLex (toLex (i, j))).1 * Yv x j2 (ofLex (toLex (i, j))).2
+                - Xv x (ofLex (toLex (i, j))).2 * Yv x j2 (ofLex (toLex (i, j))).1)
+              * (Xv x i * Yv x j2 j)⁻¹
+          = Xv x j * (Xv x i)⁻¹ * (Yv x j2 i * (Yv x j2 j)⁻¹) := by
       simp only [ofLex_toLex]
       field_simp
       ring
@@ -179,40 +212,50 @@ private theorem core (hL : LocEq) (hV : ValBasic) (hR : RYBasic)
   have hηne : Yv x j2 i * (Yv x j2 j)⁻¹ ≠ 0 := mul_ne_zero hYi (inv_ne_zero hYj)
   have hR2 : R2 (xv x) j2 {i} ≤ loc (RY (xv x) j2 I J) e := by
     intro y hy
-    obtain ⟨N, hN⟩ := hR5 {j} j (Finset.mem_singleton_self j) i y (integralClosure_mono_subset (xv x) j2 (by simp) hy)
+    obtain ⟨N, hN⟩ :=
+      hR5 {j} j (Finset.mem_singleton_self j) i y
+        (integralClosure_mono_subset (xv x) j2 (by simp) hy)
     have hyJ : y * j2 (algebraMap F K ((x i : F) / x j)) ^ N ∈ RY (xv x) j2 I J :=
-      (le_sup_right : R2 (xv x) j2 J ≤ RY (xv x) j2 I J) (integralClosure_mono_subset (xv x) j2 (Finset.singleton_subset_iff.2 hj) hN)
+      (le_sup_right : R2 (xv x) j2 J ≤ RY (xv x) j2 I J) (integralClosure_mono_subset (xv x) j2
+        (Finset.singleton_subset_iff.2 hj) hN)
     have hl := val_loc hV (val_mul hV (val_mem (e := e) hV hyJ) (val_pow hV hinv N))
     have heq : j2 (algebraMap F K ((x i : F) / x j)) = Yv x j2 i * (Yv x j2 j)⁻¹ := by
       simp [div_eq_mul_inv]
     rw [heq, mul_assoc, ← mul_pow, mul_inv_cancel₀ hηne, one_pow, mul_one] at hl
     exact hl
-  have hgen : ∀ b ∈ {b : K | b ∈ rB ℂ K (xv x) {i} ∧ ∃ l N, n l = (N, N) ∧
-      z l = (((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (b ⊗ₜ 1 - 1 ⊗ₜ b)},
-      ∃ c, Val (RY (xv x) j2 I J) e (algebraMap K K' b) c ∧ Val (RY (xv x) j2 I J) e (j2 b) c := by
+  have hgen
+      : ∀ b
+          ∈ {b : K | b ∈ rB ℂ K (xv x) {i} ∧ ∃ l N, n l = (N, N) ∧
+            z l = (((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (b ⊗ₜ 1 - 1 ⊗ₜ b)},
+        ∃ c,
+          Val (RY (xv x) j2 I J) e (algebraMap K K' b) c ∧ Val (RY (xv x) j2 I J) e (j2 b) c := by
     rintro b ⟨hb, l, N, hl, hz⟩
     have hbR : algebraMap K K' b ∈ RY (xv x) j2 I J :=
-      (le_sup_left : rB ℂ K' (xv x) I ≤ RY (xv x) j2 I J)
-        (rB_mono' (xv x) (Finset.singleton_subset_iff.2 hi) (hR4 {i} b hb).1)
+      (le_sup_left : rB ℂ K' (xv x) I ≤ RY (xv x) j2 I J) (rB_mono' (xv x)
+        (Finset.singleton_subset_iff.2 hi) (hR4 {i} b hb).1)
     have hr := h (toLex (Sum.inr l))
     have hb1 := val_mem (e := e) hV hbR
     refine ⟨_, hb1, ?_⟩
-    rw [show (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inr l)) =
-      (Yv x j2 i * (Yv x j2 j)⁻¹) ^ N * (algebraMap K K' b - j2 b) by
+    rw [show (sysY x j2 d).r (app n11 n) (gG x j2 z) i j (toLex (Sum.inr l))
+          = (Yv x j2 i * (Yv x j2 j)⁻¹) ^ N * (algebraMap K K' b - j2 b) by
         rw [r_inr, hl, hz, gS_gen]
         simp only [mul_pow, inv_pow]
-        field_simp] at hr
+        field_simp]
+      at hr
     have h2 := val_mul hV (val_pow hV hinv N) hr
     rw [← mul_assoc, ← mul_pow, inv_mul_cancel₀ hηne, one_pow, one_mul, mul_zero] at h2
     have h3 := val_sub hV hb1 h2
     rw [sub_sub_cancel, sub_zero] at h3
     exact h3
-  have hall : ∀ b ∈ rB ℂ K (xv x) {i},
-      ∃ c, Val (RY (xv x) j2 I J) e (algebraMap K K' b) c ∧ Val (RY (xv x) j2 I J) e (j2 b) c := by
+  have hall
+      : ∀ b ∈ rB ℂ K (xv x) {i}, ∃ c,
+        Val (RY (xv x) j2 I J) e (algebraMap K K' b) c ∧ Val (RY (xv x) j2 I J) e (j2 b) c := by
     intro b hb
-    have hb' : b ∈ (Algebra.adjoin ℂ {b : K | b ∈ rB ℂ K (xv x) {i} ∧ ∃ l N, n l = (N, N) ∧
-      z l = (((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (b ⊗ₜ 1 - 1 ⊗ₜ b)}) := by
-      rw [hZ.gen i]; exact hb
+    have hb'
+        : b ∈ (Algebra.adjoin ℂ
+          {b : K | b ∈ rB ℂ K (xv x) {i} ∧ ∃ l N, n l = (N, N) ∧
+            z l = (((sysZ K x 0).X i ^ N * (sysZ K x 0).Y i ^ N : (K ⊗[ℂ] K)ˣ) : K ⊗[ℂ] K) * (b ⊗ₜ 1 - 1 ⊗ₜ b)}) :=
+      by rw [hZ.gen i]; exact hb
     clear hb
     induction hb' using Algebra.adjoin_induction with
     | mem b hb => exact hgen b hb
@@ -237,8 +280,7 @@ private theorem core (hL : LocEq) (hV : ValBasic) (hR : RYBasic)
 
 end Main
 
-theorem UpperTheory.Gal.productCup_of_system.ptG_of :
-    LocEq → ValBasic → RYBasic → PtT → PtG := by
+theorem UpperTheory.Gal.productCup_of_system.ptG_of : LocEq → ValBasic → RYBasic → PtT → PtG := by
   intro hL hV hR _ F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY κ _ _ n z hZ I J i hi j hj e h
   obtain ⟨e0, hloc, hval, hfix⟩ := core x j2 hL hV hR hY hZ hi hj e h
   obtain rfl : i = 0 := by
@@ -280,7 +322,8 @@ theorem UpperTheory.Gal.productCup_of_system.ptG_of :
     have h2 := (hval _ _).2 h1
     have hm := memY' x j2 hG hIne ha 0
     have hv := val_mul hV h2 (val_mem (e := e) hV hm)
-    have heq : j2 (algebraMap F K ((xv x m.succ) / xv x 0)) * (Yv x j2 0 * (Yv x j2 m.succ)⁻¹) = 1 := by
+    have heq
+        : j2 (algebraMap F K ((xv x m.succ) / xv x 0)) * (Yv x j2 0 * (Yv x j2 m.succ)⁻¹) = 1 := by
       have h3 := Yv_ne x j2 0
       have h4 := Yv_ne x j2 m.succ
       rw [map_div₀, map_div₀]

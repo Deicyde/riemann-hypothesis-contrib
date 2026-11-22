@@ -15,14 +15,14 @@ open PI.CharIdem
 
 variable {G : Type} [Group G] [Fintype G]
 
-theorem act_single (W : FDRep ℂ G) (g : G) (r : ℂ) :
-    act W (MonoidAlgebra.single g r) = r • W.ρ g := by
+theorem act_single (W : FDRep ℂ G) (g : G) (r : ℂ)
+    : act W (MonoidAlgebra.single g r) = r • W.ρ g := by
   simp [act, MonoidAlgebra.lift_single]
 
-theorem coeff_mul_charIdem (W : FDRep ℂ G) (x : MonoidAlgebra ℂ G) (h : G) :
-    (x * charIdem W).coeff h =
-      ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ)) *
-        LinearMap.trace ℂ W (W.ρ h⁻¹ * act W x) := by
+theorem coeff_mul_charIdem (W : FDRep ℂ G) (x : MonoidAlgebra ℂ G) (h : G)
+    : (x * charIdem W).coeff h
+      = ((Module.finrank ℂ W : ℂ) / (Fintype.card G : ℂ))
+        * LinearMap.trace ℂ W (W.ρ h⁻¹ * act W x) := by
   induction x using MonoidAlgebra.induction_on with
   | of g =>
     rw [MonoidAlgebra.of_apply, MonoidAlgebra.single_mul_apply, coeff_charIdem, act_single]

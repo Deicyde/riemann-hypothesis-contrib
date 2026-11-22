@@ -16,20 +16,19 @@ namespace SheafLES
 
 section Site
 
-variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-  [HasSheafify J AddCommGrpCat.{v}]
+variable
+  {C : Type u} [Category.{v} C] {J : GrothendieckTopology C} [HasSheafify J AddCommGrpCat.{v}]
 
 variable (J) in
 abbrev freeYoneda : C ⥤ Sheaf J AddCommGrpCat.{v} :=
   yoneda ⋙ (Functor.whiskeringRight _ _ _).obj AddCommGrpCat.free ⋙ presheafToSheaf _ _
 
-def freeYonedaHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    ((freeYoneda J).obj U ⟶ F) ≃ F.obj.obj (op U) :=
+def freeYonedaHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : ((freeYoneda J).obj U ⟶ F) ≃ F.obj.obj (op U) :=
   (((sheafificationAdjunction J AddCommGrpCat.{v}).homEquiv _ F).trans
     ((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj U) F.obj)).trans yonedaEquiv
 
-def tautSection (U : C) : ((freeYoneda J).obj U).obj.obj (op U) :=
-  freeYonedaHomEquiv U _ (𝟙 _)
+def tautSection (U : C) : ((freeYoneda J).obj U).obj.obj (op U) := freeYonedaHomEquiv U _ (𝟙 _)
 
 lemma freeYonedaHomEquiv_comp (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
     (φ : (freeYoneda J).obj U ⟶ F) (f : F ⟶ G) :
@@ -55,8 +54,8 @@ lemma freeYonedaHomEquiv_map_comp {U V : C} (i : V ⟶ U) {F : Sheaf J AddCommGr
   exact congrArg yonedaEquiv ((congrArg
     ((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj V) F.obj) h1).trans h2)
 
-def freeYonedaHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    ((freeYoneda J).obj U ⟶ F) ≃+ F.obj.obj (op U) where
+def freeYonedaHomAddEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : ((freeYoneda J).obj U ⟶ F) ≃+ F.obj.obj (op U) where
   toEquiv := freeYonedaHomEquiv U F
   map_add' φ ψ := by
     change freeYonedaHomEquiv U F (φ + ψ) = freeYonedaHomEquiv U F φ + freeYonedaHomEquiv U F ψ
@@ -72,8 +71,8 @@ variable {F G K : Sheaf J AddCommGrpCat.{v}}
 def map (f : F ⟶ G) (n : ℕ) (U : C) : Sheaf.H'.{w'} F n U →+ Sheaf.H'.{w'} G n U :=
   (((Sheaf.cohomologyPresheafFunctor.{w'} J n).map f).app (op U)).hom
 
-def res (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {U V : C} (i : V ⟶ U) :
-    Sheaf.H'.{w'} F n U →+ Sheaf.H'.{w'} F n V :=
+def res (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {U V : C} (i : V ⟶ U)
+    : Sheaf.H'.{w'} F n U →+ Sheaf.H'.{w'} F n V :=
   ((Sheaf.cohomologyPresheaf.{w'} F n).map i.op).hom
 
 lemma map_apply (f : F ⟶ G) (n : ℕ) (U : C) (x : Ext.{w'} ((freeYoneda J).obj U) F n) :
@@ -99,8 +98,7 @@ lemma res_map (f : F ⟶ G) (n : ℕ) {U V : C} (i : V ⟶ U) (x : Sheaf.H'.{w'}
   (ConcreteCategory.congr_hom
     (((Sheaf.cohomologyPresheafFunctor.{w'} J n).map f).naturality i.op) x).symm
 
-def equivZero (F : Sheaf J AddCommGrpCat.{v}) (U : C) :
-    Sheaf.H'.{w'} F 0 U ≃+ F.obj.obj (op U) :=
+def equivZero (F : Sheaf J AddCommGrpCat.{v}) (U : C) : Sheaf.H'.{w'} F 0 U ≃+ F.obj.obj (op U) :=
   (Ext.addEquiv₀ (X := (freeYoneda J).obj U) (Y := F)).trans (freeYonedaHomAddEquiv U F)
 
 lemma equivZero_mk₀ (U : C) (φ : (freeYoneda J).obj U ⟶ F) :
@@ -150,8 +148,8 @@ theorem exact₁ (n : ℕ) (U : C) : Function.Exact (δ.{w'} hS n U) (map.{w'} S
   (ShortComplex.ab_exact_iff_function_exact _).1
     (Ext.covariant_sequence_exact₁' ((freeYoneda J).obj U) hS n (n + 1) rfl)
 
-theorem map_zero_injective_of_mono {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) [Mono f]
-    (U : C) : Function.Injective (map.{w'} f 0 U) :=
+theorem map_zero_injective_of_mono {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) [Mono f] (U : C)
+    : Function.Injective (map.{w'} f 0 U) :=
   Ext.postcomp_mk₀_injective_of_mono ((freeYoneda J).obj U) f
 
 include hS in
@@ -163,28 +161,30 @@ theorem injective_zero (U : C) : Function.Injective (map.{w'} S.f 0 U) :=
     δ hS n U (map S.g n U x) = 0 :=
   (exact₃ hS n U).apply_apply_eq_zero x
 
-theorem δ_naturality {S₁ S₂ : ShortComplex (Sheaf J AddCommGrpCat.{v})} (h₁ : S₁.ShortExact)
-    (h₂ : S₂.ShortExact) (φ : S₁ ⟶ S₂) (n : ℕ) (U : C) (x : Sheaf.H'.{w'} S₁.X₃ n U) :
-    map φ.τ₁ (n + 1) U (δ h₁ n U x) = δ h₂ n U (map φ.τ₃ n U x) := by
-  have (y : Ext.{w'} ((freeYoneda J).obj U) S₁.X₃ n) :
-      (y.comp h₁.extClass rfl).comp (Ext.mk₀ φ.τ₁) (add_zero (n + 1)) =
-        (y.comp (Ext.mk₀ φ.τ₃) (add_zero n)).comp h₂.extClass rfl := by
+theorem δ_naturality
+    {S₁ S₂ : ShortComplex (Sheaf J AddCommGrpCat.{v})}
+    (h₁ : S₁.ShortExact) (h₂ : S₂.ShortExact) (φ : S₁ ⟶ S₂)
+    (n : ℕ) (U : C) (x : Sheaf.H'.{w'} S₁.X₃ n U)
+    : map φ.τ₁ (n + 1) U (δ h₁ n U x) = δ h₂ n U (map φ.τ₃ n U x) := by
+  have (y : Ext.{w'} ((freeYoneda J).obj U) S₁.X₃ n)
+      : (y.comp h₁.extClass rfl).comp (Ext.mk₀ φ.τ₁) (add_zero (n + 1))
+        = (y.comp (Ext.mk₀ φ.τ₃) (add_zero n)).comp h₂.extClass rfl := by
     rw [Ext.comp_assoc_of_third_deg_zero, Ext.comp_assoc_of_second_deg_zero,
       ShortComplex.ShortExact.extClass_naturality h₁ h₂ φ]
   exact this x
 
-theorem δ_res (n : ℕ) {U V : C} (i : V ⟶ U) (x : Sheaf.H'.{w'} S.X₃ n U) :
-    res S.X₁ (n + 1) i (δ hS n U x) = δ hS n V (res S.X₃ n i x) := by
-  have (y : Ext.{w'} ((freeYoneda J).obj U) S.X₃ n) :
-      (Ext.mk₀ ((freeYoneda J).map i)).comp (y.comp hS.extClass rfl) (zero_add (n + 1)) =
-        ((Ext.mk₀ ((freeYoneda J).map i)).comp y (zero_add n)).comp hS.extClass rfl :=
+theorem δ_res (n : ℕ) {U V : C} (i : V ⟶ U) (x : Sheaf.H'.{w'} S.X₃ n U)
+    : res S.X₁ (n + 1) i (δ hS n U x) = δ hS n V (res S.X₃ n i x) := by
+  have (y : Ext.{w'} ((freeYoneda J).obj U) S.X₃ n)
+      : (Ext.mk₀ ((freeYoneda J).map i)).comp (y.comp hS.extClass rfl) (zero_add (n + 1))
+        = ((Ext.mk₀ ((freeYoneda J).map i)).comp y (zero_add n)).comp hS.extClass rfl :=
     (Ext.comp_assoc _ _ _ (zero_add n) rfl (by omega)).symm
   exact this x
 
 include hS
 
-theorem δ_equivZero_symm_eq_zero_iff (U : C) (s : S.X₃.obj.obj (op U)) :
-    δ.{w'} hS 0 U ((equivZero S.X₃ U).symm s) = 0 ↔ ∃ t, S.g.hom.app (op U) t = s := by
+theorem δ_equivZero_symm_eq_zero_iff (U : C) (s : S.X₃.obj.obj (op U))
+    : δ.{w'} hS 0 U ((equivZero S.X₃ U).symm s) = 0 ↔ ∃ t, S.g.hom.app (op U) t = s := by
   rw [exact₃ hS 0 U]
   constructor
   · rintro ⟨x, hx⟩
@@ -192,55 +192,64 @@ theorem δ_equivZero_symm_eq_zero_iff (U : C) (s : S.X₃.obj.obj (op U)) :
   · rintro ⟨t, rfl⟩
     exact ⟨_, map_equivZero_symm S.g U t⟩
 
-theorem sections_surjective_of_subsingleton (U : C)
-    (h : Subsingleton (Sheaf.H'.{w'} S.X₁ 1 U)) : Function.Surjective (S.g.hom.app (op U)) :=
-  fun s => (δ_equivZero_symm_eq_zero_iff.{w'} hS U s).1 (@Subsingleton.elim _ h _ _)
+theorem sections_surjective_of_subsingleton (U : C) (h : Subsingleton (Sheaf.H'.{w'} S.X₁ 1 U))
+    : Function.Surjective (S.g.hom.app (op U)) := fun s =>
+  (δ_equivZero_symm_eq_zero_iff.{w'} hS U s).1 (@Subsingleton.elim _ h _ _)
 
-theorem δ_surjective_of_subsingleton (n : ℕ) (U : C)
-    (h : Subsingleton (Sheaf.H'.{w'} S.X₂ (n + 1) U)) : Function.Surjective (δ.{w'} hS n U) :=
-  fun x => ((exact₁ hS n U) x).1 (Subsingleton.elim _ _)
+theorem δ_surjective_of_subsingleton
+    (n : ℕ) (U : C) (h : Subsingleton (Sheaf.H'.{w'} S.X₂ (n + 1) U))
+    : Function.Surjective (δ.{w'} hS n U) := fun x =>
+  ((exact₁ hS n U) x).1 (Subsingleton.elim _ _)
 
-theorem δ_injective_of_subsingleton (n : ℕ) (U : C)
-    (h : Subsingleton (Sheaf.H'.{w'} S.X₂ n U)) : Function.Injective (δ.{w'} hS n U) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem δ_injective_of_subsingleton (n : ℕ) (U : C) (h : Subsingleton (Sheaf.H'.{w'} S.X₂ n U))
+    : Function.Injective (δ.{w'} hS n U) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨y, rfl⟩ := ((exact₃ hS n U) x).1 hx
   rw [Subsingleton.elim y 0, map_zero]
 
-theorem map_f_injective_of_surjective (n : ℕ) (U : C)
-    (h : Function.Surjective (map.{w'} S.g n U)) :
-    Function.Injective (map.{w'} S.f (n + 1) U) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem map_f_injective_of_surjective (n : ℕ) (U : C) (h : Function.Surjective (map.{w'} S.g n U))
+    : Function.Injective (map.{w'} S.f (n + 1) U) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨y, rfl⟩ := ((exact₁ hS n U) x).1 hx
   obtain ⟨z, rfl⟩ := h y
   exact δ_map hS n U z
 
-theorem map_f_one_injective_of_sections_surjective (U : C)
-    (h : Function.Surjective (S.g.hom.app (op U))) : Function.Injective (map.{w'} S.f 1 U) := by
+theorem map_f_one_injective_of_sections_surjective
+    (U : C) (h : Function.Surjective (S.g.hom.app (op U)))
+    : Function.Injective (map.{w'} S.f 1 U) := by
   refine map_f_injective_of_surjective hS 0 U fun x => ?_
   obtain ⟨s, rfl⟩ := (equivZero S.X₃ U).symm.surjective x
   obtain ⟨t, rfl⟩ := h s
   exact ⟨_, map_equivZero_symm S.g U t⟩
 
-theorem subsingleton₂ (n : ℕ) (U : C) (h₁ : Subsingleton (Sheaf.H'.{w'} S.X₁ n U))
-    (h₃ : Subsingleton (Sheaf.H'.{w'} S.X₃ n U)) : Subsingleton (Sheaf.H'.{w'} S.X₂ n U) :=
+theorem subsingleton₂
+    (n : ℕ) (U : C)
+    (h₁ : Subsingleton (Sheaf.H'.{w'} S.X₁ n U)) (h₃ : Subsingleton (Sheaf.H'.{w'} S.X₃ n U))
+    : Subsingleton (Sheaf.H'.{w'} S.X₂ n U) :=
   subsingleton_of_forall_eq 0 fun x => by
     obtain ⟨y, rfl⟩ := ((exact₂ hS n U) x).1 (Subsingleton.elim _ _)
     rw [Subsingleton.elim y 0, map_zero]
 
-theorem subsingleton₃ (n : ℕ) (U : C) (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ n U))
-    (h₁ : Subsingleton (Sheaf.H'.{w'} S.X₁ (n + 1) U)) : Subsingleton (Sheaf.H'.{w'} S.X₃ n U) :=
+theorem subsingleton₃
+    (n : ℕ) (U : C)
+    (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ n U)) (h₁ : Subsingleton (Sheaf.H'.{w'} S.X₁ (n + 1) U))
+    : Subsingleton (Sheaf.H'.{w'} S.X₃ n U) :=
   (δ_injective_of_subsingleton hS n U h₂).subsingleton
 
-theorem subsingleton₁ (n : ℕ) (U : C) (h₃ : Subsingleton (Sheaf.H'.{w'} S.X₃ n U))
-    (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ (n + 1) U)) :
-    Subsingleton (Sheaf.H'.{w'} S.X₁ (n + 1) U) :=
+theorem subsingleton₁
+    (n : ℕ) (U : C)
+    (h₃ : Subsingleton (Sheaf.H'.{w'} S.X₃ n U)) (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ (n + 1) U))
+    : Subsingleton (Sheaf.H'.{w'} S.X₁ (n + 1) U) :=
   (δ_surjective_of_subsingleton hS n U h₂).subsingleton
 
-theorem subsingleton₁_one_of_sections_surjective (U : C)
-    (h : Function.Surjective (S.g.hom.app (op U)))
-    (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ 1 U)) : Subsingleton (Sheaf.H'.{w'} S.X₁ 1 U) :=
+theorem subsingleton₁_one_of_sections_surjective
+    (U : C)
+    (h : Function.Surjective (S.g.hom.app (op U))) (h₂ : Subsingleton (Sheaf.H'.{w'} S.X₂ 1 U))
+    : Subsingleton (Sheaf.H'.{w'} S.X₁ 1 U) :=
   (map_f_one_injective_of_sections_surjective hS U h).subsingleton
 
 end Sequence
@@ -251,18 +260,20 @@ section Modules
 
 universe v' u'
 
-variable {C : Type u'} [Category.{v'} C] {J : GrothendieckTopology C} (R : Sheaf J RingCat.{u})
+variable
+  {C : Type u'} [Category.{v'} C]
+  {J : GrothendieckTopology C} (R : Sheaf J RingCat.{u})
   [HasSheafify J AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
 
-theorem toSheaf_preservesColimitsOfShape (K : Type*) [Category K]
-    [HasColimitsOfShape K AddCommGrpCat.{v}] :
-    PreservesColimitsOfShape K (SheafOfModules.toSheaf.{v} R) where
+theorem toSheaf_preservesColimitsOfShape
+    (K : Type*) [Category K] [HasColimitsOfShape K AddCommGrpCat.{v}]
+    : PreservesColimitsOfShape K (SheafOfModules.toSheaf.{v} R) where
   preservesColimit {F} := by
     let e : F ≅ (F ⋙ SheafOfModules.forget R) ⋙ PresheafOfModules.sheafification (𝟙 R.obj) :=
       Functor.isoWhiskerLeft F
         (asIso (PresheafOfModules.sheafificationAdjunction (𝟙 R.obj)).counit).symm
-    have h1 : PreservesColimitsOfShape K (PresheafOfModules.sheafification.{v} (𝟙 R.obj) ⋙
-        SheafOfModules.toSheaf.{v} R) :=
+    have h1 : PreservesColimitsOfShape K
+        (PresheafOfModules.sheafification.{v} (𝟙 R.obj) ⋙ SheafOfModules.toSheaf.{v} R) :=
       inferInstanceAs (PreservesColimitsOfShape K
         (PresheafOfModules.toPresheaf R.obj ⋙ presheafToSheaf J AddCommGrpCat.{v}))
     have h2 : PreservesColimit
@@ -271,16 +282,17 @@ theorem toSheaf_preservesColimitsOfShape (K : Type*) [Category K]
       preservesColimit_of_preserves_colimit_cocone
         (isColimitOfPreserves (PresheafOfModules.sheafification.{v} (𝟙 R.obj))
           (colimit.isColimit (F ⋙ SheafOfModules.forget R)))
-        (isColimitOfPreserves (PresheafOfModules.sheafification.{v} (𝟙 R.obj) ⋙
-          SheafOfModules.toSheaf.{v} R) (colimit.isColimit (F ⋙ SheafOfModules.forget R)))
+        (isColimitOfPreserves
+          (PresheafOfModules.sheafification.{v} (𝟙 R.obj) ⋙ SheafOfModules.toSheaf.{v} R)
+          (colimit.isColimit (F ⋙ SheafOfModules.forget R)))
     exact preservesColimit_of_iso_diagram _ e.symm
 
-instance toSheaf_preservesFiniteColimits :
-    PreservesFiniteColimits (SheafOfModules.toSheaf.{v} R) where
+instance toSheaf_preservesFiniteColimits
+    : PreservesFiniteColimits (SheafOfModules.toSheaf.{v} R) where
   preservesFiniteColimits K _ _ := toSheaf_preservesColimitsOfShape R K
 
-theorem shortExact_map_toSheaf {S : ShortComplex (SheafOfModules.{v} R)} (hS : S.ShortExact) :
-    (S.map (SheafOfModules.toSheaf.{v} R)).ShortExact :=
+theorem shortExact_map_toSheaf {S : ShortComplex (SheafOfModules.{v} R)} (hS : S.ShortExact)
+    : (S.map (SheafOfModules.toSheaf.{v} R)).ShortExact :=
   hS.map_of_exact _
 
 end Modules
@@ -313,12 +325,12 @@ instance : PreservesFiniteColimits (toAbSheaf X) :=
 
 variable {X}
 
-theorem shortExact_map_toAbSheaf {S : ShortComplex X.Modules} (hS : S.ShortExact) :
-    (S.map (toAbSheaf X)).ShortExact :=
+theorem shortExact_map_toAbSheaf {S : ShortComplex X.Modules} (hS : S.ShortExact)
+    : (S.map (toAbSheaf X)).ShortExact :=
   hS.map_of_exact _
 
-theorem exact_map_toAbSheaf_iff (S : ShortComplex X.Modules) :
-    (S.map (toAbSheaf X)).Exact ↔ S.Exact :=
+theorem exact_map_toAbSheaf_iff (S : ShortComplex X.Modules)
+    : (S.map (toAbSheaf X)).Exact ↔ S.Exact :=
   S.exact_map_iff_of_faithful _
 
 end Scheme

@@ -12,21 +12,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem uf_dg {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (V : Lev k) (d d' : Fin 2 → kˣ) (hd : Dom d) (hd' : Dom d') : UF (V.J 2) (dg d) (dg d') := by
+private theorem uf_dg
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (V : Lev k)
+    (d d' : Fin 2 → kˣ) (hd : Dom d) (hd' : Dom d')
+    : UF (V.J 2) (dg d) (dg d') := by
   intro g
   have h := dCMul k V 2 d d' hd hd' g
   have hm : dg (d * d') = dg d * dg d' := map_mul _ _ _
   simp only [Lev.DC, hm] at h
   exact h
 
-theorem UpperTheory.V.Z.Sym.So.dMul :
-    UpperTheory.V.Z.Sym.So.DMul := by
+theorem UpperTheory.V.Z.Sym.So.dMul : UpperTheory.V.Z.Sym.So.DMul := by
   intro F _ _ Δ A hA g d hg
   classical
   let P := rpg (fun v => ↥(DX ((cv v) Δ))) (fun v => KD ((cv v) Δ) (Ov v))
@@ -34,8 +38,7 @@ theorem UpperTheory.V.Z.Sym.So.dMul :
   have hU : ∀ v ∉ A.Sg, A.dat.J2v v = KD ((cv v) Δ) (Ov v) := by
     intro v hv
     simp [Dat.J2v, SD.dat, hv]
-  have hJ : ∀ v (hv : v ∈ A.Sg),
-      A.dat.J2v v = Subgroup.comap (eD (A.hs v hv)) ((A.V v).J 2) := by
+  have hJ : ∀ v (hv : v ∈ A.Sg), A.dat.J2v v = Subgroup.comap (eD (A.hs v hv)) ((A.V v).J 2) := by
     intro v hv
     simp [Dat.J2v, SD.dat, hv, Lev.data]
   have hok := datOk F Δ A hA
@@ -43,12 +46,16 @@ theorem UpperTheory.V.Z.Sym.So.dMul :
     intro x e hx v hv
     rw [hU v hv, hpv, hx.2 v hv]
     exact one_mem _
-  have hbox := uFBox (Pl F) (DA Δ) (fun v => ↥(DX ((cv v) Δ))) (fun v => KD ((cv v) Δ) (Ov v))
-    A.dat.J2v P A.Sg hU g (hout g d hg)
-  have key : ∀ v (hv : v ∈ A.Sg),
-      UpperTheory.V.AlgebraTools.FinOrb (A.dat.J2v v) (A.dat.J2v v) (P.p v g) ∧
-      ∀ (g' : DA Δ) (d' : ParN F 2), A.IsElD g' d' → Dom (d v) → Dom (d' v) →
-        UF (A.dat.J2v v) (P.p v g) (P.p v g') := by
+  have hbox :=
+    uFBox (Pl F) (DA Δ)
+      (fun v => ↥(DX ((cv v) Δ)))
+      (fun v => KD ((cv v) Δ) (Ov v))
+      A.dat.J2v P A.Sg hU g (hout g d hg)
+  have key
+      : ∀ v (hv : v ∈ A.Sg),
+        UpperTheory.V.AlgebraTools.FinOrb (A.dat.J2v v) (A.dat.J2v v) (P.p v g)
+          ∧ ∀ (g' : DA Δ) (d' : ParN F 2),
+            A.IsElD g' d' → Dom (d v) → Dom (d' v) → UF (A.dat.J2v v) (P.p v g) (P.p v g') := by
     intro v hv
     obtain ⟨hI, h2, hs0, -, -⟩ := hok.2.2.1 v hv
     have hb := (eD_facts (Kv v) (Ov v) hI h2 ((cv v) Δ) (A.s v) (A.hs v hv) hs0).1

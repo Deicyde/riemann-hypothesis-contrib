@@ -10,12 +10,14 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem isWeaklyRegular_mvPowerSeries_of_pow_le :
-    ∀ (k : Type) [Field k] (σ : Type) [Finite σ] (n : ℕ) (e : Fin n ≃ σ)
-      (f : σ → MvPowerSeries σ k), (∀ j, MvPowerSeries.constantCoeff (f j) = 0) →
-      (∃ M : ℕ, Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M ≤
-        Ideal.span (Set.range f)) →
-      RingTheory.Sequence.IsWeaklyRegular (MvPowerSeries σ k) (List.ofFn fun i => f (e i)) := by
+theorem isWeaklyRegular_mvPowerSeries_of_pow_le
+    : ∀ (k : Type) [Field k] (σ : Type) [Finite σ] (n : ℕ) (e : Fin n ≃ σ)
+        (f : σ → MvPowerSeries σ k),
+      (∀ j, MvPowerSeries.constantCoeff (f j) = 0)
+        → (∃ M : ℕ,
+          Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ k)) ^ M
+            ≤ Ideal.span (Set.range f))
+        → RingTheory.Sequence.IsWeaklyRegular (MvPowerSeries σ k) (List.ofFn fun i => f (e i)) := by
   rintro k _ σ _ n e f h0 ⟨M, hM⟩
   have := FormalIsogeny.isRegularLocalRing_mvPowerSeries k σ
   refine (isRegular_of_radical_eq_maximalIdeal ?_ ?_).1

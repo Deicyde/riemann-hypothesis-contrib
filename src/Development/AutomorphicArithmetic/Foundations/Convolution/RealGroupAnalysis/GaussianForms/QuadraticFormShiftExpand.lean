@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -28,9 +30,12 @@ private lemma quaternaryForm_neg_right {F : Type} [Field F] [NumberField F] (δ 
   simp only [B4, Pi.neg_apply]
   ring
 
-theorem UpperTheory.ConvolutionTheory.R2.C.idxFt :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F) (b : (A F)ˣ) (c : ℂ), IsIdx δ (b : A F) c → ∀ (φ : S4 F) (v : V4 F),
-    ft4 δ (Pc δ (b : A F) φ.1) v = c * ψ (-(((b⁻¹ : (A F)ˣ) : A F) * q4 δ v)) * ft4 δ φ.1 (-v) := by
+theorem UpperTheory.ConvolutionTheory.R2.C.idxFt
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F) (b : (A F)ˣ) (c : ℂ),
+      IsIdx δ (b : A F) c
+        → ∀ (φ : S4 F) (v : V4 F),
+          ft4 δ (Pc δ (b : A F) φ.1) v
+            = c * ψ (-(((b⁻¹ : (A F)ˣ) : A F) * q4 δ v)) * ft4 δ φ.1 (-v) := by
   intro F _ _ δ b c h φ v
   have hbc : (b : A F) * ((b⁻¹ : (A F)ˣ) : A F) = 1 := Units.mul_inv b
   let φ' : S4 F := ⟨fun x => ψ (0 * q4 δ x + B4 δ x (-v)) * φ.1 x, chirpQ F δ 0 (-v) φ.1 φ.2⟩
@@ -40,12 +45,14 @@ theorem UpperTheory.ConvolutionTheory.R2.C.idxFt :
     refine integral_congr_ae (Eventually.of_forall fun x => ?_)
     simp only [hφ', zero_mul, zero_add]
     exact mul_comm _ _
-  have hl : ft4 δ (Pc δ (b : A F) φ.1) v =
-      ψ (-(((b⁻¹ : (A F)ˣ) : A F) * q4 δ v)) * Lam4 δ (b : A F) φ'.1 := by
+  have hl
+      : ft4 δ (Pc δ (b : A F) φ.1) v
+        = ψ (-(((b⁻¹ : (A F)ˣ) : A F) * q4 δ v)) * Lam4 δ (b : A F) φ'.1 := by
     unfold ft4 Pc Lam4 abelian₂
     rw [← integral_add_right_eq_self
-      (fun y => ∫ x, φ'.1 x * ψ ((b : A F) * q4 δ (x + y)) ∂(adeleMeasurePi F))
-      (fun i => ((b⁻¹ : (A F)ˣ) : A F) * v i), ← integral_const_mul]
+        (fun y => ∫ x, φ'.1 x * ψ ((b : A F) * q4 δ (x + y)) ∂(adeleMeasurePi F))
+        (fun i => ((b⁻¹ : (A F)ˣ) : A F) * v i),
+      ← integral_const_mul]
     refine integral_congr_ae (Eventually.of_forall fun y => ?_)
     simp only []
     rw [← integral_mul_const, ← integral_const_mul]

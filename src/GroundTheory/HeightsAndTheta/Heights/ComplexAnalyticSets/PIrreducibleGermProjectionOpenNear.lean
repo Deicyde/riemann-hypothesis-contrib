@@ -14,9 +14,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem IrreducibleGermProjectionOpenNear.proof (hiso : IsolatedFibreNear.Statement)
-    (himg : IrreducibleGermProjectionImageNear.Statement) (hopen : FiniteGermProjectionOpenAt.Statement) :
-    IrreducibleGermProjectionOpenNear.Statement := by
+theorem IrreducibleGermProjectionOpenNear.proof
+    (hiso : IsolatedFibreNear.Statement) (himg : IrreducibleGermProjectionImageNear.Statement)
+    (hopen : FiniteGermProjectionOpenAt.Statement)
+    : IrreducibleGermProjectionOpenNear.Statement := by
   intro σ _ X w d A hX hirr hisow hinj
   obtain ⟨N₁, hN₁, h₁⟩ := hiso σ X w d A hX hisow
   obtain ⟨N₂, hN₂, h₂⟩ := himg σ X w d A hX hirr hisow hinj

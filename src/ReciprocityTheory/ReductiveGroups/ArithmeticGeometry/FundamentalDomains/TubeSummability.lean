@@ -8,8 +8,11 @@ public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.FourBasic
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.TubeSummability
 
-open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
-  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
+open NumberField Complex MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+  ReciprocityTheory.ChartRestriction.G.FD.AdmissibleHermitianColumns
+  ReciprocityTheory.ChartRestriction.G.FD.TransvectionPeriodicity
+  ReciprocityTheory.ChartRestriction.G.FD.RealEmbeddingCharacters
   ReciprocityTheory.ChartRestriction.G.FD.FlowMeanContinuity ReciprocityTheory.L2DbarEstimates.Y
 open scoped ComplexConjugate
 
@@ -40,7 +43,9 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
 section line
 
-variable (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (ξ : Fin r → E) (x : Frame X.Ψ r)
+variable
+  (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ)
+  (ξ : Fin r → E) (x : Frame X.Ψ r)
   {n : ℕ} (ω : Fin n → X.Ψ → ℝ)
 
 def Lc (t : Fin n → ℂ) : X.Ψ → ℂ := fun τ => ∑ j, t j * (ω j τ : ℂ)

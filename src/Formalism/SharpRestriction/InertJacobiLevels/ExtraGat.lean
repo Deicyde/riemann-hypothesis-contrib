@@ -10,7 +10,9 @@ namespace Formalism.MainNotions.Inhab
 
 open Formalism.MainNotions.G MvPolynomial
 
-variable {p : ℕ} {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable
+  {p : ℕ} {O Kf : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
 
 def levAll (P : Places p O Kf) : Level P where
   Γ := (∀ v, GL (Fin (P.m + 1)) (P.Qq v)) × ℤˣ
@@ -32,13 +34,14 @@ theorem subst_one : P.subst (fun _ _ => 1) = AlgHom.id Kf P.Xsp := by
   rw [Finset.sum_eq_single a]
   · simp
   · intro b _ hb
-    rw [Matrix.one_apply_ne (Ne.symm hb)]; simp
+    rw [Matrix.one_apply_ne (Ne.symm hb)]
+    simp
   · intro h; exact absurd (Finset.mem_univ _) h
 
 theorem natAct_one : P.natAct (fun _ => 1) = LinearMap.id := by
   unfold Places.natAct
-  simp only [Units.val_one, inv_one, gPos_one, Matrix.det_one, one_zpow, Finset.prod_const_one, one_smul,
-    subst_one]
+  simp only [Units.val_one, inv_one, gPos_one, Matrix.det_one, one_zpow, Finset.prod_const_one,
+    one_smul, subst_one]
   rfl
 
 def sgnEl : (levAll P).Γ := ((1 : ∀ v, GL (Fin (P.m + 1)) (P.Qq v)), (-1 : ℤˣ))
@@ -55,7 +58,8 @@ theorem chi_sgnEl : (((levAll P).χ (sgnEl P) : Oˣ) : O) = -1 := by
   show ((Int.castRingHom O : ℤ →+* O) : ℤ →* O) ((-1 : ℤˣ) : ℤ) = -1
   simp
 
-theorem levAll_funMod (h2 : (2 : Kf) ≠ 0) (Hv : P.Tup → Submodule O P.Xsp) : (levAll P).funMod Hv = ⊥ := by
+theorem levAll_funMod (h2 : (2 : Kf) ≠ 0) (Hv : P.Tup → Submodule O P.Xsp)
+    : (levAll P).funMod Hv = ⊥ := by
   rw [eq_bot_iff]
   intro F hF
   have h := hF.2
@@ -66,8 +70,9 @@ theorem levAll_funMod (h2 : (2 : Kf) ≠ 0) (Hv : P.Tup → Submodule O P.Xsp) :
   funext L
   have h3 := h' L
   rw [LinearMap.mem_ker] at h3
-  simp only [LinearMap.sub_apply, LinearMap.proj_apply, LinearMap.comp_apply, smul_sgnEl, actX_sgnEl, chi_sgnEl,
-    neg_smul, one_smul] at h3
+  simp only [LinearMap.sub_apply, LinearMap.proj_apply, LinearMap.comp_apply, smul_sgnEl,
+      actX_sgnEl, chi_sgnEl, neg_smul, one_smul]
+    at h3
   have h5 : F L - -(F L) = 0 := h3
   have h4 : (2 : Kf) • F L = 0 := by rw [two_smul, ← sub_neg_eq_add]; exact h5
   exact (smul_eq_zero.mp h4).resolve_left h2

@@ -10,29 +10,33 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsSelf
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open MeasureTheory NumberField IsDedekindDomain Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped TensorProduct
 
 noncomputable section
 namespace GlobalTheory.LocalDensityValue
 
-def placeHom (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    Fv F v →+ AF F :=
+def placeHom (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) : Fv F v →+ AF F :=
   (AddMonoidHom.inr (Ainf F) (Af F)).comp (GlobalTheory.AdelicU.singleFin v).toAddMonoidHom
 
-theorem continuous_placeHom (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    Continuous (placeHom F v) :=
+theorem continuous_placeHom (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : Continuous (placeHom F v) :=
   Continuous.prodMk continuous_const (GlobalTheory.AdelicU.continuous_singleFin v)
 
-def localChar (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ)
-    (v : HeightOneSpectrum (𝓞 F)) : AddChar (Fv F v) ℂ :=
+def localChar
+    (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
+    : AddChar (Fv F v) ℂ :=
   ψ.compAddMonoidHom (placeHom F v)
 
-theorem isLocalChar (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ)
-    (hψ : IsCharAF F ψ) (v : HeightOneSpectrum (𝓞 F)) (m : ℤ)
-    (hm : ∀ t : Fv F v, (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (t * s) = 1) ↔
-      Valued.v t ≤ WithZero.exp m) :
-    GlobalTheory.IndefiniteRowSideFullHecke.PlaceSplittingTypes.IsLocalChar F v (localChar F ψ v) := by
+theorem isLocalChar
+    (F : Type) [Field F] [NumberField F]
+    (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
+    (v : HeightOneSpectrum (𝓞 F)) (m : ℤ)
+    (hm : ∀ t : Fv F v,
+      (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (t * s) = 1) ↔ Valued.v t ≤ WithZero.exp m)
+    : GlobalTheory.IndefiniteRowSideFullHecke.PlaceSplittingTypes.IsLocalChar F v
+      (localChar F ψ v) := by
   refine ⟨hψ.1.comp (continuous_placeHom F v), fun t => hψ.2.1 _, ?_⟩
   by_contra h
   push Not at h

@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace PSymplGcd
 
-theorem of_gcd_ne_zero (a b : ℤ) (hc : (Int.gcd a b : ℤ) ≠ 0) :
-    ∃ c a' b' x y : ℤ, a = c * a' ∧ b = c * b' ∧ x * a' + y * b' = 1 := by
+theorem of_gcd_ne_zero (a b : ℤ) (hc : (Int.gcd a b : ℤ) ≠ 0)
+    : ∃ c a' b' x y : ℤ, a = c * a' ∧ b = c * b' ∧ x * a' + y * b' = 1 := by
   obtain ⟨a', ha'⟩ := Int.gcd_dvd_left a b
   obtain ⟨b', hb'⟩ := Int.gcd_dvd_right a b
   refine ⟨(Int.gcd a b : ℤ), a', b', Int.gcdA a b, Int.gcdB a b, ha', hb', ?_⟩

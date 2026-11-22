@@ -11,56 +11,67 @@ namespace GlobalTheory.ReesHomogeneous
 
 variable {σ : Type} {R : Type} [CommRing R]
 
-theorem homogeneousComponent_mul_of_homogeneous_left {S : Type} [CommRing S] {k : ℕ} (n : ℕ)
-    {P : MvPolynomial σ S} (hP : P.IsHomogeneous k) (Q : MvPolynomial σ S) :
-    homogeneousComponent n (P * Q) = if k ≤ n then P * homogeneousComponent (n - k) Q else 0 := by
+theorem homogeneousComponent_mul_of_homogeneous_left
+    {S : Type} [CommRing S]
+    {k : ℕ}
+    (n : ℕ)
+    {P : MvPolynomial σ S} (hP : P.IsHomogeneous k)
+    (Q : MvPolynomial σ S)
+    : homogeneousComponent n (P * Q) = if k ≤ n then P * homogeneousComponent (n - k) Q else 0 := by
   classical
   letI := MvPolynomial.gradedAlgebra (σ := σ) (R := S)
-  have h := DirectSum.coe_decompose_mul_of_left_mem (homogeneousSubmodule σ S) (a := P) (b := Q) n
-    ((mem_homogeneousSubmodule k P).2 hP)
-  have e : ∀ (m : ℕ) (T : MvPolynomial σ S),
-      ((DirectSum.decompose (homogeneousSubmodule σ S) T m : homogeneousSubmodule σ S m) :
-        MvPolynomial σ S) = homogeneousComponent m T :=
-    fun m T => MvPolynomial.decomposition.decompose'_apply T m
+  have h :=
+    DirectSum.coe_decompose_mul_of_left_mem (homogeneousSubmodule σ S) (a := P) (b := Q) n
+      ((mem_homogeneousSubmodule k P).2 hP)
+  have e
+      : ∀ (m : ℕ) (T : MvPolynomial σ S),
+        ((DirectSum.decompose (homogeneousSubmodule σ S) T m : homogeneousSubmodule σ S m)
+            : MvPolynomial σ S)
+          = homogeneousComponent m T := fun m T =>
+    MvPolynomial.decomposition.decompose'_apply T m
   rw [e, e] at h
   exact h
 
-noncomputable def piece (I : Ideal R) (e : ℕ) (F : MvPolynomial σ (reesAlgebra I)) :
-    MvPolynomial σ R :=
+noncomputable def piece (I : Ideal R) (e : ℕ) (F : MvPolynomial σ (reesAlgebra I))
+    : MvPolynomial σ R :=
   ∑ m ∈ F.support, monomial m (((AddMonoidAlgebra.coeff F m : reesAlgebra I) : Polynomial R).coeff e)
 
 variable {I : Ideal R}
 
-@[simp] theorem coeff_piece (e : ℕ) (F : MvPolynomial σ (reesAlgebra I)) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (piece I e F) m = (AddMonoidAlgebra.coeff F m).1.coeff e := by
+@[simp]
+theorem coeff_piece (e : ℕ) (F : MvPolynomial σ (reesAlgebra I)) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (piece I e F) m = (AddMonoidAlgebra.coeff F m).1.coeff e := by
   classical
   simp only [piece, coeff_sum, coeff_monomial, Finset.sum_ite_eq']
   split_ifs with h
   · rfl
   · rw [notMem_support_iff.mp h]; rfl
 
-@[simp] theorem piece_zero (e : ℕ) : piece I e (0 : MvPolynomial σ (reesAlgebra I)) = 0 := by
+@[simp]
+theorem piece_zero (e : ℕ) : piece I e (0 : MvPolynomial σ (reesAlgebra I)) = 0 := by ext m; simp
+
+@[simp]
+theorem piece_add (e : ℕ) (F G : MvPolynomial σ (reesAlgebra I))
+    : piece I e (F + G) = piece I e F + piece I e G := by
   ext m; simp
 
-@[simp] theorem piece_add (e : ℕ) (F G : MvPolynomial σ (reesAlgebra I)) :
-    piece I e (F + G) = piece I e F + piece I e G := by
-  ext m; simp
-
-theorem piece_X_mul (e : ℕ) (i : σ) (F : MvPolynomial σ (reesAlgebra I)) :
-    piece I e (X i * F) = X i * piece I e F := by
+theorem piece_X_mul (e : ℕ) (i : σ) (F : MvPolynomial σ (reesAlgebra I))
+    : piece I e (X i * F) = X i * piece I e F := by
   classical
   ext m
   rw [coeff_piece, coeff_X_mul', coeff_X_mul']
   split_ifs <;> simp
 
-theorem piece_C_mul (e : ℕ) (r : reesAlgebra I) (F : MvPolynomial σ (reesAlgebra I)) :
-    piece I e (C r * F) =
-      ∑ p ∈ Finset.HasAntidiagonal.antidiagonal e, C ((r : Polynomial R).coeff p.1) * piece I p.2 F := by
-  ext m
-  simp [coeff_sum, coeff_C_mul, Polynomial.coeff_mul]
+theorem piece_C_mul (e : ℕ) (r : reesAlgebra I) (F : MvPolynomial σ (reesAlgebra I))
+    : piece I e (C r * F)
+      = ∑ p ∈ Finset.HasAntidiagonal.antidiagonal e, C ((r : Polynomial R).coeff p.1) * piece I p.2 F :=
+  by
+    ext m
+    simp [coeff_sum, coeff_C_mul, Polynomial.coeff_mul]
 
-theorem piece_isHomogeneous (e : ℕ) {d : ℕ} {F : MvPolynomial σ (reesAlgebra I)}
-    (hF : F.IsHomogeneous d) : (piece I e F).IsHomogeneous d := by
+theorem piece_isHomogeneous
+    (e : ℕ) {d : ℕ} {F : MvPolynomial σ (reesAlgebra I)} (hF : F.IsHomogeneous d)
+    : (piece I e F).IsHomogeneous d := by
   intro m hm
   apply hF
   intro h
@@ -68,8 +79,8 @@ theorem piece_isHomogeneous (e : ℕ) {d : ℕ} {F : MvPolynomial σ (reesAlgebr
   rw [coeff_piece, h]
   simp
 
-theorem coeff_piece_mem (e : ℕ) (F : MvPolynomial σ (reesAlgebra I)) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (piece I e F) m ∈ I ^ e := by
+theorem coeff_piece_mem (e : ℕ) (F : MvPolynomial σ (reesAlgebra I)) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (piece I e F) m ∈ I ^ e := by
   rw [coeff_piece]
   exact (mem_reesAlgebra_iff I _).1 (AddMonoidAlgebra.coeff F m).2 e
 
@@ -79,11 +90,16 @@ namespace GlobalTheory.ReesHomogeneous
 
 variable {σ : Type} {R : Type} [CommRing R] {I : Ideal R}
 
-theorem C_mul_mem_of_pow (J : ℕ → Ideal (MvPolynomial σ R))
-    (H : ∀ (e t : ℕ) (a : R) (F : MvPolynomial σ R), a ∈ I → F.IsHomogeneous t →
-      (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e → C a * F ∈ J (e + 1)) :
-    ∀ (k : ℕ) (b : R), b ∈ I ^ k → ∀ (l t : ℕ) (P : MvPolynomial σ R), P.IsHomogeneous t →
-      (∀ m, AddMonoidAlgebra.coeff P m ∈ I ^ l) → P ∈ J l → C b * P ∈ J (l + k) := by
+theorem C_mul_mem_of_pow
+    (J : ℕ → Ideal (MvPolynomial σ R))
+    (H : ∀ (e t : ℕ) (a : R) (F : MvPolynomial σ R),
+      a ∈ I → F.IsHomogeneous t → (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e
+        → C a * F ∈ J (e + 1))
+    : ∀ (k : ℕ) (b : R),
+      b ∈ I ^ k
+        → ∀ (l t : ℕ) (P : MvPolynomial σ R),
+          P.IsHomogeneous t → (∀ m, AddMonoidAlgebra.coeff P m ∈ I ^ l) → P ∈ J l
+            → C b * P ∈ J (l + k) := by
   intro k
   induction k with
   | zero =>
@@ -106,10 +122,12 @@ theorem C_mul_mem_of_pow (J : ℕ → Ideal (MvPolynomial σ R))
       rw [C_add, add_mul]
       exact add_mem hx hy
 
-def reesIdeal (I : Ideal R) (J : ℕ → Ideal (MvPolynomial σ R))
-    (H : ∀ (e t : ℕ) (a : R) (F : MvPolynomial σ R), a ∈ I → F.IsHomogeneous t →
-      (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e → C a * F ∈ J (e + 1)) :
-    Ideal (MvPolynomial σ (reesAlgebra I)) where
+def reesIdeal
+    (I : Ideal R) (J : ℕ → Ideal (MvPolynomial σ R))
+    (H : ∀ (e t : ℕ) (a : R) (F : MvPolynomial σ R),
+      a ∈ I → F.IsHomogeneous t → (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e
+        → C a * F ∈ J (e + 1))
+    : Ideal (MvPolynomial σ (reesAlgebra I)) where
   carrier := {F | ∀ d e, piece I e (homogeneousComponent d F) ∈ J e}
   zero_mem' := by intro d e; simp
   add_mem' := by
@@ -125,11 +143,12 @@ def reesIdeal (I : Ideal R) (J : ℕ → Ideal (MvPolynomial σ R))
       intro F hF d e
       rw [homogeneousComponent_C_mul, piece_C_mul]
       refine Ideal.sum_mem _ fun p hp => ?_
-      have hpe : p.2 + p.1 = e := by rw [add_comm]; exact Finset.HasAntidiagonal.mem_antidiagonal.1 hp
+      have hpe : p.2 + p.1 = e := by
+        rw [add_comm]; exact Finset.HasAntidiagonal.mem_antidiagonal.1 hp
       rw [← hpe]
       exact C_mul_mem_of_pow J H p.1 _ ((mem_reesAlgebra_iff I _).1 r.2 p.1) p.2 d _
-        (piece_isHomogeneous p.2 (homogeneousComponent_isHomogeneous d F))
-        (coeff_piece_mem p.2 _) (hF d p.2)
+        (piece_isHomogeneous p.2 (homogeneousComponent_isHomogeneous d F)) (coeff_piece_mem p.2 _)
+        (hF d p.2)
     | add p q hp hq =>
       intro F hF d e
       rw [add_mul, map_add (f := _), piece_add]
@@ -149,7 +168,20 @@ end GlobalTheory.ReesHomogeneous
 
 namespace GlobalTheory.ReesHomogeneous
 
-theorem exists_homogeneous_ideal : ∀ (R : Type) [CommRing R] (I : Ideal R) (n : ℕ) (J : ℕ → Ideal (MvPolynomial (Fin (n + 1)) R)), (∀ (e t : ℕ) (a : R) (F : MvPolynomial (Fin (n + 1)) R), a ∈ I → F.IsHomogeneous t → (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e → C a * F ∈ J (e + 1)) → ∃ 𝔞 : Ideal (MvPolynomial (Fin (n + 1)) (reesAlgebra I)), (∀ F ∈ 𝔞, ∀ d, homogeneousComponent d F ∈ 𝔞) ∧ ∀ (t : ℕ) (F : MvPolynomial (Fin (n + 1)) (reesAlgebra I)), F.IsHomogeneous t → (F ∈ 𝔞 ↔ ∀ (e : ℕ) (G : MvPolynomial (Fin (n + 1)) R), (∀ m, AddMonoidAlgebra.coeff G m = (AddMonoidAlgebra.coeff F m).1.coeff e) → G ∈ J e) := by
+theorem exists_homogeneous_ideal
+    : ∀ (R : Type) [CommRing R] (I : Ideal R) (n : ℕ)
+        (J : ℕ → Ideal (MvPolynomial (Fin (n + 1)) R)),
+      (∀ (e t : ℕ) (a : R) (F : MvPolynomial (Fin (n + 1)) R),
+          a ∈ I → F.IsHomogeneous t → (∀ m, AddMonoidAlgebra.coeff F m ∈ I ^ e) → F ∈ J e
+            → C a * F ∈ J (e + 1))
+        → ∃ 𝔞 : Ideal (MvPolynomial (Fin (n + 1)) (reesAlgebra I)),
+          (∀ F ∈ 𝔞, ∀ d, homogeneousComponent d F ∈ 𝔞)
+            ∧ ∀ (t : ℕ) (F : MvPolynomial (Fin (n + 1)) (reesAlgebra I)),
+              F.IsHomogeneous t
+                → (F ∈ 𝔞
+                  ↔ ∀ (e : ℕ) (G : MvPolynomial (Fin (n + 1)) R),
+                    (∀ m, AddMonoidAlgebra.coeff G m = (AddMonoidAlgebra.coeff F m).1.coeff e)
+                      → G ∈ J e) := by
   intro R _ I n J H
   refine ⟨reesIdeal I J H, ?_, ?_⟩
   · intro F hF d d' e
@@ -159,8 +191,10 @@ theorem exists_homogeneous_ideal : ∀ (R : Type) [CommRing R] (I : Ideal R) (n 
     · exact hF d e
     · simp
   · intro t F hFt
-    have hG : ∀ (e : ℕ) (G : MvPolynomial (Fin (n + 1)) R),
-        (∀ m, AddMonoidAlgebra.coeff G m = (AddMonoidAlgebra.coeff F m).1.coeff e) → G = piece I e F := by
+    have hG
+        : ∀ (e : ℕ) (G : MvPolynomial (Fin (n + 1)) R),
+          (∀ m, AddMonoidAlgebra.coeff G m = (AddMonoidAlgebra.coeff F m).1.coeff e)
+            → G = piece I e F := by
       intro e G hG
       ext m
       rw [hG, coeff_piece]

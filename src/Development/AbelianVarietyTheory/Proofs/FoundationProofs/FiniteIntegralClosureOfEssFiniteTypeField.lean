@@ -13,8 +13,9 @@ open Polynomial
 
 section General
 
-theorem finiteDimensional_algebraicClosure_of_essFiniteType (K L : Type*) [Field K] [Field L]
-    [Algebra K L] [Algebra.EssFiniteType K L] : FiniteDimensional K (algebraicClosure K L) := by
+theorem finiteDimensional_algebraicClosure_of_essFiniteType
+    (K L : Type*) [Field K] [Field L] [Algebra K L] [Algebra.EssFiniteType K L]
+    : FiniteDimensional K (algebraicClosure K L) := by
   classical
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis K L
   let E := algebraicClosure K L
@@ -43,7 +44,8 @@ theorem finiteDimensional_algebraicClosure_of_essFiniteType (K L : Type*) [Field
       ext m
       have h3 := congrArg (AddMonoidAlgebra.coeff · m) h1
       simp only [MvPolynomial.coeff_sum, mul_comm _ (MvPolynomial.C _), MvPolynomial.coeff_C_mul,
-        MvPolynomial.coeff_map, MvPolynomial.coeff_zero, mul_comm (b _), ← Algebra.smul_def] at h3
+          MvPolynomial.coeff_map, MvPolynomial.coeff_zero, mul_comm (b _), ← Algebra.smul_def]
+        at h3
       exact linearIndependent_iff'.mp b.linearIndependent t (fun j => (q j).coeff m) h3 i hi
     apply Subtype.ext
     rw [← hq, h2, map_zero]
@@ -54,10 +56,10 @@ theorem finiteDimensional_algebraicClosure_of_essFiniteType (K L : Type*) [Field
   haveI := hF.finite
   exact Module.Finite.of_basis b
 
-theorem finite_integralClosure_of_isIntegrallyClosed (A B : Type*) [CommRing A] [IsDomain A]
-    [IsNoetherianRing A] [IsIntegrallyClosed A] [CharZero A] [CommRing B] [IsDomain B]
-    [Algebra A B] [FaithfulSMul A B] [Algebra.EssFiniteType A B] :
-    Module.Finite A (integralClosure A B) := by
+theorem finite_integralClosure_of_isIntegrallyClosed
+    (A B : Type*) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [CharZero A]
+    [CommRing B] [IsDomain B] [Algebra A B] [FaithfulSMul A B] [Algebra.EssFiniteType A B]
+    : Module.Finite A (integralClosure A B) := by
   let K := FractionRing A
   let L := FractionRing B
   letI : Algebra K L := FractionRing.liftAlgebra A L
@@ -78,13 +80,17 @@ theorem finite_integralClosure_of_isIntegrallyClosed (A B : Type*) [CommRing A] 
   exact Module.Finite.of_injective (ψ.toLinearMap.codRestrict _ h)
     (fun x y hxy => hψ (congrArg Subtype.val hxy))
 
-theorem finite_integralClosure_of_cone {A B R L : Type*} [CommRing A] [IsDomain A]
-    [IsNoetherianRing A] [IsIntegrallyClosed A] [CharZero A] [CommRing B] [IsDomain B]
-    [Algebra A B] [FaithfulSMul A B] [Algebra.EssFiniteType A B] [CommRing R] [CommRing L]
-    [Algebra R L] (c : L →+* B) (ev : B →+* L) (t : B) (hc : ∀ z, ev (c z) = z) (ht : ev t = 1)
+theorem finite_integralClosure_of_cone
+    {A B R L : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    [CharZero A] [CommRing B] [IsDomain B] [Algebra A B] [FaithfulSMul A B]
+    [Algebra.EssFiniteType A B] [CommRing R] [CommRing L] [Algebra R L]
+    (c : L →+* B)
+    (ev : B →+* L)
+    (t : B)
+    (hc : ∀ z, ev (c z) = z) (ht : ev t = 1)
     (ε : A →+* R) (hε : ∀ a, ev (algebraMap A B a) = algebraMap R L (ε a))
-    (hti : IsIntegral A t) (hr : ∀ r, ∃ n, IsIntegral A (c (algebraMap R L r) * t ^ n)) :
-    Module.Finite R (integralClosure R L) := by
+    (hti : IsIntegral A t) (hr : ∀ r, ∃ n, IsIntegral A (c (algebraMap R L r) * t ^ n))
+    : Module.Finite R (integralClosure R L) := by
   haveI := finite_integralClosure_of_isIntegrallyClosed A B
   have key : ∀ z : L, IsIntegral R z → ∃ n, IsIntegral A (c z * t ^ n) := by
     rintro z ⟨p, hp, hz⟩
@@ -103,14 +109,16 @@ theorem finite_integralClosure_of_cone {A B R L : Type*} [CommRing A] [IsDomain 
         exact isIntegral_zero
     let q := p.map (c.comp (algebraMap R L))
     have hq : q.Monic := hp.map _
-    have hqz : q.eval (c z) = 0 := by
-      rw [eval_map, ← hom_eval₂, hz, map_zero]
+    have hqz : q.eval (c z) = 0 := by rw [eval_map, ← hom_eval₂, hz, map_zero]
     have hq0 : q.natDegree ≠ 0 := by
       intro h
       rw [hq.natDegree_eq_zero.mp h] at hqz
       simp at hqz
-    refine ⟨N, IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (t ^ N))
-      ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_⟩
+    refine ⟨
+      N,
+      IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (t ^ N))
+        ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_
+    ⟩
     · rw [mul_comm, scaleRoots_eval_mul, hqz, mul_zero]
       exact isIntegral_zero
     · rw [coeff_scaleRoots]
@@ -124,8 +132,7 @@ theorem finite_integralClosure_of_cone {A B R L : Type*} [CommRing A] [IsDomain 
   haveI : IsScalarTower A R L := .of_algebraMap_eq' rfl
   let ev' : B →ₐ[A] L := { ev with commutes' := hε }
   let φ : integralClosure A B →ₐ[A] (integralClosure R L).restrictScalars A :=
-    (ev'.comp (integralClosure A B).val).codRestrict _ fun w =>
-      (IsIntegral.map ev' w.2).tower_top
+    (ev'.comp (integralClosure A B).val).codRestrict _ fun w => (IsIntegral.map ev' w.2).tower_top
   have hφ : Function.Surjective φ := by
     rintro ⟨z, hz⟩
     obtain ⟨n, hn⟩ := key z hz
@@ -135,21 +142,24 @@ theorem finite_integralClosure_of_cone {A B R L : Type*} [CommRing A] [IsDomain 
   haveI : Module.Finite A (integralClosure R L) := Module.Finite.of_surjective φ.toLinearMap hφ
   exact Module.Finite.of_restrictScalars_finite A R _
 
-theorem finite_integralClosure_of_family {R B ι : Type*} [CommRing R] [IsNoetherianRing R]
-    [CommRing B] [Algebra R B] [Finite ι] {L : ι → Type*} [∀ i, CommRing (L i)]
-    [∀ i, Algebra R (L i)] [∀ i, Module.Finite R (integralClosure R (L i))]
-    (φ : ∀ i, B →ₐ[R] L i) (hφ : ∀ b, (∀ i, φ i b = 0) → b = 0) :
-    Module.Finite R (integralClosure R B) := by
-  let ψ : integralClosure R B →ₗ[R] ∀ i, integralClosure R (L i) := LinearMap.pi fun i =>
-    (((φ i).comp (integralClosure R B).val).codRestrict (integralClosure R (L i))
-      fun z => IsIntegral.map (φ i) z.2).toLinearMap
+theorem finite_integralClosure_of_family
+    {R B ι : Type*} [CommRing R] [IsNoetherianRing R] [CommRing B] [Algebra R B] [Finite ι]
+    {L : ι → Type*}
+    [∀ i, CommRing (L i)] [∀ i, Algebra R (L i)] [∀ i, Module.Finite R (integralClosure R (L i))]
+    (φ : ∀ i, B →ₐ[R] L i) (hφ : ∀ b, (∀ i, φ i b = 0) → b = 0)
+    : Module.Finite R (integralClosure R B) := by
+  let ψ : integralClosure R B →ₗ[R] ∀ i, integralClosure R (L i) :=
+    LinearMap.pi fun i =>
+      (((φ i).comp (integralClosure R B).val).codRestrict (integralClosure R (L i)) fun z =>
+        IsIntegral.map (φ i) z.2).toLinearMap
   refine Module.Finite.of_injective ψ ((injective_iff_map_eq_zero ψ).mpr fun z hz => ?_)
   exact Subtype.ext (hφ z fun i => congrArg Subtype.val (congrFun hz i))
 
-theorem finite_integralClosure_of_finite_tower (R R₁ L : Type*) [CommRing R] [CommRing R₁]
-    [CommRing L] [Algebra R R₁] [Algebra R₁ L] [Algebra R L] [IsScalarTower R R₁ L]
-    [Module.Finite R R₁] [Module.Finite R₁ (integralClosure R₁ L)] :
-    Module.Finite R (integralClosure R L) := by
+theorem finite_integralClosure_of_finite_tower
+    (R R₁ L : Type*)
+    [CommRing R] [CommRing R₁] [CommRing L] [Algebra R R₁] [Algebra R₁ L] [Algebra R L]
+    [IsScalarTower R R₁ L] [Module.Finite R R₁] [Module.Finite R₁ (integralClosure R₁ L)]
+    : Module.Finite R (integralClosure R L) := by
   haveI : IsScalarTower R R₁ (integralClosure R₁ L) :=
     .of_algebraMap_eq fun x => Subtype.ext (IsScalarTower.algebraMap_apply R R₁ L x)
   haveI : Module.Finite R (integralClosure R₁ L) := Module.Finite.trans R₁ _
@@ -162,15 +172,16 @@ section Local
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem finite_localizedModule_integralClosure {R L : Type*} [CommRing R] [CommRing L]
-    [Algebra R L] (g : R) [Algebra (Localization.Away g) L]
-    [IsScalarTower R (Localization.Away g) L]
-    [Module.Finite (Localization.Away g) (integralClosure (Localization.Away g) L)] :
-    Module.Finite (Localization.Away g) (LocalizedModule.Away g (integralClosure R L)) := by
-  let f : integralClosure R L →ₗ[R] integralClosure (Localization.Away g) L :=
-    { toFun z := ⟨z, IsIntegral.tower_top z.2⟩
-      map_add' _ _ := rfl
-      map_smul' _ _ := rfl }
+theorem finite_localizedModule_integralClosure
+    {R L : Type*} [CommRing R] [CommRing L] [Algebra R L]
+    (g : R) [Algebra (Localization.Away g) L] [IsScalarTower R (Localization.Away g) L]
+    [Module.Finite (Localization.Away g) (integralClosure (Localization.Away g) L)]
+    : Module.Finite (Localization.Away g) (LocalizedModule.Away g (integralClosure R L)) := by
+  let f : integralClosure R L →ₗ[R] integralClosure (Localization.Away g) L := {
+    toFun z := ⟨z, IsIntegral.tower_top z.2⟩
+    map_add' _ _ := rfl
+    map_smul' _ _ := rfl
+  }
   haveI : IsLocalizedModule (Submonoid.powers g) f :=
     { map_units := (isLocalizedModule_id (Submonoid.powers g) _ (Localization.Away g)).map_units
       surj y := by
@@ -185,15 +196,16 @@ theorem finite_localizedModule_integralClosure {R L : Type*} [CommRing R] [CommR
 
 variable {σ o L : Type*} [CommRing o] [CommRing L] [Algebra o L]
 
-noncomputable def coneHom (o : Type*) [CommRing o] [Algebra o L] (ρ : σ → L) :
-    MvPolynomial σ o →ₐ[o] L[X] :=
+noncomputable def coneHom (o : Type*) [CommRing o] [Algebra o L] (ρ : σ → L)
+    : MvPolynomial σ o →ₐ[o] L[X] :=
   MvPolynomial.aeval fun s => C (ρ s) * X
 
-@[simp] theorem coneHom_X (ρ : σ → L) (s : σ) :
-    coneHom o ρ (MvPolynomial.X s) = C (ρ s) * X := MvPolynomial.aeval_X _ _
+@[simp]
+theorem coneHom_X (ρ : σ → L) (s : σ) : coneHom o ρ (MvPolynomial.X s) = C (ρ s) * X :=
+  MvPolynomial.aeval_X _ _
 
-theorem coneHom_of_isHomogeneous (ρ : σ → L) {p : MvPolynomial σ o} {n : ℕ}
-    (hp : p.IsHomogeneous n) : coneHom o ρ p = C (MvPolynomial.aeval ρ p) * X ^ n := by
+theorem coneHom_of_isHomogeneous (ρ : σ → L) {p : MvPolynomial σ o} {n : ℕ} (hp : p.IsHomogeneous n)
+    : coneHom o ρ p = C (MvPolynomial.aeval ρ p) * X ^ n := by
   conv_lhs => rw [p.as_sum]
   conv_rhs => rw [p.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -206,13 +218,13 @@ theorem coneHom_of_isHomogeneous (ρ : σ → L) {p : MvPolynomial σ o} {n : �
   simp only [Finsupp.prod, mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, map_mul,
     map_prod, map_pow, Polynomial.algebraMap_apply, mul_assoc, Finsupp.degree_apply]
 
-
 attribute [local instance] MvPolynomial.gradedAlgebra in
-theorem isHomogeneous_ker_coneHom (ρ : σ → L) :
-    (RingHom.ker (coneHom o ρ)).IsHomogeneous (MvPolynomial.homogeneousSubmodule σ o) := by
+theorem isHomogeneous_ker_coneHom (ρ : σ → L)
+    : (RingHom.ker (coneHom o ρ)).IsHomogeneous (MvPolynomial.homogeneousSubmodule σ o) := by
   intro n p hp
-  have h1 : ((DirectSum.decompose (MvPolynomial.homogeneousSubmodule σ o) p n : _) :
-      MvPolynomial σ o) = MvPolynomial.homogeneousComponent n p :=
+  have h1
+      : ((DirectSum.decompose (MvPolynomial.homogeneousSubmodule σ o) p n : _) : MvPolynomial σ o)
+        = MvPolynomial.homogeneousComponent n p :=
     MvPolynomial.decomposition.decompose'_apply _ _
   rw [h1, RingHom.mem_ker]
   by_cases hn : n < p.totalDegree + 1
@@ -220,22 +232,26 @@ theorem isHomogeneous_ker_coneHom (ρ : σ → L) :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← MvPolynomial.sum_homogeneousComponent p, map_sum] at h2
     simp only [coneHom_of_isHomogeneous ρ (MvPolynomial.homogeneousComponent_isHomogeneous _ p),
-      Polynomial.finsetSum_coeff, coeff_C_mul_X_pow, Finset.sum_ite_eq, Finset.mem_range, hn, if_true,
-      coeff_zero] at h2
+        Polynomial.finsetSum_coeff, coeff_C_mul_X_pow, Finset.sum_ite_eq, Finset.mem_range, hn,
+        if_true, coeff_zero]
+      at h2
     rw [coneHom_of_isHomogeneous ρ (MvPolynomial.homogeneousComponent_isHomogeneous _ p), h2,
       map_zero, zero_mul]
   · rw [MvPolynomial.homogeneousComponent_eq_zero _ _ (by omega), map_zero]
 
-theorem finite_integralClosure_of_coneHom [IsDomain o] [IsNoetherianRing o] [IsIntegrallyClosed o]
-    [CharZero o] [IsDomain L] [Algebra.EssFiniteType o L] {R : Type*} [CommRing R] [Algebra o R]
-    [Algebra R L] [IsScalarTower o R L] (ρ : σ → R) {s₀ : σ} (h₀ : ρ s₀ = 1)
-    (hρ : Function.Surjective (MvPolynomial.aeval ρ : MvPolynomial σ o →ₐ[o] R)) {δ : ℕ}
-    (F : Fin δ → MvPolynomial σ o)
+theorem finite_integralClosure_of_coneHom
+    [IsDomain o] [IsNoetherianRing o] [IsIntegrallyClosed o] [CharZero o] [IsDomain L]
+    [Algebra.EssFiniteType o L]
+    {R : Type*} [CommRing R] [Algebra o R] [Algebra R L] [IsScalarTower o R L]
+    (ρ : σ → R)
+    {s₀ : σ} (h₀ : ρ s₀ = 1)
+    (hρ : Function.Surjective (MvPolynomial.aeval ρ : MvPolynomial σ o →ₐ[o] R))
+    {δ : ℕ} (F : Fin δ → MvPolynomial σ o)
     (hind : AlgebraicIndependent o fun i => coneHom o (fun s => algebraMap R L (ρ s)) (F i))
-    (hfin : (MvPolynomial.aeval fun i =>
-      (coneHom o (fun s => algebraMap R L (ρ s))).rangeRestrict (F i) :
-        MvPolynomial (Fin δ) o →ₐ[o] _).Finite) :
-    Module.Finite R (integralClosure R L) := by
+    (hfin
+      : (MvPolynomial.aeval fun i => (coneHom o (fun s => algebraMap R L (ρ s))).rangeRestrict (F i)
+        : MvPolynomial (Fin δ) o →ₐ[o] _).Finite)
+    : Module.Finite R (integralClosure R L) := by
   set φ := coneHom o (fun s => algebraMap R L (ρ s)) with hφ
   let θ : MvPolynomial (Fin δ) o →ₐ[o] L[X] := MvPolynomial.aeval fun i => φ (F i)
   letI : Algebra (MvPolynomial (Fin δ) o) L[X] := θ.toRingHom.toAlgebra
@@ -256,16 +272,21 @@ theorem finite_integralClosure_of_coneHom [IsDomain o] [IsNoetherianRing o] [IsI
     rw [RingHom.algebraMap_toAlgebra, ← h2]
     exact h1
   have hX : φ (MvPolynomial.X s₀) = X := by simp [hφ, h₀]
-  refine finite_integralClosure_of_cone (A := MvPolynomial (Fin δ) o) C (evalRingHom 1) X
-    (by simp) (by simp)
-    (MvPolynomial.aeval fun i => MvPolynomial.aeval ρ (F i) :
-      MvPolynomial (Fin δ) o →ₐ[o] R).toRingHom (fun a => ?_) (hX ▸ hint _) fun r => ?_
-  · have h1 : ((aeval (1 : L)).restrictScalars o).comp φ =
-        (IsScalarTower.toAlgHom o R L).comp (MvPolynomial.aeval ρ) := by
+  refine finite_integralClosure_of_cone (A := MvPolynomial (Fin δ) o) C (evalRingHom 1) X (by simp)
+    (by simp)
+    (MvPolynomial.aeval fun i => MvPolynomial.aeval ρ (F i)
+      : MvPolynomial (Fin δ) o →ₐ[o] R).toRingHom
+    (fun a => ?_)
+    (hX ▸ hint _)
+    fun r => ?_
+  · have h1
+        : ((aeval (1 : L)).restrictScalars o).comp φ
+          = (IsScalarTower.toAlgHom o R L).comp (MvPolynomial.aeval ρ) := by
       ext s; simp [hφ]
-    have h2 : ((aeval (1 : L)).restrictScalars o).comp θ =
-        (IsScalarTower.toAlgHom o R L).comp
-          (MvPolynomial.aeval fun i => MvPolynomial.aeval ρ (F i)) := by
+    have h2
+        : ((aeval (1 : L)).restrictScalars o).comp θ
+          = (IsScalarTower.toAlgHom o R L).comp
+            (MvPolynomial.aeval fun i => MvPolynomial.aeval ρ (F i)) := by
       ext i; simpa [θ] using AlgHom.congr_fun h1 (F i)
     simpa [RingHom.algebraMap_toAlgebra] using AlgHom.congr_fun h2 a
   · obtain ⟨p, rfl⟩ := hρ r
@@ -287,23 +308,33 @@ theorem finite_integralClosure_of_coneHom [IsDomain o] [IsNoetherianRing o] [IsI
       simp only [coneHom_X, map_mul, MvPolynomial.aeval_X]
       ring
 
-theorem finite_integralClosure_away_of_forms [Finite σ] [IsDomain L] {R : Type*} [CommRing R]
-    [Algebra o R] [Algebra R L] [IsScalarTower o R L] (a : o) (o' R' : Type*) [CommRing o']
-    [IsDomain o'] [IsNoetherianRing o'] [IsIntegrallyClosed o'] [CharZero o'] [CommRing R']
-    [Algebra o o'] [IsLocalization.Away a o'] [Algebra R R']
+theorem finite_integralClosure_away_of_forms
+    [Finite σ] [IsDomain L]
+    {R : Type*} [CommRing R] [Algebra o R] [Algebra R L] [IsScalarTower o R L]
+    (a : o) (o' R' : Type*)
+    [CommRing o'] [IsDomain o'] [IsNoetherianRing o'] [IsIntegrallyClosed o'] [CharZero o']
+    [CommRing R'] [Algebra o o'] [IsLocalization.Away a o'] [Algebra R R']
     [IsLocalization.Away (algebraMap o R a) R'] [Algebra o R'] [Algebra o' R'] [Algebra o' L]
     [Algebra R' L] [IsScalarTower o R R'] [IsScalarTower o o' R'] [IsScalarTower o o' L]
     [IsScalarTower o' R' L] [IsScalarTower R R' L] [Algebra.EssFiniteType o' L]
-    (ρ : σ → R) {s₀ : σ} (h₀ : ρ s₀ = 1)
-    (hρ : Function.Surjective (MvPolynomial.aeval ρ : MvPolynomial σ o →ₐ[o] R)) {δ : ℕ}
-    (F : Fin δ → MvPolynomial σ o) {e d₀ : ℕ} (he : 0 < e) (hed : e ≤ d₀)
+    (ρ : σ → R)
+    {s₀ : σ} (h₀ : ρ s₀ = 1)
+    (hρ : Function.Surjective (MvPolynomial.aeval ρ : MvPolynomial σ o →ₐ[o] R))
+    {δ : ℕ} (F : Fin δ → MvPolynomial σ o)
+    {e d₀ : ℕ} (he : 0 < e) (hed : e ≤ d₀)
     (hind : AlgebraicIndependent o fun i => coneHom o (fun s => algebraMap R L (ρ s)) (F i))
-    (hgen : ∀ d, d₀ ≤ d → ∀ p : MvPolynomial σ o, p.IsHomogeneous d → a • p ∈
-      formCombinations (RingHom.ker (coneHom o fun s => algebraMap R L (ρ s))) F (d - e)) :
-    Module.Finite R' (integralClosure R' L) := by
+    (hgen : ∀ d,
+      d₀ ≤ d
+        → ∀ p : MvPolynomial σ o,
+          p.IsHomogeneous d
+            → a • p
+              ∈ formCombinations (RingHom.ker (coneHom o fun s => algebraMap R L (ρ s))) F (d - e))
+    : Module.Finite R' (integralClosure R' L) := by
   let ρ' : σ → R' := fun s => algebraMap R R' (ρ s)
-  have h1 : ∀ p : MvPolynomial σ o, MvPolynomial.aeval ρ' (MvPolynomial.map (algebraMap o o') p) =
-      algebraMap R R' (MvPolynomial.aeval ρ p) := fun p => by
+  have h1
+      : ∀ p : MvPolynomial σ o,
+        MvPolynomial.aeval ρ' (MvPolynomial.map (algebraMap o o') p)
+          = algebraMap R R' (MvPolynomial.aeval ρ p) := fun p => by
     rw [MvPolynomial.aeval_map_algebraMap]
     exact MvPolynomial.aeval_algebraMap_apply R' ρ p
   have hρ' : Function.Surjective (MvPolynomial.aeval ρ' : MvPolynomial σ o' →ₐ[o'] R') := by
@@ -313,34 +344,36 @@ theorem finite_integralClosure_away_of_forms [Finite σ] [IsDomain L] {R : Type*
     obtain ⟨v, hv⟩ := (IsLocalization.Away.algebraMap_isUnit (S := o') a).exists_right_inv
     refine ⟨MvPolynomial.map (algebraMap o o') p * MvPolynomial.C v ^ n, ?_⟩
     rw [map_mul, h1, ← hy, map_pow, MvPolynomial.aeval_C, ← IsScalarTower.algebraMap_apply,
-      IsScalarTower.algebraMap_apply o o' R', mul_assoc, ← mul_pow, ← map_mul, hv, map_one,
-      one_pow, mul_one]
+      IsScalarTower.algebraMap_apply o o' R', mul_assoc, ← mul_pow, ← map_mul, hv, map_one, one_pow,
+      mul_one]
   let φ' := coneHom o' fun s => algebraMap R' L (ρ' s)
-  have h2 : ∀ p, φ' (MvPolynomial.map (algebraMap o o') p) =
-      coneHom o (fun s => algebraMap R L (ρ s)) p := fun p => by
-    simp only [φ', coneHom, MvPolynomial.aeval_map_algebraMap, ρ',
-      ← IsScalarTower.algebraMap_apply]
+  have h2
+      : ∀ p,
+        φ' (MvPolynomial.map (algebraMap o o') p)
+          = coneHom o (fun s => algebraMap R L (ρ s)) p := fun p => by
+    simp only [φ', coneHom, MvPolynomial.aeval_map_algebraMap, ρ', ← IsScalarTower.algebraMap_apply]
   haveI : Nontrivial o := (algebraMap o o').domain_nontrivial
   haveI : Algebra.IsAlgebraic o o' := IsLocalization.isAlgebraic o' (Submonoid.powers a)
   have h3 : AlgebraicIndependent o' fun i => φ' (MvPolynomial.map (algebraMap o o') (F i)) := by
     simpa only [← h2] using hind.extendScalars o'
   exact finite_integralClosure_of_coneHom ρ' (s₀ := s₀) (by simp [ρ', h₀]) hρ'
-    (fun i => MvPolynomial.map (algebraMap o o') (F i)) h3
-    (finite_aeval_of_smul_mem_formCombinations he hed hgen
-      (IsLocalization.Away.algebraMap_isUnit a) φ'.rangeRestrict φ'.rangeRestrict_surjective
-      fun p hp => Subtype.ext ((h2 p).trans hp))
+    (fun i => MvPolynomial.map (algebraMap o o') (F i))
+    h3
+    (finite_aeval_of_smul_mem_formCombinations he hed hgen (IsLocalization.Away.algebraMap_isUnit a)
+      φ'.rangeRestrict φ'.rangeRestrict_surjective fun p hp => Subtype.ext ((h2 p).trans hp))
 
 end Local
 
 section Main
 
-variable (o R : Type*) [CommRing o] [IsDedekindDomain o] [CommRing R] [Algebra o R]
-  [Algebra.FiniteType o R]
+variable
+  (o R : Type*)
+  [CommRing o] [IsDedekindDomain o] [CommRing R] [Algebra o R] [Algebra.FiniteType o R]
 
-theorem finite_integralClosure_of_injective (L : Type*) [Field L] [CharZero o] [Algebra R L]
-    [Algebra.EssFiniteType R L]
-    (hinj : Function.Injective ((algebraMap R L).comp (algebraMap o R))) :
-    Module.Finite R (integralClosure R L) := by
+theorem finite_integralClosure_of_injective
+    (L : Type*) [Field L] [CharZero o] [Algebra R L] [Algebra.EssFiniteType R L]
+    (hinj : Function.Injective ((algebraMap R L).comp (algebraMap o R)))
+    : Module.Finite R (integralClosure R L) := by
   classical
   letI : Algebra o L := ((algebraMap R L).comp (algebraMap o R)).toAlgebra
   haveI : IsScalarTower o R L := .of_algebraMap_eq' rfl
@@ -360,15 +393,18 @@ theorem finite_integralClosure_of_injective (L : Type*) [Field L] [CharZero o] [
   have hψ : Function.Injective ψ := Ideal.kerLiftAlg_injective φ
   haveI : Module.IsTorsionFree o (MvPolynomial σ o ⧸ I) :=
     Function.Injective.moduleIsTorsionFree ψ hψ (fun c x => map_smul _ c x)
-  have key : ∀ lam : Ideal o, lam.IsMaximal → ∃ a ∉ lam,
-      Module.Finite (Localization.Away (algebraMap o R a))
-        (LocalizedModule.Away (algebraMap o R a) (integralClosure R L)) := by
+  have key
+      : ∀ lam : Ideal o,
+        lam.IsMaximal
+          → ∃ a ∉ lam,
+            Module.Finite (Localization.Away (algebraMap o R a))
+              (LocalizedModule.Away (algebraMap o R a) (integralClosure R L)) := by
     intro lam hlam
     obtain ⟨δ, e, d₀, a, F, -, ha1, he, hed, -, hind, hgen⟩ :=
       exists_forms_algebraicIndependent_smul_sub_sum_mem I hI lam
         (map_algebraMap_quotient_ne_top I hI (RingHom.ker_ne_top φ) hlam.ne_top)
-    have ha : a ∉ lam := fun h => hlam.ne_top
-      ((Ideal.eq_top_iff_one _).mpr (by simpa using lam.sub_mem h ha1))
+    have ha : a ∉ lam := fun h =>
+      hlam.ne_top ((Ideal.eq_top_iff_one _).mpr (by simpa using lam.sub_mem h ha1))
     have hind' : AlgebraicIndependent o fun i => φ (F i) := hind.map' (f := ψ) hψ
     refine ⟨a, ha, ?_⟩
     have ha0 : a ≠ 0 := fun h => ha (h ▸ lam.zero_mem)
@@ -402,8 +438,9 @@ theorem finite_integralClosure_of_injective (L : Type*) [Field L] [CharZero o] [
     haveI := finite_integralClosure_away_of_forms (L := L) a o' R' ρ (s₀ := s₀) rfl hρ F he hed
       hind' hgen
     exact finite_localizedModule_integralClosure _
-  let t : Set o := {a | Module.Finite (Localization.Away (algebraMap o R a))
-    (LocalizedModule.Away (algebraMap o R a) (integralClosure R L))}
+  let t : Set o :=
+    {a | Module.Finite (Localization.Away (algebraMap o R a))
+      (LocalizedModule.Away (algebraMap o R a) (integralClosure R L))}
   have ht : Ideal.span t = ⊤ := by
     by_contra h
     obtain ⟨lam, hlam, hle⟩ := Ideal.exists_le_maximal _ h
@@ -414,10 +451,10 @@ theorem finite_integralClosure_of_injective (L : Type*) [Field L] [CharZero o] [
   · rintro ⟨_, a, ha, rfl⟩
     exact ha
 
-
 include o in
-theorem finite_integralClosure_of_essFiniteType_field (L : Type*) [Field L] [CharZero L]
-    [Algebra R L] [Algebra.EssFiniteType R L] : Module.Finite R (integralClosure R L) := by
+theorem finite_integralClosure_of_essFiniteType_field
+    (L : Type*) [Field L] [CharZero L] [Algebra R L] [Algebra.EssFiniteType R L]
+    : Module.Finite R (integralClosure R L) := by
   let χ := (algebraMap R L).comp (algebraMap o R)
   by_cases hinj : Function.Injective χ
   · haveI : CharZero o := χ.charZero
@@ -438,10 +475,11 @@ theorem finite_integralClosure_of_essFiniteType_field (L : Type*) [Field L] [Cha
     haveI := finite_integralClosure_of_injective (o ⧸ p) R₁ L (RingHom.injective _)
     exact finite_integralClosure_of_finite_tower R R₁ L
 
-theorem finite_integralClosure_dedekind [CharZero o] [IsDomain R] [FaithfulSMul o R]
+theorem finite_integralClosure_dedekind
+    [CharZero o] [IsDomain R] [FaithfulSMul o R]
     (K L : Type*) [Field K] [Algebra R K] [IsFractionRing R K] [Field L] [Algebra K L]
-    [FiniteDimensional K L] [Algebra R L] [IsScalarTower R K L] :
-    Module.Finite R (integralClosure R L) := by
+    [FiniteDimensional K L] [Algebra R L] [IsScalarTower R K L]
+    : Module.Finite R (integralClosure R L) := by
   haveI : Algebra.EssFiniteType R K := .of_isLocalization K (nonZeroDivisors R)
   haveI : Algebra.EssFiniteType R L := .comp R K L
   refine finite_integralClosure_of_injective o R L ?_
@@ -449,18 +487,20 @@ theorem finite_integralClosure_dedekind [CharZero o] [IsDomain R] [FaithfulSMul 
   exact ((algebraMap K L).injective.comp (IsFractionRing.injective R K)).comp
     (FaithfulSMul.algebraMap_injective o R)
 
-theorem finite_of_isIntegralClosure_dedekind [CharZero o] [IsDomain R] [FaithfulSMul o R]
+theorem finite_of_isIntegralClosure_dedekind
+    [CharZero o] [IsDomain R] [FaithfulSMul o R]
     (K L C : Type*) [Field K] [Algebra R K] [IsFractionRing R K] [Field L] [Algebra K L]
     [FiniteDimensional K L] [Algebra R L] [IsScalarTower R K L] [CommRing C] [Algebra R C]
-    [Algebra C L] [IsScalarTower R C L] [IsIntegralClosure C R L] : Module.Finite R C :=
+    [Algebra C L] [IsScalarTower R C L] [IsIntegralClosure C R L]
+    : Module.Finite R C :=
   haveI := finite_integralClosure_dedekind o R K L
   .equiv (IsIntegralClosure.equiv R (integralClosure R L) L C).toLinearEquiv
 
-
 include o in
-theorem finite_integralClosure_of_essFiniteType_of_isReduced (B : Type*) [CommRing B]
-    [IsReduced B] [IsAddTorsionFree B] [Algebra R B] [Algebra.EssFiniteType R B] :
-    Module.Finite R (integralClosure R B) := by
+theorem finite_integralClosure_of_essFiniteType_of_isReduced
+    (B : Type*)
+    [CommRing B] [IsReduced B] [IsAddTorsionFree B] [Algebra R B] [Algebra.EssFiniteType R B]
+    : Module.Finite R (integralClosure R B) := by
   haveI : IsNoetherianRing R := Algebra.FiniteType.isNoetherianRing o R
   haveI : IsNoetherianRing B := Algebra.EssFiniteType.isNoetherianRing R B
   haveI : Finite (minimalPrimes B) := (minimalPrimes.finite_of_isNoetherianRing B).to_subtype
@@ -475,10 +515,12 @@ theorem finite_integralClosure_of_essFiniteType_of_isReduced (B : Type*) [CommRi
   haveI (p : minimalPrimes B) : Algebra.EssFiniteType R p.1.ResidueField := .comp R B _
   haveI (p : minimalPrimes B) := finite_integralClosure_of_essFiniteType_field o R p.1.ResidueField
   refine finite_integralClosure_of_family
-    (fun p : minimalPrimes B => IsScalarTower.toAlgHom R B p.1.ResidueField) fun b hb => ?_
-  have h : b ∈ sInf (minimalPrimes B) := Submodule.mem_sInf.mpr fun p hp' =>
-    haveI := hp ⟨p, hp'⟩
-    Ideal.algebraMap_residueField_eq_zero.mp (hb ⟨p, hp'⟩)
+    (fun p : minimalPrimes B => IsScalarTower.toAlgHom R B p.1.ResidueField)
+    fun b hb => ?_
+  have h : b ∈ sInf (minimalPrimes B) :=
+    Submodule.mem_sInf.mpr fun p hp' =>
+      haveI := hp ⟨p, hp'⟩
+      Ideal.algebraMap_residueField_eq_zero.mp (hb ⟨p, hp'⟩)
   rw [minimalPrimes, Ideal.sInf_minimalPrimes] at h
   exact IsReduced.eq_zero b (mem_nilradical.mp h)
 
@@ -490,18 +532,21 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace
 
 universe u
 
-variable {X Y : Scheme.{u}} {o : CommRingCat.{u}} [IsDedekindDomain o]
-  (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f] (g : Y ⟶ Spec o) [LocallyOfFiniteType g]
+variable
+  {X Y : Scheme.{u}} {o : CommRingCat.{u}} [IsDedekindDomain o]
+  (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f]
+  (g : Y ⟶ Spec o) [LocallyOfFiniteType g]
 
-theorem essFiniteType_germ {U : Y.Opens} (hU : IsAffineOpen U) (y : Y) (hy : y ∈ U) :
-    (Y.presheaf.germ U y hy).hom.EssFiniteType :=
+theorem essFiniteType_germ {U : Y.Opens} (hU : IsAffineOpen U) (y : Y) (hy : y ∈ U)
+    : (Y.presheaf.germ U y hy).hom.EssFiniteType :=
   letI := Y.presheaf.algebra_section_stalk (⟨y, hy⟩ : U)
   haveI := hU.isLocalization_stalk ⟨y, hy⟩
   Algebra.EssFiniteType.of_isLocalization (Y.presheaf.stalk y)
     (hU.primeIdealOf ⟨y, hy⟩).asIdeal.primeCompl
 
-theorem essFiniteType_stalkMap_SpecMap {A B : CommRingCat.{u}} (φ : A ⟶ B)
-    (hφ : φ.hom.EssFiniteType) (x : Spec B) : ((Spec.map φ).stalkMap x).hom.EssFiniteType := by
+theorem essFiniteType_stalkMap_SpecMap
+    {A B : CommRingCat.{u}} (φ : A ⟶ B) (hφ : φ.hom.EssFiniteType) (x : Spec B)
+    : ((Spec.map φ).stalkMap x).hom.EssFiniteType := by
   refine .of_comp ((Spec A).presheaf.germ ⊤ (Spec.map φ x) (Opens.mem_top _)).hom ?_
   rw [← CommRingCat.hom_comp, Scheme.Hom.germ_stalkMap, CommRingCat.hom_comp]
   refine .comp ?_ (essFiniteType_germ (isAffineOpen_top _) _ _)
@@ -509,18 +554,19 @@ theorem essFiniteType_stalkMap_SpecMap {A B : CommRingCat.{u}} (φ : A ⟶ B)
     rw [← Scheme.ΓSpecIso_naturality_assoc, Iso.hom_inv_id, Category.comp_id]
   change (Spec.map φ).appTop.hom.EssFiniteType
   rw [h]
-  exact .comp (RingHom.FiniteType.of_surjective _
-    (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso A).hom).2).essFiniteType (hφ.comp
+  exact .comp
     (RingHom.FiniteType.of_surjective _
+      (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso A).hom).2).essFiniteType
+    (hφ.comp (RingHom.FiniteType.of_surjective _
       (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso B).inv).2).essFiniteType)
 
 include g in
-
-theorem isFinite_fromNormalization_of_dense [IsReduced X] {D : Set X} (hD : Dense D)
-    (hfin : ∀ W : X.Opens, IsCompact (W : Set X) → (D ∩ W).Finite)
+theorem isFinite_fromNormalization_of_dense
+    [IsReduced X]
+    {D : Set X} (hD : Dense D) (hfin : ∀ W : X.Opens, IsCompact (W : Set X) → (D ∩ W).Finite)
     (hchar : ∀ x ∈ D, CharZero (X.residueField x))
-    (hess : ∀ x ∈ D, (f.residueFieldMap x).hom.EssFiniteType) :
-    IsFinite f.fromNormalization := by
+    (hess : ∀ x ∈ D, (f.residueFieldMap x).hom.EssFiniteType)
+    : IsFinite f.fromNormalization := by
   refine ⟨fun U hU => ?_⟩
   letI := (f.app U).hom.toAlgebra
   letI : Algebra o Γ(Y, U) := ((Scheme.ΓSpecIso o).inv ≫ g.appLE ⊤ U le_top).hom.toAlgebra
@@ -553,18 +599,20 @@ theorem isFinite_fromNormalization_of_dense [IsReduced X] {D : Set X} (hD : Dens
     (.of_surjective _ (ConcreteCategory.bijective_of_isIso (f.normalizationObjIso hU).inv).2)
     (RingHom.finite_algebraMap.mpr this)
 
-
 omit g in
-theorem finite_genericPoints_inter [IsLocallyNoetherian X] (W : X.Opens)
-    (hW : IsCompact (W : Set X)) : (genericPoints X ∩ W).Finite := by
+theorem finite_genericPoints_inter
+    [IsLocallyNoetherian X] (W : X.Opens) (hW : IsCompact (W : Set X))
+    : (genericPoints X ∩ W).Finite := by
   haveI : CompactSpace W.toScheme := isCompact_iff_compactSpace.mp hW
   haveI : IsNoetherian W.toScheme := {}
-  refine ((genericPoints.finite (α := W.toScheme)
-    finite_irreducibleComponents_of_isNoetherian).image W.ι).subset ?_
+  refine
+    ((genericPoints.finite (α := W.toScheme) finite_irreducibleComponents_of_isNoetherian).image
+      W.ι).subset ?_
   rintro x ⟨hx, hxW⟩
   refine ⟨⟨x, hxW⟩, ?_, rfl⟩
-  have h := preimage_mem_irreducibleComponents (t := closure {x}) hx W.ι.isOpenEmbedding
-    ⟨x, subset_closure rfl, ⟨x, hxW⟩, rfl⟩
+  have h :=
+    preimage_mem_irreducibleComponents (t := closure {x}) hx W.ι.isOpenEmbedding
+      ⟨x, subset_closure rfl, ⟨x, hxW⟩, rfl⟩
   change closure _ ∈ irreducibleComponents W.toScheme
   rw [W.ι.isOpenEmbedding.isInducing.closure_eq_preimage_closure_image]
   convert h using 3
@@ -572,39 +620,49 @@ theorem finite_genericPoints_inter [IsLocallyNoetherian X] (W : X.Opens)
 
 include g
 
-theorem isFinite_fromNormalization_of_genericPoints [IsReduced X] [IsLocallyNoetherian X]
+theorem isFinite_fromNormalization_of_genericPoints
+    [IsReduced X] [IsLocallyNoetherian X]
     (hchar : ∀ x ∈ genericPoints X, CharZero (X.residueField x))
-    (hess : ∀ x ∈ genericPoints X, (f.residueFieldMap x).hom.EssFiniteType) :
-    IsFinite f.fromNormalization :=
+    (hess : ∀ x ∈ genericPoints X, (f.residueFieldMap x).hom.EssFiniteType)
+    : IsFinite f.fromNormalization :=
   isFinite_fromNormalization_of_dense f g (dense_iff_closure_eq.mpr genericPoints.closure)
     finite_genericPoints_inter hchar hess
 
-theorem isFinite_fromNormalization_of_locallyOfFiniteType [IsReduced X] [LocallyOfFiniteType f]
-    (hchar : ∀ x ∈ genericPoints X, CharZero (X.residueField x)) :
-    IsFinite f.fromNormalization :=
+theorem isFinite_fromNormalization_of_locallyOfFiniteType
+    [IsReduced X] [LocallyOfFiniteType f]
+    (hchar : ∀ x ∈ genericPoints X, CharZero (X.residueField x))
+    : IsFinite f.fromNormalization :=
   haveI : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (f ≫ g)
   isFinite_fromNormalization_of_genericPoints f g hchar fun x _ =>
     (LocallyOfFiniteType.stalkMap f x).residueFieldMap
 
-theorem isFinite_fromNormalization_of_over_fractionRing [CharZero o] [IsReduced X] (K : Type u)
-    [Field K] [Algebra o K] [IsFractionRing o K] (h : X ⟶ Spec (.of K)) [LocallyOfFiniteType h]
-    (w : f ≫ g = h ≫ Spec.map (CommRingCat.ofHom (algebraMap o K))) :
-    IsFinite f.fromNormalization := by
+theorem isFinite_fromNormalization_of_over_fractionRing
+    [CharZero o] [IsReduced X]
+    (K : Type u) [Field K] [Algebra o K] [IsFractionRing o K]
+    (h : X ⟶ Spec (.of K)) [LocallyOfFiniteType h]
+    (w : f ≫ g = h ≫ Spec.map (CommRingCat.ofHom (algebraMap o K)))
+    : IsFinite f.fromNormalization := by
   haveI : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian h
   haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective o K)
   haveI := IsPreimmersion.of_isLocalization (R := o) (S := K) (nonZeroDivisors o)
-  refine isFinite_fromNormalization_of_genericPoints f g (fun x _ => charZero_of_injective_ringHom
-    ((Scheme.ΓSpecIso (.of K)).inv ≫ h.appTop ≫ X.Γevaluation x).hom.injective) fun x _ => ?_
+  refine isFinite_fromNormalization_of_genericPoints f g
+    (fun x _ =>
+      charZero_of_injective_ringHom
+        ((Scheme.ΓSpecIso (.of K)).inv ≫ h.appTop ≫ X.Γevaluation x).hom.injective)
+    fun x _ => ?_
   have h1 : ((f ≫ g).stalkMap x).hom.EssFiniteType := by
     rw [w, Scheme.Hom.stalkMap_comp]
-    exact .comp (RingHom.FiniteType.of_surjective _
-      (Scheme.Hom.stalkMap_surjective _ _)).essFiniteType (LocallyOfFiniteType.stalkMap h x)
+    exact .comp
+      (RingHom.FiniteType.of_surjective _ (Scheme.Hom.stalkMap_surjective _ _)).essFiniteType
+      (LocallyOfFiniteType.stalkMap h x)
   rw [Scheme.Hom.stalkMap_comp] at h1
   have h2 : (f.stalkMap x).hom.EssFiniteType := .of_comp _ h1
   exact h2.residueFieldMap
 
-theorem isFinite_fromNormalization_of_isIntegral [IsIntegral X] [CharZero X.functionField]
-    (hess : (f.stalkMap (genericPoint X)).hom.EssFiniteType) : IsFinite f.fromNormalization := by
+theorem isFinite_fromNormalization_of_isIntegral
+    [IsIntegral X] [CharZero X.functionField]
+    (hess : (f.stalkMap (genericPoint X)).hom.EssFiniteType)
+    : IsFinite f.fromNormalization := by
   refine isFinite_fromNormalization_of_dense f g (D := {genericPoint X})
     (dense_iff_closure_eq.mpr (genericPoint_spec X))
     (fun W _ => (Set.finite_singleton _).inter_of_left _)
@@ -615,23 +673,28 @@ theorem isFinite_fromNormalization_of_isIntegral [IsIntegral X] [CharZero X.func
   · rintro _ rfl
     exact hess.residueFieldMap
 
-theorem isFinite_fromNormalization_of_genericallyFinite [IsIntegral X] [CharZero X.functionField]
-    (hfin : (f.stalkMap (genericPoint X)).hom.Finite) : IsFinite f.fromNormalization :=
+theorem isFinite_fromNormalization_of_genericallyFinite
+    [IsIntegral X] [CharZero X.functionField] (hfin : (f.stalkMap (genericPoint X)).hom.Finite)
+    : IsFinite f.fromNormalization :=
   isFinite_fromNormalization_of_isIntegral f g hfin.finiteType.essFiniteType
 
-
 omit f in
-theorem isFinite_fromNormalization_SpecMap_fromSpecStalk (y : Y) {L : Type u} [Field L]
-    [CharZero L] (φ : Y.presheaf.stalk y ⟶ .of L) (hφ : φ.hom.EssFiniteType) :
-    IsFinite (Spec.map φ ≫ Y.fromSpecStalk y).fromNormalization := by
-  refine isFinite_fromNormalization_of_genericPoints _ g (fun x _ => charZero_of_injective_ringHom
-    ((Scheme.ΓSpecIso (.of L)).inv ≫ (Spec (.of L)).Γevaluation x).hom.injective) fun x _ => ?_
+theorem isFinite_fromNormalization_SpecMap_fromSpecStalk
+    (y : Y)
+    {L : Type u} [Field L] [CharZero L]
+    (φ : Y.presheaf.stalk y ⟶ .of L) (hφ : φ.hom.EssFiniteType)
+    : IsFinite (Spec.map φ ≫ Y.fromSpecStalk y).fromNormalization := by
+  refine isFinite_fromNormalization_of_genericPoints _ g
+    (fun x _ =>
+      charZero_of_injective_ringHom
+        ((Scheme.ΓSpecIso (.of L)).inv ≫ (Spec (.of L)).Γevaluation x).hom.injective)
+    fun x _ => ?_
   have h : ((Spec.map φ ≫ Y.fromSpecStalk y).stalkMap x).hom.EssFiniteType := by
     rw [Scheme.Hom.stalkMap_comp]
-    exact .comp (RingHom.FiniteType.of_surjective _
-      (Scheme.Hom.stalkMap_surjective _ _)).essFiniteType (essFiniteType_stalkMap_SpecMap φ hφ x)
+    exact .comp
+      (RingHom.FiniteType.of_surjective _ (Scheme.Hom.stalkMap_surjective _ _)).essFiniteType
+      (essFiniteType_stalkMap_SpecMap φ hφ x)
   exact h.residueFieldMap
-
 
 end Schemes
 

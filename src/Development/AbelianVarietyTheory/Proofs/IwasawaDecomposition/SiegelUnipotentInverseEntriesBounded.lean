@@ -4,11 +4,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSie
 
 @[expose] public section
 
-open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-theorem siegel_unipotent_inv_bounded : ∀ n : ℕ, ∃ c : ℝ, ∀ u : Matrix (Fin n) (Fin n) ℝ, (∀ i, u i i = 1) → (∀ i j, j < i → u i j = 0) → (∀ i j, i < j → |u i j| ≤ 1 / 2) → ∃ v : Matrix (Fin n) (Fin n) ℝ, v * u = 1 ∧ u * v = 1 ∧ (∀ i j, j < i → v i j = 0) ∧ ∀ i j, |v i j| ≤ c := by
+theorem siegel_unipotent_inv_bounded
+    : ∀ n : ℕ, ∃ c : ℝ, ∀ u : Matrix (Fin n) (Fin n) ℝ,
+      (∀ i, u i i = 1) → (∀ i j, j < i → u i j = 0) → (∀ i j, i < j → |u i j| ≤ 1 / 2)
+        → ∃ v : Matrix (Fin n) (Fin n) ℝ,
+          v * u = 1 ∧ u * v = 1 ∧ (∀ i j, j < i → v i j = 0) ∧ ∀ i j, |v i j| ≤ c := by
   intro n
   refine ⟨(Nat.factorial n : ℝ), ?_⟩
   intro u hdiag hlow hup
@@ -22,8 +27,7 @@ theorem siegel_unipotent_inv_bounded : ∀ n : ℕ, ∃ c : ℝ, ∀ u : Matrix 
     letI : Invertible u := Matrix.invertibleOfIsUnitDet u hunit
     exact Matrix.blockTriangular_inv_of_blockTriangular hbt hij
   · intro i j
-    have hinv : u⁻¹ = u.adjugate := by
-      rw [Matrix.inv_def, hdet]; simp
+    have hinv : u⁻¹ = u.adjugate := by rw [Matrix.inv_def, hdet]; simp
     rw [hinv, Matrix.adjugate_apply]
     have hb : ∀ a b, |(u.updateRow j (Pi.single i 1)) a b| ≤ 1 := by
       intro a b

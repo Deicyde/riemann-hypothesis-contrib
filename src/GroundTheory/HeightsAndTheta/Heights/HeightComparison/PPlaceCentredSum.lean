@@ -36,17 +36,20 @@ lemma toNNReal_pow {b c : NNReal} (hc : c ≠ 0) (hb : b ≠ 0) {f : ℕ} (hf : 
   · rw [WithZeroMulInt.toNNReal_neg_apply _ hz, WithZeroMulInt.toNNReal_neg_apply _ hz,
       ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, mul_comm]
 
-theorem apply_algebraMap (v : FinitePlace K) (x : L) :
-    v (algebraMap L K x) = FinitePlace.mk (below v) x ^ deg L v := by
+theorem apply_algebraMap (v : FinitePlace K) (x : L)
+    : v (algebraMap L K x) = FinitePlace.mk (below v) x ^ deg L v := by
   have hQ : (below (L := L) v).asIdeal ≠ ⊥ := (below v).ne_bot
   have hf : (below (L := L) v).asIdeal.inertiaDeg' v.maximalIdeal.asIdeal ≠ 0 :=
     (inertiaDeg'_pos' _ _).ne'
-  have hN := absNorm_eq_pow_inertiaDeg'_of_liesOver v.maximalIdeal.asIdeal (below (L := L) v).asIdeal
-    inferInstance hQ
+  have hN :=
+    absNorm_eq_pow_inertiaDeg'_of_liesOver v.maximalIdeal.asIdeal (below (L := L) v).asIdeal
+      inferInstance hQ
   rw [← FinitePlace.norm_embedding_eq v, FinitePlace.mk_apply, FinitePlace.norm_embedding',
-    FinitePlace.norm_embedding', ← HeightOneSpectrum.valuation_liesOver K (below (L := L) v) v.maximalIdeal, map_pow,
-    toNNReal_pow _ (NumberField.HeightOneSpectrum.absNorm_ne_zero (below (L := L) v)) hf (by rw [hN]; push_cast; rfl), deg,
-    inertiaDeg'_eq_inertiaDeg, ← pow_mul]
+    FinitePlace.norm_embedding',
+    ← HeightOneSpectrum.valuation_liesOver K (below (L := L) v) v.maximalIdeal, map_pow,
+    toNNReal_pow _ (NumberField.HeightOneSpectrum.absNorm_ne_zero (below (L := L) v)) hf
+      (by rw [hN]; push_cast; rfl),
+    deg, inertiaDeg'_eq_inertiaDeg, ← pow_mul]
   push_cast
   rw [mul_comm]
 
@@ -55,9 +58,9 @@ lemma deg_ne_zero (v : FinitePlace K) : deg L v ≠ 0 := by
   rw [← ramificationIdx'_eq_ramificationIdx _ _ (below (L := L) v).ne_bot]
   exact IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver _ (below v).ne_bot
 
-theorem centred_iff (O : Subalgebra ℤ L) (m : Ideal O) (v : FinitePlace K) :
-    AbsCentredAt O m (fun u ↦ v (algebraMap L K u)) ↔
-      AbsCentredAt O m (fun u ↦ FinitePlace.mk (below v) u) := by
+theorem centred_iff (O : Subalgebra ℤ L) (m : Ideal O) (v : FinitePlace K)
+    : AbsCentredAt O m (fun u ↦ v (algebraMap L K u))
+      ↔ AbsCentredAt O m (fun u ↦ FinitePlace.mk (below v) u) := by
   have h1 : ∀ a : ℝ, 0 ≤ a → (a ^ deg L v ≤ 1 ↔ a ≤ 1) := fun a ha ↦
     pow_le_one_iff_of_nonneg ha (deg_ne_zero v)
   have h2 : ∀ a : ℝ, 0 ≤ a → (a ^ deg L v < 1 ↔ a < 1) := fun a ha ↦
@@ -67,26 +70,30 @@ theorem centred_iff (O : Subalgebra ℤ L) (m : Ideal O) (v : FinitePlace K) :
   exact and_congr (forall_congr' fun u ↦ h1 _ (apply_nonneg _ _))
     (forall_congr' fun u ↦ by rw [h2 _ (apply_nonneg _ _)])
 
-theorem neg_log_apply (v : FinitePlace K) (t : L) :
-    -Real.log (v (algebraMap L K t)) = deg L v * -Real.log (FinitePlace.mk (below v) t) := by
+theorem neg_log_apply (v : FinitePlace K) (t : L)
+    : - Real.log (v (algebraMap L K t)) = deg L v * - Real.log (FinitePlace.mk (below v) t) := by
   rw [apply_algebraMap, Real.log_pow]
   ring
 
-noncomputable def fibreEquiv (Q : HeightOneSpectrum (𝓞 L)) :
-    {v : FinitePlace K // below v = Q} ≃ Q.asIdeal.primesOver (𝓞 K) where
-  toFun v := ⟨v.1.maximalIdeal.asIdeal, inferInstance, ⟨(congrArg HeightOneSpectrum.asIdeal v.2).symm⟩⟩
-  invFun P := ⟨FinitePlace.mk ⟨P.1, P.2.1, ne_bot_of_liesOver_of_ne_bot Q.ne_bot P.1⟩, by
-    ext1
-    simp only [below, FinitePlace.maximalIdeal_mk]
-    exact P.2.2.over.symm⟩
+noncomputable def fibreEquiv (Q : HeightOneSpectrum (𝓞 L))
+    : {v : FinitePlace K // below v = Q} ≃ Q.asIdeal.primesOver (𝓞 K) where
+  toFun v :=
+    ⟨v.1.maximalIdeal.asIdeal, inferInstance, ⟨(congrArg HeightOneSpectrum.asIdeal v.2).symm⟩⟩
+  invFun P := ⟨
+    FinitePlace.mk ⟨P.1, P.2.1, ne_bot_of_liesOver_of_ne_bot Q.ne_bot P.1⟩,
+    by
+      ext1
+      simp only [below, FinitePlace.maximalIdeal_mk]
+      exact P.2.2.over.symm
+  ⟩
   left_inv v := Subtype.ext (FinitePlace.mk_maximalIdeal v.1)
   right_inv P := Subtype.ext (by simp only [FinitePlace.maximalIdeal_mk])
 
 noncomputable instance (Q : HeightOneSpectrum (𝓞 L)) : Fintype {v : FinitePlace K // below v = Q} :=
   Fintype.ofEquiv _ (fibreEquiv Q).symm
 
-theorem sum_fibre (Q : HeightOneSpectrum (𝓞 L)) :
-    ∑ v : {v : FinitePlace K // below v = Q}, deg L v.1 = Module.finrank L K := by
+theorem sum_fibre (Q : HeightOneSpectrum (𝓞 L))
+    : ∑ v : {v : FinitePlace K // below v = Q}, deg L v.1 = Module.finrank L K := by
   rw [← (fibreEquiv Q).symm.sum_comp, IsFractionRing.finrank_eq (𝓞 L) L (𝓞 K) K,
     ← sum_ramification_inertia_eq_finrank Q.asIdeal (𝓞 K)]
   refine Finset.sum_congr rfl fun P _ ↦ ?_
@@ -119,16 +126,18 @@ theorem proof : PlaceCentredSum.Statement := by
   intro L K _ _ _ _ _ O m t
   classical
   let g : HeightOneSpectrum (𝓞 L) → ℝ := fun Q ↦
-    if AbsCentredAt O m (fun u ↦ FinitePlace.mk Q u) then -Real.log (FinitePlace.mk Q t) else 0
-  have hL : ∑ᶠ w ∈ {w : FinitePlace L | AbsCentredAt O m fun u ↦ w u}, -Real.log (w t) =
-      ∑ᶠ Q, g Q := by
+    if AbsCentredAt O m (fun u ↦ FinitePlace.mk Q u) then - Real.log (FinitePlace.mk Q t) else 0
+  have hL
+      : ∑ᶠ w ∈ {w : FinitePlace L | AbsCentredAt O m fun u ↦ w u}, -Real.log (w t) = ∑ᶠ Q, g Q := by
     rw [finsum_mem_def, ← finsum_comp_equiv FinitePlace.equivHeightOneSpectrum.symm]
     refine finsum_congr fun Q ↦ ?_
     simp only [Set.indicator, Set.mem_ofPred_eq, g, FinitePlace.equivHeightOneSpectrum,
       Equiv.coe_fn_symm_mk]
     exact if_congr Iff.rfl rfl rfl
-  have hK : ∑ᶠ v ∈ {v : FinitePlace K | AbsCentredAt O m fun u ↦ v (algebraMap L K u)},
-      -Real.log (v (algebraMap L K t)) = ∑ᶠ v : FinitePlace K, (deg L v : ℝ) * g (below v) := by
+  have hK
+      : ∑ᶠ v ∈ {v : FinitePlace K | AbsCentredAt O m fun u ↦ v (algebraMap L K u)},
+          -Real.log (v (algebraMap L K t))
+        = ∑ᶠ v : FinitePlace K, (deg L v : ℝ) * g (below v) := by
     rw [finsum_mem_def]
     refine finsum_congr fun v ↦ ?_
     simp only [Set.indicator, Set.mem_ofPred_eq, g, centred_iff, neg_log_apply]

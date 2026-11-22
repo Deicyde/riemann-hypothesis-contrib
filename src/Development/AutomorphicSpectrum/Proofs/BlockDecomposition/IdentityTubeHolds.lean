@@ -14,18 +14,20 @@ theorem tube_isOpen {Ω : Set (ℝ × ℝ)} (hΩ : IsOpen Ω) : IsOpen (tube Ω)
     (Complex.continuous_re.comp continuous_fst).prodMk (Complex.continuous_re.comp continuous_snd)
   exact hc.isOpen_preimage Ω hΩ
 
-theorem line_tube_convex {Ω : Set (ℝ × ℝ)} (hc : Convex ℝ Ω) (p v : ℂ × ℂ) :
-    Convex ℝ {τ : ℂ | p + τ • v ∈ tube Ω} := by
+theorem line_tube_convex {Ω : Set (ℝ × ℝ)} (hc : Convex ℝ Ω) (p v : ℂ × ℂ)
+    : Convex ℝ {τ : ℂ | p + τ • v ∈ tube Ω} := by
   intro x hx y hy a b ha hb hab
   have key := hc hx hy ha hb hab
   simp only [tube, Set.mem_ofPred_eq] at hx hy key ⊢
   convert key using 1
   ext
   · simp only [Prod.fst_add, Prod.smul_fst, Complex.add_re, smul_eq_mul, Complex.real_smul,
-      Complex.mul_re, Complex.mul_im, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im, Prod.fst_add, Prod.smul_mk, Prod.mk_add_mk]
+      Complex.mul_re, Complex.mul_im, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im,
+      Prod.fst_add, Prod.smul_mk, Prod.mk_add_mk]
     linear_combination (-p.1.re) * hab
   · simp only [Prod.snd_add, Prod.smul_snd, Complex.add_re, smul_eq_mul, Complex.real_smul,
-      Complex.mul_re, Complex.mul_im, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im, Prod.smul_mk, Prod.mk_add_mk]
+      Complex.mul_re, Complex.mul_im, Complex.add_im, Complex.ofReal_re, Complex.ofReal_im,
+      Prod.smul_mk, Prod.mk_add_mk]
     linear_combination (-p.2.re) * hab
 
 theorem idTube : IdTube := by
@@ -43,7 +45,8 @@ theorem idTube : IdTube := by
   have h1 : (1 : ℂ) ∈ {τ : ℂ | z0 + τ • (z - z0) ∈ tube Ω} := by simpa using hz
   have hA := (hF z0 (z - z0)).analyticOnNhd hDo
   have hA' := (hF' z0 (z - z0)).analyticOnNhd hDo
-  have hev : (fun τ : ℂ => F (z0 + τ • (z - z0))) =ᶠ[𝓝 0] (fun τ : ℂ => F' (z0 + τ • (z - z0))) := by
+  have hev
+      : (fun τ : ℂ => F (z0 + τ • (z - z0))) =ᶠ[𝓝 0] (fun τ : ℂ => F' (z0 + τ • (z - z0))) := by
     have hO' : IsOpen {τ : ℂ | z0 + τ • (z - z0) ∈ tube Ω'} := (tube_isOpen hΩ').preimage hline
     filter_upwards [hO'.mem_nhds (by simpa using hz0')] with τ hτ
     exact heq hτ

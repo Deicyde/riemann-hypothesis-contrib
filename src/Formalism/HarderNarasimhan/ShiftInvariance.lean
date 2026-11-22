@@ -56,7 +56,8 @@ theorem twist : Twist := twist_of rescaleCovol plLat shiftInvariance
 theorem slopeIneqMean : SlopeIneqMean := slope_inequality_mean
 theorem htGram : HtGram := height_gram_determinant
 theorem htImage : HtImage := height_image_formula
-theorem sizeIneq : SizeIneq := sizeIneq_of size_maximal_slope height_image_formula place_lattice_structure
+theorem sizeIneq : SizeIneq :=
+  sizeIneq_of size_maximal_slope height_image_formula place_lattice_structure
 theorem rerealize : Rerealize := lattice_rerealization
 theorem quotRealize : QuotRealize := quotient_lattice_realization
 theorem theoremFSharp : TheoremFSharp := frame_theorem_sharp

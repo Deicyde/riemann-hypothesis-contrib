@@ -4,15 +4,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-private theorem quotient_mem_of_norm_eq_involution {M C : Type} [CommMonoidWithZero M] [UniqueFactorizationMonoid M] [Subsingleton Mˣ]
-    [CommGroup C] (σ : M ≃* M) (hσ : ∀ x, σ (σ x) = x) (H : Subgroup C) (f : M → C)
-    (hf : ∀ a b, a ≠ 0 → b ≠ 0 → f (a * b) = f a * f b) (hH : ∀ a, a ≠ 0 → f a / f (σ a) ∈ H) (I : M) :
-    I ≠ 0 → ∀ J : M, J ≠ 0 → I * σ I = J * σ J → f I / f J ∈ H := by
+private theorem quotient_mem_of_norm_eq_involution
+    {M C : Type}
+    [CommMonoidWithZero M] [UniqueFactorizationMonoid M] [Subsingleton Mˣ] [CommGroup C]
+    (σ : M ≃* M) (hσ : ∀ x, σ (σ x) = x)
+    (H : Subgroup C) (f : M → C)
+    (hf : ∀ a b, a ≠ 0 → b ≠ 0 → f (a * b) = f a * f b) (hH : ∀ a, a ≠ 0 → f a / f (σ a) ∈ H)
+    (I : M)
+    : I ≠ 0 → ∀ J : M, J ≠ 0 → I * σ I = J * σ J → f I / f J ∈ H := by
   refine UniqueFactorizationMonoid.induction_on_prime
-    (P := fun I => I ≠ 0 → ∀ J : M, J ≠ 0 → I * σ I = J * σ J → f I / f J ∈ H) I ?_ ?_ ?_
+    (P := fun I => I ≠ 0 → ∀ J : M, J ≠ 0 → I * σ I = J * σ J → f I / f J ∈ H)
+    I ?_ ?_ ?_
   · intro h
     exact absurd rfl h
   · intro x hx _ J _ hxJ
@@ -58,26 +65,31 @@ private theorem quotient_mem_of_norm_eq_involution {M C : Type} [CommMonoidWithZ
       rw [hJ', hf p a hp0 ha, hf (σ p) (σ K₀) hsp0 hsK0]
       exact key
 
-theorem UpperTheory.V.FW.classGroup_div_mem_of_mul_conj_eq :
-    ∀ (K : Type) [Field K] [NumberField K] (τ : K ≃+* K) (I J : (Ideal (𝓞 K))⁰), (∀ x, τ (τ x) = x) → I * idMap τ I = J * idMap τ J → ClassGroup.mk0 I / ClassGroup.mk0 J ∈ difR (clMap τ) := by
+theorem UpperTheory.V.FW.classGroup_div_mem_of_mul_conj_eq
+    : ∀ (K : Type) [Field K] [NumberField K] (τ : K ≃+* K) (I J : (Ideal (𝓞 K))⁰),
+      (∀ x, τ (τ x) = x) → I * idMap τ I = J * idMap τ J
+        → ClassGroup.mk0 I / ClassGroup.mk0 J ∈ difR (clMap τ) := by
   intro K _ _ τ I J hτ hIJ
   classical
   have hee : ∀ x : 𝓞 K, RingOfIntegers.mapRingEquiv τ (RingOfIntegers.mapRingEquiv τ x) = x :=
     fun x => RingOfIntegers.ext (hτ x)
-  have hmap : ∀ I : Ideal (𝓞 K), Ideal.map (RingOfIntegers.mapRingEquiv τ)
-      (Ideal.map (RingOfIntegers.mapRingEquiv τ) I) = I := by
+  have hmap
+      : ∀ I : Ideal (𝓞 K),
+        Ideal.map (RingOfIntegers.mapRingEquiv τ) (Ideal.map (RingOfIntegers.mapRingEquiv τ) I)
+          = I := by
     intro I
     show Ideal.map (RingOfIntegers.mapRingEquiv τ : 𝓞 K →+* 𝓞 K)
       (Ideal.map (RingOfIntegers.mapRingEquiv τ : 𝓞 K →+* 𝓞 K) I) = I
     rw [Ideal.map_map]
     convert Ideal.map_id I
     exact RingHom.ext fun x => hee x
-  let σ : Ideal (𝓞 K) ≃* Ideal (𝓞 K) :=
-    { toFun := Ideal.map (RingOfIntegers.mapRingEquiv τ)
-      invFun := Ideal.map (RingOfIntegers.mapRingEquiv τ)
-      left_inv := hmap
-      right_inv := hmap
-      map_mul' := Ideal.map_mul (RingOfIntegers.mapRingEquiv τ) }
+  let σ : Ideal (𝓞 K) ≃* Ideal (𝓞 K) := {
+    toFun := Ideal.map (RingOfIntegers.mapRingEquiv τ)
+    invFun := Ideal.map (RingOfIntegers.mapRingEquiv τ)
+    left_inv := hmap
+    right_inv := hmap
+    map_mul' := Ideal.map_mul (RingOfIntegers.mapRingEquiv τ)
+  }
   let f : Ideal (𝓞 K) → ClassGroup (𝓞 K) := fun a =>
     if h : a ∈ (Ideal (𝓞 K))⁰ then ClassGroup.mk0 ⟨a, h⟩ else 1
   have hfv : ∀ a (h : a ∈ (Ideal (𝓞 K))⁰), f a = ClassGroup.mk0 ⟨a, h⟩ := fun a h => dif_pos h
@@ -95,6 +107,9 @@ theorem UpperTheory.V.FW.classGroup_div_mem_of_mul_conj_eq :
     refine ⟨ClassGroup.mk0 ⟨a, ha'⟩, ?_⟩
     rw [MonoidHom.div_apply, MonoidHom.id_apply, class_map_mk0]
     rfl
-  have key := quotient_mem_of_norm_eq_involution σ (fun x => hmap x) (difR (clMap τ)) f hf hH (I : Ideal (𝓞 K))
-    (nonZeroDivisors.coe_ne_zero I) J (nonZeroDivisors.coe_ne_zero J) (congrArg Subtype.val hIJ)
+  have key :=
+    quotient_mem_of_norm_eq_involution σ
+      (fun x => hmap x)
+      (difR (clMap τ)) f hf hH (I : Ideal (𝓞 K)) (nonZeroDivisors.coe_ne_zero I) J
+      (nonZeroDivisors.coe_ne_zero J) (congrArg Subtype.val hIJ)
   rwa [hfv _ I.2, hfv _ J.2] at key

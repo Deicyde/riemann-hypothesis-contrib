@@ -13,8 +13,11 @@ namespace PI.GGConvScalarW
 
 open Formalism.L2.SG.GGMirabolic
 
-theorem nontrivial_of_irreducible {G : Type} [Monoid G] {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ G V) (hπ : π.IsIrreducible) : Nontrivial V := by
+theorem nontrivial_of_irreducible
+    {G : Type} [Monoid G]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ G V) (hπ : π.IsIrreducible)
+    : Nontrivial V := by
   by_contra h
   rw [not_nontrivial_iff_subsingleton] at h
   have hs : IsSimpleOrder (Subrepresentation π) := hπ
@@ -35,10 +38,13 @@ theorem schur_lemma_complex : SchurC := by
   haveI := nontrivial_of_irreducible π hπ
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue f
   refine ⟨c, ?_⟩
-  have hinv : ∀ (g : GL (Fin k) F) ⦃v : V⦄, v ∈ LinearMap.ker (f - c • LinearMap.id) →
-      π g v ∈ LinearMap.ker (f - c • LinearMap.id) := by
+  have hinv
+      : ∀ (g : GL (Fin k) F) ⦃v : V⦄,
+        v ∈ LinearMap.ker (f - c • LinearMap.id)
+          → π g v ∈ LinearMap.ker (f - c • LinearMap.id) := by
     intro g v hv
-    simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply] at hv ⊢
+    simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply]
+      at hv ⊢
     have h1 := congrArg (fun φ : V →ₗ[ℂ] V => φ v) (hf g)
     simp only [LinearMap.comp_apply] at h1
     rw [← h1, ← map_smul, ← map_sub, hv, map_zero]
@@ -63,7 +69,8 @@ theorem schur_lemma_complex : SchurC := by
     have hx : x ∈ LinearMap.ker (f - c • LinearMap.id) := by
       rw [h2]
       exact (show x ∈ (⊤ : Submodule ℂ V) from Submodule.mem_top)
-    simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply] at hx
+    simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply]
+      at hx
     simpa [sub_eq_zero] using hx
 
 end PI.GGConvScalarW

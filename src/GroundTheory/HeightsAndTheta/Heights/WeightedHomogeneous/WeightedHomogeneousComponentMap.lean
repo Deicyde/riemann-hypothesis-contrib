@@ -26,21 +26,24 @@ namespace WeightedDegree
 
 section Localization
 
-variable {K : Type} {ι : K → Type} {R R' : Type} [CommRing R] [CommRing R'] [Algebra R R']
+variable
+  {K : Type} {ι : K → Type} {R R' : Type} [CommRing R] [CommRing R'] [Algebra R R']
   (M₀ : Submonoid R) [IsLocalization M₀ R']
 
-
 include M₀ in
-theorem ringKrullDim_quotient_map_le (I : Ideal (MRing ι R)) :
-    ringKrullDim (MRing ι R' ⧸ I.map (algebraMap (MRing ι R) (MRing ι R'))) ≤
-      ringKrullDim (MRing ι R ⧸ I) := by
+theorem ringKrullDim_quotient_map_le (I : Ideal (MRing ι R))
+    : ringKrullDim (MRing ι R' ⧸ I.map (algebraMap (MRing ι R) (MRing ι R')))
+      ≤ ringKrullDim (MRing ι R ⧸ I) := by
   rw [ringKrullDim_quotient, ringKrullDim_quotient]
-  let f : PrimeSpectrum.zeroLocus (R := MRing ι R') (I.map (algebraMap (MRing ι R) (MRing ι R'))) →
-      PrimeSpectrum.zeroLocus (R := MRing ι R) I :=
-    fun Q ↦ ⟨PrimeSpectrum.comap (algebraMap (MRing ι R) (MRing ι R')) Q.1, by
+  let f
+      : PrimeSpectrum.zeroLocus (R := MRing ι R') (I.map (algebraMap (MRing ι R) (MRing ι R')))
+        → PrimeSpectrum.zeroLocus (R := MRing ι R) I := fun Q ↦ ⟨
+    PrimeSpectrum.comap (algebraMap (MRing ι R) (MRing ι R')) Q.1,
+    by
       have h := Q.2
       simp only [PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe] at h ⊢
-      exact Ideal.map_le_iff_le_comap.mp h⟩
+      exact Ideal.map_le_iff_le_comap.mp h
+  ⟩
   refine Order.krullDim_le_of_strictMono f (Monotone.strictMono_of_injective ?_ ?_)
   · intro Q₁ Q₂ h
     exact Ideal.comap_mono (f := algebraMap (MRing ι R) (MRing ι R')) h
@@ -49,18 +52,17 @@ theorem ringKrullDim_quotient_map_le (I : Ideal (MRing ι R)) :
     apply PrimeSpectrum.localization_comap_injective (MRing ι R') (M₀.map (C (σ := Σ k, ι k)))
     exact congrArg Subtype.val h
 
-theorem weightedHomogeneousComponent_map [DecidableEq K] (b : K → ℕ) (y : MRing ι R) :
-    weightedHomogeneousComponent (blockWeight ι) b (map (algebraMap R R') y) =
-      map (algebraMap R R') (weightedHomogeneousComponent (blockWeight ι) b y) := by
+theorem weightedHomogeneousComponent_map [DecidableEq K] (b : K → ℕ) (y : MRing ι R)
+    : weightedHomogeneousComponent (blockWeight ι) b (map (algebraMap R R') y)
+      = map (algebraMap R R') (weightedHomogeneousComponent (blockWeight ι) b y) := by
   classical
   ext d
   simp only [coeff_weightedHomogeneousComponent, coeff_map]
   split_ifs <;> simp
 
-
 include M₀ in
-theorem isMultiHomogIdeal_map [DecidableEq K] {I : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I) :
-    IsMultiHomogIdeal (I.map (algebraMap (MRing ι R) (MRing ι R'))) := by
+theorem isMultiHomogIdeal_map [DecidableEq K] {I : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I)
+    : IsMultiHomogIdeal (I.map (algebraMap (MRing ι R) (MRing ι R'))) := by
   classical
   intro z hz b
   obtain ⟨⟨x, m⟩, hxm⟩ :=
@@ -77,24 +79,26 @@ theorem isMultiHomogIdeal_map [DecidableEq K] {I : Ideal (MRing ι R)} (hI : IsM
   rw [weightedHomogeneousComponent_map]
   exact Ideal.mem_map_of_mem _ (hI x x.2 b)
 
-
 include M₀ in
-theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
+theorem cycEval_divCycle_map
+    (P : Ideal (MRing ι R)) (f : MRing ι R)
     (hdisj : ∀ W ∈ (P ⊔ Ideal.span {f}).minimalPrimes,
       Disjoint ((M₀.map (C (σ := Σ k, ι k)) : Submonoid (MRing ι R)) : Set (MRing ι R)) W)
-    (n : Ideal (MRing ι R') → ℤ) :
-    cycEval (fun W ↦ n (W.map (algebraMap (MRing ι R) (MRing ι R')))) (divCycle P f) =
-      cycEval n (divCycle (P.map (algebraMap (MRing ι R) (MRing ι R')))
-        (algebraMap (MRing ι R) (MRing ι R') f)) := by
+    (n : Ideal (MRing ι R') → ℤ)
+    : cycEval (fun W ↦ n (W.map (algebraMap (MRing ι R) (MRing ι R')))) (divCycle P f)
+      = cycEval n
+        (divCycle (P.map (algebraMap (MRing ι R) (MRing ι R')))
+          (algebraMap (MRing ι R) (MRing ι R') f)) := by
   classical
   set M : Submonoid (MRing ι R) := M₀.map (C (σ := Σ k, ι k)) with hM
   set φ := algebraMap (MRing ι R) (MRing ι R') with hφ
   set J := P ⊔ Ideal.span {f} with hJdef
   have hJ : P.map φ ⊔ Ideal.span {φ f} = J.map φ := by
     rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton]
-  have hcorr : ∀ W ∈ J.minimalPrimes, (W.map φ).IsPrime ∧ (W.map φ).comap φ = W := fun W hW ↦
-    ⟨IsLocalization.isPrime_of_isPrime_disjoint M _ W hW.1.1 (hdisj W hW),
-      IsLocalization.under_map_of_isPrime_disjoint M (MRing ι R') hW.1.1 (hdisj W hW)⟩
+  have hcorr : ∀ W ∈ J.minimalPrimes, (W.map φ).IsPrime ∧ (W.map φ).comap φ = W := fun W hW ↦ ⟨
+    IsLocalization.isPrime_of_isPrime_disjoint M _ W hW.1.1 (hdisj W hW),
+    IsLocalization.under_map_of_isPrime_disjoint M (MRing ι R') hW.1.1 (hdisj W hW)
+  ⟩
   have hmin : ∀ W ∈ J.minimalPrimes, W.map φ ∈ (P.map φ ⊔ Ideal.span {φ f}).minimalPrimes := by
     intro W hW
     rw [hJ, IsLocalization.minimalPrimes_map M]
@@ -109,8 +113,9 @@ theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
       refine forall_congr' fun k ↦ exists_congr fun i ↦ not_congr ?_
       have hX : (X ⟨k, i⟩ : MRing ι R') = φ (X ⟨k, i⟩) := (MvPolynomial.map_X _ _).symm
       rw [hX, ← Ideal.mem_comap, hcomap]
-    have hl : ∀ (h₁ : W.IsPrime) (h₂ : (W.map φ).IsPrime),
-        @multAt _ _ _ _ J W h₁ = @multAt _ _ _ _ (P.map φ ⊔ Ideal.span {φ f}) (W.map φ) h₂ := by
+    have hl
+        : ∀ (h₁ : W.IsPrime) (h₂ : (W.map φ).IsPrime),
+          @multAt _ _ _ _ J W h₁ = @multAt _ _ _ _ (P.map φ ⊔ Ideal.span {φ f}) (W.map φ) h₂ := by
       intro h₁ h₂
       have := h₂
       unfold multAt
@@ -120,8 +125,9 @@ theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
     by_cases hr : IsRelevant W
     · rw [dite_eq_left ⟨hW, hr⟩, dite_eq_left ⟨hmin W hW, hrel.mpr hr⟩, hl]
     · rw [dite_eq_right (fun h ↦ hr h.2), dite_eq_right (fun h ↦ hr (hrel.mp h.2))]
-  have hsupp : ∀ (Q : Ideal (MRing ι R')) (x) (W : Ideal (MRing ι R')),
-      divCycle Q x W ≠ 0 → W ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
+  have hsupp
+      : ∀ (Q : Ideal (MRing ι R')) (x) (W : Ideal (MRing ι R')),
+        divCycle Q x W ≠ 0 → W ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
     intro Q x W h
     unfold divCycle at h
     split_ifs at h with hh
@@ -134,8 +140,9 @@ theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
     · exact hh.1
     · exact absurd rfl h
   unfold cycEval
-  have hA : (∑ᶠ W, divCycle P f W * n (W.map φ)) =
-      ∑ᶠ W ∈ J.minimalPrimes, divCycle P f W * n (W.map φ) := by
+  have hA
+      : (∑ᶠ W, divCycle P f W * n (W.map φ))
+        = ∑ᶠ W ∈ J.minimalPrimes, divCycle P f W * n (W.map φ) := by
     rw [finsum_mem_def]
     congr 1
     funext W
@@ -146,8 +153,9 @@ theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
       by_contra h
       exact hW (hsupp0 W h)
     rw [this, zero_mul]
-  have hB : (∑ᶠ W, divCycle (P.map φ) (φ f) W * n W) =
-      ∑ᶠ W ∈ (P.map φ ⊔ Ideal.span {φ f}).minimalPrimes, divCycle (P.map φ) (φ f) W * n W := by
+  have hB
+      : (∑ᶠ W, divCycle (P.map φ) (φ f) W * n W)
+        = ∑ᶠ W ∈ (P.map φ ⊔ Ideal.span {φ f}).minimalPrimes, divCycle (P.map φ) (φ f) W * n W := by
     rw [finsum_mem_def]
     congr 1
     funext W
@@ -172,8 +180,9 @@ theorem cycEval_divCycle_map (P : Ideal (MRing ι R)) (f : MRing ι R)
 
 end Localization
 
-theorem charZero_fractionRing (O : Type) [CommRing O] [IsDomain O]
-    (h : Function.Injective (Int.castRingHom O)) : CharZero (FractionRing O) := by
+theorem charZero_fractionRing
+    (O : Type) [CommRing O] [IsDomain O] (h : Function.Injective (Int.castRingHom O))
+    : CharZero (FractionRing O) := by
   apply charZero_of_injective_algebraMap (R := ℤ)
   rw [RingHom.ext_int (algebraMap ℤ (FractionRing O))
     ((algebraMap O (FractionRing O)).comp (Int.castRingHom O))]

@@ -26,8 +26,8 @@ def unitsToTateZero : Kˣ →* TateZero (L ≃ₐ[K] L) Lˣ :=
       ext
       simp [AlgEquiv.smul_units_def])
 
-theorem coe_tateNorm_units (x : Lˣ) :
-    ((tateNorm (L ≃ₐ[K] L) Lˣ x : Lˣ) : L) = algebraMap K L (Algebra.norm K (x : L)) := by
+theorem coe_tateNorm_units (x : Lˣ)
+    : ((tateNorm (L ≃ₐ[K] L) Lˣ x : Lˣ) : L) = algebraMap K L (Algebra.norm K (x : L)) := by
   rw [algebraMap_norm_eq_prod, tateNorm_apply, Units.coe_prod]
   rfl
 
@@ -57,17 +57,17 @@ theorem ker_unitsToTateZero : (unitsToTateZero (K := K) (L := L)).ker = (normUni
     rw [coe_tateNorm_units]
     rfl
 
-theorem natCard_tateZero_units_eq :
-    Nat.card (TateZero (L ≃ₐ[K] L) Lˣ) = Nat.card (Kˣ ⧸ (normUnits K L).range) := by
+theorem natCard_tateZero_units_eq
+    : Nat.card (TateZero (L ≃ₐ[K] L) Lˣ) = Nat.card (Kˣ ⧸ (normUnits K L).range) := by
   rw [← ker_unitsToTateZero]
-  exact Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective _ unitsToTateZero_surjective).toEquiv.symm
+  exact Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective _
+    unitsToTateZero_surjective).toEquiv.symm
 
 end Galois
 
 section Ord
 
 variable {L : Type*} [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-
 
 variable (L) in
 def unitsOrd : Additive Lˣ →+ ℤ where
@@ -79,8 +79,7 @@ def unitsOrd : Additive Lˣ →+ ℤ where
     change ord (((x.toMul * y.toMul : Lˣ)) : L) = _
     rw [Units.val_mul, ord_mul x.toMul.ne_zero y.toMul.ne_zero]
 
-theorem unitsOrd_ofMul (x : Lˣ) : unitsOrd (L := L) (Additive.ofMul x) = ord (x : L) :=
-  rfl
+theorem unitsOrd_ofMul (x : Lˣ) : unitsOrd (L := L) (Additive.ofMul x) = ord (x : L) := rfl
 
 theorem unitsOrd_surjective : Function.Surjective (unitsOrd (L := L)) := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[L]
@@ -88,12 +87,12 @@ theorem unitsOrd_surjective : Function.Surjective (unitsOrd (L := L)) := by
   refine ⟨n • Additive.ofMul (uniformizerUnit hϖ), ?_⟩
   rw [map_zsmul, unitsOrd_ofMul, coe_uniformizerUnit, ord_uniformizer hϖ, smul_eq_mul, mul_one]
 
-theorem ord_eq_zero_iff_mem_range_unitsIncl (x : Lˣ) :
-    ord (x : L) = 0 ↔ x ∈ (unitsIncl L).range := by
+theorem ord_eq_zero_iff_mem_range_unitsIncl (x : Lˣ)
+    : ord (x : L) = 0 ↔ x ∈ (unitsIncl L).range := by
   rw [ord_eq_zero_iff_mem, unitFiltrationUnits, unitFiltration_zero, ← MonoidHom.range_eq_map]
 
-theorem exact_unitsIncl_unitsOrd :
-    Function.Exact (MonoidHom.toAdditive (unitsIncl L)) (unitsOrd (L := L)) := by
+theorem exact_unitsIncl_unitsOrd
+    : Function.Exact (MonoidHom.toAdditive (unitsIncl L)) (unitsOrd (L := L)) := by
   intro y
   change ord ((y.toMul : Lˣ) : L) = 0 ↔ _
   rw [ord_eq_zero_iff_mem_range_unitsIncl]
@@ -105,30 +104,30 @@ theorem exact_unitsIncl_unitsOrd :
 
 end Ord
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
 theorem ord_algEquiv (σ : L ≃ₐ[K] L) (x : L) : ord (σ x) = ord x := by
   rw [ord, ord, normalizedValuation_apply, normalizedValuation_apply,
     valuation_algEquiv_apply K L σ x]
 
-theorem unitsOrd_smul (σ : L ≃ₐ[K] L) (x : Lˣ) :
-    unitsOrd (L := L) (Additive.ofMul (σ • x)) = unitsOrd (L := L) (Additive.ofMul x) := by
+theorem unitsOrd_smul (σ : L ≃ₐ[K] L) (x : Lˣ)
+    : unitsOrd (L := L) (Additive.ofMul (σ • x)) = unitsOrd (L := L) (Additive.ofMul x) := by
   rw [unitsOrd_ofMul, unitsOrd_ofMul, AlgEquiv.smul_units_def, Units.coe_map]
   exact ord_algEquiv σ x
 
-theorem unitsOrd_cycSubOne (τ : L ≃ₐ[K] L) (x : Additive Lˣ) :
-    unitsOrd (L := L) (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) τ x) =
-      cycSubOne (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) τ (unitsOrd (L := L) x) := by
+theorem unitsOrd_cycSubOne (τ : L ≃ₐ[K] L) (x : Additive Lˣ)
+    : unitsOrd (L := L) (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) τ x)
+      = cycSubOne (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) τ (unitsOrd (L := L) x) := by
   rw [cycSubOne_apply, cycSubOne_apply, map_sub, Representation.ofMulDistribMulAction_apply_apply,
     unitsOrd_smul, Representation.trivial_apply]
   rfl
 
-theorem unitsOrd_cycNorm (x : Additive Lˣ) :
-    unitsOrd (L := L) (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) x) =
-      cycNorm (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) (unitsOrd (L := L) x) := by
+theorem unitsOrd_cycNorm (x : Additive Lˣ)
+    : unitsOrd (L := L) (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) x)
+      = cycNorm (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) (unitsOrd (L := L) x) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [cycNorm_apply, cycNorm_apply, map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
@@ -137,40 +136,45 @@ theorem unitsOrd_cycNorm (x : Additive Lˣ) :
 
 variable {σ : L ≃ₐ[K] L}
 
-theorem cycHerbrand_units_eq_mul (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
-    (hA : HasHerbrandQuotient
-      (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ)
-      (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ))) :
-    HasHerbrandQuotient (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) σ)
-        (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ)) ∧
-      cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) σ =
-        cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ *
-          Fintype.card (L ≃ₐ[K] L) := by
+theorem cycHerbrand_units_eq_mul
+    (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
+    (hA : HasHerbrandQuotient (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ)
+      (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ)))
+    : HasHerbrandQuotient (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) σ)
+        (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ))
+      ∧ cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) Lˣ) σ
+        = cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ
+          * Fintype.card (L ≃ₐ[K] L) := by
   have hi : Function.Injective (MonoidHom.toAdditive (unitsIncl L)) := unitsIncl_injective
   have hC : HasHerbrandQuotient (cycSubOne (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) σ)
       (cycNorm (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ)) :=
     hasCyclicHerbrand_of_finite (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) hσ
-  have hCv : herbrandQuotient (cycSubOne (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) σ)
-      (cycNorm (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ)) = Fintype.card (L ≃ₐ[K] L) :=
+  have hCv
+      : herbrandQuotient (cycSubOne (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ) σ)
+          (cycNorm (Representation.trivial ℤ (L ≃ₐ[K] L) ℤ))
+        = Fintype.card (L ≃ₐ[K] L) :=
     cyclicHerbrand_trivial_int σ
-  refine ⟨HasHerbrandQuotient.of_shortExact_left_right hi unitsOrd_surjective
-    exact_unitsIncl_unitsOrd (toAdditive_cycSubOne _ unitsIncl_smul σ)
-    (toAdditive_cycNorm _ unitsIncl_smul) (unitsOrd_cycSubOne σ) unitsOrd_cycNorm
-    (cycSubOne_cycNorm _ σ) (cycNorm_cycSubOne _ σ) hA hC, ?_⟩
-  rw [cycHerbrand, herbrandQuotient_eq_mul_of_shortExact hi unitsOrd_surjective
-    exact_unitsIncl_unitsOrd (toAdditive_cycSubOne _ unitsIncl_smul σ)
-    (toAdditive_cycNorm _ unitsIncl_smul) (unitsOrd_cycSubOne σ) unitsOrd_cycNorm
-    (cycSubOne_cycNorm _ σ) (cycNorm_cycSubOne _ σ) hA hC, hCv]
+  refine ⟨
+    HasHerbrandQuotient.of_shortExact_left_right hi unitsOrd_surjective exact_unitsIncl_unitsOrd
+      (toAdditive_cycSubOne _ unitsIncl_smul σ) (toAdditive_cycNorm _ unitsIncl_smul)
+      (unitsOrd_cycSubOne σ) unitsOrd_cycNorm (cycSubOne_cycNorm _ σ) (cycNorm_cycSubOne _ σ) hA hC,
+    ?_
+  ⟩
+  rw [cycHerbrand,
+    herbrandQuotient_eq_mul_of_shortExact hi unitsOrd_surjective exact_unitsIncl_unitsOrd
+      (toAdditive_cycSubOne _ unitsIncl_smul σ) (toAdditive_cycNorm _ unitsIncl_smul)
+      (unitsOrd_cycSubOne σ) unitsOrd_cycNorm (cycSubOne_cycNorm _ σ) (cycNorm_cycSubOne _ σ) hA hC,
+    hCv]
   rfl
 
-theorem cycHerbrand_integerUnits_eq_one_of_subgroup (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
+theorem cycHerbrand_integerUnits_eq_one_of_subgroup
+    (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
     (V : Subgroup 𝒪[L]ˣ) [V.FiniteIndex] [MulDistribMulAction (L ≃ₐ[K] L) V]
     (hV : ∀ (g : L ≃ₐ[K] L) (v : V), ((g • v : V) : 𝒪[L]ˣ) = g • (v : 𝒪[L]ˣ))
-    [Subsingleton (TateZero (L ≃ₐ[K] L) V)] [Subsingleton (TateNegOne (L ≃ₐ[K] L) V)] :
-    HasHerbrandQuotient
-        (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ)
-        (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ)) ∧
-      cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ = 1 := by
+    [Subsingleton (TateZero (L ≃ₐ[K] L) V)] [Subsingleton (TateNegOne (L ≃ₐ[K] L) V)]
+    : HasHerbrandQuotient (cycSubOne (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ)
+        (cycNorm (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ))
+      ∧ cycHerbrand (Representation.ofMulDistribMulAction (L ≃ₐ[K] L) 𝒪[L]ˣ) σ = 1 := by
   have : V.subtype.range.FiniteIndex := by rw [Subgroup.range_subtype]; infer_instance
   obtain ⟨h1, h2⟩ := cycHerbrand_eq_of_injective V.subtype V.subtype_injective hV σ
   obtain ⟨h3, h4⟩ := cycHerbrand_eq_one_of_subsingleton (G := L ≃ₐ[K] L) (M := V) hσ

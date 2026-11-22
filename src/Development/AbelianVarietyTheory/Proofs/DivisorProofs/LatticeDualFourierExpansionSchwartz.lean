@@ -10,9 +10,11 @@ open scoped RealInnerProductSpace FourierTransform SchwartzMap
 
 namespace GlobalTheory
 
-theorem schwartz_summable_norm_mul_one_add_pow {V : Type*} [NormedAddCommGroup V]
-    [NormedSpace ℝ V] [FiniteDimensional ℝ V] (Λ : Submodule ℤ V) [DiscreteTopology Λ]
-    (h : 𝓢(V, ℂ)) (N : ℕ) : Summable fun l : Λ => ‖h l‖ * (1 + ‖(l : V)‖) ^ N := by
+theorem schwartz_summable_norm_mul_one_add_pow
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (Λ : Submodule ℤ V) [DiscreteTopology Λ]
+    (h : 𝓢(V, ℂ)) (N : ℕ)
+    : Summable fun l : Λ => ‖h l‖ * (1 + ‖(l : V)‖) ^ N := by
   set k := finrank ℤ Λ + 1
   obtain ⟨C, hC, hg⟩ := GroundTheory.Global.exists_norm_le_inv_one_add_pow h (k + N)
   have hs : Summable fun l : Λ => C * ((1 + ‖l‖) ^ k)⁻¹ := by
@@ -26,32 +28,39 @@ theorem schwartz_summable_norm_mul_one_add_pow {V : Type*} [NormedAddCommGroup V
     linarith
   refine hs.of_nonneg_of_le (fun _ => by positivity) fun l => ?_
   have hp : 0 < 1 + ‖(l : V)‖ := by positivity
-  calc ‖h l‖ * (1 + ‖(l : V)‖) ^ N
-      ≤ C * ((1 + ‖(l : V)‖) ^ (k + N))⁻¹ * (1 + ‖(l : V)‖) ^ N := by
-        gcongr
-        exact hg _
+  calc
+    ‖h l‖ * (1 + ‖(l : V)‖) ^ N ≤ C * ((1 + ‖(l : V)‖) ^ (k + N))⁻¹ * (1 + ‖(l : V)‖) ^ N := by
+      gcongr
+      exact hg _
     _ = C * ((1 + ‖(l : V)‖) ^ k)⁻¹ := by
-        rw [pow_add]
-        field_simp
+      rw [pow_add]
+      field_simp
     _ = C * ((1 + ‖l‖) ^ k)⁻¹ := rfl
 
-theorem periodisation_hasSum_fourier_bilinForm {V : Type} [NormedAddCommGroup V]
-    [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+theorem periodisation_hasSum_fourier_bilinForm
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
     (P : LinearMap.BilinForm ℝ V) (hP : P.Nondegenerate)
-    (Λ : Submodule ℤ V) [DiscreteTopology Λ] [IsZLattice ℝ Λ] (f : SchwartzMap V ℂ) :
-    ∃ c : V → ℂ, (∀ N : ℕ, Summable (fun μ : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} =>
-        ‖c μ‖ * (1 + ‖(μ : V)‖) ^ N)) ∧
-      ∀ x : V, HasSum (fun μ : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} =>
-        c μ * Complex.exp (2 * Real.pi * Complex.I * (P x μ : ℂ))) (∑' l : Λ, f (x + l)) := by
+    (Λ : Submodule ℤ V) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
+    (f : SchwartzMap V ℂ)
+    : ∃ c : V → ℂ,
+      (∀ N : ℕ,
+          Summable (fun μ : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} => ‖c μ‖ * (1 + ‖(μ : V)‖) ^ N))
+        ∧ ∀ x : V,
+          HasSum
+            (fun μ : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} =>
+              c μ * Complex.exp (2 * Real.pi * Complex.I * (P x μ : ℂ)))
+            (∑' l : Λ, f (x + l)) := by
   let E := EuclideanSpace ℝ (Fin (finrank ℝ V))
   let T : E ≃L[ℝ] V := (toEuclidean (E := V)).symm
-  let A₀ : V ≃ₗ[ℝ] E := (P.flip.toDual hP.flip) ≪≫ₗ T.toLinearEquiv.dualMap ≪≫ₗ
-    (LinearMap.BilinForm.toDual (innerₗ E) GroundTheory.Global.innerₗ_nondegenerate).symm
+  let A₀ : V ≃ₗ[ℝ] E :=
+    (P.flip.toDual hP.flip) ≪≫ₗ T.toLinearEquiv.dualMap
+      ≪≫ₗ (LinearMap.BilinForm.toDual (innerₗ E) GroundTheory.Global.innerₗ_nondegenerate).symm
   let A : V ≃L[ℝ] E := A₀.toContinuousLinearEquiv
   have hA : ∀ μ y, ⟪A μ, y⟫ = P (T y) μ := by
     intro μ y
-    have h := LinearMap.BilinForm.toDual_def (B := innerₗ E) GroundTheory.Global.innerₗ_nondegenerate
-      (m := A₀ μ) (n := y)
+    have h :=
+      LinearMap.BilinForm.toDual_def (B := innerₗ E) GroundTheory.Global.innerₗ_nondegenerate
+        (m := A₀ μ) (n := y)
     have h2 : ⟪A μ, y⟫ = (innerₗ E) (A₀ μ) y := rfl
     rw [h2, ← h]
     simp only [A₀, LinearEquiv.trans_apply, LinearEquiv.apply_symm_apply]
@@ -79,16 +88,18 @@ theorem periodisation_hasSum_fourier_bilinForm {V : Type} [NormedAddCommGroup V]
   have hh : ∀ μ, h μ = 𝓕 (g : E → ℂ) (A μ) := fun μ => rfl
   refine ⟨fun μ => (ZLattice.covolume L)⁻¹ • h μ, fun N => ?_, fun x => ?_⟩
   · let e : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} ≃ Λ' := Equiv.subtypeEquivRight hmem
-    have hs := (e.summable_iff.mpr
-      (schwartz_summable_norm_mul_one_add_pow Λ' h N)).mul_left ‖(ZLattice.covolume L)⁻¹‖
+    have hs :=
+      (e.summable_iff.mpr (schwartz_summable_norm_mul_one_add_pow Λ' h N)).mul_left
+        ‖(ZLattice.covolume L)⁻¹‖
     refine hs.congr fun μ => ?_
     rw [norm_smul, mul_assoc]
     rfl
   · let e : {μ : V // ∀ l ∈ Λ, ∃ k : ℤ, P l μ = k} ≃ GroundTheory.Global.dualLattice L :=
       A.toEquiv.subtypeEquiv hmem
     let e' : L ≃ Λ := T.toEquiv.subtypeEquiv hL
-    have hs := e.hasSum_iff.mpr
-      (GroundTheory.Global.LatticePoisson.hasSum_smul_fourier (L := L) g (T.symm x))
+    have hs :=
+      e.hasSum_iff.mpr (GroundTheory.Global.LatticePoisson.hasSum_smul_fourier (L := L) g
+        (T.symm x))
     have hper : GroundTheory.Global.LatticePoisson.per L g (T.symm x) = ∑' l : Λ, f (x + l) := by
       rw [GroundTheory.Global.LatticePoisson.per, ← e'.tsum_eq]
       refine tsum_congr fun l => ?_

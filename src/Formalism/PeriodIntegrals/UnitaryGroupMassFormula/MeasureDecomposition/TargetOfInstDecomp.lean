@@ -16,7 +16,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MeasureDecomposi
 namespace PI.ScMuExists.UnitaryGroupMassFormula
 
 theorem target_of_instDecomp (hd : InstDecomp) : PI.ScMuExists.Target :=
-  target_of_steps generic_haar_subgroup (genSemi_of generic_haar_subgroup) generic_weil_representation measure_subFacts
-    (genModOne_of generic_haar_subgroup) hd proper_action_instance
+  target_of_steps generic_haar_subgroup (genSemi_of generic_haar_subgroup)
+    generic_weil_representation measure_subFacts (genModOne_of generic_haar_subgroup) hd
+    proper_action_instance
 
 end PI.ScMuExists.UnitaryGroupMassFormula

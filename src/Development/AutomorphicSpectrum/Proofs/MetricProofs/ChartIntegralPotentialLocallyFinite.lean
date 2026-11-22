@@ -15,7 +15,8 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LocDensDivJacN
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv.Push
 
@@ -31,15 +32,17 @@ def trivLine (ι : K → Type) : HermLine ι where
 
 theorem trivLine_smooth : IsSmoothHerm (trivLine ι) := contDiffOn_const
 
-theorem exists_localInverse (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (E : Set M.Xc) (x : M.Xc) (hx : x ∉ modelBad M Ψ E) (j : Fin M.atlas.n)
-    (hj : x ∈ (M.atlas.chart j).source) :
-    ∃ σ : (Fin e → ℂ) → (Fin e → ℂ), AnalyticAt ℂ σ (modelQ M Ψ x) ∧
-      σ (modelQ M Ψ x) = M.atlas.chart j x ∧
-      Complex.normSq (ReciprocityTheory.AnForm.A.jacC σ (modelQ M Ψ x)).det =
-        (‖LinearMap.det (fderiv ℂ (modelQ M Ψ ∘ (M.atlas.chart j).symm) (M.atlas.chart j x) :
-          (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))‖ ^ 2)⁻¹ ∧
-      ∀ᶠ x' in 𝓝 x, σ (modelQ M Ψ x') = M.atlas.chart j x' ∧ x' ∈ (M.atlas.chart j).source := by
+theorem exists_localInverse
+    (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (E : Set M.Xc) (x : M.Xc) (hx : x ∉ modelBad M Ψ E)
+    (j : Fin M.atlas.n) (hj : x ∈ (M.atlas.chart j).source)
+    : ∃ σ : (Fin e → ℂ) → (Fin e → ℂ),
+      AnalyticAt ℂ σ (modelQ M Ψ x) ∧ σ (modelQ M Ψ x) = M.atlas.chart j x
+        ∧ Complex.normSq (ReciprocityTheory.AnForm.A.jacC σ (modelQ M Ψ x)).det
+          = (‖LinearMap.det (fderiv ℂ (modelQ M Ψ ∘ (M.atlas.chart j).symm) (M.atlas.chart j x) :
+              (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))‖
+            ^ 2)⁻¹
+        ∧ ∀ᶠ x' in 𝓝 x, σ (modelQ M Ψ x') = M.atlas.chart j x' ∧ x' ∈ (M.atlas.chart j).source := by
   classical
   set u := M.atlas.chart j x with hudef
   have hsu : (M.atlas.chart j).symm u = x := (M.atlas.chart j).left_inv hj
@@ -68,8 +71,9 @@ theorem exists_localInverse (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ)
     refine F.hasFDerivAt_symm hyt ?_
     rw [hσu, hFc, hCe']
     exact hQa.differentiableAt.hasFDerivAt
-  have hdetinv : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) :
-      (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
+  have hdetinv
+      : LinearMap.det ((Ce.symm : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+        = (LinearMap.det (Df : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))⁻¹ := by
     have := ContinuousLinearEquiv.det_coe_symm Ce
     rw [hCe'] at this
     exact this
@@ -87,14 +91,15 @@ theorem exists_localInverse (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ)
     rw [hFc] at h1
     simpa only [hQdef, Function.comp_apply, (M.atlas.chart j).left_inv hx'.1] using h1
 
-theorem cxHessian_eq_of_torus (L : HermLine ι) (r : ℝ) {γ γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
-    {y : Fin e → ℂ} (hγ : AnalyticAt ℂ γ y) (hγ' : AnalyticAt ℂ γ' y)
-    (hy : ∀ k, ∃ i, γ y ⟨k, i⟩ ≠ 0)
+theorem cxHessian_eq_of_torus
+    (L : HermLine ι) (r : ℝ)
+    {γ γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ}
+    (hγ : AnalyticAt ℂ γ y) (hγ' : AnalyticAt ℂ γ' y) (hy : ∀ k, ∃ i, γ y ⟨k, i⟩ ≠ 0)
     (hrel : ∀ᶠ y' in 𝓝 y, ∃ c : K → ℂ, (∀ k, c k ≠ 0) ∧ γ' y' = bsmul c (γ y'))
-    {ψ : (Fin e → ℂ) → ℝ} (hψ : ContDiffAt ℝ 2 ψ y) {G₁ : (Fin e → ℂ) → ℂ}
-    (hG₁ : AnalyticAt ℂ G₁ y)
-    (hpot : ∀ᶠ y' in 𝓝 y, ψ y' - r * Real.log (L.h (γ y')) = (G₁ y').re) :
-    cxHessian (fun y' => r * Real.log (L.h (γ' y'))) y = cxHessian ψ y := by
+    {ψ : (Fin e → ℂ) → ℝ} (hψ : ContDiffAt ℝ 2 ψ y)
+    {G₁ : (Fin e → ℂ) → ℂ}
+    (hG₁ : AnalyticAt ℂ G₁ y) (hpot : ∀ᶠ y' in 𝓝 y, ψ y' - r * Real.log (L.h (γ y')) = (G₁ y').re)
+    : cxHessian (fun y' => r * Real.log (L.h (γ' y'))) y = cxHessian ψ y := by
   choose i0 hi0 using hy
   set t : K → (Fin e → ℂ) → ℂ := fun k y' => γ' y' ⟨k, i0 k⟩ / γ y' ⟨k, i0 k⟩ with ht_def
   have hcont : ∀ᶠ y' in 𝓝 y, ∀ k, γ y' ⟨k, i0 k⟩ ≠ 0 :=
@@ -126,8 +131,10 @@ theorem cxHessian_eq_of_torus (L : HermLine ι) (r : ℝ) {γ γ' : (Fin e → �
     have hsm : L.h (bsmul (fun k => t k y') (γ y')) = (∏ k, ‖t k y'‖ ^ L.a k) * L.h (γ y') :=
       L.smul _ _ hc
     have hne : ∀ k, ‖t k y'‖ ^ L.a k ≠ 0 := fun k => zpow_ne_zero _ (norm_ne_zero_iff.mpr (hc k))
-    have hterm : ∀ k, ((((r * (L.a k : ℝ)) : ℝ) : ℂ) * Complex.log (t k y' / t k y)).re =
-        r * (L.a k : ℝ) * Real.log ‖t k y'‖ - r * (L.a k : ℝ) * Real.log ‖t k y‖ := by
+    have hterm
+        : ∀ k,
+          ((((r * (L.a k : ℝ)) : ℝ) : ℂ) * Complex.log (t k y' / t k y)).re
+            = r * (L.a k : ℝ) * Real.log ‖t k y'‖ - r * (L.a k : ℝ) * Real.log ‖t k y‖ := by
       intro k
       rw [Complex.re_ofReal_mul, Complex.log_re, norm_div,
         Real.log_div (norm_ne_zero_iff.mpr (hc k)) (norm_ne_zero_iff.mpr (ht0 k)), mul_sub]
@@ -140,19 +147,21 @@ theorem cxHessian_eq_of_torus (L : HermLine ι) (r : ℝ) {γ γ' : (Fin e → �
     ring
   rw [cxHessian_congr heq, cxHessian_add_re C hψ hGan]
 
-theorem sheet_cxHessian (M : CxModel P e) {σ : (Fin e → ℂ) → (Fin e → ℂ)}
-    {γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y u : Fin e → ℂ} {x : M.Xc} {j : Fin M.atlas.n}
-    (hσ : AnalyticAt ℂ σ y) (hσy : σ y = u) (hu : u ∈ (M.atlas.chart j).target)
+theorem sheet_cxHessian
+    (M : CxModel P e)
+    {σ : (Fin e → ℂ) → (Fin e → ℂ)} {γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y u : Fin e → ℂ} {x : M.Xc}
+    {j : Fin M.atlas.n} (hσ : AnalyticAt ℂ σ y) (hσy : σ y = u) (hu : u ∈ (M.atlas.chart j).target)
     (hsu : (M.atlas.chart j).symm u = x) (hγ' : AnalyticAt ℂ γ' y)
     (hpts : ∀ᶠ y' in 𝓝 y, γ' y' ∈ mcPts P ∧ M.proj (γ' y') = (M.atlas.chart j).symm (σ y'))
-    (L : HermLine ι) (r : ℝ) (ϕ : M.Xc → ℝ)
-    (hϕ : ContDiffAt ℝ 2 (ϕ ∘ (M.atlas.chart j).symm) u)
-    {U : Set M.Xc} (hU : IsOpen U) (hxU : x ∈ U) {s : M.Xc → (Σ k, ι k) → ℂ}
-    (hs : ∀ y' ∈ U, s y' ∈ mcPts P ∧ M.proj (s y') = y')
-    (hsa : ∀ p, M.atlas.HoloOn U fun y' => s y' p) {G : M.Xc → ℂ} (hG : M.atlas.HoloOn U G)
-    (hpot : ∀ y' ∈ U, ϕ y' - r * Real.log (L.h (s y')) = (G y').re) :
-    cxHessian (fun y' => r * Real.log (L.h (γ' y'))) y =
-      cxHessian ((ϕ ∘ (M.atlas.chart j).symm) ∘ σ) y := by
+    (L : HermLine ι) (r : ℝ)
+    (ϕ : M.Xc → ℝ) (hϕ : ContDiffAt ℝ 2 (ϕ ∘ (M.atlas.chart j).symm) u)
+    {U : Set M.Xc} (hU : IsOpen U) (hxU : x ∈ U)
+    {s : M.Xc → (Σ k, ι k) → ℂ} (hs : ∀ y' ∈ U, s y' ∈ mcPts P ∧ M.proj (s y') = y')
+    (hsa : ∀ p, M.atlas.HoloOn U fun y' => s y' p)
+    {G : M.Xc → ℂ}
+    (hG : M.atlas.HoloOn U G) (hpot : ∀ y' ∈ U, ϕ y' - r * Real.log (L.h (s y')) = (G y').re)
+    : cxHessian (fun y' => r * Real.log (L.h (γ' y'))) y
+      = cxHessian ((ϕ ∘ (M.atlas.chart j).symm) ∘ σ) y := by
   have hmem : u ∈ (M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' U :=
     ⟨hu, by rw [Set.mem_preimage, hsu]; exact hxU⟩
   have hopen := (M.atlas.chart j).isOpen_inter_preimage_symm hU
@@ -175,18 +184,23 @@ theorem sheet_cxHessian (M : CxModel P e) {σ : (Fin e → ℂ) → (Fin e → �
   · filter_upwards [hev] with y' h1
     exact hpot _ h1.2
 
-theorem sheet_density_eq (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (E : Set M.Xc) (x : M.Xc) (hx : x ∉ modelBad M Ψ E) {γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
-    (hγ' : IsSheet P Ψ (modelQ M Ψ x) (modelW M Ψ x) γ') (c : Fin e → ℝ) (B : Fin e → HermLine ι)
-    (Φ : Fin e → LocPot M.Xc)
-    (hsm : ∀ i, ContDiffAt ℝ 2 ((Φ i).φ x ∘ (M.atlas.chart (chartIdx M.atlas x)).symm)
-      (M.atlas.chart (chartIdx M.atlas x) x))
-    (hsec : ∀ i, ∃ U : Set M.Xc, IsOpen U ∧ x ∈ U ∧ ∃ s : M.Xc → (Σ k, ι k) → ℂ,
-      (∀ y' ∈ U, s y' ∈ mcPts P ∧ M.proj (s y') = y') ∧ (∀ p, M.atlas.HoloOn U fun y' => s y' p) ∧
-      ∃ G : M.Xc → ℂ, M.atlas.HoloOn U G ∧
-        ∀ y' ∈ U, (Φ i).φ x y' - c i * Real.log ((B i).h (s y')) = (G y').re) :
-    maDensity (fun i y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x) =
-      pushDens M.atlas Φ (modelQ M Ψ) x := by
+theorem sheet_density_eq
+    (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (E : Set M.Xc) (x : M.Xc) (hx : x ∉ modelBad M Ψ E)
+    {γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ} (hγ' : IsSheet P Ψ (modelQ M Ψ x) (modelW M Ψ x) γ')
+    (c : Fin e → ℝ) (B : Fin e → HermLine ι) (Φ : Fin e → LocPot M.Xc)
+    (hsm : ∀ i,
+      ContDiffAt ℝ 2 ((Φ i).φ x ∘ (M.atlas.chart (chartIdx M.atlas x)).symm)
+        (M.atlas.chart (chartIdx M.atlas x) x))
+    (hsec : ∀ i, ∃ U : Set M.Xc,
+      IsOpen U ∧ x ∈ U
+        ∧ ∃ s : M.Xc → (Σ k, ι k) → ℂ,
+          (∀ y' ∈ U, s y' ∈ mcPts P ∧ M.proj (s y') = y') ∧ (∀ p, M.atlas.HoloOn U fun y' => s y' p)
+            ∧ ∃ G : M.Xc → ℂ,
+              M.atlas.HoloOn U G
+                ∧ ∀ y' ∈ U, (Φ i).φ x y' - c i * Real.log ((B i).h (s y')) = (G y').re)
+    : maDensity (fun i y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x)
+      = pushDens M.atlas Φ (modelQ M Ψ) x := by
   set j := chartIdx M.atlas x with hjdef
   have hj : x ∈ (M.atlas.chart j).source := Classical.choose_spec (M.atlas.cover x)
   set u := M.atlas.chart j x with hudef
@@ -202,30 +216,42 @@ theorem sheet_density_eq (M : CxModel P e) (Ψ : (((k : K) → ι k) → ℂ) �
       tendsto_nhdsWithin_iff.mpr ⟨han.continuousAt.tendsto, hγ'.2.mono fun _ h => h.2.1⟩
     have h2 := (M.cont _ hz').tendsto.comp h1
     rwa [hproj] at h2
-  have hpts : ∀ᶠ y' in 𝓝 (modelQ M Ψ x),
-      γ' y' ∈ mcPts P ∧ M.proj (γ' y') = (M.atlas.chart j).symm (σ y') := by
+  have hpts
+      : ∀ᶠ y' in 𝓝 (modelQ M Ψ x),
+        γ' y' ∈ mcPts P ∧ M.proj (γ' y') = (M.atlas.chart j).symm (σ y') := by
     filter_upwards [hγ'.2, hcont.eventually hV] with y' ⟨_, h1, h2⟩ ⟨h3, h4⟩
     obtain ⟨-, hq, -⟩ := mem_fibre_data M Ψ h1 h2
     rw [hq] at h3
     exact ⟨h1, by rw [h3, (M.atlas.chart j).left_inv h4]⟩
-  have hH : ∀ i, cxHessian (fun y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x) =
-      cxHessian (((Φ i).φ x ∘ (M.atlas.chart j).symm) ∘ σ) (modelQ M Ψ x) := by
+  have hH
+      : ∀ i,
+        cxHessian (fun y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x)
+          = cxHessian (((Φ i).φ x ∘ (M.atlas.chart j).symm) ∘ σ) (modelQ M Ψ x) := by
     intro i
     obtain ⟨U, hU, hxU, s, hs, hsa, G, hG, hpot⟩ := hsec i
     exact sheet_cxHessian M hσ hσy hu hsu han hpts (B i) (c i) _ (hsm i) hU hxU hs hsa hG hpot
-  have hma : maDensity (fun i y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x) =
-      maDensity (fun i => ((Φ i).φ x ∘ (M.atlas.chart j).symm) ∘ σ) (modelQ M Ψ x) := by
+  have hma
+      : maDensity (fun i y' => c i * Real.log ((B i).h (γ' y'))) (modelQ M Ψ x)
+        = maDensity (fun i => ((Φ i).φ x ∘ (M.atlas.chart j).symm) ∘ σ) (modelQ M Ψ x) := by
     simp only [maDensity, hH]
-  have hloc : ReciprocityTheory.AnForm.maDens (fun i => (Φ i).φ x ∘ (M.atlas.chart j).symm) u =
-      locDens M.atlas Φ j u := by
+  have hloc
+      : ReciprocityTheory.AnForm.maDens (fun i => (Φ i).φ x ∘ (M.atlas.chart j).symm) u
+        = locDens M.atlas Φ j u := by
     unfold locDens
     rw [hsu]
     rfl
-  have hpush : pushDens M.atlas Φ (modelQ M Ψ) x = locDens M.atlas Φ j u /
-      ‖LinearMap.det (fderiv ℂ (modelQ M Ψ ∘ (M.atlas.chart j).symm) u :
-        (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))‖ ^ 2 := rfl
-  rw [hma, maDensity_eq_maDens, ReciprocityTheory.AnForm.A.maDens_comp
-    (fun i => (Φ i).φ x ∘ (M.atlas.chart j).symm) σ _ hσ (fun i => by rw [hσy]; exact hsm i),
+  have hpush
+      : pushDens M.atlas Φ (modelQ M Ψ) x
+        = locDens M.atlas Φ j u
+          / ‖LinearMap.det (fderiv ℂ (modelQ M Ψ ∘ (M.atlas.chart j).symm) u :
+              (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))‖
+            ^ 2 :=
+    rfl
+  rw [hma, maDensity_eq_maDens,
+    ReciprocityTheory.AnForm.A.maDens_comp
+      (fun i => (Φ i).φ x ∘ (M.atlas.chart j).symm)
+      σ _ hσ
+      (fun i => by rw [hσy]; exact hsm i),
     hnorm, hσy, hloc, hpush, div_eq_mul_inv]
 
 theorem fibre_term_ae : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (n : ℕ) (M : CxModel P n) (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)) (Y Z : Set M.Xc) (N : Set ((Σ k, ι k) → ℂ)) (c : Fin n → ℝ) (B : Fin n → HermLine ι) (Φ : Fin n → LocPot M.Xc) (g : ((Σ k, ι k) → ℂ) → ℝ) (G₀ : M.Xc → ℝ), IsArithVar P (n + 1) → IsGoodProj P Q → IsOpen Y → (∀ j, volume ((M.atlas.chart j).target ∩ (M.atlas.chart j).symm ⁻¹' (Yᶜ ∪ Z)) = 0) → IsPtsNull P n N → (∀ i x, M.atlas.SmoothOn ((Φ i).U x ∩ Y) ((Φ i).φ x)) → (∀ i, ∀ x, ∀ y₀ ∈ (Φ i).U x ∩ Y, ∃ U : Set M.Xc, IsOpen U ∧ y₀ ∈ U ∧ U ⊆ (Φ i).U x ∩ Y ∧ ∃ s : M.Xc → (Σ k, ι k) → ℂ, (∀ y' ∈ U, s y' ∈ mcPts (P) ∧ M.proj (s y') = y') ∧ (∀ p, M.atlas.HoloOn U fun y' => s y' p) ∧ ∃ G : M.Xc → ℂ, M.atlas.HoloOn U G ∧ ∀ y' ∈ U, (Φ i).φ x y' - (fun z => c i * Real.log ((B i).h z)) (s y') = (G y').re) → (∀ z ∈ mcPts P, z ∉ N → M.proj z ∈ Y → M.proj z ∉ Z → g z = G₀ (M.proj z)) → ∀ᵐ y, ∃ W : M.Xc → (((k : K) → ι k) → ℂ), Set.InjOn W (modelQ M Q ⁻¹' {y} \ modelBad M Q (Yᶜ ∪ Z)) ∧ fibre P Q y = W '' (modelQ M Q ⁻¹' {y} \ modelBad M Q (Yᶜ ∪ Z)) ∧ ∀ x ∈ modelQ M Q ⁻¹' {y} \ modelBad M Q (Yᶜ ∪ Z), sheetDensity P Q (fun i z => c i * Real.log ((B i).h z)) g y (W x) = G₀ x * pushDens M.atlas Φ (modelQ M Q) x := by

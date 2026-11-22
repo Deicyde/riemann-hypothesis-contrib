@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryLocal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -20,8 +21,7 @@ namespace GlobalTheory.BCT.OrbUnit
 open DoubleCoset
 
 theorem avg_const {H : Type} [Group H] (c : ℂ) : avg (fun _ : H => c) = c := by
-  have h1 : rStab (fun _ : H => c) = ⊤ := by
-    ext k; simp [rStab]
+  have h1 : rStab (fun _ : H => c) = ⊤ := by ext k; simp [rStab]
   unfold avg
   rw [h1, Subgroup.index_top]
   haveI : Subsingleton (H ⧸ (⊤ : Subgroup H)) := QuotientGroup.subsingleton_quotient_top
@@ -29,29 +29,40 @@ theorem avg_const {H : Type} [Group H] (c : ℂ) : avg (fun _ : H => c) = c := b
   rw [finsum_unique]
   simp
 
-theorem twOrb_unit {G : Type} [Group G] [TopologicalSpace G] (K : Subgroup G) (γ : G)
-    (horb : ∀ g₁ g₂ : G, g₁⁻¹ * γ * g₁ ∈ K → g₂⁻¹ * γ * g₂ ∈ K →
-      ∃ t ∈ twCent (MonoidHom.id G) γ, ∃ k ∈ K, g₂ = t * g₁ * k)
-    (hcpt : ∀ g : G, g⁻¹ * γ * g ∈ K →
-      cptPart (twCent (MonoidHom.id G) γ) ≤ K.map (MulAut.conj g).toMonoidHom) :
-    twOrb (MonoidHom.id G) K γ ((K : Set G).indicator 1) = if ∃ g : G, g⁻¹ * γ * g ∈ K then 1 else 0 := by
+theorem twOrb_unit
+    {G : Type} [Group G] [TopologicalSpace G]
+    (K : Subgroup G) (γ : G)
+    (horb : ∀ g₁ g₂ : G,
+      g₁⁻¹ * γ * g₁ ∈ K → g₂⁻¹ * γ * g₂ ∈ K
+        → ∃ t ∈ twCent (MonoidHom.id G) γ, ∃ k ∈ K, g₂ = t * g₁ * k)
+    (hcpt : ∀ g : G,
+      g⁻¹ * γ * g ∈ K → cptPart (twCent (MonoidHom.id G) γ) ≤ K.map (MulAut.conj g).toMonoidHom)
+    : twOrb (MonoidHom.id G) K γ ((K : Set G).indicator 1)
+      = if ∃ g : G, g⁻¹ * γ * g ∈ K then 1 else 0 := by
   classical
   set T := twCent (MonoidHom.id G) γ with hT
   have hTle : cptPart T ≤ T := by
     unfold cptPart
     rw [Subgroup.closure_le]
-    intro t ht; exact ht.1
-  have hterm : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
-      ((((T ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex (cptPart T) : ℕ) : ℂ) *
-        avg fun k : K => (K : Set G).indicator 1 ((Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)))
-      = if (Quotient.out q)⁻¹ * γ * Quotient.out q ∈ K then 1 else 0 := by
+    intro t ht
+    exact ht.1
+  have hterm
+      : ∀ q : DoubleCoset.Quotient (T : Set G) (K : Set G),
+        ((((T ⊓ K.map (MulAut.conj (Quotient.out q)).toMonoidHom).relIndex (cptPart T) : ℕ) : ℂ)
+            * avg fun k : K =>
+              (K : Set G).indicator 1
+                ((Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)))
+          = if (Quotient.out q)⁻¹ * γ * Quotient.out q ∈ K then 1 else 0 := by
     intro q
-    have hconst : (fun k : K => (K : Set G).indicator (1 : G → ℂ)
-        ((Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)))
-        = fun _ => if (Quotient.out q)⁻¹ * γ * Quotient.out q ∈ K then 1 else 0 := by
+    have hconst
+        : (fun k : K =>
+            (K : Set G).indicator (1 : G → ℂ)
+              ((Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)))
+          = fun _ => if (Quotient.out q)⁻¹ * γ * Quotient.out q ∈ K then 1 else 0 := by
       funext k
-      have he : (Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)
-          = (k : G)⁻¹ * ((Quotient.out q)⁻¹ * γ * Quotient.out q) * k := by
+      have he
+          : (Quotient.out q * k)⁻¹ * γ * (MonoidHom.id G) (Quotient.out q * k)
+            = (k : G)⁻¹ * ((Quotient.out q)⁻¹ * γ * Quotient.out q) * k := by
         simp only [MonoidHom.id_apply]; group
       rw [he]
       by_cases hm : (Quotient.out q)⁻¹ * γ * Quotient.out q ∈ K
@@ -59,7 +70,8 @@ theorem twOrb_unit {G : Type} [Group G] [TopologicalSpace G] (K : Subgroup G) (�
           K.mul_mem (K.mul_mem (K.inv_mem k.2) hm) k.2
         simp [Set.indicator_of_mem this, hm]
       · have : (k : G)⁻¹ * ((Quotient.out q)⁻¹ * γ * Quotient.out q) * k ∉ K := by
-          intro h; apply hm
+          intro h
+          apply hm
           have := K.mul_mem (K.mul_mem k.2 h) (K.inv_mem k.2)
           simpa [mul_assoc] using this
         simp [Set.indicator_of_notMem this, hm]
@@ -76,14 +88,18 @@ theorem twOrb_unit {G : Type} [Group G] [TopologicalSpace G] (K : Subgroup G) (�
       have htc : t * γ = γ * t := by simpa [hT, twCent] using ht
       have : (t * g₀ * k)⁻¹ * γ * (t * g₀ * k) = k⁻¹ * (g₀⁻¹ * γ * g₀) * k := by
         have : t⁻¹ * γ * t = γ := by rw [mul_assoc, ← htc, ← mul_assoc, inv_mul_cancel, one_mul]
-        calc (t * g₀ * k)⁻¹ * γ * (t * g₀ * k) = k⁻¹ * (g₀⁻¹ * (t⁻¹ * γ * t) * g₀) * k := by group
+        calc
+          (t * g₀ * k)⁻¹ * γ * (t * g₀ * k)
+            = k⁻¹ * (g₀⁻¹ * (t⁻¹ * γ * t) * g₀) * k := by group
           _ = _ := by rw [this]
-      rw [this]; exact K.mul_mem (K.mul_mem (K.inv_mem hk) hg₀) hk
+      rw [this]
+      exact K.mul_mem (K.mul_mem (K.inv_mem hk) hg₀) hk
     rw [finsum_eq_single _ (DoubleCoset.mk T K g₀)]
     · rw [if_pos]
       obtain ⟨h, hh, k, hk, he⟩ := DoubleCoset.mk_out_eq_mul T K g₀
       apply hgood
-      rw [he]; exact mem_doubleCoset.2 ⟨h, hh, k, hk, rfl⟩
+      rw [he]
+      exact mem_doubleCoset.2 ⟨h, hh, k, hk, rfl⟩
     · intro q hq
       rw [if_neg]
       intro hm
@@ -93,7 +109,8 @@ theorem twOrb_unit {G : Type} [Group G] [TopologicalSpace G] (K : Subgroup G) (�
       exact ⟨t⁻¹, T.inv_mem ht, k⁻¹, K.inv_mem hk, by rw [he]; group⟩
   · push_neg at hex
     rw [finsum_eq_zero_of_forall_eq_zero]
-    intro q; rw [if_neg (hex _)]
+    intro q
+    rw [if_neg (hex _)]
 
 end GlobalTheory.BCT.OrbUnit
 

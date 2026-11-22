@@ -8,8 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix IsLocalRing TensorProduct UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.units_one_block :
-    ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι] [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) (p : ι), (∀ i, o i = p) → ∃ φ : E ≃ₐ[B] Matrix ι ι B, (∀ y i j, φ y i j = T.tr (U.x i * y * T.st (U.x j))) ∧ (∀ y, φ (T.st y) = (φ y)ᵀ) ∧ ∀ y, (φ y).trace = T.tr y := by
+theorem UpperTheory.V.AlgebraTools.units_one_block
+    : ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι]
+        [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) (p : ι),
+      (∀ i, o i = p)
+        → ∃ φ : E ≃ₐ[B] Matrix ι ι B,
+          (∀ y i j, φ y i j = T.tr (U.x i * y * T.st (U.x j))) ∧ (∀ y, φ (T.st y) = (φ y)ᵀ)
+            ∧ ∀ y, (φ y).trace = T.tr y := by
   intro B E _ _ _ T ι _ _ o U p ho
   obtain ⟨hA, hB, -, hD, hE, hF, -⟩ := units_basic T o U
   have hidem : U.ep p * U.ep p = U.ep p := (U.coi.idem p).eq
@@ -24,16 +29,21 @@ theorem UpperTheory.V.AlgebraTools.units_one_block :
     intro j
     have h := U.x_mem j
     rw [ho] at h
-    calc U.ep p * U.x j = U.ep p * (U.ep p * U.x j * U.ep j) := by rw [h]
+    calc
+      U.ep p * U.x j
+        = U.ep p * (U.ep p * U.x j * U.ep j) := by rw [h]
       _ = U.ep p * U.ep p * U.x j * U.ep j := by simp only [mul_assoc]
       _ = U.x j := by rw [hidem, h]
   have hE' : ∀ i j y, U.x i * y * T.st (U.x j) = T.tr (U.x i * y * T.st (U.x j)) • U.ep p := by
     intro i j y
     have h := hE i j y (by rw [ho i, ho j])
     rwa [ho i] at h
-  have hpair : ∀ a b : E, a = T.tr a • U.ep p → b = T.tr b • U.ep p → T.tr (a * b) = T.tr a * T.tr b := by
+  have hpair
+      : ∀ a b : E, a = T.tr a • U.ep p → b = T.tr b • U.ep p → T.tr (a * b) = T.tr a * T.tr b := by
     intro a b ha hb
-    calc T.tr (a * b) = T.tr ((T.tr a • U.ep p) * (T.tr b • U.ep p)) := by rw [← ha, ← hb]
+    calc
+      T.tr (a * b)
+        = T.tr ((T.tr a • U.ep p) * (T.tr b • U.ep p)) := by rw [← ha, ← hb]
       _ = T.tr a * T.tr b := by rw [smul_mul_smul_comm, hidem, map_smul, hte, smul_eq_mul, mul_one]
   let f : E → Matrix ι ι B := fun y => Matrix.of fun i j => T.tr (U.x i * y * T.st (U.x j))
   let g : Matrix ι ι B → E := fun M => ∑ i, ∑ j, M i j • (T.st (U.x i) * U.x j)
@@ -41,15 +51,16 @@ theorem UpperTheory.V.AlgebraTools.units_one_block :
     intro y z
     ext i j
     simp only [f, Matrix.of_apply, Matrix.mul_apply]
-    calc T.tr (U.x i * (y * z) * T.st (U.x j))
-        = T.tr (U.x i * y * (∑ k, T.st (U.x k) * U.x k) * z * T.st (U.x j)) := by
-          rw [hB, mul_one, mul_assoc (U.x i) y z]
+    calc
+      T.tr (U.x i * (y * z) * T.st (U.x j))
+          = T.tr (U.x i * y * (∑ k, T.st (U.x k) * U.x k) * z * T.st (U.x j)) := by
+        rw [hB, mul_one, mul_assoc (U.x i) y z]
       _ = ∑ k, T.tr ((U.x i * y * T.st (U.x k)) * (U.x k * z * T.st (U.x j))) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [Finset.mul_sum, Finset.sum_mul, map_sum, mul_assoc]
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp only [Finset.mul_sum, Finset.sum_mul, map_sum, mul_assoc]
       _ = _ := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          exact hpair _ _ (hE' i k y) (hE' k j z)
+        refine Finset.sum_congr rfl fun k _ => ?_
+        exact hpair _ _ (hE' i k y) (hE' k j z)
   have hfadd : ∀ y z, f (y + z) = f y + f z := by
     intro y z
     ext i j
@@ -73,11 +84,15 @@ theorem UpperTheory.V.AlgebraTools.units_one_block :
   have hfg : ∀ M, f (g M) = M := by
     intro M
     ext i j
-    have hq : ∀ k l, U.x i * (T.st (U.x k) * U.x l) * T.st (U.x j) = (U.x i * T.st (U.x k)) * (U.x l * T.st (U.x j)) := by
+    have hq
+        : ∀ k l,
+          U.x i * (T.st (U.x k) * U.x l) * T.st (U.x j)
+            = (U.x i * T.st (U.x k)) * (U.x l * T.st (U.x j)) := by
       intro k l
       simp only [mul_assoc]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, g, Matrix.of_apply, Finset.mul_sum, Finset.sum_mul, map_sum, mul_smul_comm, smul_mul_assoc, map_smul, hq, hxs]
+      simp only [f, g, Matrix.of_apply, Finset.mul_sum, Finset.sum_mul, map_sum, mul_smul_comm,
+        smul_mul_assoc, map_smul, hq, hxs]
     simp [ite_mul, mul_ite, hidem, hte, apply_ite]
   have hfst : ∀ y, f (T.st y) = (f y)ᵀ := by
     intro y
@@ -91,5 +106,13 @@ theorem UpperTheory.V.AlgebraTools.units_one_block :
   have hcomm : ∀ r : B, f (algebraMap B E r) = algebraMap B (Matrix ι ι B) r := by
     intro r
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, hfsmul, hf1]
-  let φ : E ≃ₐ[B] Matrix ι ι B := { toFun := f, invFun := g, left_inv := hgf, right_inv := hfg, map_mul' := hfmul, map_add' := hfadd, commutes' := hcomm }
+  let φ : E ≃ₐ[B] Matrix ι ι B := {
+    toFun := f
+    invFun := g
+    left_inv := hgf
+    right_inv := hfg
+    map_mul' := hfmul
+    map_add' := hfadd
+    commutes' := hcomm
+  }
   exact ⟨φ, fun y i j => rfl, hfst, hftr⟩

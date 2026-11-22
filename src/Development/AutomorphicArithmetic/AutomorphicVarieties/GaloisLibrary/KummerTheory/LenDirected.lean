@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-theorem UpperTheory.V.Kum.lenDirected :
-    ∀ (R X : Type) [CommRing R] [AddCommGroup X] [Module R X] (W : Submodule R X) (P : ℕ → Submodule R X) (Bd : ℕ∞), Monotone P → W ≤ ⨆ n, P n →
-    (∀ n₀, ∃ n, n₀ ≤ n ∧ Module.length R (P n) ≤ Bd) → Module.length R W ≤ Bd := by
+theorem UpperTheory.V.Kum.lenDirected
+    : ∀ (R X : Type) [CommRing R] [AddCommGroup X] [Module R X] (W : Submodule R X)
+        (P : ℕ → Submodule R X) (Bd : ℕ∞),
+      Monotone P → W ≤ ⨆ n, P n → (∀ n₀, ∃ n, n₀ ≤ n ∧ Module.length R (P n) ≤ Bd)
+        → Module.length R W ≤ Bd := by
   intro R X _ _ _ W P Bd hP hW hBd
   classical
   rw [← WithBot.coe_le_coe, Module.coe_length, Order.krullDim, iSup_le_iff]
@@ -30,21 +34,22 @@ theorem UpperTheory.V.Kum.lenDirected :
   have hfmono : Monotone f := by
     intro S T hST
     exact Submodule.comap_mono (Submodule.map_mono hST)
-  let q : LTSeries (Submodule R (P n)) :=
-    { length := p.length
-      toFun := fun i => f (p i)
-      step := by
-        intro i
-        refine lt_of_le_of_ne (hfmono (p.step i).le) ?_
-        intro heq
-        have h1 : (⟨(x i : X), hxn i⟩ : P n) ∈ f (p i.succ) := by
-          simp only [f, Submodule.mem_comap, Submodule.subtype_apply, Submodule.mem_map]
-          exact ⟨x i, hx1 i, rfl⟩
-        rw [← heq] at h1
-        simp only [f, Submodule.mem_comap, Submodule.subtype_apply, Submodule.mem_map] at h1
-        obtain ⟨y, hy, hyx⟩ := h1
-        have : y = x i := Subtype.ext hyx
-        exact hx2 i (this ▸ hy) }
+  let q : LTSeries (Submodule R (P n)) := {
+    length := p.length
+    toFun := fun i => f (p i)
+    step := by
+      intro i
+      refine lt_of_le_of_ne (hfmono (p.step i).le) ?_
+      intro heq
+      have h1 : (⟨(x i : X), hxn i⟩ : P n) ∈ f (p i.succ) := by
+        simp only [f, Submodule.mem_comap, Submodule.subtype_apply, Submodule.mem_map]
+        exact ⟨x i, hx1 i, rfl⟩
+      rw [← heq] at h1
+      simp only [f, Submodule.mem_comap, Submodule.subtype_apply, Submodule.mem_map] at h1
+      obtain ⟨y, hy, hyx⟩ := h1
+      have : y = x i := Subtype.ext hyx
+      exact hx2 i (this ▸ hy)
+  }
   have hq := Order.LTSeries.length_le_krullDim q
   rw [← Module.coe_length] at hq
   exact hq.trans (WithBot.coe_le_coe.mpr hlen)

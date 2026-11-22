@@ -17,16 +17,23 @@ set_option maxHeartbeats 800000
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp Formalism.WeaklyAdmissibleFiltrations
-open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.Zero.LLC UpperTheory.V.Z.Win UpperTheory.Gal.SV UpperTheory.V.Z.Win.RR
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.LocGL GlobalTheory.GalOfCusp Formalism.WeaklyAdmissibleFiltrations
+open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.Zero.LLC UpperTheory.V.Z.Win
+  UpperTheory.Gal.SV UpperTheory.V.Z.Win.RR
 open scoped Matrix Pointwise
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace UpperTheory.V.Z.Win.RR
 variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [hl : Fact l.Prime]
-private theorem alg0 (P : _root_.UpperTheory.V.Af.HypothesesH') (ι : Qbar l ≃+* ℂ) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) (hW : Continuous W)
-    (hdet : IsCycWt l 0 (Matrix.GeneralLinearGroup.det.comp W)) (m : ℤ) :
-    IsAlgChar ι (Matrix.GeneralLinearGroup.det.comp W * cycBar ℚ Ω l ^ m) := by
+private theorem alg0
+    (P : _root_.UpperTheory.V.Af.HypothesesH') (ι : Qbar l ≃+* ℂ)
+    (W : G ℚ Ω →* GL (Fin 2) (Qbar l))
+    (hW : Continuous W) (hdet : IsCycWt l 0 (Matrix.GeneralLinearGroup.det.comp W))
+    (m : ℤ)
+    : IsAlgChar ι (Matrix.GeneralLinearGroup.det.comp W * cycBar ℚ Ω l ^ m) := by
   obtain ⟨M, χ, hM, hχ, hθ⟩ := hdet
   rw [zpow_zero, one_mul] at hθ
   have hfinite : ∃ k : ℕ, 0 < k ∧ ∀ s, χ s ^ k = 1 := by
@@ -37,31 +44,49 @@ private theorem alg0 (P : _root_.UpperTheory.V.Af.HypothesesH') (ι : Qbar l ≃
     rw [← map_pow]
     refine hχ _ fun ζ h => ?_
     have h1 := hμ.autToPow_spec ℚ (s ^ Fintype.card (ZMod M)ˣ)
-    rw [map_pow, pow_card_eq_one, Units.val_one, ZMod.val_one_eq_one_mod, ← pow_eq_pow_mod _ hμ.pow_eq_one, pow_one] at h1
+    rw [map_pow, pow_card_eq_one, Units.val_one, ZMod.val_one_eq_one_mod,
+        ← pow_eq_pow_mod _ hμ.pow_eq_one, pow_one]
+      at h1
     obtain ⟨i, -, rfl⟩ := hμ.eq_pow_of_pow_eq_one h
     rw [map_pow, ← h1]
   obtain ⟨k, hk, hpow⟩ := hfinite
   refine (_root_.UpperTheory.V.Af.algOfCyc_s P ℚ Ω l ι).1 _ ?_ fun w _ => ?_
   · have hcyc : Continuous (cycBar ℚ Ω l) :=
       (Continuous.units_map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom
-        ((continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val)).comp (continuous_cycZ ℚ Ω l)
+          ((continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val)).comp
+        (continuous_cycZ ℚ Ω l)
     have h1 : Continuous fun s => Matrix.GeneralLinearGroup.det (W s) * cycBar ℚ Ω l s ^ m :=
       (Matrix.GeneralLinearGroup.continuous_det.comp hW).mul ((continuous_zpow _).comp hcyc)
     exact h1
   · obtain ⟨A, hA⟩ : ∃ A : ValuationSubring Ω, IsPlaceOver A w := exists_isPlaceOver Ω w
     refine ⟨A, hA, m, k, hk, fun s _ => ?_⟩
-    rw [MonoidHom.mul_apply, MonoidHom.zpow_apply, mul_assoc, ← zpow_add, add_neg_cancel, zpow_zero, mul_one, hθ, hpow]
-private theorem alg_det (P : _root_.UpperTheory.V.Af.HypothesesH') (ι : Qbar l ≃+* ℂ) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) (hW : Continuous W)
-    (hdet : IsCycWt l 0 (Matrix.GeneralLinearGroup.det.comp W)) :
-    IsAlgChar ι (Matrix.GeneralLinearGroup.det.comp W * cycBar ℚ Ω l ^ (((2 : ℕ) : ℤ) - 1)) := alg0 P ι W hW hdet _
-private theorem flag_all {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) {B : ValuationSubring Ω}
-    (hB : B.valuation (l : Ω) < 1) (H : Subgroup (G ℚ Ω)) (hH : IsOpen (H : Set (G ℚ Ω)))
+    rw [MonoidHom.mul_apply, MonoidHom.zpow_apply, mul_assoc, ← zpow_add, add_neg_cancel, zpow_zero,
+      mul_one, hθ, hpow]
+private theorem alg_det
+    (P : _root_.UpperTheory.V.Af.HypothesesH') (ι : Qbar l ≃+* ℂ)
+    (W : G ℚ Ω →* GL (Fin 2) (Qbar l))
+    (hW : Continuous W) (hdet : IsCycWt l 0 (Matrix.GeneralLinearGroup.det.comp W))
+    : IsAlgChar ι (Matrix.GeneralLinearGroup.det.comp W * cycBar ℚ Ω l ^ (((2 : ℕ) : ℤ) - 1)) :=
+  alg0 P ι W hW hdet _
+private theorem flag_all
+    {e : ℕ} (he : 1 ≤ e)
+    (W : G ℚ Ω →* GL (Fin 2) (Qbar l))
+    {B : ValuationSubring Ω} (hB : B.valuation (l : Ω) < 1)
+    (H : Subgroup (G ℚ Ω)) (hH : IsOpen (H : Set (G ℚ Ω)))
     (hfl : IsFlagOn W (H ⊓ Ine (F := ℚ) B)
-      (fun i => ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp (H ⊓ Ine (F := ℚ) B).subtype)) :
-    ∃ N : Subgroup (G ℚ Ω), IsOpen (N : Set (G ℚ Ω)) ∧ ∀ w : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∈ w.asIdeal →
-      ∀ A : ValuationSubring Ω, IsPlaceOver A w → (∃ s ∈ N ⊓ Ine (F := ℚ) A, ∀ k : ℕ, k ≠ 0 → cycBar ℚ Ω l s ^ k ≠ 1) ∧
-        ∃ κ, IsFlagOn W (Dec (F := ℚ) A) κ ∧ ∀ i (s : ↥(Dec (F := ℚ) A)), (s : G ℚ Ω) ∈ N ⊓ Ine (F := ℚ) A →
-          κ i s = cycBar ℚ Ω l s ^ (![(e : ℤ), -(e : ℤ)] i) := by
+      (fun i => ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp (H ⊓ Ine (F := ℚ) B).subtype))
+    : ∃ N : Subgroup (G ℚ Ω),
+      IsOpen (N : Set (G ℚ Ω))
+        ∧ ∀ w : HeightOneSpectrum (𝓞 ℚ),
+          ((l : ℕ) : 𝓞 ℚ) ∈ w.asIdeal
+            → ∀ A : ValuationSubring Ω,
+              IsPlaceOver A w
+                → (∃ s ∈ N ⊓ Ine (F := ℚ) A, ∀ k : ℕ, k ≠ 0 → cycBar ℚ Ω l s ^ k ≠ 1)
+                  ∧ ∃ κ,
+                    IsFlagOn W (Dec (F := ℚ) A) κ
+                      ∧ ∀ i (s : ↥(Dec (F := ℚ) A)),
+                        (s : G ℚ Ω) ∈ N ⊓ Ine (F := ℚ) A
+                          → κ i s = cycBar ℚ Ω l s ^ (![(e : ℤ), -(e : ℤ)] i) := by
   have : IsGalois ℚ Ω := {}
   have := Subgroup.quotient_finite_of_isOpen H hH
   have : H.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
@@ -81,7 +106,9 @@ private theorem flag_all {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) 
       change algebraMap ℚ_[l] (Qbar l) (PadicInt.Coe.ringHom ((cycZ ℚ Ω l s : ℤ_[l]ˣ) : ℤ_[l])) = _
       rw [he, hu.unit_spec, map_natCast, map_natCast]
     have h3 := congrArg Units.val h
-    rw [Units.val_pow_eq_pow_val, h2, Units.val_one, ← Nat.cast_pow, Nat.cast_eq_one, Nat.pow_eq_one] at h3
+    rw [Units.val_pow_eq_pow_val, h2, Units.val_one, ← Nat.cast_pow, Nat.cast_eq_one,
+        Nat.pow_eq_one]
+      at h3
     have := hl.out.pos
     omega
   obtain ⟨s, hs, hs'⟩ := hcyc
@@ -97,27 +124,34 @@ private theorem flag_all {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) 
     have hpr : Prime (l : 𝓞 ℚ) := by
       have e : (l : 𝓞 ℚ) = Rat.ringOfIntegersEquiv.symm (l : ℤ) := by simp
       rw [e]
-      exact (MulEquiv.prime_iff Rat.ringOfIntegersEquiv.symm.toMulEquiv).mpr (Nat.prime_iff_prime_int.1 hl.out)
+      exact (MulEquiv.prime_iff Rat.ringOfIntegersEquiv.symm.toMulEquiv).mpr
+        (Nat.prime_iff_prime_int.1 hl.out)
     have hm : (Ideal.span {(l : 𝓞 ℚ)}).IsMaximal :=
-      ((Ideal.span_singleton_prime hpr.ne_zero).2 hpr).isMaximal (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hpr.ne_zero)
-    have e : v = w := HeightOneSpectrum.ext
-      ((hm.eq_of_le v.isPrime.ne_top ((Ideal.span_singleton_le_iff_mem _).2 ((p3 v hv).1 hB))).symm.trans
+      ((Ideal.span_singleton_prime hpr.ne_zero).2 hpr).isMaximal
+        (by rw [Ne, Ideal.span_singleton_eq_bot]; exact hpr.ne_zero)
+    have e : v = w :=
+      HeightOneSpectrum.ext ((hm.eq_of_le v.isPrime.ne_top
+          ((Ideal.span_singleton_le_iff_mem _).2 ((p3 v hv).1 hB))).symm.trans
         (hm.eq_of_le w.isPrime.ne_top ((Ideal.span_singleton_le_iff_mem _).2 hw)))
     exact e ▸ hv
   obtain ⟨g, rfl⟩ := exists_smul_eq_of_isPlaceOver hBw hA
-  have hfl' : IsFlagOn W (H.normalCore ⊓ Ine (F := ℚ) (g • B))
-      (fun i => ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp (H.normalCore ⊓ Ine (F := ℚ) (g • B)).subtype) := by
+  have hfl' : IsFlagOn W (H.normalCore ⊓ Ine (F := ℚ) (g • B)) (fun i =>
+      ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp
+        (H.normalCore ⊓ Ine (F := ℚ) (g • B)).subtype) := by
     obtain ⟨p, hp⟩ := hfl
     refine ⟨p * (W g)⁻¹, fun t => ?_⟩
-    have hm : g⁻¹ * (t : G ℚ Ω) * g ∈ H ⊓ Ine (F := ℚ) B :=
-      ⟨H.normalCore_le (hn.conj_mem' _ t.2.1 g), GlobalTheory.PointIrredCompare.conj_mem_Ine_of_smul t.2.2⟩
+    have hm : g⁻¹ * (t : G ℚ Ω) * g ∈ H ⊓ Ine (F := ℚ) B := ⟨
+      H.normalCore_le (hn.conj_mem' _ t.2.1 g),
+      GlobalTheory.PointIrredCompare.conj_mem_Ine_of_smul t.2.2
+    ⟩
     have e1 : p * (W g)⁻¹ * W t * (p * (W g)⁻¹)⁻¹ = p * W (g⁻¹ * (t : G ℚ Ω) * g) * p⁻¹ := by
       rw [map_mul, map_mul, map_inv]; group
     obtain ⟨h1, h2⟩ := hp ⟨_, hm⟩
     rw [e1]
     refine ⟨h1, fun i => (h2 i).trans ?_⟩
     congr 1
-    change ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)) (g⁻¹ * (t : G ℚ Ω) * g) = ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)) t
+    change ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)) (g⁻¹ * (t : G ℚ Ω) * g)
+      = ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)) t
     rw [map_mul, map_mul, map_inv, mul_right_comm, inv_mul_cancel, one_mul]
   let D := Dec (F := ℚ) (g • B)
   let N := H.normalCore ⊓ Ine (F := ℚ) (g • B)
@@ -126,8 +160,9 @@ private theorem flag_all {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) 
     ⟨hn.conj_mem' t ht.1 d, by simpa using conj_mem_Ine (D.inv_mem hd) ht.2⟩
   have hne : ∃ t ∈ N, χ 0 t ≠ χ 1 t := by
     refine ⟨_, hs0, fun h1 => hinf (e + e) (by omega) ?_⟩
-    change ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] 0)) (s ^ H.normalCore.index) =
-      ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] 1)) (s ^ H.normalCore.index) at h1
+    change ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] 0)) (s ^ H.normalCore.index)
+        = ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] 1)) (s ^ H.normalCore.index)
+      at h1
     rw [MonoidHom.zpow_apply, MonoidHom.zpow_apply] at h1
     simp only [Matrix.cons_val_zero, Matrix.cons_val_one, zpow_neg, zpow_natCast] at h1
     rw [pow_add]
@@ -147,32 +182,46 @@ private theorem flag_all {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) 
     have : (χ 0 s0 : Qbar l) - χ 1 s0 ≠ 0 := sub_ne_zero.2 fun h => hne (Units.ext h)
     apply mul_left_cancel₀ this
     linear_combination e2
-  refine ⟨fun i => MonoidHom.toHomUnits
-    { toFun := fun s => M s i i
-      map_one' := by simp
-      map_mul' := fun s t => by
-        rw [Subgroup.coe_mul, hmul]
-        fin_cases i
-        · simp [h3 _ t.2]
-        · simp [h3 _ s.2] }, ⟨p, fun s => ⟨fun i j hij => ?_, fun i => rfl⟩⟩, fun i s hs => Units.ext (h2 _ hs i)⟩
+  refine ⟨
+    fun i =>
+      MonoidHom.toHomUnits {
+        toFun := fun s => M s i i
+        map_one' := by simp
+        map_mul' := fun s t => by
+          rw [Subgroup.coe_mul, hmul]
+          fin_cases i
+          · simp [h3 _ t.2]
+          · simp [h3 _ s.2]
+      },
+    ⟨p, fun s => ⟨fun i j hij => ?_, fun i => rfl⟩⟩,
+    fun i s hs => Units.ext (h2 _ hs i)
+  ⟩
   fin_cases i <;> fin_cases j
   · exact absurd hij (by decide)
   · exact absurd hij (by decide)
   · exact h3 _ s.2
   · exact absurd hij (by decide)
-private theorem zpow_ne {C : Type} [Group C] {x : C} (h : ∀ k : ℕ, k ≠ 0 → x ^ k ≠ 1) {a b : ℤ} (e : x ^ a = x ^ b) : a = b := by
+private theorem zpow_ne
+    {C : Type} [Group C] {x : C} (h : ∀ k : ℕ, k ≠ 0 → x ^ k ≠ 1) {a b : ℤ} (e : x ^ a = x ^ b)
+    : a = b := by
   by_contra hne
   have h1 : x ^ (a - b) = 1 := by rw [zpow_sub, e, mul_inv_cancel]
   refine h (a - b).natAbs (by omega) ?_
   rcases Int.natAbs_eq (a - b) with h2 | h2
   · rw [← zpow_natCast, ← h2, h1]
   · rw [← zpow_natCast, ← inv_inj, ← zpow_neg, ← h2, h1, inv_one]
-private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : CompatT) (ι : Qbar l ≃+* ℂ) {e : ℕ} (he : 1 ≤ e) (W : G ℚ Ω →* GL (Fin 2) (Qbar l))
-    (hW : Continuous W) (π : TR.CuspSub ℚ 2) (hreg : π.IsRegAlg) (hatt : AttR ι W π) (hU : WitUp ι W)
-    {B : ValuationSubring Ω} (hB : B.valuation (l : Ω) < 1) (H : Subgroup (G ℚ Ω)) (hH : IsOpen (H : Set (G ℚ Ω)))
+private theorem inf_char
+    (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : CompatT)
+    (ι : Qbar l ≃+* ℂ)
+    {e : ℕ} (he : 1 ≤ e)
+    (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) (hW : Continuous W)
+    (π : TR.CuspSub ℚ 2) (hreg : π.IsRegAlg) (hatt : AttR ι W π)
+    (hU : WitUp ι W)
+    {B : ValuationSubring Ω} (hB : B.valuation (l : Ω) < 1)
+    (H : Subgroup (G ℚ Ω)) (hH : IsOpen (H : Set (G ℚ Ω)))
     (hfl : IsFlagOn W (H ⊓ Ine (F := ℚ) B)
-      (fun i => ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp (H ⊓ Ine (F := ℚ) B).subtype)) :
-    ∀ v, π.HasInfChar v (infOf ![(e : ℤ), -(e : ℤ)]) := by
+      (fun i => ((cycBar ℚ Ω l) ^ (![(e : ℤ), -(e : ℤ)] i)).comp (H ⊓ Ine (F := ℚ) B).subtype))
+    : ∀ v, π.HasInfChar v (infOf ![(e : ℤ), -(e : ℤ)]) := by
   intro v
   obtain ⟨hdet, L, _, _, _, _, _, hirr, ⟨η, σ₀, hσ₀, hησ, hηL⟩, ka, hka, hWit⟩ := hU
   have : Module.IsTorsionFree L Ω := DivisionSemiring.to_moduleIsTorsionFree
@@ -182,12 +231,17 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
   have : IsAlgClosure K Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
   have a : IsAbelianGalois K L := IsAbelianGalois.tower_top ℚ K L
   have : Group.IsSolvable (L ≃ₐ[K] L) := Group.isSolvable_of_comm a.is_comm.comm
-  have ec : W.comp (galEmb ℚ L Ω) = (W.comp (galEmb ℚ K Ω)).comp (galEmb K L Ω) := MonoidHom.ext fun _ => rfl
+  have ec : W.comp (galEmb ℚ L Ω) = (W.comp (galEmb ℚ K Ω)).comp (galEmb K L Ω) :=
+    MonoidHom.ext fun _ => rfl
   have hirr' : IsIrr ((W.comp (galEmb ℚ K Ω)).comp (galEmb K L Ω)) := ec ▸ hirr
-  obtain ⟨P₁, a1, a2, a3⟩ := _root_.UpperTheory.V.Z.Bc.upQuadI_of_alt P.toClassicalTheorems (Z.Bc.quadLiftRealToComplex_of_base_change P.bc) ℚ K Ω l ι hK W π hW hreg hatt
-    ((UpperTheory.galoisRep_irreducibility_criterion.1 _ _ _ 2 _).1 _ hirr')
-  obtain ⟨Q, b1, b2, b3⟩ := _root_.UpperTheory.V.Z.Bc.upSolI_of_alt P.toClassicalTheorems (Z.Bc.cyclicLiftRankTwo_of_cyclic_base_change P.cyc) K L Ω l ι _ P₁
-    (hW.comp (continuous_restrictScalarsHom ℚ K Ω)) a1 a2 hirr'
+  obtain ⟨P₁, a1, a2, a3⟩ :=
+    _root_.UpperTheory.V.Z.Bc.upQuadI_of_alt P.toClassicalTheorems
+      (Z.Bc.quadLiftRealToComplex_of_base_change P.bc) ℚ K Ω l ι hK W π hW hreg hatt
+      ((UpperTheory.galoisRep_irreducibility_criterion.1 _ _ _ 2 _).1 _ hirr')
+  obtain ⟨Q, b1, b2, b3⟩ :=
+    _root_.UpperTheory.V.Z.Bc.upSolI_of_alt P.toClassicalTheorems
+      (Z.Bc.cyclicLiftRankTwo_of_cyclic_base_change P.cyc) K L Ω l ι _ P₁
+      (hW.comp (continuous_restrictScalarsHom ℚ K Ω)) a1 a2 hirr'
   rw [← ec] at b2
   have hWL : Continuous (W.comp (galEmb ℚ L Ω)) := hW.comp (continuous_restrictScalarsHom ℚ L Ω)
   have hpol : Sol.Pol ι W := by
@@ -200,8 +254,7 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
       have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
       let j : Ω →ₐ[ℚ] ℂ := (by
         refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-        solve_by_elim* (maxDepth := 2) only [*,
-          @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+        solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
           @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
       let : Algebra Ω ℂ := j.toRingHom.toAlgebra
       have : IsScalarTower ℚ Ω ℂ := IsScalarTower.of_algebraMap_eq fun x => (j.commutes x).symm
@@ -209,21 +262,26 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
       let τ : ℂ ≃ₐ[ℚ] ℂ := AlgEquiv.ofRingEquiv (f := starRingAut) fun x => by simp
       exact ⟨τ.restrictNormal Ω, algebraMap Ω ℂ, fun x => AlgEquiv.restrictNormal_commutes τ Ω x⟩
     obtain ⟨c, hc⟩ := hconj
-    have hpair : ∃ P, IsPairing c W ((Matrix.GeneralLinearGroup.det.comp W).comp (resG ℚ ℚ Ω)) P := by
-      let J : GL (Fin 2) (Qbar l) := Matrix.GeneralLinearGroup.mkOfDetNeZero !![0, 1; -1, 0] (by simp [Matrix.det_fin_two])
+    have hpair
+        : ∃ P, IsPairing c W ((Matrix.GeneralLinearGroup.det.comp W).comp (resG ℚ ℚ Ω)) P := by
+      let J : GL (Fin 2) (Qbar l) :=
+        Matrix.GeneralLinearGroup.mkOfDetNeZero !![0, 1; -1, 0] (by simp [Matrix.det_fin_two])
       refine ⟨J * W c⁻¹, fun s s' h => ?_⟩
       have h' : s' = c * s * c⁻¹ := h
       have e : W c⁻¹ * W s' = W s * W c⁻¹ := by rw [h', ← map_mul, ← map_mul]; congr 1; group
       have e' : (W c⁻¹).val * (W s').val = (W s).val * (W c⁻¹).val := congrArg Units.val e
       have hp : (W s).valᵀ * J.val * (W s).val = (W s).val.det • J.val := by
         ext i j
-        fin_cases i <;> fin_cases j <;> simp [J, Matrix.mul_apply, Fin.sum_univ_succ, Matrix.det_fin_two] <;> ring
-      have hd : (((Matrix.GeneralLinearGroup.det.comp W).comp (resG ℚ ℚ Ω) s : (Qbar l)ˣ) : Qbar l) = (W s).val.det := rfl
+        fin_cases i <;> fin_cases j
+          <;> simp [J, Matrix.mul_apply, Fin.sum_univ_succ, Matrix.det_fin_two] <;> ring
+      have hd
+          : (((Matrix.GeneralLinearGroup.det.comp W).comp (resG ℚ ℚ Ω) s : (Qbar l)ˣ) : Qbar l)
+            = (W s).val.det :=
+        rfl
       rw [hd, Units.val_mul, ← Matrix.smul_mul, ← hp]
       simp only [Matrix.mul_assoc, e']
     obtain ⟨J, hJ⟩ := hpair
-    refine ⟨ℚ, _, _, _, _, inferInstance, inferInstance, inferInstance, _, c, J, halg,
-      ?_, hc, hJ⟩
+    refine ⟨ℚ, _, _, _, _, inferInstance, inferInstance, inferInstance, _, c, J, halg, ?_, hc, hJ⟩
     intro c c' h h'
     rw [hθ]
     have hroot {d : G ℚ Ω} (hd : IsConjEl d) {ζ : Ω} (hz : ζ ^ M = 1) : d ζ = ζ⁻¹ := by
@@ -231,16 +289,22 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
       apply j.injective
       have h1 : (j ζ) ^ M = 1 := by rw [← map_pow, hz, map_one]
       rw [hj, map_inv₀, Complex.inv_eq_conj (Complex.norm_eq_one_of_pow_eq_one h1 (by omega))]
-    have heq := hχ (c⁻¹ * c') fun ζ hz => by
-      rw [AlgEquiv.mul_apply, hroot h' hz, ← hroot h hz]
-      exact c.symm_apply_apply ζ
+    have heq :=
+      hχ (c⁻¹ * c') fun ζ hz => by
+        rw [AlgEquiv.mul_apply, hroot h' hz, ← hroot h hz]
+        exact c.symm_apply_apply ζ
     rwa [map_mul, map_inv, inv_mul_eq_one] at heq
-  have hQ := _root_.UpperTheory.V.Z.Win.polarized_pair_of_attached P one_le_two (UpperTheory.solvable_polarized_restriction ℚ L Ω l ι 2 W hpol) b2
+  have hQ :=
+    _root_.UpperTheory.V.Z.Win.polarized_pair_of_attached P one_le_two
+      (UpperTheory.solvable_polarized_restriction ℚ L Ω l ι 2 W hpol) b2
   have hka' : IsAlgChar ι ka := by
     obtain ⟨h1, art, χ, a, h2, h3, h4⟩ := hka
     exact ⟨χ, h1, art, a, h2, h3, h4⟩
   have hWA : WitA ι (W.comp (galEmb ℚ L Ω)) := by
-    have := (_root_.UpperTheory.V.Z.Win.aIsoTwOf_alt flagLaws ImaginaryQuadraticEtaCharacter.winTw P.toClassicalTheorems L Ω l ι 2 _ hWit).2 ka⁻¹ ((_root_.UpperTheory.V.Af.algOfCyc_s P L Ω l ι).2.1 ka ka hka' hka').2
+    have :=
+      (_root_.UpperTheory.V.Z.Win.aIsoTwOf_alt flagLaws ImaginaryQuadraticEtaCharacter.winTw
+          P.toClassicalTheorems L Ω l ι 2 _ hWit).2 ka⁻¹
+        ((_root_.UpperTheory.V.Af.algOfCyc_s P L Ω l ι).2.1 ka ka hka' hka').2
     have htw : tw (tw (W.comp (galEmb ℚ L Ω)) ka) ka⁻¹ = W.comp (galEmb ℚ L Ω) := by
       refine MonoidHom.ext fun s => Units.ext ?_
       rw [tw_val, tw_val, smul_smul, MonoidHom.inv_apply, Units.val_inv_eq_inv_val,
@@ -263,21 +327,29 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
     fin_cases i <;> fin_cases j <;> simp at e2 <;> omega
   have hpotL : PotUnl (W.comp (galEmb ℚ L Ω)) w := (((flagLaws ℚ Ω l 2 W).2.2.2 L).2.2 w hw).1 hpot
   obtain ⟨HT, hwt, hloc⟩ := hC L Ω l ι 2 one_le_two _ Q hWL b1 hQ b2
-  obtain ⟨⟨σ, hσ⟩, -⟩ := _root_.UpperTheory.V.Af.local_comp_complex_of_printed_results P.toClassicalTheorems L 2 Q w
+  obtain ⟨⟨σ, hσ⟩, -⟩ :=
+    _root_.UpperTheory.V.Af.local_comp_complex_of_printed_results P.toClassicalTheorems L 2 Q w
   obtain ⟨rc, hrc⟩ := recTExists L Ω B w h
   have hpl := (guard_of plainRec b1 b2 hWA (Or.inr (Or.inr hpotL)) hrc hσ).1
   obtain ⟨j, L0, hj, hBw⟩ := GlobalTheory.PlaceBridge.exists_locBridge l L Ω w B hw h
   obtain ⟨Bw, hBj, -⟩ := hBw L0 le_rfl
   have hInd : Induces Bw := fun x => by rw [hBj]; exact hj x
-  have hJ := ((hloc w σ hσ).2 hpl B h _ Bw hInd).2 (Bw.j.comp (algebraMap L Ω)) Bw.Kw (AlgHom.id _ _) fun _ => rfl
+  have hJ :=
+    ((hloc w σ hσ).2 hpl B h _ Bw hInd).2 (Bw.j.comp (algebraMap L Ω)) Bw.Kw (AlgHom.id _ _)
+      fun _ => rfl
   have hB0 : IsPlaceOver B (w.under (𝓞 ℚ)) := fun x => by
     rw [IsScalarTower.algebraMap_apply ℚ L Ω]
     exact h (algebraMap (𝓞 ℚ) (𝓞 L) x)
   obtain ⟨-, κ, ⟨g, hg⟩, hI⟩ := hall _ hw0 B hB0
   let ρ : ↥(Dec (F := L) B) →* ↥(Dec (F := ℚ) B) :=
     ((galEmb ℚ L Ω).comp (Dec (F := L) B).subtype).codRestrict _ fun s => s.2
-  have hH2 := jumpsOpen ![(e : ℤ), -(e : ℤ)] _ hWL B Bw hInd (fun i => (κ i).comp ρ) (N.comap (galEmb ℚ L Ω))
-    (hN.preimage (continuous_restrictScalarsHom ℚ L Ω)) ⟨g, fun s => hg (ρ s)⟩ (fun i s hs => hI i (ρ s) ⟨hs.1, hs.2⟩) _ _ hJ
+  have hH2 :=
+    jumpsOpen ![(e : ℤ), -(e : ℤ)] _ hWL B Bw hInd
+      (fun i => (κ i).comp ρ)
+      (N.comap (galEmb ℚ L Ω)) (hN.preimage (continuous_restrictScalarsHom ℚ L Ω))
+      ⟨g, fun s => hg (ρ s)⟩
+      (fun i s hs => hI i (ρ s) ⟨hs.1, hs.2⟩)
+      _ _ hJ
   obtain ⟨μ, hμ, -⟩ := hreg v
   have hμQ : Q.HasInfChar (ι.toRingHom.comp (Bw.j.comp (algebraMap L Ω))) μ :=
     b3 _ μ (a3 _ μ (by rwa [Subsingleton.elim (InfinitePlace.mk _) v]))
@@ -286,35 +358,53 @@ private theorem inf_char (P : _root_.UpperTheory.V.Af.HypothesesH') (hC : Compat
   have hμeq : infOf ![(e : ℤ), -(e : ℤ)] = μ := by
     have hmap := congrArg (Multiset.map fun z : ℂ => (((2 : ℕ) : ℂ) - 1) / 2 - z) hW2
     simpa only [infOf, Multiset.map_map, Function.comp_def, sub_sub_cancel, Multiset.map_id',
-      Int.cast_neg, sub_neg_eq_add] using hmap
+        Int.cast_neg, sub_neg_eq_add]
+      using hmap
   rwa [← hμeq] at hμ
 end UpperTheory.V.Z.Win.RR
-theorem UpperTheory.V.Z.Win.RR.autNewformA_of_exRS_of_compatT_of_repNewAE (hX : ExRS) (hC : CompatT) :
-    _root_.UpperTheory.V.Af.HypothesesH' → UpperTheory.V.Br.RepNewAE → AutNewformA := by
+theorem UpperTheory.V.Z.Win.RR.autNewformA_of_exRS_of_compatT_of_repNewAE (hX : ExRS) (hC : CompatT)
+    : _root_.UpperTheory.V.Af.HypothesesH' → UpperTheory.V.Br.RepNewAE → AutNewformA := by
   rintro P hN Ω _ _ _ l hl ι e he W hW - ⟨π, hreg, hatt⟩ hU B hB H hH hfl
   have hinf := UpperTheory.V.Z.Win.RR.inf_char P hC ι he W hW π hreg hatt hU hB H hH hfl
   obtain ⟨χ, hχ⟩ := UpperTheory.V.Z.Win.RR.alg_det P ι W hW hU.1
   have hdual : DualTw W (Matrix.GeneralLinearGroup.det.comp W) := by
-    refine ⟨⟨!![0, 1; -1, 0], !![0, -1; 1, 0], by simp [Matrix.one_fin_two], by simp [Matrix.one_fin_two]⟩, fun s => ?_⟩
+    refine ⟨
+      ⟨
+        !![0, 1; -1, 0],
+        !![0, -1; 1, 0],
+        by simp [Matrix.one_fin_two],
+        by simp [Matrix.one_fin_two]
+      ⟩,
+      fun s => ?_
+    ⟩
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two] <;> ring
-  have hsd := (_root_.UpperTheory.V.Af.self_dual_real_of_printed_hida P ℚ Ω l ι 2 (by omega) W π hatt _ χ hdual hχ).1
-  obtain ⟨-, wt, HT, -, -, hall⟩ := hX ℚ Ω l ι 2 (by omega) π χ hreg ⟨fun v v' => by rw [Subsingleton.elim v v'], hsd⟩
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+      <;> ring
+  have hsd :=
+    (_root_.UpperTheory.V.Af.self_dual_real_of_printed_hida P ℚ Ω l ι 2 (by omega) W π hatt _ χ
+      hdual hχ).1
+  obtain ⟨-, wt, HT, -, -, hall⟩ :=
+    hX ℚ Ω l ι 2 (by omega) π χ hreg ⟨fun v v' => by rw [Subsingleton.elim v v'], hsd⟩
   have hG := hall W hW hatt
-  obtain ⟨f, hf⟩ := hN (2 * e + 1) (by omega) e π fun v => by
-    convert hinf v using 1
-    simp only [infOf, Fin.univ_val_map, List.ofFn_succ, List.ofFn_zero, Multiset.insert_eq_cons, ← Multiset.cons_coe,
-      Multiset.coe_nil, Multiset.cons_zero, Matrix.cons_val_zero, Matrix.cons_val_succ]
-    congr 2 <;> push_cast <;> ring
-  have hfrob : ∀ w : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal → ∀ B, π.HasSat w B →
-      FrobEig ι W w (algSat 2 (normV w) B) := hG.frob
+  obtain ⟨f, hf⟩ :=
+    hN (2 * e + 1) (by omega) e π fun v => by
+      convert hinf v using 1
+      simp only [infOf, Fin.univ_val_map, List.ofFn_succ, List.ofFn_zero, Multiset.insert_eq_cons,
+        ← Multiset.cons_coe, Multiset.coe_nil, Multiset.cons_zero, Matrix.cons_val_zero,
+        Matrix.cons_val_succ]
+      congr 2 <;> push_cast <;> ring
+  have hfrob
+      : ∀ w : HeightOneSpectrum (𝓞 ℚ),
+        ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal → ∀ B, π.HasSat w B → FrobEig ι W w (algSat 2 (normV w) B) :=
+    hG.frob
   let ψ := cycBar ℚ Ω l ^ (-(e : ℤ))
   have hss : IsSSRep (tw W ψ) := by
     have hinv (U : Submodule (Qbar l) (Fin 2 → Qbar l)) : IsInv (tw W ψ) U ↔ IsInv W U := by
       constructor
       · intro hW g v hv
         have hsmul := U.smul_mem ((ψ g : Qbar l)⁻¹) (hW g v hv)
-        rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at hsmul
+        rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at
+          hsmul
       · intro hW g v hv
         rw [tw_val, Matrix.smul_mulVec]
         exact U.smul_mem _ (hW g v hv)
@@ -336,28 +426,35 @@ theorem UpperTheory.V.Z.Win.RR.autNewformA_of_exRS_of_compatT_of_repNewAE (hX : 
   · have h3 : cycZ ℚ Ω l s = 1 := by
       refine Units.ext (PadicInt.ext_of_toZModPow.mp fun n => ?_)
       rw [cycZ_toZModPow_eq (v := w) (σ := s) hwl hA (q := 1)
-        (fun x hx => by simpa only [pow_one] using hs.2 x hx) n]
+        (fun x hx => by simpa only [pow_one] using hs.2 x hx)
+        n]
       simp
     apply Units.ext
-    rw [tw_val, h1 s hs, MonoidHom.zpow_apply, cycBar, MonoidHom.comp_apply, h3, map_one, one_zpow, Units.val_one, one_smul]
+    rw [tw_val, h1 s hs, MonoidHom.zpow_apply, cycBar, MonoidHom.comp_apply, h3, map_one, one_zpow,
+      Units.val_one, one_smul]
   · have h3 : ((cycBar ℚ Ω l σ : (Qbar l)ˣ) : Qbar l) = (normV w : ℕ) := by
       change algebraMap ℚ_[l] (Qbar l) (PadicInt.Coe.ringHom ((cycZ ℚ Ω l σ : ℤ_[l]ˣ) : ℤ_[l])) = _
       rw [cycZ_of_isFrob hwl hA hσ, map_natCast, map_natCast]
-    have h4 : ι.toRingHom (((cycBar ℚ Ω l ^ (-(e : ℤ))) σ⁻¹ : (Qbar l)ˣ) : Qbar l) = (normV w : ℂ) ^ (e : ℤ) := by
-      rw [MonoidHom.zpow_apply, map_inv, Units.val_zpow_eq_zpow_val, Units.val_inv_eq_inv_val, h3, map_zpow₀,
-        map_inv₀, map_natCast, inv_zpow', neg_neg]
+    have h4
+        : ι.toRingHom (((cycBar ℚ Ω l ^ (-(e : ℤ))) σ⁻¹ : (Qbar l)ˣ) : Qbar l)
+          = (normV w : ℂ) ^ (e : ℤ) := by
+      rw [MonoidHom.zpow_apply, map_inv, Units.val_zpow_eq_zpow_val, Units.val_inv_eq_inv_val, h3,
+        map_zpow₀, map_inv₀, map_natCast, inv_zpow', neg_neg]
     let M : Matrix (Fin 2) (Fin 2) (Qbar l) := (W σ⁻¹).val
     let c : Qbar l := (ψ σ⁻¹ : (Qbar l)ˣ)
-    have hscale (T : Multiset ℂ) (heig : M.charpoly.map ι.toRingHom = (T.map fun b => X - C b).prod) :
-        (c • M).charpoly.map ι.toRingHom = (T.map fun b => X - C (ι.toRingHom c * b)).prod := by
+    have hscale (T : Multiset ℂ) (heig : M.charpoly.map ι.toRingHom = (T.map fun b => X - C b).prod)
+        : (c • M).charpoly.map ι.toRingHom = (T.map fun b => X - C (ι.toRingHom c * b)).prod := by
       have hcard : T.card = 2 := by
         simpa only [natDegree_map, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin,
-          natDegree_multiset_prod_X_sub_C_eq_card] using (congrArg natDegree heig).symm
+            natDegree_multiset_prod_X_sub_C_eq_card]
+          using (congrArg natDegree heig).symm
       obtain ⟨x, y, rfl⟩ := Multiset.card_eq_two.1 hcard
       rw [Matrix.charpoly_fin_two] at heig ⊢
-      simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton, Multiset.prod_cons,
-        Multiset.prod_singleton, Polynomial.map_add, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_pow,
-        map_X, map_C, Matrix.trace_smul, Matrix.det_smul, smul_eq_mul, map_mul, map_pow, Fintype.card_fin] at heig ⊢
+      simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton,
+          Multiset.prod_cons, Multiset.prod_singleton, Polynomial.map_add, Polynomial.map_sub,
+          Polynomial.map_mul, Polynomial.map_pow, map_X, map_C, Matrix.trace_smul, Matrix.det_smul,
+          smul_eq_mul, map_mul, map_pow, Fintype.card_fin]
+        at heig ⊢
       have hzero := congrArg (eval 0) heig
       have hone := congrArg (eval 1) heig
       simp only [eval_add, eval_sub, eval_mul, eval_pow, eval_X, eval_C] at hzero hone

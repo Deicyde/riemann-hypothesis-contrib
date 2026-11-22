@@ -7,8 +7,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.PHeisFC
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
 open scoped TensorProduct ContDiff ENNReal
 
 namespace Formalism.IndefR.Eqv
@@ -21,9 +22,8 @@ section Basic
 
 variable {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D}
 
-theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsThetaFunO ψ S T g) :
-    IsThetaFunO ψ S T (f + g) := by
-
+theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsThetaFunO ψ S T g)
+    : IsThetaFunO ψ S T (f + g) := by
   obtain ⟨U1, hU1, h1⟩ := hf.level
   obtain ⟨U2, hU2, h2⟩ := hg.level
   constructor
@@ -31,9 +31,7 @@ theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsTh
     simp only [Pi.add_apply, hf.quasi, hg.quasi]
     ring
   · refine ⟨U1 ⊓ U2, ?_, fun u hu hfin => ?_⟩
-    · first
-      | exact hU1.inter hU2
-      | simpa using hU1.inter hU2
+    · first | exact hU1.inter hU2 | simpa using hU1.inter hU2
     · have hu' : u ∈ U1 ∧ u ∈ U2 := by simpa using hu
       funext x
       have e1x := congrFun (h1 u hu'.1 hfin) x
@@ -44,8 +42,8 @@ theorem thetaO_add {f g : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (hg : IsTh
   · intro k L hL hfin w
     exact (hf.smooth k L hL hfin w).add (hg.smooth k L hL hfin w)
 
-theorem thetaO_smul {f : WO S T → ℂ} (c : ℂ) (hf : IsThetaFunO ψ S T f) : IsThetaFunO ψ S T (c • f) := by
-
+theorem thetaO_smul {f : WO S T → ℂ} (c : ℂ) (hf : IsThetaFunO ψ S T f)
+    : IsThetaFunO ψ S T (c • f) := by
   obtain ⟨U1, hU1, h1⟩ := hf.level
   constructor
   · intro γ w
@@ -70,7 +68,8 @@ end L2
 
 section Unit
 
-variable {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}
+variable
+  {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D} {χS χT : (AE D)ˣ →* Circle}
   {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)}
 
 end Unit

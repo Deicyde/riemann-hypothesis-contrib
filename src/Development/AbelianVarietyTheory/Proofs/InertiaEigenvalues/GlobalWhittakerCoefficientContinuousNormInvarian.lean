@@ -11,16 +11,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AdelicU
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW GroundTheory.Global.IdeleGroup Formalism.L2.Host Formalism.UG GlobalTheory.LFun
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host Formalism.UG GlobalTheory.LFun
 open scoped ENNReal nonZeroDivisors Classical
 
 noncomputable section
 
 namespace GlobalTheory.JSW.WhitNorm
 
-theorem continuous_whit_and_norm_mul : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (F : GA E a → ℂ), Continuous F →
-    (∀ γ g, F (ratGL E a γ * g) = F g) →
-    Continuous (GlobalTheory.JSW.whit F) ∧ ∀ u ∈ GlobalTheory.CellDec.NA E a, ∀ g, ‖GlobalTheory.JSW.whit F (u * g)‖ = ‖GlobalTheory.JSW.whit F g‖ := by
+theorem continuous_whit_and_norm_mul
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (F : GA E a → ℂ),
+      Continuous F → (∀ γ g, F (ratGL E a γ * g) = F g)
+        → Continuous (GlobalTheory.JSW.whit F)
+          ∧ ∀ u ∈ GlobalTheory.CellDec.NA E a, ∀ g,
+            ‖GlobalTheory.JSW.whit F (u * g)‖ = ‖GlobalTheory.JSW.whit F g‖ := by
   intro E _ _ _ a F hF hl
   refine ⟨?_, fun u hu g => ?_⟩
   · have e : GlobalTheory.JSW.whit F = GroundTheory.Automorphic.FourierWhittaker.partialCoeff F 0 :=
@@ -28,6 +33,7 @@ theorem continuous_whit_and_norm_mul : ∀ (E : Type) [Field E] [NumberField E] 
     rw [e]
     exact GroundTheory.Automorphic.FourierWhittaker.continuous_partialCoeff hF 0
   · have hu' : u ∈ GlobalTheory.JSW.NA (E := E) (a := a) := (GlobalTheory.SmGL.mem_unipB _).1 hu
-    rw [GlobalTheory.JSW.WhitModel.whit_mul hF hl hu' g, norm_mul, GlobalTheory.JSW.psiN, Circle.norm_coe, one_mul]
+    rw [GlobalTheory.JSW.WhitModel.whit_mul hF hl hu' g, norm_mul, GlobalTheory.JSW.psiN,
+      Circle.norm_coe, one_mul]
 
 end GlobalTheory.JSW.WhitNorm

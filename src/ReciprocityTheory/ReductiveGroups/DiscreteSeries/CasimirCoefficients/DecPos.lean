@@ -129,8 +129,12 @@ private lemma dp_cont_phi (μ : Fin n → ℤ) {x : Matrix (Fin n) (Fin n) ℂ} 
   exact Complex.continuous_re.comp
     ((phiM_differentiableOn μ).continuousOn.comp_continuous hcont hmem)
 
-theorem psM_norm_le (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) {B : ℝ}
-    (hB : ∀ k : KG ε, (PhiM μ (toMK k⁻¹ * x * toMK k)).re ≤ B) : ‖psM T μ x‖ ≤ B := by
+theorem psM_norm_le
+    (T : KType ε Λ)
+    (μ : Fin n → ℤ)
+    {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    {B : ℝ} (hB : ∀ k : KG ε, (PhiM μ (toMK k⁻¹ * x * toMK k)).re ≤ B)
+    : ‖psM T μ x‖ ≤ B := by
   set c : ℝ := (Module.finrank ℂ T.V : ℝ) / (muK ε Set.univ).toReal with hc_def
   have hc : 0 ≤ c := div_nonneg (Nat.cast_nonneg _) (muK_univ_pos ε).le
   set g : KG ε → ℝ := fun k => (PhiM μ (toMK k⁻¹ * x * toMK k)).re with hg_def
@@ -148,7 +152,9 @@ theorem psM_norm_le (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (
     congr 1
     refine integral_congr_ae (Filter.Eventually.of_forall fun k => ?_)
     simp only [hPhi, dpP]
-  have hone : (1 : T.V →L[ℂ] T.V) = ((c : ℝ) : ℂ) • ∫ k, (((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
+  have hone
+      : (1 : T.V →L[ℂ] T.V)
+        = ((c : ℝ) : ℂ) • ∫ k, (((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
     rw [← psM_one T μ]
     unfold psM
     rw [hc_def]
@@ -159,10 +165,12 @@ theorem psM_norm_le (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (
     simp only [h1, phiM_one, one_smul, dpP]
   have i1 := dp_integrable T (g := fun _ => (1 : ℝ)) continuous_const
   have i2 := dp_integrable T hgc
-  have hlin : ∫ k, (((fun k => B - g k) k : ℝ) : ℂ) • dpP T k ∂(muK ε) =
-      (B : ℂ) • (∫ k, (((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k ∂(muK ε)) -
-        ∫ k, ((g k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
-    have i1' : Integrable (fun k => (B : ℂ) • ((((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k)) (muK ε) :=
+  have hlin
+      : ∫ k, (((fun k => B - g k) k : ℝ) : ℂ) • dpP T k ∂(muK ε)
+        = (B : ℂ) • (∫ k, (((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k ∂(muK ε))
+          - ∫ k, ((g k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
+    have i1'
+        : Integrable (fun k => (B : ℂ) • ((((fun _ => (1 : ℝ)) k : ℝ) : ℂ) • dpP T k)) (muK ε) :=
       i1.smul (B : ℂ)
     have e1 := integral_sub i1' i2
     rw [integral_smul] at e1
@@ -172,12 +180,16 @@ theorem psM_norm_le (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (
     congr 1
     push_cast
     ring
-  have hdiff : (B : ℂ) • (1 : T.V →L[ℂ] T.V) - psM T μ x =
-      ((c : ℝ) : ℂ) • ∫ k, (((fun k => B - g k) k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
+  have hdiff
+      : (B : ℂ) • (1 : T.V →L[ℂ] T.V) - psM T μ x
+        = ((c : ℝ) : ℂ) • ∫ k, (((fun k => B - g k) k : ℝ) : ℂ) • dpP T k ∂(muK ε) := by
     rw [hlin, smul_sub, smul_comm ((c : ℝ) : ℂ) (B : ℂ), ← hone, ← hA]
   have hpos1 := dp_isPositive T hc hgc hg0
-  have hpos2 := dp_isPositive T hc (g := fun k => B - g k) (continuous_const.sub hgc)
-    (fun k => sub_nonneg.mpr (hB k))
+  have hpos2 :=
+    dp_isPositive T hc
+      (g := fun k => B - g k)
+      (continuous_const.sub hgc)
+      (fun k => sub_nonneg.mpr (hB k))
   have h0 : 0 ≤ psM T μ x := by
     rw [ContinuousLinearMap.nonneg_iff_isPositive, hA]
     exact hpos1
@@ -185,12 +197,13 @@ theorem psM_norm_le (T : KType ε Λ) (μ : Fin n → ℤ) {x : Matrix (Fin n) (
     rw [ContinuousLinearMap.le_def, hdiff]
     exact hpos2
   have hB0 : 0 ≤ B := (hg0 1).trans (hB 1)
-  calc ‖psM T μ x‖ ≤ ‖(B : ℂ) • (1 : T.V →L[ℂ] T.V)‖ :=
-      CStarAlgebra.norm_le_norm_of_le_of_nonneg hle h0
+  calc
+    ‖psM T μ x‖
+      ≤ ‖(B : ℂ) • (1 : T.V →L[ℂ] T.V)‖ := CStarAlgebra.norm_le_norm_of_le_of_nonneg hle h0
     _ ≤ ‖(B : ℂ)‖ * ‖(1 : T.V →L[ℂ] T.V)‖ := norm_smul_le _ _
     _ ≤ B * 1 := by
-        rw [Complex.norm_real, Real.norm_of_nonneg hB0]
-        exact mul_le_mul_of_nonneg_left ContinuousLinearMap.norm_id_le hB0
+      rw [Complex.norm_real, Real.norm_of_nonneg hB0]
+      exact mul_le_mul_of_nonneg_left ContinuousLinearMap.norm_id_le hB0
     _ = B := mul_one B
 
 end ReciprocityTheory.ChartRestriction.DS.S7

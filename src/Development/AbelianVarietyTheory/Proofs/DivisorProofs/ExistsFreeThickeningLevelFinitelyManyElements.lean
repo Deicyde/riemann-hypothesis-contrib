@@ -9,22 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FourTermComp
 
 set_option autoImplicit false
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.CxCoh GlobalTheory.PDA GlobalTheory.PDForm GlobalTheory.SmoothLift
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.CxCoh GlobalTheory.PDA
+  GlobalTheory.PDForm GlobalTheory.SmoothLift
 
 namespace GlobalTheory.PDForm.FreeFin
 
 variable {R : Type} [CommRing R] {I : Ideal R} {κ : DividedPowers I} {X : Scheme.{0}} {t : X ⟶ Sp R}
 
-theorem isFree_id (n : ℕ) (T : Thick κ t) (hT : IsLev T.δ n) :
-    IsFree n (𝟙 T) (Fin.elim0 : Fin 0 → T.B) := by
+theorem isFree_id (n : ℕ) (T : Thick κ t) (hT : IsLev T.δ n)
+    : IsFree n (𝟙 T) (Fin.elim0 : Fin 0 → T.B) := by
   refine ⟨hT, fun i ↦ i.elim0, fun S _ a c _ ↦ ⟨a, ⟨Category.id_comp a, fun i ↦ i.elim0⟩, ?_⟩⟩
   rintro g ⟨hg, -⟩
   rw [← hg, Category.id_comp]
 
-theorem isFree_cons (n m : ℕ) {T F F' : Thick κ t} (u : T ⟶ F) (τ : Fin m → F.B) (hu : IsFree n u τ)
-    (u' : F ⟶ F') (τ' : Unit → F'.B) (hu' : IsFree n u' τ') :
-    IsFree n (u ≫ u') (Fin.cons (τ' ()) (fun i ↦ u'.φ (τ i)) : Fin (m + 1) → F'.B) := by
+theorem isFree_cons
+    (n m : ℕ)
+    {T F F' : Thick κ t} (u : T ⟶ F) (τ : Fin m → F.B) (hu : IsFree n u τ) (u' : F ⟶ F')
+    (τ' : Unit → F'.B) (hu' : IsFree n u' τ')
+    : IsFree n (u ≫ u') (Fin.cons (τ' ()) (fun i ↦ u'.φ (τ i)) : Fin (m + 1) → F'.B) := by
   obtain ⟨-, hτ, hU⟩ := hu
   obtain ⟨hF', hτ', hU'⟩ := hu'
   refine ⟨hF', fun i ↦ Fin.cases (hτ' ()) (fun j ↦ Thick.Hom.mem u' (hτ j)) i, ?_⟩
@@ -46,15 +50,18 @@ theorem isFree_cons (n m : ℕ) {T F F' : Thick κ t} (u : T ⟶ F) (τ : Fin m 
     refine hgu _ ⟨h1, fun _ ↦ ?_⟩
     simpa using hg'c 0
 
-theorem exists_free : ∀ (R : Type) [CommRing R] (I : Ideal R) (κ : DividedPowers I) (X : Scheme.{0})
-    (t : X ⟶ Sp R) (n m : ℕ) (T : Thick κ t), IsLev T.δ (n + 1) →
-    ∃ (F : Thick κ t) (u : T ⟶ F) (τ : Fin m → F.B), IsFree (n + 1) u τ ∧ (KK κ t).QAt u := by
+theorem exists_free
+    : ∀ (R : Type) [CommRing R] (I : Ideal R) (κ : DividedPowers I) (X : Scheme.{0}) (t : X ⟶ Sp R)
+        (n m : ℕ) (T : Thick κ t),
+      IsLev T.δ (n + 1)
+        → ∃ (F : Thick κ t) (u : T ⟶ F) (τ : Fin m → F.B), IsFree (n + 1) u τ ∧ (KK κ t).QAt u := by
   intro R _ I κ X t n m T hT
   induction m with
   | zero => exact ⟨T, 𝟙 T, Fin.elim0, isFree_id _ T hT, QAtFormal.qAt_ident _ T⟩
   | succ m ih =>
     obtain ⟨F, u, τ, hu, hq⟩ := ih
-    obtain ⟨F', u', τ', hu', hq'⟩ := GlobalTheory.T.exists_freeCrystallineThickening_oneElement_level R I κ X t n F hu.1
+    obtain ⟨F', u', τ', hu', hq'⟩ :=
+      GlobalTheory.T.exists_freeCrystallineThickening_oneElement_level R I κ X t n F hu.1
     exact ⟨F', u ≫ u', _, isFree_cons (n + 1) m u τ hu u' τ' hu', QAtFormal.qAt_comp _ u u' hq hq'⟩
 
 end GlobalTheory.PDForm.FreeFin

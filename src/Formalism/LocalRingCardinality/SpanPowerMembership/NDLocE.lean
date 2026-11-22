@@ -8,7 +8,8 @@ noncomputable section
 
 namespace Formalism.BasicNotions.Examples₂.LB
 
-open NumberField IsDedekindDomain Polynomial IsLocalRing Formalism.BasicNotions Formalism.BasicNotions.Loc
+open NumberField IsDedekindDomain Polynomial IsLocalRing Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
@@ -41,14 +42,12 @@ theorem mem_OL (x : ↥LL.1) : x ∈ OL LL ↔ ‖(x : PadicAlgCl l)‖ ≤ 1 :=
 
 def nrm (a : ↥(OL LL)) : ℝ := ‖((a : ↥LL.1) : PadicAlgCl l)‖
 
-theorem nrm_le (a : ↥(OL LL)) : nrm LL a ≤ 1 := by
-  exact (mem_OL LL a.1).mp a.2
+theorem nrm_le (a : ↥(OL LL)) : nrm LL a ≤ 1 := by exact (mem_OL LL a.1).mp a.2
 
 theorem nrm_mul (a b : ↥(OL LL)) : nrm LL (a * b) = nrm LL a * nrm LL b := by
   simp only [nrm, MulMemClass.coe_mul, norm_mul]
 
-theorem nrm_eq_zero (a : ↥(OL LL)) : nrm LL a = 0 ↔ a = 0 := by
-  simp [nrm]
+theorem nrm_eq_zero (a : ↥(OL LL)) : nrm LL a = 0 ↔ a = 0 := by simp [nrm]
 
 theorem dvd_iff (a b : ↥(OL LL)) : a ∣ b ↔ nrm LL b ≤ nrm LL a := by
   constructor
@@ -88,11 +87,12 @@ theorem isUnit_iff (a : ↥(OL LL)) : IsUnit a ↔ nrm LL a = 1 := by
   · intro h
     rw [h]
 
-instance : IsLocalRing ↥(OL LL) := .of_nonunits_add fun a b ha hb => by
-  rw [mem_nonunits_iff, isUnit_iff] at *
-  have h1 := lt_of_le_of_ne (nrm_le LL a) ha
-  have h2 := lt_of_le_of_ne (nrm_le LL b) hb
-  exact ((PadicAlgCl.isNonarchimedean l _ _).trans_lt (max_lt h1 h2)).ne
+instance : IsLocalRing ↥(OL LL) :=
+  .of_nonunits_add fun a b ha hb => by
+    rw [mem_nonunits_iff, isUnit_iff] at *
+    have h1 := lt_of_le_of_ne (nrm_le LL a) ha
+    have h2 := lt_of_le_of_ne (nrm_le LL b) hb
+    exact ((PadicAlgCl.isNonarchimedean l _ _).trans_lt (max_lt h1 h2)).ne
 
 theorem mem_max (a : ↥(OL LL)) : a ∈ maximalIdeal ↥(OL LL) ↔ nrm LL a < 1 := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff]
@@ -111,9 +111,12 @@ instance OL_finite : Module.Finite ℤ_[l] ↥(OL LL) :=
 theorem l_mem_max : ((l : ℕ) : ↥(OL LL)) ∈ maximalIdeal ↥(OL LL) := by
   rw [mem_max]
   show ‖(((l : ↥(OL LL)) : ↥LL.1) : PadicAlgCl l)‖ < 1
-  have h1 : (((l : ↥(OL LL)) : ↥LL.1) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
+  have h1
+      : (((l : ↥(OL LL)) : ↥LL.1) : PadicAlgCl l)
+        = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
     simp
-  rw [h1, norm_eq_spectralValue, minpoly.eq_X_sub_C (PadicAlgCl l) (l : ℚ_[l]), spectralValue_X_sub_C]
+  rw [h1, norm_eq_spectralValue, minpoly.eq_X_sub_C (PadicAlgCl l) (l : ℚ_[l]),
+    spectralValue_X_sub_C]
   exact Padic.norm_p_lt_one
 
 instance OL_dvr : IsDiscreteValuationRing ↥(OL LL) := by

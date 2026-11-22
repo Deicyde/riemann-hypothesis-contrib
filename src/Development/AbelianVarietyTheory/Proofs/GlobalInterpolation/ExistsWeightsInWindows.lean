@@ -17,11 +17,14 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Explic
 
 namespace GlobalTheory.EX
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX NumberField
 
-theorem exists_weights_in_windows : ∀ (eps : ℝ) (C : FC), 0 < eps → eps < 1 / 52 → Std C → ∃ x0 : ℝ,
-    ∀ (s : Scale) (R : Ranks) (H : Host R), s.eps = eps → x0 ≤ s.x → RankVal s R →
-      ∃ a b : R.A → ℤ, WinOK s C.GK H a b := by
+theorem exists_weights_in_windows
+    : ∀ (eps : ℝ) (C : FC),
+      0 < eps → eps < 1 / 52 → Std C
+        → ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (H : Host R),
+          s.eps = eps → x0 ≤ s.x → RankVal s R → ∃ a b : R.A → ℤ, WinOK s C.GK H a b := by
   intro eps C h0 h1 hS
   have hLa : 1 ≤ C.GK.La := hS.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1 _ (by simp [FC.cMid])
   obtain ⟨CN, x1, hN⟩ := GlobalTheory.topCount_and_lambda_bounds eps h0 h1
@@ -49,13 +52,14 @@ theorem exists_weights_in_windows : ∀ (eps : ℝ) (C : FC), 0 < eps → eps < 
   have hA : 1 ≤ s.a / ((R.k : ℝ) * s.x ^ (Scale.A / 2)) := by
     have h13 : 0 < s.x ^ (Scale.A / 2) := Real.rpow_pos_of_pos hxp _
     rw [le_div_iff₀ (mul_pos hk0 h13), one_mul]
-    calc (R.k : ℝ) * s.x ^ (Scale.A / 2) ≤ s.x ^ (5 : ℝ) * s.x ^ (Scale.A / 2) :=
-          mul_le_mul_of_nonneg_right hk5 h13.le
+    calc
+      (R.k : ℝ) * s.x ^ (Scale.A / 2)
+        ≤ s.x ^ (5 : ℝ) * s.x ^ (Scale.A / 2) := mul_le_mul_of_nonneg_right hk5 h13.le
       _ = s.x * s.x ^ (17 : ℝ) := by
-          rw [← Real.rpow_add hxp, ← Real.rpow_one_add' hxp.le (by norm_num)]
-          congr 1
-          unfold Scale.A
-          norm_num
+        rw [← Real.rpow_add hxp, ← Real.rpow_one_add' hxp.le (by norm_num)]
+        congr 1
+        unfold Scale.A
+        norm_num
       _ ≤ s.a := mul_le_mul_of_nonneg_left hb17 hxp.le
   have hB : 1 ≤ 2 * (R.n : ℝ) * s.delta1 * s.x ^ s.eps * G.La C.GK s * s.b' / (R.k : ℝ) := by
     rw [le_div_iff₀ hk0, one_mul]
@@ -71,9 +75,11 @@ theorem exists_weights_in_windows : ∀ (eps : ℝ) (C : FC), 0 < eps → eps < 
       le_trans hk5 (le_trans (Real.rpow_le_rpow_of_exponent_le hx1' (by norm_num)) hb')
     have h2 : (1 : ℝ) ≤ 2 * (R.n : ℝ) * (s.delta1 * s.x ^ s.eps) * G.La C.GK s :=
       one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le (by linarith) hd) hL
-    calc (R.k : ℝ) ≤ s.b' := hkb
+    calc
+      (R.k : ℝ)
+        ≤ s.b' := hkb
       _ ≤ (2 * (R.n : ℝ) * (s.delta1 * s.x ^ s.eps) * G.La C.GK s) * s.b' :=
-          le_mul_of_one_le_left (le_trans hk0.le hkb) h2
+        le_mul_of_one_le_left (le_trans hk0.le hkb) h2
       _ = _ := by ring
   refine ⟨fun _ => ⌈s.a⌉, fun _ => ⌈s.b'⌉, fun t _ => ⟨⟨Int.le_ceil _, ?_⟩, Int.le_ceil _, ?_⟩⟩
   · have := Int.ceil_lt_add_one s.a

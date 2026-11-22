@@ -12,13 +12,15 @@ variable {g : ℕ} [Fact g.Prime]
 open Formalism.MainNotions.ArithmeticCylinders
 
 open Classical in
-theorem coeff_mirEl {r : ℕ} (θ : (ZMod g)ˣ →* ℂˣ) (a : Fin r → ZMod g) (b : Bool) (h : Gn g r) :
-    (mirEl θ a b).coeff h = if mirSet a b h then ((θ (Matrix.GeneralLinearGroup.det h) : ℂˣ) : ℂ) else 0 := by
+theorem coeff_mirEl {r : ℕ} (θ : (ZMod g)ˣ →* ℂˣ) (a : Fin r → ZMod g) (b : Bool) (h : Gn g r)
+    : (mirEl θ a b).coeff h
+      = if mirSet a b h then ((θ (Matrix.GeneralLinearGroup.det h) : ℂˣ) : ℂ) else 0 := by
   unfold mirEl
   simp [MonoidAlgebra.coeff_single, Finsupp.single_apply]
 
-theorem sum_gl1 (M : Mt g 1) (d : (ZMod g)ˣ) (hM : M.det = d) (F : (ZMod g)ˣ → ℂ) :
-    (∑ x : Gn g 1, if M = (x : Mt g 1) then F (Matrix.GeneralLinearGroup.det x) else 0) = F d := by
+theorem sum_gl1 (M : Mt g 1) (d : (ZMod g)ˣ) (hM : M.det = d) (F : (ZMod g)ˣ → ℂ)
+    : (∑ x : Gn g 1, if M = (x : Mt g 1) then F (Matrix.GeneralLinearGroup.det x) else 0)
+      = F d := by
   have hU : IsUnit M := (Matrix.isUnit_iff_isUnit_det M).2 (by rw [hM]; exact d.isUnit)
   have key : ∀ x : Gn g 1, (M = (x : Mt g 1)) ↔ x = hU.unit := by
     intro x
@@ -30,12 +32,14 @@ theorem sum_gl1 (M : Mt g 1) (d : (ZMod g)ˣ) (hM : M.det = d) (F : (ZMod g)ˣ �
   ext
   rw [Matrix.GeneralLinearGroup.val_det_apply, IsUnit.unit_spec, hM]
 
-theorem tl_last {n : ℕ} (M : Mt g (n + 1)) (i j : Fin n) : tl n M i j = M i.castSucc j.castSucc := by
+theorem tl_last {n : ℕ} (M : Mt g (n + 1)) (i j : Fin n)
+    : tl n M i j = M i.castSucc j.castSucc := by
   unfold tl entN
   rw [dite_eq_left ⟨by omega, by omega⟩]
   rfl
 
-theorem br_last {n : ℕ} (M : Mt g (n + 1)) (i j : Fin 1) : br n 1 M i j = M (Fin.last n) (Fin.last n) := by
+theorem br_last {n : ℕ} (M : Mt g (n + 1)) (i j : Fin 1)
+    : br n 1 M i j = M (Fin.last n) (Fin.last n) := by
   unfold br entN
   rw [dite_eq_left ⟨by omega, by omega⟩]
   congr 1 <;> ext <;> simp [Fin.fin_one_eq_zero]
@@ -56,8 +60,10 @@ def ColsId {n : ℕ} (M : Mt g (n + 1)) : Prop :=
 def RowsId {n : ℕ} (M : Mt g (n + 1)) : Prop :=
   ∀ i j : Fin (n + 1), i ≠ 0 → M i j = if i = j then 1 else 0
 
-theorem mulVec_of_id {N : ℕ} (M : Mt g N) (x : Fin N → ZMod g) (i : Fin N)
-    (h : ∀ j, x j ≠ 0 → M i j = if i = j then 1 else 0) : M.mulVec x i = x i := by
+theorem mulVec_of_id
+    {N : ℕ} (M : Mt g N) (x : Fin N → ZMod g) (i : Fin N)
+    (h : ∀ j, x j ≠ 0 → M i j = if i = j then 1 else 0)
+    : M.mulVec x i = x i := by
   rw [Matrix.mulVec, dotProduct]
   rw [Finset.sum_eq_single i]
   · by_cases hx : x i = 0
@@ -69,13 +75,14 @@ theorem mulVec_of_id {N : ℕ} (M : Mt g N) (x : Fin N → ZMod g) (i : Fin N)
     · rw [h j hx, if_neg (Ne.symm hji), zero_mul]
   · intro hi; exact absurd (Finset.mem_univ i) hi
 
-theorem mirSet_last_iff {n : ℕ} (h : Gn g (n + 1)) :
-    mirSet (Pi.single (Fin.last n) 1) false h ↔ ColsId (h : Mt g (n + 1)) := by
+theorem mirSet_last_iff {n : ℕ} (h : Gn g (n + 1))
+    : mirSet (Pi.single (Fin.last n) 1) false h ↔ ColsId (h : Mt g (n + 1)) := by
   unfold mirSet
   simp only [Bool.false_eq_true, if_false]
   constructor
   · intro H i j hj
-    have := congrFun (H (Pi.single j 1) (by simp [single_dotProduct, Pi.single_apply, Ne.symm hj])) i
+    have :=
+      congrFun (H (Pi.single j 1) (by simp [single_dotProduct, Pi.single_apply, Ne.symm hj])) i
     rw [Matrix.mulVec_single_one] at this
     simpa [Pi.single_apply] using this
   · intro H x hx
@@ -85,8 +92,8 @@ theorem mirSet_last_iff {n : ℕ} (h : Gn g (n + 1)) :
     intro j hj
     exact H i j (fun e => hj (e ▸ hx'))
 
-theorem mirSet_zero_iff {n : ℕ} (h : Gn g (n + 1)) :
-    mirSet (Pi.single 0 1) true h ↔ RowsId (h : Mt g (n + 1)) := by
+theorem mirSet_zero_iff {n : ℕ} (h : Gn g (n + 1))
+    : mirSet (Pi.single 0 1) true h ↔ RowsId (h : Mt g (n + 1)) := by
   unfold mirSet
   simp only [if_true]
   constructor
@@ -122,7 +129,9 @@ theorem parTl_iff {n : ℕ} (M : Mt g (n + 1)) : (InPar n M ∧ tl n M = 1) ↔ 
     refine ⟨fun i j hj hi => ?_, ?_⟩
     · have hne : j ≠ Fin.last n := fun e => by rw [e] at hj; simp at hj
       rw [H i j hne, if_neg]
-      intro e; rw [e] at hi; omega
+      intro e
+      rw [e] at hi
+      omega
     · ext i j
       rw [tl_last, H _ _ (Fin.castSucc_ne_last j), Matrix.one_apply]
       simp [Fin.castSucc_inj]
@@ -144,12 +153,15 @@ theorem parBr_iff {n : ℕ} (M : Mt g (n + 1)) : (InPar 1 M ∧ br 1 n M = 1) �
     refine ⟨fun i j hj hi => ?_, ?_⟩
     · have hne : i ≠ 0 := fun e => by rw [e] at hi; simp at hi
       rw [H i j hne, if_neg]
-      intro e; rw [e] at hi; omega
+      intro e
+      rw [e] at hi
+      omega
     · ext i j
       rw [br_succ, H _ _ (Fin.succ_ne_zero i), Matrix.one_apply]
       simp [Fin.succ_inj]
 
-theorem det_colsId {n : ℕ} (M : Mt g (n + 1)) (H : ColsId M) : M.det = M (Fin.last n) (Fin.last n) := by
+theorem det_colsId {n : ℕ} (M : Mt g (n + 1)) (H : ColsId M)
+    : M.det = M (Fin.last n) (Fin.last n) := by
   have hT : M.BlockTriangular id := by
     intro i j hij
     have hj : j ≠ Fin.last n := fun e => by
@@ -164,8 +176,7 @@ theorem det_colsId {n : ℕ} (M : Mt g (n + 1)) (H : ColsId M) : M.det = M (Fin.
 theorem det_rowsId {n : ℕ} (M : Mt g (n + 1)) (H : RowsId M) : M.det = M 0 0 := by
   have hT : M.BlockTriangular id := by
     intro i j hij
-    have hi : i ≠ 0 := fun e => by
-      rw [e] at hij; exact absurd hij (not_lt.2 (Fin.zero_le j))
+    have hi : i ≠ 0 := fun e => by rw [e] at hij; exact absurd hij (not_lt.2 (Fin.zero_le j))
     simp only [id] at hij
     rw [H i j hi, if_neg (ne_of_gt hij)]
   rw [Matrix.det_of_upperTriangular hT, Fin.prod_univ_succ]
@@ -173,21 +184,23 @@ theorem det_rowsId {n : ℕ} (M : Mt g (n + 1)) (H : RowsId M) : M.det = M 0 0 :
   intro i _
   rw [H _ _ (Fin.succ_ne_zero i), if_pos rfl]
 
-theorem det_br_last {n : ℕ} (h : Gn g (n + 1)) (H : ColsId (h : Mt g (n + 1))) :
-    (br n 1 (h : Mt g (n + 1))).det = ((Matrix.GeneralLinearGroup.det h : (ZMod g)ˣ) : ZMod g) := by
+theorem det_br_last {n : ℕ} (h : Gn g (n + 1)) (H : ColsId (h : Mt g (n + 1)))
+    : (br n 1 (h : Mt g (n + 1))).det
+      = ((Matrix.GeneralLinearGroup.det h : (ZMod g)ˣ) : ZMod g) := by
   rw [Matrix.det_unique, br_last, Matrix.GeneralLinearGroup.val_det_apply, det_colsId _ H]
 
-theorem det_tl_zero {n : ℕ} (h : Gn g (n + 1)) (H : RowsId (h : Mt g (n + 1))) :
-    (tl 1 (h : Mt g (n + 1))).det = ((Matrix.GeneralLinearGroup.det h : (ZMod g)ˣ) : ZMod g) := by
+theorem det_tl_zero {n : ℕ} (h : Gn g (n + 1)) (H : RowsId (h : Mt g (n + 1)))
+    : (tl 1 (h : Mt g (n + 1))).det = ((Matrix.GeneralLinearGroup.det h : (ZMod g)ˣ) : ZMod g) := by
   rw [Matrix.det_unique, tl_zero, Matrix.GeneralLinearGroup.val_det_apply, det_rowsId _ H]
 
-
 open Classical in
-theorem trace_mir (g : ℕ) [Fact g.Prime] (n : ℕ) (ψ : Gn g (n + 1) → ℂ) (θ : (ZMod g)ˣ →* ℂˣ) :
-    tr (mirEl θ (Pi.single (Fin.last n) 1) false) ψ =
-        (g : ℂ) ^ n * ∑ x : Gn g 1, ((θ (Matrix.GeneralLinearGroup.det x) : ℂˣ) : ℂ) * res n 1 ψ 1 x ∧
-      tr (mirEl θ (Pi.single 0 1) true) ψ =
-        (g : ℂ) ^ n * ∑ x : Gn g 1, ((θ (Matrix.GeneralLinearGroup.det x) : ℂˣ) : ℂ) * res 1 n ψ x 1 := by
+theorem trace_mir (g : ℕ) [Fact g.Prime] (n : ℕ) (ψ : Gn g (n + 1) → ℂ) (θ : (ZMod g)ˣ →* ℂˣ)
+    : tr (mirEl θ (Pi.single (Fin.last n) 1) false) ψ
+        = (g : ℂ) ^ n
+          * ∑ x : Gn g 1, ((θ (Matrix.GeneralLinearGroup.det x) : ℂˣ) : ℂ) * res n 1 ψ 1 x
+      ∧ tr (mirEl θ (Pi.single 0 1) true) ψ
+        = (g : ℂ) ^ n
+          * ∑ x : Gn g 1, ((θ (Matrix.GeneralLinearGroup.det x) : ℂˣ) : ℂ) * res 1 n ψ x 1 := by
   have hg : (g : ℂ) ^ n ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : g.Prime).ne_zero)
   have hc : ∀ a t : ℂ, (g : ℂ) ^ n * (a * (((g : ℂ) ^ n)⁻¹ * t)) = a * t := fun a t => by
     rw [mul_left_comm, mul_inv_cancel_left₀ hg]

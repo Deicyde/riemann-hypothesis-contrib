@@ -6,21 +6,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MuGPreimageCo
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
 
 namespace GlobalTheory.LeviIso
 
-def innerAutTop {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (s : G) : G ≃ₜ* G :=
-  { MulAut.conj s with
-    continuous_toFun := by
-      change Continuous fun g : G => s * g * s⁻¹
-      fun_prop
-    continuous_invFun := by
-      change Continuous fun g : G => s⁻¹ * g * s
-      fun_prop }
+def innerAutTop {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (s : G)
+    : G ≃ₜ* G := {
+  MulAut.conj s with
+  continuous_toFun := by
+    change Continuous fun g : G => s * g * s⁻¹
+    fun_prop
+  continuous_invFun := by
+    change Continuous fun g : G => s⁻¹ * g * s
+    fun_prop
+}
 
-theorem inUJ_map_conj {n : ℕ} (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : Formalism.REAL.inUJ ε g) :
-    Formalism.REAL.inUJ ε (g.map (starRingEnd ℂ)) := by
+theorem inUJ_map_conj
+    {n : ℕ} (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n) ℂ} (hg : Formalism.REAL.inUJ ε g)
+    : Formalism.REAL.inUJ ε (g.map (starRingEnd ℂ)) := by
   unfold Formalism.REAL.inUJ at hg ⊢
   have hJ : (Formalism.REAL.Jm ε).map (starRingEnd ℂ) = Formalism.REAL.Jm ε := by
     ext i j
@@ -34,14 +38,17 @@ theorem inUJ_map_conj {n : ℕ} (ε : Fin n → Bool) {g : Matrix (Fin n) (Fin n
   rw [hH]
   exact h2
 
-noncomputable def conjUJHom {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.UJ ε →* Formalism.REAL.UJ ε :=
-  ((Units.map ((starRingEnd ℂ).mapMatrix (m := Fin n)).toMonoidHom).comp (Formalism.REAL.UJ ε).subtype).codRestrict
-    (Formalism.REAL.UJ ε) fun g => inUJ_map_conj ε g.2
+noncomputable def conjUJHom {n : ℕ} (ε : Fin n → Bool)
+    : Formalism.REAL.UJ ε →* Formalism.REAL.UJ ε :=
+  ((Units.map ((starRingEnd ℂ).mapMatrix (m := Fin n)).toMonoidHom).comp
+    (Formalism.REAL.UJ ε).subtype).codRestrict (Formalism.REAL.UJ ε) fun g => inUJ_map_conj ε g.2
 
-theorem uMat_conjUJHom {n : ℕ} (ε : Fin n → Bool) (g : Formalism.REAL.UJ ε) :
-    uMat (conjUJHom ε g) = (uMat g).map (starRingEnd ℂ) := rfl
+theorem uMat_conjUJHom {n : ℕ} (ε : Fin n → Bool) (g : Formalism.REAL.UJ ε)
+    : uMat (conjUJHom ε g) = (uMat g).map (starRingEnd ℂ) :=
+  rfl
 
-theorem conjUJHom_invol {n : ℕ} (ε : Fin n → Bool) (g : Formalism.REAL.UJ ε) : conjUJHom ε (conjUJHom ε g) = g := by
+theorem conjUJHom_invol {n : ℕ} (ε : Fin n → Bool) (g : Formalism.REAL.UJ ε)
+    : conjUJHom ε (conjUJHom ε g) = g := by
   apply Subtype.ext
   apply Units.ext
   show uMat (conjUJHom ε (conjUJHom ε g)) = uMat g
@@ -56,7 +63,8 @@ theorem continuous_conjUJHom {n : ℕ} (ε : Fin n → Bool) : Continuous (conjU
   have hu := Continuous.units_map _ hc
   exact Continuous.subtype_mk (hu.comp continuous_subtype_val) _
 
-noncomputable def conjUJ {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε where
+noncomputable def conjUJ {n : ℕ} (ε : Fin n → Bool)
+    : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε where
   toFun := conjUJHom ε
   invFun := conjUJHom ε
   left_inv := conjUJHom_invol ε
@@ -65,24 +73,37 @@ noncomputable def conjUJ {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.UJ ε 
   continuous_toFun := continuous_conjUJHom ε
   continuous_invFun := continuous_conjUJHom ε
 
-theorem gauge_map_inner_comp {n : ℕ} (ε : Fin n → Bool) (C : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε)
-    (hC : ∀ g, Formalism.REAL.hs (uMat (C g) - 1) = Formalism.REAL.hs (uMat g - 1)) (s : Formalism.REAL.UJ ε) (c : ℝ)
-    (hc : IsGauge ε c) :
-    (ENNReal.ofReal c • Formalism.REAL.muG ε).map (fun g => s * C g * s⁻¹) = ENNReal.ofReal c • Formalism.REAL.muG ε := by
+theorem gauge_map_inner_comp
+    {n : ℕ} (ε : Fin n → Bool) (C : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε)
+    (hC : ∀ g, Formalism.REAL.hs (uMat (C g) - 1) = Formalism.REAL.hs (uMat g - 1))
+    (s : Formalism.REAL.UJ ε)
+    (c : ℝ) (hc : IsGauge ε c)
+    : (ENNReal.ofReal c • Formalism.REAL.muG ε).map (fun g => s * C g * s⁻¹)
+      = ENNReal.ofReal c • Formalism.REAL.muG ε := by
   have hT : ∀ g, (C.trans (innerAutTop s)) (C.symm s⁻¹ * g * (C.symm s⁻¹)⁻¹) = C g := by
     intro g
     show s * C (C.symm s⁻¹ * g * (C.symm s⁻¹)⁻¹) * s⁻¹ = C g
     simp only [map_mul, map_inv, C.apply_symm_apply]
     group
-  have key := gauge_map_of_iso n n ε ε rfl (C.trans (innerAutTop s)) (C.symm s⁻¹)
-    (fun g => by rw [hT]; exact hC g) c c hc hc
+  have key :=
+    gauge_map_of_iso n n ε ε rfl (C.trans (innerAutTop s)) (C.symm s⁻¹)
+      (fun g => by rw [hT]; exact hC g)
+      c c hc hc
   have hf : (fun g => s * C g * s⁻¹) = ⇑(C.trans (innerAutTop s)) := by
     funext g
     rfl
   rw [hf]
   exact key
 
-theorem exists_conj_gauge_invariant : ∀ (n : ℕ) (ε : Fin n → Bool) (τ : ℂ →+* ℂ), (τ = RingHom.id ℂ ∨ τ = starRingEnd ℂ) → ∃ C : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε, (∀ g, uMat (C g) = (uMat g).map τ) ∧ ∀ (s : Formalism.REAL.UJ ε) (c : ℝ), IsGauge ε c → (ENNReal.ofReal c • Formalism.REAL.muG ε).map (fun g => s * C g * s⁻¹) = ENNReal.ofReal c • Formalism.REAL.muG ε := by
+theorem exists_conj_gauge_invariant
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (τ : ℂ →+* ℂ),
+      (τ = RingHom.id ℂ ∨ τ = starRingEnd ℂ)
+        → ∃ C : Formalism.REAL.UJ ε ≃ₜ* Formalism.REAL.UJ ε,
+          (∀ g, uMat (C g) = (uMat g).map τ)
+            ∧ ∀ (s : Formalism.REAL.UJ ε) (c : ℝ),
+              IsGauge ε c
+                → (ENNReal.ofReal c • Formalism.REAL.muG ε).map (fun g => s * C g * s⁻¹)
+                  = ENNReal.ofReal c • Formalism.REAL.muG ε := by
   intro n ε τ hτ
   rcases hτ with rfl | rfl
   · refine ⟨ContinuousMulEquiv.refl _, fun g => ?_, fun s c hc => ?_⟩

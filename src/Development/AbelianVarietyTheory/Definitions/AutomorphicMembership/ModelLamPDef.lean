@@ -26,14 +26,18 @@ structure Fits (C : Cols B) (d : C.Tup → ℕ) : Prop where
 
 def MuT (C : Cols B) (u : B.Word) : Type := (C.mem u).A.Mram
 
-instance (C : Cols B) (u : B.Word) : AddCommGroup (MuT C u) := inferInstanceAs (AddCommGroup (C.mem u).A.Mram)
-instance (C : Cols B) (u : B.Word) : Module ℂ (MuT C u) := inferInstanceAs (Module ℂ (C.mem u).A.Mram)
+instance (C : Cols B) (u : B.Word) : AddCommGroup (MuT C u) :=
+  inferInstanceAs (AddCommGroup (C.mem u).A.Mram)
+instance (C : Cols B) (u : B.Word) : Module ℂ (MuT C u) :=
+  inferInstanceAs (Module ℂ (C.mem u).A.Mram)
 instance (C : Cols B) (u : B.Word) : FiniteDimensional ℂ (MuT C u) :=
   haveI := (C.mem u).A.Mu0_fd
-  (Submodule.finiteDimensional_of_le (inf_le_left : (C.mem u).A.Mram ≤ (C.mem u).A.Mu0) :
-    FiniteDimensional ℂ (C.mem u).A.Mram)
+  (Submodule.finiteDimensional_of_le (inf_le_left : (C.mem u).A.Mram ≤ (C.mem u).A.Mu0)
+    : FiniteDimensional ℂ (C.mem u).A.Mram)
 
-@[reducible] def core {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (u : B.Word) : InnerProductSpace.Core ℂ (MuT C u) where
+@[reducible]
+def core {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (u : B.Word)
+    : InnerProductSpace.Core ℂ (MuT C u) where
   inner x y := (C.fm u).ipC 0 (Subtype.val x) (Subtype.val y)
   conj_inner_symm x y := h.herm u x y
   re_inner_nonneg x := h.pos u x
@@ -42,13 +46,15 @@ instance (C : Cols B) (u : B.Word) : FiniteDimensional ℂ (MuT C u) :=
     simp [MemberForms.ipC, mul_add, Finset.sum_add_distrib]
   smul_left x y r := by
     show (C.fm u).ipC 0 (r • x.1) y.1 = starRingEnd ℂ r * (C.fm u).ipC 0 x.1 y.1
-    simp only [MemberForms.ipC, Pi.smul_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-      Finset.mul_sum]
+    simp only [MemberForms.ipC, Pi.smul_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+      smul_eq_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun c _ => by ring
   definite x hx := h.defn u x hx
 
 def stdOLat (O : Type) [CommRing O] (φ : O →+* ℂ) (n : ℕ) : Rows.OLat O φ (Eu n) where
-  gen := by classical exact Finset.univ.image (EuclideanSpace.basisFun (Fin n) ℂ).toBasis
+  gen := by
+    classical
+    exact Finset.univ.image (EuclideanSpace.basisFun (Fin n) ℂ).toBasis
   span_top := by
     classical
     rw [Finset.coe_image, Finset.coe_univ, Set.image_univ]
@@ -59,16 +65,17 @@ def stdJ {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) : (Fin n → L) →�
   map_add' x y := by ext i; simp
   map_smul' c x := by ext i; simp
 
-theorem stdJ_single {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) (i : Fin n) :
-    stdJ σ n (Pi.single i 1) = (EuclideanSpace.basisFun (Fin n) ℂ).toBasis i := by
+theorem stdJ_single {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) (i : Fin n)
+    : stdJ σ n (Pi.single i 1) = (EuclideanSpace.basisFun (Fin n) ℂ).toBasis i := by
   ext k
   by_cases h : k = i
   · subst h; simp [stdJ]
   · simp [stdJ, h, Pi.single_eq_of_ne h]
 
-theorem stdJ_basis {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) {κ : Type} (b : Module.Basis κ L (Fin n → L)) :
-    LinearIndependent ℂ (fun i => stdJ σ n (b i)) ∧
-      Submodule.span ℂ (Set.range (fun i => stdJ σ n (b i))) = ⊤ := by
+theorem stdJ_basis
+    {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) {κ : Type} (b : Module.Basis κ L (Fin n → L))
+    : LinearIndependent ℂ (fun i => stdJ σ n (b i))
+      ∧ Submodule.span ℂ (Set.range (fun i => stdJ σ n (b i))) = ⊤ := by
   constructor
   · letI : Algebra L ℂ := σ.toAlgebra
     have h : LinearIndependent ℂ (fun i => algebraMap L ℂ ∘ b i) :=
@@ -88,10 +95,12 @@ theorem stdJ_basis {L : Type} [Field L] (σ : L →+* ℂ) (n : ℕ) {κ : Type}
     exact h _
 
 def trunc (a b : ℕ) : Eu a →ₗ[ℂ] Eu b :=
-  Matrix.toEuclideanLin (Matrix.of fun (i : Fin b) (k : Fin a) => if (i : ℕ) = k then (1 : ℂ) else 0)
+  Matrix.toEuclideanLin (Matrix.of fun (i : Fin b) (k : Fin a) =>
+    if (i : ℕ) = k then (1 : ℂ) else 0)
 
-theorem chain_lin {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} (C : ColumnChain R ι hc) (j : ℕ) :
-    IsLinearMap ℂ (Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap j) := by
+theorem chain_lin
+    {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} (C : ColumnChain R ι hc) (j : ℕ)
+    : IsLinearMap ℂ (Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap j) := by
   induction j with
   | zero => exact ⟨fun _ _ => rfl, fun _ _ => rfl⟩
   | succ j ih =>
@@ -108,7 +117,8 @@ def mdim (n e : ℕ) : ℕ → ℕ
 theorem mdim_m (R : Ranks) (n e : ℕ) : mdim n e R.m = e := by
   have := R.two_le_m
   obtain ⟨k, hk⟩ : ∃ k, R.m = k + 1 := ⟨R.m - 1, by omega⟩
-  rw [hk]; rfl
+  rw [hk]
+  rfl
 
 def model {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (n n₀ a : ℕ) : RowsRest B C where
   muAt _ := C.mu0
@@ -144,8 +154,11 @@ def model {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (n n₀ a : ℕ) : Row
   instMuf u := inferInstanceAs (FiniteDimensional ℂ (MuT C u))
   perCol u μ φ F := by
     classical
-    exact if hμ : μ = C.mu0 then (C.mem u).P.PtilCol φ.1 ((h.mt0 u).some.symm (hμ ▸ F))
-      else (C.PTw u μ).PtilCol (C.e0Tw u μ φ.1) ((h.mtTw u μ).some.symm F)
+    exact
+      if hμ : μ = C.mu0 then
+        (C.mem u).P.PtilCol φ.1 ((h.mt0 u).some.symm (hμ ▸ F))
+      else
+        (C.PTw u μ).PtilCol (C.e0Tw u μ φ.1) ((h.mtTw u μ).some.symm F)
   Bu u φ F := (C.mem u).P.PtilCol φ.1 ((h.mt0 u).some.symm (trunc n (d C.mu0) F))
   ze _ _ := 1
   rowsRest_wordColumnUnit_baseTuple _ := rfl
@@ -177,8 +190,7 @@ def model {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (n n₀ a : ℕ) : Row
   shaLen_nonneg _ _ := zero_le_one
   eMu u := LinearEquiv.refl ℂ (C.mem u).A.Mram
   eMt0 u := (h.mt0 u).some
-  perCol_base_eq_PtilCol u φ F := by
-    rw [dite_eq_left rfl]; rfl
+  perCol_base_eq_PtilCol u φ F := by rw [dite_eq_left rfl]; rfl
   Bu_linL u F := by
     refine ⟨fun x y => ?_, fun c x => ?_⟩
     · show (C.mem u).P.Ptil (Formalism.ThetaLiftIndependence.chainOpM (C.mem u).C.wt (C.mem u).C.Kmap B.R.m (x.1 + y.1)) _ = _
@@ -190,11 +202,8 @@ def model {C : Cols B} {d : C.Tup → ℕ} (h : Fits C d) (n n₀ a : ℕ) : Row
   Bu_linR u φ := by
     refine ⟨fun x y => ?_, fun c x => ?_⟩ <;> simp [PeriodMap.Ptil, PeriodMap.PtilCol]
   eMtTw u μ := (h.mtTw u μ).some
-  perCol_tie u μ hμ φ F := by
-    rw [dite_eq_right hμ]; rfl
+  perCol_tie u μ hμ φ F := by rw [dite_eq_right hμ]; rfl
   eMu_isom _ _ _ := rfl
-
-
 
 end GlobalTheory.Mem.RowsRestModel
 

@@ -10,9 +10,11 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Module
 
-theorem wa_witt_ker {K : Type} [Field K] (r m : ℕ) (g : Fin r → K)
-    (hg : ∀ k : Fin r, m ≤ (k : ℕ) → (k : ℕ) + m < r → g k ≠ 0) (v : Fin r → K)
-    (hv : ∀ p : Fin r, ∑ i, v i * wittMat r m g p i = 0) : v = 0 := by
+theorem wa_witt_ker
+    {K : Type} [Field K]
+    (r m : ℕ) (g : Fin r → K) (hg : ∀ k : Fin r, m ≤ (k : ℕ) → (k : ℕ) + m < r → g k ≠ 0)
+    (v : Fin r → K) (hv : ∀ p : Fin r, ∑ i, v i * wittMat r m g p i = 0)
+    : v = 0 := by
   funext j
   have hj := j.isLt
   by_cases hmid : m ≤ (j : ℕ) ∧ (j : ℕ) + m < r
@@ -58,8 +60,9 @@ theorem wa_witt_ker {K : Type} [Field K] (r m : ℕ) (g : Fin r → K)
 
 theorem wittBasis_holds : WittBasisStatement := by
   intro K _ _ r S hdet
-  have hnd : ∀ x ∈ (⊤ : Submodule K (Fin r → K)),
-      (∀ y ∈ (⊤ : Submodule K (Fin r → K)), S.h x y = 0) → x = 0 := by
+  have hnd
+      : ∀ x ∈ (⊤ : Submodule K (Fin r → K)),
+        (∀ y ∈ (⊤ : Submodule K (Fin r → K)), S.h x y = 0) → x = 0 := by
     intro x _ hx
     have hrow : Matrix.vecMul (fun a => S.c (x a)) S.G = 0 := by
       funext b'
@@ -70,31 +73,37 @@ theorem wittBasis_holds : WittBasisStatement := by
     have h3 := congrFun h2 a
     simp only [Pi.zero_apply, map_eq_zero] at h3
     exact h3
-  obtain ⟨m, bb, g, -, hm, hW, hg⟩ := wa_main S r ⊤ (by rw [finrank_top, Module.finrank_fin_fun]) hnd
+  obtain ⟨m, bb, g, -, hm, hW, hg⟩ :=
+    wa_main S r ⊤ (by rw [finrank_top, Module.finrank_fin_fun]) hnd
   have hgmid : ∀ k : Fin r, m ≤ (k : ℕ) → (k : ℕ) + m < r → g k ≠ 0 := by
     intro k hk1 hk2 hgk
-    have ht := hg (Pi.single k 1) (fun i hi => by
-      rw [Pi.single_apply, if_neg]
-      rintro rfl
-      omega) (by
-      rw [Finset.sum_eq_single k]
-      · simp [hgk]
-      · intro i _ hik
-        simp [Pi.single_eq_of_ne hik]
-      · intro h
-        exact absurd (Finset.mem_univ k) h)
+    have ht :=
+      hg (Pi.single k 1)
+        (fun i hi => by
+          rw [Pi.single_apply, if_neg]
+          rintro rfl
+          omega)
+        (by
+          rw [Finset.sum_eq_single k]
+          · simp [hgk]
+          · intro i _ hik
+            simp [Pi.single_eq_of_ne hik]
+          · intro h
+            exact absurd (Finset.mem_univ k) h)
     have := congrFun ht k
     simp at this
-  have hlin : ∀ (x v : Fin r → K), S.h x (fun a => ∑ i, bb i a * v i) = ∑ i, v i * S.h x (bb i) := by
+  have hlin
+      : ∀ (x v : Fin r → K), S.h x (fun a => ∑ i, bb i a * v i) = ∑ i, v i * S.h x (bb i) := by
     intro x v
     simp only [HermForm.h, Finset.mul_sum]
-    calc ∑ a, ∑ b', ∑ i, S.c (x a) * S.G a b' * (bb i b' * v i)
-        = ∑ a, ∑ i, ∑ b', S.c (x a) * S.G a b' * (bb i b' * v i) :=
-          Finset.sum_congr rfl fun a _ => Finset.sum_comm
+    calc
+      ∑ a, ∑ b', ∑ i, S.c (x a) * S.G a b' * (bb i b' * v i)
+          = ∑ a, ∑ i, ∑ b', S.c (x a) * S.G a b' * (bb i b' * v i) :=
+        Finset.sum_congr rfl fun a _ => Finset.sum_comm
       _ = ∑ i, ∑ a, ∑ b', S.c (x a) * S.G a b' * (bb i b' * v i) := Finset.sum_comm
       _ = ∑ i, ∑ a, ∑ b', v i * (S.c (x a) * S.G a b' * bb i b') :=
-          Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun a _ =>
-            Finset.sum_congr rfl fun b' _ => by ring
+        Finset.sum_congr rfl fun i _ =>
+          Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b' _ => by ring
   refine ⟨Matrix.of fun a i => bb i a, m, g, ?_, hm, ?_, hg⟩
   · intro hd
     obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hd
@@ -111,8 +120,8 @@ theorem wittBasis_holds : WittBasisStatement := by
     exact Finset.sum_congr rfl fun i _ => by rw [hW p i]
   · ext i j
     rw [← hW i j]
-    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.of_apply, HermForm.h,
-      Finset.sum_mul]
+    simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.of_apply,
+      HermForm.h, Finset.sum_mul]
     exact Finset.sum_comm
 
 end ReciprocityTheory.MultiplicativeHeights

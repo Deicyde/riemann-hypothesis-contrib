@@ -11,25 +11,29 @@ namespace GroundTheory.Heights₂.Heights
 open Filter Topology Set Function
 open scoped ContDiff Manifold
 
-theorem tendsto_of_forall_local {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] {ι : Type*} {l : Filter ι} (T : ι → (E → ℝ) → ℝ) (L : (E → ℝ) → ℝ)
-    (hT : ∀ f g : E → ℝ, ContDiff ℝ ∞ f → HasCompactSupport f → ContDiff ℝ ∞ g →
-      HasCompactSupport g → ∀ᶠ ε in l, T ε (f + g) = T ε f + T ε g)
-    (hL : ∀ f g : E → ℝ, ContDiff ℝ ∞ f → HasCompactSupport f → ContDiff ℝ ∞ g →
-      HasCompactSupport g → L (f + g) = L f + L g)
-    (hloc : ∀ p : E, ∃ N ∈ 𝓝 p, ∀ f : E → ℝ, ContDiff ℝ ∞ f → HasCompactSupport f →
-      tsupport f ⊆ N → Tendsto (fun ε => T ε f) l (𝓝 (L f)))
-    (f : E → ℝ) (hf : ContDiff ℝ ∞ f) (hfc : HasCompactSupport f) :
-    Tendsto (fun ε => T ε f) l (𝓝 (L f)) := by
+theorem tendsto_of_forall_local
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    {ι : Type*} {l : Filter ι} (T : ι → (E → ℝ) → ℝ)
+    (L : (E → ℝ) → ℝ)
+    (hT : ∀ f g : E → ℝ,
+      ContDiff ℝ ∞ f → HasCompactSupport f → ContDiff ℝ ∞ g → HasCompactSupport g
+        → ∀ᶠ ε in l, T ε (f + g) = T ε f + T ε g)
+    (hL : ∀ f g : E → ℝ,
+      ContDiff ℝ ∞ f → HasCompactSupport f → ContDiff ℝ ∞ g → HasCompactSupport g
+        → L (f + g) = L f + L g)
+    (hloc : ∀ p : E, ∃ N ∈ 𝓝 p, ∀ f : E → ℝ,
+      ContDiff ℝ ∞ f → HasCompactSupport f → tsupport f ⊆ N → Tendsto (fun ε => T ε f) l (𝓝 (L f)))
+    (f : E → ℝ) (hf : ContDiff ℝ ∞ f) (hfc : HasCompactSupport f)
+    : Tendsto (fun ε => T ε f) l (𝓝 (L f)) := by
   choose N hN hNf using hloc
-  obtain ⟨ρ, hρ⟩ := SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, E) (isClosed_tsupport f)
-    (fun p => interior (N p)) (fun _ => isOpen_interior)
-    (fun x _ => mem_iUnion.2 ⟨x, mem_interior_iff_mem_nhds.2 (hN x)⟩)
+  obtain ⟨ρ, hρ⟩ :=
+    SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, E) (isClosed_tsupport f)
+      (fun p => interior (N p))
+      (fun _ => isOpen_interior)
+      (fun x _ => mem_iUnion.2 ⟨x, mem_interior_iff_mem_nhds.2 (hN x)⟩)
   obtain ⟨g, hg⟩ : ∃ g : E → E → ℝ, g = fun i x => ρ i x * f x := ⟨_, rfl⟩
-  have hgs : ∀ i, ContDiff ℝ ∞ (g i) := fun i => by
-    rw [hg]; exact (ρ i).contMDiff.contDiff.mul hf
-  have hgc : ∀ i, HasCompactSupport (g i) := fun i => by
-    rw [hg]; exact hfc.mul_left
+  have hgs : ∀ i, ContDiff ℝ ∞ (g i) := fun i => by rw [hg]; exact (ρ i).contMDiff.contDiff.mul hf
+  have hgc : ∀ i, HasCompactSupport (g i) := fun i => by rw [hg]; exact hfc.mul_left
   have hgN : ∀ i, tsupport (g i) ⊆ N i := fun i => by
     rw [hg]; exact tsupport_mul_subset_left.trans ((hρ i).trans interior_subset)
   have hfin : {i | (support (ρ i) ∩ tsupport f).Nonempty}.Finite :=
@@ -50,9 +54,11 @@ theorem tendsto_of_forall_local {E : Type*} [NormedAddCommGroup E] [NormedSpace 
     simpa using h
   have hL0 : L 0 = 0 := by
     simpa using hL 0 0 contDiff_const HasCompactSupport.zero contDiff_const HasCompactSupport.zero
-  have key : ∀ s : Finset E, ContDiff ℝ ∞ (∑ i ∈ s, g i) ∧ HasCompactSupport (∑ i ∈ s, g i) ∧
-      (∀ᶠ ε in l, T ε (∑ i ∈ s, g i) = ∑ i ∈ s, T ε (g i)) ∧
-      L (∑ i ∈ s, g i) = ∑ i ∈ s, L (g i) := by
+  have key
+      : ∀ s : Finset E,
+        ContDiff ℝ ∞ (∑ i ∈ s, g i) ∧ HasCompactSupport (∑ i ∈ s, g i)
+          ∧ (∀ᶠ ε in l, T ε (∑ i ∈ s, g i) = ∑ i ∈ s, T ε (g i))
+          ∧ L (∑ i ∈ s, g i) = ∑ i ∈ s, L (g i) := by
     classical
     intro s
     induction s using Finset.induction_on with

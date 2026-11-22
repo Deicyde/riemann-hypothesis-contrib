@@ -11,8 +11,12 @@ open scoped Real SchwartzMap ComplexConjugate
 
 namespace GlobalTheory
 
-theorem siegelGauss_pair_standard (l : Type) [Fintype l] [DecidableEq l] (τ : Matrix l l ℂ) (c : ℂ) (hτ : GlobalTheory.IsSiegel τ) :
-    (∫ x : l → ℝ, c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ τ *ᵥ fun i => (x i : ℂ))) * conj (cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ)))) ^ 2 * (1 - I • τ).det = c ^ 2 := by
+theorem siegelGauss_pair_standard
+    (l : Type) [Fintype l] [DecidableEq l] (τ : Matrix l l ℂ) (c : ℂ) (hτ : GlobalTheory.IsSiegel τ)
+    : (∫ x : l → ℝ, c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ τ *ᵥ fun i => (x i : ℂ))) * conj (cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ))))
+          ^ 2
+        * (1 - I • τ).det
+      = c ^ 2 := by
   set σ : Matrix l l ℂ := τ + I • (1 : Matrix l l ℂ) with hσdef
   have hσ : GlobalTheory.IsSiegel σ := by
     refine ⟨?_, ?_⟩
@@ -24,18 +28,23 @@ theorem siegelGauss_pair_standard (l : Type) [Fintype l] [DecidableEq l] (τ : M
         · simp [σ, Matrix.one_apply, hij]
       rw [this]
       exact hτ.2.add_posSemidef Matrix.PosSemidef.one
-  have hint : ∀ x : l → ℝ, c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ τ *ᵥ fun i => (x i : ℂ))) * conj (cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ)))
-      = c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ (σ *ᵥ fun i => (x i : ℂ)))) := by
+  have hint
+      : ∀ x : l → ℝ,
+        c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ τ *ᵥ fun i => (x i : ℂ)))
+            * conj (cexp (-π * ((x ⬝ᵥ x : ℝ) : ℂ)))
+          = c * cexp (π * I * ((fun i => (x i : ℂ)) ⬝ᵥ (σ *ᵥ fun i => (x i : ℂ)))) := by
     intro x
     rw [← Complex.exp_conj, mul_assoc, ← Complex.exp_add]
     congr 2
     have e : ((x ⬝ᵥ x : ℝ) : ℂ) = (fun i => (x i : ℂ)) ⬝ᵥ (fun i => (x i : ℂ)) := by
       simp [dotProduct]
-    rw [e, hσdef, Matrix.add_mulVec, dotProduct_add, Matrix.smul_mulVec, Matrix.one_mulVec, dotProduct_smul]
+    rw [e, hσdef, Matrix.add_mulVec, dotProduct_add, Matrix.smul_mulVec, Matrix.one_mulVec,
+      dotProduct_smul]
     simp only [map_mul, map_neg, conj_ofReal, smul_eq_mul]
-    have : conj ((fun i => (x i : ℂ)) ⬝ᵥ (fun i => (x i : ℂ))) = (fun i => (x i : ℂ)) ⬝ᵥ (fun i => (x i : ℂ)) := by
+    have : conj ((fun i => (x i : ℂ)) ⬝ᵥ (fun i => (x i : ℂ)))
+        = (fun i => (x i : ℂ)) ⬝ᵥ (fun i => (x i : ℂ)) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [dotProduct, map_sum]
+      simp [dotProduct, map_sum]
     rw [this]
     ring_nf
     simp [I_sq]

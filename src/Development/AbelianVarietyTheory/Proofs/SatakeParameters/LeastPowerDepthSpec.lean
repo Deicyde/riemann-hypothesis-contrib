@@ -10,9 +10,11 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory
 
-theorem depth_spec : ∀ {D : D7} (L : SizeData₂ D) (_ : ParameterChoice' D L) (l : ℕ), 11 ≤ l →
-    LevelStarExponents.lA L ≤ ((l : ℝ) - 1) ^ depth L l ∧ 2 * depth L l + 2 ≤ D.host.Lw ∧
-      ((l : ℝ) < LevelStarExponents.lA L → 2 ≤ depth L l) := by
+theorem depth_spec
+    : ∀ {D : D7} (L : SizeData₂ D) (_ : ParameterChoice' D L) (l : ℕ),
+      11 ≤ l
+        → LevelStarExponents.lA L ≤ ((l : ℝ) - 1) ^ depth L l ∧ 2 * depth L l + 2 ≤ D.host.Lw
+          ∧ ((l : ℝ) < LevelStarExponents.lA L → 2 ≤ depth L l) := by
   intro D L P l hl
   obtain ⟨j, hj, hjL⟩ := P.Lw_j l hl
   have hne : ({j : ℕ | LevelStarExponents.lA L ≤ ((l : ℝ) - 1) ^ j} : Set ℕ).Nonempty := ⟨j, hj⟩

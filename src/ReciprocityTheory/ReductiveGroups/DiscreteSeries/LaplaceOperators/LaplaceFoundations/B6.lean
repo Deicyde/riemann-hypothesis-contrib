@@ -9,10 +9,12 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.DS.Lap.Base
 
-private theorem integrable_one_add_mul_norm_sq_rpow_neg {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : MeasureTheory.Measure E)
-    [μ.IsAddHaarMeasure] {a s : ℝ} (ha : 0 < a) (hs : (Module.finrank ℝ E : ℝ) < 2 * s) :
-    MeasureTheory.Integrable (fun v : E => (1 + a * ‖v‖ ^ 2) ^ (-s)) μ := by
+private theorem integrable_one_add_mul_norm_sq_rpow_neg
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : MeasureTheory.Measure E) [μ.IsAddHaarMeasure]
+    {a s : ℝ} (ha : 0 < a) (hs : (Module.finrank ℝ E : ℝ) < 2 * s)
+    : MeasureTheory.Integrable (fun v : E => (1 + a * ‖v‖ ^ 2) ^ (-s)) μ := by
   open MeasureTheory Filter Topology in
   have h := (integrable_rpow_neg_one_add_norm_sq (μ := μ) hs).comp_smul (Real.sqrt_pos.2 ha).ne'
   refine h.congr (Filter.Eventually.of_forall fun v => ?_)
@@ -21,15 +23,19 @@ private theorem integrable_one_add_mul_norm_sq_rpow_neg {E : Type*} [NormedAddCo
   congr 1
   ring
 
-private theorem main_lemma_2 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] (μ : MeasureTheory.Measure E)
-    [μ.IsAddHaarMeasure] (f : ℕ → E → ℂ)
-    (hm : ∀ᶠ t : ℕ in Filter.atTop, MeasureTheory.AEStronglyMeasurable (f t) μ) (B : E →ₗ[ℝ] E →ₗ[ℝ] ℂ)
-    (hlim : ∀ v, Filter.Tendsto (fun t : ℕ => f t ((Real.sqrt t)⁻¹ • v)) Filter.atTop
-      (nhds (Complex.exp (-(B v v)))))
+private theorem main_lemma_2
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : MeasureTheory.Measure E) [μ.IsAddHaarMeasure]
+    (f : ℕ → E → ℂ) (hm : ∀ᶠ t : ℕ in Filter.atTop, MeasureTheory.AEStronglyMeasurable (f t) μ)
+    (B : E →ₗ[ℝ] E →ₗ[ℝ] ℂ)
+    (hlim : ∀ v,
+      Filter.Tendsto
+        (fun t : ℕ => f t ((Real.sqrt t)⁻¹ • v))
+        Filter.atTop (nhds (Complex.exp (-(B v v)))))
     {c γ : ℝ} (hc : 0 < c) (hγ : 0 < γ)
-    (hbd : ∀ᶠ t : ℕ in Filter.atTop, ∀ v, ‖f t v‖ ≤ (1 + c * ‖v‖ ^ 2) ^ (-(γ * t))) :
-    ∀ᶠ t : ℕ in Filter.atTop, MeasureTheory.Integrable (f t) μ ∧ ∫ v, f t v ∂μ ≠ 0 := by
+    (hbd : ∀ᶠ t : ℕ in Filter.atTop, ∀ v, ‖f t v‖ ≤ (1 + c * ‖v‖ ^ 2) ^ (-(γ * t)))
+    : ∀ᶠ t : ℕ in Filter.atTop, MeasureTheory.Integrable (f t) μ ∧ ∫ v, f t v ∂μ ≠ 0 := by
   open MeasureTheory Filter Topology in
   have hbig : ∀ᶠ t : ℕ in atTop, (Module.finrank ℝ E : ℝ) < 2 * (γ * t) ∧ (1 : ℝ) ≤ t := by
     have h1 : Tendsto (fun t : ℕ => 2 * (γ * (t : ℝ))) atTop atTop :=
@@ -40,8 +46,9 @@ private theorem main_lemma_2 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
   obtain ⟨N, hN⟩ := eventually_atTop.1 ((hbd.and hm).and hbig)
   have hNpos : (0 : ℝ) < N := lt_of_lt_of_le one_pos (hN N le_rfl).2.2
 
-  have hmaj : ∀ t : ℕ, N ≤ t → ∀ w : E,
-      ‖f t ((Real.sqrt t)⁻¹ • w)‖ ≤ (1 + c / N * ‖w‖ ^ 2) ^ (-(γ * N)) := by
+  have hmaj
+      : ∀ t : ℕ,
+        N ≤ t → ∀ w : E, ‖f t ((Real.sqrt t)⁻¹ • w)‖ ≤ (1 + c / N * ‖w‖ ^ 2) ^ (-(γ * N)) := by
     intro t ht w
     have ht' : (N : ℝ) ≤ t := by exact_mod_cast ht
     have htpos : (0 : ℝ) < t := lt_of_lt_of_le hNpos ht'
@@ -70,12 +77,12 @@ private theorem main_lemma_2 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
     have htpos : (0 : ℝ) < t := lt_of_lt_of_le hNpos (by exact_mod_cast ht)
     have hr : (Real.sqrt t)⁻¹ ≠ 0 := inv_ne_zero (Real.sqrt_pos.2 htpos).ne'
     exact (hN t ht).1.2.comp_quasiMeasurePreserving (Measure.quasiMeasurePreserving_smul μ hr)
-  have hT : Tendsto (fun t : ℕ => ∫ w, f t ((Real.sqrt t)⁻¹ • w) ∂μ) atTop
-      (𝓝 (∫ w, Complex.exp (-(B w w)) ∂μ)) :=
-    tendsto_integral_filter_of_dominated_convergence _
-      ((eventually_ge_atTop N).mono hgm)
-      ((eventually_ge_atTop N).mono fun t ht => Eventually.of_forall (hmaj t ht))
-      hbint (Eventually.of_forall hlim)
+  have hT : Tendsto
+      (fun t : ℕ => ∫ w, f t ((Real.sqrt t)⁻¹ • w) ∂μ)
+      atTop (𝓝 (∫ w, Complex.exp (-(B w w)) ∂μ)) :=
+    tendsto_integral_filter_of_dominated_convergence _ ((eventually_ge_atTop N).mono hgm)
+      ((eventually_ge_atTop N).mono fun t ht => Eventually.of_forall (hmaj t ht)) hbint
+      (Eventually.of_forall hlim)
 
   have hpos : ∀ v : E, v ≠ 0 → 0 < (B v v).re := by
     intro v hv
@@ -97,8 +104,8 @@ private theorem main_lemma_2 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
     hT.eventually_ne (ReciprocityTheory.ChartRestriction.DS.Lap.Laplace.gauss_ne_zero μ B hpos)
   filter_upwards [eventually_ge_atTop N, hev] with t ht hgt
   refine ⟨?_, ?_⟩
-  · exact Integrable.mono' (integrable_one_add_mul_norm_sq_rpow_neg μ hc (hN t ht).2.1) (hN t ht).1.2
-      (Eventually.of_forall (hN t ht).1.1)
+  · exact Integrable.mono' (integrable_one_add_mul_norm_sq_rpow_neg μ hc (hN t ht).2.1)
+      (hN t ht).1.2 (Eventually.of_forall (hN t ht).1.1)
   · intro h0
     apply hgt
     rw [Measure.integral_comp_smul μ (f t) (Real.sqrt t)⁻¹, h0, smul_zero]

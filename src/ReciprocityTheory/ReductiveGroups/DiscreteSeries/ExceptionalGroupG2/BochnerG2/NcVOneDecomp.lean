@@ -16,16 +16,19 @@ variable {n : ℕ}
 
 section OneB
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem ncV_one_decomp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {x : Big n 1 M} (hx : x ∈ ncV ε V 1) :
-    ∃ xm ∈ Wm ε E V, ∃ xp ∈ Wp ε E V, x = xm + xp := by
+theorem ncV_one_decomp
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {x : Big n 1 M} (hx : x ∈ ncV ε V 1)
+    : ∃ xm ∈ Wm ε E V, ∃ xp ∈ Wp ε E V, x = xm + xp := by
   classical
-  have hinv : ∀ y ∈ ncV ε V 1, crossOp ε E 1 0 y ∈ ncV ε V 1 :=
-    fun y hy => crossOp_mem_ncV hV.2.1 1 0 hy
+  have hinv : ∀ y ∈ ncV ε V 1, crossOp ε E 1 0 y ∈ ncV ε V 1 := fun y hy =>
+    crossOp_mem_ncV hV.2.1 1 0 hy
   haveI : FiniteDimensional ℂ (ncV ε V 1) := finiteDimensional_ncV hV.1 1
   let T' : Module.End ℂ (ncV ε V 1) := (crossOp ε E 1 0).restrict hinv
   have hT' : T'.IsSymmetric := fun u v => crossOp_symm hU 1 0 u v
@@ -40,14 +43,19 @@ theorem ncV_one_decomp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW 
     have hev : Module.End.HasEigenvalue T' μ :=
       Module.End.hasEigenvalue_of_hasEigenvector ⟨hg μ, hμ⟩
     exact (Complex.conj_eq_iff_re.1 (hT'.conj_eigenvalue_eq_self hev)).symm
-  have hmem : ∀ μ, ((g μ : ncV ε V 1) : Big n 1 M) ∈
-      Module.End.eigenspace (crossOp ε E 1 0) μ ⊓ ncV ε V 1 := by
+  have hmem
+      : ∀ μ,
+        ((g μ : ncV ε V 1) : Big n 1 M)
+          ∈ Module.End.eigenspace (crossOp ε E 1 0) μ ⊓ ncV ε V 1 := by
     intro μ
     refine Submodule.mem_inf.2 ⟨?_, (g μ).2⟩
     rw [Module.End.mem_eigenspace_iff]
     exact congrArg Subtype.val (Module.End.mem_eigenspace_iff.1 (hg μ))
-  have hmem' : ∀ μ, g μ ≠ 0 → ((g μ : ncV ε V 1) : Big n 1 M) ∈
-      Module.End.eigenspace (crossOp ε E 1 0) ((μ.re : ℝ) : ℂ) ⊓ ncV ε V 1 := by
+  have hmem'
+      : ∀ μ,
+        g μ ≠ 0
+          → ((g μ : ncV ε V 1) : Big n 1 M)
+            ∈ Module.End.eigenspace (crossOp ε E 1 0) ((μ.re : ℝ) : ℂ) ⊓ ncV ε V 1 := by
     intro μ hμ
     have h1 := hmem μ
     rwa [← hreal μ hμ]
@@ -57,8 +65,13 @@ theorem ncV_one_decomp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW 
   have hxsum : x = ∑ μ ∈ g.support, ((g μ : ncV ε V 1) : Big n 1 M) := by
     have := congrArg Subtype.val hsum
     simpa [Finsupp.sum] using this.symm
-  refine ⟨∑ μ ∈ g.support.filter (fun μ => μ.re < 0), ((g μ : ncV ε V 1) : Big n 1 M), ?_,
-    ∑ μ ∈ g.support.filter (fun μ => ¬ μ.re < 0), ((g μ : ncV ε V 1) : Big n 1 M), ?_, ?_⟩
+  refine ⟨
+    ∑ μ ∈ g.support.filter (fun μ => μ.re < 0), ((g μ : ncV ε V 1) : Big n 1 M),
+    ?_,
+    ∑ μ ∈ g.support.filter (fun μ => ¬ μ.re < 0), ((g μ : ncV ε V 1) : Big n 1 M),
+    ?_,
+    ?_
+  ⟩
   · show _ ∈ ⨆ (θ : ℝ) (_ : θ < 0), Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1
     refine Submodule.sum_mem _ fun μ hμ => ?_
     by_cases h0 : g μ = 0
@@ -111,11 +124,13 @@ private lemma abs_rhoN_le_half (ε : Fin n → Bool) (a : Fin n) :
   · linarith [key (Finset.filter (fun b => a < b ∧ ε b ≠ ε a) Finset.univ),
       (Nat.cast_nonneg (Finset.filter (fun b => b < a ∧ ε b ≠ ε a) Finset.univ).card : (0 : ℝ) ≤ _)]
 
-theorem Wm_khw (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {x : Big n 1 M} (hx : x ∈ Wm ε E V) (hx0 : x ≠ 0) {ν : Fin n → ℝ}
-    (hν : IsKHWVec ε (bAct E 1) ν x) :
-    ∃ a b : Fin n, a < b ∧ ε a ≠ ε b ∧ ν = lowK ε lam - root a b := by
+theorem Wm_khw
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {x : Big n 1 M} (hx : x ∈ Wm ε E V) (hx0 : x ≠ 0)
+    {ν : Fin n → ℝ} (hν : IsKHWVec ε (bAct E 1) ν x)
+    : ∃ a b : Fin n, a < b ∧ ε a ≠ ε b ∧ ν = lowK ε lam - root a b := by
   have hle : Wm ε E V ≤ ncV ε V 1 := by
     show (⨆ (θ : ℝ) (_ : θ < 0),
       Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1) ≤ ncV ε V 1
@@ -125,8 +140,9 @@ theorem Wm_khw (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lo
   have hne : r ≠ s := fun h' => hrs (h' ▸ rfl)
   rcases lt_or_gt_of_ne hne with hlt | hgt
   · exfalso
-    have hdiff : casValK ε ν - casValK ε (lowK ε lam) =
-        2 * ((lowK ε lam + rhoC ε) r - (lowK ε lam + rhoC ε) s) + 2 := by
+    have hdiff
+        : casValK ε ν - casValK ε (lowK ε lam)
+          = 2 * ((lowK ε lam + rhoC ε) r - (lowK ε lam + rhoC ε) s) + 2 := by
       rw [hν']
       unfold casValK
       rw [add_right_comm]
@@ -140,23 +156,24 @@ theorem Wm_khw (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lo
     have hcpos : 0 < (casValK ε ν - n - casValK ε (lowK ε lam)) / 2 := by
       rw [hw r, hw s] at hdiff
       linarith [(abs_rhoN_le_half ε r).1, (abs_rhoN_le_half ε s).2]
-    have heig : crossOp ε E 1 0 x =
-        (((casValK ε ν - n - casValK ε (lowK ε lam)) / 2 : ℝ) : ℂ) • x := by
+    have heig
+        : crossOp ε E 1 0 x = (((casValK ε ν - n - casValK ε (lowK ε lam)) / 2 : ℝ) : ℂ) • x := by
       have h2 : (2 : ℂ) ≠ 0 := two_ne_zero
-      calc crossOp ε E 1 0 x = (2 : ℂ)⁻¹ • ((2 : ℂ) • crossOp ε E 1 0 x) := by
-            rw [smul_smul, inv_mul_cancel₀ h2, one_smul]
-        _ = (2 : ℂ)⁻¹ • (((casValK ε ν - n - casValK ε (lowK ε lam) : ℝ) : ℂ) • x) := by
-            rw [hC]
+      calc
+        crossOp ε E 1 0 x = (2 : ℂ)⁻¹ • ((2 : ℂ) • crossOp ε E 1 0 x) := by
+          rw [smul_smul, inv_mul_cancel₀ h2, one_smul]
+        _ = (2 : ℂ)⁻¹ • (((casValK ε ν - n - casValK ε (lowK ε lam) : ℝ) : ℂ) • x) := by rw [hC]
         _ = _ := by
-            rw [smul_smul]
-            congr 1
-            push_cast
-            ring
+          rw [smul_smul]
+          congr 1
+          push_cast
+          ring
     have hxP : x ∈ Wp ε E V := by
       show x ∈ ⨆ (θ : ℝ) (_ : 0 < θ),
         Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1
-      exact Submodule.mem_iSup_of_mem _ (Submodule.mem_iSup_of_mem hcpos
-        (Submodule.mem_inf.2 ⟨Module.End.mem_eigenspace_iff.2 heig, hxN⟩))
+      exact Submodule.mem_iSup_of_mem _
+        (Submodule.mem_iSup_of_mem hcpos
+          (Submodule.mem_inf.2 ⟨Module.End.mem_eigenspace_iff.2 heig, hxN⟩))
     exact hx0 (inner_self_eq_zero.1 (Wm_perp_Wp hU hx hxP))
   · refine ⟨s, r, hgt, fun h' => hrs h'.symm, ?_⟩
     rw [hν']
@@ -203,26 +220,38 @@ private lemma mul_norm_sq_sum_le_re_inner_of_orthogonal_eigen {W : Type*} [Norme
     · have := hc i (Finset.mem_insert_self i s) hyi
       nlinarith [IH, mul_le_mul_of_nonneg_right this (sq_nonneg ‖y i‖)]
 
-theorem Wp_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {x : Big n 1 M} (hx : x ∈ Wp ε E V) :
-    2 * (h - n + 1) * ‖x‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E 1 0 x) x) := by
+theorem Wp_bound
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {x : Big n 1 M} (hx : x ∈ Wp ε E V)
+    : 2 * (h - n + 1) * ‖x‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E 1 0 x) x) := by
   classical
-  have hx' : x ∈ ⨆ θ : {θ : ℝ // 0 < θ},
-      Module.End.eigenspace (crossOp ε E 1 0) (((θ : ℝ)) : ℂ) ⊓ ncV ε V 1 := by
-    have h1 : x ∈ ⨆ (θ : ℝ) (_ : 0 < θ),
-        Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1 := hx
+  have hx'
+      : x
+        ∈ ⨆ θ : {θ : ℝ // 0 < θ},
+          Module.End.eigenspace (crossOp ε E 1 0) (((θ : ℝ)) : ℂ) ⊓ ncV ε V 1 := by
+    have h1
+        : x
+          ∈ ⨆ (θ : ℝ) (_ : 0 < θ),
+            Module.End.eigenspace (crossOp ε E 1 0) (θ : ℂ) ⊓ ncV ε V 1 :=
+      hx
     rwa [iSup_subtype'] at h1
   obtain ⟨f, hf, rfl⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).1 hx'
-  have key := mul_norm_sq_sum_le_re_inner_of_orthogonal_eigen (crossOp ε E 1 0) (crossOp_symm hU 1 0) (h - n + 1)
-    (fun θ : {θ : ℝ // 0 < θ} => (θ : ℝ)) f f.support
-    (fun i _ => Module.End.mem_eigenspace_iff.1 (hf i).1)
-    (fun i _ j _ hij => inner_crossOp_eig_eq_zero hU (fun h' => hij (Subtype.ext h'))
-      (Module.End.mem_eigenspace_iff.1 (hf i).1) (Module.End.mem_eigenspace_iff.1 (hf j).1))
-    (fun i _ hi0 => by
-      rcases crossOp_eig_gap hE hU hV hmono hh hbig (hf i) hi0 with h1 | h1
-      · exact h1.2
-      · exact absurd i.2 (by linarith [h1.1, h1.2]))
+  have key :=
+    mul_norm_sq_sum_le_re_inner_of_orthogonal_eigen (crossOp ε E 1 0) (crossOp_symm hU 1 0)
+      (h - n + 1)
+      (fun θ : {θ : ℝ // 0 < θ} => (θ : ℝ))
+      f f.support
+      (fun i _ => Module.End.mem_eigenspace_iff.1 (hf i).1)
+      (fun i _ j _ hij =>
+        inner_crossOp_eig_eq_zero hU
+          (fun h' => hij (Subtype.ext h'))
+          (Module.End.mem_eigenspace_iff.1 (hf i).1) (Module.End.mem_eigenspace_iff.1 (hf j).1))
+      (fun i _ hi0 => by
+        rcases crossOp_eig_gap hE hU hV hmono hh hbig (hf i) hi0 with h1 | h1
+        · exact h1.2
+        · exact absurd i.2 (by linarith [h1.1, h1.2]))
   simp only [Finsupp.sum]
   linarith [key]
 

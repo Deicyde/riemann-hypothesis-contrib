@@ -7,5 +7,7 @@ public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PIsolated
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.IsolatedPointsCount : GroundTheory.Heights₂.Heights.IsolatedPointsCount.Statement :=
-  @GroundTheory.Heights₂.Heights.IsolatedPointsCount.proof GroundTheory.Heights₂.Heights.AutoClose.IsolatedPointsCountPrime
+theorem GroundTheory.Heights₂.Heights.AutoClose.IsolatedPointsCount
+    : GroundTheory.Heights₂.Heights.IsolatedPointsCount.Statement :=
+  @GroundTheory.Heights₂.Heights.IsolatedPointsCount.proof
+    GroundTheory.Heights₂.Heights.AutoClose.IsolatedPointsCountPrime

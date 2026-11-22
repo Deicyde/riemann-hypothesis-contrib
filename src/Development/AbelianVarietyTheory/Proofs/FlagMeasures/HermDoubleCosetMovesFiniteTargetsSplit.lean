@@ -17,16 +17,21 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL
 
-theorem split_by_target {W Y Z : Type} [AddCommGroup W] (A B : AddSubgroup W) (M : W → Prop) (m : W → Z)
-    (f : Y → Z) (hf : Function.Injective f) (hB : Fine A (ind M) B)
-    (hm : ∀ w, M w → ∀ b ∈ B, m (w + b) = m w) (hex : ∀ w, M w → ∃ y, f y = m w) (c : ℝ) (hc : 0 ≤ c) :
-    {y | ∃ w, M w ∧ f y = m w}.Finite ∧ (∀ y, Nice A (ind fun w => M w ∧ f y = m w)) ∧
-    {y | c * (cint A (ind fun w => M w ∧ f y = m w)).re ≠ 0}.Finite ∧
-    (∀ y, 0 ≤ c * (cint A (ind fun w => M w ∧ f y = m w)).re) ∧
-    ∀ (P : Y → Prop) (g : Y → ℂ) (G : W → ℂ), (∀ w y, (M w ∧ f y = m w) → G w = if P y then g y else 0) →
-      (∀ w, ¬ M w → G w = 0) → Nice A G ∧
-      ∑ᶠ y : {y // P y}, ((c * (cint A (ind fun w => M w ∧ f y = m w)).re : ℝ) : ℂ) * g y =
-        (c : ℂ) * cint A G := by
+theorem split_by_target
+    {W Y Z : Type} [AddCommGroup W]
+    (A B : AddSubgroup W) (M : W → Prop) (m : W → Z)
+    (f : Y → Z) (hf : Function.Injective f)
+    (hB : Fine A (ind M) B) (hm : ∀ w, M w → ∀ b ∈ B, m (w + b) = m w)
+    (hex : ∀ w, M w → ∃ y, f y = m w)
+    (c : ℝ) (hc : 0 ≤ c)
+    : {y | ∃ w, M w ∧ f y = m w}.Finite ∧ (∀ y, Nice A (ind fun w => M w ∧ f y = m w))
+      ∧ {y | c * (cint A (ind fun w => M w ∧ f y = m w)).re ≠ 0}.Finite
+      ∧ (∀ y, 0 ≤ c * (cint A (ind fun w => M w ∧ f y = m w)).re)
+      ∧ ∀ (P : Y → Prop) (g : Y → ℂ) (G : W → ℂ),
+        (∀ w y, (M w ∧ f y = m w) → G w = if P y then g y else 0) → (∀ w, ¬ M w → G w = 0)
+          → Nice A G
+            ∧ ∑ᶠ y : {y // P y}, ((c * (cint A (ind fun w => M w ∧ f y = m w)).re : ℝ) : ℂ) * g y
+              = (c : ℂ) * cint A G := by
   obtain ⟨hBA, hidx, hinv, hfin⟩ := hB
   have hsupp : Function.support (ind M) = {w | M w} := by
     ext w
@@ -91,7 +96,8 @@ theorem split_by_target {W Y Z : Type} [AddCommGroup W] (A B : AddSubgroup W) (M
     rw [hzero y hyT] at hy
     simp at hy
   · intro P g G hG hG0
-    have hGeq : G = fun w => ∑ y ∈ hTfin.toFinset.filter P, g y * ind (fun w => M w ∧ f y = m w) w := by
+    have hGeq
+        : G = fun w => ∑ y ∈ hTfin.toFinset.filter P, g y * ind (fun w => M w ∧ f y = m w) w := by
       funext w
       by_cases hw : M w
       · obtain ⟨y0, hy0⟩ := hex w hw
@@ -123,17 +129,22 @@ theorem split_by_target {W Y Z : Type} [AddCommGroup W] (A B : AddSubgroup W) (M
         intro y _
         simp only [ind]
         rw [if_neg (fun h => hw h.1), mul_zero]
-    have hcG : Nice A G ∧ cint A G =
-        ∑ y ∈ hTfin.toFinset.filter P, g y * cint A (ind fun w => M w ∧ f y = m w) := by
-      obtain ⟨hn, hs⟩ := hI4 Y (hTfin.toFinset.filter P)
-        (fun y w => g y * ind (fun w => M w ∧ f y = m w) w) (fun y _ => (hI2 (g y) _ (hnice y)).1)
+    have hcG
+        : Nice A G
+          ∧ cint A G
+            = ∑ y ∈ hTfin.toFinset.filter P, g y * cint A (ind fun w => M w ∧ f y = m w) := by
+      obtain ⟨hn, hs⟩ :=
+        hI4 Y (hTfin.toFinset.filter P)
+          (fun y w => g y * ind (fun w => M w ∧ f y = m w) w)
+          (fun y _ => (hI2 (g y) _ (hnice y)).1)
       rw [hGeq]
       exact ⟨hn, hs.trans (Finset.sum_congr rfl fun y _ => (hI2 (g y) _ (hnice y)).2)⟩
     refine ⟨hcG.1, ?_⟩
     rw [hcG.2]
-    have hsub : Function.support (fun y : {y // P y} =>
-        ((c * (cint A (ind fun w => M w ∧ f y.1 = m w)).re : ℝ) : ℂ) * g y.1) ⊆
-        ↑(hTfin.toFinset.subtype P) := by
+    have hsub
+        : Function.support (fun y : {y // P y} =>
+            ((c * (cint A (ind fun w => M w ∧ f y.1 = m w)).re : ℝ) : ℂ) * g y.1)
+          ⊆ ↑(hTfin.toFinset.subtype P) := by
       intro y hy
       rw [Finset.mem_coe, Finset.mem_subtype, Set.Finite.mem_toFinset]
       by_contra hyT
@@ -141,30 +152,55 @@ theorem split_by_target {W Y Z : Type} [AddCommGroup W] (A B : AddSubgroup W) (M
       rw [hzero y.1 hyT]
       simp
     rw [finsum_eq_sum_of_support_subset _ hsub]
-    refine (Finset.sum_subtype_eq_sum_filter
-      (fun y => ((c * (cint A (ind fun w => M w ∧ f y = m w)).re : ℝ) : ℂ) * g y)).trans ?_
+    refine (Finset.sum_subtype_eq_sum_filter (fun y =>
+      ((c * (cint A (ind fun w => M w ∧ f y = m w)).re : ℝ) : ℂ) * g y)).trans ?_
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun y _ => ?_
     have him := (hI3 (fun w => M w ∧ f y = m w)).2
-    have hre : ((cint A (ind fun w => M w ∧ f y = m w)).re : ℂ) = cint A (ind fun w => M w ∧ f y = m w) :=
+    have hre
+        : ((cint A (ind fun w => M w ∧ f y = m w)).re : ℂ)
+          = cint A (ind fun w => M w ∧ f y = m w) :=
       Complex.ext (by simp) (by simp [him])
     push_cast
     rw [hre]
     ring
 
-theorem moves_split_by_target : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ → {Λ₁ : Submodule L.O S.V | ∃ w, S.MvTo (j + 1) d Λ Λ₁ w}.Finite ∧ (∀ Λ₁, Nice (S.refA (j + 1) Λ) (ind (S.MvTo (j + 1) d Λ Λ₁))) ∧ {Λ₁ | S.kern β (j + 1) βJ d Λ Λ₁ ≠ 0}.Finite ∧ (∀ Λ₁, 0 ≤ S.kern β (j + 1) βJ d Λ Λ₁) ∧ ∀ (P : Submodule L.O S.V → Prop) (g : Submodule L.O S.V → ℂ) (G : S.MW → ℂ), (∀ w Λ₁, S.MvTo (j + 1) d Λ Λ₁ w → G w = if P Λ₁ then g Λ₁ else 0) → (∀ w, ¬ S.Mv (j + 1) d Λ w → G w = 0) → Nice (S.refA (j + 1) Λ) G ∧ ∑ᶠ y : {y // P y}, (S.kern β (j + 1) βJ d Λ y : ℂ) * g y = (S.cK β βJ : ℂ) * cint (S.refA (j + 1) Λ) G := by
+theorem moves_split_by_target
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k),
+        ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V),
+          S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ
+            → {Λ₁ : Submodule L.O S.V | ∃ w, S.MvTo (j + 1) d Λ Λ₁ w}.Finite
+              ∧ (∀ Λ₁, Nice (S.refA (j + 1) Λ) (ind (S.MvTo (j + 1) d Λ Λ₁)))
+              ∧ {Λ₁ | S.kern β (j + 1) βJ d Λ Λ₁ ≠ 0}.Finite
+              ∧ (∀ Λ₁, 0 ≤ S.kern β (j + 1) βJ d Λ Λ₁)
+              ∧ ∀ (P : Submodule L.O S.V → Prop) (g : Submodule L.O S.V → ℂ) (G : S.MW → ℂ),
+                (∀ w Λ₁, S.MvTo (j + 1) d Λ Λ₁ w → G w = if P Λ₁ then g Λ₁ else 0)
+                  → (∀ w, ¬ S.Mv (j + 1) d Λ w → G w = 0)
+                  → Nice (S.refA (j + 1) Λ) G
+                    ∧ ∑ᶠ y : {y // P y}, (S.kern β (j + 1) βJ d Λ y : ℂ) * g y
+                      = (S.cK β βJ : ℂ) * cint (S.refA (j + 1) Λ) G := by
   intro F _ _ _ _ _ E _ _ _ L r k S j β βJ d Λ hT hFF
-  obtain ⟨B, hB, hinv⟩ := GlobalTheory.T.exists_fineSubgroup_moves_at_lattice L r k S j β βJ d Λ hT hFF
-  have hex : ∀ w, S.Mv (j + 1) d Λ w →
-      ∃ Λ₁ : Submodule L.O S.V, (Λ₁ : Set S.V) = S.moved Λ w.1.1 w.2.1 (S.sOf w) := by
+  obtain ⟨B, hB, hinv⟩ :=
+    GlobalTheory.T.exists_fineSubgroup_moves_at_lattice L r k S j β βJ d Λ hT hFF
+  have hex
+      : ∀ w,
+        S.Mv (j + 1) d Λ w
+          → ∃ Λ₁ : Submodule L.O S.V, (Λ₁ : Set S.V) = S.moved Λ w.1.1 w.2.1 (S.sOf w) := by
     intro w hw
-    obtain ⟨Λ₁, h1, -⟩ := GlobalTheory.T.hermitianDoubleCoset_move_term_weight_character L r k S j β βJ d Λ hT hFF w.1.1 w.1.2 w.2.1 (S.sOf w) hw
+    obtain ⟨Λ₁, h1, -⟩ :=
+      GlobalTheory.T.hermitianDoubleCoset_move_term_weight_character L r k S j β βJ d Λ hT hFF w.1.1
+        w.1.2 w.2.1 (S.sOf w) hw
     exact ⟨Λ₁, h1⟩
   have hc : 0 ≤ S.cK β βJ := by
     unfold Frames.cK
     positivity
   exact split_by_target (S.refA (j + 1) Λ) B (S.Mv (j + 1) d Λ)
-    (fun w => S.moved Λ w.1.1 w.2.1 (S.sOf w)) (fun Λ₁ : Submodule L.O S.V => (Λ₁ : Set S.V))
-    SetLike.coe_injective hB (fun w hw b hb => (hinv w hw b hb).1) hex (S.cK β βJ) hc
+    (fun w => S.moved Λ w.1.1 w.2.1 (S.sOf w))
+    (fun Λ₁ : Submodule L.O S.V => (Λ₁ : Set S.V))
+    SetLike.coe_injective hB
+    (fun w hw b hb => (hinv w hw b hb).1)
+    hex (S.cK β βJ) hc
 
 end GlobalTheory.HL

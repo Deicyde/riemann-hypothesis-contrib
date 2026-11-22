@@ -19,10 +19,11 @@ lemma finite_hom (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite 
     Module.Finite ℂ (X →+ ℂ) :=
   Module.Finite.equiv (addMonoidHomLequivInt (A := X) (B := ℂ) ℂ).symm
 
-theorem trace_eq_finrank_mul_sum (E : Type) [Field E] [NumberField E] (X : Type) [AddCommGroup X]
-    [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X] (a : 𝓞 E) (f : (X →+ ℂ) →ₗ[ℂ] (X →+ ℂ))
-    (hf : ∀ l x, f l x = l (a • x)) :
-    LinearMap.trace ℂ (X →+ ℂ) f = (Module.finrank (𝓞 E) X : ℂ) * ∑ τ : E →+* ℂ, τ (a : E) := by
+theorem trace_eq_finrank_mul_sum
+    (E : Type) [Field E] [NumberField E]
+    (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (a : 𝓞 E) (f : (X →+ ℂ) →ₗ[ℂ] (X →+ ℂ)) (hf : ∀ l x, f l x = l (a • x))
+    : LinearMap.trace ℂ (X →+ ℂ) f = (Module.finrank (𝓞 E) X : ℂ) * ∑ τ : E →+* ℂ, τ (a : E) := by
   classical
   have : Module.Finite (𝓞 E) X := Module.Finite.of_restrictScalars_finite ℤ (𝓞 E) X
   set r := Module.finrank (𝓞 E) X with hr
@@ -37,8 +38,9 @@ theorem trace_eq_finrank_mul_sum (E : Type) [Field E] [NumberField E] (X : Type)
     intro x
     rw [Module.finrank_eq_zero_iff] at h0
     obtain ⟨c, hc, hx⟩ := h0 (Submodule.Quotient.mk x)
-    obtain ⟨n, hn, b, hb⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := ℤ) c).exists_nonzero_dvd
-      (mem_nonZeroDivisors_of_ne_zero hc)
+    obtain ⟨n, hn, b, hb⟩ :=
+      (Algebra.IsAlgebraic.isAlgebraic (R := ℤ) c).exists_nonzero_dvd
+        (mem_nonZeroDivisors_of_ne_zero hc)
     refine ⟨n, hn, ?_⟩
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at hx
     have h1 : n • x ∈ F := by
@@ -46,13 +48,15 @@ theorem trace_eq_finrank_mul_sum (E : Type) [Field E] [NumberField E] (X : Type)
       exact F.smul_mem _ hx
     rw [show F = LinearMap.range j from (Fintype.range_linearCombination _ _).symm] at h1
     exact h1
-  let R : (X →+ ℂ) →ₗ[ℂ] ((Fin r → 𝓞 E) →+ ℂ) :=
-    { toFun := fun l => l.comp j.toAddMonoidHom
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let R : (X →+ ℂ) →ₗ[ℂ] ((Fin r → 𝓞 E) →+ ℂ) := {
+    toFun := fun l => l.comp j.toAddMonoidHom
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hR : ∀ l y, R l y = l (j y) := fun _ _ => rfl
   have hinj : Function.Injective R := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro l hl
     ext x
     obtain ⟨n, hn, y, hy⟩ := htor x
@@ -88,12 +92,14 @@ theorem trace_eq_finrank_mul_sum (E : Type) [Field E] [NumberField E] (X : Type)
     · intro k _ hk
       simp [hw, Pi.single_eq_of_ne hk]
     · simp
-  let b := basisOfLinearIndependentOfCardEqFinrank' w hwli (by
-    rw [hdY, Fintype.card_prod, Fintype.card_fin, Embeddings.card])
+  let b :=
+    basisOfLinearIndependentOfCardEqFinrank' w hwli
+      (by rw [hdY, Fintype.card_prod, Fintype.card_fin, Embeddings.card])
   let c := b.map e.symm
   have hc : ∀ p, R (c p) = w p := fun p => by
     have : e (c p) = b p := by simp [c]
-    rw [← show b p = w p by simp [b], ← this]; rfl
+    rw [← show b p = w p by simp [b], ← this]
+    rfl
   have hfc : ∀ p, f (c p) = p.2 (a : E) • c p := fun p => by
     apply hinj
     refine AddMonoidHom.ext fun y => ?_

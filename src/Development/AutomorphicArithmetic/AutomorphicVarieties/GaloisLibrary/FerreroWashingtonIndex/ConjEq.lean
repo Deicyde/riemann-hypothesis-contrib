@@ -4,11 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.conjEq :
-    ∀ (M : ℕ) [NeZero M] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {M} ℚ L] [IsCMField L], (sg M L (-1)).toRingEquiv = cE L ∧ clA M L (-1) = clMap (cE L) := by
+theorem UpperTheory.V.FW.conjEq
+    : ∀ (M : ℕ) [NeZero M] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {M} ℚ L]
+        [IsCMField L],
+      (sg M L (-1)).toRingEquiv = cE L ∧ clA M L (-1) = clMap (cE L) := by
   intro M _ L _ _ _ _
   have hζ : IsPrimitiveRoot (IsCyclotomicExtension.zeta M ℚ L) M :=
     IsCyclotomicExtension.zeta_spec M ℚ L
@@ -25,8 +29,9 @@ theorem UpperTheory.V.FW.conjEq :
     apply φ.injective
     have hz : ‖φ ζ‖ = 1 := (hζ.map_of_injective φ.injective).norm'_eq_one (NeZero.ne M)
     rw [map_mul, map_one, cE]
-    simp only [NumberField.IsCMField.complexEmbedding_complexConj, IsCMField.complexEmbedding_complexConj,
-      AlgEquiv.coe_toRingEquiv, RingEquiv.coe_toRingHom, AlgEquiv.coe_ringEquiv]
+    simp only [NumberField.IsCMField.complexEmbedding_complexConj,
+      IsCMField.complexEmbedding_complexConj, AlgEquiv.coe_toRingEquiv, RingEquiv.coe_toRingHom,
+      AlgEquiv.coe_ringEquiv]
     rw [Complex.conj_mul', hz]
     simp
   have hc : sg M L (-1) = AlgEquiv.ofRingEquiv (f := cE L) (fun q => by simp) := by

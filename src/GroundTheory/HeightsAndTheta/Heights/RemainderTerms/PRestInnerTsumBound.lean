@@ -27,7 +27,8 @@ theorem RestInnerTsumBound.proof : RestInnerTsumBound.Statement := by
   have hS : Summable (fun n : ℕ => (p ^ ((n + 1) * k))⁻¹ * c n) :=
     Summable.of_norm_bounded hsumM hbound
   refine ⟨hS, ?_⟩
-  calc |∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ * c n|
+  calc
+    |∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ * c n|
       = ‖∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ * c n‖ := (Real.norm_eq_abs _).symm
     _ ≤ ∑' n : ℕ, ‖(p ^ ((n + 1) * k))⁻¹ * c n‖ := norm_tsum_le_tsum_norm hS.norm
     _ ≤ ∑' n : ℕ, (p ^ ((n + 1) * k))⁻¹ * M := hS.norm.tsum_le_tsum hbound hsumM

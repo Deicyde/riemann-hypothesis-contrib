@@ -27,23 +27,23 @@ variable (k : Type) [Field k] {F : Type} [Field F] [Algebra k F] {d : ℕ} (x : 
 
 def yc (i : Fin (d + 1)) : Fin d → F := fun j => x (i.succAbove j) / x i
 
-theorem isFrac_of_adjoin_eq_top (S : Set F) (h : IntermediateField.adjoin k S = ⊤) :
-    IsFractionRing (Algebra.adjoin k S) F := by
+theorem isFrac_of_adjoin_eq_top (S : Set F) (h : IntermediateField.adjoin k S = ⊤)
+    : IsFractionRing (Algebra.adjoin k S) F := by
   refine IsFractionRing.of_field (Algebra.adjoin k S) F fun z => ?_
   have hz : z ∈ IntermediateField.adjoin k S := h ▸ IntermediateField.mem_top
   obtain ⟨r, hr, s, hs, rfl⟩ := IntermediateField.mem_adjoin_iff_div.1 hz
   exact ⟨⟨r, hr⟩, ⟨s, hs⟩, rfl⟩
 
-theorem ratio_mem_field (hx : ∀ i, x i ≠ 0) (i a : Fin (d + 1)) :
-    x a / x i ∈ IntermediateField.adjoin k (Set.range (yc x i)) := by
+theorem ratio_mem_field (hx : ∀ i, x i ≠ 0) (i a : Fin (d + 1))
+    : x a / x i ∈ IntermediateField.adjoin k (Set.range (yc x i)) := by
   rcases eq_or_ne a i with rfl | h
   · rw [div_self (hx a)]
     exact IntermediateField.one_mem _
   · obtain ⟨j, rfl⟩ := Fin.exists_succAbove_eq h
     exact IntermediateField.subset_adjoin _ _ ⟨j, rfl⟩
 
-theorem adjoin_yc_eq_top (hP : IsPd k x) (i : Fin (d + 1)) :
-    IntermediateField.adjoin k (Set.range (yc x i)) = ⊤ := by
+theorem adjoin_yc_eq_top (hP : IsPd k x) (i : Fin (d + 1))
+    : IntermediateField.adjoin k (Set.range (yc x i)) = ⊤ := by
   rw [eq_top_iff, ← hP.gen, IntermediateField.adjoin_le_iff]
   rintro _ ⟨j, rfl⟩
   show x j.succ / x 0 ∈ IntermediateField.adjoin k (Set.range (yc x i))
@@ -57,15 +57,15 @@ theorem trdeg_eq (hP : IsPd k x) : Cardinal.mk (Fin d) ≤ Algebra.trdeg k F := 
   exact hP.indep.cardinalMk_le_trdeg
 
 theorem indep_yc (hP : IsPd k x) (i : Fin (d + 1)) : AlgebraicIndependent k (yc x i) := by
-
   have : IsFractionRing (Algebra.adjoin k (Set.range (yc x i))) F :=
     isFrac_of_adjoin_eq_top k _ (adjoin_yc_eq_top k x hP i)
   have : Algebra.IsAlgebraic (Algebra.adjoin k (Set.range (yc x i))) F :=
     IsLocalization.isAlgebraic F (nonZeroDivisors (Algebra.adjoin k (Set.range (yc x i))))
-  exact (Algebra.IsAlgebraic.isTranscendenceBasis_of_le_trdeg_of_finite k (yc x i) (trdeg_eq k x hP)).1
+  exact (Algebra.IsAlgebraic.isTranscendenceBasis_of_le_trdeg_of_finite k (yc x i)
+    (trdeg_eq k x hP)).1
 
-theorem rA_single_eq (hx : ∀ i, x i ≠ 0) (i : Fin (d + 1)) :
-    rA k x {i} = Algebra.adjoin k (Set.range (yc x i)) := by
+theorem rA_single_eq (hx : ∀ i, x i ≠ 0) (i : Fin (d + 1))
+    : rA k x {i} = Algebra.adjoin k (Set.range (yc x i)) := by
   unfold rA
   apply le_antisymm
   · rw [Algebra.adjoin_le_iff]

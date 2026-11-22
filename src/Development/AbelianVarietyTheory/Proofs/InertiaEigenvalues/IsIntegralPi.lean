@@ -8,9 +8,12 @@ namespace GlobalTheory.IntegralPi
 
 open Polynomial
 
-theorem isIntegral_pi {O : Type} [CommRing O] {ι : Type} [Finite ι] {R : ι → Type}
-    [∀ i, CommRing (R i)] [∀ i, Algebra O (R i)] (x : ∀ i, R i)
-    (hx : ∀ i, IsIntegral O (x i)) : IsIntegral O x := by
+theorem isIntegral_pi
+    {O : Type} [CommRing O]
+    {ι : Type} [Finite ι]
+    {R : ι → Type} [∀ i, CommRing (R i)] [∀ i, Algebra O (R i)]
+    (x : ∀ i, R i) (hx : ∀ i, IsIntegral O (x i))
+    : IsIntegral O x := by
   classical
   haveI := Fintype.ofFinite ι
   choose p hpm hp using hx
@@ -23,9 +26,11 @@ theorem isIntegral_pi {O : Type} [CommRing O] {ι : Type} [Finite ι] {R : ι �
   rw [key, map_prod, Pi.zero_apply]
   exact Finset.prod_eq_zero (Finset.mem_univ j) (by rw [aeval_def]; exact hp j)
 
-theorem main : ∀ {O : Type} [inst : CommRing O] {ι : Type} [Finite ι] {R : ι → Type}
-    [inst_2 : (i : ι) → CommRing (R i)] [inst_3 : (i : ι) → Algebra O (R i)] (x : (i : ι) → R i),
-    (∀ (i : ι), IsIntegral O (x i)) → IsIntegral O x :=
-  fun x hx => isIntegral_pi x hx
+theorem main
+    : ∀ {O : Type} [inst : CommRing O] {ι : Type} [Finite ι] {R : ι → Type}
+        [inst_2 : (i : ι) → CommRing (R i)] [inst_3 : (i : ι) → Algebra O (R i)]
+        (x : (i : ι) → R i),
+      (∀ (i : ι), IsIntegral O (x i)) → IsIntegral O x := fun x hx =>
+  isIntegral_pi x hx
 
 end GlobalTheory.IntegralPi

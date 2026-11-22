@@ -13,20 +13,23 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtIffChar
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.EmbedsOfTie
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-theorem isLocalRing_regAt {ξ : Spec (CommRingCat.of Ω) ⟶ X} (h : IsCptGen ξ) (p : Cpt ξ) :
-    IsLocalRing (regAt ξ p) := by
+theorem isLocalRing_regAt {ξ : Spec (CommRingCat.of Ω) ⟶ X} (h : IsCptGen ξ) (p : Cpt ξ)
+    : IsLocalRing (regAt ξ p) := by
   unfold regAt
   exact IsLocalRing.of_surjective' (genMap ξ p).rangeRestrict (genMap ξ p).rangeRestrict_surjective
 
-theorem unitAt_iff_isUnit {ξ : Spec (CommRingCat.of Ω) ⟶ X} (p : Cpt ξ) (s : regAt ξ p) :
-    unitAt ξ p (s : Ω) ↔ IsUnit s := by
+theorem unitAt_iff_isUnit {ξ : Spec (CommRingCat.of Ω) ⟶ X} (p : Cpt ξ) (s : regAt ξ p)
+    : unitAt ξ p (s : Ω) ↔ IsUnit s := by
   constructor
   · rintro ⟨h0, -, hinv⟩
     refine isUnit_iff_exists_inv.mpr ⟨⟨(s : Ω)⁻¹, hinv⟩, ?_⟩
@@ -39,8 +42,8 @@ theorem unitAt_iff_isUnit {ξ : Spec (CommRingCat.of Ω) ⟶ X} (p : Cpt ξ) (s 
     rw [inv_eq_of_mul_eq_one_right ht']
     exact t.2
 
-theorem mem_adjoin_rat_of_int [CharZero Ω] {S : Set Ω} {a : Ω} (h : a ∈ Algebra.adjoin ℤ S) :
-    a ∈ Algebra.adjoin ℚ S := by
+theorem mem_adjoin_rat_of_int [CharZero Ω] {S : Set Ω} {a : Ω} (h : a ∈ Algebra.adjoin ℤ S)
+    : a ∈ Algebra.adjoin ℚ S := by
   induction h using Algebra.adjoin_induction with
   | mem y hy => exact Algebra.subset_adjoin hy
   | algebraMap r =>
@@ -49,29 +52,34 @@ theorem mem_adjoin_rat_of_int [CharZero Ω] {S : Set Ω} {a : Ω} (h : a ∈ Alg
   | add y z _ _ hy hz => exact add_mem hy hz
   | mul y z _ _ hy hz => exact mul_mem hy hz
 
-theorem embedsGeneric_of_coordTie : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] [CharZero Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (κ : Type) (x : κ → Ω), CoordTie ℤ ξ x → EmbedsGeneric ξ x := by
+theorem embedsGeneric_of_coordTie
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] [CharZero Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+        (κ : Type) (x : κ → Ω),
+      CoordTie ℤ ξ x → EmbedsGeneric ξ x := by
   intro X Ω _ _ ξ κ x h
   unfold EmbedsGeneric
   intro p _
   refine ⟨h.cover p, fun i hi => ⟨?_, ?_⟩⟩
   · intro a ha
-    obtain ⟨s, hs, hu, hsa⟩ := (GlobalTheory.T.regAt_iff_chart_localization X Ω ξ ℤ κ x h i p hi a).mp ha
+    obtain ⟨s, hs, hu, hsa⟩ :=
+      (GlobalTheory.T.regAt_iff_chart_localization X Ω ξ ℤ κ x h i p hi a).mp ha
     exact ⟨s, mem_adjoin_rat_of_int hs, hu, mem_adjoin_rat_of_int hsa⟩
   · intro q _ hq hpq
     haveI := isLocalRing_regAt h.gen p
-    have hmem : ∀ a ∈ Algebra.adjoin ℤ (Set.range fun j => x j / x i), a ∈ regAt ξ p :=
-      fun a ha => (h.ring i hi.1 a).mp ha p hi
-    let φ : Algebra.adjoin ℤ (Set.range fun j => x j / x i) →+* regAt ξ p :=
-      { toFun := fun s => ⟨s, hmem s s.2⟩
-        map_one' := rfl
-        map_mul' := fun _ _ => rfl
-        map_zero' := rfl
-        map_add' := fun _ _ => rfl }
+    have hmem : ∀ a ∈ Algebra.adjoin ℤ (Set.range fun j => x j / x i), a ∈ regAt ξ p := fun a ha =>
+      (h.ring i hi.1 a).mp ha p hi
+    let φ : Algebra.adjoin ℤ (Set.range fun j => x j / x i) →+* regAt ξ p := {
+      toFun := fun s => ⟨s, hmem s s.2⟩
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl
+      map_zero' := rfl
+      map_add' := fun _ _ => rfl
+    }
     let I : Ideal (Algebra.adjoin ℤ (Set.range fun j => x j / x i)) :=
       Ideal.comap φ (IsLocalRing.maximalIdeal (regAt ξ p))
     have hI : I.IsPrime := Ideal.comap_isPrime φ _
-    have key : ∀ s : Algebra.adjoin ℤ (Set.range fun j => x j / x i), s ∉ I ↔ unitAt ξ p (s : Ω) := by
+    have key
+        : ∀ s : Algebra.adjoin ℤ (Set.range fun j => x j / x i), s ∉ I ↔ unitAt ξ p (s : Ω) := by
       intro s
       rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not]
       exact (unitAt_iff_isUnit p (φ s)).symm

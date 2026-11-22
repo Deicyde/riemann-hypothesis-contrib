@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.QuotInv
 
 @[expose] public section
 
-open BranchingSupport GlobalTheory.CellAmp Formalism.BasicNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Matrix MeasureTheory Finset
+open BranchingSupport GlobalTheory.CellAmp Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants Matrix MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -49,21 +50,27 @@ section rep
 
 variable {R : Rep k r}
 
-theorem sig_mul (hR : IsURepOn (GG k r) R.σ) {a b : MM k r} (ha : a ∈ GG k r) (hb : b ∈ GG k r) (v : R.H) :
-    R.σ (a * b) v = R.σ a (R.σ b v) := by
+theorem sig_mul
+    (hR : IsURepOn (GG k r) R.σ) {a b : MM k r} (ha : a ∈ GG k r) (hb : b ∈ GG k r) (v : R.H)
+    : R.σ (a * b) v = R.σ a (R.σ b v) := by
   rw [hR.1.2 a ha b hb]; rfl
 
-theorem sig_one (hR : IsURepOn (GG k r) R.σ) (v : R.H) : R.σ 1 v = v := by
-  rw [hR.1.1]; rfl
+theorem sig_one (hR : IsURepOn (GG k r) R.σ) (v : R.H) : R.σ 1 v = v := by rw [hR.1.1]; rfl
 
-theorem sig_sm (hR : IsURepOn (GG k r) R.σ) {c : MM k r} (hc : c ∈ GG k r) {v : R.H} (hv : v ∈ R.sm) :
-    R.σ c v ∈ R.sm := by
+theorem sig_sm (hR : IsURepOn (GG k r) R.σ) {c : MM k r} (hc : c ∈ GG k r) {v : R.H} (hv : v ∈ R.sm)
+    : R.σ c v ∈ R.sm := by
   intro g₀ hg₀
   obtain ⟨U, F, hU, hgU, hF, hag⟩ := hv (g₀ * c) (mul_mem' (g := g₀) hg₀ hc)
   let L := LinearMap.toContinuousLinearMap (LinearMap.mulRight ℝ c)
   have hL : ∀ x, L x = x * c := fun x => rfl
-  refine ⟨L ⁻¹' U, fun x => F (L x), hU.preimage L.continuous, hgU,
-    hF.comp L.contDiff.contDiffOn (fun x hx => hx), fun x hx hxH => ?_⟩
+  refine ⟨
+    L ⁻¹' U,
+    fun x => F (L x),
+    hU.preimage L.continuous,
+    hgU,
+    hF.comp L.contDiff.contDiffOn (fun x hx => hx),
+    fun x hx hxH => ?_
+  ⟩
   have e := hag (x * c) hx (mul_mem' (g := x) hxH hc)
   show R.σ x (R.σ c v) = F (x * c)
   rw [← e]
@@ -78,13 +85,17 @@ def sigEquiv (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) : R.
       show R.σ g (R.σ g⁻¹ v) = v
       rw [← sig_mul hR hg (inv_mem hg), mul_inv' hg, sig_one hR])
 
-theorem dsig_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) {X : MM k r}
-    (hX : PI.UpqRep.InLieHpk k r X) (v : R.H) :
-    PI.UpqRep.dsig (k := k) (r := r) R.σ X (R.σ g v) =
-      R.σ g (PI.UpqRep.dsig (k := k) (r := r) R.σ (g⁻¹ * X * g) v) := by
+theorem dsig_sigma
+    (hR : IsURepOn (GG k r) R.σ)
+    {g : MM k r} (hg : g ∈ GG k r)
+    {X : MM k r} (hX : PI.UpqRep.InLieHpk k r X)
+    (v : R.H)
+    : PI.UpqRep.dsig (k := k) (r := r) R.σ X (R.σ g v)
+      = R.σ g (PI.UpqRep.dsig (k := k) (r := r) R.σ (g⁻¹ * X * g) v) := by
   unfold PI.UpqRep.dsig
-  have e : (fun t : ℝ => R.σ (NormedSpace.exp ((t : ℂ) • X)) (R.σ g v)) =
-      (sigEquiv hR hg) ∘ (fun t : ℝ => R.σ (NormedSpace.exp ((t : ℂ) • (g⁻¹ * X * g))) v) := by
+  have e
+      : (fun t : ℝ => R.σ (NormedSpace.exp ((t : ℂ) • X)) (R.σ g v))
+        = (sigEquiv hR hg) ∘ (fun t : ℝ => R.σ (NormedSpace.exp ((t : ℂ) • (g⁻¹ * X * g))) v) := by
     funext t
     have hm : NormedSpace.exp ((t : ℂ) • X) ∈ GG k r :=
       CCRuleCW.exp_mem_UH _ _ (CCRuleCW.lie_smul _ X hX t)
@@ -98,10 +109,13 @@ theorem dsig_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r
   rw [ContinuousLinearEquiv.comp_fderiv]
   rfl
 
-theorem dsigW_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) (W : List (MM k r))
-    (hW : ∀ X ∈ W, PI.UpqRep.InLieHpk k r X) (v : R.H) :
-    PI.UpqRep.dsigW (k := k) (r := r) R.σ W (R.σ g v) =
-      R.σ g (PI.UpqRep.dsigW (k := k) (r := r) R.σ (W.map fun X => g⁻¹ * X * g) v) := by
+theorem dsigW_sigma
+    (hR : IsURepOn (GG k r) R.σ)
+    {g : MM k r} (hg : g ∈ GG k r)
+    (W : List (MM k r)) (hW : ∀ X ∈ W, PI.UpqRep.InLieHpk k r X)
+    (v : R.H)
+    : PI.UpqRep.dsigW (k := k) (r := r) R.σ W (R.σ g v)
+      = R.σ g (PI.UpqRep.dsigW (k := k) (r := r) R.σ (W.map fun X => g⁻¹ * X * g) v) := by
   induction W with
   | nil => rfl
   | cons X W ih =>
@@ -110,10 +124,14 @@ theorem dsigW_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k 
       R.σ g (PI.UpqRep.dsig R.σ (g⁻¹ * X * g) _)
     rw [ih hW', dsig_sigma hR hg (hW X List.mem_cons_self)]
 
-theorem smMap_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) :
-    SmMap R R (fun v => R.σ g v) := by
-  refine ⟨fun v hv => sig_sm hR hg hv, fun v _ w _ => map_add (R.σ g) v w,
-    fun a v _ => map_smul (R.σ g) a v, ?_⟩
+theorem smMap_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r)
+    : SmMap R R (fun v => R.σ g v) := by
+  refine ⟨
+    fun v hv => sig_sm hR hg hv,
+    fun v _ w _ => map_add (R.σ g) v w,
+    fun a v _ => map_smul (R.σ g) a v,
+    ?_
+  ⟩
   intro W hW
   refine ⟨1, [W.map fun X => g⁻¹ * X * g], ?_, fun v hv => ?_⟩
   · intro w hw Y hY
@@ -123,8 +141,8 @@ theorem smMap_sigma (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k 
   · simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero, one_mul]
     rw [dsigW_sigma hR hg W hW v, hR.2.1 g hg]
 
-theorem sig_TK (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) {v : R.H} (hv : v ∈ R.TK) :
-    R.σ g v ∈ R.TK := by
+theorem sig_TK (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) {v : R.H} (hv : v ∈ R.TK)
+    : R.σ g v ∈ R.TK := by
   unfold Rep.TK at hv ⊢
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -134,26 +152,32 @@ theorem sig_TK (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) {v
   | add x y _ _ hx hy => rw [map_add (f := _)]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
 
-theorem sig_inner (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) (v w : R.H) :
-    ⟪R.σ g v, R.σ g w⟫_ℂ = ⟪v, w⟫_ℂ :=
+theorem sig_inner (hR : IsURepOn (GG k r) R.σ) {g : MM k r} (hg : g ∈ GG k r) (v w : R.H)
+    : ⟪R.σ g v, R.σ g w⟫_ℂ = ⟪v, w⟫_ℂ :=
   (LinearIsometry.mk (R.σ g : R.H →ₗ[ℂ] R.H) (hR.2.1 g hg)).inner_map_map v w
 
-theorem bessel_transport (hR : IsURepOn (GG k r) R.σ) {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp]
+theorem bessel_transport
+    (hR : IsURepOn (GG k r) R.σ)
+    {Wp : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp]
     {z : Fin (2 * r + k + 1) → ℂ} {π : MM k r → (Wp →L[ℂ] Wp)} {ψ ψ' : MM k r → ℂ} {t : MM k r}
-    (ht : t ∈ GG k r) (hN : ∀ n ∈ Nset k r, t * n * t⁻¹ ∈ Nset k r) (hc : ∀ h ∈ UWset k r z, t * h = h * t)
-    (hψ : ∀ n ∈ Nset k r, ψ' n = ψ (t * n * t⁻¹)) {B : R.H → Wp}
-    (hB : PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ R.σ π B) :
-    PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ' R.σ π (fun v => B (R.σ t v)) := by
+    (ht : t ∈ GG k r) (hN : ∀ n ∈ Nset k r, t * n * t⁻¹ ∈ Nset k r)
+    (hc : ∀ h ∈ UWset k r z, t * h = h * t) (hψ : ∀ n ∈ Nset k r, ψ' n = ψ (t * n * t⁻¹))
+    {B : R.H → Wp} (hB : PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ R.σ π B)
+    : PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z ψ' R.σ π (fun v => B (R.σ t v)) := by
   obtain ⟨h1, h2, h3, h4⟩ := hB
-  refine ⟨fun v hv w hw => ?_, fun a v hv => ?_, fun h hh m hm v hv => ?_,
-    GlobalTheory.SmMapAct.cw_comp (smMap_sigma hR ht) h4⟩
+  refine ⟨
+    fun v hv w hw => ?_,
+    fun a v hv => ?_,
+    fun h hh m hm v hv => ?_,
+    GlobalTheory.SmMapAct.cw_comp (smMap_sigma hR ht) h4
+  ⟩
   · show B (R.σ t (v + w)) = _
     rw [map_add (f := _), h1 _ (sig_sm hR ht hv) _ (sig_sm hR ht hw)]
   · show B (R.σ t (a • v)) = _
     rw [map_smul, h2 _ _ (sig_sm hR ht hv)]
   · show B (R.σ t (R.σ (h * m) v)) = _
-    rw [hψ m hm, ← h3 h hh _ (hN m hm) _ (sig_sm hR ht hv),
-      ← sig_mul hR ht (mul_mem' hh.1 hm.1), ← sig_mul hR (mul_mem' hh.1 (hN m hm).1) ht]
+    rw [hψ m hm, ← h3 h hh _ (hN m hm) _ (sig_sm hR ht hv), ← sig_mul hR ht (mul_mem' hh.1 hm.1),
+      ← sig_mul hR (mul_mem' hh.1 (hN m hm).1) ht]
     congr 3
     simp only [Matrix.mul_assoc, inv_mul' ht, Matrix.mul_one]
     rw [← Matrix.mul_assoc, hc h hh, Matrix.mul_assoc]
@@ -196,13 +220,17 @@ theorem meas_lmul (a : MM k r) : Measurable (lmulM a : Mt k r → Mt k r) := by
   apply Continuous.measurable
   exact continuous_const.matrix_mul continuous_id
 
-theorem meas_mul : Measurable (fun p : Mt k r × Mt k r => (fun i j => (Matrix.of p.1 * Matrix.of p.2) i j : Mt k r)) := by
+theorem meas_mul
+    : Measurable (fun p : Mt k r × Mt k r =>
+      (fun i j => (Matrix.of p.1 * Matrix.of p.2) i j : Mt k r)) := by
   apply Continuous.measurable
   exact continuous_fst.matrix_mul continuous_snd
 
-theorem haar_conj {t : MM k r} (ht : t ∈ GG k r) {S : Set (MM k r)} (hN : ∀ n, n ∈ S ↔ t * n * t⁻¹ ∈ S)
-    {μ : Measure (Mt k r)} (hμ : PI.BesselPeriodGGP.IsHaarOn S μ) :
-    PI.BesselPeriodGGP.IsHaarOn S (μ.map (conjE ht)) := by
+theorem haar_conj
+    {t : MM k r} (ht : t ∈ GG k r)
+    {S : Set (MM k r)} (hN : ∀ n, n ∈ S ↔ t * n * t⁻¹ ∈ S)
+    {μ : Measure (Mt k r)} (hμ : PI.BesselPeriodGGP.IsHaarOn S μ)
+    : PI.BesselPeriodGGP.IsHaarOn S (μ.map (conjE ht)) := by
   obtain ⟨h1, h2, h3, h4⟩ := hμ
   refine ⟨(conjE ht).sigmaFinite_map, ?_, ?_, fun s hs => ?_⟩
   · intro h
@@ -221,26 +249,30 @@ theorem haar_conj {t : MM k r} (ht : t ∈ GG k r) {S : Set (MM k r)} (hN : ∀ 
     show s * (t⁻¹ * Matrix.of x * t) = t⁻¹ * (t * s * t⁻¹ * Matrix.of x) * t
     simp only [Matrix.mul_assoc, imc ht]
 
-theorem prod_conj {t : MM k r} (ht : t ∈ GG k r) (μW μN : Measure (Mt k r)) [SFinite μW] [SFinite μN] :
-    μW.prod (μN.map (conjE ht)) =
-      (μW.prod μN).map (MeasurableEquiv.prodCongr (MeasurableEquiv.refl _) (conjE ht)) := by
+theorem prod_conj
+    {t : MM k r} (ht : t ∈ GG k r) (μW μN : Measure (Mt k r)) [SFinite μW] [SFinite μN]
+    : μW.prod (μN.map (conjE ht))
+      = (μW.prod μN).map (MeasurableEquiv.prodCongr (MeasurableEquiv.refl _) (conjE ht)) := by
   conv_lhs => rw [← Measure.map_id (μ := μW)]
   rw [Measure.map_prod_map _ _ measurable_id (conjE ht).measurable]
   rfl
 
-theorem ae_prod {S T : Set (MM k r)} {μW μN : Measure (Mt k r)} (hW : PI.BesselPeriodGGP.IsHaarOn S μW)
-    (hN : PI.BesselPeriodGGP.IsHaarOn T μN) :
-    ∀ᵐ p ∂(μW.prod μN), Matrix.of p.1 ∈ S ∧ Matrix.of p.2 ∈ T := by
+theorem ae_prod
+    {S T : Set (MM k r)} {μW μN : Measure (Mt k r)}
+    (hW : PI.BesselPeriodGGP.IsHaarOn S μW) (hN : PI.BesselPeriodGGP.IsHaarOn T μN)
+    : ∀ᵐ p ∂(μW.prod μN), Matrix.of p.1 ∈ S ∧ Matrix.of p.2 ∈ T := by
   haveI := hW.1
   haveI := hN.1
   have a : ∀ᵐ x ∂μW, Matrix.of x ∈ S := hW.2.2.1
   have b : ∀ᵐ x ∂μN, Matrix.of x ∈ T := hN.2.2.1
   exact (Measure.quasiMeasurePreserving_fst.ae a).and (Measure.quasiMeasurePreserving_snd.ae b)
 
-theorem muS_conj {t : MM k r} (ht : t ∈ GG k r) {S T : Set (MM k r)} {μW μN : Measure (Mt k r)}
-    (hW : PI.BesselPeriodGGP.IsHaarOn S μW) (hN : PI.BesselPeriodGGP.IsHaarOn T μN)
-    (hc : ∀ h ∈ S, t * h = h * t) :
-    Formalism.FourierDecayAlt.ThreeDimData.muSof μW (μN.map (conjE ht)) = (Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN).map (conjE ht) := by
+theorem muS_conj
+    {t : MM k r} (ht : t ∈ GG k r)
+    {S T : Set (MM k r)} {μW μN : Measure (Mt k r)} (hW : PI.BesselPeriodGGP.IsHaarOn S μW)
+    (hN : PI.BesselPeriodGGP.IsHaarOn T μN) (hc : ∀ h ∈ S, t * h = h * t)
+    : Formalism.FourierDecayAlt.ThreeDimData.muSof μW (μN.map (conjE ht))
+      = (Formalism.FourierDecayAlt.ThreeDimData.muSof μW μN).map (conjE ht) := by
   haveI := hW.1
   haveI := hN.1
   unfold Formalism.FourierDecayAlt.ThreeDimData.muSof
@@ -250,18 +282,23 @@ theorem muS_conj {t : MM k r} (ht : t ∈ GG k r) {S T : Set (MM k r)} {μW μN 
   filter_upwards [ae_prod hW hN] with p hp
   show Matrix.of p.1 * (t⁻¹ * Matrix.of p.2 * t) = t⁻¹ * (Matrix.of p.1 * Matrix.of p.2) * t
   have e : Matrix.of p.1 * t⁻¹ = t⁻¹ * Matrix.of p.1 := by
-    calc Matrix.of p.1 * t⁻¹ = t⁻¹ * (t * Matrix.of p.1) * t⁻¹ := by rw [imc ht]
+    calc
+      Matrix.of p.1 * t⁻¹
+        = t⁻¹ * (t * Matrix.of p.1) * t⁻¹ := by rw [imc ht]
       _ = t⁻¹ * Matrix.of p.1 := by
         rw [hc _ hp.1]; simp only [Matrix.mul_assoc, mul_inv' ht, Matrix.mul_one]
   simp only [← Matrix.mul_assoc, e]
 
-theorem quot_conj {t : MM k r} (ht : t ∈ GG k r) {μG μS ν : Measure (Mt k r)}
-    (hG : PI.BesselPeriodGGP.IsHaarOn (GG k r) μG) (hq : PI.BesselPeriodGGP.IsQuotMeas μG μS ν) :
-    PI.BesselPeriodGGP.IsQuotMeas μG (μS.map (conjE ht)) (ν.map (leftE ht)) := by
+theorem quot_conj
+    {t : MM k r} (ht : t ∈ GG k r)
+    {μG μS ν : Measure (Mt k r)}
+    (hG : PI.BesselPeriodGGP.IsHaarOn (GG k r) μG) (hq : PI.BesselPeriodGGP.IsQuotMeas μG μS ν)
+    : PI.BesselPeriodGGP.IsQuotMeas μG (μS.map (conjE ht)) (ν.map (leftE ht)) := by
   intro f hf
   have h1 : μG.map (leftE ht) = μG := hG.2.2.2 _ (inv_mem ht)
   conv_lhs => rw [← h1]
-  rw [lintegral_map_equiv, lintegral_map_equiv, hq (fun a => f (leftE ht a)) (hf.comp (leftE ht).measurable)]
+  rw [lintegral_map_equiv, lintegral_map_equiv,
+    hq (fun a => f (leftE ht a)) (hf.comp (leftE ht).measurable)]
   refine lintegral_congr fun x => ?_
   rw [lintegral_map_equiv]
   refine lintegral_congr fun s => ?_
@@ -269,24 +306,55 @@ theorem quot_conj {t : MM k r} (ht : t ∈ GG k r) {μG μS ν : Measure (Mt k r
   show t⁻¹ * (Matrix.of s * Matrix.of x) = t⁻¹ * Matrix.of s * t * (t⁻¹ * Matrix.of x)
   simp only [Matrix.mul_assoc, mic ht]
 
-theorem bessel_move : Hyps → ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ) (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (u : ℕ → ℝ) (c : ℂ) (μW μN μG νq : Measure (Mt k r)) (t : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ), t ∈ GG k r → (∀ n, n ∈ Nset k r ↔ t * n * t⁻¹ ∈ Nset k r) → (∀ h ∈ UWset k r z, t * h = h * t) → (∀ n ∈ Nset k r, psi k r z cStd n = psi k r z c (t * n * t⁻¹)) → SideG k r z π u μW μN μG νq → SideG k r z π u μW (μN.map fun x => fun i j => (t⁻¹ * Matrix.of x * t) i j) μG (νq.map fun x => fun i j => (t⁻¹ * Matrix.of x) i j) ∧ ∀ (R : Rep k r), Formalism.MainNotions.S.IsURepOn (GG k r) R.σ → (∀ B : R.H → Wp, PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z (psi k r z c) R.σ π B ↔ IsBes R z π (fun v => B (R.σ t v))) ∧ ∀ l₁ : R.H → Wp, IsBeL R z π μW (μN.map fun x => fun i j => (t⁻¹ * Matrix.of x * t) i j) l₁ → ∀ x ∈ R.sm, ∀ v ∈ R.TK, Formalism.FourierDecayAlt.ThreeDimData.be z c π R.σ μW μN x v = (innerSL ℂ (l₁ (R.σ t⁻¹ v))).smulRight (l₁ (R.σ t⁻¹ x)) := by
+theorem bessel_move
+    : Hyps
+      → ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]
+          [FiniteDimensional ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ)
+          (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp)) (u : ℕ → ℝ)
+          (c : ℂ) (μW μN μG νq : Measure (Mt k r))
+          (t : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ),
+        t ∈ GG k r → (∀ n, n ∈ Nset k r ↔ t * n * t⁻¹ ∈ Nset k r)
+          → (∀ h ∈ UWset k r z, t * h = h * t)
+          → (∀ n ∈ Nset k r, psi k r z cStd n = psi k r z c (t * n * t⁻¹))
+          → SideG k r z π u μW μN μG νq
+          → SideG k r z π u μW (μN.map fun x => fun i j => (t⁻¹ * Matrix.of x * t) i j) μG
+              (νq.map fun x => fun i j => (t⁻¹ * Matrix.of x) i j)
+            ∧ ∀ (R : Rep k r),
+              Formalism.MainNotions.S.IsURepOn (GG k r) R.σ
+                → (∀ B : R.H → Wp,
+                    PI.BesselMapUniq.IsBesselMapSm (k := k) (r := r) z (psi k r z c) R.σ π B
+                      ↔ IsBes R z π (fun v => B (R.σ t v)))
+                  ∧ ∀ l₁ : R.H → Wp,
+                    IsBeL R z π μW (μN.map fun x => fun i j => (t⁻¹ * Matrix.of x * t) i j) l₁
+                      → ∀ x ∈ R.sm, ∀ v ∈ R.TK,
+                        Formalism.FourierDecayAlt.ThreeDimData.be z c π R.σ μW μN x v
+                          = (innerSL ℂ (l₁ (R.σ t⁻¹ v))).smulRight (l₁ (R.σ t⁻¹ x)) := by
   intro _ k r Wp _ _ _ _ z π u c μW μN μG νq t ht hN hc hψ hS
   obtain ⟨s1, s2, s3, s4, hW, hμN, hG, hq⟩ := hS
-  have hti : t⁻¹⁻¹ = t := Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).mp (unit_of ht))
+  have hti : t⁻¹⁻¹ = t :=
+    Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).mp (unit_of ht))
   have hcan : ∀ n : MM k r, t * (t⁻¹ * n * t) * t⁻¹ = n := fun n => by
     simp only [Matrix.mul_assoc, mul_inv' ht, Matrix.mul_one, mic ht]
-  have hN' : ∀ n ∈ Nset k r, t⁻¹ * n * t ∈ Nset k r := fun n hn => by
-    rw [hN, hcan]; exact hn
+  have hN' : ∀ n ∈ Nset k r, t⁻¹ * n * t ∈ Nset k r := fun n hn => by rw [hN, hcan]; exact hn
   have hc' : ∀ h ∈ UWset k r z, t⁻¹ * h = h * t⁻¹ := fun h hh => by
-    calc t⁻¹ * h = t⁻¹ * (h * t) * t⁻¹ := by simp only [Matrix.mul_assoc, mul_inv' ht, Matrix.mul_one]
+    calc
+      t⁻¹ * h
+        = t⁻¹ * (h * t) * t⁻¹ := by simp only [Matrix.mul_assoc, mul_inv' ht, Matrix.mul_one]
       _ = h * t⁻¹ := by rw [← hc h hh, imc ht]
-  refine ⟨⟨s1, s2, s3, s4, hW, haar_conj ht hN hμN, hG, ?_⟩, fun R hR => ⟨fun B => ⟨fun hB => ?_, fun hB => ?_⟩, ?_⟩⟩
+  refine ⟨
+    ⟨s1, s2, s3, s4, hW, haar_conj ht hN hμN, hG, ?_⟩,
+    fun R hR => ⟨fun B => ⟨fun hB => ?_, fun hB => ?_⟩, ?_⟩
+  ⟩
   · have := quot_conj ht hG hq
     rw [← muS_conj ht hW hμN hc] at this
     exact this
   · exact bessel_transport hR ht (fun n hn => (hN n).mp hn) hc hψ hB
-  · have h := bessel_transport (ψ' := psi k r z c) hR (inv_mem ht) (fun n hn => by rw [hti]; exact hN' n hn) hc'
-      (fun n hn => by rw [hti, hψ _ (hN' n hn), hcan]) hB
+  · have h :=
+      bessel_transport (ψ' := psi k r z c) hR (inv_mem ht)
+        (fun n hn => by rw [hti]; exact hN' n hn)
+        hc'
+        (fun n hn => by rw [hti, hψ _ (hN' n hn), hcan])
+        hB
     have e : (fun v => B (R.σ t (R.σ t⁻¹ v))) = B := by
       funext v
       rw [← sig_mul hR ht (inv_mem ht), mul_inv' ht, sig_one hR]
@@ -307,7 +375,9 @@ theorem bessel_move : Hyps → ∀ (k r : ℕ) (Wp : Type) [NormedAddCommGroup W
     rw [hψ _ (hN' _ hp.2), hcan, ← sig_inner hR (inv_mem ht) v,
       ← sig_mul hR (inv_mem ht) (mul_mem' hp.1.1 hp.2.1),
       ← sig_mul hR (mul_mem' hp.1.1 (hN' _ hp.2).1) (inv_mem ht)]
-    have e : Matrix.of p.1 * (t⁻¹ * Matrix.of p.2 * t) * t⁻¹ = t⁻¹ * (Matrix.of p.1 * Matrix.of p.2) := by
+    have e
+        : Matrix.of p.1 * (t⁻¹ * Matrix.of p.2 * t) * t⁻¹
+          = t⁻¹ * (Matrix.of p.1 * Matrix.of p.2) := by
       simp only [Matrix.mul_assoc, mul_inv' ht, Matrix.mul_one]
       rw [← Matrix.mul_assoc, ← hc' _ hp.1, Matrix.mul_assoc]
     rw [e]

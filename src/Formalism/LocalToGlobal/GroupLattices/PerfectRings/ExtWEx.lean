@@ -12,8 +12,11 @@ open Formalism.MainNotions.G IsLocalRing IntermediateField NumberField IsDedekin
 
 variable {p : ℕ} [hp : Fact p.Prime] {n : ℕ} {LL : Type} [Field LL] [NumberField LL]
 
-theorem dvd_of_mem {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤) {q M : ℕ} (hq : q.Prime) (h1 : (q : R) ∈ I)
-    (h2 : (M : R) ∈ I) : q ∣ M := by
+theorem dvd_of_mem
+    {R : Type*} [CommRing R]
+    (I : Ideal R) (hI : I ≠ ⊤)
+    {q M : ℕ} (hq : q.Prime) (h1 : (q : R) ∈ I) (h2 : (M : R) ∈ I)
+    : q ∣ M := by
   by_contra h
   have hc : Nat.Coprime q M := (Nat.Prime.coprime_iff_not_dvd hq).2 h
   have hb := Nat.gcd_eq_gcd_ab q M
@@ -30,7 +33,9 @@ theorem dvd_of_mem {R : Type*} [CommRing R] (I : Ideal R) (hI : I ≠ ⊤) {q M 
 theorem p_inv_not_integral : ¬ IsIntegral (OO p n) ((p : Om p n)⁻¹) := by
   intro h
   have hK : IsIntegral (OO p n) ((p : KO p n)⁻¹) := by
-    have e : ((p : Om p n)⁻¹) = IsScalarTower.toAlgHom (OO p n) (KO p n) (Om p n) ((p : KO p n)⁻¹) := by
+    have e
+        : ((p : Om p n)⁻¹)
+          = IsScalarTower.toAlgHom (OO p n) (KO p n) (Om p n) ((p : KO p n)⁻¹) := by
       simp
     rw [e] at h
     exact (isIntegral_algHom_iff _ (algebraMap (KO p n) (Om p n)).injective).1 h
@@ -43,30 +48,29 @@ theorem p_inv_not_integral : ¬ IsIntegral (OO p n) ((p : Om p n)⁻¹) := by
     exact ⟨⟨_, y, h1, by rw [mul_comm]; exact h1⟩, rfl⟩
   have hmem : (p : OO p n) ∈ maximalIdeal (OO p n) := by
     have hw := wU_mem_max (p := p) (n := n)
-    have e : (p : OO p n) = wU p n * wU p n := by
-      ext <;> simp [wU]
+    have e : (p : OO p n) = wU p n * wU p n := by ext <;> simp [wU]
     rw [e]
     exact Ideal.mul_mem_left _ _ hw
   rw [← under_max (p := p) (n := n) (KO p n), Ideal.mem_comap] at hmem
   exact (IsLocalRing.mem_maximalIdeal _).1 hmem hu
 
-theorem inv_integral (τ : LL →+* Om p n) {d : 𝓞 LL} (hd : d ∉ placeIdeal τ) :
-    IsIntegral (OO p n) (τ (d : LL))⁻¹ := by
+theorem inv_integral (τ : LL →+* Om p n) {d : 𝓞 LL} (hd : d ∉ placeIdeal τ)
+    : IsIntegral (OO p n) (τ (d : LL))⁻¹ := by
   obtain ⟨u, hu⟩ := isUnit_embO (τ := τ) hd
   have hint : IsIntegral (OO p n) (((u⁻¹ : (Ot τ)ˣ) : Ot τ) : Lt τ) := ((u⁻¹ : (Ot τ)ˣ) : Ot τ).2
   have hint' : IsIntegral (OO p n) ((((u⁻¹ : (Ot τ)ˣ) : Ot τ) : Lt τ) : Om p n) :=
     hint.map ((Lt τ).val.restrictScalars (OO p n))
-  have hval : (((u : Ot τ) : Lt τ) : Om p n) = τ (d : LL) := by
-    rw [hu, embO_val, embL_val]
-  have hmul : (((u : Ot τ) : Lt τ) : Om p n) * ((((u⁻¹ : (Ot τ)ˣ) : Ot τ) : Lt τ) : Om p n) = 1 := by
+  have hval : (((u : Ot τ) : Lt τ) : Om p n) = τ (d : LL) := by rw [hu, embO_val, embL_val]
+  have hmul
+      : (((u : Ot τ) : Lt τ) : Om p n) * ((((u⁻¹ : (Ot τ)ˣ) : Ot τ) : Lt τ) : Om p n) = 1 := by
     rw [← IntermediateField.coe_mul, ← Subalgebra.coe_mul, u.mul_inv]
     simp
   rw [hval] at hmul
   rw [← eq_inv_of_mul_eq_one_right hmul]
   exact hint'
 
-theorem exists_emb (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal) :
-    ∃ τ : LL →+* Om p n, placeOf τ = w := by
+theorem exists_emb (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal)
+    : ∃ τ : LL →+* Om p n, placeOf τ = w := by
   classical
   haveI : CharZero (Om p n) :=
     charZero_of_injective_algebraMap (algebraMap (KO p n) (Om p n)).injective
@@ -74,16 +78,18 @@ theorem exists_emb (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.a
   push_neg at hno
   let τ0 : LL →ₐ[ℚ] Om p n := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
 
-  have hav : ¬ ((w.asIdeal : Set (𝓞 LL)) ⊆ ⋃ σ ∈ ((Finset.univ : Finset (LL →ₐ[ℚ] Om p n)) :
-      Set (LL →ₐ[ℚ] Om p n)), ((placeIdeal σ.toRingHom : Ideal (𝓞 LL)) : Set (𝓞 LL))) := by
+  have hav : ¬((w.asIdeal : Set (𝓞 LL))
+      ⊆ ⋃ σ ∈ ((Finset.univ : Finset (LL →ₐ[ℚ] Om p n)) :
+        Set (LL →ₐ[ℚ] Om p n)), ((placeIdeal σ.toRingHom : Ideal (𝓞 LL)) : Set (𝓞 LL))) := by
     intro hsub
-    obtain ⟨σ, _, hle⟩ := (Ideal.subset_union_prime (s := Finset.univ)
-      (f := fun σ : LL →ₐ[ℚ] Om p n => placeIdeal σ.toRingHom) τ0 τ0
-      (fun σ _ _ _ => (placeOf σ.toRingHom).isPrime)).1 hsub
+    obtain ⟨σ, _, hle⟩ :=
+      (Ideal.subset_union_prime (s := Finset.univ)
+        (f := fun σ : LL →ₐ[ℚ] Om p n => placeIdeal σ.toRingHom)
+        τ0 τ0
+        (fun σ _ _ _ => (placeOf σ.toRingHom).isPrime)).1 hsub
     apply hno σ.toRingHom
     apply HeightOneSpectrum.ext
     exact ((w.isMaximal).eq_of_le (placeOf σ.toRingHom).isPrime.ne_top hle).symm
@@ -95,9 +101,11 @@ theorem exists_emb (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.a
       exact Set.mem_biUnion (Finset.mem_coe.2 (Finset.mem_univ σ)) hσ)
 
   have hint : IsIntegral (OO p n) (∏ σ : LL →ₐ[ℚ] Om p n, (σ (e : LL))⁻¹) := by
-    have := (integralClosure (OO p n) (Om p n)).prod_mem (t := Finset.univ) (fun (σ : LL →ₐ[ℚ] Om p n) _ =>
-      (show (σ (e : LL))⁻¹ ∈ integralClosure (OO p n) (Om p n) from
-        inv_integral σ.toRingHom (hen σ)))
+    have :=
+      (integralClosure (OO p n) (Om p n)).prod_mem (t := Finset.univ)
+        (fun (σ : LL →ₐ[ℚ] Om p n) _ =>
+          (show (σ (e : LL))⁻¹ ∈ integralClosure (OO p n) (Om p n) from
+            inv_integral σ.toRingHom (hen σ)))
     exact this
   set Nz : ℤ := Algebra.norm ℤ e with hNz
   have hN_eq : (∏ σ : LL →ₐ[ℚ] Om p n, (σ (e : LL))⁻¹) = ((Nz : Om p n))⁻¹ := by
@@ -138,18 +146,23 @@ theorem exists_emb (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.a
     field_simp
   apply p_inv_not_integral (p := p) (n := n)
   rw [key]
-  have hmI : IsIntegral (OO p n) ((m : ℤ) : Om p n) := (integralClosure (OO p n) (Om p n)).intCast_mem m
+  have hmI : IsIntegral (OO p n) ((m : ℤ) : Om p n) :=
+    (integralClosure (OO p n) (Om p n)).intCast_mem m
   exact hmI.mul (hN_eq ▸ hint)
 
-def tauAt (p : ℕ) [Fact p.Prime] (n : ℕ) (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal) :
-    LL →+* Om p n := (exists_emb (p := p) (n := n) w hw).choose
+def tauAt
+    (p : ℕ) [Fact p.Prime] (n : ℕ) (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal)
+    : LL →+* Om p n :=
+  (exists_emb (p := p) (n := n) w hw).choose
 
-theorem placeOf_tauAt (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal) :
-    placeOf (tauAt p n w hw) = w := (exists_emb (p := p) (n := n) w hw).choose_spec
+theorem placeOf_tauAt (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal)
+    : placeOf (tauAt p n w hw) = w :=
+  (exists_emb (p := p) (n := n) w hw).choose_spec
 
-theorem induces_tauAt (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal) (x : LL) :
-    w.valuation LL x ≤ 1 ↔
-      embL (tauAt p n w hw) x ∈ Set.range (algebraMap (Ot (tauAt p n w hw)) (Lt (tauAt p n w hw))) := by
+theorem induces_tauAt (w : HeightOneSpectrum (𝓞 LL)) (hw : (p : 𝓞 LL) ∈ w.asIdeal) (x : LL)
+    : w.valuation LL x ≤ 1
+      ↔ embL (tauAt p n w hw) x
+        ∈ Set.range (algebraMap (Ot (tauAt p n w hw)) (Lt (tauAt p n w hw))) := by
   have := induces (τ := tauAt p n w hw) x
   rwa [placeOf_tauAt] at this
 

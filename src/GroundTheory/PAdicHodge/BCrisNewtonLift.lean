@@ -27,8 +27,7 @@ local notation "𝔸" => Localization.Away (p : AInf K p)
 variable (K p) in
 def incl : AInf K p →+* WittVector p K♭ := WittVector.map (algebraMap 𝒪♭ K♭)
 
-theorem incl_coeff (x : AInf K p) (n : ℕ) :
-    (incl K p x).coeff n = algebraMap 𝒪♭ K♭ (x.coeff n) :=
+theorem incl_coeff (x : AInf K p) (n : ℕ) : (incl K p x).coeff n = algebraMap 𝒪♭ K♭ (x.coeff n) :=
   map_coeff _ _ _
 
 theorem incl_injective : Function.Injective (incl K p) := by
@@ -38,8 +37,8 @@ theorem incl_injective : Function.Injective (incl K p) := by
   simp only [incl_coeff] at this
   exact IsFractionRing.injective 𝒪♭ K♭ this
 
-theorem incl_teichmuller (a : 𝒪♭) :
-    incl K p (teichmuller p a) = teichmuller p (algebraMap 𝒪♭ K♭ a) :=
+theorem incl_teichmuller (a : 𝒪♭)
+    : incl K p (teichmuller p a) = teichmuller p (algebraMap 𝒪♭ K♭ a) :=
   map_teichmuller p _ a
 
 theorem natCast_p_ne_zero : (p : WittVector p K♭) ≠ 0 := by
@@ -96,7 +95,8 @@ def teichLift : TeichLift p K♭ (WittVector p K♭) where
     ext n
     rw [incl_coeff, ← hb n]
 
-@[simp] theorem teichLift_π : (teichLift K p).π = (p : WittVector p K♭) := rfl
+@[simp]
+theorem teichLift_π : (teichLift K p).π = (p : WittVector p K♭) := rfl
 
 theorem teichLift_red (x : WittVector p K♭) : (teichLift K p).red x = x.coeff 0 := rfl
 
@@ -105,22 +105,23 @@ theorem teich_eq (a : K♭) : (teichLift K p).teich a = teichmuller p a := by
   rw [← sub_eq_zero]
   refine IsHausdorff.haus' (I := (teichLift K p).I) _ fun n => ?_
   rw [SModEq.zero, Ideal.smul_eq_mul, Ideal.mul_top, (teichLift K p).I_pow]
-  have h := (teichLift K p).teich_sub_pow_mem a n
-    (teichmuller p ((((frobeniusEquiv K♭ p).symm : K♭ →+* K♭))^[n] a))
-    (by rw [teichLift_red, teichmuller_coeff_zero])
+  have h :=
+    (teichLift K p).teich_sub_pow_mem a n
+      (teichmuller p ((((frobeniusEquiv K♭ p).symm : K♭ →+* K♭))^[n] a))
+      (by rw [teichLift_red, teichmuller_coeff_zero])
   rw [← map_pow, TeichLift.iterate_frobeniusEquiv_symm_pow] at h
   exact (teichLift K p).span_pow_anti (Nat.le_succ n) h
 
 def tcoeff (x : AInf K p) (n : ℕ) : 𝒪♭ := ((_root_.frobeniusEquiv 𝒪♭ p).symm ^ n) (x.coeff n)
 
-theorem tcoeff_zero (x : AInf K p) : tcoeff x 0 = x.coeff 0 := by
-  simp [tcoeff]
+theorem tcoeff_zero (x : AInf K p) : tcoeff x 0 = x.coeff 0 := by simp [tcoeff]
 
-theorem coeff_incl (x : AInf K p) (n : ℕ) :
-    (teichLift K p).coeff (incl K p x) n = algebraMap 𝒪♭ K♭ (tcoeff x n) := by
+theorem coeff_incl (x : AInf K p) (n : ℕ)
+    : (teichLift K p).coeff (incl K p x) n = algebraMap 𝒪♭ K♭ (tcoeff x n) := by
   refine (teichLift K p).coeff_eq_of_mem (a := fun i => algebraMap 𝒪♭ K♭ (tcoeff x i)) ?_ n le_rfl
-  have hx := (WittVector.eq_teichmullerSeries_iff (tcoeff x) x).1
-    (WittVector.teichmullerSeries_coeff_eq x).symm n
+  have hx :=
+    (WittVector.eq_teichmullerSeries_iff (tcoeff x) x).1
+      (WittVector.teichmullerSeries_coeff_eq x).symm n
   have h2 := map_dvd (incl K p) hx
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_pow, map_natCast, map_sub, map_sum] at h2
@@ -132,11 +133,12 @@ theorem coeff_incl (x : AInf K p) (n : ℕ) :
 
 theorem incl_mem_int (x : AInf K p) : incl K p x ∈ (teichLift K p).int := ⟨x, rfl⟩
 
-theorem norm_coeff_incl_le_one (x : AInf K p) (n : ℕ) : ‖(teichLift K p).coeff (incl K p x) n‖ ≤ 1 :=
+theorem norm_coeff_incl_le_one (x : AInf K p) (n : ℕ)
+    : ‖(teichLift K p).coeff (incl K p x) n‖ ≤ 1 :=
   (teichLift K p).mem_int_iff.1 (incl_mem_int x) n
 
-theorem isUnit_incl_p : IsUnit (algebraMap (WittVector p K♭) (teichLift K p).B
-    (incl K p (p : AInf K p))) := by
+theorem isUnit_incl_p
+    : IsUnit (algebraMap (WittVector p K♭) (teichLift K p).B (incl K p (p : AInf K p))) := by
   rw [map_natCast]
   exact IsLocalization.Away.algebraMap_isUnit (teichLift K p).π
 
@@ -145,23 +147,27 @@ def toB : 𝔸 →+* (teichLift K p).B :=
   Localization.awayLift ((algebraMap (WittVector p K♭) (teichLift K p).B).comp (incl K p))
     (p : AInf K p) isUnit_incl_p
 
-theorem toB_algebraMap (x : AInf K p) :
-    toB K p (algebraMap (AInf K p) 𝔸 x) = algebraMap (WittVector p K♭) (teichLift K p).B (incl K p x) :=
+theorem toB_algebraMap (x : AInf K p)
+    : toB K p (algebraMap (AInf K p) 𝔸 x)
+      = algebraMap (WittVector p K♭) (teichLift K p).B (incl K p x) :=
   IsLocalization.lift_eq _ x
 
 theorem toB_injective : Function.Injective (toB K p) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro z hz
   obtain ⟨⟨y, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers (p : AInf K p)) z
   simp only at hs
   have h1 := congrArg (toB K p) hs
   rw [map_mul, hz, zero_mul, toB_algebraMap] at h1
-  have hy : y = 0 := incl_injective (TeichLift.algebraMap_injective _ (by rw [map_zero, map_zero]; exact h1.symm))
+  have hy : y = 0 :=
+    incl_injective (TeichLift.algebraMap_injective _ (by rw [map_zero, map_zero]; exact h1.symm))
   rw [hy, map_zero] at hs
   exact (IsLocalization.map_units 𝔸 s).mul_left_eq_zero.1 hs
 
-theorem coeffB_toB_algebraMap (x : AInf K p) :
-    (teichLift K p).coeffB (toB K p (algebraMap (AInf K p) 𝔸 x)) = (teichLift K p).zcoeff (incl K p x) := by
+theorem coeffB_toB_algebraMap (x : AInf K p)
+    : (teichLift K p).coeffB (toB K p (algebraMap (AInf K p) 𝔸 x))
+      = (teichLift K p).zcoeff (incl K p x) := by
   rw [toB_algebraMap, TeichLift.coeffB_algebraMap]
 
 end WittTilt

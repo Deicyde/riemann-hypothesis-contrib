@@ -22,16 +22,21 @@ def wordDeriv (dir : Λ → W) (l : List Λ) (F : W → ℂ) (p : W) : ℂ :=
 def applyAt (dir : Λ → W) (P : MvPolynomial Λ ℂ) (F : W → ℂ) (p : W) : ℂ :=
   ∑ μ ∈ P.support, P.coeff μ * wordDeriv dir (Finsupp.toMultiset μ).toList F p
 
-theorem iteratedFDeriv_directions_comp_perm_of_analyticAt (dir : Λ → W) {F : W → ℂ} {p : W} (hF : AnalyticAt ℂ F p)
-    {k : ℕ} (u v : Fin k → Λ) (σ : Equiv.Perm (Fin k)) (h : u = v ∘ σ) :
-    iteratedFDeriv ℂ k F p (fun j => dir (u j)) = iteratedFDeriv ℂ k F p (fun j => dir (v j)) := by
+theorem iteratedFDeriv_directions_comp_perm_of_analyticAt
+    (dir : Λ → W)
+    {F : W → ℂ} {p : W} (hF : AnalyticAt ℂ F p)
+    {k : ℕ} (u v : Fin k → Λ) (σ : Equiv.Perm (Fin k)) (h : u = v ∘ σ)
+    : iteratedFDeriv ℂ k F p (fun j => dir (u j))
+      = iteratedFDeriv ℂ k F p (fun j => dir (v j)) := by
   subst h
   exact (hF.contDiffAt (n := ⊤)).iteratedFDeriv_comp_perm (fun j => dir (v j)) σ
 
-theorem wordDeriv_perm (dir : Λ → W) {F : W → ℂ} {p : W} (hF : AnalyticAt ℂ F p)
-    {l l' : List Λ} (h : l.Perm l') : wordDeriv dir l F p = wordDeriv dir l' F p := by
-  have key : ∀ {l l' : List Λ}, l.Perm l' →
-      ∃ e : Fin l.length ≃ Fin l'.length, ∀ j, l.get j = l'.get (e j) := by
+theorem wordDeriv_perm
+    (dir : Λ → W) {F : W → ℂ} {p : W} (hF : AnalyticAt ℂ F p) {l l' : List Λ} (h : l.Perm l')
+    : wordDeriv dir l F p = wordDeriv dir l' F p := by
+  have key
+      : ∀ {l l' : List Λ},
+        l.Perm l' → ∃ e : Fin l.length ≃ Fin l'.length, ∀ j, l.get j = l'.get (e j) := by
     intro l l' h
     induction h with
     | nil => exact ⟨Equiv.refl _, fun _ => rfl⟩
@@ -57,9 +62,11 @@ theorem wordDeriv_perm (dir : Λ → W) {F : W → ℂ} {p : W} (hF : AnalyticAt
   obtain ⟨e, he⟩ := key h
   have hl := h.length_eq
   unfold wordDeriv
-  have gen : ∀ (a b : ℕ) (_ : a = b) (u : Fin a → Λ) (v : Fin b → Λ) (e : Fin a ≃ Fin b),
-      (∀ j, u j = v (e j)) → iteratedFDeriv ℂ a F p (fun j => dir (u j)) =
-        iteratedFDeriv ℂ b F p (fun j => dir (v j)) := by
+  have gen
+      : ∀ (a b : ℕ) (_ : a = b) (u : Fin a → Λ) (v : Fin b → Λ) (e : Fin a ≃ Fin b),
+        (∀ j, u j = v (e j))
+          → iteratedFDeriv ℂ a F p (fun j => dir (u j))
+            = iteratedFDeriv ℂ b F p (fun j => dir (v j)) := by
     intro a b hab u v e he
     subst hab
     exact iteratedFDeriv_directions_comp_perm_of_analyticAt dir hF u v e (funext he)
@@ -109,8 +116,10 @@ structure Params {ι : Type} (dim : ι → ℕ) (f r : ℕ) (rd : ℝ) (D n : �
   mOne_le : mOne f m rd ≤ (q : ℝ) / 2
   D_le_q : D ≤ q
   tZero_ge_log : 4 * (D : ℝ) * (7 + Real.log ((q : ℝ) * D)) + (dStar f m : ℝ) + 1 ≤ tZero rd q R₀
-  tZero_ge_rank : (gDim f r : ℝ) * Real.log 2 + 2 * (dStar f m : ℝ) + 3 +
-    ((D : ℝ) + 1) * ((r : ℝ) * Real.log r + 3 * r + 3) ≤ tZero rd q R₀
+  tZero_ge_rank
+    : (gDim f r : ℝ) * Real.log 2 + 2 * (dStar f m : ℝ) + 3
+        + ((D : ℝ) + 1) * ((r : ℝ) * Real.log r + 3 * r + 3)
+      ≤ tZero rd q R₀
 
 namespace Params
 

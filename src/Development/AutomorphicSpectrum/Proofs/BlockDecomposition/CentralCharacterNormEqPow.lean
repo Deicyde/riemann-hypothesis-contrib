@@ -14,9 +14,10 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 
 namespace GlobalTheory.CompanionTheory.CentralExp
 
-theorem continuous_scalarGL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : ℕ) :
-    Continuous (Matrix.GeneralLinearGroup.scalar (Fin n) : kˣ →* GL (Fin n) k) := by
+theorem continuous_scalarGL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ)
+    : Continuous (Matrix.GeneralLinearGroup.scalar (Fin n) : kˣ →* GL (Fin n) k) := by
   have hs : Continuous (fun a : k => Matrix.scalar (Fin n) a) := by
     have : (fun a : k => Matrix.scalar (Fin n) a) = fun a => Matrix.diagonal (fun _ => a) := by
       funext a; rfl
@@ -26,7 +27,11 @@ theorem continuous_scalarGL (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
   · exact hs.comp Units.continuous_val
   · exact hs.comp (Units.continuous_val.comp continuous_inv)
 
-theorem norm_scalarBy_eq_nabs_rpow : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x : IrrGL (k := k)), 0 < x.1 → ∃ s : ℝ, ∀ (t : kˣ) (c : ℂ), Zl.ScalarBy x t c → ‖c‖ = nabs k t ^ ((x.1 : ℝ) * s) := by
+theorem norm_scalarBy_eq_nabs_rpow
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (x : IrrGL (k := k)),
+      0 < x.1
+        → ∃ s : ℝ, ∀ (t : kˣ) (c : ℂ), Zl.ScalarBy x t c → ‖c‖ = nabs k t ^ ((x.1 : ℝ) * s) := by
   intro k _ _ _ _ x hx
   have hirr := x.2.rep.irr
   obtain ⟨v, hv⟩ : ∃ v : x.2.rep.V, v ≠ 0 := by
@@ -50,8 +55,10 @@ theorem norm_scalarBy_eq_nabs_rpow : ∀ (k : Type) [Field k] [ValuativeRel k] [
   let χ : kˣ →* ℂˣ := χ₀.toHomUnits
   have hχ : ∀ t, ((χ t : ℂˣ) : ℂ) = f t := fun t => rfl
   have hsm : IsSmoothChar χ := by
-    have hset : (χ.ker : Set kˣ) = (Matrix.GeneralLinearGroup.scalar (Fin x.1) : kˣ →* GL (Fin x.1) k) ⁻¹'
-        {g | x.rep g v = v} := by
+    have hset
+        : (χ.ker : Set kˣ)
+          = (Matrix.GeneralLinearGroup.scalar (Fin x.1) : kˣ →* GL (Fin x.1) k)
+            ⁻¹' {g | x.rep g v = v} := by
       ext t
       simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_setOf_eq]
       rw [hf t v]

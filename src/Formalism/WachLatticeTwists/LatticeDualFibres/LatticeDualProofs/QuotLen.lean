@@ -21,13 +21,14 @@ section
 
 variable {O : Type u} [CommRing O]
 
-theorem mem_mulSub {a : O} {M : Type u} [AddCommGroup M] [Module O M] (x : M) :
-    x ∈ mulSub a M ↔ ∃ m, a • m = x := by
+theorem mem_mulSub {a : O} {M : Type u} [AddCommGroup M] [Module O M] (x : M)
+    : x ∈ mulSub a M ↔ ∃ m, a • m = x := by
   simp only [mulSub, LinearMap.mem_range, LinearMap.lsmul_apply]
 
-theorem length_quot_le_of_surj {a : O} {M M' : Type u} [AddCommGroup M] [Module O M]
-    [AddCommGroup M'] [Module O M'] (f : M →ₗ[O] M') (hf : Function.Surjective f) :
-    Module.length O (M' ⧸ mulSub a M') ≤ Module.length O (M ⧸ mulSub a M) := by
+theorem length_quot_le_of_surj
+    {a : O} {M M' : Type u} [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
+    (f : M →ₗ[O] M') (hf : Function.Surjective f)
+    : Module.length O (M' ⧸ mulSub a M') ≤ Module.length O (M ⧸ mulSub a M) := by
   have hle : mulSub a M ≤ (mulSub a M').comap f := by
     intro x hx
     obtain ⟨m, rfl⟩ := (mem_mulSub x).1 hx
@@ -38,10 +39,9 @@ theorem length_quot_le_of_surj {a : O} {M M' : Type u} [AddCommGroup M] [Module 
   obtain ⟨x, rfl⟩ := hf y
   exact ⟨Submodule.Quotient.mk x, rfl⟩
 
-theorem length_quot_le_add (a : O) {M : Type u} [AddCommGroup M] [Module O M]
-    (Q : Submodule O M) :
-    Module.length O (M ⧸ mulSub a M) ≤
-      Module.length O (Q ⧸ mulSub a Q) + Module.length O ((M ⧸ Q) ⧸ mulSub a (M ⧸ Q)) := by
+theorem length_quot_le_add (a : O) {M : Type u} [AddCommGroup M] [Module O M] (Q : Submodule O M)
+    : Module.length O (M ⧸ mulSub a M)
+      ≤ Module.length O (Q ⧸ mulSub a Q) + Module.length O ((M ⧸ Q) ⧸ mulSub a (M ⧸ Q)) := by
   have hle : mulSub a M ≤ (mulSub a (M ⧸ Q)).comap Q.mkQ := by
     intro x hx
     obtain ⟨m, rfl⟩ := (mem_mulSub x).1 hx
@@ -66,31 +66,36 @@ theorem length_quot_le_add (a : O) {M : Type u} [AddCommGroup M] [Module O M]
     show (Submodule.Quotient.mk (m - a • m') : M ⧸ mulSub a M) = Submodule.Quotient.mk m
     rw [Submodule.Quotient.eq]
     refine (mem_mulSub _).2 ⟨-m', ?_⟩
-    rw [smul_neg]; abel
-  calc Module.length O (M ⧸ mulSub a M)
-      = Module.length O (LinearMap.ker f) + Module.length O (LinearMap.range f) :=
-        Formalism.NG.IdempotentNormalFormsRhoFacts.length_eq_ker_add_range f
+    rw [smul_neg]
+    abel
+  calc
+    Module.length O (M ⧸ mulSub a M)
+        = Module.length O (LinearMap.ker f) + Module.length O (LinearMap.range f) :=
+      Formalism.NG.IdempotentNormalFormsRhoFacts.length_eq_ker_add_range f
     _ ≤ Module.length O (Q ⧸ mulSub a Q) + Module.length O ((M ⧸ Q) ⧸ mulSub a (M ⧸ Q)) := by
-        refine add_le_add ?_ ?_
-        · exact (Formalism.NG.IdempotentNormalFormsRhoFacts.length_mono hker).trans
-            (Module.length_le_of_surjective g.rangeRestrict g.surjective_rangeRestrict)
-        · exact Module.length_le_of_injective (LinearMap.range f).subtype
-            (Submodule.injective_subtype _)
+      refine add_le_add ?_ ?_
+      · exact (Formalism.NG.IdempotentNormalFormsRhoFacts.length_mono hker).trans
+          (Module.length_le_of_surjective g.rangeRestrict g.surjective_rangeRestrict)
+      · exact Module.length_le_of_injective (LinearMap.range f).subtype
+          (Submodule.injective_subtype _)
 
-theorem length_coker_eq_ker (a : O) {M : Type u} [AddCommGroup M] [Module O M]
-    (hM : Module.length O M ≠ ⊤) :
-    Module.length O (M ⧸ mulSub a M) = Module.length O (LinearMap.ker (LinearMap.lsmul O M a)) := by
-  have h1 := Formalism.NG.IdempotentNormalFormsRhoFacts.length_eq_ker_add_range (LinearMap.lsmul O M a)
+theorem length_coker_eq_ker
+    (a : O) {M : Type u} [AddCommGroup M] [Module O M] (hM : Module.length O M ≠ ⊤)
+    : Module.length O (M ⧸ mulSub a M)
+      = Module.length O (LinearMap.ker (LinearMap.lsmul O M a)) := by
+  have h1 :=
+    Formalism.NG.IdempotentNormalFormsRhoFacts.length_eq_ker_add_range (LinearMap.lsmul O M a)
   have h2 : Module.length O M = Module.length O (mulSub a M) + Module.length O (M ⧸ mulSub a M) :=
     Module.length_eq_add_of_exact (mulSub a M).subtype (mulSub a M).mkQ
-      (mulSub a M).injective_subtype (mulSub a M).mkQ_surjective
-      (LinearMap.exact_subtype_mkQ _)
+      (mulSub a M).injective_subtype (mulSub a M).mkQ_surjective (LinearMap.exact_subtype_mkQ _)
   have hr : Module.length O (mulSub a M) ≠ ⊤ := by
     intro h
     rw [h, top_add] at h2
     exact hM h2
-  have h3 : Module.length O (M ⧸ mulSub a M) + Module.length O (mulSub a M) =
-      Module.length O (LinearMap.ker (LinearMap.lsmul O M a)) + Module.length O (mulSub a M) := by
+  have h3
+      : Module.length O (M ⧸ mulSub a M) + Module.length O (mulSub a M)
+        = Module.length O (LinearMap.ker (LinearMap.lsmul O M a))
+          + Module.length O (mulSub a M) := by
     rw [add_comm, ← h2, h1]; rfl
   exact ENat.add_left_injective_of_ne_top hr h3
 
@@ -116,9 +121,10 @@ theorem pi_torsion {d : ℕ} (w : Fin d → KO O) : ∃ c : O, c ≠ 0 ∧ c •
   obtain ⟨r, hr⟩ := Finset.dvd_prod_of_mem (fun i => c (w i)) (Finset.mem_univ i)
   rw [Pi.smul_apply, Pi.zero_apply, hr, mul_comm, mul_smul, hc', smul_zero]
 
-theorem span_killed {N : Type u} [AddCommGroup N] [Module O N]
-    (ht : ∀ x : N, ∃ c : O, c ≠ 0 ∧ c • x = 0) (t : Finset N) :
-    ∃ c : O, c ≠ 0 ∧ ∀ n ∈ Submodule.span O (t : Set N), c • n = 0 := by
+theorem span_killed
+    {N : Type u} [AddCommGroup N] [Module O N]
+    (ht : ∀ x : N, ∃ c : O, c ≠ 0 ∧ c • x = 0) (t : Finset N)
+    : ∃ c : O, c ≠ 0 ∧ ∀ n ∈ Submodule.span O (t : Set N), c • n = 0 := by
   classical
   induction t using Finset.induction_on with
   | empty => exact ⟨1, one_ne_zero, by simp⟩
@@ -132,10 +138,12 @@ theorem span_killed {N : Type u} [AddCommGroup N] [Module O N]
     rw [smul_add, mul_smul, smul_comm c' r x, h', smul_zero, smul_zero, zero_add, mul_comm,
       mul_smul, h z hz, smul_zero]
 
-theorem length_quot_of_KO {Q N : Type u} [AddCommGroup Q] [Module O Q] [Module.Finite O Q]
-    [AddCommGroup N] [Module O N] {d : ℕ} (ι : N →ₗ[O] (Fin d → KO O)) (hι : Function.Injective ι)
-    (δ : N →ₗ[O] Q) (hδ : Function.Surjective δ) (ℓ e : ℕ) :
-    Module.length O (Q ⧸ mulSub ((ℓ : O) ^ e) Q) ≤ (d : ℕ∞) * ((e : ℕ∞) * eO O ℓ) := by
+theorem length_quot_of_KO
+    {Q N : Type u} [AddCommGroup Q] [Module O Q] [Module.Finite O Q] [AddCommGroup N] [Module O N]
+    {d : ℕ} (ι : N →ₗ[O] (Fin d → KO O)) (hι : Function.Injective ι)
+    (δ : N →ₗ[O] Q) (hδ : Function.Surjective δ)
+    (ℓ e : ℕ)
+    : Module.length O (Q ⧸ mulSub ((ℓ : O) ^ e) Q) ≤ (d : ℕ∞) * ((e : ℕ∞) * eO O ℓ) := by
   classical
   obtain ⟨s, hs⟩ := (Module.Finite.fg_top : (⊤ : Submodule O Q).FG)
   let f : Q → N := Function.surjInv hδ
@@ -153,12 +161,13 @@ theorem length_quot_of_KO {Q N : Type u} [AddCommGroup Q] [Module O Q] [Module.F
 
   have hfin : Module.length O N₂ ≠ ⊤ := by
     obtain ⟨k, g, hg⟩ := Module.Finite.exists_fin' O N₂
-    have h1 := Formalism.RepresentationBoundsCohomology.RowCol.length_le_of_killed c g hg (by
-      intro x
-      exact Subtype.ext (hkill x x.2))
+    have h1 :=
+      Formalism.RepresentationBoundsCohomology.RowCol.length_le_of_killed c g hg (by
+        intro x
+        exact Subtype.ext (hkill x x.2))
     rw [Formalism.NG.IdempotentNormalFormsLenFacts.length_quot_span, Fintype.card_fin] at h1
-    have h2 : IsDiscreteValuationRing.addVal O c ≠ ⊤ :=
-      fun h' => hc (IsDiscreteValuationRing.addVal_eq_top_iff.1 h')
+    have h2 : IsDiscreteValuationRing.addVal O c ≠ ⊤ := fun h' =>
+      hc (IsDiscreteValuationRing.addVal_eq_top_iff.1 h')
     intro h
     rw [h, top_le_iff] at h1
     lift IsDiscreteValuationRing.addVal O c to ℕ using h2 with v
@@ -175,13 +184,15 @@ theorem length_quot_of_KO {Q N : Type u} [AddCommGroup Q] [Module O Q] [Module.F
 
   let κ := LinearMap.ker (LinearMap.lsmul O N₂ ((ℓ : O) ^ e))
   let j : κ →ₗ[O] (Fin d → KO O) := ι ∘ₗ N₂.subtype ∘ₗ κ.subtype
-  have hj : Function.Injective j :=
-    hι.comp (N₂.injective_subtype.comp κ.injective_subtype)
-  have h0 := Formalism.RepresentationBoundsCohomology.submoduleLengthBound_statement O (Fin d) (LinearMap.range j) ℓ e (by
-    rintro _ ⟨x, rfl⟩
-    rw [← map_smul]
-    have : ((ℓ : O) ^ e) • x = 0 := Subtype.ext x.2
-    rw [this, map_zero])
+  have hj : Function.Injective j := hι.comp (N₂.injective_subtype.comp κ.injective_subtype)
+  have h0 :=
+    Formalism.RepresentationBoundsCohomology.submoduleLengthBound_statement O (Fin d)
+      (LinearMap.range j) ℓ e
+      (by
+        rintro _ ⟨x, rfl⟩
+        rw [← map_smul]
+        have : ((ℓ : O) ^ e) • x = 0 := Subtype.ext x.2
+        rw [this, map_zero])
   rw [Fintype.card_fin] at h0
   exact (Module.length_le_of_injective j.rangeRestrict (by
     intro x y hxy
@@ -206,8 +217,9 @@ theorem locQuotLen : StatLocQuotLen.{u} := by
     have h := Submodule.finrank_quotient_add_finrank Q
     rw [hT0, add_zero] at h
     exact h
-  have hB := Formalism.RepresentationBoundsCohomology.rowColength O (M ⧸ Q) (mulSub ((ℓ : O) ^ e) (M ⧸ Q)) ℓ e
-    (fun m => (mem_mulSub _).2 ⟨m, rfl⟩)
+  have hB :=
+    Formalism.RepresentationBoundsCohomology.rowColength O (M ⧸ Q) (mulSub ((ℓ : O) ^ e) (M ⧸ Q)) ℓ
+      e (fun m => (mem_mulSub _).2 ⟨m, rfl⟩)
   have htors : Module.length O (Submodule.torsion O (M ⧸ Q)) = 0 := by
     rw [Submodule.QuotientTorsion.torsion_eq_bot]
     exact Module.length_eq_zero
@@ -219,8 +231,9 @@ theorem locQuotLen : StatLocQuotLen.{u} := by
     intro x
     obtain ⟨n, hn⟩ := hδ x.2
     exact ⟨⟨n, by show δ n ∈ Q; rw [hn]; exact x.2⟩, Subtype.ext hn⟩
-  have hC := length_quot_of_KO (N.subtype ∘ₗ N'.subtype)
-    (N.injective_subtype.comp N'.injective_subtype) δ' hδ' ℓ e
+  have hC :=
+    length_quot_of_KO (N.subtype ∘ₗ N'.subtype) (N.injective_subtype.comp N'.injective_subtype) δ'
+      hδ' ℓ e
   refine hA.trans ((add_le_add hC hB).trans (le_of_eq ?_))
   rw [eO, Nat.cast_add, add_mul, add_comm]
 

@@ -18,11 +18,11 @@ section InstSec
 
 variable (D : D7) (L : SizeData₂ D)
 
-
 end InstSec
 
 def GatHasPlaces (D : D7) : Prop :=
-  ∀ u (w : D.what₂.places.Pl) (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)), 0 < (D.gat u w hg).P.nV
+  ∀ u (w : D.what₂.places.Pl) (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)),
+    0 < (D.gat u w hg).P.nV
 
 theorem gatHasPlaces_of_ties {D : D7} (hT : GatTies D) : GatHasPlaces D := by
   intro u w hg

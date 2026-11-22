@@ -7,6 +7,7 @@ public import Formalism.PadicSubsetSums.StableGradedCounts.IRRCycleProbPrime
 
 namespace Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
 
-theorem prime_cycle_probability_sum : CycleProbSum := cycleProbSum_of_cycleProbPrime prime_cycle_probability
+theorem prime_cycle_probability_sum : CycleProbSum :=
+  cycleProbSum_of_cycleProbPrime prime_cycle_probability
 
 end Formalism.IrreducibleCountingLemmas.GaloisIrreducibility

@@ -19,37 +19,43 @@ namespace UpperTheory.V.Z.J.D.EigenvaluesTensorProduct
 
 section Tensor
 
-variable {I : Type} [Fintype I] [dI : DecidableEq I] {W : I → Type} [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
+variable
+  {I : Type} [Fintype I] [dI : DecidableEq I]
+  {W : I → Type} [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
 
 private noncomputable def ev (f : ∀ i, Module.Dual ℂ (W i)) : (⨂[ℂ] i, W i) →ₗ[ℂ] ℂ :=
   PiTensorProduct.lift ((MultilinearMap.mkPiAlgebra ℂ I ℂ).compLinearMap f)
 
-private theorem ev_tprod (f : ∀ i, Module.Dual ℂ (W i)) (m : ∀ i, W i) :
-    ev f (PiTensorProduct.tprod ℂ m) = ∏ i, f i (m i) :=
+private theorem ev_tprod (f : ∀ i, Module.Dual ℂ (W i)) (m : ∀ i, W i)
+    : ev f (PiTensorProduct.tprod ℂ m) = ∏ i, f i (m i) :=
   _root_.UpperTheory.Reformulated.B.CuspidalIrreducibleSubrep.ev_tprod f m
 
-private noncomputable def slM (v : I) (f : ∀ i, Module.Dual ℂ (W i)) :
-    MultilinearMap (RingHom.id ℂ) W (W v) :=
+private noncomputable def slM (v : I) (f : ∀ i, Module.Dual ℂ (W i))
+    : MultilinearMap (RingHom.id ℂ) W (W v) :=
   _root_.UpperTheory.Reformulated.B.SpecialLinearMap.slM v f
 
 private noncomputable def sl (v : I) (f : ∀ i, Module.Dual ℂ (W i)) : (⨂[ℂ] i, W i) →ₗ[ℂ] W v :=
   PiTensorProduct.lift (slM v f)
 
-private theorem sl_tprod (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (m : ∀ i, W i) :
-    sl v f (PiTensorProduct.tprod ℂ m) = (∏ i ∈ Finset.univ.erase v, f i (m i)) • m v :=
+private theorem sl_tprod (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (m : ∀ i, W i)
+    : sl v f (PiTensorProduct.tprod ℂ m) = (∏ i ∈ Finset.univ.erase v, f i (m i)) • m v :=
   _root_.UpperTheory.Reformulated.B.SpecialLinearTensor.sl_tprod v f m
 
-private theorem dual_sl (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (g : Module.Dual ℂ (W v)) (x : ⨂[ℂ] i, W i) :
-    g (sl v f x) = ev (Function.update f v g) x := by
+private theorem dual_sl
+    (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (g : Module.Dual ℂ (W v)) (x : ⨂[ℂ] i, W i)
+    : g (sl v f x) = ev (Function.update f v g) x := by
   have : g ∘ₗ sl v f = ev (Function.update f v g) := by
     refine PiTensorProduct.ext (MultilinearMap.ext fun m => ?_)
-    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, sl_tprod, ev_tprod, map_smul, smul_eq_mul]
+    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, sl_tprod, ev_tprod,
+      map_smul, smul_eq_mul]
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ v), Function.update_self, mul_comm]
     congr 1
-    exact Finset.prod_congr rfl fun j hj => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hj)]
+    exact Finset.prod_congr rfl fun j hj => by
+      rw [Function.update_of_ne (Finset.ne_of_mem_erase hj)]
   exact LinearMap.congr_fun this x
 
-private theorem ev_sep (x : ⨂[ℂ] i, W i) (h : ∀ f : ∀ i, Module.Dual ℂ (W i), ev f x = 0) : x = 0 := by
+private theorem ev_sep (x : ⨂[ℂ] i, W i) (h : ∀ f : ∀ i, Module.Dual ℂ (W i), ev f x = 0)
+    : x = 0 := by
   let b := fun i => Module.Free.chooseBasis ℂ (W i)
   let B := Basis.piTensorProduct b
   refine B.repr.map_eq_zero_iff.1 (Finsupp.ext fun p => ?_)
@@ -59,26 +65,31 @@ private theorem ev_sep (x : ⨂[ℂ] i, W i) (h : ∀ f : ∀ i, Module.Dual ℂ
   have := LinearMap.congr_fun e x
   simpa [h] using this
 
-private theorem exists_coord {U : Type} [AddCommGroup U] [Module ℂ U] (E : Submodule ℂ U) (h : Module.rank ℂ E ≤ 1) :
-    ∃ (e : U) (g : Module.Dual ℂ U), ∀ y ∈ E, y = g y • e := by
+private theorem exists_coord
+    {U : Type} [AddCommGroup U] [Module ℂ U] (E : Submodule ℂ U) (h : Module.rank ℂ E ≤ 1)
+    : ∃ (e : U) (g : Module.Dual ℂ U), ∀ y ∈ E, y = g y • e := by
   obtain ⟨e, he⟩ := (rank_submodule_le_one_iff' E).1 h
   by_cases h0 : e = 0
   · refine ⟨0, 0, fun y hy => ?_⟩
     have := he hy
     rw [h0] at this
     simpa using this
-  · obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (LinearMap.toSpanSingleton ℂ U e)
-      (LinearMap.ker_toSpanSingleton ℂ h0)
+  · obtain ⟨g, hg⟩ :=
+      LinearMap.exists_leftInverse_of_injective (LinearMap.toSpanSingleton ℂ U e)
+        (LinearMap.ker_toSpanSingleton ℂ h0)
     refine ⟨e, g, fun y hy => ?_⟩
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 (he hy)
     have h1 : g e = 1 := by simpa using LinearMap.congr_fun hg 1
     simp [h1]
 
-private theorem rank_le_one_of_slices (E : ∀ i, Submodule ℂ (W i)) (hE : ∀ i, Module.rank ℂ (E i) ≤ 1)
-    (X : Submodule ℂ (⨂[ℂ] i, W i)) (hX : ∀ x ∈ X, ∀ v f, sl v f x ∈ E v) : Module.rank ℂ X ≤ 1 := by
+private theorem rank_le_one_of_slices
+    (E : ∀ i, Submodule ℂ (W i)) (hE : ∀ i, Module.rank ℂ (E i) ≤ 1)
+    (X : Submodule ℂ (⨂[ℂ] i, W i)) (hX : ∀ x ∈ X, ∀ v f, sl v f x ∈ E v)
+    : Module.rank ℂ X ≤ 1 := by
   choose e g hg using fun i => exists_coord (E i) (hE i)
-  have key : ∀ x ∈ X, ∀ (s : Finset I) (f : ∀ i, Module.Dual ℂ (W i)),
-      ev (s.piecewise f g) x = (∏ i ∈ s, f i (e i)) * ev g x := by
+  have key
+      : ∀ x ∈ X, ∀ (s : Finset I) (f : ∀ i, Module.Dual ℂ (W i)),
+        ev (s.piecewise f g) x = (∏ i ∈ s, f i (e i)) * ev g x := by
     intro x hx s
     induction s using Finset.induction_on with
     | empty => intro f; simp
@@ -106,19 +117,22 @@ end Tensor
 
 section Rep
 
-variable {I : Type} [Fintype I] [dI : DecidableEq I] {W : I → Type} [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
-  {G : I → Type} [∀ i, Group (G i)] (τ : ∀ i, Representation ℂ (G i) (W i))
+variable
+  {I : Type} [Fintype I] [dI : DecidableEq I]
+  {W : I → Type} [∀ i, AddCommGroup (W i)] [∀ i, Module ℂ (W i)]
+  {G : I → Type} [∀ i, Group (G i)]
+  (τ : ∀ i, Representation ℂ (G i) (W i))
 
-private theorem piRep_tprod (h : ∀ i, G i) (m : ∀ i, W i) :
-    piRep τ h (PiTensorProduct.tprod ℂ m) = PiTensorProduct.tprod ℂ fun i => τ i (h i) (m i) := by
+private theorem piRep_tprod (h : ∀ i, G i) (m : ∀ i, W i)
+    : piRep τ h (PiTensorProduct.tprod ℂ m) = PiTensorProduct.tprod ℂ fun i => τ i (h i) (m i) := by
   simp [piRep, PiTensorProduct.mapMonoidHom]
 
-private theorem sl_single (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (g : G v) (x : ⨂[ℂ] i, W i) :
-    sl v f (piRep τ (Pi.mulSingle v g) x) = τ v g (sl v f x) := by
+private theorem sl_single (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (g : G v) (x : ⨂[ℂ] i, W i)
+    : sl v f (piRep τ (Pi.mulSingle v g) x) = τ v g (sl v f x) := by
   have : sl v f ∘ₗ piRep τ (Pi.mulSingle v g) = τ v g ∘ₗ sl v f := by
     refine PiTensorProduct.ext (MultilinearMap.ext fun m => ?_)
-    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, piRep_tprod, sl_tprod, map_smul,
-      Pi.mulSingle_eq_same]
+    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, piRep_tprod, sl_tprod,
+      map_smul, Pi.mulSingle_eq_same]
     congr 1
     refine Finset.prod_congr rfl fun j hj => ?_
     rw [Pi.mulSingle_eq_of_ne (Finset.ne_of_mem_erase hj), map_one]
@@ -127,11 +141,18 @@ private theorem sl_single (v : I) (f : ∀ i, Module.Dual ℂ (W i)) (g : G v) (
 
 end Rep
 
-private theorem genTransfer {M M' : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup M'] [Module ℂ M']
-    (A : Module.End ℂ M) (B : Module.End ℂ M') (s : M →ₗ[ℂ] M') (N : Submodule ℂ M) (c : ℂ)
-    (hA : ∀ F ∈ N, A F ∈ N) (hs : ∀ F ∈ N, s (A F) = B (s F)) (x : M) (hx : x ∈ N)
-    (h : x ∈ A.maxGenEigenspace c) : s x ∈ B.maxGenEigenspace c := by
-  have key : ∀ (k : ℕ), ∀ F ∈ N, ((A - c • 1) ^ k) F ∈ N ∧ s (((A - c • 1) ^ k) F) = ((B - c • 1) ^ k) (s F) := by
+private theorem genTransfer
+    {M M' : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup M'] [Module ℂ M']
+    (A : Module.End ℂ M)
+    (B : Module.End ℂ M') (s : M →ₗ[ℂ] M')
+    (N : Submodule ℂ M)
+    (c : ℂ)
+    (hA : ∀ F ∈ N, A F ∈ N) (hs : ∀ F ∈ N, s (A F) = B (s F))
+    (x : M) (hx : x ∈ N) (h : x ∈ A.maxGenEigenspace c)
+    : s x ∈ B.maxGenEigenspace c := by
+  have key
+      : ∀ (k : ℕ), ∀ F ∈ N,
+        ((A - c • 1) ^ k) F ∈ N ∧ s (((A - c • 1) ^ k) F) = ((B - c • 1) ^ k) (s F) := by
     intro k
     induction k with
     | zero => intro F hF; simpa using hF
@@ -149,8 +170,7 @@ private theorem genTransfer {M M' : Type} [AddCommGroup M] [Module ℂ M] [AddCo
 end UpperTheory.V.Z.J.D.EigenvaluesTensorProduct
 
 open UpperTheory.V.Z.J.D.EigenvaluesTensorProduct in
-theorem UpperTheory.V.Z.J.D.eigPi :
-    EigPi := by
+theorem UpperTheory.V.Z.J.D.eigPi : EigPi := by
   intro L _ _ n V _ S τ b φ μ h
   classical
   let I := fun v : V => glIwa ((S v).adicCompletion L) n
@@ -178,11 +198,16 @@ theorem UpperTheory.V.Z.J.D.eigPi :
     have h2 : π (Pi.mulSingle v ((eT _ n i y : (glIwa _ n).T) : GLw n (S v))) x = φ v i y • x := h1
     rw [show piRep (fun v => (τ v).ρ) _ x = _ from h2, map_smul]
   · have ha : al ((S v).adicCompletion L) n (j + 1) ∈ (I v).P := al_mem _ n _
-    refine genTransfer ((iwS n S).uOp π (alV n S v (j + 1))) ((I v).uOp (τ v).ρ (al _ n (j + 1))) (sl v f)
-      (fixd π (iwS n S).N) (μ v j) (fun F hF => ?_) (fun F hF => ?_) x hN (hU v j)
+    refine genTransfer ((iwS n S).uOp π (alV n S v (j + 1))) ((I v).uOp (τ v).ρ (al _ n (j + 1)))
+      (sl v f) (fixd π (iwS n S).N) (μ v j)
+      (fun F hF => ?_)
+      (fun F hF => ?_)
+      x hN (hU v j)
     · exact (uOpMul _ (piIwa I) ℂ _ π _ _ (Up.singleP I v _ ha) (Up.singleP I v _ ha) F hF).1
-    · have h1 : (iwS n S).uOp π (alV n S v (j + 1)) F =
-          (I v).uOp (π.comp (MonoidHom.mulSingle (fun v => GLw n (S v)) v)) (al _ n (j + 1)) F :=
+    · have h1
+          : (iwS n S).uOp π (alV n S v (j + 1)) F
+            = (I v).uOp (π.comp (MonoidHom.mulSingle (fun v => GLw n (S v)) v)) (al _ n (j + 1))
+              F :=
         Up.uOpPi I π v _ ha F hF
       rw [h1]
       exact uOpNat _ (I v) ℂ _ (π.comp (MonoidHom.mulSingle (fun v => GLw n (S v)) v)) ℂ _ (τ v).ρ

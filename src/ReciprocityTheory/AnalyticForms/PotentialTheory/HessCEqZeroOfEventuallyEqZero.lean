@@ -26,13 +26,16 @@ theorem smooth_continuous {A : FinHolAtlas e X} {f : X → ℝ} (hf : A.Smooth f
   filter_upwards [(A.chart j).open_source.mem_nhds hj] with q hq
   simp [(A.chart j).left_inv hq]
 
-theorem smoothOn_mul {A : FinHolAtlas e X} {U : Set X} {f g : X → ℝ} (hf : A.SmoothOn U f)
-    (hg : A.SmoothOn U g) : A.SmoothOn U (fun x => f x * g x) := fun j => (hf j).mul (hg j)
+theorem smoothOn_mul
+    {A : FinHolAtlas e X} {U : Set X} {f g : X → ℝ} (hf : A.SmoothOn U f) (hg : A.SmoothOn U g)
+    : A.SmoothOn U (fun x => f x * g x) := fun j =>
+  (hf j).mul (hg j)
 
-theorem mInt_congr {A : FinHolAtlas e X} {Φ Ψ : Fin e → LocPot X} {g g' : X → ℝ}
+theorem mInt_congr
+    {A : FinHolAtlas e X} {Φ Ψ : Fin e → LocPot X} {g g' : X → ℝ}
     (h : ∀ j, ∀ y ∈ (A.chart j).target,
-      g ((A.chart j).symm y) * locDens A Φ j y = g' ((A.chart j).symm y) * locDens A Ψ j y) :
-    mInt A Φ g = mInt A Ψ g' := by
+      g ((A.chart j).symm y) * locDens A Φ j y = g' ((A.chart j).symm y) * locDens A Ψ j y)
+    : mInt A Φ g = mInt A Ψ g' := by
   unfold mInt
   split_ifs with hP
   · unfold integralWith
@@ -42,28 +45,30 @@ theorem mInt_congr {A : FinHolAtlas e X} {Φ Ψ : Fin e → LocPot X} {g g' : X 
     rw [h j y hy]
   · rfl
 
-theorem mInt_zero_fun (A : FinHolAtlas e X) (Φ : Fin e → LocPot X) {g : X → ℝ}
-    (hg : ∀ x, g x = 0) : mInt A Φ g = 0 := by
+theorem mInt_zero_fun (A : FinHolAtlas e X) (Φ : Fin e → LocPot X) {g : X → ℝ} (hg : ∀ x, g x = 0)
+    : mInt A Φ g = 0 := by
   unfold mInt
   split_ifs
   · simp [integralWith, hg]
   · rfl
 
-theorem hessC_congr_eventuallyEq {D : ℕ} {f g : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ}
-    (h : f =ᶠ[𝓝 y] g) : hessC f y = hessC g y := by
+theorem hessC_congr_eventuallyEq {D : ℕ} {f g : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (h : f =ᶠ[𝓝 y] g)
+    : hessC f y = hessC g y := by
   have h2 : fderiv ℝ (fderiv ℝ f) y = fderiv ℝ (fderiv ℝ g) y := h.fderiv.fderiv_eq
   ext i j
   simp [hessC, h2]
 
-theorem maDens_congr_germ {D : ℕ} {φ ψ : Fin D → (Fin D → ℂ) → ℝ} {y : Fin D → ℂ}
-    (h : ∀ i, φ i =ᶠ[𝓝 y] ψ i) : maDens φ y = maDens ψ y := by
+theorem maDens_congr_germ
+    {D : ℕ} {φ ψ : Fin D → (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (h : ∀ i, φ i =ᶠ[𝓝 y] ψ i)
+    : maDens φ y = maDens ψ y := by
   unfold maDens
   congr 3
   funext k
   exact hessC_congr_eventuallyEq (h k)
 
-theorem hessC_eq_zero_of_eventuallyEq_zero {D : ℕ} {f : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ}
-    (h : f =ᶠ[𝓝 y] fun _ => 0) : hessC f y = 0 := by
+theorem hessC_eq_zero_of_eventuallyEq_zero
+    {D : ℕ} {f : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (h : f =ᶠ[𝓝 y] fun _ => 0)
+    : hessC f y = 0 := by
   have h1 : fderiv ℝ f =ᶠ[𝓝 y] fderiv ℝ (fun _ : Fin D → ℂ => (0 : ℝ)) := h.fderiv
   have h2 : fderiv ℝ (fderiv ℝ f) y = 0 := by
     rw [h1.fderiv_eq]
@@ -71,26 +76,34 @@ theorem hessC_eq_zero_of_eventuallyEq_zero {D : ℕ} {f : (Fin D → ℂ) → �
   ext i j
   simp [hessC, h2]
 
-theorem maDens_cons_eq_zero {n : ℕ} {f : (Fin (n + 1) → ℂ) → ℝ}
-    {φ : Fin n → (Fin (n + 1) → ℂ) → ℝ} {y : Fin (n + 1) → ℂ} (h : f =ᶠ[𝓝 y] fun _ => 0) :
-    maDens (Fin.cons f φ) y = 0 := by
-  have hc : (fun k => hessC ((Fin.cons f φ : Fin (n + 1) → (Fin (n + 1) → ℂ) → ℝ) k) y) =
-      Fin.cons (hessC f y) (fun k => hessC (φ k) y) := by
+theorem maDens_cons_eq_zero
+    {n : ℕ} {f : (Fin (n + 1) → ℂ) → ℝ} {φ : Fin n → (Fin (n + 1) → ℂ) → ℝ} {y : Fin (n + 1) → ℂ}
+    (h : f =ᶠ[𝓝 y] fun _ => 0)
+    : maDens (Fin.cons f φ) y = 0 := by
+  have hc
+      : (fun k => hessC ((Fin.cons f φ : Fin (n + 1) → (Fin (n + 1) → ℂ) → ℝ) k) y)
+        = Fin.cons (hessC f y) (fun k => hessC (φ k) y) := by
     funext k
     refine Fin.cases ?_ (fun k => ?_) k <;> simp
   unfold maDens
   rw [hc, ReciprocityTheory.AnForm.A.mdisc_cons_eq_sum, hessC_eq_zero_of_eventuallyEq_zero h]
   simp
 
-theorem locDens_cons_ofFun_eq_zero {A : FinHolAtlas (e + 1) X} (v : X → ℝ)
-    (Φ : Fin e → LocPot X) (j : Fin A.n) {y : Fin (e + 1) → ℂ} (hy : y ∈ (A.chart j).target)
-    (hv : (A.chart j).symm y ∉ tsupport v) :
-    locDens A (Fin.cons (LocPot.ofFun v) Φ) j y = 0 := by
+theorem locDens_cons_ofFun_eq_zero
+    {A : FinHolAtlas (e + 1) X}
+    (v : X → ℝ)
+    (Φ : Fin e → LocPot X)
+    (j : Fin A.n)
+    {y : Fin (e + 1) → ℂ} (hy : y ∈ (A.chart j).target) (hv : (A.chart j).symm y ∉ tsupport v)
+    : locDens A (Fin.cons (LocPot.ofFun v) Φ) j y = 0 := by
   unfold locDens
-  have hfam : (fun i y' => ((Fin.cons (LocPot.ofFun v) Φ : Fin (e + 1) → LocPot X) i).φ
-      ((A.chart j).symm y) ((A.chart j).symm y')) =
-      Fin.cons (fun y' => v ((A.chart j).symm y'))
-        (fun i y' => (Φ i).φ ((A.chart j).symm y) ((A.chart j).symm y')) := by
+  have hfam
+      : (fun i y' =>
+          ((Fin.cons (LocPot.ofFun v) Φ : Fin (e + 1) → LocPot X) i).φ ((A.chart j).symm y)
+            ((A.chart j).symm y'))
+        = Fin.cons
+          (fun y' => v ((A.chart j).symm y'))
+          (fun i y' => (Φ i).φ ((A.chart j).symm y) ((A.chart j).symm y')) := by
     funext i
     refine Fin.cases ?_ (fun k => ?_) i <;> rfl
   rw [hfam]
@@ -112,9 +125,11 @@ theorem ae_coord_ne_zero {n : ℕ} : ∀ᵐ y : Fin n → ℂ, ∀ i, y i ≠ 0 
   rw [ae_iff]
   simpa using volume_coord_eq_zero i
 
-theorem contDiffOn_compat {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)}
-    (hψ : IsCompatChart A ψ) {U : Set X} (hU : IsOpen U) {f : X → ℝ} (hf : A.SmoothOn U f) :
-    ContDiffOn ℝ ∞ (f ∘ ψ.symm) (ψ.target ∩ ψ.symm ⁻¹' U) := by
+theorem contDiffOn_compat
+    {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} (hψ : IsCompatChart A ψ)
+    {U : Set X} (hU : IsOpen U)
+    {f : X → ℝ} (hf : A.SmoothOn U f)
+    : ContDiffOn ℝ ∞ (f ∘ ψ.symm) (ψ.target ∩ ψ.symm ⁻¹' U) := by
   intro y hy
   refine ContDiffAt.contDiffWithinAt ?_
   obtain ⟨a, ha⟩ := A.cover (ψ.symm y)
@@ -132,9 +147,11 @@ theorem contDiffOn_compat {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (F
   filter_upwards [hN] with y' hy'
   simp [(A.chart a).left_inv hy'.2]
 
-theorem analyticAt_compat {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)}
-    (hψ : IsCompatChart A ψ) (a : Fin A.n) {p : X} (hpa : p ∈ (A.chart a).source)
-    (hpψ : p ∈ ψ.source) : AnalyticAt ℂ (ψ ∘ (A.chart a).symm) (A.chart a p) :=
+theorem analyticAt_compat
+    {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)}
+    (hψ : IsCompatChart A ψ) (a : Fin A.n)
+    {p : X} (hpa : p ∈ (A.chart a).source) (hpψ : p ∈ ψ.source)
+    : AnalyticAt ℂ (ψ ∘ (A.chart a).symm) (A.chart a p) :=
   (hψ a).1 _ ⟨(A.chart a).map_source hpa, by simpa [(A.chart a).left_inv hpa] using hpψ⟩
 
 def chartPush (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (F : (Fin e → ℂ) → ℝ) : X → ℝ :=
@@ -143,9 +160,10 @@ def chartPush (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (F : (Fin e → ℂ
 def chartExt (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (v : X → ℝ) : (Fin e → ℂ) → ℝ :=
   ψ.target.indicator (v ∘ ψ.symm)
 
-theorem chartPush_eq_zero (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
-    {F : (Fin e → ℂ) → ℝ} {p : X}
-    (hp : p ∉ ψ.symm '' tsupport F) : chartPush ψ F p = 0 := by
+theorem chartPush_eq_zero
+    (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
+    {F : (Fin e → ℂ) → ℝ} {p : X} (hp : p ∉ ψ.symm '' tsupport F)
+    : chartPush ψ F p = 0 := by
   unfold chartPush
   by_cases hs : p ∈ ψ.source
   · rw [Set.indicator_of_mem hs]
@@ -153,28 +171,36 @@ theorem chartPush_eq_zero (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
     exact hp ⟨ψ p, subset_tsupport _ hne, ψ.left_inv hs⟩
   · exact Set.indicator_of_notMem hs _
 
-theorem isCompact_symm_image {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} {F : (Fin e → ℂ) → ℝ}
-    (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target) :
-    IsCompact (ψ.symm '' tsupport F) :=
+theorem isCompact_symm_image
+    {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} {F : (Fin e → ℂ) → ℝ}
+    (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target)
+    : IsCompact (ψ.symm '' tsupport F) :=
   hK.image_of_continuousOn (ψ.continuousOn_symm.mono hKt)
 
-theorem tsupport_chartPush [T2Space X] (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
-    {F : (Fin e → ℂ) → ℝ} (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target) :
-    tsupport (chartPush ψ F) ⊆ ψ.symm '' tsupport F := by
+theorem tsupport_chartPush
+    [T2Space X]
+    (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
+    {F : (Fin e → ℂ) → ℝ} (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target)
+    : tsupport (chartPush ψ F) ⊆ ψ.symm '' tsupport F := by
   refine closure_minimal (fun p hp => ?_) (isCompact_symm_image hK hKt).isClosed
   by_contra h
   exact hp (chartPush_eq_zero ψ h)
 
-theorem tsupport_chartPush_source [T2Space X] (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
-    {F : (Fin e → ℂ) → ℝ} (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target) :
-    tsupport (chartPush ψ F) ⊆ ψ.source := by
+theorem tsupport_chartPush_source
+    [T2Space X]
+    (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
+    {F : (Fin e → ℂ) → ℝ} (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target)
+    : tsupport (chartPush ψ F) ⊆ ψ.source := by
   refine (tsupport_chartPush ψ hK hKt).trans ?_
   rintro _ ⟨y, hy, rfl⟩
   exact ψ.map_target (hKt hy)
 
-theorem smooth_chartPush [T2Space X] {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)}
-    (hψ : IsCompatChart A ψ) {F : (Fin e → ℂ) → ℝ} (hF : ContDiff ℝ ∞ F)
-    (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target) : A.Smooth (chartPush ψ F) := by
+theorem smooth_chartPush
+    [T2Space X]
+    {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} (hψ : IsCompatChart A ψ)
+    {F : (Fin e → ℂ) → ℝ}
+    (hF : ContDiff ℝ ∞ F) (hK : IsCompact (tsupport F)) (hKt : tsupport F ⊆ ψ.target)
+    : A.Smooth (chartPush ψ F) := by
   intro a y hy
   refine ContDiffAt.contDiffWithinAt ?_
   set C := ψ.symm '' tsupport F
@@ -193,9 +219,11 @@ theorem smooth_chartPush [T2Space X] {A : FinHolAtlas e X} {ψ : OpenPartialHome
     simp only [chartPush, Function.comp_apply]
     rw [Set.indicator_of_mem (show (A.chart a).symm y' ∈ ψ.source from hy'.2)]
     rfl
-  · have hnC : (A.chart a).symm y ∉ C := fun h => hs (by
-      obtain ⟨z, hz, hzz⟩ := h
-      rw [← hzz]; exact ψ.map_target (hKt hz))
+  · have hnC : (A.chart a).symm y ∉ C := fun h =>
+      hs (by
+        obtain ⟨z, hz, hzz⟩ := h
+        rw [← hzz]
+        exact ψ.map_target (hKt hz))
     refine (contDiffAt_const (c := (0 : ℝ))).congr_of_eventuallyEq ?_
     have hN : (A.chart a).target ∩ (A.chart a).symm ⁻¹' Cᶜ ∈ 𝓝 y :=
       ((A.chart a).continuousOn_symm.isOpen_inter_preimage (A.chart a).open_target
@@ -203,11 +231,12 @@ theorem smooth_chartPush [T2Space X] {A : FinHolAtlas e X} {ψ : OpenPartialHome
     filter_upwards [hN] with y' hy'
     exact chartPush_eq_zero ψ hy'.2
 
-theorem contDiff_chartExt [T2Space X] [CompactSpace X] {A : FinHolAtlas e X}
-    {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} (hψ : IsCompatChart A ψ) {v : X → ℝ}
-    (hv : A.Smooth v) (hvs : tsupport v ⊆ ψ.source) :
-    ContDiff ℝ ∞ (chartExt ψ v) ∧ IsCompact (ψ '' tsupport v) ∧
-      tsupport (chartExt ψ v) ⊆ ψ '' tsupport v := by
+theorem contDiff_chartExt
+    [T2Space X] [CompactSpace X]
+    {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} (hψ : IsCompatChart A ψ)
+    {v : X → ℝ} (hv : A.Smooth v) (hvs : tsupport v ⊆ ψ.source)
+    : ContDiff ℝ ∞ (chartExt ψ v) ∧ IsCompact (ψ '' tsupport v)
+      ∧ tsupport (chartExt ψ v) ⊆ ψ '' tsupport v := by
   have hK : IsCompact (ψ '' tsupport v) :=
     (isClosed_tsupport v).isCompact.image_of_continuousOn (ψ.continuousOn.mono hvs)
   have hsupp : ∀ y, y ∉ ψ '' tsupport v → chartExt ψ v y = 0 := by
@@ -227,8 +256,7 @@ theorem contDiff_chartExt [T2Space X] [CompactSpace X] {A : FinHolAtlas e X}
     refine (h1.contDiffAt (ψ.open_target.mem_nhds ht)).congr_of_eventuallyEq ?_
     filter_upwards [ψ.open_target.mem_nhds ht] with y' hy'
     simp [chartExt, Set.indicator_of_mem hy']
-  · have hy : y ∉ ψ '' tsupport v := by
-      rintro ⟨p, hp, rfl⟩; exact ht (ψ.map_source (hvs hp))
+  · have hy : y ∉ ψ '' tsupport v := by rintro ⟨p, hp, rfl⟩; exact ht (ψ.map_source (hvs hp))
     refine (contDiffAt_const (c := (0 : ℝ))).congr_of_eventuallyEq ?_
     filter_upwards [hK.isClosed.isOpen_compl.mem_nhds hy] with y' hy'
     exact hsupp y' hy'

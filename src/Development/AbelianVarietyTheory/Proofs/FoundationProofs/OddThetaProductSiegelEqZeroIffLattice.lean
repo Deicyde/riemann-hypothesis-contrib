@@ -78,8 +78,7 @@ lemma fac_iff (τ : ℍ) (w : ℂ) (n : ℕ) :
   push_cast
   rfl
 
-theorem th_eq_zero_iff :
-    ∀ (τ : ℍ) (z : ℂ), th z τ = 0 ↔ ∃ m n : ℤ, z = (m : ℂ) * (τ : ℂ) + n := by
+theorem th_eq_zero_iff : ∀ (τ : ℍ) (z : ℂ), th z τ = 0 ↔ ∃ m n : ℤ, z = (m : ℂ) * (τ : ℂ) + n := by
   intro τ z
   unfold th
   constructor

@@ -10,10 +10,11 @@ open GlobalTheory.UnitLemma Polynomial Module
 
 namespace GlobalTheory.IntClosureSep
 
-theorem isRoot_minpoly_of_isRoot_charpoly {E A L : Type} [Field E] [CommRing A] [Algebra E A]
-    [Module.Finite E A] [Field L] [Algebra E L] (g : A) {α : L}
-    (hα : ((LinearMap.mulLeft E g).charpoly.map (algebraMap E L)).IsRoot α) :
-    ((minpoly E g).map (algebraMap E L)).IsRoot α := by
+theorem isRoot_minpoly_of_isRoot_charpoly
+    {E A L : Type} [Field E] [CommRing A] [Algebra E A] [Module.Finite E A] [Field L] [Algebra E L]
+    (g : A)
+    {α : L} (hα : ((LinearMap.mulLeft E g).charpoly.map (algebraMap E L)).IsRoot α)
+    : ((minpoly E g).map (algebraMap E L)).IsRoot α := by
   classical
   let b := Module.finBasis E A
   set M := Algebra.leftMulMatrix b g with hM
@@ -38,7 +39,12 @@ theorem isRoot_minpoly_of_isRoot_charpoly {E A L : Type} [Field E] [CommRing A] 
   rw [h5, LinearMap.zero_apply] at h4
   exact (smul_eq_zero.mp h4.symm).resolve_right hv.2
 
-theorem integralClosure_fg_of_separable_charpoly : ∀ (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field E] [Algebra O E] [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A] [Module.Finite E A] (g : A), (LinearMap.mulLeft E g).charpoly.Separable → (Subalgebra.toSubmodule (integralClosure O A)).FG := by
+theorem integralClosure_fg_of_separable_charpoly
+    : ∀ (O E A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field E] [Algebra O E]
+        [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A]
+        [Module.Finite E A] (g : A),
+      (LinearMap.mulLeft E g).charpoly.Separable
+        → (Subalgebra.toSubmodule (integralClosure O A)).FG := by
   intro O E A _ _ _ _ _ _ _ _ _ _ _ g hsep
   classical
   rcases subsingleton_or_nontrivial A with hA | hA
@@ -58,11 +64,12 @@ theorem integralClosure_fg_of_separable_charpoly : ∀ (O E A : Type) [CommRing 
     rwa [IsRoot, eval_map_algebraMap] at this
   have hm_ne : m ≠ 0 := minpoly.ne_zero (Algebra.IsIntegral.isIntegral g)
   have hdeg_ge : n ≤ m.natDegree := by
-    have hle : R ≤ (m.map (algebraMap E L)).roots := (Multiset.le_iff_subset hRnodup).mpr
-      fun α hα => by
+    have hle : R ≤ (m.map (algebraMap E L)).roots :=
+      (Multiset.le_iff_subset hRnodup).mpr fun α hα => by
         rw [mem_roots (Polynomial.map_ne_zero hm_ne), IsRoot, eval_map_algebraMap]
         exact hsub α hα
-    calc n = Multiset.card R := hRcard.symm
+    calc
+      n = Multiset.card R := hRcard.symm
       _ ≤ _ := Multiset.card_le_card hle
       _ ≤ (m.map (algebraMap E L)).natDegree := card_roots' _
       _ = m.natDegree := natDegree_map _
@@ -70,24 +77,31 @@ theorem integralClosure_fg_of_separable_charpoly : ∀ (O E A : Type) [CommRing 
     simpa using (linearIndependent_pow (K := E) g).fintype_card_le_finrank
   have hdeg : m.natDegree = n := le_antisymm hdeg_le hdeg_ge
   haveI : Nonempty (Fin m.natDegree) := ⟨⟨0, by rw [hdeg, hn]; exact Module.finrank_pos⟩⟩
-  let pb : PowerBasis E A :=
-    { gen := g, dim := m.natDegree
-      basis := basisOfLinearIndependentOfCardEqFinrank (linearIndependent_pow g) (by simp [hdeg, m, n])
-      basis_eq_pow := fun i => by rw [coe_basisOfLinearIndependentOfCardEqFinrank] }
+  let pb : PowerBasis E A := {
+    gen := g
+    dim := m.natDegree
+    basis :=
+      basisOfLinearIndependentOfCardEqFinrank (linearIndependent_pow g) (by simp [hdeg, m, n])
+    basis_eq_pow := fun i => by rw [coe_basisOfLinearIndependentOfCardEqFinrank]
+  }
   let ι : Type := ↥R.toFinset
   have hcard : Fintype.card ι = n := by
     rw [Fintype.card_coe, Multiset.toFinset_card_of_nodup hRnodup, hRcard]
   let P : ι → (A →ₐ[E] L) := fun α => pb.lift α.1 (hsub α.1 (Multiset.mem_toFinset.mp α.2))
-  have hP : Function.Injective P := fun a b h => Subtype.ext (by
-    have h' : (P a) pb.gen = (P b) pb.gen := congrArg (fun f : A →ₐ[E] L => f pb.gen) h
-    simpa only [P, PowerBasis.lift_gen] using h')
-  let b0 : Basis ι E A := (Module.finBasisOfFinrankEq E A hcard.symm).reindex (Fintype.equivFin ι).symm
+  have hP : Function.Injective P := fun a b h =>
+    Subtype.ext (by
+      have h' : (P a) pb.gen = (P b) pb.gen := congrArg (fun f : A →ₐ[E] L => f pb.gen) h
+      simpa only [P, PowerBasis.lift_gen] using h')
+  let b0 : Basis ι E A :=
+    (Module.finBasisOfFinrankEq E A hcard.symm).reindex (Fintype.equivFin ι).symm
   have hex : ∀ i, ∃ c : nonZeroDivisors O, IsIntegral O ((c : O) • b0 i) := fun i =>
     IsIntegral.exists_multiple_integral_of_isLocalization (nonZeroDivisors O) (b0 i)
       (Algebra.IsIntegral.isIntegral (R := E) (b0 i))
   choose c hc using hex
-  let e : Basis ι E A := b0.isUnitSMul (w := fun i => algebraMap O E (c i))
-    (fun i => (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (c i).2).isUnit)
+  let e : Basis ι E A :=
+    b0.isUnitSMul
+      (w := fun i => algebraMap O E (c i))
+      (fun i => (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (c i).2).isUnit)
   have he : ∀ i, e i = (c i : O) • b0 i := fun i => by
     simp [e, Basis.isUnitSMul_apply, algebraMap_smul]
   have he_int : ∀ i, IsIntegral O (e i) := fun i => (he i) ▸ hc i
@@ -106,8 +120,8 @@ theorem integralClosure_fg_of_separable_charpoly : ∀ (O E A : Type) [CommRing 
       refine IsIntegral.sum _ fun j _ => ?_
       exact hx.map ((P j).restrictScalars O)
     have h2 : IsIntegral O (Algebra.trace E A x) :=
-      (isIntegral_algHom_iff ((Algebra.ofId E L).restrictScalars O)
-        (algebraMap E L).injective).mp h1
+      (isIntegral_algHom_iff ((Algebra.ofId E L).restrictScalars O) (algebraMap E L).injective).mp
+        h1
     exact IsIntegrallyClosed.isIntegral_iff.mp h2
   set d := (Algebra.traceForm E A).dualBasis hnd e
   have hle : Subalgebra.toSubmodule (integralClosure O A) ≤ Submodule.span O (Set.range d) := by

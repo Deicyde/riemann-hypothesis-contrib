@@ -9,7 +9,20 @@ open Polynomial
 
 namespace GlobalTheory.PicDiv
 
-theorem classGroup_nthPower_of_codim_one_mod : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (N : ℕ), 1 ≤ N → (∀ P₀ : Ideal A, P₀.IsMaximal → ∀ h₀ : P₀ ∈ nonZeroDivisors (Ideal A), ∃ a : A, a ≠ 0 ∧ ∀ P : Ideal A, P.IsMaximal → a ∉ P → ∀ h : P ∈ nonZeroDivisors (Ideal A), ∃ d : ClassGroup A, ClassGroup.mk0 ⟨P, h⟩ = ClassGroup.mk0 ⟨P₀, h₀⟩ * d ^ N) → (∃ f : A, f ≠ 0 ∧ Module.finrank k (A ⧸ Ideal.span {f}) % N = 1 % N) → ∀ c : ClassGroup A, ∃ d, c = d ^ N := by
+theorem classGroup_nthPower_of_codim_one_mod
+    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
+        [Algebra.FiniteType k A] (N : ℕ),
+      1 ≤ N
+        → (∀ P₀ : Ideal A,
+          P₀.IsMaximal
+            → ∀ h₀ : P₀ ∈ nonZeroDivisors (Ideal A), ∃ a : A,
+              a ≠ 0
+                ∧ ∀ P : Ideal A,
+                  P.IsMaximal → a ∉ P
+                    → ∀ h : P ∈ nonZeroDivisors (Ideal A), ∃ d : ClassGroup A,
+                      ClassGroup.mk0 ⟨P, h⟩ = ClassGroup.mk0 ⟨P₀, h₀⟩ * d ^ N)
+        → (∃ f : A, f ≠ 0 ∧ Module.finrank k (A ⧸ Ideal.span {f}) % N = 1 % N)
+        → ∀ c : ClassGroup A, ∃ d, c = d ^ N := by
   intro k A _ _ _ _ _ _ N _hN hyp hf c
   obtain ⟨f, hf0, hfm⟩ := hf
   obtain ⟨_hfin, hmax, hadd, _hle⟩ := GlobalTheory.DedekindCodimG.dedekind_finiteType_codim k A
@@ -30,16 +43,13 @@ theorem classGroup_nthPower_of_codim_one_mod : ∀ (k A : Type) [Field k] [IsAlg
   obtain ⟨P₀, hP₀, hP₀ne⟩ := hex
   let H : Subgroup (ClassGroup A) := (powMonoidHom N : ClassGroup A →* ClassGroup A).range
   let π : ClassGroup A →* ClassGroup A ⧸ H := QuotientGroup.mk' H
-  have hπ : ∀ d : ClassGroup A, π (d ^ N) = 1 := fun d =>
-    (QuotientGroup.eq_one_iff _).mpr ⟨d, rfl⟩
+  have hπ : ∀ d : ClassGroup A, π (d ^ N) = 1 := fun d => (QuotientGroup.eq_one_iff _).mpr ⟨d, rfl⟩
   let γ : ClassGroup A := ClassGroup.mk0 ⟨P₀, nz P₀ hP₀ne⟩
-  have hbot : ¬ (⊥ : Ideal A).IsMaximal := fun h =>
-    hP₀ne (h.eq_of_le hP₀.ne_top bot_le).symm
+  have hbot : ¬(⊥ : Ideal A).IsMaximal := fun h => hP₀ne (h.eq_of_le hP₀.ne_top bot_le).symm
   have hjac : ∀ x : A, x ≠ 0 → ∃ Q : Ideal A, Q.IsMaximal ∧ x ∉ Q := by
     intro x hx
     haveI : IsJacobsonRing A := isJacobsonRing_of_finiteType (A := k) (B := A)
-    have hj : (⊥ : Ideal A).jacobson = ⊥ :=
-      IsJacobsonRing.out' _ (Ideal.isPrime_bot).isRadical
+    have hj : (⊥ : Ideal A).jacobson = ⊥ := IsJacobsonRing.out' _ (Ideal.isPrime_bot).isRadical
     by_contra hne
     push_neg at hne
     apply hx
@@ -48,8 +58,9 @@ theorem classGroup_nthPower_of_codim_one_mod : ∀ (k A : Type) [Field k] [IsAlg
       exact Submodule.mem_sInf.mpr fun J hJ => hne J hJ.2
     rw [hj] at this
     exact (Submodule.mem_bot A).mp this
-  have hmaxcls : ∀ (P : Ideal A) (hP : P.IsMaximal) (hPne : P ≠ ⊥),
-      π (ClassGroup.mk0 ⟨P, nz P hPne⟩) = π γ := by
+  have hmaxcls
+      : ∀ (P : Ideal A) (hP : P.IsMaximal) (hPne : P ≠ ⊥),
+        π (ClassGroup.mk0 ⟨P, nz P hPne⟩) = π γ := by
     intro P hP hPne
     obtain ⟨a₀, ha₀, H0⟩ := hyp P₀ hP₀ (nz P₀ hP₀ne)
     obtain ⟨a₁, ha₁, H1⟩ := hyp P hP (nz P hPne)
@@ -61,11 +72,15 @@ theorem classGroup_nthPower_of_codim_one_mod : ∀ (k A : Type) [Field k] [IsAlg
     have h2 := congrArg π he
     rw [map_mul, hπ, mul_one] at h1 h2
     rw [← h2, h1]
-  have hall : ∀ J : Ideal A, ∀ hJ : J ∈ nonZeroDivisors (Ideal A),
-      π (ClassGroup.mk0 ⟨J, hJ⟩) = π γ ^ Module.finrank k (A ⧸ J) := by
+  have hall
+      : ∀ J : Ideal A, ∀ hJ : J ∈ nonZeroDivisors (Ideal A),
+        π (ClassGroup.mk0 ⟨J, hJ⟩) = π γ ^ Module.finrank k (A ⧸ J) := by
     intro J
-    refine UniqueFactorizationMonoid.induction_on_prime (P := fun J : Ideal A => ∀ hJ : J ∈ nonZeroDivisors (Ideal A),
-      π (ClassGroup.mk0 ⟨J, hJ⟩) = π γ ^ Module.finrank k (A ⧸ J)) J ?_ ?_ ?_
+    refine UniqueFactorizationMonoid.induction_on_prime
+      (P := fun J : Ideal A =>
+        ∀ hJ : J ∈ nonZeroDivisors (Ideal A),
+          π (ClassGroup.mk0 ⟨J, hJ⟩) = π γ ^ Module.finrank k (A ⧸ J))
+      J ?_ ?_ ?_
     · intro h; exact absurd rfl (nonZeroDivisors.ne_zero h)
     · intro x hx h
       have hx' : x = ⊤ := Ideal.isUnit_iff.mp hx
@@ -80,14 +95,15 @@ theorem classGroup_nthPower_of_codim_one_mod : ∀ (k A : Type) [Field k] [IsAlg
       rw [e1, map_mul, map_mul, hmaxcls p hpmax hpne, ih (nz a ha), hadd p a hpne ha,
         (hmax p hpmax).1, pow_add, pow_one]
   have hγN : π γ ^ N = 1 := by rw [← map_pow]; exact hπ γ
-  have hspan : Ideal.span {f} ≠ ⊥ := by
-    simpa [Ideal.span_singleton_eq_bot] using hf0
+  have hspan : Ideal.span {f} ≠ ⊥ := by simpa [Ideal.span_singleton_eq_bot] using hf0
   have hγ1 : π γ = 1 := by
     have e := hall _ (nz _ hspan)
     have e0 : ClassGroup.mk0 (⟨Ideal.span {f}, nz _ hspan⟩ : nonZeroDivisors (Ideal A)) = 1 :=
       (ClassGroup.mk0_eq_one_iff _).mpr ⟨⟨f, rfl⟩⟩
     rw [e0, map_one] at e
-    calc π γ = π γ ^ (1 % N) := by rw [← pow_eq_pow_mod 1 hγN, pow_one]
+    calc
+      π γ
+        = π γ ^ (1 % N) := by rw [← pow_eq_pow_mod 1 hγN, pow_one]
       _ = π γ ^ (Module.finrank k (A ⧸ Ideal.span {f}) % N) := by rw [hfm]
       _ = 1 := by rw [← pow_eq_pow_mod _ hγN, ← e]
   have hc := hall I.1 I.2

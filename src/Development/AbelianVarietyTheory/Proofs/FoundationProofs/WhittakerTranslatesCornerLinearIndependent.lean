@@ -86,13 +86,19 @@ def colElt (n : Fin N) (w : Fin N → ZMod g) (hw : w n = 0) : GG g N where
   val := 1 + Matrix.vecMulVec w (Pi.single n 1)
   inv := 1 - Matrix.vecMulVec w (Pi.single n 1)
   val_inv := by
-    have : Matrix.vecMulVec w (Pi.single n (1 : ZMod g)) * Matrix.vecMulVec w (Pi.single n (1 : ZMod g)) = 0 := by
+    have : Matrix.vecMulVec w (Pi.single n (1 : ZMod g))
+          * Matrix.vecMulVec w (Pi.single n (1 : ZMod g))
+        = 0 := by
       rw [Matrix.vecMulVec_mul_vecMulVec]; simp [hw]
-    rw [add_mul, mul_sub, mul_sub, this]; simp
+    rw [add_mul, mul_sub, mul_sub, this]
+    simp
   inv_val := by
-    have : Matrix.vecMulVec w (Pi.single n (1 : ZMod g)) * Matrix.vecMulVec w (Pi.single n (1 : ZMod g)) = 0 := by
+    have : Matrix.vecMulVec w (Pi.single n (1 : ZMod g))
+          * Matrix.vecMulVec w (Pi.single n (1 : ZMod g))
+        = 0 := by
       rw [Matrix.vecMulVec_mul_vecMulVec]; simp [hw]
-    rw [sub_mul, mul_add, mul_add, this]; simp
+    rw [sub_mul, mul_add, mul_add, this]
+    simp
 
 lemma conj_colElt (n : Fin N) (w : Fin N → ZMod g) (hw : w n = 0) (h : GG g N) (a b : Fin N) :
     (h⁻¹ * colElt n w hw * h).val a b =
@@ -275,7 +281,26 @@ lemma sum_up {M : Type} [AddCommGroup M] [Module ℂ M] (ρ : Representation ℂ
     · exact absurd (fun c _ => ⟨a.1 c, fun b hb => a.2 c b hb⟩) b
     · rfl
 
-theorem translates_independent : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ (M : Type) [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] (ρ : Representation ℂ (GG g N) M), ∀ (L : Lev g N), L.sharp = false → ∀ (x : M), x ≠ 0 → (∀ u, IsUp g N u → ρ u x = L.chi u • x) → ∀ k : ℕ, k < N → ∀ φ : GG g N → ℂ, (∀ h, φ h ≠ 0 → (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (h : GG g N).val a b = if a = b then 1 else 0)) → ∑ h, φ h • ρ h x = 0 → ∀ h₀ : GG g N, ∑ u ∈ Finset.univ.filter (fun u : GG g N => IsUp g N u ∧ (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u : GG g N).val a b = if a = b then 1 else 0)), φ (h₀ * u) * L.chi u = 0 := by
+theorem translates_independent
+    : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ),
+      ∀ (M : Type) [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M]
+          (ρ : Representation ℂ (GG g N) M),
+        ∀ (L : Lev g N),
+          L.sharp = false
+            → ∀ (x : M),
+              x ≠ 0 → (∀ u, IsUp g N u → ρ u x = L.chi u • x)
+                → ∀ k : ℕ,
+                  k < N
+                    → ∀ φ : GG g N → ℂ,
+                      (∀ h,
+                          φ h ≠ 0
+                            → (∀ a b : Fin N,
+                              (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ))
+                                → (h : GG g N).val a b = if a = b then 1 else 0))
+                        → ∑ h, φ h • ρ h x = 0
+                        → ∀ h₀ : GG g N,
+                          ∑ u ∈ Finset.univ.filter (fun u : GG g N => IsUp g N u ∧ (∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → (u : GG g N).val a b = if a = b then 1 else 0)), φ (h₀ * u) * L.chi u
+                            = 0 := by
   intro g _ N M _ _ _ ρ L hL x hx0 hx k hk φ hφ hs h₀
   have hφ' : ∀ h, φ h ≠ 0 → Corner k h := hφ
   by_cases h0 : Corner k h₀
@@ -296,7 +321,8 @@ theorem translates_independent : ∀ (g : ℕ) [Fact g.Prime] (N : ℕ), ∀ (M 
     refine Eq.trans (Finset.sum_congr rfl fun u _ => ?_) this
     by_cases e : φ (h₀ * u) = 0
     · simp [e]
-    have hu : ∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → u.val a b = if a = b then 1 else 0 := hc u e
+    have hu : ∀ a b : Fin N, (k ≤ (a : ℕ) ∨ k ≤ (b : ℕ)) → u.val a b = if a = b then 1 else 0 :=
+      hc u e
     by_cases e' : IsUp g N u
     · rw [if_pos ⟨e', hu⟩, if_pos e']
     · rw [if_neg (fun h => e' h.1), if_neg e']

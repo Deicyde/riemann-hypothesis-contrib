@@ -13,16 +13,20 @@ namespace GlobalTheory
 
 section Analytic
 
-variable {V W : Type*} [NormedAddCommGroup V] [NormedAddCommGroup W] {A : Type*} [AddCommGroup A]
+variable
+  {V W : Type*} [NormedAddCommGroup V] [NormedAddCommGroup W]
+  {A : Type*} [AddCommGroup A]
   {ι : Type*} {Y : Type*} [TopologicalSpace Y] [T2Space Y]
 
-theorem tendsto_map_nhds_of_separating [CompleteSpace V] [ProperSpace W] {ex : W →+ A}
-    (hex : Function.Surjective ex) {G : V →+ A} {S : Set A} (h0 : (0 : A) ∈ S) {f : ι → A → Y}
-    (hsep : ∀ a ∈ S, ∀ b ∈ S, (∀ i, f i a = f i b) → a = b)
+theorem tendsto_map_nhds_of_separating
+    [CompleteSpace V] [ProperSpace W]
+    {ex : W →+ A} (hex : Function.Surjective ex)
+    {G : V →+ A} {S : Set A} (h0 : (0 : A) ∈ S)
+    {f : ι → A → Y} (hsep : ∀ a ∈ S, ∀ b ∈ S, (∀ i, f i a = f i b) → a = b)
     (hSe : IsOpen (ex ⁻¹' S)) (hSG : IsOpen (G ⁻¹' S))
     (hfe : ∀ i, ContinuousOn (fun w ↦ f i (ex w)) (ex ⁻¹' S))
-    (hfG : ∀ i, ContinuousOn (fun z ↦ f i (G z)) (G ⁻¹' S)) :
-    ∀ N ∈ 𝓝 (0 : W), ∀ᶠ z in 𝓝 (0 : V), G z ∈ ex '' N := by
+    (hfG : ∀ i, ContinuousOn (fun z ↦ f i (G z)) (G ⁻¹' S))
+    : ∀ N ∈ 𝓝 (0 : W), ∀ᶠ z in 𝓝 (0 : V), G z ∈ ex '' N := by
   intro N hN
   have hN' : N ∩ ex ⁻¹' S ∈ 𝓝 (0 : W) := inter_mem hN (hSe.mem_nhds (by simpa using h0))
   obtain ⟨R, hR, hRN⟩ := nhds_basis_closedBall.mem_iff.1 hN'
@@ -42,8 +46,7 @@ theorem tendsto_map_nhds_of_separating [CompleteSpace V] [ProperSpace W] {ex : W
     obtain ⟨w₀, hw₀, φ, hφ, hlim⟩ := (isCompact_closedBall (0 : W) (2 * r)).tendsto_subseq hw
     refine ⟨w₀, hw₀, hsep _ (hKS hw₀) _ hzS fun i ↦ ?_⟩
     have h1 := (((hfe i).continuousAt (hSe.mem_nhds (hKS hw₀))).tendsto).comp hlim
-    have h2 := (((hfG i).continuousAt (hSG.mem_nhds hzS)).tendsto).comp
-      (hxz.comp hφ.tendsto_atTop)
+    have h2 := (((hfG i).continuousAt (hSG.mem_nhds hzS)).tendsto).comp (hxz.comp hφ.tendsto_atTop)
     refine tendsto_nhds_unique h1 (h2.congr fun n ↦ ?_)
     simp [hwx]
   obtain ⟨c, hc⟩ := TopologicalSpace.exists_dense_seq W
@@ -54,8 +57,7 @@ theorem tendsto_map_nhds_of_separating [CompleteSpace V] [ProperSpace W] {ex : W
     obtain ⟨j, hj⟩ := hc.exists_dist_lt w hr0
     exact mem_iUnion.2 ⟨j, subset_closure ⟨w, hj, hw⟩⟩
   obtain ⟨j, y, hy⟩ := nonempty_interior_of_iUnion_of_closed (fun _ ↦ isClosed_closure) hB
-  obtain ⟨z₀, hz₀i, w₀, hw₀, hz₀⟩ :=
-    mem_closure_iff.1 (interior_subset hy) _ isOpen_interior hy
+  obtain ⟨z₀, hz₀i, w₀, hw₀, hz₀⟩ := mem_closure_iff.1 (interior_subset hy) _ isOpen_interior hy
   have hBT : ∀ z ∈ B j, z - z₀ ∈ T := by
     rintro z ⟨w, hw, h⟩
     refine ⟨w - w₀, ?_, by simp [h, hz₀]⟩
@@ -68,25 +70,26 @@ theorem tendsto_map_nhds_of_separating [CompleteSpace V] [ProperSpace W] {ex : W
       simpa using (continuous_add_const z₀).tendsto 0
     exact this (mem_interior_iff_mem_nhds.1 hz₀i)
   filter_upwards [h1, hSG.mem_nhds (show (0 : V) ∈ G ⁻¹' S by simpa using h0)] with z hz hzS
-  have hzT : z ∈ closure T := by
-    simpa using map_mem_closure (continuous_sub_right z₀) hz hBT
+  have hzT : z ∈ closure T := by simpa using map_mem_closure (continuous_sub_right z₀) hz hBT
   obtain ⟨w, hw, h⟩ := hcl ⟨hzT, hzS⟩
   exact ⟨w, (hRN (closedBall_subset_closedBall (by linarith) hw)).1, h⟩
 
-theorem existsUnique_linear_lift_of_separating [NormedSpace ℂ V] [NormedSpace ℂ W]
-    [FiniteDimensional ℂ V] [FiniteDimensional ℂ W] {ex : W →+ A}
-    (hex : Function.Surjective ex) (hker : IsDiscrete (ex.ker : Set W))
-    {G : V →+ A} {S : Set A} (h0 : (0 : A) ∈ S) {f : ι → A → ℂ}
-    (hsep : ∀ a ∈ S, ∀ b ∈ S, (∀ i, f i a = f i b) → a = b)
+theorem existsUnique_linear_lift_of_separating
+    [NormedSpace ℂ V] [NormedSpace ℂ W] [FiniteDimensional ℂ V] [FiniteDimensional ℂ W]
+    {ex : W →+ A} (hex : Function.Surjective ex) (hker : IsDiscrete (ex.ker : Set W))
+    {G : V →+ A} {S : Set A} (h0 : (0 : A) ∈ S)
+    {f : ι → A → ℂ} (hsep : ∀ a ∈ S, ∀ b ∈ S, (∀ i, f i a = f i b) → a = b)
     (hSe : IsOpen (ex ⁻¹' S)) (hSG : IsOpen (G ⁻¹' S))
     (hfe : ∀ i, DifferentiableOn ℂ (fun w ↦ f i (ex w)) (ex ⁻¹' S))
     (hfG : ∀ i, DifferentiableOn ℂ (fun z ↦ f i (G z)) (G ⁻¹' S))
-    (hD : ∀ w, (∀ i, fderiv ℂ (fun w ↦ f i (ex w)) 0 w = 0) → w = 0) :
-    ∃! F : V →ₗ[ℂ] W, ∀ z, ex (F z) = G z := by
+    (hD : ∀ w, (∀ i, fderiv ℂ (fun w ↦ f i (ex w)) 0 w = 0) → w = 0)
+    : ∃! F : V →ₗ[ℂ] W, ∀ z, ex (F z) = G z := by
   have : CompleteSpace V := FiniteDimensional.complete ℂ V
   have : ProperSpace W := FiniteDimensional.proper ℂ W
-  have ht := tendsto_map_nhds_of_separating hex h0 hsep hSe hSG
-    (fun i ↦ (hfe i).continuousOn) (fun i ↦ (hfG i).continuousOn)
+  have ht :=
+    tendsto_map_nhds_of_separating hex h0 hsep hSe hSG
+      (fun i ↦ (hfe i).continuousOn)
+      (fun i ↦ (hfG i).continuousOn)
   have ht' : Tendsto G (𝓝 0) (map ex (𝓝 0)) := fun s hs ↦
     (ht _ hs).mono fun z hz ↦ image_preimage_subset _ _ hz
   obtain ⟨U, hU, hU0⟩ := isDiscrete_iff_forall_mem_exists_isOpen.1 hker 0 ex.ker.zero_mem
@@ -101,8 +104,9 @@ theorem existsUnique_linear_lift_of_separating [NormedSpace ℂ V] [NormedSpace 
     have h1 : Tendsto (Function.invFunOn ex N) (map ex (𝓝 0)) (𝓝 0) :=
       tendsto_map'_iff.2 (tendsto_id.congr' (hs.mono fun z hz ↦ hz.symm))
     exact h1.comp ht'
-  obtain ⟨L, hL, hu⟩ := existsUnique_realLinear_lift_of_germ (ex := G) hker hc
-    ((ht N hN).mono fun z hz ↦ Function.invFunOn_eq hz)
+  obtain ⟨L, hL, hu⟩ :=
+    existsUnique_realLinear_lift_of_germ (ex := G) hker hc
+      ((ht N hN).mono fun z hz ↦ Function.invFunOn_eq hz)
   have hI : ∀ (c : ℂ) z, L (c • z) = c • L z := by
     intro c z
     refine sub_eq_zero.1 (hD _ fun i ↦ ?_)
@@ -122,25 +126,28 @@ theorem existsUnique_linear_lift_of_separating [NormedSpace ℂ V] [NormedSpace 
       fun z ↦ DFunLike.congr_fun h6 z
     rw [map_sub, h7, map_smul, map_smul, h7, sub_self]
   refine ⟨⟨⟨L, L.map_add⟩, hI⟩, hL, fun F hF ↦ ?_⟩
-  have := realLinear_eq_of_sub_mem_discrete hker (L := F.restrictScalars ℝ) (L' := L.toLinearMap)
-    fun x ↦ by simp [AddMonoidHom.mem_ker, hF, hL]
+  have :=
+    realLinear_eq_of_sub_mem_discrete hker (L := F.restrictScalars ℝ) (L' := L.toLinearMap) fun x ↦
+      by simp [AddMonoidHom.mem_ker, hF, hL]
   ext z
   exact DFunLike.congr_fun this z
 
 end Analytic
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 open TangentOrigin in
-theorem existsUnique_linear_lift_of_isHolTo :
-    ∀ (A : Over (Sp ℂ)) [GrpObj A], IsAbelianScheme A → ∀ (L : LB A.left) (g m : ℕ)
-      (u : HolUnif A L g), (∀ v, IsTangent v → ∃! w, u.IsDiff w v) →
-      (∀ w, ∃! v, IsTangent v ∧ u.IsDiff w v) →
-      ∀ G : (Fin m → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ A), (∀ z w, G (z + w) = G z * G w) →
-      IsHolTo (Set.univ : Set (Fin m → ℂ)) (fun z => (G z).left) →
-      ∃! F : (Fin m → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ z, u.ex (F z) = G z := by
+theorem existsUnique_linear_lift_of_isHolTo
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (L : LB A.left) (g m : ℕ) (u : HolUnif A L g),
+          (∀ v, IsTangent v → ∃! w, u.IsDiff w v) → (∀ w, ∃! v, IsTangent v ∧ u.IsDiff w v)
+            → ∀ G : (Fin m → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ A),
+              (∀ z w, G (z + w) = G z * G w)
+                → IsHolTo (Set.univ : Set (Fin m → ℂ)) (fun z => (G z).left)
+                → ∃! F : (Fin m → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ z, u.ex (F z) = G z := by
   intro A _ _ L g m u h₁ h₂ G hG hhol
   letI : CommGroup (𝟙_ (Over (Sp ℂ)) ⟶ A) :=
     { (inferInstance : Group (𝟙_ (Over (Sp ℂ)) ⟶ A)) with
@@ -155,8 +162,8 @@ theorem existsUnique_linear_lift_of_isHolTo :
   let pt : (𝟙_ (Over (Sp ℂ))).left := (default : PrimeSpectrum ℂ)
   have hsub : ∀ q : (𝟙_ (Over (Sp ℂ))).left, q = pt := fun q ↦
     Subsingleton.elim (α := PrimeSpectrum ℂ) q pt
-  obtain ⟨U, hU, hpU, -⟩ := exists_isAffineOpen_mem_and_subset (x := (u.ex 0).left pt) (U := ⊤)
-    (Set.mem_univ _)
+  obtain ⟨U, hU, hpU, -⟩ :=
+    exists_isAffineOpen_mem_and_subset (x := (u.ex 0).left pt) (U := ⊤) (Set.mem_univ _)
   have h0 : ⊤ ≤ (u.ex 0).left ⁻¹ᵁ U := by
     intro q _
     rw [hsub q]
@@ -166,7 +173,9 @@ theorem existsUnique_linear_lift_of_isHolTo :
     (hker ▸ isDiscrete_iff_discreteTopology.2 u.discrete)
     (S := {a | ⊤ ≤ (Additive.toMul a).left ⁻¹ᵁ U})
     (f := fun (s : Γ(A.left, U)) a ↦ valAt' (Additive.toMul a).left U s)
-    ?_ ?_ (u.hol U 0).1 ?_ (fun s ↦ (u.hol U s).2) ?_ ?_
+    ?_ ?_ (u.hol U 0).1 ?_
+    (fun s ↦ (u.hol U s).2)
+    ?_ ?_
   · rw [← map_zero ex]
     exact h0
   · intro a ha b hb h

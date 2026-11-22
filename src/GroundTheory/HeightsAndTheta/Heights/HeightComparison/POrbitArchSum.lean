@@ -15,12 +15,15 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G
 
 variable {ι : Type} [Fintype ι] {n : ι → ℕ}
 
-theorem eval_smul_of_isMultiHomog (s : MvPolynomial (Coord n) ℤ) (a : ι → ℕ)
-    (hs : Geo.IsMultiHomog (ι := blockIdx n) s a) (c : ι → ℂ) (z : Coord n → ℂ) :
-    eval (fun p ↦ c p.1 * z p) (map (Int.castRingHom ℂ) s) =
-      (∏ k, c k ^ a k) * eval z (map (Int.castRingHom ℂ) s) := by
-  have key : ∀ f : MvPolynomial (Coord n) ℤ,
-      eval c (Geo.mConeMap (ι := blockIdx n) z f) = eval (fun p ↦ c p.1 * z p) (map (Int.castRingHom ℂ) f) := by
+theorem eval_smul_of_isMultiHomog
+    (s : MvPolynomial (Coord n) ℤ) (a : ι → ℕ) (hs : Geo.IsMultiHomog (ι := blockIdx n) s a)
+    (c : ι → ℂ) (z : Coord n → ℂ)
+    : eval (fun p ↦ c p.1 * z p) (map (Int.castRingHom ℂ) s)
+      = (∏ k, c k ^ a k) * eval z (map (Int.castRingHom ℂ) s) := by
+  have key
+      : ∀ f : MvPolynomial (Coord n) ℤ,
+        eval c (Geo.mConeMap (ι := blockIdx n) z f)
+          = eval (fun p ↦ c p.1 * z p) (map (Int.castRingHom ℂ) f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C r => simp [Geo.mConeMap]

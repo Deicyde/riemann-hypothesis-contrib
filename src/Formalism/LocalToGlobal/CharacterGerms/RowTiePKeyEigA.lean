@@ -25,24 +25,26 @@ def MT (V : VF C) (A : ℕ → Matrix (Fin n) (Fin n) C) (B : Matrix (Fin n) (Fi
 
 def IntM (V : VF C) (A : Matrix (Fin n) (Fin n) C) : Prop := ∀ i j, V.Ge 0 (A i j)
 
-private theorem tends_const' (x : C) : Tends V (fun _ => x) x := fun w => ⟨0, fun n _ => by
-  show ((w : ℝ) : WithTop ℝ) ≤ V.v (x - x)
-  rw [sub_self, AddValuation.map_zero]
-  exact le_top⟩
+private theorem tends_const' (x : C) : Tends V (fun _ => x) x := fun w => ⟨
+  0,
+  fun n _ => by
+    show ((w : ℝ) : WithTop ℝ) ≤ V.v (x - x)
+    rw [sub_self, AddValuation.map_zero]
+    exact le_top
+⟩
 
-theorem MT.const (B : Matrix (Fin n) (Fin n) C) : MT V (fun _ => B) B :=
-  fun i j => tends_const' _
+theorem MT.const (B : Matrix (Fin n) (Fin n) C) : MT V (fun _ => B) B := fun i j => tends_const' _
 
 variable {A A' : ℕ → Matrix (Fin n) (Fin n) C} {B B' : Matrix (Fin n) (Fin n) C}
 
-theorem MT.add (h : MT V A B) (h' : MT V A' B') : MT V (fun k => A k + A' k) (B + B') :=
-  fun i j => (h i j).add (h' i j)
+theorem MT.add (h : MT V A B) (h' : MT V A' B') : MT V (fun k => A k + A' k) (B + B') := fun i j =>
+  (h i j).add (h' i j)
 
-theorem MT.sub (h : MT V A B) (h' : MT V A' B') : MT V (fun k => A k - A' k) (B - B') :=
-  fun i j => (h i j).sub (h' i j)
+theorem MT.sub (h : MT V A B) (h' : MT V A' B') : MT V (fun k => A k - A' k) (B - B') := fun i j =>
+  (h i j).sub (h' i j)
 
-theorem MT.smul (c : C) (h : MT V A B) : MT V (fun k => c • A k) (c • B) :=
-  fun i j => (tends_const' c).mul (h i j)
+theorem MT.smul (c : C) (h : MT V A B) : MT V (fun k => c • A k) (c • B) := fun i j =>
+  (tends_const' c).mul (h i j)
 
 theorem MT.mul (h : MT V A B) (h' : MT V A' B') : MT V (fun k => A k * A' k) (B * B') := by
   intro i j
@@ -57,10 +59,11 @@ theorem MT.pow (h : MT V A B) (m : ℕ) : MT V (fun k => A k ^ m) (B ^ m) := by
 theorem MT.unique (h : MT V A B) (h' : MT V A B') : B = B' :=
   Matrix.ext fun i j => (h i j).unique (h' i j)
 
-theorem IntM.of_MT (h : MT V A B) (hA : ∀ k, IntM V (A k)) : IntM V B :=
-  fun i j => (h i j).ge0 (fun k => hA k i j)
+theorem IntM.of_MT (h : MT V A B) (hA : ∀ k, IntM V (A k)) : IntM V B := fun i j =>
+  (h i j).ge0 (fun k => hA k i j)
 
-theorem IntM.mul {X Y : Matrix (Fin n) (Fin n) C} (hX : IntM V X) (hY : IntM V Y) : IntM V (X * Y) := by
+theorem IntM.mul {X Y : Matrix (Fin n) (Fin n) C} (hX : IntM V X) (hY : IntM V Y)
+    : IntM V (X * Y) := by
   intro i j
   show ((0 : ℝ) : WithTop ℝ) ≤ V.v (∑ l, X i l * Y l j)
   apply AddValuation.map_le_sum
@@ -89,8 +92,7 @@ theorem hPT : MT V (fun k => K.ρ (K.ε ^ V.l ^ k)) K.P := by
   show (w : WithTop ℝ) ≤ _
   exact le_trans (WithTop.coe_le_coe.mpr (Nat.le_ceil w)) h
 
-theorem ρ_comm (x y : O) : K.ρ x * K.ρ y = K.ρ y * K.ρ x := by
-  rw [← map_mul, mul_comm, map_mul]
+theorem ρ_comm (x y : O) : K.ρ x * K.ρ y = K.ρ y * K.ρ x := by rw [← map_mul, mul_comm, map_mul]
 
 theorem P_comm (x : O) : K.P * K.ρ x = K.ρ x * K.P := by
   have e : (fun k => K.ρ (K.ε ^ V.l ^ k) * K.ρ x) = fun k => K.ρ x * K.ρ (K.ε ^ V.l ^ k) :=
@@ -102,24 +104,27 @@ theorem P_comm (x : O) : K.P * K.ρ x = K.ρ x * K.P := by
 theorem ρ_natmul (m : ℕ) (y : O) : K.ρ ((m : O) * y) = (m : C) • K.ρ y := by
   rw [map_mul, map_natCast, ← nsmul_eq_mul, Nat.cast_smul_eq_nsmul]
 
-theorem P_int : IntM V K.P :=
-  IntM.of_MT (hPT K) (fun k i j => K.ρ_int _ i j)
+theorem P_int : IntM V K.P := IntM.of_MT (hPT K) (fun k i j => K.ρ_int _ i j)
 
 theorem P_idem : K.P * K.P = K.P := by
   obtain ⟨y, hy⟩ := K.ε_idem
   have hd : ((V.l : ℕ) : O) ∣ K.ε ^ 2 - K.ε := ⟨y, by rw [pow_two]; exact hy⟩
-  have hk : ∀ k : ℕ, ∃ z : O,
-      (K.ε ^ 2) ^ V.l ^ k - K.ε ^ V.l ^ k = ((V.l ^ (k + 1) : ℕ) : O) * z := by
+  have hk
+      : ∀ k : ℕ, ∃ z : O, (K.ε ^ 2) ^ V.l ^ k - K.ε ^ V.l ^ k = ((V.l ^ (k + 1) : ℕ) : O) * z := by
     intro k
     obtain ⟨z, hz⟩ := dvd_sub_pow_of_dvd_sub hd k
     exact ⟨z, by rw [hz, Nat.cast_pow]⟩
   choose z hz using hk
-  have e : ∀ k, K.ρ (K.ε ^ V.l ^ k) * K.ρ (K.ε ^ V.l ^ k) - K.ρ (K.ε ^ V.l ^ k) =
-      ((V.l ^ (k + 1) : ℕ) : C) • K.ρ (z k) := by
+  have e
+      : ∀ k,
+        K.ρ (K.ε ^ V.l ^ k) * K.ρ (K.ε ^ V.l ^ k) - K.ρ (K.ε ^ V.l ^ k)
+          = ((V.l ^ (k + 1) : ℕ) : C) • K.ρ (z k) := by
     intro k
     rw [← ρ_natmul K, ← hz k, map_sub, pow_right_comm, pow_two, map_mul]
-  have h1 : MT V (fun k => K.ρ (K.ε ^ V.l ^ k) * K.ρ (K.ε ^ V.l ^ k) - K.ρ (K.ε ^ V.l ^ k))
-      (K.P * K.P - K.P) := ((hPT K).mul (hPT K)).sub (hPT K)
+  have h1 : MT V
+      (fun k => K.ρ (K.ε ^ V.l ^ k) * K.ρ (K.ε ^ V.l ^ k) - K.ρ (K.ε ^ V.l ^ k))
+      (K.P * K.P - K.P) :=
+    ((hPT K).mul (hPT K)).sub (hPT K)
   have h0 : MT V (fun k => K.ρ (K.ε ^ V.l ^ k) * K.ρ (K.ε ^ V.l ^ k) - K.ρ (K.ε ^ V.l ^ k)) 0 := by
     intro i j w
     refine ⟨⌈w⌉₊, fun k hk => ?_⟩
@@ -135,7 +140,9 @@ theorem P_idem : K.P * K.P = K.P := by
     have h4r : w ≤ ((k + 1 : ℕ) : ℝ) :=
       (Nat.le_ceil w).trans (by exact_mod_cast (by omega : ⌈w⌉₊ ≤ k + 1))
     have h4 : (w : WithTop ℝ) ≤ (((k + 1 : ℕ) : ℝ) : WithTop ℝ) := WithTop.coe_le_coe.mpr h4r
-    calc (w : WithTop ℝ) ≤ (((k + 1 : ℕ) : ℝ) : WithTop ℝ) := h4
+    calc
+      (w : WithTop ℝ)
+        ≤ (((k + 1 : ℕ) : ℝ) : WithTop ℝ) := h4
       _ = (((k + 1 : ℕ) : ℝ) : WithTop ℝ) + ((0 : ℝ) : WithTop ℝ) := by
         rw [WithTop.coe_zero, add_zero]
       _ ≤ _ := add_le_add h2 h3
@@ -152,10 +159,10 @@ theorem S_pow (x : O) (m : ℕ) : (K.P * K.ρ x) ^ (m + 1) = K.P * K.ρ (x ^ (m 
 
 def Acl : Set (Matrix (Fin n) (Fin n) C) := {B | ∃ s : ℕ → O, MT V (fun k => K.P * K.ρ (s k)) B}
 
-theorem S_mem (x : O) : K.P * K.ρ x ∈ Acl K :=
-  ⟨fun _ => x, MT.const _⟩
+theorem S_mem (x : O) : K.P * K.ρ x ∈ Acl K := ⟨fun _ => x, MT.const _⟩
 
-theorem add_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K) : B + B' ∈ Acl K := by
+theorem add_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K)
+    : B + B' ∈ Acl K := by
   obtain ⟨s, hs⟩ := hB
   obtain ⟨s', hs'⟩ := hB'
   refine ⟨fun k => s k + s' k, ?_⟩
@@ -163,10 +170,12 @@ theorem add_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' �
 
 theorem neg_mem {B : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) : -B ∈ Acl K := by
   obtain ⟨s, hs⟩ := hB
-  refine ⟨fun k => -s k, ?_⟩
-  simpa only [map_neg, Matrix.mul_neg, zero_sub] using (MT.const (V := V) (0 : Matrix (Fin n) (Fin n) C)).sub hs
+  refine ⟨fun k => - s k, ?_⟩
+  simpa only [map_neg, Matrix.mul_neg, zero_sub] using
+    (MT.const (V := V) (0 : Matrix (Fin n) (Fin n) C)).sub hs
 
-theorem mul_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K) : B * B' ∈ Acl K := by
+theorem mul_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K)
+    : B * B' ∈ Acl K := by
   obtain ⟨s, hs⟩ := hB
   obtain ⟨s', hs'⟩ := hB'
   refine ⟨fun k => s k * s' k, ?_⟩
@@ -176,11 +185,13 @@ theorem P_mem : K.P ∈ Acl K := by
   refine ⟨fun _ => 1, ?_⟩
   simpa only [map_one, Matrix.mul_one] using MT.const (V := V) K.P
 
-theorem comm_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K) : B * B' = B' * B := by
+theorem comm_mem {B B' : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) (hB' : B' ∈ Acl K)
+    : B * B' = B' * B := by
   obtain ⟨s, hs⟩ := hB
   obtain ⟨s', hs'⟩ := hB'
-  have e : (fun k => K.P * K.ρ (s k) * (K.P * K.ρ (s' k))) =
-      fun k => K.P * K.ρ (s' k) * (K.P * K.ρ (s k)) := by
+  have e
+      : (fun k => K.P * K.ρ (s k) * (K.P * K.ρ (s' k)))
+        = fun k => K.P * K.ρ (s' k) * (K.P * K.ρ (s k)) := by
     funext k
     rw [S_mul, S_mul, mul_comm (s k)]
   have h1 : MT V (fun k => K.P * K.ρ (s k) * (K.P * K.ρ (s' k))) (B * B') := hs.mul hs'
@@ -191,13 +202,15 @@ theorem int_mem {B : Matrix (Fin n) (Fin n) C} (hB : B ∈ Acl K) : IntM V B := 
   obtain ⟨s, hs⟩ := hB
   exact IntM.of_MT hs (fun k => IntM.mul (P_int K) (fun i j => K.ρ_int _ i j))
 
-theorem closed_mem {A : ℕ → Matrix (Fin n) (Fin n) C} {B : Matrix (Fin n) (Fin n) C} (hA : ∀ k, A k ∈ Acl K)
-    (h : MT V A B) : B ∈ Acl K := by
+theorem closed_mem
+    {A : ℕ → Matrix (Fin n) (Fin n) C} {B : Matrix (Fin n) (Fin n) C}
+    (hA : ∀ k, A k ∈ Acl K) (h : MT V A B)
+    : B ∈ Acl K := by
   have hA' : ∀ k : ℕ, ∃ m : O, ∀ i j, V.Ge k (A k i j - (K.P * K.ρ m) i j) := by
     intro k
     obtain ⟨s, hs⟩ := hA k
-    have hN : ∀ i j, ∃ n0 : ℕ, ∀ m ≥ n0, V.Ge k (A k i j - (K.P * K.ρ (s m)) i j) :=
-      fun i j => hs i j k
+    have hN : ∀ i j, ∃ n0 : ℕ, ∀ m ≥ n0, V.Ge k (A k i j - (K.P * K.ρ (s m)) i j) := fun i j =>
+      hs i j k
     choose N hN using hN
     refine ⟨s (Finset.univ.sup fun p : Fin n × Fin n => N p.1 p.2), fun i j => hN i j _ ?_⟩
     exact Finset.le_sup (f := fun p : Fin n × Fin n => N p.1 p.2) (Finset.mem_univ (i, j))
@@ -208,11 +221,12 @@ theorem closed_mem {A : ℕ → Matrix (Fin n) (Fin n) C} {B : Matrix (Fin n) (F
   have h1 : V.Ge w (B i j - A k i j) := hn0 k (le_of_max_le_left hk)
   have h2 : V.Ge k (A k i j - (K.P * K.ρ (t k)) i j) := ht k i j
   have h2' : (w : WithTop ℝ) ≤ V.v (A k i j - (K.P * K.ρ (t k)) i j) :=
-    le_trans (WithTop.coe_le_coe.mpr
-      ((Nat.le_ceil w).trans (by exact_mod_cast le_of_max_le_right hk))) h2
+    le_trans
+      (WithTop.coe_le_coe.mpr ((Nat.le_ceil w).trans (by exact_mod_cast le_of_max_le_right hk))) h2
   show (w : WithTop ℝ) ≤ V.v (B i j - (K.P * K.ρ (t k)) i j)
-  have e : B i j - (K.P * K.ρ (t k)) i j =
-      (B i j - A k i j) + (A k i j - (K.P * K.ρ (t k)) i j) := by ring
+  have e
+      : B i j - (K.P * K.ρ (t k)) i j = (B i j - A k i j) + (A k i j - (K.P * K.ρ (t k)) i j) := by
+    ring
   rw [e]
   exact le_trans (le_min h1 h2') (V.v.map_add _ _)
 

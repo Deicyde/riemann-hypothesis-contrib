@@ -28,25 +28,41 @@ theorem letters_pow_mono {a d : ℕ} (h : a ≤ d) : Letters k r ^ a ≤ Letters
   | refl => exact le_rfl
   | step _ ih => exact ih.trans (letters_pow_succ _)
 
-theorem mul_mem_letters_pow {a d : ℕ} {x y : B.Mat k r → ℂ} (hx : x ∈ Letters k r ^ a) (hy : y ∈ Letters k r ^ d) :
-    x * y ∈ Letters k r ^ (a + d) := by
+theorem mul_mem_letters_pow
+    {a d : ℕ} {x y : B.Mat k r → ℂ} (hx : x ∈ Letters k r ^ a) (hy : y ∈ Letters k r ^ d)
+    : x * y ∈ Letters k r ^ (a + d) := by
   rw [pow_add]
   exact Submodule.mul_mem_mul hx hy
 
 theorem entry_mem (i j : Fin (2 * r + k + 1)) : (fun g : B.Mat k r => g i j) ∈ Letters k r :=
   Submodule.subset_span (Or.inr ⟨Pi.single j 1, Pi.single i 1, Or.inl fun g _ => by simp⟩)
 
-theorem star_entry_mem (i j : Fin (2 * r + k + 1)) : (fun g : B.Mat k r => star (g i j)) ∈ Letters k r := by
-  refine Submodule.subset_span (Or.inr ⟨fun a => Formalism.QuantumDeterminants.Hpk k r a i, star (Formalism.QuantumDeterminants.Hpk k r j), Or.inr ?_⟩)
+theorem star_entry_mem (i j : Fin (2 * r + k + 1))
+    : (fun g : B.Mat k r => star (g i j)) ∈ Letters k r := by
+  refine Submodule.subset_span (Or.inr ⟨
+    fun a => Formalism.QuantumDeterminants.Hpk k r a i,
+    star (Formalism.QuantumDeterminants.Hpk k r j),
+    Or.inr ?_
+  ⟩)
   intro g hg
-  have hH : Formalism.QuantumDeterminants.Hpk k r * Formalism.QuantumDeterminants.Hpk k r = 1 := (Formalism.QuantumDeterminants.hpkFacts k r).2.1
-  have hg' : gᴴ * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r := hg
-  have hinv : g⁻¹ = Formalism.QuantumDeterminants.Hpk k r * gᴴ * Formalism.QuantumDeterminants.Hpk k r := by
+  have hH : Formalism.QuantumDeterminants.Hpk k r * Formalism.QuantumDeterminants.Hpk k r = 1 :=
+    (Formalism.QuantumDeterminants.hpkFacts k r).2.1
+  have hg'
+      : gᴴ * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r :=
+    hg
+  have hinv
+      : g⁻¹
+        = Formalism.QuantumDeterminants.Hpk k r * gᴴ * Formalism.QuantumDeterminants.Hpk k r := by
     apply Matrix.inv_eq_left_inv
-    rw [Matrix.mul_assoc (Formalism.QuantumDeterminants.Hpk k r), Matrix.mul_assoc (Formalism.QuantumDeterminants.Hpk k r), hg', hH]
-  have e : Formalism.QuantumDeterminants.Hpk k r * (g⁻¹ * Formalism.QuantumDeterminants.Hpk k r) = gᴴ := by
-    rw [hinv, Matrix.mul_assoc _ (Formalism.QuantumDeterminants.Hpk k r) (Formalism.QuantumDeterminants.Hpk k r), hH, Matrix.mul_one, ← Matrix.mul_assoc, hH,
-      Matrix.one_mul]
+    rw [Matrix.mul_assoc (Formalism.QuantumDeterminants.Hpk k r),
+      Matrix.mul_assoc (Formalism.QuantumDeterminants.Hpk k r), hg', hH]
+  have e
+      : Formalism.QuantumDeterminants.Hpk k r * (g⁻¹ * Formalism.QuantumDeterminants.Hpk k r)
+        = gᴴ := by
+    rw [hinv,
+      Matrix.mul_assoc _ (Formalism.QuantumDeterminants.Hpk k r)
+        (Formalism.QuantumDeterminants.Hpk k r),
+      hH, Matrix.mul_one, ← Matrix.mul_assoc, hH, Matrix.one_mul]
   have e2 := congrFun (congrFun e j) i
   rw [conjTranspose_apply] at e2
   rw [star_star]
@@ -55,14 +71,18 @@ theorem star_entry_mem (i j : Fin (2 * r + k + 1)) : (fun g : B.Mat k r => star 
 theorem polyDeg_mem {e : ℕ} {c : B.Mat k r → ℂ} (hc : U.IsPolyDeg e c) : c ∈ Letters k r ^ e := by
   classical
   obtain ⟨q, hq, hcq⟩ := hc
-  let X : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) →
-      B.Mat k r → ℂ := Sum.elim (fun x g => g x.1 x.2) (fun x g => star (g x.1 x.2))
+  let X
+      : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1))
+        → B.Mat k r
+        → ℂ :=
+    Sum.elim (fun x g => g x.1 x.2) (fun x g => star (g x.1 x.2))
   have hX : ∀ v, X v ∈ Letters k r := by
     rintro (x | x)
     · exact entry_mem x.1 x.2
     · exact star_entry_mem x.1 x.2
   have hpow : ∀ v (n : ℕ), X v ^ n ∈ Letters k r ^ n := fun v n => Submodule.pow_mem_pow _ (hX v) n
-  have hprod : ∀ (m : _ →₀ ℕ) (s : Finset _), (∏ v ∈ s, X v ^ m v) ∈ Letters k r ^ (∑ v ∈ s, m v) := by
+  have hprod
+      : ∀ (m : _ →₀ ℕ) (s : Finset _), (∏ v ∈ s, X v ^ m v) ∈ Letters k r ^ (∑ v ∈ s, m v) := by
     intro m s
     induction s using Finset.induction_on with
     | empty => simp
@@ -78,7 +98,8 @@ theorem polyDeg_mem {e : ℕ} {c : B.Mat k r → ℂ} (hc : U.IsPolyDeg e c) : c
     refine Finset.prod_congr rfl fun v _ => ?_
     rcases v with x | x <;> rfl
   rw [e1]
-  refine Submodule.sum_mem _ fun m hm => Submodule.smul_mem _ _ (letters_pow_mono ?_ (hprod m m.support))
+  refine Submodule.sum_mem _ fun m hm =>
+    Submodule.smul_mem _ _ (letters_pow_mono ?_ (hprod m m.support))
   exact (MvPolynomial.le_totalDegree hm).trans hq
 
 end letters

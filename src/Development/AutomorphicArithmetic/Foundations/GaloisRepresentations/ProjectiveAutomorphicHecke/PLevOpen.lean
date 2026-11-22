@@ -6,46 +6,57 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsClopenKGLI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-private theorem isOpen_intA (F : Type) [Field F] [NumberField F] :
-    IsOpen {a : FiniteAdeleRing (𝓞 F) F | ∀ v, Valued.v (a v) ≤ 1} :=
+private theorem isOpen_intA (F : Type) [Field F] [NumberField F]
+    : IsOpen {a : FiniteAdeleRing (𝓞 F) F | ∀ v, Valued.v (a v) ≤ 1} :=
   RestrictedProduct.isOpen_forall_mem
-    (A := fun v : HeightOneSpectrum (𝓞 F) => ((v.adicCompletionIntegers F : ValuationSubring _) : Set (v.adicCompletion F)))
+    (A := fun v : HeightOneSpectrum (𝓞 F) =>
+      ((v.adicCompletionIntegers F : ValuationSubring _) : Set (v.adicCompletion F)))
     (fun v => Valued.isOpen_valuationSubring _)
 
-private theorem continuous_sim {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} :
-    Continuous (sim : GUf E n → AfQˣ) := continuous_snd.comp continuous_subtype_val
+private theorem continuous_sim {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
+    : Continuous (sim : GUf E n → AfQˣ) :=
+  continuous_snd.comp continuous_subtype_val
 
-private theorem continuous_mat {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} :
-    Continuous (mat : GUf E n → GL (Fin n) (Af E)) := continuous_fst.comp continuous_subtype_val
+private theorem continuous_mat {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
+    : Continuous (mat : GUf E n → GL (Fin n) (Af E)) :=
+  continuous_fst.comp continuous_subtype_val
 
-private theorem continuous_comp {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (w : Plc E) :
-    Continuous (comp w : GUf E n → GL (Fin n) (w.adicCompletion E)) :=
-  (Continuous.units_map _ (continuous_id.matrix_map (RestrictedProduct.continuous_eval w))).comp continuous_mat
+private theorem continuous_comp
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (w : Plc E)
+    : Continuous (comp w : GUf E n → GL (Fin n) (w.adicCompletion E)) :=
+  (Continuous.units_map _ (continuous_id.matrix_map (RestrictedProduct.continuous_eval w))).comp
+    continuous_mat
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pLevOpen_of :
-    UpperTheory.Gal.CertificateRingHomMap.LevOpen := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pLevOpen_of
+    : UpperTheory.Gal.CertificateRingHomMap.LevOpen := by
   intro E _ _ _ n S Kw hK
   have hI : IsOpen {a : Af E | ∀ v, Valued.v (a v) ≤ 1} := isOpen_intA E
   have hJ : IsOpen {a : AfQ | ∀ v, Valued.v (a v) ≤ 1} := isOpen_intA ℚ
   let A : Set (GUf E n) :=
-    ((((fun k => ((sim k : AfQˣ) : AfQ)) ⁻¹' {a : AfQ | ∀ v, Valued.v (a v) ≤ 1}) ∩
-      ((fun k => (((sim k)⁻¹ : AfQˣ) : AfQ)) ⁻¹' {a : AfQ | ∀ v, Valued.v (a v) ≤ 1})) ∩
-    ((⋂ i, ⋂ j, (fun k => (mat k).val i j) ⁻¹' {a : Af E | ∀ v, Valued.v (a v) ≤ 1}) ∩
-      (⋂ i, ⋂ j, (fun k => ((mat k)⁻¹).val i j) ⁻¹' {a : Af E | ∀ v, Valued.v (a v) ≤ 1}))) ∩
-    ⋂ w ∈ S, comp w ⁻¹' (Kw w : Set (GLw n w))
+    ((((fun k => ((sim k : AfQˣ) : AfQ)) ⁻¹' {a : AfQ | ∀ v, Valued.v (a v) ≤ 1})
+          ∩ ((fun k => (((sim k)⁻¹ : AfQˣ) : AfQ)) ⁻¹' {a : AfQ | ∀ v, Valued.v (a v) ≤ 1}))
+        ∩ ((⋂ i, ⋂ j, (fun k => (mat k).val i j) ⁻¹' {a : Af E | ∀ v, Valued.v (a v) ≤ 1})
+          ∩ (⋂ i, ⋂ j, (fun k => ((mat k)⁻¹).val i j) ⁻¹' {a : Af E | ∀ v, Valued.v (a v) ≤ 1})))
+      ∩ ⋂ w ∈ S, comp w ⁻¹' (Kw w : Set (GLw n w))
   have hAo : IsOpen A := by
     refine ((IsOpen.inter ?_ ?_).inter (IsOpen.inter ?_ ?_)).inter ?_
     · exact hJ.preimage (Units.continuous_val.comp continuous_sim)
     · exact hJ.preimage (Units.continuous_val.comp continuous_sim.inv)
-    · exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-        hI.preimage ((Units.continuous_val.comp continuous_mat).matrix_elem i j)
-    · exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-        hI.preimage ((Units.continuous_val.comp continuous_mat.inv).matrix_elem i j)
+    · exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun j =>
+          hI.preimage ((Units.continuous_val.comp continuous_mat).matrix_elem i j)
+    · exact isOpen_iInter_of_finite fun i =>
+        isOpen_iInter_of_finite fun j =>
+          hI.preimage ((Units.continuous_val.comp continuous_mat.inv).matrix_elem i j)
     · exact isOpen_biInter_finset fun w hw => (hK w hw).preimage (continuous_comp w)
-  have hone : ∀ (i j : Fin n) (v : Plc E), Valued.v (((1 : Matrix (Fin n) (Fin n) (Af E)) i j) v) ≤ 1 := by
+  have hone
+      : ∀ (i j : Fin n) (v : Plc E),
+        Valued.v (((1 : Matrix (Fin n) (Fin n) (Af E)) i j) v) ≤ 1 := by
     intro i j v
     by_cases h : i = j
     · subst h
@@ -79,7 +90,9 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pLevOpen_of :
         exact map_one _
       rw [map_mul] at h
       refine le_antisymm (hs v) ?_
-      calc (1 : _) = _ := h.symm
+      calc
+        (1 : _)
+          = _ := h.symm
         _ ≤ Valued.v (((sim k : AfQˣ) : AfQ) v) * 1 := mul_le_mul' le_rfl (hs' v)
         _ = _ := mul_one _
     · rw [GlobalTheory.HenQ.Basic.mem_KGL_iff]

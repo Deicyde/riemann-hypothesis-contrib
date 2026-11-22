@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
@@ -13,8 +15,9 @@ section SlopeTestRemainingChoices
 
 variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
-private theorem quadraticForm_add_expand (δ : F) (v : V4 F) (i : Fin 4) (a : A F) :
-    q4 δ (v + Pi.single i a) = q4 δ v + a * (B4 δ v (Pi.single i 1) + a * q4 δ (Pi.single i 1)) := by
+private theorem quadraticForm_add_expand (δ : F) (v : V4 F) (i : Fin 4) (a : A F)
+    : q4 δ (v + Pi.single i a)
+      = q4 δ v + a * (B4 δ v (Pi.single i 1) + a * q4 δ (Pi.single i 1)) := by
   fin_cases i <;> simp [q4, B4, Pi.single_apply] <;> ring
 
 private theorem psi_add (x y : A F) : ψ (x + y) = ψ x * ψ y := by
@@ -23,16 +26,18 @@ private theorem psi_add (x y : A F) : ψ (x + y) = ψ x * ψ y := by
 private theorem cw_mul (w : InfinitePlace F) (a b : A F) : cw w (a * b) = cw w a * cw w b := by
   simp [cw, map_mul]
 
-private theorem psi_curve (w : InfinitePlace F) (b : A F) (δ : F) (i : Fin 4) (v : V4 F) :
-    ∃ g : ℝ → ℂ, (∀ t, ψ (b * q4 δ (v + Pi.single i (at1 w t))) = ψ (b * q4 δ v) * g t) ∧ g 0 = 1 ∧
-      HasDerivAt g (cc * (cw w b * cw w (B4 δ v (Pi.single i 1)))) 0 := by
+private theorem psi_curve (w : InfinitePlace F) (b : A F) (δ : F) (i : Fin 4) (v : V4 F)
+    : ∃ g : ℝ → ℂ,
+      (∀ t, ψ (b * q4 δ (v + Pi.single i (at1 w t))) = ψ (b * q4 δ v) * g t) ∧ g 0 = 1
+        ∧ HasDerivAt g (cc * (cw w b * cw w (B4 δ v (Pi.single i 1)))) 0 := by
   obtain ⟨hψ, -, hp, -, -, hm, -, -⟩ := atLaws F w
   obtain ⟨β, hβ⟩ : ∃ β : ℝ, β = TR.pInf F b w * TR.pInf F (B4 δ v (Pi.single i 1)) w := ⟨_, rfl⟩
   obtain ⟨κ, hκ⟩ : ∃ κ : ℝ, κ = TR.pInf F b w * TR.pInf F (q4 δ (Pi.single i 1)) w := ⟨_, rfl⟩
   refine ⟨fun t => Complex.exp (cc * ((t * (β + t * κ) : ℝ) : ℂ)), ?_, by simp, ?_⟩
   · intro t
-    have h0 : at1 w t * (b * (B4 δ v (Pi.single i 1) + at1 w t * q4 δ (Pi.single i 1))) =
-        at1 w (t * (β + t * κ)) := by
+    have h0
+        : at1 w t * (b * (B4 δ v (Pi.single i 1) + at1 w t * q4 δ (Pi.single i 1)))
+          = at1 w (t * (β + t * κ)) := by
       rw [hm]
       congr 2
       have : TR.pInf F (at1 w t) w = t := by rw [hp]; simp
@@ -49,19 +54,19 @@ private theorem psi_curve (w : InfinitePlace F) (b : A F) (δ : F) (i : Fin 4) (
     convert h2 using 1
     simp [hβ, cw]
 
-private theorem p_apply (O : Ops F) (δ : F) (w : InfinitePlace F) (i : Fin 4) (φ : S4 F) (v : V4 F) :
-    (O.p δ w i φ).1 v = cc * cw w (B4 δ v (Pi.single i 1)) * φ.1 v := by
+private theorem p_apply (O : Ops F) (δ : F) (w : InfinitePlace F) (i : Fin 4) (φ : S4 F) (v : V4 F)
+    : (O.p δ w i φ).1 v = cc * cw w (B4 δ v (Pi.single i 1)) * φ.1 v := by
   have hs : ∀ (c : ℂ) (T : Module.End ℂ (S4 F)), ((c • T) φ).1 v = c * (T φ).1 v := fun _ _ => rfl
-  have hn : ∀ a : A F, cw w (-a) = -cw w a := fun a => by simp [cw]
+  have hn : ∀ a : A F, cw w (-a) = - cw w a := fun a => by simp [cw]
   have h2 : cw w (2 : A F) = 2 := by
     have : TR.pInf F (2 : A F) = 2 := map_ofNat _ 2
     simp [cw, this]
   fin_cases i
-  · have : B4 δ v (Pi.single 0 1) = -v 1 := by simp [B4, Pi.single_apply]
+  · have : B4 δ v (Pi.single 0 1) = - v 1 := by simp [B4, Pi.single_apply]
     simp only [Fin.zero_eta, this, hn, Ops.p]
     simp [hs, O.x_apply]
     ring
-  · have : B4 δ v (Pi.single 1 1) = -v 0 := by simp [B4, Pi.single_apply]
+  · have : B4 δ v (Pi.single 1 1) = - v 0 := by simp [B4, Pi.single_apply]
     simp only [Fin.mk_one, this, hn, Ops.p]
     simp [hs, O.x_apply]
     ring
@@ -76,19 +81,22 @@ private theorem p_apply (O : Ops F) (δ : F) (w : InfinitePlace F) (i : Fin 4) (
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.dN :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (O : Ops F) w i b, O.d w i * W.Om (nU b) = W.Om (nU b) * (O.d w i + cw w b • O.p D.δ w i) ∧
-    O.x w i * W.Om (nU b) = W.Om (nU b) * O.x w i := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.dN
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (O : Ops F) w i b,
+      O.d w i * W.Om (nU b) = W.Om (nU b) * (O.d w i + cw w b • O.p D.δ w i)
+        ∧ O.x w i * W.Om (nU b) = W.Om (nU b) * O.x w i := by
   intro F E _ _ _ _ _ _ _ D W O w i b
   refine ⟨?_, ?_⟩
   · refine LinearMap.ext fun φ => Subtype.ext (funext fun v => ?_)
     obtain ⟨g, hg, hg0, hgd⟩ := psi_curve w b D.δ i v
     have hφ := O.d_spec w i φ v
     have h1 := O.d_spec w i (W.Om (nU b) φ) v
-    have hz : v + Pi.single i (at1 w 0) = v := by
-      rw [(atLaws F w).2.2.2.2.1]; simp
-    have hfun : (fun t : ℝ => (W.Om (nU b) φ).1 (v + Pi.single i (at1 w t))) =
-        fun t => (ψ (b * q4 D.δ v) * g t) * φ.1 (v + Pi.single i (at1 w t)) := by
+    have hz : v + Pi.single i (at1 w 0) = v := by rw [(atLaws F w).2.2.2.2.1]; simp
+    have hfun
+        : (fun t : ℝ => (W.Om (nU b) φ).1 (v + Pi.single i (at1 w t)))
+          = fun t => (ψ (b * q4 D.δ v) * g t) * φ.1 (v + Pi.single i (at1 w t)) := by
       funext t
       rw [W.Om_n, hg]
     rw [hfun] at h1

@@ -9,32 +9,32 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.EulerPos
 
-theorem ofReal_re_prod {ι : Type*} (s : Finset ι) (z : ι → ℂ)
-    (h : ∀ i, 0 ≤ (z i).re ∧ (z i).im = 0) :
-    ENNReal.ofReal (∏ i ∈ s, z i).re = ∏ i ∈ s, ENNReal.ofReal (z i).re := by
+theorem ofReal_re_prod {ι : Type*} (s : Finset ι) (z : ι → ℂ) (h : ∀ i, 0 ≤ (z i).re ∧ (z i).im = 0)
+    : ENNReal.ofReal (∏ i ∈ s, z i).re = ∏ i ∈ s, ENNReal.ofReal (z i).re := by
   have e : ∏ i ∈ s, z i = ((∏ i ∈ s, (z i).re : ℝ) : ℂ) := by
     rw [Complex.ofReal_prod]
     exact Finset.prod_congr rfl fun i _ => Complex.ext (by simp) (by simp [(h i).2])
   rw [e, Complex.ofReal_re, ENNReal.ofReal_prod_of_nonneg fun i _ => (h i).1]
 
-theorem hasProd_ofReal {ι : Type*} {a : ι → ℝ} {p : ℝ} (hp : HasProd a p) (h0 : ∀ i, 0 ≤ a i) :
-    HasProd (fun i => ENNReal.ofReal (a i)) (ENNReal.ofReal p) := by
+theorem hasProd_ofReal {ι : Type*} {a : ι → ℝ} {p : ℝ} (hp : HasProd a p) (h0 : ∀ i, 0 ≤ a i)
+    : HasProd (fun i => ENNReal.ofReal (a i)) (ENNReal.ofReal p) := by
   have h := (ENNReal.continuous_ofReal.tendsto p).comp hp
   refine h.congr fun s => ?_
   simp only [Function.comp_apply]
   exact ENNReal.ofReal_prod_of_nonneg fun i _ => h0 i
 
-theorem hasProd_of_tail {ι : Type} (L : ι → ℝ≥0∞) (a : ι → ℝ) (S : Finset ι) (hL : ∀ v, L v ≠ ⊤)
-    (ha0 : ∀ v, 0 ≤ a v) (hoff : ∀ v, v ∉ S → L v = ENNReal.ofReal (a v))
-    (hsum : Summable fun v => |a v - 1|) :
-    HasProd L ((∏ v ∈ S, L v) * ENNReal.ofReal (∏' v : {v // v ∉ S}, a v.1)) := by
+theorem hasProd_of_tail
+    {ι : Type} (L : ι → ℝ≥0∞) (a : ι → ℝ) (S : Finset ι) (hL : ∀ v, L v ≠ ⊤) (ha0 : ∀ v, 0 ≤ a v)
+    (hoff : ∀ v, v ∉ S → L v = ENNReal.ofReal (a v)) (hsum : Summable fun v => |a v - 1|)
+    : HasProd L ((∏ v ∈ S, L v) * ENNReal.ofReal (∏' v : {v // v ∉ S}, a v.1)) := by
   classical
   let r : ι → ℝ := fun v => (L v).toReal
   have hr0 : ∀ v, 0 ≤ r v := fun v => ENNReal.toReal_nonneg
@@ -53,17 +53,18 @@ theorem hasProd_of_tail {ι : Type} (L : ι → ℝ≥0∞) (a : ι → ℝ) (S 
   have hp := hasProd_ofReal hm.hasProd hr0
   have e : (fun i => ENNReal.ofReal (r i)) = L := funext hLr
   rw [e, htp, hT, ENNReal.ofReal_mul (Finset.prod_nonneg fun v _ => hr0 v),
-    ENNReal.ofReal_prod_of_nonneg fun v _ => hr0 v] at hp
+      ENNReal.ofReal_prod_of_nonneg fun v _ => hr0 v]
+    at hp
   simpa only [hLr] using hp
 
-theorem finprod_eq_indicator {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d n M : ℕ}
-    (b : Module.Basis (Fin d) F E)
+theorem finprod_eq_indicator
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {d n M : ℕ} (b : Module.Basis (Fin d) F E)
     (Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin n → Fin M → Fv F v ⊗[F] E) → ℂ)
-    (S : Finset (HeightOneSpectrum (𝓞 F)))
-    (hS : ∀ v, v ∉ S → Φv v = (latV b v).indicator 1)
-    (X : Fin n → Fin M → AF F ⊗[F] E) :
-    ∏ᶠ v, Φv v (projV v (projFin X)) =
-      (intOff b S).indicator (fun Y => ∏ v ∈ S, Φv v (projV v (projFin Y))) X := by
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (hS : ∀ v, v ∉ S → Φv v = (latV b v).indicator 1)
+    (X : Fin n → Fin M → AF F ⊗[F] E)
+    : ∏ᶠ v, Φv v (projV v (projFin X))
+      = (intOff b S).indicator (fun Y => ∏ v ∈ S, Φv v (projV v (projFin Y))) X := by
   classical
   by_cases hX : X ∈ intOff b S
   · rw [Set.indicator_of_mem hX]
@@ -95,16 +96,39 @@ theorem finprod_eq_indicator {F E : Type} [Field F] [NumberField F] [Field E] [A
 
 end GlobalTheory.CompanionTheory.SW.EulerPos
 
-theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n M : ℕ) (I : Measure (Fin n → Fin M → AF F ⊗[F] E)) (minf : Measure (Fin n → Fin M → Ainf F ⊗[F] E)) (m : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fin n → Fin M → Fv F v ⊗[F] E)), IsEulerProd b I 1 minf m → (∀ v, IsLocallyFiniteMeasure (m v)) → ∀ (cinf : ℝ≥0) (c : HeightOneSpectrum (𝓞 F) → ℝ≥0), IsUnitProd cinf c → ∀ (Φ : (Fin n → Fin M → AF F ⊗[F] E) → ℝ≥0∞) (Φi : (Fin n → Fin M → Ainf F ⊗[F] E) → ℝ≥0∞) (Φf : (Fin n → Fin M → Af F ⊗[F] E) → ℂ) (Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin n → Fin M → Fv F v ⊗[F] E) → ℂ), Measurable Φi → IsPureFin b Φf Φv → (∀ v Y, 0 ≤ (Φv v Y).re ∧ (Φv v Y).im = 0) → (∀ X, Φ X = Φi (projInf X) * ENNReal.ofReal (Φf (projFin X)).re) → Measurable Φ ∧ Multipliable (fun v => ∫⁻ X, ENNReal.ofReal (Φv v X).re ∂(c v • m v)) ∧ ∫⁻ X, Φ X ∂I = (∫⁻ X, Φi X ∂(cinf • minf)) * ∏' v, ∫⁻ X, ENNReal.ofReal (Φv v X).re ∂(c v • m v) := by
+theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n M : ℕ)
+            (I : Measure (Fin n → Fin M → AF F ⊗[F] E))
+            (minf : Measure (Fin n → Fin M → Ainf F ⊗[F] E))
+            (m : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fin n → Fin M → Fv F v ⊗[F] E)),
+          IsEulerProd b I 1 minf m → (∀ v, IsLocallyFiniteMeasure (m v))
+            → ∀ (cinf : ℝ≥0) (c : HeightOneSpectrum (𝓞 F) → ℝ≥0),
+              IsUnitProd cinf c
+                → ∀ (Φ : (Fin n → Fin M → AF F ⊗[F] E) → ℝ≥0∞)
+                    (Φi : (Fin n → Fin M → Ainf F ⊗[F] E) → ℝ≥0∞)
+                    (Φf : (Fin n → Fin M → Af F ⊗[F] E) → ℂ)
+                    (Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin n → Fin M → Fv F v ⊗[F] E) → ℂ),
+                  Measurable Φi → IsPureFin b Φf Φv → (∀ v Y, 0 ≤ (Φv v Y).re ∧ (Φv v Y).im = 0)
+                    → (∀ X, Φ X = Φi (projInf X) * ENNReal.ofReal (Φf (projFin X)).re)
+                    → Measurable Φ
+                      ∧ Multipliable (fun v => ∫⁻ X, ENNReal.ofReal (Φv v X).re ∂(c v • m v))
+                      ∧ ∫⁻ X, Φ X ∂I
+                        = (∫⁻ X, Φi X ∂(cinf • minf))
+                          * ∏' v, ∫⁻ X, ENNReal.ofReal (Φv v X).re ∂(c v • m v) := by
   intro F E _ _ _ _ _ σ hCM d b n M I minf m hEu hm cinf c hc Φ Φi Φf Φv hΦi hpure hpos hprod
   classical
-  obtain ⟨hpi, hpf, hpv, hlat, -⟩ := GlobalTheory.CompanionTheory.SW.MeasProj.proj_props F E σ hCM d b n M
+  obtain ⟨hpi, hpf, hpv, hlat, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.MeasProj.proj_props F E σ hCM d b n M
   haveI := GlobalTheory.CompanionTheory.SW.PureMeas.borelSpace_af F E σ hCM n M
   haveI := GlobalTheory.CompanionTheory.SW.PureMeas.borelSpace_ainf F E σ hCM n M
   haveI : ∀ v, BorelSpace (Fin n → Fin M → Fv F v ⊗[F] E) :=
     fun v => GlobalTheory.CompanionTheory.SW.PureMeas.borelSpace_fv F E σ hCM n M v
   obtain ⟨hfin, hsum, S₀, hEP⟩ := hEu
-  obtain ⟨-, -, -, -, -, -, -, S₁, hS₁⟩ := GlobalTheory.CompanionTheory.SW.UnitProdAlg.main F cinf cinf c c hc hc
+  obtain ⟨-, -, -, -, -, -, -, S₁, hS₁⟩ :=
+    GlobalTheory.CompanionTheory.SW.UnitProdAlg.main F cinf cinf c c hc hc
   let S : Finset (HeightOneSpectrum (𝓞 F)) :=
     (S₀ ∪ S₁) ∪ (Filter.eventually_cofinite.1 hpure.2.1).toFinset
   have hS : ∀ v, v ∉ S → Φv v = (latV b v).indicator 1 := by
@@ -114,14 +138,15 @@ theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos : ∀ (F E : Type) [F
   have hS₀ : S₀ ⊆ S := fun v hv => Finset.mem_union_left _ (Finset.mem_union_left _ hv)
   have hS₁S : S₁ ⊆ S := fun v hv => Finset.mem_union_left _ (Finset.mem_union_right _ hv)
   obtain ⟨hc1, hcS⟩ := hS₁ S hS₁S
-  let φ : ∀ v : HeightOneSpectrum (𝓞 F), (Fin n → Fin M → Fv F v ⊗[F] E) → ℝ≥0∞ :=
-    fun v X => ENNReal.ofReal (Φv v X).re
+  let φ : ∀ v : HeightOneSpectrum (𝓞 F), (Fin n → Fin M → Fv F v ⊗[F] E) → ℝ≥0∞ := fun v X =>
+    ENNReal.ofReal (Φv v X).re
   have hcv : ∀ v, Continuous (Φv v) := fun v => (hpure.1 v).1.continuous
   have hφ : ∀ v, Measurable (φ v) := fun v =>
     ENNReal.measurable_ofReal.comp (Complex.measurable_re.comp (hcv v).measurable)
   have hΦ : Φ = pureL b S Φi φ := by
     funext X
-    rw [hprod X, hpure.2.2 (projFin X), GlobalTheory.CompanionTheory.SW.EulerPos.finprod_eq_indicator b Φv S hS X]
+    rw [hprod X, hpure.2.2 (projFin X),
+      GlobalTheory.CompanionTheory.SW.EulerPos.finprod_eq_indicator b Φv S hS X]
     unfold pureL
     by_cases hX : X ∈ intOff b S
     · rw [Set.indicator_of_mem hX, Set.indicator_of_mem hX,
@@ -130,8 +155,7 @@ theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos : ∀ (F E : Type) [F
   have hBfin : ∀ v, ∫⁻ X, φ v X ∂(m v) ≠ ⊤ := by
     intro v
     haveI := hm v
-    have hi : Integrable (Φv v) (m v) :=
-      (hcv v).integrable_of_hasCompactSupport (hpure.1 v).2
+    have hi : Integrable (Φv v) (m v) := (hcv v).integrable_of_hasCompactSupport (hpure.1 v).2
     exact hi.re.lintegral_lt_top.ne
   have hLB : ∀ v, ∫⁻ X, φ v X ∂(c v • m v) = (c v : ℝ≥0∞) * ∫⁻ X, φ v X ∂(m v) := by
     intro v
@@ -153,8 +177,12 @@ theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos : ∀ (F E : Type) [F
     rw [hLB v, hc1 v hv, hφv, lintegral_indicator_one hl]
     simp only [ENNReal.coe_one, one_mul, a]
     exact (ENNReal.ofReal_toReal (hfin v).ne).symm
-  have hHP := GlobalTheory.CompanionTheory.SW.EulerPos.hasProd_of_tail (fun v => ∫⁻ X, φ v X ∂(c v • m v)) a S hLfin
-    (fun _ => ENNReal.toReal_nonneg) hoff hsum
+  have hHP :=
+    GlobalTheory.CompanionTheory.SW.EulerPos.hasProd_of_tail
+      (fun v => ∫⁻ X, φ v X ∂(c v • m v))
+      a S hLfin
+      (fun _ => ENNReal.toReal_nonneg)
+      hoff hsum
   refine ⟨?_, hHP.multipliable, ?_⟩
   · rw [hΦ]
     exact GlobalTheory.CompanionTheory.SW.PureMeas.measurable_pureL F E σ hCM d b n M S Φi φ hΦi hφ
@@ -162,8 +190,9 @@ theorem GlobalTheory.CompanionTheory.SW.EulerPos.euler_pos : ∀ (F E : Type) [F
     have h1 : (cinf : ℝ≥0∞) * ∏ v ∈ S, (c v : ℝ≥0∞) = 1 := by exact_mod_cast hcS
     rw [hHP.tprod_eq, hΦ, hEP S hS₀ Φi φ hΦi hφ, lintegral_smul_measure, ENNReal.smul_def,
       smul_eq_mul, Finset.prod_congr rfl fun v _ => hLB v, Finset.prod_mul_distrib]
-    calc _ = ((cinf : ℝ≥0∞) * ∏ v ∈ S, (c v : ℝ≥0∞)) * ((∫⁻ X, Φi X ∂minf) *
-            (∏ v ∈ S, ∫⁻ X, φ v X ∂(m v)) *
-            ENNReal.ofReal (∏' v : {v // v ∉ S}, (m v.1 (latV b v.1)).toReal)) := by
-          rw [h1]; simp
+    calc
+      _ = ((cinf : ℝ≥0∞) * ∏ v ∈ S, (c v : ℝ≥0∞))
+          * ((∫⁻ X, Φi X ∂minf) * (∏ v ∈ S, ∫⁻ X, φ v X ∂(m v))
+            * ENNReal.ofReal (∏' v : {v // v ∉ S}, (m v.1 (latV b v.1)).toReal)) := by
+        rw [h1]; simp
       _ = _ := by ring

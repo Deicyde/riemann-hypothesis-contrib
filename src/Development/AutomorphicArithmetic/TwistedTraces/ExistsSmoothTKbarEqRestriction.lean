@@ -10,14 +10,18 @@ public import Development.AutomorphicArithmetic.TwistedTraces.ExistsSmoothArchCu
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
 open scoped ContDiff
 
-theorem UpperTheory.exists_smoothT_kbar_eq_restriction :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), 0 < n → ∀ (a : CC K n) (x₀ : G1 K n),
-        (isExpLieAlgebra K n).IsSmoothFun (fun A : archGroup K n => a (archP K n A * x₀)) →
-        ∃ F : TI K n, SmoothT F ∧ ∀ A, kbar F A = a (archP K n A * x₀) := by
+theorem UpperTheory.exists_smoothT_kbar_eq_restriction
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ),
+      0 < n
+        → ∀ (a : CC K n) (x₀ : G1 K n),
+          (isExpLieAlgebra K n).IsSmoothFun (fun A : archGroup K n => a (archP K n A * x₀))
+            → ∃ F : TI K n, SmoothT F ∧ ∀ A, kbar F A = a (archP K n A * x₀) := by
   intro K _ _ n hn a x₀ ha
   obtain ⟨χ, hχs, hχ1, hχc⟩ := UpperTheory.exists_smooth_archCutoff_kbar_eq_one K n hn
   have hχcont : Continuous fun A : archGroup K n => (χ A : ℂ) := by
@@ -40,8 +44,10 @@ theorem UpperTheory.exists_smoothT_kbar_eq_restriction :
       (((isExpLieAlgebra K n).isSmoothFun_iff).1 ha g)
   · have h1 := hχ1 A
     unfold kbar at h1 ⊢
-    have h2 : ∀ s, (χ (A * zInf K n s) : ℂ) * a (archP K n (A * zInf K n s) * x₀) =
-        (χ (A * zInf K n s) : ℂ) * a (archP K n A * x₀) := fun s => by
+    have h2
+        : ∀ s,
+          (χ (A * zInf K n s) : ℂ) * a (archP K n (A * zInf K n s) * x₀)
+            = (χ (A * zInf K n s) : ℂ) * a (archP K n A * x₀) := fun s => by
       rw [archimedeanProjection_mul_positiveScalar hn]
     show ∫ s, (χ (A * zInf K n s) : ℂ) * a (archP K n (A * zInf K n s) * x₀) ∂_ = _
     simp_rw [h2]

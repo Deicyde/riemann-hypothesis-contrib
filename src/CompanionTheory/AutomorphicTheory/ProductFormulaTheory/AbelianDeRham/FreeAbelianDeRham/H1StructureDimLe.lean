@@ -32,7 +32,9 @@ theorem h1Le : CompanionTheory.ObstructionTrivialLocus.H1StructureDimLe := by
   have hBC := GlobalTheory.CompanionTheory.SysBC.sysBCSt hDesc hLow
   have hStein := GlobalTheory.CompanionTheory.Hodge.stein_holds
   have hAx := GlobalTheory.CompanionTheory.Axis.axOSt hDesc hLow hBC hStein
-  have hVan := GlobalTheory.CompanionTheory.Hodge.vanSt hCx (GlobalTheory.CompanionTheory.Hodge.Nerve.cmpSt_of_cxSt hCx)
+  have hVan :=
+    GlobalTheory.CompanionTheory.Hodge.vanSt hCx
+      (GlobalTheory.CompanionTheory.Hodge.Nerve.cmpSt_of_cxSt hCx)
   have hHopf := GlobalTheory.CompanionTheory.HopfSys.hopfSt hHtpy hQ hFub hAff hDesc hLow hAx
   have hHopfLe := GlobalTheory.CompanionTheory.HopfLe.hopfLeSt hCx hDict hLow
   classical
@@ -41,9 +43,11 @@ theorem h1Le : CompanionTheory.ObstructionTrivialLocus.H1StructureDimLe := by
   haveI : CompactSpace A.left := AlgebraicGeometry.QuasiCompact.compactSpace_of_compactSpace A.hom
   obtain ⟨P, _, _, ⟨S⟩⟩ := GlobalTheory.CompanionTheory.Hodge.WedgeField.exists_finite_sys A.hom
   have hfield : IsField k := Field.toIsField k
-  have hq : MainStatements.Hodge.AllQIso (MainStatements.Hodge.resSys A.hom S) := hDesc k A.left A.hom inferInstance P S
+  have hq : MainStatements.Hodge.AllQIso (MainStatements.Hodge.resSys A.hom S) :=
+    hDesc k A.left A.hom inferInstance P S
   obtain ⟨hb1, -, hst⟩ := hLow k _ _ _ _ (MainStatements.Hodge.resSys A.hom S) hq
-  have hstein : MainStatements.Hodge.Stein (MainStatements.Hodge.OSys A.hom S) := hst.mp (hStein k A g hA hsm)
+  have hstein : MainStatements.Hodge.Stein (MainStatements.Hodge.OSys A.hom S) :=
+    hst.mp (hStein k A g hA hsm)
   have hexact := hVan k A g hA hsm hfield P S
   have hhopf : MainStatements.Hodge.Hopf (MainStatements.Hodge.OSys A.hom S) True := by
     have h := hHopf k A g hA hsm P S
@@ -54,8 +58,10 @@ theorem h1Le : CompanionTheory.ObstructionTrivialLocus.H1StructureDimLe := by
     exact hno (⇑(MainStatements.Hodge.resSys A.hom S).pull1 ∘ x)
       (hx.map' (MainStatements.Hodge.resSys A.hom S).pull1 (LinearMap.ker_eq_bot.mpr hb1.1))
   let b := Module.Basis.ofVectorSpace k (GlobalTheory.CechDR.HO1 A.hom)
-  have hemb : ∀ e : Fin (g + 1) ↪ Module.Basis.ofVectorSpaceIndex k (GlobalTheory.CechDR.HO1 A.hom), False :=
-    fun e => hn _ (b.linearIndependent.comp e e.injective)
+  have hemb
+      : ∀ e : Fin (g + 1) ↪ Module.Basis.ofVectorSpaceIndex k (GlobalTheory.CechDR.HO1 A.hom),
+        False := fun e =>
+    hn _ (b.linearIndependent.comp e e.injective)
   haveI : Finite (Module.Basis.ofVectorSpaceIndex k (GlobalTheory.CechDR.HO1 A.hom)) := by
     by_contra hinf
     rw [not_finite_iff_infinite] at hinf

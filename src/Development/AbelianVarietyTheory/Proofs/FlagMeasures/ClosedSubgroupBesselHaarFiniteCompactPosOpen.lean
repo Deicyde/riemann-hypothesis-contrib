@@ -17,13 +17,12 @@ variable {k r : ℕ}
 
 theorem Hpk_ne_zero' (k r : ℕ) : Hpk k r ≠ 0 := by
   intro h
-  have h1 : Hpk k r ⟨r + k, by omega⟩ ⟨r + k, by omega⟩ = -1 := by
-    simp [Hpk]
+  have h1 : Hpk k r ⟨r + k, by omega⟩ ⟨r + k, by omega⟩ = -1 := by simp [Hpk]
   rw [h] at h1
   simp at h1
 
-theorem IsClosedSub.mul_inv {S : Set (Mat k r)} (hS : IsClosedSub k r S) {a : Mat k r} (ha : a ∈ S) :
-    a * a⁻¹ = 1 := by
+theorem IsClosedSub.mul_inv {S : Set (Mat k r)} (hS : IsClosedSub k r S) {a : Mat k r} (ha : a ∈ S)
+    : a * a⁻¹ = 1 := by
   by_cases hd : IsUnit a.det
   · exact Matrix.mul_nonsing_inv a hd
   · exfalso
@@ -37,10 +36,11 @@ theorem IsClosedSub.mul_inv {S : Set (Mat k r)} (hS : IsClosedSub k r S) {a : Ma
 theorem IsClosedSub.isMatGroup {S : Set (Mat k r)} (hS : IsClosedSub k r S) : PI.IsMatGroup S :=
   ⟨hS.2.1, hS.2.2.1, hS.2.2.2.1, fun a ha => ⟨hS.2.2.2.2 a ha, hS.mul_inv ha⟩⟩
 
-theorem haarOn_locFinite_openPos :
-    ∀ (k r : ℕ) (S : Set (Mat k r)) (μ : Measure (Mt k r)), IsClosedSub k r S → IsHaarOn S μ →
-      (∀ C : Set (Mt k r), IsCompact C → μ C < ⊤) ∧
-      (∀ U : Set (Mt k r), IsOpen U → (∃ x ∈ U, Matrix.of x ∈ S) → 0 < μ U) := by
+theorem haarOn_locFinite_openPos
+    : ∀ (k r : ℕ) (S : Set (Mat k r)) (μ : Measure (Mt k r)),
+      IsClosedSub k r S → IsHaarOn S μ
+        → (∀ C : Set (Mt k r), IsCompact C → μ C < ⊤)
+          ∧ (∀ U : Set (Mt k r), IsOpen U → (∃ x ∈ U, Matrix.of x ∈ S) → 0 < μ U) := by
   intro k r S μ hS hμ
   have hμ' : PI.IsHaarOnM S μ := hμ
   obtain ⟨-, hK, hU⟩ := GlobalTheory.MatHaar.haar_unique_locFinite_openPos _ S μ hS.isMatGroup hμ'

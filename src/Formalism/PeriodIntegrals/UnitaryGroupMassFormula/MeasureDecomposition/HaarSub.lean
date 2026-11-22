@@ -35,17 +35,19 @@ theorem generic_haar_subgroup : GenHaarSub := by
     rw [hpre, measure_empty]
   · intro s hs
     rw [hm, Measure.map_map (measurable_const_mul s) hmeas]
-    have hcomp : (fun x => s * x) ∘ (Subtype.val : K → G) =
-        Subtype.val ∘ (fun y : K => (⟨s, hs⟩ : K) * y) := by
+    have hcomp
+        : (fun x => s * x) ∘ (Subtype.val : K → G)
+          = Subtype.val ∘ (fun y : K => (⟨s, hs⟩ : K) * y) := by
       funext y
       rfl
     rw [hcomp, ← Measure.map_map hmeas (measurable_const_mul _)]
     congr 1
     first
-      | exact map_mul_left_eq_self (Measure.haar : Measure K) _
-      | exact Measure.IsMulLeftInvariant.map_mul_left_eq_self _
+    | exact map_mul_left_eq_self (Measure.haar : Measure K) _
+    | exact Measure.IsMulLeftInvariant.map_mul_left_eq_self _
   · intro U hU h1
     rw [hm, Measure.map_apply hmeas hU.measurableSet]
-    exact (hU.preimage continuous_subtype_val).measure_pos (Measure.haar : Measure K) ⟨1, by simpa using h1⟩
+    exact (hU.preimage continuous_subtype_val).measure_pos (Measure.haar : Measure K)
+      ⟨1, by simpa using h1⟩
 
 end PI.ScMuExists.UnitaryGroupMassFormula

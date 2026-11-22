@@ -10,17 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Under
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
-open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
+open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
+  GlobalTheory.NormSum GlobalTheory.FunObj.StdDatum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
 
 noncomputable section
 
 namespace GlobalTheory.FunObj.StdDatum
 
-theorem conj_smul_ne_of_isIdemAt {D : D7} {e : Formalism.L2.Theta.AE D} {P : HeightOneSpectrum (𝓞 D.host.E)}
-    (he : Formalism.L2.NTheta.IsIdemAt e P) : D.host.conj • P.asIdeal ≠ P.asIdeal := by
+theorem conj_smul_ne_of_isIdemAt
+    {D : D7} {e : Formalism.L2.Theta.AE D} {P : HeightOneSpectrum (𝓞 D.host.E)}
+    (he : Formalism.L2.NTheta.IsIdemAt e P)
+    : D.host.conj • P.asIdeal ≠ P.asIdeal := by
   intro h
   have hc := GlobalTheory.EtaProduct.cA_of_fixed (GlobalTheory.HeckeDetChar.isPlIdem he) h
   have h0 : e = 0 := by
@@ -34,8 +38,9 @@ theorem conj_smul_ne_of_isIdemAt {D : D7} {e : Formalism.L2.Theta.AE D} {P : Hei
   rw [h0, zero_mul, map_zero] at this
   exact this (zero_mem _)
 
-theorem condE_isCoprime_conj : ∀ {D : D7} {T : Type} {L : LevCh D T} (P : Places L),
-    IsCoprime (condE P) (D.host.conj • condE P) := by
+theorem condE_isCoprime_conj
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} (P : Places L),
+      IsCoprime (condE P) (D.host.conj • condE P) := by
   intro D T L P
   have hF : ∀ I : Ideal (𝓞 D.host.E), (D.host.conj • I).under (𝓞 D.host.F) = I.under (𝓞 D.host.F) :=
     GlobalTheory.PlaceOverPair.under_smul_of_fix D.host.conj

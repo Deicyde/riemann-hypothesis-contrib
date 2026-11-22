@@ -14,20 +14,24 @@ open GlobalTheory.Nef
 
 namespace GlobalTheory.Nef
 
-theorem adjoin_gen_eq_top {k F : Type} [Field k] [Field F] [Algebra k F] (x : F) :
-    k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯ = ⊤ := by
+theorem adjoin_gen_eq_top {k F : Type} [Field k] [Field F] [Algebra k F] (x : F)
+    : k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯ = ⊤ := by
   rw [eq_top_iff]
   rintro y -
-  have hm : (k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯).map (k⟮x⟯.val) = k⟮x⟯ := by
+  have hm
+      : (k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯).map (k⟮x⟯.val) = k⟮x⟯ := by
     rw [IntermediateField.adjoin_map]; simp
-  have hy : (y : F) ∈ (k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯).map (k⟮x⟯.val) := by
+  have hy
+      : (y : F)
+        ∈ (k⟮(⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ : k⟮x⟯)⟯).map (k⟮x⟯.val) := by
     rw [hm]; exact y.2
   obtain ⟨z, hz, hzy⟩ := hy
   have : z = y := Subtype.ext hzy
   exact this ▸ hz
 
-theorem val_lt_one_of_ord_eq_one {k F : Type} [Field k] [Field F] [Algebra k F] (v : Place k F) (t : F)
-    (h : ord v t = 1) : v.1 t < 1 := by
+theorem val_lt_one_of_ord_eq_one
+    {k F : Type} [Field k] [Field F] [Algebra k F] (v : Place k F) (t : F) (h : ord v t = 1)
+    : v.1 t < 1 := by
   unfold ord at h
   by_cases h0 : v.1 t = 0
   · rw [h0] at h; simp at h
@@ -39,9 +43,13 @@ end GlobalTheory.Nef
 
 namespace GlobalTheory.Nef
 
-theorem zeros_finite_sum_eq_degree : ∀ (k F : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field F] [Algebra k F], IsFF k F →
-    ∀ x : F, Transcendental k x → {v : Place k F | v.1 x < 1}.Finite ∧
-      ∑ᶠ v ∈ {v : Place k F | v.1 x < 1}, ord v x = Module.finrank k⟮x⟯ F := by
+theorem zeros_finite_sum_eq_degree
+    : ∀ (k F : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field F] [Algebra k F],
+      IsFF k F
+        → ∀ x : F,
+          Transcendental k x
+            → {v : Place k F | v.1 x < 1}.Finite
+              ∧ ∑ᶠ v ∈ {v : Place k F | v.1 x < 1}, ord v x = Module.finrank k⟮x⟯ F := by
   intro k F _ _ _ _ _ hF x hx
   haveI : FiniteDimensional k⟮x⟯ F := (GlobalTheory.T.functionFieldOneVariable_transcendental_finite_and_ext k F hF).1 x hx
   set t : k⟮x⟯ := ⟨x, IntermediateField.mem_adjoin_simple_self k x⟩ with ht
@@ -53,17 +61,18 @@ theorem zeros_finite_sum_eq_degree : ∀ (k F : Type) [Field k] [IsAlgClosed k] 
   have hL : IsFF k k⟮x⟯ := by
     refine ⟨t, htr, ?_⟩
     rw [htop]
-    have : Module.Free (⊤ : IntermediateField k k⟮x⟯) k⟮x⟯ :=
-      Module.Free.of_divisionRing _ _
+    have : Module.Free (⊤ : IntermediateField k k⟮x⟯) k⟮x⟯ := Module.Free.of_divisionRing _ _
     exact Module.finite_of_finrank_eq_succ IntermediateField.finrank_top
-  obtain ⟨v0, hv0, huniq⟩ := GlobalTheory.T.existsUnique_place_ord_eq_one_of_transcendental_generator k k⟮x⟯ t htr htop
+  obtain ⟨v0, hv0, huniq⟩ :=
+    GlobalTheory.T.existsUnique_place_ord_eq_one_of_transcendental_generator k k⟮x⟯ t htr htop
   obtain ⟨ρ, hρ⟩ := (GlobalTheory.T.functionFieldPlace_restriction_exists_pow k k⟮x⟯ F).1
-  have ht0 : t ≠ 0 := by
-    intro h; apply hx; rw [← htx, h, map_zero]; exact isAlgebraic_zero
-  obtain ⟨hfin, hsum⟩ := GlobalTheory.T.functionFieldPlace_sum_order_eq_finrank k k⟮x⟯ F hL ρ hρ v0 t ht0 hv0
+  have ht0 : t ≠ 0 := by intro h; apply hx; rw [← htx, h, map_zero]; exact isAlgebraic_zero
+  obtain ⟨hfin, hsum⟩ :=
+    GlobalTheory.T.functionFieldPlace_sum_order_eq_finrank k k⟮x⟯ F hL ρ hρ v0 t ht0 hv0
   have hset : {v : Place k F | v.1 x < 1} = {p | ρ p = v0} := by
     ext p
-    obtain ⟨e, he, hpow, -⟩ := (GlobalTheory.T.functionFieldPlace_restriction_exists_pow k k⟮x⟯ F).2 ρ hρ p
+    obtain ⟨e, he, hpow, -⟩ :=
+      (GlobalTheory.T.functionFieldPlace_restriction_exists_pow k k⟮x⟯ F).2 ρ hρ p
     simp only [Set.mem_setOf_eq]
     change p.1 (algebraMap k⟮x⟯ F t) < 1 ↔ ρ p = v0
     rw [hpow t]

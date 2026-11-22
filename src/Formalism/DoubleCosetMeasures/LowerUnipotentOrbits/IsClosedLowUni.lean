@@ -25,12 +25,12 @@ section Top
 
 variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
 
-theorem glR_open (R : Subring K) (hR : IsOpen (R : Set K)) (n : ℕ) :
-    IsOpen (glR R n : Set (GL (Fin n) K)) :=
+theorem glR_open (R : Subring K) (hR : IsOpen (R : Set K)) (n : ℕ)
+    : IsOpen (glR R n : Set (GL (Fin n) K)) :=
   _root_.UpperTheory.Reformulated.B.GLRealOpen.glR_open R hR n
 
-theorem glR_compact [T2Space K] (R : Subring K) (hR : IsCompact (R : Set K)) (n : ℕ) :
-    IsCompact (glR R n : Set (GL (Fin n) K)) := by
+theorem glR_compact [T2Space K] (R : Subring K) (hR : IsCompact (R : Set K)) (n : ℕ)
+    : IsCompact (glR R n : Set (GL (Fin n) K)) := by
   let S : Set (Matrix (Fin n) (Fin n) K) :=
     Set.pi Set.univ (fun _ => Set.pi Set.univ (fun _ => (R : Set K)))
   have hS : IsCompact S := isCompact_univ_pi (fun _ => isCompact_univ_pi (fun _ => hR))
@@ -43,8 +43,10 @@ theorem glR_compact [T2Space K] (R : Subring K) (hR : IsCompact (R : Set K)) (n 
   · rintro ⟨h1, h2⟩
     exact ⟨fun a _ b _ => h1 a b, fun a _ b _ => h2 a b⟩
   · rintro ⟨h1, h2⟩
-    exact ⟨fun a b => h1 a (Set.mem_univ _) b (Set.mem_univ _),
-      fun a b => h2 a (Set.mem_univ _) b (Set.mem_univ _)⟩
+    exact ⟨
+      fun a b => h1 a (Set.mem_univ _) b (Set.mem_univ _),
+      fun a b => h2 a (Set.mem_univ _) b (Set.mem_univ _)
+    ⟩
 
 end Top
 

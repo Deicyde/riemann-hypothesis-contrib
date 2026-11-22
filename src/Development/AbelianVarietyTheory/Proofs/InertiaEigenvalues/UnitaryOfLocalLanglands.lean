@@ -21,7 +21,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Algebra
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host GlobalTheory.HeightCounting NumberField IsDedekindDomain
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.FormDict GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -32,12 +35,13 @@ theorem host_conj_eq (D : D7) (x : D.host.E) : D.host.conj x = IsCMField.complex
   D.host.φ₀.injective (by
     rw [NumberField.IsCMField.complexEmbedding_complexConj, Formalism.HC.HostAx.conjE_apply])
 
-theorem coe_cO (D : D7) (x : 𝓞 D.host.E) :
-    ((IsCMField.ringOfIntegersComplexConj D.host.E x : 𝓞 D.host.E) : D.host.E) = D.host.conj (x : D.host.E) := by
+theorem coe_cO (D : D7) (x : 𝓞 D.host.E)
+    : ((IsCMField.ringOfIntegersComplexConj D.host.E x : 𝓞 D.host.E) : D.host.E)
+      = D.host.conj (x : D.host.E) := by
   rw [IsCMField.coe_ringOfIntegersComplexConj, host_conj_eq]
 
-theorem exists_splitPlace_w (D : D7) (w : PlE D.host) (hw : IsSplitPl D.host w) :
-    ∃ s : SplitPlace D.host.E, s.w = w := by
+theorem exists_splitPlace_w (D : D7) (w : PlE D.host) (hw : IsSplitPl D.host w)
+    : ∃ s : SplitPlace D.host.E, s.w = w := by
   obtain ⟨s, -, hc, -⟩ := GlobalTheory.SplitConjPlace.splitEx_all D w hw
   refine ⟨GlobalTheory.SplitConjPlace.conjSP s, HeightOneSpectrum.ext (Ideal.ext fun x => ?_)⟩
   change Valued.v (s.i (IsCMField.complexConj D.host.E (x : D.host.E))) < 1 ↔ _
@@ -62,7 +66,8 @@ theorem not_isSplitAt (D : D7) (w : PlE D.host) (hw : ¬ IsSplitPl D.host w) : �
         rwa [cc]
       · intro h
         apply hy0
-        rw [← cc y, h, map_zero] }
+        rw [← cc y, h, map_zero]
+  }
   have hQ (x : 𝓞 D.host.E) : x ∈ Q.asIdeal ↔ cO x ∈ w.asIdeal := Iff.rfl
   have hne : Q ≠ w := by
     intro h
@@ -75,7 +80,8 @@ theorem not_isSplitAt (D : D7) (w : PlE D.host) (hw : ¬ IsSplitPl D.host w) : �
       exact hxw (h ▸ this)
     have hfix : cO (x * cO x) = x * cO x := by rw [map_mul, cc, mul_comm]
     obtain ⟨y, hy⟩ := (IsCMField.ringOfIntegersComplexConj_eq_self_iff D.host.E _).1 hfix
-    have hyu : y ∈ u.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) := by
+    have hyu
+        : y ∈ u.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) := by
       rw [Ideal.mem_comap, hy]; exact u.asIdeal.mul_mem_right _ hx
     change y ∈ (u.under (𝓞 (maximalRealSubfield D.host.E))).asIdeal at hyu
     rw [he] at hyu
@@ -89,7 +95,8 @@ theorem not_isSplitAt (D : D7) (w : PlE D.host) (hw : ¬ IsSplitPl D.host w) : �
   obtain ⟨x, hx, hx'⟩ := Set.not_subset.mp hle
   refine ⟨x, hx, fun y hy hyw => hx' ?_⟩
   refine (hQ x).2 ?_
-  have : y = IsCMField.ringOfIntegersComplexConj D.host.E x := RingOfIntegers.ext (by rw [hy, coe_cO])
+  have : y = IsCMField.ringOfIntegersComplexConj D.host.E x :=
+    RingOfIntegers.ext (by rw [hy, coe_cO])
   rwa [← this]
 
 theorem infOf_eq_infOfWeight {n : ℕ} (lam : DomWeight n) : NG.infOf lam.w = infOfWeight lam := by

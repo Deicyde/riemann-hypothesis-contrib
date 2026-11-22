@@ -12,16 +12,19 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Rg.DzCount
 
-private theorem exists_block_lt_unipotent_lemma {K : Type} [Field K] {n s : ℕ} {d : Fin s → ℕ}
-    (e : (Σ a, Fin (d a)) ≃ Fin n) {g : GL (Fin n) K} (hg : g ∈ GlobalTheory.SmGL.unipRad K e) (i j : Fin n)
-    (hij : GlobalTheory.SmGL.blk e i = GlobalTheory.SmGL.blk e j) :
-    (g : Matrix (Fin n) (Fin n) K) i j = if i = j then 1 else 0 := by
+private theorem exists_block_lt_unipotent_lemma
+    {K : Type} [Field K]
+    {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n)
+    {g : GL (Fin n) K} (hg : g ∈ GlobalTheory.SmGL.unipRad K e)
+    (i j : Fin n) (hij : GlobalTheory.SmGL.blk e i = GlobalTheory.SmGL.blk e j)
+    : (g : Matrix (Fin n) (Fin n) K) i j = if i = j then 1 else 0 := by
   obtain ⟨⟨y, hy⟩, hk, rfl⟩ := Subgroup.mem_map.1 hg
   rw [MonoidHom.mem_ker] at hk
   obtain ⟨a, i', hi⟩ : ∃ a i', e.symm i = ⟨a, i'⟩ := ⟨_, _, rfl⟩
@@ -30,18 +33,18 @@ private theorem exists_block_lt_unipotent_lemma {K : Type} [Field K] {n s : ℕ}
     simp only [GlobalTheory.SmGL.blk, hi, hj] at hij
     exact hij
   subst hab
-  have hi2 : i = e ⟨a, i'⟩ := by
-    rw [← hi, Equiv.apply_symm_apply]
-  have hj2 : j = e ⟨a, j'⟩ := by
-    rw [← hj, Equiv.apply_symm_apply]
-  have h3 := congrArg (fun u => ((u a : GL (Fin (d a)) K) : Matrix (Fin (d a)) (Fin (d a)) K) i' j') hk
+  have hi2 : i = e ⟨a, i'⟩ := by rw [← hi, Equiv.apply_symm_apply]
+  have hj2 : j = e ⟨a, j'⟩ := by rw [← hj, Equiv.apply_symm_apply]
+  have h3 :=
+    congrArg (fun u => ((u a : GL (Fin (d a)) K) : Matrix (Fin (d a)) (Fin (d a)) K) i' j') hk
   simp [GlobalTheory.SmGL.leviProj, GlobalTheory.SmGL.diagBlock, Matrix.one_apply] at h3
   subst hi2 hj2
   simp [h3]
 
-theorem exists_block_lt_unipotent {K : Type} [Field K] {n s : ℕ} {d : Fin s → ℕ}
-    (e : (Σ a, Fin (d a)) ≃ Fin n) (h : GlobalTheory.SmGL.unipRad K e ≠ ⊥) :
-    ∃ i j : Fin n, GlobalTheory.SmGL.blk e i < GlobalTheory.SmGL.blk e j := by
+theorem exists_block_lt_unipotent
+    {K : Type} [Field K]
+    {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n) (h : GlobalTheory.SmGL.unipRad K e ≠ ⊥)
+    : ∃ i j : Fin n, GlobalTheory.SmGL.blk e i < GlobalTheory.SmGL.blk e j := by
   by_contra hcon
   push_neg at hcon
   apply h
@@ -52,11 +55,14 @@ theorem exists_block_lt_unipotent {K : Type} [Field K] {n s : ℕ} {d : Fin s �
   rw [exists_block_lt_unipotent_lemma e hg i j (le_antisymm (hcon j i) (hcon i j))]
   simp [Matrix.one_apply]
 
-private theorem finite_cuspidal_of_isCuspidal_lemma {K : Type} [Field K] {n s : ℕ} {d : Fin s → ℕ}
-    (e : (Σ a, Fin (d a)) ≃ Fin n) (g : GL (Fin n) K)
+private theorem finite_cuspidal_of_isCuspidal_lemma
+    {K : Type} [Field K]
+    {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n) (g : GL (Fin n) K)
     (h1 : (g : Matrix (Fin n) (Fin n) K).BlockTriangular (GlobalTheory.SmGL.blk e))
-    (h2 : ∀ i j, GlobalTheory.SmGL.blk e i = GlobalTheory.SmGL.blk e j → (g : Matrix (Fin n) (Fin n) K) i j = if i = j then 1 else 0) :
-    g ∈ GlobalTheory.SmGL.unipRad K e := by
+    (h2 : ∀ i j,
+      GlobalTheory.SmGL.blk e i = GlobalTheory.SmGL.blk e j
+        → (g : Matrix (Fin n) (Fin n) K) i j = if i = j then 1 else 0)
+    : g ∈ GlobalTheory.SmGL.unipRad K e := by
   refine Subgroup.mem_map.2 ⟨⟨g, h1⟩, ?_, rfl⟩
   rw [MonoidHom.mem_ker]
   funext a
@@ -65,15 +71,18 @@ private theorem finite_cuspidal_of_isCuspidal_lemma {K : Type} [Field K] {n s : 
   have h3 := h2 (e ⟨a, i'⟩) (e ⟨a, j'⟩) (by simp [GlobalTheory.SmGL.blk])
   simp [GlobalTheory.SmGL.leviProj, GlobalTheory.SmGL.diagBlock, Matrix.one_apply, h3]
 
-private theorem finite_cuspidal_of_isCuspidal_lemma_2 {K : Type} [Field K] [Fintype K] [DecidableEq K] {n s : ℕ}
-    {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n) (t : Fin s) (u : GL (Fin n) K)
-    (hu : u ∈ Formalism.IrreducibleCountingLemmas.TYPES.unip K (fun i => if GlobalTheory.SmGL.blk e i < t then (0 : Fin 2) else 1)) :
-    u ∈ GlobalTheory.SmGL.unipRad K e := by
+private theorem finite_cuspidal_of_isCuspidal_lemma_2
+    {K : Type} [Field K] [Fintype K] [DecidableEq K]
+    {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n) (t : Fin s) (u : GL (Fin n) K)
+    (hu : u ∈ Formalism.IrreducibleCountingLemmas.TYPES.unip K
+      (fun i => if GlobalTheory.SmGL.blk e i < t then (0 : Fin 2) else 1))
+    : u ∈ GlobalTheory.SmGL.unipRad K e := by
   obtain ⟨⟨hut, -⟩, hud⟩ := hu
   refine finite_cuspidal_of_isCuspidal_lemma e u ?_ ?_
   · intro i j hji
-    by_cases hb : (if GlobalTheory.SmGL.blk e j < t then (0 : Fin 2) else 1) <
-        (if GlobalTheory.SmGL.blk e i < t then (0 : Fin 2) else 1)
+    by_cases hb
+      : (if GlobalTheory.SmGL.blk e j < t then (0 : Fin 2) else 1)
+        < (if GlobalTheory.SmGL.blk e i < t then (0 : Fin 2) else 1)
     · exact hut i j hb
     · have hne : i ≠ j := by
         intro h
@@ -89,12 +98,17 @@ private theorem finite_cuspidal_of_isCuspidal_lemma_2 {K : Type} [Field K] [Fint
   · intro i j hij
     rw [hud i j (by simp [hij])]
 
-theorem finite_cuspidal_of_isCuspidal {K : Type} [Field K] [Fintype K] [DecidableEq K] {n : ℕ}
-    (τ : FDRep ℂ (GL (Fin n) K)) (h : Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ) : FinCusp τ.ρ := by
+theorem finite_cuspidal_of_isCuspidal
+    {K : Type} [Field K] [Fintype K] [DecidableEq K]
+    {n : ℕ}
+    (τ : FDRep ℂ (GL (Fin n) K)) (h : Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ)
+    : FinCusp τ.ρ := by
   unfold FinCusp
   intro s d e hne v hv
   obtain ⟨i0, j0, hlt⟩ := exists_block_lt_unipotent e hne
-  refine h 2 (fun i => if GlobalTheory.SmGL.blk e i < GlobalTheory.SmGL.blk e j0 then 0 else 1) ?_ le_rfl v ?_
+  refine h 2
+    (fun i => if GlobalTheory.SmGL.blk e i < GlobalTheory.SmGL.blk e j0 then 0 else 1)
+    ?_ le_rfl v ?_
   · intro k
     fin_cases k
     · exact ⟨i0, by simp [hlt]⟩
@@ -102,10 +116,13 @@ theorem finite_cuspidal_of_isCuspidal {K : Type} [Field K] [Fintype K] [Decidabl
   · intro u hu
     exact hv u (finite_cuspidal_of_isCuspidal_lemma_2 e _ u hu)
 
-theorem hasCuspLabel_of_equiv {K : Type} [Field K] [Fintype K] [DecidableEq K]
-    (C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv K) {n : ℕ} {τ τ' : FDRep ℂ (GL (Fin n) K)} (e : τ ≃ₗ[ℂ] τ')
-    (he : ∀ g v, e (τ.ρ g v) = τ'.ρ g (e v)) {P : K[X]} (h : Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ P) :
-    Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ' P := by
+theorem hasCuspLabel_of_equiv
+    {K : Type} [Field K] [Fintype K] [DecidableEq K]
+    (C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv K)
+    {n : ℕ} {τ τ' : FDRep ℂ (GL (Fin n) K)}
+    (e : τ ≃ₗ[ℂ] τ') (he : ∀ g v, e (τ.ρ g v) = τ'.ρ g (e v))
+    {P : K[X]} (h : Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ P)
+    : Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ' P := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := h
   refine ⟨h1, h2, h3, h4, fun x hx γ hγ z hz m hm => ?_⟩
   rw [← h5 x hx γ hγ z hz m hm]
@@ -119,10 +136,14 @@ theorem st7 : St7 := by
   classical
   letI : Fintype K := Fintype.ofFinite K
   obtain ⟨C⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.nonempty_labelConv K
-  obtain ⟨P0, a0, b0, c0, d0⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.exists_monic_irreducible K n hn
+  obtain ⟨P0, a0, b0, c0, d0⟩ :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.CuspExists.exists_monic_irreducible K n hn
   obtain ⟨τ0, -⟩ := GlobalTheory.T.exists_cuspidal_with_label K C n hn P0 a0 b0 c0 d0
-  have hex : ∀ P : K[X], ∃ τ : FDRep ℂ (GL (Fin n) K), P ∈ Lab K n →
-      CategoryTheory.Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ P := by
+  have hex
+      : ∀ P : K[X], ∃ τ : FDRep ℂ (GL (Fin n) K),
+        P ∈ Lab K n
+          → CategoryTheory.Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal K τ
+            ∧ Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel C τ P := by
     intro P
     by_cases hP : P ∈ Lab K n
     · obtain ⟨p1, p2, p3, p4⟩ := hP
@@ -130,11 +151,17 @@ theorem st7 : St7 := by
       exact ⟨τ, fun _ => ⟨hs, hc, hl⟩⟩
     · exact ⟨τ0, fun h' => absurd h' hP⟩
   choose τ hτ using hex
-  refine ⟨τ, fun P hP => ⟨GlobalTheory.SerOSys.ZSum.isIrreducible_of_simple _ (hτ P hP).1,
-    finite_cuspidal_of_isCuspidal _ (hτ P hP).2.1⟩, ?_⟩
+  refine ⟨
+    τ,
+    fun P hP => ⟨
+      GlobalTheory.SerOSys.ZSum.isIrreducible_of_simple _ (hτ P hP).1,
+      finite_cuspidal_of_isCuspidal _ (hτ P hP).2.1
+    ⟩,
+    ?_
+  ⟩
   rintro P hP P' hP' ⟨e, he⟩
-  exact GlobalTheory.T.cuspidal_label_unique K C (Fin n) (τ P') P P' (hasCuspLabel_of_equiv C e he (hτ P hP).2.2)
-    (hτ P' hP').2.2
+  exact GlobalTheory.T.cuspidal_label_unique K C (Fin n) (τ P') P P'
+    (hasCuspLabel_of_equiv C e he (hτ P hP).2.2) (hτ P' hP').2.2
 
 end PositivityTheory.Rg.DzCount
 

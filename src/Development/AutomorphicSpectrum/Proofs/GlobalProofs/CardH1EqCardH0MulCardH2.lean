@@ -8,19 +8,24 @@ public import Development.WeilBound.CoreStatements.EulerCharacteristicCounts.Gco
 
 @[expose] public section
 
-open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal ValuativeRel Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain CategoryTheory GroundTheory.ProfCoh ReciprocityTheory.Gal
+  ValuativeRel Formalism.ConjugateSelfDual
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.LocalEuler
 
-
 open PositivityTheory.LocalTateOrthogonality.Gcoh in
-theorem card_H1_eq_card_H0_mul_card_H2 (p : ℕ) [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p))
-    (hK : FiniteDimensional ℚ_[p] K) (l : ℕ) [hl : Fact l.Prime] (hlp : l ≠ p) (r : ℕ) (M : Type)
+theorem card_H1_eq_card_H0_mul_card_H2
+    (p : ℕ) [Fact p.Prime]
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (hK : FiniteDimensional ℚ_[p] K)
+    (l : ℕ) [hl : Fact l.Prime]
+    (hlp : l ≠ p)
+    (r : ℕ) (M : Type)
     [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
-    (rho : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK p K) M) (hrho : ContAction rho) :
-    Nat.card (H1 rho) = Nat.card (H0 rho) * Nat.card (H2 rho) := by
+    (rho : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK p K) M)
+    (hrho : ContAction rho)
+    : Nat.card (H1 rho) = Nat.card (H0 rho) * Nat.card (H2 rho) := by
   obtain ⟨hsep, v, t, hloc, hcard⟩ := gcField p K hK
   obtain ⟨A, hA, e, he⟩ := gcRep _ _ M rho hrho
   obtain ⟨e0, -⟩ := gc0 _ _ M rho A e he
@@ -53,8 +58,8 @@ theorem card_H1_eq_card_H0_mul_card_H2 (p : ℕ) [Fact p.Prime] (K : Intermediat
   rw [Nat.cast_mul]
   exact ((div_eq_one_iff_eq hp1).1 hE).symm
 
-theorem exists_prime_mem {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ v.asIdeal := by
+theorem exists_prime_mem {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+    : ∃ p : ℕ, p.Prime ∧ ((p : ℕ) : 𝓞 F) ∈ v.asIdeal := by
   have hmax := v.isMaximal
   letI : Field (𝓞 F ⧸ v.asIdeal) := Ideal.Quotient.field v.asIdeal
   have hfin : Finite (𝓞 F ⧸ v.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ v.ne_bot
@@ -70,7 +75,8 @@ theorem localEulerChar_holds : ReciprocityTheory.Gal.LocalEulerChar := by
   refine ⟨fun hl => ?_, fun hl => ?_⟩
   · obtain ⟨K, hK, i0, -, -, hdeg⟩ := GlobalTheory.DecLocal.decEquiv (p := l) (F := F) A (hval l hl)
     let i : ↥(Dec (F := F) A) ≃ₜ* Formalism.GaloisCohomology.GK l K := i0
-    let rhoK : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK l K) M := rho.comp i.symm.toMulEquiv.toMonoidHom
+    let rhoK : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK l K) M :=
+      rho.comp i.symm.toMulEquiv.toMonoidHom
     have hcomp : ∀ h m, rhoK (i h) m = rho h m := fun h m =>
       congrArg (fun g => rho g m) (i.symm_apply_apply h)
     have hcK : ContAction rhoK := hc.comp' i.symm.continuous
@@ -85,7 +91,8 @@ theorem localEulerChar_holds : ReciprocityTheory.Gal.LocalEulerChar := by
     have hlp : l ≠ p := fun h => hl (h ▸ hpv)
     obtain ⟨K, hK, i0, -, -, -⟩ := GlobalTheory.DecLocal.decEquiv (p := p) (F := F) A (hval p hpv)
     let i : ↥(Dec (F := F) A) ≃ₜ* Formalism.GaloisCohomology.GK p K := i0
-    let rhoK : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK p K) M := rho.comp i.symm.toMulEquiv.toMonoidHom
+    let rhoK : Representation (ZMod (l ^ r)) (Formalism.GaloisCohomology.GK p K) M :=
+      rho.comp i.symm.toMulEquiv.toMonoidHom
     have hcomp : ∀ h m, rhoK (i h) m = rho h m := fun h m =>
       congrArg (fun g => rho g m) (i.symm_apply_apply h)
     have hcK : ContAction rhoK := hc.comp' i.symm.continuous

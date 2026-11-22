@@ -23,8 +23,9 @@ theorem okpInert_main : PI.OkpInert := by
   have hcoe : ∀ a : 𝓞 K, ((cO a : 𝓞 K) : K) = c (a : K) := fun a => rfl
   set ψ : 𝓞 K →+* ℂ_[p] × ℂ_[p] :=
     RingHom.prod (τ.comp (algebraMap (𝓞 K) K)) (τ.comp ((algebraMap (𝓞 K) K).comp cO)) with hψ
-  have hR : Set.range (fun a : 𝓞 K => (τ (a : K), τ (c (a : K)))) =
-      (ψ.range : Set (ℂ_[p] × ℂ_[p])) := by
+  have hR
+      : Set.range (fun a : 𝓞 K => (τ (a : K), τ (c (a : K))))
+        = (ψ.range : Set (ℂ_[p] × ℂ_[p])) := by
     rw [RingHom.coe_range]
     rfl
   apply Set.Subset.antisymm

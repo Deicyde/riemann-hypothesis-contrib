@@ -9,10 +9,13 @@ open Formalism.REAL Finset
 
 namespace GlobalTheory
 
-theorem qminor_comm_of_comm_columns (A : Type) [Ring A] [Algebra ℂ A] (n t : ℕ)
-    (E : Fin n → Fin n → A) (x : A) (a b : Fin t → Fin n) (u : ℂ)
-    (h : ∀ (c : Fin n) (i : Fin t), E c (b i) * x = x * E c (b i)) :
-    qminor E a b u * x = x * qminor E a b u := by
+theorem qminor_comm_of_comm_columns
+    (A : Type) [Ring A] [Algebra ℂ A]
+    (n t : ℕ) (E : Fin n → Fin n → A)
+    (x : A)
+    (a b : Fin t → Fin n)
+    (u : ℂ) (h : ∀ (c : Fin n) (i : Fin t), E c (b i) * x = x * E c (b i))
+    : qminor E a b u * x = x * qminor E a b u := by
   have hT : ∀ (v : ℂ) (c : Fin n) (i : Fin t), Commute (Tm E v c (b i)) x := by
     intro v c i
     have h1 : Commute (E c (b i)) x := h c i

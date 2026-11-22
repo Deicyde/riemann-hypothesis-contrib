@@ -11,22 +11,25 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TwistedDu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
-theorem sum_count_Icc (s : Multiset ℤ) (η : ℕ) :
-    ∑ u ∈ Finset.Icc (-(η : ℤ)) η, ((s.count u : ℕ) : ℤ) =
-      ((s.filter fun u : ℤ => |u| ≤ (η : ℤ)).card : ℤ) := by
+theorem sum_count_Icc (s : Multiset ℤ) (η : ℕ)
+    : ∑ u ∈ Finset.Icc (-(η : ℤ)) η, ((s.count u : ℕ) : ℤ)
+      = ((s.filter fun u : ℤ => |u| ≤ (η : ℤ)).card : ℤ) := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons x s ih =>
     by_cases hx : |x| ≤ (η : ℤ)
     · have hm : x ∈ Finset.Icc (-(η : ℤ)) η := Finset.mem_Icc.2 (abs_le.1 hx)
-      rw [Multiset.filter_cons_of_pos (p := fun u : ℤ => |u| ≤ (η : ℤ)) _ hx, Multiset.card_cons, ← Finset.add_sum_erase _ _ hm,
-        Multiset.count_cons_self]
-      have he : ∑ u ∈ (Finset.Icc (-(η : ℤ)) η).erase x, ((Multiset.count u (x ::ₘ s) : ℕ) : ℤ) =
-          ∑ u ∈ (Finset.Icc (-(η : ℤ)) η).erase x, ((Multiset.count u s : ℕ) : ℤ) :=
+      rw [Multiset.filter_cons_of_pos (p := fun u : ℤ => |u| ≤ (η : ℤ)) _ hx, Multiset.card_cons,
+        ← Finset.add_sum_erase _ _ hm, Multiset.count_cons_self]
+      have he
+          : ∑ u ∈ (Finset.Icc (-(η : ℤ)) η).erase x, ((Multiset.count u (x ::ₘ s) : ℕ) : ℤ)
+            = ∑ u ∈ (Finset.Icc (-(η : ℤ)) η).erase x, ((Multiset.count u s : ℕ) : ℤ) :=
         Finset.sum_congr rfl fun u hu => by
           rw [Multiset.count_cons_of_ne (Finset.ne_of_mem_erase hu)]
       rw [he]
@@ -38,14 +41,25 @@ theorem sum_count_Icc (s : Multiset ℤ) (η : ℕ) :
       refine Finset.sum_congr rfl fun u hu => ?_
       rw [Multiset.count_cons_of_ne (fun h => hm (by rw [← h]; exact hu))]
 
-theorem letter_one_zero {φ : Formalism.HC.Frame} (τ : φ.GG) : letter τ 1 (0 : ZMod (orderOf (1 : φ.GG))) = τ := by
+theorem letter_one_zero {φ : Formalism.HC.Frame} (τ : φ.GG)
+    : letter τ 1 (0 : ZMod (orderOf (1 : φ.GG))) = τ := by
   simp [letter]
 
-theorem recWord_jumps : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ} (g : ZMod n → D.R.GG), Roomy L C → ∀ a, (∀ u ∈ jT1 (hcAt D (g a)) j (pos ε (g a)), u ∈ (recWord L j ε g).win a ∧ u ∈ Set.Icc (-((recWord L j ε g).Mi a : ℤ)) ((recWord L j ε g).hi a : ℤ)) ∧ (∀ u ∈ jT2 (hcAt D (g a)) j (pos ε (g a)), u ∈ jT1 (hcAt D (g a)) j (pos ε (g a))) ∧ ∑ u ∈ Finset.Icc (-(etaHat L : ℤ)) (etaHat L), (((jT2 (hcAt D (g a)) j (pos ε (g a))).count u : ℕ) : ℤ) ≤ D.R.m := by
+theorem recWord_jumps
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ} (g : ZMod n → D.R.GG),
+      Roomy L C
+        → ∀ a,
+          (∀ u ∈ jT1 (hcAt D (g a)) j (pos ε (g a)),
+              u ∈ (recWord L j ε g).win a
+                ∧ u ∈ Set.Icc (-((recWord L j ε g).Mi a : ℤ)) ((recWord L j ε g).hi a : ℤ))
+            ∧ (∀ u ∈ jT2 (hcAt D (g a)) j (pos ε (g a)), u ∈ jT1 (hcAt D (g a)) j (pos ε (g a)))
+            ∧ ∑ u ∈ Finset.Icc (-(etaHat L : ℤ)) (etaHat L), (((jT2 (hcAt D (g a)) j (pos ε (g a))).count u : ℕ) : ℤ)
+              ≤ D.R.m := by
   intro D L C j ε n g hR a
   obtain ⟨hT1, hbox⟩ := GlobalTheory.T.twistedDualPageWord_jumps_in_windows L C j ε (g a) 1 hR
   obtain ⟨hT2, hcard⟩ := GlobalTheory.T.pageWord_T2_and_J2_card_of_roomy L C j ε (g a) 1 hR
-  obtain ⟨hsz, hMi, hhi, -⟩ := GlobalTheory.T.twistedDualSizeWord_letter_eq_pageWord L C j ε (g a) 1 hR 0
+  obtain ⟨hsz, hMi, hhi, -⟩ :=
+    GlobalTheory.T.twistedDualSizeWord_letter_eq_pageWord L C j ε (g a) 1 hR 0
   have hl := letter_one_zero (g a)
   have t1 := hT1 0
   have t2 := hT2 0

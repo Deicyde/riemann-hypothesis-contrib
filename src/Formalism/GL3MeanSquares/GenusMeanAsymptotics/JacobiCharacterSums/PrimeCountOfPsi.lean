@@ -16,8 +16,13 @@ open Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds Formalism.ZeroFre
 theorem prime_count_of_psi : PiOf := by
   rintro ⟨c, A, C₀, hc, hP⟩
   obtain ⟨c₁, hc₁, hηl⟩ := etaOf_lower 1 one_pos
-  refine ⟨min (c / 2) (c ^ 2 / 2), 10 * |A| + 5632 * Real.exp (2 * min (c / 2) (c ^ 2 / 2)) / c₁,
-    max (2 * C₀) 16, lt_min (by positivity) (by positivity), ?_⟩
+  refine ⟨
+    min (c / 2) (c ^ 2 / 2),
+    10 * |A| + 5632 * Real.exp (2 * min (c / 2) (c ^ 2 / 2)) / c₁,
+    max (2 * C₀) 16,
+    lt_min (by positivity) (by positivity),
+    ?_
+  ⟩
   intro M _ h8
   refine ⟨eOf M, fun p hp => eOf_exc M p hp, fun h χ₁ β₁ => eOf_none M h χ₁ β₁, ?_⟩
   intro X b hX2 hrange hb
@@ -45,38 +50,46 @@ theorem prime_count_of_psi : PiOf := by
     linarith
   have hLC : C₀ * Real.log M * Real.log (Real.log M + 2) ≤ Real.log X / 2 := by
     have := mul_le_mul_of_nonneg_right (le_max_left (2 * C₀) 16) hprod0
-    have e : C₀ * Real.log M * Real.log (Real.log M + 2) =
-        2 * C₀ * (Real.log M * Real.log (Real.log M + 2)) / 2 := by ring
+    have e
+        : C₀ * Real.log M * Real.log (Real.log M + 2)
+          = 2 * C₀ * (Real.log M * Real.log (Real.log M + 2)) / 2 := by
+      ring
     rw [e]
     linarith
   have hX0 : 0 < X := by linarith
   have hX4 : 4 ≤ X := by
     rw [← Real.log_le_log_iff (by norm_num) hX0]
     linarith
-  have hs2 : 2 ≤ √X := by
-    rw [Real.le_sqrt' (by norm_num)]; linarith
+  have hs2 : 2 ≤ √X := by rw [Real.le_sqrt' (by norm_num)]; linarith
   have hη0 : 0 ≤ etaOf M := (etaOf_pos M (by omega)).le
   have hη1 := etaOf_le_one M
   have hηl' := hηl M (by omega)
-  have hP' : ∀ y : ℝ, √X ≤ y → y ≤ X →
-      ∑ χ : DirichletCharacter ℂ M, ‖psiChi χ y - mainPsi (eOf M) χ y‖ ≤
-      |A| * y * etaOf M *
-        (Real.exp (-(c * Real.log y / Real.log M)) + Real.exp (-(c * Real.sqrt (Real.log y)))) := by
+  have hP'
+      : ∀ y : ℝ,
+        √X ≤ y → y ≤ X
+          → ∑ χ : DirichletCharacter ℂ M, ‖psiChi χ y - mainPsi (eOf M) χ y‖
+            ≤ |A| * y * etaOf M
+              * (Real.exp (-(c * Real.log y / Real.log M))
+                + Real.exp (-(c * Real.sqrt (Real.log y)))) := by
     intro y h1 h2
     have hy2 : 2 ≤ y := hs2.trans h1
     have hly : Real.log X / 2 ≤ Real.log y := by
       rw [← Real.log_sqrt hX0.le]
       exact Real.log_le_log (by linarith) h1
     refine (hP M h8 y hy2 (by linarith)).trans ?_
-    exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
-      (mul_le_mul_of_nonneg_right (le_abs_self A) (by linarith)) hη0) (by positivity)
+    exact mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_abs_self A) (by linarith)) hη0)
+      (by positivity)
   rcases he : eOf M with _ | ⟨χ₁, β₁⟩
   · rw [he] at hP'
-    have e0 : mainAP (none : Option (DirichletCharacter ℂ M × ℝ)) b X =
-        (liX X - 0 * liX (X ^ (1 : ℝ))) / (M.totient : ℝ) := by simp [mainAP]
+    have e0
+        : mainAP (none : Option (DirichletCharacter ℂ M × ℝ)) b X
+          = (liX X - 0 * liX (X ^ (1 : ℝ))) / (M.totient : ℝ) := by
+      simp [mainAP]
     rw [e0]
     exact pi_core M h8 b hb none (by simp) (by norm_num) le_rfl
-      (fun t _ => mainPsi_sum_none M b hb t 1) hη0 hη1 (Or.inl le_rfl) hc₁ hηl' hc (abs_nonneg A) hX0 hL16 hP'
+      (fun t _ => mainPsi_sum_none M b hb t 1)
+      hη0 hη1 (Or.inl le_rfl) hc₁ hηl' hc (abs_nonneg A) hX0 hL16 hP'
   · rw [he] at hP'
     obtain ⟨_, _, _, hβlo, hβ1⟩ := eOf_exc M _ he
     have hχ := eOf_char_sq M χ₁ β₁ he b ((ZMod.isUnit_iff_coprime b M).mpr hb)
@@ -87,11 +100,13 @@ theorem prime_count_of_psi : PiOf := by
       simp only [] at hβlo
       linarith
     have hηe := etaOf_some M χ₁ β₁ he
-    have e1 : mainAP (some (χ₁, β₁)) b X =
-        (liX X - (χ₁ (b : ZMod M)).re * liX (X ^ β₁)) / (M.totient : ℝ) := rfl
+    have e1
+        : mainAP (some (χ₁, β₁)) b X
+          = (liX X - (χ₁ (b : ZMod M)).re * liX (X ^ β₁)) / (M.totient : ℝ) :=
+      rfl
     rw [e1]
     exact pi_core M h8 b hb (some (χ₁, β₁)) hθ hβ hβ1.le
-      (fun t ht => mainPsi_sum_some M b hb χ₁ β₁ t ht hχ) hη0 hη1
-      (Or.inr (by rw [hηe]; exact min_le_right _ _)) hc₁ hηl' hc (abs_nonneg A) hX0 hL16 hP'
+      (fun t ht => mainPsi_sum_some M b hb χ₁ β₁ t ht hχ)
+      hη0 hη1 (Or.inr (by rw [hηe]; exact min_le_right _ _)) hc₁ hηl' hc (abs_nonneg A) hX0 hL16 hP'
 
 end Formalism.HermitianLattices.Ext.PrimesInProgressions

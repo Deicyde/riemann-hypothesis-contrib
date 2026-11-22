@@ -4,13 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.residue_hom_norm :
-    ∀ {O R Ω : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [NormedField Ω]
+theorem UpperTheory.residue_hom_norm
+    : ∀ {O R Ω : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [NormedField Ω]
         [IsUltrametricDist Ω] [Algebra O Ω]
         (hres : ∀ x : R, ∃ a : O, x - algebraMap O R a ∈ IsLocalRing.maximalIdeal R)
         (hO : ∀ a : O, ‖algebraMap O Ω a‖ ≤ 1) (hint : ∀ x : Ω, ‖x‖ ≤ 1 → IsIntegral O x)
         (y : R →ₐ[O] Ω),
-        (∀ a, ‖y a‖ ≤ 1) ∧ ∀ a ∈ IsLocalRing.maximalIdeal R, ‖y a‖ < 1 := by
+      (∀ a, ‖y a‖ ≤ 1) ∧ ∀ a ∈ IsLocalRing.maximalIdeal R, ‖y a‖ < 1 := by
   intro O R Ω _ _ _ _ _ _ _ hres hO hint y
   have hm : ∀ a ∈ IsLocalRing.maximalIdeal R, ‖y a‖ < 1 := by
     intro m hmem
@@ -58,5 +58,4 @@ theorem UpperTheory.residue_hom_norm :
     rw [map_sub, AlgHom.commutes]
     ring
   rw [hx]
-  exact (IsUltrametricDist.norm_add_le_max _ _).trans
-    (max_le (hO a) (hm _ ha).le)
+  exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hO a) (hm _ ha).le)

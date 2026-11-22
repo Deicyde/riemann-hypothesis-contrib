@@ -16,13 +16,16 @@ open PI.ScRefExists.Sk
 variable (I : Formalism.MainNotions.S.AutInst)
 
 theorem hG_add_left (x x' y : Fin I.n → I.E) : hG I (x + x') y = hG I x y + hG I x' y := by
-  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.add_apply, star_add, add_mul, Finset.sum_add_distrib]
+  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.add_apply, star_add, add_mul,
+    Finset.sum_add_distrib]
 
 theorem hG_add_right (x y y' : Fin I.n → I.E) : hG I x (y + y') = hG I x y + hG I x y' := by
-  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.add_apply, mul_add,
+    Finset.sum_add_distrib]
 
 theorem hG_smul_left (c : I.E) (x y : Fin I.n → I.E) : hG I (c • x) y = star c * hG I x y := by
-  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.smul_apply, smul_eq_mul, star_mul', Finset.mul_sum]
+  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.smul_apply, smul_eq_mul, star_mul',
+    Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
@@ -31,11 +34,13 @@ theorem hG_smul_right (c : I.E) (x y : Fin I.n → I.E) : hG I x (c • y) = c *
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hG_neg_left (x y : Fin I.n → I.E) : hG I (-x) y = -hG I x y := by
-  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.neg_apply, star_neg, neg_mul, Finset.sum_neg_distrib]
+theorem hG_neg_left (x y : Fin I.n → I.E) : hG I (-x) y = - hG I x y := by
+  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.neg_apply, star_neg, neg_mul,
+    Finset.sum_neg_distrib]
 
-theorem hG_neg_right (x y : Fin I.n → I.E) : hG I x (-y) = -hG I x y := by
-  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.neg_apply, mul_neg, Finset.sum_neg_distrib]
+theorem hG_neg_right (x y : Fin I.n → I.E) : hG I x (-y) = - hG I x y := by
+  simp only [hG, Formalism.UG.hform, starRingEnd_apply, Pi.neg_apply, mul_neg,
+    Finset.sum_neg_distrib]
 
 theorem hG_sub_left (x x' y : Fin I.n → I.E) : hG I (x - x') y = hG I x y - hG I x' y := by
   rw [sub_eq_add_neg, hG_add_left, hG_neg_left, ← sub_eq_add_neg]
@@ -55,11 +60,12 @@ theorem hG_symm (x y : Fin I.n → I.E) : hG I y x = star (hG I x y) := by
   rw [hJ a b]
   ring
 
-private theorem mem_Ap_lemma (p : ℕ) (x : I.E) :
-    x ∈ Ap I p ↔ ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (a : I.E) :=
+private theorem mem_Ap_lemma (p : ℕ) (x : I.E)
+    : x ∈ Ap I p ↔ ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (a : I.E) :=
   Iff.rfl
 
-theorem int_mem_Ap (p : ℕ) (a : 𝓞 I.E) : (a : I.E) ∈ Ap I p := (mem_Ap_lemma I p _).mpr ⟨1, Nat.coprime_one_left p, a, by simp⟩
+theorem int_mem_Ap (p : ℕ) (a : 𝓞 I.E) : (a : I.E) ∈ Ap I p :=
+  (mem_Ap_lemma I p _).mpr ⟨1, Nat.coprime_one_left p, a, by simp⟩
 
 theorem natCast_smul_mem_L (s : ℕ) {x : Fin I.n → I.E} (hx : x ∈ I.L) : (s : I.E) • x ∈ I.L := by
   rw [Nat.cast_smul_eq_nsmul]
@@ -76,8 +82,8 @@ theorem intE_smul_mem_L (a : 𝓞 I.E) {x : Fin I.n → I.E} (hx : x ∈ I.L) : 
   rw [← oE_smul]
   exact I.L.smul_mem a hx
 
-theorem LA_clear (p : ℕ) {v : Fin I.n → I.E} (hv : v ∈ LA I p) :
-    ∃ s : ℕ, Nat.Coprime s p ∧ (s : I.E) • v ∈ I.L := by
+theorem LA_clear (p : ℕ) {v : Fin I.n → I.E} (hv : v ∈ LA I p)
+    : ∃ s : ℕ, Nat.Coprime s p ∧ (s : I.E) • v ∈ I.L := by
   have hv' : v ∈ Submodule.span (Ap I p) (I.L : Set (Fin I.n → I.E)) := hv
   clear hv
   induction hv' using Submodule.span_induction with
@@ -87,7 +93,9 @@ theorem LA_clear (p : ℕ) {v : Fin I.n → I.E} (hv : v ∈ LA I p) :
     obtain ⟨s, hs, hsx⟩ := hx
     obtain ⟨t, ht, hty⟩ := hy
     refine ⟨s * t, Nat.Coprime.mul_left hs ht, ?_⟩
-    have e : ((s * t : ℕ) : I.E) • (x + y) = (t : I.E) • ((s : I.E) • x) + (s : I.E) • ((t : I.E) • y) := by
+    have e
+        : ((s * t : ℕ) : I.E) • (x + y)
+          = (t : I.E) • ((s : I.E) • x) + (s : I.E) • ((t : I.E) • y) := by
       simp only [Nat.cast_mul, smul_add, smul_smul, mul_comm (t : I.E) (s : I.E)]
     rw [e]
     exact add_mem (natCast_smul_mem_L I t hsx) (natCast_smul_mem_L I s hty)
@@ -104,8 +112,8 @@ theorem LA_clear (p : ℕ) {v : Fin I.n → I.E} (hv : v ∈ LA I p) :
     rw [e]
     exact intE_smul_mem_L I a hsx
 
-theorem hG_mem_Ap (p : ℕ) {v v' : Fin I.n → I.E} (hv : v ∈ LA I p) (hv' : v' ∈ LA I p) :
-    hG I v v' ∈ Ap I p := by
+theorem hG_mem_Ap (p : ℕ) {v v' : Fin I.n → I.E} (hv : v ∈ LA I p) (hv' : v' ∈ LA I p)
+    : hG I v v' ∈ Ap I p := by
   obtain ⟨s, hs, hsv⟩ := LA_clear I p hv
   obtain ⟨t, ht, htv⟩ := LA_clear I p hv'
   obtain ⟨a, ha⟩ := RingHom.mem_range.mp ((I.L_dual _).mp htv _ hsv)
@@ -116,15 +124,17 @@ theorem hG_mem_Ap (p : ℕ) {v v' : Fin I.n → I.E} (hv : v ∈ LA I p) (hv' : 
   rw [Nat.cast_mul, ← e]
   exact ha.symm
 
-theorem span_clear (p : ℕ) (S : Set (Fin I.n → I.E)) {y : Fin I.n → I.E}
-    (hy : y ∈ Submodule.span (Ap I p) S) :
-    ∃ s : ℕ, Nat.Coprime s p ∧ (s : I.E) • y ∈ Submodule.span (𝓞 I.E) S := by
-  have key : ∀ (a : 𝓞 I.E) {z : Fin I.n → I.E}, z ∈ Submodule.span (𝓞 I.E) S →
-      (a : I.E) • z ∈ Submodule.span (𝓞 I.E) S := fun a z hz => by
+theorem span_clear
+    (p : ℕ) (S : Set (Fin I.n → I.E)) {y : Fin I.n → I.E} (hy : y ∈ Submodule.span (Ap I p) S)
+    : ∃ s : ℕ, Nat.Coprime s p ∧ (s : I.E) • y ∈ Submodule.span (𝓞 I.E) S := by
+  have key
+      : ∀ (a : 𝓞 I.E) {z : Fin I.n → I.E},
+        z ∈ Submodule.span (𝓞 I.E) S → (a : I.E) • z ∈ Submodule.span (𝓞 I.E) S := fun a z hz => by
     rw [← oE_smul]
     exact Submodule.smul_mem _ a hz
-  have keyN : ∀ (t : ℕ) {z : Fin I.n → I.E}, z ∈ Submodule.span (𝓞 I.E) S →
-      (t : I.E) • z ∈ Submodule.span (𝓞 I.E) S := fun t z hz => by
+  have keyN
+      : ∀ (t : ℕ) {z : Fin I.n → I.E},
+        z ∈ Submodule.span (𝓞 I.E) S → (t : I.E) • z ∈ Submodule.span (𝓞 I.E) S := fun t z hz => by
     rw [natE_smul]
     exact Submodule.smul_mem _ _ hz
   induction hy using Submodule.span_induction with
@@ -134,7 +144,9 @@ theorem span_clear (p : ℕ) (S : Set (Fin I.n → I.E)) {y : Fin I.n → I.E}
     obtain ⟨s, hs, hsx⟩ := hx
     obtain ⟨t, ht, hty⟩ := hy
     refine ⟨s * t, Nat.Coprime.mul_left hs ht, ?_⟩
-    have e : ((s * t : ℕ) : I.E) • (x + y) = (t : I.E) • ((s : I.E) • x) + (s : I.E) • ((t : I.E) • y) := by
+    have e
+        : ((s * t : ℕ) : I.E) • (x + y)
+          = (t : I.E) • ((s : I.E) • x) + (s : I.E) • ((t : I.E) • y) := by
       simp only [Nat.cast_mul, smul_add, smul_smul, mul_comm (t : I.E) (s : I.E)]
     rw [e]
     exact add_mem (keyN t hsx) (keyN s hty)
@@ -151,7 +163,8 @@ theorem span_clear (p : ℕ) (S : Set (Fin I.n → I.E)) {y : Fin I.n → I.E}
     rw [e]
     exact key a hsx
 
-def QA (p q : ℕ) (x : I.E) : Prop := ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (q : I.E) * a
+def QA (p q : ℕ) (x : I.E) : Prop :=
+  ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (q : I.E) * a
 
 theorem QA_of_GE (p q : ℕ) {x : I.E} (h : GE I q x) : QA I p q x := by
   obtain ⟨t, rfl⟩ := h
@@ -181,8 +194,8 @@ theorem QA_mul (p q : ℕ) {c x : I.E} (hc : c ∈ Ap I p) (hx : QA I p q x) : Q
   push_cast
   linear_combination ((s : I.E) * x) * ha0 + (a0 : I.E) * ha
 
-theorem GE_of_QA (p m : ℕ) {x : I.E} (hint : ∃ a : 𝓞 I.E, (a : I.E) = x) (h : QA I p (p ^ m) x) :
-    GE I (p ^ m) x := by
+theorem GE_of_QA (p m : ℕ) {x : I.E} (hint : ∃ a : 𝓞 I.E, (a : I.E) = x) (h : QA I p (p ^ m) x)
+    : GE I (p ^ m) x := by
   obtain ⟨b, rfl⟩ := hint
   obtain ⟨s, hs, a, ha⟩ := h
   have hcop : Nat.Coprime s (p ^ m) := Nat.Coprime.pow_right m hs

@@ -15,12 +15,14 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ProjectiveOv
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.XR
 
-theorem genPt_spMap_comp {X : Scheme.{0}} {K Ω : Type} [Field K] [Field Ω] (i : K →+* Ω) (ξ : Sp K ⟶ X) :
-    genPt (spMap i ≫ ξ) = genPt ξ := by
+theorem genPt_spMap_comp
+    {X : Scheme.{0}} {K Ω : Type} [Field K] [Field Ω] (i : K →+* Ω) (ξ : Sp K ⟶ X)
+    : genPt (spMap i ≫ ξ) = genPt ξ := by
   unfold genPt
   show ξ ((spMap i) (closedPoint Ω)) = ξ (closedPoint K)
   congr 1
@@ -29,18 +31,19 @@ theorem genPt_spMap_comp {X : Scheme.{0}} {K Ω : Type} [Field K] [Field Ω] (i 
   | exact IsLocalRing.comap_closedPoint i
   | exact (IsLocalRing.PrimeSpectrum.comap_closedPoint i)
 
-theorem finite_descResidueField_spMap_comp {X : Scheme.{0}} {K Ω : Type} [Field K] [Field Ω] (i : K →+* Ω)
-    (hi : i.Finite) (ξ : Sp K ⟶ X) (hξ : Function.Surjective (Scheme.stalkClosedPointTo ξ).hom) :
-    (Scheme.descResidueField (Scheme.stalkClosedPointTo (spMap i ≫ ξ))).hom.Finite := by
+theorem finite_descResidueField_spMap_comp
+    {X : Scheme.{0}} {K Ω : Type} [Field K] [Field Ω]
+    (i : K →+* Ω) (hi : i.Finite)
+    (ξ : Sp K ⟶ X) (hξ : Function.Surjective (Scheme.stalkClosedPointTo ξ).hom)
+    : (Scheme.descResidueField (Scheme.stalkClosedPointTo (spMap i ≫ ξ))).hom.Finite := by
   have hA : ∀ p : Sp K, (ξ.stalkMap p).hom.Finite := by
     intro p
     obtain rfl : p = closedPoint K := Subsingleton.elim _ _
     apply RingHom.Finite.of_surjective
-    have e : Scheme.stalkClosedPointTo ξ =
-        ξ.stalkMap (closedPoint K) ≫ (stalkClosedPointIso (CommRingCat.of K)).hom := by
-      first
-      | rfl
-      | simp [Scheme.stalkClosedPointTo]
+    have e
+        : Scheme.stalkClosedPointTo ξ
+          = ξ.stalkMap (closedPoint K) ≫ (stalkClosedPointIso (CommRingCat.of K)).hom := by
+      first | rfl | simp [Scheme.stalkClosedPointTo]
     intro y
     obtain ⟨a, ha⟩ := hξ ((stalkClosedPointIso (CommRingCat.of K)).hom y)
     refine ⟨a, ?_⟩
@@ -51,8 +54,10 @@ theorem finite_descResidueField_spMap_comp {X : Scheme.{0}} {K Ω : Type} [Field
     change (Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom i))).hom.Finite
     have h := Scheme.germ_stalkClosedPointTo_Spec (CommRingCat.ofHom i)
     refine RingHom.Finite.of_comp_finite
-      (f := ((Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ (Spec (CommRingCat.of K)).presheaf.germ ⊤
-        ((Spec.map (CommRingCat.ofHom i)) (closedPoint Ω)) trivial).hom) ?_
+      (f :=
+        ((Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ (Spec (CommRingCat.of K)).presheaf.germ ⊤
+          ((Spec.map (CommRingCat.ofHom i)) (closedPoint Ω)) trivial).hom)
+      ?_
     rw [← CommRingCat.hom_comp, Category.assoc, h, Iso.inv_hom_id_assoc]
     simpa using hi
   have hC : (Scheme.stalkClosedPointTo (spMap i ≫ ξ)).hom.Finite := by
@@ -69,8 +74,10 @@ theorem finite_descResidueField_spMap_comp {X : Scheme.{0}} {K Ω : Type} [Field
 
 theorem levelCover : LevelCoverSt := by
   intro E _ _ _ H D l Xo c Y e he N hN
-  obtain ⟨K, _, _, n0, x0, y0, htie, -, hgen⟩ := GlobalTheory.T.generic_point_normal_coords E H D l Xo c Y e he
-  obtain ⟨Ω, _, _, z, ev, hfd, hfull⟩ := GlobalTheory.T.exists_full_level_finite_extension E H D l Xo c _ _ Y K y0 N hN
+  obtain ⟨K, _, _, n0, x0, y0, htie, -, hgen⟩ :=
+    GlobalTheory.T.generic_point_normal_coords E H D l Xo c Y e he
+  obtain ⟨Ω, _, _, z, ev, hfd, hfull⟩ :=
+    GlobalTheory.T.exists_full_level_finite_extension E H D l Xo c _ _ Y K y0 N hN
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap K Ω).injective
   haveI : NumberField c.F :=
     { to_charZero := inferInstance, to_finiteDimensional := c.fin }
@@ -81,19 +88,38 @@ theorem levelCover : LevelCoverSt := by
     obtain ⟨hb, -⟩ := hg
     exact hb.2
   have hi : (algebraMap K Ω).Finite := by
-    first
-    | exact RingHom.finite_algebraMap.mpr hfd
-    | exact hfd
+    first | exact RingHom.finite_algebraMap.mpr hfd | exact hfd
   have hfin := finite_descResidueField_spMap_comp (algebraMap K Ω) hi (y0 ≫ Y.j) hsurj
   obtain ⟨n, x, M, π, hMn, hπ, hMπ⟩ :=
-    GlobalTheory.T.exists_finite_normal_model_of_residue_finite Y.X _ hproj Ω (spMap (algebraMap K Ω) ≫ (y0 ≫ Y.j)) hfin
+    GlobalTheory.T.exists_finite_normal_model_of_residue_finite Y.X _ hproj Ω
+      (spMap (algebraMap K Ω) ≫ (y0 ≫ Y.j)) hfin
   have hMg : IsCptGen M.ξ := by
     obtain ⟨hg, -, -, -⟩ := M.tie
     exact hg
   obtain ⟨t, hx, ev', h1, h2, h3⟩ :=
-    GlobalTheory.T.full_level_generic_cover E H D l Xo c Y K Ω (algebraMap K Ω) y0 N z ev hN hfull M.X M.ξ hMg hMn π hMπ
-  refine ⟨Ω, inferInstance, inferInstance, n, x, M, π, spMap (algebraMap K Ω) ≫ y0, t, hx, z, ev',
-    hMn, hπ, ?_, ?_, h1, h2, h3⟩
+    GlobalTheory.T.full_level_generic_cover E H D l Xo c Y K Ω (algebraMap K Ω) y0 N z ev hN hfull
+      M.X M.ξ hMg hMn π hMπ
+  refine ⟨
+    Ω,
+    inferInstance,
+    inferInstance,
+    n,
+    x,
+    M,
+    π,
+    spMap (algebraMap K Ω) ≫ y0,
+    t,
+    hx,
+    z,
+    ev',
+    hMn,
+    hπ,
+    ?_,
+    ?_,
+    h1,
+    h2,
+    h3
+  ⟩
   · show genPt (M.ξ ≫ π) = e
     rw [hMπ, genPt_spMap_comp, hgen]
   · rw [hMπ, Category.assoc]

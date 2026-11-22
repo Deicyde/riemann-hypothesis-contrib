@@ -6,16 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsCompact
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.SWQ.RatLattice
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem closure_range_rat (N : ℕ) :
-    AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F))) =
-      AddSubgroup.pi Set.univ fun _ : Fin N => (algebraMap F (AF F)).range.toAddSubgroup := by
+theorem closure_range_rat (N : ℕ)
+    : AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F)))
+      = AddSubgroup.pi Set.univ fun _ : Fin N => (algebraMap F (AF F)).range.toAddSubgroup := by
   apply le_antisymm
   · rw [AddSubgroup.closure_le]
     rintro _ ⟨ξ, rfl⟩ l _
@@ -26,8 +27,9 @@ theorem closure_range_rat (N : ℕ) :
     rw [this]
     exact AddSubgroup.subset_closure ⟨ξ, rfl⟩
 
-theorem mem_closure_iff (N : ℕ) (u : Fin N → AF F) :
-    u ∈ AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F))) ↔ ∃ ξ, u = rat ξ := by
+theorem mem_closure_iff (N : ℕ) (u : Fin N → AF F)
+    : u ∈ AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F)))
+      ↔ ∃ ξ, u = rat ξ := by
   rw [closure_range_rat]
   constructor
   · intro hu
@@ -45,10 +47,13 @@ theorem rat_injective (N : ℕ) : Function.Injective (rat : (Fin N → F) → (F
   funext l
   exact (algebraMap F (AF F)).injective (congrFun h l)
 
-theorem isFD_pi {Y : Type} [AddCommGroup Y] [MeasurableSpace Y] (ν : Measure Y) [SigmaFinite ν]
-    {A : AddSubgroup Y} {D : Set Y} (hF : IsAddFundamentalDomain A D ν) (n : ℕ) :
-    IsAddFundamentalDomain (AddSubgroup.pi Set.univ fun _ : Fin n => A) (Set.univ.pi fun _ : Fin n => D)
-      (Measure.pi fun _ : Fin n => ν) := by
+theorem isFD_pi
+    {Y : Type} [AddCommGroup Y] [MeasurableSpace Y]
+    (ν : Measure Y) [SigmaFinite ν]
+    {A : AddSubgroup Y} {D : Set Y} (hF : IsAddFundamentalDomain A D ν)
+    (n : ℕ)
+    : IsAddFundamentalDomain (AddSubgroup.pi Set.univ fun _ : Fin n => A)
+      (Set.univ.pi fun _ : Fin n => D) (Measure.pi fun _ : Fin n => ν) := by
   have hq (i : Fin n) := Measure.quasiMeasurePreserving_eval (fun _ : Fin n => ν) i
   refine ⟨?_, ?_, ?_⟩
   · rw [Set.univ_pi_eq_iInter]
@@ -61,8 +66,9 @@ theorem isFD_pi {Y : Type} [AddCommGroup Y] [MeasurableSpace Y] (ν : Measure Y)
     obtain ⟨i, hi⟩ : ∃ i, a.1 i ≠ b.1 i := by
       by_contra! h
       exact hab (Subtype.ext (funext h))
-    have h := hF.aedisjoint (i := ⟨a.1 i, a.2 i trivial⟩) (j := ⟨b.1 i, b.2 i trivial⟩)
-      fun e => hi (congrArg Subtype.val e)
+    have h :=
+      hF.aedisjoint (i := ⟨a.1 i, a.2 i trivial⟩) (j := ⟨b.1 i, b.2 i trivial⟩) fun e =>
+        hi (congrArg Subtype.val e)
     refine measure_mono_null ?_ ((hq i).preimage_null h)
     rintro z ⟨⟨u, hu, hu'⟩, ⟨v, hv, hv'⟩⟩
     exact ⟨⟨u i, hu i trivial, congrFun hu' i⟩, ⟨v i, hv i trivial, congrFun hv' i⟩⟩
@@ -70,7 +76,20 @@ theorem isFD_pi {Y : Type} [AddCommGroup Y] [MeasurableSpace Y] (ν : Measure Y)
 end GlobalTheory.SWQ.RatLattice
 
 open GlobalTheory.SWQ.RatLattice in
-theorem GlobalTheory.SWQ.rat_lattice_fundamentalDomain : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ) (ν : Measure (AF F)), IsCov1 ν → (muV N ν).IsAddHaarMeasure ∧ (∀ u : (Fin N → AF F), u ∈ (AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F)))) ↔ ∃ ξ, u = rat ξ) ∧ Function.Injective (rat : (Fin N → F) → (Fin N → AF F)) ∧ (∃ K : Set (Fin N → AF F), IsCompact K ∧ ∀ u, ∃ ξ, u - rat ξ ∈ K) ∧ ∃ D : Set (Fin N → AF F), MeasurableSet D ∧ IsAddFundamentalDomain (AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F)))) D (muV N ν) ∧ muV N ν D = 1 := by
+theorem GlobalTheory.SWQ.rat_lattice_fundamentalDomain
+    : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ) (ν : Measure (AF F)),
+      IsCov1 ν
+        → (muV N ν).IsAddHaarMeasure
+          ∧ (∀ u : (Fin N → AF F),
+            u ∈ (AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F))))
+              ↔ ∃ ξ, u = rat ξ)
+          ∧ Function.Injective (rat : (Fin N → F) → (Fin N → AF F))
+          ∧ (∃ K : Set (Fin N → AF F), IsCompact K ∧ ∀ u, ∃ ξ, u - rat ξ ∈ K)
+          ∧ ∃ D : Set (Fin N → AF F),
+            MeasurableSet D
+              ∧ IsAddFundamentalDomain
+                (AddSubgroup.closure (Set.range (rat : (Fin N → F) → (Fin N → AF F)))) D (muV N ν)
+              ∧ muV N ν D = 1 := by
   intro F _ _ N ν hν
   obtain ⟨hH, D₀, hD₀m, hD₀, hD₀1⟩ := hν
   haveI := hH

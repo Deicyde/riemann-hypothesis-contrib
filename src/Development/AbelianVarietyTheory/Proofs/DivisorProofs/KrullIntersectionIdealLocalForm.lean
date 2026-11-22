@@ -6,8 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem krull_inter_ideal_local (B : Type) [CommRing B] [IsNoetherianRing B] (I a a' : Ideal B)
-    (h : ∀ e : ℕ, a ≤ a' ⊔ I ^ (e + 1)) : ∃ r ∈ I, ∀ x ∈ a, (1 - r) * x ∈ a' := by
+theorem krull_inter_ideal_local
+    (B : Type) [CommRing B] [IsNoetherianRing B]
+    (I a a' : Ideal B) (h : ∀ e : ℕ, a ≤ a' ⊔ I ^ (e + 1))
+    : ∃ r ∈ I, ∀ x ∈ a, (1 - r) * x ∈ a' := by
   set N : Submodule B (B ⧸ a') := Submodule.map (Submodule.mkQ a') a with hN
   obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul I N
   have hle : N ≤ I ^ (k + 1) • (⊤ : Submodule B (B ⧸ a')) := by
@@ -21,7 +23,8 @@ theorem krull_inter_ideal_local (B : Type) [CommRing B] [IsNoetherianRing B] (I 
     exact Submodule.smul_mem_smul hz Submodule.mem_top
   have hNI : N ≤ I • N := by
     have e1 : N = I ^ (k + 1) • (⊤ : Submodule B (B ⧸ a')) ⊓ N := (inf_eq_right.2 hle).symm
-    calc N = I ^ (k + 1) • (⊤ : Submodule B (B ⧸ a')) ⊓ N := e1
+    calc
+      N = I ^ (k + 1) • (⊤ : Submodule B (B ⧸ a')) ⊓ N := e1
       _ = I ^ (k + 1 - k) • (I ^ k • ⊤ ⊓ N) := hk (k + 1) (Nat.le_succ k)
       _ ≤ I • N := by
         rw [Nat.add_sub_cancel_left, pow_one]
@@ -31,8 +34,7 @@ theorem krull_inter_ideal_local (B : Type) [CommRing B] [IsNoetherianRing B] (I 
   refine ⟨r, hr, fun x hx => ?_⟩
   have hx' := hrN (Submodule.mkQ a' x) ⟨x, hx, rfl⟩
   rw [← map_smul, smul_eq_mul] at hx'
-  have : Submodule.mkQ a' ((1 - r) * x) = 0 := by
-    rw [sub_mul, one_mul, map_sub, hx', sub_self]
+  have : Submodule.mkQ a' ((1 - r) * x) = 0 := by rw [sub_mul, one_mul, map_sub, hx', sub_self]
   rw [Submodule.mkQ_apply] at this
   exact (Submodule.Quotient.mk_eq_zero a').1 this
 

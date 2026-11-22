@@ -17,7 +17,9 @@ namespace GlobalTheory.CoordinateEmbeddingMaps
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def ball (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)) (C : ℝ) (hC : 0 ≤ C) : AddSubgroup (Fv F v) where
+def ball
+    (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)) (C : ℝ) (hC : 0 ≤ C)
+    : AddSubgroup (Fv F v) where
   carrier := {c | ‖c‖ ≤ C}
   zero_mem' := by simpa using hC
   add_mem' := by
@@ -27,12 +29,16 @@ def ball (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := 
     intro a ha
     simpa using ha
 
-theorem norm_le_one_of_mem {v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)} (a : Fv F v) (h : a ∈ v.adicCompletionIntegers F) :
-    ‖a‖ ≤ 1 :=
+theorem norm_le_one_of_mem
+    {v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)}
+    (a : Fv F v) (h : a ∈ v.adicCompletionIntegers F)
+    : ‖a‖ ≤ 1 :=
   Valued.toNormedField.norm_le_one_iff.mpr h
 
-def coordE (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F)) (n : ℕ) (x : (_ : Fin n) × Fin (Module.finrank F E)) :
-    (Fin n → E) →+ Fv F v where
+def coordE
+    (v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F))
+    (n : ℕ) (x : (_ : Fin n) × Fin (Module.finrank F E))
+    : (Fin n → E) →+ Fv F v where
   toFun y := algebraMap F (Fv F v) ((Module.finBasis F E).repr (y x.1) x.2)
   map_zero' := by simp
   map_add' := by intro a b; simp

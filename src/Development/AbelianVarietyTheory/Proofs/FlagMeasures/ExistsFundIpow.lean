@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MeasurePreser
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.DegVol
+open NumberField MeasureTheory Matrix Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat
+  GlobalTheory.DegCnt Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp GlobalTheory.DegVol
 open scoped Pointwise ENNReal Classical nonZeroDivisors
 
 noncomputable section
@@ -17,14 +19,21 @@ namespace GlobalTheory.IdealFund
 
 open GlobalTheory.HomCovolume
 
-theorem exists_lat (K : Type) [Field K] [NumberField K] (hK : IsTotallyComplex K) (ι : Type) [Fintype ι]
+theorem exists_lat
+    (K : Type) [Field K] [NumberField K]
+    (hK : IsTotallyComplex K)
+    (ι : Type) [Fintype ι]
     (σ : ι → (K →+* ℂ)) (hσ : ∀ w : InfinitePlace K, ∃! v, InfinitePlace.mk (σ v) = w)
-    (a : FractionalIdeal (𝓞 K)⁰ K) (ha : a ≠ 0) :
-    ∃ L : Submodule ℤ (ι → ℂ), (∀ z, z ∈ L ↔ ∃ y ∈ a, ∀ v, z v = σ v y) ∧
-      HasCov volume L ((FractionalIdeal.absNorm a : ℝ) * Formalism.HermitianLatticesTheory.vInv K ^ Fintype.card ι) := by
+    (a : FractionalIdeal (𝓞 K)⁰ K) (ha : a ≠ 0)
+    : ∃ L : Submodule ℤ (ι → ℂ),
+      (∀ z, z ∈ L ↔ ∃ y ∈ a, ∀ v, z v = σ v y) ∧ HasCov volume L
+        ((FractionalIdeal.absNorm a : ℝ)
+          * Formalism.HermitianLatticesTheory.vInv K ^ Fintype.card ι) := by
   obtain ⟨L, hL, hcov⟩ := exists_idealLat K hK a ha
-  let g : ι ≃ InfinitePlace K := Equiv.ofBijective (fun v => InfinitePlace.mk (σ v))
-    ((Function.bijective_iff_existsUnique _).2 hσ)
+  let g : ι ≃ InfinitePlace K :=
+    Equiv.ofBijective
+      (fun v => InfinitePlace.mk (σ v))
+      ((Function.bijective_iff_existsUnique _).2 hσ)
   have hg : ∀ w, InfinitePlace.mk (σ (g.symm w)) = w := fun w => g.apply_symm_apply w
   have hκ : ∀ w : InfinitePlace K, ∃ κ : ℂ ≃ₗᵢ[ℝ] ℂ, ∀ t, κ (σ (g.symm w) t) = w.embedding t := by
     intro w
@@ -34,12 +43,14 @@ theorem exists_lat (K : Type) [Field K] [NumberField K] (hK : IsTotallyComplex K
     · exact ⟨LinearIsometryEquiv.refl _ _, fun t => by rw [← h]; rfl⟩
     · exact ⟨Complex.conjLIE, fun t => by rw [← h]; rfl⟩
   choose κ hκ using hκ
-  let e₀ : (ι → ℂ) ≃ₗ[ℝ] (InfinitePlace K → ℂ) :=
-    { toFun := fun z w => κ w (z (g.symm w)), invFun := fun x v => (κ (g v)).symm (x (g v))
-      map_add' := fun _ _ => funext fun w => by simp
-      map_smul' := fun _ _ => funext fun w => by simp only [Pi.smul_apply, map_smul, RingHom.id_apply]
-      left_inv := fun _ => funext fun v => by simp
-      right_inv := fun _ => funext fun w => by simp }
+  let e₀ : (ι → ℂ) ≃ₗ[ℝ] (InfinitePlace K → ℂ) := {
+    toFun := fun z w => κ w (z (g.symm w))
+    invFun := fun x v => (κ (g v)).symm (x (g v))
+    map_add' := fun _ _ => funext fun w => by simp
+    map_smul' := fun _ _ => funext fun w => by simp only [Pi.smul_apply, map_smul, RingHom.id_apply]
+    left_inv := fun _ => funext fun v => by simp
+    right_inv := fun _ => funext fun w => by simp
+  }
   have hcard : Fintype.card ι = Fintype.card (InfinitePlace K) := Fintype.card_congr g
   have hmp : MeasurePreserving e₀.toContinuousLinearEquiv volume volume := by
     refine measurePreserving_of_ball _ _ _ (fun x => ?_) ?_
@@ -59,7 +70,20 @@ theorem exists_lat (K : Type) [Field K] [NumberField K] (hK : IsTotallyComplex K
   · rw [hcard]
     exact HasCov.of_measurePreserving _ hmp (fun _ => Iff.rfl) hcov
 
-theorem exists_fund_ipow : ∀ (K : Type) [Field K] [NumberField K] [StarRing K], Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (ι : Type) [Fintype ι] (σ : ι → (K →+* ℂ)), IsPlaces σ → ∀ (𝔡 : Ideal (𝓞 K)) (n : ℤ) (c : ι → ℂ), 𝔡 ≠ ⊥ → (∀ v, c v ≠ 0) → ∃ F : Set (ι → ℂ), MeasurableSet F ∧ (∀ a : ι → ℂ, ∃! t : K, t ∈ ipow 𝔡 n ∧ ((fun v => c v * σ v t) + a) ∈ F) ∧ volume F = ENNReal.ofReal (Formalism.HermitianLatticesTheory.vInv K ^ Fintype.card ι * (Ideal.absNorm 𝔡 : ℝ) ^ n * ∏ v, ‖c v‖ ^ 2) := by
+theorem exists_fund_ipow
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (ι : Type) [Fintype ι] (σ : ι → (K →+* ℂ)),
+          IsPlaces σ
+            → ∀ (𝔡 : Ideal (𝓞 K)) (n : ℤ) (c : ι → ℂ),
+              𝔡 ≠ ⊥ → (∀ v, c v ≠ 0)
+                → ∃ F : Set (ι → ℂ),
+                  MeasurableSet F
+                    ∧ (∀ a : ι → ℂ, ∃! t : K, t ∈ ipow 𝔡 n ∧ ((fun v => c v * σ v t) + a) ∈ F)
+                    ∧ volume F
+                      = ENNReal.ofReal
+                        (Formalism.HermitianLatticesTheory.vInv K ^ Fintype.card ι
+                          * (Ideal.absNorm 𝔡 : ℝ) ^ n * ∏ v, ‖c v‖ ^ 2) := by
   intro K _ _ _ hK ι _ σ hσ 𝔡 n c h𝔡 hc
   have h0 : (𝔡 : FractionalIdeal (𝓞 K)⁰ K) ≠ 0 := FractionalIdeal.coeIdeal_ne_zero.2 h𝔡
   obtain ⟨L₀, hL₀, hcov⟩ := exists_lat K hK.1 ι σ hσ.2 _ (zpow_ne_zero n h0)
@@ -69,11 +93,12 @@ theorem exists_fund_ipow : ∀ (K : Type) [Field K] [NumberField K] [StarRing K]
   have hdet : LinearMap.det f = (∏ v, ‖c v‖ ^ 2)⁻¹ := by
     rw [LinearMap.det_pi, ← Finset.prod_inv_distrib]
     refine Finset.prod_congr rfl fun v _ => ?_
-    rw [← Algebra.norm_apply, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq, norm_inv, inv_pow]
+    rw [← Algebra.norm_apply, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq, norm_inv,
+      inv_pow]
   have hpos : 0 < ∏ v, ‖c v‖ ^ 2 := Finset.prod_pos fun v _ => pow_pos (norm_pos_iff.2 (hc v)) _
   let L : Submodule ℤ (ι → ℂ) := L₀.comap (f.restrictScalars ℤ)
-  obtain ⟨_, _, h⟩ := HasCov.of_det f (L := L) (by rw [hdet]; exact (inv_pos.2 hpos).ne')
-    (fun _ => Iff.rfl) hcov
+  obtain ⟨_, _, h⟩ :=
+    HasCov.of_det f (L := L) (by rw [hdet]; exact (inv_pos.2 hpos).ne') (fun _ => Iff.rfl) hcov
   have hL : ∀ z, z ∈ L ↔ ∃ t ∈ ipow 𝔡 n, z = fun v => c v * σ v t := by
     intro z
     change f z ∈ L₀ ↔ _
@@ -91,9 +116,12 @@ theorem exists_fund_ipow : ∀ (K : Type) [Field K] [NumberField K] [StarRing K]
     have h2 := congrFun ((congrArg Subtype.val h1).trans hzt) v₀
     exact (σ v₀).injective (mul_left_cancel₀ (hc v₀) h2)
   · rw [ZLattice.covolume_eq_measure_fundamentalDomain _ _
-      (isAddFundamentalDomain_latticeDomain _ _), measureReal_def, hdet, abs_of_pos (inv_pos.2 hpos),
-      div_inv_eq_mul, map_zpow₀, FractionalIdeal.coeIdeal_absNorm] at h
-    have hfin : volume (latticeDomain L) ≠ ⊤ := (ZSpan.fundamentalDomain_isBounded _).measure_lt_top.ne
+          (isAddFundamentalDomain_latticeDomain _ _),
+        measureReal_def, hdet, abs_of_pos (inv_pos.2 hpos), div_inv_eq_mul, map_zpow₀,
+        FractionalIdeal.coeIdeal_absNorm]
+      at h
+    have hfin : volume (latticeDomain L) ≠ ⊤ :=
+      (ZSpan.fundamentalDomain_isBounded _).measure_lt_top.ne
     rw [← ENNReal.ofReal_toReal hfin, h]
     congr 1
     push_cast

@@ -10,7 +10,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.MeasWCore
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Measures NumberField Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Measures NumberField
+  Topology
 open scoped TensorProduct
 
 section Coord
@@ -20,8 +21,10 @@ variable {F E : Type} [Field F] [Field E] [Algebra F E] {d : ℕ} (b : Module.Ba
 def crd (R : Type) [CommRing R] [Algebra F R] : R ⊗[F] E ≃ₗ[R] (Fin d → R) :=
   (Algebra.TensorProduct.basis R b).equivFun
 
-theorem crd_tensMap {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
-    (φ : R →ₐ[F] R') (x : R ⊗[F] E) : crd b R' (tensMap φ x) = fun i => φ (crd b R x i) := by
+theorem crd_tensMap
+    {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Algebra F R']
+    (φ : R →ₐ[F] R') (x : R ⊗[F] E)
+    : crd b R' (tensMap φ x) = fun i => φ (crd b R x i) := by
   induction x using TensorProduct.induction_on with
   | zero => funext i; simp
   | tmul a e =>
@@ -34,7 +37,9 @@ theorem crd_tensMap {R R' : Type} [CommRing R] [Algebra F R] [CommRing R'] [Alge
     simp only [map_add (f := _), Pi.add_apply] at h1 h2 ⊢
     rw [h1, h2]
 
-variable [FiniteDimensional F E] (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+variable
+  [FiniteDimensional F E]
+  (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
 
 def crdH : R ⊗[F] E ≃ₜ (Fin d → R) where
   toEquiv := (crd b R).toEquiv
@@ -43,18 +48,22 @@ def crdH : R ⊗[F] E ≃ₜ (Fin d → R) where
 
 theorem crdH_apply (x : R ⊗[F] E) : crdH b R x = crd b R x := rfl
 
-theorem continuous_tensMap {R' : Type} [CommRing R'] [Algebra F R'] [TopologicalSpace R']
-    [IsTopologicalRing R'] (φ : R →ₐ[F] R') (hφ : Continuous φ) :
-    Continuous (tensMap (E := E) φ) := by
-  have h : (tensMap (E := E) φ : R ⊗[F] E → R' ⊗[F] E) =
-      (crdH (Module.finBasis F E) R').symm ∘ (fun c i => φ (c i)) ∘ crdH (Module.finBasis F E) R := by
+theorem continuous_tensMap
+    {R' : Type} [CommRing R'] [Algebra F R'] [TopologicalSpace R'] [IsTopologicalRing R']
+    (φ : R →ₐ[F] R') (hφ : Continuous φ)
+    : Continuous (tensMap (E := E) φ) := by
+  have h
+      : (tensMap (E := E) φ : R ⊗[F] E → R' ⊗[F] E)
+        = (crdH (Module.finBasis F E) R').symm ∘ (fun c i => φ (c i))
+          ∘ crdH (Module.finBasis F E) R := by
     funext x
     apply (crdH (Module.finBasis F E) R').injective
     simp only [Function.comp_apply, Homeomorph.apply_symm_apply, crdH_apply]
     exact crd_tensMap (Module.finBasis F E) φ x
   rw [h]
   exact (crdH (Module.finBasis F E) R').symm.continuous.comp
-    ((continuous_pi fun i => hφ.comp (continuous_apply i)).comp (crdH (Module.finBasis F E) R).continuous)
+    ((continuous_pi fun i => hφ.comp (continuous_apply i)).comp
+      (crdH (Module.finBasis F E) R).continuous)
 
 end Coord
 
@@ -67,18 +76,24 @@ theorem continuous_fstA : Continuous (fstA F) := continuous_fst
 theorem continuous_sndA : Continuous (sndA F) := continuous_snd
 
 def splInv (y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E)) : AF F ⊗[F] E :=
-  (crd (Module.finBasis F E) (AF F)).symm
-    (fun i => ((crd (Module.finBasis F E) (Ainf F) y.1 i, crd (Module.finBasis F E) (Af F) y.2 i) : AF F))
+  (crd (Module.finBasis F E) (AF F)).symm (fun i =>
+    ((crd (Module.finBasis F E) (Ainf F) y.1 i, crd (Module.finBasis F E) (Af F) y.2 i) : AF F))
 
-theorem crd_AF (x : AF F ⊗[F] E) (i : Fin (Module.finrank F E)) :
-    crd (Module.finBasis F E) (AF F) x i =
-      ((crd (Module.finBasis F E) (Ainf F) (splT x).1 i, crd (Module.finBasis F E) (Af F) (splT x).2 i) : AF F) := by
+theorem crd_AF (x : AF F ⊗[F] E) (i : Fin (Module.finrank F E))
+    : crd (Module.finBasis F E) (AF F) x i
+      = ((
+          crd (Module.finBasis F E) (Ainf F) (splT x).1 i,
+          crd (Module.finBasis F E) (Af F) (splT x).2 i
+        )
+        : AF F) := by
   rw [splT_apply, crd_tensMap, crd_tensMap]
   rfl
 
-theorem crd_splInv (y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E)) :
-    crd (Module.finBasis F E) (AF F) (splInv y) =
-      fun i => ((crd (Module.finBasis F E) (Ainf F) y.1 i, crd (Module.finBasis F E) (Af F) y.2 i) : AF F) :=
+theorem crd_splInv (y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E))
+    : crd (Module.finBasis F E) (AF F) (splInv y)
+      = fun i =>
+        ((crd (Module.finBasis F E) (Ainf F) y.1 i, crd (Module.finBasis F E) (Af F) y.2 i)
+          : AF F) :=
   LinearEquiv.apply_symm_apply _ _
 
 theorem splT_splInv (y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E)) : splT (splInv y) = y := by
@@ -116,9 +131,12 @@ theorem continuous_splT : Continuous (splT (F := F) (E := E)) := by
     (continuous_tensMap (AF F) _ continuous_sndA)
 
 theorem continuous_splInv : Continuous (splInv (F := F) (E := E)) := by
-  have h : (splInv (F := F) (E := E)) = (crdH (Module.finBasis F E) (AF F)).symm ∘
-      (fun y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E) => fun i =>
-        ((crdH (Module.finBasis F E) (Ainf F) y.1 i, crdH (Module.finBasis F E) (Af F) y.2 i) : AF F)) := by
+  have h
+      : (splInv (F := F) (E := E))
+        = (crdH (Module.finBasis F E) (AF F)).symm
+          ∘ (fun y : (Ainf F ⊗[F] E) × (Af F ⊗[F] E) => fun i =>
+            ((crdH (Module.finBasis F E) (Ainf F) y.1 i, crdH (Module.finBasis F E) (Af F) y.2 i)
+              : AF F)) := by
     funext y
     rfl
   rw [h]

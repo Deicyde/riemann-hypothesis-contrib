@@ -28,10 +28,13 @@ namespace UpperTheory.V.Z.Gam
 
 theorem crossG : CrossG := crossGOf Inf.expAlg Inf.expIndep secDiff
 
-theorem sideG : SideG := sideGOf pairGOps suppFacts (sideGCenOf (gamLocOf leviDiv coefInd suppBridge) locIso)
+theorem sideG : SideG :=
+  sideGOf pairGOps suppFacts (sideGCenOf (gamLocOf leviDiv coefInd suppBridge) locIso)
 
-theorem upDown : UpDown := upDownOf suppFacts normCnt (matchBCOf pairGOps crossG sideG suppFacts normLoc globTw regroupBC)
+theorem upDown : UpDown :=
+  upDownOf suppFacts normCnt (matchBCOf pairGOps crossG sideG suppFacts normLoc globTw regroupBC)
 
-theorem indTor : IndTor := indTorOf suppFacts normCnt (matchIndOf pairGOps crossG sideG suppFacts normLoc globTw)
+theorem indTor : IndTor :=
+  indTorOf suppFacts normCnt (matchIndOf pairGOps crossG sideG suppFacts normLoc globTw)
 
 end UpperTheory.V.Z.Gam

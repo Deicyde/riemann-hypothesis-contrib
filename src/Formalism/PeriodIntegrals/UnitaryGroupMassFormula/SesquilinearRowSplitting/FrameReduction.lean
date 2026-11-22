@@ -12,17 +12,30 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNo
 
 namespace PI.SRW
 
-theorem fi_zero {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
-    (0 : E) ∈ I := (I : Submodule (𝓞 E) E).zero_mem
+theorem fi_zero {E : Type} [Field E] [NumberField E] (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+    : (0 : E) ∈ I :=
+  (I : Submodule (𝓞 E) E).zero_mem
 
-theorem fi_add {E : Type} [Field E] [NumberField E] {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E}
-    {x y : E} (hx : x ∈ I) (hy : y ∈ I) : x + y ∈ I := (I : Submodule (𝓞 E) E).add_mem hx hy
+theorem fi_add
+    {E : Type} [Field E] [NumberField E]
+    {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} {x y : E} (hx : x ∈ I) (hy : y ∈ I)
+    : x + y ∈ I :=
+  (I : Submodule (𝓞 E) E).add_mem hx hy
 
-theorem fi_smul {E : Type} [Field E] [NumberField E] {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E}
-    (o : 𝓞 E) {x : E} (hx : x ∈ I) : o • x ∈ I := (I : Submodule (𝓞 E) E).smul_mem o hx
+theorem fi_smul
+    {E : Type} [Field E] [NumberField E]
+    {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E}
+    (o : 𝓞 E)
+    {x : E} (hx : x ∈ I)
+    : o • x ∈ I :=
+  (I : Submodule (𝓞 E) E).smul_mem o hx
 
-theorem osmul {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] (o : 𝓞 E) (v : V) : o • v = (o : E) • v := (IsScalarTower.algebraMap_smul E o v).symm
+theorem osmul
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (o : 𝓞 E) (v : V)
+    : o • v = (o : E) • v :=
+  (IsScalarTower.algebraMap_smul E o v).symm
 
 theorem exists_not_int {E : Type} [Field E] [NumberField E] : ∃ c : E, ∀ o : 𝓞 E, (o : E) ≠ c := by
   refine ⟨algebraMap ℚ E (1 / 2), fun o ho => ?_⟩
@@ -30,7 +43,8 @@ theorem exists_not_int {E : Type} [Field E] [NumberField E] : ∃ c : E, ∀ o :
     rw [← ho]
     exact o.2
   have hq : IsIntegral ℤ ((1 : ℚ) / 2) :=
-    (isIntegral_algHom_iff (x := (1 : ℚ) / 2) (IsScalarTower.toAlgHom ℤ ℚ E) (algebraMap ℚ E).injective).mp hint
+    (isIntegral_algHom_iff (x := (1 : ℚ) / 2) (IsScalarTower.toAlgHom ℤ ℚ E)
+      (algebraMap ℚ E).injective).mp hint
   obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp hq
   have hn' : (n : ℚ) = 1 / 2 := by
     rw [← hn]
@@ -42,12 +56,16 @@ theorem exists_not_int {E : Type} [Field E] [NumberField E] : ∃ c : E, ∀ o :
   have h3 : (2 * n : ℤ) = 1 := by exact_mod_cast h2
   omega
 
-theorem mem_orth_iff {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
-    {U : Submodule E S.V} {v : S.V} : v ∈ orth S U ↔ ∀ x ∈ U, S.hT x v = 0 := by
+theorem mem_orth_iff
+    {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {U : Submodule E S.V} {v : S.V}
+    : v ∈ orth S U ↔ ∀ x ∈ U, S.hT x v = 0 := by
   simp [orth]
 
-theorem hX_left {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
-    (F0 : FlagG S r T) {v : S.V} (hv : ∀ a, S.hT (F0.e a) v = 0) : ∀ y ∈ F0.X, S.hT y v = 0 := by
+theorem hX_left
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {S : HSpace E} {r : ℕ} {T : E} (F0 : FlagG S r T)
+    {v : S.V} (hv : ∀ a, S.hT (F0.e a) v = 0)
+    : ∀ y ∈ F0.X, S.hT y v = 0 := by
   intro y hy
   have hy' : y ∈ Submodule.span E (Set.range F0.e) := hy
   clear hy
@@ -59,8 +77,10 @@ theorem hX_left {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
   | add x w _ _ hx hw => simp [hx, hw]
   | smul c x _ hx => simp [hx]
 
-theorem X_le_orth {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
-    (F0 : FlagG S r T) : F0.X ≤ orth S F0.X := by
+theorem X_le_orth
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {S : HSpace E} {r : ℕ} {T : E} (F0 : FlagG S r T)
+    : F0.X ≤ orth S F0.X := by
   intro x hx
   rw [mem_orth_iff]
   apply hX_left F0
@@ -93,7 +113,8 @@ theorem frame_reduction : FrameStep := by
     obtain ⟨o, ho⟩ := hprim c hcz
     exact hc o ho
 
-  let N : Submodule (𝓞 E) S.V := Formalism.L2.SG.Saturated.latSpan aa F0.e ⊔ Submodule.span (𝓞 E) {F0.z}
+  let N : Submodule (𝓞 E) S.V :=
+    Formalism.L2.SG.Saturated.latSpan aa F0.e ⊔ Submodule.span (𝓞 E) {F0.z}
   have hlatΛ : Formalism.L2.SG.Saturated.latSpan aa F0.e ≤ Λ := hXL ▸ inf_le_left
   have hlatX : ∀ n ∈ Formalism.L2.SG.Saturated.latSpan aa F0.e, n ∈ F0.X := by
     intro n hn
@@ -107,19 +128,18 @@ theorem frame_reduction : FrameStep := by
     obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.1 hn2
     have hoE : (o : E) ≠ 0 := (RingOfIntegers.coe_ne_zero_iff).2 ho
     have hn1X : n1 ∈ F0.X := hlatX n1 hn1
-    have h1 : (o : E) • x = n1 + (t : E) • F0.z := by
-      rw [← osmul, ← osmul, hsum]
+    have h1 : (o : E) • x = n1 + (t : E) • F0.z := by rw [← osmul, ← osmul, hsum]
     have hxeq : x = (o : E)⁻¹ • n1 + ((o : E)⁻¹ * (t : E)) • F0.z := by
-      calc x = (o : E)⁻¹ • ((o : E) • x) := by rw [smul_smul, inv_mul_cancel₀ hoE, one_smul]
+      calc
+        x = (o : E)⁻¹ • ((o : E) • x) := by rw [smul_smul, inv_mul_cancel₀ hoE, one_smul]
         _ = _ := by rw [h1, smul_add, smul_smul]
     have hxorth : x ∈ orth S F0.X := by
       rw [hxeq]
       exact add_mem ((orth S F0.X).smul_mem _ (hXo hn1X)) ((orth S F0.X).smul_mem _ hzorth)
     have hcz : ((o : E)⁻¹ * (t : E)) • F0.z ∈ Lsub Λ (⟨F0, F0.z⟩ : LFlag S r T) := by
-      have he : ((o : E)⁻¹ * (t : E)) • F0.z = x + (-(o : E)⁻¹) • n1 := by
-        rw [hxeq, neg_smul]; abel
-      refine Submodule.mem_inf.2 ⟨?_, (Submodule.restrictScalars_mem _ _ _).2
-        ((orth S F0.X).smul_mem _ hzorth)⟩
+      have he : ((o : E)⁻¹ * (t : E)) • F0.z = x + (-(o : E)⁻¹) • n1 := by rw [hxeq, neg_smul]; abel
+      refine Submodule.mem_inf.2
+        ⟨?_, (Submodule.restrictScalars_mem _ _ _).2 ((orth S F0.X).smul_mem _ hzorth)⟩
       rw [he]
       refine Submodule.add_mem_sup (Submodule.mem_inf.2 ⟨hx, ?_⟩) ?_
       · exact (Submodule.restrictScalars_mem _ _ _).2 hxorth
@@ -129,8 +149,7 @@ theorem frame_reduction : FrameStep := by
       rw [← hXL]
       refine Submodule.mem_inf.2 ⟨Λ.sub_mem hx (Λ.smul_mem o' hz), ?_⟩
       refine (Submodule.restrictScalars_mem _ _ _).2 ?_
-      have he : x - o' • F0.z = (o : E)⁻¹ • n1 := by
-        rw [osmul, ho', hxeq]; abel
+      have he : x - o' • F0.z = (o : E)⁻¹ • n1 := by rw [osmul, ho', hxeq]; abel
       rw [he]
       exact F0.X.smul_mem _ hn1X
     have he : x = (x - o' • F0.z) + o' • F0.z := by abel
@@ -164,17 +183,20 @@ theorem frame_reduction : FrameStep := by
       split_ifs with hba
       · subst hba; rw [mul_one]; exact hx
       · rw [mul_zero]; exact fi_zero _
-    | zero => rw [map_zero]; exact fi_zero _
-    | add y y' _ _ h1 h2 => rw [map_add (f := _)]; exact fi_add h1 h2
+    | zero =>
+      rw [map_zero]; exact fi_zero _
+    | add y y' _ _ h1 h2 =>
+      rw [map_add (f := _)]; exact fi_add h1 h2
     | smul o y _ h1 =>
       rw [osmul o, map_smul, smul_eq_mul, ← Algebra.smul_def]
       exact fi_smul o h1
 
   have hw := fun b : Fin r =>
-    sesquilinearRepresentation E S.V S.hT S.nondeg Λ hlat (((cf (Fin.castSucc b)).restrictScalars (𝓞 E)).comp ρ)
+    sesquilinearRepresentation E S.V S.hT S.nondeg Λ hlat
+      (((cf (Fin.castSucc b)).restrictScalars (𝓞 E)).comp ρ)
   choose f hf using hw
-  have hfv : ∀ b, ∀ x (hx : x ∈ Λ), S.hT (f b) x = cf (Fin.castSucc b) (ρ ⟨x, hx⟩) :=
-    fun b x hx => hf b ⟨x, hx⟩
+  have hfv : ∀ b, ∀ x (hx : x ∈ Λ), S.hT (f b) x = cf (Fin.castSucc b) (ρ ⟨x, hx⟩) := fun b x hx =>
+    hf b ⟨x, hx⟩
   refine ⟨f, ?_, ?_, ?_⟩
   · intro a b
     have hne : (aa a : Submodule (𝓞 E) E) ≠ ⊥ := FractionalIdeal.coeToSubmodule_ne_bot.2 (haa a)

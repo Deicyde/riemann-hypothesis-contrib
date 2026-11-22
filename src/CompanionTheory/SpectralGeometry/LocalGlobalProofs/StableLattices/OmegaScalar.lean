@@ -28,8 +28,8 @@ theorem evAt_apply (u : ℂ) (p : A[X]) : evAt u p = eval₂ (RingHom.id A) (alg
 def tmPoly {n : ℕ} (E : Fin n → Fin n → A) (v : ℂ) (a b : Fin n) : A[X] :=
   (if a = b then X - C (algebraMap ℂ A v) else 0) + C (E a b)
 
-theorem evAt_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (v u : ℂ) (a b : Fin n) :
-    evAt u (tmPoly E v a b) = Tm E (u - v) a b := by
+theorem evAt_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (v u : ℂ) (a b : Fin n)
+    : evAt u (tmPoly E v a b) = Tm E (u - v) a b := by
   unfold tmPoly Tm
   by_cases h : a = b <;> simp [h, evAt_apply, map_sub]
 
@@ -47,8 +47,11 @@ theorem evAt_qdetPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) : evAt u (
 
 end Poly
 
-theorem cont {M : Type*} [AddCommGroup M] [Module ℂ M] (p : (Module.End ℂ M)[X]) (q : ℂ[X]) (h : M) (b : ℂ)
-    (H : ∀ u, u ≠ b → evAt u p h = q.eval u • h) : evAt b p h = q.eval b • h := by
+theorem cont
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
+    (p : (Module.End ℂ M)[X]) (q : ℂ[X]) (h : M) (b : ℂ)
+    (H : ∀ u, u ≠ b → evAt u p h = q.eval u • h)
+    : evAt b p h = q.eval b • h := by
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro φ
   set r : ℂ[X] := ∑ k ∈ p.support, monomial k (φ (p.coeff k h)) - q * C (φ h) with hr
@@ -61,7 +64,7 @@ theorem cont {M : Type*} [AddCommGroup M] [Module ℂ M] (p : (Module.End ℂ M)
       rfl
     rw [e1, hr]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [eval_finsetSum, map_sum, eval_monomial, mul_comm]
+    simp [eval_finsetSum, map_sum, eval_monomial, mul_comm]
   have hz : r = 0 := by
     refine eq_zero_of_infinite_isRoot r ?_
     refine Set.Infinite.mono (s := {b}ᶜ) ?_ (Set.finite_singleton b).infinite_compl
@@ -71,25 +74,28 @@ theorem cont {M : Type*} [AddCommGroup M] [Module ℂ M] (p : (Module.End ℂ M)
     rw [hev, H u hu', sub_self, map_zero]
   rw [← hev, hz, eval_zero]
 
-theorem compLeft_smul_one {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ} (c : ℂ) (w : Fin n → V) :
-    (c • (1 : Module.End ℂ V)).compLeft (Fin n) w = c • w := by
+theorem compLeft_smul_one {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ} (c : ℂ) (w : Fin n → V)
+    : (c • (1 : Module.End ℂ V)).compLeft (Fin n) w = c • w := by
   funext i
   simp [LinearMap.compLeft_apply]
 
-theorem tens_apply {n : ℕ} (X : GMod n) (χ : Fin n → ℂ) (hS : ScalChar X χ) (u : ℂ) (w : Fin n → X.V) :
-    qdet (tensE X) u (u • w + om X w) =
-      Formalism.QuantumDeterminants.capP χ (u - cn n) • ((u + 1) • w + om X w) := by
-  have hq : qdet X.E u = Formalism.QuantumDeterminants.capP χ (u - cn n) • (1 : Module.End ℂ X.V) := by
+theorem tens_apply
+    {n : ℕ} (X : GMod n) (χ : Fin n → ℂ) (hS : ScalChar X χ) (u : ℂ) (w : Fin n → X.V)
+    : qdet (tensE X) u (u • w + om X w)
+      = Formalism.QuantumDeterminants.capP χ (u - cn n) • ((u + 1) • w + om X w) := by
+  have hq
+      : qdet X.E u = Formalism.QuantumDeterminants.capP χ (u - cn n) • (1 : Module.End ℂ X.V) := by
     have := hS (u - cn n)
     rwa [show u - cn n + ((n : ℂ) - 1) / 2 = u by unfold cn; ring] at this
   have h := LinearMap.congr_fun (GlobalTheory.T.QuantumDeterminantTensor n X u) w
   rw [hq] at h
   simpa [Module.End.mul_apply, compLeft_smul_one] using h
 
-theorem core {n : ℕ} (X : GMod n) (χ : Fin n → ℂ) (s : Fin n) (hS : ScalChar X χ)
+theorem core
+    {n : ℕ} (X : GMod n) (χ : Fin n → ℂ) (s : Fin n) (hS : ScalChar X χ)
     (hs : ∀ r, r ≠ s → χ r ≠ χ s) (g : Fin n → X.V)
-    (h2 : om X (om X g - (χ s - cn n) • g) = (χ s - cn n) • (om X g - (χ s - cn n) • g)) :
-    om X g - (χ s - cn n) • g = 0 := by
+    (h2 : om X (om X g - (χ s - cn n) • g) = (χ s - cn n) • (om X g - (χ s - cn n) • g))
+    : om X g - (χ s - cn n) • g = 0 := by
   set a : ℂ := χ s - cn n with ha
   set h : Fin n → X.V := om X g - a • g with hh
   set ct : ℂ → ℂ := fun u => ∏ t ∈ univ.erase s, (u - cn n + χ t) with hct
@@ -149,10 +155,11 @@ theorem omScal : OmScal := by
       have h2 : T (T ((T ^ k) f)) = 0 := by
         rw [← hk, pow_succ' T (k + 1), pow_succ' T k]
         rfl
-      have h3 := core X χ s hS hs ((T ^ k) f) (by
-        rw [hTa] at h2
-        rw [← hTa]
-        exact sub_eq_zero.1 h2)
+      have h3 :=
+        core X χ s hS hs ((T ^ k) f) (by
+          rw [hTa] at h2
+          rw [← hTa]
+          exact sub_eq_zero.1 h2)
       rw [← hTa] at h3
       rw [pow_succ' T k]
       exact h3

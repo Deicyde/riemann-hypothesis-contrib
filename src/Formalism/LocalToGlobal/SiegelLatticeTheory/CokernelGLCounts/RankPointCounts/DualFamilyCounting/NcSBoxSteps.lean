@@ -15,7 +15,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcS.BoxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory
 open Formalism.L2.SG.Pf.NcS.BoxVolSk
 open scoped TensorProduct
 
@@ -31,8 +32,7 @@ theorem box_measurable_holds : BoxMeas := by
   have e : {x : Fin a → Fin n → Af F ⊗[F] E | ∀ v, projV v x ∈ C v} = ⋂ v, projV v ⁻¹' C v := by
     ext x; simp
   rw [e]
-  exact MeasurableSet.iInter fun v =>
-    (PI.VolStabS.TopoMeas.continuous_projV b v).measurable (hC v)
+  exact MeasurableSet.iInter fun v => (PI.VolStabS.TopoMeas.continuous_projV b v).measurable (hC v)
 
 theorem gram_measurable_holds : GramMeas := by
   intro F E _ _ _ _ _ σ n J a T
@@ -41,20 +41,18 @@ theorem gram_measurable_holds : GramMeas := by
   · have : T2Space (Af F ⊗[F] E) := PI.VolStabS.RestrProdG.t2_tensor_product (Af F)
     have : T2Space (Matrix (Fin a) (Fin a) (Af F ⊗[F] E)) :=
       inferInstanceAs (T2Space (Fin a → Fin a → Af F ⊗[F] E))
-    exact (isClosed_singleton.preimage
-      (PI.VolStabS.continuous_gramR (Af F) σ J)).isOpen_compl.measurableSet
+    exact (isClosed_singleton.preimage (PI.VolStabS.continuous_gramR (Af F) σ
+      J)).isOpen_compl.measurableSet
   · funext i j
-    have h := congrArg (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E))
-      (congrFun (congrFun hy i) j)
-    rw [PI.VolStabS.RestrProdG.map_gramR, Matrix.map_apply,
-      PI.VolStabS.RestrProdG.map_inclR] at h
+    have h :=
+      congrArg (Algebra.TensorProduct.map (sndA F) (AlgHom.id F E)) (congrFun (congrFun hy i) j)
+    rw [PI.VolStabS.RestrProdG.map_gramR, Matrix.map_apply, PI.VolStabS.RestrProdG.map_inclR] at h
     rw [Matrix.map_apply]
     exact h
   · funext i j
-    have h := congrArg (Algebra.TensorProduct.map (evalV F v) (AlgHom.id F E))
-      (congrFun (congrFun hx i) j)
-    rw [PI.VolStabS.RestrProdG.map_gramR, Matrix.map_apply,
-      PI.VolStabS.RestrProdG.map_inclR] at h
+    have h :=
+      congrArg (Algebra.TensorProduct.map (evalV F v) (AlgHom.id F E)) (congrFun (congrFun hx i) j)
+    rw [PI.VolStabS.RestrProdG.map_gramR, Matrix.map_apply, PI.VolStabS.RestrProdG.map_inclR] at h
     rw [Matrix.map_apply]
     exact h
 
@@ -65,17 +63,20 @@ theorem positivity_test_holds : PosTest := by
   let b := Module.finBasis F E
   set V := Fin a → Fin n → Ainf F ⊗[F] E
   set U : Set V := {X | LinearIndependent (Ainf F ⊗[F] E) X} with hUdef
-  have hUo : IsOpen U := PI.VolStabS.TensAllW.isOpen_linIndep b (Ainf F)
-    (PI.VolStabS.isOpen_units_Ainf F) (PI.VolStabS.lip_ainf F)
-  have : LocallyCompactSpace (Ainf F ⊗[F] E) := PI.AdicCompletionValuation.locallyCompactSpace_tens (Ainf F)
+  have hUo : IsOpen U :=
+    PI.VolStabS.TensAllW.isOpen_linIndep b (Ainf F) (PI.VolStabS.isOpen_units_Ainf F)
+      (PI.VolStabS.lip_ainf F)
+  have : LocallyCompactSpace (Ainf F ⊗[F] E) :=
+    PI.AdicCompletionValuation.locallyCompactSpace_tens (Ainf F)
   have : T2Space (Ainf F ⊗[F] E) := PI.VolStabS.RestrProdG.t2_tensor_product (Ainf F)
   have : SecondCountableTopology (Ainf F ⊗[F] E) := PI.VolStabS.secondCountable_tens (Ainf F)
 
-  have hcU : fib t Uᶜ = 0 := measure_mono_null
-    (Set.compl_subset_compl.2 Set.inter_subset_right) (hfib.1 t)
+  have hcU : fib t Uᶜ = 0 :=
+    measure_mono_null (Set.compl_subset_compl.2 Set.inter_subset_right) (hfib.1 t)
   have hUpos : 0 < fib t U := by
     rcases eq_or_ne (fib t U) 0 with h | h
-    · exfalso; apply hne
+    · exfalso
+      apply hne
       rw [← Measure.measure_univ_eq_zero]
       have := measure_union_null h hcU
       rwa [Set.union_compl_self] at this
@@ -84,9 +85,11 @@ theorem positivity_test_holds : PosTest := by
   have : LocallyCompactSpace U := hUo.locallyCompactSpace
   have : SigmaCompactSpace U := sigmaCompactSpace_of_locallyCompact_secondCountable
   have hUeq : U = ⋃ m, Subtype.val '' compactCovering U m := by
-    ext x; constructor
+    ext x
+    constructor
     · intro hx
-      obtain ⟨m, hm⟩ := Set.mem_iUnion.1 ((iUnion_compactCovering U).symm ▸ Set.mem_univ (⟨x, hx⟩ : U))
+      obtain ⟨m, hm⟩ :=
+        Set.mem_iUnion.1 ((iUnion_compactCovering U).symm ▸ Set.mem_univ (⟨x, hx⟩ : U))
       exact Set.mem_iUnion.2 ⟨m, ⟨⟨x, hx⟩, hm, rfl⟩⟩
     · intro hx
       obtain ⟨m, y, _, rfl⟩ := Set.mem_iUnion.1 hx
@@ -102,8 +105,7 @@ theorem positivity_test_holds : PosTest := by
   have hK : IsCompact K := (isCompact_compactCovering U m).image continuous_subtype_val
   have hKU : K ⊆ U := by rintro _ ⟨y, _, rfl⟩; exact y.2
   obtain ⟨f, hf1, hfc, hfU, hf01⟩ := exists_continuousMap_one_of_isCompact_subset_isOpen hK hUo hKU
-  have hint : Integrable f (fib t) :=
-    ((hfib.2.2 f f.continuous hfc hfU).1 t (Set.mem_univ _))
+  have hint : Integrable f (fib t) := ((hfib.2.2 f f.continuous hfc hfU).1 t (Set.mem_univ _))
   refine ⟨f, f.continuous, hfc, fun x => (hf01 x).1, hint, ?_⟩
   rw [integral_pos_iff_support_of_nonneg (fun x => (hf01 x).1) hint]
   refine lt_of_lt_of_le hm (measure_mono fun x hx => ?_)

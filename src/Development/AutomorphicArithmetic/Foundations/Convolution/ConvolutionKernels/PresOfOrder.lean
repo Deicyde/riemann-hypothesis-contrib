@@ -6,14 +6,16 @@ public import Mathlib
 
 open MeasureTheory
 
-theorem UpperTheory.ConvolutionTheory.K.presOfOrder :
-    ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (e : G ≃ₜ* G) (m : ℕ),
+theorem UpperTheory.ConvolutionTheory.K.presOfOrder
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] (e : G ≃ₜ* G) (m : ℕ),
       0 < m → (∀ g, (⇑e)^[m] g = g) → MeasurePreserving e μ μ := by
   intro G _ _ _ _ _ _ _ _ μ _ e m hm he
   have hme : Measurable (e : G → G) := e.continuous.measurable
   haveI : (Measure.map e μ).IsHaarMeasure := ContinuousMulEquiv.isHaarMeasure_map μ e
-  obtain ⟨c, hc⟩ : ∃ c : NNReal, Measure.map e μ = c • μ := ⟨_, Measure.isMulLeftInvariant_eq_smul _ _⟩
+  obtain ⟨c, hc⟩ : ∃ c : NNReal, Measure.map e μ = c • μ :=
+    ⟨_, Measure.isMulLeftInvariant_eq_smul _ _⟩
   have hit : ∀ k : ℕ, Measure.map ((⇑e)^[k]) μ = c ^ k • μ := by
     intro k
     induction k with
@@ -21,8 +23,7 @@ theorem UpperTheory.ConvolutionTheory.K.presOfOrder :
     | succ k ih =>
       rw [Function.iterate_succ', ← Measure.map_map hme (hme.iterate k), ih,
         Measure.map_smul _ hme.aemeasurable, hc, smul_smul, pow_succ]
-  have h1 : μ = c ^ m • μ := by
-    rw [← hit m, show (⇑e)^[m] = id from funext he, Measure.map_id]
+  have h1 : μ = c ^ m • μ := by rw [← hit m, show (⇑e)^[m] = id from funext he, Measure.map_id]
   obtain ⟨K⟩ : Nonempty (TopologicalSpace.PositiveCompacts G) := inferInstance
   have hK0 : μ K ≠ 0 := (Measure.measure_pos_of_nonempty_interior μ K.interior_nonempty).ne'
   have hK1 : μ K ≠ ⊤ := K.isCompact.measure_lt_top.ne

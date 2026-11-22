@@ -28,7 +28,8 @@ theorem HypPairExists.full : HypPairExists.Statement := HypPairExists.proof
 
 theorem EDenseInAE.full : EDenseInAE.Statement := EDenseInAE.proof AETopologicalRing.full
 
-theorem OrthProjection.full : OrthProjection.Statement := OrthProjection.proof AETopologicalRing.full
+theorem OrthProjection.full : OrthProjection.Statement :=
+  OrthProjection.proof AETopologicalRing.full
 
 theorem EichlerDense.full : EichlerDense.Statement :=
   EichlerDense.proof AETopologicalRing.full EDenseInAE.full OrthProjection.full

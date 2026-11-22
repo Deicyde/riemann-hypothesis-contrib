@@ -10,8 +10,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.HartFlatBaseChange
 
-def divIdeal (A S X : Type) [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup X] [Module S X]
-    (a : A) (y : X) : Ideal A where
+def divIdeal
+    (A S X : Type) [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup X] [Module S X]
+    (a : A) (y : X)
+    : Ideal A where
   carrier := {u | ∃ x : X, algebraMap A S u • y = algebraMap A S a • x}
   add_mem' := by
     rintro u v ⟨x, hx⟩ ⟨x', hx'⟩
@@ -22,9 +24,10 @@ def divIdeal (A S X : Type) [CommRing A] [CommRing S] [Algebra A S] [AddCommGrou
     refine ⟨algebraMap A S c • x, ?_⟩
     rw [smul_eq_mul, map_mul, mul_smul, hx, smul_comm]
 
-theorem lTensor_smul_id_apply (R M O : Type) [CommRing R] [AddCommGroup M] [Module R M] [CommRing O]
-    [Algebra R O] (r : R) (x : O ⊗[R] M) :
-    (r • LinearMap.id : M →ₗ[R] M).lTensor O x = algebraMap R O r • x := by
+theorem lTensor_smul_id_apply
+    (R M O : Type) [CommRing R] [AddCommGroup M] [Module R M] [CommRing O] [Algebra R O]
+    (r : R) (x : O ⊗[R] M)
+    : (r • LinearMap.id : M →ₗ[R] M).lTensor O x = algebraMap R O r • x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul o n => simp [LinearMap.lTensor_tmul, algebraMap_smul, TensorProduct.tmul_smul]
@@ -33,9 +36,11 @@ theorem lTensor_smul_id_apply (R M O : Type) [CommRing R] [AddCommGroup M] [Modu
 end GlobalTheory.HartFlatBaseChange
 
 open GlobalTheory.HartFlatBaseChange in
-theorem GlobalTheory.GoodEtale.hart_tensor_of_flat : ∀ (A R M O : Type) [CommRing A] [IsNoetherianRing A] [CommRing R] [Algebra A R]
-    [AddCommGroup M] [Module R M] [CommRing O] [Algebra R O] [Algebra A O] [IsScalarTower A R O]
-    [Module.Flat R O], GlobalTheory.GoodEtale.Hart A R M → GlobalTheory.GoodEtale.Hart A O (O ⊗[R] M) := by
+theorem GlobalTheory.GoodEtale.hart_tensor_of_flat
+    : ∀ (A R M O : Type) [CommRing A] [IsNoetherianRing A] [CommRing R] [Algebra A R]
+        [AddCommGroup M] [Module R M] [CommRing O] [Algebra R O] [Algebra A O] [IsScalarTower A R O]
+        [Module.Flat R O],
+      GlobalTheory.GoodEtale.Hart A R M → GlobalTheory.GoodEtale.Hart A O (O ⊗[R] M) := by
   intro A R M O _ _ _ _ _ _ _ _ _ _ _ hM a ha m hm
   classical
   obtain ⟨s, hs⟩ := (IsNoetherian.noetherian (divIdeal A O (O ⊗[R] M) a m) : Submodule.FG _)
@@ -52,12 +57,14 @@ theorem GlobalTheory.GoodEtale.hart_tensor_of_flat : ∀ (A R M O : Type) [CommR
         intro b hb
         have := congrFun hy ⟨b, hb⟩
         simp only [g, LinearMap.pi_apply, LinearMap.coe_comp, Function.comp_apply, Pi.zero_apply,
-          Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, N, LinearMap.mem_range] at this
+            Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, N, LinearMap.mem_range]
+          at this
         obtain ⟨x, hx⟩ := this
         exact ⟨x, by simpa [f] using hx.symm⟩
-      obtain ⟨m', hm'⟩ := hM a ha y fun p hp hp1 => by
-        obtain ⟨u, hup, hu⟩ := hm p hp hp1
-        exact ⟨u, hup, hyI hu⟩
+      obtain ⟨m', hm'⟩ :=
+        hM a ha y fun p hp hp1 => by
+          obtain ⟨u, hup, hu⟩ := hm p hp hp1
+          exact ⟨u, hup, hyI hu⟩
       exact ⟨m', by simp [f, hm']⟩
     · rintro ⟨x, rfl⟩
       funext i
@@ -65,8 +72,9 @@ theorem GlobalTheory.GoodEtale.hart_tensor_of_flat : ∀ (A R M O : Type) [CommR
         Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, N, LinearMap.mem_range]
       exact ⟨algebraMap A R i.1 • x, by simp [f, smul_comm (algebraMap A R a)]⟩
   have hexO := Module.Flat.lTensor_exact O hex
-  have hcomp : ∀ (z : O ⊗[R] (s → M ⧸ N)) (i : s),
-      TensorProduct.piRight R R O (fun _ : s => M ⧸ N) z i = (LinearMap.proj i).lTensor O z := by
+  have hcomp
+      : ∀ (z : O ⊗[R] (s → M ⧸ N)) (i : s),
+        TensorProduct.piRight R R O (fun _ : s => M ⧸ N) z i = (LinearMap.proj i).lTensor O z := by
     intro z i
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -79,7 +87,8 @@ theorem GlobalTheory.GoodEtale.hart_tensor_of_flat : ∀ (A R M O : Type) [CommR
     have hpg : (LinearMap.proj i).comp g = N.mkQ ∘ₗ (algebraMap A R i.1 • LinearMap.id) := rfl
     obtain ⟨m', hm'⟩ := hsI i.1 i.2
     rw [hpg, LinearMap.lTensor_comp_apply, lTensor_smul_id_apply, ← IsScalarTower.algebraMap_apply,
-      hm', IsScalarTower.algebraMap_apply A R O, ← lTensor_smul_id_apply, ← LinearMap.lTensor_comp_apply,
-      LinearMap.range_mkQ_comp, LinearMap.lTensor_zero, LinearMap.zero_apply]
+      hm', IsScalarTower.algebraMap_apply A R O, ← lTensor_smul_id_apply,
+      ← LinearMap.lTensor_comp_apply, LinearMap.range_mkQ_comp, LinearMap.lTensor_zero,
+      LinearMap.zero_apply]
   obtain ⟨m', hm'⟩ := (hexO m).1 hg
   exact ⟨m', by rw [← hm', lTensor_smul_id_apply, ← IsScalarTower.algebraMap_apply]⟩

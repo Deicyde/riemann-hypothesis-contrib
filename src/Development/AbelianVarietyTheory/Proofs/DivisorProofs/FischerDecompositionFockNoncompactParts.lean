@@ -9,12 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LineKrone
 
 noncomputable section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial GlobalTheory.JointHarm
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
+  MvPolynomial GlobalTheory.JointHarm
 
 namespace GlobalTheory.FischerParts
 
-theorem exists_fockIP (σ : Type) [DecidableEq σ] :
-    ∃ ι : MvPolynomial σ ℂ →ₗ[ℂ] lp (fun _ : σ →₀ ℕ => ℂ) 2,
+theorem exists_fockIP (σ : Type) [DecidableEq σ]
+    : ∃ ι : MvPolynomial σ ℂ →ₗ[ℂ] lp (fun _ : σ →₀ ℕ => ℂ) 2,
       IsFockIP ι ∧ Function.Injective ι := by
   classical
   let w : (σ →₀ ℕ) → ℕ := fun α => α.prod fun _ k => k.factorial
@@ -41,45 +42,59 @@ theorem exists_fockIP (σ : Type) [DecidableEq σ] :
       exact_mod_cast this.symm
     · exact (hv α β).trans (if_neg h)
 
-theorem fischer_parts : ∀ (p q r s d : ℕ), (homog (Ix p q × Ix r s) (d + 2) = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (harm2 p q r s)) ⊔ Submodule.span ℂ {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, ∃ Z : Mat p q, IsPC Z ∧ R = plusPart (fockAct1 p q r s Z) Q}) ∧ (homog (Ix p q × Ix r s) (d + 2) = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (harm1 p q r s)) ⊔ Submodule.span ℂ {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, ∃ Z : Mat r s, IsPC Z ∧ R = plusPart (fockAct2 p q r s Z) Q}) ∧ (homog (Ix p q × Ix r s) (d + 2) = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (jointHarm p q r s)) ⊔ Submodule.span ℂ {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, (∃ Z : Mat p q, IsPC Z ∧ R = plusPart (fockAct1 p q r s Z) Q) ∨ ∃ Z : Mat r s, IsPC Z ∧ R = plusPart (fockAct2 p q r s Z) Q}) := by
-  intro p q r s d
-  obtain ⟨ι, hι, hinj⟩ := exists_fockIP (Ln p q r s)
-  refine ⟨fischer hι hinj {M | ∃ Z, IsPC Z ∧ M = kron1 r s Z} ?_ ?_ d _ _ (fun P hP => ?_)
-      fun P => ?_,
-    fischer hι hinj {M | ∃ Z, IsPC Z ∧ M = kron2 p q Z} ?_ ?_ d _ _ (fun P hP => ?_)
-      fun P => ?_,
-    fischer hι hinj {M | (∃ Z, IsPC Z ∧ M = kron1 r s Z) ∨ ∃ Z, IsPC Z ∧ M = kron2 p q Z}
-      ?_ ?_ d _ _ (fun P hP => ?_) fun P => ?_⟩
-  · rintro _ ⟨Z, hZ, rfl⟩
-    exact odd_kron1 hZ
-  · rintro _ ⟨Z, hZ, rfl⟩
-    exact ⟨_, ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerLeftMatrix_conjTranspose Z⟩
-  · exact fun Z hZ => hP _ ⟨Z, hZ, rfl⟩
-  · constructor
-    · rintro ⟨Q, hQ, Z, hZ, rfl⟩
-      exact ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
-    · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
-      exact ⟨Q, hQ, Z, hZ, rfl⟩
-  · rintro _ ⟨Z, hZ, rfl⟩
-    exact odd_kron2 hZ
-  · rintro _ ⟨Z, hZ, rfl⟩
-    exact ⟨_, ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerRightMatrix_conjTranspose Z⟩
-  · exact fun Z hZ => hP _ ⟨Z, hZ, rfl⟩
-  · constructor
-    · rintro ⟨Q, hQ, Z, hZ, rfl⟩
-      exact ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
-    · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
-      exact ⟨Q, hQ, Z, hZ, rfl⟩
-  · rintro _ (⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩)
-    exacts [odd_kron1 hZ, odd_kron2 hZ]
-  · rintro _ (⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩)
-    exacts [⟨_, .inl ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerLeftMatrix_conjTranspose Z⟩,
-      ⟨_, .inr ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerRightMatrix_conjTranspose Z⟩]
-  · exact ⟨fun Z hZ => hP _ (.inl ⟨Z, hZ, rfl⟩), fun Z hZ => hP _ (.inr ⟨Z, hZ, rfl⟩)⟩
-  · constructor
-    · rintro ⟨Q, hQ, ⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩⟩
-      exacts [⟨Q, hQ, _, .inl ⟨Z, hZ, rfl⟩, rfl⟩, ⟨Q, hQ, _, .inr ⟨Z, hZ, rfl⟩, rfl⟩]
-    · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩, rfl⟩
-      exacts [⟨Q, hQ, .inl ⟨Z, hZ, rfl⟩⟩, ⟨Q, hQ, .inr ⟨Z, hZ, rfl⟩⟩]
+theorem fischer_parts
+    : ∀ (p q r s d : ℕ),
+      (homog (Ix p q × Ix r s) (d + 2)
+          = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (harm2 p q r s)) ⊔ Submodule.span ℂ
+            {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, ∃ Z : Mat p q, IsPC Z ∧ R = plusPart (fockAct1 p q r s Z) Q})
+        ∧ (homog (Ix p q × Ix r s) (d + 2)
+          = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (harm1 p q r s)) ⊔ Submodule.span ℂ
+            {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, ∃ Z : Mat r s, IsPC Z ∧ R = plusPart (fockAct2 p q r s Z) Q})
+        ∧ (homog (Ix p q × Ix r s) (d + 2)
+          = (homog (Ix p q × Ix r s) (d + 2) ⊓ Submodule.span ℂ (jointHarm p q r s)) ⊔ Submodule.span
+            ℂ
+            {R | ∃ Q ∈ homog (Ix p q × Ix r s) d, (∃ Z : Mat p q, IsPC Z ∧ R = plusPart (fockAct1 p q r s Z) Q) ∨ ∃ Z : Mat r s, IsPC Z ∧ R = plusPart (fockAct2 p q r s Z) Q}) :=
+  by
+    intro p q r s d
+    obtain ⟨ι, hι, hinj⟩ := exists_fockIP (Ln p q r s)
+    refine ⟨
+      fischer hι hinj {M | ∃ Z, IsPC Z ∧ M = kron1 r s Z} ?_ ?_ d _ _ (fun P hP => ?_) fun P => ?_,
+      fischer hι hinj {M | ∃ Z, IsPC Z ∧ M = kron2 p q Z} ?_ ?_ d _ _ (fun P hP => ?_) fun P => ?_,
+      fischer hι hinj {M | (∃ Z, IsPC Z ∧ M = kron1 r s Z) ∨ ∃ Z, IsPC Z ∧ M = kron2 p q Z} ?_ ?_ d
+        _ _
+        (fun P hP => ?_)
+        fun P => ?_
+    ⟩
+    · rintro _ ⟨Z, hZ, rfl⟩
+      exact odd_kron1 hZ
+    · rintro _ ⟨Z, hZ, rfl⟩
+      exact ⟨_, ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerLeftMatrix_conjTranspose Z⟩
+    · exact fun Z hZ => hP _ ⟨Z, hZ, rfl⟩
+    · constructor
+      · rintro ⟨Q, hQ, Z, hZ, rfl⟩
+        exact ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
+      · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
+        exact ⟨Q, hQ, Z, hZ, rfl⟩
+    · rintro _ ⟨Z, hZ, rfl⟩
+      exact odd_kron2 hZ
+    · rintro _ ⟨Z, hZ, rfl⟩
+      exact ⟨_, ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerRightMatrix_conjTranspose Z⟩
+    · exact fun Z hZ => hP _ ⟨Z, hZ, rfl⟩
+    · constructor
+      · rintro ⟨Q, hQ, Z, hZ, rfl⟩
+        exact ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
+      · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩, rfl⟩
+        exact ⟨Q, hQ, Z, hZ, rfl⟩
+    · rintro _ (⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩)
+      exacts [odd_kron1 hZ, odd_kron2 hZ]
+    · rintro _ (⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩)
+      exacts [⟨_, .inl ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerLeftMatrix_conjTranspose Z⟩,
+        ⟨_, .inr ⟨_, isPC_conjTranspose hZ, rfl⟩, lineKroneckerRightMatrix_conjTranspose Z⟩]
+    · exact ⟨fun Z hZ => hP _ (.inl ⟨Z, hZ, rfl⟩), fun Z hZ => hP _ (.inr ⟨Z, hZ, rfl⟩)⟩
+    · constructor
+      · rintro ⟨Q, hQ, ⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩⟩
+        exacts [⟨Q, hQ, _, .inl ⟨Z, hZ, rfl⟩, rfl⟩, ⟨Q, hQ, _, .inr ⟨Z, hZ, rfl⟩, rfl⟩]
+      · rintro ⟨Q, hQ, _, ⟨Z, hZ, rfl⟩ | ⟨Z, hZ, rfl⟩, rfl⟩
+        exacts [⟨Q, hQ, .inl ⟨Z, hZ, rfl⟩⟩, ⟨Q, hQ, .inr ⟨Z, hZ, rfl⟩⟩]
 
 end GlobalTheory.FischerParts

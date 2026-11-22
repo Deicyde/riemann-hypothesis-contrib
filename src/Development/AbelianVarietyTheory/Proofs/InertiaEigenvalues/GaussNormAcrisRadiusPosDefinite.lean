@@ -15,16 +15,17 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.PMon.Gauss
 
-theorem log_interp (a b c : ℝ) (h : b - a ≠ 0) :
-    a * ((b - c) / (b - a)) + b * (1 - (b - c) / (b - a)) = c := by
+theorem log_interp (a b c : ℝ) (h : b - a ≠ 0)
+    : a * ((b - c) / (b - a)) + b * (1 - (b - c) / (b - a)) = c := by
   field_simp
   ring
 
-theorem gC_pos_of_ne_zero : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l), x ≠ 0 → ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ →
-    ρ < 1 → 0 < gC l ρ x := by
+theorem gC_pos_of_ne_zero
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l),
+      x ≠ 0 → ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → 0 < gC l ρ x := by
   intro l _ x hx ρ hρ0 hρ1
-  have hN : ∀ r : ℝ, (l : ℝ)⁻¹ ≤ r → r < 1 → IsGauss l r (gC l r) :=
-    fun r h0 h1 => isGauss_gC_target l r h0 h1
+  have hN : ∀ r : ℝ, (l : ℝ)⁻¹ ≤ r → r < 1 → IsGauss l r (gC l r) := fun r h0 h1 =>
+    isGauss_gC_target l r h0 h1
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hi0 : (0 : ℝ) < (l : ℝ)⁻¹ := by positivity
   have hi1 : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ hl
@@ -52,16 +53,20 @@ theorem gC_pos_of_ne_zero : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acri
     div_nonneg (by linarith) hd.le
   have ht1 : (Real.log ρ - Real.log ρ') / (Real.log ρ - Real.log (l : ℝ)⁻¹) < 1 :=
     (div_lt_one hd).2 (by linarith)
-  have he : (l : ℝ)⁻¹ ^ ((Real.log ρ - Real.log ρ') / (Real.log ρ - Real.log (l : ℝ)⁻¹)) *
-      ρ ^ (1 - (Real.log ρ - Real.log ρ') / (Real.log ρ - Real.log (l : ℝ)⁻¹)) = ρ' := by
+  have he
+      : (l : ℝ)⁻¹ ^ ((Real.log ρ - Real.log ρ') / (Real.log ρ - Real.log (l : ℝ)⁻¹))
+          * ρ ^ (1 - (Real.log ρ - Real.log ρ') / (Real.log ρ - Real.log (l : ℝ)⁻¹))
+        = ρ' := by
     rw [Real.rpow_def_of_pos hi0, Real.rpow_def_of_pos hρpos, ← Real.exp_add,
       log_interp _ _ _ hd.ne', Real.exp_log hρ'0]
-  have hcv := GlobalTheory.T.gaussNormAcris_logConvex_in_radius l x (l : ℝ)⁻¹ ρ _ le_rfl h.le hρ1 ht0 ht1.le
+  have hcv :=
+    GlobalTheory.T.gaussNormAcris_logConvex_in_radius l x (l : ℝ)⁻¹ ρ _ le_rfl h.le hρ1 ht0 ht1.le
   rw [he, hz, Real.zero_rpow (sub_pos.2 ht1).ne', mul_zero] at hcv
   linarith
 
-theorem gC_pos_target : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l), x ≠ 0 → ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 →
-    0 < gC l ρ x :=
+theorem gC_pos_target
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l),
+      x ≠ 0 → ∀ ρ : ℝ, (l : ℝ)⁻¹ ≤ ρ → ρ < 1 → 0 < gC l ρ x :=
   gC_pos_of_ne_zero
 
 end GlobalTheory.PMon.Gauss

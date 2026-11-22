@@ -9,7 +9,8 @@ namespace Formalism.TruncatedSeriesCounting.X
 
 theorem q_numerical_identity : QaNum := by
   intro ℓ hℓ H' H eW hH heW
-  unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
+  unfold Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.aR
+    Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.lam
   have hℓ1 : (1 : ℝ) < ℓ := by exact_mod_cast (by omega : 1 < ℓ)
   have hd : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
   have hdiv : ((H' / (ℓ - 1) : ℕ) : ℝ) ≤ (H' : ℝ) / ((ℓ : ℝ) - 1) := by
@@ -27,10 +28,12 @@ theorem q_numerical_identity : QaNum := by
         linarith
       have h4 := Real.logb_le_logb_of_le hℓ1 (by positivity) h1
       linarith
-  have hfrac : (H' : ℝ) / ((ℓ : ℝ) - 1) + (H' : ℝ) * ℓ / ((ℓ : ℝ) - 1) ^ 2 ≤
-      (H : ℝ) * (2 * ℓ - 1) / ((ℓ : ℝ) - 1) ^ 2 := by
-    have heq : (H' : ℝ) / ((ℓ : ℝ) - 1) + (H' : ℝ) * ℓ / ((ℓ : ℝ) - 1) ^ 2 =
-        (H' : ℝ) * (2 * ℓ - 1) / ((ℓ : ℝ) - 1) ^ 2 := by
+  have hfrac
+      : (H' : ℝ) / ((ℓ : ℝ) - 1) + (H' : ℝ) * ℓ / ((ℓ : ℝ) - 1) ^ 2
+        ≤ (H : ℝ) * (2 * ℓ - 1) / ((ℓ : ℝ) - 1) ^ 2 := by
+    have heq
+        : (H' : ℝ) / ((ℓ : ℝ) - 1) + (H' : ℝ) * ℓ / ((ℓ : ℝ) - 1) ^ 2
+          = (H' : ℝ) * (2 * ℓ - 1) / ((ℓ : ℝ) - 1) ^ 2 := by
       have := hd.ne'
       field_simp
       ring

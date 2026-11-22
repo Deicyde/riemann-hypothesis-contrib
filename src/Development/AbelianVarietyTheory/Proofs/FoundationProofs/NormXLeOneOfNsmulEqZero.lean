@@ -57,17 +57,22 @@ lemma add_step [DecidableEq K] {A B : K} {M : ℝ} (hA : ‖A‖ ≤ 1) (hB : �
   | (intros; apply @_root_.GlobalTheory.UltrametricLineBounds.large_add <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.UltrametricLineBounds.large_add ..)
 
-theorem norm_x_le_one_of_nsmul_eq_zero (K : Type) [NormedField K] [IsUltrametricDist K]
-    [DecidableEq K] (A B : K) (N : ℕ) (x y : K)
-    (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y)
+theorem norm_x_le_one_of_nsmul_eq_zero
+    (K : Type) [NormedField K] [IsUltrametricDist K] [DecidableEq K]
+    (A B : K)
+    (N : ℕ)
+    (x y : K) (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y)
     (hA : ‖A‖ ≤ 1) (hB : ‖B‖ ≤ 1) (hN : ‖(N : K)‖ = 1)
-    (h0 : N • (WeierstrassCurve.Affine.Point.some x y h) = 0) : ‖x‖ ≤ 1 := by
+    (h0 : N • (WeierstrassCurve.Affine.Point.some x y h) = 0)
+    : ‖x‖ ≤ 1 := by
   by_contra hx
   push Not at hx
   have M0 : 0 ≤ ‖x‖⁻¹ := by positivity
   have hP : Near ‖x‖ (Affine.Point.some x y h) := le_refl _
-  have key : ∀ k : ℕ, Near ‖x‖ (k • Affine.Point.some x y h) ∧
-      ‖param (k • Affine.Point.some x y h) - (k : K) * (x / y)‖ ≤ ‖x‖⁻¹ := by
+  have key
+      : ∀ k : ℕ,
+        Near ‖x‖ (k • Affine.Point.some x y h)
+          ∧ ‖param (k • Affine.Point.some x y h) - (k : K) * (x / y)‖ ≤ ‖x‖⁻¹ := by
     intro k
     induction k with
     | zero =>
@@ -84,8 +89,8 @@ theorem norm_x_le_one_of_nsmul_eq_zero (K : Type) [NormedField K] [IsUltrametric
       ring
   have h1 := (key N).2
   rw [h0] at h1
-  simp only [Affine.Point.zero_def, param, zero_sub, norm_neg, norm_mul, hN, one_mul,
-    norm_div] at h1
+  simp only [Affine.Point.zero_def, param, zero_sub, norm_neg, norm_mul, hN, one_mul, norm_div]
+    at h1
   have he : y ^ 2 = x ^ 3 + A * x + B := by
     have := (Affine.equation_iff _ _).1 h.1
     simp only at this

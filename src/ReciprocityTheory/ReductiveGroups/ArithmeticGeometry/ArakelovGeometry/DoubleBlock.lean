@@ -27,7 +27,7 @@ abbrev FinTwoTypeFamily (κ : Type) : Fin 2 → Type := fun _ => κ
 
 variable {Ω : Type} [Field Ω] {κ : Type}
 
-def pair (x x' : Ix κ → Ω) : (Σ k, FinTwoTypeFamily κ k) → Ω :=
-  fun p => if p.1 = 0 then x ⟨(), p.2⟩ else x' ⟨(), p.2⟩
+def pair (x x' : Ix κ → Ω) : (Σ k, FinTwoTypeFamily κ k) → Ω := fun p =>
+  if p.1 = 0 then x ⟨(), p.2⟩ else x' ⟨(), p.2⟩
 
 end ReciprocityTheory.ChartRestriction.G.ArakelovGeometry

@@ -5,10 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-theorem UpperTheory.V.X.So.lineZero :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (G Γ ι : Type) [Group G] [Group Γ] [TopologicalSpace G] [TopologicalSpace Γ] (F : UnitaryThreeInertia.Frame O G Γ ι) [Finite (ResidueField O)], F.Cl1 → ∀ s : ℕ, LineVan F 0 (lineChar F 0 s) := by
+theorem UpperTheory.V.X.So.lineZero
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (G Γ ι : Type)
+        [Group G] [Group Γ] [TopologicalSpace G] [TopologicalSpace Γ]
+        (F : UnitaryThreeInertia.Frame O G Γ ι) [Finite (ResidueField O)],
+      F.Cl1 → ∀ s : ℕ, LineVan F 0 (lineChar F 0 s) := by
   intro O _ _ _ _ G Γ ι _ _ _ _ F _ hCl s z hz hcont hN hI _
   have hθ : ∀ u ∈ F.η.ker, lineChar F 0 s u = 1 := by
     intro u hu
@@ -34,7 +38,8 @@ theorem UpperTheory.V.X.So.lineZero :
     by_cases hv : v ∈ F.Tb
     · exact hI rfl v hv t ht
     · have hmem : t ^ Nat.card (ResidueField O)ˣ ∈ F.Nv v := by
-        simp only [UnitaryThreeInertia.Frame.Nv, UnitaryThreeInertia.kerBar, Subgroup.mem_inf, MonoidHom.mem_ker, map_pow]
+        simp only [UnitaryThreeInertia.Frame.Nv, UnitaryThreeInertia.kerBar, Subgroup.mem_inf,
+          MonoidHom.mem_ker, map_pow]
         refine ⟨⟨Subgroup.pow_mem _ ht _, ?_⟩, pow_card_eq_one'⟩
         simp only [UnitaryThreeInertia.Frame.ηv, MonoidHom.comp_apply]
         rw [hηt, one_pow]
@@ -44,12 +49,13 @@ theorem UpperTheory.V.X.So.lineZero :
       exact (mul_eq_zero.mp h0).resolve_left hn
   have hall : ∀ N : ℕ, ∀ u ∈ F.η.ker, z u ∈ (maximalIdeal O) ^ N := by
     intro N
-    let χ : F.η.ker →* Multiplicative (O ⧸ (maximalIdeal O) ^ N) :=
-      { toFun := fun u => Multiplicative.ofAdd (Ideal.Quotient.mk _ (z u))
-        map_one' := by simp [hz1]
-        map_mul' := by
-          intro u w
-          simp [hadd u.1 w.1 u.2, ofAdd_add] }
+    let χ : F.η.ker →* Multiplicative (O ⧸ (maximalIdeal O) ^ N) := {
+      toFun := fun u => Multiplicative.ofAdd (Ideal.Quotient.mk _ (z u))
+      map_one' := by simp [hz1]
+      map_mul' := by
+        intro u w
+        simp [hadd u.1 w.1 u.2, ofAdd_add]
+    }
     have hlc : IsLocallyConstant χ := by
       exact ((hcont N).comp_continuous (continuous_subtype_val (p := fun x => x ∈ F.η.ker))).comp
         Multiplicative.ofAdd
@@ -77,11 +83,11 @@ theorem UpperTheory.V.X.So.lineZero :
     exact Ideal.Quotient.eq_zero_iff_mem.mp (Multiplicative.ofAdd.injective e)
   have hker : ∀ u ∈ F.η.ker, z u = 0 := by
     intro u hu
-    have hm : z u ∈ ⨅ N : ℕ, (maximalIdeal O) ^ N := Submodule.mem_iInf _ |>.mpr fun N => hall N u hu
+    have hm : z u ∈ ⨅ N : ℕ, (maximalIdeal O) ^ N :=
+      Submodule.mem_iInf _ |>.mpr fun N => hall N u hu
     rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ Ideal.IsPrime.ne_top'] at hm
     simpa using hm
-  have hU : CobOn (lineChar F 0 s) z (F.η.ker ⊓ ⊤) :=
-    cobOn_of_eq_zero _ (fun g hg => hker g hg.1)
+  have hU : CobOn (lineChar F 0 s) z (F.η.ker ⊓ ⊤) := cobOn_of_eq_zero _ (fun g hg => hker g hg.1)
   have hrel : F.η.ker.relIndex ⊤ ≠ 0 := by
     rw [Subgroup.relIndex_top_right, Subgroup.index_ker]
     exact Nat.card_pos.ne'

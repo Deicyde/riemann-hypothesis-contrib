@@ -14,9 +14,10 @@ open Formalism.DoubleCosetMeasures (IsUpUni)
 
 variable {A B : Type} [CommRing A] [CommRing B] {r k : ℕ}
 
-theorem mem_sG_iff_map (f : A →+* B) (hf : Function.Injective f) (g : GL (Idx r k) A) :
-    g ∈ sG A r k ↔ glRed f g ∈ sG B r k := by
-  change Par _ (g : Matrix (Idx r k) (Idx r k) A) ↔ Par _ ((glRed f g : GL (Idx r k) B) : Matrix (Idx r k) (Idx r k) B)
+theorem mem_sG_iff_map (f : A →+* B) (hf : Function.Injective f) (g : GL (Idx r k) A)
+    : g ∈ sG A r k ↔ glRed f g ∈ sG B r k := by
+  change Par _ (g : Matrix (Idx r k) (Idx r k) A)
+    ↔ Par _ ((glRed f g : GL (Idx r k) B) : Matrix (Idx r k) (Idx r k) B)
   rw [glRed_coe]
   set x : Matrix (Idx r k) (Idx r k) A := (g : Matrix (Idx r k) (Idx r k) A) with hx
   have z0 : ∀ {a : A}, f a = 0 → a = 0 := fun h => hf (by rw [h, map_zero])
@@ -24,12 +25,11 @@ theorem mem_sG_iff_map (f : A →+* B) (hf : Function.Injective f) (g : GL (Idx 
   constructor
   · intro h
     refine MassDataIdxStImB.par_map f (map_zero f) (map_one f) (fun h hh => ?_) h
-    rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]; exact hh.map f
+    rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
+    exact hh.map f
   · rintro ⟨h11, h33, h21, h31, h32, h, _, h22⟩
-    have u11 : IsUpUni (b11 x) :=
-      ⟨fun i j hij => z0 (h11.1 hij), fun a => z1 (h11.2 a)⟩
-    have u33 : IsUpUni (b33 x) :=
-      ⟨fun i j hij => z0 (h33.1 hij), fun a => z1 (h33.2 a)⟩
+    have u11 : IsUpUni (b11 x) := ⟨fun i j hij => z0 (h11.1 hij), fun a => z1 (h11.2 a)⟩
+    have u33 : IsUpUni (b33 x) := ⟨fun i j hij => z0 (h33.1 hij), fun a => z1 (h33.2 a)⟩
     have v21 : b21 x = 0 := by ext i j; exact z0 (congrFun (congrFun h21 i) j)
     have v31 : b31 x = 0 := by ext i j; exact z0 (congrFun (congrFun h31 i) j)
     have v32 : b32 x = 0 := by ext i j; exact z0 (congrFun (congrFun h32 i) j)

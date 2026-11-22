@@ -16,16 +16,16 @@ section NonDom
 
 variable {R : Type*} [CommRing R] {r n : ℕ}
 
-def ndEul (R : Type*) [CommRing R] (r n : ℕ) (s : Fin n) :
-    Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
+def ndEul (R : Type*) [CommRing R] (r n : ℕ) (s : Fin n)
+    : Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
   mkDerivation R fun v => (colW r n v s) • X v
 
-def ndE (R : Type*) [CommRing R] (r n : ℕ) (l j : Fin n) :
-    Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
+def ndE (R : Type*) [CommRing R] (r n : ℕ) (l j : Fin n)
+    : Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
   mkDerivation R fun v => if v.2 = j then X (v.1, l) else 0
 
-def ndF (R : Type*) [CommRing R] (r n : ℕ) (l j : Fin n) :
-    Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
+def ndF (R : Type*) [CommRing R] (r n : ℕ) (l j : Fin n)
+    : Derivation R (MvPolynomial (Fin r × Fin n) R) (MvPolynomial (Fin r × Fin n) R) :=
   mkDerivation R fun v => if v.2 = l then X (v.1, j) else 0
 
 lemma nd_weight_apply (s : Fin n) (m : Fin r × Fin n →₀ ℕ) :

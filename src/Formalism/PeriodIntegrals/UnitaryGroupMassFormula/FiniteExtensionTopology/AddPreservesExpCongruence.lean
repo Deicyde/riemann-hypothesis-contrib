@@ -17,8 +17,8 @@ variable {O' : Type} [CommRing O'] [IsDomain O'] [IsDiscreteValuationRing O']
 def fracB (ϖ : O') (i : ℕ) : Submodule O' (FractionRing O') :=
   Submodule.span O' {algebraMap O' (FractionRing O') (ϖ ^ i)}
 
-theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'} :
-    x ∈ fracB ϖ i ↔ ∃ c : O', x = algebraMap O' (FractionRing O') (c * ϖ ^ i) := by
+theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'}
+    : x ∈ fracB ϖ i ↔ ∃ c : O', x = algebraMap O' (FractionRing O') (c * ϖ ^ i) := by
   simp only [fracB, Submodule.mem_span_singleton]
   constructor
   · rintro ⟨c, rfl⟩
@@ -26,8 +26,8 @@ theorem mem_fracB {ϖ : O'} {i : ℕ} {x : FractionRing O'} :
   · rintro ⟨c, rfl⟩
     exact ⟨c, by rw [Algebra.smul_def, map_mul]⟩
 
-theorem algebraMap_mem_fracB {ϖ : O'} {i : ℕ} {x : O'} :
-    algebraMap O' (FractionRing O') x ∈ fracB ϖ i ↔ ϖ ^ i ∣ x := by
+theorem algebraMap_mem_fracB {ϖ : O'} {i : ℕ} {x : O'}
+    : algebraMap O' (FractionRing O') x ∈ fracB ϖ i ↔ ϖ ^ i ∣ x := by
   rw [mem_fracB]
   constructor
   · rintro ⟨c, hc⟩
@@ -41,19 +41,21 @@ theorem fracB_anti (ϖ : O') {i j : ℕ} (h : i ≤ j) : fracB ϖ j ≤ fracB ϖ
   obtain ⟨c, rfl⟩ := hx
   exact ⟨c * ϖ ^ (j - i), by rw [mul_assoc, ← pow_add, Nat.sub_add_cancel h]⟩
 
-theorem exists_pow_mul_mem {ϖ : O'} (hϖ : Irreducible ϖ) (a : FractionRing O') :
-    ∃ n : ℕ, ∃ c : O', algebraMap O' (FractionRing O') (ϖ ^ n) * a =
-      algebraMap O' (FractionRing O') c := by
+theorem exists_pow_mul_mem {ϖ : O'} (hϖ : Irreducible ϖ) (a : FractionRing O')
+    : ∃ n : ℕ, ∃ c : O',
+      algebraMap O' (FractionRing O') (ϖ ^ n) * a = algebraMap O' (FractionRing O') c := by
   obtain ⟨⟨x, y⟩, hxy⟩ := IsLocalization.surj (nonZeroDivisors O') a
   have hy : (y : O') ≠ 0 := nonZeroDivisors.ne_zero y.2
   obtain ⟨n, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy hϖ
   refine ⟨n, x * ↑u⁻¹, ?_⟩
-  have hy' : algebraMap O' (FractionRing O') (y : O') =
-      algebraMap O' (FractionRing O') (↑u) * algebraMap O' (FractionRing O') (ϖ ^ n) := by
+  have hy'
+      : algebraMap O' (FractionRing O') (y : O')
+        = algebraMap O' (FractionRing O') (↑u) * algebraMap O' (FractionRing O') (ϖ ^ n) := by
     rw [hu, map_mul]
   have hu1 : algebraMap O' (FractionRing O') (↑u) * algebraMap O' (FractionRing O') (↑u⁻¹) = 1 := by
     rw [← map_mul, Units.mul_inv, map_one]
-  have hxy' : a * algebraMap O' (FractionRing O') (y : O') = algebraMap O' (FractionRing O') x := hxy
+  have hxy' : a * algebraMap O' (FractionRing O') (y : O') = algebraMap O' (FractionRing O') x :=
+    hxy
   rw [map_mul, ← hxy']
   linear_combination (-(a * algebraMap O' (FractionRing O') (↑u⁻¹))) * hy' +
     (-(algebraMap O' (FractionRing O') (ϖ ^ n) * a)) * hu1
@@ -68,8 +70,10 @@ theorem fracB_basis {ϖ : O'} (hϖ : Irreducible ϖ) : SubmodulesRingBasis (frac
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨d, rfl⟩ := mem_fracB.1 hx
     refine mem_fracB.2 ⟨c * d, ?_⟩
-    have e : algebraMap O' (FractionRing O') (d * ϖ ^ (i + n)) =
-        algebraMap O' (FractionRing O') (d * ϖ ^ i) * algebraMap O' (FractionRing O') (ϖ ^ n) := by
+    have e
+        : algebraMap O' (FractionRing O') (d * ϖ ^ (i + n))
+          = algebraMap O' (FractionRing O') (d * ϖ ^ i)
+            * algebraMap O' (FractionRing O') (ϖ ^ n) := by
       rw [← map_mul, pow_add, mul_assoc]
     show a * _ = _
     rw [e, mul_comm (algebraMap O' (FractionRing O') (d * ϖ ^ i)), ← mul_assoc, mul_comm a, hc,

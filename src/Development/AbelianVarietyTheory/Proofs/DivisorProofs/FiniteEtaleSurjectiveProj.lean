@@ -10,11 +10,12 @@ noncomputable section
 
 namespace GlobalTheory.Et.TrivTors
 
-def sigmaFinSuccIso (V : Scheme.{0}) (k : ℕ) :
-    (∐ fun _ : Fin (k + 1) => V) ≅ V ⨿ (∐ fun _ : Fin k => V) where
+def sigmaFinSuccIso (V : Scheme.{0}) (k : ℕ)
+    : (∐ fun _ : Fin (k + 1) => V) ≅ V ⨿ (∐ fun _ : Fin k => V) where
   hom := Sigma.desc (Fin.cases coprod.inl fun i => Sigma.ι (fun _ : Fin k => V) i ≫ coprod.inr)
-  inv := coprod.desc (Sigma.ι (fun _ : Fin (k + 1) => V) 0)
-    (Sigma.desc fun i => Sigma.ι (fun _ : Fin (k + 1) => V) i.succ)
+  inv :=
+    coprod.desc (Sigma.ι (fun _ : Fin (k + 1) => V) 0)
+      (Sigma.desc fun i => Sigma.ι (fun _ : Fin (k + 1) => V) i.succ)
   hom_inv_id := by
     ext i
     induction i using Fin.cases
@@ -30,9 +31,9 @@ def sigmaFinSuccIso (V : Scheme.{0}) (k : ℕ) :
       ext i
       simp
 
-theorem sigmaFinSuccIso_hom_desc (V : Scheme.{0}) (k : ℕ) :
-    (sigmaFinSuccIso V k).hom ≫ coprod.desc (𝟙 V) (Sigma.desc fun _ : Fin k => 𝟙 V) =
-      Sigma.desc fun _ : Fin (k + 1) => 𝟙 V := by
+theorem sigmaFinSuccIso_hom_desc (V : Scheme.{0}) (k : ℕ)
+    : (sigmaFinSuccIso V k).hom ≫ coprod.desc (𝟙 V) (Sigma.desc fun _ : Fin k => 𝟙 V)
+      = Sigma.desc fun _ : Fin (k + 1) => 𝟙 V := by
   ext i
   induction i using Fin.cases
   · simp only [sigmaFinSuccIso, Sigma.ι_comp_desc_assoc, Fin.cases_zero, Sigma.ι_comp_desc]
@@ -41,7 +42,8 @@ theorem sigmaFinSuccIso_hom_desc (V : Scheme.{0}) (k : ℕ) :
       Category.assoc]
     erw [coprod.inr_desc, Sigma.ι_comp_desc]
 
-theorem isFinite_sigmaDesc_fin (V : Scheme.{0}) : ∀ k : ℕ, IsFinite (Sigma.desc fun _ : Fin k => 𝟙 V)
+theorem isFinite_sigmaDesc_fin (V : Scheme.{0})
+    : ∀ k : ℕ, IsFinite (Sigma.desc fun _ : Fin k => 𝟙 V)
   | 0 => by
     have : IsEmpty (∐ fun _ : Fin 0 => V : Scheme.{0}) := by
       exact ⟨fun x => ((sigmaMk fun _ : Fin 0 => V).symm x).1.elim0⟩

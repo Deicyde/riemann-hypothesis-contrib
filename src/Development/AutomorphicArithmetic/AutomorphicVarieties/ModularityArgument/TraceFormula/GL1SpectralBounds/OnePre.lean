@@ -7,10 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.F UpperTheory.V.Z.Tf.GOne
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.F UpperTheory.V.Z.Tf.GOne
 
-private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictAnti t) (d : ℕ) :
-    ∀ a b : Fin n, (b : ℕ) = a + d → t b + d ≤ t a := by
+private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictAnti t) (d : ℕ)
+    : ∀ a b : Fin n, (b : ℕ) = a + d → t b + d ≤ t a := by
   induction d with
   | zero =>
     intro a b h
@@ -24,8 +25,10 @@ private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictA
     push_cast
     omega
 
-private theorem exists_weight {n : ℕ} (m : Multiset ℂ) (hc : Multiset.card m = n) (hn : m.Nodup)
-    (hz : ∀ z ∈ m, ∃ k : ℤ, z = (k : ℂ) + ((n : ℂ) - 1) / 2) : ∃ lam : Formalism.BasicNotions.DomWeight n, m = infOfWeight lam := by
+private theorem exists_weight
+    {n : ℕ} (m : Multiset ℂ) (hc : Multiset.card m = n) (hn : m.Nodup)
+    (hz : ∀ z ∈ m, ∃ k : ℤ, z = (k : ℂ) + ((n : ℂ) - 1) / 2)
+    : ∃ lam : Formalism.BasicNotions.DomWeight n, m = infOfWeight lam := by
   classical
   choose! f hf using hz
   let s : Finset ℤ := m.toFinset.image f
@@ -58,15 +61,28 @@ private theorem exists_weight {n : ℕ} (m : Multiset ℂ) (hc : Multiset.card m
     push_cast
     ring
 
-theorem UpperTheory.V.Z.Tf.GOne.onePre :
-    OnePre := by
+theorem UpperTheory.V.Z.Tf.GOne.onePre : OnePre := by
   intro E _ _ _ n hn π hr hd
   have hl : ∀ w, ∃ σ, IsLocCompGL π.V w σ := fun w =>
-    (GlobalTheory.CuspRep.LocEx.exists_isLocComp UpperTheory.V.Af.formsFiniteGL E n π w).imp fun σ h =>
-      ((cuspSub_iff π).2.1 w σ).2 h.1
+    (GlobalTheory.CuspRep.LocEx.exists_isLocComp UpperTheory.V.Af.formsFiniteGL E n π w).imp
+      fun σ h => ((cuspSub_iff π).2.1 w σ).2 h.1
   choose σ hσ using hl
-  refine ⟨⟨1, fun _ => n, by simp, fun _ => π.V, fun _ w => σ w, fun _ τ => (CG.mk π).infChar τ,
-    fun _ => hn, fun _ => hd, fun _ w => hσ w, fun _ τ => ?_⟩, ⟨rfl, fun _ => ⟨rfl, rfl⟩⟩, fun τ => ?_⟩
+  refine ⟨
+    ⟨
+      1,
+      fun _ => n,
+      by simp,
+      fun _ => π.V,
+      fun _ w => σ w,
+      fun _ τ => (CG.mk π).infChar τ,
+      fun _ => hn,
+      fun _ => hd,
+      fun _ w => hσ w,
+      fun _ τ => ?_
+    ⟩,
+    ⟨rfl, fun _ => ⟨rfl, rfl⟩⟩,
+    fun τ => ?_
+  ⟩
   · exact ((cuspSub_iff π).2.2 τ _).2 (GlobalTheory.CuspRep.ParLaws.hasInfChar_infChar (CG.mk π) τ)
   · obtain ⟨h1, h2⟩ := hr τ
     obtain ⟨lam, hlam⟩ := exists_weight _ ((CG.mk π).card_infChar τ) h1 h2

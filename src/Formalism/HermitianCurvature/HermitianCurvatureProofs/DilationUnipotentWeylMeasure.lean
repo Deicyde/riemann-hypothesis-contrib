@@ -17,8 +17,12 @@ open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 noncomputable def dg (k r : ℕ) (t : ℝ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if i.val < r then ((t ^ (r - i.val) : ℝ) : ℂ)
-    else if i.val ≤ r + k then 1 else (((t ^ (i.val - (r + k)))⁻¹ : ℝ) : ℂ)
+  if i.val < r then
+    ((t ^ (r - i.val) : ℝ) : ℂ)
+  else if i.val ≤ r + k then
+    1
+  else
+    (((t ^ (i.val - (r + k)))⁻¹ : ℝ) : ℂ)
 
 lemma aDil_eq (k r : ℕ) (t : ℝ) : aDil k r t = Matrix.diagonal (dg k r t) := rfl
 
@@ -177,8 +181,8 @@ def cv (b : Bool) (X : Mat k r) (t : ℝ) (g : Mat k r) : Mat k r :=
   | true => NormedSpace.exp (-((t : ℂ) • X)) * g
   | false => g * NormedSpace.exp ((t : ℂ) • X)
 
-def op (b : Bool) (X : Mat k r) (f : Mat k r → E) : Mat k r → E :=
-  fun g => deriv (fun t : ℝ => f (cv b X t g)) 0
+def op (b : Bool) (X : Mat k r) (f : Mat k r → E) : Mat k r → E := fun g =>
+  deriv (fun t : ℝ => f (cv b X t g)) 0
 
 lemma op_true (X : Mat k r) (f : Mat k r → E) : op true X f = LdV X f := rfl
 
@@ -278,8 +282,8 @@ lemma cast_ne_zero (m : ℕ) : (((m + 1 : ℕ) : ℕ∞) : WithTop ℕ∞) ≠ 0
     | exact_mod_cast Nat.succ_ne_zero m
     | simp
 
-def op' (b : Bool) (X : Mat k r) (f' : Mat k r → E) : Mat k r → E :=
-  fun g => fderiv ℝ f' g (vf b X g)
+def op' (b : Bool) (X : Mat k r) (f' : Mat k r → E) : Mat k r → E := fun g =>
+  fderiv ℝ f' g (vf b X g)
 
 lemma op'_contDiffOn {f' : Mat k r → E} {U : Set (Mat k r)} (m : ℕ) (b : Bool) (X : Mat k r)
     (hU : IsOpen U) (hf : ContDiffOn ℝ (((m + 1 : ℕ) : ℕ∞) : WithTop ℕ∞) f' U) :
@@ -1109,7 +1113,12 @@ lemma gN_dil {τ₁ τ₂ A : ℝ} (h₁ : τ₁ ∈ Set.Icc (1 / 2 : ℝ) 2) (h
         (show (0 : ℝ) ≤ gN (aDil k r τ₁ * g * aDil k r τ₂) from Real.sqrt_nonneg _), four_pow, sq]
 
 def zd (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℝ :=
-  if i.val < r then ((r - i.val : ℕ) : ℝ) else if i.val ≤ r + k then 0 else -((i.val - (r + k) : ℕ) : ℝ)
+  if i.val < r then
+    ((r - i.val : ℕ) : ℝ)
+  else if i.val ≤ r + k then
+    0
+  else
+    -((i.val - (r + k) : ℕ) : ℝ)
 
 def Zm (k r : ℕ) : Mat k r := Matrix.diagonal fun i => ((zd k r i : ℝ) : ℂ)
 
@@ -1535,7 +1544,8 @@ end Formalism.FourierDecayAlt.P.B4
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.B4
 
 theorem dilation_unipotent_measure : Formalism.FourierDecayAlt.B.DilN := by
   intro k r z t ht hz n hn
@@ -1557,7 +1567,11 @@ theorem dilation_unipotent_measure : Formalism.FourierDecayAlt.B.DilN := by
       · rw [dg_mid k r t⁻¹ j (by omega) (by omega)]; ring
   refine ⟨?_, hell, ?_⟩
   · rw [WeylGroupFacts.nset_iff]
-    refine ⟨WeylGroupFacts.uh_mul (WeylGroupFacts.uh_mul (aDil_mem k r t ht) hn'.1) (WeylGroupFacts.uh_inv (aDil_mem k r t ht)), ?_⟩
+    refine ⟨
+      WeylGroupFacts.uh_mul (WeylGroupFacts.uh_mul (aDil_mem k r t ht) hn'.1)
+        (WeylGroupFacts.uh_inv (aDil_mem k r t ht)),
+      ?_
+    ⟩
     intro i j hj hi
     rw [conj_apply k r t ht, hn'.2 i j hj hi]
     by_cases hij : i = j
@@ -1591,36 +1605,50 @@ theorem matrix_coefficient_linear : Formalism.FourierDecayAlt.B.CCLin := by
   refine ⟨⟨ckOn_add hF hF', ?_⟩, ⟨ckOn_smul a hF, ?_⟩⟩
   · intro u v hu hv hlen g hg
     have hl : (lr u v).length ≤ m := by rw [length_lr]; exact hlen
-    rw [dLR_eq, W_add _ (allLie_lr hu hv) (ckOn_mono hl hF) (ckOn_mono hl hF') g hg, ← dLR_eq, ← dLR_eq]
-    calc gN g ^ A * ‖dLR u v F g + dLR u v F' g‖
-        ≤ gN g ^ A * (‖dLR u v F g‖ + ‖dLR u v F' g‖) :=
-          mul_le_mul_of_nonneg_left (norm_add_le _ _) (gN_rpow_nonneg g A)
+    rw [dLR_eq, W_add _ (allLie_lr hu hv) (ckOn_mono hl hF) (ckOn_mono hl hF') g hg, ← dLR_eq,
+      ← dLR_eq]
+    calc
+      gN g ^ A * ‖dLR u v F g + dLR u v F' g‖ ≤ gN g ^ A * (‖dLR u v F g‖ + ‖dLR u v F' g‖) :=
+        mul_le_mul_of_nonneg_left (norm_add_le _ _) (gN_rpow_nonneg g A)
       _ = gN g ^ A * ‖dLR u v F g‖ + gN g ^ A * ‖dLR u v F' g‖ := by ring
       _ ≤ c + c' := add_le_add (hb u v hu hv hlen g hg) (hb' u v hu hv hlen g hg)
   · intro u v hu hv hlen g hg
     rw [dLR_eq, W_smul, ← dLR_eq, Pi.smul_apply, norm_smul]
-    calc gN g ^ A * (‖a‖ * ‖dLR u v F g‖) = ‖a‖ * (gN g ^ A * ‖dLR u v F g‖) := by ring
+    calc
+      gN g ^ A * (‖a‖ * ‖dLR u v F g‖)
+        = ‖a‖ * (gN g ^ A * ‖dLR u v F g‖) := by ring
       _ ≤ ‖a‖ * c := mul_le_mul_of_nonneg_left (hb u v hu hv hlen g hg) (norm_nonneg _)
 
 theorem dilation_matrix_coefficient : Formalism.FourierDecayAlt.B.DilCC := by
   intro k r Wp Wq _ _ _ _ A hA
-  refine ⟨((4 : ℝ) ^ r) ^ A * (4 ^ r) ^ 5 +
-    ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r), ?_⟩
+  refine ⟨
+    ((4 : ℝ) ^ r) ^ A * (4 ^ r) ^ 5
+      + ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r),
+    ?_
+  ⟩
   intro t ht F c hF
   obtain ⟨h1, h2⟩ := Set.mem_prod.mp ht
   have hc := cc_nonneg hF
   have hδ : 0 ≤ |t.1 - 1| + |t.2 - 1| := by positivity
   have a1 : (0 : ℝ) ≤ ((4 : ℝ) ^ r) ^ A * (4 ^ r) ^ 5 := by positivity
-  have a2 : (0 : ℝ) ≤ ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r) := by
+  have a2
+      : (0 : ℝ)
+        ≤ ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r) := by
     positivity
   constructor
   · refine cc_mono (dil_bound1 h1 h2 hA hF) ?_
-    have := mul_le_mul_of_nonneg_right (le_add_of_nonneg_right a2 :
-      ((4 : ℝ) ^ r) ^ A * (4 ^ r) ^ 5 ≤ _) hc
+    have :=
+      mul_le_mul_of_nonneg_right (le_add_of_nonneg_right a2 : ((4 : ℝ) ^ r) ^ A * (4 ^ r) ^ 5 ≤ _)
+        hc
     linarith
   · refine cc_mono (dil_bound2 h1 h2 hA hF) ?_
-    have := mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_add_of_nonneg_left a1 :
-      ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r) ≤ _) hδ) hc
+    have :=
+      mul_le_mul_of_nonneg_right
+        (mul_le_mul_of_nonneg_right
+          (le_add_of_nonneg_left a1
+            : ((4 : ℝ) ^ r) ^ A * (((4 : ℕ) : ℝ) * ((4 ^ r) ^ (4 + 1) * (8 * 4 ^ r)) + 2 * r) ≤ _)
+          hδ)
+        hc
     exact this
 
 end Formalism.FourierDecayAlt.P

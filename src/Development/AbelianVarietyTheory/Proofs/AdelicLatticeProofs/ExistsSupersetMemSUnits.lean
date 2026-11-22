@@ -10,8 +10,8 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem finite_valuation_ne_one (F : Type) [Field F] [NumberField F] (x : Fˣ) :
-    {v : HeightOneSpectrum (𝓞 F) | v.valuation F (x : F) ≠ 1}.Finite := by
+theorem finite_valuation_ne_one (F : Type) [Field F] [NumberField F] (x : Fˣ)
+    : {v : HeightOneSpectrum (𝓞 F) | v.valuation F (x : F) ≠ 1}.Finite := by
   refine ((HeightOneSpectrum.Support.finite (𝓞 F) (x : F)).union
     (HeightOneSpectrum.Support.finite (𝓞 F) ((x : F)⁻¹))).subset ?_
   intro v hv
@@ -27,10 +27,11 @@ theorem finite_valuation_ne_one (F : Type) [Field F] [NumberField F] (x : Fˣ) :
   · left
     exact h
 
-theorem exists_superset_mem_sUnits :
-    ∀ (F : Type) [Field F] [NumberField F] (X : Finset Fˣ)
-      (S₀ : Finset (HeightOneSpectrum (𝓞 F))),
-      ∃ S, S₀ ⊆ S ∧ ∀ S', S ⊆ S' → ∀ x ∈ X, x ∈ sUnits F S' := by
+theorem exists_superset_mem_sUnits
+    : ∀ (F : Type) [Field F] [NumberField F] (X : Finset Fˣ)
+        (S₀ : Finset (HeightOneSpectrum (𝓞 F))),
+      ∃ S,
+        S₀ ⊆ S ∧ ∀ S', S ⊆ S' → ∀ x ∈ X, x ∈ sUnits F S' := by
   intro F _ _ X S₀
   classical
   have hT : (⋃ x ∈ X, {v : HeightOneSpectrum (𝓞 F) | v.valuation F (x : F) ≠ 1}).Finite :=

@@ -5,13 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Af.Cq.embPadic :
-    ∀ (K : Type) [Field K] [NumberField K], Module.finrank ℚ K = 2 → ∀ (l : ℕ) [Fact l.Prime], Nonempty (K →+* ℚ_[l]) → ∀ (j : K →+* Om l) (x : K),
-        j x ∈ Set.range (algebraMap ℚ_[l] (Om l)) := by
+theorem UpperTheory.V.Af.Cq.embPadic
+    : ∀ (K : Type) [Field K] [NumberField K],
+      Module.finrank ℚ K = 2
+        → ∀ (l : ℕ) [Fact l.Prime],
+          Nonempty (K →+* ℚ_[l])
+            → ∀ (j : K →+* Om l) (x : K), j x ∈ Set.range (algebraMap ℚ_[l] (Om l)) := by
   intro K _ _ hK l _ hι j x
   obtain ⟨ι⟩ := hι
   have hint : IsIntegral ℚ x := Algebra.IsIntegral.isIntegral x
@@ -28,15 +35,19 @@ theorem UpperTheory.V.Af.Cq.embPadic :
   obtain hd | hd : (minpoly ℚ x).natDegree = 1 ∨ (minpoly ℚ x).natDegree = 2 := by omega
   · rw [hd] at hy hlead
     simp only [Finset.sum_range_succ, Finset.sum_range_zero, Rat.smul_def, pow_zero, pow_one,
-      mul_one, zero_add, hlead, Rat.cast_one, one_mul] at hy
+        mul_one, zero_add, hlead, Rat.cast_one, one_mul]
+      at hy
     refine ⟨-((minpoly ℚ x).coeff 0 : ℚ_[l]), ?_⟩
     rw [map_neg, map_ratCast]
     linear_combination -hy
   · rw [hd] at hy hw hlead
     simp only [Finset.sum_range_succ, Finset.sum_range_zero, Rat.smul_def, pow_zero, pow_one,
-      mul_one, zero_add, hlead, Rat.cast_one, one_mul, RingHom.comp_apply] at hy hw
-    have hfac : (j x - algebraMap ℚ_[l] (Om l) (ι x)) *
-        (j x + algebraMap ℚ_[l] (Om l) (ι x) + ((minpoly ℚ x).coeff 1 : Om l)) = 0 := by
+        mul_one, zero_add, hlead, Rat.cast_one, one_mul, RingHom.comp_apply]
+      at hy hw
+    have hfac
+        : (j x - algebraMap ℚ_[l] (Om l) (ι x))
+            * (j x + algebraMap ℚ_[l] (Om l) (ι x) + ((minpoly ℚ x).coeff 1 : Om l))
+          = 0 := by
       linear_combination hy - hw
     rcases mul_eq_zero.1 hfac with h | h
     · exact ⟨ι x, (sub_eq_zero.1 h).symm⟩

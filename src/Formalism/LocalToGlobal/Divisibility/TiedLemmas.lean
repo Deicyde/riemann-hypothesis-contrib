@@ -20,8 +20,8 @@ section PlConj
 
 open Formalism.BasicNotions
 
-theorem plConj_vAdd (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL) :
-    vAdd (D.plEq (D.what₂.places.conj w)) x = vAdd (D.plEq w) (star x) := by
+theorem plConj_vAdd (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL)
+    : vAdd (D.plEq (D.what₂.places.conj w)) x = vAdd (D.plEq w) (star x) := by
   by_cases hx : x = 0
   · subst hx
     simp [vAdd]
@@ -29,8 +29,9 @@ theorem plConj_vAdd (D : D7) (w : D.what₂.places.Pl) (x : D.what₂.LL) :
     rw [D.val_eq _ _ hx, D.val_eq _ _ (star_ne_zero.mpr hx)] at h1
     exact WithTop.coe_injective h1
 
-theorem mem_iff_vAdd_pos {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) (hx : x ≠ 0) :
-    x ∈ w.asIdeal ↔ 0 < vAdd w (x : K) := by
+theorem mem_iff_vAdd_pos
+    {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) (hx : x ≠ 0)
+    : x ∈ w.asIdeal ↔ 0 < vAdd w (x : K) := by
   have hxK : (x : K) ≠ 0 := fun h => hx (RingOfIntegers.ext (by rw [h]; simp))
   have hv : w.valuation K (x : K) ≠ 0 := (Valuation.ne_zero_iff _).mpr hxK
   rw [← IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem (K := K) w x]
@@ -41,16 +42,19 @@ theorem mem_iff_vAdd_pos {K : Type} [Field K] [NumberField K] (w : HeightOneSpec
 theorem plConjEq (D : D7) : PlConjEq D := by
   unfold PlConjEq
   intro w
-  have hc : ∀ y : 𝓞 D.what₂.LL, ((cO D.what₂.LL y : 𝓞 D.what₂.LL) : D.what₂.LL) = star (y : D.what₂.LL) :=
-    fun y => rfl
+  have hc
+      : ∀ y : 𝓞 D.what₂.LL,
+        ((cO D.what₂.LL y : 𝓞 D.what₂.LL) : D.what₂.LL) = star (y : D.what₂.LL) := fun y =>
+    rfl
   have hcc : ∀ y : 𝓞 D.what₂.LL, cO D.what₂.LL (cO D.what₂.LL y) = y := fun y =>
     RingOfIntegers.ext (by rw [hc, hc, star_star])
   ext x
   show x ∈ (D.plEq (D.what₂.places.conj w)).asIdeal ↔ x ∈ (D.plEq w).asIdeal.map (cO D.what₂.LL)
   first
-    | rw [Ideal.mem_map_of_equiv]
-    | rw [Ideal.mem_map_iff_of_surjective _ (cO D.what₂.LL).surjective]
-  have hiff : (∃ y ∈ (D.plEq w).asIdeal, cO D.what₂.LL y = x) ↔ cO D.what₂.LL x ∈ (D.plEq w).asIdeal := by
+  | rw [Ideal.mem_map_of_equiv]
+  | rw [Ideal.mem_map_iff_of_surjective _ (cO D.what₂.LL).surjective]
+  have hiff
+      : (∃ y ∈ (D.plEq w).asIdeal, cO D.what₂.LL y = x) ↔ cO D.what₂.LL x ∈ (D.plEq w).asIdeal := by
     constructor
     · rintro ⟨y, hy, rfl⟩
       rwa [hcc]
@@ -71,14 +75,17 @@ open TensorProduct Formalism.BasicNotions.Rows
 
 section CutTensor
 
-variable {O R W : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup W] [Module O W] [Module R W]
+variable
+  {O R W : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup W] [Module O W] [Module R W]
   [IsScalarTower O R W]
 
 end CutTensor
 
 section OForm
 
-def OForm {O : Type} [CommRing O] {φ : O →+* ℂ} {W : Type} [AddCommGroup W] [Module ℂ W] (M : OLat O φ W) : Prop :=
+def OForm
+    {O : Type} [CommRing O] {φ : O →+* ℂ} {W : Type} [AddCommGroup W] [Module ℂ W] (M : OLat O φ W)
+    : Prop :=
   letI : Algebra O ℂ := φ.toAlgebra
   letI : Module O W := Module.compHom W φ
   haveI : IsScalarTower O ℂ W := ⟨fun a b w => mul_smul (φ a) b w⟩
@@ -88,8 +95,9 @@ end OForm
 
 section CutRec
 
-
-theorem restRowsFiniteGroupCard_pos (D : Formalism.BasicNotions.D7) : 0 < D.what₂.restRowsFiniteGroupCard := D.what₂.restRowsFiniteGroupCard_pos
+theorem restRowsFiniteGroupCard_pos (D : Formalism.BasicNotions.D7)
+    : 0 < D.what₂.restRowsFiniteGroupCard :=
+  D.what₂.restRowsFiniteGroupCard_pos
 
 end CutRec
 
@@ -97,15 +105,16 @@ end Cut
 
 section Fam
 
-variable (D : Formalism.BasicNotions.D7) {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
-  (A : FamIn D.what₂.LL G Pl0 T m)
+variable
+  (D : Formalism.BasicNotions.D7)
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
 
 theorem ranks_r_sym (D : Formalism.BasicNotions.D7) : D.R.r = D.R.k + 2 * D.R.rS + 1 := by
   have h1 := D.R.two_le_m
   obtain ⟨j, hj⟩ := D.R.m_even
   unfold Formalism.BasicNotions.Ranks.r Formalism.BasicNotions.Ranks.rS
   omega
-
 
 end Fam
 

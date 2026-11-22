@@ -8,11 +8,12 @@ public import Mathlib.AlgebraicGeometry.Morphisms.QuasiFinite
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-theorem UpperTheory.Gal.KunnethLefschetz.finFib_holds :
-    UpperTheory.Gal.KunnethLefschetz.FinFib := by
+theorem UpperTheory.Gal.KunnethLefschetz.finFib_holds
+    : UpperTheory.Gal.KunnethLefschetz.FinFib := by
   intro k _ _ X Y p r π hπ hfin t U hU
   classical
   obtain ⟨t0, ht0⟩ := t
@@ -31,10 +32,12 @@ theorem UpperTheory.Gal.KunnethLefschetz.finFib_holds :
     pointOfClosedPoint (pullback.snd π t0) z (isClosed_discrete _)
   have he : ∀ z, e z ≫ pullback.snd π t0 = 𝟙 _ := fun z => pointOfClosedPoint_comp _ _ _
   have he' : ∀ z, e z c = z := fun z => pointOfClosedPoint_apply _ _ _ _
-  let g : ↥(pullback π t0) → Pt p := fun z =>
-    ⟨e z ≫ pullback.fst π t0, by
+  let g : ↥(pullback π t0) → Pt p := fun z => ⟨
+    e z ≫ pullback.fst π t0,
+    by
       rw [Category.assoc, ← hπ, ← Category.assoc (pullback.fst π t0), pullback.condition,
-        Category.assoc, ht0, Category.comp_id, he]⟩
+        Category.assoc, ht0, Category.comp_id, he]
+  ⟩
   refine ⟨Finset.univ.image g, ?_⟩
   unfold OffPts
   rw [Scheme.Hom.coe_preimage, hU, Set.preimage_compl]

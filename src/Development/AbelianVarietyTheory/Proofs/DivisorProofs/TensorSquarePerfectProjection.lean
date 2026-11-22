@@ -6,12 +6,20 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem tensorSquare_perfectProjection (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] (A : Type) [CommRing A] [Algebra k A] (π : A →ₐ[k] A) :
-    ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p) → ((∀ a : A ⊗[k] A, IsNilpotent (a - Algebra.TensorProduct.map π π a)) ∧ ∀ a : A ⊗[k] A, ∃ b : A ⊗[k] A, Algebra.TensorProduct.map π π a = Algebra.TensorProduct.map π π b ^ p) := by
+theorem tensorSquare_perfectProjection
+    (p : ℕ) [Fact p.Prime]
+    (k : Type) [Field k] [CharP k p]
+    (A : Type) [CommRing A] [Algebra k A]
+    (π : A →ₐ[k] A)
+    : ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p)
+      → ((∀ a : A ⊗[k] A, IsNilpotent (a - Algebra.TensorProduct.map π π a))
+        ∧ ∀ a : A ⊗[k] A, ∃ b : A ⊗[k] A,
+          Algebra.TensorProduct.map π π a = Algebra.TensorProduct.map π π b ^ p) := by
   rintro ⟨h1, h2⟩
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).ne_zero
   have hpA : ((p : ℕ) : A ⊗[k] A) = 0 := by
@@ -26,11 +34,15 @@ theorem tensorSquare_perfectProjection (p : ℕ) [Fact p.Prime] (k : Type) [Fiel
         rw [TensorProduct.sub_tmul, TensorProduct.tmul_sub]; abel
       rw [e]
       refine Ideal.add_mem _ ?_ ?_
-      · have : (a - π a) ⊗ₜ[k] b = Algebra.TensorProduct.includeLeft (S := k) (B := A) (a - π a) * ((1 : A) ⊗ₜ[k] b) := by
+      · have : (a - π a) ⊗ₜ[k] b
+            = Algebra.TensorProduct.includeLeft (S := k) (B := A) (a - π a)
+              * ((1 : A) ⊗ₜ[k] b) := by
           simp [Algebra.TensorProduct.tmul_mul_tmul]
         rw [this]
         exact Ideal.mul_mem_right _ _ (mem_nilradical.2 ((h1 a).map _))
-      · have : π a ⊗ₜ[k] (b - π b) = ((π a) ⊗ₜ[k] (1 : A)) * Algebra.TensorProduct.includeRight (R := k) (A := A) (b - π b) := by
+      · have : π a ⊗ₜ[k] (b - π b)
+            = ((π a) ⊗ₜ[k] (1 : A))
+              * Algebra.TensorProduct.includeRight (R := k) (A := A) (b - π b) := by
           simp [Algebra.TensorProduct.tmul_mul_tmul]
         rw [this]
         exact Ideal.mul_mem_left _ _ (mem_nilradical.2 ((h1 b).map _))
@@ -48,6 +60,7 @@ theorem tensorSquare_perfectProjection (p : ℕ) [Fact p.Prime] (k : Type) [Fiel
       obtain ⟨u, hu⟩ := hx
       obtain ⟨v, hv⟩ := hy
       refine ⟨u + v, ?_⟩
-      rw [map_add (f := _), map_add (f := _), hu, hv, ← frobRing_apply hpA, ← frobRing_apply hpA, ← frobRing_apply hpA, map_add (f := _)]
+      rw [map_add (f := _), map_add (f := _), hu, hv, ← frobRing_apply hpA, ← frobRing_apply hpA,
+        ← frobRing_apply hpA, map_add (f := _)]
 
 end GlobalTheory

@@ -12,11 +12,13 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 namespace GlobalTheory.PD
 
-theorem cech_isCx_of_mono : ∀ (k : Type) [Field k] (ι : Type) [LinearOrder ι] (E : Type) [AddCommGroup E] [Module k E]
-    (A : Finset ι → Submodule k E), (∀ s t, s.Nonempty → s ⊆ t → A s ≤ A t) → (cech A).IsCx := by
+theorem cech_isCx_of_mono
+    : ∀ (k : Type) [Field k] (ι : Type) [LinearOrder ι] (E : Type) [AddCommGroup E] [Module k E]
+        (A : Finset ι → Submodule k E),
+      (∀ s t, s.Nonempty → s ⊆ t → A s ≤ A t) → (cech A).IsCx := by
   intro k _ ι _ E _ _ A hA n a ha
-  have ha' : ∀ s, a s ∈ (if s.Nonempty ∧ (s.card : ℤ) = n + 1 then A s else ⊥) :=
-    fun s => (Submodule.mem_pi.1 ha) s (Set.mem_univ _)
+  have ha' : ∀ s, a s ∈ (if s.Nonempty ∧ (s.card : ℤ) = n + 1 then A s else ⊥) := fun s =>
+    (Submodule.mem_pi.1 ha) s (Set.mem_univ _)
   refine ⟨?_, ?_⟩
   · show GlobalTheory.DI.delta a ∈ cechC A (n + 1)
     refine Submodule.mem_pi.2 fun t _ => ?_

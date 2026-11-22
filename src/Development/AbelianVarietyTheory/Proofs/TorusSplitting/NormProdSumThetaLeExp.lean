@@ -9,21 +9,26 @@ open NumberField ReciprocityTheory.ChartRestriction.G.I2
 
 namespace GlobalTheory
 
-theorem norm_prod_sum_mul_le_pow {N M : ℕ} (c z : Fin N → Fin M → ℂ) {C B : ℝ}
-    (hC : 0 ≤ C) (hc : ∀ k t, ‖c k t‖ ≤ C) (hz : ∀ k t, ‖z k t‖ ≤ B) :
-    ‖∏ k, ∑ t, c k t * z k t‖ ≤ (M * (C * B)) ^ N := by
+theorem norm_prod_sum_mul_le_pow
+    {N M : ℕ} (c z : Fin N → Fin M → ℂ)
+    {C B : ℝ} (hC : 0 ≤ C) (hc : ∀ k t, ‖c k t‖ ≤ C) (hz : ∀ k t, ‖z k t‖ ≤ B)
+    : ‖∏ k, ∑ t, c k t * z k t‖ ≤ (M * (C * B)) ^ N := by
   rw [norm_prod]
-  calc ∏ k, ‖∑ t, c k t * z k t‖ ≤ ∏ _k : Fin N, (M * (C * B) : ℝ) := by
-        refine Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun k _ => ?_
-        calc ‖∑ t, c k t * z k t‖ ≤ ∑ t, ‖c k t * z k t‖ := norm_sum_le _ _
-          _ ≤ ∑ _t : Fin M, C * B := Finset.sum_le_sum fun t _ => by
-              rw [norm_mul]
-              exact mul_le_mul (hc k t) (hz k t) (norm_nonneg _) hC
-          _ = M * (C * B) := by simp
+  calc
+    ∏ k, ‖∑ t, c k t * z k t‖ ≤ ∏ _k : Fin N, (M * (C * B) : ℝ) := by
+      refine Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun k _ => ?_
+      calc
+        ‖∑ t, c k t * z k t‖
+          ≤ ∑ t, ‖c k t * z k t‖ := norm_sum_le _ _
+        _ ≤ ∑ _t : Fin M, C * B :=
+          Finset.sum_le_sum fun t _ => by
+            rw [norm_mul]
+            exact mul_le_mul (hc k t) (hz k t) (norm_nonneg _) hC
+        _ = M * (C * B) := by simp
     _ = _ := by simp
 
-theorem mul_log_mul_le_add_mul_log {A κ φ : ℝ} (hA : 0 < A) (hκ : 0 < κ) (hφ : 0 < φ) :
-    A * Real.log (κ * φ) ≤ φ + A * Real.log (A * κ) := by
+theorem mul_log_mul_le_add_mul_log {A κ φ : ℝ} (hA : 0 < A) (hκ : 0 < κ) (hφ : 0 < φ)
+    : A * Real.log (κ * φ) ≤ φ + A * Real.log (A * κ) := by
   have h1 : κ * φ = (A * κ) * (φ / A) := by field_simp
   have h2 : Real.log (φ / A) ≤ φ / A - 1 := Real.log_le_sub_one_of_pos (by positivity)
   rw [h1, Real.log_mul (by positivity) (by positivity)]
@@ -31,8 +36,32 @@ theorem mul_log_mul_le_add_mul_log {A κ φ : ℝ} (hA : 0 < A) (hκ : 0 < κ) (
   have h4 : A * (φ / A - 1) = φ - A := by field_simp
   nlinarith
 
-theorem norm_prod_sum_theta_le_exp :
-    TStatement → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (X : PT E) (DF : ℕ) (P : Par X DF) (r1 : ℕ), 2 ≤ r1 → ∀ s ∈ X.Sec 1 1, s ≠ 0 → ∀ (i Nc M : ℕ), 1 ≤ Nc → M ≤ r1 ^ (2 * PT.f E * X.r ^ 2) → ∀ (c z : Fin (2 * r1 ^ 4 * i) → Fin M → ℂ) (a : Fin (2 * r1 ^ 4 * i) → Fin M → Fin X.r → Vsp X.dim), (∀ k t, ‖c k t‖ ≤ Nc) → (∀ k t, (∀ j, ((r1 : ℂ) ^ 2) • a k t j ∈ X.L) ∧ ∀ x ∈ X.L, ∃ c : Fin X.r → 𝓞 E, ∃ y ∈ X.L, x = ∑ j, act (c j) (((r1 : ℂ) ^ 2) • a k t j) + (r1 : ℂ) • y) → (∀ k t, ‖z k t‖ ≤ ∏ j, Real.sqrt (X.ptN2 1 s fun _ => a k t j) / Real.sqrt (X.l2 1 s)) → ‖∏ k, ∑ t, c k t * z k t‖ ≤ Real.exp (-(i * (P.ph - (2 * (r1 : ℝ) ^ 4 * (P.p3 + (Real.log Nc + 2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1)) + ((r1 : ℝ) ^ 4 * X.r * dstar (E := E) P.m / 2) * Real.log (((r1 : ℝ) ^ 4 * X.r * dstar (E := E) P.m / 2) * P.ka0))))) := by
+theorem norm_prod_sum_theta_le_exp
+    : TStatement
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (X : PT E) (DF : ℕ) (P : Par X DF)
+          (r1 : ℕ),
+        2 ≤ r1
+          → ∀ s ∈ X.Sec 1 1,
+            s ≠ 0
+              → ∀ (i Nc M : ℕ),
+                1 ≤ Nc → M ≤ r1 ^ (2 * PT.f E * X.r ^ 2)
+                  → ∀ (c z : Fin (2 * r1 ^ 4 * i) → Fin M → ℂ)
+                      (a : Fin (2 * r1 ^ 4 * i) → Fin M → Fin X.r → Vsp X.dim),
+                    (∀ k t, ‖c k t‖ ≤ Nc)
+                      → (∀ k t,
+                        (∀ j, ((r1 : ℂ) ^ 2) • a k t j ∈ X.L)
+                          ∧ ∀ x ∈ X.L, ∃ c : Fin X.r → 𝓞 E, ∃ y ∈ X.L,
+                            x = ∑ j, act (c j) (((r1 : ℂ) ^ 2) • a k t j) + (r1 : ℂ) • y)
+                      → (∀ k t,
+                        ‖z k t‖
+                          ≤ ∏ j, Real.sqrt (X.ptN2 1 s fun _ => a k t j) / Real.sqrt (X.l2 1 s))
+                      → ‖∏ k, ∑ t, c k t * z k t‖
+                        ≤ Real.exp (-(i
+                          * (P.ph
+                            - (2 * (r1 : ℝ) ^ 4
+                                * (P.p3 + (Real.log Nc + 2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1))
+                              + ((r1 : ℝ) ^ 4 * X.r * dstar (E := E) P.m / 2) * Real.log
+                                (((r1 : ℝ) ^ 4 * X.r * dstar (E := E) P.m / 2) * P.ka0))))) := by
   intro hT E _ _ _ X DF P r1 hr1 s hs hs0 i Nc M hNc hM c z a hc ha hz
   have hf : 1 ≤ PT.f E := by
     rcases Nat.eq_zero_or_pos (PT.f E) with h | h
@@ -75,7 +104,8 @@ theorem norm_prod_sum_theta_le_exp :
   set A : ℝ := R * X.r * d / 2 with hAd
   have hA : 1 ≤ A := by
     have : 1 ≤ R * X.r := one_le_mul_of_one_le_of_one_le hR hrR
-    rw [hAd]; nlinarith
+    rw [hAd]
+    nlinarith
   set e : ℝ := P.p3 + (A * Real.log (A * P.ka0) - P.ph) / (2 * R) with he
   have hzB : ∀ k t, ‖z k t‖ ≤ Real.exp e := by
     intro k t
@@ -83,21 +113,21 @@ theorem norm_prod_sum_theta_le_exp :
     obtain ⟨h1, h2⟩ := hT E X DF P r1 hr1 (a k t) (ha k t).1 (ha k t).2 s hs hs0
     rcases hph.eq_or_lt with h | h
     · refine (h2 h.symm).trans (Real.exp_le_exp.2 ?_)
-      have h3 : 0 ≤ Real.log (A * P.ka0) :=
-        Real.log_nonneg (one_le_mul_of_one_le_of_one_le hA hka)
-      have h4 : 0 ≤ (A * Real.log (A * P.ka0) - P.ph) / (2 * R) := by
-        rw [← h, sub_zero]; positivity
+      have h3 : 0 ≤ Real.log (A * P.ka0) := Real.log_nonneg (one_le_mul_of_one_le_of_one_le hA hka)
+      have h4 : 0 ≤ (A * Real.log (A * P.ka0) - P.ph) / (2 * R) := by rw [← h, sub_zero]; positivity
       linarith
     · refine (h1 h).trans ?_
       rw [Real.rpow_def_of_pos (by positivity), ← Real.exp_add, ← Real.exp_add]
       refine Real.exp_le_exp.2 ?_
-      have h3 := mul_log_mul_le_add_mul_log (A := A) (κ := P.ka0) (φ := P.ph)
-        (by linarith) (by linarith) h
-      have h4 : Real.log (P.ka0 * P.ph) * (X.r * d / 4) + -(Real.pi * P.ph / R) =
-          (A * Real.log (P.ka0 * P.ph) - 2 * Real.pi * P.ph) / (2 * R) := by
+      have h3 :=
+        mul_log_mul_le_add_mul_log (A := A) (κ := P.ka0) (φ := P.ph) (by linarith) (by linarith) h
+      have h4
+          : Real.log (P.ka0 * P.ph) * (X.r * d / 4) + -(Real.pi * P.ph / R)
+            = (A * Real.log (P.ka0 * P.ph) - 2 * Real.pi * P.ph) / (2 * R) := by
         rw [hAd]; field_simp; ring
-      have h5 : (A * Real.log (P.ka0 * P.ph) - 2 * Real.pi * P.ph) / (2 * R) ≤
-          (A * Real.log (A * P.ka0) - P.ph) / (2 * R) := by
+      have h5
+          : (A * Real.log (P.ka0 * P.ph) - 2 * Real.pi * P.ph) / (2 * R)
+            ≤ (A * Real.log (A * P.ka0) - P.ph) / (2 * R) := by
         refine div_le_div_of_nonneg_right ?_ (by linarith)
         nlinarith [Real.pi_gt_three]
       rw [he, add_assoc, h4]
@@ -109,12 +139,14 @@ theorem norm_prod_sum_theta_le_exp :
     have h2 : 2 * (PT.f E : ℝ) * (X.r : ℝ) ^ 2 = ((2 * PT.f E * X.r ^ 2 : ℕ) : ℝ) := by
       push_cast; ring
     rw [h2, Real.exp_nat_mul, Real.exp_log (by linarith)]
-  have hF : (M : ℝ) * (Nc * Real.exp e) ≤
-      Real.exp ((Real.log Nc + 2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1) + e) := by
+  have hF
+      : (M : ℝ) * (Nc * Real.exp e)
+        ≤ Real.exp ((Real.log Nc + 2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1) + e) := by
     rw [Real.exp_add _ e, Real.exp_add (Real.log Nc), Real.exp_log (by linarith)]
-    calc (M : ℝ) * (Nc * Real.exp e)
-        ≤ Real.exp (2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1) * (Nc * Real.exp e) :=
-          mul_le_mul_of_nonneg_right hMR (by positivity)
+    calc
+      (M : ℝ) * (Nc * Real.exp e)
+          ≤ Real.exp (2 * PT.f E * (X.r : ℝ) ^ 2 * Real.log r1) * (Nc * Real.exp e) :=
+        mul_le_mul_of_nonneg_right hMR (by positivity)
       _ = _ := by ring
   refine (pow_le_pow_left₀ (by positivity) hF _).trans (le_of_eq ?_)
   rw [← Real.exp_nat_mul]

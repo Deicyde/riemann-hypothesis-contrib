@@ -165,15 +165,17 @@ private lemma conjTranspose_unitary_conj_real_diagonal (U : Matrix ι ι ℂ) (a
   simp [conjTranspose_mul, Matrix.mul_assoc, diagonal_conjTranspose, h]
 
 open Matrix in
-theorem _root_.GlobalTheory.ClassFin.LogSqVar.first_variation (ι : Type) [Fintype ι] [DecidableEq ι]
-    (H A : Matrix ι ι ℂ) :
-    _root_.GlobalTheory.ClassFin.IsLog H A →
-      ∃ (C : ℝ) (δ : ℝ), (0 : ℝ) < δ ∧
-        ∀ (Y H' : Matrix ι ι ℂ), (∀ (i j : ι), ‖Y i j‖ ≤ δ) →
-          _root_.GlobalTheory.ClassFin.IsLog H' (A + Y) →
-            Complex.re (Matrix.trace (H' * H')) ≤
-              Complex.re (Matrix.trace (H * H)) + (2 : ℝ) * Complex.re (Matrix.trace (H * A⁻¹ * Y)) +
-                C * ∑ i : ι, ∑ j : ι, ‖Y i j‖ ^ (2 : ℕ) := by
+theorem _root_.GlobalTheory.ClassFin.LogSqVar.first_variation
+    (ι : Type) [Fintype ι] [DecidableEq ι] (H A : Matrix ι ι ℂ)
+    : _root_.GlobalTheory.ClassFin.IsLog H A
+      → ∃ (C : ℝ) (δ : ℝ),
+        (0 : ℝ) < δ
+          ∧ ∀ (Y H' : Matrix ι ι ℂ),
+            (∀ (i j : ι), ‖Y i j‖ ≤ δ) → _root_.GlobalTheory.ClassFin.IsLog H' (A + Y)
+              → Complex.re (Matrix.trace (H' * H'))
+                ≤ Complex.re (Matrix.trace (H * H))
+                  + (2 : ℝ) * Complex.re (Matrix.trace (H * A⁻¹ * Y))
+                  + C * ∑ i : ι, ∑ j : ι, ‖Y i j‖ ^ (2 : ℕ) := by
   rintro ⟨U, d, hU, hH, hA⟩
   obtain ⟨x, hx⟩ : ∃ x : ι → ℝ, x = fun i => Real.exp (d i) := ⟨_, rfl⟩
   have hA' : A = U * diagonal (fun i => (x i : ℂ)) * Uᴴ := by subst hx; exact hA
@@ -184,11 +186,12 @@ theorem _root_.GlobalTheory.ClassFin.LogSqVar.first_variation (ι : Type) [Finty
   have hmx : ∀ i, m ≤ x i := fun i => by
     rw [hx]
     refine Real.exp_le_exp.mpr ?_
-    have h1 := Finset.single_le_sum (f := fun i => |d i|) (fun i _ => abs_nonneg _)
-      (Finset.mem_univ i)
+    have h1 :=
+      Finset.single_le_sum (f := fun i => |d i|) (fun i _ => abs_nonneg _) (Finset.mem_univ i)
     have h2 := neg_abs_le (d i)
     linarith
-  obtain ⟨C, hC0, hg⟩ := _root_.GlobalTheory.ClassFin.log_sq_le_tangent_add_sq (m / 2) (by positivity)
+  obtain ⟨C, hC0, hg⟩ :=
+    _root_.GlobalTheory.ClassFin.log_sq_le_tangent_add_sq (m / 2) (by positivity)
   set n : ℝ := (Fintype.card ι : ℝ) with hndef
   have hn : 0 ≤ n * n := mul_self_nonneg n
   refine ⟨C, (m / 2) / (n * n + 1), by positivity, ?_⟩
@@ -206,91 +209,110 @@ theorem _root_.GlobalTheory.ClassFin.LogSqVar.first_variation (ι : Type) [Finty
       nlinarith
     rw [← hndef] at h1
     linarith
-  have honeU : U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ = 1 := by
-    simp [hU]
-  have honeV : V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ = 1 := by
-    simp [hV]
+  have honeU : U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ = 1 := by simp [hU]
+  have honeV : V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ = 1 := by simp [hV]
 
-  have T1 : Complex.re (Matrix.trace (H' * H'))
-      = ∑ i, ∑ j, 1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j) := by
+  have T1
+      : Complex.re (Matrix.trace (H' * H'))
+        = ∑ i, ∑ j, 1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j) := by
     rw [hH', conj_real_diagonal_mul_conj_real_diagonal V hV' e e,
       show V * diagonal (fun i => ((e i * e i : ℝ) : ℂ)) * Vᴴ
-        = U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ
-          * (V * diagonal (fun i => ((e i * e i : ℝ) : ℂ)) * Vᴴ) by rw [honeU, Matrix.one_mul],
+          = U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ
+            * (V * diagonal (fun i => ((e i * e i : ℝ) : ℂ)) * Vᴴ) by
+        rw [honeU, Matrix.one_mul],
       re_trace_conj_diagonal_mul]
-  have T2 : Complex.re (Matrix.trace (H * H))
-      = ∑ i, ∑ j, (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j) := by
+  have T2
+      : Complex.re (Matrix.trace (H * H))
+        = ∑ i, ∑ j, (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j) := by
     rw [hH, conj_real_diagonal_mul_conj_real_diagonal U hU' d d,
       show U * diagonal (fun i => ((d i * d i : ℝ) : ℂ)) * Uᴴ
-        = U * diagonal (fun i => ((d i * d i : ℝ) : ℂ)) * Uᴴ
-          * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by rw [honeV, Matrix.mul_one],
+          = U * diagonal (fun i => ((d i * d i : ℝ) : ℂ)) * Uᴴ
+            * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by
+        rw [honeV, Matrix.mul_one],
       re_trace_conj_diagonal_mul]
   have hAinv : A⁻¹ = U * diagonal (fun i => ((x i)⁻¹ : ℂ)) * Uᴴ := by
-    have h : U * diagonal (fun i => ((x i)⁻¹ : ℂ)) * Uᴴ
-        = U * diagonal (fun i => (((x i)⁻¹ : ℝ) : ℂ)) * Uᴴ := by simp
+    have h
+        : U * diagonal (fun i => ((x i)⁻¹ : ℂ)) * Uᴴ
+          = U * diagonal (fun i => (((x i)⁻¹ : ℝ) : ℂ)) * Uᴴ := by
+      simp
     rw [h]
     refine Matrix.inv_eq_right_inv ?_
     rw [hA', conj_real_diagonal_mul_conj_real_diagonal U hU',
       show (fun i => ((x i * (x i)⁻¹ : ℝ) : ℂ)) = fun _ => ((1 : ℝ) : ℂ) from
-        funext fun i => by rw [mul_inv_cancel₀ (hxpos i).ne'], honeU]
-  have hYeq : Y = V * diagonal (fun j => (y j : ℂ)) * Vᴴ - U * diagonal (fun i => (x i : ℂ)) * Uᴴ := by
+        funext fun i => by rw [mul_inv_cancel₀ (hxpos i).ne'],
+      honeU]
+  have hYeq
+      : Y = V * diagonal (fun j => (y j : ℂ)) * Vᴴ - U * diagonal (fun i => (x i : ℂ)) * Uᴴ := by
     rw [← hB', hA', add_sub_cancel_left]
   have hHA : H * A⁻¹ = U * diagonal (fun i => ((d i * (x i)⁻¹ : ℝ) : ℂ)) * Uᴴ := by
     rw [hAinv, hH, ← conj_real_diagonal_mul_conj_real_diagonal U hU']
     simp
-  have T3 : Complex.re (Matrix.trace (H * A⁻¹ * Y))
-      = ∑ i, ∑ j, (d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
-        - ∑ i, ∑ j, d i * 1 * Complex.normSq ((Uᴴ * V) i j) := by
+  have T3
+      : Complex.re (Matrix.trace (H * A⁻¹ * Y))
+        = ∑ i, ∑ j, (d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
+          - ∑ i, ∑ j, d i * 1 * Complex.normSq ((Uᴴ * V) i j) := by
     rw [hHA, hYeq, Matrix.mul_sub, Matrix.trace_sub, Complex.sub_re, re_trace_conj_diagonal_mul,
       conj_real_diagonal_mul_conj_real_diagonal U hU',
       show (fun i => ((d i * (x i)⁻¹ * x i : ℝ) : ℂ)) = fun i => (d i : ℂ) from
         funext fun i => by rw [inv_mul_cancel_right₀ (hxpos i).ne'],
       show U * diagonal (fun i => (d i : ℂ)) * Uᴴ
-        = U * diagonal (fun i => (d i : ℂ)) * Uᴴ
-          * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by rw [honeV, Matrix.mul_one],
+          = U * diagonal (fun i => (d i : ℂ)) * Uᴴ * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by
+        rw [honeV, Matrix.mul_one],
       re_trace_conj_diagonal_mul]
-  have T4 : ∑ i : ι, ∑ j : ι, ‖Y i j‖ ^ (2 : ℕ)
-      = ∑ i, ∑ j, 1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
-        - ∑ i, ∑ j, x i * y j * Complex.normSq ((Uᴴ * V) i j)
-        - ∑ i, ∑ j, x i * y j * Complex.normSq ((Uᴴ * V) i j)
-        + ∑ i, ∑ j, (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j) := by
-    rw [sum_norm_sq_eq_re_trace_mul_conjTranspose, hYeq, conjTranspose_sub, conjTranspose_unitary_conj_real_diagonal,
-      conjTranspose_unitary_conj_real_diagonal, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub,
-      Matrix.trace_sub, Matrix.trace_sub, Matrix.trace_sub, Complex.sub_re, Complex.sub_re,
-      Complex.sub_re, Matrix.trace_mul_comm (V * _ * Vᴴ) (U * _ * Uᴴ),
-      conj_real_diagonal_mul_conj_real_diagonal V hV' y y, conj_real_diagonal_mul_conj_real_diagonal U hU' x x,
+  have T4
+      : ∑ i : ι, ∑ j : ι, ‖Y i j‖ ^ (2 : ℕ)
+        = ∑ i, ∑ j, 1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
+          - ∑ i, ∑ j, x i * y j * Complex.normSq ((Uᴴ * V) i j)
+          - ∑ i, ∑ j, x i * y j * Complex.normSq ((Uᴴ * V) i j)
+          + ∑ i, ∑ j, (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j) := by
+    rw [sum_norm_sq_eq_re_trace_mul_conjTranspose, hYeq, conjTranspose_sub,
+      conjTranspose_unitary_conj_real_diagonal, conjTranspose_unitary_conj_real_diagonal,
+      Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, Matrix.trace_sub, Matrix.trace_sub,
+      Matrix.trace_sub, Complex.sub_re, Complex.sub_re, Complex.sub_re,
+      Matrix.trace_mul_comm (V * _ * Vᴴ) (U * _ * Uᴴ),
+      conj_real_diagonal_mul_conj_real_diagonal V hV' y y,
+      conj_real_diagonal_mul_conj_real_diagonal U hU' x x,
       show V * diagonal (fun i => ((y i * y i : ℝ) : ℂ)) * Vᴴ
-        = U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ
-          * (V * diagonal (fun i => ((y i * y i : ℝ) : ℂ)) * Vᴴ) by rw [honeU, Matrix.one_mul],
+          = U * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Uᴴ
+            * (V * diagonal (fun i => ((y i * y i : ℝ) : ℂ)) * Vᴴ) by
+        rw [honeU, Matrix.one_mul],
       show U * diagonal (fun i => ((x i * x i : ℝ) : ℂ)) * Uᴴ
-        = U * diagonal (fun i => ((x i * x i : ℝ) : ℂ)) * Uᴴ
-          * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by rw [honeV, Matrix.mul_one],
+          = U * diagonal (fun i => ((x i * x i : ℝ) : ℂ)) * Uᴴ
+            * (V * diagonal (fun _ => ((1 : ℝ) : ℂ)) * Vᴴ) by
+        rw [honeV, Matrix.mul_one],
       re_trace_conj_diagonal_mul, re_trace_conj_diagonal_mul, re_trace_conj_diagonal_mul]
     ring
   rw [T1, T2, T3, T4]
-  have hpt : ∀ i j, 1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j)
-      ≤ (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j)
-        + 2 * ((d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
-          - d i * 1 * Complex.normSq ((Uᴴ * V) i j))
-        + C * (1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
-          - x i * y j * Complex.normSq ((Uᴴ * V) i j)
-          - x i * y j * Complex.normSq ((Uᴴ * V) i j)
-          + (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j)) := by
+  have hpt
+      : ∀ i j,
+        1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j)
+          ≤ (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j)
+            + 2
+              * ((d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
+                - d i * 1 * Complex.normSq ((Uᴴ * V) i j))
+            + C
+              * (1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
+                - x i * y j * Complex.normSq ((Uᴴ * V) i j)
+                - x i * y j * Complex.normSq ((Uᴴ * V) i j)
+                + (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j)) := by
     intro i j
     have hb := hg (x i) (y j) ((div_le_self hm.le one_le_two).trans (hmx i)) (hylow j)
     rw [hlogx, hlogy] at hb
     have hw := Complex.normSq_nonneg ((Uᴴ * V) i j)
     have hxne := (hxpos i).ne'
-    have key : (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j)
-        + 2 * ((d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
-          - d i * 1 * Complex.normSq ((Uᴴ * V) i j))
-        + C * (1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
-          - x i * y j * Complex.normSq ((Uᴴ * V) i j)
-          - x i * y j * Complex.normSq ((Uᴴ * V) i j)
-          + (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j))
-        - 1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j)
-        = Complex.normSq ((Uᴴ * V) i j)
-          * (d i ^ 2 + 2 * d i / x i * (y j - x i) + C * (y j - x i) ^ 2 - e j ^ 2) := by
+    have key
+        : (d i * d i) * 1 * Complex.normSq ((Uᴴ * V) i j)
+            + 2
+              * ((d i * (x i)⁻¹) * y j * Complex.normSq ((Uᴴ * V) i j)
+                - d i * 1 * Complex.normSq ((Uᴴ * V) i j))
+            + C
+              * (1 * (y j * y j) * Complex.normSq ((Uᴴ * V) i j)
+                - x i * y j * Complex.normSq ((Uᴴ * V) i j)
+                - x i * y j * Complex.normSq ((Uᴴ * V) i j)
+                + (x i * x i) * 1 * Complex.normSq ((Uᴴ * V) i j))
+            - 1 * (e j * e j) * Complex.normSq ((Uᴴ * V) i j)
+          = Complex.normSq ((Uᴴ * V) i j)
+            * (d i ^ 2 + 2 * d i / x i * (y j - x i) + C * (y j - x i) ^ 2 - e j ^ 2) := by
       field_simp
       ring
     nlinarith [mul_nonneg hw (sub_nonneg.mpr hb)]

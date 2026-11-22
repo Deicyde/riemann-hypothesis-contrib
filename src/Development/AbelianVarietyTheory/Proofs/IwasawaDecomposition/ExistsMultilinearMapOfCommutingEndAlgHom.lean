@@ -5,20 +5,21 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC Formalism.UG Formalism.BasicNotions GlobalTheory.DefU
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC Formalism.UG Formalism.BasicNotions GlobalTheory.DefU
 
 namespace GlobalTheory
 
-theorem exists_multilinear_of_commuting_endAlgHom :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Wv : ι → Type) [∀ v, AddCommGroup (Wv v)]
-      [∀ v, Module ℂ (Wv v)] (V : Type) [AddCommGroup V] [Module ℂ V]
-      (Φ : ∀ v, Module.End ℂ (Wv v) →ₐ[ℂ] Module.End ℂ V) (w : ∀ v, Wv v)
-      (ℓ : ∀ v, Module.Dual ℂ (Wv v)) (y : V),
-      (∀ u v, u ≠ v → ∀ A B, Commute (Φ u A) (Φ v B)) →
-      (∀ v, Φ v ((ℓ v).smulRight (w v)) y = y) →
-      ∃ F : (∀ v, Wv v) →ₘₗ[ℂ] V, F w = y ∧
-        ∀ v (A : Module.End ℂ (Wv v)) (x : ∀ u, Wv u),
-          Φ v A (F x) = F (Function.update x v (A (x v))) := by
+theorem exists_multilinear_of_commuting_endAlgHom
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Wv : ι → Type) [∀ v, AddCommGroup (Wv v)]
+        [∀ v, Module ℂ (Wv v)] (V : Type) [AddCommGroup V] [Module ℂ V]
+        (Φ : ∀ v, Module.End ℂ (Wv v) →ₐ[ℂ] Module.End ℂ V) (w : ∀ v, Wv v)
+        (ℓ : ∀ v, Module.Dual ℂ (Wv v)) (y : V),
+      (∀ u v, u ≠ v → ∀ A B, Commute (Φ u A) (Φ v B)) → (∀ v, Φ v ((ℓ v).smulRight (w v)) y = y)
+        → ∃ F : (∀ v, Wv v) →ₘₗ[ℂ] V,
+          F w = y
+            ∧ ∀ v (A : Module.End ℂ (Wv v)) (x : ∀ u, Wv u),
+              Φ v A (F x) = F (Function.update x v (A (x v))) := by
   intro ι _ hd Wv _ _ V _ _ Φ w ℓ y hc hfix
   let f : (∀ v, Wv v) → ι → Module.End ℂ V := fun x v => Φ v ((ℓ v).smulRight (x v))
   have comm : ∀ x, ((Finset.univ : Finset ι) : Set ι).Pairwise (Function.onFun Commute (f x)) :=
@@ -52,18 +53,18 @@ theorem exists_multilinear_of_commuting_endAlgHom :
   · intro dec x v c a
     obtain rfl : dec = hd := Subsingleton.elim _ _
     simp only [RingHom.id_apply]
-    have e : (ℓ v).smulRight (c • a) = c • (ℓ v).smulRight a := by
-      ext z; simp [smul_comm c]
+    have e : (ℓ v).smulRight (c • a) = c • (ℓ v).smulRight a := by ext z; simp [smul_comm c]
     rw [hsplit _ v, hsplit _ v, hR, hR, hfu, hfu, e, map_smul, LinearMap.smul_apply]
   · show (Finset.univ.noncommProd (f w) (comm w)) y = y
-    exact Finset.noncommProd_induction _ _ _ (fun T : Module.End ℂ V => T y = y)
-      (fun S T hS hT => by rw [mul_apply_eq_comp, hT, hS]) rfl
+    exact Finset.noncommProd_induction _ _ _
+      (fun T : Module.End ℂ V => T y = y)
+      (fun S T hS hT => by rw [mul_apply_eq_comp, hT, hS])
+      rfl
       (fun v _ => hfix v)
   · intro v A x
     show Φ v A (G x) = G (Function.update x v (A (x v)))
     rw [hsplit x v, hsplit _ v, hR, hfu]
-    have : (ℓ v).smulRight (A (x v)) = A * (ℓ v).smulRight (x v) := by
-      ext z; simp
+    have : (ℓ v).smulRight (A (x v)) = A * (ℓ v).smulRight (x v) := by ext z; simp
     rw [this, map_mul, mul_apply_eq_comp]
 
 end GlobalTheory

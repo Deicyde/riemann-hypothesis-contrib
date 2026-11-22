@@ -26,8 +26,8 @@ private lemma fiber_eq {E : Type} [Field E] (w : InfinitePlace E) [DecidableEq (
     · right
       rw [h, ComplexEmbedding.involutive_conjugate E]
 
-theorem goal1 (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (x : E) :
-    ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ w : InfinitePlace E, 2 * (w.embedding x).re := by
+theorem goal1 (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (x : E)
+    : ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ w : InfinitePlace E, 2 * (w.embedding x).re := by
   classical
   have h1 : ((Algebra.trace ℚ E x : ℚ) : ℂ) = ∑ φ : E →+* ℂ, φ x := by
     have h := trace_eq_sum_embeddings (K := ℚ) (L := E) (E := ℂ) (x := x)

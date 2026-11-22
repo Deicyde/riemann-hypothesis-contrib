@@ -12,28 +12,33 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
 open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-variable {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {X : Over (Sp R)} {X' : Over (Sp R')}
-  {q : X'.left ⟶ X.left}
+variable
+  {R R' : Type} [CommRing R] [CommRing R']
+  {σ : R →+* R'} {X : Over (Sp R)} {X' : Over (Sp R')} {q : X'.left ⟶ X.left}
 
-theorem ptVia_spOver (w : q ≫ X.hom = X'.hom ≫ spMap σ) {E E' : Type} [CommRing E] [Algebra R' E]
-    [CommRing E'] [Algebra R' E'] (φ : E →ₐ[R'] E') (y : Pt X' E) :
-    ptVia w (spOver φ ≫ y) =
-      @spOver R _ E E' _ (algVia σ E) _ (algVia σ E') (homVia σ φ) ≫ ptVia w y := by
+theorem ptVia_spOver
+    (w : q ≫ X.hom = X'.hom ≫ spMap σ)
+    {E E' : Type} [CommRing E] [Algebra R' E] [CommRing E'] [Algebra R' E']
+    (φ : E →ₐ[R'] E') (y : Pt X' E)
+    : ptVia w (spOver φ ≫ y)
+      = @spOver R _ E E' _ (algVia σ E) _ (algVia σ E') (homVia σ φ) ≫ ptVia w y := by
   apply Over.OverMorphism.ext
   change (spMap (φ : E →+* E') ≫ y.left) ≫ q = spMap (φ : E →+* E') ≫ (y.left ≫ q)
   exact Category.assoc _ _ _
 
-theorem bcPull_coc_cob (w : q ≫ X.hom = X'.hom ≫ spMap σ) (u : Fn1 X) :
-    (IsCoc (whole X) u → IsCoc (whole X') (bcPull w u)) ∧
-      ((∃ k, IsCob (whole X) u k) → ∃ k, IsCob (whole X') (bcPull w u) k) := by
+theorem bcPull_coc_cob (w : q ≫ X.hom = X'.hom ≫ spMap σ) (u : Fn1 X)
+    : (IsCoc (whole X) u → IsCoc (whole X') (bcPull w u))
+      ∧ ((∃ k, IsCob (whole X) u k) → ∃ k, IsCob (whole X') (bcPull w u) k) := by
   constructor
   · intro h
     unfold IsCoc at h ⊢
@@ -53,7 +58,11 @@ theorem bcPull_coc_cob (w : q ≫ X.hom = X'.hom ≫ spMap σ) (u : Fn1 X) :
     simp only [bcPull, ptVia_spOver]
     exact hk E E' (homVia σ φ) (ptVia w y) (sm_whole _)
 
-theorem bcPull_keeps : ∀ (R R' : Type) [CommRing R] [CommRing R'] (σ : R →+* R') (X : Over (Sp R)) (X' : Over (Sp R')) (q : X'.left ⟶ X.left) (w : q ≫ X.hom = X'.hom ≫ spMap σ) (u : Fn1 X), (IsCoc (whole X) u → IsCoc (whole X') (bcPull w u)) ∧ ((∃ k, IsCob (whole X) u k) → ∃ k, IsCob (whole X') (bcPull w u) k) :=
+theorem bcPull_keeps
+    : ∀ (R R' : Type) [CommRing R] [CommRing R'] (σ : R →+* R') (X : Over (Sp R))
+        (X' : Over (Sp R')) (q : X'.left ⟶ X.left) (w : q ≫ X.hom = X'.hom ≫ spMap σ) (u : Fn1 X),
+      (IsCoc (whole X) u → IsCoc (whole X') (bcPull w u))
+        ∧ ((∃ k, IsCob (whole X) u k) → ∃ k, IsCob (whole X') (bcPull w u) k) :=
   fun _ _ _ _ _ _ _ _ w u ↦ bcPull_coc_cob w u
 
 end GlobalTheory.PtExt

@@ -25,7 +25,8 @@ namespace Formalism.MainNotions.GapDS
 open Formalism.MainNotions.PlaceDegreeData
 
 def thrE {n : ℕ} (ε : Fin n → Bool) : ℝ :=
-  max (thrDS ε) (16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℕ) + 8 * Real.sqrt (2 * ((min (pOf ε) (qOf ε) : ℕ) : ℝ)))
+  max (thrDS ε)
+    (16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℕ) + 8 * Real.sqrt (2 * ((min (pOf ε) (qOf ε) : ℕ) : ℝ)))
 
 theorem thrE_le {n : ℕ} (ε : Fin n → Bool) (hn : (5 : ℝ) ≤ n) : thrE ε ≤ 4 * (n : ℝ) ^ 3 := by
   have hpn : pOf ε ≤ n := (Finset.card_filter_le _ _).trans (by simp)
@@ -52,10 +53,14 @@ open Formalism.MainNotions.S Formalism.REAL
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 def HCMultDSG : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), Formalism.QuantumDeterminants.IsHCParam lam → IsDS ε lam σ → ∀ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h →
-    Formalism.MainNotions.GapDS.thrDS ε < h → ∀ S : Submodule ℂ H, FiniteDimensional ℂ S → IsKStableOn ε σ S →
-      FiniteDimensional ℂ (eqImg (fun k : KG ε => σ (toMK k)) S)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    Formalism.QuantumDeterminants.IsHCParam lam → IsDS ε lam σ
+      → ∀ h : ℝ,
+        Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrDS ε < h
+          → ∀ S : Submodule ℂ H,
+            FiniteDimensional ℂ S → IsKStableOn ε σ S
+              → FiniteDimensional ℂ (eqImg (fun k : KG ε => σ (toMK k)) S)
 
 section Final
 
@@ -72,27 +77,41 @@ namespace Formalism.MainNotions.DiscreteSeriesWeylDimension
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
 
 def DiscreteSeriesExistsG : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ), Formalism.QuantumDeterminants.IsHCParam lam → ∀ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrE ε < h →
-    ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-      (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ),
+    Formalism.QuantumDeterminants.IsHCParam lam
+      → ∀ h : ℝ,
+        Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrE ε < h
+          → ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
+              (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+            IsDS ε lam σ
 
 def LowKMultOneG : Prop :=
-  ∀ (N : ℕ) (ε : Fin N → Bool) (lam : Fin N → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Matrix (Fin N) (Fin N) ℂ → (H →L[ℂ] H)), Formalism.QuantumDeterminants.IsHCParam lam → IsDS ε lam σ → ∀ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrDS ε < h →
-    ∀ S S' : Submodule ℂ H, IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S → IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S' → S = S'
+  ∀ (N : ℕ) (ε : Fin N → Bool) (lam : Fin N → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] (σ : Matrix (Fin N) (Fin N) ℂ → (H →L[ℂ] H)),
+    Formalism.QuantumDeterminants.IsHCParam lam → IsDS ε lam σ
+      → ∀ h : ℝ,
+        Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrDS ε < h
+          → ∀ S S' : Submodule ℂ H,
+            IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S
+              → IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S'
+              → S = S'
 
 end Formalism.MainNotions.DiscreteSeriesWeylDimension
 
 namespace Formalism.MainNotions.BridgeLemma₂
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions Formalism.MainNotions.S
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions
+  Formalism.MainNotions.S
 
 def deg_DSUniqG : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H H' : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')),
-    IsHCParam lam → IsDS ε lam σ → IsDS ε lam σ' → ∀ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrDS ε < h →
-      ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x, U (σ g x) = σ' g (U x)
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H H' : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H] [CompleteSpace H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+      [CompleteSpace H'] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+      (σ' : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')),
+    IsHCParam lam → IsDS ε lam σ → IsDS ε lam σ'
+      → ∀ h : ℝ,
+        Formalism.QuantumDeterminants.GapAtLeast ε lam h → Formalism.MainNotions.GapDS.thrDS ε < h
+          → ∃ U : H ≃ₗᵢ[ℂ] H', ∀ g ∈ UJset ε, ∀ x, U (σ g x) = σ' g (U x)
 
 end Formalism.MainNotions.BridgeLemma₂
 
@@ -116,7 +135,9 @@ end Formalism.MainNotions.LowestKTypeMultiplicity
 
 namespace Formalism.MainNotions.DiscreteSeriesInnerProducts
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates Formalism.MainNotions.TheoremBConstants
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates
+  Formalism.MainNotions.TheoremBConstants
 open Formalism.QuantumDeterminants.WeylGroupFacts
 
 end Formalism.MainNotions.DiscreteSeriesInnerProducts
@@ -138,7 +159,8 @@ theorem thrX_le {n : ℕ} (ε : Fin n → Bool) (hn : (900 : ℝ) ≤ n) : thrX 
   have hpow : ((min (pOf ε) (qOf ε) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ (n : ℝ) ^ ((3 : ℝ) / 2) :=
     Real.rpow_le_rpow hm0 hmn (by norm_num)
   have hsplit : (n : ℝ) ^ ((3 : ℝ) / 2) = n * Real.sqrt n := by
-    rw [show (3 : ℝ) / 2 = 1 + 1 / 2 by norm_num, Real.rpow_add hn0, Real.rpow_one, Real.sqrt_eq_rpow]
+    rw [show (3 : ℝ) / 2 = 1 + 1 / 2 by norm_num, Real.rpow_add hn0, Real.rpow_one,
+      Real.sqrt_eq_rpow]
   have hs0 : 0 ≤ Real.sqrt (n : ℝ) := Real.sqrt_nonneg _
   have hs2 : Real.sqrt (n : ℝ) ^ 2 = n := Real.sq_sqrt hn0.le
   have h30 : (30 : ℝ) ≤ Real.sqrt (n : ℝ) := by nlinarith
@@ -148,7 +170,9 @@ theorem thrX_le {n : ℕ} (ε : Fin n → Bool) (hn : (900 : ℝ) ≤ n) : thrX 
   apply max_le
   · linarith
   · rw [hsplit] at hpow
-    have hB : 120 * (n : ℝ) * ((min (pOf ε) (qOf ε) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ 120 * n * (n * Real.sqrt n) :=
+    have hB
+        : 120 * (n : ℝ) * ((min (pOf ε) (qOf ε) : ℕ) : ℝ) ^ ((3 : ℝ) / 2)
+          ≤ 120 * n * (n * Real.sqrt n) :=
       mul_le_mul_of_nonneg_left hpow (by positivity)
     have hC : 120 * (n : ℝ) * (n * Real.sqrt n) ≤ 4 * (n : ℝ) ^ 3 := by
       generalize Real.sqrt (n : ℝ) = s at hs0 hs2 h30 ⊢
@@ -172,7 +196,9 @@ end Formalism.MainNotions.TheoremBConstants
 
 namespace Formalism.MainNotions.DiscreteSeriesInnerProducts
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates Formalism.MainNotions.TheoremBConstants
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates
+  Formalism.MainNotions.TheoremBConstants
 open Formalism.QuantumDeterminants.WeylGroupFacts
 
 end Formalism.MainNotions.DiscreteSeriesInnerProducts

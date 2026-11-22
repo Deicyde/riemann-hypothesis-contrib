@@ -9,15 +9,16 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LimitTwi
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace GlobalTheory.CompanionTheory.EGlue.LeafB
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_infOf (hD : DiscInf) (hT : TopInf) (τ : E →+* ℂ) :
-    ∀ {N : ℕ} {t : Tr E N}, t.Good → ∃ m', t.InfOf τ m' := by
+theorem exists_infOf (hD : DiscInf) (hT : TopInf) (τ : E →+* ℂ)
+    : ∀ {N : ℕ} {t : Tr E N}, t.Good → ∃ m', t.InfOf τ m' := by
   intro N t
   induction t with
   | leaf V z =>
@@ -32,10 +33,15 @@ theorem exists_infOf (hD : DiscInf) (hT : TopInf) (τ : E →+* ℂ) :
     obtain ⟨m₂, h₂⟩ := i₂ h.2
     exact ⟨_, m₁, m₂, h₁, h₂, rfl⟩
 
-theorem leaf_entries (hD : DiscInf) (hT : TopInf) (B : ℝ) :
-    ∀ {N : ℕ} {t : Tr E N}, t.Good → (∀ τ m', t.InfOf τ m' → ∀ x ∈ m', ‖x‖ ≤ B) →
-      LeafZ (fun M V z => 0 < M → GlobalTheory.UnitaryBC.IsDiscrete V ∧
-        ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B) t := by
+theorem leaf_entries (hD : DiscInf) (hT : TopInf) (B : ℝ)
+    : ∀ {N : ℕ} {t : Tr E N},
+      t.Good → (∀ τ m', t.InfOf τ m' → ∀ x ∈ m', ‖x‖ ≤ B)
+        → LeafZ
+          (fun M V z =>
+            0 < M
+              → GlobalTheory.UnitaryBC.IsDiscrete V
+                ∧ ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B)
+          t := by
   intro N t
   induction t with
   | leaf V z =>
@@ -52,8 +58,8 @@ theorem leaf_entries (hD : DiscInf) (hT : TopInf) (B : ℝ) :
     · obtain ⟨m₁, h₁⟩ := exists_infOf hD hT τ h.1
       exact hb τ (m₁ + m₂) ⟨m₁, m₂, h₁, h₂, rfl⟩ x (Multiset.mem_add.2 (Or.inr hx))
 
-theorem norm_sum_le (s : Multiset ℂ) (B : ℝ) (h : ∀ x ∈ s, ‖x‖ ≤ B) :
-    ‖s.sum‖ ≤ (Multiset.card s : ℝ) * B := by
+theorem norm_sum_le (s : Multiset ℂ) (B : ℝ) (h : ∀ x ∈ s, ‖x‖ ≤ B)
+    : ‖s.sum‖ ≤ (Multiset.card s : ℝ) * B := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -64,8 +70,8 @@ theorem norm_sum_le (s : Multiset ℂ) (B : ℝ) (h : ∀ x ∈ s, ‖x‖ ≤ B
     push_cast
     linarith
 
-theorem sum_map_add_const (s : Multiset ℂ) (z : ℂ) :
-    (s.map (· + z)).sum = s.sum + (Multiset.card s : ℂ) * z := by
+theorem sum_map_add_const (s : Multiset ℂ) (z : ℂ)
+    : (s.map (· + z)).sum = s.sum + (Multiset.card s : ℂ) * z := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -73,11 +79,16 @@ theorem sum_map_add_const (s : Multiset ℂ) (z : ℂ) :
     push_cast
     ring
 
-theorem leaf_bound (hD : DiscInf) {M : ℕ} (hM : 0 < M) {V : Submodule ℂ (Sm E M)} (hV : GlobalTheory.UnitaryBC.IsDiscrete V) {z : ℂ} {B : ℝ}
-    (hb : ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B) :
-    InfBdd (2 * B) V ∧ ‖z‖ ≤ 2 * B := by
+theorem leaf_bound
+    (hD : DiscInf)
+    {M : ℕ} (hM : 0 < M)
+    {V : Submodule ℂ (Sm E M)} (hV : GlobalTheory.UnitaryBC.IsDiscrete V)
+    {z : ℂ} {B : ℝ}
+    (hb : ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B)
+    : InfBdd (2 * B) V ∧ ‖z‖ ≤ 2 * B := by
   choose m₀ hm₀ using hD E M V hV
-  have htr : ∑ τ, (m₀ τ).sum = 0 := GlobalTheory.CompanionTheory.TotalTrace.total_trace_eq_zero hV hm₀
+  have htr : ∑ τ, (m₀ τ).sum = 0 :=
+    GlobalTheory.CompanionTheory.TotalTrace.total_trace_eq_zero hV hm₀
   have hcard : ∀ τ, Multiset.card (m₀ τ) = M := fun τ => (hm₀ τ).1
   obtain ⟨τ₀⟩ : Nonempty (E →+* ℂ) := inferInstance
   have hd : 0 < Fintype.card (E →+* ℂ) := Fintype.card_pos_iff.2 ⟨τ₀⟩
@@ -85,18 +96,21 @@ theorem leaf_bound (hD : DiscInf) {M : ℕ} (hM : 0 < M) {V : Submodule ℂ (Sm 
     obtain ⟨x, hx⟩ := Multiset.card_pos_iff_exists_mem.1 (by rw [hcard τ₀]; exact hM)
     exact (norm_nonneg _).trans (hb τ₀ _ (hm₀ τ₀) x hx)
   have hsum : ∑ τ, ((m₀ τ).map (· + z)).sum = (Fintype.card (E →+* ℂ) : ℂ) * ((M : ℂ) * z) := by
-    simp only [sum_map_add_const, hcard, Finset.sum_add_distrib, htr, zero_add, Finset.sum_const, Finset.card_univ,
-      nsmul_eq_mul]
+    simp only [sum_map_add_const, hcard, Finset.sum_add_distrib, htr, zero_add, Finset.sum_const,
+      Finset.card_univ, nsmul_eq_mul]
   have hle : ‖∑ τ, ((m₀ τ).map (· + z)).sum‖ ≤ (Fintype.card (E →+* ℂ) : ℝ) * ((M : ℝ) * B) := by
-    refine (norm_sum_le_of_le Finset.univ (n := fun _ => (M : ℝ) * B) fun τ _ => ?_).trans_eq (by simp)
-    have := norm_sum_le ((m₀ τ).map (· + z)) B (fun y hy => by
-      obtain ⟨x, hx, rfl⟩ := Multiset.mem_map.1 hy
-      exact hb τ _ (hm₀ τ) x hx)
+    refine (norm_sum_le_of_le Finset.univ (n := fun _ => (M : ℝ) * B) fun τ _ => ?_).trans_eq
+      (by simp)
+    have :=
+      norm_sum_le ((m₀ τ).map (· + z)) B (fun y hy => by
+        obtain ⟨x, hx, rfl⟩ := Multiset.mem_map.1 hy
+        exact hb τ _ (hm₀ τ) x hx)
     simpa [hcard] using this
   have hz : ‖z‖ ≤ B := by
     rw [hsum, norm_mul, norm_mul, Complex.norm_natCast, Complex.norm_natCast] at hle
     have hdM : (0 : ℝ) < (Fintype.card (E →+* ℂ) : ℝ) * (M : ℝ) := by positivity
-    have : ((Fintype.card (E →+* ℂ) : ℝ) * (M : ℝ)) * ‖z‖ ≤ ((Fintype.card (E →+* ℂ) : ℝ) * (M : ℝ)) * B := by
+    have : ((Fintype.card (E →+* ℂ) : ℝ) * (M : ℝ)) * ‖z‖
+        ≤ ((Fintype.card (E →+* ℂ) : ℝ) * (M : ℝ)) * B := by
       nlinarith [hle]
     exact le_of_mul_le_mul_left this hdM
   refine ⟨fun τ => ⟨m₀ τ, hm₀ τ, fun x hx => ?_⟩, by linarith⟩
@@ -104,10 +118,15 @@ theorem leaf_bound (hD : DiscInf) {M : ℕ} (hM : 0 < M) {V : Submodule ℂ (Sm 
   have h2 : ‖x‖ ≤ ‖x + z‖ + ‖z‖ := by simpa using norm_sub_le (x + z) z
   linarith
 
-theorem leaves_of_entries (hD : DiscInf) (B : ℝ) : ∀ {N : ℕ} {t : Tr E N},
-    LeafZ (fun M V z => 0 < M → GlobalTheory.UnitaryBC.IsDiscrete V ∧
-      ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B) t →
-    LeafZ (fun M V z => 0 < M → InfBdd (2 * B) V ∧ ‖z‖ ≤ 2 * B) t := by
+theorem leaves_of_entries (hD : DiscInf) (B : ℝ)
+    : ∀ {N : ℕ} {t : Tr E N},
+      LeafZ
+          (fun M V z =>
+            0 < M
+              → GlobalTheory.UnitaryBC.IsDiscrete V
+                ∧ ∀ (τ : E →+* ℂ) (m₀ : Multiset ℂ), HasInfCharGL V τ m₀ → ∀ x ∈ m₀, ‖x + z‖ ≤ B)
+          t
+        → LeafZ (fun M V z => 0 < M → InfBdd (2 * B) V ∧ ‖z‖ ≤ 2 * B) t := by
   intro N t
   induction t with
   | leaf V z =>

@@ -57,18 +57,18 @@ private lemma not_summable_two : ¬ Summable fun x : Fin 2 → ℤ => ‖x‖ ^ 
     simpa [Nat.cast_add, Nat.cast_one] using hsum
   exact Real.not_summable_one_div_natCast ((summable_nat_add_iff 1).mp hsum')
 
-theorem UpperTheory.V.Af.Rs.wTop :
-    UpperTheory.V.Af.Rs.WTop := by
+theorem UpperTheory.V.Af.Rs.wTop : UpperTheory.V.Af.Rs.WTop := by
   unfold UpperTheory.V.Af.Rs.WTop
   refine ⟨fun t ht => EisensteinSeries.summable_one_div_norm_rpow ht, fun M => ?_⟩
-  have hnn : ∀ (s : ℝ) (x : Fin 2 → ℤ), 0 ≤ ‖x‖ ^ (-(2 * s)) :=
-    fun s x => Real.rpow_nonneg (norm_nonneg _) _
+  have hnn : ∀ (s : ℝ) (x : Fin 2 → ℤ), 0 ≤ ‖x‖ ^ (-(2 * s)) := fun s x =>
+    Real.rpow_nonneg (norm_nonneg _) _
   obtain ⟨F, hF⟩ : ∃ F : Finset (Fin 2 → ℤ), M < ∑ x ∈ F, ‖x‖ ^ (-(2 * (1 : ℝ))) := by
     by_contra h
     push_neg at h
     exact not_summable_two (summable_of_sum_le (hnn 1) h)
-  have ht : Tendsto (fun s : ℝ => ∑ x ∈ F, ‖x‖ ^ (-(2 * s))) (𝓝 1)
-      (𝓝 (∑ x ∈ F, ‖x‖ ^ (-(2 * (1 : ℝ))))) := by
+  have ht : Tendsto
+      (fun s : ℝ => ∑ x ∈ F, ‖x‖ ^ (-(2 * s)))
+      (𝓝 1) (𝓝 (∑ x ∈ F, ‖x‖ ^ (-(2 * (1 : ℝ))))) := by
     apply tendsto_finsetSum
     intro x _
     have hc : ContinuousAt (fun s : ℝ => ‖x‖ ^ (-(2 * s))) 1 := by

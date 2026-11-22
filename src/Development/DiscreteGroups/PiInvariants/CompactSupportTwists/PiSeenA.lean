@@ -9,7 +9,8 @@ set_option linter.all false
 noncomputable section
 
 open NumberField Matrix MeasureTheory Filter Set
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.Desc
 open scoped ENNReal
 
 namespace DiscreteGroups.T1.G.Dcy
@@ -40,7 +41,8 @@ theorem hasCompactSupport_chi_pow (N k : ℕ) : HasCompactSupport fun s : ℝ =>
 theorem countable_GL' (m : ℕ) : Countable (GL (Fin m) E) := by
   have : Countable E := (Module.finBasis ℚ E).equivFun.injective.countable
   have : Countable (Matrix (Fin m) (Fin m) E) := inferInstanceAs (Countable (Fin m → Fin m → E))
-  exact Function.Injective.countable (f := (Units.val : GL (Fin m) E → Matrix (Fin m) (Fin m) E)) fun a b hab => Units.ext hab
+  exact Function.Injective.countable (f := (Units.val : GL (Fin m) E → Matrix (Fin m) (Fin m) E))
+    fun a b hab => Units.ext hab
 
 theorem countable_ratH' : Countable (ratH E n 0) := by
   have := countable_GL' (E := E) n
@@ -48,20 +50,24 @@ theorem countable_ratH' : Countable (ratH E n 0) := by
   show Countable ((ratGL E n).prodMap (ratGL E 0)).range
   exact (MonoidHom.rangeRestrict_surjective ((ratGL E n).prodMap (ratGL E 0))).countable
 
-theorem bdd_of_mem {π : CuspSub E n} (hθ : ThetaFix π) {ψ : Sm E n} (hψ : ψ ∈ π.V) (R : ℝ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ x : H E n 0, |ldet x| ≤ R → ‖ψ.1 x.1‖ ≤ C := by
+theorem bdd_of_mem {π : CuspSub E n} (hθ : ThetaFix π) {ψ : Sm E n} (hψ : ψ ∈ π.V) (R : ℝ)
+    : ∃ C : ℝ, 0 ≤ C ∧ ∀ x : H E n 0, |ldet x| ≤ R → ‖ψ.1 x.1‖ ≤ C := by
   obtain ⟨C, hC⟩ := cp_decay_wt ψ (π.cusp ψ hψ) (hθ.1 ψ hψ) R 0
   refine ⟨max C 0, le_max_right _ _, fun x hx => ?_⟩
   have := hC x hx
   rw [pow_zero, mul_one] at this
   exact this.trans (le_max_left _ _)
 
-theorem integrable_of_ldet (hn : 1 ≤ n) (D : Dom E n 0) (F : H E n 0 → ℂ) (hF : Continuous F) (R K : ℝ)
-    (h0 : ∀ x, R < |ldet x| → F x = 0) (hK : ∀ x, |ldet x| ≤ R → ‖F x‖ ≤ K) : Integrable F D.ν := by
+theorem integrable_of_ldet
+    (hn : 1 ≤ n) (D : Dom E n 0)
+    (F : H E n 0 → ℂ) (hF : Continuous F)
+    (R K : ℝ) (h0 : ∀ x, R < |ldet x| → F x = 0) (hK : ∀ x, |ldet x| ≤ R → ‖F x‖ ≤ K)
+    : Integrable F D.ν := by
   haveI : BorelSpace (H E n 0) := ⟨rfl⟩
   set S : Set (H E n 0) := {x | |ldet x| ≤ R} with hSdef
   have hSm : MeasurableSet S :=
-    (isClosed_le (continuous_abs.comp (continuous_ldet (E := E) (n := n))) continuous_const).measurableSet
+    (isClosed_le (continuous_abs.comp (continuous_ldet (E := E) (n := n)))
+      continuous_const).measurableSet
   have hS : D.ν S < ⊤ := CP.cp_vol hn D R
   have hind : S.indicator F = F := by
     funext x
@@ -72,20 +78,30 @@ theorem integrable_of_ldet (hn : 1 ≤ n) (D : Dom E n 0) (F : H E n 0 → ℂ) 
   exact Measure.integrableOn_of_bounded (M := K) hS.ne hF.aestronglyMeasurable
     ((ae_restrict_iff' hSm).2 (Eventually.of_forall fun x hx => hK x hx))
 
-theorem integrable_pair (hn : 1 ≤ n) (D : Dom E n 0) {π : CuspSub E n} (hθ : ThetaFix π) {ψ φ : Sm E n}
-    (hψ : ψ ∈ π.V) (hφ : φ ∈ π.V) (U V : ℝ → ℂ) (hU : Continuous U) (hV : Continuous V) (R : ℝ)
-    (hUs : ∀ s, R < |s| → U s = 0) :
-    Integrable (fun x : H E n 0 => starRingEnd ℂ (ψ.1 x.1 * U (ldet x)) * (φ.1 x.1 * V (ldet x))) D.ν := by
+theorem integrable_pair
+    (hn : 1 ≤ n) (D : Dom E n 0)
+    {π : CuspSub E n} (hθ : ThetaFix π)
+    {ψ φ : Sm E n} (hψ : ψ ∈ π.V) (hφ : φ ∈ π.V)
+    (U V : ℝ → ℂ) (hU : Continuous U) (hV : Continuous V)
+    (R : ℝ) (hUs : ∀ s, R < |s| → U s = 0)
+    : Integrable
+      (fun x : H E n 0 => starRingEnd ℂ (ψ.1 x.1 * U (ldet x)) * (φ.1 x.1 * V (ldet x)))
+      D.ν := by
   obtain ⟨Cψ, hCψ0, hCψ⟩ := bdd_of_mem hθ hψ R
   obtain ⟨Cφ, hCφ0, hCφ⟩ := bdd_of_mem hθ hφ R
-  obtain ⟨KU, hKU⟩ := (isCompact_Icc : IsCompact (Icc (-R) R)).exists_bound_of_continuousOn hU.continuousOn
-  obtain ⟨KV, hKV⟩ := (isCompact_Icc : IsCompact (Icc (-R) R)).exists_bound_of_continuousOn hV.continuousOn
-  have hc : Continuous fun x : H E n 0 => starRingEnd ℂ (ψ.1 x.1 * U (ldet x)) * (φ.1 x.1 * V (ldet x)) := by
+  obtain ⟨KU, hKU⟩ :=
+    (isCompact_Icc : IsCompact (Icc (-R) R)).exists_bound_of_continuousOn hU.continuousOn
+  obtain ⟨KV, hKV⟩ :=
+    (isCompact_Icc : IsCompact (Icc (-R) R)).exists_bound_of_continuousOn hV.continuousOn
+  have hc : Continuous fun x : H E n 0 =>
+      starRingEnd ℂ (ψ.1 x.1 * U (ldet x)) * (φ.1 x.1 * V (ldet x)) := by
     have h1 := (continuous_of_mem π hψ).comp (continuous_fst (X := GA E n) (Y := GA E 0))
     have h2 := (continuous_of_mem π hφ).comp (continuous_fst (X := GA E n) (Y := GA E 0))
     have hl := continuous_ldet (E := E) (n := n)
     exact (continuous_star.comp (h1.mul (hU.comp hl))).mul (h2.mul (hV.comp hl))
-  refine integrable_of_ldet hn D _ hc R (Cψ * KU * (Cφ * KV)) (fun x hx => by simp [hUs _ hx]) fun x hx => ?_
+  refine integrable_of_ldet hn D _ hc R (Cψ * KU * (Cφ * KV))
+    (fun x hx => by simp [hUs _ hx])
+    fun x hx => ?_
   have hI : ldet x ∈ Icc (-R) R := abs_le.1 hx
   have hKU0 : 0 ≤ KU := (norm_nonneg _).trans (hKU _ hI)
   rw [norm_mul, RCLike.norm_conj, norm_mul, norm_mul]

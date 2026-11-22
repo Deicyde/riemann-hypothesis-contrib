@@ -81,8 +81,8 @@ theorem hermitian_dual_lattice_identity : PerfectPairingQuotient (E := E) := by
       rw [Module.isTorsionFree_iff_smul_eq_zero]
       intro n q hq
       obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective P q
-      rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, LinearMap.mem_ker,
-        map_zsmul] at hq
+      rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, LinearMap.mem_ker, map_zsmul]
+        at hq
       rcases smul_eq_zero.mp hq with h | h
       · exact Or.inl h
       · exact Or.inr ((Submodule.Quotient.mk_eq_zero P).mpr (LinearMap.mem_ker.mpr h))
@@ -93,17 +93,22 @@ theorem hermitian_dual_lattice_identity : PerfectPairingQuotient (E := E) := by
       rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub]
       change P.mkQ m - P.mkQ (s (P.mkQ m)) = 0
       rw [hsq, sub_self]
-    let ψ : ↥X.Λ →+ ℤ :=
-      { toFun := fun m => φ ⟨((m - s (P.mkQ m) : ↥X.Λ) : Fin r → E),
-          (mem_orthogonal_lattice_iff _ _ _).mpr ⟨(m - s (P.mkQ m)).2, LinearMap.mem_ker.mp (hρ m)⟩⟩
-        map_zero' := by
-          rw [← map_zero φ]; congr 1; ext1; simp
-        map_add' := by
-          intro a b
-          rw [← map_add φ]; congr 1; ext1
-          simp only [map_add (f := _)]
-          push_cast
-          abel }
+    let ψ : ↥X.Λ →+ ℤ := {
+      toFun := fun m =>
+        φ ⟨
+          ((m - s (P.mkQ m) : ↥X.Λ) : Fin r → E),
+          (mem_orthogonal_lattice_iff _ _ _).mpr ⟨(m - s (P.mkQ m)).2, LinearMap.mem_ker.mp (hρ m)⟩
+        ⟩
+      map_zero' := by rw [← map_zero φ]; congr 1; ext1; simp
+      map_add' := by
+        intro a b
+        rw [← map_add φ]
+        congr 1
+        ext1
+        simp only [map_add (f := _)]
+        push_cast
+        abel
+    }
     obtain ⟨x, hxΛ, hx⟩ := X.EF_perf ψ
     have hval : ∀ ν : X.Λp ξ, (φ ν : ℚ) = EFf X.ξ0 X.Gm x ν := by
       intro ν
@@ -112,9 +117,11 @@ theorem hermitian_dual_lattice_identity : PerfectPairingQuotient (E := E) := by
       have hmk : P.mkQ (⟨ν, hν.1⟩ : ↥X.Λ) = 0 := (Submodule.Quotient.mk_eq_zero P).mpr hP
       have hψ : ψ ⟨ν, hν.1⟩ = φ ν := by
         show φ _ = φ ν
-        congr 1; ext1
+        congr 1
+        ext1
         simp [hmk]
-      rw [← hψ]; exact hx ⟨ν, hν.1⟩
+      rw [← hψ]
+      exact hx ⟨ν, hν.1⟩
     have hxξ : herm X.Gm x ξ = 0 := by
       apply herm_eq_zero_of_trace_form_vanish X.ξ0 X.ξ0_ne
       intro β
@@ -132,8 +139,8 @@ theorem hermitian_dual_lattice_identity : PerfectPairingQuotient (E := E) := by
       apply herm_eq_zero_of_trace_form_vanish X.ξ0 X.ξ0_ne
       intro β
       exact hμ ⟨β • ν, hsm β ν hν⟩
-    obtain ⟨d, hd, hdy⟩ := exists_smul_mem (F := E) X.Λ (x := y)
-      (by rw [X.Λ_span]; exact Submodule.mem_top)
+    obtain ⟨d, hd, hdy⟩ :=
+      exists_smul_mem (F := E) X.Λ (x := y) (by rw [X.Λ_span]; exact Submodule.mem_top)
     have hdyp : d • y ∈ X.Λp ξ := by
       rw [mem_orthogonal_lattice_iff]
       refine ⟨hdy, ?_⟩

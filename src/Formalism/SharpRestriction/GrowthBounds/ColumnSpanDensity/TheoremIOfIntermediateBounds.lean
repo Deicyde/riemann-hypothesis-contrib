@@ -15,11 +15,15 @@ theorem kF_nonneg (X : Dat) (K : Cst) (R : RS X.p X.n') (al be : X.TT → ℕ) :
   Real.sInf_nonneg fun _ h => h.1
 
 open Classical in
-theorem kText_nonneg (X : Dat) (K : Cst) (R : RS X.p X.n') (hb : 0 < X.b') (aa bb : X.TT → ℤ) :
-    0 ≤ X.kText K R aa bb := by
+theorem kText_nonneg (X : Dat) (K : Cst) (R : RS X.p X.n') (hb : 0 < X.b') (aa bb : X.TT → ℤ)
+    : 0 ≤ X.kText K R aa bb := by
   unfold Dat.kText
-  have h1 : 0 ≤ (if X.Inside aa bb then
-      X.kF K R (fun s => (aa s - X.ccl).toNat) (fun s => (bb s - X.ccl).toNat) else 1) := by
+  have h1
+      : 0
+        ≤ (if X.Inside aa bb then
+             X.kF K R (fun s => (aa s - X.ccl).toNat) (fun s => (bb s - X.ccl).toNat)
+           else
+             1) := by
     split_ifs
     · exact kF_nonneg _ _ _ _ _
     · exact zero_le_one
@@ -29,9 +33,12 @@ theorem kText_nonneg (X : Dat) (K : Cst) (R : RS X.p X.n') (hb : 0 < X.b') (aa b
     positivity
   linarith
 
-theorem theorem_I_of_intermediate_bounds (D : Formalism.BasicNotions.D7) (FM : Cst → Dat → Prop) (hR : LPRingIndep) (hLP : ∀ K C, MidLP K C)
-    (hMean : ∀ K : Cst, K.Pos → MidMean D K (FM K)) (hN1 : ∀ K : Cst, K.Pos → TransportedAlt K (FactsLP K))
-    (hN2 : ∀ K : Cst, K.Pos → TransportedAlt K (fun _ => FM K)) : SecondPartClosed D := by
+theorem theorem_I_of_intermediate_bounds
+    (D : Formalism.BasicNotions.D7) (FM : Cst → Dat → Prop)
+    (hR : LPRingIndep) (hLP : ∀ K C, MidLP K C) (hMean : ∀ K : Cst, K.Pos → MidMean D K (FM K))
+    (hN1 : ∀ K : Cst, K.Pos → TransportedAlt K (FactsLP K))
+    (hN2 : ∀ K : Cst, K.Pos → TransportedAlt K (fun _ => FM K))
+    : SecondPartClosed D := by
   intro hA
   obtain ⟨T0, hT0, h0⟩ := hA 4 (by norm_num)
   refine ⟨T0, hT0, fun C₀ hC₀ => ?_⟩
@@ -42,8 +49,13 @@ theorem theorem_I_of_intermediate_bounds (D : Formalism.BasicNotions.D7) (FM : C
   have hK : K.Pos := ⟨lt_of_lt_of_le hT0 hC₀, hT2, hCA, hT1, hT1, hT1, hCkap, hCt, hCs⟩
   obtain ⟨Ta, Ca, hTa, hCa, hFa⟩ := hN1 K hK
   obtain ⟨Tb, Cb, hTb, hCb, hFb⟩ := hN2 K hK
-  refine ⟨max Ta Tb, max (max Ca Cb) K.Cmean, lt_max_of_lt_left hTa,
-    lt_max_of_lt_left (lt_max_of_lt_left hCa), fun CH hCH => ?_⟩
+  refine ⟨
+    max Ta Tb,
+    max (max Ca Cb) K.Cmean,
+    lt_max_of_lt_left hTa,
+    lt_max_of_lt_left (lt_max_of_lt_left hCa),
+    fun CH hCH => ?_
+  ⟩
   intro p n' m TT G' N₁ Y Yb a b' bl bu ccl Dp cStar hH
   have hm : m ≠ 0 := by
     have := hH.2.2.2.2.2.2.1
@@ -61,9 +73,13 @@ theorem theorem_I_of_intermediate_bounds (D : Formalism.BasicNotions.D7) (FM : C
   · obtain ⟨R₀⟩ := hne
     refine ⟨X.kText K R₀, kText_nonneg X K R₀ hLPf.bpos, ?_, ?_⟩
     · have h := hMean K hK hAdm X hMf R₀
-      have h' : K.Cmean * (TT.card : ℝ) * N₁ / Y ≤ max (max Ca Cb) K.Cmean * (TT.card : ℝ) * N₁ / Y := by
+      have h'
+          : K.Cmean * (TT.card : ℝ) * N₁ / Y
+            ≤ max (max Ca Cb) K.Cmean * (TT.card : ℝ) * N₁ / Y := by
         have := mul_le_mul_of_nonneg_right (le_max_right (max Ca Cb) K.Cmean) hnn
-        calc K.Cmean * (TT.card : ℝ) * N₁ / Y = K.Cmean * ((TT.card : ℝ) * N₁ / Y) := by ring
+        calc
+          K.Cmean * (TT.card : ℝ) * N₁ / Y
+            = K.Cmean * ((TT.card : ℝ) * N₁ / Y) := by ring
           _ ≤ max (max Ca Cb) K.Cmean * ((TT.card : ℝ) * N₁ / Y) := this
           _ = _ := by ring
       exact le_trans h h'
@@ -75,7 +91,9 @@ theorem theorem_I_of_intermediate_bounds (D : Formalism.BasicNotions.D7) (FM : C
       rw [h0]
       have hC : 0 ≤ max (max Ca Cb) K.Cmean := le_of_lt (lt_max_of_lt_left (lt_max_of_lt_left hCa))
       have := mul_nonneg hC hnn
-      calc (0 : ℝ) ≤ max (max Ca Cb) K.Cmean * ((TT.card : ℝ) * N₁ / Y) := this
+      calc
+        (0 : ℝ)
+          ≤ max (max Ca Cb) K.Cmean * ((TT.card : ℝ) * N₁ / Y) := this
         _ = _ := by ring
     · intro W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ j w hstd
       exact absurd ⟨(⟨W, Qq, O, Kf, ι, σ, j, w, hstd⟩ : RS p n')⟩ hne

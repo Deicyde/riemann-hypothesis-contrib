@@ -14,13 +14,17 @@ section LinAlg
 
 variable {K : Type*} [Field K] {m : ℕ}
 
-private theorem sep_of_mul_closed [IsAlgClosed K] {M N : Matrix (Fin m) (Fin m) K} {a : K} (ha : a ≠ 0)
-    (h : N * M = a • (1 : Matrix (Fin m) (Fin m) K)) (hM : M.charpoly.Separable) : N.charpoly.Separable := by
+private theorem sep_of_mul_closed
+    [IsAlgClosed K]
+    {M N : Matrix (Fin m) (Fin m) K} {a : K}
+    (ha : a ≠ 0) (h : N * M = a • (1 : Matrix (Fin m) (Fin m) K)) (hM : M.charpoly.Separable)
+    : N.charpoly.Separable := by
   classical
   have hdet : M.det ≠ 0 := by
     intro h0
     have := congrArg Matrix.det h
-    rw [Matrix.det_mul, h0, mul_zero, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin] at this
+    rw [Matrix.det_mul, h0, mul_zero, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin]
+      at this
     by_cases hm : m = 0
     · subst hm
       simp [Matrix.det_isEmpty] at h0
@@ -39,7 +43,8 @@ private theorem sep_of_mul_closed [IsAlgClosed K] {M N : Matrix (Fin m) (Fin m) 
     have e : Matrix.scalar (Fin m) (a / x) - N = (-x⁻¹) • (N * (Matrix.scalar (Fin m) x - M)) := by
       rw [Matrix.mul_sub, h, Matrix.scalar_apply, Matrix.scalar_apply]
       ext i j
-      by_cases hij : i = j <;> simp [hij, Matrix.mul_apply, Matrix.diagonal_apply, Matrix.one_apply] <;> field_simp <;> ring
+      by_cases hij : i = j <;> simp [hij, Matrix.mul_apply, Matrix.diagonal_apply, Matrix.one_apply]
+        <;> field_simp <;> ring
     rw [e, Matrix.det_smul, Matrix.det_mul, hx0, mul_zero, mul_zero]
   have hnd : M.charpoly.roots.Nodup := Polynomial.nodup_roots hM
   have hcM : M.charpoly.roots.card = m := by
@@ -66,17 +71,23 @@ private theorem sep_of_mul_closed [IsAlgClosed K] {M N : Matrix (Fin m) (Fin m) 
     refine le_antisymm (Multiset.card_le_card (Multiset.dedup_le _)) ?_
     rw [hcN]
     exact hle
-  exact (Polynomial.nodup_roots_iff_of_splits (Matrix.charpoly_monic N).ne_zero (IsAlgClosed.splits _)).1 hndN
+  exact (Polynomial.nodup_roots_iff_of_splits (Matrix.charpoly_monic N).ne_zero
+    (IsAlgClosed.splits _)).1 hndN
 
-private theorem sep_of_mul {M N : Matrix (Fin m) (Fin m) K} {a : K} (ha : a ≠ 0)
-    (h : N * M = a • (1 : Matrix (Fin m) (Fin m) K)) (hM : M.charpoly.Separable) : N.charpoly.Separable := by
-  have h' : N.map (algebraMap K (AlgebraicClosure K)) * M.map (algebraMap K (AlgebraicClosure K)) =
-      algebraMap K (AlgebraicClosure K) a • (1 : Matrix (Fin m) (Fin m) (AlgebraicClosure K)) := by
+private theorem sep_of_mul
+    {M N : Matrix (Fin m) (Fin m) K} {a : K}
+    (ha : a ≠ 0) (h : N * M = a • (1 : Matrix (Fin m) (Fin m) K)) (hM : M.charpoly.Separable)
+    : N.charpoly.Separable := by
+  have h'
+      : N.map (algebraMap K (AlgebraicClosure K)) * M.map (algebraMap K (AlgebraicClosure K))
+        = algebraMap K (AlgebraicClosure K) a
+          • (1 : Matrix (Fin m) (Fin m) (AlgebraicClosure K)) := by
     rw [← Matrix.map_mul, h]
     ext i j
     by_cases hij : i = j <;> simp [hij, Matrix.one_apply]
-  have h2 := sep_of_mul_closed (K := AlgebraicClosure K) (a := algebraMap K (AlgebraicClosure K) a)
-    (by simpa using ha) h' (by rw [Matrix.charpoly_map]; exact hM.map)
+  have h2 :=
+    sep_of_mul_closed (K := AlgebraicClosure K) (a := algebraMap K (AlgebraicClosure K) a)
+      (by simpa using ha) h' (by rw [Matrix.charpoly_map]; exact hM.map)
   rw [Matrix.charpoly_map] at h2
   exact (Polynomial.separable_map _).1 h2
 
@@ -84,17 +95,31 @@ end LinAlg
 
 end UpperTheory.Gal.Spc
 
-theorem UpperTheory.Gal.Spc.sepConj :
-    UpperTheory.Gal.Spc.SepConj := by
+theorem UpperTheory.Gal.Spc.sepConj : UpperTheory.Gal.Spc.SepConj := by
   intro E _ _ _ n g w hw
-  have h0 : (g.1.1.val.map (conjFin (conjE E)))ᵀ * g.1.1.val =
-      GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ) • (1 : Matrix (Fin n) (Fin n) _) := g.2
+  have h0
+      : (g.1.1.val.map (conjFin (conjE E)))ᵀ * g.1.1.val
+        = GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E
+            (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ)
+          • (1 : Matrix (Fin n) (Fin n) _) :=
+    g.2
   have h1 := congrArg (RingHom.mapMatrix (pLoc E w)) h0
   rw [map_mul] at h1
-  have ha : pLoc E w (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ)) ≠ 0 :=
-    ((g.1.2.isUnit.map (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E)).map (pLoc E w)).ne_zero
-  have h2 : (((UpperTheory.Gal.CertificateRingHomMap.comp (UpperTheory.Gal.CertificateRingHomMap.cj w) g).val.map (conjLoc (conjE E) w))ᵀ) * (UpperTheory.Gal.CertificateRingHomMap.comp w g).val =
-      pLoc E w (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ)) • (1 : Matrix (Fin n) (Fin n) _) := by
+  have ha
+      : pLoc E w
+          (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E
+            (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ))
+        ≠ 0 :=
+    ((g.1.2.isUnit.map (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E)).map
+      (pLoc E w)).ne_zero
+  have h2
+      : (((UpperTheory.Gal.CertificateRingHomMap.comp (UpperTheory.Gal.CertificateRingHomMap.cj w)
+            g).val.map (conjLoc (conjE E) w))ᵀ)
+          * (UpperTheory.Gal.CertificateRingHomMap.comp w g).val
+        = pLoc E w
+            (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E
+              (g.1.2 : UpperTheory.Gal.CertificateRingHomMap.AfQ))
+          • (1 : Matrix (Fin n) (Fin n) _) := by
     refine Eq.trans ?_ (h1.trans ?_)
     · congr 1
     · ext i j

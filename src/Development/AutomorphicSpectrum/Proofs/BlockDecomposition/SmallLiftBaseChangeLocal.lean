@@ -9,15 +9,19 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.PerfVB
 
 namespace GlobalTheory.CompanionTheory.PerfVB
 
-theorem rTensor_eq_zero_iff_mem_smul {R A A' P : Type} [CommRing R] [CommRing A] [CommRing A']
-    [Algebra R A] [Algebra R A'] [AddCommGroup P] [Module R P] (π : A →ₐ[R] A')
-    (hπ : Function.Surjective π) (w : A ⊗[R] P) :
-    π.toLinearMap.rTensor P w = 0 ↔
-      w ∈ (RingHom.ker π) • (⊤ : Submodule A (A ⊗[R] P)) := by
+theorem rTensor_eq_zero_iff_mem_smul
+    {R A A' P : Type} [CommRing R] [CommRing A] [CommRing A'] [Algebra R A] [Algebra R A']
+    [AddCommGroup P] [Module R P]
+    (π : A →ₐ[R] A') (hπ : Function.Surjective π)
+    (w : A ⊗[R] P)
+    : π.toLinearMap.rTensor P w = 0 ↔ w ∈ (RingHom.ker π) • (⊤ : Submodule A (A ⊗[R] P)) := by
   constructor
   · intro hw
     have hex : Function.Exact ((RingHom.ker π).restrictScalars R).subtype π.toLinearMap := by
@@ -52,23 +56,31 @@ theorem rTensor_eq_zero_iff_mem_smul {R A A' P : Type} [CommRing R] [CommRing A]
     · intro x y hx hy
       rw [map_add (f := _), hx, hy, add_zero]
 
-theorem lTensor_rTensor_apply {R A A' P P' : Type} [CommRing R] [CommRing A] [CommRing A']
-    [Algebra R A] [Algebra R A'] [AddCommGroup P] [Module R P] [AddCommGroup P'] [Module R P']
-    (π : A →ₐ[R] A') (f : P →ₗ[R] P') (w : A ⊗[R] P) :
-    f.lTensor A' (π.toLinearMap.rTensor P w) = π.toLinearMap.rTensor P' (f.lTensor A w) := by
+theorem lTensor_rTensor_apply
+    {R A A' P P' : Type} [CommRing R] [CommRing A] [CommRing A'] [Algebra R A] [Algebra R A']
+    [AddCommGroup P] [Module R P] [AddCommGroup P'] [Module R P']
+    (π : A →ₐ[R] A') (f : P →ₗ[R] P') (w : A ⊗[R] P)
+    : f.lTensor A' (π.toLinearMap.rTensor P w) = π.toLinearMap.rTensor P' (f.lTensor A w) := by
   induction w with
   | add u v hu hv => simp only [map_add (f := _), hu, hv]
   | tmul a p => simp
 
-private theorem lift_of_smallLift_lemma {R A : Type} [CommRing R] [CommRing A] [Algebra R A] (J : Ideal A) (t : A) :
-    RingHom.ker ((Ideal.Quotient.mkₐ R (Ideal.span {Ideal.Quotient.mk J t})).comp (Ideal.Quotient.mkₐ R J)) =
-      J ⊔ Ideal.span {t} := by
+private theorem lift_of_smallLift_lemma
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A] (J : Ideal A) (t : A)
+    : RingHom.ker ((Ideal.Quotient.mkₐ R (Ideal.span {Ideal.Quotient.mk J t})).comp
+        (Ideal.Quotient.mkₐ R J))
+      = J ⊔ Ideal.span {t} := by
   ext x
   rw [RingHom.mem_ker, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.mkₐ_eq_mk,
     Ideal.Quotient.eq_zero_iff_mem, ← Ideal.mem_comap, ← Set.image_singleton, ← Ideal.map_span,
-    Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker, sup_comm]
+    Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
+    Ideal.mk_ker, sup_comm]
 
-theorem lift_of_smallLift : ∀ (R P₀ P₁ P₂ A : Type) [CommRing R] [AddCommGroup P₀] [AddCommGroup P₁] [AddCommGroup P₂] [Module R P₀] [Module R P₁] [Module R P₂] [CommRing A] [IsLocalRing A] [Algebra R A] (a₀ : P₀ →ₗ[R] P₁) (a₁ : P₁ →ₗ[R] P₂), a₁ ∘ₗ a₀ = 0 → SmallLift a₀ a₁ → Lift (a₁.baseChange A) := by
+theorem lift_of_smallLift
+    : ∀ (R P₀ P₁ P₂ A : Type) [CommRing R] [AddCommGroup P₀] [AddCommGroup P₁] [AddCommGroup P₂]
+        [Module R P₀] [Module R P₁] [Module R P₂] [CommRing A] [IsLocalRing A] [Algebra R A]
+        (a₀ : P₀ →ₗ[R] P₁) (a₁ : P₁ →ₗ[R] P₂),
+      a₁ ∘ₗ a₀ = 0 → SmallLift a₀ a₁ → Lift (a₁.baseChange A) := by
   intro R P₀ P₁ P₂ A _ _ _ _ _ _ _ _ _ _ a₀ a₁ h01 hS
   intro J t hJ hJt z hz
   haveI : Nontrivial (A ⧸ J) := Ideal.Quotient.nontrivial_iff.mpr hJ
@@ -96,18 +108,22 @@ theorem lift_of_smallLift : ∀ (R P₀ P₁ P₂ A : Type) [CommRing R] [AddCom
     rw [hz', lTensor_rTensor_apply, rTensor_eq_zero_iff_mem_smul ρ hρs, hker]
     exact hz2
   obtain ⟨xb, y, hx0, hxy⟩ := hS (A ⧸ J) t' ht z' hz0
-  obtain ⟨x₁, rfl⟩ := LinearMap.rTensor_surjective P₁ (g := (Ideal.Quotient.mkₐ R J).toLinearMap) hJs xb
+  obtain ⟨x₁, rfl⟩ :=
+    LinearMap.rTensor_surjective P₁ (g := (Ideal.Quotient.mkₐ R J).toLinearMap) hJs xb
   obtain ⟨y₁, rfl⟩ := LinearMap.rTensor_surjective P₀ (g := ρ.toLinearMap) hρs y
-  have hcomp : ρ.toLinearMap.rTensor P₁ x₁ = (Ideal.Quotient.mkₐ R (Ideal.span {t'})).toLinearMap.rTensor P₁
-      ((Ideal.Quotient.mkₐ R J).toLinearMap.rTensor P₁ x₁) := by
+  have hcomp
+      : ρ.toLinearMap.rTensor P₁ x₁
+        = (Ideal.Quotient.mkₐ R (Ideal.span {t'})).toLinearMap.rTensor P₁
+          ((Ideal.Quotient.mkₐ R J).toLinearMap.rTensor P₁ x₁) := by
     rw [hρ, AlgHom.comp_toLinearMap, LinearMap.rTensor_comp, LinearMap.comp_apply]
   refine ⟨x₁ - a₀.lTensor A y₁, ?_, ?_⟩
   · rw [LinearMap.baseChange_eq_ltensor, map_sub]
     have h0 : a₁.lTensor A (a₀.lTensor A y₁) = 0 := by
-      rw [← LinearMap.comp_apply, ← LinearMap.lTensor_comp, h01, LinearMap.lTensor_zero, LinearMap.zero_apply]
+      rw [← LinearMap.comp_apply, ← LinearMap.lTensor_comp, h01, LinearMap.lTensor_zero,
+        LinearMap.zero_apply]
     rw [h0, sub_zero, ← hkerJ, ← rTensor_eq_zero_iff_mem_smul _ hJs, ← lTensor_rTensor_apply]
     exact hx0
-  · rw [← hker, ← rTensor_eq_zero_iff_mem_smul ρ hρs, map_sub, map_sub, ← lTensor_rTensor_apply, hcomp, ← hz',
-      sub_right_comm, hxy, sub_self]
+  · rw [← hker, ← rTensor_eq_zero_iff_mem_smul ρ hρs, map_sub, map_sub, ← lTensor_rTensor_apply,
+      hcomp, ← hz', sub_right_comm, hxy, sub_self]
 
 end GlobalTheory.CompanionTheory.PerfVB

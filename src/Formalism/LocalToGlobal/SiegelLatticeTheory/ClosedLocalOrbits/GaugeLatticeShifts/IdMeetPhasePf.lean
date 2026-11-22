@@ -12,8 +12,10 @@ noncomputable section
 namespace Formalism.L2.SG.Pf.IdMeet
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full
 
 theorem idMeetPhaseC_of (hK : IdMeetKeyC) : IdMeetPhaseC := by
   intro D X Y u hneat _ ρ t hid hmeet
@@ -29,8 +31,7 @@ theorem idMeetPhaseC_of (hK : IdMeetKeyC) : IdMeetPhaseC := by
     have h11 := (hmul 1 h1 1 h1).2
     rw [mul_one] at h11
     have hn := Formalism.L2.SG.RealObj.InfCut.norm_psiInfU X u 1
-    have h0 : X.psiInfU u 1 ≠ 0 := by
-      intro h; rw [h, norm_zero] at hn; exact zero_ne_one hn
+    have h0 : X.psiInfU u 1 ≠ 0 := by intro h; rw [h, norm_zero] at hn; exact zero_ne_one hn
     exact mul_left_cancel₀ h0 (h11.symm.trans (mul_one _).symm)
   have hinvψ : X.psiInfU u t.pt.1⁻¹ * X.psiInfU u t.pt.1 = 1 := by
     rw [← (hmul _ (hinv _ hN) _ hN).2, inv_mul_cancel, hψ1]

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermFramePair
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat GlobalTheory.DegCnt Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp GlobalTheory.DegVol
+open NumberField MeasureTheory Matrix Formalism.HermitianLatticeCounting.S6 GlobalTheory.HermLat
+  GlobalTheory.DegCnt Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp GlobalTheory.DegVol
 open scoped Pointwise ENNReal Classical
 open GlobalTheory.DegVol.RefCov
 
@@ -23,14 +25,18 @@ private lemma Hpk_esI_apply' (a : Fin r) (i : Fin (2 * r + k + 1)) :
   simp only [Hpk, esI, eI, Fin.ext_iff, Fin.val_mk]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem herm_esI (u : Fin (2 * r + k + 1) → ℂ) (a : Fin r) :
-    herm (Hpk k r) u (bvec (esI k r a)) = u (eI k r a) := by
+theorem herm_esI (u : Fin (2 * r + k + 1) → ℂ) (a : Fin r)
+    : herm (Hpk k r) u (bvec (esI k r a)) = u (eI k r a) := by
   simp [herm, bvec, dotProduct, Matrix.mulVec, Pi.single_apply, Hpk_esI_apply']
 
-theorem coord_eq_zero {g : Mat k r} (hg : g ∈ UH (Hpk k r))
-    (hX : ∀ a : Fin r, a.val < j → g⁻¹ *ᵥ bvec (eI k r a) ∈ XstJ k r j ∧ g *ᵥ bvec (eI k r a) ∈ XstJ k r j)
-    {u : Fin (2 * r + k + 1) → ℂ} (hu : ∀ a : Fin r, a.val < j → herm (Hpk k r) u (g⁻¹ *ᵥ bvec (eI k r a)) = 0)
-    (b : Fin r) (hb : b.val < j) : u (eI k r b) = 0 := by
+theorem coord_eq_zero
+    {g : Mat k r} (hg : g ∈ UH (Hpk k r))
+    (hX : ∀ a : Fin r,
+      a.val < j → g⁻¹ *ᵥ bvec (eI k r a) ∈ XstJ k r j ∧ g *ᵥ bvec (eI k r a) ∈ XstJ k r j)
+    {u : Fin (2 * r + k + 1) → ℂ}
+    (hu : ∀ a : Fin r, a.val < j → herm (Hpk k r) u (g⁻¹ *ᵥ bvec (eI k r a)) = 0)
+    (b : Fin r) (hb : b.val < j)
+    : u (eI k r b) = 0 := by
   have hdet : IsUnit g.det := GlobalTheory.DegVol.RealMat.isUnit_det hg
 
   have hinj : Function.Injective (Matrix.mulVecLin g⁻¹) := by
@@ -38,8 +44,9 @@ theorem coord_eq_zero {g : Mat k r} (hg : g ∈ UH (Hpk k r))
     have h := congrArg (fun v => g *ᵥ v) hxy
     simpa [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hdet] using h
 
-  have hli : ∀ f : {a : Fin r // a.val < j} → Fin (2 * r + k + 1), Function.Injective f →
-      LinearIndependent ℂ (fun a => bvec (f a)) := by
+  have hli
+      : ∀ f : {a : Fin r // a.val < j} → Fin (2 * r + k + 1),
+        Function.Injective f → LinearIndependent ℂ (fun a => bvec (f a)) := by
     intro f hf
     have h := (Pi.basisFun ℂ (Fin (2 * r + k + 1))).linearIndependent.comp f hf
     convert h using 1
@@ -57,8 +64,10 @@ theorem coord_eq_zero {g : Mat k r} (hg : g ∈ UH (Hpk k r))
     have := a.1.isLt
     have := a'.1.isLt
     exact Subtype.ext (Fin.ext (by omega))
-  have hl1 : LinearIndependent ℂ (fun a : {a : Fin r // a.val < j} => bvec (eI k r a.1)) := hli _ hI1
-  have hl2 : LinearIndependent ℂ (fun a : {a : Fin r // a.val < j} => bvec (esI k r a.1)) := hli _ hI2
+  have hl1 : LinearIndependent ℂ (fun a : {a : Fin r // a.val < j} => bvec (eI k r a.1)) :=
+    hli _ hI1
+  have hl2 : LinearIndependent ℂ (fun a : {a : Fin r // a.val < j} => bvec (esI k r a.1)) :=
+    hli _ hI2
 
   have hle : (XJ k r j).map (Matrix.mulVecLin g⁻¹) ≤ XstJ k r j := by
     unfold XJ
@@ -66,7 +75,9 @@ theorem coord_eq_zero {g : Mat k r} (hg : g ∈ UH (Hpk k r))
     rintro _ ⟨a, rfl⟩
     rw [Matrix.mulVecLin_apply]
     exact (hX a.1 a.2).1
-  have hrank : Module.finrank ℂ ((XJ k r j).map (Matrix.mulVecLin g⁻¹)) = Module.finrank ℂ (XstJ k r j) := by
+  have hrank
+      : Module.finrank ℂ ((XJ k r j).map (Matrix.mulVecLin g⁻¹))
+        = Module.finrank ℂ (XstJ k r j) := by
     rw [← (Submodule.equivMapOfInjective _ hinj (XJ k r j)).finrank_eq]
     unfold XJ XstJ
     rw [finrank_span_eq_card hl1, finrank_span_eq_card hl2]
@@ -84,13 +95,21 @@ theorem coord_eq_zero {g : Mat k r} (hg : g ∈ UH (Hpk k r))
     | mem y hy =>
       obtain ⟨a, rfl⟩ := hy
       exact hu a.1 a.2
-    | zero => simp [herm]
-    | add x₁ x₂ _ _ h₁ h₂ => rw [Matrix.mulVec_add, GlobalTheory.DegVol.RealMat.herm_add_right, h₁, h₂, add_zero]
-    | smul c y _ h => rw [Matrix.mulVec_smul, GlobalTheory.DegVol.RealMat.herm_smul_right, h, mul_zero]
+    | zero =>
+      simp [herm]
+    | add x₁ x₂ _ _ h₁ h₂ =>
+      rw [Matrix.mulVec_add, GlobalTheory.DegVol.RealMat.herm_add_right, h₁, h₂, add_zero]
+    | smul c y _ h =>
+      rw [Matrix.mulVec_smul, GlobalTheory.DegVol.RealMat.herm_smul_right, h, mul_zero]
   rw [← herm_esI u b, ← hxe, Matrix.mulVecLin_apply]
   exact hzero x hx
 
-theorem inWb_of_mem_Wn : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V) (r : ℕ) (N : NF H r) (k : ℕ) (σ : K →+* ℂ) (ρ : ℝ) (β : Fin r → ℕ) (Φ : V → Fin (2 * r + k + 1) → ℂ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : Mat k r), 0 < ρ → IsFrameOf N k σ ρ β Φ z z' g → ∀ w ∈ N.Wn, inWb k r (Φ w) := by
+theorem inWb_of_mem_Wn
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V)
+        (r : ℕ) (N : NF H r) (k : ℕ) (σ : K →+* ℂ) (ρ : ℝ) (β : Fin r → ℕ)
+        (Φ : V → Fin (2 * r + k + 1) → ℂ) (z z' : Fin (2 * r + k + 1) → ℂ) (g : Mat k r),
+      0 < ρ → IsFrameOf N k σ ρ β Φ z z' g → ∀ w ∈ N.Wn, inWb k r (Φ w) := by
   intro K V _ _ _ _ _ _ _ _ H r N k σ ρ β Φ z z' g hρ hF w hw
   unfold IsFrameOf at hF
   obtain ⟨hR, -, -, -, ⟨c, hN⟩, he, hist, -, -⟩ := hF
@@ -121,13 +140,16 @@ theorem inWb_of_mem_Wn : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K]
   have hes : ∀ a : Fin r, Φ w (esI k r a) = 0 := by
     intro a
     have h1 := hiso w (N.F.e a.castSucc)
-    rw [(he a).1, GlobalTheory.DegVol.RealMat.herm_smul_right, GlobalTheory.DegVol.RealMat.herm_eI, hBe a, map_zero] at h1
+    rw [(he a).1, GlobalTheory.DegVol.RealMat.herm_smul_right, GlobalTheory.DegVol.RealMat.herm_eI,
+        hBe a, map_zero]
+      at h1
     exact (mul_eq_zero.1 h1).resolve_left (star_ne_zero.2 (hρ' _))
 
   have hhi : ∀ b : Fin r, N.j ≤ b.val → Φ w (eI k r b) = 0 := by
     intro b hb
     have h1 := hiso w (N.ist b)
-    rw [hist b hb, GlobalTheory.DegVol.RealMat.herm_smul_right, herm_esI, hBist b hb, map_zero] at h1
+    rw [hist b hb, GlobalTheory.DegVol.RealMat.herm_smul_right, herm_esI, hBist b hb, map_zero]
+      at h1
     exact (mul_eq_zero.1 h1).resolve_left
       (star_ne_zero.2 (Complex.ofReal_ne_zero.2 (inv_ne_zero (pow_pos hρ _).ne')))
 

@@ -8,7 +8,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.FrameSumBound
@@ -16,17 +18,18 @@ namespace GlobalTheory.FrameSumBound
 def swapIdx {r p : ℕ} (hp : p ≤ r) : Fin (r - p) ⊕ Fin p ≃ Fin r :=
   ((Equiv.sumComm _ _).trans finSumFinEquiv).trans (finCongr (by omega))
 
-theorem swapIdx_inr {r p : ℕ} (hp : p ≤ r) (a : Fin p) :
-    swapIdx hp (Sum.inr a) = Fin.castLE hp a := by
+theorem swapIdx_inr {r p : ℕ} (hp : p ≤ r) (a : Fin p)
+    : swapIdx hp (Sum.inr a) = Fin.castLE hp a := by
   ext; simp [swapIdx]
 
-theorem swapIdx_inl_val {r p : ℕ} (hp : p ≤ r) (a : Fin (r - p)) :
-    ((swapIdx hp (Sum.inl a) : Fin r) : ℕ) = p + a := by
+theorem swapIdx_inl_val {r p : ℕ} (hp : p ≤ r) (a : Fin (r - p))
+    : ((swapIdx hp (Sum.inl a) : Fin r) : ℕ) = p + a := by
   simp [swapIdx]
 
-theorem sgn_submatrix {r p : ℕ} (hp : p ≤ r) :
-    (Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ)).submatrix (swapIdx hp) (swapIdx hp) =
-      -Jf (r - p) p := by
+theorem sgn_submatrix {r p : ℕ} (hp : p ≤ r)
+    : (Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ)).submatrix (swapIdx hp)
+        (swapIdx hp)
+      = - Jf (r - p) p := by
   rw [Matrix.submatrix_diagonal_equiv]
   ext i j
   rcases i with i | i <;> rcases j with j | j
@@ -39,16 +42,19 @@ theorem sgn_submatrix {r p : ℕ} (hp : p ≤ r) :
     · subst h; simp [Jf, swapIdx_inr, sgn]
     · simp [Jf, h, Matrix.one_apply_ne h]
 
-theorem isUpq_submatrix {r p : ℕ} (hp : p ≤ r) {g : Matrix (Fin r) (Fin r) ℂ}
-    (hg : gᵀ * (Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ)) * g.map (starRingEnd ℂ) =
-      Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ)) :
-    IsUpq (g.submatrix (swapIdx hp) (swapIdx hp)) := by
+theorem isUpq_submatrix
+    {r p : ℕ} (hp : p ≤ r)
+    {g : Matrix (Fin r) (Fin r) ℂ}
+    (hg : gᵀ * (Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ)) * g.map (starRingEnd ℂ)
+      = Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ))
+    : IsUpq (g.submatrix (swapIdx hp) (swapIdx hp)) := by
   set J : Matrix (Fin r) (Fin r) ℂ := Matrix.diagonal fun a : Fin r => ((sgn p (a : ℕ) : ℝ) : ℂ) with hJ
   have hJT : Jᵀ = J := Matrix.diagonal_transpose _
   have h1 : gᴴ * J * g = J := by
     have := congrArg Matrix.transpose hg
     rw [Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, hJT,
-      ← Matrix.mul_assoc] at this
+        ← Matrix.mul_assoc]
+      at this
     exact this
   have h2 : Jf (r - p) p = -(J.submatrix (swapIdx hp) (swapIdx hp)) := by
     rw [hJ, sgn_submatrix, neg_neg]
@@ -58,13 +64,14 @@ theorem isUpq_submatrix {r p : ℕ} (hp : p ≤ r) {g : Matrix (Fin r) (Fin r) �
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem isOrth_lact {r : ℕ} (X : Data E r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r}
-    (hx : IsOrth X x) : IsOrth X (lact γ x) := fun τ => by
+theorem isOrth_lact
+    {r : ℕ} (X : Data E r) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) {x : Frame X.Ψ r} (hx : IsOrth X x)
+    : IsOrth X (lact γ x) := fun τ => by
   rw [OntoS.gram_lact X hγ, hx τ]
 
-theorem isUpq_frame {r : ℕ} (X : Data E r) {x0 y : Frame X.Ψ r} (h0 : IsOrth X x0)
-    (hy : IsOrth X y) (τ : X.Ψ) :
-    IsUpq (((mat x0 τ)⁻¹ * mat y τ).submatrix (swapIdx X.p0_le) (swapIdx X.p0_le)) := by
+theorem isUpq_frame
+    {r : ℕ} (X : Data E r) {x0 y : Frame X.Ψ r} (h0 : IsOrth X x0) (hy : IsOrth X y) (τ : X.Ψ)
+    : IsUpq (((mat x0 τ)⁻¹ * mat y τ).submatrix (swapIdx X.p0_le) (swapIdx X.p0_le)) := by
   apply isUpq_submatrix
   have hu : IsUnit (mat x0 τ).det := isUnit_iff_ne_zero.mpr (ExF.det_ne_of_orth X h0 τ)
   have h := hy τ
@@ -72,19 +79,26 @@ theorem isUpq_frame {r : ℕ} (X : Data E r) {x0 y : Frame X.Ψ r} (h0 : IsOrth 
   rw [FrameDegreeData.gram_mul, h0 τ] at h
   exact h
 
-theorem quot_eq {r : ℕ} (X : Data E r) {x0 x : Frame X.Ψ r} (h0 : IsOrth X x0) (hx : IsOrth X x)
-    (γ δ : GL (Fin r) E) (τ : X.Ψ) :
-    ((mat x0 τ)⁻¹ * mat (lact δ x) τ) * ((mat x0 τ)⁻¹ * mat (lact γ x) τ)⁻¹ =
-      (mat x0 τ)⁻¹ * ((δ * γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x0 τ := by
+theorem quot_eq
+    {r : ℕ} (X : Data E r)
+    {x0 x : Frame X.Ψ r} (h0 : IsOrth X x0) (hx : IsOrth X x)
+    (γ δ : GL (Fin r) E) (τ : X.Ψ)
+    : ((mat x0 τ)⁻¹ * mat (lact δ x) τ) * ((mat x0 τ)⁻¹ * mat (lact γ x) τ)⁻¹
+      = (mat x0 τ)⁻¹ * ((δ * γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1
+        * mat x0 τ := by
   have hu0 : IsUnit (mat x0 τ).det := isUnit_iff_ne_zero.mpr (ExF.det_ne_of_orth X h0 τ)
   have hu : IsUnit (mat x τ).det := isUnit_iff_ne_zero.mpr (ExF.det_ne_of_orth X hx τ)
-  have e1 : ∀ γ : GL (Fin r) E,
-      mat (lact γ x) τ = (γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ := fun _ => rfl
-  have hγ : ((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 *
-      (γ : Matrix (Fin r) (Fin r) E).map τ.1 = 1 := by
+  have e1
+      : ∀ γ : GL (Fin r) E, mat (lact γ x) τ = (γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ :=
+    fun _ => rfl
+  have hγ
+      : ((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1
+          * (γ : Matrix (Fin r) (Fin r) E).map τ.1
+        = 1 := by
     rw [← Matrix.map_mul, Units.inv_mul, Matrix.map_one _ (map_zero τ.1) (map_one τ.1)]
-  have hinv : ((mat x0 τ)⁻¹ * mat (lact γ x) τ)⁻¹ =
-      (mat x τ)⁻¹ * (((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x0 τ) := by
+  have hinv
+      : ((mat x0 τ)⁻¹ * mat (lact γ x) τ)⁻¹
+        = (mat x τ)⁻¹ * (((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x0 τ) := by
     apply Matrix.inv_eq_left_inv
     rw [e1]
     simp only [Matrix.mul_assoc]

@@ -37,21 +37,20 @@ private lemma prime_C_powerSeries {A : Type} [CommRing A] [IsDomain A] {ϖ : A} 
     rw [C_dvd_iff_map_mk_eq_zero, map_mul] at h
     exact mul_eq_zero.mp h
 
-
 open scoped LaurentSeries in
 open PowerSeries in
-theorem _root_.GlobalTheory.PowerSeriesNoPole.exists_eq_algebraMap (A : Type) [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A]
-    (ϖ : A) (hϖ : Irreducible ϖ) (k : A →+* ℂ) (hk : Function.Injective k)
+theorem _root_.GlobalTheory.PowerSeriesNoPole.exists_eq_algebraMap
+    (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (ϖ : A) (hϖ : Irreducible ϖ)
+    (k : A →+* ℂ) (hk : Function.Injective k)
     (S : Type) [CommRing S] [Algebra (PowerSeries A) S]
     [IsLocalization.Away (PowerSeries.C ϖ * PowerSeries.X : PowerSeries A) S]
     (ι : S →+* ℂ⸨X⸩)
     (hι : ∀ s : PowerSeries A,
       ι (algebraMap _ S s) = HahnSeries.ofPowerSeries ℤ ℂ (PowerSeries.map k s))
     (v : S) (hv : ι v ∈ (HahnSeries.ofPowerSeries ℤ ℂ).range)
-    (hst : ∃ s t : PowerSeries A, ¬ PowerSeries.C ϖ ∣ t ∧
-      v * algebraMap _ S t = algebraMap _ S s) :
-    ∃ s : PowerSeries A, v = algebraMap _ S s := by
+    (hst : ∃ s t : PowerSeries A, ¬ PowerSeries.C ϖ ∣ t ∧ v * algebraMap _ S t = algebraMap _ S s)
+    : ∃ s : PowerSeries A, v = algebraMap _ S s := by
   obtain ⟨s, t, ht, hvt⟩ := hst
   obtain ⟨n, a, ha⟩ := IsLocalization.Away.surj (C ϖ * X : PowerSeries A) v
   rw [← map_pow] at ha

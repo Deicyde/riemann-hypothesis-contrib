@@ -19,12 +19,12 @@ section Spec
 
 variable {R : CommRingCat.{u}} {M N : (Spec (.of R)).Modules} (ψ : M ⟶ N)
 
-def cokernelTildeIso (hM : IsIso M.fromTildeΓ) (hN : IsIso N.fromTildeΓ) :
-    (tilde.functor R).obj (cokernel (moduleSpecΓFunctor.map ψ)) ≅ cokernel ψ :=
+def cokernelTildeIso (hM : IsIso M.fromTildeΓ) (hN : IsIso N.fromTildeΓ)
+    : (tilde.functor R).obj (cokernel (moduleSpecΓFunctor.map ψ)) ≅ cokernel ψ :=
   let p : (moduleSpecΓFunctor ⋙ tilde.functor R).obj M ≅ M := @asIso _ _ _ _ M.fromTildeΓ hM
   let q : (moduleSpecΓFunctor ⋙ tilde.functor R).obj N ≅ N := @asIso _ _ _ _ N.fromTildeΓ hN
-  PreservesCokernel.iso (tilde.functor R) (moduleSpecΓFunctor.map ψ) ≪≫
-    cokernel.mapIso ((moduleSpecΓFunctor ⋙ tilde.functor R).map ψ) ψ p q
+  PreservesCokernel.iso (tilde.functor R) (moduleSpecΓFunctor.map ψ)
+    ≪≫ cokernel.mapIso ((moduleSpecΓFunctor ⋙ tilde.functor R).map ψ) ψ p q
       (Scheme.Modules.fromTildeΓNatTrans.naturality ψ)
 
 lemma cokernelTildeIso_comm (hM : IsIso M.fromTildeΓ) (hN : IsIso N.fromTildeΓ) :
@@ -93,9 +93,10 @@ lemma isQuasicoherent_restrict_cokernel [F.IsQuasicoherent] [G.IsQuasicoherent] 
   exact (SheafOfModules.isQuasicoherent (Spec Γ(X, U)).ringCatSheaf).prop_of_iso
     (PreservesCokernel.iso Rf φ).symm h
 
-instance isQuasicoherent_cokernel [F.IsQuasicoherent] [G.IsQuasicoherent] :
-    (cokernel φ).IsQuasicoherent :=
-  isQuasicoherent_of_restrict (cokernel φ) (fun U : X.affineOpens => (U : X.Opens))
+instance isQuasicoherent_cokernel [F.IsQuasicoherent] [G.IsQuasicoherent]
+    : (cokernel φ).IsQuasicoherent :=
+  isQuasicoherent_of_restrict (cokernel φ)
+    (fun U : X.affineOpens => (U : X.Opens))
     (iSup_affineOpens_eq_top X)
     fun U => nonempty_presentation_restrict _ U.2 (isQuasicoherent_restrict_cokernel φ U.2)
 
@@ -113,15 +114,15 @@ lemma surjective_cokernel_π_app [F.IsQuasicoherent] [G.IsQuasicoherent] {U : X.
   rw [← fromSpec_image_top hU]
   exact h3
 
-theorem isCoherent_cokernel [F.IsQuasicoherent] (hG : IsCoherent G) :
-    IsCoherent (cokernel φ) := by
+theorem isCoherent_cokernel [F.IsQuasicoherent] (hG : IsCoherent G) : IsCoherent (cokernel φ) := by
   have := hG.1
   refine ⟨inferInstance, fun U hU => ?_⟩
   have := hG.2 U hU
-  let π' : Γ(G, U) →ₗ[Γ(X, U)] Γ(cokernel φ, U) :=
-    { toFun := (cokernel.π φ).app U
-      map_add' := map_add _
-      map_smul' := Scheme.Modules.Hom.app_smul _ }
+  let π' : Γ(G, U) →ₗ[Γ(X, U)] Γ(cokernel φ, U) := {
+    toFun := (cokernel.π φ).app U
+    map_add' := map_add _
+    map_smul' := Scheme.Modules.Hom.app_smul _
+  }
   exact Module.Finite.of_surjective π' (surjective_cokernel_π_app φ hU)
 
 end Scheme
@@ -143,15 +144,13 @@ def coimCokSC : ShortComplex C :=
     rw [← cancel_epi (Abelian.coimage.π α), ← Category.assoc, Abelian.coimage.fac, comp_zero,
       cokernel.condition])
 
-def coimCokIsColimit :
-    IsColimit (CokernelCofork.ofπ (f := Abelian.factorThruCoimage α) (cokernel.π α)
+def coimCokIsColimit
+    : IsColimit (CokernelCofork.ofπ (f := Abelian.factorThruCoimage α) (cokernel.π α)
       (coimCokSC α).zero) :=
   CokernelCofork.IsColimit.ofπ _ _
-    (fun b hb => cokernel.desc α b (by
-      rw [← Abelian.coimage.fac α, Category.assoc, hb, comp_zero]))
+    (fun b hb => cokernel.desc α b (by rw [← Abelian.coimage.fac α, Category.assoc, hb, comp_zero]))
     (fun b hb => cokernel.π_desc _ _ _)
-    (fun b hb m hm => by
-      exact (cancel_epi (cokernel.π α)).1 (by rw [hm, cokernel.π_desc]))
+    (fun b hb m hm => by exact (cancel_epi (cokernel.π α)).1 (by rw [hm, cokernel.π_desc]))
 
 lemma coimCokSC_shortExact : (coimCokSC α).ShortExact :=
   ShortComplex.ShortExact.mk' ((coimCokSC α).exact_of_g_is_cokernel (coimCokIsColimit α))

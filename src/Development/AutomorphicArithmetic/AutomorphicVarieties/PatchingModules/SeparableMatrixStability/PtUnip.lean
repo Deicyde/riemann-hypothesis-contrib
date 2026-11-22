@@ -6,10 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem chi_ofRep_single {n : ℕ} {A G : Type} [CommRing A] [Group G] (ρ : G →* Matrix (Fin n) (Fin n) A) (g : G) :
-    (GDet.ofRep ρ).chi (MonoidAlgebra.single g 1) = (ρ g).charpoly := by
+private theorem chi_ofRep_single
+    {n : ℕ} {A G : Type} [CommRing A] [Group G] (ρ : G →* Matrix (Fin n) (Fin n) A) (g : G)
+    : (GDet.ofRep ρ).chi (MonoidAlgebra.single g 1) = (ρ g).charpoly := by
   change (GDet.repAlg ρ (Polynomial A) _).det = _
   rw [map_sub, MonoidAlgebra.mapRingHom_single, Matrix.charpoly, Matrix.charmatrix]
   congr 2
@@ -18,8 +20,11 @@ private theorem chi_ofRep_single {n : ℕ} {A G : Type} [CommRing A] [Group G] (
   · ext1 a b
     simp [GDet.repAlg]
 
-private theorem kills_max {B K : Type} [CommRing B] [IsLocalRing B] [Field K] [Finite K] (g : B →+* K) (b : B)
-    (hb : b ∈ maximalIdeal B) : g b = 0 := by
+private theorem kills_max
+    {B K : Type} [CommRing B] [IsLocalRing B] [Field K] [Finite K]
+    (g : B →+* K)
+    (b : B) (hb : b ∈ maximalIdeal B)
+    : g b = 0 := by
   by_contra h
   haveI := Fintype.ofFinite K
   have h1 := FiniteField.pow_card_sub_one_eq_one (g b) h
@@ -30,12 +35,17 @@ private theorem kills_max {B K : Type} [CommRing B] [IsLocalRing B] [Field K] [F
   rw [map_sub, map_one, map_pow, h1, sub_self] at h4
   exact not_isUnit_zero h4
 
-theorem UpperTheory.V.Pa.pt_unip :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (n : ℕ) (O : Type) [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (r : Resid G0.frame O n) (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B) (D0 : ℕ) (P : Pt T u D0), Adapted T (r := r) → P.x.UnipOn T.H.toSubgroup := by
+theorem UpperTheory.V.Pa.pt_unip
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (n : ℕ) (O : Type)
+        [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (r : Resid G0.frame O n) (B : Type)
+        [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B) (D0 : ℕ) (P : Pt T u D0),
+      Adapted T (r := r) → P.x.UnipOn T.H.toSubgroup := by
   intro l _ L G0 T n O _ _ _ r B _ _ _ u D0 P hA
   refine UpperTheory.V.Pa.unip_of l G0.frame n P.x _ fun h hh => ?_
-  have key : ∀ {C : Type} [CommRing C] (f : B →+* C), (u.D.map f).chi (MonoidAlgebra.single h 1) =
-      (u.D.chi (MonoidAlgebra.single h 1)).map f := fun f => by
+  have key
+      : ∀ {C : Type} [CommRing C] (f : B →+* C),
+        (u.D.map f).chi (MonoidAlgebra.single h 1)
+          = (u.D.chi (MonoidAlgebra.single h 1)).map f := fun f => by
     have := ((UpperTheory.V.CA.d_gmap u.D).2.2.1 f (MonoidAlgebra.single h 1)).1
     rwa [MonoidAlgebra.mapRingHom_single, map_one] at this
   have h1 := key P.f.toRingHom
@@ -46,11 +56,16 @@ theorem UpperTheory.V.Pa.pt_unip :
     change Matrix.diagonal (fun i => ((r.chib i h : (ResidueField O)ˣ) : ResidueField O)) = 1
     simp [hA.1 h hh]
   rw [h3, Matrix.charpoly_one, Fintype.card_fin] at h2
-  have h4 : (u.D.chi (MonoidAlgebra.single h 1) - (Polynomial.X - 1) ^ n).map (res O B : B →+* ResidueField O) = 0 := by
+  have h4
+      : (u.D.chi (MonoidAlgebra.single h 1) - (Polynomial.X - 1) ^ n).map
+          (res O B : B →+* ResidueField O)
+        = 0 := by
     rw [Polynomial.map_sub, ← h2]
     simp
-  have h5 : (u.D.chi (MonoidAlgebra.single h 1) - (Polynomial.X - 1) ^ n).map
-      ((PowerSeries.constantCoeff : P.x.A →+* P.x.K).comp P.f.toRingHom) = 0 := by
+  have h5
+      : (u.D.chi (MonoidAlgebra.single h 1) - (Polynomial.X - 1) ^ n).map
+          ((PowerSeries.constantCoeff : P.x.A →+* P.x.K).comp P.f.toRingHom)
+        = 0 := by
     ext k
     rw [Polynomial.coeff_map, Polynomial.coeff_zero]
     refine kills_max _ _ ((res_eq_zero_iff O B _).1 ?_)

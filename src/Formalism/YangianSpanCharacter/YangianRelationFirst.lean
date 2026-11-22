@@ -14,6 +14,7 @@ public import Formalism.YangianSpanCharacter.ExchangeGen
 
 namespace Formalism.YangianSpanCharacter.Final
 
-theorem T_PlaneWave : Formalism.YangianSpanCharacter.T.PlaneWave := Formalism.YangianSpanCharacter.P.planeWaveIntertwining
+theorem T_PlaneWave : Formalism.YangianSpanCharacter.T.PlaneWave :=
+  Formalism.YangianSpanCharacter.P.planeWaveIntertwining
 
 end Formalism.YangianSpanCharacter.Final

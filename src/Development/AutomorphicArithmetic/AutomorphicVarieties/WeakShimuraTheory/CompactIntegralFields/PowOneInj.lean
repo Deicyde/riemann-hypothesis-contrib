@@ -6,11 +6,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 section SlopeTestRemainingChoices
 
-variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c}
+variable
+  {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [Fact l.Prime]
+  {c : Coef l} {D : Raw Ω c}
 
 private theorem charP_res (c : Coef l) : CharP (ResidueField c.O) l := by
   haveI := c.dvr
@@ -43,16 +48,21 @@ private theorem resQ_mem (F : IntermediateField ℚ Ω) (g : G F Ω) : resQ F g 
   rw [IntermediateField.mem_fixingSubgroup_iff]
   exact fun x hx => g.commutes ⟨x, hx⟩
 
-private theorem dec_resLe {F F' : IntermediateField ℚ Ω} (h : F ≤ F') (A : ValuationSubring Ω) (g : G F' Ω) :
-    resLe h g ∈ Dec (F := F) A ↔ g ∈ Dec (F := F') A := Iff.rfl
+private theorem dec_resLe
+    {F F' : IntermediateField ℚ Ω} (h : F ≤ F') (A : ValuationSubring Ω) (g : G F' Ω)
+    : resLe h g ∈ Dec (F := F) A ↔ g ∈ Dec (F := F') A :=
+  Iff.rfl
 
-private theorem ine_resLe {F F' : IntermediateField ℚ Ω} [NumberField F] [NumberField F'] (h : F ≤ F')
-    (A : ValuationSubring Ω) (g : G F' Ω) :
-    resLe h g ∈ Ine (F := F) A ↔ g ∈ Ine (F := F') A := Iff.rfl
+private theorem ine_resLe
+    {F F' : IntermediateField ℚ Ω} [NumberField F] [NumberField F']
+    (h : F ≤ F') (A : ValuationSubring Ω) (g : G F' Ω)
+    : resLe h g ∈ Ine (F := F) A ↔ g ∈ Ine (F := F') A :=
+  Iff.rfl
 
 variable {T T' : Tower D}
 
-private theorem up (h : T.Le T') : ∃ j : ℕ, ∀ g : G T.F Ω, ∃ g' : G T'.F Ω, resLe h.le g' = g ^ l ^ j := by
+private theorem up (h : T.Le T')
+    : ∃ j : ℕ, ∀ g : G T.F Ω, ∃ g' : G T'.F Ω, resLe h.le g' = g ^ l ^ j := by
   obtain ⟨j, hj⟩ := h.pow
   refine ⟨j, fun g => ?_⟩
   have hm := hj _ (resQ_mem T.F g)
@@ -60,31 +70,38 @@ private theorem up (h : T.Le T') : ∃ j : ℕ, ∀ g : G T.F Ω, ∃ g' : G T'.
   ext x
   simp [resLe, IntermediateField.fixingSubgroupEquiv, map_pow]
 
-private theorem rb_resLe (h : T.Le T') (w : ℤ × ℤ) (g : G T'.F Ω) : T'.rb w g = T.rb w (resLe h.le g) := by
+private theorem rb_resLe (h : T.Le T') (w : ℤ × ℤ) (g : G T'.F Ω)
+    : T'.rb w g = T.rb w (resLe h.le g) := by
   simp only [Tower.rb, Tower.fr, Fr.rt, h.pr]
   rfl
 
 private theorem rb_pow (w : ℤ × ℤ) (g : G T.F Ω) (n : ℕ) : T.rb w (g ^ n) = T.rb w g ^ n := by
   simp only [Tower.rb, map_pow, Units.val_pow_eq_pow_val]
 
-private theorem bar_pow (γ : G ℚ Ω →* c.Oˣ) (g : G ℚ Ω) (n : ℕ) : Raw.bar γ (g ^ n) = Raw.bar γ g ^ n := by
+private theorem bar_pow (γ : G ℚ Ω →* c.Oˣ) (g : G ℚ Ω) (n : ℕ)
+    : Raw.bar γ (g ^ n) = Raw.bar γ g ^ n := by
   simp only [Raw.bar, map_pow, Units.val_pow_eq_pow_val]
 
 private theorem galL_resLe (h : T.Le T') (g : G T'.F Ω) : resLe h.le g ∈ T.GalL ↔ g ∈ T'.GalL := by
   simp only [Tower.GalL, Subgroup.mem_comap, h.K]
   rfl
 
-private theorem g3'_up (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok) (η : T'.GalL →* (ResidueField c.O)ˣ) (h2 : η ^ 2 = 1)
-    (hom : ∀ g : T'.GalL, D.om (resQ T'.F g) = 1 → η g = 1)
-    (hperm : ∀ i, ∃ j, ∀ g : T'.GalL, η g * Raw.bar (chi D T'.pr i) (resQ T'.F g) =
-      Raw.bar (chi D T'.pr j) (resQ T'.F g)) : η = 1 := by
+private theorem g3'_up
+    (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok)
+    (η : T'.GalL →* (ResidueField c.O)ˣ)
+    (h2 : η ^ 2 = 1) (hom : ∀ g : T'.GalL, D.om (resQ T'.F g) = 1 → η g = 1)
+    (hperm : ∀ i, ∃ j, ∀ g : T'.GalL,
+      η g * Raw.bar (chi D T'.pr i) (resQ T'.F g) = Raw.bar (chi D T'.pr j) (resQ T'.F g))
+    : η = 1 := by
   obtain ⟨k, hk⟩ := up h
   have L : ∀ u : (ResidueField c.O)ˣ, u ^ l ^ k = 1 → u = 1 := fun u hu =>
     Units.ext (pow_one_inj k (by rw [← Units.val_pow_eq_pow_val, hu, Units.val_one]))
   let φ : Fin 4 → T.GalL →* (ResidueField c.O)ˣ := fun m =>
-    (Units.map (residue c.O).toMonoidHom).comp ((chi D T.pr m).comp ((resQ T.F).comp T.GalL.subtype))
+    (Units.map (residue c.O).toMonoidHom).comp
+      ((chi D T.pr m).comp ((resQ T.F).comp T.GalL.subtype))
   let φ' : Fin 4 → T'.GalL →* (ResidueField c.O)ˣ := fun m =>
-    (Units.map (residue c.O).toMonoidHom).comp ((chi D T.pr m).comp ((resQ T'.F).comp T'.GalL.subtype))
+    (Units.map (residue c.O).toMonoidHom).comp
+      ((chi D T.pr m).comp ((resQ T'.F).comp T'.GalL.subtype))
   have hφ : ∀ m (g : T'.GalL), φ m ⟨resLe h.le g, (galL_resLe h g).2 g.2⟩ = φ' m g := fun _ _ => rfl
   have hperm' : ∀ i, ∃ j, ∀ g : T'.GalL, η g * φ' i g = φ' j g := by
     intro i
@@ -93,8 +110,9 @@ private theorem g3'_up (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok) (η : T'.GalL �
     have hj' := hj g
     rw [h.pr] at hj'
     simpa [φ', Raw.bar] using hj'
-  have lift : ∀ g : T.GalL, ∃ g' : T'.GalL, ∀ m, φ m g ^ l ^ k = φ' m g' ∧
-      (D.om (resQ T.F g) = 1 → D.om (resQ T'.F g') = 1) := by
+  have lift
+      : ∀ g : T.GalL, ∃ g' : T'.GalL, ∀ m,
+        φ m g ^ l ^ k = φ' m g' ∧ (D.om (resQ T.F g) = 1 → D.om (resQ T'.F g') = 1) := by
     intro g
     obtain ⟨g', hg'⟩ := hk g
     have hm : g' ∈ T'.GalL := (galL_resLe h g').1 (by rw [hg']; exact pow_mem g.2 _)
@@ -131,13 +149,15 @@ private theorem g3'_up (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok) (η : T'.GalL �
         obtain ⟨g', hg'⟩ := lift g
         have hu : η₀ g * φ i g / φ i' g = 1 := by
           apply L
-          rw [div_pow, mul_pow, C g g' (fun m => (hg' m).1), (hg' i).1, (hg' i').1, hi' g', div_self']
+          rw [div_pow, mul_pow, C g g' (fun m => (hg' m).1), (hg' i).1, (hg' i').1, hi' g',
+            div_self']
         exact div_eq_one.1 hu
       have := congrArg Units.val key
       simpa [φ, Raw.bar] using this
   refine MonoidHom.ext fun g => ?_
   rw [hη g, MonoidHom.one_apply, div_eq_one, ← hφ, ← hφ]
-  have := congrArg (fun f : T.GalL →* (ResidueField c.O)ˣ => f ⟨resLe h.le g, (galL_resLe h g).2 g.2⟩) h0
+  have :=
+    congrArg (fun f : T.GalL →* (ResidueField c.O)ˣ => f ⟨resLe h.le g, (galL_resLe h g).2 g.2⟩) h0
   simp only [hη₀, MonoidHom.one_apply, div_eq_one] at this
   exact this
 
@@ -147,9 +167,21 @@ private theorem ok_up (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok) : T'.Ok := by
   have liftL : ∀ g ∈ T.GalL, ∃ g' ∈ T'.GalL, resLe h.le g' = g ^ l ^ k := fun g hg => by
     obtain ⟨g', hg'⟩ := hk g
     exact ⟨g', (galL_resLe h g').1 (by rw [hg']; exact pow_mem hg _), hg'⟩
-  refine
-    { lab := ?_, even := ?_, unr := ?_, split := ?_, g2 := ?_, g3 := ?_, g3' := ?_, ord := ?_,
-      kb := ?_, kc := ?_, ineL := ?_, dist := ?_, locL := ?_ }
+  refine {
+    lab := ?_
+    even := ?_
+    unr := ?_
+    split := ?_
+    g2 := ?_
+    g3 := ?_
+    g3' := ?_
+    ord := ?_
+    kb := ?_
+    kc := ?_
+    ineL := ?_
+    dist := ?_
+    locL := ?_
+  }
   · rw [h.pr]
     exact ho.lab
   · obtain ⟨n, hn⟩ := IntermediateField.finrank_dvd_of_le_right h.le
@@ -196,19 +228,30 @@ private theorem ok_up (hl : l ≠ 2) (h : T.Le T') (ho : T.Ok) : T'.Ok := by
     rcases ho.locL A hA with ⟨g, hg, hne⟩ | ⟨g, hg, h1, h2, h3⟩
     · obtain ⟨g', hg'⟩ := hk g
       left
-      refine ⟨g', (ine_resLe h.le A g').1 (by rw [hg']; exact pow_mem hg _), fun heq => hne (L1 _ ?_)⟩
+      refine
+        ⟨g', (ine_resLe h.le A g').1 (by rw [hg']; exact pow_mem hg _), fun heq => hne (L1 _ ?_)⟩
       rw [← bar_pow, ← map_pow (resQ T.F), ← hg']
       exact heq
     · obtain ⟨g', hg'⟩ := hk g
       right
       refine ⟨g', (dec_resLe h.le A g').1 (by rw [hg']; exact pow_mem hg _), ?_, ?_, ?_⟩
-      · rw [show resQ T'.F g' = resQ T.F (resLe h.le g') from rfl, hg', map_pow, bar_pow, h1, one_pow]
+      · rw [show resQ T'.F g' = resQ T.F (resLe h.le g') from rfl, hg', map_pow, bar_pow, h1,
+          one_pow]
       · rw [rb_resLe h, hg', rb_pow, h2, one_pow]
       · exact fun heq => h3 (L1 _ (by rw [← rb_pow, ← hg', ← rb_resLe h]; exact heq))
 
 private theorem two_up (h : T.Le T') (ht : T.Two) : T'.Two := by
   obtain ⟨j, hj⟩ := up h
-  refine ⟨fun g => ?_, fun A g hg => ?_, fun A hA g hg => ?_, ?_, ht.ord, ht.xi, fun A hA => ?_, fun A hA => ?_⟩
+  refine ⟨
+    fun g => ?_,
+    fun A g hg => ?_,
+    fun A hA g hg => ?_,
+    ?_,
+    ht.ord,
+    ht.xi,
+    fun A hA => ?_,
+    fun A hA => ?_
+  ⟩
   · rw [rb_resLe h]
     exact ht.sq _
   · rw [rb_resLe h]
@@ -233,16 +276,31 @@ private theorem three_up (h : T.Le T') (ht : T.Three) : T'.Three :=
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Ws.leFit :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ T T' : Tower D, T.Le T' → (T.Ok → T'.Ok) ∧ (T.Two → T'.Two) ∧ (T.Three → T'.Three) ∧ (T.Deep → T'.Deep) ∧ (T.Fit → T'.Fit) ∧
-      T.Le T ∧ ∀ T'' : Tower D, T'.Le T'' → T.Le T'' := by
+theorem UpperTheory.V.Ws.leFit
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ T T' : Tower D,
+          T.Le T'
+            → (T.Ok → T'.Ok) ∧ (T.Two → T'.Two) ∧ (T.Three → T'.Three) ∧ (T.Deep → T'.Deep)
+              ∧ (T.Fit → T'.Fit) ∧ T.Le T ∧ ∀ T'' : Tower D, T'.Le T'' → T.Le T'' := by
   intro Ω _ _ _ l _ c D hD T T' h
-  refine ⟨ok_up hD.l_odd h, two_up h, three_up h, ?_, ?_, ⟨rfl, rfl, le_rfl, ⟨0, fun g hg => by simpa using hg⟩, ⟨0, by simp⟩⟩,
-    fun T'' h' => ⟨h'.pr.trans h.pr, h'.K.trans h.K, h.le.trans h'.le, ?_, ?_⟩⟩
+  refine ⟨
+    ok_up hD.l_odd h,
+    two_up h,
+    three_up h,
+    ?_,
+    ?_,
+    ⟨rfl, rfl, le_rfl, ⟨0, fun g hg => by simpa using hg⟩, ⟨0, by simp⟩⟩,
+    fun T'' h' => ⟨h'.pr.trans h.pr, h'.K.trans h.K, h.le.trans h'.le, ?_, ?_⟩
+  ⟩
   · rintro ⟨m, hm, hk⟩
     exact ⟨m, hm, fun g => hk (resLe h.le g)⟩
   · rintro ⟨ho, hc⟩
-    exact ⟨ok_up hD.l_odd h ho, hc.imp (fun a => ⟨a.1, two_up h a.2⟩) fun a => ⟨a.1, a.2.five, a.2.sb, a.2.psi⟩⟩
+    exact ⟨
+      ok_up hD.l_odd h ho,
+      hc.imp (fun a => ⟨a.1, two_up h a.2⟩) fun a => ⟨a.1, a.2.five, a.2.sb, a.2.psi⟩
+    ⟩
   · obtain ⟨j, hj⟩ := h.pow
     obtain ⟨k, hk⟩ := h'.pow
     exact ⟨j + k, fun g hg => by rw [pow_add, pow_mul]; exact hk _ (hj g hg)⟩

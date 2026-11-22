@@ -16,9 +16,11 @@ namespace UnramifiedEndFlat
 
 open IsLocalRing
 
-theorem flat_of_map_maximalIdeal_self {A : Type*} [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
-    (φ : A →+* A) (hm : (maximalIdeal A).map φ = maximalIdeal A)
-    (h₀ : ∀ b, ∃ a, φ a - b ∈ maximalIdeal A) : φ.Flat := by
+theorem flat_of_map_maximalIdeal_self
+    {A : Type*} [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+    (φ : A →+* A)
+    (hm : (maximalIdeal A).map φ = maximalIdeal A) (h₀ : ∀ b, ∃ a, φ a - b ∈ maximalIdeal A)
+    : φ.Flat := by
   have hle : maximalIdeal A ≤ (maximalIdeal A).comap φ := Ideal.le_comap_of_map_le hm.le
   refine flat_of_surjective_quotient_sq (maximalIdeal_le_jacobson _) hle h₀ fun y hy => ?_
   rw [← hm, Ideal.map] at hy
@@ -26,7 +28,8 @@ theorem flat_of_map_maximalIdeal_self {A : Type*} [CommRing A] [IsLocalRing A] [
   | mem y hy =>
     obtain ⟨x, hx, rfl⟩ := hy
     exact ⟨x, hx, by simp⟩
-  | zero => exact ⟨0, zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, zero_mem _, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨a, ha, hay⟩ := hy
     obtain ⟨b, hb, hbz⟩ := hz
@@ -37,16 +40,17 @@ theorem flat_of_map_maximalIdeal_self {A : Type*} [CommRing A] [IsLocalRing A] [
     obtain ⟨a, ha, hay⟩ := hy
     obtain ⟨d, hd⟩ := h₀ c
     refine ⟨d * a, Ideal.mul_mem_left _ _ ha, ?_⟩
-    rw [show φ (d * a) - c • y = (φ d - c) * φ a + c * (φ a - y) by
-      rw [map_mul, smul_eq_mul]; ring]
+    rw [show φ (d * a) - c • y = (φ d - c) * φ a + c * (φ a - y) by rw [map_mul, smul_eq_mul]; ring]
     refine add_mem ?_ (Ideal.mul_mem_left _ _ hay)
     rw [pow_two]
     exact Ideal.mul_mem_mul hd (hle ha)
 
-theorem flat_of_map_maximalIdeal {A B : Type*} [CommRing A] [CommRing B] [IsLocalRing A]
-    [IsLocalRing B] [IsNoetherianRing A] (e : B ≃+* A)
-    (φ : A →+* B) (hm : (maximalIdeal A).map φ = maximalIdeal B)
-    (h₀ : ∀ b, ∃ a, φ a - b ∈ maximalIdeal B) : φ.Flat := by
+theorem flat_of_map_maximalIdeal
+    {A B : Type*} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B] [IsNoetherianRing A]
+    (e : B ≃+* A)
+    (φ : A →+* B)
+    (hm : (maximalIdeal A).map φ = maximalIdeal B) (h₀ : ∀ b, ∃ a, φ a - b ∈ maximalIdeal B)
+    : φ.Flat := by
   have he : (maximalIdeal B).map (e : B →+* A) = maximalIdeal A :=
     map_maximalIdeal_of_surjective _ e.surjective
   have h : ((e : B →+* A).comp φ).Flat := by
@@ -61,9 +65,11 @@ theorem flat_of_map_maximalIdeal {A B : Type*} [CommRing A] [CommRing B] [IsLoca
   ext x
   simp
 
-theorem flat_iff_comp_germ {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) {x : X}
-    (hx : x ∈ U) {C : CommRingCat.{0}} (g : X.presheaf.stalk x ⟶ C) :
-    g.hom.Flat ↔ (X.presheaf.germ U x hx ≫ g).hom.Flat := by
+theorem flat_iff_comp_germ
+    {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U)
+    {x : X} (hx : x ∈ U)
+    {C : CommRingCat.{0}} (g : X.presheaf.stalk x ⟶ C)
+    : g.hom.Flat ↔ (X.presheaf.germ U x hx ≫ g).hom.Flat := by
   letI := X.presheaf.algebra_section_stalk (⟨x, hx⟩ : U)
   haveI := hU.isLocalization_stalk ⟨x, hx⟩
   letI := g.hom.toAlgebra
@@ -72,16 +78,17 @@ theorem flat_iff_comp_germ {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) 
   exact Module.flat_iff_of_isLocalization (X.presheaf.stalk x)
     (hU.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl C
 
-theorem flat_stalkSpecializes {X : Scheme.{0}} {x x' : X} (h : x ⤳ x') :
-    (X.presheaf.stalkSpecializes h).hom.Flat := by
+theorem flat_stalkSpecializes {X : Scheme.{0}} {x x' : X} (h : x ⤳ x')
+    : (X.presheaf.stalkSpecializes h).hom.Flat := by
   obtain ⟨_, ⟨U, hU, rfl⟩, hx', -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x') isOpen_univ
   rw [flat_iff_comp_germ hU hx', TopCat.Presheaf.germ_stalkSpecializes,
     ← Category.comp_id (X.presheaf.germ U x _), ← flat_iff_comp_germ hU]
   exact RingHom.Flat.id _
 
-theorem flat_stalkMap_of_specializes {X Y : Scheme.{0}} (f : X ⟶ Y) {x x' : X} (h : x ⤳ x')
-    (hf : (f.stalkMap x').hom.Flat) : (f.stalkMap x).hom.Flat := by
+theorem flat_stalkMap_of_specializes
+    {X Y : Scheme.{0}} (f : X ⟶ Y) {x x' : X} (h : x ⤳ x') (hf : (f.stalkMap x').hom.Flat)
+    : (f.stalkMap x).hom.Flat := by
   obtain ⟨_, ⟨U, hU, rfl⟩, hx', -⟩ :=
     Y.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (f x')) isOpen_univ
   have h' : f x ⤳ f x' := h.map f.continuous
@@ -90,18 +97,24 @@ theorem flat_stalkMap_of_specializes {X Y : Scheme.{0}} (f : X ⟶ Y) {x x' : X}
     Scheme.Hom.stalkSpecializes_stalkMap f x x' h, ← flat_iff_comp_germ hU hx']
   exact hf.comp (flat_stalkSpecializes h)
 
-theorem flat_of_closedPoints {X Y : Scheme.{0}} [JacobsonSpace X] (f : X ⟶ Y)
-    (hf : ∀ x : X, IsClosed {x} → (f.stalkMap x).hom.Flat) : Flat f := by
+theorem flat_of_closedPoints
+    {X Y : Scheme.{0}} [JacobsonSpace X]
+    (f : X ⟶ Y) (hf : ∀ x : X, IsClosed {x} → (f.stalkMap x).hom.Flat)
+    : Flat f := by
   refine Flat.of_stalkMap f fun x => ?_
-  obtain ⟨y, hy, hyc⟩ := nonempty_inter_closedPoints (Z := closure {x})
-    ⟨x, subset_closure rfl⟩ isClosed_closure.isLocallyClosed
+  obtain ⟨y, hy, hyc⟩ :=
+    nonempty_inter_closedPoints (Z := closure {x}) ⟨x, subset_closure rfl⟩
+      isClosed_closure.isLocallyClosed
   exact flat_stalkMap_of_specializes f (specializes_iff_mem_closure.mpr hy) (hf y hyc)
 
-theorem residueFieldMap_surjective {k : Type} [Field k] [IsAlgClosed k] {X Y : Scheme.{0}}
-    (f : X ⟶ Y) (g : Y ⟶ Spec (.of k)) [LocallyOfFiniteType (f ≫ g)] (x : X)
-    (hx : IsClosed {x}) : Function.Surjective (f.residueFieldMap x) := by
-  have h : (residueFieldIsoBase (f ≫ g) x hx).inv =
-      Spec.preimage (Y.fromSpecResidueField (f x) ≫ g) ≫ f.residueFieldMap x := by
+theorem residueFieldMap_surjective
+    {k : Type} [Field k] [IsAlgClosed k]
+    {X Y : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ Spec (.of k)) [LocallyOfFiniteType (f ≫ g)]
+    (x : X) (hx : IsClosed {x})
+    : Function.Surjective (f.residueFieldMap x) := by
+  have h
+      : (residueFieldIsoBase (f ≫ g) x hx).inv
+        = Spec.preimage (Y.fromSpecResidueField (f x) ≫ g) ≫ f.residueFieldMap x := by
     apply Spec.map_injective
     simp
   have h2 : Function.Surjective (residueFieldIsoBase (f ≫ g) x hx).inv :=
@@ -109,10 +122,13 @@ theorem residueFieldMap_surjective {k : Type} [Field k] [IsAlgClosed k] {X Y : S
   rw [h] at h2
   exact Function.Surjective.of_comp (g := Spec.preimage (Y.fromSpecResidueField (f x) ≫ g)) h2
 
-theorem flat_stalkMap_of_fixed {k : Type} [Field k] [IsAlgClosed k] {X : Scheme.{0}}
-    (f : X ⟶ X) (g : X ⟶ Spec (.of k)) [LocallyOfFiniteType g] (hfg : f ≫ g = g)
-    [FormallyUnramified f] (x : X) (hx : IsClosed {x}) (hfx : f x = x) :
-    (f.stalkMap x).hom.Flat := by
+theorem flat_stalkMap_of_fixed
+    {k : Type} [Field k] [IsAlgClosed k]
+    {X : Scheme.{0}} (f : X ⟶ X) (g : X ⟶ Spec (.of k)) [LocallyOfFiniteType g]
+    (hfg : f ≫ g = g)
+    [FormallyUnramified f]
+    (x : X) (hx : IsClosed {x}) (hfx : f x = x)
+    : (f.stalkMap x).hom.Flat := by
   have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian g
   have : LocallyOfFiniteType (f ≫ g) := by rw [hfg]; infer_instance
   have : LocallyOfFiniteType f := locallyOfFiniteType_of_comp f g
@@ -131,11 +147,13 @@ theorem flat_stalkMap_of_fixed {k : Type} [Field k] [IsAlgClosed k] {X : Scheme.
 
 end UnramifiedEndFlat
 
-
 open UnramifiedEndFlat in
-theorem flat_of_formallyUnramified_grpEnd (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k))
-    [GrpObj G] (φ : G ⟶ G) (hG : LocallyOfFiniteType G.hom) (hφ : IsMonHom φ)
-    (hu : FormallyUnramified φ.left) : Flat φ.left := by
+theorem flat_of_formallyUnramified_grpEnd
+    (k : Type) [Field k] [IsAlgClosed k]
+    (G : Over (Sp k)) [GrpObj G]
+    (φ : G ⟶ G)
+    (hG : LocallyOfFiniteType G.hom) (hφ : IsMonHom φ) (hu : FormallyUnramified φ.left)
+    : Flat φ.left := by
   have := LocallyOfFiniteType.jacobsonSpace G.hom
   refine UnramifiedEndFlat.flat_of_closedPoints _ fun x hx => ?_
   let x' : 𝟙_ _ ⟶ G := Over.homMk _ ((pointEquivClosedPoint G.hom).symm ⟨x, hx⟩).2
@@ -147,8 +165,7 @@ theorem flat_of_formallyUnramified_grpEnd (k : Type) [Field k] [IsAlgClosed k] (
   have h0 := UnramifiedEndFlat.flat_stalkMap_of_fixed φ.left G.hom φ.w o ho hfo
   let α := GrpObj.mulRight (A := G) x'
   let β := GrpObj.mulRight (A := G) (x' ≫ φ)
-  have hαβ : α.hom ≫ φ = φ ≫ β.hom := by
-    simp [α, β, comp_lift_assoc]
+  have hαβ : α.hom ≫ φ = φ ≫ β.hom := by simp [α, β, comp_lift_assoc]
   have hα : η[G] ≫ α.hom = x' := by
     simpa [α, comp_lift_assoc] using lift_comp_one_left (𝟙 (𝟙_ (Over (Sp k)))) x'
   have hα' : α.hom.left o = x :=
@@ -160,7 +177,7 @@ theorem flat_of_formallyUnramified_grpEnd (k : Type) [Field k] [IsAlgClosed k] (
     exact (Flat.stalkMap β.hom.left _).comp h0
   rw [← Over.comp_left, ← hαβ, Over.comp_left, Scheme.Hom.stalkMap_comp] at h1
   rw [← hα']
-  exact (RingHom.Flat.respectsIso.cancel_right_isIso
-    (φ.left.stalkMap (α.hom.left o)) (α.hom.left.stalkMap o)).mp h1
+  exact (RingHom.Flat.respectsIso.cancel_right_isIso (φ.left.stalkMap (α.hom.left o))
+    (α.hom.left.stalkMap o)).mp h1
 
 end GlobalTheory

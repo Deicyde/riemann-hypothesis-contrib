@@ -9,11 +9,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem isLocallyConstant_matrix_of_adicCont_of_isNilpotent {R : Type} [CommRing R] {A : Type} [CommRing A] [Algebra A R] {n : ℕ} {X : Type}
-    [TopologicalSpace X] (t : A) (ht : IsNilpotent (algebraMap A R t)) (z : X → Matrix (Fin n) (Fin n) R)
-    (hz : ∀ i j, AdicCont (Ideal.span {(algebraMap A R) t}) fun g => z g i j) : IsLocallyConstant z := by
+private theorem isLocallyConstant_matrix_of_adicCont_of_isNilpotent
+    {R : Type} [CommRing R]
+    {A : Type} [CommRing A] [Algebra A R]
+    {n : ℕ} {X : Type} [TopologicalSpace X]
+    (t : A) (ht : IsNilpotent (algebraMap A R t))
+    (z : X → Matrix (Fin n) (Fin n) R)
+    (hz : ∀ i j, AdicCont (Ideal.span {(algebraMap A R) t}) fun g => z g i j)
+    : IsLocallyConstant z := by
   obtain ⟨k, hk⟩ := ht
   have hI : Ideal.span {(algebraMap A R) t} ^ k = ⊥ := by
     rw [Ideal.span_singleton_pow, hk, Ideal.span_singleton_eq_bot]
@@ -30,17 +36,21 @@ private theorem isLocallyConstant_matrix_of_adicCont_of_isNilpotent {R : Type} [
   ext i j
   exact hy i j
 
-private theorem topFG_subgroup_of_finiteIndex_of_isOpen {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (H : Subgroup G) [H.FiniteIndex] (hH : IsOpen (H : Set G)) (hG : TopFG G) : TopFG H := by
+private theorem topFG_subgroup_of_finiteIndex_of_isOpen
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (H : Subgroup G) [H.FiniteIndex]
+    (hH : IsOpen (H : Set G)) (hG : TopFG G)
+    : TopFG H := by
   obtain ⟨s, hsf, hsd⟩ := hG
   set K := Subgroup.closure s with hK
   have hfgK : Group.FG K := (Subgroup.fg_iff K).2 ⟨s, hK.symm, hsf⟩
   have hfg : Group.FG (H.subgroupOf K) := inferInstance
   obtain ⟨S, hS, hSf⟩ := Group.fg_iff.1 hfg
-  let ι : H.subgroupOf K →* H :=
-    { toFun := fun x => ⟨((x : K) : G), x.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl }
+  let ι : H.subgroupOf K →* H := {
+    toFun := fun x => ⟨((x : K) : G), x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   refine ⟨ι '' S, hSf.image _, ?_⟩
   unfold TopGen
   have hr : ((Subgroup.closure (ι '' S) : Subgroup H) : Set H) = Subtype.val ⁻¹' (K : Set G) := by
@@ -55,26 +65,33 @@ private theorem topFG_subgroup_of_finiteIndex_of_isOpen {G : Type} [Group G] [To
   rw [hr]
   exact hsd.preimage hH.isOpenMap_subtype_val
 
-private theorem isLocallyConstant_of_comp_surjective_of_compactSpace {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y] [CompactSpace X] [T2Space Y]
-    (f : X → Y) (hc : Continuous f) (hs : Function.Surjective f) (g : Y → Z)
-    (hg : IsLocallyConstant (g ∘ f)) : IsLocallyConstant g := by
+private theorem isLocallyConstant_of_comp_surjective_of_compactSpace
+    {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y] [CompactSpace X] [T2Space Y]
+    (f : X → Y) (hc : Continuous f) (hs : Function.Surjective f)
+    (g : Y → Z) (hg : IsLocallyConstant (g ∘ f))
+    : IsLocallyConstant g := by
   have hq : Topology.IsQuotientMap f := hc.isClosedMap.isQuotientMap hc hs
   intro s
   rw [← hq.isOpen_preimage]
   exact hg s
 
-private theorem t1_lemma {l : ℕ} [Fact l.Prime] {L : Loc} {G0 G1 G2 : Glob l L} (h1 : G1.Hom G0) (h2 : G2.Hom G0)
-    {P : Type} [Group P] [TopologicalSpace P] [CompactSpace P] (f1 : P →* G1.G₀) (f2 : P →* G2.G₀)
-    (hs : Function.Surjective f1) (hc1 : Continuous f1) (hc2 : Continuous f2) (κ : P → P)
+private theorem t1_lemma
+    {l : ℕ} [Fact l.Prime]
+    {L : Loc} {G0 G1 G2 : Glob l L} (h1 : G1.Hom G0) (h2 : G2.Hom G0)
+    {P : Type} [Group P] [TopologicalSpace P] [CompactSpace P]
+    (f1 : P →* G1.G₀) (f2 : P →* G2.G₀)
+    (hs : Function.Surjective f1) (hc1 : Continuous f1) (hc2 : Continuous f2)
+    (κ : P → P)
     (hκ1 : ∀ x, f1 (κ x) = G1.frame.conj (f1 x)) (hκ2 : ∀ x, f2 (κ x) = G2.frame.conj (f2 x))
-    {n : ℕ} {A R : Type} [CommRing A] [CommRing R] [Algebra A R] (t : A) (ht : IsNilpotent (algebraMap A R t))
+    {n : ℕ} {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
+    (t : A) (ht : IsNilpotent (algebraMap A R t))
     (ρ : G0.G₀ → Matrix (Fin n) (Fin n) R) (hρ : ∀ x, ρ (h1.p₀ (f1 x)) = ρ (h2.p₀ (f2 x)))
     (w wi : L.Vl → Matrix (Fin n) (Fin n) R) (V : Submodule A (Matrix (Fin n) (Fin n) R))
     (z1 : G1.G₀ → Matrix (Fin n) (Fin n) R) (z2 : G2.G₀ → Matrix (Fin n) (Fin n) R)
     (hz : ∀ x, z1 (f1 x) = z2 (f2 x)) (hv : ∀ v g, z1 (G1.φ v g) = z2 (G2.φ v g))
     (hu : ∀ u g, z1 (G1.φu u g) = z2 (G2.φu u g))
-    (hm : z2 ∈ SelZ G2.frame t (fun g => ρ (h2.p₀ g)) w wi V) :
-    z1 ∈ SelZ G1.frame t (fun g => ρ (h1.p₀ g)) w wi V := by
+    (hm : z2 ∈ SelZ G2.frame t (fun g => ρ (h2.p₀ g)) w wi V)
+    : z1 ∈ SelZ G1.frame t (fun g => ρ (h1.p₀ g)) w wi V := by
   simp only [SelZ, Set.mem_setOf_eq] at hm ⊢
   obtain ⟨hV, hA, hcoc, hconj, hU, hL⟩ := hm
   have hz2 : IsLocallyConstant z2 := isLocallyConstant_matrix_of_adicCont_of_isNilpotent t ht z2 hA
@@ -83,8 +100,8 @@ private theorem t1_lemma {l : ℕ} [Fact l.Prime] {L : Loc} {G0 G1 G2 : Glob l L
     have e : z1 ∘ f1 = z2 ∘ f2 := funext hz
     rw [e]
     exact hz2.comp_continuous hc2
-  have pφ : ∀ (G : Glob l L) (h : G.Hom G0) v g, h.p₀ (G.φ v g) = G0.φ v g :=
-    fun G h v g => Subtype.ext (h.φ v g)
+  have pφ : ∀ (G : Glob l L) (h : G.Hom G0) v g, h.p₀ (G.φ v g) = G0.φ v g := fun G h v g =>
+    Subtype.ext (h.φ v g)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro g
     obtain ⟨x, rfl⟩ := hs g

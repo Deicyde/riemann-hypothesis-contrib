@@ -10,13 +10,17 @@ namespace GlobalTheory.CompanionTheory.ComplexSets
 
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets Topology Filter
 
-theorem exists_hypersurface_of_monic_relation {σ : Type} [Fintype σ] {Y : Set (σ → ℂ)} {w : σ → ℂ} {d : ℕ}
-    (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (hirr : GermIrreducibleAt Y w) {φ : (σ → ℂ) → ℂ}
-    (hφ : AnalyticAt ℂ φ w) (hnv : ¬ ∀ᶠ z in 𝓝 w, z ∈ Y → φ z = 0) :
-    ∀ (N : ℕ) (a : Fin N → (Fin d → ℂ) → ℂ), (∀ j, AnalyticAt ℂ (a j) (A w)) →
-      (∀ᶠ z in 𝓝 w, z ∈ Y → φ z ^ N + ∑ j, a j (A z) * φ z ^ (j : ℕ) = 0) →
-      ∃ e : (Fin d → ℂ) → ℂ, AnalyticAt ℂ e (A w) ∧ (¬ ∀ᶠ y in 𝓝 (A w), e y = 0) ∧
-        ∀ᶠ z in 𝓝 w, z ∈ Y → φ z = 0 → e (A z) = 0 := by
+theorem exists_hypersurface_of_monic_relation
+    {σ : Type} [Fintype σ]
+    {Y : Set (σ → ℂ)} {w : σ → ℂ} {d : ℕ}
+    (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (hirr : GermIrreducibleAt Y w)
+    {φ : (σ → ℂ) → ℂ} (hφ : AnalyticAt ℂ φ w) (hnv : ¬ ∀ᶠ z in 𝓝 w, z ∈ Y → φ z = 0)
+    : ∀ (N : ℕ) (a : Fin N → (Fin d → ℂ) → ℂ),
+      (∀ j, AnalyticAt ℂ (a j) (A w))
+        → (∀ᶠ z in 𝓝 w, z ∈ Y → φ z ^ N + ∑ j, a j (A z) * φ z ^ (j : ℕ) = 0)
+        → ∃ e : (Fin d → ℂ) → ℂ,
+          AnalyticAt ℂ e (A w) ∧ (¬ ∀ᶠ y in 𝓝 (A w), e y = 0)
+            ∧ ∀ᶠ z in 𝓝 w, z ∈ Y → φ z = 0 → e (A z) = 0 := by
   intro N
   induction N with
   | zero =>
@@ -28,14 +32,16 @@ theorem exists_hypersurface_of_monic_relation {σ : Type} [Fintype σ] {Y : Set 
     intro a ha hrel
     by_cases h0 : ∀ᶠ y in 𝓝 (A w), a 0 y = 0
     · have h0' : ∀ᶠ z in 𝓝 w, a 0 (A z) = 0 := (A.continuous.tendsto w).eventually h0
-      have hQ : AnalyticAt ℂ (fun z => φ z ^ n + ∑ j : Fin n, a j.succ (A z) * φ z ^ (j : ℕ)) w := by
+      have hQ
+          : AnalyticAt ℂ (fun z => φ z ^ n + ∑ j : Fin n, a j.succ (A z) * φ z ^ (j : ℕ)) w := by
         refine (hφ.pow n).add ?_
         refine Finset.analyticAt_fun_sum _ fun j _ => ?_
         have hc : AnalyticAt ℂ (fun z => a j.succ (A z)) w :=
           AnalyticAt.fun_comp (ha j.succ) (A.analyticAt w)
         exact hc.mul (hφ.pow _)
-      have hprod : ∀ᶠ z in 𝓝 w, z ∈ Y →
-          φ z * (φ z ^ n + ∑ j : Fin n, a j.succ (A z) * φ z ^ (j : ℕ)) = 0 := by
+      have hprod
+          : ∀ᶠ z in 𝓝 w, z ∈ Y →
+            φ z * (φ z ^ n + ∑ j : Fin n, a j.succ (A z) * φ z ^ (j : ℕ)) = 0 := by
         filter_upwards [hrel, h0'] with z hz hz0 hzY
         have h := hz hzY
         rw [Fin.sum_univ_succ] at h
@@ -54,7 +60,8 @@ theorem exists_hypersurface_of_monic_relation {σ : Type} [Fintype σ] {Y : Set 
       simpa [hφ0] using h
 
 theorem irreducibleGermMeetOverHypersurface_of_finiteFibreGermIntegral
-    (H : FiniteFibreGermIntegral.Statement) : IrreducibleGermMeetOverHypersurface.Statement := by
+    (H : FiniteFibreGermIntegral.Statement)
+    : IrreducibleGermMeetOverHypersurface.Statement := by
   intro σ _ Y Z w d A hY hirr hfib hZ hnot
   obtain ⟨N₀, k, f, hN₀, hwN₀, hf, hZN⟩ := hZ
   have hex : ∃ m, ¬ ∀ᶠ z in 𝓝 w, z ∈ Y → f m z = 0 := by

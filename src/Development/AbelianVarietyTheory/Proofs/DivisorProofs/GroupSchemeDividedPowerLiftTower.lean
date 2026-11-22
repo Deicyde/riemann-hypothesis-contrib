@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PrimitiveCry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  DividedPowers
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,11 +19,13 @@ noncomputable section
 
 namespace GlobalTheory.SqLift
 
-theorem dual_eq_sum_of_ker {R R₁ : Type} [CommRing R] [CommRing R₁] (ρ : R →+* R₁) {P : Type*}
-    [AddCommGroup P] [Module R P] [Module.Finite R P] [Module.Projective R P] (x : Module.Dual R P)
-    (hx : ∀ c, ρ (x c) = 0) :
-    ∃ (n : ℕ) (j : Fin n → R) (d : Fin n → Module.Dual R P), (∀ k, ρ (j k) = 0) ∧
-      x = ∑ k, j k • d k := by
+theorem dual_eq_sum_of_ker
+    {R R₁ : Type} [CommRing R] [CommRing R₁]
+    (ρ : R →+* R₁)
+    {P : Type*} [AddCommGroup P] [Module R P] [Module.Finite R P] [Module.Projective R P]
+    (x : Module.Dual R P) (hx : ∀ c, ρ (x c) = 0)
+    : ∃ (n : ℕ) (j : Fin n → R) (d : Fin n → Module.Dual R P),
+      (∀ k, ρ (j k) = 0) ∧ x = ∑ k, j k • d k := by
   obtain ⟨n, f, hf⟩ := Module.Finite.exists_fin' R P
   obtain ⟨s, hs⟩ := Module.projective_lifting_property f LinearMap.id hf
   refine ⟨n, fun k ↦ x (f (Pi.single k 1)), fun k ↦ (LinearMap.proj k) ∘ₗ s, fun k ↦ hx _, ?_⟩
@@ -32,14 +37,21 @@ theorem dual_eq_sum_of_ker {R R₁ : Type} [CommRing R] [CommRing R₁] (ρ : R 
     rw [e2, e1, map_sum, map_sum]
   simp [mul_comm]
 
-theorem isAdmissible_reduce : AbelianDeRham → ∀ (R R₁ R₀ : Type) [CommRing R] [CommRing R₁] [CommRing R₀] (I J : Ideal R) (I₁ : Ideal R₁) (κ : DividedPowers I) (π : R →+* R₀)
-    (hJ : J ^ 2 = 0) (ρ : R →+* R₁) (κ₁ : DividedPowers I₁) (π₁ : R₁ →+* R₀), IsStep κ π hJ ρ κ₁ π₁ →
-    ∀ (g : ℕ) (A₀ : Over (Sp R₀)) [GrpObj A₀] (A₁ : Over (Sp R₁)) [GrpObj A₁] (A : Over (Sp R)) [GrpObj A]
-      (i₁ : A₀.left ⟶ A₁.left) (i₂ : A₁.left ⟶ A.left) (i : A₀.left ⟶ A.left)
-      (h₁ : IsGrpPullback A₀ A₁ (spMap π₁) i₁) (h₂ : IsGrpPullback A₁ A (spMap ρ) i₂) (h : IsGrpPullback A₀ A (spMap π) i),
-      i₁ ≫ i₂ = i → IsAbelianScheme A → SmoothOfRelativeDimension g A.hom →
-    ∀ F : Submodule R (HdR A), IsAdmissible h F → ∃ F₁ : Submodule R₁ (HdR A₁), IsAdmissible h₁ F₁ ∧
-      ∀ y : HdR A₁, y ∈ F₁ ↔ ∃ x ∈ F, (redMor h₂).Corr x y := by
+theorem isAdmissible_reduce
+    : AbelianDeRham
+      → ∀ (R R₁ R₀ : Type) [CommRing R] [CommRing R₁] [CommRing R₀] (I J : Ideal R) (I₁ : Ideal R₁)
+          (κ : DividedPowers I) (π : R →+* R₀) (hJ : J ^ 2 = 0) (ρ : R →+* R₁)
+          (κ₁ : DividedPowers I₁) (π₁ : R₁ →+* R₀),
+        IsStep κ π hJ ρ κ₁ π₁
+          → ∀ (g : ℕ) (A₀ : Over (Sp R₀)) [GrpObj A₀] (A₁ : Over (Sp R₁)) [GrpObj A₁]
+              (A : Over (Sp R)) [GrpObj A] (i₁ : A₀.left ⟶ A₁.left) (i₂ : A₁.left ⟶ A.left)
+              (i : A₀.left ⟶ A.left) (h₁ : IsGrpPullback A₀ A₁ (spMap π₁) i₁)
+              (h₂ : IsGrpPullback A₁ A (spMap ρ) i₂) (h : IsGrpPullback A₀ A (spMap π) i),
+            i₁ ≫ i₂ = i → IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+              → ∀ F : Submodule R (HdR A),
+                IsAdmissible h F
+                  → ∃ F₁ : Submodule R₁ (HdR A₁),
+                    IsAdmissible h₁ F₁ ∧ ∀ y : HdR A₁, y ∈ F₁ ↔ ∃ x ∈ F, (redMor h₂).Corr x y := by
   intro P R R₁ R₀ _ _ _ I J I₁ κ π hJ ρ κ₁ π₁ hs g A₀ _ A₁ _ A _ i₁ i₂ i h₁ h₂ h hi hA hg F hF
   obtain ⟨PF, -, PB, -, -⟩ := P
   letI : Algebra R R₁ := ρ.toAlgebra
@@ -59,31 +71,34 @@ theorem isAdmissible_reduce : AbelianDeRham → ∀ (R R₁ R₀ : Type) [CommRi
       obtain ⟨b, hb⟩ := hy
       exact ⟨a + b, by rw [map_add (f := _), map_add (f := _), ha, hb]⟩
   have hex : ∀ x : HdR A, ∃ y : HdR A₁, (redMor h₂).Corr x y := fun x ↦ hbc.exists x
-  have huniq : ∀ {x : HdR A} {y y' : HdR A₁}, (redMor h₂).Corr x y → (redMor h₂).Corr x y' → y = y' := by
+  have huniq
+      : ∀ {x : HdR A} {y y' : HdR A₁}, (redMor h₂).Corr x y → (redMor h₂).Corr x y' → y = y' := by
     intro x y y' e e'
     refine LinearMap.ext fun c₁ ↦ ?_
     obtain ⟨c, rfl⟩ := hPs c₁
     rw [e c, e' c]
   have hlift : ∀ y : HdR A₁, ∃ x : HdR A, (redMor h₂).Corr x y := by
     intro y
-    let l : primDR A →ₗ[R] R₁ :=
-      { toFun c := y ((redMor h₂).pull c)
-        map_add' := by simp
-        map_smul' r c := by rw [LinearMap.map_smulₛₗ, map_smul]; rfl }
+    let l : primDR A →ₗ[R] R₁ := {
+      toFun c := y ((redMor h₂).pull c)
+      map_add' := by simp
+      map_smul' r c := by rw [LinearMap.map_smulₛₗ, map_smul]; rfl
+    }
     obtain ⟨x, hx⟩ := Module.projective_lifting_property (Algebra.linearMap R R₁) l hs.surj
     exact ⟨x, fun c ↦ (LinearMap.congr_fun hx c).symm⟩
-  let S : Submodule R (HdR A) → Submodule R₁ (HdR A₁) := fun F ↦
-    { carrier := {y | ∃ x ∈ F, (redMor h₂).Corr x y}
-      add_mem' := by
-        rintro a b ⟨x, hx, ex⟩ ⟨x', hx', ex'⟩
-        exact ⟨x + x', F.add_mem hx hx', fun c ↦ by simp [ex c, ex' c]⟩
-      zero_mem' := ⟨0, F.zero_mem, fun c ↦ by simp⟩
-      smul_mem' := by
-        rintro r₁ y ⟨x, hx, ex⟩
-        obtain ⟨r, rfl⟩ := hs.surj r₁
-        exact ⟨r • x, F.smul_mem r hx, fun c ↦ by simp [ex c]⟩ }
-  have comp : ∀ c, (redMor h₁).pull ((redMor h₂).pull c) = (redMor h).pull c :=
-    fun c ↦ GrpMor.pull_pull (redMor h₂) (redMor h₁) (redMor h) (fun r ↦ RingHom.congr_fun hs.comp r) hi c
+  let S : Submodule R (HdR A) → Submodule R₁ (HdR A₁) := fun F ↦ {
+    carrier := {y | ∃ x ∈ F, (redMor h₂).Corr x y}
+    add_mem' := by
+      rintro a b ⟨x, hx, ex⟩ ⟨x', hx', ex'⟩
+      exact ⟨x + x', F.add_mem hx hx', fun c ↦ by simp [ex c, ex' c]⟩
+    zero_mem' := ⟨0, F.zero_mem, fun c ↦ by simp⟩
+    smul_mem' := by
+      rintro r₁ y ⟨x, hx, ex⟩
+      obtain ⟨r, rfl⟩ := hs.surj r₁
+      exact ⟨r • x, F.smul_mem r hx, fun c ↦ by simp [ex c]⟩
+  }
+  have comp : ∀ c, (redMor h₁).pull ((redMor h₂).pull c) = (redMor h).pull c := fun c ↦
+    GrpMor.pull_pull (redMor h₂) (redMor h₁) (redMor h) (fun r ↦ RingHom.congr_fun hs.comp r) hi c
   obtain ⟨⟨N, hN⟩, hFil⟩ := hF
   refine ⟨S F, ⟨⟨S N, ⟨?_, ?_⟩⟩, fun y ↦ ?_⟩, fun y ↦ Iff.rfl⟩
   · refine Submodule.disjoint_def.2 fun y ⟨f, hf, ef⟩ ⟨n, hn, en⟩ ↦ ?_
@@ -100,10 +115,11 @@ theorem isAdmissible_reduce : AbelianDeRham → ∀ (R R₁ R₀ : Type) [CommRi
     obtain ⟨c, rfl⟩ := hPs c₁
     rw [ef c, hfp, hsum]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Submodule.coe_sum, hj]
+    simp [map_sum, Submodule.coe_sum, hj]
   · refine codisjoint_iff_le_sup.2 fun y _ ↦ ?_
     obtain ⟨x, ex⟩ := hlift y
-    obtain ⟨f, hf, n, hn, rfl⟩ := Submodule.mem_sup.1 (hN.sup_eq_top ▸ Submodule.mem_top : x ∈ F ⊔ N)
+    obtain ⟨f, hf, n, hn, rfl⟩ :=
+      Submodule.mem_sup.1 (hN.sup_eq_top ▸ Submodule.mem_top : x ∈ F ⊔ N)
     obtain ⟨yf, ef⟩ := hex f
     obtain ⟨yn, en⟩ := hex n
     refine Submodule.mem_sup.2 ⟨yf, ⟨f, hf, ef⟩, yn, ⟨n, hn, en⟩, huniq (fun c ↦ ?_) ex⟩

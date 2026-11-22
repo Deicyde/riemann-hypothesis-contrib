@@ -14,15 +14,17 @@ open MvPolynomial
 
 universe u
 
-theorem ResidualContraction.proof (hle : BlowUpOrderLe.Statement.{u})
-    (hcomp : ResidualContractionComponent.Statement.{u}) :
-    ResidualContraction.Statement.{u} := by
+theorem ResidualContraction.proof
+    (hle : BlowUpOrderLe.Statement.{u}) (hcomp : ResidualContractionComponent.Statement.{u})
+    : ResidualContraction.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
     x hxP
-  have hGmin := hcomp O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
+  have hGmin :=
+    hcomp O ϖ hϖ K ι P d hP b f g hD c s hs hsP hsH e he m hm hmP hmH G' hϖG' hsG' hresG'
 
-  have hG'supp : G' ∈ (blowUpOf P (blowUpGens s g f m e) ⊔ Ideal.span {liftForm s}).minimalPrimes ∧
-      IsRelevant G' := by
+  have hG'supp
+      : G' ∈ (blowUpOf P (blowUpGens s g f m e) ⊔ Ideal.span {liftForm s}).minimalPrimes
+        ∧ IsRelevant G' := by
     by_contra h
     unfold divCycle at hsG'
     rw [dite_eq_right h] at hsG'

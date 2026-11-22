@@ -15,10 +15,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanR
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3
 open Classical
 open GlobalTheory.Mem.R3.HasLabelling
 
@@ -28,8 +33,9 @@ namespace GlobalTheory.Mem.KerSpan
 
 variable {K : Type} [Field K] {σ : K →+* ℂ}
 
-theorem semi_expand {W : Type} [AddCommGroup W] [Module ℂ W] {m : ℕ} (f : (Fin m → K) →ₛₗ[σ] W) (v : Fin m → K) :
-    f v = ∑ l, σ (v l) • f (Pi.single l 1) := by
+theorem semi_expand
+    {W : Type} [AddCommGroup W] [Module ℂ W] {m : ℕ} (f : (Fin m → K) →ₛₗ[σ] W) (v : Fin m → K)
+    : f v = ∑ l, σ (v l) • f (Pi.single l 1) := by
   conv_lhs => rw [← Finset.univ_sum_single v]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -41,35 +47,46 @@ theorem semi_expand {W : Type} [AddCommGroup W] [Module ℂ W] {m : ℕ} (f : (F
   · subst h; simp
   · simp [h]
 
-theorem left_inv_of_inj {m d : ℕ} (Θ : Matrix (Fin m) (Fin d) K) (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0) :
-    ∃ L : Matrix (Fin d) (Fin m) K, L * Θ = 1 := by
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.mulVecLin Θ)
-    (LinearMap.ker_eq_bot'.2 fun a ha => hΘ a ha)
+theorem left_inv_of_inj {m d : ℕ} (Θ : Matrix (Fin m) (Fin d) K) (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0)
+    : ∃ L : Matrix (Fin d) (Fin m) K, L * Θ = 1 := by
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Matrix.mulVecLin Θ)
+      (LinearMap.ker_eq_bot'.2 fun a ha => hΘ a ha)
   refine ⟨LinearMap.toMatrix' g, ?_⟩
   have h := congrArg LinearMap.toMatrix' hg
-  rwa [LinearMap.toMatrix'_comp, LinearMap.toMatrix'_id, ← Matrix.toLin'_apply', LinearMap.toMatrix'_toLin'] at h
+  rwa [LinearMap.toMatrix'_comp, LinearMap.toMatrix'_id, ← Matrix.toLin'_apply',
+      LinearMap.toMatrix'_toLin']
+    at h
 
-theorem map_mulVec_inj {m d : ℕ} (Θ : Matrix (Fin m) (Fin d) K) (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0)
-    (c : Fin d → ℂ) (hc : (Θ.map σ) *ᵥ c = 0) : c = 0 := by
+theorem map_mulVec_inj
+    {m d : ℕ} (Θ : Matrix (Fin m) (Fin d) K) (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0) (c : Fin d → ℂ)
+    (hc : (Θ.map σ) *ᵥ c = 0)
+    : c = 0 := by
   obtain ⟨L, hL⟩ := left_inv_of_inj Θ hΘ
   have h1 : (L.map σ) * (Θ.map σ) = 1 := by
     rw [← Matrix.map_mul, hL, Matrix.map_one _ (map_zero σ) (map_one σ)]
-  calc c = ((L.map σ) * (Θ.map σ)) *ᵥ c := by rw [h1, Matrix.one_mulVec]
+  calc
+    c = ((L.map σ) * (Θ.map σ)) *ᵥ c := by rw [h1, Matrix.one_mulVec]
     _ = 0 := by rw [← Matrix.mulVec_mulVec, hc, Matrix.mulVec_zero]
 
-theorem orth_ker_eq_span [NumberField K] [StarRing K] {V W : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [AddCommGroup W] [Module ℂ W]
+theorem orth_ker_eq_span
+    [NumberField K] [StarRing K]
+    {V W : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [AddCommGroup W] [Module ℂ W]
     {n d m : ℕ} (j : (Fin n → K) →ₛₗ[σ] V) (H : Matrix (Fin n) (Fin n) K)
     (hinner : ∀ x y, inner ℂ (j x) (j y) = σ (Formalism.DivisionValues.hform H x y))
     (hspan : Submodule.span ℂ (Set.range fun k => j (Pi.single k 1)) = ⊤)
-    (Z : Matrix (Fin n) (Fin d) K) (Pr : Matrix (Fin d) (Fin n) K) (hp : Formalism.DivisionValues.IsOrthProj H Z Pr)
-    (θ : V →ₗ[ℂ] W) (jW : (Fin m → K) →ₛₗ[σ] W) (hli : LinearIndependent ℂ fun k => jW (Pi.single k 1))
-    (Θ : Matrix (Fin m) (Fin d) K) (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0)
-    (hθ : ∀ x, θ (j x) = jW (Θ *ᵥ (Pr *ᵥ x))) :
-    (LinearMap.ker θ)ᗮ = Submodule.span ℂ (Set.range fun a => j (Z *ᵥ a)) := by
+    (Z : Matrix (Fin n) (Fin d) K) (Pr : Matrix (Fin d) (Fin n) K)
+    (hp : Formalism.DivisionValues.IsOrthProj H Z Pr)
+    (θ : V →ₗ[ℂ] W)
+    (jW : (Fin m → K) →ₛₗ[σ] W) (hli : LinearIndependent ℂ fun k => jW (Pi.single k 1))
+    (Θ : Matrix (Fin m) (Fin d) K)
+    (hΘ : ∀ a, Θ *ᵥ a = 0 → a = 0) (hθ : ∀ x, θ (j x) = jW (Θ *ᵥ (Pr *ᵥ x)))
+    : (LinearMap.ker θ)ᗮ = Submodule.span ℂ (Set.range fun a => j (Z *ᵥ a)) := by
   set U := Submodule.span ℂ (Set.range fun a => j (Z *ᵥ a)) with hU
   set r : (Fin n → K) → V := fun x => j (x - Z *ᵥ (Pr *ᵥ x)) with hr
   set R := Submodule.span ℂ (Set.range r) with hR
-  have hPZ : ∀ a, Pr *ᵥ (Z *ᵥ a) = a := fun a => by rw [Matrix.mulVec_mulVec, hp.1, Matrix.one_mulVec]
+  have hPZ : ∀ a, Pr *ᵥ (Z *ᵥ a) = a := fun a => by
+    rw [Matrix.mulVec_mulVec, hp.1, Matrix.one_mulVec]
   have hθr : ∀ x, θ (r x) = 0 := fun x => by
     simp only [hr]
     rw [hθ, Matrix.mulVec_sub, hPZ, sub_self, Matrix.mulVec_zero, map_zero]
@@ -110,7 +127,8 @@ theorem orth_ker_eq_span [NumberField K] [StarRing K] {V W : Type} [NormedAddCom
       have e : ∀ k, jW (Θ *ᵥ Pi.single k 1) = ∑ l, σ (Θ l k) • jW (Pi.single l 1) := fun k => by
         rw [semi_expand jW]
         simp
-      have h1 : ∑ k, c k • jW (Θ *ᵥ Pi.single k 1) = ∑ l, ((Θ.map σ) *ᵥ c) l • jW (Pi.single l 1) := by
+      have h1
+          : ∑ k, c k • jW (Θ *ᵥ Pi.single k 1) = ∑ l, ((Θ.map σ) *ᵥ c) l • jW (Pi.single l 1) := by
         simp only [e, Finset.smul_sum, smul_smul]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun l _ => ?_
@@ -127,29 +145,45 @@ theorem orth_ker_eq_span [NumberField K] [StarRing K] {V W : Type} [NormedAddCom
     refine le_antisymm (fun y hy => ?_) hRk
     obtain ⟨a, ha, b, hb, rfl⟩ := htop y
     have hb0 : θ b = 0 := hRk hb
-    have ha0 : θ a = 0 := by
-      rw [LinearMap.mem_ker, map_add (f := _), hb0, add_zero] at hy; exact hy
-    rw [hinj a ha ha0, zero_add]; exact hb
+    have ha0 : θ a = 0 := by rw [LinearMap.mem_ker, map_add (f := _), hb0, add_zero] at hy; exact hy
+    rw [hinj a ha ha0, zero_add]
+    exact hb
   rw [hker]
   refine le_antisymm (fun y hy => ?_) hUR
   obtain ⟨a, ha, b, hb, rfl⟩ := htop y
-  have hb' : b ∈ Rᗮ := by
-    have h := Rᗮ.sub_mem hy (hUR ha); rwa [add_sub_cancel_left] at h
+  have hb' : b ∈ Rᗮ := by have h := Rᗮ.sub_mem hy (hUR ha); rwa [add_sub_cancel_left] at h
   have hb0 : b = 0 := by
     have h : b ∈ R ⊓ Rᗮ := Submodule.mem_inf.2 ⟨hb, hb'⟩
     rw [Submodule.inf_orthogonal_eq_bot] at h
     exact (Submodule.mem_bot ℂ).1 h
-  rw [hb0, add_zero]; exact ha
-
+  rw [hb0, add_zero]
+  exact ha
 
 set_option maxHeartbeats 2000000 in
-theorem orth_ker_thetaP : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (Z : ReadL R F X0 Y), Pins R F cG → Holds R F → ∀ (i : Fin D.R.m) (t : T), (LinearMap.ker (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1)))ᗮ = Submodule.span ℂ (Set.range fun a => D.what₂.jMt (Y.tup t) ((i : ℕ) + 1) (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a))) := by
+theorem orth_ker_thetaP
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
+        (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3)
+        (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (X0 : BaseLevelRowSide D)
+        (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (Z : ReadL R F X0 Y),
+      Pins R F cG → Holds R F
+        → ∀ (i : Fin D.R.m) (t : T),
+          (LinearMap.ker (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1)))ᗮ
+            = Submodule.span ℂ
+              (Set.range fun a =>
+                D.what₂.jMt (Y.tup t) ((i : ℕ) + 1)
+                  (Y.eMt i t (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t *ᵥ a))) := by
   intro D G _ _ Pl0 I0 T A3 Ks _ _ _ R F cG X0 Y Z hP hH i t
-  have hR : ComplexDataConditionsBaseLevel A3 F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Sp F.Zsc (R.toCx3 F) 1 (U2.eigensystemChoice A3 (R.toCx3 F) F.P0 F.ψ0 F.P1 F.ψ1 hH.prim.hecke.2.choose) hH.prim.hecke.1.choose hH.prim.hecke.2.choose (R.gEx F) (R.gWx F) := by
-    have hUnitary := U2.unitary_two_package A3 (R.toCx3 F) 1 F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Sp F.Zsc hH.prim.hecke.2.choose (R.gWx F) hH.ok
-      (RealDat3.kFormR_of hP.char.base.models) (RealDat3.kFormL_of hP.char.base.models) (RealDat3.jIsoR_of hP.char.base.models)
-      (RealDat3.jIsoL_of hP.char.base.models) hH.prim.rowTest hH.prim.liftTest hH.prim.heckeL hH.prim.hecke.2.choose_spec hH.prim.gUnit.2 hH.prim.gEquiv.2 hH.prim.levW
-      hH.prim.sumW (hH.prim.liftOnto _ hH.prim.hecke.2.choose_spec)
+  have hR : ComplexDataConditionsBaseLevel A3 F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Sp F.Zsc (R.toCx3 F) 1
+      (U2.eigensystemChoice A3 (R.toCx3 F) F.P0 F.ψ0 F.P1 F.ψ1 hH.prim.hecke.2.choose)
+      hH.prim.hecke.1.choose hH.prim.hecke.2.choose (R.gEx F) (R.gWx F) := by
+    have hUnitary :=
+      U2.unitary_two_package A3 (R.toCx3 F) 1 F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Sp F.Zsc
+        hH.prim.hecke.2.choose (R.gWx F) hH.ok (RealDat3.kFormR_of hP.char.base.models)
+        (RealDat3.kFormL_of hP.char.base.models) (RealDat3.jIsoR_of hP.char.base.models)
+        (RealDat3.jIsoL_of hP.char.base.models) hH.prim.rowTest hH.prim.liftTest hH.prim.heckeL
+        hH.prim.hecke.2.choose_spec hH.prim.gUnit.2 hH.prim.gEquiv.2 hH.prim.levW hH.prim.sumW
+        (hH.prim.liftOnto _ hH.prim.hecke.2.choose_spec)
     exact {
       kFormR := RealDat3.kFormR_of hP.char.base.models
       kFormL := RealDat3.kFormL_of hP.char.base.models
@@ -190,21 +224,29 @@ theorem orth_ker_thetaP : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 
       typ0 := hUnitary.2
     }
   have hOk := hH.ok.ok2
-  have hT := GlobalTheory.T.liftCuspFormSpace_thetaMap_eq_data D G Pl0 I0 T A3 Ks R F cG X0 Y Z hP hH
-  have hp : Formalism.DivisionValues.IsOrthProj (lH D A3.A F.P0 F.ψ0 i t) (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t)
-      (lPrj D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t) := BlockDat.lf_l_proj ⟨hOk.conj, hOk.irr, hOk.lifts i t⟩
+  have hT :=
+    GlobalTheory.T.liftCuspFormSpace_thetaMap_eq_data D G Pl0 I0 T A3 Ks R F cG X0 Y Z hP hH
+  have hp : Formalism.DivisionValues.IsOrthProj (lH D A3.A F.P0 F.ψ0 i t)
+      (lZ0 D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t)
+      (lPrj D A3.A F.P0 F.ψ0 (A3.fam3.toSub2 (zsOf R F)) i t) :=
+    BlockDat.lf_l_proj ⟨hOk.conj, hOk.irr, hOk.lifts i t⟩
   have hΘ : ∀ a, ((A3.indefDown (s0Of R F)).θ i t) *ᵥ a = 0 → a = 0 := by
     intro a ha
-    have h2 := GlobalTheory.Mem.LiftTheta.liftMatrix_computes_lift_rational (R.toCx3 F) F.cr false hR.lifts0.1 hR.ratTh i t a
+    have h2 :=
+      GlobalTheory.Mem.LiftTheta.liftMatrix_computes_lift_rational (R.toCx3 F) F.cr false
+        hR.lifts0.1 hR.ratTh i t a
     have h6 := CxData.tC_cpt_eq (R.toCx3 F) F.cr false i t a
     have ha' : (R.toCx3 F).liftMat F.cr false i t *ᵥ a = 0 := ha
-    have h7 : (R.toCx3 F).tC F.cr false i t (cpt A3.fam3.base3.v0.embedding a) = (R.toCx3 F).tC F.cr false i t (cpt A3.fam3.base3.v0.embedding 0) := by
+    have h7
+        : (R.toCx3 F).tC F.cr false i t (cpt A3.fam3.base3.v0.embedding a)
+          = (R.toCx3 F).tC F.cr false i t (cpt A3.fam3.base3.v0.embedding 0) := by
       rw [h6, ← h2, ha']
-      have hz : ∀ {k : ℕ}, cpt A3.fam3.base3.v0.embedding (0 : Fin k → D.what₂.LL) = 0 := fun {k} => by
+      have hz
+          : ∀ {k : ℕ}, cpt A3.fam3.base3.v0.embedding (0 : Fin k → D.what₂.LL) = 0 := fun {k} => by
         funext l; simp [cpt]
       simp only [hz, map_zero]
     exact cpt_injective _ ((hR.lifts0.1 i t).1 h7)
-  exact GlobalTheory.Mem.KerSpan.orth_ker_eq_span _ _ (Y.formsL i t).inner (Y.formsL i t).span _ _ hp
-    (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1)) (Z.jW i) (hT.1.li i) _ hΘ (fun x => hT.2 i t x)
+  exact GlobalTheory.Mem.KerSpan.orth_ker_eq_span _ _ (Y.formsL i t).inner (Y.formsL i t).span _ _
+    hp (D.what₂.thetaP (Y.tup t) ((i : ℕ) + 1)) (Z.jW i) (hT.1.li i) _ hΘ (fun x => hT.2 i t x)
 
 end GlobalTheory.Mem.KerSpan

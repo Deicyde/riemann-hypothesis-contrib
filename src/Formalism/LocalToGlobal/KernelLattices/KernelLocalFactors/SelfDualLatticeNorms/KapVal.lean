@@ -22,7 +22,8 @@ theorem normO_le (a : 𝓞 K) : ‖f (a : K)‖ ≤ 1 := by
   have h2 : IsIntegral v.integer (f (a : K)) := by
     refine ⟨P.map (Int.castRingHom v.integer), hm.map _, ?_⟩
     rw [Polynomial.eval₂_map]
-    have e1 : (algebraMap v.integer ℂ_[p]).comp (Int.castRingHom v.integer) = f.comp (algebraMap ℤ K) :=
+    have e1
+        : (algebraMap v.integer ℂ_[p]).comp (Int.castRingHom v.integer) = f.comp (algebraMap ℤ K) :=
       RingHom.ext_int _ _
     rw [e1, ← Polynomial.hom_eval₂]
     have : Polynomial.eval₂ (algebraMap ℤ K) (a : K) P = 0 := hP
@@ -30,7 +31,9 @@ theorem normO_le (a : 𝓞 K) : ‖f (a : K)‖ ≤ 1 := by
   have := (hv.isIntegral_iff_v_le_one).mp h2
   exact_mod_cast this
 
-variable (𝔭 : HeightOneSpectrum (𝓞 K)) (ϖ : 𝓞 K) (h : ℕ) (hgen : 𝔭.asIdeal ^ h = Ideal.span {ϖ}) (hlt : ‖f (ϖ : K)‖ < 1)
+variable
+  (𝔭 : HeightOneSpectrum (𝓞 K)) (ϖ : 𝓞 K) (h : ℕ) (hgen : 𝔭.asIdeal ^ h = Ideal.span {ϖ})
+  (hlt : ‖f (ϖ : K)‖ < 1)
 
 include hgen hlt in
 theorem norm_lt_of_mem {t : 𝓞 K} (ht : t ∈ 𝔭.asIdeal) : ‖f (t : K)‖ < 1 := by
@@ -42,8 +45,9 @@ theorem norm_lt_of_mem {t : 𝓞 K} (ht : t ∈ 𝔭.asIdeal) : ‖f (t : K)‖ 
       congr 2
       exact_mod_cast hc.symm
     rw [e]
-    calc ‖f (c : K)‖ * ‖f (ϖ : K)‖ ≤ 1 * ‖f (ϖ : K)‖ :=
-          mul_le_mul_of_nonneg_right (normO_le f c) (norm_nonneg _)
+    calc
+      ‖f (c : K)‖ * ‖f (ϖ : K)‖
+        ≤ 1 * ‖f (ϖ : K)‖ := mul_le_mul_of_nonneg_right (normO_le f c) (norm_nonneg _)
       _ < 1 := by rw [one_mul]; exact hlt
   have hh : h ≠ 0 := by
     rintro rfl
@@ -63,15 +67,18 @@ theorem norm_eq_one_of_not_mem {a : 𝓞 K} (ha : a ∉ 𝔭.asIdeal) : ‖f (a 
     rw [e, map_add (f := _), map_neg, map_one]
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm] <;> simp [norm_neg] <;> linarith [hsmall]
   refine le_antisymm (normO_le f a) ?_
-  calc (1 : ℝ) = ‖f (b : K)‖ * ‖f (a : K)‖ := hba.symm
+  calc
+    (1 : ℝ)
+      = ‖f (b : K)‖ * ‖f (a : K)‖ := hba.symm
     _ ≤ 1 * ‖f (a : K)‖ := mul_le_mul_of_nonneg_right (normO_le f b) (norm_nonneg _)
     _ = ‖f (a : K)‖ := one_mul _
 
 include hgen hlt in
-theorem norm_pow_int {a : 𝓞 K} (ha : a ≠ 0) :
-    ∃ n : ℕ, 𝔭.intValuation a = WithZero.exp (-(n : ℤ)) ∧ ‖f (a : K)‖ ^ h = ‖f (ϖ : K)‖ ^ n := by
+theorem norm_pow_int {a : 𝓞 K} (ha : a ≠ 0)
+    : ∃ n : ℕ, 𝔭.intValuation a = WithZero.exp (-(n : ℤ)) ∧ ‖f (a : K)‖ ^ h = ‖f (ϖ : K)‖ ^ n := by
   classical
-  obtain ⟨n, hva⟩ : ∃ n : ℕ, 𝔭.intValuation a = WithZero.exp (-(n : ℤ)) := ⟨_, 𝔭.intValuation_if_neg ha⟩
+  obtain ⟨n, hva⟩ : ∃ n : ℕ, 𝔭.intValuation a = WithZero.exp (-(n : ℤ)) :=
+    ⟨_, 𝔭.intValuation_if_neg ha⟩
   refine ⟨n, hva, ?_⟩
   have hvah : 𝔭.intValuation (a ^ h) = WithZero.exp (-((n * h : ℕ) : ℤ)) := by
     rw [map_pow, hva, ← WithZero.exp_nsmul]
@@ -96,8 +103,8 @@ theorem norm_pow_int {a : 𝓞 K} (ha : a ≠ 0) :
   rw [← norm_pow, ← map_pow f, e, map_mul, norm_mul, hc1, one_mul, map_pow, norm_pow]
 
 include hgen hlt in
-theorem norm_pow_eq {x : K} (hx : x ≠ 0) :
-    ‖f x‖ ^ h = ‖f (ϖ : K)‖ ^ (-WithZero.log (𝔭.valuation K x)) := by
+theorem norm_pow_eq {x : K} (hx : x ≠ 0)
+    : ‖f x‖ ^ h = ‖f (ϖ : K)‖ ^ (- WithZero.log (𝔭.valuation K x)) := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have ha0 : a ≠ 0 := by

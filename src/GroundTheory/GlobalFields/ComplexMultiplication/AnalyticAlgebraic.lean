@@ -15,7 +15,6 @@ namespace Elliptic
 
 variable {L₁ L₂ : PeriodPair}
 
-
 variable (L₁ L₂) in
 def latticeHomEquiv : latticeHom L₁ L₂ ≃+ isogHom (weierstrassCurve L₁) (weierstrassCurve L₂) where
   toFun := latticeToHom
@@ -44,8 +43,8 @@ def latticeEndEquiv : latticeEnd L ≃+* isogEnd (weierstrassCurve L) where
   map_mul' α β := latticeToHom_mul ⟨α, α.2⟩ ⟨β, β.2⟩ (α * β).2
   map_add' α β := latticeToHom_add ⟨α, α.2⟩ ⟨β, β.2⟩
 
-theorem homConst_latticeEndEquiv (α : latticeEnd L) :
-    homConst (weierstrassCurve L) (weierstrassCurve L) (latticeEndEquiv L α) = α :=
+theorem homConst_latticeEndEquiv (α : latticeEnd L)
+    : homConst (weierstrassCurve L) (weierstrassCurve L) (latticeEndEquiv L α) = α :=
   homConst_latticeToHom _
 
 variable {L}

@@ -22,25 +22,30 @@ namespace Measures
 
 section General
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem map_mul_right_eq_self_of_compactSpace {K : Type*} [Group K] [TopologicalSpace K]
-    [IsTopologicalGroup K] [CompactSpace K] [T2Space K] [SecondCountableTopology K]
-    [MeasurableSpace K] [BorelSpace K] (μ : Measure K) [μ.IsHaarMeasure] (k : K) :
-    map (· * k) μ = μ := by
+theorem map_mul_right_eq_self_of_compactSpace
+    {K : Type*} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [T2Space K]
+    [SecondCountableTopology K] [MeasurableSpace K] [BorelSpace K]
+    (μ : Measure K) [μ.IsHaarMeasure]
+    (k : K)
+    : map (· * k) μ = μ := by
   have e := isMulLeftInvariant_eq_smul (map (· * k) μ) μ
   have h := congrArg (fun ν : Measure K => ν univ) e
-  simp only [map_apply (continuous_mul_const k).measurable MeasurableSet.univ,
-    Set.preimage_univ, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul] at h
+  simp only [map_apply (continuous_mul_const k).measurable MeasurableSet.univ, Set.preimage_univ,
+      Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
+    at h
   have hc : haarScalarFactor (map (· * k) μ) μ = 1 := by
-    have := (ENNReal.mul_eq_right (IsOpen.measure_ne_zero μ isOpen_univ univ_nonempty)
-      (measure_ne_top μ univ)).1 h.symm
+    have :=
+      (ENNReal.mul_eq_right (IsOpen.measure_ne_zero μ isOpen_univ univ_nonempty)
+        (measure_ne_top μ univ)).1 h.symm
     exact_mod_cast this
   rw [e, hc, one_smul]
 
-theorem smul_coe_eq_of_mem {N : Subgroup G} {x z : G} (hz : z ∈ x • (N : Set G)) :
-    x • (N : Set G) = z • (N : Set G) := by
+theorem smul_coe_eq_of_mem {N : Subgroup G} {x z : G} (hz : z ∈ x • (N : Set G))
+    : x • (N : Set G) = z • (N : Set G) := by
   obtain ⟨a, ha, rfl⟩ := hz
   ext w
   simp only [Set.mem_smul_set_iff_inv_smul_mem, smul_eq_mul, SetLike.mem_coe, mul_inv_rev,
@@ -57,15 +62,23 @@ def smallCosets : Set (Set G) :=
 
 theorem isPiSystem_smallCosets : IsPiSystem (smallCosets K) := by
   rintro _ ⟨x, N₁, hN₁, rfl⟩ _ ⟨y, N₂, hN₂, rfl⟩ ⟨z, hz₁, hz₂⟩
-  refine ⟨z, N₁ ⊓ N₂, ⟨hN₁.1.inter hN₂.1, inf_le_of_left_le hN₁.2.1,
-    fun k hk w hw => ⟨hN₁.2.2 k hk w hw.1, hN₂.2.2 k hk w hw.2⟩⟩, ?_⟩
+  refine ⟨
+    z,
+    N₁ ⊓ N₂,
+    ⟨
+      hN₁.1.inter hN₂.1,
+      inf_le_of_left_le hN₁.2.1,
+      fun k hk w hw => ⟨hN₁.2.2 k hk w hw.1, hN₂.2.2 k hk w hw.2⟩
+    ⟩,
+    ?_
+  ⟩
   rw [smul_coe_eq_of_mem hz₁, smul_coe_eq_of_mem hz₂, ← Set.smul_set_inter, Subgroup.coe_inf]
 
 variable {K}
 
 theorem borel_eq_generateFrom_smallCosets
-    (hN : ∀ U ∈ 𝓝 (1 : G), ∃ N : Subgroup G, IsSmallNormal K N ∧ (N : Set G) ⊆ U) :
-    ‹MeasurableSpace G› = MeasurableSpace.generateFrom (smallCosets K) := by
+    (hN : ∀ U ∈ 𝓝 (1 : G), ∃ N : Subgroup G, IsSmallNormal K N ∧ (N : Set G) ⊆ U)
+    : ‹MeasurableSpace G› = MeasurableSpace.generateFrom (smallCosets K) := by
   refine le_antisymm ?_ (MeasurableSpace.generateFrom_le ?_)
   · rw [BorelSpace.measurable_eq (α := G)]
     refine MeasurableSpace.generateFrom_le fun U hU => ?_
@@ -91,14 +104,15 @@ theorem borel_eq_generateFrom_smallCosets
   · rintro _ ⟨x, N, hN, rfl⟩
     exact (hN.1.smul x).measurableSet
 
-theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
-    (hP : IsClosed (P : Set G))
-    (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
-    (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
-    (μG : Measure G) [μG.IsHaarMeasure] (μP : Measure P) [μP.IsHaarMeasure] (μK : Measure K)
-    [μK.IsHaarMeasure] :
-    μG K • map (fun x : P × K => (x.1 : G) * x.2) (μP.prod μK) =
-      (μP (Subtype.val ⁻¹' (K : Set G)) * μK univ) • μG := by
+theorem map_mul_prod_eq_smul
+    [TotallyDisconnectedSpace G]
+    (P K : Subgroup G) (hP : IsClosed (P : Set G)) (hKo : IsOpen (K : Set G))
+    (hKc : IsCompact (K : Set G)) (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
+    (μG : Measure G) [μG.IsHaarMeasure]
+    (μP : Measure P) [μP.IsHaarMeasure]
+    (μK : Measure K) [μK.IsHaarMeasure]
+    : μG K • map (fun x : P × K => (x.1 : G) * x.2) (μP.prod μK)
+      = (μP (Subtype.val ⁻¹' (K : Set G)) * μK univ) • μG := by
   have hN : ∀ U ∈ 𝓝 (1 : G), ∃ N : Subgroup G, IsSmallNormal K N ∧ (N : Set G) ⊆ U := by
     intro U hU
     obtain ⟨N, -, hNU, hNK⟩ :=
@@ -112,8 +126,7 @@ theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
   have : BorelSpace K := Subtype.borelSpace (fun x => x ∈ (K : Set G))
   set m : P × K → G := fun x => (x.1 : G) * x.2 with hm_def
   have hm : Measurable m :=
-    (measurable_subtype_coe.comp measurable_fst).mul
-      (measurable_subtype_coe.comp measurable_snd)
+    (measurable_subtype_coe.comp measurable_fst).mul (measurable_subtype_coe.comp measurable_snd)
   set ν := map m (μP.prod μK) with hν
   have hleft : ∀ p : P, map ((p : G) * ·) ν = ν := by
     intro p
@@ -122,8 +135,8 @@ theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
       funext x
       simp [m, mul_assoc]
     rw [this, ← map_map hm ((continuous_const_mul p).measurable.prodMap measurable_id),
-      ← map_prod_map _ _ (continuous_const_mul p).measurable measurable_id,
-      map_mul_left_eq_self, Measure.map_id]
+      ← map_prod_map _ _ (continuous_const_mul p).measurable measurable_id, map_mul_left_eq_self,
+      Measure.map_id]
   have hright : ∀ k : K, map (· * (k : G)) ν = ν := by
     intro k
     rw [hν, map_map (continuous_mul_const _).measurable hm]
@@ -164,8 +177,7 @@ theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
       rw [← this]
       congr 1
       ext y
-      simp only [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, smul_eq_mul,
-        SetLike.mem_coe]
+      simp only [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, smul_eq_mul, SetLike.mem_coe]
       constructor
       · intro h
         have := hN.2.2 k hk _ h
@@ -180,8 +192,8 @@ theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
   have hKsmall : IsSmallNormal K K :=
     ⟨hKo, le_rfl, fun k hk y hy => K.mul_mem (K.mul_mem hk hy) (K.inv_mem hk)⟩
   obtain ⟨B, hB⟩ : ∃ B : ℕ → G, ⋃ i, B i • (K : Set G) = univ := by
-    obtain ⟨T, hTc, hT⟩ := TopologicalSpace.isOpen_iUnion_countable
-      (fun x : G => x • (K : Set G)) fun x => hKo.smul x
+    obtain ⟨T, hTc, hT⟩ :=
+      TopologicalSpace.isOpen_iUnion_countable (fun x : G => x • (K : Set G)) fun x => hKo.smul x
     have hU : ⋃ x : G, x • (K : Set G) = univ :=
       eq_univ_of_forall fun y => mem_iUnion.2 ⟨y, ⟨1, K.one_mem, mul_one y⟩⟩
     have hTne : T.Nonempty := by
@@ -197,35 +209,47 @@ theorem map_mul_prod_eq_smul [TotallyDisconnectedSpace G] (P K : Subgroup G)
     ext y
     simp only [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, smul_eq_mul]
     rw [show x⁻¹ * (g * y) = (g⁻¹ * x)⁻¹ * y by group]
-  have hinv : ν.IsMulLeftInvariant := ⟨fun g => by
-    refine ext_of_generateFrom_of_iUnion (smallCosets K) (fun i => B i • (K : Set G))
-      (borel_eq_generateFrom_smallCosets hN) (isPiSystem_smallCosets K) hB
-      (fun i => ⟨B i, K, hKsmall, rfl⟩) (fun i => ?_) ?_
-    · rw [map_apply (continuous_const_mul g).measurable (hKo.smul _).measurableSet, hpre]
-      exact hfin K hKsmall _
-    · rintro _ ⟨x, N, hN', rfl⟩
-      rw [map_apply (continuous_const_mul g).measurable (hN'.1.smul _).measurableSet, hpre,
-        hcoset N hN', hcoset N hN']⟩
-  have hfc : IsFiniteMeasureOnCompacts ν := ⟨fun C hC => by
-    obtain ⟨t, ht⟩ := hC.elim_finite_subcover (fun x : G => x • (K : Set G))
-      (fun x => hKo.smul x) fun y _ => mem_iUnion.2 ⟨y, ⟨1, K.one_mem, mul_one y⟩⟩
-    calc ν C ≤ ν (⋃ x ∈ t, x • (K : Set G)) := measure_mono ht
-      _ ≤ ∑ x ∈ t, ν (x • (K : Set G)) := measure_biUnion_finset_le _ _
-      _ < ∞ := ENNReal.sum_lt_top.2 fun x _ => (hfin K hKsmall x).lt_top⟩
+  have hinv : ν.IsMulLeftInvariant :=
+    ⟨fun g => by
+      refine ext_of_generateFrom_of_iUnion (smallCosets K)
+        (fun i => B i • (K : Set G))
+        (borel_eq_generateFrom_smallCosets hN) (isPiSystem_smallCosets K) hB
+        (fun i => ⟨B i, K, hKsmall, rfl⟩)
+        (fun i => ?_)
+        ?_
+      · rw [map_apply (continuous_const_mul g).measurable (hKo.smul _).measurableSet, hpre]
+        exact hfin K hKsmall _
+      · rintro _ ⟨x, N, hN', rfl⟩
+        rw [map_apply (continuous_const_mul g).measurable (hN'.1.smul _).measurableSet, hpre,
+          hcoset N hN', hcoset N hN']⟩
+  have hfc : IsFiniteMeasureOnCompacts ν :=
+    ⟨fun C hC => by
+      obtain ⟨t, ht⟩ :=
+        hC.elim_finite_subcover
+          (fun x : G => x • (K : Set G))
+          (fun x => hKo.smul x)
+          fun y _ => mem_iUnion.2 ⟨y, ⟨1, K.one_mem, mul_one y⟩⟩
+      calc
+        ν C
+          ≤ ν (⋃ x ∈ t, x • (K : Set G)) := measure_mono ht
+        _ ≤ ∑ x ∈ t, ν (x • (K : Set G)) := measure_biUnion_finset_le _ _
+        _ < ∞ := ENNReal.sum_lt_top.2 fun x _ => (hfin K hKsmall x).lt_top⟩
   have e := isMulLeftInvariant_eq_smul ν μG
   rw [← hνK, e]
   ext s hs
   simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   ring
 
-theorem lintegral_mul_prod_eq [TotallyDisconnectedSpace G] (P K : Subgroup G)
-    (hP : IsClosed (P : Set G))
-    (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
-    (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
-    (μG : Measure G) [μG.IsHaarMeasure] (μP : Measure P) [μP.IsHaarMeasure] (μK : Measure K)
-    [μK.IsHaarMeasure] {f : G → ℝ≥0∞} (hf : Measurable f) :
-    μG K * ∫⁻ p, ∫⁻ k, f ((p : G) * k) ∂μK ∂μP =
-      μP (Subtype.val ⁻¹' (K : Set G)) * μK univ * ∫⁻ g, f g ∂μG := by
+theorem lintegral_mul_prod_eq
+    [TotallyDisconnectedSpace G]
+    (P K : Subgroup G) (hP : IsClosed (P : Set G)) (hKo : IsOpen (K : Set G))
+    (hKc : IsCompact (K : Set G)) (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
+    (μG : Measure G) [μG.IsHaarMeasure]
+    (μP : Measure P) [μP.IsHaarMeasure]
+    (μK : Measure K) [μK.IsHaarMeasure]
+    {f : G → ℝ≥0∞} (hf : Measurable f)
+    : μG K * ∫⁻ p, ∫⁻ k, f ((p : G) * k) ∂μK ∂μP
+      = μP (Subtype.val ⁻¹' (K : Set G)) * μK univ * ∫⁻ g, f g ∂μG := by
   have : LocallyCompactSpace P := hP.locallyCompactSpace
   have : CompactSpace K := isCompact_iff_compactSpace.1 hKc
   have : SecondCountableTopology P := IsEmbedding.subtypeVal.secondCountableTopology
@@ -233,24 +257,26 @@ theorem lintegral_mul_prod_eq [TotallyDisconnectedSpace G] (P K : Subgroup G)
   have : BorelSpace P := Subtype.borelSpace (fun x => x ∈ (P : Set G))
   have : BorelSpace K := Subtype.borelSpace (fun x => x ∈ (K : Set G))
   have hm : Measurable fun x : P × K => (x.1 : G) * x.2 :=
-    (measurable_subtype_coe.comp measurable_fst).mul
-      (measurable_subtype_coe.comp measurable_snd)
-  have h := congrArg (fun μ : Measure G => ∫⁻ g, f g ∂μ)
-    (map_mul_prod_eq_smul P K hP hKo hKc hPK μG μP μK)
+    (measurable_subtype_coe.comp measurable_fst).mul (measurable_subtype_coe.comp measurable_snd)
+  have h :=
+    congrArg (fun μ : Measure G => ∫⁻ g, f g ∂μ) (map_mul_prod_eq_smul P K hP hKo hKc hPK μG μP μK)
   simp only [lintegral_smul_measure, smul_eq_mul] at h
-  rw [lintegral_map hf hm, lintegral_prod (fun x : P × K => f ((x.1 : G) * x.2))
-    (hf.comp hm).aemeasurable] at h
+  rw [lintegral_map hf hm,
+      lintegral_prod (fun x : P × K => f ((x.1 : G) * x.2)) (hf.comp hm).aemeasurable]
+    at h
   exact h
 
-theorem integral_mul_prod_eq [TotallyDisconnectedSpace G] (P K : Subgroup G)
-    (hP : IsClosed (P : Set G))
-    (hKo : IsOpen (K : Set G)) (hKc : IsCompact (K : Set G))
-    (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
-    (μG : Measure G) [μG.IsHaarMeasure] (μP : Measure P) [μP.IsHaarMeasure] (μK : Measure K)
-    [μK.IsHaarMeasure] {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    {f : G → E} (hf : Integrable f μG) :
-    μG.real K • ∫ p, ∫ k, f ((p : G) * k) ∂μK ∂μP =
-      (μP.real (Subtype.val ⁻¹' (K : Set G)) * μK.real univ) • ∫ g, f g ∂μG := by
+theorem integral_mul_prod_eq
+    [TotallyDisconnectedSpace G]
+    (P K : Subgroup G) (hP : IsClosed (P : Set G)) (hKo : IsOpen (K : Set G))
+    (hKc : IsCompact (K : Set G)) (hPK : ∀ g : G, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
+    (μG : Measure G) [μG.IsHaarMeasure]
+    (μP : Measure P) [μP.IsHaarMeasure]
+    (μK : Measure K) [μK.IsHaarMeasure]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    {f : G → E} (hf : Integrable f μG)
+    : μG.real K • ∫ p, ∫ k, f ((p : G) * k) ∂μK ∂μP
+      = (μP.real (Subtype.val ⁻¹' (K : Set G)) * μK.real univ) • ∫ g, f g ∂μG := by
   have : LocallyCompactSpace P := hP.locallyCompactSpace
   have : CompactSpace K := isCompact_iff_compactSpace.1 hKc
   have : SecondCountableTopology P := IsEmbedding.subtypeVal.secondCountableTopology
@@ -258,8 +284,7 @@ theorem integral_mul_prod_eq [TotallyDisconnectedSpace G] (P K : Subgroup G)
   have : BorelSpace P := Subtype.borelSpace (fun x => x ∈ (P : Set G))
   have : BorelSpace K := Subtype.borelSpace (fun x => x ∈ (K : Set G))
   have hm : Measurable fun x : P × K => (x.1 : G) * x.2 :=
-    (measurable_subtype_coe.comp measurable_fst).mul
-      (measurable_subtype_coe.comp measurable_snd)
+    (measurable_subtype_coe.comp measurable_fst).mul (measurable_subtype_coe.comp measurable_snd)
   have key := map_mul_prod_eq_smul P K hP hKo hKc hPK μG μP μK
   set ν := map (fun x : P × K => (x.1 : G) * x.2) (μP.prod μK)
   set d : ℝ≥0∞ := μP (Subtype.val ⁻¹' (K : Set G)) * μK univ with hd_def
@@ -278,8 +303,7 @@ theorem integral_mul_prod_eq [TotallyDisconnectedSpace G] (P K : Subgroup G)
   have h1 : ∫ g, f g ∂ν = ∫ p, ∫ k, f ((p : G) * k) ∂μK ∂μP := by
     rw [integral_map hm.aemeasurable hfν.aestronglyMeasurable]
     exact integral_prod _ hfm
-  have h2 : ∫ g, f g ∂ν = ((μG K)⁻¹ * d).toReal • ∫ g, f g ∂μG := by
-    rw [hν, integral_smul_measure]
+  have h2 : ∫ g, f g ∂ν = ((μG K)⁻¹ * d).toReal • ∫ g, f g ∂μG := by rw [hν, integral_smul_measure]
   rw [← h1, h2, smul_smul, ENNReal.toReal_mul, ENNReal.toReal_inv, ← mul_assoc, Measure.real,
     mul_inv_cancel₀ (ENNReal.toReal_ne_zero.2 ⟨hc0, hcT⟩), one_mul, hd_def, ENNReal.toReal_mul]
   rfl
@@ -288,8 +312,11 @@ end General
 
 section GeneralLinear
 
-variable (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  (n : ℕ) {α : Type*} [LinearOrder α] {β : Fin n → α}
+variable
+  (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  (n : ℕ)
+  {α : Type*} [LinearOrder α]
+  {β : Fin n → α}
 
 variable [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
 

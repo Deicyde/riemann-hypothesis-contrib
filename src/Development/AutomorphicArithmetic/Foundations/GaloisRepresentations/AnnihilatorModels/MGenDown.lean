@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -31,11 +34,9 @@ private lemma closed_iff {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuati
     have hne : (s z).asIdeal ≠ ⊥ := fun hb0 => hϖ.ne_zero (by simpa [hb0] using h)
     exact PrimeSpectrum.ext (IsLocalRing.eq_maximalIdeal (Ring.DimensionLEOne.maximalOfPrime hne (s z).2))
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.genDown_of :
-    GenDown := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.genDown_of : GenDown := by
   intro O _ _ _ ϖ hϖ X Y s h hflat y hy
-  have hc : ∀ y' : Y, s (h y') = IsLocalRing.closedPoint O ↔
-      y' ∉ Y.basicOpen (fn (h ≫ s) ϖ) := by
+  have hc : ∀ y' : Y, s (h y') = IsLocalRing.closedPoint O ↔ y' ∉ Y.basicOpen (fn (h ≫ s) ϖ) := by
     intro y'
     rw [← closed_iff hϖ (h ≫ s) y', Scheme.Hom.comp_apply]
   refine ⟨(hc y).mpr hy.1, fun z' hz' hsp => ?_⟩

@@ -23,8 +23,9 @@ theorem SheetPieceReachesCentre.proof : SheetPieceReachesCentre.Statement := by
     have hKD : Metric.closedBall y (ε / 2) ⊆ D :=
       (Metric.closedBall_subset_ball (half_lt_self hε)).trans hball
     have hP := hprop _ hKD (isCompact_closedBall y (ε / 2))
-    have hQsub : closure (T ∩ A ⁻¹' Metric.closedBall y (ε / 2)) ⊆
-        {x | x ∈ X ∩ B ∧ A x ∈ Metric.closedBall y (ε / 2)} :=
+    have hQsub
+        : closure (T ∩ A ⁻¹' Metric.closedBall y (ε / 2))
+          ⊆ {x | x ∈ X ∩ B ∧ A x ∈ Metric.closedBall y (ε / 2)} :=
       closure_minimal (fun x hx => ⟨hx.1.1.1, hx.2⟩) hP.isClosed
     have hQ : IsCompact (closure (T ∩ A ⁻¹' Metric.closedBall y (ε / 2))) :=
       hP.of_isClosed_subset isClosed_closure hQsub
@@ -34,7 +35,8 @@ theorem SheetPieceReachesCentre.proof : SheetPieceReachesCentre.Statement := by
       rw [mem_closure_iff_nhds] at hy ⊢
       intro t ht
       obtain ⟨z, ⟨hzt, hzK⟩, x, hxT, rfl⟩ :=
-        hy (t ∩ Metric.closedBall y (ε / 2)) (Filter.inter_mem ht (Metric.closedBall_mem_nhds y (half_pos hε)))
+        hy (t ∩ Metric.closedBall y (ε / 2))
+          (Filter.inter_mem ht (Metric.closedBall_mem_nhds y (half_pos hε)))
       exact ⟨A x, hzt, x, ⟨hxT, hzK⟩, rfl⟩
     obtain ⟨x, hxQ, rfl⟩ := closure_minimal (Set.image_mono subset_closure) hAQ hyK
     exact ⟨x, closure_mono Set.inter_subset_left hxQ, (hQsub hxQ).1, rfl⟩
@@ -47,7 +49,8 @@ theorem SheetPieceReachesCentre.proof : SheetPieceReachesCentre.Statement := by
     have hAx : A x = y₀ := by rw [← hgy₀, hAg y₀ hy₀O]
     subst hAx
     have h1 : g ⁻¹' (U ∩ V') ∈ 𝓝 (A x) :=
-      (hg (A x) hy₀O).continuousAt.preimage_mem_nhds (by rw [hgy₀]; exact (hU.inter hV').mem_nhds ⟨hxU, hxV'⟩)
+      (hg (A x) hy₀O).continuousAt.preimage_mem_nhds
+        (by rw [hgy₀]; exact (hU.inter hV').mem_nhds ⟨hxU, hxV'⟩)
     have h2 : δ ⁻¹' {0}ᶜ ∈ 𝓝 (A x) :=
       (hδ (A x) (hmaps hxXB)).continuousAt.preimage_mem_nhds (isOpen_compl_singleton.mem_nhds hδx)
     filter_upwards [h1, h2, hO.mem_nhds hy₀O] with y hy1 hy2 hy3
@@ -56,9 +59,20 @@ theorem SheetPieceReachesCentre.proof : SheetPieceReachesCentre.Statement := by
     rw [hAg y hy3]
     exact hy2
 
-  have hreg : ∀ y ∈ D, IsRegularPointOf D y := fun y hy =>
-    ⟨hy, d, ContinuousLinearMap.id ℂ _, D, D, id, hD, hD, hy, fun _ _ => analyticAt_id, fun _ _ => rfl,
-      by rw [Set.inter_self, Set.image_id]⟩
+  have hreg : ∀ y ∈ D, IsRegularPointOf D y := fun y hy => ⟨
+    hy,
+    d,
+    ContinuousLinearMap.id ℂ _,
+    D,
+    D,
+    id,
+    hD,
+    hD,
+    hy,
+    fun _ _ => analyticAt_id,
+    fun _ _ => rfl,
+    by rw [Set.inter_self, Set.image_id]
+  ⟩
   have hE : IsPreconnected (D \ {z | δ z = 0}) :=
     ManifoldZerosComplementConnected.proof (Fin d) D δ hDc hreg hδ ⟨y₁, hy₁D, hy₁⟩
   have hEsub : D \ {z | δ z = 0} ⊆ A '' T := by

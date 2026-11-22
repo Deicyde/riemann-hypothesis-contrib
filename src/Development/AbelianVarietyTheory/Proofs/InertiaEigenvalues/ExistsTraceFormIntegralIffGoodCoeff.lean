@@ -10,11 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.GoodCoeff
 
-theorem exists_trace_form_integral_iff : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∃ lam : LL →ₗ[ℚ_[l]] ℚ_[l], ∀ a : LL, (∀ b : O, ∃ u : ℤ_[l], lam (a * algebraMap O LL b) = (u : ℚ_[l])) ↔ ∃ b : O, algebraMap O LL b = a := by
+theorem exists_trace_form_integral_iff
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+        (O : Type) [CommRing O] [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∃ lam : LL →ₗ[ℚ_[l]] ℚ_[l], ∀ a : LL,
+          (∀ b : O, ∃ u : ℤ_[l], lam (a * algebraMap O LL b) = (u : ℚ_[l]))
+            ↔ ∃ b : O, algebraMap O LL b = a := by
   intro l _ LL _ _ _ O _ _ hG
   have hint := (good_coeff_integers l LL O hG).1
   obtain ⟨⟨hD, hDVR, hFr⟩, hfin, hmod, htop, hopen⟩ := hG
@@ -28,8 +35,9 @@ theorem exists_trace_form_integral_iff : ∀ (l : ℕ) [Fact l.Prime] (LL : Type
   have hZ : ∀ u : ℤ_[l], algebraMap ℤ_[l] LL u ∈ A := fun u =>
     padicInt_mem A (by rw [RingHom.coe_range]; exact hopen) u
   have hinj : Function.Injective (algebraMap O LL) := IsFractionRing.injective O LL
-  let ψ : O ≃+* A := RingEquiv.ofBijective (algebraMap O LL).rangeRestrict
-    ⟨fun a b h => hinj (congrArg Subtype.val h), (algebraMap O LL).rangeRestrict_surjective⟩
+  let ψ : O ≃+* A :=
+    RingEquiv.ofBijective (algebraMap O LL).rangeRestrict
+      ⟨fun a b h => hinj (congrArg Subtype.val h), (algebraMap O LL).rangeRestrict_surjective⟩
   have hψ : ∀ a : A, algebraMap O LL (ψ.symm a) = a := fun a =>
     congrArg Subtype.val (ψ.apply_symm_apply a)
   let f : ℤ_[l] →+* O := ψ.symm.toRingHom.comp ((algebraMap ℤ_[l] LL).codRestrict A hZ)
@@ -55,8 +63,9 @@ theorem exists_trace_form_integral_iff : ∀ (l : ℕ) [Fact l.Prime] (LL : Type
     rw [hDc, h, FractionalIdeal.coe_zero]
     exact Submodule.span_singleton_eq_bot.2 rfl
   refine ⟨(Algebra.trace ℚ_[l] LL).comp (LinearMap.mulLeft ℚ_[l] c), fun a => ?_⟩
-  have key : (∀ b : O, ∃ u : ℤ_[l], (Algebra.trace ℚ_[l] LL) (c * (a * algebraMap O LL b)) = (u : ℚ_[l]))
-      ↔ c * a ∈ D := by
+  have key
+      : (∀ b : O, ∃ u : ℤ_[l], (Algebra.trace ℚ_[l] LL) (c * (a * algebraMap O LL b)) = (u : ℚ_[l]))
+        ↔ c * a ∈ D := by
     rw [FractionalIdeal.mem_dual (one_ne_zero : (1 : FractionalIdeal (nonZeroDivisors O) LL) ≠ 0)]
     constructor
     · intro h y hy

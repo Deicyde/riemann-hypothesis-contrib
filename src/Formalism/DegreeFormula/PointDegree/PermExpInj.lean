@@ -9,8 +9,9 @@ open MvPolynomial
 namespace Formalism.DegreeFormula.PermutationPointDegree
 open Formalism.DegreeFormula
 
-theorem permExp_inj {ι : Type} [Fintype ι] {N : ℕ} (σ ρ : ι → Equiv.Perm (Fin N))
-    (h : permExp σ = permExp ρ) : σ = ρ := by
+theorem permExp_inj
+    {ι : Type} [Fintype ι] {N : ℕ} (σ ρ : ι → Equiv.Perm (Fin N)) (h : permExp σ = permExp ρ)
+    : σ = ρ := by
   funext τ
   ext i
   have := DFunLike.congr_fun h (τ, i)

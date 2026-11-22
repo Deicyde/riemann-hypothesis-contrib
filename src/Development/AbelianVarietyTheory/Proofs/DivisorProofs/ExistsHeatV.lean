@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LeISupInfPrei
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -28,18 +31,24 @@ theorem pbT_id {O₀ O : Y.Opens} (h : O ≤ O₀) (s : Γ(Y, O₀)) : pbT (𝟙
   rw [pbT_of_le (𝟙 Y) h, rsT_of_le h]
   rfl
 
-theorem cst_eq (π : Y ⟶ X) (V : X.Opens) {O : Y.Opens} (h : O ≤ π ⁻¹ᵁ V) (r : Γ(X, V)) :
-    GlobalTheory.HeatV.cst π V h r = pbT π r O := (pbT_of_le π h r).symm
+theorem cst_eq (π : Y ⟶ X) (V : X.Opens) {O : Y.Opens} (h : O ≤ π ⁻¹ᵁ V) (r : Γ(X, V))
+    : GlobalTheory.HeatV.cst π V h r = pbT π r O :=
+  (pbT_of_le π h r).symm
 
-theorem rsT_unit {O₀ O : Y.Opens} (h : O ≤ O₀) (w : Γ(Y, O₀)ˣ) : rsT w.val O * rsT w⁻¹.val O = 1 := by
+theorem rsT_unit {O₀ O : Y.Opens} (h : O ≤ O₀) (w : Γ(Y, O₀)ˣ)
+    : rsT w.val O * rsT w⁻¹.val O = 1 := by
   rw [← rsT_mul, Units.mul_inv, rsT_one h]
 
-theorem rsT_cocycle (L : LB Y) (hL : L.IsLB) (i j k : L.ι) {O : Y.Opens} (hO : O ≤ L.U i ⊓ L.U j ⊓ L.U k) :
-    rsT (L.g i j).val O * rsT (L.g j k).val O = rsT (L.g i k).val O := by
+theorem rsT_cocycle
+    (L : LB Y) (hL : L.IsLB) (i j k : L.ι) {O : Y.Opens} (hO : O ≤ L.U i ⊓ L.U j ⊓ L.U k)
+    : rsT (L.g i j).val O * rsT (L.g j k).val O = rsT (L.g i k).val O := by
   have e := congrArg (fun u : Γ(Y, L.U i ⊓ L.U j ⊓ L.U k)ˣ => rsT u.val O) (hL.cocycle i j k)
   simp only [Units.val_mul, rsT_mul] at e
-  have r : ∀ {V V' : Y.Opens} (h : V' ≤ V) (u : Γ(Y, V)ˣ), O ≤ V' →
-      rsT (ReciprocityTheory.ChartRestriction.G.Semi.res h u).val O = rsT u.val O := fun h u hO' => by
+  have r
+      : ∀ {V V' : Y.Opens} (h : V' ≤ V) (u : Γ(Y, V)ˣ),
+        O ≤ V'
+          → rsT (ReciprocityTheory.ChartRestriction.G.Semi.res h u).val O
+            = rsT u.val O := fun h u hO' => by
     show rsT (resG Y h u.val) O = _
     rw [← rsT_of_le h, rsT_rsT h hO']
   rw [r _ _ hO, r _ _ hO, r _ _ hO] at e

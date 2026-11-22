@@ -5,16 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory
 
-theorem starProjection_eq_add_inf_orthogonal {n : ℕ}
-    (U V : Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h : U ≤ V) (x : EuclideanSpace ℂ (Fin n)) :
-    V.starProjection x = U.starProjection x + (Uᗮ ⊓ V).starProjection x := by
+theorem starProjection_eq_add_inf_orthogonal
+    {n : ℕ}
+    (U V : Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h : U ≤ V) (x : EuclideanSpace ℂ (Fin n))
+    : V.starProjection x = U.starProjection x + (Uᗮ ⊓ V).starProjection x := by
   apply Submodule.eq_starProjection_of_mem_orthogonal
-  · exact V.add_mem (h (U.starProjection_apply_mem x))
-      (((Uᗮ ⊓ V).starProjection_apply_mem x).2)
+  · exact V.add_mem (h (U.starProjection_apply_mem x)) (((Uᗮ ⊓ V).starProjection_apply_mem x).2)
   · rw [← Submodule.sup_orthogonal_inf_of_hasOrthogonalProjection h, ← Submodule.inf_orthogonal,
       Submodule.sup_orthogonal_inf_of_hasOrthogonalProjection h]
     refine ⟨?_, ?_⟩
@@ -26,11 +27,12 @@ theorem starProjection_eq_add_inf_orthogonal {n : ℕ}
       exact Submodule.orthogonal_le (inf_le_left (a := Uᗮ) (b := V))
         (U.le_orthogonal_orthogonal (U.starProjection_apply_mem x))
 
-theorem starProjection_flag_eq_sum {n a : ℕ}
-    (W : Fin (a + 1) → Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h0 : W 0 = ⊥) (hm : Monotone W)
-    (l : Fin (a + 1)) (x : EuclideanSpace ℂ (Fin n)) :
-    (W l).starProjection x = ∑ i ∈ univ.filter (fun i : Fin a => i.val < l.val),
-      ((W i.castSucc)ᗮ ⊓ W i.succ).starProjection x := by
+theorem starProjection_flag_eq_sum
+    {n a : ℕ} (W : Fin (a + 1) → Submodule ℂ (EuclideanSpace ℂ (Fin n))) (h0 : W 0 = ⊥)
+    (hm : Monotone W) (l : Fin (a + 1)) (x : EuclideanSpace ℂ (Fin n))
+    : (W l).starProjection x
+      = ∑ i ∈ univ.filter (fun i : Fin a => i.val < l.val),
+        ((W i.castSucc)ᗮ ⊓ W i.succ).starProjection x := by
   induction l using Fin.induction with
   | zero =>
     have := (W 0).starProjection_apply_mem x
@@ -39,8 +41,9 @@ theorem starProjection_flag_eq_sum {n a : ℕ}
       simpa using h3
     simp [h2]
   | succ i ih =>
-    have hf : univ.filter (fun k : Fin a => k.val < i.succ.val)
-        = insert i (univ.filter (fun k : Fin a => k.val < i.castSucc.val)) := by
+    have hf
+        : univ.filter (fun k : Fin a => k.val < i.succ.val)
+          = insert i (univ.filter (fun k : Fin a => k.val < i.castSucc.val)) := by
       ext k
       simp only [mem_filter, mem_univ, true_and, mem_insert, Fin.val_succ, Fin.val_castSucc,
         Fin.ext_iff]
@@ -48,21 +51,22 @@ theorem starProjection_flag_eq_sum {n a : ℕ}
     rw [hf, Finset.sum_insert (by simp), ← ih, add_comm]
     exact starProjection_eq_add_inf_orthogonal _ _ (hm (Fin.castSucc_le_succ i)) x
 
-theorem exists_orthonormal_frame_of_flag (n a : ℕ) (j : Fin a → ℕ)
-    (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)) (h0 : W 0 = ⊥) (hm : Monotone W)
-    (hj : ∀ i : Fin a, Module.finrank ℂ (W i.succ) = Module.finrank ℂ (W i.castSucc) + j i) :
-    ∃ T : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ, (∀ i, (T i)ᴴ * T i = 1) ∧
-      (∀ i k, i ≠ k → (T i)ᴴ * T k = 0) ∧ ∀ (l : Fin (a + 1)) (y : Fin n → ℂ),
-        y ∈ W l ↔ (∑ i ∈ univ.filter (fun i : Fin a => i.val < l.val), T i * (T i)ᴴ) *ᵥ y = y := by
+theorem exists_orthonormal_frame_of_flag
+    (n a : ℕ) (j : Fin a → ℕ) (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ))
+    (h0 : W 0 = ⊥) (hm : Monotone W)
+    (hj : ∀ i : Fin a, Module.finrank ℂ (W i.succ) = Module.finrank ℂ (W i.castSucc) + j i)
+    : ∃ T : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ,
+      (∀ i, (T i)ᴴ * T i = 1) ∧ (∀ i k, i ≠ k → (T i)ᴴ * T k = 0)
+        ∧ ∀ (l : Fin (a + 1)) (y : Fin n → ℂ),
+          y ∈ W l
+            ↔ (∑ i ∈ univ.filter (fun i : Fin a => i.val < l.val), T i * (T i)ᴴ) *ᵥ y = y := by
   let e : (Fin n → ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin n) := (WithLp.linearEquiv 2 ℂ (Fin n → ℂ)).symm
-  let V : Fin (a + 1) → Submodule ℂ (EuclideanSpace ℂ (Fin n)) :=
-    fun l => (W l).map e.toLinearMap
+  let V : Fin (a + 1) → Submodule ℂ (EuclideanSpace ℂ (Fin n)) := fun l => (W l).map e.toLinearMap
   have hV0 : V 0 = ⊥ := by simp [V, h0]
   have hVm : Monotone V := fun l k h => Submodule.map_mono (hm h)
-  have hVr : ∀ l, Module.finrank ℂ (V l) = Module.finrank ℂ (W l) :=
-    fun l => LinearEquiv.finrank_map_eq e (W l)
-  let P : Fin a → Submodule ℂ (EuclideanSpace ℂ (Fin n)) :=
-    fun i => (V i.castSucc)ᗮ ⊓ V i.succ
+  have hVr : ∀ l, Module.finrank ℂ (V l) = Module.finrank ℂ (W l) := fun l =>
+    LinearEquiv.finrank_map_eq e (W l)
+  let P : Fin a → Submodule ℂ (EuclideanSpace ℂ (Fin n)) := fun i => (V i.castSucc)ᗮ ⊓ V i.succ
   have hP : ∀ i, Module.finrank ℂ (P i) = j i := by
     intro i
     have h1 := Submodule.finrank_add_inf_finrank_orthogonal (hVm (Fin.castSucc_le_succ i))
@@ -70,18 +74,23 @@ theorem exists_orthonormal_frame_of_flag (n a : ℕ) (j : Fin a → ℕ)
     rw [hVr, hVr] at h1
     change Module.finrank ℂ ↥((V i.castSucc)ᗮ ⊓ V i.succ) = j i
     omega
-  let b : ∀ i, OrthonormalBasis (Fin (j i)) ℂ (P i) :=
-    fun i => (stdOrthonormalBasis ℂ (P i)).reindex (finCongr (hP i))
-  let T : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ :=
-    fun i => Matrix.of fun r c => (b i c : EuclideanSpace ℂ (Fin n)) r
-  have hT : ∀ i k c d, ((T i)ᴴ * T k) c d
-      = inner ℂ (b i c : EuclideanSpace ℂ (Fin n)) (b k d : EuclideanSpace ℂ (Fin n)) := by
+  let b : ∀ i, OrthonormalBasis (Fin (j i)) ℂ (P i) := fun i =>
+    (stdOrthonormalBasis ℂ (P i)).reindex (finCongr (hP i))
+  let T : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ := fun i =>
+    Matrix.of fun r c => (b i c : EuclideanSpace ℂ (Fin n)) r
+  have hT
+      : ∀ i k c d,
+        ((T i)ᴴ * T k) c d
+          = inner ℂ (b i c : EuclideanSpace ℂ (Fin n)) (b k d : EuclideanSpace ℂ (Fin n)) := by
     intro i k c d
     simp only [Matrix.mul_apply, conjTranspose_apply, T, of_apply,
       EuclideanSpace.inner_eq_star_dotProduct, dotProduct, Pi.star_apply]
     exact Finset.sum_congr rfl fun r _ => mul_comm _ _
-  have hlt : ∀ i k : Fin a, i < k → ∀ c d,
-      inner ℂ (b i c : EuclideanSpace ℂ (Fin n)) (b k d : EuclideanSpace ℂ (Fin n)) = 0 := by
+  have hlt
+      : ∀ i k : Fin a,
+        i < k
+          → ∀ c d,
+            inner ℂ (b i c : EuclideanSpace ℂ (Fin n)) (b k d : EuclideanSpace ℂ (Fin n)) = 0 := by
     intro i k h c d
     have h1 : (b i c : EuclideanSpace ℂ (Fin n)) ∈ V k.castSucc :=
       hVm (Fin.succ_le_castSucc_iff.2 h) (b i c).2.2
@@ -90,9 +99,8 @@ theorem exists_orthonormal_frame_of_flag (n a : ℕ) (j : Fin a → ℕ)
     intro i y
     rw [(b i).starProjection_eq_sum_rankOne, ← Matrix.mulVec_mulVec]
     ext r
-    simp only [_root_.sum_apply, InnerProductSpace.rankOne_apply, WithLp.ofLp_sum,
-      Finset.sum_apply, WithLp.ofLp_smul, Pi.smul_apply, smul_eq_mul,
-      EuclideanSpace.inner_eq_star_dotProduct]
+    simp only [_root_.sum_apply, InnerProductSpace.rankOne_apply, WithLp.ofLp_sum, Finset.sum_apply,
+      WithLp.ofLp_smul, Pi.smul_apply, smul_eq_mul, EuclideanSpace.inner_eq_star_dotProduct]
     simp only [Matrix.mulVec, dotProduct, T, of_apply, conjTranspose_apply, Pi.star_apply]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [mul_comm]
@@ -110,8 +118,7 @@ theorem exists_orthonormal_frame_of_flag (n a : ℕ) (j : Fin a → ℕ)
     · rw [inner_eq_zero_symm]
       exact hlt k i h d c
   · intro l y
-    have h1 : y ∈ W l ↔ e y ∈ V l := by
-      simp [V]
+    have h1 : y ∈ W l ↔ e y ∈ V l := by simp [V]
     rw [h1, ← Submodule.starProjection_eq_self_iff, starProjection_flag_eq_sum V hV0 hVm,
       Matrix.sum_mulVec]
     simp only [hproj]

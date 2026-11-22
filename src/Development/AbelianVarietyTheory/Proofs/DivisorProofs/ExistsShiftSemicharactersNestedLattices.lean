@@ -12,7 +12,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -20,21 +21,23 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SemicharShift
 
-def imForm {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) :
-    (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun y w => (hermForm Hm y w).im)
+def imForm {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) →ₗ[ℝ] ℝ :=
+  LinearMap.mk₂ ℝ
+    (fun y w => (hermForm Hm y w).im)
     (fun a b w => by simp [hermForm, add_dotProduct])
     (fun c a w => by simp [hermForm, smul_dotProduct, Complex.smul_im])
     (fun y a b => by simp [hermForm, Matrix.mulVec_add, dotProduct_add])
     (fun c y a => by
       simp [hermForm, star_smul, Matrix.mulVec_smul, dotProduct_smul, Complex.smul_im])
 
-theorem imForm_apply {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (y w : Fin g → ℂ) :
-    imForm Hm y w = (hermForm Hm y w).im := rfl
+theorem imForm_apply {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ) (y w : Fin g → ℂ)
+    : imForm Hm y w = (hermForm Hm y w).im :=
+  rfl
 
-theorem imForm_surjective {g : ℕ} (Hm : Matrix (Fin g) (Fin g) ℂ)
-    (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) :
-    Function.Surjective (imForm Hm) := by
+theorem imForm_surjective
+    {g : ℕ}
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
+    : Function.Surjective (imForm Hm) := by
   have hinj : Function.Injective (imForm Hm) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro z hz
@@ -54,10 +57,11 @@ end GlobalTheory.SemicharShift
 
 namespace GlobalTheory.SemicharShift
 
-theorem exists_linear_of_char {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ]
-    (hsp : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤) (ρ : Λ → ℂ) (hn : ∀ l, ‖ρ l‖ = 1)
-    (hmul : ∀ l m, ρ (l + m) = ρ l * ρ m) :
-    ∃ φ : (Fin g → ℂ) →ₗ[ℝ] ℝ, ∀ l : Λ,
+theorem exists_linear_of_char
+    {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ]
+    (hsp : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+    (ρ : Λ → ℂ) (hn : ∀ l, ‖ρ l‖ = 1) (hmul : ∀ l m, ρ (l + m) = ρ l * ρ m)
+    : ∃ φ : (Fin g → ℂ) →ₗ[ℝ] ℝ, ∀ l : Λ,
       ρ l = Complex.exp (2 * Real.pi * Complex.I * (φ (l : Fin g → ℂ) : ℂ)) := by
   haveI : IsZLattice ℝ Λ := ⟨hsp⟩
   let b := Module.Free.chooseBasis ℤ Λ
@@ -76,27 +80,30 @@ theorem exists_linear_of_char {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ)) [Di
     have h := hne 0
     field_simp at this
     exact this.symm
-  let S : AddSubgroup Λ :=
-    { carrier := {l | ρ l = Complex.exp (2 * Real.pi * Complex.I * (φ (l : Fin g → ℂ) : ℂ))}
-      add_mem' := by
-        intro l m hl hm
-        simp only [Set.mem_setOf_eq] at hl hm ⊢
-        rw [hmul, hl, hm, ← Complex.exp_add]
-        congr 1
-        simp only [Submodule.coe_add, map_add (f := _)]
-        push_cast; ring
-      zero_mem' := by
-        simp only [Set.mem_setOf_eq, ZeroMemClass.coe_zero, map_zero]
-        simp [h0]
-      neg_mem' := by
-        intro l hl
-        simp only [Set.mem_setOf_eq] at hl ⊢
-        have h1 : ρ (-l) * ρ l = 1 := by rw [← hmul, neg_add_cancel, h0]
-        have h2 : ρ (-l) = (ρ l)⁻¹ := eq_inv_of_mul_eq_one_left h1
-        rw [h2, hl, ← Complex.exp_neg]
-        congr 1
-        simp only [Submodule.coe_neg, map_neg]
-        push_cast; ring }
+  let S : AddSubgroup Λ := {
+    carrier := {l | ρ l = Complex.exp (2 * Real.pi * Complex.I * (φ (l : Fin g → ℂ) : ℂ))}
+    add_mem' := by
+      intro l m hl hm
+      simp only [Set.mem_setOf_eq] at hl hm ⊢
+      rw [hmul, hl, hm, ← Complex.exp_add]
+      congr 1
+      simp only [Submodule.coe_add, map_add (f := _)]
+      push_cast
+      ring
+    zero_mem' := by
+      simp only [Set.mem_setOf_eq, ZeroMemClass.coe_zero, map_zero]
+      simp [h0]
+    neg_mem' := by
+      intro l hl
+      simp only [Set.mem_setOf_eq] at hl ⊢
+      have h1 : ρ (-l) * ρ l = 1 := by rw [← hmul, neg_add_cancel, h0]
+      have h2 : ρ (-l) = (ρ l)⁻¹ := eq_inv_of_mul_eq_one_left h1
+      rw [h2, hl, ← Complex.exp_neg]
+      congr 1
+      simp only [Submodule.coe_neg, map_neg]
+      push_cast
+      ring
+  }
   have htop : (⊤ : Submodule ℤ Λ) ≤ S.toIntSubmodule := by
     rw [← b.span_eq, Submodule.span_le]
     rintro _ ⟨j, rfl⟩
@@ -117,13 +124,19 @@ end GlobalTheory.SemicharShift
 
 namespace GlobalTheory.SemicharShift
 
-theorem exists_shift_of_semichar : ∀ (g : ℕ) (Λ Λ₁ : Submodule ℤ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (χ₁ : Λ₁ → ℂ)
-    (h : Λ ≤ Λ₁), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → Hm.IsHermitian →
-    (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → (∀ l, ‖χ l‖ = 1) → (∀ l, ‖χ₁ l‖ = 1) →
-    (∀ l m : Λ, χ (l + m) = χ l * χ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm l m).im)) →
-    (∀ l m : Λ₁, χ₁ (l + m) = χ₁ l * χ₁ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm l m).im)) →
-    ∃ a : Fin g → ℂ, ∀ l : Λ,
-      χ l = χ₁ (Submodule.inclusion h l) * Complex.exp (2 * Real.pi * Complex.I * (hermForm Hm a l).im) := by
+theorem exists_shift_of_semichar
+    : ∀ (g : ℕ) (Λ Λ₁ : Submodule ℤ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ)
+        (χ₁ : Λ₁ → ℂ) (h : Λ ≤ Λ₁),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → Hm.IsHermitian
+        → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → (∀ l, ‖χ l‖ = 1) → (∀ l, ‖χ₁ l‖ = 1)
+        → (∀ l m : Λ,
+          χ (l + m) = χ l * χ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm l m).im))
+        → (∀ l m : Λ₁,
+          χ₁ (l + m) = χ₁ l * χ₁ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm l m).im))
+        → ∃ a : Fin g → ℂ, ∀ l : Λ,
+          χ l
+            = χ₁ (Submodule.inclusion h l)
+              * Complex.exp (2 * Real.pi * Complex.I * (hermForm Hm a l).im) := by
   intro g Λ Λ₁ Hm χ χ₁ h hdisc hsp _hH hpos hχ hχ₁ hc hc₁
   haveI := hdisc
   have hne : ∀ l, χ₁ l ≠ 0 := fun l e => by simpa [e] using hχ₁ l

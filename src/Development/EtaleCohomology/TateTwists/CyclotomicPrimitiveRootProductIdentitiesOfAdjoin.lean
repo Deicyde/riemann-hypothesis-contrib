@@ -26,7 +26,8 @@ abbrev R (q : ℕ) := AdjoinRoot (cyclotomic q ℤ)
 noncomputable abbrev θ (q : ℕ) : R q := AdjoinRoot.root (cyclotomic q ℤ)
 
 noncomputable def φ (q : ℕ) [NeZero q] : R q →+* ℂ :=
-  AdjoinRoot.lift (algebraMap ℤ ℂ) (μ q) (by rw [← aeval_def]; exact aeval_cyc (NeZero.pos q) (hμ q))
+  AdjoinRoot.lift (algebraMap ℤ ℂ) (μ q)
+    (by rw [← aeval_def]; exact aeval_cyc (NeZero.pos q) (hμ q))
 
 lemma φ_root (q : ℕ) [NeZero q] : φ q (θ q) = μ q := AdjoinRoot.lift_root _
 
@@ -134,13 +135,13 @@ lemma unit_prod {q : ℕ} [NeZero q] {A : Type} [CommRing A] (ζ : Prim q A) :
   rw [eval_prod_ψ ζ 1 _ (fun i => i + 1)] at h
   simpa [eval₂_finsetSum] using h
 
-theorem cyclotomic_primitive_root_product_identities_of_adjoin_root : LateralTheory.EtaleFoundations.PrimitiveRootsOfUnityBasicIdentities := by
+theorem cyclotomic_primitive_root_product_identities_of_adjoin_root
+    : LateralTheory.EtaleFoundations.PrimitiveRootsOfUnityBasicIdentities := by
   intro q _ A _
-  have hq1 : ∀ ζ : Prim q A, ζ.1 ^ q = 1 := fun ζ => by
-    rw [← ψ_root, ← map_pow, θ_pow, map_one]
+  have hq1 : ∀ ζ : Prim q A, ζ.1 ^ q = 1 := fun ζ => by rw [← ψ_root, ← map_pow, θ_pow, map_one]
   have hu : ∀ ζ : Prim q A, IsUnit ζ.1 := fun ζ =>
-    IsUnit.of_mul_eq_one (ζ.1 ^ (q - 1)) (by
-      rw [← pow_succ', Nat.sub_add_cancel (NeZero.pos q), hq1])
+    IsUnit.of_mul_eq_one (ζ.1 ^ (q - 1))
+      (by rw [← pow_succ', Nat.sub_add_cancel (NeZero.pos q), hq1])
   have hmod : ∀ (ζ : Prim q A) (a : ℕ), ζ.1 ^ a = ζ.1 ^ (a % q) := fun ζ a => by
     conv_lhs => rw [← Nat.mod_add_div a q, pow_add, pow_mul, hq1, one_pow, mul_one]
   have hlt : ∀ (ζ : Prim q A) (c d : ℕ), c < d → d < q → IsUnit (ζ.1 ^ c - ζ.1 ^ d) := by
@@ -175,7 +176,8 @@ theorem cyclotomic_primitive_root_product_identities_of_adjoin_root : LateralThe
     rw [eval_prod_ψ0, eval₂_map] at h
     rw [h]
     have e : (ψ ζ).comp (algebraMap ℤ (R q)) = algebraMap ℤ A := RingHom.ext_int _ _
-    rw [e, ← aeval_def]; exact ξ.2.2
+    rw [e, ← aeval_def]
+    exact ξ.2.2
   · intro r hr ζ
     have hr0 : 0 < r := Nat.pos_of_dvd_of_pos hr (NeZero.pos q)
     have hur : IsUnit (r : A) := by

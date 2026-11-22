@@ -5,13 +5,18 @@ public import Formalism.SharpRestriction.GlobalTheoremInputs
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.NBand
 
-theorem prime_eq_of_mem {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
-    {w : HeightOneSpectrum (𝓞 E)} (h1 : ((p : ℕ) : 𝓞 E) ∈ w.asIdeal) (h2 : ((q : ℕ) : 𝓞 E) ∈ w.asIdeal) :
-    p = q := by
+theorem prime_eq_of_mem
+    {E : Type} [Field E] [NumberField E]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    {w : HeightOneSpectrum (𝓞 E)}
+    (h1 : ((p : ℕ) : 𝓞 E) ∈ w.asIdeal) (h2 : ((q : ℕ) : 𝓞 E) ∈ w.asIdeal)
+    : p = q := by
   by_contra hne
   have hc : IsCoprime ((p : ℕ) : 𝓞 E) ((q : ℕ) : 𝓞 E) :=
     Nat.Coprime.cast ((Nat.coprime_primes hp hq).2 hne)
@@ -20,8 +25,10 @@ theorem prime_eq_of_mem {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p
   rw [Ideal.eq_top_iff_one, ← hab]
   exact w.asIdeal.add_mem (w.asIdeal.mul_mem_left a h1) (w.asIdeal.mul_mem_left b h2)
 
-theorem logb_le_of_le_four_exp {l : ℕ} (hl : (11 : ℝ) ≤ l) {large₂ h : ℝ} (hL : 1 ≤ large₂) (h0 : 0 ≤ h)
-    (hh : h ≤ 4 * Real.exp large₂) : Real.logb l h ≤ large₂ := by
+theorem logb_le_of_le_four_exp
+    {l : ℕ} (hl : (11 : ℝ) ≤ l)
+    {large₂ h : ℝ} (hL : 1 ≤ large₂) (h0 : 0 ≤ h) (hh : h ≤ 4 * Real.exp large₂)
+    : Real.logb l h ≤ large₂ := by
   have hl1 : (1 : ℝ) < l := by linarith
   have hlog4 : 0 ≤ Real.log 4 := Real.log_nonneg (by norm_num)
   have hloge : Real.log 4 + 1 ≤ Real.log l := by
@@ -38,12 +45,13 @@ theorem logb_le_of_le_four_exp {l : ℕ} (hl : (11 : ℝ) ≤ l) {large₂ h : �
   rw [Real.logb, Real.log_mul (by norm_num) (Real.exp_pos _).ne', Real.log_exp, div_le_iff₀ hlpos]
   nlinarith
 
-theorem band_arith {lr s z Wb Lb e S Sc eta₃ lg large₂ T CB C : ℝ} (hl : 11 ≤ lr) (hs0 : 0 ≤ s)
-    (hzs : |z - s| ≤ T) (hb1 : Lb - T ≤ Wb) (hb2 : Wb ≤ Lb - T + 1) (he : e ≤ eta₃) (hS : S ≤ Sc)
-    (hlg : lg ≤ large₂) (hLg : 1 ≤ large₂) (hSc : 0 ≤ Sc) (hLb : 0 ≤ Lb) (hT : 1 / 2 ≤ T) (hTe : 2 * T + 1 ≤ eta₃)
-    (hCB : 0 ≤ CB) (hC : 6 * CB + 1 ≤ C)
-    (habs : |lr * z - Wb| ≤ CB * (lr * e + lr * S + Wb / lr + z + lr * lg)) :
-    |lr * s - Lb| ≤ C * (lr * eta₃ + lr * Sc + Lb / lr + s + lr * large₂) := by
+theorem band_arith
+    {lr s z Wb Lb e S Sc eta₃ lg large₂ T CB C : ℝ}
+    (hl : 11 ≤ lr) (hs0 : 0 ≤ s) (hzs : |z - s| ≤ T) (hb1 : Lb - T ≤ Wb) (hb2 : Wb ≤ Lb - T + 1)
+    (he : e ≤ eta₃) (hS : S ≤ Sc) (hlg : lg ≤ large₂) (hLg : 1 ≤ large₂) (hSc : 0 ≤ Sc)
+    (hLb : 0 ≤ Lb) (hT : 1 / 2 ≤ T) (hTe : 2 * T + 1 ≤ eta₃) (hCB : 0 ≤ CB) (hC : 6 * CB + 1 ≤ C)
+    (habs : |lr * z - Wb| ≤ CB * (lr * e + lr * S + Wb / lr + z + lr * lg))
+    : |lr * s - Lb| ≤ C * (lr * eta₃ + lr * Sc + Lb / lr + s + lr * large₂) := by
   set E := lr * eta₃ + lr * Sc + Lb / lr + s + lr * large₂ with hE
   have hlr0 : 0 < lr := by linarith
   rw [abs_le] at hzs habs
@@ -55,12 +63,14 @@ theorem band_arith {lr s z Wb Lb e S Sc eta₃ lg large₂ T CB C : ℝ} (hl : 1
     have e3' : 1 / lr ≤ 1 := by rw [div_le_one hlr0]; linarith
     have e5 : lr * lg ≤ lr * large₂ := mul_le_mul_of_nonneg_left hlg hlr0.le
     have e6 : eta₃ ≤ lr * eta₃ := by nlinarith
-    rw [hE]; linarith
+    rw [hE]
+    linarith
   have hEge : lr * eta₃ ≤ E := by
     have : 0 ≤ Lb / lr := div_nonneg hLb hlr0.le
     have : 0 ≤ lr * Sc := mul_nonneg hlr0.le hSc
     have : 0 ≤ lr * large₂ := mul_nonneg hlr0.le (by linarith)
-    rw [hE]; linarith
+    rw [hE]
+    linarith
   have hEt0 : 0 ≤ lr * eta₃ := mul_nonneg hlr0.le (by linarith)
   have hx1 : lr * T + T ≤ lr * eta₃ := by nlinarith
   have hCBA : CB * (lr * e + lr * S + Wb / lr + z + lr * lg) ≤ CB * (E + lr * eta₃) :=
@@ -77,7 +87,12 @@ theorem band_arith {lr s z Wb Lb e S Sc eta₃ lg large₂ T CB C : ℝ} (hl : 1
 
 end GlobalTheory.NBand
 
-theorem GlobalTheory.NBand.bandPlaceWeightApproximation_tabX : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (HW : HWOf D.loc) (X : KillingConditions.HubData D) (R : KillingConditions.RowK) (C : ℝ), KillingConditions.DataAD L HW X R → R.Le C → EmbeddingTypeJumps.ParametersPolynomiallyBounded L → TwistedPlaces.BandPlaceWeightApproximation L (tabX L X) C := by
+theorem GlobalTheory.NBand.bandPlaceWeightApproximation_tabX
+    : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (HW : HWOf D.loc)
+        (X : KillingConditions.HubData D) (R : KillingConditions.RowK) (C : ℝ),
+      KillingConditions.DataAD L HW X R → R.Le C
+        → EmbeddingTypeJumps.ParametersPolynomiallyBounded L
+        → TwistedPlaces.BandPlaceWeightApproximation L (tabX L X) C := by
   intro D L P HW X R C hX hR hpar
   intro i lam hTw hb l hl hlp
   obtain ⟨h11, π, hπ, hw, Cx, hG, Wd, hBase, hBox, hNT, hBand⟩ := (hX.band i lam).1 hb
@@ -98,15 +113,27 @@ theorem GlobalTheory.NBand.bandPlaceWeightApproximation_tabX : ∀ (D : D7) (L :
   have ht0 : (0 : ℝ) ≤ D.R.t := Nat.cast_nonneg _
   have hetaP : TwistedPlaces.eta₃ L = L.etaSz + D.R.t + 2 := rfl
   have hhB : TwistedPlaces.hB L = L.sc.b + L.Sc + L.etaSz + D.R.t + 2 := rfl
-  have hh17n : Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz ≤ Wd.b + Wd.η + Wd.S := by
+  have hh17n
+      : Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz
+        ≤ Wd.b + Wd.η + Wd.S := by
     have := hNT.w20
-    unfold Formalism.MainNotions.TruncatedSeriesCountingBounds.hB; split_ifs <;> omega
-  have hh17 : ((Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz : ℕ) : ℝ) ≤ (Wd.b : ℝ) + Wd.η + Wd.S := by
+    unfold Formalism.MainNotions.TruncatedSeriesCountingBounds.hB
+    split_ifs <;> omega
+  have hh17
+      : ((Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz : ℕ) : ℝ)
+        ≤ (Wd.b : ℝ) + Wd.η + Wd.S := by
     exact_mod_cast hh17n
   have hhle := hBase.h_le
-  have hlg : Real.logb (D.nd.l i : ℝ) (2 * ((Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz : ℕ) : ℝ)) ≤ TwistedPlaces.large₂ L := by
+  have hlg
+      : Real.logb (D.nd.l i : ℝ)
+          (2
+            * ((Formalism.MainNotions.TruncatedSeriesCountingBounds.hB Wd.b Wd.w Wd.S Wd.η Wd.sz
+                : ℕ)
+              : ℝ))
+        ≤ TwistedPlaces.large₂ L := by
     apply logb_le_of_le_four_exp hl11 hLg (by positivity)
-    rw [← hbexp]; linarith
+    rw [← hbexp]
+    linarith
   have hw0 : 0 ≤ L.sc.w'' D.R.n := by
     have hx : 0 < L.sc.x := by linarith [L.sc.one_lt_alt]
     unfold Scale.w'' Scale.b' Scale.a Scale.X' Scale.b

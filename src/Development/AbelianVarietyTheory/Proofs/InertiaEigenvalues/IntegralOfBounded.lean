@@ -12,7 +12,9 @@ open Topology Filter
 
 namespace GlobalTheory.PowerImageOpen
 
-variable {l : ℕ} [Fact l.Prime] {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
   {O : Type} [CommRing O] [Algebra O LL]
 
 def powImage (l : ℕ) (LL O : Type) [Field LL] [CommRing O] [Algebra O LL] (n : ℕ) : Set LL :=
@@ -319,13 +321,16 @@ lemma adicComplete [IsDomain O] [IsDiscreteValuationRing O] [IsModuleTopology �
     have h5 := (Ideal.neg_mem_iff (I := Ideal.span {(l : O) ^ n})).2 hL'
     rwa [neg_sub] at h5
 
-theorem main (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
-    (O : Type) [CommRing O] [Algebra O LL] (h : Formalism.MainNotions.N.GoodO (Qp := ℚ_[l]) LL O) :
-    (∀ x : LL, x ∈ Set.range (algebraMap O LL) ↔
-      ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem x) ∧
-    IsCompact (Set.range (algebraMap O LL)) ∧
-    (∀ n : ℕ, Finite (O ⧸ Ideal.span {(l : O) ^ n})) ∧
-    IsAdicComplete (Ideal.span {(l : O)}) O := by
+theorem main
+    (l : ℕ) [Fact l.Prime]
+    (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+    (O : Type) [CommRing O] [Algebra O LL]
+    (h : Formalism.MainNotions.N.GoodO (Qp := ℚ_[l]) LL O)
+    : (∀ x : LL,
+        x ∈ Set.range (algebraMap O LL)
+          ↔ ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem x)
+      ∧ IsCompact (Set.range (algebraMap O LL)) ∧ (∀ n : ℕ, Finite (O ⧸ Ideal.span {(l : O) ^ n}))
+      ∧ IsAdicComplete (Ideal.span {(l : O)}) O := by
   obtain ⟨⟨hD, hDVR, hFr⟩, hfd, hmt, htr, ho⟩ := h
   have := hD
   have := hDVR
@@ -345,7 +350,11 @@ theorem main (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL
     exact hb y hy
   have hcpt : IsCompact (Set.range (algebraMap O LL)) :=
     (isCompact_ball e he' _).of_isClosed_subset (isClosed_range ho) hsub
-  exact ⟨fun x => ⟨fun hx => integral_of_bounded ho e n hb x hx, fun hx => mem_of_integral ho x hx⟩, hcpt,
-    fun k => finite_quotient hinj ho hcpt k, adicComplete hinj ho hcpt⟩
+  exact ⟨
+    fun x => ⟨fun hx => integral_of_bounded ho e n hb x hx, fun hx => mem_of_integral ho x hx⟩,
+    hcpt,
+    fun k => finite_quotient hinj ho hcpt k,
+    adicComplete hinj ho hcpt
+  ⟩
 
 end GlobalTheory.PowerImageOpen

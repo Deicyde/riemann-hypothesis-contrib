@@ -17,7 +17,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.NineStatements
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField GroundTheory.Heights₂.Heights.LowerBoundFree Metric
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField
+  GroundTheory.Heights₂.Heights.LowerBoundFree Metric
 open ReciprocityTheory.AnForm.A (IsPsh)
 open scoped Matrix ComplexOrder
 
@@ -33,8 +34,9 @@ section Psh
 
 variable {d : ℕ}
 
-theorem isPsh_congr' {U : Set (Fin d → ℂ)} {φ ψ : (Fin d → ℂ) → ℝ} (h : Set.EqOn φ ψ U)
-    (hφ : IsPsh U φ) : IsPsh U ψ := by
+theorem isPsh_congr'
+    {U : Set (Fin d → ℂ)} {φ ψ : (Fin d → ℂ) → ℝ} (h : Set.EqOn φ ψ U) (hφ : IsPsh U φ)
+    : IsPsh U ψ := by
   refine ⟨fun z hz y hy => ?_, fun z w hd => ?_⟩
   · have h1 : ∀ᶠ x in nhdsWithin z U, φ x < y := hφ.1 z hz y (by show φ z < y; rw [h hz]; exact hy)
     filter_upwards [h1, self_mem_nhdsWithin] with x hx hxU
@@ -47,13 +49,18 @@ theorem isPsh_congr' {U : Set (Fin d → ℂ)} {φ ψ : (Fin d → ℂ) → ℝ}
     rw [← Real.circleAverage_congr_sphere hs, ← h hz]
     exact h2
 
-theorem isPsh_add_re_add_const {U : Set (Fin d → ℂ)} (hU : IsOpen U) {φ : (Fin d → ℂ) → ℝ} (hφ : IsPsh U φ)
-    {G : (Fin d → ℂ) → ℂ} (hG : DifferentiableOn ℂ G U) (c : ℝ) :
-    IsPsh U (fun w => φ w + (G w).re + c) := by
-  have hcont : ContinuousOn (fun w => (G w).re) U := Complex.continuous_re.comp_continuousOn hG.continuousOn
+theorem isPsh_add_re_add_const
+    {U : Set (Fin d → ℂ)} (hU : IsOpen U)
+    {φ : (Fin d → ℂ) → ℝ} (hφ : IsPsh U φ)
+    {G : (Fin d → ℂ) → ℂ} (hG : DifferentiableOn ℂ G U)
+    (c : ℝ)
+    : IsPsh U (fun w => φ w + (G w).re + c) := by
+  have hcont : ContinuousOn (fun w => (G w).re) U :=
+    Complex.continuous_re.comp_continuousOn hG.continuousOn
   refine ⟨(hφ.1.add hcont.upperSemicontinuousOn).add upperSemicontinuousOn_const, fun z w hd => ?_⟩
   obtain ⟨hint, hle⟩ := hφ.2 z w hd
-  have hmap : Continuous fun ζ : ℂ => z + ζ • w := continuous_const.add (continuous_id.smul continuous_const)
+  have hmap : Continuous fun ζ : ℂ => z + ζ • w :=
+    continuous_const.add (continuous_id.smul continuous_const)
   have hdiff : DifferentiableOn ℂ (fun ζ : ℂ => G (z + ζ • w)) (closedBall 0 1) := by
     intro ζ hζ
     have hζU : z + ζ • w ∈ U := hd ζ (by simpa using hζ)
@@ -76,7 +83,8 @@ theorem isPsh_add_re_add_const {U : Set (Fin d → ℂ)} (hU : IsOpen U) {φ : (
     have := ContinuousLinearMap.circleAverage_comp_comm Complex.reCLM hciG
     rw [hmean] at this
     simpa [Function.comp_def] using this
-  have hci2 : CircleIntegrable (fun ζ : ℂ => φ (z + ζ • w) + (G (z + ζ • w)).re) 0 1 := hint.add hciR
+  have hci2 : CircleIntegrable (fun ζ : ℂ => φ (z + ζ • w) + (G (z + ζ • w)).re) 0 1 :=
+    hint.add hciR
   refine ⟨hci2.add (circleIntegrable_const c 0 1), ?_⟩
   have e1 := Real.circleAverage_fun_add hci2 (circleIntegrable_const c 0 1)
   have e2 := Real.circleAverage_fun_add hint hciR

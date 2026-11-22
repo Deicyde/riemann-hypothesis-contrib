@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.CommonSmulMembership
 
-theorem exists_common_smul_mem {O M : Type} [CommRing O] [AddCommGroup M] [Module O M]
-    (P : Submonoid O) {L L' : Submodule O M} (hL : Submodule.FG L)
-    (h : ∀ v ∈ L, ∃ s ∈ P, s • v ∈ L') : ∃ s ∈ P, ∀ v ∈ L, s • v ∈ L' := by
+theorem exists_common_smul_mem
+    {O M : Type} [CommRing O] [AddCommGroup M] [Module O M]
+    (P : Submonoid O)
+    {L L' : Submodule O M} (hL : Submodule.FG L) (h : ∀ v ∈ L, ∃ s ∈ P, s • v ∈ L')
+    : ∃ s ∈ P, ∀ v ∈ L, s • v ∈ L' := by
   classical
   obtain ⟨S, rfl⟩ := hL
   choose f hfP hf using h

@@ -17,13 +17,14 @@ section Line
 
 variable {F : Type*} [Field F] [DecidableEq F] {W : WeierstrassCurve F}
 
-theorem exists_line_of_add_eq_zero {x₁ y₁ x₂ y₂ x₃ y₃ : F} (h₁ : W.toAffine.Nonsingular x₁ y₁)
-    (h₂ : W.toAffine.Nonsingular x₂ y₂) (h₃ : W.toAffine.Nonsingular x₃ y₃)
-    (hs : Point.some _ _ h₁ + Point.some _ _ h₂ + Point.some _ _ h₃ = 0) :
-    ∃ ℓ ν : F, y₁ = ℓ * x₁ + ν ∧ y₂ = ℓ * x₂ + ν ∧ y₃ = ℓ * x₃ + ν ∧
-      x₁ + x₂ + x₃ = ℓ ^ 2 + W.a₁ * ℓ - W.a₂ ∧
-      x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * ℓ * ν - W.a₁ * ν - W.a₃ * ℓ ∧
-      x₁ * x₂ * x₃ = ν ^ 2 + W.a₃ * ν - W.a₆ := by
+theorem exists_line_of_add_eq_zero
+    {x₁ y₁ x₂ y₂ x₃ y₃ : F} (h₁ : W.toAffine.Nonsingular x₁ y₁) (h₂ : W.toAffine.Nonsingular x₂ y₂)
+    (h₃ : W.toAffine.Nonsingular x₃ y₃)
+    (hs : Point.some _ _ h₁ + Point.some _ _ h₂ + Point.some _ _ h₃ = 0)
+    : ∃ ℓ ν : F,
+      y₁ = ℓ * x₁ + ν ∧ y₂ = ℓ * x₂ + ν ∧ y₃ = ℓ * x₃ + ν ∧ x₁ + x₂ + x₃ = ℓ ^ 2 + W.a₁ * ℓ - W.a₂
+        ∧ x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * ℓ * ν - W.a₁ * ν - W.a₃ * ℓ
+        ∧ x₁ * x₂ * x₃ = ν ^ 2 + W.a₃ * ν - W.a₆ := by
   have hxy : ¬(x₁ = x₂ ∧ y₁ = W.toAffine.negY x₂ y₂) := by
     intro hxy
     rw [Point.add_of_Y_eq hxy.1 hxy.2, zero_add] at hs
@@ -36,7 +37,8 @@ theorem exists_line_of_add_eq_zero {x₁ y₁ x₂ y₂ x₃ y₃ : F} (h₁ : W
   · by_cases hx : x₁ = x₂
     · subst hx
       have hy := Y_eq_of_Y_ne h₁.1 h₂.1 rfl (fun h => hxy ⟨rfl, h⟩)
-      rw [← hy]; ring
+      rw [← hy]
+      ring
     · rw [hℓ, slope_of_X_ne hx]
       have hd : x₁ - x₂ ≠ 0 := sub_ne_zero.2 hx
       field_simp
@@ -45,8 +47,8 @@ theorem exists_line_of_add_eq_zero {x₁ y₁ x₂ y₂ x₃ y₃ : F} (h₁ : W
     simp only [addY, negY_negY, negAddY]
     ring
   have e := W.toAffine.addPolynomial_slope h₁.1 h₂.1 hxy
-  rw [addPolynomial_eq, Cubic.prod_X_sub_C_eq, neg_inj, Cubic.toPoly_injective,
-    Cubic.mk.injEq, hx3] at e
+  rw [addPolynomial_eq, Cubic.prod_X_sub_C_eq, neg_inj, Cubic.toPoly_injective, Cubic.mk.injEq, hx3]
+    at e
   obtain ⟨-, e2, e3, e4⟩ := e
   rw [← hℓ] at e2 e3 e4
   refine ⟨by linear_combination e2, by linear_combination -e3, by linear_combination e4⟩
@@ -63,22 +65,17 @@ section DVR
 
 open IsLocalRing
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
-  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] (W : WeierstrassCurve 𝒪)
-
+variable
+  {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+  (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+  (W : WeierstrassCurve 𝒪)
 
 section Origin
 
 variable {π : 𝒪} (hπ : Irreducible π)
 include hπ
 
-
-
-
-
 end Origin
-
-
 
 end DVR
 

@@ -9,9 +9,12 @@ open GlobalTheory.NeedB Polynomial
 
 namespace GlobalTheory
 
-theorem kummer_aeval_mem_integralClosure {A₀ F E : Type} [CommRing A₀] [Field F] [Field E] [Algebra A₀ F]
-    [Algebra F E] [Algebra A₀ E] [IsScalarTower A₀ F E] {x : E} (hx : IsIntegral A₀ x)
-    (p : (integralClosure A₀ F)[X]) : IsIntegral A₀ (aeval x p) := by
+theorem kummer_aeval_mem_integralClosure
+    {A₀ F E : Type} [CommRing A₀] [Field F] [Field E] [Algebra A₀ F] [Algebra F E] [Algebra A₀ E]
+    [IsScalarTower A₀ F E]
+    {x : E} (hx : IsIntegral A₀ x)
+    (p : (integralClosure A₀ F)[X])
+    : IsIntegral A₀ (aeval x p) := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _)]; exact hp.add hq
   | monomial n c =>
@@ -21,16 +24,20 @@ theorem kummer_aeval_mem_integralClosure {A₀ F E : Type} [CommRing A₀] [Fiel
     rw [this]
     exact c.2.map (IsScalarTower.toAlgHom A₀ F E)
 
-theorem kummer_dual_step (A₀ K₀ F E : Type) [CommRing A₀] [IsDomain A₀] [Field K₀] [Algebra A₀ K₀]
-    [IsFractionRing A₀ K₀] [Field F] [Field E] [Algebra K₀ F] [Algebra F E] [Algebra K₀ E]
-    [IsScalarTower K₀ F E] [Algebra A₀ F] [Algebra A₀ E] [IsScalarTower A₀ K₀ F] [IsScalarTower A₀ K₀ E]
+theorem kummer_dual_step
+    (A₀ K₀ F E : Type) [CommRing A₀] [IsDomain A₀] [Field K₀] [Algebra A₀ K₀] [IsFractionRing A₀ K₀]
+    [Field F] [Field E] [Algebra K₀ F] [Algebra F E] [Algebra K₀ E] [IsScalarTower K₀ F E]
+    [Algebra A₀ F] [Algebra A₀ E] [IsScalarTower A₀ K₀ F] [IsScalarTower A₀ K₀ E]
     [IsScalarTower A₀ F E] [FiniteDimensional K₀ F] [FiniteDimensional F E] [CharZero K₀]
-    (N : ℕ) (hN : IsUnit (N : A₀)) (x : E) (u : A₀ˣ) (hx : x ^ N = algebraMap A₀ E u)
+    (N : ℕ) (hN : IsUnit (N : A₀))
+    (x : E) (u : A₀ˣ) (hx : x ^ N = algebraMap A₀ E u)
     (hgen : Algebra.adjoin F {x} = ⊤)
-    (hF : ∀ y : F, (∀ z : F, IsIntegral A₀ z → Algebra.trace K₀ F (y * z) ∈ (algebraMap A₀ K₀).range) →
-      IsIntegral A₀ y) :
-    ∀ y : E, (∀ z : E, IsIntegral A₀ z → Algebra.trace K₀ E (y * z) ∈ (algebraMap A₀ K₀).range) →
-      IsIntegral A₀ y := by
+    (hF : ∀ y : F,
+      (∀ z : F, IsIntegral A₀ z → Algebra.trace K₀ F (y * z) ∈ (algebraMap A₀ K₀).range)
+        → IsIntegral A₀ y)
+    : ∀ y : E,
+      (∀ z : E, IsIntegral A₀ z → Algebra.trace K₀ E (y * z) ∈ (algebraMap A₀ K₀).range)
+        → IsIntegral A₀ y := by
   intro y hy
   haveI : CharZero F := charZero_of_injective_algebraMap (algebraMap K₀ F).injective
   haveI : CharZero E := charZero_of_injective_algebraMap (algebraMap F E).injective
@@ -47,7 +54,9 @@ theorem kummer_dual_step (A₀ K₀ F E : Type) [CommRing A₀] [IsDomain A₀] 
   have hxC : IsIntegral C x := hxA.tower_top
   have key := traceForm_dualSubmodule_adjoin C F hgen hxC
 
-  have hymem : y ∈ (Algebra.traceForm F E).dualSubmodule (Subalgebra.toSubmodule (Algebra.adjoin C {x})) := by
+  have hymem
+      : y ∈ (Algebra.traceForm F E).dualSubmodule
+        (Subalgebra.toSubmodule (Algebra.adjoin C {x})) := by
     rw [LinearMap.BilinForm.mem_dualSubmodule]
     intro z hz
     rw [Subalgebra.mem_toSubmodule, Algebra.adjoin_singleton_eq_range_aeval] at hz
@@ -57,8 +66,8 @@ theorem kummer_dual_step (A₀ K₀ F E : Type) [CommRing A₀] [IsDomain A₀] 
     have hw : IsIntegral A₀ (Algebra.trace F E (y * aeval x p)) := by
       apply hF
       intro c hc
-      have : Algebra.trace F E (y * aeval x p) * c =
-          Algebra.trace F E (y * (aeval x p * algebraMap F E c)) := by
+      have : Algebra.trace F E (y * aeval x p) * c
+          = Algebra.trace F E (y * (aeval x p * algebraMap F E c)) := by
         rw [mul_comm _ c, ← smul_eq_mul, ← LinearMap.map_smul, Algebra.smul_def]
         ring_nf
       rw [this, Algebra.trace_trace]
@@ -75,38 +84,46 @@ theorem kummer_dual_step (A₀ K₀ F E : Type) [CommRing A₀] [IsDomain A₀] 
     simp [hx, ← IsScalarTower.algebraMap_apply]
   obtain ⟨g, hg⟩ := hdvd
   have hder := congrArg (fun p => aeval x (derivative p)) hg
-  simp only [derivative_sub, derivative_X_pow, derivative_C, sub_zero, derivative_mul, map_add (f := _), map_mul,
-    minpoly.aeval, zero_mul, add_zero] at hder
+  simp only [derivative_sub, derivative_X_pow, derivative_C, sub_zero, derivative_mul,
+      map_add (f := _), map_mul, minpoly.aeval, zero_mul, add_zero]
+    at hder
   set d := aeval x (derivative (minpoly C x))
   let v : A₀ˣ := hN.unit * u
-  have hinv : (aeval x (derivative (minpoly F x)))⁻¹ = aeval x g * x * algebraMap A₀ E (↑v⁻¹ : A₀) := by
+  have hinv
+      : (aeval x (derivative (minpoly F x)))⁻¹ = aeval x g * x * algebraMap A₀ E (↑v⁻¹ : A₀) := by
     rw [hmin, derivative_map, aeval_map_algebraMap]
     apply inv_eq_of_mul_eq_one_right
     change d * _ = 1
     have h1 : d * aeval x g = (N : E) * x ^ (N - 1) := by rw [← hder]; simp
     have hv : ((v : A₀)) = (N : A₀) * u := by simp [v]
-    calc d * (aeval x g * x * algebraMap A₀ E ↑v⁻¹)
-        = (N : E) * (x ^ (N - 1) * x) * algebraMap A₀ E ↑v⁻¹ := by
-          rw [← mul_assoc, ← mul_assoc, h1]; ring
+    calc
+      d * (aeval x g * x * algebraMap A₀ E ↑v⁻¹)
+          = (N : E) * (x ^ (N - 1) * x) * algebraMap A₀ E ↑v⁻¹ := by
+        rw [← mul_assoc, ← mul_assoc, h1]; ring
       _ = algebraMap A₀ E ((v : A₀) * ↑v⁻¹) := by
-        rw [← pow_succ, Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hN0), hx, map_mul, hv, map_mul,
-          map_natCast]
+        rw [← pow_succ, Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hN0), hx, map_mul, hv,
+          map_mul, map_natCast]
       _ = 1 := by simp
   rw [smul_eq_mul, hinv]
-  refine IsIntegral.mul (IsIntegral.mul (kummer_aeval_mem_integralClosure hxA g) hxA) isIntegral_algebraMap
+  refine IsIntegral.mul (IsIntegral.mul (kummer_aeval_mem_integralClosure hxA g) hxA)
+      isIntegral_algebraMap
     |>.mul (kummer_aeval_mem_integralClosure hxA q)
 
 end GlobalTheory
 
 namespace GlobalTheory
 
-theorem kummer_dual_induction (A₀ K₀ : Type) [CommRing A₀] [IsDomain A₀] [Field K₀] [Algebra A₀ K₀]
-    [IsFractionRing A₀ K₀] [CharZero K₀] (N : ℕ) (hN : IsUnit (N : A₀)) :
-    ∀ (n : ℕ) (E : Type) [Field E] [Algebra K₀ E] [FiniteDimensional K₀ E] [Algebra A₀ E]
-      [IsScalarTower A₀ K₀ E] (s : Finset E), s.card = n → IntermediateField.adjoin K₀ (s : Set E) = ⊤ →
-      (∀ x ∈ s, ∃ u : A₀ˣ, x ^ N = algebraMap A₀ E u) →
-      ∀ y : E, (∀ z : E, IsIntegral A₀ z → Algebra.trace K₀ E (y * z) ∈ (algebraMap A₀ K₀).range) →
-        IsIntegral A₀ y := by
+theorem kummer_dual_induction
+    (A₀ K₀ : Type)
+    [CommRing A₀] [IsDomain A₀] [Field K₀] [Algebra A₀ K₀] [IsFractionRing A₀ K₀] [CharZero K₀]
+    (N : ℕ) (hN : IsUnit (N : A₀))
+    : ∀ (n : ℕ) (E : Type) [Field E] [Algebra K₀ E] [FiniteDimensional K₀ E] [Algebra A₀ E]
+        [IsScalarTower A₀ K₀ E] (s : Finset E),
+      s.card = n → IntermediateField.adjoin K₀ (s : Set E) = ⊤
+        → (∀ x ∈ s, ∃ u : A₀ˣ, x ^ N = algebraMap A₀ E u)
+        → ∀ y : E,
+          (∀ z : E, IsIntegral A₀ z → Algebra.trace K₀ E (y * z) ∈ (algebraMap A₀ K₀).range)
+            → IsIntegral A₀ y := by
   intro n
   induction n with
   | zero =>
@@ -129,8 +146,9 @@ theorem kummer_dual_induction (A₀ K₀ : Type) [CommRing A₀] [IsDomain A₀]
     let F := IntermediateField.adjoin K₀ (t : Set E)
     let s' : Finset F := t.subtype (· ∈ F)
     have hs' : s'.card = n := by
-      rw [Finset.card_subtype, Finset.filter_true_of_mem (s := t) (p := (· ∈ F))
-        (fun y hy => IntermediateField.subset_adjoin K₀ (t : Set E) hy),
+      rw [Finset.card_subtype,
+        Finset.filter_true_of_mem (s := t) (p := (· ∈ F))
+          (fun y hy => IntermediateField.subset_adjoin K₀ (t : Set E) hy),
         Finset.card_erase_of_mem hxs, hs]
       rfl
     have hadj' : IntermediateField.adjoin K₀ (s' : Set F) = ⊤ := by
@@ -156,8 +174,9 @@ theorem kummer_dual_induction (A₀ K₀ : Type) [CommRing A₀] [IsDomain A₀]
         rw [IntermediateField.adjoin_adjoin_left, IntermediateField.restrictScalars_top, ← hadj]
         congr 1
         rw [Set.union_singleton, ← Finset.coe_insert, Finset.insert_erase hxs]
-      rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
-        (fun z _ => Algebra.IsAlgebraic.isAlgebraic z), h1]
+      rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic (fun z _ =>
+          Algebra.IsAlgebraic.isAlgebraic z),
+        h1]
       rfl
     haveI : IsScalarTower A₀ F E := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
     exact kummer_dual_step A₀ K₀ F E N hN x u hux hgen hF y hy
@@ -166,15 +185,19 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem kummer_not_map_comap_le_sq :
-    ∀ (A₀ K₀ E : Type) [CommRing A₀] [IsDedekindDomain A₀] [Field K₀] [CharZero K₀] [Algebra A₀ K₀]
-      [IsFractionRing A₀ K₀] [Field E] [Algebra K₀ E] [FiniteDimensional K₀ E] [Algebra A₀ E]
-      [IsScalarTower A₀ K₀ E] (N : ℕ), IsUnit (N : A₀) →
-      ∀ s : Finset E, IntermediateField.adjoin K₀ (s : Set E) = ⊤ →
-      (∀ x ∈ s, ∃ u : A₀ˣ, x ^ N = algebraMap A₀ E u) →
-      ∀ P : Ideal (integralClosure A₀ E), P.IsPrime → P ≠ ⊥ →
-        ¬ Ideal.map (algebraMap A₀ (integralClosure A₀ E))
-          (P.comap (algebraMap A₀ (integralClosure A₀ E))) ≤ P ^ 2 := by
+theorem kummer_not_map_comap_le_sq
+    : ∀ (A₀ K₀ E : Type) [CommRing A₀] [IsDedekindDomain A₀] [Field K₀] [CharZero K₀]
+        [Algebra A₀ K₀] [IsFractionRing A₀ K₀] [Field E] [Algebra K₀ E] [FiniteDimensional K₀ E]
+        [Algebra A₀ E] [IsScalarTower A₀ K₀ E] (N : ℕ),
+      IsUnit (N : A₀)
+        → ∀ s : Finset E,
+          IntermediateField.adjoin K₀ (s : Set E) = ⊤
+            → (∀ x ∈ s, ∃ u : A₀ˣ, x ^ N = algebraMap A₀ E u)
+            → ∀ P : Ideal (integralClosure A₀ E),
+              P.IsPrime → P ≠ ⊥
+                → ¬ Ideal.map (algebraMap A₀ (integralClosure A₀ E))
+                    (P.comap (algebraMap A₀ (integralClosure A₀ E)))
+                  ≤ P ^ 2 := by
   intro A₀ K₀ E _ _ _ _ _ _ _ _ _ _ _ N hN s hadj hu P hP hP0 hle
   have hdual := kummer_dual_induction A₀ K₀ N hN _ E s rfl hadj hu
   haveI : IsFractionRing (integralClosure A₀ E) E :=
@@ -198,7 +221,8 @@ theorem kummer_not_map_comap_le_sq :
   have hdiff : differentIdeal A₀ (integralClosure A₀ E) = 1 := by
     rw [← FractionalIdeal.coeIdeal_eq_one (K := E), coeIdeal_differentIdeal A₀ K₀ E]
     have : FractionalIdeal.dual A₀ K₀
-        (1 : FractionalIdeal (nonZeroDivisors (integralClosure A₀ E)) E) = 1 := by
+          (1 : FractionalIdeal (nonZeroDivisors (integralClosure A₀ E)) E)
+        = 1 := by
       apply FractionalIdeal.coeToSubmodule_injective
       simp only [FractionalIdeal.coe_dual_one, FractionalIdeal.coe_one, hone]
     rw [this, inv_one]
@@ -207,9 +231,9 @@ theorem kummer_not_map_comap_le_sq :
     Ideal.comap_ne_bot_of_integral_mem hb0 hbP (Algebra.IsIntegral.isIntegral b)
   haveI : (P.comap (algebraMap A₀ (integralClosure A₀ E))).IsMaximal :=
     Ideal.IsPrime.isMaximal inferInstance hp0
-  have h := pow_sub_one_dvd_differentIdeal_aux A₀ K₀ E
-    (p := P.comap (algebraMap A₀ (integralClosure A₀ E))) P (e := 2) hp0
-    (Ideal.dvd_iff_le.mpr hle)
+  have h :=
+    pow_sub_one_dvd_differentIdeal_aux A₀ K₀ E (p := P.comap (algebraMap A₀ (integralClosure A₀ E)))
+      P (e := 2) hp0 (Ideal.dvd_iff_le.mpr hle)
   rw [hdiff, Ideal.dvd_iff_le] at h
   apply hP.ne_top
   simpa using h

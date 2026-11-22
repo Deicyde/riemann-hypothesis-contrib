@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -24,11 +26,15 @@ open MeasureTheory Filter Topology
 
 namespace GlobalTheory.TypeSum
 
-theorem measurable_derFam_comp (n : ℕ) (ε : Fin n → Bool) (F : List (GlobalTheory.TypeSum.Mx n) → GlobalTheory.TypeSum.Mx n → ℂ)
-    (hF : GlobalTheory.TypeSum.IsDerFam ε F) (h0 : ContinuousOn (F []) (UJset ε)) :
-    ∀ l : List (GlobalTheory.TypeSum.Mx n), (∀ Y ∈ l, Y ∈ lieSet ε) →
-    ∀ (T : Type) [TopologicalSpace T] [MeasurableSpace T] [OpensMeasurableSpace T] (φ : T → GlobalTheory.TypeSum.Mx n),
-      Continuous φ → (∀ t, φ t ∈ UJset ε) → Measurable (fun t => F l (φ t)) := by
+theorem measurable_derFam_comp
+    (n : ℕ) (ε : Fin n → Bool)
+    (F : List (GlobalTheory.TypeSum.Mx n) → GlobalTheory.TypeSum.Mx n → ℂ)
+    (hF : GlobalTheory.TypeSum.IsDerFam ε F) (h0 : ContinuousOn (F []) (UJset ε))
+    : ∀ l : List (GlobalTheory.TypeSum.Mx n),
+      (∀ Y ∈ l, Y ∈ lieSet ε)
+        → ∀ (T : Type) [TopologicalSpace T] [MeasurableSpace T] [OpensMeasurableSpace T]
+            (φ : T → GlobalTheory.TypeSum.Mx n),
+          Continuous φ → (∀ t, φ t ∈ UJset ε) → Measurable (fun t => F l (φ t)) := by
   intro l
   induction l with
   | nil =>
@@ -44,8 +50,10 @@ theorem measurable_derFam_comp (n : ℕ) (ε : Fin n → Bool) (F : List (Global
     have hq : ∀ m, Measurable (q m) := by
       intro m
       have h1 : Measurable (fun t => F l (φ t * NormedSpace.exp ((((m : ℝ) + 1)⁻¹) • X))) :=
-        ih hl' T (fun t => φ t * NormedSpace.exp ((((m : ℝ) + 1)⁻¹) • X))
-          (hφ.mul continuous_const) (fun t => mul_mem_UJ (hφU t) (exp_mem_UJ hX _))
+        ih hl' T
+          (fun t => φ t * NormedSpace.exp ((((m : ℝ) + 1)⁻¹) • X))
+          (hφ.mul continuous_const)
+          (fun t => mul_mem_UJ (hφU t) (exp_mem_UJ hX _))
       have h2 : Measurable (fun t => F l (φ t)) := ih hl' T φ hφ hφU
       exact (h1.sub h2).const_smul ((((m : ℝ) + 1)⁻¹)⁻¹ : ℝ)
     have hlim : ∀ t, Tendsto (fun m => q m t) atTop (𝓝 (F (X :: l) (φ t))) := by

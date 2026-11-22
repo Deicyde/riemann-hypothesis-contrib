@@ -14,20 +14,23 @@ open PI Formalism.REAL
 
 variable {m : ℕ}
 
-def conjH (P Q : Matrix (Fin m) (Fin m) ℂ) (hQP : Q * P = 1) (hPQ : P * Q = 1) : MtM m ≃ₜ MtM m where
+def conjH (P Q : Matrix (Fin m) (Fin m) ℂ) (hQP : Q * P = 1) (hPQ : P * Q = 1)
+    : MtM m ≃ₜ MtM m where
   toFun x := fun i j => (Q * Matrix.of x * P) i j
   invFun x := fun i j => (P * Matrix.of x * Q) i j
   left_inv x := by
     funext i j
     show (P * (Q * Matrix.of x * P) * Q) i j = x i j
     rw [show P * (Q * Matrix.of x * P) * Q = (P * Q) * Matrix.of x * (P * Q) by
-      simp only [Matrix.mul_assoc], hPQ, Matrix.one_mul, Matrix.mul_one]
+        simp only [Matrix.mul_assoc],
+      hPQ, Matrix.one_mul, Matrix.mul_one]
     rfl
   right_inv x := by
     funext i j
     show (Q * (P * Matrix.of x * Q) * P) i j = x i j
     rw [show Q * (P * Matrix.of x * Q) * P = (Q * P) * Matrix.of x * (Q * P) by
-      simp only [Matrix.mul_assoc], hQP, Matrix.one_mul, Matrix.mul_one]
+        simp only [Matrix.mul_assoc],
+      hQP, Matrix.one_mul, Matrix.mul_one]
     rfl
   continuous_toFun := by
     show Continuous fun x : Matrix (Fin m) (Fin m) ℂ => Q * x * P
@@ -50,7 +53,8 @@ theorem transfer_holds : Transfer := by
   have hΦc : Φ = conjH P Q hQP hPQ ∘ coeMatrixAlt ε := rfl
   have hemb : MeasurableEmbedding Φ := by
     rw [hΦc]
-    exact ((conjH P Q hQP hPQ).isClosedEmbedding.comp (isClosedEmbeddingMatrix m ε).1).measurableEmbedding
+    exact ((conjH P Q hQP hPQ).isClosedEmbedding.comp
+      (isClosedEmbeddingMatrix m ε).1).measurableEmbedding
   have hΦm : Measurable Φ := hemb.measurable
 
   have hH : IsHaarOnM S (μ.map Φ) := by
@@ -75,10 +79,12 @@ theorem transfer_holds : Transfer := by
         funext i j
         show (s' * (Q * uMat g * P)) i j = (Q * (P * s' * Q * uMat g) * P) i j
         rw [show Q * (P * s' * Q * uMat g) * P = (Q * P) * s' * (Q * uMat g * P) by
-          simp only [Matrix.mul_assoc], hQP, Matrix.one_mul]
+            simp only [Matrix.mul_assoc],
+          hQP, Matrix.one_mul]
       have htT : t ∈ {g : UJ ε | uMat g ∈ T} := by
         show coeMatrixAlt ε t ∈ T
-        rw [htt]; exact ht.2
+        rw [htt]
+        exact ht.2
       rw [Measure.map_map (continuous_lmulQ s').measurable hΦm, hcomm,
         ← Measure.map_map hΦm (continuous_const_mul t).measurable, hl t htT]
   have hRI := hR _ hH
@@ -91,7 +97,8 @@ theorem transfer_holds : Transfer := by
     funext i j
     show (Q * (uMat g * uMat s) * P) i j = ((Q * uMat g * P) * (Q * uMat s * P)) i j
     rw [show (Q * uMat g * P) * (Q * uMat s * P) = Q * uMat g * (P * Q) * uMat s * P by
-      simp only [Matrix.mul_assoc], hPQ, Matrix.mul_one]
+        simp only [Matrix.mul_assoc],
+      hPQ, Matrix.mul_one]
     simp only [Matrix.mul_assoc]
   have hmap : (μ.map (fun x => x * s)).map Φ = μ.map Φ := by
     rw [Measure.map_map hΦm (continuous_mul_const s).measurable, hcomm,

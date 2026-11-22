@@ -7,10 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteMax
 
 namespace GlobalTheory
 
-theorem exists_finite_pid_subalgebra_div_padicInt :
-  ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra ℤ_[p] Ω], Function.Injective (algebraMap ℤ_[p] Ω) →
-  ∀ S : Finset Ω, (∀ s ∈ S, IsAlgebraic ℤ_[p] s) →
-  ∃ R : Subalgebra ℤ_[p] Ω, Module.Finite ℤ_[p] R ∧ IsPrincipalIdealRing R ∧ ∀ s ∈ S, ∃ a ∈ R, ∃ b ∈ R, s = a / b := by
+theorem exists_finite_pid_subalgebra_div_padicInt
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra ℤ_[p] Ω],
+      Function.Injective (algebraMap ℤ_[p] Ω)
+        → ∀ S : Finset Ω,
+          (∀ s ∈ S, IsAlgebraic ℤ_[p] s)
+            → ∃ R : Subalgebra ℤ_[p] Ω,
+              Module.Finite ℤ_[p] R ∧ IsPrincipalIdealRing R
+                ∧ ∀ s ∈ S, ∃ a ∈ R, ∃ b ∈ R, s = a / b := by
   intro p _ Ω _ _ hinj S hS
   haveI : FaithfulSMul ℤ_[p] Ω := (faithfulSMul_iff_algebraMap_injective ℤ_[p] Ω).mpr hinj
   letI : Algebra (FractionRing ℤ_[p]) Ω := FractionRing.liftAlgebra ℤ_[p] Ω
@@ -28,21 +32,28 @@ theorem exists_finite_pid_subalgebra_div_padicInt :
   have hPID : IsPrincipalIdealRing (integralClosure ℤ_[p] L) := by
     apply IsPrincipalIdealRing.of_finite_primes
     haveI := GlobalTheory.finite_maximalSpectrum_of_finite_of_isLocalRing ℤ_[p] (integralClosure ℤ_[p] L)
-    apply ((Set.finite_range (fun M : MaximalSpectrum (integralClosure ℤ_[p] L) => M.asIdeal)).insert ⊥).subset
+    apply
+      ((Set.finite_range (fun M : MaximalSpectrum (integralClosure ℤ_[p] L) => M.asIdeal)).insert
+        ⊥).subset
     intro I hI
     by_cases h : I = ⊥
     · exact Or.inl h
     · exact Or.inr ⟨⟨I, (show I.IsPrime from hI).isMaximal h⟩, rfl⟩
-  let f : L →ₐ[ℤ_[p]] Ω :=
-    { algebraMap L Ω with
-      commutes' := fun r => by
-        change ((algebraMap ℤ_[p] L r : L) : Ω) = _
-        rw [IsScalarTower.algebraMap_apply ℤ_[p] (FractionRing ℤ_[p]) L r]
-        exact (IsScalarTower.algebraMap_apply ℤ_[p] (FractionRing ℤ_[p]) Ω r).symm }
+  let f : L →ₐ[ℤ_[p]] Ω := {
+    algebraMap L Ω with
+    commutes' := fun r => by
+      change ((algebraMap ℤ_[p] L r : L) : Ω) = _
+      rw [IsScalarTower.algebraMap_apply ℤ_[p] (FractionRing ℤ_[p]) L r]
+      exact (IsScalarTower.algebraMap_apply ℤ_[p] (FractionRing ℤ_[p]) Ω r).symm
+  }
   have hf : Function.Injective f := Subtype.val_injective
   let e := Subalgebra.equivMapOfInjective (integralClosure ℤ_[p] L) f hf
-  refine ⟨(integralClosure ℤ_[p] L).map f, Module.Finite.equiv e.toLinearEquiv,
-    IsPrincipalIdealRing.of_surjective e.toRingHom e.surjective, ?_⟩
+  refine ⟨
+    (integralClosure ℤ_[p] L).map f,
+    Module.Finite.equiv e.toLinearEquiv,
+    IsPrincipalIdealRing.of_surjective e.toRingHom e.surjective,
+    ?_
+  ⟩
   intro s hs
   obtain ⟨c, hc0, hci⟩ := (hS s hs).exists_integral_multiple
   have hsL : s ∈ L := IntermediateField.subset_adjoin _ _ hs

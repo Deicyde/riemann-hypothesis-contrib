@@ -14,24 +14,29 @@ public import Mathlib.NumberTheory.PrimesCongruentOne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
 open IsDiscreteValuationRing in
-private theorem cast_val {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {a : O} (ha : a ≠ 0) :
-    (((addVal O a).toNat : ℕ) : ℕ∞) = addVal O a := by
+private theorem cast_val
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {a : O} (ha : a ≠ 0)
+    : (((addVal O a).toNat : ℕ) : ℕ∞) = addVal O a := by
   have hne : IsDiscreteValuationRing.addVal O a ≠ ⊤ := by
     rwa [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
   exact ENat.coe_toNat hne
 
-private theorem annEx {O W X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup W] [Module O W]
-    (U : Set X) (ν : X → W) : ∃ a : O, ∀ y : O, (∀ u ∈ U, y • ν u = 0) ↔ a ∣ y := by
+private theorem annEx
+    {O W X : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup W] [Module O W]
+    (U : Set X) (ν : X → W)
+    : ∃ a : O, ∀ y : O, (∀ u ∈ U, y • ν u = 0) ↔ a ∣ y := by
   classical
   let I : Submodule O O := ⨅ u ∈ U, LinearMap.ker (LinearMap.toSpanSingleton O W (ν u))
   obtain ⟨a, ha⟩ := (IsPrincipalIdealRing.principal I).principal
   refine ⟨a, fun y => ?_⟩
-  have hy : y ∈ I ↔ ∀ u ∈ U, y • ν u = 0 := by
-    simp [I, Submodule.mem_iInf]
+  have hy : y ∈ I ↔ ∀ u ∈ U, y • ν u = 0 := by simp [I, Submodule.mem_iInf]
   rw [← hy, ha, Submodule.mem_span_singleton]
   constructor
   · rintro ⟨t, rfl⟩
@@ -39,20 +44,33 @@ private theorem annEx {O W X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
   · rintro ⟨t, rfl⟩
     exact ⟨t, by rw [smul_eq_mul, mul_comm]⟩
 
-private def Sn {Ω : Type} [Field Ω] [Algebra ℚ Ω] {O : Type} (W : Type) [CommRing O] [AddCommGroup W] [Module O W]
-    (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (F : ℕ) (a : O) (n : ℕ) : Submodule O (G ℚ Ω → W) where
-  carrier := {c | c ∈ ShT W α δ F a ∧ ∀ A : ValuationSubring Ω, Over A n → ∀ g ∈ Dec (F := ℚ) A, c g = 0}
+private def Sn
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {O : Type} (W : Type) [CommRing O] [AddCommGroup W] [Module O W]
+    (α : G ℚ Ω →* Oˣ) (δ : G ℚ Ω) (F : ℕ) (a : O) (n : ℕ)
+    : Submodule O (G ℚ Ω → W) where
+  carrier :=
+    {c | c ∈ ShT W α δ F a ∧ ∀ A : ValuationSubring Ω, Over A n → ∀ g ∈ Dec (F := ℚ) A, c g = 0}
   zero_mem' := ⟨Submodule.zero_mem _, fun _ _ _ _ => rfl⟩
-  add_mem' {x y} hx hy := ⟨Submodule.add_mem _ hx.1 hy.1, fun A hA g hg => by simp [hx.2 A hA g hg, hy.2 A hA g hg]⟩
+  add_mem' {x y} hx hy :=
+    ⟨Submodule.add_mem _ hx.1 hy.1, fun A hA g hg => by simp [hx.2 A hA g hg, hy.2 A hA g hg]⟩
   smul_mem' t x hx := ⟨Submodule.smul_mem _ t hx.1, fun A hA g hg => by simp [hx.2 A hA g hg]⟩
 
 section
 
-variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O]
-  [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] {N₀ m F : ℕ} {α : G ℚ Ω →* Oˣ}
+variable
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [Fact l.Prime]
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+  {N₀ m F : ℕ} {α : G ℚ Ω →* Oˣ}
 
-private theorem lpow_ne (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (m : ℕ) : (l : O) ^ m ≠ 0 := by
+private theorem lpow_ne
+    (l : ℕ) [Fact l.Prime]
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    (m : ℕ)
+    : (l : O) ^ m ≠ 0 := by
   apply pow_ne_zero
   have hinj := (UpperTheory.V.Base.dvrFacts l O).1
   have hl : ((l : ℤ_[l])) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
@@ -61,22 +79,32 @@ private theorem lpow_ne (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDoma
   apply hinj
   simpa using h
 
-private theorem not_over {q : ℕ} (hq1 : q ≡ 1 [MOD F]) {A : ValuationSubring Ω} (hA : Over A q) : ¬ Over A F :=
+private theorem not_over {q : ℕ} (hq1 : q ≡ 1 [MOD F]) {A : ValuationSubring Ω} (hA : Over A q)
+    : ¬ Over A F :=
   (placeBasic Ω).2.2.2.1 A q F (Nat.coprime_of_mul_modEq_one 1 (by simpa using hq1)) hA
 
-private theorem frob_fix {q : ℕ} (hq1 : q ≡ 1 [MOD F]) {A : ValuationSubring Ω} (hA : Over A q) {φ : G ℚ Ω}
-    (hφ : IsFrob (F := ℚ) A q φ) : φ ∈ fixMu ℚ Ω F := fun x hx => by
-  rw [(placeBasic Ω).2.2.2.2.2.2.1 A q F φ hφ (not_over hq1 hA) x hx, pow_eq_pow_mod q hx, hq1, ← pow_eq_pow_mod 1 hx,
-    pow_one]
+private theorem frob_fix
+    {q : ℕ} (hq1 : q ≡ 1 [MOD F])
+    {A : ValuationSubring Ω} (hA : Over A q)
+    {φ : G ℚ Ω} (hφ : IsFrob (F := ℚ) A q φ)
+    : φ ∈ fixMu ℚ Ω F := fun x hx => by
+  rw [(placeBasic Ω).2.2.2.2.2.2.1 A q F φ hφ (not_over hq1 hA) x hx, pow_eq_pow_mod q hx, hq1,
+    ← pow_eq_pow_mod 1 hx, pow_one]
 
-private theorem key (hR : Rec) (hD : Dat l N₀ m F α) (hF : F ≠ 0) {n q : ℕ} (hn : n ≠ 0) (hq : q.Prime) (hq1 : q ≡ 1 [MOD F])
-    {ν : G ℚ Ω → QO l O} (hν : IsNu (l ^ m) F (F * n * q) (dualChar l α) ν) {δ : G ℚ Ω} (hδ : IsUnit ((α δ : O) - 1))
+private theorem key
+    (hR : Rec) (hD : Dat l N₀ m F α) (hF : F ≠ 0)
+    {n q : ℕ} (hn : n ≠ 0) (hq : q.Prime) (hq1 : q ≡ 1 [MOD F])
+    {ν : G ℚ Ω → QO l O} (hν : IsNu (l ^ m) F (F * n * q) (dualChar l α) ν)
+    {δ : G ℚ Ω} (hδ : IsUnit ((α δ : O) - 1))
     {a₀ a a' : O} (h0 : a₀ ∣ a) (ha' : ∀ y : O, (∀ u ∈ fixMu ℚ Ω F, y • ν u = 0) ↔ a' ∣ y)
-    {A : ValuationSubring Ω} (hA : Over A q) {φ : G ℚ Ω} (hφ : IsFrob (F := ℚ) A q φ) {τ : G ℚ Ω}
-    (hτ : τ ∈ Ine (F := ℚ) A) (ha : ∀ y : O, y • ν τ = 0 ↔ a ∣ y) :
-    ∃ e : O, a' = a * e ∧ (∀ c ∈ Sn (QO l O) α δ F a₀ n, e • c φ = 0) ∧
-      Module.length O (Sn (QO l O) α δ F a₀ n) ≤
-        Module.length O (Sn (QO l O) α δ F a₀ (n * q)) + IsDiscreteValuationRing.addVal O e := by
+    {A : ValuationSubring Ω} (hA : Over A q)
+    {φ : G ℚ Ω} (hφ : IsFrob (F := ℚ) A q φ)
+    {τ : G ℚ Ω} (hτ : τ ∈ Ine (F := ℚ) A) (ha : ∀ y : O, y • ν τ = 0 ↔ a ∣ y)
+    : ∃ e : O,
+      a' = a * e ∧ (∀ c ∈ Sn (QO l O) α δ F a₀ n, e • c φ = 0)
+        ∧ Module.length O (Sn (QO l O) α δ F a₀ n)
+          ≤ Module.length O (Sn (QO l O) α δ F a₀ (n * q))
+            + IsDiscreteValuationRing.addVal O e := by
   classical
   have hnF : ¬ Over A F := not_over hq1 hA
   have hτF : τ ∈ fixMu ℚ Ω F := (placeBasic Ω).2.2.2.2.1 A F hnF hτ
@@ -99,14 +127,19 @@ private theorem key (hR : Rec) (hD : Dat l N₀ m F α) (hF : F ≠ 0) {n q : �
   have hkill : ∀ c ∈ Sn (QO l O) α δ F a₀ n, e • c φ = 0 := by
     intro c hc
     have hyc : y • c φ = 0 :=
-      step hR Ω l O N₀ m F (F * n) q α hD (dvd_mul_right F n) (mul_ne_zero hF hn) hq hq1 ν hν δ a₀ a' w₀
-        ha₀a' ha'l hw₀ (fun u hu => (ha' a').2 dvd_rfl u hu) c hc.1
-        (fun A' hA' hA'F _ g hg => hc.2 A' ((((placeBasic Ω).2.2.1 A' F n).1 hA').resolve_left hA'F) g hg)
+      step hR Ω l O N₀ m F (F * n) q α hD (dvd_mul_right F n) (mul_ne_zero hF hn) hq hq1 ν hν δ a₀
+        a' w₀ ha₀a' ha'l hw₀
+        (fun u hu => (ha' a').2 dvd_rfl u hu)
+        c hc.1
+        (fun A' hA' hA'F _ g hg =>
+          hc.2 A' ((((placeBasic Ω).2.2.1 A' F n).1 hA').resolve_left hA'F) g hg)
         A hA φ hφ.1 τ hτ y hy
-    rcases le_total (IsDiscreteValuationRing.addVal O y) (IsDiscreteValuationRing.addVal O a') with hle | hle
+    rcases le_total (IsDiscreteValuationRing.addVal O y) (IsDiscreteValuationRing.addVal O a') with
+      hle | hle
     · rw [IsDiscreteValuationRing.addVal_le_iff_dvd] at hle
       obtain ⟨t, ht⟩ := hle
-      have hat : a ∣ t := (ha t).1 (by rw [hy, smul_smul, mul_comm t y, ← ht]; exact (hw₀ a').2 dvd_rfl)
+      have hat : a ∣ t :=
+        (ha t).1 (by rw [hy, smul_smul, mul_comm t y, ← ht]; exact (hw₀ a').2 dvd_rfl)
       obtain ⟨s, rfl⟩ := hat
       have hes : e = y * s := by
         apply mul_left_cancel₀ ha0
@@ -144,9 +177,20 @@ private theorem key (hR : Rec) (hD : Dat l N₀ m F α) (hF : F ≠ 0) {n q : �
 
 end
 
-theorem UpperTheory.V.ML.count :
-    Rec → ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (N₀ m F b : ℕ) [NeZero F] (α : G ℚ Ω →* Oˣ), Dat l N₀ m F α → b < F → ∀ δ : G ℚ Ω, IsUnit ((α δ : O) - 1) →
-    ∀ σ : (ZMod F)ˣ → G ℚ Ω, (∀ t, Lifts F t (σ t)) → ∀ a₀ : O, a₀ * zVal α σ b ∣ (l : O) ^ m → Module.length O (ShT (QO l O) α δ F a₀) ≤ IsDiscreteValuationRing.addVal O (zVal α σ b) := by
+theorem UpperTheory.V.ML.count
+    : Rec
+      → ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (O : Type)
+          [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+          [Module.Finite ℤ_[l] O] (N₀ m F b : ℕ) [NeZero F] (α : G ℚ Ω →* Oˣ),
+        Dat l N₀ m F α → b < F
+          → ∀ δ : G ℚ Ω,
+            IsUnit ((α δ : O) - 1)
+              → ∀ σ : (ZMod F)ˣ → G ℚ Ω,
+                (∀ t, Lifts F t (σ t))
+                  → ∀ a₀ : O,
+                    a₀ * zVal α σ b ∣ (l : O) ^ m
+                      → Module.length O (ShT (QO l O) α δ F a₀)
+                        ≤ IsDiscreteValuationRing.addVal O (zVal α σ b) := by
   intro hR Ω _ _ _ l _ O _ _ _ _ _ N₀ m F b _ α hD hb δ hδ σ hσ a₀ hz
   classical
   have hF : F ≠ 0 := NeZero.ne F
@@ -195,13 +239,14 @@ theorem UpperTheory.V.ML.count :
     intro y
     rw [hu₀, smul_comm y (u₀ : O), (u₀.isUnit).smul_eq_zero, smul_smul, hw, hk, mul_comm y,
       mul_dvd_mul_iff_left hz0]
-  obtain ⟨e₀, he₀, -, hlen₀⟩ := key hR hD hF one_ne_zero hr hr1 hν0 hδ ha₀k (haL []) hA₀ hφ₀ hτ₀ hbase
+  obtain ⟨e₀, he₀, -, hlen₀⟩ :=
+    key hR hD hF one_ne_zero hr hr1 hν0 hδ ha₀k (haL []) hA₀ hφ₀ hτ₀ hbase
   let St := {L : List ℕ // AdmL l F r L ∧ a₀ ∣ aL L}
   let S : St → Submodule O (G ℚ Ω → QO l O) := fun s => Sn (QO l O) α δ F a₀ (r * s.1.prod)
   let j : St → ℕ := fun s => (IsDiscreteValuationRing.addVal O (aL s.1)).toNat
   let J : ℕ := (IsDiscreteValuationRing.addVal O ((l : O) ^ m)).toNat
-  have hjc : ∀ s : St, ((j s : ℕ) : ℕ∞) = IsDiscreteValuationRing.addVal O (aL s.1) :=
-    fun s => cast_val (haL0 s.1 s.2.1)
+  have hjc : ∀ s : St, ((j s : ℕ) : ℕ∞) = IsDiscreteValuationRing.addVal O (aL s.1) := fun s =>
+    cast_val (haL0 s.1 s.2.1)
   have hJc : ((J : ℕ) : ℕ∞) = IsDiscreteValuationRing.addVal O ((l : O) ^ m) := cast_val hlm0
   have hjJ : ∀ s : St, j s ≤ J := by
     intro s
@@ -209,8 +254,12 @@ theorem UpperTheory.V.ML.count :
       rw [hjc, hJc, IsDiscreteValuationRing.addVal_le_iff_dvd]
       exact haLl s.1 s.2.1
     exact_mod_cast h
-  have hstep : ∀ s : St, S s ≠ ⊥ → ∃ s' : St, j s < j s' ∧
-      Module.length O (S s) + (j s : ℕ∞) ≤ Module.length O (S s') + (j s' : ℕ∞) := by
+  have hstep
+      : ∀ s : St,
+        S s ≠ ⊥
+          → ∃ s' : St,
+            j s < j s'
+              ∧ Module.length O (S s) + (j s : ℕ∞) ≤ Module.length O (S s') + (j s' : ℕ∞) := by
     rintro ⟨L, hL, hdiv⟩ hne
     obtain ⟨c, hc, hc0⟩ := (Submodule.ne_bot_iff _).1 hne
     have hsc := shtNu Ω l O N₀ m F α hD δ hδ a₀ ha₀l c hc.1
@@ -220,9 +269,11 @@ theorem UpperTheory.V.ML.count :
       exact hc0 (hsc.2.1 hcon)
     have hP := isCrys_isDR_prod l F r L hL
     obtain ⟨q, A, φ, hAdm, hqT, hA, hφ, hcφ, hgen⟩ :=
-      pick Ω l O N₀ m F r (F * r * L.prod) F L.prod α hD hr hrF hP.2.1 (ν L) c (hνs.isNu L hL) hsc.1 hcu
+      pick Ω l O N₀ m F r (F * r * L.prod) F L.prod α hD hr hrF hP.2.1 (ν L) c (hνs.isNu L hL) hsc.1
+        hcu
     have hqL : q ∉ L := fun h => hqT (List.dvd_prod h)
-    have hL' : AdmL l F r (q :: L) := ⟨List.nodup_cons.2 ⟨hqL, hL.1⟩, List.forall_mem_cons.2 ⟨hAdm, hL.2⟩⟩
+    have hL' : AdmL l F r (q :: L) :=
+      ⟨List.nodup_cons.2 ⟨hqL, hL.1⟩, List.forall_mem_cons.2 ⟨hAdm, hL.2⟩⟩
     obtain ⟨τ, hτ, u, hu⟩ := hνs.step q L hL' A hA φ hφ
     have hq := hAdm.1
     have hq1 := hAdm.2.1
@@ -256,7 +307,9 @@ theorem UpperTheory.V.ML.count :
         rintro rfl
         exact haL0 _ hL' (by rw [he, mul_zero])
       have hE := cast_val he0
-      have hjeq : j ⟨q :: L, hL', hdiv'⟩ = j ⟨L, hL, hdiv⟩ + (IsDiscreteValuationRing.addVal O e).toNat := by
+      have hjeq
+          : j ⟨q :: L, hL', hdiv'⟩
+            = j ⟨L, hL, hdiv⟩ + (IsDiscreteValuationRing.addVal O e).toNat := by
         apply Nat.cast_injective (R := ℕ∞)
         rw [Nat.cast_add, hjc, hjc, hE]
         show IsDiscreteValuationRing.addVal O (aL (q :: L)) =
@@ -273,9 +326,12 @@ theorem UpperTheory.V.ML.count :
           IsDiscreteValuationRing.addVal O (aL (q :: L))
       rw [List.prod_cons, show r * (q * L.prod) = r * L.prod * q by ring, he,
         IsDiscreteValuationRing.addVal_mul]
-      calc Module.length O (Sn (QO l O) α δ F a₀ (r * L.prod)) + IsDiscreteValuationRing.addVal O (aL L)
-          ≤ Module.length O (Sn (QO l O) α δ F a₀ (r * L.prod * q)) + IsDiscreteValuationRing.addVal O e +
-              IsDiscreteValuationRing.addVal O (aL L) := add_le_add hlen le_rfl
+      calc
+        Module.length O (Sn (QO l O) α δ F a₀ (r * L.prod))
+              + IsDiscreteValuationRing.addVal O (aL L)
+            ≤ Module.length O (Sn (QO l O) α δ F a₀ (r * L.prod * q))
+              + IsDiscreteValuationRing.addVal O e + IsDiscreteValuationRing.addVal O (aL L) :=
+          add_le_add hlen le_rfl
         _ = _ := by ring
   have hch := chain O (G ℚ Ω → QO l O) St S j J hjJ hstep
   have hdiv0 : a₀ ∣ aL [] := by
@@ -283,26 +339,32 @@ theorem UpperTheory.V.ML.count :
     exact ha₀k.mul_right e₀
   have h0 := hch ⟨[], isAdmissiblePrimeList_nil l F r, hdiv0⟩
   rw [hjc, hJc] at h0
-  change Module.length O (Sn (QO l O) α δ F a₀ (r * ([] : List ℕ).prod)) +
-    IsDiscreteValuationRing.addVal O (aL []) ≤ IsDiscreteValuationRing.addVal O ((l : O) ^ m) at h0
+  change Module.length O (Sn (QO l O) α δ F a₀ (r * ([] : List ℕ).prod))
+        + IsDiscreteValuationRing.addVal O (aL [])
+      ≤ IsDiscreteValuationRing.addVal O ((l : O) ^ m)
+    at h0
   rw [List.prod_nil, mul_one, he₀, IsDiscreteValuationRing.addVal_mul, hk,
-    IsDiscreteValuationRing.addVal_mul] at h0
+      IsDiscreteValuationRing.addVal_mul]
+    at h0
   rw [one_mul] at hlen₀
   have hsub : ShT (QO l O) α δ F a₀ ≤ Sn (QO l O) α δ F a₀ 1 := by
     intro c hc
     refine ⟨hc, fun A hA => ?_⟩
     exfalso
-    have hv : ¬ (A.valuation ((1 : ℕ) : Ω) < 1) := by simp
+    have hv : ¬(A.valuation ((1 : ℕ) : Ω) < 1) := by simp
     exact hv hA
-  have hlenS := Module.length_le_of_injective (Submodule.inclusion hsub) (Submodule.inclusion_injective hsub)
+  have hlenS :=
+    Module.length_le_of_injective (Submodule.inclusion hsub) (Submodule.inclusion_injective hsub)
   have hk_ne : IsDiscreteValuationRing.addVal O k ≠ ⊤ := by
     rw [Ne, IsDiscreteValuationRing.addVal_eq_top_iff]
     exact hk0
-  have h1 : Module.length O (Sn (QO l O) α δ F a₀ r) + IsDiscreteValuationRing.addVal O e₀ ≤
-      IsDiscreteValuationRing.addVal O (zVal α σ b) := by
-    have h2 : Module.length O (Sn (QO l O) α δ F a₀ r) + IsDiscreteValuationRing.addVal O e₀ +
-        IsDiscreteValuationRing.addVal O k ≤
-        IsDiscreteValuationRing.addVal O (zVal α σ b) + IsDiscreteValuationRing.addVal O k := by
+  have h1
+      : Module.length O (Sn (QO l O) α δ F a₀ r) + IsDiscreteValuationRing.addVal O e₀
+        ≤ IsDiscreteValuationRing.addVal O (zVal α σ b) := by
+    have h2
+        : Module.length O (Sn (QO l O) α δ F a₀ r) + IsDiscreteValuationRing.addVal O e₀
+            + IsDiscreteValuationRing.addVal O k
+          ≤ IsDiscreteValuationRing.addVal O (zVal α σ b) + IsDiscreteValuationRing.addVal O k := by
       rw [add_assoc, add_comm (IsDiscreteValuationRing.addVal O e₀)]
       exact h0
     exact (WithTop.add_le_add_iff_right hk_ne).1 h2

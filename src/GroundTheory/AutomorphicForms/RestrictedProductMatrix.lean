@@ -45,26 +45,29 @@ def matrixProdRingEquiv : Matrix m m (R₁ × R₂) ≃+* Matrix m m R₁ × Mat
 variable [TopologicalSpace R₁] [TopologicalSpace R₂]
 
 theorem continuous_matrixProdRingEquiv : Continuous (matrixProdRingEquiv m R₁ R₂) :=
-  (continuous_pi fun a => continuous_pi fun b =>
-      continuous_fst.comp ((continuous_apply b).comp (continuous_apply a))).prodMk
-    (continuous_pi fun a => continuous_pi fun b =>
-      continuous_snd.comp ((continuous_apply b).comp (continuous_apply a)))
+  (continuous_pi fun a =>
+      continuous_pi fun b =>
+        continuous_fst.comp ((continuous_apply b).comp (continuous_apply a))).prodMk
+    (continuous_pi fun a =>
+      continuous_pi fun b => continuous_snd.comp ((continuous_apply b).comp (continuous_apply a)))
 
 theorem continuous_matrixProdRingEquiv_symm : Continuous (matrixProdRingEquiv m R₁ R₂).symm :=
-  continuous_pi fun a => continuous_pi fun b =>
-    ((continuous_apply_apply a b).comp continuous_fst).prodMk
-      ((continuous_apply_apply a b).comp continuous_snd)
+  continuous_pi fun a =>
+    continuous_pi fun b =>
+      ((continuous_apply_apply a b).comp continuous_fst).prodMk
+        ((continuous_apply_apply a b).comp continuous_snd)
 
 variable [DecidableEq m]
 
 def glProdEquiv : GL m (R₁ × R₂) ≃ₜ* GL m R₁ × GL m R₂ :=
   (unitsCongr (matrixProdRingEquiv m R₁ R₂).toMulEquiv (continuous_matrixProdRingEquiv m R₁ R₂)
-    (continuous_matrixProdRingEquiv_symm m R₁ R₂)).trans
-    { toMulEquiv := MulEquiv.prodUnits
-      continuous_toFun := (Homeomorph.prodUnits (α := Matrix m m R₁)
-        (β := Matrix m m R₂)).continuous_toFun
-      continuous_invFun := (Homeomorph.prodUnits (α := Matrix m m R₁)
-        (β := Matrix m m R₂)).continuous_invFun }
+      (continuous_matrixProdRingEquiv_symm m R₁ R₂)).trans {
+    toMulEquiv := MulEquiv.prodUnits
+    continuous_toFun :=
+      (Homeomorph.prodUnits (α := Matrix m m R₁) (β := Matrix m m R₂)).continuous_toFun
+    continuous_invFun :=
+      (Homeomorph.prodUnits (α := Matrix m m R₁) (β := Matrix m m R₂)).continuous_invFun
+  }
 
 end Prod
 
@@ -85,12 +88,16 @@ def matrixPiRingEquiv : Matrix m m (Π j, R j) ≃+* Π j, Matrix m m (R j) wher
 variable [∀ j, TopologicalSpace (R j)]
 
 theorem continuous_matrixPiRingEquiv : Continuous (matrixPiRingEquiv m R) :=
-  continuous_pi fun j => continuous_pi fun a => continuous_pi fun b =>
-    (continuous_apply j).comp ((continuous_apply b).comp (continuous_apply a))
+  continuous_pi fun j =>
+    continuous_pi fun a =>
+      continuous_pi fun b =>
+        (continuous_apply j).comp ((continuous_apply b).comp (continuous_apply a))
 
 theorem continuous_matrixPiRingEquiv_symm : Continuous (matrixPiRingEquiv m R).symm :=
-  continuous_pi fun a => continuous_pi fun b => continuous_pi fun j =>
-    (continuous_apply b).comp ((continuous_apply a).comp (continuous_apply j))
+  continuous_pi fun a =>
+    continuous_pi fun b =>
+      continuous_pi fun j =>
+        (continuous_apply b).comp ((continuous_apply a).comp (continuous_apply j))
 
 variable [DecidableEq m]
 
@@ -104,28 +111,31 @@ namespace RestrictedProduct
 
 variable {ι : Type*} {R : ι → Type*} [∀ i, TopologicalSpace (R i)]
 
-def congrSets {A A' : (i : ι) → Set (R i)} (h : ∀ i, A i = A' i) :
-    Πʳ i, [R i, A i] ≃ₜ Πʳ i, [R i, A' i] where
-  toFun x := _root_.RestrictedProduct.mk x.1 (x.2.mono fun i hi =>
-    (congrArg (x.1 i ∈ ·) (h i)).mp hi)
-  invFun x := _root_.RestrictedProduct.mk x.1 (x.2.mono fun i hi =>
-    (congrArg (x.1 i ∈ ·) (h i)).mpr hi)
+def congrSets {A A' : (i : ι) → Set (R i)} (h : ∀ i, A i = A' i)
+    : Πʳ i, [R i, A i] ≃ₜ Πʳ i, [R i, A' i] where
+  toFun x :=
+    _root_.RestrictedProduct.mk x.1 (x.2.mono fun i hi => (congrArg (x.1 i ∈ ·) (h i)).mp hi)
+  invFun x :=
+    _root_.RestrictedProduct.mk x.1 (x.2.mono fun i hi => (congrArg (x.1 i ∈ ·) (h i)).mpr hi)
   left_inv _ := rfl
   right_inv _ := rfl
   continuous_toFun :=
     _root_.RestrictedProduct.mapAlong_continuous R R id tendsto_id (A₁ := A) (A₂ := A')
-      (fun _ x => x) (.of_forall fun i x hx => (congrArg (x ∈ ·) (h i)).mp hx)
+      (fun _ x => x)
+      (.of_forall fun i x hx => (congrArg (x ∈ ·) (h i)).mp hx)
       fun _ => continuous_id
   continuous_invFun :=
     _root_.RestrictedProduct.mapAlong_continuous R R id tendsto_id (A₁ := A') (A₂ := A)
-      (fun _ x => x) (.of_forall fun i x hx => (congrArg (x ∈ ·) (h i)).mpr hx)
+      (fun _ x => x)
+      (.of_forall fun i x hx => (congrArg (x ∈ ·) (h i)).mpr hx)
       fun _ => continuous_id
 
-def congrSetsMul [∀ i, Monoid (R i)] {S S' : ι → Type*} [∀ i, SetLike (S i) (R i)]
-    [∀ i, SubmonoidClass (S i) (R i)] [∀ i, SetLike (S' i) (R i)]
-    [∀ i, SubmonoidClass (S' i) (R i)] {B : Π i, S i} {B' : Π i, S' i}
-    (h : ∀ i, (B i : Set (R i)) = B' i) :
-    Πʳ i, [R i, B i] ≃ₜ* Πʳ i, [R i, B' i] where
+def congrSetsMul
+    [∀ i, Monoid (R i)]
+    {S S' : ι → Type*} [∀ i, SetLike (S i) (R i)] [∀ i, SubmonoidClass (S i) (R i)]
+    [∀ i, SetLike (S' i) (R i)] [∀ i, SubmonoidClass (S' i) (R i)]
+    {B : Π i, S i} {B' : Π i, S' i} (h : ∀ i, (B i : Set (R i)) = B' i)
+    : Πʳ i, [R i, B i] ≃ₜ* Πʳ i, [R i, B' i] where
   toEquiv := (congrSets h).toEquiv
   map_mul' _ _ := rfl
   continuous_toFun := (congrSets h).continuous
@@ -135,30 +145,42 @@ section Pi
 
 variable (m : Type*) [Finite m] {A : (i : ι) → Set (R i)}
 
-def piEquiv (hA : ∀ i, IsOpen (A i)) :
-    (m → Πʳ i, [R i, A i]) ≃ₜ Πʳ i, [m → R i, Set.pi univ fun _ => A i] where
-  toFun x := _root_.RestrictedProduct.mk (A := fun i => Set.pi univ fun _ => A i)
-    (fun i a => x a i)
-    (((eventually_all (ι := m)).2 fun a => (x a).2).mono fun _ hi a _ => hi a)
-  invFun y a := _root_.RestrictedProduct.mk (A := A) (fun i => y i a)
-    (y.2.mono fun _ hi => hi a (mem_univ a))
+def piEquiv (hA : ∀ i, IsOpen (A i))
+    : (m → Πʳ i, [R i, A i]) ≃ₜ Πʳ i, [m → R i, Set.pi univ fun _ => A i] where
+  toFun x :=
+    _root_.RestrictedProduct.mk
+      (A := fun i => Set.pi univ fun _ => A i)
+      (fun i a => x a i)
+      (((eventually_all (ι := m)).2 fun a => (x a).2).mono fun _ hi a _ => hi a)
+  invFun y a :=
+    _root_.RestrictedProduct.mk (A := A) (fun i => y i a) (y.2.mono fun _ hi => hi a (mem_univ a))
   left_inv _ := rfl
   right_inv _ := rfl
   continuous_toFun := by
-    refine (_root_.RestrictedProduct.continuous_dom_pi (A := fun _ i => R i)
-      (C := fun _ i => A i) fun _ => hA).2 fun S hS => ?_
+    refine (_root_.RestrictedProduct.continuous_dom_pi
+      (A := fun _ i => R i)
+      (C := fun _ i => A i)
+      fun _ => hA).2 fun S hS => ?_
     exact (_root_.RestrictedProduct.continuous_inclusion hS).comp
       (f := fun x : (m → Πʳ i, [R i, A i]_[𝓟 S]) =>
-        _root_.RestrictedProduct.mk (A := fun i => Set.pi univ fun _ => A i) (𝓕 := 𝓟 S)
-          (fun i a => x a i) (eventually_principal.2 fun i hi a _ =>
-            eventually_principal.1 (x a).2 i hi))
-      (_root_.RestrictedProduct.continuous_rng_of_principal.2
-        (continuous_pi fun i => continuous_pi fun a =>
+        _root_.RestrictedProduct.mk
+          (A := fun i => Set.pi univ fun _ => A i)
+          (𝓕 := 𝓟 S)
+          (fun i a => x a i)
+          (eventually_principal.2 fun i hi a _ => eventually_principal.1 (x a).2 i hi))
+      (_root_.RestrictedProduct.continuous_rng_of_principal.2 (continuous_pi fun i =>
+        continuous_pi fun a =>
           (_root_.RestrictedProduct.continuous_eval i).comp (continuous_apply a)))
-  continuous_invFun := continuous_pi fun a =>
-    _root_.RestrictedProduct.mapAlong_continuous (fun i => m → R i) R id tendsto_id
-      (A₁ := fun i => Set.pi univ fun _ => A i) (A₂ := A)
-      (fun _ y => y a) (.of_forall fun _ _ hy => hy a (mem_univ a)) fun _ => continuous_apply a
+  continuous_invFun :=
+    continuous_pi fun a =>
+      _root_.RestrictedProduct.mapAlong_continuous
+        (fun i => m → R i)
+        R id tendsto_id
+        (A₁ := fun i => Set.pi univ fun _ => A i)
+        (A₂ := A)
+        (fun _ y => y a)
+        (.of_forall fun _ _ hy => hy a (mem_univ a))
+        fun _ => continuous_apply a
 
 end Pi
 
@@ -166,25 +188,32 @@ section Matrix
 
 variable (m : Type*) [Fintype m] [DecidableEq m]
 
-def matrixHomeomorphSets {A : (i : ι) → Set (R i)} (hA : ∀ i, IsOpen (A i)) :
-    Matrix m m (Πʳ i, [R i, A i]) ≃ₜ Πʳ i, [Matrix m m (R i), {M | ∀ a b, M a b ∈ A i}] :=
+def matrixHomeomorphSets {A : (i : ι) → Set (R i)} (hA : ∀ i, IsOpen (A i))
+    : Matrix m m (Πʳ i, [R i, A i]) ≃ₜ Πʳ i, [Matrix m m (R i), {M | ∀ a b, M a b ∈ A i}] :=
   ((Homeomorph.piCongrRight fun _ : m => piEquiv m hA).trans
-    (piEquiv m fun i => isOpen_set_pi finite_univ fun _ _ => hA i)).trans
-    (congrSets fun _ => Set.ext fun _ =>
-      ⟨fun h a b => h a (mem_univ a) b (mem_univ b), fun h a _ b _ => h a b⟩)
+      (piEquiv m fun i => isOpen_set_pi finite_univ fun _ _ => hA i)).trans
+    (congrSets fun _ =>
+      Set.ext fun _ => ⟨fun h a b => h a (mem_univ a) b (mem_univ b), fun h a _ b _ => h a b⟩)
 
-variable [∀ i, Ring (R i)] {S : ι → Type*} [∀ i, SetLike (S i) (R i)]
-  [∀ i, SubringClass (S i) (R i)] {B : Π i, S i} {C : Π i, Subring (Matrix m m (R i))}
+variable
+  [∀ i, Ring (R i)]
+  {S : ι → Type*} [∀ i, SetLike (S i) (R i)] [∀ i, SubringClass (S i) (R i)]
+  {B : Π i, S i} {C : Π i, Subring (Matrix m m (R i))}
 
-def matrixRingEquiv (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i) :
-    Matrix m m (Πʳ i, [R i, B i]) ≃+* Πʳ i, [Matrix m m (R i), C i] where
-  toFun M := _root_.RestrictedProduct.mk (A := fun i => (C i : Set (Matrix m m (R i))))
-    (fun i => Matrix.of fun a b => M a b i)
-    (((eventually_all (ι := m)).2 fun a => (eventually_all (ι := m)).2 fun b =>
-      (M a b).2).mono fun i hi => (hC i _).2 fun a b => hi a b)
-  invFun x := Matrix.of fun a b =>
-    _root_.RestrictedProduct.mk (A := fun i => (B i : Set (R i))) (fun i => x i a b)
-      (x.2.mono fun i hi => (hC i _).1 hi a b)
+def matrixRingEquiv (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
+    : Matrix m m (Πʳ i, [R i, B i]) ≃+* Πʳ i, [Matrix m m (R i), C i] where
+  toFun M :=
+    _root_.RestrictedProduct.mk
+      (A := fun i => (C i : Set (Matrix m m (R i))))
+      (fun i => Matrix.of fun a b => M a b i)
+      (((eventually_all (ι := m)).2 fun a => (eventually_all (ι := m)).2 fun b => (M a b).2).mono
+        fun i hi => (hC i _).2 fun a b => hi a b)
+  invFun x :=
+    Matrix.of fun a b =>
+      _root_.RestrictedProduct.mk
+        (A := fun i => (B i : Set (R i)))
+        (fun i => x i a b)
+        (x.2.mono fun i hi => (hC i _).1 hi a b)
   left_inv _ := rfl
   right_inv _ := rfl
   map_mul' M N := by
@@ -194,31 +223,33 @@ def matrixRingEquiv (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M
     exact map_sum (_root_.RestrictedProduct.evalRingHom R i) _ _
   map_add' _ _ := rfl
 
-
 omit [∀ i, TopologicalSpace (R i)] [∀ i, SubringClass (S i) (R i)] in
-theorem coe_eq_setOf (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i) (i : ι) :
-    (C i : Set (Matrix m m (R i))) = {M | ∀ a b, M a b ∈ B i} :=
+theorem coe_eq_setOf (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i) (i : ι)
+    : (C i : Set (Matrix m m (R i))) = {M | ∀ a b, M a b ∈ B i} :=
   Set.ext fun M => hC i M
 
-def matrixHomeomorph (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
-    (hB : ∀ i, IsOpen (B i : Set (R i))) :
-    Matrix m m (Πʳ i, [R i, B i]) ≃ₜ Πʳ i, [Matrix m m (R i), C i] :=
+def matrixHomeomorph
+    (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
+    (hB : ∀ i, IsOpen (B i : Set (R i)))
+    : Matrix m m (Πʳ i, [R i, B i]) ≃ₜ Πʳ i, [Matrix m m (R i), C i] :=
   (matrixHomeomorphSets m hB).trans (congrSets fun i => (coe_eq_setOf m hC i).symm)
 
-
 omit [∀ i, SubringClass (S i) (R i)] in
-theorem isOpen_coe_of_forall (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
-    (hB : ∀ i, IsOpen (B i : Set (R i))) (i : ι) : IsOpen (C i : Set (Matrix m m (R i))) := by
+theorem isOpen_coe_of_forall
+    (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
+    (hB : ∀ i, IsOpen (B i : Set (R i))) (i : ι)
+    : IsOpen (C i : Set (Matrix m m (R i))) := by
   rw [coe_eq_setOf m hC i]
   simp only [Set.ofPred_forall]
-  exact isOpen_iInter_of_finite fun a => isOpen_iInter_of_finite fun b =>
-    (hB i).preimage (continuous_apply_apply a b)
+  exact isOpen_iInter_of_finite fun a =>
+    isOpen_iInter_of_finite fun b => (hB i).preimage (continuous_apply_apply a b)
 
-def matrixUnitsEquiv (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
-    (hB : ∀ i, IsOpen (B i : Set (R i))) :
-    GL m (Πʳ i, [R i, B i]) ≃ₜ* Πʳ i, [GL m (R i), (Submonoid.ofClass (C i)).units] :=
+def matrixUnitsEquiv
+    (hC : ∀ i (M : Matrix m m (R i)), M ∈ C i ↔ ∀ a b, M a b ∈ B i)
+    (hB : ∀ i, IsOpen (B i : Set (R i)))
+    : GL m (Πʳ i, [R i, B i]) ≃ₜ* Πʳ i, [GL m (R i), (Submonoid.ofClass (C i)).units] :=
   (unitsCongr (matrixRingEquiv m hC).toMulEquiv (matrixHomeomorph m hC hB).continuous
-    (matrixHomeomorph m hC hB).symm.continuous).trans
+      (matrixHomeomorph m hC hB).symm.continuous).trans
     (GroundTheory.Global.RestrictedProduct.continuousUnitsEquiv (isOpen_coe_of_forall m hC hB))
 
 end Matrix

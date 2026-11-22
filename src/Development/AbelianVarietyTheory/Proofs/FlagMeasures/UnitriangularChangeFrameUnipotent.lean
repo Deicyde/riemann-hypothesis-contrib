@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FrameDualUnip
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
@@ -15,10 +16,11 @@ namespace GlobalTheory.LocOver.UnipLevi
 
 open GlobalTheory.LocOver.UnipOnto
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
-  (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f))
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f))
 
 lemma cjO {x : E} (hx : x ∈ M.L.O) : M.L.cj x ∈ M.L.O := by
   rw [M.L.O_def] at hx ⊢
@@ -99,10 +101,11 @@ namespace GlobalTheory.LocOver.UnipLevi
 
 open GlobalTheory.LocOver.UnipOnto
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
-  (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f))
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f))
 
 lemma levi_lam (u : Fin r → V) (hu : ∀ c, u c ∈ Fr.Fj c.val) (hul : ∀ c, u c ∈ Fr.LamStd L)
     (huh : ∀ c, ∀ v ∈ Gen Fr L, H.h v (u c) ∈ M.L.O) :
@@ -172,12 +175,18 @@ namespace GlobalTheory.LocOver.UnipLevi
 
 open GlobalTheory.LocOver.UnipOnto
 
-theorem levi_integral : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type}
-    [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r)
-    (L : Submodule M.L.O (H.Wb Fr.f)), ∀ A : Matrix (Fin (r + 1)) (Fin (r + 1)) E, Uni A →
-    (∀ a b, A a b ∈ M.L.O) → ∃ n ∈ Fr.N, (∀ c : Fin r, n (Fr.f c.castSucc) = ∑ a, A a c.castSucc • Fr.f a) ∧
-      n (Fr.f (Fin.last r)) = Fr.f (Fin.last r) ∧ img n (Fr.LamStd L) = Fr.LamStd L := by
+theorem levi_integral
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r)
+            (L : Submodule M.L.O (H.Wb Fr.f)),
+          ∀ A : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+            Uni A → (∀ a b, A a b ∈ M.L.O)
+              → ∃ n ∈ Fr.N,
+                (∀ c : Fin r, n (Fr.f c.castSucc) = ∑ a, A a c.castSucc • Fr.f a)
+                  ∧ n (Fr.f (Fin.last r)) = Fr.f (Fin.last r)
+                  ∧ img n (Fr.LamStd L) = Fr.LamStd L := by
   intro F _ _ _ E _ _ _ _ M _ V _ _ H r Fr L A hA hAO
   set u : Fin r → V := fun c => (∑ a, A a c.castSucc • Fr.f a) - Fr.f c.castSucc with hud
   have hm := mem_of_tri Fr.f (fun b => ∑ a, A a b • Fr.f a) ⟨A, hA, fun b => rfl⟩
@@ -204,6 +213,7 @@ theorem levi_integral : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSp
     · intro v hv
       refine ⟨n⁻¹ v, (hnl v hv).2, ?_⟩
       show n (n⁻¹ v) = v
-      rw [← LinearEquiv.mul_apply, mul_inv_cancel]; rfl
+      rw [← LinearEquiv.mul_apply, mul_inv_cancel]
+      rfl
 
 end GlobalTheory.LocOver.UnipLevi

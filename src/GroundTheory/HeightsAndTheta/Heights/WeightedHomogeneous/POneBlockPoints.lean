@@ -18,8 +18,9 @@ noncomputable section
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem exists_int_smul_mem_latticeDual {m : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) (hL : L.FG)
-    (v : Fin m → K) : ∃ D : ℤ, D ≠ 0 ∧ D • v ∈ latticeDual L := by
+theorem exists_int_smul_mem_latticeDual
+    {m : ℕ} (L : Submodule (𝓞 K) (Fin m → K)) (hL : L.FG) (v : Fin m → K)
+    : ∃ D : ℤ, D ≠ 0 ∧ D • v ∈ latticeDual L := by
   classical
   obtain ⟨S, hS⟩ := hL
   have hint : ∀ k : ℤ, IsIntegral ℤ (k : K) := fun k ↦ by
@@ -40,27 +41,24 @@ theorem exists_int_smul_mem_latticeDual {m : ℕ} (L : Submodule (𝓞 K) (Fin m
     rw [smul_dotProduct, zsmul_eq_mul, ← Finset.mul_prod_erase S D hx, Int.cast_mul,
       mul_comm (D x : K), mul_assoc]
     exact (hint _).mul (hDint x)
-  | zero => simpa using (isIntegral_zero : IsIntegral ℤ (0 : K))
-  | add x y _ _ hx hy => rw [dotProduct_add]; exact hx.add hy
+  | zero =>
+    simpa using (isIntegral_zero : IsIntegral ℤ (0 : K))
+  | add x y _ _ hx hy =>
+    rw [dotProduct_add]; exact hx.add hy
   | smul c x _ hx =>
     rw [dotProduct_smul, Algebra.smul_def]
     exact ((IsIntegralClosure.isIntegral_iff (R := ℤ) (A := 𝓞 K)).mpr ⟨c, rfl⟩).mul hx
 
 variable {r N : ℕ}
 
-theorem exists_int_comb {F : HermLattice K (r + 1)} {φ : Fin (N + 1) → Fin (r + 1) → K}
-    (hφ : IsDualBasis F.lattice φ) (v : Fin (r + 1) → K) :
-    ∃ D : ℤ, D ≠ 0 ∧ ∃ c : Fin (N + 1) → ℤ, ∑ b, c b • φ b = D • v := by
+theorem exists_int_comb
+    {F : HermLattice K (r + 1)} {φ : Fin (N + 1) → Fin (r + 1) → K} (hφ : IsDualBasis F.lattice φ)
+    (v : Fin (r + 1) → K)
+    : ∃ D : ℤ, D ≠ 0 ∧ ∃ c : Fin (N + 1) → ℤ, ∑ b, c b • φ b = D • v := by
   obtain ⟨D, hD, hmem⟩ := exists_int_smul_mem_latticeDual F.lattice F.fg v
   have h : D • v ∈ Submodule.span ℤ (Set.range φ) := by rw [hφ.span_eq]; exact hmem
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp h
   exact ⟨D, hD, c, hc⟩
-
-
-
-
-
-
 
 end
 

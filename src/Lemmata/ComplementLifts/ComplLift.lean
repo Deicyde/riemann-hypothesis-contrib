@@ -30,16 +30,18 @@ private lemma compl_lift {R : Type*} {M : Type*} [CommRing R] [AddCommGroup M] [
   · rw [codisjoint_iff, ← sup_assoc, ← Submodule.map_sup, hAB.sup_eq_top, Submodule.map_top,
       Submodule.range_subtype, hN.sup_eq_top]
 
-theorem goal1 :
-  ∀ {R : Type u_1} {M : Type u_2} [inst : CommRing.{u_1} R] [IsDomain.{u_1} R] [IsPrincipalIdealRing.{u_1} R]
-  [inst_3 : AddCommGroup.{u_2} M] [inst_4 : Module.{u_1, u_2} R M] (N N' S : Submodule.{u_1, u_2} R M),
-  IsCompl.{u_2} N N' →
-    ∀ [Module.Finite.{u_1, u_2} R (Subtype.{u_2 + 1} fun (x : M) ↦ Membership.mem.{u_2, u_2} N x)],
-      LE.le.{u_2} S N →
-        (∀ (a : R) (x : M),
-            Ne.{u_1 + 1} a 0 →
-              Membership.mem.{u_2, u_2} S (HSMul.hSMul.{u_1, u_2, u_2} a x) → Membership.mem.{u_2, u_2} S x) →
-          Exists.{u_2 + 1} fun (T : Submodule.{u_1, u_2} R M) ↦ IsCompl.{u_2} S T := by
+theorem goal1
+    : ∀ {R : Type u_1} {M : Type u_2} [inst : CommRing.{u_1} R] [IsDomain.{u_1} R]
+        [IsPrincipalIdealRing.{u_1} R] [inst_3 : AddCommGroup.{u_2} M]
+        [inst_4 : Module.{u_1, u_2} R M] (N N' S : Submodule.{u_1, u_2} R M),
+      IsCompl.{u_2} N N'
+        → ∀ [Module.Finite.{u_1, u_2} R
+            (Subtype.{u_2 + 1} fun (x : M) ↦ Membership.mem.{u_2, u_2} N x)],
+          LE.le.{u_2} S N
+            → (∀ (a : R) (x : M),
+              Ne.{u_1 + 1} a 0 → Membership.mem.{u_2, u_2} S (HSMul.hSMul.{u_1, u_2, u_2} a x)
+                → Membership.mem.{u_2, u_2} S x)
+            → Exists.{u_2 + 1} fun (T : Submodule.{u_1, u_2} R M) ↦ IsCompl.{u_2} S T := by
   intro R M _ _ _ _ _ N N' S hN _ hSN hsat
   let S' : Submodule R N := S.comap N.subtype
   have : Module.IsTorsionFree R (N ⧸ S') := by

@@ -112,36 +112,37 @@ theorem GrassHeightBound.full : GrassHeightBound.Statement :=
 theorem DualStdMassAt.full : DualStdMassAt.Statement :=
   DualStdMassAt.proof DualPtsOnPlane.proof DualPtsOfPlane.proof
 
-theorem DualPointLineDegree.ofOpen (hVI : VertRIndex.Statement) (hSN : SectionIndexNorm.Statement) :
-    DualPointLineDegree.Statement :=
+theorem DualPointLineDegree.ofOpen (hVI : VertRIndex.Statement) (hSN : SectionIndexNorm.Statement)
+    : DualPointLineDegree.Statement :=
   DualPointLineDegree.proof DualCurvePoint.proof PointDegCPos.proof PointArInt.proof
     (PointVertR.proof hVI hSN) DualLineIndex.proof DualLineSemipositive.proof
 
-theorem DualTopBound.ofOpen (hEnergy : DualMetricEnergy.Statement)
-    (hBasis : DualTopBasisChange.Statement) (hStacked : DualTopStacked.Statement)
-    (hSDeg : DualStackedDegree.Statement) (hBC : DualStdBaseChange.Statement)
-    (hGL : GrassLinesProj.Statement) (hCharts : DualGeomDegCharts.Statement)
-    (hGChart : GrassGeomDegChart.Statement) (hMass : ChartMassInvariant.Statement) :
-    DualTopBound.Statement :=
+theorem DualTopBound.ofOpen
+    (hEnergy : DualMetricEnergy.Statement) (hBasis : DualTopBasisChange.Statement)
+    (hStacked : DualTopStacked.Statement) (hSDeg : DualStackedDegree.Statement)
+    (hBC : DualStdBaseChange.Statement) (hGL : GrassLinesProj.Statement)
+    (hCharts : DualGeomDegCharts.Statement) (hGChart : GrassGeomDegChart.Statement)
+    (hMass : ChartMassInvariant.Statement)
+    : DualTopBound.Statement :=
   DualTopBound.proof DualLatticeBasisExists.proof DualEmbBijective.proof
     (DualTopMetricChange.proof Telescope.proof hEnergy)
     (DualTopLatticeChange.proof (DualTopSubLattice.proof hBasis hStacked hSDeg))
     (DualTopStandard.proof hBC hGL) (DualGeomDegStandard.proof hCharts hGChart hMass)
     GrassHeightBound.full
 
-theorem DualGeomDegPos.ofOpen (hDeg : DegreeStatement) (hInd : PtsIndepStatement) :
-    DualGeomDegPos.Statement :=
+theorem DualGeomDegPos.ofOpen (hDeg : DegreeStatement) (hInd : PtsIndepStatement)
+    : DualGeomDegPos.Statement :=
   DualGeomDegPos.proof hDeg hInd DualArithVar.full DualLineSemipositive.proof DualPtsOnPlane.proof
     DualStdMassAt.full
 
-theorem LineOfLargeDegreeFromZ.ofOpen (hVI : VertRIndex.Statement) (hSN : SectionIndexNorm.Statement)
-    (hEnergy : DualMetricEnergy.Statement)
-    (hBasis : DualTopBasisChange.Statement) (hStacked : DualTopStacked.Statement)
-    (hSDeg : DualStackedDegree.Statement) (hBC : DualStdBaseChange.Statement)
-    (hGL : GrassLinesProj.Statement) (hCharts : DualGeomDegCharts.Statement)
-    (hGChart : GrassGeomDegChart.Statement) (hMass : ChartMassInvariant.Statement)
-    (hDeg : DegreeStatement) (hInd : PtsIndepStatement) :
-    LineOfLargeDegreeFromZ.Statement :=
+theorem LineOfLargeDegreeFromZ.ofOpen
+    (hVI : VertRIndex.Statement) (hSN : SectionIndexNorm.Statement)
+    (hEnergy : DualMetricEnergy.Statement) (hBasis : DualTopBasisChange.Statement)
+    (hStacked : DualTopStacked.Statement) (hSDeg : DualStackedDegree.Statement)
+    (hBC : DualStdBaseChange.Statement) (hGL : GrassLinesProj.Statement)
+    (hCharts : DualGeomDegCharts.Statement) (hGChart : GrassGeomDegChart.Statement)
+    (hMass : ChartMassInvariant.Statement) (hDeg : DegreeStatement) (hInd : PtsIndepStatement)
+    : LineOfLargeDegreeFromZ.Statement :=
   LineOfLargeDegreeFromZ.proofDual DualLatticeBasisExists.proof DualEmbBijective.proof
     DualArithVar.full DualLineSemipositive.proof NefOfNonneg.proof DualLineConj.proof
     (DualPointLineDegree.ofOpen hVI hSN)

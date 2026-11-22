@@ -7,11 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 
 open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU
+open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.AdelicU
 
-theorem GlobalTheory.adicEmbedding_integral_place (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (v : HeightOneSpectrum (𝓞 F)) (τ : E →ₐ[F] v.adicCompletion F) :
-    (∀ a : 𝓞 E, Valued.v (τ a) ≤ 1) ∧ ∃ Q : Ideal (𝓞 E), Q.IsMaximal ∧ ∀ a : 𝓞 E, a ∈ Q ↔ Valued.v (τ a) < 1 := by
+theorem GlobalTheory.adicEmbedding_integral_place
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (v : HeightOneSpectrum (𝓞 F)) (τ : E →ₐ[F] v.adicCompletion F)
+    : (∀ a : 𝓞 E, Valued.v (τ a) ≤ 1)
+      ∧ ∃ Q : Ideal (𝓞 E), Q.IsMaximal ∧ ∀ a : 𝓞 E, a ∈ Q ↔ Valued.v (τ a) < 1 := by
   set O := v.adicCompletionIntegers F
   have hv : (Valued.v : Valuation (v.adicCompletion F) _).Integers O := by
     have := Valuation.integer.integers (Valued.v : Valuation (v.adicCompletion F) _)
@@ -27,7 +30,8 @@ theorem GlobalTheory.adicEmbedding_integral_place (F E : Type) [Field F] [Number
       (fun a => (HeightOneSpectrum.mem_adicCompletionIntegers _ _ v).2 (ha a))
   have hmem : ∀ a : 𝓞 E, a ∈ (IsLocalRing.maximalIdeal O).comap φ ↔ Valued.v (τ a) < 1 := by
     intro a
-    rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hv.isUnit_iff_valuation_eq_one]
+    rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
+      hv.isUnit_iff_valuation_eq_one]
     change ¬ Valued.v (τ a) = 1 ↔ _
     exact ⟨fun h => lt_of_le_of_ne (ha a) h, fun h => ne_of_lt h⟩
   refine ⟨(IsLocalRing.maximalIdeal O).comap φ, ?_, hmem⟩
@@ -47,7 +51,8 @@ theorem GlobalTheory.adicEmbedding_integral_place (F E : Type) [Field F] [Number
   have : algebraMap (𝓞 F) (𝓞 E) π ∈ (IsLocalRing.maximalIdeal O).comap φ := by
     rw [hmem]
     have e : ((algebraMap (𝓞 F) (𝓞 E) π : 𝓞 E) : E) = algebraMap F E (π : F) := by
-      exact (IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E π).symm.trans (IsScalarTower.algebraMap_apply (𝓞 F) F E π)
+      exact (IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E π).symm.trans
+        (IsScalarTower.algebraMap_apply (𝓞 F) F E π)
     rw [e, AlgHom.commutes]
     exact hlt
   rw [hbot] at this

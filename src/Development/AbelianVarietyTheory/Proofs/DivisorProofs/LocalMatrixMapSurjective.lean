@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MatrixExtend
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.DblScal
 open scoped Matrix
@@ -20,17 +22,24 @@ namespace GlobalTheory.DblScal
 
 namespace SplitSurj
 
-theorem dbl_incM {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {d : ℕ}
-    (J : Matrix (Fin d) (Fin d) E) : dbl (incM F J) = incM F (dbl J) := by
+theorem dbl_incM
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {d : ℕ} (J : Matrix (Fin d) (Fin d) E)
+    : dbl (incM F J) = incM F (dbl J) := by
   ext (i | i) (j | j) <;> simp [dbl, incM]
 
-theorem dbl_skew {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) {d : ℕ}
-    (J : Matrix (Fin d) (Fin d) E) (hJ : ∀ i j, σ (J j i) = -J i j) :
-    ∀ i j, σ (dbl J j i) = -dbl J i j := by
+theorem dbl_skew
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (hJ : ∀ i j, σ (J j i) = - J i j)
+    : ∀ i j, σ (dbl J j i) = - dbl J i j := by
   rintro (i | i) (j | j) <;> simp [dbl, hJ]
 
-theorem isUnit_det_dbl_map {F E K : Type} [Field F] [Field E] [Field K] [Algebra F E] [Algebra F K]
-    (t : E →ₐ[F] K) {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (hJ : J.det ≠ 0) : IsUnit ((dbl J).map t).det := by
+theorem isUnit_det_dbl_map
+    {F E K : Type} [Field F] [Field E] [Field K] [Algebra F E] [Algebra F K]
+    (t : E →ₐ[F] K)
+    {d : ℕ} (J : Matrix (Fin d) (Fin d) E) (hJ : J.det ≠ 0)
+    : IsUnit ((dbl J).map t).det := by
   have h1 : (J.map t).det ≠ 0 := by
     rw [show J.map t = (t : E →+* K).mapMatrix J from rfl, ← RingHom.map_det]
     exact (map_ne_zero _).2 hJ
@@ -42,10 +51,14 @@ theorem isUnit_det_dbl_map {F E K : Type} [Field F] [Field E] [Field K] [Algebra
 end SplitSurj
 
 open SplitSurj in
-theorem locMatD_surjOn : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∀ (d : ℕ) (J : Matrix (Fin d) (Fin d) E), J.det ≠ 0 → (∀ i j, σ (J j i) = -J i j) →
-    ∀ (v : Pl (F := F)) (t : E →ₐ[F] Fv F v) (c : GL (Fin d) (Fv F v)),
-    Set.SurjOn (locMatD (σ := σ) (J := J) t c) (UDAt σ J (evFin F v)) Set.univ := by
+theorem locMatD_surjOn
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (J : Matrix (Fin d) (Fin d) E),
+          J.det ≠ 0 → (∀ i j, σ (J j i) = - J i j)
+            → ∀ (v : Pl (F := F)) (t : E →ₐ[F] Fv F v) (c : GL (Fin d) (Fv F v)),
+              Set.SurjOn (locMatD (σ := σ) (J := J) t c) (UDAt σ J (evFin F v)) Set.univ := by
   intro F E _ _ _ _ _ σ h d J hdet hJ v t c A _
   have hK := isUnit_det_dbl_map t J hdet
   have skew := dbl_skew σ J hJ

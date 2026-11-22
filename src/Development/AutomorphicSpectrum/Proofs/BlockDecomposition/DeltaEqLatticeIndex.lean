@@ -9,15 +9,17 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.DeltaIndex
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 variable {K : Type} [Field K] [NumberField K] {m : ℕ}
 
 theorem delta_ne_zero (c : Matrix (Fin m) (Fin m) K) : delta c ≠ 0 := by
   classical
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 K))
-    (Finset.univ : Finset (Fin m × Fin m)) (fun p => c p.1 p.2)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 K))
+      (Finset.univ : Finset (Fin m × Fin m)) (fun p => c p.1 p.2)
   have hb0 : (b : 𝓞 K) ≠ 0 := nonZeroDivisors.ne_zero b.2
   choose r hr using fun (i j : Fin m) => RingHom.mem_rangeS.1 (hb (i, j) (Finset.mem_univ _))
   have hr' : ∀ i j, algebraMap (𝓞 K) K (r i j) = algebraMap (𝓞 K) K (b : 𝓞 K) * c i j := by
@@ -27,13 +29,12 @@ theorem delta_ne_zero (c : Matrix (Fin m) (Fin m) K) : delta c ≠ 0 := by
   have hI : I ≠ ⊥ := fun h => hb0 (Ideal.span_singleton_eq_bot.1 h)
   haveI : Finite (𝓞 K ⧸ I) := Ideal.finiteQuotientOfFreeOfNeBot I hI
   let π : (Fin m → 𝓞 K) →+ (Fin m → 𝓞 K ⧸ I) :=
-    AddMonoidHom.pi (fun i => (Ideal.Quotient.mk I).toAddMonoidHom.comp
-      (Pi.evalAddMonoidHom (fun _ : Fin m => 𝓞 K) i))
+    AddMonoidHom.pi (fun i =>
+      (Ideal.Quotient.mk I).toAddMonoidHom.comp (Pi.evalAddMonoidHom (fun _ : Fin m => 𝓞 K) i))
   have hker : π.ker ≤ Kc c := by
     intro y hy
     have h0 : π y = 0 := AddMonoidHom.mem_ker.1 hy
-    have hyI : ∀ j, y j ∈ I := fun j =>
-      Ideal.Quotient.eq_zero_iff_mem.1 (congrFun h0 j)
+    have hyI : ∀ j, y j ∈ I := fun j => Ideal.Quotient.eq_zero_iff_mem.1 (congrFun h0 j)
     choose z hz using fun j => Ideal.mem_span_singleton'.1 (hyI j)
     change ∀ i : Fin m, ∃ o : 𝓞 K,
       algebraMap (𝓞 K) K o = c.mulVec (fun j => algebraMap (𝓞 K) K (y j)) i
@@ -50,20 +51,21 @@ theorem delta_ne_zero (c : Matrix (Fin m) (Fin m) K) : delta c ≠ 0 := by
     exact Nat.card_pos.ne'
   exact ne_zero_of_dvd_ne_zero hfin (AddSubgroup.index_dvd_of_le hker)
 
-theorem delta_eq_relIndex (c : Matrix (Fin m) (Fin m) K) :
-    delta c = (intVec K m).toAddSubgroup.relIndex (lam c).toAddSubgroup := by
+theorem delta_eq_relIndex (c : Matrix (Fin m) (Fin m) K)
+    : delta c = (intVec K m).toAddSubgroup.relIndex (lam c).toAddSubgroup := by
   classical
   let L := (lam c).toAddSubgroup
   let H : AddSubgroup L := (intVec K m).toAddSubgroup.addSubgroupOf L
   let f0 : (Fin m → 𝓞 K) →+ (Fin m → K) :=
-    (c.mulVecLin.toAddMonoidHom).comp (AddMonoidHom.pi fun i =>
-      (algebraMap (𝓞 K) K).toAddMonoidHom.comp (Pi.evalAddMonoidHom (fun _ : Fin m => 𝓞 K) i))
+    (c.mulVecLin.toAddMonoidHom).comp
+      (AddMonoidHom.pi fun i =>
+        (algebraMap (𝓞 K) K).toAddMonoidHom.comp (Pi.evalAddMonoidHom (fun _ : Fin m => 𝓞 K) i))
   have hmap : ∀ y, f0 y ∈ L := by
     intro y
     have : f0 y ∈ lam c := by
       unfold lam
-      refine Submodule.mem_sup_right (Submodule.mem_map.2 ⟨fun j => algebraMap (𝓞 K) K (y j),
-        fun j => ⟨y j, rfl⟩, rfl⟩)
+      refine Submodule.mem_sup_right (Submodule.mem_map.2
+        ⟨fun j => algebraMap (𝓞 K) K (y j), fun j => ⟨y j, rfl⟩, rfl⟩)
     exact this
   let ψ : (Fin m → 𝓞 K) →+ L := f0.codRestrict L hmap
   let φ : (Fin m → 𝓞 K) →+ L ⧸ H := (QuotientAddGroup.mk' H).comp ψ
@@ -98,9 +100,9 @@ theorem delta_eq_relIndex (c : Matrix (Fin m) (Fin m) K) :
   rw [hker, AddSubgroup.index_ker, AddMonoidHom.range_eq_top.2 hsurj, AddSubgroup.card_top]
   rfl
 
-theorem delta_index : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ)
-    (c : Matrix (Fin m) (Fin m) K),
-    delta c ≠ 0 ∧ delta c = (intVec K m).toAddSubgroup.relIndex (lam c).toAddSubgroup := by
+theorem delta_index
+    : ∀ (K : Type) [Field K] [NumberField K] (m : ℕ) (c : Matrix (Fin m) (Fin m) K),
+      delta c ≠ 0 ∧ delta c = (intVec K m).toAddSubgroup.relIndex (lam c).toAddSubgroup := by
   intro K _ _ m c
   exact ⟨delta_ne_zero c, delta_eq_relIndex c⟩
 

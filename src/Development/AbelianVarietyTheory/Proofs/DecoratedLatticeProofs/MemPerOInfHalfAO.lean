@@ -21,8 +21,12 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -30,20 +34,43 @@ noncomputable section
 namespace GlobalTheory.HalfAConj
 open GlobalTheory.LatVac
 
-theorem conjPl_eq_conjP {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) :
-    Formalism.L2.DIV.conjPl P = Formalism.L2.Col.conjPrime₂ P := by
+theorem conjPl_eq_conjP
+    {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E))
+    : Formalism.L2.DIV.conjPl P = Formalism.L2.Col.conjPrime₂ P := by
   apply HeightOneSpectrum.ext
   apply Ideal.ext
   intro r
   show Formalism.L2.DIV.starOHom r ∈ P.asIdeal ↔ Formalism.L2.Col.cO E r ∈ P.asIdeal
   have : Formalism.L2.DIV.starOHom r = Formalism.L2.Col.cO E r := by
     first
-      | rfl
-      | (apply RingOfIntegers.ext; simp [Formalism.L2.DIV.starOHom, Formalism.L2.DIV.starO_coe, Formalism.L2.Col.cO])
+    | rfl
+    | (
+        apply RingOfIntegers.ext
+        simp [Formalism.L2.DIV.starOHom, Formalism.L2.DIV.starO_coe, Formalism.L2.Col.cO]
+      )
   rw [this]
 
 set_option maxHeartbeats 1000000 in
-theorem mem_perO_inf_halfAO : ∀ (D : D7) (S T : HSp D), D.host.ccK = ⊤ → ∀ (e : AE D) (SS : Finset (Formalism.L2.DIV.Pl D.host.E)), IsIdemSum e SS → ∀ (N : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (N' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)), IsSelfDualC S N → IsSelfDualC T N' → ∀ c : ℕ, 0 < c → ∀ M ∈ GlobalTheory.LatVac.latRat S T (N : Set (Fin S.rank → D.host.E)) (N' : Set (Fin T.rank → D.host.E)), (∃ w ∈ (latO S T (N : Set (Fin S.rank → D.host.E)) (N' : Set (Fin T.rank → D.host.E)) fun _ => True), cA D e • GlobalTheory.LatVac.finTens 1 M = c • w) → Matrix.toLin' M ∈ (perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') ⊓ halfAO SS (perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') c := by
+theorem mem_perO_inf_halfAO
+    : ∀ (D : D7) (S T : HSp D),
+      D.host.ccK = ⊤
+        → ∀ (e : AE D) (SS : Finset (Formalism.L2.DIV.Pl D.host.E)),
+          IsIdemSum e SS
+            → ∀ (N : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+                (N' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+              IsSelfDualC S N → IsSelfDualC T N'
+                → ∀ c : ℕ,
+                  0 < c
+                    → ∀ M
+                        ∈ GlobalTheory.LatVac.latRat S T (N : Set (Fin S.rank → D.host.E))
+                          (N' : Set (Fin T.rank → D.host.E)),
+                      (∃ w
+                            ∈ (latO S T (N : Set (Fin S.rank → D.host.E))
+                              (N' : Set (Fin T.rank → D.host.E)) fun _ => True),
+                          cA D e • GlobalTheory.LatVac.finTens 1 M = c • w)
+                        → Matrix.toLin' M
+                          ∈ (perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') ⊓ halfAO SS
+                            (perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') c := by
   intro D S T hcc e SS hE N N' hN hN' c hc M hM hw
   obtain ⟨w, hw, hcw⟩ := hw
   have h1 : Matrix.toLin' M ∈ perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N' := by
@@ -51,8 +78,12 @@ theorem mem_perO_inf_halfAO : ∀ (D : D7) (S T : HSp D), D.host.ccK = ⊤ → �
     rwa [GlobalTheory.AdForm.RatLat.AA_eq hcc] at this
   refine Submodule.mem_inf.2 ⟨h1, ?_⟩
   have hcE : (c : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 hc.ne'
-  have h0 : infPart D (cA D e) = 0 := GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hE)
-  have hconj : ((LinearMap.toMatrix' ((c : D.host.E)⁻¹ • Matrix.toLin' M)).map fun r => cA D e * incA D r : WO S T) = w := by
+  have h0 : infPart D (cA D e) = 0 :=
+    GlobalTheory.PlaceVec.infPart_cA (GlobalTheory.PlaceVec.idemSum_infPart hE)
+  have hconj
+      : ((LinearMap.toMatrix' ((c : D.host.E)⁻¹ • Matrix.toLin' M)).map fun r => cA D e * incA D r
+          : WO S T)
+        = w := by
     ext i j
     have hij := congrFun (congrFun hcw i) j
     simp only [Matrix.smul_apply, smul_eq_mul] at hij
@@ -61,7 +92,9 @@ theorem mem_perO_inf_halfAO : ∀ (D : D7) (S T : HSp D), D.host.ccK = ⊤ → �
       · rw [RingHom.map_mul, RingHom.map_mul, h0, zero_mul, zero_mul]
       · rw [RingHom.map_mul, RingHom.map_mul]
         rfl
-    have e2 : LinearMap.toMatrix' ((c : D.host.E)⁻¹ • Matrix.toLin' M) i j = (c : D.host.E)⁻¹ * M i j := by
+    have e2
+        : LinearMap.toMatrix' ((c : D.host.E)⁻¹ • Matrix.toLin' M) i j
+          = (c : D.host.E)⁻¹ * M i j := by
       have e2' : (c : D.host.E)⁻¹ • Matrix.toLin' M = Matrix.toLin' ((c : D.host.E)⁻¹ • M) :=
         (map_smul Matrix.toLin' _ _).symm
       rw [e2', LinearMap.toMatrix'_toLin']
@@ -70,8 +103,9 @@ theorem mem_perO_inf_halfAO : ∀ (D : D7) (S T : HSp D), D.host.ccK = ⊤ → �
     have e3 : incA D (c : D.host.E)⁻¹ * (c : AE D) = 1 := by
       rw [← map_natCast (incA D) c, ← RingHom.map_mul, inv_mul_cancel₀ hcE, map_one]
     rw [e3, one_mul]
-  have hloc := (GlobalTheory.T.idempotentHalf_mem_completedHomLattice_iff_local D S T hcc (cA D e) _ (Formalism.IndefR.Fin.LevelGroupLemmas.isIdemSum_conj hE) N N' hN hN' _).1
-    (hconj ▸ hw)
+  have hloc :=
+    (GlobalTheory.T.idempotentHalf_mem_completedHomLattice_iff_local D S T hcc (cA D e) _
+      (Formalism.IndefR.Fin.LevelGroupLemmas.isIdemSum_conj hE) N N' hN hN' _).1 (hconj ▸ hw)
   rw [halfAO, Formalism.L2.Ker.mem_twO]
   intro Q
   by_cases hQ : Q ∈ SS

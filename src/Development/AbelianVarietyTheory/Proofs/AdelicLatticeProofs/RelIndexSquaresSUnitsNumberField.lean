@@ -13,8 +13,8 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem sqs_subgroupOf_self {G : Type} [CommGroup G] (U : Subgroup G) :
-    (sqs U).subgroupOf U = sqs (⊤ : Subgroup U) := by
+theorem sqs_subgroupOf_self {G : Type} [CommGroup G] (U : Subgroup G)
+    : (sqs U).subgroupOf U = sqs (⊤ : Subgroup U) := by
   ext x
   rw [Subgroup.mem_subgroupOf]
   constructor
@@ -23,11 +23,10 @@ theorem sqs_subgroupOf_self {G : Type} [CommGroup G] (U : Subgroup G) :
   · rintro ⟨y, -, h⟩
     exact ⟨y.1, y.2, congrArg Subtype.val h⟩
 
-theorem card_sq_eq_one_sUnits (F : Type) [Field F] [NumberField F]
-    (S : Finset (HeightOneSpectrum (𝓞 F))) :
-    Nat.card {a : sUnits F S // a ^ 2 = 1} = 2 := by
-  have hm : (-1 : Fˣ) ∈ sUnits F S := by
-    rw [mem_sUnits]; intro v _; simp
+theorem card_sq_eq_one_sUnits
+    (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F)))
+    : Nat.card {a : sUnits F S // a ^ 2 = 1} = 2 := by
+  have hm : (-1 : Fˣ) ∈ sUnits F S := by rw [mem_sUnits]; intro v _; simp
   rw [Nat.card_eq_two_iff]
   refine ⟨⟨1, by simp⟩, ⟨⟨-1, hm⟩, Subtype.ext (by simp)⟩, ?_, ?_⟩
   · intro h
@@ -45,7 +44,9 @@ theorem card_sq_eq_one_sUnits (F : Type) [Field F] [NumberField F]
     · right
       exact Subtype.ext (Subtype.ext (Units.ext h2))
 
-theorem relIndex_sqs_sUnits : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))), (sqs (sUnits F S)).relIndex (sUnits F S) = 2 ^ (S.card + Fintype.card (InfinitePlace F)) := by
+theorem relIndex_sqs_sUnits
+    : ∀ (F : Type) [Field F] [NumberField F] (S : Finset (HeightOneSpectrum (𝓞 F))),
+      (sqs (sUnits F S)).relIndex (sUnits F S) = 2 ^ (S.card + Fintype.card (InfinitePlace F)) := by
   intro F _ _ S
   haveI := GlobalTheory.T.sUnitsNumberField_fg F S
   rw [Subgroup.relIndex, sqs_subgroupOf_self, GlobalTheory.T.index_sqs_of_fg, card_sq_eq_one_sUnits,

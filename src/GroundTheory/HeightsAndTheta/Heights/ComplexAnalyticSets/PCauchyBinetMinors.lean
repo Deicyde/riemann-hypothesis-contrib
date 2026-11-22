@@ -16,5 +16,4 @@ namespace CauchyBinetMinorsAlt
 
 end CauchyBinetMinorsAlt
 
-
 end GroundTheory.Heights₂.Heights

@@ -12,21 +12,23 @@ open CategoryTheory WittVector Ideal TensorProduct Coalgebra
 
 namespace GlobalTheory.PrismModel
 
-open GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.Published
+open GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Sandwich
+  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.Published
 
 section Eps
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
-private theorem zeta_add_pow_p_pow_eq_zeta (ε : PreTilt O p) (n k : ℕ) :
-    zeta ε (n + k) ^ p ^ k = zeta ε n := by
+private theorem zeta_add_pow_p_pow_eq_zeta (ε : PreTilt O p) (n k : ℕ)
+    : zeta ε (n + k) ^ p ^ k = zeta ε n := by
   induction k with
   | zero => simp
   | succ k ih => rw [← add_assoc, pow_succ', pow_mul, zeta_succ_pow, ih]
 
-theorem isPrimitiveSystem_of_one {ε : PreTilt O p} (h : IsPrimitiveRoot (zeta ε 1) p) :
-    IsPrimitiveSystem ε := by
+theorem isPrimitiveSystem_of_one {ε : PreTilt O p} (h : IsPrimitiveRoot (zeta ε 1) p)
+    : IsPrimitiveSystem ε := by
   intro n
   cases n with
   | zero =>

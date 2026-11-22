@@ -11,14 +11,16 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.FiniteO
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZJ
 
 namespace GlobalTheory.InvExt
 
-theorem inv_left_comp {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) :
-    (ι[G']).left ≫ φ = φ ≫ (ι[G]).left := by
+theorem inv_left_comp
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    : (ι[G']).left ≫ φ = φ ≫ (ι[G]).left := by
   have e := congrArg (fun z => z.left) (map_inv (pushHom h G') (𝟙 G'))
   have e₁ : (𝟙 G' : G' ⟶ G')⁻¹ = ι[G'] := by rw [Hom.inv_def, Category.id_comp]
   rw [e₁] at e
@@ -28,19 +30,26 @@ theorem inv_left_comp {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G]
 
 theorem isDominant_gPt (p : ℕ) [Fact p.Prime] : IsDominant (gPt p) := by
   refine ⟨?_⟩
-  exact (PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical (OO p).subtype).mpr (by
-    rw [(RingHom.injective_iff_ker_eq_bot _).mp Subtype.val_injective]; exact bot_le)
+  exact (PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical (OO p).subtype).mpr
+    (by rw [(RingHom.injective_iff_ker_eq_bot _).mp Subtype.val_injective]; exact bot_le)
 
-theorem exists_common {X : Scheme.{0}} {k k' : Type} [Field k] [Field k'] (u : Sp k ⟶ X)
-    (u' : Sp k' ⟶ X) (x : Sp k) (x' : Sp k') (h : u x = u' x') :
-    ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (v : Sp K ⟶ Sp k) (v' : Sp K ⟶ Sp k'),
+theorem exists_common
+    {X : Scheme.{0}} {k k' : Type} [Field k] [Field k']
+    (u : Sp k ⟶ X) (u' : Sp k' ⟶ X) (x : Sp k) (x' : Sp k') (h : u x = u' x')
+    : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (v : Sp K ⟶ Sp k) (v' : Sp K ⟶ Sp k'),
       v ≫ u = v' ≫ u' := by
   obtain ⟨z, -, -⟩ := Scheme.Pullback.exists_preimage_pullback x x' h
   let F := (pullback u u').residueField z
   let w : Sp (AlgebraicClosure F) ⟶ pullback u u' :=
     spMap (algebraMap F (AlgebraicClosure F)) ≫ (pullback u u').fromSpecResidueField z
-  exact ⟨AlgebraicClosure F, inferInstance, inferInstance, w ≫ pullback.fst _ _,
-    w ≫ pullback.snd _ _, by simp [pullback.condition]⟩
+  exact ⟨
+    AlgebraicClosure F,
+    inferInstance,
+    inferInstance,
+    w ≫ pullback.fst _ _,
+    w ≫ pullback.snd _ _,
+    by simp [pullback.condition]
+  ⟩
 
 variable (C : Core)
 
@@ -50,10 +59,11 @@ theorem isOpenImmersion_a : IsOpenImmersion C.a := by
 
 variable {C}
 
-theorem generic_inv {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ C.Z} (τ : C.Test y)
-    (c : Sp (OO p) ⟶ τ.H.left) (hc : c ≫ τ.H.hom = spMap τ.j) (a₀ : Sp (PadicAlgCl p) ⟶ C.A.left)
-    (ha : a₀ ≫ C.a = gPt p ≫ c ≫ τ.f) :
-    gPt p ≫ c ≫ (ι[τ.H]).left ≫ τ.f = a₀ ≫ (ι[C.A]).left ≫ C.a := by
+theorem generic_inv
+    {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ C.Z} (τ : C.Test y) (c : Sp (OO p) ⟶ τ.H.left) (hc : c ≫ τ.H.hom = spMap τ.j)
+    (a₀ : Sp (PadicAlgCl p) ⟶ C.A.left) (ha : a₀ ≫ C.a = gPt p ≫ c ≫ τ.f)
+    : gPt p ≫ c ≫ (ι[τ.H]).left ≫ τ.f = a₀ ≫ (ι[C.A]).left ≫ C.a := by
   have := isOpenImmersion_a C
   have hinj : Function.Injective ((OO p).subtype.comp τ.j) := Subtype.val_injective.comp τ.j_inj
   let k : FractionRing τ.V →+* PadicAlgCl p := IsFractionRing.lift hinj
@@ -65,27 +75,31 @@ theorem generic_inv {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ C.Z} (τ : C.Tes
   let l : Sp (PadicAlgCl p) ⟶ pullback τ.H.hom (Out.jK τ.V) :=
     pullback.lift (gPt p ≫ c) (spMap k) (by rw [Category.assoc, hc, hk])
   have hl : l ≫ pullback.fst _ _ = gPt p ≫ c := pullback.lift_fst _ _ _
-  have h1 : l ≫ τ.φ = a₀ := by
-    rw [← cancel_mono C.a, Category.assoc, τ.φ_f, reassoc_of% hl, ha]
+  have h1 : l ≫ τ.φ = a₀ := by rw [← cancel_mono C.a, Category.assoc, τ.φ_f, reassoc_of% hl, ha]
   have h2 := inv_left_comp τ.φ_cart
   have h3 := inv_left_comp (isGrpPullback_pullback τ.H (Out.jK τ.V))
-  have h4 : (ι[(Over.pullback (Out.jK τ.V)).obj τ.H]).left ≫ τ.φ ≫ C.a =
-      τ.φ ≫ (ι[C.A]).left ≫ C.a := by
+  have h4
+      : (ι[(Over.pullback (Out.jK τ.V)).obj τ.H]).left ≫ τ.φ ≫ C.a = τ.φ ≫ (ι[C.A]).left ≫ C.a := by
     rw [← Category.assoc, ← Category.assoc]; exact congrArg (· ≫ C.a) h2
-  have h5 : (ι[(Over.pullback (Out.jK τ.V)).obj τ.H]).left ≫ pullback.fst τ.H.hom (Out.jK τ.V) ≫ τ.f =
-      pullback.fst τ.H.hom (Out.jK τ.V) ≫ (ι[τ.H]).left ≫ τ.f := by
+  have h5
+      : (ι[(Over.pullback (Out.jK τ.V)).obj τ.H]).left ≫ pullback.fst τ.H.hom (Out.jK τ.V) ≫ τ.f
+        = pullback.fst τ.H.hom (Out.jK τ.V) ≫ (ι[τ.H]).left ≫ τ.f := by
     rw [← Category.assoc, ← Category.assoc]; exact congrArg (· ≫ τ.f) h3
   rw [← h1, Category.assoc, ← h4, τ.φ_f]
   erw [h5]
   rw [reassoc_of% hl]
 
-theorem range_residue {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ C.Z} (τ : C.Test y)
-    {K : Type} [Field K] (v : Sp K ⟶ Sp (kb p)) :
-    Set.range (v ≫ rPt p ≫ spMap τ.j) = {IsLocalRing.closedPoint τ.V} := by
+theorem range_residue
+    {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ C.Z} (τ : C.Test y)
+    {K : Type} [Field K]
+    (v : Sp K ⟶ Sp (kb p))
+    : Set.range (v ≫ rPt p ≫ spMap τ.j) = {IsLocalRing.closedPoint τ.V} := by
   have := τ.j_loc
   have h : ∀ x : Sp K, (v ≫ rPt p ≫ spMap τ.j) x = IsLocalRing.closedPoint τ.V := by
     intro x
-    have hx : v x = IsLocalRing.closedPoint (kb p) := Subsingleton.elim (α := PrimeSpectrum (kb p)) _ _
+    have hx : v x = IsLocalRing.closedPoint (kb p) :=
+      Subsingleton.elim (α := PrimeSpectrum (kb p)) _ _
     rw [Scheme.Hom.comp_apply, Scheme.Hom.comp_apply, hx]
     exact (congrArg (spMap τ.j) (IsLocalRing.comap_closedPoint (IsLocalRing.residue (OO p)))).trans
       (IsLocalRing.comap_closedPoint τ.j)
@@ -97,9 +111,10 @@ theorem rPt_apply (p : ℕ) [Fact p.Prime] (x : Sp (kb p)) : rPt p x = cPt p := 
   rw [hx]
   exact IsLocalRing.comap_closedPoint (IsLocalRing.residue (OO p))
 
-theorem exists_common_residue {X : Scheme.{0}} {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (α : Sp (OO p) ⟶ X) (β : Sp (OO q) ⟶ X) (h : α (cPt p) = β (cPt q)) :
-    ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (v : Sp K ⟶ Sp (kb p)) (v' : Sp K ⟶ Sp (kb q)),
+theorem exists_common_residue
+    {X : Scheme.{0}} {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (α : Sp (OO p) ⟶ X) (β : Sp (OO q) ⟶ X) (h : α (cPt p) = β (cPt q))
+    : ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (v : Sp K ⟶ Sp (kb p)) (v' : Sp K ⟶ Sp (kb q)),
       v ≫ rPt p ≫ α = v' ≫ rPt q ≫ β := by
   obtain ⟨x⟩ : Nonempty (Sp (kb p)) := inferInstance
   obtain ⟨x'⟩ : Nonempty (Sp (kb q)) := inferInstance
@@ -113,8 +128,10 @@ theorem natCast_kb (p : ℕ) [hp : Fact p.Prime] : (p : kb p) = 0 := by
   rw [PadicAlgCl.valuation_p, one_div]
   exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hp.out.one_lt)
 
-theorem prime_eq {X : Scheme.{0}} {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
-    (α : Sp (OO p) ⟶ X) (β : Sp (OO q) ⟶ X) (h : α (cPt p) = β (cPt q)) : p = q := by
+theorem prime_eq
+    {X : Scheme.{0}} {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (α : Sp (OO p) ⟶ X) (β : Sp (OO q) ⟶ X) (h : α (cPt p) = β (cPt q))
+    : p = q := by
   obtain ⟨K, _, _, v, v', -⟩ := exists_common_residue α β h
   have h1 : (p : K) = 0 := by
     rw [← map_natCast (Spec.preimage v).hom]
@@ -126,12 +143,13 @@ theorem prime_eq {X : Scheme.{0}} {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.P
   have := (CharP.charP_iff_prime_eq_zero hq.out).mpr h2
   exact CharP.eq K ‹CharP K p› ‹CharP K q›
 
-theorem special_inv (hF : C.FibLaw) {p : ℕ} [Fact p.Prime] {y y' : Sp (OO p) ⟶ C.Z}
-    (τ : C.Test y) (τ' : C.Test y')
-    (c : Sp (OO p) ⟶ τ.H.left) (hc : c ≫ τ.H.hom = spMap τ.j)
-    (c' : Sp (OO p) ⟶ τ'.H.left) (hc' : c' ≫ τ'.H.hom = spMap τ'.j)
-    (h : (c ≫ τ.f) (cPt p) = (c' ≫ τ'.f) (cPt p)) :
-    (c ≫ (ι[τ.H]).left ≫ τ.f) (cPt p) = (c' ≫ (ι[τ'.H]).left ≫ τ'.f) (cPt p) := by
+theorem special_inv
+    (hF : C.FibLaw)
+    {p : ℕ} [Fact p.Prime]
+    {y y' : Sp (OO p) ⟶ C.Z} (τ : C.Test y) (τ' : C.Test y') (c : Sp (OO p) ⟶ τ.H.left)
+    (hc : c ≫ τ.H.hom = spMap τ.j) (c' : Sp (OO p) ⟶ τ'.H.left) (hc' : c' ≫ τ'.H.hom = spMap τ'.j)
+    (h : (c ≫ τ.f) (cPt p) = (c' ≫ τ'.f) (cPt p))
+    : (c ≫ (ι[τ.H]).left ≫ τ.f) (cPt p) = (c' ≫ (ι[τ'.H]).left ≫ τ'.f) (cPt p) := by
   obtain ⟨K, _, _, v, v', hv⟩ := exists_common_residue _ _ h
   let d : Over.mk (v ≫ rPt p ≫ spMap τ.j) ⟶ τ.H := Over.homMk (v ≫ rPt p ≫ c) (by simp [hc])
   let d' : Over.mk (v' ≫ rPt p ≫ spMap τ'.j) ⟶ τ'.H := Over.homMk (v' ≫ rPt p ≫ c') (by simp [hc'])
@@ -148,10 +166,13 @@ theorem special_inv (hF : C.FibLaw) {p : ℕ} [Fact p.Prime] {y y' : Sp (OO p) �
   simp only [Scheme.Hom.comp_apply, rPt_apply] at this
   simpa only [Scheme.Hom.comp_apply] using this
 
-theorem exists_test (hT : C.HasTests) {p : ℕ} [Fact p.Prime] (α : Sp (OO p) ⟶ C.G.toScheme)
-    (a₀ : Sp (PadicAlgCl p) ⟶ C.A.left) (b : Sp (OO p) ⟶ C.P.left) (ha : a₀ ≫ C.a = gPt p ≫ α)
-    (hb : gPt p ≫ b = a₀ ≫ (ι[C.A]).left ≫ C.a ≫ C.G.ι) (hb' : b ≫ C.P.hom = α ≫ C.GG.hom) :
-    ∃ (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (c : Sp (OO p) ⟶ τ.H.left),
+theorem exists_test
+    (hT : C.HasTests)
+    {p : ℕ} [Fact p.Prime]
+    (α : Sp (OO p) ⟶ C.G.toScheme) (a₀ : Sp (PadicAlgCl p) ⟶ C.A.left) (b : Sp (OO p) ⟶ C.P.left)
+    (ha : a₀ ≫ C.a = gPt p ≫ α) (hb : gPt p ≫ b = a₀ ≫ (ι[C.A]).left ≫ C.a ≫ C.G.ι)
+    (hb' : b ≫ C.P.hom = α ≫ C.GG.hom)
+    : ∃ (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (c : Sp (OO p) ⟶ τ.H.left),
       c ≫ τ.H.hom = spMap τ.j ∧ c ≫ τ.f = α ∧ b = (c ≫ (ι[τ.H]).left ≫ τ.f) ≫ C.G.ι := by
   have hw : C.a ≫ C.GG.hom = C.A.hom ≫ C.U.ι := by simpa using C.cart.w
   have hcl : C.Cl (α ≫ C.GG.hom) := by
@@ -174,9 +195,11 @@ end GlobalTheory.InvExt
 
 namespace GlobalTheory
 
-
 open InvExt in
-theorem exists_inv_extension : ∀ C : Core, C.HasTests → SmoothOfRelativeDimension C.g C.GG.hom → C.TestCart → C.FibLaw → ∃ i : C.GG ⟶ C.GG, C.a ≫ i.left = (ι[C.A]).left ≫ C.a := by
+theorem exists_inv_extension
+    : ∀ C : Core,
+      C.HasTests → SmoothOfRelativeDimension C.g C.GG.hom → C.TestCart → C.FibLaw
+        → ∃ i : C.GG ⟶ C.GG, C.a ≫ i.left = (ι[C.A]).left ≫ C.a := by
   intro C hT hS _ hF
   have := isOpenImmersion_a C
   have := C.flat
@@ -193,15 +216,28 @@ theorem exists_inv_extension : ∀ C : Core, C.HasTests → SmoothOfRelativeDime
   let e := C.a.isoOpensRange
   have he : e.inv ≫ C.a = C.a.opensRange.ι := C.a.isoOpensRange_inv_comp
   have he' : e.hom ≫ C.a.opensRange.ι = C.a := C.a.isoOpensRange_hom_ι
-  have existsUnique_extension_of_finite_specializations :
-      ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π] [QuasiCompact π], IsNormalScheme X → ∀ (Z P : Scheme.{0}) (s : X ⟶ Z) (t : P ⟶ Z) [IsProper t] (G : P.Opens) (U : X.Opens) (φ : U.toScheme ⟶ P), (U : Set X).Nonempty → φ ≫ t = U.ι ≫ s → (∀ σ : X, IsClosed ({σ} : Set X) → ∃ F : Set P, F.Finite ∧ F ⊆ G ∧ ∀ (p : ℕ) [Fact p.Prime] (a : Sp (OO p) ⟶ X) (a₀ : Sp (PadicAlgCl p) ⟶ U.toScheme) (b : Sp (OO p) ⟶ P), a (cPt p) = σ → a₀ ≫ U.ι = gPt p ≫ a → gPt p ≫ b = a₀ ≫ φ → b ≫ t = a ≫ s → b (cPt p) ∈ F) → ∃! Φ : X ⟶ G.toScheme, U.ι ≫ Φ ≫ G.ι = φ ∧ Φ ≫ G.ι ≫ t = s := by
+  have existsUnique_extension_of_finite_specializations
+      : ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π]
+          [QuasiCompact π],
+        IsNormalScheme X
+          → ∀ (Z P : Scheme.{0}) (s : X ⟶ Z) (t : P ⟶ Z) [IsProper t] (G : P.Opens) (U : X.Opens)
+              (φ : U.toScheme ⟶ P),
+            (U : Set X).Nonempty → φ ≫ t = U.ι ≫ s
+              → (∀ σ : X,
+                IsClosed ({σ} : Set X)
+                  → ∃ F : Set P,
+                    F.Finite ∧ F ⊆ G
+                      ∧ ∀ (p : ℕ) [Fact p.Prime] (a : Sp (OO p) ⟶ X)
+                          (a₀ : Sp (PadicAlgCl p) ⟶ U.toScheme) (b : Sp (OO p) ⟶ P),
+                        a (cPt p) = σ → a₀ ≫ U.ι = gPt p ≫ a → gPt p ≫ b = a₀ ≫ φ → b ≫ t = a ≫ s
+                          → b (cPt p) ∈ F)
+              → ∃! Φ : X ⟶ G.toScheme, U.ι ≫ Φ ≫ G.ι = φ ∧ Φ ≫ G.ι ≫ t = s := by
     intro X _ π _ _ _ hX Z P s t _ G U φ hU hφ H
     have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian π
     have : Nonempty U.toScheme := hU.to_subtype
     have : IsIntegral U.toScheme := isIntegral_of_isOpenImmersion U.ι
     have : QuasiCompact U.ι := inferInstance
-    have : IsDominant U.ι := ⟨by
-      rw [DenseRange, Scheme.Opens.range_ι]; exact U.isOpen.dense hU⟩
+    have : IsDominant U.ι := ⟨by rw [DenseRange, Scheme.Opens.range_ι]; exact U.isOpen.dense hU⟩
     let Γ := graphClosure s t U.ι φ hφ.symm
     let f : Γ ⟶ X := graphClosure.fst s t U.ι φ hφ.symm
     let g : Γ ⟶ P := graphClosure.snd s t U.ι φ hφ.symm
@@ -216,17 +252,17 @@ theorem exists_inv_extension : ∀ C : Core, C.HasTests → SmoothOfRelativeDime
     have hcl (z : Γ) (hz : IsClosed ({z} : Set Γ)) : IsClosed ({f z} : Set X) := by
       simpa using f.isClosedMap _ hz
     have key (z : Γ) (hz : IsClosed ({z} : Set Γ)) : g z ∈ F (f z) (hcl z hz) := by
-      obtain ⟨p, hp, y, hy, hyU⟩ := padicAlgCl_integral_points.1 Γ (f ≫ π) z hz j.opensRange
-        (Set.range_nonempty _)
+      obtain ⟨p, hp, y, hy, hyU⟩ :=
+        padicAlgCl_integral_points.1 Γ (f ≫ π) z hz j.opensRange (Set.range_nonempty _)
       obtain ⟨l, e⟩ : ∃ l, l ≫ j = gPt p ≫ y := ⟨_, IsOpenImmersion.lift_fac j (gPt p ≫ y) hyU⟩
-      have := hFH (f z) (hcl z hz) p (y ≫ f) l (y ≫ g)
-        ((Scheme.Hom.comp_apply _ _ _).trans (congrArg f hy))
-        (by rw [← reassoc_of% e, hjf]) (by rw [← reassoc_of% e, hjg]) (by simp [hfg])
+      have :=
+        hFH (f z) (hcl z hz) p (y ≫ f) l (y ≫ g)
+          ((Scheme.Hom.comp_apply _ _ _).trans (congrArg f hy)) (by rw [← reassoc_of% e, hjf])
+          (by rw [← reassoc_of% e, hjg]) (by simp [hfg])
       exact ((Scheme.Hom.comp_apply y g _).trans (congrArg g hy)) ▸ this
     have : LocallyQuasiFinite f := by
       refine locallyQuasiFinite_of_finite_fibres_closedPoints f fun y hy ↦ ?_
-      refine finite_of_isClosed_of_finite_inter_closedPoints
-        ((hcl y hy).preimage f.continuous) ?_
+      refine finite_of_isClosed_of_finite_inter_closedPoints ((hcl y hy).preimage f.continuous) ?_
       refine ((finite_pullback_over_closedPoint π s t (f y) (hcl y hy) (hF _ (hcl y hy))).preimage
         (graphClosure.ι s t U.ι φ hφ.symm).isClosedEmbedding.injective.injOn).subset ?_
       rintro z ⟨hz, hz'⟩
@@ -244,7 +280,8 @@ theorem exists_inv_extension : ∀ C : Core, C.HasTests → SmoothOfRelativeDime
       rintro _ ⟨x, rfl⟩
       rw [Scheme.Hom.comp_apply]
       exact subset_of_isOpen_of_closedPoints isOpen_univ (g ⁻¹ᵁ G).isOpen
-        (fun z hz _ ↦ hFG _ _ (key z hz)) (Set.mem_univ _)
+        (fun z hz _ ↦ hFG _ _ (key z hz))
+        (Set.mem_univ _)
     have e := IsOpenImmersion.lift_fac G.ι (inv f ≫ g) hG
     have e' : U.ι ≫ inv f = j := by simp [hjf]
     refine ⟨IsOpenImmersion.lift G.ι (inv f ≫ g) hG, ⟨?_, ?_⟩, fun Φ hΦ ↦ ?_⟩
@@ -254,30 +291,33 @@ theorem exists_inv_extension : ∀ C : Core, C.HasTests → SmoothOfRelativeDime
       refine ext_of_isDominant_of_isSeparated t ?_ U.ι ?_
       · rw [Category.assoc, hΦ.2, Category.assoc, ← hfg, IsIso.inv_hom_id_assoc]
       · rw [hΦ.1, reassoc_of% e', hjg]
-  obtain ⟨Φ, ⟨h1, h2⟩, -⟩ := @existsUnique_extension_of_finite_specializations C.G.toScheme hI
-    (C.GG.hom ≫ C.π) inferInstance inferInstance inferInstance
-    (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth C.GG.hom C.normal)
-    C.Z C.P.left C.GG.hom C.P.hom _ C.G C.a.opensRange
-    (e.inv ≫ (ι[C.A]).left ≫ C.a ≫ C.G.ι) ⟨_, eSec C.A (⟨z, hz⟩ : C.U), rfl⟩
-    (by
-      have h : C.a ≫ C.G.ι ≫ C.P.hom = C.A.hom ≫ C.U.ι := hw
-      simp only [Category.assoc]
-      rw [h, Over.w_assoc, ← hw, reassoc_of% he])
-    (by
-      intro σ _
-      let F : Set C.P.left := {w | ∃ (p : ℕ) (_ : Fact p.Prime) (y : Sp (OO p) ⟶ C.Z)
-        (τ : C.Test y) (c : Sp (OO p) ⟶ τ.H.left), c ≫ τ.H.hom = spMap τ.j ∧
-          (c ≫ τ.f) (cPt p) = σ ∧ w = C.G.ι ((c ≫ (ι[τ.H]).left ≫ τ.f) (cPt p))}
-      refine ⟨F, Set.Subsingleton.finite ?_, ?_, ?_⟩
-      · rintro _ ⟨p, _, y, τ, c, hc, hσ, rfl⟩ _ ⟨q, _, y', τ', c', hc', hσ', rfl⟩
-        obtain rfl := prime_eq _ _ (hσ.trans hσ'.symm)
-        rw [special_inv hF τ τ' c hc c' hc' (hσ.trans hσ'.symm)]
-      · rintro _ ⟨p, _, y, τ, c, hc, hσ, rfl⟩
-        exact Subtype.property _
-      · intro p _ α a₀ b hσ ha hb hb'
-        obtain ⟨y, τ, c, hc, hcf, rfl⟩ := exists_test hT α (a₀ ≫ e.inv) b
-          (by rw [Category.assoc, he, ha]) (by rw [hb, Category.assoc]) hb'
-        exact ⟨p, _, y, τ, c, hc, hcf ▸ hσ, Scheme.Hom.comp_apply _ _ _⟩)
+  obtain ⟨Φ, ⟨h1, h2⟩, -⟩ :=
+    @existsUnique_extension_of_finite_specializations C.G.toScheme hI (C.GG.hom ≫ C.π) inferInstance
+      inferInstance inferInstance
+      (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth C.GG.hom C.normal) C.Z C.P.left
+      C.GG.hom C.P.hom _ C.G C.a.opensRange (e.inv ≫ (ι[C.A]).left ≫ C.a ≫ C.G.ι)
+      ⟨_, eSec C.A (⟨z, hz⟩ : C.U), rfl⟩
+      (by
+        have h : C.a ≫ C.G.ι ≫ C.P.hom = C.A.hom ≫ C.U.ι := hw
+        simp only [Category.assoc]
+        rw [h, Over.w_assoc, ← hw, reassoc_of% he])
+      (by
+        intro σ _
+        let F : Set C.P.left :=
+          {w | ∃ (p : ℕ) (_ : Fact p.Prime) (y : Sp (OO p) ⟶ C.Z)
+            (τ : C.Test y) (c : Sp (OO p) ⟶ τ.H.left), c ≫ τ.H.hom = spMap τ.j ∧
+              (c ≫ τ.f) (cPt p) = σ ∧ w = C.G.ι ((c ≫ (ι[τ.H]).left ≫ τ.f) (cPt p))}
+        refine ⟨F, Set.Subsingleton.finite ?_, ?_, ?_⟩
+        · rintro _ ⟨p, _, y, τ, c, hc, hσ, rfl⟩ _ ⟨q, _, y', τ', c', hc', hσ', rfl⟩
+          obtain rfl := prime_eq _ _ (hσ.trans hσ'.symm)
+          rw [special_inv hF τ τ' c hc c' hc' (hσ.trans hσ'.symm)]
+        · rintro _ ⟨p, _, y, τ, c, hc, hσ, rfl⟩
+          exact Subtype.property _
+        · intro p _ α a₀ b hσ ha hb hb'
+          obtain ⟨y, τ, c, hc, hcf, rfl⟩ :=
+            exists_test hT α (a₀ ≫ e.inv) b (by rw [Category.assoc, he, ha])
+              (by rw [hb, Category.assoc]) hb'
+          exact ⟨p, _, y, τ, c, hc, hcf ▸ hσ, Scheme.Hom.comp_apply _ _ _⟩)
   refine ⟨Over.homMk Φ h2, ?_⟩
   rw [← cancel_mono C.G.ι]
   change (C.a ≫ Φ) ≫ C.G.ι = _

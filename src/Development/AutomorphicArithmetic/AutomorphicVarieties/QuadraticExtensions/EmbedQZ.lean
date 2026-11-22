@@ -6,21 +6,31 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem embQ_smul (l : ℕ) [Fact l.Prime] {M : Type} [AddCommGroup M] [Module ℤ_[l] M] (z : ℤ_[l]) (x : M)
-    (hx : (l : ℤ_[l]) • x = 0) : z • x = z.zmodRepr • x := by
+private theorem embQ_smul
+    (l : ℕ) [Fact l.Prime]
+    {M : Type} [AddCommGroup M] [Module ℤ_[l] M]
+    (z : ℤ_[l])
+    (x : M) (hx : (l : ℤ_[l]) • x = 0)
+    : z • x = z.zmodRepr • x := by
   have hm := PadicInt.sub_zmodRepr_mem z
   rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton'] at hm
   obtain ⟨b, hb⟩ := hm
-  calc z • x = (z - (z.zmodRepr : ℤ_[l])) • x + (z.zmodRepr : ℤ_[l]) • x := by
-        rw [sub_smul, sub_add_cancel]
-    _ = z.zmodRepr • x := by
-        rw [← hb, mul_smul, hx, smul_zero, zero_add, Nat.cast_smul_eq_nsmul]
+  calc
+    z • x = (z - (z.zmodRepr : ℤ_[l])) • x + (z.zmodRepr : ℤ_[l]) • x := by
+      rw [sub_smul, sub_add_cancel]
+    _ = z.zmodRepr • x := by rw [← hb, mul_smul, hx, smul_zero, zero_add, Nat.cast_smul_eq_nsmul]
 
-private theorem embQ_fl (l : ℕ) [hl : Fact l.Prime] (T : Type) [AddCommGroup T] (r : ℕ) (hTn : ∀ x : T, l • x = 0)
-    (hcard : CardLe T (l ^ r)) : ∃ g : T →+ (Fin r → ZMod l), Function.Injective g := by
+private theorem embQ_fl
+    (l : ℕ) [hl : Fact l.Prime]
+    (T : Type) [AddCommGroup T]
+    (r : ℕ)
+    (hTn : ∀ x : T, l • x = 0) (hcard : CardLe T (l ^ r))
+    : ∃ g : T →+ (Fin r → ZMod l), Function.Injective g := by
   obtain ⟨hfin, hc⟩ := hcard
   letI : Module (ZMod l) T := AddCommGroup.zmodModule hTn
   haveI := Fintype.ofFinite T
@@ -39,19 +49,20 @@ private theorem embQ_fl (l : ℕ) [hl : Fact l.Prime] (T : Type) [AddCommGroup T
     have := hadd 0 0
     simp only [add_zero] at this
     exact left_eq_add.mp this
-  let g : T →+ (Fin r → ZMod l) :=
-    { toFun := fun t i => if h : (i : ℕ) < d then E.toFun t ⟨i, h⟩ else 0
-      map_zero' := by
-        funext i
-        by_cases h : (i : ℕ) < d
-        · simp only [h, dif_pos, hzero, Pi.zero_apply]
-        · simp only [h, dif_neg, not_false_eq_true, Pi.zero_apply]
-      map_add' := by
-        intro s t
-        funext i
-        by_cases h : (i : ℕ) < d
-        · simp only [h, dif_pos, hadd, Pi.add_apply]
-        · simp only [h, dif_neg, not_false_eq_true, Pi.add_apply, add_zero] }
+  let g : T →+ (Fin r → ZMod l) := {
+    toFun := fun t i => if h : (i : ℕ) < d then E.toFun t ⟨i, h⟩ else 0
+    map_zero' := by
+      funext i
+      by_cases h : (i : ℕ) < d
+      · simp only [h, dif_pos, hzero, Pi.zero_apply]
+      · simp only [h, dif_neg, not_false_eq_true, Pi.zero_apply]
+    map_add' := by
+      intro s t
+      funext i
+      by_cases h : (i : ℕ) < d
+      · simp only [h, dif_pos, hadd, Pi.add_apply]
+      · simp only [h, dif_neg, not_false_eq_true, Pi.add_apply, add_zero]
+  }
   refine ⟨g, ?_⟩
   intro s t hst
   have key : E.toFun s = E.toFun t := by
@@ -59,13 +70,16 @@ private theorem embQ_fl (l : ℕ) [hl : Fact l.Prime] (T : Type) [AddCommGroup T
     have := congr_fun hst (Fin.castLE hd j)
     simp only [g, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Fin.coe_castLE, Fin.eta] at this
     rwa [dif_pos j.isLt, dif_pos j.isLt] at this
-  calc s = E.invFun (E.toFun s) := (E.left_inv s).symm
+  calc
+    s = E.invFun (E.toFun s) := (E.left_inv s).symm
     _ = E.invFun (E.toFun t) := by rw [key]
     _ = t := E.left_inv t
 
-theorem UpperTheory.V.Two.embedQZ :
-    ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (r : ℕ), (∀ x : D, ∃ k : ℕ, (l : ℤ_[l]) ^ k • x = 0) → CardLe (Submodule.torsionBy ℤ_[l] D (l : ℤ_[l])) (l ^ r) →
-      ∃ f : D →ₗ[ℤ_[l]] (Fin r → QZ l), Function.Injective f := by
+theorem UpperTheory.V.Two.embedQZ
+    : ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (r : ℕ),
+      (∀ x : D, ∃ k : ℕ, (l : ℤ_[l]) ^ k • x = 0)
+        → CardLe (Submodule.torsionBy ℤ_[l] D (l : ℤ_[l])) (l ^ r)
+        → ∃ f : D →ₗ[ℤ_[l]] (Fin r → QZ l), Function.Injective f := by
   intro l _ D _ _ r htors hcard
   set Tl := Submodule.torsionBy ℤ_[l] D (l : ℤ_[l]) with hTl
   have hTl' : ∀ t : Tl, (l : ℤ_[l]) • t = 0 := by
@@ -85,15 +99,17 @@ theorem UpperTheory.V.Two.embedQZ :
     have := (hιrange (ι a)).mp ⟨a, rfl⟩
     simpa using this
   let ψ : Fin r → Tl →+ QZ l := fun i =>
-    ((ι : ZMod (l ^ 1) →+ QZ l).comp e.toAddMonoidHom).comp ((Pi.evalAddMonoidHom (fun _ => ZMod l) i).comp g)
+    ((ι : ZMod (l ^ 1) →+ QZ l).comp e.toAddMonoidHom).comp
+      ((Pi.evalAddMonoidHom (fun _ => ZMod l) i).comp g)
   have hψl : ∀ i t, (l : ℤ_[l]) • ψ i t = 0 := fun i t => hιl _
-  let ψL : Fin r → Tl →ₗ[ℤ_[l]] QZ l := fun i =>
-    { toFun := ψ i
-      map_add' := (ψ i).map_add
-      map_smul' := by
-        intro z t
-        simp only [RingHom.id_apply]
-        rw [embQ_smul l z t (hTl' t), map_nsmul, ← embQ_smul l z (ψ i t) (hψl i t)] }
+  let ψL : Fin r → Tl →ₗ[ℤ_[l]] QZ l := fun i => {
+    toFun := ψ i
+    map_add' := (ψ i).map_add
+    map_smul' := by
+      intro z t
+      simp only [RingHom.id_apply]
+      rw [embQ_smul l z t (hTl' t), map_nsmul, ← embQ_smul l z (ψ i t) (hψl i t)]
+  }
   have hext := fun i => (UpperTheory.V.PropA.qzInj l).out Tl.subtype Subtype.val_injective (ψL i)
   choose y hy using hext
   refine ⟨LinearMap.pi y, ?_⟩
@@ -109,7 +125,8 @@ theorem UpperTheory.V.Two.embedQZ :
       have h3 := hιinj h2
       simpa using h3
     exact hg (by rw [hgt, map_zero])
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   have hxi : ∀ x : D, LinearMap.pi y x = 0 → ∀ i, y i x = 0 := by
     intro x hx i
@@ -117,8 +134,7 @@ theorem UpperTheory.V.Two.embedQZ :
     simpa using this
   obtain ⟨k, hk⟩ := htors x
   induction k generalizing x with
-  | zero =>
-    simpa using hk
+  | zero => simpa using hk
   | succ k ih =>
     have hlx : (l : ℤ_[l]) • x = 0 := by
       apply ih ((l : ℤ_[l]) • x)

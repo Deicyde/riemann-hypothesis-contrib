@@ -9,16 +9,17 @@ open GlobalTheory.BI GlobalTheory.BrauerZero
 
 namespace GlobalTheory.BrauerZero
 
-theorem ind_ind_of_le {G : Type} [Group G] [Finite G] (K A : Subgroup G) (hKA : K ≤ A)
-    (ψ : K → ℂ) :
-    ind A (ind (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩)) = ind K ψ := by
+theorem ind_ind_of_le {G : Type} [Group G] [Finite G] (K A : Subgroup G) (hKA : K ≤ A) (ψ : K → ℂ)
+    : ind A (ind (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩)) = ind K ψ := by
   classical
   haveI := Fintype.ofFinite G
   funext g
   have hcard : Nat.card (K.subgroupOf A) = Nat.card K :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKA).toEquiv
-  have key : ∀ a y : A, ext0 (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩) (y⁻¹ * a * y)
-      = ext0 K ψ ((y : G)⁻¹ * (a : G) * y) := by
+  have key
+      : ∀ a y : A,
+        ext0 (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩) (y⁻¹ * a * y)
+          = ext0 K ψ ((y : G)⁻¹ * (a : G) * y) := by
     intro a y
     have hc : ((y⁻¹ * a * y : A) : G) = (y : G)⁻¹ * (a : G) * y := by simp
     by_cases h : (y : G)⁻¹ * (a : G) * y ∈ K
@@ -27,8 +28,10 @@ theorem ind_ind_of_le {G : Type} [Group G] [Finite G] (K A : Subgroup G) (hKA : 
       congr 1
     · have h' : y⁻¹ * a * y ∉ K.subgroupOf A := by rw [Subgroup.mem_subgroupOf, hc]; exact h
       rw [ext0, ext0, dite_eq_right h', dite_eq_right h]
-  have step : ∀ x : G, ext0 A (ind (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩)) (x⁻¹ * g * x)
-      = (Nat.card K : ℂ)⁻¹ * ∑ y : A, ext0 K ψ ((x * y)⁻¹ * g * (x * y)) := by
+  have step
+      : ∀ x : G,
+        ext0 A (ind (K.subgroupOf A) (fun k => ψ ⟨((k : A) : G), k.2⟩)) (x⁻¹ * g * x)
+          = (Nat.card K : ℂ)⁻¹ * ∑ y : A, ext0 K ψ ((x * y)⁻¹ * g * (x * y)) := by
     intro x
     by_cases hx : x⁻¹ * g * x ∈ A
     · rw [ext0, dite_eq_left hx, ind, hcard, finsum_eq_sum_of_fintype]
@@ -51,7 +54,8 @@ theorem ind_ind_of_le {G : Type} [Group G] [Finite G] (K A : Subgroup G) (hKA : 
       rw [ext0, dite_eq_right hn]
   rw [ind, ind, finsum_eq_sum_of_fintype, finsum_eq_sum_of_fintype,
     Finset.sum_congr rfl (fun x _ => step x), ← Finset.mul_sum, Finset.sum_comm]
-  have shift : ∀ y : A, ∑ x : G, ext0 K ψ ((x * y)⁻¹ * g * (x * y)) = ∑ z : G, ext0 K ψ (z⁻¹ * g * z) :=
+  have shift
+      : ∀ y : A, ∑ x : G, ext0 K ψ ((x * y)⁻¹ * g * (x * y)) = ∑ z : G, ext0 K ψ (z⁻¹ * g * z) :=
     fun y => Fintype.sum_equiv (Equiv.mulRight (y : G)) _ _ (fun x => rfl)
   rw [Finset.sum_congr rfl (fun y _ => shift y), Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
     ← Nat.card_eq_fintype_card]

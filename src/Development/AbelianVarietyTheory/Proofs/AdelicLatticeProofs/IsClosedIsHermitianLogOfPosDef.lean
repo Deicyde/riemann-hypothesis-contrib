@@ -10,16 +10,17 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem isClosed_isLog : ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
-    IsClosed {p : Matrix ι ι ℂ × Matrix ι ι ℂ | IsLog p.1 p.2} := by
+theorem isClosed_isLog
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
+      IsClosed {p : Matrix ι ι ℂ × Matrix ι ι ℂ | IsLog p.1 p.2} := by
   intro ι _ _
   let K : Set (Matrix ι ι ℂ) :=
     Set.pi Set.univ (fun _ => Set.pi Set.univ (fun _ => Metric.closedBall (0 : ℂ) 1))
   have hK : IsCompact K :=
     isCompact_univ_pi (fun _ => isCompact_univ_pi (fun _ => isCompact_closedBall _ _))
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hK
-  let D : K × (Matrix ι ι ℂ × Matrix ι ι ℂ) → ι → ℝ :=
-    fun q i => (((q.1 : Matrix ι ι ℂ)ᴴ * q.2.1 * (q.1 : Matrix ι ι ℂ)) i i).re
+  let D : K × (Matrix ι ι ℂ × Matrix ι ι ℂ) → ι → ℝ := fun q i =>
+    (((q.1 : Matrix ι ι ℂ)ᴴ * q.2.1 * (q.1 : Matrix ι ι ℂ)) i i).re
   have hU : Continuous (fun q : K × (Matrix ι ι ℂ × Matrix ι ι ℂ) => (q.1 : Matrix ι ι ℂ)) :=
     continuous_subtype_val.comp continuous_fst
   have hD : ∀ i, Continuous (fun q => D q i) := by
@@ -39,8 +40,7 @@ theorem isClosed_isLog : ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
     · refine (hU.matrix_mul (Continuous.matrix_diagonal ?_)).matrix_mul hU.matrix_conjTranspose
       exact continuous_pi fun i => Complex.continuous_ofReal.comp (hD i)
     · refine (hU.matrix_mul (Continuous.matrix_diagonal ?_)).matrix_mul hU.matrix_conjTranspose
-      exact continuous_pi fun i =>
-        Complex.continuous_ofReal.comp (Real.continuous_exp.comp (hD i))
+      exact continuous_pi fun i => Complex.continuous_ofReal.comp (Real.continuous_exp.comp (hD i))
   have key : {p : Matrix ι ι ℂ × Matrix ι ι ℂ | IsLog p.1 p.2} = Prod.snd '' S := by
     ext p
     constructor
@@ -55,11 +55,13 @@ theorem isClosed_isLog : ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
         show ((Uᴴ * p.1 * U) i i).re = d i
         have : Uᴴ * p.1 * U = diagonal (fun i => (d i : ℂ)) := by
           rw [h2]
-          calc Uᴴ * (U * diagonal (fun i => (d i : ℂ)) * Uᴴ) * U
-              = (Uᴴ * U) * diagonal (fun i => (d i : ℂ)) * (Uᴴ * U) := by
-                simp only [Matrix.mul_assoc]
+          calc
+            Uᴴ * (U * diagonal (fun i => (d i : ℂ)) * Uᴴ) * U
+                = (Uᴴ * U) * diagonal (fun i => (d i : ℂ)) * (Uᴴ * U) := by
+              simp only [Matrix.mul_assoc]
             _ = _ := by rw [h1']; simp
-        rw [this]; simp
+        rw [this]
+        simp
       refine ⟨(⟨U, hUK⟩, p), ⟨h1, ?_, ?_⟩, rfl⟩
       · rw [hd]; exact h2
       · rw [hd]; exact h3

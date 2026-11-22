@@ -20,20 +20,19 @@ section LP
 variable (l d : ℕ) [NeZero d]
 
 def IsFlow (D : ZMod d → ℝ) (x : ZMod d → ℕ → ℝ) : Prop :=
-  (∀ s i, 0 ≤ x s i) ∧
-    ∀ s : ZMod d, (∑ i ∈ oddLevels d, (l : ℝ) ^ i * x s i) +
-      (∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i) ≤ D s
+  (∀ s i, 0 ≤ x s i)
+    ∧ ∀ s : ZMod d,
+      (∑ i ∈ oddLevels d, (l : ℝ) ^ i * x s i) + (∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i) ≤ D s
 
 def flowVal (x : ZMod d → ℕ → ℝ) : ℝ := ∑ s : ZMod d, ∑ i ∈ oddLevels d, x s i
 
-def maxFlow (D : ZMod d → ℝ) : ℝ :=
-  sSup {t : ℝ | ∃ x, IsFlow l d D x ∧ flowVal d x = t}
+def maxFlow (D : ZMod d → ℝ) : ℝ := sSup {t : ℝ | ∃ x, IsFlow l d D x ∧ flowVal d x = t}
 
 def Fnum (D : ZMod d → ℝ) : ℝ := gam l * (∑ s : ZMod d, D s) - maxFlow l d D
 
 def IsDual (sig : ZMod d → ℝ) : Prop :=
-  (∀ s, 0 ≤ sig s ∧ sig s ≤ 1) ∧
-    ∀ s : ZMod d, ∀ i ∈ oddLevels d, 1 ≤ (l : ℝ) ^ i * sig s + sig (s + (i : ZMod d))
+  (∀ s, 0 ≤ sig s ∧ sig s ≤ 1)
+    ∧ ∀ s : ZMod d, ∀ i ∈ oddLevels d, 1 ≤ (l : ℝ) ^ i * sig s + sig (s + (i : ZMod d))
 
 def IsDualAll (sig : ZMod d → ℝ) : Prop :=
   ∀ s : ZMod d, ∀ i : ℕ, Odd i → 1 ≤ (l : ℝ) ^ i * sig s + sig (s + (i : ZMod d))
@@ -44,44 +43,61 @@ def IsOptDual (D sig : ZMod d → ℝ) : Prop :=
 end LP
 
 def ValGain : Prop :=
-  ∀ l : ℕ, l.Prime →
-    (∀ n : ℕ, 1 ≤ n → 1 / ((l : ℝ) - 1) ≤ (n : ℝ) / ((l : ℝ) - 1) - (padicValNat l n : ℝ)) ∧
-      ∀ e : ℕ, rho l ≤ ((l : ℝ) ^ 2) ^ e * rho l - e
+  ∀ l : ℕ,
+    l.Prime
+      → (∀ n : ℕ, 1 ≤ n → 1 / ((l : ℝ) - 1) ≤ (n : ℝ) / ((l : ℝ) - 1) - (padicValNat l n : ℝ))
+        ∧ ∀ e : ℕ, rho l ≤ ((l : ℝ) ^ 2) ^ e * rho l - e
 
 def FlowAttained : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D : ZMod d → ℝ, 0 ≤ D →
-    ∃ x, IsFlow l d D x ∧ flowVal d x = maxFlow l d D
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D : ZMod d → ℝ, 0 ≤ D → ∃ x, IsFlow l d D x ∧ flowVal d x = maxFlow l d D
 
 def LemmaFa : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D : ZMod d → ℝ, 0 ≤ D →
-    (∃ sig, IsDual l d sig ∧ IsDualAll l d sig ∧
-        Fnum l d D = ∑ s : ZMod d, D s * (gam l - sig s)) ∧
-      IsGreatest {t : ℝ | ∃ sig, IsDual l d sig ∧ t = ∑ s : ZMod d, D s * (gam l - sig s)}
-        (Fnum l d D)
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D : ZMod d → ℝ,
+        0 ≤ D
+          → (∃ sig,
+              IsDual l d sig ∧ IsDualAll l d sig ∧ Fnum l d D = ∑ s : ZMod d, D s * (gam l - sig s))
+            ∧ IsGreatest {t : ℝ | ∃ sig, IsDual l d sig ∧ t = ∑ s : ZMod d, D s * (gam l - sig s)}
+              (Fnum l d D)
 
 def LemmaFc : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D E sig : ZMod d → ℝ, 0 ≤ D → 0 ≤ E →
-    IsOptDual l d D sig →
-      Fnum l d D - (∑ s : ZMod d, E s * max (sig s - gam l) 0) ≤ Fnum l d (D + E) ∧
-        Fnum l d (D + E) ≤ Fnum l d D + gam l * (∑ s : ZMod d, E s)
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D E sig : ZMod d → ℝ,
+        0 ≤ D → 0 ≤ E → IsOptDual l d D sig
+          → Fnum l d D - (∑ s : ZMod d, E s * max (sig s - gam l) 0) ≤ Fnum l d (D + E)
+            ∧ Fnum l d (D + E) ≤ Fnum l d D + gam l * (∑ s : ZMod d, E s)
 
 def LemmaFd : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D sig : ZMod d → ℝ, 0 ≤ D →
-    IsOptDual l d D sig → ∀ s : ZMod d, 2 / (l : ℝ) ≤ sig s →
-      (∀ x, IsFlow l d D x → flowVal d x = maxFlow l d D →
-          (∀ i ∈ oddLevels d, x s i = 0) ∧ D s = ∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i) ∧
-        D s ≤ ∑ i ∈ oddLevels d, D (s - (i : ZMod d)) / (l : ℝ) ^ i ∧
-        (0 < D s → ∃ s' : ZMod d, D s / gam l ≤ D s')
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D sig : ZMod d → ℝ,
+        0 ≤ D → IsOptDual l d D sig
+          → ∀ s : ZMod d,
+            2 / (l : ℝ) ≤ sig s
+              → (∀ x,
+                  IsFlow l d D x → flowVal d x = maxFlow l d D
+                    → (∀ i ∈ oddLevels d, x s i = 0)
+                      ∧ D s = ∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i)
+                ∧ D s ≤ ∑ i ∈ oddLevels d, D (s - (i : ZMod d)) / (l : ℝ) ^ i
+                ∧ (0 < D s → ∃ s' : ZMod d, D s / gam l ≤ D s')
 
 def LemmaFe : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D : ZMod d → ℝ, 0 ≤ D →
-    (∀ s s' : ZMod d, D s' ≤ (l : ℝ) * D s) → Fnum l d D = rho l * (∑ s : ZMod d, D s)
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D : ZMod d → ℝ,
+        0 ≤ D → (∀ s s' : ZMod d, D s' ≤ (l : ℝ) * D s) → Fnum l d D = rho l * (∑ s : ZMod d, D s)
 
 def IncomingBound : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → Even d → ∀ D sig : ZMod d → ℝ, 0 ≤ D →
-    IsOptDual l d D sig →
-      (∑ s ∈ Finset.univ.filter (fun s : ZMod d => 2 / (l : ℝ) ≤ sig s), D s) ≤
-        (∑ s : ZMod d, D s) / l
+  ∀ (l d : ℕ) [NeZero d],
+    3 ≤ l → 2 ≤ d → Even d
+      → ∀ D sig : ZMod d → ℝ,
+        0 ≤ D → IsOptDual l d D sig
+          → (∑ s ∈ Finset.univ.filter (fun s : ZMod d => 2 / (l : ℝ) ≤ sig s), D s)
+            ≤ (∑ s : ZMod d, D s) / l
 
 section TopData
 
@@ -94,8 +110,9 @@ def Dl (s : ZMod d) : ℕ := if s ∈ TT then size s - nu1 s else size s
 def dTop (s : ZMod d) : ℕ∞ := ⨅ (e : ℕ) (_ : Odd e ∧ s + (e : ZMod d) ∈ TT), (e : ℕ∞)
 
 def Wcap (s : ZMod d) : ℕ :=
-  sSup ((fun i : ℕ => capL d TT nu1 nu2 (s - (i : ZMod d))) ''
-    {i : ℕ | Odd i ∧ l ^ i ≤ size (s - (i : ZMod d))})
+  sSup
+    ((fun i : ℕ => capL d TT nu1 nu2 (s - (i : ZMod d)))
+      '' {i : ℕ | Odd i ∧ l ^ i ≤ size (s - (i : ZMod d))})
 
 def topTerm (s : ZMod d) : ℝ :=
   ∑' e : ℕ,
@@ -103,7 +120,6 @@ def topTerm (s : ZMod d) : ℝ :=
       max ((nu1 s : ℝ) / (l : ℝ) ^ e - capL d TT nu1 nu2 (s + (e : ZMod d))) 0
     else if Odd e ∧ dTop d TT s < (e : ℕ∞) then (nu1 s : ℝ) / (l : ℝ) ^ e
     else 0
-
 
 end TopData
 

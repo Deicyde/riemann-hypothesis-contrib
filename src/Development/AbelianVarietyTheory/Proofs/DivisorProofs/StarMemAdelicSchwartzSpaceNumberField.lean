@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FromBlocksMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -17,7 +19,8 @@ namespace GlobalTheory.SchAConj
 open GlobalTheory.WeilM
 open scoped Classical
 
-def conjSchwartz {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ) : SchwartzMap V ℂ where
+def conjSchwartz {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ)
+    : SchwartzMap V ℂ where
   toFun x := star (f x)
   smooth' := Complex.conjLIE.toContinuousLinearEquiv.contDiff.comp f.smooth'
   decay' := by
@@ -30,11 +33,14 @@ def conjSchwartz {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : Schw
     rw [e, h]
     exact hC x
 
-theorem conjSchwartz_apply {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ) (x : V) :
-    conjSchwartz f x = star (f x) := rfl
+theorem conjSchwartz_apply
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (f : SchwartzMap V ℂ) (x : V)
+    : conjSchwartz f x = star (f x) :=
+  rfl
 
-theorem star_mem_schA : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
-    (Φ : (κ → AF F) → ℂ), Φ ∈ schA F κ → (fun x => star (Φ x)) ∈ schA F κ := by
+theorem star_mem_schA
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (Φ : (κ → AF F) → ℂ),
+      Φ ∈ schA F κ → (fun x => star (Φ x)) ∈ schA F κ := by
   intro F _ _ κ _ Φ hΦ
   induction hΦ using Submodule.span_induction with
   | mem Ψ hΨ =>
@@ -45,14 +51,17 @@ theorem star_mem_schA : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fi
       simp [pureA, conjSchwartz_apply, star_mul']
   | zero =>
     convert (schA F κ).zero_mem using 1
-    funext x; simp
+    funext x
+    simp
   | add Ψ Ψ' _ _ h h' =>
     have := (schA F κ).add_mem h h'
     convert this using 1
-    funext x; simp [star_add]
+    funext x
+    simp [star_add]
   | smul c Ψ _ h =>
     have := (schA F κ).smul_mem (star c) h
     convert this using 1
-    funext x; simp [star_mul']
+    funext x
+    simp [star_mul']
 
 end GlobalTheory.SchAConj

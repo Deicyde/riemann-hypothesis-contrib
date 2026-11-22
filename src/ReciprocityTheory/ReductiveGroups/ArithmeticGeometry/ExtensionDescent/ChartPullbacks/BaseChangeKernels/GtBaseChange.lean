@@ -65,7 +65,6 @@ lemma hleG (j : (pullExt f E).ChartIdx) {V : E.B.left.Opens} {V₁ : ((Over.pull
         | rfl
         | exact Scheme.preimage_comp _ _ _
 
-
 set_option maxHeartbeats 800000 in
 def datum : (pullExt f E).GtDatum ((Over.pullback f).obj G) where
   q := qB f d.q
@@ -84,24 +83,31 @@ def datum : (pullExt f E).GtDatum ((Over.pullback f).obj G) where
   u := uB f E d
   coord := fun j V hV h => by
     refine coord_glue (qB f d.q).left (W := (pullExt f E).chart j)
-      (fun V' h' => cmap (pullExt f E).basis
-        (fun k => res ((qB f d.q).left.preimage_mono h') (uB f E d j k)))
-      (fun V₁ V₂ h₁ h₂ h x => cmap_comp _ _ _ _ (fun k => res_val_res _ _ _ _) x) ?_ V hV h
+      (fun V' h' =>
+        cmap (pullExt f E).basis (fun k => res ((qB f d.q).left.preimage_mono h') (uB f E d j k)))
+      (fun V₁ V₂ h₁ h₂ h x => cmap_comp _ _ _ _ (fun k => res_val_res _ _ _ _) x)
+      ?_ V hV h
     intro x hx
     have hFx : pullback.fst E.B.hom f x ∈ E.chart (jj f E j) := chart_le f E j hx
     obtain ⟨V, hVa, hxV, hVle⟩ :=
       TopologicalSpace.Opens.isBasis_iff_nbhd.1 E.B.left.isBasis_affineOpens hFx
-    refine ⟨(pullExt f E).chart j ⊓ pullback.fst E.B.hom f ⁻¹ᵁ V, inf_le_left, ⟨hx, hxV⟩,
-      fun V₁ h₁ hV₁ => ?_⟩
+    refine ⟨
+      (pullExt f E).chart j ⊓ pullback.fst E.B.hom f ⁻¹ᵁ V,
+      inf_le_left,
+      ⟨hx, hxV⟩,
+      fun V₁ h₁ hV₁ => ?_
+    ⟩
     exact affineBCSt (qB_sq f d.q) d.q_affine hVa hV₁ (h₁.trans inf_le_right)
       (hleG f E d j (h₁.trans inf_le_right))
       (cmap E.basis (fun k => res (d.q.left.preimage_mono hVle) (d.u (jj f E j) k))) _
-      (fun y => cmap_comp _ _ _ _ (fun k => appLE_res _ _ _ _ _ _) y) (d.coord (jj f E j) V hVa hVle)
-  trans := fun j j' k => trans_pull (pullback.fst G.hom f) d.q.left (qB f d.q).left
-    (pullback.fst E.B.hom f) (qB_h f d.q) (E.O (E.basis k)).L (j k PUnit.unit) (j' k PUnit.unit)
-    (E.chart_le (jj f E j) k) (E.chart_le (jj f E j') k) ((pullExt f E).chart_le j k)
-    ((pullExt f E).chart_le j' k) (d.u (jj f E j) k) (d.u (jj f E j') k)
-    (d.trans (jj f E j) (jj f E j') k) (pre_le f E d j) (pre_le f E d j')
+      (fun y => cmap_comp _ _ _ _ (fun k => appLE_res _ _ _ _ _ _) y)
+      (d.coord (jj f E j) V hVa hVle)
+  trans := fun j j' k =>
+    trans_pull (pullback.fst G.hom f) d.q.left (qB f d.q).left (pullback.fst E.B.hom f) (qB_h f d.q)
+      (E.O (E.basis k)).L (j k PUnit.unit) (j' k PUnit.unit) (E.chart_le (jj f E j) k)
+      (E.chart_le (jj f E j') k) ((pullExt f E).chart_le j k) ((pullExt f E).chart_le j' k)
+      (d.u (jj f E j) k) (d.u (jj f E j') k) (d.trans (jj f E j) (jj f E j') k) (pre_le f E d j)
+      (pre_le f E d j')
   act_le := actB_le f E d
   equiv := equivB f E d
   unit_norm := unit_normB f E d

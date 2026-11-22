@@ -5,16 +5,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 
 namespace GlobalTheory
 
-theorem isUnit_det_sub_smul_one_of_forall_not_isUnit {C : Type} [CommRing C] [IsLocalRing C]
-    {n : Type} [Fintype n] [DecidableEq n] (Q : Matrix n n C) (hQ : ∀ i j, ¬ IsUnit (Q i j))
-    (c : C) (hc : IsUnit c) : IsUnit (Q - c • (1 : Matrix n n C)).det := by
+theorem isUnit_det_sub_smul_one_of_forall_not_isUnit
+    {C : Type} [CommRing C] [IsLocalRing C]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (Q : Matrix n n C) (hQ : ∀ i j, ¬ IsUnit (Q i j))
+    (c : C) (hc : IsUnit c)
+    : IsUnit (Q - c • (1 : Matrix n n C)).det := by
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det]
-  have hm : (IsLocalRing.residue C).mapMatrix (Q - c • (1 : Matrix n n C)) =
-      (-(IsLocalRing.residue C c)) • (1 : Matrix n n _) := by
+  have hm
+      : (IsLocalRing.residue C).mapMatrix (Q - c • (1 : Matrix n n C))
+        = (-(IsLocalRing.residue C c)) • (1 : Matrix n n _) := by
     ext i j
     have hq : IsLocalRing.residue C (Q i j) = 0 :=
       (IsLocalRing.residue_eq_zero_iff _).2 ((IsLocalRing.mem_maximalIdeal _).2 (hQ i j))
@@ -25,11 +30,12 @@ theorem isUnit_det_sub_smul_one_of_forall_not_isUnit {C : Type} [CommRing C] [Is
   refine pow_ne_zero _ (neg_ne_zero.2 ?_)
   exact (IsLocalRing.residue_ne_zero_iff_isUnit _).2 hc
 
-theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod :
-    ∀ {C : Type} [CommRing C] [IsLocalRing C] (A : Matrix (Fin 3) (Fin 3) C) (p : Fin 3 → C),
-      (∀ a b, a ≠ b → IsUnit (p a - p b)) → A.charpoly = ∏ a, (X - Polynomial.C (p a)) →
-      ∃ h : GL (Fin 3) C, (h : Matrix (Fin 3) (Fin 3) C) * A *
-        ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C) = Matrix.diagonal p := by
+theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod
+    : ∀ {C : Type} [CommRing C] [IsLocalRing C] (A : Matrix (Fin 3) (Fin 3) C) (p : Fin 3 → C),
+      (∀ a b, a ≠ b → IsUnit (p a - p b)) → A.charpoly = ∏ a, (X - Polynomial.C (p a))
+        → ∃ h : GL (Fin 3) C,
+          (h : Matrix (Fin 3) (Fin 3) C) * A * ((h⁻¹ : GL (Fin 3) C) : Matrix (Fin 3) (Fin 3) C)
+            = Matrix.diagonal p := by
   intro C _ _ A p hp hchar
   classical
   set P : Fin 3 → C[X] := fun a => ∏ b ∈ Finset.univ.erase a, (X - Polynomial.C (p b)) with hPdef
@@ -37,8 +43,10 @@ theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod :
     Finset.mul_prod_erase _ (fun b => X - Polynomial.C (p b)) (Finset.mem_univ a)
   have hz : aeval A (∏ b, (X - Polynomial.C (p b))) = 0 := by
     rw [← hchar]; exact Matrix.aeval_self_charpoly A
-  have hsplit : ∀ (f : C[X]) a, f = Polynomial.C (f.eval (p a)) +
-      (X - Polynomial.C (p a)) * (f /ₘ (X - Polynomial.C (p a))) := by
+  have hsplit
+      : ∀ (f : C[X]) a,
+        f = Polynomial.C (f.eval (p a))
+          + (X - Polynomial.C (p a)) * (f /ₘ (X - Polynomial.C (p a))) := by
     intro f a
     have h := modByMonic_add_div f (X - Polynomial.C (p a))
     rw [modByMonic_X_sub_C_eq_C_eval] at h
@@ -51,7 +59,9 @@ theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod :
   have hq : ∀ a, IsUnit ((P a).eval (p a)) := by
     intro a
     simp only [hPdef, eval_prod, eval_sub, eval_X, eval_C]
-    exact Finset.prod_induction _ IsUnit (fun _ _ => IsUnit.mul) isUnit_one
+    exact Finset.prod_induction _ IsUnit
+      (fun _ _ => IsUnit.mul)
+      isUnit_one
       (fun b hb => hp a b (Finset.ne_of_mem_erase hb).symm)
   have hq0 : ∀ a b, a ≠ b → (P a).eval (p b) = 0 := by
     intro a b hab
@@ -79,25 +89,29 @@ theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod :
       rw [h']
       exact (Units.isUnit u).mul h
     have hEE : E * E = E := by
-      rw [hE, Matrix.smul_mul, Matrix.mul_smul, hBB, ← hu, smul_smul, smul_smul,
-        mul_assoc, Units.inv_mul, mul_one]
+      rw [hE, Matrix.smul_mul, Matrix.mul_smul, hBB, ← hu, smul_smul, smul_smul, mul_assoc,
+        Units.inv_mul, mul_one]
     have hdet := isUnit_det_sub_smul_one_of_forall_not_isUnit E hEn 1 isUnit_one
     rw [one_smul] at hdet
     have hE0 : E = 0 := by
       have h1 : (E - 1) * E = 0 := by rw [sub_mul, hEE, one_mul, sub_self]
       obtain ⟨w, hw⟩ := (Matrix.isUnit_iff_isUnit_det _).2 hdet
-      calc E = ((w⁻¹ : (Matrix (Fin 3) (Fin 3) C)ˣ) : Matrix (Fin 3) (Fin 3) C) * ((E - 1) * E) := by
-            rw [← mul_assoc, ← hw, Units.inv_mul, one_mul]
+      calc
+        E = ((w⁻¹ : (Matrix (Fin 3) (Fin 3) C)ˣ) : Matrix (Fin 3) (Fin 3) C) * ((E - 1) * E) := by
+          rw [← mul_assoc, ← hw, Units.inv_mul, one_mul]
         _ = 0 := by rw [h1, mul_zero]
     have hB0 : aeval A (P a) = 0 := by
       have h' : aeval A (P a) = (u : C) • E := by rw [hE, smul_smul, Units.mul_inv, one_smul]
       rw [h', hE0, smul_zero]
     have hs := congrArg (aeval A) (hsplit (P a) a)
     rw [hB0, map_add (f := _), aeval_C, map_mul, ← hu] at hs
-    have hinv : aeval A (X - Polynomial.C (p a)) *
-        (-(((u⁻¹ : Cˣ) : C) • aeval A (P a /ₘ (X - Polynomial.C (p a))))) = 1 := by
-      have h2 : aeval A (X - Polynomial.C (p a)) * aeval A (P a /ₘ (X - Polynomial.C (p a))) =
-          -algebraMap C _ (u : C) := by
+    have hinv
+        : aeval A (X - Polynomial.C (p a))
+            * (-(((u⁻¹ : Cˣ) : C) • aeval A (P a /ₘ (X - Polynomial.C (p a)))))
+          = 1 := by
+      have h2
+          : aeval A (X - Polynomial.C (p a)) * aeval A (P a /ₘ (X - Polynomial.C (p a)))
+            = - algebraMap C _ (u : C) := by
         rw [eq_neg_iff_add_eq_zero, add_comm]; exact hs.symm
       rw [mul_neg, Matrix.mul_smul, h2, smul_neg, neg_neg, Algebra.smul_def, ← map_mul,
         Units.inv_mul, map_one]
@@ -128,7 +142,9 @@ theorem exists_GL_conj_eq_diagonal_of_charpoly_eq_prod :
   have hdetH : IsUnit H.det := by
     have h2 : IsUnit (H * Q).det := by
       rw [hHQ, Matrix.det_diagonal]
-      exact Finset.prod_induction _ IsUnit (fun _ _ => IsUnit.mul) isUnit_one
+      exact Finset.prod_induction _ IsUnit
+        (fun _ _ => IsUnit.mul)
+        isUnit_one
         (fun a _ => (hq a).mul (hij a))
     rw [Matrix.det_mul] at h2
     exact isUnit_of_mul_isUnit_left h2

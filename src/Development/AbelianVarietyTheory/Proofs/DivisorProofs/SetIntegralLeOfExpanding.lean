@@ -8,10 +8,11 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem volume_le_mul_volume_image_of_expanding (N : ℕ) (S : Set (Fin N → ℝ)) (K : ℝ)
-    (f : (Fin N → ℝ) → (Fin N → ℝ)) (hK : 0 ≤ K)
-    (hf : ∀ t ∈ S, ∀ t' ∈ S, ‖t - t'‖ ≤ K * ‖f t - f t'‖) :
-    volume S ≤ ENNReal.ofReal (K ^ N) * volume (f '' S) := by
+theorem volume_le_mul_volume_image_of_expanding
+    (N : ℕ) (S : Set (Fin N → ℝ))
+    (K : ℝ) (f : (Fin N → ℝ) → (Fin N → ℝ))
+    (hK : 0 ≤ K) (hf : ∀ t ∈ S, ∀ t' ∈ S, ‖t - t'‖ ≤ K * ‖f t - f t'‖)
+    : volume S ≤ ENNReal.ofReal (K ^ N) * volume (f '' S) := by
   have hinj : Set.InjOn f S := by
     intro a ha b hb hab
     have := hf a ha b hb
@@ -29,12 +30,13 @@ theorem volume_le_mul_volume_image_of_expanding (N : ℕ) (S : Set (Fin N → �
   rw [ENNReal.ofReal_pow hK]
   exact h
 
-theorem setIntegral_le_of_expanding (N : ℕ) (A Q : Set (Fin N → ℝ)) (K : ℝ)
-    (f : (Fin N → ℝ) → (Fin N → ℝ)) (h₁ h₂ : (Fin N → ℝ) → ℝ)
+theorem setIntegral_le_of_expanding
+    (N : ℕ) (A Q : Set (Fin N → ℝ))
+    (K : ℝ) (f : (Fin N → ℝ) → (Fin N → ℝ)) (h₁ h₂ : (Fin N → ℝ) → ℝ)
     (hA : IsCompact A) (hQ : IsCompact Q) (hK : 0 ≤ K) (c₁ : Continuous h₁) (c₂ : Continuous h₂)
     (n₁ : ∀ t, 0 ≤ h₁ t) (n₂ : ∀ t, 0 ≤ h₂ t) (hm : ∀ t ∈ A, f t ∈ Q ∧ h₁ t ≤ h₂ (f t))
-    (hf : ∀ t ∈ A, ∀ t' ∈ A, ‖t - t'‖ ≤ K * ‖f t - f t'‖) :
-    ∫ t in A, h₁ t ≤ K ^ N * ∫ t in Q, h₂ t := by
+    (hf : ∀ t ∈ A, ∀ t' ∈ A, ‖t - t'‖ ≤ K * ‖f t - f t'‖)
+    : ∫ t in A, h₁ t ≤ K ^ N * ∫ t in Q, h₂ t := by
   have i₁ : IntegrableOn h₁ A volume := c₁.continuousOn.integrableOn_compact hA
   have i₂ : IntegrableOn h₂ Q volume := c₂.continuousOn.integrableOn_compact hQ
   have hKN : 0 ≤ K ^ N := pow_nonneg hK N

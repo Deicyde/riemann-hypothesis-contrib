@@ -47,11 +47,12 @@ theorem exists_weierstrassP_eq (c : ℂ) : ∃ z, z ∉ L.lattice ∧ ℘[L] z =
       rfl
   simp [h0] at h2
 
-
 variable (L) in
 def toPoint (L : PeriodPair) (z : ℂ) : (weierstrassCurve L).toAffine.Point :=
   haveI := Classical.propDecidable (z ∈ L.lattice)
-  if h : z ∈ L.lattice then 0 else
+  if h : z ∈ L.lattice then
+    0
+  else
     .some (℘[L] z) (℘'[L] z / 2) (equation_iff_nonsingular.1 (equation_weierstrassP L h))
 
 lemma toPoint_of_mem {z : ℂ} (h : z ∈ L.lattice) : toPoint L z = 0 := by
@@ -82,7 +83,7 @@ lemma toPoint_add_mem {z l : ℂ} (hl : l ∈ L.lattice) : toPoint L (z + l) = t
 lemma toPoint_eq_of_sub_mem {z w : ℂ} (h : z - w ∈ L.lattice) : toPoint L z = toPoint L w := by
   simpa using toPoint_add_mem (z := w) h
 
-theorem toPoint_neg (z : ℂ) : toPoint L (-z) = -toPoint L z := by
+theorem toPoint_neg (z : ℂ) : toPoint L (-z) = - toPoint L z := by
   by_cases hz : z ∈ L.lattice
   · rw [toPoint_of_mem hz, toPoint_of_mem (neg_mem hz), neg_zero]
   · have hz' : -z ∉ L.lattice := fun h ↦ hz (by simpa using neg_mem h)
@@ -106,31 +107,35 @@ theorem toPoint_add (z w : ℂ) : toPoint L (z + w) = toPoint L z + toPoint L w 
   · have : toPoint L w = toPoint L (-z) := toPoint_eq_of_sub_mem (by rwa [sub_neg_eq_add, add_comm])
     rw [toPoint_of_mem hzw', this, toPoint_neg, add_neg_cancel]
   by_cases hzw : z - w ∈ L.lattice
-  ·
-    have hwz : toPoint L w = toPoint L z := toPoint_eq_of_sub_mem (by simpa using neg_mem hzw)
+  · have hwz : toPoint L w = toPoint L z := toPoint_eq_of_sub_mem (by simpa using neg_mem hzw)
     have h2 : toPoint L (z + w) = toPoint L (2 * z) :=
       toPoint_eq_of_sub_mem (by rw [show z + w - 2 * z = -(z - w) by ring]; exact neg_mem hzw)
-    have h2z : 2 * z ∉ L.lattice := fun h ↦ hzw' (by
-      rw [show z + w = 2 * z - (z - w) by ring]; exact sub_mem h hzw)
-    have hd : ℘'[L] z ≠ 0 := fun h ↦ h2z ((two_mul_mem_lattice_iff_derivWeierstrassP_eq_zero hz).2 h)
+    have h2z : 2 * z ∉ L.lattice := fun h ↦
+      hzw' (by rw [show z + w = 2 * z - (z - w) by ring]; exact sub_mem h hzw)
+    have hd : ℘'[L] z ≠ 0 := fun h ↦
+      h2z ((two_mul_mem_lattice_iff_derivWeierstrassP_eq_zero hz).2 h)
     have hy : ℘'[L] z / 2 ≠ (weierstrassCurve L).toAffine.negY (℘[L] z) (℘'[L] z / 2) := by
       simp only [negY, weierstrassCurve_a₁, weierstrassCurve_a₃, zero_mul, sub_zero]
       intro h
       apply hd
       linear_combination h
     rw [h2, hwz, toPoint_of_notMem hz, toPoint_of_notMem h2z, Point.add_self_of_Y_ne hy]
-    have hsl : (weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] z) (℘'[L] z / 2) (℘'[L] z / 2) =
-        tangentSlope L z / 2 := by
-      have hden : ℘'[L] z / 2 - (weierstrassCurve L).toAffine.negY (℘[L] z) (℘'[L] z / 2) =
-          ℘'[L] z := by
+    have hsl
+        : (weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] z) (℘'[L] z / 2) (℘'[L] z / 2)
+          = tangentSlope L z / 2 := by
+      have hden
+          : ℘'[L] z / 2 - (weierstrassCurve L).toAffine.negY (℘[L] z) (℘'[L] z / 2) = ℘'[L] z := by
         simp only [negY, weierstrassCurve_a₁, weierstrassCurve_a₃]
         ring
       rw [slope_of_Y_ne rfl hy, hden]
       simp only [tangentSlope, weierstrassCurve_a₁, weierstrassCurve_a₂, weierstrassCurve_a₄]
       field_simp
       ring
-    have hx : ℘[L] (2 * z) = (weierstrassCurve L).toAffine.addX (℘[L] z) (℘[L] z)
-        ((weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] z) (℘'[L] z / 2) (℘'[L] z / 2)) := by
+    have hx
+        : ℘[L] (2 * z)
+          = (weierstrassCurve L).toAffine.addX (℘[L] z) (℘[L] z)
+            ((weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] z) (℘'[L] z / 2)
+              (℘'[L] z / 2)) := by
       rw [hsl, weierstrassP_two_mul hz h2z]
       simp only [addX, weierstrassCurve_a₁, weierstrassCurve_a₂]
       ring
@@ -138,17 +143,19 @@ theorem toPoint_add (z w : ℂ) : toPoint L (z + w) = toPoint L z + toPoint L w 
     rw [addY, negAddY, ← hx, hsl, derivWeierstrassP_two_mul hz h2z]
     simp only [negY, weierstrassCurve_a₁, weierstrassCurve_a₃]
     ring
-  ·
-    have hne : ℘[L] z ≠ ℘[L] w := fun h ↦
+  · have hne : ℘[L] z ≠ ℘[L] w := fun h ↦
       (sub_mem_or_add_mem_of_weierstrassP_eq hz hw h).elim hzw hzw'
-    rw [toPoint_of_notMem hz, toPoint_of_notMem hw, toPoint_of_notMem hzw',
-      Point.add_of_X_ne hne]
-    have hsl : (weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] w) (℘'[L] z / 2) (℘'[L] w / 2) =
-        chordSlope L z w / 2 := by
+    rw [toPoint_of_notMem hz, toPoint_of_notMem hw, toPoint_of_notMem hzw', Point.add_of_X_ne hne]
+    have hsl
+        : (weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] w) (℘'[L] z / 2) (℘'[L] w / 2)
+          = chordSlope L z w / 2 := by
       rw [slope_of_X_ne hne, chordSlope]
       ring
-    have hx : ℘[L] (z + w) = (weierstrassCurve L).toAffine.addX (℘[L] z) (℘[L] w)
-        ((weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] w) (℘'[L] z / 2) (℘'[L] w / 2)) := by
+    have hx
+        : ℘[L] (z + w)
+          = (weierstrassCurve L).toAffine.addX (℘[L] z) (℘[L] w)
+            ((weierstrassCurve L).toAffine.slope (℘[L] z) (℘[L] w) (℘'[L] z / 2)
+              (℘'[L] w / 2)) := by
       rw [hsl, weierstrassP_add hz hw hzw hzw']
       simp only [addX, weierstrassCurve_a₁, weierstrassCurve_a₂]
       ring
@@ -175,13 +182,11 @@ theorem toPoint_surjective : Function.Surjective (toPoint L) := by
     exact point_some_congr (by rw [L.weierstrassP_neg, hx])
       (by rw [L.derivWeierstrassP_neg]; linear_combination -h1)
 
-
 variable (L) in
 def toPointHom (L : PeriodPair) : ℂ →+ (weierstrassCurve L).toAffine.Point where
   toFun := toPoint L
   map_zero' := toPoint_zero
   map_add' := toPoint_add
-
 
 variable (L) in
 def torusToPoint (L : PeriodPair) : Torus L →+ (weierstrassCurve L).toAffine.Point :=
@@ -195,7 +200,6 @@ lemma torusToPoint_injective : Function.Injective (torusToPoint L) := by
   obtain ⟨z, rfl⟩ := Torus.mk_surjective L x
   rw [torusToPoint_mk, toPoint_eq_zero_iff] at hx
   exact (QuotientAddGroup.eq_zero_iff z).2 hx
-
 
 end Elliptic
 end GroundTheory.Global

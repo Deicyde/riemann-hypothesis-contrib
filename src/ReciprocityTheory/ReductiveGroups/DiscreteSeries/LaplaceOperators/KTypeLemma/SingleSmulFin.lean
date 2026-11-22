@@ -81,8 +81,10 @@ end GeneratorMatrix
 
 theorem gen_statement (n : ℕ) : GenStatement n := by
   intro ε M _ _ E V _ _
-  refine ⟨fun f hf => gen_generic E V (tensV E) (fun a b c m => ?_) f hf,
-    fun f hf => gen_generic E V (tensVd E) (fun a b c m => ?_) f hf⟩
+  refine ⟨
+    fun f hf => gen_generic E V (tensV E) (fun a b c m => ?_) f hf,
+    fun f hf => gen_generic E V (tensVd E) (fun a b c m => ?_) f hf
+  ⟩
   · rw [tensV_single, sub_add_cancel_left]
     split_ifs
     · exact neg_mem (Submodule.subset_span ⟨a, rfl⟩)

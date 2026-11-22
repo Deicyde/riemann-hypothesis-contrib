@@ -22,35 +22,43 @@ variable {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 def kFinSub (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Submodule ℂ H :=
   GlobalTheory.KFiniteVectors.kFiniteVectors ε σ
 
-theorem isKStableOn_kFinSub (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) :
-    IsKStableOn ε σ (kFinSub ε σ) := by
+theorem isKStableOn_kFinSub (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    : IsKStableOn ε σ (kFinSub ε σ) := by
   rintro g hg v ⟨S, hS, hv, hK⟩
   exact ⟨S, hS, hK g hg v hv, hK⟩
 
-def IsIrrKSub (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H) : Prop :=
-  FiniteDimensional ℂ S ∧ S ≠ ⊥ ∧ IsKStableOn ε σ S ∧
-    ∀ S' : Submodule ℂ H, S' ≤ S → IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S
+def IsIrrKSub (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H)
+    : Prop :=
+  FiniteDimensional ℂ S ∧ S ≠ ⊥ ∧ IsKStableOn ε σ S
+    ∧ ∀ S' : Submodule ℂ H, S' ≤ S → IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S
 
-def IsKMapFrom (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H)
-    (T : S →ₗ[ℂ] H) : Prop :=
+def IsKMapFrom
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (S : Submodule ℂ H) (T : S →ₗ[ℂ] H)
+    : Prop :=
   ∀ k ∈ Kset ε, ∀ s s' : S, (s' : H) = σ k s → T s' = σ k (T s)
 
-def kIsotypic (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H) :
-    Submodule ℂ H :=
+def kIsotypic (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H)
+    : Submodule ℂ H :=
   ⨆ T : {T : S →ₗ[ℂ] H // IsKMapFrom ε σ S T}, LinearMap.range T.1
 
-theorem range_le_kIsotypic {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {S : Submodule ℂ H}
-    {T : S →ₗ[ℂ] H} (hT : IsKMapFrom ε σ S T) : LinearMap.range T ≤ kIsotypic ε σ S :=
+theorem range_le_kIsotypic
+    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {S : Submodule ℂ H}
+    {T : S →ₗ[ℂ] H} (hT : IsKMapFrom ε σ S T)
+    : LinearMap.range T ≤ kIsotypic ε σ S :=
   le_iSup (fun T : {T : S →ₗ[ℂ] H // IsKMapFrom ε σ S T} => LinearMap.range T.1) ⟨T, hT⟩
 
 def IsAdmissible (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Prop :=
   ∀ S : Submodule ℂ H, IsIrrKSub ε σ S → FiniteDimensional ℂ (kIsotypic ε σ S)
 
-def IsLieStable (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H) : Prop :=
+def IsLieStable (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H)
+    : Prop :=
   ∀ X, inG ε X → ∀ v ∈ S, dRep σ X v ∈ S
 
-theorem isIrrKSub_of_isKTypeOf {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {Λ : Fin n → ℝ}
-    {S : Submodule ℂ H} (h : IsKTypeOf ε σ Λ S) : IsIrrKSub ε σ S := by
+theorem isIrrKSub_of_isKTypeOf
+    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {Λ : Fin n → ℝ}
+    {S : Submodule ℂ H} (h : IsKTypeOf ε σ Λ S)
+    : IsIrrKSub ε σ S := by
   refine ⟨h.1, ?_, h.2.1, h.2.2.1⟩
   rintro rfl
   obtain ⟨v, hv, hv0, -⟩ := h.2.2.2.1
@@ -63,46 +71,58 @@ namespace GlobalTheory.Published
 open GlobalTheory.KFinVec
 
 def KFiniteVectorsUnitary : Prop :=
-  ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    [Nontrivial H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
-    IsURepOn (UJset ε) σ → IsIrredOn (UJset ε) σ →
-    IsAdmissible ε σ ∧
-    (∀ v : H, IsKFin ε σ v → AnalyticOnUJ ε fun g => σ g v) ∧
-    Dense (kFinSub ε σ : Set H) ∧
-    IsLieStable ε σ (kFinSub ε σ) ∧
-    ∀ S : Submodule ℂ H, S ≤ kFinSub ε σ → IsLieStable ε σ S → S = ⊥ ∨ S = kFinSub ε σ
+  ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+      [CompleteSpace H] [Nontrivial H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+    IsURepOn (UJset ε) σ → IsIrredOn (UJset ε) σ
+      → IsAdmissible ε σ ∧ (∀ v : H, IsKFin ε σ v → AnalyticOnUJ ε fun g => σ g v)
+        ∧ Dense (kFinSub ε σ : Set H) ∧ IsLieStable ε σ (kFinSub ε σ)
+        ∧ ∀ S : Submodule ℂ H, S ≤ kFinSub ε σ → IsLieStable ε σ S → S = ⊥ ∨ S = kFinSub ε σ
 
 namespace KFiniteVectorsUnitary
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem analytic [CompleteSpace H] (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ)
-    (hI : IsIrredOn (UJset ε) σ) {v : H} (hv : IsKFin ε σ v) : AnalyticOnUJ ε fun g => σ g v := by
+theorem analytic
+    [CompleteSpace H]
+    (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ) (hI : IsIrredOn (UJset ε) σ)
+    {v : H} (hv : IsKFin ε σ v)
+    : AnalyticOnUJ ε fun g => σ g v := by
   rcases subsingleton_or_nontrivial H with hs | hn
   · intro g₀ _
-    exact ⟨Set.univ, fun _ => 0, isOpen_univ, trivial, analyticOnNhd_const, fun _ _ _ => Subsingleton.elim _ _⟩
+    exact ⟨
+      Set.univ,
+      fun _ => 0,
+      isOpen_univ,
+      trivial,
+      analyticOnNhd_const,
+      fun _ _ _ => Subsingleton.elim _ _
+    ⟩
   · exact (h n ε H σ hU hI).2.1 v hv
 
-theorem smoothOnH [CompleteSpace H] (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ)
-    (hI : IsIrredOn (UJset ε) σ) {v : H} (hv : IsKFin ε σ v) :
-    Formalism.QuantumDeterminants.SmoothOnH (Jm ε) fun g => σ g v :=
+theorem smoothOnH
+    [CompleteSpace H]
+    (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ) (hI : IsIrredOn (UJset ε) σ)
+    {v : H} (hv : IsKFin ε σ v)
+    : Formalism.QuantumDeterminants.SmoothOnH (Jm ε) fun g => σ g v :=
   (h.analytic hU hI hv).smoothOnH
 
-theorem hasDerivAt [CompleteSpace H] (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ)
-    (hI : IsIrredOn (UJset ε) σ) {v : H} (hv : IsKFin ε σ v) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) :
-    HasDerivAt (fun t : ℝ => σ (NormedSpace.exp (t • X)) v) (dRep σ X v) 0 := by
+theorem hasDerivAt
+    [CompleteSpace H]
+    (h : KFiniteVectorsUnitary) (hU : IsURepOn (UJset ε) σ) (hI : IsIrredOn (UJset ε) σ)
+    {v : H} (hv : IsKFin ε σ v)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X)
+    : HasDerivAt (fun t : ℝ => σ (NormedSpace.exp (t • X)) v) (dRep σ X v) 0 := by
   have h1 : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ UJset ε := by simp [UJset, Formalism.REAL.inUJ]
   have := ((h.analytic hU hI hv).analytic_exp h1 hX 0).differentiableAt
   simp only [Matrix.one_mul] at this
   exact this.hasDerivAt
 
-theorem of_isDS (h : KFiniteVectorsUnitary) {lam : Fin n → ℝ} (hσ : IsDS ε lam σ) :
-    IsAdmissible ε σ ∧
-    (∀ v : H, IsKFin ε σ v → AnalyticOnUJ ε fun g => σ g v) ∧
-    Dense (kFinSub ε σ : Set H) ∧
-    IsLieStable ε σ (kFinSub ε σ) ∧
-    ∀ S : Submodule ℂ H, S ≤ kFinSub ε σ → IsLieStable ε σ S → S = ⊥ ∨ S = kFinSub ε σ :=
+theorem of_isDS (h : KFiniteVectorsUnitary) {lam : Fin n → ℝ} (hσ : IsDS ε lam σ)
+    : IsAdmissible ε σ ∧ (∀ v : H, IsKFin ε σ v → AnalyticOnUJ ε fun g => σ g v)
+      ∧ Dense (kFinSub ε σ : Set H) ∧ IsLieStable ε σ (kFinSub ε σ)
+      ∧ ∀ S : Submodule ℂ H, S ≤ kFinSub ε σ → IsLieStable ε σ S → S = ⊥ ∨ S = kFinSub ε σ :=
   haveI := hσ.1
   haveI := hσ.2.1
   h n ε H σ hσ.2.2.1 hσ.2.2.2.1

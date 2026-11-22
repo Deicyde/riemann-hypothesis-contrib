@@ -7,16 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibrePowerMa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
 set_option backward.isDefEq.respectTransparency.types false in
-private noncomputable def powSuccIso {S : Scheme.{0}} (A : Over S) (k : ℕ) :
-    GlobalTheory.KS.pow A (k + 1) ≅ A ⨯ GlobalTheory.KS.pow A k :=
+private noncomputable def powSuccIso {S : Scheme.{0}} (A : Over S) (k : ℕ)
+    : GlobalTheory.KS.pow A (k + 1) ≅ A ⨯ GlobalTheory.KS.pow A k :=
   let f : GlobalTheory.KS.pow A (k + 1) ⟶ A := Pi.π _ 0
   let g : GlobalTheory.KS.pow A (k + 1) ⟶ GlobalTheory.KS.pow A k :=
     Pi.lift fun i : Fin k => Pi.π (fun _ : Fin (k + 1) => A) i.succ
@@ -27,9 +30,12 @@ private noncomputable def powSuccIso {S : Scheme.{0}} (A : Over S) (k : ℕ) :
   let b : A ⨯ GlobalTheory.KS.pow A k ⟶ GlobalTheory.KS.pow A (k + 1) :=
     Pi.lift (Fin.cases Limits.prod.fst (fun i => Limits.prod.snd ≫ Pi.π _ i))
   have hb0 : b ≫ Pi.π (fun _ : Fin (k + 1) => A) 0 = Limits.prod.fst := Pi.lift_comp_π _ _
-  have hbs (i : Fin k) : b ≫ Pi.π (fun _ : Fin (k + 1) => A) i.succ =
-      Limits.prod.snd ≫ Pi.π (fun _ : Fin k => A) i := Pi.lift_comp_π _ _
-  { hom := Limits.prod.lift f g
+  have hbs (i : Fin k)
+      : b ≫ Pi.π (fun _ : Fin (k + 1) => A) i.succ
+        = Limits.prod.snd ≫ Pi.π (fun _ : Fin k => A) i :=
+    Pi.lift_comp_π _ _
+  {
+    hom := Limits.prod.lift f g
     inv := b
     hom_inv_id := by
       apply Pi.hom_ext
@@ -44,13 +50,15 @@ private noncomputable def powSuccIso {S : Scheme.{0}} (A : Over S) (k : ℕ) :
       · rw [Category.assoc, hg, Category.id_comp]
         apply Pi.hom_ext
         intro i
-        rw [Category.assoc, hgi, hbs] }
+        rw [Category.assoc, hgi, hbs]
+  }
 
-private theorem flat_pow {S : Scheme.{0}} (A : Over S) (h : Flat A.hom) :
-    ∀ k, Flat (GlobalTheory.KS.pow A k).hom
+private theorem flat_pow {S : Scheme.{0}} (A : Over S) (h : Flat A.hom)
+    : ∀ k, Flat (GlobalTheory.KS.pow A k).hom
   | 0 => by
     have t : IsTerminal (GlobalTheory.KS.pow A 0) :=
-      IsTerminal.ofUniqueHom (fun Y => Pi.lift (fun i => i.elim0))
+      IsTerminal.ofUniqueHom
+        (fun Y => Pi.lift (fun i => i.elim0))
         (fun Y m => Pi.hom_ext _ _ (fun i => i.elim0))
     let e := t.uniqueUpToIso Over.mkIdTerminal
     have h1 : (GlobalTheory.KS.pow A 0).hom = e.hom.left := by simpa using (Over.w e.hom).symm
@@ -60,16 +68,18 @@ private theorem flat_pow {S : Scheme.{0}} (A : Over S) (h : Flat A.hom) :
   | k + 1 => by
     haveI := flat_pow A h k
     let e := powSuccIso A k
-    have h1 : (GlobalTheory.KS.pow A (k + 1)).hom = e.hom.left ≫ (Over.prodLeftIsoPullback A (GlobalTheory.KS.pow A k)).hom ≫
-        pullback.fst A.hom (GlobalTheory.KS.pow A k).hom ≫ A.hom := by
-      rw [← Category.assoc (Over.prodLeftIsoPullback A (GlobalTheory.KS.pow A k)).hom, Over.prodLeftIsoPullback_hom_fst]
+    have h1
+        : (GlobalTheory.KS.pow A (k + 1)).hom
+          = e.hom.left ≫ (Over.prodLeftIsoPullback A (GlobalTheory.KS.pow A k)).hom
+            ≫ pullback.fst A.hom (GlobalTheory.KS.pow A k).hom ≫ A.hom := by
+      rw [← Category.assoc (Over.prodLeftIsoPullback A (GlobalTheory.KS.pow A k)).hom,
+        Over.prodLeftIsoPullback_hom_fst]
       simp
     haveI : IsIso e.hom.left := inferInstanceAs (IsIso ((Over.forget S).map e.hom))
     rw [h1]
     infer_instance
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.powExt_of :
-    PowExt := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.powExt_of : PowExt := by
   intro S A k
   refine ⟨fun h => flat_pow A inferInstance k, ?_⟩
   intro X u v h1 h2

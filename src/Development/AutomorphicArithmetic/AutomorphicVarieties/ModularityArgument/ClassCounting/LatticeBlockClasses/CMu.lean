@@ -6,17 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-theorem UpperTheory.V.ZK.Cl.cMu :
-    UpperTheory.V.ZK.Cl.CMu := by
+theorem UpperTheory.V.ZK.Cl.cMu : UpperTheory.V.ZK.Cl.CMu := by
   intro L F _ _ _ _ _ J _ k _ r b hb hsurj hsplit
   classical
   obtain ⟨cU, cAM, cA, cLoc⟩ := cRes L F k r
   obtain ⟨aV, aMul, aOne, aMem, -, -, -⟩ := cAct L F
   obtain ⟨hs1, hs2⟩ := hsplit
   have cL := (cLoc b hb).1
-  have vInt : ∀ (P : HeightOneSpectrum (𝓞 F)) (a : 𝓞 F), HeightOneSpectrum.valuation F P (a : F) ≤ 1 :=
+  have vInt
+      : ∀ (P : HeightOneSpectrum (𝓞 F)) (a : 𝓞 F), HeightOneSpectrum.valuation F P (a : F) ≤ 1 :=
     fun P a => P.valuation_le_one a
   have R0 : ResF r (0 : F) 0 := by simpa using cAM 0
   have Rsub : ∀ (x y : F) (u w : k), ResF r x u → ResF r y w → ResF r (x - y) (u - w) := by
@@ -58,7 +59,9 @@ theorem UpperTheory.V.ZK.Cl.cMu :
     have h := cAM (actO σ (a j))
     rw [ha j σ] at h
     exact h
-  have Kz : ∀ (g : GLoc F J b) (y : J → F), InLoc b y → RedV L r y 0 → RedV L r ((g : GG L F J) y) 0 := by
+  have Kz
+      : ∀ (g : GLoc F J b) (y : J → F),
+        InLoc b y → RedV L r y 0 → RedV L r ((g : GG L F J) y) 0 := by
     intro g y hy hy0
     let W : Set (J → F) := {z | RedV L r ((g : GG L F J) z) 0}
     have W0 : (0 : J → F) ∈ W := by
@@ -72,9 +75,12 @@ theorem UpperTheory.V.ZK.Cl.cMu :
       show ResF r (σ (((g : GG L F J) (z1 + z2)) j)) 0
       rw [map_add (f := _), Pi.add_apply, map_add (f := _)]
       simpa using this
-    have Wgen : ∀ (j : J) (c : F), (∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-        HeightOneSpectrum.valuation F P c ≤ 1) →
-        ∀ m : 𝓞 L, r (algebraMap (𝓞 L) (𝓞 F) m) = 0 → Pi.single j (c * algebraMap L F (m : L)) ∈ W := by
+    have Wgen
+        : ∀ (j : J) (c : F),
+          (∀ P : HeightOneSpectrum (𝓞 F),
+              algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → HeightOneSpectrum.valuation F P c ≤ 1)
+            → ∀ m : 𝓞 L,
+              r (algebraMap (𝓞 L) (𝓞 F) m) = 0 → Pi.single j (c * algebraMap L F (m : L)) ∈ W := by
       intro j c hc m hm
       have hs : InLoc b (Pi.single j c : J → F) := by
         intro i P hP
@@ -82,7 +88,9 @@ theorem UpperTheory.V.ZK.Cl.cMu :
         · subst hij
           simpa using hc P hP
         · simp [Pi.single_apply, hij]
-      have e : (Pi.single j (c * algebraMap L F (m : L)) : J → F) = (m : L) • (Pi.single j c : J → F) := by
+      have e
+          : (Pi.single j (c * algebraMap L F (m : L)) : J → F)
+            = (m : L) • (Pi.single j c : J → F) := by
         ext i
         by_cases hij : i = j
         · subst hij
@@ -95,12 +103,17 @@ theorem UpperTheory.V.ZK.Cl.cMu :
       have := (cA _ _ _ _ (cAM (algebraMap (𝓞 L) (𝓞 F) m)) hu).2
       rw [hm, zero_mul] at this
       exact this
-    have Wspan : ∀ a ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F)) (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))),
-        ∀ (j : J) (c : F), (∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-          HeightOneSpectrum.valuation F P c ≤ 1) → Pi.single j (c * (a : F)) ∈ W := by
+    have Wspan
+        : ∀ a ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F)) (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))),
+          ∀ (j : J) (c : F),
+            (∀ P : HeightOneSpectrum (𝓞 F),
+                algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → HeightOneSpectrum.valuation F P c ≤ 1)
+              → Pi.single j (c * (a : F)) ∈ W := by
       intro a ha
-      replace ha : a ∈ Submodule.span (𝓞 F)
-          (⇑(algebraMap (𝓞 L) (𝓞 F)) '' (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F))))) := ha
+      replace ha
+          : a ∈ Submodule.span (𝓞 F)
+            (⇑(algebraMap (𝓞 L) (𝓞 F)) '' (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F))))) :=
+        ha
       induction ha using Submodule.span_induction with
       | mem x hx =>
         obtain ⟨m, hm, rfl⟩ := hx
@@ -115,9 +128,10 @@ theorem UpperTheory.V.ZK.Cl.cMu :
         simpa [mul_add, Pi.single_add] using this
       | smul c' x _ hx =>
         intro j c hc
-        have := hx j (c * (c' : F)) (fun P hP => by
-          rw [map_mul]
-          exact mul_le_one' (hc P hP) (vInt P c'))
+        have :=
+          hx j (c * (c' : F)) (fun P hP => by
+            rw [map_mul]
+            exact mul_le_one' (hc P hP) (vInt P c'))
         simpa [mul_assoc] using this
     have hyW : ∀ j, Pi.single j (y j) ∈ W := by
       intro j
@@ -128,14 +142,18 @@ theorem UpperTheory.V.ZK.Cl.cMu :
         intro h0
         apply hb
         rw [IsFractionRing.injective (𝓞 F) F (h0.trans (map_zero _).symm), map_zero]
-      have hmem : a ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F)) (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) := by
+      have hmem
+          : a ∈ Ideal.map (algebraMap (𝓞 L) (𝓞 F))
+            (RingHom.ker (r.comp (algebraMap (𝓞 L) (𝓞 F)))) := by
         apply hs2
         intro σ
         have h1 := cAM (actO σ a)
         have h2 : ResF r (σ (a : F)) (r (algebraMap (𝓞 L) (𝓞 F) b) ^ n * 0) := by
           rw [← hna, map_mul, map_pow]
-          have hb' : σ (algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b)) =
-              algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b) := AlgEquiv.commutes σ (b : L)
+          have hb'
+              : σ (algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b))
+                = algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b) :=
+            AlgEquiv.commutes σ (b : L)
           rw [hb']
           have hbn := cAM (algebraMap (𝓞 L) (𝓞 F) b ^ n)
           rw [map_pow] at hbn
@@ -148,10 +166,16 @@ theorem UpperTheory.V.ZK.Cl.cMu :
       have hyj : y j = ((algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b)) ^ n)⁻¹ * (a : F) := by
         rw [eq_inv_mul_iff_mul_eq₀ (pow_ne_zero n hβ0)]
         exact hna
-      have hc : ∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-          HeightOneSpectrum.valuation F P (((algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b)) ^ n)⁻¹) ≤ 1 := by
+      have hc
+          : ∀ P : HeightOneSpectrum (𝓞 F),
+            algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal
+              → HeightOneSpectrum.valuation F P
+                  (((algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b)) ^ n)⁻¹)
+                ≤ 1 := by
         intro P hP
-        have h1 : HeightOneSpectrum.valuation F P (algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b)) = 1 := by
+        have h1
+            : HeightOneSpectrum.valuation F P (algebraMap (𝓞 F) F (algebraMap (𝓞 L) (𝓞 F) b))
+              = 1 := by
           rw [P.valuation_of_algebraMap]
           exact le_antisymm (P.intValuation_le_one _)
             (not_lt.1 (fun h => hP ((P.intValuation_lt_one_iff_mem _).1 h)))
@@ -171,9 +195,11 @@ theorem UpperTheory.V.ZK.Cl.cMu :
     show ResF r (σ (x j)) (if h : ∃ u, ResF r (σ (x j)) u then h.choose else 0)
     rw [dite_eq_left h]
     exact h.choose_spec
-  let T : GLoc F J b → (Gal(F/L) × J → k) → (Gal(F/L) × J → k) := fun g v => rd ((g : GG L F J) (lf v))
-  have P3 : ∀ (g : GLoc F J b) (x : J → F) (v : Gal(F/L) × J → k), InLoc b x → RedV L r x v →
-      RedV L r ((g : GG L F J) x) (T g v) := by
+  let T : GLoc F J b → (Gal(F/L) × J → k) → (Gal(F/L) × J → k) := fun g v =>
+    rd ((g : GG L F J) (lf v))
+  have P3
+      : ∀ (g : GLoc F J b) (x : J → F) (v : Gal(F/L) × J → k),
+        InLoc b x → RedV L r x v → RedV L r ((g : GG L F J) x) (T g v) := by
     intro g x v hx hv
     have hd : RedV L r (x - lf v) 0 := by
       intro σ j
@@ -188,9 +214,10 @@ theorem UpperTheory.V.ZK.Cl.cMu :
     simpa using this
   have Tadd : ∀ (g : GLoc F J b) v w, T g (v + w) = T g v + T g w := by
     intro g v w
-    have h1 := P3 g (lf v + lf w) (v + w) (Iadd _ _ (hlfI v) (hlfI w)) (fun σ j => by
-      have := (cA _ _ _ _ (hlfR v σ j) (hlfR w σ j)).1
-      simpa using this)
+    have h1 :=
+      P3 g (lf v + lf w) (v + w) (Iadd _ _ (hlfI v) (hlfI w)) (fun σ j => by
+        have := (cA _ _ _ _ (hlfR v σ j) (hlfR w σ j)).1
+        simpa using this)
     have h2 : RedV L r ((g : GG L F J) (lf v + lf w)) (T g v + T g w) := by
       intro σ j
       have := (cA _ _ _ _ (P1 _ (GI g _ (hlfI v)) σ j) (P1 _ (GI g _ (hlfI w)) σ j)).1
@@ -201,12 +228,13 @@ theorem UpperTheory.V.ZK.Cl.cMu :
     intro g c v
     obtain ⟨m, hm⟩ := hsurj c
     have hm' : r (algebraMap (𝓞 L) (𝓞 F) m) = c := hm
-    have h1 := P3 g _ (c • v) (Ismul m _ (hlfI v)) (fun σ j => by
-      have := (cA _ _ _ _ (cAM (algebraMap (𝓞 L) (𝓞 F) m)) (hlfR v σ j)).2
-      rw [hm'] at this
-      show ResF r (σ (((m : L) • lf v) j)) (c * v (σ, j))
-      rw [Pi.smul_apply, Algebra.smul_def, map_mul, AlgEquiv.commutes]
-      exact this)
+    have h1 :=
+      P3 g _ (c • v) (Ismul m _ (hlfI v)) (fun σ j => by
+        have := (cA _ _ _ _ (cAM (algebraMap (𝓞 L) (𝓞 F) m)) (hlfR v σ j)).2
+        rw [hm'] at this
+        show ResF r (σ (((m : L) • lf v) j)) (c * v (σ, j))
+        rw [Pi.smul_apply, Algebra.smul_def, map_mul, AlgEquiv.commutes]
+        exact this)
     have h2 : RedV L r ((g : GG L F J) ((m : L) • lf v)) (c • T g v) := by
       intro σ j
       have := (cA _ _ _ _ (cAM (algebraMap (𝓞 L) (𝓞 F) m)) (P1 _ (GI g _ (hlfI v)) σ j)).2
@@ -223,18 +251,25 @@ theorem UpperTheory.V.ZK.Cl.cMu :
   have Tone : ∀ v, T 1 v = v := by
     intro v
     exact Runiq _ _ _ (P1 _ (GI 1 _ (hlfI v))) (hlfR v)
-  let Tl : GLoc F J b → ((Gal(F/L) × J → k) →ₗ[k] (Gal(F/L) × J → k)) := fun g =>
-    { toFun := T g
-      map_add' := Tadd g
-      map_smul' := fun c v => Tsmul g c v }
-  refine ⟨{ toFun := fun g => LinearEquiv.ofLinear (Tl g) (Tl g⁻¹)
-              (LinearMap.ext fun v => by
-                show T g (T g⁻¹ v) = v
-                rw [← Tmul, mul_inv_cancel, Tone])
-              (LinearMap.ext fun v => by
-                show T g⁻¹ (T g v) = v
-                rw [← Tmul, inv_mul_cancel, Tone])
-            map_one' := LinearEquiv.ext fun v => Tone v
-            map_mul' := fun g h => LinearEquiv.ext fun v => Tmul g h v }, ?_⟩
+  let Tl : GLoc F J b → ((Gal(F/L) × J → k) →ₗ[k] (Gal(F/L) × J → k)) := fun g => {
+    toFun := T g
+    map_add' := Tadd g
+    map_smul' := fun c v => Tsmul g c v
+  }
+  refine ⟨
+    {
+      toFun := fun g =>
+        LinearEquiv.ofLinear (Tl g) (Tl g⁻¹)
+          (LinearMap.ext fun v => by
+            show T g (T g⁻¹ v) = v
+            rw [← Tmul, mul_inv_cancel, Tone])
+          (LinearMap.ext fun v => by
+            show T g⁻¹ (T g v) = v
+            rw [← Tmul, inv_mul_cancel, Tone])
+      map_one' := LinearEquiv.ext fun v => Tone v
+      map_mul' := fun g h => LinearEquiv.ext fun v => Tmul g h v
+    },
+    ?_
+  ⟩
   intro g x v hx hv
   exact P3 g x v hx hv

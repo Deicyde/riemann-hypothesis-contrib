@@ -18,8 +18,9 @@ open scoped Pointwise
 
 namespace GlobalTheory.QuadSplit
 
-theorem mem_decompositionSubgroup_iff' {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (A : ValuationSubring Ω)
-    (g : Ω ≃ₐ[K] Ω) : g ∈ A.decompositionSubgroup K ↔ ∀ x, g x ∈ A ↔ x ∈ A := by
+theorem mem_decompositionSubgroup_iff'
+    {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (A : ValuationSubring Ω) (g : Ω ≃ₐ[K] Ω)
+    : g ∈ A.decompositionSubgroup K ↔ ∀ x, g x ∈ A ↔ x ∈ A := by
   rw [ValuationSubring.decompositionSubgroup, MulAction.mem_stabilizer_iff]
   constructor
   · intro h x

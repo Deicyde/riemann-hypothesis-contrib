@@ -26,9 +26,16 @@ private lemma not_dvd_choose_prime_pow_of_between {p : ℕ} (hp : p.Prime) :
     · exact (Nat.le_div_iff_mul_le hp.pos).2 (by rw [← pow_succ]; exact h1)
     · exact (Nat.div_lt_iff_lt_mul hp.pos).2 (by rw [← pow_succ]; exact h2)
 
-theorem _root_.GlobalTheory.exists_choose_small_valuation_ax : ∀ (p : ℕ), p.Prime → ∀ N : ℕ, 2 ≤ N →
-    ∃ j e : ℕ, 0 < j ∧ j < N ∧ ¬ p ^ (e + 1) ∣ N.choose j ∧
-  (e : ℚ) / ((N - j : ℕ) : ℚ) + (p : ℚ) / ((p : ℚ) - 1) ^ 2 * (1 - 1 / (p : ℚ) ^ Nat.log p (N - j)) ≤ (p : ℚ) / ((p : ℚ) - 1) ^ 2 * (1 - 1 / (p : ℚ) ^ Nat.log p N) := by
+theorem _root_.GlobalTheory.exists_choose_small_valuation_ax
+    : ∀ (p : ℕ),
+      p.Prime
+        → ∀ N : ℕ,
+          2 ≤ N
+            → ∃ j e : ℕ,
+              0 < j ∧ j < N ∧ ¬ p ^ (e + 1) ∣ N.choose j
+                ∧ (e : ℚ) / ((N - j : ℕ) : ℚ)
+                    + (p : ℚ) / ((p : ℚ) - 1) ^ 2 * (1 - 1 / (p : ℚ) ^ Nat.log p (N - j))
+                  ≤ (p : ℚ) / ((p : ℚ) - 1) ^ 2 * (1 - 1 / (p : ℚ) ^ Nat.log p N) := by
   intro p hp N hN
   have hp1 : 1 < p := hp.one_lt
   obtain ⟨k, hk⟩ : ∃ k, Nat.log p N = k := ⟨_, rfl⟩
@@ -52,8 +59,9 @@ theorem _root_.GlobalTheory.exists_choose_small_valuation_ax : ∀ (p : ℕ), p.
     have h2 : 2 * p ^ k' ≤ p ^ (k' + 1) := by
       rw [hsucc, mul_comm]; exact Nat.mul_le_mul le_rfl hp.two_le
     refine ⟨p ^ k', 1, hpk', by omega, ?_, ?_⟩
-    · have hmult := hp.emultiplicity_choose_prime_pow (n := k' + 1) (k := p ^ k')
-        (by omega) (pow_ne_zero _ hp.ne_zero)
+    · have hmult :=
+        hp.emultiplicity_choose_prime_pow (n := k' + 1) (k := p ^ k') (by omega)
+          (pow_ne_zero _ hp.ne_zero)
       rw [multiplicity_pow_self_of_prime hp.prime k'] at hmult
       rw [pow_dvd_iff_le_emultiplicity, hmult]
       norm_num

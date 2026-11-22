@@ -15,27 +15,33 @@ namespace RestTerms
 
 open MvPolynomial Finset
 
-theorem FlagIntegralPermute.proof (h1 : FlagCoeffBlockPermute.Statement) :
-    FlagIntegralPermute.Statement := by
+theorem FlagIntegralPermute.proof (h1 : FlagCoeffBlockPermute.Statement)
+    : FlagIntegralPermute.Statement := by
   classical
   intro f N w H
   let e : Fin f × Fin N ≃ Fin f × Fin N := Equiv.prodShear (Equiv.refl _) w
-  have hcomp : ∀ α : Fin f × Fin N →₀ ℕ,
-      (Finsupp.equivFunOnFinite.symm fun p : Fin f × Fin N => α (p.1, w p.1 p.2)) =
-        Finsupp.equivMapDomain e.symm α := by
+  have hcomp
+      : ∀ α : Fin f × Fin N →₀ ℕ,
+        (Finsupp.equivFunOnFinite.symm fun p : Fin f × Fin N => α (p.1, w p.1 p.2))
+          = Finsupp.equivMapDomain e.symm α := by
     intro α; ext p; simp [Finsupp.equivMapDomain_apply, e, Equiv.prodShear]
-  have hH : ∀ α, AddMonoidAlgebra.coeff (blockPermute f N w H) α = AddMonoidAlgebra.coeff H (Finsupp.equivMapDomain e.symm α) := by
+  have hH
+      : ∀ α,
+        AddMonoidAlgebra.coeff (blockPermute f N w H) α
+          = AddMonoidAlgebra.coeff H (Finsupp.equivMapDomain e.symm α) := by
     intro α; rw [h1, hcomp]
-  have hD : ∀ α, AddMonoidAlgebra.coeff (blockVandermonde f N) (Finsupp.equivMapDomain e.symm α) =
-      blockSign f N w * AddMonoidAlgebra.coeff (blockVandermonde f N) α := by
+  have hD
+      : ∀ α,
+        AddMonoidAlgebra.coeff (blockVandermonde f N) (Finsupp.equivMapDomain e.symm α)
+          = blockSign f N w * AddMonoidAlgebra.coeff (blockVandermonde f N) α := by
     intro α
     rw [← hcomp, ← h1, Flag.blockPermute_blockVandermonde, coeff_smul, smul_eq_mul]
   have hs2 : blockSign f N w * blockSign f N w = 1 := Flag.blockSign_mul_self f N w
-  have hs0 : blockSign f N w ≠ 0 := by
-    intro h0; rw [h0, zero_mul] at hs2; exact zero_ne_one hs2
-  have hfac : ∀ α : Fin f × Fin N →₀ ℕ,
-      (Finsupp.equivMapDomain e.symm α).prod (fun _ n => (n.factorial : ℚ)) =
-        α.prod (fun _ n => (n.factorial : ℚ)) := by
+  have hs0 : blockSign f N w ≠ 0 := by intro h0; rw [h0, zero_mul] at hs2; exact zero_ne_one hs2
+  have hfac
+      : ∀ α : Fin f × Fin N →₀ ℕ,
+        (Finsupp.equivMapDomain e.symm α).prod (fun _ n => (n.factorial : ℚ))
+          = α.prod (fun _ n => (n.factorial : ℚ)) := by
     intro α; rw [Finsupp.prod_equivMapDomain]
   unfold flagIntegral
   rw [Finset.mul_sum]

@@ -12,8 +12,9 @@ namespace RankOnePf
 
 variable {W : Type} [AddCommGroup W] [Module ℚ W]
 
-theorem rankOne_H_X_pow (X H : Module.End ℚ W) (hHX : ∀ w, H (X w) = X (H w) + (2 : ℚ) • X w)
-    (k : ℕ) (w : W) : H ((X ^ k) w) = (X ^ k) (H w) + ((2 * k : ℕ) : ℚ) • (X ^ k) w := by
+theorem rankOne_H_X_pow
+    (X H : Module.End ℚ W) (hHX : ∀ w, H (X w) = X (H w) + (2 : ℚ) • X w) (k : ℕ) (w : W)
+    : H ((X ^ k) w) = (X ^ k) (H w) + ((2 * k : ℕ) : ℚ) • (X ^ k) w := by
   induction k generalizing w with
   | zero => simp
   | succ k ih =>
@@ -22,8 +23,9 @@ theorem rankOne_H_X_pow (X H : Module.End ℚ W) (hHX : ∀ w, H (X w) = X (H w)
     push_cast
     module
 
-theorem rankOne_H_Y_pow (Y H : Module.End ℚ W) (hHY : ∀ w, H (Y w) = Y (H w) - (2 : ℚ) • Y w)
-    (k : ℕ) (w : W) : H ((Y ^ k) w) = (Y ^ k) (H w) - ((2 * k : ℕ) : ℚ) • (Y ^ k) w := by
+theorem rankOne_H_Y_pow
+    (Y H : Module.End ℚ W) (hHY : ∀ w, H (Y w) = Y (H w) - (2 : ℚ) • Y w) (k : ℕ) (w : W)
+    : H ((Y ^ k) w) = (Y ^ k) (H w) - ((2 * k : ℕ) : ℚ) • (Y ^ k) w := by
   induction k generalizing w with
   | zero => simp
   | succ k ih =>
@@ -32,10 +34,13 @@ theorem rankOne_H_Y_pow (Y H : Module.End ℚ W) (hHY : ∀ w, H (Y w) = Y (H w)
     push_cast
     module
 
-theorem rankOne_X_Y_pow (X Y H : Module.End ℚ W) (hXY : ∀ w, X (Y w) = Y (X w) + H w)
-    (hHY : ∀ w, H (Y w) = Y (H w) - (2 : ℚ) • Y w) (k : ℕ) (w : W) :
-    X ((Y ^ (k + 1)) w) = (Y ^ (k + 1)) (X w) + ((k + 1 : ℕ) : ℚ) • (Y ^ k) (H w)
-      - (((k + 1) * k : ℕ) : ℚ) • (Y ^ k) w := by
+theorem rankOne_X_Y_pow
+    (X Y H : Module.End ℚ W)
+    (hXY : ∀ w, X (Y w) = Y (X w) + H w) (hHY : ∀ w, H (Y w) = Y (H w) - (2 : ℚ) • Y w)
+    (k : ℕ) (w : W)
+    : X ((Y ^ (k + 1)) w)
+      = (Y ^ (k + 1)) (X w) + ((k + 1 : ℕ) : ℚ) • (Y ^ k) (H w)
+        - (((k + 1) * k : ℕ) : ℚ) • (Y ^ k) w := by
   induction k generalizing w with
   | zero => simp [hXY]
   | succ k ih =>
@@ -46,8 +51,8 @@ theorem rankOne_X_Y_pow (X Y H : Module.End ℚ W) (hXY : ∀ w, X (Y w) = Y (X 
     push_cast
     module
 
-theorem rankOne_coef_succ (n : ℕ) :
-    coef 0 (n + 1) * (((n + 1) * (n + 1 + 1) : ℕ) : ℚ) = - coef 0 n := by
+theorem rankOne_coef_succ (n : ℕ)
+    : coef 0 (n + 1) * (((n + 1) * (n + 1 + 1) : ℕ) : ℚ) = - coef 0 n := by
   have h1 : (n.factorial : ℚ) ≠ 0 := by exact_mod_cast Nat.factorial_ne_zero n
   simp only [coef, Nat.factorial_succ, add_zero, Nat.factorial_zero]
   push_cast
@@ -59,7 +64,6 @@ end RankOnePf
 end GlobalTheory.LeviCut
 
 namespace GlobalTheory.LeviCut
-
 
 open RankOnePf in
 theorem rankOne : RankOne := by
@@ -81,24 +85,29 @@ theorem rankOne : RankOne := by
     simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, sub_zero] at e1
     have e2 := LinearMap.congr_fun (hG q q o q hq hq ho hq) w
     rw [if_neg hqo, if_pos (rfl : q = q)] at e2
-    simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, zero_sub, LinearMap.neg_apply] at e2
+    simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, zero_sub,
+        LinearMap.neg_apply]
+      at e2
     rw [hH, hH, map_sub, sub_eq_iff_eq_add'.mp e1, sub_eq_iff_eq_add'.mp e2]
     module
   have hHY : ∀ w, (D o o - D q q) (D q o w) = D q o ((D o o - D q q) w) - (2 : ℚ) • D q o w := by
     intro w
     have e1 := LinearMap.congr_fun (hG o o q o ho ho hq ho) w
     rw [if_neg hoq, if_pos (rfl : o = o)] at e1
-    simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, zero_sub, LinearMap.neg_apply] at e1
+    simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, zero_sub,
+        LinearMap.neg_apply]
+      at e1
     have e2 := LinearMap.congr_fun (hG q q q o hq hq hq ho) w
     rw [if_pos (rfl : q = q), if_neg hoq] at e2
     simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply, sub_zero] at e2
     rw [hH, hH, map_sub, sub_eq_iff_eq_add'.mp e1, sub_eq_iff_eq_add'.mp e2]
     module
   constructor
-  ·
-    have hterm : ∀ m : ℕ, D o q ((D q o ^ (m + 1)) ((D o q ^ (m + 1)) T)) =
-        (D q o ^ (m + 1)) ((D o q ^ (m + 1 + 1)) T) +
-          (((m + 1) * (m + 1 + 1) : ℕ) : ℚ) • (D q o ^ m) ((D o q ^ (m + 1)) T) := by
+  · have hterm
+        : ∀ m : ℕ,
+          D o q ((D q o ^ (m + 1)) ((D o q ^ (m + 1)) T))
+            = (D q o ^ (m + 1)) ((D o q ^ (m + 1 + 1)) T)
+              + (((m + 1) * (m + 1 + 1) : ℕ) : ℚ) • (D q o ^ m) ((D o q ^ (m + 1)) T) := by
       intro m
       have hx : D o q ((D o q ^ (m + 1)) T) = (D o q ^ (m + 1 + 1)) T := by
         rw [pow_succ' (D o q) (m + 1), Module.End.mul_apply]
@@ -106,15 +115,18 @@ theorem rankOne : RankOne := by
         map_smul]
       push_cast
       module
-    have hsum : ∀ n : ℕ, D o q (∑ k ∈ Finset.range (n + 1), coef 0 k • (D q o ^ k) ((D o q ^ k) T)) =
-        coef 0 n • (D q o ^ n) ((D o q ^ (n + 1)) T) := by
+    have hsum
+        : ∀ n : ℕ,
+          D o q (∑ k ∈ Finset.range (n + 1), coef 0 k • (D q o ^ k) ((D o q ^ k) T))
+            = coef 0 n • (D q o ^ n) ((D o q ^ (n + 1)) T) := by
       intro n
       induction n with
       | zero => simp
       | succ n ih =>
         rw [Finset.sum_range_succ, map_add (f := _), ih, map_smul, hterm n]
         have hc := rankOne_coef_succ n
-        rw [show coef 0 n = -(coef 0 (n + 1) * (((n + 1) * (n + 1 + 1) : ℕ) : ℚ)) by rw [hc, neg_neg]]
+        rw [show coef 0 n = -(coef 0 (n + 1) * (((n + 1) * (n + 1 + 1) : ℕ) : ℚ)) by
+          rw [hc, neg_neg]]
         module
     have hXK : (D o q ^ (K + 1)) T = 0 := by
       refine hB o ho q hq ((2 * (K + 1) : ℕ) : ℤ) _ ?_ (by push_cast; omega)
@@ -122,16 +134,17 @@ theorem rankOne : RankOne := by
       rw [hHT, map_zero, zero_add, hH] at h
       rw [Int.cast_natCast]
       exact h
-    have hp : proj K 0 (D o q) (D q o) T =
-        ∑ k ∈ Finset.range (K + 1), coef 0 k • (D q o ^ k) ((D o q ^ k) T) := by
+    have hp
+        : proj K 0 (D o q) (D q o) T
+          = ∑ k ∈ Finset.range (K + 1), coef 0 k • (D q o ^ k) ((D o q ^ k) T) := by
       simp only [proj, LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply]
     rw [hp, hsum K, hXK, map_zero, smul_zero]
-  ·
-    intro hXT
-    have hYterm : ∀ k : ℕ, D o q ((D q o ^ (k + 1)) T) = -((((k + 1) * k : ℕ) : ℚ)) • (D q o ^ k) T := by
+  · intro hXT
+    have hYterm
+        : ∀ k : ℕ, D o q ((D q o ^ (k + 1)) T) = -((((k + 1) * k : ℕ) : ℚ)) • (D q o ^ k) T := by
       intro k
-      rw [rankOne_X_Y_pow _ _ _ hXY hHY, hXT, hHT, map_zero, map_zero, smul_zero, add_zero, zero_sub,
-        neg_smul]
+      rw [rankOne_X_Y_pow _ _ _ hXY hHY, hXT, hHT, map_zero, map_zero, smul_zero, add_zero,
+        zero_sub, neg_smul]
     have hYK : (D q o ^ (K + 1)) T = 0 := by
       refine hB q hq o ho ((2 * (K + 1) : ℕ) : ℤ) _ ?_ (by push_cast; omega)
       have h := rankOne_H_Y_pow _ _ hHY (K + 1) T

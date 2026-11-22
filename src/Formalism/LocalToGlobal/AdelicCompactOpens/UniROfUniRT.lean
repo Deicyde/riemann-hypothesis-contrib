@@ -13,8 +13,7 @@ section
 
 variable (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
 
-def DualUnique : Prop :=
-  ∀ a b b' : AlgWt L n, a.IsDual b → a.IsDual b' → b.Iso b'
+def DualUnique : Prop := ∀ a b b' : AlgWt L n, a.IsDual b → a.IsDual b' → b.Iso b'
 
 variable {L n}
 

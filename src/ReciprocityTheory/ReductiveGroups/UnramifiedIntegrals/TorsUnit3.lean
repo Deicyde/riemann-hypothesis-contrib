@@ -52,10 +52,15 @@ lemma chordBig {x y x2 y2 m : K} (h2 : ‖(2 : K)‖ = 1) (hx : ‖x‖ < 1) (hy
 
 end ThreeTorsionChord
 
-theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (h2 : ‖(2 : K)‖ = 1)
-    (h3 : ‖(3 : K)‖ = 1) (hg2 : ‖g2‖ < 1) (hg3 : ‖g3‖ ≤ 1) (hΔ : ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1)
-    (n : ℕ) (hn : ‖(n : K)‖ = 1) (hen : ¬ 3 ∣ n) (x y : K)
-    (h : (Formalism.L2.Th1.A.shortW g2 g3).toAffine.Nonsingular x y) (hP : n • (Affine.Point.some x y h) = 0) : ‖x‖ = 1 := by
+theorem torsUnit3
+    (K : Type) [NormedField K] [IsUltrametricDist K]
+    (g2 g3 : K)
+    (h2 : ‖(2 : K)‖ = 1) (h3 : ‖(3 : K)‖ = 1) (hg2 : ‖g2‖ < 1) (hg3 : ‖g3‖ ≤ 1)
+    (hΔ : ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1)
+    (n : ℕ) (hn : ‖(n : K)‖ = 1) (hen : ¬ 3 ∣ n)
+    (x y : K) (h : (Formalism.L2.Th1.A.shortW g2 g3).toAffine.Nonsingular x y)
+    (hP : n • (Affine.Point.some x y h) = 0)
+    : ‖x‖ = 1 := by
   have h20 : (2 : K) ≠ 0 := by intro h0; rw [h0, norm_zero] at h2; exact zero_ne_one h2
   have h4 : ‖(4 : K)‖ = 1 := by
     have : (4 : K) = 2 * 2 := by norm_num
@@ -64,8 +69,7 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
     have : (27 : K) = 3 * 3 * 3 := by norm_num
     rw [this, norm_mul, norm_mul, h3, one_mul, one_mul]
   have hg3' : ‖g3‖ = 1 := by
-    have hc : ‖g2 ^ 3‖ < 1 := by
-      rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hg2 (by norm_num)
+    have hc : ‖g2 ^ 3‖ < 1 := by rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hg2 (by norm_num)
     by_contra hne
     have hlt : ‖g3‖ < 1 := lt_of_le_of_ne hg3 hne
     have : ‖g2 ^ 3 - 27 * g3 ^ 2‖ < 1 := by
@@ -87,15 +91,16 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
       field_simp
       ring
     rw [this, hΔ]
-  have formalGroupTorsionFree : ∀ P : (Formalism.L2.Th1.A.shortW g2 g3).toAffine.Point,
-      Formalism.ELL.InFormalGroupPoints P → n • P = 0 → P = 0 := by
+  have formalGroupTorsionFree
+      : ∀ P : (Formalism.L2.Th1.A.shortW g2 g3).toAffine.Point,
+        Formalism.ELL.InFormalGroupPoints P → n • P = 0 → P = 0 := by
     intro P hFormal hTorsion
     by_contra hNonzero
-    obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 :=
-      Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
+    obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
     have hz := (Formalism.ELL.FormalGroupPointsTorsion.mulz hW P hFormal hNonzero m).2
     rw [hTorsion, Affine.Point.zero_def] at hz
-    simp only [Formalism.ELL.FormalGroupPointsTorsion.zf, zero_sub, norm_neg, norm_mul, hn, one_mul] at hz
+    simp only [Formalism.ELL.FormalGroupPointsTorsion.zf, zero_sub, norm_neg, norm_mul, hn, one_mul]
+      at hz
     exact lt_irrefl _ hz
   have hx1 : ‖x‖ ≤ 1 := by
     by_contra hx
@@ -109,8 +114,10 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
     linear_combination this
   have hy : ‖y‖ = 1 := by
     have hs : ‖x ^ 3 + -g2 / 4 * x‖ < 1 := by
-      refine Formalism.ELL.FormalGroupPointsTorsion.add_lt ?_ ((Formalism.ELL.FormalGroupPointsTorsion.mul_le_of_one ha4.le).trans_lt hx)
-      rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hx (by norm_num)
+      refine Formalism.ELL.FormalGroupPointsTorsion.add_lt ?_
+        ((Formalism.ELL.FormalGroupPointsTorsion.mul_le_of_one ha4.le).trans_lt hx)
+      rw [norm_pow]
+      exact pow_lt_one₀ (norm_nonneg _) hx (by norm_num)
     have : ‖y ^ 2‖ = 1 := by
       rw [heq, Formalism.ELL.FormalGroupPointsTorsion.dom (by rw [ha6]; exact hs), ha6]
     rw [norm_pow] at this
@@ -119,14 +126,18 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
   have hneg : ∀ u v : K, (Formalism.L2.Th1.A.shortW g2 g3).toAffine.negY u v = -v := by
     intro u v; simp [Affine.negY, Formalism.L2.Th1.A.shortW]
   have hyne : y ≠ (Formalism.L2.Th1.A.shortW g2 g3).toAffine.negY x y := by
-    rw [hneg]; intro h0
+    rw [hneg]
+    intro h0
     have : 2 * y = 0 := by linear_combination h0
-    rw [this, norm_zero] at h2y; exact zero_ne_one h2y
-  have hxy : ¬(x = x ∧ y = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.negY x y) := fun hh => hyne hh.2
+    rw [this, norm_zero] at h2y
+    exact zero_ne_one h2y
+  have hxy : ¬(x = x ∧ y = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.negY x y) := fun hh =>
+    hyne hh.2
 
   have hE : Formalism.ELL.InFormalGroupPoints (3 • Affine.Point.some x y h) := by
-    have e3 : 3 • Affine.Point.some x y h =
-        (Affine.Point.some x y h + Affine.Point.some x y h) + Affine.Point.some x y h := by
+    have e3
+        : 3 • Affine.Point.some x y h
+          = (Affine.Point.some x y h + Affine.Point.some x y h) + Affine.Point.some x y h := by
       rw [succ_nsmul, two_nsmul]
     rw [e3, Affine.Point.add_some hxy]
     obtain ⟨l, hl⟩ : ∃ l, l = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.slope x x y y := ⟨_, rfl⟩
@@ -135,11 +146,11 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
       simp only [Formalism.L2.Th1.A.shortW]
       congr 1 <;> ring
     obtain ⟨x2, hx2⟩ : ∃ x2, x2 = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.addX x x l := ⟨_, rfl⟩
-    obtain ⟨y2, hy2⟩ : ∃ y2, y2 = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.addY x x y l := ⟨_, rfl⟩
+    obtain ⟨y2, hy2⟩ : ∃ y2, y2 = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.addY x x y l :=
+      ⟨_, rfl⟩
     have hx2' : x2 = l ^ 2 - x - x := by
       rw [hx2]; simp only [Affine.addX, Formalism.L2.Th1.A.shortW]; ring
-    have hy2' : y2 = -(l * (x2 - x) + y) := by
-      rw [hy2, Affine.addY, hneg, Affine.negAddY, ← hx2]
+    have hy2' : y2 = -(l * (x2 - x) + y) := by rw [hy2, Affine.addY, hneg, Affine.negAddY, ← hx2]
     obtain ⟨hX2, hY2⟩ := ThreeTorsionChord.dbl h2 hx hy ha4 hl' hx2' hy2'
     simp only [← hl, ← hx2, ← hy2]
     by_cases hc : x2 = x ∧ y2 = (Formalism.L2.Th1.A.shortW g2 g3).toAffine.negY x y
@@ -164,8 +175,7 @@ theorem torsUnit3 (K : Type) [NormedField K] [IsUltrametricDist K] (g2 g3 : K) (
   have hd1 : addOrderOf (Affine.Point.some x y h) ∣ 3 := addOrderOf_dvd_of_nsmul_eq_zero h3P
   have hd2 : addOrderOf (Affine.Point.some x y h) ∣ n := addOrderOf_dvd_of_nsmul_eq_zero hP
   have hcop : Nat.Coprime 3 n := (Nat.Prime.coprime_iff_not_dvd Nat.prime_three).mpr hen
-  have h1 : addOrderOf (Affine.Point.some x y h) = 1 :=
-    Nat.eq_one_of_dvd_coprimes hcop hd1 hd2
+  have h1 : addOrderOf (Affine.Point.some x y h) = 1 := Nat.eq_one_of_dvd_coprimes hcop hd1 hd2
   exact Affine.Point.some_ne_zero h (AddMonoid.addOrderOf_eq_one_iff.mp h1)
 
 end ReciprocityTheory.ChartRestriction.L1

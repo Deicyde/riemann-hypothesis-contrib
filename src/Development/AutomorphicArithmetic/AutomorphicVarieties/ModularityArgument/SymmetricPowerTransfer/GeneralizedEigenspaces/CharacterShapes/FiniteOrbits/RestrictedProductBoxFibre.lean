@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,44 +19,51 @@ section Box
 
 variable {I G : Type} [Group G] {Gv : I → Type} [∀ v, Group (Gv v)] {K U : ∀ v, Subgroup (Gv v)}
 
-private theorem memBox (P : RPG G Gv K) (U : ∀ v, Subgroup (Gv v)) (g : G) :
-    g ∈ P.box U ↔ ∀ v, P.p v g ∈ U v := by
+private theorem memBox (P : RPG G Gv K) (U : ∀ v, Subgroup (Gv v)) (g : G)
+    : g ∈ P.box U ↔ ∀ v, P.p v g ∈ U v := by
   simp [RPG.box, Subgroup.mem_iInf]
 
-private theorem smulMk {A : Type} [Group A] (W W' : Subgroup A) (u : W) (x : A) :
-    u • (x : A ⧸ W') = (((u : A) * x : A) : A ⧸ W') := rfl
+private theorem smulMk {A : Type} [Group A] (W W' : Subgroup A) (u : W) (x : A)
+    : u • (x : A ⧸ W') = (((u : A) * x : A) : A ⧸ W') :=
+  rfl
 
 end Box
 
 end UpperTheory.V.Z.Sym.So
 
-private theorem mem_doubleCoset_iff_exists_eq_mul_mul {A : Type} [Group A] {W : Subgroup A} {a x : A} :
-    x ∈ DC W a ↔ ∃ u ∈ W, ∃ u' ∈ W, x = u * a * u' := Iff.rfl
+private theorem mem_doubleCoset_iff_exists_eq_mul_mul
+    {A : Type} [Group A] {W : Subgroup A} {a x : A}
+    : x ∈ DC W a ↔ ∃ u ∈ W, ∃ u' ∈ W, x = u * a * u' :=
+  Iff.rfl
 
-private theorem mul_mem_doubleCoset_of_mem_doubleCoset_of_mem {A : Type} [Group A] {W : Subgroup A} {a x c : A}
-    (hx : x ∈ DC W a) (hc : c ∈ W) : x * c ∈ DC W a := by
+private theorem mul_mem_doubleCoset_of_mem_doubleCoset_of_mem
+    {A : Type} [Group A] {W : Subgroup A} {a x c : A} (hx : x ∈ DC W a) (hc : c ∈ W)
+    : x * c ∈ DC W a := by
   obtain ⟨u, hu, u', hu', rfl⟩ := mem_doubleCoset_iff_exists_eq_mul_mul.1 hx
-  exact mem_doubleCoset_iff_exists_eq_mul_mul.2 ⟨u, hu, u' * c, mul_mem hu' hc, by simp only [mul_assoc]⟩
+  exact mem_doubleCoset_iff_exists_eq_mul_mul.2
+    ⟨u, hu, u' * c, mul_mem hu' hc, by simp only [mul_assoc]⟩
 
-private theorem mul_mem_doubleCoset_of_mem_of_mem_doubleCoset {A : Type} [Group A] {W : Subgroup A} {a x c : A}
-    (hx : x ∈ DC W a) (hc : c ∈ W) : c * x ∈ DC W a := by
+private theorem mul_mem_doubleCoset_of_mem_of_mem_doubleCoset
+    {A : Type} [Group A] {W : Subgroup A} {a x c : A} (hx : x ∈ DC W a) (hc : c ∈ W)
+    : c * x ∈ DC W a := by
   obtain ⟨u, hu, u', hu', rfl⟩ := mem_doubleCoset_iff_exists_eq_mul_mul.1 hx
-  exact mem_doubleCoset_iff_exists_eq_mul_mul.2 ⟨c * u, mul_mem hc hu, u', hu', by simp only [mul_assoc]⟩
+  exact mem_doubleCoset_iff_exists_eq_mul_mul.2
+    ⟨c * u, mul_mem hc hu, u', hu', by simp only [mul_assoc]⟩
 
-private theorem out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset {A : Type} [Group A] {W : Subgroup A} {a b g x : A}
-    (h1 : x ∈ DC W a) (h2 : x⁻¹ * g ∈ DC W b) :
-    Quotient.out (x : A ⧸ W) ∈ DC W a ∧ (Quotient.out (x : A ⧸ W))⁻¹ * g ∈ DC W b := by
+private theorem out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset
+    {A : Type} [Group A] {W : Subgroup A} {a b g x : A} (h1 : x ∈ DC W a) (h2 : x⁻¹ * g ∈ DC W b)
+    : Quotient.out (x : A ⧸ W) ∈ DC W a ∧ (Quotient.out (x : A ⧸ W))⁻¹ * g ∈ DC W b := by
   obtain ⟨c, hc⟩ := QuotientGroup.mk_out_eq_mul W x
   rw [hc]
   refine ⟨mul_mem_doubleCoset_of_mem_doubleCoset_of_mem h1 c.2, ?_⟩
   rw [mul_inv_rev, mul_assoc]
   exact mul_mem_doubleCoset_of_mem_of_mem_doubleCoset h2 (inv_mem c.2)
 
-private theorem quotientGroup_coe_out_eq_self {A : Type} [Group A] (W : Subgroup A) (y : A ⧸ W) :
-    ((Quotient.out y : A) : A ⧸ W) = y := Quotient.out_eq y
+private theorem quotientGroup_coe_out_eq_self {A : Type} [Group A] (W : Subgroup A) (y : A ⧸ W)
+    : ((Quotient.out y : A) : A ⧸ W) = y :=
+  Quotient.out_eq y
 
-theorem UpperTheory.V.Z.Sym.So.uFBox :
-    UpperTheory.V.Z.Sym.So.UFBox := by
+theorem UpperTheory.V.Z.Sym.So.uFBox : UpperTheory.V.Z.Sym.So.UFBox := by
   intro I G _ Gv _ K U P S _ a ha
   classical
   have hB : ∀ g, g ∈ P.box U ↔ ∀ v, P.p v g ∈ U v := memBox P U
@@ -65,19 +74,28 @@ theorem UpperTheory.V.Z.Sym.So.uFBox :
     intro v hv
     by_contra hvS
     exact hv (by rw [hx v hvS]; exact one_mem _)
-  have key : ∀ c : G, (∀ v ∉ S, P.p v c ∈ U v) → ∀ g : G, g ∈ DC (P.box U) c ↔
-      (∀ v ∈ S, P.p v g ∈ DC (U v) (P.p v c)) ∧ ∀ v ∉ S, P.p v g ∈ U v := by
+  have key
+      : ∀ c : G,
+        (∀ v ∉ S, P.p v c ∈ U v)
+          → ∀ g : G,
+            g ∈ DC (P.box U) c
+              ↔ (∀ v ∈ S, P.p v g ∈ DC (U v) (P.p v c)) ∧ ∀ v ∉ S, P.p v g ∈ U v := by
     intro c hc g
     constructor
     · intro hg
       obtain ⟨u, hu, u', hu', rfl⟩ := mem_doubleCoset_iff_exists_eq_mul_mul.1 hg
       rw [hB] at hu hu'
-      refine ⟨fun v _ => mem_doubleCoset_iff_exists_eq_mul_mul.2 ⟨P.p v u, hu v, P.p v u', hu' v, by rw [map_mul, map_mul]⟩, fun v hv => ?_⟩
+      refine ⟨
+        fun v _ =>
+          mem_doubleCoset_iff_exists_eq_mul_mul.2
+            ⟨P.p v u, hu v, P.p v u', hu' v, by rw [map_mul, map_mul]⟩,
+        fun v hv => ?_
+      ⟩
       rw [map_mul, map_mul]
       exact mul_mem (mul_mem (hu v) (hc v hv)) (hu' v)
     · rintro ⟨h1, h2⟩
-      have h1' : ∀ v ∈ S, ∃ u ∈ U v, ∃ u' ∈ U v, P.p v g = u * P.p v c * u' :=
-        fun v hv => mem_doubleCoset_iff_exists_eq_mul_mul.1 (h1 v hv)
+      have h1' : ∀ v ∈ S, ∃ u ∈ U v, ∃ u' ∈ U v, P.p v g = u * P.p v c * u' := fun v hv =>
+        mem_doubleCoset_iff_exists_eq_mul_mul.1 (h1 v hv)
       choose! u hu u' hu' hg using h1'
       obtain ⟨w, hw⟩ := glue (fun v => if v ∈ S then u v else 1) (fun v hv => if_neg hv)
       refine mem_doubleCoset_iff_exists_eq_mul_mul.2 ⟨w, ?_, c⁻¹ * w⁻¹ * g, ?_, by group⟩
@@ -99,16 +117,16 @@ theorem UpperTheory.V.Z.Sym.So.uFBox :
   refine ⟨key a ha, ?_, ?_⟩
   · intro hf
     unfold UpperTheory.V.AlgebraTools.FinOrb at hf ⊢
-    have hout : ∀ u : P.box U, ∀ v ∉ S,
-        P.p v (Quotient.out (u • (a : G ⧸ P.box U))) ∈ U v := by
+    have hout : ∀ u : P.box U, ∀ v ∉ S, P.p v (Quotient.out (u • (a : G ⧸ P.box U))) ∈ U v := by
       intro u v hv
       obtain ⟨c, hc⟩ := QuotientGroup.mk_out_eq_mul (P.box U) ((u : G) * a)
       rw [smulMk, hc, map_mul, map_mul]
       exact mul_mem (mul_mem ((hB _).1 u.2 v) (ha v hv)) ((hB _).1 c.2 v)
     apply Set.Finite.of_finite_image
       (f := fun (y : G ⧸ P.box U) (v : S) => ((P.p v.1 (Quotient.out y) : Gv v.1) : Gv v.1 ⧸ U v.1))
-    · refine (Set.Finite.pi (t := fun v : S =>
-        MulAction.orbit (U v.1) ((P.p v.1 a : Gv v.1) : Gv v.1 ⧸ U v.1)) (fun v => hf v.1 v.2)).subset ?_
+    · refine (Set.Finite.pi
+        (t := fun v : S => MulAction.orbit (U v.1) ((P.p v.1 a : Gv v.1) : Gv v.1 ⧸ U v.1))
+        (fun v => hf v.1 v.2)).subset ?_
       rintro _ ⟨y, ⟨u, rfl⟩, rfl⟩
       rw [Set.mem_univ_pi]
       intro v
@@ -120,7 +138,8 @@ theorem UpperTheory.V.Z.Sym.So.uFBox :
       simp only [map_mul, Subgroup.coe_mk]
       group
     · rintro _ ⟨u1, rfl⟩ _ ⟨u2, rfl⟩ h12
-      refine (quotientGroup_coe_out_eq_self _ _).symm.trans ((QuotientGroup.eq.2 ?_).trans (quotientGroup_coe_out_eq_self _ _))
+      refine (quotientGroup_coe_out_eq_self _ _).symm.trans
+        ((QuotientGroup.eq.2 ?_).trans (quotientGroup_coe_out_eq_self _ _))
       rw [hB]
       intro v
       rw [map_mul, map_inv]
@@ -143,12 +162,16 @@ theorem UpperTheory.V.Z.Sym.So.uFBox :
         exact ⟨_, hy⟩
       choose! z hz1 hz2 using hl
       obtain ⟨w, hw⟩ := glue (fun v => if v ∈ S then z v else 1) (fun v hv => if_neg hv)
-      have hw1 : w ∈ DC (P.box U) a := (key a ha w).2
-        ⟨fun v hv => by rw [hw, if_pos hv]; exact hz1 v hv,
-         fun v hv => by rw [hw, if_neg hv]; exact one_mem _⟩
-      have hw2 : w⁻¹ * g ∈ DC (P.box U) b := (key b hb _).2
-        ⟨fun v hv => by rw [map_mul, map_inv, hw, if_pos hv]; exact hz2 v hv,
-         fun v hv => by rw [map_mul, map_inv, hw, if_neg hv, inv_one, one_mul]; exact hgN v hv⟩
+      have hw1 : w ∈ DC (P.box U) a :=
+        (key a ha w).2 ⟨
+          fun v hv => by rw [hw, if_pos hv]; exact hz1 v hv,
+          fun v hv => by rw [hw, if_neg hv]; exact one_mem _
+        ⟩
+      have hw2 : w⁻¹ * g ∈ DC (P.box U) b :=
+        (key b hb _).2 ⟨
+          fun v hv => by rw [map_mul, map_inv, hw, if_pos hv]; exact hz2 v hv,
+          fun v hv => by rw [map_mul, map_inv, hw, if_neg hv, inv_one, one_mul]; exact hgN v hv
+        ⟩
       refine ⟨(w : G ⧸ P.box U), out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset hw1 hw2, ?_⟩
       rintro y ⟨hy1, hy2⟩
       refine (quotientGroup_coe_out_eq_self _ _).symm.trans (QuotientGroup.eq.2 ?_)
@@ -164,8 +187,10 @@ theorem UpperTheory.V.Z.Sym.So.uFBox :
         rw [← if_pos (c := v ∈ S) (t := z v) (e := 1) hv, ← hw v] at hz2'
         have hz1' := hz1 v hv
         rw [← if_pos (c := v ∈ S) (t := z v) (e := 1) hv, ← hw v] at hz1'
-        have e := ((hloc v hv (P.p v g)).1 (hgl v hv)).unique
-          (out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset (ha1.1 v hv) hb2) (out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset hz1' hz2')
+        have e :=
+          ((hloc v hv (P.p v g)).1 (hgl v hv)).unique
+            (out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset (ha1.1 v hv) hb2)
+            (out_mem_doubleCoset_and_out_inv_mul_mem_doubleCoset hz1' hz2')
         exact QuotientGroup.eq.1 e
       · rw [hw, if_neg hv]
         exact mul_mem (inv_mem (ha1.2 v hv)) (one_mem _)

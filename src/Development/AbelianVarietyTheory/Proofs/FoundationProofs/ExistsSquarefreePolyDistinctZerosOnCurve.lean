@@ -9,12 +9,14 @@ open Polynomial
 
 namespace GlobalTheory.SquarefreeFibre
 
-theorem algebraMap_norm_mem_span {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
-    [Module.Free R S] [Module.Finite R S] (g : S) :
-    algebraMap R S (Algebra.norm R g) ∈ Ideal.span {g} := by
+theorem algebraMap_norm_mem_span
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Module.Free R S] [Module.Finite R S]
+    (g : S)
+    : algebraMap R S (Algebra.norm R g) ∈ Ideal.span {g} := by
   set p := LinearMap.charpoly (Algebra.lmul R S g) with hp
   have h1 : aeval g p = 0 := by
-    have h2 := congrArg (fun φ : Module.End R S => φ 1) (LinearMap.aeval_self_charpoly (Algebra.lmul R S g))
+    have h2 :=
+      congrArg (fun φ : Module.End R S => φ 1) (LinearMap.aeval_self_charpoly (Algebra.lmul R S g))
     rw [← hp, Polynomial.aeval_algHom_apply (Algebra.lmul R S) g p] at h2
     simpa using h2
   have h3 : algebraMap R S (p.coeff 0) = -(g * aeval g p.divX) := by
@@ -23,10 +25,17 @@ theorem algebraMap_norm_mem_span {R S : Type} [CommRing R] [CommRing S] [Algebra
     simp only [map_add (f := _), map_mul, aeval_X, aeval_C] at h1
     linear_combination h1
   rw [Algebra.norm_apply, LinearMap.det_eq_sign_charpoly_coeff, map_mul, ← hp, h3]
-  exact Ideal.mul_mem_left _ _ ((Ideal.span {g}).neg_mem
-    (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self g)))
+  exact Ideal.mul_mem_left _ _
+    ((Ideal.span {g}).neg_mem (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self g)))
 
-theorem main : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra k[X] A] [IsScalarTower k k[X] A] [Module.Finite k[X] A] [Module.Free k[X] A] (g : A) (s : ℕ), g ≠ 0 → ∃ (q : k[X]) (r : ℕ) (Q : Fin r → Ideal A), q.Monic ∧ q.natDegree = s ∧ (∀ i, (Q i).IsMaximal) ∧ Function.Injective Q ∧ (∀ i, g ∉ Q i) ∧ Ideal.span {algebraMap k[X] A q} = ∏ i, Q i := by
+theorem main
+    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing A] [IsDedekindDomain A]
+        [Algebra k A] [Algebra k[X] A] [IsScalarTower k k[X] A] [Module.Finite k[X] A]
+        [Module.Free k[X] A] (g : A) (s : ℕ),
+      g ≠ 0
+        → ∃ (q : k[X]) (r : ℕ) (Q : Fin r → Ideal A),
+          q.Monic ∧ q.natDegree = s ∧ (∀ i, (Q i).IsMaximal) ∧ Function.Injective Q ∧ (∀ i, g ∉ Q i)
+            ∧ Ideal.span {algebraMap k[X] A q} = ∏ i, Q i := by
   intro k A _ _ _ _ _ _ _ _ _ _ g s hg
   classical
   obtain ⟨δ, hδ0, hδ⟩ := GlobalTheory.T.exists_nonzero_sub_C_not_mem_sq_maximal k A
@@ -49,8 +58,7 @@ theorem main : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing
     have hdec := modByMonic_add_div N (X - C α)
     rw [modByMonic_X_sub_C_eq_C_eval] at hdec
     have h5 : C (N.eval α) = N - (X - C α) * (N /ₘ (X - C α)) := eq_sub_of_add_eq hdec
-    have : u (C (N.eval α)) = u N - u (X - C α) * u (N /ₘ (X - C α)) := by
-      rw [h5, map_sub, map_mul]
+    have : u (C (N.eval α)) = u N - u (X - C α) * u (N /ₘ (X - C α)) := by rw [h5, map_sub, map_mul]
     exact hCnot P hP _ hα (this ▸ P.sub_mem hNP (P.mul_mem_right _ hX))
 
   have hδN : δ * N ≠ 0 := mul_ne_zero hδ0 hN
@@ -77,11 +85,11 @@ theorem main : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing
     intro P hP hqP
     rw [hq, map_prod] at hqP
     exact Ideal.IsPrime.prod_mem_iff.mp hqP
-  have huniq : ∀ (P : Ideal A), P.IsPrime → ∀ a b : k, u (X - C a) ∈ P → u (X - C b) ∈ P → a = b := by
+  have huniq
+      : ∀ (P : Ideal A), P.IsPrime → ∀ a b : k, u (X - C a) ∈ P → u (X - C b) ∈ P → a = b := by
     intro P hP a b ha hb
     by_contra hab
-    have : u (C (b - a)) = u (X - C a) - u (X - C b) := by
-      rw [← map_sub]; congr 1; simp [C_sub]
+    have : u (C (b - a)) = u (X - C a) - u (X - C b) := by rw [← map_sub]; congr 1; simp [C_sub]
     exact hCnot P hP (b - a) (sub_ne_zero.mpr (Ne.symm hab)) (this ▸ P.sub_mem ha hb)
   have hnotsq : ∀ (P : Ideal A), P.IsMaximal → u q ∉ P ^ 2 := by
     intro P hPm hq2
@@ -105,17 +113,20 @@ theorem main : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing
     by_contra hJu
     have hJtop : J ≠ ⊤ := fun h => hJu (Ideal.isUnit_iff.mpr h)
     obtain ⟨P, hPm, hJP⟩ := Ideal.exists_le_maximal J hJtop
-    have hle : I ≤ P ^ 2 := (Ideal.le_of_dvd hJ).trans (by rw [pow_two]; exact Ideal.mul_mono hJP hJP)
+    have hle : I ≤ P ^ 2 :=
+      (Ideal.le_of_dvd hJ).trans (by rw [pow_two]; exact Ideal.mul_mono hJP hJP)
     exact hnotsq P hPm (hle (Ideal.mem_span_singleton_self _))
   have hnodup := (UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hI0).mp hsq
   set M := UniqueFactorizationMonoid.normalizedFactors I with hM
   have hmem : ∀ P ∈ M, P.IsMaximal ∧ g ∉ P := by
     intro P hPM
-    have hPp : P.IsPrime := Ideal.isPrime_of_prime (UniqueFactorizationMonoid.prime_of_normalized_factor P hPM)
+    have hPp : P.IsPrime :=
+      Ideal.isPrime_of_prime (UniqueFactorizationMonoid.prime_of_normalized_factor P hPM)
     have hPne : P ≠ ⊥ := UniqueFactorizationMonoid.ne_zero_of_mem_normalizedFactors hPM
     refine ⟨hPp.isMaximal hPne, ?_⟩
-    have hqP : u q ∈ P := Ideal.le_of_dvd (UniqueFactorizationMonoid.dvd_of_mem_normalizedFactors hPM)
-      (Ideal.mem_span_singleton_self _)
+    have hqP : u q ∈ P :=
+      Ideal.le_of_dvd (UniqueFactorizationMonoid.dvd_of_mem_normalizedFactors hPM)
+        (Ideal.mem_span_singleton_self _)
     obtain ⟨a, haF, haP⟩ := hone P hPp hqP
     exact hgnot P hPp a (hF a haF).2 haP
   let e := M.toFinset.equivFin
@@ -123,9 +134,12 @@ theorem main : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing
   · intro i; exact (hmem _ (Multiset.mem_toFinset.mp (e.symm i).2)).1
   · intro i j h; exact e.symm.injective (Subtype.ext h)
   · intro i; exact (hmem _ (Multiset.mem_toFinset.mp (e.symm i).2)).2
-  · rw [Fintype.prod_equiv e.symm (fun i => (e.symm i : Ideal A)) (fun x => (x : Ideal A)) (fun _ => rfl),
-      Finset.prod_coe_sort M.toFinset (fun x => x), Finset.prod_eq_multiset_prod, Multiset.toFinset_val,
-      hnodup.dedup, Multiset.map_id', hM, ← hI]
+  · rw [Fintype.prod_equiv e.symm
+        (fun i => (e.symm i : Ideal A))
+        (fun x => (x : Ideal A))
+        (fun _ => rfl),
+      Finset.prod_coe_sort M.toFinset (fun x => x), Finset.prod_eq_multiset_prod,
+      Multiset.toFinset_val, hnodup.dedup, Multiset.map_id', hM, ← hI]
     exact (Ideal.prod_normalizedFactors_eq_self hI0).symm
 
 end GlobalTheory.SquarefreeFibre

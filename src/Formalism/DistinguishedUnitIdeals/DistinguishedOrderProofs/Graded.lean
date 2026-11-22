@@ -361,8 +361,8 @@ lemma cf_tp (g : ℤ) (f : Amb LL Ks D) (i : ℤ) : cf (tp Ks g • f) i = cf f 
 lemma mem_Xi {X : ℤ → Submodule LL D} {f : Amb LL Ks D} :
     f ∈ Xi Ks X ↔ ∀ i, cf f i ∈ (X i).baseChange Ks := Iff.rfl
 
-def Ti (Lev : Level LL Ks Δ) (D : Type) [AddCommGroup D] [Module LL D] (i : ℤ) :
-    Module.End LL (Ks ⊗[LL] D) :=
+def Ti (Lev : Level LL Ks Δ) (D : Type) [AddCommGroup D] [Module LL D] (i : ℤ)
+    : Module.End LL (Ks ⊗[LL] D) :=
   ((Lev.u ^ i : LLˣ) : LL) • tD D Lev.σ
 
 lemma cf_gam (Lev : Level LL Ks Δ) (f : Amb LL Ks D) (i : ℤ) :
@@ -680,7 +680,8 @@ end SlopeTestRemainingChoices
 
 theorem xi_gamma_commute : XiGam := by
   intro LL Ks Δ D _ _ _ _ _ Lev
-  refine ⟨fun X f hf => ?_, fun d => grd_cst Lev.σ Lev.u d, fun d j => grd_cst (Lev.τ j) (Lev.a j) d⟩
+  refine
+    ⟨fun X f hf => ?_, fun d => grd_cst Lev.σ Lev.u d, fun d j => grd_cst (Lev.τ j) (Lev.a j) d⟩
   rw [mem_Xi] at hf ⊢
   intro i
   rw [cf_gam]
@@ -688,8 +689,9 @@ theorem xi_gamma_commute : XiGam := by
 
 theorem graded_fourth_second_estimate : KillingPolyShape := by
   intro LL Ks Δ D _ _ _ _ _ Lev ℓ s E h1 hE kind g b U JS hg hb hW f d hf
-  have key : Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks ((PPoly Lev.u ℓ E JS).eval 1 • d) =
-      Lev.pAct (PPoly Lev.u ℓ E JS) (f - cstD Ks d) := by
+  have key
+      : Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks ((PPoly Lev.u ℓ E JS).eval 1 • d)
+        = Lev.pAct (PPoly Lev.u ℓ E JS) (f - cstD Ks d) := by
     rw [pAct_sub, pAct_cst]
   rw [key, mem_Xi]
   intro i
@@ -702,10 +704,10 @@ theorem graded_fourth_second_estimate : KillingPolyShape := by
   · have hwin := nbK_win kind g b hg hb U i hN
     have hi0 : i ≠ 0 := by
       rintro rfl
-      cases kind <;> simp only [Win2] at hwin <;>
-        first | omega | (have := hb (by decide); omega)
+      cases kind <;> simp only [Win2] at hwin <;> first | omega | (have := hb (by decide); omega)
     rw [aeval_projectionPoly_eq_zero_of_pow_eq (Ti Lev D i) Lev.u ℓ E JS i (hW i hwin) hi0
-      (Ti_pow Lev (ℓ ^ E) (iter_of_le Lev.σ ℓ s E h1.1 hE) i), LinearMap.zero_apply]
+        (Ti_pow Lev (ℓ ^ E) (iter_of_le Lev.σ ℓ s E h1.1 hE) i),
+      LinearMap.zero_apply]
     exact Submodule.zero_mem _
 
 theorem graded_fourth_estimate : KillingPolyFiltration := by
@@ -721,23 +723,30 @@ theorem graded_fourth_estimate : KillingPolyFiltration := by
   have hI : ∀ i, Fil (-(i + (n : ℤ))) ≠ Fil (-i) → i ∈ JS := by
     intro i hne
     by_contra hJS
-    have hc := fil_const Fil n (-(i + (n : ℤ))) (fun u hu1 hu2 => by
-      by_contra hu
-      apply hJS
-      have := hJ u (-i - u) hu (by omega) (by omega)
-      rwa [show -u - (-i - u) = i by ring] at this)
+    have hc :=
+      fil_const Fil n (-(i + (n : ℤ))) (fun u hu1 hu2 => by
+        by_contra hu
+        apply hJS
+        have := hJ u (-i - u) hu (by omega) (by omega)
+        rwa [show -u - (-i - u) = i by ring] at this)
     apply hne
     rw [hc]
     congr 1
     omega
-  obtain ⟨d0, hd0, hsum⟩ := trace_sum_descends_to_base Lev ℓ s E h1 hd hE (Fil (-(0 + (n : ℤ)))) (cf F 0)
-    ((mem_Xi.mp hFX) 0) (fun j => inv_zero Lev F hinvF j)
-  refine ⟨(PPoly Lev.u ℓ E JS).eval 1 • d +
-    (∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0, ?_⟩
-  have key : Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks ((PPoly Lev.u ℓ E JS).eval 1 • d +
-      (∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0) =
-      Lev.pAct (PPoly Lev.u ℓ E JS) F - cstD Ks
-        ((∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0) := by
+  obtain ⟨d0, hd0, hsum⟩ :=
+    trace_sum_descends_to_base Lev ℓ s E h1 hd hE (Fil (-(0 + (n : ℤ)))) (cf F 0)
+      ((mem_Xi.mp hFX) 0) (fun j => inv_zero Lev F hinvF j)
+  refine ⟨
+    (PPoly Lev.u ℓ E JS).eval 1 • d
+      + (∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0,
+    ?_
+  ⟩
+  have key
+      : Lev.pAct (PPoly Lev.u ℓ E JS) f - cstD Ks
+          ((PPoly Lev.u ℓ E JS).eval 1 • d
+            + (∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0)
+        = Lev.pAct (PPoly Lev.u ℓ E JS) F - cstD Ks
+          ((∏ i ∈ JS.erase 0, (1 - ((Lev.u ^ (i * ((ℓ ^ E : ℕ) : ℤ)) : LLˣ) : LL))) • d0) := by
     rw [hFdef, pAct_sub, pAct_cst, cst_add]
     abel
   rw [key, mem_Xi]
@@ -745,20 +754,24 @@ theorem graded_fourth_estimate : KillingPolyFiltration := by
   rw [cf_sub]
   by_cases hi : i = 0
   · subst hi
-    rw [polynomial_action_constant_coeff Lev ℓ s E h1 hE JS F, hsum, cf_cst_zero, TensorProduct.tmul_smul, sub_self]
+    rw [polynomial_action_constant_coeff Lev ℓ s E h1 hE JS F, hsum, cf_cst_zero,
+      TensorProduct.tmul_smul, sub_self]
     exact Submodule.zero_mem _
   · rw [cf_cst_ne _ hi, sub_zero]
-    exact polynomial_action_coeff_mem Lev ℓ s E h1 hE JS (fun i => Fil (-(i + (n : ℤ)))) (fun i => Fil (-i)) hI F hFX i
-      (Or.inl hi)
+    exact polynomial_action_coeff_mem Lev ℓ s E h1 hE JS
+      (fun i => Fil (-(i + (n : ℤ))))
+      (fun i => Fil (-i))
+      hI F hFX i (Or.inl hi)
 
 theorem reduction_degree_module : RDmod := by
   intro hR LL Ks D _ _ _ _ _ Fil kind G S η g b hF hG hS hη hGg hSg hηg hgb hJ
-  have key : ∀ i, NbK kind b (UOf kind b η Fil) (i - g) ≤ Fil (-i) ∧
-      Fil (-i) ≤ NbK kind b (UOf kind b η Fil) (i + g) := by
+  have key
+      : ∀ i,
+        NbK kind b (UOf kind b η Fil) (i - g) ≤ Fil (-i)
+          ∧ Fil (-i) ≤ NbK kind b (UOf kind b η Fil) (i + g) := by
     cases kind with
     | thin => exact (hR LL D Fil G S η g (g + 1) hF hG hS hη hGg hSg hηg (by omega)).1 hJ
-    | up =>
-      exact (hR LL D Fil G S η g b hF hG hS hη hGg hSg hηg (hgb (by intro h; cases h))).2.1 hJ
+    | up => exact (hR LL D Fil G S η g b hF hG hS hη hGg hSg hηg (hgb (by intro h; cases h))).2.1 hJ
     | down =>
       exact (hR LL D Fil G S η g b hF hG hS hη hGg hSg hηg (hgb (by intro h; cases h))).2.2 hJ
   constructor
@@ -799,12 +812,14 @@ theorem graded_semilinear_holds : GrdSemi := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [HahnModule.coeff_smul, HahnModule.coeff_smul, map_sum, Finset.smul_sum]
   symm
-  have hsub : ∀ ij : ℤ × ℤ, ij ∈ Finset.VAddAntidiagonal n
-      (Set.VAddAntidiagonal.finite_of_isPWO (grdB τ a x).isPWO_support
-        ((HahnModule.of Ks).symm (grd τ a f)).isPWO_support n) →
-      ij ∈ Finset.VAddAntidiagonal n
-      (Set.VAddAntidiagonal.finite_of_isPWO x.isPWO_support
-        ((HahnModule.of Ks).symm f).isPWO_support n) := by
+  have hsub
+      : ∀ ij : ℤ × ℤ,
+        ij ∈ Finset.VAddAntidiagonal n
+            (Set.VAddAntidiagonal.finite_of_isPWO (grdB τ a x).isPWO_support
+              ((HahnModule.of Ks).symm (grd τ a f)).isPWO_support n)
+          → ij ∈ Finset.VAddAntidiagonal n
+            (Set.VAddAntidiagonal.finite_of_isPWO x.isPWO_support
+              ((HahnModule.of Ks).symm f).isPWO_support n) := by
     intro ij hij
     rw [Finset.mem_vaddAntidiagonal] at hij ⊢
     refine ⟨fun h0 => hij.1 ?_, fun h0 => hij.2.1 ?_, hij.2.2⟩
@@ -816,8 +831,9 @@ theorem graded_semilinear_holds : GrdSemi := by
   · refine Finset.sum_congr rfl fun ij hij => ?_
     rw [Finset.mem_vaddAntidiagonal] at hij
     have hn : ij.1 + ij.2 = n := hij.2.2
-    change (algebraMap LL Ks ((a ^ ij.1 : LLˣ) : LL) * τ (x.coeff ij.1)) •
-      (((a ^ ij.2 : LLˣ) : LL) • tD D τ (((HahnModule.of Ks).symm f).coeff ij.2)) = _
+    change (algebraMap LL Ks ((a ^ ij.1 : LLˣ) : LL) * τ (x.coeff ij.1))
+        • (((a ^ ij.2 : LLˣ) : LL) • tD D τ (((HahnModule.of Ks).symm f).coeff ij.2))
+      = _
     rw [tD_smul, ← hn, zpow_add, Units.val_mul, mul_smul, mul_smul, algebraMap_smul,
       smul_comm (τ (x.coeff ij.1))]
   · intro ij hmem hnot
@@ -848,11 +864,13 @@ lemma PPoly_map {R R' : Type} [CommRing R] [CommRing R'] (φ : R →+* R') (u : 
   all_goals rfl
 
 section
-variable {O : Type} [CommRing O] {B : E.Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V] {L : E.Lat B n V} {c : ZMod n} {ell : ℕ} {Λ : PowerSeries O} {r : ℕ}
-  {S : E.LevelData L c ell Λ r} {LL : Type} [Field LL] [Algebra O LL]
-  {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] {Δ D : Type}
-  [AddCommGroup D] [Module LL D]
+variable
+  {O : Type} [CommRing O]
+  {B : E.Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  {L : E.Lat B n V} {c : ZMod n} {ell : ℕ} {Λ : PowerSeries O} {r : ℕ} {S : E.LevelData L c ell Λ r}
+  {LL : Type} [Field LL] [Algebra O LL]
+  {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)]
+  {Δ D : Type} [AddCommGroup D] [Module LL D]
 
 lemma pr_dv (R : LevelModel S LL Ks Δ D) (hb : R.K1b) (s : ℕ) (hs : s < ell) (g : ℕ)
     (X : ℤ → Submodule LL D) (hX : Monotone X) (e : S.Lv) :
@@ -922,38 +940,46 @@ theorem reduction_degree_holds : RDOf := by
   intro hR O _ B n V _ _ L c ell Λ r S LL _ _ Ks _ _ Δ D _ _ R G Sz g hb hG hS hη hK s hs
   obtain ⟨hF, hk, hJ⟩ := hK s hs
   obtain ⟨hA, -, -⟩ := id hF
-  have hrd := reduction_degree_module hR LL (Ks s) D (R.Fil s) (R.kind s) G Sz R.η g (R.b s) hF
-    (by positivity) (by positivity) (by positivity) (by exact_mod_cast hG) (by exact_mod_cast hS)
-    (by exact_mod_cast hη) (fun h => by exact_mod_cast hk h) hJ
+  have hrd :=
+    reduction_degree_module hR LL (Ks s) D (R.Fil s) (R.kind s) G Sz R.η g (R.b s) hF
+      (by positivity) (by positivity) (by positivity) (by exact_mod_cast hG) (by exact_mod_cast hS)
+      (by exact_mod_cast hη)
+      (fun h => by exact_mod_cast hk h)
+      hJ
   constructor
   · intro e he
     first
-      | show B.p s ^ g • e ∈ S.Nl s
-      | simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply]
+    | show B.p s ^ g • e ∈ S.Nl s
+    | simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply]
     rw [R.mem_Nl s hs, pr_dv R hb s hs g (fun i => R.Fil s (-i)) (fil_mono hA)]
     exact hrd.1 _ ((R.mem_Nb s hs e).mp he)
   · intro e he
     first
-      | show B.p s ^ g • e ∈ S.Nb s
-      | simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply]
-    rw [R.mem_Nb s hs, pr_dv R hb s hs g
-      (NbK (R.kind s) (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)))
-      (nbK_mono (R.kind s) (R.b s) (by positivity) _)]
+    | show B.p s ^ g • e ∈ S.Nb s
+    | simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply]
+    rw [R.mem_Nb s hs,
+      pr_dv R hb s hs g (NbK (R.kind s) (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)))
+        (nbK_mono (R.kind s) (R.b s) (by positivity) _)]
     exact hrd.2 _ ((R.mem_Nl s hs e).mp he)
 
 theorem graded_third_clause_holds : KillingPolynomialDegreeBound := by
   intro O _ B n V _ _ L c ell Λ r S LL _ _ Ks _ _ Δ D _ _ R ℓ hℓ hK s hs w hw
-  have hpr : (R.lev s).γ (R.pr s (S.loc s w)) - R.pr s (S.loc s w) ∈
-      Xi (Ks s) (fun i => R.Fil s (-i)) := by
+  have hpr
+      : (R.lev s).γ (R.pr s (S.loc s w)) - R.pr s (S.loc s w)
+        ∈ Xi (Ks s) (fun i => R.Fil s (-i)) := by
     have := (R.mem_Nl s hs _).mp hw
     rwa [map_sub, R.pr_γ s hs s hs (S.loc s w)] at this
-  have hδ : ∀ j, (R.lev s).δ j (R.pr s (S.loc s w)) - R.pr s (S.loc s w) ∈
-      Xi (Ks s) (fun i => R.Fil s (-i)) := by
+  have hδ
+      : ∀ j,
+        (R.lev s).δ j (R.pr s (S.loc s w)) - R.pr s (S.loc s w)
+          ∈ Xi (Ks s) (fun i => R.Fil s (-i)) := by
     intro j
     rw [R.pr_inv s hs (S.loc s w) j, sub_self]
     exact (Xi (Ks s) _).zero_mem
-  obtain ⟨d, hd⟩ := k2iii_core (R.lev s) ℓ s hℓ (hK s hs).1 (hK s hs).2 (fun i => R.Fil s (-i))
-    (R.pr s (S.loc s w)) hδ hpr
+  obtain ⟨d, hd⟩ :=
+    k2iii_core (R.lev s) ℓ s hℓ (hK s hs).1 (hK s hs).2
+      (fun i => R.Fil s (-i))
+      (R.pr s (S.loc s w)) hδ hpr
   obtain ⟨e0, he0⟩ := R.const d
   refine ⟨e0, (R.mem_Dc s hs e0).mpr ⟨d, he0⟩, ?_⟩
   rw [R.mem_Nl s hs, map_sub, he0 s hs]
@@ -966,15 +992,21 @@ theorem constant_term_second_form : KillingPolynomialValuationBound := by
   have hsE : s ≤ E := by omega
   have h1 : B.p s ^ g • (e - d) ∈ S.Nb s := by
     first
-      | exact hd
-      | (simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply] at hd
-         exact hd)
-  rw [R.mem_Nb s hs, pr_dv R hb s hs g
-    (NbK (R.kind s) (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)))
-    (nbK_mono (R.kind s) (R.b s) (by positivity) _), map_sub, hd0 s hs] at h1
-  have key := graded_fourth_second_estimate LL (Ks s) Δ D (R.lev s) ℓ s E (hK s hs) hsE (R.kind s) (g : ℤ)
-    (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)) JS (by positivity)
-    (fun h => by exact_mod_cast (hW s hs).1 h) (hW s hs).2 (R.pr s e) d0 h1
+    | exact hd
+    | (
+        simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply] at hd
+        exact hd
+      )
+  rw [R.mem_Nb s hs,
+      pr_dv R hb s hs g (NbK (R.kind s) (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)))
+        (nbK_mono (R.kind s) (R.b s) (by positivity) _),
+      map_sub, hd0 s hs]
+    at h1
+  have key :=
+    graded_fourth_second_estimate LL (Ks s) Δ D (R.lev s) ℓ s E (hK s hs) hsE (R.kind s) (g : ℤ)
+      (R.b s) (UOf (R.kind s) (R.b s) R.η (R.Fil s)) JS (by positivity)
+      (fun h => by exact_mod_cast (hW s hs).1 h)
+      (hW s hs).2 (R.pr s e) d0 h1
   obtain ⟨e0, he0⟩ := R.const ((PPoly (R.lev s).u ℓ E JS).eval 1 • d0)
   refine ⟨e0, (R.mem_Dc s hs e0).mpr ⟨_, he0⟩, ?_⟩
   rw [R.mem_Nb s hs, map_sub, he0 s hs, pr_PP R u hu s hs ℓ E JS e]
@@ -987,13 +1019,17 @@ theorem constant_term_fourth_form : KillingPolynomialLeadingUnit := by
   have hsE : s ≤ E := by omega
   have h1 : B.p s ^ g • (e - d) ∈ S.Nl s := by
     first
-      | exact hd
-      | (simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply] at hd
-         exact hd)
-  rw [R.mem_Nl s hs, pr_dv R hb s hs g (fun i => R.Fil s (-i)) (fil_mono (hA s hs)),
-    map_sub, hd0 s hs] at h1
-  obtain ⟨d', hd'⟩ := graded_fourth_estimate LL (Ks s) Δ D (R.lev s) ℓ s E (hK s hs).1 (hK s hs).2 hsE
-    (g : ℤ) (R.Fil s) JS (by positivity) (hJ s hs) (R.pr s e) d0 (R.pr_inv s hs e) h1
+    | exact hd
+    | (
+        simp only [Formalism.ExponentWindows.E.dv, Submodule.mem_comap, LinearMap.lsmul_apply] at hd
+        exact hd
+      )
+  rw [R.mem_Nl s hs, pr_dv R hb s hs g (fun i => R.Fil s (-i)) (fil_mono (hA s hs)), map_sub,
+      hd0 s hs]
+    at h1
+  obtain ⟨d', hd'⟩ :=
+    graded_fourth_estimate LL (Ks s) Δ D (R.lev s) ℓ s E (hK s hs).1 (hK s hs).2 hsE (g : ℤ)
+      (R.Fil s) JS (by positivity) (hJ s hs) (R.pr s e) d0 (R.pr_inv s hs e) h1
   obtain ⟨e0, he0⟩ := R.const d'
   refine ⟨e0, (R.mem_Dc s hs e0).mpr ⟨_, he0⟩, ?_⟩
   rw [R.mem_Nl s hs, map_sub, he0 s hs, pr_PP R u hu s hs ℓ E JS e]

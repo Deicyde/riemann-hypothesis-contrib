@@ -6,7 +6,8 @@ public import GroundTheory.Brauer.TensorSimple
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 noncomputable section
@@ -17,19 +18,23 @@ variable {p : ℕ} [Fact p.Prime]
 open Matrix NumberField in
 open scoped TensorProduct Classical in
 variable {p : ℕ} [Fact p.Prime] in
-private theorem mem_span_infinitePlace_embedding (K : Type) [Field K] [NumberField K]
-    [_root_.NumberField.IsTotallyComplex K] (w : InfinitePlace K → ℂ) :
-    w ∈ Submodule.span ℝ (Set.range fun (f : K) (u : InfinitePlace K) => u.embedding f) := by
+private theorem mem_span_infinitePlace_embedding
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (w : InfinitePlace K → ℂ)
+    : w ∈ Submodule.span ℝ (Set.range fun (f : K) (u : InfinitePlace K) => u.embedding f) := by
   have hc : ∀ u : InfinitePlace K, u.IsComplex := fun u => IsTotallyComplex.isComplex u
-  let P : mixedEmbedding.mixedSpace K →ₗ[ℝ] (InfinitePlace K → ℂ) :=
-    { toFun := fun x u => x.2 ⟨u, hc u⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let P : mixedEmbedding.mixedSpace K →ₗ[ℝ] (InfinitePlace K → ℂ) := {
+    toFun := fun x u => x.2 ⟨u, hc u⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hP : ∀ f : K, P (mixedEmbedding K f) = fun u => u.embedding f := by
-    intro f; funext u
+    intro f
+    funext u
     exact mixedEmbedding.mixedEmbedding_apply_isComplex K f ⟨u, hc u⟩
-  have hmem : ((0, fun u => w u.1) : mixedEmbedding.mixedSpace K) ∈
-      Submodule.span ℝ (Set.range (mixedEmbedding.latticeBasis K)) := by
+  have hmem
+      : ((0, fun u => w u.1) : mixedEmbedding.mixedSpace K)
+        ∈ Submodule.span ℝ (Set.range (mixedEmbedding.latticeBasis K)) := by
     rw [(mixedEmbedding.latticeBasis K).span_eq]; trivial
   have hmap := Submodule.mem_map_of_mem (f := P) hmem
   rw [Submodule.map_span] at hmap
@@ -40,35 +45,43 @@ private theorem mem_span_infinitePlace_embedding (K : Type) [Field K] [NumberFie
 open Matrix NumberField in
 open scoped TensorProduct Classical in
 variable {p : ℕ} [Fact p.Prime] in
-private theorem mem_span_range_psi {p : ℕ} [Fact p.Prime] (G : _root_.GlobalTheory.LKTrip.HTGroup p)
-    (v : InfinitePlace G.F) (M : Matrix (Fin G.n) (Fin G.n) ℂ) :
-    M ∈ Submodule.span ℂ (Set.range (G.psi v)) := by
+private theorem mem_span_range_psi
+    {p : ℕ} [Fact p.Prime]
+    (G : _root_.GlobalTheory.LKTrip.HTGroup p)
+    (v : InfinitePlace G.F) (M : Matrix (Fin G.n) (Fin G.n) ℂ)
+    : M ∈ Submodule.span ℂ (Set.range (G.psi v)) := by
   letI : Algebra G.F ℂ := v.embedding.toAlgebra
-  have hsc : ∀ f : G.F, algebraMap G.F (Matrix (Fin G.n) (Fin G.n) ℂ) f =
-      Matrix.scalar (Fin G.n) (v.embedding f) := by
-    intro f; ext i j
+  have hsc
+      : ∀ f : G.F,
+        algebraMap G.F (Matrix (Fin G.n) (Fin G.n) ℂ) f
+          = Matrix.scalar (Fin G.n) (v.embedding f) := by
+    intro f
+    ext i j
     simp [Matrix.algebraMap_matrix_apply, Matrix.scalar_apply, Matrix.diagonal_apply,
       RingHom.algebraMap_toAlgebra]
-  let ψ : G.C →ₐ[G.F] Matrix (Fin G.n) (Fin G.n) ℂ :=
-    { G.psi v with
-      commutes' := fun f => by
-        simp only [RingHom.toMonoidHom_eq_coe, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe,
-          MonoidHom.coe_coe]
-        rw [G.psi_F, hsc] }
+  let ψ : G.C →ₐ[G.F] Matrix (Fin G.n) (Fin G.n) ℂ := {
+    G.psi v with
+    commutes' := fun f => by
+      simp only [RingHom.toMonoidHom_eq_coe, OneHom.toFun_eq_coe, MonoidHom.toOneHom_coe,
+        MonoidHom.coe_coe]
+      rw [G.psi_F, hsc]
+  }
   let φ : ℂ ⊗[G.F] G.C →ₐ[ℂ] Matrix (Fin G.n) (Fin G.n) ℂ :=
     Algebra.TensorProduct.lift (Algebra.ofId ℂ _) ψ (fun z c => Algebra.commutes z _)
   have hφ : ∀ (z : ℂ) (c : G.C), φ (z ⊗ₜ c) = z • G.psi v c := by
     intro z c
     change (Algebra.TensorProduct.lift (Algebra.ofId ℂ _) ψ _) (z ⊗ₜ[G.F] c) = _
     erw [Algebra.TensorProduct.lift_tmul]
-    rw [Algebra.ofId_apply, Algebra.smul_def]; rfl
+    rw [Algebra.ofId_apply, Algebra.smul_def]
+    rfl
   have hn : 0 < G.n := G.n_pos
   have hinj : Function.Injective φ := by
     let χ : G.C ⊗[G.F] ℂ →+* Matrix (Fin G.n) (Fin G.n) ℂ :=
       φ.toRingHom.comp (Algebra.TensorProduct.comm G.F G.C ℂ).toRingEquiv.toRingHom
     have hker : TwoSidedIdeal.ker χ = ⊥ := by
       by_contra h
-      obtain ⟨b, hb, hmem⟩ := _root_.GroundTheory.Brauer.exists_one_tmul_mem_of_ne_bot (TwoSidedIdeal.ker χ) h
+      obtain ⟨b, hb, hmem⟩ :=
+        _root_.GroundTheory.Brauer.exists_one_tmul_mem_of_ne_bot (TwoSidedIdeal.ker χ) h
       rw [TwoSidedIdeal.mem_ker] at hmem
       have h1 : χ (1 ⊗ₜ b) = b • (1 : Matrix (Fin G.n) (Fin G.n) ℂ) := by
         change φ ((Algebra.TensorProduct.comm G.F G.C ℂ) (1 ⊗ₜ b)) = _
@@ -82,10 +95,9 @@ private theorem mem_span_range_psi {p : ℕ} [Fact p.Prime] (G : _root_.GlobalTh
     apply (Algebra.TensorProduct.comm G.F G.C ℂ).symm.injective
     apply hχ
     simpa [χ] using hxy
-  have hrank : Module.finrank ℂ (ℂ ⊗[G.F] G.C) =
-      Module.finrank ℂ (Matrix (Fin G.n) (Fin G.n) ℂ) := by
-    rw [Module.finrank_baseChange, G.rankC, Module.finrank_matrix,
-      Module.finrank_self]
+  have hrank
+      : Module.finrank ℂ (ℂ ⊗[G.F] G.C) = Module.finrank ℂ (Matrix (Fin G.n) (Fin G.n) ℂ) := by
+    rw [Module.finrank_baseChange, G.rankC, Module.finrank_matrix, Module.finrank_self]
     simp [sq]
   have hsurj : Function.Surjective φ.toLinearMap :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hrank).1 hinj
@@ -100,17 +112,20 @@ private theorem mem_span_range_psi {p : ℕ} [Fact p.Prime] (G : _root_.GlobalTh
     rw [map_add (f := _)]
     exact Submodule.add_mem _ hx hy
 
-
 open Matrix NumberField in
 open scoped TensorProduct Classical in
 variable {p : ℕ} [Fact p.Prime] in
-theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime] (G : _root_.GlobalTheory.LKTrip.HTGroup p), ∃ R : ℝ, ∀ (c : G.C) (i : Fin (Module.finrank ℚ G.C)),
-    |((Module.finBasis ℚ G.C).repr c i : ℝ)| ≤ R * ∑ w : InfinitePlace G.F, ∑ a : Fin G.n, ∑ b : Fin G.n, ‖G.psi w c a b‖ := by
+theorem _root_.GlobalTheory.CoordArch.coord_bound
+    : ∀ (p : ℕ) [Fact p.Prime] (G : _root_.GlobalTheory.LKTrip.HTGroup p), ∃ R : ℝ,
+      ∀ (c : G.C) (i : Fin (Module.finrank ℚ G.C)),
+        |((Module.finBasis ℚ G.C).repr c i : ℝ)|
+          ≤ R * ∑ w : InfinitePlace G.F, ∑ a : Fin G.n, ∑ b : Fin G.n, ‖G.psi w c a b‖ := by
   intro p _ G
   classical
   let B := Module.finBasis ℚ G.C
   let Φ : G.C → (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) := fun c u => G.psi u c
-  let L : (Fin (Module.finrank ℚ G.C) → ℝ) →ₗ[ℝ] (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) :=
+  let L
+      : (Fin (Module.finrank ℚ G.C) → ℝ) →ₗ[ℝ] (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) :=
     Fintype.linearCombination ℝ (fun i => Φ (B i))
   have hL : ∀ c : G.C, L (fun i => (B.repr c i : ℝ)) = Φ c := by
     intro c
@@ -122,8 +137,9 @@ theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime]
     rw [← h]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [Rat.smul_def]
-  have hF : ∀ (w : InfinitePlace G.F → ℂ) (c : G.C),
-      (fun u => w u • G.psi u c) ∈ Submodule.span ℝ (Set.range Φ) := by
+  have hF
+      : ∀ (w : InfinitePlace G.F → ℂ) (c : G.C),
+        (fun u => w u • G.psi u c) ∈ Submodule.span ℝ (Set.range Φ) := by
     intro w c
     have hw := mem_span_infinitePlace_embedding G.F w
     induction hw using Submodule.span_induction with
@@ -145,13 +161,15 @@ theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime]
       convert Submodule.smul_mem _ r hx using 1
       funext u
       simpa only [Pi.smul_apply] using (smul_assoc r (x u) (G.psi u c))
-  have hspan : ∀ y : InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ,
-      y ∈ Submodule.span ℝ (Set.range Φ) := by
+  have hspan
+      : ∀ y : InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ,
+        y ∈ Submodule.span ℝ (Set.range Φ) := by
     intro y
     rw [← Finset.univ_sum_single y]
     refine Submodule.sum_mem _ fun u _ => ?_
-    suffices h : ∀ M ∈ Submodule.span ℂ (Set.range (G.psi u)), ∀ z : ℂ,
-        Pi.single u (z • M) ∈ Submodule.span ℝ (Set.range Φ) by
+    suffices h
+        : ∀ M ∈ Submodule.span ℂ (Set.range (G.psi u)), ∀ z : ℂ,
+          Pi.single u (z • M) ∈ Submodule.span ℝ (Set.range Φ) by
       simpa using h _ (mem_span_range_psi G u (y u)) 1
     intro M hM
     induction hM using Submodule.span_induction with
@@ -181,8 +199,9 @@ theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime]
     refine Submodule.span_le.mpr ?_ (hspan y)
     rintro _ ⟨c, rfl⟩
     exact ⟨_, hL c⟩
-  have hdim : Module.finrank ℝ (Fin (Module.finrank ℚ G.C) → ℝ) =
-      Module.finrank ℝ (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) := by
+  have hdim
+      : Module.finrank ℝ (Fin (Module.finrank ℚ G.C) → ℝ)
+        = Module.finrank ℝ (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) := by
     have h1 := InfinitePlace.card_add_two_mul_card_eq_rank G.F
     have h2 := InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces G.F
     have h3 := IsTotallyComplex.nrRealPlaces_eq_zero G.F
@@ -196,8 +215,9 @@ theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime]
   have hinj : Function.Injective L :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).2
       (LinearMap.range_eq_top.1 hrange)
-  let E : (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) ≃ₗ[ℝ]
-      (InfinitePlace G.F → Fin G.n → Fin G.n → ℂ) :=
+  let E
+      : (InfinitePlace G.F → Matrix (Fin G.n) (Fin G.n) ℂ) ≃ₗ[ℝ]
+        (InfinitePlace G.F → Fin G.n → Fin G.n → ℂ) :=
     LinearEquiv.piCongrRight fun _ => (Matrix.ofLinearEquiv ℝ).symm
   obtain ⟨K, -, hK⟩ :=
     (LinearMap.injective_iff_antilipschitz (E.toLinearMap ∘ₗ L)).1 (E.injective.comp hinj)
@@ -211,10 +231,17 @@ theorem _root_.GlobalTheory.CoordArch.coord_bound : ∀ (p : ℕ) [Fact p.Prime]
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun u => ?_
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun a => ?_
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun b => ?_
-  exact (Finset.single_le_sum (f := fun b => ‖G.psi u c a b‖) (fun _ _ => norm_nonneg _)
-    (Finset.mem_univ b)).trans ((Finset.single_le_sum (f := fun a => ∑ b, ‖G.psi u c a b‖)
-    (fun _ _ => by positivity) (Finset.mem_univ a)).trans
-    (Finset.single_le_sum (f := fun u => ∑ a, ∑ b, ‖G.psi u c a b‖)
-    (fun _ _ => by positivity) (Finset.mem_univ u)))
+  exact (Finset.single_le_sum
+      (f := fun b => ‖G.psi u c a b‖)
+      (fun _ _ => norm_nonneg _)
+      (Finset.mem_univ b)).trans
+    ((Finset.single_le_sum
+        (f := fun a => ∑ b, ‖G.psi u c a b‖)
+        (fun _ _ => by positivity)
+        (Finset.mem_univ a)).trans
+      (Finset.single_le_sum
+        (f := fun u => ∑ a, ∑ b, ‖G.psi u c a b‖)
+        (fun _ _ => by positivity)
+        (Finset.mem_univ u)))
 
 end GlobalTheory.CoordArch

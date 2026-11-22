@@ -6,15 +6,17 @@ public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.CuspFormsSiegel
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
+open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
 open scoped TensorProduct
 attribute [local instance 100] LieRing.ofAssociativeRing
 
 open GroundTheory.Automorphic.CuspidalSpectrum in
-private theorem archExp_single (K : Type) [Field K] [NumberField K] (r s : ℕ) (i : Fin r) (j : Fin s)
-    (x : mixedSpace K) :
-    ∃ P : UPos (r + s) r → AdeleRing (𝓞 K) K,
-      archExp (K := K) (n := r + s) (Matrix.single (Fin.castAdd s i) (Fin.natAdd r j) x) = unipGL P := by
+private theorem archExp_single
+    (K : Type) [Field K] [NumberField K] (r s : ℕ) (i : Fin r) (j : Fin s) (x : mixedSpace K)
+    : ∃ P : UPos (r + s) r → AdeleRing (𝓞 K) K,
+      archExp (K := K) (n := r + s) (Matrix.single (Fin.castAdd s i) (Fin.natAdd r j) x)
+        = unipGL P := by
   classical
   let e := InfiniteAdeleRing.ringEquiv_mixedSpace K
   let P : UPos (r + s) r → AdeleRing (𝓞 K) K := fun p =>
@@ -36,7 +38,8 @@ private theorem archExp_single (K : Type) [Field K] [NumberField K] (r s : ℕ) 
   rw [blockEntry_apply]
   by_cases hab : Fin.castAdd s i = a ∧ Fin.natAdd r j = b
   · obtain ⟨rfl, rfl⟩ := hab
-    have hh : ((Fin.castAdd s i : Fin (r + s)) : ℕ) < r ∧ r ≤ ((Fin.natAdd r j : Fin (r + s)) : ℕ) :=
+    have hh
+        : ((Fin.castAdd s i : Fin (r + s)) : ℕ) < r ∧ r ≤ ((Fin.natAdd r j : Fin (r + s)) : ℕ) :=
       ⟨by simp, by simp⟩
     rw [dite_eq_left hh, if_pos ⟨rfl, rfl⟩]
     simp only [P, if_pos rfl, Prod.fst]
@@ -53,12 +56,16 @@ private theorem archExp_single (K : Type) [Field K] [NumberField K] (r s : ℕ) 
     · exact (map_zero e).symm
 
 open GroundTheory.Automorphic.CuspidalSpectrum in
-theorem UpperTheory.archExp_single_unipotent_embedding :
-    ∀ (K : Type) [Field K] [NumberField K] (r s : ℕ) (i : Fin r) (j : Fin s) (x : mixedSpace K), ∀ ψ ∈ NInv K (r + s) r, lam K (r + s) (Matrix.single (Fin.castAdd s i) (Fin.natAdd r j) x) ψ ∈ Van K r s := by
+theorem UpperTheory.archExp_single_unipotent_embedding
+    : ∀ (K : Type) [Field K] [NumberField K] (r s : ℕ) (i : Fin r) (j : Fin s) (x : mixedSpace K),
+      ∀ ψ ∈ NInv K (r + s) r,
+        lam K (r + s) (Matrix.single (Fin.castAdd s i) (Fin.natAdd r j) x) ψ ∈ Van K r s := by
   intro K _ _ r s i j x ψ hψ
   classical
-  have hψ' : ∀ (X : UPos (r + s) r → AdeleRing (𝓞 K) K) (g : AdelicGLn.AdelicGL K (r + s)),
-      ψ.1 (unipGL X * g) = ψ.1 g := hψ
+  have hψ'
+      : ∀ (X : UPos (r + s) r → AdeleRing (𝓞 K) K) (g : AdelicGLn.AdelicGL K (r + s)),
+        ψ.1 (unipGL X * g) = ψ.1 g :=
+    hψ
   show ∀ (m₁ : GL (Fin r) (AdeleRing (𝓞 K) K)) (m₂ : GL (Fin s) (AdeleRing (𝓞 K) K)),
     (lam K (r + s) (Matrix.single (Fin.castAdd s i) (Fin.natAdd r j) x) ψ).1 (blk m₁ m₂) = 0
   intro m₁ m₂
@@ -67,7 +74,8 @@ theorem UpperTheory.archExp_single_unipotent_embedding :
   have hd := CuspidalSpectrum.hasDerivAt_archExp ψ g Y 0
   simp only [zero_smul, CuspidalSpectrum.archExp_zero, mul_one] at hd
   obtain ⟨c, hc⟩ := UpperTheory.blockDiag_conj_unipotent_linear (AdeleRing (𝓞 K) K) r s m₁ m₂
-  have hmap : Matrix.GeneralLinearGroup.map (RingHom.id (AdeleRing (𝓞 K) K)) (blk m₁ m₂) = blk m₁ m₂ := by
+  have hmap
+      : Matrix.GeneralLinearGroup.map (RingHom.id (AdeleRing (𝓞 K) K)) (blk m₁ m₂) = blk m₁ m₂ := by
     ext
     rfl
   have hconst : (fun t : ℝ => ψ.1 (g * CuspidalSpectrum.archExp (t • Y))) = fun _ => ψ.1 g := by

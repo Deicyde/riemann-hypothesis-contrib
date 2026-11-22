@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ContDiffMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -100,9 +102,9 @@ namespace GlobalTheory.HaarSmallBall
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-noncomputable def roundK (h : ℝ) (k : Formalism.REAL.KG ε) :
-    Fin n → Fin n → Fin (⌊2 / h⌋₊ + 1) × Fin (⌊2 / h⌋₊ + 1) :=
-  fun i j => (cell h (toMK k i j).re, cell h (toMK k i j).im)
+noncomputable def roundK (h : ℝ) (k : Formalism.REAL.KG ε)
+    : Fin n → Fin n → Fin (⌊2 / h⌋₊ + 1) × Fin (⌊2 / h⌋₊ + 1) := fun i j =>
+  (cell h (toMK k i j).re, cell h (toMK k i j).im)
 
 lemma norm_sub_lt_of_round_eq {h : ℝ} (hh : 0 < h) {a b : Formalism.REAL.KG ε}
     (hab : roundK h b = roundK h a) (i j : Fin n) : ‖toMK b i j - toMK a i j‖ ≤ 2 * h := by
@@ -116,14 +118,19 @@ lemma norm_sub_lt_of_round_eq {h : ℝ} (hh : 0 < h) {a b : Formalism.REAL.KG ε
         Complex.norm_le_abs_re_add_abs_im _
     _ ≤ 2 * h := by rw [Complex.sub_re, Complex.sub_im]; linarith
 
-theorem smallBall : ∀ {n : ℕ} (ε : Fin n → Bool), ∃ c : ℝ, 0 < c ∧ ∃ D : ℕ, ∀ δ : ℝ, 0 < δ → δ ≤ 1 → c * δ ^ D ≤ (muK ε {k | Formalism.REAL.hs (toMK k - 1) ≤ δ}).toReal := by
+theorem smallBall
+    : ∀ {n : ℕ} (ε : Fin n → Bool), ∃ c : ℝ,
+      0 < c
+        ∧ ∃ D : ℕ, ∀ δ : ℝ,
+          0 < δ → δ ≤ 1 → c * δ ^ D ≤ (muK ε {k | Formalism.REAL.hs (toMK k - 1) ≤ δ}).toReal := by
   intro n ε
   rcases Nat.eq_zero_or_pos n with hn | hn
   · subst hn
     refine ⟨1, one_pos, 0, fun δ hδ _ => ?_⟩
     have hset : {k : Formalism.REAL.KG ε | Formalism.REAL.hs (toMK k - 1) ≤ δ} = Set.univ := by
       ext k; simp [Formalism.REAL.hs, hδ.le]
-    rw [hset, measure_univ]; simp
+    rw [hset, measure_univ]
+    simp
   set C : ℝ := 5 * (n : ℝ) ^ 2 with hC
   have hn1 : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have hCpos : 0 < C := by positivity
@@ -138,46 +145,53 @@ theorem smallBall : ∀ {n : ℕ} (ε : Fin n → Bool), ∃ c : ℝ, 0 < c ∧ 
     intro g
     by_cases hne : (R ⁻¹' {g}).Nonempty
     · obtain ⟨a, ha⟩ := hne
-      calc muK ε (R ⁻¹' {g}) ≤ muK ε ((fun x => a⁻¹ * x) ⁻¹' B) := by
-            apply measure_mono
-            intro b hb
-            have hab : R b = R a := by
-              rw [Set.mem_preimage, Set.mem_singleton_iff] at ha hb; rw [ha, hb]
-            show Formalism.REAL.hs (toMK (a⁻¹ * b) - 1) ≤ δ
-            refine (hs_translate_le a b (2 * h) (norm_sub_lt_of_round_eq hh hab)).trans ?_
-            have : (n : ℝ) * n * ((n : ℝ) * (2 * h)) ^ 2 = δ ^ 2 := by
-              rw [hhdef]; field_simp
-            rw [this]; nlinarith
+      calc
+        muK ε (R ⁻¹' {g}) ≤ muK ε ((fun x => a⁻¹ * x) ⁻¹' B) := by
+          apply measure_mono
+          intro b hb
+          have hab : R b = R a := by
+            rw [Set.mem_preimage, Set.mem_singleton_iff] at ha hb; rw [ha, hb]
+          show Formalism.REAL.hs (toMK (a⁻¹ * b) - 1) ≤ δ
+          refine (hs_translate_le a b (2 * h) (norm_sub_lt_of_round_eq hh hab)).trans ?_
+          have : (n : ℝ) * n * ((n : ℝ) * (2 * h)) ^ 2 = δ ^ 2 := by rw [hhdef]; field_simp
+          rw [this]
+          nlinarith
         _ = muK ε B := measure_preimage_mul _ _ _
     · rw [Set.not_nonempty_iff_eq_empty.1 hne]; simp
-  have hcov : (1 : ENNReal) ≤
-      (Fintype.card (Fin n → Fin n → Fin m × Fin m) : ENNReal) * muK ε B := by
-    calc (1 : ENNReal) = muK ε Set.univ := measure_univ.symm
-      _ = muK ε (⋃ g, R ⁻¹' {g}) := by
-          congr 1; ext k; simp
+  have hcov
+      : (1 : ENNReal) ≤ (Fintype.card (Fin n → Fin n → Fin m × Fin m) : ENNReal) * muK ε B := by
+    calc
+      (1 : ENNReal)
+        = muK ε Set.univ := measure_univ.symm
+      _ = muK ε (⋃ g, R ⁻¹' {g}) := by congr 1; ext k; simp
       _ ≤ ∑ g, muK ε (R ⁻¹' {g}) := measure_iUnion_fintype_le _ _
       _ ≤ ∑ _g : Fin n → Fin n → Fin m × Fin m, muK ε B := Finset.sum_le_sum fun g _ => hfib g
       _ = _ := by rw [Finset.sum_const, nsmul_eq_mul, Finset.card_univ]
   have hcard : (Fintype.card (Fin n → Fin n → Fin m × Fin m) : ℝ) = (m : ℝ) ^ (2 * n * n) := by
     simp only [Fintype.card_fun, Fintype.card_prod, Fintype.card_fin]
-    push_cast; ring
+    push_cast
+    ring
   have hcovR : (1 : ℝ) ≤ (m : ℝ) ^ (2 * n * n) * (muK ε B).toReal := by
-    have := ENNReal.toReal_mono (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) (measure_ne_top _ _)) hcov
+    have :=
+      ENNReal.toReal_mono (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) (measure_ne_top _ _)) hcov
     rw [ENNReal.toReal_mul, ENNReal.toReal_natCast, hcard, ENNReal.toReal_one] at this
     exact this
   have hmδ : (m : ℝ) * δ ≤ C := by
     have hfl : ((⌊2 / h⌋₊ : ℕ) : ℝ) ≤ 2 / h := Nat.floor_le (by positivity)
     have h2h : 2 / h * δ = 4 * (n : ℝ) ^ 2 := by rw [hhdef]; field_simp; ring
     have hn2 : (1 : ℝ) ≤ (n : ℝ) ^ 2 := one_le_pow₀ hn1
-    calc (m : ℝ) * δ = ((⌊2 / h⌋₊ : ℕ) : ℝ) * δ + δ := by rw [hm]; push_cast; ring
+    calc
+      (m : ℝ) * δ
+        = ((⌊2 / h⌋₊ : ℕ) : ℝ) * δ + δ := by rw [hm]; push_cast; ring
       _ ≤ 2 / h * δ + δ := by nlinarith
       _ ≤ C := by rw [h2h, hC]; nlinarith
   have hpow : ((m : ℝ) * δ) ^ (2 * n * n) ≤ C ^ (2 * n * n) :=
     pow_le_pow_left₀ (by positivity) hmδ _
   have hμ0 : 0 ≤ (muK ε B).toReal := ENNReal.toReal_nonneg
   rw [inv_mul_le_iff₀ (by positivity)]
-  calc δ ^ (2 * n * n) ≤ δ ^ (2 * n * n) * ((m : ℝ) ^ (2 * n * n) * (muK ε B).toReal) :=
-        le_mul_of_one_le_right (by positivity) hcovR
+  calc
+    δ ^ (2 * n * n) ≤ δ ^ (2 * n * n) * ((m : ℝ) ^ (2 * n * n) * (muK ε B).toReal) :=
+      le_mul_of_one_le_right (by positivity) hcovR
     _ = ((m : ℝ) * δ) ^ (2 * n * n) * (muK ε B).toReal := by rw [mul_pow]; ring
     _ ≤ C ^ (2 * n * n) * (muK ε B).toReal := mul_le_mul_of_nonneg_right hpow hμ0
 

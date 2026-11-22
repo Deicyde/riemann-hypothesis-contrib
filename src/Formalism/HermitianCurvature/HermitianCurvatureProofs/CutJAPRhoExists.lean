@@ -12,7 +12,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRhoLag
 namespace Formalism.FourierDecayAlt.P.CutMP.JA
 
 theorem rho_projection_existence : PRho.PRhoExists :=
-  PRhoCut.pRhoExists_of_cut PRhoCut.rho_projection_assembly PRhoCut.frame_locality_holds PRhoCut.capacity_smoothness_holds
-    PRhoCut.eigenvector_orthogonality_holds PRhoCut.lagrange_annihilation
+  PRhoCut.pRhoExists_of_cut PRhoCut.rho_projection_assembly PRhoCut.frame_locality_holds
+    PRhoCut.capacity_smoothness_holds PRhoCut.eigenvector_orthogonality_holds
+    PRhoCut.lagrange_annihilation
 
 end Formalism.FourierDecayAlt.P.CutMP.JA

@@ -9,8 +9,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcS.IntWittPf
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Filter
-  Formalism.L2.SG.Pf.NcS.KfOrbPf
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Filter Formalism.L2.SG.Pf.NcS.KfOrbPf
 open scoped TensorProduct
 
 theorem lamAE : LamAE := by
@@ -26,7 +26,8 @@ theorem lamAE : LamAE := by
       rw [ComplexEmbedding.isReal_iff]
       ext z
       rw [ComplexEmbedding.conjugate_coe_eq, ← Complex.star_def, ← hCM.2.2.2, H z]
-    exact (InfinitePlace.not_isReal_iff_isComplex.2 (hCM.2.1.isComplex w)) (InfinitePlace.isReal_iff.2 hreal)
+    exact (InfinitePlace.not_isReal_iff_isComplex.2 (hCM.2.1.isComplex w))
+      (InfinitePlace.isReal_iff.2 hreal)
   set θ : E := x - σ x with hθdef
   have hσθ : σ θ = -θ := by rw [hθdef, map_sub, hσ]; ring
   have hθ0 : θ ≠ 0 := sub_ne_zero.2 (Ne.symm hx)
@@ -113,8 +114,9 @@ theorem lamAE : LamAE := by
   intro t ht
   let ι : v.adicCompletionIntegers F →+* Fv F v ⊗[F] E :=
     (algebraMap (Fv F v) (Fv F v ⊗[F] E)).comp (v.adicCompletionIntegers F).subtype
-  have hιF : ∀ (y : F) (hy : algebraMap F (Fv F v) y ∈ v.adicCompletionIntegers F),
-      ι ⟨_, hy⟩ = algebraMap F (Fv F v ⊗[F] E) y := by
+  have hιF
+      : ∀ (y : F) (hy : algebraMap F (Fv F v) y ∈ v.adicCompletionIntegers F),
+        ι ⟨_, hy⟩ = algebraMap F (Fv F v ⊗[F] E) y := by
     intro y hy
     show algebraMap (Fv F v) (Fv F v ⊗[F] E) (algebraMap F (Fv F v) y) = _
     rw [← IsScalarTower.algebraMap_apply]
@@ -128,19 +130,21 @@ theorem lamAE : LamAE := by
     show sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) (r : Fv F v)) = _
     simp [sigR, Algebra.TensorProduct.algebraMap_apply]
     rfl
-  have hincl : ∀ y : F, inclR (F := F) (Fv F v) (algebraMap F E y) = algebraMap F (Fv F v ⊗[F] E) y :=
+  have hincl
+      : ∀ y : F, inclR (F := F) (Fv F v) (algebraMap F E y) = algebraMap F (Fv F v ⊗[F] E) y :=
     fun y => (Algebra.TensorProduct.includeRight : E →ₐ[F] Fv F v ⊗[F] E).commutes y
-  have hΘ : (inclR (F := F) (Fv F v) θ) ^ 2 = ι ⟨_, hdv⟩ := by
-    rw [hιF, ← map_pow, hd, hincl]
-  have hsΘ : sigR (Fv F v) σ (inclR (F := F) (Fv F v) θ) = -inclR (F := F) (Fv F v) θ := by
+  have hΘ : (inclR (F := F) (Fv F v) θ) ^ 2 = ι ⟨_, hdv⟩ := by rw [hιF, ← map_pow, hd, hincl]
+  have hsΘ : sigR (Fv F v) σ (inclR (F := F) (Fv F v) θ) = - inclR (F := F) (Fv F v) θ := by
     simp [sigR, inclR, hσθ, TensorProduct.tmul_neg]
   have hcrd' := hcrd t ht
   have htd : t = ι ⟨_, hcrd' 0⟩ + ι ⟨_, hcrd' 1⟩ * inclR (F := F) (Fv F v) θ := by
     conv_lhs => rw [← (Algebra.TensorProduct.basis (Fv F v) b2).sum_repr t]
-    rw [Fin.sum_univ_two, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.basis_apply, hb2, hb2]
+    rw [Fin.sum_univ_two, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.basis_apply, hb2,
+      hb2]
     show _ = algebraMap (Fv F v) (Fv F v ⊗[F] E) (PI.VolStabS.PositiveNearLattice.crd b2 (Fv F v) t 0) +
       algebraMap (Fv F v) (Fv F v ⊗[F] E) (PI.VolStabS.PositiveNearLattice.crd b2 (Fv F v) t 1) * inclR (F := F) (Fv F v) θ
-    simp only [PI.VolStabS.PositiveNearLattice.crd, Algebra.smul_def, v2, Matrix.cons_val_zero, Matrix.cons_val_one]
+    simp only [PI.VolStabS.PositiveNearLattice.crd, Algebra.smul_def, v2, Matrix.cons_val_zero,
+      Matrix.cons_val_one]
     simp [inclR]
   have hPQ : (⟨_, hPv⟩ : v.adicCompletionIntegers F) ^ 2 - ⟨_, hdv⟩ * ⟨_, hQv⟩ ^ 2 = 1 := by
     apply Subtype.ext
@@ -160,9 +164,10 @@ theorem lamAE : LamAE := by
     have e4 : ((4 : v.adicCompletionIntegers F) : Fv F v) = algebraMap F (Fv F v) 4 := by
       rw [map_ofNat]; rfl
     rw [e4, ← map_mul, mul_inv_cancel₀ (by norm_num), map_one]
-  obtain ⟨lam, hlamO, hlam, c', hc'O, hc'⟩ := core_loc ι (sigR (Fv F v) σ) (oevRing (E := E) v) hιO
-    (inclR (F := F) (Fv F v) θ) hθv ⟨_, hdv⟩ ⟨_, hβv⟩ ⟨_, hPv⟩ ⟨_, hQv⟩ ⟨_, hcrd' 0⟩ ⟨_, hcrd' 1⟩
-    hΘ hsΘ hsι hPQ ⟨_, hβiv⟩ ⟨_, hKv⟩ ⟨_, h4v⟩ hB hK h4
+  obtain ⟨lam, hlamO, hlam, c', hc'O, hc'⟩ :=
+    core_loc ι (sigR (Fv F v) σ) (oevRing (E := E) v) hιO (inclR (F := F) (Fv F v) θ) hθv ⟨_, hdv⟩
+      ⟨_, hβv⟩ ⟨_, hPv⟩ ⟨_, hQv⟩ ⟨_, hcrd' 0⟩ ⟨_, hcrd' 1⟩ hΘ hsΘ hsι hPQ ⟨_, hβiv⟩ ⟨_, hKv⟩
+      ⟨_, h4v⟩ hB hK h4
   refine ⟨lam, hlamO, hlam, c', hc'O, ?_⟩
   have hδι : inclR (F := F) (Fv F v) δ = ι ⟨_, hβv⟩ := by rw [hιF, hδF, hincl]
   rw [hδι]

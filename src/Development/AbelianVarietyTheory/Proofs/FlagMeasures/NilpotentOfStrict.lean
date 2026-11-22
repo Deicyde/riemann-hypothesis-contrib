@@ -7,24 +7,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2Spa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures
 open scoped TensorProduct ENNReal
 
 namespace GlobalTheory.UnitriHaar
 
-theorem map_add_nilpotent {k G : Type*} [NormedField k] [IsUltrametricDist k] [ProperSpace k]
-    [AddCommGroup G] [Module k G] [Module.Finite k G] [TopologicalSpace G] [IsModuleTopology k G]
-    [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsAddHaarMeasure]
-    (N : Module.End k G) (hN : IsNilpotent N) : μ.map (fun x => x + N x) = μ := by
+theorem map_add_nilpotent
+    {k G : Type*} [NormedField k] [IsUltrametricDist k] [ProperSpace k] [AddCommGroup G]
+    [Module k G] [Module.Finite k G] [TopologicalSpace G] [IsModuleTopology k G] [MeasurableSpace G]
+    [BorelSpace G]
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (N : Module.End k G) (hN : IsNilpotent N)
+    : μ.map (fun x => x + N x) = μ := by
   have : IsTopologicalAddGroup G := IsModuleTopology.topologicalAddGroup k G
   let e₀ : G ≃ₗ[k] (Fin (Module.finrank k G) → k) := (Module.finBasis k G).equivFun
-  let e : G ≃ₜ (Fin (Module.finrank k G) → k) :=
-    { e₀.toEquiv with
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap e₀.toLinearMap
-      continuous_invFun := IsModuleTopology.continuous_of_linearMap e₀.symm.toLinearMap }
+  let e : G ≃ₜ (Fin (Module.finrank k G) → k) := {
+    e₀.toEquiv with
+    continuous_toFun := IsModuleTopology.continuous_of_linearMap e₀.toLinearMap
+    continuous_invFun := IsModuleTopology.continuous_of_linearMap e₀.symm.toLinearMap
+  }
   have : LocallyCompactSpace G := e.isClosedEmbedding.locallyCompactSpace
   have : SecondCountableTopology G := e.secondCountableTopology
-  have hc : ∀ f : Module.End k G, Continuous f := fun f => IsModuleTopology.continuous_of_linearMap f
+  have hc : ∀ f : Module.End k G, Continuous f := fun f =>
+    IsModuleTopology.continuous_of_linearMap f
   let K₀ := IsUltrametricDist.closedBall_openAddSubgroup (Fin (Module.finrank k G) → k) one_pos
   let K : AddSubgroup G := K₀.toAddSubgroup.comap e₀.toLinearMap.toAddMonoidHom
   have hKo : IsOpen (K : Set G) := K₀.isOpen.preimage e.continuous
@@ -32,8 +39,7 @@ theorem map_add_nilpotent {k G : Type*} [NormedField k] [IsUltrametricDist k] [P
     e.isCompact_preimage.2 (isCompact_closedBall (0 : Fin (Module.finrank k G) → k) 1)
   obtain ⟨m, hm⟩ := hN
   let B : AddSubgroup G := ⨅ j : ℕ, K.comap (N ^ j).toAddMonoidHom
-  have hB : ∀ x, x ∈ B ↔ ∀ j : ℕ, (N ^ j) x ∈ K := fun x => by
-    simp [B, AddSubgroup.mem_iInf]
+  have hB : ∀ x, x ∈ B ↔ ∀ j : ℕ, (N ^ j) x ∈ K := fun x => by simp [B, AddSubgroup.mem_iInf]
   have hBo : IsOpen (B : Set G) := by
     have : (B : Set G) = ⋂ j ∈ Finset.range m, (N ^ j : Module.End k G) ⁻¹' (K : Set G) := by
       ext x
@@ -45,10 +51,9 @@ theorem map_add_nilpotent {k G : Type*} [NormedField k] [IsUltrametricDist k] [P
     rw [this]
     exact isOpen_biInter_finset fun j _ => hKo.preimage (hc _)
   have hBc : IsCompact (B : Set G) :=
-    hKc.of_isClosed_subset (B.isClosed_of_isOpen hBo) fun x hx => by
-      simpa using (hB x).1 hx 0
-  have hNB : ∀ x ∈ B, N x ∈ B := fun x hx => (hB _).2 fun j => by
-    rw [← Module.End.mul_apply, ← pow_succ]; exact (hB x).1 hx _
+    hKc.of_isClosed_subset (B.isClosed_of_isOpen hBo) fun x hx => by simpa using (hB x).1 hx 0
+  have hNB : ∀ x ∈ B, N x ∈ B := fun x hx =>
+    (hB _).2 fun j => by rw [← Module.End.mul_apply, ← pow_succ]; exact (hB x).1 hx _
   have hNp : ∀ (j : ℕ), ∀ x ∈ B, ((-N) ^ j) x ∈ B := fun j => by
     induction j with
     | zero => intro x hx; simpa using hx
@@ -63,14 +68,15 @@ theorem map_add_nilpotent {k G : Type*} [NormedField k] [IsUltrametricDist k] [P
   have h2 : (1 + N) * (∑ j ∈ Finset.range m, (-N) ^ j) = 1 := by
     have := mul_neg_geom_sum (-N) m
     rwa [hm', sub_zero, sub_neg_eq_add] at this
-  let L : G ≃ₜ+ G :=
-    { toFun := fun x => x + N x
-      invFun := (∑ j ∈ Finset.range m, (-N) ^ j : Module.End k G)
-      left_inv := fun x => LinearMap.congr_fun h1 x
-      right_inv := fun x => LinearMap.congr_fun h2 x
-      map_add' := fun x y => by rw [map_add (f := _)]; abel
-      continuous_toFun := continuous_id.add (hc N)
-      continuous_invFun := hc _ }
+  let L : G ≃ₜ+ G := {
+    toFun := fun x => x + N x
+    invFun := (∑ j ∈ Finset.range m, (-N) ^ j : Module.End k G)
+    left_inv := fun x => LinearMap.congr_fun h1 x
+    right_inv := fun x => LinearMap.congr_fun h2 x
+    map_add' := fun x y => by rw [map_add (f := _)]; abel
+    continuous_toFun := continuous_id.add (hc N)
+    continuous_invFun := hc _
+  }
   have hLB : L ⁻¹' (B : Set G) = B := by
     ext x
     refine ⟨fun hx => ?_, fun hx => B.add_mem hx (hNB x hx)⟩
@@ -90,8 +96,10 @@ theorem map_add_nilpotent {k G : Type*} [NormedField k] [IsUltrametricDist k] [P
     exact_mod_cast this
   rw [h3, h7, one_smul]
 
-theorem nilpotent_of_strict {R : Type*} [CommRing R] {n : ℕ} (A : Matrix (Fin n) (Fin n) R)
-    (hA : ∀ a b, ¬ a < b → A a b = 0) : A ^ n = 0 := by
+theorem nilpotent_of_strict
+    {R : Type*} [CommRing R]
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (hA : ∀ a b, ¬ a < b → A a b = 0)
+    : A ^ n = 0 := by
   have : ∀ (j : ℕ) (a b : Fin n), b.val < a.val + j → (A ^ j) a b = 0 := fun j => by
     induction j with
     | zero => intro a b h; rw [pow_zero, Matrix.one_apply_ne]; rintro rfl; omega
@@ -104,25 +112,35 @@ theorem nilpotent_of_strict {R : Type*} [CommRing R] {n : ℕ} (A : Matrix (Fin 
       · rw [hA c b hc, mul_zero]
   exact Matrix.ext fun a b => this n a b (by omega)
 
-def strictOf (R : Type*) [CommRing R] (n : ℕ) :
-    ({p : Fin n × Fin n // p.1 < p.2} → R) →ₗ[R] Matrix (Fin n) (Fin n) R where
+def strictOf (R : Type*) [CommRing R] (n : ℕ)
+    : ({p : Fin n × Fin n // p.1 < p.2} → R) →ₗ[R] Matrix (Fin n) (Fin n) R where
   toFun x := Matrix.of fun a b => if h : a < b then x ⟨(a, b), h⟩ else 0
   map_add' x y := by ext a b; simp only [Matrix.add_apply, Matrix.of_apply]; split_ifs <;> simp
   map_smul' c x := by ext a b; simp only [Matrix.smul_apply, Matrix.of_apply]; split_ifs <;> simp
 
-def above (R : Type*) [CommRing R] (n : ℕ) :
-    Matrix (Fin n) (Fin n) R →ₗ[R] ({p : Fin n × Fin n // p.1 < p.2} → R) where
+def above (R : Type*) [CommRing R] (n : ℕ)
+    : Matrix (Fin n) (Fin n) R →ₗ[R] ({p : Fin n × Fin n // p.1 < p.2} → R) where
   toFun A p := A p.1.1 p.1.2
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem exists_nilpotent {R : Type*} [CommRing R] {n : ℕ} (u : Matrix (Fin n) (Fin n) R)
-    (h1 : ∀ i, u i i = 1) (h0 : ∀ i j, j < i → u i j = 0) :
-    ∃ N : Module.End R ({p : Fin n × Fin n // p.1 < p.2} → R), IsNilpotent N ∧
-      ∀ x : {p : Fin n × Fin n // p.1 < p.2} → R,
-        (fun p : {p : Fin n × Fin n // p.1 < p.2} => (u * Matrix.of (fun a b : Fin n =>
-          (if a = b then 1 else if h : a < b then x ⟨(a, b), h⟩ else 0 : R))) p.1.1 p.1.2) =
-        above R n u + (x + N x) := by
+theorem exists_nilpotent
+    {R : Type*} [CommRing R]
+    {n : ℕ} (u : Matrix (Fin n) (Fin n) R) (h1 : ∀ i, u i i = 1) (h0 : ∀ i j, j < i → u i j = 0)
+    : ∃ N : Module.End R ({p : Fin n × Fin n // p.1 < p.2} → R),
+      IsNilpotent N
+        ∧ ∀ x : {p : Fin n × Fin n // p.1 < p.2} → R,
+          (fun p : {p : Fin n × Fin n // p.1 < p.2} =>
+              (u * Matrix.of (fun a b : Fin n =>
+                  (if a = b then
+                     1
+                   else if h : a < b then
+                     x ⟨(a, b), h⟩
+                   else
+                     0
+                    : R)))
+                p.1.1 p.1.2)
+            = above R n u + (x + N x) := by
   have hu : ∀ a b, ¬ a < b → (u - 1) a b = 0 := fun a b h => by
     rcases (not_lt.1 h).eq_or_lt with rfl | h
     · simp [h1]
@@ -147,7 +165,14 @@ theorem exists_nilpotent {R : Type*} [CommRing R] {n : ℕ} (u : Matrix (Fin n) 
   refine ⟨N, ⟨n, LinearMap.ext fun x => ?_⟩, fun x => ?_⟩
   · rw [← has ((N ^ n) x), hp, nilpotent_of_strict _ hu, zero_mul, map_zero, LinearMap.zero_apply]
   · have : Matrix.of (fun a b : Fin n =>
-        (if a = b then 1 else if h : a < b then x ⟨(a, b), h⟩ else 0 : R)) = 1 + strictOf R n x := by
+          (if a = b then
+             1
+           else if h : a < b then
+             x ⟨(a, b), h⟩
+           else
+             0
+            : R))
+        = 1 + strictOf R n x := by
       ext a b
       by_cases hab : a = b
       · subst hab; simp [hs x a a (lt_irrefl a)]
@@ -159,9 +184,26 @@ theorem exists_nilpotent {R : Type*} [CommRing R] {n : ℕ} (u : Matrix (Fin n) 
     rw [h2, map_add (f := _), map_add (f := _), has]
     rfl
 
-
 open GlobalTheory.GaugeEx in
-theorem map_unitri_mul : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (v : HeightOneSpectrum (𝓞 F)) (r : ℕ) (μU : Measure ({p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2} → Fv F v ⊗[F] E)), μU.IsAddHaarMeasure → ∀ u : Matrix (Fin (r + 1)) (Fin (r + 1)) (Fv F v ⊗[F] E), (∀ i, u i i = 1) → (∀ i j, j < i → u i j = 0) → μU.map (fun (x : {p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2} → Fv F v ⊗[F] E) (p : {p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2}) => (u * Matrix.of (fun a b : Fin (r + 1) => (if a = b then 1 else if h : a < b then x ⟨(a, b), h⟩ else 0 : Fv F v ⊗[F] E))) p.1.1 p.1.2) = μU := by
+theorem map_unitri_mul
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (v : HeightOneSpectrum (𝓞 F)) (r : ℕ)
+        (μU : Measure ({p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2} → Fv F v ⊗[F] E)),
+      μU.IsAddHaarMeasure
+        → ∀ u : Matrix (Fin (r + 1)) (Fin (r + 1)) (Fv F v ⊗[F] E),
+          (∀ i, u i i = 1) → (∀ i j, j < i → u i j = 0)
+            → μU.map (fun (x : {p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2} → Fv F v ⊗[F] E)
+                  (p : {p : Fin (r + 1) × Fin (r + 1) // p.1 < p.2}) =>
+                (u * Matrix.of (fun a b : Fin (r + 1) =>
+                    (if a = b then
+                       1
+                     else if h : a < b then
+                       x ⟨(a, b), h⟩
+                     else
+                       0
+                      : Fv F v ⊗[F] E)))
+                  p.1.1 p.1.2)
+              = μU := by
   intro F E _ _ _ _ _ v r μ hμ u h1 h0
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   obtain ⟨N, hN, hx⟩ := exists_nilpotent u h1 h0

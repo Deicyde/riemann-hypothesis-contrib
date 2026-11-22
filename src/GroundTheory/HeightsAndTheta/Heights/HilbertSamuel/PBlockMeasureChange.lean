@@ -12,52 +12,75 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics MeasureTheory Matrix
-  SupBoundCount
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  Filter Asymptotics MeasureTheory Matrix SupBoundCount
 
 noncomputable section
 
 namespace BlockMeasureChange
 
-variable {D : ℕ} {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
+variable
+  {D : ℕ} {K : Type} [Fintype K] [DecidableEq K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
   {Ω : Type} [Field Ω] [CharZero Ω]
 
-theorem sup_one_le (hS : SupBoundBlock.Statement) (d : HSMBlockDatum D K ι Ω) :
-    ∃ C : ℝ, 1 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ F : MRing ι, IsMultiHomog F (blockDeg d.k₀ n) →
-      ∀ z ∈ mcPts (mCoordIdeal d.y),
-        ‖eval z (map (Int.castRingHom ℂ) F)‖ / d.A.h z ^ n ≤ (C * (n : ℝ) ^ ((D : ℝ) / 2)) * blockL2Norm d n F := by
+theorem sup_one_le (hS : SupBoundBlock.Statement) (d : HSMBlockDatum D K ι Ω)
+    : ∃ C : ℝ,
+      1 ≤ C
+        ∧ ∀ n : ℕ,
+          1 ≤ n
+            → ∀ F : MRing ι,
+              IsMultiHomog F (blockDeg d.k₀ n)
+                → ∀ z ∈ mcPts (mCoordIdeal d.y),
+                  ‖eval z (map (Int.castRingHom ℂ) F)‖ / d.A.h z ^ n
+                    ≤ (C * (n : ℝ) ^ ((D : ℝ) / 2)) * blockL2Norm d n F := by
   obtain ⟨C, hC⟩ := hS D K ι Ω d
   refine ⟨max C 1, le_max_right _ _, fun n hn F hF z hz => (hC n hn F hF z hz).trans ?_⟩
   have h0 : 0 ≤ blockL2Norm d n F := Real.sqrt_nonneg _
   have h1 : 0 ≤ (n : ℝ) ^ ((D : ℝ) / 2) := by positivity
   exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _) h1) h0
 
-theorem integral_le_of_le {X : Type*} [MeasurableSpace X] (μ : Measure X) [IsProbabilityMeasure μ] {g : X → ℝ}
-    {c : ℝ} (hg0 : ∀ x, 0 ≤ g x) (hgc : ∀ x, g x ≤ c) : ∫ x, g x ∂μ ≤ c := by
-  have h := norm_integral_le_of_norm_le_const (μ := μ) (f := g) (C := c)
-    (Filter.Eventually.of_forall fun x => by rw [Real.norm_of_nonneg (hg0 x)]; exact hgc x)
+theorem integral_le_of_le
+    {X : Type*} [MeasurableSpace X]
+    (μ : Measure X) [IsProbabilityMeasure μ]
+    {g : X → ℝ} {c : ℝ} (hg0 : ∀ x, 0 ≤ g x) (hgc : ∀ x, g x ≤ c)
+    : ∫ x, g x ∂μ ≤ c := by
+  have h :=
+    norm_integral_le_of_norm_le_const (μ := μ) (f := g) (C := c)
+      (Filter.Eventually.of_forall fun x => by rw [Real.norm_of_nonneg (hg0 x)]; exact hgc x)
   rw [probReal_univ, mul_one, Real.norm_eq_abs] at h
   exact (le_abs_self _).trans h
 
-theorem quad_nonneg (d : HSMBlockDatum D K ι Ω) (n : ℕ) {r : ℕ} (f : Fin r → MRing ι)
-    (hf : ∀ k, IsMultiHomog (f k) (blockDeg d.k₀ n)) (a : Fin r → ℝ) :
-    0 ≤ a ⬝ᵥ (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a) := by
+theorem quad_nonneg
+    (d : HSMBlockDatum D K ι Ω) (n : ℕ)
+    {r : ℕ} (f : Fin r → MRing ι) (hf : ∀ k, IsMultiHomog (f k) (blockDeg d.k₀ n)) (a : Fin r → ℝ)
+    : 0 ≤ a ⬝ᵥ (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a) := by
   rw [gram_quad d n f hf a]
   have hp : ∀ (w : ℂ) (t : ℝ), 0 ≤ ‖w‖ ^ 2 / t ^ (2 * n) := fun w t =>
     div_nonneg (sq_nonneg _) (by rw [pow_mul']; exact sq_nonneg _)
-  have := integral_nonneg (μ := d.dV)
-    (f := fun x => ‖comb f a (blockPt d x)‖ ^ 2 / d.A.h (blockPt d x) ^ (2 * n)) fun x => hp _ _
-  have := integral_nonneg (μ := d.dV)
-    (f := fun x => ‖comb f a (conjPt (blockPt d x))‖ ^ 2 / d.A.h (conjPt (blockPt d x)) ^ (2 * n))
-    fun x => hp _ _
+  have :=
+    integral_nonneg (μ := d.dV)
+      (f := fun x => ‖comb f a (blockPt d x)‖ ^ 2 / d.A.h (blockPt d x) ^ (2 * n))
+      fun x => hp _ _
+  have :=
+    integral_nonneg (μ := d.dV)
+      (f := fun x => ‖comb f a (conjPt (blockPt d x))‖ ^ 2 / d.A.h (conjPt (blockPt d x)) ^ (2 * n))
+      fun x => hp _ _
   positivity
 
-theorem quad_le (d d' : HSMBlockDatum D K ι Ω) (hy : d'.y = d.y) (hk : d'.k₀ = d.k₀) (hA : d'.A = d.A) (n : ℕ)
-    {r : ℕ} (f : Fin r → MRing ι) (hf : ∀ k, IsMultiHomog (f k) (blockDeg d.k₀ n)) {c : ℝ} (hc : 0 < c)
-    (hsup : ∀ F : MRing ι, IsMultiHomog F (blockDeg d.k₀ n) → ∀ z ∈ mcPts (mCoordIdeal d.y),
-      ‖eval z (map (Int.castRingHom ℂ) F)‖ / d.A.h z ^ n ≤ c * blockL2Norm d n F) (a : Fin r → ℝ) :
-    a ⬝ᵥ (blockGram d' n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a) ≤
-      c ^ 2 * (a ⬝ᵥ (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a)) := by
+theorem quad_le
+    (d d' : HSMBlockDatum D K ι Ω) (hy : d'.y = d.y) (hk : d'.k₀ = d.k₀) (hA : d'.A = d.A)
+    (n : ℕ)
+    {r : ℕ} (f : Fin r → MRing ι) (hf : ∀ k, IsMultiHomog (f k) (blockDeg d.k₀ n))
+    {c : ℝ} (hc : 0 < c)
+    (hsup : ∀ F : MRing ι,
+      IsMultiHomog F (blockDeg d.k₀ n)
+        → ∀ z ∈ mcPts (mCoordIdeal d.y),
+          ‖eval z (map (Int.castRingHom ℂ) F)‖ / d.A.h z ^ n ≤ c * blockL2Norm d n F)
+    (a : Fin r → ℝ)
+    : a ⬝ᵥ (blockGram d' n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a)
+      ≤ c ^ 2 * (a ⬝ᵥ (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j)) *ᵥ a)) := by
   have hf' : ∀ k, IsMultiHomog (f k) (blockDeg d'.k₀ n) := fun k => by rw [hk]; exact hf k
   have := d'.vol.1
   have hQ := quad_nonneg d n f hf a
@@ -77,8 +100,10 @@ theorem quad_le (d d' : HSMBlockDatum D K ι Ω) (hy : d'.y = d.y) (hk : d'.k₀
   have i2 := integral_le_of_le d'.dV (fun x => hp _ _) fun x => hpt _ (conjPt_mem_mcPts (hmem x))
   linarith
 
-theorem det_le {r : ℕ} {G G' : Matrix (Fin r) (Fin r) ℝ} (hG : G.IsHermitian) (hG' : G'.PosSemidef) {c : ℝ}
-    (h : ∀ a, a ⬝ᵥ (G' *ᵥ a) ≤ c * (a ⬝ᵥ (G *ᵥ a))) : G'.det ≤ c ^ r * G.det := by
+theorem det_le
+    {r : ℕ} {G G' : Matrix (Fin r) (Fin r) ℝ} (hG : G.IsHermitian) (hG' : G'.PosSemidef)
+    {c : ℝ} (h : ∀ a, a ⬝ᵥ (G' *ᵥ a) ≤ c * (a ⬝ᵥ (G *ᵥ a)))
+    : G'.det ≤ c ^ r * G.det := by
   have hH : (c • G - G').IsHermitian := by
     refine Matrix.IsHermitian.ext fun i j => ?_
     have e1 := hG.apply i j
@@ -94,7 +119,6 @@ theorem det_le {r : ℕ} {G G' : Matrix (Fin r) (Fin r) ℝ} (hG : G.IsHermitian
 
 end BlockMeasureChange
 
-
 open BlockMeasureChange in
 theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureChange.Statement := by
   intro D K _ _ ι _ Ω _ _ d d' hy hk hA
@@ -103,8 +127,11 @@ theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureCh
   set L := max C C' with hL
   have hL1 : 1 ≤ L := hC.trans (le_max_left _ _)
 
-  have key : ∀ n : ℕ, 1 ≤ n → |blockChi d' n - blockChi d n| ≤
-      (2 * L ^ 2 * (Real.log L + D)) * ((n : ℝ) ^ D * (1 + Real.log n)) := by
+  have key
+      : ∀ n : ℕ,
+        1 ≤ n
+          → |blockChi d' n - blockChi d n|
+            ≤ (2 * L ^ 2 * (Real.log L + D)) * ((n : ℝ) ^ D * (1 + Real.log n)) := by
     intro n hn
     have hex := exists_isSecBasisM d.y d.k₀ n
     have hb := hex.choose_spec
@@ -116,17 +143,22 @@ theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureCh
       simp only [hbf, aeval_map_int] at this
       exact this
     have hli' : LinearIndependent ℤ fun k => aeval d'.y (f k) := by rw [hy]; exact hli
-    have hsame : ∀ (y' : (Σ k, ι k) → Ω) (k' : K), y' = d.y → k' = d.k₀ →
-        ∀ h : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Σ k, ι k) ℚ), IsSecBasisM y' k' n p.2,
-          h.choose = hex.choose := by
+    have hsame
+        : ∀ (y' : (Σ k, ι k) → Ω) (k' : K),
+          y' = d.y → k' = d.k₀
+            → ∀ h : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Σ k, ι k) ℚ), IsSecBasisM y' k' n p.2,
+              h.choose = hex.choose := by
       rintro _ _ rfl rfl h; rfl
-    have hex' : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Σ k, ι k) ℚ), IsSecBasisM d'.y d'.k₀ n p.2 := by
+    have hex'
+        : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Σ k, ι k) ℚ), IsSecBasisM d'.y d'.k₀ n p.2 := by
       rw [hy, hk]; exact hex
-    have e1 : blockChi d n = -(1 / 2) *
-        Real.log (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j))).det := by
+    have e1
+        : blockChi d n
+          = -(1 / 2) * Real.log (blockGram d n (fun j => map (Int.castRingHom ℚ) (f j))).det := by
       rw [blockChi, dite_eq_left hex, hbf]
-    have e2 : blockChi d' n = -(1 / 2) *
-        Real.log (blockGram d' n (fun j => map (Int.castRingHom ℚ) (f j))).det := by
+    have e2
+        : blockChi d' n
+          = -(1 / 2) * Real.log (blockGram d' n (fun j => map (Int.castRingHom ℚ) (f j))).det := by
       rw [blockChi, dite_eq_left hex', hsame _ _ hy hk hex', hbf]
     set G := blockGram d n (fun j => map (Int.castRingHom ℚ) (f j))
     set G' := blockGram d' n (fun j => map (Int.castRingHom ℚ) (f j))
@@ -137,8 +169,7 @@ theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureCh
       rw [hs, ← Real.rpow_natCast _ 2, ← Real.rpow_mul (by positivity), ← Real.rpow_natCast]
       congr 1
       ring
-    have hlogs : Real.log s = (D / 2) * Real.log n := by
-      rw [hs, Real.log_rpow (by positivity)]
+    have hlogs : Real.log s = (D / 2) * Real.log n := by rw [hs, Real.log_rpow (by positivity)]
     set c := C * s
     set c' := C' * s
     have hc : 1 ≤ c := one_le_mul_of_one_le_of_one_le hC hs1
@@ -174,7 +205,8 @@ theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureCh
     have hrb : (hex.choose.1 : ℝ) ≤ 2 * L ^ 2 * (n : ℝ) ^ D := by
       have : c ^ 2 ≤ L ^ 2 * (n : ℝ) ^ D := by
         rw [mul_pow, hs2]
-        exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (by linarith) (le_max_left _ _) 2) (by positivity)
+        exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (by linarith) (le_max_left _ _) 2)
+          (by positivity)
       linarith
     rw [Real.log_pow] at l1 l2
     push_cast at l1 l2
@@ -187,24 +219,29 @@ theorem BlockMeasureChange.proof (hS : SupBoundBlock.Statement) : BlockMeasureCh
     have hlL : 0 ≤ Real.log L := Real.log_nonneg hL1
     have hnD : 0 ≤ (n : ℝ) ^ D := by positivity
     refine hdiff.trans ?_
-    calc (hex.choose.1 : ℝ) * (Real.log L + D * Real.log n)
-        ≤ (2 * L ^ 2 * (n : ℝ) ^ D) * (Real.log L + D * Real.log n) :=
-          mul_le_mul_of_nonneg_right hrb (by positivity)
+    calc
+      (hex.choose.1 : ℝ) * (Real.log L + D * Real.log n)
+          ≤ (2 * L ^ 2 * (n : ℝ) ^ D) * (Real.log L + D * Real.log n) :=
+        mul_le_mul_of_nonneg_right hrb (by positivity)
       _ ≤ (2 * L ^ 2 * (Real.log L + D)) * ((n : ℝ) ^ D * (1 + Real.log n)) := by
-          have : Real.log L + D * Real.log n ≤ (Real.log L + D) * (1 + Real.log n) := by
-            have h3 : 0 ≤ Real.log L * Real.log n := mul_nonneg hlL hln
-            have h4 : (0 : ℝ) ≤ D := Nat.cast_nonneg _
-            have e : (Real.log L + D) * (1 + Real.log n) =
-                Real.log L + D * Real.log n + (D + Real.log L * Real.log n) := by ring
-            rw [e]
-            linarith
-          calc (2 * L ^ 2 * (n : ℝ) ^ D) * (Real.log L + D * Real.log n)
+        have : Real.log L + D * Real.log n ≤ (Real.log L + D) * (1 + Real.log n) := by
+          have h3 : 0 ≤ Real.log L * Real.log n := mul_nonneg hlL hln
+          have h4 : (0 : ℝ) ≤ D := Nat.cast_nonneg _
+          have e
+              : (Real.log L + D) * (1 + Real.log n)
+                = Real.log L + D * Real.log n + (D + Real.log L * Real.log n) := by
+            ring
+          rw [e]
+          linarith
+        calc
+          (2 * L ^ 2 * (n : ℝ) ^ D) * (Real.log L + D * Real.log n)
               ≤ (2 * L ^ 2 * (n : ℝ) ^ D) * ((Real.log L + D) * (1 + Real.log n)) :=
-                mul_le_mul_of_nonneg_left this (by positivity)
-            _ = _ := by ring
+            mul_le_mul_of_nonneg_left this (by positivity)
+          _ = _ := by ring
 
-  have hO : (fun n : ℕ => blockChi d' n - blockChi d n) =O[atTop]
-      fun n : ℕ => (n : ℝ) ^ D * (1 + Real.log n) := by
+  have hO
+      : (fun n : ℕ => blockChi d' n - blockChi d n) =O[atTop]
+        fun n : ℕ => (n : ℝ) ^ D * (1 + Real.log n) := by
     refine IsBigO.of_bound (2 * L ^ 2 * (Real.log L + D)) (eventually_atTop.2 ⟨1, fun n hn => ?_⟩)
     rw [Real.norm_eq_abs, Real.norm_eq_abs]
     refine (key n hn).trans (le_of_eq ?_)

@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open NumberField Polynomial
 
-theorem subalgebra_isAlgebraic_int {K : Type} [Field K] [NumberField K] (O : Subalgebra ℤ K)
-    (y : O) : IsAlgebraic ℤ y := by
+theorem subalgebra_isAlgebraic_int {K : Type} [Field K] [NumberField K] (O : Subalgebra ℤ K) (y : O)
+    : IsAlgebraic ℤ y := by
   have := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
   have hK : IsAlgebraic ℤ (y : K) :=
     ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) (y : K))).restrictScalars (R := ℤ)
@@ -22,8 +22,7 @@ theorem SubringPrimeMaximal.proof : SubringPrimeMaximal.Statement := by
   intro K _ _ O q hq hq0
   obtain ⟨b, hbq, hb0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hq0
   set J : Ideal ℤ := q.comap (algebraMap ℤ O) with hJ
-  have hJ0 : J ≠ ⊥ :=
-    Ideal.comap_ne_bot_of_algebraic_mem hb0 hbq (subalgebra_isAlgebraic_int O b)
+  have hJ0 : J ≠ ⊥ := Ideal.comap_ne_bot_of_algebraic_mem hb0 hbq (subalgebra_isAlgebraic_int O b)
   have hJp : J.IsPrime := Ideal.comap_isPrime _ _
   have hJm : J.IsMaximal := hJp.isMaximal hJ0
   let _ : Field (ℤ ⧸ J) := Ideal.Quotient.field J
@@ -41,8 +40,7 @@ theorem SubringPrimeMaximal.proof : SubringPrimeMaximal.Statement := by
       have hdvd : C g ∣ Q := by
         rw [C_dvd_iff_dvd_coeff]
         intro i
-        have : Q.coeff i ∈ J := by
-          rw [← Ideal.Quotient.eq_zero_iff_mem, ← coeff_map, h, coeff_zero]
+        have : Q.coeff i ∈ J := by rw [← Ideal.Quotient.eq_zero_iff_mem, ← coeff_map, h, coeff_zero]
         rw [hg, Submodule.mem_span_singleton] at this
         obtain ⟨a, ha⟩ := this
         exact ⟨a, by rw [← ha, smul_eq_mul, mul_comm]⟩
@@ -52,8 +50,10 @@ theorem SubringPrimeMaximal.proof : SubringPrimeMaximal.Statement := by
       exact hu
     refine IsAlgebraic.isIntegral ⟨Q.map (Ideal.Quotient.mk J), hQmap, ?_⟩
     have e : Q.map (Ideal.Quotient.mk J) = Q.map (algebraMap ℤ (ℤ ⧸ J)) := rfl
-    rw [e, aeval_def, eval₂_map, show (algebraMap (ℤ ⧸ J) (O ⧸ q)).comp (algebraMap ℤ (ℤ ⧸ J)) =
-      algebraMap ℤ (O ⧸ q) from RingHom.ext_int _ _, ← aeval_def]
+    rw [e, aeval_def, eval₂_map,
+      show (algebraMap (ℤ ⧸ J) (O ⧸ q)).comp (algebraMap ℤ (ℤ ⧸ J)) = algebraMap ℤ (O ⧸ q) from
+        RingHom.ext_int _ _,
+      ← aeval_def]
     have := aeval_algHom_apply (Ideal.Quotient.mkₐ ℤ q) y Q
     rw [Ideal.Quotient.mkₐ_eq_mk] at this
     rw [this, hQy, map_zero]

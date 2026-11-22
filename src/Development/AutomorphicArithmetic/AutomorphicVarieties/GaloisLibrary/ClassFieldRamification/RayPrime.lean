@@ -10,12 +10,15 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-private theorem rayPrime_span (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ) (hp : p.Prime)
-    (hv : (p : 𝓞 ℚ) ∈ v.asIdeal) : v.asIdeal = Ideal.span {(p : 𝓞 ℚ)} :=
+private theorem rayPrime_span
+    (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ) (hp : p.Prime) (hv : (p : 𝓞 ℚ) ∈ v.asIdeal)
+    : v.asIdeal = Ideal.span {(p : 𝓞 ℚ)} :=
   _root_.UpperTheory.Reformulated.B.Qi16.rayPrime_span v p hp hv
 
-theorem UpperTheory.V.CF.rayPrime :
-    ∀ (𝔪 : GroundTheory.Global.Modulus ℚ) (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ), p.Prime → (p : 𝓞 ℚ) ∈ v.asIdeal → p ≡ 1 [MOD Ideal.absNorm 𝔪.ideal] → ∃ hv : ¬ v.asIdeal ∣ 𝔪.ideal, 𝔪.primeClass hv = 1 := by
+theorem UpperTheory.V.CF.rayPrime
+    : ∀ (𝔪 : GroundTheory.Global.Modulus ℚ) (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ),
+      p.Prime → (p : 𝓞 ℚ) ∈ v.asIdeal → p ≡ 1 [MOD Ideal.absNorm 𝔪.ideal]
+        → ∃ hv : ¬ v.asIdeal ∣ 𝔪.ideal, 𝔪.primeClass hv = 1 := by
   intro 𝔪 v p hp hpv hmod
   have hm : (p : 𝓞 ℚ) - 1 ∈ 𝔪.ideal := by
     obtain ⟨c, hc⟩ := (Nat.modEq_iff_dvd' hp.one_le).1 hmod.symm

@@ -12,10 +12,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Cj.A UpperTheory.V.Lit UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Geo
 
-private theorem van_dOm {Γ V S I : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ}
-    (G : Dr.Geo Γ V S d) (C : I → S → Set V) (F : S → Set V) (hC : ∀ i s, IsOpen (C i s))
-    (hF : ∀ s, IsOpen (F s)) {q : ℕ} (k : ℕ) (b : List I → G.Om q) (hb : Van G C F k b) :
-    Van G C F k (fun x => G.dOm q (b x)) := by
+private theorem van_dOm
+    {Γ V S I : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {d : ℕ} (G : Dr.Geo Γ V S d)
+    (C : I → S → Set V) (F : S → Set V) (hC : ∀ i s, IsOpen (C i s)) (hF : ∀ s, IsOpen (F s))
+    {q : ℕ} (k : ℕ) (b : List I → G.Om q) (hb : Van G C F k b)
+    : Van G C F k (fun x => G.dOm q (b x)) := by
   intro x hx s p hp hxC
   beta_reduce
   by_cases hY : p ∈ G.Y
@@ -29,8 +31,7 @@ private theorem van_dOm {Γ V S I : Type} [Group Γ] [NormedAddCommGroup V] [Nor
     exact map_zero (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ V (Fin d → ℂ))
   · exact ((G.dOm q (b x)).2 s).2 p hY
 
-theorem UpperTheory.V.Cj.A.zigBwd :
-    ZigBwd := by
+theorem UpperTheory.V.Cj.A.zigBwd : ZigBwd := by
   intro Γ V S I _ _ _ _ _ d G hY hne φ hφ C F hC hF hφC n c hc hdc hvc q
   obtain ⟨-, -, -, hhom, -, -⟩ := hdFacts
   obtain ⟨hi1, -, hi3⟩ := inclFacts Γ V S d G hY hne
@@ -38,8 +39,14 @@ theorem UpperTheory.V.Cj.A.zigBwd :
   | zero =>
     intro k hk
     obtain rfl : k = n := by omega
-    refine ⟨fun x => G.incl (c x), fun x _ => rfl, fun γ x hx => ?_, fun x _ => hi3.apply_apply_eq_zero _,
-      fun x hx => ?_, fun x hx s p _ hp => ?_⟩
+    refine ⟨
+      fun x => G.incl (c x),
+      fun x _ => rfl,
+      fun γ x hx => ?_,
+      fun x _ => hi3.apply_apply_eq_zero _,
+      fun x hx => ?_,
+      fun x hx s p _ hp => ?_
+    ⟩
     · beta_reduce
       rw [hc γ x hx, hi1]
     · refine (hhom I _ _ G.incl.toAddMonoidHom c x).trans ?_
@@ -53,9 +60,14 @@ theorem UpperTheory.V.Cj.A.zigBwd :
     intro k hk
     obtain ⟨u, hz, hu, hdu, hhu, hvu⟩ := ih (k + 1) (by omega)
     obtain ⟨b, hb, hhb, hvb⟩ := bwdStep Γ V S I d G φ hφ C F hφC q k u hu hhu hvu
-    refine ⟨fun x => G.dOm q (b x), ⟨b, hb, fun _ _ => rfl, ?_⟩, fun γ x hx => ?_,
-      fun x _ => (dExact Γ V S d G hY q).apply_apply_eq_zero _, fun x hx => ?_,
-      van_dOm G C F hC.isOpen hF k b hvb⟩
+    refine ⟨
+      fun x => G.dOm q (b x),
+      ⟨b, hb, fun _ _ => rfl, ?_⟩,
+      fun γ x hx => ?_,
+      fun x _ => (dExact Γ V S d G hY q).apply_apply_eq_zero _,
+      fun x hx => ?_,
+      van_dOm G C F hC.isOpen hF k b hvb
+    ⟩
     · exact (zigFormal Γ V S I d G).1 q (k + 1) u (hd b) c (fun x hx => (hhb x hx).symm) hz
     · beta_reduce
       rw [hb γ x hx, dEquiv]

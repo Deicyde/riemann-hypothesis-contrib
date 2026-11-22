@@ -6,14 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedOrbit
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
 open scoped Classical
 
 namespace GlobalTheory.OrbWeights
 
-theorem mem_stabLat_iff_mulLat_eq {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
-    (t : Aˣ) (L : Submodule O A) :
-    t ∈ GlobalTheory.UnitLemma.stabLat O L ↔ GlobalTheory.UnitLemma.mulLat O (t : A) L = L := by
+theorem mem_stabLat_iff_mulLat_eq
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (t : Aˣ) (L : Submodule O A)
+    : t ∈ GlobalTheory.UnitLemma.stabLat O L ↔ GlobalTheory.UnitLemma.mulLat O (t : A) L = L := by
   constructor
   · intro ht
     apply le_antisymm
@@ -42,17 +43,35 @@ theorem mem_stabLat_iff_mulLat_eq {O A : Type} [CommRing O] [CommRing A] [Algebr
       rw [← this]
       exact hz
 
-theorem relIndex_stab_eq_relIndex_stabLat : ∀ {G : Type} [Group G] [TopologicalSpace G] (Kg : Subgroup G) (δ : G) {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (Tb : Subgroup Aˣ) (M : G → Submodule O A) (τ : G → Aˣ), (∀ g k : G, k ∈ Kg → M (g * k) = M g) → (∀ g g' : G, M g = M g' → g⁻¹ * g' ∈ Kg) → (∀ h ∈ twCent (MonoidHom.id G) δ, τ h ∈ Tb ∧ ∀ g : G, M (h * g) = GlobalTheory.UnitLemma.mulLat O (τ h : A) (M g)) → (∀ s ∈ Tb, ∃ h ∈ twCent (MonoidHom.id G) δ, τ h = s) → (∀ h ∈ twCent (MonoidHom.id G) δ, ∀ h' ∈ twCent (MonoidHom.id G) δ, τ (h * h') = τ h * τ h') → (∀ h ∈ twCent (MonoidHom.id G) δ, ∀ h' ∈ twCent (MonoidHom.id G) δ, τ h = τ h' → h = h') → (∀ h ∈ twCent (MonoidHom.id G) δ, h ∈ cptPart (twCent (MonoidHom.id G) δ) ↔ τ h ∈ GlobalTheory.UnitLemma.intUnits O A) → ∀ g : G, (twCent (MonoidHom.id G) δ ⊓ Kg.map (MulAut.conj g).toMonoidHom).relIndex (cptPart (twCent (MonoidHom.id G) δ)) = (GlobalTheory.UnitLemma.stabLat O (M g) ⊓ Tb).relIndex (GlobalTheory.UnitLemma.intUnits O A ⊓ Tb) := by
+theorem relIndex_stab_eq_relIndex_stabLat
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] (Kg : Subgroup G) (δ : G) {O A : Type}
+        [CommRing O] [CommRing A] [Algebra O A] (Tb : Subgroup Aˣ) (M : G → Submodule O A)
+        (τ : G → Aˣ),
+      (∀ g k : G, k ∈ Kg → M (g * k) = M g) → (∀ g g' : G, M g = M g' → g⁻¹ * g' ∈ Kg)
+        → (∀ h ∈ twCent (MonoidHom.id G) δ,
+          τ h ∈ Tb ∧ ∀ g : G, M (h * g) = GlobalTheory.UnitLemma.mulLat O (τ h : A) (M g))
+        → (∀ s ∈ Tb, ∃ h ∈ twCent (MonoidHom.id G) δ, τ h = s)
+        → (∀ h ∈ twCent (MonoidHom.id G) δ, ∀ h' ∈ twCent (MonoidHom.id G) δ,
+          τ (h * h') = τ h * τ h')
+        → (∀ h ∈ twCent (MonoidHom.id G) δ, ∀ h' ∈ twCent (MonoidHom.id G) δ, τ h = τ h' → h = h')
+        → (∀ h ∈ twCent (MonoidHom.id G) δ,
+          h ∈ cptPart (twCent (MonoidHom.id G) δ) ↔ τ h ∈ GlobalTheory.UnitLemma.intUnits O A)
+        → ∀ g : G,
+          (twCent (MonoidHom.id G) δ ⊓ Kg.map (MulAut.conj g).toMonoidHom).relIndex
+              (cptPart (twCent (MonoidHom.id G) δ))
+            = (GlobalTheory.UnitLemma.stabLat O (M g) ⊓ Tb).relIndex
+              (GlobalTheory.UnitLemma.intUnits O A ⊓ Tb) := by
   intro G _ _ Kg δ O A _ _ _ Tb M τ hK hM hτ hsurj hmul hinj hcpt g
   set T := twCent (MonoidHom.id G) δ with hT
   have hone : τ 1 = 1 := by
     have := hmul 1 T.one_mem 1 T.one_mem
     rw [one_mul] at this
     exact (mul_eq_left.mp this.symm)
-  let φ : T →* Aˣ :=
-    { toFun := fun h => τ h
-      map_one' := hone
-      map_mul' := fun a b => hmul a a.2 b b.2 }
+  let φ : T →* Aˣ := {
+    toFun := fun h => τ h
+    map_one' := hone
+    map_mul' := fun a b => hmul a a.2 b b.2
+  }
   have hφ : ∀ x : T, φ x = τ x := fun _ => rfl
   have hinjφ : Function.Injective φ := fun a b hab => Subtype.ext (hinj a a.2 b b.2 hab)
   have hCT : cptPart T ≤ T := by

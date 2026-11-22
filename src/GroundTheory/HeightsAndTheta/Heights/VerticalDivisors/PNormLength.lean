@@ -15,21 +15,23 @@ noncomputable section
 
 section NormLength
 
-variable {R B : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing B]
-  [Algebra R B] [Module.Free R B] [Module.Finite R B]
+variable
+  {R B : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing B] [Algebra R B]
+  [Module.Free R B] [Module.Finite R B]
 
-theorem ord_prod {ι : Type*} (s : Finset ι) (a : ι → R) (ha : ∀ i ∈ s, a i ≠ 0) :
-    Ring.ord R (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord R (a i) := by
+theorem ord_prod {ι : Type*} (s : Finset ι) (a : ι → R) (ha : ∀ i ∈ s, a i ≠ 0)
+    : Ring.ord R (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord R (a i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert j s hj ih =>
-    rw [Finset.prod_insert hj, Finset.sum_insert hj, Ring.ord_mul, ih fun i hi => ha i (by simp [hi])]
-    exact mem_nonZeroDivisors_of_ne_zero
-      (Finset.prod_ne_zero_iff.mpr fun i hi => ha i (by simp [hi]))
+    rw [Finset.prod_insert hj, Finset.sum_insert hj, Ring.ord_mul,
+      ih fun i hi => ha i (by simp [hi])]
+    exact mem_nonZeroDivisors_of_ne_zero (Finset.prod_ne_zero_iff.mpr fun i hi =>
+      ha i (by simp [hi]))
 
-theorem ord_norm_eq_length {b : B} (hb : Function.Injective (fun x : B => b * x)) :
-    Ring.ord R (Algebra.norm R b) = Module.length R (B ⧸ Ideal.span {b}) := by
+theorem ord_norm_eq_length {b : B} (hb : Function.Injective (fun x : B => b * x))
+    : Ring.ord R (Algebra.norm R b) = Module.length R (B ⧸ Ideal.span {b}) := by
   classical
   let bs := Module.Free.chooseBasis R B
   let ι := Module.Free.ChooseBasisIndex R B

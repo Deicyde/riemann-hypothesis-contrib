@@ -20,12 +20,13 @@ theorem one_parameter_differentiable : Formalism.FourierDecayAlt.Qr.OneParamDiff
     rwa [dist_eq_norm, h0] at this
   set h : ℝ := δ / 2 with hh
   have hpos : 0 < h := by positivity
-  have hint : ∀ a b : ℝ, IntervalIntegrable φ MeasureTheory.volume a b := fun a b => hc.intervalIntegrable a b
+  have hint : ∀ a b : ℝ, IntervalIntegrable φ MeasureTheory.volume a b := fun a b =>
+    hc.intervalIntegrable a b
   set M : W →L[ℂ] W := ∫ s in (0 : ℝ)..h, φ s with hM
   have hbound : ‖M - h • (1 : W →L[ℂ] W)‖ ≤ 1 / 2 * |h - 0| := by
     have e : M - h • (1 : W →L[ℂ] W) = ∫ s in (0 : ℝ)..h, (φ s - 1) := by
-      rw [intervalIntegral.integral_sub (hint 0 h) intervalIntegrable_const, intervalIntegral.integral_const,
-        sub_zero]
+      rw [intervalIntegral.integral_sub (hint 0 h) intervalIntegrable_const,
+        intervalIntegral.integral_const, sub_zero]
     rw [e]
     apply intervalIntegral.norm_integral_le_of_norm_le_const
     intro s hs
@@ -38,9 +39,12 @@ theorem one_parameter_differentiable : Formalism.FourierDecayAlt.Qr.OneParamDiff
     have e : tt = h⁻¹ • (h • (1 : W →L[ℂ] W) - M) := by
       rw [htt, smul_sub, smul_smul, inv_mul_cancel₀ hpos.ne', one_smul]
     rw [e, norm_smul, norm_sub_rev, Real.norm_eq_abs, abs_inv, abs_of_pos hpos]
-    calc h⁻¹ * ‖M - h • (1 : W →L[ℂ] W)‖ ≤ h⁻¹ * (1 / 2 * |h - 0|) := by gcongr
+    calc
+      h⁻¹ * ‖M - h • (1 : W →L[ℂ] W)‖
+        ≤ h⁻¹ * (1 / 2 * |h - 0|) := by gcongr
       _ = 1 / 2 := by
-        rw [sub_zero, abs_of_pos hpos, ← mul_assoc, mul_comm h⁻¹, mul_assoc, inv_mul_cancel₀ hpos.ne', mul_one]
+        rw [sub_zero, abs_of_pos hpos, ← mul_assoc, mul_comm h⁻¹, mul_assoc,
+          inv_mul_cancel₀ hpos.ne', mul_one]
       _ < 1 := by norm_num
   let u0 := Units.oneSub tt hnorm
   have hu0 : (u0 : W →L[ℂ] W) = h⁻¹ • M := by
@@ -59,8 +63,8 @@ theorem one_parameter_differentiable : Formalism.FourierDecayAlt.Qr.OneParamDiff
   have hφ : φ = fun t => (h⁻¹ • G t) * (↑u0⁻¹ : W →L[ℂ] W) := by
     funext t
     rw [← hφM t, ← mul_smul_comm, ← hu0, Units.mul_inv_cancel_right]
-  have hF : ∀ x, HasDerivAt (fun u => ∫ s in (0 : ℝ)..u, φ s) (φ x) x :=
-    fun x => (hc.integral_hasStrictDerivAt 0 x).hasDerivAt
+  have hF : ∀ x, HasDerivAt (fun u => ∫ s in (0 : ℝ)..u, φ s) (φ x) x := fun x =>
+    (hc.integral_hasStrictDerivAt 0 x).hasDerivAt
   refine ⟨(h⁻¹ • (φ h - 1)) * (↑u0⁻¹ : W →L[ℂ] W), fun t => ?_⟩
   have hGd : HasDerivAt G (φ (t + h) - φ t) t := ((hF (t + h)).comp_add_const t h).sub (hF t)
   let R : (W →L[ℂ] W) →L[ℝ] (W →L[ℂ] W) :=
@@ -72,7 +76,8 @@ theorem one_parameter_differentiable : Formalism.FourierDecayAlt.Qr.OneParamDiff
     rfl
   have e2 : φ t ∘SL ((h⁻¹ • (φ h - 1)) * (↑u0⁻¹ : W →L[ℂ] W)) = R (h⁻¹ • (φ (t + h) - φ t)) := by
     show φ t * ((h⁻¹ • (φ h - 1)) * (↑u0⁻¹ : W →L[ℂ] W)) = (h⁻¹ • (φ (t + h) - φ t)) * (↑u0⁻¹ : W →L[ℂ] W)
-    rw [hmul t h, show φ t * φ h - φ t = φ t * (φ h - 1) by rw [mul_sub, mul_one], ← mul_smul_comm, mul_assoc]
+    rw [hmul t h, show φ t * φ h - φ t = φ t * (φ h - 1) by rw [mul_sub, mul_one], ← mul_smul_comm,
+      mul_assoc]
   rw [e2]
   exact hd.congr_of_eventuallyEq (Filter.Eventually.of_forall e)
 

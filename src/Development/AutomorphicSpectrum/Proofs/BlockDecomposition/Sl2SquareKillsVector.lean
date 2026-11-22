@@ -7,15 +7,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCliff
 
 open Matrix Finset
 open scoped InnerProductSpace
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.RealCount
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  GlobalTheory.CompanionTheory.RealCount
 
 namespace GlobalTheory.CompanionTheory.RealCount
 
-theorem sl2_square_kills : ∀ {n : ℕ} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
-    (E : Fin n → Fin n → Module.End ℂ Z), Formalism.REAL.GlRel E →
-    (∀ x y (f g : Z), ⟪E x y f, g⟫_ℂ = ⟪f, E y x g⟫_ℂ) → ∀ {i j : Fin n}, i ≠ j → ∀ {a : Z}, a ≠ 0 →
-    ∀ {p r : ℝ}, E i i a = (p : ℂ) • a → E j j a = (r : ℂ) • a → (∃ m : ℤ, p - r = m) → -1 ≤ p - r →
-    (E i j a = 0 ∨ E j i a = 0) → ((E i j) ^ 2) a = 0 := by
+theorem sl2_square_kills
+    : ∀ {n : ℕ} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
+        (E : Fin n → Fin n → Module.End ℂ Z),
+      Formalism.REAL.GlRel E → (∀ x y (f g : Z), ⟪E x y f, g⟫_ℂ = ⟪f, E y x g⟫_ℂ)
+        → ∀ {i j : Fin n},
+          i ≠ j
+            → ∀ {a : Z},
+              a ≠ 0
+                → ∀ {p r : ℝ},
+                  E i i a = (p : ℂ) • a → E j j a = (r : ℂ) • a → (∃ m : ℤ, p - r = m) → -1 ≤ p - r
+                    → (E i j a = 0 ∨ E j i a = 0)
+                    → ((E i j) ^ 2) a = 0 := by
   intro n Z _ _ E hG hA i j hij a ha p r hp hr hm hd hor
   have hji : j ≠ i := hij.symm
   have c1 : ∀ v, E i j (E j i v) - E j i (E i j v) = E i i v - E j j v := by
@@ -30,8 +38,7 @@ theorem sl2_square_kills : ∀ {n : ℕ} {Z : Type} [NormedAddCommGroup Z] [Inne
     intro v
     have h := LinearMap.congr_fun (hG j j i j) v
     simpa [Module.End.mul_apply, hji] using h
-  have hsq : ((E i j) ^ 2) a = E i j (E i j a) := by
-    simp [pow_two, Module.End.mul_apply]
+  have hsq : ((E i j) ^ 2) a = E i j (E i j a) := by simp [pow_two, Module.End.mul_apply]
   rw [hsq]
   rcases hor with h | h
   · simp [h]
@@ -40,8 +47,7 @@ theorem sl2_square_kills : ∀ {n : ℕ} {Z : Type} [NormedAddCommGroup Z] [Inne
     rw [h, map_zero, hp, hr, zero_sub] at h1
     rw [sub_smul, ← neg_sub ((p : ℂ) • a), ← h1, neg_neg]
   have hn : ‖E i j a‖ ^ 2 = (r - p) * ‖a‖ ^ 2 := by
-    have h1 : ⟪E i j a, E i j a⟫_ℂ = ((r : ℂ) - p) * ⟪a, a⟫_ℂ := by
-      rw [hA, hYX, inner_smul_right]
+    have h1 : ⟪E i j a, E i j a⟫_ℂ = ((r : ℂ) - p) * ⟪a, a⟫_ℂ := by rw [hA, hYX, inner_smul_right]
     rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K] at h1
     have h2 : (((‖E i j a‖ ^ 2 : ℝ)) : ℂ) = (((r - p) * ‖a‖ ^ 2 : ℝ) : ℂ) := by
       push_cast
@@ -83,15 +89,12 @@ theorem sl2_square_kills : ∀ {n : ℕ} {Z : Type} [NormedAddCommGroup Z] [Inne
     have hY2 : E j i (E i j (E i j a)) = 0 := by
       have h1 := c1 (E i j a)
       rw [hYX', e1, e2] at h1
-      have h2 : E j i (E i j (E i j a)) =
-          (1 - (((p : ℂ) + 1) - ((r : ℂ) - 1))) • E i j a := by
+      have h2 : E j i (E i j (E i j a)) = (1 - (((p : ℂ) + 1) - ((r : ℂ) - 1))) • E i j a := by
         rw [sub_smul, sub_smul, one_smul, ← h1]
         abel
-      have h3 : (1 - (((p : ℂ) + 1) - ((r : ℂ) - 1))) = 0 := by
-        linear_combination hprC
+      have h3 : (1 - (((p : ℂ) + 1) - ((r : ℂ) - 1))) = 0 := by linear_combination hprC
       rw [h2, h3, zero_smul]
-    have h4 : ⟪E i j (E i j a), E i j (E i j a)⟫_ℂ = 0 := by
-      rw [hA, hY2, inner_zero_right]
+    have h4 : ⟪E i j (E i j a), E i j (E i j a)⟫_ℂ = 0 := by rw [hA, hY2, inner_zero_right]
     exact inner_self_eq_zero.mp h4
 
 end GlobalTheory.CompanionTheory.RealCount

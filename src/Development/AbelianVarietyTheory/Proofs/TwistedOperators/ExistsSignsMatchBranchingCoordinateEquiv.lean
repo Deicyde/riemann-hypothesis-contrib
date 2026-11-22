@@ -19,9 +19,11 @@ private def optSumLeft (α β : Type) : Option (α ⊕ β) ≃ Option α ⊕ β 
   left_inv := by rintro (_ | _ | _) <;> rfl
   right_inv := by rintro ((_ | _) | _) <;> rfl
 
-theorem exists_signs_equiv {n : ℕ} (ε : Fin (n + 1) → Bool) (ε' : Fin n → Bool)
-    (h : (Finset.univ.filter fun a => ε a = false).card = (Finset.univ.filter fun i => ε' i = false).card) :
-    ∃ e : Option (Fin n) ≃ Fin (n + 1), Signs e ε ε' := by
+theorem exists_signs_equiv
+    {n : ℕ} (ε : Fin (n + 1) → Bool) (ε' : Fin n → Bool)
+    (h : (Finset.univ.filter fun a => ε a = false).card
+      = (Finset.univ.filter fun i => ε' i = false).card)
+    : ∃ e : Option (Fin n) ≃ Fin (n + 1), Signs e ε ε' := by
   classical
   have hF : Fintype.card {a // ¬ ε a = true} = Fintype.card {i // ¬ ε' i = true} := by
     rw [Fintype.card_subtype, Fintype.card_subtype]
@@ -37,8 +39,8 @@ theorem exists_signs_equiv {n : ℕ} (ε : Fin (n + 1) → Bool) (ε' : Fin n �
   let eT := Fintype.equivOfCardEq hT
   let eF := Fintype.equivOfCardEq hF
   let e : Option (Fin n) ≃ Fin (n + 1) :=
-    ((Equiv.optionCongr (Equiv.sumCompl fun i => ε' i = true).symm).trans
-      (optSumLeft _ _)).trans ((Equiv.sumCongr eT.symm eF.symm).trans (Equiv.sumCompl fun a => ε a = true))
+    ((Equiv.optionCongr (Equiv.sumCompl fun i => ε' i = true).symm).trans (optSumLeft _ _)).trans
+      ((Equiv.sumCongr eT.symm eF.symm).trans (Equiv.sumCompl fun a => ε a = true))
   refine ⟨e, ?_, ?_⟩
   · show ε ((eT.symm none : {a // ε a = true}) : Fin (n + 1)) = true
     exact (eT.symm none).2

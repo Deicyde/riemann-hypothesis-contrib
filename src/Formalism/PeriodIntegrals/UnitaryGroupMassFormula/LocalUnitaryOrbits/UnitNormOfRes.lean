@@ -10,16 +10,22 @@ noncomputable section
 
 namespace PI.OmLocU.UnN
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix Formalism.UG PI.OmLocU.Orb PI.OmLocU
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix Formalism.UG PI.OmLocU.Orb PI.OmLocU
   PI.OmLocU.Red
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
-theorem tr_nd_field {k K : Type} [Field k] [Field K] [Algebra k K] (σ' : K ≃ₐ[k] K) (hne : σ' ≠ AlgEquiv.refl)
-    (z : K) (hz : z ≠ 0) : ∃ t : K, t * z + σ' (t * z) ≠ 0 := by
+theorem tr_nd_field
+    {k K : Type} [Field k] [Field K] [Algebra k K]
+    (σ' : K ≃ₐ[k] K) (hne : σ' ≠ AlgEquiv.refl)
+    (z : K) (hz : z ≠ 0)
+    : ∃ t : K, t * z + σ' (t * z) ≠ 0 := by
   have hu : ∃ u : K, u + σ' u ≠ 0 := by
     by_contra h
     push_neg at h
@@ -36,8 +42,8 @@ theorem tr_nd_field {k K : Type} [Field k] [Field K] [Algebra k K] (σ' : K ≃�
   rw [mul_assoc, inv_mul_cancel₀ hz, mul_one]
   exact hu
 
-theorem tr_nd_prod {k : Type} [Field k] (z : k × k) (hz : z ≠ 0) :
-    ∃ t : k × k, t * z + (RingEquiv.prodComm (R := k) (S := k)).toRingHom (t * z) ≠ 0 := by
+theorem tr_nd_prod {k : Type} [Field k] (z : k × k) (hz : z ≠ 0)
+    : ∃ t : k × k, t * z + (RingEquiv.prodComm (R := k) (S := k)).toRingHom (t * z) ≠ 0 := by
   by_cases h1 : z.1 = 0
   · have h2 : z.2 ≠ 0 := by
       intro h2
@@ -49,10 +55,15 @@ theorem tr_nd_prod {k : Type} [Field k] (z : k × k) (hz : z ≠ 0) :
     have := congrArg Prod.fst h
     simp [inv_mul_cancel₀ h1] at this
 
-theorem trNd_of_res {K : Type} [CommRing K] (τ : K →+* K) (π : OR (E := E) v →+* K) (hcm : IsCMExt F E σ)
-    {ϖ : Fv F v} (hϖ : IsUnif v ϖ) (hres : IsRes σ v ϖ τ π) (hnd : ∀ z : K, z ≠ 0 → ∃ t : K, t * z + τ (t * z) ≠ 0)
-    (c : Fv F v ⊗[F] E) (hc : c ∈ OEv (E := E) v) (hcn : sc (E := E) v (ϖ⁻¹) * c ∉ OEv (E := E) v) :
-    ∃ t ∈ OEv (E := E) v, IsU v (t * c + sigR (Fv F v) σ (t * c)) := by
+theorem trNd_of_res
+    {K : Type} [CommRing K]
+    (τ : K →+* K)
+    (π : OR (E := E) v →+* K)
+    (hcm : IsCMExt F E σ)
+    {ϖ : Fv F v} (hϖ : IsUnif v ϖ) (hres : IsRes σ v ϖ τ π)
+    (hnd : ∀ z : K, z ≠ 0 → ∃ t : K, t * z + τ (t * z) ≠ 0)
+    (c : Fv F v ⊗[F] E) (hc : c ∈ OEv (E := E) v) (hcn : sc (E := E) v (ϖ⁻¹) * c ∉ OEv (E := E) v)
+    : ∃ t ∈ OEv (E := E) v, IsU v (t * c + sigR (Fv F v) σ (t * c)) := by
   have hv : Valued.v ϖ = WithZero.exp (-1 : ℤ) := hϖ
   have hϖ0 : ϖ ≠ 0 := by
     intro h
@@ -78,8 +89,7 @@ theorem trNd_of_res {K : Type} [CommRing K] (τ : K →+* K) (π : OR (E := E) v
     rw [map_add (f := _), hy, map_mul, htO]
     exact htb
   have hs0 : s ∈ OEv (E := E) v := (tO * cO + yO).2
-  have hsf : sigR (Fv F v) σ s = s := by
-    rw [hs, map_add (f := _), sigR_invol σ v hcm, add_comm]
+  have hsf : sigR (Fv F v) σ s = s := by rw [hs, map_add (f := _), sigR_invol σ v hcm, add_comm]
   refine ⟨tO, ht0, ?_⟩
   obtain ⟨a, ha, hsa⟩ := fix_int σ v hcm hs0 hsf
   rw [← hs, hsa]
@@ -92,7 +102,9 @@ theorem trNd_of_res {K : Type} [CommRing K] (τ : K →+* K) (π : OR (E := E) v
     show s = _
     rw [hsa, sc_eq, sc_eq, sc_eq, ← map_mul]
     exact congrArg _ hd
-  · have ha1 : Valued.v a = 1 := le_antisymm ((HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 F) (K := F) (v := v)).1 ha) (not_lt.1 hva)
+  · have ha1 : Valued.v a = 1 :=
+      le_antisymm ((HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 F) (K := F) (v := v)).1 ha)
+        (not_lt.1 hva)
     have ha0 : a ≠ 0 := by
       intro h
       rw [h, map_zero] at ha1
@@ -106,7 +118,8 @@ theorem trNd_of (hR : ResAlg σ J ψ v) : TrNd σ J ψ v := by
   intro hstd hun ϖ hϖ c hc hcn
   obtain ⟨k, _, _, -, hcase⟩ := hR hstd hun ϖ hϖ
   rcases hcase with ⟨-, K, _, _, σ', π, -, -, hne, hres⟩ | ⟨-, π, hres⟩
-  · exact trNd_of_res σ v (σ' : K →+* K) π hstd.1 hϖ hres (fun z hz => tr_nd_field σ' hne z hz) c hc hcn
+  · exact
+      trNd_of_res σ v (σ' : K →+* K) π hstd.1 hϖ hres (fun z hz => tr_nd_field σ' hne z hz) c hc hcn
   · exact trNd_of_res σ v _ π hstd.1 hϖ hres (fun z hz => tr_nd_prod z hz) c hc hcn
 
 theorem unitNorm_of_res (hR : ResAlg σ J ψ v) : UnitNorm σ J ψ v Λ :=

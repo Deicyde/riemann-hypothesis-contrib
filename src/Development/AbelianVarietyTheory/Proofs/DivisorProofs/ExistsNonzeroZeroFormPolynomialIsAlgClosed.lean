@@ -18,5 +18,4 @@ def CoeffHom (e : ℕ) (p : (MvPolynomial σ k)[X]) : Prop := ∀ j, (p.coeff j)
 
 end TsenCount
 
-
 end GlobalTheory

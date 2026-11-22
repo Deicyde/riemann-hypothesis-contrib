@@ -24,20 +24,25 @@ theorem paU_zero (q : ℕ) (F : EuclideanSpace ℂ ι → ℂ) : paU q 0 F = F :
   funext v
   simp [paU, Hf]
 
-theorem paTh_diff_le (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT ι) {q c : ℕ} {R0 : ℝ}
-    (hq : 1 ≤ q) (hR0 : 0 < R0) (hk0 : Y.ka 0 = 1)
-    (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖)
+theorem paTh_diff_le
+    (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound)
+    (Y : GT ι)
+    {q c : ℕ} {R0 : ℝ} (hq : 1 ≤ q) (hR0 : 0 < R0)
+    (hk0 : Y.ka 0 = 1) (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖)
     (hR : 16 * (2 * (Fintype.card ι : ℝ) + 1) ≤ R0 ^ 2)
-    {F G : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (hG : G ∈ paPoly c) :
-    ‖paIP q (paTh Y q F) G - paIP q F G‖ ≤
-      (2 ^ (1 + 3 * ((Fintype.card ι : ℝ) + c) / 2) *
-        ∑' γ : lat Y.b, (if (γ : EuclideanSpace ℂ ι) = 0 then 0 else
-          Real.exp (-(q * Real.pi) * ‖(γ : EuclideanSpace ℂ ι)‖ ^ 2 / 16))) * paN q F * paN q G := by
+    {F G : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (hG : G ∈ paPoly c)
+    : ‖paIP q (paTh Y q F) G - paIP q F G‖
+      ≤ (2 ^ (1 + 3 * ((Fintype.card ι : ℝ) + c) / 2)
+          * ∑' γ : lat Y.b, (if (γ : EuclideanSpace ℂ ι) = 0 then 0 else
+              Real.exp (-(q * Real.pi) * ‖(γ : EuclideanSpace ℂ ι)‖ ^ 2 / 16)))
+        * paN q F * paN q G := by
   obtain ⟨hBs, -⟩ := paTail hP hA Y hq hR0 hlat hR
   have hT := paTh_IP hP hA Y hq hR0 hlat hR hF hG
   have hg := hT.update 0 0
-  have hf0 : Y.ka ((0 : lat Y.b) : EuclideanSpace ℂ ι) *
-      paIP q (paU q ((0 : lat Y.b) : EuclideanSpace ℂ ι) F) G = paIP q F G := by
+  have hf0
+      : Y.ka ((0 : lat Y.b) : EuclideanSpace ℂ ι)
+          * paIP q (paU q ((0 : lat Y.b) : EuclideanSpace ℂ ι) F) G
+        = paIP q F G := by
     simp [hk0, paU_zero]
   set K : ℝ := 2 ^ (1 + 3 * ((Fintype.card ι : ℝ) + c) / 2) with hK
   set B : lat Y.b → ℝ := fun γ => if (γ : EuclideanSpace ℂ ι) = 0 then 0 else
@@ -56,17 +61,17 @@ theorem paTh_diff_le (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : G
       exact polynomial_translate_innerProduct_bound hq (γ : EuclideanSpace ℂ ι) hF hG
   have hsB : Summable fun γ => K * B γ * paN q F * paN q G :=
     ((hBs.mul_left K).mul_right (paN q F)).mul_right (paN q G)
-  have hsg : Summable fun γ => ‖g γ‖ :=
-    Summable.of_nonneg_of_le (fun _ => norm_nonneg _) hbound hsB
+  have hsg : Summable fun γ => ‖g γ‖ := Summable.of_nonneg_of_le (fun _ => norm_nonneg _) hbound hsB
   have heq : paIP q (paTh Y q F) G - paIP q F G = ∑' γ, g γ := by
     rw [hg.tsum_eq]
     simp only [hf0]
     ring
   rw [heq]
-  calc ‖∑' γ, g γ‖ ≤ ∑' γ, ‖g γ‖ := norm_tsum_le_tsum_norm hsg
+  calc
+    ‖∑' γ, g γ‖
+      ≤ ∑' γ, ‖g γ‖ := norm_tsum_le_tsum_norm hsg
     _ ≤ ∑' γ, K * B γ * paN q F * paN q G := Summable.tsum_le_tsum hbound hsg hsB
-    _ = (K * ∑' γ, B γ) * paN q F * paN q G := by
-      rw [tsum_mul_right, tsum_mul_right, tsum_mul_left]
+    _ = (K * ∑' γ, B γ) * paN q F * paN q G := by rw [tsum_mul_right, tsum_mul_right, tsum_mul_left]
 
 end Asm
 
@@ -76,28 +81,31 @@ variable {ι : Type} [Fintype ι]
 
 open Classical
 
-theorem paU_add (q : ℕ) (a : EuclideanSpace ℂ ι) (F G : EuclideanSpace ℂ ι → ℂ) :
-    paU q a (F + G) = paU q a F + paU q a G := by
+theorem paU_add (q : ℕ) (a : EuclideanSpace ℂ ι) (F G : EuclideanSpace ℂ ι → ℂ)
+    : paU q a (F + G) = paU q a F + paU q a G := by
   funext v
   simp only [paU, Pi.add_apply]
   ring
 
-theorem paU_smul (q : ℕ) (a : EuclideanSpace ℂ ι) (b : ℂ) (F : EuclideanSpace ℂ ι → ℂ) :
-    paU q a (b • F) = b • paU q a F := by
+theorem paU_smul (q : ℕ) (a : EuclideanSpace ℂ ι) (b : ℂ) (F : EuclideanSpace ℂ ι → ℂ)
+    : paU q a (b • F) = b • paU q a F := by
   funext v
   simp only [paU, Pi.smul_apply, smul_eq_mul]
   ring
 
-theorem paTh_data (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT ι) {q c : ℕ} {R0 : ℝ}
-    (hq : 1 ≤ q) (hR0 : 0 < R0)
-    (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖)
+theorem paTh_data
+    (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound)
+    (Y : GT ι)
+    {q c : ℕ} {R0 : ℝ}
+    (hq : 1 ≤ q) (hR0 : 0 < R0) (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖)
     (hR : 16 * (2 * (Fintype.card ι : ℝ) + 1) ≤ R0 ^ 2)
-    {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) :
-    Differentiable ℂ (paTh Y q F) ∧ (∀ v, Summable (fun γ : lat Y.b => Y.ka γ * paU q γ F v)) ∧
-      ∀ α : ι →₀ ℕ, HasSum (fun γ : lat Y.b => Y.ka γ * paD α (paU q γ F)) (paD α (paTh Y q F)) := by
+    {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c)
+    : Differentiable ℂ (paTh Y q F) ∧ (∀ v, Summable (fun γ : lat Y.b => Y.ka γ * paU q γ F v))
+      ∧ ∀ α : ι →₀ ℕ,
+        HasSum (fun γ : lat Y.b => Y.ka γ * paD α (paU q γ F)) (paD α (paTh Y q F)) := by
   have hb := fun R => paTh_bound hP hA Y hq hR0 hlat hR hF R
-  have hcd : ∀ γ : lat Y.b, ContDiff ℂ (⊤ : ℕ∞) (fun v => Y.ka γ * paU q γ F v) :=
-    fun γ => contDiff_const.mul (paU_contDiff (γ : EuclideanSpace ℂ ι) hF)
+  have hcd : ∀ γ : lat Y.b, ContDiff ℂ (⊤ : ℕ∞) (fun v => Y.ka γ * paU q γ F v) := fun γ =>
+    contDiff_const.mul (paU_contDiff (γ : EuclideanSpace ℂ ι) hF)
   obtain ⟨hd, hD⟩ := paD_tsum (fun γ : lat Y.b => fun v => Y.ka γ * paU q γ F v) hcd hb
   refine ⟨hd, fun v => ?_, fun α => ?_⟩
   · obtain ⟨u, hu, hub⟩ := hb ‖v‖
@@ -115,14 +123,16 @@ variable {ι : Type} [Fintype ι]
 
 open Classical
 
-theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT ι) {q c : ℕ} {R0 : ℝ}
-    (hq : 1 ≤ q) (hR0 : 0 < R0)
+theorem propA_core
+    (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound)
+    (Y : GT ι)
+    {q c : ℕ} {R0 : ℝ} (hq : 1 ≤ q) (hR0 : 0 < R0)
     (hC : ∀ γ ∈ lat Y.b, ∀ γ' ∈ lat Y.b,
       Y.ka (γ + γ') = Y.ka γ * Y.ka γ' * cexp (-(Real.pi * q * (Hf γ γ').im) * I))
-    (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖)
-    (h270 : 270 ≤ R0 ^ 2) (h90 : 90 * ((Fintype.card ι : ℝ) + c) ≤ R0 ^ 2)
-    {j : EuclideanSpace ℂ ι → ℂ} (hj : j ∈ paPoly c) :
-    ∃ β ∈ Y.Sec q, (∀ α ∈ paS c, paD α β = paD α j) ∧ Y.l2 q β ≤ 2 * (paIP q j j).re := by
+    (hlat : ∀ γ ∈ lat Y.b, γ ≠ 0 → R0 ≤ Real.sqrt (q * Real.pi) * ‖γ‖) (h270 : 270 ≤ R0 ^ 2)
+    (h90 : 90 * ((Fintype.card ι : ℝ) + c) ≤ R0 ^ 2)
+    {j : EuclideanSpace ℂ ι → ℂ} (hj : j ∈ paPoly c)
+    : ∃ β ∈ Y.Sec q, (∀ α ∈ paS c, paD α β = paD α j) ∧ Y.l2 q β ≤ 2 * (paIP q j j).re := by
   have hg0 : (0 : ℝ) ≤ Fintype.card ι := Nat.cast_nonneg _
   have hc0 : (0 : ℝ) ≤ c := Nat.cast_nonneg _
   have hR : 16 * (2 * (Fintype.card ι : ℝ) + 1) ≤ R0 ^ 2 := by linarith
@@ -137,7 +147,8 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
       simp only [add_zero] at h
       have hH : Hf (0 : EuclideanSpace ℂ ι) 0 = 0 := by simp [Hf]
       simp only [hH, Complex.zero_im, Complex.ofReal_zero, mul_zero, neg_zero, zero_mul,
-        Complex.exp_zero, mul_one] at h
+          Complex.exp_zero, mul_one]
+        at h
       rw [mul_one]
       exact h.symm
     exact mul_left_cancel₀ hne h2
@@ -145,8 +156,9 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
     paTh_data hP hA Y hq hR0 hlat hR hF
   have hcd : ∀ {F : EuclideanSpace ℂ ι → ℂ}, F ∈ paPoly c → ContDiff ℂ (⊤ : ℕ∞) (paTh Y q F) :=
     fun hF => pa_contDiff_of_diff (hdata hF).1
-  have hThAdd : ∀ {F G : EuclideanSpace ℂ ι → ℂ}, F ∈ paPoly c → G ∈ paPoly c →
-      paTh Y q (F + G) = paTh Y q F + paTh Y q G := by
+  have hThAdd
+      : ∀ {F G : EuclideanSpace ℂ ι → ℂ},
+        F ∈ paPoly c → G ∈ paPoly c → paTh Y q (F + G) = paTh Y q F + paTh Y q G := by
     intro F G hF hG
     funext v
     simp only [paTh, Pi.add_apply]
@@ -163,43 +175,52 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
     funext γ
     rw [paU_smul, Pi.smul_apply, smul_eq_mul]
     ring
-  have hJetAdd : ∀ {H1 H2 : EuclideanSpace ℂ ι → ℂ}, ContDiff ℂ (⊤ : ℕ∞) H1 →
-      ContDiff ℂ (⊤ : ℕ∞) H2 → paJet c (H1 + H2) = paJet c H1 + paJet c H2 := by
+  have hJetAdd
+      : ∀ {H1 H2 : EuclideanSpace ℂ ι → ℂ},
+        ContDiff ℂ (⊤ : ℕ∞) H1 → ContDiff ℂ (⊤ : ℕ∞) H2
+          → paJet c (H1 + H2) = paJet c H1 + paJet c H2 := by
     intro H1 H2 h1 h2
     unfold paJet
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun α _ => ?_
     rw [paD_add α h1 h2, add_div, add_smul]
-  have hJetSmul : ∀ (a : ℂ) {H : EuclideanSpace ℂ ι → ℂ}, ContDiff ℂ (⊤ : ℕ∞) H →
-      paJet c (a • H) = a • paJet c H := by
+  have hJetSmul
+      : ∀ (a : ℂ) {H : EuclideanSpace ℂ ι → ℂ},
+        ContDiff ℂ (⊤ : ℕ∞) H → paJet c (a • H) = a • paJet c H := by
     intro a H h
     unfold paJet
     rw [Finset.smul_sum]
     refine Finset.sum_congr rfl fun α _ => ?_
     rw [paD_smul α a h, mul_div_assoc, mul_smul]
-  let T : paPoly (ι := ι) c →ₗ[ℂ] paPoly (ι := ι) c :=
-    { toFun := fun F => ⟨paJet c (paTh Y q F), paJet_mem c _⟩
-      map_add' := fun F G => by
-        apply Subtype.ext
-        simp only [Submodule.coe_add]
-        rw [hThAdd F.2 G.2, hJetAdd (hcd F.2) (hcd G.2)]
-      map_smul' := fun a F => by
-        apply Subtype.ext
-        simp only [Submodule.coe_smul, RingHom.id_apply]
-        rw [hThSmul, hJetSmul a (hcd F.2)] }
-  have hJ : ∀ {F G : EuclideanSpace ℂ ι → ℂ}, F ∈ paPoly c → G ∈ paPoly c →
-      paIP q (paJet c (paTh Y q F)) G = paIP q (paTh Y q F) G := by
+  let T : paPoly (ι := ι) c →ₗ[ℂ] paPoly (ι := ι) c := {
+    toFun := fun F => ⟨paJet c (paTh Y q F), paJet_mem c _⟩
+    map_add' := fun F G => by
+      apply Subtype.ext
+      simp only [Submodule.coe_add]
+      rw [hThAdd F.2 G.2, hJetAdd (hcd F.2) (hcd G.2)]
+    map_smul' := fun a F => by
+      apply Subtype.ext
+      simp only [Submodule.coe_smul, RingHom.id_apply]
+      rw [hThSmul, hJetSmul a (hcd F.2)]
+  }
+  have hJ
+      : ∀ {F G : EuclideanSpace ℂ ι → ℂ},
+        F ∈ paPoly c → G ∈ paPoly c → paIP q (paJet c (paTh Y q F)) G = paIP q (paTh Y q F) G := by
     intro F G hF hG
     rw [gaussianInner_jet_eq_sum hq _ hG]
     have h1 := paTh_IP hP hA Y hq hR0 hlat hR hF hG
-    have h2 : ∀ γ : lat Y.b, Y.ka γ * paIP q (paU q γ F) G =
-        ∑ α ∈ paS c, (Y.ka γ * paD α (paU q γ F)) / paFact α * paIP q (paMono α) G := by
+    have h2
+        : ∀ γ : lat Y.b,
+          Y.ka γ * paIP q (paU q γ F) G
+            = ∑ α ∈ paS c, (Y.ka γ * paD α (paU q γ F)) / paFact α * paIP q (paMono α) G := by
       intro γ
       rw [gaussianInner_jet hq _ hF hG, gaussianInner_jet_eq_sum hq _ hG, Finset.mul_sum]
       refine Finset.sum_congr rfl fun α _ => ?_
       ring
-    have h3 : HasSum (fun γ : lat Y.b => ∑ α ∈ paS c,
-        (Y.ka γ * paD α (paU q γ F)) / paFact α * paIP q (paMono α) G)
+    have h3 : HasSum
+        (fun γ : lat Y.b =>
+          ∑ α ∈ paS c,
+            (Y.ka γ * paD α (paU q γ F)) / paFact α * paIP q (paMono α) G)
         (∑ α ∈ paS c, paD α (paTh Y q F) / paFact α * paIP q (paMono α) G) := by
       apply hasSum_sum
       intro α _
@@ -208,9 +229,12 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
     exact h3.unique h1
   obtain ⟨hBs2, hBt⟩ := paTail hP hA Y hq hR0 hlat hR
   have hK0 : (0 : ℝ) ≤ 2 ^ (1 + 3 * ((Fintype.card ι : ℝ) + c) / 2) := by positivity
-  have hε := (mul_le_mul_of_nonneg_left hBt hK0).trans (paNum (Fintype.card ι) (c : ℝ) R0 hc0 h270 h90)
-  have hclose : ∀ {F G : EuclideanSpace ℂ ι → ℂ}, F ∈ paPoly c → G ∈ paPoly c →
-      ‖paIP q (paJet c (paTh Y q F)) G - paIP q F G‖ ≤ 1 / 2 * paN q F * paN q G := by
+  have hε :=
+    (mul_le_mul_of_nonneg_left hBt hK0).trans (paNum (Fintype.card ι) (c : ℝ) R0 hc0 h270 h90)
+  have hclose
+      : ∀ {F G : EuclideanSpace ℂ ι → ℂ},
+        F ∈ paPoly c → G ∈ paPoly c
+          → ‖paIP q (paJet c (paTh Y q F)) G - paIP q F G‖ ≤ 1 / 2 * paN q F * paN q G := by
     intro F G hF hG
     rw [hJ hF hG]
     refine (paTh_diff_le hP hA Y hq hR0 hk0 hlat hR hF hG).trans ?_
@@ -219,8 +243,9 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
     gcongr
   have hsq : ∀ F : EuclideanSpace ℂ ι → ℂ, paN q F ^ 2 = (paIP q F F).re := fun F =>
     Real.sq_sqrt (gaussianInner_self_re q F).2
-  have hlow : ∀ {F : EuclideanSpace ℂ ι → ℂ}, F ∈ paPoly c →
-      1 / 2 * paN q F ^ 2 ≤ (paIP q (paJet c (paTh Y q F)) F).re := by
+  have hlow
+      : ∀ {F : EuclideanSpace ℂ ι → ℂ},
+        F ∈ paPoly c → 1 / 2 * paN q F ^ 2 ≤ (paIP q (paJet c (paTh Y q F)) F).re := by
     intro F hF
     have h1 := hclose hF hF
     have h2 := (abs_le.1 ((Complex.abs_re_le_norm _).trans h1)).1
@@ -228,7 +253,8 @@ theorem propA_core (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) (Y : GT 
     have h3 := hsq F
     nlinarith
   have hinj : Function.Injective T := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro F hF0
     have h0 : paJet c (paTh Y q F) = 0 := congrArg Subtype.val hF0
     have h1 := hlow F.2
@@ -267,7 +293,9 @@ theorem propA (hP : Ext.PackingCount) (hA : Ext.GaussianTailBound) : PropAStatem
   rw [gaussianInner_self q (paPF p), Complex.ofReal_re] at hl2
   have hnn : 0 ≤ ∫ v, ‖paPF p v‖ ^ 2 * paW q v :=
     integral_nonneg fun v => mul_nonneg (sq_nonneg _) (paW_pos q v).le
-  calc Y.l2 q β ≤ 2 * ∫ v, ‖paPF p v‖ ^ 2 * paW q v := hl2
+  calc
+    Y.l2 q β
+      ≤ 2 * ∫ v, ‖paPF p v‖ ^ 2 * paW q v := hl2
     _ ≤ 6 * ∫ v, ‖paPF p v‖ ^ 2 * paW q v := by linarith
     _ = _ := rfl
 

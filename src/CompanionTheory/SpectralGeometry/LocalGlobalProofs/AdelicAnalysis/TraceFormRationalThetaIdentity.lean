@@ -13,16 +13,19 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.BB.ThetaGauss
 
-theorem continuous_gaussQ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) {M d : ℕ} (b : Module.Basis (Fin d) F E)
+theorem continuous_gaussQ
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ)
+    {M d : ℕ} (b : Module.Basis (Fin d) F E)
     (e : Ainf F ≃+* (InfinitePlace F → ℝ)) (hom : IsHomeomorph e)
-    (Pm : InfinitePlace F → Matrix (Fin M × Fin d) (Fin M × Fin d) ℝ) :
-    Continuous (gaussQ e b Pm) := by
+    (Pm : InfinitePlace F → Matrix (Fin M × Fin d) (Fin M × Fin d) ℝ)
+    : Continuous (gaussQ e b Pm) := by
   obtain ⟨h1, h2, h3, h4, -⟩ := GlobalTheory.T.infinite_adeles_local_ring_totally_real F hσ.1
   haveI := h1
   haveI := h2
@@ -32,8 +35,9 @@ theorem continuous_gaussQ {F E : Type} [Field F] [NumberField F] [Field E] [Numb
   have hxw : ∀ w p, Continuous fun X : Fin 1 → Fin M → Ainf F ⊗[F] E => xw e b X w p := by
     intro w p
     have h := (hco d b).continuous
-    exact (continuous_apply w).comp (hom.continuous.comp ((continuous_apply p.2).comp
-      (h.comp ((continuous_apply p.1).comp (continuous_apply 0)))))
+    exact (continuous_apply w).comp
+      (hom.continuous.comp ((continuous_apply p.2).comp
+        (h.comp ((continuous_apply p.1).comp (continuous_apply 0)))))
   have hxw' : ∀ w, Continuous fun X : Fin 1 → Fin M → Ainf F ⊗[F] E => xw e b X w := fun w =>
     continuous_pi (hxw w)
   unfold gaussQ

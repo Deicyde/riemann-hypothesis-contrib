@@ -11,11 +11,14 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.ProductIntervalFrames
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
 
-theorem isInternal_comp {ι κ W : Type*} [DecidableEq ι] [DecidableEq κ] [AddCommGroup W] [Module ℂ W]
-    (Φ : ι → κ) (hΦ : Function.Bijective Φ) (S : κ → Submodule ℂ W) (h : DirectSum.IsInternal S) :
-    DirectSum.IsInternal (fun i => S (Φ i)) := by
+theorem isInternal_comp
+    {ι κ W : Type*} [DecidableEq ι] [DecidableEq κ] [AddCommGroup W] [Module ℂ W]
+    (Φ : ι → κ) (hΦ : Function.Bijective Φ)
+    (S : κ → Submodule ℂ W) (h : DirectSum.IsInternal S)
+    : DirectSum.IsInternal (fun i => S (Φ i)) := by
   rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top] at h ⊢
   exact ⟨h.1.comp hΦ.1, by rw [hΦ.2.iSup_comp S]; exact h.2⟩
 
@@ -28,22 +31,27 @@ theorem prod_Icc_one (n : ℕ) (f : ℕ → ℂ) : ∏ i ∈ Icc 1 n, f i = ∏ 
 
 abbrev par (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) : M.Par := ⟨n + 1, r, T, T', u, u⟩
 
-theorem rho_eq (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) (ρ : M.Ty (par n r T T' u)) (j : Fin n) :
-    M.rho (par n r T T' u) ρ ((j : ℕ) + 1) = u ((j : ℕ) + 2) + 1 / 2 + (((ρ j : Fin _) : ℕ) : ℝ) := by
+theorem rho_eq (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) (ρ : M.Ty (par n r T T' u)) (j : Fin n)
+    : M.rho (par n r T T' u) ρ ((j : ℕ) + 1)
+      = u ((j : ℕ) + 2) + 1 / 2 + (((ρ j : Fin _) : ℕ) : ℝ) := by
   have hj := j.isLt
   simp only [M.rho, M.Par.lo, par, max_self]
   rw [dite_eq_left ⟨by omega, by omega⟩]
   rfl
 
-theorem wid_eq (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) (L : Fin (n + 1) → ℤ)
-    (hL : ∀ j : Fin (n + 1), u ((j : ℕ) + 1) - u 1 = (L j : ℝ))
-    (hg : ∀ j : Fin n, L j.succ + 1 ≤ L j.castSucc) (j : Fin n) :
-    (((par n r T T' u).wid ((j : ℕ) + 1) : ℕ) : ℤ) = L j.castSucc - L j.succ - 1 := by
+theorem wid_eq
+    (n r : ℕ)
+    (T T' : ℝ)
+    (u : ℕ → ℝ) (L : Fin (n + 1) → ℤ) (hL : ∀ j : Fin (n + 1), u ((j : ℕ) + 1) - u 1 = (L j : ℝ))
+    (hg : ∀ j : Fin n, L j.succ + 1 ≤ L j.castSucc)
+    (j : Fin n)
+    : (((par n r T T' u).wid ((j : ℕ) + 1) : ℕ) : ℤ) = L j.castSucc - L j.succ - 1 := by
   have h1 := hL j.castSucc
   have h2 := hL j.succ
   simp only [Fin.coe_castSucc, Fin.val_succ] at h1 h2
-  have hd : (par n r T T' u).hi ((j : ℕ) + 1) - (par n r T T' u).lo ((j : ℕ) + 1) =
-      ((L j.castSucc - L j.succ - 1 : ℤ) : ℝ) := by
+  have hd
+      : (par n r T T' u).hi ((j : ℕ) + 1) - (par n r T T' u).lo ((j : ℕ) + 1)
+        = ((L j.castSucc - L j.succ - 1 : ℤ) : ℝ) := by
     simp only [M.Par.hi, M.Par.lo, par, min_self, max_self]
     push_cast
     linarith
@@ -51,17 +59,25 @@ theorem wid_eq (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) (L : Fin (n + 1) → �
   simp only [M.Par.wid]
   rw [hd, ← Int.floor_toNat, Int.floor_intCast, Int.toNat_of_nonneg hnn]
 
-theorem main (hK : BranchingK) (Wp : Type) [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+theorem main
+    (hK : BranchingK)
+    (Wp : Type) [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [FiniteDimensional ℂ Wp]
     (n r : ℕ) (T T' : ℝ) (u : ℕ → ℝ) (hOK : (par n r T T' u).OK)
     (z e : Fin (2 * r + (n + 1) + 1) → ℂ) (π : Mx (n + 1) r → (Wp →L[ℂ] Wp)) (hz : inWb (n + 1) r z)
     (hT : 0 < Tz (n + 1) r z) (hπ : IsType (n + 1) r z π u) (he : inWb (n + 1) r e)
-    (hez : herm (Hpk (n + 1) r) e z = 0) (hee : herm (Hpk (n + 1) r) e e = 1) :
-    ∃ S : M.Ty (par n r T T' u) → Submodule ℂ Wp, DirectSum.IsInternal S ∧
-      (∀ ρ, S ρ ≠ ⊥ ∧ ∀ S' : Submodule ℂ Wp, S' ≤ S ρ →
-        (∀ h ∈ UWset (n + 1) r z, h *ᵥ e = e → ∀ v ∈ S', π h v ∈ S') → S' = ⊥ ∨ S' = S ρ) ∧
-      ∀ Bs : Fin n → Fin (2 * r + (n + 1) + 1) → ℂ, IsFrameOf (n + 1) r [z, e] Bs →
-        ∀ (ρ : M.Ty (par n r T T' u)) (w : ℂ), ∀ v ∈ S ρ,
-        capRep (n + 1) r π Bs w v = M.xC (par n r T T' u) ρ (w - (((n + 1 : ℕ) : ℂ) - 2) / 2) • v := by
+    (hez : herm (Hpk (n + 1) r) e z = 0) (hee : herm (Hpk (n + 1) r) e e = 1)
+    : ∃ S : M.Ty (par n r T T' u) → Submodule ℂ Wp,
+      DirectSum.IsInternal S
+        ∧ (∀ ρ,
+          S ρ ≠ ⊥
+            ∧ ∀ S' : Submodule ℂ Wp,
+              S' ≤ S ρ → (∀ h ∈ UWset (n + 1) r z, h *ᵥ e = e → ∀ v ∈ S', π h v ∈ S')
+                → S' = ⊥ ∨ S' = S ρ)
+        ∧ ∀ Bs : Fin n → Fin (2 * r + (n + 1) + 1) → ℂ,
+          IsFrameOf (n + 1) r [z, e] Bs
+            → ∀ (ρ : M.Ty (par n r T T' u)) (w : ℂ), ∀ v ∈ S ρ,
+              capRep (n + 1) r π Bs w v
+                = M.xC (par n r T T' u) ρ (w - (((n + 1 : ℕ) : ℂ) - 2) / 2) • v := by
   have hint : ∀ j : Fin (n + 1), ∃ N : ℤ, u ((j : ℕ) + 1) - u 1 = (N : ℝ) := fun j =>
     hOK.int_u ((j : ℕ) + 1) (by
       have := j.2
@@ -72,13 +88,14 @@ theorem main (hK : BranchingK) (Wp : Type) [NormedAddCommGroup Wp] [NormedSpace 
         omega)
   choose L hL using hint
   have hgap : ∀ j : Fin n, u ((j : ℕ) + 2) + 1 ≤ u ((j : ℕ) + 1) := fun j => by
-    have h := hOK.gap ((j : ℕ) + 1) (by
-      have := j.2
-      rw [mem_Icc]
-      constructor
-      · omega
-      · show (j : ℕ) + 1 ≤ n + 1 - 1
-        omega)
+    have h :=
+      hOK.gap ((j : ℕ) + 1) (by
+        have := j.2
+        rw [mem_Icc]
+        constructor
+        · omega
+        · show (j : ℕ) + 1 ≤ n + 1 - 1
+          omega)
     simp only [M.Par.lo, M.Par.hi, max_self, min_self] at h
     linarith
   have hg : ∀ j : Fin n, L j.succ + 1 ≤ L j.castSucc := fun j => by
@@ -91,20 +108,25 @@ theorem main (hK : BranchingK) (Wp : Type) [NormedAddCommGroup Wp] [NormedSpace 
   have hanti : StrictAnti L := Fin.strictAnti_iff_succ_lt.2 fun j => by have := hg j; omega
   have hw := wid_eq n r T T' u L hL hg
   set β : ℂ := (u 1 : ℂ) - ((n + 1 : ℕ) : ℂ) / 2 + 1 / 2 with hβ
-  have hrel : ∀ j : Fin (n + 1), (u ((j : ℕ) + 1) : ℂ) - ((n + 1 : ℕ) : ℂ) / 2 + 1 / 2 = β + (L j : ℂ) := fun j => by
-    have h : (u ((j : ℕ) + 1) : ℂ) - (u 1 : ℂ) = (L j : ℂ) := by exact_mod_cast congrArg (fun x : ℝ => (x : ℂ)) (hL j)
+  have hrel
+      : ∀ j : Fin (n + 1),
+        (u ((j : ℕ) + 1) : ℂ) - ((n + 1 : ℕ) : ℂ) / 2 + 1 / 2 = β + (L j : ℂ) := fun j => by
+    have h : (u ((j : ℕ) + 1) : ℂ) - (u 1 : ℂ) = (L j : ℂ) := by
+      exact_mod_cast congrArg (fun x : ℝ => (x : ℂ)) (hL j)
     rw [hβ, ← h]
     ring
   obtain ⟨S₀, hint₀, hirr, heig⟩ := hK Wp n r z e π u β L hz hT hπ hanti hrel he hez hee
-  let Φ : M.Ty (par n r T T' u) → {M : Fin n → ℤ // Box L M} := fun ρ =>
-    ⟨fun j => L j.succ + 1 + (((ρ j : Fin _) : ℕ) : ℤ), fun j => by
+  let Φ : M.Ty (par n r T T' u) → {M : Fin n → ℤ // Box L M} := fun ρ => ⟨
+    fun j => L j.succ + 1 + (((ρ j : Fin _) : ℕ) : ℤ),
+    fun j => by
       have h1 := (ρ j).2
       have h2 := hw j
       constructor
       · show L j.succ < L j.succ + 1 + (((ρ j : Fin _) : ℕ) : ℤ)
         omega
       · show L j.succ + 1 + (((ρ j : Fin _) : ℕ) : ℤ) ≤ L j.castSucc
-        omega⟩
+        omega
+  ⟩
   have hΦ : Function.Bijective Φ := by
     constructor
     · intro ρ ρ' h
@@ -144,7 +166,8 @@ end Formalism.FourierDecayAlt.P.ProductIntervalFrames
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
 
 theorem qr_branching_of : Qr.BranchingK → Formalism.FourierDecayAlt.Q.Branching := by
   intro hK Wp _ _ _ P hOK hu'

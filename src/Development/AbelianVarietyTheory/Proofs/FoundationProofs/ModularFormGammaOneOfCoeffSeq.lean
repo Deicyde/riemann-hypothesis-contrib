@@ -10,15 +10,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsBounded
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
 
 namespace GlobalTheory.EisM.OnGammaOne
 
-theorem slash_inv {k L N : ℕ} {ε : DirichletCharacter ℂ N} (hNL : N ∣ L) {f : ℍ → ℂ}
-    (hf : Inv k L (ch ε) f) (γ : SL(2, ℤ)) (hγ : γ ∈ Gamma1 L) : f ∣[(k : ℤ)] γ = f := by
+theorem slash_inv
+    {k L N : ℕ} {ε : DirichletCharacter ℂ N} (hNL : N ∣ L)
+    {f : ℍ → ℂ} (hf : Inv k L (ch ε) f)
+    (γ : SL(2, ℤ)) (hγ : γ ∈ Gamma1 L)
+    : f ∣[(k : ℤ)] γ = f := by
   obtain ⟨-, h11, h10⟩ := (Gamma1_mem L γ).1 hγ
   have hc : (L : ℤ) ∣ γ 1 0 := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).1 h10
   have hd1 : (L : ℤ) ∣ γ 1 1 - 1 := by
@@ -32,10 +36,10 @@ theorem slash_inv {k L N : ℕ} {ε : DirichletCharacter ℂ N} (hNL : N ∣ L) 
   funext τ
   rw [ModularForm.slash_action_eq'_iff, hf γ hc τ, hd, one_mul, zpow_natCast]
 
-theorem periodic {k L : ℕ} {f : ℍ → ℂ} (hinv : ∀ γ ∈ Gamma1 L, f ∣[(k : ℤ)] γ = f)
-    (γ : SL(2, ℤ)) (τ : ℍ) : (f ∣[(k : ℤ)] γ) ((L : ℝ) +ᵥ τ) = (f ∣[(k : ℤ)] γ) τ := by
-  have hT : (ModularGroup.T ^ (L : ℤ)) • τ = (L : ℝ) +ᵥ τ := by
-    rw [modular_T_zpow_smul]; simp
+theorem periodic
+    {k L : ℕ} {f : ℍ → ℂ} (hinv : ∀ γ ∈ Gamma1 L, f ∣[(k : ℤ)] γ = f) (γ : SL(2, ℤ)) (τ : ℍ)
+    : (f ∣[(k : ℤ)] γ) ((L : ℝ) +ᵥ τ) = (f ∣[(k : ℤ)] γ) τ := by
+  have hT : (ModularGroup.T ^ (L : ℤ)) • τ = (L : ℝ) +ᵥ τ := by rw [modular_T_zpow_smul]; simp
   have hδ : γ * ModularGroup.T ^ (L : ℤ) * γ⁻¹ ∈ Gamma1 L := by
     have h1 : ModularGroup.T ^ (L : ℤ) ∈ CongruenceSubgroup.Gamma L := by
       simpa using ModularGroup_T_pow_mem_Gamma (L : ℤ) (L : ℤ) dvd_rfl
@@ -44,8 +48,7 @@ theorem periodic {k L : ℕ} {f : ℍ → ℂ} (hinv : ∀ γ ∈ Gamma1 L, f �
     rw [Gamma1_mem]
     exact ⟨h2.1, h2.2.2.2, h2.2.2.1⟩
   have e : (f ∣[(k : ℤ)] γ) ∣[(k : ℤ)] (ModularGroup.T ^ (L : ℤ)) = f ∣[(k : ℤ)] γ := by
-    rw [← SlashAction.slash_mul,
-      (inv_mul_cancel_right (γ * ModularGroup.T ^ (L : ℤ)) γ).symm,
+    rw [← SlashAction.slash_mul, (inv_mul_cancel_right (γ * ModularGroup.T ^ (L : ℤ)) γ).symm,
       SlashAction.slash_mul, hinv _ hδ]
   have h := congrFun e τ
   have hden : denom (ModularGroup.T ^ (L : ℤ) : SL(2, ℤ)) τ = 1 := by
@@ -57,9 +60,12 @@ end GlobalTheory.EisM.OnGammaOne
 
 namespace GlobalTheory.EisM.OnGammaOne
 
-theorem normSq_denom_bounds (L : ℕ) (γ : SL(2, ℤ)) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ τ : ℍ, 1 ≤ τ.im → |τ.re| ≤ L →
-      1 ≤ Complex.normSq (denom γ τ) ∧ Complex.normSq (denom γ τ) ≤ K * τ.im ^ 2 := by
+theorem normSq_denom_bounds (L : ℕ) (γ : SL(2, ℤ))
+    : ∃ K : ℝ,
+      0 ≤ K
+        ∧ ∀ τ : ℍ,
+          1 ≤ τ.im → |τ.re| ≤ L
+            → 1 ≤ Complex.normSq (denom γ τ) ∧ Complex.normSq (denom γ τ) ≤ K * τ.im ^ 2 := by
   set c : ℝ := ((γ 1 0 : ℤ) : ℝ)
   set d : ℝ := ((γ 1 1 : ℤ) : ℝ)
   refine ⟨(|c| * L + |d|) ^ 2 + c ^ 2, by positivity, fun τ h1 h2 => ?_⟩
@@ -81,7 +87,8 @@ theorem normSq_denom_bounds (L : ℕ) (γ : SL(2, ℤ)) :
         · exact Or.inr h.2
       have hc' : c = 0 := by simp [c, hc]
       have hd' : d ^ 2 = 1 := by rcases hd with h | h <;> simp [d, h]
-      rw [hc']; nlinarith
+      rw [hc']
+      nlinarith
     · have hc1 : 1 ≤ c ^ 2 := by
         have : (1 : ℤ) ≤ (γ 1 0) ^ 2 := by
           have := Int.one_le_abs hc
@@ -90,7 +97,9 @@ theorem normSq_denom_bounds (L : ℕ) (γ : SL(2, ℤ)) :
         simpa [c] using this
       nlinarith [sq_nonneg (c * τ.re + d)]
   · have hM : |c * τ.re + d| ≤ |c| * L + |d| := by
-      calc |c * τ.re + d| ≤ |c * τ.re| + |d| := abs_add_le _ _
+      calc
+        |c * τ.re + d|
+          ≤ |c * τ.re| + |d| := abs_add_le _ _
         _ = |c| * |τ.re| + |d| := by rw [abs_mul]
         _ ≤ |c| * L + |d| := by gcongr
     have hM2 : (c * τ.re + d) ^ 2 ≤ (|c| * L + |d|) ^ 2 := by
@@ -98,8 +107,8 @@ theorem normSq_denom_bounds (L : ℕ) (γ : SL(2, ℤ)) :
     have hM0 : 0 ≤ (|c| * L + |d|) ^ 2 := by positivity
     nlinarith
 
-theorem growth {f : ℍ → ℂ} (hf : Mod f) (k L : ℕ) (γ : SL(2, ℤ)) :
-    ∃ (C : ℝ) (A : ℕ), ∀ τ : ℍ, 1 ≤ τ.im → |τ.re| ≤ L → ‖(f ∣[(k : ℤ)] γ) τ‖ ≤ C * τ.im ^ A := by
+theorem growth {f : ℍ → ℂ} (hf : Mod f) (k L : ℕ) (γ : SL(2, ℤ))
+    : ∃ (C : ℝ) (A : ℕ), ∀ τ : ℍ, 1 ≤ τ.im → |τ.re| ≤ L → ‖(f ∣[(k : ℤ)] γ) τ‖ ≤ C * τ.im ^ A := by
   obtain ⟨C, A, hC⟩ := hf
   obtain ⟨K, hK0, hK⟩ := normSq_denom_bounds L γ
   refine ⟨|C| * (1 + K ^ A), A, fun τ h1 h2 => ?_⟩
@@ -125,22 +134,21 @@ theorem growth {f : ℍ → ℂ} (hf : Mod f) (k L : ℕ) (γ : SL(2, ℤ)) :
     exact inv_le_one_of_one_le₀ (one_le_pow₀ hn)
   rw [ModularForm.SL_slash_apply, norm_mul]
   have hfw := hC (γ • τ)
-  have hpos : 0 ≤ (γ • τ).im ^ A + ((γ • τ).im ^ A)⁻¹ := by
-    have := (γ • τ).im_pos; positivity
-  calc ‖f (γ • τ)‖ * ‖denom γ τ ^ (-(k : ℤ))‖ ≤ ‖f (γ • τ)‖ * 1 :=
-        mul_le_mul_of_nonneg_left hden (norm_nonneg _)
+  have hpos : 0 ≤ (γ • τ).im ^ A + ((γ • τ).im ^ A)⁻¹ := by have := (γ • τ).im_pos; positivity
+  calc
+    ‖f (γ • τ)‖ * ‖denom γ τ ^ (-(k : ℤ))‖
+      ≤ ‖f (γ • τ)‖ * 1 := mul_le_mul_of_nonneg_left hden (norm_nonneg _)
     _ ≤ |C| * ((γ • τ).im ^ A + ((γ • τ).im ^ A)⁻¹) := by
-        rw [mul_one]; exact hfw.trans (mul_le_mul_of_nonneg_right (le_abs_self C) hpos)
+      rw [mul_one]; exact hfw.trans (mul_le_mul_of_nonneg_right (le_abs_self C) hpos)
     _ ≤ |C| * (y ^ A + K ^ A * y ^ A) := by gcongr
     _ = |C| * (1 + K ^ A) * y ^ A := by ring
 
 end GlobalTheory.EisM.OnGammaOne
 
-
 open GlobalTheory.EisM.OnGammaOne in
-theorem GlobalTheory.EisM.modularForm_gammaOne_of_MF :
-    ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ), 0 < L → N ∣ L → MF k L (ch ε) a →
-      ∃ f : ModularForm (Gamma1 L) (k : ℤ), ⇑f = qs a := by
+theorem GlobalTheory.EisM.modularForm_gammaOne_of_MF
+    : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (a : ℕ → ℂ),
+      0 < L → N ∣ L → MF k L (ch ε) a → ∃ f : ModularForm (Gamma1 L) (k : ℤ), ⇑f = qs a := by
   intro k L N ε a hL hNL ha
   haveI : NeZero L := ⟨hL.ne'⟩
   have hinv : ∀ γ ∈ Gamma1 L, qs a ∣[(k : ℤ)] γ = qs a := fun γ hγ => slash_inv hNL ha.2 γ hγ
@@ -152,7 +160,9 @@ theorem GlobalTheory.EisM.modularForm_gammaOne_of_MF :
     rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
     rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
     intro γ _
-    obtain ⟨C, A, hC⟩ := growth (GlobalTheory.T.hasModerateGrowth_qExpansion_of_coeffPolynomialGrowth a ha.1) k L γ
+    obtain ⟨C, A, hC⟩ :=
+      growth (GlobalTheory.T.hasModerateGrowth_qExpansion_of_coeffPolynomialGrowth a ha.1) k L γ
     have hs : MDifferentiable 𝓘(ℂ) 𝓘(ℂ) (qs a ∣[(k : ℤ)] γ) := by
       rw [ModularForm.SL_slash]; exact hhol.slash _ _
-    exact GlobalTheory.T.isBoundedAtImInfty_of_periodic_polynomial_bound _ L C A hL hs (periodic hinv γ) hC
+    exact GlobalTheory.T.isBoundedAtImInfty_of_periodic_polynomial_bound _ L C A hL hs
+      (periodic hinv γ) hC

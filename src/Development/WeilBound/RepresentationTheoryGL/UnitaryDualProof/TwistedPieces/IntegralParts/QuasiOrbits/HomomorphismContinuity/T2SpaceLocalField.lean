@@ -14,31 +14,44 @@ open Matrix GroundTheory.Automorphic.Whittaker GlobalTheory.SplitWeil Set Polyno
 
 namespace PositivityTheory.RgUd.TP.Nil.Orb.Asm
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Nil
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.TP
+  PositivityTheory.RgUd.TP.Nil
 open PositivityTheory.RgUd.T.Nil.Orb (GzS orb stab modul act_mul act_one)
-open PositivityTheory.RgUd.T.Nil.Orb.Oasm (exists_open_orbit isClosed_Bz isNilpotent_iff_pow comp_mem_supportedIn orb_subset_UU
-  action_mem_orbit_closure)
+open PositivityTheory.RgUd.T.Nil.Orb.Oasm
+  (exists_open_orbit isClosed_Bz isNilpotent_iff_pow comp_mem_supportedIn orb_subset_UU
+    action_mem_orbit_closure)
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 local instance t2SpaceLocalField : T2Space k := GlobalTheory.SplitWeil.t2Space k
 
-
 variable (k) in
 def ModH : Prop :=
-  TraceForm k → ∀ (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)), CR Z → 0 < dB0 Z → ∀ (p : Sp k n) (P : GL (Fin n) k)
-    (w : Fin n → ℤ), p.1 ∈ Bz Z → IsNilpotent p.1 → p.2 ≠ 0 →
-    (∀ t : kˣ, let g : Matrix (Fin n) (Fin n) k := P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
-        (∀ a ∈ Z, a * g = g * a) ∧ g * p.1 = (t : k) • (p.1 * g) ∧ g *ᵥ p.2 = p.2) →
-    (∀ a : Matrix (Fin n) (Fin n) k, (∀ z ∈ Z, z * a = a * z) → a * p.1 = p.1 * a →
-        ∃ u : Fin n → k, a *ᵥ p.2 = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0) →
-    ∃ a : ℝ, 2 * a < dB0 Z ∧ ∀ t : kˣ, nabs k t < 1 → ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k),
-      K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k))) ∧
-      IsCompact (K : Set (GL (Fin n) k)) ∧
-      IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k))) ∧ L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧
-      L.Normal' K ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom) ∧
-      g.val = P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val ∧
-      modul (stab Z p) K L g = (nabs k t)⁻¹ ^ a
+  TraceForm k
+    → ∀ (n : ℕ) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)),
+      CR Z → 0 < dB0 Z
+        → ∀ (p : Sp k n) (P : GL (Fin n) k) (w : Fin n → ℤ),
+          p.1 ∈ Bz Z → IsNilpotent p.1 → p.2 ≠ 0
+            → (∀ t : kˣ,
+              let g : Matrix (Fin n) (Fin n) k :=
+                P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
+              (∀ a ∈ Z, a * g = g * a) ∧ g * p.1 = (t : k) • (p.1 * g) ∧ g *ᵥ p.2 = p.2)
+            → (∀ a : Matrix (Fin n) (Fin n) k,
+              (∀ z ∈ Z, z * a = a * z) → a * p.1 = p.1 * a
+                → ∃ u : Fin n → k, a *ᵥ p.2 = P.val *ᵥ u ∧ ∀ i, w i < 0 → u i = 0)
+            → ∃ a : ℝ,
+              2 * a < dB0 Z
+                ∧ ∀ t : kˣ,
+                  nabs k t < 1
+                    → ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k),
+                      K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k)))
+                        ∧ IsCompact (K : Set (GL (Fin n) k))
+                        ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k)))
+                        ∧ L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K
+                        ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom)
+                        ∧ g.val = P.val * diagonal (fun i => ((t ^ w i : kˣ) : k)) * P⁻¹.val
+                        ∧ modul (stab Z p) K L g = (nabs k t)⁻¹ ^ a
 
 section Hom
 
@@ -66,8 +79,8 @@ theorem hom_act (t : kˣ) (g : GL (Fin n) k) (p : Sp k n) : hom t (act g p) = ac
   refine Prod.ext ?_ rfl
   simp only [mul_smul_comm, smul_mul_assoc]
 
-theorem comp_hom_mem (t : kˣ) {f : Sp k n → ℂ} (hf : f ∈ supportedIn (UU : Set (Sp k n))) :
-    (fun p => f (hom t p)) ∈ supportedIn (UU : Set (Sp k n)) :=
+theorem comp_hom_mem (t : kˣ) {f : Sp k n → ℂ} (hf : f ∈ supportedIn (UU : Set (Sp k n)))
+    : (fun p => f (hom t p)) ∈ supportedIn (UU : Set (Sp k n)) :=
   comp_mem_supportedIn (homH t) hf
 
 theorem invU_pullH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : InvU Z ξ) : InvU Z (pullH t ξ) := by
@@ -78,15 +91,16 @@ theorem invU_pullH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : InvU
   rw [e]
   exact hξ g hg _ (comp_hom_mem t hf)
 
-theorem invU_sub_smul {ξ η : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (h1 : InvU Z ξ) (h2 : InvU Z η) (a : ℂ) : InvU Z (ξ - a • η) := by
+theorem invU_sub_smul {ξ η : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (h1 : InvU Z ξ) (h2 : InvU Z η) (a : ℂ)
+    : InvU Z (ξ - a • η) := by
   intro g hg f hf
   simp [h1 g hg f hf, h2 g hg f hf]
 
 theorem kills_pullH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Kills ξ UU) : Kills (pullH t ξ) UU :=
   fun f hf => hξ _ (comp_hom_mem t hf)
 
-theorem kills_aevalH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Kills ξ UU) (Q : ℂ[X]) :
-    Kills (aeval (pullH (n := n) t) Q ξ) UU := by
+theorem kills_aevalH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Kills ξ UU) (Q : ℂ[X])
+    : Kills (aeval (pullH (n := n) t) Q ξ) UU := by
   induction Q using Polynomial.induction_on' with
   | add p q hp hq => intro f hf; simp [hp f hf, hq f hf]
   | monomial m a =>
@@ -100,12 +114,13 @@ theorem kills_aevalH (t : kˣ) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Ki
         exact kills_pullH t ih
     simp [aeval_monomial, key m f hf]
 
-theorem aeval_X_subH (t : kˣ) (a : ℂ) (ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ) :
-    aeval (pullH (n := n) t) (X - Polynomial.C a) ξ = pullH t ξ - a • ξ := by
+theorem aeval_X_subH (t : kˣ) (a : ℂ) (ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ)
+    : aeval (pullH (n := n) t) (X - Polynomial.C a) ξ = pullH t ξ - a • ξ := by
   simp [Algebra.algebraMap_eq_smul_one]
 
-theorem kills_of_suppU {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} {D : Set (Sp k n)} (hD : D ∩ UU = ∅) (h : SuppU ξ D) :
-    Kills ξ UU := by
+theorem kills_of_suppU
+    {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} {D : Set (Sp k n)} (hD : D ∩ UU = ∅) (h : SuppU ξ D)
+    : Kills ξ UU := by
   intro f hf
   refine h f hf fun q hq => ?_
   by_contra hfq
@@ -114,20 +129,22 @@ theorem kills_of_suppU {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} {D : Set (Sp k n)
   exact this
 
 theorem isClosed_NB : IsClosed (NB Z ×ˢ (Set.univ : Set (Fin n → k))) := by
-  have : NB Z = Bz Z ∩ {x | x ^ n = 0} := by
-    ext x; simp [NB, isNilpotent_iff_pow]
+  have : NB Z = Bz Z ∩ {x | x ^ n = 0} := by ext x; simp [NB, isNilpotent_iff_pow]
   rw [this]
   exact (isClosed_Bz.inter (isClosed_eq (continuous_id.pow n) continuous_const)).prod isClosed_univ
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem act_mem_NB (hZ : CR Z) {g : GL (Fin n) k} (hg : g ∈ Gz Z) {q : Sp k n}
-    (hq : q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k))) : act g q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)) := by
+theorem act_mem_NB
+    (hZ : CR Z)
+    {g : GL (Fin n) k} (hg : g ∈ Gz Z)
+    {q : Sp k n} (hq : q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)))
+    : act g q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)) := by
   have h := action_mem_orbit_closure hZ (zero_mem Z) hg (q := q) ⟨hq.1.1, by simpa using hq.1.2⟩
   exact ⟨⟨h.1, by simpa using h.2⟩, mem_univ _⟩
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem hom_mem_NB (t : kˣ) {q : Sp k n} (hq : q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k))) :
-    hom t q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)) := by
+theorem hom_mem_NB (t : kˣ) {q : Sp k n} (hq : q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)))
+    : hom t q ∈ NB Z ×ˢ (Set.univ : Set (Fin n → k)) := by
   refine ⟨⟨fun a ha => ?_, hq.1.2.smul _⟩, mem_univ _⟩
   show a * ((t : k) • q.1) = (t : k) • q.1 * a
   rw [mul_smul_comm, smul_mul_assoc, hq.1.1 a ha]
@@ -138,16 +155,29 @@ section Main
 
 variable {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)}
 
-theorem main_ind (h4 : StepModH k) (hZ : CR Z) (t : kˣ) (mm : Sp k n → ℂ) (s : Finset (Sp k n))
-    (hs : ∀ p ∈ s, p.2 ≠ 0 ∧ ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k), g ∈ Gz Z ∧ act g p = hom t p ∧
-      K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k))) ∧
-      IsCompact (K : Set (GL (Fin n) k)) ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k))) ∧
-      L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom) ∧
-      ((modul (stab Z p) K L g : ℝ) : ℂ) = mm p) :
-    ∀ (N : ℕ) (T : Finset (Sp k n)), T.card ≤ N → T ⊆ s → ∀ D : Set (Sp k n), IsClosed D →
-      (∀ h ∈ Gz Z, ∀ q ∈ D, act h q ∈ D) → (∀ q ∈ D, hom t q ∈ D) → D ∩ UU ⊆ ⋃ p ∈ T, orb Z p →
-      ∀ ξ, InvU Z ξ → SuppU ξ D → ∀ Q : ℂ[X], (∏ p ∈ T, (X - Polynomial.C (mm p))) ∣ Q →
-        Kills (aeval (pullH (n := n) t) Q ξ) UU := by
+theorem main_ind
+    (h4 : StepModH k) (hZ : CR Z)
+    (t : kˣ) (mm : Sp k n → ℂ) (s : Finset (Sp k n))
+    (hs : ∀ p ∈ s,
+      p.2 ≠ 0
+        ∧ ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k),
+          g ∈ Gz Z ∧ act g p = hom t p ∧ K ≤ GzS Z
+            ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k)))
+            ∧ IsCompact (K : Set (GL (Fin n) k))
+            ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k)))
+            ∧ L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K
+            ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom)
+            ∧ ((modul (stab Z p) K L g : ℝ) : ℂ) = mm p)
+    : ∀ (N : ℕ) (T : Finset (Sp k n)),
+      T.card ≤ N → T ⊆ s
+        → ∀ D : Set (Sp k n),
+          IsClosed D → (∀ h ∈ Gz Z, ∀ q ∈ D, act h q ∈ D) → (∀ q ∈ D, hom t q ∈ D)
+            → D ∩ UU ⊆ ⋃ p ∈ T, orb Z p
+            → ∀ ξ,
+              InvU Z ξ → SuppU ξ D
+                → ∀ Q : ℂ[X],
+                  (∏ p ∈ T, (X - Polynomial.C (mm p))) ∣ Q
+                    → Kills (aeval (pullH (n := n) t) Q ξ) UU := by
   classical
   intro N
   induction N with
@@ -164,7 +194,8 @@ theorem main_ind (h4 : StepModH k) (hZ : CR Z) (t : kˣ) (mm : Sp k n → ℂ) (
     by_cases hne : (D ∩ UU).Nonempty
     swap
     · exact kills_aevalH t (kills_of_suppU (Set.not_nonempty_iff_eq_empty.1 hne) hS) Q
-    obtain ⟨p₀, hp₀T, hO, hcl⟩ := exists_open_orbit T (fun p hp => (hs p (hTs hp)).1) D hD hinv hcov hne
+    obtain ⟨p₀, hp₀T, hO, hcl⟩ :=
+      exists_open_orbit T (fun p hp => (hs p (hTs hp)).1) D hD hinv hcov hne
     obtain ⟨hp₀2, K, L, g, hg, hgp, hK, hKo, hKc, hLo, hLKK, hLn1, hLn2, hm⟩ := hs p₀ (hTs hp₀T)
     set O := orb Z p₀ with hOdef
     set U := (UU : Set (Sp k n)) ∩ (D \ O)ᶜ with hUdef
@@ -177,7 +208,8 @@ theorem main_ind (h4 : StepModH k) (hZ : CR Z) (t : kˣ) (mm : Sp k n → ℂ) (
         exact hqn ⟨hqD, hqO⟩
       · intro hqO
         exact ⟨⟨orb_subset_UU hp₀2 hqO, fun h => h.2 hqO⟩, hO hqO⟩
-    have hstep := h4 n Z hZ t p₀ g hg hgp hp₀2 K hK hKo hKc L hLo hLKK hLn1 hLn2 D U hD hU hUD hinv hsig ξ hξ hS
+    have hstep :=
+      h4 n Z hZ t p₀ g hg hgp hp₀2 K hK hKo hKc L hLo hLKK hLn1 hLn2 D U hD hU hUD hinv hsig ξ hξ hS
     have hDU : D \ U = D \ O := by
       ext q
       constructor
@@ -193,7 +225,9 @@ theorem main_ind (h4 : StepModH k) (hZ : CR Z) (t : kˣ) (mm : Sp k n → ℂ) (
     have hsig0 : hom t⁻¹ p₀ = act g⁻¹ p₀ := by
       have e1 : hom t⁻¹ (act g p₀) = p₀ := by rw [hgp, hom_hom]
       rw [hom_act] at e1
-      calc hom t⁻¹ p₀ = act g⁻¹ (act g (hom t⁻¹ p₀)) := by rw [← act_mul, inv_mul_cancel, act_one]
+      calc
+        hom t⁻¹ p₀
+          = act g⁻¹ (act g (hom t⁻¹ p₀)) := by rw [← act_mul, inv_mul_cancel, act_one]
         _ = act g⁻¹ p₀ := by rw [e1]
     have hsigO : ∀ q, hom t q ∈ O → q ∈ O := by
       rintro q ⟨g', hg', hg'q⟩
@@ -215,11 +249,13 @@ theorem main_ind (h4 : StepModH k) (hZ : CR Z) (t : kˣ) (mm : Sp k n → ℂ) (
       ring
     have hT'R : (∏ p ∈ T', (X - Polynomial.C (mm p))) ∣ R :=
       dvd_mul_of_dvd_left (Finset.prod_dvd_prod_of_subset _ _ _ hT'sub) Q0
-    have key : aeval (pullH (n := n) t) Q ξ = aeval (pullH (n := n) t) R (pullH t ξ - mm p₀ • ξ) := by
+    have key
+        : aeval (pullH (n := n) t) Q ξ = aeval (pullH (n := n) t) R (pullH t ξ - mm p₀ • ξ) := by
       rw [hQR, map_mul, Module.End.mul_apply, aeval_X_subH]
     rw [key]
-    refine ih T' hT'card (fun p hp => hTs (Finset.mem_of_mem_filter p hp)) (D \ O) hcl ?_ ?_ ?_ _
-      (invU_sub_smul (invU_pullH t hξ) hξ _) hstep R hT'R
+    refine ih T' hT'card
+      (fun p hp => hTs (Finset.mem_of_mem_filter p hp))
+      (D \ O) hcl ?_ ?_ ?_ _ (invU_sub_smul (invU_pullH t hξ) hξ _) hstep R hT'R
     · rintro h hh q ⟨hqD, hqO⟩
       exact ⟨hinv h hh q hqD, fun h' => hqO (hOinv h hh q h')⟩
     · rintro q ⟨hqD, hqO⟩
@@ -232,18 +268,22 @@ end Main
 
 section Final
 
-
 variable (k) in
 theorem orbQ_of (h3 : Reps0 k) (h4 : StepModH k) (h5 : ModH k) : OrbQ k := by
   classical
   intro hT _ n Z hZ hd t ht
   obtain ⟨s, hs, hcov⟩ := h3 n Z hZ
-  have H : ∀ p ∈ s, ∃ a : ℝ, 2 * a < dB0 Z ∧ ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k),
-      g ∈ Gz Z ∧ act g p = hom t p ∧
-      K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k))) ∧
-      IsCompact (K : Set (GL (Fin n) k)) ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k))) ∧
-      L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom) ∧
-      modul (stab Z p) K L g = (nabs k t)⁻¹ ^ a := by
+  have H
+      : ∀ p ∈ s, ∃ a : ℝ,
+        2 * a < dB0 Z
+          ∧ ∃ (K L : Subgroup (GL (Fin n) k)) (g : GL (Fin n) k),
+            g ∈ Gz Z ∧ act g p = hom t p ∧ K ≤ GzS Z
+              ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k)))
+              ∧ IsCompact (K : Set (GL (Fin n) k))
+              ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k)))
+              ∧ L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K
+              ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom)
+              ∧ modul (stab Z p) K L g = (nabs k t)⁻¹ ^ a := by
     intro p hp
     obtain ⟨hp1, hpn, hp2, P, w, hgr, hpos⟩ := hs p hp
     obtain ⟨a, ha, hat⟩ := h5 hT n Z hZ hd p P w hp1 hpn hp2 hgr hpos
@@ -263,17 +303,21 @@ theorem orbQ_of (h3 : Reps0 k) (h4 : StepModH k) (h5 : ModH k) : OrbQ k := by
     exact ha p (Finset.mem_toList.1 hp)
   · intro ξ hsupp hinv
     set mm : Sp k n → ℂ := fun p => (((nabs k t)⁻¹ ^ a p : ℝ) : ℂ) with hmm
-    have hprod : (polyH t (s.toList.map a) : Module.End ℂ ((Sp k n → ℂ) →ₗ[ℂ] ℂ)) =
-        aeval (pullH (n := n) t) (∏ p ∈ s, (X - Polynomial.C (mm p))) := by
+    have hprod
+        : (polyH t (s.toList.map a) : Module.End ℂ ((Sp k n → ℂ) →ₗ[ℂ] ℂ))
+          = aeval (pullH (n := n) t) (∏ p ∈ s, (X - Polynomial.C (mm p))) := by
       unfold polyH
-      rw [← Finset.prod_map_toList s (fun p => X - Polynomial.C (mm p)), map_list_prod, List.map_map, List.map_map]
+      rw [← Finset.prod_map_toList s (fun p => X - Polynomial.C (mm p)), map_list_prod,
+        List.map_map, List.map_map]
       congr 1
       refine List.map_congr_left fun p _ => ?_
       simp only [mm, Function.comp_apply, map_sub, aeval_X, aeval_C, Algebra.algebraMap_eq_smul_one]
       rfl
     rw [hprod]
     refine main_ind h4 hZ t mm s ?_ s.card s le_rfl subset_rfl (NB Z ×ˢ Set.univ) isClosed_NB
-      (fun h hh q hq => act_mem_NB hZ hh hq) (fun q hq => hom_mem_NB t hq) ?_ ξ hinv hsupp _ dvd_rfl
+      (fun h hh q hq => act_mem_NB hZ hh hq)
+      (fun q hq => hom_mem_NB t hq)
+      ?_ ξ hinv hsupp _ dvd_rfl
     · intro p hp
       obtain ⟨K, L, g, hgG, hact, hK, hKo, hKc, hLo, hLKK, hLn1, hLn2, hmod⟩ := hKLg p hp
       exact ⟨(hs p hp).2.2.1, K, L, g, hgG, hact, hK, hKo, hKc, hLo, hLKK, hLn1, hLn2, by rw [hmod]⟩

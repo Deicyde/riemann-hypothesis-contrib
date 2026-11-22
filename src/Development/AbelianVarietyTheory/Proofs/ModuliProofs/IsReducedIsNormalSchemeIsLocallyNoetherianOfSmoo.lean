@@ -9,15 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsDomain
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-theorem isDomain_and_isIntegrallyClosed_stalk_Sp (A : Type) [CommRing A] [IsDomain A]
-    [IsIntegrallyClosed A] (y : Sp A) :
-    IsDomain ((Sp A).presheaf.stalk y) ∧ IsIntegrallyClosed ((Sp A).presheaf.stalk y) := by
+theorem isDomain_and_isIntegrallyClosed_stalk_Sp
+    (A : Type) [CommRing A] [IsDomain A] [IsIntegrallyClosed A] (y : Sp A)
+    : IsDomain ((Sp A).presheaf.stalk y) ∧ IsIntegrallyClosed ((Sp A).presheaf.stalk y) := by
   have hy : (y.asIdeal : Ideal A).IsPrime := y.isPrime
   let _ : Algebra A ((Sp A).presheaf.stalk y) := StructureSheaf.stalkAlgebra A y
   have : IsLocalization.AtPrime ((Sp A).presheaf.stalk y) (y.asIdeal : Ideal A) :=
@@ -25,9 +27,9 @@ theorem isDomain_and_isIntegrallyClosed_stalk_Sp (A : Type) [CommRing A] [IsDoma
   exact isDomain_and_isIntegrallyClosed_atPrime_of_isDomain (B := A) (y.asIdeal : Ideal A)
     ((Sp A).presheaf.stalk y)
 
-theorem isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field :
-    ∀ (k : Type) [Field k] (X : Scheme.{0}) (s : X ⟶ Sp k), Smooth s →
-      IsReduced X ∧ IsNormalScheme X ∧ IsLocallyNoetherian X := by
+theorem isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field
+    : ∀ (k : Type) [Field k] (X : Scheme.{0}) (s : X ⟶ Sp k),
+      Smooth s → IsReduced X ∧ IsNormalScheme X ∧ IsLocallyNoetherian X := by
   intro k _ X s hs
   have : Smooth s := hs
   have hN : ∀ x : X, IsDomain (X.presheaf.stalk x) ∧ IsIntegrallyClosed (X.presheaf.stalk x) :=

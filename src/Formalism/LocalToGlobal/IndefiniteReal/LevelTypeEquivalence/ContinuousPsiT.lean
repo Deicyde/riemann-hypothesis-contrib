@@ -8,8 +8,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.Contin
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Filter
+  Topology
 open scoped TensorProduct ContDiff ENNReal
 
 namespace Formalism.IndefR.Eqv
@@ -19,8 +21,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7} {S T : HSp D} {k : ℕ}
 
 theorem continuous_psiT (τ : D.what₂.Tau) : Continuous (psiT D τ) := by
-  have heq : (psiT D τ : AE D → ℂ) = fun x => gW D (plW D τ) (fstA D.host.F ((basAF D).repr x 0)) +
-      gW D (plW D τ) (fstA D.host.F ((basAF D).repr x 1)) * betaT D τ := by
+  have heq
+      : (psiT D τ : AE D → ℂ)
+        = fun x =>
+          gW D (plW D τ) (fstA D.host.F ((basAF D).repr x 0))
+            + gW D (plW D τ) (fstA D.host.F ((basAF D).repr x 1)) * betaT D τ := by
     funext x
     simp only [psiT, RingHom.coe_comp, Function.comp_apply]
     rw [thetaC_decomp, repr_infPart, repr_infPart]

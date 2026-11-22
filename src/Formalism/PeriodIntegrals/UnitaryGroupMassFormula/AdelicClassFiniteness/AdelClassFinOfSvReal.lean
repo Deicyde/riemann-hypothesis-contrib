@@ -15,7 +15,8 @@ noncomputable section
 namespace PIW.AdelClassFin
 
 theorem adelClassFin_of_svReal (h : SvReal) : PI.AdelClassFin.AdelClassFin :=
-  adelClassFin_of_open spOne existsBoundedMultiplier successive_vector_majorant_e successive_vector_codifferent successive_vector_basis successive_vector_gram_det h
+  adelClassFin_of_open spOne existsBoundedMultiplier successive_vector_majorant_e
+    successive_vector_codifferent successive_vector_basis successive_vector_gram_det h
 
 end PIW.AdelClassFin
 

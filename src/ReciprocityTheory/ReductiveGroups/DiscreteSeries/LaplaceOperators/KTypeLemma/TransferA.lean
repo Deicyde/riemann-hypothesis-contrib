@@ -110,12 +110,13 @@ lemma ta_inUJ_mul_exp (ε : Fin n → Bool) {g X : Matrix (Fin n) (Fin n) ℂ} (
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-theorem ta_rdV_local (ε : Fin n → Bool) {F : Matrix (Fin n) (Fin n) ℂ → E}
-    {W : Set (Matrix (Fin n) (Fin n) ℂ)} {m g X : Matrix (Fin n) (Fin n) ℂ}
-    (hW : IsOpen W) (hg : g ∈ W) (hgu : inUJ ε g) (hX : inG ε X)
-    (hF : DifferentiableAt ℂ F (g⁻¹ * m)) {f : Matrix (Fin n) (Fin n) ℂ → E}
-    (hf : ∀ h ∈ W, inUJ ε h → f h = F (h⁻¹ * m)) :
-    RdV X f g = fderiv ℂ F (g⁻¹ * m) (-X * (g⁻¹ * m)) := by
+theorem ta_rdV_local
+    (ε : Fin n → Bool)
+    {F : Matrix (Fin n) (Fin n) ℂ → E} {W : Set (Matrix (Fin n) (Fin n) ℂ)}
+    {m g X : Matrix (Fin n) (Fin n) ℂ} (hW : IsOpen W) (hg : g ∈ W) (hgu : inUJ ε g) (hX : inG ε X)
+    (hF : DifferentiableAt ℂ F (g⁻¹ * m))
+    {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : ∀ h ∈ W, inUJ ε h → f h = F (h⁻¹ * m))
+    : RdV X f g = fderiv ℂ F (g⁻¹ * m) (-X * (g⁻¹ * m)) := by
   have hc := ta_curve g X
   have hnear : ∀ᶠ t : ℝ in nhds (0 : ℝ), g * NormedSpace.exp ((t : ℂ) • X) ∈ W := by
     apply hc.continuousAt.preimage_mem_nhds
@@ -124,30 +125,36 @@ theorem ta_rdV_local (ε : Fin n → Bool) {F : Matrix (Fin n) (Fin n) ℂ → E
     rw [h0]
     exact hW.mem_nhds hg
   have hcn := ta_curve_neg X (g⁻¹ * m)
-  have hcomp : HasDerivAt (fun t : ℝ => F (NormedSpace.exp (-((t : ℂ) • X)) * (g⁻¹ * m)))
+  have hcomp : HasDerivAt
+      (fun t : ℝ => F (NormedSpace.exp (-((t : ℂ) • X)) * (g⁻¹ * m)))
       (fderiv ℂ F (g⁻¹ * m) (-X * (g⁻¹ * m))) 0 := by
-    have := (hF.hasFDerivAt.restrictScalars ℝ).comp_hasDerivAt_of_eq (0 : ℝ) hcn
-      (by simp only [Complex.ofReal_zero, zero_smul, neg_zero, NormedSpace.exp_zero, one_mul])
+    have :=
+      (hF.hasFDerivAt.restrictScalars ℝ).comp_hasDerivAt_of_eq (0 : ℝ) hcn
+        (by simp only [Complex.ofReal_zero, zero_smul, neg_zero, NormedSpace.exp_zero, one_mul])
     exact this
-  have heq : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[nhds 0]
-      (fun t : ℝ => F (NormedSpace.exp (-((t : ℂ) • X)) * (g⁻¹ * m))) := by
+  have heq
+      : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[nhds 0]
+        (fun t : ℝ => F (NormedSpace.exp (-((t : ℂ) • X)) * (g⁻¹ * m))) := by
     filter_upwards [hnear] with t ht
     rw [hf _ ht (ta_inUJ_mul_exp ε hgu hX t), Matrix.mul_inv_rev, ← Matrix.exp_neg, mul_assoc]
   exact (hcomp.congr_of_eventuallyEq heq).deriv
 
-theorem ta_ecV_local (ε : Fin n → Bool) {F : Matrix (Fin n) (Fin n) ℂ → E}
-    {W : Set (Matrix (Fin n) (Fin n) ℂ)} {m g : Matrix (Fin n) (Fin n) ℂ}
-    (hW : IsOpen W) (hg : g ∈ W) (hgu : inUJ ε g)
-    (hF : DifferentiableAt ℂ F (g⁻¹ * m)) {f : Matrix (Fin n) (Fin n) ℂ → E}
-    (hf : ∀ h ∈ W, inUJ ε h → f h = F (h⁻¹ * m)) (Z : Matrix (Fin n) (Fin n) ℂ) :
-    EcV ε Z f g = Lhol (-Z) F (g⁻¹ * m) := by
+theorem ta_ecV_local
+    (ε : Fin n → Bool)
+    {F : Matrix (Fin n) (Fin n) ℂ → E} {W : Set (Matrix (Fin n) (Fin n) ℂ)}
+    {m g : Matrix (Fin n) (Fin n) ℂ}
+    (hW : IsOpen W) (hg : g ∈ W) (hgu : inUJ ε g) (hF : DifferentiableAt ℂ F (g⁻¹ * m))
+    {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : ∀ h ∈ W, inUJ ε h → f h = F (h⁻¹ * m))
+    (Z : Matrix (Fin n) (Fin n) ℂ)
+    : EcV ε Z f g = Lhol (-Z) F (g⁻¹ * m) := by
   unfold EcV Lhol
-  rw [ta_rdV_local ε hW hg hgu (ta_inG_cpart1 ε Z) hF hf, ta_rdV_local ε hW hg hgu (ta_inG_cpart2 ε Z) hF hf,
-    ← map_smul, ← map_add]
+  rw [ta_rdV_local ε hW hg hgu (ta_inG_cpart1 ε Z) hF hf,
+    ta_rdV_local ε hW hg hgu (ta_inG_cpart2 ε Z) hF hf, ← map_smul, ← map_add]
   congr 1
-  calc -cpart1 ε Z * (g⁻¹ * m) + Complex.I • (-cpart2 ε Z * (g⁻¹ * m))
-      = -(cpart1 ε Z + Complex.I • cpart2 ε Z) * (g⁻¹ * m) := by
-        simp only [neg_mul, smul_neg, add_mul, smul_mul_assoc, neg_add]
+  calc
+    - cpart1 ε Z * (g⁻¹ * m) + Complex.I • (- cpart2 ε Z * (g⁻¹ * m))
+        = -(cpart1 ε Z + Complex.I • cpart2 ε Z) * (g⁻¹ * m) := by
+      simp only [neg_mul, smul_neg, add_mul, smul_mul_assoc, neg_add]
     _ = -Z * (g⁻¹ * m) := by rw [ta_cpart_sum ε Z]
 
 end ReciprocityTheory.ChartRestriction.DS.Lap.LemK

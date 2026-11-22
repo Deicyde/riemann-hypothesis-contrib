@@ -64,7 +64,8 @@ theorem locKer_of (hS : StrictHenselization) (hL : LhNat) : LocKer := by
   let z : ∀ t : (Σ a : Fin (M + 1), Fin (r a)), Ht q (sp (D.obj j₀)) (n - ((t.1 : ℕ) : ℤ)) 0 :=
     fun t => N • pull _ (sch.map ψ) _ _ (y t.1 t.2)
   have e1 : spMap (cc.ι.app j₀).hom ≫ sch.map ψ = sch.map φ := by
-    simp only [spMap, CommRingCat.ofHom_hom, ψ, φ, ← Functor.map_comp, Spec.map_comp, Category.assoc]
+    simp only [spMap, CommRingCat.ofHom_hom, ψ, φ, ← Functor.map_comp, Spec.map_comp,
+      Category.assoc]
   have hz : ∀ t, pull _ (spMap (cc.ι.app j₀).hom) _ _ (z t) = 0 := by
     intro t
     have := congrFun (congrFun h2 t.1) t.2
@@ -74,8 +75,11 @@ theorem locKer_of (hS : StrictHenselization) (hL : LhNat) : LocKer := by
     exact this
   have hk : ∀ t, ∃ (k : J) (f : j₀ ⟶ k), pull _ (spMap (D.map f).hom) _ _ (z t) = 0 := fun t =>
     (hB q D cc hc _ _).2 j₀ (z t) (hunit j₀) (hz t)
-  obtain ⟨k, F, hF⟩ := lk_fin j₀ (fun t {k} (f : j₀ ⟶ k) => pull _ (spMap (D.map f).hom) _ _ (z t) = 0)
-    (fun t k k' f g hf => by simp only [Functor.map_comp, lk_pull_spMap, hf, map_zero]) hk
+  obtain ⟨k, F, hF⟩ :=
+    lk_fin j₀
+      (fun t {k} (f : j₀ ⟶ k) => pull _ (spMap (D.map f).hom) _ _ (z t) = 0)
+      (fun t k k' f g hf => by simp only [Functor.map_comp, lk_pull_spMap, hf, map_zero])
+      hk
   let gl : Spec (D.obj k) ⟶ U.left := Spec.map (w.app k) ≫ ι
   have hwk : w.app k = w.app j₀ ≫ D.map F := by simpa using (w.naturality F)
   have := lk_etale _ (hw k).1
@@ -83,10 +87,13 @@ theorem locKer_of (hS : StrictHenselization) (hL : LhNat) : LocKer := by
   refine ⟨Over.mk (gl ≫ U.hom), Over.homMk gl rfl, ⟨?_, 𝔮, ?_⟩, fun a s => ?_⟩
   · change Etale gl; infer_instance
   · change ι (Spec.map (w.app k) 𝔮) = u
-    rw [← hb]; congr 1; exact PrimeSpectrum.ext h𝔮
+    rw [← hb]
+    congr 1
+    exact PrimeSpectrum.ext h𝔮
   · have := hF ⟨a, s⟩
     have e2 : sch.map gl = spMap (D.map F).hom ≫ sch.map ψ := by
-      simp only [gl, ψ, hwk, spMap, CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc, Functor.map_comp]
+      simp only [gl, ψ, hwk, spMap, CommRingCat.ofHom_hom, Spec.map_comp, Category.assoc,
+        Functor.map_comp]
     change N • pull _ (sch.map gl) _ _ (y a s) = 0
     rw [e2, pull_comp, ← map_nsmul]
     exact this

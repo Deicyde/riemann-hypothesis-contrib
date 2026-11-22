@@ -13,17 +13,29 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.Member GlobalTheory.CompRat GlobalTheory.FinalJoin
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.CoverRead
+  GlobalTheory.Member GlobalTheory.CompRat GlobalTheory.FinalJoin
 open scoped TensorProduct Matrix
 
 namespace GlobalTheory.CoverRead.Cover
 
-theorem exists_pinned_dom : ∀ (D : D7) (T : CoreJ D), LawsJ T → ∀ j, Formalism.L2.Pj.InR D j → ∀ σ : T.Q.c.F →+* ℂ,
-    GoodEmb T.Q.c σ → ∀ C : Cover T j σ, C.IsUnif → ∀ n : ℕ, ∃ cc₂ : C.U₂.Comp → ℂ,
-      ∀ a : (D.host.E →+* ℂ) × ℕ → ℕ, Dom a n → ({ C with cc₂ := cc₂ } : Cover T j σ).IsPinned a n := by
+theorem exists_pinned_dom
+    : ∀ (D : D7) (T : CoreJ D),
+      LawsJ T
+        → ∀ j,
+          Formalism.L2.Pj.InR D j
+            → ∀ σ : T.Q.c.F →+* ℂ,
+              GoodEmb T.Q.c σ
+                → ∀ C : Cover T j σ,
+                  C.IsUnif
+                    → ∀ n : ℕ, ∃ cc₂ : C.U₂.Comp → ℂ, ∀ a : (D.host.E →+* ℂ) × ℕ → ℕ,
+                      Dom a n → ({ C with cc₂ := cc₂ } : Cover T j σ).IsPinned a n := by
   intro D T hT j hj σ hσ C hC n
-  obtain ⟨u, hu1, hu⟩ := GlobalTheory.T.exists_unitConstant_coverPullbackReading D T hT j hj σ hσ C hC n
+  obtain ⟨u, hu1, hu⟩ :=
+    GlobalTheory.T.exists_unitConstant_coverPullbackReading D T hT j hj σ hσ C hC n
   choose k γ hk using fun k₂ => GlobalTheory.T.coverComponent_over_baseComponent_rationalIsometry D T hT j hj σ hσ C hC k₂
   have hu0 : ∀ k₂, u k₂ ≠ 0 := fun k₂ h => by simpa [h] using hu1 k₂
   refine ⟨fun k₂ => T.cE j σ (k k₂) / u k₂, fun a ha => ⟨?_, ?_⟩⟩

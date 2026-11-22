@@ -4,8 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.exists_linear_preimage_of_successive_approximation :
-    ∀ (A M ι : Type) [CommRing A] [AddCommGroup M] [Module A M] [Fintype ι] (I : Ideal A) [IsAdicComplete I A] (V : ℕ → Submodule A M) (σ : (ι → A) →ₗ[A] M), Antitone V → (∀ k, (I ^ k • ⊤ : Submodule A M) ≤ V k) → (∀ f, (∀ k, f ∈ V k) → f = 0) → (∀ j, ∀ f ∈ V j, ∃ a : ι → A, (∀ i, a i ∈ I ^ j) ∧ f - σ a ∈ V (j + 1)) → ∀ j, ∀ f ∈ V j, ∃ a : ι → A, (∀ i, a i ∈ I ^ j) ∧ σ a = f := by
+theorem UpperTheory.exists_linear_preimage_of_successive_approximation
+    : ∀ (A M ι : Type) [CommRing A] [AddCommGroup M] [Module A M] [Fintype ι] (I : Ideal A)
+        [IsAdicComplete I A] (V : ℕ → Submodule A M) (σ : (ι → A) →ₗ[A] M),
+      Antitone V → (∀ k, (I ^ k • ⊤ : Submodule A M) ≤ V k) → (∀ f, (∀ k, f ∈ V k) → f = 0)
+        → (∀ j, ∀ f ∈ V j, ∃ a : ι → A, (∀ i, a i ∈ I ^ j) ∧ f - σ a ∈ V (j + 1))
+        → ∀ j, ∀ f ∈ V j, ∃ a : ι → A, (∀ i, a i ∈ I ^ j) ∧ σ a = f := by
   intro A M ι _ _ _ _ I _ V σ hV hI hsep hstep j f hf
   classical
   let a' : ℕ → M → ι → A := fun k g => if h : g ∈ V k then (hstep k g h).choose else 0
@@ -32,8 +36,9 @@ theorem UpperTheory.exists_linear_preimage_of_successive_approximation :
       show r N - σ (b N) = f - σ (∑ n ∈ Finset.range (N + 1), b n)
       rw [ih, Finset.sum_range_succ, map_add (f := _)]
       abel
-  have hlim : ∀ i, ∃ L : A, ∀ n,
-      (∑ k ∈ Finset.range n, b k i) ≡ L [SMOD (I ^ n • ⊤ : Submodule A A)] := by
+  have hlim
+      : ∀ i, ∃ L : A, ∀ n,
+        (∑ k ∈ Finset.range n, b k i) ≡ L [SMOD (I ^ n • ⊤ : Submodule A A)] := by
     intro i
     refine IsPrecomplete.prec (inferInstance : IsPrecomplete I A) ?_
     intro m n hmn
@@ -42,8 +47,9 @@ theorem UpperTheory.exists_linear_preimage_of_successive_approximation :
     have hmk : m ≤ j + k := by
       have := (Finset.mem_Ico.mp hk).1
       omega
-    simpa using Submodule.smul_mem_smul (Ideal.pow_le_pow_right hmk (hb k i))
-      (Submodule.mem_top : (1 : A) ∈ (⊤ : Submodule A A))
+    simpa using
+      Submodule.smul_mem_smul (Ideal.pow_le_pow_right hmk (hb k i))
+        (Submodule.mem_top : (1 : A) ∈ (⊤ : Submodule A A))
   choose L hL using hlim
   refine ⟨L, fun i => ?_, ?_⟩
   · have h1 := SModEq.sub_mem.mp (hL i j)

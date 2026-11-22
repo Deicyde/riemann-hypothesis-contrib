@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.BlockIdentityExpansion
 
-open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.PositiveSpanMatrices
+open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.PositiveSpanMatrices
 open scoped ComplexConjugate
 
 noncomputable section
@@ -112,19 +113,24 @@ private lemma hermC_add_right_fundamental_domains (τ : E →+* ℂ) (G : Matrix
   unfold hermC
   simp only [Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
-theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
+theorem key
+    (X : DataX E r)
+    (ξ : Fin r → E)
+    (z0 x0 : Frame X.Ψ r)
     (f : X.Ψ → Fin (r - 2) → Fin r → ℂ) (h1 : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (δ : ℝ)
-    (hz : z0 ∈ X.dom) (hx0 : x0 ∈ X.dom) (hortho : X.IsOrtho x0)
-    (hflag : X.SameFlag z0 x0) (hf : X.UBasis z0 ξ f)
-    (hI : ∀ s t : X.Ψ → ℂ, X.applyV h1 (X.lineV ξ s + X.Jz z0 (X.lineV ξ t)) =
-      X.lineV ξ s + X.Jz z0 (X.lineV ξ t))
+    (hz : z0 ∈ X.dom) (hx0 : x0 ∈ X.dom) (hortho : X.IsOrtho x0) (hflag : X.SameFlag z0 x0)
+    (hf : X.UBasis z0 ξ f)
+    (hI : ∀ s t : X.Ψ → ℂ,
+      X.applyV h1 (X.lineV ξ s + X.Jz z0 (X.lineV ξ t)) = X.lineV ξ s + X.Jz z0 (X.lineV ξ t))
     (hUz : ∀ u ∈ X.Uz z0 ξ, X.applyV h1 u ∈ X.Uz z0 ξ)
-    (hgraph : ∀ τ (v : Fin r → ℂ), v ∈ Submodule.span ℂ (f τ '' {k | (k : ℕ) < X.p0 - 1}) →
-      ∀ c : Fin (r - 2) → ℂ, (h1 τ) *ᵥ v = ∑ k, c k • f τ k →
-        (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖c k‖ ^ 2) ≤
-          δ ^ 2 * ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖c k‖ ^ 2 else 0)
-    (τ : X.Ψ) (v : Fin r → ℂ) (hv : v ∈ Spos X.toData z0 τ) :
-    Neg X.toData x0 τ (h1 τ *ᵥ v) ≤ δ ^ 2 * Pos X.toData x0 τ (h1 τ *ᵥ v) := by
+    (hgraph : ∀ τ (v : Fin r → ℂ),
+      v ∈ Submodule.span ℂ (f τ '' {k | (k : ℕ) < X.p0 - 1})
+        → ∀ c : Fin (r - 2) → ℂ,
+          (h1 τ) *ᵥ v = ∑ k, c k • f τ k
+            → (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖c k‖ ^ 2)
+              ≤ δ ^ 2 * ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖c k‖ ^ 2 else 0)
+    (τ : X.Ψ) (v : Fin r → ℂ) (hv : v ∈ Spos X.toData z0 τ)
+    : Neg X.toData x0 τ (h1 τ *ᵥ v) ≤ δ ^ 2 * Pos X.toData x0 τ (h1 τ *ᵥ v) := by
   classical
   obtain ⟨hperp, hJ, hgr, -, hspan⟩ := hf τ
   have hdet0 : (mat x0 τ).det ≠ 0 := (hx0 τ).1
@@ -157,8 +163,10 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
     intro k hk
     rw [← hvP, Data.ppos_selfadj (X := X.toData) hz τ v (f τ k), hPneg k hk, hermC_zero_right']
 
-  obtain ⟨a, ha⟩ : ∃ a : Fin (r - 2) → ℂ,
-      a = fun k : Fin (r - 2) => if (k : ℕ) < X.p0 - 1 then hermC τ.1 X.Gm v (f τ k) else 0 := ⟨_, rfl⟩
+  obtain ⟨a, ha⟩
+      : ∃ a : Fin (r - 2) → ℂ,
+        a = fun k : Fin (r - 2) => if (k : ℕ) < X.p0 - 1 then hermC τ.1 X.Gm v (f τ k) else 0 :=
+    ⟨_, rfl⟩
   obtain ⟨w, hw⟩ : ∃ w : Fin r → ℂ, w = ∑ k, a k • f τ k := ⟨_, rfl⟩
   have hwspan : w ∈ Submodule.span ℂ (f τ '' {k | (k : ℕ) < X.p0 - 1}) := by
     rw [hw]
@@ -172,8 +180,8 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
     by_cases hk : (k : ℕ) < X.p0 - 1
     · exact Submodule.smul_mem _ _ (hfS k hk)
     · simp [ha, hk]
-  have hfw : ∀ k, hermC τ.1 X.Gm (f τ k) w =
-      conj (a k) * (if (k : ℕ) < X.p0 - 1 then 1 else -1) := by
+  have hfw
+      : ∀ k, hermC τ.1 X.Gm (f τ k) w = conj (a k) * (if (k : ℕ) < X.p0 - 1 then 1 else -1) := by
     intro k
     rw [hw, hermC_sum_right_lemma_2]
     simp only [hgr, mul_ite, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -187,20 +195,22 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
     · rw [if_neg hk, ha]
       simp only [if_neg hk, map_zero, zero_mul, sub_zero]
       rw [← hermC_conj τ.1 X.Gm_herm, hvneg k hk, map_zero]
-  have hskew : ∀ u q, hermC τ.1 X.Gm (X.Jt z0 τ u) q = -hermC τ.1 X.Gm u (X.Jt z0 τ q) := by
+  have hskew : ∀ u q, hermC τ.1 X.Gm (X.Jt z0 τ u) q = - hermC τ.1 X.Gm u (X.Jt z0 τ q) := by
     intro u q
-    rw [hJt, hJt, hermC_smul_left_fundamental_domains, hermC_smul_right_fundamental_domains, hermC_sub_left', hermC_sub_right',
-      hermC_smul_left_fundamental_domains, hermC_smul_right_fundamental_domains, Data.ppos_selfadj (X := X.toData) hz τ u q, Complex.conj_I]
-    first
-      | (simp only [map_ofNat]; ring)
-      | (simp; ring)
+    rw [hJt, hJt, hermC_smul_left_fundamental_domains, hermC_smul_right_fundamental_domains,
+      hermC_sub_left', hermC_sub_right', hermC_smul_left_fundamental_domains,
+      hermC_smul_right_fundamental_domains, Data.ppos_selfadj (X := X.toData) hz τ u q,
+      Complex.conj_I]
+    first | (simp only [map_ofNat]; ring) | (simp; ring)
 
-  let Lq : (Fin r → ℂ) → (Fin r → ℂ) →ₗ[ℂ] ℂ := fun q =>
-    { toFun := fun u => hermC τ.1 X.Gm u q
-      map_add' := fun u u' => hermC_add_left_fundamental_domains _ _ u u' q
-      map_smul' := fun c u => hermC_smul_left_fundamental_domains _ _ c u q }
-  have hK : ⨅ i, LinearMap.ker (![Lq (Data.emb τ.1 ξ), Lq (X.Jt z0 τ (Data.emb τ.1 ξ))] i) ≤
-      LinearMap.ker (Lq (v - w)) := by
+  let Lq : (Fin r → ℂ) → (Fin r → ℂ) →ₗ[ℂ] ℂ := fun q => {
+    toFun := fun u => hermC τ.1 X.Gm u q
+    map_add' := fun u u' => hermC_add_left_fundamental_domains _ _ u u' q
+    map_smul' := fun c u => hermC_smul_left_fundamental_domains _ _ c u q
+  }
+  have hK
+      : ⨅ i, LinearMap.ker (![Lq (Data.emb τ.1 ξ), Lq (X.Jt z0 τ (Data.emb τ.1 ξ))] i)
+        ≤ LinearMap.ker (Lq (v - w)) := by
     intro u hu
     rw [Submodule.mem_iInf] at hu
     have h0 : hermC τ.1 X.Gm u (Data.emb τ.1 ξ) = 0 := hu 0
@@ -211,14 +221,18 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
     rw [← hc, hermC_sum_left_lemma]
     exact Finset.sum_eq_zero fun k _ => by rw [hfp k, mul_zero]
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (mem_span_of_iInf_ker_le_ker hK)
-  have hc' : ∀ u, hermC τ.1 X.Gm u (v - w) =
-      hermC τ.1 X.Gm u (conj (c 0) • Data.emb τ.1 ξ + conj (c 1) • X.Jt z0 τ (Data.emb τ.1 ξ)) := by
+  have hc'
+      : ∀ u,
+        hermC τ.1 X.Gm u (v - w)
+          = hermC τ.1 X.Gm u
+            (conj (c 0) • Data.emb τ.1 ξ + conj (c 1) • X.Jt z0 τ (Data.emb τ.1 ξ)) := by
     intro u
     have h := LinearMap.congr_fun hc u
     simp only [Fin.sum_univ_two, LinearMap.add_apply, LinearMap.smul_apply, Matrix.cons_val_zero,
-      Matrix.cons_val_one, Matrix.head_cons, smul_eq_mul] at h
-    rw [hermC_add_right_fundamental_domains, hermC_smul_right_fundamental_domains, hermC_smul_right_fundamental_domains, Complex.conj_conj,
-      Complex.conj_conj]
+        Matrix.cons_val_one, Matrix.head_cons, smul_eq_mul]
+      at h
+    rw [hermC_add_right_fundamental_domains, hermC_smul_right_fundamental_domains,
+      hermC_smul_right_fundamental_domains, Complex.conj_conj, Complex.conj_conj]
     exact h.symm
   have hnd : ∀ z : Fin r → ℂ, (∀ u, hermC τ.1 X.Gm u z = 0) → z = 0 := by
     intro z hz'
@@ -231,17 +245,16 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
   have hfix : h1 τ *ᵥ (v - w) = v - w := by
     have h := congrFun (hI (fun _ => conj (c 0)) (fun _ => conj (c 1))) τ
     simp only [Data.applyV, Data.lineV, Data.Jz, Pi.add_apply] at h
-    have he : conj (c 0) • Data.emb τ.1 ξ + conj (c 1) • X.Jt z0 τ (Data.emb τ.1 ξ) =
-        conj (c 0) • Data.emb τ.1 ξ + I • ((2 : ℂ) • X.ppos z0 τ (conj (c 1) • Data.emb τ.1 ξ) -
-          conj (c 1) • Data.emb τ.1 ξ) := by
+    have he
+        : conj (c 0) • Data.emb τ.1 ξ + conj (c 1) • X.Jt z0 τ (Data.emb τ.1 ξ)
+          = conj (c 0) • Data.emb τ.1 ξ
+            + I
+              • ((2 : ℂ) • X.ppos z0 τ (conj (c 1) • Data.emb τ.1 ξ)
+                - conj (c 1) • Data.emb τ.1 ξ) := by
       rw [hJt, ppos_smul_fundamental_domains]
-      first
-        | module
-        | (simp only [smul_sub, smul_smul]; ring_nf)
+      first | module | (simp only [smul_sub, smul_smul]; ring_nf)
     rw [hpq, he]
-    first
-      | exact h
-      | simpa using h
+    first | exact h | simpa using h
 
   have hwe : hermC τ.1 X.Gm w (Data.emb τ.1 ξ) = 0 := by
     rw [hw, hermC_sum_left_lemma]
@@ -259,7 +272,8 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
         exact hermC_zero_left' _ _ _
     · by_cases h : τ' = τ
       · simp only [Data.Jz, if_pos h]
-        rw [h, hwP, hermC_smul_left_fundamental_domains, hermC_sub_left', hermC_smul_left_fundamental_domains, hwe]
+        rw [h, hwP, hermC_smul_left_fundamental_domains, hermC_sub_left',
+          hermC_smul_left_fundamental_domains, hwe]
         ring
       · simp only [Data.Jz, if_neg h, hp0, smul_zero, sub_zero]
         exact hermC_zero_left' _ _ _
@@ -279,10 +293,12 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
   rw [hy]
 
   have hpS0 : v - w ∈ Spos X.toData x0 τ := hS ▸ Submodule.sub_mem _ hv hwS
-  obtain ⟨b, hb⟩ : ∃ b : Fin (r - 2) → ℂ,
-      b = fun k : Fin (r - 2) => if (k : ℕ) < X.p0 - 1 then 0 else cc k := ⟨_, rfl⟩
-  have hNeq : PositiveSpanMatrices.Neg X.toData x0 τ ((v - w) + ∑ k, cc k • f τ k) =
-      PositiveSpanMatrices.Neg X.toData x0 τ (∑ k, b k • f τ k) := by
+  obtain ⟨b, hb⟩
+      : ∃ b : Fin (r - 2) → ℂ, b = fun k : Fin (r - 2) => if (k : ℕ) < X.p0 - 1 then 0 else cc k :=
+    ⟨_, rfl⟩
+  have hNeq
+      : PositiveSpanMatrices.Neg X.toData x0 τ ((v - w) + ∑ k, cc k • f τ k)
+        = PositiveSpanMatrices.Neg X.toData x0 τ (∑ k, b k • f τ k) := by
     unfold PositiveSpanMatrices.Neg
     refine Finset.sum_congr rfl fun a' _ => ?_
     rw [hermC_add_left_fundamental_domains, perp_kap (X := X.toData) hortho τ _ hpS0 a', zero_add,
@@ -294,8 +310,9 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
     · simp only [if_pos hk, zero_mul]
       rw [perp_kap (X := X.toData) hortho τ _ (hS ▸ hfS k hk) a', mul_zero]
     · simp only [if_neg hk]
-  have hnegperp : ∀ b' : Fin X.p0,
-      hermC τ.1 X.Gm (∑ k, b k • f τ k) (col (mat x0 τ) (Fin.castLE X.p0_le b')) = 0 := by
+  have hnegperp
+      : ∀ b' : Fin X.p0,
+        hermC τ.1 X.Gm (∑ k, b k • f τ k) (col (mat x0 τ) (Fin.castLE X.p0_le b')) = 0 := by
     intro b'
     rw [hermC_sum_left_lemma]
     refine Finset.sum_eq_zero fun k _ => ?_
@@ -306,13 +323,15 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
       rw [perp_of_ppos_zero (X := X.toData) hx0 τ (f τ k) ?_ b', mul_zero]
       rw [← FrameDegreeData.ppos_sameFlag (X := X.toData) hz hx0 hflag τ]
       exact hPneg k hk
-  have hN : PositiveSpanMatrices.Neg X.toData x0 τ ((v - w) + ∑ k, cc k • f τ k) =
-      ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖cc k‖ ^ 2 := by
+  have hN
+      : PositiveSpanMatrices.Neg X.toData x0 τ ((v - w) + ∑ k, cc k • f τ k)
+        = ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖cc k‖ ^ 2 := by
     rw [hNeq]
     have h1' := re_self_of_perp (X := X.toData) hortho τ hdet0 _ hnegperp
     have h2' := f_gram_re X.toData ξ z0 f hf τ b
-    have h3' : PositiveSpanMatrices.Neg X.toData x0 τ (∑ k, b k • f τ k) =
-        -∑ k : Fin (r - 2), (if (k : ℕ) < X.p0 - 1 then ‖b k‖ ^ 2 else -‖b k‖ ^ 2) := by
+    have h3'
+        : PositiveSpanMatrices.Neg X.toData x0 τ (∑ k, b k • f τ k)
+          = - ∑ k : Fin (r - 2), (if (k : ℕ) < X.p0 - 1 then ‖b k‖ ^ 2 else -‖b k‖ ^ 2) := by
       linarith
     rw [h3', ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
@@ -322,18 +341,21 @@ theorem key (X : DataX E r) (ξ : Fin r → E) (z0 x0 : Frame X.Ψ r)
   have hre := re_self_split (X := X.toData) hortho τ hdet0 ((v - w) + ∑ k, cc k • f τ k)
   have hpf : ∀ k, hermC τ.1 X.Gm (v - w) (f τ k) = 0 := fun k => by
     rw [← hermC_conj τ.1 X.Gm_herm, hfp k, map_zero]
-  have hexp : (hermC τ.1 X.Gm ((v - w) + ∑ k, cc k • f τ k) ((v - w) + ∑ k, cc k • f τ k)).re =
-      (hermC τ.1 X.Gm (v - w) (v - w)).re +
-        (hermC τ.1 X.Gm (∑ k, cc k • f τ k) (∑ k, cc k • f τ k)).re := by
-    rw [hermC_add_left_fundamental_domains, hermC_add_right_fundamental_domains, hermC_add_right_fundamental_domains,
-      hermC_sum_right_lemma_2 τ.1 X.Gm (v - w), hermC_sum_left_lemma τ.1 X.Gm cc (f τ) (v - w)]
+  have hexp
+      : (hermC τ.1 X.Gm ((v - w) + ∑ k, cc k • f τ k) ((v - w) + ∑ k, cc k • f τ k)).re
+        = (hermC τ.1 X.Gm (v - w) (v - w)).re
+          + (hermC τ.1 X.Gm (∑ k, cc k • f τ k) (∑ k, cc k • f τ k)).re := by
+    rw [hermC_add_left_fundamental_domains, hermC_add_right_fundamental_domains,
+      hermC_add_right_fundamental_domains, hermC_sum_right_lemma_2 τ.1 X.Gm (v - w),
+      hermC_sum_left_lemma τ.1 X.Gm cc (f τ) (v - w)]
     simp only [hpf, hfp, mul_zero, Finset.sum_const_zero, add_zero, zero_add, Complex.add_re]
   have hSS := f_gram_re X.toData ξ z0 f hf τ cc
   have hPp := re_self_of_mem (X := X.toData) hortho τ hdet0 _ hpS0
   have hP0 := Pos_nonneg (X := X.toData) x0 τ (v - w)
-  have hsplit : (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖cc k‖ ^ 2 else -‖cc k‖ ^ 2) =
-      (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖cc k‖ ^ 2 else 0) -
-        ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖cc k‖ ^ 2 := by
+  have hsplit
+      : (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖cc k‖ ^ 2 else -‖cc k‖ ^ 2)
+        = (∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then ‖cc k‖ ^ 2 else 0)
+          - ∑ k : Fin (r - 2), if (k : ℕ) < X.p0 - 1 then 0 else ‖cc k‖ ^ 2 := by
     rw [← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     split_ifs <;> ring

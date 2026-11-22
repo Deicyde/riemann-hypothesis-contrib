@@ -5,14 +5,18 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsAu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host
+  GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
 
 namespace GlobalTheory.LamTie.SplitBelow
 
-theorem ef_eq_one (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E) (P : Ideal (𝓞 E)) [hP : P.IsPrime] (hm : (p : 𝓞 E) ∈ P)
-    (hN : Ideal.absNorm P = p) : P.ramificationIdx (𝓞 F) * P.inertiaDeg (𝓞 F) = 1 := by
-
+theorem ef_eq_one
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {p : ℕ} (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ discr E)
+    (P : Ideal (𝓞 E)) [hP : P.IsPrime]
+    (hm : (p : 𝓞 E) ∈ P) (hN : Ideal.absNorm P = p)
+    : P.ramificationIdx (𝓞 F) * P.inertiaDeg (𝓞 F) = 1 := by
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   have hmZ : ((p : ℤ) : 𝓞 E) ∈ P := by simpa using hm
   have hU : Algebra.IsUnramifiedAt ℤ P :=
@@ -30,8 +34,11 @@ theorem ef_eq_one (F E : Type) [Field F] [NumberField F] [Field E] [NumberField 
   rw [(mul_eq_one.mp het.symm).2, (mul_eq_one.mp hft.symm).2]
   exact mul_one 1
 
-theorem splits_below_of_absNorm : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (p : ℕ), p.Prime → ¬ (p : ℤ) ∣ discr E → (∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → Ideal.absNorm P.asIdeal = p) → ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → Splits (below P) := by
-
+theorem splits_below_of_absNorm
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (p : ℕ),
+      p.Prime → ¬ (p : ℤ) ∣ discr E
+        → (∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → Ideal.absNorm P.asIdeal = p)
+        → ∀ P : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ P.asIdeal → Splits (below P) := by
   intro E _ _ _ p hp hd hN P hPm
   classical
   by_contra hns
@@ -47,8 +54,9 @@ theorem splits_below_of_absNorm : ∀ (E : Type) [Field E] [NumberField E] [IsCM
     have hne : q.1 ≠ ⊥ := Ideal.ne_bot_of_liesOver_of_ne_bot (below P).ne_bot q.1
     have h := hO ⟨q.1, hq.1, hne⟩ (Ideal.LiesOver.over (P := q.1) (p := (below P).asIdeal)).symm
     exact congrArg HeightOneSpectrum.asIdeal h
-  have hterm : ∀ q : (below P).asIdeal.primesOver (𝓞 E),
-      q.1.ramificationIdx (OF E) * q.1.inertiaDeg (OF E) = 1 := by
+  have hterm
+      : ∀ q : (below P).asIdeal.primesOver (𝓞 E),
+        q.1.ramificationIdx (OF E) * q.1.inertiaDeg (OF E) = 1 := by
     intro q
     rw [hq1 q]
     have := P.isPrime

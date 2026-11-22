@@ -8,20 +8,24 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_denominator_aeval_elem (O E A : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E]
-    [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A] (g : A)
-    (h : ∀ x : A, ∃ p : E[X], aeval g p = x) (x : A) :
-    ∃ c : O, c ≠ 0 ∧ ∃ p : O[X], aeval g p = c • x := by
+theorem exists_denominator_aeval_elem
+    (O E A : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
+    [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A]
+    (g : A) (h : ∀ x : A, ∃ p : E[X], aeval g p = x)
+    (x : A)
+    : ∃ c : O, c ≠ 0 ∧ ∃ p : O[X], aeval g p = c • x := by
   obtain ⟨q, rfl⟩ := h x
   obtain ⟨b, hb, hq⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors O) q
-  refine ⟨b, nonZeroDivisors.ne_zero hb, IsLocalization.integerNormalization (nonZeroDivisors O) q, ?_⟩
+  refine
+    ⟨b, nonZeroDivisors.ne_zero hb, IsLocalization.integerNormalization (nonZeroDivisors O) q, ?_⟩
   rw [← aeval_map_algebraMap E, hq, ← algebraMap_smul E b q, map_smul, algebraMap_smul]
 
-theorem exists_common_denominator_aeval_of_fg (O E A : Type) [CommRing O] [IsDomain O] [Field E]
-    [Algebra O E] [IsFractionRing O E] [CommRing A] [Algebra O A] [Algebra E A]
-    [IsScalarTower O E A] (g : A) (h : ∀ x : A, ∃ p : E[X], aeval g p = x)
-    (S : Submodule O A) (hS : S.FG) :
-    ∃ c : O, c ≠ 0 ∧ ∀ x ∈ S, ∃ p : O[X], aeval g p = c • x := by
+theorem exists_common_denominator_aeval_of_fg
+    (O E A : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
+    [CommRing A] [Algebra O A] [Algebra E A] [IsScalarTower O E A]
+    (g : A) (h : ∀ x : A, ∃ p : E[X], aeval g p = x)
+    (S : Submodule O A) (hS : S.FG)
+    : ∃ c : O, c ≠ 0 ∧ ∀ x ∈ S, ∃ p : O[X], aeval g p = c • x := by
   classical
   obtain ⟨s, rfl⟩ := hS
   have key : ∃ c : O, c ≠ 0 ∧ ∀ x ∈ s, ∃ p : O[X], aeval g p = c • x := by

@@ -18,25 +18,30 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-theorem sup_smul_top_eq_top_of_span {R M N : Type} [CommRing R] (I : Ideal R) [AddCommGroup M]
-    [Module R M] [AddCommGroup N] [Module (R ⧸ I) N] (om : M →ₛₗ[algebraMap R (R ⧸ I)] N)
-    (hinj : Function.Injective (PDiv.liftSemi om)) (S : Submodule R M)
-    (hall : ∀ y : N, y ∈ Submodule.span (R ⧸ I) (om '' (S : Set M))) :
-    S ⊔ I • (⊤ : Submodule R M) = ⊤ := by
+theorem sup_smul_top_eq_top_of_span
+    {R M N : Type} [CommRing R]
+    (I : Ideal R) [AddCommGroup M] [Module R M] [AddCommGroup N] [Module (R ⧸ I) N]
+    (om : M →ₛₗ[algebraMap R (R ⧸ I)] N) (hinj : Function.Injective (PDiv.liftSemi om))
+    (S : Submodule R M) (hall : ∀ y : N, y ∈ Submodule.span (R ⧸ I) (om '' (S : Set M)))
+    : S ⊔ I • (⊤ : Submodule R M) = ⊤ := by
   let f := TensorProduct.mk R (R ⧸ I) M 1
   have hsf : ∀ x, PDiv.liftSemi om (f x) = om x := fun x => by simp [f]
   have hmemK : ∀ x, f x ∈ Submodule.span (R ⧸ I) (f '' (S : Set M)) := by
     intro x
-    have h1 : PDiv.liftSemi om (f x) ∈ Submodule.map (PDiv.liftSemi om)
-        (Submodule.span (R ⧸ I) (f '' (S : Set M))) := by
+    have h1
+        : PDiv.liftSemi om (f x)
+          ∈ Submodule.map (PDiv.liftSemi om) (Submodule.span (R ⧸ I) (f '' (S : Set M))) := by
       have himg : (⇑(PDiv.liftSemi om) ∘ ⇑f) '' (S : Set M) = om '' (S : Set M) :=
         Set.image_congr fun a _ => hsf a
       rw [Submodule.map_span, ← Set.image_comp, himg, hsf]
@@ -45,17 +50,18 @@ theorem sup_smul_top_eq_top_of_span {R M N : Type} [CommRing R] (I : Ideal R) [A
     have hz' : z = f x := hinj hzx
     subst hz'
     exact hz
-  let Q : Submodule (R ⧸ I) ((R ⧸ I) ⊗[R] M) :=
-    { carrier := Submodule.map f S
-      add_mem' := fun ha hb => Submodule.add_mem _ ha hb
-      zero_mem' := Submodule.zero_mem _
-      smul_mem' := by
-        intro a z hz
-        obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective a
-        obtain ⟨w, hw, rfl⟩ := Submodule.mem_map.1 hz
-        refine Submodule.mem_map.2 ⟨r • w, Submodule.smul_mem _ r hw, ?_⟩
-        rw [map_smul]
-        exact (algebraMap_smul (R ⧸ I) r (f w)).symm }
+  let Q : Submodule (R ⧸ I) ((R ⧸ I) ⊗[R] M) := {
+    carrier := Submodule.map f S
+    add_mem' := fun ha hb => Submodule.add_mem _ ha hb
+    zero_mem' := Submodule.zero_mem _
+    smul_mem' := by
+      intro a z hz
+      obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective a
+      obtain ⟨w, hw, rfl⟩ := Submodule.mem_map.1 hz
+      refine Submodule.mem_map.2 ⟨r • w, Submodule.smul_mem _ r hw, ?_⟩
+      rw [map_smul]
+      exact (algebraMap_smul (R ⧸ I) r (f w)).symm
+  }
   have hQ : Submodule.span (R ⧸ I) (f '' (S : Set M)) ≤ Q := by
     rw [Submodule.span_le]
     rintro _ ⟨a, ha, rfl⟩
@@ -74,13 +80,17 @@ theorem sup_smul_top_eq_top_of_span {R M N : Type} [CommRing R] (I : Ideal R) [A
   rw [hx]
   exact Submodule.add_mem_sup hy hxy
 
-theorem psi_sup_smul_top_eq_top : GlobalTheory.Published.AbelianHodgeDeRham →
-    ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ), (p : R) ^ N = 0 →
-    ∀ (A : Over (Sp R)) [GrpObj A] (g : ℕ), IsAbelianScheme A →
-    SmoothOfRelativeDimension g A.hom →
-    ∀ (G : PDivGroup p R) (t : G.TorsionTower A) (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
-    (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c))) →
-    ∀ I : Ideal R, I.IsMaximal → LinearMap.range ψ ⊔ I • (⊤ : Submodule R G.omega) = ⊤ := by
+theorem psi_sup_smul_top_eq_top
+    : GlobalTheory.Published.AbelianHodgeDeRham
+      → ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (N : ℕ),
+        (p : R) ^ N = 0
+          → ∀ (A : Over (Sp R)) [GrpObj A] (g : ℕ),
+            IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+              → ∀ (G : PDivGroup p R) (t : G.TorsionTower A)
+                  (ψ : PrimitiveSubmodule A →ₗ[R] G.omega),
+                (∀ c : PrimitiveSubmodule A, PtExt.IsCan t c.1 (G.rigOfOmega (ψ c)))
+                  → ∀ I : Ideal R,
+                    I.IsMaximal → LinearMap.range ψ ⊔ I • (⊤ : Submodule R G.omega) = ⊤ := by
   intro hH p _ R _ N hN A _ g hA hg G t ψ hψ I hI
   obtain ⟨-, hBC, -⟩ := GlobalTheory.abelianDeRham_free_baseChange_rigid hH
   letI : Field (R ⧸ I) := Ideal.Quotient.field I
@@ -88,25 +98,35 @@ theorem psi_sup_smul_top_eq_top : GlobalTheory.Published.AbelianHodgeDeRham →
     rw [← map_natCast (algebraMap R (R ⧸ I)), ← map_pow, hN, map_zero]
   have hk0 : ((p : ℕ) : R ⧸ I) = 0 := pow_eq_zero_iff'.1 hNk |>.1
   letI : GrpObj ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A) := Functor.grpObjObj
-  have h := ReciprocityTheory.ChartRestriction.G.Geo.Tor.isGrpPullback_pullback A (spMap (algebraMap R (R ⧸ I)))
+  have h :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.isGrpPullback_pullback A
+      (spMap (algebraMap R (R ⧸ I)))
   have hAk : IsAbelianScheme ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A) :=
     GlobalTheory.isAbelianScheme_pullback_obj _ A hA
   obtain ⟨gk, hgk⟩ := GlobalTheory.AbVarRelDim.exists_relDim (R ⧸ I) _ hAk
-  obtain ⟨ψk, hψk⟩ := GlobalTheory.T.exists_hodgeFiltration_to_pDivOmega_linearMap p (R ⧸ I) N hNk _ hAk (G.baseChange (R ⧸ I)) (t.baseChange h)
-  have hsurj := GlobalTheory.T.primitive_hodge_to_pdivisible_omega_surjective hH p (R ⧸ I) hk0 _ gk hAk hgk _ _ ψk hψk
-  have hbc := GlobalTheory.T.hodgeToOmega_canonical_extension_base_change p R (R ⧸ I) N hN A _ _ h hA hAk G _ t (t.baseChange h) ψ ψk hψ hψk
+  obtain ⟨ψk, hψk⟩ :=
+    GlobalTheory.T.exists_hodgeFiltration_to_pDivOmega_linearMap p (R ⧸ I) N hNk _ hAk
+      (G.baseChange (R ⧸ I)) (t.baseChange h)
+  have hsurj :=
+    GlobalTheory.T.primitive_hodge_to_pdivisible_omega_surjective hH p (R ⧸ I) hk0 _ gk hAk hgk _ _
+      ψk hψk
+  have hbc :=
+    GlobalTheory.T.hodgeToOmega_canonical_extension_base_change p R (R ⧸ I) N hN A _ _ h hA hAk G _
+      t (t.baseChange h) ψ ψk hψ hψk
   rw [t.semiHom_baseChange h] at hbc
   have hF := (hBC R A g hA hg (R ⧸ I) _ _ h).2
   have hom := GlobalTheory.PDivGroup.omega_baseChange_bijective_of_isNilpotent p R (R ⧸ I) ⟨N, hN⟩ G
 
   let T : Submodule (R ⧸ I) (G.baseChange (R ⧸ I)).omega :=
     Submodule.span (R ⧸ I) ((G.toBase (R ⧸ I)).omega '' (LinearMap.range ψ : Set G.omega))
-  have hle : PrimitiveSubmodule ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A) ≤
-      Submodule.map (PrimitiveSubmodule _).subtype (T.comap ψk) := by
+  have hle
+      : PrimitiveSubmodule ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A)
+        ≤ Submodule.map (PrimitiveSubmodule _).subtype (T.comap ψk) := by
     refine hF.le.trans (Submodule.span_le.2 ?_)
     rintro _ ⟨c, hc, rfl⟩
-    have hc' : (GlobalTheory.Published.AbelianDeRham.bcMor h).pull c ∈
-        PrimitiveSubmodule ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A) :=
+    have hc'
+        : (GlobalTheory.Published.AbelianDeRham.bcMor h).pull c
+          ∈ PrimitiveSubmodule ((Over.pullback (spMap (algebraMap R (R ⧸ I)))).obj A) :=
       hF ▸ Submodule.subset_span ⟨c, hc, rfl⟩
     refine ⟨⟨_, hc'⟩, ?_, rfl⟩
     show ψk ⟨_, hc'⟩ ∈ T

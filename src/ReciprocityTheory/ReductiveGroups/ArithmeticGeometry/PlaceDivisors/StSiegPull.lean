@@ -9,12 +9,15 @@ set_option autoImplicit false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace ReciprocityTheory.ChartRestriction.G.Pdiv
 
-structure SiegPairPB {S S' : Scheme.{0}} {h M₁ : ℕ} {B : Type} [CommRing B] {ζ : B} {s : S ⟶ Sp B}
-    (o : SiegPre h M₁ ζ s) (f : S' ⟶ S) where
+structure SiegPairPB
+    {S S' : Scheme.{0}} {h M₁ : ℕ} {B : Type} [CommRing B]
+    {ζ : B} {s : S ⟶ Sp B} (o : SiegPre h M₁ ζ s)
+    (f : S' ⟶ S) where
   A : Over S'
   [grp : GrpObj A]
   [comm : IsCommMonObj A]
@@ -34,6 +37,7 @@ attribute [instance] SiegPairPB.grp SiegPairPB.comm
 
 def StSiegPull : Prop :=
   ∀ {S S' : Scheme.{0}} {h M₁ : ℕ} {B : Type} [CommRing B] {ζ : B} {s : S ⟶ Sp B}
-    (o : SiegPre h M₁ ζ s) (f : S' ⟶ S), Nonempty (SiegPairPB o f)
+      (o : SiegPre h M₁ ζ s) (f : S' ⟶ S),
+    Nonempty (SiegPairPB o f)
 
 end ReciprocityTheory.ChartRestriction.G.Pdiv

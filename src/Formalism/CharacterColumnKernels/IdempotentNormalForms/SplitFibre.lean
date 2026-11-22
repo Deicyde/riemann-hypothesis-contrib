@@ -12,14 +12,15 @@ namespace Formalism.NG
 
 universe u
 
-private theorem exists_universal_splitting_algebra (n : ℕ) : ∀ (T : Type u) [CommRing T] (P : T[X]), P.Monic → P.natDegree = n →
-    ∃ (T' : Type u) (_ : CommRing T') (_ : Algebra T T') (rr : Fin n → T'),
-      Module.Free T T' ∧ Module.Finite T T' ∧ Module.finrank T T' = n.factorial ∧
-      P.map (algebraMap T T') = ∏ i, (X - C (rr i)) ∧
-      Algebra.adjoin T (Set.range rr) = ⊤ ∧
-      ∀ (B : Type*) [CommRing B] [Algebra T B] (a : Fin n → B),
-        P.map (algebraMap T B) = ∏ i, (X - C (a i)) →
-        ∃ φ : T' →ₐ[T] B, ∀ i, φ (rr i) = a i := by
+private theorem exists_universal_splitting_algebra (n : ℕ)
+    : ∀ (T : Type u) [CommRing T] (P : T[X]),
+      P.Monic → P.natDegree = n
+        → ∃ (T' : Type u) (_ : CommRing T') (_ : Algebra T T') (rr : Fin n → T'),
+          Module.Free T T' ∧ Module.Finite T T' ∧ Module.finrank T T' = n.factorial
+            ∧ P.map (algebraMap T T') = ∏ i, (X - C (rr i)) ∧ Algebra.adjoin T (Set.range rr) = ⊤
+            ∧ ∀ (B : Type*) [CommRing B] [Algebra T B] (a : Fin n → B),
+              P.map (algebraMap T B) = ∏ i, (X - C (a i))
+                → ∃ φ : T' →ₐ[T] B, ∀ i, φ (rr i) = a i := by
   induction n with
   | zero =>
     intro T _ P hP hdeg
@@ -65,28 +66,43 @@ private theorem exists_universal_splitting_algebra (n : ℕ) : ∀ (T : Type u) 
       have h1 := (monic_X_sub_C r).natDegree_mul hQm
       rw [hfac1, hP.natDegree_map, hdeg, natDegree_X_sub_C] at h1
       omega
-    obtain ⟨T₂, i₂, a₂, rr₂, hfree2, hfin2, hrank2, hfac2, hadj2, huniv2⟩ := ih (AdjoinRoot P) Q hQm hQdeg
-    let _ : Algebra T T₂ := ((algebraMap (AdjoinRoot P) T₂).comp (algebraMap T (AdjoinRoot P))).toAlgebra
+    obtain ⟨T₂, i₂, a₂, rr₂, hfree2, hfin2, hrank2, hfac2, hadj2, huniv2⟩ :=
+      ih (AdjoinRoot P) Q hQm hQdeg
+    let _ : Algebra T T₂ :=
+      ((algebraMap (AdjoinRoot P) T₂).comp (algebraMap T (AdjoinRoot P))).toAlgebra
     have : IsScalarTower T (AdjoinRoot P) T₂ := IsScalarTower.of_algebraMap_eq fun _ => rfl
     let rr : Fin (n + 1) → T₂ := Fin.cons (algebraMap (AdjoinRoot P) T₂ r) rr₂
-    refine ⟨T₂, i₂, inferInstance, rr, Module.Free.trans (R := T) (S := AdjoinRoot P) (M := T₂),
+    refine ⟨
+      T₂,
+      i₂,
+      inferInstance,
+      rr,
+      Module.Free.trans (R := T) (S := AdjoinRoot P) (M := T₂),
       Module.Finite.trans (AdjoinRoot P) T₂,
-      ?_, ?_, ?_, ?_⟩
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · rw [← Module.finrank_mul_finrank T (AdjoinRoot P) T₂, hrank1, hrank2, Nat.factorial_succ]
-    · have hmap : P.map (algebraMap T T₂) =
-          (P.map (algebraMap T (AdjoinRoot P))).map (algebraMap (AdjoinRoot P) T₂) := by
+    · have hmap
+          : P.map (algebraMap T T₂)
+            = (P.map (algebraMap T (AdjoinRoot P))).map (algebraMap (AdjoinRoot P) T₂) := by
         rw [Polynomial.map_map, ← IsScalarTower.algebraMap_eq]
       rw [hmap, ← hfac1, Polynomial.map_mul, hfac2, Fin.prod_univ_succ]
       simp [rr]
-    · have hsub : ∀ t : AdjoinRoot P,
-          algebraMap (AdjoinRoot P) T₂ t ∈ Algebra.adjoin T (Set.range rr) := by
+    · have hsub
+          : ∀ t : AdjoinRoot P,
+            algebraMap (AdjoinRoot P) T₂ t ∈ Algebra.adjoin T (Set.range rr) := by
         intro t
         have ht : t ∈ Algebra.adjoin T ({r} : Set (AdjoinRoot P)) := by
           rw [AdjoinRoot.adjoinRoot_eq_top]
           trivial
-        have hm : (IsScalarTower.toAlgHom T (AdjoinRoot P) T₂) t ∈
-            (Algebra.adjoin T ({r} : Set (AdjoinRoot P))).map
-              (IsScalarTower.toAlgHom T (AdjoinRoot P) T₂) := Subalgebra.mem_map.mpr ⟨t, ht, rfl⟩
+        have hm
+            : (IsScalarTower.toAlgHom T (AdjoinRoot P) T₂) t
+              ∈ (Algebra.adjoin T ({r} : Set (AdjoinRoot P))).map
+                (IsScalarTower.toAlgHom T (AdjoinRoot P) T₂) :=
+          Subalgebra.mem_map.mpr ⟨t, ht, rfl⟩
         rw [AlgHom.map_adjoin, Set.image_singleton] at hm
         exact Algebra.adjoin_mono (by rintro _ rfl; exact ⟨0, rfl⟩) hm
       rw [eq_top_iff]
@@ -128,16 +144,18 @@ private theorem exists_universal_splitting_algebra (n : ℕ) : ∀ (T : Type u) 
       · simp only [rr, Fin.cons_succ, AlgHom.restrictScalars_apply]
         exact hφ₂ j
 
-theorem splitAux (n : ℕ) : ∀ (T : Type u) [CommRing T] (P : T[X]), P.Monic → P.natDegree = n →
-    ∃ (T' : Type u) (_ : CommRing T') (_ : Algebra T T') (rr : Fin n → T'),
-      Module.Free T T' ∧ Module.Finite T T' ∧ Module.finrank T T' = n.factorial ∧
-      P.map (algebraMap T T') = ∏ i, (X - C (rr i)) ∧
-      Algebra.adjoin T (Set.range rr) = ⊤ ∧
-      ∀ (B : Type u) [CommRing B] [Algebra T B] (a : Fin n → B),
-        P.map (algebraMap T B) = ∏ i, (X - C (a i)) →
-        ∃ φ : T' →ₐ[T] B, ∀ i, φ (rr i) = a i := by
+theorem splitAux (n : ℕ)
+    : ∀ (T : Type u) [CommRing T] (P : T[X]),
+      P.Monic → P.natDegree = n
+        → ∃ (T' : Type u) (_ : CommRing T') (_ : Algebra T T') (rr : Fin n → T'),
+          Module.Free T T' ∧ Module.Finite T T' ∧ Module.finrank T T' = n.factorial
+            ∧ P.map (algebraMap T T') = ∏ i, (X - C (rr i)) ∧ Algebra.adjoin T (Set.range rr) = ⊤
+            ∧ ∀ (B : Type u) [CommRing B] [Algebra T B] (a : Fin n → B),
+              P.map (algebraMap T B) = ∏ i, (X - C (a i))
+                → ∃ φ : T' →ₐ[T] B, ∀ i, φ (rr i) = a i := by
   intro T _ P hP hdeg
-  obtain ⟨T', i', a', rr, h1, h2, h3, h4, h5, h6⟩ := exists_universal_splitting_algebra n T P hP hdeg
+  obtain ⟨T', i', a', rr, h1, h2, h3, h4, h5, h6⟩ :=
+    exists_universal_splitting_algebra n T P hP hdeg
   exact ⟨T', i', a', rr, h1, h2, h3, h4, h5, fun B _ _ a ha => h6 B a ha⟩
 
 theorem splitAlg : StatSplitAlg := by
@@ -159,11 +177,15 @@ theorem splitFibre : StatSplitFibre := by
   let _ : Algebra T K := x.toAlgebra
   obtain ⟨U, iU, aU, u, hUfree, hUfin, hUrank, hUfac, hUadj, hUuniv⟩ :=
     exists_universal_splitting_algebra P.natDegree T P hP rfl
-  have hfacσ : ∀ σ : Equiv.Perm (Fin P.natDegree),
-      P.map (algebraMap T (T' × K)) = ∏ i, (X - C ((rr i, a (σ i)) : T' × K)) := by
+  have hfacσ
+      : ∀ σ : Equiv.Perm (Fin P.natDegree),
+        P.map (algebraMap T (T' × K)) = ∏ i, (X - C ((rr i, a (σ i)) : T' × K)) := by
     intro σ
-    have hext : ∀ p q : (T' × K)[X], p.map (RingHom.fst T' K) = q.map (RingHom.fst T' K) →
-        p.map (RingHom.snd T' K) = q.map (RingHom.snd T' K) → p = q := by
+    have hext
+        : ∀ p q : (T' × K)[X],
+          p.map (RingHom.fst T' K) = q.map (RingHom.fst T' K)
+            → p.map (RingHom.snd T' K) = q.map (RingHom.snd T' K)
+            → p = q := by
       intro p q h1 h2
       ext k
       · simpa using congrArg (fun f => _root_.AddMonoidAlgebra.coeff (M := ℕ) f k) h1
@@ -211,8 +233,8 @@ theorem splitFibre : StatSplitFibre := by
     exact (hψ i).symm
   let χ : Equiv.Perm (Fin P.natDegree) → (U →ₐ[T] K) := fun σ => (AlgHom.snd T T' K).comp (Φ σ)
   have hχ : ∀ σ i, χ σ (u i) = a (σ i) := fun σ i => by simp [χ, hΦ]
-  let φ : Equiv.Perm (Fin P.natDegree) → (T' →+* K) :=
-    fun σ => ((χ σ).comp ψe.symm.toAlgHom).toRingHom
+  let φ : Equiv.Perm (Fin P.natDegree) → (T' →+* K) := fun σ =>
+    ((χ σ).comp ψe.symm.toAlgHom).toRingHom
   have hφr : ∀ σ i, φ σ (rr i) = a (σ i) := by
     intro σ i
     change χ σ (ψe.symm (rr i)) = _
@@ -240,12 +262,12 @@ theorem splitFibre : StatSplitFibre := by
     rw [Algebra.smul_def, map_mul]
     congr 1
     exact RingHom.congr_fun (hcomp σ) _
-  have hcard : Fintype.card (Equiv.Perm (Fin P.natDegree)) =
-      Fintype.card (Fin P.natDegree.factorial) := by
+  have hcard
+      : Fintype.card (Equiv.Perm (Fin P.natDegree)) = Fintype.card (Fin P.natDegree.factorial) := by
     rw [Fintype.card_perm, Fintype.card_fin, Fintype.card_fin]
   let e₀ : Equiv.Perm (Fin P.natDegree) ≃ Fin P.natDegree.factorial := Fintype.equivOfCardEq hcard
-  let M : Matrix (Fin P.natDegree.factorial) (Fin P.natDegree.factorial) K :=
-    fun p k => φ (e₀.symm p) (b k)
+  let M : Matrix (Fin P.natDegree.factorial) (Fin P.natDegree.factorial) K := fun p k =>
+    φ (e₀.symm p) (b k)
   have hdetM : M.det ≠ 0 := by
     intro hdet
     have hdetT : M.transpose.det = 0 := by rw [Matrix.det_transpose]; exact hdet
@@ -258,14 +280,15 @@ theorem splitFibre : StatSplitFibre := by
     have hsum : ∑ σ ∈ Finset.univ, d (e₀ σ) • (fun σ => (φ σ : T' → K)) σ = 0 := by
       funext t
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
-      calc ∑ σ, d (e₀ σ) * φ σ t = ∑ σ, d (e₀ σ) * ∑ k, x (b.repr t k) * φ σ (b k) := by
-            refine Finset.sum_congr rfl fun σ _ => ?_
-            rw [hexp σ t]
+      calc
+        ∑ σ, d (e₀ σ) * φ σ t = ∑ σ, d (e₀ σ) * ∑ k, x (b.repr t k) * φ σ (b k) := by
+          refine Finset.sum_congr rfl fun σ _ => ?_
+          rw [hexp σ t]
         _ = ∑ k, x (b.repr t k) * ∑ σ, d (e₀ σ) * φ σ (b k) := by
-            simp only [Finset.mul_sum]
-            rw [Finset.sum_comm]
-            refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun σ _ => ?_
-            ring
+          simp only [Finset.mul_sum]
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun σ _ => ?_
+          ring
         _ = 0 := by simp [hk]
     have h0 := linearIndependent_iff'.mp hF Finset.univ (fun σ => d (e₀ σ)) hsum
     apply hd0

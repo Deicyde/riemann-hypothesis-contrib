@@ -69,8 +69,8 @@ lemma prodG (m n : ℕ) (c : ℝ) (hc : 0 < c) (D : Fin m → Fin n → ℕ) :
   exact Integrable.fintype_prod (f := fun i (z : ℂ) => ‖z‖ ^ D a i * Real.exp (-c * ‖z‖ ^ 2))
     (μ := fun _ => volume) (fun i => cplx c hc _)
 
-abbrev fx {m n : ℕ} (x : Fin m → Fin n → ℂ) : Fin m × Fin n × Bool → ℂ :=
-  fun k => if k.2.2 then star (x k.1 k.2.1) else x k.1 k.2.1
+abbrev fx {m n : ℕ} (x : Fin m → Fin n → ℂ) : Fin m × Fin n × Bool → ℂ := fun k =>
+  if k.2.2 then star (x k.1 k.2.1) else x k.1 k.2.1
 
 lemma continuous_evX {m n : ℕ} (P : PX m n) : Continuous fun x : Fin m → Fin n → ℂ => evX P x := by
   have : Continuous fun x : Fin m → Fin n → ℂ => fx x := by
@@ -108,8 +108,9 @@ lemma norm_mono {m n : ℕ} (d : (Fin m × Fin n × Bool) →₀ ℕ) (x : Fin m
 
 theorem integP : IntegP := by
   intro m n c hc P
-  have key : ∀ d : (Fin m × Fin n × Bool) →₀ ℕ,
-      Integrable fun x : Fin m → Fin n → ℂ => evX (monomial d 1) x * gs c x := by
+  have key
+      : ∀ d : (Fin m × Fin n × Bool) →₀ ℕ,
+        Integrable fun x : Fin m → Fin n → ℂ => evX (monomial d 1) x * gs c x := by
     intro d
     refine (prodG m n c hc (fun a i => d (a, i, false) + d (a, i, true))).mono'
       ((continuous_evX _).mul (continuous_gs c)).aestronglyMeasurable
@@ -117,8 +118,10 @@ theorem integP : IntegP := by
     rw [norm_mul, norm_mono, norm_gs, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun a _ => ?_
     rw [← Finset.prod_mul_distrib]
-  have hP : (fun x => evX P x * gs c x) =
-      fun x => ∑ d ∈ P.support, AddMonoidAlgebra.coeff P d * (evX (monomial d 1) x * gs c x) := by
+  have hP
+      : (fun x => evX P x * gs c x)
+        = fun x =>
+          ∑ d ∈ P.support, AddMonoidAlgebra.coeff P d * (evX (monomial d 1) x * gs c x) := by
     funext x
     simp only [evX]
     rw [MvPolynomial.eval_eq, Finset.sum_mul]

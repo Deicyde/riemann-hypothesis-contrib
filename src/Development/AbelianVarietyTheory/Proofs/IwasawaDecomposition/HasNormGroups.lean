@@ -8,7 +8,8 @@ public import ReciprocityTheory.NeutralLocalFields.Reciprocity
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne Neutral.B1
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne Neutral.B1
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -26,15 +27,20 @@ def IsLocEmb (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (ι : Ω
 def Lifts {w : HeightOneSpectrum (𝓞 E)} (ι : Ω →ₐ[E] Kbar w) (g : GalLoc w) (σ : G E Ω) : Prop :=
   ∀ z, g (ι z) = ι (σ z)
 
-theorem Lifts.eq {w : HeightOneSpectrum (𝓞 E)} {ι : Ω →ₐ[E] Kbar w} {g : GalLoc w} {σ σ' : G E Ω}
-    (H : Lifts ι g σ) (H' : Lifts ι g σ') : σ = σ' :=
+theorem Lifts.eq
+    {w : HeightOneSpectrum (𝓞 E)} {ι : Ω →ₐ[E] Kbar w} {g : GalLoc w} {σ σ' : G E Ω}
+    (H : Lifts ι g σ) (H' : Lifts ι g σ')
+    : σ = σ' :=
   AlgEquiv.ext fun z => ι.toRingHom.injective ((H z).symm.trans (H' z))
 
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)}
 
-def HasNormGroups (h : IsPlaceOver A w) (ι : Ω →ₐ[E] Kbar w) (a : Weil h →* (w.adicCompletion E)ˣ) : Prop :=
-  ∀ L : IntermediateField (w.adicCompletion E) (Kbar w), IsFiniteAbelian (w.adicCompletion E) L →
-    ∀ (σ : Weil h) (g : GalLoc w), Lifts ι g σ → ((∀ z ∈ L, g z = z) ↔ a σ ∈ normGroup (w.adicCompletion E) L)
+def HasNormGroups (h : IsPlaceOver A w) (ι : Ω →ₐ[E] Kbar w) (a : Weil h →* (w.adicCompletion E)ˣ)
+    : Prop :=
+  ∀ L : IntermediateField (w.adicCompletion E) (Kbar w),
+    IsFiniteAbelian (w.adicCompletion E) L
+      → ∀ (σ : Weil h) (g : GalLoc w),
+        Lifts ι g σ → ((∀ z ∈ L, g z = z) ↔ a σ ∈ normGroup (w.adicCompletion E) L)
 
 end GlobalTheory.LocDict
 

@@ -10,13 +10,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.TorsLiftComplete
 
-theorem existsUnique_torsion_lift : ∀ (V K : Type) [CommRing V] [IsLocalRing V] [IsNoetherianRing V] [Field K] (n : ℕ), IsAdicComplete (IsLocalRing.maximalIdeal V) V → IsUnit (n : V) → ∀ π : V →+* K, Function.Surjective π → ∀ (A₀ : Over (Sp K)) [GrpObj A₀] [IsCommMonObj A₀] (A : Over (Sp V)) [GrpObj A] [IsCommMonObj A] (i : A₀.left ⟶ A.left), IsAbelianScheme A → IsGrpPullback A₀ A (spMap π) i → ∀ s₀ : 𝟙_ (Over (Sp K)) ⟶ A₀, s₀ ^ n = 1 → ∃! s : 𝟙_ (Over (Sp V)) ⟶ A, s ^ n = 1 ∧ s₀.left ≫ i = spMap π ≫ s.left := by
+theorem existsUnique_torsion_lift
+    : ∀ (V K : Type) [CommRing V] [IsLocalRing V] [IsNoetherianRing V] [Field K] (n : ℕ),
+      IsAdicComplete (IsLocalRing.maximalIdeal V) V → IsUnit (n : V)
+        → ∀ π : V →+* K,
+          Function.Surjective π
+            → ∀ (A₀ : Over (Sp K)) [GrpObj A₀] [IsCommMonObj A₀] (A : Over (Sp V)) [GrpObj A]
+                [IsCommMonObj A] (i : A₀.left ⟶ A.left),
+              IsAbelianScheme A → IsGrpPullback A₀ A (spMap π) i
+                → ∀ s₀ : 𝟙_ (Over (Sp K)) ⟶ A₀,
+                  s₀ ^ n = 1
+                    → ∃! s : 𝟙_ (Over (Sp V)) ⟶ A, s ^ n = 1 ∧ s₀.left ≫ i = spMap π ≫ s.left := by
   intro V K _ _ _ _ n hc hn π hπ A₀ _ _ A _ _ i hA hpb s₀ hs₀
   haveI : IsAdicComplete (IsLocalRing.maximalIdeal V) V := hc
   haveI : HenselianLocalRing V := GlobalTheory.henselianLocalRing_of_henselianRing V
@@ -49,11 +60,14 @@ theorem existsUnique_torsion_lift : ∀ (V K : Type) [CommRing V] [IsLocalRing V
   have hf : ∀ {Y : Over (Sp V)} (y : Y ⟶ A), y.left ≫ f = (y ^ n).left := by
     intro Y y
     rw [← Over.comp_left, MonObj.comp_pow, Category.comp_id]
-  have hone' : ∀ {Y : Over (Sp V)} , ((1 : Y ⟶ A)).left = Y.hom ≫ (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
+  have hone'
+      : ∀ {Y : Over (Sp V)}, ((1 : Y ⟶ A)).left = Y.hom ≫ (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
     intro Y
     rw [Hom.one_def, Over.comp_left]
     congr 1
-  have hw : (s₀.left ≫ i) ≫ f = Spec.map (CommRingCat.ofHom π) ≫ (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
+  have hw
+      : (s₀.left ≫ i) ≫ f
+        = Spec.map (CommRingCat.ofHom π) ≫ (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
     have := hf (pt s₀)
     rw [hx, hone'] at this
     simpa [pt, T, T'] using this
@@ -64,7 +78,9 @@ theorem existsUnique_torsion_lift : ∀ (V K : Type) [CommRing V] [IsLocalRing V
     rw [← e, ← Category.assoc, hl2]
     exact Over.w (η[A] : 𝟙_ (Over (Sp V)) ⟶ A)
   let s : 𝟙_ (Over (Sp V)) ⟶ A := Over.homMk l hls
-  have hsn : ∀ s' : 𝟙_ (Over (Sp V)) ⟶ A, s' ^ n = 1 ↔ s'.left ≫ f = (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
+  have hsn
+      : ∀ s' : 𝟙_ (Over (Sp V)) ⟶ A,
+        s' ^ n = 1 ↔ s'.left ≫ f = (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
     intro s'
     have e1 : ((1 : 𝟙_ (Over (Sp V)) ⟶ A)).left = (η[A] : 𝟙_ (Over (Sp V)) ⟶ A).left := by
       rw [hone']; exact Category.id_comp _

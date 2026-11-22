@@ -4,9 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.CountingPairs.rhoPair :
-    {n : ℕ} → (Fin n → ℤ) → ℤ :=
-    fun {n : ℕ} (l : Fin n → ℤ) ↦ ∑ i : Fin n, ((↑n : ℤ) - (1 : ℤ) - (2 : ℤ) * (↑(↑i : ℕ) : ℤ)) * l i
+noncomputable def UpperTheory.Reformulated.B.CountingPairs.rhoPair : {n : ℕ} → (Fin n → ℤ) → ℤ :=
+  fun {n : ℕ} (l : Fin n → ℤ) ↦ ∑ i : Fin n, ((↑n : ℤ) - (1 : ℤ) - (2 : ℤ) * (↑(↑i : ℕ) : ℤ)) * l i
 
 namespace UpperTheory.Reformulated.B.CountingPairs.Priv
 
@@ -30,15 +29,18 @@ private lemma cntLt {k : ℕ} (c : Fin k) :
 end UpperTheory.Reformulated.B.CountingPairs.Priv
 
 open UpperTheory.Reformulated.B.CountingPairs.Priv in
-theorem UpperTheory.Reformulated.B.CountingPairs.main :
-    ∀ {k : ℕ} (l : Fin k → ℤ),
-      (∑ c : Fin k, ∑ i : Fin k, if i < c then l i - l c else (0 : ℤ)) = UpperTheory.Reformulated.B.CountingPairs.rhoPair l := by
+theorem UpperTheory.Reformulated.B.CountingPairs.main
+    : ∀ {k : ℕ} (l : Fin k → ℤ),
+      (∑ c : Fin k, ∑ i : Fin k, if i < c then l i - l c else (0 : ℤ))
+        = UpperTheory.Reformulated.B.CountingPairs.rhoPair l := by
   intro k l
-  have h1 : ∀ c i : Fin k, (if i < c then l i - l c else (0:ℤ))
-      = (if i < c then (1:ℤ) else 0) * l i - (if i < c then (1:ℤ) else 0) * l c := by
+  have h1
+      : ∀ c i : Fin k,
+        (if i < c then l i - l c else (0 : ℤ))
+          = (if i < c then (1 : ℤ) else 0) * l i - (if i < c then (1 : ℤ) else 0) * l c := by
     intro c i; split_ifs <;> simp
   simp_rw [h1, Finset.sum_sub_distrib]
-  rw [Finset.sum_comm (f := fun c i => (if i < c then (1:ℤ) else 0) * l i)]
+  rw [Finset.sum_comm (f := fun c i => (if i < c then (1 : ℤ) else 0) * l i)]
   simp_rw [← Finset.sum_mul, cntGt, cntLt]
   unfold UpperTheory.Reformulated.B.CountingPairs.rhoPair
   rw [← Finset.sum_sub_distrib]

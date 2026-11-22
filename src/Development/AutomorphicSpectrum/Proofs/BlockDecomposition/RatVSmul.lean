@@ -194,26 +194,30 @@ lemma vec_map (B : GL ι k) (i : ι) :
 
 theorem lines : Lines := by
   intro G _ _ _ _ K _ k _ _ ι _ _ π Γ P i ω d c η hS
-  have alg_inj : Function.Injective (algebraMap k 𝔸[k]) := GlobalTheory.CompanionTheory.RgEisLines.algebraMap_injective
-  have hpick : ∀ γ : Γ, ∃ B : GL ι k,
-      Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) B = π γ := by
+  have alg_inj : Function.Injective (algebraMap k 𝔸[k]) :=
+    GlobalTheory.CompanionTheory.RgEisLines.algebraMap_injective
+  have hpick
+      : ∀ γ : Γ, ∃ B : GL ι k,
+        Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) B = π γ := by
     intro γ
     obtain ⟨B, hB⟩ := MonoidHom.mem_range.mp (hS.piΓ γ γ.2)
     exact ⟨B, hB⟩
   choose Bf hBf using hpick
   have hne : ∀ γ : Γ, (((Bf γ)⁻¹ : GL ι k) : Matrix ι ι k) *ᵥ Pi.single i 1 ≠ 0 := fun γ =>
-    GlobalTheory.CompanionTheory.RgEisLines.mulVec_ne_zero _ (GlobalTheory.CompanionTheory.RgEisLines.single_ne_zero i)
+    GlobalTheory.CompanionTheory.RgEisLines.mulVec_ne_zero _
+      (GlobalTheory.CompanionTheory.RgEisLines.single_ne_zero i)
   let f : Γ → Projectivization k (ι → k) := fun γ => Projectivization.mk k _ (hne γ)
   have key : ∀ γ γ' : Γ, f γ = f γ' ↔ ((γ' : G) * (γ : G)⁻¹) ∈ P := by
     intro γ γ'
     show Projectivization.mk k _ (hne γ) = Projectivization.mk k _ (hne γ') ↔ _
-    rw [Projectivization.mk_eq_mk_iff, hS.mem, map_mul, map_inv, ← hBf γ, ← hBf γ', ← map_inv, ← map_mul,
-      GlobalTheory.CompanionTheory.RgEisLines.map_mul_inv_mem_stab_iff _ alg_inj]
+    rw [Projectivization.mk_eq_mk_iff, hS.mem, map_mul, map_inv, ← hBf γ, ← hBf γ', ← map_inv,
+      ← map_mul, GlobalTheory.CompanionTheory.RgEisLines.map_mul_inv_mem_stab_iff _ alg_inj]
     simp only [Units.smul_def]
-  let F : Cos P Γ → Projectivization k (ι → k) := Quotient.lift f (fun a b h => by
-    rw [key]
-    have h' := QuotientGroup.rightRel_apply.mp h
-    rwa [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv] at h')
+  let F : Cos P Γ → Projectivization k (ι → k) :=
+    Quotient.lift f (fun a b h => by
+      rw [key]
+      have h' := QuotientGroup.rightRel_apply.mp h
+      rwa [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv] at h')
   have hFinj : Function.Injective F := by
     intro q₁ q₂ h
     obtain ⟨γ, rfl⟩ := Quotient.exists_rep q₁
@@ -224,15 +228,18 @@ theorem lines : Lines := by
     exact (key γ γ').1 h
   have hFsurj : Function.Surjective F := by
     intro l
-    obtain ⟨g, hg⟩ := GlobalTheory.CompanionTheory.RgEisLines.exists_inv_mulVec_eq (k := k) i l.rep_nonzero
+    obtain ⟨g, hg⟩ :=
+      GlobalTheory.CompanionTheory.RgEisLines.exists_inv_mulVec_eq (k := k) i l.rep_nonzero
     have hmem : Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) g ∈ (adStd k).ratGL ι :=
       MonoidHom.mem_range.mpr ⟨g, rfl⟩
     obtain ⟨γ, hγ, hst⟩ := hS.trans _ hmem
-    have h2 : Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) (g * (Bf ⟨γ, hγ⟩)⁻¹) ∈
-        stab 𝔸[k] ({i} : Set ι) := by
+    have h2
+        : Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) (g * (Bf ⟨γ, hγ⟩)⁻¹)
+          ∈ stab 𝔸[k] ({i} : Set ι) := by
       rw [map_mul, map_inv, hBf]
       exact hst
-    obtain ⟨b, hb⟩ := (GlobalTheory.CompanionTheory.RgEisLines.map_mul_inv_mem_stab_iff _ alg_inj _ _ i).1 h2
+    obtain ⟨b, hb⟩ :=
+      (GlobalTheory.CompanionTheory.RgEisLines.map_mul_inv_mem_stab_iff _ alg_inj _ _ i).1 h2
     refine ⟨Quotient.mk _ ⟨γ, hγ⟩, ?_⟩
     refine Eq.trans ?_ (Projectivization.mk_rep l)
     show Projectivization.mk k _ (hne ⟨γ, hγ⟩) = _
@@ -240,17 +247,24 @@ theorem lines : Lines := by
     exact ⟨b, by rw [Units.smul_def, ← hg]; exact hb⟩
   refine ⟨Equiv.ofBijective F ⟨hFinj, hFsurj⟩, fun q => ?_⟩
   have hq : F q = f (Quotient.out q) := by
-    calc F q = F (Quotient.mk _ (Quotient.out q)) := by rw [Quotient.out_eq]
+    calc
+      F q
+        = F (Quotient.mk _ (Quotient.out q)) := by rw [Quotient.out_eq]
       _ = f (Quotient.out q) := rfl
   obtain ⟨a, ha⟩ := Projectivization.exists_smul_eq_mk_rep (K := k) _ (hne (Quotient.out q))
   refine ⟨a, ?_⟩
-  have e1 : (Equiv.ofBijective F ⟨hFinj, hFsurj⟩ q).rep =
-      a • ((((Bf (Quotient.out q))⁻¹ : GL ι k) : Matrix ι ι k) *ᵥ Pi.single i 1) := by
+  have e1
+      : (Equiv.ofBijective F ⟨hFinj, hFsurj⟩ q).rep
+        = a • ((((Bf (Quotient.out q))⁻¹ : GL ι k) : Matrix ι ι k) *ᵥ Pi.single i 1) := by
     rw [ha]
     exact congrArg Projectivization.rep hq
-  have e2 : MG.vec (π (rep q)) i = ratV ((((Bf (Quotient.out q))⁻¹ : GL ι k) : Matrix ι ι k) *ᵥ Pi.single i 1) := by
-    rw [show π (rep q) = Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) (Bf (Quotient.out q)) from
-      (hBf (Quotient.out q)).symm, GlobalTheory.CompanionTheory.RgEisLines.vec_map]
+  have e2
+      : MG.vec (π (rep q)) i
+        = ratV ((((Bf (Quotient.out q))⁻¹ : GL ι k) : Matrix ι ι k) *ᵥ Pi.single i 1) := by
+    rw [show π (rep q)
+          = Matrix.GeneralLinearGroup.map (n := ι) (algebraMap k 𝔸[k]) (Bf (Quotient.out q)) from
+        (hBf (Quotient.out q)).symm,
+      GlobalTheory.CompanionTheory.RgEisLines.vec_map]
   rw [e1, GlobalTheory.CompanionTheory.RgEisLines.ratV_smul, e2]
 
 end Adelic

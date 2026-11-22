@@ -4,7 +4,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreGTCR
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Complex MeasureTheory intervalIntegral
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Complex MeasureTheory
+  intervalIntegral
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
@@ -34,7 +35,8 @@ theorem reference_annulus_holds : GTCRefAn := by
     simp only [Complex.mul_im, Complex.mul_re, Complex.I_re, Complex.I_im]
     ring
   unfold circleIntegral
-  rw [← Complex.imCLM_apply, ← ContinuousLinearMap.intervalIntegral_comp_comm _ (hF.intervalIntegrable _ _)]
+  rw [← Complex.imCLM_apply,
+    ← ContinuousLinearMap.intervalIntegral_comp_comm _ (hF.intervalIntegrable _ _)]
   simp only [key]
   rw [intervalIntegral.integral_const, smul_eq_mul, sub_zero]
 

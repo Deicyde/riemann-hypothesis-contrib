@@ -11,23 +11,36 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModelLocalRi
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH
+  GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
 open GlobalTheory.Izumi
 
 noncomputable section
 namespace GlobalTheory.Izumi
 
-theorem algebraMap_completion_injective : ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A], Function.Injective (algebraMap A (AdicCompletion (maximalIdeal A) A)) := by
+theorem algebraMap_completion_injective
+    : ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A],
+      Function.Injective (algebraMap A (AdicCompletion (maximalIdeal A) A)) := by
   intro A _ _ _
   have h : IsHausdorff (maximalIdeal A) A := inferInstance
   intro a b hab
-  exact AdicCompletion.of_injective (maximalIdeal A) A (by simpa [AdicCompletion.algebraMap_apply] using hab)
+  exact AdicCompletion.of_injective (maximalIdeal A) A
+    (by simpa [AdicCompletion.algebraMap_apply] using hab)
 
-theorem exists_sub_algebraMap_mem_maximalIdeal_completion : ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A] (b : AdicCompletion (maximalIdeal A) A), ∃ a : A, b - algebraMap A (AdicCompletion (maximalIdeal A) A) a ∈ maximalIdeal (AdicCompletion (maximalIdeal A) A) := by
+theorem exists_sub_algebraMap_mem_maximalIdeal_completion
+    : ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+        (b : AdicCompletion (maximalIdeal A) A),
+      ∃ a : A,
+        b - algebraMap A (AdicCompletion (maximalIdeal A) A) a
+          ∈ maximalIdeal (AdicCompletion (maximalIdeal A) A) := by
   intro A _ _ _ b
   set ψ := AdicCompletion.evalₐ (maximalIdeal A) (R := A) 1
-  have hψ : ∀ r : A, ψ (algebraMap A (AdicCompletion (maximalIdeal A) A) r) = Ideal.Quotient.mk _ r := fun r => ψ.commutes r
+  have hψ
+      : ∀ r : A, ψ (algebraMap A (AdicCompletion (maximalIdeal A) A) r) = Ideal.Quotient.mk _ r :=
+    fun r => ψ.commutes r
   obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (ψ b)
   refine ⟨a, ?_⟩
   by_contra hn
@@ -42,13 +55,28 @@ theorem exists_sub_algebraMap_mem_maximalIdeal_completion : ∀ (A : Type) [Comm
     exact Ideal.Quotient.nontrivial_iff.2 (maximalIdeal.isMaximal A).ne_top
   exact not_isUnit_zero h1
 
-theorem norm_le_of_mem_iInf_map_smallIdeal : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M : RatModel o Ω) (U : M.Z.Opens) (x : M.Z) (f : Ω) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), M.Cen U x y → ∀ ψ : AdicCompletion (maximalIdeal (M.O x)) (M.O x) →+* PadicAlgCl p, (∀ g, ‖ψ g‖ ≤ 1) → (∀ a : M.O x, ψ (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x)) a) = M.val (gPt p ≫ y) a) → ∀ G ∈ ⨅ N, (smallIdeal M U x f N).map (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x))), ‖ψ G‖ ≤ ‖M.val (gPt p ≫ y) f‖ := by
+theorem norm_le_of_mem_iInf_map_smallIdeal
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M : RatModel o Ω)
+        (U : M.Z.Opens) (x : M.Z) (f : Ω) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z),
+      M.Cen U x y
+        → ∀ ψ : AdicCompletion (maximalIdeal (M.O x)) (M.O x) →+* PadicAlgCl p,
+          (∀ g, ‖ψ g‖ ≤ 1)
+            → (∀ a : M.O x,
+              ψ (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x)) a)
+                = M.val (gPt p ≫ y) a)
+            → ∀ G
+                ∈ ⨅ N, (smallIdeal M U x f N).map (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x))),
+              ‖ψ G‖ ≤ ‖M.val (gPt p ≫ y) f‖ := by
   intro o Ω _ _ _ _ M U x f p _ y hy ψ hψ1 hψv G hG
   haveI := ArithBase.ded (o := o) (Ω := Ω)
   haveI : IsNoetherianRing (M.O x) := RatModel.isNoetherianRing_O M x
-  have hadd : ∀ a b : M.O x, ‖M.val (gPt p ≫ y) ((a + b : M.O x) : Ω)‖ ≤
-      max ‖M.val (gPt p ≫ y) (a : Ω)‖ ‖M.val (gPt p ≫ y) (b : Ω)‖ := norm_val_add_le M hy
-  have hmul : ∀ c a : M.O x, ‖M.val (gPt p ≫ y) ((c * a : M.O x) : Ω)‖ ≤ ‖M.val (gPt p ≫ y) (a : Ω)‖ :=
+  have hadd
+      : ∀ a b : M.O x,
+        ‖M.val (gPt p ≫ y) ((a + b : M.O x) : Ω)‖
+          ≤ max ‖M.val (gPt p ≫ y) (a : Ω)‖ ‖M.val (gPt p ≫ y) (b : Ω)‖ :=
+    norm_val_add_le M hy
+  have hmul
+      : ∀ c a : M.O x, ‖M.val (gPt p ≫ y) ((c * a : M.O x) : Ω)‖ ≤ ‖M.val (gPt p ≫ y) (a : Ω)‖ :=
     norm_val_mul_le M hy
   obtain ⟨S, hS⟩ := (IsNoetherian.noetherian (maximalIdeal (M.O x)) : (maximalIdeal (M.O x)).FG)
   set ρ : ℝ := ((S.sup fun g => ‖M.val (gPt p ≫ y) (g : Ω)‖₊ : NNReal) : ℝ) with hρdef
@@ -87,8 +115,12 @@ theorem norm_le_of_mem_iInf_map_smallIdeal : ∀ (o Ω : Type) [CommRing o] [Fie
       apply hinv
       rw [← eq_inv_of_mul_eq_one_right e]
       exact w.2
-  have hN : ∀ N, ∀ g ∈ (smallIdeal M U x f N).map (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x))),
-      ‖ψ g‖ ≤ max ‖M.val (gPt p ≫ y) f‖ (ρ ^ N) := by
+  have hN
+      : ∀ N,
+        ∀ g
+            ∈ (smallIdeal M U x f N).map
+              (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x))),
+          ‖ψ g‖ ≤ max ‖M.val (gPt p ≫ y) f‖ (ρ ^ N) := by
     intro N g hg
     induction hg using Submodule.span_induction with
     | mem g hg =>
@@ -98,7 +130,8 @@ theorem norm_le_of_mem_iInf_map_smallIdeal : ∀ (o Ω : Type) [CommRing o] [Fie
       · exact h.trans (le_max_left _ _)
       · refine le_max_of_le_right (hle.trans ?_)
         exact pow_le_pow_left₀ (norm_nonneg _) (hρ _ (hnu h hh hh.1)) N
-    | zero => rw [map_zero, norm_zero]; exact le_max_of_le_right (pow_nonneg hρ0 N)
+    | zero =>
+      rw [map_zero, norm_zero]; exact le_max_of_le_right (pow_nonneg hρ0 N)
     | add a b _ _ ha hb =>
       set_option synthInstance.maxHeartbeats 200000 in
         rw [map_add ψ]
@@ -115,9 +148,20 @@ theorem norm_le_of_mem_iInf_map_smallIdeal : ∀ (o Ω : Type) [CommRing o] [Fie
   · exact absurd h2 (not_le.2 hlt)
   · exact absurd h2 (not_le.2 hNlt)
 
-
 set_option maxHeartbeats 800000 in
-theorem iInf_map_smallIdeal_le_span : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M : RatModel o Ω), ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z → ∀ (U : M.Z.Opens), (U : Set M.Z).Nonempty → ∀ (x : M.Z), IsClosed ({x} : Set M.Z) → ∀ (f : Ω) (hf : f ∈ M.O x), f ≠ 0 → ⨅ N, (smallIdeal M U x f N).map (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x))) ≤ Ideal.span {algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x)) ⟨f, hf⟩} := by
+theorem iInf_map_smallIdeal_le_span
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (M : RatModel o Ω),
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme M.Z
+        → ∀ (U : M.Z.Opens),
+          (U : Set M.Z).Nonempty
+            → ∀ (x : M.Z),
+              IsClosed ({x} : Set M.Z)
+                → ∀ (f : Ω) (hf : f ∈ M.O x),
+                  f ≠ 0
+                    → ⨅ N, (smallIdeal M U x f N).map (algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x)))
+                      ≤ Ideal.span {
+                        algebraMap (M.O x) (AdicCompletion (maximalIdeal (M.O x)) (M.O x)) ⟨f, hf⟩
+                      } := by
   intro o Ω _ _ _ _ M hN U hU x hx f hf hf0
   haveI := ArithBase.ded (o := o) (Ω := Ω)
   haveI := ArithBase.char (o := o) (Ω := Ω)
@@ -136,8 +180,10 @@ theorem iInf_map_smallIdeal_le_span : ∀ (o Ω : Type) [CommRing o] [Field Ω] 
   have hinj : Function.Injective φ := algebraMap_completion_injective A
   intro G hG
   by_contra hGf
-  obtain ⟨s, hs0, hs⟩ := GlobalTheory.T.exists_nonzero_classicalPoint_of_localHom_avoiding o Ω M U hU x
-  obtain ⟨B, _, _, _, _, ι, hιinj, hιloc, hιres, u, hu, hfu⟩ := GlobalTheory.T.exists_dominating_local_domain_eq_mul_maximal R (φ ⟨f, hf⟩) G hGf
+  obtain ⟨s, hs0, hs⟩ :=
+    GlobalTheory.T.exists_nonzero_classicalPoint_of_localHom_avoiding o Ω M U hU x
+  obtain ⟨B, _, _, _, _, ι, hιinj, hιloc, hιres, u, hu, hfu⟩ :=
+    GlobalTheory.T.exists_dominating_local_domain_eq_mul_maximal R (φ ⟨f, hf⟩) G hGf
   have hG0 : G ≠ 0 := by
     rintro rfl
     exact hGf (Submodule.zero_mem _)
@@ -176,16 +222,14 @@ theorem iInf_map_smallIdeal_le_span : ∀ (o Ω : Type) [CommRing o] [Field Ω] 
     rw [Ne, ← map_zero ι]
     intro h
     exact mul_ne_zero hG0 ((map_ne_zero_iff φ hinj).2 hs0) (hιinj h)
-  obtain ⟨p, hp, χ, hχ1, hχm, hχh⟩ := GlobalTheory.T.exists_ringHom_padicAlgCl_ne_zero' B inferInstance (ι (G * φ s)) hh
+  obtain ⟨p, hp, χ, hχ1, hχm, hχh⟩ :=
+    GlobalTheory.T.exists_ringHom_padicAlgCl_ne_zero' B inferInstance (ι (G * φ s)) hh
   set ψ : R →+* PadicAlgCl p := χ.comp ι with hψ
   have hψ1 : ∀ g, ‖ψ g‖ ≤ 1 := fun g => hχ1 _
-  have hψG : ψ G ≠ 0 := by
-    intro h; apply hχh; rw [map_mul, map_mul]; simp [hψ] at h; simp [h]
-  have hψs : ψ (φ s) ≠ 0 := by
-    intro h; apply hχh; rw [map_mul, map_mul]; simp [hψ] at h; simp [h]
+  have hψG : ψ G ≠ 0 := by intro h; apply hχh; rw [map_mul, map_mul]; simp [hψ] at h; simp [h]
+  have hψs : ψ (φ s) ≠ 0 := by intro h; apply hχh; rw [map_mul, map_mul]; simp [hψ] at h; simp [h]
   have hlt : ‖ψ (φ ⟨f, hf⟩)‖ < ‖ψ G‖ := by
-    have e : ψ (φ ⟨f, hf⟩) = ψ G * χ u := by
-      simp only [hψ, RingHom.comp_apply, hfu, map_mul]
+    have e : ψ (φ ⟨f, hf⟩) = ψ G * χ u := by simp only [hψ, RingHom.comp_apply, hfu, map_mul]
     rw [e, norm_mul]
     have h1 : ‖χ u‖ < 1 := hχm u hu
     have h2 : 0 < ‖ψ G‖ := norm_pos_iff.2 hψG
@@ -201,7 +245,8 @@ theorem iInf_map_smallIdeal_le_span : ∀ (o Ω : Type) [CommRing o] [Field Ω] 
     exact (not_isUnit_OO_iff (χ0 a)).2 h2 ha
   have hχ0s : χ0 s ≠ 0 := fun h => hψs (congrArg Subtype.val h)
   obtain ⟨y, hy, hval⟩ := hs p χ0 hloc hχ0s
-  have hb := norm_le_of_mem_iInf_map_smallIdeal o Ω M U x f p y hy ψ hψ1 (fun a => (hval a).symm) G hG
+  have hb :=
+    norm_le_of_mem_iInf_map_smallIdeal o Ω M U x f p y hy ψ hψ1 (fun a => (hval a).symm) G hG
   have hf' := hval ⟨f, hf⟩
   simp only at hf'
   rw [hf'] at hb

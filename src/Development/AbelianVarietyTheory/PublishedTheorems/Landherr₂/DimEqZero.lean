@@ -12,20 +12,23 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 namespace GlobalTheory.Published
 
 def AbMulNSt : Prop :=
-  (∀ (k : Type) [Field k] [IsAlgClosed k] (B : Over (Sp k)) [GrpObj B] (g n : ℕ), IsAbelianScheme B → SmoothOfRelativeDimension g B.hom → (n : k) ≠ 0 → Nat.card {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} = n ^ (2 * g))
+  (∀ (k : Type) [Field k] [IsAlgClosed k] (B : Over (Sp k)) [GrpObj B] (g n : ℕ),
+    IsAbelianScheme B → SmoothOfRelativeDimension g B.hom → (n : k) ≠ 0
+      → Nat.card {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} = n ^ (2 * g))
 
 namespace AbMulNSt
 
 variable {k : Type} [Field k] [IsAlgClosed k] {B : Over (Sp k)} [GrpObj B] {g n : ℕ}
 
-theorem finite (h : AbMulNSt) (hB : IsAbelianScheme B) (hg : SmoothOfRelativeDimension g B.hom)
-    (hn : (n : k) ≠ 0) : Finite {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} := by
+theorem finite
+    (h : AbMulNSt) (hB : IsAbelianScheme B) (hg : SmoothOfRelativeDimension g B.hom)
+    (hn : (n : k) ≠ 0)
+    : Finite {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} := by
   refine Nat.finite_of_card_ne_zero ?_
   rw [h k B g n hB hg hn]
   refine pow_ne_zero _ ?_
   rintro rfl
   exact hn Nat.cast_zero
-
 
 end AbMulNSt
 

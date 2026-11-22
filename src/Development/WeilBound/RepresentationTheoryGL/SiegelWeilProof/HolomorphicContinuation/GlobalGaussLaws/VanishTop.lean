@@ -23,12 +23,17 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 
 namespace PositivityTheory.Rg.Sw.Glob
 
-theorem top (hA : AbsThm) (hLF : LocFact) (hAA : AwayAct)
-    (hLi : LocInst) (hTA : PositivityTheory.PfSWUS.ThetaAuto) (hLC : LieComm) (hDO : DerivOne) (hId : GIdil)
+theorem top
+    (hA : AbsThm) (hLF : LocFact) (hAA : AwayAct) (hLi : LocInst)
+    (hTA : PositivityTheory.PfSWUS.ThetaAuto) (hLC : LieComm) (hDO : DerivOne) (hId : GIdil)
     (hE : EisStrong) (hC : PositivityTheory.PfSWUS.CoefND)
-    (hW : GlobalTheory.Published.WeilThetaConvergence) :
-    ∀ D n V ψ χ θ μ ω H l s ν Φ, PositivityTheory.PfSWUS.Std D n V ψ χ θ μ ω H l s ν Φ → PositivityTheory.PfSWUS.InRange V n → 1 ≤ n →
-      ∀ g, GlobalTheory.Cont.HolValueAt (PositivityTheory.PfSWUS.eis ω H Φ g) (GlobalTheory.StdUnn.s0 V n) (GlobalTheory.StdUnn.thetaInt ω ν Φ g) := by
+    (hW : GlobalTheory.Published.WeilThetaConvergence)
+    : ∀ D n V ψ χ θ μ ω H l s ν Φ,
+      PositivityTheory.PfSWUS.Std D n V ψ χ θ μ ω H l s ν Φ → PositivityTheory.PfSWUS.InRange V n
+        → 1 ≤ n
+        → ∀ g,
+          GlobalTheory.Cont.HolValueAt (PositivityTheory.PfSWUS.eis ω H Φ g)
+            (GlobalTheory.StdUnn.s0 V n) (GlobalTheory.StdUnn.thetaInt ω ν Φ g) := by
   have hTM := tensMem
   have hTL := thLin_of hW
   exact main hA sFrame sEmb sigOK splitFock hTM (locOpEx_of_locFact hLF) hLi (linSec_of hTL)

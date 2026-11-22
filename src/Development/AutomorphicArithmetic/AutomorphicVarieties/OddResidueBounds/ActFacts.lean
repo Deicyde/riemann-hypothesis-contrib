@@ -5,10 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-theorem UpperTheory.V.Odd.actFacts :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ) [NeZero N] (ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E)), IsCycAct Ω N ρ → Function.Surjective ρ ∧ IsAbelianGalois ℚ E ∧ Nat.card (Gq ρ) = Module.finrank ℚ E ∧ ρ.ker.index = Module.finrank ℚ E ∧ ∀ (M : ℕ) [NeZero M] (h : N ∣ M), IsCycAct Ω M (ρ.comp (ZMod.unitsMap h)) := by
+theorem UpperTheory.V.Odd.actFacts
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ)
+        [NeZero N] (ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E)),
+      IsCycAct Ω N ρ
+        → Function.Surjective ρ ∧ IsAbelianGalois ℚ E ∧ Nat.card (Gq ρ) = Module.finrank ℚ E
+          ∧ ρ.ker.index = Module.finrank ℚ E
+          ∧ ∀ (M : ℕ) [NeZero M] (h : N ∣ M), IsCycAct Ω M (ρ.comp (ZMod.unitsMap h)) := by
   intro E Ω _ _ _ _ _ N _ ρ hρ
   obtain ⟨_, hb⟩ := liftEx E Ω N
   have inj := (algebraMap E Ω).injective
@@ -29,8 +36,10 @@ theorem UpperTheory.V.Odd.actFacts :
   haveI : IsAlgClosure ℚ Ω := ⟨inferInstance, inferInstance⟩
   have key : ∀ φ : E →ₐ[ℚ] Ω, ∃ σ : Ω ≃+* Ω, ∀ x : E, σ (algebraMap E Ω x) = φ x := by
     intro φ
-    refine ⟨((Algebra.IsAlgebraic.algEquivEquivAlgHom ℚ Ω).symm (φ.liftNormal Ω)).toRingEquiv,
-      fun x => ?_⟩
+    refine ⟨
+      ((Algebra.IsAlgebraic.algEquivEquivAlgHom ℚ Ω).symm (φ.liftNormal Ω)).toRingEquiv,
+      fun x => ?_
+    ⟩
     change φ.liftNormal Ω (algebraMap E Ω x) = φ x
     simpa only [Algebra.algebraMap_self_apply] using φ.liftNormal_commutes Ω x
   let f : Gal(E/ℚ) → (E →ₐ[ℚ] Ω) := fun g => (IsScalarTower.toAlgHom ℚ E Ω).comp g.toAlgHom
@@ -47,19 +56,22 @@ theorem UpperTheory.V.Odd.actFacts :
     apply le_antisymm
     · rw [Nat.card_eq_fintype_card]
       exact AlgEquiv.card_le
-    · calc Module.finrank ℚ E = Nat.card (E →ₐ[ℚ] Ω) := by
-            rw [Nat.card_eq_fintype_card, AlgHom.card]
+    · calc
+        Module.finrank ℚ E
+          = Nat.card (E →ₐ[ℚ] Ω) := by rw [Nat.card_eq_fintype_card, AlgHom.card]
         _ ≤ Nat.card Gal(E/ℚ) := Nat.card_le_card_of_surjective f hf
   haveI : IsGalois ℚ E := IsGalois.of_card_aut_eq_finrank ℚ E hcard
   have hq : Nat.card (Gq ρ) = Module.finrank ℚ E := by
     rw [← hcard]
     exact Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective ρ hsurj).toEquiv
   refine ⟨hsurj, ?_, hq, hq, ?_⟩
-  · exact
-      { is_comm := ⟨fun x y => by
+  · exact {
+      is_comm :=
+        ⟨fun x y => by
           obtain ⟨a, rfl⟩ := hsurj x
           obtain ⟨c, rfl⟩ := hsurj y
-          rw [← map_mul, ← map_mul, mul_comm]⟩ }
+          rw [← map_mul, ← map_mul, mul_comm]⟩
+    }
   · intro M _ h b σ hσ
     apply hρ
     intro x hx

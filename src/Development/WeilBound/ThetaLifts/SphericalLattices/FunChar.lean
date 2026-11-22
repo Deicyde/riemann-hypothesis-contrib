@@ -9,10 +9,14 @@ noncomputable section
 
 namespace PositivityTheory.Sph
 
-open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
-theorem unrAt_one {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (w : HeightOneSpectrum (𝓞 E)) : UnrAt (1 : Chr F E) w := fun x _ => by
+theorem unrAt_one
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (w : HeightOneSpectrum (𝓞 E))
+    : UnrAt (1 : Chr F E) w := fun x _ => by
   simp [locChar]
 
 theorem charSt : CharSt := by
@@ -28,10 +32,13 @@ theorem charSt : CharSt := by
     split_ifs
     · simp
     · rw [← pow_add, hev.neg_one_pow]
-  have key := GlobalTheory.InertChars.locIdele_eq_of_inert hw (X.α * X.β) 1 hres
-    ((hX.chars.unrα w hwT).mul (hX.chars.unrβ w hwT)) (unrAt_one w)
-  refine ⟨?_, GlobalTheory.InertChars.beta_eq_alpha_of_inert F E σ B a a' G X om om' hX v w hw hv z hz⟩
-  rw [GlobalTheory.InertChars.eq_ideleAt_of_at z hz, GlobalTheory.LFun.ideleAt_eq_locIdele_of_isInertAt h hw, ← MonoidHom.mul_apply, key,
+  have key :=
+    GlobalTheory.InertChars.locIdele_eq_of_inert hw (X.α * X.β) 1 hres
+      ((hX.chars.unrα w hwT).mul (hX.chars.unrβ w hwT)) (unrAt_one w)
+  refine
+    ⟨?_, GlobalTheory.InertChars.beta_eq_alpha_of_inert F E σ B a a' G X om om' hX v w hw hv z hz⟩
+  rw [GlobalTheory.InertChars.eq_ideleAt_of_at z hz,
+    GlobalTheory.LFun.ideleAt_eq_locIdele_of_isInertAt h hw, ← MonoidHom.mul_apply, key,
     MonoidHom.one_apply]
 
 end PositivityTheory.Sph

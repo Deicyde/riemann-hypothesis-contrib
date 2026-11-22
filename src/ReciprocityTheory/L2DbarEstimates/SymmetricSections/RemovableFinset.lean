@@ -10,9 +10,10 @@ open Filter Topology Asymptotics
 
 universe u
 
-theorem removable_finset (S : Finset ℂ) : ∀ f : ℂ → ℂ, DifferentiableOn ℂ f (↑S)ᶜ →
-    (∀ c ∈ S, ∃ M : ℝ, ∀ᶠ t in 𝓝[≠] c, ‖f t‖ ≤ M) →
-    ∃ F : ℂ → ℂ, Differentiable ℂ F ∧ ∀ t ∉ S, F t = f t := by
+theorem removable_finset (S : Finset ℂ)
+    : ∀ f : ℂ → ℂ,
+      DifferentiableOn ℂ f (↑S)ᶜ → (∀ c ∈ S, ∃ M : ℝ, ∀ᶠ t in 𝓝[≠] c, ‖f t‖ ≤ M)
+        → ∃ F : ℂ → ℂ, Differentiable ℂ F ∧ ∀ t ∉ S, F t = f t := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -56,8 +57,7 @@ theorem removable_finset (S : Finset ℂ) : ∀ f : ℂ → ℂ, DifferentiableO
       obtain ⟨M', hM'⟩ := hb c' (Finset.mem_insert_of_mem hc')
       refine ⟨M', ?_⟩
       have hne : c' ≠ c := fun h => hc (h ▸ hc')
-      have hnc : ∀ᶠ t in 𝓝[≠] c', t ≠ c :=
-        nhdsWithin_le_nhds (isOpen_compl_singleton.mem_nhds hne)
+      have hnc : ∀ᶠ t in 𝓝[≠] c', t ≠ c := nhdsWithin_le_nhds (isOpen_compl_singleton.mem_nhds hne)
       filter_upwards [hM', hnc] with t h1 h2
       rwa [hg, Function.update_of_ne h2]
     obtain ⟨F, hF, hFg⟩ := ih g hgS hgb
@@ -141,15 +141,18 @@ theorem lineVanish : lineVanishStatement := by
     rw [div_le_div_iff₀ (pow_pos hxpos N) hxpos]
     have hg1 : ‖g x‖ ≤ |A| * (2 * ‖x‖) ^ K := by
       refine (hgr x hx'.2).trans ?_
-      calc A * (1 + ‖x‖) ^ K ≤ |A| * (1 + ‖x‖) ^ K :=
-            mul_le_mul_of_nonneg_right (le_abs_self A) (by positivity)
+      calc
+        A * (1 + ‖x‖) ^ K
+          ≤ |A| * (1 + ‖x‖) ^ K := mul_le_mul_of_nonneg_right (le_abs_self A) (by positivity)
         _ ≤ |A| * (2 * ‖x‖) ^ K :=
-            mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) (by linarith) K)
-              (abs_nonneg A)
+          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) (by linarith) K)
+            (abs_nonneg A)
     have hpow : ‖x‖ ^ K * ‖x‖ ≤ ‖x‖ ^ N := by
       rw [← pow_succ]
       exact pow_le_pow_right₀ hx1 hKN
-    calc ‖g x‖ * ‖x‖ ≤ |A| * (2 * ‖x‖) ^ K * ‖x‖ := mul_le_mul_of_nonneg_right hg1 hxpos.le
+    calc
+      ‖g x‖ * ‖x‖
+        ≤ |A| * (2 * ‖x‖) ^ K * ‖x‖ := mul_le_mul_of_nonneg_right hg1 hxpos.le
       _ = |A| * 2 ^ K * (‖x‖ ^ K * ‖x‖) := by rw [mul_pow]; ring
       _ ≤ |A| * 2 ^ K * ‖x‖ ^ N := mul_le_mul_of_nonneg_left hpow (by positivity)
   have hF0 : ∀ x, F x = 0 := fun x => hF.apply_eq_of_tendsto_cocompact x hlim

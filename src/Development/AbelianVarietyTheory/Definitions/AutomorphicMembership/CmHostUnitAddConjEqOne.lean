@@ -13,8 +13,12 @@ set_option autoImplicit false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
-open Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts Formalism.MainNotions.BoundaryLocalData GlobalTheory.ShFam GlobalTheory.FieldBaseChange GlobalTheory.ConstFam
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
+open Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.ModuliIntegralCharts Formalism.MainNotions.BoundaryLocalData
+  GlobalTheory.ShFam GlobalTheory.FieldBaseChange GlobalTheory.ConstFam
 
 namespace GlobalTheory.LocM
 
@@ -24,16 +28,21 @@ section Reg
 
 open scoped CategoryTheory.Obj
 
-variable {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R] {D : DegData R (maximalIdeal R)}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
-  (U : Unif (maximalIdeal R) D A G) (hR : AdmBase R (maximalIdeal R)) [GeometricallyConnected G.hom]
+variable
+  {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R]
+  {D : DegData R (maximalIdeal R)} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+  (U : Unif (maximalIdeal R) D A G) (hR : AdmBase R (maximalIdeal R))
+  [GeometricallyConnected G.hom]
 
 end Reg
 
 namespace BDat
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {X : Scheme.{0}}
-  {t₀ : SAB H X} {x : X} (B : BDat t₀ x)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {X : Scheme.{0}} {t₀ : SAB H X} {x : X}
+  (B : BDat t₀ x)
 
 abbrev Ylat : Type := B.U.D.toPre.X
 
@@ -69,8 +78,9 @@ open Bdy
 
 variable {D : D7} {A : Amb D} {N j : ℕ} {S : Sig A N j} {κ : Lv A} {p : ℕ}
 
-theorem bar_eq_of_conj (A : Amb D) {c c' : 𝓞 D.host.E} (hc : (c' : D.host.E) = D.host.conj (c : D.host.E)) :
-    c' = A.H.bar c := by
+theorem bar_eq_of_conj
+    (A : Amb D) {c c' : 𝓞 D.host.E} (hc : (c' : D.host.E) = D.host.conj (c : D.host.E))
+    : c' = A.H.bar c := by
   apply RingOfIntegers.ext
   rw [hc, A.H.bar_eq]
   apply D.host.φ₀.injective
@@ -84,7 +94,8 @@ namespace At
 variable (ct : At S κ p)
 
 def BPt : Type :=
-  {x : ct.Xm.X // IsClosed ({x} : Set ct.Xm.X) ∧ ¬ ct.Xm.abP x ∧ IsDomain (Cpl ct.Xm.X x) ∧ IsIntegrallyClosed (Cpl ct.Xm.X x)}
+  {x : ct.Xm.X // IsClosed ({x} : Set ct.Xm.X) ∧ ¬ ct.Xm.abP x ∧ IsDomain (Cpl ct.Xm.X x)
+    ∧ IsIntegrallyClosed (Cpl ct.Xm.X x)}
 
 theorem nonempty_bdat (z : ct.BPt) : Nonempty (BDat ct.Xm.t z.1) :=
   haveI := z.2.2.2.1
@@ -110,7 +121,8 @@ def bdyTrue (ct : At S κ p) : BdySt ct where
   taub_add_right z a χ χ' := by
     letI := A.H.starRing
     have h := (ct.bdat z).tau_spec
-    exact (h.symm _ _).trans ((h.add_left χ χ' a).trans (congrArg₂ (· * ·) (h.symm _ _) (h.symm _ _)))
+    exact (h.symm _ _).trans
+      ((h.add_left χ χ' a).trans (congrArg₂ (· * ·) (h.symm _ _) (h.symm _ _)))
   taub_symm z := letI := A.H.starRing; (ct.bdat z).tau_spec.symm
   taub_smul z := letI := A.H.starRing; (ct.bdat z).tau_spec.bal
   taub_pos z := letI := A.H.starRing; (ct.bdat z).tau_spec.pos

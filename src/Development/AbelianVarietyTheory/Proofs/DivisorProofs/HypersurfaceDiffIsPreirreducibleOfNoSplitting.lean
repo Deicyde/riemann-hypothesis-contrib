@@ -4,14 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem exists_prime_factor_mem_prime_ideal_ufd {R : Type} [CommRing R] [IsDomain R]
-    [UniqueFactorizationMonoid R] (I : Ideal R) [hI : I.IsPrime] (a : R) (ha : a ≠ 0)
-    (haI : a ∈ I) : ∃ u : R, Prime u ∧ u ∣ a ∧ u ∈ I := by
+theorem exists_prime_factor_mem_prime_ideal_ufd
+    {R : Type} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
+    (I : Ideal R) [hI : I.IsPrime]
+    (a : R) (ha : a ≠ 0) (haI : a ∈ I)
+    : ∃ u : R, Prime u ∧ u ∣ a ∧ u ∈ I := by
   induction a using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => exact absurd rfl ha
   | h₂ x hx => exact absurd (I.eq_top_of_isUnit_mem haI hx) hI.ne_top
@@ -21,12 +24,16 @@ theorem exists_prime_factor_mem_prime_ideal_ufd {R : Type} [CommRing R] [IsDomai
     · obtain ⟨u, hu, hua, huI⟩ := ih (right_ne_zero_of_mul ha) h
       exact ⟨u, hu, dvd_mul_of_dvd_right hua _, huI⟩
 
-theorem hypersurface_diff_isPreirreducible (Ω : Type) [Field Ω] [IsAlgClosed Ω] (σ : Type) [Finite σ]
+theorem hypersurface_diff_isPreirreducible
+    (Ω : Type) [Field Ω] [IsAlgClosed Ω]
+    (σ : Type) [Finite σ]
     (f g : MvPolynomial σ Ω) (D : ℕ) (hf0 : f ≠ 0) (hfD : f.totalDegree ≤ D)
-    (hno : ¬ (∃ u v : MvPolynomial σ Ω, u.totalDegree ≤ D ∧ v.totalDegree ≤ D ∧ u * v = f ∧
-      ∃ P Q : σ → Ω, MvPolynomial.eval P u = 0 ∧ MvPolynomial.eval P g ≠ 0 ∧
-        MvPolynomial.eval Q v = 0 ∧ MvPolynomial.eval Q g ≠ 0)) :
-    IsPreirreducible (PrimeSpectrum.zeroLocus {f} \ PrimeSpectrum.zeroLocus {g}) := by
+    (hno : ¬(∃ u v : MvPolynomial σ Ω,
+      u.totalDegree ≤ D ∧ v.totalDegree ≤ D ∧ u * v = f
+        ∧ ∃ P Q : σ → Ω,
+          MvPolynomial.eval P u = 0 ∧ MvPolynomial.eval P g ≠ 0 ∧ MvPolynomial.eval Q v = 0
+            ∧ MvPolynomial.eval Q g ≠ 0))
+    : IsPreirreducible (PrimeSpectrum.zeroLocus {f} \ PrimeSpectrum.zeroLocus {g}) := by
   intro U V hU hV ⟨p, hpS, hpU⟩ ⟨q, hqS, hqV⟩
   have hfp : f ∈ p.asIdeal := by simpa using hpS.1
   have hgp : g ∉ p.asIdeal := by simpa using hpS.2
@@ -40,8 +47,7 @@ theorem hypersurface_diff_isPreirreducible (Ω : Type) [Field Ω] [IsAlgClosed �
     intro hg
     apply hgp
     have : (Ideal.span {u}).radical ≤ p.asIdeal :=
-      (Ideal.radical_mono ((Ideal.span_singleton_le_iff_mem _).mpr hup)).trans
-        p.isPrime.radical.le
+      (Ideal.radical_mono ((Ideal.span_singleton_le_iff_mem _).mpr hup)).trans p.isPrime.radical.le
     exact this hg
   rw [← MvPolynomial.vanishingIdeal_zeroLocus_eq_radical (K := Ω)] at hgrad
   simp only [MvPolynomial.mem_vanishingIdeal_iff, not_forall] at hgrad
@@ -64,8 +70,9 @@ theorem hypersurface_diff_isPreirreducible (Ω : Type) [Field Ω] [IsAlgClosed �
 
   have hprime : (Ideal.span {u}).IsPrime := (Ideal.span_singleton_prime hu0).mpr hu
   let x : PrimeSpectrum (MvPolynomial σ Ω) := ⟨Ideal.span {u}, hprime⟩
-  have key : ∀ y ∈ PrimeSpectrum.zeroLocus {u * v} \ PrimeSpectrum.zeroLocus {g},
-      y ∈ closure ({x} : Set _) := by
+  have key
+      : ∀ y ∈ PrimeSpectrum.zeroLocus {u * v} \ PrimeSpectrum.zeroLocus {g},
+        y ∈ closure ({x} : Set _) := by
     intro y hy
     have hfy : u * v ∈ y.asIdeal := by simpa using hy.1
     have hgy : g ∉ y.asIdeal := by simpa using hy.2
@@ -74,10 +81,10 @@ theorem hypersurface_diff_isPreirreducible (Ω : Type) [Field Ω] [IsAlgClosed �
     rw [Ideal.span_singleton_le_iff_mem]
     rcases y.isPrime.mem_or_mem hfy with h | h
     · exact h
-    · exfalso; apply hgy
+    · exfalso
+      apply hgy
       have : (Ideal.span {v}).radical ≤ y.asIdeal :=
-        (Ideal.radical_mono ((Ideal.span_singleton_le_iff_mem _).mpr h)).trans
-          y.isPrime.radical.le
+        (Ideal.radical_mono ((Ideal.span_singleton_le_iff_mem _).mpr h)).trans y.isPrime.radical.le
       exact this hvg
   have hxS : x ∈ PrimeSpectrum.zeroLocus {u * v} \ PrimeSpectrum.zeroLocus {g} := by
     constructor
@@ -90,12 +97,14 @@ theorem hypersurface_diff_isPreirreducible (Ω : Type) [Field Ω] [IsAlgClosed �
     have := key p hpS
     rw [mem_closure_iff] at this
     obtain ⟨z, hzU, hz⟩ := this U hU hpU
-    rw [Set.mem_singleton_iff.mp hz] at hzU; exact hzU
+    rw [Set.mem_singleton_iff.mp hz] at hzU
+    exact hzU
   have hxV : x ∈ V := by
     have := key q hqS
     rw [mem_closure_iff] at this
     obtain ⟨z, hzV, hz⟩ := this V hV hqV
-    rw [Set.mem_singleton_iff.mp hz] at hzV; exact hzV
+    rw [Set.mem_singleton_iff.mp hz] at hzV
+    exact hzV
   exact ⟨x, hxS, hxU, hxV⟩
 
 end GlobalTheory

@@ -17,33 +17,39 @@ namespace VerticalGauss
 
 open IsLocalRing IsDedekindDomain
 
-noncomputable def extPrime {K : Type} [Field K] [NumberField K] (σ : Type)
-    (la : HeightOneSpectrum (𝓞 K)) : Ideal (MvPolynomial σ (𝓞 K)) :=
+noncomputable def extPrime
+    {K : Type} [Field K] [NumberField K] (σ : Type) (la : HeightOneSpectrum (𝓞 K))
+    : Ideal (MvPolynomial σ (𝓞 K)) :=
   la.asIdeal.map MvPolynomial.C
 
-theorem mem_extPrime {K : Type} [Field K] [NumberField K] {σ : Type}
-    (la : HeightOneSpectrum (𝓞 K)) (p : MvPolynomial σ (𝓞 K)) :
-    p ∈ extPrime σ la ↔ ∀ m, p.coeff m ∈ la.asIdeal :=
+theorem mem_extPrime
+    {K : Type} [Field K] [NumberField K]
+    {σ : Type}
+    (la : HeightOneSpectrum (𝓞 K)) (p : MvPolynomial σ (𝓞 K))
+    : p ∈ extPrime σ la ↔ ∀ m, p.coeff m ∈ la.asIdeal :=
   MvPolynomial.mem_map_C_iff
 
-instance extPrime_isPrime {K : Type} [Field K] [NumberField K] (σ : Type)
-    (la : HeightOneSpectrum (𝓞 K)) : (extPrime σ la).IsPrime := by
+instance extPrime_isPrime
+    {K : Type} [Field K] [NumberField K] (σ : Type) (la : HeightOneSpectrum (𝓞 K))
+    : (extPrime σ la).IsPrime := by
   haveI := la.isPrime
   unfold extPrime
   rw [← Ideal.Quotient.isDomain_iff_prime]
-  exact (MvPolynomial.quotientEquivQuotientMvPolynomial (σ := σ) la.asIdeal).symm.toMulEquiv.isDomain
+  exact (MvPolynomial.quotientEquivQuotientMvPolynomial (σ := σ)
+    la.asIdeal).symm.toMulEquiv.isDomain
 
-theorem isDVR {K : Type} [Field K] [NumberField K] (σ : Type) [Finite σ]
-    (la : HeightOneSpectrum (𝓞 K)) :
-    IsDiscreteValuationRing (Localization.AtPrime (extPrime σ la)) := by
+theorem isDVR
+    {K : Type} [Field K] [NumberField K] (σ : Type) [Finite σ] (la : HeightOneSpectrum (𝓞 K))
+    : IsDiscreteValuationRing (Localization.AtPrime (extPrime σ la)) := by
   classical
   set P := extPrime σ la
   set Ol := Localization.AtPrime la.asIdeal
   have : IsDiscreteValuationRing Ol :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 K) la.ne_bot Ol
-  have hC : ∀ y : la.asIdeal.primeCompl,
-      IsUnit ((algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)).comp
-        (MvPolynomial.C) (y : 𝓞 K)) := by
+  have hC
+      : ∀ y : la.asIdeal.primeCompl,
+        IsUnit ((algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)).comp (MvPolynomial.C)
+          (y : 𝓞 K)) := by
     intro y
     apply IsLocalization.map_units (M := P.primeCompl) (Localization.AtPrime P)
       ⟨MvPolynomial.C (y : 𝓞 K), _⟩
@@ -52,8 +58,9 @@ theorem isDVR {K : Type} [Field K] [NumberField K] (σ : Type) [Finite σ]
     have := (MvPolynomial.mem_map_C_iff (I := la.asIdeal) (f := MvPolynomial.C (y : 𝓞 K))).mp hy 0
     simpa using this
   let φ : Ol →+* Localization.AtPrime P := IsLocalization.lift (M := la.asIdeal.primeCompl) hC
-  have hφ : φ.comp (algebraMap (𝓞 K) Ol) =
-      (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)).comp MvPolynomial.C :=
+  have hφ
+      : φ.comp (algebraMap (𝓞 K) Ol)
+        = (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)).comp MvPolynomial.C :=
     IsLocalization.lift_comp hC
   have hmax : maximalIdeal (Localization.AtPrime P) = (maximalIdeal Ol).map φ := by
     rw [← Localization.AtPrime.map_eq_maximalIdeal, ← Localization.AtPrime.map_eq_maximalIdeal,
@@ -65,12 +72,14 @@ theorem isDVR {K : Type} [Field K] [NumberField K] (σ : Type) [Finite σ]
     rw [isField_iff_maximalIdeal_eq, ← Localization.AtPrime.map_eq_maximalIdeal]
     intro h
     obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot la.ne_bot
-    have hm : (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)) (MvPolynomial.C a) ∈
-        P.map (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)) :=
+    have hm
+        : (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)) (MvPolynomial.C a)
+          ∈ P.map (algebraMap (MvPolynomial σ (𝓞 K)) (Localization.AtPrime P)) :=
       Ideal.mem_map_of_mem _ (Ideal.mem_map_of_mem _ ha)
     rw [h, Ideal.mem_bot] at hm
-    have hinj := IsLocalization.injective (Localization.AtPrime P) (M := P.primeCompl)
-      P.primeCompl_le_nonZeroDivisors
+    have hinj :=
+      IsLocalization.injective (Localization.AtPrime P) (M := P.primeCompl)
+        P.primeCompl_le_nonZeroDivisors
     apply ha0
     have := hinj (hm.trans (map_zero _).symm)
     simpa using this
@@ -82,10 +91,13 @@ theorem isDVR {K : Type} [Field K] [NumberField K] (σ : Type) [Finite σ]
   change Ideal.map φ (Ideal.span {g}) = Ideal.span {φ g}
   rw [Ideal.map_span, Set.image_singleton]
 
-theorem injective_of_dvr {R Ω : Type} [CommRing R] [IsDomain R] [Field Ω] (φ : R →+* Ω)
+theorem injective_of_dvr
+    {R Ω : Type} [CommRing R] [IsDomain R] [Field Ω]
+    (φ : R →+* Ω)
     (P : Ideal R) [P.IsPrime] [IsDiscreteValuationRing (Localization.AtPrime P)]
-    (hker : ∀ r, φ r = 0 → r ∈ P) (a : R) (ha : a ∈ P) (ha0 : φ a ≠ 0) :
-    Function.Injective φ := by
+    (hker : ∀ r, φ r = 0 → r ∈ P)
+    (a : R) (ha : a ∈ P) (ha0 : φ a ≠ 0)
+    : Function.Injective φ := by
   have hu : ∀ y : P.primeCompl, IsUnit (φ y) := fun y =>
     isUnit_iff_ne_zero.2 fun h => y.2 (hker _ h)
   let ψ : Localization.AtPrime P →+* Ω := IsLocalization.lift (M := P.primeCompl) hu
@@ -99,19 +111,23 @@ theorem injective_of_dvr {R Ω : Type} [CommRing R] [IsDomain R] [Field Ω] (φ 
     obtain ⟨c, hc⟩ := hm
     apply ha0
     rw [← hψ, hc, map_mul, h, zero_mul]
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   by_contra hr0
-  have hinj := IsLocalization.injective (Localization.AtPrime P) (M := P.primeCompl)
-    P.primeCompl_le_nonZeroDivisors
+  have hinj :=
+    IsLocalization.injective (Localization.AtPrime P) (M := P.primeCompl)
+      P.primeCompl_le_nonZeroDivisors
   have hr1 : algebraMap R (Localization.AtPrime P) r ≠ 0 := (map_ne_zero_iff _ hinj).2 hr0
   obtain ⟨n, u, hn⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hr1 hϖ
   rw [← hψ, hn, map_mul, map_pow] at hr
   exact mul_ne_zero (u.isUnit.map ψ).ne_zero (pow_ne_zero _ hϖ0) hr
 
-theorem nonneg_of_isIntegral {R Ω : Type} [CommRing R] [Field Ω] [Algebra R Ω]
-    (w : AddValuation Ω (WithTop ℤ)) (h : ∀ r, 0 ≤ w (algebraMap R Ω r)) {b : Ω}
-    (hb : IsIntegral R b) : 0 ≤ w b := by
+theorem nonneg_of_isIntegral
+    {R Ω : Type} [CommRing R] [Field Ω] [Algebra R Ω]
+    (w : AddValuation Ω (WithTop ℤ)) (h : ∀ r, 0 ≤ w (algebraMap R Ω r))
+    {b : Ω} (hb : IsIntegral R b)
+    : 0 ≤ w b := by
   letI : Algebra R (vRing w) := ((algebraMap R Ω).codRestrict (vRing w) h).toAlgebra
   haveI : IsScalarTower R (vRing w) Ω := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   have hb' : IsIntegral (vRing w) b := hb.tower_top
@@ -119,12 +135,13 @@ theorem nonneg_of_isIntegral {R Ω : Type} [CommRing R] [Field Ω] [Algebra R Ω
   rw [← hy]
   exact y.2
 
-theorem finite_places {R Ω : Type} [CommRing R] [IsDomain R] [Field Ω] [CharZero Ω] [Algebra R Ω]
-    [Algebra (FractionRing R) Ω] [IsScalarTower R (FractionRing R) Ω]
-    [FiniteDimensional (FractionRing R) Ω]
-    (P : Ideal R) [P.IsPrime] [IsDiscreteValuationRing (Localization.AtPrime P)] :
-    {v : AddValuation Ω (WithTop ℤ) | IsNormDiscrete v ∧
-      ∀ x : R, 0 ≤ v (algebraMap R Ω x) ∧ (0 < v (algebraMap R Ω x) ↔ x ∈ P)}.Finite := by
+theorem finite_places
+    {R Ω : Type}
+    [CommRing R] [IsDomain R] [Field Ω] [CharZero Ω] [Algebra R Ω] [Algebra (FractionRing R) Ω]
+    [IsScalarTower R (FractionRing R) Ω] [FiniteDimensional (FractionRing R) Ω]
+    (P : Ideal R) [P.IsPrime] [IsDiscreteValuationRing (Localization.AtPrime P)]
+    : {v : AddValuation Ω (WithTop ℤ) | IsNormDiscrete v ∧
+        ∀ x : R, 0 ≤ v (algebraMap R Ω x) ∧ (0 < v (algebraMap R Ω x) ↔ x ∈ P)}.Finite := by
   set O := Localization.AtPrime P
   set F := FractionRing R
   letI : Algebra O Ω := ((algebraMap F Ω).comp (algebraMap O F)).toAlgebra
@@ -149,7 +166,6 @@ theorem finite_places {R Ω : Type} [CommRing R] [IsDomain R] [Field Ω] [CharZe
   exact ⟨h1, (ValPl.placesOver_iff_loc P v).1 h2⟩
 
 end VerticalGauss
-
 
 open VerticalGauss IsDedekindDomain in
 theorem finite_vertical_gauss_valuations : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] (D : ℕ) (x : Fin D → Ω), (⊤ : IntermediateField K Ω).FG → Algebra.trdeg K Ω = D → ∀ g : Ω, g ≠ 0 → {v : AddValuation Ω (WithTop ℤ) | IsNormDiscrete v ∧ v g ≠ 0 ∧ ∃ la : IsDedekindDomain.HeightOneSpectrum (𝓞 K), ∀ p : MvPolynomial (Fin D) (𝓞 K), 0 ≤ v (MvPolynomial.eval₂ ((algebraMap K Ω).comp (algebraMap (𝓞 K) K)) x p) ∧ (0 < v (MvPolynomial.eval₂ ((algebraMap K Ω).comp (algebraMap (𝓞 K) K)) x p) ↔ ∀ m, p.coeff m ∈ la.asIdeal)}.Finite := by

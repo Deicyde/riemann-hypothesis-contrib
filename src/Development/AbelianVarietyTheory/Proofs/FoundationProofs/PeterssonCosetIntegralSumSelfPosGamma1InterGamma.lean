@@ -15,8 +15,8 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.Hk
 
-theorem petersson_self_eq (k : ℤ) (f : ℍ → ℂ) (z : ℍ) :
-    petersson k f f z = ((‖f z‖ ^ 2 * z.im ^ k : ℝ) : ℂ) := by
+theorem petersson_self_eq (k : ℤ) (f : ℍ → ℂ) (z : ℍ)
+    : petersson k f f z = ((‖f z‖ ^ 2 * z.im ^ k : ℝ) : ℂ) := by
   rw [petersson, mul_comm (starRingEnd ℂ (f z)), Complex.mul_conj, Complex.normSq_eq_norm_sq]
   push_cast
   rfl
@@ -25,9 +25,9 @@ end GlobalTheory.Hk
 
 namespace GlobalTheory.Hk
 
-theorem pet_self_pos (N l : ℕ) (k : ℤ) (hN : 0 < N) (hl : 0 < l) (f : CuspForm (lev N l) k)
-    (hf : f ≠ 0) :
-    0 < (pet (lev N l) k ⇑f ⇑f).re ∧ (pet (lev N l) k ⇑f ⇑f).im = 0 := by
+theorem pet_self_pos
+    (N l : ℕ) (k : ℤ) (hN : 0 < N) (hl : 0 < l) (f : CuspForm (lev N l) k) (hf : f ≠ 0)
+    : 0 < (pet (lev N l) k ⇑f ⇑f).re ∧ (pet (lev N l) k ⇑f ⇑f).im = 0 := by
   haveI := lev_finiteIndex N l hN hl
   haveI : Finite (SL(2, ℤ) ⧸ lev N l) := Subgroup.finite_quotient_of_finiteIndex
   haveI : Fintype (SL(2, ℤ) ⧸ lev N l) := Fintype.ofFinite _
@@ -54,11 +54,13 @@ theorem pet_self_pos (N l : ℕ) (k : ℤ) (hN : 0 < N) (hl : 0 < l) (f : CuspFo
   obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (lev N l) g
   have hinv : ∀ z, r (((h⁻¹ : lev N l) : SL(2, ℤ)) • z) = r z := by
     intro z
-    have e := SlashInvariantFormClass.norm_petersson_smul (f := f) (f' := f) (τ := z)
-      (Γ := (lev N l : Subgroup (GL (Fin 2) ℝ)))
-      (g := (((h⁻¹ : lev N l) : SL(2, ℤ)) : GL (Fin 2) ℝ)) ⟨_, (h⁻¹).2, rfl⟩
+    have e :=
+      SlashInvariantFormClass.norm_petersson_smul (f := f) (f' := f) (τ := z)
+        (Γ := (lev N l : Subgroup (GL (Fin 2) ℝ)))
+        (g := (((h⁻¹ : lev N l) : SL(2, ℤ)) : GL (Fin 2) ℝ)) ⟨_, (h⁻¹).2, rfl⟩
     rw [hrp, hrp, Complex.norm_real, Complex.norm_real, Real.norm_of_nonneg (hr0 _),
-      Real.norm_of_nonneg (hr0 _)] at e
+        Real.norm_of_nonneg (hr0 _)]
+      at e
     exact e
   have hpt : (((g : SL(2, ℤ) ⧸ lev N l)).out⁻¹ • (g • z₀)) = ((h⁻¹ : lev N l) : SL(2, ℤ)) • z₀ := by
     rw [hh, smul_smul, mul_inv_rev, inv_mul_cancel_right]
@@ -69,9 +71,13 @@ theorem pet_self_pos (N l : ℕ) (k : ℤ) (hN : 0 < N) (hl : 0 < l) (f : CuspFo
       exact mul_pos (pow_pos (norm_pos_iff.2 hz₀) 2) (zpow_pos z₀.im_pos _)
     have hc : Continuous fun z : ℍ => r ((g : SL(2, ℤ) ⧸ lev N l).out⁻¹ • z) :=
       hrc.comp (continuous_const_smul (((g : SL(2, ℤ) ⧸ lev N l).out⁻¹ : SL(2, ℤ)) : GL (Fin 2) ℝ))
-    have hint : IntegrableOn (fun z : ℍ => r ((g : SL(2, ℤ) ⧸ lev N l).out⁻¹ • z)) ModularGroup.fd := by
-      obtain ⟨C, hC⟩ := CuspFormClass.petersson_bounded_left k (lev N l : Subgroup (GL (Fin 2) ℝ)) f f
-      have fin := UpperTheory.V.Af.Rs.fdFin (UpperTheory.V.Af.Rs.stripIm UpperTheory.V.Af.Rs.volMap) UpperTheory.V.Af.Rs.volMap
+    have hint
+        : IntegrableOn (fun z : ℍ => r ((g : SL(2, ℤ) ⧸ lev N l).out⁻¹ • z)) ModularGroup.fd := by
+      obtain ⟨C, hC⟩ :=
+        CuspFormClass.petersson_bounded_left k (lev N l : Subgroup (GL (Fin 2) ℝ)) f f
+      have fin :=
+        UpperTheory.V.Af.Rs.fdFin (UpperTheory.V.Af.Rs.stripIm UpperTheory.V.Af.Rs.volMap)
+          UpperTheory.V.Af.Rs.volMap
       refine Measure.integrableOn_of_bounded (M := C) fin.2.ne hc.aestronglyMeasurable
         (Filter.Eventually.of_forall fun z => ?_)
       have := hC ((g : SL(2, ℤ) ⧸ lev N l).out⁻¹ • z)

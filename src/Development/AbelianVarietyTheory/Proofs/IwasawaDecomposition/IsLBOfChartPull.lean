@@ -13,12 +13,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.Toroidal GlobalTheory.ShFam
+  GlobalTheory.ShFam.Pad
 
 namespace GlobalTheory.NefFibre
 
-theorem isLB_of_chartPull {Y : Scheme.{0}} {A M : LB Y} (a : ChartPull A M (𝟙 Y)) (hM : M.IsLB)
-    (hc : ∀ y : Y, ∃ i, y ∈ A.U i) : A.IsLB := by
+theorem isLB_of_chartPull
+    {Y : Scheme.{0}} {A M : LB Y}
+    (a : ChartPull A M (𝟙 Y)) (hM : M.IsLB) (hc : ∀ y : Y, ∃ i, y ∈ A.U i)
+    : A.IsLB := by
   refine GlobalTheory.GenSpread.isLB_of_gm A hc ?_
   intro y i j k hi hj hk
   have hi' : y ∈ M.U (a.idx i) := a.le i hi

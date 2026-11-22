@@ -10,8 +10,12 @@ open scoped ComplexConjugate
 namespace PI.UnitaryGroupMassFormula.UnimodLocStd
 open PI.ULS
 
-theorem rep_coord (a : ℕ) (ha : 0 < a) (b : ℤ) (d : ℕ) (hd : 0 < d) (p q r s : ℝ)
-    (h : (p : ℂ) * a + q * cmTheta b d = r * a + s * cmTheta b d) : p = r ∧ q = s := by
+theorem rep_coord
+    (a : ℕ) (ha : 0 < a)
+    (b : ℤ)
+    (d : ℕ) (hd : 0 < d)
+    (p q r s : ℝ) (h : (p : ℂ) * a + q * cmTheta b d = r * a + s * cmTheta b d)
+    : p = r ∧ q = s := by
   have hs : (0 : ℝ) < Real.sqrt d := Real.sqrt_pos.mpr (by exact_mod_cast hd)
   have ha' : (0 : ℝ) < a := by exact_mod_cast ha
   have him := congrArg Complex.im h
@@ -26,9 +30,20 @@ theorem rep_coord (a : ℕ) (ha : 0 < a) (b : ℤ) (d : ℕ) (hd : 0 < d) (p q r
   have h3 : p * a = r * a := by linarith
   exact mul_right_cancel₀ ha'.ne' h3
 
-theorem rep_prim_pair (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0) (m : Type) [Fintype m] [DecidableEq m] (Λ : AddSubgroup (m → ℂ)) (l : ℕ) (x y : ℤ) (T : Finset m) (i₀ : m) (h : KeyHyps a b c d ha hd lam hlam m Λ l x y T i₀) :
-    ∃ xt : m → ℂ, xt ∈ Λ ∧ (∀ j ∈ T, xt j = 0) ∧ ∃ yv : m → ℂ, yv ∈ Λ ∧ ∃ c₂ : ℤ,
-      (stdH (cmL a b d ha hd lam hlam) m xt yv).im = c₂ ∧ ¬ (l : ℤ) ∣ c₂ := by
+theorem rep_prim_pair
+    (a : ℕ)
+    (b c : ℤ)
+    (d : ℕ)
+    (ha : 0 < a) (hd : 0 < d)
+    (lam : ℂ) (hlam : lam ≠ 0)
+    (m : Type) [Fintype m] [DecidableEq m]
+    (Λ : AddSubgroup (m → ℂ)) (l : ℕ) (x y : ℤ) (T : Finset m) (i₀ : m)
+    (h : KeyHyps a b c d ha hd lam hlam m Λ l x y T i₀)
+    : ∃ xt : m → ℂ,
+      xt ∈ Λ ∧ (∀ j ∈ T, xt j = 0)
+        ∧ ∃ yv : m → ℂ,
+          yv ∈ Λ
+            ∧ ∃ c₂ : ℤ, (stdH (cmL a b d ha hd lam hlam) m xt yv).im = c₂ ∧ ¬ (l : ℤ) ∣ c₂ := by
   obtain ⟨hOK, hΛ, hθ, h1, h2, hl, hQ, hi₀, hT⟩ := h
   set L := cmL a b d ha hd lam hlam with hL
   set f := fvec a b d lam x y i₀ with hfdef
@@ -55,40 +70,55 @@ theorem rep_prim_pair (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) 
           (fun j hj hle => Nat.dvd_factorial hj hle)).1
       obtain ⟨p, q, hpq⟩ := PeriodPair.mem_lattice.mp (hmem i₀ (Set.mem_univ i₀))
       rw [rep_omega1, rep_omega2] at hpq
-      simp only [hfdef, fvec, Pi.smul_apply, Pi.single_eq_same, nsmul_eq_mul, smul_eq_mul, Pi.mul_apply, Pi.natCast_apply] at hpq
+      simp only [hfdef, fvec, Pi.smul_apply, Pi.single_eq_same, nsmul_eq_mul, smul_eq_mul,
+          Pi.mul_apply, Pi.natCast_apply]
+        at hpq
       have hlj : ((l : ℂ) ^ j) ≠ 0 := pow_ne_zero _ hl0
-      have e : ((p : ℝ) : ℂ) * a + ((q : ℝ) : ℂ) * cmTheta b d =
-          (((K * x : ℤ) / (l : ℝ) ^ j : ℝ) : ℂ) * a + (((K * y : ℤ) / (l : ℝ) ^ j : ℝ) : ℂ) * cmTheta b d := by
+      have e
+          : ((p : ℝ) : ℂ) * a + ((q : ℝ) : ℂ) * cmTheta b d
+            = (((K * x : ℤ) / (l : ℝ) ^ j : ℝ) : ℂ) * a
+              + (((K * y : ℤ) / (l : ℝ) ^ j : ℝ) : ℂ) * cmTheta b d := by
         apply mul_left_cancel₀ hlam
         push_cast
-        rw [hK]; push_cast
+        rw [hK]
+        push_cast
         linear_combination hpq
       obtain ⟨ep, eq'⟩ := rep_coord a ha b d hd _ _ _ _ e
       have hlj' : ((l : ℝ) ^ j) ≠ 0 := pow_ne_zero _ (by exact_mod_cast hl.ne_zero)
       refine ⟨⟨p, ?_⟩, ⟨q, ?_⟩⟩
       · rw [eq_div_iff hlj'] at ep
-        have : ((K * x : ℤ) : ℝ) = ((l ^ j * p : ℤ) : ℝ) := by push_cast at ep ⊢; linear_combination -ep
+        have : ((K * x : ℤ) : ℝ) = ((l ^ j * p : ℤ) : ℝ) := by
+          push_cast at ep ⊢; linear_combination -ep
         exact_mod_cast this
       · rw [eq_div_iff hlj'] at eq'
-        have : ((K * y : ℤ) : ℝ) = ((l ^ j * q : ℤ) : ℝ) := by push_cast at eq' ⊢; linear_combination -eq'
+        have : ((K * y : ℤ) : ℝ) = ((l ^ j * q : ℤ) : ℝ) := by
+          push_cast at eq' ⊢; linear_combination -eq'
         exact_mod_cast this
     set J := K * (x.natAbs + y.natAbs) + 1
     have hJ : K * (x.natAbs + y.natAbs) < l ^ J :=
       lt_of_lt_of_le (Nat.lt_succ_self _) ((Nat.lt_pow_self hl.one_lt).le)
     have hx0 : K * x = 0 := by
       apply Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (hdvd J).1
-      rw [Int.natAbs_mul, Int.natAbs_pow]; simp only [Int.natAbs_natCast]
-      calc K * x.natAbs ≤ K * (x.natAbs + y.natAbs) := Nat.mul_le_mul_left _ (Nat.le_add_right _ _)
+      rw [Int.natAbs_mul, Int.natAbs_pow]
+      simp only [Int.natAbs_natCast]
+      calc
+        K * x.natAbs
+          ≤ K * (x.natAbs + y.natAbs) := Nat.mul_le_mul_left _ (Nat.le_add_right _ _)
         _ < l ^ J := hJ
     have hy0 : K * y = 0 := by
       apply Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (hdvd J).2
-      rw [Int.natAbs_mul, Int.natAbs_pow]; simp only [Int.natAbs_natCast]
-      calc K * y.natAbs ≤ K * (x.natAbs + y.natAbs) := Nat.mul_le_mul_left _ (Nat.le_add_left _ _)
+      rw [Int.natAbs_mul, Int.natAbs_pow]
+      simp only [Int.natAbs_natCast]
+      calc
+        K * y.natAbs
+          ≤ K * (x.natAbs + y.natAbs) := Nat.mul_le_mul_left _ (Nat.le_add_left _ _)
         _ < l ^ J := hJ
     have hK0' : (K : ℤ) ≠ 0 := by exact_mod_cast hK0
     have hx : x = 0 := (mul_eq_zero.mp hx0).resolve_left hK0'
     have hy : y = 0 := (mul_eq_zero.mp hy0).resolve_left hK0'
-    apply hQ; rw [hx, hy]; simp
+    apply hQ
+    rw [hx, hy]
+    simp
   classical
   set j₁ := Nat.find hex with hj₁
   have hP0 : P 0 := by simp only [hPdef, pow_zero, inv_one, one_smul]; exact hDfΛ

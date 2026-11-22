@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteInt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
@@ -21,11 +25,14 @@ noncomputable section
 
 namespace GlobalTheory.NormBlowupField
 
-theorem exists_normBl : ∀ (K : Type) [Field K] [CharZero K] (Z : Scheme.{0}) (z : Z ⟶ Sp K),
-    IsProjOver z → GlobalTheory.IsNormalScheme Z → ∀ (J : Z.IdealSheafData) (W : Z.Opens),
-    Dense (W : Set Z) → (∀ x ∈ J.support, x ∉ W) → ∃ (S : Scheme.{0}) (π : S ⟶ Z)
-    (BD : EffCartierData S), GlobalTheory.Poinc.IsNormBl π J ∧ IsProjOver (π ≫ z) ∧ IsProper π ∧
-    BD.idealSheaf = J.comap π ∧ IsIso (π ∣_ W) ∧ Dense (π ⁻¹' W : Set S) := by
+theorem exists_normBl
+    : ∀ (K : Type) [Field K] [CharZero K] (Z : Scheme.{0}) (z : Z ⟶ Sp K),
+      IsProjOver z → GlobalTheory.IsNormalScheme Z
+        → ∀ (J : Z.IdealSheafData) (W : Z.Opens),
+          Dense (W : Set Z) → (∀ x ∈ J.support, x ∉ W)
+            → ∃ (S : Scheme.{0}) (π : S ⟶ Z) (BD : EffCartierData S),
+              GlobalTheory.Poinc.IsNormBl π J ∧ IsProjOver (π ≫ z) ∧ IsProper π
+                ∧ BD.idealSheaf = J.comap π ∧ IsIso (π ∣_ W) ∧ Dense (π ⁻¹' W : Set S) := by
   intro K _ _ Z z hz hZ J W hWd hWJ
   obtain ⟨X', b, hb, hbs, hiso⟩ := GlobalTheory.ProjBlowup.exists_blowup z hz J
   haveI : LocallyOfFiniteType (b ≫ z) := by
@@ -47,10 +54,13 @@ theorem exists_normBl : ∀ (K : Type) [Field K] [CharZero K] (Z : Scheme.{0}) (
         (RingHom.injective _))
       fun x _ => (LocallyOfFiniteType.stalkMap V.ι x).residueFieldMap
   let ν := V.ι.fromNormalization
-  have hS : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme V.ι.normalization := IsNormalScheme.pred _
+  have hS : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme V.ι.normalization :=
+    IsNormalScheme.pred _
   have hν : IsIso (ν ∣_ V) := by
     have H := isPullback_toNormalization_of_mono (𝟙 _) V.ι V.ι (Category.id_comp _).symm
-    have e := IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict V.ι.fromNormalization V) H.flip
+    have e :=
+      IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict V.ι.fromNormalization V)
+        H.flip
     rw [← e]
     infer_instance
   have hd : Dense ((ν ⁻¹ᵁ V : V.ι.normalization.Opens) : Set V.ι.normalization) := by
@@ -59,7 +69,8 @@ theorem exists_normBl : ∀ (K : Type) [Field K] [CharZero K] (Z : Scheme.{0}) (
     change V.ι.fromNormalization (V.ι.toNormalization x) ∈ V
     rw [← Scheme.Hom.comp_apply, Scheme.Hom.toNormalization_fromNormalization]
     exact x.2
-  have hVd : Dense (V : Set X') := GlobalTheory.NormBlowupInt.dense_preimage_of_blowup J b hb hiso W hWd
+  have hVd : Dense (V : Set X') :=
+    GlobalTheory.NormBlowupInt.dense_preimage_of_blowup J b hb hiso W hWd
   obtain ⟨D, hD⟩ := EffCartierData.exists_idealSheaf_eq hb.1
   have hK : D.KeepsRegular ν := by
     refine D.keepsRegular_of_dense ν (fun y => (hS y).1) (hd.mono fun t ht => ?_)
@@ -78,8 +89,17 @@ theorem exists_normBl : ∀ (K : Type) [Field K] [CharZero K] (Z : Scheme.{0}) (
       have := isProper_str K m
       rw [← e]; infer_instance
     exact IsProper.of_comp (ν ≫ b) z
-  refine ⟨V.ι.normalization, ν ≫ b, D.pull ν hK,
-    ⟨inferInstance, X', b, ν, V, hb, rfl, hfin, hVd, hd, hν⟩, hproj, hprop, ?_, ?_, ?_⟩
+  refine ⟨
+    V.ι.normalization,
+    ν ≫ b,
+    D.pull ν hK,
+    ⟨inferInstance, X', b, ν, V, hb, rfl, hfin, hVd, hd, hν⟩,
+    hproj,
+    hprop,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [EffCartierData.idealSheaf_pull, hD, Scheme.IdealSheafData.comap_comp]
   · rw [morphismRestrict_comp]; exact IsIso.comp_isIso' hν hbW
   · convert hd using 1

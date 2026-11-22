@@ -7,8 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-private theorem eq_bot_of_forall_isNilpotent_of_isSemisimple {R : Type*} [Ring R] [IsSemisimpleRing R] (L : Submodule R R)
-    (h : ∀ z ∈ L, IsNilpotent z) : L = ⊥ := by
+private theorem eq_bot_of_forall_isNilpotent_of_isSemisimple
+    {R : Type*} [Ring R] [IsSemisimpleRing R] (L : Submodule R R) (h : ∀ z ∈ L, IsNilpotent z)
+    : L = ⊥ := by
   obtain ⟨C, hC⟩ := exists_isCompl L
   have h1 : (1 : R) ∈ L ⊔ C := by rw [hC.sup_eq_top]; trivial
   obtain ⟨e, he, f, hf, hef⟩ := Submodule.mem_sup.mp h1
@@ -16,13 +17,14 @@ private theorem eq_bot_of_forall_isNilpotent_of_isSemisimple {R : Type*} [Ring R
     intro l hl
     have hl1 : l * e ∈ L := L.smul_mem l he
     have hl2 : l * f ∈ C := C.smul_mem l hf
-    have hsub : l * f = l - l * e := by
-      rw [eq_sub_iff_add_eq, add_comm, ← mul_add, hef, mul_one]
+    have hsub : l * f = l - l * e := by rw [eq_sub_iff_add_eq, add_comm, ← mul_add, hef, mul_one]
     have hL : l * f ∈ L := by rw [hsub]; exact L.sub_mem hl hl1
     exact (Submodule.disjoint_def.mp hC.disjoint) _ hL hl2
   have hee : IsIdempotentElem e := by
     show e * e = e
-    calc e * e = e * (e + f) := by rw [mul_add, key e he, add_zero]
+    calc
+      e * e
+        = e * (e + f) := by rw [mul_add, key e he, add_zero]
       _ = e := by rw [hef, mul_one]
   have he0 : e = 0 := hee.eq_zero_of_isNilpotent (h e he)
   rw [eq_bot_iff]
@@ -30,8 +32,10 @@ private theorem eq_bot_of_forall_isNilpotent_of_isSemisimple {R : Type*} [Ring R
   have hl' : l = l * e + l * f := by rw [← mul_add, hef, mul_one]
   rw [Submodule.mem_bot, hl', key l hl, he0, mul_zero, add_zero]
 
-theorem UpperTheory.V.Pa.BC.ss_descend :
-    ∀ (κ κ' E : Type) [Field κ] [Field κ'] [Algebra κ κ'] [Ring E] [Algebra κ E] [Module.Finite κ E], IsSemisimpleRing (κ' ⊗[κ] E) → IsSemisimpleRing E := by
+theorem UpperTheory.V.Pa.BC.ss_descend
+    : ∀ (κ κ' E : Type) [Field κ] [Field κ'] [Algebra κ κ'] [Ring E] [Algebra κ E]
+        [Module.Finite κ E],
+      IsSemisimpleRing (κ' ⊗[κ] E) → IsSemisimpleRing E := by
   intro κ κ' E _ _ _ _ _ _ hT
   haveI : IsArtinianRing E := IsArtinianRing.of_finite κ E
   rw [IsArtinianRing.isSemisimpleRing_iff_jacobson, eq_bot_iff]
@@ -41,8 +45,8 @@ theorem UpperTheory.V.Pa.BC.ss_descend :
   set J := Ring.jacobson E with hJ
   let S : ℕ → Submodule κ (κ' ⊗[κ] E) := fun k =>
     Submodule.span κ {z | ∃ c : κ', ∃ a ∈ J ^ k, z = c ⊗ₜ[κ] a}
-  have hgen : ∀ k (c : κ') (a : E), a ∈ J ^ k → c ⊗ₜ[κ] a ∈ S k :=
-    fun k c a ha => Submodule.subset_span ⟨c, a, ha, rfl⟩
+  have hgen : ∀ k (c : κ') (a : E), a ∈ J ^ k → c ⊗ₜ[κ] a ∈ S k := fun k c a ha =>
+    Submodule.subset_span ⟨c, a, ha, rfl⟩
   have hmul : ∀ a (z w : κ' ⊗[κ] E), z ∈ S a → w ∈ S 1 → z * w ∈ S (a + 1) := by
     intro a z w hz hw
     induction hz using Submodule.span_induction with

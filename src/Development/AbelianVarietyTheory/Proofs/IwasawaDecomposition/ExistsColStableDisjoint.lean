@@ -15,9 +15,12 @@ namespace GlobalTheory.DefLift
 
 namespace Compl
 
-theorem exists_sub_perp {E : Type*} [AddCommGroup E] [Module ℂ E] (B : E →ₗ[ℂ] E →ₗ⋆[ℂ] ℂ)
-    (hB : ∀ x, B x x = 0 → x = 0) (W : Submodule ℂ E) [FiniteDimensional ℂ W] (P : E) :
-    ∃ Q ∈ W, ∀ w ∈ W, B (P - Q) w = 0 := by
+theorem exists_sub_perp
+    {E : Type*} [AddCommGroup E] [Module ℂ E]
+    (B : E →ₗ[ℂ] E →ₗ⋆[ℂ] ℂ) (hB : ∀ x, B x x = 0 → x = 0)
+    (W : Submodule ℂ E) [FiniteDimensional ℂ W]
+    (P : E)
+    : ∃ Q ∈ W, ∀ w ∈ W, B (P - Q) w = 0 := by
   let b := Module.finBasis ℂ W
   let L : E →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) := LinearMap.pi fun i => B.flip (b i)
   have hL (P) (h : L P = 0) (w) (hw : w ∈ W) : B P w = 0 := by
@@ -31,50 +34,59 @@ theorem exists_sub_perp {E : Type*} [AddCommGroup E] [Module ℂ E] (B : E →�
     rw [map_smul, map_smulₛₗ]
     exact smul_eq_zero_of_right _ (congrFun h i)
   have hinj : Function.Injective (L ∘ₗ W.subtype) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     exact Subtype.ext (hB _ (hL x hx x x.2))
-  obtain ⟨x, hx⟩ := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).mp hinj
-    (L P)
+  obtain ⟨x, hx⟩ :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).mp hinj (L P)
   exact ⟨x, x.2, hL _ (by rw [map_sub, ← hx]; simp)⟩
 
-theorem totalDegree_aeval_le {σ : Type*} (f : σ → MvPolynomial σ ℂ) (hf : ∀ v, (f v).totalDegree ≤ 1)
-    (P : MvPolynomial σ ℂ) : (aeval f P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_aeval_le
+    {σ : Type*} (f : σ → MvPolynomial σ ℂ) (hf : ∀ v, (f v).totalDegree ≤ 1) (P : MvPolynomial σ ℂ)
+    : (aeval f P).totalDegree ≤ P.totalDegree := by
   first
   | exact @_root_.GlobalTheory.AevalTotalDegreeBound.main
   | exact _root_.GlobalTheory.AevalTotalDegreeBound.main
   | (apply _root_.GlobalTheory.AevalTotalDegreeBound.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.AevalTotalDegreeBound.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.AevalTotalDegreeBound.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.AevalTotalDegreeBound.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.AevalTotalDegreeBound.main ..)
 
 variable {ι : Type} {m n : ℕ}
 
-theorem totalDegree_subst_le (a : ι → Matrix (Fin n) (Fin n) ℂ) (b : ι → Matrix (Fin m) (Fin m) ℂ) (P : Pol ι m n) :
-    (subst a b P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_subst_le
+    (a : ι → Matrix (Fin n) (Fin n) ℂ) (b : ι → Matrix (Fin m) (Fin m) ℂ) (P : Pol ι m n)
+    : (subst a b P).totalDegree ≤ P.totalDegree := by
   refine totalDegree_aeval_le _ (fun v => ?_) P
   refine totalDegree_finsetSum_le fun i _ => totalDegree_finsetSum_le fun c _ => ?_
   exact (totalDegree_smul_le _ _).trans (totalDegree_X _).le
 
-theorem totalDegree_colSub_le (τ : ι) (g : Matrix.unitaryGroup (Fin n) ℂ) (P : Pol ι m n) :
-    (colSub m τ g P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_colSub_le (τ : ι) (g : Matrix.unitaryGroup (Fin n) ℂ) (P : Pol ι m n)
+    : (colSub m τ g P).totalDegree ≤ P.totalDegree := by
   unfold colSub
   rw [AlgHom.toLinearMap_apply]
   exact totalDegree_subst_le _ _ _
 
-theorem fockInner_subst [Fintype ι] (a : ι → Matrix (Fin n) (Fin n) ℂ) (b : ι → Matrix (Fin m) (Fin m) ℂ)
-    (P Q : Pol ι m n) :
-    fockInner (subst a b P) Q = fockInner P (subst (fun τ => star (a τ)) (fun τ => star (b τ)) Q) := by
+theorem fockInner_subst
+    [Fintype ι]
+    (a : ι → Matrix (Fin n) (Fin n) ℂ) (b : ι → Matrix (Fin m) (Fin m) ℂ) (P Q : Pol ι m n)
+    : fockInner (subst a b P) Q
+      = fockInner P (subst (fun τ => star (a τ)) (fun τ => star (b τ)) Q) := by
   classical
   refine fockInner_algHom_of_linear _ _
-    (fun v w => if v.1 = w.1 then b v.1 w.2.1 v.2.1 * a v.1 v.2.2 w.2.2 else 0) ?_ ?_ P Q
+    (fun v w => if v.1 = w.1 then b v.1 w.2.1 v.2.1 * a v.1 v.2.2 w.2.2 else 0)
+    ?_ ?_ P Q
   · rintro ⟨t, i, k⟩
     simp [subst, Fintype.sum_prod_type]
   · rintro ⟨t, i, k⟩
     simp [subst, Fintype.sum_prod_type, apply_ite star, mul_comm]
 
-theorem fockInner_colSub [Fintype ι] (τ : ι) (g : Matrix.unitaryGroup (Fin n) ℂ) (P Q : Pol ι m n) :
-    fockInner (colSub m τ g P) Q = fockInner P (colSub m τ g⁻¹ Q) := by
+theorem fockInner_colSub [Fintype ι] (τ : ι) (g : Matrix.unitaryGroup (Fin n) ℂ) (P Q : Pol ι m n)
+    : fockInner (colSub m τ g P) Q = fockInner P (colSub m τ g⁻¹ Q) := by
   unfold colSub
   simp only [AlgHom.toLinearMap_apply]
   rw [fockInner_subst]
@@ -88,17 +100,20 @@ theorem fockInner_colSub [Fintype ι] (τ : ι) (g : Matrix.unitaryGroup (Fin n)
 
 end Compl
 
-
 open Compl in
-theorem exists_colStable_disjoint (ι : Type) [Fintype ι] (m n : ℕ) (X : Type) [AddCommGroup X] [Module ℂ X]
-    [FiniteDimensional ℂ X] (U W : Submodule ℂ (X →ₗ[ℂ] Pol ι m n))
-    (hU : ∀ Φ ∈ U, ∀ τ g, colSub m τ g ∘ₗ Φ ∈ U) (hW : ∀ Φ ∈ W, ∀ τ g, colSub m τ g ∘ₗ Φ ∈ W) (hlt : U < W) :
-    ∃ U' : Submodule ℂ (X →ₗ[ℂ] Pol ι m n), U' ≠ ⊥ ∧ U' ≤ W ∧ U ⊓ U' = ⊥ ∧
-      ∀ Φ ∈ U', ∀ τ g, colSub m τ g ∘ₗ Φ ∈ U' := by
+theorem exists_colStable_disjoint
+    (ι : Type) [Fintype ι]
+    (m n : ℕ)
+    (X : Type) [AddCommGroup X] [Module ℂ X] [FiniteDimensional ℂ X]
+    (U W : Submodule ℂ (X →ₗ[ℂ] Pol ι m n)) (hU : ∀ Φ ∈ U, ∀ τ g, colSub m τ g ∘ₗ Φ ∈ U)
+    (hW : ∀ Φ ∈ W, ∀ τ g, colSub m τ g ∘ₗ Φ ∈ W) (hlt : U < W)
+    : ∃ U' : Submodule ℂ (X →ₗ[ℂ] Pol ι m n),
+      U' ≠ ⊥ ∧ U' ≤ W ∧ U ⊓ U' = ⊥ ∧ ∀ Φ ∈ U', ∀ τ g, colSub m τ g ∘ₗ Φ ∈ U' := by
   classical
   let b := Module.finBasis ℂ X
   let B : (X →ₗ[ℂ] Pol ι m n) →ₗ[ℂ] (X →ₗ[ℂ] Pol ι m n) →ₗ⋆[ℂ] ℂ :=
-    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun Φ Ψ => ∑ i, fockInner (Φ (b i)) (Ψ (b i)))
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun Φ Ψ => ∑ i, fockInner (Φ (b i)) (Ψ (b i)))
       (fun _ _ _ => by simp [fockInner_add_left, Finset.sum_add_distrib])
       (fun _ _ _ => by simp [fockInner_smul_left, Finset.mul_sum])
       (fun _ _ _ => by simp [fockInner_add_right, Finset.sum_add_distrib])
@@ -119,12 +134,17 @@ theorem exists_colStable_disjoint (ι : Type) [Fintype ι] (m n : ℕ) (X : Type
   obtain ⟨β, hβW, hβU⟩ := SetLike.exists_of_lt hlt
   obtain ⟨d, hd⟩ : ∃ d : ℕ, ∀ i, (β (b i)).totalDegree ≤ d :=
     ⟨_, fun i => Finset.le_sup (f := fun i => (β (b i)).totalDegree) (Finset.mem_univ i)⟩
-  obtain ⟨R, hRf, hR⟩ : ∃ R : Submodule ℂ (Pol ι m n), FiniteDimensional ℂ R ∧ ∀ P, P ∈ R ↔ P.totalDegree ≤ d :=
-    ⟨restrictTotalDegree (ι × Fin m × Fin n) ℂ d, inferInstance, fun P => mem_restrictTotalDegree _ _ _⟩
-  let ψ : (X →ₗ[ℂ] R) →ₗ[ℂ] (X →ₗ[ℂ] Pol ι m n) :=
-    { toFun := fun Ψ => R.subtype ∘ₗ Ψ
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  obtain ⟨R, hRf, hR⟩
+      : ∃ R : Submodule ℂ (Pol ι m n), FiniteDimensional ℂ R ∧ ∀ P, P ∈ R ↔ P.totalDegree ≤ d := ⟨
+    restrictTotalDegree (ι × Fin m × Fin n) ℂ d,
+    inferInstance,
+    fun P => mem_restrictTotalDegree _ _ _
+  ⟩
+  let ψ : (X →ₗ[ℂ] R) →ₗ[ℂ] (X →ₗ[ℂ] Pol ι m n) := {
+    toFun := fun Ψ => R.subtype ∘ₗ Ψ
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   let D : Submodule ℂ (X →ₗ[ℂ] Pol ι m n) := LinearMap.range ψ
   have hD (Φ) : Φ ∈ D ↔ ∀ x, Φ x ∈ R := by
     constructor

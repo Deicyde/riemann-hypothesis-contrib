@@ -13,7 +13,7 @@ open MvPolynomial ComplexSets
 
 def CMHeightOneGeneral.Statement : Prop :=
   ∀ (n : ℕ) (J W : Ideal (MvPolynomial (Fin n) ℂ)) (g : MvPolynomial (Fin n) ℂ),
-    J.IsPrime → g ∉ J → W ∈ (J ⊔ Ideal.span {g}).minimalPrimes →
-      ∃ f : MvPolynomial (Fin n) ℂ, f ∉ W ∧ ∀ q ∈ zeroSet W, eval q f ≠ 0 → IsCohenMacaulayAt J q
+    J.IsPrime → g ∉ J → W ∈ (J ⊔ Ideal.span {g}).minimalPrimes
+      → ∃ f : MvPolynomial (Fin n) ℂ, f ∉ W ∧ ∀ q ∈ zeroSet W, eval q f ≠ 0 → IsCohenMacaulayAt J q
 
 end GroundTheory.Heights₂.Heights

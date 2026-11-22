@@ -11,19 +11,23 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
-
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 set_option maxHeartbeats 1000000 in
 theorem invLiftCondition : InvLiftStep := by
   set_option synthInstance.maxHeartbeats 400000 in
   intro D HW F Cm CA CB CK hA l _ hl K LL hG π' E hπ T h' hh' hT hJ c
   haveI := ((HW l).W K 1 LL hG).ddTowO T
-  have hNL : NinLam ((HW l).W K 1 LL hG) T (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' :=
+  have hNL
+      : NinLam ((HW l).W K 1 LL hG) T (Formalism.MainNotions.DeltaInvariantLattices.Eat E π') h' :=
     ninlam_pf D HW F Cm CA CB CK hA l hl K LL hG π' E hπ T h' hT hJ
   rcases le_or_gt (MK l K h') 1 with hM | hM
-  · refine ⟨fun w hw => ⟨((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ^ sigA l (sK l K) h' • w, ?_, ?_⟩,
-      fun wb _ hwb => gradNPf_PiNS_anti _ T π' hM hwb⟩
+  · refine ⟨
+      fun w hw => ⟨((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ^ sigA l (sK l K) h' • w, ?_, ?_⟩,
+      fun wb _ hwb => gradNPf_PiNS_anti _ T π' hM hwb
+    ⟩
     · obtain ⟨hwL, hwγ⟩ := (mem_InvS _ T π' _ h' 1 c w).1 hw
       refine (mem_InvS _ T π' _ h' _ c _).2 ⟨Submodule.smul_mem _ _ hwL, ?_⟩
       rw [map_smul, ← smul_sub]
@@ -61,24 +65,27 @@ theorem invLiftCondition : InvLiftStep := by
   obtain ⟨-, ⟨π'₀, E₀, -, hm₀⟩, -⟩ := h9W T hT hs1 hp
   obtain ⟨⟨r, b, hbΔ, huniq, -⟩, -⟩ := hm₀
   obtain ⟨w, hw⟩ := hπ.2.2.1
-  have hnz : ∀ y : ℕ, 1 ≤ y → y < MK l K h' → ∀ r₀ ∈ ((HW l).W K 1 LL hG).N T,
-      ∀ d ∈ ((HW l).W K 1 LL hG).N T, ((x ^ sK l K) ^ y - 1) • r₀ = π' • d →
-      ∃ e ∈ ((HW l).W K 1 LL hG).N T, r₀ = π' • e := by
+  have hnz
+      : ∀ y : ℕ,
+        1 ≤ y → y < MK l K h'
+          → ∀ r₀ ∈ ((HW l).W K 1 LL hG).N T, ∀ d ∈ ((HW l).W K 1 LL hG).N T,
+            ((x ^ sK l K) ^ y - 1) • r₀ = π' • d → ∃ e ∈ ((HW l).W K 1 LL hG).N T, r₀ = π' • e := by
     intro y hy1 hyM r₀ hr₀ d hd hrd
-    obtain ⟨q, hq⟩ := Finset.dvd_prod_of_mem (fun y => (x ^ sK l K) ^ y - 1)
-      (Finset.mem_Ico.2 ⟨hy1, hyM⟩)
+    obtain ⟨q, hq⟩ :=
+      Finset.dvd_prod_of_mem (fun y => (x ^ sK l K) ^ y - 1) (Finset.mem_Ico.2 ⟨hy1, hyM⟩)
     rw [hq] at ha
     refine invLiftPf_nzd _ T π' w (sK l K) w.isUnit hw (l : ↥(OL LL)) hℓ r b
-      (fun j => (hbΔ j).1) huniq (MK l K h' - 1 + padicValNat l (MK l K h' - 1).factorial) r₀
-      ((a * q) • d) hr₀ ?_ ?_
+      (fun j => (hbΔ j).1)
+      huniq (MK l K h' - 1 + padicValNat l (MK l K h' - 1).factorial) r₀ ((a * q) • d) hr₀ ?_ ?_
     · rw [← algebraMap_smul (LetA ↥(OL LL) (finrank ℚ_[l] ↥(K0 K)))]
       exact Submodule.smul_mem _ _ hd
     · rw [ha, mul_comm ((x ^ sK l K) ^ y - 1) q, ← mul_assoc, mul_smul, hrd,
         ← algebraMap_smul (LetA ↥(OL LL) (finrank ℚ_[l] ↥(K0 K))) (a * q) (π' • d),
         ← algebraMap_smul (LetA ↥(OL LL) (finrank ℚ_[l] ↥(K0 K))) (a * q) d, smul_smul, smul_smul,
         mul_comm]
-  have hpσ : (((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ^ sigA l (sK l K) h') =
-      a * ∏ y ∈ Finset.Ico 1 (MK l K h'), ((x ^ sK l K) ^ y - 1) := by
+  have hpσ
+      : (((((D.loc l).PD K).p : ℕ) : ↥(OL LL)) ^ sigA l (sK l K) h')
+        = a * ∏ y ∈ Finset.Ico 1 (MK l K h'), ((x ^ sK l K) ^ y - 1) := by
     rw [hpl, hσ]
     exact ha
   have hGr : GradN ((HW l).W K 1 LL hG) T π' (sigA l (sK l K) h') (MK l K h') :=

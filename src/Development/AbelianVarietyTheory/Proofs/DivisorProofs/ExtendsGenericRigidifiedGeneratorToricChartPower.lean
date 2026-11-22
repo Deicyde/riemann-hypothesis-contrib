@@ -13,16 +13,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGlobal
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
 open GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChartCubExt
 
-theorem extendGenAt_chartRing : ∀ (k : Type) [Field k] (m n : ℕ),
-    GlobalTheory.ChartCubExt.ExtendGenAt (ChartRing k m n) (FractionRing (ChartRing k m n)) := by
+theorem extendGenAt_chartRing
+    : ∀ (k : Type) [Field k] (m n : ℕ),
+      GlobalTheory.ChartCubExt.ExtendGenAt (ChartRing k m n) (FractionRing (ChartRing k m n)) := by
   intro k _ m n
   have : IsRegularLocalRing (ChartRing k m n) :=
     GlobalTheory.FormalIsogeny.isRegularLocalRing_mvPowerSeries k (Fin m ⊕ Fin n)
@@ -34,9 +38,13 @@ theorem extendGenAt_chartRing : ∀ (k : Type) [Field k] (m n : ℕ),
   have := hG.smooth
   have := hG.quasiCompact
   have := hG.geomConnected
-  obtain ⟨a, u, hu, hf⟩ := GlobalTheory.T.exists_const_mul_eq_generator_factorial_base _ _ G _ _ _ N.L r inferInstance inferInstance inferInstance
-    (IsPullback.of_hasPullback _ _) N.isLB hr
-  obtain ⟨b, hb⟩ := GlobalTheory.T.exists_baseUnit_rigidifiedGenericGenerator _ _ G (eSec G) (Over.w η[G]) eA heA N.L N.rig r N.isLB N.rigGen hc a u hu hf
-  exact GlobalTheory.T.exists_globalGenerator_div_baseUnit_eq_generic _ _ G _ _ _ pullback.condition N.L r a b hb u hu hf
+  obtain ⟨a, u, hu, hf⟩ :=
+    GlobalTheory.T.exists_const_mul_eq_generator_factorial_base _ _ G _ _ _ N.L r inferInstance
+      inferInstance inferInstance (IsPullback.of_hasPullback _ _) N.isLB hr
+  obtain ⟨b, hb⟩ :=
+    GlobalTheory.T.exists_baseUnit_rigidifiedGenericGenerator _ _ G (eSec G) (Over.w η[G]) eA heA
+      N.L N.rig r N.isLB N.rigGen hc a u hu hf
+  exact GlobalTheory.T.exists_globalGenerator_div_baseUnit_eq_generic _ _ G _ _ _ pullback.condition
+    N.L r a b hb u hu hf
 
 end GlobalTheory.ChartCubExt

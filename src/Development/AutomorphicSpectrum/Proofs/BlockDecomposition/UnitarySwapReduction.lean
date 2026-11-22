@@ -21,60 +21,91 @@ open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.Spherical
 namespace GlobalTheory.CompanionTheory.SwapRoot
 
 section Lem
-variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {n : ℕ} {ϖ : L} {σ : L →+* L} {q : ℕ}
+variable
+  {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+  {n : ℕ} {ϖ : L} {σ : L →+* L} {q : ℕ}
 
-theorem step_exists_int [CompleteSpace L] (hU : IsUnramInv ϖ σ q) (w : ℂ) (hw0 : w ≠ 0) (hw : ‖w‖ * (q : ℝ) ^ 2 < 1) :
-    ∃ I : (L → ℂ) → ℂ,
-      (∀ F G : L → ℂ, IsAdm w F → IsAdm w G → I (F + G) = I F + I G) ∧
-      (∀ (c : ℂ) (F : L → ℂ), IsAdm w F → I (c • F) = c * I F) ∧
-      (∀ (F : L → ℂ) (y : L), IsAdm w F → IsAdm w (fun x => F (x + y)) ∧ I (fun x => F (x + y)) = I F) ∧
-      (∀ (F : L → ℂ) (c : L), IsAdm w F → c ≠ 0 →
-        IsAdm w (fun x => F (c * x)) ∧ I (fun x => F (c * x)) = (q : ℂ) ^ (2 * ordL c) * I F) ∧
-      IsAdm w (sphFn (L := L) w) ∧ I (sphFn w) = (1 - w) / (1 - w * (q : ℂ) ^ 2) :=
+theorem step_exists_int
+    [CompleteSpace L] (hU : IsUnramInv ϖ σ q) (w : ℂ) (hw0 : w ≠ 0) (hw : ‖w‖ * (q : ℝ) ^ 2 < 1)
+    : ∃ I : (L → ℂ) → ℂ,
+      (∀ F G : L → ℂ, IsAdm w F → IsAdm w G → I (F + G) = I F + I G)
+        ∧ (∀ (c : ℂ) (F : L → ℂ), IsAdm w F → I (c • F) = c * I F)
+        ∧ (∀ (F : L → ℂ) (y : L),
+          IsAdm w F → IsAdm w (fun x => F (x + y)) ∧ I (fun x => F (x + y)) = I F)
+        ∧ (∀ (F : L → ℂ) (c : L),
+          IsAdm w F → c ≠ 0
+            → IsAdm w (fun x => F (c * x)) ∧ I (fun x => F (c * x)) = (q : ℂ) ^ (2 * ordL c) * I F)
+        ∧ IsAdm w (sphFn (L := L) w) ∧ I (sphFn w) = (1 - w) / (1 - w * (q : ℂ) ^ 2) :=
   GlobalTheory.T.exists_admissible_linear_functional L ϖ σ q hU w hw0 hw
 
-theorem step_uR_continuous (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) :
-    Continuous (uR σ hU.1 a h : L → GU σ n) :=
+theorem step_uR_continuous (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    : Continuous (uR σ hU.1 a h : L → GU σ n) :=
   GlobalTheory.T.continuous_unitary_root_map L ϖ σ q n hU a h
 
-theorem step_factor (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (χ : Fin (n / 2) → ℂˣ) (i j : Fin (n / 2))
-    (hi : i.val = a) (hj : j.val = a + 1) (x : L) (hx : x ≠ 0) :
-    ∃ b : GU σ n, IsBorelU b ∧
-      chiDeltaU q (fun k => (χ k : ℂ)) b = (((χ i : ℂ) / (χ j : ℂ)) / (q : ℂ) ^ 2) ^ (-ordL x) ∧
-      sR σ hU.1 a h * uR σ hU.1 a h x = b * (sR σ hU.1 a h * uR σ hU.1 a h x⁻¹ * sR σ hU.1 a h) :=
+theorem step_factor
+    (hU : IsUnramInv ϖ σ q)
+    (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    (χ : Fin (n / 2) → ℂˣ)
+    (i j : Fin (n / 2)) (hi : i.val = a) (hj : j.val = a + 1)
+    (x : L) (hx : x ≠ 0)
+    : ∃ b : GU σ n,
+      IsBorelU b
+        ∧ chiDeltaU q (fun k => (χ k : ℂ)) b = (((χ i : ℂ) / (χ j : ℂ)) / (q : ℂ) ^ 2) ^ (- ordL x)
+        ∧ sR σ hU.1 a h * uR σ hU.1 a h x
+          = b * (sR σ hU.1 a h * uR σ hU.1 a h x⁻¹ * sR σ hU.1 a h) :=
   GlobalTheory.T.simple_reflection_root_borel_decomp L ϖ σ q n hU a h χ i j hi hj x hx
 
-theorem step_sR_mem_KU (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) : sR σ hU.1 a h ∈ KU σ n :=
+theorem step_sR_mem_KU (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    : sR σ hU.1 a h ∈ KU σ n :=
   GlobalTheory.T.simple_reflection_mem_maximal_compact L ϖ σ q n hU a h
 
-theorem step_uR_mem_KU (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (x : L) (hx : Valued.v x ≤ 1) :
-    uR σ hU.1 a h x ∈ KU σ n :=
+theorem step_uR_mem_KU
+    (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (x : L) (hx : Valued.v x ≤ 1)
+    : uR σ hU.1 a h x ∈ KU σ n :=
   GlobalTheory.T.root_map_mem_compact_of_integral L ϖ σ q n hU a h x hx
 
-theorem step_unip_shift (hσ : ∀ x, σ (σ x) = x) (a : ℕ) (h : 2 * (a + 2) ≤ n) (v : GU σ n) (hv : IsUnipU v) :
-    ∃ y : L, ∀ x : L, ∃ b : GU σ n, IsUnipU b ∧
-      sR σ hσ a h * uR σ hσ a h x * v = b * (sR σ hσ a h * uR σ hσ a h (x + y)) :=
+theorem step_unip_shift
+    (hσ : ∀ x, σ (σ x) = x) (a : ℕ) (h : 2 * (a + 2) ≤ n) (v : GU σ n) (hv : IsUnipU v)
+    : ∃ y : L, ∀ x : L, ∃ b : GU σ n,
+      IsUnipU b ∧ sR σ hσ a h * uR σ hσ a h x * v = b * (sR σ hσ a h * uR σ hσ a h (x + y)) :=
   GlobalTheory.T.reflection_root_unipotent_shift L σ n hσ a h v hv
 
-theorem step_torus_shift (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (χ : Fin (n / 2) → ℂˣ) (i j : Fin (n / 2))
-    (hi : i.val = a) (hj : j.val = a + 1) (t : GU σ n) (ht : IsDiagM (t : GL (Fin n) L)) :
-    ∃ c : L, c ≠ 0 ∧ ∃ t' : GU σ n, IsBorelU t' ∧
-      (∀ x : L, sR σ hU.1 a h * uR σ hU.1 a h x * t = t' * (sR σ hU.1 a h * uR σ hU.1 a h (c * x))) ∧
-      chiDeltaU q (fun k => (χ k : ℂ)) t' * (q : ℂ) ^ (2 * ordL c) =
-        chiDeltaU q (fun k => ((χ ∘ Equiv.swap i j) k : ℂ)) t :=
+theorem step_torus_shift
+    (hU : IsUnramInv ϖ σ q)
+    (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    (χ : Fin (n / 2) → ℂˣ)
+    (i j : Fin (n / 2)) (hi : i.val = a) (hj : j.val = a + 1)
+    (t : GU σ n) (ht : IsDiagM (t : GL (Fin n) L))
+    : ∃ c : L,
+      c ≠ 0
+        ∧ ∃ t' : GU σ n,
+          IsBorelU t'
+            ∧ (∀ x : L,
+              sR σ hU.1 a h * uR σ hU.1 a h x * t = t' * (sR σ hU.1 a h * uR σ hU.1 a h (c * x)))
+            ∧ chiDeltaU q (fun k => (χ k : ℂ)) t' * (q : ℂ) ^ (2 * ordL c)
+              = chiDeltaU q (fun k => ((χ ∘ Equiv.swap i j) k : ℂ)) t :=
   GlobalTheory.T.reflection_root_diagonal_conj L ϖ σ q n hU a h χ i j hi hj t ht
 
 end Lem
 
 section Main
-variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {n : ℕ} {ϖ : L} {σ : L →+* L} {q : ℕ}
+variable
+  {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+  {n : ℕ} {ϖ : L} {σ : L →+* L} {q : ℕ}
 
-theorem step_borel_shift (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (χ : Fin (n / 2) → ℂˣ) (i j : Fin (n / 2))
-    (hi : i.val = a) (hj : j.val = a + 1) (b : GU σ n) (hb : IsBorelU b) :
-    ∃ (c y : L) (C : ℂ), c ≠ 0 ∧
-      (∀ x : L, ∃ b' : GU σ n, IsBorelU b' ∧ chiDeltaU q (fun k => (χ k : ℂ)) b' = C ∧
-        sR σ hU.1 a h * uR σ hU.1 a h x * b = b' * (sR σ hU.1 a h * uR σ hU.1 a h (c * x + y))) ∧
-      C * (q : ℂ) ^ (2 * ordL c) = chiDeltaU q (fun k => ((χ ∘ Equiv.swap i j) k : ℂ)) b := by
+theorem step_borel_shift
+    (hU : IsUnramInv ϖ σ q)
+    (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    (χ : Fin (n / 2) → ℂˣ)
+    (i j : Fin (n / 2)) (hi : i.val = a) (hj : j.val = a + 1)
+    (b : GU σ n) (hb : IsBorelU b)
+    : ∃ (c y : L) (C : ℂ),
+      c ≠ 0
+        ∧ (∀ x : L, ∃ b' : GU σ n,
+          IsBorelU b' ∧ chiDeltaU q (fun k => (χ k : ℂ)) b' = C
+            ∧ sR σ hU.1 a h * uR σ hU.1 a h x * b
+              = b' * (sR σ hU.1 a h * uR σ hU.1 a h (c * x + y)))
+        ∧ C * (q : ℂ) ^ (2 * ordL c) = chiDeltaU q (fun k => ((χ ∘ Equiv.swap i j) k : ℂ)) b := by
   have hq : (q : ℂ) ≠ 0 := by
     have := hU.2.2.2.2.2.1
     exact_mod_cast (show q ≠ 0 by omega)
@@ -90,10 +121,17 @@ theorem step_borel_shift (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) �
     · rw [← mul_assoc, h1 x, mul_assoc, mul_assoc, ← mul_assoc _ _ v, e, mul_assoc]
   · rw [h2, chi_borel_mul hq (χ ∘ Equiv.swap i j) t v ht2 hv'.1, chi_unip _ v hv', mul_one]
 
-theorem step_stab_adm (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n) (χ : Fin (n / 2) → ℂˣ) (i j : Fin (n / 2))
-    (hi : i.val = a) (hj : j.val = a + 1) (φ : GU σ n → ℂ) (hφ : φ ∈ psSpaceU σ q χ) (S : Set (GU σ n)) (hS : IsOpen S)
-    (h1 : (1 : GU σ n) ∈ S) (hinv : ∀ s ∈ S, ∀ g, φ (g * s) = φ g) (g : GU σ n) :
-    IsAdm (((χ i : ℂ) / (χ j : ℂ)) / (q : ℂ) ^ 2) (fun x => φ (sR σ hU.1 a h * uR σ hU.1 a h x * g)) := by
+theorem step_stab_adm
+    (hU : IsUnramInv ϖ σ q)
+    (a : ℕ) (h : 2 * (a + 2) ≤ n)
+    (χ : Fin (n / 2) → ℂˣ)
+    (i j : Fin (n / 2)) (hi : i.val = a) (hj : j.val = a + 1)
+    (φ : GU σ n → ℂ) (hφ : φ ∈ psSpaceU σ q χ)
+    (S : Set (GU σ n))
+    (hS : IsOpen S) (h1 : (1 : GU σ n) ∈ S) (hinv : ∀ s ∈ S, ∀ g, φ (g * s) = φ g)
+    (g : GU σ n)
+    : IsAdm (((χ i : ℂ) / (χ j : ℂ)) / (q : ℂ) ^ 2)
+      (fun x => φ (sR σ hU.1 a h * uR σ hU.1 a h x * g)) := by
   have hc := step_uR_continuous (L := L) (n := n) hU a h
   set s := sR σ hU.1 a h
   set u : L → GU σ n := uR σ hU.1 a h
@@ -110,13 +148,12 @@ theorem step_stab_adm (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n
       hA.continuousAt.eventually_mem (hS.mem_nhds (by have h2 := h1; rw [← hA1] at h2; exact h2))
     filter_upwards [this] with y hy
     have e : s * u y * g = s * u x * g * (g⁻¹ * u (y - x) * g) := by
-      have : u y = u x * u (y - x) := by
-        rw [← uR_add]; congr 1; ring
-      rw [this]; group
+      have : u y = u x * u (y - x) := by rw [← uR_add]; congr 1; ring
+      rw [this]
+      group
     rw [e, hinv _ hy]
   · have hB : Continuous fun y : L => g⁻¹ * (s * u y * s) * g := by fun_prop
-    have hB1 : (fun y : L => g⁻¹ * (s * u y * s) * g) 0 = 1 := by
-      simp [hu0, hss]
+    have hB1 : (fun y : L => g⁻¹ * (s * u y * s) * g) 0 = 1 := by simp [hu0, hss]
     have hB2 : (fun y : L => g⁻¹ * (s * u y * s) * g) ⁻¹' S ∈ nhds (0 : L) :=
       hB.continuousAt.preimage_mem_nhds (hS.mem_nhds (by have h2 := h1; rw [← hB1] at h2; exact h2))
     obtain ⟨γ, hγ⟩ := Valued.mem_nhds.1 hB2
@@ -131,7 +168,8 @@ theorem step_stab_adm (hU : IsUnramInv ϖ σ q) (a : ℕ) (h : 2 * (a + 2) ≤ n
     obtain ⟨b, hb, hbc, e⟩ := step_factor hU a h χ i j hi hj x hx
     have e1 : s * u x * g = b * (g * (g⁻¹ * (s * u x⁻¹ * s) * g)) := by
       have : s * u x = b * (s * u x⁻¹ * s) := e
-      rw [this]; group
+      rw [this]
+      group
     show φ (s * u x * g) = _
     rw [e1, hφ b _ hb, hinv _ hmem, hbc, mul_comm]
 
@@ -154,11 +192,14 @@ theorem swapStepU : PositivityTheory.SphericalProduct.SwapStepU := by
   obtain ⟨I, Iadd, Ismul, Itr, Isc, Isph, Ival⟩ := step_exists_int (L := L) hU w hw0 hw
   set s := sR σ hU.1 i.val h with hs
   set u : L → GU σ n := uR σ hU.1 i.val h with hu
-  have hr : ∀ (k : GU σ n) (v : V) (g' : GU σ n), (f (ρ k v)).1 g' = (f v).1 (g' * k) := fun k v g' => by
+  have hr
+      : ∀ (k : GU σ n) (v : V) (g' : GU σ n),
+        (f (ρ k v)).1 g' = (f v).1 (g' * k) := fun k v g' => by
     rw [hf]; rfl
   have hAdm : ∀ (v : V) (g : GU σ n), IsAdm w (fun x => (f v).1 (s * u x * g)) := fun v g =>
     step_stab_adm hU i.val h χ i j rfl hij.symm (f v).1 (f v).2 {k | ρ k v = v} (hadm.1 v) (by simp)
-      (fun k hk g' => by rw [← hr, show ρ k v = v from hk]) g
+      (fun k hk g' => by rw [← hr, show ρ k v = v from hk])
+      g
   let T : V → (GU σ n → ℂ) := fun v g => I (fun x => (f v).1 (s * u x * g))
   have Tmem : ∀ v, T v ∈ psSpaceU σ q (χ ∘ Equiv.swap i j) := by
     intro v b g hb
@@ -166,8 +207,9 @@ theorem swapStepU : PositivityTheory.SphericalProduct.SwapStepU := by
     have hF := hAdm v g
     have hG := (Itr _ y hF).1
     have hH := (Isc _ c hG hc).1
-    have e : (fun x => (f v).1 (s * u x * (b * g))) =
-        C • (fun x => (fun x' => (fun x'' => (f v).1 (s * u x'' * g)) (x' + y)) (c * x)) := by
+    have e
+        : (fun x => (f v).1 (s * u x * (b * g)))
+          = C • (fun x => (fun x' => (fun x'' => (f v).1 (s * u x'' * g)) (x' + y)) (c * x)) := by
       funext x
       obtain ⟨b', hb', hb'C, hx⟩ := hrel x
       have e2 := (f v).2 b' (s * u (c * x + y) * g) hb'
@@ -178,22 +220,23 @@ theorem swapStepU : PositivityTheory.SphericalProduct.SwapStepU := by
     show I (fun x => (f v).1 (s * u x * (b * g))) = _ * I (fun x => (f v).1 (s * u x * g))
     rw [e, Ismul C _ hH, (Isc _ c hG hc).2, (Itr _ y hF).2, ← hC]
     ring
-  let f' : V →ₗ[ℂ] psSpaceU σ q (χ ∘ Equiv.swap i j) :=
-    { toFun := fun v => ⟨T v, Tmem v⟩
-      map_add' := fun v v' => by
-        refine Subtype.ext (funext fun g => ?_)
-        show I (fun x => (f (v + v')).1 (s * u x * g)) = I _ + I _
-        rw [← Iadd _ _ (hAdm v g) (hAdm v' g)]
-        congr 1
-        funext x
-        simp [map_add (f := _)]
-      map_smul' := fun c v => by
-        refine Subtype.ext (funext fun g => ?_)
-        show I (fun x => (f (c • v)).1 (s * u x * g)) = c * I _
-        rw [← Ismul c _ (hAdm v g)]
-        congr 1
-        funext x
-        simp [map_smul] }
+  let f' : V →ₗ[ℂ] psSpaceU σ q (χ ∘ Equiv.swap i j) := {
+    toFun := fun v => ⟨T v, Tmem v⟩
+    map_add' := fun v v' => by
+      refine Subtype.ext (funext fun g => ?_)
+      show I (fun x => (f (v + v')).1 (s * u x * g)) = I _ + I _
+      rw [← Iadd _ _ (hAdm v g) (hAdm v' g)]
+      congr 1
+      funext x
+      simp [map_add (f := _)]
+    map_smul' := fun c v => by
+      refine Subtype.ext (funext fun g => ?_)
+      show I (fun x => (f (c • v)).1 (s * u x * g)) = c * I _
+      rw [← Ismul c _ (hAdm v g)]
+      congr 1
+      funext x
+      simp [map_smul]
+  }
   have hf' : ∀ (g : GU σ n) (v : V), f' (ρ g v) = psFunU σ q (χ ∘ Equiv.swap i j) g (f' v) := by
     intro g v
     refine Subtype.ext (funext fun g' => ?_)
@@ -232,7 +275,8 @@ theorem swapStepU : PositivityTheory.SphericalProduct.SwapStepU := by
         rw [map_inv₀]
         exact inv_le_one_of_one_le₀ (le_of_lt (not_le.1 hx))
       have hk : s * u x⁻¹ * s ∈ KU σ n :=
-        mul_mem (mul_mem (step_sR_mem_KU hU _ h) (step_uR_mem_KU hU _ h _ hx1)) (step_sR_mem_KU hU _ h)
+        mul_mem (mul_mem (step_sR_mem_KU hU _ h) (step_uR_mem_KU hU _ h _ hx1))
+          (step_sR_mem_KU hU _ h)
       have e1 : s * u x = b * (s * u x⁻¹ * s) := e
       have e2 := hK 1 _ hk
       rw [one_mul] at e2

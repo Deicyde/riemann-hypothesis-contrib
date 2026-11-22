@@ -7,8 +7,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.CharLem
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
-  IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
 
 namespace Formalism.IndefR.Eqv
 
@@ -28,8 +29,8 @@ theorem countable_ratMx (m n : ℕ) : Countable (ratMx D m n) := by
     inferInstanceAs (Countable (Fin m → Fin n → D.host.E))
   unfold ratMx
   have hs : Function.Surjective (fun x : Matrix (Fin m) (Fin n) D.host.E =>
-      (⟨_, AddMonoidHom.mem_range.mpr ⟨x, rfl⟩⟩ :
-        ((incA D).toAddMonoidHom.mapMatrix (m := Fin m) (n := Fin n)).range)) := by
+      (⟨_, AddMonoidHom.mem_range.mpr ⟨x, rfl⟩⟩
+        : ((incA D).toAddMonoidHom.mapMatrix (m := Fin m) (n := Fin n)).range)) := by
     rintro ⟨y, hy⟩
     obtain ⟨x, rfl⟩ := AddMonoidHom.mem_range.mp hy
     exact ⟨x, rfl⟩

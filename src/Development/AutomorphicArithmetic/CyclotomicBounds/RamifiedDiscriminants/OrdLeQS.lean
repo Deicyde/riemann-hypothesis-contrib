@@ -10,28 +10,32 @@ open UpperTheory.HF
 open Formalism.HC
 open scoped Pointwise
 
-private theorem ordCompl_eq_self_of_not_dvd {n p : ℕ} (h : ¬p ∣ n) : ordCompl[p] n = n := by
+private theorem ordCompl_eq_self_of_not_dvd {n p : ℕ} (h : ¬ p ∣ n) : ordCompl[p] n = n := by
   simp [Nat.factorization_eq_zero_of_not_dvd h]
 
 private theorem ordCompl_q' {φ : Frame} (H : HostRaw φ) : ordCompl[H.q] H.condN = H.QS * H.d := by
   have hq := H.q_prime
-  have h1 : ¬H.q ∣ H.QS := (Nat.Prime.coprime_iff_not_dvd hq).1 H.coprime_QS_q.symm
-  have h2 : ¬H.q ∣ H.d := (Nat.Prime.coprime_iff_not_dvd hq).1
-    (Nat.Coprime.coprime_dvd_left (dvd_mul_left H.d H.QS) H.coprime_QSd_q).symm
-  have h3 : ordCompl[H.q] H.q = 1 := by
-    simpa using Nat.ordCompl_self_pow (k := 1) hq
-  simp only [HostRaw.condN, Nat.ordCompl_mul, h3, ordCompl_eq_self_of_not_dvd h1, ordCompl_eq_self_of_not_dvd h2, mul_one]
+  have h1 : ¬ H.q ∣ H.QS := (Nat.Prime.coprime_iff_not_dvd hq).1 H.coprime_QS_q.symm
+  have h2 : ¬ H.q ∣ H.d :=
+    (Nat.Prime.coprime_iff_not_dvd hq).1
+      (Nat.Coprime.coprime_dvd_left (dvd_mul_left H.d H.QS) H.coprime_QSd_q).symm
+  have h3 : ordCompl[H.q] H.q = 1 := by simpa using Nat.ordCompl_self_pow (k := 1) hq
+  simp only [HostRaw.condN, Nat.ordCompl_mul, h3, ordCompl_eq_self_of_not_dvd h1,
+    ordCompl_eq_self_of_not_dvd h2, mul_one]
 
 private theorem ordCompl_d' {φ : Frame} (H : HostRaw φ) : ordCompl[H.d] H.condN = H.QS * H.q := by
   have hd := H.d_prime
-  have h3 : ordCompl[H.d] H.d = 1 := by
-    simpa using Nat.ordCompl_self_pow (k := 1) hd
+  have h3 : ordCompl[H.d] H.d = 1 := by simpa using Nat.ordCompl_self_pow (k := 1) hd
   simp only [HostRaw.condN]
   rw [Nat.ordCompl_mul, h3, mul_one, ordCompl_eq_self_of_not_dvd H.d_not_dvd_QSq]
 
-private theorem crt_unit {φ : Frame} (H : HostRaw φ) {a b : ℕ} (hab : a.Coprime b) (hN : H.condN = a * b)
-    (u : (ZMod H.condN)ˣ) : ∃ v : (ZMod H.condN)ˣ, (v : ZMod H.condN).val ≡ 1 [MOD a] ∧
-      (v : ZMod H.condN).val ≡ (u : ZMod H.condN).val [MOD b] := by
+private theorem crt_unit
+    {φ : Frame} (H : HostRaw φ)
+    {a b : ℕ} (hab : a.Coprime b) (hN : H.condN = a * b)
+    (u : (ZMod H.condN)ˣ)
+    : ∃ v : (ZMod H.condN)ˣ,
+      (v : ZMod H.condN).val ≡ 1 [MOD a]
+        ∧ (v : ZMod H.condN).val ≡ (u : ZMod H.condN).val [MOD b] := by
   obtain ⟨x, hxa, hxb⟩ := Nat.chineseRemainder hab 1 (u : ZMod H.condN).val
   have hu : Nat.Coprime (u : ZMod H.condN).val H.condN := ZMod.val_coe_unit_coprime u
   have hxa' : Nat.Coprime x a := by
@@ -49,8 +53,8 @@ private theorem crt_unit {φ : Frame} (H : HostRaw φ) {a b : ℕ} (hab : a.Copr
   · exact ((H.val_unitOfCoprime hx).of_dvd (hN ▸ dvd_mul_right a b)).trans hxa
   · exact ((H.val_unitOfCoprime hx).of_dvd (hN ▸ dvd_mul_left b a)).trans hxb
 
-private theorem img_sub {φ : Frame} (H : HostRaw φ) :
-    (H.imgOne H.QS : Set φ.GG) ⊆ (H.inertG H.q : Set φ.GG) * (H.inertG H.d : Set φ.GG) := by
+private theorem img_sub {φ : Frame} (H : HostRaw φ)
+    : (H.imgOne H.QS : Set φ.GG) ⊆ (H.inertG H.q : Set φ.GG) * (H.inertG H.d : Set φ.GG) := by
   intro g hg
   rw [SetLike.mem_coe, HostRaw.mem_imgOne H H.QS_dvd_condN] at hg
   obtain ⟨u, hu1, rfl⟩ := hg
@@ -59,7 +63,8 @@ private theorem img_sub {φ : Frame} (H : HostRaw φ) :
   set w : (ZMod H.condN)ˣ := v⁻¹ * u with hw
   have hvw : ((v : ZMod H.condN) * (w : ZMod H.condN)) = (u : ZMod H.condN) := by
     rw [← Units.val_mul, hw, mul_inv_cancel_left]
-  have hmod : (u : ZMod H.condN).val ≡ (v : ZMod H.condN).val * (w : ZMod H.condN).val [MOD H.condN] := by
+  have hmod
+      : (u : ZMod H.condN).val ≡ (v : ZMod H.condN).val * (w : ZMod H.condN).val [MOD H.condN] := by
     rw [← hvw, ZMod.val_mul]
     exact Nat.mod_modEq _ _
   have hQSN : H.QS ∣ H.condN := H.QS_dvd_condN
@@ -67,7 +72,8 @@ private theorem img_sub {φ : Frame} (H : HostRaw φ) :
   have hwQS : (w : ZMod H.condN).val ≡ 1 [MOD H.QS] := by
     have e1 := hmod.of_dvd hQSN
     have e2 : (v : ZMod H.condN).val ≡ 1 [MOD H.QS] := hv1.of_dvd (dvd_mul_right _ _)
-    have e3 : (v : ZMod H.condN).val * (w : ZMod H.condN).val ≡ 1 * (w : ZMod H.condN).val [MOD H.QS] :=
+    have e3
+        : (v : ZMod H.condN).val * (w : ZMod H.condN).val ≡ 1 * (w : ZMod H.condN).val [MOD H.QS] :=
       e2.mul_right _
     rw [one_mul] at e3
     exact e3.symm.trans (e1.symm.trans hu1)
@@ -105,8 +111,10 @@ private theorem two_totient_le {n : ℕ} (h : 2 ∣ n) : 2 * Nat.totient n ≤ n
       have := Nat.totient_le m
       omega
 
-theorem UpperTheory.KR.two_ord_le_QS :
-    ∀ {φ : Frame} (H : HostAx φ), φ.ord ≤ Nat.totient H.QS ∧ 2 * φ.ord ≤ H.QS ∧ 4 * φ.ord ^ 2 * H.q * H.d ≤ (H.QS * H.q * H.d) ^ 2 := by
+theorem UpperTheory.KR.two_ord_le_QS
+    : ∀ {φ : Frame} (H : HostAx φ),
+      φ.ord ≤ Nat.totient H.QS ∧ 2 * φ.ord ≤ H.QS
+        ∧ 4 * φ.ord ^ 2 * H.q * H.d ≤ (H.QS * H.q * H.d) ^ 2 := by
   intro φ H
   set R := H.toHostRaw with hR
   have hsurj : Function.Surjective R.art := Der.art_surj R
@@ -134,14 +142,20 @@ theorem UpperTheory.KR.two_ord_le_QS :
       exact (Nat.le_of_dvd hpos' hdvd).trans hK
     have hI4 : Nat.card I ≤ 4 := by
       have hsub := img_sub R
-      have hm : Nat.card ((I : Set φ.GG)) ≤ Nat.card ((HostRaw.inertG R R.q : Set φ.GG) * (HostRaw.inertG R R.d : Set φ.GG)) :=
+      have hm
+          : Nat.card ((I : Set φ.GG))
+            ≤ Nat.card ((HostRaw.inertG R R.q : Set φ.GG) * (HostRaw.inertG R R.d : Set φ.GG)) :=
         Nat.card_mono (Set.toFinite _) hsub
-      have hmul := Set.natCard_mul_le (s := (HostRaw.inertG R R.q : Set φ.GG)) (t := (HostRaw.inertG R R.d : Set φ.GG))
+      have hmul :=
+        Set.natCard_mul_le (s := (HostRaw.inertG R R.q : Set φ.GG))
+          (t := (HostRaw.inertG R R.d : Set φ.GG))
       have hq2 : Nat.card (HostRaw.inertG R R.q) ≤ 2 := (inert_q H).1
       have hd2 : Nat.card (HostRaw.inertG R R.d) = 2 := (inert_d H).2.1
       have e1 : Nat.card I = Nat.card ((I : Set φ.GG)) := rfl
-      have e2 : Nat.card (HostRaw.inertG R R.q) = Nat.card ((HostRaw.inertG R R.q : Set φ.GG)) := rfl
-      have e3 : Nat.card (HostRaw.inertG R R.d) = Nat.card ((HostRaw.inertG R R.d : Set φ.GG)) := rfl
+      have e2 : Nat.card (HostRaw.inertG R R.q) = Nat.card ((HostRaw.inertG R R.q : Set φ.GG)) :=
+        rfl
+      have e3 : Nat.card (HostRaw.inertG R R.d) = Nat.card ((HostRaw.inertG R R.d : Set φ.GG)) :=
+        rfl
       rw [e1]
       rw [← e2, ← e3, hd2] at hmul
       nlinarith
@@ -151,11 +165,12 @@ theorem UpperTheory.KR.two_ord_le_QS :
       rw [← hci]
       exact Nat.mul_le_mul hI4 hidx
     omega
-  have h2 : 2 * φ.ord ≤ R.QS :=
-    (Nat.mul_le_mul_left 2 h1).trans (two_totient_le R.two_dvd_QS)
+  have h2 : 2 * φ.ord ≤ R.QS := (Nat.mul_le_mul_left 2 h1).trans (two_totient_le R.two_dvd_QS)
   refine ⟨h1, h2, ?_⟩
   have hqd : R.q * R.d ≤ (R.q * R.d) ^ 2 := Nat.le_self_pow (by norm_num) _
   have hsq : (2 * φ.ord) ^ 2 ≤ R.QS ^ 2 := Nat.pow_le_pow_left h2 2
-  calc 4 * φ.ord ^ 2 * H.q * H.d = (2 * φ.ord) ^ 2 * (R.q * R.d) := by rw [hR]; ring
+  calc
+    4 * φ.ord ^ 2 * H.q * H.d
+      = (2 * φ.ord) ^ 2 * (R.q * R.d) := by rw [hR]; ring
     _ ≤ R.QS ^ 2 * (R.q * R.d) ^ 2 := Nat.mul_le_mul hsq hqd
     _ = (H.QS * H.q * H.d) ^ 2 := by rw [hR]; ring

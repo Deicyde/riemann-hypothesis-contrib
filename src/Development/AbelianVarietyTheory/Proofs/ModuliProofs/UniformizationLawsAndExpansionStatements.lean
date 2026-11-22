@@ -17,22 +17,38 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllSi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField in
-theorem _root_.GlobalTheory.lawsAndExpansions :
-    _root_.GlobalTheory.UT.LL ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBCSpanStatement ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.VRatioGtStatement ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWStatement ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.UUStatement := by
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField in
+theorem _root_.GlobalTheory.lawsAndExpansions
+    : _root_.GlobalTheory.UT.LL
+      ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBCSpanStatement
+      ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.VRatioGtStatement
+      ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWStatement
+      ∧ _root_.ReciprocityTheory.ChartRestriction.G.DVR.UUStatement := by
   have hLaws := _root_.GlobalTheory.allSixLaws
-  have hU : _root_.ReciprocityTheory.ChartRestriction.G.Out.GlobalFnsSt := _root_.GlobalTheory.laws_without_cohomology.1
-  have hS : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBaseChangeStatement := _root_.GlobalTheory.twistBaseChange
-  have hR : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBCSpanStatement := _root_.ReciprocityTheory.ChartRestriction.G.DVR.twistBCSpan_of hS
-  have hA : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.VRatioGtStatement := _root_.GlobalTheory.RatioVal.main
-  refine ⟨?_, hR, hA, _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.tw_of hU hR hA, _root_.GlobalTheory.UnitBallFree.main hU hS⟩
+  have hU : _root_.ReciprocityTheory.ChartRestriction.G.Out.GlobalFnsSt :=
+    _root_.GlobalTheory.laws_without_cohomology.1
+  have hS : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBaseChangeStatement :=
+    _root_.GlobalTheory.twistBaseChange
+  have hR : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBCSpanStatement :=
+    _root_.ReciprocityTheory.ChartRestriction.G.DVR.twistBCSpan_of hS
+  have hA : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.VRatioGtStatement :=
+    _root_.GlobalTheory.RatioVal.main
+  refine ⟨
+    ?_,
+    hR,
+    hA,
+    _root_.ReciprocityTheory.ChartRestriction.G.DVR.TWM.tw_of hU hR hA,
+    _root_.GlobalTheory.UnitBallFree.main hU hS
+  ⟩
   unfold _root_.GlobalTheory.UT.LL
   exact ⟨hLaws.1, hLaws.2.1, hLaws.2.2.1, hLaws.2.2.2.1, hLaws.2.2.2.2.1⟩
 

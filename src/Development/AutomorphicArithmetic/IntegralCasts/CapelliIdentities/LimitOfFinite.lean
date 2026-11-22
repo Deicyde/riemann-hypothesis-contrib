@@ -6,13 +6,14 @@ public import Mathlib
 
 theorem UpperTheory.Reformulated.B.LimitOfFinite.exists_limit_of_finite.{u_1, u_2}
     {A : Type u_1} {M : Type u_2} [CommRing A] [AddCommGroup M] [Module A M] [Module.Finite A M]
-    (I : Ideal A) (hI : IsPrecomplete I A) (f : ℕ → M)
-    (hf : ∀ m : ℕ, f m - f (m + 1) ∈ (I ^ m • ⊤ : Submodule A M)) :
-    ∃ L : M, ∀ m : ℕ, f m - L ∈ (I ^ m • ⊤ : Submodule A M) := by
+    (I : Ideal A) (hI : IsPrecomplete I A)
+    (f : ℕ → M) (hf : ∀ m : ℕ, f m - f (m + 1) ∈ (I ^ m • ⊤ : Submodule A M))
+    : ∃ L : M, ∀ m : ℕ, f m - L ∈ (I ^ m • ⊤ : Submodule A M) := by
   classical
   obtain ⟨n, s, hs⟩ := Module.Finite.exists_fin (R := A) (M := M)
-  have key : ∀ (J : Ideal A) (x : M), x ∈ (J • ⊤ : Submodule A M) →
-      ∃ d : Fin n → A, (∀ i, d i ∈ J) ∧ ∑ i, d i • s i = x := by
+  have key
+      : ∀ (J : Ideal A) (x : M),
+        x ∈ (J • ⊤ : Submodule A M) → ∃ d : Fin n → A, (∀ i, d i ∈ J) ∧ ∑ i, d i • s i = x := by
     intro J x hx
     refine Submodule.smul_induction_on hx ?_ ?_
     · intro r hr y _
@@ -46,20 +47,21 @@ theorem UpperTheory.Reformulated.B.LimitOfFinite.exists_limit_of_finite.{u_1, u_
       exact (I ^ m).sub_mem ih (Ideal.pow_le_pow_right hmk (hd k i))
   have hl : ∀ i, ∃ a : A, ∀ m, g m i - a ∈ I ^ m := by
     intro i
-    obtain ⟨a, ha⟩ := hI.prec (f := fun m => g m i) (by
-      intro m k hmk
-      rw [SModEq.sub_mem]
-      simpa using hc i m k hmk)
+    obtain ⟨a, ha⟩ :=
+      hI.prec (f := fun m => g m i) (by
+        intro m k hmk
+        rw [SModEq.sub_mem]
+        simpa using hc i m k hmk)
     refine ⟨a, fun m => ?_⟩
     have := ha m
     rw [SModEq.sub_mem] at this
     simpa using this
   choose a ha using hl
   refine ⟨f 0 - ∑ i, a i • s i, fun m => ?_⟩
-  have h2 : f m - (f 0 - ∑ i, a i • s i) = -∑ i, (g m i - a i) • s i := by
+  have h2 : f m - (f 0 - ∑ i, a i • s i) = - ∑ i, (g m i - a i) • s i := by
     rw [hg m]
     simp only [sub_smul, Finset.sum_sub_distrib]
     abel
   rw [h2]
-  exact Submodule.neg_mem _ (Submodule.sum_mem _ fun i _ =>
-    Submodule.smul_mem_smul (ha i m) Submodule.mem_top)
+  exact Submodule.neg_mem _
+    (Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (ha i m) Submodule.mem_top)

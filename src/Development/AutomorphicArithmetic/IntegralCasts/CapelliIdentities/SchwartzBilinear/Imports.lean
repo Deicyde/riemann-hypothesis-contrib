@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.P6.r08a
 
-theorem GlobalTheory.CompanionTheory.AvgFree.Cov.exists_sep :
-    ∀ {K : Type} [inst : AddCommGroup K] (H : AddSubgroup K) (T : Finset K), ∃ Rep ⊆ T, (∀ x ∈ T, ∃ r ∈ Rep, x - r ∈ H) ∧ ∀ r ∈ Rep, ∀ r' ∈ Rep, r - r' ∈ H → r = r' := by
+theorem GlobalTheory.CompanionTheory.AvgFree.Cov.exists_sep
+    : ∀ {K : Type} [inst : AddCommGroup K] (H : AddSubgroup K) (T : Finset K), ∃ Rep ⊆ T,
+      (∀ x ∈ T, ∃ r ∈ Rep, x - r ∈ H) ∧ ∀ r ∈ Rep, ∀ r' ∈ Rep, r - r' ∈ H → r = r' := by
   intro K inst H T
   classical
   refine Finset.induction_on T ?_ ?_

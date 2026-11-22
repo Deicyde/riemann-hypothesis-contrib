@@ -11,8 +11,8 @@ open scoped Classical
 
 namespace GlobalTheory.Shin
 
-theorem trace_pi_eq_sum (n : ℕ) (A : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) :
-    LinearMap.trace ℂ (Fin n → ℂ) A = ∑ i, A (Pi.single i 1) i := by
+theorem trace_pi_eq_sum (n : ℕ) (A : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))
+    : LinearMap.trace ℂ (Fin n → ℂ) A = ∑ i, A (Pi.single i 1) i := by
   rw [LinearMap.trace_eq_matrix_trace ℂ (Pi.basisFun ℂ (Fin n)), LinearMap.toMatrix_eq_toMatrix',
     Matrix.trace]
   simp [LinearMap.toMatrix'_apply]
@@ -28,9 +28,10 @@ theorem kills_self : ∀ (G : Type) [Group G] [Finite G] (Y : G → ℂ), IsChar
   rw [finsum_eq_sum_of_fintype]
   simp only [hst] at h ⊢
 
-  have hinv : Invertible (Nat.card G : ℂ) := invertibleOfNonzero (by
-    have : 0 < Nat.card G := Nat.card_pos
-    exact_mod_cast this.ne')
+  have hinv : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (by
+      have : 0 < Nat.card G := Nat.card_pos
+      exact_mod_cast this.ne')
   have hfr := Representation.card_inv_mul_sum_char_eq_finrank (Representation.linHom σ ρ)
   simp only [Representation.char_linHom] at hfr
   have h' : ∑ g : G, σ.character g⁻¹ * ρ.character g = 0 := h
@@ -52,8 +53,10 @@ theorem kills_self : ∀ (G : Type) [Group G] [Finite G] (Y : G → ℂ), IsChar
   ext v
   have key : ∀ i : Fin n, ∑ g : G, (σ g⁻¹ (Pi.single i 1)) i • ρ g v = 0 := by
     intro i
-    have := congrArg (fun F : (Fin n → ℂ) →ₗ[ℂ] V => F (Pi.single i 1))
-      (hsum ((LinearMap.proj i : (Fin n → ℂ) →ₗ[ℂ] ℂ).smulRight v))
+    have :=
+      congrArg
+        (fun F : (Fin n → ℂ) →ₗ[ℂ] V => F (Pi.single i 1))
+        (hsum ((LinearMap.proj i : (Fin n → ℂ) →ₗ[ℂ] ℂ).smulRight v))
     simpa [Representation.linHom_apply, LinearMap.sum_apply] using this
   simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.zero_apply]
   simp only [Representation.character, trace_pi_eq_sum, Finset.sum_smul]

@@ -11,16 +11,32 @@ namespace GlobalTheory
 
 open ReciprocityTheory.Aut
 
-theorem unitary_conjugator_of_split_idempotents :
-  ∀ (R : Type) [CommRing R] (σ : R →+* R), (∀ a, σ (σ a) = a) → ∀ (m n : ℕ) (ι : Type) [Fintype ι] (ε : ι → R), (∀ j, ε j * ε j = ε j) → (∀ j, ε j * σ (ε j) = 0) → (∀ j k, j ≠ k → ε j * ε k = 0 ∧ ε j * σ (ε k) = 0) → ∀ (Z P : Matrix (Fin m) (Fin n) R) (Z' P' : Matrix (Fin n) (Fin m) R), Z * Z' = 1 → Z' * Z = 1 → P * P' = 1 → P' * P = 1 → ∃ c : GL (Fin n) R, (c : Matrix (Fin n) (Fin n) R) * ReciprocityTheory.Aut.conjT σ (c : Matrix (Fin n) (Fin n) R) = 1 ∧ ∀ j, ε j • (Z * (c : Matrix (Fin n) (Fin n) R)) = ε j • P ∧ ε j • (((c⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) * Z') = ε j • P' := by
+theorem unitary_conjugator_of_split_idempotents
+    : ∀ (R : Type) [CommRing R] (σ : R →+* R),
+      (∀ a, σ (σ a) = a)
+        → ∀ (m n : ℕ) (ι : Type) [Fintype ι] (ε : ι → R),
+          (∀ j, ε j * ε j = ε j) → (∀ j, ε j * σ (ε j) = 0)
+            → (∀ j k, j ≠ k → ε j * ε k = 0 ∧ ε j * σ (ε k) = 0)
+            → ∀ (Z P : Matrix (Fin m) (Fin n) R) (Z' P' : Matrix (Fin n) (Fin m) R),
+              Z * Z' = 1 → Z' * Z = 1 → P * P' = 1 → P' * P = 1
+                → ∃ c : GL (Fin n) R,
+                  (c : Matrix (Fin n) (Fin n) R)
+                        * ReciprocityTheory.Aut.conjT σ (c : Matrix (Fin n) (Fin n) R)
+                      = 1
+                    ∧ ∀ j,
+                      ε j • (Z * (c : Matrix (Fin n) (Fin n) R)) = ε j • P
+                        ∧ ε j • (((c⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) * Z')
+                          = ε j • P' := by
   intro R _ σ hσ m n ι _ ε hidem hself hcross Z P Z' P' hZZ' hZ'Z hPP' hP'P
   classical
-
   obtain ⟨e, he⟩ : ∃ e : R, e = ∑ j, ε j := ⟨_, rfl⟩
   have hje : ∀ j, ε j * e = ε j := by
     intro j
-    rw [he, Finset.mul_sum, Finset.sum_eq_single j (fun k _ hk => (hcross j k (Ne.symm hk)).1)
-      (fun h => absurd (Finset.mem_univ j) h), hidem]
+    rw [he, Finset.mul_sum,
+      Finset.sum_eq_single j
+        (fun k _ hk => (hcross j k (Ne.symm hk)).1)
+        (fun h => absurd (Finset.mem_univ j) h),
+      hidem]
   have hjse : ∀ j, ε j * σ e = 0 := by
     intro j
     set_option synthInstance.maxHeartbeats 100000 in
@@ -63,7 +79,8 @@ theorem unitary_conjugator_of_split_idempotents :
   have hcT : conjT σ c = f • (1 : Matrix (Fin n) (Fin n) R) + e' • conjT σ X + e • (P' * Z) := by
     rw [hc, cadd, cadd, csmul, csmul, csmul, conjT_one, hσf, hY, conjT_conjT σ hσ, hσe', ← he']
   have hXY : X * conjT σ Y = 1 := by
-    rw [hY, conjT_conjT σ hσ, hX, Matrix.mul_assoc, ← Matrix.mul_assoc P, hPP', Matrix.one_mul, hZ'Z]
+    rw [hY, conjT_conjT σ hσ, hX, Matrix.mul_assoc, ← Matrix.mul_assoc P, hPP', Matrix.one_mul,
+      hZ'Z]
   have hYX : Y * conjT σ X = 1 := by
     rw [hY, ← conjT_mul, ← hXY, hY, conjT_conjT σ hσ]
     rw [hX, Matrix.mul_assoc, ← Matrix.mul_assoc P, hPP', Matrix.one_mul, hZ'Z, conjT_one]
@@ -71,23 +88,21 @@ theorem unitary_conjugator_of_split_idempotents :
     rw [hcT, hc]
     have hYeq : P' * Z = conjT σ Y := by rw [hY, conjT_conjT σ hσ]
     rw [hYeq]
-    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-      hff, hfe, hfe', hef, he'f, hee, hee'', he'e, he'e', zero_smul, add_zero, zero_add,
-      Matrix.one_mul, Matrix.mul_one, hXY, hYX, smul_add]
+    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hff,
+      hfe, hfe', hef, he'f, hee, hee'', he'e, he'e', zero_smul, add_zero, zero_add, Matrix.one_mul,
+      Matrix.mul_one, hXY, hYX, smul_add]
     conv_rhs => rw [← one_smul R (1 : Matrix (Fin n) (Fin n) R), ← hsum]
     simp only [add_smul]
     abel
   have hcc' : conjT σ c * c = 1 := mul_eq_one_comm.mp hcc
   refine ⟨⟨c, conjT σ c, hcc, hcc'⟩, hcc, fun j => ⟨?_, ?_⟩⟩
   · show ε j • (Z * c) = ε j • P
-    have hjf : ε j * f = 0 := by
-      rw [hf]; linear_combination -hje j - hjse j
+    have hjf : ε j * f = 0 := by rw [hf]; linear_combination -hje j - hjse j
     rw [hc, Matrix.mul_add, Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_smul,
       smul_add, smul_add, smul_smul, smul_smul, smul_smul, hjf, hje, hjse, zero_smul, zero_smul,
       zero_add, add_zero, hX, ← Matrix.mul_assoc, hZZ', Matrix.one_mul]
   · show ε j • (conjT σ c * Z') = ε j • P'
-    have hjf : ε j * f = 0 := by
-      rw [hf]; linear_combination -hje j - hjse j
+    have hjf : ε j * f = 0 := by rw [hf]; linear_combination -hje j - hjse j
     rw [hcT, Matrix.add_mul, Matrix.add_mul, Matrix.smul_mul, Matrix.smul_mul, Matrix.smul_mul,
       smul_add, smul_add, smul_smul, smul_smul, smul_smul, hjf, hje, hjse, zero_smul, zero_smul,
       zero_add, zero_add, Matrix.mul_assoc, hZZ', Matrix.mul_one]

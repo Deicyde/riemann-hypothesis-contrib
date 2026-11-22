@@ -18,32 +18,35 @@ universe u v w v₁ v₂ v₃
 
 namespace Cech
 
-variable {n : ℕ} {U : Finset (Fin n)} {R : Type u} [CommRing R]
+variable
+  {n : ℕ} {U : Finset (Fin n)} {R : Type u} [CommRing R]
   {A : Cell U → Type v₁} [∀ I, AddCommGroup (A I)] [∀ I, Module R (A I)]
   {B : Cell U → Type v₂} [∀ I, AddCommGroup (B I)] [∀ I, Module R (B I)]
   {C : Cell U → Type v₃} [∀ I, AddCommGroup (C I)] [∀ I, Module R (C I)]
 
-
 set_option maxHeartbeats 1000000 in
-theorem finite_H_zero_of_exact [IsNoetherianRing R]
-    (ρA : ∀ I J : Cell U, I.1 ⊆ J.1 → A I →ₗ[R] A J) (ρB : ∀ I J : Cell U, I.1 ⊆ J.1 → B I →ₗ[R] B J)
+theorem finite_H_zero_of_exact
+    [IsNoetherianRing R]
+    (ρA : ∀ I J : Cell U, I.1 ⊆ J.1 → A I →ₗ[R] A J)
+    (ρB : ∀ I J : Cell U, I.1 ⊆ J.1 → B I →ₗ[R] B J)
     (ρC : ∀ I J : Cell U, I.1 ⊆ J.1 → C I →ₗ[R] C J)
     (hρB : ∀ (I J K : Cell U) (h : I.1 ⊆ J.1) (h' : J.1 ⊆ K.1) (m : B I),
       ρB J K h' (ρB I J h m) = ρB I K (h.trans h') m)
     (ι : ∀ I, A I →ₗ[R] B I) (q : ∀ I, B I →ₗ[R] C I)
     (hι : ∀ I J h m, ι J (ρA I J h m) = ρB I J h (ι I m))
-    (hq : ∀ I J h m, q J (ρB I J h m) = ρC I J h (q I m))
-    (hinj : ∀ I, Function.Injective (ι I)) (hsurj : ∀ I, Function.Surjective (q I))
-    (hex : ∀ I b, q I b = 0 ↔ ∃ a, ι I a = b)
-    (hB : Module.Finite R (H B ρB 0)) (hA : Module.Finite R (H A ρA 1)) :
-    Module.Finite R (H C ρC 0) := by
+    (hq : ∀ I J h m, q J (ρB I J h m) = ρC I J h (q I m)) (hinj : ∀ I, Function.Injective (ι I))
+    (hsurj : ∀ I, Function.Surjective (q I)) (hex : ∀ I b, q I b = 0 ↔ ∃ a, ι I a = b)
+    (hB : Module.Finite R (H B ρB 0)) (hA : Module.Finite R (H A ρA 1))
+    : Module.Finite R (H C ρC 0) := by
   have := hA
   have hιd := mapC_d (R := R) (G := A) (G' := B) ι hι
   have hqd := mapC_d (R := R) (G := B) (G' := C) q hq
   have hιinj : ∀ i, Function.Injective (mapC (R := R) (G := A) (G' := B) ι i) := fun i a b hab =>
     _root_.funext fun I => hinj I.1 (congrFun hab I)
-  have hq0 : ∀ i (c : Cochain B i), mapC (R := R) (G := B) (G' := C) q i c = 0 ↔
-      ∃ a, mapC (R := R) (G := A) (G' := B) ι i a = c := fun i c => by
+  have hq0
+      : ∀ i (c : Cochain B i),
+        mapC (R := R) (G := B) (G' := C) q i c = 0
+          ↔ ∃ a, mapC (R := R) (G := A) (G' := B) ι i a = c := fun i c => by
     constructor
     · intro h
       choose a ha using fun I => (hex I.1 (c I)).mp (congrFun h I)
@@ -51,16 +54,26 @@ theorem finite_H_zero_of_exact [IsNoetherianRing R]
     · rintro ⟨a, rfl⟩
       exact _root_.funext fun I => (hex I.1 _).mpr ⟨a I, rfl⟩
 
-  obtain ⟨P, hP⟩ : ∃ P : Submodule R (Cochain B 0), ∀ w, w ∈ P ↔
-      mapC (R := R) (G := B) (G' := C) q 1 (d B ρB 0 w) = 0 :=
-    ⟨LinearMap.ker ((mapC (R := R) (G := B) (G' := C) q 1).comp (d B ρB 0)), fun _ => LinearMap.mem_ker⟩
+  obtain ⟨P, hP⟩
+      : ∃ P : Submodule R (Cochain B 0), ∀ w,
+        w ∈ P ↔ mapC (R := R) (G := B) (G' := C) q 1 (d B ρB 0 w) = 0 := ⟨
+    LinearMap.ker ((mapC (R := R) (G := B) (G' := C) q 1).comp (d B ρB 0)),
+    fun _ => LinearMap.mem_ker
+  ⟩
 
-  obtain ⟨θ, hθ0, hθs⟩ : ∃ θ : P →ₗ[R] H C ρC 0,
-      (∀ p, θ p = 0 ↔ mapC (R := R) (G := B) (G' := C) q 0 p.1 = 0) ∧ Function.Surjective θ := by
-    have hk : ∀ p : P, mapC (R := R) (G := B) (G' := C) q 0 p.1 ∈ LinearMap.ker (d C ρC 0) := fun p => by
+  obtain ⟨θ, hθ0, hθs⟩
+      : ∃ θ : P →ₗ[R] H C ρC 0,
+        (∀ p, θ p = 0 ↔ mapC (R := R) (G := B) (G' := C) q 0 p.1 = 0) ∧ Function.Surjective θ := by
+    have hk
+        : ∀ p : P,
+          mapC (R := R) (G := B) (G' := C) q 0 p.1 ∈ LinearMap.ker (d C ρC 0) := fun p => by
       rw [LinearMap.mem_ker, ← hqd 0]; exact (hP p.1).mp p.2
-    refine ⟨(Submodule.mkQ _).comp (LinearMap.codRestrict _
-      ((mapC (R := R) (G := B) (G' := C) q 0).comp P.subtype) hk), fun p => ?_, fun h => ?_⟩
+    refine ⟨
+      (Submodule.mkQ _).comp
+        (LinearMap.codRestrict _ ((mapC (R := R) (G := B) (G' := C) q 0).comp P.subtype) hk),
+      fun p => ?_,
+      fun h => ?_
+    ⟩
     · change Submodule.Quotient.mk _ = 0 ↔ _
       rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
       exact Submodule.mem_bot R
@@ -72,21 +85,25 @@ theorem finite_H_zero_of_exact [IsNoetherianRing R]
       congr 1
       exact Subtype.ext hmw
 
-  have hdP : ∀ p : P, d B ρB 0 p.1 ∈ LinearMap.range (mapC (R := R) (G := A) (G' := B) ι 1) := fun p =>
-    LinearMap.mem_range.mpr ((hq0 1 _).mp ((hP p.1).mp p.2))
-  obtain ⟨g, hg⟩ : ∃ g : P →ₗ[R] Cochain A 1,
-      ∀ p, mapC (R := R) (G := A) (G' := B) ι 1 (g p) = d B ρB 0 p.1 :=
-    ⟨(LinearEquiv.ofInjective _ (hιinj 1)).symm.toLinearMap.comp
-        (LinearMap.codRestrict _ ((d B ρB 0).comp P.subtype) hdP),
-      fun p => congrArg Subtype.val ((LinearEquiv.ofInjective _ (hιinj 1)).apply_symm_apply _)⟩
+  have hdP : ∀ p : P, d B ρB 0 p.1 ∈ LinearMap.range (mapC (R := R) (G := A) (G' := B) ι 1) :=
+    fun p => LinearMap.mem_range.mpr ((hq0 1 _).mp ((hP p.1).mp p.2))
+  obtain ⟨g, hg⟩
+      : ∃ g : P →ₗ[R] Cochain A 1, ∀ p,
+        mapC (R := R) (G := A) (G' := B) ι 1 (g p) = d B ρB 0 p.1 := ⟨
+    (LinearEquiv.ofInjective _ (hιinj 1)).symm.toLinearMap.comp
+      (LinearMap.codRestrict _ ((d B ρB 0).comp P.subtype) hdP),
+    fun p => congrArg Subtype.val ((LinearEquiv.ofInjective _ (hιinj 1)).apply_symm_apply _)
+  ⟩
   have hgk : ∀ p : P, g p ∈ LinearMap.ker (d A ρA 1) := fun p =>
-    LinearMap.mem_ker.mpr (hιinj (1 + 1) ((hιd 1 (g p)).trans (by
-      rw [hg, d_one_d_zero hρB, map_zero])))
-  obtain ⟨ψ, hψ0⟩ : ∃ ψ : P →ₗ[R] H A ρA 1, ∀ p, ψ p = 0 ↔ ∃ g', d A ρA 0 g' = g p :=
-    ⟨(Submodule.mkQ _).comp (LinearMap.codRestrict _ g hgk), fun p => by
+    LinearMap.mem_ker.mpr (hιinj (1 + 1)
+      ((hιd 1 (g p)).trans (by rw [hg, d_one_d_zero hρB, map_zero])))
+  obtain ⟨ψ, hψ0⟩ : ∃ ψ : P →ₗ[R] H A ρA 1, ∀ p, ψ p = 0 ↔ ∃ g', d A ρA 0 g' = g p := ⟨
+    (Submodule.mkQ _).comp (LinearMap.codRestrict _ g hgk),
+    fun p => by
       change Submodule.Quotient.mk _ = 0 ↔ _
       rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
-      exact LinearMap.mem_range⟩
+      exact LinearMap.mem_range
+  ⟩
   have hle : LinearMap.ker θ ≤ LinearMap.ker ψ := fun p hp => by
     obtain ⟨a, ha⟩ := (hq0 0 _).mp ((hθ0 p).mp hp)
     refine (hψ0 p).mpr ⟨a, hιinj 1 ?_⟩
@@ -104,11 +121,13 @@ theorem finite_H_zero_of_exact [IsNoetherianRing R]
       obtain ⟨g', hg'⟩ := (hψ0 p).mp hm'
       have hz : p.1 - mapC (R := R) (G := A) (G' := B) ι 0 g' ∈ LinearMap.ker (d B ρB 0) := by
         rw [LinearMap.mem_ker, map_sub, ← hιd 0, hg', hg, sub_self]
-      have hqι : mapC (R := R) (G := B) (G' := C) q 0 (mapC (R := R) (G := A) (G' := B) ι 0 g') = 0 :=
+      have hqι
+          : mapC (R := R) (G := B) (G' := C) q 0 (mapC (R := R) (G := A) (G' := B) ι 0 g') = 0 :=
         (hq0 0 _).mpr ⟨g', rfl⟩
       refine ⟨⟨_, hz⟩, (Submodule.Quotient.eq _).mpr ((hθ0 _).mpr ?_)⟩
       change mapC (R := R) (G := B) (G' := C) q 0
-        (p.1 - mapC (R := R) (G := A) (G' := B) ι 0 g' - p.1) = 0
+          (p.1 - mapC (R := R) (G := A) (G' := B) ι 0 g' - p.1)
+        = 0
       rw [sub_sub_cancel_left, map_neg, hqι, neg_zero]
     · rintro _ ⟨z, rfl⟩
       show ψ (Submodule.inclusion hZP z) = 0
@@ -117,12 +136,16 @@ theorem finite_H_zero_of_exact [IsNoetherianRing R]
       exact (LinearMap.mem_ker.mp z.2).symm
 
   have hZfin : Module.Finite R (LinearMap.ker (d B ρB 0)) := by
-    have : Module.Finite R (LinearMap.ker (d B ρB 0) ⧸
-        (bdry B ρB 0).comap (LinearMap.ker (d B ρB 0)).subtype) := hB
+    have : Module.Finite R
+        (LinearMap.ker (d B ρB 0) ⧸
+          (bdry B ρB 0).comap (LinearMap.ker (d B ρB 0)).subtype) :=
+      hB
     exact Module.Finite.equiv (Submodule.quotEquivOfEqBot
-      ((bdry B ρB 0).comap (LinearMap.ker (d B ρB 0)).subtype) (eq_bot_iff.mpr fun z hz =>
-      (Submodule.mem_bot R).mpr (Subtype.ext ((Submodule.mem_bot R).mp
-        (show (z : Cochain B 0) ∈ (⊥ : Submodule R (Cochain B 0)) from hz)))))
+      ((bdry B ρB 0).comap (LinearMap.ker (d B ρB 0)).subtype)
+      (eq_bot_iff.mpr fun z hz =>
+        (Submodule.mem_bot R).mpr
+          (Subtype.ext ((Submodule.mem_bot R).mp
+            (show (z : Cochain B 0) ∈ (⊥ : Submodule R (Cochain B 0)) from hz)))))
   have hM : Module.Finite R (P ⧸ LinearMap.ker θ) := by
     refine ⟨Submodule.fg_of_fg_map_of_fg_inf_ker f (IsNoetherian.noetherian _) ?_⟩
     rw [top_inf_eq, hker, LinearMap.range_eq_map]
@@ -133,16 +156,28 @@ end Cech
 
 theorem QuotientH0Finite.proof : QuotientH0Finite.Statement.{u, v, w} := by
   intro S _ _ Ω _ _ N x E _ _ _ _ F G hGF hF hG
-  have key := Cech.finite_H_zero_of_exact (A := fun I => ↥(G.sub I)) (B := fun I => ↥(F.sub I))
-    (C := fun I => ↥(F.sub I) ⧸ SubSystem.quotSub F G I) G.res F.res (SubSystem.quotRes F G)
-    (fun _ _ _ _ _ _ => rfl)
-    (fun I => { toFun := fun y => ⟨y, hGF I y.2⟩, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl })
-    (fun I => (SubSystem.quotSub F G I).mkQ) (fun _ _ _ _ => rfl) (fun _ _ _ _ => rfl)
-    (fun I a b hab => Subtype.ext (congrArg (fun y : F.sub I => (y : E)) hab))
-    (fun I => Submodule.mkQ_surjective _)
-    (fun I b => ⟨fun h => ⟨⟨b, (Submodule.Quotient.mk_eq_zero (SubSystem.quotSub F G I)).mp h⟩, rfl⟩,
-      fun ⟨a, ha⟩ => (Submodule.Quotient.mk_eq_zero (SubSystem.quotSub F G I)).mpr (ha ▸ a.2)⟩)
-    hF hG
+  have key :=
+    Cech.finite_H_zero_of_exact
+      (A := fun I => ↥(G.sub I))
+      (B := fun I => ↥(F.sub I))
+      (C := fun I => ↥(F.sub I) ⧸ SubSystem.quotSub F G I)
+      G.res F.res (SubSystem.quotRes F G)
+      (fun _ _ _ _ _ _ => rfl)
+      (fun I => {
+        toFun := fun y => ⟨y, hGF I y.2⟩
+        map_add' := fun _ _ => rfl
+        map_smul' := fun _ _ => rfl
+      })
+      (fun I => (SubSystem.quotSub F G I).mkQ)
+      (fun _ _ _ _ => rfl)
+      (fun _ _ _ _ => rfl)
+      (fun I a b hab => Subtype.ext (congrArg (fun y : F.sub I => (y : E)) hab))
+      (fun I => Submodule.mkQ_surjective _)
+      (fun I b => ⟨
+        fun h => ⟨⟨b, (Submodule.Quotient.mk_eq_zero (SubSystem.quotSub F G I)).mp h⟩, rfl⟩,
+        fun ⟨a, ha⟩ => (Submodule.Quotient.mk_eq_zero (SubSystem.quotSub F G I)).mpr (ha ▸ a.2)
+      ⟩)
+      hF hG
   exact key
 
 end

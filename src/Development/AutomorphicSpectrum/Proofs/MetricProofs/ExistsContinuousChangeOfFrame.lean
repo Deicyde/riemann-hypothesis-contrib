@@ -11,7 +11,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLattice
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 namespace GlobalTheory.CompanionTheory.Ar.SolveCoeff
@@ -87,24 +89,28 @@ private lemma colMat_continuousAt {n g m : ℕ} (M : (Fin n → ℂ) → Fin m �
   refine continuousAt_pi.2 fun a => continuousAt_pi.2 fun i => ?_
   exact (continuous_apply a).continuousAt.comp (h i)
 
-theorem coeff_continuous (n g m : ℕ) (M f : (Fin n → ℂ) → Fin m → Fin g → ℂ)
-    (T₀ : Matrix (Fin m) (Fin m) ℂ) (hM : ∀ i, ContinuousAt (fun z => M z i) 0)
-    (hf : ∀ i, ContinuousAt (fun z => f z i) 0) (hli : LinearIndependent ℂ (M 0))
-    (h0 : ∀ i, f 0 i = ∑ j, T₀ j i • M 0 j)
-    (hspan : ∀ᶠ z in 𝓝 (0 : Fin n → ℂ), ∀ i, f z i ∈ Submodule.span ℂ (Set.range (M z))) :
-    ∃ T : (Fin n → ℂ) → Matrix (Fin m) (Fin m) ℂ, ContinuousAt T 0 ∧ T 0 = T₀ ∧
-      ∀ᶠ z in 𝓝 (0 : Fin n → ℂ), ∀ i, f z i = ∑ j, T z j i • M z j := by
+theorem coeff_continuous
+    (n g m : ℕ) (M f : (Fin n → ℂ) → Fin m → Fin g → ℂ) (T₀ : Matrix (Fin m) (Fin m) ℂ)
+    (hM : ∀ i, ContinuousAt (fun z => M z i) 0) (hf : ∀ i, ContinuousAt (fun z => f z i) 0)
+    (hli : LinearIndependent ℂ (M 0)) (h0 : ∀ i, f 0 i = ∑ j, T₀ j i • M 0 j)
+    (hspan : ∀ᶠ z in 𝓝 (0 : Fin n → ℂ), ∀ i, f z i ∈ Submodule.span ℂ (Set.range (M z)))
+    : ∃ T : (Fin n → ℂ) → Matrix (Fin m) (Fin m) ℂ,
+      ContinuousAt T 0 ∧ T 0 = T₀
+        ∧ ∀ᶠ z in 𝓝 (0 : Fin n → ℂ), ∀ i, f z i = ∑ j, T z j i • M z j := by
   have hA : ContinuousAt (fun z => colMat (M z)) 0 := colMat_continuousAt M hM
   have hF : ContinuousAt (fun z => colMat (f z)) 0 := colMat_continuousAt f hf
-  have hG : ContinuousAt (fun z => (colMat (M z))ᴴ * colMat (M z)) 0 :=
-    cat_mul (cat_conj hA) hA
+  have hG : ContinuousAt (fun z => (colMat (M z))ᴴ * colMat (M z)) 0 := cat_mul (cat_conj hA) hA
   have hdet : ContinuousAt (fun z => ((colMat (M z))ᴴ * colMat (M z)).det) 0 := cat_det hG
   have hd0 := gram_det_ne (M 0) hli
   have hinv : ContinuousAt (fun z => ((colMat (M z))ᴴ * colMat (M z))⁻¹) 0 := by
     simp only [Matrix.inv_def, Ring.inverse_eq_inv']
     exact (hdet.inv₀ hd0).smul (cat_adj hG)
-  refine ⟨fun z => ((colMat (M z))ᴴ * colMat (M z))⁻¹ * (colMat (M z))ᴴ * colMat (f z),
-    cat_mul (cat_mul hinv (cat_conj hA)) hF, ?_, ?_⟩
+  refine ⟨
+    fun z => ((colMat (M z))ᴴ * colMat (M z))⁻¹ * (colMat (M z))ᴴ * colMat (f z),
+    cat_mul (cat_mul hinv (cat_conj hA)) hF,
+    ?_,
+    ?_
+  ⟩
   · show ((colMat (M 0))ᴴ * colMat (M 0))⁻¹ * (colMat (M 0))ᴴ * colMat (f 0) = T₀
     rw [colMat_eq_mul (M 0) (f 0) T₀ h0]
     exact solve_eq _ _ hd0
@@ -114,8 +120,9 @@ theorem coeff_continuous (n g m : ℕ) (M f : (Fin n → ℂ) → Fin m → Fin 
     choose c hc using hc
     have hcol : colMat (f z) = colMat (M z) * Matrix.of (fun j i => c i j) :=
       colMat_eq_mul (M z) (f z) _ (fun i => by simpa using (hc i).symm)
-    have hT : ((colMat (M z))ᴴ * colMat (M z))⁻¹ * (colMat (M z))ᴴ * colMat (f z)
-        = Matrix.of (fun j i => c i j) := by
+    have hT
+        : ((colMat (M z))ᴴ * colMat (M z))⁻¹ * (colMat (M z))ᴴ * colMat (f z)
+          = Matrix.of (fun j i => c i j) := by
       rw [hcol]; exact solve_eq _ _ hdz
     simp only [hT, Matrix.of_apply]
     exact (hc i).symm

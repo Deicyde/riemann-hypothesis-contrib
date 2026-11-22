@@ -4,7 +4,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Spherica
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
+open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical
+  GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
 
 namespace UpperTheory.ConvolutionTheory.H.NonVanishingCharacter
 
@@ -117,9 +118,11 @@ private lemma evalAt_term (z : Fin n → ℂˣ) (a : Fin n → ℤ) (t : ℂ) :
 end UpperTheory.ConvolutionTheory.H.NonVanishingCharacter
 
 open UpperTheory.ConvolutionTheory.H.NonVanishingCharacter in
-theorem UpperTheory.ConvolutionTheory.H.nonVan :
-    ∀ (n : ℕ) (t : ℂ), ‖t‖ < 1 → ∀ (z : Fin n → ℂˣ) (m : ℕ),
-      ∃ a : Fin n → ℤ, Gap m a ∧ (∀ i, 0 ≤ a i) ∧ evalAt z (symSum (monomial a * dPol n t)) ≠ 0 := by
+theorem UpperTheory.ConvolutionTheory.H.nonVan
+    : ∀ (n : ℕ) (t : ℂ),
+      ‖t‖ < 1
+        → ∀ (z : Fin n → ℂˣ) (m : ℕ), ∃ a : Fin n → ℤ,
+          Gap m a ∧ (∀ i, 0 ≤ a i) ∧ evalAt z (symSum (monomial a * dPol n t)) ≠ 0 := by
   classical
   intro n t ht z m
   by_contra hcon
@@ -137,13 +140,14 @@ theorem UpperTheory.ConvolutionTheory.H.nonVan :
   let Ψ : Equiv.Perm (Fin n) → (Multiplicative (Fin n → ℕ) →* ℂ) := fun σ => chi (z ∘ σ)
   have hsum : ∀ b, ∑ σ, W σ * Ψ σ b = 0 := by
     intro b
-    have h0 := hcon (s + phi (Multiplicative.toAdd b))
-      (fun i j hij => by
-        have := hsgap i j hij
-        have := phi_anti (Multiplicative.toAdd b) hij.le
-        simp only [Pi.add_apply]
-        linarith)
-      (fun i => add_nonneg (hs0 i) (phi_nonneg _ i))
+    have h0 :=
+      hcon (s + phi (Multiplicative.toAdd b))
+        (fun i j hij => by
+          have := hsgap i j hij
+          have := phi_anti (Multiplicative.toAdd b) hij.le
+          simp only [Pi.add_apply]
+          linarith)
+        (fun i => add_nonneg (hs0 i) (phi_nonneg _ i))
     rw [evalAt_term] at h0
     rw [← h0]
     refine Finset.sum_congr rfl fun σ _ => ?_
@@ -160,11 +164,11 @@ theorem UpperTheory.ConvolutionTheory.H.nonVan :
     rw [← hsum b]
     rw [← Finset.sum_fiberwise_of_maps_to (g := Ψ) (t := Finset.univ.image Ψ)
       (fun σ _ => Finset.mem_image_of_mem _ (Finset.mem_univ _))]
-    exact Finset.sum_congr rfl fun χ _ => Finset.sum_congr rfl fun σ hσ => by
-      rw [(Finset.mem_filter.1 hσ).2]
-  let σ₀ : Equiv.Perm (Fin n) := Tuple.sort (fun i => -‖(z i : ℂ)‖)
+    exact Finset.sum_congr rfl fun χ _ =>
+      Finset.sum_congr rfl fun σ hσ => by rw [(Finset.mem_filter.1 hσ).2]
+  let σ₀ : Equiv.Perm (Fin n) := Tuple.sort (fun i => - ‖(z i : ℂ)‖)
   have hw : ∀ i j, i ≤ j → ‖((z ∘ σ₀) j : ℂ)‖ ≤ ‖((z ∘ σ₀) i : ℂ)‖ := fun i j hij =>
-    neg_le_neg_iff.1 (Tuple.monotone_sort (fun i => -‖(z i : ℂ)‖) hij)
+    neg_le_neg_iff.1 (Tuple.monotone_sort (fun i => - ‖(z i : ℂ)‖) hij)
   have hW : W σ₀ ≠ 0 := by
     refine mul_ne_zero ?_ (evalAt_dPol_ne ht _ hw)
     rw [monomialChar_apply, Finset.prod_ne_zero_iff]

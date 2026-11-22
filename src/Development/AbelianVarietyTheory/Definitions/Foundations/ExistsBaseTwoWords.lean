@@ -28,7 +28,6 @@ section host
 
 variable {R : Ranks} (H : Host R)
 
-
 end host
 
 theorem isAlgebraic_exp (N : ℕ) : IsAlgebraic ℚ (Complex.exp (2 * Real.pi * Complex.I / N)) := by
@@ -36,8 +35,10 @@ theorem isAlgebraic_exp (N : ℕ) : IsAlgebraic ℚ (Complex.exp (2 * Real.pi * 
   · simpa using isAlgebraic_one
   · exact ((Complex.isPrimitiveRoot_exp N h.ne').isIntegral h).tower_top.isAlgebraic
 
-theorem exists_gens (E : Type) [Field E] [NumberField E] : ∃ S : Finset ℂ, (∀ z ∈ S, IsAlgebraic ℚ z) ∧
-    ∀ K : IntermediateField ℚ ℂ, (∀ z ∈ S, z ∈ K) → ∀ (τ : E →+* ℂ) x, τ x ∈ K := by
+theorem exists_gens (E : Type) [Field E] [NumberField E]
+    : ∃ S : Finset ℂ,
+      (∀ z ∈ S, IsAlgebraic ℚ z)
+        ∧ ∀ K : IntermediateField ℚ ℂ, (∀ z ∈ S, z ∈ K) → ∀ (τ : E →+* ℂ) x, τ x ∈ K := by
   classical
   let b := Module.finBasis ℚ E
   refine ⟨Finset.univ.image fun p : (E →+* ℂ) × Fin (Module.finrank ℚ E) => p.1 (b p.2), ?_, ?_⟩

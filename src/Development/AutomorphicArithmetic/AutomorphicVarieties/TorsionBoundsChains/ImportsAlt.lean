@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.kill :
-    ∀ (S : Type) [Group S] [Finite S] (j : ℕ) (z : HZ S (j + 1)), Nat.card S • z = 0 := by
+theorem UpperTheory.V.KH.kill
+    : ∀ (S : Type) [Group S] [Finite S] (j : ℕ) (z : HZ S (j + 1)), Nat.card S • z = 0 := by
   intro S _ _ j z
   classical
   haveI : Fintype S := Fintype.ofFinite S
@@ -19,22 +19,27 @@ theorem UpperTheory.V.KH.kill :
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [v, map_sum, perm_single]
     exact Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun _ => rfl)
-  let fi : (Rep.trivial ℤ S ℤ).ρ.IntertwiningMap (permRep S S).ρ :=
-    ⟨LinearMap.toSpanSingleton ℤ _ v, fun g => by
+  let fi : (Rep.trivial ℤ S ℤ).ρ.IntertwiningMap (permRep S S).ρ := ⟨
+    LinearMap.toSpanSingleton ℤ _ v,
+    fun g => by
       apply LinearMap.ext_ring
-      simp [Rep.trivial_ρ, permRep, hv]⟩
-  let gi : (permRep S S).ρ.IntertwiningMap (Rep.trivial ℤ S ℤ).ρ :=
-    ⟨aug S, fun g => by
+      simp [Rep.trivial_ρ, permRep, hv]
+  ⟩
+  let gi : (permRep S S).ρ.IntertwiningMap (Rep.trivial ℤ S ℤ).ρ := ⟨
+    aug S,
+    fun g => by
       apply Finsupp.lhom_ext
       intro x c
-      simp [Rep.trivial_ρ, permRep, perm_single, aug_single]⟩
-  have hcomp : ∀ a : Rep.trivial ℤ S ℤ,
-      (Rep.Hom.hom (Rep.ofHom gi)) ((Rep.Hom.hom (Rep.ofHom fi)) a) = Nat.card S • a := by
+      simp [Rep.trivial_ρ, permRep, perm_single, aug_single]
+  ⟩
+  have hcomp
+      : ∀ a : Rep.trivial ℤ S ℤ,
+        (Rep.Hom.hom (Rep.ofHom gi)) ((Rep.Hom.hom (Rep.ofHom fi)) a) = Nat.card S • a := by
     intro a
     change aug S (a • v) = Nat.card S • a
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [v, map_smul, map_sum, aug_single, Finset.sum_const, Finset.card_univ, smul_eq_mul,
-      nsmul_eq_mul, Nat.card_eq_fintype_card, mul_one]
+        nsmul_eq_mul, Nat.card_eq_fintype_card, mul_one]
     ring
   have hsub : Subsingleton (groupHomology (permRep S S) (j + 1)) := by
     obtain ⟨e⟩ := shapiro S S (1 : S) (j + 1)
@@ -46,8 +51,9 @@ theorem UpperTheory.V.KH.kill :
       simp only [mul_one] at ha' hb'
       subst ha' hb'
       rfl
-    have hz := ModuleCat.isZero_iff_subsingleton.mp
-      (isZero_groupHomology_succ_of_subsingleton
+    have hz :=
+      ModuleCat.isZero_iff_subsingleton.mp (isZero_groupHomology_succ_of_subsingleton
         (Rep.trivial ℤ (MulAction.stabilizer S (1 : S)) ℤ) j)
     exact e.injective.subsingleton
-  exact mapNsmul S (Rep.trivial ℤ S ℤ) (permRep S S) (Rep.ofHom fi) (Rep.ofHom gi) (Nat.card S) (j + 1) hcomp hsub z
+  exact mapNsmul S (Rep.trivial ℤ S ℤ) (permRep S S) (Rep.ofHom fi) (Rep.ofHom gi) (Nat.card S)
+    (j + 1) hcomp hsub z

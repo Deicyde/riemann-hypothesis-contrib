@@ -15,9 +15,10 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 variable {n : ℕ}
 
-theorem isHomogeneous_of_mem_minimalPrimes {I P : Ideal (MvPolynomial (Fin n) ℂ)}
-    (hI : I.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ)) (hP : P ∈ I.minimalPrimes) :
-    P.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) := by
+theorem isHomogeneous_of_mem_minimalPrimes
+    {I P : Ideal (MvPolynomial (Fin n) ℂ)}
+    (hI : I.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ)) (hP : P ∈ I.minimalPrimes)
+    : P.IsHomogeneous (homogeneousSubmodule (Fin n) ℂ) := by
   have hcore : (P.homogeneousCore (homogeneousSubmodule (Fin n) ℂ)).toIdeal.IsPrime :=
     hP.1.1.homogeneousCore
   have hle : I ≤ (P.homogeneousCore (homogeneousSubmodule (Fin n) ℂ)).toIdeal :=

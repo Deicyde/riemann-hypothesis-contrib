@@ -50,16 +50,19 @@ private lemma isUnit_of_inv_integral {R K : Type*} [CommRing R] [Field K] [Algeb
   simp only [eval_add, eval_mul, eval_X, eval_C] at h3
   exact isUnit_iff_exists_inv.2 ⟨-(eval a p.reverse.divX), by linear_combination -h3⟩
 
-theorem UpperTheory.integral_dvr_norm :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Subalgebra ℤ_[l] (PadicAlgCl l)) [IsDiscreteValuationRing O]
+theorem UpperTheory.integral_dvr_norm
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Subalgebra ℤ_[l] (PadicAlgCl l)) [IsDiscreteValuationRing O]
         [Module.Finite ℤ_[l] O],
-        (∀ x : PadicAlgCl l, ‖x‖ ≤ 1 → IsIntegral O x) ∧ (∀ a : O, ‖(a : PadicAlgCl l)‖ ≤ 1) ∧
-          ∀ a : O, ¬ IsUnit a → ‖(a : PadicAlgCl l)‖ < 1 := by
+      (∀ x : PadicAlgCl l, ‖x‖ ≤ 1 → IsIntegral O x) ∧ (∀ a : O, ‖(a : PadicAlgCl l)‖ ≤ 1)
+        ∧ ∀ a : O, ¬ IsUnit a → ‖(a : PadicAlgCl l)‖ < 1 := by
   intro l _ O _ _
   have hfin : ∀ a : O, IsIntegral ℤ_[l] (a : PadicAlgCl l) := fun a =>
     (Algebra.IsIntegral.isIntegral (R := ℤ_[l]) a).map O.val
-  refine ⟨fun x hx => (integral_of_norm x hx).tower_top, fun a => norm_of_integral _ (hfin a),
-    fun a ha => lt_of_le_of_ne (norm_of_integral _ (hfin a)) fun h1 => ha ?_⟩
+  refine ⟨
+    fun x hx => (integral_of_norm x hx).tower_top,
+    fun a => norm_of_integral _ (hfin a),
+    fun a ha => lt_of_le_of_ne (norm_of_integral _ (hfin a)) fun h1 => ha ?_
+  ⟩
   have ha0 : (a : PadicAlgCl l) ≠ 0 := by
     intro h
     simp [h] at h1

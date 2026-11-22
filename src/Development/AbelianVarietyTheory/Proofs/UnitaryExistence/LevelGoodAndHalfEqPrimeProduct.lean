@@ -13,16 +13,21 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.Numerica
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
 
 namespace GlobalTheory.LevelHalf
 
-theorem map_comap_half (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (l : Level H)
-    (hrt : (H.rt : D.host.E) = D.host.sqrtMinusD) :
-    (l.Mb.comap (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))).map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) = l.Mb := by
+theorem map_comap_half
+    (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E)
+    (l : Level H) (hrt : (H.rt : D.host.E) = D.host.sqrtMinusD)
+    : (l.Mb.comap (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))).map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))
+      = l.Mb := by
   refine le_antisymm Ideal.map_comap_le ?_
   have hw : algebraMap (𝓞 D.host.K) (𝓞 D.host.E) (LPb.w0K D) = H.w0 := by
     apply RingOfIntegers.ext
@@ -42,16 +47,23 @@ theorem map_comap_half (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.To
   obtain ⟨b, rfl⟩ := hr
   exact Ideal.mem_map_of_mem _ ha
 
-theorem exists_prime_half (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (l : Level H)
-    (hrt : (H.rt : D.host.E) = D.host.sqrtMinusD) {p : ℕ} (hp : p.Prime) (hpM : p ∣ l.M) :
-    ∃ pb : HeightOneSpectrum (𝓞 D.host.K), (p : 𝓞 D.host.K) ∈ pb.asIdeal ∧
-      pb.asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) = l.Mb ⊔ Ideal.span {(p : 𝓞 D.host.E)} := by
+theorem exists_prime_half
+    (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E)
+    (l : Level H) (hrt : (H.rt : D.host.E) = D.host.sqrtMinusD)
+    {p : ℕ} (hp : p.Prime) (hpM : p ∣ l.M)
+    : ∃ pb : HeightOneSpectrum (𝓞 D.host.K),
+      (p : 𝓞 D.host.K) ∈ pb.asIdeal
+        ∧ pb.asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))
+          = l.Mb ⊔ Ideal.span {(p : 𝓞 D.host.E)} := by
   set I : Ideal (𝓞 D.host.K) := l.Mb.comap (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) ⊔
     Ideal.span {(p : 𝓞 D.host.K)} with hI
-  have hmap : I.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) = l.Mb ⊔ Ideal.span {(p : 𝓞 D.host.E)} := by
-    rw [hI, Ideal.map_sup, map_comap_half D H l hrt, Ideal.map_span, Set.image_singleton, map_natCast]
-  have hbar : (Ideal.span {(p : 𝓞 D.host.E)}).map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) =
-      Ideal.span {(p : 𝓞 D.host.E)} := by
+  have hmap
+      : I.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) = l.Mb ⊔ Ideal.span {(p : 𝓞 D.host.E)} := by
+    rw [hI, Ideal.map_sup, map_comap_half D H l hrt, Ideal.map_span, Set.image_singleton,
+      map_natCast]
+  have hbar
+      : (Ideal.span {(p : 𝓞 D.host.E)}).map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E)
+        = Ideal.span {(p : 𝓞 D.host.E)} := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have hnt := LPb.span_p_ne_top D hp
   have hle : Ideal.span {(p : 𝓞 D.host.K)} ≤ I := le_sup_right
@@ -66,9 +78,11 @@ theorem exists_prime_half (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo
       rw [hieq, Ideal.map_top] at hmap
       have hmap' := congrArg (Ideal.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E)) hmap
       rw [Ideal.map_top, Ideal.map_sup, hbar] at hmap'
-      have hc := (Ideal.isCoprime_iff_sup_eq.2 hmap.symm).mul_left (Ideal.isCoprime_iff_sup_eq.2 hmap'.symm)
-      rw [l.prod, Ideal.isCoprime_iff_sup_eq, sup_eq_right.2
-        (Ideal.span_singleton_le_span_singleton.2 (Nat.cast_dvd_cast hpM))] at hc
+      have hc :=
+        (Ideal.isCoprime_iff_sup_eq.2 hmap.symm).mul_left (Ideal.isCoprime_iff_sup_eq.2 hmap'.symm)
+      rw [l.prod, Ideal.isCoprime_iff_sup_eq,
+          sup_eq_right.2 (Ideal.span_singleton_le_span_singleton.2 (Nat.cast_dvd_cast hpM))]
+        at hc
       exact hnt hc
     · rfl
     · exfalso
@@ -91,8 +105,9 @@ theorem exists_prime_half (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo
     exact hp.ne_zero hieq.symm
   exact ⟨⟨I, hprime, hne⟩, hle (Ideal.subset_span rfl), hmap⟩
 
-theorem eq_mul_sup {R : Type*} [CommRing R] (I : Ideal R) {a b : R} (hab : IsCoprime a b) (h : a * b ∈ I) :
-    I = (I ⊔ Ideal.span {a}) * (I ⊔ Ideal.span {b}) := by
+theorem eq_mul_sup
+    {R : Type*} [CommRing R] (I : Ideal R) {a b : R} (hab : IsCoprime a b) (h : a * b ∈ I)
+    : I = (I ⊔ Ideal.span {a}) * (I ⊔ Ideal.span {b}) := by
   apply le_antisymm
   · intro x hx
     obtain ⟨u, v, huv⟩ := hab
@@ -107,9 +122,20 @@ theorem eq_mul_sup {R : Type*} [CommRing R] (I : Ideal R) {a b : R} (hab : IsCop
     exact sup_le (sup_le Ideal.mul_le_left Ideal.mul_le_left)
       (sup_le Ideal.mul_le_right ((Ideal.span_singleton_le_iff_mem _).2 h))
 
-theorem good_and_half_eq_prod : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (l : Level H), (H.rt : D.host.E) = D.host.sqrtMinusD → l.M = D.host.g 0 * D.host.g 1 → (∀ p : ℕ, p.Prime → l.GoodAt p) ∧ ∃ pb : Fin 2 → HeightOneSpectrum (𝓞 D.host.K), (∀ k, ((D.host.g k : ℕ) : 𝓞 D.host.K) ∈ (pb k).asIdeal) ∧ l.Mb = ∏ k, (pb k).asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) := by
+theorem good_and_half_eq_prod
+    : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (l : Level H),
+      (H.rt : D.host.E) = D.host.sqrtMinusD → l.M = D.host.g 0 * D.host.g 1
+        → (∀ p : ℕ, p.Prime → l.GoodAt p)
+          ∧ ∃ pb : Fin 2 → HeightOneSpectrum (𝓞 D.host.K),
+            (∀ k, ((D.host.g k : ℕ) : 𝓞 D.host.K) ∈ (pb k).asIdeal)
+              ∧ l.Mb = ∏ k, (pb k).asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) := by
   intro D H l hrt hM
-  refine ⟨fun p _ => GlobalTheory.PinNum.goodAt_of_two_primes l (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne hM p, ?_⟩
+  refine ⟨
+    fun p _ =>
+      GlobalTheory.PinNum.goodAt_of_two_primes l (D.host.g_prime 0) (D.host.g_prime 1) D.host.g_ne
+        hM p,
+    ?_
+  ⟩
   have hd : ∀ k : Fin 2, D.host.g k ∣ l.M := by
     intro k
     rw [hM]
@@ -120,7 +146,8 @@ theorem good_and_half_eq_prod : ∀ (D : D7) (H : ReciprocityTheory.ChartRestric
   refine ⟨pb, h1, ?_⟩
   rw [Fin.prod_univ_two, h2 0, h2 1]
   apply eq_mul_sup
-  · exact Nat.Coprime.cast ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).2 D.host.g_ne)
+  · exact Nat.Coprime.cast ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).2
+      D.host.g_ne)
   · rw [← Nat.cast_mul, ← hM]
     have : Ideal.span {((l.M : ℕ) : 𝓞 D.host.E)} ≤ l.Mb := l.prod ▸ Ideal.mul_le_left
     exact this (Ideal.subset_span rfl)

@@ -15,12 +15,17 @@ variable (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
 local notation3 "L⁺" => maximalRealSubfield L
 
 theorem exists_place : Nonempty (IsDedekindDomain.HeightOneSpectrum (𝓞 L⁺)) := by
-  obtain ⟨I, hbot, htop⟩ := Ring.not_isField_iff_exists_ideal_bot_lt_and_lt_top.mp
-    (NumberField.RingOfIntegers.not_isField L⁺)
+  obtain ⟨I, hbot, htop⟩ :=
+    Ring.not_isField_iff_exists_ideal_bot_lt_and_lt_top.mp (NumberField.RingOfIntegers.not_isField
+      L⁺)
   obtain ⟨M, hM, hIM⟩ := Ideal.exists_le_maximal I htop.ne
-  exact ⟨⟨M, hM.isPrime, fun h => by
-    rw [h] at hIM
-    exact hbot.ne' (le_bot_iff.mp hIM)⟩⟩
+  exact ⟨⟨
+    M,
+    hM.isPrime,
+    fun h => by
+      rw [h] at hIM
+      exact hbot.ne' (le_bot_iff.mp hIM)
+  ⟩⟩
 
 instance nontrivial_AFplus : Nontrivial (AFplus L) := by
   obtain ⟨v⟩ := exists_place L

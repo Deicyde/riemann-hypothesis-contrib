@@ -11,8 +11,9 @@ noncomputable section
 
 namespace PI.AprimeInfW
 
-open MeasureTheory Topology Filter Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal
+open MeasureTheory Topology Filter Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal
 open scoped TensorProduct
 
 theorem rmulFacts_holds : RmulFacts := by
@@ -24,8 +25,18 @@ theorem rmulFacts_holds : RmulFacts := by
     intro a
     unfold rmulT
     refine continuous_pi fun b => continuous_pi fun i => ?_
-    exact continuous_finsetSum _ fun c _ => continuous_const.mul ((continuous_apply i).comp (continuous_apply c))
-  refine ⟨fun a => (hcont a).measurable, ?_, ?_, ?_, ?_, ?_, fun K hK => hK.isClosed.measurableSet, hcont⟩
+    exact continuous_finsetSum _ fun c _ =>
+      continuous_const.mul ((continuous_apply i).comp (continuous_apply c))
+  refine ⟨
+    fun a => (hcont a).measurable,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun K hK => hK.isClosed.measurableSet,
+    hcont
+  ⟩
   · intro a b Y
     funext b' i
     simp only [rmulT, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]

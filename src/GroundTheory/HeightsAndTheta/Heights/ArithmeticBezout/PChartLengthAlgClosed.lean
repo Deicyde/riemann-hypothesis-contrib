@@ -15,13 +15,13 @@ open MvPolynomial
 
 noncomputable section
 
-theorem ChartLengthAlgClosed.proof (h₂ : SpecFirstMemIncIdeal.Statement)
-    (h₃ : ChartFinite.Statement) (h₄ : LengthFiniteAlgebra.Statement) (h₅ : ChartMaxIdeals.Statement)
-    (h₆ : ChartLocalOrder.Statement) (h₇ : ChartResidueDegreeAlgClosed.Statement) :
-    ChartLengthAlgClosed.Statement := by
+theorem ChartLengthAlgClosed.proof
+    (h₂ : SpecFirstMemIncIdeal.Statement) (h₃ : ChartFinite.Statement)
+    (h₄ : LengthFiniteAlgebra.Statement) (h₅ : ChartMaxIdeals.Statement)
+    (h₆ : ChartLocalOrder.Statement) (h₇ : ChartResidueDegreeAlgClosed.Statement)
+    : ChartLengthAlgClosed.Statement := by
   intro F _ _ n e I f t u q p _ hI hf hu hq hp hqt
   classical
-
   have hpt : specFirst f t ∉ p := by
     rw [hp, Ideal.mem_span_singleton]
     exact hqt

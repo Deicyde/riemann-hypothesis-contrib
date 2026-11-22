@@ -17,14 +17,29 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
 
-theorem isCompatChart_atlas {e : ℕ} {X : Type*} [TopologicalSpace X] (A : FinHolAtlas e X) (j : Fin A.n) :
-    IsCompatChart A (A.chart j) :=
-  fun k => ⟨A.holo k j, A.holo j k⟩
+theorem isCompatChart_atlas
+    {e : ℕ} {X : Type*} [TopologicalSpace X] (A : FinHolAtlas e X) (j : Fin A.n)
+    : IsCompatChart A (A.chart j) := fun k =>
+  ⟨A.holo k j, A.holo j k⟩
 
-theorem potential_pos_of_section :
-    ∀ (II : IntersectionSystem) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (E : Ψ → Type) [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)] (D : ComponentData II Ψ K ι Ω E) (M : XModel D) (Φ : LocPot M.Xc), IsPotential M.atlas Φ → (∀ x, ∀ y₀ ∈ (Φ).U x ∩ Set.univ, ∃ U : Set M.Xc, IsOpen U ∧ y₀ ∈ U ∧ U ⊆ (Φ).U x ∩ Set.univ ∧ ∃ s : M.Xc → (Σ k, ι k) → ℂ, (∀ y' ∈ U, s y' ∈ mcPts (mCoordIdeal D.y) ∧ M.proj (s y') = y') ∧ (∀ p, M.atlas.HoloOn U fun y' => s y' p) ∧ ∃ G : M.Xc → ℂ, M.atlas.HoloOn U G ∧ ∀ y' ∈ U, (Φ).φ x y' - (fun z => Real.log (D.A'.h z)) (s y') = (G y').re) → IsPosPot M.atlas Φ := by
+theorem potential_pos_of_section
+    : ∀ (II : IntersectionSystem) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (K : Type) [Fintype K]
+        (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (E : Ψ → Type)
+        [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)] (D : ComponentData II Ψ K ι Ω E)
+        (M : XModel D) (Φ : LocPot M.Xc),
+      IsPotential M.atlas Φ
+        → (∀ x, ∀ y₀ ∈ (Φ).U x ∩ Set.univ, ∃ U : Set M.Xc,
+          IsOpen U ∧ y₀ ∈ U ∧ U ⊆ (Φ).U x ∩ Set.univ
+            ∧ ∃ s : M.Xc → (Σ k, ι k) → ℂ,
+              (∀ y' ∈ U, s y' ∈ mcPts (mCoordIdeal D.y) ∧ M.proj (s y') = y')
+                ∧ (∀ p, M.atlas.HoloOn U fun y' => s y' p)
+                ∧ ∃ G : M.Xc → ℂ,
+                  M.atlas.HoloOn U G
+                    ∧ ∀ y' ∈ U, (Φ).φ x y' - (fun z => Real.log (D.A'.h z)) (s y') = (G y').re)
+        → IsPosPot M.atlas Φ := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D M Φ hΦ hloc x j y hy v hv
   classical
   set e := M.atlas.chart j with he
@@ -38,7 +53,8 @@ theorem potential_pos_of_section :
   set τ : (Fin D.n → ℂ) → (Σ k, ι k) → ℂ := fun u => s (e.symm u) with hτdef
   have hτ : AnalyticOnNhd ℂ τ V := fun u hu => analyticAt_pi_iff.2 fun p => hsh p j u hu
   have hg : AnalyticAt ℂ (G ∘ e.symm) y := hG j y hyV
-  have hτmem : ∀ u ∈ V, τ u ∈ mcPts (mCoordIdeal D.y) ∧ M.proj (τ u) = e.symm u := fun u hu => hs _ hu.2
+  have hτmem : ∀ u ∈ V, τ u ∈ mcPts (mCoordIdeal D.y) ∧ M.proj (τ u) = e.symm u := fun u hu =>
+    hs _ hu.2
   have hz : τ y ∈ mcPts (mCoordIdeal D.y) := (hτmem y hyV).1
   have hpz : M.proj (τ y) = e.symm y := (hτmem y hyV).2
   have hτy : AnalyticAt ℂ τ y := hτ y hyV
@@ -78,7 +94,8 @@ theorem potential_pos_of_section :
     have h1 : fderiv ℂ F (τ y) w = v := by
       refine (hFγ.comp_hasDerivAt (0 : ℂ) hγw).unique (hLd.congr_of_eventuallyEq ?_)
       filter_upwards [hLn, hWγ] with σ hσ hσW
-      rw [Function.comp_apply, ← (hF (γ σ) ⟨hσW, (hτmem _ hσ).1⟩).2, (hτmem _ hσ).2, e.right_inv hσ.1]
+      rw [Function.comp_apply, ← (hF (γ σ) ⟨hσW, (hτmem _ hσ).1⟩).2, (hτmem _ hσ).2,
+        e.right_inv hσ.1]
     set δ : ℂ → (Σ k, ι k) → ℂ := fun σ => torusSmul (fun k => Complex.exp (σ * c k)) (τ y) with hδ
     have hδ0 : δ 0 = τ y := by
       funext p
@@ -108,11 +125,12 @@ theorem potential_pos_of_section :
   have hc1 : ContDiffAt ℝ 2 ((fun z => Real.log (D.A'.h z)) ∘ τ) y :=
     hlogA.comp y (hτy.restrictScalars.contDiffAt (n := 2))
   have hc2 : ContDiffAt ℝ 2 (fun u => ((G ∘ e.symm) u).re) y := by
-    have h := (Complex.reCLM.contDiff (n := 2)).contDiffAt.comp y
-      (hg.restrictScalars.contDiffAt (n := 2))
+    have h :=
+      (Complex.reCLM.contDiff (n := 2)).contDiffAt.comp y (hg.restrictScalars.contDiffAt (n := 2))
     simpa only [Function.comp_def, Complex.reCLM_apply] using h
-  have hev : (Φ.φ x ∘ e.symm) =ᶠ[𝓝 y]
-      fun u => ((fun z => Real.log (D.A'.h z)) ∘ τ) u + (1 : ℝ) * ((G ∘ e.symm) u).re := by
+  have hev
+      : (Φ.φ x ∘ e.symm) =ᶠ[𝓝 y]
+        fun u => ((fun z => Real.log (D.A'.h z)) ∘ τ) u + (1 : ℝ) * ((G ∘ e.symm) u).re := by
     filter_upwards [hVn] with u hu
     have := hrel _ hu.2
     simp only [Function.comp_apply, one_mul, hτdef]

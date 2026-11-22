@@ -11,8 +11,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR
 
-theorem exists_nhds_zero_add_invariant_of_isTest {X : Type} [UniformSpace X] [AddCommGroup X] [IsUniformAddGroup X] {f : X → ℂ}
-    (hf : IsTest f) : ∃ U ∈ 𝓝 (0 : X), ∀ Y : X, ∀ u ∈ U, f (Y + u) = f Y := by
+theorem exists_nhds_zero_add_invariant_of_isTest
+    {X : Type} [UniformSpace X] [AddCommGroup X] [IsUniformAddGroup X] {f : X → ℂ} (hf : IsTest f)
+    : ∃ U ∈ 𝓝 (0 : X), ∀ Y : X, ∀ u ∈ U, f (Y + u) = f Y := by
   obtain ⟨hlc, hcs⟩ := hf
 
   have hK : IsCompact (tsupport f) := hcs
@@ -44,13 +45,16 @@ theorem exists_nhds_zero_add_invariant_of_isTest {X : Type} [UniformSpace X] [Ad
   by_contra hne
   exact h3 ⟨⟨_, ⟨_, rfl⟩, _, ⟨_, rfl⟩, rfl⟩, fun h => hne (sub_eq_zero.1 h)⟩
 
-theorem fourG_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-    [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ), IsStdChar ψ →
-    ∀ f' : Gl r F → ℂ, IsTest f' → IsTest (fourG M ψ f') := by
+theorem fourG_isTest
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ → ∀ f' : Gl r F → ℂ, IsTest f' → IsTest (fourG M ψ f') := by
   intro F E _ _ _ _ _ r M ψ hψ f' hf
   have hU : ∃ U ∈ 𝓝 (0 : Gl r F), ∀ Y : Gl r F, ∀ u ∈ U, f' (Y + u) = f' Y := by
     exact exists_nhds_zero_add_invariant_of_isTest (X := Gl r F) (f := f') (by exact hf)
-  exact ⟨fourG_isLocallyConstant_of_invariant F E r M ψ hψ f' hf hU,
-    fourG_hasCompactSupport F E r M ψ hψ f' hf hU⟩
+  exact ⟨
+    fourG_isLocallyConstant_of_invariant F E r M ψ hψ f' hf hU,
+    fourG_hasCompactSupport F E r M ψ hψ f' hf hU
+  ⟩
 
 end GlobalTheory.JR

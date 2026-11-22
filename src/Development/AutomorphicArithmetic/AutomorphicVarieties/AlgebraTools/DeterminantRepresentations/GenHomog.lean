@@ -7,44 +7,58 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial UpperTheory.V.W
 
-private theorem coeff_scale {A : Type} [CommRing A] {m : ℕ} (P : MvPolynomial (Fin m) A) (s : Fin m →₀ ℕ) :
-    AddMonoidAlgebra.coeff ((MvPolynomial.aeval (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X])) P).coeff s.degree)
-      s
+private theorem coeff_scale
+    {A : Type} [CommRing A] {m : ℕ} (P : MvPolynomial (Fin m) A) (s : Fin m →₀ ℕ)
+    : AddMonoidAlgebra.coeff
+        ((MvPolynomial.aeval
+          (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
+          P).coeff s.degree)
+        s
       = AddMonoidAlgebra.coeff P s := by
   induction P using MvPolynomial.induction_on' with
   | monomial u a =>
-    have h : MvPolynomial.aeval (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
-        (MvPolynomial.monomial u a) = C (MvPolynomial.monomial u a) * X ^ u.degree := by
+    have h
+        : MvPolynomial.aeval
+            (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
+            (MvPolynomial.monomial u a)
+          = C (MvPolynomial.monomial u a) * X ^ u.degree := by
       rw [MvPolynomial.aeval_monomial, MvPolynomial.monomial_eq, Finsupp.prod, Finsupp.prod,
         show u.degree = ∑ i ∈ u.support, u i from rfl]
       simp only [mul_pow, Finset.prod_mul_distrib, ← C_pow, ← map_prod, Finset.prod_pow_eq_pow_sum,
         Polynomial.algebraMap_apply, MvPolynomial.algebraMap_eq, map_mul]
       ring
-    rw [h, Polynomial.C_mul_X_pow_eq_monomial, Polynomial.coeff_monomial_apply, MvPolynomial.coeff_monomial]
+    rw [h, Polynomial.C_mul_X_pow_eq_monomial, Polynomial.coeff_monomial_apply,
+      MvPolynomial.coeff_monomial]
     split_ifs with h1 h2 h2
     · rw [MvPolynomial.coeff_monomial, if_pos h2]
     · rw [MvPolynomial.coeff_monomial, if_neg h2]
     · exact absurd (congrArg Finsupp.degree h2) h1
     · simp
   | add p q hp hq =>
-    rw [map_add (f := _), Polynomial.coeff_add, MvPolynomial.coeff_add, hp, hq, MvPolynomial.coeff_add]
+    rw [map_add (f := _), Polynomial.coeff_add, MvPolynomial.coeff_add, hp, hq,
+      MvPolynomial.coeff_add]
 
-theorem UpperTheory.V.AlgebraTools.Det.genHomog :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (m : ℕ) (y : Fin m → MonoidAlgebra A G),
-    (D.D (MvPolynomial (Fin m) A) (GDet.gen y)).IsHomogeneous n := by
+theorem UpperTheory.V.AlgebraTools.Det.genHomog
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (m : ℕ)
+        (y : Fin m → MonoidAlgebra A G),
+      (D.D (MvPolynomial (Fin m) A) (GDet.gen y)).IsHomogeneous n := by
   intro n A G _ _ D m y
-  have hφ : (MvPolynomial.aeval (fun j => (C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))) =
-      (Polynomial.CAlgHom : MvPolynomial (Fin m) A →ₐ[A] (MvPolynomial (Fin m) A)[X]) :=
+  have hφ
+      : (MvPolynomial.aeval (fun j => (C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X])))
+        = (Polynomial.CAlgHom : MvPolynomial (Fin m) A →ₐ[A] (MvPolynomial (Fin m) A)[X]) :=
     MvPolynomial.algHom_ext fun i => by
       change _ = Polynomial.C (MvPolynomial.X i)
       simp
-  have hC : MvPolynomial.aeval (fun j => (C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
-      (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) = C (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
+  have hC
+      : MvPolynomial.aeval
+          (fun j => (C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
+          (D.D (MvPolynomial (Fin m) A) (GDet.gen y))
+        = C (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
     rw [hφ]
     rfl
-  have hgen (B : Type) [CommRing B] [Algebra A B] (b : Fin m → B) :
-      D.D B (∑ j, b j • MonoidAlgebra.mapRingHom G (algebraMap A B) (y j)) =
-        MvPolynomial.aeval b (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
+  have hgen (B : Type) [CommRing B] [Algebra A B] (b : Fin m → B)
+      : D.D B (∑ j, b j • MonoidAlgebra.mapRingHom G (algebraMap A B) (y j))
+        = MvPolynomial.aeval b (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
     rw [← D.nat (MvPolynomial (Fin m) A) B (MvPolynomial.aeval b)]
     congr 1
     set_option synthInstance.maxHeartbeats 100000 in
@@ -52,10 +66,12 @@ theorem UpperTheory.V.AlgebraTools.Det.genHomog :
     refine Finset.sum_congr rfl fun j _ => ?_
     ext g
     simp [MonoidAlgebra.mapRingHom]
-  have key : MvPolynomial.aeval (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
-      (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) = X ^ n * C (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
-    rw [← hgen _, ← hC, ← hgen _, ← D.homog,
-      Finset.smul_sum]
+  have key
+      : MvPolynomial.aeval
+          (fun j => (X * C (MvPolynomial.X j) : (MvPolynomial (Fin m) A)[X]))
+          (D.D (MvPolynomial (Fin m) A) (GDet.gen y))
+        = X ^ n * C (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
+    rw [← hgen _, ← hC, ← hgen _, ← D.homog, Finset.smul_sum]
     simp only [mul_smul]
   intro d hd
   have h1 := coeff_scale (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) d

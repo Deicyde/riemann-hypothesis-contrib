@@ -6,34 +6,49 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 
 namespace UpperTheory.Gal.W2
 
-private theorem formB_add_left {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
-    (a b c : VQ D) : formB L β (a + b) c = formB L β a c + formB L β b c := by
+private theorem formB_add_left
+    {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ) (a b c : VQ D)
+    : formB L β (a + b) c = formB L β a c + formB L β b c := by
   simp only [formB, map_add (f := _), LinearMap.add_apply]
 
-private theorem formB_nsmul_left {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
-    (n : ℕ) (a c : VQ D) : formB L β (n • a) c = n * formB L β a c := by
+private theorem formB_nsmul_left
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
+    (n : ℕ) (a c : VQ D)
+    : formB L β (n • a) c = n * formB L β a c := by
   simp only [formB, map_nsmul, LinearMap.smul_apply, nsmul_eq_mul]
 
-private theorem formB_add_right {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
-    (a b c : VQ D) : formB L β a (b + c) = formB L β a b + formB L β a c := by
+private theorem formB_add_right
+    {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ) (a b c : VQ D)
+    : formB L β a (b + c) = formB L β a b + formB L β a c := by
   simp only [formB, map_add (f := _)]
 
-private theorem formB_nsmul_right {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
-    (n : ℕ) (a c : VQ D) : formB L β a (n • c) = n * formB L β a c := by
+private theorem formB_nsmul_right
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
+    (n : ℕ) (a c : VQ D)
+    : formB L β a (n • c) = n * formB L β a c := by
   simp only [formB, map_nsmul, nsmul_eq_mul]
 
-private theorem formB_zsmul_right {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
-    (n : ℤ) (a c : VQ D) : formB L β a (n • c) = n * formB L β a c := by
+private theorem formB_zsmul_right
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (β : G.Cˣ)
+    (n : ℤ) (a c : VQ D)
+    : formB L β a (n • c) = n * formB L β a c := by
   simp only [formB, map_zsmul, zsmul_eq_mul]
 
-private theorem den_dvd_of_mul_eq_int (q : ℚ) (n : ℕ) (z : ℤ) (h : (n : ℚ) * q = z) : q.den ∣ n := by
+private theorem den_dvd_of_mul_eq_int (q : ℚ) (n : ℕ) (z : ℤ) (h : (n : ℚ) * q = z)
+    : q.den ∣ n := by
   have h1 : (n : ℤ) * q.num = z * q.den := by
     have h2 : (q.num : ℚ) = q * q.den := (Rat.mul_den_eq_num q).symm
     have h3 : (((n : ℤ) * q.num : ℤ) : ℚ) = ((z * q.den : ℤ) : ℚ) := by
@@ -69,16 +84,18 @@ theorem placeLoc_of : PlaceLoc := by
     | smul a x _ hx => exact zsmul_mem (hx trivial) a
   have hcl : AddSubgroup.closure ((S.image j : Finset (VQ D)) : Set (VQ D)) = j.range := by
     rw [Finset.coe_image, ← AddMonoidHom.map_closure, hcl0, AddMonoidHom.range_eq_map]
-  let M : AddSubgroup (VQ D) :=
-    { carrier := {w | ∃ (m : ℕ) (u : D'.La), m.Coprime p ∧ m • w = j u}
-      add_mem' := by
-        rintro a b ⟨m, u, hm, hu⟩ ⟨m', u', hm', hu'⟩
-        refine ⟨m * m', m' • u + m • u', hm.mul_left hm', ?_⟩
-        rw [map_add (f := _), map_nsmul, map_nsmul, ← hu, ← hu', smul_add, smul_smul, smul_smul, mul_comm m' m]
-      zero_mem' := ⟨1, 0, Nat.coprime_one_left p, by simp⟩
-      neg_mem' := by
-        rintro a ⟨m, u, hm, hu⟩
-        exact ⟨m, -u, hm, by rw [map_neg, ← hu, smul_neg]⟩ }
+  let M : AddSubgroup (VQ D) := {
+    carrier := {w | ∃ (m : ℕ) (u : D'.La), m.Coprime p ∧ m • w = j u}
+    add_mem' := by
+      rintro a b ⟨m, u, hm, hu⟩ ⟨m', u', hm', hu'⟩
+      refine ⟨m * m', m' • u + m • u', hm.mul_left hm', ?_⟩
+      rw [map_add (f := _), map_nsmul, map_nsmul, ← hu, ← hu', smul_add, smul_smul, smul_smul,
+        mul_comm m' m]
+    zero_mem' := ⟨1, 0, Nat.coprime_one_left p, by simp⟩
+    neg_mem' := by
+      rintro a ⟨m, u, hm, hu⟩
+      exact ⟨m, -u, hm, by rw [map_neg, ← hu, smul_neg]⟩
+  }
   have hM : ∀ w, w ∈ M ↔ ∃ (m : ℕ) (u : D'.La), m.Coprime p ∧ m • w = j u := fun w => Iff.rfl
   refine ⟨M, ⟨?_, S.image j, ?_, ?_⟩, ⟨s0 / 2, by positivity, ?_⟩, fun w => (hM w).symm⟩
   · rintro c w ⟨m, u, hm, h⟩
@@ -88,10 +105,11 @@ theorem placeLoc_of : PlaceLoc := by
     obtain ⟨m, u, hm, h⟩ := hspan w
     have hu : j u ∈ AddSubgroup.closure ((S.image j : Finset (VQ D)) : Set (VQ D)) := hcl ▸ ⟨u, rfl⟩
     have hu' : j u ∈ Submodule.span ℚ ((S.image j : Finset (VQ D)) : Set (VQ D)) :=
-      (AddSubgroup.closure_le (Submodule.span ℚ ((S.image j : Finset (VQ D)) : Set (VQ D))).toAddSubgroup).2
-        Submodule.subset_span hu
+      (AddSubgroup.closure_le (Submodule.span ℚ
+        ((S.image j : Finset (VQ D)) : Set (VQ D))).toAddSubgroup).2 Submodule.subset_span hu
     have hw : w = (m : ℚ)⁻¹ • j u := by
-      rw [← h, ← Nat.cast_smul_eq_nsmul ℚ, smul_smul, inv_mul_cancel₀ (by exact_mod_cast hm), one_smul]
+      rw [← h, ← Nat.cast_smul_eq_nsmul ℚ, smul_smul, inv_mul_cancel₀ (by exact_mod_cast hm),
+        one_smul]
     rw [hw]
     exact Submodule.smul_mem _ _ hu'
   · intro w
@@ -122,7 +140,8 @@ theorem placeLoc_of : PlaceLoc := by
           obtain ⟨r, hr⟩ := Finset.dvd_prod_of_mem (fun x => (s0 / 2 * formB L β w (j x)).den) hx
           refine ⟨r * (s0 / 2 * formB L β w (j x)).num, ?_⟩
           have h2 := Rat.mul_den_eq_num (s0 / 2 * formB L β w (j x))
-          change (((r : ℤ) * (s0 / 2 * formB L β w (j x)).num : ℤ) : ℚ) = ((∏ x ∈ S, (s0 / 2 * formB L β w (j x)).den : ℕ) : ℚ) * _
+          change (((r : ℤ) * (s0 / 2 * formB L β w (j x)).num : ℤ) : ℚ)
+            = ((∏ x ∈ S, (s0 / 2 * formB L β w (j x)).den : ℕ) : ℚ) * _
           rw [hr]
           push_cast
           rw [← h2]
@@ -150,12 +169,13 @@ theorem placeLoc_of : PlaceLoc := by
           rw [hb]
           ring
       choose c hc using hint
-      let f : D'.La →ₗ[ℤ] ℤ := AddMonoidHom.toIntLinearMap (AddMonoidHom.mk' c (fun a b => by
-        have h3 : ((c (a + b) : ℤ) : ℚ) = ((c a + c b : ℤ) : ℚ) := by
-          push_cast
-          rw [hc, hc, hc, map_add (f := _), formB_add_right]
-          ring
-        exact_mod_cast h3))
+      let f : D'.La →ₗ[ℤ] ℤ :=
+        AddMonoidHom.toIntLinearMap (AddMonoidHom.mk' c (fun a b => by
+          have h3 : ((c (a + b) : ℤ) : ℚ) = ((c a + c b : ℤ) : ℚ) := by
+            push_cast
+            rw [hc, hc, hc, map_add (f := _), formB_add_right]
+            ring
+          exact_mod_cast h3))
       obtain ⟨x, hx⟩ := hperf f
       obtain ⟨z, hz⟩ : ∃ z, z + j x = (e * m) • w := ⟨(e * m) • w - j x, sub_add_cancel _ _⟩
       have hs : s0 / 2 ≠ 0 := by positivity
@@ -173,8 +193,10 @@ theorem placeLoc_of : PlaceLoc := by
           rw [hz, formB_nsmul_left]
         rw [formB_add_left] at h3
         have h4 : s0 / 2 * formB L β z (j u) = 0 := by
-          have h5 : s0 / 2 * (formB L β z (j u) + formB L β (j x) (j u)) =
-              s0 / 2 * (((e * m : ℕ) : ℚ) * formB L β w (j u)) := by rw [h3]
+          have h5
+              : s0 / 2 * (formB L β z (j u) + formB L β (j x) (j u))
+                = s0 / 2 * (((e * m : ℕ) : ℚ) * formB L β w (j u)) := by
+            rw [h3]
           push_cast at h5
           linarith
         exact (mul_eq_zero.1 h4).resolve_left hs

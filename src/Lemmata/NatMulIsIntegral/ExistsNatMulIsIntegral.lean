@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace Bl.NatMulIsIntegral
 
-private theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (c : E) :
-    ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * c) := by
-  obtain ⟨y, hy, hint⟩ := IsAlgebraic.exists_integral_multiple
-    ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (Algebra.IsAlgebraic.isAlgebraic c))
+private theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (c : E)
+    : ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * c) := by
+  obtain ⟨y, hy, hint⟩ :=
+    IsAlgebraic.exists_integral_multiple ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr
+      (Algebra.IsAlgebraic.isAlgebraic c))
   obtain ⟨m, hm⟩ : ∃ m : ℕ, m = y.natAbs := ⟨_, rfl⟩
   rcases Int.natAbs_eq y with h | h <;> rw [← hm] at h <;> subst h
   · refine ⟨m, by omega, ?_⟩
@@ -18,11 +19,12 @@ private theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (
     have h2 := hint.neg
     simpa [zsmul_eq_mul] using h2
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {n : Nat}
-  {L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin n → E)} {z : Fin n → E},
-  Membership.mem.{0, 0} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) z →
-    Exists.{1} fun (N : Nat) ↦ And (LT.lt.{0} 0 N) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} N z)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {n : Nat}
+        {L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin n → E)} {z : Fin n → E},
+      Membership.mem.{0, 0} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L)) z
+        → Exists.{1} fun (N : Nat) ↦
+          And (LT.lt.{0} 0 N) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} N z)) := by
   intro E _ _ n L z hz
   induction hz using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩
@@ -39,7 +41,8 @@ theorem goal1 :
     obtain ⟨a, ha, hax⟩ := hx
     obtain ⟨d, hd, hdi⟩ := exists_nat_mul_isIntegral c
     refine ⟨d * a, Nat.mul_pos hd ha, ?_⟩
-    have key : (⟨(d : E) * c, hdi⟩ : NumberField.RingOfIntegers E) • (a • x) = (d * a) • (c • x) := by
+    have key
+        : (⟨(d : E) * c, hdi⟩ : NumberField.RingOfIntegers E) • (a • x) = (d * a) • (c • x) := by
       rw [algebra_compatible_smul E (⟨(d : E) * c, hdi⟩ : NumberField.RingOfIntegers E)]
       show ((d : E) * c) • (a • x) = _
       rw [mul_smul, smul_comm c a x, Nat.cast_smul_eq_nsmul E, smul_smul]

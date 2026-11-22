@@ -14,16 +14,17 @@ open scoped ComplexOrder
 
 namespace HadamardPSDAux
 
-theorem det_eq_zero_of_diag_eq_zero {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSemidef)
-    {i : Fin n} (hi : A i i = 0) : A.det = 0 := by
-  have h0 : star (Pi.single i (1 : ℂ)) ⬝ᵥ A *ᵥ Pi.single i 1 = 0 := by
-    simpa using hi
+theorem det_eq_zero_of_diag_eq_zero
+    {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSemidef) {i : Fin n} (hi : A i i = 0)
+    : A.det = 0 := by
+  have h0 : star (Pi.single i (1 : ℂ)) ⬝ᵥ A *ᵥ Pi.single i 1 = 0 := by simpa using hi
   have hcol := (hA.dotProduct_mulVec_zero_iff).mp h0
   refine det_eq_zero_of_column_eq_zero i fun k => ?_
   simpa using congrFun hcol k
 
-theorem le_of_diag_pos {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSemidef)
-    (hpos : ∀ i, 0 < (A i i).re) : ‖A.det‖ ≤ ∏ i, ‖A i i‖ := by
+theorem le_of_diag_pos
+    {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSemidef) (hpos : ∀ i, 0 < (A i i).re)
+    : ‖A.det‖ ≤ ∏ i, ‖A i i‖ := by
   set d : Fin n → ℝ := fun i => (A i i).re with hd_def
   have hAd : ∀ i, A i i = (d i : ℂ) := by
     intro i
@@ -48,9 +49,11 @@ theorem le_of_diag_pos {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSem
     simp only [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one] at h
     simpa using (congrArg Complex.re h).symm
   have hprod : ∏ i, hB.1.eigenvalues i ≤ 1 := by
-    calc ∏ i, hB.1.eigenvalues i ≤ ∏ i, Real.exp (hB.1.eigenvalues i - 1) :=
-          prod_le_prod₀ (fun i _ => hB.eigenvalues_nonneg i)
-            (fun i _ => by linarith [Real.add_one_le_exp (hB.1.eigenvalues i - 1)])
+    calc
+      ∏ i, hB.1.eigenvalues i ≤ ∏ i, Real.exp (hB.1.eigenvalues i - 1) :=
+        prod_le_prod₀
+          (fun i _ => hB.eigenvalues_nonneg i)
+          (fun i _ => by linarith [Real.add_one_le_exp (hB.1.eigenvalues i - 1)])
       _ = Real.exp (∑ i, (hB.1.eigenvalues i - 1)) := (Real.exp_sum _ _).symm
       _ = 1 := by simp [sum_sub_distrib, htr]
   have hnormB : ‖(D * A * D).det‖ ≤ 1 := by
@@ -64,13 +67,15 @@ theorem le_of_diag_pos {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.PosSem
     ring
   have key : ‖(D * A * D).det‖ * ∏ i, d i = ‖A.det‖ := by
     rw [hdetB, norm_mul, Complex.norm_of_nonneg (by positivity)]
-    calc (∏ i, c i) ^ 2 * ‖A.det‖ * ∏ i, d i = ‖A.det‖ * ∏ i, (c i * c i * d i) := by
-          rw [prod_mul_distrib, prod_mul_distrib]; ring
+    calc
+      (∏ i, c i) ^ 2 * ‖A.det‖ * ∏ i, d i
+        = ‖A.det‖ * ∏ i, (c i * c i * d i) := by rw [prod_mul_distrib, prod_mul_distrib]; ring
       _ = ‖A.det‖ := by simp [hcd]
   have hnd : ∀ i, ‖A i i‖ = d i := fun i => by rw [hAd i, Complex.norm_of_nonneg (hpos i).le]
   rw [← key, prod_congr rfl fun i _ => hnd i]
-  calc ‖(D * A * D).det‖ * ∏ i, d i ≤ 1 * ∏ i, d i :=
-        mul_le_mul_of_nonneg_right hnormB (prod_nonneg fun i _ => (hpos i).le)
+  calc
+    ‖(D * A * D).det‖ * ∏ i, d i
+      ≤ 1 * ∏ i, d i := mul_le_mul_of_nonneg_right hnormB (prod_nonneg fun i _ => (hpos i).le)
     _ = ∏ i, d i := one_mul _
 
 end HadamardPSDAux

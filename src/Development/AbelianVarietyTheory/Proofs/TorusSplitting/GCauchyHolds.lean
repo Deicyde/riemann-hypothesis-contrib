@@ -23,13 +23,14 @@ namespace GlobalTheory.ThetaTorus
 
 theorem gSup_holds : GSupStatement := gSup GlobalTheory.packingCount
 
-theorem propA_holds : PropAStatement := propA GlobalTheory.packingCount GlobalTheory.gaussTail_of_card_le
+theorem propA_holds : PropAStatement :=
+  propA GlobalTheory.packingCount GlobalTheory.gaussTail_of_card_le
 
 theorem dim_holds : DimStatement := dim
 
 theorem J_holds : JStatement :=
-  jOf GlobalTheory.ext_all_inputs GlobalTheory.T.greedy_splitting_principal_torus_exists GlobalTheory.charStatement_holds
-    (colTorus GlobalTheory.ext_all_inputs propA_holds gSup_holds)
+  jOf GlobalTheory.ext_all_inputs GlobalTheory.T.greedy_splitting_principal_torus_exists
+    GlobalTheory.charStatement_holds (colTorus GlobalTheory.ext_all_inputs propA_holds gSup_holds)
     (colAbel GlobalTheory.ext_all_inputs propA_holds gSup_holds)
     (colEmpty GlobalTheory.ext_all_inputs propA_holds gSup_holds)
 

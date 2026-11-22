@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsScheme
 
 section ProOpen
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory.HomExtProOpen
@@ -23,24 +25,30 @@ open GlobalTheory GlobalTheory.HomExt GlobalTheory.HomExtNormal
 
 theorem existsUnique_hom_extension_of_dvr
     (H : (∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K]
-      [Algebra T K] [IsFractionRing T K] (G G' : Over (Sp T)) [GrpObj G] [GrpObj G'],
-      IsSemiAbelian G → IsSemiAbelian G' →
-      ∀ f : (Over.pullback (spMap (algebraMap T K))).obj G ⟶
-        (Over.pullback (spMap (algebraMap T K))).obj G', IsMonHom f →
-      ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f))
-    (X U : Scheme.{0}) [IsLocallyNoetherian X] (j : U ⟶ X) (hX : Geo.Tor.IsNormalScheme X)
-    [IsPreimmersion j] [Flat j] [IsDominant j] [QuasiCompact j] (G G' : Over X) [GrpObj G] [GrpObj G']
+        [Algebra T K] [IsFractionRing T K] (G G' : Over (Sp T)) [GrpObj G] [GrpObj G'],
+      IsSemiAbelian G → IsSemiAbelian G'
+        → ∀ f
+            : (Over.pullback (spMap (algebraMap T K))).obj G
+              ⟶ (Over.pullback (spMap (algebraMap T K))).obj G',
+          IsMonHom f
+            → ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f))
+    (X U : Scheme.{0}) [IsLocallyNoetherian X]
+    (j : U ⟶ X)
+    (hX : Geo.Tor.IsNormalScheme X)
+    [IsPreimmersion j] [Flat j] [IsDominant j] [QuasiCompact j]
+    (G G' : Over X) [GrpObj G] [GrpObj G']
     (hG : IsSemiAbelian G) (hG' : IsSemiAbelian G')
-    (f : (Over.pullback j).obj G ⟶ (Over.pullback j).obj G') (hf : IsMonHom f) :
-    ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback j).map F = f := by
+    (f : (Over.pullback j).obj G ⟶ (Over.pullback j).obj G') (hf : IsMonHom f)
+    : ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback j).map F = f := by
   have := hG.smooth
   have := hG'.smooth
   have := hG.quasiCompact
   have := hG'.quasiCompact
   have := hG'.separated
   have : GlobalTheory.IsNormalScheme X := (GlobalTheory.isNormalScheme_iff X).mpr hX
-  have : GlobalTheory.IsNormalScheme G.left := (GlobalTheory.isNormalScheme_iff _).mpr
-    (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth G.hom hX)
+  have : GlobalTheory.IsNormalScheme G.left :=
+    (GlobalTheory.isNormalScheme_iff _).mpr
+      (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth G.hom hX)
   have : IsSchemeTheoreticallyDominant j := IsSchemeTheoreticallyDominant.of_isDominant j
   let u : pullback G.hom j ⟶ G.left := pullback.fst G.hom j
   let φ : pullback G.hom j ⟶ G'.left := f.left ≫ pullback.fst G'.hom j
@@ -52,7 +60,8 @@ theorem existsUnique_hom_extension_of_dvr
   have : Flat u := inferInstanceAs (Flat (pullback.fst G.hom j))
   have : QuasiCompact u := inferInstanceAs (QuasiCompact (pullback.fst G.hom j))
   have hus := isIso_stalkMap_of_flat_of_surjectiveOnStalks u
-  have : GlobalTheory.IsNormalScheme (pullback G.hom j) := GlobalTheory.IsNormalScheme.of_isIso_stalkMap u
+  have : GlobalTheory.IsNormalScheme (pullback G.hom j) :=
+    GlobalTheory.IsNormalScheme.of_isIso_stalkMap u
   let Γ := graphClosure G.hom G'.hom u φ huφ
   let p : Γ ⟶ G.left := graphClosure.fst G.hom G'.hom u φ huφ
   let q : Γ ⟶ G'.left := graphClosure.snd G.hom G'.hom u φ huφ
@@ -79,43 +88,51 @@ theorem existsUnique_hom_extension_of_dvr
     obtain ⟨F, s, -, -, hs₂, hs⟩ := exists_hom_along_dvr H j hG hG' f T _ a c hc
     have := schemeTheoreticallyDominant_fractionField T (FractionRing T)
     have hF : F.left ≫ pullback.snd G'.hom (a ≫ G.hom) = pullback.snd G.hom (a ≫ G.hom) := Over.w F
-    obtain ⟨l, ⟨hl, -⟩, -⟩ := graphClosure.existsUnique_lift G.hom G'.hom u φ huφ a
-      (s ≫ F.left ≫ pullback.fst G'.hom (a ≫ G.hom))
-      (by rw [Category.assoc, Category.assoc, pullback.condition, reassoc_of% hF, reassoc_of% hs₂])
-      (spMap (algebraMap T (FractionRing T))) c hc.symm hs
+    obtain ⟨l, ⟨hl, -⟩, -⟩ :=
+      graphClosure.existsUnique_lift G.hom G'.hom u φ huφ a
+        (s ≫ F.left ≫ pullback.fst G'.hom (a ≫ G.hom))
+        (by
+          rw [Category.assoc, Category.assoc, pullback.condition, reassoc_of% hF, reassoc_of% hs₂])
+        (spMap (algebraMap T (FractionRing T))) c hc.symm hs
     exact ⟨l (IsLocalRing.closedPoint T), by rw [← hl]; rfl⟩
   let Γ' : Over X := Over.mk (p ≫ G.hom)
   let p' : Γ' ⟶ G := Over.homMk p rfl
   let q' : Γ' ⟶ G' := Over.homMk q hpq.symm
   have : LocallyOfFiniteType p'.left := ‹LocallyOfFiniteType p›
-  have key : ∀ (k : Type) [Field k] (x : Sp k ⟶ Γ'.left) (n : ℕ),
-      x ≫ (p' ^ n).left = x ≫ (1 : Γ' ⟶ G).left → x ≫ (q' ^ n).left = x ≫ (1 : Γ' ⟶ G').left := by
+  have key
+      : ∀ (k : Type) [Field k] (x : Sp k ⟶ Γ'.left) (n : ℕ),
+        x ≫ (p' ^ n).left = x ≫ (1 : Γ' ⟶ G).left → x ≫ (q' ^ n).left = x ≫ (1 : Γ' ⟶ G').left := by
     intro k _ x n hx
     rcases mem_range_or_exists_dvr i (x default) with hw | ⟨T, _, _, _, a, c, hc, ha⟩
-    · obtain ⟨c, rfl⟩ := exists_lift_of_range_subset i x (by
-        rintro _ ⟨t, rfl⟩
-        rwa [Subsingleton.elim t default])
+    · obtain ⟨c, rfl⟩ :=
+        exists_lift_of_range_subset i x (by
+          rintro _ ⟨t, rfl⟩
+          rwa [Subsingleton.elim t default])
       exact comp_pow_eq_one_of_pullback_hom j f p' q' _ c
         (by rw [Category.assoc]; exact congrArg (c ≫ ·) hip.symm)
         (by rw [Category.assoc]; exact congrArg (c ≫ ·) hiq.symm) n hx
-    obtain ⟨F, s, _, hs₁, hs₂, hs⟩ := exists_hom_along_dvr H j hG hG' f T _ (a ≫ p) c
-      (by rw [← reassoc_of% hc, hip])
+    obtain ⟨F, s, _, hs₁, hs₂, hs⟩ :=
+      exists_hom_along_dvr H j hG hG' f T _ (a ≫ p) c (by rw [← reassoc_of% hc, hip])
     have := schemeTheoreticallyDominant_fractionField T (FractionRing T)
-    have hF : F.left ≫ pullback.snd G'.hom ((a ≫ p) ≫ G.hom) =
-      pullback.snd G.hom ((a ≫ p) ≫ G.hom) := Over.w F
+    have hF
+        : F.left ≫ pullback.snd G'.hom ((a ≫ p) ≫ G.hom) = pullback.snd G.hom ((a ≫ p) ≫ G.hom) :=
+      Over.w F
     have hb : s ≫ F.left ≫ pullback.fst G'.hom ((a ≫ p) ≫ G.hom) = a ≫ q := by
-      have := over_ext_of_schemeTheoreticallyDominant (Y := Over.mk ((a ≫ p) ≫ G.hom)) (X := G')
-        (spMap (algebraMap T (FractionRing T)))
-        (a := Over.homMk (s ≫ F.left ≫ pullback.fst G'.hom ((a ≫ p) ≫ G.hom)) (by
-          change (s ≫ F.left ≫ pullback.fst G'.hom ((a ≫ p) ≫ G.hom)) ≫ G'.hom = (a ≫ p) ≫ G.hom
-          rw [Category.assoc s, Category.assoc F.left, pullback.condition, reassoc_of% hF,
-            reassoc_of% hs₂]))
-        (b := Over.homMk (a ≫ q) (by
-          change (a ≫ q) ≫ G'.hom = (a ≫ p) ≫ G.hom
-          rw [Category.assoc, Category.assoc, hpq]))
-        (hs.trans (by
-          change _ = spMap (algebraMap T (FractionRing T)) ≫ a ≫ q
-          rw [← reassoc_of% hc, hiq]))
+      have :=
+        over_ext_of_schemeTheoreticallyDominant (Y := Over.mk ((a ≫ p) ≫ G.hom)) (X := G')
+          (spMap (algebraMap T (FractionRing T)))
+          (a :=
+            Over.homMk (s ≫ F.left ≫ pullback.fst G'.hom ((a ≫ p) ≫ G.hom)) (by
+              change (s ≫ F.left ≫ pullback.fst G'.hom ((a ≫ p) ≫ G.hom)) ≫ G'.hom = (a ≫ p) ≫ G.hom
+              rw [Category.assoc s, Category.assoc F.left, pullback.condition, reassoc_of% hF,
+                reassoc_of% hs₂]))
+          (b :=
+            Over.homMk (a ≫ q) (by
+              change (a ≫ q) ≫ G'.hom = (a ≫ p) ≫ G.hom
+              rw [Category.assoc, Category.assoc, hpq]))
+          (hs.trans (by
+            change _ = spMap (algebraMap T (FractionRing T)) ≫ a ≫ q
+            rw [← reassoc_of% hc, hiq]))
       exact congrArg CommaMorphism.left this
     let r : Sp (IsLocalRing.ResidueField T) ⟶ Sp T := spMap (IsLocalRing.residue T)
     have hr : x default ∈ Set.range (r ≫ a) := by
@@ -123,7 +140,8 @@ theorem existsUnique_hom_extension_of_dvr
       exact (Scheme.Hom.comp_apply r a _).trans
         ((congrArg a (IsLocalRing.comap_closedPoint (IsLocalRing.residue T))).trans ha)
     rw [field_point_comp_eq_iff _ _ x _ ⟨default, rfl⟩,
-      ← field_point_comp_eq_iff (Z := Γ'.left) _ _ (r ≫ a) _ hr] at hx ⊢
+        ← field_point_comp_eq_iff (Z := Γ'.left) _ _ (r ≫ a) _ hr]
+      at hx ⊢
     exact comp_pow_eq_one_of_pullback_hom _ F p' q' (r ≫ a) (r ≫ s)
       (by rw [Category.assoc, hs₁, Category.assoc]; rfl)
       (by rw [Category.assoc, hb, Category.assoc]; rfl) n hx
@@ -132,10 +150,12 @@ theorem existsUnique_hom_extension_of_dvr
   have : IsDominant (i ≫ p) := by rwa [hip]
   have : QuasiCompact (i ≫ p) := by rwa [hip]
   have hQ : IsOpenImmersion (p.quasiFiniteLocus.ι ≫ p) := isOpenImmersion_quasiFiniteLocus i p
-  have hgraph : ∀ w : Γ, ∃ (T : Scheme.{0}) (τ : T ⟶ X)
-      (F : (Over.pullback τ).obj G ⟶ (Over.pullback τ).obj G') (l : pullback G.hom τ ⟶ Γ)
-      (x : ↥(pullback G.hom τ)), IsMonHom F ∧ l ≫ p = pullback.fst G.hom τ ∧
-        l ≫ q = F.left ≫ pullback.fst G'.hom τ ∧ l x = w := by
+  have hgraph
+      : ∀ w : Γ,
+        ∃ (T : Scheme.{0}) (τ : T ⟶ X) (F : (Over.pullback τ).obj G ⟶ (Over.pullback τ).obj G')
+            (l : pullback G.hom τ ⟶ Γ) (x : ↥(pullback G.hom τ)),
+          IsMonHom F ∧ l ≫ p = pullback.fst G.hom τ ∧ l ≫ q = F.left ≫ pullback.fst G'.hom τ
+            ∧ l x = w := by
     intro w
     rcases mem_range_or_exists_dvr i w with ⟨c, rfl⟩ | ⟨T, _, _, _, a, c, hc, rfl⟩
     · exact ⟨U, j, f, i, c, hf, hip, hiq, rfl⟩
@@ -151,18 +171,20 @@ theorem existsUnique_hom_extension_of_dvr
     obtain ⟨F, hF, hFf⟩ := exists_hom_along_trait H j hG hG' f T (FractionRing T) t y hy
     have hFw : F.left ≫ pullback.snd G'.hom t = pullback.snd G.hom t := Over.w F
     let d : pullback (pullback.snd G.hom t) iK ⟶ pullback G.hom t := pullback.fst _ _
-    have : IsDominant d := isDominant_pullback_fst_of_isOpenMap iK (pullback.snd G.hom t)
-      (pullback.snd G.hom t).isOpenMap
-    have : GlobalTheory.IsNormalScheme (pullback G.hom t) := (GlobalTheory.isNormalScheme_iff _).mpr
-      (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth (pullback.snd G.hom t)
-        ((GlobalTheory.isNormalScheme_iff _).mp inferInstance))
+    have : IsDominant d :=
+      isDominant_pullback_fst_of_isOpenMap iK (pullback.snd G.hom t)
+        (pullback.snd G.hom t).isOpenMap
+    have : GlobalTheory.IsNormalScheme (pullback G.hom t) :=
+      (GlobalTheory.isNormalScheme_iff _).mpr
+        (forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth (pullback.snd G.hom t)
+          ((GlobalTheory.isNormalScheme_iff _).mp inferInstance))
     have : IsSchemeTheoreticallyDominant d := IsSchemeTheoreticallyDominant.of_isDominant d
     let v : pullback (pullback.snd G.hom t) iK ⟶ pullback G.hom (iK ≫ t) :=
       pullback.lift (d ≫ pullback.fst G.hom t) (pullback.snd _ iK) (by
         change (pullback.fst _ _ ≫ pullback.fst G.hom t) ≫ G.hom = _
-        rw [Category.assoc, pullback.condition, reassoc_of% (pullback.condition (f := pullback.snd G.hom t) (g := iK))])
-    have hv₁ : v ≫ pullback.fst G.hom (iK ≫ t) = d ≫ pullback.fst G.hom t :=
-      pullback.lift_fst _ _ _
+        rw [Category.assoc, pullback.condition,
+          reassoc_of% (pullback.condition (f := pullback.snd G.hom t) (g := iK))])
+    have hv₁ : v ≫ pullback.fst G.hom (iK ≫ t) = d ≫ pullback.fst G.hom t := pullback.lift_fst _ _ _
     have hv₂ : v ≫ pullback.snd G.hom (iK ≫ t) = pullback.snd _ iK := pullback.lift_snd _ _ _
     have hv : v ≫ pullMap iK t _ rfl G = d := by
       apply pullback.hom_ext
@@ -179,8 +201,9 @@ theorem existsUnique_hom_extension_of_dvr
       rw [← hv, Category.assoc, Category.assoc, hFf]
     have hcond : pullback.fst G.hom t ≫ G.hom = (F.left ≫ pullback.fst G'.hom t) ≫ G'.hom := by
       rw [Category.assoc, pullback.condition, pullback.condition, reassoc_of% hFw]
-    obtain ⟨l, ⟨hl₁, hl₂⟩, -⟩ := graphClosure.existsUnique_lift G.hom G'.hom u φ huφ
-      (pullback.fst G.hom t) (F.left ≫ pullback.fst G'.hom t) hcond d (v ≫ ρ) hw₁ hw₂
+    obtain ⟨l, ⟨hl₁, hl₂⟩, -⟩ :=
+      graphClosure.existsUnique_lift G.hom G'.hom u φ huφ (pullback.fst G.hom t)
+        (F.left ≫ pullback.fst G'.hom t) hcond d (v ≫ ρ) hw₁ hw₂
     let s : Sp T ⟶ pullback G.hom t := pullback.lift (a ≫ p) (𝟙 _) (by simp [t])
     have hs₁ : s ≫ pullback.fst G.hom t = a ≫ p := pullback.lift_fst _ _ _
     have hs₂ : s ≫ pullback.snd G.hom t = 𝟙 _ := pullback.lift_snd _ _ _
@@ -200,15 +223,18 @@ theorem existsUnique_hom_extension_of_dvr
         · rw [Category.assoc, hρ₂, reassoc_of% hv'₂]
       have h₃ : iK ≫ s ≫ F.left ≫ pullback.fst G'.hom t = iK ≫ a ≫ q := by
         rw [← reassoc_of% h₁, hFf, reassoc_of% h₂, ← reassoc_of% hc, hiq]
-      have := over_ext_of_schemeTheoreticallyDominant (Y := Over.mk t) (X := G') iK
-        (a := Over.homMk (s ≫ F.left ≫ pullback.fst G'.hom t) (by
-          change (s ≫ F.left ≫ pullback.fst G'.hom t) ≫ G'.hom = t
-          rw [Category.assoc s, Category.assoc F.left, pullback.condition, reassoc_of% hFw,
-            reassoc_of% hs₂]))
-        (b := Over.homMk (a ≫ q) (by
-          change (a ≫ q) ≫ G'.hom = (a ≫ p) ≫ G.hom
-          rw [Category.assoc, Category.assoc, hpq]))
-        h₃
+      have :=
+        over_ext_of_schemeTheoreticallyDominant (Y := Over.mk t) (X := G') iK
+          (a :=
+            Over.homMk (s ≫ F.left ≫ pullback.fst G'.hom t) (by
+              change (s ≫ F.left ≫ pullback.fst G'.hom t) ≫ G'.hom = t
+              rw [Category.assoc s, Category.assoc F.left, pullback.condition, reassoc_of% hFw,
+                reassoc_of% hs₂]))
+          (b :=
+            Over.homMk (a ≫ q) (by
+              change (a ≫ q) ≫ G'.hom = (a ≫ p) ≫ G.hom
+              rw [Category.assoc, Category.assoc, hpq]))
+          h₃
       exact congrArg CommaMorphism.left this
     have hsl : s ≫ l = a := by
       refine graphClosure.hom_ext G.hom G'.hom u φ huφ ?_ ?_
@@ -216,8 +242,17 @@ theorem existsUnique_hom_extension_of_dvr
         rw [Category.assoc, hl₁, hs₁]
       · change (s ≫ l) ≫ q = a ≫ q
         rw [Category.assoc, hl₂, hq]
-    exact ⟨Sp T, t, F, l, s (IsLocalRing.closedPoint T), hF, hl₁, hl₂,
-      (Scheme.Hom.comp_apply s l _).symm.trans (by rw [hsl])⟩
+    exact ⟨
+      Sp T,
+      t,
+      F,
+      l,
+      s (IsLocalRing.closedPoint T),
+      hF,
+      hl₁,
+      hl₂,
+      (Scheme.Hom.comp_apply s l _).symm.trans (by rw [hsl])
+    ⟩
   have hinj : ∀ w₁ w₂ : Γ, p w₁ = p w₂ → w₁ = w₂ := by
     intro w₁ w₂ hw₁₂
     obtain ⟨T₁, τ₁, F₁, l₁, x₁, m₁, a₁, b₁, rfl⟩ := hgraph w₁
@@ -227,8 +262,7 @@ theorem existsUnique_hom_extension_of_dvr
       exact hw₁₂
     obtain ⟨Ω, _, _, e₁, e₂, he, ⟨s₁, rfl⟩, ⟨s₂, rfl⟩⟩ := exists_common_point _ _ x₁ x₂ hx
     let τ : Sp Ω ⟶ X := e₁ ≫ pullback.fst G.hom τ₁ ≫ G.hom
-    have h₁ : (e₁ ≫ pullback.snd G.hom τ₁) ≫ τ₁ = τ := by
-      rw [Category.assoc, ← pullback.condition]
+    have h₁ : (e₁ ≫ pullback.snd G.hom τ₁) ≫ τ₁ = τ := by rw [Category.assoc, ← pullback.condition]
     have h₂ : (e₂ ≫ pullback.snd G.hom τ₂) ≫ τ₂ = τ := by
       rw [Category.assoc, ← pullback.condition, ← reassoc_of% he]
     obtain ⟨F₁', m₁', c₁⟩ := exists_pull_hom _ τ₁ τ h₁ F₁
@@ -241,23 +275,21 @@ theorem existsUnique_hom_extension_of_dvr
     have hg₂p : g₂ ≫ p = pullback.fst G.hom τ := by
       change (pullMap _ τ₂ τ h₂ G ≫ l₂) ≫ p = _
       rw [Category.assoc, a₂, pullMap_fst]
-    have hg₁q : g₁ ≫ q = F₁'.left ≫ pullback.fst G'.hom τ := by
-      rw [c₁, Category.assoc, b₁]
-    have hg₂q : g₂ ≫ q = F₂'.left ≫ pullback.fst G'.hom τ := by
-      rw [c₂, Category.assoc, b₂]
+    have hg₁q : g₁ ≫ q = F₁'.left ≫ pullback.fst G'.hom τ := by rw [c₁, Category.assoc, b₁]
+    have hg₂q : g₂ ≫ q = F₂'.left ≫ pullback.fst G'.hom τ := by rw [c₂, Category.assoc, b₂]
     have hF : F₁' = F₂' := by
-      refine hom_eq_of_torsion (IsSemiAbelian.pullback τ G hG) (IsSemiAbelian.pullback τ G' hG')
-        F₁' F₂' fun y n hn hy ↦ ?_
+      refine hom_eq_of_torsion (IsSemiAbelian.pullback τ G hG) (IsSemiAbelian.pullback τ G' hG') F₁'
+        F₂' fun y n hn hy ↦ ?_
       let e := TorsionLift.ptsEquiv τ G (𝟙_ (Over (Sp Ω))) τ (Category.id_comp _)
       have hx : (e y) ^ n = 1 := by rw [← map_pow, hy, map_one]
       have hxl : (e y).left = y.left ≫ pullback.fst G.hom τ := TorsionLift.ptsEquiv_left ..
-      have hqf : ∀ z : Sp Ω ⟶ Γ, z ≫ p = (e y).left →
-          Set.range z ⊆ Set.range p.quasiFiniteLocus.ι := by
+      have hqf
+          : ∀ z : Sp Ω ⟶ Γ, z ≫ p = (e y).left → Set.range z ⊆ Set.range p.quasiFiniteLocus.ι := by
         rintro z hz _ ⟨s, rfl⟩
         rw [Scheme.Opens.range_ι]
         exact quasiFiniteAt_of_torsion hG' p' q'
-          (fun a b ↦ graphClosure.hom_ext G.hom G'.hom u φ huφ) key τ (e y) hn hx (z s)
-          ⟨s, by rw [← hz]; exact (Scheme.Hom.comp_apply _ _ _).symm⟩
+          (fun a b ↦ graphClosure.hom_ext G.hom G'.hom u φ huφ)
+          key τ (e y) hn hx (z s) ⟨s, by rw [← hz]; exact (Scheme.Hom.comp_apply _ _ _).symm⟩
       let z₁ : Sp Ω ⟶ Γ := y.left ≫ g₁
       let z₂ : Sp Ω ⟶ Γ := y.left ≫ g₂
       have hz₁ : z₁ ≫ p = (e y).left := by
@@ -285,7 +317,8 @@ theorem existsUnique_hom_extension_of_dvr
       refine graphClosure.hom_ext G.hom G'.hom u φ huφ ?_ ?_
       · exact hg₁p.trans hg₂p.symm
       · refine hg₁q.trans (hF ▸ hg₂q.symm)
-    let b : Sp Ω ⟶ pullback G.hom τ := pullback.lift (e₁ ≫ pullback.fst G.hom τ₁) (𝟙 _) (by simp [τ])
+    let b : Sp Ω ⟶ pullback G.hom τ :=
+      pullback.lift (e₁ ≫ pullback.fst G.hom τ₁) (𝟙 _) (by simp [τ])
     have hbf : b ≫ pullback.fst G.hom τ = e₁ ≫ pullback.fst G.hom τ₁ := pullback.lift_fst _ _ _
     have hbs : b ≫ pullback.snd G.hom τ = 𝟙 _ := pullback.lift_snd _ _ _
     have hb₁ : b ≫ pullMap _ τ₁ τ h₁ G = e₁ := by
@@ -302,8 +335,9 @@ theorem existsUnique_hom_extension_of_dvr
     rw [Subsingleton.elim s₂ s₁]
     simp only [← Scheme.Hom.comp_apply]
     rw [hl]
-  have : LocallyQuasiFinite p := locallyQuasiFinite_iff_finite_preimage_singleton.mpr fun σ ↦
-    Set.Subsingleton.finite fun a ha b hb ↦ hinj a b (ha.trans hb.symm)
+  have : LocallyQuasiFinite p :=
+    locallyQuasiFinite_iff_finite_preimage_singleton.mpr fun σ ↦
+      Set.Subsingleton.finite fun a ha b hb ↦ hinj a b (ha.trans hb.symm)
   have : IsIso p := isIso_of_densePart i p
   obtain ⟨ψ, hψ, huψ⟩ := graphClosure.exists_extension_of_isIso_fst G.hom G'.hom u φ huφ
   let F : G ⟶ G' := Over.homMk ψ hψ.symm
@@ -321,6 +355,8 @@ end GlobalTheory.HomExtProOpen
 end ProOpen
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.ShFam GlobalTheory.Models GlobalTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.ShFam GlobalTheory.Models GlobalTheory
 open scoped CategoryTheory.Obj

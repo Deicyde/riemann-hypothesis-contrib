@@ -15,5 +15,4 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 def ResidualIrreducibleGood (D : D7) : Prop := ResidualIrreducibleRankR D
 
-
 end Formalism.MainNotions.AutomorphicSideWildInertia

@@ -30,7 +30,6 @@ lemma eSec_struct {S : Scheme.{0}} (H : Over S) [GrpObj H] (κ : Γ((𝟙_ (Over
       = (eSec H ≫ H.hom).appTop.hom κ := by first | rfl | simp
     _ = κ := by rw [key]; simp
 
-
 set_option backward.isDefEq.respectTransparency false in
 theorem tLin_of (hGF : GlobalFnsSt) : TLinSt := by
   intro R _ _ I O _ _ D _ A G _ _ U ιD ιA ιG hlin e a u hu hu0 χ
@@ -56,9 +55,13 @@ theorem tLin_of (hGF : GlobalFnsSt) : TLinSt := by
   have h1 := hρ j j' cj cj' (fun k k' h => (cjj' k' k h.symm).symm)
   rw [hρ1, map_one] at h1
   have h1' := h1.trans (_root_.one_mul _)
-  have h2 := congrArg (res (le_of_eq (inf_comm _ _) : LB.wchart D.toPre.P.L (φA U ιD e a χ) j ⊓
-      LB.wchart D.toPre.P.L (φB U ιG e a χ) j' ≤
-      LB.wchart D.toPre.P.L (φB U ιG e a χ) j' ⊓ LB.wchart D.toPre.P.L (φA U ιD e a χ) j)) h1'
+  have h2 :=
+    congrArg
+      (res
+        (le_of_eq (inf_comm _ _)
+          : LB.wchart D.toPre.P.L (φA U ιD e a χ) j ⊓ LB.wchart D.toPre.P.L (φB U ιG e a χ) j'
+            ≤ LB.wchart D.toPre.P.L (φB U ιG e a χ) j' ⊓ LB.wchart D.toPre.P.L (φA U ιD e a χ) j))
+      h1'
   exact (Canon.res_res' _ _ _).symm.trans (h2.trans (Canon.res_res' _ _ _))
 
 end ReciprocityTheory.ChartRestriction.G.Out.TLinPf

@@ -14,7 +14,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.LocJacTyp
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain PI.LocJacTyp
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain PI.LocJacTyp
 open scoped TensorProduct
 
 attribute [local instance] PI.VolStabSW.secondCountable_Fv PI.VolStabSW.locallyCompact_Fv
@@ -22,12 +23,16 @@ attribute [local instance] Sd.finDim
 
 section Gen
 
-variable {W : Type} [AddCommGroup W] [TopologicalSpace W] [IsTopologicalAddGroup W]
-  [LocallyCompactSpace W] [SecondCountableTopology W] [T2Space W] [MeasurableSpace W] [BorelSpace W]
+variable
+  {W : Type} [AddCommGroup W] [TopologicalSpace W] [IsTopologicalAddGroup W] [LocallyCompactSpace W]
+  [SecondCountableTopology W] [T2Space W] [MeasurableSpace W] [BorelSpace W]
 
-theorem haar_shear (μ : Measure W) [μ.IsAddHaarMeasure] (Φ : W ≃ₜ+ W) (K : Set W)
-    (hK : IsCompact K) (hKo : IsOpen K) (hK0 : K.Nonempty) (hΦ : Φ ⁻¹' K = K) (S : Set W) :
-    μ (Φ ⁻¹' S) = μ S := by
+theorem haar_shear
+    (μ : Measure W) [μ.IsAddHaarMeasure]
+    (Φ : W ≃ₜ+ W) (K : Set W)
+    (hK : IsCompact K) (hKo : IsOpen K) (hK0 : K.Nonempty) (hΦ : Φ ⁻¹' K = K)
+    (S : Set W)
+    : μ (Φ ⁻¹' S) = μ S := by
   have hmap : ∀ T, (μ.map Φ) T = μ (Φ ⁻¹' T) := fun T =>
     (Φ.toHomeomorph.toMeasurableEquiv).map_apply (μ := μ) T
   have e := Measure.isAddLeftInvariant_eq_smul (μ.map Φ) μ
@@ -43,7 +48,8 @@ theorem haar_shear (μ : Measure W) [μ.IsAddHaarMeasure] (Φ : W ≃ₜ+ W) (K 
 
 end Gen
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)}
 
 theorem continuous_sigR' (σ : E →ₐ[F] E) : Continuous (sigR (Fv F v) σ) := by
@@ -63,8 +69,7 @@ namespace SD
 
 variable (D : SD σ v)
 
-theorem e_mul_f : D.e * (1 - D.e) = 0 := by
-  rw [mul_sub, mul_one, D.he.eq, sub_self]
+theorem e_mul_f : D.e * (1 - D.e) = 0 := by rw [mul_sub, mul_one, D.he.eq, sub_self]
 
 def shear {ι : Type} (τ : ι → ι) : (ι → Fv F v ⊗[F] E) ≃ₜ+ (ι → Fv F v ⊗[F] E) where
   toFun z k := z k + D.e * sigR (Fv F v) σ (z (τ k))
@@ -81,25 +86,31 @@ def shear {ι : Type} (τ : ι → ι) : (ι → Fv F v ⊗[F] E) ≃ₜ+ (ι �
     funext k
     simp only [Pi.add_apply, map_add (f := _)]
     ring
-  continuous_toFun := continuous_pi fun k =>
-    (continuous_apply k).add (continuous_const.mul ((continuous_sigR' σ).comp (continuous_apply (τ k))))
-  continuous_invFun := continuous_pi fun k =>
-    (continuous_apply k).sub (continuous_const.mul ((continuous_sigR' σ).comp (continuous_apply (τ k))))
+  continuous_toFun :=
+    continuous_pi fun k =>
+      (continuous_apply k).add
+        (continuous_const.mul ((continuous_sigR' σ).comp (continuous_apply (τ k))))
+  continuous_invFun :=
+    continuous_pi fun k =>
+      (continuous_apply k).sub
+        (continuous_const.mul ((continuous_sigR' σ).comp (continuous_apply (τ k))))
 
-theorem shear_apply {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι) :
-    D.shear τ z k = z k + D.e * sigR (Fv F v) σ (z (τ k)) := rfl
+theorem shear_apply {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι)
+    : D.shear τ z k = z k + D.e * sigR (Fv F v) σ (z (τ k)) :=
+  rfl
 
-theorem shear_first_coordinate {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι) :
-    D.p 0 (D.shear τ z k) = D.p 0 (z k) + D.p 1 (z (τ k)) := by
+theorem shear_first_coordinate {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι)
+    : D.p 0 (D.shear τ z k) = D.p 0 (z k) + D.p 1 (z (τ k)) := by
   rw [shear_apply, map_add (f := _), map_mul, D.p_e.1, (D.p_sig _).1, one_mul]
 
-theorem shear_second_coordinate {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι) :
-    D.p 1 (D.shear τ z k) = D.p 1 (z k) := by
+theorem shear_second_coordinate {ι : Type} (τ : ι → ι) (z : ι → Fv F v ⊗[F] E) (k : ι)
+    : D.p 1 (D.shear τ z k) = D.p 1 (z k) := by
   rw [shear_apply, map_add (f := _), map_mul, D.p_e.2, zero_mul, add_zero]
 
-theorem mem_box_iff {ι : Type} (z : ι → Fv F v ⊗[F] E) :
-    z ∈ Obox (E := E) v ι ↔ ∀ k, D.p 0 (z k) ∈ v.adicCompletionIntegers F ∧
-      D.p 1 (z k) ∈ v.adicCompletionIntegers F := by
+theorem mem_box_iff {ι : Type} (z : ι → Fv F v ⊗[F] E)
+    : z ∈ Obox (E := E) v ι
+      ↔ ∀ k,
+        D.p 0 (z k) ∈ v.adicCompletionIntegers F ∧ D.p 1 (z k) ∈ v.adicCompletionIntegers F := by
   simp only [Obox, Set.mem_pi, Set.mem_univ, true_implies, D.mem_iff]
 
 theorem shear_box {ι : Type} (τ : ι → ι) : D.shear τ ⁻¹' Obox (E := E) v ι = Obox (E := E) v ι := by
@@ -114,9 +125,9 @@ theorem shear_box {ι : Type} (τ : ι → ι) : D.shear τ ⁻¹' Obox (E := E)
   · intro h k
     exact ⟨add_mem (h k).1 (h (τ k)).2, (h k).2⟩
 
-theorem mem_sc_mul (t : Fv F v) (c : Fv F v ⊗[F] E) :
-    sc (E := E) v t * c ∈ OEv (E := E) v ↔
-      t * D.p 0 c ∈ v.adicCompletionIntegers F ∧ t * D.p 1 c ∈ v.adicCompletionIntegers F := by
+theorem mem_sc_mul (t : Fv F v) (c : Fv F v ⊗[F] E)
+    : sc (E := E) v t * c ∈ OEv (E := E) v
+      ↔ t * D.p 0 c ∈ v.adicCompletionIntegers F ∧ t * D.p 1 c ∈ v.adicCompletionIntegers F := by
   rw [D.mem_iff, map_mul, map_mul, D.p_sc, D.p_sc]
 
 def pt (s t : Fv F v) : Fv F v ⊗[F] E := s • D.e + t • (1 - D.e)
@@ -128,9 +139,9 @@ theorem isUnit_pt {s t : Fv F v} (hs : s ≠ 0) (ht : t ≠ 0) : IsUnit (D.pt s 
   · rw [map_mul, (D.p_pt _ _).1, (D.p_pt _ _).1, map_one, mul_inv_cancel₀ hs]
   · rw [map_mul, (D.p_pt _ _).2, (D.p_pt _ _).2, map_one, mul_inv_cancel₀ ht]
 
-theorem mem_pt_mul (s t : Fv F v) (c : Fv F v ⊗[F] E) :
-    D.pt s t * c ∈ OEv (E := E) v ↔
-      s * D.p 0 c ∈ v.adicCompletionIntegers F ∧ t * D.p 1 c ∈ v.adicCompletionIntegers F := by
+theorem mem_pt_mul (s t : Fv F v) (c : Fv F v ⊗[F] E)
+    : D.pt s t * c ∈ OEv (E := E) v
+      ↔ s * D.p 0 c ∈ v.adicCompletionIntegers F ∧ t * D.p 1 c ∈ v.adicCompletionIntegers F := by
   rw [D.mem_iff, map_mul, map_mul, (D.p_pt _ _).1, (D.p_pt _ _).2]
 
 theorem norm_pt (s t : Fv F v) : Algebra.norm (Fv F v) (D.pt s t) = s * t := by
@@ -144,7 +155,6 @@ theorem obox_compact (ι : Type) [Finite ι] : IsCompact (Obox (E := E) v ι) :=
 theorem obox_open (ι : Type) [Finite ι] : IsOpen (Obox (E := E) v ι) :=
   isOpen_set_pi Set.finite_univ fun _ _ => (integer_ring_topology (E := E) v).2.1
 
-theorem obox_nonempty (ι : Type) : (Obox (E := E) v ι).Nonempty :=
-  ⟨0, fun _ _ => Sd.oev_zero v⟩
+theorem obox_nonempty (ι : Type) : (Obox (E := E) v ι).Nonempty := ⟨0, fun _ _ => Sd.oev_zero v⟩
 
 end PI.UnitaryGroupMassFormula.LocJacTyp

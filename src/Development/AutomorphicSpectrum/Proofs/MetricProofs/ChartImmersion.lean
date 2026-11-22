@@ -13,7 +13,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagAdjacentCh
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WMan
 open GlobalTheory.CompanionTheory.Ar.PB.PFl
@@ -28,8 +32,8 @@ section Block
 
 variable {K : Type} {ι : K → Type} {Kk : Type} {ιk : Kk → Type}
 
-theorem block_equiv {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : IsBlockMap κ v) (k₂ : Kk) :
-    ∃ σ : ιk k₂ ≃ ι (κ k₂), ∀ m, v ⟨k₂, m⟩ = ⟨κ k₂, σ m⟩ := by
+theorem block_equiv {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : IsBlockMap κ v) (k₂ : Kk)
+    : ∃ σ : ιk k₂ ≃ ι (κ k₂), ∀ m, v ⟨k₂, m⟩ = ⟨κ k₂, σ m⟩ := by
   have h1 : ∀ m, ∃ m', v ⟨k₂, m⟩ = ⟨κ k₂, m'⟩ := fun m => by
     rcases e : v ⟨k₂, m⟩ with ⟨a, m'⟩
     have ha : a = κ k₂ := by
@@ -44,10 +48,11 @@ theorem block_equiv {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : I
     exact eq_of_heq (Sigma.mk.inj_iff.1 (hv.2.1 e1)).2
   have surj : Function.Surjective σ := fun m => by
     obtain ⟨⟨k', m'⟩, e⟩ := hv.2.2.2 ⟨κ k₂, m⟩ ⟨k₂, rfl⟩
-    have hk : k' = k₂ := hv.1 (by
-      have := hv.2.2.1 ⟨k', m'⟩
-      rw [e] at this
-      exact this.symm)
+    have hk : k' = k₂ :=
+      hv.1 (by
+        have := hv.2.2.1 ⟨k', m'⟩
+        rw [e] at this
+        exact this.symm)
     subst hk
     refine ⟨m', ?_⟩
     rw [hσ] at e
@@ -58,15 +63,21 @@ end Block
 
 section Flag
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ] {y : (Σ k, ι k) → Φ}
-  {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N j : ℕ}
-  {Kk : Type} [Fintype Kk] {ιk : Kk → Type} [∀ k, Fintype (ιk k)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Φ : Type} [Field Φ]
+  {y : (Σ k, ι k) → Φ} {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+  {N j : ℕ} {Kk : Type} [Fintype Kk]
+  {ιk : Kk → Type} [∀ k, Fintype (ιk k)]
 
-theorem twMinor_up (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (zb : (Σ k, baseIdx ι M.blk k) → ℂ)
-    (i : Fin N) {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hinj : Function.Injective v) {k₂ : Kk}
-    (σ : ιk k₂ ≃ ι (κ k₂)) (hσ : ∀ m, v ⟨k₂, m⟩ = ⟨κ k₂, σ m⟩) (g : Matrix (Fin N) (Fin N) ℂ)
-    (z : (Σ k, ιk k) → ℂ) (J : Finset (Fin N)) :
-    twMinor M F zb i (κ k₂) g (upV v z) J = ∑ m, twC M F zb i (κ k₂) g J (σ m) * z ⟨k₂, m⟩ := by
+theorem twMinor_up
+    (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (zb : (Σ k, baseIdx ι M.blk k) → ℂ)
+    (i : Fin N)
+    {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hinj : Function.Injective v)
+    {k₂ : Kk} (σ : ιk k₂ ≃ ι (κ k₂)) (hσ : ∀ m, v ⟨k₂, m⟩ = ⟨κ k₂, σ m⟩)
+    (g : Matrix (Fin N) (Fin N) ℂ) (z : (Σ k, ιk k) → ℂ) (J : Finset (Fin N))
+    : twMinor M F zb i (κ k₂) g (upV v z) J = ∑ m, twC M F zb i (κ k₂) g J (σ m) * z ⟨k₂, m⟩ := by
   rw [twMinor_eq, ← Equiv.sum_comp σ]
   refine Finset.sum_congr rfl fun m _ => ?_
   have e : upV v z ⟨κ k₂, σ m⟩ = z ⟨k₂, m⟩ := by
@@ -75,41 +86,62 @@ theorem twMinor_up (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (
   rw [e]
   rfl
 
-theorem pRead_some (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (keep : Ψ × Fin N → Prop)
-    (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (z : (Σ k, ι k) → ℂ) {τ : Ψ} (a : Fin N)
-    {b : Fin N} {k : K} (hk : M.blk (τ, pStep j keep τ b) = some k) :
-    pRead M F keep zb h z τ a b =
-      twMinor M F zb (pStep j keep τ b) k (h τ)⁻¹ z (insert a ((stepCols N j (pStep j keep τ b)).erase b)) /
-        (pSgn (stepCols N j (pStep j keep τ b)) a b *
-          twMinor M F zb (pStep j keep τ b) k (h τ)⁻¹ z (stepCols N j (pStep j keep τ b))) := by
+theorem pRead_some
+    (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk)
+    (keep : Ψ × Fin N → Prop)
+    (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (z : (Σ k, ι k) → ℂ)
+    {τ : Ψ}
+    (a : Fin N)
+    {b : Fin N} {k : K} (hk : M.blk (τ, pStep j keep τ b) = some k)
+    : pRead M F keep zb h z τ a b
+      = twMinor M F zb (pStep j keep τ b) k (h τ)⁻¹ z
+          (insert a ((stepCols N j (pStep j keep τ b)).erase b))
+        / (pSgn (stepCols N j (pStep j keep τ b)) a b
+          * twMinor M F zb (pStep j keep τ b) k (h τ)⁻¹ z (stepCols N j (pStep j keep τ b))) := by
   unfold pRead
   rw [hk]
   rfl
 
-theorem pRead_none (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (keep : Ψ × Fin N → Prop)
-    (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (z : (Σ k, ι k) → ℂ) {τ : Ψ} (a : Fin N)
-    {b : Fin N} (hk : M.blk (τ, pStep j keep τ b) = none) : pRead M F keep zb h z τ a b = 0 := by
+theorem pRead_none
+    (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk)
+    (keep : Ψ × Fin N → Prop)
+    (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (z : (Σ k, ι k) → ℂ)
+    {τ : Ψ}
+    (a : Fin N)
+    {b : Fin N} (hk : M.blk (τ, pStep j keep τ b) = none)
+    : pRead M F keep zb h z τ a b = 0 := by
   unfold pRead
   rw [hk]
   rfl
 
-theorem pRead_deriv (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk) (keep : Ψ × Fin N → Prop)
-    (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) {κ : Kk → K}
-    {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : IsBlockMap κ v) {Z : ℂ → (Σ k, ιk k) → ℂ} {p : (k : Kk) → ιk k}
+theorem pRead_deriv
+    (M : FlagModel y Ψ N j) (F : FrameData ι Ψ N M.Ω M.blk)
+    (keep : Ψ × Fin N → Prop) (zb : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ)
+    {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} (hv : IsBlockMap κ v)
+    {Z : ℂ → (Σ k, ιk k) → ℂ} {p : (k : Kk) → ιk k}
     (hd : HasDerivAt (fun s => affCoord p (Z s)) 0 0) (hc : ∀ q, ContinuousAt (fun s => Z s q) 0)
-    (hp : ∀ k, Z 0 ⟨k, p k⟩ ≠ 0) {τ : Ψ} (a : Fin N) {b : Fin N} {k₂ : Kk}
-    (hk : M.blk (τ, pStep j keep τ b) = some (κ k₂))
-    (h0 : twMinor M F zb (pStep j keep τ b) (κ k₂) (h τ)⁻¹ (upV v (Z 0)) (stepCols N j (pStep j keep τ b)) ≠ 0) :
-    HasDerivAt (fun s => pRead M F keep zb h (upV v (Z s)) τ a b) 0 0 := by
+    (hp : ∀ k, Z 0 ⟨k, p k⟩ ≠ 0)
+    {τ : Ψ}
+    (a : Fin N)
+    {b : Fin N} {k₂ : Kk} (hk : M.blk (τ, pStep j keep τ b) = some (κ k₂))
+    (h0 : twMinor M F zb (pStep j keep τ b) (κ k₂) (h τ)⁻¹ (upV v (Z 0))
+        (stepCols N j (pStep j keep τ b))
+      ≠ 0)
+    : HasDerivAt (fun s => pRead M F keep zb h (upV v (Z s)) τ a b) 0 0 := by
   obtain ⟨σ, hσ⟩ := block_equiv hv k₂
-  simp only [pRead_some M F keep zb h _ a hk, twMinor_up M F zb _ hv.2.1 σ hσ, div_mul_eq_div_div_swap]
+  simp only [pRead_some M F keep zb h _ a hk, twMinor_up M F zb _ hv.2.1 σ hσ,
+    div_mul_eq_div_div_swap]
   rw [twMinor_up M F zb _ hv.2.1 σ hσ] at h0
-  have := (ratio_deriv (ρ := ιk) hd hc hp k₂
-    (fun m => twC M F zb (pStep j keep τ b) (κ k₂) (h τ)⁻¹ (insert a ((stepCols N j (pStep j keep τ b)).erase b)) (σ m))
-    _ h0).div_const (pSgn (stepCols N j (pStep j keep τ b)) a b)
+  have :=
+    (ratio_deriv (ρ := ιk) hd hc hp k₂
+      (fun m =>
+        twC M F zb (pStep j keep τ b) (κ k₂) (h τ)⁻¹
+          (insert a ((stepCols N j (pStep j keep τ b)).erase b)) (σ m))
+      _ h0).div_const (pSgn (stepCols N j (pStep j keep τ b)) a b)
   simpa using this
 
-variable {M : FlagModel y Ψ N j} {n e : ℕ} {Rb : AnLogRes (mCoordIdeal M.x) ⊤ n} {keep : Ψ × Fin N → Prop}
+variable
+  {M : FlagModel y Ψ N j} {n e : ℕ} {Rb : AnLogRes (mCoordIdeal M.x) ⊤ n} {keep : Ψ × Fin N → Prop}
   {κ : Kk → K} {v : (Σ k, ιk k) → (Σ k, ι k)} {F : FrameData ι Ψ N M.Ω M.blk} {kb : Fin Rb.A.n}
   {V : Set (Fin n → ℂ)} {bl : (Fin n → ℂ) → (Σ k, baseIdx ι M.blk k) → ℂ}
   {r : ((Σ k, baseIdx ι M.blk k) → ℂ) → Rb.X} {h : Ψ → Matrix (Fin N) (Fin N) ℂ}
@@ -118,8 +150,8 @@ variable {M : FlagModel y Ψ N j} {n e : ℕ} {Rb : AnLogRes (mCoordIdeal M.x) �
 theorem pB_diff (w : Fin e → ℂ) : DifferentiableAt ℂ (pB ε) w :=
   differentiableAt_pi.2 fun _ => differentiableAt_apply _ _
 
-theorem pH_diff (τ : Ψ) (a b : Fin N) (w : Fin e → ℂ) :
-    DifferentiableAt ℂ (fun w' => pH keep h ε τ w' a b) w := by
+theorem pH_diff (τ : Ψ) (a b : Fin N) (w : Fin e → ℂ)
+    : DifferentiableAt ℂ (fun w' => pH keep h ε τ w' a b) w := by
   have hl : ∀ x, DifferentiableAt ℂ (fun w' => pMat keep (pL ε w') τ x b) w := by
     intro x
     unfold pMat lowMat
@@ -133,18 +165,26 @@ theorem pH_diff (τ : Ψ) (a b : Fin N) (w : Fin e → ℂ) :
   simp only [pH, Matrix.mul_apply]
   exact DifferentiableAt.fun_sum fun x _ => (differentiableAt_const _).fun_mul (hl x)
 
-theorem pPhi_diff (hb : IsBaseChart M Rb F kb V bl) {w : Fin e → ℂ} (hw : w ∈ pD ε V) (q : Σ k, ιk k) :
-    DifferentiableAt ℂ (fun w' => pPhi M F keep v bl h ε w' q) w := by
+theorem pPhi_diff
+    (hb : IsBaseChart M Rb F kb V bl) {w : Fin e → ℂ} (hw : w ∈ pD ε V) (q : Σ k, ιk k)
+    : DifferentiableAt ℂ (fun w' => pPhi M F keep v bl h ε w' q) w := by
   have hz : ∀ q, DifferentiableAt ℂ (fun w' => bl (pB ε w') q) w := fun q =>
     DifferentiableAt.comp (g := fun u => bl u q) w (hb.2.2.1 q _ hw).differentiableAt (pB_diff w)
-  have hv' : ∀ q I, DifferentiableAt ℂ (fun w' => valAt M.x (F.u q I) (bl (pB ε w'))) w := fun q I =>
-    DifferentiableAt.comp (g := fun u => valAt M.x (F.u q I) (bl u)) w (hb.2.2.2.1 q I _ hw).differentiableAt
-      (pB_diff w)
-  exact flagZ_diff M F hz hv' (H := fun w' τ' => pH keep h ε τ' w') (fun τ' a b => pH_diff τ' a b w) (v q)
+  have hv'
+      : ∀ q I, DifferentiableAt ℂ (fun w' => valAt M.x (F.u q I) (bl (pB ε w'))) w := fun q I =>
+    DifferentiableAt.comp
+      (g := fun u => valAt M.x (F.u q I) (bl u))
+      w (hb.2.2.2.1 q I _ hw).differentiableAt (pB_diff w)
+  exact flagZ_diff M F hz hv'
+    (H := fun w' τ' => pH keep h ε τ' w')
+    (fun τ' a b => pH_diff τ' a b w)
+    (v q)
 
-theorem base_inj (hb : IsBaseChart M Rb F kb V bl) {u : Fin n → ℂ} (hu : u ∈ V)
-    (pb : (k : NonPluckerBlocks M.blk) → baseIdx ι M.blk k) (hp : ∀ k, bl u ⟨k, pb k⟩ ≠ 0) :
-    (fderiv ℂ (fun u' => affCoord pb (bl u')) u).ker = ⊥ := by
+theorem base_inj
+    (hb : IsBaseChart M Rb F kb V bl)
+    {u : Fin n → ℂ} (hu : u ∈ V)
+    (pb : (k : NonPluckerBlocks M.blk) → baseIdx ι M.blk k) (hp : ∀ k, bl u ⟨k, pb k⟩ ≠ 0)
+    : (fderiv ℂ (fun u' => affCoord pb (bl u')) u).ker = ⊥ := by
   obtain ⟨hV, hVt, -, -, hbl⟩ := hb
   have hut := hVt hu
   set x := (Rb.A.chart kb).symm u with hx
@@ -160,21 +200,27 @@ theorem base_inj (hb : IsBaseChart M Rb F kb V bl) {u : Fin n → ℂ} (hu : u �
     exact mul_ne_zero (hcne k) (hp k)
   have him := Rb.immersion x hnot pb hne kb hxs
   rw [hcx] at him
-  have hev : (fun u' => affCoord pb (Rb.lift x ((Rb.A.chart kb).symm u'))) =ᶠ[𝓝 u] fun u' => affCoord pb (bl u') := by
-    have h1 : ∀ᶠ u' in 𝓝 u, (Rb.A.chart kb).symm u' ∈ Rb.U x :=
-      ((Rb.A.chart kb).continuousAt_symm hut).eventually_mem ((Rb.isOpen_U x).mem_nhds (Rb.mem_U x))
-    filter_upwards [h1, hV.mem_nhds hu] with u' h1 h2
-    exact affCoord_orbit pb (orbit_trans (Rb.compat x _ _ ⟨h1, Rb.mem_U _⟩) (hbl u' h2).2.2.2)
+  have hev
+      : (fun u' => affCoord pb (Rb.lift x ((Rb.A.chart kb).symm u'))) =ᶠ[𝓝 u] fun u' => affCoord pb (bl u') :=
+    by
+      have h1 : ∀ᶠ u' in 𝓝 u, (Rb.A.chart kb).symm u' ∈ Rb.U x :=
+        ((Rb.A.chart kb).continuousAt_symm hut).eventually_mem
+          ((Rb.isOpen_U x).mem_nhds (Rb.mem_U x))
+      filter_upwards [h1, hV.mem_nhds hu] with u' h1 h2
+      exact affCoord_orbit pb (orbit_trans (Rb.compat x _ _ ⟨h1, Rb.mem_U _⟩) (hbl u' h2).2.2.2)
   rw [← hev.fderiv_eq]
   exact him
 
-theorem pPhi_base (w' : Fin e → ℂ) {q' : Σ k, ιk k} (k : NonPluckerBlocks M.blk) (m : ι k.1) (hq : v q' = ⟨k.1, m⟩) :
-    pPhi M F keep v bl h ε w' q' = bl (pB ε w') ⟨k, m⟩ := by
+theorem pPhi_base
+    (w' : Fin e → ℂ)
+    {q' : Σ k, ιk k} (k : NonPluckerBlocks M.blk) (m : ι k.1) (hq : v q' = ⟨k.1, m⟩)
+    : pPhi M F keep v bl h ε w' q' = bl (pB ε w') ⟨k, m⟩ := by
   simp only [pPhi, hq]
   exact flagZ_base M F _ _ k m
 
-theorem exists_base_pt (hc : IsPCtx M Rb keep κ v F kb V bl r h) (p : (k : Kk) → ιk k) (k : NonPluckerBlocks M.blk) :
-    ∃ (k' : Kk) (m : ι k.1), κ k' = k.1 ∧ v ⟨k', p k'⟩ = ⟨k.1, m⟩ := by
+theorem exists_base_pt
+    (hc : IsPCtx M Rb keep κ v F kb V bl r h) (p : (k : Kk) → ιk k) (k : NonPluckerBlocks M.blk)
+    : ∃ (k' : Kk) (m : ι k.1), κ k' = k.1 ∧ v ⟨k', p k'⟩ = ⟨k.1, m⟩ := by
   obtain ⟨k', hk'⟩ := (hc.2.1 k.1).2 (Or.inl k.2)
   obtain ⟨k₀, hk₀⟩ := k
   simp only at hk'
@@ -182,20 +228,24 @@ theorem exists_base_pt (hc : IsPCtx M Rb keep κ v F kb V bl r h) (p : (k : Kk) 
   obtain ⟨σ, hσ⟩ := block_equiv hc.1 k'
   exact ⟨k', σ (p k'), rfl, hσ _⟩
 
-theorem base_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ} (hw : w ∈ pD ε V)
+theorem base_zero
+    (hc : IsPCtx M Rb keep κ v F kb V bl r h)
+    {w : Fin e → ℂ} (hw : w ∈ pD ε V)
     (p : (k : Kk) → ιk k) (hp : ∀ k, pPhi M F keep v bl h ε w ⟨k, p k⟩ ≠ 0)
     {D : (Fin e → ℂ) →L[ℂ] (Σ k, ιk k) → ℂ}
     (hD : HasFDerivAt (fun w' => affCoord p (pPhi M F keep v bl h ε w')) D w)
-    {u : Fin e → ℂ} (hu : D u = 0) : pB ε u = 0 := by
+    {u : Fin e → ℂ} (hu : D u = 0)
+    : pB ε u = 0 := by
   have hb : IsBaseChart M Rb F kb V bl := hc.2.2.2.1
   choose k' pb hk' hpb using exists_base_pt hc p
   have hs : ∀ q : Σ k, baseIdx ι M.blk k, ∃ q', v q' = ⟨q.1.1, q.2⟩ := fun q =>
     hc.1.2.2.2 ⟨q.1.1, q.2⟩ ((hc.2.1 q.1.1).2 (Or.inl q.1.2))
   choose s hs using hs
-  have hblock : ∀ q, (s q).1 = k' q.1 := fun q => hc.1.1 (by
-    have := hc.1.2.2.1 (s q)
-    rw [hs] at this
-    rw [← this, hk'])
+  have hblock : ∀ q, (s q).1 = k' q.1 := fun q =>
+    hc.1.1 (by
+      have := hc.1.2.2.1 (s q)
+      rw [hs] at this
+      rw [← this, hk'])
   have hpk : ∀ a b : Kk, a = b → (⟨a, p a⟩ : Σ k, ιk k) = ⟨b, p b⟩ := by
     rintro a b rfl
     rfl
@@ -207,25 +257,37 @@ theorem base_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ}
   have hB : DifferentiableAt ℂ (fun u' => affCoord pb (bl u')) (pB ε w) :=
     differentiableAt_pi.2 fun q => diff_div (hbd q) (hbd _) (hne q.1)
   have hinj := base_inj hb hw pb hne
-  have hcoord : ∀ (w' : Fin e → ℂ) (q : Σ k, baseIdx ι M.blk k),
-      affCoord p (pPhi M F keep v bl h ε w') (s q) = affCoord pb (bl (pB ε w')) q := fun w' q => by
+  have hcoord
+      : ∀ (w' : Fin e → ℂ) (q : Σ k, baseIdx ι M.blk k),
+        affCoord p (pPhi M F keep v bl h ε w') (s q)
+          = affCoord pb (bl (pB ε w')) q := fun w' q => by
     obtain ⟨k, m⟩ := q
     simp only [affCoord]
     rw [hpk _ _ (hblock ⟨k, m⟩), pPhi_base w' k m (hs ⟨k, m⟩), pPhi_base w' k (pb k) (hpb k)]
-  have hz := comp_zero (W := ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (ε (Sum.inl i)))
-    (e := s) (fun w' q => hcoord w' q) hD hB hu
+  have hz :=
+    comp_zero (W := ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (ε (Sum.inl i)))
+      (e := s)
+      (fun w' q => hcoord w' q)
+      hD hB hu
   have hm : pB ε u ∈ (fderiv ℂ (fun u' => affCoord pb (bl u')) (pB ε w)).ker := hz
   rw [hinj] at hm
   exact hm
 
-theorem line_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ} (hw : w ∈ pD ε V)
+theorem line_zero
+    (hc : IsPCtx M Rb keep κ v F kb V bl r h)
+    {w : Fin e → ℂ} (hw : w ∈ pD ε V)
     (p : (k : Kk) → ιk k) (hp : ∀ k, pPhi M F keep v bl h ε w ⟨k, p k⟩ ≠ 0)
     {D : (Fin e → ℂ) →L[ℂ] (Σ k, ιk k) → ℂ}
     (hD : HasFDerivAt (fun w' => affCoord p (pPhi M F keep v bl h ε w')) D w)
-    {u : Fin e → ℂ} (hu : D u = 0) (hb0 : pB ε u = 0) : u = 0 := by
+    {u : Fin e → ℂ} (hu : D u = 0) (hb0 : pB ε u = 0)
+    : u = 0 := by
   have hb : IsBaseChart M Rb F kb V bl := hc.2.2.2.1
-  have hE := GlobalTheory.T.frameData_local_resolution_open K ι Φ y Ψ N j M n e Rb keep Kk ιk κ v F kb V bl r h ε hc
-  have hR := GlobalTheory.T.frameData_local_integrability K ι Φ y Ψ N j M n e Rb keep Kk ιk κ v F kb V bl r h ε hc
+  have hE :=
+    GlobalTheory.T.frameData_local_resolution_open K ι Φ y Ψ N j M n e Rb keep Kk ιk κ v F kb V bl r
+      h ε hc
+  have hR :=
+    GlobalTheory.T.frameData_local_integrability K ι Φ y Ψ N j M n e Rb keep Kk ιk κ v F kb V bl r h
+      ε hc
   have hwB : ∀ s : ℂ, pB ε (w + s • u) = pB ε w := fun s => by
     funext i
     have : u (ε (Sum.inl i)) = 0 := congrFun hb0 i
@@ -242,8 +304,9 @@ theorem line_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ}
     rw [hu] at this
     exact this
   have hcZ : ∀ q, ContinuousAt (fun s : ℂ => pPhi M F keep v bl h ε (w + s • u) q) 0 := fun q =>
-    ContinuousAt.comp_of_eq (g := fun w' => pPhi M F keep v bl h ε w' q) (pPhi_diff hb hw q).continuousAt
-      hcurve.continuousAt h00.symm
+    ContinuousAt.comp_of_eq
+      (g := fun w' => pPhi M F keep v bl h ε w' q)
+      (pPhi_diff hb hw q).continuousAt hcurve.continuousAt h00.symm
   have hZ0 : pPhi M F keep v bl h ε (w + (0 : ℂ) • u) = pPhi M F keep v bl h ε w := by simp
   have hp0 : ∀ k, pPhi M F keep v bl h ε (w + (0 : ℂ) • u) ⟨k, p k⟩ ≠ 0 := fun k => by
     rw [hZ0]
@@ -253,8 +316,11 @@ theorem line_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ}
   have hlin : ∀ i, HasDerivAt (fun s : ℂ => w i + s * u i) (u i) 0 := fun i => by
     simpa using ((hasDerivAt_id (0 : ℂ)).mul_const (u i)).const_add (w i)
   have hcell : ∀ q : PIdx j keep, u (ε (Sum.inr q)) = 0 := fun q => by
-    have hrel : ∀ s : ℂ, pRead M F keep (bl (pB ε w)) h (upV v (pPhi M F keep v bl h ε (w + s • u)))
-        q.1.1.1 q.1.1.2.1 q.1.1.2.2 = w (ε (Sum.inr q)) + s * u (ε (Sum.inr q)) := fun s => by
+    have hrel
+        : ∀ s : ℂ,
+          pRead M F keep (bl (pB ε w)) h (upV v (pPhi M F keep v bl h ε (w + s • u))) q.1.1.1
+              q.1.1.2.1 q.1.1.2.2
+            = w (ε (Sum.inr q)) + s * u (ε (Sum.inr q)) := fun s => by
       have := congrFun (hR _ (hmem s)).2 (ε (Sum.inr q))
       simp only [pRho, Equiv.symm_apply_apply] at this
       rw [hbase s] at this
@@ -270,14 +336,19 @@ theorem line_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ}
       exact e1.symm
     | some k =>
       obtain ⟨k₂, rfl⟩ := (hc.2.1 k).2 (Or.inr ⟨_, hS.1, hk⟩)
-      have h0 : twMinor M F (bl (pB ε w)) (pStep j keep q.1.1.1 q.1.1.2.2) (κ k₂) (h q.1.1.1)⁻¹
-          (upV v (pPhi M F keep v bl h ε (w + (0 : ℂ) • u))) (stepCols N j (pStep j keep q.1.1.1 q.1.1.2.2)) ≠ 0 := by
+      have h0
+          : twMinor M F (bl (pB ε w)) (pStep j keep q.1.1.1 q.1.1.2.2) (κ k₂) (h q.1.1.1)⁻¹
+              (upV v (pPhi M F keep v bl h ε (w + (0 : ℂ) • u)))
+              (stepCols N j (pStep j keep q.1.1.1 q.1.1.2.2))
+            ≠ 0 := by
         have := (hR w hw).1.2.2.2 _ _ hS.1 hk
         rw [(hE w hw).2.1] at this
         rw [hZ0]
         exact this
-      have h1 := pRead_deriv M F keep (bl (pB ε w)) h hc.1
-        (Z := fun s : ℂ => pPhi M F keep v bl h ε (w + s • u)) hdZ hcZ hp0 q.1.1.2.1 hk h0
+      have h1 :=
+        pRead_deriv M F keep (bl (pB ε w)) h hc.1
+          (Z := fun s : ℂ => pPhi M F keep v bl h ε (w + s • u))
+          hdZ hcZ hp0 q.1.1.2.1 hk h0
       rw [funext hrel] at h1
       exact (hlin _).unique h1
   funext i
@@ -286,7 +357,19 @@ theorem line_zero (hc : IsPCtx M Rb keep κ v F kb V bl r h) {w : Fin e → ℂ}
   · exact congrFun hb0 l
   · exact hcell q
 
-theorem chart_immersion : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (n e : ℕ) (Rb : AnLogRes (mCoordIdeal M.x) ⊤ n) (keep : Ψ × Fin N → Prop) (Kk : Type) [Fintype Kk] (ιk : Kk → Type) [∀ k, Fintype (ιk k)] (κ : Kk → K) (v : (Σ k, ιk k) → (Σ k, ι k)) (F : FrameData ι Ψ N M.Ω M.blk) (kb : Fin Rb.A.n) (V : Set (Fin n → ℂ)) (bl : (Fin n → ℂ) → (Σ k, baseIdx ι M.blk k) → ℂ) (r : ((Σ k, baseIdx ι M.blk k) → ℂ) → Rb.X) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (ε : Fin n ⊕ PIdx j keep ≃ Fin e), IsPCtx M Rb keep κ v F kb V bl r h → ∀ w ∈ pD ε V, ∀ p : (k : Kk) → ιk k, (∀ k, pPhi M F keep v bl h ε w ⟨k, p k⟩ ≠ 0) → (fderiv ℂ (fun w' => affCoord p (pPhi M F keep v bl h ε w')) w).ker = ⊥ := by
+theorem chart_immersion
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (n e : ℕ) (Rb : AnLogRes (mCoordIdeal M.x) ⊤ n)
+        (keep : Ψ × Fin N → Prop) (Kk : Type) [Fintype Kk] (ιk : Kk → Type) [∀ k, Fintype (ιk k)]
+        (κ : Kk → K) (v : (Σ k, ιk k) → (Σ k, ι k)) (F : FrameData ι Ψ N M.Ω M.blk)
+        (kb : Fin Rb.A.n) (V : Set (Fin n → ℂ)) (bl : (Fin n → ℂ) → (Σ k, baseIdx ι M.blk k) → ℂ)
+        (r : ((Σ k, baseIdx ι M.blk k) → ℂ) → Rb.X) (h : Ψ → Matrix (Fin N) (Fin N) ℂ)
+        (ε : Fin n ⊕ PIdx j keep ≃ Fin e),
+      IsPCtx M Rb keep κ v F kb V bl r h
+        → ∀ w ∈ pD ε V, ∀ p : (k : Kk) → ιk k,
+          (∀ k, pPhi M F keep v bl h ε w ⟨k, p k⟩ ≠ 0)
+            → (fderiv ℂ (fun w' => affCoord p (pPhi M F keep v bl h ε w')) w).ker = ⊥ := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n e Rb keep Kk _ ιk _ κ v F kb V bl r h ε hc w hw p hp
   have hb : IsBaseChart M Rb F kb V bl := hc.2.2.2.1
   have hT : DifferentiableAt ℂ (fun w' => affCoord p (pPhi M F keep v bl h ε w')) w :=

@@ -5,35 +5,41 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvMemIntV
 
 @[expose] public section
 
-open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.OrbFinAf
+open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.OrbFinAf
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.OrbFinAf
 
-theorem ratCast_mem_intV_eventually (p : ℕ) [Fact p.Prime] (q : ℚ) :
-    ∀ᶠ v in (Filter.cofinite : Filter (AwayP p)),
-      algebraMap ℚ (Qv v) q ∈ v.1.adicCompletionIntegers ℚ := by
-  have h : ∀ᶠ w in (Filter.cofinite : Filter (HeightOneSpectrum ℤ)),
-      algebraMap ℚ (w.adicCompletion ℚ) q ∈ w.adicCompletionIntegers ℚ :=
+theorem ratCast_mem_intV_eventually (p : ℕ) [Fact p.Prime] (q : ℚ)
+    : ∀ᶠ v in (Filter.cofinite : Filter (AwayP p)),
+        algebraMap ℚ (Qv v) q ∈ v.1.adicCompletionIntegers ℚ := by
+  have h
+      : ∀ᶠ w in (Filter.cofinite : Filter (HeightOneSpectrum ℤ)),
+        algebraMap ℚ (w.adicCompletion ℚ) q ∈ w.adicCompletionIntegers ℚ :=
     (algebraMap ℚ (FiniteAdeleRing ℤ ℚ) q).2.mono fun _ hv => hv
   exact (Subtype.val_injective.tendsto_cofinite).eventually h
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem basV_repr_tmul (G : HTGroup p) (v : AwayP p) (r : Qv v) (c : G.C) (k : Fin (Module.finrank ℚ G.C)) :
-    (basV G v).repr (r ⊗ₜ c) k = r * algebraMap ℚ (Qv v) ((Module.finBasis ℚ G.C).repr c k) := by
+theorem basV_repr_tmul
+    (G : HTGroup p) (v : AwayP p) (r : Qv v) (c : G.C) (k : Fin (Module.finrank ℚ G.C))
+    : (basV G v).repr (r ⊗ₜ c) k = r * algebraMap ℚ (Qv v) ((Module.finBasis ℚ G.C).repr c k) := by
   simp [basV, Algebra.TensorProduct.basis_repr_tmul]
 
-theorem eq_sum_tmul (G : HTGroup p) (v : AwayP p) (y : Qv v ⊗[ℚ] G.C) :
-    y = ∑ i, (basV G v).repr y i ⊗ₜ (Module.finBasis ℚ G.C i) := by
+theorem eq_sum_tmul (G : HTGroup p) (v : AwayP p) (y : Qv v ⊗[ℚ] G.C)
+    : y = ∑ i, (basV G v).repr y i ⊗ₜ (Module.finBasis ℚ G.C i) := by
   conv_lhs => rw [← (basV G v).sum_repr y]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [basV, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
 
-theorem isIntV_of_eq_sum (G : HTGroup p) (v : AwayP p) {ι : Type*} (s : Finset ι) (r : ι → Qv v) (c : ι → G.C)
-    (hr : ∀ i ∈ s, r i ∈ v.1.adicCompletionIntegers ℚ)
-    (hc : ∀ i ∈ s, ∀ k, algebraMap ℚ (Qv v) ((Module.finBasis ℚ G.C).repr (c i) k) ∈ v.1.adicCompletionIntegers ℚ) :
-    IsIntV G v (∑ i ∈ s, r i ⊗ₜ c i) := by
+theorem isIntV_of_eq_sum
+    (G : HTGroup p) (v : AwayP p)
+    {ι : Type*}
+    (s : Finset ι) (r : ι → Qv v) (c : ι → G.C) (hr : ∀ i ∈ s, r i ∈ v.1.adicCompletionIntegers ℚ)
+    (hc : ∀ i ∈ s, ∀ k,
+      algebraMap ℚ (Qv v) ((Module.finBasis ℚ G.C).repr (c i) k) ∈ v.1.adicCompletionIntegers ℚ)
+    : IsIntV G v (∑ i ∈ s, r i ⊗ₜ c i) := by
   intro k
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]

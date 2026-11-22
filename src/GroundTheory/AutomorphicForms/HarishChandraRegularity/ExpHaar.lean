@@ -11,42 +11,47 @@ namespace GroundTheory.Automorphic
 open scoped Manifold ContDiff Topology
 open MeasureTheory Metric Set Filter
 
-variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
+variable
+  {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
   {G : Subgroup 𝔸ˣ} {𝔤 : Submodule ℝ 𝔸}
 
 namespace IsExpLieAlgebra
 
 variable (h : IsExpLieAlgebra G 𝔤)
 
-theorem prodExp_eq_expG_prodExpCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤) {z : Fin d → ℝ}
-    (hz : prodExpVal (fun i => (b i : 𝔸)) z ∈ h.nhdOne) :
-    h.prodExp (⇑b) z = h.expG (b.equivFun.symm (prodExpCoord b z)) := by
+theorem prodExp_eq_expG_prodExpCoord
+    {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤)
+    {z : Fin d → ℝ} (hz : prodExpVal (fun i => (b i : 𝔸)) z ∈ h.nhdOne)
+    : h.prodExp (⇑b) z = h.expG (b.equivFun.symm (prodExpCoord b z)) := by
   have hPz : (((h.prodExp (⇑b) z : G) : 𝔸ˣ) : 𝔸) = prodExpVal (fun i => (b i : 𝔸)) z :=
     h.val_prodExp _ z
   have hN : (((h.prodExp (⇑b) z : G) : 𝔸ˣ) : 𝔸) ∈ h.nhdOne := hPz ▸ hz
   have hL := h.symm_mem_lie hN
   rw [hPz] at hL
-  have e1 : ((b.equivFun.symm (prodExpCoord b z) : 𝔤) : 𝔸) =
-      (expPartialHomeomorph ℝ 𝔸).symm (prodExpVal (fun i => (b i : 𝔸)) z) := by
+  have e1
+      : ((b.equivFun.symm (prodExpCoord b z) : 𝔤) : 𝔸)
+        = (expPartialHomeomorph ℝ 𝔸).symm (prodExpVal (fun i => (b i : 𝔸)) z) := by
     simp only [prodExpCoord, logCoord, LinearEquiv.coe_toContinuousLinearEquiv',
       LinearEquiv.symm_apply_apply]
     exact subspaceProj_of_mem hL
-  apply Subtype.ext; apply Units.ext
+  apply Subtype.ext
+  apply Units.ext
   rw [coe_expG, e1, h.exp_symm hz, hPz]
 
 variable [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure]
 
-theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤) :
-    ∃ ε > 0, ∀ K : (Fin d → ℝ) → ℂ, ContDiff ℝ ∞ K → tsupport K ⊆ closedBall 0 ε →
-      ∃ κ : G → ℂ, (letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, ℂ) ∞ κ) ∧
-        HasCompactSupport κ ∧ tsupport κ ⊆ h.prodExp (⇑b) '' tsupport K ∧
-        ∀ φ : G → ℂ, Continuous φ → ∫ y, κ y * φ y ∂μ = ∫ t, K t * φ (h.prodExp (⇑b) t) := by
+theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤)
+    : ∃ ε > 0, ∀ K : (Fin d → ℝ) → ℂ,
+      ContDiff ℝ ∞ K → tsupport K ⊆ closedBall 0 ε
+        → ∃ κ : G → ℂ,
+          (letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, ℂ) ∞ κ) ∧ HasCompactSupport κ
+            ∧ tsupport κ ⊆ h.prodExp (⇑b) '' tsupport K
+            ∧ ∀ φ : G → ℂ, Continuous φ → ∫ y, κ y * φ y ∂μ = ∫ t, K t * φ (h.prodExp (⇑b) t) := by
   obtain ⟨r, ρ, c, W, hr, hρ, hρpos, hW, hPW, hcP, hc, hint⟩ := h.exists_haar_density_prodExp μ b
   set P := h.prodExp (⇑b) with hPdef
   have hPc : Continuous P := h.continuous_prodExp _
   refine ⟨r / 2, by positivity, fun K hK hKs => ?_⟩
-  have hεr : closedBall (0 : Fin d → ℝ) (r / 2) ⊆ ball 0 r :=
-    closedBall_subset_ball (by linarith)
+  have hεr : closedBall (0 : Fin d → ℝ) (r / 2) ⊆ ball 0 r := closedBall_subset_ball (by linarith)
   set C := P '' closedBall (0 : Fin d → ℝ) (r / 2) with hCdef
   have hCc : IsCompact C := (isCompact_closedBall _ _).image hPc
   let κ : G → ℂ := W.indicator fun y => K (c y) * (((ρ (c y))⁻¹ : ℝ) : ℂ)
@@ -64,8 +69,7 @@ theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin 
   have hκsupp' : tsupport κ ⊆ P '' tsupport K := by
     refine closure_minimal (fun y hy => ?_) (hKc.image hPc).isClosed
     by_cases hyW : y ∈ W
-    · have hK0 : K (c y) ≠ 0 := by
-        intro h0; apply hy; simp [κ, indicator_of_mem hyW, h0]
+    · have hK0 : K (c y) ≠ 0 := by intro h0; apply hy; simp [κ, indicator_of_mem hyW, h0]
       exact ⟨c y, subset_tsupport _ hK0, hcP y hyW⟩
     · exact absurd (by simp [κ, indicator_of_notMem hyW]) hy
   have hκW : ∀ z ∈ ball (0 : Fin d → ℝ) r, κ (P z) * (ρ z : ℂ) = K z := by
@@ -77,15 +81,15 @@ theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin 
   have hsmooth : (letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, ℂ) ∞ κ) := by
     intro g
     rw [h.contMDiffAt_iff_expG]
-    have hcont : Continuous (fun Y : 𝔤 => g * h.expG Y) :=
-      continuous_const.mul h.continuous_expG
+    have hcont : Continuous (fun Y : 𝔤 => g * h.expG Y) := continuous_const.mul h.continuous_expG
     have hg0 : g * h.expG 0 = g := by rw [h.expG_zero, mul_one]
     by_cases hg : g ∈ C
     · obtain ⟨z₀, hz₀, rfl⟩ := hg
       have hz₀r : z₀ ∈ ball (0 : Fin d → ℝ) r := hεr hz₀
       obtain ⟨hgW, hcg⟩ := hPW z₀ hz₀r
-      have hev : (fun Y : 𝔤 => κ (P z₀ * h.expG Y)) =ᶠ[𝓝 0]
-          fun Y => K (c (P z₀ * h.expG Y)) * (((ρ (c (P z₀ * h.expG Y)))⁻¹ : ℝ) : ℂ) := by
+      have hev
+          : (fun Y : 𝔤 => κ (P z₀ * h.expG Y)) =ᶠ[𝓝 0]
+            fun Y => K (c (P z₀ * h.expG Y)) * (((ρ (c (P z₀ * h.expG Y)))⁻¹ : ℝ) : ℂ) := by
         have : ∀ᶠ Y in 𝓝 (0 : 𝔤), P z₀ * h.expG Y ∈ W := by
           have := hcont.continuousAt (x := 0)
           rw [ContinuousAt, hg0] at this
@@ -94,8 +98,7 @@ theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin 
         simp [κ, indicator_of_mem hY]
       refine ContDiffAt.congr_of_eventuallyEq ?_ hev
       have hc0 := hc (P z₀) hgW
-      have hρ0 : ρ (c (P z₀ * h.expG 0)) ≠ 0 := by
-        rw [hg0, hcg]; exact (hρpos z₀ hz₀r).ne'
+      have hρ0 : ρ (c (P z₀ * h.expG 0)) ≠ 0 := by rw [hg0, hcg]; exact (hρpos z₀ hz₀r).ne'
       exact (hK.contDiffAt.comp _ hc0).mul
         ((Complex.ofRealCLM.contDiff.contDiffAt).comp _ ((hρ.contDiffAt.comp _ hc0).inv hρ0))
     · have hev : (fun Y : 𝔤 => κ (g * h.expG Y)) =ᶠ[𝓝 0] fun _ => 0 := by
@@ -112,22 +115,24 @@ theorem exists_smooth_density_prodExp_tsupport {d : ℕ} (b : Module.Basis (Fin 
   refine ⟨κ, hsmooth, HasCompactSupport.intro hCc hκC, hκsupp', fun φ hφ => ?_⟩
   have hψ₀s : tsupport (fun y => κ y * φ y) ⊆ P '' ball 0 r :=
     (tsupport_mul_subset_left).trans (hκsupp.trans (image_mono hεr))
-  rw [hint (fun y => κ y * φ y) (hκc.mul hφ)
-    ((HasCompactSupport.intro hCc hκC).mul_right) hψ₀s]
-  rw [← setIntegral_eq_integral_of_forall_compl_eq_zero (f := fun t => K t * φ (P t))
-    (s := ball (0 : Fin d → ℝ) r) fun z hz => by
+  rw [hint (fun y => κ y * φ y) (hκc.mul hφ) ((HasCompactSupport.intro hCc hκC).mul_right) hψ₀s]
+  rw [← setIntegral_eq_integral_of_forall_compl_eq_zero
+    (f := fun t => K t * φ (P t))
+    (s := ball (0 : Fin d → ℝ) r)
+    fun z hz => by
       have : K z = 0 := image_eq_zero_of_notMem_tsupport fun h' => hz (hεr (hKs h'))
       simp [this]]
   refine setIntegral_congr_fun measurableSet_ball fun z hz => ?_
   rw [mul_right_comm, hκW z hz]
 
-theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤) :
-    ∃ ε > 0, ∀ β : EuclideanSpace ℝ (Fin d) → ℂ, ContDiff ℝ ∞ β →
-      tsupport β ⊆ closedBall 0 ε →
-      ∃ κ : G → ℂ, (letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, ℂ) ∞ κ) ∧
-        HasCompactSupport κ ∧ tsupport κ ⊆ (fun x => h.expG (coordEquiv b x)) '' tsupport β ∧
-        ∀ φ : G → ℂ, Continuous φ →
-          ∫ y, κ y * φ y ∂μ = ∫ x, β x * φ (h.expG (coordEquiv b x)) := by
+theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ 𝔤)
+    : ∃ ε > 0, ∀ β : EuclideanSpace ℝ (Fin d) → ℂ,
+      ContDiff ℝ ∞ β → tsupport β ⊆ closedBall 0 ε
+        → ∃ κ : G → ℂ,
+          (letI := h.chartedSpace; ContMDiff 𝓘(ℝ, 𝔤) 𝓘(ℝ, ℂ) ∞ κ) ∧ HasCompactSupport κ
+            ∧ tsupport κ ⊆ (fun x => h.expG (coordEquiv b x)) '' tsupport β
+            ∧ ∀ φ : G → ℂ,
+              Continuous φ → ∫ y, κ y * φ y ∂μ = ∫ x, β x * φ (h.expG (coordEquiv b x)) := by
   classical
   obtain ⟨ε₁, hε₁, hdens⟩ := h.exists_smooth_density_prodExp_tsupport μ b
   obtain ⟨S, T, ψ, hSo, hTo, h0S, hΦST, hψTS, hψΦ, hΦψ, hψs, hSN⟩ := h.exists_prodExp_coord b
@@ -148,7 +153,8 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
 
   have hdet : ∀ t ∈ S, (fderiv ℝ Φ t).det ≠ 0 := by
     intro t ht
-    have hΦt : HasFDerivAt Φ (fderiv ℝ Φ t) t := ((hΦat t ht).differentiableAt (by simp)).hasFDerivAt
+    have hΦt : HasFDerivAt Φ (fderiv ℝ Φ t) t :=
+      ((hΦat t ht).differentiableAt (by simp)).hasFDerivAt
     have hψt : HasFDerivAt ψ (fderiv ℝ ψ (Φ t)) (Φ t) :=
       ((hψat _ (hΦST ht)).differentiableAt (by simp)).hasFDerivAt
     have hcomp := hψt.comp t hΦt
@@ -160,12 +166,16 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
     intro h0
     have := congrArg (fun L : (Fin d → ℝ) →L[ℝ] (Fin d → ℝ) => L.det) e
     simp only [ContinuousLinearMap.det, ContinuousLinearMap.coe_id, LinearMap.det_id] at this
-    have h2 : LinearMap.det ((fderiv ℝ ψ (Φ t) : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ)) ∘ₗ
-        (fderiv ℝ Φ t : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ))) = 1 := this
+    have h2
+        : LinearMap.det
+            ((fderiv ℝ ψ (Φ t) : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ))
+              ∘ₗ (fderiv ℝ Φ t : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ)))
+          = 1 :=
+      this
     rw [LinearMap.det_comp] at h2
     replace this := h2
-    rw [show LinearMap.det (fderiv ℝ Φ t : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ)) = 0 from h0,
-      mul_zero] at this
+    rw [show LinearMap.det (fderiv ℝ Φ t : (Fin d → ℝ) →ₗ[ℝ] (Fin d → ℝ)) = 0 from h0, mul_zero]
+      at this
     exact zero_ne_one this
 
   have hψc : ContinuousAt ψ 0 := (hψat 0 h0T).continuousAt
@@ -188,10 +198,12 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
     have : e w ∈ closedBall 0 ε := hβs (subset_tsupport _ hw)
     rw [mem_closedBall_zero_iff] at this ⊢
     exact (hnorm w).trans this
-  have hβ'T : tsupport β' ⊆ T := fun w hw => hδT (by
-    have := hβ's hw
-    rw [mem_closedBall_zero_iff] at this
-    rw [mem_ball_zero_iff]; linarith)
+  have hβ'T : tsupport β' ⊆ T := fun w hw =>
+    hδT (by
+      have := hβ's hw
+      rw [mem_closedBall_zero_iff] at this
+      rw [mem_ball_zero_iff]
+      linarith)
   have hβ'comp : IsCompact (tsupport β') :=
     (isCompact_closedBall _ _).of_isClosed_subset (isClosed_tsupport _) hβ's
   have hβ'e : ∀ w ∈ tsupport β', e w ∈ tsupport β := by
@@ -209,14 +221,14 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
     rw [mem_closedBall_zero_iff] at hw'
     have := hηψ (x := w) (by rw [dist_zero_right]; linarith)
     rw [hψ0, dist_zero_right] at this
-    rw [mem_closedBall_zero_iff]; exact this.le
+    rw [mem_closedBall_zero_iff]
+    exact this.le
   let K : (Fin d → ℝ) → ℂ := fun t =>
     if t ∈ S then ((|(fderiv ℝ Φ t).det| : ℝ) : ℂ) * β' (Φ t) else 0
   have hKsupp : Function.support K ⊆ C' := by
     intro t ht
     by_cases htS : t ∈ S
-    · have hβt : β' (Φ t) ≠ 0 := by
-        intro h0; apply ht; simp [K, htS, h0]
+    · have hβt : β' (Φ t) ≠ 0 := by intro h0; apply ht; simp [K, htS, h0]
       exact ⟨Φ t, subset_tsupport _ hβt, hψΦ t htS⟩
     · exact absurd (by simp [K, htS]) ht
   have hKts : tsupport K ⊆ C' := closure_minimal hKsupp hC'c.isClosed
@@ -244,8 +256,7 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
       exact contDiffAt_const.congr_of_eventuallyEq hev
   obtain ⟨κ, hκs, hκc, hκt, hκint⟩ := hdens K hK (hKts.trans hC'ε)
   refine ⟨κ, hκs, hκc, ?_, fun φ hφ => ?_⟩
-  ·
-    refine hκt.trans ?_
+  · refine hκt.trans ?_
     rintro _ ⟨t, ht, rfl⟩
     obtain ⟨w, hw, rfl⟩ := hKts ht
     have hψw : ψ w ∈ S := hψTS (hβ'T hw)
@@ -256,8 +267,8 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
     set F : (Fin d → ℝ) → ℂ := fun w => β' w * φ (h.expG (b.equivFun.symm w)) with hF
 
     have h1 : ∫ x, β x * φ (h.expG (coordEquiv b x)) = ∫ w, F w := by
-      have := (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin d)).integral_comp'
-        (g := F)
+      have :=
+        (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp (Fin d)).integral_comp' (g := F)
       rw [← this]
       refine integral_congr_ae (Eventually.of_forall fun x => ?_)
       simp [F, β', e, coordEquiv]
@@ -266,7 +277,8 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
     set s := S ∩ Φ ⁻¹' T with hsdef
     have hs : IsOpen s := hΦs.continuousOn.isOpen_inter_preimage hSo hTo
     have hΦs_img : Φ '' s = T := by
-      ext w; constructor
+      ext w
+      constructor
       · rintro ⟨t, ht, rfl⟩; exact ht.2
       · intro hw; exact ⟨ψ w, ⟨hψTS hw, by rw [mem_preimage, hΦψ w hw]; exact hw⟩, hΦψ w hw⟩
     have h2 : ∫ w, F w = ∫ w in T, F w := by
@@ -275,14 +287,14 @@ theorem exists_smooth_density_expCoord {d : ℕ} (b : Module.Basis (Fin d) ℝ �
       simp [F, this]
     have hderiv : ∀ t ∈ s, HasFDerivWithinAt Φ (fderiv ℝ Φ t) s t := fun t ht =>
       ((hΦat t ht.1).differentiableAt (by simp)).hasFDerivAt.hasFDerivWithinAt
-    have hinj : InjOn Φ s := fun t₁ ht₁ t₂ ht₂ he => by
-      rw [← hψΦ t₁ ht₁.1, ← hψΦ t₂ ht₂.1, he]
+    have hinj : InjOn Φ s := fun t₁ ht₁ t₂ ht₂ he => by rw [← hψΦ t₁ ht₁.1, ← hψΦ t₂ ht₂.1, he]
     have h3 := integral_image_eq_integral_abs_det_fderiv_smul volume hs.measurableSet hderiv hinj F
     rw [hΦs_img] at h3
     rw [h2, h3]
 
     rw [← setIntegral_eq_integral_of_forall_compl_eq_zero (s := s)
-      (f := fun t => K t * φ (P t)) fun t ht => by
+      (f := fun t => K t * φ (P t))
+      fun t ht => by
         by_cases htS : t ∈ S
         · have hΦt : Φ t ∉ T := fun hT => ht ⟨htS, hT⟩
           have : β' (Φ t) = 0 := image_eq_zero_of_notMem_tsupport fun h' => hΦt (hβ'T h')

@@ -11,16 +11,20 @@ public import GroundTheory.HeightsAndTheta.Heights.IntegralModels.ChartGlueSat
 
 open MvPolynomial GlobalTheory.CompanionTheory.Ar.Num GroundTheory.Heights₂.Heights.NumbersDVR
 open ReciprocityTheory.ChartRestriction.G.Geo (ChartBundle chartRing)
-open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg mcIdeal chartMon joinCoord bcCoord pullDeg liftVar fnField ck rootNum SameGeneric LatLE IsPull IsPullBC IsSubQuot QuotIso IsFrobPres FlagModel modelDeg)
+open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+  (mseg mcIdeal chartMon joinCoord bcCoord pullDeg liftVar fnField ck rootNum SameGeneric LatLE
+    IsPull IsPullBC IsSubQuot QuotIso IsFrobPres FlagModel modelDeg)
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.PluckerBirat
 
-theorem exists_minor_ne_zero {Ω : Type*} [Field Ω] {M i : ℕ} (A : Fin M → Fin i → Ω)
-    (hA : ∀ t : Fin i → Ω, t ∈ Submodule.span Ω (Set.range A)) :
-    ∃ I : Fin i → Fin M, Matrix.det (Matrix.of fun a b : Fin i => A (I a) b) ≠ 0 := by
+theorem exists_minor_ne_zero
+    {Ω : Type*} [Field Ω]
+    {M i : ℕ} (A : Fin M → Fin i → Ω) (hA : ∀ t : Fin i → Ω, t ∈ Submodule.span Ω (Set.range A))
+    : ∃ I : Fin i → Fin M, Matrix.det (Matrix.of fun a b : Fin i => A (I a) b) ≠ 0 := by
   classical
   obtain ⟨b, hb, hspan, hli⟩ := exists_linearIndependent Ω (Set.range A)
-  have htop : (⊤ : Submodule Ω (Fin i → Ω)) ≤ Submodule.span Ω (Set.range ((↑) : b → Fin i → Ω)) := by
+  have htop
+      : (⊤ : Submodule Ω (Fin i → Ω)) ≤ Submodule.span Ω (Set.range ((↑) : b → Fin i → Ω)) := by
     rw [Subtype.range_coe, hspan]
     exact fun t _ => hA t
   let bas := Module.Basis.mk hli htop
@@ -37,10 +41,13 @@ theorem exists_minor_ne_zero {Ω : Type*} [Field Ω] {M i : ℕ} (A : Fin M → 
   have hu := Matrix.linearIndependent_rows_iff_isUnit.1 hrow
   exact ((Matrix.isUnit_iff_isUnit_det _).1 hu).ne_zero
 
-theorem chartRing_le_fnField (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {Ω : Type*} [Field Ω] [Algebra O Ω] {K : Type} [Fintype K] {ι : K → Type}
-    (x : (Σ k, ι k) → Ω) (s : ∀ k, ι k) {r : Ω} (hr : r ∈ chartRing O (mseg x) s) :
-    r ∈ fnField O x := by
+theorem chartRing_le_fnField
+    (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {Ω : Type*} [Field Ω] [Algebra O Ω]
+    {K : Type} [Fintype K]
+    {ι : K → Type} (x : (Σ k, ι k) → Ω) (s : ∀ k, ι k)
+    {r : Ω} (hr : r ∈ chartRing O (mseg x) s)
+    : r ∈ fnField O x := by
   rw [chartRing] at hr
   induction hr using Algebra.adjoin_induction with
   | mem y hy =>
@@ -52,13 +59,19 @@ theorem chartRing_le_fnField (O : Type*) [CommRing O] [IsDomain O] [IsDiscreteVa
   | add a b _ _ ha hb => exact add_mem ha hb
   | mul a b _ _ ha hb => exact mul_mem ha hb
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  {Ω : Type*} [Field Ω] [Algebra O Ω] {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {Ω : Type*} [Field Ω] [Algebra O Ω]
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
   {x : (Σ k, ι k) → Ω} {N : ℕ} {V : Type*} [AddCommGroup V] [Module Ω V]
 
-theorem mem_span_of_twistedDualGens (E : ChartBundle O (mseg x) N V) {M : ℕ} {a : K → ℤ}
-    {φ : Fin M → Module.Dual Ω V} (hg : IsTwistedDualGens x E a φ) {s₀ : ∀ k, ι k}
-    (hs : mseg x s₀ ≠ 0) (ψ : Module.Dual Ω V) : ψ ∈ Submodule.span Ω (Set.range φ) := by
+theorem mem_span_of_twistedDualGens
+    (E : ChartBundle O (mseg x) N V)
+    {M : ℕ} {a : K → ℤ} {φ : Fin M → Module.Dual Ω V} (hg : IsTwistedDualGens x E a φ)
+    {s₀ : ∀ k, ι k} (hs : mseg x s₀ ≠ 0)
+    (ψ : Module.Dual Ω V)
+    : ψ ∈ Submodule.span Ω (Set.range φ) := by
   classical
   obtain ⟨k, f, c, hf, hc, hsum, hb⟩ := E.frame s₀ hs
   have hne : ∃ l, f l ≠ 0 := by
@@ -108,10 +121,12 @@ theorem mem_span_of_twistedDualGens (E : ChartBundle O (mseg x) N V) {M : ℕ} {
   rw [← bas.sum_dual_apply_smul_coord ψ]
   exact sum_mem fun q _ => Submodule.smul_mem _ _ (hcoord q)
 
-theorem exists_flagMinor_ne_zero {M : ℕ} {φ : Fin M → Module.Dual Ω V}
+theorem exists_flagMinor_ne_zero
+    {M : ℕ} {φ : Fin M → Module.Dual Ω V}
     (hφ : ∀ ψ : Module.Dual Ω V, ψ ∈ Submodule.span Ω (Set.range φ))
-    (w : Module.Basis (Fin N) Ω V) (i : ℕ) (hi : i ≤ N) :
-    ∃ I : Fin i → Fin M, flagMinor φ w i hi I ≠ 0 := by
+    (w : Module.Basis (Fin N) Ω V)
+    (i : ℕ) (hi : i ≤ N)
+    : ∃ I : Fin i → Fin M, flagMinor φ w i hi I ≠ 0 := by
   classical
   let L : Module.Dual Ω V →ₗ[Ω] (Fin i → Ω) :=
     LinearMap.pi fun b => Module.Dual.eval Ω V (w (Fin.castLE hi b))
@@ -124,17 +139,20 @@ theorem exists_flagMinor_ne_zero {M : ℕ} {φ : Fin M → Module.Dual Ω V}
   rw [Submodule.map_span, ← Set.range_comp, hL] at h
   exact h
 
-theorem flagMinor_div_mem (E : ChartBundle O (mseg x) N V) {M : ℕ} {a : K → ℤ}
-    {φ : Fin M → Module.Dual Ω V} (hg : IsTwistedDualGens x E a φ) {s₀ : ∀ k, ι k}
-    (hs : mseg x s₀ ≠ 0) (w : Module.Basis (Fin N) Ω V)
+theorem flagMinor_div_mem
+    (E : ChartBundle O (mseg x) N V)
+    {M : ℕ} {a : K → ℤ} {φ : Fin M → Module.Dual Ω V} (hg : IsTwistedDualGens x E a φ)
+    {s₀ : ∀ k, ι k} (hs : mseg x s₀ ≠ 0)
+    (w : Module.Basis (Fin N) Ω V)
     (hw : ∀ i, ∃ c : O, algebraMap O Ω c ≠ 0 ∧ algebraMap O Ω c • w i ∈ E.lat s₀)
-    (i : ℕ) (hi : i ≤ N) (I I' : Fin i → Fin M) :
-    flagMinor φ w i hi I / flagMinor φ w i hi I' ∈ fnField O x := by
+    (i : ℕ) (hi : i ≤ N) (I I' : Fin i → Fin M)
+    : flagMinor φ w i hi I / flagMinor φ w i hi I' ∈ fnField O x := by
   classical
   choose c hc0 hc using hw
-  have hr : ∀ l b, ∃ r ∈ chartRing O (mseg x) s₀,
-      φ l (algebraMap O Ω (c b) • w b) = r * ∏ k, x ⟨k, s₀ k⟩ ^ a k :=
-    fun l b => hg.sections s₀ hs l _ (hc b)
+  have hr
+      : ∀ l b, ∃ r ∈ chartRing O (mseg x) s₀,
+        φ l (algebraMap O Ω (c b) • w b) = r * ∏ k, x ⟨k, s₀ k⟩ ^ a k := fun l b =>
+    hg.sections s₀ hs l _ (hc b)
   choose r hrm hr using hr
   set T : Ω := ∏ k, x ⟨k, s₀ k⟩ ^ a k with hT
   let D : Fin i → Ω := fun b => (algebraMap O Ω (c (Fin.castLE hi b)))⁻¹ * T
@@ -144,16 +162,19 @@ theorem flagMinor_div_mem (E : ChartBundle O (mseg x) N V) {M : ℕ} {a : K → 
     rw [map_smul, smul_eq_mul] at this
     field_simp [hc0 b]
     linear_combination this
-  have hdet : ∀ J : Fin i → Fin M, flagMinor φ w i hi J = (∏ b, D b) *
-      Matrix.det (Matrix.of fun a' b : Fin i => r (J a') (Fin.castLE hi b)) := by
+  have hdet
+      : ∀ J : Fin i → Fin M,
+        flagMinor φ w i hi J
+          = (∏ b, D b) * Matrix.det (Matrix.of fun a' b : Fin i => r (J a') (Fin.castLE hi b)) := by
     intro J
     rw [← Matrix.det_mul_row]
     unfold flagMinor
     congr 1
     ext a' b
     simp [hφw, D]
-  have hmem : ∀ J : Fin i → Fin M,
-      Matrix.det (Matrix.of fun a' b : Fin i => r (J a') (Fin.castLE hi b)) ∈ fnField O x := by
+  have hmem
+      : ∀ J : Fin i → Fin M,
+        Matrix.det (Matrix.of fun a' b : Fin i => r (J a') (Fin.castLE hi b)) ∈ fnField O x := by
     intro J
     rw [Matrix.det_apply']
     refine sum_mem fun σ _ => mul_mem (intCast_mem _ _) (prod_mem fun b _ => ?_)
@@ -167,7 +188,18 @@ theorem flagMinor_div_mem (E : ChartBundle O (mseg x) N V) {M : ℕ} {a : K → 
 end GlobalTheory.CompanionTheory.Ar.Num.PluckerBirat
 
 open GlobalTheory.CompanionTheory.Ar.Num.PluckerBirat in
-theorem GlobalTheory.CompanionTheory.Ar.Num.plucker_birat : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (Ω : Type) [Field Ω] [Algebra O Ω] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (x : (Σ k, ι k) → Ω) (N : ℕ) (V : Type) [AddCommGroup V] [Module Ω V] (J : Type) [Fintype J] [DecidableEq J] (E : J → ChartBundle O (mseg x) N V) (M : J → ℕ) (a : J → K → ℤ) (φ : ∀ j, Fin (M j) → Module.Dual Ω V), (∀ j, IsTwistedDualGens x (E j) (a j) (φ j)) → ∀ (w : Module.Basis (Fin N) Ω V) (s₀ : ∀ k, ι k), mseg x s₀ ≠ 0 → (∀ k, ∃ I, pluckerCoord φ w ⟨k, I⟩ ≠ 0) ∧ ((∀ j i, ∃ c : O, algebraMap O Ω c ≠ 0 ∧ algebraMap O Ω c • w i ∈ (E j).lat s₀) → fnField O (joinCoord x (pluckerCoord φ w)) = fnField O x) := by
+theorem GlobalTheory.CompanionTheory.Ar.Num.plucker_birat
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (Ω : Type) [Field Ω]
+        [Algebra O Ω] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
+        (x : (Σ k, ι k) → Ω) (N : ℕ) (V : Type) [AddCommGroup V] [Module Ω V] (J : Type) [Fintype J]
+        [DecidableEq J] (E : J → ChartBundle O (mseg x) N V) (M : J → ℕ) (a : J → K → ℤ)
+        (φ : ∀ j, Fin (M j) → Module.Dual Ω V),
+      (∀ j, IsTwistedDualGens x (E j) (a j) (φ j))
+        → ∀ (w : Module.Basis (Fin N) Ω V) (s₀ : ∀ k, ι k),
+          mseg x s₀ ≠ 0
+            → (∀ k, ∃ I, pluckerCoord φ w ⟨k, I⟩ ≠ 0)
+              ∧ ((∀ j i, ∃ c : O, algebraMap O Ω c ≠ 0 ∧ algebraMap O Ω c • w i ∈ (E j).lat s₀)
+                → fnField O (joinCoord x (pluckerCoord φ w)) = fnField O x) := by
   intro O _ _ _ Ω _ _ K _ _ ι _ x N V _ _ J _ _ E M a φ hg w s₀ hs
   refine ⟨fun k => ?_, fun hw => le_antisymm ?_ ?_⟩
   · exact exists_flagMinor_ne_zero (mem_span_of_twistedDualGens (E k.1) (hg k.1) hs) w k.2

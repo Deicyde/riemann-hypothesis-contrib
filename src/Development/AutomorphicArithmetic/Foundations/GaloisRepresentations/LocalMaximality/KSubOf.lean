@@ -5,11 +5,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.productCup_of_system.kSub_of :
-    FiltrationBoundaryCriterion → SubQEx → KSub := by
+theorem UpperTheory.Gal.productCup_of_system.kSub_of
+    : FiltrationBoundaryCriterion → SubQEx → KSub := by
   intro gl sub S E _ _ _ _ act κ _ _ R M r hst hr
   refine ⟨?_, ?_⟩
   · intro d e hK m hm c hc
@@ -19,8 +20,10 @@ theorem UpperTheory.Gal.productCup_of_system.kSub_of :
       rw [← map_mul, ← map_mul, mul_comm]
     have hQ := sub S E act κ M r d e hK
     have hcard : (img e).card = d := by simp [img]
-    refine gl κ E (fun _ => M) (fun l => act (r l)) (img e) d m hW hQ c hc ?_
-      ⟨0, Submodule.zero_mem _, fun _ _ => rfl, ?_⟩
+    refine gl κ E
+      (fun _ => M)
+      (fun l => act (r l))
+      (img e) d m hW hQ c hc ?_ ⟨0, Submodule.zero_mem _, fun _ _ => rfl, ?_⟩
     · intro s hs
       exfalso
       apply hs
@@ -47,11 +50,14 @@ theorem UpperTheory.Gal.productCup_of_system.kSub_of :
       · rw [Submodule.mem_bot] at h2
         rw [h2]
         exact M.zero_mem
-    have hexp : (kos act M r).D y L
-        = ∑ i ∈ L, (GlobalTheory.cubeSign L i : ℤ) • act (r i) (y (L.erase i)) := by
+    have hexp
+        : (kos act M r).D y L
+          = ∑ i ∈ L, (GlobalTheory.cubeSign L i : ℤ) • act (r i) (y (L.erase i)) := by
       simp [kos, acx, wd]
     rw [hexp]
     refine Submodule.sum_mem _ fun i hi => ?_
     refine Submodule.smul_of_tower_mem _ _ ?_
     have h3 : act (r i) (y (L.erase i)) ∈ M.map (act (r i)) := ⟨_, hval i hi, rfl⟩
-    exact (le_iSup₂_of_le (r i) (Set.mem_range_self i) le_rfl : M.map (act (r i)) ≤ sm act M (Set.range r)) h3
+    exact (le_iSup₂_of_le (r i) (Set.mem_range_self i) le_rfl
+        : M.map (act (r i)) ≤ sm act M (Set.range r))
+      h3

@@ -20,8 +20,11 @@ def bigA (I : AutInst) (x : I.GA) : ℝ :=
   (3 * Real.sqrt (I.n : ℝ) / (tau1 I x) ^ 2) ^ (2 * (I.n ^ 2 * I.f))
 
 def AutBallCount : Prop :=
-  ∀ (I : AutInst), 1 ≤ I.n → ∀ (x : I.GA) (r : InfinitePlace I.F → ℝ), (∀ v, 0 ≤ r v) →
-    (ballSet I x r).Finite ∧
-      ((ballSet I x r).ncard : ℝ) ≤ bigA I x * Real.exp (2 * (I.n : ℝ) ^ 2 * ∑ v, r v)
+  ∀ (I : AutInst),
+    1 ≤ I.n
+      → ∀ (x : I.GA) (r : InfinitePlace I.F → ℝ),
+        (∀ v, 0 ≤ r v)
+          → (ballSet I x r).Finite
+            ∧ ((ballSet I x r).ncard : ℝ) ≤ bigA I x * Real.exp (2 * (I.n : ℝ) ^ 2 * ∑ v, r v)
 
 end GlobalTheory.IndefiniteRowSideFullHecke.AutomorphicBallCount

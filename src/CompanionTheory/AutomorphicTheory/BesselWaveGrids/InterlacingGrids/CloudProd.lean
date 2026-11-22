@@ -8,8 +8,8 @@ namespace GroundTheory.BlockD.FourierDecayAlt.WaveGridLiftGrid
 
 open Finset
 
-theorem cloud_weight_prod (c : ℝ) (n : ℕ) :
-    ∏ j ∈ range (n + 1), (if j = 0 then 2 + c else 1 + 1 / (j : ℝ)) = (2 + c) * (n + 1) := by
+theorem cloud_weight_prod (c : ℝ) (n : ℕ)
+    : ∏ j ∈ range (n + 1), (if j = 0 then 2 + c else 1 + 1 / (j : ℝ)) = (2 + c) * (n + 1) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -18,8 +18,8 @@ theorem cloud_weight_prod (c : ℝ) (n : ℕ) :
     push_cast
     field_simp
 
-theorem cloud_factor_le (c g d : ℝ) (j : ℕ) (hc : 0 ≤ c) (hg : 1 + c ≤ g) (hd : (j : ℝ) * g ≤ d) :
-    1 + (1 + c) / max d 1 ≤ (if j = 0 then 2 + c else 1 + 1 / (j : ℝ)) := by
+theorem cloud_factor_le (c g d : ℝ) (j : ℕ) (hc : 0 ≤ c) (hg : 1 + c ≤ g) (hd : (j : ℝ) * g ≤ d)
+    : 1 + (1 + c) / max d 1 ≤ (if j = 0 then 2 + c else 1 + 1 / (j : ℝ)) := by
   split_ifs with hj
   · have : (1 + c) / max d 1 ≤ 1 + c := div_le_self (by linarith) (le_max_right _ _)
     linarith
@@ -35,12 +35,15 @@ theorem cloud_factor_le (c g d : ℝ) (j : ℕ) (hc : 0 ≤ c) (hg : 1 + c ≤ g
       field_simp
     linarith
 
-theorem prod_le_prod_range_of_rank (A : Finset ℕ) (F : ℕ → ℝ) (φ : ℕ → ℕ) (w : ℕ → ℝ) (k : ℕ)
+theorem prod_le_prod_range_of_rank
+    (A : Finset ℕ) (F : ℕ → ℝ) (φ : ℕ → ℕ) (w : ℕ → ℝ) (k : ℕ)
     (hF0 : ∀ s ∈ A, 0 ≤ F s) (hF : ∀ s ∈ A, F s ≤ w (φ s)) (hinj : Set.InjOn φ A)
-    (hmap : ∀ s ∈ A, φ s < k) (hw : ∀ j, 1 ≤ w j) :
-    ∏ s ∈ A, F s ≤ ∏ j ∈ range k, w j := by
+    (hmap : ∀ s ∈ A, φ s < k) (hw : ∀ j, 1 ≤ w j)
+    : ∏ s ∈ A, F s ≤ ∏ j ∈ range k, w j := by
   classical
-  calc ∏ s ∈ A, F s ≤ ∏ s ∈ A, w (φ s) := prod_le_prod₀ hF0 hF
+  calc
+    ∏ s ∈ A, F s
+      ≤ ∏ s ∈ A, w (φ s) := prod_le_prod₀ hF0 hF
     _ = ∏ j ∈ A.image φ, w j := (prod_image hinj).symm
     _ ≤ ∏ j ∈ range k, w j := by
       apply prod_le_prod_of_subset_of_one_le₀
@@ -52,9 +55,10 @@ theorem prod_le_prod_range_of_rank (A : Finset ℕ) (F : ℕ → ℝ) (φ : ℕ 
       · intro j _ _
         exact hw j
 
-theorem cloud_gap_sum (k : ℕ) (lam : ℕ → ℝ) (g : ℝ)
-    (hgap : ∀ s, 1 ≤ s → s + 1 ≤ k - 1 → lam (s + 1) + g ≤ lam s) (s : ℕ) (hs : 1 ≤ s) :
-    ∀ s', s ≤ s' → s' ≤ k - 1 → lam s' + ((s' : ℝ) - s) * g ≤ lam s := by
+theorem cloud_gap_sum
+    (k : ℕ) (lam : ℕ → ℝ) (g : ℝ) (hgap : ∀ s, 1 ≤ s → s + 1 ≤ k - 1 → lam (s + 1) + g ≤ lam s)
+    (s : ℕ) (hs : 1 ≤ s)
+    : ∀ s', s ≤ s' → s' ≤ k - 1 → lam s' + ((s' : ℝ) - s) * g ≤ lam s := by
   intro s' hss'
   induction s', hss' using Nat.le_induction with
   | base => intro _; simp
@@ -66,9 +70,12 @@ theorem cloud_gap_sum (k : ℕ) (lam : ℕ → ℝ) (g : ℝ)
     rw [h3]
     linarith
 
-theorem cloud_prod_le (k : ℕ) (lam : ℕ → ℝ) (c g Y : ℝ) (hk : 1 ≤ k) (hc : 0 ≤ c) (hg : 1 + c ≤ g)
-    (hgap : ∀ s, 1 ≤ s → s + 1 ≤ k - 1 → lam (s + 1) + g ≤ lam s) :
-    ∏ s ∈ Icc 1 (k - 1), (1 + (1 + c) / max |Y + lam s| 1) ≤ (2 + c) ^ 2 * (k : ℝ) ^ 2 := by
+theorem cloud_prod_le
+    (k : ℕ) (lam : ℕ → ℝ)
+    (c g Y : ℝ)
+    (hk : 1 ≤ k) (hc : 0 ≤ c) (hg : 1 + c ≤ g)
+    (hgap : ∀ s, 1 ≤ s → s + 1 ≤ k - 1 → lam (s + 1) + g ≤ lam s)
+    : ∏ s ∈ Icc 1 (k - 1), (1 + (1 + c) / max |Y + lam s| 1) ≤ (2 + c) ^ 2 * (k : ℝ) ^ 2 := by
   classical
   have hF0 : ∀ s, 0 ≤ 1 + (1 + c) / max |Y + lam s| 1 := fun s => by
     have : 0 ≤ (1 + c) / max |Y + lam s| 1 :=
@@ -88,8 +95,10 @@ theorem cloud_prod_le (k : ℕ) (lam : ℕ → ℝ) (c g Y : ℝ) (hk : 1 ≤ k)
   have hone : (1 : ℝ) ≤ (2 + c) * k := by nlinarith
   have hbound0 : 0 ≤ (2 + c) * k := by positivity
   rw [← prod_filter_mul_prod_filter_not (Icc 1 (k - 1)) (fun s => 0 < Y + lam s)]
-  have hL : ∏ s ∈ (Icc 1 (k - 1)).filter (fun s => 0 < Y + lam s),
-      (1 + (1 + c) / max |Y + lam s| 1) ≤ (2 + c) * k := by
+  have hL
+      : ∏ s ∈ (Icc 1 (k - 1)).filter (fun s => 0 < Y + lam s),
+          (1 + (1 + c) / max |Y + lam s| 1)
+        ≤ (2 + c) * k := by
     by_cases hne : ((Icc 1 (k - 1)).filter (fun s => 0 < Y + lam s)).Nonempty
     · have ht := max'_mem _ hne
       set t := ((Icc 1 (k - 1)).filter (fun s => 0 < Y + lam s)).max' hne with ht_def
@@ -116,8 +125,10 @@ theorem cloud_prod_le (k : ℕ) (lam : ℕ → ℝ) (c g Y : ℝ) (hk : 1 ≤ k)
         omega
     · rw [not_nonempty_iff_eq_empty.mp hne, prod_empty]
       exact hone
-  have hR : ∏ s ∈ (Icc 1 (k - 1)).filter (fun s => ¬ 0 < Y + lam s),
-      (1 + (1 + c) / max |Y + lam s| 1) ≤ (2 + c) * k := by
+  have hR
+      : ∏ s ∈ (Icc 1 (k - 1)).filter (fun s => ¬ 0 < Y + lam s),
+          (1 + (1 + c) / max |Y + lam s| 1)
+        ≤ (2 + c) * k := by
     by_cases hne : ((Icc 1 (k - 1)).filter (fun s => ¬ 0 < Y + lam s)).Nonempty
     · have hu := min'_mem _ hne
       set u := ((Icc 1 (k - 1)).filter (fun s => ¬ 0 < Y + lam s)).min' hne with hu_def
@@ -146,8 +157,9 @@ theorem cloud_prod_le (k : ℕ) (lam : ℕ → ℝ) (c g Y : ℝ) (hk : 1 ≤ k)
         omega
     · rw [not_nonempty_iff_eq_empty.mp hne, prod_empty]
       exact hone
-  calc _ ≤ ((2 + c) * k) * ((2 + c) * k) :=
-        mul_le_mul_of_nonneg hL hR (prod_nonneg fun s _ => hF0 s) hbound0
+  calc
+    _ ≤ ((2 + c) * k) * ((2 + c) * k) :=
+      mul_le_mul_of_nonneg hL hR (prod_nonneg fun s _ => hF0 s) hbound0
     _ = (2 + c) ^ 2 * (k : ℝ) ^ 2 := by ring
 
 end GroundTheory.BlockD.FourierDecayAlt.WaveGridLiftGrid

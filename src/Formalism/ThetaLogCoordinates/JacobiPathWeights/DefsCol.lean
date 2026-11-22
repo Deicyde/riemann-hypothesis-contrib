@@ -19,11 +19,11 @@ variable {R : Type*} [CommRing R] {n : ℕ}
 
 def oneF : Form R n := fun I => if I = ∅ then 1 else 0
 
-def wedgeF (K : Form R n) (X : Fin n → R) : Form R n :=
-  fun I => ∑ m ∈ I, ((sg I m : ℤ) : R) * K (I.erase m) * X m
+def wedgeF (K : Form R n) (X : Fin n → R) : Form R n := fun I =>
+  ∑ m ∈ I, ((sg I m : ℤ) : R) * K (I.erase m) * X m
 
-def contrF (K : Form R n) (X : Fin n → R) : Form R n :=
-  fun I => ∑ m ∈ Iᶜ, ((sg I m : ℤ) : R) * X m * K (insert m I)
+def contrF (K : Form R n) (X : Fin n → R) : Form R n := fun I =>
+  ∑ m ∈ Iᶜ, ((sg I m : ℤ) : R) * X m * K (insert m I)
 
 def stepF (up : Bool) (K : Form R n) (X : Fin n → R) : Form R n :=
   if up then wedgeF K X else contrF K X

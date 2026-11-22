@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TameTwi
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum
-  IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain
+  NumberField Matrix
 open Formalism.IndefR.Links (PolF)
 open Formalism.L2.NTheta (IsIdemAt)
 open scoped TensorProduct
@@ -31,10 +33,8 @@ open GlobalTheory.StepLaw (ResAt UnrOff)
 
 variable {D : D7} {S T : HSp D}
 
-
 open Classical in
 def allP (B : Base S T) (Q : Finset (Pl D.host.E)) : Finset (Pl D.host.E) := B.G.Pg ∪ (B.de.Q ∪ Q)
-
 
 open Classical in
 def resP (B : Base S T) (ν : Twist D Circle) (PP : Pl D.host.E) : (kP PP)ˣ →* ℂˣ :=

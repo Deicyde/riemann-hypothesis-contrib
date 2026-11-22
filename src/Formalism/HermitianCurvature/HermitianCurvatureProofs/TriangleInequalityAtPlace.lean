@@ -13,24 +13,28 @@ open scoped ENNReal
 noncomputable section
 
 open Classical in
-theorem choose_dite_congr {α E : Type*} [Zero E] (P Q : α → Prop) (hPQ : P = Q) (f g : α → E)
+theorem choose_dite_congr
+    {α E : Type*} [Zero E]
+    (P Q : α → Prop) (hPQ : P = Q)
+    (f g : α → E)
     [Decidable (∃ θ, P θ)] [Decidable (∃ θ, Q θ)]
-    (hfg : ∀ θ, P θ → f θ = g θ) :
-    (if h : ∃ θ, P θ then f h.choose else 0) = (if h : ∃ θ, Q θ then g h.choose else 0) := by
+    (hfg : ∀ θ, P θ → f θ = g θ)
+    : (if h : ∃ θ, P θ then f h.choose else 0) = (if h : ∃ θ, Q θ then g h.choose else 0) := by
   subst hPQ
   split_ifs with h1 <;> first | rfl | exact hfg _ h1.choose_spec
 
-
-theorem one_mem_UW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
-    (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) ∈ UWset k r z := by
+theorem one_mem_UW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    : (1 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) ∈ UWset k r z := by
   simp only [UWset, Set.mem_setOf_eq]
   refine ⟨?_, fun a => ⟨Matrix.one_mulVec _, Matrix.one_mulVec _⟩, Matrix.one_mulVec _⟩
   simp only [UH, Set.mem_setOf_eq, Matrix.conjTranspose_one, one_mul, mul_one]
 
-theorem Gf_sgs {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (Ds : B.RealPlaceData k r Wp Wq) (q : B.SS k r)
-    (hq : Ds.inSS q) (g : B.Mat k r) :
-    Gf k r Ds.z Ds.z' (B.sgs q g) = Gf k r Ds.z Ds.z' g := by
+theorem Gf_sgs
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+    (Ds : B.RealPlaceData k r Wp Wq) (q : B.SS k r) (hq : Ds.inSS q)
+    (g : B.Mat k r)
+    : Gf k r Ds.z Ds.z' (B.sgs q g) = Gf k r Ds.z Ds.z' g := by
   obtain ⟨hh, hn, hh', hn'⟩ := hq
   have SG := sGroup k r Ds.z Ds.z_mem
   have SG' := sGroup k r Ds.z' Ds.z'_mem
@@ -41,21 +45,29 @@ theorem Gf_sgs {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductS
   have hs : (Matrix.of q.1.1)⁻¹ * (Matrix.of q.1.2)⁻¹ ∈ Sset k r Ds.z :=
     SG.2.1 _ (SG.2.2 _ hS1) _ (SG.2.2 _ hS2)
   have hs' : Matrix.of q.2.2 * Matrix.of q.2.1 ∈ Sset k r Ds.z' := SG'.2.1 _ hS4 _ hS3
-  have e : B.sgs q g = ((Matrix.of q.1.1)⁻¹ * (Matrix.of q.1.2)⁻¹) * g *
-      (Matrix.of q.2.2 * Matrix.of q.2.1) := by
+  have e
+      : B.sgs q g
+        = ((Matrix.of q.1.1)⁻¹ * (Matrix.of q.1.2)⁻¹) * g
+          * (Matrix.of q.2.2 * Matrix.of q.2.1) := by
     unfold B.sgs; simp only [mul_assoc]
   rw [e]
   exact gInv k r Ds.z Ds.z' Ds.z_mem Ds.z'_mem _ hs _ hs' g
 
-theorem ae_inSS {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] (Ds : B.RealPlaceData k r Wp Wq) :
-    ∀ᵐ q ∂Ds.μSS, Ds.inSS q := by
-  have key : ∀ {α β : Type} [MeasurableSpace α] [MeasurableSpace β] (μ : Measure α) (ν : Measure β)
-      (P : α → Prop), (∀ᵐ x ∂μ, P x) → ∀ᵐ p ∂(μ.prod ν), P p.1 := by
+theorem ae_inSS
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+    (Ds : B.RealPlaceData k r Wp Wq)
+    : ∀ᵐ q ∂Ds.μSS, Ds.inSS q := by
+  have key
+      : ∀ {α β : Type} [MeasurableSpace α] [MeasurableSpace β] (μ : Measure α) (ν : Measure β)
+          (P : α → Prop),
+        (∀ᵐ x ∂μ, P x) → ∀ᵐ p ∂(μ.prod ν), P p.1 := by
     intro α β _ _ μ ν P h
     exact Measure.quasiMeasurePreserving_fst.ae h
-  have key2 : ∀ {α β : Type} [MeasurableSpace α] [MeasurableSpace β] (μ : Measure α) (ν : Measure β)
-      (P : β → Prop), (∀ᵐ y ∂ν, P y) → ∀ᵐ p ∂(μ.prod ν), P p.2 := by
+  have key2
+      : ∀ {α β : Type} [MeasurableSpace α] [MeasurableSpace β] (μ : Measure α) (ν : Measure β)
+          (P : β → Prop),
+        (∀ᵐ y ∂ν, P y) → ∀ᵐ p ∂(μ.prod ν), P p.2 := by
     intro α β _ _ μ ν P h
     exact Measure.quasiMeasurePreserving_snd.ae h
   have h1 : ∀ᵐ x ∂Ds.μW, Matrix.of x ∈ UWset k r Ds.z := ae_iff.mpr Ds.haarW.conc
@@ -66,9 +78,10 @@ theorem ae_inSS {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProduct
     key2 _ _ _ (key2 _ _ _ h2)] with q a b c d
   exact And.intro a (And.intro b (And.intro c d))
 
-theorem Gf_of_Zhat {k r : ℕ} (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (pt : C.LPt)
-    (h : Zhat k r z z' g = D.ptMatN pt (r + 1)) :
-    Gf k r z z' g = D.ptG (Tz k r z * Tz k r z') r pt := by
+theorem Gf_of_Zhat
+    {k r : ℕ} (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r)
+    (pt : C.LPt) (h : Zhat k r z z' g = D.ptMatN pt (r + 1))
+    : Gf k r z z' g = D.ptG (Tz k r z * Tz k r z') r pt := by
   have e1 : Dmin k r z z' g (Fin.last (r + 1)) = (D.ptMatN pt (r + 1)).det := by
     unfold Dmin
     rw [h]
@@ -84,7 +97,6 @@ end
 
 end Formalism.FourierDecayAlt.P.TBBx2
 
-
 namespace Formalism.FourierDecayAlt.P.TBBx2
 
 open MeasureTheory Filter Topology Formalism.QuantumDeterminants
@@ -92,8 +104,8 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem finite_words {α : Type*} (A : Set α) (hA : A.Finite) (N : ℕ) :
-    {w : List α | w.length ≤ N ∧ ∀ l ∈ w, l ∈ A}.Finite := by
+theorem finite_words {α : Type*} (A : Set α) (hA : A.Finite) (N : ℕ)
+    : {w : List α | w.length ≤ N ∧ ∀ l ∈ w, l ∈ A}.Finite := by
   have : Finite A := hA.to_subtype
   refine ((List.finite_length_le A N).image (List.map Subtype.val)).subset ?_
   rintro w ⟨hw, hwA⟩
@@ -103,24 +115,29 @@ theorem finite_words {α : Type*} (A : Set α) (hA : A.Finite) (N : ℕ) :
 
 section one
 
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
-theorem RR_top (p : KB.Pl P Wp Wq) (G : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (γ : C.LPt)
-    (hγ : D.IsLocPt γ (P.r + 1)) :
-    p.RR G (P.r + 1) [] γ γ = B.hsInner (p.V G γ) (p.V G γ) := by
-  have h1 : ¬ (P.r + 1 ≤ P.r) := by omega
+theorem RR_top
+    (p : KB.Pl P Wp Wq) (G : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (γ : C.LPt) (hγ : D.IsLocPt γ (P.r + 1))
+    : p.RR G (P.r + 1) [] γ γ = B.hsInner (p.V G γ) (p.V G γ) := by
+  have h1 : ¬(P.r + 1 ≤ P.r) := by omega
   unfold KB.Pl.RR KB.Pl.V D.RRplace
   rw [dite_eq_left (And.intro hγ hγ), dite_eq_right h1, if_pos rfl, if_pos rfl]
 
-theorem Ew_nil (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (G : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (i : ℕ) (γ : C.LPt) :
-    TBB.Ew p nn G i [] γ = TBB.Ew p (fun _ => 1) G i [] γ := by
+theorem Ew_nil
+    (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (G : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (i : ℕ) (γ : C.LPt)
+    : TBB.Ew p nn G i [] γ = TBB.Ew p (fun _ => 1) G i [] γ := by
   simp only [TBB.Ew, TBB.NP, TBB.normC, List.map_nil, List.prod_nil]
 
-theorem Ew_cut (p : KB.Pl P Wp Wq) (nn : ℝ → ℝ) (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp))
-    (hV : TBB.VecCutAt p χ F) (ε : ℝ) (hε : 0 < ε) (γ : C.LPt) (hγ : D.IsLocPt γ (P.r + 1))
-    (hG : ε ≤ TBB.Gp p γ) :
-    TBB.Ew p nn (D.cutF p.T.base χ F ε) (P.r + 1) [] γ = TBB.Ew p nn F (P.r + 1) [] γ := by
+theorem Ew_cut
+    (p : KB.Pl P Wp Wq)
+    (nn : ℝ → ℝ)
+    (χ : ℝ → ℝ) (F : B.Mat P.k P.r → (Wq →L[ℂ] Wp)) (hV : TBB.VecCutAt p χ F)
+    (ε : ℝ) (hε : 0 < ε)
+    (γ : C.LPt) (hγ : D.IsLocPt γ (P.r + 1)) (hG : ε ≤ TBB.Gp p γ)
+    : TBB.Ew p nn (D.cutF p.T.base χ F ε) (P.r + 1) [] γ = TBB.Ew p nn F (P.r + 1) [] γ := by
   unfold TBB.Ew TBB.NP
   rw [RR_top p (D.cutF p.T.base χ F ε) γ hγ, RR_top p F γ hγ, hV ε hε γ hγ hG]
 
@@ -199,7 +216,8 @@ open scoped ENNReal
 
 noncomputable section
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
 lemma hsVec_smul (c : ℂ) (A : Wq →L[ℂ] Wp) : B.hsVec (c • A) = c • B.hsVec A := by
@@ -253,7 +271,6 @@ lemma cs_bound {n : ℕ} (a x : Fin n → ℝ) (ha : ∀ i, 0 ≤ a i) :
 end
 
 end Formalism.FourierDecayAlt.P.TBBx2.Tri
-
 
 namespace Formalism.FourierDecayAlt.P.TBBx2.Bp
 
@@ -393,7 +410,8 @@ lemma jacobi_norm_sq_bound {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [I
 end Formalism.FourierDecayAlt.P.TBBx2.Bp
 
 open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TBB MeasureTheory in
-theorem Formalism.FourierDecayAlt.P.theorem_b_of_parts : Formalism.FourierDecayAlt.TBB.ThmBpOfParts := by
+theorem Formalism.FourierDecayAlt.P.theorem_b_of_parts
+    : Formalism.FourierDecayAlt.TBB.ThmBpOfParts := by
   intro C₃ CΛ C₀ C₂ Cκ hC₃ hCΛ hC₀ hC₂
   refine ⟨40 + CΛ + max 0 (Real.log C₂ / Real.log 3) + |Cκ| + 2 * C₃ * (3 * C₀ + 10), ?_⟩
   intro Wp Wq _ _ _ _ _ _ P p f Fp Fm b Λ κ₀ n₀ p₀ hb hΛ hΛb hκ hκb hT hn₀ hp₀ hN hPp hPm hR γ hγ hG
@@ -402,46 +420,102 @@ theorem Formalism.FourierDecayAlt.P.theorem_b_of_parts : Formalism.FourierDecayA
   have hX0 : 0 ≤ (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) := by positivity
   have hK0 : 0 ≤ κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) := by positivity
   have hTn0 : 0 ≤ (Tq p)⁻¹ ^ n₀ := by positivity
-  have hBq0 : 0 ≤ b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)) := by positivity
-  have hZ0 : 0 ≤ κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)) := mul_nonneg (mul_nonneg hK0 hTn0) hBq0
+  have hBq0 : 0 ≤ b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)) := by
+    positivity
+  have hZ0
+      : 0
+        ≤ κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+          * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)) :=
+    mul_nonneg (mul_nonneg hK0 hTn0) hBq0
   have hD := hR (2 * p₀ + n₀) le_rfl
-  have hFb : ∀ F, F ∈ ({Fp, Fm} : Set (B.Mat P.k P.r → (Wq →L[ℂ] Wp))) →
-      PtBound p F (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1)) →
-      ENNReal.ofReal (Ew p (fun _ => 1) F (P.r + 1) [] γ) ≤ ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * jN2 p f := by
+  have hFb
+      : ∀ F,
+        F ∈ ({Fp, Fm} : Set (B.Mat P.k P.r → (Wq →L[ℂ] Wp)))
+          → PtBound p F (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1))
+          → ENNReal.ofReal (Ew p (fun _ => 1) F (P.r + 1) [] γ)
+            ≤ ENNReal.ofReal
+                (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                  * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+              * jN2 p f := by
     intro F hF hP
-    have hj := Formalism.FourierDecayAlt.P.TBBx2.Bp.jacobi_norm_sq_bound p f F n₀ p₀ hT (fun c => hN.2 c F hF)
-    calc ENNReal.ofReal (Ew p (fun _ => 1) F (P.r + 1) [] γ)
+    have hj :=
+      Formalism.FourierDecayAlt.P.TBBx2.Bp.jacobi_norm_sq_bound p f F n₀ p₀ hT
+        (fun c => hN.2 c F hF)
+    calc
+      ENNReal.ofReal (Ew p (fun _ => 1) F (P.r + 1) [] γ)
         ≤ ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1)) * jN2 p F := hP γ hγ hG
-      _ ≤ ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1)) * (ENNReal.ofReal ((Tq p)⁻¹ ^ n₀) * (ENNReal.ofReal (b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * jN2 p f)) := by
-          gcongr
-          exact hj.trans (by gcongr)
-      _ = ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * jN2 p f := by
-          rw [ENNReal.ofReal_mul (mul_nonneg hK0 hTn0), ENNReal.ofReal_mul hK0]
-          ring
+      _ ≤ ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1))
+          * (ENNReal.ofReal ((Tq p)⁻¹ ^ n₀)
+            * (ENNReal.ofReal (b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+              * jN2 p f)) := by
+        gcongr
+        exact hj.trans (by gcongr)
+      _ = ENNReal.ofReal
+            (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+              * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+          * jN2 p f := by
+        rw [ENNReal.ofReal_mul (mul_nonneg hK0 hTn0), ENNReal.ofReal_mul hK0]
+        ring
   have hEp := hFb Fp (Set.mem_insert _ _) hPp
   have hEm := hFb Fm (Set.mem_insert_of_mem _ (Set.mem_singleton Fm)) hPm
-  have hTG : (Tq p / Gp p γ) ^ n₀ * (Tq p)⁻¹ ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) = (Gp p γ)⁻¹ ^ (2 * p₀ + n₀) := by
+  have hTG
+      : (Tq p / Gp p γ) ^ n₀ * (Tq p)⁻¹ ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+        = (Gp p γ)⁻¹ ^ (2 * p₀ + n₀) := by
     have e : Tq p / Gp p γ * (Tq p)⁻¹ = (Gp p γ)⁻¹ := by
       rw [div_mul_eq_mul_div, mul_inv_cancel₀ hT0.ne', one_div]
     rw [← mul_pow, e, ← pow_add, add_comm]
-  calc ENNReal.ofReal (Ew p (fun _ => 1) f (P.r + 1) [] γ)
-      ≤ ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) * (Ew p (fun _ => 1) Fp (P.r + 1) [] γ + Ew p (fun _ => 1) Fm (P.r + 1) [] γ)) := ENNReal.ofReal_le_ofReal (hN.1 γ hγ hG)
-    _ ≤ ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)) * (ENNReal.ofReal (Ew p (fun _ => 1) Fp (P.r + 1) [] γ) + ENNReal.ofReal (Ew p (fun _ => 1) Fm (P.r + 1) [] γ)) := by
-        rw [ENNReal.ofReal_mul hX0]
-        gcongr
-        exact ENNReal.ofReal_add_le
-    _ ≤ ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)) * (ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * jN2 p f + ENNReal.ofReal (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * jN2 p f) := by
-        gcongr
-    _ = ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) + (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))) * jN2 p f := by
-        rw [ENNReal.ofReal_add (mul_nonneg hX0 hZ0) (mul_nonneg hX0 hZ0), ENNReal.ofReal_mul hX0]
-        ring
-    _ ≤ ENNReal.ofReal (b ^ ((40 + CΛ + max 0 (Real.log C₂ / Real.log 3) + |Cκ| + 2 * C₃ * (3 * C₀ + 10)) * ((2 * P.r + 2 : ℕ) : ℝ) ^ 4) * (Gp p γ)⁻¹ ^ (2 * p₀ + n₀)) * jN2 p f := by
-        gcongr ?_ * _
-        apply ENNReal.ofReal_le_ofReal
-        have key : (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) + (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀ * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) =
-            (2 * (3 * b) ^ (2 * n₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1)) * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))) * (Gp p γ)⁻¹ ^ (2 * p₀ + n₀) := by
-          rw [← hTG]; ring
-        rw [key]
-        exact mul_le_mul_of_nonneg_right
-          (Formalism.FourierDecayAlt.P.TBBx2.Bp.const_le C₃ CΛ C₀ C₂ Cκ b Λ κ₀ P.r n₀ p₀ hC₃ hCΛ hC₀ hC₂ hb hΛ hΛb hκ hκb
-            hn₀ hp₀) (by positivity)
+  calc
+    ENNReal.ofReal (Ew p (fun _ => 1) f (P.r + 1) [] γ)
+        ≤ ENNReal.ofReal
+          ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+            * (Ew p (fun _ => 1) Fp (P.r + 1) [] γ + Ew p (fun _ => 1) Fm (P.r + 1) [] γ)) :=
+      ENNReal.ofReal_le_ofReal (hN.1 γ hγ hG)
+    _ ≤ ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀))
+        * (ENNReal.ofReal (Ew p (fun _ => 1) Fp (P.r + 1) [] γ)
+          + ENNReal.ofReal (Ew p (fun _ => 1) Fm (P.r + 1) [] γ)) := by
+      rw [ENNReal.ofReal_mul hX0]
+      gcongr
+      exact ENNReal.ofReal_add_le
+    _ ≤ ENNReal.ofReal ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀))
+        * (ENNReal.ofReal
+              (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+            * jN2 p f
+          + ENNReal.ofReal
+              (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+            * jN2 p f) := by
+      gcongr
+    _ = ENNReal.ofReal
+          ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+              * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+            + (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+              * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))))
+        * jN2 p f := by
+      rw [ENNReal.ofReal_add (mul_nonneg hX0 hZ0) (mul_nonneg hX0 hZ0), ENNReal.ofReal_mul hX0]
+      ring
+    _ ≤ ENNReal.ofReal
+          (b ^ ((40 + CΛ + max 0 (Real.log C₂ / Real.log 3) + |Cκ| + 2 * C₃ * (3 * C₀ + 10))
+              * ((2 * P.r + 2 : ℕ) : ℝ) ^ 4)
+            * (Gp p γ)⁻¹ ^ (2 * p₀ + n₀))
+        * jN2 p f := by
+      gcongr ?_ * _
+      apply ENNReal.ofReal_le_ofReal
+      have key
+          : (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+                * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                  * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+              + (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+                * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1) * (Tq p)⁻¹ ^ n₀
+                  * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+            = (2 * (3 * b) ^ (2 * n₀) * (κ₀ * (C₂ * Λ ^ 2) ^ (P.r + 1))
+                * b ^ (2 * C₃ * ((2 * P.r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)))
+              * (Gp p γ)⁻¹ ^ (2 * p₀ + n₀) := by
+        rw [← hTG]; ring
+      rw [key]
+      exact mul_le_mul_of_nonneg_right
+        (Formalism.FourierDecayAlt.P.TBBx2.Bp.const_le C₃ CΛ C₀ C₂ Cκ b Λ κ₀ P.r n₀ p₀ hC₃ hCΛ hC₀
+          hC₂ hb hΛ hΛb hκ hκb hn₀ hp₀)
+        (by positivity)

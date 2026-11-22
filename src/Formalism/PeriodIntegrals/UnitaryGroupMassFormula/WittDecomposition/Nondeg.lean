@@ -9,20 +9,23 @@ namespace PI.Witt
 
 variable {K V : Type} [Field K] [StarRing K] [CharZero K] [AddCommGroup V] [Module K V]
 
-theorem nondeg_extend (h1 : OneVector) (h2 : Anisotropic) [FiniteDimensional K V]
-    (B : V →ₗ⋆[K] V →ₗ[K] K) (hB : ∀ x y, star (B x y) = B y x) :
-    ∀ (n : ℕ) (U : Submodule K V), Module.finrank K U = n →
-      (∀ x ∈ U, (∀ y ∈ U, B x y = 0) → x = 0) →
-      ∀ f : U →ₗ[K] V, (∀ x y : U, B (f x) (f y) = B x y) →
-      ∃ g : V ≃ₗ[K] V, (∀ x y, B (g x) (g y) = B x y) ∧ (∀ x : U, g x = f x) ∧
-        ∀ z, (∀ u : U, B (u : V) z = 0) → (∀ u : U, B (f u) z = 0) → g z = z := by
+theorem nondeg_extend
+    (h1 : OneVector) (h2 : Anisotropic)
+    [FiniteDimensional K V]
+    (B : V →ₗ⋆[K] V →ₗ[K] K) (hB : ∀ x y, star (B x y) = B y x)
+    : ∀ (n : ℕ) (U : Submodule K V),
+      Module.finrank K U = n → (∀ x ∈ U, (∀ y ∈ U, B x y = 0) → x = 0)
+        → ∀ f : U →ₗ[K] V,
+          (∀ x y : U, B (f x) (f y) = B x y)
+            → ∃ g : V ≃ₗ[K] V,
+              (∀ x y, B (g x) (g y) = B x y) ∧ (∀ x : U, g x = f x)
+                ∧ ∀ z, (∀ u : U, B (u : V) z = 0) → (∀ u : U, B (f u) z = 0) → g z = z := by
   intro n
   refine Nat.strong_induction_on n (fun n ih => ?_)
   intro U hU hnd f hf
   by_cases hex : ∃ x ∈ U, ∃ y ∈ U, B x y ≠ 0
   · obtain ⟨u, hu, hBu⟩ := h2 K V B hB U hex
-    obtain ⟨g₁, hg₁, hg₁u, hg₁fix⟩ :=
-      h1 K V B hB u (f ⟨u, hu⟩) (hf ⟨u, hu⟩ ⟨u, hu⟩).symm hBu
+    obtain ⟨g₁, hg₁, hg₁u, hg₁fix⟩ := h1 K V B hB u (f ⟨u, hu⟩) (hf ⟨u, hu⟩ ⟨u, hu⟩).symm hBu
     have hsym : ∀ a b, B (g₁.symm a) b = B a (g₁ b) := by
       intro a b
       rw [← hg₁ (g₁.symm a) b, LinearEquiv.apply_symm_apply]
@@ -69,13 +72,15 @@ theorem nondeg_extend (h1 : OneVector) (h2 : Anisotropic) [FiniteDimensional K V
       let x' : U' := ⟨_, hmem⟩
       have hxv : (x : V) = c • u + (x' : V) := by simp [x']
       have hxU : x = c • (⟨u, hu⟩ : U) + Submodule.inclusion hle x' := Subtype.ext (by simp [x'])
-      calc (g₂.trans g₁) (x : V) = g₁ (g₂ (c • u + (x' : V))) := by rw [← hxv]; rfl
+      calc
+        (g₂.trans g₁) (x : V)
+          = g₁ (g₂ (c • u + (x' : V))) := by rw [← hxv]; rfl
         _ = c • g₁ u + g₁ (f' x') := by
-            rw [map_add (f := _), map_smul, hg₂u, hg₂f x', map_add (f := _), map_smul]
+          rw [map_add (f := _), map_smul, hg₂u, hg₂f x', map_add (f := _), map_smul]
         _ = f x := by
-            rw [hg₁u, hf'x, LinearEquiv.apply_symm_apply]
-            conv_rhs => rw [hxU]
-            rw [map_add (f := _), map_smul]
+          rw [hg₁u, hf'x, LinearEquiv.apply_symm_apply]
+          conv_rhs => rw [hxU]
+          rw [map_add (f := _), map_smul]
     · have hg₁z : g₁ z = z := hg₁fix z (hz₁ ⟨u, hu⟩) (hz₂ ⟨u, hu⟩)
       have hg₂z : g₂ z = z := by
         refine hg₂fix z (fun w => hz₁ (Submodule.inclusion hle w)) fun w => ?_

@@ -17,17 +17,26 @@ def shC (C : ℕ → Rep k G) (Z : Rep k G) : ℕ → Rep k G
   | 0 => Z
   | n + 1 => C (n + 2)
 
-def shD (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p) (Z : Rep k G) (b : C 2 ⟶ Z) :
-    ∀ p, shC C Z (p + 1) ⟶ shC C Z p
+def shD (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p) (Z : Rep k G) (b : C 2 ⟶ Z)
+    : ∀ p, shC C Z (p + 1) ⟶ shC C Z p
   | 0 => b
   | p + 1 => d (p + 2)
 
-theorem main : ∀ (k G : Type) [CommRing k] [Group G] (i : ℕ) (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p), (∀ p, d (p + 1) ≫ d p = 0) → Function.Surjective (d 0).hom → (∀ p, p + 1 ≤ i + 1 → Function.Exact (d (p + 1)).hom (d p).hom) → (∀ p q, 2 ≤ p → p + q = i + 1 → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom) → Function.Exact (hMap (d 1) i).hom (hMap (d 0) i).hom := by
+theorem main
+    : ∀ (k G : Type) [CommRing k] [Group G] (i : ℕ) (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p),
+      (∀ p, d (p + 1) ≫ d p = 0) → Function.Surjective (d 0).hom
+        → (∀ p, p + 1 ≤ i + 1 → Function.Exact (d (p + 1)).hom (d p).hom)
+        → (∀ p q,
+          2 ≤ p → p + q = i + 1 → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom)
+        → Function.Exact (hMap (d 1) i).hom (hMap (d 0) i).hom := by
   intro k G _ _ i C d hd hs hex hH
-  obtain ⟨Z, ι, hι, b, hse, hbι, hbs, hdb, hexb⟩ := GlobalTheory.T.exists_syzygy_factorization k G C d hd hs (hex 0 (by omega))
-  have hfun : ∀ {A B : Rep k G} (f : A ⟶ B), hMap f i = (groupHomology.functor k G i).map f := fun f => rfl
+  obtain ⟨Z, ι, hι, b, hse, hbι, hbs, hdb, hexb⟩ :=
+    GlobalTheory.T.exists_syzygy_factorization k G C d hd hs (hex 0 (by omega))
+  have hfun : ∀ {A B : Rep k G} (f : A ⟶ B), hMap f i = (groupHomology.functor k G i).map f :=
+    fun f => rfl
   have hsurj : Function.Surjective (hMap b i).hom := by
-    refine GlobalTheory.T.surjective_hMap_zero_of_staircase k G i (shC C Z) (shD C d Z b) ?_ hbs ?_ ?_
+    refine GlobalTheory.T.surjective_hMap_zero_of_staircase k G i (shC C Z) (shD C d Z b) ?_ hbs ?_
+      ?_
     · intro p
       cases p with
       | zero => exact hdb
@@ -64,7 +73,12 @@ end GlobalTheory.HomStab.StairMid
 
 section
 open CategoryTheory CategoryTheory.Limits GlobalTheory.HomStab
-theorem _root_.GlobalTheory.T.exact_hMap_one_zero_of_staircase : ∀ (k G : Type) [CommRing k] [Group G] (i : ℕ) (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p), (∀ p, d (p + 1) ≫ d p = 0) → Function.Surjective (d 0).hom → (∀ p, p + 1 ≤ i + 1 → Function.Exact (d (p + 1)).hom (d p).hom) → (∀ p q, 2 ≤ p → p + q = i + 1 → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom) → Function.Exact (hMap (d 1) i).hom (hMap (d 0) i).hom := by
-  first
-  | exact @GlobalTheory.HomStab.StairMid.main
+theorem _root_.GlobalTheory.T.exact_hMap_one_zero_of_staircase
+    : ∀ (k G : Type) [CommRing k] [Group G] (i : ℕ) (C : ℕ → Rep k G) (d : ∀ p, C (p + 1) ⟶ C p),
+      (∀ p, d (p + 1) ≫ d p = 0) → Function.Surjective (d 0).hom
+        → (∀ p, p + 1 ≤ i + 1 → Function.Exact (d (p + 1)).hom (d p).hom)
+        → (∀ p q,
+          2 ≤ p → p + q = i + 1 → Function.Exact (hMap (d (p + 1)) q).hom (hMap (d p) q).hom)
+        → Function.Exact (hMap (d 1) i).hom (hMap (d 0) i).hom := by
+  first | exact @GlobalTheory.HomStab.StairMid.main
 end

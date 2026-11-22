@@ -12,28 +12,32 @@ open CategoryTheory Polynomial
 
 namespace GlobalTheory.SerCmp
 
-theorem zOf_character {G : Type} [Group G] [Fintype G] (τ : FDRep ℂ G) :
-    GlobalTheory.GLq.zOf τ.character = Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ := by
+theorem zOf_character {G : Type} [Group G] [Fintype G] (τ : FDRep ℂ G)
+    : GlobalTheory.GLq.zOf τ.character = Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ := by
   unfold GlobalTheory.GLq.zOf Formalism.IrreducibleCountingLemmas.TYPES.zIdem
   rw [FDRep.char_one]
   rfl
 
-theorem zOf_coeff {G : Type} [Group G] [Fintype G] (χ : G → ℂ) (y : G) :
-    (GlobalTheory.GLq.zOf χ).coeff y = χ 1 / (Fintype.card G : ℂ) * χ y⁻¹ := by
+theorem zOf_coeff {G : Type} [Group G] [Fintype G] (χ : G → ℂ) (y : G)
+    : (GlobalTheory.GLq.zOf χ).coeff y = χ 1 / (Fintype.card G : ℂ) * χ y⁻¹ := by
   classical
   unfold GlobalTheory.GLq.zOf
   rw [MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply]
-  simp only [MonoidAlgebra.coeff_single, Finsupp.single_apply, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [MonoidAlgebra.coeff_single, Finsupp.single_apply, Finset.sum_ite_eq', Finset.mem_univ,
+    if_true]
 
-theorem character_eq_zero_of_finrank {G : Type} [Group G] (τ : FDRep ℂ G)
-    (h : Module.finrank ℂ τ.V = 0) (x : G) : τ.character x = 0 := by
+theorem character_eq_zero_of_finrank
+    {G : Type} [Group G] (τ : FDRep ℂ G) (h : Module.finrank ℂ τ.V = 0) (x : G)
+    : τ.character x = 0 := by
   have : Subsingleton τ.V := Module.finrank_zero_iff.mp h
   unfold FDRep.character
   rw [Subsingleton.elim (τ.ρ x) 0]
   exact map_zero _
 
-theorem character_eq_of_zOf_eq {G : Type} [Group G] [Fintype G] (σ τ : FDRep ℂ G)
-    (h : GlobalTheory.GLq.zOf σ.character = GlobalTheory.GLq.zOf τ.character) : σ.character = τ.character := by
+theorem character_eq_of_zOf_eq
+    {G : Type} [Group G] [Fintype G]
+    (σ τ : FDRep ℂ G) (h : GlobalTheory.GLq.zOf σ.character = GlobalTheory.GLq.zOf τ.character)
+    : σ.character = τ.character := by
   have hc : (Fintype.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   have hy : ∀ y : G, σ.character 1 * σ.character y = τ.character 1 * τ.character y := by
     intro y
@@ -44,7 +48,9 @@ theorem character_eq_of_zOf_eq {G : Type} [Group G] [Fintype G] (σ τ : FDRep �
     first | exact h1.symm | linear_combination (-1 : ℂ) * h1
   have h1 := hy 1
   rw [FDRep.char_one, FDRep.char_one] at h1
-  have h2 : Module.finrank ℂ σ.V * Module.finrank ℂ σ.V = Module.finrank ℂ τ.V * Module.finrank ℂ τ.V := by
+  have h2
+      : Module.finrank ℂ σ.V * Module.finrank ℂ σ.V
+        = Module.finrank ℂ τ.V * Module.finrank ℂ τ.V := by
     exact_mod_cast h1
   have h3 : Module.finrank ℂ σ.V = Module.finrank ℂ τ.V := Nat.mul_self_inj.mp h2
   funext y
@@ -54,19 +60,23 @@ theorem character_eq_of_zOf_eq {G : Type} [Group G] [Fintype G] (σ τ : FDRep �
     rw [FDRep.char_one, FDRep.char_one, h3] at h4
     exact mul_left_cancel₀ (Nat.cast_ne_zero.mpr h0) h4
 
-theorem finsum_zOf_eq_finsum_zIdem {G : Type} [Group G] [Fintype G] (Q : (G → ℂ) → Prop) :
-    ∑ᶠ χ ∈ {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ}, GlobalTheory.GLq.zOf χ =
-      ∑ᶠ (z : MonoidAlgebra ℂ G) (_ : ∃ τ : FDRep ℂ G, CategoryTheory.Simple τ ∧
-        Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z ∧ Q τ.character), z := by
-  have hinj : Set.InjOn (GlobalTheory.GLq.zOf (G := G)) {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ} := by
+theorem finsum_zOf_eq_finsum_zIdem {G : Type} [Group G] [Fintype G] (Q : (G → ℂ) → Prop)
+    : ∑ᶠ χ ∈ {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ}, GlobalTheory.GLq.zOf χ
+      = ∑ᶠ (z : MonoidAlgebra ℂ G) (_ : ∃ τ : FDRep ℂ G, CategoryTheory.Simple τ ∧
+          Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z ∧ Q τ.character), z := by
+  have hinj
+      : Set.InjOn (GlobalTheory.GLq.zOf (G := G)) {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ} := by
     rintro a ⟨⟨V, -, hV⟩, -⟩ b ⟨⟨U, -, hU⟩, -⟩ hab
     obtain rfl : V.character = a := funext hV
     obtain rfl : U.character = b := funext hU
     exact character_eq_of_zOf_eq V U hab
   rw [← finsum_mem_image (f := fun z : MonoidAlgebra ℂ G => z) hinj]
   refine finsum_congr fun z => ?_
-  have hiff : (z ∈ GlobalTheory.GLq.zOf '' {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ}) =
-      ∃ τ : FDRep ℂ G, CategoryTheory.Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z ∧ Q τ.character := by
+  have hiff
+      : (z ∈ GlobalTheory.GLq.zOf '' {χ : G → ℂ | GlobalTheory.GLq.IsIrr χ ∧ Q χ})
+        = ∃ τ : FDRep ℂ G,
+          CategoryTheory.Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z
+            ∧ Q τ.character := by
     apply propext
     constructor
     · rintro ⟨a, ⟨⟨V, hs, hV⟩, hQ⟩, rfl⟩

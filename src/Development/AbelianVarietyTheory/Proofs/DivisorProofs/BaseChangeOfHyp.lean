@@ -18,7 +18,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -26,29 +27,34 @@ namespace GlobalTheory.AbelianBaseChange
 
 variable {R R' : Type} [CommRing R] [CommRing R'] [Algebra R R'] {X X' : Scheme.{0}}
 
-theorem isPull1_unique {s : X ⟶ Sp R} {s' : X' ⟶ Sp R'} {φ : X' ⟶ X}
-    {w : φ ≫ s = s' ≫ spMap (algebraMap R R')} (hu : Function.Injective (pullHyp1 (pairRes φ s')))
-    {c : HH1 s} {c₁ c₂ : HH1 s'} (h₁ : IsPull1 w c c₁) (h₂ : IsPull1 w c c₂) : c₁ = c₂ :=
+theorem isPull1_unique
+    {s : X ⟶ Sp R} {s' : X' ⟶ Sp R'} {φ : X' ⟶ X} {w : φ ≫ s = s' ≫ spMap (algebraMap R R')}
+    (hu : Function.Injective (pullHyp1 (pairRes φ s')))
+    {c : HH1 s} {c₁ c₂ : HH1 s'} (h₁ : IsPull1 w c c₁) (h₂ : IsPull1 w c c₂)
+    : c₁ = c₂ :=
   hu (h₁.symm.trans h₂)
 
-theorem core (s₀ s : X ⟶ Sp R) (hs : s = s₀) (s₀' s' : X' ⟶ Sp R') (hs' : s' = s₀') (φ : X' ⟶ X)
-    (hpb : φ ≫ s₀ = s₀' ≫ spMap (algebraMap R R'))
+theorem core
+    (s₀ s : X ⟶ Sp R) (hs : s = s₀)
+    (s₀' s' : X' ⟶ Sp R') (hs' : s' = s₀')
+    (φ : X' ⟶ X) (hpb : φ ≫ s₀ = s₀' ≫ spMap (algebraMap R R'))
     (m : IsMor (dp0 R) s (dp0 R') s' (algebraMap R R') φ)
     (hcmp : Function.Bijective (cmp1 s)) (hcmp' : Function.Bijective (cmp1 s'))
     (hO : Function.Injective (cmpO s)) (hu : Function.Injective (pullHyp1 (pairRes φ s')))
     (hcl : ClosedForm s₀ = ⊤) (hcl' : ClosedForm s₀' = ⊤)
     (e : R' ⊗[R] HH1 s₀ ≃ₗ[R'] HH1 s₀') (he : ∀ c, IsPull1 hpb c (e (1 ⊗ₜ c)))
-    (e' : R' ⊗[R] GlobForm s₀ ≃ₗ[R'] GlobForm s₀') (he' : ∀ c, IsPullForm hpb c (e' (1 ⊗ₜ c))) :
-    Function.Bijective (liftSemi m.pull1) ∧
-      F1 s' = Submodule.span R' (m.pull1 '' (F1 s : Set (FirstDeRham s))) := by
+    (e' : R' ⊗[R] GlobForm s₀ ≃ₗ[R'] GlobForm s₀') (he' : ∀ c, IsPullForm hpb c (e' (1 ⊗ₜ c)))
+    : Function.Bijective (liftSemi m.pull1)
+      ∧ F1 s' = Submodule.span R' (m.pull1 '' (F1 s : Set (FirstDeRham s))) := by
   subst hs hs'
 
   have key : ∀ c : FirstDeRham s, cmp1 s' (m.pull1 c) = e (1 ⊗ₜ cmp1 s c) := fun c ↦
     isPull1_unique hu (comparison_pullback m c) (he _)
   let C := LinearEquiv.ofBijective (cmp1 s) hcmp
   let C' := LinearEquiv.ofBijective (cmp1 s') hcmp'
-  have hsq : (cmp1 s') ∘ₗ liftSemi m.pull1 =
-      e.toLinearMap ∘ₗ (LinearEquiv.baseChange R R' _ _ C).toLinearMap := by
+  have hsq
+      : (cmp1 s') ∘ₗ liftSemi m.pull1
+        = e.toLinearMap ∘ₗ (LinearEquiv.baseChange R R' _ _ C).toLinearMap := by
     refine LinearMap.ext fun z ↦ ?_
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -70,8 +76,7 @@ theorem core (s₀ s : X ⟶ Sp R) (hs : s = s₀) (s₀' s' : X' ⟶ Sp R') (hs
       have h1 : cmp1 s' c' ∈ CechHodgeFiltration s' := comparison_mem_cechHodgeFiltration s' hc'
       rw [cechHodgeFiltration_eq_range] at h1
       obtain ⟨ω', hω'⟩ := h1
-      let Φ : GlobForm s' →ₗ[R'] HH1 s' :=
-        clForm s' ∘ₗ (LinearEquiv.ofTop _ hcl').symm.toLinearMap
+      let Φ : GlobForm s' →ₗ[R'] HH1 s' := clForm s' ∘ₗ (LinearEquiv.ofTop _ hcl').symm.toLinearMap
       let Ψ : R' ⊗[R] GlobForm s →ₗ[R'] FirstDeRham s' := C'.symm.toLinearMap ∘ₗ Φ ∘ₗ e'.toLinearMap
       have hΦ : ∀ ω : ClosedForm s', Φ ω.1 = clForm s' ω := fun ω ↦ by
         simp only [Φ, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
@@ -93,7 +98,8 @@ theorem core (s₀ s : X ⟶ Sp R) (hs : s = s₀) (s₀' s' : X' ⟶ Sp R') (hs
         refine Submodule.smul_mem _ x (Submodule.subset_span ?_)
         let ωc : ClosedForm s := ⟨ω, hcl ▸ trivial⟩
         refine ⟨C.symm (clForm s ωc), ?_, ?_⟩
-        · have hF : clForm s ωc ∈ CechHodgeFiltration s := by rw [cechHodgeFiltration_eq_range]; exact ⟨ωc, rfl⟩
+        · have hF : clForm s ωc ∈ CechHodgeFiltration s := by
+            rw [cechHodgeFiltration_eq_range]; exact ⟨ωc, rfl⟩
           change toH1O s _ = 0
           apply hO
           rw [← structureSheaf_comparison_comm, map_zero]
@@ -117,17 +123,23 @@ end GlobalTheory.AbelianBaseChange
 
 namespace GlobalTheory.AbelianBaseChange
 
-theorem abelianDeRham_baseChange_of_smoothLift (H₁ : GlobalTheory.Published.CrystallineSmoothLift) (H₂ : GlobalTheory.Published.AbelianHodgeDeRham) :
-    GlobalTheory.Published.AbelianDeRham.BaseChange := by
+theorem abelianDeRham_baseChange_of_smoothLift
+    (H₁ : GlobalTheory.Published.CrystallineSmoothLift)
+    (H₂ : GlobalTheory.Published.AbelianHodgeDeRham)
+    : GlobalTheory.Published.AbelianDeRham.BaseChange := by
   intro R _ A _ g hA hg R' _ _ A' _ φ h
   have hA' : IsAbelianScheme A' := GlobalTheory.PolPull.isAbelianScheme_of_isGrpPullback hA h
   have hg' : SmoothOfRelativeDimension g A'.hom :=
     (smoothOfRelativeDimension_isStableUnderBaseChange (n := g)).of_isPullback h.1 hg
-  have hF := GlobalTheory.AbelianPrim.abelianDeRham_free (GlobalTheory.T.abelianDeRhamFree_of_crystalline_comparison H₁ H₂)
+  have hF :=
+    GlobalTheory.AbelianPrim.abelianDeRham_free
+      (GlobalTheory.T.abelianDeRhamFree_of_crystalline_comparison H₁ H₂)
   have hP : primDR A = ⊤ := (hF R A g hA hg).1
   have hP' : primDR A' = ⊤ := (hF R' A' g hA' hg').1
-  have geom : ∀ {S : Type} [CommRing S] (B : Over (Sp S)) [GrpObj B], IsAbelianScheme B →
-      Smooth (B.hom ≫ 𝟙 _) ∧ IsSeparated (B.hom ≫ 𝟙 _) ∧ QuasiCompact (B.hom ≫ 𝟙 _) := by
+  have geom
+      : ∀ {S : Type} [CommRing S] (B : Over (Sp S)) [GrpObj B],
+        IsAbelianScheme B
+          → Smooth (B.hom ≫ 𝟙 _) ∧ IsSeparated (B.hom ≫ 𝟙 _) ∧ QuasiCompact (B.hom ≫ 𝟙 _) := by
     intro S _ B _ hB
     rw [Category.comp_id]
     haveI := hB.smooth
@@ -135,25 +147,35 @@ theorem abelianDeRham_baseChange_of_smoothLift (H₁ : GlobalTheory.Published.Cr
     exact ⟨inferInstance, inferInstance, inferInstance⟩
   obtain ⟨sm, se, sq⟩ := geom A hA
   obtain ⟨sm', se', sq'⟩ := geom A' hA'
-  have hcmp := (GlobalTheory.CechDR.cechDeRham_comparison_bijective_cup_smooth H₁ R A.left (A.hom ≫ 𝟙 _) sm se sq).1
-  have hcmp' := (GlobalTheory.CechDR.cechDeRham_comparison_bijective_cup_smooth H₁ R' A'.left (A'.hom ≫ 𝟙 _) sm' se' sq').1
+  have hcmp :=
+    (GlobalTheory.CechDR.cechDeRham_comparison_bijective_cup_smooth H₁ R A.left (A.hom ≫ 𝟙 _) sm se
+      sq).1
+  have hcmp' :=
+    (GlobalTheory.CechDR.cechDeRham_comparison_bijective_cup_smooth H₁ R' A'.left (A'.hom ≫ 𝟙 _) sm'
+      se' sq').1
   obtain ⟨-, -, -, -, ⟨hcl, -, -⟩, hbc⟩ := H₂ R A g hA hg
   obtain ⟨-, -, -, -, ⟨hcl', -, -⟩, -⟩ := H₂ R' A' g hA' hg'
   obtain ⟨⟨e, he⟩, ⟨e', he'⟩, -⟩ := hbc R' A'.left A'.hom φ h.1
   let m := (GlobalTheory.Published.AbelianDeRham.bcMor h).isMor
-  obtain ⟨hB, hF1⟩ := core A.hom (A.hom ≫ 𝟙 _) (Category.comp_id _) A'.hom (A'.hom ≫ 𝟙 _)
-    (Category.comp_id _) φ h.1.w m hcmp hcmp' (GlobalTheory.T.structure_sheaf_comparison_injective R A.left _)
-    (GlobalTheory.T.affinePairRestriction_injective_firstCohomology φ (A'.hom ≫ 𝟙 _)).2.2 hcl hcl' e he e' he'
+  obtain ⟨hB, hF1⟩ :=
+    core A.hom (A.hom ≫ 𝟙 _) (Category.comp_id _) A'.hom (A'.hom ≫ 𝟙 _) (Category.comp_id _) φ h.1.w
+      m hcmp hcmp' (GlobalTheory.T.structure_sheaf_comparison_injective R A.left _)
+      (GlobalTheory.T.affinePairRestriction_injective_firstCohomology φ (A'.hom ≫ 𝟙 _)).2.2 hcl hcl'
+      e he e' he'
   refine ⟨?_, ?_⟩
-  · have hsq : (LinearEquiv.ofTop _ hP').toLinearMap ∘ₗ liftSemi (GlobalTheory.Published.AbelianDeRham.bcMor h).pull =
-        liftSemi m.pull1 ∘ₗ (LinearEquiv.baseChange R R' _ _ (LinearEquiv.ofTop _ hP)).toLinearMap := by
+  · have hsq
+        : (LinearEquiv.ofTop _ hP').toLinearMap
+            ∘ₗ liftSemi (GlobalTheory.Published.AbelianDeRham.bcMor h).pull
+          = liftSemi m.pull1
+            ∘ₗ (LinearEquiv.baseChange R R' _ _ (LinearEquiv.ofTop _ hP)).toLinearMap := by
       refine LinearMap.ext fun z ↦ ?_
       induction z using TensorProduct.induction_on with
       | zero => simp
       | add x y hx hy => simp only [map_add (f := _)] at hx hy ⊢; rw [hx, hy]
       | tmul x c => rfl
     have hb : Function.Bijective
-        ((LinearEquiv.ofTop _ hP') ∘ liftSemi (GlobalTheory.Published.AbelianDeRham.bcMor h).pull) := by
+        ((LinearEquiv.ofTop _ hP')
+          ∘ liftSemi (GlobalTheory.Published.AbelianDeRham.bcMor h).pull) := by
       have := congrArg DFunLike.coe hsq
       rw [LinearMap.coe_comp] at this
       rw [LinearEquiv.coe_toLinearMap] at this
@@ -162,8 +184,7 @@ theorem abelianDeRham_baseChange_of_smoothLift (H₁ : GlobalTheory.Published.Cr
     exact (Function.Bijective.of_comp_iff' (LinearEquiv.ofTop _ hP').bijective _).1 hb
   · apply Submodule.map_injective_of_injective (primDR A').injective_subtype
     rw [PrimitiveSubmodule, Submodule.map_comap_eq, Submodule.range_subtype,
-      inf_eq_right.2 (by rw [hP']; exact le_top), hF1,
-      Submodule.map_span, Set.image_image]
+      inf_eq_right.2 (by rw [hP']; exact le_top), hF1, Submodule.map_span, Set.image_image]
     congr 1
     ext x
     constructor

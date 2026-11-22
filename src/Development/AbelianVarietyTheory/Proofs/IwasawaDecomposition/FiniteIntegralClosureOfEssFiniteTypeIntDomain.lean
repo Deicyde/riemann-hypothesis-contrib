@@ -10,10 +10,11 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem finite_integralClosure_of_isLocalization {R S L : Type*} [CommRing R] [CommRing S]
-    [CommRing L] [Algebra R S] [Algebra R L] [Algebra S L] [IsScalarTower R S L]
-    (M : Submonoid R) [IsLocalization M S] [Module.Finite R (integralClosure R L)] :
-    Module.Finite S (integralClosure S L) := by
+theorem finite_integralClosure_of_isLocalization
+    {R S L : Type*} [CommRing R] [CommRing S] [CommRing L] [Algebra R S] [Algebra R L] [Algebra S L]
+    [IsScalarTower R S L]
+    (M : Submonoid R) [IsLocalization M S] [Module.Finite R (integralClosure R L)]
+    : Module.Finite S (integralClosure S L) := by
   classical
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := R) (M := integralClosure R L)
   let f : integralClosure R L → integralClosure S L := fun z => ⟨z, IsIntegral.tower_top z.2⟩
@@ -21,23 +22,27 @@ theorem finite_integralClosure_of_isLocalization {R S L : Type*} [CommRing R] [C
   rw [eq_top_iff]
   rintro y -
   obtain ⟨m, hm⟩ := IsIntegral.exists_multiple_integral_of_isLocalization M (Rₘ := S) (y : L) y.2
-  have key : ∀ z ∈ Submodule.span R (s : Set (integralClosure R L)),
-      f z ∈ Submodule.span S (↑(s.image f) : Set (integralClosure S L)) := by
+  have key
+      : ∀ z ∈ Submodule.span R (s : Set (integralClosure R L)),
+        f z ∈ Submodule.span S (↑(s.image f) : Set (integralClosure S L)) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem x hx => exact Submodule.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem f hx))
     | zero =>
       have : f 0 = 0 := rfl
-      rw [this]; exact zero_mem _
+      rw [this]
+      exact zero_mem _
     | add x y _ _ hx hy =>
       have : f (x + y) = f x + f y := rfl
-      rw [this]; exact add_mem hx hy
+      rw [this]
+      exact add_mem hx hy
     | smul a x _ hx =>
       have : f (a • x) = algebraMap R S a • f x := by
         apply Subtype.ext
         change a • (x : L) = algebraMap R S a • (x : L)
         rw [algebraMap_smul]
-      rw [this]; exact Submodule.smul_mem _ _ hx
+      rw [this]
+      exact Submodule.smul_mem _ _ hx
   have hz : (⟨m • (y : L), hm⟩ : integralClosure R L) ∈ Submodule.span R (s : Set _) :=
     hs ▸ Submodule.mem_top
   have e : y = IsLocalization.mk' S (1 : R) m • f ⟨m • (y : L), hm⟩ := by
@@ -48,8 +53,8 @@ theorem finite_integralClosure_of_isLocalization {R S L : Type*} [CommRing R] [C
   rw [e]
   exact Submodule.smul_mem _ _ (key _ hz)
 
-theorem finite_integralClosure_of_essFiniteType_int :
-    ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.EssFiniteType ℤ D],
+theorem finite_integralClosure_of_essFiniteType_int
+    : ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.EssFiniteType ℤ D],
       Module.Finite D (integralClosure D (FractionRing D)) := by
   intro D _ _ _
   obtain ⟨S₀, M, hft, hloc⟩ := (Algebra.essFiniteType_iff_exists_subalgebra ℤ D).mp inferInstance

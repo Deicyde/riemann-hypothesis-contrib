@@ -12,17 +12,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SameDiv
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.LogPair
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_integral_clopen_cover_of_smooth_field :
-    ∀ (k : Type) [Field k] (X : Scheme.{0}) (f : X ⟶ Sp k) [Smooth f] [QuasiCompact f], ∃ (κ : Type) (U : κ → X.Opens), ⨆ c, U c = ⊤ ∧ (Pairwise fun a b => Disjoint (U a) (U b)) ∧ ∀ c, IsIntegral (U c).toScheme ∧ IsClosedImmersion (U c).ι := by
+theorem exists_integral_clopen_cover_of_smooth_field
+    : ∀ (k : Type) [Field k] (X : Scheme.{0}) (f : X ⟶ Sp k) [Smooth f] [QuasiCompact f],
+      ∃ (κ : Type) (U : κ → X.Opens),
+        ⨆ c, U c = ⊤ ∧ (Pairwise fun a b => Disjoint (U a) (U b))
+          ∧ ∀ c, IsIntegral (U c).toScheme ∧ IsClosedImmersion (U c).ι := by
   intro k _ X f _ _
   haveI : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian f
-  have hopen : ∀ c : _root_.ConnectedComponents X, IsOpen ((_root_.ConnectedComponents.mk : X → _) ⁻¹' {c}) := by
+  have hopen
+      : ∀ c : _root_.ConnectedComponents X,
+        IsOpen ((_root_.ConnectedComponents.mk : X → _) ⁻¹' {c}) := by
     intro c
     obtain ⟨x, rfl⟩ := _root_.ConnectedComponents.surjective_coe c
     rw [connectedComponents_preimage_singleton]
@@ -47,7 +53,8 @@ theorem exists_integral_clopen_cover_of_smooth_field :
         show ConnectedSpace ((U (_root_.ConnectedComponents.mk x) : Set X))
         rw [← isConnected_iff_connectedSpace, hU]
         exact isConnected_connectedComponent
-      exact isIntegral_of_smooth_field_of_connectedSpace ((U (_root_.ConnectedComponents.mk x)).ι ≫ f)
+      exact isIntegral_of_smooth_field_of_connectedSpace
+        ((U (_root_.ConnectedComponents.mk x)).ι ≫ f)
     · refine IsClosedImmersion.of_isPreimmersion _ ?_
       rw [Scheme.Opens.range_ι, hU]
       exact isClosed_connectedComponent

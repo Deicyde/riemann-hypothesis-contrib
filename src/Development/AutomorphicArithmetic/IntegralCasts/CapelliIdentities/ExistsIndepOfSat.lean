@@ -4,12 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat :
-    ∀ {R E : Type} [inst : CommRing R] [IsDomain R] [IsNoetherianRing R]
-    [inst_3 : AddCommGroup E] [inst_4 : _root_.Module R E] [Module.Finite R E] [Module.IsTorsionFree R E] (T : Set E)
-    (F : Submodule R E),
-    (∀ (x : E), x ∈ F ↔ ∃ (a : R), a ≠ (0 : R) ∧ a • x ∈ Submodule.span R T) →
-      ∃ (f : Fin (Module.finrank R ↥F) → E), (∀ (j : Fin (Module.finrank R ↥F)), f j ∈ T) ∧ LinearIndependent R f := by
+theorem UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat
+    : ∀ {R E : Type} [inst : CommRing R] [IsDomain R] [IsNoetherianRing R] [inst_3 : AddCommGroup E]
+        [inst_4 : _root_.Module R E] [Module.Finite R E] [Module.IsTorsionFree R E] (T : Set E)
+        (F : Submodule R E),
+      (∀ (x : E), x ∈ F ↔ ∃ (a : R), a ≠ (0 : R) ∧ a • x ∈ Submodule.span R T)
+        → ∃ (f : Fin (Module.finrank R ↥F) → E),
+          (∀ (j : Fin (Module.finrank R ↥F)), f j ∈ T) ∧ LinearIndependent R f := by
   intro R E _ _ _ _ _ _ _ T F hF
   obtain ⟨I, hI, hmax⟩ := exists_maximal_linearIndepOn R (Subtype.val : T → E)
   set S : Submodule R E := Submodule.span R ((Subtype.val : T → E) '' I) with hS
@@ -18,10 +19,10 @@ theorem UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat :
     induction hy using Submodule.span_induction with
     | mem x hx =>
       by_cases h : (⟨x, hx⟩ : T) ∈ I
-      · exact ⟨1, one_ne_zero, by
-          rw [one_smul]; exact Submodule.subset_span ⟨⟨x, hx⟩, h, rfl⟩⟩
+      · exact ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span ⟨⟨x, hx⟩, h, rfl⟩⟩
       · exact hmax ⟨x, hx⟩ h
-    | zero => exact ⟨1, one_ne_zero, by simp⟩
+    | zero =>
+      exact ⟨1, one_ne_zero, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha, hax⟩ := hx
       obtain ⟨b, hb, hby⟩ := hy
@@ -33,7 +34,8 @@ theorem UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat :
     | smul c x _ hx =>
       obtain ⟨a, ha, hax⟩ := hx
       refine ⟨a, ha, ?_⟩
-      rw [smul_comm]; exact S.smul_mem _ hax
+      rw [smul_comm]
+      exact S.smul_mem _ hax
   let N : Submodule R F := S.comap F.subtype
   have h0 : Module.rank R (F ⧸ N) = 0 := by
     rw [rank_eq_zero_iff]
@@ -53,8 +55,7 @@ theorem UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat :
     intro x y hxy
     have h : ((g x : S) : E) = ((g y : S) : E) := congrArg Subtype.val hxy
     exact Subtype.ext (Subtype.ext h)
-  have h3 : Module.rank R S ≤ Cardinal.mk I :=
-    (rank_span_le _).trans Cardinal.mk_image_le
+  have h3 : Module.rank R S ≤ Cardinal.mk I := (rank_span_le _).trans Cardinal.mk_image_le
   have h4 : Cardinal.mk (Fin (Module.finrank R F)) ≤ Cardinal.mk I := by
     rw [Cardinal.mk_fin, Module.finrank_eq_rank, h1]
     exact h2.trans h3

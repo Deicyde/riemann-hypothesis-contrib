@@ -6,21 +6,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-private theorem fix_rt_lemma {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (g : HostAut H) : g.s H.rt = H.rt := by
+private theorem fix_rt_lemma
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (g : HostAut H)
+    : g.s H.rt = H.rt := by
   apply RingOfIntegers.ext
   rw [HostAut.s, RingOfIntegers.mapRingEquiv_apply]
   exact g.fix
 
-private theorem fix_gen_lemma_2 {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (g : HostAut H) : g.s H.w0 = H.w0 ∧ g.s (H.bar H.w0) = H.bar H.w0 := by
+private theorem fix_gen_lemma_2
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (g : HostAut H)
+    : g.s H.w0 = H.w0 ∧ g.s (H.bar H.w0) = H.bar H.w0 := by
   have hr := fix_rt_lemma g
   have hbr : g.s (H.bar H.rt) = H.bar H.rt := by
-    have hsq : (H.bar H.rt) ^ 2 = H.rt ^ 2 := by
-      rw [← map_pow, H.rt_sq, map_neg, map_natCast]
+    have hsq : (H.bar H.rt) ^ 2 = H.rt ^ 2 := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
     rcases sq_eq_sq_iff_eq_or_eq_neg.mp hsq with h | h
     · rw [h, hr]
     · rw [h, map_neg, hr]
@@ -38,7 +43,11 @@ private theorem fix_gen_lemma_2 {E : Type} [Field E] [NumberField E] [IsCMField 
     rw [map_mul, map_ofNat, map_add (f := _), map_one] at h2
     exact h2.symm
 
-private theorem fix_adj_lemma_3 {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (g : HostAut H) (a : 𝓞 E) (ha : a ∈ Algebra.adjoin ℤ ({H.w0} : Set (𝓞 E))) : g.s a = a ∧ g.s (H.bar a) = H.bar a := by
+private theorem fix_adj_lemma_3
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} (g : HostAut H)
+    (a : 𝓞 E) (ha : a ∈ Algebra.adjoin ℤ ({H.w0} : Set (𝓞 E)))
+    : g.s a = a ∧ g.s (H.bar a) = H.bar a := by
   obtain ⟨h1, h2⟩ := fix_gen_lemma_2 g
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
@@ -53,7 +62,12 @@ private theorem fix_adj_lemma_3 {E : Type} [Field E] [NumberField E] [IsCMField 
     simp only [map_mul, hx.1, hy.1, hx.2, hy.2]
     exact ⟨trivial, trivial⟩
 
-theorem tw_mb : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (g : HostAut H), l.Mb.map (g.s : 𝓞 E →+* 𝓞 E) = l.Mb ∧ (l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)).map (g.s : 𝓞 E →+* 𝓞 E) = l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := by
+theorem tw_mb
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H)
+        (g : HostAut H),
+      l.Mb.map (g.s : 𝓞 E →+* 𝓞 E) = l.Mb
+        ∧ (l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E)).map (g.s : 𝓞 E →+* 𝓞 E)
+          = l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := by
   intro E _ _ _ H l g
   set S : Set (𝓞 E) := {a : 𝓞 E | a ∈ l.Mb ∧ a ∈ Algebra.adjoin ℤ ({H.w0} : Set (𝓞 E))} with hSdef
   have hS : l.Mb = Ideal.span S := l.fromK

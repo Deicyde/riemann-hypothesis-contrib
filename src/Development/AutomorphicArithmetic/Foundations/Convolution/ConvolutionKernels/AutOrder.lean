@@ -4,8 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.K.autOrder :
-    ∀ (K : Type) [Field K] [NumberField K] (σ : K ≃+* K), ∃ m : ℕ, 0 < m ∧ σ ^ m = 1 := by
+theorem UpperTheory.ConvolutionTheory.K.autOrder
+    : ∀ (K : Type) [Field K] [NumberField K] (σ : K ≃+* K), ∃ m : ℕ, 0 < m ∧ σ ^ m = 1 := by
   intro K _ _ σ
   let τ : K ≃ₐ[ℚ] K := AlgEquiv.ofRingEquiv (f := σ) (fun x => by simp)
   refine ⟨orderOf τ, orderOf_pos τ, ?_⟩

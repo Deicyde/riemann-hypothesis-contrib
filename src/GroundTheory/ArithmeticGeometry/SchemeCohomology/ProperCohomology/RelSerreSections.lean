@@ -17,9 +17,11 @@ noncomputable section
 
 namespace RelSerre
 
-variable {A : Type u} [CommRing A] {X X' : Scheme.{u}} [X.Over (Spec (.of A))] {N : ℕ}
-  (i : X' ⟶ projectiveSpace A N) (ψ : X' ⟶ X)
-  (h : i ≫ ProjSpace.toSpecBase A N = ψ ≫ (X ↘ Spec (.of A)))
+variable
+  {A : Type u} [CommRing A]
+  {X X' : Scheme.{u}} [X.Over (Spec (.of A))]
+  {N : ℕ} (i : X' ⟶ projectiveSpace A N)
+  (ψ : X' ⟶ X) (h : i ≫ ProjSpace.toSpecBase A N = ψ ≫ (X ↘ Spec (.of A)))
 
 lemma embed_snd {V : X.Opens} (hV : IsAffineOpen V) :
     letI := baseAlgebra A hV
@@ -63,7 +65,6 @@ lemma algebraMap_overBase {V : X.Opens} (hV : IsAffineOpen V) (b : Γ(X, V)) :
   refine (app_eqToHom_apply ψ (Scheme.Opens.ι_image_top V) _ _ b).trans ?_
   simp
 
-
 omit [X.Over (Spec (.of A))] in
 lemma smul_restrict_top (M : X'.Modules) (U : X'.Opens) (a : Γ(U.toScheme, ⊤))
     (y : Γ(M.restrict U.ι, ⊤)) :
@@ -82,14 +83,16 @@ lemma smul_restrict_top (M : X'.Modules) (U : X'.Opens) (a : Γ(U.toScheme, ⊤)
   rw [e1, e2, e3, Scheme.Opens.ι_appIso, Iso.refl_inv]
   exact Scheme.Modules.map_smul M (eqToHom (Scheme.Opens.ι_image_top U).symm) a y
 
-def H0ToSections {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules) :
-    letI := overBase i ψ h hV
-    Sheaf.H.{u} (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) 0 →ₗ[Γ(X, V)]
-      Γ((Scheme.Modules.pushforward ψ).obj M, V) :=
+def H0ToSections {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules)
+    : letI := overBase i ψ h hV
+      Sheaf.H.{u} (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) 0 →ₗ[Γ(X, V)]
+        Γ((Scheme.Modules.pushforward ψ).obj M, V) :=
   letI := overBase i ψ h hV
-  { toFun := fun x => M.presheaf.map (eqToHom (Scheme.Opens.ι_image_top (ψ ⁻¹ᵁ V)).symm).op
-      (Sheaf.H.equiv₀ (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) isTerminalTop x :
-        Γ(M, (ψ ⁻¹ᵁ V).ι ''ᵁ ⊤))
+  {
+    toFun := fun x =>
+      M.presheaf.map (eqToHom (Scheme.Opens.ι_image_top (ψ ⁻¹ᵁ V)).symm).op
+        (Sheaf.H.equiv₀ (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) isTerminalTop x
+          : Γ(M, (ψ ⁻¹ᵁ V).ι ''ᵁ ⊤))
     map_add' := fun x y => by
       rw [map_add (f := _)]
       exact map_add _ _ _
@@ -97,7 +100,8 @@ def H0ToSections {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules) :
       rw [H.smul_def, ← Sheaf.H.equiv₀_naturality]
       refine (smul_restrict_top M (ψ ⁻¹ᵁ V) _ _).trans ?_
       refine (congrArg (· • _) (algebraMap_overBase i ψ h hV b)).trans ?_
-      exact (smul_pushforward ψ M b _).symm }
+      exact (smul_pushforward ψ M b _).symm
+  }
 
 lemma H0ToSections_bijective {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules) :
     Function.Bijective (H0ToSections i ψ h hV M) := by
@@ -106,10 +110,10 @@ lemma H0ToSections_bijective {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules
     (eqToHom (Scheme.Opens.ι_image_top (ψ ⁻¹ᵁ V)).symm).op)).comp
     (Sheaf.H.equiv₀ (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) isTerminalTop).bijective
 
-theorem finite_sections_pushforward {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules) :
-    letI := overBase i ψ h hV
-    Module.Finite Γ(X, V) (Sheaf.H.{u} (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) 0) →
-      Module.Finite Γ(X, V) Γ((Scheme.Modules.pushforward ψ).obj M, V) := by
+theorem finite_sections_pushforward {V : X.Opens} (hV : IsAffineOpen V) (M : X'.Modules)
+    : letI := overBase i ψ h hV
+      Module.Finite Γ(X, V) (Sheaf.H.{u} (modulesAb (M.restrict (ψ ⁻¹ᵁ V).ι)) 0)
+        → Module.Finite Γ(X, V) Γ((Scheme.Modules.pushforward ψ).obj M, V) := by
   letI := overBase i ψ h hV
   intro hfin
   exact Module.Finite.of_surjective (H0ToSections i ψ h hV M) (H0ToSections_bijective i ψ h hV M).2

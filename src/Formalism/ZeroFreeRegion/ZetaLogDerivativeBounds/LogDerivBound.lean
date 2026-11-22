@@ -58,7 +58,9 @@ theorem logDerivBoundOnBall : LogDerivBound := by
       by_contra h
       have h3 := mul_lt_mul_of_pos_left (lt_of_not_ge h) hf0
       linarith
-    calc (g w).re = Real.log (Real.exp (g w).re) := (Real.log_exp _).symm
+    calc
+      (g w).re
+        = Real.log (Real.exp (g w).re) := (Real.log_exp _).symm
       _ ≤ Real.log M := Real.log_le_log (Real.exp_pos _) h2
   have hzb : dist z z₀ ≤ R / 2 := hz
   have hshift : ∀ v ∈ ball (0 : ℂ) R, z₀ + v ∈ ball z₀ R := by
@@ -85,7 +87,9 @@ theorem logDerivBoundOnBall : LogDerivBound := by
       have hB : ‖g (z₀ + u)‖ ≤ 2 * A * ‖u‖ / (R - ‖u‖) :=
         Complex.borelCaratheodory_zero hA0 hhd hhm hR huR (by simpa using hg0)
       have hpos : 0 < R - ‖u‖ := by linarith
-      calc ‖g (z₀ + u)‖ ≤ 2 * A * ‖u‖ / (R - ‖u‖) := hB
+      calc
+        ‖g (z₀ + u)‖
+          ≤ 2 * A * ‖u‖ / (R - ‖u‖) := hB
         _ ≤ 6 * A := by
           rw [div_le_iff₀ hpos]
           nlinarith [norm_nonneg u]
@@ -94,7 +98,9 @@ theorem logDerivBoundOnBall : LogDerivBound := by
       intro w hw
       rw [mem_closedBall] at hw
       rw [mem_ball]
-      calc dist w z₀ ≤ dist w z + dist z z₀ := dist_triangle _ _ _
+      calc
+        dist w z₀
+          ≤ dist w z + dist z z₀ := dist_triangle _ _ _
         _ < R := by linarith
     have hdiff : DiffContOnCl ℂ g (ball z (R / 4)) := by
       apply DifferentiableOn.diffContOnCl
@@ -106,12 +112,16 @@ theorem logDerivBoundOnBall : LogDerivBound := by
       apply hbc
       rw [mem_sphere] at hw
       rw [mem_closedBall]
-      calc dist w z₀ ≤ dist w z + dist z z₀ := dist_triangle _ _ _
+      calc
+        dist w z₀
+          ≤ dist w z + dist z z₀ := dist_triangle _ _ _
         _ ≤ 3 * R / 4 := by linarith
     have hzb' : z ∈ ball z₀ R := hsub (mem_closedBall_self hR4.le)
     have hder := norm_deriv_le_of_forall_mem_sphere_norm_le hR4 hdiff hC
     rw [(hgd z hzb').deriv] at hder
-    calc ‖deriv f z / f z‖ ≤ 6 * A / (R / 4) := hder
+    calc
+      ‖deriv f z / f z‖
+        ≤ 6 * A / (R / 4) := hder
       _ = 24 * A / R := by
         field_simp
         all_goals ring
@@ -119,8 +129,9 @@ theorem logDerivBoundOnBall : LogDerivBound := by
   intro ε hε
   have hεR : 0 < ε * R / 24 := by positivity
   have h := hmain (Real.log M + ε * R / 24) (by linarith)
-  calc ‖deriv f z / f z‖ ≤ 24 * (Real.log M + ε * R / 24) / R := h
-    _ = 24 * Real.log M / R + ε := by
-      field_simp
+  calc
+    ‖deriv f z / f z‖
+      ≤ 24 * (Real.log M + ε * R / 24) / R := h
+    _ = 24 * Real.log M / R + ε := by field_simp
 
 end Formalism.ZF

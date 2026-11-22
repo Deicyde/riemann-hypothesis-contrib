@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open GlobalTheory.LFun (KGL)
 open GlobalTheory.CongL (SatU)
 open GlobalTheory.Cong (Apart)
@@ -19,6 +21,9 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
 end UpperTheory.Gal.CertificateRingHomMap
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pVecU_of :
-    UpperTheory.Gal.CertificateRingHomMap.NbhdU → UpperTheory.Gal.CertificateRingHomMap.StepAt → UpperTheory.Gal.CertificateRingHomMap.SphType → UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.VecU :=
+theorem UpperTheory.Gal.CertificateRingHomMap.pVecU_of
+    : UpperTheory.Gal.CertificateRingHomMap.NbhdU → UpperTheory.Gal.CertificateRingHomMap.StepAt
+      → UpperTheory.Gal.CertificateRingHomMap.SphType
+      → UpperTheory.Gal.CertificateRingHomMap.LocComm
+      → UpperTheory.Gal.CertificateRingHomMap.VecU :=
   _root_.UpperTheory.Reformulated.B.Grk2.pVecU_of

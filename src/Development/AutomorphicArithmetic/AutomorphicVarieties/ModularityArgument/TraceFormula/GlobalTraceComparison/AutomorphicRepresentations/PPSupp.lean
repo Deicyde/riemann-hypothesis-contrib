@@ -23,9 +23,11 @@ section Abs
 
 variable {K : Type*} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K]
 
-private theorem fix_proj (S : Submodule ℂ K) [S.HasOrthogonalProjection] (m : K →L[ℂ] K)
-    (hs : ∀ x y, inner ℂ (m x) y = inner ℂ x (m y)) (hS : ∀ x ∈ S, m x ∈ S) (w : K) (hw : m w = w) :
-    m (S.starProjection w) = S.starProjection w := by
+private theorem fix_proj
+    (S : Submodule ℂ K) [S.HasOrthogonalProjection]
+    (m : K →L[ℂ] K) (hs : ∀ x y, inner ℂ (m x) y = inner ℂ x (m y)) (hS : ∀ x ∈ S, m x ∈ S)
+    (w : K) (hw : m w = w)
+    : m (S.starProjection w) = S.starProjection w := by
   set p := S.starProjection w with hp
   have hpS : p ∈ S := Submodule.starProjection_apply_mem S w
   have hq : w - p ∈ Sᗮ := Submodule.sub_starProjection_mem_orthogonal w
@@ -36,8 +38,7 @@ private theorem fix_proj (S : Submodule ℂ K) [S.HasOrthogonalProjection] (m : 
     exact hq _ (hS u hu)
   have h1 : m p - p ∈ S := S.sub_mem (hS p hpS) hpS
   have h2 : m p - p ∈ Sᗮ := by
-    have e : m p - p = (w - p) - m (w - p) := by
-      rw [map_sub, hw]; abel
+    have e : m p - p = (w - p) - m (w - p) := by rw [map_sub, hw]; abel
     rw [e]
     exact Sᗮ.sub_mem hq hmq
   have h3 : m p - p = 0 := by
@@ -51,15 +52,16 @@ section Mul
 
 variable {X : Type*} [MeasurableSpace X] {ν : Measure X} (c : X → ℝ)
 
-private noncomputable def mulL (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) : Lp ℂ 2 ν →L[ℂ] Lp ℂ 2 ν :=
-  by apply _root_.UpperTheory.Reformulated.B.MultiplicationNormBound.mulL <;> assumption
+private noncomputable def mulL (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1)
+    : Lp ℂ 2 ν →L[ℂ] Lp ℂ 2 ν := by
+  apply _root_.UpperTheory.Reformulated.B.MultiplicationNormBound.mulL <;> assumption
 
-private theorem mulL_ae (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f : Lp ℂ 2 ν) :
-    (mulL c hc hb f : X → ℂ) =ᵐ[ν] fun x => (c x : ℂ) * (f : X → ℂ) x :=
-  by apply _root_.UpperTheory.Reformulated.B.MulLinearAe.mulL_ae <;> assumption
+private theorem mulL_ae (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f : Lp ℂ 2 ν)
+    : (mulL c hc hb f : X → ℂ) =ᵐ[ν] fun x => (c x : ℂ) * (f : X → ℂ) x := by
+  apply _root_.UpperTheory.Reformulated.B.MulLinearAe.mulL_ae <;> assumption
 
-private theorem mulL_inner (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f g : Lp ℂ 2 ν) :
-    inner ℂ (mulL c hc hb f) g = inner ℂ f (mulL c hc hb g) := by
+private theorem mulL_inner (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f g : Lp ℂ 2 ν)
+    : inner ℂ (mulL c hc hb f) g = inner ℂ f (mulL c hc hb g) := by
   rw [L2.inner_def, L2.inner_def]
   refine integral_congr_ae ?_
   filter_upwards [mulL_ae c hc hb f, mulL_ae c hc hb g] with x h1 h2
@@ -67,19 +69,22 @@ private theorem mulL_inner (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f g : 
   simp only [RCLike.inner_apply, map_mul, Complex.conj_ofReal]
   ring
 
-private def mulS (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) :
-    PiLp 2 (fun _ : Unit => Lp ℂ 2 ν) →L[ℂ] PiLp 2 (fun _ : Unit => Lp ℂ 2 ν) :=
+private def mulS (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1)
+    : PiLp 2 (fun _ : Unit => Lp ℂ 2 ν) →L[ℂ] PiLp 2 (fun _ : Unit => Lp ℂ 2 ν) :=
   (PiLp.continuousLinearEquiv 2 ℂ (fun _ : Unit => Lp ℂ 2 ν)).symm.toContinuousLinearMap.comp
-    ((ContinuousLinearMap.pi fun i : Unit => (mulL c hc hb).comp
-        (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Unit => Lp ℂ 2 ν) i)).comp
+    ((ContinuousLinearMap.pi fun i : Unit =>
+        (mulL c hc hb).comp
+          (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Unit => Lp ℂ 2 ν) i)).comp
       (PiLp.continuousLinearEquiv 2 ℂ (fun _ : Unit => Lp ℂ 2 ν)).toContinuousLinearMap)
 
-private theorem mulS_apply (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1)
-    (f : PiLp 2 (fun _ : Unit => Lp ℂ 2 ν)) (i : Unit) : mulS c hc hb f i = mulL c hc hb (f i) := rfl
+private theorem mulS_apply
+    (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f : PiLp 2 (fun _ : Unit => Lp ℂ 2 ν)) (i : Unit)
+    : mulS c hc hb f i = mulL c hc hb (f i) :=
+  rfl
 
-private theorem mulS_inner (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1)
-    (f g : PiLp 2 (fun _ : Unit => Lp ℂ 2 ν)) :
-    inner ℂ (mulS c hc hb f) g = inner ℂ f (mulS c hc hb g) := by
+private theorem mulS_inner
+    (hc : Measurable c) (hb : ∀ x, |c x| ≤ 1) (f g : PiLp 2 (fun _ : Unit => Lp ℂ 2 ν))
+    : inner ℂ (mulS c hc hb f) g = inner ℂ f (mulS c hc hb g) := by
   rw [PiLp.inner_apply, PiLp.inner_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [mulS_apply, mulS_apply, mulL_inner]
@@ -125,10 +130,10 @@ end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.PS
 
 end
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.PS PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc MeasureTheory in
+open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.PS PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.Desc MeasureTheory in
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pSupp_pf :
-    PSupp := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pSupp_pf : PSupp := by
   intro E _ _ _ n D π a b v hv
   haveI : BorelSpace (H E n 0) := ⟨rfl⟩
   have hl : Continuous (ldet : H E n 0 → ℝ) := continuous_ldet
@@ -138,20 +143,28 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pSupp_pf :
   have hgen : ∀ f : Hs (ι := Unit) D, IsPiVec D π f → IsPiVec D π (mulS c hc hb f) := by
     intro f hf i
     obtain ⟨ψ, hψ, u, hu, hus, he⟩ := hf i
-    refine ⟨ψ, hψ, fun s => (chi a b s : ℂ) * u s,
-      (Complex.continuous_ofReal.comp (chi_cont a b)).mul hu, hus.mul_left, ?_⟩
+    refine ⟨
+      ψ,
+      hψ,
+      fun s => (chi a b s : ℂ) * u s,
+      (Complex.continuous_ofReal.comp (chi_cont a b)).mul hu,
+      hus.mul_left,
+      ?_
+    ⟩
     rw [mulS_apply]
     filter_upwards [mulL_ae c hc hb (f i), he] with x h1 h2
     rw [h1, h2]
     simp only [hcdef]
     ring
   have hS : ∀ f ∈ piSp D π Unit, mulS c hc hb f ∈ piSp D π Unit := by
-    have hle : Submodule.span ℂ {f | IsPiVec D π f} ≤
-        (piSp D π Unit).comap (mulS (ν := D.ν) c hc hb).toLinearMap := by
+    have hle
+        : Submodule.span ℂ {f | IsPiVec D π f}
+          ≤ (piSp D π Unit).comap (mulS (ν := D.ν) c hc hb).toLinearMap := by
       refine Submodule.span_le.2 fun f hf => ?_
       exact Submodule.le_topologicalClosure _ (Submodule.subset_span (hgen f hf))
-    have hcl : IsClosed (((piSp D π Unit).comap
-        (mulS (ν := D.ν) c hc hb).toLinearMap : Submodule ℂ _) : Set (Hs (ι := Unit) D)) :=
+    have hcl : IsClosed
+        (((piSp D π Unit).comap (mulS (ν := D.ν) c hc hb).toLinearMap : Submodule ℂ _)
+          : Set (Hs (ι := Unit) D)) :=
       (show IsClosed (piSp D π Unit : Set (Hs (ι := Unit) D)) from
         Submodule.isClosed_topologicalClosure _).preimage (mulS c hc hb).continuous
     exact fun f hf => Submodule.topologicalClosure_minimal _ hle hcl hf
@@ -178,7 +191,6 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pSupp_pf :
     rw [sub_mul, one_mul, ← h4, sub_self]
   rcases mul_eq_zero.1 h5 with h6 | h6
   · exfalso
-    have h7 : (c x : ℂ) = ((1 : ℝ) : ℂ) := by
-      rw [sub_eq_zero.1 h6]; simp
+    have h7 : (c x : ℂ) = ((1 : ℝ) : ℂ) := by rw [sub_eq_zero.1 h6]; simp
     exact chi_ne_one hx (Complex.ofReal_injective h7)
   · exact h6

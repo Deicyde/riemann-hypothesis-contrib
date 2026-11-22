@@ -6,18 +6,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LayeredIsom
 
 @[expose] public section
 
-open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
+open NumberField Formalism.GaloisCohomology UpperTheory.Top UpperTheory.V
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Win
 
-theorem UpperTheory.V.Win.exc :
-    ∀ (l R : ℕ) [Fact l.Prime] (L₀ : Type) [Field L₀], ABound l R L₀ →
-      ∃ c : ℕ, (∃ ζ : L₀, IsPrimitiveRoot ζ (l ^ c)) ∧ ∀ Z : ℕ, ∃ Exc : Finset ℕ, FirstBound l R c L₀ Z Exc := by
+theorem UpperTheory.V.Win.exc
+    : ∀ (l R : ℕ) [Fact l.Prime] (L₀ : Type) [Field L₀],
+      ABound l R L₀
+        → ∃ c : ℕ,
+          (∃ ζ : L₀, IsPrimitiveRoot ζ (l ^ c))
+            ∧ ∀ Z : ℕ, ∃ Exc : Finset ℕ, FirstBound l R c L₀ Z Exc := by
   intro l R _ L₀ _ h
   classical
   obtain ⟨⟨K, _, _, hU, c, R', s, hR', hζ, hb⟩, -⟩ := h
   refine ⟨c, hζ, fun Z => ?_⟩
-  obtain ⟨near, hnear⟩ : ∃ near : Fin R' → Finset ℕ, near = fun i =>
-      (Finset.Icc 1 Z : Finset ℕ).filter
-        (fun e : ℕ => ‖s i - (e : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ))) :=
+  obtain ⟨near, hnear⟩
+      : ∃ near : Fin R' → Finset ℕ,
+        near
+          = fun i =>
+            (Finset.Icc 1 Z : Finset ℕ).filter
+              (fun e : ℕ => ‖s i - (e : K)‖ < (l : ℝ) ^ (-(Nat.log l Z : ℤ))) :=
     ⟨_, rfl⟩
   refine ⟨Finset.univ.biUnion near, ?_⟩
   unfold FirstBound
@@ -29,7 +36,9 @@ theorem UpperTheory.V.Win.exc :
       rw [hnear] at ha hb'
       simp only [Finset.mem_filter, Finset.mem_Icc] at ha hb'
       exact near1 l K (s i) Z a b ha.1.1 ha.1.2 hb'.1.1 hb'.1.2 ha.2 hb'.2
-    calc (Finset.univ.biUnion near).card ≤ ∑ i : Fin R', (near i).card := Finset.card_biUnion_le
+    calc
+      (Finset.univ.biUnion near).card
+        ≤ ∑ i : Fin R', (near i).card := Finset.card_biUnion_le
       _ ≤ ∑ _i : Fin R', 1 := Finset.sum_le_sum (fun i _ => hone i)
       _ = R' := by simp
       _ ≤ R := hR'

@@ -8,39 +8,50 @@ open GlobalTheory.UnitLemma GlobalTheory.StableLatCount Polynomial
 
 namespace GlobalTheory.StableGraph
 
-variable {O : Type} [CommRing O] {A₁ A₂ : Type} [CommRing A₁] [CommRing A₂] [Algebra O A₁]
-  [Algebra O A₂] {M₁ : Submodule O A₁} {M₂ : Submodule O A₂}
+variable
+  {O : Type} [CommRing O]
+  {A₁ A₂ : Type} [CommRing A₁] [CommRing A₂] [Algebra O A₁] [Algebra O A₂]
+  {M₁ : Submodule O A₁} {M₂ : Submodule O A₂}
 
-theorem mem_of_inl {M : Submodule O (A₁ × A₂)} (h : M.comap (LinearMap.inl O A₁ A₂) = M₁)
-    {a : A₁} (ha : (a, (0 : A₂)) ∈ M) : a ∈ M₁ := by
+theorem mem_of_inl
+    {M : Submodule O (A₁ × A₂)} (h : M.comap (LinearMap.inl O A₁ A₂) = M₁)
+    {a : A₁} (ha : (a, (0 : A₂)) ∈ M)
+    : a ∈ M₁ := by
   rw [← h]; exact ha
 
-theorem mem_of_snd {M : Submodule O (A₁ × A₂)} (h : M.map (LinearMap.snd O A₁ A₂) = M₂)
-    {a : A₁} {x : A₂} (hx : (a, x) ∈ M) : x ∈ M₂ := by
+theorem mem_of_snd
+    {M : Submodule O (A₁ × A₂)} (h : M.map (LinearMap.snd O A₁ A₂) = M₂)
+    {a : A₁} {x : A₂} (hx : (a, x) ∈ M)
+    : x ∈ M₂ := by
   rw [← h]; exact Submodule.mem_map_of_mem (f := LinearMap.snd O A₁ A₂) hx
 
-theorem exists_of_map {M : Submodule O (A₁ × A₂)} (h : M.map (LinearMap.snd O A₁ A₂) = M₂)
-    (x : M₂) : ∃ a : A₁, (a, (x : A₂)) ∈ M := by
+theorem exists_of_map {M : Submodule O (A₁ × A₂)} (h : M.map (LinearMap.snd O A₁ A₂) = M₂) (x : M₂)
+    : ∃ a : A₁, (a, (x : A₂)) ∈ M := by
   have hx : (x : A₂) ∈ M.map (LinearMap.snd O A₁ A₂) := h ▸ x.2
   obtain ⟨p, hp, hpx⟩ := Submodule.mem_map.1 hx
   have hp' : p = (p.1, (x : A₂)) := Prod.ext rfl hpx
   exact ⟨p.1, hp' ▸ hp⟩
 
-noncomputable def classOf {M : Submodule O (A₁ × A₂)} (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂)
-    (x : M₂) : A₁ ⧸ M₁ :=
+noncomputable def classOf
+    {M : Submodule O (A₁ × A₂)} (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂) (x : M₂)
+    : A₁ ⧸ M₁ :=
   Submodule.Quotient.mk (exists_of_map h₂ x).choose
 
-theorem classOf_eq {M : Submodule O (A₁ × A₂)} (h₁ : M.comap (LinearMap.inl O A₁ A₂) = M₁)
-    (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂) {x : M₂} {a : A₁} (hp : (a, (x : A₂)) ∈ M) :
-    classOf (M₁ := M₁) h₂ x = Submodule.Quotient.mk a := by
+theorem classOf_eq
+    {M : Submodule O (A₁ × A₂)}
+    (h₁ : M.comap (LinearMap.inl O A₁ A₂) = M₁) (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂)
+    {x : M₂} {a : A₁} (hp : (a, (x : A₂)) ∈ M)
+    : classOf (M₁ := M₁) h₂ x = Submodule.Quotient.mk a := by
   unfold classOf
   rw [Submodule.Quotient.eq]
   apply mem_of_inl h₁
   have := M.sub_mem (exists_of_map h₂ x).choose_spec hp
   simpa using this
 
-noncomputable def toHom (M : Submodule O (A₁ × A₂)) (h₁ : M.comap (LinearMap.inl O A₁ A₂) = M₁)
-    (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂) : M₂ →ₗ[O] A₁ ⧸ M₁ where
+noncomputable def toHom
+    (M : Submodule O (A₁ × A₂))
+    (h₁ : M.comap (LinearMap.inl O A₁ A₂) = M₁) (h₂ : M.map (LinearMap.snd O A₁ A₂) = M₂)
+    : M₂ →ₗ[O] A₁ ⧸ M₁ where
   toFun := classOf h₂
   map_add' x y := by
     obtain ⟨a, ha⟩ := exists_of_map h₂ x
@@ -60,10 +71,13 @@ def graph (φ : M₂ →ₗ[O] A₁ ⧸ M₁) : Submodule O (A₁ × A₂) where
     have e : (⟨x + y, M₂.add_mem hx hy⟩ : M₂) = ⟨x, hx⟩ + ⟨y, hy⟩ := rfl
     simp only [Prod.fst_add, Prod.snd_add] at *
     rw [e, map_add (f := _), Submodule.Quotient.mk_add, ha, hb]
-  zero_mem' := ⟨M₂.zero_mem, by
-    have e : (⟨0, M₂.zero_mem⟩ : M₂) = 0 := rfl
-    simp only [Prod.fst_zero, Prod.snd_zero]
-    rw [e, map_zero, Submodule.Quotient.mk_zero]⟩
+  zero_mem' := ⟨
+    M₂.zero_mem,
+    by
+      have e : (⟨0, M₂.zero_mem⟩ : M₂) = 0 := rfl
+      simp only [Prod.fst_zero, Prod.snd_zero]
+      rw [e, map_zero, Submodule.Quotient.mk_zero]
+  ⟩
   smul_mem' := by
     rintro c ⟨a, x⟩ ⟨hx, ha⟩
     refine ⟨M₂.smul_mem c hx, ?_⟩
@@ -71,59 +85,68 @@ def graph (φ : M₂ →ₗ[O] A₁ ⧸ M₁) : Submodule O (A₁ × A₂) where
     simp only [Prod.smul_fst, Prod.smul_snd] at *
     rw [e, map_smul, Submodule.Quotient.mk_smul, ha]
 
-theorem mem_graph {φ : M₂ →ₗ[O] A₁ ⧸ M₁} {a : A₁} {x : A₂} :
-    (a, x) ∈ graph φ ↔ ∃ h : x ∈ M₂, Submodule.Quotient.mk a = φ ⟨x, h⟩ := Iff.rfl
+theorem mem_graph {φ : M₂ →ₗ[O] A₁ ⧸ M₁} {a : A₁} {x : A₂}
+    : (a, x) ∈ graph φ ↔ ∃ h : x ∈ M₂, Submodule.Quotient.mk a = φ ⟨x, h⟩ :=
+  Iff.rfl
 
 theorem graph_comap (φ : M₂ →ₗ[O] A₁ ⧸ M₁) : (graph φ).comap (LinearMap.inl O A₁ A₂) = M₁ := by
-    ext a
-    simp only [Submodule.mem_comap, LinearMap.inl_apply]
-    rw [mem_graph]
-    constructor
-    · rintro ⟨h, e⟩
-      have e0 : (⟨0, h⟩ : M₂) = 0 := rfl
-      rw [e0, map_zero, Submodule.Quotient.mk_eq_zero] at e
-      exact e
-    · intro ha
-      refine ⟨M₂.zero_mem, ?_⟩
-      have e0 : (⟨0, M₂.zero_mem⟩ : M₂) = 0 := rfl
-      rw [e0, map_zero, Submodule.Quotient.mk_eq_zero]
-      exact ha
+  ext a
+  simp only [Submodule.mem_comap, LinearMap.inl_apply]
+  rw [mem_graph]
+  constructor
+  · rintro ⟨h, e⟩
+    have e0 : (⟨0, h⟩ : M₂) = 0 := rfl
+    rw [e0, map_zero, Submodule.Quotient.mk_eq_zero] at e
+    exact e
+  · intro ha
+    refine ⟨M₂.zero_mem, ?_⟩
+    have e0 : (⟨0, M₂.zero_mem⟩ : M₂) = 0 := rfl
+    rw [e0, map_zero, Submodule.Quotient.mk_eq_zero]
+    exact ha
 
 theorem graph_map (φ : M₂ →ₗ[O] A₁ ⧸ M₁) : (graph φ).map (LinearMap.snd O A₁ A₂) = M₂ := by
-    ext x
-    constructor
-    · rintro ⟨p, ⟨h, _⟩, rfl⟩
-      exact h
-    · intro hx
-      obtain ⟨a, ha⟩ := Submodule.Quotient.mk_surjective M₁ (φ ⟨x, hx⟩)
-      exact ⟨(a, x), ⟨hx, ha⟩, rfl⟩
+  ext x
+  constructor
+  · rintro ⟨p, ⟨h, _⟩, rfl⟩
+    exact h
+  · intro hx
+    obtain ⟨a, ha⟩ := Submodule.Quotient.mk_surjective M₁ (φ ⟨x, hx⟩)
+    exact ⟨(a, x), ⟨hx, ha⟩, rfl⟩
 
-noncomputable def stableEquiv (g₁ : A₁) (g₂ : A₂) (hM₂ : ∀ y ∈ M₂, g₂ * y ∈ M₂) :
-    {M : Submodule O (A₁ × A₂) // (∀ y ∈ M, (g₁, g₂) * y ∈ M) ∧
-        M.comap (LinearMap.inl O A₁ A₂) = M₁ ∧ M.map (LinearMap.snd O A₁ A₂) = M₂} ≃
-      {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂, (y : A₂) = g₂ * x → ∀ a : A₁,
-        φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)} where
-  toFun M := ⟨toHom M.1 M.2.2.1 M.2.2.2, by
-    obtain ⟨M, hst, h₁, h₂⟩ := M
-    intro x y hy a ha
-    obtain ⟨c, hc⟩ := exists_of_map h₂ x
-    have hφx : toHom M h₁ h₂ x = Submodule.Quotient.mk c := classOf_eq h₁ h₂ hc
-    rw [hφx, Submodule.Quotient.eq] at ha
-    have h1 : (c - a, (0 : A₂)) ∈ M := by rw [← h₁] at ha; exact ha
-    have h2 := hst _ hc
-    have h3 := hst _ h1
-    have h4 : (g₁ * a, (y : A₂)) ∈ M := by
-      have := M.sub_mem h2 h3
-      rw [hy]
-      convert this using 1
-      ext
-      · simp only [Prod.fst_sub, Prod.fst_mul]; ring
-      · simp
-    exact classOf_eq h₁ h₂ h4⟩
-  invFun φ := ⟨graph φ.1, by
-    rintro ⟨a, x⟩ ⟨hx, ha⟩
-    exact ⟨hM₂ x hx, (φ.2 ⟨x, hx⟩ ⟨g₂ * x, hM₂ x hx⟩ rfl a ha.symm).symm⟩,
-    graph_comap φ.1, graph_map φ.1⟩
+noncomputable def stableEquiv (g₁ : A₁) (g₂ : A₂) (hM₂ : ∀ y ∈ M₂, g₂ * y ∈ M₂)
+    : {M : Submodule O (A₁ × A₂) // (∀ y ∈ M, (g₁, g₂) * y ∈ M)
+        ∧ M.comap (LinearMap.inl O A₁ A₂) = M₁ ∧ M.map (LinearMap.snd O A₁ A₂) = M₂}
+      ≃ {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂,
+        (y : A₂) = g₂ * x
+          → ∀ a : A₁, φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)} where
+  toFun M := ⟨
+    toHom M.1 M.2.2.1 M.2.2.2,
+    by
+      obtain ⟨M, hst, h₁, h₂⟩ := M
+      intro x y hy a ha
+      obtain ⟨c, hc⟩ := exists_of_map h₂ x
+      have hφx : toHom M h₁ h₂ x = Submodule.Quotient.mk c := classOf_eq h₁ h₂ hc
+      rw [hφx, Submodule.Quotient.eq] at ha
+      have h1 : (c - a, (0 : A₂)) ∈ M := by rw [← h₁] at ha; exact ha
+      have h2 := hst _ hc
+      have h3 := hst _ h1
+      have h4 : (g₁ * a, (y : A₂)) ∈ M := by
+        have := M.sub_mem h2 h3
+        rw [hy]
+        convert this using 1
+        ext
+        · simp only [Prod.fst_sub, Prod.fst_mul]; ring
+        · simp
+      exact classOf_eq h₁ h₂ h4
+  ⟩
+  invFun φ := ⟨
+    graph φ.1,
+    by
+      rintro ⟨a, x⟩ ⟨hx, ha⟩
+      exact ⟨hM₂ x hx, (φ.2 ⟨x, hx⟩ ⟨g₂ * x, hM₂ x hx⟩ rfl a ha.symm).symm⟩,
+    graph_comap φ.1,
+    graph_map φ.1
+  ⟩
   left_inv M := by
     obtain ⟨M, hst, h₁, h₂⟩ := M
     apply Subtype.ext
@@ -150,8 +173,18 @@ noncomputable def stableEquiv (g₁ : A₁) (g₂ : A₂) (hM₂ : ∀ y ∈ M�
 
 end GlobalTheory.StableGraph
 
-
 open GlobalTheory.StableGraph in
-theorem GlobalTheory.StableGraph.card_stable_eq_card_hom : ∀ (O : Type) [CommRing O] (A₁ A₂ : Type) [CommRing A₁] [CommRing A₂] [Algebra O A₁] [Algebra O A₂] (g₁ : A₁) (g₂ : A₂) (M₁ : Submodule O A₁) (M₂ : Submodule O A₂), (∀ y ∈ M₂, g₂ * y ∈ M₂) → Nat.card {M : Submodule O (A₁ × A₂) // (∀ y ∈ M, (g₁, g₂) * y ∈ M) ∧ M.comap (LinearMap.inl O A₁ A₂) = M₁ ∧ M.map (LinearMap.snd O A₁ A₂) = M₂} = Nat.card {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂, (y : A₂) = g₂ * x → ∀ a : A₁, φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)} := by
+theorem GlobalTheory.StableGraph.card_stable_eq_card_hom
+    : ∀ (O : Type) [CommRing O] (A₁ A₂ : Type) [CommRing A₁] [CommRing A₂] [Algebra O A₁]
+        [Algebra O A₂] (g₁ : A₁) (g₂ : A₂) (M₁ : Submodule O A₁) (M₂ : Submodule O A₂),
+      (∀ y ∈ M₂, g₂ * y ∈ M₂)
+        → Nat.card
+            {M : Submodule O (A₁ × A₂) // (∀ y ∈ M, (g₁, g₂) * y ∈ M)
+              ∧ M.comap (LinearMap.inl O A₁ A₂) = M₁ ∧ M.map (LinearMap.snd O A₁ A₂) = M₂}
+          = Nat.card
+            {φ : M₂ →ₗ[O] A₁ ⧸ M₁ // ∀ x y : M₂,
+              (y : A₂) = g₂ * x
+                → ∀ a : A₁,
+                  φ x = Submodule.Quotient.mk a → φ y = Submodule.Quotient.mk (g₁ * a)} := by
   intro O _ A₁ A₂ _ _ _ _ g₁ g₂ M₁ M₂ hM₂
   exact Nat.card_congr (stableEquiv g₁ g₂ hM₂)

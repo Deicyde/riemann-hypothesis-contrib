@@ -22,10 +22,11 @@ theorem L2GramLattice.proof : L2GramLattice.Statement := by
     obtain ⟨C, hC⟩ := hbdd s
     exact (memLp_top_of_bound (hmeas s) C hC).mono_exponent le_top
   let F : Fin n → Lp ℂ 2 μ := fun i => (hmem (b i)).toLp _
-  let ψ : (Fin n → ℝ) →ₗ[ℝ] Lp ℂ 2 μ :=
-    { toFun := fun c => ∑ i, c i • F i
-      map_add' := fun c d => by simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := fun a c => by simp [Finset.smul_sum, smul_smul] }
+  let ψ : (Fin n → ℝ) →ₗ[ℝ] Lp ℂ 2 μ := {
+    toFun := fun c => ∑ i, c i • F i
+    map_add' := fun c d => by simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := fun a c => by simp [Finset.smul_sum, smul_smul]
+  }
 
   have hψ : ∀ c : Fin n → ℝ, (ψ c : X → ℂ) =ᵐ[μ] fun z => ∑ i, (c i : ℂ) * w (b i) z := by
     intro c
@@ -62,8 +63,7 @@ theorem L2GramLattice.proof : L2GramLattice.Statement := by
     simp [zsmul_eq_mul]
   let W := LinearMap.range ψ
   let e₁ : (Fin n → ℝ) ≃ₗ[ℝ] W := LinearEquiv.ofInjective ψ hinj
-  have hW : Module.finrank ℝ W = n := by
-    rw [← e₁.finrank_eq, Module.finrank_fin_fun]
+  have hW : Module.finrank ℝ W = n := by rw [← e₁.finrank_eq, Module.finrank_fin_fun]
   let o := (stdOrthonormalBasis ℝ W).reindex (finCongr hW)
   let T : (Fin n → ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin n) := e₁.trans o.repr.toLinearEquiv
   have hT : ∀ c, ‖T c‖ = ‖ψ c‖ := by
@@ -94,8 +94,10 @@ theorem L2GramLattice.proof : L2GramLattice.Statement := by
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       exact ⟨b i, hφb i⟩
-  have key : ∀ L : Submodule ℤ (EuclideanSpace ℝ (Fin n)), L = Submodule.span ℤ (Set.range v) →
-      DiscreteTopology L ∧ ∀ [DiscreteTopology L], IsZLattice ℝ L := by
+  have key
+      : ∀ L : Submodule ℤ (EuclideanSpace ℝ (Fin n)),
+        L = Submodule.span ℤ (Set.range v)
+          → DiscreteTopology L ∧ ∀ [DiscreteTopology L], IsZLattice ℝ L := by
     rintro _ rfl
     exact ⟨inferInstance, by intro _; infer_instance⟩
   refine ⟨φ, ?_, (key _ hL).1, (key _ hL).2, ?_⟩

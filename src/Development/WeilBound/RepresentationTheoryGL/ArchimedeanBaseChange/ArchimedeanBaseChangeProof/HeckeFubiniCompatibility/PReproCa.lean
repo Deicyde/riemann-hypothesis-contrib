@@ -24,7 +24,8 @@ theorem norm_cosh_sub_one_le {z : ℂ} (hz : ‖z‖ ≤ 1) : ‖Complex.cosh z 
   linarith
 
 theorem continuous_cas (N : ℕ) : Continuous fun χ : Inf N => cas χ := by
-  have hA : ∀ f : Inf N → Fin N → ℂ, Continuous f → Continuous fun χ => Formalism.REAL.Amat (f χ) := by
+  have hA
+      : ∀ f : Inf N → Fin N → ℂ, Continuous f → Continuous fun χ => Formalism.REAL.Amat (f χ) := by
     intro f hf
     refine continuous_pi fun a => continuous_pi fun b => ?_
     simp only [Formalism.REAL.Amat, Matrix.of_apply]
@@ -42,11 +43,13 @@ theorem continuous_cas (N : ℕ) : Continuous fun χ : Inf N => cas χ := by
   unfold cas
   exact continuous_const.mul ((hg true).add (hg false))
 
-theorem exists_bump (N : ℕ) (R : ℝ) : ∃ (g : ℝ → ℝ) (T : ℝ), 0 < T ∧ IsBump g T ∧
-    ∀ χ : Inf N, (∀ s i, ‖χ s i‖ ≤ R) → 1 / 2 ≤ ‖coshT g (cas χ)‖ := by
+theorem exists_bump (N : ℕ) (R : ℝ)
+    : ∃ (g : ℝ → ℝ) (T : ℝ),
+      0 < T ∧ IsBump g T ∧ ∀ χ : Inf N, (∀ s i, ‖χ s i‖ ≤ R) → 1 / 2 ≤ ‖coshT g (cas χ)‖ := by
   have hS : IsCompact {χ : Inf N | ∀ s i, ‖χ s i‖ ≤ R} := by
-    have e : {χ : Inf N | ∀ s i, ‖χ s i‖ ≤ R} =
-        Set.univ.pi fun _ => Set.univ.pi fun _ => Metric.closedBall (0 : ℂ) R := by
+    have e
+        : {χ : Inf N | ∀ s i, ‖χ s i‖ ≤ R}
+          = Set.univ.pi fun _ => Set.univ.pi fun _ => Metric.closedBall (0 : ℂ) R := by
       ext χ; simp [Set.mem_pi]
     rw [e]
     exact isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
@@ -85,55 +88,68 @@ theorem exists_bump (N : ℕ) (R : ℝ) : ∃ (g : ℝ → ℝ) (T : ℝ), 0 < T
   have hcont1 : Continuous fun t : ℝ => Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) :=
     Complex.continuous_cosh.comp (Complex.continuous_ofReal.mul continuous_const)
   have hi1 : Integrable fun t : ℝ => (g t : ℂ) * Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) :=
-    ((Complex.continuous_ofReal.comp hgc).mul hcont1).integrable_of_hasCompactSupport (hgC.mul_right)
+    ((Complex.continuous_ofReal.comp hgc).mul hcont1).integrable_of_hasCompactSupport
+      (hgC.mul_right)
   have hi2 : Integrable fun t : ℝ => (g t : ℂ) :=
     (Complex.continuous_ofReal.comp hgc).integrable_of_hasCompactSupport hgC
   have hone : ∫ t, (g t : ℂ) = 1 := by
     rw [integral_complex_ofReal, hg, ContDiffBump.integral_normed]; simp
-  have h3 : ∫ t, (g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1) =
-      (∫ t, (g t : ℂ) * Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ))) - ∫ t, (g t : ℂ) := by
+  have h3
+      : ∫ t, (g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1)
+        = (∫ t, (g t : ℂ) * Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ))) - ∫ t, (g t : ℂ) := by
     rw [← integral_sub hi1 hi2]; congr 1; funext t; ring
   have hdiff : coshT g c - 1 = ∫ t, (g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1) := by
     rw [h3, hone]; rfl
-  have hbound : ∀ t, ‖(g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1)‖ ≤ g t * (1 / 2) := by
+  have hbound
+      : ∀ t, ‖(g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1)‖ ≤ g t * (1 / 2) := by
     intro t
     by_cases h0 : g t = 0
     · simp [h0]
     have ht := hsupp t h0
     have hz : ‖(t : ℂ) * c ^ (1 / 2 : ℂ)‖ ≤ 1 / 4 := by
       rw [norm_mul, Complex.norm_real, Real.norm_eq_abs]
-      calc |t| * ‖c ^ (1 / 2 : ℂ)‖ ≤ T * s := mul_le_mul ht.le hroot (norm_nonneg _) hT0.le
+      calc
+        |t| * ‖c ^ (1 / 2 : ℂ)‖
+          ≤ T * s := mul_le_mul ht.le hroot (norm_nonneg _) hT0.le
         _ ≤ 1 / 4 := hTs
     have hgt : 0 ≤ g t := ContDiffBump.nonneg_normed f t
     rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hgt]
     refine mul_le_mul_of_nonneg_left ?_ hgt
-    calc ‖Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1‖ ≤ 2 * ‖(t : ℂ) * c ^ (1 / 2 : ℂ)‖ :=
-          norm_cosh_sub_one_le (hz.trans (by norm_num))
+    calc
+      ‖Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1‖
+        ≤ 2 * ‖(t : ℂ) * c ^ (1 / 2 : ℂ)‖ := norm_cosh_sub_one_le (hz.trans (by norm_num))
       _ ≤ 1 / 2 := by linarith
   have hle : ‖coshT g c - 1‖ ≤ 1 / 2 := by
     rw [hdiff]
-    calc ‖∫ t, (g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1)‖ ≤ ∫ t, g t * (1 / 2) :=
-          norm_integral_le_of_norm_le ((hgc.mul continuous_const).integrable_of_hasCompactSupport hgcs.mul_right)
-            (Filter.Eventually.of_forall hbound)
+    calc
+      ‖∫ t, (g t : ℂ) * (Complex.cosh ((t : ℂ) * c ^ (1 / 2 : ℂ)) - 1)‖ ≤ ∫ t, g t * (1 / 2) :=
+        norm_integral_le_of_norm_le
+          ((hgc.mul continuous_const).integrable_of_hasCompactSupport hgcs.mul_right)
+          (Filter.Eventually.of_forall hbound)
       _ = 1 / 2 := by rw [integral_mul_const, hg, ContDiffBump.integral_normed]; ring
   have := norm_sub_norm_le (1 : ℂ) (1 - coshT g c)
   rw [sub_sub_cancel, norm_one, norm_sub_rev] at this
   linarith
 
-theorem exists_enum {N : ℕ} (m : Multiset ℂ) (h : Multiset.card m = N) :
-    ∃ e : Fin N → ℂ, Multiset.map e Finset.univ.val = m := by
+theorem exists_enum {N : ℕ} (m : Multiset ℂ) (h : Multiset.card m = N)
+    : ∃ e : Fin N → ℂ, Multiset.map e Finset.univ.val = m := by
   subst h
   refine ⟨fun i => m.toList.get (Fin.cast (by simp) i), ?_⟩
   rw [Fin.univ_val_map]
-  have e : List.ofFn (fun i : Fin (Multiset.card m) => m.toList.get (Fin.cast (by simp) i)) = m.toList :=
+  have e
+      : List.ofFn (fun i : Fin (Multiset.card m) => m.toList.get (Fin.cast (by simp) i))
+        = m.toList :=
     List.ext_get (by simp) (by simp)
   rw [e, Multiset.coe_toList]
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
 
-theorem exists_chi (hB : Bridge.BridgeSt) (R : ℝ) (v : InfinitePlace E) (φ : Sm E N)
-    (hR : PositivityTheory.Rg.BcB.SpectralAccumulation.InfBdd R (Submodule.span ℂ {φ})) :
-    ∃ χ : Inf N, (∀ s i, ‖χ s i‖ ≤ R) ∧ ∀ g : GA E N, IsEig χ (Bridge.along v g φ.1) := by
+theorem exists_chi
+    (hB : Bridge.BridgeSt)
+    (R : ℝ)
+    (v : InfinitePlace E)
+    (φ : Sm E N) (hR : PositivityTheory.Rg.BcB.SpectralAccumulation.InfBdd R (Submodule.span ℂ {φ}))
+    : ∃ χ : Inf N, (∀ s i, ‖χ s i‖ ≤ R) ∧ ∀ g : GA E N, IsEig χ (Bridge.along v g φ.1) := by
   obtain ⟨m1, h1, b1⟩ := hR v.embedding
   obtain ⟨m2, h2, b2⟩ := hR (ComplexEmbedding.conjugate v.embedding)
   obtain ⟨e1, he1⟩ := exists_enum m1 h1.1
@@ -144,8 +160,9 @@ theorem exists_chi (hB : Bridge.BridgeSt) (R : ℝ) (v : InfinitePlace E) (φ : 
     · exact b2 _ (he2 ▸ Multiset.mem_map_of_mem e2 (Finset.mem_univ_val i))
     · exact b1 _ (he1 ▸ Multiset.mem_map_of_mem e1 (Finset.mem_univ_val i))
   · intro g
-    have key := (hB E N (Submodule.span ℂ {φ}) v (fun s => if s then e1 else e2)).2
-      ⟨by simpa [he1] using h1, by simpa [he2] using h2⟩
+    have key :=
+      (hB E N (Submodule.span ℂ {φ}) v (fun s => if s then e1 else e2)).2
+        ⟨by simpa [he1] using h1, by simpa [he2] using h2⟩
     exact key φ (Submodule.mem_span_singleton_self φ) g
 
 end PositivityTheory.Rg.BcB.CG.ReproL

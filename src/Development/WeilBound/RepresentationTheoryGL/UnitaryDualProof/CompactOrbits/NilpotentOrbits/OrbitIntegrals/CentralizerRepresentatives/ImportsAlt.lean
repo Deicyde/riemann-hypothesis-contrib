@@ -30,8 +30,9 @@ theorem reps [CharZero k] : Reps (k := k) := by
   let S : Type := {p : Sp k n // p.1 ∈ Bz Z ∧ IsNilpotent (p.1 - c) ∧ p.2 ≠ 0}
   let F : (p : S) → Frame Z M L R o (p.1.1 - c) p.1.2 := fun p =>
     Classical.choice (hF _ (hN _ p.2.1) p.2.2.1 p.1.2)
-  have hb : ∀ (p : S) (m : M) (ℓ σ : ℕ),
-      Nat.card {a : (F p).ι m // (F p).l m a = ℓ ∧ (F p).s m a = σ} < n + 1 := by
+  have hb
+      : ∀ (p : S) (m : M) (ℓ σ : ℕ),
+        Nat.card {a : (F p).ι m // (F p).l m a = ℓ ∧ (F p).s m a = σ} < n + 1 := by
     intro p m ℓ σ
     haveI := (F p).fι m
     exact Nat.lt_succ_of_le ((Finite.card_subtype_le _).trans ((F p).card_le m))
@@ -60,9 +61,10 @@ theorem reps [CharZero k] : Reps (k := k) := by
     · rw [Set.Finite.mem_toFinset]
       exact ⟨t, rfl⟩
     · have he : τ (rep t) = τ q := hrepτ t
-      obtain ⟨g, hgZ, hgN, hgv⟩ := conj_of_frames (F (rep t)) (F q) (by
-        intro m ℓ σ hℓ hσ
-        exact congrArg (fun f => (f m ⟨ℓ, Nat.lt_succ_of_le hℓ⟩ ⟨σ, Nat.lt_succ_of_le hσ⟩).1) he)
+      obtain ⟨g, hgZ, hgN, hgv⟩ :=
+        conj_of_frames (F (rep t)) (F q) (by
+          intro m ℓ σ hℓ hσ
+          exact congrArg (fun f => (f m ⟨ℓ, Nat.lt_succ_of_le hℓ⟩ ⟨σ, Nat.lt_succ_of_le hσ⟩).1) he)
       refine ⟨g, hgZ, ?_⟩
       have hgc : (g : Matrix (Fin n) (Fin n) k) * c = c * g := (hgZ c hc).symm
       have key : (g : Matrix (Fin n) (Fin n) k) * (rep t).1.1 = x * g := by

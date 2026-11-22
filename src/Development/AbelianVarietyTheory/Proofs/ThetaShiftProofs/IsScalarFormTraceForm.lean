@@ -12,12 +12,16 @@ noncomputable section
 namespace GlobalTheory.TauTwist
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.TorusExt
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.TorusExt
 
 section Forms
 
-variable (O : Type) [CommRing O] [StarRing O] {X : Type} [AddCommGroup X] [Module O X] {U U' : Type} [CommGroup U]
-  [CommGroup U']
+variable
+  (O : Type) [CommRing O] [StarRing O]
+  {X : Type} [AddCommGroup X] [Module O X]
+  {U U' : Type} [CommGroup U] [CommGroup U']
 
 structure IsScalarForm (t : X → X → U) : Prop where
   add_right : ∀ y x x', t y (x + x') = t y x * t y x'
@@ -49,20 +53,25 @@ theorem nsmul_right (n : ℕ) (y x : X) : t y (n • x) = t y x ^ n := by
   | zero => rw [zero_nsmul, pow_zero, ht.zero_right]
   | succ n ih => rw [succ_nsmul, pow_succ, ht.add_right, ih]
 
-theorem nsmul_left (n : ℕ) (y x : X) : t (n • y) x = t y x ^ n := by rw [ht.symm, ht.nsmul_right, ht.symm]
+theorem nsmul_left (n : ℕ) (y x : X) : t (n • y) x = t y x ^ n := by
+  rw [ht.symm, ht.nsmul_right, ht.symm]
 
-theorem map (f : U →* U') : IsScalarForm O fun y x => f (t y x) :=
-  ⟨fun y x x' => by rw [ht.add_right, map_mul], fun y x => by rw [ht.symm], fun a y x => by rw [ht.bal]⟩
+theorem map (f : U →* U') : IsScalarForm O fun y x => f (t y x) := ⟨
+  fun y x x' => by rw [ht.add_right, map_mul],
+  fun y x => by rw [ht.symm],
+  fun a y x => by rw [ht.bal]
+⟩
 
 theorem inv : IsScalarForm O fun y x => (t y x)⁻¹ := ht.map invMonoidHom
 
 theorem pow (n : ℕ) : IsScalarForm O fun y x => t y x ^ n := ht.map (powMonoidHom n)
 
-theorem mem_balForms : Forms.bilOfMul t ht.add_left ht.add_right ∈ Forms.balForms ℤ O X (Additive U) :=
+theorem mem_balForms
+    : Forms.bilOfMul t ht.add_left ht.add_right ∈ Forms.balForms ℤ O X (Additive U) :=
   ⟨ht.symm, ht.bal⟩
 
-theorem refine_add {w : O} (hw : w + star w = 1) (a b : X) :
-    t (a + b) (w • (a + b)) = t a (w • a) * t b (w • b) * t a b := by
+theorem refine_add {w : O} (hw : w + star w = 1) (a b : X)
+    : t (a + b) (w • (a + b)) = t a (w • a) * t b (w • b) * t a b := by
   have h : t a (w • b) * t b (w • a) = t a b := by
     rw [ht.symm b, ht.bal, ← ht.add_right, ← add_smul, hw, one_smul]
   rw [smul_add, ht.add_left, ht.add_right, ht.add_right, ← h]
@@ -77,8 +86,9 @@ end Forms
 
 section Constants
 
-variable {A A' : Type} [CommRing A] [CommRing A'] {X Y Y' Z : Scheme.{0}} {L : LB X} {K K' : Type} [Fintype K]
-  [Fintype K']
+variable
+  {A A' : Type} [CommRing A] [CommRing A']
+  {X Y Y' Z : Scheme.{0}} {L : LB X} {K K' : Type} [Fintype K] [Fintype K']
 
 def unitAt (q : Z ⟶ Sp A) (z : Z) : Aˣ →* (Z.presheaf.stalk z)ˣ :=
   (gm q z ⊤).comp (Units.map (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom.toMonoidHom)
@@ -88,20 +98,29 @@ theorem unitAt_apply (q : Z ⟶ Sp A) (z : Z) (u : Aˣ) : unitAt q z u = gm q z 
 theorem unitAt_val (q : Z ⟶ Sp A) (z : Z) (u : Aˣ) : (unitAt q z u).val = gs q z ⊤ (unitOn u).val :=
   (gs_unit q z ⊤ trivial (unitOn u)).symm
 
-theorem unitAt_spMap (q : Z ⟶ Sp A') (f : A →+* A') (z : Z) (u : Aˣ) :
-    unitAt (q ≫ spMap f) z u = unitAt q z (Units.map f.toMonoidHom u) := by
-  refine (gm_pull q (spMap f) z ⊤ trivial (unitOn u)).symm.trans (congrArg (gm q z ⊤) (Units.ext ?_))
-  exact (congrArg (fun e => e.hom u.val) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom f))).symm
+theorem unitAt_spMap (q : Z ⟶ Sp A') (f : A →+* A') (z : Z) (u : Aˣ)
+    : unitAt (q ≫ spMap f) z u = unitAt q z (Units.map f.toMonoidHom u) := by
+  refine (gm_pull q (spMap f) z ⊤ trivial (unitOn u)).symm.trans
+    (congrArg (gm q z ⊤) (Units.ext ?_))
+  exact
+    (congrArg (fun e => e.hom u.val) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom f))).symm
 
-theorem unitAt_injective {F : Type} [Field F] (y : Sp F) : Function.Injective (unitAt (𝟙 (Sp F)) y) :=
-  fun u v h => (stalkUnits y).injective ((gm_unitOn y u).symm.trans (h.trans (gm_unitOn y v)))
+theorem unitAt_injective {F : Type} [Field F] (y : Sp F)
+    : Function.Injective (unitAt (𝟙 (Sp F)) y) := fun u v h =>
+  (stalkUnits y).injective ((gm_unitOn y u).symm.trans (h.trans (gm_unitOn y v)))
 
-theorem val_scale {φ : K → (Sp A ⟶ X)} {ε : K → ℤ} (u : Aˣ) (t : LB.Gen (LB.LinComb L φ ε)) (r : Z ⟶ Sp A) {z : Z}
-    {J : (Z ⟶ X) → L.ι} (hJ : Good L z J) : val (scaleGen (unitOn u) t) r z J = unitAt r z u * val t r z J :=
+theorem val_scale
+    {φ : K → (Sp A ⟶ X)} {ε : K → ℤ}
+    (u : Aˣ) (t : LB.Gen (LB.LinComb L φ ε)) (r : Z ⟶ Sp A)
+    {z : Z} {J : (Z ⟶ X) → L.ι} (hJ : Good L z J)
+    : val (scaleGen (unitOn u) t) r z J = unitAt r z u * val t r z J :=
   val_scaleGen _ t r hJ
 
-theorem val_powGen {φ : K → (Y ⟶ X)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb L φ ε)) (n : ℕ) (r : Z ⟶ Y) (z : Z)
-    (J : (Z ⟶ X) → L.ι) : val (GeneratorPullback.powGen L φ ε t n) r z J = val t r z J ^ n := map_pow _ _ _
+theorem val_powGen
+    {φ : K → (Y ⟶ X)} {ε : K → ℤ} (t : LB.Gen (LB.LinComb L φ ε))
+    (n : ℕ) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι)
+    : val (GeneratorPullback.powGen L φ ε t n) r z J = val t r z J ^ n :=
+  map_pow _ _ _
 
 end Constants
 
@@ -110,32 +129,52 @@ variable {R : Type} [CommRing R] [IsDomain R]
 abbrev PsiFam (D : DegPre R) : Type :=
   ∀ χ : D.X, LB.Gen (LB.LinComb D.P.L (K := PUnit) (fun _ => ptK (D.c χ)) (fun _ => -1))
 
-@[reducible] def withPsi (D : DegPre R) (ψ : PsiFam D) (hψ : ∀ χ, (ψ χ).IsGen) : DegPre R :=
-  { D with psi := ψ, psi_gen := hψ }
+@[reducible]
+def withPsi (D : DegPre R) (ψ : PsiFam D) (hψ : ∀ χ, (ψ χ).IsGen) : DegPre R := {
+  D with
+  psi := ψ
+  psi_gen := hψ
+}
 
-@[reducible] def rescale (D : DegPre R) (q : D.X → (FractionRing R)ˣ) : DegPre R :=
+@[reducible]
+def rescale (D : DegPre R) (q : D.X → (FractionRing R)ˣ) : DegPre R :=
   withPsi D (fun χ => scaleGen (unitOn (q χ)) (D.psi χ)) fun χ => scaleGen_isGen _ _ (D.psi_gen χ)
 
 variable {O : Type} [CommRing O] [StarRing O]
 
-@[reducible] def twist (D : DegPre R) [Module O D.X] (w : O) (t : D.X → D.X → (FractionRing R)ˣ) : DegPre R :=
+@[reducible]
+def twist (D : DegPre R) [Module O D.X] (w : O) (t : D.X → D.X → (FractionRing R)ˣ) : DegPre R :=
   rescale D fun y => t y (w • y)
 
 variable {D : DegPre R}
 
-theorem val_tau (D : DegPre R) (a b : D.X) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left) {z : Z} {J} (hJ : Good D.P.L z J) :
-    val (D.tau a b) r z J = val (D.psi (a + b)) r z J * (val (D.psi a) r z J)⁻¹ * (val (D.psi b) r z J)⁻¹ *
-      (val D.rigK r z J)⁻¹ :=
-  (val_mul hJ _ _ _).trans (congrArg₂ (· * ·) ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) ((val_mul hJ _ _ _).trans
-    (congrArg₂ (· * ·) rfl (val_inv _ _))) (val_inv _ _))) (val_inv _ _))
+theorem val_tau
+    (D : DegPre R) (a b : D.X)
+    {Z : Scheme.{0}} (r : Z ⟶ (TK R).left)
+    {z : Z} {J} (hJ : Good D.P.L z J)
+    : val (D.tau a b) r z J
+      = val (D.psi (a + b)) r z J * (val (D.psi a) r z J)⁻¹ * (val (D.psi b) r z J)⁻¹
+        * (val D.rigK r z J)⁻¹ :=
+  (val_mul hJ _ _ _).trans
+    (congrArg₂ (· * ·)
+      ((val_mul hJ _ _ _).trans
+        (congrArg₂ (· * ·) ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) rfl (val_inv _ _)))
+          (val_inv _ _)))
+      (val_inv _ _))
 
-theorem val_psi_rescale (q : D.X → (FractionRing R)ˣ) (a : D.X) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left) {z : Z} {J}
-    (hJ : Good D.P.L z J) : val ((rescale D q).psi a) r z J = unitAt r z (q a) * val (D.psi a) r z J :=
+theorem val_psi_rescale
+    (q : D.X → (FractionRing R)ˣ) (a : D.X)
+    {Z : Scheme.{0}} (r : Z ⟶ (TK R).left)
+    {z : Z} {J} (hJ : Good D.P.L z J)
+    : val ((rescale D q).psi a) r z J = unitAt r z (q a) * val (D.psi a) r z J :=
   val_scale (q a) (D.psi a) r hJ
 
-theorem val_tau_rescale (q : D.X → (FractionRing R)ˣ) {a b : D.X} {x : (FractionRing R)ˣ}
-    (hx : q (a + b) = q a * q b * x) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left) {z : Z} {J} (hJ : Good D.P.L z J) :
-    val ((rescale D q).tau a b) r z J = unitAt r z x * val (D.tau a b) r z J := by
+theorem val_tau_rescale
+    (q : D.X → (FractionRing R)ˣ)
+    {a b : D.X} {x : (FractionRing R)ˣ} (hx : q (a + b) = q a * q b * x)
+    {Z : Scheme.{0}} (r : Z ⟶ (TK R).left)
+    {z : Z} {J} (hJ : Good D.P.L z J)
+    : val ((rescale D q).tau a b) r z J = unitAt r z x * val (D.tau a b) r z J := by
   have e := val_tau (rescale D q) a b r hJ
   have e₁ := val_psi_rescale q (a + b) r hJ
   have e₂ := val_psi_rescale q a r hJ
@@ -153,9 +192,11 @@ section Twist
 
 variable [Module O D.X] {w : O} {t : D.X → D.X → (FractionRing R)ˣ}
 
-theorem val_psi_twist (w : O) (t : D.X → D.X → (FractionRing R)ˣ) (a : D.X) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left)
-    {z : Z} {J} (hJ : Good D.P.L z J) :
-    val ((twist D w t).psi a) r z J = unitAt r z (t a (w • a)) * val (D.psi a) r z J :=
+theorem val_psi_twist
+    (w : O) (t : D.X → D.X → (FractionRing R)ˣ) (a : D.X)
+    {Z : Scheme.{0}} (r : Z ⟶ (TK R).left)
+    {z : Z} {J} (hJ : Good D.P.L z J)
+    : val ((twist D w t).psi a) r z J = unitAt r z (t a (w • a)) * val (D.psi a) r z J :=
   val_psi_rescale (fun y => t y (w • y)) a r hJ
 
 variable (hw : w + star w = 1) (ht : IsScalarForm O t)
@@ -164,44 +205,54 @@ include ht
 theorem psiEven_twist (w : O) (h : D.PsiEven) : (twist D w t).PsiEven := fun χ =>
   corr_of_val D.P.isLB fun y J hJ => by
     have e := (val_mul hJ _ _ _).symm.trans (val_corr hJ (h χ) (𝟙 _))
-    refine (val_mul hJ _ _ _).trans ((congrArg₂ (· * ·) (val_psi_twist w t (-χ) _ hJ) rfl).trans
-      (Eq.trans ?_ (val_psi_twist w t χ _ hJ).symm))
+    refine (val_mul hJ _ _ _).trans
+      ((congrArg₂ (· * ·) (val_psi_twist w t (-χ) _ hJ) rfl).trans
+        (Eq.trans ?_ (val_psi_twist w t χ _ hJ).symm))
     rw [ht.refine_neg, ← e, _root_.mul_assoc]
 
 include hw
 
-theorem val_tau_twist (a b : D.X) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left) {z : Z} {J} (hJ : Good D.P.L z J) :
-    val ((twist D w t).tau a b) r z J = unitAt r z (t a b) * val (D.tau a b) r z J :=
+theorem val_tau_twist
+    (a b : D.X) {Z : Scheme.{0}} (r : Z ⟶ (TK R).left) {z : Z} {J} (hJ : Good D.P.L z J)
+    : val ((twist D w t).tau a b) r z J = unitAt r z (t a b) * val (D.tau a b) r z J :=
   val_tau_rescale (fun y => t y (w • y)) (ht.refine_add hw a b) r hJ
 
 theorem tauBimult_twist (h : D.TauBimult) : (twist D w t).TauBimult := fun a a' b =>
   corr_of_val D.P.isLB fun y J hJ => by
-    have e := (val_mul hJ _ _ _).symm.trans ((val_corr hJ (h a a' b) (𝟙 _)).trans (val_mul hJ _ _ _))
-    refine (val_mul hJ _ _ _).trans ((congrArg₂ (· * ·) (val_tau_twist hw ht (a + a') b _ hJ) rfl).trans
-      (Eq.trans ?_ ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (val_tau_twist hw ht a b _ hJ)
-        (val_tau_twist hw ht a' b _ hJ))).symm))
+    have e :=
+      (val_mul hJ _ _ _).symm.trans ((val_corr hJ (h a a' b) (𝟙 _)).trans (val_mul hJ _ _ _))
+    refine (val_mul hJ _ _ _).trans
+      ((congrArg₂ (· * ·) (val_tau_twist hw ht (a + a') b _ hJ) rfl).trans
+        (Eq.trans ?_
+          ((val_mul hJ _ _ _).trans
+            (congrArg₂ (· * ·) (val_tau_twist hw ht a b _ hJ)
+              (val_tau_twist hw ht a' b _ hJ))).symm))
     rw [ht.add_left, map_mul, _root_.mul_mul_mul_comm, ← e, _root_.mul_assoc]
     rfl
 
 def twistAct (oa : D.OAct O) : (twist D w t).OAct O where
   onB := oa.onB
   c_lin := oa.c_lin
-  tau_bal a u hu u₀ x x' := corr_of_val D.P.isLB fun y J hJ => by
-    have e := (val_mul hJ _ _ _).symm.trans (val_corr hJ (oa.tau_bal a u hu u₀ x x') (𝟙 _))
-    refine (val_mul hJ _ _ _).trans ((congrArg₂ (· * ·) (val_tau_twist hw ht (a • x) x' _ hJ) rfl).trans
-      (Eq.trans ?_ (val_tau_twist hw ht x (star a • x') _ hJ).symm))
-    rw [ht.bal, ← e, _root_.mul_assoc]
-    rfl
+  tau_bal a u hu u₀ x x' :=
+    corr_of_val D.P.isLB fun y J hJ => by
+      have e := (val_mul hJ _ _ _).symm.trans (val_corr hJ (oa.tau_bal a u hu u₀ x x') (𝟙 _))
+      refine (val_mul hJ _ _ _).trans
+        ((congrArg₂ (· * ·) (val_tau_twist hw ht (a • x) x' _ hJ) rfl).trans
+          (Eq.trans ?_ (val_tau_twist hw ht x (star a • x') _ hJ).symm))
+      rw [ht.bal, ← e, _root_.mul_assoc]
+      rfl
 
-theorem psi_weight_zero_twist {oa : D.OAct O} (h : TraceFormTwistIso D oa w) : TraceFormTwistIso (twist D w t) (twistAct hw ht oa) w := by
+theorem psi_weight_zero_twist {oa : D.OAct O} (h : TraceFormTwistIso D oa w)
+    : TraceFormTwistIso (twist D w t) (twistAct hw ht oa) w := by
   obtain ⟨u, hu, u₀, h⟩ := h
   refine ⟨u, hu, u₀, fun x => corr_of_val D.P.isLB fun y J hJ => ?_⟩
   have e := (val_mul hJ _ _ _).symm.trans ((val_corr hJ (h x) (𝟙 _)).trans (val_mul hJ _ _ _))
-  refine (val_mul hJ _ _ _).trans ((congrArg₂ (· * ·) (val_tau_twist hw ht x (w • x) _ hJ) rfl).trans
-    (Eq.trans ?_ ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (val_psi_twist w t x _ hJ) rfl)).symm))
+  refine (val_mul hJ _ _ _).trans
+    ((congrArg₂ (· * ·) (val_tau_twist hw ht x (w • x) _ hJ) rfl).trans
+      (Eq.trans ?_
+        ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (val_psi_twist w t x _ hJ) rfl)).symm))
   rw [_root_.mul_assoc, _root_.mul_assoc]
   exact congrArg _ e
-
 
 end Twist
 

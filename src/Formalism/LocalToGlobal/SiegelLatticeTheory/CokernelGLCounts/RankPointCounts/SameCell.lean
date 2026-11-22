@@ -9,7 +9,8 @@ noncomputable section
 
 open scoped Classical
 open Module Matrix
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermOp
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermOp
 
 namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 
@@ -32,7 +33,8 @@ theorem zhatOM_eq (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) : ZhatOM Z = Z * Sg
   show (-1) ^ (r - b.val) * Z a b = _
   ring
 
-theorem upUni_Sg {U : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni U) : IsUpUni (Sg r * U * Sg r) := by
+theorem upUni_Sg {U : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (h : IsUpUni U)
+    : IsUpUni (Sg r * U * Sg r) := by
   intro i j
   simp only [Sg, Matrix.mul_diagonal, Matrix.diagonal_mul]
   refine ⟨fun hji => by rw [(h i j).1 hji]; ring, fun hij => ?_⟩
@@ -44,11 +46,16 @@ end Sg
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem same_cell (F : FlagG S r T) (F1 F2 : FlagG S r T') (hG1 : Gflag F F1 ≠ 0) (hG2 : Gflag F F2 ≠ 0)
-    (w : Point E (r + 1)) (h1 : IsInCell (ZhatOM (Zhat F F1)) w) (h2 : IsInCell (ZhatOM (Zhat F F2)) w) :
-    ∃ g : S.V ≃ₗ[E] S.V, g ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧
-      (∃ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E, IsUpUni M ∧ ∀ b, g.symm (F.fvec b) = ∑ c, M c b • F.fvec c) ∧
-      ∃ U : Matrix (Fin (r + 1)) (Fin (r + 1)) E, IsUpUni U ∧ ∀ b, g (∑ c, U c b • F1.fvec c) = F2.fvec b := by
+theorem same_cell
+    (F : FlagG S r T) (F1 F2 : FlagG S r T') (hG1 : Gflag F F1 ≠ 0) (hG2 : Gflag F F2 ≠ 0)
+    (w : Point E (r + 1))
+    (h1 : IsInCell (ZhatOM (Zhat F F1)) w) (h2 : IsInCell (ZhatOM (Zhat F F2)) w)
+    : ∃ g : S.V ≃ₗ[E] S.V,
+      g ∈ Formalism.HermitianLatticesTheory.isom S.hT
+        ∧ (∃ M : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+          IsUpUni M ∧ ∀ b, g.symm (F.fvec b) = ∑ c, M c b • F.fvec c)
+        ∧ ∃ U : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
+          IsUpUni U ∧ ∀ b, g (∑ c, U c b • F1.fvec c) = F2.fvec b := by
   obtain ⟨L1, U1, hL1, hU1, e1⟩ := h1
   obtain ⟨L2, U2, hL2, hU2, e2⟩ := h2
   rw [zhatOM_eq] at e1 e2
@@ -71,8 +78,9 @@ theorem same_cell (F : FlagG S r T) (F1 F2 : FlagG S r T') (hG1 : Gflag F F1 ≠
   set M := Lᴴ with hM
   have hMu : IsUpUni M := loUni_iff_ct.1 hLl
   have hZ' : Zhat F F2 = Mᴴ * Zhat F F1 * U := by rw [hM, conjTranspose_conjTranspose]; exact hZ
-  obtain ⟨g, hg, hgx⟩ := witt_tuple (tupMU F F1 M U) (Sum.elim F.fvec F2.fvec) (tupMU_indep F F1 M U hMu hUu hG1)
-    (PI.PairCorankPos.W.linIndep F F2 hG2) (gram_moved F F1 F2 M U hMu hUu hZ')
+  obtain ⟨g, hg, hgx⟩ :=
+    witt_tuple (tupMU F F1 M U) (Sum.elim F.fvec F2.fvec) (tupMU_indep F F1 M U hMu hUu hG1)
+      (PI.PairCorankPos.W.linIndep F F2 hG2) (gram_moved F F1 F2 M U hMu hUu hZ')
   refine ⟨g, hg, ⟨M, hMu, fun b => ?_⟩, U, hUu, fun b => hgx (Sum.inr b)⟩
   have := hgx (Sum.inl b)
   simp only [tupMU, Sum.elim_inl] at this

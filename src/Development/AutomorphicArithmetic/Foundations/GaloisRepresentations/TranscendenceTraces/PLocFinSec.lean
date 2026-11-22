@@ -6,10 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.locFinSec_of :
-    CoverOne → LocFinGeo → LocFinSec := by
+theorem UpperTheory.Gal.TranscendenceTraces.locFinSec_of : CoverOne → LocFinGeo → LocFinSec := by
   intro hC hG R _ F G f V U r _ b hb
   obtain ⟨W, π, a, hE, hS, ha⟩ := hC R f V b hb
   haveI := hE

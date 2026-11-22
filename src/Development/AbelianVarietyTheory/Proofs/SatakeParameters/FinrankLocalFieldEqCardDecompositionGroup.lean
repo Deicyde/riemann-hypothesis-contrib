@@ -6,7 +6,8 @@ public import Formalism.FrobeniusOrbits.HostCorollaries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits
+  Formalism.MainNotions.N
 open scoped Pointwise
 
 namespace GlobalTheory.LocStab
@@ -15,9 +16,8 @@ open Polynomial
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_compare (v : HeightOneSpectrum (𝓞 E)) (a b : 𝓞 E) :
-    ∃ d t : 𝓞 E, d ∉ v.asIdeal ∧ (d * b = t * a ∨ d * a = t * b) := by
-
+theorem exists_compare (v : HeightOneSpectrum (𝓞 E)) (a b : 𝓞 E)
+    : ∃ d t : 𝓞 E, d ∉ v.asIdeal ∧ (d * b = t * a ∨ d * a = t * b) := by
   haveI := v.isPrime
   let Rv := Localization.AtPrime v.asIdeal
   haveI : IsDiscreteValuationRing Rv :=
@@ -36,7 +36,8 @@ theorem exists_compare (v : HeightOneSpectrum (𝓞 E)) (a b : 𝓞 E) :
 variable {l : ℕ} [Fact l.Prime]
 
 theorem norm_int_le (c : E →+* PadicAlgCl l) (x : 𝓞 E) : ‖c (x : E)‖ ≤ 1 := by
-  have hI : IsIntegral ℤ (c (x : E)) := (NumberField.RingOfIntegers.isIntegral_coe x).map c.toIntAlgHom
+  have hI : IsIntegral ℤ (c (x : E)) :=
+    (NumberField.RingOfIntegers.isIntegral_coe x).map c.toIntAlgHom
   obtain ⟨P, hPm, hP⟩ := hI
   set y := c (x : E) with hy
   by_contra hlt
@@ -52,13 +53,15 @@ theorem norm_int_le (c : E →+* PadicAlgCl l) (x : 𝓞 E) : ‖c (x : E)‖ �
     rw [h1] at hP
     simp at hP
 
-  have heq : y ^ n = -∑ i ∈ Finset.range n, (P.coeff i : PadicAlgCl l) * y ^ i := by
+  have heq : y ^ n = - ∑ i ∈ Finset.range n, (P.coeff i : PadicAlgCl l) * y ^ i := by
     have h := hP
     rw [hPm.as_sum] at h
     change (Polynomial.eval₂RingHom (algebraMap ℤ (PadicAlgCl l)) y)
-      (X ^ P.natDegree + ∑ i ∈ Finset.range P.natDegree, (P.coeff i : ℤ[X]) * X ^ i) = 0 at h
-    simp only [map_add, map_sum, map_mul, map_pow, Polynomial.coe_eval₂RingHom,
-      Polynomial.eval₂_X] at h
+          (X ^ P.natDegree + ∑ i ∈ Finset.range P.natDegree, (P.coeff i : ℤ[X]) * X ^ i)
+        = 0
+      at h
+    simp only [map_add, map_sum, map_mul, map_pow, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X]
+      at h
     simp only [← Polynomial.C_eq_intCast, Polynomial.eval₂_C] at h
     simp only [map_intCast] at h
     rw [eq_neg_iff_add_eq_zero]
@@ -71,22 +74,27 @@ theorem norm_int_le (c : E →+* PadicAlgCl l) (x : 𝓞 E) : ‖c (x : E)‖ �
     have hi' : i ≤ n - 1 := by
       have := Finset.mem_range.mp hi
       omega
-    calc ‖(P.coeff i : PadicAlgCl l)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (n - 1) :=
-          mul_le_mul (hcoef _) (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
+    calc
+      ‖(P.coeff i : PadicAlgCl l)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (n - 1) :=
+        mul_le_mul (hcoef _) (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
       _ = ‖y‖ ^ (n - 1) := one_mul _
   rw [norm_pow] at hle
   have hlt2 : ‖y‖ ^ (n - 1) < ‖y‖ ^ n := pow_lt_pow_right₀ hlt (by omega)
   linarith
 
-theorem norm_unit (c : E →+* PadicAlgCl l) (v : HeightOneSpectrum (𝓞 E))
-    (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1) {d : 𝓞 E} (hd : d ∉ v.asIdeal) :
-    ‖c (d : E)‖ = 1 :=
+theorem norm_unit
+    (c : E →+* PadicAlgCl l) (v : HeightOneSpectrum (𝓞 E))
+    (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1)
+    {d : 𝓞 E} (hd : d ∉ v.asIdeal)
+    : ‖c (d : E)‖ = 1 :=
   le_antisymm (norm_int_le c d) (not_lt.mp fun h => hd ((hc d).mpr h))
 
-theorem lt_one_of_lt_one (c c' : E →+* PadicAlgCl l) (v : HeightOneSpectrum (𝓞 E))
+theorem lt_one_of_lt_one
+    (c c' : E →+* PadicAlgCl l) (v : HeightOneSpectrum (𝓞 E))
     (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1)
-    (hc' : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c' (x : E)‖ < 1) (x : E) (hx : ‖c x‖ < 1) :
-    ‖c' x‖ < 1 := by
+    (hc' : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c' (x : E)‖ < 1)
+    (x : E) (hx : ‖c x‖ < 1)
+    : ‖c' x‖ < 1 := by
   by_cases hx0 : x = 0
   · simp [hx0]
   obtain ⟨a, b, hbm, hab⟩ := IsFractionRing.div_surjective (A := 𝓞 E) x
@@ -96,8 +104,7 @@ theorem lt_one_of_lt_one (c c' : E →+* PadicAlgCl l) (v : HeightOneSpectrum (�
     rw [norm_ne_zero_iff]
     exact (map_ne_zero φ).mpr hb
   obtain ⟨d, t, hd, h | h⟩ := exists_compare v a b
-  ·
-    exfalso
+  · exfalso
     have ha : (a : E) ≠ 0 := by
       intro ha
       apply hx0
@@ -117,10 +124,11 @@ theorem lt_one_of_lt_one (c c' : E →+* PadicAlgCl l) (v : HeightOneSpectrum (�
     change ‖c ((a : E) / (b : E))‖ < 1 at hx
     rw [map_div₀, norm_div, hmul, div_lt_one (mul_pos hct hca)] at hx
     nlinarith
-  ·
-    have hE : (d : E) * a = t * b := by exact_mod_cast congrArg (fun z : 𝓞 E => (z : E)) h
-    have hmul : ∀ φ : E →+* PadicAlgCl l, (∀ y : 𝓞 E, y ∈ v.asIdeal ↔ ‖φ (y : E)‖ < 1) →
-        ‖φ (a : E)‖ = ‖φ (t : E)‖ * ‖φ (b : E)‖ := by
+  · have hE : (d : E) * a = t * b := by exact_mod_cast congrArg (fun z : 𝓞 E => (z : E)) h
+    have hmul
+        : ∀ φ : E →+* PadicAlgCl l,
+          (∀ y : 𝓞 E, y ∈ v.asIdeal ↔ ‖φ (y : E)‖ < 1)
+            → ‖φ (a : E)‖ = ‖φ (t : E)‖ * ‖φ (b : E)‖ := by
       intro φ hφ
       have h1 : ‖φ (d : E)‖ * ‖φ (a : E)‖ = ‖φ (t : E)‖ * ‖φ (b : E)‖ := by
         rw [← norm_mul, ← norm_mul, ← map_mul φ, ← map_mul φ, hE]
@@ -133,9 +141,8 @@ theorem lt_one_of_lt_one (c c' : E →+* PadicAlgCl l) (v : HeightOneSpectrum (�
     rw [map_div₀, norm_div, hmul c' hc', mul_div_assoc, div_self (hcb c'), mul_one]
     exact h2
 
-theorem approx (β γ : PadicAlgCl l) (f : ℚ_[l][X]) {ε : ℝ} (hε : 0 < ε) :
-    ∃ G : ℚ[X], ‖aeval β G - aeval β f‖ < ε ∧ ‖aeval γ G - aeval γ f‖ < ε := by
-
+theorem approx (β γ : PadicAlgCl l) (f : ℚ_[l][X]) {ε : ℝ} (hε : 0 < ε)
+    : ∃ G : ℚ[X], ‖aeval β G - aeval β f‖ < ε ∧ ‖aeval γ G - aeval γ f‖ < ε := by
   set n := f.natDegree with hn
   set M : ℝ := max 1 (max ‖β‖ ‖γ‖) with hM
   have hM1 : 1 ≤ M := le_max_left _ _
@@ -146,17 +153,23 @@ theorem approx (β γ : PadicAlgCl l) (f : ℚ_[l][X]) {ε : ℝ} (hε : 0 < ε)
   let G : ℚ[X] := ∑ i ∈ Finset.range (n + 1), C (g i) * X ^ i
   have key : ∀ x : PadicAlgCl l, ‖x‖ ≤ M → ‖aeval x G - aeval x f‖ < ε := by
     intro x hx
-    have e1 : aeval x G = ∑ i ∈ Finset.range (n + 1),
-        algebraMap ℚ_[l] (PadicAlgCl l) (g i : ℚ_[l]) * x ^ i := by
+    have e1
+        : aeval x G
+          = ∑ i ∈ Finset.range (n + 1),
+            algebraMap ℚ_[l] (PadicAlgCl l) (g i : ℚ_[l]) * x ^ i := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [G, map_sum, map_mul, map_pow, aeval_C, aeval_X, map_ratCast, eq_ratCast]
-    have e2 : aeval x f = ∑ i ∈ Finset.range (n + 1),
-        algebraMap ℚ_[l] (PadicAlgCl l) (f.coeff i) * x ^ i := by
+      simp only [G, map_sum, map_mul, map_pow, aeval_C, aeval_X, map_ratCast, eq_ratCast]
+    have e2
+        : aeval x f
+          = ∑ i ∈ Finset.range (n + 1),
+            algebraMap ℚ_[l] (PadicAlgCl l) (f.coeff i) * x ^ i := by
       rw [aeval_eq_sum_range, ← hn]
       simp only [Algebra.smul_def]
     rw [e1, e2, ← Finset.sum_sub_distrib]
-    have hle : ‖∑ i ∈ Finset.range (n + 1), (algebraMap ℚ_[l] (PadicAlgCl l) (g i : ℚ_[l]) * x ^ i -
-        algebraMap ℚ_[l] (PadicAlgCl l) (f.coeff i) * x ^ i)‖ ≤ δ * M ^ n := by
+    have hle
+        : ‖∑ i ∈ Finset.range (n + 1), (algebraMap ℚ_[l] (PadicAlgCl l) (g i : ℚ_[l]) * x ^ i -
+            algebraMap ℚ_[l] (PadicAlgCl l) (f.coeff i) * x ^ i)‖
+          ≤ δ * M ^ n := by
       apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
       intro i hi
       have hi' : i ≤ n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
@@ -170,34 +183,43 @@ theorem approx (β γ : PadicAlgCl l) (f : ℚ_[l][X]) {ε : ℝ} (hε : 0 < ε)
       rw [this]
       linarith
     exact lt_of_le_of_lt hle hlt
-  exact ⟨G, key β (le_trans (le_max_left _ _) (le_max_right _ _)),
-    key γ (le_trans (le_max_right _ _) (le_max_right _ _))⟩
+  exact ⟨
+    G,
+    key β (le_trans (le_max_left _ _) (le_max_right _ _)),
+    key γ (le_trans (le_max_right _ _) (le_max_right _ _))
+  ⟩
 
-theorem adjoin_eq_top {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤) :
-    Algebra.adjoin ℚ {α} = ⊤ := by
-  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic α), hα,
-    IntermediateField.top_toSubalgebra]
+theorem adjoin_eq_top {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤)
+    : Algebra.adjoin ℚ {α} = ⊤ := by
+  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic
+      α),
+    hα, IntermediateField.top_toSubalgebra]
 
-theorem ringHom_ext {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤) {B : Type} [Field B]
-    [CharZero B] (f g : E →+* B) (h : f α = g α) : f = g := by
-  have h1 := AlgHom.ext_of_adjoin_eq_top (adjoin_eq_top hα) (φ₁ := f.toRatAlgHom) (φ₂ := g.toRatAlgHom)
-    (by
+theorem ringHom_ext
+    {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤)
+    {B : Type} [Field B] [CharZero B]
+    (f g : E →+* B) (h : f α = g α)
+    : f = g := by
+  have h1 :=
+    AlgHom.ext_of_adjoin_eq_top (adjoin_eq_top hα) (φ₁ := f.toRatAlgHom) (φ₂ := g.toRatAlgHom) (by
       intro x hx
       rw [Set.mem_singleton_iff.mp hx]
       exact h)
   ext x
   exact AlgHom.congr_fun h1 x
 
-theorem norm_natCast_pow (c : E →+* PadicAlgCl l) (m : ℕ) :
-    ‖c ((l : E) ^ m)‖ = ((l : ℝ)⁻¹) ^ m := by
+theorem norm_natCast_pow (c : E →+* PadicAlgCl l) (m : ℕ)
+    : ‖c ((l : E) ^ m)‖ = ((l : ℝ)⁻¹) ^ m := by
   rw [map_pow, map_natCast, norm_pow]
   congr 1
   rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), PadicAlgCl.norm_extends, Padic.norm_p]
 
-theorem root_of_stab (c : E →+* PadicAlgCl l) (α : E) (s : E ≃ₐ[ℚ] E)
-    (v : HeightOneSpectrum (𝓞 E)) (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1)
-    (hs : s • v.asIdeal = v.asIdeal) :
-    aeval (c (s α)) (minpoly ℚ_[l] (c α)) = 0 := by
+theorem root_of_stab
+    (c : E →+* PadicAlgCl l)
+    (α : E)
+    (s : E ≃ₐ[ℚ] E) (v : HeightOneSpectrum (𝓞 E))
+    (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1) (hs : s • v.asIdeal = v.asIdeal)
+    : aeval (c (s α)) (minpoly ℚ_[l] (c α)) = 0 := by
   by_contra hne
   let c' : E →+* PadicAlgCl l := c.comp (s : E →+* E)
   have hc' : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c' (x : E)‖ < 1 := fun x => by
@@ -230,13 +252,16 @@ theorem root_of_stab (c : E →+* PadicAlgCl l) (α : E) (s : E ≃ₐ[ℚ] E)
     simpa using this
   linarith
 
-theorem stab_of_root (c : E →+* PadicAlgCl l) {α : E}
-    (hα : IntermediateField.adjoin ℚ {α} = ⊤) (s : E ≃ₐ[ℚ] E)
+theorem stab_of_root
+    (c : E →+* PadicAlgCl l)
+    {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤)
+    (s : E ≃ₐ[ℚ] E)
     (v : HeightOneSpectrum (𝓞 E)) (hc : ∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1)
-    (hroot : aeval (c (s α)) (minpoly ℚ_[l] (c α)) = 0) :
-    s • v.asIdeal = v.asIdeal := by
-  obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root' (K := ℚ_[l]) (L := PadicAlgCl l)
-    (Algebra.IsAlgebraic.isAlgebraic (c α)) hroot
+    (hroot : aeval (c (s α)) (minpoly ℚ_[l] (c α)) = 0)
+    : s • v.asIdeal = v.asIdeal := by
+  obtain ⟨σ, hσ⟩ :=
+    minpoly.exists_algEquiv_of_root' (K := ℚ_[l]) (L := PadicAlgCl l)
+      (Algebra.IsAlgebraic.isAlgebraic (c α)) hroot
   have hcomp : ((σ : PadicAlgCl l →+* PadicAlgCl l).comp c) = c.comp (s : E →+* E) :=
     ringHom_ext hα _ _ hσ
   have hn : ∀ x : E, ‖c (s x)‖ = ‖c x‖ := fun x => by
@@ -250,9 +275,8 @@ theorem stab_of_root (c : E →+* PadicAlgCl l) {α : E}
   ext y
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem, ← hmem (s⁻¹ • y), smul_inv_smul]
 
-theorem adjoin_range_eq (c : E →+* PadicAlgCl l) {α : E}
-    (hα : IntermediateField.adjoin ℚ {α} = ⊤) :
-    IntermediateField.adjoin ℚ_[l] (Set.range c) = IntermediateField.adjoin ℚ_[l] {c α} := by
+theorem adjoin_range_eq (c : E →+* PadicAlgCl l) {α : E} (hα : IntermediateField.adjoin ℚ {α} = ⊤)
+    : IntermediateField.adjoin ℚ_[l] (Set.range c) = IntermediateField.adjoin ℚ_[l] {c α} := by
   apply le_antisymm
   · rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨e, rfl⟩
@@ -277,11 +301,13 @@ theorem adjoin_range_eq (c : E →+* PadicAlgCl l) {α : E}
   · rw [IntermediateField.adjoin_simple_le_iff]
     exact IntermediateField.subset_adjoin _ _ ⟨α, rfl⟩
 
-theorem exists_aut_of_root (c : E →+* PadicAlgCl l) [IsGalois ℚ E] (α : E)
-    {r : PadicAlgCl l} (hr : aeval r (minpoly ℚ_[l] (c α)) = 0) :
-    ∃ s : E ≃ₐ[ℚ] E, c (s α) = r := by
-  have hmin : minpoly ℚ (c α) = minpoly ℚ α :=
-    minpoly.algHom_eq c.toRatAlgHom c.injective α
+theorem exists_aut_of_root
+    (c : E →+* PadicAlgCl l)
+    [IsGalois ℚ E]
+    (α : E)
+    {r : PadicAlgCl l} (hr : aeval r (minpoly ℚ_[l] (c α)) = 0)
+    : ∃ s : E ≃ₐ[ℚ] E, c (s α) = r := by
+  have hmin : minpoly ℚ (c α) = minpoly ℚ α := minpoly.algHom_eq c.toRatAlgHom c.injective α
   have hdvd := minpoly.dvd_map_of_isScalarTower ℚ ℚ_[l] (c α)
   have hr' : aeval r (minpoly ℚ α) = 0 := by
     obtain ⟨q, hq⟩ := hdvd
@@ -293,16 +319,17 @@ theorem exists_aut_of_root (c : E →+* PadicAlgCl l) [IsGalois ℚ E] (α : E)
   have hmem : r ∈ (minpoly ℚ α).rootSet (PadicAlgCl l) := mem_rootSet.2 ⟨hne, hr'⟩
   rw [← hsplit.image_rootSet c.toRatAlgHom] at hmem
   obtain ⟨e, he, rfl⟩ := hmem
-  obtain ⟨s, hs⟩ := minpoly.exists_algEquiv_of_root' (K := ℚ) (L := E)
-    (Algebra.IsAlgebraic.isAlgebraic α) (mem_rootSet.1 he).2
+  obtain ⟨s, hs⟩ :=
+    minpoly.exists_algEquiv_of_root' (K := ℚ) (L := E) (Algebra.IsAlgebraic.isAlgebraic α)
+      (mem_rootSet.1 he).2
   exact ⟨s, by rw [hs]; rfl⟩
 
-theorem finrank_adjoin_range_eq_card_stabilizer :
-    ∀ (l : ℕ) [Fact l.Prime] (E : Type) [Field E] [NumberField E] (c : E →+* PadicAlgCl l)
-      [IsGalois ℚ E] (v : HeightOneSpectrum (𝓞 E)),
-      (∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1) →
-      Module.finrank ℚ_[l] (IntermediateField.adjoin ℚ_[l] (Set.range c)) =
-        Nat.card (MulAction.stabilizer (E ≃ₐ[ℚ] E) v.asIdeal) := by
+theorem finrank_adjoin_range_eq_card_stabilizer
+    : ∀ (l : ℕ) [Fact l.Prime] (E : Type) [Field E] [NumberField E] (c : E →+* PadicAlgCl l)
+        [IsGalois ℚ E] (v : HeightOneSpectrum (𝓞 E)),
+      (∀ x : 𝓞 E, x ∈ v.asIdeal ↔ ‖c (x : E)‖ < 1)
+        → Module.finrank ℚ_[l] (IntermediateField.adjoin ℚ_[l] (Set.range c))
+          = Nat.card (MulAction.stabilizer (E ≃ₐ[ℚ] E) v.asIdeal) := by
   intro l _ E _ _ c _ v hc
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ E
   have hint : IsIntegral ℚ_[l] (c α) := Algebra.IsIntegral.isIntegral _
@@ -315,7 +342,8 @@ theorem finrank_adjoin_range_eq_card_stabilizer :
   rw [← hcard, ← Nat.card_eq_fintype_card]
   symm
   refine Nat.card_congr (Equiv.ofBijective
-    (fun s => ⟨c (s.1 α), mem_rootSet.2 ⟨hg0, root_of_stab c α s.1 v hc s.2⟩⟩) ⟨?_, ?_⟩)
+    (fun s => ⟨c (s.1 α), mem_rootSet.2 ⟨hg0, root_of_stab c α s.1 v hc s.2⟩⟩)
+    ⟨?_, ?_⟩)
   · rintro ⟨s, hs⟩ ⟨t, ht⟩ h
     have h1 : c (s α) = c (t α) := congrArg Subtype.val h
     have h2 : s α = t α := c.injective h1

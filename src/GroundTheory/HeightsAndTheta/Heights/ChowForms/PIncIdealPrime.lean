@@ -27,10 +27,12 @@ theorem IncIdealPrime.proof (h₁ : IncidenceGeneric.Statement) : IncIdealPrime.
       simp [hc, Pi.single_eq_of_ne hb]
     · intro h
       exact absurd (Finset.mem_univ j) h
-  have hker : incIdeal P k =
-      RingHom.ker (aeval (genSubst (k := k) (genPt P) c) :
-        MvPolynomial (Fin k × Fin n) F →ₐ[F]
-          MvPolynomial (Fin k × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ P))) := by
+  have hker
+      : incIdeal P k
+        = RingHom.ker
+          (aeval (genSubst (k := k) (genPt P) c)
+            : MvPolynomial (Fin k × Fin n) F →ₐ[F]
+                MvPolynomial (Fin k × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ P))) := by
     ext g
     rw [RingHom.mem_ker]
     exact h₁ F n k P c hsum g

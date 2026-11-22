@@ -14,8 +14,8 @@ section LocS
 
 variable {R : Type*} [CommRing R]
 
-def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submodule R W) :
-    Submodule R W where
+def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submodule R W)
+    : Submodule R W where
   carrier := {x | ∃ s ∈ S, s • x ∈ L}
   zero_mem' := ⟨1, S.one_mem, by simp⟩
   add_mem' := by
@@ -31,8 +31,9 @@ def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submod
     rw [smul_comm]
     exact L.smul_mem r hx
 
-def localization₂ {W : Type*} [AddCommGroup W] [Module R W] (p : Ideal R) [p.IsPrime] (L : Submodule R W) :
-    Submodule R W :=
+def localization₂
+    {W : Type*} [AddCommGroup W] [Module R W] (p : Ideal R) [p.IsPrime] (L : Submodule R W)
+    : Submodule R W :=
   locS p.primeCompl L
 
 end LocS
@@ -45,9 +46,13 @@ variable {E : Type} [Field E] [NumberField E]
 
 def redP (P : HeightOneSpectrum (𝓞 E)) (a : E) : 𝓞 E ⧸ P.asIdeal :=
   open Classical in
-  if h : ∃ c : 𝓞 E ⧸ P.asIdeal, ∃ r s : 𝓞 E, s ∉ P.asIdeal ∧ algebraMap (𝓞 E) E s * a = algebraMap (𝓞 E) E r ∧
-      Ideal.Quotient.mk P.asIdeal s * c = Ideal.Quotient.mk P.asIdeal r
-  then h.choose else 0
+  if h
+      : ∃ c : 𝓞 E ⧸ P.asIdeal, ∃ r s : 𝓞 E,
+        s ∉ P.asIdeal ∧ algebraMap (𝓞 E) E s * a = algebraMap (𝓞 E) E r
+          ∧ Ideal.Quotient.mk P.asIdeal s * c = Ideal.Quotient.mk P.asIdeal r then
+    h.choose
+  else
+    0
 
 def IntAt (P : HeightOneSpectrum (𝓞 E)) (a : E) : Prop :=
   ∃ r s : 𝓞 E, s ∉ P.asIdeal ∧ algebraMap (𝓞 E) E s * a = algebraMap (𝓞 E) E r
@@ -75,7 +80,8 @@ def stabL (M : Submodule (𝓞 E) (Sp E n)) : Subgroup (Sp E n ≃ₗ[E] Sp E n)
     rw [show a (a⁻¹ x) = x from LinearEquiv.apply_symm_apply a x] at h
     exact h.symm
 
-def stdAt (P : HeightOneSpectrum (𝓞 E)) : Submodule (𝓞 E) (Sp E n) := localization₂ P.asIdeal (stdLat E n)
+def stdAt (P : HeightOneSpectrum (𝓞 E)) : Submodule (𝓞 E) (Sp E n) :=
+  localization₂ P.asIdeal (stdLat E n)
 
 end Frames
 
@@ -85,7 +91,8 @@ section Groups
 
 variable (k : Type) [CommRing k] (n c : ℕ)
 
-def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k := if h : i < N then v ⟨i, h⟩ else 0
+def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k :=
+  if h : i < N then v ⟨i, h⟩ else 0
 
 def eN (N i : ℕ) : Fin N → k := fun l => if l.1 = i then 1 else 0
 
@@ -101,28 +108,34 @@ def inX : (Fin n → k) →ₗ[k] (Fin (n + c) → k) :=
   LinearMap.pi fun l => if h : l.1 < n then LinearMap.proj ⟨l.1, h⟩ else 0
 
 def R1cond (r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) : Prop :=
-  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n ∧
-    ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
+  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n
+    ∧ ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
 
 variable {k n c} in
-theorem R1cond.mul {r s : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : R1cond k n c r) (hs : R1cond k n c s) :
-    R1cond k n c (r * s) := by
+theorem R1cond.mul
+    {r s : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : R1cond k n c r) (hs : R1cond k n c s)
+    : R1cond k n c (r * s) := by
   refine ⟨fun i v hv => hr.1 i _ (hs.1 i v hv), ?_, fun i => ?_⟩
   · show r (s _) = _
     rw [hs.2.1, hr.2.1]
-  · have h1 : (r * s) (eN k (n + c) (n + i)) - eN k (n + c) (n + i) =
-        r (s (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) + (r (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) := by
+  · have h1
+        : (r * s) (eN k (n + c) (n + i)) - eN k (n + c) (n + i)
+          = r (s (eN k (n + c) (n + i)) - eN k (n + c) (n + i))
+            + (r (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) := by
       rw [map_sub]
       show r (s _) - _ = _
       abel
     rw [h1]
     exact add_mem (hr.1 i _ (hs.2.2 i)) (hr.2.2 i)
 
-theorem R1cond_one : R1cond k n c 1 :=
-  ⟨fun _ _ hv => hv, rfl, fun i => by
+theorem R1cond_one : R1cond k n c 1 := ⟨
+  fun _ _ hv => hv,
+  rfl,
+  fun i => by
     show eN k (n + c) (n + i) - eN k (n + c) (n + i) ∈ _
     rw [sub_self]
-    exact zero_mem _⟩
+    exact zero_mem _
+⟩
 
 def R1 : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) where
   carrier := {r | R1cond k n c r ∧ R1cond k n c r⁻¹}
@@ -140,10 +153,14 @@ variable {k K : Type} [CommRing k] [Field K]
 
 abbrev SF (k K : Type) [CommRing k] (a b : ℕ) : Type := ((Fin a → k) →ₗ[k] (Fin b → k)) → K
 
-def om {a b : ℕ} (mu : k → K) (v : k → ℤ) (sq : K) (g₀ : (Fin a → k) ≃ₗ[k] (Fin a → k))
-    (h : (Fin b → k) ≃ₗ[k] (Fin b → k)) (Φ : SF k K a b) : SF k K a b := fun x =>
-  mu (LinearEquiv.det g₀ : kˣ) * (mu (LinearEquiv.det h : kˣ))⁻¹ * sq ^ (-(v (LinearEquiv.det g₀ : kˣ)) * b) *
-    sq ^ (v (LinearEquiv.det h : kˣ) * a) * Φ (h.symm.toLinearMap ∘ₗ x ∘ₗ g₀.toLinearMap)
+def om
+    {a b : ℕ}
+    (mu : k → K) (v : k → ℤ) (sq : K) (g₀ : (Fin a → k) ≃ₗ[k] (Fin a → k))
+    (h : (Fin b → k) ≃ₗ[k] (Fin b → k)) (Φ : SF k K a b)
+    : SF k K a b := fun x =>
+  mu (LinearEquiv.det g₀ : kˣ) * (mu (LinearEquiv.det h : kˣ))⁻¹
+    * sq ^ (-(v (LinearEquiv.det g₀ : kˣ)) * b) * sq ^ (v (LinearEquiv.det h : kˣ) * a)
+    * Φ (h.symm.toLinearMap ∘ₗ x ∘ₗ g₀.toLinearMap)
 
 variable (n' c' n c : ℕ)
 
@@ -155,18 +172,25 @@ abbrev FC : Type := {p : Fin (n + c) × Fin (n' + c') // IsFree n' n c p.1.1 p.2
 
 variable {n' c' n c}
 
-def xx1 (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' c' n c → k) : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k) :=
+def xx1 (xj : (Fin n' → k) →ₗ[k] (Fin n → k)) (t : FC n' c' n c → k)
+    : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k) :=
   Matrix.toLin' (Matrix.of fun (l : Fin (n + c)) (s : Fin (n' + c')) =>
-    if hf : IsFree n' n c l.1 s.1 then t ⟨(l, s), hf⟩
-    else if hs : s.1 < n' then (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
-    else if l.1 = n + (s.1 - n') then 1 else 0)
+    if hf : IsFree n' n c l.1 s.1 then
+      t ⟨(l, s), hf⟩
+    else if hs : s.1 < n' then
+      (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
+    else if l.1 = n + (s.1 - n') then
+      1
+    else
+      0)
 
 def chArg (x : (Fin (n' + c') → k) →ₗ[k] (Fin (n + c) → k)) : k :=
   ∑ i ∈ Finset.range c, atN (x (eN k (n' + c') (n' + i + 1))) (n + i)
 
-def E1 (psi : k → K) (vals : Finset k) (wt : K) (Φ : SF k K (n' + c') (n + c)) : SF k K n' n := fun xj =>
-  wt ^ Fintype.card (FC n' c' n c) *
-    ∑ t ∈ Fintype.piFinset fun _ : FC n' c' n c => vals, Φ (xx1 xj t) * psi (-chArg (xx1 xj t))
+def E1 (psi : k → K) (vals : Finset k) (wt : K) (Φ : SF k K (n' + c') (n + c))
+    : SF k K n' n := fun xj =>
+  wt ^ Fintype.card (FC n' c' n c)
+    * ∑ t ∈ Fintype.piFinset fun _ : FC n' c' n c => vals, Φ (xx1 xj t) * psi (-chArg (xx1 xj t))
 
 end Data
 
@@ -178,16 +202,20 @@ namespace LocE
 
 open Loc
 
-variable {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
+variable
+  {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K]
+  (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
 
 def vP (a : E) : ℤ := Classical.epsilon fun z : ℤ => IsUnit (redP P (a / (q : E) ^ z))
 
 variable {P} in
 open Classical in
-def unitV (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (a : E) : K := if h : IsUnit (redP P a) then ((χ h.unit : Kˣ) : K) else 0
+def unitV (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (a : E) : K :=
+  if h : IsUnit (redP P a) then ((χ h.unit : Kˣ) : K) else 0
 
 variable {P} in
-def locChar (cq : K) (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (a : E) : K := cq ^ vP P q a * unitV χ (a / (q : E) ^ vP P q a)
+def locChar (cq : K) (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (a : E) : K :=
+  cq ^ vP P q a * unitV χ (a / (q : E) ^ vP P q a)
 
 open Classical in
 def valsQ (E : Type) [Field E] (q A B : ℕ) : Finset E :=
@@ -195,24 +223,39 @@ def valsQ (E : Type) [Field E] (q A B : ℕ) : Finset E :=
 
 def sclLat (N : ℕ) (e : ℕ → ℤ) : Submodule (𝓞 E) (Sp E N) :=
   (stdAt E N P).comap
-    ((LinearMap.pi fun l : Fin N => ((q : E) ^ e l.1)⁻¹ • (LinearMap.proj l : Sp E N →ₗ[E] E)).restrictScalars (𝓞 E))
+    ((LinearMap.pi fun l : Fin N =>
+      ((q : E) ^ e l.1)⁻¹ • (LinearMap.proj l : Sp E N →ₗ[E] E)).restrictScalars (𝓞 E))
 
-def fIdx (k₀ c n s : ℕ) : ℕ := if s < k₀ then s else if s < k₀ + c then n + (s - k₀) else s - c
+def fIdx (k₀ c n s : ℕ) : ℕ :=
+  if s < k₀ then
+    s
+  else if s < k₀ + c then
+    n + (s - k₀)
+  else
+    s - c
 
-def fPos (k₀ c n l : ℕ) : ℕ := if l < k₀ then l else if l < n then l + c else k₀ + (l - n)
+def fPos (k₀ c n l : ℕ) : ℕ :=
+  if l < k₀ then
+    l
+  else if l < n then
+    l + c
+  else
+    k₀ + (l - n)
 
 def scE (n : ℕ) (ex : ℕ → ℕ) (l : ℕ) : ℤ := if l < n then 0 else (ex (l - n) : ℤ)
 
 def lamY (n c : ℕ) (ex : ℕ → ℕ) : Submodule (𝓞 E) (Sp E (n + c)) := sclLat P q (n + c) (scE n ex)
 
 def entB {N' N : ℕ} (k₀ c' n' c n : ℕ) (ex' ex : ℕ → ℕ) (x : HomE E N' N) (p p' : ℕ) : E :=
-  atN (x (eN E N' (fIdx k₀ c' n' p'))) (fIdx k₀ c n p) * (q : E) ^ (scE n' ex' (fIdx k₀ c' n' p') - scE n ex (fIdx k₀ c n p))
+  atN (x (eN E N' (fIdx k₀ c' n' p'))) (fIdx k₀ c n p)
+    * (q : E) ^ (scE n' ex' (fIdx k₀ c' n' p') - scE n ex (fIdx k₀ c n p))
 
 section AtQ
 
 variable (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
 
-def parL (kj n c : ℕ) : Submodule (𝓞 E) (Sp E (n + c)) := sclLat P q (n + c) fun l => if kj ≤ l ∧ l < n then 1 else 0
+def parL (kj n c : ℕ) : Submodule (𝓞 E) (Sp E (n + c)) :=
+  sclLat P q (n + c) fun l => if kj ≤ l ∧ l < n then 1 else 0
 
 def JQ (kj n c : ℕ) : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c)) :=
   stabL E (n + c) (stdAt E (n + c) P) ⊓ stabL E (n + c) (parL P q kj n c)
@@ -221,9 +264,12 @@ variable {P}
 
 open Classical in
 def PhiQ (k₀ r c' n' c n : ℕ) : SF E K (n' + c') (n + c) := fun x =>
-  if (∀ p p', p < n + c → p' < n' + c' → IntAt P (entB q k₀ c' n' c n 0 0 x p p')) ∧
-      (∀ p p', r ≤ p → p < n + c → p' < r → IntAt P (entB q k₀ c' n' c n 0 0 x p p' / (q : E)))
-  then unitV ξ (Matrix.det (Matrix.of fun s t : Fin r => entB q k₀ c' n' c n 0 0 x s.1 t.1)) else 0
+  if (∀ p p', p < n + c → p' < n' + c' → IntAt P (entB q k₀ c' n' c n 0 0 x p p'))
+      ∧ (∀ p p',
+        r ≤ p → p < n + c → p' < r → IntAt P (entB q k₀ c' n' c n 0 0 x p p' / (q : E))) then
+    unitV ξ (Matrix.det (Matrix.of fun s t : Fin r => entB q k₀ c' n' c n 0 0 x s.1 t.1))
+  else
+    0
 
 end AtQ
 
@@ -239,13 +285,10 @@ structure Ranks where
   t_odd : Odd t
   two_le_m : 2 ≤ m
   m_add_three_le_k : m + 3 ≤ k
-
   rank_add_five_le : k + m - 1 + 5 ≤ t
   three_m_lt_t : 3 * m < t
-
   m_le_f : m ≤ 2 * ord
   f_le_k : 2 * ord ≤ k
-
   m_sq_le_N : m ^ 2 ≤ k + m * (t + 1)
 
 namespace Ranks
@@ -262,43 +305,62 @@ end Ranks
 
 def cOf (R : Ranks) (j : ℕ) : ℕ := R.m - 1 - j
 
-def qOf {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) : ℕ := Ideal.absNorm P.asIdeal
+def qOf {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) : ℕ :=
+  Ideal.absNorm P.asIdeal
 
 section Target
 
 variable {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K]
 
-abbrev AutYL (E : Type) [Field E] (R : Ranks) (j : ℕ) : Type := Sp E (R.N j + cOf R j) ≃ₗ[E] Sp E (R.N j + cOf R j)
+abbrev AutYL (E : Type) [Field E] (R : Ranks) (j : ℕ) : Type :=
+  Sp E (R.N j + cOf R j) ≃ₗ[E] Sp E (R.N j + cOf R j)
 
 def BddL (R : Ranks) (P : HeightOneSpectrum (𝓞 E)) (j : ℕ) (h : AutYL E R j) : Prop :=
-  ∀ x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0, h⁻¹ x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0 ∧
-    ((qOf P : E) ^ j) • h x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0
+  ∀ x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0,
+    h⁻¹ x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0
+      ∧ ((qOf P : E) ^ j) • h x ∈ LocE.lamY P (qOf P) (R.N j) (cOf R j) 0
 
 def DCL (R : Ranks) (P : HeightOneSpectrum (𝓞 E)) (j : ℕ) (h h' : AutYL E R j) : Prop :=
-  ∃ r ∈ Loc.R1 E (R.N j) (cOf R j), ∃ κ ∈ LocE.JQ P (qOf P) (R.k + j) (R.N j) (cOf R j), h' = r * h * κ
+  ∃ r ∈ Loc.R1 E (R.N j) (cOf R j), ∃ κ ∈ LocE.JQ P (qOf P) (R.k + j) (R.N j) (cOf R j),
+    h' = r * h * κ
 
-def TwistedEisensteinCoefficient (R : Ranks) (P : HeightOneSpectrum (𝓞 E)) (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (A B i : ℕ)
-    (hal : AutYL E R i) (h : AutYL E R (i + 1)) : Loc.SF E K (R.N i) (R.N (i + 1)) :=
+def TwistedEisensteinCoefficient
+    (R : Ranks)
+    (P : HeightOneSpectrum (𝓞 E))
+    (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
+    (A B i : ℕ) (hal : AutYL E R i) (h : AutYL E R (i + 1))
+    : Loc.SF E K (R.N i) (R.N (i + 1)) :=
   Loc.E1 psi (LocE.valsQ E (qOf P) A B) (((qOf P : K) ^ B)⁻¹)
     (Loc.om (LocE.locChar (qOf P) cq ξ⁻¹) (LocE.vP P (qOf P)) sq hal h
       (LocE.PhiQ (qOf P) ξ R.k R.r (cOf R i) (R.N i) (cOf R (i + 1)) (R.N (i + 1))))
 
-def TwistedEisensteinCoeffNonzero (R : Ranks) (P : HeightOneSpectrum (𝓞 E)) (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) (i : ℕ)
-    (hal : AutYL E R i) (h : AutYL E R (i + 1)) : Prop :=
-  ∃ A₀ B₀ : ℕ, ∀ A' B', A₀ ≤ A' → B₀ ≤ B' → TwistedEisensteinCoefficient R P psi sq cq ξ A' B' i hal h ≠ 0
+def TwistedEisensteinCoeffNonzero
+    (R : Ranks)
+    (P : HeightOneSpectrum (𝓞 E))
+    (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
+    (i : ℕ) (hal : AutYL E R i) (h : AutYL E R (i + 1))
+    : Prop :=
+  ∃ A₀ B₀ : ℕ, ∀ A' B',
+    A₀ ≤ A' → B₀ ≤ B' → TwistedEisensteinCoefficient R P psi sq cq ξ A' B' i hal h ≠ 0
 
 def PsiOk (D : ℕ) (P : HeightOneSpectrum (𝓞 E)) (psi : E → K) : Prop :=
-  (∀ x y : E, IntAt P ((qOf P : E) ^ D * x) → IntAt P ((qOf P : E) ^ D * y) → psi (x + y) = psi x * psi y) ∧
-  (∀ x : E, IntAt P x → psi x = 1) ∧ (∀ x : E, ¬ IntAt P ((qOf P : E) ^ D * x) → psi x = 1)
+  (∀ x y : E,
+      IntAt P ((qOf P : E) ^ D * x) → IntAt P ((qOf P : E) ^ D * y) → psi (x + y) = psi x * psi y)
+    ∧ (∀ x : E, IntAt P x → psi x = 1) ∧ (∀ x : E, ¬ IntAt P ((qOf P : E) ^ D * x) → psi x = 1)
 
 end Target
 
 def TwistedEisensteinNonvanishing : Prop :=
-  ∀ (E K : Type) [Field E] [NumberField E] [StarRing E] [Field K] (R : Ranks) (P : HeightOneSpectrum (𝓞 E)),
-    (Ideal.absNorm P.asIdeal).Prime → ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 →
-    ∀ (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ), PsiOk (2 * R.m) P psi → sq ≠ 0 → cq ≠ 0 →
-    ∀ i, i + 3 ≤ R.m → ∀ (hal : AutYL E R i) (h h' : AutYL E R (i + 1)),
-      BddL R P i hal → BddL R P (i + 1) h → BddL R P (i + 1) h' → DCL R P (i + 1) h h' →
-        TwistedEisensteinCoeffNonzero R P psi sq cq ξ i hal h → TwistedEisensteinCoeffNonzero R P psi sq cq ξ i hal h'
+  ∀ (E K : Type) [Field E] [NumberField E] [StarRing E] [Field K] (R : Ranks)
+      (P : HeightOneSpectrum (𝓞 E)),
+    (Ideal.absNorm P.asIdeal).Prime → ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2
+      → ∀ (psi : E → K) (sq cq : K) (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ),
+        PsiOk (2 * R.m) P psi → sq ≠ 0 → cq ≠ 0
+          → ∀ i,
+            i + 3 ≤ R.m
+              → ∀ (hal : AutYL E R i) (h h' : AutYL E R (i + 1)),
+                BddL R P i hal → BddL R P (i + 1) h → BddL R P (i + 1) h' → DCL R P (i + 1) h h'
+                  → TwistedEisensteinCoeffNonzero R P psi sq cq ξ i hal h
+                  → TwistedEisensteinCoeffNonzero R P psi sq cq ξ i hal h'
 
 end PI.TwistedEisensteinNonvanishing

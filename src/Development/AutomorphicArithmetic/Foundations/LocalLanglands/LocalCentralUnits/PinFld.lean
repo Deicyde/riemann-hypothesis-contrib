@@ -10,9 +10,10 @@ open Finset
 
 namespace UpperTheory.Zero.LLC.CharacterSumPairs
 
-theorem exists_gen_char {G : Type} [CommGroup G] [Fintype G] [IsCyclic G] : ∃ η₀ : G →* ℂˣ,
-    (∀ χ : G →* ℂˣ, ∃ t < Fintype.card G, χ = η₀ ^ t) ∧
-    ∀ u v : ℕ, η₀ ^ u = η₀ ^ v ↔ u % Fintype.card G = v % Fintype.card G := by
+theorem exists_gen_char {G : Type} [CommGroup G] [Fintype G] [IsCyclic G]
+    : ∃ η₀ : G →* ℂˣ,
+      (∀ χ : G →* ℂˣ, ∃ t < Fintype.card G, χ = η₀ ^ t)
+        ∧ ∀ u v : ℕ, η₀ ^ u = η₀ ^ v ↔ u % Fintype.card G = v % Fintype.card G := by
   classical
   obtain ⟨x, hx⟩ := IsCyclic.exists_generator (α := G)
   have hN : 0 < Fintype.card G := Fintype.card_pos
@@ -55,8 +56,10 @@ theorem pow_iter {z : K} {d : ℕ} (h : z ^ g ^ d = z) (k : ℕ) : z ^ g ^ (d * 
   | zero => simp
   | succ k ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, h]
 
-theorem pow_of_deg (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (z : K)
-    (hd : (minpoly (ZMod g) z).natDegree ≠ n) : ∃ p ∈ n.primeFactors, z ^ g ^ (n / p) = z := by
+theorem pow_of_deg
+    (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n)
+    (z : K) (hd : (minpoly (ZMod g) z).natDegree ≠ n)
+    : ∃ p ∈ n.primeFactors, z ^ g ^ (n / p) = z := by
   haveI : FiniteDimensional (ZMod g) K := Module.finite_of_finrank_pos (by rw [hr]; exact hn)
   have hint : IsIntegral (ZMod g) z := Algebra.IsIntegral.isIntegral z
   set d := (minpoly (ZMod g) z).natDegree with hd_def
@@ -92,17 +95,20 @@ theorem unit_frob (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (z : Kˣ) : 
   push_cast
   rw [← hc, FiniteField.pow_card]
 
-theorem char_frob (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (θ : Kˣ →* ℂˣ) :
-    θ ^ g ^ n = θ := by
+theorem char_frob (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (θ : Kˣ →* ℂˣ)
+    : θ ^ g ^ n = θ := by
   refine MonoidHom.ext (fun z => ?_)
   rw [MonoidHom.pow_apply, ← map_pow, unit_frob hn hr]
 
-theorem exists_D [Fintype Kˣ] (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) :
-    ∃ D : Finset Kˣ, (∀ z : Kˣ, z ∉ D → (minpoly (ZMod g) (z : K)).natDegree = n) ∧
-      (∀ z ∈ D, ∃ p ∈ n.primeFactors, z ^ (g ^ (n / p) - 1) = 1) ∧ #D ≤ bd g n := by
+theorem exists_D [Fintype Kˣ] (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n)
+    : ∃ D : Finset Kˣ,
+      (∀ z : Kˣ, z ∉ D → (minpoly (ZMod g) (z : K)).natDegree = n)
+        ∧ (∀ z ∈ D, ∃ p ∈ n.primeFactors, z ^ (g ^ (n / p) - 1) = 1) ∧ #D ≤ bd g n := by
   classical
-  have key : ∀ z : Kˣ, (minpoly (ZMod g) (z : K)).natDegree ≠ n →
-      ∃ p ∈ n.primeFactors, z ^ (g ^ (n / p) - 1) = 1 := by
+  have key
+      : ∀ z : Kˣ,
+        (minpoly (ZMod g) (z : K)).natDegree ≠ n
+          → ∃ p ∈ n.primeFactors, z ^ (g ^ (n / p) - 1) = 1 := by
     intro z hz
     obtain ⟨p, hp, hpz⟩ := pow_of_deg hn hr (z : K) hz
     refine ⟨p, hp, ?_⟩
@@ -119,47 +125,51 @@ theorem exists_D [Fintype Kˣ] (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n)
     exact hz (Finset.mem_filter.2 ⟨Finset.mem_univ _, h⟩)
   · intro z hz
     exact key z (Finset.mem_filter.1 hz).2
-  · calc #(Finset.univ.filter (fun z : Kˣ => (minpoly (ZMod g) (z : K)).natDegree ≠ n))
-        ≤ #(n.primeFactors.biUnion
-            (fun p => Finset.univ.filter (fun z : Kˣ => z ^ (g ^ (n / p) - 1) = 1))) := by
-          apply Finset.card_le_card
-          intro z hz
-          obtain ⟨p, hp, hpz⟩ := key z (Finset.mem_filter.1 hz).2
-          exact Finset.mem_biUnion.2 ⟨p, hp, Finset.mem_filter.2 ⟨Finset.mem_univ _, hpz⟩⟩
+  · calc
+      #(Finset.univ.filter (fun z : Kˣ => (minpoly (ZMod g) (z : K)).natDegree ≠ n))
+          ≤ #(n.primeFactors.biUnion (fun p =>
+            Finset.univ.filter (fun z : Kˣ => z ^ (g ^ (n / p) - 1) = 1))) := by
+        apply Finset.card_le_card
+        intro z hz
+        obtain ⟨p, hp, hpz⟩ := key z (Finset.mem_filter.1 hz).2
+        exact Finset.mem_biUnion.2 ⟨p, hp, Finset.mem_filter.2 ⟨Finset.mem_univ _, hpz⟩⟩
       _ ≤ ∑ p ∈ n.primeFactors, #(Finset.univ.filter (fun z : Kˣ => z ^ (g ^ (n / p) - 1) = 1)) :=
-          Finset.card_biUnion_le
+        Finset.card_biUnion_le
       _ ≤ bd g n := by
-          unfold bd
-          refine Finset.sum_le_sum fun p hp => ?_
-          have hpp := Nat.mem_primeFactors.1 hp
-          have hle : p ≤ n := Nat.le_of_dvd hn hpp.2.1
-          have hq : 0 < n / p := Nat.div_pos hle hpp.1.pos
-          have hg2 : 1 < g ^ (n / p) := Nat.one_lt_pow hq.ne' (Fact.out : g.Prime).one_lt
-          exact IsCyclic.card_pow_eq_one_le (by omega)
+        unfold bd
+        refine Finset.sum_le_sum fun p hp => ?_
+        have hpp := Nat.mem_primeFactors.1 hp
+        have hle : p ≤ n := Nat.le_of_dvd hn hpp.2.1
+        have hq : 0 < n / p := Nat.div_pos hle hpp.1.pos
+        have hg2 : 1 < g ^ (n / p) := Nat.one_lt_pow hq.ne' (Fact.out : g.Prime).one_lt
+        exact IsCyclic.card_pow_eq_one_le (by omega)
 
 end Fld
-
 
 open Classical in
 noncomputable def cj {G : Type} [CommGroup G] (g n : ℕ) (θ : G →* ℂˣ) : Finset (G →* ℂˣ) := by
   classical
   exact (range n).image (fun j => θ ^ g ^ j)
 
-theorem mem_cj {G : Type} [CommGroup G] {g n : ℕ} {θ χ : G →* ℂˣ} :
-    χ ∈ cj g n θ ↔ ∃ j < n, θ ^ g ^ j = χ := by
+theorem mem_cj {G : Type} [CommGroup G] {g n : ℕ} {θ χ : G →* ℂˣ}
+    : χ ∈ cj g n θ ↔ ∃ j < n, θ ^ g ^ j = χ := by
   simp [cj]
 
-theorem card_cj {G : Type} [CommGroup G] {g n : ℕ} {θ : G →* ℂˣ}
-    (hθ : ∀ i j, i < n → j < n → θ ^ g ^ i = θ ^ g ^ j → i = j) : #(cj g n θ) = n := by
+theorem card_cj
+    {G : Type} [CommGroup G]
+    {g n : ℕ} {θ : G →* ℂˣ} (hθ : ∀ i j, i < n → j < n → θ ^ g ^ i = θ ^ g ^ j → i = j)
+    : #(cj g n θ) = n := by
   classical
   unfold cj
   rw [Finset.card_image_of_injOn, Finset.card_range]
   intro i hi j hj hij
   exact hθ i j (Finset.mem_range.1 hi) (Finset.mem_range.1 hj) hij
 
-theorem sum_cj {G : Type} [CommGroup G] {g n : ℕ} {θ : G →* ℂˣ}
-    (hθ : ∀ i j, i < n → j < n → θ ^ g ^ i = θ ^ g ^ j → i = j) (z : G) :
-    ∑ χ ∈ cj g n θ, ((χ z : ℂˣ) : ℂ) = ∑ j ∈ range n, ((θ (z ^ g ^ j) : ℂˣ) : ℂ) := by
+theorem sum_cj
+    {G : Type} [CommGroup G]
+    {g n : ℕ} {θ : G →* ℂˣ} (hθ : ∀ i j, i < n → j < n → θ ^ g ^ i = θ ^ g ^ j → i = j)
+    (z : G)
+    : ∑ χ ∈ cj g n θ, ((χ z : ℂˣ) : ℂ) = ∑ j ∈ range n, ((θ (z ^ g ^ j) : ℂˣ) : ℂ) := by
   classical
   unfold cj
   rw [Finset.sum_image]
@@ -172,23 +182,27 @@ section Fld2
 
 variable {g : ℕ} [Fact g.Prime] {n : ℕ} {K : Type} [Field K] [Algebra (ZMod g) K]
 
-private theorem char_pow_pow_mul_eq_self_of_finrank (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n)
-    (ψ : Kˣ →* ℂˣ) (m : ℕ) : ψ ^ g ^ (n * m) = ψ := by
+private theorem char_pow_pow_mul_eq_self_of_finrank
+    (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (ψ : Kˣ →* ℂˣ) (m : ℕ)
+    : ψ ^ g ^ (n * m) = ψ := by
   induction m with
   | zero => simp
   | succ m ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, char_frob hn hr]
 
-theorem disj_cj (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n) (θ θ' : Kˣ →* ℂˣ)
-    (hno : ¬ ∃ j < n, θ' = θ ^ g ^ j) : Disjoint (cj g n θ) (cj g n θ') := by
+theorem disj_cj
+    (hn : 0 < n) (hr : Module.finrank (ZMod g) K = n)
+    (θ θ' : Kˣ →* ℂˣ) (hno : ¬ ∃ j < n, θ' = θ ^ g ^ j)
+    : Disjoint (cj g n θ) (cj g n θ') := by
   rw [Finset.disjoint_left]
   intro χ h1 h2
   obtain ⟨i, hi, rfl⟩ := mem_cj.1 h1
   obtain ⟨j, hj, hj'⟩ := mem_cj.1 h2
   apply hno
   have e1 : θ' = θ ^ g ^ (i + (n - j)) := by
-    calc θ' = θ' ^ g ^ n := (char_frob hn hr θ').symm
-      _ = (θ' ^ g ^ j) ^ g ^ (n - j) := by
-        rw [← pow_mul, ← pow_add, Nat.add_sub_cancel' hj.le]
+    calc
+      θ'
+        = θ' ^ g ^ n := (char_frob hn hr θ').symm
+      _ = (θ' ^ g ^ j) ^ g ^ (n - j) := by rw [← pow_mul, ← pow_add, Nat.add_sub_cancel' hj.le]
       _ = θ ^ g ^ (i + (n - j)) := by rw [hj', ← pow_mul, ← pow_add]
   refine ⟨(i + (n - j)) % n, Nat.mod_lt _ hn, ?_⟩
   rw [e1]

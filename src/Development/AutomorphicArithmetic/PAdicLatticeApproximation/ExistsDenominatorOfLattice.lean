@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
 open scoped TensorProduct
 
 private lemma exists_den_finset {p : ℕ} [Fact p.Prime] (D : Datum p) (s : Finset (VQ D)) :
@@ -31,8 +32,9 @@ private lemma exists_den_closure {p : ℕ} [Fact p.Prime] (D : Datum p) (s : Fin
     obtain ⟨a, ha⟩ := hx
     exact ⟨-a, by rw [smul_neg, ha, TensorProduct.tmul_neg]⟩
 
-theorem UpperTheory.exists_denominator_of_lattice :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D), ∃ d : ℕ, 0 < d ∧ ∀ w ∈ X.lat, ∃ a : D.La, d • w = (1 : ℚ) ⊗ₜ[ℤ] a := by
+theorem UpperTheory.exists_denominator_of_lattice
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D), ∃ d : ℕ,
+      0 < d ∧ ∀ w ∈ X.lat, ∃ a : D.La, d • w = (1 : ℚ) ⊗ₜ[ℤ] a := by
   intro p _ D X
   obtain ⟨-, s, -, hmem⟩ := X.hM
   obtain ⟨k, hk, hkc⟩ := exists_den_closure D s

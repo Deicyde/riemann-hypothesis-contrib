@@ -5,8 +5,7 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TraceSpl
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.T.goodEx :
-    UpperTheory.ConvolutionTheory.T.GoodEx := by
+theorem UpperTheory.ConvolutionTheory.T.goodEx : UpperTheory.ConvolutionTheory.T.GoodEx := by
   intro n hn
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   set S : ℤ := ∑ k : Fin m, ((m : ℤ) + 1 - (k : ℕ)) with hS
@@ -63,7 +62,6 @@ theorem UpperTheory.ConvolutionTheory.T.goodEx :
         intro h
         exact hJu (by simpa using h)
       have h1 := hJ Jᶜ hc (by simpa using hl)
-      have h2 : ∑ i ∈ J, ν i + ∑ i ∈ Jᶜ, ν i = 0 := by
-        rw [Finset.sum_add_sum_compl, hsum]
+      have h2 : ∑ i ∈ J, ν i + ∑ i ∈ Jᶜ, ν i = 0 := by rw [Finset.sum_add_sum_compl, hsum]
       omega
     · exact (hJ J hJne hl).ne'

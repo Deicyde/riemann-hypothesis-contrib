@@ -12,8 +12,9 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
-theorem FormalFibresRegular.proof (hQ : FormalFibreQuotient.Statement)
-    (hP : FormalFibresRegularPolynomial.Statement) : FormalFibresRegular.Statement := by
+theorem FormalFibresRegular.proof
+    (hQ : FormalFibreQuotient.Statement) (hP : FormalFibresRegularPolynomial.Statement)
+    : FormalFibresRegular.Statement := by
   intro k A _ _ _ hA m hm P _
   obtain ⟨n, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp hA
   have hfs : Function.Surjective (f : MvPolynomial (Fin n) k →+* A) := hf

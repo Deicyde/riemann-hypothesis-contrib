@@ -6,24 +6,27 @@ public import Development.AutomorphicArithmetic.CMTraceEmbeddings.CmFieldRealTen
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed UpperTheory.Gal.W2.Seed.Ori
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed UpperTheory.Gal.W2.Seed.Ori
 open scoped TensorProduct
 
-private noncomputable def entL {E : Type} [Field E] [NumberField E] {n : ℕ} (i j : Fin n) :
-    Matrix (Fin n) (Fin n) E →ₗ[ℚ] E where
+private noncomputable def entL {E : Type} [Field E] [NumberField E] {n : ℕ} (i j : Fin n)
+    : Matrix (Fin n) (Fin n) E →ₗ[ℚ] E where
   toFun x := x i j
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-private noncomputable def sgL {E : Type} [Field E] [NumberField E] {n : ℕ} (i j : Fin n) :
-    E →ₗ[ℚ] Matrix (Fin n) (Fin n) E where
+private noncomputable def sgL {E : Type} [Field E] [NumberField E] {n : ℕ} (i j : Fin n)
+    : E →ₗ[ℚ] Matrix (Fin n) (Fin n) E where
   toFun x := Matrix.single i j x
   map_add' a b := by simp [Matrix.single_add]
   map_smul' q a := by simp [Matrix.smul_single]
 
-private theorem evaluation_baseChange_entry {E : Type} [Field E] [NumberField E] {n : ℕ} (σ : E →+* ℂ) (i j : Fin n)
-    (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) :
-    ev1 σ ((entL i j).baseChange ℝ z) = evM σ z i j := by
+private theorem evaluation_baseChange_entry
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ}
+    (σ : E →+* ℂ) (i j : Fin n) (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E)
+    : ev1 σ ((entL i j).baseChange ℝ z) = evM σ z i j := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r x =>
@@ -32,9 +35,9 @@ private theorem evaluation_baseChange_entry {E : Type} [Field E] [NumberField E]
     simp
   | add a b ha hb => simp only [map_add (f := _), ha, hb, Matrix.add_apply]
 
-private theorem evM_sg {E : Type} [Field E] [NumberField E] {n : ℕ} (σ : E →+* ℂ) (i j : Fin n)
-    (w : ℝ ⊗[ℚ] E) :
-    evM σ ((sgL i j).baseChange ℝ w) = Matrix.single i j (ev1 σ w) := by
+private theorem evM_sg
+    {E : Type} [Field E] [NumberField E] {n : ℕ} (σ : E →+* ℂ) (i j : Fin n) (w : ℝ ⊗[ℚ] E)
+    : evM σ ((sgL i j).baseChange ℝ w) = Matrix.single i j (ev1 σ w) := by
   induction w using TensorProduct.induction_on with
   | zero => simp
   | tmul r x =>
@@ -44,9 +47,9 @@ private theorem evM_sg {E : Type} [Field E] [NumberField E] {n : ℕ} (σ : E �
   | add a b ha hb =>
     rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), Matrix.single_add]
 
-private theorem sum_sg_ent {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) :
-    z = ∑ i, ∑ j, (sgL i j).baseChange ℝ ((entL i j).baseChange ℝ z) := by
+private theorem sum_sg_ent
+    {E : Type} [Field E] [NumberField E] {n : ℕ} (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E)
+    : z = ∑ i, ∑ j, (sgL i j).baseChange ℝ ((entL i j).baseChange ℝ z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r x =>
@@ -58,8 +61,11 @@ private theorem sum_sg_ent {E : Type} [Field E] [NumberField E] {n : ℕ}
     conv_lhs => rw [ha, hb]
     simp only [map_add (f := _), ← Finset.sum_add_distrib]
 
-theorem UpperTheory.cmField_real_tensor_matrix_bijective_cmType :
-    TraceType → ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith E) (n : ℕ), Function.Bijective (fun (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) (τ : Phi A) => evM τ.1 z) := by
+theorem UpperTheory.cmField_real_tensor_matrix_bijective_cmType
+    : TraceType
+      → ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (A : Arith E) (n : ℕ),
+        Function.Bijective (fun (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) (τ : Phi A) =>
+          evM τ.1 z) := by
   intro hT E _ _ _ A n
   have hb := UpperTheory.cmField_real_tensor_bijective_cmType hT A
   constructor

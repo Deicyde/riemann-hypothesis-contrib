@@ -8,12 +8,14 @@ namespace GlobalTheory.EqOneOfPowerClose
 
 open Finset
 
-theorem eq_one_of_pow_close {u : ℂ} (h : ∀ n : ℕ, ‖u ^ n - (1 : ℂ)‖ < (1 / 2 : ℝ)) :
-    u = (1 : ℂ) := by
+theorem eq_one_of_pow_close {u : ℂ} (h : ∀ n : ℕ, ‖u ^ n - (1 : ℂ)‖ < (1 / 2 : ℝ))
+    : u = (1 : ℂ) := by
   have key : ∀ n : ℕ, (n : ℝ) * ‖u - 1‖ ≤ 1 := by
     intro n
     have h1 : ‖∑ k ∈ range n, (u ^ k - 1)‖ ≤ (n : ℝ) / 2 := by
-      calc ‖∑ k ∈ range n, (u ^ k - 1)‖ ≤ ∑ k ∈ range n, ‖u ^ k - 1‖ := norm_sum_le _ _
+      calc
+        ‖∑ k ∈ range n, (u ^ k - 1)‖
+          ≤ ∑ k ∈ range n, ‖u ^ k - 1‖ := norm_sum_le _ _
         _ ≤ ∑ _k ∈ range n, (1 / 2 : ℝ) := sum_le_sum fun k _ => (h k).le
         _ = (n : ℝ) / 2 := by simp; ring
     have h2 : (n : ℂ) = ∑ k ∈ range n, u ^ k - ∑ k ∈ range n, (u ^ k - 1) := by

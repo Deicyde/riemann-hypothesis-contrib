@@ -9,14 +9,15 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem fg_of_saturated_ideal_power_into_image :
-    ∀ (S : Type) [CommRing S] [IsDomain S] [IsNoetherianRing S] (I : Ideal S),
-      (∀ (k : ℕ) (c : FractionRing S), (∀ a ∈ I ^ k, IsLocalization.IsInteger S (a • c)) →
-        IsLocalization.IsInteger S c) →
-      ∀ (M : Type) [AddCommGroup M] [Module S M] [Module.Finite S M]
-        (N : Submodule S (FractionRing S ⊗[S] M)),
-        (∀ z ∈ N, ∃ k : ℕ, ∀ a ∈ I ^ k,
-          a • z ∈ LinearMap.range (TensorProduct.mk S (FractionRing S) M 1)) → N.FG := by
+theorem fg_of_saturated_ideal_power_into_image
+    : ∀ (S : Type) [CommRing S] [IsDomain S] [IsNoetherianRing S] (I : Ideal S),
+      (∀ (k : ℕ) (c : FractionRing S),
+          (∀ a ∈ I ^ k, IsLocalization.IsInteger S (a • c)) → IsLocalization.IsInteger S c)
+        → ∀ (M : Type) [AddCommGroup M] [Module S M] [Module.Finite S M]
+            (N : Submodule S (FractionRing S ⊗[S] M)),
+          (∀ z ∈ N, ∃ k : ℕ, ∀ a ∈ I ^ k,
+              a • z ∈ LinearMap.range (TensorProduct.mk S (FractionRing S) M 1))
+            → N.FG := by
   intro S _ _ _ I hsat M _ _ _ N hN
   classical
   set K := FractionRing S
@@ -34,8 +35,9 @@ theorem fg_of_saturated_ideal_power_into_image :
     rintro v ⟨w, rfl⟩ i
     exact ⟨w i, rfl⟩
   obtain ⟨n, g, hg⟩ := Module.Finite.exists_fin (R := S) (M := M)
-  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors S)
-    (Finset.univ : Finset (Fin n × ι)) (fun p => T (1 ⊗ₜ g p.1) p.2)
+  obtain ⟨d, hd⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors S) (Finset.univ : Finset (Fin n × ι))
+      (fun p => T (1 ⊗ₜ g p.1) p.2)
   let F : V →ₗ[S] (ι → K) := (d : S) • T
   have hFM : ∀ m : M, F (1 ⊗ₜ m) ∈ L := by
     intro m

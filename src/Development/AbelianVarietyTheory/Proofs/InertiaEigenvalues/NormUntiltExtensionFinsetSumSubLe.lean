@@ -13,11 +13,12 @@ open scoped Formalism.Per
 
 namespace GlobalTheory
 
-theorem untilt_ext_sum_sub_le : ∀ (l : ℕ) [Fact l.Prime] (F : Type) [NormedField F] (ι : Fl l →+* F)
-    (tsh : F →*₀ ℂ_[l]),
-    (∀ z, ‖tsh z‖ = ‖z‖) → (∀ x, tsh (ι x) = sh x) → (∀ z : F, ‖z‖ ≤ 1 → ∃ x, ι x = z) →
-    ∀ (α : Type) (s : Finset α) (z : α → F) (R : ℝ), 0 ≤ R → (∀ a ∈ s, ‖z a‖ ≤ R) →
-      ‖tsh (∑ a ∈ s, z a) - ∑ a ∈ s, tsh (z a)‖ ≤ ‖(l : ℂ_[l])‖ * R := by
+theorem untilt_ext_sum_sub_le
+    : ∀ (l : ℕ) [Fact l.Prime] (F : Type) [NormedField F] (ι : Fl l →+* F) (tsh : F →*₀ ℂ_[l]),
+      (∀ z, ‖tsh z‖ = ‖z‖) → (∀ x, tsh (ι x) = sh x) → (∀ z : F, ‖z‖ ≤ 1 → ∃ x, ι x = z)
+        → ∀ (α : Type) (s : Finset α) (z : α → F) (R : ℝ),
+          0 ≤ R → (∀ a ∈ s, ‖z a‖ ≤ R)
+            → ‖tsh (∑ a ∈ s, z a) - ∑ a ∈ s, tsh (z a)‖ ≤ ‖(l : ℂ_[l])‖ * R := by
   intro l _ F _ ι tsh hn hι hsurj α s z R hR hz
   classical
   obtain ⟨-, -, -, -, -, hon, -, -⟩ := GlobalTheory.PSer.Laws.sh_laws l
@@ -31,9 +32,9 @@ theorem untilt_ext_sum_sub_le : ∀ (l : ℕ) [Fact l.Prime] (F : Type) [NormedF
   obtain ⟨N, hN⟩ : ∃ N : ℕ, ‖ι w‖ ^ N * R ≤ 1 := by
     rcases le_or_gt R 1 with h | h
     · exact ⟨0, by simpa using h⟩
-    · obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one (inv_pos.2 (by linarith : (0:ℝ) < R)) (hnw ▸ hl1)
+    · obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one (inv_pos.2 (by linarith : (0 : ℝ) < R)) (hnw ▸ hl1)
       refine ⟨N, ?_⟩
-      have := mul_lt_mul_of_pos_right hN (by linarith : (0:ℝ) < R)
+      have := mul_lt_mul_of_pos_right hN (by linarith : (0 : ℝ) < R)
       rw [inv_mul_cancel₀ (by linarith)] at this
       exact this.le
   set c : F := ι w ^ N with hc
@@ -44,17 +45,17 @@ theorem untilt_ext_sum_sub_le : ∀ (l : ℕ) [Fact l.Prime] (F : Type) [NormedF
     split_ifs with ha
     · refine hsurj _ ?_
       rw [norm_mul, hcn]
-      calc ‖ι w‖ ^ N * ‖z a‖ ≤ ‖ι w‖ ^ N * R :=
-            mul_le_mul_of_nonneg_left (hz a ha) (pow_nonneg (norm_nonneg _) _)
+      calc
+        ‖ι w‖ ^ N * ‖z a‖
+          ≤ ‖ι w‖ ^ N * R := mul_le_mul_of_nonneg_left (hz a ha) (pow_nonneg (norm_nonneg _) _)
         _ ≤ 1 := hN
     · exact ⟨0, map_zero ι⟩
   choose x hxe using hx
   have hxa : ∀ a ∈ s, ι (x a) = c * z a := fun a ha => by rw [hxe, if_pos ha]
-  have hsa : ∀ a ∈ s, sh (x a) = tsh c * tsh (z a) := fun a ha => by
-    rw [← hι, hxa a ha, map_mul]
+  have hsa : ∀ a ∈ s, sh (x a) = tsh c * tsh (z a) := fun a ha => by rw [← hι, hxa a ha, map_mul]
   have hss : sh (∑ a ∈ s, x a) = tsh c * tsh (∑ a ∈ s, z a) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hι, map_sum, Finset.sum_congr rfl hxa, ← Finset.mul_sum, map_mul]
+    rw [← hι, map_sum, Finset.sum_congr rfl hxa, ← Finset.mul_sum, map_mul]
   have hbd : ∀ a ∈ s, ‖sh (x a)‖ ≤ ‖c‖ * R := fun a ha => by
     rw [hsa a ha, norm_mul, hn, hn]
     exact mul_le_mul_of_nonneg_left (hz a ha) (norm_nonneg _)

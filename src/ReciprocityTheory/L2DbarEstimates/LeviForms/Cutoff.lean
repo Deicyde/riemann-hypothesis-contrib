@@ -56,7 +56,8 @@ theorem prim_contDiff : ContDiff ℝ ∞ prim :=
     ⟨fun t => (prim_hasDerivAt t).differentiableAt, by rw [deriv_prim]; exact bump_contDiff⟩
 
 theorem prim_monotone : Monotone prim :=
-  monotone_of_deriv_nonneg (fun t => (prim_hasDerivAt t).differentiableAt)
+  monotone_of_deriv_nonneg
+    (fun t => (prim_hasDerivAt t).differentiableAt)
     (fun t => by rw [deriv_prim]; exact bump_nonneg t)
 
 theorem prim_of_le_half {t : ℝ} (ht : t ≤ 1 / 2) : prim t = 0 := by
@@ -79,8 +80,8 @@ theorem prim_of_one_le {t : ℝ} (ht : 1 ≤ t) : prim t = prim 1 := by
 
 theorem prim_one_ge : 2 / 5 ≤ prim 1 := by
   unfold prim
-  have hi : ∀ a b : ℝ, IntervalIntegrable bump volume a b :=
-    fun a b => bump_continuous.intervalIntegrable a b
+  have hi : ∀ a b : ℝ, IntervalIntegrable bump volume a b := fun a b =>
+    bump_continuous.intervalIntegrable a b
   rw [← intervalIntegral.integral_add_adjacent_intervals (b := 19 / 20) (hi _ _) (hi _ _),
     ← intervalIntegral.integral_add_adjacent_intervals (a := 0) (b := 11 / 20) (hi _ _) (hi _ _)]
   have h1 : 0 ≤ ∫ s in (0 : ℝ)..11 / 20, bump s :=

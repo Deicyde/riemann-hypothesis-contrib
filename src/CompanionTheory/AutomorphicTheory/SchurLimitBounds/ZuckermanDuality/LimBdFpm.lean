@@ -17,7 +17,8 @@ open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P Formalism.FourierDeca
 
 theorem span_powers : SpanPow := mul_mem_spanBox_of_gap
 
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
 end CompanionTheory.LimBd.Main

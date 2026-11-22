@@ -5,11 +5,18 @@ public import Development.AutomorphicArithmetic.TwistedTraces.NormSkewAdjointLeO
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C Polynomial Topology
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C Polynomial Topology
 
-theorem UpperTheory.norm_generator_le_of_polynomial_annihilated :
-    ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E] (u : ℝ → Module.End ℂ E) (D : Module.End ℂ E) (p : ℝ → ℂ[X]) (M : ℝ), u 0 = 1 → (∀ s t, u (s + t) = u s * u t) → (∀ t x, ‖u t x‖ = ‖x‖) → (∀ x, HasDerivAt (fun t : ℝ => u t x) (D x) 0) → (∀ t, aeval (u t) (p t) = 0) → (∀ z : ℂ, (∀ t : ℝ, (p t).IsRoot (Complex.exp (z * t))) → ‖z‖ ≤ M) → ∀ x, ‖D x‖ ≤ M * ‖x‖ := by
+theorem UpperTheory.norm_generator_le_of_polynomial_annihilated
+    : ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+        (u : ℝ → Module.End ℂ E) (D : Module.End ℂ E) (p : ℝ → ℂ[X]) (M : ℝ),
+      u 0 = 1 → (∀ s t, u (s + t) = u s * u t) → (∀ t x, ‖u t x‖ = ‖x‖)
+        → (∀ x, HasDerivAt (fun t : ℝ => u t x) (D x) 0) → (∀ t, aeval (u t) (p t) = 0)
+        → (∀ z : ℂ, (∀ t : ℝ, (p t).IsRoot (Complex.exp (z * t))) → ‖z‖ ≤ M)
+        → ∀ x, ‖D x‖ ≤ M * ‖x‖ := by
   intro E _ _ _ u D p M h0 hadd hiso hder hroot hM x
   have hshift : ∀ (t : ℝ) (w : E), HasDerivAt (fun s : ℝ => u s w) (u t (D w)) t := by
     intro t w
@@ -54,7 +61,8 @@ theorem UpperTheory.norm_generator_le_of_polynomial_annihilated :
     have hconst : ∀ t : ℝ, Complex.exp (-(z * t)) • u t w = w := by
       have hd : ∀ t : ℝ, HasDerivAt (fun s : ℝ => Complex.exp (-(z * s)) • u s w) 0 t := by
         intro t
-        have he : HasDerivAt (fun s : ℝ => Complex.exp (-(z * s)))
+        have he : HasDerivAt
+            (fun s : ℝ => Complex.exp (-(z * s)))
             (Complex.exp (-(z * t)) * (-z)) t := by
           have hl : HasDerivAt (fun s : ℝ => -(z * (s : ℂ))) (-z) t := by
             have h : HasDerivAt (fun s : ℝ => (s : ℂ)) 1 t := by
@@ -63,15 +71,20 @@ theorem UpperTheory.norm_generator_le_of_polynomial_annihilated :
             simpa [neg_mul] using h2
           exact hl.cexp
         have h1 := he.smul (hshift t w)
-        have h2 : Complex.exp (-(z * t)) • u t (D w) + (Complex.exp (-(z * t)) * (-z)) • u t w = 0 := by
+        have h2
+            : Complex.exp (-(z * t)) • u t (D w) + (Complex.exp (-(z * t)) * (-z)) • u t w = 0 := by
           rw [hDw, map_smul, smul_smul, ← add_smul]
           have : Complex.exp (-(z * t)) * z + Complex.exp (-(z * t)) * (-z) = 0 := by ring
           rw [this, zero_smul]
         rw [h2] at h1
         exact h1
       intro t
-      have hc := is_const_of_deriv_eq_zero (f := fun s : ℝ => Complex.exp (-(z * s)) • u s w)
-        (fun s => (hd s).differentiableAt) (fun s => (hd s).deriv) t 0
+      have hc :=
+        is_const_of_deriv_eq_zero
+          (f := fun s : ℝ => Complex.exp (-(z * s)) • u s w)
+          (fun s => (hd s).differentiableAt)
+          (fun s => (hd s).deriv)
+          t 0
       simpa [h0'] using hc
     have hut : ∀ t : ℝ, u t w = Complex.exp (z * t) • w := by
       intro t

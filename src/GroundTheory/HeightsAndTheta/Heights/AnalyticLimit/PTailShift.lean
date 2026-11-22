@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 open MeasureTheory
 open ReciprocityTheory.AnForm.M (FinHolAtlas LocPot mInt MIntegrable locDens)
 
-theorem log_le_of_abs_sub_le {B a b : ℝ} (hb : Real.exp 1 ≤ b) (ha : 0 < a) (hab : |a - b| ≤ B) :
-    Real.log a ≤ (1 + max B 0) * Real.log b := by
+theorem log_le_of_abs_sub_le {B a b : ℝ} (hb : Real.exp 1 ≤ b) (ha : 0 < a) (hab : |a - b| ≤ B)
+    : Real.log a ≤ (1 + max B 0) * Real.log b := by
   have hb0 : 0 < b := lt_of_lt_of_le (Real.exp_pos 1) hb
   have hlb : 1 ≤ Real.log b := by rw [← Real.log_exp 1]; exact Real.log_le_log (Real.exp_pos 1) hb
   have hB : 0 ≤ max B 0 := le_max_right _ _
@@ -23,7 +23,9 @@ theorem log_le_of_abs_sub_le {B a b : ℝ} (hb : Real.exp 1 ≤ b) (ha : 0 < a) 
     have := (abs_le.1 hab).2
     have := le_max_left B 0
     nlinarith [mul_nonneg (sub_nonneg.2 hb1) hB]
-  calc Real.log a ≤ Real.log (b * (1 + max B 0)) := Real.log_le_log ha h1
+  calc
+    Real.log a
+      ≤ Real.log (b * (1 + max B 0)) := Real.log_le_log ha h1
     _ = Real.log b + Real.log (1 + max B 0) := Real.log_mul hb0.ne' (by positivity)
     _ ≤ Real.log b + max B 0 := by
       linarith [Real.log_le_sub_one_of_pos (show 0 < 1 + max B 0 by positivity)]
@@ -46,13 +48,17 @@ theorem TailShift.proof : TailShift.Statement := by
   have hl : ∀ x ∈ Yo, 1 ≤ Real.log (r x) := fun x hx => by
     rw [← Real.log_exp 1]; exact Real.log_le_log he (hre x hx)
 
-  have key : ∀ R₀ R', Real.exp 1 ≤ R' → (∀ x ∈ Yo, R₀ ≤ r x → R' ≤ r' x) →
-      mInt A T ((tail Yo r R₀).indicator fun x => Real.log (r x)) ≤
-        (1 + Bp) * mInt A T ((tail Yo r' R').indicator fun x => Real.log (r' x)) := by
+  have key
+      : ∀ R₀ R',
+        Real.exp 1 ≤ R' → (∀ x ∈ Yo, R₀ ≤ r x → R' ≤ r' x)
+          → mInt A T ((tail Yo r R₀).indicator fun x => Real.log (r x))
+            ≤ (1 + Bp) * mInt A T ((tail Yo r' R').indicator fun x => Real.log (r' x)) := by
     intro R₀ R' hR' hsub
-    refine mInt_le_mul_of_le A T Yo (hT R' hR').1 hdens (fun x => ?_)
+    refine mInt_le_mul_of_le A T Yo (hT R' hR').1 hdens
+      (fun x => ?_)
       (fun x hx => Set.indicator_of_notMem (by exact fun h => hx h.1) _)
-      (fun x hx => Set.indicator_of_notMem (by exact fun h => hx h.1) _) (fun x hx => ?_)
+      (fun x hx => Set.indicator_of_notMem (by exact fun h => hx h.1) _)
+      (fun x hx => ?_)
     · by_cases h : x ∈ tail Yo r R₀
       · rw [Set.indicator_of_mem h]; linarith [hl x h.1]
       · rw [Set.indicator_of_notMem h]
@@ -87,24 +93,33 @@ theorem TailShift.proof : TailShift.Statement := by
       funext x
       simp [Set.indicator, Set.piecewise]
     have hT' : MeasurableSet (A.chart j).target := (A.chart j).open_target.measurableSet
-    have hsm : AEMeasurable (fun y => (tail Yo r R₀).indicator
-        (fun x => Real.log (r x) / Real.log (r' x)) ((A.chart j).symm y)) (volume.restrict K) :=
+    have hsm : AEMeasurable
+        (fun y =>
+          (tail Yo r R₀).indicator (fun x => Real.log (r x) / Real.log (r' x)) ((A.chart j).symm y))
+        (volume.restrict K) :=
       (hGm.comp_aemeasurable ((A.chart j).continuousOn_symm.aemeasurable hT')).mono_measure
         (Measure.restrict_mono hK le_rfl)
-    have hid : ∀ x, (tail Yo r R₀).indicator (fun x => Real.log (r x)) x =
-        (tail Yo r R₀).indicator (fun x => Real.log (r x) / Real.log (r' x)) x *
-          (tail Yo r' (Real.exp 1)).indicator (fun x => Real.log (r' x)) x := by
+    have hid
+        : ∀ x,
+          (tail Yo r R₀).indicator (fun x => Real.log (r x)) x
+            = (tail Yo r R₀).indicator (fun x => Real.log (r x) / Real.log (r' x)) x
+              * (tail Yo r' (Real.exp 1)).indicator (fun x => Real.log (r' x)) x := by
       intro x
       by_cases h : x ∈ tail Yo r R₀
       · rw [Set.indicator_of_mem h, Set.indicator_of_mem h,
           Set.indicator_of_mem (show x ∈ tail Yo r' (Real.exp 1) from ⟨h.1, hr'e x h.1⟩),
           div_mul_cancel₀ _ (lt_of_lt_of_le one_pos (hl' x h.1)).ne']
       · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem h, zero_mul]
-    have e1 : (fun y => (tail Yo r R₀).indicator (fun x => Real.log (r x)) ((A.chart j).symm y) *
-        locDens A T j y) = fun y => (tail Yo r R₀).indicator
-          (fun x => Real.log (r x) / Real.log (r' x)) ((A.chart j).symm y) *
-          ((tail Yo r' (Real.exp 1)).indicator (fun x => Real.log (r' x)) ((A.chart j).symm y) *
-            locDens A T j y) := by
+    have e1
+        : (fun y =>
+            (tail Yo r R₀).indicator (fun x => Real.log (r x)) ((A.chart j).symm y)
+              * locDens A T j y)
+          = fun y =>
+            (tail Yo r R₀).indicator
+                (fun x => Real.log (r x) / Real.log (r' x))
+                ((A.chart j).symm y)
+              * ((tail Yo r' (Real.exp 1)).indicator (fun x => Real.log (r' x)) ((A.chart j).symm y)
+                * locDens A T j y) := by
       funext y
       rw [hid, mul_assoc]
     rw [e1]
@@ -142,23 +157,27 @@ theorem TailShift.proof : TailShift.Statement := by
     have hlog1 : 0 ≤ Real.log (R₀ - Bp) := Real.log_nonneg (by linarith)
     have hpow : Real.log (R₀ - Bp) ^ (D + 1) ≤ Real.log R₀ ^ (D + 1) :=
       pow_le_pow_left₀ hlog1 (Real.log_le_log hpos (by linarith)) _
-    have s1 : CE * Real.log (R₀ - Bp) ^ (D + 1) / (R₀ - Bp) ≤
-        max CE 0 * Real.log R₀ ^ (D + 1) / (R₀ - Bp) :=
+    have s1
+        : CE * Real.log (R₀ - Bp) ^ (D + 1) / (R₀ - Bp)
+          ≤ max CE 0 * Real.log R₀ ^ (D + 1) / (R₀ - Bp) :=
       div_le_div_of_nonneg_right (mul_le_mul hCE hpow (pow_nonneg hlog1 _) hCE0) hpos.le
-    have s2 : max CE 0 * Real.log R₀ ^ (D + 1) / (R₀ - Bp) ≤
-        max CE 0 * Real.log R₀ ^ (D + 1) * 2 / R₀ := by
+    have s2
+        : max CE 0 * Real.log R₀ ^ (D + 1) / (R₀ - Bp)
+          ≤ max CE 0 * Real.log R₀ ^ (D + 1) * 2 / R₀ := by
       rw [div_le_div_iff₀ hpos hR0]
       nlinarith [mul_nonneg (mul_nonneg hCE0 hL0) (show 0 ≤ 2 * (R₀ - Bp) - R₀ by linarith)]
-    have s3 : 2 * (1 + Bp) * max CE 0 * Real.log R₀ ^ (D + 1) ≤
-        2 * (1 + Bp) * max CE 0 * R1 * Real.log R₀ ^ (D + 1) := by
+    have s3
+        : 2 * (1 + Bp) * max CE 0 * Real.log R₀ ^ (D + 1)
+          ≤ 2 * (1 + Bp) * max CE 0 * R1 * Real.log R₀ ^ (D + 1) := by
       have h0 : 0 ≤ 2 * (1 + Bp) * max CE 0 * Real.log R₀ ^ (D + 1) := by positivity
       nlinarith [mul_nonneg h0 (show 0 ≤ R1 - 1 by linarith)]
-    calc (1 + Bp) * mInt A T ((tail Yo r' (R₀ - Bp)).indicator fun x => Real.log (r' x))
-        ≤ (1 + Bp) * (max CE 0 * Real.log R₀ ^ (D + 1) * 2 / R₀) :=
-          mul_le_mul_of_nonneg_left (hb.trans (s1.trans s2)) hBp1
+    calc
+      (1 + Bp) * mInt A T ((tail Yo r' (R₀ - Bp)).indicator fun x => Real.log (r' x))
+          ≤ (1 + Bp) * (max CE 0 * Real.log R₀ ^ (D + 1) * 2 / R₀) :=
+        mul_le_mul_of_nonneg_left (hb.trans (s1.trans s2)) hBp1
       _ = 2 * (1 + Bp) * max CE 0 * Real.log R₀ ^ (D + 1) / R₀ := by ring
       _ ≤ 2 * (1 + Bp) * max CE 0 * R1 * Real.log R₀ ^ (D + 1) / R₀ :=
-          div_le_div_of_nonneg_right s3 hR0.le
+        div_le_div_of_nonneg_right s3 hR0.le
   · replace hbig := not_le.1 hbig
     refine (key R₀ (Real.exp 1) le_rfl fun x hx _ => hr'e x hx).trans ?_
     have hb := (hT (Real.exp 1) le_rfl).2
@@ -167,10 +186,11 @@ theorem TailShift.proof : TailShift.Statement := by
       rw [div_le_iff₀ he]; nlinarith [mul_nonneg hCE0 (show 0 ≤ Real.exp 1 - 1 by linarith)]
     have hZ : 0 ≤ (1 + Bp) * max CE 0 := mul_nonneg hBp1 hCE0
     have s2 : R₀ ≤ 2 * R1 * Real.log R₀ ^ (D + 1) := by nlinarith
-    calc (1 + Bp) * mInt A T ((tail Yo r' (Real.exp 1)).indicator fun x => Real.log (r' x))
+    calc
+      (1 + Bp) * mInt A T ((tail Yo r' (Real.exp 1)).indicator fun x => Real.log (r' x))
         ≤ (1 + Bp) * max CE 0 := mul_le_mul_of_nonneg_left (hb.trans s1) hBp1
       _ ≤ 2 * (1 + Bp) * max CE 0 * R1 * Real.log R₀ ^ (D + 1) / R₀ := by
-          rw [le_div_iff₀ hR0]
-          nlinarith [mul_le_mul_of_nonneg_left s2 hZ]
+        rw [le_div_iff₀ hR0]
+        nlinarith [mul_le_mul_of_nonneg_left s2 hZ]
 
 end GroundTheory.Heights₂.Heights.AnalyticLimit

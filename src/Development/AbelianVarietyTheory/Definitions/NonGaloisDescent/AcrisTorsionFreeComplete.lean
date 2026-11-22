@@ -38,16 +38,16 @@ namespace GlobalTheory.MemLoc
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem locAinf_actC {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (x : ℂ_[l]) :
-    AI.actC g x = Per.σC g x := by
+theorem locAinf_actC {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (x : ℂ_[l])
+    : AI.actC g x = Per.σC g x := by
   have hc : Continuous (AI.actC g) :=
     (AddMonoidHomClass.isometry_of_norm (AI.actC g) (AI.actC_norm g)).continuous
   induction x using UniformSpace.Completion.induction_on with
   | hp => exact isClosed_eq hc (GlobalTheory.RingIface.sigC_cont l g)
   | ih a => exact (AI.actC_ext g a).trans (GlobalTheory.RingBasics.σC_coe g a).symm
 
-theorem locAinf_actT {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (x : OCb l) :
-    AI.actT g x = Per.σF g x := by
+theorem locAinf_actT {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (x : OCb l)
+    : AI.actT g x = Per.σF g x := by
   refine Perfection.ext fun n => ?_
   obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (PreTilt.coeff n x)
   obtain ⟨y₁, h₁, e₁⟩ := AI.actT_coeff g x n y hy.symm
@@ -55,9 +55,10 @@ theorem locAinf_actT {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (x : OCb l) 
   have : y₁ = y₂ := Subtype.ext (by rw [h₁, h₂, locAinf_actC])
   exact e₁.trans (this ▸ e₂.symm)
 
-theorem locAinf_actW {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (a : Ainf l) :
-    AI.actW g a = Per.σA g a :=
-  WittVector.ext fun n => (locAinf_actT AI g (a.coeff n)).trans (GlobalTheory.RingIface.sigA_coeff l g a n).symm
+theorem locAinf_actW {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (a : Ainf l)
+    : AI.actW g a = Per.σA g a :=
+  WittVector.ext fun n =>
+    (locAinf_actT AI g (a.coeff n)).trans (GlobalTheory.RingIface.sigA_coeff l g a n).symm
 
 variable (l)
 
@@ -67,10 +68,11 @@ theorem isUnit_l_BdRp : IsUnit ((l : ℕ) : Per.BdRp l) := by
 
 theorem isUnit_l_Bcris : IsUnit ((l : ℕ) : Per.Bcris l) := by
   obtain ⟨ζ, e, h0, -, h1, hr⟩ := exists_zeta_eps l
-  have he : e.untilt = 1 := Subtype.ext (by
-    have := hr 0
-    rw [h0, map_one] at this
-    exact this)
+  have he : e.untilt = 1 :=
+    Subtype.ext (by
+      have := hr 0
+      rw [h0, map_one] at this
+      exact this)
   have hne : e ≠ 1 := by
     rintro rfl
     apply h1
@@ -78,20 +80,24 @@ theorem isUnit_l_Bcris : IsUnit ((l : ℕ) : Per.Bcris l) := by
     rw [← hr 1, map_one]
     simp [rootT]
   obtain ⟨w, hw, -⟩ := exists_mu_pow_div l e he
-  have hw' : ((l : ℕ) : Per.Acris0 l) * w = algebraMap (Per.Ainf l) (Per.Acris0 l) (mu e) ^ (l - 1) :=
+  have hw'
+      : ((l : ℕ) : Per.Acris0 l) * w = algebraMap (Per.Ainf l) (Per.Acris0 l) (mu e) ^ (l - 1) :=
     Subtype.ext (by simpa using hw)
-  have hm : IsUnit (((algebraMap (Per.Acris l) (Per.Bcris l)).comp (algebraMap (Per.Acris0 l) (Per.Acris l)))
+  have hm : IsUnit (((algebraMap (Per.Acris l) (Per.Bcris l)).comp
+        (algebraMap (Per.Acris0 l) (Per.Acris l)))
       (algebraMap (Per.Ainf l) (Per.Acris0 l) (mu e))) := by
     rw [RingHom.comp_apply, ← GlobalTheory.RingIface.tower]
     exact GlobalTheory.CrisLoc.unit_of_root l e he hne
-  have h2 := congrArg
-    ((algebraMap (Per.Acris l) (Per.Bcris l)).comp (algebraMap (Per.Acris0 l) (Per.Acris l))) hw'
+  have h2 :=
+    congrArg
+      ((algebraMap (Per.Acris l) (Per.Bcris l)).comp (algebraMap (Per.Acris0 l) (Per.Acris l))) hw'
   rw [map_mul, map_natCast, map_pow] at h2
   exact isUnit_of_mul_isUnit_left (h2 ▸ hm.pow (l - 1))
 
 def BcrisP : Type := Localization.Away ((l : ℕ) : Per.Acris l)
 
-instance : CommRing (BcrisP l) := inferInstanceAs (CommRing (Localization.Away ((l : ℕ) : Per.Acris l)))
+instance : CommRing (BcrisP l) :=
+  inferInstanceAs (CommRing (Localization.Away ((l : ℕ) : Per.Acris l)))
 
 instance : Algebra (Per.Acris l) (BcrisP l) :=
   inferInstanceAs (Algebra (Per.Acris l) (Localization.Away ((l : ℕ) : Per.Acris l)))
@@ -99,15 +105,15 @@ instance : Algebra (Per.Acris l) (BcrisP l) :=
 instance : IsLocalization.Away ((l : ℕ) : Per.Acris l) (BcrisP l) :=
   inferInstanceAs (IsLocalization.Away _ (Localization.Away ((l : ℕ) : Per.Acris l)))
 
-
 variable {l} in
-def plusLift {S : Type} [CommRing S] (f : Per.Acris l →+* S) (h : IsUnit ((l : ℕ) : S)) : BcrisP l →+* S :=
+def plusLift {S : Type} [CommRing S] (f : Per.Acris l →+* S) (h : IsUnit ((l : ℕ) : S))
+    : BcrisP l →+* S :=
   IsLocalization.Away.lift ((l : ℕ) : Per.Acris l) (g := f) (by rwa [map_natCast])
 
-
 variable {l} in
-theorem plusLift_alg {S : Type} [CommRing S] (f : Per.Acris l →+* S) (h : IsUnit ((l : ℕ) : S))
-    (x : Per.Acris l) : plusLift f h (algebraMap _ _ x) = f x :=
+theorem plusLift_alg
+    {S : Type} [CommRing S] (f : Per.Acris l →+* S) (h : IsUnit ((l : ℕ) : S)) (x : Per.Acris l)
+    : plusLift f h (algebraMap _ _ x) = f x :=
   IsLocalization.Away.lift_eq _ _ x
 
 def plusToB : BcrisP l →+* Per.Bcris l :=
@@ -115,11 +121,14 @@ def plusToB : BcrisP l →+* Per.Bcris l :=
 
 variable {l}
 
-theorem plusToB_alg (x : Per.Acris l) :
-    plusToB l (algebraMap _ _ x) = algebraMap (Per.Acris l) (Per.Bcris l) x := plusLift_alg _ _ x
+theorem plusToB_alg (x : Per.Acris l)
+    : plusToB l (algebraMap _ _ x) = algebraMap (Per.Acris l) (Per.Bcris l) x :=
+  plusLift_alg _ _ x
 
-theorem plus_ext {S : Type} [CommRing S] {f f' : BcrisP l →+* S}
-    (h : ∀ x : Per.Acris l, f (algebraMap _ _ x) = f' (algebraMap _ _ x)) : f = f' :=
+theorem plus_ext
+    {S : Type} [CommRing S]
+    {f f' : BcrisP l →+* S} (h : ∀ x : Per.Acris l, f (algebraMap _ _ x) = f' (algebraMap _ _ x))
+    : f = f' :=
   IsLocalization.ringHom_ext (Submonoid.powers ((l : ℕ) : Per.Acris l)) (RingHom.ext h)
 
 namespace Core
@@ -130,11 +139,12 @@ def jP : BcrisP l →+* Per.BdRp l := plusLift C.j (isUnit_l_BdRp l)
 
 theorem jP_alg (x : Per.Acris l) : C.jP (algebraMap _ _ x) = C.j x := plusLift_alg _ _ x
 
-theorem ι_plusToB (x : BcrisP l) :
-    C.ι (plusToB l x) = algebraMap (Per.BdRp l) (Per.BdR l) (C.jP x) :=
-  RingHom.congr_fun (plus_ext (f := C.ι.comp (plusToB l))
-    (f' := (algebraMap (Per.BdRp l) (Per.BdR l)).comp C.jP) fun y => by
-      rw [RingHom.comp_apply, RingHom.comp_apply, plusToB_alg, jP_alg, C.ι_j]) x
+theorem ι_plusToB (x : BcrisP l)
+    : C.ι (plusToB l x) = algebraMap (Per.BdRp l) (Per.BdR l) (C.jP x) :=
+  RingHom.congr_fun
+    (plus_ext (f := C.ι.comp (plusToB l)) (f' := (algebraMap (Per.BdRp l) (Per.BdR l)).comp C.jP)
+      fun y => by rw [RingHom.comp_apply, RingHom.comp_apply, plusToB_alg, jP_alg, C.ι_j])
+    x
 
 def oD : Om l →+* Per.BdR l := (algebraMap (Per.BdRp l) (Per.BdR l)).comp C.o
 
@@ -149,12 +159,11 @@ theorem ker_theta : RingHom.ker (Per.θ l) = Ideal.span {xi C.ε} := by
 
 end Core
 
-
 variable (l) in
-theorem acris_torsionFree_complete : (∀ x : Per.Acris l, ((l : ℕ) : Per.Acris l) * x = 0 → x = 0) ∧
-    IsAdicComplete (Ideal.span {((l : ℕ) : Per.Acris l)}) (Per.Acris l) :=
+theorem acris_torsionFree_complete
+    : (∀ x : Per.Acris l, ((l : ℕ) : Per.Acris l) * x = 0 → x = 0)
+      ∧ IsAdicComplete (Ideal.span {((l : ℕ) : Per.Acris l)}) (Per.Acris l) :=
   ⟨(acris_basic l).2.1, (acris_basic l).1⟩
-
 
 variable (l) in
 theorem thetaD_onto_ker : Function.Surjective (Per.θD l) ∧ RingHom.ker (Per.θD l) = Per.FilP l 1 :=
@@ -166,11 +175,10 @@ variable (C : Core l)
 
 def DVR : Prop :=
   ∃ _ : IsDomain (Per.BdRp l), ∃ _ : IsDiscreteValuationRing (Per.BdRp l),
-    IsLocalRing.maximalIdeal (Per.BdRp l) = Ideal.span {C.j C.t} ∧
-    IsLocalRing.maximalIdeal (Per.BdRp l) = RingHom.ker (Per.θD l) ∧
-    IsAdicComplete (IsLocalRing.maximalIdeal (Per.BdRp l)) (Per.BdRp l) ∧
-    (∀ n : ℕ, Per.FilP l n = Ideal.span {C.j C.t ^ n}) ∧
-    IsFractionRing (Per.BdRp l) (Per.BdR l)
+    IsLocalRing.maximalIdeal (Per.BdRp l) = Ideal.span {C.j C.t}
+      ∧ IsLocalRing.maximalIdeal (Per.BdRp l) = RingHom.ker (Per.θD l)
+      ∧ IsAdicComplete (IsLocalRing.maximalIdeal (Per.BdRp l)) (Per.BdRp l)
+      ∧ (∀ n : ℕ, Per.FilP l n = Ideal.span {C.j C.t ^ n}) ∧ IsFractionRing (Per.BdRp l) (Per.BdR l)
 
 def AwayT : Prop := IsLocalization.Away C.t (Per.Bcris l)
 
@@ -180,46 +188,47 @@ def PlusAwayT : Prop :=
 
 def PlusInj : Prop := Function.Injective C.jP
 
-def InvdR : Prop := ∀ (K : FinExt l) (b : Per.BdR l), (∀ g ∈ GK K, Per.σD g b = b) → ∃ x ∈ K.1, C.oD x = b
+def InvdR : Prop :=
+  ∀ (K : FinExt l) (b : Per.BdR l), (∀ g ∈ GK K, Per.σD g b = b) → ∃ x ∈ K.1, C.oD x = b
 
-def InvB : Prop := ∀ (K : FinExt l) (b : Per.Bcris l), (∀ g ∈ GK K, Per.σB g b = b) →
-  ∃ x : ↥(MaximalUnramifiedExtension l), (x : Om l) ∈ K.1 ∧ C.u x = b
+def InvB : Prop :=
+  ∀ (K : FinExt l) (b : Per.Bcris l),
+    (∀ g ∈ GK K, Per.σB g b = b)
+      → ∃ x : ↥(MaximalUnramifiedExtension l), (x : Om l) ∈ K.1 ∧ C.u x = b
 
 def PhiInj (_C : Core l) : Prop := Function.Injective (Per.φB l)
 
 def IotaInj : Prop := Function.Injective C.ι
 
-def TensorInj : Prop := ∀ (m : ℕ) (x : Fin m → Om l), LinearIndependent ↥(MaximalUnramifiedExtension l) x →
-  ∀ b : Fin m → Per.Bcris l, ∑ i, C.oD (x i) * C.ι (b i) = 0 → ∀ i, b i = 0
+def TensorInj : Prop :=
+  ∀ (m : ℕ) (x : Fin m → Om l),
+    LinearIndependent ↥(MaximalUnramifiedExtension l) x
+      → ∀ b : Fin m → Per.Bcris l, ∑ i, C.oD (x i) * C.ι (b i) = 0 → ∀ i, b i = 0
 
-def Fund : Prop := ∀ b : Per.Bcris l, Per.φB l b = b → C.ι b ∈ Per.FilD l 0 → ∃ x : ℚ_[l], C.qB x = b
+def Fund : Prop :=
+  ∀ b : Per.Bcris l, Per.φB l b = b → C.ι b ∈ Per.FilD l 0 → ∃ x : ℚ_[l], C.qB x = b
 
 def FundOnto : Prop := ∀ w : Per.BdR l, ∃ b : Per.Bcris l, Per.φB l b = b ∧ C.ι b - w ∈ Per.FilD l 0
 
 def OneSubPhiOnto (_C : Core l) : Prop := ∀ y : Per.Bcris l, ∃ x : Per.Bcris l, x - Per.φB l x = y
 
-def Regular : Prop := ∀ (K : FinExt l) (b : Per.Bcris l), b ≠ 0 →
-  (∀ g ∈ GK K, ∃ x : ℚ_[l], Per.σB g b = C.qB x * b) → IsUnit b
+def Regular : Prop :=
+  ∀ (K : FinExt l) (b : Per.Bcris l),
+    b ≠ 0 → (∀ g ∈ GK K, ∃ x : ℚ_[l], Per.σB g b = C.qB x * b) → IsUnit b
 
 end Core
 
 structure Fits {P : LocPrime l} {AI : LocAinf l P} (T : LocTied l P AI) (C : Core l) : Prop where
-
   ζ : C.ζ = P.ζQ
-
   ε : C.ε = AI.ε
-
   o : ∀ x : Om l, T.eD (algebraMap (Om l) P.R.BdR x) = C.oD x
-
   ι : ∀ b : P.R.B, T.eD (P.ιB b) = C.ι (T.eB b)
-
-  u : ∀ c : ↥(MaximalUnramifiedExtension l), T.eB (algebraMap ↥(MaximalUnramifiedExtension l) P.R.B c) = C.u c
-
+  u : ∀ c : ↥(MaximalUnramifiedExtension l),
+    T.eB (algebraMap ↥(MaximalUnramifiedExtension l) P.R.B c) = C.u c
   t : T.eB P.tB = C.tB
-
   χ : ∀ g : GQ l, ((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) = (((C.χ g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l])
-
-  σ : ∀ (K : FinExt l) (x : ↥(K0 K)) (c : ↥(MaximalUnramifiedExtension l)), (c : Om l) = (x : Om l) →
-    (((P.PD K).σ x : ↥(K0 K)) : Om l) = ((C.σ c : ↥(MaximalUnramifiedExtension l)) : Om l)
+  σ : ∀ (K : FinExt l) (x : ↥(K0 K)) (c : ↥(MaximalUnramifiedExtension l)),
+    (c : Om l) = (x : Om l)
+      → (((P.PD K).σ x : ↥(K0 K)) : Om l) = ((C.σ c : ↥(MaximalUnramifiedExtension l)) : Om l)
 
 end GlobalTheory.MemLoc

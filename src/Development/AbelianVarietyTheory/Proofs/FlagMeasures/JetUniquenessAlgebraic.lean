@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SymmetricKMap
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId GlobalTheory.Jet
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+  GlobalTheory.Jet
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -20,24 +22,32 @@ namespace GlobalTheory.Jet.UniqAlg
 section Arrays
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
 
-theorem jm_arr_sum_apply {j : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Arr V n j) (α : Fin j → Fin n × Fin n) :
-    (∑ i ∈ s, f i) α = ∑ i ∈ s, f i α := by
+theorem jm_arr_sum_apply
+    {j : ℕ} {ι : Type*} (s : Finset ι) (f : ι → Arr V n j) (α : Fin j → Fin n × Fin n)
+    : (∑ i ∈ s, f i) α = ∑ i ∈ s, f i α := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | @insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, ← ih]; rfl
 
-theorem jm_positionE_apply {j : ℕ} (i : Fin j) (c d : Fin n) (F : Arr V n j) (α : Fin j → Fin n × Fin n) :
-    factorAction i c d F α = (if (α i).1 = c then F (Function.update α i (d, (α i).2)) else 0) -
-      (if (α i).2 = d then F (Function.update α i ((α i).1, c)) else 0) := by
-  by_cases h1 : (α i).1 = c <;> by_cases h2 : (α i).2 = d <;> simp [factorAction, arrTo, arrOf, h1, h2]
+theorem jm_positionE_apply
+    {j : ℕ} (i : Fin j) (c d : Fin n) (F : Arr V n j) (α : Fin j → Fin n × Fin n)
+    : factorAction i c d F α
+      = (if (α i).1 = c then F (Function.update α i (d, (α i).2)) else 0)
+        - (if (α i).2 = d then F (Function.update α i ((α i).1, c)) else 0) := by
+  by_cases h1 : (α i).1 = c <;> by_cases h2 : (α i).2 = d
+    <;> simp [factorAction, arrTo, arrOf, h1, h2]
 
-theorem jm_ptE_apply {j : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (c d : Fin n) (F : Arr V n j)
-    (α : Fin j → Fin n × Fin n) : ptE E c d F α = E c d (F α) := by
+theorem jm_ptE_apply
+    {j : ℕ}
+    (E : Fin n → Fin n → Module.End ℂ V) (c d : Fin n) (F : Arr V n j) (α : Fin j → Fin n × Fin n)
+    : ptE E c d F α = E c d (F α) := by
   simp [ptE, arrTo, arrOf]
 
-theorem jm_arrE_apply {j : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (c d : Fin n) (F : Arr V n j)
-    (α : Fin j → Fin n × Fin n) : arrE E j c d F α = ∑ i, factorAction i c d F α + E c d (F α) := by
+theorem jm_arrE_apply
+    {j : ℕ}
+    (E : Fin n → Fin n → Module.End ℂ V) (c d : Fin n) (F : Arr V n j) (α : Fin j → Fin n × Fin n)
+    : arrE E j c d F α = ∑ i, factorAction i c d F α + E c d (F α) := by
   simp only [arrE]
   rw [LinearMap.add_apply, WithLp.ofLp_add, Pi.add_apply, LinearMap.sum_apply, jm_arr_sum_apply,
     jm_ptE_apply]
@@ -45,19 +55,20 @@ theorem jm_arrE_apply {j : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (c d 
 def jmW (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (α : Fin j → Fin n × Fin n) : Module.End ℂ V :=
   ew E (List.ofFn α).reverse
 
-theorem jm_ew_append (E : Fin n → Fin n → Module.End ℂ V) (l1 l2 : List (Fin n × Fin n)) :
-    ew E (l1 ++ l2) = ew E l1 * ew E l2 := by
+theorem jm_ew_append (E : Fin n → Fin n → Module.End ℂ V) (l1 l2 : List (Fin n × Fin n))
+    : ew E (l1 ++ l2) = ew E l1 * ew E l2 := by
   induction l1 with
   | nil => simp [ew]
   | cons p l ih => simp [ew, ih, mul_assoc]
 
-theorem jmW_zero (E : Fin n → Fin n → Module.End ℂ V) (α : Fin 0 → Fin n × Fin n) : jmW E α = 1 := by
+theorem jmW_zero (E : Fin n → Fin n → Module.End ℂ V) (α : Fin 0 → Fin n × Fin n)
+    : jmW E α = 1 := by
   simp [jmW, ew]
 
-theorem jmW_succ (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (α : Fin (j + 1) → Fin n × Fin n) :
-    jmW E α = E (α (Fin.last j)).1 (α (Fin.last j)).2 * jmW E (Fin.init α) := by
-  simp only [jmW, List.ofFn_succ', List.concat_eq_append, List.reverse_append, List.reverse_singleton,
-    List.singleton_append, ew, Fin.init]
+theorem jmW_succ (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (α : Fin (j + 1) → Fin n × Fin n)
+    : jmW E α = E (α (Fin.last j)).1 (α (Fin.last j)).2 * jmW E (Fin.init α) := by
+  simp only [jmW, List.ofFn_succ', List.concat_eq_append, List.reverse_append,
+    List.reverse_singleton, List.singleton_append, ew, Fin.init]
   rfl
 
 private lemma update_castSucc_apply_last {X : Type*} {j : ℕ} (α : Fin (j + 1) → X) (k : Fin j) (x : X) :
@@ -67,28 +78,33 @@ private lemma update_castSucc_apply_last {X : Type*} {j : ℕ} (α : Fin (j + 1)
 private lemma fin_castSucc_apply_eq_init {X : Type*} {j : ℕ} (α : Fin (j + 1) → X) (k : Fin j) :
     α k.castSucc = Fin.init α k := rfl
 
-theorem jm_deriv (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) (c d : Fin n) :
-    ∀ (j : ℕ) (α : Fin j → Fin n × Fin n), E c d * jmW E α - jmW E α * E c d =
-      ∑ i, ((if d = (α i).1 then jmW E (Function.update α i (c, (α i).2)) else 0) -
-        (if (α i).2 = c then jmW E (Function.update α i ((α i).1, d)) else 0)) := by
+theorem jm_deriv (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) (c d : Fin n)
+    : ∀ (j : ℕ) (α : Fin j → Fin n × Fin n),
+      E c d * jmW E α - jmW E α * E c d
+        = ∑ i, ((if d = (α i).1 then jmW E (Function.update α i (c, (α i).2)) else 0) -
+            (if (α i).2 = c then jmW E (Function.update α i ((α i).1, d)) else 0)) := by
   intro j
   induction j with
   | zero => intro α; simp [jmW_zero]
   | succ j ih =>
     intro α
     rw [Fin.sum_univ_castSucc]
-    simp only [jmW_succ E, Fin.init_update_last, Fin.init_update_castSucc, update_castSucc_apply_last, Function.update_self]
+    simp only [jmW_succ E, Fin.init_update_last, Fin.init_update_castSucc,
+      update_castSucc_apply_last, Function.update_self]
     have hrel := hE c d (α (Fin.last j)).1 (α (Fin.last j)).2
-    have key : ∀ A B : Module.End ℂ V,
-        E c d * (A * B) - A * B * E c d = (E c d * A - A * E c d) * B + A * (E c d * B - B * E c d) := by
+    have key
+        : ∀ A B : Module.End ℂ V,
+          E c d * (A * B) - A * B * E c d
+            = (E c d * A - A * E c d) * B + A * (E c d * B - B * E c d) := by
       intro A B; noncomm_ring
     rw [key, hrel, ih (Fin.init α)]
-    simp only [Finset.mul_sum, mul_sub, sub_mul, mul_ite, ite_mul, mul_zero, zero_mul, fin_castSucc_apply_eq_init]
+    simp only [Finset.mul_sum, mul_sub, sub_mul, mul_ite, ite_mul, mul_zero, zero_mul,
+      fin_castSucc_apply_eq_init]
     clear ih hrel key hE
     abel
 
-theorem jm_thetaA_apply (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (F : Arr V n j) :
-    thetaA E j F = ∑ α, jmW E α (F α) := by
+theorem jm_thetaA_apply (E : Fin n → Fin n → Module.End ℂ V) {j : ℕ} (F : Arr V n j)
+    : thetaA E j F = ∑ α, jmW E α (F α) := by
   simp [thetaA, jmW, arrOf]
 
 private lemma sum_eq_sum_update_involutive {X M : Type*} [Fintype X] [DecidableEq X] [AddCommMonoid M] {j : ℕ}
@@ -124,8 +140,9 @@ private lemma sum_jmW_slotE_eq_sum_sub (E : Fin n → Fin n → Module.End ℂ V
       simp [hb, hβ]
     · simp [hb, h, Equiv.swap_apply_eq_iff]
 
-theorem jm_theta_equiv (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) {j : ℕ} (c d : Fin n)
-    (F : Arr V n j) : thetaA E j (arrE E j c d F) = E c d (thetaA E j F) := by
+theorem jm_theta_equiv
+    (E : Fin n → Fin n → Module.End ℂ V) (hE : GlRel E) {j : ℕ} (c d : Fin n) (F : Arr V n j)
+    : thetaA E j (arrE E j c d F) = E c d (thetaA E j F) := by
   rw [jm_thetaA_apply, jm_thetaA_apply]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [jm_arrE_apply, map_add (f := _), map_sum, Finset.sum_add_distrib]
@@ -145,18 +162,21 @@ section Transfer
 variable {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] {n : ℕ}
 
 def mapArr (ι : V →ₗ[ℂ] V') (n j : ℕ) : Arr V n j →ₗ[ℂ] Arr V' n j :=
-  arrTo V' n j ∘ₗ (LinearMap.pi fun α : Fin j → Fin n × Fin n =>
-    ι ∘ₗ LinearMap.proj (R := ℂ) (φ := fun _ : Fin j → Fin n × Fin n => V) α) ∘ₗ arrOf V n j
+  arrTo V' n j
+    ∘ₗ (LinearMap.pi fun α : Fin j → Fin n × Fin n =>
+      ι ∘ₗ LinearMap.proj (R := ℂ) (φ := fun _ : Fin j → Fin n × Fin n => V) α)
+    ∘ₗ arrOf V n j
 
-theorem mapArr_apply (ι : V →ₗ[ℂ] V') {j : ℕ} (F : Arr V n j) (α : Fin j → Fin n × Fin n) :
-    mapArr ι n j F α = ι (F α) := by
+theorem mapArr_apply (ι : V →ₗ[ℂ] V') {j : ℕ} (F : Arr V n j) (α : Fin j → Fin n × Fin n)
+    : mapArr ι n j F α = ι (F α) := by
   simp [mapArr, arrTo, arrOf]
 
-variable (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (E' : Fin n → Fin n → Module.End ℂ V')
+variable
+  (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (E' : Fin n → Fin n → Module.End ℂ V')
   (ι : V →ₗ[ℂ] V') (u : V)
 
-theorem kSpan_map (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x)) :
-    kSpan ε E' (ι u) = (kSpan ε E u).map ι := by
+theorem kSpan_map (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
+    : kSpan ε E' (ι u) = (kSpan ε E u).map ι := by
   apply le_antisymm
   · apply compactSpan_le_of_mem ε E' (Submodule.mem_map_of_mem (mem_compactSpan_self ε E u))
     intro c d hcd y hy
@@ -180,8 +200,8 @@ private lemma mem_arrV0_iff_forall_mem_kSpan {W : Type} [AddCommGroup W] [Module
   simp only [arrV0, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.comp_apply, LinearMap.proj_apply]
   rfl
 
-theorem val_mem {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) (α : Fin j → Fin n × Fin n) :
-    F α ∈ kSpan ε E u := by
+theorem val_mem {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) (α : Fin j → Fin n × Fin n)
+    : F α ∈ kSpan ε E u := by
   have h := (mem_arrV0_iff_forall_mem_kSpan ε E u F).mp hF α
   by_cases hc : ∀ i, ε (α i).1 ≠ ε (α i).2
   · rwa [if_pos hc] at h
@@ -189,8 +209,10 @@ theorem val_mem {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) (α : Fin 
     rw [h]
     exact Submodule.zero_mem _
 
-theorem mapArr_mem (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
-    {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) : mapArr ι n j F ∈ arrV0 ε E' (ι u) j := by
+theorem mapArr_mem
+    (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
+    {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j)
+    : mapArr ι n j F ∈ arrV0 ε E' (ι u) j := by
   rw [mem_arrV0_iff_forall_mem_kSpan] at hF ⊢
   intro α
   rw [mapArr_apply]
@@ -202,9 +224,11 @@ theorem mapArr_mem (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E
   · rw [if_neg hc, Submodule.mem_bot] at h ⊢
     rw [h, map_zero]
 
-theorem mapArr_arrE (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
-    {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j) (c d : Fin n) (hcd : ε c = ε d) :
-    mapArr ι n j (arrE E j c d F) = arrE E' j c d (mapArr ι n j F) := by
+theorem mapArr_arrE
+    (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
+    {j : ℕ} (F : Arr V n j) (hF : F ∈ arrV0 ε E u j)
+    (c d : Fin n) (hcd : ε c = ε d)
+    : mapArr ι n j (arrE E j c d F) = arrE E' j c d (mapArr ι n j F) := by
   refine PiLp.ext (fun α => ?_)
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [mapArr_apply, jm_arrE_apply, map_add (f := _), map_sum]
@@ -214,19 +238,19 @@ theorem mapArr_arrE (hι : ∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (
   rw [jm_positionE_apply, jm_positionE_apply, map_sub]
   split_ifs <;> simp [mapArr_apply]
 
-theorem mapArr_perm {j : ℕ} (F : Arr V n j) (s : Equiv.Perm (Fin j)) :
-    mapArr ι n j (permArr V n s F) = permArr V' n s (mapArr ι n j F) := by
+theorem mapArr_perm {j : ℕ} (F : Arr V n j) (s : Equiv.Perm (Fin j))
+    : mapArr ι n j (permArr V n s F) = permArr V' n s (mapArr ι n j F) := by
   refine PiLp.ext (fun α => ?_)
   simp [mapArr_apply, permArr, arrTo, arrOf]
 
-theorem at1_sliceLin {j : ℕ} (F : Arr V n (j + 1)) (α' : Fin j → Fin n × Fin n) (a b : Fin n) :
-    at1 (sliceLin V n α' F) a b = F (Fin.cons (a, b) α') := by
+theorem at1_sliceLin {j : ℕ} (F : Arr V n (j + 1)) (α' : Fin j → Fin n × Fin n) (a b : Fin n)
+    : at1 (sliceLin V n α' F) a b = F (Fin.cons (a, b) α') := by
   simp [at1, sliceLin, arrTo, arrOf]
 
-theorem theta_slices {j : ℕ} (F : Arr V n (j + 1)) :
-    thetaA E' (j + 1) (mapArr ι n (j + 1) F) =
-      ∑ α' : Fin j → Fin n × Fin n, ew E' (List.ofFn α').reverse
-        (∑ a, ∑ b, E' a b (ι (at1 (sliceLin V n α' F) a b))) := by
+theorem theta_slices {j : ℕ} (F : Arr V n (j + 1))
+    : thetaA E' (j + 1) (mapArr ι n (j + 1) F)
+      = ∑ α' : Fin j → Fin n × Fin n, ew E' (List.ofFn α').reverse
+          (∑ a, ∑ b, E' a b (ι (at1 (sliceLin V n α' F) a b))) := by
   rw [jm_thetaA_apply]
   simp only [mapArr_apply]
   rw [← (Fin.consEquiv fun _ => Fin n × Fin n).sum_comp, Fintype.sum_prod_type, Finset.sum_comm]
@@ -240,8 +264,8 @@ theorem theta_slices {j : ℕ} (F : Arr V n (j + 1)) :
   rw [at1_sliceLin]
   simp [jmW, List.ofFn_succ, jm_ew_append, ew, Fin.consEquiv]
 
-theorem ew_mem_pfil (hE : GlRel E) (x : V) (hx : x ∈ kSpan ε E u) (w : List (Fin n × Fin n)) :
-    ew E w x ∈ pfil ε E u w.length := by
+theorem ew_mem_pfil (hE : GlRel E) (x : V) (hx : x ∈ kSpan ε E u) (w : List (Fin n × Fin n))
+    : ew E w x ∈ pfil ε E u w.length := by
   have hp := pfilFacts V n ε E u hE
   induction w with
   | nil =>
@@ -254,10 +278,23 @@ theorem ew_mem_pfil (hE : GlRel E) (x : V) (hx : x ∈ kSpan ε E u) (w : List (
 
 end Transfer
 
-theorem uniqAlg : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V), GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u) → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g → ∀ (V' : Type) [AddCommGroup V'] [Module ℂ V'] (E' : Fin n → Fin n → Module.End ℂ V') (ι : V →ₗ[ℂ] V') (ev : V' →ₗ[ℂ] V), GlRel E' → (∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x)) → (∀ y, ev y ∈ kSpan ε E u) → (∀ c d, ε c = ε d → ∀ y, ev (E' c d y) = E c d (ev y)) → (∀ G ∈ Vminus ε E (LamOf ε lam) u, ∑ a, ∑ b, E' a b (ι (at1 G a b)) = 0) → (∀ x ∈ kSpan ε E u, ev (ι x) = 0) → ∀ (w : List (Fin n × Fin n)), ∀ x ∈ kSpan ε E u, ev (ew E' w (ι x)) = 0 := by
+theorem uniqAlg
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ V) (lam : Fin n → ℝ) (g : ℝ) (u : V),
+      GlRel E → IsUnitary ε E → KHighest ε E (LamOf ε lam) u → FiniteDimensional ℂ (kSpan ε E u)
+        → (∀ a b : Fin n, a < b → ε a ≠ ε b → g ≤ lam a - lam b) → 2 * (n : ℝ) < g
+        → ∀ (V' : Type) [AddCommGroup V'] [Module ℂ V'] (E' : Fin n → Fin n → Module.End ℂ V')
+            (ι : V →ₗ[ℂ] V') (ev : V' →ₗ[ℂ] V),
+          GlRel E' → (∀ c d, ε c = ε d → ∀ x ∈ kSpan ε E u, ι (E c d x) = E' c d (ι x))
+            → (∀ y, ev y ∈ kSpan ε E u) → (∀ c d, ε c = ε d → ∀ y, ev (E' c d y) = E c d (ev y))
+            → (∀ G ∈ Vminus ε E (LamOf ε lam) u, ∑ a, ∑ b, E' a b (ι (at1 G a b)) = 0)
+            → (∀ x ∈ kSpan ε E u, ev (ι x) = 0)
+            → ∀ (w : List (Fin n × Fin n)), ∀ x ∈ kSpan ε E u, ev (ew E' w (ι x)) = 0 := by
   intro V _ _ n ε E lam g u hE hU hK hfd hgap hg V' _ _ E' ι ev hE' hι hev hevE hVm hevι
-  have hPf : ∀ k : ℕ, (∀ m ≤ k, ∀ F ∈ arrV0 ε E u m, ev (thetaA E' m (mapArr ι n m F)) = 0) →
-      ∀ y ∈ pfil ε E' (ι u) k, ev y = 0 := by
+  have hPf
+      : ∀ k : ℕ,
+        (∀ m ≤ k, ∀ F ∈ arrV0 ε E u m, ev (thetaA E' m (mapArr ι n m F)) = 0)
+          → ∀ y ∈ pfil ε E' (ι u) k, ev y = 0 := by
     intro k hD
     intro y hy
     have hle : pfil ε E' (ι u) k ≤ LinearMap.ker ev := by
@@ -304,8 +341,8 @@ theorem uniqAlg : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V
         intro F hF
         have hC : ∀ y ∈ pfil ε E' (ι u) j, ev y = 0 :=
           hPf j (fun m hm => ih m (Nat.lt_succ_of_le hm))
-        refine GlobalTheory.T.symmetric_kMap_eq_zero_of_vminus_slices V n ε E lam g u j hE hU hK hfd hgap hg
-          (ev ∘ₗ thetaA E' (j + 1) ∘ₗ mapArr ι n (j + 1)) ?_ ?_ ?_ ?_ F hF
+        refine GlobalTheory.T.symmetric_kMap_eq_zero_of_vminus_slices V n ε E lam g u j hE hU hK hfd
+          hgap hg (ev ∘ₗ thetaA E' (j + 1) ∘ₗ mapArr ι n (j + 1)) ?_ ?_ ?_ ?_ F hF
         · intro G _
           exact hev _
         · intro c d hcd G hG
@@ -323,7 +360,6 @@ theorem uniqAlg : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V
   have hx' : ι x ∈ kSpan ε E' (ι u) := by
     rw [kSpan_map ε E E' ι u hι]
     exact Submodule.mem_map_of_mem hx
-  exact hPf w.length (fun m _ => hD m) _
-    (ew_mem_pfil ε E' (ι u) hE' (ι x) hx' w)
+  exact hPf w.length (fun m _ => hD m) _ (ew_mem_pfil ε E' (ι u) hE' (ι x) hx' w)
 
 end GlobalTheory.Jet.UniqAlg

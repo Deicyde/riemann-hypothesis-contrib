@@ -44,13 +44,13 @@ theorem SpanningExtension.proof : SpanningExtension.Statement := by
   · let f : ι ⊕ Fin (finrank ℝ V - Fintype.card ι) → b :=
       Sum.elim (fun i => ⟨v i, hsb (mem_range_self i)⟩) (fun j => ⟨w j, (hw_mem j).1⟩)
     have hf : Function.Injective f := by
-      rintro (i | j) (i' | j') h <;> simp only [f, Sum.elim_inl, Sum.elim_inr, Subtype.mk.injEq] at h
+      rintro (i | j) (i' | j') h
+        <;> simp only [f, Sum.elim_inl, Sum.elim_inr, Subtype.mk.injEq] at h
       · rw [hv.injective h]
       · exact absurd (h ▸ mem_range_self i) (hw_mem j').2
       · exact absurd (h ▸ mem_range_self i') (hw_mem j).2
       · rw [e.symm.injective (Subtype.ext h)]
-    have : Sum.elim v w = (fun x : b => (x : V)) ∘ f := by
-      funext x; rcases x with i | j <;> rfl
+    have : Sum.elim v w = (fun x : b => (x : V)) ∘ f := by funext x; rcases x with i | j <;> rfl
     rw [this]
     exact hbli.comp f hf
 

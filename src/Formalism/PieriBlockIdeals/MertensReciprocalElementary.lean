@@ -19,16 +19,15 @@ def ChebyshevThetaUpperBound : Prop := ∀ y : ℝ, 0 < y → ∑ p ∈ pr y, Re
 
 def MertensLogBound : Prop := ∀ y : ℝ, 1 < y → ∑ p ∈ pr y, Real.log (p : ℝ) / (p : ℝ) < Real.log y
 
-def MertensLogLowerBound : Prop := ∀ y : ℝ, 1 < y →
-  Real.log y - 1.34 - 1 / (2 * Real.log y) < ∑ p ∈ pr y, Real.log (p : ℝ) / (p : ℝ)
+def MertensLogLowerBound : Prop :=
+  ∀ y : ℝ, 1 < y → Real.log y - 1.34 - 1 / (2 * Real.log y) < ∑ p ∈ pr y, Real.log (p : ℝ) / (p : ℝ)
 
 def PrimeCountingBound : Prop := ∀ y : ℝ, 1 < y → ((pr y).card : ℝ) < 1.26 * y / Real.log y
 
-def MertensReciprocalBound : Prop := ∀ y : ℝ, 1 < y →
-  ∑ p ∈ pr y, 1 / (p : ℝ) < Real.log (Real.log y) + 0.27 + 1 / (Real.log y) ^ 2
+def MertensReciprocalBound : Prop :=
+  ∀ y : ℝ, 1 < y → ∑ p ∈ pr y, 1 / (p : ℝ) < Real.log (Real.log y) + 0.27 + 1 / (Real.log y) ^ 2
 
-def RS2' : Prop := ∀ y : ℝ, 1 < y →
-  ∑ p ∈ pr y, Real.log (p : ℝ) / ((p : ℝ) - 1) < Real.log y + 0.76
+def RS2' : Prop := ∀ y : ℝ, 1 < y → ∑ p ∈ pr y, Real.log (p : ℝ) / ((p : ℝ) - 1) < Real.log y + 0.76
 
 structure Par where
   k : ℕ
@@ -36,7 +35,6 @@ structure Par where
   t : ℕ
   f : ℕ
   n : ℕ
-
   Nr : ℕ
   L : ℝ
   x : ℝ
@@ -53,8 +51,8 @@ def w'' (P : Par) : ℝ := P.b' / (P.x * (P.n : ℝ))
 def N (P : Par) : ℝ := (P.k : ℝ) + (P.m : ℝ) * ((P.t : ℝ) + 1)
 
 def lstar (P : Par) : ℝ :=
-  (P.m : ℝ) * P.b /
-    ((P.n : ℝ) * (P.t : ℝ) ^ 2 * (P.N + (P.t : ℝ)) * P.L ^ 2
+  (P.m : ℝ) * P.b
+    / ((P.n : ℝ) * (P.t : ℝ) ^ 2 * (P.N + (P.t : ℝ)) * P.L ^ 2
       + (P.k : ℝ) * (P.n : ℝ) ^ 2 * (P.S + (P.t : ℝ) + P.L))
 
 def h (P : Par) : ℝ := P.b + P.S + P.η + (P.t : ℝ) + 1
@@ -67,8 +65,9 @@ def kmax (P : Par) : ℕ := ⌊2 * P.b / P.lstar⌋₊
 def kap (P : Par) (l : ℕ) : ℕ := ⌊P.h / ((l : ℝ) - 1)⌋₊
 
 def Excl (P : Par) (l : ℕ) : Prop :=
-  ∃ z : ℤ, P.b - ((P.t : ℝ) - 1) / 2 - (P.kmax : ℝ) ≤ (z : ℝ) ∧
-    (z : ℝ) ≤ P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ) ∧ (l : ℤ) ∣ z
+  ∃ z : ℤ,
+    P.b - ((P.t : ℝ) - 1) / 2 - (P.kmax : ℝ) ≤ (z : ℝ)
+      ∧ (z : ℝ) ≤ P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ) ∧ (l : ℤ) ∣ z
 
 structure Hyp (P : Par) : Prop where
   x_ge : 1 ≤ P.x
@@ -95,26 +94,29 @@ structure Large (P : Par) : Prop where
 
 end Par
 
-def Elem0 : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → P.Nr ≤ 2 * P.t ∧ 2 * P.lstar ≤ P.b ∧ P.h ≤ 2 * P.b
+def Elem0 : Prop := ∀ P : Par, P.Hyp → P.Large → P.Nr ≤ 2 * P.t ∧ 2 * P.lstar ≤ P.b ∧ P.h ≤ 2 * P.b
 
 def Elem_a : Prop :=
-  ∀ P : Par, P.Hyp → P.Large →
-    Real.log (3 * P.h) ≤ P.L + Real.log 6 ∧ P.L + Real.log 6 ≤ 2 * P.L ∧ P.lJ ≤ P.b
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → Real.log (3 * P.h) ≤ P.L + Real.log 6 ∧ P.L + Real.log 6 ≤ 2 * P.L ∧ P.lJ ≤ P.b
 
-def Elem_b : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → P.L * P.lstar ≤ P.lJ ∧ P.lstar + 1 < P.L * P.lstar
+def Elem_b : Prop := ∀ P : Par, P.Hyp → P.Large → P.L * P.lstar ≤ P.lJ ∧ P.lstar + 1 < P.L * P.lstar
 
 def Elem_c : Prop :=
-  ∀ P : Par, P.Hyp → P.Large →
-    P.b / (4 * (P.k : ℝ) * (P.t : ℝ)) ≤ P.lJ ∧ 3 * P.b < P.lJ ^ 2 ∧ P.h + (P.Nr : ℝ) ≤ 3 * P.b ∧
-      P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ) ≤ 3 * P.b
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → P.b / (4 * (P.k : ℝ) * (P.t : ℝ)) ≤ P.lJ ∧ 3 * P.b < P.lJ ^ 2 ∧ P.h + (P.Nr : ℝ) ≤ 3 * P.b
+        ∧ P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ) ≤ 3 * P.b
 
 def Elem_d : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ l : ℕ, P.lJ < (l : ℝ) →
-    P.lstar ≤ (l : ℝ) - 1 ∧ (P.kap l : ℝ) ≤ 2 * P.b / P.lstar ∧ P.kap l ≤ P.kmax ∧
-      P.t + 2 * P.kap l < l ∧ P.η + (P.t : ℝ) + (P.kap l : ℝ) < (l : ℝ) ∧ P.Nr + 1 < l ∧
-      P.S + (P.k : ℝ) < (l : ℝ) ∧ P.h + (P.Nr : ℝ) < (l : ℝ) ^ 2
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ l : ℕ,
+        P.lJ < (l : ℝ)
+          → P.lstar ≤ (l : ℝ) - 1 ∧ (P.kap l : ℝ) ≤ 2 * P.b / P.lstar ∧ P.kap l ≤ P.kmax
+            ∧ P.t + 2 * P.kap l < l ∧ P.η + (P.t : ℝ) + (P.kap l : ℝ) < (l : ℝ) ∧ P.Nr + 1 < l
+            ∧ P.S + (P.k : ℝ) < (l : ℝ) ∧ P.h + (P.Nr : ℝ) < (l : ℝ) ^ 2
 
 def Elem_e : Prop := ∀ P : Par, P.Hyp → P.Large → 3 * P.b' < P.lJ
 
@@ -126,36 +128,44 @@ namespace Par
 def Thick (P : Par) (e : ℝ) : Prop := P.b ≤ e ∧ e ≤ P.b + P.η + 1
 
 def Top (P : Par) (e : ℝ) : Prop :=
-  ∃ bt : ℝ, P.b' ≤ bt ∧ bt ≤ P.b' * (1 + 1 / P.x ^ 2) ∧ bt + P.b' / P.x ≤ e ∧
-    e ≤ bt + P.b' / P.x + P.η
+  ∃ bt : ℝ,
+    P.b' ≤ bt ∧ bt ≤ P.b' * (1 + 1 / P.x ^ 2) ∧ bt + P.b' / P.x ≤ e ∧ e ≤ bt + P.b' / P.x + P.η
 
 def Thin (P : Par) (e : ℝ) : Prop := P.w'' ≤ e ∧ e ≤ P.w'' + P.η
 
 def Shape (P : Par) (U : Finset ℤ) (bot : ℤ) (c e : ℝ) (σ : ℤ) : Prop :=
-  (σ = 1 ∨ σ = -1) ∧ (σ : ℝ) * ((bot : ℝ) + ((P.t : ℝ) - 1) / 2 - c) = -e ∧
-    ∀ u ∈ U, u ∉ Finset.Icc bot (bot + (P.t : ℤ) - 1) →
-      (0 ≤ (σ : ℝ) * ((u : ℝ) - c) ∧ (σ : ℝ) * ((u : ℝ) - c) ≤ P.S) ∨
-      (2 * P.b / P.lstar + (P.t : ℝ) / 2 + 3 ≤ |(σ : ℝ) * ((u : ℝ) - c) + e| ∧
-        |(σ : ℝ) * ((u : ℝ) - c) + e| ≤ P.η)
+  (σ = 1 ∨ σ = -1) ∧ (σ : ℝ) * ((bot : ℝ) + ((P.t : ℝ) - 1) / 2 - c) = -e
+    ∧ ∀ u ∈ U,
+      u ∉ Finset.Icc bot (bot + (P.t : ℤ) - 1)
+        → (0 ≤ (σ : ℝ) * ((u : ℝ) - c) ∧ (σ : ℝ) * ((u : ℝ) - c) ≤ P.S)
+          ∨ (2 * P.b / P.lstar + (P.t : ℝ) / 2 + 3 ≤ |(σ : ℝ) * ((u : ℝ) - c) + e|
+            ∧ |(σ : ℝ) * ((u : ℝ) - c) + e| ≤ P.η)
 
 end Par
 
 def NoResidueInWindow : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ l : ℕ, l.Prime → P.lJ < (l : ℝ) →
-    ∀ (U : Finset ℤ) (bot : ℤ) (c e : ℝ) (σ : ℤ), P.Shape U bot c e σ →
-      ((P.Thick e ∧ ¬ P.Excl l) ∨ P.Top e ∨ P.Thin e) →
-      mwCount l bot P.t (P.kap l) U = 0
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ l : ℕ,
+        l.Prime → P.lJ < (l : ℝ)
+          → ∀ (U : Finset ℤ) (bot : ℤ) (c e : ℝ) (σ : ℤ),
+            P.Shape U bot c e σ → ((P.Thick e ∧ ¬ P.Excl l) ∨ P.Top e ∨ P.Thin e)
+              → mwCount l bot P.t (P.kap l) U = 0
 
 def ExceptionalRange : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ z : ℤ,
-    P.b - ((P.t : ℝ) - 1) / 2 - (P.kmax : ℝ) ≤ (z : ℝ) →
-    (z : ℝ) ≤ P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ) →
-    0 < z ∧ (z : ℝ) < P.lJ ^ 2
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ z : ℤ,
+        P.b - ((P.t : ℝ) - 1) / 2 - (P.kmax : ℝ) ≤ (z : ℝ)
+          → (z : ℝ) ≤ P.b + P.S + P.η + 1 + ((P.t : ℝ) - 1) / 2 + (P.kmax : ℝ)
+          → 0 < z ∧ (z : ℝ) < P.lJ ^ 2
 
 def ExceptionalCount : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ Q : Finset ℕ,
-    (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ P.Excl l) →
-    (Q.card : ℝ) ≤ P.S + P.η + (P.t : ℝ) + 2 * (P.kmax : ℝ) + 1
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ Q : Finset ℕ,
+        (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ P.Excl l)
+          → (Q.card : ℝ) ≤ P.S + P.η + (P.t : ℝ) + 2 * (P.kmax : ℝ) + 1
 
 structure SizeData₂ (ι : Type) where
   T2 : Finset ι
@@ -177,49 +187,58 @@ namespace SizeData₂
 variable {ι : Type}
 
 def depth (D : SizeData₂ ι) (P : Par) (τ : ι) (l : ℕ) : ℝ :=
-  (D.q τ : ℝ) * P.h
-    + ((l : ℝ) * (D.mwF τ l : ℝ) + (D.mw τ l : ℝ)) * ((P.t : ℝ) + 2 * (P.kap l : ℝ))
+  (D.q τ : ℝ) * P.h + ((l : ℝ) * (D.mwF τ l : ℝ) + (D.mw τ l : ℝ)) * ((P.t : ℝ) + 2 * (P.kap l : ℝ))
 
 def cW (D : SizeData₂ ι) (P : Par) (τ : ι) (l : ℕ) : ℝ :=
-  ((D.q τ : ℝ) + 2 * (D.j τ : ℝ)) * ((P.h + (P.Nr : ℝ)) / ((l : ℝ) - 1) + 6)
-    + (D.ecl τ l : ℝ)
+  ((D.q τ : ℝ) + 2 * (D.j τ : ℝ)) * ((P.h + (P.Nr : ℝ)) / ((l : ℝ) - 1) + 6) + (D.ecl τ l : ℝ)
     + (P.k : ℝ) * (P.S / (l : ℝ) + IlInd l (D.xlo τ) (D.xhi τ) (D.maxB τ))
     + (if ((d0 l (D.xlo τ - D.maxB τ) : ℕ) : ℤ) < D.xlo τ - D.maxB τ then
-        min (min (P.k : ℝ) (P.t : ℝ)) (D.depth P τ l / (d0 l (D.xlo τ - D.maxB τ) : ℝ)) else 0)
+         min (min (P.k : ℝ) (P.t : ℝ)) (D.depth P τ l / (d0 l (D.xlo τ - D.maxB τ) : ℝ))
+       else
+         0)
     + (D.depth P τ l / (l : ℝ)) * (1 + max 0 (Real.log (P.h / (l : ℝ))))
 
 def BoundA [Fintype ι] (D : SizeData₂ ι) (P : Par) : Prop :=
   ∀ l : ℕ, l.Prime → ((l : ℝ) ≤ P.lJ ∨ P.Excl l ∨ l ∈ D.Sp) → D.J l ≤ ∑ τ, D.ex τ l
 
 def BoundW [Fintype ι] (D : SizeData₂ ι) (P : Par) : Prop :=
-  ∀ l : ℕ, l.Prime → P.lJ < (l : ℝ) → ¬ P.Excl l → l ∉ D.Sp →
-    P.h + (P.Nr : ℝ) < (l : ℝ) ^ 2 → P.Nr + 1 < l → P.t + 2 * P.kap l < l →
-    (D.J l : ℝ) ≤ ∑ τ, (if τ ∈ D.T2 then min (D.ex τ l : ℝ) (D.cW P τ l) else (D.ex τ l : ℝ))
+  ∀ l : ℕ,
+    l.Prime → P.lJ < (l : ℝ) → ¬ P.Excl l → l ∉ D.Sp → P.h + (P.Nr : ℝ) < (l : ℝ) ^ 2 → P.Nr + 1 < l
+      → P.t + 2 * P.kap l < l
+      → (D.J l : ℝ) ≤ ∑ τ, (if τ ∈ D.T2 then min (D.ex τ l : ℝ) (D.cW P τ l) else (D.ex τ l : ℝ))
 
 def ThinA (D : SizeData₂ ι) (P : Par) : Prop :=
-  ∀ τ, τ ∉ D.T2 → ∀ l : ℕ, l.Prime →
-    (D.hw τ < (l : ℝ) → D.ex τ l = 0) ∧
-    ((l : ℝ) ≤ D.hw τ → (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ (P.Nr.choose 2 : ℝ) * Real.log (D.hw τ))
+  ∀ τ,
+    τ ∉ D.T2
+      → ∀ l : ℕ,
+        l.Prime
+          → (D.hw τ < (l : ℝ) → D.ex τ l = 0)
+            ∧ ((l : ℝ) ≤ D.hw τ
+              → (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ (P.Nr.choose 2 : ℝ) * Real.log (D.hw τ))
 
 def ThickA (D : SizeData₂ ι) (P : Par) : Prop :=
-  ∀ τ ∈ D.T2, ∀ l : ℕ, l.Prime →
-    (P.h < (l : ℝ) → D.ex τ l = 0) ∧
-    (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ (P.Nr.choose 2 : ℝ) * Real.log P.h ∧
-    (2 * P.η + (P.t : ℝ) ≤ (l : ℝ) → (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤
-      (P.k : ℝ) * ((P.m : ℝ) + (P.t : ℝ)) * Real.log (3 * P.h)
-        + (P.k : ℝ) ^ 2 * Real.log (P.S + (P.k : ℝ)))
+  ∀ τ ∈ D.T2, ∀ l : ℕ,
+    l.Prime
+      → (P.h < (l : ℝ) → D.ex τ l = 0)
+        ∧ (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ (P.Nr.choose 2 : ℝ) * Real.log P.h
+        ∧ (2 * P.η + (P.t : ℝ) ≤ (l : ℝ)
+          → (D.ex τ l : ℝ) * Real.log (l : ℝ)
+            ≤ (P.k : ℝ) * ((P.m : ℝ) + (P.t : ℝ)) * Real.log (3 * P.h)
+              + (P.k : ℝ) ^ 2 * Real.log (P.S + (P.k : ℝ)))
 
 def CloudA (D : SizeData₂ ι) (P : Par) : Prop :=
   ∀ τ ∈ D.T2, ∀ l : ℕ, l.Prime → P.S + (P.k : ℝ) < (l : ℝ) → D.ecl τ l = 0
 
 def ShapeT (D : SizeData₂ ι) (P : Par) : Prop :=
-  ∀ τ ∈ D.T2, 0 ≤ D.maxB τ ∧ D.maxB τ < D.xlo τ ∧ D.xlo τ ≤ D.xhi τ ∧ ((D.xhi τ : ℤ) : ℝ) ≤ P.h ∧
-    ((D.xhi τ - D.xlo τ : ℤ) : ℝ) ≤ P.S ∧ D.q τ + D.j τ ≤ P.m
+  ∀ τ ∈ D.T2,
+    0 ≤ D.maxB τ ∧ D.maxB τ < D.xlo τ ∧ D.xlo τ ≤ D.xhi τ ∧ ((D.xhi τ : ℤ) : ℝ) ≤ P.h
+      ∧ ((D.xhi τ - D.xlo τ : ℤ) : ℝ) ≤ P.S ∧ D.q τ + D.j τ ≤ P.m
 
 def Widths (D : SizeData₂ ι) (P : Par) : Prop :=
-  ∀ τ, τ ∉ D.T2 →
-    D.hw τ ≤ P.S + P.b' * (1 + 1 / P.x + 1 / P.x ^ 2) + P.η + ((P.t : ℝ) - 1) / 2 ∨
-    D.hw τ ≤ P.S + P.w'' + P.η + ((P.t : ℝ) - 1) / 2
+  ∀ τ,
+    τ ∉ D.T2
+      → D.hw τ ≤ P.S + P.b' * (1 + 1 / P.x + 1 / P.x ^ 2) + P.η + ((P.t : ℝ) - 1) / 2
+        ∨ D.hw τ ≤ P.S + P.w'' + P.η + ((P.t : ℝ) - 1) / 2
 
 def NoWindow (D : SizeData₂ ι) (P : Par) : Prop :=
   ∀ l : ℕ, l.Prime → P.lJ < (l : ℝ) → ¬ P.Excl l → ∀ τ, D.mw τ l = 0 ∧ D.mwF τ l = 0
@@ -259,38 +278,60 @@ def NoWindowOf : Prop :=
   ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) (D : SizeData₂ ι), Places D P → D.NoWindow P
 
 def SumA : Prop :=
-  PrimeCountingBound → ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) (D : SizeData₂ ι), D.ThinA P → D.Widths P →
-    ∀ τ, τ ∉ D.T2 → ∀ Q : Finset ℕ, (∀ l ∈ Q, l.Prime) →
-      ∑ l ∈ Q, (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 1.3 * (P.Nr : ℝ) ^ 2 * P.b'
+  PrimeCountingBound
+    → ∀ P : Par,
+      P.Hyp → P.Large
+        → ∀ (ι : Type) (D : SizeData₂ ι),
+          D.ThinA P → D.Widths P
+            → ∀ τ,
+              τ ∉ D.T2
+                → ∀ Q : Finset ℕ,
+                  (∀ l ∈ Q, l.Prime)
+                    → ∑ l ∈ Q, (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 1.3 * (P.Nr : ℝ) ^ 2 * P.b'
 
 def CostB : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι), Fintype.card ι = P.f →
-    D.ThinA P → D.ThickA P → D.Widths P → ∀ l : ℕ, l.Prime →
-      (∑ τ, (D.ex τ l : ℝ)) * Real.log (l : ℝ) ≤ (P.f : ℝ) * (P.Nr : ℝ) ^ 2 * P.L
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι),
+        Fintype.card ι = P.f → D.ThinA P → D.ThickA P → D.Widths P
+          → ∀ l : ℕ,
+            l.Prime → (∑ τ, (D.ex τ l : ℝ)) * Real.log (l : ℝ) ≤ (P.f : ℝ) * (P.Nr : ℝ) ^ 2 * P.L
 
 def TermC : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) (D : SizeData₂ ι), D.ThickA P →
-    ∀ τ ∈ D.T2, ∀ l : ℕ, l.Prime → (l : ℝ) ≤ P.lJ →
-      (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 2 * (P.m : ℝ) * P.b * P.L / (l : ℝ)
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ (ι : Type) (D : SizeData₂ ι),
+        D.ThickA P
+          → ∀ τ ∈ D.T2, ∀ l : ℕ,
+            l.Prime → (l : ℝ) ≤ P.lJ
+              → (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 2 * (P.m : ℝ) * P.b * P.L / (l : ℝ)
 
 def totalBound (P : Par) (T : ℕ) (X : ℝ) : ℝ :=
-  (T : ℝ) * (X + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2))
-    + 1.3 * (P.f : ℝ) * (P.Nr : ℝ) ^ 2 * P.b'
+  (T : ℝ) * (X + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2)) + 1.3 * (P.f : ℝ) * (P.Nr : ℝ) ^ 2 * P.b'
     + (P.S + P.η + (P.t : ℝ) + 2 * (P.kmax : ℝ) + 6) * (P.f : ℝ) * (P.Nr : ℝ) ^ 2 * P.L
 
 def TotalWeightBound : Prop :=
-  ChebyshevThetaUpperBound → MertensLogBound → RS2' → PrimeCountingBound → MertensReciprocalBound → ∀ P : Par, P.Hyp → P.Large →
-    ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι), D.Inputs P → D.NoWindow P →
-    ∀ Q : Finset ℕ, (∀ l ∈ Q, l.Prime) →
-      ∑ l ∈ Q, (D.J l : ℝ) * Real.log (l : ℝ) ≤ totalBound P D.T2.card (30 * (P.m : ℝ) * P.b * P.L ^ 2)
+  ChebyshevThetaUpperBound → MertensLogBound → RS2' → PrimeCountingBound → MertensReciprocalBound
+    → ∀ P : Par,
+      P.Hyp → P.Large
+        → ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι),
+          D.Inputs P → D.NoWindow P
+            → ∀ Q : Finset ℕ,
+              (∀ l ∈ Q, l.Prime)
+                → ∑ l ∈ Q, (D.J l : ℝ) * Real.log (l : ℝ)
+                  ≤ totalBound P D.T2.card (30 * (P.m : ℝ) * P.b * P.L ^ 2)
 
 def ShortPrimeSum : Prop :=
-  MertensLogBound → MertensLogLowerBound → ∀ P : Par, P.Hyp → P.Large → ∀ Q : Finset ℕ,
-    (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ (l : ℝ) ≤ P.h + (P.Nr : ℝ)) →
-    ∑ l ∈ Q, Real.log (l : ℝ) / (l : ℝ) ≤ Real.log ((P.h + (P.Nr : ℝ)) / P.lJ) + 2 ∧
-      Real.log ((P.h + (P.Nr : ℝ)) / P.lJ) ≤ Real.log (12 * (P.k : ℝ) * (P.t : ℝ))
+  MertensLogBound → MertensLogLowerBound
+    → ∀ P : Par,
+      P.Hyp → P.Large
+        → ∀ Q : Finset ℕ,
+          (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ (l : ℝ) ≤ P.h + (P.Nr : ℝ))
+            → ∑ l ∈ Q, Real.log (l : ℝ) / (l : ℝ) ≤ Real.log ((P.h + (P.Nr : ℝ)) / P.lJ) + 2
+              ∧ Real.log ((P.h + (P.Nr : ℝ)) / P.lJ) ≤ Real.log (12 * (P.k : ℝ) * (P.t : ℝ))
 
-def ConvolutionKernelIntegrable : Prop := ∀ y : ℝ, 0 ≤ y → ∑ p ∈ pr y, Real.log (p : ℝ) ≤ Real.log 4 * y
+def ConvolutionKernelIntegrable : Prop :=
+  ∀ y : ℝ, 0 ≤ y → ∑ p ∈ pr y, Real.log (p : ℝ) ≤ Real.log 4 * y
 
 def MertensLogElementary : Prop :=
   ∀ y : ℝ, 1 ≤ y → ∑ p ∈ pr y, Real.log (p : ℝ) / (p : ℝ) ≤ Real.log y + Real.log 4
@@ -298,25 +339,39 @@ def MertensLogElementary : Prop :=
 def MertensReciprocalElementary : Prop := ∀ y : ℝ, 1 ≤ y → ∑ p ∈ pr y, 1 / (p : ℝ) ≤ Real.log y
 
 def SumCE : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) (D : SizeData₂ ι), D.ThickA P →
-    ∀ τ ∈ D.T2, ∀ Q : Finset ℕ, (∀ l ∈ Q, l.Prime ∧ (l : ℝ) ≤ P.lJ) →
-      ∑ l ∈ Q, (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 2 * (P.m : ℝ) * P.b * P.L ^ 2
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ (ι : Type) (D : SizeData₂ ι),
+        D.ThickA P
+          → ∀ τ ∈ D.T2, ∀ Q : Finset ℕ,
+            (∀ l ∈ Q, l.Prime ∧ (l : ℝ) ≤ P.lJ)
+              → ∑ l ∈ Q, (D.ex τ l : ℝ) * Real.log (l : ℝ) ≤ 2 * (P.m : ℝ) * P.b * P.L ^ 2
 
 def SumDE : Prop :=
-  ∀ P : Par, P.Hyp → P.Large → ∀ (ι : Type) (D : SizeData₂ ι), D.ThickA P →
-    D.CloudA P → D.ShapeT P → D.NoWindow P →
-    ∀ τ ∈ D.T2, ∀ Q : Finset ℕ, (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ ¬ P.Excl l) →
-      ∑ l ∈ Q, min (D.ex τ l : ℝ) (D.cW P τ l) * Real.log (l : ℝ) ≤
-        (P.m : ℝ) * P.b * (12 * (P.L + 2.5) + 51 + 2 * (P.L + 2) ^ 2 + 2 * (P.L + 2) * (P.L + 2.5))
-          + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2) ∧
-      (P.m : ℝ) * P.b * (12 * (P.L + 2.5) + 51 + 2 * (P.L + 2) ^ 2 + 2 * (P.L + 2) * (P.L + 2.5))
-          + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2) ≤
-        18 * (P.m : ℝ) * P.b * P.L ^ 2 + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2)
+  ∀ P : Par,
+    P.Hyp → P.Large
+      → ∀ (ι : Type) (D : SizeData₂ ι),
+        D.ThickA P → D.CloudA P → D.ShapeT P → D.NoWindow P
+          → ∀ τ ∈ D.T2, ∀ Q : Finset ℕ,
+            (∀ l ∈ Q, l.Prime ∧ P.lJ < (l : ℝ) ∧ ¬ P.Excl l)
+              → ∑ l ∈ Q, min (D.ex τ l : ℝ) (D.cW P τ l) * Real.log (l : ℝ)
+                  ≤ (P.m : ℝ) * P.b
+                      * (12 * (P.L + 2.5) + 51 + 2 * (P.L + 2) ^ 2 + 2 * (P.L + 2) * (P.L + 2.5))
+                    + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2)
+                ∧ (P.m : ℝ) * P.b
+                      * (12 * (P.L + 2.5) + 51 + 2 * (P.L + 2) ^ 2 + 2 * (P.L + 2) * (P.L + 2.5))
+                    + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2)
+                  ≤ 18 * (P.m : ℝ) * P.b * P.L ^ 2 + 2 * (P.k : ℝ) * (P.S + 1) * (P.L + 2)
 
 def TotalElementary : Prop :=
-  PrimeCountingBound → ∀ P : Par, P.Hyp → P.Large →
-    ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι), D.Inputs P → D.NoWindow P →
-    ∀ Q : Finset ℕ, (∀ l ∈ Q, l.Prime) →
-      ∑ l ∈ Q, (D.J l : ℝ) * Real.log (l : ℝ) ≤ totalBound P D.T2.card (30 * (P.m : ℝ) * P.b * P.L ^ 2)
+  PrimeCountingBound
+    → ∀ P : Par,
+      P.Hyp → P.Large
+        → ∀ (ι : Type) [Fintype ι] (D : SizeData₂ ι),
+          D.Inputs P → D.NoWindow P
+            → ∀ Q : Finset ℕ,
+              (∀ l ∈ Q, l.Prime)
+                → ∑ l ∈ Q, (D.J l : ℝ) * Real.log (l : ℝ)
+                  ≤ totalBound P D.T2.card (30 * (P.m : ℝ) * P.b * P.L ^ 2)
 
 end Formalism.CohomologicalDescent.LogSmallConstantBounds

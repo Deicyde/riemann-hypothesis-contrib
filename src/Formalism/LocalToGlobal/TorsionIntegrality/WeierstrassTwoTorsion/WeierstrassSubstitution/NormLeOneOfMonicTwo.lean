@@ -22,14 +22,14 @@ variable {R : Type u} [CommRing R]
 theorem subst_neg_X (f : R⟦X⟧) : f.subst (-X : R⟦X⟧) = rescale (-1) f := by
   rw [PowerSeries.rescale_eq_subst, neg_one_smul]
 
-theorem coeff_subst_neg_X (f : R⟦X⟧) (n : ℕ) :
-    coeff n (f.subst (-X : R⟦X⟧)) = (-1) ^ n * coeff n f := by
+theorem coeff_subst_neg_X (f : R⟦X⟧) (n : ℕ)
+    : coeff n (f.subst (-X : R⟦X⟧)) = (-1) ^ n * coeff n f := by
   rw [subst_neg_X, PowerSeries.coeff_rescale]
 
 variable {K : Type u} [Field K] [CharZero K]
 
-theorem coeff_odd_eq_zero {f : K⟦X⟧} (h : f.subst (-X : K⟦X⟧) = f) {n : ℕ} (hn : Odd n) :
-    coeff n f = 0 := by
+theorem coeff_odd_eq_zero {f : K⟦X⟧} (h : f.subst (-X : K⟦X⟧) = f) {n : ℕ} (hn : Odd n)
+    : coeff n f = 0 := by
   have h1 := coeff_subst_neg_X f n
   rw [h, hn.neg_one_pow] at h1
   have h2 : (2 : K) * coeff n f = 0 := by linear_combination h1
@@ -41,7 +41,8 @@ section Ball
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
-theorem nadd {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) : ‖a + b‖ ≤ 1 := (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
+theorem nadd {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) : ‖a + b‖ ≤ 1 :=
+  (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
 
 theorem nneg {a : K} (ha : ‖a‖ ≤ 1) : ‖-a‖ ≤ 1 := by
   rw [norm_neg]
@@ -73,8 +74,8 @@ theorem nthree : ‖(3 : K)‖ ≤ 1 := by
   rw [h]
   exact nadd ntwo h1
 
-theorem norm_le_one_of_monic_two {y b c : K} (hb : ‖b‖ ≤ 1) (hc : ‖c‖ ≤ 1)
-    (h : y ^ 2 + b * y = c) : ‖y‖ ≤ 1 := by
+theorem norm_le_one_of_monic_two {y b c : K} (hb : ‖b‖ ≤ 1) (hc : ‖c‖ ≤ 1) (h : y ^ 2 + b * y = c)
+    : ‖y‖ ≤ 1 := by
   by_contra hy
   push_neg at hy
   have h2 : y ^ 2 = c + -(b * y) := by rw [← h]; ring
@@ -105,7 +106,8 @@ theorem two_curves_relation : BridgeTwoMore := by
     linear_combination hE
   refine ⟨hy, ?_, ?_⟩
   · have : W.b₂ / 12 - (xT + W.b₂ / 12) = -xT := by ring
-    rw [this]; exact nneg hx
+    rw [this]
+    exact nneg hx
   · rw [hkap]
     exact nsub (nadd (nadd (nmul nthree (npow hx 2)) (nmul (nmul ntwo h2') hx)) h4) (nmul h1 hy)
 
@@ -116,11 +118,13 @@ theorem flow_unique_integral : FlowUniqueZ.{u} := by
   have hR : ∀ (n : ℕ) (r : K), n ≠ 0 → (n : K) * r = 0 → r = 0 := fun n r hn h =>
     (mul_eq_zero.1 h).resolve_left (Nat.cast_ne_zero.2 hn)
   simp only [WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
-    WeierstrassCurve.map_a₄] at hx hy hx' hy'
+      WeierstrassCurve.map_a₄]
+    at hx hy hx' hy'
   have dx : PowerSeries.derivative (x - x') = 2 * (y - y') + C W.a₁ * (x - x') := by
     rw [map_sub, hx, hx']; ring
-  have dy : PowerSeries.derivative (y - y')
-      = (x - x') * (3 * (x + x') + 2 * C W.a₂) - C W.a₁ * (y - y') := by
+  have dy
+      : PowerSeries.derivative (y - y')
+        = (x - x') * (3 * (x + x') + 2 * C W.a₂) - C W.a₁ * (y - y') := by
     rw [map_sub, hy, hy']; ring
   have cx : constantCoeff (x - x') = 0 := by rw [map_sub, hx0, sub_self]
   have cy : constantCoeff (y - y') = 0 := by rw [map_sub, hy0, sub_self]
@@ -135,7 +139,9 @@ theorem flow_unique_integral : FlowUniqueZ.{u} := by
         exact dvd_add (Dvd.dvd.mul_left iy _) (Dvd.dvd.mul_left ix _)
       · rw [dy]
         exact dvd_sub (Dvd.dvd.mul_right ix _) (Dvd.dvd.mul_left iy _)
-  exact ⟨sub_eq_zero.1 (Nn.eq_zero_of_forall_X_pow_dvd fun n => (key n).1),
-    sub_eq_zero.1 (Nn.eq_zero_of_forall_X_pow_dvd fun n => (key n).2)⟩
+  exact ⟨
+    sub_eq_zero.1 (Nn.eq_zero_of_forall_X_pow_dvd fun n => (key n).1),
+    sub_eq_zero.1 (Nn.eq_zero_of_forall_X_pow_dvd fun n => (key n).2)
+  ⟩
 
 end Formalism.L2.Th1.A

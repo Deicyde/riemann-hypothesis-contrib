@@ -13,8 +13,9 @@ namespace Formalism.UG.P
 
 open Formalism.UG Formalism.UG.CS
 
-theorem class_injective_of_span_recovery (hSpanRecover : Formalism.UG.CS.SpanRecover)
-    (hGlobLatEquiv : Formalism.UG.CS.GlobLatEquiv) : Formalism.UG.CS.ClassInj := by
+theorem class_injective_of_span_recovery
+    (hSpanRecover : Formalism.UG.CS.SpanRecover) (hGlobLatEquiv : Formalism.UG.CS.GlobLatEquiv)
+    : Formalism.UG.CS.ClassInj := by
   intro F E _ _ _ _ _ n _ _ σ J Λ hfin hspan g g' γ hγ hlat
   set A := FiniteAdeleRing (𝓞 F) F with hA
   set L := latS (F := F) A (tensInt (F := F) A (intOE E) (intAd F)) Λ with hL
@@ -26,10 +27,12 @@ theorem class_injective_of_span_recovery (hSpanRecover : Formalism.UG.CS.SpanRec
   have hγm : (γA : Matrix n n (E ⊗[F] A)) = (γ : Matrix n n E).map (inclE (F := F) A) := rfl
   have hγU : γA ∈ UPts σ J A := by
     change cT (sigR σ A) (γA : Matrix n n (E ⊗[F] A)) * J.map (inclE (F := F) A)
-      * (γA : Matrix n n (E ⊗[F] A)) = J.map (inclE (F := F) A)
+        * (γA : Matrix n n (E ⊗[F] A))
+      = J.map (inclE (F := F) A)
     have h0 : cT (σ : E →+* E) (γ : Matrix n n E) * J * (γ : Matrix n n E) = J := hγ
-    have hc : cT (sigR σ A) (γA : Matrix n n (E ⊗[F] A))
-        = (cT (σ : E →+* E) (γ : Matrix n n E)).map (inclE (F := F) A) := by
+    have hc
+        : cT (sigR σ A) (γA : Matrix n n (E ⊗[F] A))
+          = (cT (σ : E →+* E) (γ : Matrix n n E)).map (inclE (F := F) A) := by
       ext i j
       simp [cT, hγm, hsig]
     rw [hc, hγm, ← Matrix.map_mul, ← Matrix.map_mul, h0]
@@ -38,9 +41,10 @@ theorem class_injective_of_span_recovery (hSpanRecover : Formalism.UG.CS.SpanRec
     have h1 := hGlobLatEquiv F E n Λ γ (g' : GL n (E ⊗[F] A)) 1 (one_mem _)
     rw [mul_one] at h1
     rw [h1, hlat]
-  have hR : ∀ u : n → E ⊗[F] A,
-      (((g : GL n (E ⊗[F] A))⁻¹ : GL n (E ⊗[F] A)) : Matrix n n _) *ᵥ u ∈ L ↔
-        (((γA * (g' : GL n (E ⊗[F] A)))⁻¹ : GL n (E ⊗[F] A)) : Matrix n n _) *ᵥ u ∈ L := by
+  have hR
+      : ∀ u : n → E ⊗[F] A,
+        (((g : GL n (E ⊗[F] A))⁻¹ : GL n (E ⊗[F] A)) : Matrix n n _) *ᵥ u ∈ L
+          ↔ (((γA * (g' : GL n (E ⊗[F] A)))⁻¹ : GL n (E ⊗[F] A)) : Matrix n n _) *ᵥ u ∈ L := by
     intro u
     have h1 := hSpanRecover F E n Λ hfin hspan (g : GL n (E ⊗[F] A)) u
     have h2 := hSpanRecover F E n Λ hfin hspan (γA * (g' : GL n (E ⊗[F] A))) u
@@ -51,10 +55,10 @@ theorem class_injective_of_span_recovery (hSpanRecover : Formalism.UG.CS.SpanRec
     intro x
     have h := hR (((γA * (g' : GL n (E ⊗[F] A)) : GL n (E ⊗[F] A)) : Matrix n n _) *ᵥ x)
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← Units.val_mul, ← Units.val_mul,
-      inv_mul_cancel, Units.val_one, Matrix.one_mulVec] at h
+        inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
+      at h
     exact h.symm
-  have hkU : k ∈ UPts σ J A :=
-    mul_mem (inv_mem g.2) (mul_mem hγU g'.2)
+  have hkU : k ∈ UPts σ J A := mul_mem (inv_mem g.2) (mul_mem hγU g'.2)
   rw [DoubleCoset.eq]
   refine ⟨⟨γA⁻¹, inv_mem hγU⟩, ?_, ⟨k, hkU⟩, ?_, ?_⟩
   · rw [Subgroup.mem_subgroupOf]

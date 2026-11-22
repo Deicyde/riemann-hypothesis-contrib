@@ -10,21 +10,30 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem ac_mul {G R : Type} [TopologicalSpace G] [CommRing R] {I : Ideal R} {f h : G → R}
-    (hf : AdicCont I f) (hh : AdicCont I h) : AdicCont I fun g => f g * h g := by
+private theorem ac_mul
+    {G R : Type} [TopologicalSpace G] [CommRing R]
+    {I : Ideal R} {f h : G → R} (hf : AdicCont I f) (hh : AdicCont I h)
+    : AdicCont I fun g => f g * h g := by
   intro N
   simpa only [map_mul] using (hf N).comp₂ (hh N) (· * ·)
 
-private theorem ac_add {G R : Type} [TopologicalSpace G] [CommRing R] {I : Ideal R} {f h : G → R}
-    (hf : AdicCont I f) (hh : AdicCont I h) : AdicCont I fun g => f g + h g := by
+private theorem ac_add
+    {G R : Type} [TopologicalSpace G] [CommRing R]
+    {I : Ideal R} {f h : G → R} (hf : AdicCont I f) (hh : AdicCont I h)
+    : AdicCont I fun g => f g + h g := by
   intro N
   simpa only [map_add (f := _)] using (hf N).comp₂ (hh N) (· + ·)
 
-private theorem ac_const {G R : Type} [TopologicalSpace G] [CommRing R] {I : Ideal R} (c : R) :
-    AdicCont I fun _ : G => c := fun _ => IsLocallyConstant.const _
+private theorem ac_const {G R : Type} [TopologicalSpace G] [CommRing R] {I : Ideal R} (c : R)
+    : AdicCont I fun _ : G => c := fun _ =>
+  IsLocallyConstant.const _
 
-private theorem ac_sum {G R ι : Type} [TopologicalSpace G] [CommRing R] {I : Ideal R} (s : Finset ι)
-    {f : ι → G → R} (hf : ∀ i, AdicCont I (f i)) : AdicCont I fun g => ∑ i ∈ s, f i g := by
+private theorem ac_sum
+    {G R ι : Type} [TopologicalSpace G] [CommRing R]
+    {I : Ideal R}
+    (s : Finset ι)
+    {f : ι → G → R} (hf : ∀ i, AdicCont I (f i))
+    : AdicCont I fun g => ∑ i ∈ s, f i g := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using ac_const (G := G) (I := I) 0
@@ -32,26 +41,36 @@ private theorem ac_sum {G R ι : Type} [TopologicalSpace G] [CommRing R] {I : Id
     simp only [Finset.sum_insert ha]
     exact ac_add (hf a) ih
 
-private theorem ac_map {G A R : Type} [TopologicalSpace G] [CommRing A] [CommRing R] (φ : A →+* R) (t : A)
-    {f : G → A} (hf : AdicCont (Ideal.span {t}) f) : AdicCont (Ideal.span {φ t}) fun g => φ (f g) := by
+private theorem ac_map
+    {G A R : Type} [TopologicalSpace G] [CommRing A] [CommRing R]
+    (φ : A →+* R)
+    (t : A)
+    {f : G → A} (hf : AdicCont (Ideal.span {t}) f)
+    : AdicCont (Ideal.span {φ t}) fun g => φ (f g) := by
   intro N
   have hle : (Ideal.span {t}) ^ N ≤ ((Ideal.span {φ t}) ^ N).comap φ := by
     rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow, Ideal.map_span, Set.image_singleton]
   have h := (hf N).comp (Ideal.quotientMap ((Ideal.span {φ t}) ^ N) φ hle)
   simpa [Function.comp_def, Ideal.quotientMap_mk] using h
 
-private theorem dd_sum {X ι Y : Type} [CommRing X] [AddCommMonoid Y] {g : ℕ} (p : DD X g → Y) (h0 : p 0 = 0)
-    (ha : ∀ x y, p (x + y) = p x + p y) (s : Finset ι) (f : ι → DD X g) : p (∑ i ∈ s, f i) = ∑ i ∈ s, p (f i) := by
+private theorem dd_sum
+    {X ι Y : Type} [CommRing X] [AddCommMonoid Y]
+    {g : ℕ} (p : DD X g → Y) (h0 : p 0 = 0) (ha : ∀ x y, p (x + y) = p x + p y)
+    (s : Finset ι) (f : ι → DD X g)
+    : p (∑ i ∈ s, f i) = ∑ i ∈ s, p (f i) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simpa using h0
   · intro i s hi ih
     rw [Finset.sum_insert hi, Finset.sum_insert hi, ha, ih]
 
-private theorem epM_entry {X : Type} [CommRing X] {g n : ℕ} (Z : Fin g → Matrix (Fin n) (Fin n) X) (a b : Fin n) :
-    DD.epM Z a b = ∑ j, DD.C (Z j a b) * (⟨0, Pi.single j 1, 0, 0⟩ : DD X g) := by
-  have hm : ∀ j, DD.C (Z j a b) * (⟨0, Pi.single j 1, 0, 0⟩ : DD X g)
-      = (⟨0, Pi.single j (Z j a b), 0, 0⟩ : DD X g) := by
+private theorem epM_entry
+    {X : Type} [CommRing X] {g n : ℕ} (Z : Fin g → Matrix (Fin n) (Fin n) X) (a b : Fin n)
+    : DD.epM Z a b = ∑ j, DD.C (Z j a b) * (⟨0, Pi.single j 1, 0, 0⟩ : DD X g) := by
+  have hm
+      : ∀ j,
+        DD.C (Z j a b) * (⟨0, Pi.single j 1, 0, 0⟩ : DD X g)
+          = (⟨0, Pi.single j (Z j a b), 0, 0⟩ : DD X g) := by
     intro j
     apply DD.ext
     · show Z j a b * 0 = 0
@@ -80,20 +99,23 @@ private theorem epM_entry {X : Type} [CommRing X] {g n : ℕ} (Z : Fin g → Mat
   · rw [dd_sum (fun x : DD X g => x.eta) rfl (fun _ _ => rfl)]
     simp [DD.epM]
 
-private noncomputable def ddLin (A : Type) [CommRing A] (g : ℕ) :
-    DD A g ≃ₗ[A] A × (Fin g → A) × (Fin g → A) × A :=
-  { DD.equiv with
-    map_add' := fun _ _ => rfl
-    map_smul' := fun c x => by
-      have hc : c • x = DD.C c * x := rfl
-      rw [hc]
-      ext <;> simp [DD.equiv] }
+private noncomputable def ddLin (A : Type) [CommRing A] (g : ℕ)
+    : DD A g ≃ₗ[A] A × (Fin g → A) × (Fin g → A) × A := {
+  DD.equiv with
+  map_add' := fun _ _ => rfl
+  map_smul' := fun c x => by
+    have hc : c • x = DD.C c * x := rfl
+    rw [hc]
+    ext <;> simp [DD.equiv]
+}
 
-private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K] : CharP K l := by
+private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [Algebra ℤ_[l] K]
+    : CharP K l := by
   have hl : (algebraMap ℤ_[l] K) (l : ℤ_[l]) = 0 := by
     by_contra hne
     have hinj : Function.Injective (algebraMap ℤ_[l] K) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro a ha
       by_contra ha0
       have hker : RingHom.ker (algebraMap ℤ_[l] K) ≠ ⊥ := by
@@ -116,8 +138,12 @@ private theorem charK (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [Finite K] [
     exact hl
   exact (CharP.charP_iff_prime_eq_zero (Fact.out : l.Prime)).mpr hK
 
-private theorem lc_zp {l : ℕ} [Fact l.Prime] {G R : Type} [TopologicalSpace G] [CommRing R] (φ : ℤ_[l] →+* R)
-    (hl : (l : R) = 0) {e : G → ℤ_[l]} (he : Continuous e) : IsLocallyConstant fun g => φ (e g) := by
+private theorem lc_zp
+    {l : ℕ} [Fact l.Prime]
+    {G R : Type} [TopologicalSpace G] [CommRing R]
+    (φ : ℤ_[l] →+* R) (hl : (l : R) = 0)
+    {e : G → ℤ_[l]} (he : Continuous e)
+    : IsLocallyConstant fun g => φ (e g) := by
   have hφ : IsLocallyConstant (φ : ℤ_[l] → R) := by
     rw [IsLocallyConstant.iff_eventually_eq]
     intro x
@@ -128,8 +154,10 @@ private theorem lc_zp {l : ℕ} [Fact l.Prime] {G R : Type} [TopologicalSpace G]
     rw [hy', map_add (f := _), map_mul, map_natCast, hl, zero_mul, add_zero]
   exact hφ.comp_continuous he
 
-theorem UpperTheory.V.Pa.Det.detFin :
-    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x) (S : Set F.G₀), PhiCond F.Γ l → Detects k S → ∃ T : Finset F.G₀, (T : Set F.G₀) ⊆ S ∧ Detects k (T : Set F.G₀) := by
+theorem UpperTheory.V.Pa.Det.detFin
+    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x) (S : Set F.G₀),
+      PhiCond F.Γ l → Detects k S
+        → ∃ T : Finset F.G₀, (T : Set F.G₀) ⊆ S ∧ Detects k (T : Set F.G₀) := by
   intro l _ F n x k S hΦ hdet
   classical
   haveI : CharP x.K l := charK l x.K
@@ -139,29 +167,31 @@ theorem UpperTheory.V.Pa.Det.detFin :
     isCompact_iff_compactSpace.mp (Subgroup.isClosed_of_isOpen _ F.η_open).isCompact
   let I : Ideal (DD x.A k.g) := Ideal.span {algebraMap x.A (DD x.A k.g) x.t}
   let χ : F.G₀ →* DD x.A k.g :=
-    (algebraMap x.A (DD x.A k.g)).toMonoidHom.comp ((algebraMap ℤ_[l] x.A).toMonoidHom.comp
-      ((Units.coeHom ℤ_[l]).comp (F.ε.comp F.η.ker.subtype)))
+    (algebraMap x.A (DD x.A k.g)).toMonoidHom.comp
+      ((algebraMap ℤ_[l] x.A).toMonoidHom.comp
+        ((Units.coeHom ℤ_[l]).comp (F.ε.comp F.η.ker.subtype)))
   let r : F.G₀ →* Matrix (Fin n) (Fin n) (DD x.A k.g) :=
     ⟨⟨k.ρ1 x.A, (Det.rho1Hom k x.A).1⟩, (Det.rho1Hom k x.A).2.1⟩
-  let Zb : Submodule x.A (F.G₀ → Matrix (Fin n) (Fin n) (DD x.A k.g)) :=
-    { carrier := {z | (∀ i j, AdicCont I fun g => z g i j) ∧ TwCoc (⇑χ) (⇑r) Set.univ z}
-      zero_mem' := by
-        refine ⟨fun _ _ => ac_const 0, fun g _ h _ => ?_⟩
-        simp
-      add_mem' := by
-        intro a b ha hb
-        refine ⟨fun i j => ac_add (ha.1 i j) (hb.1 i j), fun g _ h _ => ?_⟩
-        simp only [Pi.add_apply]
-        rw [ha.2 g trivial h trivial, hb.2 g trivial h trivial]
-        simp only [Matrix.mul_add, Matrix.add_mul, smul_add]
-        abel
-      smul_mem' := by
-        intro c z hz
-        refine ⟨fun i j => ?_, fun g _ h _ => ?_⟩
-        · have h := ac_mul (ac_const (G := F.G₀) (I := I) (algebraMap x.A (DD x.A k.g) c)) (hz.1 i j)
-          simpa [Algebra.smul_def] using h
-        · simp only [Pi.smul_apply]
-          rw [hz.2 g trivial h trivial, smul_add, Matrix.mul_smul, Matrix.smul_mul, smul_comm c (χ g)] }
+  let Zb : Submodule x.A (F.G₀ → Matrix (Fin n) (Fin n) (DD x.A k.g)) := {
+    carrier := {z | (∀ i j, AdicCont I fun g => z g i j) ∧ TwCoc (⇑χ) (⇑r) Set.univ z}
+    zero_mem' := by
+      refine ⟨fun _ _ => ac_const 0, fun g _ h _ => ?_⟩
+      simp
+    add_mem' := by
+      intro a b ha hb
+      refine ⟨fun i j => ac_add (ha.1 i j) (hb.1 i j), fun g _ h _ => ?_⟩
+      simp only [Pi.add_apply]
+      rw [ha.2 g trivial h trivial, hb.2 g trivial h trivial]
+      simp only [Matrix.mul_add, Matrix.add_mul, smul_add]
+      abel
+    smul_mem' := by
+      intro c z hz
+      refine ⟨fun i j => ?_, fun g _ h _ => ?_⟩
+      · have h := ac_mul (ac_const (G := F.G₀) (I := I) (algebraMap x.A (DD x.A k.g) c)) (hz.1 i j)
+        simpa [Algebra.smul_def] using h
+      · simp only [Pi.smul_apply]
+        rw [hz.2 g trivial h trivial, smul_add, Matrix.mul_smul, Matrix.smul_mul, smul_comm c (χ g)]
+  }
   have hG : PhiCond F.G₀ l := Det.phiSub l F.η.ker F.η_open hΦ
   have he : Continuous fun g : F.G₀ => ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) :=
     Units.continuous_val.comp (F.ε_cont.comp continuous_subtype_val)
@@ -172,7 +202,8 @@ theorem UpperTheory.V.Pa.Det.detFin :
         CharP.cast_eq_zero, map_zero, map_zero]
     exact lc_zp ((Ideal.Quotient.mk _).comp (algebraMap ℤ_[l] x.A)) hl he
   have hχ : AdicCont I χ := ac_map (algebraMap x.A (DD x.A k.g)) x.t hA
-  have hE : ∀ a b, AdicCont I fun g => DD.epM (fun j => (k.κ j g).map (algebraMap x.A x.A)) a b := by
+  have hE
+      : ∀ a b, AdicCont I fun g => DD.epM (fun j => (k.κ j g).map (algebraMap x.A x.A)) a b := by
     intro a b
     simp_rw [epM_entry]
     refine ac_sum _ (fun j => ac_mul ?_ (ac_const _))
@@ -190,17 +221,21 @@ theorem UpperTheory.V.Pa.Det.detFin :
     exact ac_sum _ fun m => ac_mul (ac_add (ac_const _) (hE i m)) (hρ m j)
   have hFG : Zb.FG := Det.matFg l χ r Zb hG hχ hr (fun z hz => hz)
   let etaL : DD x.A k.g →ₗ[x.A] x.A :=
-    (LinearMap.snd x.A _ _).comp ((LinearMap.snd x.A _ _).comp
-      ((LinearMap.snd x.A _ _).comp (ddLin x.A k.g).toLinearMap))
+    (LinearMap.snd x.A _ _).comp
+      ((LinearMap.snd x.A _ _).comp ((LinearMap.snd x.A _ _).comp (ddLin x.A k.g).toLinearMap))
   let f : S → (F.G₀ → Matrix (Fin n) (Fin n) (DD x.A k.g)) →ₗ[x.A] x.A := fun σ =>
     etaL.comp ((Matrix.traceLinearMap (Fin n) x.A (DD x.A k.g)).comp
       ((LinearMap.mulRight x.A (k.ρ1 x.A σ)).comp (LinearMap.proj (σ : F.G₀))))
   let B : Submodule x.A (F.G₀ → Matrix (Fin n) (Fin n) (DD x.A k.g)) := ⨅ σ : S, LinearMap.ker (f σ)
-  obtain ⟨T, hT⟩ := Det.finSub x.t Zb B f PowerSeries.X_irreducible hFG
-    (fun i b hb => LinearMap.mem_ker.mp ((Submodule.mem_iInf _).mp hb i))
-    (fun z _ hz => ⟨0, by
-      rw [pow_zero, one_smul]
-      exact (Submodule.mem_iInf _).mpr fun i => LinearMap.mem_ker.mpr (hz i)⟩)
+  obtain ⟨T, hT⟩ :=
+    Det.finSub x.t Zb B f PowerSeries.X_irreducible hFG
+      (fun i b hb => LinearMap.mem_ker.mp ((Submodule.mem_iInf _).mp hb i))
+      (fun z _ hz => ⟨
+        0,
+        by
+          rw [pow_zero, one_smul]
+          exact (Submodule.mem_iInf _).mpr fun i => LinearMap.mem_ker.mpr (hz i)
+      ⟩)
   refine ⟨T.map (Function.Embedding.subtype _), ?_, ?_⟩
   · intro σ hσ
     rw [Finset.coe_map, Set.mem_image] at hσ

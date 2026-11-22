@@ -7,11 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.InfPow
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pFinToHecke_of :
-    UpperTheory.Gal.CertificateRingHomMap.FinToHecke := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pFinToHecke_of
+    : UpperTheory.Gal.CertificateRingHomMap.FinToHecke := by
   intro E _ _ ψ m ho hk
   obtain ⟨f, hf, hfe⟩ := exists_infPow_hom E m
   let p : Neutral.B1.Ideles E →* (Af E)ˣ :=

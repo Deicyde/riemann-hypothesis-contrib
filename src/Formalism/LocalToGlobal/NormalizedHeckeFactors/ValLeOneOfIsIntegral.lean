@@ -13,21 +13,35 @@ open scoped Pointwise
 namespace Formalism.L2.NR
 
 structure NRhoTied (D : D7) : Prop where
-  rbarSS : ∀ (σ : D.what₂.FT) (lam : D.what₂.places.Pl), (∃ a : D.nd.Loc, D.nd.w a = lam) →
-    Formalism.MainNotions.N.IsSSRep (D.ntypes.rbar σ lam)
-  rbar : ∀ (i : D.nd.Loc) (σ : D.what₂.FT), D.what₂.isot (D.nd.j i) σ ≠ ⊥ → D.nd.goodRow σ →
-    ∀ (Sig : List (Part D.naut.CG)) (ρ : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om →* GL (Fin D.R.r) (D.nd.O i)),
-      Formalism.MainNotions.N.HasParamW D.nd D.naut i σ Sig → Formalism.MainNotions.N.IsRepOfSig D.nd D.naut i Sig ρ →
-      ∀ g, (((D.ntypes.rbar σ (D.nd.w i) g : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly).map
-          (Formalism.MainNotions.N.fbCast (D.nd.w_l i) (D.what₂.places.resChar_prime (D.nd.w i)) (D.nd.lPrime i).out).toRingHom =
-        ((ρ g : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)).charpoly.map
-          ((D.naut.kFbar i).comp (IsLocalRing.residue (D.nd.O i)))
-  rhoS : ∀ (hP : RowPar D) (hG : GalRepEx D) (hC : ClassFieldHeckeAlgebraic D) (hη : EtaShiftInt D)
-    (a : D.nd.Loc) (s : D.ntw.Sig (D.ntw.twOf a)), D.ntw.side _ s = D.ntw.twSide a → D.ntw.jS _ s = D.nd.j a →
-    ∃ (σ : D.what₂.FT) (hσ : D.what₂.isot (D.nd.j a) σ ≠ ⊥) (hg : D.nd.goodRow σ),
-      ∀ (π : D.naut.CG D.R.r) (hS : rowSig D a σ = [⟨D.R.r, π, 1⟩]),
-        IsConjRep (Formalism.MainNotions.N.mapRep ((Formalism.MainNotions.N.iotaOQ D.nd D.naut a).comp (D.ntw.twist₂ a)) (D.ntw.rhoS _ s))
-          (rhoOfRow D hG hC hη a π (rowSig_csd_ralg D hP a σ hσ hg π hS).1 (rowSig_csd_ralg D hP a σ hσ hg π hS).2)
+  rbarSS
+    : ∀ (σ : D.what₂.FT) (lam : D.what₂.places.Pl),
+      (∃ a : D.nd.Loc, D.nd.w a = lam) → Formalism.MainNotions.N.IsSSRep (D.ntypes.rbar σ lam)
+  rbar
+    : ∀ (i : D.nd.Loc) (σ : D.what₂.FT),
+      D.what₂.isot (D.nd.j i) σ ≠ ⊥ → D.nd.goodRow σ
+        → ∀ (Sig : List (Part D.naut.CG))
+            (ρ : Formalism.ConjugateSelfDual.G D.host.E D.nd.Om →* GL (Fin D.R.r) (D.nd.O i)),
+          Formalism.MainNotions.N.HasParamW D.nd D.naut i σ Sig
+            → Formalism.MainNotions.N.IsRepOfSig D.nd D.naut i Sig ρ
+            → ∀ g,
+              (((D.ntypes.rbar σ (D.nd.w i) g : GL _ _)
+                    : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly).map
+                  (Formalism.MainNotions.N.fbCast (D.nd.w_l i)
+                    (D.what₂.places.resChar_prime (D.nd.w i)) (D.nd.lPrime i).out).toRingHom
+                = ((ρ g : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O i)).charpoly.map
+                  ((D.naut.kFbar i).comp (IsLocalRing.residue (D.nd.O i)))
+  rhoS
+    : ∀ (hP : RowPar D) (hG : GalRepEx D) (hC : ClassFieldHeckeAlgebraic D) (hη : EtaShiftInt D)
+        (a : D.nd.Loc) (s : D.ntw.Sig (D.ntw.twOf a)),
+      D.ntw.side _ s = D.ntw.twSide a → D.ntw.jS _ s = D.nd.j a
+        → ∃ (σ : D.what₂.FT) (hσ : D.what₂.isot (D.nd.j a) σ ≠ ⊥) (hg : D.nd.goodRow σ),
+          ∀ (π : D.naut.CG D.R.r) (hS : rowSig D a σ = [⟨D.R.r, π, 1⟩]),
+            IsConjRep
+              (Formalism.MainNotions.N.mapRep
+                ((Formalism.MainNotions.N.iotaOQ D.nd D.naut a).comp (D.ntw.twist₂ a))
+                (D.ntw.rhoS _ s))
+              (rhoOfRow D hG hC hη a π (rowSig_csd_ralg D hP a σ hσ hg π hS).1
+                (rowSig_csd_ralg D hP a σ hσ hg π hS).2)
 
 section transport
 
@@ -42,23 +56,26 @@ variable {K : Type} [Field K]
 theorem reverse_X_sub_C (μ : K) : (X - C μ : K[X]).reverse = 1 - C μ * X := by
   have h1 : (1 : K[X]).reverse = 1 := by simp only [reverse, natDegree_one, reflect_one, pow_zero]
   have hX : (X : K[X]).reverse = 1 := by simpa [h1] using reverse_X_mul (1 : K[X])
-  rw [sub_eq_add_neg, ← C_neg, reverse_add_C, hX, natDegree_X, pow_one, C_neg, neg_mul, ← sub_eq_add_neg]
+  rw [sub_eq_add_neg, ← C_neg, reverse_add_C, hX, natDegree_X, pow_one, C_neg, neg_mul,
+    ← sub_eq_add_neg]
 
-theorem reverse_prod_X_sub_C (s : Multiset K) :
-    (s.map fun μ => X - C μ).prod.reverse = (s.map fun μ => 1 - C μ * X).prod := by
+theorem reverse_prod_X_sub_C (s : Multiset K)
+    : (s.map fun μ => X - C μ).prod.reverse = (s.map fun μ => 1 - C μ * X).prod := by
   induction s using Multiset.induction_on with
-  | empty => simp only [Multiset.map_zero, Multiset.prod_zero, reverse, natDegree_one, reflect_one, pow_zero]
+  | empty =>
+    simp only [Multiset.map_zero, Multiset.prod_zero, reverse, natDegree_one, reflect_one, pow_zero]
   | cons a s ih =>
-    rw [Multiset.map_cons, Multiset.prod_cons, reverse_mul_of_domain, ih, reverse_X_sub_C, Multiset.map_cons,
-      Multiset.prod_cons]
+    rw [Multiset.map_cons, Multiset.prod_cons, reverse_mul_of_domain, ih, reverse_X_sub_C,
+      Multiset.map_cons, Multiset.prod_cons]
 
 theorem one_sub_C_mul_X (μ : K) (h : μ ≠ 0) : (1 - C μ * X : K[X]) = C (-μ) * (X - C μ⁻¹) := by
   rw [C_neg, neg_mul, mul_sub, ← C_mul, mul_inv_cancel₀ h, C_1]
   ring
 
-theorem charpoly_inv_of_eq {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (hM : IsUnit M) (s : Multiset K)
-    (hs : M.charpoly = (s.map fun μ => X - C μ).prod) :
-    (M⁻¹).charpoly = (s.map fun μ => X - C μ⁻¹).prod := by
+theorem charpoly_inv_of_eq
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (hM : IsUnit M)
+    (s : Multiset K) (hs : M.charpoly = (s.map fun μ => X - C μ).prod)
+    : (M⁻¹).charpoly = (s.map fun μ => X - C μ⁻¹).prod := by
   have hdet : M.det ≠ 0 := ((Matrix.isUnit_iff_isUnit_det M).mp hM).ne_zero
   set c : K := (s.map fun μ => -μ).prod with hc
   have hcoeff : M.charpoly.coeff 0 = c := by
@@ -89,27 +106,43 @@ theorem charpoly_inv_of_eq {n : ℕ} (M : Matrix (Fin n) (Fin n) K) (hM : IsUnit
   rw [Matrix.charpoly_inv M hM, hrev, Ring.inverse_eq_inv, hdetc, Fintype.card_fin]
   have hpm : ((-1 : K) ^ n) ≠ 0 := pow_ne_zero _ (neg_ne_zero.mpr one_ne_zero)
   have hscal : (-1 : K) ^ n * ((-1 : K) ^ n * c)⁻¹ * c = 1 := by
-    rw [mul_inv, show (-1 : K) ^ n * (((-1 : K) ^ n)⁻¹ * c⁻¹) * c = ((-1 : K) ^ n * ((-1 : K) ^ n)⁻¹) * (c⁻¹ * c) by ring,
+    rw [mul_inv,
+      show (-1 : K) ^ n * (((-1 : K) ^ n)⁻¹ * c⁻¹) * c
+          = ((-1 : K) ^ n * ((-1 : K) ^ n)⁻¹) * (c⁻¹ * c) by
+        ring,
       mul_inv_cancel₀ hpm, inv_mul_cancel₀ hc0, one_mul]
-  have key : (-1 : K[X]) ^ n * C (((-1 : K) ^ n * c)⁻¹) * (C c * (s.map fun μ => X - C μ⁻¹).prod) =
-      C ((-1 : K) ^ n * ((-1 : K) ^ n * c)⁻¹ * c) * (s.map fun μ => X - C μ⁻¹).prod := by
+  have key
+      : (-1 : K[X]) ^ n * C (((-1 : K) ^ n * c)⁻¹) * (C c * (s.map fun μ => X - C μ⁻¹).prod)
+        = C ((-1 : K) ^ n * ((-1 : K) ^ n * c)⁻¹ * c) * (s.map fun μ => X - C μ⁻¹).prod := by
     rw [map_mul, map_mul, map_pow, map_neg, C_1]
     ring
   rw [key, hscal, C_1, one_mul]
 
-theorem charpoly_GL_inv {n : ℕ} (g : GL (Fin n) K) (s : Multiset K)
-    (hs : (g : Matrix (Fin n) (Fin n) K).charpoly = (s.map fun μ => X - C μ).prod) :
-    ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly = (s.map fun μ => X - C μ⁻¹).prod := by
+theorem charpoly_GL_inv
+    {n : ℕ} (g : GL (Fin n) K)
+    (s : Multiset K) (hs : (g : Matrix (Fin n) (Fin n) K).charpoly = (s.map fun μ => X - C μ).prod)
+    : ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly
+      = (s.map fun μ => X - C μ⁻¹).prod := by
   rw [Matrix.coe_units_inv]
   exact charpoly_inv_of_eq _ (Units.isUnit g) s hs
 
-theorem charpoly_map_of_inv {L : Type} [Field L] {n : ℕ} (f : K →+* L) (g : GL (Fin n) K) (s : Multiset L)
-    (hs : ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.map f = (s.map fun μ => X - C μ).prod) :
-    ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.map f = (s.map fun μ => X - C μ⁻¹).prod := by
-  let g' : GL (Fin n) L := Units.map (f.mapMatrix : Matrix (Fin n) (Fin n) K →+* Matrix (Fin n) (Fin n) L).toMonoidHom g
-  have hg : g'⁻¹ = Units.map (f.mapMatrix : Matrix (Fin n) (Fin n) K →+* Matrix (Fin n) (Fin n) L).toMonoidHom g⁻¹ :=
+theorem charpoly_map_of_inv
+    {L : Type} [Field L]
+    {n : ℕ} (f : K →+* L) (g : GL (Fin n) K) (s : Multiset L)
+    (hs : ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.map f
+      = (s.map fun μ => X - C μ).prod)
+    : ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.map f
+      = (s.map fun μ => X - C μ⁻¹).prod := by
+  let g' : GL (Fin n) L :=
+    Units.map (f.mapMatrix : Matrix (Fin n) (Fin n) K →+* Matrix (Fin n) (Fin n) L).toMonoidHom g
+  have hg
+      : g'⁻¹
+        = Units.map
+          (f.mapMatrix : Matrix (Fin n) (Fin n) K →+* Matrix (Fin n) (Fin n) L).toMonoidHom g⁻¹ :=
     (map_inv _ g).symm
-  have h1 : ((g'⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).charpoly = (s.map fun μ => X - C μ).prod := by
+  have h1
+      : ((g'⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L).charpoly
+        = (s.map fun μ => X - C μ).prod := by
     rw [hg, Units.coe_map]
     show (f.mapMatrix ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)).charpoly = _
     rw [RingHom.mapMatrix_apply, Matrix.charpoly_map, hs]
@@ -149,7 +182,8 @@ variable (D : D7) (T : NormalizedHeckeDataPlaceholder D)
 
 end gal
 
-theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p ≠ 0) : (placesOver E p).Finite := by
+theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p ≠ 0)
+    : (placesOver E p).Finite := by
   have h0 : Ideal.span {((p : ℕ) : 𝓞 E)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp
@@ -158,8 +192,9 @@ theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p
   rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
   exact hv
 
-theorem isoLoc_single (D : D7) {a : ℕ} (π : D.naut.CG a) (w : PlE D.host) :
-    Formalism.MainNotions.N.isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
-  simp [Formalism.MainNotions.N.isoLoc, Formalism.MainNotions.N.spehLoc, D.naut.lpSum_zero, D.naut.lpTw_zero]
+theorem isoLoc_single (D : D7) {a : ℕ} (π : D.naut.CG a) (w : PlE D.host)
+    : Formalism.MainNotions.N.isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
+  simp [Formalism.MainNotions.N.isoLoc, Formalism.MainNotions.N.spehLoc, D.naut.lpSum_zero,
+    D.naut.lpTw_zero]
 
 end Formalism.L2.NR

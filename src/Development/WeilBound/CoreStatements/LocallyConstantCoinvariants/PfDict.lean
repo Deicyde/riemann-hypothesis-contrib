@@ -10,7 +10,8 @@ public import Development.WeilBound.CoreStatements.LocallyConstantCoinvariants.P
 
 namespace PositivityTheory.KCo
 
-theorem dictionary_extended : DictX := dictX_of model_existence cyclicity adjoint_statement section_statement action_uniqueness
+theorem dictionary_extended : DictX :=
+  dictX_of model_existence cyclicity adjoint_statement section_statement action_uniqueness
 
 theorem dictionary_statement : DictSt := dictSt_of dictionary_extended section_statement
 

@@ -92,26 +92,33 @@ private lemma vol_lt_infty_of_compact {n : ℕ} {M : Type*} [TopologicalSpace M]
       _ < ⊤ := ENNReal.mul_lt_top (by simp) (hK.image hz.continuous).measure_lt_top
   · simp
 
-theorem shell (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] : ShellStatement n M := by
+theorem shell
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : ShellStatement n M := by
   classical
   intro z hz e ph ψ v a he hK hph hψ hv
   set g : M → ℝ := fun x => ‖v x‖ ^ 2 * Real.exp (-ph x + ψ x) with hg
   have hgc : Continuous g := by
     simp only [hg]
     fun_prop
-  have hgm : Measurable fun x => ENNReal.ofReal (g x) := ENNReal.measurable_ofReal.comp hgc.measurable
+  have hgm : Measurable fun x => ENNReal.ofReal (g x) :=
+    ENNReal.measurable_ofReal.comp hgc.measurable
   have hfin : ∀ b : ℝ, ∫⁻ x in {x | e x ≤ b}, ENNReal.ofReal (g x) ∂vol n z < ⊤ := by
     intro b
     exact setLIntegral_lt_top_of_isCompact (vol_lt_infty_of_compact z hz (hK b)).ne (hK b)
-      (f := fun x => (g x).toNNReal) (continuous_real_toNNReal.comp hgc)
+      (f := fun x => (g x).toNNReal)
+      (continuous_real_toNNReal.comp hgc)
   set C : ℕ → ℝ := fun k => (∫⁻ x in {x | e x ≤ a + 2 + k}, ENNReal.ofReal (g x) ∂vol n z).toReal with hC
   have hC0 : ∀ k : ℕ, 0 ≤ C k := fun k => ENNReal.toReal_nonneg
-  have hCeq : ∀ k : ℕ, ∫⁻ x in {x | e x ≤ a + 2 + k}, ENNReal.ofReal (g x) ∂vol n z = ENNReal.ofReal (C k) :=
+  have hCeq
+      : ∀ k : ℕ,
+        ∫⁻ x in {x | e x ≤ a + 2 + k}, ENNReal.ofReal (g x) ∂vol n z = ENNReal.ofReal (C k) :=
     fun k => (ENNReal.ofReal_toReal (hfin _).ne).symm
   set R : ℝ → ℝ := fun t => if a + 1 < t then Real.log (1 + C ⌈t - a - 2⌉₊) + ⌈t - a - 2⌉₊ else 0 with hR
-  have hterm0 : ∀ k : ℕ, 0 ≤ Real.log (1 + C k) + k :=
-    fun k => add_nonneg (Real.log_nonneg (by linarith [hC0 k])) (Nat.cast_nonneg k)
+  have hterm0 : ∀ k : ℕ, 0 ≤ Real.log (1 + C k) + k := fun k =>
+    add_nonneg (Real.log_nonneg (by linarith [hC0 k])) (Nat.cast_nonneg k)
   refine ⟨R, ?_, ?_⟩
   · intro b
     refine ⟨∑ k ∈ Finset.range (⌈b - a - 2⌉₊ + 1), (Real.log (1 + C k) + k), ?_⟩
@@ -119,19 +126,24 @@ theorem shell (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
     simp only [Set.mem_Iic] at ht
     simp only [hR]
     split_ifs with h
-    · exact Finset.single_le_sum (f := fun k : ℕ => Real.log (1 + C k) + k) (fun k _ => hterm0 k)
+    · exact Finset.single_le_sum
+        (f := fun k : ℕ => Real.log (1 + C k) + k)
+        (fun k _ => hterm0 k)
         (Finset.mem_range.mpr (Nat.lt_succ_of_le (Nat.ceil_mono (by linarith))))
     · exact Finset.sum_nonneg fun k _ => hterm0 k
   · intro χ hχ0 hχR
     unfold nV
     set S : ℕ → Set M := fun k => {x | a + 1 + k < e x ∧ e x ≤ a + 2 + k} with hS
     have hSm : ∀ k, MeasurableSet (S k) := fun k =>
-      (measurableSet_lt measurable_const he.measurable).inter (measurableSet_le he.measurable measurable_const)
+      (measurableSet_lt measurable_const he.measurable).inter
+        (measurableSet_le he.measurable measurable_const)
     have hLm : MeasurableSet {x | e x ≤ a + 1} := measurableSet_le he.measurable measurable_const
-    have hpt : ∀ x, ENNReal.ofReal (‖v x‖ ^ 2 * Real.exp (-(ph x + χ (e x) - ψ x))) ≤
-        {x | e x ≤ a + 1}.indicator (fun x => ENNReal.ofReal (g x)) x +
-        ∑' k, (S k).indicator (fun x => ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
-          ENNReal.ofReal (g x)) x := by
+    have hpt
+        : ∀ x,
+          ENNReal.ofReal (‖v x‖ ^ 2 * Real.exp (-(ph x + χ (e x) - ψ x)))
+            ≤ {x | e x ≤ a + 1}.indicator (fun x => ENNReal.ofReal (g x)) x
+              + ∑' k, (S k).indicator (fun x => ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
+                  ENNReal.ofReal (g x)) x := by
       intro x
       by_cases hx : e x ≤ a + 1
       · rw [Set.indicator_of_mem (show x ∈ {x | e x ≤ a + 1} from hx)]
@@ -150,35 +162,43 @@ theorem shell (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
           simp only [hR, if_pos hx] at this
           exact this
         simp only [hg]
-        rw [show -(ph x + χ (e x) - ψ x) = -(χ (e x)) + (-ph x + ψ x) by ring, Real.exp_add]
-        have h1 : Real.exp (-(χ (e x))) ≤ Real.exp (-(Real.log (1 + C ⌈e x - a - 2⌉₊) + ⌈e x - a - 2⌉₊)) :=
+        rw [show -(ph x + χ (e x) - ψ x) = -(χ (e x)) + (- ph x + ψ x) by ring, Real.exp_add]
+        have h1
+            : Real.exp (-(χ (e x)))
+              ≤ Real.exp (-(Real.log (1 + C ⌈e x - a - 2⌉₊) + ⌈e x - a - 2⌉₊)) :=
           Real.exp_le_exp.mpr (by linarith)
-        have h2 : 0 ≤ ‖v x‖ ^ 2 * Real.exp (-ph x + ψ x) := by positivity
+        have h2 : 0 ≤ ‖v x‖ ^ 2 * Real.exp (- ph x + ψ x) := by positivity
         nlinarith [mul_le_mul_of_nonneg_right h1 h2]
-    calc ∫⁻ x, ENNReal.ofReal (‖v x‖ ^ 2 * Real.exp (-(ph x + χ (e x) - ψ x))) ∂vol n z
-        ≤ ∫⁻ x, ({x | e x ≤ a + 1}.indicator (fun x => ENNReal.ofReal (g x)) x +
-          ∑' k, (S k).indicator (fun x => ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
-            ENNReal.ofReal (g x)) x) ∂vol n z := lintegral_mono hpt
-      _ = ∫⁻ x in {x | e x ≤ a + 1}, ENNReal.ofReal (g x) ∂vol n z +
-          ∑' k, ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
-            ∫⁻ x in S k, ENNReal.ofReal (g x) ∂vol n z := by
+    calc
+      ∫⁻ x, ENNReal.ofReal (‖v x‖ ^ 2 * Real.exp (-(ph x + χ (e x) - ψ x))) ∂vol n z
+          ≤ ∫⁻ x, ({x | e x ≤ a + 1}.indicator (fun x => ENNReal.ofReal (g x)) x +
+            ∑' k, (S k).indicator (fun x => ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
+              ENNReal.ofReal (g x)) x) ∂vol n z :=
+        lintegral_mono hpt
+      _ = ∫⁻ x in {x | e x ≤ a + 1}, ENNReal.ofReal (g x) ∂vol n z
+          + ∑' k, ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) *
+              ∫⁻ x in S k, ENNReal.ofReal (g x) ∂vol n z := by
         rw [lintegral_add_left (hgm.indicator hLm), lintegral_indicator hLm,
           lintegral_tsum (fun k => ((hgm.const_mul _).indicator (hSm k)).aemeasurable)]
         congr 1
         refine tsum_congr fun k => ?_
         rw [lintegral_indicator (hSm k), lintegral_const_mul _ hgm]
-      _ ≤ ∫⁻ x in {x | e x ≤ a + 1}, ENNReal.ofReal (g x) ∂vol n z +
-          ∑' k : ℕ, ENNReal.ofReal (Real.exp (-(k : ℝ))) := by
+      _ ≤ ∫⁻ x in {x | e x ≤ a + 1}, ENNReal.ofReal (g x) ∂vol n z
+          + ∑' k : ℕ, ENNReal.ofReal (Real.exp (-(k : ℝ))) := by
         refine add_le_add le_rfl (ENNReal.tsum_le_tsum fun k => ?_)
-        calc ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) * ∫⁻ x in S k, ENNReal.ofReal (g x) ∂vol n z
-            ≤ ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) * ENNReal.ofReal (C k) := by
-              gcongr
-              rw [← hCeq k]
-              exact lintegral_mono_set (fun x hx => hx.2)
+        calc
+          ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k)))
+                * ∫⁻ x in S k, ENNReal.ofReal (g x) ∂vol n z
+              ≤ ENNReal.ofReal (Real.exp (-(Real.log (1 + C k) + k))) * ENNReal.ofReal (C k) := by
+            gcongr
+            rw [← hCeq k]
+            exact lintegral_mono_set (fun x hx => hx.2)
           _ ≤ _ := shell_coef (C k) (hC0 k) k
       _ < ⊤ := by
         refine ENNReal.add_lt_top.mpr ⟨hfin (a + 1), ?_⟩
-        rw [← ENNReal.ofReal_tsum_of_nonneg (fun k => (Real.exp_pos _).le) Real.summable_exp_neg_nat]
+        rw [← ENNReal.ofReal_tsum_of_nonneg
+          (fun k => (Real.exp_pos _).le)
+          Real.summable_exp_neg_nat]
         exact ENNReal.ofReal_lt_top
 
 end

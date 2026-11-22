@@ -18,8 +18,8 @@ noncomputable section
 
 namespace GlobalTheory.AV.AbVar.DegNorm
 
-theorem dvd_algebraMap_norm {S : Type} [CommRing S] [Module.Free ℤ S] [Module.Finite ℤ S] (x : S) :
-    x ∣ algebraMap ℤ S (Algebra.norm ℤ x) := by
+theorem dvd_algebraMap_norm {S : Type} [CommRing S] [Module.Free ℤ S] [Module.Finite ℤ S] (x : S)
+    : x ∣ algebraMap ℤ S (Algebra.norm ℤ x) := by
   classical
   let b := Module.Free.chooseBasis ℤ S
   let M := Algebra.leftMulMatrix b x
@@ -27,17 +27,26 @@ theorem dvd_algebraMap_norm {S : Type} [CommRing S] [Module.Free ℤ S] [Module.
     apply Algebra.leftMulMatrix_injective b
     rw [map_zero, ← Polynomial.aeval_algHom_apply]
     exact Matrix.aeval_self_charpoly M
-  have hsplit : aeval x M.charpoly = x * aeval x M.charpoly.divX + algebraMap ℤ S (M.charpoly.coeff 0) := by
+  have hsplit
+      : aeval x M.charpoly = x * aeval x M.charpoly.divX + algebraMap ℤ S (M.charpoly.coeff 0) := by
     conv_lhs => rw [← X_mul_divX_add M.charpoly]
     rw [map_add (f := _), map_mul, aeval_X, aeval_C]
   rw [h0] at hsplit
-  refine ⟨-(algebraMap ℤ S ((-1) ^ Fintype.card (Module.Free.ChooseBasisIndex ℤ S)) * aeval x M.charpoly.divX), ?_⟩
+  refine ⟨
+    -(algebraMap ℤ S ((-1) ^ Fintype.card (Module.Free.ChooseBasisIndex ℤ S))
+      * aeval x M.charpoly.divX),
+    ?_
+  ⟩
   rw [Algebra.norm_eq_matrix_det b, Matrix.det_eq_sign_charpoly_coeff, map_mul]
   linear_combination (-(algebraMap ℤ S ((-1) ^ Fintype.card (Module.Free.ChooseBasisIndex ℤ S)))) * hsplit
 
-theorem isIsogeny_and_deg_ne_zero {K : Type} [Field K] (A : AbVar K) {F : Type} [Field F] [NumberField F]
-    (ι : 𝓞 F →+* End A) (z : 𝓞 F) (hz : z ≠ 0) :
-    IsIsogeny (ι z).asHom ∧ deg (ι z).asHom ≠ 0 := by
+theorem isIsogeny_and_deg_ne_zero
+    {K : Type} [Field K]
+    (A : AbVar K)
+    {F : Type} [Field F] [NumberField F]
+    (ι : 𝓞 F →+* End A)
+    (z : 𝓞 F) (hz : z ≠ 0)
+    : IsIsogeny (ι z).asHom ∧ deg (ι z).asHom ≠ 0 := by
   obtain ⟨y, hy⟩ := dvd_algebraMap_norm z
   have hN : Algebra.norm ℤ z ≠ 0 := by
     intro h
@@ -60,15 +69,22 @@ end GlobalTheory.AV.AbVar.DegNorm
 
 namespace GlobalTheory.AV.AbVar.DegNorm
 
-theorem charpoly_eq_minpoly_pow {K : Type} [Field K] (A : AbVar K) (hA : A.dim ≠ 0) {F : Type} [Field F]
-    [NumberField F] (ι : 𝓞 F →+* End A) (x : 𝓞 F) :
-    ∃ k : ℕ, 0 < k ∧ (charpoly (ι x)).map (Int.castRingHom ℚ) = minpoly ℚ (x : F) ^ k := by
+theorem charpoly_eq_minpoly_pow
+    {K : Type} [Field K]
+    (A : AbVar K) (hA : A.dim ≠ 0)
+    {F : Type} [Field F] [NumberField F]
+    (ι : 𝓞 F →+* End A) (x : 𝓞 F)
+    : ∃ k : ℕ, 0 < k ∧ (charpoly (ι x)).map (Int.castRingHom ℚ) = minpoly ℚ (x : F) ^ k := by
   first
   | exact @_root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow
   | exact _root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow
   | (apply _root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow <;> assumption)
   | (intros; apply _root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.CharpolyMinpolyPower.charpoly_eq_minpoly_pow ..)
 
 end GlobalTheory.AV.AbVar.DegNorm

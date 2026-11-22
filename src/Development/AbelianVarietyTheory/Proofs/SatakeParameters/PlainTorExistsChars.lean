@@ -5,15 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsEqu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut GlobalTheory.RoadU GlobalTheory.AboveL
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut
+  GlobalTheory.RoadU GlobalTheory.AboveL
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.RoadU.PlainChars
 
-theorem exists_fin_enum {S : Type*} (t : Multiset S) {n : ℕ} (hn : Multiset.card t = n) :
-    ∃ ξ : Fin n → S, Finset.univ.val.map ξ = t := by
+theorem exists_fin_enum {S : Type*} (t : Multiset S) {n : ℕ} (hn : Multiset.card t = n)
+    : ∃ ξ : Fin n → S, Finset.univ.val.map ξ = t := by
   subst hn
   refine ⟨fun j => t.toList.get (Fin.cast (by simp) j), ?_⟩
   rw [Fin.univ_val_map]
@@ -33,7 +37,12 @@ theorem exists_eq_ofChar (x : IrrGL (k := k)) (hx : x.1 = 1) : ∃ θ hθ, x = I
 
 end GlobalTheory.RoadU.PlainChars
 
-theorem GlobalTheory.RoadU.plainTor_exists_chars : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k] (x : IrrGL (k := k)), PlainTor x → ∃ (ξ : Fin x.1 → (kˣ →* ℂˣ)) (hξ : ∀ j, IsSmoothChar (ξ j)), HasSupport x.rep (chars ξ hξ) ∧ Unlinked (chars ξ hξ) := by
+theorem GlobalTheory.RoadU.plainTor_exists_chars
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [CharZero k] (x : IrrGL (k := k)),
+      PlainTor x
+        → ∃ (ξ : Fin x.1 → (kˣ →* ℂˣ)) (hξ : ∀ j, IsSmoothChar (ξ j)),
+          HasSupport x.rep (chars ξ hξ) ∧ Unlinked (chars ξ hξ) := by
   intro k _ _ _ _ _ x ⟨s, hs, h1, hu⟩
   let S := {χ : kˣ →* ℂˣ // IsSmoothChar χ}
   let F : S → IrrGL (k := k) := fun χ => IrrGL.ofChar χ.1 χ.2
@@ -46,9 +55,12 @@ theorem GlobalTheory.RoadU.plainTor_exists_chars : ∀ (k : Type) [Field k] [Val
     have h2 := hs.sum_fst
     rw [Multiset.map_map] at h2
     have h3 : t.map (Sigma.fst ∘ F) = Multiset.replicate (Multiset.card t) 1 :=
-      Multiset.eq_replicate.2 ⟨by simp, fun b hb => by
-        obtain ⟨χ, -, rfl⟩ := Multiset.mem_map.1 hb
-        rfl⟩
+      Multiset.eq_replicate.2 ⟨
+        by simp,
+        fun b hb => by
+          obtain ⟨χ, -, rfl⟩ := Multiset.mem_map.1 hb
+          rfl
+      ⟩
     rw [h3, Multiset.sum_replicate, smul_eq_mul, mul_one, Fintype.card_fin] at h2
     exact h2
   obtain ⟨ξ, hξ⟩ := PlainChars.exists_fin_enum t hcard

@@ -4,13 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.phiMu :
-    ∀ {l : ℕ} [Fact l.Prime] {H Γ : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (f : H →* Γ), Continuous f → ∀ D : Subgroup Γ, (∀ g, f g ∈ D) → ∀ g ∈ W.muG l H, f g ∈ muOf l D := by
+theorem UpperTheory.V.Ws.phiMu
+    : ∀ {l : ℕ} [Fact l.Prime] {H Γ : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
+        [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (f : H →* Γ),
+      Continuous f → ∀ D : Subgroup Γ, (∀ g, f g ∈ D) → ∀ g ∈ W.muG l H, f g ∈ muOf l D := by
   intro l _ H Γ _ _ _ _ _ _ f hf D hD g hg
   refine ⟨hD g, ?_⟩
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, (QuotientGroup.mk' (commutator H).topologicalClosure g) ^ l ^ k = 1 := hg
+  obtain ⟨k, hk⟩ : ∃ k : ℕ, (QuotientGroup.mk' (commutator H).topologicalClosure g) ^ l ^ k = 1 :=
+    hg
   refine ⟨k, ?_⟩
   have h1 : g ^ l ^ k ∈ (commutator H).topologicalClosure := by
     rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hk

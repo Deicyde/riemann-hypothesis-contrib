@@ -12,16 +12,17 @@ open scoped ENNReal Classical
 
 namespace GlobalTheory.Mass.SplitOver
 
-theorem cyc_iff {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (A B : Submodule R W) (I : Ideal R) :
-    Nonempty ((↥A ⧸ B.comap A.subtype) ≃ₗ[R] (R ⧸ I)) ↔
-      ∃ x ∈ A, (∀ y ∈ A, ∃ r : R, y - r • x ∈ B) ∧ ∀ r : R, r • x ∈ B ↔ r ∈ I := by
+theorem cyc_iff
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (A B : Submodule R W) (I : Ideal R)
+    : Nonempty ((↥A ⧸ B.comap A.subtype) ≃ₗ[R] (R ⧸ I))
+      ↔ ∃ x ∈ A, (∀ y ∈ A, ∃ r : R, y - r • x ∈ B) ∧ ∀ r : R, r • x ∈ B ↔ r ∈ I := by
   constructor
   · rintro ⟨e⟩
     obtain ⟨x, hx⟩ := Submodule.Quotient.mk_surjective _ (e.symm (Submodule.Quotient.mk 1))
     have key : ∀ r : R, e (Submodule.Quotient.mk (r • x)) = Submodule.Quotient.mk r := by
       intro r
-      rw [Submodule.Quotient.mk_smul, map_smul, hx, e.apply_symm_apply, ← Submodule.Quotient.mk_smul,
-        smul_eq_mul, mul_one]
+      rw [Submodule.Quotient.mk_smul, map_smul, hx, e.apply_symm_apply,
+        ← Submodule.Quotient.mk_smul, smul_eq_mul, mul_one]
     refine ⟨x, x.2, fun y hy => ?_, fun r => ?_⟩
     · obtain ⟨r, hr⟩ := Submodule.Quotient.mk_surjective I (e (Submodule.Quotient.mk ⟨y, hy⟩))
       rw [← key, e.injective.eq_iff, eq_comm, Submodule.Quotient.eq] at hr
@@ -44,25 +45,32 @@ theorem cyc_iff {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (A B : 
       exact (Submodule.Quotient.eq (B.comap A.subtype) (x := y) (y := r • (⟨x, hx⟩ : A))).2 hr
     exact ⟨((Submodule.quotEquivOfEq _ _ hk).trans (f.quotKerEquivOfSurjective hsurj)).symm⟩
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-noncomputable abbrev cj : 𝓞 K →+* 𝓞 K := locBasic_sigma (genusCovol_hinj (K := K)) star_algebraMap_ringOfIntegers_mem_range
+noncomputable abbrev cj : 𝓞 K →+* 𝓞 K :=
+  locBasic_sigma (genusCovol_hinj (K := K)) star_algebraMap_ringOfIntegers_mem_range
 
-theorem cj_cj (r : 𝓞 K) : cj (cj r) = r := genusCovol_hinj (by
-  rw [locBasic_sigma_spec, locBasic_sigma_spec, star_star])
+theorem cj_cj (r : 𝓞 K) : cj (cj r) = r :=
+  genusCovol_hinj (by rw [locBasic_sigma_spec, locBasic_sigma_spec, star_star])
 
 theorem mem_conj (P : Ideal (𝓞 K)) (r : 𝓞 K) : r ∈ conjIdeal (K := K) P ↔ cj r ∈ P := by
   rw [locBasic_conj_eq genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, Ideal.mem_comap]
 
 omit [FiniteDimensional K V] in
 theorem adj (h : V →ₗ⋆[K] V →ₗ[K] K) (r : 𝓞 K) (v w : V) : h v (r • w) = h (cj r • v) w := by
-  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range, genusBasic_hsmul_right]
+  rw [genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range,
+    genusBasic_hsmul_right]
   exact congrArg (fun t => algebraMap (𝓞 K) K t * h v w) (cj_cj r).symm
 
-theorem smul_mem_of_gen {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] {A B : Submodule R W}
-    {I : Ideal R} {x : W} (h1 : ∀ y ∈ A, ∃ r : R, y - r • x ∈ B) (h2 : ∀ r : R, r • x ∈ B ↔ r ∈ I)
-    {s : R} (hs : s ∈ I) {y : W} (hy : y ∈ A) : s • y ∈ B := by
+theorem smul_mem_of_gen
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
+    {A B : Submodule R W} {I : Ideal R} {x : W}
+    (h1 : ∀ y ∈ A, ∃ r : R, y - r • x ∈ B) (h2 : ∀ r : R, r • x ∈ B ↔ r ∈ I)
+    {s : R} (hs : s ∈ I)
+    {y : W} (hy : y ∈ A)
+    : s • y ∈ B := by
   obtain ⟨r, hr⟩ := h1 y hy
   have : s • y = s • (y - r • x) + (s * r) • x := by rw [smul_sub, mul_smul, sub_add_cancel]
   rw [this]
@@ -71,11 +79,13 @@ theorem smul_mem_of_gen {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 variable (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (hn : h.Nondegenerate)
 include hs hn
 
-theorem exists_unique_over (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K := K) P))
+theorem exists_unique_over
+    (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K := K) P))
     (L : Submodule (𝓞 K) V) (hL : IsIntLat h L)
-    (e : Nonempty ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P * conjIdeal (K := K) P))) :
-    ∃! M : Submodule (𝓞 K) V, Submodule.IsFullLattice K M ∧ IsUnimodular h M ∧ L ≤ M ∧
-      Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P)) := by
+    (e : Nonempty
+      ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P * conjIdeal (K := K) P)))
+    : ∃! M : Submodule (𝓞 K) V, Submodule.IsFullLattice K M ∧ IsUnimodular h M ∧ L ≤ M ∧
+        Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P)) := by
   have dl := dualLattice (𝓞 K) K V h hs hn star_algebraMap_ringOfIntegers_mem_range
   obtain ⟨an, -, -, hint, huni⟩ := dualBasic (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range
   obtain ⟨p, hp, q, hq, hpq⟩ := Ideal.isCoprime_iff_exists.1 hc
@@ -83,7 +93,9 @@ theorem exists_unique_over (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K 
   have hLD := (hint L).1 hL.2
   have hDD := (dl L hL.1).2.1
   have split : ∀ y : V, p • y + q • y = y := fun y => by rw [← add_smul, hpq, one_smul]
-  have kill : ∀ a ∈ P, ∀ b ∈ conjIdeal (K := K) P, ∀ y ∈ dual h L, a • b • y ∈ L := fun a ha b hb y hy => by
+  have kill
+      : ∀ a ∈ P, ∀ b ∈ conjIdeal (K := K) P, ∀ y ∈ dual h L,
+        a • b • y ∈ L := fun a ha b hb y hy => by
     rw [← mul_smul]
     exact smul_mem_of_gen g1 g2 (Ideal.mul_mem_mul ha hb) hy
   let M : Submodule (𝓞 K) V := dual h L ⊓ L.comap (LinearMap.lsmul (𝓞 K) V p)
@@ -108,8 +120,21 @@ theorem exists_unique_over (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K 
       intro d hd
       rw [adj]
       exact (dualBasic_mem_dual h M y).1 hy _ (hQ _ ((mem_conj P _).2 (by rwa [cj_cj])) d hd)
-  refine ⟨M, ⟨DiscOrder.lattice_between hL.1 (dl L hL.1).1 hLM hMD, hMu, hLM,
-    (cyc_iff _ _ _).2 ⟨q • x, hQ q hq x hx, fun y hy => ?_, fun r => ⟨fun hr => ?_, fun hr => kill r hr q hq x hx⟩⟩⟩, ?_⟩
+  refine ⟨
+    M,
+    ⟨
+      DiscOrder.lattice_between hL.1 (dl L hL.1).1 hLM hMD,
+      hMu,
+      hLM,
+      (cyc_iff _ _ _).2 ⟨
+        q • x,
+        hQ q hq x hx,
+        fun y hy => ?_,
+        fun r => ⟨fun hr => ?_, fun hr => kill r hr q hq x hx⟩
+      ⟩
+    ⟩,
+    ?_
+  ⟩
   · obtain ⟨r, hr⟩ := g1 y (hMD hy)
     refine ⟨r, ?_⟩
     have : y - r • q • x = p • y + q • (y - r • x) := by
@@ -130,11 +155,12 @@ theorem exists_unique_over (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K 
     rw [← hNu', ← hMu']
     exact an _ _ hNM
 
-theorem disc_of_over (P : Ideal (𝓞 K)) (hP0 : P ≠ ⊥) (hc : IsCoprime P (conjIdeal (K := K) P))
-    (M L : Submodule (𝓞 K) V) (hM : Submodule.IsFullLattice K M) (hMu : IsUnimodular h M) (hLM : L ≤ M)
-    (e : Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P))) :
-    IsIntLat h L ∧
-      Nonempty ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P * conjIdeal (K := K) P)) := by
+theorem disc_of_over
+    (P : Ideal (𝓞 K)) (hP0 : P ≠ ⊥) (hc : IsCoprime P (conjIdeal (K := K) P))
+    (M L : Submodule (𝓞 K) V) (hM : Submodule.IsFullLattice K M) (hMu : IsUnimodular h M)
+    (hLM : L ≤ M) (e : Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P)))
+    : IsIntLat h L ∧ Nonempty
+      ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ P * conjIdeal (K := K) P)) := by
   have dl := dualLattice (𝓞 K) K V h hs hn star_algebraMap_ringOfIntegers_mem_range
   obtain ⟨an, -, -, hint, huni⟩ := dualBasic (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range
   obtain ⟨p, hp, q, hq, hpq⟩ := Ideal.isCoprime_iff_exists.1 hc
@@ -188,9 +214,11 @@ theorem disc_of_over (P : Ideal (𝓞 K)) (hP0 : P ≠ ⊥) (hc : IsCoprime P (c
     have hφ : ∀ d, φ d = algebraMap (𝓞 K) K (cj t) * h m d := fun d =>
       genusBasic_hsmul_left genusCovol_hinj star_algebraMap_ringOfIntegers_mem_range h t m d
     let J : Ideal (𝓞 K) := ((dual h L).map φ).comap (Algebra.linearMap (𝓞 K) K)
-    obtain ⟨a, ha⟩ := IsDedekindDomain.exists_sup_span_eq (I := Ideal.span {cj t})
-      (J := Ideal.span {cj t} ⊔ J) le_sup_left (by simpa using hs0)
-    have ha1 : a ∈ Ideal.span {cj t} ⊔ J := ha ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self a)
+    obtain ⟨a, ha⟩ :=
+      IsDedekindDomain.exists_sup_span_eq (I := Ideal.span {cj t}) (J := Ideal.span {cj t} ⊔ J)
+        le_sup_left (by simpa using hs0)
+    have ha1 : a ∈ Ideal.span {cj t} ⊔ J :=
+      ha ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self a)
     obtain ⟨b, hb, c₀, hc₀, rfl⟩ := Submodule.mem_sup.1 ha1
     obtain ⟨u, rfl⟩ := Ideal.mem_span_singleton'.1 hb
     obtain ⟨d₀, hd₀, e₀⟩ := Submodule.mem_map.1 (Submodule.mem_comap.1 hc₀)
@@ -202,8 +230,11 @@ theorem disc_of_over (P : Ideal (𝓞 K)) (hP0 : P ≠ ⊥) (hc : IsCoprime P (c
     obtain ⟨b, hb, b', hb', e1⟩ := Submodule.mem_sup.1 hcJ
     obtain ⟨x, rfl⟩ := Ideal.mem_span_singleton'.1 hb
     obtain ⟨v, rfl⟩ := Ideal.mem_span_singleton'.1 hb'
-    refine ⟨v, test _ (Submodule.sub_mem _ hd (Submodule.smul_mem _ v hd₀))
-      (Submodule.mem_one.2 ⟨x + v * u, mul_left_cancel₀ hne ?_⟩)⟩
+    refine ⟨
+      v,
+      test _ (Submodule.sub_mem _ hd (Submodule.smul_mem _ v hd₀))
+        (Submodule.mem_one.2 ⟨x + v * u, mul_left_cancel₀ hne ?_⟩)
+    ⟩
     have e2 : φ d = algebraMap (𝓞 K) K c := hc.symm
     have e3 : φ d₀ = algebraMap (𝓞 K) K c₀ := e₀
     rw [← hφ, map_sub, map_smul, e2, e3, ← e1, Algebra.smul_def]
@@ -216,14 +247,18 @@ theorem disc_of_over (P : Ideal (𝓞 K)) (hP0 : P ≠ ⊥) (hc : IsCoprime P (c
     rw [this]
     exact M.add_mem (M.smul_mem r hv) (M.smul_mem v hr)
   have hq' : q = 1 - p := by rw [← hpq]; ring
-  refine (cyc_iff _ _ _).2 ⟨q • m + p • d₀,
-    Submodule.add_mem _ (Submodule.smul_mem _ _ (hMD hm)) (Submodule.smul_mem _ _ hd₀), fun d hd => ?_,
-    fun r => ⟨fun hr => ?_, fun hr => ?_⟩⟩
+  refine (cyc_iff _ _ _).2 ⟨
+    q • m + p • d₀,
+    Submodule.add_mem _ (Submodule.smul_mem _ _ (hMD hm)) (Submodule.smul_mem _ _ hd₀),
+    fun d hd => ?_,
+    fun r => ⟨fun hr => ?_, fun hr => ?_⟩
+  ⟩
   · obtain ⟨v, hv⟩ := gen d hd
     obtain ⟨u, hu⟩ := k1 _ (M.add_mem hv (M.smul_mem v (hQ q hq d₀ hd₀)))
     refine ⟨v * p + u * q, ?_⟩
-    have : d - (v * p + u * q) • (q • m + p • d₀) = (d - v • d₀ + v • q • d₀ - u • m)
-        + p • ((u * (2 - p) - v * q) • m) + p • ((v - u) • q • d₀) := by
+    have : d - (v * p + u * q) • (q • m + p • d₀)
+        = (d - v • d₀ + v • q • d₀ - u • m) + p • ((u * (2 - p) - v * q) • m)
+          + p • ((v - u) • q • d₀) := by
       rw [hq']; module
     rw [this]
     exact L.add_mem (L.add_mem hu (hP p hp _ (M.smul_mem _ hm)))
@@ -250,8 +285,24 @@ end GlobalTheory.Mass.SplitOver
 
 namespace GlobalTheory.Mass.SplitOver
 
-theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), IsCMUnram K → h.IsSymm → h.Nondegenerate → ∀ (𝔓 : Ideal (𝓞 K)), 𝔓 ≠ ⊥ → IsCoprime 𝔓 (conjIdeal (K := K) 𝔓) → (∀ L : Submodule (𝓞 K) V, IsIntLat h L → Nonempty ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓 * conjIdeal (K := K) 𝔓)) → ∃! M : Submodule (𝓞 K) V, Submodule.IsFullLattice K M ∧ IsUnimodular h M ∧ L ≤ M ∧ Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓))) ∧ ∀ M L : Submodule (𝓞 K) V, Submodule.IsFullLattice K M → IsUnimodular h M → L ≤ M → Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓)) → IsIntLat h L ∧ Nonempty ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓 * conjIdeal (K := K) 𝔓)) := by
-  intro K V _ _ _ _ _ _ _ _ h _ hs hn P hP0 hc
-  exact ⟨exists_unique_over h hs hn P hc, disc_of_over h hs hn P hP0 hc⟩
+theorem main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      IsCMUnram K → h.IsSymm → h.Nondegenerate
+        → ∀ (𝔓 : Ideal (𝓞 K)),
+          𝔓 ≠ ⊥ → IsCoprime 𝔓 (conjIdeal (K := K) 𝔓)
+            → (∀ L : Submodule (𝓞 K) V,
+                IsIntLat h L
+                  → Nonempty
+                    ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓 * conjIdeal (K := K) 𝔓))
+                  → ∃! M : Submodule (𝓞 K) V, Submodule.IsFullLattice K M ∧ IsUnimodular h M ∧ L ≤ M ∧ Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓)))
+              ∧ ∀ M L : Submodule (𝓞 K) V,
+                Submodule.IsFullLattice K M → IsUnimodular h M → L ≤ M
+                  → Nonempty ((↥M ⧸ L.comap M.subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓))
+                  → IsIntLat h L ∧ Nonempty
+                    ((↥(dual h L) ⧸ L.comap (dual h L).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ 𝔓 * conjIdeal (K := K) 𝔓)) :=
+  by
+    intro K V _ _ _ _ _ _ _ _ h _ hs hn P hP0 hc
+    exact ⟨exists_unique_over h hs hn P hc, disc_of_over h hs hn P hP0 hc⟩
 
 end GlobalTheory.Mass.SplitOver

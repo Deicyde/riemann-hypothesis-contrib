@@ -11,14 +11,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntDvdOfEqNa
 noncomputable section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.W2.Wit
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem actQ_tmul {D : Datum p} (b : D.O) (q : ℚ) (x : D.La) : actQ D b (q ⊗ₜ x) = q ⊗ₜ (b • x) := by
+theorem actQ_tmul {D : Datum p} (b : D.O) (q : ℚ) (x : D.La)
+    : actQ D b (q ⊗ₜ x) = q ⊗ₜ (b • x) := by
   simp only [actQ, LinearMap.baseChange_tmul]; rfl
 
 theorem actQ_one (D : Datum p) (w : VQ D) : actQ D 1 w = w := by
@@ -27,13 +29,15 @@ theorem actQ_one (D : Datum p) (w : VQ D) : actQ D 1 w = w := by
   | tmul q x => rw [actQ_tmul, one_smul]
   | add u v hu hv => rw [map_add (f := _), hu, hv]
 
-theorem actQ_mul (D : Datum p) (a b : D.O) (w : VQ D) : actQ D (a * b) w = actQ D a (actQ D b w) := by
+theorem actQ_mul (D : Datum p) (a b : D.O) (w : VQ D)
+    : actQ D (a * b) w = actQ D a (actQ D b w) := by
   induction w using TensorProduct.induction_on with
   | zero => simp
   | tmul q x => rw [actQ_tmul, actQ_tmul, actQ_tmul, mul_smul]
   | add u v hu hv => rw [map_add (f := _), hu, hv, map_add (f := _), map_add (f := _)]
 
-theorem actQ_add (D : Datum p) (a b : D.O) (w : VQ D) : actQ D (a + b) w = actQ D a w + actQ D b w := by
+theorem actQ_add (D : Datum p) (a b : D.O) (w : VQ D)
+    : actQ D (a + b) w = actQ D a w + actQ D b w := by
   induction w using TensorProduct.induction_on with
   | zero => simp
   | tmul q x => rw [actQ_tmul, actQ_tmul, actQ_tmul, add_smul, TensorProduct.tmul_add]
@@ -62,8 +66,11 @@ structure Sys (D : Datum p) where
   ε : (AfP p)ˣ
   ε_int : IsIntAf (ε : AfP p)
   ε_inv : IsIntAf ((ε⁻¹ : (AfP p)ˣ) : AfP p)
-  form : ∀ u w, algebraMap ℚ (AfP p) (s * B u w) =
-    (ε : AfP p) * (D.EF.baseChange ℚ).baseChange (AfP p) (T ((1 : AfP p) ⊗ₜ u)) (T ((1 : AfP p) ⊗ₜ w))
+  form
+    : ∀ u w,
+      algebraMap ℚ (AfP p) (s * B u w)
+        = (ε : AfP p)
+          * (D.EF.baseChange ℚ).baseChange (AfP p) (T ((1 : AfP p) ⊗ₜ u)) (T ((1 : AfP p) ⊗ₜ w))
   dense : ∀ n : ℕ, 0 < n → ∀ z, ∃ w, ∃ e ∈ LaHat D, z = T ((1 : AfP p) ⊗ₜ w) + n • e
 
 namespace Sys

@@ -13,7 +13,9 @@ open Formalism.L2.Th1.Top.FrP Jac
 
 variable {l : ℕ} [Fact l.Prime]
 
-def OO (dK : ℕ) (δ : MaximalUnramifiedExtension l) (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)) : Subring (MaximalUnramifiedExtension l) where
+def OO
+    (dK : ℕ) (δ : MaximalUnramifiedExtension l) (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l))
+    : Subring (MaximalUnramifiedExtension l) where
   carrier := {x | ∃ a b : ℤ_[l], x = ψ l a + δ * ψ l b}
   mul_mem' := by
     rintro _ _ ⟨a, b, rfl⟩ ⟨c, e, rfl⟩
@@ -33,32 +35,43 @@ theorem norm_add_le_Kur (x y : MaximalUnramifiedExtension l) : ‖x + y‖ ≤ m
   show ‖(x : ℂ_[l]) + y‖ ≤ max ‖(x : ℂ_[l])‖ ‖(y : ℂ_[l])‖
   exact IsUltrametricDist.norm_add_le_max _ _
 
-theorem norm_δ_le {dK : ℕ} {δ : MaximalUnramifiedExtension l} (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)) : ‖δ‖ ≤ 1 := by
+theorem norm_δ_le
+    {dK : ℕ} {δ : MaximalUnramifiedExtension l} (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l))
+    : ‖δ‖ ≤ 1 := by
   have h : ‖δ‖ ^ 2 ≤ 1 := by
     rw [← norm_pow, hδ, norm_neg, norm_natCast_Kur]
     have : ((dK : ℤ_[l]) : ℚ_[l]) = (dK : ℚ_[l]) := by push_cast; rfl
-    rw [← this]; exact PadicInt.norm_le_one _
+    rw [← this]
+    exact PadicInt.norm_le_one _
   exact (pow_le_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp h
 
-theorem norm_le_one_of_mem {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)} {x : MaximalUnramifiedExtension l}
-    (hx : x ∈ OO dK δ hδ) : ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_mem
+    {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)}
+    {x : MaximalUnramifiedExtension l} (hx : x ∈ OO dK δ hδ)
+    : ‖x‖ ≤ 1 := by
   obtain ⟨a, b, rfl⟩ := hx
   refine (norm_add_le_Kur _ _).trans (max_le (norm_ψ_le l a) ?_)
   rw [norm_mul]
   exact mul_le_one₀ (norm_δ_le hδ) (norm_nonneg _) (norm_ψ_le l b)
 
-theorem ratCast_mem {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)} (q : ℚ) (hq : padicNorm l q ≤ 1) :
-    (q : MaximalUnramifiedExtension l) ∈ OO dK δ hδ := by
+theorem ratCast_mem
+    {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)}
+    (q : ℚ) (hq : padicNorm l q ≤ 1)
+    : (q : MaximalUnramifiedExtension l) ∈ OO dK δ hδ := by
   have hq' : ‖(q : ℚ_[l])‖ ≤ 1 := by rw [Padic.eq_padicNorm]; exact_mod_cast hq
   refine ⟨⟨(q : ℚ_[l]), hq'⟩, 0, ?_⟩
   simp only [map_zero, mul_zero, add_zero]
   show (q : MaximalUnramifiedExtension l) = φ l (q : ℚ_[l])
   rw [map_ratCast]
 
-theorem δ_mem {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)} : δ ∈ OO dK δ hδ := ⟨0, 1, by simp⟩
+theorem δ_mem
+    {dK : ℕ} {δ : MaximalUnramifiedExtension l} {hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)}
+    : δ ∈ OO dK δ hδ :=
+  ⟨0, 1, by simp⟩
 
-theorem norm_sq_unit {dK : ℕ} (hin : ¬ ∃ a : ZMod l, a ^ 2 = -(dK : ZMod l)) (a b : ℤ_[l])
-    (h : ‖a‖ = 1 ∨ ‖b‖ = 1) : ‖a * a + dK * (b * b)‖ = 1 := by
+theorem norm_sq_unit
+    {dK : ℕ} (hin : ¬ ∃ a : ZMod l, a ^ 2 = -(dK : ZMod l)) (a b : ℤ_[l]) (h : ‖a‖ = 1 ∨ ‖b‖ = 1)
+    : ‖a * a + dK * (b * b)‖ = 1 := by
   rw [norm_eq_one_iff]
   intro h0
   rw [map_add (f := _), map_mul, map_mul, map_mul, toZMod_natCast] at h0
@@ -70,9 +83,13 @@ theorem norm_sq_unit {dK : ℕ} (hin : ¬ ∃ a : ZMod l, a ^ 2 = -(dK : ZMod l)
     · exact (norm_eq_one_iff l b).mp h hB
   · exact hin ⟨PadicInt.toZMod a / PadicInt.toZMod b, by field_simp; linear_combination h0⟩
 
-def setup (h5 : 5 ≤ l) (dK : ℕ) (hld : ¬ l ∣ dK) (hin : ¬ ∃ a : ZMod l, a ^ 2 = -(dK : ZMod l))
-    (σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l) (hσ : ∀ x, ‖σ x‖ = ‖x‖) (δ : MaximalUnramifiedExtension l) (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)) (hσδ : σ δ = -δ) :
-    JSetup (MaximalUnramifiedExtension l) where
+def setup
+    (h5 : 5 ≤ l)
+    (dK : ℕ) (hld : ¬ l ∣ dK) (hin : ¬ ∃ a : ZMod l, a ^ 2 = -(dK : ZMod l))
+    (σ : MaximalUnramifiedExtension l →+* MaximalUnramifiedExtension l) (hσ : ∀ x, ‖σ x‖ = ‖x‖)
+    (δ : MaximalUnramifiedExtension l)
+    (hδ : δ ^ 2 = -(dK : MaximalUnramifiedExtension l)) (hσδ : σ δ = -δ)
+    : JSetup (MaximalUnramifiedExtension l) where
   σ := σ
   O := OO dK δ hδ
   p := (l : MaximalUnramifiedExtension l)
@@ -96,8 +113,10 @@ def setup (h5 : 5 ≤ l) (dK : ℕ) (hld : ¬ l ∣ dK) (hin : ¬ ∃ a : ZMod l
       by_contra hc
       push Not at hc
       apply hnu
-      obtain ⟨a', rfl⟩ := (PadicInt.norm_lt_one_iff_dvd a).mp (lt_of_le_of_ne (PadicInt.norm_le_one a) hc.1)
-      obtain ⟨b', rfl⟩ := (PadicInt.norm_lt_one_iff_dvd b).mp (lt_of_le_of_ne (PadicInt.norm_le_one b) hc.2)
+      obtain ⟨a', rfl⟩ :=
+        (PadicInt.norm_lt_one_iff_dvd a).mp (lt_of_le_of_ne (PadicInt.norm_le_one a) hc.1)
+      obtain ⟨b', rfl⟩ :=
+        (PadicInt.norm_lt_one_iff_dvd b).mp (lt_of_le_of_ne (PadicInt.norm_le_one b) hc.2)
       exact ⟨ψ l a' + δ * ψ l b', ⟨a', b', rfl⟩, by simp only [map_mul, map_natCast]; ring⟩
     obtain ⟨u, hu⟩ := PadicInt.isUnit_iff.mpr (norm_sq_unit hin a b hab)
     refine ⟨a * ↑u⁻¹, -(b * ↑u⁻¹), ?_⟩
@@ -117,8 +136,7 @@ def setup (h5 : 5 ≤ l) (dK : ℕ) (hld : ¬ l ∣ dK) (hin : ¬ ∃ a : ZMod l
     have : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ hl
     linarith
   htwo := by
-    have h2 : ‖(2 : ℤ_[l])‖ = 1 := by
-      rw [norm_eq_one_iff, map_ofNat]; exact odd_l l h5
+    have h2 : ‖(2 : ℤ_[l])‖ = 1 := by rw [norm_eq_one_iff, map_ofNat]; exact odd_l l h5
     obtain ⟨u, hu⟩ := PadicInt.isUnit_iff.mpr h2
     refine ⟨↑u⁻¹, 0, ?_⟩
     have : (2 : MaximalUnramifiedExtension l) * ψ l ↑u⁻¹ = 1 := by
@@ -141,7 +159,8 @@ def setup (h5 : 5 ≤ l) (dK : ℕ) (hld : ¬ l ∣ dK) (hin : ¬ ∃ a : ZMod l
     have ha : ‖a‖ = 1 := by
       by_contra hc
       apply hnu
-      obtain ⟨a', rfl⟩ := (PadicInt.norm_lt_one_iff_dvd a).mp (lt_of_le_of_ne (PadicInt.norm_le_one a) hc)
+      obtain ⟨a', rfl⟩ :=
+        (PadicInt.norm_lt_one_iff_dvd a).mp (lt_of_le_of_ne (PadicInt.norm_le_one a) hc)
       exact ⟨ψ l a', ⟨a', 0, by simp⟩, by rw [hb]; simp [map_mul]⟩
     obtain ⟨x, y, hxy⟩ := exists_norm l h5 dK hld a ha
     refine ⟨ψ l x + δ * ψ l y, ⟨x, y, rfl⟩, ?_⟩

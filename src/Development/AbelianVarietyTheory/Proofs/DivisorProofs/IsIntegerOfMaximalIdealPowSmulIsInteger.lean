@@ -10,15 +10,17 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem isInteger_of_maximalIdeal_smul_isInteger (S : Type) [CommRing S] [IsRegularLocalRing S]
-    (hdim : 2 ≤ ringKrullDim S) (c : FractionRing S)
-    (hc : ∀ a ∈ maximalIdeal S, IsLocalization.IsInteger S (a • c)) :
-    IsLocalization.IsInteger S c := by
+theorem isInteger_of_maximalIdeal_smul_isInteger
+    (S : Type) [CommRing S] [IsRegularLocalRing S]
+    (hdim : 2 ≤ ringKrullDim S)
+    (c : FractionRing S) (hc : ∀ a ∈ maximalIdeal S, IsLocalization.IsInteger S (a • c))
+    : IsLocalization.IsInteger S c := by
   obtain ⟨hD, hI⟩ := GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing S
-  have hinj : Function.Injective (algebraMap S (FractionRing S)) := IsFractionRing.injective S (FractionRing S)
+  have hinj : Function.Injective (algebraMap S (FractionRing S)) :=
+    IsFractionRing.injective S (FractionRing S)
   by_cases hA : ∀ a ∈ maximalIdeal S, ∃ y ∈ maximalIdeal S, algebraMap S (FractionRing S) y = a • c
-  ·
-    let N : Submodule S (FractionRing S) := Submodule.map (Algebra.linearMap S (FractionRing S)) (maximalIdeal S)
+  · let N : Submodule S (FractionRing S) :=
+      Submodule.map (Algebra.linearMap S (FractionRing S)) (maximalIdeal S)
     have hne : maximalIdeal S ≠ ⊥ := by
       intro h
       have hF : IsField S := (isField_iff_maximalIdeal_eq).2 h
@@ -60,7 +62,9 @@ theorem isInteger_of_maximalIdeal_smul_isInteger (S : Type) [CommRing S] [IsRegu
         rw [Ideal.mem_span_singleton']
         obtain ⟨u, rfl⟩ := hyunit
         refine ⟨z * ↑u⁻¹, ?_⟩
-        calc z * ↑u⁻¹ * a = (a * z) * ↑u⁻¹ := by ring
+        calc
+          z * ↑u⁻¹ * a
+            = (a * z) * ↑u⁻¹ := by ring
           _ = (b * ↑u) * ↑u⁻¹ := by rw [key]
           _ = b := by simp [mul_assoc]
       · rw [Ideal.span_le]
@@ -74,10 +78,12 @@ theorem isInteger_of_maximalIdeal_smul_isInteger (S : Type) [CommRing S] [IsRegu
     have := hdim.trans h3
     exact absurd this (by decide)
 
-theorem isInteger_of_maximalIdeal_pow_smul_isInteger :
-    ∀ (S : Type) [CommRing S] [IsRegularLocalRing S], 2 ≤ ringKrullDim S →
-      ∀ (k : ℕ) (c : FractionRing S), (∀ a ∈ maximalIdeal S ^ k,
-        IsLocalization.IsInteger S (a • c)) → IsLocalization.IsInteger S c := by
+theorem isInteger_of_maximalIdeal_pow_smul_isInteger
+    : ∀ (S : Type) [CommRing S] [IsRegularLocalRing S],
+      2 ≤ ringKrullDim S
+        → ∀ (k : ℕ) (c : FractionRing S),
+          (∀ a ∈ maximalIdeal S ^ k, IsLocalization.IsInteger S (a • c))
+            → IsLocalization.IsInteger S c := by
   intro S _ _ hdim k
   induction k with
   | zero =>

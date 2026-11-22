@@ -7,14 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowFinrankCo
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 set_option autoImplicit false
 
 namespace GlobalTheory.PDivGroup
 
-theorem app_one_eq_zero_of_mem_kerIdeal_of_comp_eq_prime_smul :
-    ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (G H : PDivGroup p R) (f : G ⟶ H) (g : H ⟶ G),
+theorem app_one_eq_zero_of_mem_kerIdeal_of_comp_eq_prime_smul
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (G H : PDivGroup p R) (f : G ⟶ H)
+        (g : H ⟶ G),
       g ≫ f = (p : ℤ_[p]) • 𝟙 H → ∀ a ∈ kerIdeal (f.app 1), g.app 1 a = 0 := by
   intro p _ R _ G H f g hgf a ha
   have hle : kerIdeal (f.app 1) ≤ RingHom.ker (g.app 1 : G.A 1 →ₐ[R] H.A 1) := by

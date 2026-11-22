@@ -14,8 +14,9 @@ open IsDedekindDomain IsLocalRing Formalism.L2.Pj
 
 namespace GlobalTheory.CompleteValExt
 
-variable {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K]
+variable
+  {V K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
 
 theorem exists_algebraMap_eq_iff (x : K) : (∃ a : V, algebraMap V K a = x) ↔ 0 ≤ vV V x := by
   by_cases hx : x = 0
@@ -32,23 +33,28 @@ theorem exists_algebraMap_eq_iff (x : K) : (∃ a : V, algebraMap V K a = x) ↔
   rintro ⟨a, rfl⟩
   exact HeightOneSpectrum.valuation_le_one _ a
 
-variable {W L : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field L] [Algebra W L]
-  [IsFractionRing W L]
+variable
+  {W L : Type}
+  [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field L] [Algebra W L] [IsFractionRing W L]
 
-theorem finite_and_integral_of_scale [IsAdicComplete (maximalIdeal V) V] (i : K →+* L) {r : ℕ} (hr : 0 < r)
-    (hi : ∀ z, vV W (i z) = (r : ℤ) * vV V z) (h' : Finite (ResidueField W)) :
-    i.Finite ∧ ∀ b : W, (i.comp (algebraMap V K)).IsIntegralElem (algebraMap W L b) := by
+theorem finite_and_integral_of_scale
+    [IsAdicComplete (maximalIdeal V) V]
+    (i : K →+* L)
+    {r : ℕ} (hr : 0 < r) (hi : ∀ z, vV W (i z) = (r : ℤ) * vV V z)
+    (h' : Finite (ResidueField W))
+    : i.Finite ∧ ∀ b : W, (i.comp (algebraMap V K)).IsIntegralElem (algebraMap W L b) := by
   have hint : ∀ a : V, ∃ v : W, algebraMap W L v = i (algebraMap V K a) := fun a =>
-    (exists_algebraMap_eq_iff _).2 (by
-      rw [hi]; exact mul_nonneg (by positivity) ((exists_algebraMap_eq_iff _).1 ⟨a, rfl⟩))
+    (exists_algebraMap_eq_iff _).2
+      (by rw [hi]; exact mul_nonneg (by positivity) ((exists_algebraMap_eq_iff _).1 ⟨a, rfl⟩))
   choose g0 hg0 using hint
   have hinj := IsFractionRing.injective W L
-  let g : V →+* W :=
-    { toFun := g0
-      map_one' := hinj (by simp [hg0])
-      map_mul' := fun a b => hinj (by simp [hg0])
-      map_zero' := hinj (by simp [hg0])
-      map_add' := fun a b => hinj (by simp [hg0]) }
+  let g : V →+* W := {
+    toFun := g0
+    map_one' := hinj (by simp [hg0])
+    map_mul' := fun a b => hinj (by simp [hg0])
+    map_zero' := hinj (by simp [hg0])
+    map_add' := fun a b => hinj (by simp [hg0])
+  }
   have hg : ∀ a, algebraMap W L (g a) = i (algebraMap V K a) := hg0
   letI : Algebra V W := g.toAlgebra
   letI : Algebra K L := i.toAlgebra
@@ -78,8 +84,8 @@ theorem finite_and_integral_of_scale [IsAdicComplete (maximalIdeal V) V] (i : K 
       exact eq_inv_of_mul_eq_one_right hb'
     have h2 := (exists_algebraMap_eq_iff (V := W) _).1 ⟨b, h1⟩
     rw [hi] at h2
-    obtain ⟨c, hc⟩ := (exists_algebraMap_eq_iff (V := V) _).2
-      (nonneg_of_mul_nonneg_right h2 (by exact_mod_cast hr))
+    obtain ⟨c, hc⟩ :=
+      (exists_algebraMap_eq_iff (V := V) _).2 (nonneg_of_mul_nonneg_right h2 (by exact_mod_cast hr))
     refine (mem_maximalIdeal a).1 ha (IsUnit.of_mul_eq_one c (IsFractionRing.injective V K ?_))
     rw [map_mul, hc, map_one, mul_inv_cancel₀ h0]
   have hne : (maximalIdeal V).map (algebraMap V W) ≠ ⊥ := by
@@ -89,15 +95,20 @@ theorem finite_and_integral_of_scale [IsAdicComplete (maximalIdeal V) V] (i : K 
     ne_top_of_le_ne_top (maximalIdeal.isMaximal W).ne_top hle
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible W
   have : Finite (W ⧸ maximalIdeal W) := h'
-  have : Module.Finite V W := GlobalTheory.finite_of_forall_prime_mem hϖ.ne_zero (fun P hP h0 => by
-    rw [eq_maximalIdeal (hP.isMaximal h0)]
-    exact hϖ.not_isUnit) hne htop
+  have : Module.Finite V W :=
+    GlobalTheory.finite_of_forall_prime_mem hϖ.ne_zero
+      (fun P hP h0 => by
+        rw [eq_maximalIdeal (hP.isMaximal h0)]
+        exact hϖ.not_isUnit)
+      hne htop
   refine ⟨Module.Finite.of_isLocalization V W (nonZeroDivisors V), fun b => ?_⟩
   exact (Algebra.IsIntegral.isIntegral (R := V) b).algebraMap (B := L)
 
-theorem finite_and_integral : ∀ (T T' : CDVR) (i : T.Fr →+* T'.Fr) (r : ℕ), 0 < r →
-    (∀ a : T.Fr, vV T'.V (i a) = (r : ℤ) * vV T.V a) → T'.FinRes →
-    i.Finite ∧ ∀ b : T'.V, (i.comp (algebraMap T.V T.Fr)).IsIntegralElem (algebraMap T'.V T'.Fr b) :=
+theorem finite_and_integral
+    : ∀ (T T' : CDVR) (i : T.Fr →+* T'.Fr) (r : ℕ),
+      0 < r → (∀ a : T.Fr, vV T'.V (i a) = (r : ℤ) * vV T.V a) → T'.FinRes
+        → i.Finite
+          ∧ ∀ b : T'.V, (i.comp (algebraMap T.V T.Fr)).IsIntegralElem (algebraMap T'.V T'.Fr b) :=
   fun T T' i _ hr hi h' => finite_and_integral_of_scale (V := T.V) (W := T'.V) i hr hi h'
 
 end GlobalTheory.CompleteValExt

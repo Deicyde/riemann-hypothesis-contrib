@@ -5,7 +5,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsHermRi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.KFin
+open NumberField IsDedekindDomain Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.KFin
 open Formalism.UG (cT)
 open scoped TensorProduct
 
@@ -17,8 +19,8 @@ section Ring
 
 variable {A : Type} [CommRing A] (c : A →+* A) {n : ℕ} (M : Matrix (Fin n) (Fin n) A)
 
-theorem isHerm_hform (hc : ∀ a, c (c a) = a) (hM : ∀ i j, c (M j i) = M i j) :
-    IsHerm c (Formalism.UG.hform c M) := by
+theorem isHerm_hform (hc : ∀ a, c (c a) = a) (hM : ∀ i j, c (M j i) = M i j)
+    : IsHerm c (Formalism.UG.hform c M) := by
   refine ⟨fun x y z => ?_, fun a x y => ?_, fun x y => ?_⟩
   · simp only [Formalism.UG.hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   · simp only [Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
@@ -31,13 +33,13 @@ theorem isHerm_hform (hc : ∀ a, c (c a) = a) (hM : ∀ i j, c (M j i) = M i j)
     rw [hM]
     ring
 
-theorem hform_eq_dotProduct (x y : Fin n → A) :
-    Formalism.UG.hform c M x y = ((fun i => c (x i)) ᵥ* M) ⬝ᵥ y := by
+theorem hform_eq_dotProduct (x y : Fin n → A)
+    : Formalism.UG.hform c M x y = ((fun i => c (x i)) ᵥ* M) ⬝ᵥ y := by
   simp only [Formalism.UG.hform, Matrix.vecMul, dotProduct, Finset.sum_mul]
   rw [Finset.sum_comm]
 
-theorem isPerfect_hform (hc : ∀ a, c (c a) = a) (hM : IsUnit M.det) :
-    IsPerfect (Formalism.UG.hform c M) := by
+theorem isPerfect_hform (hc : ∀ a, c (c a) = a) (hM : IsUnit M.det)
+    : IsPerfect (Formalism.UG.hform c M) := by
   refine ⟨fun x hx => ?_, fun f => ?_⟩
   · have hv : (fun i => c (x i)) ᵥ* M = 0 := by
       funext j
@@ -66,11 +68,15 @@ end Ring
 
 section Tensor
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  (R : Type) [CommRing R] [Algebra F R]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 theorem sigR_inclR (a : E) : sigR R σ (inclR (F := F) R a) = inclR (F := F) R (σ a) := by
-  simp [Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR]
+  simp [Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR,
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR]
 
 theorem sigR_sigR_of_invol (hσ : ∀ x, σ (σ x) = x) (t : R ⊗[F] E) : sigR R σ (sigR R σ t) = t := by
   induction t using TensorProduct.induction_on with
@@ -91,7 +97,12 @@ end GlobalTheory.CompanionTheory.KFin.HermForm
 
 namespace GlobalTheory.CompanionTheory.KFin
 
-theorem isHerm_isPerfect_hR : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}, IsCMExt F E σ → IsHermND σ J → ∀ (v : HeightOneSpectrum (𝓞 F)), IsHerm (sigR (Fv F v) σ) (hR (Fv F v) σ J) ∧ IsPerfect (hR (Fv F v) σ J) := by
+theorem isHerm_isPerfect_hR
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E},
+      IsCMExt F E σ → IsHermND σ J
+        → ∀ (v : HeightOneSpectrum (𝓞 F)),
+          IsHerm (sigR (Fv F v) σ) (hR (Fv F v) σ J) ∧ IsPerfect (hR (Fv F v) σ J) := by
   intro F E _ _ _ _ _ σ n J hCM hJ v
   obtain ⟨w⟩ : Nonempty (InfinitePlace E) := inferInstance
   have hinv : ∀ x : E, σ (σ x) = x := by
@@ -105,8 +116,10 @@ theorem isHerm_isPerfect_hR : ∀ {F E : Type} [Field F] [NumberField F] [Field 
     intro i j
     simp only [Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.JR, Matrix.map_apply]
     rw [HermForm.sigR_inclR, hJ.1]
-  exact ⟨HermForm.isHerm_hform _ _ hc hM,
-    HermForm.isPerfect_hform _ _ hc (HermForm.isUnit_det_JR (F := F) (Fv F v) J hJ.2)⟩
+  exact ⟨
+    HermForm.isHerm_hform _ _ hc hM,
+    HermForm.isPerfect_hform _ _ hc (HermForm.isUnit_det_JR (F := F) (Fv F v) J hJ.2)
+  ⟩
 
 end GlobalTheory.CompanionTheory.KFin
 

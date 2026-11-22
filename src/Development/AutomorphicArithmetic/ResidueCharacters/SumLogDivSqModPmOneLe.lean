@@ -17,11 +17,12 @@ lemma filter_sub_Icc (T : Finset ℕ) (Y : ℝ) :
   rw [Finset.mem_Icc]
   exact ⟨hl.2.1, Nat.le_floor hl.2.2⟩
 
-theorem sum_log_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y) :
-    ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l ≤ Y * Real.log Y := by
+theorem sum_log_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y)
+    : ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l ≤ Y * Real.log Y := by
   have hlogY : 0 ≤ Real.log Y := Real.log_nonneg hY
-  have h1 : ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l ≤
-      (T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y)).card • Real.log Y := by
+  have h1
+      : ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l
+        ≤ (T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y)).card • Real.log Y := by
     apply Finset.sum_le_card_nsmul
     intro l hl
     simp only [Finset.mem_filter] at hl
@@ -36,65 +37,68 @@ theorem sum_log_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y) :
   rw [nsmul_eq_mul] at h1
   nlinarith
 
-theorem sum_log_div_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y) :
-    ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l ≤ (1 + Real.log Y) ^ 2 := by
+theorem sum_log_div_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y)
+    : ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l ≤ (1 + Real.log Y) ^ 2 := by
   have hlogY : 0 ≤ Real.log Y := Real.log_nonneg hY
-  calc ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l
-      ≤ ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log Y * ((l : ℝ))⁻¹ := by
-        apply Finset.sum_le_sum
-        intro l hl
-        simp only [Finset.mem_filter] at hl
-        have : (1 : ℝ) ≤ l := by exact_mod_cast hl.2.1
-        rw [div_eq_mul_inv]
-        exact mul_le_mul_of_nonneg_right (Real.log_le_log (by linarith) hl.2.2) (by positivity)
+  calc
+    ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l
+        ≤ ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log Y * ((l : ℝ))⁻¹ := by
+      apply Finset.sum_le_sum
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      have : (1 : ℝ) ≤ l := by exact_mod_cast hl.2.1
+      rw [div_eq_mul_inv]
+      exact mul_le_mul_of_nonneg_right (Real.log_le_log (by linarith) hl.2.2) (by positivity)
     _ ≤ ∑ l ∈ Finset.Icc 1 ⌊Y⌋₊, Real.log Y * ((l : ℝ))⁻¹ := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg (filter_sub_Icc T Y)
-        intro l _ _
-        positivity
+      apply Finset.sum_le_sum_of_subset_of_nonneg (filter_sub_Icc T Y)
+      intro l _ _
+      positivity
     _ = Real.log Y * (harmonic ⌊Y⌋₊ : ℝ) := by
-        rw [← Finset.mul_sum, harmonic_eq_sum_Icc]
-        push_cast
-        rfl
+      rw [← Finset.mul_sum, harmonic_eq_sum_Icc]
+      push_cast
+      rfl
     _ ≤ Real.log Y * (1 + Real.log ⌊Y⌋₊) := by
-        exact mul_le_mul_of_nonneg_left (harmonic_le_one_add_log _) hlogY
+      exact mul_le_mul_of_nonneg_left (harmonic_le_one_add_log _) hlogY
     _ ≤ Real.log Y * (1 + Real.log Y) := by
-        have hf : (1 : ℝ) ≤ ⌊Y⌋₊ := by exact_mod_cast Nat.le_floor (by exact_mod_cast hY)
-        have : Real.log ⌊Y⌋₊ ≤ Real.log Y := Real.log_le_log (by linarith) (Nat.floor_le (by linarith))
-        nlinarith
+      have hf : (1 : ℝ) ≤ ⌊Y⌋₊ := by exact_mod_cast Nat.le_floor (by exact_mod_cast hY)
+      have : Real.log ⌊Y⌋₊ ≤ Real.log Y :=
+        Real.log_le_log (by linarith) (Nat.floor_le (by linarith))
+      nlinarith
     _ ≤ (1 + Real.log Y) ^ 2 := by nlinarith
 
-theorem sum_log_div_pred_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y) :
-    ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / ((l : ℝ) - 1) ≤ 2 * (1 + Real.log Y) ^ 2 := by
-  calc ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / ((l : ℝ) - 1)
-      ≤ ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), 2 * (Real.log l / l) := by
-        apply Finset.sum_le_sum
-        intro l hl
-        simp only [Finset.mem_filter] at hl
-        have h2 : (2 : ℝ) ≤ l := by exact_mod_cast hl.2.1
-        have hlog : 0 ≤ Real.log l := Real.log_nonneg (by linarith)
-        rw [div_le_iff₀ (by linarith)]
-        rw [show 2 * (Real.log l / l) * ((l : ℝ) - 1) = Real.log l * (2 * ((l : ℝ) - 1) / l) by
-          field_simp]
-        have : 1 ≤ 2 * ((l : ℝ) - 1) / l := by
-          rw [le_div_iff₀ (by linarith)]; linarith
-        nlinarith
+theorem sum_log_div_pred_le (T : Finset ℕ) (Y : ℝ) (hY : 1 ≤ Y)
+    : ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / ((l : ℝ) - 1)
+      ≤ 2 * (1 + Real.log Y) ^ 2 := by
+  calc
+    ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / ((l : ℝ) - 1)
+        ≤ ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), 2 * (Real.log l / l) := by
+      apply Finset.sum_le_sum
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      have h2 : (2 : ℝ) ≤ l := by exact_mod_cast hl.2.1
+      have hlog : 0 ≤ Real.log l := Real.log_nonneg (by linarith)
+      rw [div_le_iff₀ (by linarith)]
+      rw [show 2 * (Real.log l / l) * ((l : ℝ) - 1) = Real.log l * (2 * ((l : ℝ) - 1) / l) by
+        field_simp]
+      have : 1 ≤ 2 * ((l : ℝ) - 1) / l := by rw [le_div_iff₀ (by linarith)]; linarith
+      nlinarith
     _ = 2 * ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l := by
-        rw [Finset.mul_sum]
+      rw [Finset.mul_sum]
     _ ≤ 2 * ∑ l ∈ T.filter (fun l : ℕ => 1 ≤ l ∧ (l : ℝ) ≤ Y), Real.log l / l := by
-        apply mul_le_mul_of_nonneg_left _ (by norm_num)
-        apply Finset.sum_le_sum_of_subset_of_nonneg
-        · intro l hl
-          simp only [Finset.mem_filter] at hl ⊢
-          exact ⟨hl.1, by omega, hl.2.2⟩
-        · intro l _ _
-          have : (0:ℝ) ≤ l := by positivity
-          rcases Nat.eq_zero_or_pos l with h | h
-          · subst h; simp
-          · have : (1:ℝ) ≤ l := by exact_mod_cast h
-            exact div_nonneg (Real.log_nonneg this) (by linarith)
+      apply mul_le_mul_of_nonneg_left _ (by norm_num)
+      apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro l hl
+        simp only [Finset.mem_filter] at hl ⊢
+        exact ⟨hl.1, by omega, hl.2.2⟩
+      · intro l _ _
+        have : (0 : ℝ) ≤ l := by positivity
+        rcases Nat.eq_zero_or_pos l with h | h
+        · subst h; simp
+        · have : (1 : ℝ) ≤ l := by exact_mod_cast h
+          exact div_nonneg (Real.log_nonneg this) (by linarith)
     _ ≤ 2 * (1 + Real.log Y) ^ 2 := by
-        have := sum_log_div_le T Y hY
-        linarith
+      have := sum_log_div_le T Y hY
+      linarith
 
 def frobeniusStickelbergerDetMulSigmaCube (u : ℝ) : ℝ := (Real.log u + 2) / u
 
@@ -189,18 +193,21 @@ lemma ap_sum (S : Finset ℕ) (u0 M : ℕ) (hu : 1 ≤ u0) (hM : 1 ≤ M)
           div_le_div_of_nonneg_right (by linarith) (by linarith)
         linarith
 
-theorem sum_log_div_sq_le (T : Finset ℕ) :
-    ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l), Real.log l / (l : ℝ) ^ 2 ≤ 2 := by
-  have h := ap_sum (T.filter (fun l : ℕ => 2 ≤ l)) 1 1 le_rfl le_rfl (by
-    intro l hl
-    simp only [Finset.mem_filter] at hl
-    exact ⟨l - 1, by omega⟩)
-  have : frobeniusStickelbergerDetMulSigmaCube ((1 : ℕ) : ℝ) = 2 := by unfold frobeniusStickelbergerDetMulSigmaCube; simp
+theorem sum_log_div_sq_le (T : Finset ℕ)
+    : ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l), Real.log l / (l : ℝ) ^ 2 ≤ 2 := by
+  have h :=
+    ap_sum (T.filter (fun l : ℕ => 2 ≤ l)) 1 1 le_rfl le_rfl (by
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      exact ⟨l - 1, by omega⟩)
+  have : frobeniusStickelbergerDetMulSigmaCube ((1 : ℕ) : ℝ) = 2 := by
+    unfold frobeniusStickelbergerDetMulSigmaCube; simp
   rw [this] at h
   simpa using h
 
-theorem sum_log_div_sq_tail (T : Finset ℕ) (A : ℝ) (hA : 2 ≤ A) :
-    ∑ l ∈ T.filter (fun l : ℕ => A ≤ (l : ℝ)), Real.log l / (l : ℝ) ^ 2 ≤ 4 * (Real.log A + 2) / A := by
+theorem sum_log_div_sq_tail (T : Finset ℕ) (A : ℝ) (hA : 2 ≤ A)
+    : ∑ l ∈ T.filter (fun l : ℕ => A ≤ (l : ℝ)), Real.log l / (l : ℝ) ^ 2
+      ≤ 4 * (Real.log A + 2) / A := by
   set c := ⌈A⌉₊ with hc
   have hcA : A ≤ (c : ℝ) := Nat.le_ceil A
   have hcA' : (c : ℝ) < A + 1 := Nat.ceil_lt_add_one (by linarith)
@@ -208,18 +215,18 @@ theorem sum_log_div_sq_tail (T : Finset ℕ) (A : ℝ) (hA : 2 ≤ A) :
     have : (1 : ℝ) < c := by linarith
     exact_mod_cast this
   have hu : 1 ≤ c - 1 := by omega
-  have hcast : ((c - 1 : ℕ) : ℝ) = (c : ℝ) - 1 := by
-    rw [Nat.cast_sub (by omega)]; simp
-  have h := ap_sum (T.filter (fun l : ℕ => A ≤ (l : ℝ))) (c - 1) 1 hu le_rfl (by
-    intro l hl
-    simp only [Finset.mem_filter] at hl
-    have : c ≤ l := Nat.ceil_le.mpr hl.2
-    exact ⟨l - (c - 1), by omega⟩)
+  have hcast : ((c - 1 : ℕ) : ℝ) = (c : ℝ) - 1 := by rw [Nat.cast_sub (by omega)]; simp
+  have h :=
+    ap_sum (T.filter (fun l : ℕ => A ≤ (l : ℝ))) (c - 1) 1 hu le_rfl (by
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      have : c ≤ l := Nat.ceil_le.mpr hl.2
+      exact ⟨l - (c - 1), by omega⟩)
   rw [hcast] at h
   unfold frobeniusStickelbergerDetMulSigmaCube at h
   set u := (c : ℝ) - 1 with hu_def
   have hu1 : 1 ≤ u := by
-    have : (2:ℝ) ≤ c := by exact_mod_cast hc2
+    have : (2 : ℝ) ≤ c := by exact_mod_cast hc2
     linarith
   have huA : u < A := by linarith
   have huA2 : A / 2 ≤ u := by linarith
@@ -234,9 +241,9 @@ theorem sum_log_div_sq_tail (T : Finset ℕ) (A : ℝ) (hA : 2 ≤ A) :
     apply div_le_div₀ (by linarith) (by linarith) (by linarith) huA2
   have h3 : Real.log u / u ≤ (Real.log A + 2) / (A / 2) := by
     apply div_le_div₀ (by linarith) (by linarith) (by linarith) huA2
-  have h4 : (Real.log A + 2) / (A / 2) = 2 * (Real.log A + 2) / A := by
-    field_simp
-  have h5 : 4 * (Real.log A + 2) / A = 2 * (Real.log A + 2) / A + 2 * (Real.log A + 2) / A := by ring
+  have h4 : (Real.log A + 2) / (A / 2) = 2 * (Real.log A + 2) / A := by field_simp
+  have h5 : 4 * (Real.log A + 2) / A = 2 * (Real.log A + 2) / A + 2 * (Real.log A + 2) / A := by
+    ring
   linarith
 
 lemma log_ge_one_of_three {Y : ℝ} (hY : 3 ≤ Y) : 1 ≤ Real.log Y := by
@@ -273,9 +280,10 @@ lemma logAddTwoDivSelf_le_of_le {u Y : ℝ} (hY : 1 ≤ Y) (hu : Y ≤ u) : frob
   rw [div_le_div_iff₀ hu0 hY0]
   nlinarith [mul_nonneg hl (sub_nonneg.mpr hu)]
 
-theorem sum_log_div_sq_mod_pm_one_le (T : Finset ℕ) (M : ℕ) (Y : ℝ) (hY : 3 ≤ Y) (hYM : Y ≤ (M : ℝ) - 1) :
-    ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l % M = 1 ∨ l % M = M - 1)), Real.log l / (l : ℝ) ^ 2 ≤
-      2 * Real.log Y / Y ^ 2 + 2 * (Real.log Y + 2) / (Y * M) := by
+theorem sum_log_div_sq_mod_pm_one_le
+    (T : Finset ℕ) (M : ℕ) (Y : ℝ) (hY : 3 ≤ Y) (hYM : Y ≤ (M : ℝ) - 1)
+    : ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l % M = 1 ∨ l % M = M - 1)), Real.log l / (l : ℝ) ^ 2
+      ≤ 2 * Real.log Y / Y ^ 2 + 2 * (Real.log Y + 2) / (Y * M) := by
   classical
   have hM4 : (4 : ℝ) ≤ M := by linarith
   have hM4n : 4 ≤ M := by exact_mod_cast hM4
@@ -286,71 +294,84 @@ theorem sum_log_div_sq_mod_pm_one_le (T : Finset ℕ) (M : ℕ) (Y : ℝ) (hY : 
     have := Real.log_natCast_nonneg l
     simp only [hf]
     positivity
-  have hsplit : ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l % M = 1 ∨ l % M = M - 1)), f l ≤
-      ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = 1), f l +
-      ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = M - 1), f l := by
+  have hsplit
+      : ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ (l % M = 1 ∨ l % M = M - 1)), f l
+        ≤ ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = 1), f l
+          + ∑ l ∈ T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = M - 1), f l := by
     rw [Finset.sum_filter, Finset.sum_filter, Finset.sum_filter, ← Finset.sum_add_distrib]
     apply Finset.sum_le_sum
     intro l _
     have := fnn l
     split_ifs <;> first | linarith | (exfalso; tauto)
-  have h1 := ap_sum (T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = 1)) (M + 1) M (by omega) (by omega) (by
-    intro l hl
-    simp only [Finset.mem_filter] at hl
-    have h := Nat.div_add_mod l M
-    rw [hl.2.2] at h
-    obtain ⟨q, hq⟩ : ∃ q, l / M = q + 1 := by
-      rcases Nat.eq_zero_or_pos (l / M) with h0 | h0
-      · rw [h0] at h; omega
-      · exact ⟨l / M - 1, by omega⟩
-    rw [hq] at h
-    exact ⟨q, by linarith⟩)
-  have h2 := ap_sum (T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = M - 1)) (M - 1) M (by omega) (by omega) (by
-    intro l hl
-    simp only [Finset.mem_filter] at hl
-    have h := Nat.div_add_mod l M
-    rw [hl.2.2] at h
-    exact ⟨l / M, by linarith⟩)
+  have h1 :=
+    ap_sum (T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = 1)) (M + 1) M (by omega) (by omega) (by
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      have h := Nat.div_add_mod l M
+      rw [hl.2.2] at h
+      obtain ⟨q, hq⟩ : ∃ q, l / M = q + 1 := by
+        rcases Nat.eq_zero_or_pos (l / M) with h0 | h0
+        · rw [h0] at h; omega
+        · exact ⟨l / M - 1, by omega⟩
+      rw [hq] at h
+      exact ⟨q, by linarith⟩)
+  have h2 :=
+    ap_sum (T.filter (fun l : ℕ => 2 ≤ l ∧ l % M = M - 1)) (M - 1) M (by omega) (by omega) (by
+      intro l hl
+      simp only [Finset.mem_filter] at hl
+      have h := Nat.div_add_mod l M
+      rw [hl.2.2] at h
+      exact ⟨l / M, by linarith⟩)
   have c1 : ((M + 1 : ℕ) : ℝ) = (M : ℝ) + 1 := by push_cast; ring
   have c2 : ((M - 1 : ℕ) : ℝ) = (M : ℝ) - 1 := by rw [Nat.cast_sub (by omega)]; simp
   rw [c1] at h1
   rw [c2] at h2
-  have a1 : Real.log ((M : ℝ) + 1) / ((M : ℝ) + 1) ^ 2 ≤ Real.log Y / Y ^ 2 := logsq_anti hY (by linarith)
+  have a1 : Real.log ((M : ℝ) + 1) / ((M : ℝ) + 1) ^ 2 ≤ Real.log Y / Y ^ 2 :=
+    logsq_anti hY (by linarith)
   have a2 : Real.log ((M : ℝ) - 1) / ((M : ℝ) - 1) ^ 2 ≤ Real.log Y / Y ^ 2 := logsq_anti hY hYM
-  have b1 : frobeniusStickelbergerDetMulSigmaCube ((M : ℝ) + 1) / M ≤ frobeniusStickelbergerDetMulSigmaCube Y / M :=
+  have b1
+      : frobeniusStickelbergerDetMulSigmaCube ((M : ℝ) + 1) / M
+        ≤ frobeniusStickelbergerDetMulSigmaCube Y / M :=
     div_le_div_of_nonneg_right (logAddTwoDivSelf_le_of_le (by linarith) (by linarith)) hMpos.le
-  have b2 : frobeniusStickelbergerDetMulSigmaCube ((M : ℝ) - 1) / M ≤ frobeniusStickelbergerDetMulSigmaCube Y / M :=
+  have b2
+      : frobeniusStickelbergerDetMulSigmaCube ((M : ℝ) - 1) / M
+        ≤ frobeniusStickelbergerDetMulSigmaCube Y / M :=
     div_le_div_of_nonneg_right (logAddTwoDivSelf_le_of_le (by linarith) hYM) hMpos.le
-  have e : frobeniusStickelbergerDetMulSigmaCube Y / M = (Real.log Y + 2) / (Y * M) := by unfold frobeniusStickelbergerDetMulSigmaCube; rw [div_div]
-  have e2 : 2 * Real.log Y / Y ^ 2 + 2 * (Real.log Y + 2) / (Y * M) =
-      2 * (Real.log Y / Y ^ 2) + 2 * ((Real.log Y + 2) / (Y * M)) := by ring
+  have e : frobeniusStickelbergerDetMulSigmaCube Y / M = (Real.log Y + 2) / (Y * M) := by
+    unfold frobeniusStickelbergerDetMulSigmaCube; rw [div_div]
+  have e2
+      : 2 * Real.log Y / Y ^ 2 + 2 * (Real.log Y + 2) / (Y * M)
+        = 2 * (Real.log Y / Y ^ 2) + 2 * ((Real.log Y + 2) / (Y * M)) := by
+    ring
   simp only [hf] at hsplit
   linarith
 
-theorem sum_padicVal_log_le (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime) (n : ℕ) (hn : n ≠ 0) :
-    ∑ p ∈ T, (padicValNat p n : ℝ) * Real.log p ≤ Real.log n := by
+theorem sum_padicVal_log_le (T : Finset ℕ) (hT : ∀ p ∈ T, p.Prime) (n : ℕ) (hn : n ≠ 0)
+    : ∑ p ∈ T, (padicValNat p n : ℝ) * Real.log p ≤ Real.log n := by
   classical
   have hlog : Real.log n = ∑ p ∈ n.primeFactors, (n.factorization p : ℝ) * Real.log p := by
     rw [Real.log_nat_eq_sum_factorization, Finsupp.sum, Nat.support_factorization]
-  have hT' : ∑ p ∈ T, (padicValNat p n : ℝ) * Real.log p =
-      ∑ p ∈ T, (n.factorization p : ℝ) * Real.log p := by
+  have hT'
+      : ∑ p ∈ T, (padicValNat p n : ℝ) * Real.log p
+        = ∑ p ∈ T, (n.factorization p : ℝ) * Real.log p := by
     apply Finset.sum_congr rfl
     intro p hp
     rw [Nat.factorization_def n (hT p hp), Nat.padicValNat_def]
   rw [hT', hlog]
-  calc ∑ p ∈ T, (n.factorization p : ℝ) * Real.log p
-      = ∑ p ∈ T ∩ n.primeFactors, (n.factorization p : ℝ) * Real.log p := by
-        symm
-        apply Finset.sum_subset Finset.inter_subset_left
-        intro p hp hnot
-        have : p ∉ n.primeFactors := fun h => hnot (Finset.mem_inter.mpr ⟨hp, h⟩)
-        rw [← Nat.support_factorization, Finsupp.notMem_support_iff] at this
-        simp [this]
+  calc
+    ∑ p ∈ T, (n.factorization p : ℝ) * Real.log p
+        = ∑ p ∈ T ∩ n.primeFactors, (n.factorization p : ℝ) * Real.log p := by
+      symm
+      apply Finset.sum_subset Finset.inter_subset_left
+      intro p hp hnot
+      have : p ∉ n.primeFactors := fun h => hnot (Finset.mem_inter.mpr ⟨hp, h⟩)
+      rw [← Nat.support_factorization, Finsupp.notMem_support_iff] at this
+      simp [this]
     _ ≤ ∑ p ∈ n.primeFactors, (n.factorization p : ℝ) * Real.log p := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg Finset.inter_subset_right
-        intro p _ _
-        have := Real.log_natCast_nonneg p
-        positivity
+      apply Finset.sum_le_sum_of_subset_of_nonneg Finset.inter_subset_right
+      intro p _ _
+      have := Real.log_natCast_nonneg p
+      positivity
 
 end Formalism.MainNotions.TwistedPlaces.Sums
 
@@ -451,8 +472,8 @@ lemma pm_int (K : ℕ) (x : ℤ) (hx : Odd x) (o : ℕ) (ho : 0 < o)
   rw [pow_mul] at h
   exact pm_of_pow_odd K _ hx.pow m hm h
 
-theorem ordPM_nonempty (K l : ℕ) (hl : Odd l) :
-    {o : ℕ | 0 < o ∧ ((l : ZMod (2 ^ K)) ^ o = 1 ∨ (l : ZMod (2 ^ K)) ^ o = -1)}.Nonempty := by
+theorem ordPM_nonempty (K l : ℕ) (hl : Odd l)
+    : {o : ℕ | 0 < o ∧ ((l : ZMod (2 ^ K)) ^ o = 1 ∨ (l : ZMod (2 ^ K)) ^ o = -1)}.Nonempty := by
   have hc : Nat.Coprime l (2 ^ K) := by
     apply Nat.Coprime.pow_right
     exact Nat.coprime_two_right.mpr hl
@@ -462,33 +483,35 @@ theorem ordPM_nonempty (K l : ℕ) (hl : Odd l) :
   push_cast at h2
   exact h2
 
-theorem pm_one_of_pow (K l o : ℕ) (hl : Odd l) (ho : 0 < o)
-    (h : (l : ZMod (2 ^ K)) ^ o = 1 ∨ (l : ZMod (2 ^ K)) ^ o = -1) :
-    l % 2 ^ (K - padicValNat 2 o) = 1 ∨ l % 2 ^ (K - padicValNat 2 o) = 2 ^ (K - padicValNat 2 o) - 1 := by
+theorem pm_one_of_pow
+    (K l o : ℕ)
+    (hl : Odd l) (ho : 0 < o) (h : (l : ZMod (2 ^ K)) ^ o = 1 ∨ (l : ZMod (2 ^ K)) ^ o = -1)
+    : l % 2 ^ (K - padicValNat 2 o) = 1
+      ∨ l % 2 ^ (K - padicValNat 2 o) = 2 ^ (K - padicValNat 2 o) - 1 := by
   have hlz : Odd (l : ℤ) := by exact_mod_cast hl
-  have hint : (2:ℤ) ^ K ∣ (l:ℤ) ^ o - 1 ∨ (2:ℤ) ^ K ∣ (l:ℤ) ^ o + 1 := by
+  have hint : (2 : ℤ) ^ K ∣ (l : ℤ) ^ o - 1 ∨ (2 : ℤ) ^ K ∣ (l : ℤ) ^ o + 1 := by
     rcases h with h | h
     · left
-      have h0 : (((l:ℤ) ^ o - 1 : ℤ) : ZMod (2 ^ K)) = 0 := by push_cast; rw [h]; ring
+      have h0 : (((l : ℤ) ^ o - 1 : ℤ) : ZMod (2 ^ K)) = 0 := by push_cast; rw [h]; ring
       have := (ZMod.intCast_zmod_eq_zero_iff_dvd _ (2 ^ K)).mp h0
       exact_mod_cast this
     · right
-      have h0 : (((l:ℤ) ^ o + 1 : ℤ) : ZMod (2 ^ K)) = 0 := by push_cast; rw [h]; ring
+      have h0 : (((l : ℤ) ^ o + 1 : ℤ) : ZMod (2 ^ K)) = 0 := by push_cast; rw [h]; ring
       have := (ZMod.intCast_zmod_eq_zero_iff_dvd _ (2 ^ K)).mp h0
       exact_mod_cast this
-  have key := pm_int K (l:ℤ) hlz o ho hint
+  have key := pm_int K (l : ℤ) hlz o ho hint
   generalize K - padicValNat 2 o = s at key ⊢
   rcases Nat.eq_zero_or_pos s with hs | hs
   · subst hs; right; simp [Nat.mod_one]
   have hN : 2 ≤ 2 ^ s := by
-    calc 2 = 2 ^ 1 := by norm_num
-    _ ≤ 2 ^ s := Nat.pow_le_pow_right (by norm_num) hs
+    calc
+      2 = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ s := Nat.pow_le_pow_right (by norm_num) hs
   have hl1 : 1 ≤ l := hl.pos
   rcases key with h1 | h1
   · left
     have h2 : 2 ^ s ∣ l - 1 := by
-      have : ((2 ^ s : ℕ) : ℤ) ∣ ((l - 1 : ℕ) : ℤ) := by
-        rw [Nat.cast_sub hl1]; push_cast; exact h1
+      have : ((2 ^ s : ℕ) : ℤ) ∣ ((l - 1 : ℕ) : ℤ) := by rw [Nat.cast_sub hl1]; push_cast; exact h1
       exact Int.natCast_dvd_natCast.mp this
     have h3 := (Nat.modEq_iff_dvd' hl1).mpr h2
     rw [Nat.ModEq, Nat.mod_eq_of_lt (by omega)] at h3

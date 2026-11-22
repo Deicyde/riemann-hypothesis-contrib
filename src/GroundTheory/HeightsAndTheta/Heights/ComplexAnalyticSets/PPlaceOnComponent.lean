@@ -13,12 +13,16 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets
 
-theorem ringKrullDim_eq_one_of_surjective_of_ker_mem_minimalPrimes {R S : Type*} [CommRing R] [CommRing S]
-    [IsLocalRing R] (hR : ringKrullDim R = 1) {p : Ideal R} (hp : p ∈ minimalPrimes R) (φ : R →+* S)
-    (hφ : Function.Surjective φ) (hker : RingHom.ker φ = p) : ringKrullDim S = 1 := by
+theorem ringKrullDim_eq_one_of_surjective_of_ker_mem_minimalPrimes
+    {R S : Type*} [CommRing R] [CommRing S] [IsLocalRing R]
+    (hR : ringKrullDim R = 1)
+    {p : Ideal R} (hp : p ∈ minimalPrimes R)
+    (φ : R →+* S) (hφ : Function.Surjective φ) (hker : RingHom.ker φ = p)
+    : ringKrullDim S = 1 := by
   have hpp : p.IsPrime := hp.1.1
   refine le_antisymm (hR ▸ ringKrullDim_le_of_surjective φ hφ) ?_
-  obtain ⟨x, y, hxy⟩ := Order.one_le_krullDim_iff.1 (le_of_eq hR.symm : (1 : WithBot ℕ∞) ≤ ringKrullDim R)
+  obtain ⟨x, y, hxy⟩ :=
+    Order.one_le_krullDim_iff.1 (le_of_eq hR.symm : (1 : WithBot ℕ∞) ≤ ringKrullDim R)
   have hxm : x.asIdeal < IsLocalRing.maximalIdeal R :=
     lt_of_lt_of_le hxy (IsLocalRing.le_maximalIdeal y.isPrime.ne_top)
   have hpm : p < IsLocalRing.maximalIdeal R := by
@@ -35,8 +39,9 @@ theorem ringKrullDim_eq_one_of_surjective_of_ker_mem_minimalPrimes {R S : Type*}
   refine lt_of_le_of_ne (Ideal.map_mono hpm.le) fun h ↦ hpm.ne ?_
   rw [← hk p le_rfl, h, hk _ hpm.le]
 
-theorem PlaceOnComponent.proof (h₁ : ReducedNormalisationPlace.Statement)
-    (h₂ : CurveMinimalPrimeQuotient.Statement) : PlaceOnComponent.Statement := by
+theorem PlaceOnComponent.proof
+    (h₁ : ReducedNormalisationPlace.Statement) (h₂ : CurveMinimalPrimeQuotient.Statement)
+    : PlaceOnComponent.Statement := by
   intro n I q hrad hdim P
   have : IsReduced (curveLocalRing I q) := isReduced_curveLocalRing I q hrad
   have : Nontrivial (curveLocalRing I q) := by
@@ -48,7 +53,14 @@ theorem PlaceOnComponent.proof (h₁ : ReducedNormalisationPlace.Statement)
   obtain ⟨p, hp, hS⟩ := h₁ (curveLocalRing I q) P
   obtain ⟨J, hJ, hJq, φ, hφ, hker, hφf⟩ := h₂ n I q p hp
   obtain ⟨P', hP'⟩ := hS (curveLocalRing J q) φ hφ hker
-  refine ⟨J, hJ, hJq, ringKrullDim_eq_one_of_surjective_of_ker_mem_minimalPrimes hdim hp φ hφ hker, P', fun f ↦ ?_⟩
+  refine ⟨
+    J,
+    hJ,
+    hJq,
+    ringKrullDim_eq_one_of_surjective_of_ker_mem_minimalPrimes hdim hp φ hφ hker,
+    P',
+    fun f ↦ ?_
+  ⟩
   have e := hP' (algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f)
   rw [hφf] at e
   exact e

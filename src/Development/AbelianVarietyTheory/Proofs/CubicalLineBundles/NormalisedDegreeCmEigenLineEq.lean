@@ -18,15 +18,20 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.LamCM
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.LamCM
 open scoped CategoryTheory.Obj ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.LamF
 
 namespace GlobalTheory.LamF
 
-theorem splits_of_injective_label {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
-    {lab : (E →+* ℂ) → (E →+* K)} (hl : Function.Injective lab) : GlobalTheory.CM.Splits E K := by
+theorem splits_of_injective_label
+    {E K : Type} [Field E] [NumberField E] [Field K] [NumberField K]
+    {lab : (E →+* ℂ) → (E →+* K)} (hl : Function.Injective lab)
+    : GlobalTheory.CM.Splits E K := by
   rw [GlobalTheory.CM.splits_iff_card]
   refine le_antisymm GlobalTheory.CM.card_ringHom_le_finrank ?_
   have h1 : Nat.card (E →+* ℂ) = Module.finrank ℚ E := by
@@ -35,7 +40,18 @@ theorem splits_of_injective_label {E K : Type} [Field E] [NumberField E] [Field 
   rw [← h1]
   exact Nat.card_le_card_of_injective lab hl
 
-theorem ndeg_vecLine_eq : DegSt → ThetaUnifAV → Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [StarRing (𝓞 E)] (H : Host E) [NeZero H.d] (χ : DirichletCharacter ℂ H.d), IsKroneckerChar χ → (∀ a : 𝓞 E, star a = H.bar a) → ∀ (K : Type) [Field K] [NumberField K] (A : Out.PolAV (Sp (𝓞 K))) (oa : A.OAct (𝓞 E)) (x : KeyIn K) (φ : x.P.A.left ⟶ A.A.left) (S : Set (E →+* ℂ)) (τ : Fin x.P.g ≃ S) (lab : (E →+* ℂ) → (E →+* K)) (ρ : 𝓞 K), IsFibreOf A x (gmap K) φ → Function.Injective lab → ρ ^ 2 = -(H.d : 𝓞 K) → (∀ t, t ∈ S ↔ lab t (H.rt : E) = (ρ : K)) → IsLieType A oa x φ τ lab → ∀ (i : Fin x.P.g) (ℓ : MLine K), IsVecLine A x φ i ℓ → ℓ.ndeg = (logOm E χ).re / 2 := by
+theorem ndeg_vecLine_eq
+    : DegSt → ThetaUnifAV → Out.Laws
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [StarRing (𝓞 E)] (H : Host E)
+          [NeZero H.d] (χ : DirichletCharacter ℂ H.d),
+        IsKroneckerChar χ → (∀ a : 𝓞 E, star a = H.bar a)
+          → ∀ (K : Type) [Field K] [NumberField K] (A : Out.PolAV (Sp (𝓞 K))) (oa : A.OAct (𝓞 E))
+              (x : KeyIn K) (φ : x.P.A.left ⟶ A.A.left) (S : Set (E →+* ℂ)) (τ : Fin x.P.g ≃ S)
+              (lab : (E →+* ℂ) → (E →+* K)) (ρ : 𝓞 K),
+            IsFibreOf A x (gmap K) φ → Function.Injective lab → ρ ^ 2 = -(H.d : 𝓞 K)
+              → (∀ t, t ∈ S ↔ lab t (H.rt : E) = (ρ : K)) → IsLieType A oa x φ τ lab
+              → ∀ (i : Fin x.P.g) (ℓ : MLine K),
+                IsVecLine A x φ i ℓ → ℓ.ndeg = (logOm E χ).re / 2 := by
   intro hD hU hL E _ _ _ _ H _ χ hχ hstar K _ _ A oa x φ S τ lab ρ hfib hl hρ hS hLie i ℓ hℓ
   have hf : IsPolFibre (algebraMap (𝓞 K) K) A x.P φ :=
     (GlobalTheory.LamF.isFibreOf_iff_isPolFibre (𝓞 K) K (algebraMap (𝓞 K) K) A x φ).1 hfib
@@ -59,25 +75,31 @@ theorem ndeg_vecLine_eq : DegSt → ThetaUnifAV → Out.Laws → ∀ (E : Type) 
     apply RingOfIntegers.ext
     rw [htv]
     exact (hS (τ i)).1 (τ i).2
-  have hdeg := GlobalTheory.T.two_mul_deg_eigenLattice_polarizedAbelianScheme hD hU hL E H χ hχ K ρ A act hlam hsplit hρ htype F h hh t hti
+  have hdeg :=
+    GlobalTheory.T.two_mul_deg_eigenLattice_polarizedAbelianScheme hD hU hL E H χ hχ K ρ A act hlam
+      hsplit hρ htype F h hh t hti
   have hline : deg h (F.eigLat act t) = ℓ.ndeg := by
-    refine GlobalTheory.LamF.deg_eq_ndeg_of_line K (Fin x.P.g → K) h (F.eigLat act t) (Pi.single i 1) ℓ ?_ hℓ.1 ?_ ?_
+    refine GlobalTheory.LamF.deg_eq_ndeg_of_line K (Fin x.P.g → K) h (F.eigLat act t)
+      (Pi.single i 1) ℓ ?_ hℓ.1 ?_ ?_
     · intro h0
       have := congrFun h0 i
       simp at this
     · intro z
-      rw [GlobalTheory.LamF.EigLine.mem_eigLat_iff E K A x φ hf oa act S τ lab hact hl hLie i t htv z]
+      rw [GlobalTheory.LamF.EigLine.mem_eigLat_iff E K A x φ hf oa act S τ lab hact hl hLie i t htv
+        z]
       constructor
       · rintro ⟨hz, r, rfl⟩
         refine ⟨r, ?_, ?_⟩
-        · exact (GlobalTheory.T.mem_lieVector_line_ideal_iff_mem_lie_lattice K A x φ hf i ℓ hℓ r).2 hz
+        · exact (GlobalTheory.T.mem_lieVector_line_ideal_iff_mem_lie_lattice K A x φ hf i ℓ hℓ r).2
+            hz
         · ext j
           by_cases hj : j = i
           · subst hj; simp
           · simp [hj]
       · rintro ⟨c, hc, rfl⟩
         refine ⟨?_, c, ?_⟩
-        · have := (GlobalTheory.T.mem_lieVector_line_ideal_iff_mem_lie_lattice K A x φ hf i ℓ hℓ c).1 hc
+        · have :=
+            (GlobalTheory.T.mem_lieVector_line_ideal_iff_mem_lie_lattice K A x φ hf i ℓ hℓ c).1 hc
           convert this using 1
           ext j
           by_cases hj : j = i

@@ -15,8 +15,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open ReciprocityTheory.ChartRestriction.G NumberField
 
-theorem OrbitFiniteSum.proof (hD : OrbitDegreeRatio.Statement) (hL : OrbitLocalSum.Statement)
-    (hZ : OrbitCenterZero.Statement) : OrbitFiniteSum.Statement := by
+theorem OrbitFiniteSum.proof
+    (hD : OrbitDegreeRatio.Statement) (hL : OrbitLocalSum.Statement)
+    (hZ : OrbitCenterZero.Statement)
+    : OrbitFiniteSum.Statement := by
   classical
   intro ι _ _ _ n A x s hx hs
   obtain ⟨a, _, hsa, hsW⟩ := id hs
@@ -25,26 +27,34 @@ theorem OrbitFiniteSum.proof (hD : OrbitDegreeRatio.Statement) (hL : OrbitLocalS
       Real.log (v (evalCone (coordVec x) s))).Finite := by
     refine Set.Finite.subset (FinitePlace.hasFiniteMulSupport ht) fun v hv h ↦ hv ?_
     simp only [h, Real.log_one]
-  have hS := ((finite_support_height A x hx).union hsupp2).subset
-    (Function.support_sub (fun v : FinitePlace (coordField x) ↦ finiteTerm A v (coordVec x)) _)
-  have hsubF : Function.support (fun v : FinitePlace (coordField x) ↦
-      finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s))) ⊆ hS.toFinset := by
+  have hS :=
+    ((finite_support_height A x hx).union hsupp2).subset
+      (Function.support_sub (fun v : FinitePlace (coordField x) ↦ finiteTerm A v (coordVec x)) _)
+  have hsubF
+      : Function.support (fun v : FinitePlace (coordField x) ↦
+          finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)))
+        ⊆ hS.toFinset := by
     simp
   have hK : (0 : ℝ) < Module.finrank ℚ (coordField x) := by exact_mod_cast Module.finrank_pos
-  have hloc : ∀ V, ∑ᶠ v ∈ {v : FinitePlace (coordField x) | orbitCenter x v = V},
-      (finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s))) =
-      ∑ v ∈ hS.toFinset, if orbitCenter x v = V then
-        finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)) else 0 := by
+  have hloc
+      : ∀ V,
+        ∑ᶠ v ∈ {v : FinitePlace (coordField x) | orbitCenter x v = V},
+            (finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)))
+          = ∑ v ∈ hS.toFinset, if orbitCenter x v = V then
+              finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)) else 0 := by
     intro V
-    rw [finsum_mem_def, finsum_eq_sum_of_support_subset _
-      (by rw [Set.support_indicator]; exact Set.inter_subset_right.trans hsubF)]
+    rw [finsum_mem_def,
+      finsum_eq_sum_of_support_subset _
+        (by rw [Set.support_indicator]; exact Set.inter_subset_right.trans hsubF)]
     exact Finset.sum_congr rfl fun v _ ↦ by simp [Set.indicator_apply]
-  have hterm : ∀ V ∈ (Geo.divSupp_finite (orbitIdeal x) s).toFinset,
-      (Geo.multAt (orbitIdeal x ⊔ Ideal.span {s}) V : ℝ) *
-          ((Geo.geoNum (ι := blockIdx n) 0 V Fin.elim0 : ℝ) * Real.log (Geo.charOf V)) =
-        (∑ v ∈ hS.toFinset, if orbitCenter x v = V then
-          finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)) else 0) *
-          (Module.finrank ℚ (ratioField x) / Module.finrank ℚ (coordField x) : ℝ) := fun V hV ↦ by
+  have hterm
+      : ∀ V ∈ (Geo.divSupp_finite (orbitIdeal x) s).toFinset,
+        (Geo.multAt (orbitIdeal x ⊔ Ideal.span {s}) V : ℝ)
+            * ((Geo.geoNum (ι := blockIdx n) 0 V Fin.elim0 : ℝ) * Real.log (Geo.charOf V))
+          = (∑ v ∈ hS.toFinset, if orbitCenter x v = V then
+              finiteTerm A v (coordVec x) - Real.log (v (evalCone (coordVec x) s)) else 0)
+            * (Module.finrank ℚ (ratioField x) / Module.finrank ℚ (coordField x)
+              : ℝ) := fun V hV ↦ by
     have h := hL ι n A x s hx hs V ((Geo.divSupp_finite _ _).mem_toFinset.mp hV)
     rw [hloc V] at h
     rw [mul_div_assoc', eq_div_iff hK.ne', mul_comm _ (Module.finrank ℚ (ratioField x) : ℝ), ← h,

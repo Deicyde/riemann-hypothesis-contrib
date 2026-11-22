@@ -9,14 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSol
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.UnitaryBC
 open scoped Pointwise
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem apply_eq_of_not_fixes {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
-    {s t : G (maximalRealSubfield L) Ω} (hs : ¬ Fixes L s) (ht : ¬ Fixes L t) (y : L) :
-    s (algebraMap L Ω y) = t (algebraMap L Ω y) := by
+private theorem apply_eq_of_not_fixes
+    {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+    {s t : G (maximalRealSubfield L) Ω} (hs : ¬ Fixes L s) (ht : ¬ Fixes L t)
+    (y : L)
+    : s (algebraMap L Ω y) = t (algebraMap L Ω y) := by
   haveI : IsGalois (maximalRealSubfield L) L := Algebra.IsQuadraticExtension.isGalois _ _
   have hcard : Nat.card (L ≃ₐ[maximalRealSubfield L] L) = 2 := by
     rw [IsGalois.card_aut_eq_finrank]
@@ -34,18 +37,22 @@ private theorem apply_eq_of_not_fixes {L Ω : Type} [Field L] [NumberField L] [I
 theorem splitIff : SplitIff := by
   intro L Ω _ _ _ _ _ _ A w hA
   show IsSplitAt w ↔ ∀ g ∈ Dec (F := maximalRealSubfield L) A, Fixes L g
-  have up : ∀ (B : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 L)), IsPlaceOver B u →
-      IsPlaceOver B (HeightOneSpectrum.under (𝓞 (maximalRealSubfield L)) u) := by
+  have up
+      : ∀ (B : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 L)),
+        IsPlaceOver B u
+          → IsPlaceOver B (HeightOneSpectrum.under (𝓞 (maximalRealSubfield L)) u) := by
     intro B u hB x
-    have e : algebraMap (maximalRealSubfield L) Ω (x : maximalRealSubfield L) =
-        algebraMap L Ω ((algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) x : 𝓞 L) : L) := by
+    have e
+        : algebraMap (maximalRealSubfield L) Ω (x : maximalRealSubfield L)
+          = algebraMap L Ω ((algebraMap (𝓞 (maximalRealSubfield L)) (𝓞 L) x : 𝓞 L) : L) := by
       rw [IsScalarTower.algebraMap_apply (maximalRealSubfield L) L Ω]
       rfl
     rw [e, hB]
     simp [HeightOneSpectrum.under]
   have hv := up A w hA
-  have val : ∀ (σ : G (maximalRealSubfield L) Ω) (y : Ω),
-      (σ • A).valuation y < 1 ↔ A.valuation (σ⁻¹ y) < 1 := by
+  have val
+      : ∀ (σ : G (maximalRealSubfield L) Ω) (y : Ω),
+        (σ • A).valuation y < 1 ↔ A.valuation (σ⁻¹ y) < 1 := by
     intro σ y
     rw [valuation_lt_one_iff', valuation_lt_one_iff',
       ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem,

@@ -6,9 +6,11 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
-open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free GlobalTheory.CompanionTheory.WeilSiegel.HypStep
+open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep
 
 noncomputable section
 
@@ -16,10 +18,13 @@ namespace GlobalTheory.CompanionTheory.WeilSiegel.HypStep.PrimTrans
 
 open GlobalTheory.CompanionTheory.SW.QuasiRefl Matrix
 
-theorem carry {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] {σ : A →+* A}
-    {J : Matrix n n A} (hσ : ∀ a, σ (σ a) = a) (hJ : ∀ i j, σ (J j i) = J i j) (y y' : n → A)
-    (hy : hform σ J y y = 0) (hy' : hform σ J y' y' = 0) (hu : IsUnit (hform σ J y' y)) :
-    ∃ g ∈ UJ σ J, (g : Matrix n n A) *ᵥ y = y' := by
+theorem carry
+    {A : Type} [CommRing A]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {σ : A →+* A} {J : Matrix n n A} (hσ : ∀ a, σ (σ a) = a) (hJ : ∀ i j, σ (J j i) = J i j)
+    (y y' : n → A)
+    (hy : hform σ J y y = 0) (hy' : hform σ J y' y' = 0) (hu : IsUnit (hform σ J y' y))
+    : ∃ g ∈ UJ σ J, (g : Matrix n n A) *ᵥ y = y' := by
   obtain ⟨ci, hci⟩ := hu.exists_right_inv
   set p := hform σ J y' y with hp
   have hyy' : hform σ J y y' = σ p := by rw [hp, hform_conj_symm hσ hJ]
@@ -45,20 +50,25 @@ theorem carry {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] {σ
   simp only [hd, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, one_mul]
   linear_combination (-(y i - y' i)) * hci
 
-theorem hform_hyp {A : Type} [CommRing A] (σ : A →+* A) {M : ℕ} (J : Matrix (Fin M) (Fin M) A)
-    (x y : Fin (M + 2) → A) :
-    hform σ (hypOne J) x y = σ (x 0) * y 1 + σ (x 1) * y 0 +
-      hform σ J (fun i => x i.succ.succ) (fun i => y i.succ.succ) := by
+theorem hform_hyp
+    {A : Type} [CommRing A]
+    (σ : A →+* A)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) A) (x y : Fin (M + 2) → A)
+    : hform σ (hypOne J) x y
+      = σ (x 0) * y 1 + σ (x 1) * y 0
+        + hform σ J (fun i => x i.succ.succ) (fun i => y i.succ.succ) := by
   simp only [hform, Fin.sum_univ_succ, Fin.succ_zero_eq_one, hypOne_zero_zero, hypOne_zero_one,
     hypOne_one_zero, hypOne_one_one, hypOne_zero_rest, hypOne_one_rest, hypOne_rest_zero,
     hypOne_rest_one, hypOne_rest_rest]
   simp
   ring
 
-theorem exists_u_local {A : Type} [CommRing A] (σ : A →+* A) {M : ℕ}
-    (J Ji : Matrix (Fin M) (Fin M) A) (hJi : J * Ji = 1) (x : Fin (M + 2) → A) (P : Ideal A)
-    (hprim : ∃ i, x i ∉ P) :
-    ∃ u : Fin M → A, x 1 ∉ P ∨ x 0 + hform σ J u (fun i => x i.succ.succ) ∉ P := by
+theorem exists_u_local
+    {A : Type} [CommRing A]
+    (σ : A →+* A)
+    {M : ℕ} (J Ji : Matrix (Fin M) (Fin M) A) (hJi : J * Ji = 1) (x : Fin (M + 2) → A)
+    (P : Ideal A) (hprim : ∃ i, x i ∉ P)
+    : ∃ u : Fin M → A, x 1 ∉ P ∨ x 0 + hform σ J u (fun i => x i.succ.succ) ∉ P := by
   by_cases h1 : x 1 ∈ P
   swap
   · exact ⟨0, Or.inl h1⟩
@@ -77,8 +87,7 @@ theorem exists_u_local {A : Type} [CommRing A] (σ : A →+* A) {M : ℕ}
   have hex : ∃ k, (J *ᵥ w) k ∉ P := by
     by_contra hc
     push_neg at hc
-    have e : w = Ji *ᵥ (J *ᵥ w) := by
-      rw [Matrix.mulVec_mulVec, mul_eq_one_comm.1 hJi, one_mulVec]
+    have e : w = Ji *ᵥ (J *ᵥ w) := by rw [Matrix.mulVec_mulVec, mul_eq_one_comm.1 hJi, one_mulVec]
     apply hi
     show w j ∈ P
     rw [e]
@@ -95,30 +104,36 @@ theorem exists_u_local {A : Type} [CommRing A] (σ : A →+* A) {M : ℕ}
   rw [e] at hmem
   exact (Ideal.add_mem_iff_right P h0).1 hmem
 
-theorem hform_comb {A : Type} [CommRing A] (σ : A →+* A) {M : ℕ} (J : Matrix (Fin M) (Fin M) A)
-    (c c' : A) (u v w : Fin M → A) :
-    hform σ J (c • u + c' • v) w = σ c * hform σ J u w + σ c' * hform σ J v w := by
+theorem hform_comb
+    {A : Type} [CommRing A]
+    (σ : A →+* A)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) A)
+    (c c' : A) (u v w : Fin M → A)
+    : hform σ J (c • u + c' • v) w = σ c * hform σ J u w + σ c' * hform σ J v w := by
   simp [hform, Finset.mul_sum, add_mul, Finset.sum_add_distrib, mul_assoc]
 
-theorem exists_u {A : Type} [CommRing A] (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a) (P₁ P₂ : Ideal A)
-    (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂) {M : ℕ}
-    (J : Matrix (Fin M) (Fin M) A) (w : Fin M → A) (b a : A)
-    (hloc : ∀ P : Ideal A, P.IsMaximal → ∃ u : Fin M → A, b ∉ P ∨ a + hform σ J u w ∉ P) :
-    ∃ u : Fin M → A, ∀ P : Ideal A, P.IsMaximal → b ∉ P ∨ a + hform σ J u w ∉ P := by
+theorem exists_u
+    {A : Type} [CommRing A]
+    (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a)
+    (P₁ P₂ : Ideal A) (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) A) (w : Fin M → A)
+    (b a : A) (hloc : ∀ P : Ideal A, P.IsMaximal → ∃ u : Fin M → A, b ∉ P ∨ a + hform σ J u w ∉ P)
+    : ∃ u : Fin M → A, ∀ P : Ideal A, P.IsMaximal → b ∉ P ∨ a + hform σ J u w ∉ P := by
   by_cases hdist : ∃ P Q : Ideal A, P.IsMaximal ∧ Q.IsMaximal ∧ P ≠ Q
   · obtain ⟨P, Q, hP, hQ, hne⟩ := hdist
     have hall : ∀ R : Ideal A, R.IsMaximal → R = P ∨ R = Q := by
       intro R hR
-      rcases hmax R hR with h | h <;> rcases hmax P hP with h' | h' <;>
-        rcases hmax Q hQ with h'' | h'' <;> simp_all
+      rcases hmax R hR with h | h <;> rcases hmax P hP with h' | h'
+        <;> rcases hmax Q hQ with h'' | h'' <;> simp_all
     have h1 : (1 : A) ∈ P ⊔ Q := by
       rw [Ideal.IsMaximal.coprime_of_ne hP hQ hne]
       trivial
     obtain ⟨p, hp, q, hq, hpq⟩ := Submodule.mem_sup.1 h1
     obtain ⟨uP, huP⟩ := hloc P hP
     obtain ⟨uQ, huQ⟩ := hloc Q hQ
-    have hval : a + hform σ J (σ q • uP + σ p • uQ) w =
-        q * (a + hform σ J uP w) + p * (a + hform σ J uQ w) := by
+    have hval
+        : a + hform σ J (σ q • uP + σ p • uQ) w
+          = q * (a + hform σ J uP w) + p * (a + hform σ J uQ w) := by
       rw [hform_comb, hσ, hσ]
       linear_combination (-a) * hpq
     refine ⟨σ q • uP + σ p • uQ, fun R hR => ?_⟩
@@ -148,18 +163,23 @@ theorem exists_u {A : Type} [CommRing A] (σ : A →+* A) (hσ : ∀ a, σ (σ a
       exact ⟨u, fun R hR => by rw [hdist R P hR hP]; exact hu⟩
     · exact ⟨0, fun P hP => absurd ⟨P, hP⟩ hex⟩
 
-theorem exists_mu {A : Type} [CommRing A] (P₁ P₂ : Ideal A)
-    (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂) (h2 : IsUnit (2 : A)) (a b : A)
-    (hab : ∀ P : Ideal A, P.IsMaximal → b ∉ P ∨ a ∉ P) : ∃ μ : ℤ, IsUnit (a - (μ : A) * b) := by
+theorem exists_mu
+    {A : Type} [CommRing A]
+    (P₁ P₂ : Ideal A) (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂)
+    (h2 : IsUnit (2 : A))
+    (a b : A) (hab : ∀ P : Ideal A, P.IsMaximal → b ∉ P ∨ a ∉ P)
+    : ∃ μ : ℤ, IsUnit (a - (μ : A) * b) := by
   by_contra hc
   push_neg at hc
-  have pair : ∀ P : Ideal A, P.IsMaximal → ∀ m n : ℤ, IsUnit ((n : A) - m) →
-      a - (m : A) * b ∈ P → a - (n : A) * b ∈ P → False := by
+  have pair
+      : ∀ P : Ideal A,
+        P.IsMaximal
+          → ∀ m n : ℤ,
+            IsUnit ((n : A) - m) → a - (m : A) * b ∈ P → a - (n : A) * b ∈ P → False := by
     intro P hP m n hu h1 h3
     obtain ⟨v, hv⟩ := hu.exists_left_inv
     have hb : b ∈ P := by
-      have e : b = v * ((a - (m : A) * b) - (a - (n : A) * b)) := by
-        linear_combination (-b) * hv
+      have e : b = v * ((a - (m : A) * b) - (a - (n : A) * b)) := by linear_combination (-b) * hv
       rw [e]
       exact P.mul_mem_left _ (P.sub_mem h1 h3)
     have ha : a ∈ P := by
@@ -169,9 +189,12 @@ theorem exists_mu {A : Type} [CommRing A] (P₁ P₂ : Ideal A)
     rcases hab P hP with h | h
     · exact h hb
     · exact h ha
-  obtain ⟨Pa, ha, ha'⟩ := exists_max_ideal_of_mem_nonunits (show a - ((0 : ℤ) : A) * b ∈ nonunits A from hc 0)
-  obtain ⟨Pb, hb, hb'⟩ := exists_max_ideal_of_mem_nonunits (show a - ((1 : ℤ) : A) * b ∈ nonunits A from hc 1)
-  obtain ⟨Pc, hc₁, hc'⟩ := exists_max_ideal_of_mem_nonunits (show a - ((-1 : ℤ) : A) * b ∈ nonunits A from hc (-1))
+  obtain ⟨Pa, ha, ha'⟩ :=
+    exists_max_ideal_of_mem_nonunits (show a - ((0 : ℤ) : A) * b ∈ nonunits A from hc 0)
+  obtain ⟨Pb, hb, hb'⟩ :=
+    exists_max_ideal_of_mem_nonunits (show a - ((1 : ℤ) : A) * b ∈ nonunits A from hc 1)
+  obtain ⟨Pc, hc₁, hc'⟩ :=
+    exists_max_ideal_of_mem_nonunits (show a - ((-1 : ℤ) : A) * b ∈ nonunits A from hc (-1))
   have u01 : IsUnit (((1 : ℤ) : A) - ((0 : ℤ) : A)) := by simp
   have u0m : IsUnit (((-1 : ℤ) : A) - ((0 : ℤ) : A)) := by simp
   have u1m : IsUnit (((1 : ℤ) : A) - ((-1 : ℤ) : A)) := by
@@ -179,8 +202,8 @@ theorem exists_mu {A : Type} [CommRing A] (P₁ P₂ : Ideal A)
     rw [this]
     exact h2
   have hpig : Pa = Pb ∨ Pa = Pc ∨ Pb = Pc := by
-    rcases hmax Pa ha with h | h <;> rcases hmax Pb hb with h' | h' <;>
-      rcases hmax Pc hc₁ with h'' | h'' <;> simp_all
+    rcases hmax Pa ha with h | h <;> rcases hmax Pb hb with h' | h'
+      <;> rcases hmax Pc hc₁ with h'' | h'' <;> simp_all
   rcases hpig with h | h | h
   · subst h
     exact pair Pa ha 0 1 u01 ha' hb'
@@ -189,14 +212,18 @@ theorem exists_mu {A : Type} [CommRing A] (P₁ P₂ : Ideal A)
   · subst h
     exact pair Pb hb (-1) 1 u1m hc' hb'
 
-theorem orbit_ring {A : Type} [CommRing A] (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a)
-    (h2 : IsUnit (2 : A)) (δ : A) (hδ : IsUnit δ) (hδs : σ δ = -δ) (P₁ P₂ : Ideal A)
-    (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂) {M : ℕ}
-    (J Ji : Matrix (Fin M) (Fin M) A) (hJi : J * Ji = 1) (hJ : ∀ i j, σ (J j i) = J i j)
+theorem orbit_ring
+    {A : Type} [CommRing A]
+    (σ : A →+* A) (hσ : ∀ a, σ (σ a) = a)
+    (h2 : IsUnit (2 : A))
+    (δ : A) (hδ : IsUnit δ) (hδs : σ δ = -δ)
+    (P₁ P₂ : Ideal A) (hmax : ∀ P : Ideal A, P.IsMaximal → P = P₁ ∨ P = P₂)
+    {M : ℕ} (J Ji : Matrix (Fin M) (Fin M) A) (hJi : J * Ji = 1) (hJ : ∀ i j, σ (J j i) = J i j)
     (x : Fin (M + 2) → A) (hprim : ∀ P : Ideal A, P.IsMaximal → ∃ i, x i ∉ P)
-    (hiso : hform σ (hypOne J) x x = 0) :
-    ∃ g ∈ UJ σ (hypOne J), (g : Matrix (Fin (M + 2)) (Fin (M + 2)) A) *ᵥ
-      (Fin.cons 1 fun _ => 0 : Fin (M + 2) → A) = x := by
+    (hiso : hform σ (hypOne J) x x = 0)
+    : ∃ g ∈ UJ σ (hypOne J),
+      (g : Matrix (Fin (M + 2)) (Fin (M + 2)) A) *ᵥ (Fin.cons 1 fun _ => 0 : Fin (M + 2) → A)
+        = x := by
   have hH : ∀ i j, σ (hypOne J j i) = hypOne J i j := by
     intro i j
     induction i using Fin.cases with
@@ -224,8 +251,9 @@ theorem orbit_ring {A : Type} [CommRing A] (σ : A →+* A) (hσ : ∀ a, σ (σ
           | zero => exact (map_zero σ).trans rfl
           | succ j => exact hJ i j
   set w : Fin M → A := fun i => x i.succ.succ with hw
-  obtain ⟨u, hu⟩ := exists_u σ hσ P₁ P₂ hmax J w (x 1) (x 0)
-    (fun P hP => exists_u_local σ J Ji hJi x P (hprim P hP))
+  obtain ⟨u, hu⟩ :=
+    exists_u σ hσ P₁ P₂ hmax J w (x 1) (x 0)
+      (fun P hP => exists_u_local σ J Ji hJi x P (hprim P hP))
   obtain ⟨i2, hi2⟩ := h2.exists_right_inv
   have hsi2 : σ i2 = i2 := by
     have h : 2 * σ i2 = 1 := by
@@ -287,7 +315,23 @@ theorem orbit_ring {A : Type} [CommRing A] (σ : A →+* A) (hσ : ∀ a, σ (σ
   show ((g₂ * g₁ : GL (Fin (M + 2)) A) : Matrix (Fin (M + 2)) (Fin (M + 2)) A) *ᵥ e = x
   rw [Units.val_mul, ← mulVec_mulVec, h₁, h₂]
 
-theorem trans_orbit : ∀ (T : Type) [CommRing T] (O : Subring T) (s : T →+* T), (∀ y ∈ O, s y ∈ O) → (∀ y, s (s y) = y) → IsUnit (2 : O) → (∃ δ : O, IsUnit δ ∧ s δ = -δ) → ∀ π₁ π₂ : O, (∀ P : Ideal O, P.IsMaximal → P = Ideal.span {π₁} ∨ P = Ideal.span {π₂}) → ∀ (M : ℕ) (J Ji : Matrix (Fin M) (Fin M) T), (∀ i j, J i j ∈ O) → (∀ i j, Ji i j ∈ O) → J * Ji = 1 → (∀ i j, s (J j i) = J i j) → ∀ x : Fin (M + 2) → O, (∀ P : Ideal O, P.IsMaximal → ∃ i, x i ∉ P) → hform s (hypOne J) (fun i => (x i : T)) (fun i => (x i : T)) = 0 → ∃ g ∈ UJ s (hypOne J), (g : Matrix (Fin (M + 2)) (Fin (M + 2)) T) *ᵥ (e0 T M 0) = (fun i => (x i : T)) ∧ (∀ i j, (g : Matrix (Fin (M + 2)) (Fin (M + 2)) T) i j ∈ O) ∧ ∀ i j, ((g⁻¹ : GL (Fin (M + 2)) T) : Matrix (Fin (M + 2)) (Fin (M + 2)) T) i j ∈ O := by
+theorem trans_orbit
+    : ∀ (T : Type) [CommRing T] (O : Subring T) (s : T →+* T),
+      (∀ y ∈ O, s y ∈ O) → (∀ y, s (s y) = y) → IsUnit (2 : O) → (∃ δ : O, IsUnit δ ∧ s δ = -δ)
+        → ∀ π₁ π₂ : O,
+          (∀ P : Ideal O, P.IsMaximal → P = Ideal.span {π₁} ∨ P = Ideal.span {π₂})
+            → ∀ (M : ℕ) (J Ji : Matrix (Fin M) (Fin M) T),
+              (∀ i j, J i j ∈ O) → (∀ i j, Ji i j ∈ O) → J * Ji = 1 → (∀ i j, s (J j i) = J i j)
+                → ∀ x : Fin (M + 2) → O,
+                  (∀ P : Ideal O, P.IsMaximal → ∃ i, x i ∉ P)
+                    → hform s (hypOne J) (fun i => (x i : T)) (fun i => (x i : T)) = 0
+                    → ∃ g ∈ UJ s (hypOne J),
+                      (g : Matrix (Fin (M + 2)) (Fin (M + 2)) T) *ᵥ (e0 T M 0)
+                          = (fun i => (x i : T))
+                        ∧ (∀ i j, (g : Matrix (Fin (M + 2)) (Fin (M + 2)) T) i j ∈ O)
+                        ∧ ∀ i j,
+                          ((g⁻¹ : GL (Fin (M + 2)) T) : Matrix (Fin (M + 2)) (Fin (M + 2)) T) i j
+                            ∈ O := by
   intro T _ O s hs hss h2 ⟨δ, hδ, hδs⟩ π₁ π₂ hmax M J Ji hJO hJiO hJJ hJ x hprim hiso
   let τ : O →+* O := s.restrict O O hs
   have hτ : ∀ a : O, ((τ a : O) : T) = s a := fun a => rfl
@@ -325,36 +369,49 @@ theorem trans_orbit : ∀ (T : Type) [CommRing T] (O : Subring T) (s : T →+* T
     rw [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)]
     exact hJJ
   have hiso0 : hform τ (hypOne JO) x x = 0 := by
-    have h3 : ((hform τ (hypOne JO) x x : O) : T) =
-        hform s (hypOne J) (fun i => (x i : T)) (fun i => (x i : T)) := by
+    have h3
+        : ((hform τ (hypOne JO) x x : O) : T)
+          = hform s (hypOne J) (fun i => (x i : T)) (fun i => (x i : T)) := by
       rw [← hmapJ]
       simp [hform, hτ]
     exact Subtype.ext (h3.trans hiso)
-  obtain ⟨g0, hg0, hgx⟩ := orbit_ring τ (fun a => Subtype.ext (hss a)) h2 δ hδ
-    (Subtype.ext hδs) (Ideal.span {π₁}) (Ideal.span {π₂}) hmax JO JiO hmul
-    (fun i j => Subtype.ext (hJ i j)) x hprim hiso0
-  have hval : ∀ g : GL (Fin (M + 2)) O,
-      ((Matrix.GeneralLinearGroup.map O.subtype g : GL (Fin (M + 2)) T) :
-        Matrix (Fin (M + 2)) (Fin (M + 2)) T) =
-      (g : Matrix (Fin (M + 2)) (Fin (M + 2)) O).map O.subtype := fun g => rfl
+  obtain ⟨g0, hg0, hgx⟩ :=
+    orbit_ring τ
+      (fun a => Subtype.ext (hss a))
+      h2 δ hδ (Subtype.ext hδs) (Ideal.span {π₁}) (Ideal.span {π₂}) hmax JO JiO hmul
+      (fun i j => Subtype.ext (hJ i j))
+      x hprim hiso0
+  have hval
+      : ∀ g : GL (Fin (M + 2)) O,
+        ((Matrix.GeneralLinearGroup.map O.subtype g : GL (Fin (M + 2)) T)
+            : Matrix (Fin (M + 2)) (Fin (M + 2)) T)
+          = (g : Matrix (Fin (M + 2)) (Fin (M + 2)) O).map O.subtype := fun g =>
+    rfl
   refine ⟨Matrix.GeneralLinearGroup.map O.subtype g0, ?_, ?_, ?_, ?_⟩
-  · have h0 : cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) * hypOne JO *
-        (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) = hypOne JO := hg0
+  · have h0
+        : cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) * hypOne JO
+            * (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O)
+          = hypOne JO :=
+      hg0
     have h1 := congrArg (RingHom.mapMatrix O.subtype) h0
     rw [map_mul, map_mul] at h1
     show cT s ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T) :
         Matrix (Fin (M + 2)) (Fin (M + 2)) T) * hypOne J *
       ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T) :
         Matrix (Fin (M + 2)) (Fin (M + 2)) T) = hypOne J
-    have e1 : RingHom.mapMatrix O.subtype (cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O)) =
-        cT s ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T) :
-          Matrix (Fin (M + 2)) (Fin (M + 2)) T) := by
+    have e1
+        : RingHom.mapMatrix O.subtype (cT τ (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O))
+          = cT s
+            ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T)
+              : Matrix (Fin (M + 2)) (Fin (M + 2)) T) := by
       ext i j
       rfl
     have e2 : RingHom.mapMatrix O.subtype (hypOne JO) = hypOne J := hmapJ
-    have e3 : RingHom.mapMatrix O.subtype (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O) =
-        ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T) :
-          Matrix (Fin (M + 2)) (Fin (M + 2)) T) := rfl
+    have e3
+        : RingHom.mapMatrix O.subtype (g0 : Matrix (Fin (M + 2)) (Fin (M + 2)) O)
+          = ((Matrix.GeneralLinearGroup.map O.subtype g0 : GL (Fin (M + 2)) T)
+            : Matrix (Fin (M + 2)) (Fin (M + 2)) T) :=
+      rfl
     rwa [e1, e2, e3] at h1
   · funext i
     have h3 := congrArg Subtype.val (congrFun hgx i)

@@ -15,11 +15,13 @@ namespace GlobalTheory.CompanionTheory.Ar.FlagModel
 
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
 
-variable {X X' : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-  {E E' : Type} [AddCommGroup E] [Module Ω E] [AddCommGroup E'] [Module Ω E']
+variable
+  {X X' : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E E' : Type}
+  [AddCommGroup E] [Module Ω E] [AddCommGroup E'] [Module Ω E']
 
-theorem pull_map (L : Lat ξ E) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' ⟶ X) (φ : E →ₗ[Ω] E') :
-    (L.map φ).pull ξ' f (AddMonoidHom.id E') = (L.pull ξ' f (AddMonoidHom.id E)).map φ := by
+theorem pull_map (L : Lat ξ E) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' ⟶ X) (φ : E →ₗ[Ω] E')
+    : (L.map φ).pull ξ' f (AddMonoidHom.id E') = (L.pull ξ' f (AddMonoidHom.id E)).map φ := by
   funext p'
   simp only [Lat.pull, Lat.map, Submodule.map_span]
   congr 1
@@ -31,8 +33,10 @@ theorem pull_map (L : Lat ξ E) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' 
   · rintro ⟨u, ⟨h, v, hv, huv⟩, rfl⟩
     exact ⟨h, φ v, Submodule.mem_map.2 ⟨v, hv, rfl⟩, congrArg φ huv⟩
 
-theorem pull_vb {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) {ξ' : Spec (CommRingCat.of Ω) ⟶ X'}
-    {f : X' ⟶ X} (hd : Dominates ξ' ξ f (RingHom.id Ω)) : (L.pull ξ' f (AddMonoidHom.id E)).IsVB g W := by
+theorem pull_vb
+    {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W)
+    {ξ' : Spec (CommRingCat.of Ω) ⟶ X'} {f : X' ⟶ X} (hd : Dominates ξ' ξ f (RingHom.id Ω))
+    : (L.pull ξ' f (AddMonoidHom.id E)).IsVB g W := by
   intro p' _
   obtain ⟨h, -⟩ := RegAtDom.regAt_dominates _ _ _ _ _ _ _ _ hd p'
   obtain ⟨U, hU, b, hW, hb⟩ := hL ⟨f p'.1, h⟩ (Set.mem_univ _)
@@ -55,8 +59,8 @@ theorem pull_vb {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) 
     intro e he
     exact ⟨hq, e, hsp ▸ Submodule.subset_span he, rfl⟩
 
-theorem coh_map {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) (φ : E →ₗ[Ω] E') :
-    (L.map φ).IsCohOn Set.univ := by
+theorem coh_map {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) (φ : E →ₗ[Ω] E')
+    : (L.map φ).IsCohOn Set.univ := by
   intro p hp
   obtain ⟨U, hU, b, -, hb⟩ := hL p hp
   refine ⟨U, hU, g, φ ∘ b, fun q hq hqU => ?_⟩
@@ -64,14 +68,17 @@ theorem coh_map {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) 
   rw [(hb q hq hqU).2, Submodule.map_span, Set.range_comp]
   rfl
 
-theorem span_map {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) (φ : E →ₗ[Ω] E') (p : Cpt ξ) :
-    Submodule.span Ω ((L.map φ) p : Set E') = W.map φ := by
+theorem span_map
+    {L : Lat ξ E} {g : ℕ} {W : Submodule Ω E} (hL : L.IsVB g W) (φ : E →ₗ[Ω] E') (p : Cpt ξ)
+    : Submodule.span Ω ((L.map φ) p : Set E') = W.map φ := by
   obtain ⟨U, hU, b, hW, hb⟩ := hL p (Set.mem_univ p)
   simp only [Lat.map]
-  rw [(hb p (Set.mem_univ p) hU).2, Submodule.map_span, Submodule.span_span_of_tower, ← hW, Submodule.map_span]
+  rw [(hb p (Set.mem_univ p) hU).2, Submodule.map_span, Submodule.span_span_of_tower, ← hW,
+    Submodule.map_span]
   rfl
 
-theorem flagStep_min {r : ℕ} (b₀ : Fin r → E) (n : ℕ) : flagStep Ω b₀ (min n r) = flagStep Ω b₀ n := by
+theorem flagStep_min {r : ℕ} (b₀ : Fin r → E) (n : ℕ)
+    : flagStep Ω b₀ (min n r) = flagStep Ω b₀ n := by
   unfold flagStep
   congr 2
   ext k
@@ -79,8 +86,8 @@ theorem flagStep_min {r : ℕ} (b₀ : Fin r → E) (n : ℕ) : flagStep Ω b₀
   simp only [Set.mem_setOf_eq]
   omega
 
-theorem flagStep_le {r : ℕ} {b₀ : Fin r → E} {W : Submodule Ω E} (h : ∀ k, b₀ k ∈ W) (n : ℕ) :
-    flagStep Ω b₀ n ≤ W := by
+theorem flagStep_le {r : ℕ} {b₀ : Fin r → E} {W : Submodule Ω E} (h : ∀ k, b₀ k ∈ W) (n : ℕ)
+    : flagStep Ω b₀ n ≤ W := by
   unfold flagStep
   rw [Submodule.span_le]
   rintro _ ⟨k, -, rfl⟩
@@ -97,20 +104,26 @@ theorem flagModel : FlagModelStatement := by
     GlobalTheory.T.flag_model_common_refinement o Ω κ x M A κa w (Σ σ, Fin (r σ + 1))
       (fun q => E ⧸ flagStep Ω (b₀ q.1) q.2)
       (fun q => (L q.1).map (flagStep Ω (b₀ q.1) q.2).mkQ)
-      (fun q => (W q.1).map (flagStep Ω (b₀ q.1) q.2).mkQ) hw
-      (fun q => coh_map (hL q.1) _) (fun q p => span_map (hL q.1) _ p)
-  have hpull : ∀ σ, ((L σ).pull M'.ξ f (AddMonoidHom.id E)).IsVBOn Set.univ (g σ) (W σ) :=
-    fun σ => pull_vb (hL σ) hdom
-  have hquot : ∀ σ (n : ℕ), ∃ s W', (((L σ).pull M'.ξ f (AddMonoidHom.id E)).map
-      (flagStep Ω (b₀ σ) n).mkQ).IsVBOn Set.univ s W' := fun σ n => by
+      (fun q => (W q.1).map (flagStep Ω (b₀ q.1) q.2).mkQ)
+      hw
+      (fun q => coh_map (hL q.1) _)
+      (fun q p => span_map (hL q.1) _ p)
+  have hpull : ∀ σ, ((L σ).pull M'.ξ f (AddMonoidHom.id E)).IsVBOn Set.univ (g σ) (W σ) := fun σ =>
+    pull_vb (hL σ) hdom
+  have hquot
+      : ∀ σ (n : ℕ), ∃ s W',
+        (((L σ).pull M'.ξ f (AddMonoidHom.id E)).map (flagStep Ω (b₀ σ) n).mkQ).IsVBOn Set.univ s
+          W' := fun σ n => by
     rw [← flagStep_min]
     have h := hvb ⟨σ, ⟨min n (r σ), Nat.lt_succ_of_le (min_le_right _ _)⟩⟩
     rw [pull_map] at h
     exact ⟨_, _, h⟩
   refine ⟨κ', hκ', y, M', f, hdom, hnorm, hchart, fun σ => ?_, fun σ n p' => ?_, fun p hp hfr => ?_⟩
-  · exact GlobalTheory.T.lattice_flag_vector_bundle _ _ _ _ _ _ _ _ _ _ (hb σ) (hbW σ) (hpull σ) (hquot σ)
+  · exact GlobalTheory.T.lattice_flag_vector_bundle _ _ _ _ _ _ _ _ _ _ (hb σ) (hbW σ) (hpull σ)
+      (hquot σ)
   · obtain ⟨s, W', h⟩ := hquot σ n
-    exact (GlobalTheory.T.lattice_sub_quotient_split _ _ _ _ _ _ _ _ _ _ _ (flagStep_le (hbW σ) n) (hpull σ) h).2 p' (Set.mem_univ _)
+    exact (GlobalTheory.T.lattice_sub_quotient_split _ _ _ _ _ _ _ _ _ _ _ (flagStep_le (hbW σ) n)
+      (hpull σ) h).2 p' (Set.mem_univ _)
   · exact hat p hp fun q => hfr q.1 q.2
 
 end GlobalTheory.CompanionTheory.Ar.FlagModel

@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.matRep_of :
-    MatRep := by
+theorem UpperTheory.Gal.crystallineComparison.matRep_of : MatRep := by
   intro R S _ _ _ _ _
   obtain ⟨n, f, g, -, -, hfg⟩ := Module.Finite.exists_comp_eq_id_of_projective R S
   set e : Fin n → S := fun k => f (Pi.single k 1) with he
@@ -27,7 +26,8 @@ theorem UpperTheory.Gal.crystallineComparison.matRep_of :
   intro B _ _ I _ _ z hz
   let φ := AlgEquiv.ofBijective (splitMap z) hz
   let G : Fin n → (B ⊗[R] S →ₗ[B] B) := fun j =>
-    (TensorProduct.AlgebraTensorModule.rid R B B).toLinearMap ∘ₗ ((LinearMap.proj j ∘ₗ g).baseChange B)
+    (TensorProduct.AlgebraTensorModule.rid R B B).toLinearMap
+      ∘ₗ ((LinearMap.proj j ∘ₗ g).baseChange B)
   have hG : ∀ j b s, G j (b ⊗ₜ s) = algebraMap R B (g s j) * b := by
     intro j b s
     simp [G, LinearMap.baseChange_tmul, Algebra.smul_def]
@@ -66,8 +66,7 @@ theorem UpperTheory.Gal.crystallineComparison.matRep_of :
     ext j k
     rw [Matrix.mul_apply]
     simp only [Matrix.mul_diagonal, Matrix.of_apply, Matrix.map_apply]
-    have h3 : (algebraMap R B) (g (s * e k) j) = G j ((1 : B) ⊗ₜ (s * e k)) := by
-      rw [hG, mul_one]
+    have h3 : (algebraMap R B) (g (s * e k) j) = G j ((1 : B) ⊗ₜ (s * e k)) := by rw [hG, mul_one]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h3, ← hL, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

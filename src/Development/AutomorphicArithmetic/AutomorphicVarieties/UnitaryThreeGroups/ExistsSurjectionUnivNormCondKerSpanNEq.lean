@@ -7,9 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open Matrix IsLocalRing UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.U3.Mop
 
-private theorem mat_symm {R : Type} [CommRing R] (x : GG (m := 3) (R := R))
-    (h2 : x * x = 1) (hx : x.right = -1) :
-    x.mat = Jmat (R := R) 3 * x.matᵀ * Jmat (R := R) 3 := by
+private theorem mat_symm
+    {R : Type} [CommRing R] (x : GG (m := 3) (R := R)) (h2 : x * x = 1) (hx : x.right = -1)
+    : x.mat = Jmat (R := R) 3 * x.matᵀ * Jmat (R := R) 3 := by
   have h : x.left * theta x.left = 1 := by
     have := congrArg SemidirectProduct.left h2
     rwa [SemidirectProduct.mul_left, hx, sgnAct_neg_one] at this
@@ -18,9 +18,12 @@ private theorem mat_symm {R : Type} [CommRing R] (x : GG (m := 3) (R := R))
   rw [← h'] at this
   exact this
 
-private theorem norm_iff {G R : Type} [Group G] [CommRing R] (c g₁ : G)
-    (r : G →* GG (m := 3) (R := R)) (hc : c * c = 1)
-    (hr : (r c).right = -1) : Normalised c g₁ r ↔ ∀ i, nEq c g₁ r i = 0 := by
+private theorem norm_iff
+    {G R : Type} [Group G] [CommRing R]
+    (c g₁ : G)
+    (r : G →* GG (m := 3) (R := R))
+    (hc : c * c = 1) (hr : (r c).right = -1)
+    : Normalised c g₁ r ↔ ∀ i, nEq c g₁ r i = 0 := by
   have hs := mat_symm (r c) (by rw [← map_mul, hc, map_one]) hr
   have hsym : ∀ i j, (r c).mat i j = (r c).mat j.rev i.rev := by
     intro i j
@@ -46,16 +49,24 @@ private theorem norm_iff {G R : Type} [Group G] [CommRing R] (c g₁ : G)
     ext i j
     fin_cases i <;> fin_cases j <;> simp [h0, h1, h2, h3, h4, h5, e12, e21, e22]
 
-private theorem nEq_map {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} (c g₁ : Γ) {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R']
-    [Algebra O R'] [IsCO O R'] (r : GLift O η Ψ R) (f : R →ₐ[O] R') (i : Fin 8) :
-    nEq c g₁ (r.map f).hom i = f (nEq c g₁ r.hom i) := by
-  have hm : ∀ g, ((r.map f).hom g).mat = (r.hom g).mat.map f := fun g => GG.map_mat (f : R →+* R') (r.hom g)
+private theorem nEq_map
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ}
+    (c g₁ : Γ)
+    {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
+    (r : GLift O η Ψ R) (f : R →ₐ[O] R') (i : Fin 8)
+    : nEq c g₁ (r.map f).hom i = f (nEq c g₁ r.hom i) := by
+  have hm : ∀ g, ((r.map f).hom g).mat = (r.hom g).mat.map f := fun g =>
+    GG.map_mat (f : R →+* R') (r.hom g)
   fin_cases i <;> simp [nEq, zmat, hm, map_sub, map_one]
 
-private theorem ext_lemma {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+private theorem ext_lemma
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
     {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
-    (a b : GLift O η Ψ R) (h : ∀ x, (a.hom x).mat = (b.hom x).mat) : a = b := by
+    (a b : GLift O η Ψ R) (h : ∀ x, (a.hom x).mat = (b.hom x).mat)
+    : a = b := by
   apply GLift.ext
   apply MonoidHom.ext
   intro x
@@ -63,38 +74,53 @@ private theorem ext_lemma {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [G
   · exact Units.ext (h x)
   · rw [a.hasMult x, b.hasMult x]
 
-private theorem gLift_map_hom_mat_eq_map {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R']
-    [Algebra O R'] [IsCO O R'] (r : GLift O η Ψ R) (f : R →ₐ[O] R') (x : Γ) :
-    ((r.map f).hom x).mat = (r.hom x).mat.map f :=
+private theorem gLift_map_hom_mat_eq_map
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R R' : Type}
+    [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R']
+    (r : GLift O η Ψ R) (f : R →ₐ[O] R') (x : Γ)
+    : ((r.map f).hom x).mat = (r.hom x).mat.map f :=
   GG.map_mat (f : R →+* R') (r.hom x)
 
-private theorem comp_lemma_3 {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
-    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R R' R'' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R']
-    [Algebra O R'] [IsCO O R'] [CommRing R''] [Algebra O R''] [IsCO O R''] (r : GLift O η Ψ R)
-    (f : R →ₐ[O] R') (g : R' →ₐ[O] R'') : r.map (g.comp f) = (r.map f).map g := by
+private theorem comp_lemma_3
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R R' R'' : Type} [CommRing R] [Algebra O R] [IsCO O R]
+    [CommRing R'] [Algebra O R'] [IsCO O R'] [CommRing R''] [Algebra O R''] [IsCO O R'']
+    (r : GLift O η Ψ R) (f : R →ₐ[O] R') (g : R' →ₐ[O] R'')
+    : r.map (g.comp f) = (r.map f).map g := by
   apply ext_lemma
   intro x
   rw [gLift_map_hom_mat_eq_map, gLift_map_hom_mat_eq_map, gLift_map_hom_mat_eq_map]
   ext i j
   simp
 
-private theorem gLift_map_id {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+private theorem gLift_map_id
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
     {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
-    (r : GLift O η Ψ R) : r.map (AlgHom.id O R) = r := by
+    (r : GLift O η Ψ R)
+    : r.map (AlgHom.id O R) = r := by
   apply ext_lemma
   intro x
   rw [gLift_map_hom_mat_eq_map]
   ext i j
   simp
 
-theorem UpperTheory.exists_surjection_univ_normCond_ker_span_nEq :
-    ∀ {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ] {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {P : GCond O η Ψ} (c g₁ : Γ)
-          (B : Univ P) (S : Univ (NormCond c g₁ P)), c * c = 1 → η c = -1 →
-          ∃ p : B.R →ₐ[O] S.R, Function.Surjective p ∧ B.r.map p = S.r ∧ RingHom.ker p = Ideal.span (Set.range (nEq c g₁ B.r.hom)) := by
+theorem UpperTheory.exists_surjection_univ_normCond_ker_span_nEq
+    : ∀ {O : Type} [CommRing O] [IsLocalRing O] {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+        {η : Γ →* ℤˣ} {Ψ : Γ →* Oˣ} {P : GCond O η Ψ} (c g₁ : Γ) (B : Univ P)
+        (S : Univ (NormCond c g₁ P)),
+      c * c = 1 → η c = -1
+        → ∃ p : B.R →ₐ[O] S.R,
+          Function.Surjective p ∧ B.r.map p = S.r
+            ∧ RingHom.ker p = Ideal.span (Set.range (nEq c g₁ B.r.hom)) := by
   intro O _ _ Γ _ _ η Ψ P c g₁ B S hc hη
-  have hr : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (r : GLift O η Ψ R),
-      (r.hom c).right = -1 := fun R _ _ _ r => by rw [r.hasMult c, hη]
+  have hr
+      : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (r : GLift O η Ψ R),
+        (r.hom c).right = -1 := fun R _ _ _ r => by
+    rw [r.hasMult c, hη]
   have hNS : NormCond c g₁ P S.R S.r := by
     have h := (S.rep S.R).1 (AlgHom.id O S.R)
     rwa [gLift_map_id] at h
@@ -118,9 +144,10 @@ theorem UpperTheory.exists_surjection_univ_normCond_ker_span_nEq :
   obtain ⟨s, hs, -⟩ := (S.rep (B.R ⧸ I)).2 _ hNq
   have hsp : s.comp p = Ideal.Quotient.mkₐ O I := by
     obtain ⟨u, -, hu⟩ := (B.rep (B.R ⧸ I)).2 _ hNq.2
-    have e1 := hu (s.comp p) (by
-      show GLift.map (s.comp p) B.r = _
-      rw [comp_lemma_3, hp, hs])
+    have e1 :=
+      hu (s.comp p) (by
+        show GLift.map (s.comp p) B.r = _
+        rw [comp_lemma_3, hp, hs])
     have e2 := hu (Ideal.Quotient.mkₐ O I) rfl
     rw [e1, e2]
   have hker : RingHom.ker p = I := by
@@ -136,9 +163,10 @@ theorem UpperTheory.exists_surjection_univ_normCond_ker_span_nEq :
   have hpq : p'.comp (Ideal.Quotient.mkₐ O I) = p := AlgHom.ext hp'q
   have hid : p'.comp s = AlgHom.id O S.R := by
     obtain ⟨u, -, hu⟩ := (S.rep S.R).2 S.r hNS
-    have e1 := hu (p'.comp s) (by
-      show GLift.map (p'.comp s) S.r = S.r
-      rw [comp_lemma_3, hs, ← comp_lemma_3, hpq, hp])
+    have e1 :=
+      hu (p'.comp s) (by
+        show GLift.map (p'.comp s) S.r = S.r
+        rw [comp_lemma_3, hs, ← comp_lemma_3, hpq, hp])
     have e2 := hu (AlgHom.id O S.R) (gLift_map_id _)
     rw [e1, e2]
   refine ⟨p, fun y => ?_, hp, hker⟩

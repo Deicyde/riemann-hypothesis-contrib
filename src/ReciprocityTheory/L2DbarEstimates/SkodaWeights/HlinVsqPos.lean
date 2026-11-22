@@ -17,8 +17,12 @@ lemma hlin_vsq_pos {p : ℕ} {g : Fin p → ℂ} (hg : g ≠ 0) : 0 < vsq g := b
 theorem perpTrace : PerpTraceStatement := by
   intro p g hg
   have hs := hlin_vsq_pos hg
-  refine ⟨fun i => sub_nonneg.mpr ((div_le_one hs).mpr
-    (Finset.single_le_sum (fun j _ => sq_nonneg ‖g j‖) (Finset.mem_univ i))), ?_⟩
+  refine ⟨
+    fun i =>
+      sub_nonneg.mpr ((div_le_one hs).mpr
+        (Finset.single_le_sum (fun j _ => sq_nonneg ‖g j‖) (Finset.mem_univ i))),
+    ?_
+  ⟩
   rw [Finset.sum_sub_distrib, ← Finset.sum_div]
   change _ - vsq g / vsq g = _
   rw [div_self hs.ne']

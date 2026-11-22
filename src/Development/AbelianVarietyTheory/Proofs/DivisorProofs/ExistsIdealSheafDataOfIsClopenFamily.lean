@@ -11,11 +11,14 @@ open AlgebraicGeometry CategoryTheory Limits
 
 namespace GlobalTheory.ClopenIdealSheaf
 
-theorem map_comap_localization {R A S T : Type*} [CommRing R] [CommRing A] [CommRing S]
-    [CommRing T] [Algebra R S] [Algebra A T] (f : R) [IsLocalization.Away f S] (ρ : R →+* A)
-    [IsLocalization.Away (ρ f) T] (τ : S →+* T)
-    (hcomm : ∀ a, τ (algebraMap R S a) = algebraMap A T (ρ a)) (I : Ideal A) :
-    (I.comap ρ).map (algebraMap R S) = (I.map (algebraMap A T)).comap τ := by
+theorem map_comap_localization
+    {R A S T : Type*}
+    [CommRing R] [CommRing A] [CommRing S] [CommRing T] [Algebra R S] [Algebra A T]
+    (f : R) [IsLocalization.Away f S]
+    (ρ : R →+* A) [IsLocalization.Away (ρ f) T]
+    (τ : S →+* T) (hcomm : ∀ a, τ (algebraMap R S a) = algebraMap A T (ρ a))
+    (I : Ideal A)
+    : (I.comap ρ).map (algebraMap R S) = (I.map (algebraMap A T)).comap τ := by
   apply le_antisymm
   · rw [Ideal.map_le_iff_le_comap]
     intro a ha
@@ -28,10 +31,10 @@ theorem map_comap_localization {R A S T : Type*} [CommRing R] [CommRing A] [Comm
     obtain ⟨⟨b, ⟨_, k, rfl⟩⟩, hb⟩ := IsLocalization.surj (.powers f) s
     simp only at hxs hb
     have h1 : algebraMap A T (ρ b * ρ f ^ n) = algebraMap A T (x * ρ f ^ k) := by
-      calc algebraMap A T (ρ b * ρ f ^ n)
+      calc
+        algebraMap A T (ρ b * ρ f ^ n)
           = τ (algebraMap R S b) * algebraMap A T (ρ f ^ n) := by rw [map_mul, hcomm]
-        _ = τ s * τ (algebraMap R S (f ^ k)) * algebraMap A T (ρ f ^ n) := by
-          rw [← hb, map_mul]
+        _ = τ s * τ (algebraMap R S (f ^ k)) * algebraMap A T (ρ f ^ n) := by rw [← hb, map_mul]
         _ = τ s * algebraMap A T (ρ f ^ n) * algebraMap A T (ρ f ^ k) := by
           rw [hcomm, map_pow]; ring
         _ = algebraMap A T (x * ρ f ^ k) := by rw [hxs, map_mul]
@@ -47,16 +50,17 @@ theorem map_comap_localization {R A S T : Type*} [CommRing R] [CommRing A] [Comm
       rw [map_mul, pow_add, map_mul, ← hb]
       ring
 
-theorem map_comap_eq {Z : Scheme.{0}} (F : ∀ U : Z.affineOpens, Ideal Γ(Z, U))
+theorem map_comap_eq
+    {Z : Scheme.{0}} (F : ∀ U : Z.affineOpens, Ideal Γ(Z, U))
     {U V B : Z.affineOpens} (hVU : (V : Z.Opens) ≤ U) (f : Γ(Z, U))
     (hB : Z.affineBasicOpen ((Z.presheaf.map (homOfLE hVU).op).hom f) = B)
     (hBD : (B : Z.Opens) ≤ Z.basicOpen f)
-    (hI : (F V).map (Z.presheaf.map (homOfLE (Z.basicOpen_le
-        ((Z.presheaf.map (homOfLE hVU).op).hom f))).op).hom =
-      F (Z.affineBasicOpen ((Z.presheaf.map (homOfLE hVU).op).hom f))) :
-    ((F V).comap (Z.presheaf.map (homOfLE hVU).op).hom).map
-        (Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom =
-      (F B).comap (Z.presheaf.map (homOfLE hBD).op).hom := by
+    (hI : (F V).map
+        (Z.presheaf.map (homOfLE (Z.basicOpen_le ((Z.presheaf.map (homOfLE hVU).op).hom f))).op).hom
+      = F (Z.affineBasicOpen ((Z.presheaf.map (homOfLE hVU).op).hom f)))
+    : ((F V).comap (Z.presheaf.map (homOfLE hVU).op).hom).map
+        (Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom
+      = (F B).comap (Z.presheaf.map (homOfLE hBD).op).hom := by
   subst hB
   rw [← hI]
   haveI := U.2.isLocalization_basicOpen f
@@ -65,39 +69,45 @@ theorem map_comap_eq {Z : Scheme.{0}} (F : ∀ U : Z.affineOpens, Ideal Γ(Z, U)
     (T := Γ(Z, Z.basicOpen ((Z.presheaf.map (homOfLE hVU).op).hom f))) _ ?_ _
   intro a
   change (Z.presheaf.map (homOfLE hBD).op).hom
-      ((Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom a) =
-    (Z.presheaf.map (homOfLE (Z.basicOpen_le _)).op).hom
-      ((Z.presheaf.map (homOfLE hVU).op).hom a)
-  rw [← CommRingCat.comp_apply, ← CommRingCat.comp_apply, ← Functor.map_comp,
-    ← Functor.map_comp]
+      ((Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom a)
+    = (Z.presheaf.map (homOfLE (Z.basicOpen_le _)).op).hom ((Z.presheaf.map (homOfLE hVU).op).hom a)
+  rw [← CommRingCat.comp_apply, ← CommRingCat.comp_apply, ← Functor.map_comp, ← Functor.map_comp]
   rfl
 
 end GlobalTheory.ClopenIdealSheaf
 
 namespace GlobalTheory.ClopenIdealSheaf
 
-theorem exists_idealSheafData_of_isClopen : ∀ (Z : Scheme.{0}) (W : Set Z), IsClopen W →
-    ∀ (F : ∀ U : Z.affineOpens, Ideal Γ(Z, U)),
-    (∀ (U : Z.affineOpens) (f : Γ(Z, U)), (U : Set Z) ⊆ W →
-      (F U).map (Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom = F (Z.affineBasicOpen f)) →
-    ∃ J : Z.IdealSheafData, (∀ U : Z.affineOpens, (U : Set Z) ⊆ W → J.ideal U = F U) ∧
-      (J.support : Set Z) ⊆ W := by
+theorem exists_idealSheafData_of_isClopen
+    : ∀ (Z : Scheme.{0}) (W : Set Z),
+      IsClopen W
+        → ∀ (F : ∀ U : Z.affineOpens, Ideal Γ(Z, U)),
+          (∀ (U : Z.affineOpens) (f : Γ(Z, U)),
+              (U : Set Z) ⊆ W
+                → (F U).map (Z.presheaf.map (homOfLE (Z.basicOpen_le f)).op).hom
+                  = F (Z.affineBasicOpen f))
+            → ∃ J : Z.IdealSheafData,
+              (∀ U : Z.affineOpens, (U : Set Z) ⊆ W → J.ideal U = F U)
+                ∧ (J.support : Set Z) ⊆ W := by
   intro Z W hW F hF
   let W' : Z.Opens := ⟨W, hW.isOpen⟩
   let Wc : Z.Opens := ⟨Wᶜ, hW.isClosed.isOpen_compl⟩
   have hAff : ∀ U : Z.affineOpens, IsAffineOpen ((U : Z.Opens) ⊓ W') := by
     intro U
-    obtain ⟨e, -, he, -⟩ := GlobalTheory.IsNormalScheme.exists_isIdempotentElem_basicOpen_eq (X := Z)
-      (U := (U : Z.Opens)) (V := (U : Z.Opens) ⊓ W') (W := (U : Z.Opens) ⊓ Wc)
-      (by
-        rw [← inf_sup_left]
-        have : W' ⊔ Wc = ⊤ := by
-          ext x; simp [W', Wc, em]
-        rw [this, inf_top_eq])
-      (by
-        refine Disjoint.mono inf_le_right inf_le_right ?_
-        rw [disjoint_iff]; ext x; simp [W', Wc])
-    rw [← he]; exact U.2.basicOpen e
+    obtain ⟨e, -, he, -⟩ :=
+      GlobalTheory.IsNormalScheme.exists_isIdempotentElem_basicOpen_eq (X := Z) (U := (U : Z.Opens))
+        (V := (U : Z.Opens) ⊓ W') (W := (U : Z.Opens) ⊓ Wc)
+        (by
+          rw [← inf_sup_left]
+          have : W' ⊔ Wc = ⊤ := by ext x; simp [W', Wc, em]
+          rw [this, inf_top_eq])
+        (by
+          refine Disjoint.mono inf_le_right inf_le_right ?_
+          rw [disjoint_iff]
+          ext x
+          simp [W', Wc])
+    rw [← he]
+    exact U.2.basicOpen e
   let V : Z.affineOpens → Z.affineOpens := fun U => ⟨(U : Z.Opens) ⊓ W', hAff U⟩
   have hVU : ∀ U, (V U : Z.Opens) ≤ U := fun U => inf_le_left
   have hVW : ∀ U, ((V U : Z.Opens) : Set Z) ⊆ W := fun U => Set.inter_subset_right
@@ -105,8 +115,9 @@ theorem exists_idealSheafData_of_isClopen : ∀ (Z : Scheme.{0}) (W : Set Z), Is
     (F (V U)).comap (Z.presheaf.map (homOfLE (hVU U)).op).hom
   refine ⟨{ ideal := I, map_ideal_basicOpen := ?_ }, ?_, ?_⟩
   · intro U f
-    have hB : Z.affineBasicOpen ((Z.presheaf.map (homOfLE (hVU U)).op).hom f) =
-        V (Z.affineBasicOpen f) := by
+    have hB
+        : Z.affineBasicOpen ((Z.presheaf.map (homOfLE (hVU U)).op).hom f)
+          = V (Z.affineBasicOpen f) := by
       apply Subtype.ext
       change Z.basicOpen ((Z.presheaf.map (homOfLE (hVU U)).op).hom f) = Z.basicOpen f ⊓ W'
       rw [Scheme.basicOpen_res]
@@ -116,8 +127,11 @@ theorem exists_idealSheafData_of_isClopen : ∀ (Z : Scheme.{0}) (W : Set Z), Is
       · exact le_inf (le_inf (inf_le_left.trans this) inf_le_right) inf_le_left
     exact map_comap_eq F (hVU U) f hB (hVU _) (hF (V U) _ (hVW U))
   · intro U hU
-    have key : ∀ (A B : Z.affineOpens), A = B → ∀ hle : (B : Z.Opens) ≤ A,
-        (F B).comap (Z.presheaf.map (homOfLE hle).op).hom = F A := by
+    have key
+        : ∀ (A B : Z.affineOpens),
+          A = B
+            → ∀ hle : (B : Z.Opens) ≤ A,
+              (F B).comap (Z.presheaf.map (homOfLE hle).op).hom = F A := by
       rintro A B rfl hle
       have : homOfLE hle = 𝟙 _ := rfl
       rw [this, op_id, CategoryTheory.Functor.map_id, CommRingCat.hom_id]
@@ -138,8 +152,7 @@ theorem exists_idealSheafData_of_isClopen : ∀ (Z : Scheme.{0}) (W : Set Z), Is
     have htop : F (V ⟨U, hU⟩) = ⊤ := by
       rw [Ideal.eq_top_iff_one, Subsingleton.elim (1 : Γ(Z, (V ⟨U, hU⟩ : Z.Opens))) 0]
       exact zero_mem _
-    have hI : I ⟨U, hU⟩ = ⊤ := by
-      simp only [I, htop, Ideal.comap_top]
+    have hI : I ⟨U, hU⟩ = ⊤ := by simp only [I, htop, Ideal.comap_top]
     change x ∈ Z.zeroLocus (U := U) (I ⟨U, hU⟩ : Set Γ(Z, U)) at hx
     rw [hI, Scheme.mem_zeroLocus_iff] at hx
     exact hx 1 (Submodule.mem_top) (by rw [Scheme.basicOpen_one]; exact hxU)

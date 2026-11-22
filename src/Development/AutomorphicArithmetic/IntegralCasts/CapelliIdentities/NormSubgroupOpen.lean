@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.zlW :
-    (l : ℕ) → [inst : Fact (Nat.Prime l)] → (R : Type) → [inst_1 : CommRing R] → [CharP R l] → ℤ_[l] →+* WittVector l R :=
-    fun (l : ℕ) [Fact (Nat.Prime l)] (R : Type) [CommRing R] [CharP R l] ↦
-      (WittVector.map (ZMod.castHom (dvd_refl l) R)).comp (WittVector.equiv l).symm.toRingHom
+noncomputable def UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.zlW
+    : (l : ℕ) → [inst : Fact (Nat.Prime l)] → (R : Type) → [inst_1 : CommRing R] → [CharP R l]
+      → ℤ_[l]
+        →+* WittVector l R := fun (l : ℕ) [Fact (Nat.Prime l)] (R : Type) [CommRing R] [CharP R l] ↦
+  (WittVector.map (ZMod.castHom (dvd_refl l) R)).comp (WittVector.equiv l).symm.toRingHom
 
 namespace UpperTheory.Reformulated.B.WittVectorTrivializingMatrix
 
@@ -141,7 +142,8 @@ private def Nm (ρ : G →* R ≃+* R) (p m : ℕ) : Subgroup G where
     intro a ha y hy
     have : ρ a⁻¹ (ρ a y) = y := by
       change (ρ a⁻¹ * ρ a) y = y
-      rw [← map_mul, inv_mul_cancel, map_one]; rfl
+      rw [← map_mul, inv_mul_cancel, map_one]
+      rfl
     rwa [ha y hy] at this
 
 private lemma per_mul {p m : ℕ} {y : R} (h : y ^ p ^ m = y) (k : ℕ) : y ^ p ^ (m * k) = y := by
@@ -149,8 +151,9 @@ private lemma per_mul {p m : ℕ} {y : R} (h : y ^ p ^ m = y) (k : ℕ) : y ^ p 
   | zero => simp
   | succ k ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, h]
 
-private noncomputable def sg (p : ℕ) [Fact (Nat.Prime p)] (ρ : G →* R ≃+* R) (g : G) :
-    WittVector p R →+* WittVector p R := WittVector.map (ρ g).toRingHom
+private noncomputable def sg (p : ℕ) [Fact (Nat.Prime p)] (ρ : G →* R ≃+* R) (g : G)
+    : WittVector p R →+* WittVector p R :=
+  WittVector.map (ρ g).toRingHom
 
 private lemma sg_coeff (ρ : G →* R ≃+* R) (g : G) (x : WittVector p R) (i : ℕ) :
     (sg p ρ g x).coeff i = ρ g (x.coeff i) := by
@@ -177,12 +180,14 @@ private lemma map_zl (f : R →+* R) (x : ℤ_[p]) : WittVector.map f (zlW p R x
   exact RingHom.congr_fun (RingHom.ext_zmod (f.comp (ZMod.castHom (dvd_refl p) R))
     (ZMod.castHom (dvd_refl p) R)) _
 
-private noncomputable def Sm (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [CommRing R] [CharP R p]
-    (m : ℕ) : Subring (WittVector p R) :=
+private noncomputable def Sm
+    (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [CommRing R] [CharP R p] (m : ℕ)
+    : Subring (WittVector p R) :=
   (WittVector.map (iterateFrobenius R p m)).eqLocus (RingHom.id _)
 
-private noncomputable def Km (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [CommRing R] [CharP R p]
-    (m : ℕ) : Subring R :=
+private noncomputable def Km
+    (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [CommRing R] [CharP R p] (m : ℕ)
+    : Subring R :=
   (iterateFrobenius R p m).eqLocus (RingHom.id _)
 
 private lemma mem_Km (m : ℕ) (y : R) : y ∈ Km p R m ↔ y ^ p ^ m = y := by
@@ -233,8 +238,10 @@ private lemma unit_of_per {m : ℕ} (hm : 0 < m) {y : R} (hy : y ^ p ^ m = y) (h
     ring
   exact IsUnit.of_mul_eq_one _ this
 
-private noncomputable def chi (ρ : G →* R ≃+* R) (p : ℕ) [Fact (Nat.Prime p)] [CharP R p] (m : ℕ)
-    (q : G ⧸ Nm ρ p m) : Km p R m →+* R := (ρ q.out).toRingHom.comp (Km p R m).subtype
+private noncomputable def chi
+    (ρ : G →* R ≃+* R) (p : ℕ) [Fact (Nat.Prime p)] [CharP R p] (m : ℕ) (q : G ⧸ Nm ρ p m)
+    : Km p R m →+* R :=
+  (ρ q.out).toRingHom.comp (Km p R m).subtype
 
 omit [IsDomain R] in
 private lemma chi_apply (ρ : G →* R ≃+* R) (m : ℕ) (q : G ⧸ Nm ρ p m) (a : Km p R m) :
@@ -285,14 +292,22 @@ private lemma free_etale_sheaf_zmod_exists_hom_sending_generator (ρ : G →* R 
   simp only [map_mul, hinv _ (hfix _)]
   rw [← Finset.sum_mul, ← hs, ← hu, Units.mul_inv]
 
-private noncomputable def Mw (p : ℕ) [Fact (Nat.Prime p)] (R : Type) [CommRing R] [CharP R p]
-    {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p]) (g : G) :
-    Matrix (Fin r) (Fin r) (WittVector p R) := (M g).map (zlW p R)
+private noncomputable def Mw
+    (p : ℕ) [Fact (Nat.Prime p)]
+    (R : Type) [CommRing R] [CharP R p]
+    {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p])
+    (g : G)
+    : Matrix (Fin r) (Fin r) (WittVector p R) :=
+  (M g).map (zlW p R)
 
-private def Good (ρ : G →* R ≃+* R) {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p]) (n : ℕ)
-    (W : Matrix (Fin r) (Fin r) (WittVector p R)) : Prop :=
-  (∃ m, 0 < m ∧ ∀ i j, W i j ∈ Sm p R m) ∧
-    ∀ g, (Mw p R M g * W.map (sg p ρ g)).map (WittVector.truncate n) = W.map (WittVector.truncate n)
+private def Good
+    (ρ : G →* R ≃+* R)
+    {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p])
+    (n : ℕ) (W : Matrix (Fin r) (Fin r) (WittVector p R))
+    : Prop :=
+  (∃ m, 0 < m ∧ ∀ i j, W i j ∈ Sm p R m)
+    ∧ ∀ g,
+      (Mw p R M g * W.map (sg p ρ g)).map (WittVector.truncate n) = W.map (WittVector.truncate n)
 
 omit [IsDomain R] in
 private lemma Mw_mul {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p]) (g h : G) :
@@ -513,22 +528,31 @@ end
 
 end UpperTheory.Reformulated.B.WittVectorTrivializingMatrix
 
-theorem UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.exists_alg :
-    ∀ {p : ℕ} [hp : Fact (Nat.Prime p)] {G : Type} [inst : Group G] {R : Type} [inst_1 : CommRing R] (ρ : G →* R ≃+* R)
-      [inst_2 : TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [IsDomain R] [inst_6 : CharP R p],
-      (∀ (y : R) (m : ℕ), (0 : ℕ) < m → y ^ p ^ m = y → ∀ᶠ (g : G) in nhds (1 : G), ((ρ : G → R ≃+* R) g : R → R) y = y) →
-        ∀ {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p]),
-          Continuous (⇑M : G → Matrix (Fin r) (Fin r) ℤ_[p]) →
-            (∀ (g : G),
-                (∀ (m : ℕ), (0 : ℕ) < m → ∀ (y : R), y ^ p ^ m = y → ((ρ : G → R ≃+* R) g : R → R) y = y) →
-                  (M : G → Matrix (Fin r) (Fin r) ℤ_[p]) g = (1 : Matrix (Fin r) (Fin r) ℤ_[p])) →
-              ∃ (W : Matrix (Fin r) (Fin r) (WittVector p R)),
-                IsUnit W.det ∧
-                  ∀ (g : G) (f : R →+* R),
-                    (∀ (m : ℕ), (0 : ℕ) < m → ∀ (y : R), y ^ p ^ m = y → (f : R → R) y = ((ρ : G → R ≃+* R) g : R → R) y) →
-                      ((M : G → Matrix (Fin r) (Fin r) ℤ_[p]) g).map (⇑(UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.zlW p R) : ℤ_[p] → WittVector p R) *
-                          W.map (⇑(WittVector.map f) : WittVector p R → WittVector p R) =
-                        W := by
+theorem UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.exists_alg
+    : ∀ {p : ℕ} [hp : Fact (Nat.Prime p)] {G : Type} [inst : Group G] {R : Type}
+        [inst_1 : CommRing R] (ρ : G →* R ≃+* R) [inst_2 : TopologicalSpace G]
+        [IsTopologicalGroup G] [CompactSpace G] [IsDomain R] [inst_6 : CharP R p],
+      (∀ (y : R) (m : ℕ),
+          (0 : ℕ) < m → y ^ p ^ m = y
+            → ∀ᶠ (g : G) in nhds (1 : G), ((ρ : G → R ≃+* R) g : R → R) y = y)
+        → ∀ {r : ℕ} (M : G →* Matrix (Fin r) (Fin r) ℤ_[p]),
+          Continuous (⇑M : G → Matrix (Fin r) (Fin r) ℤ_[p])
+            → (∀ (g : G),
+              (∀ (m : ℕ),
+                  (0 : ℕ) < m → ∀ (y : R), y ^ p ^ m = y → ((ρ : G → R ≃+* R) g : R → R) y = y)
+                → (M : G → Matrix (Fin r) (Fin r) ℤ_[p]) g = (1 : Matrix (Fin r) (Fin r) ℤ_[p]))
+            → ∃ (W : Matrix (Fin r) (Fin r) (WittVector p R)),
+              IsUnit W.det
+                ∧ ∀ (g : G) (f : R →+* R),
+                  (∀ (m : ℕ),
+                      (0 : ℕ) < m
+                        → ∀ (y : R),
+                          y ^ p ^ m = y → (f : R → R) y = ((ρ : G → R ≃+* R) g : R → R) y)
+                    → ((M : G → Matrix (Fin r) (Fin r) ℤ_[p]) g).map
+                          (⇑(UpperTheory.Reformulated.B.WittVectorTrivializingMatrix.zlW p R)
+                            : ℤ_[p] → WittVector p R)
+                        * W.map (⇑(WittVector.map f) : WittVector p R → WittVector p R)
+                      = W := by
   intro p hp G _ R _ ρ _ _ _ _ _ h r M hc hM
-  exact core ρ M
-    (fun m hm => Subgroup.quotient_finite_of_isOpen _ (Nm_open ρ h hm)) (level ρ h M hc hM)
+  exact
+    core ρ M (fun m hm => Subgroup.quotient_finite_of_isOpen _ (Nm_open ρ h hm)) (level ρ h M hc hM)

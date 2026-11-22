@@ -17,8 +17,10 @@ theorem LocalQuotRing.proof : LocalQuotRing.Statement.{u} := by
     Set.disjoint_left.mpr fun x hx hxP => hx (hPU hxP)
   have hPS : (P.map (algebraMap R (Localization.AtPrime U))).IsPrime :=
     IsLocalization.isPrime_of_isPrime_disjoint U.primeCompl (Localization.AtPrime U) P hP hdisj
-  have hker : (P.map (algebraMap R (Localization.AtPrime U))).comap
-      (algebraMap R (Localization.AtPrime U)) = P :=
+  have hker
+      : (P.map (algebraMap R (Localization.AtPrime U))).comap
+          (algebraMap R (Localization.AtPrime U))
+        = P :=
     IsLocalization.under_map_of_isPrime_disjoint U.primeCompl (Localization.AtPrime U) hP hdisj
   haveI := hPS
   have hdom : IsDomain (localQuot P U) := Ideal.Quotient.isDomain _

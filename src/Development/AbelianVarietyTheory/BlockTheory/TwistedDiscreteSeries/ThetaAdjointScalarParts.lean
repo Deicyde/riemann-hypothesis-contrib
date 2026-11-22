@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LinksChar
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
 
@@ -15,22 +17,26 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.ThetaAdjointScalarOnComponents
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
-
-theorem gap {Rk : Ranks} (h : HCParam Rk) (j : Fin Rk.m) {n : ℕ} (hn : n < Rk.r) :
-    ((Rk.t : ℚ) + 3) / 2 ≤ |Formalism.L2.NTheta.lamAt h n + h.e j| := by
+theorem gap {Rk : Ranks} (h : HCParam Rk) (j : Fin Rk.m) {n : ℕ} (hn : n < Rk.r)
+    : ((Rk.t : ℚ) + 3) / 2 ≤ |Formalism.L2.NTheta.lamAt h n + h.e j| := by
   have hk := Rk.m_add_three_le_k
   have hj := j.2
-  have mono : ∀ a d : ℕ, a + d < Rk.r → Formalism.L2.NTheta.lamAt h (a + d) ≤ Formalism.L2.NTheta.lamAt h a := by
+  have mono
+      : ∀ a d : ℕ,
+        a + d < Rk.r → Formalism.L2.NTheta.lamAt h (a + d) ≤ Formalism.L2.NTheta.lamAt h a := by
     intro a d
     induction d with
     | zero => intro _; exact le_rfl
     | succ d ih =>
       intro hd
       exact (Formalism.L2.NTheta.lamAt_lt h (a + d) hd).le.trans (ih (by omega))
-  have val : ∀ (c : ℕ) (hc : c < Rk.m), Formalism.L2.NTheta.lamAt h (Rk.k - 1 + c) = -h.b ⟨c, hc⟩ := by
+  have val
+      : ∀ (c : ℕ) (hc : c < Rk.m), Formalism.L2.NTheta.lamAt h (Rk.k - 1 + c) = - h.b ⟨c, hc⟩ := by
     intro c hc
     unfold Formalism.L2.NTheta.lamAt
     rw [dite_eq_right (by omega), dite_eq_left (by omega)]
@@ -47,8 +53,8 @@ theorem gap {Rk : Ranks} (h : HCParam Rk) (j : Fin Rk.m) {n : ℕ} (hn : n < Rk.
     have h2 := h.gap_eb j hj1
     exact le_trans (by linarith) (neg_le_abs _)
 
-theorem offS_iff (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : HeightOneSpectrum (𝓞 D.host.E)) :
-    OffS D S P ↔ P.under (𝓞 D.host.F) ∉ S := by
+theorem offS_iff (S : Finset (HeightOneSpectrum (𝓞 D.host.F))) (P : HeightOneSpectrum (𝓞 D.host.E))
+    : OffS D S P ↔ P.under (𝓞 D.host.F) ∉ S := by
   constructor
   · intro h hP
     obtain ⟨x, hx, hy⟩ := h _ hP

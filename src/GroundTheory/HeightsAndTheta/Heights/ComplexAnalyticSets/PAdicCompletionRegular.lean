@@ -20,7 +20,8 @@ theorem AdicCompletionRegular.proof : AdicCompletionRegular.Statement := by
   have hfg : M.FG := Ideal.fg_of_isNoetherianRing M
   have : IsLocalRing B := adicCompletion_isLocalRing_of_isMaximal M hfg
   have : IsNoetherianRing B := GroundTheory.Arith.Etale.isNoetherianRing_adicCompletion R M
-  have hmax : (M.map (algebraMap R B)).IsMaximal := AdicCompletion.isMaximal_map_of_le M M le_rfl hfg
+  have hmax : (M.map (algebraMap R B)).IsMaximal :=
+    AdicCompletion.isMaximal_map_of_le M M le_rfl hfg
   have hmB : M.map (algebraMap R B) = maximalIdeal B := IsLocalRing.eq_maximalIdeal hmax
   have hc : (M.map (algebraMap R B)).comap (algebraMap R B) = M :=
     (hM.eq_of_le (Ideal.comap_ne_top _ hmax.ne_top) Ideal.le_comap_map).symm
@@ -38,9 +39,11 @@ theorem AdicCompletionRegular.proof : AdicCompletionRegular.Statement := by
     IsScalarTower.of_algebraMap_eq fun r => (IsLocalization.lift_eq hunit r).symm
   have : Module.Flat (Localization.AtPrime M) B :=
     (Module.flat_iff_of_isLocalization (Localization.AtPrime M) M.primeCompl B).mpr inferInstance
-  have hmap : (maximalIdeal (Localization.AtPrime M)).map (algebraMap (Localization.AtPrime M) B) =
-      maximalIdeal B := by
-    rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, ← IsScalarTower.algebraMap_eq, hmB]
+  have hmap
+      : (maximalIdeal (Localization.AtPrime M)).map (algebraMap (Localization.AtPrime M) B)
+        = maximalIdeal B := by
+    rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, ← IsScalarTower.algebraMap_eq,
+      hmB]
   have : IsLocalHom (algebraMap (Localization.AtPrime M) B) := by
     refine ⟨fun a ha => ?_⟩
     by_contra h

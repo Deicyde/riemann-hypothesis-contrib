@@ -21,8 +21,11 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
+  UpperTheory.ConvolutionTheory.RankTwoDescent.Xg
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
@@ -32,11 +35,13 @@ private theorem ψ_add' (x y : A ℚ) : ψ (x + y) = ψ x * ψ y := by simp [ψ,
 
 private theorem ψ_zero' : ψ (0 : A ℚ) = 1 := by simp [ψ]
 
-private theorem ψ_neg_mul' (x : A ℚ) : ψ (-x) * ψ x = 1 := by
-  rw [← ψ_add', neg_add_cancel, ψ_zero']
+private theorem ψ_neg_mul' (x : A ℚ) : ψ (-x) * ψ x = 1 := by rw [← ψ_add', neg_add_cancel, ψ_zero']
 
-private theorem congE_mono {E : Type} [Field E] [NumberField E] {M L : ℕ} (h : M ∣ L) {κ : GL (Fin 2) (A E)}
-    (hκ : CongE L κ) : CongE M κ := by
+private theorem congE_mono
+    {E : Type} [Field E] [NumberField E]
+    {M L : ℕ} (h : M ∣ L)
+    {κ : GL (Fin 2) (A E)} (hκ : CongE L κ)
+    : CongE M κ := by
   obtain ⟨e, rfl⟩ := h
   have hmul : ∀ (e : ℕ) (c : A E), c ∈ Oh E → (e : A E) * c ∈ Oh E := by
     intro e c hc
@@ -53,7 +58,8 @@ private theorem congE_mono {E : Type} [Field E] [NumberField E] {M L : ℕ} (h :
         rw [ih.1, hc.1, add_zero]
       · change Valued.v (((e : A E) * c).2 v + c.2 v) ≤ 1
         exact (Valuation.map_add _ _ _).trans (max_le (ih.2 v) (hc.2 v))
-  have key : ∀ x : A E, (∃ c ∈ Oh E, x = ((M * e : ℕ) : A E) * c) → ∃ c ∈ Oh E, x = (M : A E) * c := by
+  have key
+      : ∀ x : A E, (∃ c ∈ Oh E, x = ((M * e : ℕ) : A E) * c) → ∃ c ∈ Oh E, x = (M : A E) * c := by
     rintro x ⟨c, hc, rfl⟩
     exact ⟨(e : A E) * c, hmul e c hc, by push_cast; ring⟩
   exact fun i j => ⟨key _ (hκ i j).1, key _ (hκ i j).2⟩
@@ -66,13 +72,23 @@ private theorem exNat (S : Finset (H.P ℚ)) : ∃ Q : ℕ, 0 < Q ∧ ∀ v ∈ 
     rw [← Finset.mul_prod_erase S _ hv, Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ (Ideal.absNorm_mem _)
 
-private theorem dv_mul_iff (L : ℕ) (v : H.P ℚ) (y t : (A ℚ)ˣ) (ht : Valued.v (H.cp v (t : A ℚ)) = 1)
-    (h1 : Dv L v ((t : A ℚ) - 1)) : Dv L v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) ↔ Dv L v ((y : A ℚ) - 1) := by
-  have e : H.cp v ((y : A ℚ) - 1) * H.cp v (t : A ℚ) = H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1) := by
+private theorem dv_mul_iff
+    (L : ℕ) (v : H.P ℚ) (y t : (A ℚ)ˣ)
+    (ht : Valued.v (H.cp v (t : A ℚ)) = 1) (h1 : Dv L v ((t : A ℚ) - 1))
+    : Dv L v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) ↔ Dv L v ((y : A ℚ) - 1) := by
+  have e
+      : H.cp v ((y : A ℚ) - 1) * H.cp v (t : A ℚ)
+        = H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1) := by
     simp only [Units.val_mul, map_sub, map_mul, map_one]; ring
-  have e2 : Valued.v (H.cp v ((y : A ℚ) - 1)) = Valued.v (H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1)) := by
+  have e2
+      : Valued.v (H.cp v ((y : A ℚ) - 1))
+        = Valued.v (H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1)) := by
     rw [← e, Valuation.map_mul, ht, mul_one]
-  have e3 : H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) = (H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1)) + H.cp v ((t : A ℚ) - 1) := by ring
+  have e3
+      : H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1)
+        = (H.cp v (((y * t : (A ℚ)ˣ) : A ℚ) - 1) - H.cp v ((t : A ℚ) - 1))
+          + H.cp v ((t : A ℚ) - 1) := by
+    ring
   unfold Dv at h1 ⊢
   constructor
   · intro h
@@ -92,8 +108,7 @@ private theorem aE_one' : aE (1 : (A ℚ)ˣ) = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [aE]
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
-    ExGd := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of : ExGd := by
   intro E _ _ _ D P ω _ _ _ _ hA N₀ hN₀
   obtain ⟨f, hf, h, hne⟩ := UpperTheory.exists_whittakerCoeff_ne_zero_of_admissible E D P ω hA
   obtain ⟨M₀, hM₀, hlev⟩ := UpperTheory.exists_principalCongruence_level_invariant E P f hf h
@@ -126,8 +141,14 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
     unfold Bad at hv ⊢
     rw [Nat.cast_pow]
     exact Ideal.pow_mem_of_mem _ hv _ (by norm_num)
-  have hgood : ∀ v, ¬ Bad (L ^ 5) v → (H.Gd D.δ v ∧ ∀ w : H.P E, w.under (𝓞 ℚ) = v →
-      Valued.v (H.cp w (rt D.θ)) ≤ 1 ∧ H.Fix w φ₀ ∧ ∃ B, (CG.mk P).HasSat w B ∧ EigAt w B φ₀) := fun v hv => by
+  have hgood
+      : ∀ v,
+        ¬ Bad (L ^ 5) v
+          → (H.Gd D.δ v
+            ∧ ∀ w : H.P E,
+              w.under (𝓞 ℚ) = v
+                → Valued.v (H.cp w (rt D.θ)) ≤ 1 ∧ H.Fix w φ₀
+                  ∧ ∃ B, (CG.mk P).HasSat w B ∧ EigAt w B φ₀) := fun v hv => by
     by_contra hc
     refine hv (hBadN v ?_)
     have hb : Bad Q v := hQT v (by simpa using hc)
@@ -146,15 +167,26 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
   obtain ⟨Φ, hΦ⟩ : ∃ Φ : ℕ → GL (Fin 2) (A E) → ℂ, Φ = fun a g => φ₀ (g * nu D (x a)) := ⟨_, rfl⟩
   have hΦc : ∀ a, Continuous (Φ a) := fun a => by rw [hΦ]; exact (admν _).cont
   have hΦb : ∀ a, ∃ B : ℝ, ∀ g, ‖Φ a g‖ ≤ B := fun a => by rw [hΦ]; exact (admν _).bdd
-  obtain ⟨φ, hφ⟩ : ∃ φ : GL (Fin 2) (A E) → ℂ, φ = fun g => ∑ a ∈ Finset.range n, c a * Φ a g := ⟨_, rfl⟩
-  obtain ⟨Wz, hWz⟩ : ∃ Wz : (A ℚ)ˣ → GL (Fin 2) (Cinf E) → ℂ, Wz = fun y X => Wo D φ₀ (em E (aE y) * infGL E 2 X) := ⟨_, rfl⟩
-  obtain ⟨S, hS⟩ : ∃ S : (A ℚ)ˣ → ℂ, S = fun y : (A ℚ)ˣ => ∑ a ∈ Finset.range n, ψ ((a : A ℚ) * iota L * (1 - (y : A ℚ))) := ⟨_, rfl⟩
+  obtain ⟨φ, hφ⟩ : ∃ φ : GL (Fin 2) (A E) → ℂ, φ = fun g => ∑ a ∈ Finset.range n, c a * Φ a g :=
+    ⟨_, rfl⟩
+  obtain ⟨Wz, hWz⟩
+      : ∃ Wz : (A ℚ)ˣ → GL (Fin 2) (Cinf E) → ℂ,
+        Wz = fun y X => Wo D φ₀ (em E (aE y) * infGL E 2 X) :=
+    ⟨_, rfl⟩
+  obtain ⟨S, hS⟩
+      : ∃ S : (A ℚ)ˣ → ℂ,
+        S = fun y : (A ℚ)ˣ => ∑ a ∈ Finset.range n, ψ ((a : A ℚ) * iota L * (1 - (y : A ℚ))) :=
+    ⟨_, rfl⟩
   have hW : ∀ y X, Wo D φ (em E (aE y) * infGL E 2 X) = S y / n * Wz y X := fun y X => by
     rw [hφ, UpperTheory.whittaker_sum_mul_eq_sum_mul_whittaker E D ℕ _ c Φ hΦc hΦb, hS, hWz]
     simp only [Finset.sum_div, Finset.sum_mul]
     refine Finset.sum_congr rfl fun a _ => ?_
-    have e := UpperTheory.whittaker_unipotent_translate_of_infinite_component_zero E D φ₀ adm₀.cont adm₀.left (x a) (hx1 a) y X
-    have e' : Wo D (Φ a) (em E (aE y) * infGL E 2 X) = ψ (-((y : A ℚ) * x a)) * Wo D φ₀ (em E (aE y) * infGL E 2 X) := by
+    have e :=
+      UpperTheory.whittaker_unipotent_translate_of_infinite_component_zero E D φ₀ adm₀.cont
+        adm₀.left (x a) (hx1 a) y X
+    have e'
+        : Wo D (Φ a) (em E (aE y) * infGL E 2 X)
+          = ψ (-((y : A ℚ) * x a)) * Wo D φ₀ (em E (aE y) * infGL E 2 X) := by
       rw [hΦ]; exact e
     rw [e', hc]
     have e2 : ψ ((a : A ℚ) * iota L * (1 - (y : A ℚ))) = ψ (x a) * ψ (-((y : A ℚ) * x a)) := by
@@ -163,13 +195,17 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
       ring
     rw [e2]
     ring
-  have hsup : ∀ y X, Wz y X ≠ 0 → ∀ b ∈ Oh ℚ, ψ ((y : A ℚ) * ((M : A ℚ) * b)) = 1 := fun y X hz b hb => by
+  have hsup
+      : ∀ y X, Wz y X ≠ 0 → ∀ b ∈ Oh ℚ, ψ ((y : A ℚ) * ((M : A ℚ) * b)) = 1 := fun y X hz b hb => by
     have hb0 : ((M₀ : A ℚ) * (d : A ℚ) * b).1 = 0 := by
       change ((M₀ : A ℚ) * (d : A ℚ)).1 * b.1 = 0
       rw [hb.1, mul_zero]
     have hcg := UpperTheory.unipotentTheta_mem_congruence_of_integral E D M₀ d (hdθ d dvd_rfl) b hb
-    have e := UpperTheory.whittaker_unipotent_translate_of_infinite_component_zero E D φ₀ adm₀.cont adm₀.left _ hb0 y X
-    have e1 : (fun g => φ₀ (g * nu D ((M₀ : A ℚ) * (d : A ℚ) * b))) = φ₀ := funext fun g => hlev₀ _ hcg g
+    have e :=
+      UpperTheory.whittaker_unipotent_translate_of_infinite_component_zero E D φ₀ adm₀.cont
+        adm₀.left _ hb0 y X
+    have e1 : (fun g => φ₀ (g * nu D ((M₀ : A ℚ) * (d : A ℚ) * b))) = φ₀ :=
+      funext fun g => hlev₀ _ hcg g
     rw [e1] at e
     have hz' : Wo D φ₀ (em E (aE y) * infGL E 2 X) ≠ 0 := by rw [hWz] at hz; exact hz
     have e2 : ψ (-((y : A ℚ) * ((M₀ : A ℚ) * (d : A ℚ) * b))) = 1 := by
@@ -180,59 +216,74 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
     rw [hMdef]
     push_cast
     exact e3
-  have hSv : ∀ y X, Wz y X ≠ 0 → S y = if ∀ v : H.P ℚ, Dv L v ((y : A ℚ) - 1) then (n : ℂ) else 0 := fun y X hz => by
-    have := UpperTheory.sum_range_ratAdeleChar_iota_mul_one_sub_eq_ite L M hL hM (y : A ℚ) (hsup y X hz)
+  have hSv
+      : ∀ y X,
+        Wz y X ≠ 0
+          → S y = if ∀ v : H.P ℚ, Dv L v ((y : A ℚ) - 1) then (n : ℂ) else 0 := fun y X hz => by
+    have :=
+      UpperTheory.sum_range_ratAdeleChar_iota_mul_one_sub_eq_ite L M hL hM (y : A ℚ) (hsup y X hz)
     rw [hS, hndef]
     exact this
   refine ⟨L, L ^ 5, φ, hN₀L, ?_, ?_⟩
-  · refine ⟨by positivity, Dvd.intro_left (L ^ 4) (by ring), hBadL, ?_, fun v hv => (hgood v hv).1, ?_, ?_, ?_, ?_⟩
-    ·
-      have : φ = ∑ a ∈ Finset.range n, c a • (fun g => φ₀ (g * nu D (x a))) := by
+  · refine ⟨
+      by positivity,
+      Dvd.intro_left (L ^ 4) (by ring),
+      hBadL,
+      ?_,
+      fun v hv => (hgood v hv).1,
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩
+    · have : φ = ∑ a ∈ Finset.range n, c a • (fun g => φ₀ (g * nu D (x a))) := by
         rw [hφ, hΦ]
         funext g
         simp [Finset.sum_apply]
       rw [this]
       exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (trans _)
-    ·
-      intro w hw
+    · intro w hw
       obtain ⟨-, hv⟩ := hgood _ hw
       obtain ⟨hθ, hfix, B, hB, hE⟩ := hv w rfl
       have hLw : ¬ Bad L (w.under (𝓞 ℚ)) := fun hb => hw (hBadN _ hb)
       have hk : ∀ a, H.KAt w (nu D (x a)) := fun a => by
-        rw [hx]; exact UpperTheory.unipotent_natDiv_mem_maximalCompact_of_not_badPrime E D L a w hLw hθ
-      have hfx := UpperTheory.fixed_and_heckeEigen_of_finset_linearCombination E w ℕ (Finset.range n) c Φ B ⟨0, Finset.mem_range.2 hn⟩
-        (fun a => by rw [hΦ]; exact (H.fixTr E w φ₀ _ (hk a)).1 hfix)
-        (fun a => by rw [hΦ]; exact (H.fixTr E w φ₀ _ (hk a)).2 B hE)
+        rw [hx]
+        exact UpperTheory.unipotent_natDiv_mem_maximalCompact_of_not_badPrime E D L a w hLw hθ
+      have hfx :=
+        UpperTheory.fixed_and_heckeEigen_of_finset_linearCombination E w ℕ (Finset.range n) c Φ B
+          ⟨0, Finset.mem_range.2 hn⟩
+          (fun a => by rw [hΦ]; exact (H.fixTr E w φ₀ _ (hk a)).1 hfix)
+          (fun a => by rw [hΦ]; exact (H.fixTr E w φ₀ _ (hk a)).2 B hE)
       rw [hφ]
       exact ⟨hfx.1, B, hB, hfx.2⟩
-    ·
-      intro k hk g
+    · intro k hk g
       rw [hφ, hΦ]
       refine Finset.sum_congr rfl fun a _ => ?_
       congr 1
-      have hcg := UpperTheory.unipotent_conj_congruence_of_pow_five E D L a hL (hdθ L hdL) (em E k) (UpperTheory.baseChangeGL2_congruence_of_level E (L ^ 5) (by positivity) k hk)
+      have hcg :=
+        UpperTheory.unipotent_conj_congruence_of_pow_five E D L a hL (hdθ L hdL) (em E k)
+          (UpperTheory.baseChangeGL2_congruence_of_level E (L ^ 5) (by positivity) k hk)
       have e := hlev₀ _ (congE_mono hM₀L hcg) (g * nu D ((a : A ℚ) * iota L))
       rw [hx]
       simp only
       rw [← e]
       congr 1
       group
-    ·
-      intro y X hy v _
+    · intro y X hy v _
       rw [hW] at hy
       have hz : Wz y X ≠ 0 := right_ne_zero_of_mul hy
       have hs : S y ≠ 0 := fun h0 => hy (by rw [h0]; simp)
       rw [hSv y X hz] at hs
       by_contra hv
       exact hs (if_neg fun hall => hv (hall v))
-    ·
-      intro t ht h1 y X
+    · intro t ht h1 y X
       have htL := UpperTheory.hasLevel_of_unitIdele_congruent_one L hL t ht h1
       have hcg : CongE L (em E (aE t)) := UpperTheory.baseChangeGL2_congruence_of_level E L hL _ htL
       have hWzt : Wz (y * t) X = Wz y X := by
         rw [hWz]
         have e : em E (aE (y * t)) * infGL E 2 X = em E (aE y) * infGL E 2 X * em E (aE t) := by
-          rw [mul_assoc, ← UpperTheory.congruence_element_commute_inf_embedding E L _ hcg X, ← mul_assoc, ← map_mul]
+          rw [mul_assoc, ← UpperTheory.congruence_element_commute_inf_embedding E L _ hcg X,
+            ← mul_assoc, ← map_mul]
           congr 2
           exact aE_mul' y t
         simp only
@@ -246,11 +297,12 @@ theorem UpperTheory.ConvolutionTheory.RankTwoDescent.exGd_of :
       · rw [hz, mul_zero, mul_zero]
       · congr 2
         rw [hSv y X hz, hSv (y * t) X (hWzt ▸ hz)]
-        have hiff : (∀ v : H.P ℚ, Dv L v (((y * t : (A ℚ)ˣ) : A ℚ) - 1)) ↔ ∀ v : H.P ℚ, Dv L v ((y : A ℚ) - 1) :=
+        have hiff
+            : (∀ v : H.P ℚ, Dv L v (((y * t : (A ℚ)ˣ) : A ℚ) - 1))
+              ↔ ∀ v : H.P ℚ, Dv L v ((y : A ℚ) - 1) :=
           forall_congr' fun v => dv_mul_iff L v y t (ht.2 v) (h1 v)
         simp only [hiff]
-  ·
-    have e1 : em E (aE (1 : (A ℚ)ˣ)) * infGL E 2 (1 : GL (Fin 2) (Cinf E)) = 1 := by
+  · have e1 : em E (aE (1 : (A ℚ)ˣ)) * infGL E 2 (1 : GL (Fin 2) (Cinf E)) = 1 := by
       rw [map_one, aE_one', map_one, one_mul]
     have hz : Wz 1 1 ≠ 0 := by
       rw [hWz]

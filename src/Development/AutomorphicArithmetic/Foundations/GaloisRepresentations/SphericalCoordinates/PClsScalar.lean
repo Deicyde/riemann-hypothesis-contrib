@@ -135,7 +135,8 @@ theorem clsScalar_of : ClsScalar := by
     ⟨fun h x y => by simpa [X] using h (w.symm x, w.symm y), fun h u => h _ _⟩
   have hYall : ∀ m : ℤ, (∀ u, m ∣ Y u) ↔ ∀ x y, m ∣ D''.EF x y := fun m =>
     ⟨fun h x y => h (x, y), fun h u => h _ _⟩
-  have hP : ∀ q k : ℕ, q.Prime → ((∀ u, ((q ^ k : ℕ) : ℤ) ∣ X u) ↔ ∀ u, ((q ^ k : ℕ) : ℤ) ∣ Y u) := by
+  have hP
+      : ∀ q k : ℕ, q.Prime → ((∀ u, ((q ^ k : ℕ) : ℤ) ∣ X u) ↔ ∀ u, ((q ^ k : ℕ) : ℤ) ∣ Y u) := by
     intro q k hq
     rw [hXall, hYall]
     by_cases hqp : q = p
@@ -156,11 +157,12 @@ theorem clsScalar_of : ClsScalar := by
     exact_mod_cast h2
   obtain ⟨x₀, y₀, h0⟩ := half_ne hp hD''.2
   obtain ⟨x₁, y₁, h1⟩ := half_ne hp hD'.2
-  have ha : r.num.natAbs = 1 :=
-    power_free X Y r.num.natAbs r.den r.reduced hkey hP (x₀, y₀) h0
+  have ha : r.num.natAbs = 1 := power_free X Y r.num.natAbs r.den r.reduced hkey hP (x₀, y₀) h0
   have hb : r.den = 1 :=
-    power_free Y X r.den r.num.natAbs r.reduced.symm (fun u => (hkey u).symm)
-      (fun q k hq => (hP q k hq).symm) (w.symm x₁, w.symm y₁) (by simpa [X] using h1)
+    power_free Y X r.den r.num.natAbs r.reduced.symm
+      (fun u => (hkey u).symm)
+      (fun q k hq => (hP q k hq).symm)
+      (w.symm x₁, w.symm y₁) (by simpa [X] using h1)
   have hn1 : r.num = 1 := by omega
   rw [← Rat.num_div_den r, hn1, hb]
   norm_num

@@ -23,23 +23,27 @@ structure LawD (lam : PowerSeries K) (Φ : MvPowerSeries (Fin 2) K) : Prop where
   Φint : IntegralMv Φ
   log : lam.subst Φ = atX lam + atY lam
 
-structure HD (σ : K →+* K) (lam : PowerSeries K) (Φ : MvPowerSeries (Fin 2) K) (A : PowerSeries K)
-    (a : K) : Prop extends LawD lam Φ where
+structure HD
+    (σ : K →+* K) (lam : PowerSeries K) (Φ : MvPowerSeries (Fin 2) K) (A : PowerSeries K) (a : K)
+    : Prop
+    extends LawD lam Φ where
   A0 : constantCoeff A = 0
   Aint : IntegralPS A
   Alog : lam.subst A = C a * lam
   a_ne : ‖σ a - a‖ = 1
   a_sq : σ (σ a) = a
 
-structure QCls (l : ℕ) (Φ : MvPowerSeries (Fin 2) K) (A : PowerSeries K) (b : K)
-    (D : PowerSeries K) : Prop where
+structure QCls (l : ℕ) (Φ : MvPowerSeries (Fin 2) K) (A : PowerSeries K) (b : K) (D : PowerSeries K)
+    : Prop where
   D0 : constantCoeff D = 0
   dInt : IntegralPS (PowerSeries.derivative D)
   add : DivByMv (l : K) (D.subst Φ - atX D - atY D)
   eig : DivBy (l : K) (D.subst A - C b * D)
 
-structure HomCls (l : ℕ) (Φ₁ : MvPowerSeries (Fin 2) K) (A₁ : PowerSeries K)
-    (Φ₂ : MvPowerSeries (Fin 2) K) (A₂ : PowerSeries K) (g : PowerSeries K) : Prop where
+structure HomCls
+    (l : ℕ) (Φ₁ : MvPowerSeries (Fin 2) K) (A₁ : PowerSeries K) (Φ₂ : MvPowerSeries (Fin 2) K)
+    (A₂ : PowerSeries K) (g : PowerSeries K)
+    : Prop where
   g0 : constantCoeff g = 0
   gInt : IntegralPS g
   add : DivByMv (l : K) (g.subst Φ₁ - Φ₂.subst ![atX g, atY g])
@@ -51,7 +55,6 @@ def d2 (Φ : MvPowerSeries (Fin 2) K) : PowerSeries K :=
   PowerSeries.mk fun n => MvPowerSeries.coeff (Finsupp.single 0 n + Finsupp.single 1 1) Φ
 
 end Abstract
-
 
 open Classical in
 def lgS {K : Type} [Field K] (g2 g3 : K) : PowerSeries K :=

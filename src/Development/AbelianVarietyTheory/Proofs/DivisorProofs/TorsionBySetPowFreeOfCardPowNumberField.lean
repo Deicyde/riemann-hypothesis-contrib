@@ -8,9 +8,9 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem exists_mem_span_pow_sup_pow_succ (F : Type) [Field F] [NumberField F] (w0 : Ideal (𝓞 F))
-    (hmax : w0.IsMaximal) (hne : w0 ≠ ⊥) :
-    ∃ π ∈ w0, ∀ j : ℕ, Ideal.span {π ^ j} ⊔ w0 ^ (j + 1) = w0 ^ j := by
+theorem exists_mem_span_pow_sup_pow_succ
+    (F : Type) [Field F] [NumberField F] (w0 : Ideal (𝓞 F)) (hmax : w0.IsMaximal) (hne : w0 ≠ ⊥)
+    : ∃ π ∈ w0, ∀ j : ℕ, Ideal.span {π ^ j} ⊔ w0 ^ (j + 1) = w0 ^ j := by
   obtain ⟨π, hπ1, hπ2⟩ := Ideal.exists_mem_pow_notMem_pow_succ w0 hne hmax.ne_top 1
   rw [pow_one] at hπ1
   have h1 : Ideal.span {π} ⊔ w0 ^ 2 = w0 := by
@@ -34,38 +34,47 @@ theorem exists_mem_span_pow_sup_pow_succ (F : Type) [Field F] [NumberField F] (w
     induction j with
     | zero => simp
     | succ j ih =>
-      calc w0 ^ (j + 1) = w0 ^ j * w0 := pow_succ _ _
+      calc
+        w0 ^ (j + 1)
+          = w0 ^ j * w0 := pow_succ _ _
         _ ≤ (Ideal.span {π ^ j} ⊔ w0 ^ (j + 1)) * (Ideal.span {π} ⊔ w0 ^ 2) :=
-            Ideal.mul_mono ih h1.ge
+          Ideal.mul_mono ih h1.ge
         _ ≤ Ideal.span {π ^ (j + 1)} ⊔ w0 ^ (j + 1 + 1) := by
-            rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
-            refine sup_le (sup_le ?_ ?_) (sup_le ?_ ?_)
-            · rw [Ideal.span_singleton_mul_span_singleton, ← pow_succ]; exact le_sup_left
-            · refine le_trans ?_ le_sup_right
-              calc Ideal.span {π ^ j} * w0 ^ 2 ≤ w0 ^ j * w0 ^ 2 :=
-                    Ideal.mul_mono_left ((Ideal.span_singleton_le_iff_mem _).2 (Ideal.pow_mem_pow hπ1 j))
-                _ = w0 ^ (j + 1 + 1) := by rw [← pow_add]
-            · refine le_trans ?_ le_sup_right
-              calc w0 ^ (j + 1) * Ideal.span {π} ≤ w0 ^ (j + 1) * w0 :=
-                    Ideal.mul_mono_right ((Ideal.span_singleton_le_iff_mem _).2 hπ1)
-                _ = w0 ^ (j + 1 + 1) := (pow_succ _ _).symm
-            · refine le_trans ?_ le_sup_right
-              calc w0 ^ (j + 1) * w0 ^ 2 = w0 * w0 ^ (j + 1 + 1) := by ring
-                _ ≤ w0 ^ (j + 1 + 1) := Ideal.mul_le_right
+          rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
+          refine sup_le (sup_le ?_ ?_) (sup_le ?_ ?_)
+          · rw [Ideal.span_singleton_mul_span_singleton, ← pow_succ]; exact le_sup_left
+          · refine le_trans ?_ le_sup_right
+            calc
+              Ideal.span {π ^ j} * w0 ^ 2 ≤ w0 ^ j * w0 ^ 2 :=
+                Ideal.mul_mono_left ((Ideal.span_singleton_le_iff_mem _).2
+                  (Ideal.pow_mem_pow hπ1 j))
+              _ = w0 ^ (j + 1 + 1) := by rw [← pow_add]
+          · refine le_trans ?_ le_sup_right
+            calc
+              w0 ^ (j + 1) * Ideal.span {π} ≤ w0 ^ (j + 1) * w0 :=
+                Ideal.mul_mono_right ((Ideal.span_singleton_le_iff_mem _).2 hπ1)
+              _ = w0 ^ (j + 1 + 1) := (pow_succ _ _).symm
+          · refine le_trans ?_ le_sup_right
+            calc
+              w0 ^ (j + 1) * w0 ^ 2
+                = w0 * w0 ^ (j + 1 + 1) := by ring
+              _ ≤ w0 ^ (j + 1 + 1) := Ideal.mul_le_right
   refine ⟨π, hπ1, fun j => le_antisymm (sup_le ?_ (Ideal.pow_le_pow_right (Nat.le_succ j))) (hge j)⟩
   exact (Ideal.span_singleton_le_iff_mem _).2 (Ideal.pow_mem_pow hπ1 j)
 
-theorem natCard_quotient_pow_eq (F : Type) [Field F] [NumberField F] (w0 : Ideal (𝓞 F)) (r : ℕ) :
-    Nat.card (𝓞 F ⧸ w0 ^ r) = Nat.card (𝓞 F ⧸ w0) ^ r := by
+theorem natCard_quotient_pow_eq (F : Type) [Field F] [NumberField F] (w0 : Ideal (𝓞 F)) (r : ℕ)
+    : Nat.card (𝓞 F ⧸ w0 ^ r) = Nat.card (𝓞 F ⧸ w0) ^ r := by
   have := map_pow Ideal.absNorm w0 r
   simpa [Ideal.absNorm_apply, Submodule.cardQuot_apply] using this
 
-theorem exists_span_torsionBySet_maximal (F : Type) [Field F] [NumberField F] (M : Type)
-    [AddCommGroup M] [Module (𝓞 F) M] (w0 : Ideal (𝓞 F)) (h : ℕ) (hmax : w0.IsMaximal)
-    (hne : w0 ≠ ⊥)
-    (hc : Nat.card (Submodule.torsionBySet (𝓞 F) M (w0 : Set (𝓞 F))) = Nat.card (𝓞 F ⧸ w0) ^ h) :
-    ∃ e : Fin h → M, (∀ i, ∀ c ∈ w0, c • e i = 0) ∧
-      ∀ g : M, (∀ c ∈ w0, c • g = 0) → ∃ u : Fin h → 𝓞 F, g = ∑ i, u i • e i := by
+theorem exists_span_torsionBySet_maximal
+    (F : Type) [Field F] [NumberField F]
+    (M : Type) [AddCommGroup M] [Module (𝓞 F) M]
+    (w0 : Ideal (𝓞 F)) (h : ℕ) (hmax : w0.IsMaximal) (hne : w0 ≠ ⊥)
+    (hc : Nat.card (Submodule.torsionBySet (𝓞 F) M (w0 : Set (𝓞 F))) = Nat.card (𝓞 F ⧸ w0) ^ h)
+    : ∃ e : Fin h → M,
+      (∀ i, ∀ c ∈ w0, c • e i = 0)
+        ∧ ∀ g : M, (∀ c ∈ w0, c • g = 0) → ∃ u : Fin h → 𝓞 F, g = ∑ i, u i • e i := by
   set T := Submodule.torsionBySet (𝓞 F) M (w0 : Set (𝓞 F)) with hT
   haveI : Finite (𝓞 F ⧸ w0) := Ideal.finiteQuotientOfFreeOfNeBot w0 hne
   haveI : Nontrivial (𝓞 F ⧸ w0) := Ideal.Quotient.nontrivial_iff.mpr hmax.ne_top
@@ -92,11 +101,20 @@ theorem exists_span_torsionBySet_maximal (F : Type) [Field F] [NumberField F] (M
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← hu i]
   first
-    | (rw [Submodule.torsionBySet.mk_smul]; rfl)
-    | (rw [Module.IsTorsionBySet.mk_smul]; rfl)
-    | rfl
+  | (rw [Submodule.torsionBySet.mk_smul]; rfl)
+  | (rw [Module.IsTorsionBySet.mk_smul]; rfl)
+  | rfl
 
-theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField F] (M : Type) [AddCommGroup M] [Module (𝓞 F) M] (w0 : Ideal (𝓞 F)) (h r : ℕ), w0.IsMaximal → w0 ≠ ⊥ → (∀ j : ℕ, Nat.card (Submodule.torsionBySet (𝓞 F) M ((w0 ^ j : Ideal (𝓞 F)) : Set (𝓞 F))) = Nat.card (𝓞 F ⧸ w0) ^ (j * h)) → ∃ f : (Fin h → 𝓞 F ⧸ w0 ^ r) →+ M, (∀ (c : 𝓞 F) (a : Fin h → 𝓞 F ⧸ w0 ^ r), f (Ideal.Quotient.mk (w0 ^ r) c • a) = c • f a) ∧ Function.Injective f ∧ ∀ g : M, (∀ c ∈ w0 ^ r, c • g = 0) → ∃ a, f a = g := by
+theorem torsionBySet_pow_free_of_natCard
+    : ∀ (F : Type) [Field F] [NumberField F] (M : Type) [AddCommGroup M] [Module (𝓞 F) M]
+        (w0 : Ideal (𝓞 F)) (h r : ℕ),
+      w0.IsMaximal → w0 ≠ ⊥
+        → (∀ j : ℕ,
+          Nat.card (Submodule.torsionBySet (𝓞 F) M ((w0 ^ j : Ideal (𝓞 F)) : Set (𝓞 F)))
+            = Nat.card (𝓞 F ⧸ w0) ^ (j * h))
+        → ∃ f : (Fin h → 𝓞 F ⧸ w0 ^ r) →+ M,
+          (∀ (c : 𝓞 F) (a : Fin h → 𝓞 F ⧸ w0 ^ r), f (Ideal.Quotient.mk (w0 ^ r) c • a) = c • f a)
+            ∧ Function.Injective f ∧ ∀ g : M, (∀ c ∈ w0 ^ r, c • g = 0) → ∃ a, f a = g := by
   intro F _ _ M _ _ w0 h r hmax hne hcard
   set T : ℕ → Submodule (𝓞 F) M :=
     fun j => Submodule.torsionBySet (𝓞 F) M ((w0 ^ j : Ideal (𝓞 F)) : Set (𝓞 F)) with hT
@@ -107,15 +125,15 @@ theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField
   haveI : Nontrivial (𝓞 F ⧸ w0) := Ideal.Quotient.nontrivial_iff.mpr hmax.ne_top
   have hq : 2 ≤ Nat.card (𝓞 F ⧸ w0) := Finite.one_lt_card
   have hqpos : 0 < Nat.card (𝓞 F ⧸ w0) := by omega
-  have hfin : ∀ j, Finite (T j) := fun j =>
-    Nat.finite_of_card_ne_zero (by rw [hcard j]; positivity)
+  have hfin : ∀ j, Finite (T j) := fun j => Nat.finite_of_card_ne_zero (by rw [hcard j]; positivity)
   rcases r with _ | n
   · haveI : Subsingleton (𝓞 F ⧸ w0 ^ 0) :=
       Ideal.Quotient.subsingleton_iff.mpr (by rw [pow_zero, Ideal.one_eq_top])
     refine ⟨0, fun c a => by simp, fun a b _ => Subsingleton.elim a b, fun g hg => ⟨0, ?_⟩⟩
     have h1 := hg 1 (by rw [pow_zero, Ideal.one_eq_top]; exact Submodule.mem_top)
     rw [one_smul] at h1
-    rw [h1]; rfl
+    rw [h1]
+    rfl
   · obtain ⟨π, hπ, hspan⟩ := exists_mem_span_pow_sup_pow_succ F w0 hmax hne
     have key : ∀ j (g : M), g ∈ T (j + 1) → π ^ j • g = 0 → g ∈ T j := by
       intro j g hg h0
@@ -125,8 +143,8 @@ theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField
       obtain ⟨a, ha, b, hb, rfl⟩ := hc
       obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton'.mp ha
       rw [add_smul, mul_smul, h0, smul_zero, zero_add, hg b hb]
-    obtain ⟨eb, heb, hspanb⟩ := exists_span_torsionBySet_maximal F M w0 h hmax hne
-      (by simpa using hcard 1)
+    obtain ⟨eb, heb, hspanb⟩ :=
+      exists_span_torsionBySet_maximal F M w0 h hmax hne (by simpa using hcard 1)
     have hebT : ∀ i, eb i ∈ T 1 := fun i =>
       (memT 1 _).2 fun c hc => heb i c (by rwa [pow_one] at hc)
     have hTle : T n ≤ T (n + 1) := fun x hx => by
@@ -160,8 +178,9 @@ theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField
         rw [pow_one] at hc
         rw [pow_succ']
         exact Ideal.mul_mem_mul hc (Ideal.pow_mem_pow hπ n)
-      have hbij := (Submodule.inclusion_injective hrange_le).bijective_of_nat_card_le
-        (le_of_eq hcardrange.symm)
+      have hbij :=
+        (Submodule.inclusion_injective hrange_le).bijective_of_nat_card_le
+          (le_of_eq hcardrange.symm)
       intro y hy
       obtain ⟨⟨_, ⟨x, rfl⟩⟩, hx⟩ := hbij.2 ⟨y, hy⟩
       refine ⟨x, x.2, ?_⟩
@@ -176,8 +195,7 @@ theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField
       (w0 ^ (n + 1)).liftQ (LinearMap.toSpanSingleton (𝓞 F) M (e i)) (hker_e i)
     have φi_mk : ∀ i c, φi i (Ideal.Quotient.mk _ c) = c • e i := fun i c => rfl
     let fL : (Fin h → 𝓞 F ⧸ w0 ^ (n + 1)) →ₗ[𝓞 F] M := ∑ i, (φi i).comp (LinearMap.proj i)
-    have fL_apply : ∀ a, fL a = ∑ i, φi i (a i) := by
-      intro a; simp [fL]
+    have fL_apply : ∀ a, fL a = ∑ i, φi i (a i) := by intro a; simp [fL]
     have hce : ∀ i (c : 𝓞 F), c • e i ∈ LinearMap.range fL := by
       intro i c
       refine ⟨Pi.single i (Ideal.Quotient.mk _ c), ?_⟩
@@ -199,7 +217,8 @@ theorem torsionBySet_pow_free_of_natCard : ∀ (F : Type) [Field F] [NumberField
         intro _ g hg
         have h1 := (memT 0 g).1 hg 1 (by rw [pow_zero, Ideal.one_eq_top]; exact Submodule.mem_top)
         rw [one_smul] at h1
-        rw [h1]; exact Submodule.zero_mem _
+        rw [h1]
+        exact Submodule.zero_mem _
       | succ j ih =>
         intro hj g hg
         have hgT1 : ∀ c ∈ w0, c • π ^ j • g = 0 := by

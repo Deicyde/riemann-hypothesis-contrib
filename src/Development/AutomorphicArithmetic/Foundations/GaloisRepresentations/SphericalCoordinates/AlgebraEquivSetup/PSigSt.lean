@@ -6,12 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardSubtypeE
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-private theorem UpperTheory.Gal.W2.Seed.card_signs {n : ℕ} (hn : 1 ≤ n) (r : Fin n → ℝ)
-    (h0 : ∀ i : Fin n, (i : ℕ) = 0 → 0 < r i) (h1 : ∀ i : Fin n, (i : ℕ) ≠ 0 → r i < 0) :
-    Fintype.card {i // 0 < r i} = 1 ∧ Fintype.card {i // r i < 0} = n - 1 := by
+private theorem UpperTheory.Gal.W2.Seed.card_signs
+    {n : ℕ} (hn : 1 ≤ n) (r : Fin n → ℝ) (h0 : ∀ i : Fin n, (i : ℕ) = 0 → 0 < r i)
+    (h1 : ∀ i : Fin n, (i : ℕ) ≠ 0 → r i < 0)
+    : Fintype.card {i // 0 < r i} = 1 ∧ Fintype.card {i // r i < 0} = n - 1 := by
   have hiff : ∀ i : Fin n, r i < 0 ↔ ¬ 0 < r i := by
     intro i
     by_cases hi : (i : ℕ) = 0
@@ -30,8 +32,7 @@ private theorem UpperTheory.Gal.W2.Seed.card_signs {n : ℕ} (hn : 1 ≤ n) (r :
   rw [Fintype.card_congr (Equiv.subtypeEquivRight hiff), Fintype.card_subtype_compl, hc1,
     Fintype.card_fin]
 
-theorem UpperTheory.Gal.W2.Seed.pSigSt :
-    HdSign → SigSt := by
+theorem UpperTheory.Gal.W2.Seed.pSigSt : HdSign → SigSt := by
   intro hS E _ _ _ A n hn τ
   have hdiag : gramAt (A.H n) τ = diagonal (fun i => ((τ (A.hd n i : E)).re : ℂ)) := by
     ext i j
@@ -41,15 +42,19 @@ theorem UpperTheory.Gal.W2.Seed.pSigSt :
       rw [if_pos rfl, if_pos rfl, Complex.ext_iff]
       simp [(hS E A n τ i).1]
     · simp [h, Ne.symm h]
-  have aux : ∀ (r : Fin n → ℝ) (M : Matrix (Fin n) (Fin n) ℂ) (hM : M.IsHermitian),
-      M = diagonal (fun i => (r i : ℂ)) →
-      sigPosH hM = Fintype.card {i // 0 < r i} ∧ sigNegH hM = Fintype.card {i // r i < 0} := by
+  have aux
+      : ∀ (r : Fin n → ℝ) (M : Matrix (Fin n) (Fin n) ℂ) (hM : M.IsHermitian),
+        M = diagonal (fun i => (r i : ℂ))
+          → sigPosH hM = Fintype.card {i // 0 < r i}
+            ∧ sigNegH hM = Fintype.card {i // r i < 0} := by
     rintro r M hM rfl
     exact sigPosH_sigNegH_diagonal n r hM
   obtain ⟨hp, hneg⟩ := aux _ _ (isHermitian_gramAt (A.herm n) τ) hdiag
   refine ⟨fun hτ => ?_, fun hτ => ?_⟩
-  · have hcs := card_signs hn _ (fun i hi => (hS E A n τ i).2.2.1 ⟨hτ, hi⟩)
-      (fun i hi => (hS E A n τ i).2.2.2 (fun h => hi h.2))
+  · have hcs :=
+      card_signs hn _
+        (fun i hi => (hS E A n τ i).2.2.1 ⟨hτ, hi⟩)
+        (fun i hi => (hS E A n τ i).2.2.2 (fun h => hi h.2))
     exact ⟨hp.trans hcs.1, hneg.trans hcs.2⟩
   · have hall : ∀ i : Fin n, (τ (A.hd n i : E)).re < 0 := fun i =>
       (hS E A n τ i).2.2.2 (fun h => hτ h.1)

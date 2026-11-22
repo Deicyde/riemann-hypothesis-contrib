@@ -70,18 +70,20 @@ lemma infR_skew (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu la
           (psM T μ x * T.dτ A - T.dτ A * psM T μ x) := by rw [hs, hd]
       _ = -(psM T μ x * T.dτ A) + -(psM T μ x * T.dτ A) := by abel
 
-theorem psM_inf_right (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ) {x : Matrix (Fin n) (Fin n) ℂ}
-    (hx : x.PosDef) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : IsBlock ε Y) :
-    fderiv ℂ (psM T μ) x (x * Y) = -(T.dτ Y * psM T μ x) ∧
-      fderiv ℂ (psM T μ) x (Y * x) = -(psM T μ x * T.dτ Y) := by
-
+theorem psM_inf_right
+    (T : KType ε (lowK ε lam))
+    (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : IsBlock ε Y)
+    : fderiv ℂ (psM T μ) x (x * Y) = -(T.dτ Y * psM T μ x)
+      ∧ fderiv ℂ (psM T μ) x (Y * x) = -(psM T μ x * T.dτ Y) := by
   obtain ⟨A, B, hA, hB, rfl, -⟩ := block_decomp hY
   have hA' := infR_skew T μ hμ hx hA
   have hB' := infR_skew T μ hμ hx hB
   constructor
-  · simp only [mul_add, add_mul, mul_smul_comm, smul_mul_assoc, map_add (f := _), map_smul, hA'.1, hB'.1,
-      neg_add, smul_neg]
-  · simp only [mul_add, add_mul, mul_smul_comm, smul_mul_assoc, map_add (f := _), map_smul, hA'.2, hB'.2,
-      neg_add, smul_neg]
+  · simp only [mul_add, add_mul, mul_smul_comm, smul_mul_assoc, map_add (f := _), map_smul, hA'.1,
+      hB'.1, neg_add, smul_neg]
+  · simp only [mul_add, add_mul, mul_smul_comm, smul_mul_assoc, map_add (f := _), map_smul, hA'.2,
+      hB'.2, neg_add, smul_neg]
 
 end ReciprocityTheory.ChartRestriction.DS.S7

@@ -7,13 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockNormBoun
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
+  MvPolynomial
 
 noncomputable section
 namespace GlobalTheory.FockAnalytic
 
-theorem totalDegree_pderiv_le_self {σ : Type} (i : σ) (Q : MvPolynomial σ ℂ) :
-    (pderiv i Q).totalDegree ≤ Q.totalDegree := by
+theorem totalDegree_pderiv_le_self {σ : Type} (i : σ) (Q : MvPolynomial σ ℂ)
+    : (pderiv i Q).totalDegree ≤ Q.totalDegree := by
   classical
   refine Finset.sup_le fun m hm => ?_
   have hc : AddMonoidAlgebra.coeff Q (m + Finsupp.single i 1) ≠ 0 := by
@@ -28,13 +29,17 @@ theorem totalDegree_pderiv_le_self {σ : Type} (i : σ) (Q : MvPolynomial σ ℂ
   show (m.sum fun _ e => e) ≤ Q.totalDegree
   omega
 
-def OneStep {σ : Type} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (ι : MvPolynomial σ ℂ →ₗ[ℂ] H) (A : Module.End ℂ (MvPolynomial σ ℂ)) : Prop :=
-  ∀ (d : ℕ) (P : MvPolynomial σ ℂ), P.totalDegree ≤ d →
-    (A P).totalDegree ≤ d + 1 ∧ ‖ι (A P)‖ ^ 2 ≤ ((d : ℝ) + 1) * ‖ι P‖ ^ 2
+def OneStep
+    {σ : Type} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : MvPolynomial σ ℂ →ₗ[ℂ] H) (A : Module.End ℂ (MvPolynomial σ ℂ))
+    : Prop :=
+  ∀ (d : ℕ) (P : MvPolynomial σ ℂ),
+    P.totalDegree ≤ d → (A P).totalDegree ≤ d + 1 ∧ ‖ι (A P)‖ ^ 2 ≤ ((d : ℝ) + 1) * ‖ι P‖ ^ 2
 
 section
-variable {σ : Type} [DecidableEq σ] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {σ : Type} [DecidableEq σ]
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {ι : MvPolynomial σ ℂ →ₗ[ℂ] H}
 
 theorem oneStep_mul (h : IsFockIP ι) (i : σ) : OneStep ι (LinearMap.mulLeft ℂ (X i)) := by
@@ -42,7 +47,8 @@ theorem oneStep_mul (h : IsFockIP ι) (i : σ) : OneStep ι (LinearMap.mulLeft �
   refine ⟨?_, (GlobalTheory.T.fock_norm_bounds_mul_X_pderiv σ H ι h i d P hP).1⟩
   rw [LinearMap.mulLeft_apply]
   refine (totalDegree_mul _ _).trans ?_
-  rw [totalDegree_X]; omega
+  rw [totalDegree_X]
+  omega
 
 theorem oneStep_pderiv (h : IsFockIP ι) (i : σ) : OneStep ι (pderiv i).toLinearMap := by
   intro d P hP
@@ -58,9 +64,10 @@ theorem OneStep.neg {A : Module.End ℂ (MvPolynomial σ ℂ)} (h : OneStep ι A
   simpa using h d P hP
 
 omit [DecidableEq σ] in
-theorem OneStep.comp {A B : Module.End ℂ (MvPolynomial σ ℂ)} (hA : OneStep ι A) (hB : OneStep ι B)
-    (d : ℕ) (P : MvPolynomial σ ℂ) (hP : P.totalDegree ≤ d) :
-    ((A * B) P).totalDegree ≤ d + 2 ∧ ‖ι ((A * B) P)‖ ≤ ((d : ℝ) + 3 / 2) * ‖ι P‖ := by
+theorem OneStep.comp
+    {A B : Module.End ℂ (MvPolynomial σ ℂ)} (hA : OneStep ι A) (hB : OneStep ι B)
+    (d : ℕ) (P : MvPolynomial σ ℂ) (hP : P.totalDegree ≤ d)
+    : ((A * B) P).totalDegree ≤ d + 2 ∧ ‖ι ((A * B) P)‖ ≤ ((d : ℝ) + 3 / 2) * ‖ι P‖ := by
   obtain ⟨h1, h2⟩ := hB d P hP
   obtain ⟨h3, h4⟩ := hA (d + 1) _ h1
   refine ⟨h3, ?_⟩
@@ -74,24 +81,27 @@ theorem OneStep.comp {A B : Module.End ℂ (MvPolynomial σ ℂ)} (hA : OneStep 
 end
 
 section
-variable {p q r s : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  {ι : Pol p q r s →ₗ[ℂ] H}
+variable
+  {p q r s : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ι : Pol p q r s →ₗ[ℂ] H}
 
-theorem omE_bound (h : IsFockIP ι) (l l' : Ln p q r s) (d : ℕ) (P : Pol p q r s)
-    (hP : P.totalDegree ≤ d) :
-    (omE l l' P).totalDegree ≤ d + 2 ∧ ‖ι (omE l l' P)‖ ≤ ((d : ℝ) + 2) * ‖ι P‖ := by
+theorem omE_bound
+    (h : IsFockIP ι) (l l' : Ln p q r s) (d : ℕ) (P : Pol p q r s) (hP : P.totalDegree ≤ d)
+    : (omE l l' P).totalDegree ≤ d + 2 ∧ ‖ι (omE l l' P)‖ ≤ ((d : ℝ) + 2) * ‖ι P‖ := by
   have hA : OneStep ι (raiB l) := by
-    unfold raiB; split_ifs
+    unfold raiB
+    split_ifs
     exacts [oneStep_mul h l, (oneStep_pderiv h l).neg]
   have hB : OneStep ι (lowB l') := by
-    unfold lowB; split_ifs
+    unfold lowB
+    split_ifs
     exacts [oneStep_pderiv h l', oneStep_mul h l']
   obtain ⟨h1, h2⟩ := hA.comp hB d P hP
   have hn := norm_nonneg (ι P)
   unfold omE
   split_ifs
   · rw [LinearMap.add_apply, LinearMap.smul_apply, Module.End.one_apply]
-    refine ⟨(totalDegree_add _ _).trans (max_le h1 ((totalDegree_smul_le _ _).trans (by omega))), ?_⟩
+    refine
+      ⟨(totalDegree_add _ _).trans (max_le h1 ((totalDegree_smul_le _ _).trans (by omega))), ?_⟩
     rw [map_add (f := _), map_smul]
     refine (norm_add_le _ _).trans ?_
     rw [norm_smul]
@@ -101,10 +111,11 @@ theorem omE_bound (h : IsFockIP ι) (l l' : Ln p q r s) (d : ℕ) (P : Pol p q r
   · rw [add_zero]
     exact ⟨h1, by linarith⟩
 
-theorem omAct_bound (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d : ℕ)
-    (P : Pol p q r s) (hP : P.totalDegree ≤ d) :
-    (omAct p q r s Y P).totalDegree ≤ d + 2 ∧
-      ‖ι (omAct p q r s Y P)‖ ≤ (∑ l, ∑ l', ‖Y l l'‖) * (((d : ℝ) + 2) * ‖ι P‖) := by
+theorem omAct_bound
+    (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ)
+    (d : ℕ) (P : Pol p q r s) (hP : P.totalDegree ≤ d)
+    : (omAct p q r s Y P).totalDegree ≤ d + 2
+      ∧ ‖ι (omAct p q r s Y P)‖ ≤ (∑ l, ∑ l', ‖Y l l'‖) * (((d : ℝ) + 2) * ‖ι P‖) := by
   have e : omAct p q r s Y P = ∑ l, ∑ l', Y l l' • omE l l' P := by
     simp [omAct, LinearMap.sum_apply]
   rw [e]
@@ -121,11 +132,14 @@ theorem omAct_bound (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ)
     rw [map_smul, norm_smul]
     exact mul_le_mul_of_nonneg_left (omE_bound h l l' d P hP).2 (norm_nonneg _)
 
-theorem omAct_pow_bound (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d m : ℕ)
-    (hm : d ≤ 2 * m) (P : Pol p q r s) (hP : P.totalDegree ≤ d) (k : ℕ) :
-    ((omAct p q r s Y ^ k) P).totalDegree ≤ d + 2 * k ∧
-      ‖ι ((omAct p q r s Y ^ k) P)‖ ≤
-        (2 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * ((m + 1).ascFactorial k : ℝ) * ‖ι P‖ := by
+theorem omAct_pow_bound
+    (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ)
+    (d m : ℕ) (hm : d ≤ 2 * m)
+    (P : Pol p q r s) (hP : P.totalDegree ≤ d)
+    (k : ℕ)
+    : ((omAct p q r s Y ^ k) P).totalDegree ≤ d + 2 * k
+      ∧ ‖ι ((omAct p q r s Y ^ k) P)‖
+        ≤ (2 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * ((m + 1).ascFactorial k : ℝ) * ‖ι P‖ := by
   induction k with
   | zero => simpa using hP
   | succ k ih =>
@@ -136,14 +150,25 @@ theorem omAct_pow_bound (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) 
     have hm' : (d : ℝ) ≤ 2 * m := by exact_mod_cast hm
     rw [Nat.ascFactorial_succ]
     push_cast
-    calc _ ≤ (∑ l, ∑ l', ‖Y l l'‖) * ((2 * ((m : ℝ) + 1 + k)) *
-            ((2 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * ((m + 1).ascFactorial k : ℝ) * ‖ι P‖)) := by
-          refine mul_le_mul_of_nonneg_left ?_ hS
-          exact mul_le_mul (by linarith) ih.2 (norm_nonneg _) (by positivity)
+    calc
+      _ ≤ (∑ l, ∑ l', ‖Y l l'‖)
+          * ((2 * ((m : ℝ) + 1 + k))
+            * ((2 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * ((m + 1).ascFactorial k : ℝ) * ‖ι P‖)) := by
+        refine mul_le_mul_of_nonneg_left ?_ hS
+        exact mul_le_mul (by linarith) ih.2 (norm_nonneg _) (by positivity)
       _ = _ := by ring
 end
 
-theorem omAct_pow_norm_le : ∀ (p q r s : ℕ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ι : Pol p q r s →ₗ[ℂ] H), IsFockIP ι → ∀ (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d k : ℕ) (P : Pol p q r s), P.totalDegree ≤ d → ((omAct p q r s Y ^ k) P).totalDegree ≤ d + 2 * k ∧ ‖ι ((omAct p q r s Y ^ k) P)‖ ≤ (4 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * (k.factorial : ℝ) * (2 : ℝ) ^ ((d : ℝ) / 2 + 1) * ‖ι P‖ := by
+theorem omAct_pow_norm_le
+    : ∀ (p q r s : ℕ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (ι : Pol p q r s →ₗ[ℂ] H),
+      IsFockIP ι
+        → ∀ (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d k : ℕ) (P : Pol p q r s),
+          P.totalDegree ≤ d
+            → ((omAct p q r s Y ^ k) P).totalDegree ≤ d + 2 * k
+              ∧ ‖ι ((omAct p q r s Y ^ k) P)‖
+                ≤ (4 * ∑ l, ∑ l', ‖Y l l'‖) ^ k * (k.factorial : ℝ) * (2 : ℝ) ^ ((d : ℝ) / 2 + 1)
+                  * ‖ι P‖ := by
   intro p q r s H _ _ ι h Y d k P hP
   obtain ⟨h1, h2⟩ := omAct_pow_bound h Y d ((d + 1) / 2) (by omega) P hP k
   refine ⟨h1, h2.trans (mul_le_mul_of_nonneg_right ?_ (norm_nonneg _))⟩
@@ -161,10 +186,11 @@ theorem omAct_pow_norm_le : ∀ (p q r s : ℕ) (H : Type) [NormedAddCommGroup H
     exact_mod_cast Nat.choose_le_two_pow (m + k) k
   rw [Nat.ascFactorial_eq_factorial_mul_choose]
   push_cast
-  calc (2 * S) ^ k * ((k.factorial : ℝ) * ((m + k).choose k : ℝ))
+  calc
+    (2 * S) ^ k * ((k.factorial : ℝ) * ((m + k).choose k : ℝ))
       ≤ (2 * S) ^ k * ((k.factorial : ℝ) * 2 ^ (m + k)) := by gcongr
     _ = (4 * S) ^ k * (k.factorial : ℝ) * 2 ^ m := by
-        rw [show (4 : ℝ) * S = 2 * (2 * S) by ring, mul_pow 2 (2 * S), pow_add]; ring
+      rw [show (4 : ℝ) * S = 2 * (2 * S) by ring, mul_pow 2 (2 * S), pow_add]; ring
     _ ≤ _ := by gcongr
 
 end GlobalTheory.FockAnalytic

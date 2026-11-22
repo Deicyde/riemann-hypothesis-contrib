@@ -17,20 +17,23 @@ variable {R : Type} [CommRing R] {n : ℕ}
 
 def Fil (k : ℕ) (X : Matrix (Fin n) (Fin n) R) : Prop := ∀ i j : Fin n, (j : ℕ) < i + k → X i j = 0
 
-theorem fil_add {k : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (hY : Fil k Y) : Fil k (X + Y) :=
-  fun i j h => by rw [Matrix.add_apply, hX i j h, hY i j h, add_zero]
+theorem fil_add {k : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (hY : Fil k Y)
+    : Fil k (X + Y) := fun i j h => by
+  rw [Matrix.add_apply, hX i j h, hY i j h, add_zero]
 
-theorem fil_sub {k : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (hY : Fil k Y) : Fil k (X - Y) :=
-  fun i j h => by rw [Matrix.sub_apply, hX i j h, hY i j h, sub_zero]
+theorem fil_sub {k : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (hY : Fil k Y)
+    : Fil k (X - Y) := fun i j h => by
+  rw [Matrix.sub_apply, hX i j h, hY i j h, sub_zero]
 
-theorem fil_nsmul {k : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (m : ℕ) : Fil k (m • X) :=
-  fun i j h => by rw [Matrix.smul_apply, hX i j h, smul_zero]
+theorem fil_nsmul {k : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (m : ℕ)
+    : Fil k (m • X) := fun i j h => by
+  rw [Matrix.smul_apply, hX i j h, smul_zero]
 
 theorem fil_mono {a b : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil b X) (hab : a ≤ b) : Fil a X :=
   fun i j h => hX i j (by omega)
 
-theorem fil_mul {a b : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil a X) (hY : Fil b Y) :
-    Fil (a + b) (X * Y) := by
+theorem fil_mul {a b : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil a X) (hY : Fil b Y)
+    : Fil (a + b) (X * Y) := by
   intro i j hij
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -38,16 +41,19 @@ theorem fil_mul {a b : ℕ} {X Y : Matrix (Fin n) (Fin n) R} (hX : Fil a X) (hY 
   · rw [hX i l h, zero_mul]
   · rw [hY l j (by omega), mul_zero]
 
-theorem fil_pow {k : ℕ} (hk : 1 ≤ k) {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (m : ℕ) :
-    Fil (k + 1) ((1 + X) ^ m - 1 - m • X) := by
+theorem fil_pow {k : ℕ} (hk : 1 ≤ k) {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X) (m : ℕ)
+    : Fil (k + 1) ((1 + X) ^ m - 1 - m • X) := by
   induction m with
   | zero => intro i j _; simp
   | succ m ih =>
-    have e : (1 + X) ^ (m + 1) - 1 - (m + 1) • X =
-        ((1 + X) ^ m - 1 - m • X) + ((1 + X) ^ m - 1 - m • X) * X + m • (X * X) := by
-      rw [pow_succ, add_smul, one_smul, mul_add, mul_one, sub_mul, sub_mul, one_mul, smul_mul_assoc]; abel
+    have e
+        : (1 + X) ^ (m + 1) - 1 - (m + 1) • X
+          = ((1 + X) ^ m - 1 - m • X) + ((1 + X) ^ m - 1 - m • X) * X + m • (X * X) := by
+      rw [pow_succ, add_smul, one_smul, mul_add, mul_one, sub_mul, sub_mul, one_mul, smul_mul_assoc]
+      abel
     rw [e]
-    refine fil_add (fil_add ih (fil_mono (fil_mul ih hX) (by omega))) (fil_nsmul (fil_mono (fil_mul hX hX) (by omega)) m)
+    refine fil_add (fil_add ih (fil_mono (fil_mul ih hX) (by omega)))
+      (fil_nsmul (fil_mono (fil_mul hX hX) (by omega)) m)
 
 end GlobalTheory.CellDec.Unimod
 
@@ -57,13 +63,15 @@ variable {R : Type} [CommRing R] {n : ℕ}
 
 def wt (c : Rˣ) (i : Fin n) : Rˣ := c⁻¹ ^ (i : ℕ)
 
-theorem wt_mul_inv (c : Rˣ) {i j : Fin n} {k : ℕ} (h : (j : ℕ) = i + k) :
-    (wt c i * (wt c j)⁻¹ : Rˣ) = c ^ k := by
-  simp only [wt, h, pow_add, mul_inv, ← mul_assoc, mul_inv_cancel, inv_mul_cancel, one_mul, inv_pow, inv_inv]
+theorem wt_mul_inv (c : Rˣ) {i j : Fin n} {k : ℕ} (h : (j : ℕ) = i + k)
+    : (wt c i * (wt c j)⁻¹ : Rˣ) = c ^ k := by
+  simp only [wt, h, pow_add, mul_inv, ← mul_assoc, mul_inv_cancel, inv_mul_cancel, one_mul, inv_pow,
+    inv_inv]
 
-theorem fil_conj (c : Rˣ) {k : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X) :
-    Fil (k + 1) (diagonal (fun i => (wt c i : R)) * X * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R))
-      - ((c : R) ^ k) • X) := by
+theorem fil_conj (c : Rˣ) {k : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil k X)
+    : Fil (k + 1)
+      (diagonal (fun i => (wt c i : R)) * X * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R))
+        - ((c : R) ^ k) • X) := by
   intro i j h
   rw [Matrix.sub_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.smul_apply, smul_eq_mul]
   by_cases h' : (j : ℕ) < i + k
@@ -73,23 +81,36 @@ theorem fil_conj (c : Rˣ) {k : ℕ} {X : Matrix (Fin n) (Fin n) R} (hX : Fil k 
     simp only [Units.val_mul, Units.val_pow_eq_pow_val] at this
     rw [mul_right_comm, this, sub_self]
 
-theorem hom_trivial (c : Rˣ) (hc : (c : R) = 2) (Δ : GlobalTheory.SmGL.unipB R (Fin n) →* ℝ≥0)
+theorem hom_trivial
+    (c : Rˣ) (hc : (c : R) = 2)
+    (Δ : GlobalTheory.SmGL.unipB R (Fin n) →* ℝ≥0)
     (hΔ : ∀ u : GlobalTheory.SmGL.unipB R (Fin n),
-      Δ ⟨GlobalTheory.SmGL.diagT R (Fin n) (wt c) * u * (GlobalTheory.SmGL.diagT R (Fin n) (wt c))⁻¹,
-        GlobalTheory.CellDec.diagT_conj_mem (wt c) u.2⟩ = Δ u)
-    (u : GlobalTheory.SmGL.unipB R (Fin n)) : Δ u = 1 := by
-  let M : (GlobalTheory.SmGL.unipB R (Fin n)) → Matrix (Fin n) (Fin n) R := fun u => ((u : GL (Fin n) R) : Matrix (Fin n) (Fin n) R)
+      Δ ⟨
+          GlobalTheory.SmGL.diagT R (Fin n) (wt c) * u
+            * (GlobalTheory.SmGL.diagT R (Fin n) (wt c))⁻¹,
+          GlobalTheory.CellDec.diagT_conj_mem (wt c) u.2
+        ⟩
+        = Δ u)
+    (u : GlobalTheory.SmGL.unipB R (Fin n))
+    : Δ u = 1 := by
+  let M : (GlobalTheory.SmGL.unipB R (Fin n)) → Matrix (Fin n) (Fin n) R := fun u =>
+    ((u : GL (Fin n) R) : Matrix (Fin n) (Fin n) R)
   have hne : ∀ u : (GlobalTheory.SmGL.unipB R (Fin n)), Δ u ≠ 0 := fun u h => by
     have := map_mul Δ u u⁻¹
     rw [mul_inv_cancel, map_one, h, zero_mul] at this
     exact one_ne_zero this
-  have key : ∀ d k : ℕ, n ≤ k + d → 1 ≤ k → ∀ u : (GlobalTheory.SmGL.unipB R (Fin n)), Fil k (M u - 1) → Δ u = 1 := by
+  have key
+      : ∀ d k : ℕ,
+        n ≤ k + d → 1 ≤ k
+          → ∀ u : (GlobalTheory.SmGL.unipB R (Fin n)), Fil k (M u - 1) → Δ u = 1 := by
     intro d
     induction d with
     | zero =>
       intro k hk _ u hu
       have : u = 1 := by
-        apply Subtype.ext; apply Units.ext; ext i j
+        apply Subtype.ext
+        apply Units.ext
+        ext i j
         have := hu i j (by omega)
         rw [Matrix.sub_apply, sub_eq_zero] at this
         exact this
@@ -104,18 +125,30 @@ theorem hom_trivial (c : Rˣ) (hc : (c : R) = 2) (Δ : GlobalTheory.SmGL.unipB R
       have hMa : M a = (1 + X) ^ (2 ^ k) := by
         rw [hXdef, add_sub_cancel]
         simp only [M, a, Subgroup.coe_pow, Units.val_pow_eq_pow_val]
-      have hMb : M b - 1 = diagonal (fun i => (wt c i : R)) * X * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R)) := by
-        have e1 : M b = diagonal (fun i => (wt c i : R)) * M u * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R)) := by
+      have hMb
+          : M b - 1
+            = diagonal (fun i => (wt c i : R)) * X
+              * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R)) := by
+        have e1
+            : M b
+              = diagonal (fun i => (wt c i : R)) * M u
+                * diagonal (fun i => (((wt c i)⁻¹ : Rˣ) : R)) := by
           simp only [M, b, t, Units.val_mul, ← map_inv, GlobalTheory.SmGL.val_diagT, Pi.inv_apply]
-        have e2 : diagonal (fun i : Fin n => (wt c i : R)) * diagonal (fun i : Fin n => (((wt c i)⁻¹ : Rˣ) : R)) = 1 := by
+        have e2
+            : diagonal (fun i : Fin n => (wt c i : R))
+                * diagonal (fun i : Fin n => (((wt c i)⁻¹ : Rˣ) : R))
+              = 1 := by
           rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-          congr 1; funext i; simp
+          congr 1
+          funext i
+          simp
         rw [e1, hXdef, mul_sub, sub_mul, mul_one, e2]
       have hba : Fil (k + 1) (M b - M a) := by
         have e : M b - M a = (M b - 1 - ((c : R) ^ k) • X) - (M a - 1 - (2 ^ k : ℕ) • X) := by
           have : ((c : R) ^ k) • X = (2 ^ k : ℕ) • X := by
             rw [hc, ← Nat.cast_smul_eq_nsmul R]; push_cast; rfl
-          rw [this]; abel
+          rw [this]
+          abel
         rw [e, hMb, hMa]
         exact fil_sub (fil_conj c hu) (fil_pow hk1 hu _)
       have hinv : Fil 0 (M a⁻¹) := fun i j h =>
@@ -126,7 +159,8 @@ theorem hom_trivial (c : Rˣ) (hc : (c : R) = 2) (Δ : GlobalTheory.SmGL.unipB R
             simp only [M, ← Units.val_mul, ← Subgroup.coe_mul, inv_mul_cancel]; rfl
           simp only [M, Subgroup.coe_mul, Units.val_mul] at h1 ⊢
           rw [mul_sub, h1]
-        rw [e]; simpa using fil_mul hinv hba
+        rw [e]
+        simpa using fil_mul hinv hba
       have h1 : Δ b = Δ a := by
         have : b = a * (a⁻¹ * b) := by group
         rw [this, map_mul, P _ hab, mul_one]
@@ -139,7 +173,8 @@ theorem hom_trivial (c : Rˣ) (hc : (c : R) = 2) (Δ : GlobalTheory.SmGL.unipB R
         exact mul_right_cancel₀ (hne u) h3
       have h4 : 2 ^ k - 1 ≠ 0 := by
         have : 2 ≤ 2 ^ k := by
-          calc 2 = 2 ^ 1 := rfl
+          calc
+            2 = 2 ^ 1 := rfl
             _ ≤ 2 ^ k := Nat.pow_le_pow_right (by norm_num) hk1
         omega
       exact (pow_eq_one_iff_of_nonneg zero_le h4).1 h2
@@ -157,11 +192,14 @@ end GlobalTheory.CellDec.Unimod
 
 namespace GlobalTheory.CellDec.Unimod
 
-theorem modularCharacter_map_equiv {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (φ : G ≃ₜ* G) (g : G) : Measure.modularCharacter (φ g) = Measure.modularCharacter g := by
-  have R : ∀ (ρ : Measure G) [ρ.IsHaarMeasure] (h : G),
-      ρ.map (· * h) = (Measure.modularCharacterFun h) • ρ := by
+theorem modularCharacter_map_equiv
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (φ : G ≃ₜ* G) (g : G)
+    : Measure.modularCharacter (φ g) = Measure.modularCharacter g := by
+  have R
+      : ∀ (ρ : Measure G) [ρ.IsHaarMeasure] (h : G),
+        ρ.map (· * h) = (Measure.modularCharacterFun h) • ρ := by
     intro ρ _ h
     rw [Measure.modularCharacterFun_eq_haarScalarFactor ρ h]
     exact Measure.isMulLeftInvariant_eq_smul _ ρ
@@ -185,8 +223,10 @@ theorem modularCharacter_map_equiv {G : Type} [Group G] [TopologicalSpace G] [Is
   have h4 := (ENNReal.mul_left_inj hne hnt).1 h3
   exact (ENNReal.coe_injective h4).symm
 
-def conjEquiv {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (H : Subgroup G) (t : G)
-    (h1 : ∀ u ∈ H, t * u * t⁻¹ ∈ H) (h2 : ∀ u ∈ H, t⁻¹ * u * t ∈ H) : H ≃ₜ* H where
+def conjEquiv
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (H : Subgroup G) (t : G) (h1 : ∀ u ∈ H, t * u * t⁻¹ ∈ H) (h2 : ∀ u ∈ H, t⁻¹ * u * t ∈ H)
+    : H ≃ₜ* H where
   toFun u := ⟨t * u * t⁻¹, h1 u u.2⟩
   invFun u := ⟨t⁻¹ * u * t, h2 u u.2⟩
   left_inv u := Subtype.ext (by simp [mul_assoc])
@@ -201,10 +241,11 @@ end GlobalTheory.CellDec.Unimod
 
 namespace GlobalTheory.CellDec
 
-
 open GlobalTheory.CellDec.Unimod in
-theorem NA_isInvInvariant : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) [MeasurableSpace (GA E n)]
-    [BorelSpace (GA E n)] (ν : Measure (GlobalTheory.CellDec.NA E n)) [ν.IsHaarMeasure], ν.IsInvInvariant := by
+theorem NA_isInvInvariant
+    : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) [MeasurableSpace (GA E n)]
+        [BorelSpace (GA E n)] (ν : Measure (GlobalTheory.CellDec.NA E n)) [ν.IsHaarMeasure],
+      ν.IsInvInvariant := by
   intro E _ _ n _ _ ν _
   haveI := GlobalTheory.AdelicUnitaryTop.t2Space_adeleRing_numberField E
   haveI := GlobalTheory.AdelicUnitaryTop.locallyCompact_adele E
@@ -224,14 +265,17 @@ theorem NA_isInvInvariant : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) [
   have hcl : IsClosed ((NA E n : Subgroup (GA E n)) : Set (GA E n)) := by
     have hc : ∀ i j : Fin n, Continuous fun g : GA E n => (g : Matrix (Fin n) (Fin n) (Ad E)) i j :=
       fun i j => (continuous_id.matrix_elem i j).comp Units.continuous_val
-    have e : ((NA E n : Subgroup (GA E n)) : Set (GA E n)) =
-        (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : j < i), {g : GA E n | (g : Matrix (Fin n) (Fin n) (Ad E)) i j = 0}) ∩
-          ⋂ i : Fin n, {g : GA E n | (g : Matrix (Fin n) (Fin n) (Ad E)) i i = 1} := by
+    have e
+        : ((NA E n : Subgroup (GA E n)) : Set (GA E n))
+          = (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : j < i), {g : GA E n | (g : Matrix (Fin n) (Fin n) (Ad E)) i j = 0})
+            ∩ ⋂ i : Fin n, {g : GA E n | (g : Matrix (Fin n) (Fin n) (Ad E)) i i = 1} := by
       ext g
-      simp only [SetLike.mem_coe, NA, GlobalTheory.SmGL.mem_unipB, Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq]
+      simp only [SetLike.mem_coe, NA, GlobalTheory.SmGL.mem_unipB, Set.mem_inter_iff,
+        Set.mem_iInter, Set.mem_setOf_eq]
     rw [e]
-    exact (isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-      isClosed_eq (hc i j) continuous_const).inter
+    exact (isClosed_iInter fun i =>
+        isClosed_iInter fun j =>
+          isClosed_iInter fun _ => isClosed_eq (hc i j) continuous_const).inter
       (isClosed_iInter fun i => isClosed_eq (hc i i) continuous_const)
   haveI : LocallyCompactSpace (NA E n) := hcl.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : SecondCountableTopology (NA E n) := TopologicalSpace.Subtype.secondCountableTopology _

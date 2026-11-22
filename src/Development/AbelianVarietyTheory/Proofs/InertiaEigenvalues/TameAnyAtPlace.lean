@@ -11,10 +11,13 @@ noncomputable section
 
 namespace GlobalTheory.TypeLeaf
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Polynomial NumberField IsDedekindDomain
 
-theorem tameAnyFix_map_primeToPart {M K : Type} [Monoid M] [Field K] (l : ℕ) [Fact l.Prime] [CharP K l]
-    (ι : M →* K) (x : M) : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
+theorem tameAnyFix_map_primeToPart
+    {M K : Type} [Monoid M] [Field K] (l : ℕ) [Fact l.Prime] [CharP K l] (ι : M →* K) (x : M)
+    : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
   have hl : l.Prime := Fact.out
   unfold Formalism.CyclotomicNorms.primeToPart
   rcases Nat.eq_zero_or_pos (orderOf x) with h0 | hpos
@@ -48,17 +51,20 @@ theorem tameAnyFix_map_primeToPart {M K : Type} [Monoid M] [Field K] (l : ℕ) [
       rw [pow_eq_pow_mod _ h2, h3, ← pow_eq_pow_mod _ h2]
     rw [h4, pow_one]
 
-theorem tameAnyFix_isoLoc (D : D7) {a : ℕ} (π : D.naut.CG a) (w : PlE D.host) :
-    isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
+theorem tameAnyFix_isoLoc (D : D7) {a : ℕ} (π : D.naut.CG a) (w : PlE D.host)
+    : isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
   simp [isoLoc, spehLoc, D.naut.lpSum_zero, D.naut.lpTw_zero]
 
-theorem tameAnyFix_not_over (D : D7) (i : D.nd.Loc) (k : Fin 2) (h : D.nd.l i ≠ D.host.g k) (v : D.nd.PlG k) :
-    D.naut.plGw k v ∉ placesOver D.host.E (D.nd.l i) := by
+theorem tameAnyFix_not_over
+    (D : D7) (i : D.nd.Loc) (k : Fin 2) (h : D.nd.l i ≠ D.host.g k) (v : D.nd.PlG k)
+    : D.naut.plGw k v ∉ placesOver D.host.E (D.nd.l i) := by
   intro hl
   have hg : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw k v).asIdeal := D.naut.plGw_over k v
   have hl' : ((D.nd.l i : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw k v).asIdeal := hl
-  have hc : Nat.Coprime (D.nd.l i) (D.host.g k) := (Nat.coprime_primes (D.nd.lPrime i).out (D.host.g_prime k)).2 h
-  have hc' : IsCoprime ((D.nd.l i : ℕ) : 𝓞 D.host.E) ((D.host.g k : ℕ) : 𝓞 D.host.E) := Nat.Coprime.cast hc
+  have hc : Nat.Coprime (D.nd.l i) (D.host.g k) :=
+    (Nat.coprime_primes (D.nd.lPrime i).out (D.host.g_prime k)).2 h
+  have hc' : IsCoprime ((D.nd.l i : ℕ) : 𝓞 D.host.E) ((D.host.g k : ℕ) : 𝓞 D.host.E) :=
+    Nat.Coprime.cast hc
   obtain ⟨a, b, hab⟩ := hc'
   apply (D.naut.plGw k v).isPrime.ne_top
   rw [Ideal.eq_top_iff_one, ← hab]

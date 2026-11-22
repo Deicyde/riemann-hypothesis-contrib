@@ -16,18 +16,21 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.MassOrbit
 
-theorem mass_orbit_class {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+theorem mass_orbit_class
+    {F : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
     (L : LocE F E) (r k : ℕ) (S : Frames L r k) (d₁ : S.Datum) (Λ₁ : Submodule L.O S.V)
-    (h₁ : S.IsTerm d₁ Λ₁) (d : S.Datum) :
-    (S.mass d fun Λ => S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • S.Fr d₁ Λ₁) =
-      ENNReal.ofReal (S.wC (S.Fr d₁ Λ₁)) * S.nT d (S.Fr d₁ Λ₁) fun Λ => S.BBzero d Λ := by
+    (h₁ : S.IsTerm d₁ Λ₁) (d : S.Datum)
+    : (S.mass d fun Λ => S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • S.Fr d₁ Λ₁)
+      = ENNReal.ofReal (S.wC (S.Fr d₁ Λ₁)) * S.nT d (S.Fr d₁ Λ₁) fun Λ => S.BBzero d Λ := by
   have act := @GlobalTheory.FrameAct.stabiliser_acts_on_terms F _ _ _ _ _ E _ _ _ L r k S
   have trm := @GlobalTheory.HL.TermBasic.term_basic F _ _ _ _ _ E _ _ _ L r k S
   have vol := (@GlobalTheory.HL.volSt F _ _ _ _ _ E _ _ _ L r k S).2
-  have hT : ∀ d Λ, S.IsTerm d Λ → ∀ h ∈ S.St, S.IsTerm d (h • Λ) := fun d Λ H h hh => (act d Λ H h hh).1
-  have hF : ∀ d Λ, S.IsTerm d Λ → ∀ h ∈ S.St, S.Fr d (h • Λ) = h • S.Fr d Λ :=
-    fun d Λ H h hh => (act d Λ H h hh).2.2.2.2.1
+  have hT : ∀ d Λ, S.IsTerm d Λ → ∀ h ∈ S.St, S.IsTerm d (h • Λ) := fun d Λ H h hh =>
+    (act d Λ H h hh).1
+  have hF : ∀ d Λ, S.IsTerm d Λ → ∀ h ∈ S.St, S.Fr d (h • Λ) = h • S.Fr d Λ := fun d Λ H h hh =>
+    (act d Λ H h hh).2.2.2.2.1
   have hB : ∀ d Λ, S.IsTerm d Λ → ∀ h ∈ S.St, (S.BBzero d (h • Λ) ↔ S.BBzero d Λ) :=
     fun d Λ H h hh => (act d Λ H h hh).2.2.2.2.2.2.2.1
   have hI : ∀ d Λ, S.IsTerm d Λ → S.IsIntCls (S.Fr d Λ) := fun d Λ H => (trm d Λ H).2.2.2.2.2.2.1
@@ -39,22 +42,29 @@ theorem mass_orbit_class {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
   unfold Frames.sumCls
   rw [tsum_eq_single (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁)]
   · have hrel : (MulAction.orbitRel S.St (Set S.FrP))
-        (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out C₁ := Quotient.mk_out C₁
+        (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out C₁ :=
+      Quotient.mk_out C₁
     obtain ⟨⟨h, hh⟩, e⟩ := MulAction.orbitRel_apply.1 hrel
     have e' : (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out = h • C₁ := e.symm
     have hint : S.IsIntCls (h • C₁) := by
       rw [hC, ← hF d₁ Λ₁ h₁ h hh]
       exact hI _ _ (hT _ _ h₁ h hh)
-    change (if S.IsIntCls (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out then
-      ENNReal.ofReal (S.wC (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out) *
-        S.nT d (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out _ else 0) = _
+    change
+      (if S.IsIntCls (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out then
+         ENNReal.ofReal (S.wC (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out)
+           * S.nT d (Quotient.mk (MulAction.orbitRel S.St (Set S.FrP)) C₁).out _
+       else
+         0)
+        = _
     rw [e', if_pos hint, (vol C₁ (hI _ _ h₁).1).2.2.2 h hh]
     congr 1
     unfold Frames.nT
     congr 1
-    have hset : {Λ : Submodule L.O S.V | S.IsTerm d Λ ∧
-        (S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • C₁) ∧ S.Fr d Λ = h • C₁} =
-        (fun Λ : Submodule L.O S.V => h • Λ) '' {Λ | S.IsTerm d Λ ∧ S.BBzero d Λ ∧ S.Fr d Λ = C₁} := by
+    have hset
+        : {Λ : Submodule L.O S.V | S.IsTerm d Λ ∧
+            (S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • C₁) ∧ S.Fr d Λ = h • C₁}
+          = (fun Λ : Submodule L.O S.V => h • Λ)
+            '' {Λ | S.IsTerm d Λ ∧ S.BBzero d Λ ∧ S.Fr d Λ = C₁} := by
       ext Λ
       constructor
       · rintro ⟨H, ⟨hb, -⟩, e⟩
@@ -70,7 +80,8 @@ theorem mass_orbit_class {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
     have h0 : S.nT d o.out (fun Λ => S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • C₁) = 0 := by
       unfold Frames.nT
       have : {Λ : Submodule L.O S.V | S.IsTerm d Λ ∧
-        (S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • C₁) ∧ S.Fr d Λ = o.out} = ∅ := by
+            (S.BBzero d Λ ∧ ∃ s ∈ S.St, S.Fr d Λ = s • C₁) ∧ S.Fr d Λ = o.out}
+          = ∅ := by
         ext Λ
         simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨-, ⟨-, s, hs, e⟩, e2⟩

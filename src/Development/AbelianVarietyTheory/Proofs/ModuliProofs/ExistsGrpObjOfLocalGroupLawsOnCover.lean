@@ -8,44 +8,65 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.CoverGlue
 
-theorem exists_grpObj_of_cover : ∀ (S : Scheme.{0}) (I : Type) (U : I → S.Opens) (A : Over S) (G : ∀ i, Over (U i).toScheme) [∀ i, GrpObj (G i)] (ψ : ∀ i, (G i).left ⟶ A.left) (m n : A ⊗ A ⟶ A) (e : Out.baseOver S ⟶ A), iSup U = ⊤ → (∀ i, IsPullback (ψ i) (G i).hom A.hom (U i).ι) → (∀ i (T : Over (U i).toScheme) (x y : T ⟶ G i) (x₀ y₀ : Over.mk (T.hom ≫ (U i).ι) ⟶ A), x₀.left = x.left ≫ ψ i → y₀.left = y.left ≫ ψ i → (lift x₀ y₀ ≫ m).left = (x * y).left ≫ ψ i ∧ (lift x₀ y₀ ≫ n).left = (x⁻¹).left ≫ ψ i) → (∀ i, (1 : Out.baseOver (U i).toScheme ⟶ G i).left ≫ ψ i = (U i).ι ≫ e.left) → ∃ _ : GrpObj A, ∀ i, IsGrpPullback (G i) A (U i).ι (ψ i) := by
+theorem exists_grpObj_of_cover
+    : ∀ (S : Scheme.{0}) (I : Type) (U : I → S.Opens) (A : Over S) (G : ∀ i, Over (U i).toScheme)
+        [∀ i, GrpObj (G i)] (ψ : ∀ i, (G i).left ⟶ A.left) (m n : A ⊗ A ⟶ A)
+        (e : Out.baseOver S ⟶ A),
+      iSup U = ⊤ → (∀ i, IsPullback (ψ i) (G i).hom A.hom (U i).ι)
+        → (∀ i (T : Over (U i).toScheme) (x y : T ⟶ G i) (x₀ y₀ : Over.mk (T.hom ≫ (U i).ι) ⟶ A),
+          x₀.left = x.left ≫ ψ i → y₀.left = y.left ≫ ψ i
+            → (lift x₀ y₀ ≫ m).left = (x * y).left ≫ ψ i ∧ (lift x₀ y₀ ≫ n).left = (x⁻¹).left ≫ ψ i)
+        → (∀ i, (1 : Out.baseOver (U i).toScheme ⟶ G i).left ≫ ψ i = (U i).ι ≫ e.left)
+        → ∃ _ : GrpObj A, ∀ i, IsGrpPullback (G i) A (U i).ι (ψ i) := by
   intro S I U A G _ ψ m n e hU hpb hgrp hone
 
-  have hl : ∀ i (T' : Over (U i).toScheme) (a : Over.mk (T'.hom ≫ (U i).ι) ⟶ A),
-      ∃ x : T' ⟶ G i, a.left = x.left ≫ ψ i :=
-    fun i _ a => GlobalTheory.CoverGlue.exists_lift (hpb i) a
-  have hm : ∀ i (T' : Over (U i).toScheme) (a b : Over.mk (T'.hom ≫ (U i).ι) ⟶ A) (x y : T' ⟶ G i),
-      a.left = x.left ≫ ψ i → b.left = y.left ≫ ψ i → (lift a b ≫ m).left = (x * y).left ≫ ψ i :=
+  have hl
+      : ∀ i (T' : Over (U i).toScheme) (a : Over.mk (T'.hom ≫ (U i).ι) ⟶ A), ∃ x : T' ⟶ G i,
+        a.left = x.left ≫ ψ i := fun i _ a =>
+    GlobalTheory.CoverGlue.exists_lift (hpb i) a
+  have hm
+      : ∀ i (T' : Over (U i).toScheme) (a b : Over.mk (T'.hom ≫ (U i).ι) ⟶ A) (x y : T' ⟶ G i),
+        a.left = x.left ≫ ψ i → b.left = y.left ≫ ψ i → (lift a b ≫ m).left = (x * y).left ≫ ψ i :=
     fun i T' a b x y ha hb => (hgrp i T' x y a b ha hb).1
-  have hn : ∀ i (T' : Over (U i).toScheme) (a b : Over.mk (T'.hom ≫ (U i).ι) ⟶ A) (x y : T' ⟶ G i),
-      a.left = x.left ≫ ψ i → b.left = y.left ≫ ψ i → (lift a b ≫ n).left = (x⁻¹).left ≫ ψ i :=
+  have hn
+      : ∀ i (T' : Over (U i).toScheme) (a b : Over.mk (T'.hom ≫ (U i).ι) ⟶ A) (x y : T' ⟶ G i),
+        a.left = x.left ≫ ψ i → b.left = y.left ≫ ψ i → (lift a b ≫ n).left = (x⁻¹).left ≫ ψ i :=
     fun i T' a b x y ha hb => (hgrp i T' x y a b ha hb).2
   obtain ⟨e', he'⟩ : ∃ e' : 𝟙_ (Over S) ⟶ A, e' = e := ⟨e, rfl⟩
   subst he'
 
-  have h1 : ∀ i (T' : Over (U i).toScheme) (p : Over.mk (T'.hom ≫ (U i).ι) ⟶ 𝟙_ (Over S)),
-      (p ≫ e').left = (1 : T' ⟶ G i).left ≫ ψ i := by
+  have h1
+      : ∀ i (T' : Over (U i).toScheme) (p : Over.mk (T'.hom ≫ (U i).ι) ⟶ 𝟙_ (Over S)),
+        (p ≫ e').left = (1 : T' ⟶ G i).left ≫ ψ i := by
     intro i T' p
     have hp : p.left = T'.hom ≫ (U i).ι := by
       have h := Over.w p
-      first | simpa using h | simpa [Over.tensorUnit_hom] using h | exact (Category.comp_id _).symm.trans h
+      first
+      | simpa using h
+      | simpa [Over.tensorUnit_hom] using h
+      | exact (Category.comp_id _).symm.trans h
     have hT : (toUnit T').left = T'.hom := by
       have h := Over.w (toUnit T')
-      first | simpa using h | simpa [Over.tensorUnit_hom] using h | exact (Category.comp_id _).symm.trans h
+      first
+      | simpa using h
+      | simpa [Over.tensorUnit_hom] using h
+      | exact (Category.comp_id _).symm.trans h
     have h1' : (1 : T' ⟶ G i) = toUnit T' ≫ (1 : Out.baseOver (U i).toScheme ⟶ G i) := by
       rw [CategoryTheory.Hom.one_def, CategoryTheory.Hom.one_def, ← Category.assoc]
       first | exact congrArg (· ≫ _) (toUnit_unique _ _) | (congr 1; exact toUnit_unique _ _)
     rw [h1']
     first
-      | (rw [Over.comp_left, Over.comp_left, Category.assoc, hone i, hp, hT, Category.assoc])
-      | (simp only [Over.comp_left, Category.assoc, hone i, hp, hT])
+    | (rw [Over.comp_left, Over.comp_left, Category.assoc, hone i, hp, hT, Category.assoc])
+    | (simp only [Over.comp_left, Category.assoc, hone i, hp, hT])
   have ax1 : e' ▷ A ≫ m = (λ_ A).hom := by
     apply GlobalTheory.CoverGlue.over_ext hU
     intro i T' r
@@ -90,9 +111,16 @@ theorem exists_grpObj_of_cover : ∀ (S : Scheme.{0}) (I : Type) (U : I → S.Op
     rw [← Category.assoc r (toUnit A) e']
     apply Over.OverMorphism.ext
     rw [hm i T' _ _ z z⁻¹ hz (hn i T' r r z z hz hz), _root_.mul_inv_cancel, h1 i T' (r ≫ toUnit A)]
-  let inst : GrpObj A :=
-    { one := e', mul := m, inv := lift (𝟙 A) (𝟙 A) ≫ n,
-      one_mul := ax1, mul_one := ax2, mul_assoc := ax3, left_inv := ax4, right_inv := ax5 }
+  let inst : GrpObj A := {
+    one := e'
+    mul := m
+    inv := lift (𝟙 A) (𝟙 A) ≫ n
+    one_mul := ax1
+    mul_one := ax2
+    mul_assoc := ax3
+    left_inv := ax4
+    right_inv := ax5
+  }
   refine ⟨inst, fun i => ⟨hpb i, fun T x y x₀ y₀ hx hy => ?_⟩⟩
   rw [CategoryTheory.Hom.mul_def]
   exact hm i T x₀ y₀ x y hx hy

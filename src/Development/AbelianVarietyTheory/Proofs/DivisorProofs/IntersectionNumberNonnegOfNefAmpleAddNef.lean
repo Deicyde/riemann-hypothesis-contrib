@@ -16,25 +16,35 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowLeG
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
 
-theorem interNum_nonneg_of_isNef_of_ample_tens_nef (k : Type) [Field k] [Infinite k]
-    (X : Scheme.{0}) [Algebra k Γ(X, ⊤)] (hX : IsProjOver (strHom k (X := X)))
+theorem interNum_nonneg_of_isNef_of_ample_tens_nef
+    (k : Type) [Field k] [Infinite k]
+    (X : Scheme.{0}) [Algebra k Γ(X, ⊤)]
+    (hX : IsProjOver (strHom k (X := X)))
     (hAN : ∀ A N : LB X, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N))
-    (d : ℕ) (F : X.Modules) [IsFiniteQC F] (hd : suppDim F ≤ (d : ℕ))
-    (P : Fin d → LB X) (hP : ∀ i, IsNef k (P i)) : 0 ≤ interNum k F P := by
+    (d : ℕ)
+    (F : X.Modules) [IsFiniteQC F]
+    (hd : suppDim F ≤ (d : ℕ))
+    (P : Fin d → LB X) (hP : ∀ i, IsNef k (P i))
+    : 0 ≤ interNum k F P := by
   classical
   obtain ⟨_, A, hA⟩ := isProper_and_exists_isAmpleLB_of_isProjOver hX
   have hD : DiffVanish (d + 1) (chiPic k F) :=
     diffVanish_chiPic_of_isProjOver (algebraMap_eq_strHom k X) F hX hd
-  have key : ∀ S : Finset (Fin d), ∀ Q : Fin d → LB X, (∀ i ∈ S, IsNef k (Q i)) →
-      (∀ i ∉ S, IsAmpleLB (Q i)) → 0 ≤ interNum k F Q := by
+  have key
+      : ∀ S : Finset (Fin d), ∀ Q : Fin d → LB X,
+        (∀ i ∈ S, IsNef k (Q i)) → (∀ i ∉ S, IsAmpleLB (Q i)) → 0 ≤ interNum k F Q := by
     intro S
     induction S using Finset.induction_on with
-    | empty => exact fun Q _ h ↦ GlobalTheory.T.lineBundleIntersectionNumber_nonneg_of_ample k X hX d F hd Q fun i ↦ h i (by simp)
+    | empty =>
+      exact fun Q _ h ↦
+        GlobalTheory.T.lineBundleIntersectionNumber_nonneg_of_ample k X hX d F hd Q fun i ↦
+          h i (by simp)
     | insert i S hi ih =>
       intro Q hn ha
       have hi' : IsNef k (Q i) := hn i (Finset.mem_insert_self _ _)
@@ -51,8 +61,11 @@ theorem interNum_nonneg_of_isNef_of_ample_tens_nef (k : Type) [Field k] [Infinit
           · subst h; rwa [Function.update_self]
           · rw [Function.update_of_ne h]
             exact ha j (by simp [h, hj])
-      have h2 : ∀ m : ℕ, ∃ B : LB X, IsAmpleLB B ∧ interNum k F (Function.update Q i B) =
-          interNum k F (Function.update Q i A) + m * interNum k F Q := by
+      have h2
+          : ∀ m : ℕ, ∃ B : LB X,
+            IsAmpleLB B
+              ∧ interNum k F (Function.update Q i B)
+                = interNum k F (Function.update Q i A) + m * interNum k F Q := by
         intro m
         induction m with
         | zero => exact ⟨A, hA, by simp⟩

@@ -7,15 +7,17 @@ public import Formalism.GaloisCohomology.Statement
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 
 namespace GlobalTheory
 
-theorem exists_descend_pair_quotient {Γ M : Type} [Group Γ] [TopologicalSpace Γ]
-    [IsTopologicalGroup Γ] [TopologicalSpace M] (N : Subgroup Γ) (w : Γ × Γ → M)
-    (hw : Continuous w) (h : ∀ g h : Γ, ∀ n ∈ N, ∀ n' ∈ N, w (g * n, h * n') = w (g, h)) :
-    ∃ W : (Γ ⧸ N) × (Γ ⧸ N) → M, Continuous W ∧
-      ∀ g h : Γ, W ((g : Γ ⧸ N), (h : Γ ⧸ N)) = w (g, h) := by
+theorem exists_descend_pair_quotient
+    {Γ M : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [TopologicalSpace M]
+    (N : Subgroup Γ) (w : Γ × Γ → M)
+    (hw : Continuous w) (h : ∀ g h : Γ, ∀ n ∈ N, ∀ n' ∈ N, w (g * n, h * n') = w (g, h))
+    : ∃ W : (Γ ⧸ N) × (Γ ⧸ N) → M,
+      Continuous W ∧ ∀ g h : Γ, W ((g : Γ ⧸ N), (h : Γ ⧸ N)) = w (g, h) := by
   refine ⟨fun p => Quotient.liftOn₂' p.1 p.2 (fun a b => w (a, b)) ?_, ?_, fun g h => rfl⟩
   · intro a b a' b' ha hb
     have e := h a b _ (QuotientGroup.leftRel_apply.1 ha) _ (QuotientGroup.leftRel_apply.1 hb)
@@ -24,7 +26,25 @@ theorem exists_descend_pair_quotient {Γ M : Type} [Group Γ] [TopologicalSpace 
       (QuotientGroup.isOpenQuotientMap_mk (N := N))).isQuotientMap.continuous_iff]
     exact hw
 
-theorem sum_inv_eq_zero_of_unramified_cocycle : PoitouTateTotallyComplex → ∀ (F Ω : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (ζ : Ω), IsPrimitiveRoot ζ (l ^ 1) → ∃ inv : InvFam F Ω l 1, IsLocalInvariants ζ inv ∧ ∀ S : Finset (HeightOneSpectrum (𝓞 F)), ContainsAbove S l → ∀ Av : HeightOneSpectrum (𝓞 F) → ValuationSubring Ω, (∀ v, IsPlaceOver (Av v) v) → ∀ w : Z2 (muRep F Ω l 1), (∀ g h : G F Ω, ∀ n ∈ NS Ω (S : Set (HeightOneSpectrum (𝓞 F))), ∀ n' ∈ NS Ω (S : Set (HeightOneSpectrum (𝓞 F))), w.1 (g * n, h * n') = w.1 (g, h)) → ∀ wl : ∀ v, Z2 (muLoc F l 1 (Av v)), (∀ v (g h : Dec (F := F) (Av v)), (wl v).1 (g, h) = w.1 ((g : G F Ω), (h : G F Ω))) → ∑ v ∈ S, inv (Av v) (Submodule.Quotient.mk (wl v)) = 0 := by
+theorem sum_inv_eq_zero_of_unramified_cocycle
+    : PoitouTateTotallyComplex
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] [Field Ω]
+          [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (ζ : Ω),
+        IsPrimitiveRoot ζ (l ^ 1)
+          → ∃ inv : InvFam F Ω l 1,
+            IsLocalInvariants ζ inv
+              ∧ ∀ S : Finset (HeightOneSpectrum (𝓞 F)),
+                ContainsAbove S l
+                  → ∀ Av : HeightOneSpectrum (𝓞 F) → ValuationSubring Ω,
+                    (∀ v, IsPlaceOver (Av v) v)
+                      → ∀ w : Z2 (muRep F Ω l 1),
+                        (∀ g h : G F Ω, ∀ n ∈ NS Ω (S : Set (HeightOneSpectrum (𝓞 F))),
+                            ∀ n' ∈ NS Ω (S : Set (HeightOneSpectrum (𝓞 F))),
+                              w.1 (g * n, h * n') = w.1 (g, h))
+                          → ∀ wl : ∀ v, Z2 (muLoc F l 1 (Av v)),
+                            (∀ v (g h : Dec (F := F) (Av v)),
+                                (wl v).1 (g, h) = w.1 ((g : G F Ω), (h : G F Ω)))
+                              → ∑ v ∈ S, inv (Av v) (Submodule.Quotient.mk (wl v)) = 0 := by
   intro hPT F Ω _ _ _ _ _ _ l _ ζ hζ
   obtain ⟨inv, hinv, H⟩ := hPT.annihilators F Ω l 1 one_pos ζ hζ
   refine ⟨inv, hinv, fun S hS Av hA w hw wl hwl => ?_⟩
@@ -39,8 +59,7 @@ theorem sum_inv_eq_zero_of_unramified_cocycle : PoitouTateTotallyComplex → ∀
     have e2 : μ (g : G F Ω ⧸ _) = cycMod F Ω l 1 g := DFunLike.congr_fun hμ g
     rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, hW, hW, hW, hW, charRep_apply, e2]
     exact e
-  have e := (H S hS (fun v => Av v.1) (fun v => hA v.1) μ hμ).1
-    (Submodule.Quotient.mk ⟨W, hmem⟩)
+  have e := (H S hS (fun v => Av v.1) (fun v => hA v.1) μ hμ).1 (Submodule.Quotient.mk ⟨W, hmem⟩)
   rw [← Finset.sum_coe_sort]
   refine Eq.trans (Finset.sum_congr rfl fun v _ => ?_) e
   refine congrArg (inv (Av v.1)) ?_

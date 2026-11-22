@@ -17,9 +17,9 @@ open ReciprocityTheory.AnForm.A (polyMax molli mollify_thm polyMax_le' polyMax_m
 
 noncomputable section
 
-theorem log_inv_facts {t a : ℝ} (ht : 0 < t) (ha : 0 ≤ a)
-    (hta : t < Real.exp (-(Real.exp 1 + 2 * a))) :
-    Real.exp 1 + 2 * a < Real.log t⁻¹ ∧ 1 < Real.log (Real.log t⁻¹) := by
+theorem log_inv_facts
+    {t a : ℝ} (ht : 0 < t) (ha : 0 ≤ a) (hta : t < Real.exp (-(Real.exp 1 + 2 * a)))
+    : Real.exp 1 + 2 * a < Real.log t⁻¹ ∧ 1 < Real.log (Real.log t⁻¹) := by
   have h1 : Real.log t < -(Real.exp 1 + 2 * a) := by
     have := Real.log_lt_log ht hta
     rwa [Real.log_exp] at this
@@ -29,9 +29,10 @@ theorem log_inv_facts {t a : ℝ} (ht : 0 < t) (ha : 0 ≤ a)
   rw [Real.lt_log_iff_exp_lt (by linarith)]
   linarith
 
-theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
-    (h1 : PolyMaxOscillation.Statement) (h2 : PolyMaxLowerBound.Statement)
-    (h3 : TruncPsh.Statement) (h4 : TruncTransfer.Statement) : ChartComparison.Statement := by
+theorem ChartComparison.proof
+    (h0 : MollifiedLowerBound.Statement) (h1 : PolyMaxOscillation.Statement)
+    (h2 : PolyMaxLowerBound.Statement) (h3 : TruncPsh.Statement) (h4 : TruncTransfer.Statement)
+    : ChartComparison.Statement := by
   intro X _ _ _ D A R ρ
   obtain ⟨δ, B₀, hδ, hV⟩ := h3 X D A R
   choose V hVo _hVt hVball hVpsh using hV
@@ -58,8 +59,12 @@ theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
   have hCB : C₂' + |B₁| + 1 ≤ C := hC ▸ le_max_right _ _
   have hC0 : 0 ≤ C := by linarith [abs_nonneg B₁]
   have hC₁2 : 0 < C₁ + 2 := by linarith
-  refine ⟨C, min (min t₂ δ₁) (min (δ / (C₁ + 2)) (Real.exp (-(Real.exp 1 + 2 * a)))),
-    lt_min (lt_min ht₂ hδ₁) (lt_min (div_pos hδ hC₁2) (Real.exp_pos _)), ?_⟩
+  refine ⟨
+    C,
+    min (min t₂ δ₁) (min (δ / (C₁ + 2)) (Real.exp (-(Real.exp 1 + 2 * a)))),
+    lt_min (lt_min ht₂ hδ₁) (lt_min (div_pos hδ hC₁2) (Real.exp_pos _)),
+    ?_
+  ⟩
   intro t ht ht₀ K hK
   simp only [lt_min_iff] at ht₀
   obtain ⟨⟨htt₂, htδ₁⟩, htδ, hte⟩ := ht₀
@@ -82,12 +87,17 @@ theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
       linarith [le_abs_self B₁]
     have h3' : C₂ * Real.log (Real.log t⁻¹) ≤ C₂' * Real.log (Real.log t⁻¹) :=
       mul_le_mul_of_nonneg_right hC₂C₂' (by linarith)
-    have h4' : (C₂' + |B₁| + 1) * Real.log (Real.log t⁻¹) = C₂' * Real.log (Real.log t⁻¹) +
-        |B₁| * Real.log (Real.log t⁻¹) + Real.log (Real.log t⁻¹) := by ring
+    have h4'
+        : (C₂' + |B₁| + 1) * Real.log (Real.log t⁻¹)
+          = C₂' * Real.log (Real.log t⁻¹) + |B₁| * Real.log (Real.log t⁻¹)
+            + Real.log (Real.log t⁻¹) := by
+      ring
     have h5' : -C₂ * Real.log (Real.log t⁻¹) = -(C₂ * Real.log (Real.log t⁻¹)) := by ring
     linarith
-  have key : ∀ j k : Fin R.N, ∀ x ∈ R.mid j ∩ R.mid k,
-      R.phReg ρ K t j x - R.phReg ρ K t k x ≤ E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) + L * t := by
+  have key
+      : ∀ j k : Fin R.N, ∀ x ∈ R.mid j ∩ R.mid k,
+        R.phReg ρ K t j x - R.phReg ρ K t k x
+          ≤ E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) + L * t := by
     intro j k x hx
     obtain ⟨hpj, -⟩ := hVpsh j K
     obtain ⟨hpk, hbk⟩ := hVpsh k K
@@ -99,12 +109,15 @@ theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
     have hi : molli ρ t (R.trunc K j) (R.chart j x) ≤ polyMax (R.trunc K j) (R.chart j x) t :=
       (((mollify_thm D ρ (V j) (R.trunc K j) (hVo j) hpj).1 t ht).2.2.2 (R.chart j x) hballj).2
 
-    have hii : polyMax (R.trunc K j) (R.chart j x) t ≤
-        max (polyMax (R.trunc K k) (R.chart k x) (L * t)) (-K + B₁) +
-          (R.q j (R.chart j x) - R.q k (R.chart k x)) + L * t :=
+    have hii
+        : polyMax (R.trunc K j) (R.chart j x) t
+          ≤ max (polyMax (R.trunc K k) (R.chart k x) (L * t)) (-K + B₁)
+            + (R.q j (R.chart j x) - R.q k (R.chart k x)) + L * t :=
       polyMax_le' ht.le fun y hy => hT K j k x hx t ht htδ₁ y hy
-    have mono : ∀ s s', 0 ≤ s → s ≤ s' → s' ≤ δ →
-        polyMax (R.trunc K k) (R.chart k x) s ≤ polyMax (R.trunc K k) (R.chart k x) s' :=
+    have mono
+        : ∀ s s',
+          0 ≤ s → s ≤ s' → s' ≤ δ
+            → polyMax (R.trunc K k) (R.chart k x) s ≤ polyMax (R.trunc K k) (R.chart k x) s' :=
       fun s s' hs hss' hs' => polyMax_mono' hpk.1 hs hss' (hball _ hs')
     have hlowk := hlow t ht htt₂ K k x hx.2
     have e0 := mono t (L * t) ht.le htLt (by linarith)
@@ -115,27 +128,33 @@ theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
     have e3 := mono (t / 4) (2 * t) (by positivity) (by linarith) (by linarith)
     have e4 := mono (2 * t) (C₁ * t) (by positivity) h2t hC₁t
     have e5 := mono t (C₁ * t) ht.le htC hC₁t
-    have hmax : max (polyMax (R.trunc K k) (R.chart k x) (L * t)) (-K + B₁) =
-        polyMax (R.trunc K k) (R.chart k x) (L * t) := max_eq_left (by linarith)
+    have hmax
+        : max (polyMax (R.trunc K k) (R.chart k x) (L * t)) (-K + B₁)
+          = polyMax (R.trunc K k) (R.chart k x) (L * t) :=
+      max_eq_left (by linarith)
     rw [hmax] at hii
 
-    have hiv := h0 D ρ b (V k) (R.trunc K k) (R.chart k x) t (hVo k) hpk ht
-      (hball _ (by linarith)) hb
+    have hiv :=
+      h0 D ρ b (V k) (R.trunc K k) (R.chart k x) t (hVo k) hpk ht (hball _ (by linarith)) hb
     rw [← hc₀] at hiv
 
-    have hv := h1 D (V k) (R.trunc K k) (R.chart k x) δ t C₁ (hVo k) hpk (hball δ le_rfl) ht
-      (by linarith) hC₁tlt
+    have hv :=
+      h1 D (V k) (R.trunc K k) (R.chart k x) δ t C₁ (hVo k) hpk (hball δ le_rfl) ht (by linarith)
+        hC₁tlt
     have hMδ : polyMax (R.trunc K k) (R.chart k x) δ ≤ B₀' :=
-      polyMax_le' hδ.le fun y hy => (hbk y (hVball k x hx.2 hy)).trans
-        (max_le (hB₀' ▸ le_max_left _ _) (by linarith))
-    have hN : polyMax (R.trunc K k) (R.chart k x) δ - polyMax (R.trunc K k) (R.chart k x) (C₁ * t) ≤
-        (B₀' + C₂') * Real.log (Real.log t⁻¹) := by
+      polyMax_le' hδ.le fun y hy =>
+        (hbk y (hVball k x hx.2 hy)).trans (max_le (hB₀' ▸ le_max_left _ _) (by linarith))
+    have hN
+        : polyMax (R.trunc K k) (R.chart k x) δ - polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+          ≤ (B₀' + C₂') * Real.log (Real.log t⁻¹) := by
       have h1' : C₂ * Real.log (Real.log t⁻¹) ≤ C₂' * Real.log (Real.log t⁻¹) :=
         mul_le_mul_of_nonneg_right hC₂C₂' (by linarith)
       have h2' : B₀' ≤ B₀' * Real.log (Real.log t⁻¹) := le_mul_of_one_le_right hB₀'0 hlogℓ.le
       have h3' : -C₂ * Real.log (Real.log t⁻¹) = -(C₂ * Real.log (Real.log t⁻¹)) := by ring
-      have h4' : (B₀' + C₂') * Real.log (Real.log t⁻¹) =
-          B₀' * Real.log (Real.log t⁻¹) + C₂' * Real.log (Real.log t⁻¹) := by ring
+      have h4'
+          : (B₀' + C₂') * Real.log (Real.log t⁻¹)
+            = B₀' * Real.log (Real.log t⁻¹) + C₂' * Real.log (Real.log t⁻¹) := by
+        ring
       linarith
     have hden : Real.log t⁻¹ / 2 ≤ Real.log (δ / (C₁ * t)) := by
       rw [show δ / (C₁ * t) = (δ / C₁) * t⁻¹ by field_simp,
@@ -145,54 +164,70 @@ theorem ChartComparison.proof (h0 : MollifiedLowerBound.Statement)
       linarith [Real.exp_pos 1]
     have hden0 : 0 < Real.log (δ / (C₁ * t)) := by linarith
     have hP : 0 ≤ 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') := by positivity
-    have hO : polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-          polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁)) ≤
-        2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) := by
+    have hO
+        : polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+            - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))
+          ≤ 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) := by
       refine hv.trans ?_
       rw [div_le_iff₀ hden0]
-      calc Real.log (4 * C₁ ^ 2) * (polyMax (R.trunc K k) (R.chart k x) δ -
-              polyMax (R.trunc K k) (R.chart k x) (C₁ * t))
-          ≤ Real.log (4 * C₁ ^ 2) * ((B₀' + C₂') * Real.log (Real.log t⁻¹)) :=
-            mul_le_mul_of_nonneg_left hN hlog4
-        _ = 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') *
-              (Real.log (Real.log t⁻¹) / Real.log t⁻¹) * (Real.log t⁻¹ / 2) := by
-            have hx := div_mul_cancel₀ (Real.log (Real.log t⁻¹)) hℓ0.ne'
-            linear_combination (-(Real.log (4 * C₁ ^ 2) * (B₀' + C₂'))) * hx
-        _ ≤ 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') *
-              (Real.log (Real.log t⁻¹) / Real.log t⁻¹) * Real.log (δ / (C₁ * t)) :=
-            mul_le_mul_of_nonneg_left hden (mul_nonneg hP (div_nonneg (by linarith) hℓ0.le))
-    have hc : c₀ * (polyMax (R.trunc K k) (R.chart k x) (2 * t) -
-          polyMax (R.trunc K k) (R.chart k x) (t / 4)) ≤
-        c₀ * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-          polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) :=
+      calc
+        Real.log (4 * C₁ ^ 2)
+              * (polyMax (R.trunc K k) (R.chart k x) δ
+                - polyMax (R.trunc K k) (R.chart k x) (C₁ * t))
+            ≤ Real.log (4 * C₁ ^ 2) * ((B₀' + C₂') * Real.log (Real.log t⁻¹)) :=
+          mul_le_mul_of_nonneg_left hN hlog4
+        _ = 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') * (Real.log (Real.log t⁻¹) / Real.log t⁻¹)
+            * (Real.log t⁻¹ / 2) := by
+          have hx := div_mul_cancel₀ (Real.log (Real.log t⁻¹)) hℓ0.ne'
+          linear_combination (-(Real.log (4 * C₁ ^ 2) * (B₀' + C₂'))) * hx
+        _ ≤ 2 * Real.log (4 * C₁ ^ 2) * (B₀' + C₂') * (Real.log (Real.log t⁻¹) / Real.log t⁻¹)
+            * Real.log (δ / (C₁ * t)) :=
+          mul_le_mul_of_nonneg_left hden (mul_nonneg hP (div_nonneg (by linarith) hℓ0.le))
+    have hc
+        : c₀
+            * (polyMax (R.trunc K k) (R.chart k x) (2 * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / 4))
+          ≤ c₀
+            * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) :=
       mul_le_mul_of_nonneg_left (by linarith) hc₀0
-    have hfin : (1 + c₀) * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-          polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) ≤
-        E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) := by
+    have hfin
+        : (1 + c₀)
+            * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁)))
+          ≤ E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) := by
       rw [hE]
       have := mul_le_mul_of_nonneg_left hO (by linarith : (0 : ℝ) ≤ 1 + c₀)
       linarith
-    have hsum : polyMax (R.trunc K k) (R.chart k x) (L * t) -
-          polyMax (R.trunc K k) (R.chart k x) (2 * t) +
-          c₀ * (polyMax (R.trunc K k) (R.chart k x) (2 * t) -
-            polyMax (R.trunc K k) (R.chart k x) (t / 4)) ≤
-        (1 + c₀) * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-          polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) := by
-      have h' : polyMax (R.trunc K k) (R.chart k x) (L * t) -
-          polyMax (R.trunc K k) (R.chart k x) (2 * t) ≤
-          polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-            polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁)) := by linarith
-      calc _ ≤ (polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-              polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) +
-            c₀ * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t) -
-              polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) := add_le_add h' hc
+    have hsum
+        : polyMax (R.trunc K k) (R.chart k x) (L * t) - polyMax (R.trunc K k) (R.chart k x) (2 * t)
+            + c₀
+              * (polyMax (R.trunc K k) (R.chart k x) (2 * t)
+                - polyMax (R.trunc K k) (R.chart k x) (t / 4))
+          ≤ (1 + c₀)
+            * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) := by
+      have h'
+          : polyMax (R.trunc K k) (R.chart k x) (L * t)
+              - polyMax (R.trunc K k) (R.chart k x) (2 * t)
+            ≤ polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁)) := by
+        linarith
+      calc
+        _ ≤ (polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+              - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁)))
+            + c₀
+              * (polyMax (R.trunc K k) (R.chart k x) (C₁ * t)
+                - polyMax (R.trunc K k) (R.chart k x) (t / (4 * C₁))) :=
+          add_le_add h' hc
         _ = _ := by ring
     simp only [RegChartData.phReg, RegChartData.smoothed]
     linarith
   have hr : 0 ≤ Real.log (Real.log t⁻¹) / Real.log t⁻¹ := div_nonneg (by linarith) hℓ0.le
   intro j k x hx
-  have hEC : E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) + L * t ≤
-      C * Real.log (Real.log t⁻¹) / Real.log t⁻¹ + C * t := by
+  have hEC
+      : E * (Real.log (Real.log t⁻¹) / Real.log t⁻¹) + L * t
+        ≤ C * Real.log (Real.log t⁻¹) / Real.log t⁻¹ + C * t := by
     rw [mul_div_assoc]
     have := mul_le_mul_of_nonneg_right hCE hr
     have := mul_le_mul_of_nonneg_right hCL ht.le

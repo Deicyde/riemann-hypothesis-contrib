@@ -9,9 +9,12 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace LateralTheory.CohomologicalPurity.Thom.ExcP.Chart
 
-def LeafPLoc : Prop := ∀ (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E), LocCov f g →
-  ∀ n, Presheaf.IsLocallySurjective Scheme.etaleTopology.{0}
-    (biprod.desc ((freeP R).map (f.app n)) ((freeP R).map (g.app n)))
+def LeafPLoc : Prop :=
+  ∀ (R : Type) [CommRing R] {U V E : Spc} (f : U ⟶ E) (g : V ⟶ E),
+    LocCov f g
+      → ∀ n,
+        Presheaf.IsLocallySurjective Scheme.etaleTopology.{0}
+          (biprod.desc ((freeP R).map (f.app n)) ((freeP R).map (g.app n)))
 
 theorem LeafCovLoc_of (hP : LeafPLoc) : LeafCovLoc := by
   intro R _ U V E f g hf hg hL

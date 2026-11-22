@@ -4,14 +4,17 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.PrimeSetTwoBoun
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-theorem ind_unique :
-    ∀ (N N' M : ℕ) [NeZero N] [NeZero N'] (ψ : DirichletCharacter ℂ N) (ψ' : DirichletCharacter ℂ N'), M ≠ 0 →
-      ψ.IsPrimitive → ψ'.IsPrimitive → (∀ n : ℕ, n.Coprime M → ψ (n : ZMod N) = ψ' (n : ZMod N')) →
-      (⟨N, ψ⟩ : Σ n : ℕ, DirichletCharacter ℂ n) = ⟨N', ψ'⟩ := by
+theorem ind_unique
+    : ∀ (N N' M : ℕ) [NeZero N] [NeZero N'] (ψ : DirichletCharacter ℂ N)
+        (ψ' : DirichletCharacter ℂ N'),
+      M ≠ 0 → ψ.IsPrimitive → ψ'.IsPrimitive
+        → (∀ n : ℕ, n.Coprime M → ψ (n : ZMod N) = ψ' (n : ZMod N'))
+        → (⟨N, ψ⟩ : Σ n : ℕ, DirichletCharacter ℂ n) = ⟨N', ψ'⟩ := by
   intro N N' M _ _ ψ ψ' hM hψ hψ' h
   have hN : N ≠ 0 := NeZero.ne N
   have hN' : N' ≠ 0 := NeZero.ne N'
@@ -25,7 +28,8 @@ theorem ind_unique :
   have hB : N' * N ∣ N * N' * M := ⟨M, by ring⟩
   have key : ψ.changeLevel hL1 = ψ'.changeLevel hL2 := by
     ext a
-    rw [DirichletCharacter.changeLevel_eq_cast_of_dvd, DirichletCharacter.changeLevel_eq_cast_of_dvd]
+    rw [DirichletCharacter.changeLevel_eq_cast_of_dvd,
+      DirichletCharacter.changeLevel_eq_cast_of_dvd]
     have hc : ((a : ZMod (N * N' * M)).val).Coprime (N * N' * M) := ZMod.val_coe_unit_coprime a
     rw [← ZMod.natCast_zmod_val (a : ZMod (N * N' * M)), ZMod.cast_natCast hL1,
       ZMod.cast_natCast hL2]

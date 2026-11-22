@@ -10,29 +10,35 @@ open scoped Nat
 
 namespace PositivityTheory.SiegelWeilFormula.KFPB
 
-theorem iteratedDeriv_scale (E : ℂ → ℂ) (hE : Differentiable ℂ E) (c : ℂ) (j : ℕ) :
-    iteratedDeriv j (fun z => E (c * z)) 0 = c ^ j * iteratedDeriv j E 0 := by
+theorem iteratedDeriv_scale (E : ℂ → ℂ) (hE : Differentiable ℂ E) (c : ℂ) (j : ℕ)
+    : iteratedDeriv j (fun z => E (c * z)) 0 = c ^ j * iteratedDeriv j E 0 := by
   rw [iteratedDeriv_comp_const_mul hE.contDiff c]
   simp only [mul_zero]
 
-theorem iteratedDeriv_rel (q : Polynomial ℂ) (μ ω : ℂ) (E : ℂ → ℂ) (hE : Differentiable ℂ E) (j : ℕ) :
-    iteratedDeriv j (fun z => ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z)) 0 =
-      q.eval (μ * ω ^ j) * iteratedDeriv j E 0 := by
+theorem iteratedDeriv_rel (q : Polynomial ℂ) (μ ω : ℂ) (E : ℂ → ℂ) (hE : Differentiable ℂ E) (j : ℕ)
+    : iteratedDeriv j
+        (fun z => ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z))
+        0
+      = q.eval (μ * ω ^ j) * iteratedDeriv j E 0 := by
   have hcomp : ∀ i : ℕ, Differentiable ℂ (fun z => E (ω ^ i * z)) := fun i => by fun_prop
-  have hterm : ∀ i ∈ Finset.range (q.natDegree + 1),
-      ContDiffAt ℂ (j : WithTop ℕ∞) (fun z => q.coeff i * μ ^ i * E (ω ^ i * z)) 0 := fun i _ =>
+  have hterm
+      : ∀ i ∈ Finset.range (q.natDegree + 1),
+        ContDiffAt ℂ (j : WithTop ℕ∞) (fun z => q.coeff i * μ ^ i * E (ω ^ i * z)) 0 := fun i _ =>
     ((hcomp i).const_mul (q.coeff i * μ ^ i)).contDiff.contDiffAt
   rw [iteratedDeriv_fun_sum hterm, Polynomial.eval_eq_sum_range, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [iteratedDeriv_const_mul _ (hcomp i).contDiff.contDiffAt,
-    PositivityTheory.SiegelWeilFormula.KFPB.iteratedDeriv_scale E hE, mul_pow, ← pow_mul, ← pow_mul, mul_comm i j]
+    PositivityTheory.SiegelWeilFormula.KFPB.iteratedDeriv_scale E hE, mul_pow, ← pow_mul, ← pow_mul,
+    mul_comm i j]
   ring
 
-theorem poly_of_rot (q : Polynomial ℂ) (hq : q ≠ 0) (μ ω : ℂ) (hμ : μ ≠ 0) (hω0 : ω ≠ 0)
-    (hω : ∀ j : ℕ, 0 < j → ω ^ j ≠ 1) :
-    ∃ N : ℕ, ∀ E : ℂ → ℂ, Differentiable ℂ E →
-      (∀ z, ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z) = 0) →
-      ∃ p : Polynomial ℂ, p.natDegree ≤ N ∧ ∀ z, E z = p.eval z := by
+theorem poly_of_rot
+    (q : Polynomial ℂ) (hq : q ≠ 0)
+    (μ ω : ℂ) (hμ : μ ≠ 0) (hω0 : ω ≠ 0) (hω : ∀ j : ℕ, 0 < j → ω ^ j ≠ 1)
+    : ∃ N : ℕ, ∀ E : ℂ → ℂ,
+      Differentiable ℂ E
+        → (∀ z, ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z) = 0)
+        → ∃ p : Polynomial ℂ, p.natDegree ≤ N ∧ ∀ z, E z = p.eval z := by
   have hlt : ∀ a b : ℕ, a < b → ω ^ a ≠ ω ^ b := by
     intro a b h hab
     apply hω (b - a) (Nat.sub_pos_of_lt h)
@@ -55,15 +61,20 @@ theorem poly_of_rot (q : Polynomial ℂ) (hq : q ≠ 0) (μ ω : ℂ) (hμ : μ 
   refine ⟨N, fun E hE hrel => ?_⟩
   have hvan : ∀ j, N < j → iteratedDeriv j E 0 = 0 := by
     intro j hj
-    have h0 : (fun z => ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z)) = 0 :=
+    have h0
+        : (fun z => ∑ i ∈ Finset.range (q.natDegree + 1), q.coeff i * μ ^ i * E (ω ^ i * z)) = 0 :=
       funext hrel
     have h1 := PositivityTheory.SiegelWeilFormula.KFPB.iteratedDeriv_rel q μ ω E hE j
     rw [h0, iteratedDeriv_const_zero] at h1
     rcases mul_eq_zero.1 h1.symm with h | h
     · exact absurd (hN h) (not_le.2 hj)
     · exact h
-  refine ⟨∑ n ∈ Finset.range (N + 1),
-      Polynomial.C ((n ! : ℂ)⁻¹ * iteratedDeriv n E 0) * Polynomial.X ^ n, ?_, fun z => ?_⟩
+  refine ⟨
+    ∑ n ∈ Finset.range (N + 1),
+      Polynomial.C ((n ! : ℂ)⁻¹ * iteratedDeriv n E 0) * Polynomial.X ^ n,
+    ?_,
+    fun z => ?_
+  ⟩
   · exact Polynomial.natDegree_sum_le_of_forall_le _ _ fun n hn =>
       (Polynomial.natDegree_C_mul_X_pow_le _ n).trans (Nat.lt_succ_iff.1 (Finset.mem_range.1 hn))
   · have hs := Complex.hasSum_taylorSeries_of_entire hE 0 z

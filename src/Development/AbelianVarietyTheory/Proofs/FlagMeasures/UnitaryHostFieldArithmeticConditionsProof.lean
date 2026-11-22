@@ -19,17 +19,21 @@ variable (D : D7)
 theorem places : GlobalTheory.DegVol.IsPlaces (embS D) := by
   have := D.host.toHostAx.isCMField_hostE
   have : IsGalois ℚ D.host.E := D.host.toHostAx.hostE_isGalois
-  have hcc : ∀ g : D.R.GG, (D.R.toFrame.cc * g).1.2 = - g.1.2 := by
+  have hcc : ∀ g : D.R.GG, (D.R.toFrame.cc * g).1.2 = -g.1.2 := by
     intro g
     simp [Formalism.HC.Frame.cc, Formalism.FrobeniusOrbits.c0]
-  have hemb : ∀ (τ : D.what₂.Tau) (x : D.host.E),
-      embS D τ x = D.host.φ₀ (D.host.gal.symm (D.eTau τ : D.R.GG) x) := fun _ _ => rfl
-  have hconj : ∀ y : D.host.E, D.host.φ₀ (D.host.conj y) = starRingEnd ℂ (D.host.φ₀ y) :=
-    fun y => D.host.toHostAx.conjE_apply _ y
+  have hemb
+      : ∀ (τ : D.what₂.Tau) (x : D.host.E),
+        embS D τ x = D.host.φ₀ (D.host.gal.symm (D.eTau τ : D.R.GG) x) := fun _ _ =>
+    rfl
+  have hconj : ∀ y : D.host.E, D.host.φ₀ (D.host.conj y) = starRingEnd ℂ (D.host.φ₀ y) := fun y =>
+    D.host.toHostAx.conjE_apply _ y
   refine ⟨fun τ a => D.sp.cm.cmUnram.2.1 _ a, fun w => ?_⟩
 
-  have key : ∀ τ₁ τ₂ : D.what₂.Tau, NumberField.InfinitePlace.mk (embS D τ₁) =
-      NumberField.InfinitePlace.mk (embS D τ₂) → τ₁ = τ₂ := by
+  have key
+      : ∀ τ₁ τ₂ : D.what₂.Tau,
+        NumberField.InfinitePlace.mk (embS D τ₁) = NumberField.InfinitePlace.mk (embS D τ₂)
+          → τ₁ = τ₂ := by
     intro τ₁ τ₂ h
     rw [NumberField.InfinitePlace.mk_eq_iff] at h
     have h1 := (D.eTau τ₁).2
@@ -44,8 +48,9 @@ theorem places : GlobalTheory.DegVol.IsPlaces (embS D) := by
       have := DFunLike.congr_fun h x
       rwa [hemb, hemb] at this
     · exfalso
-      have heq : D.host.conj * D.host.gal.symm (D.eTau τ₁ : D.R.GG) =
-          D.host.gal.symm (D.eTau τ₂ : D.R.GG) := by
+      have heq
+          : D.host.conj * D.host.gal.symm (D.eTau τ₁ : D.R.GG)
+            = D.host.gal.symm (D.eTau τ₂ : D.R.GG) := by
         ext x
         apply D.host.φ₀.injective
         have := DFunLike.congr_fun h x
@@ -54,12 +59,14 @@ theorem places : GlobalTheory.DegVol.IsPlaces (embS D) := by
         exact this
       have h3 := congrArg (fun g : D.R.GG => g.1.2) (congrArg D.host.gal heq)
       simp only [map_mul, MulEquiv.apply_symm_apply] at h3
-      rw [show D.host.gal D.host.conj = D.R.toFrame.cc from D.host.gal.apply_symm_apply _,
-        hcc, h1, h2] at h3
+      rw [show D.host.gal D.host.conj = D.R.toFrame.cc from D.host.gal.apply_symm_apply _, hcc, h1,
+          h2]
+        at h3
       exact absurd h3 (by decide)
 
-  obtain ⟨σ, hσ⟩ := NumberField.ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := ℚ)
-    D.host.φ₀ w.embedding (Subsingleton.elim _ _)
+  obtain ⟨σ, hσ⟩ :=
+    NumberField.ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := ℚ) D.host.φ₀ w.embedding
+      (Subsingleton.elim _ _)
   have hwρ : ∀ x, D.host.φ₀ (σ.symm x) = w.embedding x := fun x => by rw [← hσ]; rfl
   have hex : ∃ τ : D.what₂.Tau, NumberField.InfinitePlace.mk (embS D τ) = w := by
     by_cases hgP : D.host.gal σ.symm ∈ D.R.Psi
@@ -77,7 +84,8 @@ theorem places : GlobalTheory.DegVol.IsPlaces (embS D) := by
         · exact absurd h hgP
         · rw [h, neg_neg]
       refine ⟨D.eTau.symm ⟨_, hg'⟩, ?_⟩
-      have : embS D (D.eTau.symm ⟨_, hg'⟩) = NumberField.ComplexEmbedding.conjugate w.embedding := by
+      have : embS D (D.eTau.symm ⟨_, hg'⟩)
+          = NumberField.ComplexEmbedding.conjugate w.embedding := by
         ext x
         rw [hemb, Equiv.apply_symm_apply, NumberField.ComplexEmbedding.conjugate_coe_eq]
         simp only [map_mul, MulEquiv.symm_apply_apply, AlgEquiv.mul_apply]
@@ -111,7 +119,8 @@ variable (D : D7)
 theorem vInv_eq : Formalism.HermitianLatticesTheory.vInv D.host.E = D.host.v := by
   have h1 := GlobalTheory.TypeAsm.HostArith.fDeg_eq D
   have h2 := GlobalTheory.TypeAsm.HostArith.finrank_eq D
-  unfold Formalism.HermitianLatticesTheory.vInv Formalism.BasicNotions.Host.v Formalism.BasicNotions.Host.rdE
+  unfold Formalism.HermitianLatticesTheory.vInv Formalism.BasicNotions.Host.v
+    Formalism.BasicNotions.Host.rdE
   rw [h1, h2]
   push_cast
   rfl
@@ -121,8 +130,9 @@ theorem finrank_O : Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) = 2 := by
   rw [← IsFractionRing.finrank_eq (𝓞 D.host.F) D.host.F (𝓞 D.host.E) D.host.E]
   exact Algebra.IsQuadraticExtension.finrank_eq_two _ _
 
-private theorem absNorm_dI_eq_abs_discr_of_discr_eq_sq (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2) :
-    (Ideal.absNorm (dI D) : ℝ) = |(NumberField.discr D.host.E : ℝ)| := by
+private theorem absNorm_dI_eq_abs_discr_of_discr_eq_sq
+    (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2)
+    : (Ideal.absNorm (dI D) : ℝ) = |(NumberField.discr D.host.E : ℝ)| := by
   have := D.host.toHostAx.isCMField_hostE
   unfold dI
   rw [Ideal.absNorm_algebraMap, GlobalTheory.TypeAsm.HostArith.finrank_O,
@@ -139,23 +149,23 @@ private theorem one_le_host_v : 1 ≤ D.host.v := by
   unfold Formalism.BasicNotions.Host.v
   nlinarith
 
-theorem absNorm_dI (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2) :
-    (Ideal.absNorm (dI D) : ℝ) = (2 * D.host.v) ^ (2 * D.R.f) := by
+theorem absNorm_dI (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2)
+    : (Ideal.absNorm (dI D) : ℝ) = (2 * D.host.v) ^ (2 * D.R.f) := by
   rw [absNorm_dI_eq_abs_discr_of_discr_eq_sq D hd]
   have h2 := GlobalTheory.TypeAsm.HostArith.finrank_eq D
-  have hf : (0 : ℝ) < ((2 * D.R.f : ℕ) : ℝ) := by
-    rw [← h2]; exact_mod_cast Module.finrank_pos
+  have hf : (0 : ℝ) < ((2 * D.R.f : ℕ) : ℝ) := by rw [← h2]; exact_mod_cast Module.finrank_pos
   have hv : 2 * D.host.v = D.host.rdE := by unfold Formalism.BasicNotions.Host.v; ring
   rw [hv]
   unfold Formalism.BasicNotions.Host.rdE
-  rw [h2, ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), one_div,
-    inv_mul_cancel₀ hf.ne', Real.rpow_one]
+  rw [h2, ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), one_div, inv_mul_cancel₀ hf.ne',
+    Real.rpow_one]
 
 theorem dI_star : ∀ x ∈ dI D, ∃ y ∈ dI D, (y : D.host.E) = star (x : D.host.E) := by
   have := D.host.toHostAx.isCMField_hostE
   intro x hx
 
-  have key : dI D ≤ Ideal.comap (NumberField.IsCMField.ringOfIntegersComplexConj D.host.E) (dI D) := by
+  have key
+      : dI D ≤ Ideal.comap (NumberField.IsCMField.ringOfIntegersComplexConj D.host.E) (dI D) := by
     show Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) _ ≤ _
     rw [Ideal.map_le_iff_le_comap]
     intro i hi
@@ -164,7 +174,8 @@ theorem dI_star : ∀ x ∈ dI D, ∃ y ∈ dI D, (y : D.host.E) = star (x : D.h
     exact Ideal.mem_map_of_mem _ hi
   exact ⟨NumberField.IsCMField.ringOfIntegersComplexConj D.host.E x, key hx, rfl⟩
 
-theorem dI_ne_bot (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2) : dI D ≠ ⊥ := by
+theorem dI_ne_bot (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2)
+    : dI D ≠ ⊥ := by
   intro h
   have h1 := absNorm_dI D hd
   rw [h, Ideal.absNorm_bot, Nat.cast_zero] at h1
@@ -177,7 +188,9 @@ theorem rank_VS : Module.finrank D.host.E (VS D).V = 2 * D.R.rS + D.R.k + 1 := b
   have h := D.sp.Y_rank 0 (Nat.zero_le _)
   obtain ⟨j, hj⟩ := D.R.m_even
   have hm2 := D.R.two_le_m
-  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r, Formalism.BasicNotions.Ranks.rS] at h ⊢
+  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r,
+      Formalism.BasicNotions.Ranks.rS]
+    at h ⊢
   show (D.sp.Y 0).rank = _
   rw [h]
   omega
@@ -206,10 +219,22 @@ theorem hostC : HostC := by
   obtain ⟨C', Cl, Cg, cb, Cw, cT, CT, C0, hK⟩ := hStd
   obtain ⟨⟨-, hD0, -⟩, -⟩ := hK
   obtain ⟨-, -, -, -, -, -, -, -, hsplit, -⟩ := hD0
-  have hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2 := D.host.toHostAx.der.discr_sq
-  exact ⟨D.sp.cm.cmUnram, HostArith.places D, HostArith.vInv_eq D, HostArith.one_le_host_v D,
-    HostArith.fDeg_eq D, HostArith.card_Tau_eq_f D, HostArith.finrank_eq D, HostArith.dI_ne_bot D hd,
-    HostArith.dI_star D, HostArith.absNorm_dI D hd, HostArith.rank_VS D, HostArith.two_le_gS D,
-    fun u => ⟨(D.mem u).A.T_prime, (hsplit u).1⟩⟩
+  have hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2 :=
+    D.host.toHostAx.der.discr_sq
+  exact ⟨
+    D.sp.cm.cmUnram,
+    HostArith.places D,
+    HostArith.vInv_eq D,
+    HostArith.one_le_host_v D,
+    HostArith.fDeg_eq D,
+    HostArith.card_Tau_eq_f D,
+    HostArith.finrank_eq D,
+    HostArith.dI_ne_bot D hd,
+    HostArith.dI_star D,
+    HostArith.absNorm_dI D hd,
+    HostArith.rank_VS D,
+    HostArith.two_le_gS D,
+    fun u => ⟨(D.mem u).A.T_prime, (hsplit u).1⟩
+  ⟩
 
 end GlobalTheory.TypeAsm

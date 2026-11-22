@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsPrimiti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
@@ -45,9 +47,12 @@ theorem barK_wK_add (H : Host E) : barK H (wK H) + wK H = 1 :=
     show H.bar H.w0 + H.w0 = 1
     rw [GlobalTheory.HostModel.cmHost_bar_halfIntegerGenerator, sub_add_cancel])
 
-theorem isLieComb_one_sub {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G] (v : epsR R ⟶ G)
-    (hv : IsTangent v) (ω : R) (f g : G ⟶ G) (hfg : g * f = 𝟙 G) (h : IsLieComb ![ω] ![v] (v ≫ f)) :
-    IsLieComb ![1 - ω] ![v] (v ≫ g) := by
+theorem isLieComb_one_sub
+    {R : Type} [CommRing R]
+    {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G]
+    (v : epsR R ⟶ G) (hv : IsTangent v)
+    (ω : R) (f g : G ⟶ G) (hfg : g * f = 𝟙 G) (h : IsLieComb ![ω] ![v] (v ≫ f))
+    : IsLieComb ![1 - ω] ![v] (v ≫ g) := by
   have hv' : ∀ i, IsTangent (![v] i) := fun i => by fin_cases i; exact hv
   rw [GlobalTheory.LieComb.isLieComb_iff_tanExp] at h ⊢
   have e₁ : (v ≫ g) * (v ≫ f) = v := by rw [← MonObj.comp_mul, hfg, Category.comp_id]
@@ -62,29 +67,39 @@ theorem isLieComb_one_sub {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] [
   rw [← h] at e₄
   exact mul_right_cancel (e₁.trans e₄)
 
-
 open GlobalTheory.PrimNorm in
-theorem lbIso_of_adj {S : Scheme.{0}} {B : Over S} [GrpObj B] [IsCommMonObj B] {M : LB B.left} (hM : M.IsLB)
-    {f g : B ⟶ B} (h : LamEq M f (𝟙 B) M (𝟙 B) g) : LBIso (cubeLB B ![𝟙 B, g] M) (cubeLB B ![𝟙 B, f] M) := by
+theorem lbIso_of_adj
+    {S : Scheme.{0}} {B : Over S} [GrpObj B] [IsCommMonObj B]
+    {M : LB B.left} (hM : M.IsLB)
+    {f g : B ⟶ B} (h : LamEq M f (𝟙 B) M (𝟙 B) g)
+    : LBIso (cubeLB B ![𝟙 B, g] M) (cubeLB B ![𝟙 B, f] M) := by
   have h' : LBIso (cubeLB B ![fst B B ≫ f, snd B B] M) (cubeLB B ![fst B B, snd B B ≫ g] M) := by
     simpa only [LamEq, Category.comp_id] using h
   have e := diff₂_ptCls_adj hM h' (𝟙 B) (𝟙 B)
   rw [Category.id_comp, Category.id_comp, diff₂_comm] at e
-  exact (lbIso_iff hM _ _ _ _).2 ((prod_square_id _ _ (cls M)).trans (e.symm.trans (prod_square_id _ _ (cls M)).symm))
+  exact (lbIso_iff hM _ _ _ _).2
+    ((prod_square_id _ _ (cls M)).trans (e.symm.trans (prod_square_id _ _ (cls M)).symm))
 
-theorem exists_conj_action (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (R : Type) [CommRing R]
-    (ω : R) (C : Ell H R ω) :
-    ∃ a : OAct (OK H) C.P.A, (∀ x y : OK H, (y : 𝓞 E) = H.bar x → a.act x = C.act.act y) ∧
-      IsLieComb ![1 - ω] ![C.v] (C.v ≫ a.act (wK H)) ∧
-      (∀ x y : OK H, (y : 𝓞 E) = H.bar x → LamEq C.P.L (a.act x) (𝟙 C.P.A) C.P.L (𝟙 C.P.A) (a.act y)) ∧
-      LBIso C.P.L (cubeLB C.P.A ![𝟙 C.P.A, a.act (wK H)] C.P.L) := by
+theorem exists_conj_action
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : Host E)
+    (R : Type) [CommRing R]
+    (ω : R) (C : Ell H R ω)
+    : ∃ a : OAct (OK H) C.P.A,
+      (∀ x y : OK H, (y : 𝓞 E) = H.bar x → a.act x = C.act.act y)
+        ∧ IsLieComb ![1 - ω] ![C.v] (C.v ≫ a.act (wK H))
+        ∧ (∀ x y : OK H,
+          (y : 𝓞 E) = H.bar x → LamEq C.P.L (a.act x) (𝟙 C.P.A) C.P.L (𝟙 C.P.A) (a.act y))
+        ∧ LBIso C.P.L (cubeLB C.P.A ![𝟙 C.P.A, a.act (wK H)] C.P.L) := by
   refine ⟨Serre.comapAct C.act (barK H), fun x y h => ?_, ?_, fun x y h => ?_, ?_⟩
   · exact congrArg C.act.act (Subtype.ext h.symm)
   · exact isLieComb_one_sub C.v (C.basis.1 0) ω (C.act.act (wK H)) _
       (by rw [Serre.comapAct_act, ← C.act.add, barK_wK_add, C.act.one]) C.eig
   · exact C.adj _ _ (congrArg H.bar h)
-  · exact LBIso.trans C.P.isLB (DVR.linComb_isLB _ C.P.isLB _ _) (DVR.linComb_isLB _ C.P.isLB _ _) C.prim
-      (lbIso_of_adj C.P.isLB (C.adj (barK H (wK H)) (wK H) (GlobalTheory.HostModel.bar_bar H _).symm))
+  · exact LBIso.trans C.P.isLB (DVR.linComb_isLB _ C.P.isLB _ _) (DVR.linComb_isLB _ C.P.isLB _ _)
+      C.prim
+      (lbIso_of_adj C.P.isLB
+        (C.adj (barK H (wK H)) (wK H) (GlobalTheory.HostModel.bar_bar H _).symm))
 
 end GlobalTheory.CM.EllConj
 end

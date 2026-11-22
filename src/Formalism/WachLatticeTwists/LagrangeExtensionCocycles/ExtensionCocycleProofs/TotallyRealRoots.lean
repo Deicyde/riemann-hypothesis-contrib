@@ -20,8 +20,9 @@ theorem cost_formula_holds : StatCostFormula := by
       simp only [Finset.mem_Ioc, Finset.mem_insert]
       omega
     have hnot : s + 1 ∉ Finset.Ioc j s := by simp
-    have hc : cost ℓ j (s + 1) =
-        cost ℓ j s + (if (ℓ - 1) ∣ (s + 1) then 1 + padicValNat ℓ (s + 1) else 0) := by
+    have hc
+        : cost ℓ j (s + 1)
+          = cost ℓ j s + (if (ℓ - 1) ∣ (s + 1) then 1 + padicValNat ℓ (s + 1) else 0) := by
       unfold cost
       rw [hI, Finset.sum_insert hnot, add_comm]
     rw [hc]
@@ -36,10 +37,24 @@ theorem cost_formula_holds : StatCostFormula := by
         rw [Nat.padicValNat_def]
         exact padicValNat.eq_zero_of_not_dvd (fun h => by have := Nat.le_of_dvd hd h; omega)
       have hv : padicValNat ℓ (s + 1) = padicValNat ℓ (s / (ℓ - 1) + 1) := by
-        rw [hmul, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.pos_iff_ne_zero.1 hd) (Nat.succ_ne_zero _), hv0, zero_add]
-      have hf : padicValNat ℓ (s / (ℓ - 1) + 1).factorial =
-          padicValNat ℓ (s / (ℓ - 1) + 1) + padicValNat ℓ (s / (ℓ - 1)).factorial := by
-        rw [Nat.factorial_succ, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.succ_ne_zero _) (Nat.factorial_ne_zero _)]
+        rw [hmul,
+          (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+                a ≠ 0 → b ≠ 0
+                  → _root_.padicValNat p (a * b)
+                    = _root_.padicValNat p a + _root_.padicValNat p b from by
+              simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+            (Nat.pos_iff_ne_zero.1 hd) (Nat.succ_ne_zero _),
+          hv0, zero_add]
+      have hf
+          : padicValNat ℓ (s / (ℓ - 1) + 1).factorial
+            = padicValNat ℓ (s / (ℓ - 1) + 1) + padicValNat ℓ (s / (ℓ - 1)).factorial := by
+        rw [Nat.factorial_succ,
+          (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+                a ≠ 0 → b ≠ 0
+                  → _root_.padicValNat p (a * b)
+                    = _root_.padicValNat p a + _root_.padicValNat p b from by
+              simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+            (Nat.succ_ne_zero _) (Nat.factorial_ne_zero _)]
       rw [hq, hv, hf]
       omega
     · rw [if_neg hdv, add_zero, Nat.succ_div_of_not_dvd hdv]
@@ -58,13 +73,29 @@ theorem cost_bound : StatCostBound := by
   have hk01 : k0 ≤ k1 := Nat.div_le_div_right hjs
   obtain ⟨n', hn'⟩ : ∃ n', k1 = k0 + n' := ⟨k1 - k0, by omega⟩
   have hch := Nat.choose_mul_factorial_mul_factorial hk01
-  have hvch : padicValNat (L + 1) k1.factorial = padicValNat (L + 1) (k1.choose k0) +
-      padicValNat (L + 1) k0.factorial + padicValNat (L + 1) n'.factorial := by
-    rw [← hch, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.mul_ne_zero (Nat.choose_pos hk01).ne' (Nat.factorial_ne_zero _))
-      (Nat.factorial_ne_zero _), (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (Nat.choose_pos hk01).ne' (Nat.factorial_ne_zero _),
+  have hvch
+      : padicValNat (L + 1) k1.factorial
+        = padicValNat (L + 1) (k1.choose k0) + padicValNat (L + 1) k0.factorial
+          + padicValNat (L + 1) n'.factorial := by
+    rw [← hch,
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (Nat.mul_ne_zero (Nat.choose_pos hk01).ne' (Nat.factorial_ne_zero _))
+        (Nat.factorial_ne_zero _),
+      (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+            a ≠ 0 → b ≠ 0
+              → _root_.padicValNat p (a * b)
+                = _root_.padicValNat p a + _root_.padicValNat p b from by
+          simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+        (Nat.choose_pos hk01).ne' (Nat.factorial_ne_zero _),
       show k1 - k0 = n' by omega]
-  have hcost : cost (L + 1) j s = n' + padicValNat (L + 1) n'.factorial +
-      padicValNat (L + 1) (k1.choose k0) := by omega
+  have hcost
+      : cost (L + 1) j s
+        = n' + padicValNat (L + 1) n'.factorial + padicValNat (L + 1) (k1.choose k0) := by
+    omega
   have hLr : (2 : ℝ) ≤ (L : ℝ) := by exact_mod_cast hL2
   have hsub : (((L + 1 : ℕ) : ℝ) - 1) = L := by push_cast; ring
   have hb1 : (1 : ℝ) < ((L + 1 : ℕ) : ℝ) := by push_cast; linarith
@@ -74,23 +105,20 @@ theorem cost_bound : StatCostBound := by
   rw [hsub]
   have hpos : (0 : ℝ) < (L : ℝ) ^ 2 := by positivity
   rcases Nat.eq_zero_or_pos n' with h0 | hpos'
-  · have : cost (L + 1) j s = 0 := by
-      rw [hcost, h0, hn', h0]; simp [Nat.padicValNat_def]
+  · have : cost (L + 1) j s = 0 := by rw [hcost, h0, hn', h0]; simp [Nat.padicValNat_def]
     rw [this]
     have : 0 ≤ ((s : ℝ) - j) * ((L + 1 : ℕ) : ℝ) / (L : ℝ) ^ 2 := by
       apply div_nonneg _ hpos.le
       apply mul_nonneg (by linarith) (by linarith)
     push_cast at this hlog0 ⊢
     linarith
-  ·
-    have hw : L * padicValNat (L + 1) n'.factorial < n' := by
+  · have hw : L * padicValNat (L + 1) n'.factorial < n' := by
       have := sub_one_mul_padicValNat_factorial_lt_of_ne_zero (p := L + 1) (n := n') hpos'.ne'
       simpa [Nat.padicValNat_def] using this
     have hc : padicValNat (L + 1) (k1.choose k0) ≤ Nat.log (L + 1) k1 := by
       rw [Nat.padicValNat_def, ← Nat.factorization_def _ hprime]
       exact Nat.factorization_choose_le_log
-    have hk1pos : 1 ≤ k1 := by
-      rw [hn']; exact le_trans hpos' (Nat.le_add_left _ _)
+    have hk1pos : 1 ≤ k1 := by rw [hn']; exact le_trans hpos' (Nat.le_add_left _ _)
     have hk1H : k1 ≤ H := le_trans (Nat.div_le_self _ _) hsH
     have hlog : (Nat.log (L + 1) k1 : ℝ) ≤ Real.logb ((L + 1 : ℕ) : ℝ) ((H : ℝ) + 1) := by
       refine le_trans (Real.natLog_le_logb _ _) ?_

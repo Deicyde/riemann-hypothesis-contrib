@@ -12,9 +12,11 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BetaLUniq
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf Formalism.L2.SG.LoopsFinal Formalism.FourierDecayAlt
-  Formalism.L2.SG.ThmSOwn
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf Formalism.L2.SG.LoopsFinal
+  Formalism.FourierDecayAlt Formalism.L2.SG.ThmSOwn
 
 namespace Formalism.L2.SG.LoopsTies
 
@@ -32,64 +34,90 @@ section Closed
 
 variable (C0 : ℝ) {𝒞 : FamClass} (sel : SSel 𝒞)
 
-theorem cOut_take {eps : ℝ} (Fm : FamP eps) (CH : ℝ) : (Fm.cOut ++ Fm.cMid CH).take 16 = Fm.cOut := by
+theorem cOut_take {eps : ℝ} (Fm : FamP eps) (CH : ℝ)
+    : (Fm.cOut ++ Fm.cMid CH).take 16 = Fm.cOut := by
   unfold FamP.cOut; simp
 
-theorem constant_list_cylinder {eps : ℝ} (Fm : FamP eps) (CH : ℝ) : (Fm.cOut ++ Fm.cMid CH).getD 6 0 = Fm.CYL := by
+theorem constant_list_cylinder {eps : ℝ} (Fm : FamP eps) (CH : ℝ)
+    : (Fm.cOut ++ Fm.cMid CH).getD 6 0 = Fm.CYL := by
   unfold FamP.cOut; simp
 
-theorem constant_list_trace {eps : ℝ} (Fm : FamP eps) (CH : ℝ) : (Fm.cOut ++ Fm.cMid CH).getD 13 0 = Fm.CTu := by
+theorem constant_list_trace {eps : ℝ} (Fm : FamP eps) (CH : ℝ)
+    : (Fm.cOut ++ Fm.cMid CH).getD 13 0 = Fm.CTu := by
   unfold FamP.cOut; simp
 
 end Closed
 
 section Raised
 
-variable (C0 : ℝ) {𝒞 : FamClass} (sel : SSel 𝒞)
-  (yF : ∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → ℝ)
+variable (C0 : ℝ) {𝒞 : FamClass} (sel : SSel 𝒞) (yF : ∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → ℝ)
 
 def YFOK : Prop :=
-  ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) x (hx : Fm.x1 < x) (h0 : (sel Fm hc).1 ≤ x), yF Fm hc ≤ x →
-    ∀ i : Fm.Ix x, FinX ((sel Fm hc).2 x hx h0 i).Y ∧ Formalism.L2.SG.WuDecay.WuDecay ((sel Fm hc).2 x hx h0 i).X
+  ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) x (hx : Fm.x1 < x) (h0 : (sel Fm hc).1 ≤ x),
+    yF Fm hc ≤ x
+      → ∀ i : Fm.Ix x,
+        FinX ((sel Fm hc).2 x hx h0 i).Y
+          ∧ Formalism.L2.SG.WuDecay.WuDecay ((sel Fm hc).2 x hx h0 i).X
 
 def yR {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) : ℝ := max (sel Fm hc).1 (yF Fm hc)
 
-theorem h0R {eps : ℝ} {Fm : FamP eps} {hc : 𝒞 Fm} {x : ℝ} (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) :
-    (sel Fm hc).1 ≤ x :=
+theorem h0R {eps : ℝ} {Fm : FamP eps} {hc : 𝒞 Fm} {x : ℝ} (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x)
+    : (sel Fm hc).1 ≤ x :=
   ((le_max_left _ _).trans (le_max_right _ _)).trans hx.le
 
-theorem hyR {eps : ℝ} {Fm : FamP eps} {hc : 𝒞 Fm} {x : ℝ} (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) :
-    yF Fm hc ≤ x :=
+theorem hyR {eps : ℝ} {Fm : FamP eps} {hc : 𝒞 Fm} {x : ℝ} (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x)
+    : yF Fm hc ≤ x :=
   ((le_max_right _ _).trans (le_max_right _ _)).trans hx.le
 
-def AtR (hyF : YFOK sel yF) {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) (x : ℝ) (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x)
-    (i : Fm.Ix x) : TermTie (Fm.D x i) :=
-  atOfW ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).X ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).Y
+def AtR
+    (hyF : YFOK sel yF)
+    {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm)
+    (x : ℝ) (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) (i : Fm.Ix x)
+    : TermTie (Fm.D x i) :=
+  atOfW ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).X
+    ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).Y
     (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1
-    (((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).hI (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1)
+    (((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).hI
+      (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1)
     (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).2
 
-def CcR (hyF : YFOK sel yF) {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) (x : ℝ) (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x)
-    (i : Fm.Ix x) : ConcAt0 (Fm.D x i) (AtR sel yF hyF Fm hc x hx i) :=
-  ccOfW ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).X ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).Y
+def CcR
+    (hyF : YFOK sel yF)
+    {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm)
+    (x : ℝ) (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) (i : Fm.Ix x)
+    : ConcAt0 (Fm.D x i) (AtR sel yF hyF Fm hc x hx i) :=
+  ccOfW ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).X
+    ((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).Y
     (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1
-    (((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).hI (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1)
+    (((sel Fm hc).2 x (raise_lt hx) (h0R sel yF hx) i).hI
+      (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).1)
     (hyF Fm hc x (raise_lt hx) (h0R sel yF hx) (hyR sel yF hx) i).2
-
 
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
-theorem loopRowS_of_raised (hyF : YFOK sel yF) (C1f : List ℝ → ℝ) (C₀f : (List ℝ → ℝ) → List ℝ → ℝ)
-    (Yt : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) x (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) (i : Fm.Ix x)
-      (u u' : (Fm.D x i).what₂.Word), LoopTie (Fm.D x i) (Fm.L x i) (AtR sel yF hyF Fm hc x hx i) u u' (C1f Fm.cOut))
-    (hRowsF : ∀ aF : List ℝ → ℝ, Closed 𝒞 fun Fm CH => ∀ hc : 𝒞 Fm, ∀ C : ℝ, C₀f aF (Fm.cOut ++ Fm.cMid CH) ≤ C →
-      OwnEv Fm fun C' Cl x i => ∀ (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) (u u' : (Fm.D x i).what₂.Word),
-        Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu C0 (aF Fm.cOut) →
-          Formalism.MainNotions.BridgeLemma.RowsND (AtR sel yF hyF Fm hc x hx i) (Yt Fm hc x hx i u u') C ∧
-            Formalism.MainNotions.BridgeLemma.RowsDeg (AtR sel yF hyF Fm hc x hx i) (Yt Fm hc x hx i u u') C ∧
-            Formalism.MainNotions.BridgeLemma.RowsOne (AtR sel yF hyF Fm hc x hx i) (Yt Fm hc x hx i u u') C)
-    (hForm : Closed 𝒞 fun Fm _ => OwnEv Fm fun C' Cl x i =>
-      Hyp0 (Fm.D x i) (Fm.L x i) C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu C0 → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u) :
-    LoopRowS C0 𝒞 sel := by
+theorem loopRowS_of_raised
+    (hyF : YFOK sel yF) (C1f : List ℝ → ℝ) (C₀f : (List ℝ → ℝ) → List ℝ → ℝ)
+    (Yt : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒞 Fm) x (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x)
+        (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
+      LoopTie (Fm.D x i) (Fm.L x i) (AtR sel yF hyF Fm hc x hx i) u u' (C1f Fm.cOut))
+    (hRowsF : ∀ aF : List ℝ → ℝ,
+      Closed 𝒞 fun Fm CH =>
+        ∀ hc : 𝒞 Fm, ∀ C : ℝ,
+          C₀f aF (Fm.cOut ++ Fm.cMid CH) ≤ C
+            → OwnEv Fm fun C' Cl x i =>
+              ∀ (hx : (Fm.raise (yR sel yF Fm hc)).x1 < x) (u u' : (Fm.D x i).what₂.Word),
+                Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu C0
+                    (aF Fm.cOut)
+                  → Formalism.MainNotions.BridgeLemma.RowsND (AtR sel yF hyF Fm hc x hx i)
+                      (Yt Fm hc x hx i u u') C
+                    ∧ Formalism.MainNotions.BridgeLemma.RowsDeg (AtR sel yF hyF Fm hc x hx i)
+                      (Yt Fm hc x hx i u u') C
+                    ∧ Formalism.MainNotions.BridgeLemma.RowsOne (AtR sel yF hyF Fm hc x hx i)
+                      (Yt Fm hc x hx i u u') C)
+    (hForm : Closed 𝒞 fun Fm _ =>
+      OwnEv Fm fun C' Cl x i =>
+        Hyp0 (Fm.D x i) (Fm.L x i) C' Cl (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu C0
+          → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u)
+    : LoopRowS C0 𝒞 sel := by
   intro aF
   choose f g hfg using fun p : ℝ × ℝ × ℝ × ℝ =>
     loop_evaluation_threshold_zero Formalism.FourierDecayAlt.P.loop_kernels Formalism.FourierDecayAlt.P.subfamilyAlt Formalism.HermitianLattices.Ext.L3.siegelMassRatio
@@ -105,10 +133,15 @@ theorem loopRowS_of_raised (hyF : YFOK sel yF) (C1f : List ℝ → ℝ) (C₀f :
   obtain ⟨hL12, hL4⟩ := (Fm.large_sup _ _ CH).1 hL
   obtain ⟨hL1, hL2⟩ := (Fm.large_sup _ _ CH).1 hL12
   intro hc'
-  have epar : par (Fm.cOut ++ Fm.cMid CH) = (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)) := by
+  have epar
+      : par (Fm.cOut ++ Fm.cMid CH)
+        = (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)) := by
     simp only [par, constant_list_cylinder, constant_list_trace, cOut_take]
-  have hthr : ∀ c ∈ Fm.cLast, max (f (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)))
-      (g (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH))) ≤ c := by
+  have hthr
+      : ∀ c ∈ Fm.cLast,
+        max (f (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)))
+            (g (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)))
+          ≤ c := by
     intro c hc0
     have := hL4.2.2.2 c hc0
     simpa only [K4, epar] using this
@@ -117,11 +150,15 @@ theorem loopRowS_of_raised (hyF : YFOK sel yF) (C1f : List ℝ → ℝ) (C₀f :
   have hCl : g (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)) ≤ sCl Fm := by
     have h := fun c hc => (le_max_right _ _).trans (hthr c hc)
     unfold sCl
-    refine le_min (h _ (by unfold FamP.cLast; simp)) (le_min (h _ (by unfold FamP.cLast; simp))
-      (le_min (h _ (by unfold FamP.cLast; simp)) (le_min (h _ (by unfold FamP.cLast; simp))
-        (le_min (h _ (by unfold FamP.cLast; simp)) (h _ (by unfold FamP.cLast; simp))))))
-  have hE := hfg (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)) (Fm.raise (yR sel yF Fm hc')) (C1f Fm.cOut)
-    (AtR sel yF hyF Fm hc') (Yt Fm hc') (CcR sel yF hyF Fm hc') (hK1 Fm CH hc hL1 hc') (hK2 Fm CH hc hL2)
+    refine le_min (h _ (by unfold FamP.cLast; simp))
+      (le_min (h _ (by unfold FamP.cLast; simp))
+        (le_min (h _ (by unfold FamP.cLast; simp))
+          (le_min (h _ (by unfold FamP.cLast; simp))
+            (le_min (h _ (by unfold FamP.cLast; simp)) (h _ (by unfold FamP.cLast; simp))))))
+  have hE :=
+    hfg (Fm.CYL, Fm.CTu, aF Fm.cOut, C₀f aF (Fm.cOut ++ Fm.cMid CH)) (Fm.raise (yR sel yF Fm hc'))
+      (C1f Fm.cOut) (AtR sel yF hyF Fm hc') (Yt Fm hc') (CcR sel yF hyF Fm hc')
+      (hK1 Fm CH hc hL1 hc') (hK2 Fm CH hc hL2)
   obtain ⟨x0, H⟩ := hE
   refine ⟨max x0 (yR sel yF Fm hc' + 1), fun x hx0 i => ?_⟩
   intro hx h0 u u' hH hCT hA
@@ -132,9 +169,9 @@ theorem loopRowS_of_raised (hyF : YFOK sel yF) (C1f : List ℝ → ℝ) (C₀f :
     linarith
   exact H x ((le_max_left _ _).trans hx0) i hC' hCl hx' u u' hH hCT hA
 
-theorem constant_list_gamma {eps : ℝ} (Fm : FamP eps) (CH : ℝ) : (Fm.cOut ++ Fm.cMid CH).getD 17 0 = Fm.CGam := by
+theorem constant_list_gamma {eps : ℝ} (Fm : FamP eps) (CH : ℝ)
+    : (Fm.cOut ++ Fm.cMid CH).getD 17 0 = Fm.CGam := by
   unfold FamP.cOut FamP.cMid; simp
-
 
 end Raised
 

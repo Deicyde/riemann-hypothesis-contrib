@@ -7,6 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.Int
 
-theorem galoisLocalGlobalStrong_recParameter : UpperTheory.GalStar.Row0b recT := galoisRepresentations_of_thetaLift UpperTheory.TP.K.tLiftK
+theorem galoisLocalGlobalStrong_recParameter : UpperTheory.GalStar.Row0b recT :=
+  galoisRepresentations_of_thetaLift UpperTheory.TP.K.tLiftK
 
 end UpperTheory.Gal.Int

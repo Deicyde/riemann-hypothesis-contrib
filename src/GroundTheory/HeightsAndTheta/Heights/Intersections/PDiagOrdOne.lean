@@ -20,16 +20,19 @@ section Length
 
 variable {A : Type*} [CommRing A]
 
-theorem length_eq_one_of_sat (J W : Ideal A) [W.IsPrime] (hJ : J ≤ W) (hs : ∀ d ∈ W, ∃ u ∉ W, u * d ∈ J) :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ J)) = 1 := by
-  have hz : ∀ (r : A) (s : W.primeCompl),
-      LocalizedModule.mk (Ideal.Quotient.mk J r) s = 0 ↔ r ∈ W := by
+theorem length_eq_one_of_sat
+    (J W : Ideal A) [W.IsPrime] (hJ : J ≤ W) (hs : ∀ d ∈ W, ∃ u ∉ W, u * d ∈ J)
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ J)) = 1 := by
+  have hz
+      : ∀ (r : A) (s : W.primeCompl), LocalizedModule.mk (Ideal.Quotient.mk J r) s = 0 ↔ r ∈ W := by
     intro r s
     rw [← LocalizedModule.zero_mk s, LocalizedModule.mk_eq]
     constructor
     · rintro ⟨u, hu⟩
-      rw [smul_zero, smul_zero, Submonoid.smul_def, Submonoid.smul_def, Algebra.smul_def, Algebra.smul_def,
-        Ideal.Quotient.algebraMap_eq, ← map_mul, ← map_mul, Ideal.Quotient.eq_zero_iff_mem] at hu
+      rw [smul_zero, smul_zero, Submonoid.smul_def, Submonoid.smul_def, Algebra.smul_def,
+          Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, ← map_mul,
+          Ideal.Quotient.eq_zero_iff_mem]
+        at hu
       rcases ‹W.IsPrime›.mem_or_mem (hJ hu) with h | h
       · exact absurd h u.2
       rcases ‹W.IsPrime›.mem_or_mem h with h | h
@@ -38,23 +41,26 @@ theorem length_eq_one_of_sat (J W : Ideal A) [W.IsPrime] (hJ : J ≤ W) (hs : �
     · intro hr
       obtain ⟨u, hu, hud⟩ := hs r hr
       refine ⟨⟨u, hu⟩, ?_⟩
-      rw [smul_zero, smul_zero, Submonoid.smul_def, Submonoid.smul_def, Algebra.smul_def, Algebra.smul_def,
-        Ideal.Quotient.algebraMap_eq, ← map_mul, ← map_mul, Ideal.Quotient.eq_zero_iff_mem]
+      rw [smul_zero, smul_zero, Submonoid.smul_def, Submonoid.smul_def, Algebra.smul_def,
+        Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, ← map_mul,
+        Ideal.Quotient.eq_zero_iff_mem]
       have e : u * ((s : A) * r) = u * r * s := by ring
       rw [show ((⟨u, hu⟩ : W.primeCompl) : A) = u from rfl, e]
       exact J.mul_mem_right _ hud
-  have hgen : ∀ (q : A) (t : W.primeCompl) (r : A) (s : W.primeCompl) (hr : r ∉ W),
-      LocalizedModule.mk (Ideal.Quotient.mk J q) t =
-        Localization.mk (q * s) (t * ⟨r, hr⟩) • LocalizedModule.mk (Ideal.Quotient.mk J r) s := by
+  have hgen
+      : ∀ (q : A) (t : W.primeCompl) (r : A) (s : W.primeCompl) (hr : r ∉ W),
+        LocalizedModule.mk (Ideal.Quotient.mk J q) t
+          = Localization.mk (q * s) (t * ⟨r, hr⟩)
+            • LocalizedModule.mk (Ideal.Quotient.mk J r) s := by
     intro q t r s hr
     rw [LocalizedModule.mk_smul_mk, LocalizedModule.mk_eq]
     refine ⟨1, ?_⟩
-    simp only [one_smul, Submonoid.smul_def, Submonoid.coe_mul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq,
-      ← map_mul]
+    simp only [one_smul, Submonoid.smul_def, Submonoid.coe_mul, Algebra.smul_def,
+      Ideal.Quotient.algebraMap_eq, ← map_mul]
     congr 1
     ring
-  have h1 : LocalizedModule.mk (Ideal.Quotient.mk J 1) (1 : W.primeCompl) ≠ 0 :=
-    fun h => ‹W.IsPrime›.ne_top ((Ideal.eq_top_iff_one W).2 ((hz 1 1).1 h))
+  have h1 : LocalizedModule.mk (Ideal.Quotient.mk J 1) (1 : W.primeCompl) ≠ 0 := fun h =>
+    ‹W.IsPrime›.ne_top ((Ideal.eq_top_iff_one W).2 ((hz 1 1).1 h))
   have : Nontrivial (LocalizedModule W.primeCompl (A ⧸ J)) := ⟨⟨_, 0, h1⟩⟩
   rw [Module.length_eq_one_iff, isSimpleModule_iff]
   refine { eq_bot_or_eq_top := fun N => ?_ }
@@ -78,12 +84,12 @@ end Length
 
 section Graded
 
-variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ]
+variable
+  {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ]
 
 end Graded
 
 end DiagonalOrderOne
-
 
 end
 

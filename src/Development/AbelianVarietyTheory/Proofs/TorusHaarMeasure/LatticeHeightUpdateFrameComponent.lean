@@ -8,13 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExistsMax
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory.HeightStep
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
-
 
 open NumberField MeasureTheory Topology in
 open scoped ComplexOrder ENNReal Matrix in

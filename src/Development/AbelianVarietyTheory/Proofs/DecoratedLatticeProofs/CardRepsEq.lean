@@ -18,20 +18,31 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.RepsCard
 
-theorem card_reps_eq : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Formalism.L2.Th1.H.Sesq V) (α : V → ℂ) (A B Λ : AddSubgroup V), SplitHyp H α A B Λ → ∀ SA SB : Finset V, Formalism.L2.Th1.H.IsReps B (Λ ⊓ A) SA → Formalism.L2.Th1.H.IsReps Λ B SB → SA.card = SB.card := by
+theorem card_reps_eq
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Formalism.L2.Th1.H.Sesq V) (α : V → ℂ)
+        (A B Λ : AddSubgroup V),
+      SplitHyp H α A B Λ
+        → ∀ SA SB : Finset V,
+          Formalism.L2.Th1.H.IsReps B (Λ ⊓ A) SA → Formalism.L2.Th1.H.IsReps Λ B SB
+            → SA.card = SB.card := by
   intro V _ _ H α A B Λ hyp SA SB hSA hSB
   obtain ⟨hH, -, hB, -, sdB, hΛ, -, -, -, h5⟩ := hyp
   have hBint := (Formalism.L2.Th1.H.semicharacterBasic V H hH B α hB).2.2
   have hΛint := (Formalism.L2.Th1.H.semicharacterBasic V H hH Λ α hΛ).2.2
-  have hone : ∀ {Λ₁ Λ₂ : AddSubgroup V} {S : Finset V} (c : ℂ), Formalism.L2.Th1.H.IsReps Λ₁ Λ₂ S →
-      ∑ x ∈ S, (if x ∈ Λ₁ then c else 0) = c := by
+  have hone
+      : ∀ {Λ₁ Λ₂ : AddSubgroup V} {S : Finset V} (c : ℂ),
+        Formalism.L2.Th1.H.IsReps Λ₁ Λ₂ S → ∑ x ∈ S, (if x ∈ Λ₁ then c else 0) = c := by
     intro Λ₁ Λ₂ S c hS
     obtain ⟨x₀, hx₀, hd⟩ := hS.2.2 0 Λ₂.zero_mem
     have hx₀Λ : x₀ ∈ Λ₁ := by simpa using Λ₁.neg_mem hd
@@ -54,7 +65,10 @@ theorem card_reps_eq : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Forma
       have hsd : s ∈ Formalism.L2.Th1.H.dualLat H B := by
         intro y hyB
         by_contra hno
-        refine hne (char_sum_zero hSB (fun y => brk H y s) (fun u v => brk_add_left H u v s) ?_ (x₀ := y) hyB ?_)
+        refine hne (char_sum_zero hSB
+          (fun y => brk H y s)
+          (fun u v => brk_add_left H u v s)
+          ?_ (x₀ := y) hyB ?_)
         · intro m _ hmΛ; exact brk_one_of_int H (hΛint hsΛ m hmΛ)
         · intro h1; exact hno (int_of_brk_one H h1)
       rwa [sdB] at hsd
@@ -69,7 +83,10 @@ theorem card_reps_eq : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Forma
       apply h5 y hyB
       intro a haA haΛ
       by_contra hno
-      refine hne (char_sum_zero hSA (fun s => brk H y s) (fun u v => brk_add_right H y u v) ?_ (x₀ := a) ⟨haΛ, haA⟩ ?_)
+      refine hne (char_sum_zero hSA
+        (fun s => brk H y s)
+        (fun u v => brk_add_right H y u v)
+        ?_ (x₀ := a) ⟨haΛ, haA⟩ ?_)
       · intro m _ hmB; exact brk_one_of_int H (hBint hmB y hyB)
       · intro h1; exact hno (int_of_brk_one H h1)
   have key : ∑ s ∈ SA, ∑ y ∈ SB, brk H y s = ∑ y ∈ SB, ∑ s ∈ SA, brk H y s := Finset.sum_comm

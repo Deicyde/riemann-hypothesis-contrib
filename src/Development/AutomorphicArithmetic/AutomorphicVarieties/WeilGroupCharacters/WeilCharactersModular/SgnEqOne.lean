@@ -6,19 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
 
 open Classical in
 private noncomputable def sgn {Γ : Type} [Group Γ] (H : Subgroup Γ) (h : H.index = 2) : Γ →* ℤˣ :=
-  MonoidHom.mk' (fun g => if g ∈ H then 1 else -1) fun a b => by
-    simp only [Subgroup.mul_mem_iff_of_index_two h]
-    by_cases ha : a ∈ H <;> by_cases hb : b ∈ H <;> simp [ha, hb]
+  MonoidHom.mk'
+    (fun g => if g ∈ H then 1 else -1)
+    fun a b => by
+      simp only [Subgroup.mul_mem_iff_of_index_two h]
+      by_cases ha : a ∈ H <;> by_cases hb : b ∈ H <;> simp [ha, hb]
 
-theorem UpperTheory.V.W.levEx :
-    LevEx := by
+theorem UpperTheory.V.W.levEx : LevEx := by
   intro l _ L Ω _ _ _ _ _ _ s S' hfin hsub hsplit
-  have key : ∀ σ : G (Lp L) Ω, σ ∈ (resP L Ω).range ↔
-      ∀ x : L, σ (algebraMap L Ω x) = algebraMap L Ω x := by
+  have key
+      : ∀ σ : G (Lp L) Ω,
+        σ ∈ (resP L Ω).range ↔ ∀ x : L, σ (algebraMap L Ω x) = algebraMap L Ω x := by
     intro σ
     constructor
     · rintro ⟨τ, rfl⟩ x
@@ -81,8 +84,9 @@ theorem UpperTheory.V.W.levEx :
   let η : GS Ω S' →* ℤˣ := QuotientGroup.lift (NS Ω S') (sgn _ hidx) hNSη
   let ε : GS Ω S' →* ℤ_[l]ˣ := QuotientGroup.lift (NS Ω S') (cycZ (Lp L) Ω l) hNS2
   have hηg : ∀ g, η (toGS Ω S' g) = sgn _ hidx g := fun g => QuotientGroup.lift_mk _ hNSη g
-  have hpre : (QuotientGroup.mk ⁻¹' (η.ker : Set (GS Ω S')) : Set (G (Lp L) Ω)) =
-      ((resP L Ω).range : Set (G (Lp L) Ω)) := by
+  have hpre
+      : (QuotientGroup.mk ⁻¹' (η.ker : Set (GS Ω S')) : Set (G (Lp L) Ω))
+        = ((resP L Ω).range : Set (G (Lp L) Ω)) := by
     ext g
     simp only [Set.mem_preimage, SetLike.mem_coe, MonoidHom.mem_ker]
     rw [← hsg g]

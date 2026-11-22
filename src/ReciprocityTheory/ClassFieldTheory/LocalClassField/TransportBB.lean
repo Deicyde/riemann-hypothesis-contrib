@@ -9,9 +9,12 @@ namespace ReciprocityTheory.DiscreteGroups.LocalClassField
 
 open _root_.Neutral.B1 ValuativeRel Function
 
-theorem continuous_gal_of_fix {k F k' F' : Type*} [Field k] [Field F] [Algebra k F] [Field k'] [Field F']
-    [Algebra k' F'] [Algebra.IsIntegral k F] (φ : (F ≃ₐ[k] F) →* (F' ≃ₐ[k'] F'))
-    (h : ∀ y : F', ∃ x : F, ∀ σ : F ≃ₐ[k] F, σ x = x → φ σ y = y) : Continuous φ := by
+theorem continuous_gal_of_fix
+    {k F k' F' : Type*}
+    [Field k] [Field F] [Algebra k F] [Field k'] [Field F'] [Algebra k' F'] [Algebra.IsIntegral k F]
+    (φ : (F ≃ₐ[k] F) →* (F' ≃ₐ[k'] F'))
+    (h : ∀ y : F', ∃ x : F, ∀ σ : F ≃ₐ[k] F, σ x = x → φ σ y = y)
+    : Continuous φ := by
   apply continuous_of_continuousAt_one
   rw [ContinuousAt, map_one]
   refine Filter.tendsto_def.2 fun s hs => ?_
@@ -37,16 +40,21 @@ theorem continuous_gal_of_fix {k F k' F' : Type*} [Field k] [Field F] [Algebra k
   rw [Algebra.smul_def, map_mul, AlgEquiv.commutes]
   exact congrArg _ (hc _ σ (Set.mem_iInter.1 hσ i))
 
-theorem exists_topAb_iso {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
-    [TopologicalSpace H] [IsTopologicalGroup H] (φ : G ≃* H) (hφ : IsHomeomorph φ) :
-    ∃ ψ : TopologicalAbelianization G ≃* TopologicalAbelianization H, IsHomeomorph ψ ∧
-      ∀ g : G, ψ (QuotientGroup.mk g) = QuotientGroup.mk (φ g) := by
+theorem exists_topAb_iso
+    {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
+    [TopologicalSpace H] [IsTopologicalGroup H]
+    (φ : G ≃* H) (hφ : IsHomeomorph φ)
+    : ∃ ψ : TopologicalAbelianization G ≃* TopologicalAbelianization H,
+      IsHomeomorph ψ ∧ ∀ g : G, ψ (QuotientGroup.mk g) = QuotientGroup.mk (φ g) := by
   have hc : (commutator G).map (φ : G →* H) = commutator H := by
-    rw [commutator_def, commutator_def, Subgroup.map_commutator, Subgroup.map_top_of_surjective _ φ.surjective]
-  have hmap : (Subgroup.topologicalClosure (commutator G)).map (φ : G →* H) =
-      Subgroup.topologicalClosure (commutator H) := by
+    rw [commutator_def, commutator_def, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ φ.surjective]
+  have hmap
+      : (Subgroup.topologicalClosure (commutator G)).map (φ : G →* H)
+        = Subgroup.topologicalClosure (commutator H) := by
     apply SetLike.coe_injective
-    rw [Subgroup.coe_map, Subgroup.topologicalClosure_coe, Subgroup.topologicalClosure_coe, ← hc, Subgroup.coe_map]
+    rw [Subgroup.coe_map, Subgroup.topologicalClosure_coe, Subgroup.topologicalClosure_coe, ← hc,
+      Subgroup.coe_map]
     exact (hφ.homeomorph φ).image_closure _
   let ψ := QuotientGroup.congr _ _ φ hmap
   have h1 : Continuous ψ :=
@@ -59,10 +67,11 @@ theorem exists_topAb_iso {G H : Type*} [Group G] [TopologicalSpace G] [IsTopolog
       (QuotientGroup.continuous_mk.comp hs)
   exact ⟨ψ, (Homeomorph.mk ψ.toEquiv h1 h2).isHomeomorph, fun g => rfl⟩
 
-variable {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] {p : ℕ} [Fact p.Prime] (m : Model K p)
+variable
+  {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] {p : ℕ} [Fact p.Prime] (m : Model K p)
 
-theorem Model.E_symm_coe (x : m.K') :
-    m.E.symm (x : PadicAlgCl p) = algebraMap K (AlgebraicClosure K) (m.e.symm x) := by
+theorem Model.E_symm_coe (x : m.K')
+    : m.E.symm (x : PadicAlgCl p) = algebraMap K (AlgebraicClosure K) (m.e.symm x) := by
   rw [RingEquiv.symm_apply_eq, m.comm, RingEquiv.apply_symm_apply]
 
 include m in
@@ -70,18 +79,20 @@ theorem Model.charZero : CharZero K :=
   charZero_of_injective_ringHom (f := (m.e.symm : m.K' →+* K)) m.e.symm.injective
 
 noncomputable def Model.galIso : (AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) ≃* GK p m.K' where
-  toFun σ :=
-    { m.E.symm.trans (σ.toRingEquiv.trans m.E) with
-      commutes' := fun x => by
-        show m.E (σ (m.E.symm (x : PadicAlgCl p))) = (x : PadicAlgCl p)
-        rw [m.E_symm_coe, AlgEquiv.commutes, m.comm, RingEquiv.apply_symm_apply] }
-  invFun τ :=
-    { m.E.trans (τ.toRingEquiv.trans m.E.symm) with
-      commutes' := fun x => by
-        show m.E.symm (τ (m.E (algebraMap K (AlgebraicClosure K) x))) = algebraMap K (AlgebraicClosure K) x
-        rw [m.comm, show τ ((m.e x : m.K') : PadicAlgCl p) = _ from τ.commutes (m.e x)]
-        show m.E.symm ((m.e x : m.K') : PadicAlgCl p) = _
-        rw [m.E_symm_coe, RingEquiv.symm_apply_apply] }
+  toFun σ := {
+    m.E.symm.trans (σ.toRingEquiv.trans m.E) with
+    commutes' := fun x => by
+      show m.E (σ (m.E.symm (x : PadicAlgCl p))) = (x : PadicAlgCl p)
+      rw [m.E_symm_coe, AlgEquiv.commutes, m.comm, RingEquiv.apply_symm_apply]
+  }
+  invFun τ := {
+    m.E.trans (τ.toRingEquiv.trans m.E.symm) with
+    commutes' := fun x => by
+      show m.E.symm (τ (m.E (algebraMap K (AlgebraicClosure K) x))) = algebraMap K (AlgebraicClosure K) x
+      rw [m.comm, show τ ((m.e x : m.K') : PadicAlgCl p) = _ from τ.commutes (m.e x)]
+      show m.E.symm ((m.e x : m.K') : PadicAlgCl p) = _
+      rw [m.E_symm_coe, RingEquiv.symm_apply_apply]
+  }
   left_inv σ := by
     ext x
     show m.E.symm (m.E (σ (m.E.symm (m.E x)))) = σ x
@@ -101,37 +112,52 @@ theorem Model.isGalIso_galIso : m.IsGalIso m.galIso := fun σ x => by
 
 variable {m}
 
-theorem Model.IsGalIso.symm_apply {φ} (hφ : m.IsGalIso φ) (τ : GK p m.K') (x : AlgebraicClosure K) :
-    m.E (φ.symm τ x) = τ (m.E x) := by
+theorem Model.IsGalIso.symm_apply {φ} (hφ : m.IsGalIso φ) (τ : GK p m.K') (x : AlgebraicClosure K)
+    : m.E (φ.symm τ x) = τ (m.E x) := by
   rw [← hφ, MulEquiv.apply_symm_apply]
 
 theorem Model.IsGalIso.galois_iso_isHomeomorph {φ} (hφ : m.IsGalIso φ) : IsHomeomorph φ := by
   have hint : Algebra.IsIntegral m.K' (PadicAlgCl p) := Algebra.IsIntegral.tower_top (R := ℚ_[p])
-  have h1 : Continuous φ.toMonoidHom := continuous_gal_of_fix φ.toMonoidHom fun y => ⟨m.E.symm y, fun σ hσ => by
-    show φ σ y = y
-    have := hφ σ (m.E.symm y)
-    rwa [hσ, RingEquiv.apply_symm_apply] at this⟩
-  have h2 : Continuous φ.symm.toMonoidHom := continuous_gal_of_fix φ.symm.toMonoidHom fun y => ⟨m.E y, fun τ hτ => by
-    show φ.symm τ y = y
-    apply m.E.injective
-    rw [hφ.symm_apply, hτ]⟩
+  have h1 : Continuous φ.toMonoidHom :=
+    continuous_gal_of_fix φ.toMonoidHom fun y => ⟨
+      m.E.symm y,
+      fun σ hσ => by
+        show φ σ y = y
+        have := hφ σ (m.E.symm y)
+        rwa [hσ, RingEquiv.apply_symm_apply] at this
+    ⟩
+  have h2 : Continuous φ.symm.toMonoidHom :=
+    continuous_gal_of_fix φ.symm.toMonoidHom fun y => ⟨
+      m.E y,
+      fun τ hτ => by
+        show φ.symm τ y = y
+        apply m.E.injective
+        rw [hφ.symm_apply, hτ]
+    ⟩
   exact (Homeomorph.mk φ.toEquiv h1 h2).isHomeomorph
 
-theorem Model.isFrobeniusLift_iff_model [IsNonarchimedeanLocalField K] {φ} (hφ : m.IsGalIso φ)
-    (g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K) : IsFrobeniusLift K g ↔ IsFrob p m.K' (φ g) := by
+theorem Model.isFrobeniusLift_iff_model
+    [IsNonarchimedeanLocalField K]
+    {φ} (hφ : m.IsGalIso φ)
+    (g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K)
+    : IsFrobeniusLift K g ↔ IsFrob p m.K' (φ g) := by
   constructor
   · intro h y hy
-    have h1 := h (m.E.symm y) ((m.mem_integral_closure_iff_norm _).2 (by rwa [RingEquiv.apply_symm_apply]))
-    rw [m.mem_maximal_ideal_closure_iff_norm, map_sub, map_pow, ← hφ, RingEquiv.apply_symm_apply, m.card_residue_field_model] at h1
+    have h1 :=
+      h (m.E.symm y) ((m.mem_integral_closure_iff_norm _).2 (by rwa [RingEquiv.apply_symm_apply]))
+    rw [m.mem_maximal_ideal_closure_iff_norm, map_sub, map_pow, ← hφ, RingEquiv.apply_symm_apply,
+        m.card_residue_field_model]
+      at h1
     exact h1
   · intro h x hx
     have h1 := h (m.E x) ((m.mem_integral_closure_iff_norm _).1 hx)
     rw [m.mem_maximal_ideal_closure_iff_norm, map_sub, map_pow, ← hφ, m.card_residue_field_model]
     exact h1
 
-theorem Model.exists_abelianization_iso {φ} (hφ : m.IsGalIso φ) :
-    ∃ ψ : Field.absoluteGaloisGroupAbelianization K ≃* GKab p m.K', IsHomeomorph ψ ∧
-      ∀ g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K, ψ (toAb K g) = toAbK p m.K' (φ g) :=
+theorem Model.exists_abelianization_iso {φ} (hφ : m.IsGalIso φ)
+    : ∃ ψ : Field.absoluteGaloisGroupAbelianization K ≃* GKab p m.K',
+      IsHomeomorph ψ
+        ∧ ∀ g : AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K, ψ (toAb K g) = toAbK p m.K' (φ g) :=
   exists_topAb_iso φ hφ.galois_iso_isHomeomorph
 
 end ReciprocityTheory.DiscreteGroups.LocalClassField

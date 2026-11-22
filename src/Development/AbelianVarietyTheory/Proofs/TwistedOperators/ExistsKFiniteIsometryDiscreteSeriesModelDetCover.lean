@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ModelsAre
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
 open Formalism.IndefR.Mult (DSModel dualPar parA parB)
-open Formalism.MainNotions.SchurIrreducible (AdmGK ARi ARiiiUp ARiiiDown ARiiiLine DiscreteSeriesBlattner admQ5)
+open Formalism.MainNotions.SchurIrreducible
+  (AdmGK ARi ARiiiUp ARiiiDown ARiiiLine DiscreteSeriesBlattner admQ5)
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction hiding Mat
 open GlobalTheory.IndefiniteRowSideFullHecke.BarMatrix (SignCompat plainMat barMat)
 open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (fockIp)
@@ -28,27 +31,35 @@ open GlobalTheory.IndefiniteRowSideFullHecke.BarMatrix (toFrame)
 
 section Semi
 
-variable {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+variable
+  {H H' : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
   {cj : Bool} {U : H → H'}
 
-theorem cjc_ofReal (cj : Bool) (r : ℝ) : cjc cj (r : ℂ) = r := by
-  cases cj <;> simp [cjc]
+theorem cjc_ofReal (cj : Bool) (r : ℝ) : cjc cj (r : ℂ) = r := by cases cj <;> simp [cjc]
 
-theorem exists_real (hadd : ∀ x y, U (x + y) = U x + U y) (hs : ∀ (z : ℂ) x, U (z • x) = cjc cj z • U x)
-    (hb : Function.Bijective U) (hn : ∀ x, ‖U x‖ = ‖x‖) : ∃ L : H ≃ₗᵢ[ℝ] H', ∀ x, L x = U x := by
-  let L₀ : H →ₗᵢ[ℝ] H' :=
-    { toFun := U
-      map_add' := hadd
-      map_smul' := fun r x => by
-        rw [← Complex.coe_smul, hs, cjc_ofReal, Complex.coe_smul, RingHom.id_apply]
-      norm_map' := hn }
+theorem exists_real
+    (hadd : ∀ x y, U (x + y) = U x + U y) (hs : ∀ (z : ℂ) x, U (z • x) = cjc cj z • U x)
+    (hb : Function.Bijective U) (hn : ∀ x, ‖U x‖ = ‖x‖)
+    : ∃ L : H ≃ₗᵢ[ℝ] H', ∀ x, L x = U x := by
+  let L₀ : H →ₗᵢ[ℝ] H' := {
+    toFun := U
+    map_add' := hadd
+    map_smul' := fun r x => by
+      rw [← Complex.coe_smul, hs, cjc_ofReal, Complex.coe_smul, RingHom.id_apply]
+    norm_map' := hn
+  }
   exact ⟨LinearIsometryEquiv.ofSurjective L₀ hb.2, fun _ => rfl⟩
 
-theorem inner_map (hadd : ∀ x y, U (x + y) = U x + U y) (hs : ∀ (z : ℂ) x, U (z • x) = cjc cj z • U x)
-    (hn : ∀ x, ‖U x‖ = ‖x‖) (w x : H) : ⟪U w, U x⟫_ℂ = cjc cj ⟪w, x⟫_ℂ := by
+theorem inner_map
+    (hadd : ∀ x y, U (x + y) = U x + U y) (hs : ∀ (z : ℂ) x, U (z • x) = cjc cj z • U x)
+    (hn : ∀ x, ‖U x‖ = ‖x‖) (w x : H)
+    : ⟪U w, U x⟫_ℂ = cjc cj ⟪w, x⟫_ℂ := by
   have hre : ∀ w x : H, (⟪U w, U x⟫_ℂ).re = (⟪w, x⟫_ℂ).re := fun w x => by
-    have h1 := re_inner_eq_norm_add_mul_self_sub_norm_mul_self_sub_norm_mul_self_div_two (𝕜 := ℂ) (U w) (U x)
-    have h2 := re_inner_eq_norm_add_mul_self_sub_norm_mul_self_sub_norm_mul_self_div_two (𝕜 := ℂ) w x
+    have h1 :=
+      re_inner_eq_norm_add_mul_self_sub_norm_mul_self_sub_norm_mul_self_div_two (𝕜 := ℂ) (U w) (U x)
+    have h2 :=
+      re_inner_eq_norm_add_mul_self_sub_norm_mul_self_sub_norm_mul_self_div_two (𝕜 := ℂ) w x
     rw [← hadd, hn, hn, hn, ← h2] at h1
     exact h1
   have h1 := hre w x
@@ -64,13 +75,22 @@ theorem inner_map (hadd : ∀ x y, U (x + y) = U x + U y) (hs : ∀ (z : ℂ) x,
 
 end Semi
 
-theorem isFormIso_phi {p q n : ℕ} {ε : Fin n → Bool} {e : Ix p q ≃ Fin n} (h : SignCompat ε e) (br : Bool) :
-    IsFormIso ε (phi br e) := by
+theorem isFormIso_phi
+    {p q n : ℕ} {ε : Fin n → Bool} {e : Ix p q ≃ Fin n} (h : SignCompat ε e) (br : Bool)
+    : IsFormIso ε (phi br e) := by
   cases br
   · exact isFormIso_plainMat h
   · exact isFormIso_barMat h
 
-theorem exists_kTie : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (τ : D.what₂.Tau) (p q : ℕ) (T : GrpData p q) (R : DSRep T) (lam : Ix p q → ℚ) (c : ℚ) (br cj : Bool) (e : Ix p q ≃ Fin V.rank) (m : ℤ) (U : M.H τ → R.U.H), IsParam lam → IsOrd (M.ε τ) (M.lam τ) lam c (sg br cj) e → (m : ℚ) = 2 * c → Comparison₂ R M τ br cj e m U → (∀ x v, U x = R.ι v → (IsHighestUnit (M.ε τ) (M.lam τ) (M.σ τ) x ↔ UnitHW R (blattner lam) v)) → ∃ u, KTie R M τ lam c br cj e u := by
+theorem exists_kTie
+    : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (τ : D.what₂.Tau) (p q : ℕ)
+        (T : GrpData p q) (R : DSRep T) (lam : Ix p q → ℚ) (c : ℚ) (br cj : Bool)
+        (e : Ix p q ≃ Fin V.rank) (m : ℤ) (U : M.H τ → R.U.H),
+      IsParam lam → IsOrd (M.ε τ) (M.lam τ) lam c (sg br cj) e → (m : ℚ) = 2 * c
+        → Comparison₂ R M τ br cj e m U
+        → (∀ x v,
+          U x = R.ι v → (IsHighestUnit (M.ε τ) (M.lam τ) (M.σ τ) x ↔ UnitHW R (blattner lam) v))
+        → ∃ u, KTie R M τ lam c br cj e u := by
   intro D V S M τ p q T R lam c br cj e m U hpar hord hm hT hhi
   have hφ := isFormIso_phi hord.1 br
   obtain ⟨L, hL⟩ := exists_real hT.add hT.smul hT.bij hT.norm
@@ -84,11 +104,23 @@ theorem exists_kTie : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M :
     | smul z x _ hx => rw [hT.smul]; exact Submodule.smul_mem _ _ hx
   choose u hu using hr
   have hmC : (m : ℂ) = 2 * (c : ℂ) := by exact_mod_cast hm
-  have hgrp : ∀ (g : T.G) (x : M.H τ), U (M.σ τ (phi br e ((T.cov g : GL (Ix p q) ℂ) : Mat p q)) x) =
-      ((T.sq g : ℂˣ) : ℂ) ^ m • R.U.π g (U x) := fun g x => by
+  have hgrp
+      : ∀ (g : T.G) (x : M.H τ),
+        U (M.σ τ (phi br e ((T.cov g : GL (Ix p q) ℂ) : Mat p q)) x)
+          = ((T.sq g : ℂˣ) : ℂ) ^ m • R.U.π g (U x) := fun g x => by
     rw [hT.grp, smul_smul, ← zpow_add₀ (Units.ne_zero _), add_neg_cancel, zpow_zero, one_smul]
-  refine ⟨u, hpar, hord, fun x y => R.ι_inj ?_, fun z x => R.ι_inj ?_, ⟨fun x y h => ?_, fun y => ?_⟩, ?_,
-    fun Z hZ v v' => ?_, fun v => hhi _ _ (hu v).symm, fun m' hm' g v w => ?_⟩
+  refine ⟨
+    u,
+    hpar,
+    hord,
+    fun x y => R.ι_inj ?_,
+    fun z x => R.ι_inj ?_,
+    ⟨fun x y h => ?_, fun y => ?_⟩,
+    ?_,
+    fun Z hZ v v' => ?_,
+    fun v => hhi _ _ (hu v).symm,
+    fun m' hm' g v w => ?_
+  ⟩
   · rw [map_add (f := _), hu, hu, hu, Submodule.coe_add, hT.add]
   · rw [map_smul, hu, hu, Submodule.coe_smul, hT.smul]
   · exact Subtype.ext (hT.bij.1 (by rw [← hu, ← hu, h]))
@@ -102,7 +134,8 @@ theorem exists_kTie : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M :
     rw [hφ.bij.1.mem_set_image, ← hφ.mem_lie]
     rfl
   · have h1 := (hasDerivAt_sq_zpow T m hZ).fun_smul (R.der Z hZ (u v))
-    have h2 : HasDerivAt (fun t : ℝ => L (M.rep τ (NormedSpace.exp (t • phiFr (M.fr τ) br e Z)) (v : M.H τ)))
+    have h2 : HasDerivAt
+        (fun t : ℝ => L (M.rep τ (NormedSpace.exp (t • phiFr (M.fr τ) br e Z)) (v : M.H τ)))
         (R.ι (R.HK.act Z (u v) + ((c : ℂ) * Z.trace) • u v)) 0 := by
       convert (preTransparency := .reducible) h1 using 1
       · funext t
@@ -113,13 +146,15 @@ theorem exists_kTie : ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M :
         simp [T.expt_zero]
     constructor
     · intro h
-      have h3 := L.toContinuousLinearEquiv.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h
+      have h3 :=
+        L.toContinuousLinearEquiv.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h
       refine R.ι_inj ?_
       rw [hu, ← hL]
       exact h3.unique h2
     · intro h
       rw [← h, hu, ← hL] at h2
-      have h3 := L.symm.toContinuousLinearEquiv.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h2
+      have h3 :=
+        L.symm.toContinuousLinearEquiv.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h2
       unfold VecDer
       convert h3 using 1
       · funext t; simp

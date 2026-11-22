@@ -17,8 +17,8 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E)
 theorem mem_orth {U : Submodule E S.V} {v : S.V} : v ∈ orth S U ↔ ∀ x ∈ U, S.hT x v = 0 := by
   simp [orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem finrank_orth_add (U : Submodule E S.V) :
-    finrank E (orth S U) + finrank E U = finrank E S.V := by
+theorem finrank_orth_add (U : Submodule E S.V)
+    : finrank E (orth S U) + finrank E U = finrank E S.V := by
   set d := finrank E U
   let b := Module.finBasis E U
   let f : Fin d → Module.Dual E S.V := fun i => S.hT (b i : S.V)
@@ -30,15 +30,13 @@ theorem finrank_orth_add (U : Submodule E S.V) :
         rw [map_sum]
       simp only [LinearMap.map_smulₛₗ, starRingEnd_apply, star_star]
       exact hg
-    have h1 : ∑ j, star (g j) • (b j : S.V) = 0 :=
-      S.nondeg.1 _ (fun y => by rw [h0]; rfl)
+    have h1 : ∑ j, star (g j) • (b j : S.V) = 0 := S.nondeg.1 _ (fun y => by rw [h0]; rfl)
     have hli' : LinearIndependent E (fun j => (b j : S.V)) :=
       b.linearIndependent.map' U.subtype (Submodule.ker_subtype U)
     have := (Fintype.linearIndependent_iff.mp hli') (fun j => star (g j)) h1 i
     simpa using this
   let Φ : Submodule E (Module.Dual E S.V) := Submodule.span E (Set.range f)
-  have hΦ : finrank E Φ = d := by
-    rw [finrank_span_eq_card hli]; simp [d]
+  have hΦ : finrank E Φ = d := by rw [finrank_span_eq_card hli]; simp [d]
   have hco : Φ.dualCoannihilator = orth S U := by
     ext v
     rw [Submodule.mem_dualCoannihilator, mem_orth]
@@ -69,12 +67,13 @@ theorem finrank_orth_add (U : Submodule E S.V) :
   rw [hco, hΦ] at this
   omega
 
-theorem exists_smul_mem (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (x : S.V) :
-    ∃ a : 𝓞 E, a ≠ 0 ∧ a • x ∈ Λ :=
+theorem exists_smul_mem (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (x : S.V)
+    : ∃ a : 𝓞 E, a ≠ 0 ∧ a • x ∈ Λ :=
   Bl.general_b_fact_third''''.goal1 S Λ hΛ x
 
-theorem span_inf_toO (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V) :
-    Submodule.span E ((Λ ⊓ toO S U : Submodule (𝓞 E) S.V) : Set S.V) = U := by
+theorem span_inf_toO
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V)
+    : Submodule.span E ((Λ ⊓ toO S U : Submodule (𝓞 E) S.V) : Set S.V) = U := by
   apply le_antisymm
   · rw [Submodule.span_le]
     intro x hx
@@ -90,16 +89,20 @@ theorem span_inf_toO (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattic
     rw [hx']
     exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem Xsp_le_UUE (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) {r : ℕ} {T T' : E}
-    (F : LFlag S r T) (F' : LFlag S r T') : Xsp F ≤ UUE Λ F F' := by
+theorem Xsp_le_UUE
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+    {r : ℕ} {T T' : E} (F : LFlag S r T) (F' : LFlag S r T')
+    : Xsp F ≤ UUE Λ F F' := by
   rw [← span_inf_toO S Λ hΛ (Xsp F)]
   apply Submodule.span_mono
   intro x hx
   simp only [UU]
   exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.mem_sup_left hx))
 
-theorem Xsp_le_UUE' (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) {r : ℕ} {T T' : E}
-    (F : LFlag S r T) (F' : LFlag S r T') : Xsp F' ≤ UUE Λ F F' := by
+theorem Xsp_le_UUE'
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+    {r : ℕ} {T T' : E} (F : LFlag S r T) (F' : LFlag S r T')
+    : Xsp F' ≤ UUE Λ F F' := by
   rw [← span_inf_toO S Λ hΛ (Xsp F')]
   apply Submodule.span_mono
   intro x hx

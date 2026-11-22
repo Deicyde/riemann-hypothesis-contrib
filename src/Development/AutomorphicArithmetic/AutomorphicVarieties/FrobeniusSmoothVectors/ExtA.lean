@@ -7,8 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.ext_A :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (C : Type) [CommRing C] [IsLocalRing C] [IsNoetherianRing C] [Algebra O C] (ξ ξ' : S.A →ₐ[O] C), S.u.map (ξ : S.A →+* C) = S.u.map (ξ' : S.A →+* C) → S.x0 ≤ (maximalIdeal C).comap (ξ : S.A →+* C) → S.x0 ≤ (maximalIdeal C).comap (ξ' : S.A →+* C) → ξ = ξ' := by
+theorem UpperTheory.V.Fr.ext_A
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n,
+          ∀ (C : Type) [CommRing C] [IsLocalRing C] [IsNoetherianRing C] [Algebra O C]
+              (ξ ξ' : S.A →ₐ[O] C),
+            S.u.map (ξ : S.A →+* C) = S.u.map (ξ' : S.A →+* C)
+              → S.x0 ≤ (maximalIdeal C).comap (ξ : S.A →+* C)
+              → S.x0 ≤ (maximalIdeal C).comap (ξ' : S.A →+* C)
+              → ξ = ξ' := by
   intro l _ O _ _ _ _ F C₀ n hF hn S C _ _ _ _ ξ ξ' hu h1 h2
   obtain ⟨-, -, -, hc⟩ := UpperTheory.V.Fr.cont_u hF hn S
   let E : Subalgebra O S.R := (AlgHom.equalizer ξ ξ').map S.A.val
@@ -25,8 +34,10 @@ theorem UpperTheory.V.Fr.ext_A :
       obtain ⟨s, -, rfl⟩ := List.mem_map.1 hy
       exact hr _ _ _
     · exact hψ v i g
-  have hpow : ∀ (f : S.A →ₐ[O] C), S.x0 ≤ (maximalIdeal C).comap (f : S.A →+* C) → ∀ (N : ℕ) (a : S.A),
-      a ∈ S.mB ^ N • S.gr 0 → f a ∈ maximalIdeal C ^ N := by
+  have hpow
+      : ∀ (f : S.A →ₐ[O] C),
+        S.x0 ≤ (maximalIdeal C).comap (f : S.A →+* C)
+          → ∀ (N : ℕ) (a : S.A), a ∈ S.mB ^ N • S.gr 0 → f a ∈ maximalIdeal C ^ N := by
     intro f hf N a ha
     refine Submodule.smul_induction_on ha (fun b hb y _ => ?_) fun x y hx hy => ?_
     · rw [Algebra.smul_def, map_mul]
@@ -43,7 +54,8 @@ theorem UpperTheory.V.Fr.ext_A :
     intro b hb
     refine (hE ⟨b, S.B_le_A hb⟩).2 ?_
     rw [← sub_eq_zero, ← Ideal.mem_bot,
-      ← Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal C) (maximalIdeal.isMaximal C).ne_top, Ideal.mem_iInf]
+      ← Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal C) (maximalIdeal.isMaximal C).ne_top,
+      Ideal.mem_iInf]
     intro N
     obtain ⟨M, hM⟩ := hc 0 N
     obtain ⟨y, hy, hby⟩ := hb M

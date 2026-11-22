@@ -11,8 +11,11 @@ open scoped Manifold
 
 namespace GlobalTheory.HeckeFamilyMatrices
 
-theorem ulFam_perm : ∀ (N l : ℕ), 5 ≤ N → l.Prime → ¬ l ∣ N → ∀ γ : Lev N l, ∃ π : Equiv.Perm (Fin l),
-    ∀ i, ∃ γ' : Lev N l, ulFam l i * mat γ = mat γ' * ulFam l (π i) := by
+theorem ulFam_perm
+    : ∀ (N l : ℕ),
+      5 ≤ N → l.Prime → ¬ l ∣ N
+        → ∀ γ : Lev N l, ∃ π : Equiv.Perm (Fin l), ∀ i, ∃ γ' : Lev N l,
+          ulFam l i * mat γ = mat γ' * ulFam l (π i) := by
   intro N l _ hl _ γ
   haveI : Fact l.Prime := ⟨hl⟩
   obtain ⟨hγ1, hγ0⟩ := Subgroup.mem_inf.mp γ.2
@@ -76,20 +79,26 @@ theorem ulFam_perm : ∀ (N l : ℕ), 5 ≤ N → l.Prime → ¬ l ∣ N → ∀
     · rw [CongruenceSubgroup.Gamma1_mem]
       refine ⟨?_, ?_, ?_⟩
       · show ((a + x * c : ℤ) : ZMod N) = 1
-        push_cast; rw [ha1', hcN']; ring
+        push_cast
+        rw [ha1', hcN']
+        ring
       · show ((d - j * c : ℤ) : ZMod N) = 1
-        push_cast; rw [hd1', hcN']; ring
+        push_cast
+        rw [hd1', hcN']
+        ring
       · show (((l : ℤ) * c : ℤ) : ZMod N) = 0
-        push_cast; rw [hcN']; ring
+        push_cast
+        rw [hcN']
+        ring
     · rw [CongruenceSubgroup.Gamma0_mem]
       show (((l : ℤ) * c : ℤ) : ZMod l) = 0
-      push_cast; simp
+      push_cast
+      simp
   refine ⟨⟨g, hg⟩, ?_⟩
   show ulFam l i * mat γ = M * ulFam l (f i)
   rw [hmat]
   ext r s
-  fin_cases r <;> fin_cases s <;>
-    simp [ulFam, M, Matrix.mul_apply, Fin.sum_univ_two, ← hj, ← hx] <;>
-    first | ring1 | linear_combination he
+  fin_cases r <;> fin_cases s <;> simp [ulFam, M, Matrix.mul_apply, Fin.sum_univ_two, ← hj, ← hx]
+    <;> first | ring1 | linear_combination he
 
 end GlobalTheory.HeckeFamilyMatrices

@@ -11,16 +11,15 @@ namespace GlobalTheory.CompanionTheory.Ar.Tw
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem oldIdx_injective {K : Type} {ι : K → Type} :
-    Function.Injective (oldIdx (ι := ι)) := by
+theorem oldIdx_injective {K : Type} {ι : K → Type} : Function.Injective (oldIdx (ι := ι)) := by
   rintro ⟨a, b⟩ ⟨c, d⟩ h
   change (⟨some a, b⟩ : (o : Option K) × Tb ι o) = ⟨some c, d⟩ at h
   cases h
   rfl
 
-theorem isMultiHomog_inc {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] {f : MRing ι} {a : K → ℕ}
-    (hf : IsMultiHomog f a) :
-    IsMultiHomog (inc f : MRing (Tb ι)) (fun o => o.elim 0 a) := by
+theorem isMultiHomog_inc
+    {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] {f : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a)
+    : IsMultiHomog (inc f : MRing (Tb ι)) (fun o => o.elim 0 a) := by
   classical
   intro m hm o
   have hinj : Function.Injective (oldIdx (ι := ι)) := oldIdx_injective
@@ -39,23 +38,27 @@ theorem isMultiHomog_inc {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] {f
   | some k =>
     simp only [Option.elim_some]
     refine (Fintype.sum_equiv (show Tb ι (some k) ≃ ι k from Equiv.refl _) _
-      (fun i => m' ⟨k, i⟩) (fun i => ?_)).trans (hf m' hm' k)
+      (fun i => m' ⟨k, i⟩)
+      (fun i => ?_)).trans (hf m' hm' k)
     exact Finsupp.mapDomain_apply_of_injective hinj m' ⟨k, i⟩
 
-theorem sum_single_none {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (j : Fin 2) (o : Option K) :
-    ∑ i, (Finsupp.single (⟨none, j⟩ : Σ o, Tb ι o) 2) ⟨o, i⟩ = o.elim 2 (fun _ => 0) := by
+theorem sum_single_none {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (j : Fin 2) (o : Option K)
+    : ∑ i, (Finsupp.single (⟨none, j⟩ : Σ o, Tb ι o) 2) ⟨o, i⟩ = o.elim 2 (fun _ => 0) := by
   classical
   cases o with
   | none =>
     simp only [Option.elim_none]
     refine (Fintype.sum_equiv (show Tb ι none ≃ Fin 2 from Equiv.refl _) _
-      (fun i : Fin 2 => (Finsupp.single (⟨none, j⟩ : Σ o, Tb ι o) 2) ⟨none, i⟩) (fun _ => rfl)).trans ?_
+      (fun i : Fin 2 => (Finsupp.single (⟨none, j⟩ : Σ o, Tb ι o) 2) ⟨none, i⟩)
+      (fun _ => rfl)).trans ?_
     rw [Fin.sum_univ_two]
-    fin_cases j <;> simp [Finsupp.single_apply] <;>
-      (intro h
-       have h2 := eq_of_heq (Sigma.mk.inj_iff.mp h).2
-       have h3 := congrArg (fun t : Fin 2 => (t : ℕ)) h2
-       exact absurd h3 (by decide))
+    fin_cases j <;> simp [Finsupp.single_apply]
+      <;> (
+        intro h
+        have h2 := eq_of_heq (Sigma.mk.inj_iff.mp h).2
+        have h3 := congrArg (fun t : Fin 2 => (t : ℕ)) h2
+        exact absurd h3 (by decide)
+      )
   | some k =>
     simp only [Option.elim_some]
     apply Finset.sum_eq_zero
@@ -65,19 +68,26 @@ theorem sum_single_none {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (j 
     have h0 := congrArg (fun z : (o : Option K) × Tb ι o => z.1) h
     simp at h0
 
-theorem isMultiHomog_quad {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (p : ℕ) :
-    IsMultiHomog (quad p : MRing (Tb ι)) (fun o => o.elim 2 (fun _ => 0)) := by
+theorem isMultiHomog_quad {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (p : ℕ)
+    : IsMultiHomog (quad p : MRing (Tb ι)) (fun o => o.elim 2 (fun _ => 0)) := by
   classical
   intro m hm o
-  have h1 : (xN ^ 2 : MRing (Tb ι)) =
-      MvPolynomial.monomial (Finsupp.single (⟨none, (0 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2) (1 : ℤ) := by
+  have h1
+      : (xN ^ 2 : MRing (Tb ι))
+        = MvPolynomial.monomial (Finsupp.single (⟨none, (0 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2)
+          (1 : ℤ) := by
     simp only [xN, MvPolynomial.X_pow_eq_monomial]
-  have h2 : (MvPolynomial.C (p : ℤ) * yN ^ 2 : MRing (Tb ι)) =
-      MvPolynomial.monomial (Finsupp.single (⟨none, (1 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2) (p : ℤ) := by
+  have h2
+      : (MvPolynomial.C (p : ℤ) * yN ^ 2 : MRing (Tb ι))
+        = MvPolynomial.monomial (Finsupp.single (⟨none, (1 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2)
+          (p : ℤ) := by
     simp only [yN, MvPolynomial.X_pow_eq_monomial, MvPolynomial.C_mul_monomial, mul_one]
-  have hq : (quad p : MRing (Tb ι)) =
-      MvPolynomial.monomial (Finsupp.single (⟨none, (0 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2) (1 : ℤ) +
-      MvPolynomial.monomial (Finsupp.single (⟨none, (1 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2) (p : ℤ) := by
+  have hq
+      : (quad p : MRing (Tb ι))
+        = MvPolynomial.monomial (Finsupp.single (⟨none, (0 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2)
+            (1 : ℤ)
+          + MvPolynomial.monomial (Finsupp.single (⟨none, (1 : Fin 2)⟩ : (o : Option K) × Tb ι o) 2)
+            (p : ℤ) := by
     unfold quad
     rw [h1, h2]
   rw [hq] at hm
@@ -90,8 +100,12 @@ theorem isMultiHomog_quad {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)] (
     subst h'
     exact sum_single_none (ι := ι) 1 o
 
-theorem isMultiHomogIdeal_twist (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (p : ℕ)
-    (W : Ideal (MRing ι)) (hW : IsMultiHomogIdeal W) : IsMultiHomogIdeal (twist p W) := by
+theorem isMultiHomogIdeal_twist
+    (K : Type) [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (p : ℕ)
+    (W : Ideal (MRing ι)) (hW : IsMultiHomogIdeal W)
+    : IsMultiHomogIdeal (twist p W) := by
   obtain ⟨S, hS, rfl⟩ := hW
   refine ⟨(inc '' S) ∪ {quad p}, ?_, ?_⟩
   · rintro f (⟨g, hg, rfl⟩ | hf)

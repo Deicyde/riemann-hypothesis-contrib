@@ -5,16 +5,20 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTen
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.LatVac
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.LatVac
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LatVacDual
 
-theorem exists_extension {O E V : Type} [CommRing O] [IsDomain O] [Field E] [Algebra O E]
-    [IsFractionRing O E] [AddCommGroup V] [Module E V] [Module O V] [IsScalarTower O E V]
-    (Λ : Submodule O V) (hspan : Submodule.span E (Λ : Set V) = ⊤) (φ : Λ →ₗ[O] O) :
-    ∃ ψ : V →ₗ[E] E, ∀ x : Λ, ψ x = algebraMap O E (φ x) := by
+theorem exists_extension
+    {O E V : Type} [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
+    [AddCommGroup V] [Module E V] [Module O V] [IsScalarTower O E V]
+    (Λ : Submodule O V) (hspan : Submodule.span E (Λ : Set V) = ⊤) (φ : Λ →ₗ[O] O)
+    : ∃ ψ : V →ₗ[E] E, ∀ x : Λ, ψ x = algebraMap O E (φ x) := by
   haveI : IsLocalizedModule (nonZeroDivisors O) Λ.subtype :=
     { map_units := fun x => by
         rw [Module.End.isUnit_iff]
@@ -31,18 +35,23 @@ theorem exists_extension {O E V : Type} [CommRing O] [IsDomain O] [Field E] [Alg
         rw [Submodule.span_eq] at ht
         exact ⟨(⟨_, ht⟩, t), rfl⟩
       exists_of_eq := fun {a b} h => ⟨1, by rw [Λ.injective_subtype h]⟩ }
-  let g : V →ₗ[O] E := IsLocalizedModule.lift (nonZeroDivisors O) Λ.subtype
-    ((Algebra.linearMap O E).comp φ) (IsLocalizedModule.map_units (Algebra.linearMap O E))
+  let g : V →ₗ[O] E :=
+    IsLocalizedModule.lift (nonZeroDivisors O) Λ.subtype ((Algebra.linearMap O E).comp φ)
+      (IsLocalizedModule.map_units (Algebra.linearMap O E))
   refine ⟨g.extendScalarsOfIsLocalization (nonZeroDivisors O) E, fun x => ?_⟩
   exact IsLocalizedModule.lift_apply (nonZeroDivisors O) Λ.subtype ((Algebra.linearMap O E).comp φ)
     (IsLocalizedModule.map_units (Algebra.linearMap O E)) x
 
-theorem exists_dual_family {E : Type} [Field E] [NumberField E] [StarRing E] {r : ℕ}
-    (G : Matrix (Fin r) (Fin r) E) (hG : ∀ i j, star (G i j) = G j i) (hdet : IsUnit G.det)
-    (Λ : Submodule (𝓞 E) (Fin r → E)) (hfg : Λ.FG) (hspan : Submodule.span E (Λ : Set (Fin r → E)) = ⊤)
-    (hsd : ∀ y : Fin r → E, (∀ x ∈ Λ, ∃ b : 𝓞 E, (b : E) = ∑ i, ∑ j, star (x i) * G i j * y j) → y ∈ Λ) :
-    ∃ (n : ℕ) (s s' : Fin n → Fin r → E), (∀ i, s i ∈ Λ ∧ s' i ∈ Λ) ∧
-      ∀ a j, ∑ i, s i a * ∑ k, star (s' i k) * G k j = if a = j then 1 else 0 := by
+theorem exists_dual_family
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (hG : ∀ i j, star (G i j) = G j i) (hdet : IsUnit G.det)
+    (Λ : Submodule (𝓞 E) (Fin r → E)) (hfg : Λ.FG)
+    (hspan : Submodule.span E (Λ : Set (Fin r → E)) = ⊤)
+    (hsd
+      : ∀ y : Fin r → E, (∀ x ∈ Λ, ∃ b : 𝓞 E, (b : E) = ∑ i, ∑ j, star (x i) * G i j * y j) → y ∈ Λ)
+    : ∃ (n : ℕ) (s s' : Fin n → Fin r → E),
+      (∀ i, s i ∈ Λ ∧ s' i ∈ Λ)
+        ∧ ∀ a j, ∑ i, s i a * ∑ k, star (s' i k) * G k j = if a = j then 1 else 0 := by
   haveI : Module.Finite (𝓞 E) Λ := Module.Finite.iff_fg.2 hfg
   haveI : Module.FinitePresentation (𝓞 E) Λ := Module.finitePresentation_of_finite _ _
   haveI : Module.Projective (𝓞 E) Λ := Module.Flat.projective_of_finitePresentation
@@ -54,7 +63,7 @@ theorem exists_dual_family {E : Type} [Field E] [NumberField E] [StarRing E] {r 
     intro i x
     conv_lhs => rw [pi_eq_sum_univ' x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [c, map_sum]
+    simp [c, map_sum]
   let s' : Fin n → Fin r → E := fun i => star (c i ᵥ* G⁻¹)
   have hs' : ∀ i j, ∑ k, star (s' i k) * G k j = c i j := by
     intro i j
@@ -69,7 +78,8 @@ theorem exists_dual_family {E : Type} [Field E] [NumberField E] [StarRing E] {r 
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [← hs', star_mul', star_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
-      rw [star_mul', star_star, hG]; ring
+      rw [star_mul', star_star, hG]
+      ring
     have h2 := hψ i ⟨x, hx⟩
     rw [h1]
     refine ⟨⟨star (ψ i x), ?_⟩, rfl⟩
@@ -87,23 +97,29 @@ theorem exists_dual_family {E : Type} [Field E] [NumberField E] [StarRing E] {r 
         rw [map_sum] at h2
       rw [LinearMap.sum_apply, LinearMap.id_apply]
       refine Eq.trans (Finset.sum_congr rfl fun i _ => ?_) h2
-      rw [LinearMap.smulRight_apply, show ψ i x = _ from hψ i ⟨x, hx⟩, algebraMap_smul, map_smul, map_smul]
+      rw [LinearMap.smulRight_apply, show ψ i x = _ from hψ i ⟨x, hx⟩, algebraMap_smul, map_smul,
+        map_smul]
       rfl
     have h := congrFun (LinearMap.congr_fun key (Pi.single j 1)) a
     simp only [LinearMap.sum_apply, LinearMap.smulRight_apply, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul, LinearMap.id_apply, Pi.single_apply] at h
+        smul_eq_mul, LinearMap.id_apply, Pi.single_apply]
+      at h
     rw [← h]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hs', mul_comm]
 
-theorem dualFamily : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)), IsSelfDualC S Λ → ∃ (n : ℕ) (s s' : Fin n → Fin S.rank → D.host.E), (∀ i, s i ∈ Λ ∧ s' i ∈ Λ) ∧ ∀ a j, ∑ i, s i a * ∑ k, star (s' i k) * S.gram k j = if a = j then 1 else 0 := by
+theorem dualFamily
+    : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)),
+      IsSelfDualC S Λ
+        → ∃ (n : ℕ) (s s' : Fin n → Fin S.rank → D.host.E),
+          (∀ i, s i ∈ Λ ∧ s' i ∈ Λ)
+            ∧ ∀ a j, ∑ i, s i a * ∑ k, star (s' i k) * S.gram k j = if a = j then 1 else 0 := by
   intro D S Λ h
   have hspan : Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) = ⊤ := by
     obtain ⟨t, ht⟩ := h.1.fg
     apply eq_top_iff.mpr
     intro y _
-    let p : (Fin S.rank → D.host.E) → D.host.E := fun x =>
-      ∑ i, ∑ j, star (x i) * S.gram i j * y j
+    let p : (Fin S.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * S.gram i j * y j
     obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) t p
     have hp : ∀ x ∈ Λ, IsIntegral ℤ ((b : 𝓞 D.host.E) • p x) := by
       intro x hx
@@ -113,17 +129,19 @@ theorem dualFamily : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (F
         obtain ⟨a, ha⟩ := hb x hx
         rw [← ha]
         exact RingOfIntegers.isIntegral_coe a
-      | zero => simpa [p] using (isIntegral_zero : IsIntegral ℤ (0 : D.host.E))
+      | zero =>
+        simpa [p] using (isIntegral_zero : IsIntegral ℤ (0 : D.host.E))
       | add x z hx hz ihx ihz =>
-        have heq : p (x + z) = p x + p z := by
-          simp [p, star_add, add_mul, Finset.sum_add_distrib]
+        have heq : p (x + z) = p x + p z := by simp [p, star_add, add_mul, Finset.sum_add_distrib]
         rw [heq, smul_add]
         exact ihx.add ihz
       | smul c x hx ih =>
         have heq : p (c • x) = star (c : D.host.E) * p x := by
           simp only [p, Pi.smul_apply, algebraMap_smul, star_mul', Finset.mul_sum]
-          apply Finset.sum_congr rfl; intro i _
-          apply Finset.sum_congr rfl; intro j _
+          apply Finset.sum_congr rfl
+          intro i _
+          apply Finset.sum_congr rfl
+          intro j _
           change star ((c : D.host.E) * x i) * S.gram i j * y j = _
           rw [star_mul']
           ring
@@ -131,31 +149,37 @@ theorem dualFamily : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (F
         have hc := (RingOfIntegers.isIntegral_coe c).map (starRingEnd D.host.E).toIntAlgHom
         have hc' : IsIntegral ℤ (star (c : D.host.E)) := hc
         convert hc'.mul ih using 1 <;> simp only [Algebra.smul_def] <;> ring
-    have hy : (b : 𝓞 D.host.E) • y ∈ Λ := (h.2 _).2 (by
-      intro x hx
-      have hi := hp x hx
-      refine ⟨⟨_, ?_⟩, rfl⟩
-      have heq : (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j) =
-          (b : 𝓞 D.host.E) • p x := by
-        simp only [p, Pi.smul_apply, algebraMap_smul, Algebra.smul_def, Finset.mul_sum]
-        apply Finset.sum_congr rfl; intro i _
-        apply Finset.sum_congr rfl; intro j _
-        ring
-      change IsIntegral ℤ (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
-      rw [heq]
-      exact hi)
+    have hy : (b : 𝓞 D.host.E) • y ∈ Λ :=
+      (h.2 _).2 (by
+        intro x hx
+        have hi := hp x hx
+        refine ⟨⟨_, ?_⟩, rfl⟩
+        have heq
+            : (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
+              = (b : 𝓞 D.host.E) • p x := by
+          simp only [p, Pi.smul_apply, algebraMap_smul, Algebra.smul_def, Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro i _
+          apply Finset.sum_congr rfl
+          intro j _
+          ring
+        change IsIntegral ℤ (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
+        rw [heq]
+        exact hi)
     have hb0 : (algebraMap (𝓞 D.host.E) D.host.E b) ≠ 0 :=
       IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
     have hy' : (b : 𝓞 D.host.E) • y ∈ Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) :=
       Submodule.subset_span hy
-    have hy'' : (algebraMap (𝓞 D.host.E) D.host.E b) • y ∈
-        Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) := by
+    have hy''
+        : (algebraMap (𝓞 D.host.E) D.host.E b) • y
+          ∈ Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) := by
       simpa only [algebraMap_smul] using hy'
-    have := (Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E b)⁻¹ hy''
+    have :=
+      (Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E))).smul_mem
+        (algebraMap (𝓞 D.host.E) D.host.E b)⁻¹ hy''
     rw [smul_smul, inv_mul_cancel₀ hb0, one_smul] at this
     exact this
-  exact exists_dual_family S.gram (gram_star S) (gram_det_isUnit S) Λ h.1.fg hspan
-    fun y hy => (h.2 y).2 hy
+  exact exists_dual_family S.gram (gram_star S) (gram_det_isUnit S) Λ h.1.fg hspan fun y hy =>
+    (h.2 y).2 hy
 
 end GlobalTheory.LatVacDual

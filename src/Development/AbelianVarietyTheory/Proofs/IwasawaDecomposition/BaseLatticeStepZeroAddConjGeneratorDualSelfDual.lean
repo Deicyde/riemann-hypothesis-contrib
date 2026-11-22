@@ -8,18 +8,25 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.Joints
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.TC
 
-theorem base_sup_dual_eq {E : Type} [Field E] [NumberField E] (σ : E →+* E) {n : ℕ}
-    (Lb M : Submodule (𝓞 E) (Fin n → E)) (π pb : 𝓞 E) (hpb : (pb : E) = σ (π : E))
+theorem base_sup_dual_eq
+    {E : Type} [Field E] [NumberField E]
+    (σ : E →+* E)
+    {n : ℕ} (Lb M : Submodule (𝓞 E) (Fin n → E))
+    (π pb : 𝓞 E) (hpb : (pb : E) = σ (π : E))
     (hspan : Submodule.span E (Lb : Set (Fin n → E)) = ⊤)
     (hL : ∀ x, x ∈ Lb ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → π ∣ r))
-    (hM : ∀ x, x ∈ M ↔ ∀ j, x j ∈ (algebraMap (𝓞 E) E).range) :
-    Lb ⊔ Ideal.span {pb} • Submodule.span (𝓞 E) (dualSet σ (1 : Matrix (Fin n) (Fin n) E) Lb) = M := by
-  have hform1 : ∀ x y : Fin n → E, hform σ (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
+    (hM : ∀ x, x ∈ M ↔ ∀ j, x j ∈ (algebraMap (𝓞 E) E).range)
+    : Lb ⊔ Ideal.span {pb} • Submodule.span (𝓞 E) (dualSet σ (1 : Matrix (Fin n) (Fin n) E) Lb)
+      = M := by
+  have hform1
+      : ∀ x y : Fin n → E, hform σ (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
     intro x y
     unfold hform
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -70,7 +77,9 @@ theorem base_sup_dual_eq {E : Type} [Field E] [NumberField E] (σ : E →+* E) {
     have hl : l.1 + 1 = n := by simp [l]; omega
     have hπ : π ≠ 0 := by
       rintro rfl
-      have hle : Submodule.span E (Lb : Set (Fin n → E)) ≤ LinearMap.ker (LinearMap.proj (R := E) (φ := fun _ : Fin n => E) l) := by
+      have hle
+          : Submodule.span E (Lb : Set (Fin n → E))
+            ≤ LinearMap.ker (LinearMap.proj (R := E) (φ := fun _ : Fin n => E) l) := by
         refine Submodule.span_le.2 fun z hz => ?_
         obtain ⟨r, hr, hd⟩ := (hL z).1 hz l
         have : r = 0 := zero_dvd_iff.1 (hd hl)
@@ -101,7 +110,10 @@ theorem base_sup_dual_eq {E : Type} [Field E] [NumberField E] (σ : E →+* E) {
         exact ⟨0, by simp, fun _ => dvd_zero _⟩
       · obtain ⟨r, hr⟩ := hxi j
         refine ⟨r, by simp [h, hr], fun hj => absurd (Fin.ext (by simp [l]; omega)) h⟩
-    have hx'' : Pi.single l (x l) ∈ Ideal.span {pb} • Submodule.span (𝓞 E) (dualSet σ (1 : Matrix (Fin n) (Fin n) E) Lb) := by
+    have hx''
+        : Pi.single l (x l)
+          ∈ Ideal.span {pb}
+            • Submodule.span (𝓞 E) (dualSet σ (1 : Matrix (Fin n) (Fin n) E) Lb) := by
       rw [Submodule.ideal_span_singleton_smul]
       refine ⟨_, Submodule.subset_span hy, ?_⟩
       funext j
@@ -120,16 +132,37 @@ end GlobalTheory.Mem.Col2.TC
 
 namespace GlobalTheory.Mem.Col2.TC
 
-
 set_option maxHeartbeats 4000000 in
-theorem base_step_zero_tied : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ∀ (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z)) (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u)) (A : ∀ u, Formalism.L2.Herm.AtT (I.rec7 l Z) u (H.vT u) (H.Fv u)), (∀ u, I.StdF l Z u (F u) ∧ I.StdLvC l Z u (F u)) → CarH H F → CarT H F A → ∀ u (pb : 𝓞 (I.rec7 l Z).host.E), (pb : (I.rec7 l Z).host.E) = (I.rec7 l Z).host.conj ((A u).piU : (I.rec7 l Z).host.E) → (H.lev0 u).Lb ⊔ Ideal.span {pb} • Submodule.span (𝓞 (I.rec7 l Z).host.E) (dualSet ((I.rec7 l Z).sp.cm.sig : (I.rec7 l Z).host.E →+* (I.rec7 l Z).host.E) (I.rec7 l Z).sp.gram0 (H.lev0 u).Lb) = (I.rec7 l Z).sp.crdLat0 ((I.rec7 l Z).sp.X 0).L0 := by
+theorem base_step_zero_tied
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)),
+          ∀ (H : Formalism.L2.Herm.HermColsCh (I.rec7 l Z))
+              (F : ∀ u, FormsTiedSym (I.rec7 l Z) u (H.Ch u) (H.chOf u))
+              (A : ∀ u, Formalism.L2.Herm.AtT (I.rec7 l Z) u (H.vT u) (H.Fv u)),
+            (∀ u, I.StdF l Z u (F u) ∧ I.StdLvC l Z u (F u)) → CarH H F → CarT H F A
+              → ∀ u (pb : 𝓞 (I.rec7 l Z).host.E),
+                (pb : (I.rec7 l Z).host.E)
+                    = (I.rec7 l Z).host.conj ((A u).piU : (I.rec7 l Z).host.E)
+                  → (H.lev0 u).Lb
+                      ⊔ Ideal.span {pb} • Submodule.span (𝓞 (I.rec7 l Z).host.E)
+                        (dualSet
+                          ((I.rec7 l Z).sp.cm.sig : (I.rec7 l Z).host.E →+* (I.rec7 l Z).host.E)
+                          (I.rec7 l Z).sp.gram0 (H.lev0 u).Lb)
+                    = (I.rec7 l Z).sp.crdLat0 ((I.rec7 l Z).sp.X 0).L0 := by
   intro B X I hI hP l Z H F A hS hH hT u pb hpb
   obtain ⟨-, -, -, hN⟩ := GlobalTheory.T.trueColumn_spaces_standard_in_frameCoords I hI hP l Z
   obtain ⟨hgram, hl0, -⟩ := hN 0 (Nat.zero_le _)
   have hgram0 : (I.rec7 l Z).sp.gram0 = 1 := by
     refine Matrix.ext fun a b => ?_
-    have := congrFun (congrFun hgram (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) a)) (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) b)
-    have e : (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) a = Fin.cast (rank_eq_first_level (I.rec7 l Z).R) b) ↔ a = b := by simp [Fin.ext_iff]
+    have :=
+      congrFun (congrFun hgram (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) a))
+        (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) b)
+    have e
+        : (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) a
+            = Fin.cast (rank_eq_first_level (I.rec7 l Z).R) b)
+          ↔ a = b := by
+      simp [Fin.ext_iff]
     simp only [Matrix.one_apply, e] at this
     rw [Matrix.one_apply]
     exact this
@@ -139,9 +172,13 @@ theorem base_step_zero_tied : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.
   have hπ : (A u).piU = X.piT u := (hT.piU u).symm.trans (hS u).1.piU
   refine base_sup_dual_eq _ _ _ (X.piT u) pb ?_ (H.lev0 u).Lb_span ?_ ?_
   · have e := congrArg (fun t : 𝓞 B.host.E => (t : B.host.E)) hπ
-    exact hpb.trans ((congrArg (I.rec7 l Z).host.conj e).trans (Formalism.MainNotions.GlobalTheoryTheory.jnt_sig_eq_conj (I.rec7 l Z) _).symm)
+    exact hpb.trans ((congrArg (I.rec7 l Z).host.conj e).trans
+      (Formalism.MainNotions.GlobalTheoryTheory.jnt_sig_eq_conj (I.rec7 l Z) _).symm)
   · intro x
-    have e1 : x ∈ (H.lev0 u).Lb ↔ reV (rank_eq_first_level (I.rec7 l Z).R) _ x ∈ ((F u).cls 0 (Nat.zero_le _) (Or.inl rfl)).lev.Lb := by
+    have e1
+        : x ∈ (H.lev0 u).Lb
+          ↔ reV (rank_eq_first_level (I.rec7 l Z).R) _ x
+            ∈ ((F u).cls 0 (Nat.zero_le _) (Or.inl rfl)).lev.Lb := by
       rw [hLb]
       constructor
       · exact fun h => ⟨x, h, rfl⟩
@@ -157,8 +194,10 @@ theorem base_step_zero_tied : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.
       obtain ⟨r, hr, hd⟩ := h (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j)
       exact ⟨r, hr, fun hj => hd (hj.trans (rank_eq_first_level _).symm)⟩
   · intro x
-    have e1 : (fun j => x (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j)) ∈ selfDualLatticeCoords (I.rec7 l Z) 0 (Nat.zero_le _) ↔
-        x ∈ (I.rec7 l Z).sp.crdLat0 ((I.rec7 l Z).sp.X 0).L0 := by
+    have e1
+        : (fun j => x (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j))
+            ∈ selfDualLatticeCoords (I.rec7 l Z) 0 (Nat.zero_le _)
+          ↔ x ∈ (I.rec7 l Z).sp.crdLat0 ((I.rec7 l Z).sp.X 0).L0 := by
       constructor
       · rintro ⟨v, hv, e⟩
         refine ⟨v, hv, ?_⟩
@@ -169,6 +208,9 @@ theorem base_step_zero_tied : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.
         funext j
         exact congrFun e (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j)
     refine e1.symm.trans ((hl0 _).trans ?_)
-    exact ⟨fun h j => h (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) j), fun h j => h (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j)⟩
+    exact ⟨
+      fun h j => h (Fin.cast (rank_eq_first_level (I.rec7 l Z).R) j),
+      fun h j => h (Fin.cast (rank_eq_first_level (I.rec7 l Z).R).symm j)
+    ⟩
 
 end GlobalTheory.Mem.Col2.TC

@@ -13,23 +13,26 @@ section
 
 variable {o Ω : Type*} [CommRing o] [Field Ω] [Algebra o Ω] {J : Type*}
 
-theorem exists_finite_span_isIntegral_chart [IsDedekindDomain o] [CharZero Ω] [Finite J]
-    (t : J → Ω) {i : J} (hi : t i ≠ 0)
+theorem exists_finite_span_isIntegral_chart
+    [IsDedekindDomain o] [CharZero Ω] [Finite J]
+    (t : J → Ω)
+    {i : J} (hi : t i ≠ 0)
     (hfin : Module.Finite
-      (Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i})) Ω) :
-    ∃ G : Set Ω, G.Finite ∧
-      (∀ x ∈ G, IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x) ∧
-      ∀ x, IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x →
-        x ∈ Submodule.span (Algebra.adjoin o (Set.range fun j => t j / t i)) G := by
+      (Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i})) Ω)
+    : ∃ G : Set Ω,
+      G.Finite ∧ (∀ x ∈ G, IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x)
+        ∧ ∀ x,
+          IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x
+            → x ∈ Submodule.span (Algebra.adjoin o (Set.range fun j => t j / t i)) G := by
   set A := Algebra.adjoin o (Set.range fun j => t j / t i) with hA
   haveI : Algebra.FiniteType o A := .adjoin_of_finite (Set.finite_range _)
-  have hK : Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i}) ≤
-      Subfield.closure (A : Set Ω) := by
+  have hK
+      : Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i})
+        ≤ Subfield.closure (A : Set Ω) := by
     refine Subfield.closure_le.mpr ?_
     rintro x (⟨a, rfl⟩ | ⟨k, j, rfl⟩)
     · exact Subfield.subset_closure (A.algebraMap_mem a)
-    · have : t j / t k = (t j / t i) / (t k / t i) := by
-        rw [div_div_div_cancel_right₀ hi]
+    · have : t j / t k = (t j / t i) / (t k / t i) := by rw [div_div_div_cancel_right₀ hi]
       rw [this]
       exact div_mem (Subfield.subset_closure (Algebra.subset_adjoin ⟨j, rfl⟩))
         (Subfield.subset_closure (Algebra.subset_adjoin ⟨k, rfl⟩))
@@ -73,26 +76,30 @@ theorem exists_finite_span_isIntegral_chart [IsDedekindDomain o] [CharZero Ω] [
   · rw [Submodule.span_image, hs]
     exact ⟨⟨x, hx⟩, trivial, rfl⟩
 
-theorem exists_mul_pow_mem_chart (t : J → Ω) {i : J} (j : J) (hi : t i ≠ 0) {r : Ω}
-    (hr : r ∈ Algebra.adjoin o (Set.range fun k => t k / t i)) :
-    ∃ n : ℕ, r * (t i / t j) ^ n ∈ Algebra.adjoin o (Set.range fun k => t k / t j) := by
+theorem exists_mul_pow_mem_chart
+    (t : J → Ω)
+    {i : J}
+    (j : J) (hi : t i ≠ 0)
+    {r : Ω} (hr : r ∈ Algebra.adjoin o (Set.range fun k => t k / t i))
+    : ∃ n : ℕ, r * (t i / t j) ^ n ∈ Algebra.adjoin o (Set.range fun k => t k / t j) := by
   have hu : t i / t j ∈ Algebra.adjoin o (Set.range fun k => t k / t j) :=
     Algebra.subset_adjoin ⟨i, rfl⟩
   induction hr using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨k, rfl⟩ := hx
     refine ⟨1, ?_⟩
-    have : t k / t i * (t i / t j) ^ 1 = t k / t j := by
-      rw [pow_one, div_mul_div_cancel₀ hi]
+    have : t k / t i * (t i / t j) ^ 1 = t k / t j := by rw [pow_one, div_mul_div_cancel₀ hi]
     rw [this]
     exact Algebra.subset_adjoin ⟨k, rfl⟩
-  | algebraMap a => exact ⟨0, by simp⟩
+  | algebraMap a =>
+    exact ⟨0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨n, hx⟩ := hx
     obtain ⟨m, hy⟩ := hy
     refine ⟨n + m, ?_⟩
-    have : (x + y) * (t i / t j) ^ (n + m) = x * (t i / t j) ^ n * (t i / t j) ^ m +
-      y * (t i / t j) ^ m * (t i / t j) ^ n := by ring
+    have : (x + y) * (t i / t j) ^ (n + m)
+        = x * (t i / t j) ^ n * (t i / t j) ^ m + y * (t i / t j) ^ m * (t i / t j) ^ n := by
+      ring
     rw [this]
     exact add_mem (mul_mem hx (pow_mem hu _)) (mul_mem hy (pow_mem hu _))
   | mul x y _ _ hx hy =>
@@ -103,9 +110,11 @@ theorem exists_mul_pow_mem_chart (t : J → Ω) {i : J} (j : J) (hi : t i ≠ 0)
     rw [this]
     exact mul_mem hx hy
 
-theorem exists_isIntegral_mul_pow_of_subalgebra (A B : Subalgebra o Ω) {u : Ω} (hu : u ∈ B)
-    (hr : ∀ r ∈ A, ∃ n : ℕ, r * u ^ n ∈ B) {z : Ω} (hz : IsIntegral A z) :
-    ∃ N : ℕ, ∀ M, N ≤ M → IsIntegral B (z * u ^ M) := by
+theorem exists_isIntegral_mul_pow_of_subalgebra
+    (A B : Subalgebra o Ω)
+    {u : Ω} (hu : u ∈ B) (hr : ∀ r ∈ A, ∃ n : ℕ, r * u ^ n ∈ B)
+    {z : Ω} (hz : IsIntegral A z)
+    : ∃ N : ℕ, ∀ M, N ≤ M → IsIntegral B (z * u ^ M) := by
   have hB : ∀ x ∈ B, IsIntegral B x := fun x hx => isIntegral_algebraMap (x := (⟨x, hx⟩ : B))
   suffices ∃ N : ℕ, IsIntegral B (z * u ^ N) by
     obtain ⟨N, hN⟩ := this
@@ -134,8 +143,11 @@ theorem exists_isIntegral_mul_pow_of_subalgebra (A B : Subalgebra o Ω) {u : Ω}
     intro h
     rw [hq.natDegree_eq_zero.mp h] at hqz
     simp at hqz
-  refine ⟨N, IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (u ^ N))
-    ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_⟩
+  refine ⟨
+    N,
+    IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (u ^ N))
+      ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_
+  ⟩
   · rw [mul_comm, scaleRoots_eval_mul, hqz, mul_zero]
     exact isIntegral_zero
   · rw [coeff_scaleRoots]
@@ -145,11 +157,14 @@ theorem exists_isIntegral_mul_pow_of_subalgebra (A B : Subalgebra o Ω) {u : Ω}
     · simpa [hq.coeff_natDegree] using isIntegral_one
     · simpa [coeff_eq_zero_of_natDegree_lt h] using isIntegral_zero
 
-theorem exists_sum_mul_pow_div_eq_one [Fintype J] (t : J → Ω) (ht : ∃ i, t i ≠ 0) (e : ℕ) {w : Ω}
-    (hw0 : w ≠ 0) (hw : ∀ i, t i ≠ 0 →
-      IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) (w / t i ^ e))
-    (C : Subalgebra o Ω) (hC : ∀ i, t i ^ e / w ∈ C) :
-    ∃ c : J → C, ∑ i, (c i : Ω) * (t i ^ e / w) = 1 := by
+theorem exists_sum_mul_pow_div_eq_one
+    [Fintype J]
+    (t : J → Ω) (ht : ∃ i, t i ≠ 0)
+    (e : ℕ)
+    {w : Ω} (hw0 : w ≠ 0)
+    (hw : ∀ i, t i ≠ 0 → IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) (w / t i ^ e))
+    (C : Subalgebra o Ω) (hC : ∀ i, t i ^ e / w ∈ C)
+    : ∃ c : J → C, ∑ i, (c i : Ω) * (t i ^ e / w) = 1 := by
   let y : J → C.toSubring := fun i => ⟨_, hC i⟩
   by_cases hI : Ideal.span (Set.range y) = ⊤
   · obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.mp ((Ideal.eq_top_iff_one _).mp hI)
@@ -161,8 +176,8 @@ theorem exists_sum_mul_pow_div_eq_one [Fintype J] (t : J → Ω) (ht : ∃ i, t 
   exfalso
   obtain ⟨V, hV, hV'⟩ := Ideal.image_subset_nonunits_valuationSubring _ hI
   obtain ⟨i₀, hi₀⟩ := ht
-  obtain ⟨i, -, hi⟩ := Finset.exists_max_image Finset.univ (fun j => V.valuation (t j))
-    ⟨i₀, Finset.mem_univ _⟩
+  obtain ⟨i, -, hi⟩ :=
+    Finset.exists_max_image Finset.univ (fun j => V.valuation (t j)) ⟨i₀, Finset.mem_univ _⟩
   have hv : 0 < V.valuation (t i) :=
     ((V.valuation.pos_iff).mpr hi₀).trans_le (hi _ (Finset.mem_univ _))
   have hti : t i ≠ 0 := (V.valuation.pos_iff).mp hv
@@ -178,8 +193,9 @@ theorem exists_sum_mul_pow_div_eq_one [Fintype J] (t : J → Ω) (ht : ∃ i, t 
     | mul x y _ _ hx hy => exact mul_mem hx hy
   have h1 : IsIntegral V (w / t i ^ e) :=
     (hw i hti).map_of_comp_eq (T := V)
-      ((Algebra.adjoin o (Set.range fun j => t j / t i)).val.toRingHom.codRestrict V
-        fun x => hle x x.2) (RingHom.id Ω) rfl
+      ((Algebra.adjoin o (Set.range fun j => t j / t i)).val.toRingHom.codRestrict V fun x =>
+        hle x x.2)
+      (RingHom.id Ω) rfl
   obtain ⟨v, hv1⟩ := IsIntegrallyClosed.isIntegral_iff.mp h1
   have h2 : V.valuation (w / t i ^ e) ≤ 1 := by
     rw [V.valuation_le_one_iff, ← hv1]
@@ -192,16 +208,24 @@ theorem exists_sum_mul_pow_div_eq_one [Fintype J] (t : J → Ω) (ht : ∃ i, t 
 
 end
 
-theorem exists_tuple_normalisation_charts (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω]
-    [IsDedekindDomain o] [CharZero Ω] (_hinj : Function.Injective (algebraMap o Ω)) (J : Type)
-    [Fintype J] (t : J → Ω) (ht : ∃ i, t i ≠ 0)
+theorem exists_tuple_normalisation_charts
+    (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [IsDedekindDomain o] [CharZero Ω]
+    (_hinj : Function.Injective (algebraMap o Ω))
+    (J : Type) [Fintype J]
+    (t : J → Ω) (ht : ∃ i, t i ≠ 0)
     (hfin : Module.Finite
-      (Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i})) Ω) :
-    ∃ (e n : ℕ) (z : Fin (n + 1) → Ω), 1 ≤ e ∧ (∀ i, ∃ k, z k = t i ^ e) ∧
-      (∀ i, t i ≠ 0 → ∀ x, x ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) ↔
-        IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x) ∧
-      ∀ k, z k ≠ 0 → ∃ c : J → Algebra.adjoin o (Set.range fun l => z l / z k),
-        ∑ i, (c i : Ω) * (t i ^ e / z k) = 1 := by
+      (Subfield.closure (Set.range (algebraMap o Ω) ∪ {x | ∃ i j, x = t j / t i})) Ω)
+    : ∃ (e n : ℕ) (z : Fin (n + 1) → Ω),
+      1 ≤ e ∧ (∀ i, ∃ k, z k = t i ^ e)
+        ∧ (∀ i,
+          t i ≠ 0
+            → ∀ x,
+              x ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e)
+                ↔ IsIntegral (Algebra.adjoin o (Set.range fun j => t j / t i)) x)
+        ∧ ∀ k,
+          z k ≠ 0
+            → ∃ c : J → Algebra.adjoin o (Set.range fun l => z l / z k),
+              ∑ i, (c i : Ω) * (t i ^ e / z k) = 1 := by
   let A : J → Subalgebra o Ω := fun i => Algebra.adjoin o (Set.range fun j => t j / t i)
   have hA : ∀ i, ∀ x ∈ A i, IsIntegral (A i) x := fun i x hx =>
     isIntegral_algebraMap (x := (⟨x, hx⟩ : A i))
@@ -213,12 +237,12 @@ theorem exists_tuple_normalisation_charts (o Ω : Type) [CommRing o] [Field Ω] 
     exists_isIntegral_mul_pow_of_subalgebra (A a.1.1) (A a.2) (hmem a.2 a.1.1)
       (fun r hr => exists_mul_pow_mem_chart t a.2 a.1.1.2 hr) (hGi _ _ a.1.2.2)
   obtain ⟨d, hd⟩ := (Set.finite_range N).bddAbove
-  let Z : Set Ω := Set.range (fun a : J × J => t a.1 ^ d * t a.2) ∪
-    Set.range (fun a : (Σ i, G i) => (a.2 : Ω) * t a.1 ^ (d + 1))
+  let Z : Set Ω :=
+    Set.range (fun a : J × J => t a.1 ^ d * t a.2)
+      ∪ Set.range (fun a : (Σ i, G i) => (a.2 : Ω) * t a.1 ^ (d + 1))
   have hZ : Z.Finite := (Set.finite_range _).union (Set.finite_range _)
   obtain ⟨n, z, -, hz⟩ := hZ.fin_param
-  have hzt : ∀ i j, ∃ k, z k = t i ^ d * t j := fun i j =>
-    (hz.ge (Or.inl ⟨(i, j), rfl⟩) :)
+  have hzt : ∀ i j, ∃ k, z k = t i ^ d * t j := fun i j => (hz.ge (Or.inl ⟨(i, j), rfl⟩) :)
   obtain _ | n := n
   · obtain ⟨i, -⟩ := ht
     obtain ⟨k, -⟩ := hzt i i
@@ -235,10 +259,17 @@ theorem exists_tuple_normalisation_charts (o Ω : Type) [CommRing o] [Field Ω] 
       rw [this]
       exact hN (a, i) _ ((hd ⟨_, rfl⟩).trans (Nat.le_succ d))
   have hzp : ∀ i, ∃ k, z k = t i ^ (d + 1) := fun i => by simpa [pow_succ] using hzt i i
-  refine ⟨d + 1, n, z, Nat.le_add_left _ _, hzp, fun i hi x => ⟨fun hx => ?_, fun hx => ?_⟩,
-    fun k hk => exists_sum_mul_pow_div_eq_one t ht _ hk (hzi k) _ fun i => ?_⟩
-  · have : Algebra.adjoin o (Set.range fun k => z k / t i ^ (d + 1)) ≤
-        (integralClosure (A i) Ω).restrictScalars o := by
+  refine ⟨
+    d + 1,
+    n,
+    z,
+    Nat.le_add_left _ _,
+    hzp,
+    fun i hi x => ⟨fun hx => ?_, fun hx => ?_⟩,
+    fun k hk => exists_sum_mul_pow_div_eq_one t ht _ hk (hzi k) _ fun i => ?_
+  ⟩
+  · have : Algebra.adjoin o (Set.range fun k => z k / t i ^ (d + 1))
+        ≤ (integralClosure (A i) Ω).restrictScalars o := by
       refine Algebra.adjoin_le ?_
       rintro _ ⟨k, rfl⟩
       exact hzi k i hi

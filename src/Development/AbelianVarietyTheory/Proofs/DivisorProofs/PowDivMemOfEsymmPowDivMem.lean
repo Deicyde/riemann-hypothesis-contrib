@@ -8,11 +8,15 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem pow_div_mem_of_esymm_pow_div_mem (K : Type) [Field K] (V : ValuationSubring K)
-    (A : Type) [Fintype A] (x : A → K) (D : ℕ) (c : K) (hc : c ≠ 0)
-    (h : ∀ k : ℕ, 1 ≤ k → k ≤ Fintype.card A →
-      k ∣ D ∧ (Finset.univ.val.map x).esymm k ^ (D / k) / c ∈ V) (a : A) :
-    x a ^ D / c ∈ V := by
+theorem pow_div_mem_of_esymm_pow_div_mem
+    (K : Type) [Field K]
+    (V : ValuationSubring K)
+    (A : Type) [Fintype A]
+    (x : A → K) (D : ℕ) (c : K) (hc : c ≠ 0)
+    (h : ∀ k : ℕ,
+      1 ≤ k → k ≤ Fintype.card A → k ∣ D ∧ (Finset.univ.val.map x).esymm k ^ (D / k) / c ∈ V)
+    (a : A)
+    : x a ^ D / c ∈ V := by
   classical
   set v := V.valuation with hv
   set s : Multiset K := Finset.univ.val.map x with hs
@@ -45,18 +49,24 @@ theorem pow_div_mem_of_esymm_pow_div_mem (K : Type) [Field K] (V : ValuationSubr
     exact Multiset.mem_map.mpr ⟨x a, by simp [s], sub_self _⟩
   rw [Multiset.prod_X_sub_X_eq_sum_esymm, Polynomial.eval_finsetSum, Finset.sum_range_succ'] at h0
   simp only [eval_mul, eval_pow, eval_neg, eval_one, eval_C, eval_X, pow_zero, one_mul,
-    Nat.sub_zero] at h0
+      Nat.sub_zero]
+    at h0
   have he0 : s.esymm 0 = 1 := by simp [Multiset.esymm, Multiset.powersetCard_zero_left]
   rw [he0, one_mul, ← eq_neg_iff_add_eq_zero] at h0
-  have hlt2 : v (∑ j ∈ Finset.range (Multiset.card s),
-      (-1) ^ (j + 1) * (s.esymm (j + 1) * x a ^ (Multiset.card s - (j + 1)))) < v (x a) ^ Multiset.card s := by
+  have hlt2
+      : v
+          (∑ j ∈ Finset.range (Multiset.card s),
+            (-1) ^ (j + 1) * (s.esymm (j + 1) * x a ^ (Multiset.card s - (j + 1))))
+        < v (x a) ^ Multiset.card s := by
     apply Valuation.map_sum_lt _ (pow_ne_zero _ hpos.ne')
     intro j hj
     have hj' : j + 1 ≤ Multiset.card s := Finset.mem_range.mp hj
     rw [map_mul, map_mul, map_pow, map_pow, Valuation.map_neg, map_one, one_pow, one_mul]
-    calc v (s.esymm (j + 1)) * v (x a) ^ (Multiset.card s - (j + 1))
-        < v (x a) ^ (j + 1) * v (x a) ^ (Multiset.card s - (j + 1)) :=
-          mul_lt_mul_of_pos_right (key (j + 1) (Nat.succ_le_succ (Nat.zero_le _)) hj') (pow_pos hpos _)
+    calc
+      v (s.esymm (j + 1)) * v (x a) ^ (Multiset.card s - (j + 1))
+          < v (x a) ^ (j + 1) * v (x a) ^ (Multiset.card s - (j + 1)) :=
+        mul_lt_mul_of_pos_right (key (j + 1) (Nat.succ_le_succ (Nat.zero_le _)) hj')
+          (pow_pos hpos _)
       _ = v (x a) ^ Multiset.card s := by rw [← pow_add, Nat.add_sub_cancel' hj']
   rw [h0, Valuation.map_neg, map_pow] at hlt2
   exact lt_irrefl _ hlt2

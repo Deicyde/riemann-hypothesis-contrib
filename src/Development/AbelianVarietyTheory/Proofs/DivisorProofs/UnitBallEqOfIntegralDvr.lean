@@ -6,15 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem unitBall_eq_of_integral_dvr (p : ℕ) [Fact p.Prime] (V W : Type) [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Algebra V W]
-    [Algebra.IsIntegral V W] [IsLocalHom (algebraMap V W)]
+theorem unitBall_eq_of_integral_dvr
+    (p : ℕ) [Fact p.Prime]
+    (V W : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CommRing W] [IsDomain W]
+    [IsDiscreteValuationRing W] [Algebra V W] [Algebra.IsIntegral V W] [IsLocalHom (algebraMap V W)]
     (hinj : Function.Injective (algebraMap V W))
     (κ : FractionRing V →+* PadicAlgCl p) (κ' : FractionRing W →+* PadicAlgCl p)
-    (hc : ∀ v : V, κ' (algebraMap W (FractionRing W) (algebraMap V W v)) =
-      κ (algebraMap V (FractionRing V) v))
-    (hV : ∀ x, ‖κ x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap V (FractionRing V))) :
-    ∀ x, ‖κ' x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap W (FractionRing W)) := by
+    (hc : ∀ v : V,
+      κ' (algebraMap W (FractionRing W) (algebraMap V W v)) = κ (algebraMap V (FractionRing V) v))
+    (hV : ∀ x, ‖κ x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap V (FractionRing V)))
+    : ∀ x, ‖κ' x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap W (FractionRing W)) := by
   classical
   have hW1 : ∀ w : W, ‖κ' (algebraMap W (FractionRing W) w)‖ ≤ 1 := by
     intro w
@@ -24,13 +25,13 @@ theorem unitBall_eq_of_integral_dvr (p : ℕ) [Fact p.Prime] (V W : Type) [CommR
       rw [Valuation.mem_integer_iff]
       show ‖κ (algebraMap V (FractionRing V) a)‖₊ ≤ 1
       exact NNReal.coe_le_coe.1 (by simpa using (hV _).2 ⟨a, rfl⟩)
-    let ψ : V →+* vP.integer :=
-      (κ.comp (algebraMap V (FractionRing V))).codRestrict vP.integer hmem
+    let ψ : V →+* vP.integer := (κ.comp (algebraMap V (FractionRing V))).codRestrict vP.integer hmem
     obtain ⟨q, hqm, hq⟩ := Algebra.IsIntegral.isIntegral (R := V) w
     have hint : IsIntegral vP.integer (κ' (algebraMap W (FractionRing W) w)) := by
       refine ⟨q.map ψ, hqm.map ψ, ?_⟩
-      have hcomp : (algebraMap vP.integer (PadicAlgCl p)).comp ψ =
-          (κ'.comp (algebraMap W (FractionRing W))).comp (algebraMap V W) :=
+      have hcomp
+          : (algebraMap vP.integer (PadicAlgCl p)).comp ψ
+            = (κ'.comp (algebraMap W (FractionRing W))).comp (algebraMap V W) :=
         RingHom.ext fun a => (hc a).symm
       rw [Polynomial.eval₂_map, hcomp]
       have h0 : (κ'.comp (algebraMap W (FractionRing W))) (q.eval₂ (algebraMap V W) w) = 0 := by
@@ -43,8 +44,9 @@ theorem unitBall_eq_of_integral_dvr (p : ℕ) [Fact p.Prime] (V W : Type) [CommR
     simpa using h3
   have hunit : ∀ u : Wˣ, ‖κ' (algebraMap W (FractionRing W) u)‖ = 1 := by
     intro u
-    have hm : ‖κ' (algebraMap W (FractionRing W) u)‖ *
-        ‖κ' (algebraMap W (FractionRing W) ↑u⁻¹)‖ = 1 := by
+    have hm
+        : ‖κ' (algebraMap W (FractionRing W) u)‖ * ‖κ' (algebraMap W (FractionRing W) ↑u⁻¹)‖
+          = 1 := by
       rw [← norm_mul, ← map_mul, ← map_mul, Units.mul_inv, map_one, map_one, norm_one]
     have ha := hW1 u
     have hb := hW1 ↑u⁻¹
@@ -64,8 +66,7 @@ theorem unitBall_eq_of_integral_dvr (p : ℕ) [Fact p.Prime] (V W : Type) [CommR
     rw [map_mul, ha, mul_inv_cancel₀ hπK0, map_one]
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible W
   have hϖ1 : ‖κ' (algebraMap W (FractionRing W) ϖ)‖ < 1 := by
-    have hπW0 : algebraMap V W π ≠ 0 := fun h =>
-      hπ.ne_zero (hinj (h.trans (map_zero _).symm))
+    have hπW0 : algebraMap V W π ≠ 0 := fun h => hπ.ne_zero (hinj (h.trans (map_zero _).symm))
     obtain ⟨e, u, he⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hπW0 hϖ
     have he0 : e ≠ 0 := by
       rintro rfl

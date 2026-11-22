@@ -10,14 +10,15 @@ open GlobalTheory.UnitLemma Polynomial IsDedekindDomain
 noncomputable section
 namespace GlobalTheory.FieldUnitsQuotFG
 
-theorem fg_quot_ker {G S : Type} [CommGroup G] [Finite S] (φ : G →* (S → Multiplicative ℤ)) :
-    Group.FG (G ⧸ φ.ker) := by
-  let e : (S → ℤ) ≃+ Additive (S → Multiplicative ℤ) :=
-    { toFun := fun f => Additive.ofMul (fun v => Multiplicative.ofAdd (f v))
-      invFun := fun g v => Multiplicative.toAdd (Additive.toMul g v)
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-      map_add' := fun _ _ => rfl }
+theorem fg_quot_ker {G S : Type} [CommGroup G] [Finite S] (φ : G →* (S → Multiplicative ℤ))
+    : Group.FG (G ⧸ φ.ker) := by
+  let e : (S → ℤ) ≃+ Additive (S → Multiplicative ℤ) := {
+    toFun := fun f => Additive.ofMul (fun v => Multiplicative.ofAdd (f v))
+    invFun := fun g v => Multiplicative.toAdd (Additive.toMul g v)
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+    map_add' := fun _ _ => rfl
+  }
   haveI : Module.Finite ℤ (Additive (S → Multiplicative ℤ)) := Module.Finite.equiv e.toIntLinearEquiv
   have h1 : φ.range.FG := by
     rw [Subgroup.fg_iff_add_fg]
@@ -27,11 +28,12 @@ theorem fg_quot_ker {G S : Type} [CommGroup G] [Finite S] (φ : G →* (S → Mu
   exact Group.fg_of_surjective (f := (QuotientGroup.quotientKerEquivRange φ).symm.toMonoidHom)
     (QuotientGroup.quotientKerEquivRange φ).symm.surjective
 
-variable (K : UQ) (L : Type) [Field L] [Algebra K.O L] [Algebra K.E L] [IsScalarTower K.O K.E L]
-  [FiniteDimensional K.E L]
+variable
+  (K : UQ) (L : Type)
+  [Field L] [Algebra K.O L] [Algebra K.E L] [IsScalarTower K.O K.E L] [FiniteDimensional K.E L]
 
-theorem finite_spec [IsDedekindDomain (integralClosure K.O L)] :
-    Finite (HeightOneSpectrum (integralClosure K.O L)) := by
+theorem finite_spec [IsDedekindDomain (integralClosure K.O L)]
+    : Finite (HeightOneSpectrum (integralClosure K.O L)) := by
   set C := integralClosure K.O L
   have hinj : Function.Injective (algebraMap K.O C) := by
     intro a b h
@@ -61,25 +63,32 @@ theorem finite_spec [IsDedekindDomain (integralClosure K.O L)] :
     ext v; simp [hall v]
   exact Set.finite_univ_iff.1 (huniv ▸ this)
 
-def valHom [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L] :
-    Lˣ →* (HeightOneSpectrum (integralClosure K.O L) → Multiplicative ℤ) :=
-  Pi.monoidHom fun v => WithZero.unitsWithZeroEquiv.toMonoidHom.comp
-    (Units.map ((v.valuation L : Valuation L (WithZero (Multiplicative ℤ))) : L →* WithZero (Multiplicative ℤ)))
+def valHom [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L]
+    : Lˣ →* (HeightOneSpectrum (integralClosure K.O L) → Multiplicative ℤ) :=
+  Pi.monoidHom fun v =>
+    WithZero.unitsWithZeroEquiv.toMonoidHom.comp (Units.map
+      ((v.valuation L : Valuation L (WithZero (Multiplicative ℤ)))
+        : L →* WithZero (Multiplicative ℤ)))
 
-theorem valHom_apply [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L]
-    (x : Lˣ) (v : HeightOneSpectrum (integralClosure K.O L)) :
-    ((valHom K L x v : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) = v.valuation L (x : L) := by
+theorem valHom_apply
+    [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L]
+    (x : Lˣ) (v : HeightOneSpectrum (integralClosure K.O L))
+    : ((valHom K L x v : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+      = v.valuation L (x : L) := by
   show ((WithZero.unitsWithZeroEquiv (Units.map ((v.valuation L : Valuation L (WithZero (Multiplicative ℤ))) :
     L →* WithZero (Multiplicative ℤ)) x) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) = _
   rw [WithZero.coe_unitsWithZeroEquiv_eq_units_val]
   rfl
 
-theorem ker_valHom [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L] :
-    (valHom K L).ker = intUnits K.O L := by
+theorem ker_valHom
+    [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (integralClosure K.O L) L]
+    : (valHom K L).ker = intUnits K.O L := by
   ext x
   rw [MonoidHom.mem_ker]
-  have key : ∀ y : L, IsIntegral K.O y ↔
-      ∀ v : HeightOneSpectrum (integralClosure K.O L), v.valuation L y ≤ 1 := by
+  have key
+      : ∀ y : L,
+        IsIntegral K.O y
+          ↔ ∀ v : HeightOneSpectrum (integralClosure K.O L), v.valuation L y ≤ 1 := by
     intro y
     constructor
     · intro hy v
@@ -90,7 +99,9 @@ theorem ker_valHom [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (i
       obtain ⟨c, hc⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one L y h
       rw [← hc]
       exact c.2
-  have h1 : valHom K L x = 1 ↔ ∀ v : HeightOneSpectrum (integralClosure K.O L), v.valuation L (x : L) = 1 := by
+  have h1
+      : valHom K L x = 1
+        ↔ ∀ v : HeightOneSpectrum (integralClosure K.O L), v.valuation L (x : L) = 1 := by
     rw [funext_iff]
     refine forall_congr' fun v => ?_
     rw [← valHom_apply, Pi.one_apply]
@@ -110,12 +121,15 @@ theorem ker_valHom [IsDedekindDomain (integralClosure K.O L)] [IsFractionRing (i
     apply le_antisymm (ha v)
     have hx : v.valuation L (x : L) * v.valuation L ((x⁻¹ : Lˣ) : L) = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
-    calc 1 = v.valuation L (x : L) * v.valuation L ((x⁻¹ : Lˣ) : L) := hx.symm
+    calc
+      1 = v.valuation L (x : L) * v.valuation L ((x⁻¹ : Lˣ) : L) := hx.symm
       _ ≤ v.valuation L (x : L) * 1 := by gcongr; exact hb v
       _ = v.valuation L (x : L) := mul_one _
 
-theorem fg_units_quot : ∀ (K : UQ) (L : Type) [Field L] [Algebra K.O L] [Algebra K.E L] [IsScalarTower K.O K.E L]
-    [FiniteDimensional K.E L], Group.FG (Lˣ ⧸ intUnits K.O L) := by
+theorem fg_units_quot
+    : ∀ (K : UQ) (L : Type) [Field L] [Algebra K.O L] [Algebra K.E L] [IsScalarTower K.O K.E L]
+        [FiniteDimensional K.E L],
+      Group.FG (Lˣ ⧸ intUnits K.O L) := by
   intro K L _ _ _ _ _
   haveI : IsDedekindDomain (integralClosure K.O L) := integralClosure.isDedekindDomain K.O K.E L
   haveI : IsFractionRing (integralClosure K.O L) L := integralClosure.isFractionRing_of_finite_extension K.E L

@@ -7,10 +7,11 @@ public import GroundTheory.GlobalFields.TateThesis.ArchCharsUnitary
 
 namespace GlobalTheory.CompanionTheory.KlocOp
 
-theorem cstar_char_eq_zpow : ∀ φ : ℂ → ℂ, (∀ z w : ℂ, z ≠ 0 → w ≠ 0 → φ (z * w) = φ z * φ w) →
-    ContinuousOn φ {z : ℂ | z ≠ 0} → (∀ z : ℂ, z ≠ 0 → ‖φ z‖ = 1) →
-    (∀ r : ℝ, 0 < r → φ (r : ℂ) = 1) →
-    ∃ k : ℤ, ∀ z : ℂ, z ≠ 0 → φ z = (z / (‖z‖ : ℂ)) ^ k := by
+theorem cstar_char_eq_zpow
+    : ∀ φ : ℂ → ℂ,
+      (∀ z w : ℂ, z ≠ 0 → w ≠ 0 → φ (z * w) = φ z * φ w) → ContinuousOn φ {z : ℂ | z ≠ 0}
+        → (∀ z : ℂ, z ≠ 0 → ‖φ z‖ = 1) → (∀ r : ℝ, 0 < r → φ (r : ℂ) = 1)
+        → ∃ k : ℤ, ∀ z : ℂ, z ≠ 0 → φ z = (z / (‖z‖ : ℂ)) ^ k := by
   intro φ hmul hc hn h1
   have hmem : ∀ z : ℂˣ, φ (z : ℂ) ∈ Submonoid.unitSphere ℂ := fun z => by
     simpa [Submonoid.unitSphere] using hn z z.ne_zero
@@ -28,17 +29,20 @@ theorem cstar_char_eq_zpow : ∀ φ : ℂ → ℂ, (∀ z w : ℂ, z ≠ 0 → w
     change φ ((a * b : ℂˣ) : ℂ) = φ (a : ℂ) * φ (b : ℂ)
     rw [Units.val_mul]
     exact hmul a b a.ne_zero b.ne_zero
-  let χ : ℂˣ →ₜ* Circle :=
-    { toFun := f, map_one' := hf1, map_mul' := hfm, continuous_toFun := hfc }
+  let χ : ℂˣ →ₜ* Circle := { toFun := f, map_one' := hf1, map_mul' := hfm, continuous_toFun := hfc }
   obtain ⟨⟨m, τ⟩, hp, -⟩ := GroundTheory.Global.existsUnique_complexUnits_circle χ
-  have hp' : ∀ z : ℂˣ, φ (z : ℂ) = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ m *
-      ((‖(z : ℂ)‖ : ℝ) : ℂ) ^ ((τ : ℂ) * Complex.I) := hp
+  have hp'
+      : ∀ z : ℂˣ,
+        φ (z : ℂ)
+          = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ m * ((‖(z : ℂ)‖ : ℝ) : ℂ) ^ ((τ : ℂ) * Complex.I) :=
+    hp
   have hr : ∀ r : ℝ, 0 < r → (r : ℂ) ^ ((τ : ℂ) * Complex.I) = 1 := by
     intro r hr0
     have hne : (r : ℂ) ≠ 0 := by exact_mod_cast hr0.ne'
     have h := hp' (Units.mk0 (r : ℂ) hne)
-    rw [Units.val_mk0, h1 r hr0, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr0,
-      div_self hne, one_zpow, one_mul] at h
+    rw [Units.val_mk0, h1 r hr0, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hr0, div_self hne,
+        one_zpow, one_mul]
+      at h
     exact h.symm
   refine ⟨m, fun z hz => ?_⟩
   have h := hp' (Units.mk0 z hz)

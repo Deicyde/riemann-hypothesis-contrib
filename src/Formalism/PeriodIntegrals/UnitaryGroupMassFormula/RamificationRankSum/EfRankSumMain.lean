@@ -9,10 +9,11 @@ namespace PI.UnitaryGroupMassFormula.EfRankSum
 
 open Formalism.MainNotions.Gaps.EtaleWeightGaps IsLocalRing
 
-theorem sum_ef (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+theorem sum_ef
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     (A : Type) [CommRing A] [Algebra O A] [Module.Finite O ↥(As O A)] [Module.Flat O ↥(As O A)]
-    {ϖ : O} (hϖ : Irreducible ϖ) :
-    (∑ᶠ ζ : Pts O A, ep ϖ ζ * fdeg ζ) = Module.finrank O ↥(As O A) := by
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    : (∑ᶠ ζ : Pts O A, ep ϖ ζ * fdeg ζ) = Module.finrank O ↥(As O A) := by
   classical
   have : Finite (Pts O A) := finite_pts O A
   let : Fintype (Pts O A) := Fintype.ofFinite _

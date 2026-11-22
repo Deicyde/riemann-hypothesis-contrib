@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5.HerC
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.P5
 
 theorem cf_last_isEmpty (r : ℕ) : IsEmpty {l : Fin r // (Fin.last r).val ≤ l.val} :=
   ⟨fun l => by have := l.1.isLt; have := l.2; simp at *; omega⟩

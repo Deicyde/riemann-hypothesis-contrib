@@ -10,8 +10,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -31,9 +33,11 @@ theorem eq_of_choose_eq_one_of_pos {r D : ℕ} (hD : 0 < D) (h : r.choose D = 1)
   · rw [Nat.choose_eq_zero_of_lt hgt] at h
     exact absurd h zero_ne_one
 
-theorem trBasis_of_isFreeGen_dForm : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (Q : Subring L)
-    (hQ : IsLocModel cL Q) (D : ℕ) (x : Fin D → Q), 0 < D →
-    IsFreeGen Q (dForm (cL.codRestrict Q hQ.const_mem) x) → TrBasis cL (fun i => (x i : L)) := by
+theorem trBasis_of_isFreeGen_dForm
+    : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel cL Q) (D : ℕ)
+        (x : Fin D → Q),
+      0 < D → IsFreeGen Q (dForm (cL.codRestrict Q hQ.const_mem) x)
+        → TrBasis cL (fun i => (x i : L)) := by
   intro L _ cL Q hQ D x hD hx
   letI := cL.toAlgebra
   let c0 : ℂ →+* Q := cL.codRestrict Q hQ.const_mem

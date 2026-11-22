@@ -6,14 +6,17 @@ public import Development.EtaleCohomology.TateTwists.EtaleChainCochainExistsOfEv
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.AwExPf
 
 variable {R : Type} [CommRing R]
 
-theorem free_ext (P : PSh) (F : Shv R) (φ ψ : (free R).obj P ⟶ F)
-    (h : ∀ U x, Sec.map φ (freeGen R P U x) = Sec.map ψ (freeGen R P U x)) : φ = ψ := by
+theorem free_ext
+    (P : PSh) (F : Shv R) (φ ψ : (free R).obj P ⟶ F)
+    (h : ∀ U x, Sec.map φ (freeGen R P U x) = Sec.map ψ (freeGen R P U x))
+    : φ = ψ := by
   let φ' : (presheafToSheaf Scheme.etaleTopology _).obj ((freeP R).obj P) ⟶ F := φ
   let ψ' : (presheafToSheaf Scheme.etaleTopology _).obj ((freeP R).obj P) ⟶ F := ψ
   change φ' = ψ'
@@ -22,8 +25,10 @@ theorem free_ext (P : PSh) (F : Shv R) (φ ψ : (free R).obj P ⟶ F)
   refine NatTrans.ext (funext fun U => ModuleCat.free_hom_ext fun x => ?_)
   exact h U.unop x.down
 
-theorem ev_ext {E : Spc} {I : Cx R} {n : ℤ} (α β : Cochain ((chains R).obj E) I n)
-    (h : ∀ p s h U x, ev α p s h U x = ev β p s h U x) : α = β := by
+theorem ev_ext
+    {E : Spc} {I : Cx R} {n : ℤ}
+    (α β : Cochain ((chains R).obj E) I n) (h : ∀ p s h U x, ev α p s h U x = ev β p s h U x)
+    : α = β := by
   refine Cochain.ext _ _ (fun i j hij => ?_)
   by_cases hi : 0 ≤ -i
   · obtain ⟨p, rfl⟩ : ∃ p : ℕ, i = -(p : ℤ) := ⟨(-i).toNat, by omega⟩

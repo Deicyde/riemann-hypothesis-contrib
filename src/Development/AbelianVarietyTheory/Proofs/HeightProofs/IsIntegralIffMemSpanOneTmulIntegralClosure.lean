@@ -13,11 +13,12 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_eq_algebraMap_add_pow_mul {R R' : Type} [CommRing R] [IsLocalRing R]
-    [CommRing R'] [IsLocalRing R'] [Algebra R R'] [IsLocalHom (algebraMap R R')] {ϖ : R}
-    (hϖ : IsLocalRing.maximalIdeal R' = Ideal.span {algebraMap R R' ϖ})
-    (hres : Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R'))) (n : ℕ)
-    (r' : R') : ∃ (r : R) (s : R'), r' = algebraMap R R' r + algebraMap R R' ϖ ^ n * s := by
+theorem exists_eq_algebraMap_add_pow_mul
+    {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R'] [Algebra R R']
+    [IsLocalHom (algebraMap R R')]
+    {ϖ : R} (hϖ : IsLocalRing.maximalIdeal R' = Ideal.span {algebraMap R R' ϖ})
+    (hres : Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R'))) (n : ℕ) (r' : R')
+    : ∃ (r : R) (s : R'), r' = algebraMap R R' r + algebraMap R R' ϖ ^ n * s := by
   have h1 : ∀ r' : R', ∃ (r : R) (s : R'), r' = algebraMap R R' r + algebraMap R R' ϖ * s := by
     intro r'
     obtain ⟨a, ha⟩ := hres (IsLocalRing.residue R' r')
@@ -40,15 +41,17 @@ theorem exists_eq_algebraMap_add_pow_mul {R R' : Type} [CommRing R] [IsLocalRing
 open NumberField in
 open scoped TensorProduct in
 open Polynomial in
-variable (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R']
-  [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R']
-  [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F']
-  [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F']
-  [IsScalarTower R R' F']
-  (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
-  [Algebra R L] [IsScalarTower R F L] in
-private theorem exists_algebraMap_eq_of_algebraMap_eq_algebraMap {c : F} {a : R'}
-    (h : algebraMap F F' c = algebraMap R' F' a) : ∃ r : R, algebraMap R F r = c := by
+variable
+  (R R' F F' : Type)
+  [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R'] [IsDomain R']
+  [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R'] [IsLocalHom (algebraMap R R')]
+  [Field F] [Algebra R F] [IsFractionRing R F] [Field F'] [Algebra R' F'] [IsFractionRing R' F']
+  [Algebra F F'] [Algebra R F'] [IsScalarTower R F F'] [IsScalarTower R R' F']
+  (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L] [Algebra R L]
+  [IsScalarTower R F L] in
+private theorem exists_algebraMap_eq_of_algebraMap_eq_algebraMap
+    {c : F} {a : R'} (h : algebraMap F F' c = algebraMap R' F' a)
+    : ∃ r : R, algebraMap R F r = c := by
   rcases ValuationRing.isInteger_or_isInteger R c with ⟨r, hr⟩ | ⟨r, hr⟩
   · exact ⟨r, hr⟩
   · by_cases hc : c = 0
@@ -65,15 +68,17 @@ private theorem exists_algebraMap_eq_of_algebraMap_eq_algebraMap {c : F} {a : R'
 open NumberField in
 open scoped TensorProduct in
 open Polynomial in
-variable (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R']
-  [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R']
-  [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F']
-  [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F']
-  [IsScalarTower R R' F']
-  (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
-  [Algebra R L] [IsScalarTower R F L] in
-private theorem isIntegral_of_isIntegral_one_tmul' {y : L}
-    (hy : IsIntegral R' ((1 : F') ⊗ₜ[F] y : F' ⊗[F] L)) : IsIntegral R y := by
+variable
+  (R R' F F' : Type)
+  [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R'] [IsDomain R']
+  [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R'] [IsLocalHom (algebraMap R R')]
+  [Field F] [Algebra R F] [IsFractionRing R F] [Field F'] [Algebra R' F'] [IsFractionRing R' F']
+  [Algebra F F'] [Algebra R F'] [IsScalarTower R F F'] [IsScalarTower R R' F']
+  (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L] [Algebra R L]
+  [IsScalarTower R F L] in
+private theorem isIntegral_of_isIntegral_one_tmul'
+    {y : L} (hy : IsIntegral R' ((1 : F') ⊗ₜ[F] y : F' ⊗[F] L))
+    : IsIntegral R y := by
   obtain ⟨p, hpm, hp⟩ := hy
   have hyF : IsIntegral F y := Algebra.IsIntegral.isIntegral y
   set f := minpoly F y with hf
@@ -84,8 +89,7 @@ private theorem isIntegral_of_isIntegral_one_tmul' {y : L}
   have hft : aeval t f' = 0 := by
     rw [hf', aeval_map_algebraMap, ht', aeval_algHom_apply, minpoly.aeval, map_zero]
   set g : F'[X] := p.map (algebraMap R' F') with hg
-  have hgt : aeval t g = 0 := by
-    rw [hg, aeval_map_algebraMap, aeval_def, hp]
+  have hgt : aeval t g = 0 := by rw [hg, aeval_map_algebraMap, aeval_def, hp]
   have hind : LinearIndependent F' fun i : Fin f.natDegree => t ^ (i : ℕ) := by
     have := Module.Flat.linearIndependent_one_tmul (S := F') (linearIndependent_pow (K := F) y)
     convert this using 2 with i
@@ -128,23 +132,33 @@ private theorem isIntegral_of_isIntegral_one_tmul' {y : L}
   refine ⟨q', hq'm, ?_⟩
   rw [← aeval_def, ← aeval_map_algebraMap F, hq'map, hf, minpoly.aeval]
 
-
 open NumberField in
 open scoped TensorProduct in
 open Polynomial in
-theorem _root_.GlobalTheory.isIntegral_iff_mem_span_one_tmul_integralClosure :
-    ∀ (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R'] [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R'] [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F'] [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F'] [IsScalarTower R R' F'], Ideal.map (algebraMap R R') (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal R' → Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R')) → ∀ (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L] [Algebra R L] [IsScalarTower R F L] (x : F' ⊗[F] L), IsIntegral R' x ↔ x ∈ Submodule.span R' ((fun b : L => (1 : F') ⊗ₜ[F] b) '' (integralClosure R L : Set L)) := by
+theorem _root_.GlobalTheory.isIntegral_iff_mem_span_one_tmul_integralClosure
+    : ∀ (R R' F F' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R']
+        [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [Module.Flat R R']
+        [IsLocalHom (algebraMap R R')] [Field F] [Algebra R F] [IsFractionRing R F] [Field F']
+        [Algebra R' F'] [IsFractionRing R' F'] [Algebra F F'] [Algebra R F'] [IsScalarTower R F F']
+        [IsScalarTower R R' F'],
+      Ideal.map (algebraMap R R') (IsLocalRing.maximalIdeal R) = IsLocalRing.maximalIdeal R'
+        → Function.Surjective (IsLocalRing.ResidueField.map (algebraMap R R'))
+        → ∀ (L : Type) [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
+            [Algebra R L] [IsScalarTower R F L] (x : F' ⊗[F] L),
+          IsIntegral R' x
+            ↔ x ∈ Submodule.span R'
+              ((fun b : L => (1 : F') ⊗ₜ[F] b) '' (integralClosure R L : Set L)) := by
   intro R R' F F' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hmax hres L _ _ _ _ _ _ x
   set M := Submodule.span R' ((fun b : L => (1 : F') ⊗ₜ[F] b) '' (integralClosure R L : Set L))
     with hM
   have hMint : ∀ z ∈ M, IsIntegral R' z := by
     intro z hz
-    refine (Submodule.span_le (p := Subalgebra.toSubmodule (integralClosure R' (F' ⊗[F] L)))).2
-      ?_ hz
+    refine (Submodule.span_le (p := Subalgebra.toSubmodule (integralClosure R' (F' ⊗[F] L)))).2 ?_
+      hz
     rintro _ ⟨s, hs, rfl⟩
     have hs' : IsIntegral R s := hs
-    exact (hs'.map (Algebra.TensorProduct.includeRight.restrictScalars R :
-      L →ₐ[R] F' ⊗[F] L)).tower_top
+    exact (hs'.map
+      (Algebra.TensorProduct.includeRight.restrictScalars R : L →ₐ[R] F' ⊗[F] L)).tower_top
   refine ⟨fun hx => ?_, hMint x⟩
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
   set ϖ := algebraMap R R' π with hϖdef
@@ -160,8 +174,9 @@ theorem _root_.GlobalTheory.isIntegral_iff_mem_span_one_tmul_integralClosure :
       rw [← hmax', ← IsLocalRing.residue_eq_zero_iff, map_sub, hc, sub_self]
     obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.1 hmem
     exact ⟨r, b, eq_add_of_sub_eq' (hb.symm.trans (mul_comm _ _))⟩
-  have hsm : ∀ (c : R) (s : L), algebraMap R R' c • ((1 : F') ⊗ₜ[F] s) =
-      (1 : F') ⊗ₜ[F] (algebraMap R L c * s) := by
+  have hsm
+      : ∀ (c : R) (s : L),
+        algebraMap R R' c • ((1 : F') ⊗ₜ[F] s) = (1 : F') ⊗ₜ[F] (algebraMap R L c * s) := by
     intro c s
     rw [TensorProduct.smul_tmul', Algebra.smul_def, mul_one, ← IsScalarTower.algebraMap_apply,
       IsScalarTower.algebraMap_apply R F F', Algebra.algebraMap_eq_smul_one (A := F'),
@@ -178,19 +193,33 @@ theorem _root_.GlobalTheory.isIntegral_iff_mem_span_one_tmul_integralClosure :
       obtain ⟨s, hs, rfl⟩ := hz
       exact ⟨s, hs, 0, M.zero_mem, by rw [smul_zero, add_zero]⟩
     | zero =>
-      exact ⟨0, (integralClosure R L).zero_mem, 0, M.zero_mem,
-        by rw [TensorProduct.tmul_zero, smul_zero, add_zero]⟩
+      exact ⟨
+        0,
+        (integralClosure R L).zero_mem,
+        0,
+        M.zero_mem,
+        by rw [TensorProduct.tmul_zero, smul_zero, add_zero]
+      ⟩
     | add z w _ _ hz hw =>
       obtain ⟨s, hs, m, hm, rfl⟩ := hz
       obtain ⟨s', hs', m', hm', rfl⟩ := hw
-      exact ⟨s + s', add_mem hs hs', m + m', add_mem hm hm',
-        by rw [TensorProduct.tmul_add, smul_add]; abel⟩
+      exact ⟨
+        s + s',
+        add_mem hs hs',
+        m + m',
+        add_mem hm hm',
+        by rw [TensorProduct.tmul_add, smul_add]; abel
+      ⟩
     | smul a z _ hz =>
       obtain ⟨s, hs, m, hm, rfl⟩ := hz
       obtain ⟨r, b, rfl⟩ := happrox a
-      refine ⟨algebraMap R L r * s, mul_mem (algebraMap_mem _ r) hs,
+      refine ⟨
+        algebraMap R L r * s,
+        mul_mem (algebraMap_mem _ r) hs,
         b • ((1 : F') ⊗ₜ[F] s) + (algebraMap R R' r + ϖ * b) • m,
-        add_mem (M.smul_mem _ (Submodule.subset_span ⟨s, hs, rfl⟩)) (M.smul_mem _ hm), ?_⟩
+        add_mem (M.smul_mem _ (Submodule.subset_span ⟨s, hs, rfl⟩)) (M.smul_mem _ hm),
+        ?_
+      ⟩
       rw [← hsm]
       module
   have hden : ∀ z : F' ⊗[F] L, ∃ c : R', c ≠ 0 ∧ c • z ∈ M := by
@@ -199,18 +228,19 @@ theorem _root_.GlobalTheory.isIntegral_iff_mem_span_one_tmul_integralClosure :
     | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact M.zero_mem⟩
     | tmul a l =>
       obtain ⟨n, e, he, rfl⟩ := IsFractionRing.div_surjective (A := R') a
-      obtain ⟨d, hd⟩ := IsIntegral.exists_multiple_integral_of_isLocalization
-        (nonZeroDivisors R) l (Algebra.IsIntegral.isIntegral (R := F) l)
+      obtain ⟨d, hd⟩ :=
+        IsIntegral.exists_multiple_integral_of_isLocalization (nonZeroDivisors R) l
+          (Algebra.IsIntegral.isIntegral (R := F) l)
       have hd0 : (d : R) ≠ 0 := nonZeroDivisors.coe_ne_zero d
       have he0 : e ≠ 0 := nonZeroDivisors.ne_zero he
       refine ⟨e * algebraMap R R' d, mul_ne_zero he0 (hinj _ hd0), ?_⟩
-      have hcalc : (e * algebraMap R R' d) • ((algebraMap R' F' n / algebraMap R' F' e) ⊗ₜ[F] l) =
-          n • (algebraMap R R' d • ((1 : F') ⊗ₜ[F] l)) := by
+      have hcalc
+          : (e * algebraMap R R' d) • ((algebraMap R' F' n / algebraMap R' F' e) ⊗ₜ[F] l)
+            = n • (algebraMap R R' d • ((1 : F') ⊗ₜ[F] l)) := by
         rw [TensorProduct.smul_tmul', TensorProduct.smul_tmul', TensorProduct.smul_tmul',
           Algebra.smul_def, Algebra.smul_def, Algebra.smul_def, mul_one]
         congr 1
-        have : algebraMap R' F' e ≠ 0 :=
-          (map_ne_zero_iff _ (IsFractionRing.injective R' F')).2 he0
+        have : algebraMap R' F' e ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R' F')).2 he0
         rw [map_mul]
         field_simp
       rw [hcalc, hsm, ← Algebra.smul_def]

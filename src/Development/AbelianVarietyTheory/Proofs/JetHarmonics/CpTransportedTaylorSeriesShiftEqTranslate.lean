@@ -20,8 +20,8 @@ namespace GlobalTheory.MomOne.Transfer
 variable {q : ℕ} [Fact q.Prime]
 
 def Tr (ι : ℂ ≃+* ℂ_[q]) (ℓ : ℂ_[q]⟦X⟧) (ζ : ℂ_[q]) (p : ℂ) (F : ℂ → ℂ) : Prop :=
-  AnalyticAt ℂ F 0 ∧ AnalyticAt ℂ (fun z => F (z + p)) 0 ∧ Bdd (hat ι ℓ F) ∧
-    hat ι ℓ (fun z => F (z + p)) = shiftS ζ (hat ι ℓ F)
+  AnalyticAt ℂ F 0 ∧ AnalyticAt ℂ (fun z => F (z + p)) 0 ∧ Bdd (hat ι ℓ F)
+    ∧ hat ι ℓ (fun z => F (z + p)) = shiftS ζ (hat ι ℓ F)
 
 lemma bdd_add {f g : ℂ_[q]⟦X⟧} (hf : Bdd f) (hg : Bdd g) : Bdd (f + g) := by
   obtain ⟨A, hf⟩ := hf
@@ -175,13 +175,20 @@ lemma tendsto_add_punct (p : ℂ) : Filter.Tendsto (fun z : ℂ => z + p) (𝓝[
   · filter_upwards [self_mem_nhdsWithin] with z hz
     simpa using hz
 
-theorem shift_eq_hat_translate : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ : ℂ_[q]) (p : ℂ) (φ : ℂ → ℂ), M.MChart ω → M.At ω ζ p → Ell M.L φ → AnalyticAt ℂ φ 0 → Bdd (hat M.ι (C ω * logS) φ) → ∃ ψ : ℂ → ℂ, AnalyticAt ℂ ψ 0 ∧ (∀ᶠ z in 𝓝[≠] (0 : ℂ), ψ z = φ (z + p)) ∧ hat M.ι (C ω * logS) ψ = shiftS ζ (hat M.ι (C ω * logS) φ) := by
+theorem shift_eq_hat_translate
+    : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ : ℂ_[q]) (p : ℂ) (φ : ℂ → ℂ),
+      M.MChart ω → M.At ω ζ p → Ell M.L φ → AnalyticAt ℂ φ 0 → Bdd (hat M.ι (C ω * logS) φ)
+        → ∃ ψ : ℂ → ℂ,
+          AnalyticAt ℂ ψ 0 ∧ (∀ᶠ z in 𝓝[≠] (0 : ℂ), ψ z = φ (z + p))
+            ∧ hat M.ι (C ω * logS) ψ = shiftS ζ (hat M.ι (C ω * logS) φ) := by
   intro q _ M ω ζ p φ hch hat' hφ hφ0 hφb
   have hM : M.Ok := hch.1
   have h0 : constantCoeff (C ω * logS : ℂ_[q]⟦X⟧) = 0 := hch.2.1
   have hζ : ‖ζ - 1‖ < 1 := hat'.2.1
-  obtain ⟨h1, v, xs, ys, -, -, bys, -, -, cys, -, hwy, -⟩ := GlobalTheory.T.integral_weierstrass_chart_xy_unit_series q M _ hch
-  obtain ⟨tu, tw⟩ := GlobalTheory.T.multiplicativeShift_eq_translate_by_small_point q M ω ζ p hch hat'
+  obtain ⟨h1, v, xs, ys, -, -, bys, -, -, cys, -, hwy, -⟩ :=
+    GlobalTheory.T.integral_weierstrass_chart_xy_unit_series q M _ hch
+  obtain ⟨tu, tw⟩ :=
+    GlobalTheory.T.multiplicativeShift_eq_translate_by_small_point q M ω ζ p hch hat'
   obtain ⟨m, P, A, B, -, hAB⟩ := GlobalTheory.T.exists_ellipticFunction_mul_prod_eq_xy q M φ hM hφ
   obtain ⟨-, -, -, -, -, -, -, -, hs⟩ := uw_elliptic_flow q M hM
   obtain ⟨au0, aw0, -, -, e0, -⟩ := hs 0 (Or.inl M.L.lattice.zero_mem)
@@ -204,12 +211,15 @@ theorem shift_eq_hat_translate : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω ζ
     tQ.mul h0 hζ (hw.pow h0 hζ _)
   have tN : Tr M.ι (C ω * logS) ζ p
       (fun z => M.w z ^ a * (FA z * M.w z ^ (c + 1) + (-1) * (FB z * M.w z ^ b))) :=
-    (hw.pow h0 hζ _).mul h0 hζ ((tA.mul h0 hζ (hw.pow h0 hζ _)).add h0 hζ
-      ((Tr.const h0 (-1)).mul h0 hζ (tB.mul h0 hζ (hw.pow h0 hζ _))))
-  have hid : ∀ z, (z ∉ M.L.lattice ∧ M.y z ≠ 0 ∧ M.x z * M.w z = M.u z ∧ M.y z * M.w z = -1) →
-      φ z * Q.eval (M.x z) = A.eval (M.x z) + B.eval (M.x z) * M.y z →
-      φ z * (FQ z * M.w z ^ (b + c + 1)) =
-        M.w z ^ a * (FA z * M.w z ^ (c + 1) + (-1) * (FB z * M.w z ^ b)) := by
+    (hw.pow h0 hζ _).mul h0 hζ
+      ((tA.mul h0 hζ (hw.pow h0 hζ _)).add h0 hζ
+        ((Tr.const h0 (-1)).mul h0 hζ (tB.mul h0 hζ (hw.pow h0 hζ _))))
+  have hid
+      : ∀ z,
+        (z ∉ M.L.lattice ∧ M.y z ≠ 0 ∧ M.x z * M.w z = M.u z ∧ M.y z * M.w z = -1)
+          → φ z * Q.eval (M.x z) = A.eval (M.x z) + B.eval (M.x z) * M.y z
+          → φ z * (FQ z * M.w z ^ (b + c + 1))
+            = M.w z ^ a * (FA z * M.w z ^ (c + 1) + (-1) * (FB z * M.w z ^ b)) := by
     intro z e1 e2
     rw [eQ z _ e1.2.2.1, eA z _ e1.2.2.1, eB z _ e1.2.2.1, ← e1.2.2.2]
     linear_combination M.w z ^ (a + b + c + 1) * e2

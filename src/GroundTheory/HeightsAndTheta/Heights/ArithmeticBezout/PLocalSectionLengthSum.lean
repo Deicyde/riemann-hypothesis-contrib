@@ -16,13 +16,12 @@ open scoped Pointwise
 
 namespace LocalSectionLengthSum
 
-theorem length_quot_smul_top_eq {B : Type*} [CommRing B] (I : Ideal B) (f : B) :
-    Module.length B ((B ⧸ I) ⧸ (f • ⊤ : Submodule B (B ⧸ I))) =
-      Module.length B (B ⧸ (I ⊔ Ideal.span {f})) := by
+theorem length_quot_smul_top_eq {B : Type*} [CommRing B] (I : Ideal B) (f : B)
+    : Module.length B ((B ⧸ I) ⧸ (f • ⊤ : Submodule B (B ⧸ I)))
+      = Module.length B (B ⧸ (I ⊔ Ideal.span {f})) := by
   let g : B →ₗ[B] (B ⧸ I) ⧸ (f • ⊤ : Submodule B (B ⧸ I)) :=
     (f • ⊤ : Submodule B (B ⧸ I)).mkQ ∘ₗ I.mkQ
-  have hg : Function.Surjective g :=
-    (Submodule.mkQ_surjective _).comp (Submodule.mkQ_surjective _)
+  have hg : Function.Surjective g := (Submodule.mkQ_surjective _).comp (Submodule.mkQ_surjective _)
   have hker : LinearMap.ker g = I ⊔ Ideal.span {f} := by
     ext x
     simp only [g, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply, mkQ_apply,
@@ -45,10 +44,12 @@ theorem length_quot_smul_top_eq {B : Type*} [CommRing B] (I : Ideal B) (f : B) :
       exact neg_mem hy
   rw [← hker, (g.quotKerEquivOfSurjective hg).length_eq]
 
-theorem length_pi_quot_smul_top_eq {B ι : Type*} [CommRing B] [Fintype ι] (M : ι → Type*)
-    [∀ i, AddCommGroup (M i)] [∀ i, Module B (M i)] (f : B) :
-    Module.length B ((Π i, M i) ⧸ (f • ⊤ : Submodule B (Π i, M i))) =
-      ∑ i, Module.length B (M i ⧸ (f • ⊤ : Submodule B (M i))) := by
+theorem length_pi_quot_smul_top_eq
+    {B ι : Type*} [CommRing B] [Fintype ι]
+    (M : ι → Type*) [∀ i, AddCommGroup (M i)] [∀ i, Module B (M i)]
+    (f : B)
+    : Module.length B ((Π i, M i) ⧸ (f • ⊤ : Submodule B (Π i, M i)))
+      = ∑ i, Module.length B (M i ⧸ (f • ⊤ : Submodule B (M i))) := by
   let g : (Π i, M i) →ₗ[B] (Π i, M i ⧸ (f • ⊤ : Submodule B (M i))) :=
     LinearMap.pi fun i => (f • ⊤ : Submodule B (M i)).mkQ ∘ₗ LinearMap.proj i
   have hg : Function.Surjective g := by
@@ -72,8 +73,8 @@ theorem length_pi_quot_smul_top_eq {B ι : Type*} [CommRing B] [Fintype ι] (M :
 
 end LocalSectionLengthSum
 
-theorem LocalSectionLengthSum.proof (hPi : PiQuotCokerFiniteLength.Statement) :
-    LocalSectionLengthSum.Statement := by
+theorem LocalSectionLengthSum.proof (hPi : PiQuotCokerFiniteLength.Statement)
+    : LocalSectionLengthSum.Statement := by
   intro B _ _ _ J f hJ hf hQ
   obtain ⟨hinj, hfin⟩ := hPi B J hJ hQ
   have hfinite := J.finite_minimalPrimes_of_isNoetherianRing B
@@ -87,8 +88,8 @@ theorem LocalSectionLengthSum.proof (hPi : PiQuotCokerFiniteLength.Statement) :
     refine mul_left_cancel₀ ?_ h
     rw [Ne, Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem]
     exact hf P P.2
-  have e1 := Model.TorsionFreeQuotientLength.length_quot_smul_eq (quotToPiMinimalPrimes J) hinj
-    hreg hfin
+  have e1 :=
+    Model.TorsionFreeQuotientLength.length_quot_smul_eq (quotToPiMinimalPrimes J) hinj hreg hfin
   rw [← LocalSectionLengthSum.length_quot_smul_top_eq J f, ← e1,
     LocalSectionLengthSum.length_pi_quot_smul_top_eq]
   simp_rw [LocalSectionLengthSum.length_quot_smul_top_eq]

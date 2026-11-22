@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Quotien
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -25,16 +27,19 @@ variable {E : Type} [Field E] [NumberField E] {ι : Type} [Fintype ι]
 
 instance haar : (vecMeasure E ι).IsAddHaarMeasure := inferInstance
 
-theorem avg_eq_integral (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) :
-    avg (ratV E ι) f = ∫ x in vecDomain E ι, f x ∂vecMeasure E ι := by
-  have h := GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average (ι → Ad E) (ratV E ι) (isCoLat_ratV E ι) (vecMeasure E ι) (vecDomain E ι) inferInstance
-    isAddFundamentalDomain_vecDomain f hf
+theorem avg_eq_integral (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f)
+    : avg (ratV E ι) f = ∫ x in vecDomain E ι, f x ∂vecMeasure E ι := by
+  have h :=
+    GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average (ι → Ad E) (ratV E ι)
+      (isCoLat_ratV E ι) (vecMeasure E ι) (vecDomain E ι) inferInstance
+      isAddFundamentalDomain_vecDomain f hf
   rw [h.2.2.2, vecMeasure_vecDomain]
   simp
 
-theorem integrableOn (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) :
-    IntegrableOn f (vecDomain E ι) (vecMeasure E ι) :=
-  (GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average (ι → Ad E) (ratV E ι) (isCoLat_ratV E ι) (vecMeasure E ι) (vecDomain E ι) inferInstance
+theorem integrableOn (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f)
+    : IntegrableOn f (vecDomain E ι) (vecMeasure E ι) :=
+  (GlobalTheory.T.setIntegral_fundamentalDomain_eq_mass_mul_average (ι → Ad E) (ratV E ι)
+    (isCoLat_ratV E ι) (vecMeasure E ι) (vecDomain E ι) inferInstance
     isAddFundamentalDomain_vecDomain f hf).2.2.1
 
 theorem exists_ne_one {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) : ∃ a, ψ a ≠ 1 := by
@@ -43,14 +48,14 @@ theorem exists_ne_one {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) : ∃ a, ψ a 
   obtain ⟨y, hy⟩ := hψ.loc ⟨M, hM.isPrime, hne⟩
   exact ⟨_, hy⟩
 
-theorem per_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E) :
-    Per (ratV E ι) (fun x => ψ (dot ζ x)) := by
+theorem per_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E)
+    : Per (ratV E ι) (fun x => ψ (dot ζ x)) := by
   refine ⟨hψ.cont.comp (continuous_dot ζ), ?_⟩
   rintro _ ⟨c, rfl⟩ x
   exact hψ.map_dot ζ c x
 
-theorem dot_single' [DecidableEq ι] (ζ : ι → E) (t : ι) (a : Ad E) :
-    dot ζ (Pi.single t a) = algebraMap E (Ad E) (ζ t) * a := by
+theorem dot_single' [DecidableEq ι] (ζ : ι → E) (t : ι) (a : Ad E)
+    : dot ζ (Pi.single t a) = algebraMap E (Ad E) (ζ t) * a := by
   rw [dot, Finset.sum_eq_single t]
   · simp
   · intro s _ hs
@@ -58,8 +63,8 @@ theorem dot_single' [DecidableEq ι] (ζ : ι → E) (t : ι) (a : Ad E) :
   · simp
 
 open Classical in
-theorem avg_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E) :
-    avg (ratV E ι) (fun x => ψ (dot ζ x)) = if ζ = 0 then 1 else 0 := by
+theorem avg_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E)
+    : avg (ratV E ι) (fun x => ψ (dot ζ x)) = if ζ = 0 then 1 else 0 := by
   classical
   split_ifs with h
   · subst h
@@ -75,7 +80,9 @@ theorem avg_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E) :
     set y : ι → Ad E := Pi.single t (algebraMap E (Ad E) (ζ t)⁻¹ * a)
     have hy : dot ζ y = a := by
       rw [dot_single', ← mul_assoc, ← map_mul, mul_inv_cancel₀ ht, map_one, one_mul]
-    have h1 := GlobalTheory.T.quotientAverage_translate_invariant (ι → Ad E) (ratV E ι) (isCoLat_ratV E ι) _ (per_char hψ ζ) y
+    have h1 :=
+      GlobalTheory.T.quotientAverage_translate_invariant (ι → Ad E) (ratV E ι) (isCoLat_ratV E ι) _
+        (per_char hψ ζ) y
     have h2 : (fun x => ψ (dot ζ (x + y))) = fun x => ψ a * ψ (dot ζ x) := by
       funext x
       rw [dot_add_right, hy, AddChar.map_add_eq_mul, mul_comm]
@@ -83,7 +90,6 @@ theorem avg_char {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (ζ : ι → E) :
     have h3 : (ψ a - 1) * avg (ratV E ι) (fun x => ψ (dot ζ x)) = 0 := by
       rw [sub_mul, h1, one_mul, sub_self]
     exact (mul_eq_zero.1 h3).resolve_left (sub_ne_zero.2 ha)
-
 
 variable (E ι) in
 abbrev Q : Type := (ι → Ad E) ⧸ ratV E ι
@@ -114,7 +120,6 @@ instance instMS : MeasurableSpace (Q E ι) := borel _
 
 instance instBS : BorelSpace (Q E ι) := ⟨rfl⟩
 
-
 variable (E ι) in
 def nu : Measure (Q E ι) :=
   Measure.map (QuotientAddGroup.mk : (ι → Ad E) → Q E ι) ((vecMeasure E ι).restrict (vecDomain E ι))
@@ -128,45 +133,51 @@ instance instFin : IsFiniteMeasure (nu E ι) := by
   unfold nu
   infer_instance
 
-theorem integral_nu (F : Q E ι → ℂ) (hF : Continuous F) :
-    ∫ q, F q ∂nu E ι = ∫ x in vecDomain E ι, F (x : Q E ι) ∂vecMeasure E ι :=
+theorem integral_nu (F : Q E ι → ℂ) (hF : Continuous F)
+    : ∫ q, F q ∂nu E ι = ∫ x in vecDomain E ι, F (x : Q E ι) ∂vecMeasure E ι :=
   integral_map measurable_mk.aemeasurable hF.aestronglyMeasurable
 
-def lift (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) : C(Q E ι, ℂ) :=
-  ⟨Quotient.lift f (fun x y hxy => by
-      have h : -x + y ∈ ratV E ι := QuotientAddGroup.leftRel_apply.1 hxy
-      rw [← hf.2 _ h x]
-      congr 1
-      abel), hf.1.quotient_lift _⟩
+def lift (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) : C(Q E ι, ℂ) := ⟨
+  Quotient.lift f (fun x y hxy => by
+    have h : -x + y ∈ ratV E ι := QuotientAddGroup.leftRel_apply.1 hxy
+    rw [← hf.2 _ h x]
+    congr 1
+    abel),
+  hf.1.quotient_lift _
+⟩
 
-@[simp] theorem lift_mk (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) (x : ι → Ad E) :
-    lift f hf (x : Q E ι) = f x := rfl
+@[simp]
+theorem lift_mk (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) (x : ι → Ad E)
+    : lift f hf (x : Q E ι) = f x :=
+  rfl
 
-theorem per_mul {f g : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g) :
-    Per (ratV E ι) (fun x => f x * g x) :=
+theorem per_mul {f g : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g)
+    : Per (ratV E ι) (fun x => f x * g x) :=
   ⟨hf.1.mul hg.1, fun γ hγ x => by simp only; rw [hf.2 γ hγ x, hg.2 γ hγ x]⟩
 
-theorem per_conj {f : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f) :
-    Per (ratV E ι) (fun x => conj (f x)) :=
+theorem per_conj {f : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f)
+    : Per (ratV E ι) (fun x => conj (f x)) :=
   ⟨Complex.continuous_conj.comp hf.1, fun γ hγ x => by simp only; rw [hf.2 γ hγ x]⟩
 
-theorem inner_lift {f g : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g) :
-    ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ =
-      avg (ratV E ι) (fun x => f x * conj (g x)) := by
+theorem inner_lift {f g : (ι → Ad E) → ℂ} (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g)
+    : ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ
+      = avg (ratV E ι) (fun x => f x * conj (g x)) := by
   rw [ContinuousMap.inner_toLp]
-  rw [integral_nu (fun q => lift f hf q * conj (lift g hg q))
+  rw [integral_nu
+      (fun q => lift f hf q * conj (lift g hg q))
       ((lift f hf).continuous.mul (Complex.continuous_conj.comp (lift g hg).continuous)),
     avg_eq_integral _ (per_mul hf (per_conj hg))]
   rfl
 
 theorem conj_psi {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (a : Ad E) : conj (ψ a) = ψ (-a) := by
-  rw [AddChar.map_neg_eq_inv, Complex.inv_def, Complex.normSq_eq_norm_sq, hψ.norm, one_pow, inv_one, Complex.ofReal_one, mul_one]
+  rw [AddChar.map_neg_eq_inv, Complex.inv_def, Complex.normSq_eq_norm_sq, hψ.norm, one_pow, inv_one,
+    Complex.ofReal_one, mul_one]
 
-theorem dot_neg (ξ : ι → E) (x : ι → Ad E) : dot (-ξ) x = -dot ξ x := by
+theorem dot_neg (ξ : ι → E) (x : ι → Ad E) : dot (-ξ) x = - dot ξ x := by
   simp [dot, Finset.sum_neg_distrib]
 
-theorem char_mul {ψ : AddChar (Ad E) ℂ} (ξ η : ι → E) (x : ι → Ad E) :
-    ψ (dot ξ x) * ψ (dot η x) = ψ (dot (ξ + η) x) := by
+theorem char_mul {ψ : AddChar (Ad E) ℂ} (ξ η : ι → E) (x : ι → Ad E)
+    : ψ (dot ξ x) * ψ (dot η x) = ψ (dot (ξ + η) x) := by
   rw [dot_add_left, AddChar.map_add_eq_mul]
 
 variable (ψ : AddChar (Ad E) ℂ) (hψ : StdPsi ψ)
@@ -199,11 +210,12 @@ theorem ch_sep {p q : Q E ι} (h : p ≠ q) : ∃ ξ, ch ψ hψ ξ p ≠ ch ψ h
   refine h (QuotientAddGroup.eq.2 ((hψ.forall_dot_eq_one_iff _).1 fun ξ => ?_))
   have h1 := hc ξ
   simp only [ch, lift_mk] at h1
-  have e : -dot ξ (-x + y) = dot ξ x + -dot ξ y := by
-    have h2 : dot ξ (-x) = -dot ξ x := by simp [dot, Finset.sum_neg_distrib]
+  have e : - dot ξ (-x + y) = dot ξ x + - dot ξ y := by
+    have h2 : dot ξ (-x) = - dot ξ x := by simp [dot, Finset.sum_neg_distrib]
     rw [dot_add_right, h2]
     ring
-  rw [e, AddChar.map_add_eq_mul, h1, ← AddChar.map_add_eq_mul, add_neg_cancel, AddChar.map_zero_eq_one]
+  rw [e, AddChar.map_add_eq_mul, h1, ← AddChar.map_add_eq_mul, add_neg_cancel,
+    AddChar.map_zero_eq_one]
 
 theorem span_dense : (Submodule.span ℂ (Set.range (ch ψ hψ (ι := ι)))).topologicalClosure = ⊤ := by
   let V : Submodule ℂ C(Q E ι, ℂ) := Submodule.span ℂ (Set.range (ch ψ hψ (ι := ι)))
@@ -225,9 +237,10 @@ theorem span_dense : (Submodule.span ℂ (Set.range (ch ψ hψ (ι := ι)))).top
     | zero => rw [star_zero]; exact V.zero_mem
     | add x y _ _ hx hy => rw [star_add]; exact V.add_mem hx hy
     | smul c x _ hx => rw [star_smul]; exact V.smul_mem _ hx
-  let S : StarSubalgebra ℂ C(Q E ι, ℂ) :=
-    { toSubalgebra := V.toSubalgebra hV1 (fun p q hp hq => hVmul p hp q hq)
-      star_mem' := fun {p} hp => hVstar p hp }
+  let S : StarSubalgebra ℂ C(Q E ι, ℂ) := {
+    toSubalgebra := V.toSubalgebra hV1 (fun p q hp hq => hVmul p hp q hq)
+    star_mem' := fun {p} hp => hVstar p hp
+  }
   have hS : S.topologicalClosure = ⊤ := by
     refine ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints _ ?_
     intro x y hxy
@@ -272,8 +285,10 @@ theorem dense : ⊤ ≤ (Submodule.span ℂ (Set.range (chL ψ hψ (ι := ι))))
     | zero => rw [map_zero]; exact Submodule.zero_mem _
     | add y z _ _ hy hz => rw [map_add (f := _)]; exact Submodule.add_mem _ hy hz
     | smul c y _ hy => rw [map_smul]; exact Submodule.smul_mem _ c hy
-  have h1 : Set.range (ContinuousMap.toLp 2 (nu E ι) ℂ : C(Q E ι, ℂ) →L[ℂ] Lp ℂ 2 (nu E ι)) ⊆
-      ((Submodule.span ℂ (Set.range (chL ψ hψ (ι := ι)))).topologicalClosure : Set (Lp ℂ 2 (nu E ι))) := by
+  have h1
+      : Set.range (ContinuousMap.toLp 2 (nu E ι) ℂ : C(Q E ι, ℂ) →L[ℂ] Lp ℂ 2 (nu E ι))
+        ⊆ ((Submodule.span ℂ (Set.range (chL ψ hψ (ι := ι)))).topologicalClosure
+          : Set (Lp ℂ 2 (nu E ι))) := by
     rintro _ ⟨g, rfl⟩
     have hg : g ∈ closure (Submodule.span ℂ (Set.range (ch ψ hψ (ι := ι))) : Set C(Q E ι, ℂ)) := by
       rw [← Submodule.topologicalClosure_coe, span_dense]
@@ -286,29 +301,39 @@ def basis : HilbertBasis (ι → E) ℂ (Lp ℂ 2 (nu E ι)) := HilbertBasis.mk 
 
 theorem coe_basis : ⇑(basis ψ hψ (ι := ι)) = chL ψ hψ := HilbertBasis.coe_mk _ _
 
-theorem inner_chL (u : (ι → Ad E) → ℂ) (hu : Per (ratV E ι) u) (ξ : ι → E) :
-    ⟪chL ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift u hu)⟫_ℂ = avg (ratV E ι) (fun x => ψ (-dot ξ x) * u x) := by
+theorem inner_chL (u : (ι → Ad E) → ℂ) (hu : Per (ratV E ι) u) (ξ : ι → E)
+    : ⟪chL ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift u hu)⟫_ℂ
+      = avg (ratV E ι) (fun x => ψ (- dot ξ x) * u x) := by
   rw [chL, ch, inner_lift]
   congr 1
   funext x
   rw [conj_psi hψ, mul_comm]
 
 include hψ in
-theorem parseval (f g : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g) :
-    HasSum (fun ξ : ι → E => avg (ratV E ι) (fun x => ψ (-dot ξ x) * f x) *
-      conj (avg (ratV E ι) fun x => ψ (-dot ξ x) * g x)) (avg (ratV E ι) fun x => f x * conj (g x)) := by
-  have h := (basis ψ hψ).hasSum_inner_mul_inner (ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg))
-    (ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf))
+theorem parseval (f g : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f) (hg : Per (ratV E ι) g)
+    : HasSum
+      (fun ξ : ι → E =>
+        avg (ratV E ι) (fun x => ψ (- dot ξ x) * f x)
+          * conj (avg (ratV E ι) fun x => ψ (- dot ξ x) * g x))
+      (avg (ratV E ι) fun x => f x * conj (g x)) := by
+  have h :=
+    (basis ψ hψ).hasSum_inner_mul_inner (ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg))
+      (ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf))
   rw [inner_lift] at h
-  have key : ∀ ξ, ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), basis ψ hψ ξ⟫_ℂ *
-      ⟪basis ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ =
-      avg (ratV E ι) (fun x => ψ (-dot ξ x) * f x) * conj (avg (ratV E ι) fun x => ψ (-dot ξ x) * g x) := by
+  have key
+      : ∀ ξ,
+        ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), basis ψ hψ ξ⟫_ℂ
+            * ⟪basis ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ
+          = avg (ratV E ι) (fun x => ψ (- dot ξ x) * f x)
+            * conj (avg (ratV E ι) fun x => ψ (- dot ξ x) * g x) := by
     intro ξ
-    have e1 : ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), basis ψ hψ ξ⟫_ℂ =
-        conj (avg (ratV E ι) fun x => ψ (-dot ξ x) * g x) := by
+    have e1
+        : ⟪ContinuousMap.toLp 2 (nu E ι) ℂ (lift g hg), basis ψ hψ ξ⟫_ℂ
+          = conj (avg (ratV E ι) fun x => ψ (- dot ξ x) * g x) := by
       rw [← inner_conj_symm, coe_basis, inner_chL]
-    have e2 : ⟪basis ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ =
-        avg (ratV E ι) fun x => ψ (-dot ξ x) * f x := by
+    have e2
+        : ⟪basis ψ hψ ξ, ContinuousMap.toLp 2 (nu E ι) ℂ (lift f hf)⟫_ℂ
+          = avg (ratV E ι) fun x => ψ (- dot ξ x) * f x := by
       rw [coe_basis, inner_chL]
     rw [e1, e2, mul_comm]
   simp only [key] at h
@@ -320,20 +345,24 @@ namespace tableDegreeThreeBase
 
 variable {E : Type} [Field E] [NumberField E] {ι : Type} [Fintype ι]
 
-theorem per_cmul {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (c : ℂ) (ζ : ι → E) :
-    Per (ratV E ι) (fun x => c * ψ (dot ζ x)) :=
-  ⟨continuous_const.mul (per_char hψ ζ).1, fun γ hγ x => by
+theorem per_cmul {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (c : ℂ) (ζ : ι → E)
+    : Per (ratV E ι) (fun x => c * ψ (dot ζ x)) := ⟨
+  continuous_const.mul (per_char hψ ζ).1,
+  fun γ hγ x => by
     have h := (per_char hψ ζ).2 γ hγ x
     simp only at h ⊢
-    rw [h]⟩
+    rw [h]
+⟩
 
-theorem twist_char {ψ : AddChar (Ad E) ℂ} (ξ η : ι → E) (x : ι → Ad E) :
-    ψ (-dot ξ x) * ψ (dot η x) = ψ (dot (η - ξ) x) := by
+theorem twist_char {ψ : AddChar (Ad E) ℂ} (ξ η : ι → E) (x : ι → Ad E)
+    : ψ (- dot ξ x) * ψ (dot η x) = ψ (dot (η - ξ) x) := by
   rw [sub_eq_add_neg, dot_add_left, dot_neg, AddChar.map_add_eq_mul, mul_comm]
 
-theorem fin_case {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f)
-    (hfin : {ξ : ι → E | avg (ratV E ι) (fun x => ψ (-dot ξ x) * f x) ≠ 0}.Finite) :
-    HasSum (fun ξ : ι → E => avg (ratV E ι) fun x => ψ (-dot ξ x) * f x) (f 0) := by
+theorem fin_case
+    {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ)
+    (f : (ι → Ad E) → ℂ) (hf : Per (ratV E ι) f)
+    (hfin : {ξ : ι → E | avg (ratV E ι) (fun x => ψ (-dot ξ x) * f x) ≠ 0}.Finite)
+    : HasSum (fun ξ : ι → E => avg (ratV E ι) fun x => ψ (- dot ξ x) * f x) (f 0) := by
   classical
   set c : (ι → E) → ℂ := fun ξ => avg (ratV E ι) fun x => ψ (-dot ξ x) * f x with hc
   set S := hfin.toFinset
@@ -346,23 +375,27 @@ theorem fin_case {ψ : AddChar (Ad E) ℂ} (hψ : StdPsi ψ) (f : (ι → Ad E) 
     congr 1
     refine Finset.sum_congr rfl fun η _ => ?_
     exact (per_cmul hψ (c η) η).2 γ hγ x
-  have hcoef : ∀ ξ, avg (ratV E ι) (fun x => ψ (-dot ξ x) * h x) = 0 := by
+  have hcoef : ∀ ξ, avg (ratV E ι) (fun x => ψ (- dot ξ x) * h x) = 0 := by
     intro ξ
     rw [avg_eq_integral _ (hψ.per_twist hh ξ)]
-    have e : (fun x => ψ (-dot ξ x) * h x) =
-        fun x => ψ (-dot ξ x) * f x - ∑ η ∈ S, c η * ψ (dot (η - ξ) x) := by
+    have e
+        : (fun x => ψ (- dot ξ x) * h x)
+          = fun x => ψ (- dot ξ x) * f x - ∑ η ∈ S, c η * ψ (dot (η - ξ) x) := by
       funext x
       simp only [h, mul_sub, Finset.mul_sum]
       congr 1
       refine Finset.sum_congr rfl fun η _ => ?_
       rw [← twist_char]
       ring
-    rw [e, integral_sub (integrableOn _ (hψ.per_twist hf ξ))
-      (integrable_finsetSum _ fun η _ => integrableOn _ (per_cmul hψ (c η) (η - ξ))),
+    rw [e,
+      integral_sub (integrableOn _ (hψ.per_twist hf ξ))
+        (integrable_finsetSum _ fun η _ => integrableOn _ (per_cmul hψ (c η) (η - ξ))),
       integral_finsetSum _ fun η _ => integrableOn _ (per_cmul hψ (c η) (η - ξ))]
     rw [← avg_eq_integral _ (hψ.per_twist hf ξ)]
-    have h3 : ∀ η ∈ S, ∫ x in vecDomain E ι, c η * ψ (dot (η - ξ) x) ∂vecMeasure E ι =
-        if ξ = η then c η else 0 := by
+    have h3
+        : ∀ η ∈ S,
+          ∫ x in vecDomain E ι, c η * ψ (dot (η - ξ) x) ∂vecMeasure E ι
+            = if ξ = η then c η else 0 := by
       intro η _
       rw [integral_const_mul, ← avg_eq_integral _ (per_char hψ _), avg_char hψ]
       by_cases hξ : ξ = η
@@ -387,8 +420,11 @@ end tableDegreeThreeBase
 
 theorem poisson_base_holds : P0 := by
   intro E _ _ ψ hψ ι _
-  exact ⟨fun f hf => tableDegreeThreeBase.avg_eq_integral f hf, fun f g hf hg => tableDegreeThreeBase.parseval ψ hψ f g hf hg,
-    fun f hf hfin => tableDegreeThreeBase.fin_case hψ f hf hfin⟩
+  exact ⟨
+    fun f hf => tableDegreeThreeBase.avg_eq_integral f hf,
+    fun f g hf hg => tableDegreeThreeBase.parseval ψ hψ f g hf hg,
+    fun f hf hfin => tableDegreeThreeBase.fin_case hψ f hf hfin
+  ⟩
 
 end PositivityTheory.AdelicQuotientData
 

@@ -10,10 +10,10 @@ namespace PositivityTheory.RgUd.TP.Desc.Piece.PSect
 
 open Module Polynomial
 
-private theorem finrank_adjoin_pow_le {k R : Type*} [Field k] [CommRing R] [Algebra k R]
-    [FiniteDimensional k R] (T : Subalgebra k R) (q n : ℕ) (hq : 0 < q) (L : Fin n → R)
-    (hL : ∀ i, L i ^ q ∈ T) :
-    finrank k (Algebra.adjoin k ((T : Set R) ∪ Set.range L)) ≤ q ^ n * finrank k T := by
+private theorem finrank_adjoin_pow_le
+    {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensional k R]
+    (T : Subalgebra k R) (q n : ℕ) (hq : 0 < q) (L : Fin n → R) (hL : ∀ i, L i ^ q ∈ T)
+    : finrank k (Algebra.adjoin k ((T : Set R) ∪ Set.range L)) ≤ q ^ n * finrank k T := by
   classical
   let G : (Fin n → ℕ) → R := fun e => ∏ i, L i ^ e i
   let Φ : ((Fin n → Fin q) → T) →ₗ[k] R :=
@@ -30,8 +30,10 @@ private theorem finrank_adjoin_pow_le {k R : Type*} [Field k] [CommRing R] [Alge
     · simp
   have hA : ∀ t ∈ T, ∀ e : Fin n → ℕ, t * G e ∈ LinearMap.range Φ := by
     intro t ht e
-    have hG : G e = (∏ i, (L i ^ q) ^ (e i / q)) *
-        G (fun i => ((⟨e i % q, Nat.mod_lt _ hq⟩ : Fin q) : ℕ)) := by
+    have hG
+        : G e
+          = (∏ i, (L i ^ q) ^ (e i / q))
+            * G (fun i => ((⟨e i % q, Nat.mod_lt _ hq⟩ : Fin q) : ℕ)) := by
       simp only [G]
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_
@@ -45,8 +47,9 @@ private theorem finrank_adjoin_pow_le {k R : Type*} [Field k] [CommRing R] [Alge
     congr 1
     rw [Finset.prod_eq_single i (fun j _ hj => by simp [hj]) (by simp)]
     simp
-  have hclosed : ∀ y ∈ Algebra.adjoin k ((T : Set R) ∪ Set.range L),
-      ∀ m ∈ LinearMap.range Φ, y * m ∈ LinearMap.range Φ := by
+  have hclosed
+      : ∀ y ∈ Algebra.adjoin k ((T : Set R) ∪ Set.range L), ∀ m ∈ LinearMap.range Φ,
+        y * m ∈ LinearMap.range Φ := by
     intro y hy
     induction hy using Algebra.adjoin_induction with
     | mem x hx =>
@@ -56,31 +59,32 @@ private theorem finrank_adjoin_pow_le {k R : Type*} [Field k] [CommRing R] [Alge
       rcases hx with hx | ⟨i, rfl⟩
       · rw [← mul_assoc]; exact hsingle _ (T.mul_mem hx (f e).2) e
       · rw [mul_left_comm, hLmul]; exact hA _ (f e).2 _
-    | algebraMap a =>
-      intro m hm; rw [← Algebra.smul_def]; exact Submodule.smul_mem _ a hm
-    | add x y _ _ hx hy =>
-      intro m hm; rw [add_mul]; exact add_mem (hx m hm) (hy m hm)
-    | mul x y _ _ hx hy =>
-      intro m hm; rw [mul_assoc]; exact hx _ (hy m hm)
+    | algebraMap a => intro m hm; rw [← Algebra.smul_def]; exact Submodule.smul_mem _ a hm
+    | add x y _ _ hx hy => intro m hm; rw [add_mul]; exact add_mem (hx m hm) (hy m hm)
+    | mul x y _ _ hx hy => intro m hm; rw [mul_assoc]; exact hx _ (hy m hm)
   have h1 : (1 : R) ∈ LinearMap.range Φ := by
     have := hA 1 T.one_mem 0
     simpa [G] using this
-  have hle : Subalgebra.toSubmodule (Algebra.adjoin k ((T : Set R) ∪ Set.range L)) ≤
-      LinearMap.range Φ := by
+  have hle
+      : Subalgebra.toSubmodule (Algebra.adjoin k ((T : Set R) ∪ Set.range L))
+        ≤ LinearMap.range Φ := by
     intro y hy
     simpa using hclosed y hy 1 h1
-  calc finrank k (Algebra.adjoin k ((T : Set R) ∪ Set.range L))
-      = finrank k (Subalgebra.toSubmodule (Algebra.adjoin k ((T : Set R) ∪ Set.range L))) :=
-        (Subalgebra.finrank_toSubmodule _).symm
+  calc
+    finrank k (Algebra.adjoin k ((T : Set R) ∪ Set.range L))
+        = finrank k (Subalgebra.toSubmodule (Algebra.adjoin k ((T : Set R) ∪ Set.range L))) :=
+      (Subalgebra.finrank_toSubmodule _).symm
     _ ≤ finrank k (LinearMap.range Φ) := Submodule.finrank_mono hle
     _ ≤ finrank k ((Fin n → Fin q) → T) := LinearMap.finrank_range_le Φ
     _ = q ^ n * finrank k T := by simp [Module.finrank_pi_fintype]
 
-theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensional k R]
+theorem sectionEx
+    {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDimensional k R]
     (p c : ℕ) [Fact p.Prime] [CharP k p] [FiniteDimensional k (Tw k p c)]
     (hnil : ∀ r : R, IsNilpotent r → r ^ (p ^ c) = 0)
-    (hroot : ∀ a : k, ∃ w : R, w ^ (p ^ c) = algebraMap k R a) :
-    ∃ S : Subalgebra k R, (∀ s ∈ S, IsNilpotent s → s = 0) ∧ ∀ r : R, ∃ s ∈ S, IsNilpotent (r - s) := by
+    (hroot : ∀ a : k, ∃ w : R, w ^ (p ^ c) = algebraMap k R a)
+    : ∃ S : Subalgebra k R,
+      (∀ s ∈ S, IsNilpotent s → s = 0) ∧ ∀ r : R, ∃ s ∈ S, IsNilpotent (r - s) := by
   classical
   rcases Nat.eq_zero_or_pos c with rfl | hc
   · refine ⟨⊤, fun s _ hs => by simpa using hnil s hs, fun r => ⟨r, Algebra.mem_top, by simp⟩⟩
@@ -101,20 +105,21 @@ theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDime
     obtain ⟨w, hw⟩ := hroot a
     exact ⟨f w, by rw [← map_pow, hw, AlgHom.commutes]⟩
 
-  obtain ⟨n, hn, -⟩ := fieldGen (k := k) (E := Tw k p c) p c
-    (fun a => ⟨(a : k), rfl⟩)
+  obtain ⟨n, hn, -⟩ := fieldGen (k := k) (E := Tw k p c) p c (fun a => ⟨(a : k), rfl⟩)
 
-  have hα : ∀ I : MaximalSpectrum R, ∃ α : Fin n → R ⧸ I.asIdeal,
-      Algebra.adjoin k (Set.range (fun b : R ⧸ I.asIdeal => b ^ (p ^ c)) ∪ Set.range α) = ⊤ := by
+  have hα
+      : ∀ I : MaximalSpectrum R, ∃ α : Fin n → R ⧸ I.asIdeal,
+        Algebra.adjoin k (Set.range (fun b : R ⧸ I.asIdeal => b ^ (p ^ c)) ∪ Set.range α) = ⊤ := by
     intro I
     haveI := I.isMaximal
     letI : Field (R ⧸ I.asIdeal) := Ideal.Quotient.field I.asIdeal
     haveI : FiniteDimensional k (R ⧸ I.asIdeal) :=
       Module.Finite.of_surjective (Ideal.Quotient.mkₐ k I.asIdeal).toLinearMap
         Ideal.Quotient.mk_surjective
-    obtain ⟨n', hn', α, hα⟩ := fieldGen (k := k) (E := R ⧸ I.asIdeal) p c (fun a => by
-      obtain ⟨w, hw⟩ := hroot a
-      exact ⟨Ideal.Quotient.mkₐ k I.asIdeal w, by rw [← map_pow, hw, AlgHom.commutes]⟩)
+    obtain ⟨n', hn', α, hα⟩ :=
+      fieldGen (k := k) (E := R ⧸ I.asIdeal) p c (fun a => by
+        obtain ⟨w, hw⟩ := hroot a
+        exact ⟨Ideal.Quotient.mkₐ k I.asIdeal w, by rw [← map_pow, hw, AlgHom.commutes]⟩)
     have : n' = n := Nat.pow_right_injective hq2 (hn'.symm.trans hn)
     subst this
     exact ⟨α, hα⟩
@@ -151,11 +156,13 @@ theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDime
   let A := Algebra.adjoin k (Set.range (fun b : R ⧸ N => b ^ (p ^ c)) ∪ Set.range Lbar)
   have he : ∀ I, σ I 1 ∈ A := fun I => by
     have : σ I 1 = σ I 1 ^ (p ^ c) := by rw [← hσpow, one_pow]
-    rw [this]; exact Algebra.subset_adjoin (Or.inl ⟨_, rfl⟩)
+    rw [this]
+    exact Algebra.subset_adjoin (Or.inl ⟨_, rfl⟩)
   have hσA : ∀ I z, σ I z ∈ A := by
     intro I z
-    have hz : z ∈ Algebra.adjoin k
-        (Set.range (fun b : R ⧸ I.asIdeal => b ^ (p ^ c)) ∪ Set.range (α I)) := by
+    have hz
+        : z ∈ Algebra.adjoin k
+          (Set.range (fun b : R ⧸ I.asIdeal => b ^ (p ^ c)) ∪ Set.range (α I)) := by
       rw [hα I]; trivial
     induction hz using Algebra.adjoin_induction with
     | mem x hx =>
@@ -173,18 +180,23 @@ theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDime
         rw [map_sum]
       simp only [σ, AlgEquiv.apply_symm_apply]
       exact (Finset.univ_sum_single (π x)).symm
-    rw [this]; exact A.sum_mem fun I _ => hσA I _
+    rw [this]
+    exact A.sum_mem fun I _ => hσA I _
 
   choose L hL using fun i => Ideal.Quotient.mk_surjective (I := N) (Lbar i)
   let T := Pw k R (p ^ c)
   have hLq : ∀ i, L i ^ (p ^ c) ∈ T := fun i => Algebra.subset_adjoin ⟨L i, rfl⟩
   let S := Algebra.adjoin k ((T : Set R) ∪ Set.range L)
-  have hAS : A ≤ S.map f := Algebra.adjoin_le (by
-    rintro _ (⟨b, rfl⟩ | ⟨i, rfl⟩)
-    · obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective b
-      exact ⟨r ^ (p ^ c), Algebra.subset_adjoin (Or.inl (Algebra.subset_adjoin ⟨r, rfl⟩)),
-        by rw [map_pow]; rfl⟩
-    · exact ⟨L i, Algebra.subset_adjoin (Or.inr ⟨i, rfl⟩), hL i⟩)
+  have hAS : A ≤ S.map f :=
+    Algebra.adjoin_le (by
+      rintro _ (⟨b, rfl⟩ | ⟨i, rfl⟩)
+      · obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective b
+        exact ⟨
+          r ^ (p ^ c),
+          Algebra.subset_adjoin (Or.inl (Algebra.subset_adjoin ⟨r, rfl⟩)),
+          by rw [map_pow]; rfl
+        ⟩
+      · exact ⟨L i, Algebra.subset_adjoin (Or.inr ⟨i, rfl⟩), hL i⟩)
   have hlift : ∀ r : R, ∃ s ∈ S, f s = f r := fun r => hAS (hAtop (f r))
 
   let g : S →ₗ[k] R ⧸ N := f.toLinearMap ∘ₗ S.val.toLinearMap
@@ -193,8 +205,7 @@ theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDime
     obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective x
     obtain ⟨s, hs, hfs⟩ := hlift r
     exact ⟨⟨s, hs⟩, hfs⟩
-  have hS : finrank k S ≤ (p ^ c) ^ n * finrank k T :=
-    finrank_adjoin_pow_le T (p ^ c) n hq0 L hLq
+  have hS : finrank k S ≤ (p ^ c) ^ n * finrank k T := finrank_adjoin_pow_le T (p ^ c) n hq0 L hLq
   have hTmem : ∀ t : T, f t ∈ Subalgebra.toSubmodule (Pw k (R ⧸ N) (p ^ c)) := by
     intro t
     obtain ⟨w, hw⟩ := (mem_Pw p c hroot).mp t.2
@@ -221,14 +232,15 @@ theorem sectionEx {k R : Type*} [Field k] [CommRing R] [Algebra k R] [FiniteDime
     exact LinearMap.finrank_range_le g
   have heq : finrank k S = finrank k (R ⧸ N) := by
     refine le_antisymm ?_ hbar
-    calc finrank k S ≤ (p ^ c) ^ n * finrank k T := hS
+    calc
+      finrank k S
+        ≤ (p ^ c) ^ n * finrank k T := hS
       _ ≤ (p ^ c) ^ n * finrank k (Pw k (R ⧸ N) (p ^ c)) := Nat.mul_le_mul_left _ hT
       _ = finrank k (R ⧸ N) := hfc.symm
   have hginj : Function.Injective g :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank heq).mpr hg
   refine ⟨S, fun s hs hsn => ?_, fun r => ?_⟩
-  · have : g ⟨s, hs⟩ = g 0 := by
-      rw [map_zero]; exact (hfN s).mpr hsn
+  · have : g ⟨s, hs⟩ = g 0 := by rw [map_zero]; exact (hfN s).mpr hsn
     exact congrArg Subtype.val (hginj this)
   · obtain ⟨s, hs, hfs⟩ := hlift r
     refine ⟨s, hs, (hfN _).mp ?_⟩

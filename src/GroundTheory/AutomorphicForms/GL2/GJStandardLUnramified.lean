@@ -19,16 +19,17 @@ open Matrix GLnLocal Parabolic Iwasawa Polynomial Spherical HeckeAlgebra
 def homSum (m : ℕ) (b : Fin m → ℂ) (k : ℕ) : ℂ :=
   ∑ l ∈ Finset.Nat.antidiagonalTuple m k, ∏ i, b i ^ l i
 
-theorem homSum_mul (m : ℕ) (b : Fin m → ℂ) (t : ℂ) (k : ℕ) :
-    homSum m (fun i ↦ t * b i) k = t ^ k * homSum m b k := by
+theorem homSum_mul (m : ℕ) (b : Fin m → ℂ) (t : ℂ) (k : ℕ)
+    : homSum m (fun i ↦ t * b i) k = t ^ k * homSum m b k := by
   unfold homSum
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun l hl ↦ ?_
   rw [← Finset.Nat.mem_antidiagonalTuple.1 hl]
   simp only [mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
 
-theorem norm_lt_one_of_summable {m : ℕ} {b : Fin m → ℂ} (h : Summable fun k ↦ ‖homSum m b k‖) (i : Fin m) :
-    ‖b i‖ < 1 := by
+theorem norm_lt_one_of_summable
+    {m : ℕ} {b : Fin m → ℂ} (h : Summable fun k ↦ ‖homSum m b k‖) (i : Fin m)
+    : ‖b i‖ < 1 := by
   set P : ℂ → ℂ := fun t ↦ ∑' k, homSum m b k * t ^ k with hPdef
   set Q : ℂ → ℂ := fun t ↦ ∏ j, (1 - t * b j) with hQdef
   set R : ℂ → ℂ := fun t ↦ Q t * P t with hRdef
@@ -39,14 +40,16 @@ theorem norm_lt_one_of_summable {m : ℕ} {b : Fin m → ℂ} (h : Summable fun 
     exact mul_le_of_le_one_right (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) ht1)
   have hPd : DifferentiableOn ℂ P (ball 0 1) :=
     Complex.differentiableOn_tsum_of_summable_norm h
-      (fun k ↦ ((differentiable_const _).mul (differentiable_pow k)).differentiableOn) isOpen_ball
+      (fun k ↦ ((differentiable_const _).mul (differentiable_pow k)).differentiableOn)
+      isOpen_ball
       (fun k t ht ↦ hterm k t (ball_subset_closedBall ht))
   have hPc : ContinuousOn P (closedBall 0 1) :=
     continuousOn_tsum (fun k ↦ (continuous_const.mul (continuous_pow k)).continuousOn) h hterm
   have hQd : Differentiable ℂ Q := by
     rw [hQdef]
     fun_prop
-  have hRa : AnalyticOnNhd ℂ R (ball 0 1) := (hQd.differentiableOn.mul hPd).analyticOnNhd isOpen_ball
+  have hRa : AnalyticOnNhd ℂ R (ball 0 1) :=
+    (hQd.differentiableOn.mul hPd).analyticOnNhd isOpen_ball
   have hRc : ContinuousOn R (closedBall 0 1) := hQd.continuous.continuousOn.mul hPc
 
   set ε : ℝ := (1 + ∑ j, ‖b j‖)⁻¹ with hεdef
@@ -58,7 +61,9 @@ theorem norm_lt_one_of_summable {m : ℕ} {b : Fin m → ℂ} (h : Summable fun 
       rw [norm_mul]
       have h2 : ‖b j‖ ≤ ∑ j, ‖b j‖ :=
         Finset.single_le_sum (f := fun j ↦ ‖b j‖) (fun j _ ↦ norm_nonneg _) (Finset.mem_univ j)
-      calc ‖t‖ * ‖b j‖ ≤ ε * ∑ j, ‖b j‖ := mul_le_mul ht.le h2 (norm_nonneg _) hε.le
+      calc
+        ‖t‖ * ‖b j‖
+          ≤ ε * ∑ j, ‖b j‖ := mul_le_mul ht.le h2 (norm_nonneg _) hε.le
         _ < ε * (1 + ∑ j, ‖b j‖) := mul_lt_mul_of_pos_left (by linarith) hε
         _ = 1 := by rw [hεdef, inv_mul_cancel₀ hpos.ne']
     have hs := hasSum_sum_antidiagonalTuple hsmall
@@ -95,18 +100,26 @@ theorem norm_lt_one_of_summable {m : ℕ} {b : Fin m → ℂ} (h : Summable fun 
   simp only [hRdef, h0, zero_mul] at h1
   exact zero_ne_one h1
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {n : ℕ} [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
-  {V : Type*} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin n) F) V}
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
+  {π : Representation ℂ (GL (Fin n) F) V}
 
-theorem zetaIntegral_sphericalCoeff_of_integrable (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
-    {z : Fin n → ℂˣ} (hz : IsSatakeParameter π μ z) {v₀ : V}
-    (hv₀ : v₀ ∈ fixedVectors π (integralGL F n)) {ℓ₀ : Module.Dual ℂ V} (hℓ₀ : ℓ₀ v₀ = 1) {s : ℂ}
-    (hI : Integrable (fun g : GL (Fin n) F ↦ integralIndicator F n (g : Matrix (Fin n) (Fin n) F) *
-      matrixCoeff π v₀ ℓ₀ g * detPow g (s + ((n : ℂ) - 1) / 2)) μ) :
-    (∀ i, ‖(z i : ℂ) * qs F s‖ < 1) ∧
-      zetaIntegral μ (integralIndicator F n) (matrixCoeff π v₀ ℓ₀) s =
-        (μ.real (integralGL F n : Set (GL (Fin n) F)) : ℂ) * ∏ i, (1 - (z i : ℂ) * qs F s)⁻¹ := by
+theorem zetaIntegral_sphericalCoeff_of_integrable
+    (μ : Measure (GL (Fin n) F)) [μ.IsHaarMeasure]
+    {z : Fin n → ℂˣ} (hz : IsSatakeParameter π μ z)
+    {v₀ : V} (hv₀ : v₀ ∈ fixedVectors π (integralGL F n))
+    {ℓ₀ : Module.Dual ℂ V} (hℓ₀ : ℓ₀ v₀ = 1)
+    {s : ℂ}
+    (hI : Integrable
+      (fun g : GL (Fin n) F ↦
+        integralIndicator F n (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v₀ ℓ₀ g
+          * detPow g (s + ((n : ℂ) - 1) / 2))
+      μ)
+    : (∀ i, ‖(z i : ℂ) * qs F s‖ < 1)
+      ∧ zetaIntegral μ (integralIndicator F n) (matrixCoeff π v₀ ℓ₀) s
+        = (μ.real (integralGL F n : Set (GL (Fin n) F)) : ℂ) * ∏ i, (1 - (z i : ℂ) * qs F s)⁻¹ := by
   set H : GL (Fin n) F → ℂ := fun g : GL (Fin n) F ↦ integralIndicator F n (g : Matrix (Fin n) (Fin n) F) *
       matrixCoeff π v₀ ℓ₀ g * detPow g (s + ((n : ℂ) - 1) / 2) with hHdef
   set w : Fin n → ℂ := fun i ↦ (z i : ℂ) * qs F s with hwdef
@@ -114,12 +127,15 @@ theorem zetaIntegral_sphericalCoeff_of_integrable (μ : Measure (GL (Fin n) F)) 
   have hcpos : 0 < μ.real (integralGL F n : Set (GL (Fin n) F)) :=
     ENNReal.toReal_pos ((isOpen_integralGL F n).measure_pos μ ⟨1, (integralGL F n).one_mem⟩).ne'
       (isCompact_integralGL F n).measure_lt_top.ne
-  have hterm : ∀ m : ℕ, ∫ g in {g : GL (Fin n) F | ordDet g = (m : ℤ)}, H g ∂μ = c * homSum n w m := by
+  have hterm
+      : ∀ m : ℕ, ∫ g in {g : GL (Fin n) F | ordDet g = (m : ℤ)}, H g ∂μ = c * homSum n w m := by
     intro m
-    rw [hHdef, integral_shell_integralIndicator, integral_mul_matrixCoeff_of_isSatakeParameter hz hv₀,
-      hℓ₀, mul_one, evalAt_satakeTransform_integralHecke]
-    have hprod : ∀ l ∈ Finset.Nat.antidiagonalTuple n m,
-        ∏ i, ((z i : ℂ) * qs F s) ^ l i = qs F s ^ m * ∏ i, (z i : ℂ) ^ l i := by
+    rw [hHdef, integral_shell_integralIndicator,
+      integral_mul_matrixCoeff_of_isSatakeParameter hz hv₀, hℓ₀, mul_one,
+      evalAt_satakeTransform_integralHecke]
+    have hprod
+        : ∀ l ∈ Finset.Nat.antidiagonalTuple n m,
+          ∏ i, ((z i : ℂ) * qs F s) ^ l i = qs F s ^ m * ∏ i, (z i : ℂ) ^ l i := by
       intro l hl
       rw [← Finset.Nat.mem_antidiagonalTuple.1 hl]
       simp only [mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
@@ -135,9 +151,12 @@ theorem zetaIntegral_sphericalCoeff_of_integrable (μ : Measure (GL (Fin n) F)) 
       refine h1.congr fun k ↦ ?_
       exact integral_complex_ofReal
     have h3 := h2.comp_injective Nat.cast_injective
-    refine Summable.of_nonneg_of_le (fun m ↦ norm_nonneg _) (fun m ↦ ?_)
+    refine Summable.of_nonneg_of_le
+      (fun m ↦ norm_nonneg _)
+      (fun m ↦ ?_)
       (h3.mul_left (μ.real (integralGL F n : Set (GL (Fin n) F)))⁻¹)
-    have hle := norm_integral_le_integral_norm (μ := μ.restrict {g : GL (Fin n) F | ordDet g = (m : ℤ)}) H
+    have hle :=
+      norm_integral_le_integral_norm (μ := μ.restrict {g : GL (Fin n) F | ordDet g = (m : ℤ)}) H
     rw [hterm m, norm_mul, hcdef, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hcpos] at hle
     simp only [Function.comp_apply]
     rw [le_inv_mul_iff₀ hcpos]
@@ -146,13 +165,18 @@ theorem zetaIntegral_sphericalCoeff_of_integrable (μ : Measure (GL (Fin n) F)) 
   refine ⟨hw, ?_⟩
   have hsum := hasSum_integral_shell μ hI
   rw [← (Nat.cast_injective (R := ℤ)).hasSum_iff fun k hk ↦ by
-    have hk' : k < 0 := by
-      by_contra hc
-      exact hk ⟨k.toNat, Int.toNat_of_nonneg (not_lt.1 hc)⟩
-    exact integral_shell_integralIndicator_of_neg μ _ _ hk'] at hsum
-  have hfun : ((fun k : ℤ ↦ ∫ g in {g : GL (Fin n) F | ordDet g = k},
-      integralIndicator F n (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v₀ ℓ₀ g *
-        detPow g (s + ((n : ℂ) - 1) / 2) ∂μ) ∘ Nat.cast) = fun m : ℕ ↦ c * homSum n w m :=
+      have hk' : k < 0 := by
+        by_contra hc
+        exact hk ⟨k.toNat, Int.toNat_of_nonneg (not_lt.1 hc)⟩
+      exact integral_shell_integralIndicator_of_neg μ _ _ hk']
+    at hsum
+  have hfun
+      : ((fun k : ℤ ↦
+            ∫ g in {g : GL (Fin n) F | ordDet g = k},
+              integralIndicator F n (g : Matrix (Fin n) (Fin n) F) * matrixCoeff π v₀ ℓ₀ g *
+                detPow g (s + ((n : ℂ) - 1) / 2) ∂μ)
+          ∘ Nat.cast)
+        = fun m : ℕ ↦ c * homSum n w m :=
     funext hterm
   rw [hfun] at hsum
   rw [zetaIntegral]

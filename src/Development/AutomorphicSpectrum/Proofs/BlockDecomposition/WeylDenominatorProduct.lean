@@ -9,12 +9,15 @@ open Finset GlobalTheory.CompanionTheory.CoefId
 
 namespace GlobalTheory.CompanionTheory.CoefId
 
-theorem prod_prod_symm_eq_diag_mul_prs_sq {n : ℕ} (g : Fin n → Fin n → ℂ) (hg : ∀ a b, g a b = g b a) :
-    ∏ a, ∏ b, g a b = (∏ a, g a a) * (∏ p ∈ prs n, g p.1 p.2) ^ 2 := by
+theorem prod_prod_symm_eq_diag_mul_prs_sq
+    {n : ℕ} (g : Fin n → Fin n → ℂ) (hg : ∀ a b, g a b = g b a)
+    : ∏ a, ∏ b, g a b = (∏ a, g a a) * (∏ p ∈ prs n, g p.1 p.2) ^ 2 := by
   have h1 : ∏ a, ∏ b, g a b = ∏ p : Fin n × Fin n, g p.1 p.2 :=
     (Fintype.prod_prod_type' (f := g)).symm
-  have hd : ∏ p ∈ (univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2).filter (fun p => p.1 = p.2),
-      g p.1 p.2 = ∏ a, g a a := by
+  have hd
+      : ∏ p ∈ (univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2).filter (fun p => p.1 = p.2),
+          g p.1 p.2
+        = ∏ a, g a a := by
     refine Finset.prod_nbij' (fun p => p.1) (fun a => (a, a)) ?_ ?_ ?_ ?_ ?_
     · intro p _; exact mem_univ _
     · intro a _; simp
@@ -25,8 +28,10 @@ theorem prod_prod_symm_eq_diag_mul_prs_sq {n : ℕ} (g : Fin n → Fin n → ℂ
     · intro p hp
       have : p.1 = p.2 := (mem_filter.mp hp).2
       simp [← this]
-  have ho : ∏ p ∈ (univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2).filter (fun p => ¬ p.1 = p.2),
-      g p.1 p.2 = ∏ p ∈ prs n, g p.1 p.2 := by
+  have ho
+      : ∏ p ∈ (univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2).filter (fun p => ¬ p.1 = p.2),
+          g p.1 p.2
+        = ∏ p ∈ prs n, g p.1 p.2 := by
     refine Finset.prod_nbij' Prod.swap Prod.swap ?_ ?_ ?_ ?_ ?_
     · intro p hp
       simp only [mem_filter, mem_univ, true_and] at hp
@@ -41,12 +46,13 @@ theorem prod_prod_symm_eq_diag_mul_prs_sq {n : ℕ} (g : Fin n → Fin n → ℂ
     · intro p _; simpa using hg p.1 p.2
   rw [h1, ← Finset.prod_filter_mul_prod_filter_not univ (fun p : Fin n × Fin n => p.1 < p.2),
     ← Finset.prod_filter_mul_prod_filter_not (univ.filter fun p : Fin n × Fin n => ¬ p.1 < p.2)
-      (fun p => p.1 = p.2), hd, ho]
+      (fun p => p.1 = p.2),
+    hd, ho]
   change (∏ p ∈ prs n, g p.1 p.2) * _ = _
   ring
 
-theorem prod_one_add_div_mul_prod_pow {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, z a ≠ 0) :
-    (∏ a, ∏ b, (1 + z a / z b)) * (∏ a, z a) ^ (n - 1)
+theorem prod_one_add_div_mul_prod_pow {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, z a ≠ 0)
+    : (∏ a, ∏ b, (1 + z a / z b)) * (∏ a, z a) ^ (n - 1)
       = 2 ^ n * (∏ p ∈ prs n, (z p.1 + z p.2)) ^ 2 := by
   have hZ : (∏ a, z a) ≠ 0 := Finset.prod_ne_zero_iff.mpr fun a _ => hz a
   have h1 : ∏ a, ∏ b, (1 + z a / z b) = (∏ a, ∏ b, (z a + z b)) / (∏ a, z a) ^ n := by

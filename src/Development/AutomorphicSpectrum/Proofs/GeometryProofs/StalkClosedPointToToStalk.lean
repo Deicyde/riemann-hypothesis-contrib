@@ -16,16 +16,17 @@ namespace CoordInhab
 
 variable {o K : Type} [CommRing o] [Field K] [Algebra o K]
 
-theorem inv_mem_of_span_eq_top {κ : Type} (x : κ → o) (hx : Ideal.span (Set.range x) = ⊤) (c : κ)
-    (S : Subring K) (h1 : ∀ a : o, algebraMap o K a ∈ S)
-    (h2 : ∀ j, algebraMap o K (x j) / algebraMap o K (x c) ∈ S) : (algebraMap o K (x c))⁻¹ ∈ S := by
+theorem inv_mem_of_span_eq_top
+    {κ : Type} (x : κ → o) (hx : Ideal.span (Set.range x) = ⊤) (c : κ)
+    (S : Subring K)
+    (h1 : ∀ a : o, algebraMap o K a ∈ S) (h2 : ∀ j, algebraMap o K (x j) / algebraMap o K (x c) ∈ S)
+    : (algebraMap o K (x c))⁻¹ ∈ S := by
   have h1mem : (1 : o) ∈ Submodule.span o (Set.range x) := by
     have h : (1 : o) ∈ Ideal.span (Set.range x) := by
       rw [hx]
       exact Submodule.mem_top
     exact h
-  have key : ∀ y ∈ Submodule.span o (Set.range x),
-      algebraMap o K y / algebraMap o K (x c) ∈ S := by
+  have key : ∀ y ∈ Submodule.span o (Set.range x), algebraMap o K y / algebraMap o K (x c) ∈ S := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem z hz =>
@@ -43,15 +44,16 @@ theorem inv_mem_of_span_eq_top {κ : Type} (x : κ → o) (hx : Ideal.span (Set.
   have h := key 1 h1mem
   rwa [map_one, one_div] at h
 
-theorem algebraMap_mem_regAt (p : Cpt (pt (algebraMap o K))) (a : o) :
-    algebraMap o K a ∈ regAt (pt (algebraMap o K)) p :=
+theorem algebraMap_mem_regAt (p : Cpt (pt (algebraMap o K))) (a : o)
+    : algebraMap o K a ∈ regAt (pt (algebraMap o K)) p :=
   RingHom.mem_range.2 ⟨tS p.1 a, genMap_toStalk _ p a⟩
 
 variable [IsFractionRing o K]
 
-theorem inChart_iff {κ : Type} (x : κ → o) (hx : Ideal.span (Set.range x) = ⊤) (c : κ)
-    (p : Cpt (pt (algebraMap o K))) :
-    InChart (pt (algebraMap o K)) (fun j => algebraMap o K (x j)) c p ↔ x c ∉ p.1.asIdeal := by
+theorem inChart_iff
+    {κ : Type} (x : κ → o) (hx : Ideal.span (Set.range x) = ⊤) (c : κ)
+    (p : Cpt (pt (algebraMap o K)))
+    : InChart (pt (algebraMap o K)) (fun j => algebraMap o K (x j)) c p ↔ x c ∉ p.1.asIdeal := by
   have hinj := IsFractionRing.injective o K
   constructor
   · rintro ⟨hne, hrat⟩ hmem
@@ -79,9 +81,12 @@ end CoordInhab
 
 open CoordInhab
 
-theorem ValAt.unique {X : Scheme.{0}} {Ω : Type} [Field Ω] {R : Type} [CommRing R] [IsLocalRing R]
+theorem ValAt.unique
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {R : Type} [CommRing R] [IsLocalRing R]
     {ξ : Spec (CommRingCat.of Ω) ⟶ X} {z : Spec (CommRingCat.of R) ⟶ X} {a : Ω} {r r' : R}
-    (hξ : IsCptGen ξ) (h : ValAt ξ z a r) (h' : ValAt ξ z a r') : r = r' := by
+    (hξ : IsCptGen ξ) (h : ValAt ξ z a r) (h' : ValAt ξ z a r')
+    : r = r' := by
   obtain ⟨hs, s, hsa, rfl⟩ := h
   obtain ⟨hs', s', hsa', rfl⟩ := h'
   exact congrArg (Scheme.stalkClosedPointTo z).hom (hξ.inj ⟨centre z, hs⟩ (hsa.trans hsa'.symm))

@@ -12,9 +12,11 @@ namespace GroundTheory.Heights₂.Heights.Vertical
 
 open MvPolynomial IsDedekindDomain
 
-theorem not_lt_of_mem_minimalPrimes_sup_span {R : Type*} [CommRing R] [IsNoetherianRing R]
-    {P W Q : Ideal R} {f : R} [P.IsPrime] [W.IsPrime] (hPW : P < W)
-    (hQ : Q ∈ (P ⊔ Ideal.span {f}).minimalPrimes) : ¬ W < Q := by
+theorem not_lt_of_mem_minimalPrimes_sup_span
+    {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {P W Q : Ideal R} {f : R} [P.IsPrime] [W.IsPrime]
+    (hPW : P < W) (hQ : Q ∈ (P ⊔ Ideal.span {f}).minimalPrimes)
+    : ¬ W < Q := by
   intro hWQ
   have : Q.IsPrime := hQ.isPrime
   have hPQ : P ≤ Q := le_sup_left.trans hQ.le
@@ -25,12 +27,14 @@ theorem not_lt_of_mem_minimalPrimes_sup_span {R : Type*} [CommRing R] [IsNoether
     Ideal.map_isPrime_of_surjective hπ (hker.le.trans hPW.le)
   have hQm : (Q.map (Ideal.Quotient.mk P)).IsPrime :=
     Ideal.map_isPrime_of_surjective hπ (hker.le.trans hPQ)
-  have hinj : ∀ {I J : Ideal R}, P ≤ I → P ≤ J →
-      I.map (Ideal.Quotient.mk P) = J.map (Ideal.Quotient.mk P) → I = J := by
+  have hinj
+      : ∀ {I J : Ideal R},
+        P ≤ I → P ≤ J → I.map (Ideal.Quotient.mk P) = J.map (Ideal.Quotient.mk P) → I = J := by
     intro I J hI hJ h
     have := congrArg (Ideal.comap (Ideal.Quotient.mk P)) h
     rwa [Ideal.comap_map_of_surjective' _ hπ, Ideal.comap_map_of_surjective' _ hπ, hker,
-      sup_eq_left.mpr hI, sup_eq_left.mpr hJ] at this
+        sup_eq_left.mpr hI, sup_eq_left.mpr hJ]
+      at this
   have hlt1 : (⊥ : Ideal (R ⧸ P)) < W.map (Ideal.Quotient.mk P) := by
     refine bot_lt_iff_ne_bot.mpr fun h => hPW.ne ?_
     exact hinj le_rfl hPW.le (by rw [h, Ideal.map_quotient_self])
@@ -62,40 +66,47 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
       rw [Set.Finite.mem_toFinset] at hQ
       exact hQW' (le_antisymm hQW (hW.2 ⟨hQ.isPrime, hQ.le⟩ hQW))
     obtain ⟨h, hh, hhW⟩ := SetLike.not_le_iff_exists.mp hnot
-    exact ⟨h, fun Q hQ hQW => Finset.inf_le (f := id)
-      (Finset.mem_erase.mpr ⟨hQW, hfin.mem_toFinset.mpr hQ⟩) hh, hhW⟩
+    exact ⟨
+      h,
+      fun Q hQ hQW =>
+        Finset.inf_le (f := id) (Finset.mem_erase.mpr ⟨hQW, hfin.mem_toFinset.mpr hQ⟩) hh,
+      hhW
+    ⟩
 
   have hvmax : v.asIdeal.IsMaximal := v.isPrime.isMaximal v.ne_bot
   have hWC : W.comap (C : O →+* MvPolynomial (Fin n) O) = v.asIdeal :=
     (hvmax.eq_of_le (Ideal.comap_ne_top _ hWp.ne_top) (Ideal.map_le_iff_le_comap.mp hvW)).symm
   have : W.LiesOver v.asIdeal := ⟨hWC.symm⟩
   let _ : Field (O ⧸ v.asIdeal) := Ideal.Quotient.field _
-  have hBnf : ¬ IsField (MvPolynomial (Fin n) O ⧸ W) :=
-    fun hf => hWmax (Ideal.Quotient.maximal_of_isField W hf)
+  have hBnf : ¬ IsField (MvPolynomial (Fin n) O ⧸ W) := fun hf =>
+    hWmax (Ideal.Quotient.maximal_of_isField W hf)
   obtain ⟨I, hIbot, hItop⟩ := Ring.not_isField_iff_exists_ideal_bot_lt_and_lt_top.mp hBnf
   have hdim1 : 1 ≤ ringKrullDim (MvPolynomial (Fin n) O ⧸ W) := by
     have : Nontrivial (_ ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hItop.ne
     have h2 := GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_quotient_add_one_le I hIbot.ne'
     have h0 := ringKrullDim_nonneg_of_nontrivial (R := (MvPolynomial (Fin n) O ⧸ W) ⧸ I)
-    calc (1 : WithBot ℕ∞) = 0 + 1 := by simp
+    calc
+      (1 : WithBot ℕ∞)
+        = 0 + 1 := by simp
       _ ≤ ringKrullDim ((MvPolynomial (Fin n) O ⧸ W) ⧸ I) + 1 := add_le_add h0 le_rfl
       _ ≤ _ := h2
-  obtain ⟨N₀, hN₀, hhN₀, hdimN₀⟩ := hAvoid (O ⧸ v.asIdeal) (MvPolynomial (Fin n) O ⧸ W)
-    (Ideal.Quotient.mk W h) (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem]) hdim1
+  obtain ⟨N₀, hN₀, hhN₀, hdimN₀⟩ :=
+    hAvoid (O ⧸ v.asIdeal) (MvPolynomial (Fin n) O ⧸ W) (Ideal.Quotient.mk W h)
+      (by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem]) hdim1
 
   set φ : MvPolynomial (Fin n) O →+* (MvPolynomial (Fin n) O ⧸ W) ⧸ N₀ :=
     (Ideal.Quotient.mk N₀).comp (Ideal.Quotient.mk W) with hφ
-  have hφs : Function.Surjective φ :=
-    Ideal.Quotient.mk_surjective.comp Ideal.Quotient.mk_surjective
+  have hφs : Function.Surjective φ := Ideal.Quotient.mk_surjective.comp Ideal.Quotient.mk_surjective
   set N := RingHom.ker φ with hNdef
   have hNp : N.IsPrime := RingHom.ker_isPrime φ
   have hmemN : ∀ a, a ∈ N ↔ Ideal.Quotient.mk W a ∈ N₀ := fun a => by
     simp [N, φ, RingHom.mem_ker, Ideal.Quotient.eq_zero_iff_mem]
-  have hWN : W ≤ N := fun a ha => (hmemN a).mpr (by
-    rw [Ideal.Quotient.eq_zero_iff_mem.mpr ha]; exact N₀.zero_mem)
+  have hWN : W ≤ N := fun a ha =>
+    (hmemN a).mpr (by rw [Ideal.Quotient.eq_zero_iff_mem.mpr ha]; exact N₀.zero_mem)
   have hhN : h ∉ N := fun hh => hhN₀ ((hmemN h).mp hh)
-  have hdimN : ringKrullDim (MvPolynomial (Fin n) O ⧸ N) + 1 =
-      ringKrullDim (MvPolynomial (Fin n) O ⧸ W) := by
+  have hdimN
+      : ringKrullDim (MvPolynomial (Fin n) O ⧸ N) + 1
+        = ringKrullDim (MvPolynomial (Fin n) O ⧸ W) := by
     rw [ringKrullDim_eq_of_ringEquiv (RingHom.quotientKerEquivOfSurjective hφs)]
     exact hdimN₀
   have hNW : ¬ N ≤ W := by
@@ -107,8 +118,9 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
       exact Ideal.mem_bot.mpr (Ideal.Quotient.eq_zero_iff_mem.mpr (hle ((hmemN a).mpr hx)))
     subst hN₀bot
     rw [ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot _)] at hdimN₀
-    obtain ⟨m, hm, -⟩ := GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg
-      (k := O ⧸ v.asIdeal) (A := MvPolynomial (Fin n) O ⧸ W)
+    obtain ⟨m, hm, -⟩ :=
+      GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg (k := O ⧸ v.asIdeal)
+        (A := MvPolynomial (Fin n) O ⧸ W)
     rw [hm] at hdimN₀
     have : ((m + 1 : ℕ) : WithBot ℕ∞) = (m : WithBot ℕ∞) := by push_cast; exact hdimN₀
     have : m + 1 = m := by exact_mod_cast this
@@ -117,12 +129,13 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
   have hNQ : ∀ Q ∈ (P ⊔ vX).minimalPrimes, ¬ N ≤ Q := fun Q hQ hle =>
     hNW (hle.trans (hQ.2 ⟨hWp, hW.le⟩ (hWN.trans hle)))
   obtain ⟨f, hfN, hfQ⟩ : ∃ f ∈ N, ∀ Q ∈ (P ⊔ vX).minimalPrimes, f ∉ Q := by
-    have hns : ¬ ((N : Set (MvPolynomial (Fin n) O)) ⊆
-        ⋃ Q ∈ (↑hfin.toFinset : Set (Ideal (MvPolynomial (Fin n) O))), ((id Q : Ideal _) : Set _)) := by
-      rw [Ideal.subset_union_prime (f := id) ⊥ ⊥
-        (fun Q hQ _ _ => (hfin.mem_toFinset.mp hQ).isPrime)]
-      rintro ⟨Q, hQ, hle⟩
-      exact hNQ Q (hfin.mem_toFinset.mp hQ) hle
+    have hns : ¬((N : Set (MvPolynomial (Fin n) O))
+        ⊆ ⋃ Q ∈ (↑hfin.toFinset : Set (Ideal (MvPolynomial (Fin n) O))), ((id Q : Ideal _) : Set _)) :=
+      by
+        rw [Ideal.subset_union_prime (f := id) ⊥ ⊥
+          (fun Q hQ _ _ => (hfin.mem_toFinset.mp hQ).isPrime)]
+        rintro ⟨Q, hQ, hle⟩
+        exact hNQ Q (hfin.mem_toFinset.mp hQ) hle
     obtain ⟨f, hfN, hf⟩ := Set.not_subset.mp hns
     refine ⟨f, hfN, fun Q hQ hfQ => hf ?_⟩
     exact Set.mem_biUnion (Finset.mem_coe.mpr (hfin.mem_toFinset.mpr hQ)) hfQ
@@ -138,9 +151,11 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
   have hQN : ∀ Q ∈ (P ⊔ vX).minimalPrimes, Q ≤ N → Q = W := fun Q hQ hle => by
     by_contra hne
     exact hhN (hle (hhQ Q hQ hne))
-  have hPltW : P < W := lt_of_le_of_ne hPW fun hPW' => v.ne_bot (by
-    rw [eq_bot_iff, ← hPC, hPW']
-    exact Ideal.map_le_iff_le_comap.mp hvW)
+  have hPltW : P < W :=
+    lt_of_le_of_ne hPW fun hPW' =>
+      v.ne_bot (by
+        rw [eq_bot_iff, ← hPC, hPW']
+        exact Ideal.map_le_iff_le_comap.mp hvW)
   have hvP' : ¬ vX ≤ P' := by
     intro hle
     obtain ⟨Q, hQ, hQP'⟩ := Ideal.exists_minimalPrimes_le (sup_le hPP' hle)
@@ -158,12 +173,13 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
     rw [hvX, Ideal.map_le_iff_le_comap, heq]
     exact Ideal.map_le_iff_le_comap.mp (hvW.trans hWN)
 
-  obtain ⟨W', hW', hW'N⟩ := Ideal.exists_minimalPrimes_le
-    (sup_le hP'N (hvW.trans hWN) : P' ⊔ vX ≤ N)
+  obtain ⟨W', hW', hW'N⟩ :=
+    Ideal.exists_minimalPrimes_le (sup_le hP'N (hvW.trans hWN) : P' ⊔ vX ≤ N)
   have : W'.IsPrime := hW'.isPrime
   have hWW' : W ≤ W' := by
-    obtain ⟨Q, hQ, hQW'⟩ := Ideal.exists_minimalPrimes_le
-      (sup_le (hPP'.trans (le_sup_left.trans hW'.le)) (le_sup_right.trans hW'.le) : P ⊔ vX ≤ W')
+    obtain ⟨Q, hQ, hQW'⟩ :=
+      Ideal.exists_minimalPrimes_le
+        (sup_le (hPP'.trans (le_sup_left.trans hW'.le)) (le_sup_right.trans hW'.le) : P ⊔ vX ≤ W')
     rw [← hQN Q hQ (hQW'.trans hW'N)]
     exact hQW'
   have hfW' : f ∈ W' := hW'.le (Ideal.mem_sup_left hfP')
@@ -177,7 +193,9 @@ theorem FibreCut.proof (hAvoid : CodimOnePrimeAvoid.Statement) : FibreCut.Statem
     have h2 := GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_quotient_add_one_le _ hne
     rwa [ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hWW')] at h2
   · rw [← hdimN]
-    exact add_le_add (ringKrullDim_le_of_surjective (Ideal.Quotient.factor hW'N)
-      (Ideal.Quotient.factor_surjective hW'N)) le_rfl
+    exact add_le_add
+      (ringKrullDim_le_of_surjective (Ideal.Quotient.factor hW'N)
+        (Ideal.Quotient.factor_surjective hW'N))
+      le_rfl
 
 end GroundTheory.Heights₂.Heights.Vertical

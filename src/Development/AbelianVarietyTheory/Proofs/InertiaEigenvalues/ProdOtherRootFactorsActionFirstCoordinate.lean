@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemSpan
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.SpanRing
 
 namespace GlobalTheory.RootFactorProduct
 
@@ -33,17 +34,24 @@ private lemma map_sub_smul_E_mulVec_eq {O : Type} [CommRing O] [IsDomain O] {n r
   simp only [Prod.snd_sub, Prod.smul_snd, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub]
   ring
 
-theorem prod_cons_action {O : Type} [CommRing O] [IsDomain O] {n r t : ℕ}
-    (e : (Fin n → FractionRing O) ≃ₗ[FractionRing O]
-      ((Fin r → FractionRing O) × (Fin t → FractionRing O)))
-    (E X₀ : Matrix (Fin n) (Fin n) O) (ρ : ℕ → O)
+theorem prod_cons_action
+    {O : Type} [CommRing O] [IsDomain O]
+    {n r t : ℕ}
+    (e
+      : (Fin n → FractionRing O) ≃ₗ[FractionRing O]
+        ((Fin r → FractionRing O) × (Fin t → FractionRing O)))
+    (E X₀ : Matrix (Fin n) (Fin n) O)
+    (ρ : ℕ → O)
     (hE : ∀ u, e ((E.map (toFr O)).mulVec u) = (0, (e u).2))
-    (hX : ∀ u, e ((X₀.map (toFr O)).mulVec u) =
-      (0, fun c : Fin t => toFr O (ρ ((c : ℕ) + 1)) * (e u).2 c))
-    (s : List ℕ) : ∀ (a : ℕ) (u : Fin n → FractionRing O),
-      e (((((a :: s).map fun c => X₀ - ρ c • E).prod).map (toFr O)).mulVec u) =
-        (0, fun c : Fin t =>
-          toFr O (((a :: s).map fun c' => ρ ((c : ℕ) + 1) - ρ c').prod) * (e u).2 c) := by
+    (hX : ∀ u,
+      e ((X₀.map (toFr O)).mulVec u) = (0, fun c : Fin t => toFr O (ρ ((c : ℕ) + 1)) * (e u).2 c))
+    (s : List ℕ)
+    : ∀ (a : ℕ) (u : Fin n → FractionRing O),
+      e (((((a :: s).map fun c => X₀ - ρ c • E).prod).map (toFr O)).mulVec u)
+        = (
+          0,
+          fun c : Fin t => toFr O (((a :: s).map fun c' => ρ ((c : ℕ) + 1) - ρ c').prod) * (e u).2 c
+        ) := by
   induction s with
   | nil =>
     intro a u
@@ -66,16 +74,27 @@ private lemma list_prod_range'_eq_prod_Ico {M : Type} [CommMonoid M] (g : ℕ �
     rw [List.range'_succ, List.map_cons, List.prod_cons, ih, show m + (n + 1) = m + 1 + n by omega,
       Finset.prod_eq_prod_Ico_succ_bot (show m < m + 1 + n by omega)]
 
-theorem prod_other_factors_action {O : Type} [CommRing O] [IsDomain O] {n r t : ℕ}
-    (e : (Fin n → FractionRing O) ≃ₗ[FractionRing O]
-      ((Fin r → FractionRing O) × (Fin t → FractionRing O)))
-    (E X₀ : Matrix (Fin n) (Fin n) O) (ρ : ℕ → O) (ht : 2 ≤ t)
-    (hE : ∀ u, e ((E.map (toFr O)).mulVec u) = (0, (e u).2))
-    (hX : ∀ u, e ((X₀.map (toFr O)).mulVec u) =
-      (0, fun c : Fin t => toFr O (ρ ((c : ℕ) + 1)) * (e u).2 c)) (u : Fin n → FractionRing O) :
-    e (((((List.range' 2 (t - 1)).map fun c => X₀ - ρ c • E).prod).map (toFr O)).mulVec u) =
-      (0, fun c : Fin t => if (c : ℕ) = 0 then
-        toFr O (∏ c' ∈ Finset.Ioc 1 t, (ρ 1 - ρ c')) * (e u).2 c else 0) := by
+theorem prod_other_factors_action
+    {O : Type} [CommRing O] [IsDomain O]
+    {n r t : ℕ}
+    (e
+      : (Fin n → FractionRing O) ≃ₗ[FractionRing O]
+        ((Fin r → FractionRing O) × (Fin t → FractionRing O)))
+    (E X₀ : Matrix (Fin n) (Fin n) O)
+    (ρ : ℕ → O)
+    (ht : 2 ≤ t) (hE : ∀ u, e ((E.map (toFr O)).mulVec u) = (0, (e u).2))
+    (hX : ∀ u,
+      e ((X₀.map (toFr O)).mulVec u) = (0, fun c : Fin t => toFr O (ρ ((c : ℕ) + 1)) * (e u).2 c))
+    (u : Fin n → FractionRing O)
+    : e (((((List.range' 2 (t - 1)).map fun c => X₀ - ρ c • E).prod).map (toFr O)).mulVec u)
+      = (
+        0,
+        fun c : Fin t =>
+          if (c : ℕ) = 0 then
+            toFr O (∏ c' ∈ Finset.Ioc 1 t, (ρ 1 - ρ c')) * (e u).2 c
+          else
+            0
+      ) := by
   have hl : List.range' 2 (t - 1) = 2 :: List.range' 3 (t - 2) := by
     rw [show t - 1 = (t - 2) + 1 by omega, List.range'_succ]
   rw [hl, prod_cons_action e E X₀ ρ hE hX, ← hl]

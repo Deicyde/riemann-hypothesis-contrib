@@ -13,19 +13,22 @@ open scoped NumberField.LiesOver TensorProduct
 
 namespace Matrix
 
-theorem det_blockDiagonal' {R ι : Type*} [CommRing R] [Fintype ι] [DecidableEq ι] {κ : ι → Type*}
-    [∀ i, Fintype (κ i)] [∀ i, DecidableEq (κ i)] (M : ∀ i, Matrix (κ i) (κ i) R) :
-    (Matrix.blockDiagonal' M).det = ∏ i, (M i).det := by
+theorem det_blockDiagonal'
+    {R ι : Type*} [CommRing R] [Fintype ι] [DecidableEq ι]
+    {κ : ι → Type*} [∀ i, Fintype (κ i)] [∀ i, DecidableEq (κ i)]
+    (M : ∀ i, Matrix (κ i) (κ i) R)
+    : (Matrix.blockDiagonal' M).det = ∏ i, (M i).det := by
   classical
   let _ : LinearOrder ι := LinearOrder.lift' (Fintype.equivFin ι) (Fintype.equivFin ι).injective
   rw [(Matrix.blockTriangular_blockDiagonal' M).det]
   have hblock : ∀ a, ((Matrix.blockDiagonal' M).toSquareBlock Sigma.fst a).det = (M a).det := by
     intro a
-    let e : κ a ≃ {x : (i : ι) × κ i // x.1 = a} :=
-      { toFun := fun x => ⟨⟨a, x⟩, rfl⟩
-        invFun := fun x => x.2 ▸ x.1.2
-        left_inv := fun x => rfl
-        right_inv := by rintro ⟨⟨i, x⟩, rfl⟩; rfl }
+    let e : κ a ≃ {x : (i : ι) × κ i // x.1 = a} := {
+      toFun := fun x => ⟨⟨a, x⟩, rfl⟩
+      invFun := fun x => x.2 ▸ x.1.2
+      left_inv := fun x => rfl
+      right_inv := by rintro ⟨⟨i, x⟩, rfl⟩; rfl
+    }
     rw [← Matrix.det_submatrix_equiv_self e]
     congr 1
     ext x y
@@ -39,16 +42,17 @@ end Matrix
 
 namespace Algebra
 
-variable {R ι : Type*} [CommRing R] [Fintype ι] [DecidableEq ι] {A : ι → Type*}
-  [∀ i, CommRing (A i)] [∀ i, Algebra R (A i)] [∀ i, Module.Free R (A i)]
+variable
+  {R ι : Type*} [CommRing R] [Fintype ι] [DecidableEq ι]
+  {A : ι → Type*} [∀ i, CommRing (A i)] [∀ i, Algebra R (A i)] [∀ i, Module.Free R (A i)]
   [∀ i, Module.Finite R (A i)]
 
-
 omit [∀ i, Module.Free R (A i)] [∀ i, Module.Finite R (A i)] in
-theorem leftMulMatrix_pi {κ : ι → Type*} [∀ i, Fintype (κ i)] [∀ i, DecidableEq (κ i)]
-    (b : ∀ i, Module.Basis (κ i) R (A i)) (x : ∀ i, A i) :
-    Algebra.leftMulMatrix (Pi.basis b) x =
-      Matrix.blockDiagonal' fun i => Algebra.leftMulMatrix (b i) (x i) := by
+theorem leftMulMatrix_pi
+    {κ : ι → Type*} [∀ i, Fintype (κ i)] [∀ i, DecidableEq (κ i)]
+    (b : ∀ i, Module.Basis (κ i) R (A i)) (x : ∀ i, A i)
+    : Algebra.leftMulMatrix (Pi.basis b) x
+      = Matrix.blockDiagonal' fun i => Algebra.leftMulMatrix (b i) (x i) := by
   ext ⟨i, k⟩ ⟨j, l⟩
   rw [Algebra.leftMulMatrix_eq_repr_mul, Pi.basis_apply, Pi.basis_repr, Matrix.blockDiagonal'_apply]
   by_cases h : i = j
@@ -93,53 +97,51 @@ def tensorPiHom : v.Completion ⊗[K] L →ₐ[v.Completion] PiPlacesOver (L := 
     ((Algebra.ofId L (PiPlacesOver (L := L) v)).restrictScalars K) (fun _ _ => Commute.all _ _)
 
 @[simp]
-theorem tensorPiHom_tmul (x : v.Completion) (l : L) (w : v.placesOver L) :
-    tensorPiHom v (x ⊗ₜ l) w =
-      algebraMap v.Completion _ x * (l : (w : InfinitePlace L).Completion) := by
+theorem tensorPiHom_tmul (x : v.Completion) (l : L) (w : v.placesOver L)
+    : tensorPiHom v (x ⊗ₜ l) w
+      = algebraMap v.Completion _ x * (l : (w : InfinitePlace L).Completion) := by
   simp [tensorPiHom, AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply]
 
-
 variable {v} in
-theorem finrank_completion_pos (w : InfinitePlace L) [w.LiesOver v] :
-    0 < Module.finrank v.Completion w.Completion := by
+theorem finrank_completion_pos (w : InfinitePlace L) [w.LiesOver v]
+    : 0 < Module.finrank v.Completion w.Completion := by
   rcases w.isUnramified_or_isRamified K with h | h
   · rw [h.finrank_eq_one v]; norm_num
   · rw [h.finrank_eq_two v]; norm_num
 
-instance finiteDimensional_completion (w : InfinitePlace L) [w.LiesOver v] :
-    FiniteDimensional v.Completion w.Completion :=
+instance finiteDimensional_completion (w : InfinitePlace L) [w.LiesOver v]
+    : FiniteDimensional v.Completion w.Completion :=
   Module.finite_of_finrank_pos (finrank_completion_pos (v := v) w)
 
 open scoped Classical in
-instance instFintypePlacesOver [NumberField L] : Fintype (v.placesOver L) :=
-  Subtype.fintype _
+instance instFintypePlacesOver [NumberField L] : Fintype (v.placesOver L) := Subtype.fintype _
 
 variable [NumberField K] [NumberField L]
 
-
 open scoped Classical in
-theorem sum_finrank_completion :
-    ∑ w : v.placesOver L, Module.finrank v.Completion (w : InfinitePlace L).Completion =
-      Module.finrank K L := by
+theorem sum_finrank_completion
+    : ∑ w : v.placesOver L, Module.finrank v.Completion (w : InfinitePlace L).Completion
+      = Module.finrank K L := by
   classical
   rw [← sum_inertiaDeg_eq_finrank K L v]
-  refine Finset.sum_bij (fun w _ => w.1) (fun w _ => by simp)
-    (fun a _ b _ h => Subtype.ext h) (fun b hb => ⟨⟨b, by simpa using hb⟩, Finset.mem_univ _, rfl⟩)
+  refine Finset.sum_bij
+    (fun w _ => w.1)
+    (fun w _ => by simp)
+    (fun a _ b _ h => Subtype.ext h)
+    (fun b hb => ⟨⟨b, by simpa using hb⟩, Finset.mem_univ _, rfl⟩)
     (fun w _ => (inertiaDeg_eq_finrank v w.1).symm)
 
-theorem finrank_piPlacesOver :
-    Module.finrank v.Completion (PiPlacesOver (L := L) v) = Module.finrank K L := by
+theorem finrank_piPlacesOver
+    : Module.finrank v.Completion (PiPlacesOver (L := L) v) = Module.finrank K L := by
   classical
   rw [Module.finrank_pi_fintype, sum_finrank_completion]
 
-theorem finrank_tensor :
-    Module.finrank v.Completion (v.Completion ⊗[K] L) = Module.finrank K L :=
+theorem finrank_tensor : Module.finrank v.Completion (v.Completion ⊗[K] L) = Module.finrank K L :=
   Module.finrank_baseChange
 
-
 omit [NumberField K] in
-theorem denseRange_algebraMap_piPlacesOver :
-    DenseRange (algebraMap L (PiPlacesOver (L := L) v)) := by
+theorem denseRange_algebraMap_piPlacesOver
+    : DenseRange (algebraMap L (PiPlacesOver (L := L) v)) := by
   classical
   let π : InfiniteAdeleRing L → PiPlacesOver (L := L) v := fun x w => x w
   have hπ : Continuous π := continuous_pi fun w => continuous_apply (w : InfinitePlace L)
@@ -167,8 +169,9 @@ theorem tensorPiHom_surjective : Function.Surjective (tensorPiHom (L := L) v) :=
 
 theorem tensorPiHom_bijective : Function.Bijective (tensorPiHom (L := L) v) := by
   refine ⟨?_, tensorPiHom_surjective v⟩
-  have h : Module.finrank v.Completion (v.Completion ⊗[K] L) =
-      Module.finrank v.Completion (PiPlacesOver (L := L) v) := by
+  have h
+      : Module.finrank v.Completion (v.Completion ⊗[K] L)
+        = Module.finrank v.Completion (PiPlacesOver (L := L) v) := by
     rw [finrank_tensor, finrank_piPlacesOver]
   exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank h
     (f := (tensorPiHom (L := L) v).toLinearMap)).mpr (tensorPiHom_surjective v)
@@ -177,23 +180,24 @@ def tensorPiEquiv : v.Completion ⊗[K] L ≃ₐ[v.Completion] PiPlacesOver (L :
   AlgEquiv.ofBijective (tensorPiHom v) (tensorPiHom_bijective v)
 
 @[simp]
-theorem tensorPiEquiv_apply (x : v.Completion ⊗[K] L) :
-    tensorPiEquiv (L := L) v x = tensorPiHom v x := rfl
-
+theorem tensorPiEquiv_apply (x : v.Completion ⊗[K] L)
+    : tensorPiEquiv (L := L) v x = tensorPiHom v x :=
+  rfl
 
 def tensorPiEquivLeft : L ⊗[K] v.Completion ≃ₐ[L] PiPlacesOver (L := L) v :=
   AlgEquiv.ofRingEquiv
-    (f := ((Algebra.TensorProduct.comm K L v.Completion).trans
-      ((tensorPiEquiv (L := L) v).restrictScalars K)).toRingEquiv)
+    (f :=
+      ((Algebra.TensorProduct.comm K L v.Completion).trans
+        ((tensorPiEquiv (L := L) v).restrictScalars K)).toRingEquiv)
     (fun l => by
       ext w
       simp [Algebra.TensorProduct.algebraMap_apply, AbsoluteValue.Completion.algebraMap_def,
         WithAbs.algebraMap_right_apply])
 
 @[simp]
-theorem tensorPiEquivLeft_tmul (l : L) (x : v.Completion) (w : v.placesOver L) :
-    tensorPiEquivLeft (L := L) v (l ⊗ₜ x) w =
-      (l : (w : InfinitePlace L).Completion) * algebraMap v.Completion _ x := by
+theorem tensorPiEquivLeft_tmul (l : L) (x : v.Completion) (w : v.placesOver L)
+    : tensorPiEquivLeft (L := L) v (l ⊗ₜ x) w
+      = (l : (w : InfinitePlace L).Completion) * algebraMap v.Completion _ x := by
   simp [tensorPiEquivLeft, mul_comm]
 
 end InfinitePlace
@@ -202,29 +206,33 @@ namespace InfinitePlace
 
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] (v : InfinitePlace K)
 
-theorem liesOver_iff_comap_eq (w : InfinitePlace L) :
-    w.LiesOver v ↔ w.comap (algebraMap K L) = v :=
+theorem liesOver_iff_comap_eq (w : InfinitePlace L) : w.LiesOver v ↔ w.comap (algebraMap K L) = v :=
   ⟨fun _ => NumberField.InfinitePlace.LiesOver.comap_eq w v, fun h => ⟨congrArg Subtype.val h⟩⟩
 
-theorem comap_smul_algebraMap (σ : Gal(L/K)) (w : InfinitePlace L) :
-    (σ • w).comap (algebraMap K L) = w.comap (algebraMap K L) := by
+theorem comap_smul_algebraMap (σ : Gal(L/K)) (w : InfinitePlace L)
+    : (σ • w).comap (algebraMap K L) = w.comap (algebraMap K L) := by
   rw [comap_smul]
   congr 1
   ext x
   simp
 
 instance : MulAction Gal(L/K) (v.placesOver L) where
-  smul σ w := ⟨σ • (w : InfinitePlace L), (liesOver_iff_comap_eq v _).2 <| by
-    rw [comap_smul_algebraMap, (liesOver_iff_comap_eq v _).1 w.2]⟩
+  smul σ w := ⟨
+    σ • (w : InfinitePlace L),
+    (liesOver_iff_comap_eq v _).2 <| by
+      rw [comap_smul_algebraMap, (liesOver_iff_comap_eq v _).1 w.2]
+  ⟩
   one_smul w := Subtype.ext (one_smul _ (w : InfinitePlace L))
   mul_smul σ τ w := Subtype.ext (mul_smul σ τ (w : InfinitePlace L))
 
 @[simp]
-theorem coe_smul_placesOver (σ : Gal(L/K)) (w : v.placesOver L) :
-    ((σ • w : v.placesOver L) : InfinitePlace L) = σ • (w : InfinitePlace L) := rfl
+theorem coe_smul_placesOver (σ : Gal(L/K)) (w : v.placesOver L)
+    : ((σ • w : v.placesOver L) : InfinitePlace L) = σ • (w : InfinitePlace L) :=
+  rfl
 
-theorem exists_smul_eq_of_liesOver [IsGalois K L] (w w' : InfinitePlace L) [w.LiesOver v]
-    [w'.LiesOver v] : ∃ σ : Gal(L/K), σ • w = w' :=
+theorem exists_smul_eq_of_liesOver
+    [IsGalois K L] (w w' : InfinitePlace L) [w.LiesOver v] [w'.LiesOver v]
+    : ∃ σ : Gal(L/K), σ • w = w' :=
   exists_smul_eq_of_comap_eq <| by
     rw [(liesOver_iff_comap_eq v w).1 ‹_›, (liesOver_iff_comap_eq v w').1 ‹_›]
 

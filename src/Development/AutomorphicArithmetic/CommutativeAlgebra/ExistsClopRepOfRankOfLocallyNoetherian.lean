@@ -70,11 +70,15 @@ private lemma UpperTheory.isPullback_transport_symmetry {S : Scheme.{0}} {T Y G 
       rw [Iso.eq_inv_comp, ← Category.assoc, ← hsq, Category.assoc, Iso.hom_inv_id, Category.comp_id]
     · simp
 
-theorem UpperTheory.exists_clopRepOfRank_of_locallyNoetherian :
-    ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S), IsFinite G.hom → Etale G.hom → ∀ r : ℕ, ∃ (Y : Over S) (U : (Y ⊗ G).left.Opens), UpperTheory.RepresentationRank.RepOfRank r G Y U := by
+theorem UpperTheory.exists_clopRepOfRank_of_locallyNoetherian
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (G : Over S),
+      IsFinite G.hom → Etale G.hom
+        → ∀ r : ℕ, ∃ (Y : Over S) (U : (Y ⊗ G).left.Opens),
+          UpperTheory.RepresentationRank.RepOfRank r G Y U := by
   intro S _ G hfin het r
   obtain ⟨H, h, U₀, u, hprop, hcl, hfin', hflat', hrk, huniv⟩ :=
-    GlobalTheory.T.hilbertScheme_finite_locallyFree_representable_proper S G.left G.hom hfin inferInstance inferInstance r
+    GlobalTheory.T.hilbertScheme_finite_locallyFree_representable_proper S G.left G.hom hfin
+      inferInstance inferInstance r
   haveI := hprop
   haveI := hcl
   haveI := hfin'
@@ -90,7 +94,9 @@ theorem UpperTheory.exists_clopRepOfRank_of_locallyNoetherian :
   refine ⟨Y, ι₀.opensRange, ?_, ?_, ?_⟩
   · exact ι₀.isClosedEmbedding.isClosed_range
   · intro y
-    have hp : UpperTheory.RepresentationRank.proj ι₀.opensRange = ι₀.isoOpensRange.inv ≫ (u ≫ pullback.snd G.hom h) := by
+    have hp
+        : UpperTheory.RepresentationRank.proj ι₀.opensRange
+          = ι₀.isoOpensRange.inv ≫ (u ≫ pullback.snd G.hom h) := by
       rw [Iso.eq_inv_comp]
       change ι₀.isoOpensRange.hom ≫ (ι₀.opensRange.ι ≫ pullback.fst Y.hom G.hom) = _
       rw [← Category.assoc, Scheme.Hom.isoOpensRange_hom_ι]
@@ -109,11 +115,16 @@ theorem UpperTheory.exists_clopRepOfRank_of_locallyNoetherian :
       simp [v, UpperTheory.RepresentationRank.proj]
     haveI : IsFinite (v ≫ pullback.snd G.hom T.hom) := by rw [hvp]; exact hVF
     haveI : Flat (v ≫ pullback.snd G.hom T.hom) := by rw [hvp]; infer_instance
-    obtain ⟨f, ⟨hf, w, hw⟩, huniq⟩ := huniv T.left T.hom V v inferInstance inferInstance
-      inferInstance (fun t => by rw [hvp]; exact hVr t)
-    have key : ∀ y' : T ⟶ Y, ((y' ▷ G).left ⁻¹ᵁ ι₀.opensRange = V ↔
-        ∃ w, IsPullback v w
-          (pullback.map G.hom T.hom G.hom Y.hom (𝟙 _) y'.left (𝟙 S) (by simp) (by simp)) u) := by
+    obtain ⟨f, ⟨hf, w, hw⟩, huniq⟩ :=
+      huniv T.left T.hom V v inferInstance inferInstance inferInstance
+        (fun t => by rw [hvp]; exact hVr t)
+    have key
+        : ∀ y' : T ⟶ Y,
+          ((y' ▷ G).left ⁻¹ᵁ ι₀.opensRange = V
+            ↔ ∃ w,
+              IsPullback v w
+                (pullback.map G.hom T.hom G.hom Y.hom (𝟙 _) y'.left (𝟙 S) (by simp) (by simp))
+                u) := by
       intro y'
       have h1 := UpperTheory.exists_isPullback_iff_preimage V.ι (y' ▷ G).left ι₀
       rw [Scheme.Opens.opensRange_ι] at h1

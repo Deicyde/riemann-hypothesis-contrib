@@ -8,10 +8,10 @@ open TensorProduct LinearMap
 
 namespace GlobalTheory
 
-theorem flat_of_forall_finset_subset_flat :
-    ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M],
-      (∀ s : Finset M, ∃ N : Submodule R M, (↑s : Set M) ⊆ ↑N ∧ Module.Flat R ↥N) →
-        Module.Flat R M := by
+theorem flat_of_forall_finset_subset_flat
+    : ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M],
+      (∀ s : Finset M, ∃ N : Submodule R M, (↑s : Set M) ⊆ ↑N ∧ Module.Flat R ↥N)
+        → Module.Flat R M := by
   intro R M _ _ _ h
   refine Module.Flat.iff_lTensor_injective'.mpr fun I => ?_
   refine (injective_iff_map_eq_zero _).mpr fun x hx => ?_
@@ -23,8 +23,9 @@ theorem flat_of_forall_finset_subset_flat :
   have hxy : rTensor (↥I) J.subtype y = rTensor (↥I) N.subtype y' := by
     rw [hy', ← rTensor_comp_apply]; rfl
   rw [hxy] at hx ⊢
-  have hcomm : lTensor M I.subtype (rTensor (↥I) N.subtype y') =
-      rTensor R N.subtype (lTensor (↥N) I.subtype y') := by
+  have hcomm
+      : lTensor M I.subtype (rTensor (↥I) N.subtype y')
+        = rTensor R N.subtype (lTensor (↥N) I.subtype y') := by
     rw [← LinearMap.comp_apply, ← LinearMap.comp_apply, lTensor_comp_rTensor, rTensor_comp_lTensor]
   rw [hcomm] at hx
   have hinj1 : Function.Injective (rTensor R N.subtype) :=

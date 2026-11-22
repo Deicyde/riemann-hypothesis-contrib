@@ -13,12 +13,18 @@ open Formalism.IndefR.Bridge
 def LocSplit {G : Type} [Group G] (J L : Subgroup G) : Prop :=
   ∀ k ∈ J, ∃ k₁ ∈ J, ∃ k₂ ∈ J, k₁ ∈ L ∧ k = k₁ * k₂ ∧ ∀ l ∈ L, Commute k₂ l
 
-theorem locSplit_prod_left {G H : Type} [Group G] [Group H] (A : Subgroup G) (B : Subgroup H) :
-    LocSplit (A.prod B) ((⊤ : Subgroup G).prod ⊥) := by
+theorem locSplit_prod_left {G H : Type} [Group G] [Group H] (A : Subgroup G) (B : Subgroup H)
+    : LocSplit (A.prod B) ((⊤ : Subgroup G).prod ⊥) := by
   intro k hk
-  refine ⟨(k.1, 1), Subgroup.mem_prod.2 ⟨(Subgroup.mem_prod.1 hk).1, B.one_mem⟩, (1, k.2),
+  refine ⟨
+    (k.1, 1),
+    Subgroup.mem_prod.2 ⟨(Subgroup.mem_prod.1 hk).1, B.one_mem⟩,
+    (1, k.2),
     Subgroup.mem_prod.2 ⟨A.one_mem, (Subgroup.mem_prod.1 hk).2⟩,
-    Subgroup.mem_prod.2 ⟨Subgroup.mem_top _, Subgroup.one_mem _⟩, ?_, ?_⟩
+    Subgroup.mem_prod.2 ⟨Subgroup.mem_top _, Subgroup.one_mem _⟩,
+    ?_,
+    ?_
+  ⟩
   · ext <;> simp
   · intro l hl
     have hl2 : l.2 = 1 := Subgroup.mem_bot.1 (Subgroup.mem_prod.1 hl).2
@@ -30,16 +36,21 @@ section Operators
 variable {G Γ : Type} [Group G] [Group Γ] (ι : Γ →* G)
 variable {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
 
-theorem sum_mul_reps (ρ : Γ →* Module.End ℂ W) {J L : Subgroup G} {χ : J →* ℂˣ}
-    (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1) {x : G} {A B : Finset G} (hA : IsDC J x A) (hB : IsDC J x B)
-    (hAL : ∀ a ∈ A, a ∈ L) (hBL : ∀ b ∈ B, b ∈ L) {F : G → W} (hF : F ∈ AdForms ι ρ J χ)
-    {k : G} (hkJ : k ∈ J) (hkL : k ∈ L) (h : G) :
-    ∑ a ∈ A, F (h * k * a) = ∑ b ∈ B, F (h * b) := by
+theorem sum_mul_reps
+    (ρ : Γ →* Module.End ℂ W)
+    {J L : Subgroup G} {χ : J →* ℂˣ} (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1)
+    {x : G} {A B : Finset G}
+    (hA : IsDC J x A) (hB : IsDC J x B) (hAL : ∀ a ∈ A, a ∈ L) (hBL : ∀ b ∈ B, b ∈ L)
+    {F : G → W} (hF : F ∈ AdForms ι ρ J χ)
+    {k : G} (hkJ : k ∈ J) (hkL : k ∈ L)
+    (h : G)
+    : ∑ a ∈ A, F (h * k * a) = ∑ b ∈ B, F (h * b) := by
   have hF' : ∀ (γ : Γ) (g : G) (j : J), F (ι γ * g * j) = (χ j : ℂ) • ρ γ (F g) := hF
   have hterm : ∀ a ∈ A, ∀ b ∈ B, b⁻¹ * (k * a) ∈ J → F (h * k * a) = F (h * b) := by
     intro a ha b hb hJ
     have e : h * k * a = ι 1 * (h * b) * ((⟨b⁻¹ * (k * a), hJ⟩ : J) : G) := by simp [mul_assoc]
-    rw [e, hF', hχ ⟨b⁻¹ * (k * a), hJ⟩ (L.mul_mem (L.inv_mem (hBL b hb)) (L.mul_mem hkL (hAL a ha)))]
+    rw [e, hF',
+      hχ ⟨b⁻¹ * (k * a), hJ⟩ (L.mul_mem (L.inv_mem (hBL b hb)) (L.mul_mem hkL (hAL a ha)))]
     simp
   have exB : ∀ a ∈ A, ∃ b, b ∈ B ∧ b⁻¹ * (k * a) ∈ J := by
     intro a ha
@@ -69,18 +80,24 @@ theorem sum_mul_reps (ρ : Γ →* Module.End ℂ W) {J L : Subgroup G} {χ : J 
   · intro a ha
     exact hterm a ha (φ a) (hφB a ha) (hφJ a ha)
 
-theorem dcOp_eq_of_isDC (ρ : Γ →* Module.End ℂ W) {J L : Subgroup G} {χ : J →* ℂˣ}
-    (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1) {x : G} {A B : Finset G} (hA : IsDC J x A) (hB : IsDC J x B)
-    (hAL : ∀ a ∈ A, a ∈ L) (hBL : ∀ b ∈ B, b ∈ L) {F : G → W} (hF : F ∈ AdForms ι ρ J χ) :
-    dcOp A F = dcOp B F := by
+theorem dcOp_eq_of_isDC
+    (ρ : Γ →* Module.End ℂ W)
+    {J L : Subgroup G} {χ : J →* ℂˣ} (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1)
+    {x : G} {A B : Finset G}
+    (hA : IsDC J x A) (hB : IsDC J x B) (hAL : ∀ a ∈ A, a ∈ L) (hBL : ∀ b ∈ B, b ∈ L)
+    {F : G → W} (hF : F ∈ AdForms ι ρ J χ)
+    : dcOp A F = dcOp B F := by
   funext h
   have hs := sum_mul_reps ι ρ hχ hA hB hAL hBL hF J.one_mem L.one_mem h
   simp only [mul_one] at hs
   exact hs
 
-theorem LocSplit.dcOp_mem (ρ : Γ →* Module.End ℂ W) {J L : Subgroup G} {χ : J →* ℂˣ} (hs : LocSplit J L)
-    (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1) {x : G} {A : Finset G} (hA : IsDC J x A) (hAL : ∀ a ∈ A, a ∈ L)
-    {F : G → W} (hF : F ∈ AdForms ι ρ J χ) : dcOp A F ∈ AdForms ι ρ J χ := by
+theorem LocSplit.dcOp_mem
+    (ρ : Γ →* Module.End ℂ W)
+    {J L : Subgroup G} {χ : J →* ℂˣ} (hs : LocSplit J L) (hχ : ∀ k : J, (k : G) ∈ L → χ k = 1)
+    {x : G} {A : Finset G} (hA : IsDC J x A) (hAL : ∀ a ∈ A, a ∈ L)
+    {F : G → W} (hF : F ∈ AdForms ι ρ J χ)
+    : dcOp A F ∈ AdForms ι ρ J χ := by
   have hF' : ∀ (γ : Γ) (g : G) (j : J), F (ι γ * g * j) = (χ j : ℂ) • ρ γ (F g) := hF
   show ∀ (γ : Γ) (g : G) (j : J), dcOp A F (ι γ * g * j) = (χ j : ℂ) • ρ γ (dcOp A F g)
   intro γ g j

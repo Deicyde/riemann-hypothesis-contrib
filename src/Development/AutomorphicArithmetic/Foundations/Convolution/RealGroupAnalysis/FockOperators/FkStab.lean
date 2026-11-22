@@ -7,13 +7,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.fkStab :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (δ : F) (O : Ops F) (T : Module.End ℂ (S4 F)) (N N' : Submodule ℂ (S4 F)), N' ≤ Vac δ → (∀ φ ∈ N, T φ ∈ N') →
-    (∀ w i φ, T (O.x w i φ) ∈ Submodule.span ℂ {χ : S4 F | ∃ w' j, χ = O.x w' j (T φ) ∨ χ = O.d w' j (T φ)}) → ∀ m, ∀ φ ∈ O.Fk N m, T φ ∈ O.Fk N' m := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.fkStab
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (δ : F) (O : Ops F)
+        (T : Module.End ℂ (S4 F)) (N N' : Submodule ℂ (S4 F)),
+      N' ≤ Vac δ → (∀ φ ∈ N, T φ ∈ N')
+        → (∀ w i φ,
+          T (O.x w i φ)
+            ∈ Submodule.span ℂ {χ : S4 F | ∃ w' j, χ = O.x w' j (T φ) ∨ χ = O.d w' j (T φ)})
+        → ∀ m, ∀ φ ∈ O.Fk N m, T φ ∈ O.Fk N' m := by
   intro F _ _ _ δ O T N N' hN' hN hT m
   induction m with
   | zero => exact hN
@@ -25,7 +32,9 @@ theorem UpperTheory.ConvolutionTheory.R2.Fo.fkStab :
       rw [hu]
       refine sup_le (fun φ hφ => hmono (ih φ hφ)) (iSup_le fun w => iSup_le fun i => ?_)
       rintro _ ⟨φ, hφ, rfl⟩
-      have hs : Submodule.span ℂ {χ : S4 F | ∃ w' j, χ = O.x w' j (T φ) ∨ χ = O.d w' j (T φ)} ≤ O.Fk N' (m + 1) := by
+      have hs
+          : Submodule.span ℂ {χ : S4 F | ∃ w' j, χ = O.x w' j (T φ) ∨ χ = O.d w' j (T φ)}
+            ≤ O.Fk N' (m + 1) := by
         refine Submodule.span_le.2 ?_
         rintro χ ⟨w', j, rfl | rfl⟩
         · exact hb.2.1 N' m w' j _ (ih φ hφ)

@@ -16,8 +16,11 @@ def SB (X : Type*) [TopologicalSpace X] : Submodule ℂ (X → ℂ) where
   zero_mem' := ⟨IsLocallyConstant.const 0, HasCompactSupport.zero⟩
   smul_mem' c f hf := ⟨(IsLocallyConstant.const c).mul hf.1, hf.2.smul_left (f := fun _ => c)⟩
 
-def IsSmoothRep {G V : Type*} [Group G] [TopologicalSpace G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) : Prop := ∀ v : V, IsOpen {g : G | ρ g v = v}
+def IsSmoothRep
+    {G V : Type*} [Group G] [TopologicalSpace G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    : Prop :=
+  ∀ v : V, IsOpen {g : G | ρ g v = v}
 
 variable (k : Type*) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
@@ -41,14 +44,17 @@ def IsTame (μ : kˣ →* ℂˣ) : Prop := ∀ x : kˣ, valuation k ((x : k) - 1
 
 def IsUnram (μ : kˣ →* ℂˣ) : Prop := ∀ x : kˣ, valuation k (x : k) = 1 → μ x = 1
 
-def om {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] (μ : kˣ →* ℂˣ)
-    (g : GL a k) (h : GL b k) (Φ : Matrix b a k → ℂ) : Matrix b a k → ℂ := fun x =>
-  (μ (Matrix.GeneralLinearGroup.det g) : ℂ) * ((μ (Matrix.GeneralLinearGroup.det h))⁻¹ : ℂˣ) *
-    ((nabs k (Matrix.GeneralLinearGroup.det g) ^ ((Fintype.card b : ℝ) / 2) : ℝ) : ℂ) *
-    ((nabs k (Matrix.GeneralLinearGroup.det h) ^ (-(Fintype.card a : ℝ) / 2) : ℝ) : ℂ) *
-    Φ ((h⁻¹ : GL b k).val * x * g.val)
+def om
+    {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
+    (μ : kˣ →* ℂˣ) (g : GL a k) (h : GL b k) (Φ : Matrix b a k → ℂ)
+    : Matrix b a k → ℂ := fun x =>
+  (μ (Matrix.GeneralLinearGroup.det g) : ℂ) * ((μ (Matrix.GeneralLinearGroup.det h))⁻¹ : ℂˣ)
+    * ((nabs k (Matrix.GeneralLinearGroup.det g) ^ ((Fintype.card b : ℝ) / 2) : ℝ) : ℂ)
+    * ((nabs k (Matrix.GeneralLinearGroup.det h) ^ (-(Fintype.card a : ℝ) / 2) : ℝ) : ℂ)
+    * Φ ((h⁻¹ : GL b k).val * x * g.val)
 
-instance matrixMeasurableSpace {m n α : Type*} [MeasurableSpace α] : MeasurableSpace (Matrix m n α) :=
+instance matrixMeasurableSpace {m n α : Type*} [MeasurableSpace α]
+    : MeasurableSpace (Matrix m n α) :=
   (MeasurableSpace.pi : MeasurableSpace (m → n → α))
 
 variable [MeasurableSpace k] [BorelSpace k]

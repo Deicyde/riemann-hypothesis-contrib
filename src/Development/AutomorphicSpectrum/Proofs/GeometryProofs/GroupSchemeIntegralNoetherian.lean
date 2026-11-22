@@ -8,8 +8,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValua
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
 open GlobalTheory.CompanionTheory.Ar.Sl.Reg
@@ -17,23 +19,33 @@ open GlobalTheory.CompanionTheory.Ar.Sl.Reg
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Sl.Reg
 
-theorem app_fst_sc_eq_zero {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ Sp V) (J : Ideal V) (U : X.Opens)
-    {r : V} (hr : r ∈ J) :
-    ((pullback.fst π (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))).app U).hom (sc π U r) = 0 := by
-  let j : Spec (CommRingCat.of (V ⧸ J)) ⟶ Spec (CommRingCat.of V) := Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))
+theorem app_fst_sc_eq_zero
+    {V : Type} [CommRing V]
+    {X : Scheme.{0}} (π : X ⟶ Sp V)
+    (J : Ideal V)
+    (U : X.Opens)
+    {r : V} (hr : r ∈ J)
+    : ((pullback.fst π (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))).app U).hom (sc π U r)
+      = 0 := by
+  let j : Spec (CommRingCat.of (V ⧸ J)) ⟶ Spec (CommRingCat.of V) :=
+    Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))
   let f := pullback.fst π j
   let g := pullback.snd π j
   have e1 := Scheme.Hom.appLE_comp_appLE f π ⊤ U (f ⁻¹ᵁ U) (fun _ _ => trivial) le_rfl
-  have e0 : ∀ e : ⊤ ≤ j ⁻¹ᵁ ⊤, (j.appLE ⊤ ⊤ e).hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r) = 0 := by
+  have e0
+      : ∀ e : ⊤ ≤ j ⁻¹ᵁ ⊤,
+        (j.appLE ⊤ ⊤ e).hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r) = 0 := by
     intro e
     have a1 : j.appLE ⊤ ⊤ e = j.appTop := Scheme.Hom.appLE_eq_app (f := j) (U := ⊤)
     have a2 := Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (Ideal.Quotient.mk J))
-    have a3 : j.appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r) =
-        (Scheme.ΓSpecIso (CommRingCat.of (V ⧸ J))).inv.hom (Ideal.Quotient.mk J r) :=
+    have a3
+        : j.appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r)
+          = (Scheme.ΓSpecIso (CommRingCat.of (V ⧸ J))).inv.hom (Ideal.Quotient.mk J r) :=
       (congrArg (fun q => q.hom r) a2).symm
     rw [a1, a3, Ideal.Quotient.eq_zero_iff_mem.2 hr, map_zero]
-  have key : ∀ (w : pullback π j ⟶ Spec (CommRingCat.of V)) (_ : w = g ≫ j) (e : f ⁻¹ᵁ U ≤ w ⁻¹ᵁ ⊤),
-      (w.appLE ⊤ (f ⁻¹ᵁ U) e).hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r) = 0 := by
+  have key
+      : ∀ (w : pullback π j ⟶ Spec (CommRingCat.of V)) (_ : w = g ≫ j) (e : f ⁻¹ᵁ U ≤ w ⁻¹ᵁ ⊤),
+        (w.appLE ⊤ (f ⁻¹ᵁ U) e).hom ((Scheme.ΓSpecIso (CommRingCat.of V)).inv.hom r) = 0 := by
     rintro _ rfl e
     rw [← Scheme.Hom.appLE_comp_appLE g j ⊤ ⊤ (f ⁻¹ᵁ U) (fun _ _ => trivial) (fun _ _ => trivial),
       CommRingCat.comp_apply]
@@ -44,7 +56,18 @@ theorem app_fst_sc_eq_zero {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ 
   rw [e2] at h
   exact h
 
-theorem semiAb_props : ∀ (L : Type) [Field L] [NumberField L] (G : Over (Sp (𝓞 L))) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → IsIntegral G.left ∧ ∀ W : G.left.Opens, IsAffineOpen W → IsNoetherianRing Γ(G.left, W) ∧ (sc G.hom W).FiniteType ∧ ∀ p : Ideal (𝓞 L), p.IsMaximal → ∀ a b : Γ(G.left, W), a * b ∈ p.map (sc G.hom W) → a ∈ p.map (sc G.hom W) ∨ b ∈ p.map (sc G.hom W) := by
+theorem semiAb_props
+    : ∀ (L : Type) [Field L] [NumberField L] (G : Over (Sp (𝓞 L))) [GrpObj G] [IsCommMonObj G],
+      IsSemiAbelian G
+        → IsIntegral G.left
+          ∧ ∀ W : G.left.Opens,
+            IsAffineOpen W
+              → IsNoetherianRing Γ(G.left, W) ∧ (sc G.hom W).FiniteType
+                ∧ ∀ p : Ideal (𝓞 L),
+                  p.IsMaximal
+                    → ∀ a b : Γ(G.left, W),
+                      a * b ∈ p.map (sc G.hom W)
+                        → a ∈ p.map (sc G.hom W) ∨ b ∈ p.map (sc G.hom W) := by
   intro L _ _ G _ _ hG
   have := hG.smooth
   have := hG.geomConnected
@@ -59,12 +82,13 @@ theorem semiAb_props : ∀ (L : Type) [Field L] [NumberField L] (G : Over (Sp (�
       HasRingHomProperty.appLE (P := @LocallyOfFiniteType) G.hom inferInstance
         ⟨⊤, isAffineOpen_top _⟩ ⟨W, hW⟩ (fun _ _ => trivial)
     have h2 : (Scheme.ΓSpecIso (CommRingCat.of (𝓞 L))).inv.hom.FiniteType :=
-      RingHom.FiniteType.of_surjective _ (ConcreteCategory.bijective_of_isIso
-        (Scheme.ΓSpecIso (CommRingCat.of (𝓞 L))).inv).2
+      RingHom.FiniteType.of_surjective _
+        (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of (𝓞 L))).inv).2
     exact h1.comp h2
   · intro p hp a b hab
     letI : Field (𝓞 L ⧸ p) := Ideal.Quotient.field p
-    let j : Spec (CommRingCat.of (𝓞 L ⧸ p)) ⟶ Sp (𝓞 L) := Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk p))
+    let j : Spec (CommRingCat.of (𝓞 L ⧸ p)) ⟶ Sp (𝓞 L) :=
+      Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk p))
     have hY : IsIntegral (pullback G.hom j) :=
       GeometricallyIntegral.geometrically_isIntegral _ _ _ (IsPullback.of_hasPullback G.hom j)
     let f := pullback.fst G.hom j

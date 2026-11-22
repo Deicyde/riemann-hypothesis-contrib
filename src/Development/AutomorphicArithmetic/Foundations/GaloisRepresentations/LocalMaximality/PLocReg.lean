@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralClos
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open RingTheory.Sequence
 open scoped TensorProduct
 
@@ -20,15 +21,16 @@ private lemma le_loc (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ) : B ≤ loc 
 
 end LocRegAux
 
-private theorem isWeaklyRegular_mvPolynomial_X (k : Type) [Field k] (d : ℕ) :
-    IsWeaklyRegular (MvPolynomial (Fin d) k)
+private theorem isWeaklyRegular_mvPolynomial_X (k : Type) [Field k] (d : ℕ)
+    : IsWeaklyRegular (MvPolynomial (Fin d) k)
       (List.ofFn (MvPolynomial.X : Fin d → MvPolynomial (Fin d) k)) := by
   rw [isWeaklyRegular_iff_Fin]
   intro i
   have hlen : i.val < d := by simpa using i.isLt
-  have hI : (Ideal.ofList ((List.ofFn (MvPolynomial.X : Fin d → MvPolynomial (Fin d) k)).take i) •
-      (⊤ : Submodule (MvPolynomial (Fin d) k) (MvPolynomial (Fin d) k))) =
-      Ideal.span (MvPolynomial.X '' {j : Fin d | j.val < i.val}) := by
+  have hI
+      : (Ideal.ofList ((List.ofFn (MvPolynomial.X : Fin d → MvPolynomial (Fin d) k)).take i)
+          • (⊤ : Submodule (MvPolynomial (Fin d) k) (MvPolynomial (Fin d) k)))
+        = Ideal.span (MvPolynomial.X '' {j : Fin d | j.val < i.val}) := by
     rw [smul_eq_mul, Ideal.mul_top, Ideal.ofList]
     congr 1
     ext p
@@ -39,8 +41,9 @@ private theorem isWeaklyRegular_mvPolynomial_X (k : Type) [Field k] (d : ℕ) :
       exact ⟨⟨j, by omega⟩, by simp; omega, rfl⟩
     · rintro ⟨j, hj, rfl⟩
       exact ⟨j.val, by omega, rfl⟩
-  have hget : (List.ofFn (MvPolynomial.X : Fin d → MvPolynomial (Fin d) k))[i] =
-      MvPolynomial.X ⟨i.val, hlen⟩ := by
+  have hget
+      : (List.ofFn (MvPolynomial.X : Fin d → MvPolynomial (Fin d) k))[i]
+        = MvPolynomial.X ⟨i.val, hlen⟩ := by
     rw [Fin.getElem_fin, List.getElem_ofFn]
   rw [hI, hget]
   refine isSMulRegular_iff_right_eq_zero_of_smul.mpr ?_
@@ -52,8 +55,9 @@ private theorem isWeaklyRegular_mvPolynomial_X (k : Type) [Field k] (d : ℕ) :
     rw [smul_eq_mul, MvPolynomial.mem_ideal_span_X_image] at hq
     rw [MvPolynomial.mem_ideal_span_X_image]
     intro m hm
-    have hm' : m + Finsupp.single (⟨i.val, hlen⟩ : Fin d) 1 ∈
-        (MvPolynomial.X (⟨i.val, hlen⟩ : Fin d) * p).support := by
+    have hm'
+        : m + Finsupp.single (⟨i.val, hlen⟩ : Fin d) 1
+          ∈ (MvPolynomial.X (⟨i.val, hlen⟩ : Fin d) * p).support := by
       rw [MvPolynomial.mem_support_iff, mul_comm, MvPolynomial.coeff_mul_X]
       exact MvPolynomial.mem_support_iff.mp hm
     obtain ⟨j, hj, hne⟩ := hq _ hm'
@@ -64,9 +68,10 @@ private theorem isWeaklyRegular_mvPolynomial_X (k : Type) [Field k] (d : ℕ) :
       simp at hj
     simpa [Finsupp.single_apply, Ne.symm hji] using hne
 
-private theorem mem_span_image_lt_iff_exists_sum {S : Type} [CommRing S] {d : ℕ} (τ : Fin d → S) (k : Fin d)
-    (x : S) : x ∈ Ideal.span (τ '' {j | j < k}) ↔
-      ∃ c : Fin d → S, x = ∑ j ∈ Finset.univ.filter (· < k), τ j * c j := by
+private theorem mem_span_image_lt_iff_exists_sum
+    {S : Type} [CommRing S] {d : ℕ} (τ : Fin d → S) (k : Fin d) (x : S)
+    : x ∈ Ideal.span (τ '' {j | j < k})
+      ↔ ∃ c : Fin d → S, x = ∑ j ∈ Finset.univ.filter (· < k), τ j * c j := by
   constructor
   · intro hx
     induction hx using Submodule.span_induction with
@@ -79,7 +84,8 @@ private theorem mem_span_image_lt_iff_exists_sum {S : Type} [CommRing S] {d : �
         simp [Pi.single_apply, hb]
       · intro h
         exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj⟩) h
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add y z _ _ hy hz =>
       obtain ⟨c1, rfl⟩ := hy
       obtain ⟨c2, rfl⟩ := hz
@@ -93,12 +99,15 @@ private theorem mem_span_image_lt_iff_exists_sum {S : Type} [CommRing S] {d : �
     exact Ideal.sum_mem _ fun j hj =>
       Ideal.mul_mem_right _ _ (Ideal.subset_span ⟨j, (Finset.mem_filter.mp hj).2, rfl⟩)
 
-private theorem mem_span_image_lt_of_mul_mem_of_weaklyRegular {S : Type} [CommRing S] {d : ℕ} (τ : Fin d → S)
-    (h : IsWeaklyRegular S (List.ofFn τ)) (k : Fin d) (a : S)
-    (ha : τ k * a ∈ Ideal.span (τ '' {j | j < k})) : a ∈ Ideal.span (τ '' {j | j < k}) := by
+private theorem mem_span_image_lt_of_mul_mem_of_weaklyRegular
+    {S : Type} [CommRing S]
+    {d : ℕ} (τ : Fin d → S) (h : IsWeaklyRegular S (List.ofFn τ)) (k : Fin d)
+    (a : S) (ha : τ k * a ∈ Ideal.span (τ '' {j | j < k}))
+    : a ∈ Ideal.span (τ '' {j | j < k}) := by
   have h1 := (isWeaklyRegular_iff_Fin _ _).mp h ⟨k.val, by simp⟩
-  have hI : (Ideal.ofList ((List.ofFn τ).take k.val) • (⊤ : Submodule S S)) =
-      Ideal.span (τ '' {j | j < k}) := by
+  have hI
+      : (Ideal.ofList ((List.ofFn τ).take k.val) • (⊤ : Submodule S S))
+        = Ideal.span (τ '' {j | j < k}) := by
     rw [smul_eq_mul, Ideal.mul_top, Ideal.ofList]
     congr 1
     ext p
@@ -112,39 +121,48 @@ private theorem mem_span_image_lt_of_mul_mem_of_weaklyRegular {S : Type} [CommRi
   have hget : (List.ofFn τ)[(⟨k.val, by simp⟩ : Fin (List.ofFn τ).length)] = τ k := by
     rw [Fin.getElem_fin, List.getElem_ofFn]
   rw [hI, hget] at h1
-  have hz := h1 (a₁ := Submodule.Quotient.mk a) (a₂ := 0) (by
-    beta_reduce
-    rw [smul_zero, ← Submodule.Quotient.mk_smul, smul_eq_mul, Submodule.Quotient.mk_eq_zero]
-    exact ha)
+  have hz :=
+    h1 (a₁ := Submodule.Quotient.mk a) (a₂ := 0) (by
+      beta_reduce
+      rw [smul_zero, ← Submodule.Quotient.mk_smul, smul_eq_mul, Submodule.Quotient.mk_eq_zero]
+      exact ha)
   exact (Submodule.Quotient.mk_eq_zero _).mp hz
 
-private theorem exists_integral_coeffs_of_algebraMap_mul_eq_sum {R0 L : Type} [CommRing R0] [Field L] [Algebra R0 L] {d : ℕ}
-    (τ0 : Fin d → R0) (r0 : IsWeaklyRegular R0 (List.ofFn τ0))
-    (hp : Module.Projective R0 (integralClosure R0 L)) (i : Fin d) (a : L)
-    (ha : a ∈ integralClosure R0 L) (c : Fin d → L) (hc : ∀ j, c j ∈ integralClosure R0 L)
-    (h : algebraMap R0 L (τ0 i) * a =
-      ∑ j ∈ Finset.univ.filter (· < i), algebraMap R0 L (τ0 j) * c j) :
-    ∃ b : Fin d → L, (∀ j, b j ∈ integralClosure R0 L) ∧
-      a = ∑ j ∈ Finset.univ.filter (· < i), algebraMap R0 L (τ0 j) * b j := by
+private theorem exists_integral_coeffs_of_algebraMap_mul_eq_sum
+    {R0 L : Type} [CommRing R0] [Field L] [Algebra R0 L]
+    {d : ℕ} (τ0 : Fin d → R0) (r0 : IsWeaklyRegular R0 (List.ofFn τ0))
+    (hp : Module.Projective R0 (integralClosure R0 L))
+    (i : Fin d)
+    (a : L) (ha : a ∈ integralClosure R0 L)
+    (c : Fin d → L) (hc : ∀ j, c j ∈ integralClosure R0 L)
+    (h
+      : algebraMap R0 L (τ0 i) * a = ∑ j ∈ Finset.univ.filter (· < i), algebraMap R0 L (τ0 j) * c j)
+    : ∃ b : Fin d → L,
+      (∀ j, b j ∈ integralClosure R0 L)
+        ∧ a = ∑ j ∈ Finset.univ.filter (· < i), algebraMap R0 L (τ0 j) * b j := by
   haveI : Module.Flat R0 (integralClosure R0 L) := Module.Flat.of_projective
   have r1 := r0.of_flat (S := integralClosure R0 L)
   rw [List.map_ofFn] at r1
   let τ : Fin d → integralClosure R0 L := fun j => algebraMap R0 (integralClosure R0 L) (τ0 j)
   have hτ : ∀ j, (τ j : L) = algebraMap R0 L (τ0 j) := fun j => rfl
-  have key := mem_span_image_lt_of_mul_mem_of_weaklyRegular τ r1 i ⟨a, ha⟩ ((mem_span_image_lt_iff_exists_sum τ i _).mpr
-    ⟨fun j => ⟨c j, hc j⟩, Subtype.ext (by simpa [hτ] using h)⟩)
+  have key :=
+    mem_span_image_lt_of_mul_mem_of_weaklyRegular τ r1 i ⟨a, ha⟩
+      ((mem_span_image_lt_iff_exists_sum τ i _).mpr
+        ⟨fun j => ⟨c j, hc j⟩, Subtype.ext (by simpa [hτ] using h)⟩)
   obtain ⟨b, hb⟩ := (mem_span_image_lt_iff_exists_sum τ i _).mp key
   refine ⟨fun j => (b j : L), fun j => (b j).2, ?_⟩
   have := congrArg (fun y : integralClosure R0 L => (y : L)) hb
   simpa [hτ] using this
 
-private theorem exists_rB_coeffs_of_tt_mul_eq_sum (k : Type) [Field k] [CharZero k] (F L : Type) [Field F] [Field L]
-    [Algebra k F] [Algebra k L] [Algebra F L] [IsScalarTower k F L] (d : ℕ) (x : Fin (d + 1) → Fˣ)
-    (hc : IsFinCover k L (xv x)) (i : Fin d) (a : L) (ha : a ∈ rB k L (xv x) {0})
+private theorem exists_rB_coeffs_of_tt_mul_eq_sum
+    (k : Type) [Field k] [CharZero k]
+    (F L : Type) [Field F] [Field L] [Algebra k F] [Algebra k L] [Algebra F L] [IsScalarTower k F L]
+    (d : ℕ) (x : Fin (d + 1) → Fˣ) (hc : IsFinCover k L (xv x)) (i : Fin d)
+    (a : L) (ha : a ∈ rB k L (xv x) {0})
     (c : Fin d → L) (hc' : ∀ j, c j ∈ rB k L (xv x) {0})
-    (h : tt L x i * a = ∑ j ∈ Finset.univ.filter (· < i), tt L x j * c j) :
-    ∃ b : Fin d → L, (∀ j, b j ∈ rB k L (xv x) {0}) ∧
-      a = ∑ j ∈ Finset.univ.filter (· < i), tt L x j * b j := by
+    (h : tt L x i * a = ∑ j ∈ Finset.univ.filter (· < i), tt L x j * c j)
+    : ∃ b : Fin d → L,
+      (∀ j, b j ∈ rB k L (xv x) {0}) ∧ a = ∑ j ∈ Finset.univ.filter (· < i), tt L x j * b j := by
   obtain ⟨e0, he0⟩ := GlobalTheory.T.standardAffineOpen_ring_polynomialEquiv k F d (xv x) hc.pd 0
   let τ0 : Fin d → rA k (xv x) {0} := fun j => e0 (MvPolynomial.X j)
   have r0 : IsWeaklyRegular (rA k (xv x) {0}) (List.ofFn τ0) := by
@@ -161,19 +179,25 @@ private theorem exists_rB_coeffs_of_tt_mul_eq_sum (k : Type) [Field k] [CharZero
     show algebraMap F L ((e0 (MvPolynomial.X j) : F)) = _
     rw [he0 j, Fin.succAbove_zero]
     rfl
-  obtain ⟨b, hb, hab⟩ := exists_integral_coeffs_of_algebraMap_mul_eq_sum τ0 r0 (GlobalTheory.T.integralClosure_projective_over_standardOpenRing k F L d (xv x) hc 0) i a ha c hc'
-    (by simpa [hτ] using h)
+  obtain ⟨b, hb, hab⟩ :=
+    exists_integral_coeffs_of_algebraMap_mul_eq_sum τ0 r0
+      (GlobalTheory.T.integralClosure_projective_over_standardOpenRing k F L d (xv x) hc 0) i a ha c
+      hc' (by simpa [hτ] using h)
   exact ⟨b, hb, by simpa [hτ] using hab⟩
 
-private theorem exists_loc_coeffs_of_mul_eq_sum {L : Type} [Field L] [Algebra ℂ L] (B : Subalgebra ℂ L)
-    (e : B →ₐ[ℂ] ℂ) {d : ℕ} (t : Fin d → L) (i : Fin d)
-    (hB : ∀ a : L, a ∈ B → ∀ c : Fin d → L, (∀ j, c j ∈ B) →
-      t i * a = ∑ j ∈ Finset.univ.filter (· < i), t j * c j →
-      ∃ b : Fin d → L, (∀ j, b j ∈ B) ∧ a = ∑ j ∈ Finset.univ.filter (· < i), t j * b j)
-    (a : L) (ha : a ∈ loc B e) (c : Fin d → L) (hc : ∀ j, c j ∈ loc B e)
-    (h : t i * a = ∑ j ∈ Finset.univ.filter (· < i), t j * c j) :
-    ∃ b : Fin d → L, (∀ j, b j ∈ loc B e) ∧
-      a = ∑ j ∈ Finset.univ.filter (· < i), t j * b j := by
+private theorem exists_loc_coeffs_of_mul_eq_sum
+    {L : Type} [Field L] [Algebra ℂ L]
+    (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ)
+    {d : ℕ} (t : Fin d → L) (i : Fin d)
+    (hB : ∀ a : L,
+      a ∈ B
+        → ∀ c : Fin d → L,
+          (∀ j, c j ∈ B) → t i * a = ∑ j ∈ Finset.univ.filter (· < i), t j * c j
+            → ∃ b : Fin d → L, (∀ j, b j ∈ B) ∧ a = ∑ j ∈ Finset.univ.filter (· < i), t j * b j)
+    (a : L) (ha : a ∈ loc B e)
+    (c : Fin d → L)
+    (hc : ∀ j, c j ∈ loc B e) (h : t i * a = ∑ j ∈ Finset.univ.filter (· < i), t j * c j)
+    : ∃ b : Fin d → L, (∀ j, b j ∈ loc B e) ∧ a = ∑ j ∈ Finset.univ.filter (· < i), t j * b j := by
   have ha' : ∃ u : B, e u ≠ 0 ∧ (u : L) * a ∈ B := ha
   have hc' : ∀ j, ∃ u : B, e u ≠ 0 ∧ (u : L) * c j ∈ B := hc
   obtain ⟨u0, hu0, hau⟩ := ha'
@@ -217,11 +241,13 @@ private theorem exists_loc_coeffs_of_mul_eq_sum {L : Type} [Field L] [Algebra �
     rw [this, hab, Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => by ring
 
-theorem UpperTheory.Gal.productCup_of_system.locReg_of :
-    LocForms → DtBasic → ValBasic → LocReg := by
+theorem UpperTheory.Gal.productCup_of_system.locReg_of
+    : LocForms → DtBasic → ValBasic → LocReg := by
   intro hLF _ _ F L _ _ _ _ _ _ d x hcov hred e
-  have hM : ∀ m : DR ℂ L, m ∈ omB ℂ L (loc (rB ℂ L (xv x) {0}) e.1) d ↔
-      ∃ a ∈ loc (rB ℂ L (xv x) {0}) e.1, m = a • dtS L x Finset.univ := by
+  have hM
+      : ∀ m : DR ℂ L,
+        m ∈ omB ℂ L (loc (rB ℂ L (xv x) {0}) e.1) d
+          ↔ ∃ a ∈ loc (rB ℂ L (xv x) {0}) e.1, m = a • dtS L x Finset.univ := by
     intro m
     have hp : Finset.powersetCard d (Finset.univ : Finset (Fin d)) = {Finset.univ} := by
       simpa using Finset.powersetCard_self (Finset.univ : Finset (Fin d))
@@ -233,26 +259,48 @@ theorem UpperTheory.Gal.productCup_of_system.locReg_of :
     · rintro ⟨a, ha, rfl⟩
       exact ⟨fun _ => a, fun _ => ha, rfl⟩
   intro k m hm hkm
-  have hadd : ∀ y1 y2 : DR ℂ L,
-      (∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        y1 = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) →
-      (∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        y2 = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) →
-      (∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        y1 + y2 = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) := by
+  have hadd
+      : ∀ y1 y2 : DR ℂ L,
+        (∃ c : Fin d → L,
+            (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+              ∧ y1 = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ)
+          → (∃ c : Fin d → L,
+            (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+              ∧ y2 = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ)
+          → (∃ c : Fin d → L,
+            (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+              ∧ y1 + y2
+                = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) := by
     rintro y1 y2 ⟨c1, hc1, rfl⟩ ⟨c2, hc2, rfl⟩
-    exact ⟨c1 + c2, fun j => Subalgebra.add_mem _ (hc1 j) (hc2 j),
-      by simp [mul_add, Finset.sum_add_distrib, add_smul]⟩
-  have hsm : ∀ w ∈ sm (Algebra.lsmul ℂ ℂ (DR ℂ L)) (omB ℂ L (loc (rB ℂ L (xv x) {0}) e.1) d)
-      (tt L x '' {j | j < k}), ∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        w = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ := by
+    exact ⟨
+      c1 + c2,
+      fun j => Subalgebra.add_mem _ (hc1 j) (hc2 j),
+      by simp [mul_add, Finset.sum_add_distrib, add_smul]
+    ⟩
+  have hsm
+      : ∀ w
+          ∈ sm (Algebra.lsmul ℂ ℂ (DR ℂ L)) (omB ℂ L (loc (rB ℂ L (xv x) {0}) e.1) d)
+            (tt L x '' {j | j < k}),
+        ∃ c : Fin d → L,
+          (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+            ∧ w = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ := by
     intro w hw
     unfold sm at hw
-    refine Submodule.iSup_induction (motive := fun y => ∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        y = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) _ hw (fun r y hy => ?_)
+    refine Submodule.iSup_induction
+      (motive := fun y =>
+        ∃ c : Fin d → L,
+          (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+            ∧ y = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ)
+      _ hw
+      (fun r y hy => ?_)
       ⟨0, fun _ => Subalgebra.zero_mem _, by simp⟩ hadd
-    refine Submodule.iSup_induction (motive := fun y => ∃ c : Fin d → L, (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1) ∧
-        y = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ) _ hy (fun hr z hz => ?_)
+    refine Submodule.iSup_induction
+      (motive := fun y =>
+        ∃ c : Fin d → L,
+          (∀ j, c j ∈ loc (rB ℂ L (xv x) {0}) e.1)
+            ∧ y = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ)
+      _ hy
+      (fun hr z hz => ?_)
       ⟨0, fun _ => Subalgebra.zero_mem _, by simp⟩ hadd
     obtain ⟨j0, hj0, rfl⟩ := hr
     obtain ⟨m', hm', rfl⟩ := hz
@@ -276,13 +324,16 @@ theorem UpperTheory.Gal.productCup_of_system.locReg_of :
   · rw [hω, smul_zero]
     exact Submodule.zero_mem _
   have heq : tt L x k * a = ∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j := by
-    have h2 : (tt L x k * a) • dtS L x Finset.univ =
-        (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ := by
+    have h2
+        : (tt L x k * a) • dtS L x Finset.univ
+          = (∑ j ∈ Finset.univ.filter (· < k), tt L x j * c j) • dtS L x Finset.univ := by
       rw [← smul_smul]
       exact hcw
     exact smul_left_injective L hω h2
-  obtain ⟨b, hb, hab⟩ := exists_loc_coeffs_of_mul_eq_sum _ _ (tt L x) k
-    (fun a' ha' c' hc' h' => exists_rB_coeffs_of_tt_mul_eq_sum ℂ F L d x hcov k a' ha' c' hc' h') a ha c hc heq
+  obtain ⟨b, hb, hab⟩ :=
+    exists_loc_coeffs_of_mul_eq_sum _ _ (tt L x) k
+      (fun a' ha' c' hc' h' => exists_rB_coeffs_of_tt_mul_eq_sum ℂ F L d x hcov k a' ha' c' hc' h')
+      a ha c hc heq
   rw [hab, Finset.sum_smul]
   refine Submodule.sum_mem _ fun j hj => ?_
   unfold sm

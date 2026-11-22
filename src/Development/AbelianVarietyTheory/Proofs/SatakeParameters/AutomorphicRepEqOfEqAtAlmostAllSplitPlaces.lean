@@ -7,10 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RankOn
 
 namespace GlobalTheory.RowTie.RepDet
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
 
-theorem isoLoc_perm {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
-    {Pa Pa' : List (Part A.CG)} (h : Pa.Perm Pa') (w : PlE H) : isoLoc N A Pa w = isoLoc N A Pa' w := by
+theorem isoLoc_perm
+    {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
+    {Pa Pa' : List (Part A.CG)} (h : Pa.Perm Pa')
+    (w : PlE H)
+    : isoLoc N A Pa w = isoLoc N A Pa' w := by
   unfold isoLoc
   induction h with
   | nil => rfl
@@ -22,11 +26,16 @@ theorem isoLoc_perm {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData 
 
 end GlobalTheory.RowTie.RepDet
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
 
-theorem GlobalTheory.RowTie.repDet_split : ∀ (R : Ranks) (H : Host R) (what₂ : Rows.Data R) (N : NData R H what₂) (A : NAut N)
-    (i : N.Loc), GlobalTheory.RowTie.BCEx N A i → GlobalTheory.RowTie.SplitBC N A i → GlobalTheory.RowTie.RepOfLoc N A i →
-    ∀ P P' : A.AV i, (∀ᶠ w in Filter.cofinite, IsSplitPl H w → A.locV i P w = A.locV i P' w) → P = P' := by
+theorem GlobalTheory.RowTie.repDet_split
+    : ∀ (R : Ranks) (H : Host R) (what₂ : Rows.Data R) (N : NData R H what₂) (A : NAut N)
+        (i : N.Loc),
+      GlobalTheory.RowTie.BCEx N A i → GlobalTheory.RowTie.SplitBC N A i
+        → GlobalTheory.RowTie.RepOfLoc N A i
+        → ∀ P P' : A.AV i,
+          (∀ᶠ w in Filter.cofinite, IsSplitPl H w → A.locV i P w = A.locV i P' w) → P = P' := by
   intro R H what₂ N A i hBC hSp hRep P P' hP
   obtain ⟨Pa, hPa⟩ := hBC P
   obtain ⟨Pa', hPa'⟩ := hBC P'

@@ -32,8 +32,9 @@ theorem UpperTheory.V.Z.Kato.Sym.PT.chB : UpperTheory.V.Z.Kato.Sym.PT.ChB := by
     exact congrArg Subtype.val h2
   have hfix : cj X M e σ (topRoot X M (l ^ n) u ^ l ^ n) = topRoot X M (l ^ n) u ^ l ^ n := by
     rw [hpow]
-    have h3 : (algebraMap (topL X M) (topBar X M)) ⟨u, huL⟩
-        = algebraMap (topF X M) (topBar X M) ⟨u, huF⟩ := by
+    have h3
+        : (algebraMap (topL X M) (topBar X M)) ⟨u, huL⟩
+          = algebraMap (topF X M) (topBar X M) ⟨u, huF⟩ := by
       rw [IsScalarTower.algebraMap_apply (topF X M) (topL X M) (topBar X M)]
       rfl
     rw [h3]
@@ -43,8 +44,9 @@ theorem UpperTheory.V.Z.Kato.Sym.PT.chB : UpperTheory.V.Z.Kato.Sym.PT.ChB := by
     rw [mul_pow, inv_pow, ← map_pow, hfix]
     exact mul_inv_cancel₀ (pow_ne_zero _ hθ0)
   obtain ⟨k, hk, hkr⟩ := hζ.eq_pow_of_pow_eq_one hr
-  have hex : ∃ i : ZMod (l ^ n),
-      cj X M e σ (topRoot X M (l ^ n) u) = topZeta X M l n ^ i.val * topRoot X M (l ^ n) u := by
+  have hex
+      : ∃ i : ZMod (l ^ n),
+        cj X M e σ (topRoot X M (l ^ n) u) = topZeta X M l n ^ i.val * topRoot X M (l ^ n) u := by
     refine ⟨(k : ZMod (l ^ n)), ?_⟩
     rw [ZMod.val_natCast_of_lt hk, hkr, inv_mul_cancel_right₀ hθ0]
   rw [topChar_apply X hl.ne_zero hdvd huF hu0 (cj X M e σ)]

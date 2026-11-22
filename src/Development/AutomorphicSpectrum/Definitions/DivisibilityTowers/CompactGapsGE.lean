@@ -24,10 +24,10 @@ def permExp (σ : Ψ → Equiv.Perm (Fin N)) : (Ψ × Fin N) →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm (fun x => N - 1 - ((σ x.1 x.2 : Fin N) : ℕ))
 
 def degFl [DecidableEq Ψ] (F : RP Ψ N) : ℝ :=
-  (-1) ^ dimFl Ψ N *
-    ∑ σ : Ψ → Equiv.Perm (Fin N), (∏ τ, ((Equiv.Perm.sign (σ τ) : ℤ) : ℝ)) * F.coeff (permExp σ)
+  (-1) ^ dimFl Ψ N
+    * ∑ σ : Ψ → Equiv.Perm (Fin N), (∏ τ, ((Equiv.Perm.sign (σ τ) : ℤ) : ℝ)) * F.coeff (permExp σ)
 
-def linRoot (lam : Wt Ψ N) : RP Ψ N := -∑ x : Ψ × Fin N, C (lam x.1 x.2) * X x
+def linRoot (lam : Wt Ψ N) : RP Ψ N := - ∑ x : Ψ × Fin N, C (lam x.1 x.2) * X x
 
 def flagDeg [DecidableEq Ψ] (lam : Wt Ψ N) : ℝ := degFl (linRoot lam ^ dimFl Ψ N)
 
@@ -64,8 +64,8 @@ def IsRatWt (lam : Wt Ψ N) : Prop := ∀ τ i, ∃ q : ℚ, lam τ i = (q : ℝ
 
 def l1 (lam : Wt Ψ N) : ℝ := ∑ τ, ∑ i, |lam τ i|
 
-def swapWt [DecidableEq Ψ] (τ : Ψ) (a b : Fin N) (lam : Wt Ψ N) : Wt Ψ N :=
-  fun σ i => if σ = τ then lam σ (Equiv.swap a b i) else lam σ i
+def swapWt [DecidableEq Ψ] (τ : Ψ) (a b : Fin N) (lam : Wt Ψ N) : Wt Ψ N := fun σ i =>
+  if σ = τ then lam σ (Equiv.swap a b i) else lam σ i
 
 def rhoWt : Wt Ψ N := fun _ i => (N : ℝ) - 1 - (i : ℕ)
 
@@ -75,8 +75,8 @@ def NefThreshold (j : ℕ) (b : ℝ) (mu : Wt Ψ N) : Prop :=
 def InSmall (j : ℕ) (i : Fin N) : Prop := if j ≤ N - j then (i : ℕ) < j else j ≤ (i : ℕ)
 
 def WeightHyp (j : ℕ) (u : Wt Ψ N) (g : ℝ) : Prop :=
-  0 < g ∧ RegDominant u ∧ (∀ τ, g ≤ gap j u τ) ∧
-    ∀ τ (a b : Fin N), InSmall j a → a ≠ b → g ≤ |u τ a - u τ b|
+  0 < g ∧ RegDominant u ∧ (∀ τ, g ≤ gap j u τ)
+    ∧ ∀ τ (a b : Fin N), InSmall j a → a ≠ b → g ≤ |u τ a - u τ b|
 
 def bigB0 (u : Wt Ψ N) (g : ℝ) : ℝ := 4 * (Fintype.card Ψ : ℝ) * (N : ℝ) ^ 2 * (1 + ‖u‖ / g)
 
@@ -85,7 +85,8 @@ def spread (u : Wt Ψ N) : ℝ := ∑ τ, ((⨆ i, u τ i) - ⨅ i, u τ i)
 def bigLam (B rd Lval : ℝ) : ℝ := Real.log (B * rd) + |Lval|
 
 def deltaTerm [DecidableEq Ψ] (j p : ℕ) (τ : Ψ) (fr : ℕ → Ψ ⊕ Ψ) (k : ℕ) (Q : RP Ψ N) : ℝ :=
-  Real.log p * k * ((∑' n : ℕ, ((p : ℝ) ^ k)⁻¹ ^ (n + 1) * degFl (pLie j (k - 1) (fr n) * Q)) -
-    degFl (pkLow j τ (k - 1) * Q) / ((p : ℝ) - 1))
+  Real.log p * k
+    * ((∑' n : ℕ, ((p : ℝ) ^ k)⁻¹ ^ (n + 1) * degFl (pLie j (k - 1) (fr n) * Q))
+      - degFl (pkLow j τ (k - 1) * Q) / ((p : ℝ) - 1))
 
 end GlobalTheory.CompanionTheory.Ar.Top

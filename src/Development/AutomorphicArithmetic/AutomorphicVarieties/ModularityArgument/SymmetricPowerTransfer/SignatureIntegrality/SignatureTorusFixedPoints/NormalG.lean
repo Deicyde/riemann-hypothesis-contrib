@@ -8,18 +8,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Integrality
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.Z.Sym.Sig
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.Z.Sym.Sig
 
 namespace UpperTheory.V.Z.Sym.Sig
 
-private theorem exists_conj_diag {k : Type} [Field k] (N : GL (Fin 3) k) (μ : Fin 3 → kˣ)
-    (hμ : Function.Injective μ) (hroot : ∀ i, ((N : Matrix (Fin 3) (Fin 3) k).charpoly).IsRoot (μ i : k)) :
-    ∃ g : GL (Fin 3) k, N = g * diagT k (Fin 3) μ * g⁻¹ :=
-  UpperTheory.V.Lib.Small.conj_of_roots (fun i => (μ i : k)) (fun _ _ e => hμ (Units.ext e)) N _ (GlobalTheory.SmGL.val_diagT k μ) hroot
+private theorem exists_conj_diag
+    {k : Type} [Field k]
+    (N : GL (Fin 3) k) (μ : Fin 3 → kˣ) (hμ : Function.Injective μ)
+    (hroot : ∀ i, ((N : Matrix (Fin 3) (Fin 3) k).charpoly).IsRoot (μ i : k))
+    : ∃ g : GL (Fin 3) k, N = g * diagT k (Fin 3) μ * g⁻¹ :=
+  UpperTheory.V.Lib.Small.conj_of_roots
+    (fun i => (μ i : k))
+    (fun _ _ e => hμ (Units.ext e))
+    N _ (GlobalTheory.SmGL.val_diagT k μ) hroot
 
-private theorem diag_of_comm {k : Type} [Field k] (μ : Fin 3 → kˣ) (hμ : Function.Injective μ)
-    (e : GL (Fin 3) k) (h : e * diagT k (Fin 3) μ = diagT k (Fin 3) μ * e) :
-    ∃ u : Fin 3 → kˣ, e = diagT k (Fin 3) u := by
+private theorem diag_of_comm
+    {k : Type} [Field k]
+    (μ : Fin 3 → kˣ) (hμ : Function.Injective μ)
+    (e : GL (Fin 3) k) (h : e * diagT k (Fin 3) μ = diagT k (Fin 3) μ * e)
+    : ∃ u : Fin 3 → kˣ, e = diagT k (Fin 3) u := by
   have hoff : ∀ i j, i ≠ j → (e : Matrix (Fin 3) (Fin 3) k) i j = 0 := by
     intro i j hij
     have h1 := congrArg (fun M : Matrix (Fin 3) (Fin 3) k => M i j) (congrArg Units.val h)
@@ -28,7 +36,9 @@ private theorem diag_of_comm {k : Type} [Field k] (μ : Fin 3 → kˣ) (hμ : Fu
     have h3 : (e : Matrix (Fin 3) (Fin 3) k) i j * ((μ j : k) - μ i) = 0 := by
       rw [mul_sub, h1]; ring
     exact (mul_eq_zero.1 h3).resolve_right (sub_ne_zero.2 h2)
-  have hdiag : (e : Matrix (Fin 3) (Fin 3) k) = Matrix.diagonal fun i => (e : Matrix (Fin 3) (Fin 3) k) i i := by
+  have hdiag
+      : (e : Matrix (Fin 3) (Fin 3) k)
+        = Matrix.diagonal fun i => (e : Matrix (Fin 3) (Fin 3) k) i i := by
     ext i j
     by_cases hij : i = j
     · subst hij; simp
@@ -46,8 +56,7 @@ private theorem diag_of_comm {k : Type} [Field k] (μ : Fin 3 → kˣ) (hμ : Fu
 
 end UpperTheory.V.Z.Sym.Sig
 
-theorem UpperTheory.V.Z.Sym.Sig.normalG :
-    UpperTheory.V.Z.Sym.Sig.NormalG := by
+theorem UpperTheory.V.Z.Sym.Sig.normalG : UpperTheory.V.Z.Sym.Sig.NormalG := by
   intro k _ _ _ _
   obtain ⟨-, -, hd, hθ, hΦ, hi, hc⟩ := thFacts k (Lev.iw k)
   obtain hP := (thFacts k (Lev.iw k)).1
@@ -68,20 +77,29 @@ theorem UpperTheory.V.Z.Sym.Sig.normalG :
       exact (one_lt_inv₀ (zero_lt_iff.2 ((valuation k).ne_zero_iff.2 ha0))).2 ha
     have h1 : (a : k) ≠ 1 := fun h => by rw [h, map_one] at ha; exact lt_irrefl _ ha
     have h2 : ((a⁻¹ : kˣ) : k) ≠ 1 := fun h => by rw [h, map_one] at hgt; exact lt_irrefl _ hgt
-    have h3 : (a : k) ≠ ((a⁻¹ : kˣ) : k) := fun h => by
-      rw [← h] at hgt; exact lt_asymm ha hgt
+    have h3 : (a : k) ≠ ((a⁻¹ : kˣ) : k) := fun h => by rw [← h] at hgt; exact lt_asymm ha hgt
     have hμ : Function.Injective (![a, 1, a⁻¹] : Fin 3 → kˣ) := by
       intro i j hij
-      fin_cases i <;> fin_cases j <;> first
-        | rfl
-        | (exfalso
-           have hij' := congrArg Units.val hij
-           simp only [Fin.zero_eta, Fin.mk_one, Fin.reduceFinMk, Matrix.cons_val, Units.val_one] at hij'
-           first
-             | exact h1 hij' | exact h1 hij'.symm | exact h2 hij' | exact h2 hij'.symm
-             | exact h3 hij' | exact h3 hij'.symm)
-    have hroot : ∀ i, (((δ * th k 3 δ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k).charpoly).IsRoot
-        (((![a, 1, a⁻¹] : Fin 3 → kˣ) i : kˣ) : k) := by
+      fin_cases i <;> fin_cases j
+        <;> first
+          | rfl
+          | (
+              exfalso
+              have hij' := congrArg Units.val hij
+              simp only [Fin.zero_eta, Fin.mk_one, Fin.reduceFinMk, Matrix.cons_val, Units.val_one]
+                at hij'
+              first
+              | exact h1 hij'
+              | exact h1 hij'.symm
+              | exact h2 hij'
+              | exact h2 hij'.symm
+              | exact h3 hij'
+              | exact h3 hij'.symm
+            )
+    have hroot
+        : ∀ i,
+          (((δ * th k 3 δ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k).charpoly).IsRoot
+            (((![a, 1, a⁻¹] : Fin 3 → kˣ) i : kˣ) : k) := by
       intro i
       rw [hch]
       fin_cases i <;> simp [Polynomial.IsRoot]
@@ -107,14 +125,12 @@ theorem UpperTheory.V.Z.Sym.Sig.normalG :
       nth_rewrite 1 [← hen]
       group
     obtain ⟨u, hu⟩ := diag_of_comm _ hμ e hcomm
-    have hu' : u = ![u 0, u 1, u 2] := by
-      funext i; fin_cases i <;> rfl
+    have hu' : u = ![u 0, u 1, u 2] := by funext i; fin_cases i <;> rfl
     refine ⟨g₀, u 0, u 1, u 2, ?_, ?_⟩
     · have : dg ![u 0, u 1, u 2] = e := by rw [hu]; exact congrArg _ hu'.symm
       rw [this, he]
       group
-    · have h4 : dg ![u 0 / u 2, 1, u 2 / u 0] = n := by
-        rw [← hprod, ← hu' , ← hen, hu]
+    · have h4 : dg ![u 0 / u 2, 1, u 2 / u 0] = n := by rw [← hprod, ← hu', ← hen, hu]
       have h5 := congrArg (fun M : Matrix (Fin 3) (Fin 3) k => M 0 0) (congrArg Units.val h4)
       simp only [hn, dg, val_diagT] at h5
       simpa [Units.ext_iff] using h5

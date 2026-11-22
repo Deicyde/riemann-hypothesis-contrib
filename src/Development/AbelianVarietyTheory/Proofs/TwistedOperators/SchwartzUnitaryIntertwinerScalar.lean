@@ -20,34 +20,35 @@ def modPt (q : EuclideanSpace ℝ l) : l ⊕ l → ℝ := Sum.elim 0 fun i => q 
 
 def trPt (p : EuclideanSpace ℝ l) : l ⊕ l → ℝ := Sum.elim (fun i => p i) 0
 
-theorem pPart_modPt (q : EuclideanSpace ℝ l) : pPart (modPt q) = 0 := by
-  ext i; simp [pPart, modPt]
+theorem pPart_modPt (q : EuclideanSpace ℝ l) : pPart (modPt q) = 0 := by ext i; simp [pPart, modPt]
 
-theorem qPart_modPt (q : EuclideanSpace ℝ l) : qPart (modPt q) = q := by
-  ext i; simp [qPart, modPt]
+theorem qPart_modPt (q : EuclideanSpace ℝ l) : qPart (modPt q) = q := by ext i; simp [qPart, modPt]
 
-theorem pPart_trPt (p : EuclideanSpace ℝ l) : pPart (trPt p) = p := by
-  ext i; simp [pPart, trPt]
+theorem pPart_trPt (p : EuclideanSpace ℝ l) : pPart (trPt p) = p := by ext i; simp [pPart, trPt]
 
-theorem qPart_trPt (p : EuclideanSpace ℝ l) : qPart (trPt p) = 0 := by
-  ext i; simp [qPart, trPt]
+theorem qPart_trPt (p : EuclideanSpace ℝ l) : qPart (trPt p) = 0 := by ext i; simp [qPart, trPt]
 
-theorem rhoFun_modPt (q : EuclideanSpace ℝ l) (f : EuclideanSpace ℝ l → ℂ) (x : EuclideanSpace ℝ l) :
-    rhoFun (modPt q) f x = cexp (((2 * π * ⟪q, x⟫ : ℝ) : ℂ) * I) * f x := by
+theorem rhoFun_modPt (q : EuclideanSpace ℝ l) (f : EuclideanSpace ℝ l → ℂ) (x : EuclideanSpace ℝ l)
+    : rhoFun (modPt q) f x = cexp (((2 * π * ⟪q, x⟫ : ℝ) : ℂ) * I) * f x := by
   simp [rhoFun, phase, pPart_modPt, qPart_modPt]
 
-theorem rhoFun_trPt (p : EuclideanSpace ℝ l) (f : EuclideanSpace ℝ l → ℂ) (x : EuclideanSpace ℝ l) :
-    rhoFun (trPt p) f x = f (x + p) := by
+theorem rhoFun_trPt (p : EuclideanSpace ℝ l) (f : EuclideanSpace ℝ l → ℂ) (x : EuclideanSpace ℝ l)
+    : rhoFun (trPt p) f x = f (x + p) := by
   simp [rhoFun, phase, pPart_trPt, qPart_trPt]
 
 def modS (q : EuclideanSpace ℝ l) (g : Sch l) : Sch l :=
-  SchwartzMap.smulLeftCLM ℂ (fun x : EuclideanSpace ℝ l => GlobalTheory.Published.Metaplectic.eChar ⟪q, x⟫) g
+  SchwartzMap.smulLeftCLM ℂ
+    (fun x : EuclideanSpace ℝ l => GlobalTheory.Published.Metaplectic.eChar ⟪q, x⟫)
+    g
 
 theorem coe_modS (q : EuclideanSpace ℝ l) (g : Sch l) : ⇑(modS q g) = rhoFun (modPt q) ⇑g := by
-  have ht : Function.HasTemperateGrowth fun x : EuclideanSpace ℝ l => GlobalTheory.Published.Metaplectic.eChar ⟪q, x⟫ :=
-    GlobalTheory.Published.Metaplectic.hasTemperateGrowth_eChar.comp (innerSL ℝ q).hasTemperateGrowth
+  have ht : Function.HasTemperateGrowth fun x : EuclideanSpace ℝ l =>
+      GlobalTheory.Published.Metaplectic.eChar ⟪q, x⟫ :=
+    GlobalTheory.Published.Metaplectic.hasTemperateGrowth_eChar.comp (innerSL ℝ
+      q).hasTemperateGrowth
   funext x
-  rw [modS, SchwartzMap.smulLeftCLM_apply_apply ht, GlobalTheory.Published.Metaplectic.eChar_apply, rhoFun_modPt, smul_eq_mul]
+  rw [modS, SchwartzMap.smulLeftCLM_apply_apply ht, GlobalTheory.Published.Metaplectic.eChar_apply,
+    rhoFun_modPt, smul_eq_mul]
   congr 2
   push_cast
   ring
@@ -64,19 +65,26 @@ theorem integrable_conj_mul (a b : Sch l) : Integrable (fun x => conj (a x) * b 
   rw [Complex.norm_conj]
   exact SchwartzMap.norm_le_seminorm ℝ a x
 
-theorem integral_conj_mul_eq (U : Sch l →ₗ[ℂ] Sch l)
-    (hU : ∀ h : Sch l, ∫⁻ x, ‖U h x‖ₑ ^ 2 = ∫⁻ x, ‖h x‖ₑ ^ 2) (f g : Sch l) :
-    ∫ x, conj (U f x) * U g x = ∫ x, conj (f x) * g x := by
+theorem integral_conj_mul_eq
+    (U : Sch l →ₗ[ℂ] Sch l) (hU : ∀ h : Sch l, ∫⁻ x, ‖U h x‖ₑ ^ 2 = ∫⁻ x, ‖h x‖ₑ ^ 2) (f g : Sch l)
+    : ∫ x, conj (U f x) * U g x = ∫ x, conj (f x) * g x := by
   have hn : ∀ h : Sch l, ‖(U h).toLp 2‖ = ‖h.toLp 2‖ := fun h => by
     rw [SchwartzMap.norm_toLp, SchwartzMap.norm_toLp,
-      eLpNorm_eq_lintegral_rpow_eNorm_toReal (by norm_num) (by norm_num) (U h).continuous.aestronglyMeasurable,
-      eLpNorm_eq_lintegral_rpow_eNorm_toReal (by norm_num) (by norm_num) h.continuous.aestronglyMeasurable]
+      eLpNorm_eq_lintegral_rpow_eNorm_toReal (by norm_num) (by norm_num)
+        (U h).continuous.aestronglyMeasurable,
+      eLpNorm_eq_lintegral_rpow_eNorm_toReal (by norm_num) (by norm_num)
+        h.continuous.aestronglyMeasurable]
     simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two, hU]
-  have hlin : ∀ (b : ℂ) (u v : Sch l), u.toLp 2 volume + b • v.toLp 2 volume = (u + b • v).toLp 2 volume := fun b u v => by
+  have hlin
+      : ∀ (b : ℂ) (u v : Sch l),
+        u.toLp 2 volume + b • v.toLp 2 volume = (u + b • v).toLp 2 volume := fun b u v => by
     have := (SchwartzMap.toLpCLM ℂ ℂ 2 (volume : Measure (EuclideanSpace ℝ l))).map_add u (b • v)
     rw [(SchwartzMap.toLpCLM ℂ ℂ 2 (volume : Measure (EuclideanSpace ℝ l))).map_smul] at this
     exact this.symm
-  have key : ∀ b : ℂ, ‖(U f).toLp 2 volume + b • (U g).toLp 2 volume‖ = ‖f.toLp 2 volume + b • g.toLp 2 volume‖ := fun b => by
+  have key
+      : ∀ b : ℂ,
+        ‖(U f).toLp 2 volume + b • (U g).toLp 2 volume‖
+          = ‖f.toLp 2 volume + b • g.toLp 2 volume‖ := fun b => by
     rw [hlin, hlin, ← map_smul, ← map_add (f := _), hn]
   have k1 := key 1
   have k2 := key (-1)
@@ -95,10 +103,12 @@ namespace GlobalTheory.RealWeil.SchurSchwartz
 
 variable {l : Type} [Fintype l]
 
-theorem conj_mul_eq (U : Sch l →ₗ[ℂ] Sch l)
+theorem conj_mul_eq
+    (U : Sch l →ₗ[ℂ] Sch l)
     (hc : ∀ (w : l ⊕ l → ℝ) (h h₁ : Sch l), ⇑h₁ = rhoFun w ⇑h → ⇑(U h₁) = rhoFun w ⇑(U h))
-    (hU : ∀ h : Sch l, ∫⁻ x, ‖U h x‖ₑ ^ 2 = ∫⁻ x, ‖h x‖ₑ ^ 2) (f g : Sch l) (x : EuclideanSpace ℝ l) :
-    conj (U f x) * U g x = conj (f x) * g x := by
+    (hU : ∀ h : Sch l, ∫⁻ x, ‖U h x‖ₑ ^ 2 = ∫⁻ x, ‖h x‖ₑ ^ 2)
+    (f g : Sch l) (x : EuclideanSpace ℝ l)
+    : conj (U f x) * U g x = conj (f x) * g x := by
   set D : EuclideanSpace ℝ l → ℂ := fun y => conj (U f y) * U g y - conj (f y) * g y with hD
   have hDi : Integrable D := (integrable_conj_mul (U f) (U g)).sub (integrable_conj_mul f g)
   have hDc : Continuous D :=
@@ -118,9 +128,7 @@ theorem conj_mul_eq (U : Sch l →ₗ[ℂ] Sch l)
     ring_nf
   have hinv := hDc.fourierInv_fourier_eq hDi (by rw [hF]; exact integrable_zero _ _ _)
   have hz : 𝓕⁻ (0 : EuclideanSpace ℝ l → ℂ) = 0 := by
-    first
-      | exact FourierTransform.fourierInv_zero
-      | (funext w; simp [Real.fourierInv_eq])
+    first | exact FourierTransform.fourierInv_zero | (funext w; simp [Real.fourierInv_eq])
   rw [hF, hz] at hinv
   have hx := congrFun hinv x
   simp only [hD, Pi.zero_apply] at hx

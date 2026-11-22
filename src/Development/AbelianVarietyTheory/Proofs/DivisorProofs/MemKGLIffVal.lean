@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.GLintEqKO
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -16,9 +17,13 @@ namespace GlobalTheory.EulerTwKU
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem mem_KGL_iff_val {u : Pl E} (x : GLw n u) :
-    x ∈ GlobalTheory.LFun.KGL u (n := n) ↔ (∀ i j, Valued.v (x.val i j) ≤ 1) ∧ ∀ i j, Valued.v ((x⁻¹).val i j) ≤ 1 := by
-  refine ⟨?_, fun h => ⟨⟨Matrix.of fun i j => ⟨_, h.1 i j⟩, Matrix.of fun i j => ⟨_, h.2 i j⟩, ?_, ?_⟩, rfl⟩⟩
+theorem mem_KGL_iff_val {u : Pl E} (x : GLw n u)
+    : x ∈ GlobalTheory.LFun.KGL u (n := n)
+      ↔ (∀ i j, Valued.v (x.val i j) ≤ 1) ∧ ∀ i j, Valued.v ((x⁻¹).val i j) ≤ 1 := by
+  refine ⟨
+    ?_,
+    fun h => ⟨⟨Matrix.of fun i j => ⟨_, h.1 i j⟩, Matrix.of fun i j => ⟨_, h.2 i j⟩, ?_, ?_⟩, rfl⟩
+  ⟩
   · rintro ⟨y, rfl⟩
     exact ⟨fun i j => (y.1 i j).2, fun i j => ((y⁻¹).1 i j).2⟩
   · refine Matrix.map_injective (Ov E u).subtype_injective ?_
@@ -30,8 +35,9 @@ theorem mem_KGL_iff_val {u : Pl E} (x : GLw n u) :
     rw [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)]
     exact x.inv_mul
 
-theorem mem_Kglob_iff (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) :
-    g ∈ GlobalTheory.EulerTw.Kglob E n ↔ ∀ u : Pl E, GeneralLinearGroup.map (pLoc E u) g ∈ GlobalTheory.LFun.KGL u (n := n) := by
+theorem mem_Kglob_iff (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E))
+    : g ∈ GlobalTheory.EulerTw.Kglob E n
+      ↔ ∀ u : Pl E, GeneralLinearGroup.map (pLoc E u) g ∈ GlobalTheory.LFun.KGL u (n := n) := by
   unfold GlobalTheory.EulerTw.Kglob
   simp only [Subgroup.mem_iInf, Subgroup.mem_comap]
 
@@ -51,18 +57,22 @@ theorem pLoc_prjG (T : Finset (Pl E)) (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) 
     · subst hij; simp
     · simp [Matrix.one_apply_ne hij]
 
-theorem val_pLoc_thF (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (u : Pl E) (i j : Fin n) :
-    Valued.v ((GeneralLinearGroup.map (pLoc E u) (thF E n g)).val i j) =
-      Valued.v ((GeneralLinearGroup.map (pLoc E (conjSrc (IsCMField.complexConj E).toRingEquiv u)) g⁻¹).val j.rev i.rev) := by
+theorem val_pLoc_thF (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (u : Pl E) (i j : Fin n)
+    : Valued.v ((GeneralLinearGroup.map (pLoc E u) (thF E n g)).val i j)
+      = Valued.v
+        ((GeneralLinearGroup.map (pLoc E (conjSrc (IsCMField.complexConj E).toRingEquiv u)) g⁻¹).val
+          j.rev i.rev) := by
   show Valued.v (pLoc E u ((thetaGL n (conjFin (IsCMField.complexConj E).toRingEquiv) g).val i j)) = _
-  rw [GlobalTheory.ThetaPull.thetaGL_apply, map_mul, Valuation.map_mul, pLoc_conjFin, (conjLoc_spec _ u).2.2]
+  rw [GlobalTheory.ThetaPull.thetaGL_apply, map_mul, Valuation.map_mul, pLoc_conjFin,
+    (conjLoc_spec _ u).2.2]
   have : Valued.v (pLoc E u ((-1) ^ ((i : ℕ) + j))) = 1 := by
     rw [map_pow, map_neg, map_one, Valuation.map_pow, Valuation.map_neg, Valuation.map_one, one_pow]
   rw [this, one_mul]
   rfl
 
-theorem thF_mem_Kglob (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (hg : g ∈ GlobalTheory.EulerTw.Kglob E n) :
-    thF E n g ∈ GlobalTheory.EulerTw.Kglob E n := by
+theorem thF_mem_Kglob
+    (g : GL (Fin n) (FiniteAdeleRing (𝓞 E) E)) (hg : g ∈ GlobalTheory.EulerTw.Kglob E n)
+    : thF E n g ∈ GlobalTheory.EulerTw.Kglob E n := by
   rw [mem_Kglob_iff] at hg ⊢
   intro u
   have hs := (mem_KGL_iff_val _).1 (hg (conjSrc (IsCMField.complexConj E).toRingEquiv u))

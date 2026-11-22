@@ -15,15 +15,29 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc
 
-theorem mem_FilD_iff_xi_pow : ∀ (l : ℕ) [Fact l.Prime], ∀ e : Per.Fl l, IsEps e → ∀ (a : ℤ) (x : Per.BdR l), x ∈ Per.FilD l a ↔ ∃ y : Per.BdRp l, x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ (-a).toNat = algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e) ^ a.toNat * y) := by
+theorem mem_FilD_iff_xi_pow
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ e : Per.Fl l,
+      IsEps e
+        → ∀ (a : ℤ) (x : Per.BdR l),
+          x ∈ Per.FilD l a
+            ↔ ∃ y : Per.BdRp l,
+              x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ (-a).toNat
+                = algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e) ^ a.toNat * y) := by
   intro l _ e he a x
   have h := (GlobalTheory.T.bdRPlus_filtration_eq_fontaineXi_pow l e he).1
-  have hg : ∀ (n : ℕ) (x : Per.BdR l), x ∈ Per.FilD l (-(n : ℤ)) ↔ ∃ y : Per.BdRp l,
-      x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n = algebraMap (Per.BdRp l) (Per.BdR l) y :=
-    GlobalTheory.CrisLoc.mem_fil_neg l _ (GlobalTheory.T.kerThetaLocalized_eq_span_fontaineXiElement l e he)
+  have hg
+      : ∀ (n : ℕ) (x : Per.BdR l),
+        x ∈ Per.FilD l (-(n : ℤ))
+          ↔ ∃ y : Per.BdRp l,
+            x * algebraMap (Per.BdRp l) (Per.BdR l) (aDp l (xi e)) ^ n
+              = algebraMap (Per.BdRp l) (Per.BdR l) y :=
+    GlobalTheory.CrisLoc.mem_fil_neg l _
+      (GlobalTheory.T.kerThetaLocalized_eq_span_fontaineXiElement l e he)
   generalize aDp l (xi e) = ξ at h hg ⊢
-  have hn : ∀ (n : ℕ) (w : Per.BdR l), w ∈ Per.FilD l (n : ℤ) ↔
-      ∃ y : Per.BdRp l, w = algebraMap (Per.BdRp l) (Per.BdR l) (ξ ^ n * y) := by
+  have hn
+      : ∀ (n : ℕ) (w : Per.BdR l),
+        w ∈ Per.FilD l (n : ℤ)
+          ↔ ∃ y : Per.BdRp l, w = algebraMap (Per.BdRp l) (Per.BdR l) (ξ ^ n * y) := by
     intro n w
     constructor
     · intro hw

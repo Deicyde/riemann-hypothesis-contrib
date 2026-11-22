@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrimitiveRoo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC GlobalTheory.EtC.KummerSplit
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC GlobalTheory.EtC.KummerSplit
 
 noncomputable section
 
@@ -78,19 +79,24 @@ end GlobalTheory.EtC.FreeActSum
 
 namespace GlobalTheory.EtC.FreeActSum
 
-theorem free_act_sum : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A] [Nontrivial A] (ζ : Prim q A) (ι : Type) (s : Finset ι) (c : ι → ULift.{1} (ZMod q)) (a : ι → ℕ) (v w : ι → Aˣ), (∀ i ∈ s, (w i : A) = ζ.1 ^ a i * v i) → (∑ i ∈ s, (Finsupp.single (w i) (c i) - Finsupp.single (v i) (c i))) = 0 → ∑ i ∈ s, (c i).down * (a i : ZMod q) = 0 := by
+theorem free_act_sum
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A] [Nontrivial A] (ζ : Prim q A) (ι : Type)
+        (s : Finset ι) (c : ι → ULift.{1} (ZMod q)) (a : ι → ℕ) (v w : ι → Aˣ),
+      (∀ i ∈ s, (w i : A) = ζ.1 ^ a i * v i)
+        → (∑ i ∈ s, (Finsupp.single (w i) (c i) - Finsupp.single (v i) (c i))) = 0
+        → ∑ i ∈ s, (c i).down * (a i : ZMod q) = 0 := by
   intro q _ A _ _ ζ ι s c a v w hw hsum
   let T : (Aˣ →₀ ULift.{1} (ZMod q)) →+ ZMod q :=
-    Finsupp.liftAddHom (fun u => (AddMonoidHom.mulRight (tau ζ u)).comp (AddEquiv.ulift.toAddMonoidHom))
+    Finsupp.liftAddHom (fun u =>
+      (AddMonoidHom.mulRight (tau ζ u)).comp (AddEquiv.ulift.toAddMonoidHom))
   have hT := congrArg T hsum
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_zero] at hT
   rw [← hT]
   refine Finset.sum_congr rfl (fun i hi => ?_)
-  have hwu : w i = rootUnit ζ ^ a i * v i := by
-    ext; simp [rootUnit_val, hw i hi]
-  simp only [T, map_sub, Finsupp.liftAddHom_apply_single, AddMonoidHom.coe_comp, Function.comp_apply,
-    AddMonoidHom.coe_mulRight]
+  have hwu : w i = rootUnit ζ ^ a i * v i := by ext; simp [rootUnit_val, hw i hi]
+  simp only [T, map_sub, Finsupp.liftAddHom_apply_single, AddMonoidHom.coe_comp,
+    Function.comp_apply, AddMonoidHom.coe_mulRight]
   rw [hwu, tau_mul]
   show (c i).down * (a i : ZMod q) = (c i).down * (tau ζ (v i) + a i) - (c i).down * tau ζ (v i)
   ring

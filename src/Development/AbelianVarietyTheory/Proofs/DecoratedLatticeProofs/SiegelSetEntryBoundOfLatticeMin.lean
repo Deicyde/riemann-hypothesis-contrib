@@ -9,10 +9,13 @@ open Matrix GlobalTheory.ClassFin
 
 namespace GlobalTheory
 
-theorem siegelSet_entry_bound_of_lattice_min (N : ℕ) (C : ℝ) (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ)
-    (n : Matrix (Fin N) (Fin N) ℝ) (hS : IsSiegel C k a n) (t : ℝ) (ht0 : 0 < t) (ht1 : t ≤ 1)
+theorem siegelSet_entry_bound_of_lattice_min
+    (N : ℕ) (C : ℝ) (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ) (n : Matrix (Fin N) (Fin N) ℝ)
+    (hS : IsSiegel C k a n)
+    (t : ℝ) (ht0 : 0 < t) (ht1 : t ≤ 1)
     (hmin : ∀ z : Fin N → ℤ, z ≠ 0 → t ≤ ‖(k * diagonal a * n) *ᵥ fun i => (z i : ℝ)‖)
-    (i j : Fin N) : |(k * diagonal a * n) i j| * t ^ N ≤ N * C ^ N := by
+    (i j : Fin N)
+    : |(k * diagonal a * n) i j| * t ^ N ≤ N * C ^ N := by
   have hN : 0 < N := Fin.pos i
   set i0 : Fin N := ⟨0, hN⟩ with hi0
 
@@ -21,7 +24,10 @@ theorem siegelSet_entry_bound_of_lattice_min (N : ℕ) (C : ℝ) (k : Matrix (Fi
     have h := congrFun (congrFun hS.orth q) q
     simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.one_apply_eq] at h
     have : k p q * k p q ≤ ∑ x, k x q * k x q :=
-      Finset.single_le_sum (f := fun x => k x q * k x q) (fun x _ => mul_self_nonneg _) (Finset.mem_univ p)
+      Finset.single_le_sum
+        (f := fun x => k x q * k x q)
+        (fun x _ => mul_self_nonneg _)
+        (Finset.mem_univ p)
     rw [h] at this
     have h2 : |k p q| ^ 2 ≤ 1 := by rw [sq_abs, sq]; exact this
     nlinarith [abs_nonneg (k p q)]
@@ -47,12 +53,11 @@ theorem siegelSet_entry_bound_of_lattice_min (N : ℕ) (C : ℝ) (k : Matrix (Fi
       rw [hS.lower l i0 this, mul_zero]
     · intro h; exact absurd (Finset.mem_univ _) h
   have ha0 : t ≤ a i0 := by
-    have h := hmin (Pi.single i0 1) (by
-      intro h; have := congrFun h i0; simp at this)
+    have h := hmin (Pi.single i0 1) (by intro h; have := congrFun h i0; simp at this)
     refine h.trans ?_
     refine (pi_norm_le_iff_of_nonneg (le_of_lt (hS.pos i0))).2 ?_
     intro p
-    have : ((k * diagonal a * n) *ᵥ fun i => (((Pi.single i0 (1:ℤ) : Fin N → ℤ) i : ℤ) : ℝ)) p
+    have : ((k * diagonal a * n) *ᵥ fun i => (((Pi.single i0 (1 : ℤ) : Fin N → ℤ) i : ℤ) : ℝ)) p
         = (k * diagonal a * n) p i0 := by
       simp [Matrix.mulVec, dotProduct, Pi.single_apply]
     rw [this, hcol, Real.norm_eq_abs, abs_mul, abs_of_pos (hS.pos i0)]
@@ -72,12 +77,14 @@ theorem siegelSet_entry_bound_of_lattice_min (N : ℕ) (C : ℝ) (k : Matrix (Fi
     have hprod : ∏ x ∈ Finset.univ.erase l, t ≤ ∏ x ∈ Finset.univ.erase l, (C * a x) :=
       Finset.prod_le_prod₀ (fun _ _ => le_of_lt ht0) (fun x _ => hlow x)
     rw [Finset.prod_const, Finset.prod_mul_distrib, Finset.prod_const,
-      Finset.card_erase_of_mem (Finset.mem_univ l), Finset.card_univ, Fintype.card_fin] at hprod
+        Finset.card_erase_of_mem (Finset.mem_univ l), Finset.card_univ, Fintype.card_fin]
+      at hprod
     have h1 : a l * ∏ x ∈ Finset.univ.erase l, a x = 1 := by
       rw [Finset.mul_prod_erase _ _ (Finset.mem_univ l)]; exact hS.prod_eq
     have hal := le_of_lt (hS.pos l)
-    calc a l * t ^ (N - 1) ≤ a l * (C ^ (N - 1) * ∏ x ∈ Finset.univ.erase l, a x) :=
-          mul_le_mul_of_nonneg_left hprod hal
+    calc
+      a l * t ^ (N - 1) ≤ a l * (C ^ (N - 1) * ∏ x ∈ Finset.univ.erase l, a x) :=
+        mul_le_mul_of_nonneg_left hprod hal
       _ = C ^ (N - 1) * (a l * ∏ x ∈ Finset.univ.erase l, a x) := by ring
       _ = C ^ (N - 1) := by rw [h1, mul_one]
   have hent : |(k * diagonal a * n) i j| ≤ ∑ l, a l * C := by
@@ -87,29 +94,36 @@ theorem siegelSet_entry_bound_of_lattice_min (N : ℕ) (C : ℝ) (k : Matrix (Fi
     have h1 := hk i l
     have h2 := hS.bdd l j
     have hal := le_of_lt (hS.pos l)
-    calc |k i l| * a l * |n l j| ≤ 1 * a l * C := by
-          apply mul_le_mul (mul_le_mul_of_nonneg_right h1 hal) h2 (abs_nonneg _) (by positivity)
+    calc
+      |k i l| * a l * |n l j| ≤ 1 * a l * C := by
+        apply mul_le_mul (mul_le_mul_of_nonneg_right h1 hal) h2 (abs_nonneg _) (by positivity)
       _ = a l * C := by ring
-  have htN : t ^ N = t ^ (N - 1) * t := by
-    rw [← pow_succ, Nat.sub_add_cancel hN]
+  have htN : t ^ N = t ^ (N - 1) * t := by rw [← pow_succ, Nat.sub_add_cancel hN]
   have htpow : 0 ≤ t ^ N := by positivity
-  calc |(k * diagonal a * n) i j| * t ^ N ≤ (∑ l, a l * C) * t ^ N :=
-        mul_le_mul_of_nonneg_right hent htpow
+  calc
+    |(k * diagonal a * n) i j| * t ^ N
+      ≤ (∑ l, a l * C) * t ^ N := mul_le_mul_of_nonneg_right hent htpow
     _ = ∑ l, (a l * t ^ (N - 1)) * C * t := by
-        rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun l _ => ?_; rw [htN]; ring
+      rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun l _ => ?_; rw [htN]; ring
     _ ≤ ∑ l : Fin N, C ^ (N - 1) * C * 1 := by
-        refine Finset.sum_le_sum fun l _ => ?_
-        apply mul_le_mul (mul_le_mul_of_nonneg_right (hup l) (by linarith)) ht1 (le_of_lt ht0)
-        positivity
+      refine Finset.sum_le_sum fun l _ => ?_
+      apply mul_le_mul (mul_le_mul_of_nonneg_right (hup l) (by linarith)) ht1 (le_of_lt ht0)
+      positivity
     _ = N * C ^ N := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, ← pow_succ,
-          Nat.sub_add_cancel hN]
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, ← pow_succ,
+        Nat.sub_add_cancel hN]
 
-theorem siegel_entry_bound : ∀ (N : ℕ) (C : ℝ), ∃ C' : ℝ, ∀ (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ)
-    (n : Matrix (Fin N) (Fin N) ℝ), IsSiegel C k a n → ∀ t : ℝ, 0 < t → t ≤ 1 →
-    (∀ z : Fin N → ℤ, z ≠ 0 → t ≤ ‖(k * diagonal a * n) *ᵥ fun i => (z i : ℝ)‖) →
-    ∀ i j, |(k * diagonal a * n) i j| * t ^ N ≤ C' :=
-  fun N C => ⟨N * C ^ N, fun k a n hS t ht0 ht1 hmin i j =>
-    siegelSet_entry_bound_of_lattice_min N C k a n hS t ht0 ht1 hmin i j⟩
+theorem siegel_entry_bound
+    : ∀ (N : ℕ) (C : ℝ), ∃ C' : ℝ,
+      ∀ (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ) (n : Matrix (Fin N) (Fin N) ℝ),
+        IsSiegel C k a n
+          → ∀ t : ℝ,
+            0 < t → t ≤ 1
+              → (∀ z : Fin N → ℤ, z ≠ 0 → t ≤ ‖(k * diagonal a * n) *ᵥ fun i => (z i : ℝ)‖)
+              → ∀ i j, |(k * diagonal a * n) i j| * t ^ N ≤ C' := fun N C => ⟨
+  N * C ^ N,
+  fun k a n hS t ht0 ht1 hmin i j =>
+    siegelSet_entry_bound_of_lattice_min N C k a n hS t ht0 ht1 hmin i j
+⟩
 
 end GlobalTheory

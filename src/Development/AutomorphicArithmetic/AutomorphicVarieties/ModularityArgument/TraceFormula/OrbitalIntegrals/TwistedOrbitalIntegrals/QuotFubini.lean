@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MeasureTheory PositivityTheory.Rg.Tf.Loc
 
-theorem UpperTheory.V.Z.Tf.Orb.quotFubini :
-    UpperTheory.V.Z.Tf.Orb.QuotMass → UpperTheory.V.Z.Tf.Orb.QuotFubini := by
+theorem UpperTheory.V.Z.Tf.Orb.quotFubini
+    : UpperTheory.V.Z.Tf.Orb.QuotMass → UpperTheory.V.Z.Tf.Orb.QuotFubini := by
   intro hM G _ _ _ _ _ _ _ _ μG hμG H hH μ hμ hinv F hF hFH hsupp
   obtain ⟨Y, C, hY, hC, hsupp⟩ := hsupp
   by_cases hex : ∃ ρ, IsQuotNormaliser H μ ρ
@@ -27,8 +27,7 @@ theorem UpperTheory.V.Z.Tf.Orb.quotFubini :
     exact integrableOn_const hY.measure_lt_top.ne
   have hint : Integrable (Function.uncurry fun g y => F y g * ((ρ g).toReal : ℂ)) (μG.prod μG) := by
     refine (h1.mul_prod h2).mono' ?_ (Filter.Eventually.of_forall ?_)
-    · have a1 : Measurable fun p : G × G => F p.2 p.1 :=
-        (hF.comp continuous_swap).measurable
+    · have a1 : Measurable fun p : G × G => F p.2 p.1 := (hF.comp continuous_swap).measurable
       have a2 : Measurable fun p : G × G => ((ρ p.1).toReal : ℂ) :=
         Complex.measurable_ofReal.comp ((hρ.1.comp measurable_fst).ennreal_toReal)
       exact (a1.mul a2).aestronglyMeasurable

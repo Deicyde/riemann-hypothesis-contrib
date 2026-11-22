@@ -8,4 +8,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.rational_finite_places : PositivityTheory.Rg.BcB.G8.Fin.RatFin := by
-  first | exact @GlobalTheory.CompanionTheory.RatFinG.ratFin | exact GlobalTheory.CompanionTheory.RatFinG.ratFin | (intros; apply GlobalTheory.CompanionTheory.RatFinG.ratFin <;> assumption)
+  first
+  | exact @GlobalTheory.CompanionTheory.RatFinG.ratFin
+  | exact GlobalTheory.CompanionTheory.RatFinG.ratFin
+  | (intros; apply GlobalTheory.CompanionTheory.RatFinG.ratFin <;> assumption)

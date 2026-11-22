@@ -11,8 +11,8 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-theorem lehw_eval_idFrame_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    eval (idFrame ℚ r n) (hw ℚ hn ν) = 1 := by
+theorem lehw_eval_idFrame_hw {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : eval (idFrame ℚ r n) (hw ℚ hn ν) = 1 := by
   unfold hw
   rw [map_prod]
   apply Finset.prod_eq_one
@@ -32,8 +32,8 @@ theorem fock_space_highest_weight : FockQHW := by
   have hG : G ∈ dualWeyl ℚ r n ν := dualWeylRowGraded ℚ r n ν _ F hF
   have hGh : IsWeightedHomogeneous (rowW r n) G (rowNu (r := r) ν) :=
     weightedHomogeneousComponent_isWeightedHomogeneous _ _
-  obtain ⟨c, hc⟩ := hwLine ℚ r n hn ν hν G hG
-    (fun a b hab k hk => lehw_kill hn ν hν G hG hGh a b hab k hk)
+  obtain ⟨c, hc⟩ :=
+    hwLine ℚ r n hn ν hν G hG (fun a b hab k hk => lehw_kill hn ν hν G hG hGh a b hab k hk)
   have hHW := hwRowWeight ℚ r n hn ν hν
   have h1 : fockQ (hw ℚ hn ν) F = fockQ (hw ℚ hn ν) G := by
     unfold fockQ
@@ -61,12 +61,15 @@ theorem fock_space_highest_weight : FockQHW := by
     intro h0
     rw [h0, zero_mul, hev1] at eH
     exact one_ne_zero eH
-  have hcoef : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν) = c * AddMonoidAlgebra.coeff (hw ℚ hn ν) (lhwline_mnu hn ν) := by
-    have e : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν) = AddMonoidAlgebra.coeff G (lhwline_mnu hn ν) := by
+  have hcoef
+      : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν)
+        = c * AddMonoidAlgebra.coeff (hw ℚ hn ν) (lhwline_mnu hn ν) := by
+    have e
+        : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν)
+          = AddMonoidAlgebra.coeff G (lhwline_mnu hn ν) := by
       rw [hGdef, coeff_weightedHomogeneousComponent, if_pos (hHW (mem_support_iff.mp hDmem))]
     rw [e, hc, coeff_smul, smul_eq_mul]
-  have hevF : eval (idFrame ℚ r n) F = c := by
-    rw [eF, hcoef, mul_assoc, ← eH, hev1, mul_one]
+  have hevF : eval (idFrame ℚ r n) F = c := by rw [eF, hcoef, mul_assoc, ← eH, hev1, mul_one]
   rw [h1, h2, hevF]
 
 end Formalism.GradedWeylDivisibility

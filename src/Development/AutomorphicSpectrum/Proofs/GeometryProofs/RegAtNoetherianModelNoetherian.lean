@@ -5,7 +5,8 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.CoordsA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -98,10 +99,15 @@ lemma isNoetherianRing_chart {ξ : Spec (CommRingCat.of Ω) ⟶ X} {o : Type} [C
       exact ⟨s, rfl⟩
   exact isNoetherianRing_of_ringEquiv _ (RingEquiv.ofBijective g hb).symm
 
-theorem noetherian_of_coordTie (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    (o : Type) [CommRing o] [IsNoetherianRing o] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
-    (tie : CoordTie o ξ x) :
-    (∀ p : Cpt ξ, IsNoetherianRing (regAt ξ p)) ∧ ((∀ q : X, genPt ξ ⤳ q) → IsNoetherian X ∧ IsIntegral X) := by
+theorem noetherian_of_coordTie
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    (o : Type) [CommRing o] [IsNoetherianRing o] [Algebra o Ω]
+    (κ : Type) [Finite κ]
+    (x : κ → Ω) (tie : CoordTie o ξ x)
+    : (∀ p : Cpt ξ, IsNoetherianRing (regAt ξ p))
+      ∧ ((∀ q : X, genPt ξ ⤳ q) → IsNoetherian X ∧ IsIntegral X) := by
   refine ⟨fun p => ?_, fun hall => ?_⟩
   · obtain ⟨c, hcp⟩ := tie.cover p
     obtain ⟨U, hUa, hU⟩ := tie.affine c hcp.1
@@ -114,8 +120,9 @@ theorem noetherian_of_coordTie (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spe
       IsLocalization.isNoetherianRing (hUa.primeIdealOf ⟨p.1, hp⟩).asIdeal.primeCompl _ ‹_›
     exact isNoetherianRing_of_surjective _ _ (genMap ξ p).rangeRestrict
       (genMap ξ p).rangeRestrict_surjective
-  · have ex : ∀ c : {c // x c ≠ 0}, ∃ U : X.affineOpens,
-        ∀ q : X, q ∈ (U : X.Opens) ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c.1 ⟨q, h⟩ := fun c => by
+  · have ex
+        : ∀ c : {c // x c ≠ 0}, ∃ U : X.affineOpens, ∀ q : X,
+          q ∈ (U : X.Opens) ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c.1 ⟨q, h⟩ := fun c => by
       obtain ⟨U, hUa, hU⟩ := tie.affine c.1 c.2
       exact ⟨⟨U, hUa⟩, hU⟩
     choose S hS using ex

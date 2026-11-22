@@ -18,8 +18,8 @@ namespace FsInvPow
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem fsHerm_h_eq (a : K → ℤ) (z : (Σ k, ι k) → ℂ) :
-    (fsHerm ι a).h z = (HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) a).h z := by
+theorem fsHerm_h_eq (a : K → ℤ) (z : (Σ k, ι k) → ℂ)
+    : (fsHerm ι a).h z = (HermLine.ofMetrics (fun k => fsMetric (ι := ι k)) a).h z := by
   rw [fsHerm_h, Inter.ofMetrics_fs_h]
   unfold refNorm
   refine Finset.prod_congr rfl fun k _ => ?_
@@ -56,16 +56,20 @@ theorem invTensor_h {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ 
   refine Finset.prod_eq_one fun k _ => ?_
   obtain ⟨i, hi⟩ := hz k
   have hS : Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2) ≠ 0 :=
-    (Real.sqrt_pos.2 (Finset.sum_pos' (fun j _ => sq_nonneg ‖z ⟨k, j⟩‖)
+    (Real.sqrt_pos.2 (Finset.sum_pos'
+      (fun j _ => sq_nonneg ‖z ⟨k, j⟩‖)
       ⟨i, Finset.mem_univ _, pow_pos (norm_pos_iff.mpr hi) 2⟩)).ne'
   show Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2) ^ (-1 : ℤ) * Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2) ^ (1 : ℤ) = 1
   rw [zpow_neg_one, zpow_one]
   exact inv_mul_cancel₀ hS
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem ptsIntegral_eq_zero {e : ℕ} (P : Ideal (MRing ι)) (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
-    (g : ((Σ k, ι k) → ℂ) → ℝ) (hg : ∀ z ∈ mcPts P, g z = 0) : ptsIntegral P φ g = 0 := by
+theorem ptsIntegral_eq_zero
+    {e : ℕ}
+    (P : Ideal (MRing ι))
+    (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (hg : ∀ z ∈ mcPts P, g z = 0)
+    : ptsIntegral P φ g = 0 := by
   unfold ptsIntegral
   split_ifs with hΨ
   · unfold ptsIntegralAt
@@ -78,9 +82,11 @@ theorem ptsIntegral_eq_zero {e : ℕ} (P : Ideal (MRing ι)) (φ : Fin e → ((�
     simp [h0]
   · rfl
 
-theorem snoc_invTensor (II : IntersectionSystem) (hII : IsIntersectionSystem II) (P : Ideal (MRing ι)) (n : ℕ)
-    (L : Fin n → HermLine ι) (hP : IsArithVar P (n + 1)) (hL : ∀ j, IsSmoothHerm (L j)) :
-    II K ι P (n + 1) (Fin.snoc L (invTensor ι)) = 0 := by
+theorem snoc_invTensor
+    (II : IntersectionSystem) (hII : IsIntersectionSystem II)
+    (P : Ideal (MRing ι)) (n : ℕ) (L : Fin n → HermLine ι)
+    (hP : IsArithVar P (n + 1)) (hL : ∀ j, IsSmoothHerm (L j))
+    : II K ι P (n + 1) (Fin.snoc L (invTensor ι)) = 0 := by
   have h1 : IsMultiHomog (1 : MRing ι) (0 : K → ℕ) := by
     classical
     intro m hm k
@@ -102,11 +108,12 @@ theorem snoc_invTensor (II : IntersectionSystem) (hII : IsIntersectionSystem II)
     simp [logNorm, invTensor_h hz.1]
   simp [hsupp, hint]
 
-theorem intersection_update_fsHerm_neg_one (II : IntersectionSystem) (hII : IsIntersectionSystem II) (P : Ideal (MRing ι)) (n : ℕ)
-    (M : Fin (n + 1) → HermLine ι) (hP : IsArithVar P (n + 1)) (hM : ∀ i, IsSmoothHerm (M i))
-    (j : Fin (n + 1)) :
-    II K ι P (n + 1) (Function.update M j (fsHerm ι fun _ => -1)) =
-      -II K ι P (n + 1) (Function.update M j (GroundTheory.Heights₂.Heights.fsMulti ι)) := by
+theorem intersection_update_fsHerm_neg_one
+    (II : IntersectionSystem) (hII : IsIntersectionSystem II)
+    (P : Ideal (MRing ι)) (n : ℕ) (M : Fin (n + 1) → HermLine ι)
+    (hP : IsArithVar P (n + 1)) (hM : ∀ i, IsSmoothHerm (M i)) (j : Fin (n + 1))
+    : II K ι P (n + 1) (Function.update M j (fsHerm ι fun _ => -1))
+      = - II K ι P (n + 1) (Function.update M j (GroundTheory.Heights₂.Heights.fsMulti ι)) := by
   let σ := Equiv.swap j (Fin.last n)
   let L : Fin n → HermLine ι := fun i => M (σ (Fin.castSucc i))
   have hL : ∀ i, IsSmoothHerm (L i) := fun i => hM _
@@ -127,14 +134,17 @@ theorem intersection_update_fsHerm_neg_one (II : IntersectionSystem) (hII : IsIn
       simpa using hC
     · rw [Function.update_of_ne h]
       exact hM i
-  have hsym : ∀ C, IsSmoothHerm C →
-      II K ι P (n + 1) (Function.update M j C) = II K ι P (n + 1) (Fin.snoc L C) := by
+  have hsym
+      : ∀ C,
+        IsSmoothHerm C
+          → II K ι P (n + 1) (Function.update M j C) = II K ι P (n + 1) (Fin.snoc L C) := by
     intro C hC
     rw [← key C]
     exact ((hII K ι).1 P (n + 1) _ σ hP (hsm C hC)).symm
   rw [hsym _ (isSmoothHerm_fsHerm _), hsym _ isSmoothHerm_fsMulti]
-  have hadd := (hII K ι).2.1 P n L (fsHerm ι fun _ => -1) (GroundTheory.Heights₂.Heights.fsMulti ι) hP hL
-    (isSmoothHerm_fsHerm _) isSmoothHerm_fsMulti
+  have hadd :=
+    (hII K ι).2.1 P n L (fsHerm ι fun _ => -1) (GroundTheory.Heights₂.Heights.fsMulti ι) hP hL
+      (isSmoothHerm_fsHerm _) isSmoothHerm_fsMulti
   rw [snoc_invTensor II hII P n L hP hL] at hadd
   linarith
 
@@ -155,8 +165,8 @@ theorem proof : FsInvPow.Statement := by
       split_ifs
       · exact isSmoothHerm_fsMulti
       · exact isSmoothHerm_fsHerm _
-    have step : ∀ k, (hk : k < n + 1) →
-        II K ι P (n + 1) (M k) = -II K ι P (n + 1) (M (k + 1)) := by
+    have step
+        : ∀ k, (hk : k < n + 1) → II K ι P (n + 1) (M k) = - II K ι P (n + 1) (M (k + 1)) := by
       intro k hk
       have h1 : Function.update (M k) ⟨k, hk⟩ (fsHerm ι fun _ => -1) = M k := by
         funext i
@@ -164,7 +174,9 @@ theorem proof : FsInvPow.Statement := by
         · subst h
           simp [M]
         · rw [Function.update_of_ne h]
-      have h2 : Function.update (M k) ⟨k, hk⟩ (GroundTheory.Heights₂.Heights.fsMulti ι) = M (k + 1) := by
+      have h2
+          : Function.update (M k) ⟨k, hk⟩ (GroundTheory.Heights₂.Heights.fsMulti ι)
+            = M (k + 1) := by
         funext i
         by_cases h : i = ⟨k, hk⟩
         · subst h

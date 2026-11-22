@@ -10,65 +10,84 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomolo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 namespace UpperTheory.Gal.crystallineComparison.Mod
 
 open GlobalTheory.UPel.HT.EtLev
 
 section
-variable {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {S : Scheme.{0}}
-  {s : S ⟶ Sp R}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {D : Datum p} {R : Type} [CommRing R]
+  {b : Base D R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R}
 
-private theorem act_add' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (a a' : 𝓞 D.F) :
-    g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (a + a')) =
-      (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a)) * (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a')) := by
+private theorem act_add' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (a a' : 𝓞 D.F)
+    : g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (a + a'))
+      = (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a))
+        * (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a')) := by
   rw [map_add (f := _), o.act.add, MonObj.comp_mul]
 
-private theorem act_mul' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (a a' : 𝓞 D.F) :
-    g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (a * a')) =
-      (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a')) ≫ o.act.act (algebraMap (𝓞 D.F) D.O a) := by
+private theorem act_mul' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (a a' : 𝓞 D.F)
+    : g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (a * a'))
+      = (g ≫ o.act.act (algebraMap (𝓞 D.F) D.O a')) ≫ o.act.act (algebraMap (𝓞 D.F) D.O a) := by
   rw [map_mul, o.act.mul, Category.assoc]
 
-private theorem act_one' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) :
-    g ≫ o.act.act (algebraMap (𝓞 D.F) D.O 1) = g := by
+private theorem act_one' (o : Obj b N s) {T : Over S} (g : T ⟶ o.A)
+    : g ≫ o.act.act (algebraMap (𝓞 D.F) D.O 1) = g := by
   rw [map_one, o.act.one, Category.comp_id]
 
-private theorem act_nat (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (n : ℕ) :
-    g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (n : 𝓞 D.F)) = g ^ n := by
+private theorem act_nat (o : Obj b N s) {T : Over S} (g : T ⟶ o.A) (n : ℕ)
+    : g ≫ o.act.act (algebraMap (𝓞 D.F) D.O (n : 𝓞 D.F)) = g ^ n := by
   induction n with
   | zero =>
     have h := act_add' o g 0 0
     rw [add_zero] at h
     rw [Nat.cast_zero, pow_zero]
     exact left_eq_mul.mp h
-  | succ n ih =>
-    rw [Nat.cast_succ, act_add', ih, act_one', pow_succ]
+  | succ n ih => rw [Nat.cast_succ, act_add', ih, act_one', pow_succ]
 
-private theorem eq_one_of_killed (o : Obj b N s) {I J : Ideal (𝓞 D.F)} (h : I ⊔ J = ⊤) {T : Over S} {g : T ⟶ o.A}
-    (hI : KilledBy o I g) (hJ : KilledBy o J g) : g = 1 := by
+private theorem eq_one_of_killed
+    (o : Obj b N s)
+    {I J : Ideal (𝓞 D.F)} (h : I ⊔ J = ⊤)
+    {T : Over S} {g : T ⟶ o.A} (hI : KilledBy o I g) (hJ : KilledBy o J g)
+    : g = 1 := by
   have h1 : (1 : 𝓞 D.F) ∈ I ⊔ J := h ▸ Submodule.mem_top
   obtain ⟨i, hi, j, hj, hij⟩ := Submodule.mem_sup.mp h1
   rw [← act_one' o g, ← hij, act_add', hI i hi, hJ j hj, _root_.mul_one]
 
-private theorem exists_pow_eq (A : Over S) [GrpObj A] (hA : IsAbelianScheme A) {c : ℕ} (hc : 0 < c)
-    {k : Type} [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (g : Over.mk x ⟶ A) :
-    ∃ v : Over.mk x ⟶ A, v ^ c = g := by
+private theorem exists_pow_eq
+    (A : Over S) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    {c : ℕ} (hc : 0 < c)
+    {k : Type} [Field k] [IsAlgClosed k]
+    (x : Sp k ⟶ S) (g : Over.mk x ⟶ A)
+    : ∃ v : Over.mk x ⟶ A, v ^ c = g := by
   obtain ⟨hfin, -, hsurj⟩ := GlobalTheory.KthRoot.finite_flat_surjective_mulN_any S A hA c hc
-  obtain ⟨t, ht⟩ := ReciprocityTheory.ChartRestriction.G.H1.SectionDivision.exists_section (pullback.fst g.left (mulN A c).left)
-  have hsq : pullback.fst g.left (mulN A c).left ≫ g.left = pullback.snd g.left (mulN A c).left ≫ (mulN A c).left :=
+  obtain ⟨t, ht⟩ :=
+    ReciprocityTheory.ChartRestriction.G.H1.SectionDivision.exists_section (pullback.fst g.left
+      (mulN A c).left)
+  have hsq
+      : pullback.fst g.left (mulN A c).left ≫ g.left
+        = pullback.snd g.left (mulN A c).left ≫ (mulN A c).left :=
     pullback.condition
   have hw : (t ≫ pullback.snd g.left (mulN A c).left) ≫ A.hom = x := by
     have e1 := Over.w (mulN A c)
     have e2 := Over.w g
-    calc (t ≫ pullback.snd g.left (mulN A c).left) ≫ A.hom
-        = t ≫ pullback.snd g.left (mulN A c).left ≫ (mulN A c).left ≫ A.hom := by rw [e1, Category.assoc]
+    calc
+      (t ≫ pullback.snd g.left (mulN A c).left) ≫ A.hom
+          = t ≫ pullback.snd g.left (mulN A c).left ≫ (mulN A c).left ≫ A.hom := by
+        rw [e1, Category.assoc]
       _ = t ≫ pullback.fst g.left (mulN A c).left ≫ g.left ≫ A.hom := by
-          rw [← Category.assoc (pullback.snd _ _), ← hsq, Category.assoc]
+        rw [← Category.assoc (pullback.snd _ _), ← hsq, Category.assoc]
       _ = x := by rw [e2, ← Category.assoc, ht, Category.id_comp]; rfl
   refine ⟨Over.homMk (t ≫ pullback.snd g.left (mulN A c).left) hw, ?_⟩
-  rw [← Category.comp_id (Over.homMk _ hw), ← MonObj.comp_pow, ← GlobalTheory.MulFlatSurj.mulN_eq_pow]
+  rw [← Category.comp_id (Over.homMk _ hw), ← MonObj.comp_pow,
+    ← GlobalTheory.MulFlatSurj.mulN_eq_pow]
   ext1
   simp only [Over.comp_left, Over.homMk_left, Category.assoc]
   rw [← hsq, ← Category.assoc, ht]
@@ -92,8 +111,9 @@ theorem levPush_of : IdealSplit → LevPush := by
     intro y a ha
     rw [← hlin]
     exact hwsub _ (Submodule.subset_span ⟨a, ha, y, rfl⟩)
-  have hfix : ∀ {X : Over S} (oo : GlobalTheory.UPel.HT.Obj b N s) (g : X ⟶ oo.A) (β : 𝓞 D.F), β - 1 ∈ 𝔞 ^ ρ →
-      KilledBy oo (𝔞 ^ ρ) g → g ≫ oo.act.act (algebraMap (𝓞 D.F) D.O β) = g := by
+  have hfix
+      : ∀ {X : Over S} (oo : GlobalTheory.UPel.HT.Obj b N s) (g : X ⟶ oo.A) (β : 𝓞 D.F),
+        β - 1 ∈ 𝔞 ^ ρ → KilledBy oo (𝔞 ^ ρ) g → g ≫ oo.act.act (algebraMap (𝓞 D.F) D.O β) = g := by
     intro X oo g β hβ hg
     have h3 := act_add' oo g (β - 1) 1
     rw [sub_add_cancel] at h3
@@ -137,8 +157,11 @@ theorem levPush_of : IdealSplit → LevPush := by
         intro a ha
         rw [Category.assoc, hcomm, ← Category.assoc, hpre]
         exact hg' a ha
-      have hB : ∀ a ∈ 𝔞 ^ ρ, KilledBy o w ((h0 ≫ o.act.act (algebraMap (𝓞 D.F) D.O a)) ≫
-          o.act.act (algebraMap (𝓞 D.F) D.O α)) := by
+      have hB
+          : ∀ a ∈ 𝔞 ^ ρ,
+            KilledBy o w
+              ((h0 ≫ o.act.act (algebraMap (𝓞 D.F) D.O a))
+                ≫ o.act.act (algebraMap (𝓞 D.F) D.O α)) := by
         intro a ha
         refine hker _ _ ⟨?_, m, ?_⟩
         · haveI := o'.act.hom (algebraMap (𝓞 D.F) D.O α)
@@ -150,8 +173,8 @@ theorem levPush_of : IdealSplit → LevPush := by
           rw [hre, act_mul', act_mul', act_nat, hkill _ (hA a ha)]
           haveI := o.act.hom (algebraMap (𝓞 D.F) D.O t)
           exact MonObj.one_comp _
-      have hK : KilledBy o (𝔞 ^ ρ) ((h0 ≫ o.act.act (algebraMap (𝓞 D.F) D.O α)) ≫
-          o.act.act (algebraMap (𝓞 D.F) D.O u)) := by
+      have hK : KilledBy o (𝔞 ^ ρ)
+          ((h0 ≫ o.act.act (algebraMap (𝓞 D.F) D.O α)) ≫ o.act.act (algebraMap (𝓞 D.F) D.O u)) := by
         intro a ha
         rw [← act_mul', ← act_mul', show a * u * α = u * (α * a) by ring, act_mul', act_mul']
         exact hB a ha u hu

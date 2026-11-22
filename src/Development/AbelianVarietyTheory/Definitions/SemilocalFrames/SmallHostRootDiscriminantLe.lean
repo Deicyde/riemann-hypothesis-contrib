@@ -16,8 +16,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.Examples₂ NumberField
 
 variable {R : Ranks} {x eps : ℝ} {Del h : ℕ}
 
-
-
 end GlobalTheory.Diag.PG.Wit
 
 end

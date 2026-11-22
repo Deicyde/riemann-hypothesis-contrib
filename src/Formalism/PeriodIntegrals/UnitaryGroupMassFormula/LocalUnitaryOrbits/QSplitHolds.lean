@@ -9,18 +9,21 @@ noncomputable section
 
 namespace PI.OmLocU.Red
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Formalism.UG
 open PI.VolStabSW PI.OmLocU
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-  (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
 
 set_option linter.deprecated false
 
-theorem card_QE (h : IsCMExt F E σ) [Finite (𝓞 F ⧸ v.asIdeal)] :
-    Nat.card (QE (E := E) v) = Nat.card (𝓞 F ⧸ v.asIdeal) ^ 2 := by
+theorem card_QE (h : IsCMExt F E σ) [Finite (𝓞 F ⧸ v.asIdeal)]
+    : Nat.card (QE (E := E) v) = Nat.card (𝓞 F ⧸ v.asIdeal) ^ 2 := by
   haveI : v.asIdeal.IsMaximal := v.isMaximal
   letI : Field (𝓞 F ⧸ v.asIdeal) := Ideal.Quotient.field _
   have hr : Module.finrank (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) = 2 := by
@@ -37,8 +40,11 @@ theorem card_QE (h : IsCMExt F E σ) [Finite (𝓞 F ⧸ v.asIdeal)] :
 def gP (P : Ideal (𝓞 E)) (hP : IE (E := E) v ≤ P) : 𝓞 F ⧸ v.asIdeal →+* 𝓞 E ⧸ P :=
   Ideal.quotientMap P (algebraMap (𝓞 F) (𝓞 E)) (Ideal.map_le_iff_le_comap.1 hP)
 
-theorem bij_of_card {A B : Type} [Finite A] [Finite B] (f : A → B) (hf : Function.Injective f)
-    (hc : Nat.card A = Nat.card B) : Function.Bijective f := by
+theorem bij_of_card
+    {A B : Type} [Finite A] [Finite B]
+    (f : A → B) (hf : Function.Injective f)
+    (hc : Nat.card A = Nat.card B)
+    : Function.Bijective f := by
   exact hf.bijective_of_nat_card_le hc.ge
 
 theorem qProd_holds : QProd σ J ψ v := by
@@ -50,20 +56,22 @@ theorem qProd_holds : QProd σ J ψ v := by
   set ι := (UniqueFactorizationMonoid.factors (IE (E := E) v)).toFinset with hι
   have hmem : ∀ P : ι, (P : Ideal (𝓞 E)) ∈ UniqueFactorizationMonoid.factors (IE (E := E) v) :=
     fun P => Multiset.mem_toFinset.mp P.2
-  have hprime : ∀ P : ι, (P : Ideal (𝓞 E)).IsPrime :=
-    fun P => Ideal.isPrime_of_prime (UniqueFactorizationMonoid.prime_of_factor _ (hmem P))
-  have hne : ∀ P : ι, (P : Ideal (𝓞 E)) ≠ ⊥ :=
-    fun P => (UniqueFactorizationMonoid.prime_of_factor _ (hmem P)).ne_zero
-  have hle : ∀ P : ι, IE (E := E) v ≤ (P : Ideal (𝓞 E)) :=
-    fun P => Ideal.le_of_dvd (UniqueFactorizationMonoid.dvd_of_mem_factors (hmem P))
-  have hcomap : ∀ P : ι,
-      Ideal.comap (algebraMap (𝓞 F) (𝓞 E)) (P : Ideal (𝓞 E)) = v.asIdeal := by
+  have hprime : ∀ P : ι, (P : Ideal (𝓞 E)).IsPrime := fun P =>
+    Ideal.isPrime_of_prime (UniqueFactorizationMonoid.prime_of_factor _ (hmem P))
+  have hne : ∀ P : ι, (P : Ideal (𝓞 E)) ≠ ⊥ := fun P =>
+    (UniqueFactorizationMonoid.prime_of_factor _ (hmem P)).ne_zero
+  have hle : ∀ P : ι, IE (E := E) v ≤ (P : Ideal (𝓞 E)) := fun P =>
+    Ideal.le_of_dvd (UniqueFactorizationMonoid.dvd_of_mem_factors (hmem P))
+  have hcomap : ∀ P : ι, Ideal.comap (algebraMap (𝓞 F) (𝓞 E)) (P : Ideal (𝓞 E)) = v.asIdeal := by
     intro P
     haveI := hprime P
     exact (v.isMaximal.eq_of_le (Ideal.IsPrime.comap _).ne_top
       (Ideal.map_le_iff_le_comap.mp (hle P))).symm
-  have hcount : ∀ P : ι, (P : Ideal (𝓞 E)) ^ Multiset.count (P : Ideal (𝓞 E))
-      (UniqueFactorizationMonoid.factors (IE (E := E) v)) = P := by
+  have hcount
+      : ∀ P : ι,
+        (P : Ideal (𝓞 E))
+            ^ Multiset.count (P : Ideal (𝓞 E)) (UniqueFactorizationMonoid.factors (IE (E := E) v))
+          = P := by
     intro P
     haveI := hprime P
     haveI : (P : Ideal (𝓞 E)).LiesOver v.asIdeal := ⟨(hcomap P).symm⟩
@@ -83,14 +91,16 @@ theorem qProd_holds : QProd σ J ψ v := by
     exact (gP v _ (hle P)).injective
   set q := Nat.card (𝓞 F ⧸ v.asIdeal) with hq
   have hq2 : 1 < q := Finite.one_lt_card
-  have hcardP : ∀ P : ι, q ≤ Nat.card (𝓞 E ⧸ (P : Ideal (𝓞 E))) :=
-    fun P => Nat.card_le_card_of_injective _ (hinj P)
+  have hcardP : ∀ P : ι, q ≤ Nat.card (𝓞 E ⧸ (P : Ideal (𝓞 E))) := fun P =>
+    Nat.card_le_card_of_injective _ (hinj P)
   have hprod : ∏ P : ι, Nat.card (𝓞 E ⧸ (P : Ideal (𝓞 E))) = q ^ 2 := by
     rw [← Nat.card_pi, ← Nat.card_congr eqv.toEquiv, card_QE σ v hcm]
   have hn : Fintype.card ι = 2 := by
     have hpow : q ^ Fintype.card ι ≤ q ^ 2 := by
       rw [← hprod]
-      calc q ^ Fintype.card ι = ∏ _P : ι, q := by rw [Finset.prod_const, Finset.card_univ]
+      calc
+        q ^ Fintype.card ι
+          = ∏ _P : ι, q := by rw [Finset.prod_const, Finset.card_univ]
         _ ≤ _ := Finset.prod_le_prod' fun P _ => hcardP P
     rcases Nat.lt_or_ge (Fintype.card ι) 2 with hlt | hge
     · exfalso
@@ -101,8 +111,7 @@ theorem qProd_holds : QProd σ J ψ v := by
       · obtain ⟨P0, hP0⟩ := Fintype.card_eq_one_iff.mp hc
         apply hnp
         haveI := hprime P0
-        have h0 : ∀ z : 𝓞 E, z ∈ IE (E := E) v ↔
-            Ideal.Quotient.mk (P0 : Ideal (𝓞 E)) z = 0 := by
+        have h0 : ∀ z : 𝓞 E, z ∈ IE (E := E) v ↔ Ideal.Quotient.mk (P0 : Ideal (𝓞 E)) z = 0 := by
           intro z
           rw [← Ideal.Quotient.eq_zero_iff_mem (I := IE (E := E) v)]
           constructor
@@ -133,8 +142,10 @@ theorem qProd_holds : QProd σ J ψ v := by
     rcases hfin2 (eι P) with h | h
     · left; rw [← h, Equiv.symm_apply_apply]
     · right; rw [← h, Equiv.symm_apply_apply]
-  have hprod2 : Nat.card (𝓞 E ⧸ ((eι.symm 0 : ι) : Ideal (𝓞 E))) *
-      Nat.card (𝓞 E ⧸ ((eι.symm 1 : ι) : Ideal (𝓞 E))) = q ^ 2 := by
+  have hprod2
+      : Nat.card (𝓞 E ⧸ ((eι.symm 0 : ι) : Ideal (𝓞 E)))
+          * Nat.card (𝓞 E ⧸ ((eι.symm 1 : ι) : Ideal (𝓞 E)))
+        = q ^ 2 := by
     rw [← hprod, ← eι.symm.prod_comp, Fin.prod_univ_two]
   have hc0 := hcardP (eι.symm 0)
   have hc1 := hcardP (eι.symm 1)
@@ -174,14 +185,18 @@ theorem qProd_holds : QProd σ J ψ v := by
   · show (eP (eι.symm 0)).symm (eqv (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v)
       (Ideal.Quotient.mk v.asIdeal f)) (eι.symm 0)) = _
     rw [RingEquiv.symm_apply_eq]
-    rw [show algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f) =
-      Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f) from h1, heqv]
+    rw [show algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f)
+          = Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f) from
+        h1,
+      heqv]
     rfl
   · show (eP (eι.symm 1)).symm (eqv (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v)
       (Ideal.Quotient.mk v.asIdeal f)) (eι.symm 1)) = _
     rw [RingEquiv.symm_apply_eq]
-    rw [show algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f) =
-      Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f) from h1, heqv]
+    rw [show algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f)
+          = Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f) from
+        h1,
+      heqv]
     rfl
 
 theorem qSplit_holds : QSplit σ J ψ v := qSplit_of σ J ψ v (qProd_holds σ J ψ v)
@@ -221,25 +236,29 @@ theorem resAlg_of' (hQ : ResQ σ J ψ v) (hE : EtaLink σ J ψ v) : ResAlg σ J 
       congr 1
       apply RingOfIntegers.ext
       exact sigma_sigma_eq_of_isCMExt σ hcm (y : E)
-    have hfixc : ∀ c, sigQ σ v (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c) =
-        algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c := by
+    have hfixc
+        : ∀ c,
+          sigQ σ v (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c)
+            = algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) c := by
       intro c
       obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective c
       have h1 := Ideal.Quotient.algebraMap_quotient_map_quotient (S := 𝓞 E) (p := v.asIdeal) f
       have h2 : sigO σ (algebraMap (𝓞 F) (𝓞 E) f) = algebraMap (𝓞 F) (𝓞 E) f := by
         apply RingOfIntegers.ext
         exact σ.commutes (f : F)
-      calc sigQ σ v (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f))
+      calc
+        sigQ σ v (algebraMap (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) (Ideal.Quotient.mk v.asIdeal f))
           = sigQ σ v (Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f)) := congrArg _ h1
         _ = Ideal.Quotient.mk (IE (E := E) v) (algebraMap (𝓞 F) (𝓞 E) f) := by
-            simp only [sigQ, Ideal.quotientMap_mk, h2]
+          simp only [sigQ, Ideal.quotientMap_mk, h2]
         _ = _ := h1.symm
-    let s : QE (E := E) v ≃ₐ[𝓞 F ⧸ v.asIdeal] QE (E := E) v :=
-      { sigQ σ v with
-        invFun := sigQ σ v
-        left_inv := hinv
-        right_inv := hinv
-        commutes' := hfixc }
+    let s : QE (E := E) v ≃ₐ[𝓞 F ⧸ v.asIdeal] QE (E := E) v := {
+      sigQ σ v with
+      invFun := sigQ σ v
+      left_inv := hinv
+      right_inv := hinv
+      commutes' := hfixc
+    }
     have hr : Module.finrank (𝓞 F ⧸ v.asIdeal) (QE (E := E) v) = 2 := by
       rw [← hcm.2.2.1]
       exact Ideal.finrank_quotient_map v.asIdeal F E

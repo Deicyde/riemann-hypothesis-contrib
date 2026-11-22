@@ -15,8 +15,9 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.TotalWeight
 
-theorem natCast_pow_le_pow_of_exponent_le (q m a e e' : ℕ) (he : e ≤ e') (h1 : (1 : ℝ) ≤ (q : ℝ) ^ (m + a)) :
-    (q : ℝ) ^ (e * m) ≤ ((q : ℝ) ^ (m + a)) ^ e' := by
+theorem natCast_pow_le_pow_of_exponent_le
+    (q m a e e' : ℕ) (he : e ≤ e') (h1 : (1 : ℝ) ≤ (q : ℝ) ^ (m + a))
+    : (q : ℝ) ^ (e * m) ≤ ((q : ℝ) ^ (m + a)) ^ e' := by
   have h2 : (q : ℝ) ^ m ≤ (q : ℝ) ^ (m + a) := by
     rcases Nat.eq_zero_or_pos q with hq | hq
     · subst hq
@@ -25,15 +26,18 @@ theorem natCast_pow_le_pow_of_exponent_le (q m a e e' : ℕ) (he : e ≤ e') (h1
         simpa using h1
       · simp [hm.ne']
     · exact pow_le_pow_right₀ (by exact_mod_cast hq) (Nat.le_add_right _ _)
-  calc (q : ℝ) ^ (e * m) = ((q : ℝ) ^ m) ^ e := by rw [mul_comm, pow_mul]
+  calc
+    (q : ℝ) ^ (e * m)
+      = ((q : ℝ) ^ m) ^ e := by rw [mul_comm, pow_mul]
     _ ≤ ((q : ℝ) ^ (m + a)) ^ e := pow_le_pow_left₀ (by positivity) h2 e
     _ ≤ _ := pow_le_pow_right₀ h1 he
 
-theorem sumCls_one_le {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E]
-    [TopologicalSpace E] (L : LocE F E) (r k : ℕ) (S : Frames L r k)
-    (h : ∃ d Λ, S.IsTerm d Λ) :
-    (S.sumCls fun _ => 1) ≤ ENNReal.ofReal (S.Hp ^ (3 * (r + 1) ^ 2)) := by
+theorem sumCls_one_le
+    {F : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : LocE F E) (r k : ℕ) (S : Frames L r k) (h : ∃ d Λ, S.IsTerm d Λ)
+    : (S.sumCls fun _ => 1) ≤ ENNReal.ofReal (S.Hp ^ (3 * (r + 1) ^ 2)) := by
   obtain ⟨d, Λ, hT⟩ := h
   obtain ⟨ha, hD, -, -, h1, -⟩ := GlobalTheory.HL.Defect.exponents_and_defect L r k S d Λ hT
   have hth : 0 ≤ S.vth := by

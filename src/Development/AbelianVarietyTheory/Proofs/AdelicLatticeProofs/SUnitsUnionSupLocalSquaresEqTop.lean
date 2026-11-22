@@ -12,19 +12,27 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem sUnits_union_sup_finSq_eq_top :
-    ∀ (F : Type) [Field F] [NumberField F] [DecidableEq (HeightOneSpectrum (𝓞 F))] (S T : Finset (HeightOneSpectrum (𝓞 F))), admitted F S → Disjoint S T → (∀ A : Finset (HeightOneSpectrum (𝓞 F)), ∃ u ∈ sUnits F S, ∀ v ∈ T, (IsSquare (algebraMap F (v.adicCompletion F) (u : F)) ↔ v ∉ A)) → sUnits F (S ∪ T) ⊔ finSq F T = ⊤ := by
+theorem sUnits_union_sup_finSq_eq_top
+    : ∀ (F : Type) [Field F] [NumberField F] [DecidableEq (HeightOneSpectrum (𝓞 F))]
+        (S T : Finset (HeightOneSpectrum (𝓞 F))),
+      admitted F S → Disjoint S T
+        → (∀ A : Finset (HeightOneSpectrum (𝓞 F)), ∃ u ∈ sUnits F S, ∀ v ∈ T,
+          (IsSquare (algebraMap F (v.adicCompletion F) (u : F)) ↔ v ∉ A))
+        → sUnits F (S ∪ T) ⊔ finSq F T = ⊤ := by
   intro F _ _ _ S T hS hST hA
   classical
-  have hval : ∀ (v : HeightOneSpectrum (𝓞 F)) (z : F),
-      Valued.v (algebraMap F (v.adicCompletion F) z) = v.valuation F z :=
-    fun v z => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v z
+  have hval
+      : ∀ (v : HeightOneSpectrum (𝓞 F)) (z : F),
+        Valued.v (algebraMap F (v.adicCompletion F) z) = v.valuation F z := fun v z =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v z
   have hTS : ∀ v ∈ T, v ∉ S := fun v hv h => Finset.disjoint_left.1 hST h hv
   rw [eq_top_iff]
   intro x _
-  obtain ⟨a, ha⟩ := exists_unit_valuation_eq_of_adm F S T
-    (fun v => if v ∈ T then -WithZero.log (v.valuation F (x : F)) else 0) hS
-    (fun v hv => by simp [hv])
+  obtain ⟨a, ha⟩ :=
+    exists_unit_valuation_eq_of_adm F S T
+      (fun v => if v ∈ T then - WithZero.log (v.valuation F (x : F)) else 0)
+      hS
+      (fun v hv => by simp [hv])
   have haU : a ∈ sUnits F (S ∪ T) := by
     rw [mem_sUnits]
     intro v hv
@@ -34,10 +42,10 @@ theorem sUnits_union_sup_finSq_eq_top :
   have hy : ∀ v ∈ T, v.valuation F ((a * x : Fˣ) : F) = 1 := by
     intro v hv
     have hx0 : v.valuation F (x : F) ≠ 0 := by simp
-    rw [Units.val_mul, map_mul, ha v (hTS v hv), if_pos hv, WithZero.exp_neg,
-      WithZero.exp_log hx0, inv_mul_cancel₀ hx0]
-  obtain ⟨u, hu, huA⟩ := hA (T.filter fun v =>
-    ¬ IsSquare (algebraMap F (v.adicCompletion F) ((a * x : Fˣ) : F)))
+    rw [Units.val_mul, map_mul, ha v (hTS v hv), if_pos hv, WithZero.exp_neg, WithZero.exp_log hx0,
+      inv_mul_cancel₀ hx0]
+  obtain ⟨u, hu, huA⟩ :=
+    hA (T.filter fun v => ¬ IsSquare (algebraMap F (v.adicCompletion F) ((a * x : Fˣ) : F)))
   have huU : u ∈ sUnits F (S ∪ T) := by
     rw [mem_sUnits] at hu ⊢
     intro v hv

@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
@@ -23,50 +24,63 @@ theorem pM_mul_qM (x : F) (hx : x ≠ 0) : pM r x⁻¹ * qM r x = 1 := by
   rw [pM, qM, Matrix.fromBlocks_multiply, ← Matrix.fromBlocks_one]
   congr 1 <;> simp [smul_smul, mul_inv_cancel₀ hx]
 
-theorem firstProj_iotaOne_cases (hs : M.split = some g) (l : Fin (r + 1) → M.R) (i : Ix r) :
-    ph1 g (iota1 hs l i : E) = match i with
-      | Sum.inl a => ph1 g (l a)
-      | Sum.inr a => (ph2 g (l a) - ph1 g (l a)) / (g.q : F) := by
+theorem firstProj_iotaOne_cases (hs : M.split = some g) (l : Fin (r + 1) → M.R) (i : Ix r)
+    : ph1 g (iota1 hs l i : E)
+      = match i with
+        | Sum.inl a => ph1 g (l a)
+        | Sum.inr a => (ph2 g (l a) - ph1 g (l a)) / (g.q : F) := by
   rcases i with a | a <;> simp [iota1, firstProj_apply, secondProj_apply]
 
-theorem secondProj_iotaOne_eq_zero (hs : M.split = some g) (l : Fin (r + 1) → M.R) (i : Ix r) :
-    ph2 g (iota1 hs l i : E) = 0 := by
+theorem secondProj_iotaOne_eq_zero (hs : M.split = some g) (l : Fin (r + 1) → M.R) (i : Ix r)
+    : ph2 g (iota1 hs l i : E) = 0 := by
   rcases i with a | a <;> simp [iota1, secondProj_apply]
 
-theorem vecMul_qM (hs : M.split = some g) (l : Fin (r + 1) → M.R) :
-    Matrix.vecMul (fun i => ph1 g (iota1 hs l i : E)) (qM r (g.q : F)) = uV g l := by
+theorem vecMul_qM (hs : M.split = some g) (l : Fin (r + 1) → M.R)
+    : Matrix.vecMul (fun i => ph1 g (iota1 hs l i : E)) (qM r (g.q : F)) = uV g l := by
   have hq := q_ne g
   funext k
   rcases k with a | a
-  · simp [Matrix.vecMul, dotProduct, Fintype.sum_sum_type, qM, firstProj_iotaOne_cases, uV, Matrix.one_apply]
-  · simp [Matrix.vecMul, dotProduct, Fintype.sum_sum_type, qM, firstProj_iotaOne_cases, uV, Matrix.one_apply]
+  · simp [Matrix.vecMul, dotProduct, Fintype.sum_sum_type, qM, firstProj_iotaOne_cases, uV,
+      Matrix.one_apply]
+  · simp [Matrix.vecMul, dotProduct, Fintype.sum_sum_type, qM, firstProj_iotaOne_cases, uV,
+      Matrix.one_apply]
     field_simp
     ring
 
-theorem splitForm_iota_secondProj (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
-    (l w : Fin (r + 1) → M.R) :
-    ph2 g (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
-      (algebraMap F E T') (iota1 hs l) (iota2 hs w)) = 0 := by
+theorem splitForm_iota_secondProj
+    (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+    (l w : Fin (r + 1) → M.R)
+    : ph2 g
+        (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
+          (algebraMap F E T') (iota1 hs l) (iota2 hs w))
+      = 0 := by
   unfold formG
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, map_mul, secondProj_iotaOne_eq_zero]
+  simp [map_sum, map_mul, secondProj_iotaOne_eq_zero]
 
-theorem splitForm_iota_firstProj (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+theorem splitForm_iota_firstProj
+    (hs : M.split = some g)
+    (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
     (hG : IsUnit (gramG (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
       (algebraMap F E T')).det)
-    (l w : Fin (r + 1) → M.R) :
-    ph1 g (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
-      (algebraMap F E T') (iota1 hs l) (iota2 hs w)) =
-      dotProduct (uV g l) (Matrix.mulVec (gHat g Zh T T')⁻¹ (uV g w)) := by
+    (l w : Fin (r + 1) → M.R)
+    : ph1 g
+        (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
+          (algebraMap F E T') (iota1 hs l) (iota2 hs w))
+      = dotProduct (uV g l) (Matrix.mulVec (gHat g Zh T T')⁻¹ (uV g w)) := by
   set G := gramG (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T) (algebraMap F E T')
   have hq := q_ne g
   have hcw : ∀ j, ph1 g ((M.L.cj : E →+* E) (iota2 hs w j : E)) = ph1 g (iota1 hs w j : E) := by
     intro j
     show ph1 g (M.L.cj (M.L.cj (iota1 hs w j : E))) = _
     rw [M.L.cj_cj]
-  have h1 : ph1 g (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
-      (algebraMap F E T') (iota1 hs l) (iota2 hs w)) =
-      dotProduct (fun i => ph1 g (iota1 hs l i : E)) (Matrix.mulVec (G.map (ph1 g))⁻¹ fun j => ph1 g (iota1 hs w j : E)) := by
+  have h1
+      : ph1 g
+          (formG M.L.O (M.L.cj : E →+* E) (algebraMap F E ((g.q : F)⁻¹)) Zh (algebraMap F E T)
+            (algebraMap F E T') (iota1 hs l) (iota2 hs w))
+        = dotProduct
+          (fun i => ph1 g (iota1 hs l i : E))
+          (Matrix.mulVec (G.map (ph1 g))⁻¹ fun j => ph1 g (iota1 hs w j : E)) := by
     rw [← map_inv_of (ph1 g) G hG]
     unfold formG
     set_option synthInstance.maxHeartbeats 100000 in

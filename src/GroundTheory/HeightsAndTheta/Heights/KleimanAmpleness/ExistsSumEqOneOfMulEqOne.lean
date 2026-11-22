@@ -18,9 +18,12 @@ section Loc
 
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω]
 
-theorem locIn_eq_of_le_powMulMem {A B : Subalgebra S Ω} (hAB : A ≤ B) {e : Ω} (he : e ∈ A)
-    (hB : B ≤ powMulMem A e he) (P : Ideal B) (hP : P.IsPrime) (heP : (⟨e, hAB he⟩ : B) ∉ P) :
-    IndefiniteRowSideFullHecke.Kleiman2.locIn B P = IndefiniteRowSideFullHecke.Kleiman2.locIn A (P.comap (Subalgebra.inclusion hAB)) := by
+theorem locIn_eq_of_le_powMulMem
+    {A B : Subalgebra S Ω} (hAB : A ≤ B)
+    {e : Ω} (he : e ∈ A) (hB : B ≤ powMulMem A e he)
+    (P : Ideal B) (hP : P.IsPrime) (heP : (⟨e, hAB he⟩ : B) ∉ P)
+    : IndefiniteRowSideFullHecke.Kleiman2.locIn B P
+      = IndefiniteRowSideFullHecke.Kleiman2.locIn A (P.comap (Subalgebra.inclusion hAB)) := by
   have he0 : e ≠ 0 := by
     rintro rfl
     have h0 : (⟨0, hAB he⟩ : B) = 0 := rfl
@@ -51,27 +54,37 @@ theorem locIn_eq_of_le_powMulMem {A B : Subalgebra S Ω} (hAB : A ≤ B) {e : Ω
     rintro _ ⟨a, b, hb, rfl⟩
     exact Subring.subset_closure ⟨Subalgebra.inclusion hAB a, Subalgebra.inclusion hAB b, hb, rfl⟩
 
-theorem exists_isPrime_locIn_eq {A B : Subalgebra S Ω} (hAB : A ≤ B) {e : Ω} (he : e ∈ A)
-    (hB : B ≤ powMulMem A e he) (p : Ideal A) (hp : p.IsPrime) (hep : (⟨e, he⟩ : A) ∉ p) :
-    ∃ P : Ideal B, P.IsPrime ∧ IndefiniteRowSideFullHecke.Kleiman2.locIn B P = IndefiniteRowSideFullHecke.Kleiman2.locIn A p := by
+theorem exists_isPrime_locIn_eq
+    {A B : Subalgebra S Ω} (hAB : A ≤ B)
+    {e : Ω} (he : e ∈ A) (hB : B ≤ powMulMem A e he)
+    (p : Ideal A) (hp : p.IsPrime) (hep : (⟨e, he⟩ : A) ∉ p)
+    : ∃ P : Ideal B,
+      P.IsPrime
+        ∧ IndefiniteRowSideFullHecke.Kleiman2.locIn B P
+          = IndefiniteRowSideFullHecke.Kleiman2.locIn A p := by
   have hpow : ∀ M : ℕ, (⟨e, he⟩ : A) ^ M ∉ p := fun M h => hep (hp.mem_of_pow_mem M h)
-  let P : Ideal B :=
-    { carrier := {b | ∃ M : ℕ, ∃ a ∈ p, e ^ M * (b : Ω) = (a : Ω)}
-      add_mem' := by
-        rintro b b' ⟨M, a, ha, hab⟩ ⟨M', a', ha', hab'⟩
-        refine ⟨M + M', ⟨e, he⟩ ^ M' * a + ⟨e, he⟩ ^ M * a',
-          p.add_mem (p.mul_mem_left _ ha) (p.mul_mem_left _ ha'), ?_⟩
-        simp only [Subalgebra.coe_add, Subalgebra.coe_mul, SubmonoidClass.coe_pow]
-        rw [← hab, ← hab']
-        ring
-      zero_mem' := ⟨0, 0, p.zero_mem, by simp⟩
-      smul_mem' := by
-        rintro c b ⟨M, a, ha, hab⟩
-        obtain ⟨K, hK⟩ := hB c.2
-        refine ⟨K + M, ⟨_, hK⟩ * a, p.mul_mem_left _ ha, ?_⟩
-        simp only [smul_eq_mul, Subalgebra.coe_mul]
-        rw [← hab]
-        ring }
+  let P : Ideal B := {
+    carrier := {b | ∃ M : ℕ, ∃ a ∈ p, e ^ M * (b : Ω) = (a : Ω)}
+    add_mem' := by
+      rintro b b' ⟨M, a, ha, hab⟩ ⟨M', a', ha', hab'⟩
+      refine ⟨
+        M + M',
+        ⟨e, he⟩ ^ M' * a + ⟨e, he⟩ ^ M * a',
+        p.add_mem (p.mul_mem_left _ ha) (p.mul_mem_left _ ha'),
+        ?_
+      ⟩
+      simp only [Subalgebra.coe_add, Subalgebra.coe_mul, SubmonoidClass.coe_pow]
+      rw [← hab, ← hab']
+      ring
+    zero_mem' := ⟨0, 0, p.zero_mem, by simp⟩
+    smul_mem' := by
+      rintro c b ⟨M, a, ha, hab⟩
+      obtain ⟨K, hK⟩ := hB c.2
+      refine ⟨K + M, ⟨_, hK⟩ * a, p.mul_mem_left _ ha, ?_⟩
+      simp only [smul_eq_mul, Subalgebra.coe_mul]
+      rw [← hab]
+      ring
+  }
   have hmemP : ∀ b : B, b ∈ P ↔ ∃ M : ℕ, ∃ a ∈ p, e ^ M * (b : Ω) = (a : Ω) := fun _ => Iff.rfl
   have hPprime : P.IsPrime := by
     refine ⟨?_, ?_⟩
@@ -121,15 +134,17 @@ theorem exists_isPrime_locIn_eq {A B : Subalgebra S Ω} (hAB : A ≤ B) {e : Ω}
   refine ⟨P, hPprime, ?_⟩
   rw [locIn_eq_of_le_powMulMem hAB he hB P hPprime heP, hcomap]
 
-theorem exists_sum_eq_one_of_mul_eq_one (A : Subalgebra S Ω) (Q' : Submodule A Ω) {m : ℕ} (g : Fin m → Ω)
-    (hQQ : Submodule.span A (Set.range g) * Q' = 1) :
-    ∃ w : Fin m → Ω, (∀ a b, g a * w b ∈ A) ∧ ∑ b, g b * w b = 1 := by
+theorem exists_sum_eq_one_of_mul_eq_one
+    (A : Subalgebra S Ω) (Q' : Submodule A Ω)
+    {m : ℕ} (g : Fin m → Ω) (hQQ : Submodule.span A (Set.range g) * Q' = 1)
+    : ∃ w : Fin m → Ω, (∀ a b, g a * w b ∈ A) ∧ ∑ b, g b * w b = 1 := by
   classical
   have hone : (1 : Ω) ∈ Submodule.span A (Set.range g) * Q' := by
     rw [hQQ]; exact Submodule.mem_one.mpr ⟨1, map_one _⟩
   obtain ⟨w, hwQ, hsum⟩ : ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = 1 := by
     refine Submodule.mul_induction_on
-      (C := fun z => ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = z) hone ?_ ?_
+      (C := fun z => ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = z)
+      hone ?_ ?_
     · intro q hq q' hq'
       obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun A).mp hq
       refine ⟨fun b => (a b : Ω) * q', fun b => Q'.smul_mem (a b) hq', ?_⟩
@@ -142,8 +157,9 @@ theorem exists_sum_eq_one_of_mul_eq_one (A : Subalgebra S Ω) (Q' : Submodule A 
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun b _ => by simp [mul_add]
   refine ⟨w, fun a b => ?_, hsum⟩
-  have h := Submodule.mul_mem_mul (Submodule.subset_span ⟨a, rfl⟩ : g a ∈ Submodule.span A (Set.range g))
-    (hwQ b)
+  have h :=
+    Submodule.mul_mem_mul (Submodule.subset_span ⟨a, rfl⟩ : g a ∈ Submodule.span A (Set.range g))
+      (hwQ b)
   rw [hQQ, Submodule.mem_one] at h
   obtain ⟨y, hy⟩ := h
   rw [← hy]
@@ -155,10 +171,12 @@ section Graph
 
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {N m : ℕ} {x : Fin (N + 1) → Ω}
 
-theorem span_graphGens_eq (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
-    {i : Fin (N + 1)} (hi : x i ≠ 0) :
-    Submodule.span (Kleiman.chartRing S x (Kleiman.singleChart hi)) (Set.range fun b => x i ^ (-n) * s b) =
-      Q.sub (Kleiman.singleChart hi) := by
+theorem span_graphGens_eq
+    (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
+    {i : Fin (N + 1)} (hi : x i ≠ 0)
+    : Submodule.span (Kleiman.chartRing S x (Kleiman.singleChart hi))
+        (Set.range fun b => x i ^ (-n) * s b)
+      = Q.sub (Kleiman.singleChart hi) := by
   set I := Kleiman.singleChart hi with hIdef
   have hiI : i ∈ I.1 := Finset.mem_singleton_self i
   apply le_antisymm
@@ -184,10 +202,14 @@ theorem span_graphGens_eq (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → 
       rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun b _ => by ring
     rw [this, ha, zpow_neg, ← mul_assoc, inv_mul_cancel₀ (zpow_ne_zero n hi), one_mul]
 
-theorem exists_graph_inverse (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
-    {i : Fin (N + 1)} (hi : x i ≠ 0) :
-    ∃ w : Fin m → Ω, (∀ a b, x i ^ (-n) * s a * w b ∈ chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)) ∧
-      ∑ b, x i ^ (-n) * s b * w b = 1 := by
+theorem exists_graph_inverse
+    (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
+    {i : Fin (N + 1)} (hi : x i ≠ 0)
+    : ∃ w : Fin m → Ω,
+      (∀ a b,
+          x i ^ (-n) * s a * w b
+            ∈ chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
+        ∧ ∑ b, x i ^ (-n) * s b * w b = 1 := by
   obtain ⟨Q', hQ'⟩ := Q.invertible (Kleiman.singleChart hi)
   rw [← span_graphGens_eq Q n s hgen hi] at hQ'
   obtain ⟨w, hw, hsum⟩ := exists_sum_eq_one_of_mul_eq_one _ Q' _ hQ'
@@ -195,18 +217,23 @@ theorem exists_graph_inverse (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m �
   rw [chartRingOver_oneBlock x (fun _ => i) hi]
   exact hw a b
 
-theorem graphRing_between {i : Fin (N + 1)} (hi : x i ≠ 0) (n : ℤ) (s : Fin m → Ω) (w : Fin m → Ω)
-    (hw : ∀ a b, x i ^ (-n) * s a * w b ∈ chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
-    {j : Fin m} (hj : s j ≠ 0) (b : Fin m) :
-    chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i) ≤ graphRing S x s i j ∧
-      graphRing S x s i j ≤ powMulMem _ _ (hw j b) := by
+theorem graphRing_between
+    {i : Fin (N + 1)} (hi : x i ≠ 0)
+    (n : ℤ) (s : Fin m → Ω) (w : Fin m → Ω)
+    (hw : ∀ a b,
+      x i ^ (-n) * s a * w b
+        ∈ chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
+    {j : Fin m} (hj : s j ≠ 0)
+    (b : Fin m)
+    : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)
+        ≤ graphRing S x s i j
+      ∧ graphRing S x s i j ≤ powMulMem _ _ (hw j b) := by
   have hA := chartRingOver_oneBlock (S := S) x (fun _ => i) hi
   refine ⟨?_, ?_⟩
   · rw [hA]; exact chartRing_le_graphRing x s hi j
   · refine graphRing_le x s hi j _ (fun a ha => ⟨0, ?_⟩) fun c => ⟨1, ?_⟩
     · rw [pow_zero, one_mul, hA]; exact ha
-    · have : (x i ^ (-n) * s j * w b) ^ 1 * (s c / s j) = x i ^ (-n) * s c * w b := by
-        field_simp
+    · have : (x i ^ (-n) * s j * w b) ^ 1 * (s c / s j) = x i ^ (-n) * s c * w b := by field_simp
       rw [this]
       exact hw c b
 
@@ -232,21 +259,27 @@ theorem GraphModel.full : GraphModel.Statement := by
       have hi : x i ≠ 0 := hc (Sum.inl ())
       have hj : s j ≠ 0 := hc (Sum.inr ())
       obtain ⟨w, hw, hsum⟩ := exists_graph_inverse Q n s hgen hi
-      have hB : ∀ b, chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i) ≤ graphRing S x s i j ∧
-          graphRing S x s i j ≤ powMulMem _ _ (hw j b) := graphRing_between hi n s w hw hj
+      have hB
+          : ∀ b,
+            chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)
+                ≤ graphRing S x s i j
+              ∧ graphRing S x s i j ≤ powMulMem _ _ (hw j b) :=
+        graphRing_between hi n s w hw hj
       obtain ⟨hAB, -⟩ := hB j
       obtain ⟨b, hb⟩ : ∃ b, (⟨_, hAB (hw j b)⟩ : graphRing S x s i j) ∉ P := by
         by_contra h
         push Not at h
         apply hP.ne_top
         rw [Ideal.eq_top_iff_one]
-        have h1 : (1 : graphRing S x s i j) =
-            ∑ b, (⟨s b / s j, div_mem_graphRing_inr x s i j b⟩ : graphRing S x s i j) * ⟨_, hAB (hw j b)⟩ := by
-          apply Subtype.ext
-          simp only [Subalgebra.coe_one, AddSubmonoidClass.coe_finsetSum, Subalgebra.coe_mul]
-          rw [← hsum]
-          refine Finset.sum_congr rfl fun b _ => ?_
-          field_simp
+        have h1
+            : (1 : graphRing S x s i j)
+              = ∑ b, (⟨s b / s j, div_mem_graphRing_inr x s i j b⟩ : graphRing S x s i j) * ⟨_, hAB (hw j b)⟩ :=
+          by
+            apply Subtype.ext
+            simp only [Subalgebra.coe_one, AddSubmonoidClass.coe_finsetSum, Subalgebra.coe_mul]
+            rw [← hsum]
+            refine Finset.sum_congr rfl fun b _ => ?_
+            field_simp
         rw [h1]
         exact Ideal.sum_mem _ fun b _ => P.mul_mem_left _ (h b)
       obtain ⟨hAB', hle⟩ := hB b
@@ -257,12 +290,18 @@ theorem GraphModel.full : GraphModel.Statement := by
       obtain ⟨i, rfl⟩ : ∃ i : Fin (N + 1), c = fun _ => i := ⟨c (), funext fun u => rfl⟩
       have hi : x i ≠ 0 := hc ()
       obtain ⟨w, hw, hsum⟩ := exists_graph_inverse Q n s hgen hi
-      obtain ⟨j, hj⟩ : ∃ j, (⟨_, hw j j⟩ : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)) ∉ p := by
+      obtain ⟨j, hj⟩
+          : ∃ j,
+            (⟨_, hw j j⟩
+                : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
+              ∉ p := by
         by_contra h
         push Not at h
         apply hp.ne_top
         rw [Ideal.eq_top_iff_one]
-        have h1 : (1 : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)) = ∑ b, ⟨_, hw b b⟩ := by
+        have h1
+            : (1 : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
+              = ∑ b, ⟨_, hw b b⟩ := by
           apply Subtype.ext
           simp only [Subalgebra.coe_one, AddSubmonoidClass.coe_finsetSum]
           exact hsum.symm
@@ -271,7 +310,9 @@ theorem GraphModel.full : GraphModel.Statement := by
       have hsj : s j ≠ 0 := by
         intro h0
         apply hj
-        have : (⟨_, hw j j⟩ : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i)) = 0 :=
+        have : (⟨_, hw j j⟩
+              : chartRingOver S (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (fun _ => i))
+            = 0 :=
           Subtype.ext (by simp [h0])
         rw [this]
         exact p.zero_mem

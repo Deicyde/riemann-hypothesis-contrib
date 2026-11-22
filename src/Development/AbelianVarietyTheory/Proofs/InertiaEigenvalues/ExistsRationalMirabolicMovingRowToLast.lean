@@ -9,9 +9,16 @@ open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.CuspRep Glob
 
 namespace GlobalTheory.CuspGeneric
 
-theorem mir_exists_row : ∀ (E : Type) [Field E] [NumberField E] (a m : ℕ), m + 1 < a →
-    ∀ ξ : UnipotentBlockColumnIndex a (m + 1) (m + 1) → E, ξ ≠ 0 → ∃ γ : GL (Fin a) E, IsMir (m + 1) γ ∧
-      ∀ t : UnipotentBlockColumnIndex a (m + 1) (m + 1), ∑ s : UnipotentBlockColumnIndex a (m + 1) (m + 1), eLast a (m + 1) s * γ.val s.1.1 t.1.1 = ξ t := by
+theorem mir_exists_row
+    : ∀ (E : Type) [Field E] [NumberField E] (a m : ℕ),
+      m + 1 < a
+        → ∀ ξ : UnipotentBlockColumnIndex a (m + 1) (m + 1) → E,
+          ξ ≠ 0
+            → ∃ γ : GL (Fin a) E,
+              IsMir (m + 1) γ
+                ∧ ∀ t : UnipotentBlockColumnIndex a (m + 1) (m + 1),
+                  ∑ s : UnipotentBlockColumnIndex a (m + 1) (m + 1), eLast a (m + 1) s * γ.val s.1.1 t.1.1
+                    = ξ t := by
   intro E _ _ a m hma ξ hξ
   classical
   set mm : Fin a := ⟨m, by omega⟩ with hmm
@@ -31,8 +38,14 @@ theorem mir_exists_row : ∀ (E : Type) [Field E] [NumberField E] (a m : ℕ), m
   set i₀ : Fin a := t₀.1.1 with hi₀
   have hi₀m : (i₀ : ℕ) ≤ m := by have := t₀.2; omega
   have hvi₀ : v i₀ ≠ 0 := by rw [hi₀, hv]; exact ht₀
-  let M : Matrix (Fin a) (Fin a) E := Matrix.of fun i k =>
-    if i = mm then v k else if i = i₀ then (if k = mm then 1 else 0) else (1 : Matrix (Fin a) (Fin a) E) i k
+  let M : Matrix (Fin a) (Fin a) E :=
+    Matrix.of fun i k =>
+      if i = mm then
+        v k
+      else if i = i₀ then
+        (if k = mm then 1 else 0)
+      else
+        (1 : Matrix (Fin a) (Fin a) E) i k
   have hdet : M.det ≠ 0 := by
     intro h0
     obtain ⟨x, hx0, hx⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h0
@@ -73,17 +86,19 @@ theorem mir_exists_row : ∀ (E : Type) [Field E] [NumberField E] (a m : ℕ), m
       · rfl
   · intro t
     rw [IsUnit.unit_spec]
-    have hs : ∃ s : UnipotentBlockColumnIndex a (m + 1) (m + 1), s.1.1 = mm := ⟨⟨(mm, c), by simp [hmm, hc]⟩, rfl⟩
+    have hs : ∃ s : UnipotentBlockColumnIndex a (m + 1) (m + 1), s.1.1 = mm :=
+      ⟨⟨(mm, c), by simp [hmm, hc]⟩, rfl⟩
     obtain ⟨s₀, hs₀⟩ := hs
     rw [Finset.sum_eq_single s₀]
     · simp only [eLast, hs₀, hmm, M, Matrix.of_apply, if_true, one_mul]
       exact hv t
     · intro s _ hs
-      have : ¬ ((s.1.1 : ℕ) + 1 = m + 1) := by
+      have : ¬((s.1.1 : ℕ) + 1 = m + 1) := by
         intro e
         apply hs
         apply Subtype.ext
-        have h1 := s.2; have h2 := s₀.2
+        have h1 := s.2
+        have h2 := s₀.2
         apply Prod.ext
         · apply Fin.ext; rw [hs₀]; simp [hmm]; omega
         · apply Fin.ext; omega

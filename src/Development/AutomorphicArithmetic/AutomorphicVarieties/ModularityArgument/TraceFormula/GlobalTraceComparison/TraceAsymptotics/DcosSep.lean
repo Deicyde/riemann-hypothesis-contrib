@@ -10,17 +10,17 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
-
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.dcosSep :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.DcosSep :=
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.dcosSep
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm.DcosSep :=
   _root_.UpperTheory.Reformulated.B.DoubleCosetSeparation.dcosSep

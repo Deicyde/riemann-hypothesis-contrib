@@ -16,8 +16,8 @@ section
 
 variable (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_nat_mul_integral (y : E) :
-    ∃ d : ℕ, 0 < d ∧ (d : E) * y ∈ Set.range (algebraMap (𝓞 E) E) := by
+theorem exists_nat_mul_integral (y : E)
+    : ∃ d : ℕ, 0 < d ∧ (d : E) * y ∈ Set.range (algebraMap (𝓞 E) E) := by
   have hy : IsAlgebraic ℤ y :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic y)
   obtain ⟨m, hm, h⟩ := hy.exists_integral_multiple
@@ -33,15 +33,16 @@ theorem exists_nat_mul_integral (y : E) :
     rfl
 
 omit [NumberField E] in
-theorem mul_mem_hat {x y : RA F E} (hx : x ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)))
-    (hy : y ∈ hat1 F (Set.range (algebraMap (𝓞 E) E))) :
-    x * y ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) := by
+theorem mul_mem_hat
+    {x y : RA F E} (hx : x ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)))
+    (hy : y ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)))
+    : x * y ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) := by
   refine mul_mem_adelicCompletionOfElementSet_of_mul_mem F ?_ hx hy
   rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩
   exact ⟨a * b, map_mul _ _ _⟩
 
-theorem exists_eq_one_tmul_add (z : RA F E) :
-    ∃ (x : E), ∃ h ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)),
+theorem exists_eq_one_tmul_add (z : RA F E)
+    : ∃ (x : E), ∃ h ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)),
       z = (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] x + h := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, zero_mem _, by simp⟩
@@ -59,38 +60,46 @@ theorem exists_eq_one_tmul_add (z : RA F E) :
     rw [TensorProduct.tmul_add]
     abel
 
-theorem mem_range_of_one_tmul_mem {x : E}
-    (hx : (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] x ∈ hat1 F (Set.range (algebraMap (𝓞 E) E))) :
-    x ∈ Set.range (algebraMap (𝓞 E) E) := by
+theorem mem_range_of_one_tmul_mem
+    {x : E} (hx : (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] x ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)))
+    : x ∈ Set.range (algebraMap (𝓞 E) E) := by
   have h : ((1 : FractionalIdeal (𝓞 E)⁰ E) : Set E) = Set.range (algebraMap (𝓞 E) E) := by
     ext y
     exact FractionalIdeal.mem_one_iff _
   rw [← h] at hx ⊢
   exact (one_tmul_mem_adelicCompletion_fractionalIdeal_iff F 1 x).1 hx
 
-theorem mem_hat_of_idempotent (z : RA F E) (hz : z * z = z) :
-    z ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) := by
+theorem mem_hat_of_idempotent (z : RA F E) (hz : z * z = z)
+    : z ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) := by
   obtain ⟨x, h, hh, hx⟩ := exists_eq_one_tmul_add F E z
   obtain ⟨N, hN, hNx⟩ := exists_nat_mul_integral E x
   have h1 : (1 : RA F E) ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) :=
     one_tmul_mem_adelicCompletionOfElementSet F ⟨1, map_one _⟩
-  have hc : ∀ y : E, (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] ((N : E) * y) =
-      N • ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] y : RA F E) := by
+  have hc
+      : ∀ y : E,
+        (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] ((N : E) * y)
+          = N • ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] y : RA F E) := by
     intro y
-    rw [← nsmul_eq_mul, ← Nat.cast_smul_eq_nsmul F, TensorProduct.tmul_smul,
-      Nat.cast_smul_eq_nsmul]
+    rw [← nsmul_eq_mul, ← Nat.cast_smul_eq_nsmul F, TensorProduct.tmul_smul, Nat.cast_smul_eq_nsmul]
   have hNz : N • z ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)) := by
     rw [hx, nsmul_add, ← hc]
     exact add_mem (one_tmul_mem_adelicCompletionOfElementSet F hNx) (nsmul_mem hh N)
-  have hpow : ∀ n : ℕ, ∃ a ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)),
-      ∃ b ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)), (z - h) ^ n = a + z * b := by
+  have hpow
+      : ∀ n : ℕ, ∃ a ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)),
+        ∃ b ∈ hat1 F (Set.range (algebraMap (𝓞 E) E)),
+          (z - h) ^ n = a + z * b := by
     intro n
     induction n with
     | zero => exact ⟨1, h1, 0, zero_mem _, by simp⟩
     | succ n ih =>
       obtain ⟨a, ha, b, hb, e⟩ := ih
-      refine ⟨-(a * h), neg_mem (mul_mem_hat F E ha hh), a + b - b * h,
-        sub_mem (add_mem ha hb) (mul_mem_hat F E hb hh), ?_⟩
+      refine ⟨
+        -(a * h),
+        neg_mem (mul_mem_hat F E ha hh),
+        a + b - b * h,
+        sub_mem (add_mem ha hb) (mul_mem_hat F E hb hh),
+        ?_
+      ⟩
       rw [pow_succ, e]
       linear_combination b * hz
   have hzh : z - h = (1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] x := by rw [hx]; abel
@@ -113,13 +122,18 @@ end
 
 section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem idempotent_mem_intAE : ∀ (D : D7) (z : Af D.host.F ⊗[D.host.F] D.host.E), z * z = z → z ∈ intAE D := by
+theorem idempotent_mem_intAE
+    : ∀ (D : D7) (z : Af D.host.F ⊗[D.host.F] D.host.E), z * z = z → z ∈ intAE D := by
   intro D z hz
-  have h : intAE D = GlobalTheory.AdLat.hat1 D.host.F (Set.range (algebraMap (𝓞 D.host.E) D.host.E)) := by
+  have h
+      : intAE D
+        = GlobalTheory.AdLat.hat1 D.host.F (Set.range (algebraMap (𝓞 D.host.E) D.host.E)) := by
     unfold intAE GlobalTheory.AdLat.hat1
     congr 1
     ext z

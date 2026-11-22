@@ -33,8 +33,10 @@ section Pi
 
 variable {k Γ : Type*} [CommSemiring k] [Monoid Γ]
 
-def piFamilyRep {ι : Type*} (V : ι → Type*) [∀ i, AddCommMonoid (V i)] [∀ i, Module k (V i)]
-    (ρ : ∀ i, Representation k Γ (V i)) : Representation k Γ (∀ i, V i) where
+def piFamilyRep
+    {ι : Type*} (V : ι → Type*) [∀ i, AddCommMonoid (V i)] [∀ i, Module k (V i)]
+    (ρ : ∀ i, Representation k Γ (V i))
+    : Representation k Γ (∀ i, V i) where
   toFun γ := LinearMap.pi fun i => ρ i γ ∘ₗ LinearMap.proj i
   map_one' := by
     ext
@@ -45,9 +47,11 @@ def piFamilyRep {ι : Type*} (V : ι → Type*) [∀ i, AddCommMonoid (V i)] [�
 
 end Pi
 
-theorem finite_tensorProduct_zmod (l : ℕ) [NeZero l] (W N : Type*) [AddCommGroup W]
-    [Module (ZMod l) W] [Finite W] [AddCommGroup N] [Module (ZMod l) N] [Finite N] :
-    Finite (W ⊗[ZMod l] N) := by
+theorem finite_tensorProduct_zmod
+    (l : ℕ) [NeZero l]
+    (W N : Type*)
+    [AddCommGroup W] [Module (ZMod l) W] [Finite W] [AddCommGroup N] [Module (ZMod l) N] [Finite N]
+    : Finite (W ⊗[ZMod l] N) := by
   have := Module.Finite.of_finite (R := ZMod l) (M := W)
   have := Module.Finite.of_finite (R := ZMod l) (M := N)
   exact Module.finite_of_finite (ZMod l)
@@ -56,9 +60,12 @@ namespace AdditiveFunction
 
 variable {l : ℕ} {Γ : Type v} [Group Γ]
 
-noncomputable def tensorRep [Fact l.Prime] (d : AdditiveFunction.{u} l Γ) {N : Type u}
-    [AddCommGroup N] [Module (ZMod l) N] [Finite N] (σ : Representation (ZMod l) Γ N) :
-    AdditiveFunction.{u} l Γ where
+noncomputable def tensorRep
+    [Fact l.Prime]
+    (d : AdditiveFunction.{u} l Γ)
+    {N : Type u} [AddCommGroup N] [Module (ZMod l) N] [Finite N]
+    (σ : Representation (ZMod l) Γ N)
+    : AdditiveFunction.{u} l Γ where
   toFun W _ _ _ ρ :=
     haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
     haveI := finite_tensorProduct_zmod l W N
@@ -69,16 +76,19 @@ noncomputable def tensorRep [Fact l.Prime] (d : AdditiveFunction.{u} l Γ) {N : 
     have := finite_tensorProduct_zmod l X₁ N
     have := finite_tensorProduct_zmod l X₂ N
     have := finite_tensorProduct_zmod l X₃ N
-    exact d.additive _ _ _ (f.rTensor N) (g.rTensor N)
-      (isIntertwiningMap_rTensor σ hf) (isIntertwiningMap_rTensor σ hg)
-      (Module.Flat.rTensor_preserves_injective_linearMap f hinj) (rTensor_exact N hfg hs)
-      (LinearMap.rTensor_surjective N hs)
+    exact d.additive _ _ _ (f.rTensor N) (g.rTensor N) (isIntertwiningMap_rTensor σ hf)
+      (isIntertwiningMap_rTensor σ hg) (Module.Flat.rTensor_preserves_injective_linearMap f hinj)
+      (rTensor_exact N hfg hs) (LinearMap.rTensor_surjective N hs)
 
-theorem tensorRep_apply [Fact l.Prime] (d : AdditiveFunction.{u} l Γ) {N : Type u}
-    [AddCommGroup N] [Module (ZMod l) N] [Finite N] (σ : Representation (ZMod l) Γ N)
+theorem tensorRep_apply
+    [Fact l.Prime]
+    (d : AdditiveFunction.{u} l Γ)
+    {N : Type u} [AddCommGroup N] [Module (ZMod l) N] [Finite N]
+    (σ : Representation (ZMod l) Γ N)
     (W : Type u) [AddCommGroup W] [Module (ZMod l) W] [Finite W]
-    (ρ : Representation (ZMod l) Γ W) [Finite (W ⊗[ZMod l] N)] :
-    (d.tensorRep σ).toFun W ρ = d.toFun (W ⊗[ZMod l] N) (ρ.tprod σ) := by
+    (ρ : Representation (ZMod l) Γ W)
+    [Finite (W ⊗[ZMod l] N)]
+    : (d.tensorRep σ).toFun W ρ = d.toFun (W ⊗[ZMod l] N) (ρ.tprod σ) := by
   rfl
 
 end AdditiveFunction

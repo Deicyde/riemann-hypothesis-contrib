@@ -13,8 +13,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.EllIso
 
-theorem exists_eigvec {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (S : Submodule ℂ (Fin n → ℂ)) (hS : S ≠ ⊥)
-    (hst : ∀ x ∈ S, G *ᵥ x ∈ S) : ∃ (z : ℂ) (v : Fin n → ℂ), v ∈ S ∧ v ≠ 0 ∧ G *ᵥ v = z • v := by
+theorem exists_eigvec
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (S : Submodule ℂ (Fin n → ℂ)) (hS : S ≠ ⊥)
+    (hst : ∀ x ∈ S, G *ᵥ x ∈ S)
+    : ∃ (z : ℂ) (v : Fin n → ℂ), v ∈ S ∧ v ≠ 0 ∧ G *ᵥ v = z • v := by
   haveI : Nontrivial S := Submodule.nontrivial_iff_ne_bot.2 hS
   let f : Module.End ℂ S := (Matrix.toLin' G).restrict (fun x hx => by simpa using hst x hx)
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue f
@@ -23,11 +25,12 @@ theorem exists_eigvec {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (S : Submodule 
   have := congrArg Subtype.val hv.apply_eq_smul
   simpa [f] using this
 
-theorem eig_line {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hs : G.charpoly.Separable) (z : ℂ) (v u : Fin n → ℂ)
-    (hv : v ≠ 0) (hGv : G *ᵥ v = z • v) (hGu : G *ᵥ u = z • u) : ∃ c : ℂ, u = c • v := by
+theorem eig_line
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hs : G.charpoly.Separable)
+    (z : ℂ) (v u : Fin n → ℂ) (hv : v ≠ 0) (hGv : G *ᵥ v = z • v) (hGu : G *ᵥ u = z • u)
+    : ∃ c : ℂ, u = c • v := by
   let f : Module.End ℂ (Fin n → ℂ) := Matrix.toLin' G
-  have hfc : LinearMap.charpoly f = G.charpoly := by
-    simp [f, Matrix.charpoly_toLin']
+  have hfc : LinearMap.charpoly f = G.charpoly := by simp [f, Matrix.charpoly_toLin']
   have hmem : ∀ w, G *ᵥ w = z • w → w ∈ Module.End.eigenspace f z := fun w hw => by
     rw [Module.End.mem_eigenspace_iff]; simpa [f] using hw
   have h1 : Module.finrank ℂ (Module.End.eigenspace f z) ≤ 1 := by
@@ -46,11 +49,13 @@ theorem eig_line {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hs : G.charpoly.Sep
   obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' v' hv').1 h2 u'
   exact ⟨c, (congrArg Subtype.val hc).symm⟩
 
-
 open ComplexOrder in
-theorem iso_bot_C {n : ℕ} (G B Bi : Matrix (Fin n) (Fin n) ℂ) (hB : B * Bi = 1) (hinv : Gᴴ * B * G = B)
-    (hs : G.charpoly.Separable) (hz : ∀ z, G.charpoly.IsRoot z → ‖z‖ = 1) (S : Submodule ℂ (Fin n → ℂ))
-    (hst : ∀ x ∈ S, G *ᵥ x ∈ S) (hiso : ∀ x ∈ S, ∀ y ∈ S, star x ⬝ᵥ (B *ᵥ y) = 0) : S = ⊥ := by
+theorem iso_bot_C
+    {n : ℕ} (G B Bi : Matrix (Fin n) (Fin n) ℂ) (hB : B * Bi = 1) (hinv : Gᴴ * B * G = B)
+    (hs : G.charpoly.Separable) (hz : ∀ z, G.charpoly.IsRoot z → ‖z‖ = 1)
+    (S : Submodule ℂ (Fin n → ℂ)) (hst : ∀ x ∈ S, G *ᵥ x ∈ S)
+    (hiso : ∀ x ∈ S, ∀ y ∈ S, star x ⬝ᵥ (B *ᵥ y) = 0)
+    : S = ⊥ := by
   by_contra hS
   obtain ⟨z, v, hvS, hv0, hGv⟩ := exists_eigvec G S hS hst
   have hroot : G.charpoly.IsRoot z := by
@@ -62,20 +67,24 @@ theorem iso_bot_C {n : ℕ} (G B Bi : Matrix (Fin n) (Fin n) ℂ) (hB : B * Bi =
     exact this
   have hz1 : star z * z = 1 := by
     have h := hz z hroot
-    have : (starRingEnd ℂ) z * z = ((Complex.normSq z : ℝ) : ℂ) := by rw [mul_comm]; exact Complex.mul_conj z
+    have : (starRingEnd ℂ) z * z = ((Complex.normSq z : ℝ) : ℂ) := by
+      rw [mul_comm]; exact Complex.mul_conj z
     rw [Complex.normSq_eq_norm_sq, h] at this
     simpa using this
   let l : (Fin n → ℂ) → ℂ := fun y => star v ⬝ᵥ (B *ᵥ y)
-  have hladd : ∀ a b, l (a + b) = l a + l b := fun a b => by simp [l, Matrix.mulVec_add, dotProduct_add]
+  have hladd : ∀ a b, l (a + b) = l a + l b := fun a b => by
+    simp [l, Matrix.mulVec_add, dotProduct_add]
   have hlsmul : ∀ (c : ℂ) a, l (c • a) = c * l a := fun c a => by
     simp [l, Matrix.mulVec_smul, dotProduct_smul]
   have hlG : ∀ y, l (G *ᵥ y) = z * l y := fun y => by
     have h0 : star (G *ᵥ v) ⬝ᵥ (B *ᵥ (G *ᵥ y)) = star v ⬝ᵥ (B *ᵥ y) := by
-      rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hinv]
+      rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+        Matrix.mulVec_mulVec, hinv]
     rw [hGv, star_smul, smul_dotProduct] at h0
     have h1 : star z * l (G *ᵥ y) = l y := by simpa [l] using h0
-    calc l (G *ᵥ y) = z * (star z * l (G *ᵥ y)) := by
-          rw [← mul_assoc, mul_comm z, hz1, one_mul]
+    calc
+      l (G *ᵥ y)
+        = z * (star z * l (G *ᵥ y)) := by rw [← mul_assoc, mul_comm z, hz1, one_mul]
       _ = z * l y := by rw [h1]
   have hpoly : ∀ (f : ℂ[X]) y, l (aeval G f *ᵥ y) = f.eval z * l y := by
     intro f
@@ -129,8 +138,8 @@ theorem iso_bot_C {n : ℕ} (G B Bi : Matrix (Fin n) (Fin n) ℂ) (hB : B * Bi =
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem nrm_map (τ : E →+* ℂ) (d : GL (Fin n) E) :
-    (nrm d).val.map τ = d.val.map τ * ((d⁻¹ : GL (Fin n) E).val.map τ)ᴴ := by
+theorem nrm_map (τ : E →+* ℂ) (d : GL (Fin n) E)
+    : (nrm d).val.map τ = d.val.map τ * ((d⁻¹ : GL (Fin n) E).val.map τ)ᴴ := by
   have e : (thetaE E n d).val.map τ = ((d⁻¹ : GL (Fin n) E).val.map τ)ᴴ := by
     rw [thetaE, thetaR_val]
     ext i j
@@ -138,8 +147,10 @@ theorem nrm_map (τ : E →+* ℂ) (d : GL (Fin n) E) :
     exact NumberField.IsCMField.complexEmbedding_complexConj E τ _
   rw [nrm, Units.val_mul, Matrix.map_mul, e]
 
-theorem iso_bot (d : GL (Fin n) E) (hd : IsRegEll d) (W : Submodule E (Fin n → E)) (hW : img (nrm d) W = W)
-    (hi : W ≤ perpD (conjE E) d W) : W = ⊥ := by
+theorem iso_bot
+    (d : GL (Fin n) E) (hd : IsRegEll d)
+    (W : Submodule E (Fin n → E)) (hW : img (nrm d) W = W) (hi : W ≤ perpD (conjE E) d W)
+    : W = ⊥ := by
   let τ : E →+* ℂ := (IsAlgClosed.lift : E →ₐ[ℚ] ℂ).toRingHom
   set A := d.val.map τ with hA
   set Ai := (d⁻¹ : GL (Fin n) E).val.map τ with hAi
@@ -154,13 +165,16 @@ theorem iso_bot (d : GL (Fin n) E) (hd : IsRegEll d) (W : Submodule E (Fin n →
   have hinv : Gᴴ * Ai * G = Ai := by
     have h1 : Aᴴ * Aiᴴ = 1 := by rw [← Matrix.conjTranspose_mul, hAA, Matrix.conjTranspose_one]
     rw [hGe, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-    calc Ai * Aᴴ * Ai * (A * Aiᴴ) = Ai * Aᴴ * (Ai * A) * Aiᴴ := by simp only [Matrix.mul_assoc]
+    calc
+      Ai * Aᴴ * Ai * (A * Aiᴴ)
+        = Ai * Aᴴ * (Ai * A) * Aiᴴ := by simp only [Matrix.mul_assoc]
       _ = Ai * (Aᴴ * Aiᴴ) := by rw [hAA, Matrix.mul_one, Matrix.mul_assoc]
       _ = Ai := by rw [h1, Matrix.mul_one]
   have hcp : G.charpoly = (nrm d).val.charpoly.map τ := Matrix.charpoly_map _ _
   have hs : G.charpoly.Separable := by rw [hcp]; exact hd.1.map
   have hz : ∀ z, G.charpoly.IsRoot z → ‖z‖ = 1 := fun z h => hd.2 τ z (hcp ▸ h)
-  let S : Submodule ℂ (Fin n → ℂ) := Submodule.span ℂ ((fun w : Fin n → E => τ ∘ w) '' (W : Set (Fin n → E)))
+  let S : Submodule ℂ (Fin n → ℂ) :=
+    Submodule.span ℂ ((fun w : Fin n → E => τ ∘ w) '' (W : Set (Fin n → E)))
   have hgen : ∀ w ∈ W, τ ∘ w ∈ S := fun w hw => Submodule.subset_span ⟨w, hw, rfl⟩
   have hstab : ∀ w ∈ W, (nrm d).val *ᵥ w ∈ W := fun w hw => by
     have : (nrm d).val *ᵥ w ∈ img (nrm d) W := ⟨w, hw, rfl⟩
@@ -183,8 +197,8 @@ theorem iso_bot (d : GL (Fin n) E) (hd : IsRegEll d) (W : Submodule E (Fin n →
     obtain ⟨y', hy', hyy⟩ := hi hy
     have hy2 : (d⁻¹ : GL (Fin n) E).val *ᵥ y = y' := by
       rw [← hyy]
-      simp only [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-        Matrix.one_mulVec]
+      simp only [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel,
+        Units.val_one, Matrix.one_mulVec]
     have h0 : ∑ i, conjE E (x i) * y' i = 0 := hy' x hx
     have h1 : Ai *ᵥ (τ ∘ y) = τ ∘ y' := by
       funext i
@@ -212,7 +226,8 @@ theorem iso_bot (d : GL (Fin n) E) (hd : IsRegEll d) (W : Submodule E (Fin n →
       | zero => simp
       | add p q _ _ hp hq => rw [Matrix.mulVec_add, dotProduct_add, hp, hq, add_zero]
       | smul c p _ hp => rw [Matrix.mulVec_smul, dotProduct_smul, hp, smul_zero]
-    | zero => intro y _; simp
+    | zero =>
+      intro y _; simp
     | add p q _ _ hp hq =>
       intro y hy
       rw [star_add, add_dotProduct, hp y hy, hq y hy, add_zero]

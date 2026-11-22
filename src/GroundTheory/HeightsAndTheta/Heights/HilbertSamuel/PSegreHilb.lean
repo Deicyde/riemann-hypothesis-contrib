@@ -13,39 +13,40 @@ open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR
 
 noncomputable section
 
-variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  (F : Type) [Field F]
+variable
+  {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)] (F : Type) [Field F]
 
-theorem weight_blockWeight_apply (e : (Σ k, ι k) →₀ ℕ) (k : K) :
-    Finsupp.weight (blockWeight ι) e k = ∑ i, e ⟨k, i⟩ := by
+theorem weight_blockWeight_apply (e : (Σ k, ι k) →₀ ℕ) (k : K)
+    : Finsupp.weight (blockWeight ι) e k = ∑ i, e ⟨k, i⟩ := by
   classical
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply,
-    Fintype.sum_sigma]
+  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_sigma]
   simp [blockWeight, Pi.single_apply]
 
-
 omit [Fintype K] [DecidableEq K] [∀ k, Fintype (ι k)] in
-theorem blockWeight_unit (v : Σ _ : Unit, ∀ k, ι k) :
-    blockWeight (fun _ : Unit => ∀ k, ι k) v = fun _ => 1 := by
+theorem blockWeight_unit (v : Σ _ : Unit, ∀ k, ι k)
+    : blockWeight (fun _ : Unit => ∀ k, ι k) v = fun _ => 1 := by
   funext u
   simp [blockWeight]
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem segreMap_isMultiHomog {m : ℕ} {p : MRing (fun _ : Unit => ∀ k, ι k) F}
-    (hp : IsWeightedHomogeneous (blockWeight (fun _ : Unit => ∀ k, ι k)) p (fun _ => m)) :
-    IsWeightedHomogeneous (blockWeight ι) (segreMap F p) (fun _ => m) := by
+theorem segreMap_isMultiHomog
+    {m : ℕ} {p : MRing (fun _ : Unit => ∀ k, ι k) F}
+    (hp : IsWeightedHomogeneous (blockWeight (fun _ : Unit => ∀ k, ι k)) p (fun _ => m))
+    : IsWeightedHomogeneous (blockWeight ι) (segreMap F p) (fun _ => m) := by
   classical
   induction hp using IsWeightedHomogeneous.induction_on with
   | zero => rw [map_zero]; exact isWeightedHomogeneous_zero _ _ _
   | add p q _ _ hp hq => rw [map_add (f := _)]; exact hp.add hq
   | monomial d r hr =>
-    have hX : ∀ v : Σ _ : Unit, ∀ k, ι k,
-        IsWeightedHomogeneous (blockWeight ι) (∏ k, (X ⟨k, v.2 k⟩ : MRing ι F)) (fun _ => 1) := by
+    have hX
+        : ∀ v : Σ _ : Unit, ∀ k, ι k,
+          IsWeightedHomogeneous (blockWeight ι) (∏ k, (X ⟨k, v.2 k⟩ : MRing ι F)) (fun _ => 1) := by
       intro v
-      have h := IsWeightedHomogeneous.prod (R := F) (w := blockWeight ι) Finset.univ
-        (fun k => (X ⟨k, v.2 k⟩ : MRing ι F)) (fun k => blockWeight ι ⟨k, v.2 k⟩)
-        (fun k _ => isWeightedHomogeneous_X _ _ _)
+      have h :=
+        IsWeightedHomogeneous.prod (R := F) (w := blockWeight ι) Finset.univ
+          (fun k => (X ⟨k, v.2 k⟩ : MRing ι F))
+          (fun k => blockWeight ι ⟨k, v.2 k⟩)
+          (fun k _ => isWeightedHomogeneous_X _ _ _)
       convert h using 1
       funext j
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
@@ -62,12 +63,12 @@ theorem segreMap_isMultiHomog {m : ℕ} {p : MRing (fun _ : Unit => ∀ k, ι k)
     rw [← hdeg]
     exact IsWeightedHomogeneous.prod _ _ _ fun v _ => (hX v).pow _
 
-
 omit [DecidableEq K] in
-theorem monomial_mem_map_segreMap (m : ℕ) :
-    ∀ e : (Σ k, ι k) →₀ ℕ, (∀ k, ∑ i, e ⟨k, i⟩ = m) →
-      monomial e (1 : F) ∈ (weightedHomogeneousSubmodule F
-        (blockWeight (fun _ : Unit => ∀ k, ι k)) (fun _ => m)).map (segreMap F).toLinearMap := by
+theorem monomial_mem_map_segreMap (m : ℕ)
+    : ∀ e : (Σ k, ι k) →₀ ℕ,
+      (∀ k, ∑ i, e ⟨k, i⟩ = m)
+        → monomial e (1 : F) ∈ (weightedHomogeneousSubmodule F
+          (blockWeight (fun _ : Unit => ∀ k, ι k)) (fun _ => m)).map (segreMap F).toLinearMap := by
   classical
   induction m with
   | zero =>
@@ -82,8 +83,9 @@ theorem monomial_mem_map_segreMap (m : ℕ) :
   | succ m ih =>
     intro e he
     have hne : ∀ k, ∃ i, e ⟨k, i⟩ ≠ 0 := fun k => by
-      obtain ⟨i, -, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ)
-        (f := fun i => e ⟨k, i⟩) (by rw [he k]; omega)
+      obtain ⟨i, -, hi⟩ :=
+        Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ) (f := fun i => e ⟨k, i⟩) (by
+          rw [he k]; omega)
       exact ⟨i, hi⟩
     choose f hf using hne
     set s : (Σ k, ι k) →₀ ℕ :=
@@ -110,17 +112,18 @@ theorem monomial_mem_map_segreMap (m : ℕ) :
       refine Finset.prod_congr rfl fun k _ => ?_
       simp [hs]
     refine ⟨g * X ⟨(), f⟩, ?_, ?_⟩
-    · have h := (show IsWeightedHomogeneous _ g _ from hg).mul
-        (isWeightedHomogeneous_X F (blockWeight (fun _ : Unit => ∀ k, ι k)) ⟨(), f⟩)
+    · have h :=
+        (show IsWeightedHomogeneous _ g _ from hg).mul
+          (isWeightedHomogeneous_X F (blockWeight (fun _ : Unit => ∀ k, ι k)) ⟨(), f⟩)
       rw [blockWeight_unit] at h
       exact h
     · simp only [AlgHom.toLinearMap_apply, map_mul] at hge ⊢
       rw [hge, segreMap_X, ← hsX, monomial_mul, one_mul, hadd]
 
-theorem map_segreMap_weightedHomogeneousSubmodule (m : ℕ) :
-    (weightedHomogeneousSubmodule F (blockWeight (fun _ : Unit => ∀ k, ι k)) (fun _ => m)).map
-        (segreMap F).toLinearMap =
-      weightedHomogeneousSubmodule F (blockWeight ι) (fun _ => m) := by
+theorem map_segreMap_weightedHomogeneousSubmodule (m : ℕ)
+    : (weightedHomogeneousSubmodule F (blockWeight (fun _ : Unit => ∀ k, ι k)) (fun _ => m)).map
+        (segreMap F).toLinearMap
+      = weightedHomogeneousSubmodule F (blockWeight ι) (fun _ => m) := by
   refine le_antisymm ?_ ?_
   · rintro _ ⟨p, hp, rfl⟩
     exact segreMap_isMultiHomog F hp
@@ -131,31 +134,33 @@ theorem map_segreMap_weightedHomogeneousSubmodule (m : ℕ) :
     | zero => exact Submodule.zero_mem _
     | add p q _ _ hp hq => exact Submodule.add_mem _ hp hq
     | monomial d r hr =>
-      have hd : ∀ k, ∑ i, d ⟨k, i⟩ = m := fun k => by
-        rw [← weight_blockWeight_apply, hr]
+      have hd : ∀ k, ∑ i, d ⟨k, i⟩ = m := fun k => by rw [← weight_blockWeight_apply, hr]
       have h := Submodule.smul_mem _ r (monomial_mem_map_segreMap F m d hd)
       rwa [smul_monomial, smul_eq_mul, mul_one] at h
 
-def segreQuotMap (q : Ideal (MRing ι F)) :
-    MRing (fun _ : Unit => ∀ k, ι k) F ⧸ segrePrime F q →ₐ[F] MRing ι F ⧸ q :=
+def segreQuotMap (q : Ideal (MRing ι F))
+    : MRing (fun _ : Unit => ∀ k, ι k) F ⧸ segrePrime F q →ₐ[F] MRing ι F ⧸ q :=
   Ideal.quotientMapₐ (I := segrePrime F q) q (segreMap F) fun _ h => h
-
 
 omit [DecidableEq K] [∀ k, Fintype (ι k)] in
 theorem segreQuotMap_injective (q : Ideal (MRing ι F)) : Function.Injective (segreQuotMap F q) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective a
   change Ideal.Quotient.mk q (segreMap F x) = 0 at ha
-  exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_comap.mpr (Ideal.Quotient.eq_zero_iff_mem.mp ha))
+  exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_comap.mpr (Ideal.Quotient.eq_zero_iff_mem.mp
+    ha))
 
-def segreGradedPieceEquiv (q : Ideal (MRing ι F)) (m : ℕ) :
-    gradedPiece (segrePrime F q) (fun _ : Unit => m) ≃ₗ[F] gradedPiece q (fun _ : K => m) :=
+def segreGradedPieceEquiv (q : Ideal (MRing ι F)) (m : ℕ)
+    : gradedPiece (segrePrime F q) (fun _ : Unit => m) ≃ₗ[F] gradedPiece q (fun _ : K => m) :=
   have hinj : Function.Injective (segreQuotMap F q).toLinearMap := segreQuotMap_injective F q
-  have hmap : (gradedPiece (segrePrime F q) (fun _ : Unit => m)).map (segreQuotMap F q).toLinearMap =
-      gradedPiece q (fun _ : K => m) := by
-    have hc : (segreQuotMap F q).toLinearMap ∘ₗ (Ideal.Quotient.mkₐ F (segrePrime F q)).toLinearMap =
-        (Ideal.Quotient.mkₐ F q).toLinearMap ∘ₗ (segreMap F).toLinearMap :=
+  have hmap
+      : (gradedPiece (segrePrime F q) (fun _ : Unit => m)).map (segreQuotMap F q).toLinearMap
+        = gradedPiece q (fun _ : K => m) := by
+    have hc
+        : (segreQuotMap F q).toLinearMap ∘ₗ (Ideal.Quotient.mkₐ F (segrePrime F q)).toLinearMap
+          = (Ideal.Quotient.mkₐ F q).toLinearMap ∘ₗ (segreMap F).toLinearMap :=
       LinearMap.ext fun _ => rfl
     unfold gradedPiece
     rw [← Submodule.map_comp, hc, Submodule.map_comp, map_segreMap_weightedHomogeneousSubmodule]

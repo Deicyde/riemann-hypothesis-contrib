@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr
+  UpperTheory.V
 
-private theorem dual_nontriv (K V : Type) [Field K] [AddCommGroup V] [Module K V] [Nontrivial V] :
-    Nontrivial (Module.Dual K V) := by
+private theorem dual_nontriv (K V : Type) [Field K] [AddCommGroup V] [Module K V] [Nontrivial V]
+    : Nontrivial (Module.Dual K V) := by
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
   by_contra h
   rw [not_nontrivial_iff_subsingleton] at h
@@ -15,8 +17,15 @@ private theorem dual_nontriv (K V : Type) [Field K] [AddCommGroup V] [Module K V
     rw [Subsingleton.elim φ 0]
     rfl)
 
-theorem UpperTheory.V.Fr.st_loc :
-    LocalFiniteness → LocalTateDuality → LocalEulerChar → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [Nontrivial M] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)), IsPlaceOver A v → ((l : ℕ) : 𝓞 ℚ) ∉ v.asIdeal → (∀ g ∈ Dec (F := ℚ) A, cycMod ℚ Ω l 1 g = 1) → ∀ ρ : Representation (ZMod (l ^ 1)) (Dec (F := ℚ) A) M, (∀ g m, ρ g m = m) → Nat.card (H0 ρ) < Nat.card (H1 ρ) := by
+theorem UpperTheory.V.Fr.st_loc
+    : LocalFiniteness → LocalTateDuality → LocalEulerChar
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (M : Type)
+          [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M]
+          [DiscreteTopology M] [Nontrivial M] (A : ValuationSubring Ω)
+          (v : HeightOneSpectrum (𝓞 ℚ)),
+        IsPlaceOver A v → ((l : ℕ) : 𝓞 ℚ) ∉ v.asIdeal → (∀ g ∈ Dec (F := ℚ) A, cycMod ℚ Ω l 1 g = 1)
+          → ∀ ρ : Representation (ZMod (l ^ 1)) (Dec (F := ℚ) A) M,
+            (∀ g m, ρ g m = m) → Nat.card (H0 ρ) < Nat.card (H1 ρ) := by
   intro hFin hTate hEuler Ω _ _ _ l hl M _ _ _ _ _ _ A v hv hlv hcyc ρ htriv
   haveI : Fact (l ^ 1).Prime := ⟨by rw [pow_one]; exact hl.out⟩
   have hcont : ReciprocityTheory.Gal.ContAction ρ := by
@@ -28,8 +37,10 @@ theorem UpperTheory.V.Fr.st_loc :
   obtain ⟨⟨e⟩, -, -, -, hbij⟩ := hTate ℚ Ω l 1 M A ρ v one_pos hv hcont
   haveI : Finite (H2 ρ) := hF.2.2.1
   haveI : Finite (H0 ρ) := hF.1
-  have hinv : ∀ φ : TDual (ZMod (l ^ 1)) M,
-      φ ∈ H0 ((twDual ((cycMod ℚ Ω l 1).comp (Dec (F := ℚ) A).subtype) ρ).comp (MonoidHom.id _)) := by
+  have hinv
+      : ∀ φ : TDual (ZMod (l ^ 1)) M,
+        φ ∈ H0 ((twDual ((cycMod ℚ Ω l 1).comp (Dec (F := ℚ) A).subtype) ρ).comp
+          (MonoidHom.id _)) := by
     intro φ g
     apply LinearMap.ext
     intro m
@@ -44,8 +55,10 @@ theorem UpperTheory.V.Fr.st_loc :
     by_contra h
     push_neg at h
     exact hx0 ((Module.forall_dual_apply_eq_zero_iff (ZMod (l ^ 1)) _).mp h)
-  let ψ : X →ₗ[ZMod (l ^ 1)] H2 ((charRep ((cycMod ℚ Ω l 1).comp (Dec (F := ℚ) A).subtype)).comp
-      (MonoidHom.id _)) := e.symm.toLinearMap ∘ₗ f
+  let ψ
+      : X →ₗ[ZMod (l ^ 1)] H2 ((charRep ((cycMod ℚ Ω l 1).comp (Dec (F := ℚ) A).subtype)).comp
+        (MonoidHom.id _)) :=
+    e.symm.toLinearMap ∘ₗ f
   have hψ : ψ ≠ 0 := by
     intro h
     have h1 : ψ ⟨φ0, hinv φ0⟩ = 0 := by rw [h]; rfl

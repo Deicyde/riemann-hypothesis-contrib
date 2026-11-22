@@ -17,13 +17,15 @@ def FactX2wedge : Prop :=
     actF (wedgeF K X) m = wedgeF (actF K m) (Matrix.vecMul X m)
 
 def FactX2contr : Prop :=
-  ∀ (R : Type) [CommRing R] (n : ℕ) (K : Form R n) (Y : Fin n → R) (m : (Matrix (Fin n) (Fin n) R)ˣ),
-    actF (contrF K Y) (↑m : Matrix _ _ R) =
-      contrF (actF K (↑m : Matrix _ _ R)) (Matrix.vecMul Y (↑m⁻¹ : Matrix _ _ R).transpose)
+  ∀ (R : Type) [CommRing R] (n : ℕ) (K : Form R n) (Y : Fin n → R)
+      (m : (Matrix (Fin n) (Fin n) R)ˣ),
+    actF (contrF K Y) (↑m : Matrix _ _ R)
+      = contrF (actF K (↑m : Matrix _ _ R)) (Matrix.vecMul Y (↑m⁻¹ : Matrix _ _ R).transpose)
 
 def MinorMap : Prop :=
   ∀ (R R' : Type) [CommRing R] [CommRing R'] (φ : R →+* R') (n : ℕ) (m : Matrix (Fin n) (Fin n) R)
-    (I J : Finset (Fin n)), φ (minorF m I J) = minorF (m.map φ) I J
+      (I J : Finset (Fin n)),
+    φ (minorF m I J) = minorF (m.map φ) I J
 
 def ContractWedge : Prop :=
   ∀ (R : Type) [CommRing R] (n : ℕ) (K : Form R n) (X Y : Fin n → R),

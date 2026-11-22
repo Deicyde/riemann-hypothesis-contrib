@@ -9,27 +9,33 @@ namespace ReciprocityTheory.AnForm.R
 
 open MvPolynomial IsLocalRing
 
-noncomputable def jacSpanAt {σ : Type} (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ) : Submodule ℂ (σ → ℂ) :=
+noncomputable def jacSpanAt {σ : Type} (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ)
+    : Submodule ℂ (σ → ℂ) :=
   Submodule.span ℂ ((fun h : MvPolynomial σ ℂ => fun j => eval z (pderiv j h)) '' (I : Set _))
 
-theorem locAt_isLocalRing_isNoetherian {σ : Type} [Finite σ] (I : Ideal (MvPolynomial σ ℂ))
-    (z : σ → ℂ) (hz : ∀ h ∈ I, eval z h = 0) :
-    IsLocalRing (locAt I z) ∧ IsNoetherianRing (locAt I z) := by
+theorem locAt_isLocalRing_isNoetherian
+    {σ : Type} [Finite σ] (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ) (hz : ∀ h ∈ I, eval z h = 0)
+    : IsLocalRing (locAt I z) ∧ IsNoetherianRing (locAt I z) := by
   haveI := Fintype.ofFinite σ
   have hle : I ≤ ptIdealOf z := fun h hh => by
     show h ∈ RingHom.ker (MvPolynomial.eval z : MvPolynomial σ ℂ →+* ℂ)
     exact hz h hh
-  have hne : Ideal.map (algebraMap (MvPolynomial σ ℂ) (Localization.AtPrime (ptIdealOf z))) I ≠ ⊤ := by
+  have hne
+      : Ideal.map (algebraMap (MvPolynomial σ ℂ) (Localization.AtPrime (ptIdealOf z))) I ≠ ⊤ := by
     intro htop
-    have h1 : Ideal.map (algebraMap (MvPolynomial σ ℂ) (Localization.AtPrime (ptIdealOf z)))
-        (ptIdealOf z) = ⊤ := top_unique (htop ▸ Ideal.map_mono hle)
+    have h1
+        : Ideal.map (algebraMap (MvPolynomial σ ℂ) (Localization.AtPrime (ptIdealOf z)))
+            (ptIdealOf z)
+          = ⊤ :=
+      top_unique (htop ▸ Ideal.map_mono hle)
     rw [Localization.AtPrime.map_eq_maximalIdeal] at h1
     exact (IsLocalRing.maximalIdeal.isMaximal _).ne_top h1
   haveI : Nontrivial (locAt I z) := Ideal.Quotient.nontrivial_iff.2 hne
-  exact ⟨IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective, inferInstance⟩
+  exact
+    ⟨IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective, inferInstance⟩
 
-theorem grad_renC {σ : Type} [Fintype σ] (z : σ → ℂ) (h : MvPolynomial σ ℂ) :
-    grad (renPt z) (renC σ h) = fun j => eval z (pderiv ((Fintype.equivFin σ).symm j) h) := by
+theorem grad_renC {σ : Type} [Fintype σ] (z : σ → ℂ) (h : MvPolynomial σ ℂ)
+    : grad (renPt z) (renC σ h) = fun j => eval z (pderiv ((Fintype.equivFin σ).symm j) h) := by
   funext j
   simp only [grad, renC, renameEquiv_apply]
   conv_lhs => rw [← Equiv.apply_symm_apply (Fintype.equivFin σ) j]
@@ -39,14 +45,18 @@ theorem grad_renC {σ : Type} [Fintype σ] (z : σ → ℂ) (h : MvPolynomial σ
     simp [renPt]
   rw [hc]
 
-theorem finrank_jacSpanAt_eq {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ) :
-    Module.finrank ℂ (jacSpanAt I z) =
-      Module.finrank ℂ (jacSpan (I.map (renR σ : MvPolynomial σ ℂ →+* _)) (renPt z)) := by
+theorem finrank_jacSpanAt_eq {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ)
+    : Module.finrank ℂ (jacSpanAt I z)
+      = Module.finrank ℂ (jacSpan (I.map (renR σ : MvPolynomial σ ℂ →+* _)) (renPt z)) := by
   let L : (σ → ℂ) ≃ₗ[ℂ] (Fin (Fintype.card σ) → ℂ) :=
     LinearEquiv.funCongrLeft ℂ ℂ (Fintype.equivFin σ).symm
-  have hset : grad (renPt z) '' ((I.map (renR σ : MvPolynomial σ ℂ →+* MvPolynomial (Fin (Fintype.card σ)) ℂ) :
-      Ideal (MvPolynomial (Fin (Fintype.card σ)) ℂ)) : Set (MvPolynomial (Fin (Fintype.card σ)) ℂ)) =
-      (L : (σ → ℂ) →ₗ[ℂ] _) '' ((fun h : MvPolynomial σ ℂ => fun j => eval z (pderiv j h)) '' (I : Set _)) := by
+  have hset
+      : grad (renPt z)
+          '' ((I.map (renR σ : MvPolynomial σ ℂ →+* MvPolynomial (Fin (Fintype.card σ)) ℂ)
+              : Ideal (MvPolynomial (Fin (Fintype.card σ)) ℂ))
+            : Set (MvPolynomial (Fin (Fintype.card σ)) ℂ))
+        = (L : (σ → ℂ) →ₗ[ℂ] _)
+          '' ((fun h : MvPolynomial σ ℂ => fun j => eval z (pderiv j h)) '' (I : Set _)) := by
     ext v
     constructor
     · rintro ⟨q, hq, rfl⟩
@@ -64,10 +74,11 @@ theorem finrank_jacSpanAt_eq {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial �
   rw [hset, Submodule.span_image]
   exact (LinearEquiv.finrank_map_eq L _).symm
 
-theorem finrank_cotangentSpace_locAt {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ))
-    (z : σ → ℂ) [IsLocalRing (locAt I z)] :
-    Module.finrank (ResidueField (locAt I z)) (CotangentSpace (locAt I z))
-      + Module.finrank ℂ (jacSpanAt I z) = Fintype.card σ := by
+theorem finrank_cotangentSpace_locAt
+    {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ) [IsLocalRing (locAt I z)]
+    : Module.finrank (ResidueField (locAt I z)) (CotangentSpace (locAt I z))
+        + Module.finrank ℂ (jacSpanAt I z)
+      = Fintype.card σ := by
   haveI : IsNoetherianRing (locAt I z) := inferInstance
   haveI : Nontrivial (locRing (I.map (renR σ : MvPolynomial σ ℂ →+* _)) (renPt z)) :=
     (locAtEquiv I z).symm.toEquiv.nontrivial

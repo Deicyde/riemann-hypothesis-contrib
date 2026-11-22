@@ -8,25 +8,27 @@ public import Formalism.FormalDegreeBessel.FinalG
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp Filter Topology
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp Filter Topology
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp.LenCont
 
-theorem eucl_eq {n : ℕ} (v : Fin n → ℂ) : eucl v = ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Fin n))‖ := by
+theorem eucl_eq {n : ℕ} (v : Fin n → ℂ)
+    : eucl v = ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Fin n))‖ := by
   rw [EuclideanSpace.norm_eq]
   simp [eucl, Complex.normSq_eq_norm_sq]
 
-theorem eucl_mulVec_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → ℂ) :
-    eucl (A *ᵥ v) ≤ opn A * eucl v := by
+theorem eucl_mulVec_le {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → ℂ)
+    : eucl (A *ᵥ v) ≤ opn A * eucl v := by
   rw [eucl_eq, eucl_eq, opn, ← Matrix.toEuclideanCLM_toLp]
   exact ContinuousLinearMap.le_opNorm _ _
 
 theorem opn_continuous {n : ℕ} : Continuous (opn (n := n)) := by
   unfold opn
   refine continuous_norm.comp ?_
-  exact LinearMap.continuous_of_finiteDimensional
-    ((Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin n)).toAlgEquiv.toLinearMap)
+  exact LinearMap.continuous_of_finiteDimensional ((Matrix.toEuclideanCLM (𝕜 := ℂ)
+    (n := Fin n)).toAlgEquiv.toLinearMap)
 
 theorem opn_one {n : ℕ} : opn (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) = 1 := by
   rw [opn, map_one, norm_one]
@@ -34,8 +36,10 @@ theorem opn_one {n : ℕ} : opn (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) = 1
 def len {n : ℕ} (Y : Submodule ℂ (Fin n → ℂ)) (f : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) : ℝ :=
   sInf {t | ∃ y ∈ Y, t = eucl (g⁻¹ *ᵥ (f - y))}
 
-theorem len_le {n : ℕ} (Y : Submodule ℂ (Fin n → ℂ)) (f : Fin n → ℂ) (g h : Matrix (Fin n) (Fin n) ℂ)
-    (hh : IsUnit h.det) : len Y f g ≤ opn (g⁻¹ * h) * len Y f h := by
+theorem len_le
+    {n : ℕ} (Y : Submodule ℂ (Fin n → ℂ)) (f : Fin n → ℂ) (g h : Matrix (Fin n) (Fin n) ℂ)
+    (hh : IsUnit h.det)
+    : len Y f g ≤ opn (g⁻¹ * h) * len Y f h := by
   have hb : BddBelow {t | ∃ y ∈ Y, t = eucl (g⁻¹ *ᵥ (f - y))} :=
     ⟨0, by rintro t ⟨y, -, rfl⟩; exact Real.sqrt_nonneg _⟩
   have hne : {t | ∃ y ∈ Y, t = eucl (h⁻¹ *ᵥ (f - y))}.Nonempty := ⟨_, 0, Y.zero_mem, rfl⟩
@@ -43,7 +47,8 @@ theorem len_le {n : ℕ} (Y : Submodule ℂ (Fin n → ℂ)) (f : Fin n → ℂ)
     rintro t ⟨y, hy, rfl⟩
     refine (csInf_le hb ⟨y, hy, rfl⟩).trans ?_
     have := eucl_mulVec_le (g⁻¹ * h) (h⁻¹ *ᵥ (f - y))
-    rwa [Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hh, Matrix.mul_one] at this
+    rwa [Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hh, Matrix.mul_one] at
+      this
   have h0 : 0 ≤ opn (g⁻¹ * h) := norm_nonneg _
   rcases h0.eq_or_lt with h0 | h0
   · obtain ⟨t, ht⟩ := hne
@@ -55,8 +60,8 @@ theorem len_le {n : ℕ} (Y : Submodule ℂ (Fin n → ℂ)) (f : Fin n → ℂ)
     rw [div_le_iff₀ h0, mul_comm]
     exact key t ht
 
-theorem len_continuousOn {n : ℕ} (Y : Submodule ℂ (Fin (n + 1) → ℂ)) (f : Fin (n + 1) → ℂ) :
-    ContinuousOn (len Y f) {g | IsUnit g.det} := by
+theorem len_continuousOn {n : ℕ} (Y : Submodule ℂ (Fin (n + 1) → ℂ)) (f : Fin (n + 1) → ℂ)
+    : ContinuousOn (len Y f) {g | IsUnit g.det} := by
   intro x₀ hx₀
   have hx₀' : IsUnit x₀.det := hx₀
   have hinv : ContinuousAt (Inv.inv : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ → _) x₀ := by
@@ -85,17 +90,20 @@ theorem len_continuousOn {n : ℕ} (Y : Submodule ℂ (Fin (n + 1) → ℂ)) (f 
   rw [div_le_iff₀ hpos, mul_comm]
   exact len_le Y f x₀ x hx
 
-theorem fold_continuousOn {X ι : Type*} [TopologicalSpace X] [DecidableEq ι] (S : Set X) (F : ι → X → ℝ)
-    (hF : ∀ a, ContinuousOn (F a) S) (s : Finset ι) :
-    ContinuousOn (fun x => s.fold max 1 fun a => F a x) S := by
+theorem fold_continuousOn
+    {X ι : Type*} [TopologicalSpace X] [DecidableEq ι]
+    (S : Set X) (F : ι → X → ℝ) (hF : ∀ a, ContinuousOn (F a) S)
+    (s : Finset ι)
+    : ContinuousOn (fun x => s.fold max 1 fun a => F a x) S := by
   induction s using Finset.induction_on with
   | empty => simpa using continuousOn_const
   | insert a s ha ih =>
     simp only [Finset.fold_insert ha]
     exact continuous_max.comp_continuousOn ((hF a).prodMk ih)
 
-theorem lA_Sg_continuousOn : ∀ (k r : ℕ) (z : (Fin (2 * r + k + 1) → ℂ)),
-    (∀ a, ContinuousOn (fun x => lA k r z x a) (GG k r)) ∧ ContinuousOn (Sg k r z) (GG k r) := by
+theorem lA_Sg_continuousOn
+    : ∀ (k r : ℕ) (z : (Fin (2 * r + k + 1) → ℂ)),
+      (∀ a, ContinuousOn (fun x => lA k r z x a) (GG k r)) ∧ ContinuousOn (Sg k r z) (GG k r) := by
   intro k r z
   have hH : IsUnit (Hpk k r).det := Matrix.isUnit_det_of_left_inverse (hpkFacts k r).2.1
   have h : ∀ a, ContinuousOn (fun x => lA k r z x a) (GG k r) := fun a =>

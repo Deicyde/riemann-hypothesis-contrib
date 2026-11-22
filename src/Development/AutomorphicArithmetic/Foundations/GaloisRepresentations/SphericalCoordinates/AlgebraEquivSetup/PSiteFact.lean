@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocEqOneOfMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
 open UpperTheory.Gal.CertificateRingHomMap (GUf Plc comp lev GLw IsCen mat sim)
 open UpperTheory.Gal.W2.Seed UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Pl UpperTheory.Gal.Spc
 open scoped TensorProduct Classical
@@ -133,8 +134,9 @@ private lemma pr_mem {E : Type} [Field E] [NumberField E] [IsCMField E] {A : Ari
   rw [e]
   exact mul_mem (mul_mem (inv_mem ha) h2) ha
 
-theorem UpperTheory.Gal.W2.Seed.pSiteFact :
-    Dict → Sides → UpperTheory.Gal.W2.Seed.IntConj → UpperTheory.Gal.CertificateRingHomMap.LocComm → SiteFact := by
+theorem UpperTheory.Gal.W2.Seed.pSiteFact
+    : Dict → Sides → UpperTheory.Gal.W2.Seed.IntConj → UpperTheory.Gal.CertificateRingHomMap.LocComm
+      → SiteFact := by
   intro hD hS hI hC E _ _ _ A n p _ S F x hx N w σ L hL
   refine ⟨fun y hy => ?_, fun k hk => ?_⟩
   · rw [hL.2 y]

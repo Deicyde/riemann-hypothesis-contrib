@@ -16,9 +16,11 @@ noncomputable section
 
 namespace GlobalTheory.MaxLatStruct
 
-theorem finite_field_invol {k : Type*} [Field k] [Finite k] (τ : k →+* k) (hτ : ∀ a, τ (τ a) = a)
-    (θ : k) (hθ : θ - τ θ ≠ 0) :
-    (∃ q : ℕ, 2 ≤ q ∧ Nat.card k = q ^ 2) ∧ ∀ u, τ u = u → ∃ w, τ w * w = u := by
+theorem finite_field_invol
+    {k : Type*} [Field k] [Finite k]
+    (τ : k →+* k) (hτ : ∀ a, τ (τ a) = a)
+    (θ : k) (hθ : θ - τ θ ≠ 0)
+    : (∃ q : ℕ, 2 ≤ q ∧ Nat.card k = q ^ 2) ∧ ∀ u, τ u = u → ∃ w, τ w * w = u := by
   let F : Subfield k := RingHom.eqLocusField τ (RingHom.id k)
   have hF : ∀ a, a ∈ F ↔ τ a = a := fun a => Iff.rfl
   constructor
@@ -53,8 +55,8 @@ theorem finite_field_invol {k : Type*} [Field k] [Finite k] (τ : k →+* k) (h�
   · intro u hu
     have hT : τ (θ + τ θ) = θ + τ θ := by rw [map_add (f := _), hτ, add_comm]
     have hN : τ (τ θ * θ) = τ θ * θ := by rw [map_mul, hτ, mul_comm]
-    obtain ⟨a, b, hab⟩ := unimodUnramUnique_ff (k := F) ⟨_, (hF _).2 hT⟩ ⟨_, (hF _).2 hN⟩ ⟨u, (hF _).2 hu⟩
-      (by
+    obtain ⟨a, b, hab⟩ :=
+      unimodUnramUnique_ff (k := F) ⟨_, (hF _).2 hT⟩ ⟨_, (hF _).2 hN⟩ ⟨u, (hF _).2 hu⟩ (by
         intro e
         have e1 := congrArg F.subtype e
         rw [map_sub, map_pow, map_mul, map_ofNat, map_zero] at e1
@@ -71,12 +73,16 @@ theorem finite_field_invol {k : Type*} [Field k] [Finite k] (τ : k →+* k) (h�
 
 section Lat
 
-variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
+variable
+  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
   [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem int_of_unif {P : Ideal R} (hP : P.IsMaximal) {π b : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2) {α : K}
-    (hα : ∀ p ∈ P, algebraMap R K p * α ∈ (1 : Submodule R K)) (hb : b ∈ P)
-    (e : algebraMap R K π * α = algebraMap R K b) : α ∈ (1 : Submodule R K) := by
+theorem int_of_unif
+    {P : Ideal R} (hP : P.IsMaximal)
+    {π b : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2)
+    {α : K} (hα : ∀ p ∈ P, algebraMap R K p * α ∈ (1 : Submodule R K))
+    (hb : b ∈ P) (e : algebraMap R K π * α = algebraMap R K b)
+    : α ∈ (1 : Submodule R K) := by
   have hπ0 : π ≠ 0 := fun h => h2 (h ▸ Submodule.zero_mem _)
   obtain ⟨I, hI⟩ : P ∣ Ideal.span {π} := by
     rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]; exact h1
@@ -101,32 +107,42 @@ theorem int_of_unif {P : Ideal R} (hP : P.IsMaximal) {π b : R} (h1 : π ∈ P) 
 variable {h : V →ₗ⋆[K] V →ₗ[K] K} {M : Submodule R V} {σ : R →+* R}
 
 omit [IsDedekindDomain R] [IsFractionRing R K] in
-theorem star_one_mem (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) {a : K}
-    (ha : a ∈ (1 : Submodule R K)) : star a ∈ (1 : Submodule R K) := by
+theorem star_one_mem
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r))
+    {a : K} (ha : a ∈ (1 : Submodule R K))
+    : star a ∈ (1 : Submodule R K) := by
   obtain ⟨r, rfl⟩ := Submodule.mem_one.1 ha
-  rw [← hσ]; exact locDual_alg_mem _
+  rw [← hσ]
+  exact locDual_alg_mem _
 
 omit [IsDedekindDomain R] [IsFractionRing R K] in
-theorem dual_left (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) {y m : V}
-    (hy : y ∈ dual h M) (hm : m ∈ M) : h y m ∈ (1 : Submodule R K) := by
+theorem dual_left
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
+    {y m : V} (hy : y ∈ dual h M) (hm : m ∈ M)
+    : h y m ∈ (1 : Submodule R K) := by
   rw [← hs.eq m y]
   exact star_one_mem hσ ((dualBasic_mem_dual h M y).1 hy m hm)
 
-
 omit [IsDedekindDomain R] in
-theorem mem_of_int (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) {y : V} (hy : y ∈ dual h M) (hyy : h y y ∈ (1 : Submodule R K)) : y ∈ M := by
+theorem mem_of_int
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    {y : V} (hy : y ∈ dual h M) (hyy : h y y ∈ (1 : Submodule R K))
+    : y ∈ M := by
   have hN : IsIntLat h (M ⊔ Submodule.span R {y}) := by
     letI : Submodule.IsFullLattice K M := hM.1.1
-    refine ⟨Submodule.IsFullLattice.of_le_of_fg K le_sup_left
-      (hM.1.1.fg.sup (Submodule.fg_span_singleton y)), ?_⟩
+    refine ⟨
+      Submodule.IsFullLattice.of_le_of_fg K le_sup_left
+        (hM.1.1.fg.sup (Submodule.fg_span_singleton y)),
+      ?_
+    ⟩
     intro u hu v hv
     obtain ⟨m, hm, u', hu', rfl⟩ := Submodule.mem_sup.1 hu
     obtain ⟨n, hn, v', hv', rfl⟩ := Submodule.mem_sup.1 hv
     obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hu'
     obtain ⟨b, rfl⟩ := Submodule.mem_span_singleton.1 hv'
     rw [map_add h, LinearMap.add_apply, map_add (f := _), map_add (f := _)]
-    refine Submodule.add_mem _ (Submodule.add_mem _ (hM.1.2 m hm n hn) ?_) (Submodule.add_mem _ ?_ ?_)
+    refine Submodule.add_mem _ (Submodule.add_mem _ (hM.1.2 m hm n hn) ?_)
+      (Submodule.add_mem _ ?_ ?_)
     · exact (dualBasic_mem_dual h M _).1 (Submodule.smul_mem _ b hy) m hm
     · exact dual_left hσ hs (Submodule.smul_mem _ a hy) hn
     · rw [locDual_h_smul_left, locDual_h_smul_right, ← hσ]
@@ -134,18 +150,21 @@ theorem mem_of_int (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)
   rw [← hM.2 _ hN le_sup_left]
   exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self y)
 
-theorem max_span_eq_top [FiniteDimensional K V]
-    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) : Submodule.span K (M : Set V) = ⊤ := by
+theorem max_span_eq_top
+    [FiniteDimensional K V]
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    : Submodule.span K (M : Set V) = ⊤ := by
   rw [eq_top_iff]
   intro x _
   obtain ⟨S, hS⟩ := hM.1.1.fg
-  obtain ⟨⟨d, hd⟩, hint⟩ := IsLocalization.exist_integer_multiples_of_finset
-    (nonZeroDivisors R) (insert (h x x) (S.image fun m => h m x))
+  obtain ⟨⟨d, hd⟩, hint⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
+      (insert (h x x) (S.image fun m => h m x))
   have hd0 : algebraMap R K d ≠ 0 :=
     (map_ne_zero_iff _ (IsFractionRing.injective R K)).2 (nonZeroDivisors.ne_zero hd)
-  have hden : ∀ z ∈ insert (h x x) (S.image fun m => h m x),
-      algebraMap R K d * z ∈ (1 : Submodule R K) := by
+  have hden
+      : ∀ z ∈ insert (h x x) (S.image fun m => h m x),
+        algebraMap R K d * z ∈ (1 : Submodule R K) := by
     intro z hz
     obtain ⟨r, hr⟩ := hint z hz
     have hr' : algebraMap R K r = algebraMap R K d * z := by simpa [Algebra.smul_def] using hr
@@ -157,7 +176,9 @@ theorem max_span_eq_top [FiniteDimensional K V]
     induction hm using Submodule.span_induction with
     | mem m hm => exact hden _ (Finset.mem_insert_of_mem (Finset.mem_image.mpr ⟨m, hm, rfl⟩))
     | zero => simp
-    | add a b ha hb iha ihb => simpa [map_add, LinearMap.add_apply, mul_add] using Submodule.add_mem (1 : Submodule R K) iha ihb
+    | add a b ha hb iha ihb =>
+      simpa [map_add, LinearMap.add_apply, mul_add] using
+        Submodule.add_mem (1 : Submodule R K) iha ihb
     | smul r m hm ih =>
       rw [locDual_h_smul_left, ← hσ]
       have := locDual_one_mul (locDual_alg_mem (σ r)) ih
@@ -178,9 +199,11 @@ theorem max_span_eq_top [FiniteDimensional K V]
   rw [smul_smul, inv_mul_cancel₀ hd0, one_smul] at this
   exact this
 
-theorem inert_of_tors (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) {P : Ideal R} (hP : P.IsMaximal) {y : V} (hy : y ∈ dual h M)
-    (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M) : ∀ r, σ r ∈ P ↔ r ∈ P := by
+theorem inert_of_tors
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    {P : Ideal R} (hP : P.IsMaximal)
+    {y : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M)
+    : ∀ r, σ r ∈ P ↔ r ∈ P := by
   have hσσ : ∀ r, σ (σ r) = r := fun r => IsFractionRing.injective R K (by rw [hσ, hσ, star_star])
   have key : ∀ r ∈ P, σ r ∈ P := by
     intro r hr
@@ -189,33 +212,40 @@ theorem inert_of_tors (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K
     apply hyM
     apply mem_of_int hσ hs hM hy
     have : h y y = algebraMap R K c * h (r • y) y + h y (p • y) := by
-      rw [locDual_h_smul_left, locDual_h_smul_right, ← hσ, ← mul_assoc, ← add_mul, ← map_mul, ← map_add (f := _),
-        hcp, map_one, one_mul]
+      rw [locDual_h_smul_left, locDual_h_smul_right, ← hσ, ← mul_assoc, ← add_mul, ← map_mul,
+        ← map_add (f := _), hcp, map_one, one_mul]
     rw [this]
-    exact Submodule.add_mem _ (locDual_one_mul (locDual_alg_mem _)
-      ((dualBasic_mem_dual h M y).1 hy _ (hPy r hr))) (dual_left hσ hs hy (hPy p hp))
+    exact Submodule.add_mem _
+      (locDual_one_mul (locDual_alg_mem _) ((dualBasic_mem_dual h M y).1 hy _ (hPy r hr)))
+      (dual_left hσ hs hy (hPy p hp))
   exact fun r => ⟨fun hr => hσσ r ▸ key _ hr, key r⟩
 
-
 omit [IsDedekindDomain R] in
-theorem tors_sq (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) {P : Ideal R} (hin : ∀ r, σ r ∈ P ↔ r ∈ P) {y : V} (hy : y ∈ dual h M)
-    (hPy : ∀ p ∈ P * P, p • y ∈ M) : ∀ p ∈ P, p • y ∈ M := by
+theorem tors_sq
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    {P : Ideal R} (hin : ∀ r, σ r ∈ P ↔ r ∈ P)
+    {y : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P * P, p • y ∈ M)
+    : ∀ p ∈ P, p • y ∈ M := by
   intro p hp
   apply mem_of_int hσ hs hM (Submodule.smul_mem _ p hy)
   rw [locDual_h_smul_left, ← hσ, ← locDual_h_smul_right, smul_smul]
   exact dual_left hσ hs hy (hPy _ (Ideal.mul_mem_mul ((hin p).2 hp) hp))
 
-theorem tors_line (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) {P : Ideal R} (hP : P.IsMaximal) {π : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2)
+theorem tors_line
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    {P : Ideal R} (hP : P.IsMaximal)
+    {π : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2)
     (hnorm : ∀ a b : R, a ∉ P → σ a * b = σ b * a → ∃ w, σ w * w * a + b ∈ P)
-    {y z : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M)
-    (hz : z ∈ dual h M) (hPz : ∀ p ∈ P, p • z ∈ M) : ∃ c : R, z - c • y ∈ M := by
+    {y z : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M) (hz : z ∈ dual h M)
+    (hPz : ∀ p ∈ P, p • z ∈ M)
+    : ∃ c : R, z - c • y ∈ M := by
   have hinj := IsFractionRing.injective R K
   have hπ0 : π ≠ 0 := fun h => h2 (h ▸ Submodule.zero_mem _)
   have hπK : algebraMap R K π ≠ 0 := (map_ne_zero_iff _ hinj).2 hπ0
-  have hP1 : ∀ u ∈ dual h M, ∀ v : V, (∀ p ∈ P, p • v ∈ M) → ∀ p ∈ P,
-      algebraMap R K p * h u v ∈ (1 : Submodule R K) := fun u hu v hv p hp => by
+  have hP1
+      : ∀ u ∈ dual h M, ∀ v : V,
+        (∀ p ∈ P, p • v ∈ M)
+          → ∀ p ∈ P, algebraMap R K p * h u v ∈ (1 : Submodule R K) := fun u hu v hv p hp => by
     rw [← locDual_h_smul_right]; exact dual_left hσ hs hu (hv p hp)
   obtain ⟨a, ha⟩ := Submodule.mem_one.1 (hP1 y hy y hPy π h1)
   have haP : a ∉ P := fun haP =>
@@ -229,26 +259,30 @@ theorem tors_line (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r))
     exact M.sub_mem (hPz p hp) (M.smul_mem _ (hPy p hp))
   have hyz' : h y z' ∈ (1 : Submodule R K) := by
     refine int_of_unif hP h1 h2 (hP1 y hy z' hPz') (P.mul_mem_left b hp) ?_
-    rw [hz'def, map_sub, locDual_h_smul_right, mul_sub, mul_left_comm, ← ha, ← hb, ← map_mul, ← map_sub]
+    rw [hz'def, map_sub, locDual_h_smul_right, mul_sub, mul_left_comm, ← ha, ← hb, ← map_mul,
+      ← map_sub]
     congr 1
     linear_combination (-b) * hip
   obtain ⟨d, hd⟩ := Submodule.mem_one.1 (hP1 z' hz' z' hPz' π h1)
   have hyy : star (h y y) = h y y := hs.eq y y
   have hzz : star (h z' z') = h z' z' := hs.eq z' z'
-  obtain ⟨w, hw⟩ := hnorm a d haP (hinj (by
-    rw [map_mul, map_mul, hσ, hσ, ha, hd, star_mul, star_mul, hyy, hzz]; ring))
+  obtain ⟨w, hw⟩ :=
+    hnorm a d haP
+      (hinj (by rw [map_mul, map_mul, hσ, hσ, ha, hd, star_mul, star_mul, hyy, hzz]; ring))
   have hv : w • y + z' ∈ M := by
     apply mem_of_int hσ hs hM (Submodule.add_mem _ (Submodule.smul_mem _ _ hy) hz')
-    have e : h (w • y + z') (w • y + z') =
-        (algebraMap R K (σ w * w) * h y y + h z' z') +
-          (algebraMap R K (σ w) * h y z' + algebraMap R K w * star (h y z')) := by
+    have e
+        : h (w • y + z') (w • y + z')
+          = (algebraMap R K (σ w * w) * h y y + h z' z')
+            + (algebraMap R K (σ w) * h y z' + algebraMap R K w * star (h y z')) := by
       have : star (h y z') = h z' y := hs.eq y z'
-      rw [map_add h, LinearMap.add_apply, map_add (f := _), map_add (f := _), locDual_h_smul_left, locDual_h_smul_left,
-        locDual_h_smul_right, locDual_h_smul_right, map_mul, hσ, this]
+      rw [map_add h, LinearMap.add_apply, map_add (f := _), map_add (f := _), locDual_h_smul_left,
+        locDual_h_smul_left, locDual_h_smul_right, locDual_h_smul_right, map_mul, hσ, this]
       ring
     rw [e]
-    refine Submodule.add_mem _ ?_ (Submodule.add_mem _ (locDual_one_mul (locDual_alg_mem _) hyz')
-      (locDual_one_mul (locDual_alg_mem _) (star_one_mem hσ hyz')))
+    refine Submodule.add_mem _ ?_
+      (Submodule.add_mem _ (locDual_one_mul (locDual_alg_mem _) hyz')
+        (locDual_one_mul (locDual_alg_mem _) (star_one_mem hσ hyz')))
     refine int_of_unif hP h1 h2 (fun p hp => ?_) hw ?_
     · rw [mul_add, mul_left_comm]
       exact Submodule.add_mem _ (locDual_one_mul (locDual_alg_mem _) (hP1 y hy y hPy p hp))
@@ -266,8 +300,9 @@ theorem tors_line (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r))
   rwa [add_sub_cancel_left] at this
 
 omit [IsDedekindDomain R] in
-theorem mem_of_local (L : Submodule R V) (x : V)
-    (hx : ∀ Q : Ideal R, Q.IsMaximal → ∃ s ∉ Q, s • x ∈ L) : x ∈ L := by
+theorem mem_of_local
+    (L : Submodule R V) (x : V) (hx : ∀ Q : Ideal R, Q.IsMaximal → ∃ s ∉ Q, s • x ∈ L)
+    : x ∈ L := by
   by_contra hxL
   have hI : L.colon {x} ≠ ⊤ := by
     intro e
@@ -278,8 +313,9 @@ theorem mem_of_local (L : Submodule R V) (x : V)
   exact hs (hIp (Submodule.mem_colon.2 (by rintro _ rfl; exact hsx)))
 
 omit [StarRing K] in
-theorem colon_ne_bot [FiniteDimensional K V] {N : Submodule R V} (hN : N.FG)
-    (hsp : Submodule.span K (M : Set V) = ⊤) : M.colon (N : Set V) ≠ ⊥ := by
+theorem colon_ne_bot
+    [FiniteDimensional K V] {N : Submodule R V} (hN : N.FG) (hsp : Submodule.span K (M : Set V) = ⊤)
+    : M.colon (N : Set V) ≠ ⊥ := by
   obtain ⟨s, _, b, hbv, hsL⟩ := dualLattice_basis (R := R) M hsp
   obtain ⟨d, hd0, hd⟩ := dualLattice_denom (R := R) b N hN
   have hle : Submodule.span R (Set.range b) ≤ M := by
@@ -289,11 +325,12 @@ theorem colon_ne_bot [FiniteDimensional K V] {N : Submodule R V} (hN : N.FG)
   rw [e] at this
   exact hd0 this
 
-theorem exists_tors (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) (hJ : M.colon (dual h M : Set V) ≠ ⊥) {P : Ideal R} (hP : P.IsMaximal)
-    (hJP : M.colon (dual h M : Set V) ≤ P) :
-    (∃ y ∈ dual h M, (∀ p ∈ P, p • y ∈ M) ∧ y ∉ M) ∧ (∀ r, σ r ∈ P ↔ r ∈ P) ∧
-      ∃ s ∉ P, ∀ z ∈ dual h M, ∀ p ∈ P, p • s • z ∈ M := by
+theorem exists_tors
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    (hJ : M.colon (dual h M : Set V) ≠ ⊥)
+    {P : Ideal R} (hP : P.IsMaximal) (hJP : M.colon (dual h M : Set V) ≤ P)
+    : (∃ y ∈ dual h M, (∀ p ∈ P, p • y ∈ M) ∧ y ∉ M) ∧ (∀ r, σ r ∈ P ↔ r ∈ P)
+      ∧ ∃ s ∉ P, ∀ z ∈ dual h M, ∀ p ∈ P, p • s • z ∈ M := by
   obtain ⟨I, hI⟩ := Ideal.dvd_iff_le.2 hJP
   have hI0 : I ≠ 0 := by
     rintro rfl
@@ -310,8 +347,8 @@ theorem exists_tors (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r
   have hy : ∃ y ∈ dual h M, (∀ p ∈ P, p • y ∈ M) ∧ y ∉ M := by
     by_contra hcon
     push Not at hcon
-    exact hnle fun r hr => Submodule.mem_colon.2 fun z hz =>
-      hcon _ (Submodule.smul_mem _ r hz) (hkill r hr z hz)
+    exact hnle fun r hr =>
+      Submodule.mem_colon.2 fun z hz => hcon _ (Submodule.smul_mem _ r hz) (hkill r hr z hz)
   obtain ⟨y, hy1, hy2, hy3⟩ := hy
   have hin := inert_of_tors hσ hs hM hP hy1 hy2 hy3
   refine ⟨⟨y, hy1, hy2, hy3⟩, hin, ?_⟩
@@ -332,17 +369,18 @@ theorem exists_tors (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r
   exact ⟨s, hs2, hkill s hs1⟩
 
 omit [IsDedekindDomain R] in
-theorem conj_mem (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (P : Ideal R) (r : R) :
-    r ∈ conjIdeal (K := K) P ↔ σ r ∈ P := by
+theorem conj_mem (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (P : Ideal R) (r : R)
+    : r ∈ conjIdeal (K := K) P ↔ σ r ∈ P := by
   have hinj := IsFractionRing.injective R K
   have hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K) := fun r => ⟨σ r, hσ r⟩
   rw [locBasic_conj_eq hinj hstar, Ideal.mem_comap]
   have : locBasic_sigma hinj hstar r = σ r := hinj (by rw [locBasic_sigma_spec, hσ])
   rw [this]
 
-theorem bad_iff (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) (hJ : M.colon (dual h M : Set V) ≠ ⊥) (P : Ideal R) :
-    P ∈ badP h M ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P := by
+theorem bad_iff
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    (hJ : M.colon (dual h M : Set V) ≠ ⊥) (P : Ideal R)
+    : P ∈ badP h M ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P := by
   have hinj := IsFractionRing.injective R K
   have hstar : ∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K) := fun r => ⟨σ r, hσ r⟩
   have hσσ : ∀ r, σ (σ r) = r := fun r => hinj (by rw [hσ, hσ, star_star])
@@ -393,13 +431,15 @@ theorem bad_iff (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (
     rw [← one_smul R y, ← hcp, add_smul, mul_smul]
     exact M.add_mem (M.smul_mem c hs2) (hy2 p hp)
 
-theorem colon_eq_prod (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) (hJ : M.colon (dual h M : Set V) ≠ ⊥) (T : Finset (Ideal R))
-    (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P) :
-    M.colon (dual h M : Set V) = ∏ P ∈ T, P := by
+theorem colon_eq_prod
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    (hJ : M.colon (dual h M : Set V) ≠ ⊥)
+    (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P)
+    : M.colon (dual h M : Set V) = ∏ P ∈ T, P := by
   apply le_antisymm
   · rw [← Ideal.dvd_iff_le]
-    refine Finset.prod_primes_dvd _ (fun P hP => ?_) (fun P hP => Ideal.dvd_iff_le.2 ((hT P).1 hP).2)
+    refine
+      Finset.prod_primes_dvd _ (fun P hP => ?_) (fun P hP => Ideal.dvd_iff_le.2 ((hT P).1 hP).2)
     refine Ideal.prime_of_isPrime ?_ ((hT P).1 hP).1.isPrime
     rintro rfl
     exact hJ (le_bot_iff.1 ((hT _).1 hP).2)
@@ -413,10 +453,12 @@ theorem colon_eq_prod (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K
     · obtain ⟨s, hs1, hs2⟩ := Set.not_subset.1 hle
       exact ⟨s, hs2, Submodule.mem_colon.1 hs1 _ (Submodule.smul_mem _ r hz)⟩
 
-theorem cyclic (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P)
-    (hloc : ∀ P ∈ T, ∃ y ∈ dual h M, (∀ p ∈ P, p • y ∈ M) ∧
-      ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : R, s • z - c • y ∈ M) :
-    Nonempty ((↥(dual h M) ⧸ M.comap (dual h M).subtype) ≃ₗ[R] (R ⧸ M.colon (dual h M : Set V))) := by
+theorem cyclic
+    (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P)
+    (hloc : ∀ P ∈ T, ∃ y ∈ dual h M,
+      (∀ p ∈ P, p • y ∈ M) ∧ ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : R, s • z - c • y ∈ M)
+    : Nonempty
+      ((↥(dual h M) ⧸ M.comap (dual h M).subtype) ≃ₗ[R] (R ⧸ M.colon (dual h M : Set V))) := by
   choose! y hy1 hy2 hy3 using hloc
   set g := ∑ P ∈ T, y P with hg
   have hgd : g ∈ dual h M := Submodule.sum_mem _ hy1
@@ -434,9 +476,11 @@ theorem cyclic (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M
       refine ⟨t * s, fun hm => (hQ.isPrime.mem_or_mem hm).elim ht2 hs1, ?_⟩
       have h1 : t • ∑ P ∈ T.erase Q, y P ∈ M := by
         rw [Finset.smul_sum]
-        exact Submodule.sum_mem _ fun P hP => hy2 P (Finset.mem_of_mem_erase hP) t
-          (Ideal.dvd_iff_le.1 (Finset.dvd_prod_of_mem _ hP) ht1)
-      have e : (t * s) • z = (t • (s • z - c • y Q) - c • t • ∑ P ∈ T.erase Q, y P) + (c * t) • g := by
+        exact Submodule.sum_mem _ fun P hP =>
+          hy2 P (Finset.mem_of_mem_erase hP) t
+            (Ideal.dvd_iff_le.1 (Finset.dvd_prod_of_mem _ hP) ht1)
+      have e
+          : (t * s) • z = (t • (s • z - c • y Q) - c • t • ∑ P ∈ T.erase Q, y P) + (c * t) • g := by
         rw [hg, ← Finset.add_sum_erase T y hQT]
         module
       rw [e]
@@ -460,7 +504,8 @@ theorem cyclic (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M
     exact M.neg_mem hm
   have hker : LinearMap.ker f = M.colon (dual h M : Set V) := by
     ext r
-    rw [LinearMap.mem_ker, hf, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.mem_colon]
+    rw [LinearMap.mem_ker, hf, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap,
+      Submodule.mem_colon]
     change r • g ∈ M ↔ _
     refine ⟨fun hr z hz => ?_, fun hr => hr g hgd⟩
     obtain ⟨m, hm, u, hu, rfl⟩ := Submodule.mem_sup.1 (hgen z hz)
@@ -469,12 +514,16 @@ theorem cyclic (T : Finset (Ideal R)) (hT : ∀ P, P ∈ T ↔ P.IsMaximal ∧ M
     exact M.add_mem (M.smul_mem _ hm) (M.smul_mem _ hr)
   exact ⟨((Submodule.quotEquivOfEq _ _ hker.symm).trans (f.quotKerEquivOfSurjective hsurj)).symm⟩
 
-theorem local_vec (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm)
-    (hM : IsMaxLat h M) {P : Ideal R} (hP : P.IsMaximal) (hin : ∀ r, σ r ∈ P ↔ r ∈ P)
-    {π : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2) {y : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M)
-    (hgen : ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : R, s • z - c • y ∈ M) :
-    ∃ x ∈ M, (∃ a : R, algebraMap R K a = h x x ∧ a ∈ P ∧ a ∉ P ^ 2) ∧
-      ∀ z ∈ loc (K := K) P (dual h M), ∃ c ∈ locR (K := K) P, z - (c * (h x x)⁻¹) • x ∈ loc (K := K) P M := by
+theorem local_vec
+    (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r)) (hs : h.IsSymm) (hM : IsMaxLat h M)
+    {P : Ideal R} (hP : P.IsMaximal) (hin : ∀ r, σ r ∈ P ↔ r ∈ P)
+    {π : R} (h1 : π ∈ P) (h2 : π ∉ P ^ 2)
+    {y : V} (hy : y ∈ dual h M) (hPy : ∀ p ∈ P, p • y ∈ M) (hyM : y ∉ M)
+    (hgen : ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : R, s • z - c • y ∈ M)
+    : ∃ x ∈ M,
+      (∃ a : R, algebraMap R K a = h x x ∧ a ∈ P ∧ a ∉ P ^ 2)
+        ∧ ∀ z ∈ loc (K := K) P (dual h M), ∃ c ∈ locR (K := K) P,
+          z - (c * (h x x)⁻¹) • x ∈ loc (K := K) P M := by
   have hinj := IsFractionRing.injective R K
   have hσσ : ∀ r, σ (σ r) = r := fun r => hinj (by rw [hσ, hσ, star_star])
   have hπ0 : π ≠ 0 := fun h => h2 (h ▸ Submodule.zero_mem _)
@@ -504,14 +553,19 @@ theorem local_vec (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r))
     have hst : s * t ∈ hcompl (K := K) P :=
       mul_mem (locBasic_mem_hcompl P s hs1 (by rw [conj_mem hσ, hin]; exact hs1)) ht
     have := hP.isPrime
-    have hst0 : algebraMap R K (s * t) ≠ 0 := (map_ne_zero_iff _ hinj).2 fun e =>
-      locBasic_hcompl_not_mem (K := K) P _ hst (e ▸ P.zero_mem)
+    have hst0 : algebraMap R K (s * t) ≠ 0 :=
+      (map_ne_zero_iff _ hinj).2 fun e => locBasic_hcompl_not_mem (K := K) P _ hst (e ▸ P.zero_mem)
     have ha0 : algebraMap R K a ≠ 0 := (map_ne_zero_iff _ hinj).2 fun e => haP (e ▸ P.zero_mem)
-    refine ⟨algebraMap R K (c * a) / algebraMap R K (s * t), (locDual_mem_locR P _).2 ⟨s * t, hst, ?_⟩,
-      locBasic_mem_locS.2 ⟨s * t, hst, ?_⟩⟩
+    refine ⟨
+      algebraMap R K (c * a) / algebraMap R K (s * t),
+      (locDual_mem_locR P _).2 ⟨s * t, hst, ?_⟩,
+      locBasic_mem_locS.2 ⟨s * t, hst, ?_⟩
+    ⟩
     · rw [mul_div_cancel₀ _ hst0]; exact locDual_alg_mem _
-    · have e : (s * t) • ((algebraMap R K (c * a) / algebraMap R K (s * t) * (h (π • y) (π • y))⁻¹) • π • y)
-          = c • y := by
+    · have e
+          : (s * t)
+              • ((algebraMap R K (c * a) / algebraMap R K (s * t) * (h (π • y) (π • y))⁻¹) • π • y)
+            = c • y := by
         rw [hxx, ← algebraMap_smul K π y, ← algebraMap_smul K c y, smul_smul,
           ← algebraMap_smul K (s * t), smul_smul, map_mul _ c a]
         congr 1
@@ -521,15 +575,17 @@ theorem local_vec (hσ : ∀ r, algebraMap R K (σ r) = star (algebraMap R K r))
 
 end Lat
 
-theorem star_int {K : Type} [Field K] [NumberField K] [StarRing K] :
-    ∃ σ : 𝓞 K →+* 𝓞 K, ∀ r, algebraMap (𝓞 K) K (σ r) = star (algebraMap (𝓞 K) K r) :=
+theorem star_int {K : Type} [Field K] [NumberField K] [StarRing K]
+    : ∃ σ : 𝓞 K →+* 𝓞 K, ∀ r, algebraMap (𝓞 K) K (σ r) = star (algebraMap (𝓞 K) K r) :=
   ⟨RingOfIntegers.mapRingHom (starRingEnd K), fun _ => rfl⟩
 
-theorem inert_facts {K : Type} [Field K] [NumberField K] [StarRing K] (hK : IsCMUnram K) {σ : 𝓞 K →+* 𝓞 K}
-    (hσ : ∀ r, algebraMap (𝓞 K) K (σ r) = star (algebraMap (𝓞 K) K r)) {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
-    (hin : ∀ r, σ r ∈ P ↔ r ∈ P) :
-    (2 ≤ qIn P ∧ Ideal.absNorm P = qIn P ^ 2) ∧
-      ∀ a b : 𝓞 K, a ∉ P → σ a * b = σ b * a → ∃ w, σ w * w * a + b ∈ P := by
+theorem inert_facts
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (hK : IsCMUnram K)
+    {σ : 𝓞 K →+* 𝓞 K} (hσ : ∀ r, algebraMap (𝓞 K) K (σ r) = star (algebraMap (𝓞 K) K r))
+    {P : Ideal (𝓞 K)} (hP : P.IsMaximal) (hin : ∀ r, σ r ∈ P ↔ r ∈ P)
+    : (2 ≤ qIn P ∧ Ideal.absNorm P = qIn P ^ 2)
+      ∧ ∀ a b : 𝓞 K, a ∉ P → σ a * b = σ b * a → ∃ w, σ w * w * a + b ∈ P := by
   have hinj := IsFractionRing.injective (𝓞 K) K
   have hσσ : ∀ r, σ (σ r) = r := fun r => hinj (by rw [hσ, hσ, star_star])
   have hP0 : P ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField K)
@@ -539,10 +595,11 @@ theorem inert_facts {K : Type} [Field K] [NumberField K] [StarRing K] (hK : IsCM
   have hτ : ∀ r, τ (Ideal.Quotient.mk P r) = Ideal.Quotient.mk P (σ r) := fun r => rfl
   obtain ⟨θ, t, ht, hθ⟩ := hK.2.2 P hP
   have ht' : t = σ θ := hinj (by rw [ht, hσ])
-  obtain ⟨⟨q, hq2, hq⟩, hN⟩ := finite_field_invol τ
-    (fun a => by obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective a; rw [hτ, hτ, hσσ])
-    (Ideal.Quotient.mk P θ)
-    (by rw [hτ, ← map_sub, Ne, Ideal.Quotient.eq_zero_iff_mem, ← ht']; exact hθ)
+  obtain ⟨⟨q, hq2, hq⟩, hN⟩ :=
+    finite_field_invol τ
+      (fun a => by obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective a; rw [hτ, hτ, hσσ])
+      (Ideal.Quotient.mk P θ)
+      (by rw [hτ, ← map_sub, Ne, Ideal.Quotient.eq_zero_iff_mem, ← ht']; exact hθ)
   have hn : Ideal.absNorm P = q ^ 2 := by rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, hq]
   have hqq : qIn P = q := by rw [qIn, hn, Nat.sqrt_eq']
   refine ⟨by rw [hqq]; exact ⟨hq2, hn⟩, fun a b ha hab => ?_⟩
@@ -550,53 +607,89 @@ theorem inert_facts {K : Type} [Field K] [NumberField K] [StarRing K] (hK : IsCM
   have ha1 : Ideal.Quotient.mk P (σ a) ≠ 0 := by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem, hin]
   have hab' := congrArg (Ideal.Quotient.mk P) hab
   rw [map_mul, map_mul] at hab'
-  obtain ⟨w, hw⟩ := hN (-(Ideal.Quotient.mk P b / Ideal.Quotient.mk P a)) (by
-    rw [map_neg, map_div₀, hτ, hτ, neg_inj, div_eq_div_iff ha1 ha0, ← hab', mul_comm])
+  obtain ⟨w, hw⟩ :=
+    hN (-(Ideal.Quotient.mk P b / Ideal.Quotient.mk P a))
+      (by rw [map_neg, map_div₀, hτ, hτ, neg_inj, div_eq_div_iff ha1 ha0, ← hab', mul_comm])
   obtain ⟨w, rfl⟩ := Ideal.Quotient.mk_surjective w
   refine ⟨w, ?_⟩
-  rw [← Ideal.Quotient.eq_zero_iff_mem, map_add (f := _), map_mul, map_mul, ← hτ, hw, neg_mul, div_mul_cancel₀ _ ha0,
-    neg_add_cancel]
+  rw [← Ideal.Quotient.eq_zero_iff_mem, map_add (f := _), map_mul, map_mul, ← hτ, hw, neg_mul,
+    div_mul_cancel₀ _ ha0, neg_add_cancel]
 
-theorem main : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), IsCMUnram K → h.IsSymm → h.Nondegenerate → ∀ M : Submodule (𝓞 K) V, IsMaxLat h M → (badP h M).Finite ∧ discN h M = ∏ᶠ P ∈ badP h M, Ideal.absNorm P ∧ Nonempty ((↥(dual h M) ⧸ M.comap (dual h M).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ ∏ᶠ P ∈ badP h M, P)) ∧ ∀ P ∈ badP h M, conjIdeal (K := K) P = P ∧ 2 ≤ qIn P ∧ Ideal.absNorm P = qIn P ^ 2 ∧ ∃ x ∈ M, (∃ a : 𝓞 K, (a : K) = h x x ∧ a ∈ P ∧ a ∉ P ^ 2) ∧ ∀ y ∈ loc (K := K) P (dual h M), ∃ c ∈ locR (K := K) P, y - (c * (h x x)⁻¹) • x ∈ loc (K := K) P M := by
+theorem main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      IsCMUnram K → h.IsSymm → h.Nondegenerate
+        → ∀ M : Submodule (𝓞 K) V,
+          IsMaxLat h M
+            → (badP h M).Finite ∧ discN h M = ∏ᶠ P ∈ badP h M, Ideal.absNorm P
+              ∧ Nonempty
+                ((↥(dual h M) ⧸ M.comap (dual h M).subtype) ≃ₗ[𝓞 K] (𝓞 K ⧸ ∏ᶠ P ∈ badP h M, P))
+              ∧ ∀ P ∈ badP h M,
+                conjIdeal (K := K) P = P ∧ 2 ≤ qIn P ∧ Ideal.absNorm P = qIn P ^ 2
+                  ∧ ∃ x ∈ M,
+                    (∃ a : 𝓞 K, (a : K) = h x x ∧ a ∈ P ∧ a ∉ P ^ 2)
+                      ∧ ∀ y ∈ loc (K := K) P (dual h M), ∃ c ∈ locR (K := K) P,
+                        y - (c * (h x x)⁻¹) • x ∈ loc (K := K) P M := by
   intro K V _ _ _ _ _ _ _ _ h hK hs hnd M hM
   obtain ⟨σ, hσ⟩ := star_int (K := K)
-  have hstar : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) :=
-    fun r => ⟨σ r, hσ r⟩
+  have hstar : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K) := fun r =>
+    ⟨σ r, hσ r⟩
   have hfull : Submodule.IsFullLattice K M := hM.1.1
   have hJ : M.colon (dual h M : Set V) ≠ ⊥ :=
-    colon_ne_bot (K := K) (dualLattice (𝓞 K) K V h hs hnd hstar M hfull).1.fg (max_span_eq_top hσ hs hM)
+    colon_ne_bot (K := K) (dualLattice (𝓞 K) K V h hs hnd hstar M hfull).1.fg
+      (max_span_eq_top hσ hs hM)
   have hbad := bad_iff hσ hs hM hJ
   have hfin : (badP h M).Finite := by
-    refine (UniqueFactorizationMonoid.normalizedFactors (M.colon (dual h M : Set V))).toFinset.finite_toSet.subset
-      fun P hP => ?_
+    refine (UniqueFactorizationMonoid.normalizedFactors (M.colon
+      (dual h M : Set V))).toFinset.finite_toSet.subset fun P hP => ?_
     rw [Finset.mem_coe, Multiset.mem_toFinset, Ideal.mem_normalizedFactors_iff hJ]
     exact ⟨((hbad P).1 hP).1.isPrime, ((hbad P).1 hP).2⟩
   have hT : ∀ P, P ∈ hfin.toFinset ↔ P.IsMaximal ∧ M.colon (dual h M : Set V) ≤ P := fun P => by
     rw [Set.Finite.mem_toFinset, hbad]
   have hprod := colon_eq_prod hσ hs hM hJ _ hT
-  have hloc : ∀ P ∈ badP h M, (∀ r, σ r ∈ P ↔ r ∈ P) ∧ (∃ π ∈ P, π ∉ P ^ 2) ∧
-      ∃ y ∈ dual h M, (∀ p ∈ P, p • y ∈ M) ∧ y ∉ M ∧
-        ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : 𝓞 K, s • z - c • y ∈ M := by
+  have hloc
+      : ∀ P ∈ badP h M,
+        (∀ r, σ r ∈ P ↔ r ∈ P) ∧ (∃ π ∈ P, π ∉ P ^ 2)
+          ∧ ∃ y ∈ dual h M,
+            (∀ p ∈ P, p • y ∈ M) ∧ y ∉ M
+              ∧ ∀ z ∈ dual h M, ∃ s ∉ P, ∃ c : 𝓞 K, s • z - c • y ∈ M := by
     intro P hP
     obtain ⟨hP, hle⟩ := (hbad P).1 hP
     obtain ⟨⟨y, hy1, hy2, hy3⟩, hin, s, hs1, hs2⟩ := exists_tors hσ hs hM hJ hP hle
     have hP0 : P ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField K)
     obtain ⟨π, h1, h2⟩ := Ideal.exists_mem_pow_notMem_pow_succ P hP0 hP.ne_top 1
     rw [pow_one] at h1
-    exact ⟨hin, ⟨π, h1, h2⟩, y, hy1, hy2, hy3, fun z hz => ⟨s, hs1,
-      tors_line hσ hs hM hP h1 h2 (inert_facts hK hσ hP hin).2 hy1 hy2 hy3 (Submodule.smul_mem _ s hz)
-        (hs2 z hz)⟩⟩
-  obtain ⟨e⟩ := cyclic (h := h) (M := M) _ hT fun P hP => by
-    obtain ⟨-, -, y, hy1, hy2, -, hy4⟩ := hloc P (hfin.mem_toFinset.1 hP)
-    exact ⟨y, hy1, hy2, hy4⟩
+    exact ⟨
+      hin,
+      ⟨π, h1, h2⟩,
+      y,
+      hy1,
+      hy2,
+      hy3,
+      fun z hz => ⟨
+        s,
+        hs1,
+        tors_line hσ hs hM hP h1 h2 (inert_facts hK hσ hP hin).2 hy1 hy2 hy3
+          (Submodule.smul_mem _ s hz) (hs2 z hz)
+      ⟩
+    ⟩
+  obtain ⟨e⟩ :=
+    cyclic (h := h) (M := M) _ hT fun P hP => by
+      obtain ⟨-, -, y, hy1, hy2, -, hy4⟩ := hloc P (hfin.mem_toFinset.1 hP)
+      exact ⟨y, hy1, hy2, hy4⟩
   rw [finprod_mem_eq_finite_toFinset_prod _ hfin, finprod_mem_eq_finite_toFinset_prod _ hfin]
   refine ⟨hfin, ?_, ?_, fun P hP => ?_⟩
-  · rw [← map_prod, ← hprod, Ideal.absNorm_apply, Submodule.cardQuot_apply, ← Nat.card_congr e.toEquiv]
+  · rw [← map_prod, ← hprod, Ideal.absNorm_apply, Submodule.cardQuot_apply,
+      ← Nat.card_congr e.toEquiv]
     rfl
   · rw [← hprod]; exact ⟨e⟩
   · obtain ⟨hin, ⟨π, h1, h2⟩, y, hy1, hy2, hy3, hy4⟩ := hloc P hP
     have hPm := ((hbad P).1 hP).1
-    exact ⟨Ideal.ext fun r => (conj_mem hσ P r).trans (hin r), (inert_facts hK hσ hPm hin).1.1,
-      (inert_facts hK hσ hPm hin).1.2, local_vec hσ hs hM hPm hin h1 h2 hy1 hy2 hy3 hy4⟩
+    exact ⟨
+      Ideal.ext fun r => (conj_mem hσ P r).trans (hin r),
+      (inert_facts hK hσ hPm hin).1.1,
+      (inert_facts hK hσ hPm hin).1.2,
+      local_vec hσ hs hM hPm hin h1 h2 hy1 hy2 hy3 hy4
+    ⟩
 
 end GlobalTheory.MaxLatStruct

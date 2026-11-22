@@ -10,8 +10,8 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory.ExplicitRect
 
-theorem analyticAt_dslope {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p) :
-    AnalyticAt ℂ (dslope f p) p := by
+theorem analyticAt_dslope {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p)
+    : AnalyticAt ℂ (dslope f p) p := by
   obtain ⟨q, hq⟩ := hf
   exact ⟨_, hq.has_fpower_series_dslope_fslope⟩
 
@@ -20,11 +20,14 @@ theorem eq_add_dslope (f : ℂ → ℂ) (p s : ℂ) : f s = f p + (s - p) * dslo
   rw [smul_eq_mul] at h
   linear_combination -h
 
-theorem logDeriv_pole {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p)
-    (hn : analyticOrderAt f p ≠ ⊤) : ∃ g : ℂ → ℂ, AnalyticAt ℂ g p ∧ ∀ᶠ s in 𝓝[≠] p,
-      deriv f s / f s = ((analyticOrderNatAt f p : ℕ) : ℂ) / (s - p) + g s := by
+theorem logDeriv_pole {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p) (hn : analyticOrderAt f p ≠ ⊤)
+    : ∃ g : ℂ → ℂ,
+      AnalyticAt ℂ g p
+        ∧ ∀ᶠ s in 𝓝[≠] p,
+          deriv f s / f s = ((analyticOrderNatAt f p : ℕ) : ℂ) / (s - p) + g s := by
   obtain ⟨g0, hg0, hg0p, hfg⟩ :=
-    (hf.analyticOrderAt_eq_natCast (n := analyticOrderNatAt f p)).mp (Nat.cast_analyticOrderNatAt hn).symm
+    (hf.analyticOrderAt_eq_natCast (n := analyticOrderNatAt f p)).mp
+      (Nat.cast_analyticOrderNatAt hn).symm
   generalize analyticOrderNatAt f p = n at hfg ⊢
   refine ⟨fun s => deriv g0 s / g0 s, hg0.deriv.div hg0 hg0p, ?_⟩
   have hne : ∀ᶠ s in 𝓝 p, g0 s ≠ 0 := hg0.continuousAt.eventually_ne hg0p
@@ -33,7 +36,8 @@ theorem logDeriv_pole {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p)
   filter_upwards [nhdsWithin_le_nhds hne, nhdsWithin_le_nhds hfg.eventually_nhds,
     nhdsWithin_le_nhds hdiff, nhdsWithin_le_nhds hfg, self_mem_nhdsWithin] with s h1 h2 h3 h4 h5
   have hsp : s - p ≠ 0 := sub_ne_zero.mpr h5
-  have hd : HasDerivAt (fun z => (z - p) ^ n • g0 z)
+  have hd : HasDerivAt
+      (fun z => (z - p) ^ n • g0 z)
       ((n : ℂ) * (s - p) ^ (n - 1) * 1 * g0 s + (s - p) ^ n * deriv g0 s) s := by
     have := (((hasDerivAt_id' s).sub_const p).pow n).mul h3.hasDerivAt
     convert this using 1
@@ -45,30 +49,42 @@ theorem logDeriv_pole {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p)
   · rw [Nat.add_sub_cancel, pow_succ]
     field_simp
 
-theorem analyticAt_cpow {u : ℝ} (hu : 0 < u) (p : ℂ) :
-    AnalyticAt ℂ (fun s : ℂ => (u : ℂ) ^ s) p := analyticAt_const.cpow analyticAt_id (Complex.ofReal_mem_slitPlane.2 hu)
+theorem analyticAt_cpow {u : ℝ} (hu : 0 < u) (p : ℂ) : AnalyticAt ℂ (fun s : ℂ => (u : ℂ) ^ s) p :=
+  analyticAt_const.cpow analyticAt_id (Complex.ofReal_mem_slitPlane.2 hu)
 
-theorem expand_simple {φ g : ℂ → ℂ} {p k : ℂ} {u : ℝ} (hu : 0 < u) (hp : p ≠ 0)
-    (hg : AnalyticAt ℂ g p) (hφ : ∀ᶠ s in 𝓝[≠] p, φ s = k / (s - p) + g s) :
-    ∃ (a : ℂ) (G : ℂ → ℂ), AnalyticAt ℂ G p ∧ ∀ᶠ s in 𝓝[≠] p,
-      -(φ s) * (u : ℂ) ^ s / s = a / (s - p) ^ 2 + (-(k * ((u : ℂ) ^ p / p))) / (s - p) + G s := by
-  have hW : AnalyticAt ℂ (fun s : ℂ => (u : ℂ) ^ s / s) p :=
-    (analyticAt_cpow hu p).div analyticAt_id hp
-  refine ⟨0, fun s => -(k * dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s) - g s * ((u : ℂ) ^ s / s),
-    ((analyticAt_const.mul (analyticAt_dslope hW)).neg).sub (hg.mul hW), ?_⟩
-  filter_upwards [hφ, self_mem_nhdsWithin] with s hs hsp
-  have hsp' : s - p ≠ 0 := sub_ne_zero.mpr hsp
-  have hexp : (u : ℂ) ^ s / s = (u : ℂ) ^ p / p + (s - p) * dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s :=
-    eq_add_dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s
-  rw [hs, mul_div_assoc, hexp]
-  field_simp
-  ring
+theorem expand_simple
+    {φ g : ℂ → ℂ} {p k : ℂ} {u : ℝ}
+    (hu : 0 < u) (hp : p ≠ 0) (hg : AnalyticAt ℂ g p) (hφ : ∀ᶠ s in 𝓝[≠] p, φ s = k / (s - p) + g s)
+    : ∃ (a : ℂ) (G : ℂ → ℂ),
+      AnalyticAt ℂ G p
+        ∧ ∀ᶠ s in 𝓝[≠] p,
+          -(φ s) * (u : ℂ) ^ s / s = a / (s - p) ^ 2 + (-(k * ((u : ℂ) ^ p / p))) / (s - p) + G s :=
+  by
+    have hW : AnalyticAt ℂ (fun s : ℂ => (u : ℂ) ^ s / s) p :=
+      (analyticAt_cpow hu p).div analyticAt_id hp
+    refine ⟨
+      0,
+      fun s => -(k * dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s) - g s * ((u : ℂ) ^ s / s),
+      ((analyticAt_const.mul (analyticAt_dslope hW)).neg).sub (hg.mul hW),
+      ?_
+    ⟩
+    filter_upwards [hφ, self_mem_nhdsWithin] with s hs hsp
+    have hsp' : s - p ≠ 0 := sub_ne_zero.mpr hsp
+    have hexp
+        : (u : ℂ) ^ s / s = (u : ℂ) ^ p / p + (s - p) * dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s :=
+      eq_add_dslope (fun s : ℂ => (u : ℂ) ^ s / s) p s
+    rw [hs, mul_div_assoc, hexp]
+    field_simp
+    ring
 
-theorem expand_zero {φ h : ℂ → ℂ} {m : ℂ} {u : ℝ} (hu : 0 < u)
-    (hh : AnalyticAt ℂ h 0) (hφ : ∀ᶠ s in 𝓝[≠] (0 : ℂ), φ s = m / s + h s) :
-    ∃ (a : ℂ) (G : ℂ → ℂ), AnalyticAt ℂ G 0 ∧ ∀ᶠ s in 𝓝[≠] (0 : ℂ),
-      -(φ s) * (u : ℂ) ^ s / s =
-        a / (s - 0) ^ 2 + (-(m * (Real.log u : ℂ) + h 0)) / (s - 0) + G s := by
+theorem expand_zero
+    {φ h : ℂ → ℂ} {m : ℂ} {u : ℝ}
+    (hu : 0 < u) (hh : AnalyticAt ℂ h 0) (hφ : ∀ᶠ s in 𝓝[≠] (0 : ℂ), φ s = m / s + h s)
+    : ∃ (a : ℂ) (G : ℂ → ℂ),
+      AnalyticAt ℂ G 0
+        ∧ ∀ᶠ s in 𝓝[≠] (0 : ℂ),
+          -(φ s) * (u : ℂ) ^ s / s =
+            a / (s - 0) ^ 2 + (-(m * (Real.log u : ℂ) + h 0)) / (s - 0) + G s := by
   have hE : AnalyticAt ℂ (fun s : ℂ => (u : ℂ) ^ s) 0 := analyticAt_cpow hu 0
   have hD1 := analyticAt_dslope hE
   have hD2 := analyticAt_dslope hD1
@@ -78,10 +94,15 @@ theorem expand_zero {φ h : ℂ → ℂ} {m : ℂ} {u : ℝ} (hu : 0 < u)
     have hu0 : (u : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr hu.ne'
     rw [(hasStrictDerivAt_const_cpow (x := (u : ℂ)) (y := 0) (.inl hu0)).hasDerivAt.deriv,
       Complex.cpow_zero, one_mul, Complex.ofReal_log hu.le]
-  refine ⟨-m, fun s => -(m * dslope (dslope (fun s : ℂ => (u : ℂ) ^ s) 0) 0 s + dslope h 0 s +
-      h s * (Real.log u : ℂ) + h s * s * dslope (dslope (fun s : ℂ => (u : ℂ) ^ s) 0) 0 s),
+  refine ⟨
+    -m,
+    fun s =>
+      -(m * dslope (dslope (fun s : ℂ => (u : ℂ) ^ s) 0) 0 s + dslope h 0 s + h s * (Real.log u : ℂ)
+        + h s * s * dslope (dslope (fun s : ℂ => (u : ℂ) ^ s) 0) 0 s),
     ((((analyticAt_const.mul hD2).add hDh).add (hh.mul analyticAt_const)).add
-      ((hh.mul analyticAt_id).mul hD2)).neg, ?_⟩
+      ((hh.mul analyticAt_id).mul hD2)).neg,
+    ?_
+  ⟩
   filter_upwards [hφ, self_mem_nhdsWithin] with s hs hs0
   have hs0' : s ≠ 0 := hs0
   have e1 := eq_add_dslope (fun s : ℂ => (u : ℂ) ^ s) 0 s
@@ -95,25 +116,35 @@ theorem expand_zero {φ h : ℂ → ℂ} {m : ℂ} {u : ℝ} (hu : 0 < u)
   field_simp
   ring
 
-theorem analyticOff {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) :
-    AnalyticOnNhd ℂ (LFunction χ) ({1}ᶜ : Set ℂ) := DifferentiableOn.analyticOnNhd
-    (fun s hs => (DirichletCharacter.differentiableAt_LFunction χ s (.inl hs)).differentiableWithinAt)
+theorem analyticOff {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q)
+    : AnalyticOnNhd ℂ (LFunction χ) ({1}ᶜ : Set ℂ) :=
+  DifferentiableOn.analyticOnNhd
+    (fun s hs =>
+      (DirichletCharacter.differentiableAt_LFunction χ s (.inl hs)).differentiableWithinAt)
     isOpen_compl_singleton
 
-theorem exists_entire {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) :
-    ∃ F : ℂ → ℂ, Differentiable ℂ F ∧ F 1 ≠ 0 ∧ ∀ s, s ≠ 1 → LFunction χ s = 0 → F s = 0 := by
+theorem exists_entire {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q)
+    : ∃ F : ℂ → ℂ, Differentiable ℂ F ∧ F 1 ≠ 0 ∧ ∀ s, s ≠ 1 → LFunction χ s = 0 → F s = 0 := by
   by_cases h1 : χ = 1
   · subst h1
-    refine ⟨DirichletCharacter.LFunctionTrivChar₁ q, DirichletCharacter.differentiable_LFunctionTrivChar₁ q,
-      DirichletCharacter.LFunctionTrivChar₁_apply_one_ne_zero q, fun s hs hL => ?_⟩
+    refine ⟨
+      DirichletCharacter.LFunctionTrivChar₁ q,
+      DirichletCharacter.differentiable_LFunctionTrivChar₁ q,
+      DirichletCharacter.LFunctionTrivChar₁_apply_one_ne_zero q,
+      fun s hs hL => ?_
+    ⟩
     rw [DirichletCharacter.LFunctionTrivChar₁, Function.update_of_ne hs]
     show (s - 1) * LFunction 1 s = 0
     rw [hL, mul_zero]
-  · exact ⟨LFunction χ, DirichletCharacter.differentiable_LFunction h1,
-      DirichletCharacter.LFunction_apply_one_ne_zero h1, fun s _ h => h⟩
+  · exact ⟨
+      LFunction χ,
+      DirichletCharacter.differentiable_LFunction h1,
+      DirichletCharacter.LFunction_apply_one_ne_zero h1,
+      fun s _ h => h
+    ⟩
 
-theorem finite_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (T : ℝ) :
-    {ρ : ℂ | 0 < ρ.re ∧ ρ.re < 1 ∧ |ρ.im| < T ∧ LFunction χ ρ = 0}.Finite := by
+theorem finite_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (T : ℝ)
+    : {ρ : ℂ | 0 < ρ.re ∧ ρ.re < 1 ∧ |ρ.im| < T ∧ LFunction χ ρ = 0}.Finite := by
   obtain ⟨F, hF, hF1, hFz⟩ := exists_entire χ
   have hZc : IsCompact ({ρ : ℂ | F ρ = 0} ∩ Metric.closedBall 0 (1 + T)) :=
     (isCompact_closedBall 0 (1 + T)).inter_left (isClosed_eq hF.continuous continuous_const)
@@ -140,10 +171,11 @@ theorem finite_zeros {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) (T : �
   rw [abs_of_pos h0]
   linarith
 
-theorem order_ne_top {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {ρ : ℂ} (hρ : ρ ≠ 1) :
-    analyticOrderAt (LFunction χ) ρ ≠ ⊤ := by
+theorem order_ne_top {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {ρ : ℂ} (hρ : ρ ≠ 1)
+    : analyticOrderAt (LFunction χ) ρ ≠ ⊤ := by
   have hU : IsPreconnected ({1}ᶜ : Set ℂ) :=
-    (isConnected_compl_singleton_of_one_lt_rank (by rw [Complex.rank_real_complex]; norm_num) 1).isPreconnected
+    (isConnected_compl_singleton_of_one_lt_rank (by rw [Complex.rank_real_complex]; norm_num)
+      1).isPreconnected
   have h2 : analyticOrderAt (LFunction χ) 2 ≠ ⊤ := by
     intro htop
     have hne : LFunction χ 2 ≠ 0 :=
@@ -152,30 +184,41 @@ theorem order_ne_top {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {ρ : 
   exact (analyticOff χ).analyticOrderAt_ne_top_of_isPreconnected hU
     (by norm_num : (2 : ℂ) ∈ ({1}ᶜ : Set ℂ)) hρ h2
 
-theorem logDeriv_one {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) :
-    ∃ g : ℂ → ℂ, AnalyticAt ℂ g 1 ∧ ∀ᶠ s in 𝓝[≠] (1 : ℂ),
-      deriv (LFunction χ) s / LFunction χ s = (if N = 1 then -1 else 0) / (s - 1) + g s := by
+theorem logDeriv_one {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive)
+    : ∃ g : ℂ → ℂ,
+      AnalyticAt ℂ g 1
+        ∧ ∀ᶠ s in 𝓝[≠] (1 : ℂ),
+          deriv (LFunction χ) s / LFunction χ s = (if N = 1 then -1 else 0) / (s - 1) + g s := by
   by_cases hN : N = 1
   · subst hN
     obtain rfl : χ = 1 := DirichletCharacter.level_one χ
     have hZd := DirichletCharacter.differentiable_LFunctionTrivChar₁ 1
     have hZa : AnalyticAt ℂ (DirichletCharacter.LFunctionTrivChar₁ 1) 1 := hZd.analyticAt 1
     have hZ1 := DirichletCharacter.LFunctionTrivChar₁_apply_one_ne_zero 1
-    refine ⟨fun s => deriv (DirichletCharacter.LFunctionTrivChar₁ 1) s /
-      DirichletCharacter.LFunctionTrivChar₁ 1 s, hZa.deriv.div hZa hZ1, ?_⟩
+    refine ⟨
+      fun s =>
+        deriv (DirichletCharacter.LFunctionTrivChar₁ 1) s
+          / DirichletCharacter.LFunctionTrivChar₁ 1 s,
+      hZa.deriv.div hZa hZ1,
+      ?_
+    ⟩
     have hne : ∀ᶠ s in 𝓝 (1 : ℂ), DirichletCharacter.LFunctionTrivChar₁ 1 s ≠ 0 :=
       hZa.continuousAt.eventually_ne hZ1
     filter_upwards [nhdsWithin_le_nhds hne, self_mem_nhdsWithin] with s hZs hs1
     have hs1' : s - 1 ≠ 0 := sub_ne_zero.mpr hs1
-    have hLeq : LFunction (1 : DirichletCharacter ℂ 1) =ᶠ[𝓝 s]
-        fun z => DirichletCharacter.LFunctionTrivChar₁ 1 z / (z - 1) := by
+    have hLeq
+        : LFunction (1 : DirichletCharacter ℂ 1) =ᶠ[𝓝 s]
+          fun z => DirichletCharacter.LFunctionTrivChar₁ 1 z / (z - 1) := by
       filter_upwards [isOpen_compl_singleton.mem_nhds hs1] with z hz
       have hz' : z - 1 ≠ 0 := sub_ne_zero.mpr hz
       rw [DirichletCharacter.LFunctionTrivChar₁, Function.update_of_ne hz]
       field_simp
-    have hd : HasDerivAt (fun z => DirichletCharacter.LFunctionTrivChar₁ 1 z / (z - 1))
-        ((deriv (DirichletCharacter.LFunctionTrivChar₁ 1) s * (s - 1) -
-          DirichletCharacter.LFunctionTrivChar₁ 1 s * 1) / (s - 1) ^ 2) s :=
+    have hd : HasDerivAt
+        (fun z => DirichletCharacter.LFunctionTrivChar₁ 1 z / (z - 1))
+        ((deriv (DirichletCharacter.LFunctionTrivChar₁ 1) s * (s - 1)
+            - DirichletCharacter.LFunctionTrivChar₁ 1 s * 1)
+          / (s - 1) ^ 2)
+        s :=
       (hZd s).hasDerivAt.div ((hasDerivAt_id' s).sub_const 1) hs1'
     rw [hLeq.deriv_eq, hLeq.eq_of_nhds, hd.deriv, if_pos rfl]
     field_simp
@@ -184,10 +227,14 @@ theorem logDeriv_one {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (hχ :
       rintro rfl
       rw [DirichletCharacter.IsPrimitive, DirichletCharacter.conductor_one] at hχ
       exact hN hχ.symm
-    have hLa : AnalyticAt ℂ (LFunction χ) 1 := (DirichletCharacter.differentiable_LFunction hχ1).analyticAt 1
+    have hLa : AnalyticAt ℂ (LFunction χ) 1 :=
+      (DirichletCharacter.differentiable_LFunction hχ1).analyticAt 1
     have hL1 := DirichletCharacter.LFunction_apply_one_ne_zero hχ1
-    refine ⟨fun s => deriv (LFunction χ) s / LFunction χ s, hLa.deriv.div hLa hL1,
-      Filter.Eventually.of_forall fun s => ?_⟩
+    refine ⟨
+      fun s => deriv (LFunction χ) s / LFunction χ s,
+      hLa.deriv.div hLa hL1,
+      Filter.Eventually.of_forall fun s => ?_
+    ⟩
     simp only [hN, if_false, zero_div, zero_add]
 
 theorem residue_identity : ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive → ∀ (u c T : ℝ) (m : ℕ) (h : ℂ → ℂ), 1 < u → 1 < c → 0 < T → AnalyticAt ℂ h 0 → (∀ᶠ s in 𝓝[≠] (0 : ℂ), deriv (LFunction χ) s / LFunction χ s = (m : ℂ) / s + h s) → (∀ s : ℂ, -(1/2 : ℝ) ≤ s.re → s.re ≤ c → |s.im| = T → LFunction χ s ≠ 0) → (∀ s : ℂ, s.re = -(1/2 : ℝ) → LFunction χ s ≠ 0) → (∫ x : ℝ in (-(1/2 : ℝ))..c, (-(deriv (LFunction χ) ((x : ℂ) - T * I) / LFunction χ ((x : ℂ) - T * I)) * (u : ℂ) ^ ((x : ℂ) - T * I) / ((x : ℂ) - T * I))) - (∫ x : ℝ in (-(1/2 : ℝ))..c, (-(deriv (LFunction χ) ((x : ℂ) + T * I) / LFunction χ ((x : ℂ) + T * I)) * (u : ℂ) ^ ((x : ℂ) + T * I) / ((x : ℂ) + T * I))) + I * (∫ t : ℝ in (-T)..T, (-(deriv (LFunction χ) ((c : ℂ) + t * I) / LFunction χ ((c : ℂ) + t * I)) * (u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))) - I * (∫ t : ℝ in (-T)..T, (-(deriv (LFunction χ) (((-(1/2) : ℝ) : ℂ) + t * I) / LFunction χ (((-(1/2) : ℝ) : ℂ) + t * I)) * (u : ℂ) ^ (((-(1/2) : ℝ) : ℂ) + t * I) / (((-(1/2) : ℝ) : ℂ) + t * I))) = 2 * Real.pi * I * ((if N = 1 then (u : ℂ) else 0) - (∑ᶠ ρ ∈ {ρ : ℂ | 0 < ρ.re ∧ ρ.re < 1 ∧ |ρ.im| < T ∧ LFunction χ ρ = 0}, ((analyticOrderNatAt (LFunction χ) ρ : ℕ) : ℂ) * ((u : ℂ) ^ ρ / ρ)) - (m * (Real.log u : ℂ) + h 0)) := by

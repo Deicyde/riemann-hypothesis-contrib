@@ -9,6 +9,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 namespace PositivityTheory.KB.SplitAffineSpectral
 
 theorem core : Core :=
-  NormTraceLemmas.core_of NormTraceLemmas.splitA NormTraceLemmas.splitS NormTraceLemmas.splitB NormTraceLemmas.zInv NormTraceLemmas.e2z NormTraceLemmas.e2s
+  NormTraceLemmas.core_of NormTraceLemmas.splitA NormTraceLemmas.splitS NormTraceLemmas.splitB
+    NormTraceLemmas.zInv NormTraceLemmas.e2z NormTraceLemmas.e2s
 
 end PositivityTheory.KB.SplitAffineSpectral

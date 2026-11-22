@@ -27,11 +27,12 @@ abbrev muU (N : ℕ) : Measure (UG N) := Measure.haar
 
 section
 
-variable {N : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {N : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin N) (Fin N) ℂ → (H →L[ℂ] H)} {S : Submodule ℂ H}
 
-def orb (hst : IsKStableOn (allPos N) σ S) (u : S) : UG N → S :=
-  fun x => ⟨σ x u, hst _ (memK x) _ u.2⟩
+def orb (hst : IsKStableOn (allPos N) σ S) (u : S) : UG N → S := fun x =>
+  ⟨σ x u, hst _ (memK x) _ u.2⟩
 
 lemma orb_cont (hrep : IsURepOn (Kset (allPos N)) σ) (hst : IsKStableOn (allPos N) σ S) (u : S) :
     Continuous (orb hst u) := by
@@ -88,7 +89,6 @@ lemma isPositiveDefinite_matrix_coefficient_of_mem_algA [FiniteDimensional ℂ S
   rw [e]
   exact IsPD.sum _ fun i _ => (ha i).mul (IsPD.const _)
 
-
 variable (σ S) in
 def Ugood : Submodule ℂ S where
   carrier := {u | ∀ w : H, IsPD (fun h : UG N => ⟪w, σ h (u : H)⟫_ℂ)}
@@ -102,8 +102,10 @@ def Ugood : Submodule ℂ S where
     intro c u hu w
     simpa [map_smul, inner_smul_right] using (IsPD.const c).mul (hu w)
 
-theorem Ugood_eq_top (hrep : IsURepOn (Kset (allPos N)) σ) (hfin : FiniteDimensional ℂ S)
-    (hst : IsKStableOn (allPos N) σ S) : Ugood (σ := σ) (S := S) = ⊤ := by
+theorem Ugood_eq_top
+    (hrep : IsURepOn (Kset (allPos N)) σ) (hfin : FiniteDimensional ℂ S)
+    (hst : IsKStableOn (allPos N) σ S)
+    : Ugood (σ := σ) (S := S) = ⊤ := by
   haveI := hfin
   by_contra hne
   obtain ⟨φ, hφ0, hle⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
@@ -114,8 +116,8 @@ theorem Ugood_eq_top (hrep : IsURepOn (Kset (allPos N)) σ) (hfin : FiniteDimens
   have hg : Continuous g := φC.continuous.comp (orb_cont hrep hst u)
   have hA : ∀ f ∈ algA N, ∫ x, f x * g x ∂(muU N) = 0 := by
     intro f hf
-    have hmem : T hst f u ∈ Ugood (σ := σ) (S := S) :=
-      fun w => isPositiveDefinite_matrix_coefficient_of_mem_algA hrep hst hf u w
+    have hmem : T hst f u ∈ Ugood (σ := σ) (S := S) := fun w =>
+      isPositiveDefinite_matrix_coefficient_of_mem_algA hrep hst hf u w
     have h0 : φ (T hst f u) = 0 := LinearMap.mem_ker.mp (hle hmem)
     have hint : Integrable (fun x => f x • orb hst u x) (muU N) :=
       integrable_cont (f.continuous.smul (orb_cont hrep hst u))
@@ -131,18 +133,22 @@ theorem Ugood_eq_top (hrep : IsURepOn (Kset (allPos N)) σ) (hfin : FiniteDimens
       intro ε hε
       obtain ⟨f, hf, hfF⟩ := algA_dense N F hε
       have hsplit : ∫ x, F x * g x ∂(muU N) = ∫ x, (F - f) x * g x ∂(muU N) := by
-        have h1 : ∫ x, (F - f) x * g x ∂(muU N) =
-            ∫ x, F x * g x ∂(muU N) - ∫ x, f x * g x ∂(muU N) := by
-          have hi1 : Integrable (fun x => F x * g x) (muU N) := integrable_cont (F.continuous.mul hg)
-          have hi2 : Integrable (fun x => f x * g x) (muU N) := integrable_cont (f.continuous.mul hg)
+        have h1
+            : ∫ x, (F - f) x * g x ∂(muU N)
+              = ∫ x, F x * g x ∂(muU N) - ∫ x, f x * g x ∂(muU N) := by
+          have hi1 : Integrable (fun x => F x * g x) (muU N) :=
+            integrable_cont (F.continuous.mul hg)
+          have hi2 : Integrable (fun x => f x * g x) (muU N) :=
+            integrable_cont (f.continuous.mul hg)
           rw [← integral_sub hi1 hi2]
           congr 1
           funext x
           simp [sub_mul]
         rw [h1, hA f hf, sub_zero]
       rw [hsplit]
-      calc ‖∫ x, (F - f) x * g x ∂(muU N)‖ ≤ ∫ x, ‖(F - f) x * g x‖ ∂(muU N) :=
-            norm_integral_le_integral_norm _
+      calc
+        ‖∫ x, (F - f) x * g x ∂(muU N)‖
+          ≤ ∫ x, ‖(F - f) x * g x‖ ∂(muU N) := norm_integral_le_integral_norm _
         _ ≤ ∫ x, ε * ‖g x‖ ∂(muU N) := by
           refine integral_mono (integrable_cont (((F - f).continuous.mul hg).norm))
             (integrable_cont (continuous_const.mul hg.norm)) fun x => ?_
@@ -168,8 +174,9 @@ theorem Ugood_eq_top (hrep : IsURepOn (Kset (allPos N)) σ) (hfin : FiniteDimens
       exact Complex.normSq_eq_conj_mul_self
     rw [integral_complex_ofReal] at h4
     exact_mod_cast h4
-  have hae := (integral_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (g x))
-    (integrable_cont hcn)).mp hF'
+  have hae :=
+    (integral_eq_zero_iff_of_nonneg (fun x => Complex.normSq_nonneg (g x)) (integrable_cont hcn)).mp
+      hF'
   have heq : (fun x => Complex.normSq (g x)) = fun _ => (0 : ℝ) :=
     (Continuous.ae_eq_iff_eq (muU N) hcn continuous_const).mp hae
   have h1 : Complex.normSq (g 1) = 0 := congrFun heq 1

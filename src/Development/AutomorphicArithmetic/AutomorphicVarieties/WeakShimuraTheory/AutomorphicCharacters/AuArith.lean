@@ -7,11 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-private theorem mul_zpow_pow_eq_one_of_pow_eqs {H : Type*} [CommGroup H] (P A C : H) (N k : ℕ) (m a : ℤ)
-    (hP : P ^ (2 * N) = A ^ (2 * N) * C ^ (2 * (N : ℤ) * m)) (hA : A ^ k = C ^ (a * k)) :
-    (P * C ^ (-(m + a))) ^ (2 * N * k) = 1 := by
+private theorem mul_zpow_pow_eq_one_of_pow_eqs
+    {H : Type*} [CommGroup H]
+    (P A C : H) (N k : ℕ) (m a : ℤ)
+    (hP : P ^ (2 * N) = A ^ (2 * N) * C ^ (2 * (N : ℤ) * m)) (hA : A ^ k = C ^ (a * k))
+    : (P * C ^ (-(m + a))) ^ (2 * N * k) = 1 := by
   have hP' : P ^ ((2 * N : ℕ) : ℤ) = A ^ ((2 * N : ℕ) : ℤ) * C ^ (2 * (N : ℤ) * m) := by
     rw [zpow_natCast, zpow_natCast]
     exact hP
@@ -32,14 +36,25 @@ private theorem mul_zpow_pow_eq_one_of_pow_eqs {H : Type*} [CommGroup H] (P A C 
   push_cast
   ring
 
-theorem UpperTheory.V.Ws.auArith :
-    GlobalTheory.Published.GlobalArtinReciprocity → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D) (c' : Coef l) (h : c.O ≤ c'.O) (K : Link T c' h) (X : Space (T.fr ∅) (inc h)) (B : W.UniversalOrdinaryDeterminantRing K.r) (φ : B.B →ₐ[c'.O] X.B), K.IsPhi X 0 B φ → ∀ (y : X.A →ₐ[c'.O] PadicAlgCl l) (x : B.Pt), (∀ b, x b = y (algebraMap X.B X.A (φ b))) → (∀ (v : W.Vl l T.L) (i : Fin 4), Continuous (x.psi v i)) → ∀ m : Fin 4 → ℤ, StrictAnti m → T.Wts (fun i => 2 * m i) (X.P.map (y : X.A →+* PadicAlgCl l)) → ∃ w : K.s.Wt 4, x.Arith w := by
+theorem UpperTheory.V.Ws.auArith
+    : GlobalTheory.Published.GlobalArtinReciprocity
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+          (D : Raw Ω c) (T : Tower D) (c' : Coef l) (h : c.O ≤ c'.O) (K : Link T c' h)
+          (X : Space (T.fr ∅) (inc h)) (B : W.UniversalOrdinaryDeterminantRing K.r)
+          (φ : B.B →ₐ[c'.O] X.B),
+        K.IsPhi X 0 B φ
+          → ∀ (y : X.A →ₐ[c'.O] PadicAlgCl l) (x : B.Pt),
+            (∀ b, x b = y (algebraMap X.B X.A (φ b)))
+              → (∀ (v : W.Vl l T.L) (i : Fin 4), Continuous (x.psi v i))
+              → ∀ m : Fin 4 → ℤ,
+                StrictAnti m → T.Wts (fun i => 2 * m i) (X.P.map (y : X.A →+* PadicAlgCl l))
+                  → ∃ w : K.s.Wt 4, x.Arith w := by
   intro hGAR Ω _ _ _ l _ c D T c' h K X B φ hφ y x hx hcont m hm hW
   obtain ⟨U, hUo, hU⟩ := hW
   haveI : Finite (G T.F Ω ⧸ U) := Subgroup.quotient_finite_of_isOpen U hUo
   haveI : U.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  have hpowU : ∀ g : G T.F Ω, g ^ U.normalCore.index ∈ U :=
-    fun g => Subgroup.normalCore_le U (U.normalCore.pow_index_mem g)
+  have hpowU : ∀ g : G T.F Ω, g ^ U.normalCore.index ∈ U := fun g =>
+    Subgroup.normalCore_le U (U.normalCore.pow_index_mem g)
   have hN0 : U.normalCore.index ≠ 0 := Subgroup.FiniteIndex.index_ne_zero
   have hl' : ∀ v : W.Vl l T.L, (K.s.A v).valuation (l : Ω) < 1 := by
     intro v
@@ -52,7 +67,8 @@ theorem UpperTheory.V.Ws.auArith :
     simp only
     omega
   · intro v j
-    have hlw : ((l : ℕ) : 𝓞 T.L) ∈ (K.s.w v).asIdeal := (K.s.hw v (l : 𝓞 T.L)).1 (by simpa using hl' v)
+    have hlw : ((l : ℕ) : 𝓞 T.L) ∈ (K.s.w v).asIdeal :=
+      (K.s.hw v (l : 𝓞 T.L)).1 (by simpa using hl' v)
     refine UpperTheory.V.Loc.laArith hGAR (K.s.hw v) hlw (x.psi v j) (hcont v j) (m j + a v)
       (2 * U.normalCore.index * k v) ?_ ?_
     · exact Nat.mul_pos (Nat.mul_pos two_pos (Nat.pos_of_ne_zero hN0)) (hk v)
@@ -68,7 +84,9 @@ theorem UpperTheory.V.Ws.auArith :
           exact Subgroup.pow_mem _ hg N
         have hin := hU (K.e v) j _ ⟨by rw [Subgroup.coe_pow, map_pow]; exact hpowU _, hIneF hgN⟩
         have e0 : x.psi v j (g ^ N) = P ^ N := map_pow _ _ _
-        have hκN : (algebraMap c'.O (PadicAlgCl l)) (↑(K.κ ↑(g ^ N)) * ↑(K.β ↑(g ^ N)) ^ 0) = ↑(A ^ N) := by
+        have hκN
+            : (algebraMap c'.O (PadicAlgCl l)) (↑(K.κ ↑(g ^ N)) * ↑(K.β ↑(g ^ N)) ^ 0)
+              = ↑(A ^ N) := by
           rw [pow_zero, mul_one, Subgroup.coe_pow, map_pow, Units.val_pow_eq_pow_val, map_pow,
             Units.val_pow_eq_pow_val]
           rfl
@@ -90,10 +108,13 @@ theorem UpperTheory.V.Ws.auArith :
           congr 1
           push_cast
           ring
-      · have h1 := congrArg (Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l))
-          (hcyc v ↑g hg).1
-        have h2 : Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l)
-            (chiO T.L Ω l c'.O ↑g) = C := by
+      · have h1 :=
+          congrArg (Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l))
+            (hcyc v ↑g hg).1
+        have h2
+            : Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l)
+                (chiO T.L Ω l c'.O ↑g)
+              = C := by
           have := congrArg (fun f => f (↑g : G T.L Ω)) (UpperTheory.V.Ws.auChi T.L Ω c').1
           exact this
         rw [map_one, map_pow, map_mul, map_zpow, h2, mul_pow, mul_eq_one_iff_eq_inv] at h1

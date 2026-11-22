@@ -14,19 +14,28 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-theorem cobOne_diagSum_eq (p : ℕ) (R : Type) [CommRing R] (G : PDivGroup p R) (n m : ℕ) (hm : (m : R) = 0) :
-    ∀ c ∈ symCocycles R (G.A n), cobOne R (G.A n) (diagSum R (G.A n) m c) = pullbackTwo (mulBy R (G.A n) m) c -
-      (Algebra.TensorProduct.lift (Bialgebra.counitAlgHom R (G.A n)) (Bialgebra.counitAlgHom R (G.A n))
-        (fun _ _ ↦ Commute.all _ _) c) • (1 : G.A n ⊗[R] G.A n) := by
+theorem cobOne_diagSum_eq
+    (p : ℕ) (R : Type) [CommRing R] (G : PDivGroup p R) (n m : ℕ) (hm : (m : R) = 0)
+    : ∀ c ∈ symCocycles R (G.A n),
+      cobOne R (G.A n) (diagSum R (G.A n) m c)
+        = pullbackTwo (mulBy R (G.A n) m) c
+          - (Algebra.TensorProduct.lift (Bialgebra.counitAlgHom R (G.A n))
+              (Bialgebra.counitAlgHom R (G.A n))
+              (fun _ _ ↦ Commute.all _ _)
+              c)
+            • (1 : G.A n ⊗[R] G.A n) := by
   intro c hc
   have hd : diagSum R (G.A n) m c = ∑ i ∈ Finset.range m, multDiag R (G.A n) i c := by
     simp [diagSum, LinearMap.sum_apply]

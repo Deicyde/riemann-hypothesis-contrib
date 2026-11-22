@@ -42,7 +42,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Adeli
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR
 open scoped TensorProduct InnerProductSpace ContDiff Topology
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -63,11 +67,10 @@ section Adelic
 
 variable {D : D7}
 
-theorem fix_iff (τ : D.host.E →+* ℂ) :
-    τ D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD ↔ ∃ ρ, τ = tauE D ρ := by
+theorem fix_iff (τ : D.host.E →+* ℂ)
+    : τ D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD ↔ ∃ ρ, τ = tauE D ρ := by
   obtain ⟨g, rfl⟩ := (factEmb D.R D.host).1.2 τ
-  have h1 : D.host.galE (D.host.sigmaOf g) = g :=
-    (D.host.gal).apply_symm_apply g
+  have h1 : D.host.galE (D.host.sigmaOf g) = g := (D.host.gal).apply_symm_apply g
   refine Iff.trans ?_ (Formalism.L2.Geo.exists_tauEmb_iff D g).symm
   conv_rhs => rw [← h1]
   refine Iff.trans ?_ (D.host.galE_mem_Psi_iff _).symm
@@ -77,17 +80,16 @@ end Adelic
 
 section Dict
 
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.Member
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.Member
 
 variable {D : D7}
-
 
 end Dict
 
 section Forms
 
 variable {D : D7}
-
 
 end Forms
 

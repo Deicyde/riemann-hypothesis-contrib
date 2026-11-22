@@ -42,8 +42,7 @@ private lemma dens_eq {n : ℕ} (t : ℂ) (z : Fin n → ℂˣ) :
   rw [h3, Finset.prod_union hd, ← half_inv_eq]
   rfl
 
-theorem UpperTheory.Gal.Gen.densSymm :
-    UpperTheory.Gal.Gen.DensSymm := by
+theorem UpperTheory.Gal.Gen.densSymm : UpperTheory.Gal.Gen.DensSymm := by
   intro n t z σ
   rw [dens_eq, dens_eq]
   refine Finset.prod_nbij' (Prod.map σ σ) (Prod.map σ.symm σ.symm) ?_ ?_ ?_ ?_ ?_

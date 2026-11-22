@@ -11,8 +11,9 @@ open Zc.Cos
 
 namespace PositivityTheory.Groth.AltC
 
-theorem filter_mem_eq_of_sublist {α : Type*} [DecidableEq α] {l m : List α} (hs : l.Sublist m)
-    (hm : m.Nodup) : m.filter (fun x => decide (x ∈ l)) = l := by
+theorem filter_mem_eq_of_sublist
+    {α : Type*} [DecidableEq α] {l m : List α} (hs : l.Sublist m) (hm : m.Nodup)
+    : m.filter (fun x => decide (x ∈ l)) = l := by
   induction hs with
   | slnil => rfl
   | @cons l m a hs ih =>
@@ -28,25 +29,25 @@ theorem filter_mem_eq_of_sublist {α : Type*} [DecidableEq α] {l m : List α} (
     have : x ≠ a := fun h => (List.nodup_cons.1 hm).1 (h ▸ hx)
     simp [this, hx]
 
-theorem mem_sub {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (i : Fin h) (x : α) :
-    x ∈ sub W c i ↔ ∃ p, c p = i ∧ W.get p = x := by
+theorem mem_sub {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (i : Fin h) (x : α)
+    : x ∈ sub W c i ↔ ∃ p, c p = i ∧ W.get p = x := by
   unfold sub
   simp [List.mem_map, List.mem_filter, List.mem_finRange]
 
-theorem mem_sub_self {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (p : Fin W.length) :
-    W.get p ∈ sub W c (c p) :=
+theorem mem_sub_self {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (p : Fin W.length)
+    : W.get p ∈ sub W c (c p) :=
   (mem_sub W c (c p) _).2 ⟨p, rfl, rfl⟩
 
-theorem sub_sublist {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (i : Fin h) :
-    (sub W c i).Sublist W := by
+theorem sub_sublist {α : Type*} {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (i : Fin h)
+    : (sub W c i).Sublist W := by
   unfold sub
-  have := (List.filter_sublist (p := fun p => decide (c p = i)) (l := List.finRange W.length)).map W.get
+  have :=
+    (List.filter_sublist (p := fun p => decide (c p = i)) (l := List.finRange W.length)).map W.get
   rwa [← List.ofFn_eq_map, List.ofFn_get] at this
 
-
 open Classical in
-theorem shuffleCount_eq {α : Type*} {h : ℕ} (W : List α) (D : Fin h → List α) (hW : W.Nodup) :
-    shuffleCount W D = if (∀ i, (D i).Sublist W) ∧ (∀ x ∈ W, ∃! i, x ∈ D i) then 1 else 0 := by
+theorem shuffleCount_eq {α : Type*} {h : ℕ} (W : List α) (D : Fin h → List α) (hW : W.Nodup)
+    : shuffleCount W D = if (∀ i, (D i).Sublist W) ∧ (∀ x ∈ W, ∃! i, x ∈ D i) then 1 else 0 := by
   unfold shuffleCount
   split_ifs with hc
   · rw [Finset.card_eq_one]
@@ -80,7 +81,8 @@ theorem shuffleCount_eq {α : Type*} {h : ℕ} (W : List α) (D : Fin h → List
     obtain ⟨p, rfl⟩ := List.get_of_mem hx
     refine ⟨c p, ?_, fun j hj => ?_⟩
     · show W.get p ∈ D (c p)
-      rw [← hcs (c p)]; exact mem_sub_self W c p
+      rw [← hcs (c p)]
+      exact mem_sub_self W c p
     simp only at hj
     rw [← hcs j] at hj
     obtain ⟨q, hq, hqp⟩ := (mem_sub W c j _).1 hj
@@ -88,10 +90,10 @@ theorem shuffleCount_eq {α : Type*} {h : ℕ} (W : List α) (D : Fin h → List
     subst this
     exact hq.symm
 
-theorem cond_map {β α : Type*} {h : ℕ} (f : β → α) (hf : Function.Injective f) (w : List β)
-    (E : Fin h → List β) :
-    ((∀ i, ((E i).map f).Sublist (w.map f)) ∧ (∀ x ∈ w.map f, ∃! i, x ∈ (E i).map f)) ↔
-      ((∀ i, (E i).Sublist w) ∧ (∀ y ∈ w, ∃! i, y ∈ E i)) := by
+theorem cond_map
+    {β α : Type*} {h : ℕ} (f : β → α) (hf : Function.Injective f) (w : List β) (E : Fin h → List β)
+    : ((∀ i, ((E i).map f).Sublist (w.map f)) ∧ (∀ x ∈ w.map f, ∃! i, x ∈ (E i).map f))
+      ↔ ((∀ i, (E i).Sublist w) ∧ (∀ y ∈ w, ∃! i, y ∈ E i)) := by
   have hs : ∀ i, ((E i).map f).Sublist (w.map f) ↔ (E i).Sublist w := by
     intro i
     refine ⟨fun H => ?_, fun H => H.map f⟩
@@ -100,7 +102,8 @@ theorem cond_map {β α : Type*} {h : ℕ} (f : β → α) (hf : Function.Inject
   simp only [hs, List.forall_mem_map, List.mem_map_of_injective hf]
 
 def wN (L : ℕ) (T : Finset ℕ) : List ℕ :=
-  ((List.range L).filter (fun x => decide (x ∈ T))).reverse ++ (List.range L).filter (fun x => decide (x ∉ T))
+  ((List.range L).filter (fun x => decide (x ∈ T))).reverse
+    ++ (List.range L).filter (fun x => decide (x ∉ T))
 
 theorem mem_wN {L x : ℕ} {T : Finset ℕ} : x ∈ wN L T ↔ x < L := by
   unfold wN
@@ -115,12 +118,13 @@ theorem nodup_wN (L : ℕ) (T : Finset ℕ) : (wN L T).Nodup := by
   simp at ha hc
   exact hc.2 ha.2
 
-theorem sublist_of_lt {l m : List ℕ} (hl : l.Pairwise (· < ·)) (hm : m.Pairwise (· < ·))
-    (hs : ∀ x ∈ l, x ∈ m) : l.Sublist m :=
+theorem sublist_of_lt
+    {l m : List ℕ} (hl : l.Pairwise (· < ·)) (hm : m.Pairwise (· < ·)) (hs : ∀ x ∈ l, x ∈ m)
+    : l.Sublist m :=
   List.sublist_of_subperm_of_pairwise (List.subperm_of_subset hl.nodup hs) hl hm
 
-theorem run_sublist {L b l : ℕ} {T : Finset ℕ} (hbl : b + l ≤ L) :
-    ((List.range' b l).reverse).Sublist (wN L T) ↔ ∀ x, b < x → x < b + l → x ∈ T := by
+theorem run_sublist {L b l : ℕ} {T : Finset ℕ} (hbl : b + l ≤ L)
+    : ((List.range' b l).reverse).Sublist (wN L T) ↔ ∀ x, b < x → x < b + l → x ∈ T := by
   have hA : ((List.range L).filter (fun x => decide (x ∈ T))).Pairwise (· < ·) :=
     List.pairwise_lt_range.filter _
   have hB : ((List.range L).filter (fun x => decide (x ∉ T))).Pairwise (· < ·) :=
@@ -181,12 +185,13 @@ theorem run_sublist {L b l : ℕ} {T : Finset ℕ} (hbl : b + l ≤ L) :
       exact ⟨by omega, hb⟩
 
 def Cond (L : ℕ) (T : Finset ℕ) {h : ℕ} (b l : Fin h → ℕ) : Prop :=
-  (∀ i, ((List.range' (b i) (l i)).reverse).Sublist (wN L T)) ∧
-    (∀ x ∈ wN L T, ∃! i, x ∈ (List.range' (b i) (l i)).reverse)
+  (∀ i, ((List.range' (b i) (l i)).reverse).Sublist (wN L T))
+    ∧ (∀ x ∈ wN L T, ∃! i, x ∈ (List.range' (b i) (l i)).reverse)
 
-theorem cond_iff {L : ℕ} {T : Finset ℕ} {h : ℕ} {b l : Fin h → ℕ} (hl : ∀ i, 0 < l i) :
-    Cond L T b l ↔ (∀ i, b i + l i ≤ L) ∧ (∀ x < L, ∃! i, b i ≤ x ∧ x < b i + l i) ∧
-      (∀ i x, b i < x → x < b i + l i → x ∈ T) := by
+theorem cond_iff {L : ℕ} {T : Finset ℕ} {h : ℕ} {b l : Fin h → ℕ} (hl : ∀ i, 0 < l i)
+    : Cond L T b l
+      ↔ (∀ i, b i + l i ≤ L) ∧ (∀ x < L, ∃! i, b i ≤ x ∧ x < b i + l i)
+        ∧ (∀ i x, b i < x → x < b i + l i → x ∈ T) := by
   have hmem : ∀ i x, x ∈ (List.range' (b i) (l i)).reverse ↔ b i ≤ x ∧ x < b i + l i := by
     intro i x; simp [List.mem_range'_1]
   constructor
@@ -208,15 +213,18 @@ end PositivityTheory.Groth.AltC
 
 namespace PositivityTheory.Groth.AltC
 
-
 open Classical in
-theorem altSumN (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S, S ∈ s ↔ ∀ a ∈ S, (a : ℕ) ≠ 0)
-    {h : ℕ} (b l : Fin h → ℕ) (hl : ∀ i, 0 < l i) (f : Finset (Fin L) → ℤ)
-    (hf : ∀ S, f S = (-1) ^ S.card * if Cond L (S.map Fin.valEmbedding) b l then 1 else 0) :
-    ∑ S ∈ s, f S = if h = 1 ∧ ∀ i, b i = 0 ∧ l i = L then (-1) ^ (L - 1) else 0 := by
-  have hcond : ∀ S : Finset (Fin L), Cond L (S.map Fin.valEmbedding) b l ↔ (∀ i, b i + l i ≤ L) ∧
-      (∀ x < L, ∃! i, b i ≤ x ∧ x < b i + l i) ∧
-      (∀ i x, b i < x → x < b i + l i → ∃ a ∈ S, (a : ℕ) = x) := by
+theorem altSumN
+    (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S, S ∈ s ↔ ∀ a ∈ S, (a : ℕ) ≠ 0)
+    {h : ℕ} (b l : Fin h → ℕ) (hl : ∀ i, 0 < l i)
+    (f : Finset (Fin L) → ℤ)
+    (hf : ∀ S, f S = (-1) ^ S.card * if Cond L (S.map Fin.valEmbedding) b l then 1 else 0)
+    : ∑ S ∈ s, f S = if h = 1 ∧ ∀ i, b i = 0 ∧ l i = L then (-1) ^ (L - 1) else 0 := by
+  have hcond
+      : ∀ S : Finset (Fin L),
+        Cond L (S.map Fin.valEmbedding) b l
+          ↔ (∀ i, b i + l i ≤ L) ∧ (∀ x < L, ∃! i, b i ≤ x ∧ x < b i + l i)
+            ∧ (∀ i x, b i < x → x < b i + l i → ∃ a ∈ S, (a : ℕ) = x) := by
     intro S
     rw [cond_iff hl]
     simp [Finset.mem_map]
@@ -230,7 +238,10 @@ theorem altSumN (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S
       exact fun H => hB ⟨H.1, H.2.1⟩
     · rintro ⟨rfl, hbl⟩
       apply hB
-      refine ⟨fun i => by rw [(hbl i).1, (hbl i).2]; simp, fun x hx => ⟨0, ?_, fun j _ => Subsingleton.elim _ _⟩⟩
+      refine ⟨
+        fun i => by rw [(hbl i).1, (hbl i).2]; simp,
+        fun x hx => ⟨0, ?_, fun j _ => Subsingleton.elim _ _⟩
+      ⟩
       show b 0 ≤ x ∧ x < b 0 + l 0
       rw [(hbl 0).1, (hbl 0).2]
       exact ⟨Nat.zero_le _, by omega⟩
@@ -251,14 +262,21 @@ theorem altSumN (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S
       rw [← e2] at e1
       subst e1
       omega
-    have hg : ∀ S : Finset (Fin L), (if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding =
-        (if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding := fun _ => rfl
-    have hc : ∀ S : Finset (Fin L), Cond L ((if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding) b l ↔
-        Cond L (S.map Fin.valEmbedding) b l := by
+    have hg
+        : ∀ S : Finset (Fin L),
+          (if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding
+            = (if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding := fun _ =>
+      rfl
+    have hc
+        : ∀ S : Finset (Fin L),
+          Cond L ((if a ∈ S then S.erase a else insert a S).map Fin.valEmbedding) b l
+            ↔ Cond L (S.map Fin.valEmbedding) b l := by
       intro S
       rw [hcond, hcond]
-      refine and_congr_right fun _ => and_congr_right fun _ => forall_congr' fun i => forall_congr' fun x =>
-        imp_congr_right fun h1 => imp_congr_right fun h2 => ?_
+      refine and_congr_right fun _ =>
+        and_congr_right fun _ =>
+          forall_congr' fun i =>
+            forall_congr' fun x => imp_congr_right fun h1 => imp_congr_right fun h2 => ?_
       have hxa := hint i x h1 h2
       constructor
       · rintro ⟨a', ha', rfl⟩
@@ -274,8 +292,9 @@ theorem altSumN (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S
         split_ifs
         · exact Finset.mem_erase.2 ⟨this, ha'⟩
         · exact Finset.mem_insert_of_mem ha'
-    have hcard : ∀ S : Finset (Fin L), (-1 : ℤ) ^ (if a ∈ S then S.erase a else insert a S).card =
-        -(-1) ^ S.card := by
+    have hcard
+        : ∀ S : Finset (Fin L),
+          (-1 : ℤ) ^ (if a ∈ S then S.erase a else insert a S).card = - (-1) ^ S.card := by
       intro S
       split_ifs with haS
       · rw [Finset.card_erase_of_mem haS]
@@ -322,8 +341,11 @@ theorem altSumN (L : ℕ) (hL : 0 < L) (s : Finset (Finset (Fin L))) (hs : ∀ S
       rw [hall k, hz] at hk
       omega
     rw [if_pos ⟨rfl, fun i => ⟨hz i, hlL i⟩⟩]
-    obtain ⟨S0, hS0def⟩ : ∃ S0 : Finset (Fin L), S0 = Finset.univ.filter (fun a : Fin L => (a : ℕ) ≠ 0) := ⟨_, rfl⟩
-    have hS0 : S0 ∈ s := (hs S0).2 (fun a ha => by rw [hS0def] at ha; exact (Finset.mem_filter.1 ha).2)
+    obtain ⟨S0, hS0def⟩
+        : ∃ S0 : Finset (Fin L), S0 = Finset.univ.filter (fun a : Fin L => (a : ℕ) ≠ 0) :=
+      ⟨_, rfl⟩
+    have hS0 : S0 ∈ s :=
+      (hs S0).2 (fun a ha => by rw [hS0def] at ha; exact (Finset.mem_filter.1 ha).2)
     rw [Finset.sum_eq_single_of_mem S0 hS0]
     · rw [hf, if_pos, mul_one]
       · congr 1

@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
@@ -18,20 +19,22 @@ private def lin {κ : Type} (c : κ → ℂ) : List κ → Ex κ
   | [] => Ex.smul 0 Ex.one
   | p :: L => Ex.add (Ex.smul (c p) (Ex.gen p)) (lin c L)
 
-private theorem ev_lin {κ : Type} (c x : κ → ℂ) (L : List κ) :
-    (lin c L).ev x = (L.map fun p => c p * x p).sum := by
+private theorem ev_lin {κ : Type} (c x : κ → ℂ) (L : List κ)
+    : (lin c L).ev x = (L.map fun p => c p * x p).sum := by
   induction L with
   | nil => simp [lin, Ex.ev]
   | cons p L ih => simp [lin, Ex.ev, ih]
 
-private theorem fn_lin {κ : Type} {G : Type} [Group G] (K : Subgroup G) (g : κ → G → ℂ) (c : κ → ℂ)
-    (L : List κ) (y : G) : (lin c L).fn K g y = (L.map fun p => c p * g p y).sum := by
+private theorem fn_lin
+    {κ : Type} {G : Type} [Group G]
+    (K : Subgroup G) (g : κ → G → ℂ) (c : κ → ℂ) (L : List κ) (y : G)
+    : (lin c L).fn K g y = (L.map fun p => c p * g p y).sum := by
   induction L with
   | nil => simp [lin, Ex.fn]
   | cons p L ih => simp [lin, Ex.fn, ih]
 
-private theorem ev_bind {ι κ : Type} (x : κ → ℂ) (τ : ι → Ex κ) (e : Ex ι) :
-    (e.bind τ).ev x = e.ev fun i => (τ i).ev x := by
+private theorem ev_bind {ι κ : Type} (x : κ → ℂ) (τ : ι → Ex κ) (e : Ex ι)
+    : (e.bind τ).ev x = e.ev fun i => (τ i).ev x := by
   induction e with
   | one => rfl
   | gen i => rfl
@@ -39,8 +42,9 @@ private theorem ev_bind {ι κ : Type} (x : κ → ℂ) (τ : ι → Ex κ) (e :
   | add a b iha ihb => simp [Ex.bind, Ex.ev, iha, ihb]
   | mul a b iha ihb => simp [Ex.bind, Ex.ev, iha, ihb]
 
-private theorem hint_const_mul {H : Type} [Group H] (K : Subgroup H) (c : ℂ) (hc : c ≠ 0) (u : H → ℂ) :
-    hint K (fun z => c * u z) = c * hint K u := by
+private theorem hint_const_mul
+    {H : Type} [Group H] (K : Subgroup H) (c : ℂ) (hc : c ≠ 0) (u : H → ℂ)
+    : hint K (fun z => c * u z) = c * hint K u := by
   have hs : rStab (fun z => c * u z) = rStab u := by
     ext g
     simp [rStab, hc]
@@ -56,14 +60,17 @@ private def tco (q a b : ℕ) (c₁ c₂ : ℂˣ) (j : ℕ) (p : Fin (a + 1) × 
 private def tEx (q a b : ℕ) (c₁ c₂ : ℂˣ) (j : ℕ) : Ex (Fin (a + 1) × Fin (b + 1)) :=
   lin (tco q a b c₁ c₂ j) Finset.univ.toList
 
-private theorem ev_tEx (q a b : ℕ) (c₁ c₂ : ℂˣ) (j : ℕ) (x : Fin (a + 1) × Fin (b + 1) → ℂ) :
-    (tEx q a b c₁ c₂ j).ev x = ∑ p, tco q a b c₁ c₂ j p * x p := by
+private theorem ev_tEx (q a b : ℕ) (c₁ c₂ : ℂˣ) (j : ℕ) (x : Fin (a + 1) × Fin (b + 1) → ℂ)
+    : (tEx q a b c₁ c₂ j).ev x = ∑ p, tco q a b c₁ c₂ j p * x p := by
   rw [tEx, ev_lin]
   exact Finset.sum_map_toList _ _
 
-private theorem fn_tEx {G : Type} [Group G] (K : Subgroup G) (q a b : ℕ) (c₁ c₂ : ℂˣ) (j : ℕ)
-    (g : Fin (a + 1) × Fin (b + 1) → G → ℂ) (y : G) :
-    (tEx q a b c₁ c₂ j).fn K g y = ∑ p, tco q a b c₁ c₂ j p * g p y := by
+private theorem fn_tEx
+    {G : Type} [Group G]
+    (K : Subgroup G)
+    (q a b : ℕ)
+    (c₁ c₂ : ℂˣ) (j : ℕ) (g : Fin (a + 1) × Fin (b + 1) → G → ℂ) (y : G)
+    : (tEx q a b c₁ c₂ j).fn K g y = ∑ p, tco q a b c₁ c₂ j p * g p y := by
   rw [tEx, fn_lin]
   exact Finset.sum_map_toList _ _
 
@@ -79,10 +86,11 @@ theorem rCtEx : RCtEx := by
     have hm : y ∈ UL (a + b) w := by simp [UL, hs]
     simp [toSub, hm]
   have hne : ∀ m, chi μ a b w m ≠ 0 := fun m => Units.ne_zero _
-  let t : Fin (a + b + 1) → Ex (Fin (a + 1) × Fin (b + 1)) :=
-    fun j => tEx (qV E w) a b (μ.val w ^ b) (μ.val w ^ a) j
-  have key : ∀ e : Ex (Fin (a + b + 1)),
-      (fun m => chi μ a b w m * ct rfl w (fn1 (a + b) w e) m) = fn2 a b w (e.bind t) := by
+  let t : Fin (a + b + 1) → Ex (Fin (a + 1) × Fin (b + 1)) := fun j =>
+    tEx (qV E w) a b (μ.val w ^ b) (μ.val w ^ a) j
+  have key
+      : ∀ e : Ex (Fin (a + b + 1)),
+        (fun m => chi μ a b w m * ct rfl w (fn1 (a + b) w e) m) = fn2 a b w (e.bind t) := by
     intro e
     induction e with
     | one =>
@@ -112,17 +120,21 @@ theorem rCtEx : RCtEx := by
       funext m
       ring
     | add e₁ e₂ ih₁ ih₂ =>
-      have h1 : fn1 (a + b) w (Ex.add e₁ e₂) = fun y => fn1 (a + b) w e₁ y + fn1 (a + b) w e₂ y := rfl
+      have h1 : fn1 (a + b) w (Ex.add e₁ e₂) = fun y => fn1 (a + b) w e₁ y + fn1 (a + b) w e₂ y :=
+        rfl
       have h2 := (hLin E w (a + b) a b rfl _ _ 1 (hEx E (a + b) w e₁).1 (hEx E (a + b) w e₂).1).1
       show _ = fun y => fn2 a b w (e₁.bind t) y + fn2 a b w (e₂.bind t) y
       rw [h1, h2, ← ih₁, ← ih₂]
       funext m
       ring
     | mul e₁ e₂ ih₁ ih₂ =>
-      have h1 : fn1 (a + b) w (Ex.mul e₁ e₂) =
-          cv (KGL w (n := (a + b))) (fn1 (a + b) w e₁) (fn1 (a + b) w e₂) := rfl
+      have h1
+          : fn1 (a + b) w (Ex.mul e₁ e₂)
+            = cv (KGL w (n := (a + b))) (fn1 (a + b) w e₁) (fn1 (a + b) w e₂) :=
+        rfl
       show _ = fun y => hint (K2 a b w) fun z => fn2 a b w (e₁.bind t) z * fn2 a b w (e₂.bind t) (z⁻¹ * y)
-      rw [h1, hMul E w (a + b) a b rfl _ _ (hEx E (a + b) w e₁).1 (hEx E (a + b) w e₂).1, ← ih₁, ← ih₂]
+      rw [h1, hMul E w (a + b) a b rfl _ _ (hEx E (a + b) w e₁).1 (hEx E (a + b) w e₂).1, ← ih₁,
+        ← ih₂]
       funext m
       show chi μ a b w m * hint (K2 a b w) (fun z => ct rfl w (fn1 (a + b) w e₁) z *
           ct rfl w (fn1 (a + b) w e₂) (z⁻¹ * m)) = _
@@ -137,8 +149,9 @@ theorem rCtEx : RCtEx := by
   · intro e
     rw [← key e]
     funext m
-    have hf : (fun y : GLw (a + b) w => (fun x : UL (a + b) w => fn1 (a + b) w e x.1) (toSub _ y)) =
-        fn1 (a + b) w e := by
+    have hf
+        : (fun y : GLw (a + b) w => (fun x : UL (a + b) w => fn1 (a + b) w e x.1) (toSub _ y))
+          = fn1 (a + b) w e := by
       funext y
       show fn1 (a + b) w e (toSub (UL (a + b) w) y : UL (a + b) w).1 = _
       rw [hy]

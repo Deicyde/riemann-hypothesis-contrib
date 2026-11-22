@@ -7,20 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsCompact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField Formalism.L2.Theta
-open Formalism.IndefR.Mult Formalism.UG GlobalTheory.SphPar GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefTransfer
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField Formalism.L2.Theta
+open Formalism.IndefR.Mult Formalism.UG GlobalTheory.SphPar GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC GlobalTheory.DefTransfer
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-theorem signs_pos_of_frame_gram_posdef {r : ℕ} (ε : Fin r → Bool) (fr G : Matrix (Fin r) (Fin r) ℂ)
-    (h : fr.conjTranspose * Formalism.REAL.Jm ε * fr = G) (hs : Formalism.UG.HasSignature G r 0) :
-    ∀ i, ε i = true := by
+theorem signs_pos_of_frame_gram_posdef
+    {r : ℕ} (ε : Fin r → Bool) (fr G : Matrix (Fin r) (Fin r) ℂ)
+    (h : fr.conjTranspose * Formalism.REAL.Jm ε * fr = G) (hs : Formalism.UG.HasSignature G r 0)
+    : ∀ i, ε i = true := by
   obtain ⟨e, P, hP⟩ := hs
-  have hcT : Formalism.UG.cT (starRingEnd ℂ) (P : Matrix (Fin r ⊕ Fin 0) (Fin r ⊕ Fin 0) ℂ) =
-      (P : Matrix (Fin r ⊕ Fin 0) (Fin r ⊕ Fin 0) ℂ).conjTranspose := by
+  have hcT
+      : Formalism.UG.cT (starRingEnd ℂ) (P : Matrix (Fin r ⊕ Fin 0) (Fin r ⊕ Fin 0) ℂ)
+        = (P : Matrix (Fin r ⊕ Fin 0) (Fin r ⊕ Fin 0) ℂ).conjTranspose := by
     ext i j; simp [Formalism.UG.cT, Matrix.conjTranspose_apply]
   have hJ0 : Formalism.UG.Jpq r 0 = 1 := by
     ext i j
@@ -47,7 +52,9 @@ theorem signs_pos_of_frame_gram_posdef {r : ℕ} (ε : Fin r → Bool) (fr G : M
   by_contra hi
   have hi' : ε i = false := by simpa using hi
   have h5 := congrFun (congrFun h4 i) i
-  simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Formalism.REAL.Jm, Matrix.diagonal_apply_eq, hi'] at h5
+  simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Formalism.REAL.Jm,
+      Matrix.diagonal_apply_eq, hi']
+    at h5
   have h6 := congrArg Complex.re h5
   simp only [Complex.re_sum, Bool.false_eq_true, if_false, Complex.neg_re, Complex.one_re] at h6
   have h7 : ∀ k, 0 ≤ (Q i k * star (Q i k)).re := by

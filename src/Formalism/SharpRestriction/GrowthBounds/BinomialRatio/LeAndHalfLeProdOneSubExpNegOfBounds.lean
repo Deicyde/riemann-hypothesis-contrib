@@ -12,11 +12,13 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-theorem le_and_half_le_prod_one_sub_exp_neg_of_bounds {a b' k Q Y La N1 A0 m M : ℝ} (hk : 5 ≤ k) (hQ : 1 ≤ Q) (hY : 1 ≤ Y) (hN1 : 1 ≤ N1) (hLa : 24 ≤ La)
-    (hb : 0 < b') (hab : k * Y * La * b' ≤ a) (hkQ : k ^ 3 * Q ≤ b') (hA0 : a / (2 * Q) ≤ A0) (hm0 : 0 ≤ m)
-    (hm : m ≤ b' / (k * Q * Y)) (hM0 : 0 ≤ M) (hM : M < m + 1) :
-    M ≤ A0 * N1 * La / k ∧
-      1 / 2 ≤ (1 - Real.exp (-La / 8)) * (1 - Real.exp (-La / 3)) * (1 - (k - 1) * M / A0) := by
+theorem le_and_half_le_prod_one_sub_exp_neg_of_bounds
+    {a b' k Q Y La N1 A0 m M : ℝ}
+    (hk : 5 ≤ k) (hQ : 1 ≤ Q) (hY : 1 ≤ Y) (hN1 : 1 ≤ N1) (hLa : 24 ≤ La) (hb : 0 < b')
+    (hab : k * Y * La * b' ≤ a) (hkQ : k ^ 3 * Q ≤ b') (hA0 : a / (2 * Q) ≤ A0) (hm0 : 0 ≤ m)
+    (hm : m ≤ b' / (k * Q * Y)) (hM0 : 0 ≤ M) (hM : M < m + 1)
+    : M ≤ A0 * N1 * La / k
+      ∧ 1 / 2 ≤ (1 - Real.exp (-La / 8)) * (1 - Real.exp (-La / 3)) * (1 - (k - 1) * M / A0) := by
   have hk0 : 0 < k := by linarith
   have hQ0 : 0 < Q := by linarith
   have hY0 : 0 < Y := by linarith
@@ -24,7 +26,8 @@ theorem le_and_half_le_prod_one_sub_exp_neg_of_bounds {a b' k Q Y La N1 A0 m M :
 
   have h1 : m * (k * Q * Y) ≤ b' := (le_div_iff₀ (mul_pos hkQ0 hY0)).mp hm
   have h2 : m * (k * Q) ≤ b' := by
-    have : m * (k * Q) * 1 ≤ m * (k * Q) * Y := mul_le_mul_of_nonneg_left hY (mul_nonneg hm0 hkQ0.le)
+    have : m * (k * Q) * 1 ≤ m * (k * Q) * Y :=
+      mul_le_mul_of_nonneg_left hY (mul_nonneg hm0 hkQ0.le)
     nlinarith
 
   have h3 : k * Q ≤ b' := by
@@ -80,8 +83,9 @@ theorem le_and_half_le_prod_one_sub_exp_neg_of_bounds {a b' k Q Y La N1 A0 m M :
     have u3 : 29 / 30 ≤ 1 - (k - 1) * M / A0 := by linarith
     have v1 : (3 / 4 : ℝ) * (8 / 9) ≤ (1 - Real.exp (-La / 8)) * (1 - Real.exp (-La / 3)) :=
       mul_le_mul u1 u2 (by norm_num) (by linarith)
-    have v2 : (3 / 4 : ℝ) * (8 / 9) * (29 / 30) ≤
-        (1 - Real.exp (-La / 8)) * (1 - Real.exp (-La / 3)) * (1 - (k - 1) * M / A0) :=
+    have v2
+        : (3 / 4 : ℝ) * (8 / 9) * (29 / 30)
+          ≤ (1 - Real.exp (-La / 8)) * (1 - Real.exp (-La / 3)) * (1 - (k - 1) * M / A0) :=
       mul_le_mul v1 u3 (by norm_num) (by linarith)
     linarith [v2, (by norm_num : (1 / 2 : ℝ) ≤ (3 / 4 : ℝ) * (8 / 9) * (29 / 30))]
 
@@ -89,10 +93,12 @@ section Plug
 
 variable {C0 Cde CE1 CE2 H : ℝ} {X : Loc}
 
-theorem Std.half_ratio_le_segment_base_of_std (h : Std C0 Cde CE1 CE2 H X) (j : Fin (numSeg X.TT)) :
-    (X.a : ℝ) / (2 * X.Q) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
-  have hA : (X.seg C0 CE1 CE2 j).A0 X.p =
-      ⌊((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ)⌋ := rfl
+theorem Std.half_ratio_le_segment_base_of_std (h : Std C0 Cde CE1 CE2 H X) (j : Fin (numSeg X.TT))
+    : (X.a : ℝ) / (2 * X.Q) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
+  have hA
+      : (X.seg C0 CE1 CE2 j).A0 X.p
+        = ⌊((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ)⌋ :=
+    rfl
   rw [hA]
   have hp1 := h.p1
   have ha := h.apos
@@ -119,14 +125,15 @@ theorem Std.half_ratio_le_segment_base_of_std (h : Std C0 Cde CE1 CE2 H X) (j : 
     have := (div_le_iff₀ ha).mp h3
     linarith
   have hnum : 0 ≤ (X.a : ℝ) - X.E0 C0 CE1 CE2 := by linarith
-  have h1 : ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q ≤
-      ((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ) :=
+  have h1
+      : ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q
+        ≤ ((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ) :=
     div_le_div_of_nonneg_left hnum hQj0 hQjQ
   have h2 := Int.sub_one_lt_floor (((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ))
   have h3 : (X.a : ℝ) / (2 * X.Q) ≤ ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q - 1 := by
     rw [div_le_iff₀ (by linarith)]
-    have : (((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q - 1) * (2 * X.Q) =
-        2 * ((X.a : ℝ) - X.E0 C0 CE1 CE2 - X.Q) := by
+    have : (((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q - 1) * (2 * X.Q)
+        = 2 * ((X.a : ℝ) - X.E0 C0 CE1 CE2 - X.Q) := by
       field_simp
     rw [this]
     linarith
@@ -144,10 +151,15 @@ theorem Std.La_ge (h : Std C0 Cde CE1 CE2 H X) (hC0 : 0 ≤ C0) : C0 ≤ X.La C0
 
 end Plug
 
-theorem one_segment_of_upper_lower {D : Formalism.BasicNotions.D7} (hU : RestUp) (hL : RestLow) : RootMultiplicityTwoBeyond D := by
-  have hS : TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 _ Cc => 24 ≤ C0 ∧
-      ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X :=
-    TransportedAlt.of_explicit (fun _ => 24) (fun _ _ => 1) (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
+theorem one_segment_of_upper_lower {D : Formalism.BasicNotions.D7} (hU : RestUp) (hL : RestLow)
+    : RootMultiplicityTwoBeyond D := by
+  have hS : TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 _ Cc =>
+      24 ≤ C0
+        ∧ ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X :=
+    TransportedAlt.of_explicit
+      (fun _ => 24)
+      (fun _ _ => 1)
+      (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
       fun _ _ _ _ _ _ _ _ _ _ hCc hC0 h24 h1 h2 _ _ _ _ _ _ _ _ _ t1 t2 t3 t4 t5 =>
         ⟨h24, fun _ hD hI hc => std_of hCc hC0 h1 h2 le_rfl t1 t2 t3 t4 t5 hD hI hc⟩
   refine TransportedAlt.mono ?_ ((hS.and hU).and hL)
@@ -156,8 +168,10 @@ theorem one_segment_of_upper_lower {D : Formalism.BasicNotions.D7} (hU : RestUp)
   have hD1 : D1num X := ⟨hSet.1.prime, hSet.1.five_le, hSet.1.two_le, hSet.1.even⟩
   have hs := hstd X hD1 hH hc
   have hLa : 24 ≤ X.La C0 := le_trans h24 (hs.La_ge (by linarith))
-  have hcore := le_and_half_le_prod_one_sub_exp_neg_of_bounds (M := ((⌈m⌉₊ : ℕ) : ℝ)) hs.k5 hs.Q1 hs.Y1 hs.one_le_level_alt hLa hs.bpos hs.kYLab (hs.kQ le_rfl) (hs.half_ratio_le_segment_base_of_std j)
-    hm0 hmM (Nat.cast_nonneg _) (Nat.ceil_lt_add_one hm0)
+  have hcore :=
+    le_and_half_le_prod_one_sub_exp_neg_of_bounds (M := ((⌈m⌉₊ : ℕ) : ℝ)) hs.k5 hs.Q1 hs.Y1
+      hs.one_le_level_alt hLa hs.bpos hs.kYLab (hs.kQ le_rfl)
+      (hs.half_ratio_le_segment_base_of_std j) hm0 hmM (Nat.cast_nonneg _) (Nat.ceil_lt_add_one hm0)
   refine ⟨?_, up X W Qq O Kf ι σ jO w hSet hH hc j m hm0 rz ry hd⟩
   have hlow := low X W Qq O Kf ι σ jO w hSet hH hc j m hm0 hcore.1 rz ry hd
   have hfac : 1 / 2 ≤ lowFac C0 CE1 CE2 X j ⌈m⌉₊ := by
@@ -166,9 +180,12 @@ theorem one_segment_of_upper_lower {D : Formalism.BasicNotions.D7} (hU : RestUp)
     rw [hkm]
     exact hcore.2
   have hmm : (0 : ℝ) ≤ (mmB C0 CE1 CE2 X j rz ry : ℝ) := Nat.cast_nonneg _
-  have h1 : 1 / 2 * (mmB C0 CE1 CE2 X j rz ry : ℝ) ≤ lowFac C0 CE1 CE2 X j ⌈m⌉₊ * (mmB C0 CE1 CE2 X j rz ry : ℝ) :=
+  have h1
+      : 1 / 2 * (mmB C0 CE1 CE2 X j rz ry : ℝ)
+        ≤ lowFac C0 CE1 CE2 X j ⌈m⌉₊ * (mmB C0 CE1 CE2 X j rz ry : ℝ) :=
     mul_le_mul_of_nonneg_right hfac hmm
-  have h2 : (mmB C0 CE1 CE2 X j rz ry : ℝ) / 2 ≤ (rankOnDigits O C0 CE1 CE2 X j m rz ry : ℝ) := by linarith
+  have h2 : (mmB C0 CE1 CE2 X j rz ry : ℝ) / 2 ≤ (rankOnDigits O C0 CE1 CE2 X j m rz ry : ℝ) := by
+    linarith
   exact h2
 
 end Formalism.MainNotions.ColumnSystems.Pf

@@ -12,7 +12,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 
 namespace GlobalTheory.FourierChainCompare
 
@@ -21,7 +22,6 @@ section Duality
 variable {A B K : Type} [AddCommGroup A] [AddCommGroup B] [Field K]
 
 variable [Fintype A] [Fintype B]
-
 
 end Duality
 
@@ -44,20 +44,27 @@ theorem act_zero {O : Type} [CommRing O] {G : FGLaw R d} (A : OAct O G) : A.act 
     rw [← h1] at this
     exact left_eq_add.mp this
   have h4 : ∀ i, 2 ≤ (A.act 0 i).order := fun i =>
-    GlobalTheory.FormalSeries.two_le_order_iff.mpr ⟨hc i, fun j => by
-      obtain ⟨j0, j⟩ := j
-      obtain rfl : j0 = 0 := Subsingleton.elim _ _
-      exact congrFun (congrFun h3 i) j⟩
+    GlobalTheory.FormalSeries.two_le_order_iff.mpr ⟨
+      hc i,
+      fun j => by
+        obtain ⟨j0, j⟩ := j
+        obtain rfl : j0 = 0 := Subsingleton.elim _ _
+        exact congrFun (congrFun h3 i) j
+    ⟩
   have h5 : ∀ (k : ℕ) i, (k : ℕ∞) ≤ (A.act 0 i).order := by
     intro k
     induction k with
     | zero => simp
     | succ k ih =>
       intro i
-      have := GlobalTheory.FormalSeries.le_order_subst_sub_subst
-        (a := fun p : Fin 1 × Fin d => (![A.act 0] : Fin 1 → Pt R 1 d) p.1 p.2) (b := 0) (k := k)
-        (fun p => GlobalTheory.GaugeAdjoint.const_one hc p.1 p.2) (by simp)
-        (fun p => by simpa using ih p.2) (h4 i)
+      have :=
+        GlobalTheory.FormalSeries.le_order_subst_sub_subst
+          (a := fun p : Fin 1 × Fin d => (![A.act 0] : Fin 1 → Pt R 1 d) p.1 p.2)
+          (b := 0) (k := k)
+          (fun p => GlobalTheory.GaugeAdjoint.const_one hc p.1 p.2)
+          (by simp)
+          (fun p => by simpa using ih p.2)
+          (h4 i)
       rw [subst_zero_of_constantCoeff_zero (hc i), sub_zero] at this
       rw [congrFun h2 i]
       exact this

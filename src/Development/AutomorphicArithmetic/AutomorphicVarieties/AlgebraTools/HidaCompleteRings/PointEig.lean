@@ -9,15 +9,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.pointEig :
-    ∀ {Λ T K M : Type*} [CommRing Λ] [CommRing T] [Algebra Λ T] [Field K] [Algebra Λ K] [AddCommGroup M] [Module Λ M] [Module T M] [IsScalarTower Λ T M] [Module.Finite Λ M] [FaithfulSMul T M] (x : T →ₐ[Λ] K), ∃ y : K ⊗[Λ] M, y ≠ 0 ∧ ∀ t : T, (Algebra.lsmul Λ Λ M t).baseChange K y = x t • y := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.pointEig
+    : ∀ {Λ T K M : Type*} [CommRing Λ] [CommRing T] [Algebra Λ T] [Field K] [Algebra Λ K]
+        [AddCommGroup M] [Module Λ M] [Module T M] [IsScalarTower Λ T M] [Module.Finite Λ M]
+        [FaithfulSMul T M] (x : T →ₐ[Λ] K),
+      ∃ y : K ⊗[Λ] M,
+        y ≠ 0 ∧ ∀ t : T, (Algebra.lsmul Λ Λ M t).baseChange K y = x t • y := by
   intro Λ T K M _ _ _ _ _ _ _ _ _ _ _ x
   letI : Algebra T K := x.toRingHom.toAlgebra
   haveI : IsScalarTower Λ T K := IsScalarTower.of_algebraMap_eq fun r => (x.commutes r).symm
   haveI : Module.Finite T M := Module.Finite.of_restrictScalars_finite Λ T M
   have hne : Nontrivial (K ⊗[T] M) := UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.fibreNe
-  let φ : K ⊗[Λ] M →ₗ[K] K ⊗[T] M := TensorProduct.AlgebraTensorModule.lift
-    ((LinearMap.restrictScalarsₗ Λ T M (K ⊗[T] M) K).comp
+  let φ : K ⊗[Λ] M →ₗ[K] K ⊗[T] M :=
+    TensorProduct.AlgebraTensorModule.lift ((LinearMap.restrictScalarsₗ Λ T M (K ⊗[T] M) K).comp
       (TensorProduct.AlgebraTensorModule.mk T K K M))
   have hφt : ∀ (k : K) (m : M), φ (k ⊗ₜ[Λ] m) = k ⊗ₜ[T] m := by
     intro k m
@@ -33,8 +37,7 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.pointEig :
     intro y
     induction y using TensorProduct.induction_on with
     | zero => simp
-    | tmul k m =>
-      rw [Module.End.mul_apply, Module.End.mul_apply, hA, hA, hA, hA, smul_comm]
+    | tmul k m => rw [Module.End.mul_apply, Module.End.mul_apply, hA, hA, hA, hA, smul_comm]
     | add a b ha hb =>
       rw [Module.End.mul_apply, Module.End.mul_apply] at ha hb ⊢
       rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), map_add (f := _)]
@@ -45,8 +48,7 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.pointEig :
     | tmul k m =>
       rw [hA, hφt, hφt, ← TensorProduct.smul_tmul, TensorProduct.smul_tmul']
       congr 1
-    | add a b ha hb =>
-      rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), smul_add]
+    | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _), smul_add]
   have hφ0 : φ ≠ 0 := by
     intro h0
     have hall : ∀ p : K ⊗[T] M, p = 0 := by

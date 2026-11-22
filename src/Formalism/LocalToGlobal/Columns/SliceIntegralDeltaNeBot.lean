@@ -16,23 +16,33 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.DIV Formalism.LFunctionChainParameters.LLcv
+open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory
+  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.DIV Formalism.LFunctionChainParameters.LLcv
 
 namespace T2
 
-abbrev piL {R V : Type} [CommRing R] [AddCommGroup V] [Module R V] (β : Type) (L : Submodule R V) :
-    Submodule R (β → V) := Submodule.pi Set.univ fun _ => L
+abbrev piL {R V : Type} [CommRing R] [AddCommGroup V] [Module R V] (β : Type) (L : Submodule R V)
+    : Submodule R (β → V) :=
+  Submodule.pi Set.univ fun _ => L
 
-def kronMap (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] {α β : Type} [Fintype β] (t : Matrix β α ℤ) :
-    (β → M) →ₗ[R] (α → M) :=
+def kronMap
+    (R M : Type) [CommRing R] [AddCommGroup M] [Module R M]
+    {α β : Type} [Fintype β]
+    (t : Matrix β α ℤ)
+    : (β → M) →ₗ[R] (α → M) :=
   LinearMap.pi fun a => ∑ b, t b a • LinearMap.proj b
 
-def piKron {ι : Type} [Fintype ι] {α : ι → Type} {R : Type} [CommRing R] (M : ∀ i, Matrix (α i) (α i) R) :
-    Matrix (∀ i, α i) (∀ i, α i) R :=
+def piKron
+    {ι : Type} [Fintype ι] {α : ι → Type} {R : Type} [CommRing R] (M : ∀ i, Matrix (α i) (α i) R)
+    : Matrix (∀ i, α i) (∀ i, α i) R :=
   Matrix.of fun a b => ∏ i, M i (a i) (b i)
 
-def piKronOn {ι : Type} [Fintype ι] [DecidableEq ι] {α : ι → Type} [∀ i, DecidableEq (α i)] {R : Type} [CommRing R]
-    (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) : Matrix (∀ i, α i) (∀ i, α i) R :=
+def piKronOn
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {α : ι → Type} [∀ i, DecidableEq (α i)]
+    {R : Type} [CommRing R]
+    (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι)
+    : Matrix (∀ i, α i) (∀ i, α i) R :=
   Matrix.of fun a b => (∏ i ∈ s, M i (a i) (b i)) * if ∀ i, i ∉ s → a i = b i then 1 else 0
 
 section
@@ -57,8 +67,9 @@ end T2
 
 namespace GSD
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {S : GSD K}
-  {A : Type} [Group A] [MulAction A S.D] [SMulCommClass A S.G S.D]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {S : GSD K} {A : Type} [Group A] [MulAction A S.D] [SMulCommClass A S.G S.D]
 
 end GSD
 
@@ -70,9 +81,9 @@ variable {R V : Type} [CommRing R] [AddCommGroup V] [Module R V]
 
 variable {β : Type} [Fintype β]
 
-theorem relIndex_piL (A A' : Submodule R V) :
-    (piL β A).toAddSubgroup.relIndex (piL β A').toAddSubgroup =
-      (A.toAddSubgroup.relIndex A'.toAddSubgroup) ^ Fintype.card β := by
+theorem relIndex_piL (A A' : Submodule R V)
+    : (piL β A).toAddSubgroup.relIndex (piL β A').toAddSubgroup
+      = (A.toAddSubgroup.relIndex A'.toAddSubgroup) ^ Fintype.card β := by
   classical
   let f : (β → A') →ₗ[R] (β → V) := LinearMap.pi fun b => A'.subtype ∘ₗ LinearMap.proj b
   have hr : f.toAddMonoidHom.range = (piL β A').toAddSubgroup := by
@@ -83,25 +94,28 @@ theorem relIndex_piL (A A' : Submodule R V) :
       exact (G b).2
     · intro hF
       exact ⟨fun b => ⟨F b, hF b (Set.mem_univ b)⟩, rfl⟩
-  have hc : (piL β A).toAddSubgroup.comap f.toAddMonoidHom =
-      (Submodule.pi Set.univ fun _ : β => A.comap A'.subtype).toAddSubgroup := by
+  have hc
+      : (piL β A).toAddSubgroup.comap f.toAddMonoidHom
+        = (Submodule.pi Set.univ fun _ : β => A.comap A'.subtype).toAddSubgroup := by
     ext F
     rfl
   rw [← hr, ← AddSubgroup.index_comap, hc]
   show Nat.card ((β → A') ⧸ Submodule.pi Set.univ fun _ : β => A.comap A'.subtype) = _
-  rw [Nat.card_congr (Submodule.quotientPi _).toEquiv, Nat.card_pi, Finset.prod_const, Finset.card_univ]
+  rw [Nat.card_congr (Submodule.quotientPi _).toEquiv, Nat.card_pi, Finset.prod_const,
+    Finset.card_univ]
   rfl
 
-theorem piL_span [DecidableEq β] {γ : Type} (e : γ → V) :
-    piL β (Submodule.span R (Set.range e)) =
-      Submodule.span R (Set.range fun p : β × γ => (Pi.single p.1 (e p.2) : β → V)) := by
+theorem piL_span [DecidableEq β] {γ : Type} (e : γ → V)
+    : piL β (Submodule.span R (Set.range e))
+      = Submodule.span R (Set.range fun p : β × γ => (Pi.single p.1 (e p.2) : β → V)) := by
   apply le_antisymm
   · intro x hx
     rw [← Finset.univ_sum_single x]
     refine Submodule.sum_mem _ fun b _ => ?_
     have hb : x b ∈ Submodule.span R (Set.range e) := hx b (Set.mem_univ b)
-    have hle : Submodule.map (LinearMap.single R (fun _ : β => V) b) (Submodule.span R (Set.range e)) ≤
-        Submodule.span R (Set.range fun p : β × γ => (Pi.single p.1 (e p.2) : β → V)) := by
+    have hle
+        : Submodule.map (LinearMap.single R (fun _ : β => V) b) (Submodule.span R (Set.range e))
+          ≤ Submodule.span R (Set.range fun p : β × γ => (Pi.single p.1 (e p.2) : β → V)) := by
       rw [Submodule.map_span_le]
       rintro _ ⟨g, rfl⟩
       exact Submodule.subset_span ⟨(b, g), rfl⟩
@@ -122,10 +136,13 @@ section Slope
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
 
-theorem mu_eq_log_ht {V ι : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    [Fintype ι] [DecidableEq ι] (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (L : Submodule (𝓞 K) V) (hL : L.FG) (h0 : L ≠ ⊥) :
-    muDef b X L = -Real.log (ht b X L) / ((nPl K : ℝ) * (rkK L : ℝ)) := by
+theorem mu_eq_log_ht
+    {V ι : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    [Fintype ι] [DecidableEq ι]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (L : Submodule (𝓞 K) V) (hL : L.FG) (h0 : L ≠ ⊥)
+    : muDef b X L = - Real.log (ht b X L) / ((nPl K : ℝ) * (rkK L : ℝ)) := by
   have h1 := (sizeMu K V ι b X hX L hL h0).2.1
   have h2 := (plLat K V ι b X hX L hL).2.2
   rw [h1]
@@ -133,17 +150,20 @@ theorem mu_eq_log_ht {V ι : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K
   rw [Real.log_rpow h2]
   ring
 
-theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ ⊥)
+theorem kron_mu
+    (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ ⊥)
     {β : Type} [Fintype β] [DecidableEq β] [Nonempty β]
-    (Ψ : (β → Wh.V) →ₗ[K] B.V) (hΨ : Function.Injective Ψ) (g : Matrix β β ℤ) (hg : 0 < g.det)
-    (hmaj : ∀ v F F', majAt B.b B.X v (Ψ F) (Ψ F') =
-      ∑ b, ∑ c, (g b c : ℂ) * majAt Wh.b Wh.X v (F b) (F' c)) :
-    (withL B ((piL β Wh.L).map (Ψ.restrictScalars (𝓞 K)))).mu =
-      Wh.mu - Real.log (g.det : ℝ) / (Fintype.card β : ℝ) := by
+    (Ψ : (β → Wh.V) →ₗ[K] B.V) (hΨ : Function.Injective Ψ)
+    (g : Matrix β β ℤ) (hg : 0 < g.det)
+    (hmaj : ∀ v F F',
+      majAt B.b B.X v (Ψ F) (Ψ F') = ∑ b, ∑ c, (g b c : ℂ) * majAt Wh.b Wh.X v (F b) (F' c))
+    : (withL B ((piL β Wh.L).map (Ψ.restrictScalars (𝓞 K)))).mu
+      = Wh.mu - Real.log (g.det : ℝ) / (Fintype.card β : ℝ) := by
   classical
   have : FiniteDimensional K Wh.V := Module.Finite.of_basis Wh.b
   obtain ⟨w, e, he, heL, hsp⟩ := covolume_exists K Wh.V Wh.L
-  obtain ⟨hrkW, hw, hdet, -, -⟩ := log_covolume_slope_mu K Wh.V Wh.ι Wh.b Wh.X hW.1 w e Wh.L he hW.2.1 hW0 hsp
+  obtain ⟨hrkW, hw, hdet, -, -⟩ :=
+    log_covolume_slope_mu K Wh.V Wh.ι Wh.b Wh.X hW.1 w e Wh.L he hW.2.1 hW0 hsp
   obtain ⟨hG1, hG2⟩ := htGram K Wh.V Wh.ι Wh.b Wh.X hW.1 w e he
   have heL' : Submodule.span (𝓞 K) (Set.range e) ≤ Wh.L :=
     Submodule.span_le.2 (by rintro _ ⟨a, rfl⟩; exact heL a)
@@ -161,12 +181,14 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     intro p
     simp [P, bP, bW, Pi.basis_apply, Basis.mk_apply]
   have hPli : LinearIndependent K P := by
-    have h1 := bP.linearIndependent.comp (fun p : β × Fin w => (⟨p.1, p.2⟩ : Σ _ : β, Fin w))
-      (fun p q h => by
-        obtain ⟨p1, p2⟩ := p
-        obtain ⟨q1, q2⟩ := q
-        simp only [Sigma.mk.injEq, heq_eq_eq] at h
-        exact Prod.ext h.1 h.2)
+    have h1 :=
+      bP.linearIndependent.comp
+        (fun p : β × Fin w => (⟨p.1, p.2⟩ : Σ _ : β, Fin w))
+        (fun p q h => by
+          obtain ⟨p1, p2⟩ := p
+          obtain ⟨q1, q2⟩ := q
+          simp only [Sigma.mk.injEq, heq_eq_eq] at h
+          exact Prod.ext h.1 h.2)
     have h2 : P = bP ∘ fun p : β × Fin w => (⟨p.1, p.2⟩ : Σ _ : β, Fin w) := funext hP
     rw [h2]
     exact h1
@@ -175,8 +197,7 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     apply Submodule.span_mono
     rintro _ ⟨⟨b, i⟩, rfl⟩
     exact ⟨(b, i), hP (b, i)⟩
-  have hEli : LinearIndependent K E :=
-    (hPli.map' Ψ (LinearMap.ker_eq_bot.2 hΨ)).comp ε ε.injective
+  have hEli : LinearIndependent K E := (hPli.map' Ψ (LinearMap.ker_eq_bot.2 hΨ)).comp ε ε.injective
   have hrange : Set.range E = Ψ '' Set.range P := by
     ext x
     constructor
@@ -185,8 +206,9 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     · rintro ⟨_, ⟨p, rfl⟩, rfl⟩
       exact ⟨ε.symm p, by simp [E]⟩
   set LN : Submodule (𝓞 K) B.V := (piL β Wh.L).map (Ψ.restrictScalars (𝓞 K)) with hLN
-  have hspanE : Submodule.span (𝓞 K) (Set.range E) =
-      (piL β (Submodule.span (𝓞 K) (Set.range e))).map (Ψ.restrictScalars (𝓞 K)) := by
+  have hspanE
+      : Submodule.span (𝓞 K) (Set.range E)
+        = (piL β (Submodule.span (𝓞 K) (Set.range e))).map (Ψ.restrictScalars (𝓞 K)) := by
     rw [piL_span, Submodule.map_span, hrange]
     rfl
   have hEle : Submodule.span (𝓞 K) (Set.range E) ≤ LN := by
@@ -210,11 +232,13 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     · apply Submodule.span_mono
       rintro _ ⟨k, rfl⟩
       exact hEle (Submodule.subset_span ⟨k, rfl⟩)
-  obtain ⟨hrkN, -, -, -, -⟩ := log_covolume_slope_mu K B.V B.ι B.b B.X hB (n * w) E LN hEli hLNfg hLN0 hspK
+  obtain ⟨hrkN, -, -, -, -⟩ :=
+    log_covolume_slope_mu K B.V B.ι B.b B.X hB (n * w) E LN hEli hLNfg hLN0 hspK
   obtain ⟨hH1, hH2⟩ := htGram K B.V B.ι B.b B.X hB (n * w) E hEli
   have hH3 := hH2 LN hLNfg hEle hrkN
-  have hidx : (Submodule.span (𝓞 K) (Set.range E)).toAddSubgroup.relIndex LN.toAddSubgroup =
-      ((Submodule.span (𝓞 K) (Set.range e)).toAddSubgroup.relIndex Wh.L.toAddSubgroup) ^ n := by
+  have hidx
+      : (Submodule.span (𝓞 K) (Set.range E)).toAddSubgroup.relIndex LN.toAddSubgroup
+        = ((Submodule.span (𝓞 K) (Set.range e)).toAddSubgroup.relIndex Wh.L.toAddSubgroup) ^ n := by
     rw [hspanE, hLN, Submodule.map_toAddSubgroup, Submodule.map_toAddSubgroup]
     exact (AddSubgroup.relIndex_map_map_of_injective _ _ hΨ).trans (relIndex_piL _ _)
   have hz : ∀ v (x : Wh.V), majAt Wh.b Wh.X v 0 x = 0 ∧ majAt Wh.b Wh.X v x 0 = 0 := by
@@ -225,12 +249,14 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
       simpa using this
     · have := h4 0 x 0
       simpa using this
-  have hgram : ∀ v, gramPl B.b B.X v E =
-      Matrix.reindex ε.symm ε.symm ((g.map (Int.cast : ℤ → ℂ)) ⊗ₖ gramPl Wh.b Wh.X v e) := by
+  have hgram
+      : ∀ v,
+        gramPl B.b B.X v E
+          = Matrix.reindex ε.symm ε.symm ((g.map (Int.cast : ℤ → ℂ)) ⊗ₖ gramPl Wh.b Wh.X v e) := by
     intro v
     ext k l
-    simp only [gramPl, Matrix.of_apply, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm,
-      Matrix.kroneckerMap_apply, Matrix.map_apply, E, hmaj]
+    simp only [gramPl, Matrix.of_apply, Matrix.reindex_apply, Matrix.submatrix_apply,
+      Equiv.symm_symm, Matrix.kroneckerMap_apply, Matrix.map_apply, E, hmaj]
     rw [Finset.sum_eq_single (ε k).1, Finset.sum_eq_single (ε l).1]
     · simp [P]
     · intro c _ hc
@@ -252,8 +278,8 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
       have := (Int.castRingHom ℂ).map_det g
       simpa [RingHom.mapMatrix_apply] using this.symm
     rw [hgram, Matrix.det_reindex_self, Matrix.det_kronecker, h1, hdc, Fintype.card_fin]
-    have : (((g.det : ℤ) : ℂ) ^ w * ((d v : ℝ) : ℂ) ^ Fintype.card β) =
-        ((((g.det : ℝ) ^ w * d v ^ n : ℝ)) : ℂ) := by
+    have : (((g.det : ℤ) : ℂ) ^ w * ((d v : ℝ) : ℂ) ^ Fintype.card β)
+        = ((((g.det : ℝ) ^ w * d v ^ n : ℝ)) : ℂ) := by
       rw [Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_pow, Complex.ofReal_intCast]
     rw [this, Complex.ofReal_re]
   set I : ℕ := (Submodule.span (𝓞 K) (Set.range e)).toAddSubgroup.relIndex Wh.L.toAddSubgroup with hI
@@ -270,9 +296,12 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     rw [← Real.log_mul hWpos.ne' hIpos.ne', hG3, Real.log_prod]
     intro v _
     exact (hd v).ne'
-  have hlogN : Real.log (ht B.b B.X LN) + n * Real.log I =
-      (nPl K : ℝ) * (w * Real.log (g.det : ℝ)) + n * ∑ v, Real.log (d v) := by
-    have h1 : Real.log (ht B.b B.X LN * ((I ^ n : ℕ) : ℝ)) = ∑ v, Real.log ((g.det : ℝ) ^ w * d v ^ n) := by
+  have hlogN
+      : Real.log (ht B.b B.X LN) + n * Real.log I
+        = (nPl K : ℝ) * (w * Real.log (g.det : ℝ)) + n * ∑ v, Real.log (d v) := by
+    have h1
+        : Real.log (ht B.b B.X LN * ((I ^ n : ℕ) : ℝ))
+          = ∑ v, Real.log ((g.det : ℝ) ^ w * d v ^ n) := by
       rw [hH3, Real.log_prod]
       · exact Finset.sum_congr rfl fun v _ => by rw [hdetE]
       · intro v _
@@ -281,10 +310,13 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
     rw [Nat.cast_pow] at h1
     rw [Real.log_mul hNpos.ne' (pow_pos hIpos _).ne', Real.log_pow] at h1
     rw [h1]
-    have h2 : ∀ v, Real.log ((g.det : ℝ) ^ w * d v ^ n) = w * Real.log (g.det : ℝ) + n * Real.log (d v) := by
+    have h2
+        : ∀ v,
+          Real.log ((g.det : ℝ) ^ w * d v ^ n) = w * Real.log (g.det : ℝ) + n * Real.log (d v) := by
       intro v
       rw [Real.log_mul (pow_pos hgR _).ne' (pow_pos (hd v) _).ne', Real.log_pow, Real.log_pow]
-    simp only [h2, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Finset.mul_sum]
+    simp only [h2, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+      Finset.mul_sum]
     rfl
   have hnPl : (0 : ℝ) < (nPl K : ℝ) := by
     have : 0 < nPl K := Fintype.card_pos
@@ -292,9 +324,11 @@ theorem kron_mu (B Wh : HLat K) (hB : FrameOK B) (hW : Wh.Good) (hW0 : Wh.L ≠ 
   have hnR : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn0
   have hwR : (0 : ℝ) < (w : ℝ) := by exact_mod_cast hw
   show muDef B.b B.X LN = muDef Wh.b Wh.X Wh.L - _
-  rw [mu_eq_log_ht B.b B.X hB LN hLNfg hLN0, mu_eq_log_ht Wh.b Wh.X hW.1 Wh.L hW.2.1 hW0, hrkN, hrkW]
-  have h3 : Real.log (ht B.b B.X LN) =
-      (nPl K : ℝ) * (w * Real.log (g.det : ℝ)) + n * Real.log (ht Wh.b Wh.X Wh.L) := by
+  rw [mu_eq_log_ht B.b B.X hB LN hLNfg hLN0, mu_eq_log_ht Wh.b Wh.X hW.1 Wh.L hW.2.1 hW0, hrkN,
+    hrkW]
+  have h3
+      : Real.log (ht B.b B.X LN)
+        = (nPl K : ℝ) * (w * Real.log (g.det : ℝ)) + n * Real.log (ht Wh.b Wh.X Wh.L) := by
     rw [← hlogW] at hlogN
     linarith
   rw [h3]
@@ -306,7 +340,9 @@ end Slope
 
 section PiKron
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {α : ι → Type} [∀ i, Fintype (α i)] [∀ i, DecidableEq (α i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {α : ι → Type} [∀ i, Fintype (α i)] [∀ i, DecidableEq (α i)]
   {R : Type} [CommRing R]
 
 theorem piKronOn_empty (M : ∀ i, Matrix (α i) (α i) R) : piKronOn M ∅ = 1 := by
@@ -317,8 +353,8 @@ theorem piKronOn_univ (M : ∀ i, Matrix (α i) (α i) R) : piKronOn M Finset.un
   ext a b
   simp [piKronOn, piKron]
 
-theorem piKronOn_insert (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) (k : ι) (hk : k ∉ s) :
-    piKronOn M (insert k s) = piKronOn M s * piKronOn M {k} := by
+theorem piKronOn_insert (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) (k : ι) (hk : k ∉ s)
+    : piKronOn M (insert k s) = piKronOn M s * piKronOn M {k} := by
   ext a b
   rw [Matrix.mul_apply, Finset.sum_eq_single (Function.update b k (a k))]
   · have h1 : ∀ i ∈ s, M i (a i) (Function.update b k (a k) i) = M i (a i) (b i) := by
@@ -327,7 +363,8 @@ theorem piKronOn_insert (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) (k :
     have h2 : (∀ i, i ∉ ({k} : Finset ι) → Function.update b k (a k) i = b i) := by
       intro i hi
       rw [Function.update_of_ne (fun h : i = k => hi (by simp [h]))]
-    have h3 : (∀ i, i ∉ s → a i = Function.update b k (a k) i) ↔ ∀ i, i ∉ insert k s → a i = b i := by
+    have h3
+        : (∀ i, i ∉ s → a i = Function.update b k (a k) i) ↔ ∀ i, i ∉ insert k s → a i = b i := by
       constructor
       · intro H i hi
         rw [Finset.mem_insert, not_or] at hi
@@ -339,8 +376,8 @@ theorem piKronOn_insert (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) (k :
           rw [Function.update_self]
         · rw [Function.update_of_ne hik]
           exact H i (by rw [Finset.mem_insert, not_or]; exact ⟨hik, hi⟩)
-    simp only [piKronOn, Matrix.of_apply, Finset.prod_insert hk, Finset.prod_singleton, Function.update_self,
-      if_pos h2, mul_one, Finset.prod_congr rfl h1]
+    simp only [piKronOn, Matrix.of_apply, Finset.prod_insert hk, Finset.prod_singleton,
+      Function.update_self, if_pos h2, mul_one, Finset.prod_congr rfl h1]
     by_cases h4 : ∀ i, i ∉ insert k s → a i = b i
     · rw [if_pos h4, if_pos (h3.2 h4)]
       ring
@@ -362,13 +399,16 @@ theorem piKronOn_insert (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) (k :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem det_piKronOn_singleton (M : ∀ i, Matrix (α i) (α i) R) (k : ι) :
-    (piKronOn M {k}).det = (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
-  have h : piKronOn M {k} = Matrix.reindex (Equiv.piSplitAt k α).symm (Equiv.piSplitAt k α).symm
-      (M k ⊗ₖ (1 : Matrix (∀ j : {j // j ≠ k}, α j) (∀ j : {j // j ≠ k}, α j) R)) := by
+theorem det_piKronOn_singleton (M : ∀ i, Matrix (α i) (α i) R) (k : ι)
+    : (piKronOn M {k}).det = (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
+  have h
+      : piKronOn M {k}
+        = Matrix.reindex (Equiv.piSplitAt k α).symm (Equiv.piSplitAt k α).symm
+          (M k ⊗ₖ (1 : Matrix (∀ j : {j // j ≠ k}, α j) (∀ j : {j // j ≠ k}, α j) R)) := by
     ext a b
-    simp only [piKronOn, Matrix.of_apply, Finset.prod_singleton, Matrix.reindex_apply, Matrix.submatrix_apply,
-      Equiv.symm_symm, Matrix.kroneckerMap_apply, Equiv.piSplitAt_apply, Matrix.one_apply]
+    simp only [piKronOn, Matrix.of_apply, Finset.prod_singleton, Matrix.reindex_apply,
+      Matrix.submatrix_apply, Equiv.symm_symm, Matrix.kroneckerMap_apply, Equiv.piSplitAt_apply,
+      Matrix.one_apply]
     congr 1
     refine if_congr ?_ rfl rfl
     constructor
@@ -377,18 +417,20 @@ theorem det_piKronOn_singleton (M : ∀ i, Matrix (α i) (α i) R) (k : ι) :
       exact H j (by simpa using j.2)
     · intro H i hi
       exact congrFun H ⟨i, by simpa using hi⟩
-  rw [h, Matrix.det_reindex_self, Matrix.det_kronecker, Matrix.det_one, one_pow, mul_one, Fintype.card_pi]
+  rw [h, Matrix.det_reindex_self, Matrix.det_kronecker, Matrix.det_one, one_pow, mul_one,
+    Fintype.card_pi]
   congr 1
   rw [← Finset.prod_subtype (Finset.univ.erase k) (by simp) fun j => Fintype.card (α j)]
 
-theorem det_piKronOn (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι) :
-    (piKronOn M s).det = ∏ k ∈ s, (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
+theorem det_piKronOn (M : ∀ i, Matrix (α i) (α i) R) (s : Finset ι)
+    : (piKronOn M s).det = ∏ k ∈ s, (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
   refine Finset.induction_on s (by simp [piKronOn_empty]) ?_
   intro k s hk ih
-  rw [piKronOn_insert M s k hk, Matrix.det_mul, ih, det_piKronOn_singleton, Finset.prod_insert hk, mul_comm]
+  rw [piKronOn_insert M s k hk, Matrix.det_mul, ih, det_piKronOn_singleton, Finset.prod_insert hk,
+    mul_comm]
 
-theorem det_piKron (M : ∀ i, Matrix (α i) (α i) R) :
-    (piKron M).det = ∏ k, (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
+theorem det_piKron (M : ∀ i, Matrix (α i) (α i) R)
+    : (piKron M).det = ∏ k, (M k).det ^ ∏ j ∈ Finset.univ.erase k, Fintype.card (α j) := by
   rw [← piKronOn_univ, det_piKronOn]
 
 end PiKron
@@ -399,7 +441,8 @@ variable (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] {α β : Type} 
 
 variable {R M}
 
-theorem kronMap_apply (t : Matrix β α ℤ) (F : β → M) (a : α) : kronMap R M t F a = ∑ b, t b a • F b := by
+theorem kronMap_apply (t : Matrix β α ℤ) (F : β → M) (a : α)
+    : kronMap R M t F a = ∑ b, t b a • F b := by
   simp [kronMap]
 
 theorem kronMap_one [DecidableEq β] : kronMap R M (1 : Matrix β β ℤ) = LinearMap.id := by
@@ -412,22 +455,30 @@ end KronMap
 
 section Model
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] (G : ι → Type) [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)]
-  [∀ i, DecidableEq (G i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  (G : ι → Type) [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)]
 
 theorem szVec_mul_transpose : szVec G * (szVec G)ᵀ = szGram G := by
-  have hfac : ∀ (b c : SzIdx G) (i : ι), (∑ x : G i, ((if x = (b i : G i) then (1 : ℤ) else 0) - (if x = 1 then 1 else 0)) *
-      ((if x = (c i : G i) then 1 else 0) - (if x = 1 then 1 else 0))) = (if b i = c i then 1 else 0) + 1 := by
+  have hfac
+      : ∀ (b c : SzIdx G) (i : ι),
+        (∑ x : G i, ((if x = (b i : G i) then (1 : ℤ) else 0) - (if x = 1 then 1 else 0)) *
+          ((if x = (c i : G i) then 1 else 0) - (if x = 1 then 1 else 0)))
+          = (if b i = c i then 1 else 0) + 1 := by
     intro b c i
     have hb := (b i).2
     have hc := (c i).2
-    have e : ∀ x : G i, ((if x = (b i : G i) then (1 : ℤ) else 0) - (if x = 1 then 1 else 0)) *
-        ((if x = (c i : G i) then 1 else 0) - (if x = 1 then 1 else 0)) =
-        (if x = (b i : G i) then (if (b i : G i) = (c i : G i) then (1 : ℤ) else 0) else 0) +
-          (if x = 1 then 1 else 0) := by
+    have e
+        : ∀ x : G i,
+          ((if x = (b i : G i) then (1 : ℤ) else 0) - (if x = 1 then 1 else 0))
+              * ((if x = (c i : G i) then 1 else 0) - (if x = 1 then 1 else 0))
+            = (if x = (b i : G i) then (if (b i : G i) = (c i : G i) then (1 : ℤ) else 0) else 0)
+              + (if x = 1 then 1 else 0) := by
       intro x
-      by_cases h1 : x = (b i : G i) <;> by_cases h2 : x = 1 <;> by_cases h3 : x = (c i : G i) <;> simp_all
-    rw [Finset.sum_congr rfl (fun x _ => e x), Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.sum_ite_eq']
+      by_cases h1 : x = (b i : G i) <;> by_cases h2 : x = 1 <;> by_cases h3 : x = (c i : G i)
+        <;> simp_all
+    rw [Finset.sum_congr rfl (fun x _ => e x), Finset.sum_add_distrib, Finset.sum_ite_eq',
+      Finset.sum_ite_eq']
     simp only [Finset.mem_univ, if_true, add_left_inj]
     split_ifs with h1 h2 h2
     · rfl
@@ -435,13 +486,15 @@ theorem szVec_mul_transpose : szVec G * (szVec G)ᵀ = szGram G := by
     · exact absurd (congrArg Subtype.val h2) h1
     · rfl
   ext b c
-  simp only [Matrix.mul_apply, Matrix.transpose_apply, szVec, szGram, piKron, szGram1, Matrix.of_apply]
+  simp only [Matrix.mul_apply, Matrix.transpose_apply, szVec, szGram, piKron, szGram1,
+    Matrix.of_apply]
   simp_rw [← Finset.prod_mul_distrib]
   simp_rw [← hfac b c]
   rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
 
 theorem card_ne_one (i : ι) : Fintype.card {g : G i // g ≠ 1} = Fintype.card (G i) - 1 := by
-  rw [Fintype.card_subtype, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ]
+  rw [Fintype.card_subtype, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _),
+    Finset.card_univ]
 
 theorem card_SzIdx : Fintype.card (SzIdx G) = ∏ i, (Fintype.card (G i) - 1) := by
   simp [Fintype.card_pi, card_ne_one]
@@ -450,21 +503,29 @@ theorem det_szGram1 (i : ι) : (szGram1 G i).det = (Fintype.card (G i) : ℤ) :=
   have h : szGram1 G i = 1 + Matrix.vecMulVec (fun _ => (1 : ℤ)) (fun _ => 1) := by
     ext b c
     simp [szGram1, Matrix.one_apply, Matrix.vecMulVec_apply]
-  have hdet : (1 + Matrix.vecMulVec (fun _ : {g : G i // g ≠ 1} => (1 : ℤ)) (fun _ => 1)).det =
-      1 + (fun _ : {g : G i // g ≠ 1} => (1 : ℤ)) ⬝ᵥ (fun _ => 1) := by
+  have hdet
+      : (1 + Matrix.vecMulVec (fun _ : {g : G i // g ≠ 1} => (1 : ℤ)) (fun _ => 1)).det
+        = 1 + (fun _ : {g : G i // g ≠ 1} => (1 : ℤ)) ⬝ᵥ (fun _ => 1) := by
     first
-    | (rw [Matrix.vecMulVec_eq (ι := Unit)]
-       exact Matrix.det_one_add_replicateCol_mul_replicateRow (ι := Unit) _ _)
-    | (rw [Matrix.vecMulVec_eq Unit]
-       exact Matrix.det_one_add_replicateCol_mul_replicateRow _ _)
-    | (simp only [Matrix.vecMulVec_eq (ι := Unit)]
-       exact Matrix.det_one_add_replicateCol_mul_replicateRow (ι := Unit) _ _)
+    | (
+        rw [Matrix.vecMulVec_eq (ι := Unit)]
+        exact Matrix.det_one_add_replicateCol_mul_replicateRow (ι := Unit) _ _
+      )
+    | (
+        rw [Matrix.vecMulVec_eq Unit]
+        exact Matrix.det_one_add_replicateCol_mul_replicateRow _ _
+      )
+    | (
+        simp only [Matrix.vecMulVec_eq (ι := Unit)]
+        exact Matrix.det_one_add_replicateCol_mul_replicateRow (ι := Unit) _ _
+      )
   have hpos : 1 ≤ Fintype.card (G i) := Fintype.card_pos
   rw [h, hdet]
   simp [dotProduct, card_ne_one, Nat.cast_sub hpos]
 
-theorem det_szGram : (szGram G).det =
-    ∏ k, (Fintype.card (G k) : ℤ) ^ ∏ j ∈ Finset.univ.erase k, (Fintype.card (G j) - 1) := by
+theorem det_szGram
+    : (szGram G).det
+      = ∏ k, (Fintype.card (G k) : ℤ) ^ ∏ j ∈ Finset.univ.erase k, (Fintype.card (G j) - 1) := by
   rw [szGram, det_piKron]
   simp only [det_szGram1, card_ne_one]
 
@@ -492,19 +553,23 @@ theorem szVec_pt (b c : SzIdx G) : szVec G b c.pt = if b = c then 1 else 0 := by
     · exact absurd (Subtype.ext h.symm) hi
     · exact if_neg h
 
-theorem sum_szVec (b : SzIdx G) (i : ι) (c : ∀ i, G i) : ∑ g : G i, szVec G b (Pi.mulSingle i g * c) = 0 := by
+theorem sum_szVec (b : SzIdx G) (i : ι) (c : ∀ i, G i)
+    : ∑ g : G i, szVec G b (Pi.mulSingle i g * c) = 0 := by
   simp only [szVec, Matrix.of_apply]
-  have key : ∀ g : G i, (∏ j, ((if (Pi.mulSingle i g * c) j = (b j : G j) then (1 : ℤ) else 0) -
-      (if (Pi.mulSingle i g * c) j = 1 then 1 else 0))) =
-      ((if g * c i = (b i : G i) then 1 else 0) - (if g * c i = 1 then 1 else 0)) *
-        ∏ j ∈ Finset.univ.erase i, ((if c j = (b j : G j) then (1 : ℤ) else 0) - (if c j = 1 then 1 else 0)) := by
-    intro g
-    rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i)]
-    congr 1
-    · simp
-    · apply Finset.prod_congr rfl
-      intro j hj
-      rw [Pi.mul_apply, Pi.mulSingle_eq_of_ne (Finset.ne_of_mem_erase hj), one_mul]
+  have key
+      : ∀ g : G i,
+        (∏ j, ((if (Pi.mulSingle i g * c) j = (b j : G j) then (1 : ℤ) else 0) -
+          (if (Pi.mulSingle i g * c) j = 1 then 1 else 0)))
+          = ((if g * c i = (b i : G i) then 1 else 0) - (if g * c i = 1 then 1 else 0))
+            * ∏ j ∈ Finset.univ.erase i, ((if c j = (b j : G j) then (1 : ℤ) else 0) - (if c j = 1 then 1 else 0)) :=
+    by
+      intro g
+      rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i)]
+      congr 1
+      · simp
+      · apply Finset.prod_congr rfl
+        intro j hj
+        rw [Pi.mul_apply, Pi.mulSingle_eq_of_ne (Finset.ne_of_mem_erase hj), one_mul]
   have h1 : ∀ x : G i, (∑ g : G i, if g * c i = x then (1 : ℤ) else 0) = 1 := by
     intro x
     rw [Finset.sum_eq_single (x * (c i)⁻¹)]
@@ -512,14 +577,18 @@ theorem sum_szVec (b : SzIdx G) (i : ι) (c : ∀ i, G i) : ∑ g : G i, szVec G
     · intro g _ hg
       rw [if_neg (fun h => hg (eq_mul_inv_of_mul_eq h))]
     · simp
-  rw [Finset.sum_congr rfl (fun g _ => key g), ← Finset.sum_mul, Finset.sum_sub_distrib, h1, h1, sub_self, zero_mul]
+  rw [Finset.sum_congr rfl (fun g _ => key g), ← Finset.sum_mul, Finset.sum_sub_distrib, h1, h1,
+    sub_self, zero_mul]
 
 end Model
 
 section Ram
 
-variable {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] [DecidableEq ι] (G : ι → Type)
-  [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)] {M : Type} [AddCommGroup M] [Module K M]
+variable
+  {K : Type} [Field K] [CharZero K]
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  (G : ι → Type) [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)]
+  {M : Type} [AddCommGroup M] [Module K M]
 
 theorem kron_szVec_pt (F : SzIdx G → M) (c : SzIdx G) : kronMap K M (szVec G) F c.pt = F c := by
   simp [kronMap_apply, szVec_pt]
@@ -536,19 +605,20 @@ theorem kron_szVec_mem (F : SzIdx G → M) : kronMap K M (szVec G) F ∈ RamFun.
   simp only [RamFun.ramFun, Submodule.mem_iInf, LinearMap.mem_ker]
   intro i
   funext c
-  simp only [RamFun.nmF, RamFun.trl, LinearMap.sum_apply, Finset.sum_apply, LinearMap.funLeft_apply, kronMap_apply,
-    Pi.zero_apply]
+  simp only [RamFun.nmF, RamFun.trl, LinearMap.sum_apply, Finset.sum_apply, LinearMap.funLeft_apply,
+    kronMap_apply, Pi.zero_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_eq_zero fun b _ => ?_
   rw [← Finset.sum_smul, sum_szVec, zero_smul]
 
-theorem range_kron_szVec [FiniteDimensional K M] :
-    LinearMap.range (kronMap K M (szVec G)) = RamFun.ramFun K G M := by
+theorem range_kron_szVec [FiniteDimensional K M]
+    : LinearMap.range (kronMap K M (szVec G)) = RamFun.ramFun K G M := by
   apply Submodule.eq_of_le_of_finrank_eq
   · rintro _ ⟨F, rfl⟩
     exact kron_szVec_mem G F
-  · rw [LinearMap.finrank_range_of_inj (kron_szVec_injective G), RamFun.finrank_ramFun, Module.finrank_pi_fintype,
-      Finset.sum_const, Finset.card_univ, card_SzIdx, smul_eq_mul, mul_comm]
+  · rw [LinearMap.finrank_range_of_inj (kron_szVec_injective G), RamFun.finrank_ramFun,
+      Module.finrank_pi_fintype, Finset.sum_const, Finset.card_univ, card_SzIdx, smul_eq_mul,
+      mul_comm]
 
 end Ram
 
@@ -556,15 +626,23 @@ end T2
 
 namespace T2
 
-theorem sesq_sum_zsmul {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H) (v : InfinitePlace K) {β γ : Type} [Fintype β] [Fintype γ]
-    (z : β → ℤ) (x : β → V) (z' : γ → ℤ) (y : γ → V) :
-    H v (∑ b, z b • x b) (∑ c, z' c • y c) = ∑ b, ∑ c, ((z b : ℂ) * (z' c : ℂ)) * H v (x b) (y c) := by
+theorem sesq_sum_zsmul
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+    {H : InfinitePlace K → V → V → ℂ} (hH : IsSesq H)
+    (v : InfinitePlace K)
+    {β γ : Type} [Fintype β] [Fintype γ]
+    (z : β → ℤ) (x : β → V) (z' : γ → ℤ) (y : γ → V)
+    : H v (∑ b, z b • x b) (∑ c, z' c • y c)
+      = ∑ b, ∑ c, ((z b : ℂ) * (z' c : ℂ)) * H v (x b) (y c) := by
   obtain ⟨h1, h2, -, -⟩ := hH v
-  have sumL : ∀ {κ : Type} (s : Finset κ) (f : κ → V) (y : V), H v (∑ k ∈ s, f k) y = ∑ k ∈ s, H v (f k) y := by
+  have sumL
+      : ∀ {κ : Type} (s : Finset κ) (f : κ → V) (y : V),
+        H v (∑ k ∈ s, f k) y = ∑ k ∈ s, H v (f k) y := by
     intro κ s f y
     exact map_sum (AddMonoidHom.mk' (fun x => H v x y) (fun x x' => h1 x x' y)) f s
-  have sumR : ∀ {κ : Type} (s : Finset κ) (f : κ → V) (x : V), H v x (∑ k ∈ s, f k) = ∑ k ∈ s, H v x (f k) := by
+  have sumR
+      : ∀ {κ : Type} (s : Finset κ) (f : κ → V) (x : V),
+        H v x (∑ k ∈ s, f k) = ∑ k ∈ s, H v x (f k) := by
     intro κ s f x
     exact map_sum (AddMonoidHom.mk' (fun y => H v x y) (fun y y' => h2 x y y')) f s
   have zL : ∀ (n : ℤ) (x y : V), H v (n • x) y = (n : ℂ) * H v x y := by
@@ -596,22 +674,27 @@ end GSD
 
 namespace GSD
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {S : GSD K}
-  {A : Type} [Group A] [MulAction A S.D] [SMulCommClass A S.G S.D]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {S : GSD K} {A : Type} [Group A] [MulAction A S.D] [SMulCommClass A S.G S.D]
 
 end GSD
 
 namespace T2
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] (G : ι → Type) [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)]
-  [∀ i, DecidableEq (G i)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  (G : ι → Type) [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)]
 
-theorem nonempty_SzIdx (h2 : ∀ i, 1 < Fintype.card (G i)) : Nonempty (SzIdx G) := ⟨fun i => ⟨(Fintype.exists_ne_of_one_lt_card (h2 i) 1).choose,
-    (Fintype.exists_ne_of_one_lt_card (h2 i) 1).choose_spec⟩⟩
+theorem nonempty_SzIdx (h2 : ∀ i, 1 < Fintype.card (G i)) : Nonempty (SzIdx G) :=
+  ⟨fun i => ⟨
+    (Fintype.exists_ne_of_one_lt_card (h2 i) 1).choose,
+    (Fintype.exists_ne_of_one_lt_card (h2 i) 1).choose_spec
+  ⟩⟩
 
-theorem log_det_szGram_div (q : ℕ) (hq : 3 ≤ q) (hG : ∀ i, Fintype.card (G i) = q - 1) :
-    Real.log (((szGram G).det : ℤ) : ℝ) / (Fintype.card (SzIdx G) : ℝ) =
-      (Fintype.card ι : ℝ) * Real.log ((q : ℝ) - 1) / ((q : ℝ) - 2) := by
+theorem log_det_szGram_div (q : ℕ) (hq : 3 ≤ q) (hG : ∀ i, Fintype.card (G i) = q - 1)
+    : Real.log (((szGram G).det : ℤ) : ℝ) / (Fintype.card (SzIdx G) : ℝ)
+      = (Fintype.card ι : ℝ) * Real.log ((q : ℝ) - 1) / ((q : ℝ) - 2) := by
   obtain ⟨m, rfl⟩ : ∃ m, q = m + 3 := ⟨q - 3, by omega⟩
   have hG' : ∀ i, Fintype.card (G i) = m + 2 := fun i => by rw [hG]; omega
   rw [det_szGram, card_SzIdx]
@@ -633,21 +716,18 @@ end T2
 
 namespace GSD
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {S : GSD K}
-  {ι : Type} [Fintype ι] [DecidableEq ι] {G : ι → Type} [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)]
-  [∀ i, DecidableEq (G i)] [MulAction (∀ i, G i) S.D] [SMulCommClass (∀ i, G i) S.G S.D]
-
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {S : GSD K} {ι : Type} [Fintype ι] [DecidableEq ι]
+  {G : ι → Type} [∀ i, CommGroup (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)]
+  [MulAction (∀ i, G i) S.D] [SMulCommClass (∀ i, G i) S.G S.D]
 
 end GSD
 
 section Cols
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
-
-
-
-
-
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
 
 end Cols
 

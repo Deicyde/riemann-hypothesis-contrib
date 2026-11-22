@@ -4,27 +4,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Pp
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Ws.Pp
 
 open TensorProduct in
-theorem UpperTheory.V.Ws.Pp.extFg :
-    ∀ {B C K : Type} [CommRing B] [CommRing C] [Field K] [IsAlgClosed K] [Algebra B C] [Algebra.FiniteType B C] (q : Ideal C) [q.IsPrime] (f : B →+* K), RingHom.ker f = q.comap (algebraMap B C) → ∃ φ : C →+* K, φ.comp (algebraMap B C) = f := by
+theorem UpperTheory.V.Ws.Pp.extFg
+    : ∀ {B C K : Type} [CommRing B] [CommRing C] [Field K] [IsAlgClosed K] [Algebra B C]
+        [Algebra.FiniteType B C] (q : Ideal C) [q.IsPrime] (f : B →+* K),
+      RingHom.ker f = q.comap (algebraMap B C) → ∃ φ : C →+* K, φ.comp (algebraMap B C) = f := by
   intro B C K _ _ _ _ _ _ q _ f hf
   letI : Algebra B K := f.toAlgebra
   let p : Ideal B := q.comap (algebraMap B C)
   haveI : p.IsPrime := Ideal.comap_isPrime _ _
-  have hunit : ∀ {L : Type} [Field L] (g : B →+* L), RingHom.ker g = p →
-      ∃ g' : p.ResidueField →+* L, g'.comp (algebraMap B p.ResidueField) = g := by
+  have hunit
+      : ∀ {L : Type} [Field L] (g : B →+* L),
+        RingHom.ker g = p
+          → ∃ g' : p.ResidueField →+* L, g'.comp (algebraMap B p.ResidueField) = g := by
     intro L _ g hg
     have h2 : p.primeCompl ≤ Submonoid.comap g (IsUnit.submonoid L) := by
       intro x hx
       have : g x ≠ 0 := fun h => hx (by rw [← hg]; exact h)
       exact (isUnit_iff_ne_zero.2 this)
-    exact ⟨Ideal.ResidueField.lift p g hg.ge h2,
-      RingHom.ext fun x => Ideal.ResidueField.lift_algebraMap p g hg.ge h2 x⟩
+    exact ⟨
+      Ideal.ResidueField.lift p g hg.ge h2,
+      RingHom.ext fun x => Ideal.ResidueField.lift_algebraMap p g hg.ge h2 x
+    ⟩
   obtain ⟨a, ha⟩ := hunit f hf
-  obtain ⟨b, hb⟩ := hunit ((algebraMap C q.ResidueField).comp (algebraMap B C)) (by
-    rw [← RingHom.comap_ker, Ideal.ker_algebraMap_residueField])
+  obtain ⟨b, hb⟩ :=
+    hunit ((algebraMap C q.ResidueField).comp (algebraMap B C))
+      (by rw [← RingHom.comap_ker, Ideal.ker_algebraMap_residueField])
   haveI hnt : Nontrivial (K ⊗[B] C) := by
     letI : Algebra p.ResidueField K := a.toAlgebra
     letI : Algebra p.ResidueField q.ResidueField := b.toAlgebra
@@ -48,7 +56,11 @@ theorem UpperTheory.V.Ws.Pp.extFg :
     IsAlgClosed.algebraMap_bijective_of_isIntegral
   let ψ : ((K ⊗[B] C) ⧸ m) →ₐ[K] K := (AlgEquiv.ofBijective (Algebra.ofId K _) hbij).symm.toAlgHom
   let χ : (K ⊗[B] C) →ₐ[K] K := ψ.comp (Ideal.Quotient.mkₐ K m)
-  refine ⟨(χ : K ⊗[B] C →+* K).comp ((Algebra.TensorProduct.includeRight : C →ₐ[B] K ⊗[B] C) : C →+* K ⊗[B] C), ?_⟩
+  refine ⟨
+    (χ : K ⊗[B] C →+* K).comp
+      ((Algebra.TensorProduct.includeRight : C →ₐ[B] K ⊗[B] C) : C →+* K ⊗[B] C),
+    ?_
+  ⟩
   ext x
   show χ ((Algebra.TensorProduct.includeRight : C →ₐ[B] K ⊗[B] C) (algebraMap B C x)) = f x
   rw [AlgHom.commutes, IsScalarTower.algebraMap_apply B K (K ⊗[B] C), AlgHom.commutes]

@@ -21,18 +21,20 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
-  ReciprocityTheory.ChartRestriction.G.T0 Filter Topology
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.T0 Filter Topology
 
 section An
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem analyticOnNhd_dom (X : Data E r) {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom) :
-    AnalyticOnNhd ℂ F X.dom := by
+theorem analyticOnNhd_dom (X : Data E r) {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom)
+    : AnalyticOnNhd ℂ F X.dom := by
   let e : Frame X.Ψ r ≃L[ℂ] (Fin (Module.finrank ℂ (Frame X.Ψ r)) → ℂ) :=
     (Module.finBasis ℂ (Frame X.Ψ r)).equivFun.toContinuousLinearEquiv
-  have hU : IsOpen (e.symm ⁻¹' X.dom) := (FourierCoefficientDomain.isOpen_dom X).preimage e.symm.continuous
+  have hU : IsOpen (e.symm ⁻¹' X.dom) :=
+    (FourierCoefficientDomain.isOpen_dom X).preimage e.symm.continuous
   have hd : DifferentiableOn ℂ (F ∘ e.symm) (e.symm ⁻¹' X.dom) :=
     hF.comp e.symm.differentiableOn (fun _ h => h)
   have ha := ReciprocityTheory.AnForm.Osgood.osgood _ _ _ hU hd
@@ -41,10 +43,14 @@ theorem analyticOnNhd_dom (X : Data E r) {F : Frame X.Ψ r → ℂ} (hF : Differ
   rw [hF']
   exact (ha (e z) (by simpa using hz)).comp (e.toContinuousLinearMap.analyticAt z)
 
-theorem interior_closure_zero (X : Data E r) {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom)
-    (hne : ∃ x ∈ X.dom, F x ≠ 0) : interior (closure {x | x ∈ X.dom ∧ F x = 0}) = ∅ := by
+theorem interior_closure_zero
+    (X : Data E r)
+    {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom) (hne : ∃ x ∈ X.dom, F x ≠ 0)
+    : interior (closure {x | x ∈ X.dom ∧ F x = 0}) = ∅ := by
   have hA := analyticOnNhd_dom X hF
-  have hc : IsPreconnected X.dom := (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.flag_domain_frames_connected (E := E) r X).isPreconnected
+  have hc : IsPreconnected X.dom :=
+    (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.flag_domain_frames_connected (E := E) r
+      X).isPreconnected
   have hO := FourierCoefficientDomain.isOpen_dom X
   by_contra hU
   obtain ⟨y, hy⟩ := Set.nonempty_iff_ne_empty.2 hU
@@ -63,6 +69,5 @@ theorem interior_closure_zero (X : Data E r) {F : Frame X.Ψ r → ℂ} (hF : Di
 end An
 
 variable {D : D7} {T : Top D}
-
 
 end Formalism.L2.Pj

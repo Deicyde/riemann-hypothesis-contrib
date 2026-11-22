@@ -8,12 +8,13 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem eq_map_maximalIdeal_of_ringKrullDim_eq_one (R A : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [CommRing A] [IsDomain A] [Algebra R A] [Module.Flat R A]
-    (p : Ideal A) [p.IsPrime] :
-    (maximalIdeal R).map (algebraMap R A) ≤ p → ringKrullDim (Localization.AtPrime p) = 1 →
-      IsDomain (A ⧸ (maximalIdeal R).map (algebraMap R A)) →
-      p = (maximalIdeal R).map (algebraMap R A) := by
+theorem eq_map_maximalIdeal_of_ringKrullDim_eq_one
+    (R A : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing A] [IsDomain A]
+    [Algebra R A] [Module.Flat R A]
+    (p : Ideal A) [p.IsPrime]
+    : (maximalIdeal R).map (algebraMap R A) ≤ p → ringKrullDim (Localization.AtPrime p) = 1
+      → IsDomain (A ⧸ (maximalIdeal R).map (algebraMap R A))
+      → p = (maximalIdeal R).map (algebraMap R A) := by
   intro hle hdim hdom
   set I := (maximalIdeal R).map (algebraMap R A) with hI
   haveI : I.IsPrime := (Ideal.Quotient.isDomain_iff_prime I).1 hdom

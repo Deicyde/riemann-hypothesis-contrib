@@ -14,12 +14,15 @@ section Rep
 
 variable {G : Type} [Group G] (Γ K : Subgroup G)
 
-theorem mem_AMFK_iff {k : Type} [CommRing k] {W : Type} [AddCommGroup W] [Module k W]
-    (ρK : Representation k K W) (f : G → W) :
-    f ∈ AMFK k Γ K ρK ↔ ∀ γ : Γ, ∀ g : G, ∀ κ : K, f ((γ : G) * g * κ) = ρK κ⁻¹ (f g) := Iff.rfl
+theorem mem_AMFK_iff
+    {k : Type} [CommRing k]
+    {W : Type} [AddCommGroup W] [Module k W]
+    (ρK : Representation k K W) (f : G → W)
+    : f ∈ AMFK k Γ K ρK ↔ ∀ γ : Γ, ∀ g : G, ∀ κ : K, f ((γ : G) * g * κ) = ρK κ⁻¹ (f g) :=
+  Iff.rfl
 
-theorem exists_rep (s : ClassSet Γ K → G) (hs : ∀ c, DoubleCoset.mk Γ K (s c) = c) (g : G) :
-    ∃ p : Γ × K, g = (p.1 : G) * s (DoubleCoset.mk Γ K g) * (p.2 : G) := by
+theorem exists_rep (s : ClassSet Γ K → G) (hs : ∀ c, DoubleCoset.mk Γ K (s c) = c) (g : G)
+    : ∃ p : Γ × K, g = (p.1 : G) * s (DoubleCoset.mk Γ K g) * (p.2 : G) := by
   have h := (@DoubleCoset.eq _ _ Γ K (s (DoubleCoset.mk Γ K g)) g).1 (hs _)
   obtain ⟨a, ha, b, hb, hab⟩ := h
   exact ⟨(⟨a, ha⟩, ⟨b, hb⟩), hab⟩

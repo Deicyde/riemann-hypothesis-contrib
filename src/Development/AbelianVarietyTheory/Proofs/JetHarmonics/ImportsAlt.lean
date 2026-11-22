@@ -6,7 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory.JetConstSq
 
-theorem main : ∀ C₃ CΛ C₀ C₂ : ℝ, 0 ≤ C₃ → 0 ≤ CΛ → 0 ≤ C₀ → 0 < C₂ → ∃ C₄ : ℝ, ∀ (b Λ : ℝ) (r n₀ p₀ : ℕ), 3 ≤ b → 1 ≤ Λ → Λ ≤ b ^ (CΛ * ((2 * r + 2 : ℕ) : ℝ)) → n₀ ≤ 30 * (r + 1) ^ 2 + 6 → (p₀ : ℝ) ≤ C₀ * ((r : ℝ) + 1) ^ 2 → 2 * (3 * b) ^ (2 * n₀) * (1 * (C₂ * Λ ^ 2) ^ (r + 1)) * b ^ (2 * C₃ * ((2 * r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ)) ≤ b ^ (C₄ * ((2 * r + 2 : ℕ) : ℝ) ^ 4) := by
+theorem main
+    : ∀ C₃ CΛ C₀ C₂ : ℝ,
+      0 ≤ C₃ → 0 ≤ CΛ → 0 ≤ C₀ → 0 < C₂
+        → ∃ C₄ : ℝ, ∀ (b Λ : ℝ) (r n₀ p₀ : ℕ),
+          3 ≤ b → 1 ≤ Λ → Λ ≤ b ^ (CΛ * ((2 * r + 2 : ℕ) : ℝ)) → n₀ ≤ 30 * (r + 1) ^ 2 + 6
+            → (p₀ : ℝ) ≤ C₀ * ((r : ℝ) + 1) ^ 2
+            → 2 * (3 * b) ^ (2 * n₀) * (1 * (C₂ * Λ ^ 2) ^ (r + 1))
+                * b ^ (2 * C₃ * ((2 * r + 2 : ℕ) : ℝ) ^ 2 * ((2 * p₀ + n₀ : ℕ) : ℝ))
+              ≤ b ^ (C₄ * ((2 * r + 2 : ℕ) : ℝ) ^ 4) := by
   intro C₃ CΛ C₀ C₂ h3 hΛ h0 h2
   refine ⟨40 + CΛ + C₂ + 2 * C₃ * (C₀ + 9), ?_⟩
   intro b Λ r n₀ p₀ hb hΛ1 hΛb hn hp
@@ -36,8 +44,9 @@ theorem main : ∀ C₃ CΛ C₀ C₂ : ℝ, 0 ≤ C₃ → 0 ≤ CΛ → 0 ≤ 
     refine this.trans (le_of_eq ?_)
     rw [show (4 * (n₀ : ℝ)) = ((4 * n₀ : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
     ring
-  have e3 : 1 * (C₂ * Λ ^ 2) ^ (r + 1) ≤
-      b ^ ((C₂ + 2 * (CΛ * (2 * ((r : ℝ) + 1)))) * ((r : ℝ) + 1)) := by
+  have e3
+      : 1 * (C₂ * Λ ^ 2) ^ (r + 1)
+        ≤ b ^ ((C₂ + 2 * (CΛ * (2 * ((r : ℝ) + 1)))) * ((r : ℝ) + 1)) := by
     rw [one_mul, Real.rpow_mul hb0.le, ← hr, Real.rpow_natCast]
     refine pow_le_pow_left₀ (by positivity) ?_ _
     rw [Real.rpow_add hb0, mul_comm (2 : ℝ) (CΛ * _), Real.rpow_mul hb0.le, Real.rpow_two, hr]
@@ -47,25 +56,27 @@ theorem main : ∀ C₃ CΛ C₀ C₂ : ℝ, 0 ≤ C₃ → 0 ≤ CΛ → 0 ≤ 
   have hs2 : 1 ≤ s ^ 2 := one_le_pow₀ hs
   have hs12 : s ≤ s ^ 2 := by nlinarith
   have hs4 : s ^ 2 ≤ s ^ 4 := pow_le_pow_right₀ hs (by norm_num)
-  calc _ ≤ b ^ (1 : ℝ) * b ^ (4 * (n₀ : ℝ)) * b ^ ((C₂ + 2 * (CΛ * (2 * s))) * s) *
-        b ^ (2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀)) := by
-        gcongr
-    _ = b ^ (1 + 4 * (n₀ : ℝ) + (C₂ + 2 * (CΛ * (2 * s))) * s +
-        2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀)) := by
-        rw [Real.rpow_add hb0, Real.rpow_add hb0, Real.rpow_add hb0]
+  calc
+    _ ≤ b ^ (1 : ℝ) * b ^ (4 * (n₀ : ℝ)) * b ^ ((C₂ + 2 * (CΛ * (2 * s))) * s)
+        * b ^ (2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀)) := by
+      gcongr
+    _ = b
+        ^ (1 + 4 * (n₀ : ℝ) + (C₂ + 2 * (CΛ * (2 * s))) * s
+          + 2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀)) := by
+      rw [Real.rpow_add hb0, Real.rpow_add hb0, Real.rpow_add hb0]
     _ ≤ _ := by
-        apply Real.rpow_le_rpow_of_exponent_le hb1
-        have a1 : 1 + 4 * (n₀ : ℝ) ≤ 40 * (2 * s) ^ 4 := by nlinarith
-        have a2 : C₂ * s ≤ C₂ * (2 * s) ^ 4 := by
-          apply mul_le_mul_of_nonneg_left _ h2.le; nlinarith
-        have a3 : CΛ * (4 * s ^ 2) ≤ CΛ * (2 * s) ^ 4 := by
-          apply mul_le_mul_of_nonneg_left _ hΛ; nlinarith
-        have a4 : 2 * (p₀ : ℝ) + n₀ ≤ (C₀ + 9) * (2 * s) ^ 2 := by
-          have : 0 ≤ C₀ * s ^ 2 := by positivity
-          nlinarith
-        have a5 : 2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀) ≤
-            2 * C₃ * (2 * s) ^ 2 * ((C₀ + 9) * (2 * s) ^ 2) :=
-          mul_le_mul_of_nonneg_left a4 (by positivity)
+      apply Real.rpow_le_rpow_of_exponent_le hb1
+      have a1 : 1 + 4 * (n₀ : ℝ) ≤ 40 * (2 * s) ^ 4 := by nlinarith
+      have a2 : C₂ * s ≤ C₂ * (2 * s) ^ 4 := by apply mul_le_mul_of_nonneg_left _ h2.le; nlinarith
+      have a3 : CΛ * (4 * s ^ 2) ≤ CΛ * (2 * s) ^ 4 := by
+        apply mul_le_mul_of_nonneg_left _ hΛ; nlinarith
+      have a4 : 2 * (p₀ : ℝ) + n₀ ≤ (C₀ + 9) * (2 * s) ^ 2 := by
+        have : 0 ≤ C₀ * s ^ 2 := by positivity
         nlinarith
+      have a5
+          : 2 * C₃ * (2 * s) ^ 2 * (2 * (p₀ : ℝ) + n₀)
+            ≤ 2 * C₃ * (2 * s) ^ 2 * ((C₀ + 9) * (2 * s) ^ 2) :=
+        mul_le_mul_of_nonneg_left a4 (by positivity)
+      nlinarith
 
 end GlobalTheory.JetConstSq

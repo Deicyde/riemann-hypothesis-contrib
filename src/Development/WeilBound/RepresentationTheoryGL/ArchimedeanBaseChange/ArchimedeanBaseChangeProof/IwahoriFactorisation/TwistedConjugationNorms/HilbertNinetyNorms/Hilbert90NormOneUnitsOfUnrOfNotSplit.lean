@@ -19,8 +19,9 @@ namespace PositivityTheory.Rg.Bc.ArchbcB.B.M4
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem norm_one_eq_unit_div_conj (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (u : w.adicCompletion E) (hu : u * cj w u = 1) :
-    ∃ z, Valued.v z = 1 ∧ u * cj w z = z := by
+theorem norm_one_eq_unit_div_conj
+    (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (u : w.adicCompletion E) (hu : u * cj w u = 1)
+    : ∃ z, Valued.v z = 1 ∧ u * cj w z = z := by
   obtain ⟨-, hcc, hv, hns, -⟩ := GlobalTheory.T.placeConjugation_properties_cmField E hU w
   obtain ⟨-, ⟨ϖ, q, hUI, -⟩, -⟩ := hns hw
   obtain ⟨-, -, hϖc, hϖv, ⟨x, -, hx⟩, -⟩ := hUI
@@ -39,17 +40,16 @@ theorem norm_one_eq_unit_div_conj (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) 
       exact zero_ne_one hx
     · exact ⟨_, h1, key 1⟩
   have h0 : Valued.v v0 ≠ 0 := (Valuation.ne_zero_iff _).2 hv0
-  have hϖ0 : ϖ ≠ 0 := by
-    intro h; rw [h, map_zero] at hϖv; exact WithZero.zero_ne_coe hϖv
+  have hϖ0 : ϖ ≠ 0 := by intro h; rw [h, map_zero] at hϖv; exact WithZero.zero_ne_coe hϖv
   refine ⟨v0 * ϖ ^ WithZero.log (Valued.v v0), ?_, ?_⟩
   · have h2 : Valued.v ϖ = WithZero.exp (-1 : ℤ) := hϖv
     rw [map_mul, map_zpow₀, h2, ← WithZero.exp_zsmul, ← WithZero.exp_log h0, ← WithZero.exp_add]
     simp
   · rw [map_mul, map_zpow₀, hϖc, ← mul_assoc, hkey]
 
-theorem hilbert90_norm_one_units_of_unr_of_not_split (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) :
-    (∀ u : w.adicCompletion E, Valued.v u = 1 → cj w u = u → ∃ z, Valued.v z = 1 ∧ z * cj w z = u) ∧
-    (∀ u : w.adicCompletion E, u * cj w u = 1 → ∃ z, Valued.v z = 1 ∧ u * cj w z = z) := by
+theorem hilbert90_norm_one_units_of_unr_of_not_split (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w)
+    : (∀ u : w.adicCompletion E, Valued.v u = 1 → cj w u = u → ∃ z, Valued.v z = 1 ∧ z * cj w z = u)
+      ∧ (∀ u : w.adicCompletion E, u * cj w u = 1 → ∃ z, Valued.v z = 1 ∧ u * cj w z = z) := by
   refine ⟨fun u hu hcu => ?_, norm_one_eq_unit_div_conj hU w hw⟩
   obtain ⟨s, hs, hs'⟩ := GlobalTheory.T.norm_one_unit_hilbert_ninety E hU w hw u hcu hu
   exact ⟨s, hs, by rw [mul_comm]; exact hs'⟩

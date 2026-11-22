@@ -18,7 +18,8 @@ noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
   CartesianMonoidalCategory MonObj TensorProduct NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult GlobalTheory.TorusRM
 
 open scoped nonZeroDivisors
 
@@ -26,22 +27,36 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PointDesc
 
-theorem hasGen_of_comp {X Y Z : Scheme.{0}} {L : LB X} (f : Y ⟶ X) (h : Z ⟶ Y) (m : Z ⟶ X)
-    (hm : h ≫ f = m) (H : HasGen (L.pull f)) : HasGen (L.pull m) := by
+theorem hasGen_of_comp
+    {X Y Z : Scheme.{0}} {L : LB X}
+    (f : Y ⟶ X) (h : Z ⟶ Y) (m : Z ⟶ X) (hm : h ≫ f = m) (H : HasGen (L.pull f))
+    : HasGen (L.pull m) := by
   obtain ⟨t, ht⟩ := H
   subst hm
-  exact ⟨LB.pullGen L (fun _ : PUnit => f) (fun _ => 1) t h,
-    DVR.pullGen_isGen L (fun _ : PUnit => f) (fun _ => 1) t ht h⟩
+  exact ⟨
+    LB.pullGen L (fun _ : PUnit => f) (fun _ => 1) t h,
+    DVR.pullGen_isGen L (fun _ : PUnit => f) (fun _ => 1) t ht h
+  ⟩
 
-theorem hasGen_pull_pull {X Y Z : Scheme.{0}} {L : LB X} (hL : L.IsLB) (f : Y ⟶ X) (h : Z ⟶ Y)
-    (H : HasGen (L.pull (h ≫ f))) : HasGen ((L.pull f).pull h) := by
+theorem hasGen_pull_pull
+    {X Y Z : Scheme.{0}} {L : LB X}
+    (hL : L.IsLB) (f : Y ⟶ X) (h : Z ⟶ Y) (H : HasGen (L.pull (h ≫ f)))
+    : HasGen ((L.pull f).pull h) := by
   obtain ⟨t, ht⟩ := H
   exact GlobalTheory.RigidTranslate.gen_of_lbIso (pull_isLB hL _) (pull_isLB (pull_isLB hL f) h)
     (GlobalTheory.FamRep.lbIso_pull_pull hL f h).symm t ht
 
-theorem hasGen_lam_pull_of_eq_on_open : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsAbelianScheme A → ∀ (M : LB A.left), M.IsLB →
-    ∀ (T : Over (Sp ℂ)) (x : T ⟶ A) (U : T.left.Opens) (y : 𝟙_ (Over (Sp ℂ)) ⟶ A) (t : T.left), t ∈ U →
-      U.ι ≫ x.left = U.ι ≫ T.hom ≫ y.left → HasGen ((abelian₂ A M).pull (lift (fst A T) (snd A T ≫ x)).left) → HasGen ((abelian₂ A M).pull (lift (fst A (𝟙_ (Over (Sp ℂ)))) (snd A (𝟙_ (Over (Sp ℂ))) ≫ y)).left) := by
+theorem hasGen_lam_pull_of_eq_on_open
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ (M : LB A.left),
+          M.IsLB
+            → ∀ (T : Over (Sp ℂ)) (x : T ⟶ A) (U : T.left.Opens) (y : 𝟙_ (Over (Sp ℂ)) ⟶ A)
+                (t : T.left),
+              t ∈ U → U.ι ≫ x.left = U.ι ≫ T.hom ≫ y.left
+                → HasGen ((abelian₂ A M).pull (lift (fst A T) (snd A T ≫ x)).left)
+                → HasGen ((abelian₂ A M).pull
+                  (lift (fst A (𝟙_ (Over (Sp ℂ)))) (snd A (𝟙_ (Over (Sp ℂ))) ≫ y)).left) := by
   intro A _ hA M hM T x U y t ht hU H
   have hL : (abelian₂ A M).IsLB := LB.isLB_linComb hM _ _
 
@@ -72,9 +87,11 @@ theorem hasGen_lam_pull_of_eq_on_open : ∀ (A : Over (Sp ℂ)) [GrpObj A], IsAb
   have H₁ : HasGen ((abelian₂ A M).pull ((fst A Tk).left ≫ (e ≫ g).left)) :=
     hasGen_of_comp _ (A ◁ pk).left _ (by rw [← Over.comp_left, sq, Over.comp_left]) H
   have H₂ := hasGen_pull_pull hL (e ≫ g).left (fst A Tk).left H₁
-  have hpb : IsPullback (fst A Tk).left (snd A Tk).left A.hom (spMap β) := IsPullback.of_hasPullback _ _
-  obtain ⟨u, hu⟩ := GlobalTheory.FieldTriv.exists_gen_of_field_extension ℂ K β A hA _ (fst A Tk).left (snd A Tk).left hpb
-    ((abelian₂ A M).pull (e ≫ g).left) (pull_isLB hL _) H₂
+  have hpb : IsPullback (fst A Tk).left (snd A Tk).left A.hom (spMap β) :=
+    IsPullback.of_hasPullback _ _
+  obtain ⟨u, hu⟩ :=
+    GlobalTheory.FieldTriv.exists_gen_of_field_extension ℂ K β A hA _ (fst A Tk).left
+      (snd A Tk).left hpb ((abelian₂ A M).pull (e ≫ g).left) (pull_isLB hL _) H₂
   refine hasGen_of_comp (e ≫ g).left (fst A (𝟙_ (Over (Sp ℂ)))).left _ ?_ ⟨u, hu⟩
   rw [← Over.comp_left]
   congr 1

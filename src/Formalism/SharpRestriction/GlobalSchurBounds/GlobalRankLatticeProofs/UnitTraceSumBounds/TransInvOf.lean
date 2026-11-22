@@ -11,8 +11,11 @@ namespace Formalism.MainNotions.Ext
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
 
-theorem lamOf_lat (HI : IdealLattice) (D : D7) (cc : Ideal (NumberField.RingOfIntegers D.host.K)) (hc : cc ≠ ⊥) (δ : ℂ) (hδ : δ ≠ 0) :
-    ∃ w₁ w₂ : ℂ, ((starRingEnd ℂ) w₁ * w₂).im ≠ 0 ∧ lamOf D cc δ = lat2 w₁ w₂ := by
+theorem lamOf_lat
+    (HI : IdealLattice)
+    (D : D7) (cc : Ideal (NumberField.RingOfIntegers D.host.K)) (hc : cc ≠ ⊥)
+    (δ : ℂ) (hδ : δ ≠ 0)
+    : ∃ w₁ w₂ : ℂ, ((starRingEnd ℂ) w₁ * w₂).im ≠ 0 ∧ lamOf D cc δ = lat2 w₁ w₂ := by
   have hd : D.host.d ≠ 0 := by
     intro h0
     have hs : D.host.sqd = 0 := by
@@ -29,8 +32,9 @@ theorem lamOf_lat (HI : IdealLattice) (D : D7) (cc : Ideal (NumberField.RingOfIn
     omega
   have hreal : IsEmpty (D.host.K →+* ℝ) := by
     refine ⟨fun f => ?_⟩
-    have hs : (⟨D.host.sqd, Formalism.HC.HostRaw.sqd_mem_K (H := D.host.toHostRaw)⟩ : D.host.K) ^ 2 =
-        -((D.host.d : ℕ) : D.host.K) := by
+    have hs
+        : (⟨D.host.sqd, Formalism.HC.HostRaw.sqd_mem_K (H := D.host.toHostRaw)⟩ : D.host.K) ^ 2
+          = -((D.host.d : ℕ) : D.host.K) := by
       apply Subtype.ext
       simpa using D.host.sqd_sq
     have h2 := congrArg f hs
@@ -39,12 +43,15 @@ theorem lamOf_lat (HI : IdealLattice) (D : D7) (cc : Ideal (NumberField.RingOfIn
     have h4 : (0 : ℝ) < (D.host.d : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero hd
     linarith
   obtain ⟨⟨w₁, w₂, hw, heq⟩, -⟩ :=
-    HI D.host.K (D.host.φ₀.comp (algebraMap D.host.K D.host.E)) (Formalism.HC.HostRaw.finrank_K (H := D.host.toHostRaw))
-      hreal cc δ hc hδ
+    HI D.host.K (D.host.φ₀.comp (algebraMap D.host.K D.host.E))
+      (Formalism.HC.HostRaw.finrank_K (H := D.host.toHostRaw)) hreal cc δ hc hδ
   exact ⟨w₁, w₂, hw, heq⟩
 
-theorem delta_ne (HI : IdealLattice) (HD : DiscrNe) (D : D7) (cc : Ideal (NumberField.RingOfIntegers D.host.K)) (hc : cc ≠ ⊥) (δ : ℂ)
-    (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ) : δ ≠ 0 := by
+theorem delta_ne
+    (HI : IdealLattice) (HD : DiscrNe)
+    (D : D7) (cc : Ideal (NumberField.RingOfIntegers D.host.K)) (hc : cc ≠ ⊥)
+    (δ : ℂ) (hδ : IsDiscriminantTwelfthRootOfIdealLattice D cc δ)
+    : δ ≠ 0 := by
   obtain ⟨w₁, w₂, hw, hL⟩ := lamOf_lat HI D cc hc 1 one_ne_zero
   intro h0
   have h12 : δ ^ 12 = discr (lamOf D cc 1) := hδ

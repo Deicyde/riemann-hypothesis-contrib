@@ -10,16 +10,20 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ProjLine
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ProjLine
 open scoped Topology
 
 noncomputable section
 
 namespace BlockImageMetrics
 
-theorem leviForm_comp_clm {E F : Type} [Fintype E] [Fintype F] (L : (E → ℂ) →L[ℂ] (F → ℂ))
-    {φ : (F → ℂ) → ℝ} {z : E → ℂ} (hφ : ContDiffAt ℝ 2 φ (L z)) (w : E → ℂ) :
-    leviForm (fun y => φ (L y)) z w = leviForm φ (L z) (L w) := by
+theorem leviForm_comp_clm
+    {E F : Type} [Fintype E] [Fintype F]
+    (L : (E → ℂ) →L[ℂ] (F → ℂ))
+    {φ : (F → ℂ) → ℝ} {z : E → ℂ} (hφ : ContDiffAt ℝ 2 φ (L z))
+    (w : E → ℂ)
+    : leviForm (fun y => φ (L y)) z w = leviForm φ (L z) (L w) := by
   set Lr : (E → ℂ) →L[ℝ] (F → ℂ) := L.restrictScalars ℝ with hLr
   have hev : fderiv ℝ (fun y => φ (L y)) =ᶠ[𝓝 z] fun y => (fderiv ℝ φ (Lr y)).comp Lr := by
     have h1 : ∀ᶠ x in 𝓝 (L z), ContDiffAt ℝ 2 φ x := hφ.eventually (by simp)
@@ -29,22 +33,28 @@ theorem leviForm_comp_clm {E F : Type} [Fintype E] [Fintype F] (L : (E → ℂ) 
     exact (hd.hasFDerivAt.comp y Lr.hasFDerivAt).fderiv
   have hd2 : DifferentiableAt ℝ (fderiv ℝ φ) (Lr z) :=
     (hφ.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
-  have hD : HasFDerivAt (fun y => (fderiv ℝ φ (Lr y)).comp Lr)
-      ((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ (fderiv ℝ φ (Lr z))).comp 0 +
-        ((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr).comp
-          ((fderiv ℝ (fderiv ℝ φ) (Lr z)).comp Lr)) z :=
+  have hD : HasFDerivAt
+      (fun y => (fderiv ℝ φ (Lr y)).comp Lr)
+      ((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ (fderiv ℝ φ (Lr z))).comp 0
+        + ((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr).comp
+          ((fderiv ℝ (fderiv ℝ φ) (Lr z)).comp Lr))
+      z :=
     (hd2.hasFDerivAt.comp z Lr.hasFDerivAt).clm_comp (hasFDerivAt_const Lr z)
   have hIw : L (Complex.I • w) = Complex.I • L w := L.map_smul _ _
   unfold leviForm
   rw [hev.fderiv_eq, hD.fderiv]
   simp [hLr, hIw]
 
-theorem isSemipositiveRel_of_linear {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {F : Type}
-    [Fintype F] (A : HermLine ι) (L : ((Σ k, ι k) → ℂ) →L[ℂ] (F → ℂ))
+theorem isSemipositiveRel_of_linear
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {F : Type} [Fintype F]
+    (A : HermLine ι) (L : ((Σ k, ι k) → ℂ) →L[ℂ] (F → ℂ))
     (hA : A.h = fun z => (fsMetric (ι := F)).ρ (L z)) (hL : ∀ z, (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) → L z ≠ 0)
-    (P0 P : Ideal (MRing ι)) : IsSemipositiveRel P0 P A := by
-  have hsm : ∀ z, L z ≠ 0 → ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fsMetric (ι := F)).ρ (L z) := fun z hz =>
-    (isSmoothMetric_fs (J := F) (L z) hz).contDiffAt (isOpen_ne.mem_nhds hz)
+    (P0 P : Ideal (MRing ι))
+    : IsSemipositiveRel P0 P A := by
+  have hsm : ∀ z, L z ≠ 0 → ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fsMetric (ι := F)).ρ (L z) :=
+    fun z hz => (isSmoothMetric_fs (J := F) (L z) hz).contDiffAt (isOpen_ne.mem_nhds hz)
   refine ⟨?_, fun z hz w _ => ?_⟩
   · unfold IsSmoothHerm
     rw [hA]
@@ -53,24 +63,26 @@ theorem isSemipositiveRel_of_linear {K : Type} [Fintype K] {ι : K → Type} [�
   · have hz0 := hL z hz.1
     have hlog : ContDiffAt ℝ 2 (fun x => Real.log ((fsMetric (ι := F)).ρ x)) (L z) :=
       ((hsm z hz0).of_le (WithTop.coe_le_coe.2 le_top)).log ((fsMetric (ι := F)).pos _ hz0).ne'
-    rw [show (fun z => Real.log (A.h z)) =
-      fun y => (fun x => Real.log ((fsMetric (ι := F)).ρ x)) (L y) by rw [hA]]
+    rw [show (fun z => Real.log (A.h z))
+        = fun y => (fun x => Real.log ((fsMetric (ι := F)).ρ x)) (L y) by
+      rw [hA]]
     rw [leviForm_comp_clm L hlog w]
     exact leviForm_log_fs_nonneg hz0 _
 
 def matCLM {κ J : Type} [Fintype κ] [Fintype J] (N : Matrix κ J ℤ) : (J → ℂ) →L[ℂ] (κ → ℂ) :=
   LinearMap.toContinuousLinearMap (Matrix.mulVecLin (N.map (Int.cast : ℤ → ℂ)))
 
-theorem matCLM_apply {κ J : Type} [Fintype κ] [Fintype J] (N : Matrix κ J ℤ) (u : J → ℂ) :
-    matCLM N u = fun i => ∑ j, (N i j : ℂ) * u j := by
+theorem matCLM_apply {κ J : Type} [Fintype κ] [Fintype J] (N : Matrix κ J ℤ) (u : J → ℂ)
+    : matCLM N u = fun i => ∑ j, (N i j : ℂ) * u j := by
   funext i
   simp [matCLM, Matrix.mulVec, dotProduct]
 
 def blockCLM {K : Type} {ι : K → Type} (k₀ : K) : ((Σ k, ι k) → ℂ) →L[ℂ] (ι k₀ → ℂ) :=
   ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (⟨k₀, i⟩ : Σ k, ι k)
 
-theorem blockCLM_apply {K : Type} {ι : K → Type} (k₀ : K) (z : (Σ k, ι k) → ℂ) :
-    blockCLM k₀ z = fun i => z ⟨k₀, i⟩ := rfl
+theorem blockCLM_apply {K : Type} {ι : K → Type} (k₀ : K) (z : (Σ k, ι k) → ℂ)
+    : blockCLM k₀ z = fun i => z ⟨k₀, i⟩ :=
+  rfl
 
 theorem proof : BlockImageMetrics.Statement := by
   constructor

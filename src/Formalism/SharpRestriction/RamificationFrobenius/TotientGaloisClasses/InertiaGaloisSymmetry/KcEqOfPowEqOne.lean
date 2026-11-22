@@ -15,15 +15,20 @@ open Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition
 
 variable {φ : Frame} (H : HostRaw φ)
 
-theorem kc_eq_of_pow_eq_one {S : Type*} [CommRing S] [IsDomain S] (P : Ideal S) [hP : P.IsPrime] {m : ℕ} (hm : (m : S) ∉ P)
-    {x y : S} (hx : x ^ m = 1) (hy : y ^ m = 1) (hxy : x - y ∈ P) : x = y := by
+theorem kc_eq_of_pow_eq_one
+    {S : Type*} [CommRing S] [IsDomain S]
+    (P : Ideal S) [hP : P.IsPrime]
+    {m : ℕ} (hm : (m : S) ∉ P)
+    {x y : S} (hx : x ^ m = 1) (hy : y ^ m = 1) (hxy : x - y ∈ P)
+    : x = y := by
   by_contra hne
   have h1 := geom_sum₂_mul x y m
   rw [hx, hy, sub_self, mul_eq_zero, sub_eq_zero] at h1
   have h2 := congrArg (Ideal.Quotient.mk P) (h1.resolve_right hne)
   have h3 : Ideal.Quotient.mk P x = Ideal.Quotient.mk P y := Ideal.Quotient.eq.mpr hxy
-  rw [RingHom.map_geom_sum₂, h3, geom_sum₂_self, map_zero, ← map_pow, ← map_natCast (Ideal.Quotient.mk P), ← map_mul,
-    Ideal.Quotient.eq_zero_iff_mem] at h2
+  rw [RingHom.map_geom_sum₂, h3, geom_sum₂_self, map_zero, ← map_pow,
+      ← map_natCast (Ideal.Quotient.mk P), ← map_mul, Ideal.Quotient.eq_zero_iff_mem]
+    at h2
   rcases hP.mem_or_mem h2 with h4 | h4
   · exact hm h4
   · have h5 : y ∈ P := hP.mem_of_pow_mem _ h4
@@ -41,12 +46,15 @@ theorem kc_no_root_d (η : H.E) (hη : IsPrimitiveRoot η H.d) : False := by
   obtain ⟨⟨Q, hQp, hQl⟩⟩ : Nonempty ((span {(H.d : ℤ)}).primesOver (𝓞 H.E)) := inferInstance
   have hge := Mu.mu_le_ram H.d Q (H.d - 1) (Mu.mu_mem_pow H.d Q η hη)
   have hd := H.hyp.2.2.2.1
-  have hle := Mu.mu_card_le_two (L := H.E) H.gal H.gal.injective φ.iod (Q.inertia Gal(H.E/ℚ))
-    (fun ρ hρ => (C.inertia_d Q ρ).mp (AddSubgroup.mem_inertia.mp hρ))
+  have hle :=
+    Mu.mu_card_le_two (L := H.E) H.gal H.gal.injective φ.iod (Q.inertia Gal(H.E/ℚ))
+      (fun ρ hρ => (C.inertia_d Q ρ).mp (AddSubgroup.mem_inertia.mp hρ))
   rw [odd_card H.E H.d Q] at hle
   omega
 
-theorem kc_iod_fix (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ = φ.iod) (x : H.E) (hx : ∃ m : ℕ, 0 < m ∧ x ^ m = 1) : σ x = x := by
+theorem kc_iod_fix
+    (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ = φ.iod) (x : H.E) (hx : ∃ m : ℕ, 0 < m ∧ x ^ m = 1)
+    : σ x = x := by
   obtain ⟨n, hn, hxn⟩ := hx
   have hfin : IsOfFinOrder x := isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, hxn⟩
   have hmpos : 0 < orderOf x := orderOf_pos_iff.2 hfin
@@ -108,7 +116,11 @@ theorem norm_mu : ∀ x : H.E, (∃ m : ℕ, 0 < m ∧ x ^ m = 1) → Algebra.no
     exact absurd (congrArg (fun g : φ.GG => g.1) hg) (show ¬ (1 : G0) = (-1, 1) by decide)
   apply (algebraMap H.K H.E).injective
   rw [Algebra.norm_eq_prod_automorphisms, map_one]
-  refine Finset.prod_involution (fun σ _ => σ * s) (fun σ _ => ?_) (fun σ _ _ => ?_) (fun _ _ => Finset.mem_univ _)
+  refine Finset.prod_involution
+    (fun σ _ => σ * s)
+    (fun σ _ => ?_)
+    (fun σ _ _ => ?_)
+    (fun _ _ => Finset.mem_univ _)
     (fun σ _ => ?_)
   · rw [AlgEquiv.mul_apply, ← map_mul, hsx, map_one]
   · exact fun h1 => hs1 (mul_eq_left.mp h1)

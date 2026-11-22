@@ -11,12 +11,12 @@ namespace RootFieldNumerics.L3
 
 variable {Ψ : Type} [Fintype Ψ] {N : ℕ}
 
-theorem permExp_apply (σ : Ψ → Equiv.Perm (Fin N)) (x : Ψ × Fin N) :
-    permExp σ x = N - 1 - ((σ x.1 x.2 : Fin N) : ℕ) := by
+theorem permExp_apply (σ : Ψ → Equiv.Perm (Fin N)) (x : Ψ × Fin N)
+    : permExp σ x = N - 1 - ((σ x.1 x.2 : Fin N) : ℕ) := by
   simp [permExp]
 
-theorem permExp_injective :
-    Function.Injective (permExp : (Ψ → Equiv.Perm (Fin N)) → (Ψ × Fin N) →₀ ℕ) := by
+theorem permExp_injective
+    : Function.Injective (permExp : (Ψ → Equiv.Perm (Fin N)) → (Ψ × Fin N) →₀ ℕ) := by
   intro σ σ' h
   funext τ
   ext i
@@ -27,16 +27,15 @@ theorem permExp_injective :
   dsimp only at h1
   omega
 
-theorem degree_permExp_one :
-    (permExp (1 : Ψ → Equiv.Perm (Fin N))).degree = dimFl Ψ N := by
+theorem degree_permExp_one : (permExp (1 : Ψ → Equiv.Perm (Fin N))).degree = dimFl Ψ N := by
   rw [Finsupp.degree_eq_sum, Fintype.sum_prod_type]
   simp only [permExp_apply, Pi.one_apply, Equiv.Perm.one_apply]
   rw [Finset.sum_const, Finset.card_univ, smul_eq_mul, dimFl,
     Fin.sum_univ_eq_sum_range (fun i => N - 1 - i) N, Finset.sum_range_reflect (fun i => i) N,
     Finset.sum_range_id]
 
-theorem degFl_monomial_one [DecidableEq Ψ] :
-    degFl (monomial (permExp (1 : Ψ → Equiv.Perm (Fin N))) ((-1 : ℝ) ^ dimFl Ψ N)) = 1 := by
+theorem degFl_monomial_one [DecidableEq Ψ]
+    : degFl (monomial (permExp (1 : Ψ → Equiv.Perm (Fin N))) ((-1 : ℝ) ^ dimFl Ψ N)) = 1 := by
   unfold degFl
   rw [Finset.sum_eq_single (1 : Ψ → Equiv.Perm (Fin N))]
   · simp [← mul_pow]
@@ -46,9 +45,20 @@ theorem degFl_monomial_one [DecidableEq Ψ] :
 
 end RootFieldNumerics.L3
 
-theorem RootFieldNumerics.exists_degree_one_class : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (τ : Ψ), 1 ≤ j → j < N → (∃ Q : RP Ψ N, Q.IsHomogeneous (dimFl Ψ N) ∧ degFl Q = 1) ∧ ∃ Q : RP Ψ N, Q.IsHomogeneous (dimFl Ψ N - 1) ∧ degFl (pkLow j τ 1 * Q) = 1 := by
+theorem RootFieldNumerics.exists_degree_one_class
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (τ : Ψ),
+      1 ≤ j → j < N
+        → (∃ Q : RP Ψ N, Q.IsHomogeneous (dimFl Ψ N) ∧ degFl Q = 1)
+          ∧ ∃ Q : RP Ψ N, Q.IsHomogeneous (dimFl Ψ N - 1) ∧ degFl (pkLow j τ 1 * Q) = 1 := by
   intro Ψ _ _ N j τ h1 hj
-  refine ⟨⟨_, isHomogeneous_monomial _ RootFieldNumerics.L3.degree_permExp_one, RootFieldNumerics.L3.degFl_monomial_one⟩, ?_⟩
+  refine ⟨
+    ⟨
+      _,
+      isHomogeneous_monomial _ RootFieldNumerics.L3.degree_permExp_one,
+      RootFieldNumerics.L3.degFl_monomial_one
+    ⟩,
+    ?_
+  ⟩
   let i0 : Fin N := ⟨j - 1, by omega⟩
   let i1 : Fin N := ⟨j, hj⟩
   let m : (Ψ × Fin N) →₀ ℕ := permExp (1 : Ψ → Equiv.Perm (Fin N)) - Finsupp.single (τ, i0) 1
@@ -66,8 +76,8 @@ theorem RootFieldNumerics.exists_degree_one_class : ∀ (Ψ : Type) [Fintype Ψ]
     simp only [i0, i1] at this
     omega
   have hm0 : m (τ, i0) = N - 1 - j := by
-    simp only [m, Finsupp.tsub_apply, RootFieldNumerics.L3.permExp_apply, Finsupp.single_eq_same, Pi.one_apply,
-      Equiv.Perm.one_apply, i0]
+    simp only [m, Finsupp.tsub_apply, RootFieldNumerics.L3.permExp_apply, Finsupp.single_eq_same,
+      Pi.one_apply, Equiv.Perm.one_apply, i0]
     omega
   have hm1 : m (τ, i1) = N - 1 - j := by
     have : (Finsupp.single (τ, i0) 1 : (Ψ × Fin N) →₀ ℕ) (τ, i1) = 0 :=
@@ -93,9 +103,11 @@ theorem RootFieldNumerics.exists_degree_one_class : ∀ (Ψ : Type) [Fintype Ψ]
     have e0 := DFunLike.congr_fun h (τ, i0)
     have e1 := DFunLike.congr_fun h (τ, i1)
     rw [Finsupp.add_apply, Finsupp.single_eq_of_ne' (by simpa using hi0), hm0,
-      RootFieldNumerics.L3.permExp_apply] at e0
+        RootFieldNumerics.L3.permExp_apply]
+      at e0
     rw [Finsupp.add_apply, Finsupp.single_eq_of_ne' (by simpa using hi1), hm1,
-      RootFieldNumerics.L3.permExp_apply] at e1
+        RootFieldNumerics.L3.permExp_apply]
+      at e1
     dsimp only at e0 e1
     have h2 := (σ τ i0).2
     have h3 := (σ τ i1).2

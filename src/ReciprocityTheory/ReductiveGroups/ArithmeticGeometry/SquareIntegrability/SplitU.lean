@@ -18,18 +18,17 @@ section lin
 
 variable {dim : (E →+* ℂ) → ℕ}
 
-theorem IsU.add' {I : Submodule ℤ (Vsp dim)} {x y u v : Vsp dim} (hu : IsU I x u)
-    (hv : IsU I y v) : IsU I (x + y) (u + v) := by
+theorem IsU.add' {I : Submodule ℤ (Vsp dim)} {x y u v : Vsp dim} (hu : IsU I x u) (hv : IsU I y v)
+    : IsU I (x + y) (u + v) := by
   refine ⟨add_mem hu.1 hv.1, fun a ha => ?_⟩
-  have hH : Hf (x + y) a = Hf x a + Hf y a := by
-    simp [Hf, add_mul, Finset.sum_add_distrib]
+  have hH : Hf (x + y) a = Hf x a + Hf y a := by simp [Hf, add_mul, Finset.sum_add_distrib]
   rw [inner_add_left, hu.2 a ha, hv.2 a ha, hH, Complex.add_im]
 
 theorem IsU.zero' (I : Submodule ℤ (Vsp dim)) : IsU I 0 0 := by
   exact ⟨zero_mem _, fun a _ => by simp [Hf]⟩
 
-theorem IsU.zsmul' {I : Submodule ℤ (Vsp dim)} {x u : Vsp dim} (k : ℤ) (hu : IsU I x u) :
-    IsU I (k • x) (k • u) := by
+theorem IsU.zsmul' {I : Submodule ℤ (Vsp dim)} {x u : Vsp dim} (k : ℤ) (hu : IsU I x u)
+    : IsU I (k • x) (k • u) := by
   refine ⟨zsmul_mem hu.1 k, fun a ha => ?_⟩
   have hH : Hf (k • x) a = (k : ℂ) * Hf x a := by
     simp only [Hf]
@@ -42,18 +41,19 @@ theorem IsU.zsmul' {I : Submodule ℤ (Vsp dim)} {x u : Vsp dim} (k : ℤ) (hu :
 end lin
 
 theorem eq_zero_of_im_L (X : PT E) {a : Vsp X.dim} (h : ∀ y ∈ X.L, (Hf y a).im = 0) : a = 0 := by
-  have hH : ∀ y, Hf y a = inner ℂ a y := fun y => by
-    simp [Hf, PiLp.inner_apply, mul_comm]
+  have hH : ∀ y, Hf y a = inner ℂ a y := fun y => by simp [Hf, PiLp.inner_apply, mul_comm]
   have hf : (Complex.imLm.comp ((innerₛₗ ℂ a).restrictScalars ℝ) : Vsp X.dim →ₗ[ℝ] ℝ) = 0 :=
-    X.b.ext fun i => by
-      simpa [← hH] using h (X.b i) (Submodule.subset_span ⟨i, rfl⟩)
+    X.b.ext fun i => by simpa [← hH] using h (X.b i) (Submodule.subset_span ⟨i, rfl⟩)
   have h0 : (inner ℂ a ((Complex.I : ℂ) • a)).im = 0 := by
     have := LinearMap.congr_fun hf ((Complex.I : ℂ) • a)
     first
-      | exact this
-      | (simp only [LinearMap.comp_apply, LinearMap.restrictScalars_apply, innerₛₗ_apply,
-          LinearMap.zero_apply] at this
-         exact this)
+    | exact this
+    | (
+        simp only [LinearMap.comp_apply, LinearMap.restrictScalars_apply, innerₛₗ_apply,
+            LinearMap.zero_apply]
+          at this
+        exact this
+      )
   rw [inner_smul_right, inner_self_eq_norm_sq_to_K] at h0
   have h2 : ‖a‖ ^ 2 = 0 := by
     have h3 : (Complex.I * ((‖a‖ : ℂ) ^ 2)).im = ‖a‖ ^ 2 := by
@@ -64,26 +64,28 @@ theorem eq_zero_of_im_L (X : PT E) {a : Vsp X.dim} (h : ∀ y ∈ X.L, (Hf y a).
     exact h0
   simpa using h2
 
-theorem mem_L_of_int (X : PT E) {a : Vsp X.dim} (h : ∀ y ∈ X.L, ∃ k : ℤ, (Hf y a).im = k) :
-    a ∈ X.L := by
-  have hadd : ∀ y y' : Vsp X.dim, (Hf (y + y') a).im = (Hf y a).im + (Hf y' a).im :=
-    fun y y' => by simp [Hf, add_mul, Finset.sum_add_distrib]
-  let φ : X.L →+ ℤ :=
-    { toFun := fun y => (h (y : Vsp X.dim) y.2).choose
-      map_zero' := by
-        have e := (h ((0 : X.L) : Vsp X.dim) (0 : X.L).2).choose_spec
-        have e' : (((h ((0 : X.L) : Vsp X.dim) (0 : X.L).2).choose : ℤ) : ℝ) = 0 := by
-          rw [← e]
-          simp [Hf]
-        exact_mod_cast e'
-      map_add' := fun y y' => by
-        have e1 := (h ((y + y' : X.L) : Vsp X.dim) (y + y').2).choose_spec
-        have e2 := (h (y : Vsp X.dim) y.2).choose_spec
-        have e3 := (h (y' : Vsp X.dim) y'.2).choose_spec
-        have e' : (((h ((y + y' : X.L) : Vsp X.dim) (y + y').2).choose : ℤ) : ℝ) =
-            (h (y : Vsp X.dim) y.2).choose + (h (y' : Vsp X.dim) y'.2).choose := by
-          rw [← e1, ← e2, ← e3, Submodule.coe_add, hadd]
-        exact_mod_cast e' }
+theorem mem_L_of_int (X : PT E) {a : Vsp X.dim} (h : ∀ y ∈ X.L, ∃ k : ℤ, (Hf y a).im = k)
+    : a ∈ X.L := by
+  have hadd : ∀ y y' : Vsp X.dim, (Hf (y + y') a).im = (Hf y a).im + (Hf y' a).im := fun y y' => by
+    simp [Hf, add_mul, Finset.sum_add_distrib]
+  let φ : X.L →+ ℤ := {
+    toFun := fun y => (h (y : Vsp X.dim) y.2).choose
+    map_zero' := by
+      have e := (h ((0 : X.L) : Vsp X.dim) (0 : X.L).2).choose_spec
+      have e' : (((h ((0 : X.L) : Vsp X.dim) (0 : X.L).2).choose : ℤ) : ℝ) = 0 := by
+        rw [← e]
+        simp [Hf]
+      exact_mod_cast e'
+    map_add' := fun y y' => by
+      have e1 := (h ((y + y' : X.L) : Vsp X.dim) (y + y').2).choose_spec
+      have e2 := (h (y : Vsp X.dim) y.2).choose_spec
+      have e3 := (h (y' : Vsp X.dim) y'.2).choose_spec
+      have e'
+          : (((h ((y + y' : X.L) : Vsp X.dim) (y + y').2).choose : ℤ) : ℝ)
+            = (h (y : Vsp X.dim) y.2).choose + (h (y' : Vsp X.dim) y'.2).choose := by
+        rw [← e1, ← e2, ← e3, Submodule.coe_add, hadd]
+      exact_mod_cast e'
+  }
   obtain ⟨x, hx, hxy⟩ := X.perfect φ
   have key : a + x = 0 := by
     apply eq_zero_of_im_L X
@@ -100,26 +102,31 @@ theorem mem_L_of_int (X : PT E) {a : Vsp X.dim} (h : ∀ y ∈ X.L, ∃ k : ℤ,
   rw [ha]
   exact neg_mem hx
 
-theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim)) (hle : I ≤ X.L)
-    (hsat : ∀ x ∈ X.L, x ∈ IR I → x ∈ I) (hla : 0 < X.la1) {ε : ℝ} (hε : 0 < ε) :
-    ∃ x u : Fin (Module.finrank ℝ (IR I)) → Vsp X.dim, (∀ j, x j ∈ X.L ∧ IsU I (x j) (u j)) ∧
-      LinearIndependent ℝ u ∧ ∀ j, ‖u j‖ ≤ Module.finrank ℝ (IR I) / X.la1 + ε := by
+theorem exists_short_vectors_realSpan
+    (X : PT E) (I : Submodule ℤ (Vsp X.dim))
+    (hle : I ≤ X.L) (hsat : ∀ x ∈ X.L, x ∈ IR I → x ∈ I) (hla : 0 < X.la1)
+    {ε : ℝ} (hε : 0 < ε)
+    : ∃ x u : Fin (Module.finrank ℝ (IR I)) → Vsp X.dim,
+      (∀ j, x j ∈ X.L ∧ IsU I (x j) (u j)) ∧ LinearIndependent ℝ u
+        ∧ ∀ j, ‖u j‖ ≤ Module.finrank ℝ (IR I) / X.la1 + ε := by
   set K := IR I with hK
   set N := Module.finrank ℝ K with hNdef
   let e : K ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin N) := (stdOrthonormalBasis ℝ K).repr
-  let M : Submodule ℤ (EuclideanSpace ℝ (Fin N)) :=
-    { carrier := {z | ∃ y ∈ X.L, IsU I y ((e.symm z : K) : Vsp X.dim)}
-      add_mem' := by
-        rintro z z' ⟨y, hy, hu⟩ ⟨y', hy', hu'⟩
-        exact ⟨y + y', X.L.add_mem hy hy', by simpa using hu.add' hu'⟩
-      zero_mem' := ⟨0, X.L.zero_mem, by simpa using IsU.zero' I⟩
-      smul_mem' := by
-        rintro k z ⟨y, hy, hu⟩
-        exact ⟨k • y, X.L.smul_mem k hy, by simpa using hu.zsmul' k⟩ }
+  let M : Submodule ℤ (EuclideanSpace ℝ (Fin N)) := {
+    carrier := {z | ∃ y ∈ X.L, IsU I y ((e.symm z : K) : Vsp X.dim)}
+    add_mem' := by
+      rintro z z' ⟨y, hy, hu⟩ ⟨y', hy', hu'⟩
+      exact ⟨y + y', X.L.add_mem hy hy', by simpa using hu.add' hu'⟩
+    zero_mem' := ⟨0, X.L.zero_mem, by simpa using IsU.zero' I⟩
+    smul_mem' := by
+      rintro k z ⟨y, hy, hu⟩
+      exact ⟨k • y, X.L.smul_mem k hy, by simpa using hu.zsmul' k⟩
+  }
   have hmemM : ∀ y ∈ X.L, ∀ u, IsU I y u → ∃ z ∈ M, ((e.symm z : K) : Vsp X.dim) = u :=
     fun y hy u hu => ⟨e ⟨u, hu.1⟩, ⟨y, hy, by simpa using hu⟩, by simp⟩
-  have hinner : ∀ z z' : EuclideanSpace ℝ (Fin N),
-      ⟪z, z'⟫_ℝ = ⟪((e.symm z : K) : Vsp X.dim), ((e.symm z' : K) : Vsp X.dim)⟫_ℝ := by
+  have hinner
+      : ∀ z z' : EuclideanSpace ℝ (Fin N),
+        ⟪z, z'⟫_ℝ = ⟪((e.symm z : K) : Vsp X.dim), ((e.symm z' : K) : Vsp X.dim)⟫_ℝ := by
     intro z z'
     rw [← Submodule.coe_inner, LinearIsometryEquiv.inner_map_map]
   have hnormE : ∀ z, ‖((e.symm z : K) : Vsp X.dim)‖ = ‖z‖ := by
@@ -138,8 +145,13 @@ theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim))
     rw [← hu.2 _ (e.symm z).2, ← hk, hinner, hz', real_inner_comm]
   rcases Nat.eq_zero_or_pos N with hN0 | hNpos
   · have : IsEmpty (Fin N) := by rw [hN0]; infer_instance
-    exact ⟨fun _ => 0, fun _ => 0, fun j => isEmptyElim j, linearIndependent_empty_type,
-      fun j => isEmptyElim j⟩
+    exact ⟨
+      fun _ => 0,
+      fun _ => 0,
+      fun j => isEmptyElim j,
+      linearIndependent_empty_type,
+      fun j => isEmptyElim j
+    ⟩
   obtain ⟨a0, ha0I, ha0⟩ : ∃ a ∈ I, a ≠ 0 := by
     by_contra hcon
     push Not at hcon
@@ -196,8 +208,11 @@ theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim))
       exact one_le_abs_im X hy (hle (hsI has)) ha
     have h2 : |⟪u, a⟫_ℝ| ≤ ‖u‖ * ‖a‖ := abs_real_inner_le_norm _ _
     have h3 : ‖a‖ ≤ A := by
-      have := Finset.single_le_sum (f := fun a => ‖a‖) (fun _ _ => norm_nonneg _)
-        ((Set.Finite.mem_toFinset hsfin).2 has)
+      have :=
+        Finset.single_le_sum
+          (f := fun a => ‖a‖)
+          (fun _ _ => norm_nonneg _)
+          ((Set.Finite.mem_toFinset hsfin).2 has)
       linarith
     rw [← hnormE z, div_le_iff₀ hApos]
     nlinarith [norm_nonneg u]
@@ -219,9 +234,16 @@ theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim))
         obtain ⟨y, hy, hu⟩ := hz
         obtain ⟨k, hk⟩ := X.integral y a0 hy (hle ha0I)
         refine ⟨k, ?_⟩
-        rw [hinner, LinearIsometryEquiv.symm_apply_apply, real_inner_comm, hu.2 a0 (mem_IR ha0I), hk]
-      refine ⟨‖e ⟨a0, mem_IR ha0I⟩‖, norm_nonneg _, fun _ => e ⟨a0, mem_IR ha0I⟩,
-        fun _ => hmem, ?_, fun _ => le_rfl⟩
+        rw [hinner, LinearIsometryEquiv.symm_apply_apply, real_inner_comm, hu.2 a0 (mem_IR ha0I),
+          hk]
+      refine ⟨
+        ‖e ⟨a0, mem_IR ha0I⟩‖,
+        norm_nonneg _,
+        fun _ => e ⟨a0, mem_IR ha0I⟩,
+        fun _ => hmem,
+        ?_,
+        fun _ => le_rfl
+      ⟩
       rw [linearIndependent_unique_iff]
       intro h0
       apply ha0
@@ -235,27 +257,38 @@ theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim))
         apply hv0
         have : e.symm (v 0) = 0 := Subtype.ext h0
         simpa using congrArg e this
-      calc X.la1 ≤ ‖((e.symm (v 0) : K) : Vsp X.dim)‖ := sq_le_Qy_of_le_firstMinimum X (hle ha) hne
+      calc
+        X.la1
+          ≤ ‖((e.symm (v 0) : K) : Vsp X.dim)‖ := sq_le_Qy_of_le_firstMinimum X (hle ha) hne
         _ = ‖v 0‖ := hnormE _
         _ ≤ t := hvt 0
   have hlam : PI.succMin M N ≤ N / X.la1 := by
     rw [le_div_iff₀ hla]
     nlinarith
 
-  have hne : {t : ℝ | 0 ≤ t ∧ ∃ v : Fin N → EuclideanSpace ℝ (Fin N),
-      (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ t}.Nonempty := by
-    obtain ⟨s', hs'M, hs'span, hs'li⟩ := exists_linearIndependent ℝ (M : Set (EuclideanSpace ℝ (Fin N)))
+  have hne
+      : {t : ℝ | 0 ≤ t ∧ ∃ v : Fin N → EuclideanSpace ℝ (Fin N),
+        (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ t}.Nonempty := by
+    obtain ⟨s', hs'M, hs'span, hs'li⟩ :=
+      exists_linearIndependent ℝ (M : Set (EuclideanSpace ℝ (Fin N)))
     have hfin' : s'.Finite := hs'li.setFinite
     have : Fintype s' := hfin'.fintype
     let bs := Module.Basis.mk hs'li (by rw [Subtype.range_coe, hs'span, hspan])
     have hcard : Fintype.card s' = N := by
       rw [← Module.finrank_eq_card_basis bs, finrank_euclideanSpace_fin]
     let eq : Fin N ≃ s' := (Fintype.equivFinOfCardEq hcard).symm
-    refine ⟨∑ j, ‖((eq j : s') : EuclideanSpace ℝ (Fin N))‖,
-      Finset.sum_nonneg (fun _ _ => norm_nonneg _), fun j => (eq j : EuclideanSpace ℝ (Fin N)),
-      fun j => hs'M (eq j).2, hs'li.comp eq eq.injective, fun j => ?_⟩
-    exact Finset.single_le_sum (f := fun j => ‖((eq j : s') : EuclideanSpace ℝ (Fin N))‖)
-      (fun _ _ => norm_nonneg _) (Finset.mem_univ j)
+    refine ⟨
+      ∑ j, ‖((eq j : s') : EuclideanSpace ℝ (Fin N))‖,
+      Finset.sum_nonneg (fun _ _ => norm_nonneg _),
+      fun j => (eq j : EuclideanSpace ℝ (Fin N)),
+      fun j => hs'M (eq j).2,
+      hs'li.comp eq eq.injective,
+      fun j => ?_
+    ⟩
+    exact Finset.single_le_sum
+      (f := fun j => ‖((eq j : s') : EuclideanSpace ℝ (Fin N))‖)
+      (fun _ _ => norm_nonneg _)
+      (Finset.mem_univ j)
   obtain ⟨t, ⟨-, v, hvM, hvli, hvt⟩, htlt⟩ :=
     exists_lt_of_csInf_lt hne (lt_add_of_pos_right (PI.succMin M N) hε)
   choose y hy hyU using hvM
@@ -265,8 +298,12 @@ theorem exists_short_vectors_realSpan (X : PT E) (I : Submodule ℤ (Vsp X.dim))
   · intro j
     rw [hnormE]
     have := hvt j
-    have h2 : PI.succMin M N = sInf {t : ℝ | 0 ≤ t ∧ ∃ v : Fin N → EuclideanSpace ℝ (Fin N),
-      (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ t} := rfl
+    have h2
+        : PI.succMin M N
+          = sInf
+            {t : ℝ | 0 ≤ t ∧ ∃ v : Fin N → EuclideanSpace ℝ (Fin N),
+              (∀ j, v j ∈ M) ∧ LinearIndependent ℝ v ∧ ∀ j, ‖v j‖ ≤ t} :=
+      rfl
     linarith
 
 end

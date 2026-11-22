@@ -15,14 +15,20 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 namespace B2x7
 
 variable {k r' : ℕ}
 
 def dgR (k r : ℕ) (t : ℝ) (i : Fin (2 * r + k + 1)) : ℝ :=
-  if i.val < r then t ^ (r - i.val) else if i.val ≤ r + k then 1 else (t ^ (i.val - (r + k)))⁻¹
+  if i.val < r then
+    t ^ (r - i.val)
+  else if i.val ≤ r + k then
+    1
+  else
+    (t ^ (i.val - (r + k)))⁻¹
 
 lemma aDil_eq (k r : ℕ) (t : ℝ) : aDil k r t = Matrix.diagonal fun i => ((dgR k r t i : ℝ) : ℂ) := by
   unfold aDil dgR
@@ -192,8 +198,8 @@ open B2x7
 theorem dilation_conjugates_heisenberg : Formalism.FourierDecayAlt.B2.DilHeis := by
   intro k r' t ht x
   unfold heis0
-  rw [heisG_comm _ (dilation_mem_group k (1 + r') t ht) _ (dilation_base_vector t), Matrix.mul_assoc, aDil_mul_inv _ _ _ ht, Matrix.mul_one,
-    aDil_lift, ← liftVec_smul, hb_dil t ht]
+  rw [heisG_comm _ (dilation_mem_group k (1 + r') t ht) _ (dilation_base_vector t),
+    Matrix.mul_assoc, aDil_mul_inv _ _ _ ht, Matrix.mul_one, aDil_lift, ← liftVec_smul, hb_dil t ht]
 
 theorem dilation_levi_conjugation : Formalism.FourierDecayAlt.B2.DilLev := by
   intro k r' t ht g
@@ -205,7 +211,8 @@ theorem dilation_levi_conjugation : Formalism.FourierDecayAlt.B2.DilLev := by
   by_cases hi : 1 ≤ i.val ∧ i.val < 2 * r' + k + 1 + 1
   · rw [dif_pos hi, dif_pos hi]
     by_cases hj : 1 ≤ j.val ∧ j.val < 2 * r' + k + 1 + 1
-    · rw [dif_pos hj, dif_pos hj, Matrix.mul_diagonal, Matrix.diagonal_mul, dgR_shift t i hi, dgR_shift t⁻¹ j hj]
+    · rw [dif_pos hj, dif_pos hj, Matrix.mul_diagonal, Matrix.diagonal_mul, dgR_shift t i hi,
+        dgR_shift t⁻¹ j hj]
     · rw [dif_neg hj, dif_neg hj]; simp
   · rw [dif_neg hi, dif_neg hi]
     by_cases h : i = j
@@ -269,7 +276,8 @@ lemma heisF_cont : Continuous (heisF k r') := by
 
 def dilL (k r' : ℕ) (t : ℝ) : HPar k r' →ₗ[ℝ] HPar k r' :=
   LinearMap.prodMap
-    (LinearMap.pi fun i => ((t ^ (1 + r') * dgR k r' t i) • (LinearMap.id : ℂ →ₗ[ℝ] ℂ)).comp (LinearMap.proj i))
+    (LinearMap.pi fun i =>
+      ((t ^ (1 + r') * dgR k r' t i) • (LinearMap.id : ℂ →ₗ[ℝ] ℂ)).comp (LinearMap.proj i))
     ((t ^ (2 * (1 + r'))) • LinearMap.id)
 
 lemma haarHPar (k r' : ℕ) : (volume : Measure (HPar k r')).IsAddHaarMeasure := by
@@ -303,15 +311,17 @@ theorem dilation_scales_heisenberg_measure : Formalism.FourierDecayAlt.B2.DilHei
   have ht0 : t ≠ 0 := ht.ne'
   have hL : Measurable (dilL k r' t) := (LinearMap.continuous_of_finiteDimensional _).measurable
   have hH : Measurable (heisF k r') := heisF_cont.measurable
-  have hC : Measurable (conjM (aDil k (1 + r') t) : Mt k (1 + r') → Mt k (1 + r')) := (conjM_cont _).measurable
+  have hC : Measurable (conjM (aDil k (1 + r') t) : Mt k (1 + r') → Mt k (1 + r')) :=
+    (conjM_cont _).measurable
   have hcomp : conjM (aDil k (1 + r') t) ∘ heisF k r' = heisF k r' ∘ dilL k r' t := by
     funext x
     show aDil k (1 + r') t * heis0 k r' x * (aDil k (1 + r') t)⁻¹ = heis0 k r' (dilL k r' t x)
     rw [dilation_conjugates_heisenberg k r' t ht0 x, dilL_apply]
   have := haarHPar k r'
   have hdet : LinearMap.det (dilL k r' t) ≠ 0 := by rw [det_dilL t ht0]; exact pow_ne_zero _ ht0
-  rw [μHeis_eq, Measure.map_map hC hH, hcomp, ← Measure.map_map hH hL, Measure.map_linearMap_addHaar_eq_smul_addHaar _ hdet, Measure.map_smul,
-    det_dilL t ht0, abs_of_pos (inv_pos.mpr (pow_pos ht _))]
+  rw [μHeis_eq, Measure.map_map hC hH, hcomp, ← Measure.map_map hH hL,
+    Measure.map_linearMap_addHaar_eq_smul_addHaar _ hdet, Measure.map_smul, det_dilL t ht0,
+    abs_of_pos (inv_pos.mpr (pow_pos ht _))]
   exact hH.aemeasurable
 
 namespace B2x7
@@ -384,7 +394,8 @@ lemma dil_step (μ' : Measure (Mt k r')) [SigmaFinite μ'] (t : ℝ) (ht : 0 < t
     smul_smul, Measure.map_smul, ← ENNReal.ofReal_mul (by positivity), ← mul_inv, ← pow_add, ← modular_exponent_recursion k r']
   exact hM.aemeasurable
 
-theorem dilJacRaw_of (hU : HaarUnique) (hN : ClosedN) (hR : NRecHaar) (hE : HaarNExists) : DilJacRaw := by
+theorem dilJacRaw_of (hU : HaarUnique) (hN : ClosedN) (hR : NRecHaar) (hE : HaarNExists)
+    : DilJacRaw := by
   intro k r
   induction r with
   | zero =>
@@ -396,17 +407,22 @@ theorem dilJacRaw_of (hU : HaarUnique) (hN : ClosedN) (hR : NRecHaar) (hE : Haar
     intro μN hμ t ht
     obtain ⟨μ', hμ'⟩ := hE k r'
     have := sigmaFinite_of_haar hμ'
-    obtain ⟨c, hc⟩ := hU k (1 + r') (Nset k (1 + r')) _ μN (hN k (1 + r')) (hR k r' μ' hμ') hμ.conc hμ.left hμ.finite_compact
+    obtain ⟨c, hc⟩ :=
+      hU k (1 + r') (Nset k (1 + r')) _ μN (hN k (1 + r')) (hR k r' μ' hμ') hμ.conc hμ.left
+        hμ.finite_compact
     rw [hc, Measure.map_smul, dil_step μ' t ht (ih μ' hμ' t ht), smul_comm]
     exact (conjM_cont _).measurable.aemeasurable
 
-theorem dilJacAll_of (h : DilJacRaw) : DilJacAll := fun k r _ _ _ _ _ _ D t ht => h k r D.μN D.haarN t ht
+theorem dilJacAll_of (h : DilJacRaw) : DilJacAll := fun k r _ _ _ _ _ _ D t ht =>
+  h k r D.μN D.haarN t ht
 
 end B2x7
 
 theorem dilation_jacobian_unipotent : Formalism.FourierDecayAlt.B2.DilJacRaw :=
-  B2x7.dilJacRaw_of haar_measure_unique_up_to_scalar unipotent_radical_closed unipotent_haar_recursion unipotent_haar_exists
+  B2x7.dilJacRaw_of haar_measure_unique_up_to_scalar unipotent_radical_closed
+    unipotent_haar_recursion unipotent_haar_exists
 
-theorem dilation_jacobian_every_setting : Formalism.FourierDecayAlt.B2.DilJacAll := B2x7.dilJacAll_of dilation_jacobian_unipotent
+theorem dilation_jacobian_every_setting : Formalism.FourierDecayAlt.B2.DilJacAll :=
+  B2x7.dilJacAll_of dilation_jacobian_unipotent
 
 end Formalism.FourierDecayAlt.P

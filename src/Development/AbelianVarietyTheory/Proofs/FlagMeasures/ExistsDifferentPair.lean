@@ -49,8 +49,8 @@ theorem mem_std (v : Fin 2 → E) : v ∈ std E ↔ v 0 ∈ Int' E ∧ v 1 ∈ I
     fin_cases i <;> simp [smul_eq, ← ha, ← hb]
 
 omit [NumberField E] in
-theorem form_two (σ : E →+* E) (v w : Fin 2 → E) :
-    form σ !![1, 0; 0, -1] v w = σ (w 0) * v 0 - σ (w 1) * v 1 := by
+theorem form_two (σ : E →+* E) (v w : Fin 2 → E)
+    : form σ !![1, 0; 0, -1] v w = σ (w 0) * v 0 - σ (w 1) * v 1 := by
   simp [form, dotProduct, Matrix.mulVec, Fin.sum_univ_two, sub_eq_add_neg]
 
 theorem selfDual_std (σ : E →+* E) : SelfDual σ !![1, 0; 0, -1] (std E) := by
@@ -63,8 +63,8 @@ theorem selfDual_std (σ : E →+* E) : SelfDual σ !![1, 0; 0, -1] (std E) := b
     rw [form_two] at h0 h1
     exact (mem_std v).2 ⟨by simpa using h0, by simpa using h1⟩
 
-theorem frameLat_zero {n : ℕ} (P : Matrix (Fin n) (Fin (0 + 1)) E) :
-    frameLat P = Submodule.span (𝓞 E) {fun i => P i 0} := by
+theorem frameLat_zero {n : ℕ} (P : Matrix (Fin n) (Fin (0 + 1)) E)
+    : frameLat P = Submodule.span (𝓞 E) {fun i => P i 0} := by
   apply le_antisymm
   · rw [frameLat, Submodule.span_le]
     rintro v ⟨b, a, ha, rfl⟩
@@ -75,17 +75,18 @@ theorem frameLat_zero {n : ℕ} (P : Matrix (Fin n) (Fin (0 + 1)) E) :
     rintro v rfl
     exact Submodule.subset_span ⟨0, 1, (mem_dInv_zero 1).2 (one_mem _), by simp⟩
 
-theorem pairLat_std {g : ℕ} (hg : g ≠ 0) :
-    pairLat (r := 0) g (!![0; 1] : Matrix (Fin 2) (Fin (0 + 1)) E) !![(g : E); 1 + g] = std E := by
+theorem pairLat_std {g : ℕ} (hg : g ≠ 0)
+    : pairLat (r := 0) g (!![0; 1] : Matrix (Fin 2) (Fin (0 + 1)) E) !![(g : E); 1 + g]
+      = std E := by
   have hg' : (g : E) ≠ 0 := Nat.cast_ne_zero.2 hg
   rw [pairLat, frameLat_zero, frameLat_zero, std, Submodule.span_insert]
   congr 3
   · ext i; fin_cases i <;> simp
   · ext i; fin_cases i <;> simp [hg']
 
-theorem mem_genConf_zero (σ : E →+* E) {g : ℕ} (hg : g ≠ 0) :
-    ((std E, !![0; 1], !![(g : E); 1 + g]) : Tri E 2 0) ∈
-      GenConf σ !![1, 0; 0, -1] 1 (1 + 2 * g) g !![-1 - (g : E)] := by
+theorem mem_genConf_zero (σ : E →+* E) {g : ℕ} (hg : g ≠ 0)
+    : ((std E, !![0; 1], !![(g : E); 1 + g]) : Tri E 2 0)
+      ∈ GenConf σ !![1, 0; 0, -1] 1 (1 + 2 * g) g !![-1 - (g : E)] := by
   refine ⟨selfDual_std σ, ⟨⟨⟨!![0, 1], ?_⟩, ?_⟩, ⟨⟨!![-1, 1], ?_⟩, ?_⟩, ?_⟩, ?_⟩
   · ext i j; fin_cases i; fin_cases j; simp [Matrix.mul_apply]
   · ext i j; fin_cases i; fin_cases j; simp [pairM, cT, TF, Matrix.mul_apply]
@@ -97,8 +98,8 @@ theorem mem_genConf_zero (σ : E →+* E) {g : ℕ} (hg : g ≠ 0) :
     exact ⟨le_rfl, fun v hv _ => hv⟩
 
 omit [NumberField E] in
-theorem gq_zero (σ : E →+* E) (g : ℕ) :
-    Gq (r := 0) σ 1 (1 + 2 * g) !![-1 - (g : E)] = (g : E) ^ 2 := by
+theorem gq_zero (σ : E →+* E) (g : ℕ)
+    : Gq (r := 0) σ 1 (1 + 2 * g) !![-1 - (g : E)] = (g : E) ^ 2 := by
   simp [Gq, lead]
   ring
 

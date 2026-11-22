@@ -13,11 +13,13 @@ open Matrix
 
 section Leg
 
-variable {K : Type} [Field K] (O : ValuationSubring K) {n r : ℕ} (P : Matrix (Fin n) (Fin n) K)
-  (Λ1 Λ2 : Submodule O (Fin n → K)) (a a' α α' : Fin r → Fin n → K)
+variable
+  {K : Type} [Field K]
+  (O : ValuationSubring K)
+  {n r : ℕ}
+  (P : Matrix (Fin n) (Fin n) K) (Λ1 Λ2 : Submodule O (Fin n → K)) (a a' α α' : Fin r → Fin n → K)
 
-theorem memO_of_v {x : K} (h : O.valuation x = 1) : x ∈ O :=
-  (O.valuation_le_one_iff x).1 h.le
+theorem memO_of_v {x : K} (h : O.valuation x = 1) : x ∈ O := (O.valuation_le_one_iff x).1 h.le
 
 theorem inv_memO_of_v {x : K} (h : O.valuation x = 1) : x⁻¹ ∈ O :=
   memO_of_v O (by rw [map_inv₀, h, inv_one])
@@ -27,16 +29,18 @@ theorem ne_zero_of_v {x : K} (h : O.valuation x = 1) : x ≠ 0 := by
   simp at h
 
 def Pair (u φ : Fin n → K) : Prop :=
-  u ∈ Λ1 ∧ φ ∈ Λ2 ∧ (∀ i, pr P (α i) u = 0 ∧ pr P (α' i) u = 0) ∧
-    (∀ i, pr P φ (a i) = 0 ∧ pr P φ (a' i) = 0)
+  u ∈ Λ1 ∧ φ ∈ Λ2 ∧ (∀ i, pr P (α i) u = 0 ∧ pr P (α' i) u = 0)
+    ∧ (∀ i, pr P φ (a i) = 0 ∧ pr P φ (a' i) = 0)
 
 variable {O P Λ1 Λ2 a a' α α'} in
-theorem leg (hP : ∀ β ∈ Λ2, ∀ x ∈ Λ1, pr P β x ∈ O) {up φp uq φq : Fin n → K}
-    (hp : Pair O P Λ1 Λ2 a a' α α' up φp) (hq : Pair O P Λ1 Λ2 a a' α α' uq φq)
-    (hcp : O.valuation (pr P φp up) = 1) (hcq : O.valuation (pr P φq uq) = 1)
-    (hd : O.valuation (pr P φp uq) = 1) :
-    ∃ T : GL (Fin n) K, Good O P Λ1 Λ2 a a' α α' T ∧ (T : Matrix (Fin n) (Fin n) K) *ᵥ up = uq ∧
-      (φq ᵥ* P) ᵥ* (T : Matrix (Fin n) (Fin n) K) = (pr P φq uq / pr P φp up) • (φp ᵥ* P) := by
+theorem leg
+    (hP : ∀ β ∈ Λ2, ∀ x ∈ Λ1, pr P β x ∈ O)
+    {up φp uq φq : Fin n → K} (hp : Pair O P Λ1 Λ2 a a' α α' up φp)
+    (hq : Pair O P Λ1 Λ2 a a' α α' uq φq) (hcp : O.valuation (pr P φp up) = 1)
+    (hcq : O.valuation (pr P φq uq) = 1) (hd : O.valuation (pr P φp uq) = 1)
+    : ∃ T : GL (Fin n) K,
+      Good O P Λ1 Λ2 a a' α α' T ∧ (T : Matrix (Fin n) (Fin n) K) *ᵥ up = uq
+        ∧ (φq ᵥ* P) ᵥ* (T : Matrix (Fin n) (Fin n) K) = (pr P φq uq / pr P φp up) • (φp ᵥ* P) := by
   unfold Pair at hp hq
   obtain ⟨hup, hφp, hupα, hφpa⟩ := hp
   obtain ⟨huq, hφq, huqα, hφqa⟩ := hq
@@ -70,7 +74,11 @@ theorem leg (hP : ∀ β ∈ Λ2, ∀ x ∈ Λ1, pr P β x ∈ O) {up φp uq φq
     | (simp only [sub_vecMul, vecMul_smul]; done)
     | (simp only [sub_vecMul, smul_vecMul]; done)
     | (simp [sub_vecMul]; done)
-    | (ext j; simp [vecMul, dotProduct, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum, mul_assoc]; done)
+    | (
+        ext j
+        simp [vecMul, dotProduct, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum, mul_assoc]
+        done
+      )
   have hγ2mem : γ2 ∈ Λ2 := by
     have hs : pr P φq up * (pr P φp up)⁻¹ ∈ O := by
       first | exact mul_mem hb hcpi | exact O.mul_mem _ _ hb hcpi
@@ -79,27 +87,34 @@ theorem leg (hP : ∀ β ∈ Λ2, ∀ x ∈ Λ1, pr P β x ∈ O) {up φp uq φq
   have hγ2a : ∀ i, pr P γ2 (a i) = 0 ∧ pr P γ2 (a' i) = 0 := fun i => by
     simp only [hγ2, pr_sub_left, pr_smul_left, (hφqa i).1, (hφqa i).2, (hφpa i).1, (hφpa i).2,
       mul_zero, sub_zero, and_self]
-  have hwα1 : ∀ i, pr P (α i) (uq - up) = 0 ∧ pr P (α' i) (uq - up) = 0 := fun i =>
-    ⟨by rw [pr_sub_right, (huqα i).1, (hupα i).1, sub_self],
-      by rw [pr_sub_right, (huqα i).2, (hupα i).2, sub_self]⟩
-  have h1 : (pr P φp up)⁻¹ + -(pr P φp uq)⁻¹ +
-      (pr P φp up)⁻¹ * -(pr P φp uq)⁻¹ * ((φp ᵥ* P) ⬝ᵥ (uq - up)) = 0 := by
+  have hwα1 : ∀ i, pr P (α i) (uq - up) = 0 ∧ pr P (α' i) (uq - up) = 0 := fun i => ⟨
+    by rw [pr_sub_right, (huqα i).1, (hupα i).1, sub_self],
+    by rw [pr_sub_right, (huqα i).2, (hupα i).2, sub_self]
+  ⟩
+  have h1
+      : (pr P φp up)⁻¹ + -(pr P φp uq)⁻¹
+          + (pr P φp up)⁻¹ * -(pr P φp uq)⁻¹ * ((φp ᵥ* P) ⬝ᵥ (uq - up))
+        = 0 := by
     rw [← pr_eq_vecMul, pr_sub_right]
     linear_combination (pr P φp uq)⁻¹ * e2 - (pr P φp up)⁻¹ * e1
-  have h2 : -(pr P φq uq)⁻¹ + (pr P φq uq)⁻¹ +
-      -(pr P φq uq)⁻¹ * (pr P φq uq)⁻¹ * ((γ2 ᵥ* P) ⬝ᵥ up) = 0 := by
+  have h2
+      : -(pr P φq uq)⁻¹ + (pr P φq uq)⁻¹ + -(pr P φq uq)⁻¹ * (pr P φq uq)⁻¹ * ((γ2 ᵥ* P) ⬝ᵥ up)
+        = 0 := by
     rw [hγ2u]
     ring
-  have hn1 : -(pr P φp uq)⁻¹ ∈ O := by
-    first | exact neg_mem hdi | exact O.neg_mem _ hdi
-  have hn2 : -(pr P φq uq)⁻¹ ∈ O := by
-    first | exact neg_mem hcqi | exact O.neg_mem _ hcqi
-  have hT1 := isAdmissible_rankOneGL hP (uq - up) φp _ _ h1 hcpi hn1 (Λ1.sub_mem huq hup) hφp hwα1 hφpa
+  have hn1 : -(pr P φp uq)⁻¹ ∈ O := by first | exact neg_mem hdi | exact O.neg_mem _ hdi
+  have hn2 : -(pr P φq uq)⁻¹ ∈ O := by first | exact neg_mem hcqi | exact O.neg_mem _ hcqi
+  have hT1 :=
+    isAdmissible_rankOneGL hP (uq - up) φp _ _ h1 hcpi hn1 (Λ1.sub_mem huq hup) hφp hwα1 hφpa
   have hT2 := isAdmissible_rankOneGL hP up γ2 _ _ h2 hn2 hcqi hup hγ2mem hupα hγ2a
-  refine ⟨rankOneUnitGL (uq - up) (φp ᵥ* P) _ _ h1 * rankOneUnitGL up (γ2 ᵥ* P) _ _ h2,
-    good_mul _ _ _ _ _ _ _ _ hT1 hT2, ?_, ?_⟩
-  · simp only [Units.val_mul, ← mulVec_mulVec, coe_rankOneGL, one_add_smul_vecMulVec_mulVec, hγ2u, mul_zero,
-      zero_smul, add_zero, hYup, inv_mul_cancel₀ hcp0, one_smul]
+  refine ⟨
+    rankOneUnitGL (uq - up) (φp ᵥ* P) _ _ h1 * rankOneUnitGL up (γ2 ᵥ* P) _ _ h2,
+    good_mul _ _ _ _ _ _ _ _ hT1 hT2,
+    ?_,
+    ?_
+  ⟩
+  · simp only [Units.val_mul, ← mulVec_mulVec, coe_rankOneGL, one_add_smul_vecMulVec_mulVec, hγ2u,
+      mul_zero, zero_smul, add_zero, hYup, inv_mul_cancel₀ hcp0, one_smul]
     abel
   · simp only [Units.val_mul, ← vecMul_vecMul, coe_rankOneGL, vecMul_one_add_smul_vecMulVec]
     rw [hD1, hdot, hXup, hYup, hγ2P]

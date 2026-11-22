@@ -16,13 +16,18 @@ open MvPolynomial ComplexSets
 
 noncomputable section
 
-theorem NormalModelPointOfPlace.proof (hLoc : NormalisationModelLocalization.Statement)
-    (hMax : ModelLocalizationMaximalPoint.Statement) (hAt : LocalizationAtPrimeQuotient.Statement.{0}) :
-    NormalModelPointOfPlace.Statement := by
+theorem NormalModelPointOfPlace.proof
+    (hLoc : NormalisationModelLocalization.Statement)
+    (hMax : ModelLocalizationMaximalPoint.Statement)
+    (hAt : LocalizationAtPrimeQuotient.Statement.{0})
+    : NormalModelPointOfPlace.Statement := by
   intro n J q M hJ P
   obtain ⟨e, he⟩ := hLoc n J q M hJ
-  obtain ⟨P', hP'def⟩ : ∃ P' : @Ideal (Localization (normalModelSubmonoid M q)) CommSemiring.toSemiring,
-      P' = P.asIdeal.comap (e.symm : Localization (normalModelSubmonoid M q) →+* curveNormalisation J q) :=
+  obtain ⟨P', hP'def⟩
+      : ∃ P' : @Ideal (Localization (normalModelSubmonoid M q)) CommSemiring.toSemiring,
+        P'
+          = P.asIdeal.comap
+            (e.symm : Localization (normalModelSubmonoid M q) →+* curveNormalisation J q) :=
     ⟨_, rfl⟩
   have hP' : P'.IsMaximal := by
     rw [hP'def]
@@ -31,11 +36,13 @@ theorem NormalModelPointOfPlace.proof (hLoc : NormalisationModelLocalization.Sta
     rw [hP'def]
     infer_instance
   obtain ⟨w, hw, hq, hcomap⟩ := hMax n J q M P' hP'
-  obtain ⟨eAt, heAt⟩ := hAt (MvPolynomial (Fin n ⊕ Fin M.m) ℂ) M.ideal (normalModelSubmonoid M q) P'
-    (RingHom.ker (eval w : MvPolynomial (Fin n ⊕ Fin M.m) ℂ →+* ℂ)) hcomap
+  obtain ⟨eAt, heAt⟩ :=
+    hAt (MvPolynomial (Fin n ⊕ Fin M.m) ℂ) M.ideal (normalModelSubmonoid M q) P'
+      (RingHom.ker (eval w : MvPolynomial (Fin n ⊕ Fin M.m) ℂ →+* ℂ)) hcomap
   let eP : Localization.AtPrime P.asIdeal ≃+* Localization.AtPrime P' :=
     IsLocalization.ringEquivOfRingEquiv (M := P.asIdeal.primeCompl) (T := P'.primeCompl)
-      (Localization.AtPrime P.asIdeal) (Localization.AtPrime P') e (by
+      (Localization.AtPrime P.asIdeal) (Localization.AtPrime P') e
+      (by
         ext y
         constructor
         · rintro ⟨x, hx, rfl⟩

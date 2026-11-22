@@ -10,9 +10,10 @@ public import GroundTheory.FunctionField.PlaceAbove
 open GroundTheory.FunctionField UpperTheory.Et.Sel
 open scoped TensorProduct
 
-private theorem functionField_isAlgebraic_of_tower (k K K' : Type) [Field k] [Field K] [Field K'] [Algebra k K] [Algebra k K']
-    [Algebra K K'] [IsScalarTower k K K'] [IsFunctionField k K] [IsFunctionField k K'] :
-    Algebra.IsAlgebraic K K' := by
+private theorem functionField_isAlgebraic_of_tower
+    (k K K' : Type) [Field k] [Field K] [Field K'] [Algebra k K] [Algebra k K'] [Algebra K K']
+    [IsScalarTower k K K'] [IsFunctionField k K] [IsFunctionField k K']
+    : Algebra.IsAlgebraic K K' := by
   have h := trdeg_add_eq k K (A := K')
   rw [trdeg_eq_one (k := k) (K := K), trdeg_eq_one (k := k) (K := K')] at h
   have hfin : Algebra.trdeg K K' < Cardinal.aleph0 :=
@@ -25,8 +26,11 @@ private theorem functionField_isAlgebraic_of_tower (k K K' : Type) [Field k] [Fi
     omega
   rw [← trdeg_eq_zero_iff, hn, hn0, Nat.cast_zero]
 
-theorem UpperTheory.finite_kummerSelmer_of_finite_extension :
-    ∀ (k K K' : Type) [Field k] [IsAlgClosed k] [Field K] [Field K'] [Algebra k K] [Algebra k K'] [Algebra K K'] [IsScalarTower k K K'] [IsFunctionField k K] [IsFunctionField k K'] (q : ℕ) [NeZero q], IsUnit (q : k) → FinCls q (SelAll k K' q) → FinCls q (SelAll k K q) := by
+theorem UpperTheory.finite_kummerSelmer_of_finite_extension
+    : ∀ (k K K' : Type) [Field k] [IsAlgClosed k] [Field K] [Field K'] [Algebra k K] [Algebra k K']
+        [Algebra K K'] [IsScalarTower k K K'] [IsFunctionField k K] [IsFunctionField k K'] (q : ℕ)
+        [NeZero q],
+      IsUnit (q : k) → FinCls q (SelAll k K' q) → FinCls q (SelAll k K q) := by
   classical
   intro k K K' _ _ _ _ _ _ _ _ _ _ q _ hq hK'
   have := functionField_isAlgebraic_of_tower k K K'
@@ -35,8 +39,9 @@ theorem UpperTheory.finite_kummerSelmer_of_finite_extension :
   have : Module.Finite K K' := Algebra.finite_of_essFiniteType_of_isAlgebraic
   have : NeZero (q : k) := ⟨hq.ne_zero⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot k q
-  obtain ⟨T0, hT0⟩ := UpperTheory.finite_kernel_powClasses_of_primitive_root K K' q
-    ⟨algebraMap k K ζ, hζ.map_of_injective (algebraMap k K).injective⟩
+  obtain ⟨T0, hT0⟩ :=
+    UpperTheory.finite_kernel_powClasses_of_primitive_root K K' q
+      ⟨algebraMap k K ζ, hζ.map_of_injective (algebraMap k K).injective⟩
   obtain ⟨T', hT'⟩ := hK'
   let φ : Kˣ →* K'ˣ := Units.map (algebraMap K K' : K →* K')
   have hφ : ∀ x : Kˣ, ((φ x : K'ˣ) : K') = algebraMap K K' (x : K) := fun x => rfl

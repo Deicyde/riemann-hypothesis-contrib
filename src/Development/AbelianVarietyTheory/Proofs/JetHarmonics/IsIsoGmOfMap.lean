@@ -12,8 +12,8 @@ open GlobalTheory.ConvSer
 
 namespace GlobalTheory.ConvSer.HeightOneInt
 
-theorem mulN_eq_nMul {R : Type} [CommRing R] (F : FormalGroup R) (n : ℕ) :
-    JetMomFound.mulN F n = nMul F n := by
+theorem mulN_eq_nMul {R : Type} [CommRing R] (F : FormalGroup R) (n : ℕ)
+    : JetMomFound.mulN F n = nMul F n := by
   induction n with
   | zero => rfl
   | succ n ih => rw [JetMomFound.mulN, nMul_succ, ih]
@@ -22,28 +22,32 @@ theorem mem_int_iff {p : ℕ} [Fact p.Prime] (x : ℂ_[p]) : x ∈ 𝓞_ℂ_[p] 
   rw [PadicComplexInt, Valuation.mem_valuationSubring_iff, PadicComplex.norm_eq_norm]
   exact (Valued.toNormedField.norm_le_one_iff).symm
 
-theorem isIsoGm_of_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S)
-    (hφ : Function.Injective φ) (F : FormalGroup R) (f : PowerSeries R)
+theorem isIsoGm_of_map
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S) (hφ : Function.Injective φ)
+    (F : FormalGroup R) (f : PowerSeries R)
     (h0 : PowerSeries.constantCoeff f = 0) (h1 : IsUnit (PowerSeries.coeff 1 f))
-    (h : (f.map φ).subst (F.map φ).toPowerSeries =
-      (f.map φ).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) S) +
-        (f.map φ).subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) S) +
-        (f.map φ).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) S) *
-          (f.map φ).subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) S)) :
-    JetMomFound.IsIsoGm F f := by
+    (h : (f.map φ).subst (F.map φ).toPowerSeries
+      = (f.map φ).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) S)
+        + (f.map φ).subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) S)
+        + (f.map φ).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) S)
+          * (f.map φ).subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) S))
+    : JetMomFound.IsIsoGm F f := by
   refine ⟨h0, h1, ?_⟩
   have hX : ∀ i : Fin 2, PowerSeries.HasSubst (MvPowerSeries.X i : MvPowerSeries (Fin 2) R) :=
     fun i => PowerSeries.HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X i)
   have hF : PowerSeries.HasSubst F.toPowerSeries :=
     PowerSeries.HasSubst.of_constantCoeff_zero F.zero_constantCoeff
-  have hc : ∀ i : Fin 2, MvPowerSeries.constantCoeff
-      (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin 2) R) f) = 0 := fun i =>
+  have hc
+      : ∀ i : Fin 2,
+        MvPowerSeries.constantCoeff (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries (Fin 2) R)
+            f)
+          = 0 := fun i =>
     PowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.constantCoeff_X i) f h0
   have hs : MvPowerSeries.HasSubst
       ![PowerSeries.subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R) f,
           PowerSeries.subst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) R) f] :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero (by
-      intro s; fin_cases s <;> simp [hc])
+    MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp [hc])
   rw [FormalGroup.𝔾ₘ_toPowerSeries, MvPowerSeries.subst_add hs, MvPowerSeries.subst_add hs,
     MvPowerSeries.subst_mul hs, MvPowerSeries.subst_X hs, MvPowerSeries.subst_X hs]
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
@@ -53,8 +57,9 @@ theorem isIsoGm_of_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S)
     apply hφ
     rw [← MvPowerSeries.coeff_map, ← MvPowerSeries.coeff_map, hab]
   apply hinj
-  rw [map_add (f := _), map_add (f := _), map_mul, PowerSeries.map_subst hF, PowerSeries.map_subst (hX 0),
-    PowerSeries.map_subst (hX 1), MvPowerSeries.map_X, MvPowerSeries.map_X]
+  rw [map_add (f := _), map_add (f := _), map_mul, PowerSeries.map_subst hF,
+    PowerSeries.map_subst (hX 0), PowerSeries.map_subst (hX 1), MvPowerSeries.map_X,
+    MvPowerSeries.map_X]
   exact h
 
 theorem htOneIsGm : JetMomFound.HtOneIsGm := by
@@ -65,15 +70,18 @@ theorem htOneIsGm : JetMomFound.HtOneIsGm := by
     intro ν
     rw [FormalGroup.map_toPowerSeries, MvPowerSeries.coeff_map]
     exact (mem_int_iff _).1 (MvPowerSeries.coeff ν F.toPowerSeries).2
-  have hn : ∀ k, PowerSeries.coeff k (nMul (F.map φ) p) =
-      ((PowerSeries.coeff k (JetMomFound.mulN F p) : 𝓞_ℂ_[p]) : ℂ_[p]) := by
+  have hn
+      : ∀ k,
+        PowerSeries.coeff k (nMul (F.map φ) p)
+          = ((PowerSeries.coeff k (JetMomFound.mulN F p) : 𝓞_ℂ_[p]) : ℂ_[p]) := by
     intro k
     rw [← (nMul_props _ F).2.2.2.2 _ φ p, PowerSeries.coeff_map, mulN_eq_nMul]
     rfl
-  obtain ⟨f, hfI, hf0, hf1, hf⟩ := HeightOne.exists_iso_multiplicative ℂ_[p] p (F.map φ) hI
-    (by rw [hn]; exact hH.1) (fun k hk => by rw [hn]; exact hH.2 k hk)
-  let f₀ : PowerSeries 𝓞_ℂ_[p] := PowerSeries.mk fun n =>
-    ⟨PowerSeries.coeff n f, (mem_int_iff _).2 (hfI (Finsupp.single () n))⟩
+  obtain ⟨f, hfI, hf0, hf1, hf⟩ :=
+    HeightOne.exists_iso_multiplicative ℂ_[p] p (F.map φ) hI (by rw [hn]; exact hH.1)
+      (fun k hk => by rw [hn]; exact hH.2 k hk)
+  let f₀ : PowerSeries 𝓞_ℂ_[p] :=
+    PowerSeries.mk fun n => ⟨PowerSeries.coeff n f, (mem_int_iff _).2 (hfI (Finsupp.single () n))⟩
   have hc : ∀ n, φ (PowerSeries.coeff n f₀) = PowerSeries.coeff n f := by
     intro n
     simp only [f₀, PowerSeries.coeff_mk]

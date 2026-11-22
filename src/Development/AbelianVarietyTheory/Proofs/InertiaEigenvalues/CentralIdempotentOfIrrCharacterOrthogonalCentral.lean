@@ -17,9 +17,10 @@ open GlobalTheory.BadShare GlobalTheory.BadShare.Basic
 
 theorem zOf_eq_alg {G : Type} [Group G] [Fintype G] (χ : G → ℂ) : zOf χ = alg (zc χ) := rfl
 
-theorem ip_simple {G : Type} [Group G] [Fintype G] (V W : FDRep ℂ G) [CategoryTheory.Simple V]
-    [CategoryTheory.Simple W] :
-    ip V.character W.character = if V.character = W.character then 1 else 0 := by
+theorem ip_simple
+    {G : Type} [Group G] [Fintype G]
+    (V W : FDRep ℂ G) [CategoryTheory.Simple V] [CategoryTheory.Simple W]
+    : ip V.character W.character = if V.character = W.character then 1 else 0 := by
   haveI : Invertible (Nat.card G : ℂ) := invertibleOfNonzero (by
     rw [Nat.card_eq_fintype_card]; exact_mod_cast Fintype.card_ne_zero)
   have h := FDRep.char_orthonormal V W
@@ -39,7 +40,11 @@ theorem ip_simple {G : Type} [Group G] [Fintype G] (V W : FDRep ℂ G) [Category
       simp at h2
     · rw [if_neg hc]
 
-theorem zorth : ∀ (G : Type) [Group G] [Fintype G] (χ χ' : G → ℂ), IsIrr χ → IsIrr χ' → (zOf χ * zOf χ' = if χ = χ' then zOf χ else 0) ∧ (∀ a, zOf χ * a = a * zOf χ) ∧ ip χ χ' = if χ = χ' then 1 else 0 := by
+theorem zorth
+    : ∀ (G : Type) [Group G] [Fintype G] (χ χ' : G → ℂ),
+      IsIrr χ → IsIrr χ'
+        → (zOf χ * zOf χ' = if χ = χ' then zOf χ else 0) ∧ (∀ a, zOf χ * a = a * zOf χ)
+          ∧ ip χ χ' = if χ = χ' then 1 else 0 := by
   intro G _ _ χ χ' hχ hχ'
   obtain ⟨V, hV, hVχ⟩ := hχ
   obtain ⟨W, hW, hWχ⟩ := hχ'
@@ -52,7 +57,8 @@ theorem zorth : ∀ (G : Type) [Group G] [Fintype G] (χ χ' : G → ℂ), IsIrr
     by_cases hc : V.character = W.character
     · rw [if_pos hc, ← hc, hidem]
     · rw [if_neg hc, horth W hc]
-      unfold alg; simp
+      unfold alg
+      simp
   · intro a
     rw [zOf_eq_alg, ← alg_coeff a, ← alg_conv, ← alg_conv, hcen]
 end GlobalTheory.GLq.ZOrth

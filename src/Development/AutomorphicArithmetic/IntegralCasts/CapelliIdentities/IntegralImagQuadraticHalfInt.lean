@@ -99,33 +99,39 @@ private lemma int_of_sqfree_mul_sq (d : ℕ) (hd : Squarefree d) (q : ℚ) (m : 
   have h5 : q.den = 1 := Nat.isUnit_iff.1 (hd _ h4)
   exact ⟨q.num, by rw [← h1, h5]; simp⟩
 
-theorem UpperTheory.integral_imag_quadratic_half_int :
-    ∀ (E : Type) [Field E] [CharZero E] (d : ℕ) (s : E), Squarefree d → s ^ 2 = -(d : E) → ∀ z : E, z ∈ IntermediateField.adjoin ℚ ({s} : Set E) → IsIntegral ℤ z → ∃ x y : ℤ, Even (x - y) ∧ z = ((x : E) + (y : E) * s) / 2 := by
+theorem UpperTheory.integral_imag_quadratic_half_int
+    : ∀ (E : Type) [Field E] [CharZero E] (d : ℕ) (s : E),
+      Squarefree d → s ^ 2 = -(d : E)
+        → ∀ z : E,
+          z ∈ IntermediateField.adjoin ℚ ({s} : Set E) → IsIntegral ℤ z
+            → ∃ x y : ℤ, Even (x - y) ∧ z = ((x : E) + (y : E) * s) / 2 := by
   intro E _ _ d s hd hs z hz hi
   obtain ⟨a, b, rfl⟩ := coords d s hs z hz
   have hc := conj_integral d s (Nat.pos_of_ne_zero hd.ne_zero) hs a b hi
-  obtain ⟨x, hx⟩ := rat_int (E := E) (2 * a) (by
-    have e : ((2 * a : ℚ) : E) = (a : E) + (b : E) * s + ((a : E) - (b : E) * s) := by
-      push_cast; ring
-    rw [e]
-    exact hi.add hc)
-  obtain ⟨n, hn⟩ := rat_int (E := E) (a ^ 2 + d * b ^ 2) (by
-    have e : ((a ^ 2 + d * b ^ 2 : ℚ) : E)
-        = ((a : E) + (b : E) * s) * ((a : E) - (b : E) * s) := by
+  obtain ⟨x, hx⟩ :=
+    rat_int (E := E) (2 * a) (by
+      have e : ((2 * a : ℚ) : E) = (a : E) + (b : E) * s + ((a : E) - (b : E) * s) := by
+        push_cast; ring
+      rw [e]
+      exact hi.add hc)
+  obtain ⟨n, hn⟩ :=
+    rat_int (E := E) (a ^ 2 + d * b ^ 2) (by
+      have e
+          : ((a ^ 2 + d * b ^ 2 : ℚ) : E) = ((a : E) + (b : E) * s) * ((a : E) - (b : E) * s) := by
+        push_cast
+        linear_combination (b : E) ^ 2 * hs
+      rw [e]
+      exact hi.mul hc)
+  obtain ⟨y, hy⟩ :=
+    int_of_sqfree_mul_sq d hd (2 * b) (4 * n - x ^ 2) (by
       push_cast
-      linear_combination (b : E) ^ 2 * hs
-    rw [e]
-    exact hi.mul hc)
-  obtain ⟨y, hy⟩ := int_of_sqfree_mul_sq d hd (2 * b) (4 * n - x ^ 2) (by
-    push_cast
-    rw [hx, hn]; ring)
+      rw [hx, hn]
+      ring)
   have key : x ^ 2 + d * y ^ 2 = 4 * n := by
-    have : (x : ℚ) ^ 2 + d * (y : ℚ) ^ 2 = 4 * n := by
-      rw [hx, hy, hn]; ring
+    have : (x : ℚ) ^ 2 + d * (y : ℚ) ^ 2 = 4 * n := by rw [hx, hy, hn]; ring
     exact_mod_cast this
   refine ⟨x, y, ?_, ?_⟩
-  · rcases Int.even_or_odd' x with ⟨k, rfl | rfl⟩ <;>
-      rcases Int.even_or_odd' y with ⟨l, rfl | rfl⟩
+  · rcases Int.even_or_odd' x with ⟨k, rfl | rfl⟩ <;> rcases Int.even_or_odd' y with ⟨l, rfl | rfl⟩
     · exact ⟨k - l, by ring⟩
     · exfalso
       have h4 : (4 : ℤ) ∣ d := ⟨n - k ^ 2 - d * (l ^ 2 + l), by linear_combination key⟩
@@ -137,4 +143,5 @@ theorem UpperTheory.integral_imag_quadratic_half_int :
     · exact ⟨k - l, by ring⟩
   · have hx' : (x : E) = 2 * (a : E) := by exact_mod_cast congrArg (fun t : ℚ => (t : E)) hx
     have hy' : (y : E) = 2 * (b : E) := by exact_mod_cast congrArg (fun t : ℚ => (t : E)) hy
-    rw [hx', hy']; ring
+    rw [hx', hy']
+    ring

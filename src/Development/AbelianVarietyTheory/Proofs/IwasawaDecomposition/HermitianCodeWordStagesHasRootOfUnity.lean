@@ -15,10 +15,11 @@ open Formalism.L2.Pj
 
 namespace GlobalTheory.Mem
 
-theorem exp_div_mul_eq_zpow_mul_zpow {p q : ℕ} (hp : 2 ≤ p) (hq : 2 ≤ q) (h : Nat.Coprime p q) :
-    ∃ a b : ℤ, Complex.exp (2 * Real.pi * Complex.I / ((p * q : ℕ) : ℂ)) =
-      Complex.exp (2 * Real.pi * Complex.I / ((p * (p - 1) : ℕ) : ℂ)) ^ a *
-        Complex.exp (2 * Real.pi * Complex.I / ((q * (q - 1) : ℕ) : ℂ)) ^ b := by
+theorem exp_div_mul_eq_zpow_mul_zpow {p q : ℕ} (hp : 2 ≤ p) (hq : 2 ≤ q) (h : Nat.Coprime p q)
+    : ∃ a b : ℤ,
+      Complex.exp (2 * Real.pi * Complex.I / ((p * q : ℕ) : ℂ))
+        = Complex.exp (2 * Real.pi * Complex.I / ((p * (p - 1) : ℕ) : ℂ)) ^ a
+          * Complex.exp (2 * Real.pi * Complex.I / ((q * (q - 1) : ℕ) : ℂ)) ^ b := by
   obtain ⟨u, v, huv⟩ := Nat.isCoprime_iff_coprime.2 h
   obtain ⟨p', rfl⟩ : ∃ p', p = p' + 1 := ⟨p - 1, by omega⟩
   obtain ⟨q', rfl⟩ : ∃ q', q = q' + 1 := ⟨q - 1, by omega⟩
@@ -35,17 +36,20 @@ theorem exp_div_mul_eq_zpow_mul_zpow {p q : ℕ} (hp : 2 ≤ p) (hq : 2 ≤ q) (
   field_simp
   linear_combination (-1 : ℂ) * h5
 
-theorem Base.exists_root_mul (B : Base) : ∃ y : B.O, B.embLL (B.OtoLL y) =
-    Complex.exp (2 * Real.pi * Complex.I / ((B.host.g 0 * B.host.g 1 : ℕ) : ℂ)) := by
+theorem Base.exists_root_mul (B : Base)
+    : ∃ y : B.O,
+      B.embLL (B.OtoLL y)
+        = Complex.exp (2 * Real.pi * Complex.I / ((B.host.g 0 * B.host.g 1 : ℕ) : ℂ)) := by
   have p0 := B.host.g_prime 0
   have p1 := B.host.g_prime 1
   obtain ⟨z₀, hz₀, e₀⟩ := B.roots_Ks (B.host.g 0 * (B.host.g 0 - 1)) (by simp)
   obtain ⟨z₁, hz₁, e₁⟩ := B.roots_Ks (B.host.g 1 * (B.host.g 1 - 1)) (by simp)
-  obtain ⟨a, b, hab⟩ := exp_div_mul_eq_zpow_mul_zpow p0.two_le p1.two_le
-    ((Nat.coprime_primes p0 p1).2 B.host.g_ne)
+  obtain ⟨a, b, hab⟩ :=
+    exp_div_mul_eq_zpow_mul_zpow p0.two_le p1.two_le ((Nat.coprime_primes p0 p1).2 B.host.g_ne)
   have hmem : z₀ ^ a * z₁ ^ b ∈ B.Ks := mul_mem (zpow_mem hz₀ a) (zpow_mem hz₁ b)
-  have he : B.embLL (z₀ ^ a * z₁ ^ b) =
-      Complex.exp (2 * Real.pi * Complex.I / ((B.host.g 0 * B.host.g 1 : ℕ) : ℂ)) := by
+  have he
+      : B.embLL (z₀ ^ a * z₁ ^ b)
+        = Complex.exp (2 * Real.pi * Complex.I / ((B.host.g 0 * B.host.g 1 : ℕ) : ℂ)) := by
     rw [map_mul, map_zpow₀, map_zpow₀, e₀, e₁, hab]
   have hne : B.host.g 0 * B.host.g 1 ≠ 0 := mul_ne_zero p0.ne_zero p1.ne_zero
   have hint : IsIntegral ℤ (B.embLL (z₀ ^ a * z₁ ^ b)) := by
@@ -56,6 +60,7 @@ theorem Base.exists_root_mul (B : Base) : ∃ y : B.O, B.embLL (B.OtoLL y) =
   refine ⟨⟨⟨z₀ ^ a * z₁ ^ b, hmem⟩, ?_⟩, he⟩
   exact (isIntegral_algHom_iff (B.Ks.val : B.Ks →+* B.LL).toIntAlgHom Subtype.val_injective).1 hint'
 
-theorem hermitianCodeWordStages_has_rootOfUnity : ∀ X : Stages, OZeta X.toD7 := fun X => X.B.exists_root_mul
+theorem hermitianCodeWordStages_has_rootOfUnity : ∀ X : Stages, OZeta X.toD7 := fun X =>
+  X.B.exists_root_mul
 
 end GlobalTheory.Mem

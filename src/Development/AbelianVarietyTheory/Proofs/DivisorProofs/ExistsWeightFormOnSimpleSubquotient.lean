@@ -6,7 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnique
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LogSmallConstantBounds Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD Formalism.RankGapBounds.FormsTensorLocalization
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpTie GlobalTheory.ExpFrame
+  Formalism.CohomologicalDescent.DepthNonnegative
+  Formalism.CohomologicalDescent.LogSmallConstantBounds
+  Formalism.CohomologicalDescent.ShortWeightBounds Formalism.CohomologicalDescent.LD
+  Formalism.RankGapBounds.FormsTensorLocalization
 open MvPolynomial Formalism.GradedWeylDivisibility GlobalTheory.HighWtEmb
 
 set_option autoImplicit false
@@ -15,12 +20,20 @@ noncomputable section
 
 namespace GlobalTheory.HighWtEmb
 
-theorem exists_prodProj (O : Type) [CommRing O] (N : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (lam : ι → ℕ → ℕ)
-    (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm] (w : ι → Fin N → ℕ) (z₀ : Gm)
-    (hz : ∀ τ (a : alg O N lam), IsProj O N lam τ (w τ) a → a • z₀ = z₀) (s : Finset ι) :
-    ∃ e : alg O N lam, e • z₀ = z₀ ∧ ∀ x : ∀ τ, dualWeyl O N N (res N (lam τ)),
-      (e : Module.End O (NablaT O N lam)) (PiTensorProduct.tprod O x) =
-        PiTensorProduct.tprod O (fun σ => if σ ∈ s then rowProj O N (res N (lam σ)) (w σ) (x σ) else x σ) := by
+theorem exists_prodProj
+    (O : Type) [CommRing O]
+    (N : ℕ)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (lam : ι → ℕ → ℕ) (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm]
+    (w : ι → Fin N → ℕ) (z₀ : Gm)
+    (hz : ∀ τ (a : alg O N lam), IsProj O N lam τ (w τ) a → a • z₀ = z₀)
+    (s : Finset ι)
+    : ∃ e : alg O N lam,
+      e • z₀ = z₀
+        ∧ ∀ x : ∀ τ, dualWeyl O N N (res N (lam τ)),
+          (e : Module.End O (NablaT O N lam)) (PiTensorProduct.tprod O x)
+            = PiTensorProduct.tprod O
+              (fun σ => if σ ∈ s then rowProj O N (res N (lam σ)) (w σ) (x σ) else x σ) := by
   induction s using Finset.induction_on with
   | empty => exact ⟨1, one_smul _ _, fun x => by simp⟩
   | insert τ s hτ ih =>
@@ -37,11 +50,17 @@ theorem exists_prodProj (O : Type) [CommRing O] (N : ℕ) (ι : Type) [Fintype �
     · subst h; simp
     · simp [Function.update_of_ne h, h]
 
-theorem prodProj_mul_eq_zero (O : Type) [CommRing O] (N : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (lam : ι → ℕ → ℕ)
-    (w : ι → Fin N → ℕ) (e : Module.End O (NablaT O N lam))
+theorem prodProj_mul_eq_zero
+    (O : Type) [CommRing O]
+    (N : ℕ)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (lam : ι → ℕ → ℕ) (w : ι → Fin N → ℕ) (e : Module.End O (NablaT O N lam))
     (he : ∀ x : ∀ τ, dualWeyl O N N (res N (lam τ)),
-      e (PiTensorProduct.tprod O x) = PiTensorProduct.tprod O (fun σ => rowProj O N (res N (lam σ)) (w σ) (x σ)))
-    (τ : ι) (v : Fin N → ℕ) (a : Module.End O (NablaT O N lam)) (ha : IsProj O N lam τ v a) (hv : v ≠ w τ) : e * a = 0 := by
+      e (PiTensorProduct.tprod O x)
+        = PiTensorProduct.tprod O (fun σ => rowProj O N (res N (lam σ)) (w σ) (x σ)))
+    (τ : ι) (v : Fin N → ℕ) (a : Module.End O (NablaT O N lam)) (ha : IsProj O N lam τ v a)
+    (hv : v ≠ w τ)
+    : e * a = 0 := by
   apply PiTensorProduct.ext
   apply MultilinearMap.ext
   intro x
@@ -51,11 +70,25 @@ theorem prodProj_mul_eq_zero (O : Type) [CommRing O] (N : ℕ) (ι : Type) [Fint
   simp only [Function.update_self]
   apply Subtype.ext
   simp only [rowProj, LinearMap.restrict_apply, ZeroMemClass.coe_zero]
-  rw [weightedHomogeneousComponent_of_mem (weightedHomogeneousComponent_isWeightedHomogeneous _ _), if_neg hv.symm]
-
+  rw [weightedHomogeneousComponent_of_mem (weightedHomogeneousComponent_isWeightedHomogeneous _ _),
+    if_neg hv.symm]
 
 set_option synthInstance.maxHeartbeats 400000 in
-theorem exists_weightForm : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (N : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (lam : ι → ℕ → ℕ) (ϖ : O), Irreducible ϖ → ∀ (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm], SubQ O N lam ϖ Gm → ∀ (w : ι → Fin N → ℕ) (z₀ : Gm), z₀ ≠ 0 → (∀ τ (a : alg O N lam), IsProj O N lam τ (w τ) a → a • z₀ = z₀) → ∃ φ : Gm →+ O ⧸ Ideal.span {ϖ}, φ z₀ ≠ 0 ∧ (∀ (c : O) (z : Gm), φ (algebraMap O (alg O N lam) c • z) = Ideal.Quotient.mk (Ideal.span {ϖ}) c * φ z) ∧ ∀ τ (v : Fin N → ℕ) (a : alg O N lam), IsProj O N lam τ v a → v ≠ w τ → ∀ z, φ (a • z) = 0 := by
+theorem exists_weightForm
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (N : ℕ) (ι : Type)
+        [Fintype ι] [DecidableEq ι] (lam : ι → ℕ → ℕ) (ϖ : O),
+      Irreducible ϖ
+        → ∀ (Gm : Type) [AddCommGroup Gm] [Module (alg O N lam) Gm],
+          SubQ O N lam ϖ Gm
+            → ∀ (w : ι → Fin N → ℕ) (z₀ : Gm),
+              z₀ ≠ 0 → (∀ τ (a : alg O N lam), IsProj O N lam τ (w τ) a → a • z₀ = z₀)
+                → ∃ φ : Gm →+ O ⧸ Ideal.span {ϖ},
+                  φ z₀ ≠ 0
+                    ∧ (∀ (c : O) (z : Gm),
+                      φ (algebraMap O (alg O N lam) c • z)
+                        = Ideal.Quotient.mk (Ideal.span {ϖ}) c * φ z)
+                    ∧ ∀ τ (v : Fin N → ℕ) (a : alg O N lam),
+                      IsProj O N lam τ v a → v ≠ w τ → ∀ z, φ (a • z) = 0 := by
   intro O _ _ _ N ι _ _ lam ϖ hϖ Gm _ _ hSQ w z₀ hz0 hfix
 
   have hkill : ∀ z : Gm, algebraMap O (alg O N lam) ϖ • z = 0 := by
@@ -72,22 +105,27 @@ theorem exists_weightForm : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscrete
   letI iK : Module (O ⧸ Ideal.span {ϖ}) Gm := hT.module
   obtain ⟨f, hf⟩ := Module.Projective.exists_dual_ne_zero (O ⧸ Ideal.span {ϖ}) hz0
   obtain ⟨e, he, hex⟩ := exists_prodProj O N ι lam Gm w z₀ hfix Finset.univ
-  let φ : Gm →+ O ⧸ Ideal.span {ϖ} :=
-    { toFun := fun z => f (e • z)
-      map_zero' := by simp
-      map_add' := fun y z => by simp [smul_add] }
+  let φ : Gm →+ O ⧸ Ideal.span {ϖ} := {
+    toFun := fun z => f (e • z)
+    map_zero' := by simp
+    map_add' := fun y z => by simp [smul_add]
+  }
   refine ⟨φ, ?_, fun c z => ?_, fun τ v a ha hv z => ?_⟩
   · show f (e • z₀) ≠ 0
-    rw [he]; exact hf
+    rw [he]
+    exact hf
   · show f (e • (algebraMap O (alg O N lam) c • z)) = _ * f (e • z)
     rw [← mul_smul, ← Algebra.commutes, mul_smul]
-    have : algebraMap O (alg O N lam) c • (e • z) = (Ideal.Quotient.mk (Ideal.span {ϖ}) c) • (e • z) := rfl
+    have : algebraMap O (alg O N lam) c • (e • z)
+        = (Ideal.Quotient.mk (Ideal.span {ϖ}) c) • (e • z) :=
+      rfl
     rw [this, map_smul, smul_eq_mul]
   · show f (e • (a • z)) = 0
     have h0 : e * a = 0 := by
       apply Subtype.ext
       exact prodProj_mul_eq_zero O N ι lam w (e : Module.End O (NablaT O N lam))
-        (fun x => by rw [hex]; simp) τ v a ha hv
+        (fun x => by rw [hex]; simp)
+        τ v a ha hv
     rw [← mul_smul, h0, zero_smul, map_zero]
 
 end GlobalTheory.HighWtEmb

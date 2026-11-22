@@ -5,7 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.ChernClassEvaluation
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.E.ChernCocycleFaceFormulas
 
@@ -68,15 +69,22 @@ lemma etale_kummer_chern_cochain_coboundary_triangle_eq_zero_of_qth_roots (q : �
   abel
 
 open LateralTheory.E.ChernClassRootLocalization in
-theorem etale_kummer_chern_cochain_coboundary_vanishes_on_triangles_of_local_r (hr : LateralTheory.E.ChernClassRootLocalization.LeafRootLoc) : LateralTheory.E.ChernClassExistence.EtaleKummerChernCochainCoboundaryVanishesOnTriangles := by
+theorem etale_kummer_chern_cochain_coboundary_vanishes_on_triangles_of_local_r
+    (hr : LateralTheory.E.ChernClassRootLocalization.LeafRootLoc)
+    : LateralTheory.E.ChernClassExistence.EtaleKummerChernCochainCoboundaryVanishesOnTriangles := by
   intro q _ E L hi α hα U x
   apply sec_sep
-  refine LateralTheory.EtaleFoundations.FirstChernUniqueness.loc_imp (LateralTheory.EtaleFoundations.FirstChernUniqueness.loc_and
-    (LateralTheory.EtaleFoundations.FirstChernUniqueness.root_line hr q L hi U (x.sub 0 1 (by omega)))
-    (LateralTheory.EtaleFoundations.FirstChernUniqueness.root_line hr q L hi U (x.sub 1 1 (by omega)))) fun V g hvw => ?_
+  refine LateralTheory.EtaleFoundations.FirstChernUniqueness.loc_imp
+    (LateralTheory.EtaleFoundations.FirstChernUniqueness.loc_and
+      (LateralTheory.EtaleFoundations.FirstChernUniqueness.root_line hr q L hi U
+        (x.sub 0 1 (by omega)))
+      (LateralTheory.EtaleFoundations.FirstChernUniqueness.root_line hr q L hi U
+        (x.sub 1 1 (by omega))))
+    fun V g hvw => ?_
   obtain ⟨⟨v, hv⟩, ⟨w, hw⟩⟩ := hvw
   rw [← LateralTheory.EtaleFoundations.FirstChernUniqueness.sub_res] at hv hw
   rw [← ev_res]
-  exact (etale_kummer_chern_cochain_coboundary_triangle_eq_zero_of_qth_roots q L α hα V _ v w hv hw).trans (map_zero ((_ : Sec _ U →ₗ[_] Sec _ V))).symm
+  exact (etale_kummer_chern_cochain_coboundary_triangle_eq_zero_of_qth_roots q L α hα V _ v w hv
+    hw).trans (map_zero ((_ : Sec _ U →ₗ[_] Sec _ V))).symm
 
 end LateralTheory.E.ChernCocycleFaceFormulas

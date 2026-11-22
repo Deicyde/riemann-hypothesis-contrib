@@ -11,16 +11,18 @@ open UpperTheory.ConvolutionTheory.R
 
 open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.L2.Host UpperTheory.V.Published
 
-theorem UpperTheory.ConvolutionTheory.R.normCharPow :
-    Count → NormCharPow := by
+theorem UpperTheory.ConvolutionTheory.R.normCharPow : Count → NormCharPow := by
   classical
   intro hN K M _ _ _ _ _ _ _ _ hl η hη
-  have hp : ∀ (n : ℕ) (v : HeightOneSpectrum (𝓞 K)), (η ^ n).val v = η.val v ^ n :=
-    fun n v => MonoidHom.pow_apply η.1 n _
+  have hp : ∀ (n : ℕ) (v : HeightOneSpectrum (𝓞 K)), (η ^ n).val v = η.val v ^ n := fun n v =>
+    MonoidHom.pow_apply η.1 n _
   refine ⟨fun χ hχ => ?_, fun j hj0 hjl => ⟨fun h => ?_, ?_, ?_⟩⟩
-  · have hW : ∀ ψ : HChar K, (∀ᶠ w : HeightOneSpectrum (𝓞 M) in Filter.cofinite, ∀ f : ℕ,
-        Formalism.ConjugateSelfDual.normV w = Formalism.ConjugateSelfDual.normV (w.under (𝓞 K)) ^ f → ψ.val (w.under (𝓞 K)) ^ f = 1) →
-        WeakBC (CG.ofChar ψ).HasSat (sumSat (m := fun _ : Unit => 1) fun _ => CG.ofChar (1 : HChar M)) := by
+  · have hW
+        : ∀ ψ : HChar K,
+          (∀ᶠ w : HeightOneSpectrum (𝓞 M) in Filter.cofinite, ∀ f : ℕ,
+            Formalism.ConjugateSelfDual.normV w = Formalism.ConjugateSelfDual.normV (w.under (𝓞 K)) ^ f → ψ.val (w.under (𝓞 K)) ^ f = 1)
+            → WeakBC (CG.ofChar ψ).HasSat
+              (sumSat (m := fun _ : Unit => 1) fun _ => CG.ofChar (1 : HChar M)) := by
       intro ψ h
       rw [sumSat_unit]
       filter_upwards [h, (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.tendsto_under K M).eventually
@@ -28,10 +30,17 @@ theorem UpperTheory.ConvolutionTheory.R.normCharPow :
       refine ⟨_, CG.hasSat_ofChar h2, ?_⟩
       rw [Multiset.map_singleton, h1 f hf]
       exact CG.hasSat_ofChar (χ := 1) (w := w) fun _ _ => rfl
-    have h1 := hN K M hl η hη 1 (CG.ofChar 1) (CG.ofChar χ) Unit (fun _ => 1) (fun _ => CG.ofChar 1) le_rfl
-      (fun _ => le_rfl) (hW 1 (Filter.Eventually.of_forall fun w f _ => one_pow f)) (hW χ hχ.2.2)
-    have h2 : 0 < ((Finset.range (Module.finrank K M)).filter
-        fun j => CG.ofChar χ = (CG.ofChar 1).twist (η ^ j)).card := by
+    have h1 :=
+      hN K M hl η hη 1 (CG.ofChar 1) (CG.ofChar χ) Unit
+        (fun _ => 1)
+        (fun _ => CG.ofChar 1)
+        le_rfl
+        (fun _ => le_rfl)
+        (hW 1 (Filter.Eventually.of_forall fun w f _ => one_pow f)) (hW χ hχ.2.2)
+    have h2
+        : 0
+          < ((Finset.range (Module.finrank K M)).filter fun j =>
+            CG.ofChar χ = (CG.ofChar 1).twist (η ^ j)).card := by
       rw [h1]
       exact Finset.card_pos.2 ⟨((), ()), by simp⟩
     obtain ⟨j, hj⟩ := Finset.card_pos.1 h2

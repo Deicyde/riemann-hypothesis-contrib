@@ -8,9 +8,11 @@ namespace PI.QmIndepW
 
 open Complex
 
-theorem quartic_coeffs (a0 a1 a2 a3 a4 : ℂ)
-    (h : ∀ t : ℕ, 1 ≤ t → t ≤ 5 → a0 + a1 * t + a2 * (t : ℂ) ^ 2 + a3 * (t : ℂ) ^ 3 + a4 * (t : ℂ) ^ 4 = 0) :
-    a0 = 0 ∧ a1 = 0 ∧ a2 = 0 ∧ a3 = 0 ∧ a4 = 0 := by
+theorem quartic_coeffs
+    (a0 a1 a2 a3 a4 : ℂ)
+    (h : ∀ t : ℕ,
+      1 ≤ t → t ≤ 5 → a0 + a1 * t + a2 * (t : ℂ) ^ 2 + a3 * (t : ℂ) ^ 3 + a4 * (t : ℂ) ^ 4 = 0)
+    : a0 = 0 ∧ a1 = 0 ∧ a2 = 0 ∧ a3 = 0 ∧ a4 = 0 := by
   have h1 := h 1 le_rfl (by norm_num)
   have h2 := h 2 (by norm_num) (by norm_num)
   have h3 := h 3 (by norm_num) (by norm_num)
@@ -25,19 +27,20 @@ theorem quartic_coeffs (a0 a1 a2 a3 a4 : ℂ)
   · linear_combination (1/24 : ℂ) * h1 + (-1/6 : ℂ) * h2 + (1/4 : ℂ) * h3 + (-1/6 : ℂ) * h4 + (1/24 : ℂ) * h5
 
 def nine (u v y00 y10 y20 y01 y11 y21 y02 y12 y22 : ℂ) : ℂ :=
-  y00 + u * y10 + u ^ 2 * y20 + v * y01 + u * v * y11 + u ^ 2 * v * y21 + v ^ 2 * y02 + u * v ^ 2 * y12 +
-    u ^ 2 * v ^ 2 * y22
+  y00 + u * y10 + u ^ 2 * y20 + v * y01 + u * v * y11 + u ^ 2 * v * y21 + v ^ 2 * y02
+    + u * v ^ 2 * y12 + u ^ 2 * v ^ 2 * y22
 
 def IndepC : Prop :=
   ∀ y00 y10 y20 y01 y11 y21 y02 y12 y22 : ℂ,
-    (∀ c : ℂ, c ≠ 0 → nine c⁻¹ (star c)⁻¹ y00 y10 y20 y01 y11 y21 y02 y12 y22 = 0) →
-    y00 = 0 ∧ y10 = 0 ∧ y20 = 0 ∧ y01 = 0 ∧ y11 = 0 ∧ y21 = 0 ∧ y02 = 0 ∧ y12 = 0 ∧ y22 = 0
+    (∀ c : ℂ, c ≠ 0 → nine c⁻¹ (star c)⁻¹ y00 y10 y20 y01 y11 y21 y02 y12 y22 = 0)
+      → y00 = 0 ∧ y10 = 0 ∧ y20 = 0 ∧ y01 = 0 ∧ y11 = 0 ∧ y21 = 0 ∧ y02 = 0 ∧ y12 = 0 ∧ y22 = 0
 
-theorem ray (y00 y10 y20 y01 y11 y21 y02 y12 y22 : ℂ)
+theorem ray
+    (y00 y10 y20 y01 y11 y21 y02 y12 y22 : ℂ)
     (hyp : ∀ c : ℂ, c ≠ 0 → nine c⁻¹ (star c)⁻¹ y00 y10 y20 y01 y11 y21 y02 y12 y22 = 0)
-    (ω ω' : ℂ) (hω : ω ≠ 0) (hs : star ω = ω') :
-    y00 = 0 ∧ ω * y10 + ω' * y01 = 0 ∧ ω ^ 2 * y20 + ω * ω' * y11 + ω' ^ 2 * y02 = 0 ∧
-      ω ^ 2 * ω' * y21 + ω * ω' ^ 2 * y12 = 0 ∧ ω ^ 2 * ω' ^ 2 * y22 = 0 := by
+    (ω ω' : ℂ) (hω : ω ≠ 0) (hs : star ω = ω')
+    : y00 = 0 ∧ ω * y10 + ω' * y01 = 0 ∧ ω ^ 2 * y20 + ω * ω' * y11 + ω' ^ 2 * y02 = 0
+      ∧ ω ^ 2 * ω' * y21 + ω * ω' ^ 2 * y12 = 0 ∧ ω ^ 2 * ω' ^ 2 * y22 = 0 := by
   refine quartic_coeffs _ _ _ _ _ fun t ht1 _ => ?_
   have ht : (t : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
   have h := hyp _ (inv_ne_zero (mul_ne_zero ht hω))
@@ -48,8 +51,9 @@ theorem indepC : IndepC := by
   intro y00 y10 y20 y01 y11 y21 y02 y12 y22 hyp
   obtain ⟨A1, B1, C1, D1, E1⟩ := ray _ _ _ _ _ _ _ _ _ hyp 1 1 one_ne_zero (by simp)
   obtain ⟨-, B2, C2, D2, -⟩ := ray _ _ _ _ _ _ _ _ _ hyp I (-I) I_ne_zero (by simp)
-  obtain ⟨-, -, C3, -, -⟩ := ray _ _ _ _ _ _ _ _ _ hyp (1 + I) (1 - I)
-    (by intro h; have := congrArg Complex.re h; simp at this) (by simp [sub_eq_add_neg])
+  obtain ⟨-, -, C3, -, -⟩ :=
+    ray _ _ _ _ _ _ _ _ _ hyp (1 + I) (1 - I)
+      (by intro h; have := congrArg Complex.re h; simp at this) (by simp [sub_eq_add_neg])
   have h2I : (2 : ℂ) * I ≠ 0 := mul_ne_zero two_ne_zero I_ne_zero
   have h4I : (4 : ℂ) * I ≠ 0 := mul_ne_zero (by norm_num) I_ne_zero
   have y01z : y01 = 0 := by

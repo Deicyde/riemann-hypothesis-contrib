@@ -6,8 +6,9 @@ public import Mathlib
 
 open MvPolynomial Filter Topology
 
-private theorem UpperTheory.ConvolutionTheory.FX.cheb_closed (y s : ℝ) (hs : s ^ 2 = y ^ 2 - 1) (m : ℕ) :
-    (Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y = ((y + s) ^ m + (y - s) ^ m) / 2 := by
+private theorem UpperTheory.ConvolutionTheory.FX.cheb_closed
+    (y s : ℝ) (hs : s ^ 2 = y ^ 2 - 1) (m : ℕ)
+    : (Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y = ((y + s) ^ m + (y - s) ^ m) / 2 := by
   induction m using Nat.twoStepInduction with
   | zero => simp
   | one => simp
@@ -20,8 +21,13 @@ private theorem UpperTheory.ConvolutionTheory.FX.cheb_closed (y s : ℝ) (hs : s
     rw [h0, h1]
     linear_combination (-((y + s) ^ n + (y - s) ^ n) / 2) * hs
 
-theorem UpperTheory.ConvolutionTheory.FX.cheb_facts :
-    ∀ (m : ℕ) (y : ℝ), (|y| ≤ 1 → |(Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y| ≤ 1) ∧ (1 ≤ y → (Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y = ((y + Real.sqrt (y ^ 2 - 1)) ^ m + (y - Real.sqrt (y ^ 2 - 1)) ^ m) / 2 ∧ |(Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y| ≤ (2 * y) ^ m) := by
+theorem UpperTheory.ConvolutionTheory.FX.cheb_facts
+    : ∀ (m : ℕ) (y : ℝ),
+      (|y| ≤ 1 → |(Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y| ≤ 1)
+        ∧ (1 ≤ y
+          → (Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y
+              = ((y + Real.sqrt (y ^ 2 - 1)) ^ m + (y - Real.sqrt (y ^ 2 - 1)) ^ m) / 2
+            ∧ |(Polynomial.Chebyshev.T ℝ (m : ℤ)).eval y| ≤ (2 * y) ^ m) := by
   intro m y
   refine ⟨fun hy => ?_, fun hy => ?_⟩
   · obtain ⟨h1, h2⟩ := abs_le.mp hy

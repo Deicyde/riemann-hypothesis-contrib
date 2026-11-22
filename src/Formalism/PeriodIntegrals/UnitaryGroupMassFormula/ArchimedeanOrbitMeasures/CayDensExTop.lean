@@ -27,8 +27,8 @@ theorem Jpq_mul_self : HcS.UG.Jpq P Q * HcS.UG.Jpq P Q = 1 := by
 theorem Jpq_conjTranspose : (HcS.UG.Jpq P Q)ᴴ = HcS.UG.Jpq P Q := by
   simp [HcS.UG.Jpq, Matrix.fromBlocks_conjTranspose]
 
-theorem mem_Upq_iff (g : GL (Fin P ⊕ Fin Q) ℂ) :
-    g ∈ HcS.UG.Upq P Q ↔ (g : Mat)ᴴ * HcS.UG.Jpq P Q * (g : Mat) = HcS.UG.Jpq P Q := by
+theorem mem_Upq_iff (g : GL (Fin P ⊕ Fin Q) ℂ)
+    : g ∈ HcS.UG.Upq P Q ↔ (g : Mat)ᴴ * HcS.UG.Jpq P Q * (g : Mat) = HcS.UG.Jpq P Q := by
   unfold HcS.UG.Upq
   rw [← cT_eq]
   rfl
@@ -37,47 +37,55 @@ def toS (g : UpqT P Q) : HcS.UG.Upq P Q := g
 
 theorem mat_eq (g : UpqT P Q) : UpqT.mat g = ((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ) : Mat) := rfl
 
-theorem mat_inv (g : UpqT P Q) :
-    (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat) =
-      HcS.UG.Jpq P Q * (UpqT.mat g)ᴴ * HcS.UG.Jpq P Q := by
+theorem mat_inv (g : UpqT P Q)
+    : (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat)
+      = HcS.UG.Jpq P Q * (UpqT.mat g)ᴴ * HcS.UG.Jpq P Q := by
   have hmem : (UpqT.mat g)ᴴ * HcS.UG.Jpq P Q * UpqT.mat g = HcS.UG.Jpq P Q := by
     rw [mat_eq]
     exact (mem_Upq_iff P Q _).mp (toS P Q g).2
-  have hAB : UpqT.mat g * (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat) = 1 := by
+  have hAB
+      : UpqT.mat g * (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat) = 1 := by
     rw [mat_eq, ← Units.val_mul, mul_inv_cancel, Units.val_one]
-  calc (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat)
-      = (HcS.UG.Jpq P Q * ((UpqT.mat g)ᴴ * HcS.UG.Jpq P Q * UpqT.mat g)) *
-          (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat) := by
-        rw [hmem, Jpq_mul_self, Matrix.one_mul]
-    _ = HcS.UG.Jpq P Q * (UpqT.mat g)ᴴ * HcS.UG.Jpq P Q *
-          (UpqT.mat g * (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat)) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat)
+        = (HcS.UG.Jpq P Q * ((UpqT.mat g)ᴴ * HcS.UG.Jpq P Q * UpqT.mat g))
+          * (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat) := by
+      rw [hmem, Jpq_mul_self, Matrix.one_mul]
+    _ = HcS.UG.Jpq P Q * (UpqT.mat g)ᴴ * HcS.UG.Jpq P Q
+        * (UpqT.mat g * (((toS P Q g : GL (Fin P ⊕ Fin Q) ℂ)⁻¹ : GL (Fin P ⊕ Fin Q) ℂ) : Mat)) := by
+      simp only [Matrix.mul_assoc]
     _ = _ := by rw [hAB, Matrix.mul_one]
 
 theorem isInducing_mat : IsInducing (UpqT.mat (P := P) (Q := Q)) := by
-  have hv : IsInducing (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ)) := by
+  have hv
+      : IsInducing (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ)) := by
     rw [isInducing_iff]
     ext s
     rw [isOpen_induced_iff]
     show HcS.BasicNotions.instTopologicalSpaceUpqT._aux_1 P Q s ↔ _
     unfold HcS.BasicNotions.instTopologicalSpaceUpqT._aux_1
     rfl
-  have he : IsInducing ((Units.embedProduct Mat) ∘
-      (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ))) :=
+  have he : IsInducing
+      ((Units.embedProduct Mat)
+        ∘ (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ))) :=
     Units.isEmbedding_embedProduct.isInducing.comp hv
-  have hcomp : (Units.embedProduct Mat) ∘
-      (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ)) =
-      (fun X : Mat => (X, MulOpposite.op (HcS.UG.Jpq P Q * Xᴴ * HcS.UG.Jpq P Q))) ∘ UpqT.mat := by
+  have hcomp
+      : (Units.embedProduct Mat)
+          ∘ (fun g : UpqT P Q => ((toS P Q g : HcS.UG.Upq P Q) : GL (Fin P ⊕ Fin Q) ℂ))
+        = (fun X : Mat => (X, MulOpposite.op (HcS.UG.Jpq P Q * Xᴴ * HcS.UG.Jpq P Q)))
+          ∘ UpqT.mat := by
     funext x
     exact Prod.ext rfl (congrArg MulOpposite.op (mat_inv P Q x))
   rw [hcomp] at he
   refine IsInducing.of_comp ?_ ?_ he
   · exact Units.continuous_val.comp hv.continuous
   · exact continuous_id.prodMk (MulOpposite.continuous_op.comp
-      ((continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul continuous_const))
+      ((continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul
+        continuous_const))
 
-theorem range_mat : Set.range (UpqT.mat (P := P) (Q := Q)) =
-    {X : Mat | Xᴴ * HcS.UG.Jpq P Q * X = HcS.UG.Jpq P Q} := by
+theorem range_mat
+    : Set.range (UpqT.mat (P := P) (Q := Q))
+      = {X : Mat | Xᴴ * HcS.UG.Jpq P Q * X = HcS.UG.Jpq P Q} := by
   ext X
   constructor
   · rintro ⟨g, rfl⟩
@@ -117,7 +125,10 @@ instance : SecondCountableTopology (UpqT P Q) := by
 
 end Upq
 
-variable (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-  (hc : CMData F E) (T : Type) [Fintype T] (cd : CDHaar)
+variable
+  (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  (hc : CMData F E)
+  (T : Type) [Fintype T]
+  (cd : CDHaar)
 
 end HcInf

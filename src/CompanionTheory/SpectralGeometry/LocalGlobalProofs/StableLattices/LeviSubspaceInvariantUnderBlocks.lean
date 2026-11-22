@@ -9,20 +9,25 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.RgTransport
 
-open CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J Formalism.REAL ReciprocityTheory.ChartRestriction.DS GlobalTheory.SmGL
+open CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J Formalism.REAL
+  ReciprocityTheory.ChartRestriction.DS GlobalTheory.SmGL
 
-theorem glRel_bops {n : ℕ} (Q : GMod n) {c : ℕ} (d : Fin c → ℕ) (h : ∑ i, d i = n) (i : Fin c) :
-    GlRel (bops Q d h i) := by
+theorem glRel_bops {n : ℕ} (Q : GMod n) {c : ℕ} (d : Fin c → ℕ) (h : ∑ i, d i = n) (i : Fin c)
+    : GlRel (bops Q d h i) := by
   intro p q r s
   have inj : ∀ p q : Fin (d i), stdBlocks d h ⟨i, p⟩ = stdBlocks d h ⟨i, q⟩ ↔ p = q := fun p q => by
     simp
-  have e := Q.gl (stdBlocks d h ⟨i, p⟩) (stdBlocks d h ⟨i, q⟩) (stdBlocks d h ⟨i, r⟩) (stdBlocks d h ⟨i, s⟩)
+  have e :=
+    Q.gl (stdBlocks d h ⟨i, p⟩) (stdBlocks d h ⟨i, q⟩) (stdBlocks d h ⟨i, r⟩) (stdBlocks d h ⟨i, s⟩)
   simp only [inj] at e
   exact e
 
-theorem commute_E_Qd {n : ℕ} (P : GMod n) {c : ℕ} (d : Fin c → ℕ) (h : ∑ i, d i = n) (i : Fin c) (Y : ℂ)
-    (a b : Fin n) (hab : blk (stdBlocks d h) a = blk (stdBlocks d h) b) :
-    Commute (P.E a b) (Qd P d h i Y) := by
+theorem commute_E_Qd
+    {n : ℕ} (P : GMod n)
+    {c : ℕ} (d : Fin c → ℕ) (h : ∑ i, d i = n) (i : Fin c)
+    (Y : ℂ)
+    (a b : Fin n) (hab : blk (stdBlocks d h) a = blk (stdBlocks d h) b)
+    : Commute (P.E a b) (Qd P d h i Y) := by
   by_cases hi : blk (stdBlocks d h) a = i
   · obtain ⟨⟨i₁, p⟩, rfl⟩ := (stdBlocks d h).surjective a
     obtain ⟨⟨i₂, q⟩, rfl⟩ := (stdBlocks d h).surjective b
@@ -47,9 +52,12 @@ theorem commute_E_Qd {n : ℕ} (P : GMod n) {c : ℕ} (d : Fin c → ℕ) (h : �
     · exact (Algebra.commutes _ _).symm
     · exact Commute.zero_right _
 
-theorem leviSub_stable {n : ℕ} (P : GMod n) (d : Fin 3 → ℕ) (h : ∑ i, d i = n) (χ : Fin n → ℂ) (L : Fin n → Fin 3)
-    (a b : Fin n) (hab : blk (stdBlocks d h) a = blk (stdBlocks d h) b) :
-    ∀ x ∈ leviSub P d h χ L, P.E a b x ∈ leviSub P d h χ L := by
+theorem leviSub_stable
+    {n : ℕ} (P : GMod n)
+    (d : Fin 3 → ℕ) (h : ∑ i, d i = n)
+    (χ : Fin n → ℂ) (L : Fin n → Fin 3)
+    (a b : Fin n) (hab : blk (stdBlocks d h) a = blk (stdBlocks d h) b)
+    : ∀ x ∈ leviSub P d h χ L, P.E a b x ∈ leviSub P d h χ L := by
   rintro x ⟨hk, he⟩
   refine ⟨fun c e hce => ?_, fun i Y => ?_⟩
   · rw [comm_apply P c e a b x, hk c e hce, map_zero, zero_add]

@@ -24,7 +24,8 @@ variable {R : Type u} [CommRing R] (W : WeierstrassCurve R) (xP yP : R)
 theorem tDen_cc : constantCoeff (tDen W xP) = 1 := by
   simp [tDen, xS, PowerSeries.constantCoeff_invOfUnit]
 
-theorem tDen_mul_inv : tDen W xP * invOfUnit (tDen W xP) 1 = 1 := PowerSeries.mul_invOfUnit _ _ (by simpa using tDen_cc W xP)
+theorem tDen_mul_inv : tDen W xP * invOfUnit (tDen W xP) 1 = 1 :=
+  PowerSeries.mul_invOfUnit _ _ (by simpa using tDen_cc W xP)
 
 theorem inv_cc : constantCoeff (invOfUnit (tDen W xP) 1) = 1 := by
   simp [PowerSeries.constantCoeff_invOfUnit]
@@ -45,11 +46,9 @@ theorem uPow_neg_three : (uPow (-3) : LaurentSeries R) = uPow (-1) ^ 3 := by
   rw [pow_three, HahnSeries.single_mul_single, HahnSeries.single_mul_single]
   norm_num
 
-theorem xL_eq : xL W = uPow (-1) ^ 2 * toL (xS W) := by
-  rw [xL, uPow_neg_two]
+theorem xL_eq : xL W = uPow (-1) ^ 2 * toL (xS W) := by rw [xL, uPow_neg_two]
 
-theorem yL_eq : yL W = uPow (-1) ^ 3 * toL (yS W) := by
-  rw [yL, uPow_neg_three]
+theorem yL_eq : yL W = uPow (-1) ^ 3 * toL (yS W) := by rw [yL, uPow_neg_three]
 
 theorem toL_tDen : toL (tDen W xP) = toL (xS W) - HahnSeries.C xP * toL X ^ 2 := by
   simp only [tDen, map_sub, map_mul, map_pow, HahnSeries.ofPowerSeries_C]
@@ -73,31 +72,37 @@ theorem yL_sub : yL W - HahnSeries.C yP = uPow (-1) ^ 3 * toL (yS W - C yP * X ^
 
 theorem toL_tS_mul : toL (tS W xP) * (xL W - HahnSeries.C xP) = 1 := by
   rw [xL_sub, toL_tS]
-  calc (toL X : LaurentSeries R) ^ 2 * toL (invOfUnit (tDen W xP) 1) * (uPow (-1) ^ 2 * toL (tDen W xP))
-      = ((toL X : LaurentSeries R) * uPow (-1)) ^ 2
-          * (toL (tDen W xP) * toL (invOfUnit (tDen W xP) 1)) := by ring
+  calc
+    (toL X : LaurentSeries R) ^ 2 * toL (invOfUnit (tDen W xP) 1)
+          * (uPow (-1) ^ 2 * toL (tDen W xP))
+        = ((toL X : LaurentSeries R) * uPow (-1)) ^ 2
+          * (toL (tDen W xP) * toL (invOfUnit (tDen W xP) 1)) := by
+      ring
     _ = 1 := by rw [toL_X_mul, toL_tDen_mul_inv, one_pow, one_mul]
 
-theorem coeff_two_tS : coeff 2 (tS W xP) = 1 := by
-  simp [tS, PowerSeries.coeff_X_pow_mul', inv_cc]
+theorem coeff_two_tS : coeff 2 (tS W xP) = 1 := by simp [tS, PowerSeries.coeff_X_pow_mul', inv_cc]
 
-theorem toL_nS : toL (nS W xP yP) =
-    HahnSeries.C (W.a₄ - W.a₁ * yP + 2 * W.a₂ * xP + 3 * xP ^ 2) * toL X * toL (xS W)
-      - HahnSeries.C (2 * yP + W.a₁ * xP + W.a₃) * toL (yS W)
-      + HahnSeries.C (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3) * toL X ^ 3 := by
+theorem toL_nS
+    : toL (nS W xP yP)
+      = HahnSeries.C (W.a₄ - W.a₁ * yP + 2 * W.a₂ * xP + 3 * xP ^ 2) * toL X * toL (xS W)
+        - HahnSeries.C (2 * yP + W.a₁ * xP + W.a₃) * toL (yS W)
+        + HahnSeries.C (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3) * toL X ^ 3 := by
   simp only [nS, map_add (f := _), map_sub, map_mul, map_pow, HahnSeries.ofPowerSeries_C]
 
-theorem toL_xPlus : toL (xPlus W xP yP) = HahnSeries.C xP
-    + toL X * toL (nS W xP yP) * toL (invOfUnit (tDen W xP) 1) ^ 2 := by
+theorem toL_xPlus
+    : toL (xPlus W xP yP)
+      = HahnSeries.C xP + toL X * toL (nS W xP yP) * toL (invOfUnit (tDen W xP) 1) ^ 2 := by
   simp only [xPlus, map_add (f := _), map_mul, map_pow, HahnSeries.ofPowerSeries_C]
 
-theorem toL_yPlus : toL (yPlus W xP yP) =
-    -(toL (yS W - C yP * X ^ 3) * toL (nS W xP yP) * toL (invOfUnit (tDen W xP) 1) ^ 3)
-      - HahnSeries.C yP - HahnSeries.C W.a₁ * toL (xPlus W xP yP) - HahnSeries.C W.a₃ := by
-  simp only [yPlus, map_add (f := _), map_sub, map_neg, map_mul, map_pow, HahnSeries.ofPowerSeries_C]
+theorem toL_yPlus
+    : toL (yPlus W xP yP)
+      = -(toL (yS W - C yP * X ^ 3) * toL (nS W xP yP) * toL (invOfUnit (tDen W xP) 1) ^ 3)
+        - HahnSeries.C yP - HahnSeries.C W.a₁ * toL (xPlus W xP yP) - HahnSeries.C W.a₃ := by
+  simp only [yPlus, map_add (f := _), map_sub, map_neg, map_mul, map_pow,
+    HahnSeries.ofPowerSeries_C]
 
-theorem inv_subst (hI : ISerSpec.{u}) :
-    (invOfUnit (tDen W xP) 1).subst (iSer W) = iDen W ^ 2 * invOfUnit (tDen W xP) 1 := by
+theorem inv_subst (hI : ISerSpec.{u})
+    : (invOfUnit (tDen W xP) 1).subst (iSer W) = iDen W ^ 2 * invOfUnit (tDen W xP) 1 := by
   obtain ⟨hs0, -, -, -, hx, -, -, -⟩ := hI R W
   have hS : HasSubst (iSer W) := HasSubst.of_constantCoeff_zero' hs0
   have hw0 : constantCoeff (wSer W) = 0 := (Formalism.ELL.wSeriesUnique R W).choose_spec.1.1
@@ -108,8 +113,8 @@ theorem inv_subst (hI : ISerSpec.{u}) :
     rw [← PowerSeries.coe_substAlgHom hS]
     exact (PowerSeries.substAlgHom hS).commutes xP
   have hT : (tDen W xP).subst (iSer W) = invOfUnit (iDen W) (-1) ^ 2 * tDen W xP := by
-    rw [tDen, ← PowerSeries.coe_substAlgHom hS, map_sub, map_mul, map_pow, PowerSeries.coe_substAlgHom,
-      PowerSeries.subst_X hS, hCs, hx, iSer]
+    rw [tDen, ← PowerSeries.coe_substAlgHom hS, map_sub, map_mul, map_pow,
+      PowerSeries.coe_substAlgHom, PowerSeries.subst_X hS, hCs, hx, iSer]
     ring
   have hA : (tDen W xP).subst (iSer W) * (invOfUnit (tDen W xP) 1).subst (iSer W) = 1 := by
     rw [← PowerSeries.coe_substAlgHom hS, ← map_mul, hC, map_one]
@@ -127,21 +132,23 @@ theorem tS_subst (hI : ISerSpec.{u}) : (tS W xP).subst (iSer W) = tS W xP := by
     PowerSeries.subst_X hS, inv_subst W xP hI, iSer]
   linear_combination (X ^ 2 * invOfUnit (tDen W xP) 1 * (iDen W * invOfUnit (iDen W) (-1) + 1)) * hB
 
-theorem equation_C {xP yP : R} (hP : W.toAffine.Equation xP yP) :
-    (curveL W).toAffine.Equation (HahnSeries.C xP) (HahnSeries.C yP) := by
+theorem equation_C {xP yP : R} (hP : W.toAffine.Equation xP yP)
+    : (curveL W).toAffine.Equation (HahnSeries.C xP) (HahnSeries.C yP) := by
   rw [WeierstrassCurve.Affine.equation_iff] at hP ⊢
   have h := congrArg (HahnSeries.C : R →+* LaurentSeries R) hP
   simpa using h
 
-theorem chord (hFL : FlowL.{u}) {xP yP : R} (hP : W.toAffine.Equation xP yP) :
-    toL (xPlus W xP yP) = (curveL W).toAffine.addX (xL W) (HahnSeries.C xP) (slopeL W xP yP) ∧
-    toL (yPlus W xP yP)
-      = (curveL W).toAffine.addY (xL W) (HahnSeries.C xP) (yL W) (slopeL W xP yP) := by
-  obtain ⟨hX, hY⟩ := chordFormula _ (curveL W) (xL W) (yL W) (HahnSeries.C xP)
-    (HahnSeries.C yP) (toL (tS W xP)) (hFL R W).1.1 (equation_C W hP) (toL_tS_mul W xP)
+theorem chord (hFL : FlowL.{u}) {xP yP : R} (hP : W.toAffine.Equation xP yP)
+    : toL (xPlus W xP yP) = (curveL W).toAffine.addX (xL W) (HahnSeries.C xP) (slopeL W xP yP)
+      ∧ toL (yPlus W xP yP)
+        = (curveL W).toAffine.addY (xL W) (HahnSeries.C xP) (yL W) (slopeL W xP yP) := by
+  obtain ⟨hX, hY⟩ :=
+    chordFormula _ (curveL W) (xL W) (yL W) (HahnSeries.C xP) (HahnSeries.C yP) (toL (tS W xP))
+      (hFL R W).1.1 (equation_C W hP) (toL_tS_mul W xP)
   have h : (toL X : LaurentSeries R) * uPow (-1) = 1 := toL_X_mul
-  have hx : toL (xPlus W xP yP)
-      = (curveL W).toAffine.addX (xL W) (HahnSeries.C xP) (slopeL W xP yP) := by
+  have hx
+      : toL (xPlus W xP yP)
+        = (curveL W).toAffine.addX (xL W) (HahnSeries.C xP) (slopeL W xP yP) := by
     rw [slopeL, hX, toL_xPlus, toL_nS, toL_tS, xL_eq, yL_eq]
     simp only [WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
       WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆, map_add, map_sub, map_mul, map_pow,
@@ -162,11 +169,12 @@ theorem chord (hFL : FlowL.{u}) {xP yP : R} (hP : W.toAffine.Equation xP yP) :
   linear_combination (toL (yS W - C yP * X ^ 3) * toL (nS W xP yP)
     * toL (invOfUnit (tDen W xP) 1) ^ 3 * ((toL X * uPow (-1)) ^ 2 + toL X * uPow (-1) + 1)) * h
 
-theorem isFlow_of_toL (hDL : DLSpec.{u}) {a b : R⟦X⟧}
-    (h : IsFlow (curveL W) (DL W) (toL a) (toL b)) : IsFlow (curveS W) (D W) a b := by
+theorem isFlow_of_toL (hDL : DLSpec.{u}) {a b : R⟦X⟧} (h : IsFlow (curveL W) (DL W) (toL a) (toL b))
+    : IsFlow (curveS W) (D W) a b := by
   obtain ⟨hE, h1, h2⟩ := h
   obtain ⟨-, -, -, hD⟩ := hDL R W
-  have inj : Function.Injective (toL : R⟦X⟧ →+* LaurentSeries R) := HahnSeries.ofPowerSeries_injective
+  have inj : Function.Injective (toL : R⟦X⟧ →+* LaurentSeries R) :=
+    HahnSeries.ofPowerSeries_injective
   refine ⟨?_, ?_, ?_⟩
   · rw [WeierstrassCurve.Affine.equation_iff] at hE ⊢
     apply inj
@@ -181,8 +189,7 @@ theorem isFlow_of_toL (hDL : DLSpec.{u}) {a b : R⟦X⟧}
 theorem nS_cc : constantCoeff (nS W xP yP) = 2 * yP + W.a₁ * xP + W.a₃ := by
   simp [nS, yS, xS, PowerSeries.constantCoeff_invOfUnit]
 
-theorem xPlus_cc : constantCoeff (xPlus W xP yP) = xP := by
-  simp [xPlus]
+theorem xPlus_cc : constantCoeff (xPlus W xP yP) = xP := by simp [xPlus]
 
 theorem yPlus_cc : constantCoeff (yPlus W xP yP) = yP := by
   simp [yPlus, yS, xS, xPlus_cc, nS_cc, PowerSeries.constantCoeff_invOfUnit] <;> ring
@@ -194,24 +201,25 @@ variable {S : Type v} [CommRing S] (φ : R →+* S)
 theorem map_tDen : PowerSeries.map φ (tDen W xP) = tDen (W.map φ) (φ xP) := by
   simp only [tDen, map_sub, map_mul, map_pow, PowerSeries.map_C, PowerSeries.map_X, CurveSer.map_xS]
 
-theorem map_inv : PowerSeries.map φ (invOfUnit (tDen W xP) 1)
-    = invOfUnit (tDen (W.map φ) (φ xP)) 1 := by
+theorem map_inv
+    : PowerSeries.map φ (invOfUnit (tDen W xP) 1) = invOfUnit (tDen (W.map φ) (φ xP)) 1 := by
   have h1 : tDen (W.map φ) (φ xP) * PowerSeries.map φ (invOfUnit (tDen W xP) 1) = 1 := by
     rw [← Plus.map_tDen W xP φ, ← map_mul, tDen_mul_inv, map_one]
   have h2 := tDen_mul_inv (W.map φ) (φ xP)
-  calc PowerSeries.map φ (invOfUnit (tDen W xP) 1)
-      = (invOfUnit (tDen (W.map φ) (φ xP)) 1 * tDen (W.map φ) (φ xP))
+  calc
+    PowerSeries.map φ (invOfUnit (tDen W xP) 1)
+        = (invOfUnit (tDen (W.map φ) (φ xP)) 1 * tDen (W.map φ) (φ xP))
           * PowerSeries.map φ (invOfUnit (tDen W xP) 1) := by
-        rw [mul_comm (invOfUnit (tDen (W.map φ) (φ xP)) 1) (tDen (W.map φ) (φ xP)), h2, one_mul]
+      rw [mul_comm (invOfUnit (tDen (W.map φ) (φ xP)) 1) (tDen (W.map φ) (φ xP)), h2, one_mul]
     _ = invOfUnit (tDen (W.map φ) (φ xP)) 1 := by rw [mul_assoc, h1, mul_one]
 
 theorem map_tS : PowerSeries.map φ (tS W xP) = tS (W.map φ) (φ xP) := by
   simp only [tS, map_mul, map_pow, PowerSeries.map_X, Plus.map_inv W xP φ]
 
 theorem map_nS : PowerSeries.map φ (nS W xP yP) = nS (W.map φ) (φ xP) (φ yP) := by
-  simp only [nS, yS, map_add (f := _), map_sub, map_mul, map_neg, map_pow, PowerSeries.map_C, PowerSeries.map_X,
-    CurveSer.map_xS, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
-    WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆, map_ofNat]
+  simp only [nS, yS, map_add (f := _), map_sub, map_mul, map_neg, map_pow, PowerSeries.map_C,
+    PowerSeries.map_X, CurveSer.map_xS, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂,
+    WeierstrassCurve.map_a₃, WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆, map_ofNat]
 
 theorem map_xPlus : PowerSeries.map φ (xPlus W xP yP) = xPlus (W.map φ) (φ xP) (φ yP) := by
   simp only [xPlus, map_add (f := _), map_mul, map_pow, PowerSeries.map_C, PowerSeries.map_X,
@@ -230,8 +238,14 @@ open Plus
 
 theorem tSpec_of (hI : ISerSpec.{u}) : TSpec.{u} := by
   intro R _ W xP
-  exact ⟨Plus.tDen_cc W xP, Plus.tDen_mul_inv W xP, Plus.toL_tS_mul W xP, Plus.coeff_two_tS W xP,
-    ⟨invOfUnit (tDen W xP) 1, rfl⟩, Plus.tS_subst W xP hI⟩
+  exact ⟨
+    Plus.tDen_cc W xP,
+    Plus.tDen_mul_inv W xP,
+    Plus.toL_tS_mul W xP,
+    Plus.coeff_two_tS W xP,
+    ⟨invOfUnit (tDen W xP) 1, rfl⟩,
+    Plus.tS_subst W xP hI
+  ⟩
 
 theorem plusChord_of (hFL : FlowL.{u}) : PlusChord.{u} := by
   intro R _ W xP yP hP
@@ -241,9 +255,9 @@ theorem plusFlow_of (hDL : DLSpec.{u}) (hFL : FlowL.{u}) : PlusFlow.{u} := by
   intro R _ W xP yP hP
   obtain ⟨hDer, hConst, hC, -⟩ := hDL R W
   obtain ⟨hx, hy⟩ := chord W hFL hP
-  have h := flowTranslation _ (curveL W) (DL W) (xL W) (yL W) (HahnSeries.C xP)
-    (HahnSeries.C yP) (toL (tS W xP)) hDer hConst (hFL R W).1 (equation_C W hP) (hC xP) (hC yP)
-    (toL_tS_mul W xP)
+  have h :=
+    flowTranslation _ (curveL W) (DL W) (xL W) (yL W) (HahnSeries.C xP) (HahnSeries.C yP)
+      (toL (tS W xP)) hDer hConst (hFL R W).1 (equation_C W hP) (hC xP) (hC yP) (toL_tS_mul W xP)
   rw [slopeL] at hx hy
   rw [← hx, ← hy] at h
   exact ⟨isFlow_of_toL W hDL h, xPlus_cc W xP yP, yPlus_cc W xP yP⟩

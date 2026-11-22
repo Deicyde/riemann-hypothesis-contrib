@@ -7,15 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsF
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtFin
 
-theorem exists_finset_fix : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] (A : Over (Sp K)),
-    LocallyOfFiniteType A.hom → ∀ x : ptOver K Ω ⟶ A, ∃ s : Finset Ω, ∀ σ : Ω ≃ₐ[K] Ω,
-      (∀ a ∈ s, σ a = a) → specAut σ ≫ x = x := by
+theorem exists_finset_fix
+    : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] (A : Over (Sp K)),
+      LocallyOfFiniteType A.hom
+        → ∀ x : ptOver K Ω ⟶ A, ∃ s : Finset Ω, ∀ σ : Ω ≃ₐ[K] Ω,
+          (∀ a ∈ s, σ a = a) → specAut σ ≫ x = x := by
   classical
   intro K Ω _ _ _ A hA x
   haveI := hA
@@ -27,8 +30,10 @@ theorem exists_finset_fix : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω
   rw [← hx, Category.assoc, ← hψ, ← Spec.map_comp, Spec.map_inj] at hxs
   letI : Algebra K (A.left.residueField p) := ψ.hom.toAlgebra
   haveI : Algebra.EssFiniteType K (A.left.residueField p) := hess
-  let fa : A.left.residueField p →ₐ[K] Ω :=
-    { φ.hom with commutes' := fun c => congrArg (fun g => g.hom c) hxs }
+  let fa : A.left.residueField p →ₐ[K] Ω := {
+    φ.hom with
+    commutes' := fun c => congrArg (fun g => g.hom c) hxs
+  }
   refine ⟨(Algebra.EssFiniteType.finset K (A.left.residueField p)).image fa, fun σ hσ => ?_⟩
   have e : (σ : Ω →ₐ[K] Ω).comp fa = fa :=
     Algebra.EssFiniteType.algHom_ext Ω _ _ fun c hc => hσ _ (Finset.mem_image_of_mem _ hc)

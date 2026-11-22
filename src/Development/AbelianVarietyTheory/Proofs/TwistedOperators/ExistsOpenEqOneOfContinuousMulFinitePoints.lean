@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Nonarchim
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
 open scoped ContDiff ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,7 +22,13 @@ namespace GlobalTheory.OpenKer
 
 open GlobalTheory.AdelicU Filter Topology
 
-theorem eq_one_on_finite_of_mul : ∀ {D : D7} (T : HSp D) (K : Subgroup (GA D T)), IsOpen (K : Set (GA D T)) → ∀ F : GA D T → ℂ, Continuous F → F 1 = 1 → (∀ a ∈ K, a ∈ GfC T → ∀ b ∈ K, b ∈ GfC T → F (a * b) = F a * F b) → ∃ U : Subgroup (GA D T), IsOpen (U : Set (GA D T)) ∧ ∀ k ∈ U, k ∈ GfC T → F k = 1 := by
+theorem eq_one_on_finite_of_mul
+    : ∀ {D : D7} (T : HSp D) (K : Subgroup (GA D T)),
+      IsOpen (K : Set (GA D T))
+        → ∀ F : GA D T → ℂ,
+          Continuous F → F 1 = 1 → (∀ a ∈ K, a ∈ GfC T → ∀ b ∈ K, b ∈ GfC T → F (a * b) = F a * F b)
+            → ∃ U : Subgroup (GA D T),
+              IsOpen (U : Set (GA D T)) ∧ ∀ k ∈ U, k ∈ GfC T → F k = 1 := by
   intro D T K hK F hF h1 hmul
   haveI := GlobalTheory.Doubling.nonarchimedeanGroup_GFin D.sp.cm.sig T.gram
   have hc := continuous_ofFin D.sp.cm.sig T.gram
@@ -30,10 +38,15 @@ theorem eq_one_on_finite_of_mul : ∀ {D : D7} (T : HSp D) (K : Subgroup (GA D T
   have hK' : {y | ofFin D.sp.cm.sig T.gram y ∈ K} ∈ 𝓝 (1 : GFin D.sp.cm.sig T.gram) :=
     (hK.preimage hc).mem_nhds (by simp [one_mem])
   obtain ⟨W, hW⟩ := NonarchimedeanGroup.is_nonarchimedean _ (inter_mem hN hK')
-  refine ⟨W.toSubgroup.comap (projFin D.sp.cm.sig T.gram),
-    W.isOpen.preimage (continuous_projFin D.sp.cm.sig T.gram), ?_⟩
+  refine ⟨
+    W.toSubgroup.comap (projFin D.sp.cm.sig T.gram),
+    W.isOpen.preimage (continuous_projFin D.sp.cm.sig T.gram),
+    ?_
+  ⟩
   intro k hk hkf
-  have hkk : ∀ n : ℕ, ofFin D.sp.cm.sig T.gram (projFin D.sp.cm.sig T.gram (k ^ n)) = k ^ n := fun n => by
+  have hkk
+      : ∀ n : ℕ,
+        ofFin D.sp.cm.sig T.gram (projFin D.sp.cm.sig T.gram (k ^ n)) = k ^ n := fun n => by
     have h := ofInf_projInf_mul_ofFin_projFin D.sp.cm.sig T.gram (k ^ n)
     rwa [mem_finPts.1 (pow_mem hkf n), map_one, one_mul] at h
   have hW' : ∀ n : ℕ, ‖F (k ^ n) - 1‖ < 1 / 2 ∧ k ^ n ∈ K := fun n => by

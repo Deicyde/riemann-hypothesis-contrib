@@ -18,22 +18,23 @@ theorem i2bdeg_add (m n : (Σ k, ι k) →₀ ℕ) : i2bdeg (m + n) = i2bdeg m +
   funext k
   simp [i2bdeg, Finset.sum_add_distrib]
 
-
 open Classical in
 def i2comp (a : K → ℕ) (h : MRing ι) : MRing ι :=
   ∑ m ∈ h.support.filter (fun m => i2bdeg m = a), monomial m (AddMonoidAlgebra.coeff h m)
 
 open Classical in
-theorem coeff_i2comp (a : K → ℕ) (h : MRing ι) (m : (Σ k, ι k) →₀ ℕ) :
-    AddMonoidAlgebra.coeff (i2comp a h) m = if i2bdeg m = a then AddMonoidAlgebra.coeff h m else 0 := by
+theorem coeff_i2comp (a : K → ℕ) (h : MRing ι) (m : (Σ k, ι k) →₀ ℕ)
+    : AddMonoidAlgebra.coeff (i2comp a h) m
+      = if i2bdeg m = a then AddMonoidAlgebra.coeff h m else 0 := by
   unfold i2comp
   rw [coeff_sum]
   simp only [coeff_monomial]
   rw [Finset.sum_ite_eq']
-  by_cases h0 : AddMonoidAlgebra.coeff h m = 0 <;> by_cases e : i2bdeg m = a <;> simp [Finset.mem_filter, mem_support_iff, h0, e]
+  by_cases h0 : AddMonoidAlgebra.coeff h m = 0 <;> by_cases e : i2bdeg m = a
+    <;> simp [Finset.mem_filter, mem_support_iff, h0, e]
 
-theorem isMultiHomog_iff_coeff (s : MRing ι) (a : K → ℕ) :
-    IsMultiHomog s a ↔ ∀ m, AddMonoidAlgebra.coeff s m ≠ 0 → i2bdeg m = a := by
+theorem isMultiHomog_iff_coeff (s : MRing ι) (a : K → ℕ)
+    : IsMultiHomog s a ↔ ∀ m, AddMonoidAlgebra.coeff s m ≠ 0 → i2bdeg m = a := by
   constructor
   · intro h m hm
     funext k
@@ -51,8 +52,8 @@ def i2compHom (a : K → ℕ) : MRing ι →+ MRing ι where
   map_add' x y := by
     classical
     ext m
-    change AddMonoidAlgebra.coeff (i2comp a (x + y)) m =
-      AddMonoidAlgebra.coeff (i2comp a x) m + AddMonoidAlgebra.coeff (i2comp a y) m
+    change AddMonoidAlgebra.coeff (i2comp a (x + y)) m
+      = AddMonoidAlgebra.coeff (i2comp a x) m + AddMonoidAlgebra.coeff (i2comp a y) m
     rw [coeff_i2comp, coeff_i2comp, coeff_i2comp, AddMonoidAlgebra.coeff_add]
     change (if i2bdeg m = a then AddMonoidAlgebra.coeff x m + AddMonoidAlgebra.coeff y m else 0) = _
     split_ifs <;> simp
@@ -70,8 +71,8 @@ theorem isMultiHomog_i2comp (a : K → ℕ) (h : MRing ι) : IsMultiHomog (i2com
   by_contra e
   exact hm (ite_eq_right e)
 
-theorem i2comp_of_homog {a b : K → ℕ} {h : MRing ι} (hh : IsMultiHomog h b) :
-    i2comp a h = if b = a then h else 0 := by
+theorem i2comp_of_homog {a b : K → ℕ} {h : MRing ι} (hh : IsMultiHomog h b)
+    : i2comp a h = if b = a then h else 0 := by
   classical
   rw [isMultiHomog_iff_coeff] at hh
   ext m
@@ -85,8 +86,8 @@ theorem i2comp_of_homog {a b : K → ℕ} {h : MRing ι} (hh : IsMultiHomog h b)
 theorem i2comp_self {a : K → ℕ} {h : MRing ι} (hh : IsMultiHomog h a) : i2comp a h = h := by
   rw [i2comp_of_homog hh, ite_eq_left rfl]
 
-theorem eq_sum_multihomogeneous_components (r : MRing ι) :
-    r = ∑ b ∈ r.support.image i2bdeg, i2comp b r := by
+theorem eq_sum_multihomogeneous_components (r : MRing ι)
+    : r = ∑ b ∈ r.support.image i2bdeg, i2comp b r := by
   classical
   ext m
   rw [coeff_sum]
@@ -120,8 +121,9 @@ theorem mem_mHom_iff (s : MRing ι) (a : K → ℕ) : s ∈ mHom ι a ↔ IsMult
   · intro hs
     exact Submodule.subset_span hs
 
-theorem isMultiHomog_mul' {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a)
-    (hg : IsMultiHomog g b) : IsMultiHomog (f * g) (a + b) := by
+theorem isMultiHomog_mul'
+    {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   rw [isMultiHomog_iff_coeff] at hf hg ⊢
   intro m hm
@@ -130,13 +132,13 @@ theorem isMultiHomog_mul' {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog 
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
   rw [← hx, i2bdeg_add, hf x.1 (left_ne_zero_of_mul hx0), hg x.2 (right_ne_zero_of_mul hx0)]
 
-theorem i2bdeg_apply_add (m n : (Σ k, ι k) →₀ ℕ) (k : K) :
-    i2bdeg (m + n) k = i2bdeg m k + i2bdeg n k := by
+theorem i2bdeg_apply_add (m n : (Σ k, ι k) →₀ ℕ) (k : K)
+    : i2bdeg (m + n) k = i2bdeg m k + i2bdeg n k := by
   simp [i2bdeg, Finset.sum_add_distrib]
 
 open Classical in
-theorem i2comp_mul_right {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c) (a : K → ℕ)
-    (g : MRing ι) : i2comp a (g * f) = if c ≤ a then i2comp (a - c) g * f else 0 := by
+theorem i2comp_mul_right {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c) (a : K → ℕ) (g : MRing ι)
+    : i2comp a (g * f) = if c ≤ a then i2comp (a - c) g * f else 0 := by
   rw [isMultiHomog_iff_coeff] at hf
   ext m
   rw [coeff_i2comp]
@@ -193,8 +195,9 @@ theorem i2comp_mul_right {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c) 
   · simp
 
 open Classical in
-theorem i2comp_mem {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) (a : K → ℕ) {u : MRing ι}
-    (hu : u ∈ F) : i2comp a u ∈ F := by
+theorem i2comp_mem
+    {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) (a : K → ℕ) {u : MRing ι} (hu : u ∈ F)
+    : i2comp a u ∈ F := by
   classical
   obtain ⟨S, hS, rfl⟩ := hF
   revert a
@@ -206,13 +209,16 @@ theorem i2comp_mem {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) (a : K → 
     split_ifs
     · exact Ideal.subset_span hx
     · exact zero_mem _
-  | zero => intro a; rw [i2comp_zero]; exact zero_mem _
-  | add x y _ _ hx hy => intro a; rw [i2comp_add]; exact add_mem (hx a) (hy a)
+  | zero =>
+    intro a; rw [i2comp_zero]; exact zero_mem _
+  | add x y _ _ hx hy =>
+    intro a; rw [i2comp_add]; exact add_mem (hx a) (hy a)
   | smul r x _ hx =>
     intro a
     rw [smul_eq_mul, eq_sum_multihomogeneous_components r, Finset.sum_mul]
-    have : i2comp a (∑ b ∈ r.support.image i2bdeg, i2comp b r * x) =
-        ∑ b ∈ r.support.image i2bdeg, i2comp a (i2comp b r * x) := map_sum (i2compHom a) _ _
+    have : i2comp a (∑ b ∈ r.support.image i2bdeg, i2comp b r * x)
+        = ∑ b ∈ r.support.image i2bdeg, i2comp a (i2comp b r * x) :=
+      map_sum (i2compHom a) _ _
     rw [this]
     refine Ideal.sum_mem _ fun b _ => ?_
     rw [mul_comm, i2comp_mul_right (isMultiHomog_i2comp b r)]
@@ -220,8 +226,10 @@ theorem i2comp_mem {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) (a : K → 
     · exact Ideal.mul_mem_right _ _ (hx _)
     · exact zero_mem _
 
-theorem isMultiHomogIdeal_sup_span {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) {f : MRing ι}
-    {c : K → ℕ} (hf : IsMultiHomog f c) : IsMultiHomogIdeal (F ⊔ Ideal.span {f}) := by
+theorem isMultiHomogIdeal_sup_span
+    {F : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F)
+    {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c)
+    : IsMultiHomogIdeal (F ⊔ Ideal.span {f}) := by
   obtain ⟨S, hS, rfl⟩ := hF
   refine ⟨S ∪ {f}, fun g hg => ?_, (Ideal.span_union S {f}).symm⟩
   rcases hg with hg | hg

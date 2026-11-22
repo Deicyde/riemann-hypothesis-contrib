@@ -16,24 +16,30 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj
 
 namespace GlobalTheory
 
 theorem isIntegral_rat_zeta_of_coeff (n : ℕ) : IsIntegral ℚ (zeta n) := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have : zeta 0 = 1 := by simp [zeta]
-    rw [this]; exact isIntegral_one
+    rw [this]
+    exact isIntegral_one
   · have h := Complex.isPrimitiveRoot_exp n hn.ne'
     exact (h.isIntegral hn).tower_top
 
-theorem exists_coeff_containing :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (s : Finset ℂ), (∀ z ∈ s, IsAlgebraic ℚ z) → ∃ c : Coeff l, ∀ z ∈ s, z ∈ c.F := by
+theorem exists_coeff_containing
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (s : Finset ℂ),
+      (∀ z ∈ s, IsAlgebraic ℚ z) → ∃ c : Coeff l, ∀ z ∈ s, z ∈ c.F := by
   intro E _ _ _ H l s hs
   classical
   let b := Module.finBasis ℚ E
-  let S : Set ℂ := (s : Set ℂ) ∪ Set.range (fun p : (E →+* ℂ) × Fin (Module.finrank ℚ E) => p.1 (b p.2)) ∪
-    {zeta l.M', H.rt0, zeta l.A}
+  let S : Set ℂ :=
+    (s : Set ℂ) ∪ Set.range (fun p : (E →+* ℂ) × Fin (Module.finrank ℚ E) => p.1 (b p.2))
+      ∪ {zeta l.M', H.rt0, zeta l.A}
   have hfin : S.Finite := ((s.finite_toSet).union (Set.finite_range _)).union (Set.toFinite _)
   haveI : Finite S := hfin.to_subtype
   have hint : ∀ x ∈ S, IsIntegral ℚ x := by
@@ -47,7 +53,10 @@ theorem exists_coeff_containing :
         exact (isIntegral_natCast _).neg
       · exact isIntegral_rat_zeta_of_coeff _
   have hsub : S ⊆ IntermediateField.adjoin ℚ S := IntermediateField.subset_adjoin _ _
-  refine ⟨⟨IntermediateField.adjoin ℚ S, IntermediateField.finiteDimensional_adjoin hint, ?_, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨IntermediateField.adjoin ℚ S, IntermediateField.finiteDimensional_adjoin hint, ?_, ?_, ?_⟩,
+    ?_
+  ⟩
   · intro τ a
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← b.sum_repr a, map_sum]

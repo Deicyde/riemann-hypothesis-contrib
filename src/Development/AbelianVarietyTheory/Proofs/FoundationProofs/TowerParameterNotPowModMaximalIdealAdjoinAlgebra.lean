@@ -16,19 +16,29 @@ open scoped NNReal
 
 namespace GlobalTheory.K5.NotPow
 
-theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω], (Ideal.span {(p : O)}).IsMaximal →
-  ∀ (v : Valuation Ω NNReal), (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x) →
-  ∀ (T : Finset Ω), (∀ t ∈ T, IsIntegral O t) → ∀ π ∈ Algebra.adjoin O (T : Set Ω), π ≠ 0 → v π < 1 →
-  (p : Ω) / π ∈ Algebra.adjoin O (T : Set Ω) →
-  ∀ f : ℕ, 0 < f → (∀ t ∈ T, (t ^ p ^ f - t) / π ∈ Algebra.adjoin O (T : Set Ω)) →
-  (∀ x ∈ Algebra.adjoin O (T : Set Ω), v x < 1 → x / π ∈ Algebra.adjoin O (T : Set Ω)) ∧
-  ∀ y ∈ Algebra.adjoin O (T : Set Ω), ∀ a : O, v (y ^ p - algebraMap O Ω a) < 1 → ∃ b : O, v (y - algebraMap O Ω b) < 1 := by
+theorem residue_core
+    : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [Field Ω] [Algebra O Ω],
+      (Ideal.span {(p : O)}).IsMaximal
+        → ∀ (v : Valuation Ω NNReal),
+          (∀ x : Ω, v x ≤ 1 ↔ IsIntegral O x)
+            → ∀ (T : Finset Ω),
+              (∀ t ∈ T, IsIntegral O t)
+                → ∀ π ∈ Algebra.adjoin O (T : Set Ω),
+                  π ≠ 0 → v π < 1 → (p : Ω) / π ∈ Algebra.adjoin O (T : Set Ω)
+                    → ∀ f : ℕ,
+                      0 < f → (∀ t ∈ T, (t ^ p ^ f - t) / π ∈ Algebra.adjoin O (T : Set Ω))
+                        → (∀ x ∈ Algebra.adjoin O (T : Set Ω),
+                            v x < 1 → x / π ∈ Algebra.adjoin O (T : Set Ω))
+                          ∧ ∀ y ∈ Algebra.adjoin O (T : Set Ω), ∀ a : O,
+                            v (y ^ p - algebraMap O Ω a) < 1
+                              → ∃ b : O, v (y - algebraMap O Ω b) < 1 := by
   intro p _ O Ω _ _ _ hmax v hv T hT π hπ hπ0 hvπ hpπ f hf hstep
   classical
   have hint : ∀ x ∈ Algebra.adjoin O (T : Set Ω), v x ≤ 1 := fun x hx =>
     (hv x).2 (Algebra.adjoin_le (S := integralClosure O Ω) (fun t ht => hT t ht) hx)
-  have hunit : ∀ x ∈ Algebra.adjoin O (T : Set Ω), v x = 1 →
-      ∃ w ∈ Algebra.adjoin O (T : Set Ω), x * w = 1 := by
+  have hunit
+      : ∀ x ∈ Algebra.adjoin O (T : Set Ω),
+        v x = 1 → ∃ w ∈ Algebra.adjoin O (T : Set Ω), x * w = 1 := by
     intro x hx hx1
     have hx0 : x ≠ 0 := by
       rintro rfl
@@ -42,16 +52,16 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
       (mul_eq_zero.1 h1).resolve_right (pow_ne_zero _ (inv_ne_zero hx0))
     have h3 := Polynomial.divX_mul_X_add P.reverse
     rw [Polynomial.coeff_zero_reverse, hPm.leadingCoeff, Polynomial.C_1] at h3
-    rw [← h3, Polynomial.eval₂_add, Polynomial.eval₂_mul, Polynomial.eval₂_X,
-      Polynomial.eval₂_one] at h2
-    refine ⟨-Polynomial.eval₂ (algebraMap O Ω) x (Polynomial.divX P.reverse), neg_mem ?_, ?_⟩
-    · have hm := (Polynomial.aeval (⟨x, hx⟩ : Algebra.adjoin O (T : Set Ω))
-        (Polynomial.divX P.reverse)).2
+    rw [← h3, Polynomial.eval₂_add, Polynomial.eval₂_mul, Polynomial.eval₂_X, Polynomial.eval₂_one]
+      at h2
+    refine ⟨- Polynomial.eval₂ (algebraMap O Ω) x (Polynomial.divX P.reverse), neg_mem ?_, ?_⟩
+    · have hm :=
+        (Polynomial.aeval (⟨x, hx⟩ : Algebra.adjoin O (T : Set Ω)) (Polynomial.divX P.reverse)).2
       rwa [Polynomial.aeval_subalgebra_coe, Polynomial.aeval_def] at hm
     · linear_combination -h2
   let I : Ideal (Algebra.adjoin O (T : Set Ω)) := Ideal.span {⟨π, hπ⟩}
-  have memI : ∀ z : Algebra.adjoin O (T : Set Ω), z ∈ I ↔
-      (z : Ω) / π ∈ Algebra.adjoin O (T : Set Ω) := by
+  have memI
+      : ∀ z : Algebra.adjoin O (T : Set Ω), z ∈ I ↔ (z : Ω) / π ∈ Algebra.adjoin O (T : Set Ω) := by
     intro z
     rw [Ideal.mem_span_singleton']
     constructor
@@ -66,7 +76,9 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
     obtain ⟨w, rfl⟩ := Ideal.mem_span_singleton'.1 hz
     show v ((w : Ω) * π) < 1
     rw [map_mul]
-    calc v w * v π ≤ 1 * v π := mul_le_mul_of_nonneg_right (hint _ w.2) zero_le
+    calc
+      v w * v π
+        ≤ 1 * v π := mul_le_mul_of_nonneg_right (hint _ w.2) zero_le
       _ < 1 := by rw [one_mul]; exact hvπ
   have hpI : (p : Algebra.adjoin O (T : Set Ω)) ∈ I := by
     rw [memI]
@@ -120,10 +132,12 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
       refine IsUnit.of_mul_eq_one (Ideal.Quotient.mk I ⟨w, hw⟩) ?_
       rw [← map_mul, e, map_one]
   let T' : Finset (Algebra.adjoin O (T : Set Ω) ⧸ I) :=
-    T.attach.image (fun t => Ideal.Quotient.mk I ⟨t.1, Algebra.subset_adjoin (Finset.mem_coe.2 t.2)⟩)
-  have hgen0 : ∀ x (hx : x ∈ Algebra.adjoin O (T : Set Ω)),
-      Ideal.Quotient.mk I ⟨x, hx⟩ ∈ Algebra.adjoin (O ⧸ Ideal.span {(p : O)})
-        (T' : Set (Algebra.adjoin O (T : Set Ω) ⧸ I)) := by
+    T.attach.image (fun t =>
+      Ideal.Quotient.mk I ⟨t.1, Algebra.subset_adjoin (Finset.mem_coe.2 t.2)⟩)
+  have hgen0
+      : ∀ x (hx : x ∈ Algebra.adjoin O (T : Set Ω)),
+        Ideal.Quotient.mk I ⟨x, hx⟩ ∈ Algebra.adjoin (O ⧸ Ideal.span {(p : O)})
+          (T' : Set (Algebra.adjoin O (T : Set Ω) ⧸ I)) := by
     intro x hx
     induction hx using Algebra.adjoin_induction with
     | mem t ht =>
@@ -143,8 +157,9 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
       have e : (⟨x * y, mul_mem hx hy⟩ : Algebra.adjoin O (T : Set Ω)) = ⟨x, hx⟩ * ⟨y, hy⟩ := rfl
       rw [e, map_mul]
       exact mul_mem ihx ihy
-  have hgen : Algebra.adjoin (O ⧸ Ideal.span {(p : O)})
-      (T' : Set (Algebra.adjoin O (T : Set Ω) ⧸ I)) = ⊤ := by
+  have hgen
+      : Algebra.adjoin (O ⧸ Ideal.span {(p : O)}) (T' : Set (Algebra.adjoin O (T : Set Ω) ⧸ I))
+        = ⊤ := by
     rw [eq_top_iff]
     rintro a -
     obtain ⟨⟨x, hx⟩, rfl⟩ := Ideal.Quotient.mk_surjective a
@@ -155,8 +170,9 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
     obtain ⟨⟨t0, ht0⟩, -, rfl⟩ := ht
     rw [← map_pow, ← sub_eq_zero, ← map_sub, Ideal.Quotient.eq_zero_iff_mem, memI]
     simpa using hstep t0 ht0
-  obtain ⟨hfield, hroot⟩ := GlobalTheory.T.isField_and_pthRoots_of_localAlg_frobenius_fixed p (O ⧸ Ideal.span {(p : O)})
-    (Algebra.adjoin O (T : Set Ω) ⧸ I) T' f hf hgen hfrob
+  obtain ⟨hfield, hroot⟩ :=
+    GlobalTheory.T.isField_and_pthRoots_of_localAlg_frobenius_fixed p (O ⧸ Ideal.span {(p : O)})
+      (Algebra.adjoin O (T : Set Ω) ⧸ I) T' f hf hgen hfrob
   have hzero : ∀ z : Algebra.adjoin O (T : Set Ω), v z < 1 → z ∈ I := by
     intro z hz
     rw [← Ideal.Quotient.eq_zero_iff_mem]
@@ -168,7 +184,9 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
     have h2 := hvI _ h1
     have h3 : v ((z : Ω) * w) < 1 := by
       rw [map_mul]
-      calc v z * v w ≤ v z * 1 := mul_le_mul_of_nonneg_left (hint _ w.2) zero_le
+      calc
+        v z * v w
+          ≤ v z * 1 := mul_le_mul_of_nonneg_left (hint _ w.2) zero_le
         _ < 1 := by rw [mul_one]; exact hz
     have e1 : (1 : Ω) = (z : Ω) * w - ((z * w - 1 : Algebra.adjoin O (T : Set Ω)) : Ω) := by
       push_cast
@@ -181,8 +199,9 @@ theorem residue_core : ∀ (p : ℕ) [Fact p.Prime] (O Ω : Type) [CommRing O] [
   intro y hy a hva
   have hI : (⟨y, hy⟩ : Algebra.adjoin O (T : Set Ω)) ^ p - algebraMap O _ a ∈ I :=
     hzero _ (by simpa using hva)
-  have heq : (Ideal.Quotient.mk I ⟨y, hy⟩) ^ p =
-      algebraMap (O ⧸ Ideal.span {(p : O)}) _ (Ideal.Quotient.mk _ a) := by
+  have heq
+      : (Ideal.Quotient.mk I ⟨y, hy⟩) ^ p
+        = algebraMap (O ⧸ Ideal.span {(p : O)}) _ (Ideal.Quotient.mk _ a) := by
     have h0 := (Ideal.Quotient.eq_zero_iff_mem).2 hI
     rw [map_sub, map_pow] at h0
     exact sub_eq_zero.1 h0
@@ -201,11 +220,14 @@ theorem q_not_pow_mod (p : ℕ) [hp : Fact p.Prime] (a : O0 p) : ¬ (p : O0 p) �
   have hmem : a ^ p - qO p ∈ Ideal.span {(p : O0 p)} :=
     Ideal.mem_span_singleton'.2 ⟨c, by simpa [mul_comm] using hc.symm⟩
   have h1 := (Ideal.Quotient.eq_zero_iff_mem).2 hmem
-  have h2 : Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (a ^ p) -
-      Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (qO p) = 0 := by
+  have h2
+      : Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (a ^ p)
+          - Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (qO p)
+        = 0 := by
     simpa only [RingHom.map_sub] using h1
-  have h1 : (Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) a) ^ p =
-      Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (qO p) := by
+  have h1
+      : (Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) a) ^ p
+        = Ideal.Quotient.mk (Ideal.span {(p : O0 p)}) (qO p) := by
     simpa only [RingHom.map_pow] using sub_eq_zero.mp h2
   have h2 := congrArg e h1
   rw [map_pow, he] at h2
@@ -214,10 +236,15 @@ theorem q_not_pow_mod (p : ℕ) [hp : Fact p.Prime] (a : O0 p) : ¬ (p : O0 p) �
   have h4 : (p : ℤ) ∣ 1 := Dvd.intro _ h3
   exact hp.out.not_dvd_one (by exact_mod_cast h4)
 
-theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ S : Finset Ω, (∀ s ∈ S, IsAlgZp (p := p) s) →
-  ∀ y ∈ Subfield.closure (Set.range (algebraMap (O0 p) Ω) ∪ (S : Set Ω)), IsInt (p := p) y →
-    ¬ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((y ^ p - algebraMap (O0 p) Ω (qO p)) ^ m / (p : Ω)) := by
+theorem not_pow_mod_max
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ S : Finset Ω,
+          (∀ s ∈ S, IsAlgZp (p := p) s)
+            → ∀ y ∈ Subfield.closure (Set.range (algebraMap (O0 p) Ω) ∪ (S : Set Ω)),
+              IsInt (p := p) y
+                → ¬ ∃ m : ℕ,
+                  0 < m ∧ IsInt (p := p) ((y ^ p - algebraMap (O0 p) Ω (qO p)) ^ m / (p : Ω)) := by
   intro p _ Ω _ _ hclo S hS y hy hyint
   rintro ⟨m, hm, hmint⟩
   classical
@@ -231,14 +258,13 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
     rw [huni]
     exact GlobalTheory.T.unramified_integers_adic_complete p
   have := hclo.alg
-  obtain ⟨v, hv⟩ := GlobalTheory.T.exists_valuation_le_one_iff_isIntegral_of_complete_dvr
-    (O0 p) Ω hclo.inj
+  obtain ⟨v, hv⟩ :=
+    GlobalTheory.T.exists_valuation_le_one_iff_isIntegral_of_complete_dvr (O0 p) Ω hclo.inj
   have hp0 : (p : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
   have hvp0 : 0 < v (p : Ω) := (Valuation.pos_iff v).2 hp0
   have hvp1 : v (p : Ω) < 1 := by
     have hpint : IsIntegral (O0 p) (p : Ω) := by
-      simpa only [map_natCast] using
-        (isIntegral_algebraMap (A := Ω) (x := (p : O0 p)))
+      simpa only [map_natCast] using (isIntegral_algebraMap (A := Ω) (x := (p : O0 p)))
     refine lt_of_le_of_ne ((hv _).2 hpint) ?_
     intro heq
     have hinv : IsInt (p := p) ((p : Ω)⁻¹) := (hv _).1 (by rw [map_inv₀, heq, inv_one])
@@ -247,7 +273,8 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
   letI : Algebra ℤ_[p] Ω := ((algebraMap (O0 p) Ω).comp (algebraMap ℤ_[p] (O0 p))).toAlgebra
   haveI : IsScalarTower ℤ_[p] (O0 p) Ω := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   have hinj : Function.Injective (algebraMap ℤ_[p] Ω) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra hx0
     have e := PadicInt.unitCoeff_spec hx0
@@ -261,36 +288,45 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
     intro s hs
     obtain ⟨P, hP0, hP⟩ := hS s hs
     exact ⟨P, hP0, by rwa [Polynomial.aeval_map_algebraMap] at hP⟩
-  obtain ⟨R, hRfin, hRpid, hRS⟩ := GlobalTheory.T.exists_finite_pid_subalgebra_padicInt_contains_fractions p Ω hinj S hSalg
+  obtain ⟨R, hRfin, hRpid, hRS⟩ :=
+    GlobalTheory.T.exists_finite_pid_subalgebra_padicInt_contains_fractions p Ω hinj S hSalg
   obtain ⟨π, hπR, hπ0, hvπ, hpπ, f, hf, hstep⟩ :=
-    GlobalTheory.T.exists_uniformizer_valuation_lt_one_frobenius_congr p Ω hinj v hvint hvp1 R hRfin hRpid
+    GlobalTheory.T.exists_uniformizer_valuation_lt_one_frobenius_congr p Ω hinj v hvint hvp1 R hRfin
+      hRpid
   have hfg : (Subalgebra.toSubmodule R).FG := Module.Finite.iff_fg.1 hRfin
   obtain ⟨T, hT⟩ := Subalgebra.fg_of_fg_toSubmodule hfg
   have hRB : ∀ x ∈ R, x ∈ Algebra.adjoin (O0 p) (T : Set Ω) := by
     intro x hx
-    have hle : Algebra.adjoin ℤ_[p] (T : Set Ω) ≤
-        (Algebra.adjoin (O0 p) (T : Set Ω)).restrictScalars ℤ_[p] :=
-      Algebra.adjoin_le (fun t ht => (Subalgebra.mem_restrictScalars _).2 (Algebra.subset_adjoin ht))
+    have hle
+        : Algebra.adjoin ℤ_[p] (T : Set Ω)
+          ≤ (Algebra.adjoin (O0 p) (T : Set Ω)).restrictScalars ℤ_[p] :=
+      Algebra.adjoin_le (fun t ht =>
+        (Subalgebra.mem_restrictScalars _).2 (Algebra.subset_adjoin ht))
     rw [hT] at hle
     exact (Subalgebra.mem_restrictScalars _).1 (hle hx)
   have hTR : ∀ t ∈ T, t ∈ R := fun t ht => hT ▸ Algebra.subset_adjoin (Finset.mem_coe.2 ht)
   have hTint : ∀ t ∈ T, IsIntegral (O0 p) t := fun t ht =>
     (IsIntegral.of_mem_of_fg R hfg t (hTR t ht)).tower_top
-  obtain ⟨hdiv, hres⟩ := residue_core p (O0 p) Ω hmax v hv T hTint π (hRB _ hπR) hπ0 hvπ
-    (hRB _ hpπ) f hf (fun t ht => hRB _ (hstep t (hTR t ht)))
+  obtain ⟨hdiv, hres⟩ :=
+    residue_core p (O0 p) Ω hmax v hv T hTint π (hRB _ hπR) hπ0 hvπ (hRB _ hpπ) f hf
+      (fun t ht => hRB _ (hstep t (hTR t ht)))
   have hBint : ∀ x ∈ Algebra.adjoin (O0 p) (T : Set Ω), v x ≤ 1 := fun x hx =>
     (hv x).2 (Algebra.adjoin_le (S := integralClosure (O0 p) Ω) (fun t ht => hTint t ht) hx)
-  have hclosed := GlobalTheory.T.div_mem_subalgebra_of_valuation_le_one_of_uniformizer (O0 p) Ω v hv _ hBint π (hRB _ hπR) hπ0 hvπ hdiv
-  have hsub : Subfield.closure (Set.range (algebraMap (O0 p) Ω) ∪ (S : Set Ω)) ≤
-      Subfield.closure (Algebra.adjoin (O0 p) (T : Set Ω) : Set Ω) := by
+  have hclosed :=
+    GlobalTheory.T.div_mem_subalgebra_of_valuation_le_one_of_uniformizer (O0 p) Ω v hv _ hBint π
+      (hRB _ hπR) hπ0 hvπ hdiv
+  have hsub
+      : Subfield.closure (Set.range (algebraMap (O0 p) Ω) ∪ (S : Set Ω))
+        ≤ Subfield.closure (Algebra.adjoin (O0 p) (T : Set Ω) : Set Ω) := by
     rw [Subfield.closure_le]
     rintro x (⟨c, rfl⟩ | hx)
     · exact Subfield.subset_closure (Subalgebra.algebraMap_mem _ c)
     · obtain ⟨a, ha, b, hb, rfl⟩ := hRS x hx
       exact div_mem (Subfield.subset_closure (hRB _ ha)) (Subfield.subset_closure (hRB _ hb))
   obtain ⟨a, ha, b, hb, hab⟩ := Subfield.mem_closure_iff.1 (hsub hy)
-  have hcl : ∀ z ∈ Subring.closure (Algebra.adjoin (O0 p) (T : Set Ω) : Set Ω),
-      z ∈ Algebra.adjoin (O0 p) (T : Set Ω) := fun z hz =>
+  have hcl
+      : ∀ z ∈ Subring.closure (Algebra.adjoin (O0 p) (T : Set Ω) : Set Ω),
+        z ∈ Algebra.adjoin (O0 p) (T : Set Ω) := fun z hz =>
     (Subring.closure_le (t := (Algebra.adjoin (O0 p) (T : Set Ω)).toSubring)).2 (fun _ h => h) hz
   have hyv : v y ≤ 1 := (hv y).2 hyint
   have hyB : y ∈ Algebra.adjoin (O0 p) (T : Set Ω) := by
@@ -307,8 +343,9 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
   obtain ⟨b, hb⟩ := hres y hyB (qO p) hvq
   have hbv : v (algebraMap (O0 p) Ω b) ≤ 1 := (hv _).2 isIntegral_algebraMap
   have hvb : v (algebraMap (O0 p) Ω (b ^ p - qO p)) < 1 := by
-    have e : algebraMap (O0 p) Ω (b ^ p - qO p) = (y ^ p - algebraMap (O0 p) Ω (qO p)) -
-        (y ^ p - (algebraMap (O0 p) Ω b) ^ p) := by
+    have e
+        : algebraMap (O0 p) Ω (b ^ p - qO p)
+          = (y ^ p - algebraMap (O0 p) Ω (qO p)) - (y ^ p - (algebraMap (O0 p) Ω b) ^ p) := by
       rw [map_sub, map_pow]
       ring
     have hg : v (y ^ p - (algebraMap (O0 p) Ω b) ^ p) < 1 := by
@@ -318,7 +355,8 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
         intro i _
         rw [map_mul, map_pow, map_pow]
         exact mul_le_one' (pow_le_one' hyv _) (pow_le_one' hbv _)
-      calc _ ≤ 1 * v (y - algebraMap (O0 p) Ω b) := mul_le_mul_of_nonneg_right hs zero_le
+      calc
+        _ ≤ 1 * v (y - algebraMap (O0 p) Ω b) := mul_le_mul_of_nonneg_right hs zero_le
         _ < 1 := by rw [one_mul]; exact hb
     rw [e]
     exact lt_of_le_of_lt (v.map_sub _ _) (max_lt hvq hg)
@@ -337,7 +375,8 @@ theorem not_pow_mod_max : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [A
   have h2 : v (algebraMap (O0 p) Ω (↑u⁻¹ : O0 p)) ≤ 1 := (hv _).2 isIntegral_algebraMap
   rw [← hu] at hvb
   have h4 : v (algebraMap (O0 p) Ω (u : O0 p)) * v (algebraMap (O0 p) Ω (↑u⁻¹ : O0 p)) < 1 :=
-    calc _ ≤ v (algebraMap (O0 p) Ω (u : O0 p)) * 1 := mul_le_mul_of_nonneg_left h2 zero_le
+    calc
+      _ ≤ v (algebraMap (O0 p) Ω (u : O0 p)) * 1 := mul_le_mul_of_nonneg_left h2 zero_le
       _ < 1 := by rw [mul_one]; exact hvb
   rw [h1] at h4
   exact lt_irrefl _ h4

@@ -23,7 +23,8 @@ def qv (M : ℕ) (τ : ℍ) : ℂ := Complex.exp (2 * Real.pi * Complex.I * τ /
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.norm_qv_lt {M : ℕ} (hM : 0 < M) (τ : ℍ) : ‖_root_.GlobalTheory.SiegQ.qv M τ‖ < 1 := by
+theorem _root_.GlobalTheory.SiegQ.norm_qv_lt {M : ℕ} (hM : 0 < M) (τ : ℍ)
+    : ‖_root_.GlobalTheory.SiegQ.qv M τ‖ < 1 := by
   rw [_root_.GlobalTheory.SiegQ.qv, Complex.norm_exp, ← Real.exp_zero, Real.exp_lt_exp]
   have hre : (2 * Real.pi * Complex.I * (τ : ℂ) / M).re = -(2 * Real.pi * τ.im / M) := by
     simp [Complex.div_natCast_re]; ring
@@ -41,19 +42,26 @@ theorem _root_.GlobalTheory.SiegQ.tc_zero (F : ℂ → ℂ) : _root_.GlobalTheor
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.hasQ_tc {F : ℂ → ℂ}
-    (hF : DifferentiableOn ℂ F (Metric.ball 0 1)) {M : ℕ} (hM : 0 < M) :
-    _root_.GlobalTheory.QFam.HasQ M (fun τ => F (_root_.GlobalTheory.SiegQ.qv M τ)) (_root_.GlobalTheory.SiegQ.tc F) := by
+theorem _root_.GlobalTheory.SiegQ.hasQ_tc
+    {F : ℂ → ℂ} (hF : DifferentiableOn ℂ F (Metric.ball 0 1)) {M : ℕ} (hM : 0 < M)
+    : _root_.GlobalTheory.QFam.HasQ M
+      (fun τ => F (_root_.GlobalTheory.SiegQ.qv M τ))
+      (_root_.GlobalTheory.SiegQ.tc F) := by
   unfold _root_.GlobalTheory.QFam.HasQ
   intro τ
   have hz : _root_.GlobalTheory.SiegQ.qv M τ ∈ Metric.ball (0 : ℂ) 1 := by
     simpa using _root_.GlobalTheory.SiegQ.norm_qv_lt hM τ
   have h := Complex.hasSum_taylorSeries_on_ball hF hz
-  have heq : (fun n : ℕ => _root_.GlobalTheory.SiegQ.tc F n *
-      Complex.exp (2 * Real.pi * Complex.I * n * τ / M)) =
-      fun n : ℕ => (n.factorial : ℂ)⁻¹ • (_root_.GlobalTheory.SiegQ.qv M τ - 0) ^ n • iteratedDeriv n F 0 := by
+  have heq
+      : (fun n : ℕ =>
+          _root_.GlobalTheory.SiegQ.tc F n * Complex.exp (2 * Real.pi * Complex.I * n * τ / M))
+        = fun n : ℕ =>
+          (n.factorial : ℂ)⁻¹ • (_root_.GlobalTheory.SiegQ.qv M τ - 0) ^ n
+            • iteratedDeriv n F 0 := by
     funext n
-    have hexp : Complex.exp (2 * Real.pi * Complex.I * n * τ / M) = _root_.GlobalTheory.SiegQ.qv M τ ^ n := by
+    have hexp
+        : Complex.exp (2 * Real.pi * Complex.I * n * τ / M)
+          = _root_.GlobalTheory.SiegQ.qv M τ ^ n := by
       rw [_root_.GlobalTheory.SiegQ.qv, ← Complex.exp_nat_mul]
       congr 1
       ring
@@ -64,8 +72,8 @@ theorem _root_.GlobalTheory.SiegQ.hasQ_tc {F : ℂ → ℂ}
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.tc_congr {F G : ℂ → ℂ} (h : ∀ z : ℂ, ‖z‖ < 1 → F z = G z) :
-    _root_.GlobalTheory.SiegQ.tc F = _root_.GlobalTheory.SiegQ.tc G := by
+theorem _root_.GlobalTheory.SiegQ.tc_congr {F G : ℂ → ℂ} (h : ∀ z : ℂ, ‖z‖ < 1 → F z = G z)
+    : _root_.GlobalTheory.SiegQ.tc F = _root_.GlobalTheory.SiegQ.tc G := by
   funext n
   unfold _root_.GlobalTheory.SiegQ.tc
   congr 1
@@ -75,11 +83,12 @@ theorem _root_.GlobalTheory.SiegQ.tc_congr {F G : ℂ → ℂ} (h : ∀ z : ℂ,
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.tc_mul {F G : ℂ → ℂ}
-    (hF : DifferentiableOn ℂ F (Metric.ball 0 1))
-    (hG : DifferentiableOn ℂ G (Metric.ball 0 1)) :
-    _root_.GlobalTheory.SiegQ.tc (fun z => F z * G z) =
-      _root_.GlobalTheory.QFam.conv (_root_.GlobalTheory.SiegQ.tc F) (_root_.GlobalTheory.SiegQ.tc G) := by
+theorem _root_.GlobalTheory.SiegQ.tc_mul
+    {F G : ℂ → ℂ}
+    (hF : DifferentiableOn ℂ F (Metric.ball 0 1)) (hG : DifferentiableOn ℂ G (Metric.ball 0 1))
+    : _root_.GlobalTheory.SiegQ.tc (fun z => F z * G z)
+      = _root_.GlobalTheory.QFam.conv (_root_.GlobalTheory.SiegQ.tc F)
+        (_root_.GlobalTheory.SiegQ.tc G) := by
   funext n
   have h0 : Metric.ball (0 : ℂ) 1 ∈ 𝓝 0 := Metric.ball_mem_nhds 0 one_pos
   have hF' : ContDiffAt ℂ n F 0 := (hF.contDiffOn Metric.isOpen_ball).contDiffAt h0
@@ -97,8 +106,8 @@ theorem _root_.GlobalTheory.SiegQ.tc_mul {F G : ℂ → ℂ}
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.tc_const (c : ℂ) :
-    _root_.GlobalTheory.SiegQ.tc (fun _ => c) = fun n => if n = 0 then c else 0 := by
+theorem _root_.GlobalTheory.SiegQ.tc_const (c : ℂ)
+    : _root_.GlobalTheory.SiegQ.tc (fun _ => c) = fun n => if n = 0 then c else 0 := by
   funext n
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · simp [_root_.GlobalTheory.SiegQ.tc]
@@ -106,16 +115,17 @@ theorem _root_.GlobalTheory.SiegQ.tc_const (c : ℂ) :
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
-theorem _root_.GlobalTheory.SiegQ.tc_lin (w : ℂ) (e : ℕ) :
-    _root_.GlobalTheory.SiegQ.tc (fun z => 1 - w * z ^ e) =
-      fun n => (if n = 0 then 1 else 0) - if n = e then w else 0 := by
+theorem _root_.GlobalTheory.SiegQ.tc_lin (w : ℂ) (e : ℕ)
+    : _root_.GlobalTheory.SiegQ.tc (fun z => 1 - w * z ^ e)
+      = fun n => (if n = 0 then 1 else 0) - if n = e then w else 0 := by
   funext n
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · rcases Nat.eq_zero_or_pos e with rfl | he
     · simp [_root_.GlobalTheory.SiegQ.tc]
     · simp [_root_.GlobalTheory.SiegQ.tc, he.ne', (Ne.symm he.ne')]
-  · have h1 : iteratedDeriv n (fun z : ℂ => 1 - w * z ^ e) 0 =
-        -(w * ((e.descFactorial n : ℂ) * 0 ^ (e - n))) := by
+  · have h1
+        : iteratedDeriv n (fun z : ℂ => 1 - w * z ^ e) 0
+          = -(w * ((e.descFactorial n : ℂ) * 0 ^ (e - n))) := by
       rw [iteratedDeriv_const_sub hn, iteratedDeriv_neg, iteratedDeriv_const_mul_field,
         iteratedDeriv_pow]
     rw [_root_.GlobalTheory.SiegQ.tc, h1, if_neg hn.ne']
@@ -131,13 +141,15 @@ def Good (R : Subring ℂ) (F : ℂ → ℂ) : Prop :=
 
 variable {R : Subring ℂ}
 
-theorem Good.mul {F G : ℂ → ℂ} (hF : Good R F) (hG : Good R G) : Good R fun z => F z * G z :=
-  ⟨hF.1.mul hG.1, fun n => by
+theorem Good.mul {F G : ℂ → ℂ} (hF : Good R F) (hG : Good R G) : Good R fun z => F z * G z := ⟨
+  hF.1.mul hG.1,
+  fun n => by
     rw [tc_mul hF.1 hG.1]
-    exact R.sum_mem fun p _ => R.mul_mem (hF.2 _) (hG.2 _)⟩
+    exact R.sum_mem fun p _ => R.mul_mem (hF.2 _) (hG.2 _)
+⟩
 
-theorem Good.inv {F : ℂ → ℂ} (hF : Good R F) (h0 : ∀ z : ℂ, ‖z‖ < 1 → F z ≠ 0) (hi : (F 0)⁻¹ ∈ R) :
-    Good R fun z => (F z)⁻¹ := by
+theorem Good.inv {F : ℂ → ℂ} (hF : Good R F) (h0 : ∀ z : ℂ, ‖z‖ < 1 → F z ≠ 0) (hi : (F 0)⁻¹ ∈ R)
+    : Good R fun z => (F z)⁻¹ := by
   have hd : DifferentiableOn ℂ (fun z => (F z)⁻¹) (Metric.ball 0 1) :=
     hF.1.inv fun z hz => h0 z (by simpa using hz)
   refine ⟨hd, fun n => ?_⟩
@@ -150,12 +162,19 @@ theorem Good.inv {F : ℂ → ℂ} (hF : Good R F) (h0 : ∀ z : ℂ, ‖z‖ < 
     · simpa [tc_zero] using hi
     · have h := congrFun hc (n + 1)
       simp only [conv, Finset.Nat.antidiagonal_succ, Finset.sum_cons, Finset.sum_map, tc_zero,
-        Nat.succ_ne_zero, if_false] at h
+          Nat.succ_ne_zero, if_false]
+        at h
       have h1 := h0 0 (by simp)
-      have : tc (fun z => (F z)⁻¹) (n + 1) = -(F 0)⁻¹ * ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n,
-          tc F (p.1 + 1) * tc (fun z => (F z)⁻¹) p.2 := by
-        have h' : F 0 * tc (fun z => (F z)⁻¹) (n + 1) + ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n,
-          tc F (p.1 + 1) * tc (fun z => (F z)⁻¹) p.2 = 0 := by simpa using h
+      have : tc (fun z => (F z)⁻¹) (n + 1)
+          = -(F 0)⁻¹
+            * ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n,
+              tc F (p.1 + 1) * tc (fun z => (F z)⁻¹) p.2 := by
+        have h'
+            : F 0 * tc (fun z => (F z)⁻¹) (n + 1)
+                + ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n,
+                  tc F (p.1 + 1) * tc (fun z => (F z)⁻¹) p.2
+              = 0 := by
+          simpa using h
         apply mul_left_cancel₀ h1
         rw [← mul_assoc, mul_neg, mul_inv_cancel₀ h1]
         linear_combination h'
@@ -167,10 +186,11 @@ theorem Good.inv {F : ℂ → ℂ} (hF : Good R F) (h0 : ∀ z : ℂ, ‖z‖ < 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.tendsto_iteratedDeriv {F : ℕ → ℂ → ℂ} {G : ℂ → ℂ} (n : ℕ)
-    (h : TendstoLocallyUniformlyOn F G atTop (Metric.ball 0 1))
-    (hd : ∀ N, DifferentiableOn ℂ (F N) (Metric.ball 0 1)) :
-    Tendsto (fun N => iteratedDeriv n (F N) 0) atTop (𝓝 (iteratedDeriv n G 0)) := by
+theorem _root_.GlobalTheory.SiegQ.tendsto_iteratedDeriv
+    {F : ℕ → ℂ → ℂ} {G : ℂ → ℂ}
+    (n : ℕ) (h : TendstoLocallyUniformlyOn F G atTop (Metric.ball 0 1))
+    (hd : ∀ N, DifferentiableOn ℂ (F N) (Metric.ball 0 1))
+    : Tendsto (fun N => iteratedDeriv n (F N) 0) atTop (𝓝 (iteratedDeriv n G 0)) := by
   induction n generalizing F G with
   | zero => simpa using h.tendsto_at (Metric.mem_ball_self one_pos)
   | succ n ih =>
@@ -183,25 +203,32 @@ def ep (M : ℕ) (w : ℂ) (e : ℕ) (z : ℂ) : ℂ := ∏' m : ℕ, (1 - w * z
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.norm_term_le {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ}
-    (he : 0 < e) {z : ℂ} {r : ℝ}
-    (hz : ‖z‖ ≤ r) (hr : r < 1) (m : ℕ) : ‖-(w * z ^ (e + m * M))‖ ≤ r ^ (m + 1) := by
+theorem _root_.GlobalTheory.SiegQ.norm_term_le
+    {M : ℕ} (hM : 0 < M)
+    {w : ℂ} (hw : ‖w‖ ≤ 1)
+    {e : ℕ} (he : 0 < e)
+    {z : ℂ} {r : ℝ} (hz : ‖z‖ ≤ r) (hr : r < 1)
+    (m : ℕ)
+    : ‖-(w * z ^ (e + m * M))‖ ≤ r ^ (m + 1) := by
   have hr0 : 0 ≤ r := (norm_nonneg z).trans hz
   have hm : m + 1 ≤ e + m * M := by
     have := Nat.le_mul_of_pos_right m hM
     omega
   rw [norm_neg, norm_mul, norm_pow]
-  calc ‖w‖ * ‖z‖ ^ (e + m * M) ≤ 1 * r ^ (e + m * M) := by gcongr
+  calc
+    ‖w‖ * ‖z‖ ^ (e + m * M)
+      ≤ 1 * r ^ (e + m * M) := by gcongr
     _ ≤ r ^ (m + 1) := by rw [one_mul]; exact pow_le_pow_of_le_one hr0 hr.le hm
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.hasProd_ep {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1)
-    {e : ℕ} (he : 0 < e) {z : ℂ} (hz : ‖z‖ < 1) :
-    HasProd (fun m : ℕ => 1 - w * z ^ (e + m * M)) (_root_.GlobalTheory.SiegQ.ep M w e z) := by
+theorem _root_.GlobalTheory.SiegQ.hasProd_ep
+    {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e) {z : ℂ} (hz : ‖z‖ < 1)
+    : HasProd (fun m : ℕ => 1 - w * z ^ (e + m * M)) (_root_.GlobalTheory.SiegQ.ep M w e z) := by
   have hs : Summable fun m : ℕ => ‖-(w * z ^ (e + m * M))‖ :=
-    Summable.of_nonneg_of_le (fun _ => norm_nonneg _)
+    Summable.of_nonneg_of_le
+      (fun _ => norm_nonneg _)
       (fun m => _root_.GlobalTheory.SiegQ.norm_term_le hM hw he le_rfl hz m)
       ((summable_nat_add_iff 1).mpr (summable_geometric_of_lt_one (norm_nonneg _) hz))
   have hm := multipliable_one_add_of_summable hs
@@ -211,12 +238,15 @@ theorem _root_.GlobalTheory.SiegQ.hasProd_ep {M : ℕ} (hM : 0 < M) {w : ℂ} (h
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.lin_ne_zero {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e) {z : ℂ}
-    (hz : ‖z‖ < 1) : 1 - w * z ^ e ≠ 0 := by
+theorem _root_.GlobalTheory.SiegQ.lin_ne_zero
+    {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e) {z : ℂ} (hz : ‖z‖ < 1)
+    : 1 - w * z ^ e ≠ 0 := by
   intro h
   have h1 : ‖w * z ^ e‖ < 1 := by
     rw [norm_mul, norm_pow]
-    calc ‖w‖ * ‖z‖ ^ e ≤ 1 * ‖z‖ ^ e := by gcongr
+    calc
+      ‖w‖ * ‖z‖ ^ e
+        ≤ 1 * ‖z‖ ^ e := by gcongr
       _ < 1 := by rw [one_mul]; exact pow_lt_one₀ (norm_nonneg _) hz he.ne'
   have h2 : w * z ^ e = 1 := by linear_combination -h
   rw [h2, norm_one] at h1
@@ -225,9 +255,9 @@ theorem _root_.GlobalTheory.SiegQ.lin_ne_zero {w : ℂ} (hw : ‖w‖ ≤ 1) {e 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.ep_ne_zero {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ}
-    (he : 0 < e) {z : ℂ}
-    (hz : ‖z‖ < 1) : _root_.GlobalTheory.SiegQ.ep M w e z ≠ 0 := by
+theorem _root_.GlobalTheory.SiegQ.ep_ne_zero
+    {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e) {z : ℂ} (hz : ‖z‖ < 1)
+    : _root_.GlobalTheory.SiegQ.ep M w e z ≠ 0 := by
   rcases eq_or_ne z 0 with rfl | hz0
   · have h : ∀ m : ℕ, (1 : ℂ) - w * 0 ^ (e + m * M) = 1 := fun m => by
       simp [zero_pow (by omega : e + m * M ≠ 0)]
@@ -241,8 +271,9 @@ theorem _root_.GlobalTheory.SiegQ.ep_ne_zero {M : ℕ} (hM : 0 < M) {w : ℂ} (h
   have hqn : ‖z ^ M‖ < 1 := by
     rw [norm_pow]
     exact pow_lt_one₀ (norm_nonneg _) hz hM.ne'
-  obtain ⟨P, hP, hprod⟩ := _root_.GlobalTheory.Sieg.Model.hasProd_geom hqn (w * z ^ e * (z ^ M)⁻¹)
-    (fun m => by rw [hfac]; exact _root_.GlobalTheory.SiegQ.lin_ne_zero hw (by omega) hz)
+  obtain ⟨P, hP, hprod⟩ :=
+    _root_.GlobalTheory.Sieg.Model.hasProd_geom hqn (w * z ^ e * (z ^ M)⁻¹)
+      (fun m => by rw [hfac]; exact _root_.GlobalTheory.SiegQ.lin_ne_zero hw (by omega) hz)
   simp only [hfac] at hprod
   rw [_root_.GlobalTheory.SiegQ.ep, hprod.tprod_eq]
   exact hP
@@ -250,8 +281,8 @@ theorem _root_.GlobalTheory.SiegQ.ep_ne_zero {M : ℕ} (hM : 0 < M) {w : ℂ} (h
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.ep_zero (M : ℕ) (w : ℂ) {e : ℕ} (he : 0 < e) :
-    _root_.GlobalTheory.SiegQ.ep M w e 0 = 1 := by
+theorem _root_.GlobalTheory.SiegQ.ep_zero (M : ℕ) (w : ℂ) {e : ℕ} (he : 0 < e)
+    : _root_.GlobalTheory.SiegQ.ep M w e 0 = 1 := by
   unfold _root_.GlobalTheory.SiegQ.ep
   have h : ∀ m : ℕ, (1 : ℂ) - w * 0 ^ (e + m * M) = 1 := fun m => by
     simp [zero_pow (by omega : e + m * M ≠ 0)]
@@ -260,9 +291,10 @@ theorem _root_.GlobalTheory.SiegQ.ep_zero (M : ℕ) (w : ℂ) {e : ℕ} (he : 0 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.ep_locUnif {M : ℕ} (hM : 0 < M) {w : ℂ}
-    (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e) :
-    HasProdLocallyUniformlyOn (fun (m : ℕ) (z : ℂ) => 1 - w * z ^ (e + m * M))
+theorem _root_.GlobalTheory.SiegQ.ep_locUnif
+    {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) {e : ℕ} (he : 0 < e)
+    : HasProdLocallyUniformlyOn
+      (fun (m : ℕ) (z : ℂ) => 1 - w * z ^ (e + m * M))
       (_root_.GlobalTheory.SiegQ.ep M w e) (Metric.ball 0 1) := by
   apply hasProdLocallyUniformlyOn_of_forall_compact Metric.isOpen_ball
   intro K hK hKc
@@ -270,11 +302,14 @@ theorem _root_.GlobalTheory.SiegQ.ep_locUnif {M : ℕ} (hM : 0 < M) {w : ℂ}
   have hr1 : max r' 0 < 1 := max_lt hr' one_pos
   have hsum : Summable (fun m : ℕ => max r' 0 ^ (m + 1)) :=
     (summable_nat_add_iff 1).mpr (summable_geometric_of_lt_one (le_max_right _ _) hr1)
-  have h := Summable.hasProdUniformlyOn_nat_one_add
-    (f := fun (m : ℕ) (z : ℂ) => -(w * z ^ (e + m * M))) hKc hsum
-    (Eventually.of_forall fun m z hz => _root_.GlobalTheory.SiegQ.norm_term_le hM hw he
-      ((mem_ball_zero_iff.mp (hKr hz)).le.trans (le_max_left _ _)) hr1 m)
-    (fun m => by fun_prop)
+  have h :=
+    Summable.hasProdUniformlyOn_nat_one_add
+      (f := fun (m : ℕ) (z : ℂ) => -(w * z ^ (e + m * M)))
+      hKc hsum
+      (Eventually.of_forall fun m z hz =>
+        _root_.GlobalTheory.SiegQ.norm_term_le hM hw he
+          ((mem_ball_zero_iff.mp (hKr hz)).le.trans (le_max_left _ _)) hr1 m)
+      (fun m => by fun_prop)
   convert (preTransparency := .reducible) h using 1
   · funext m z
     ring
@@ -284,7 +319,8 @@ theorem _root_.GlobalTheory.SiegQ.ep_locUnif {M : ℕ} (hM : 0 < M) {w : ℂ}
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_const_foundation {c : ℂ} (hc : c ∈ R) : _root_.GlobalTheory.SiegQ.Good R (fun _ => c) := by
+private theorem good_const_foundation {c : ℂ} (hc : c ∈ R)
+    : _root_.GlobalTheory.SiegQ.Good R (fun _ => c) := by
   refine ⟨differentiableOn_const c, fun n => ?_⟩
   rw [_root_.GlobalTheory.SiegQ.tc_const]
   dsimp only
@@ -295,8 +331,10 @@ private theorem good_const_foundation {c : ℂ} (hc : c ∈ R) : _root_.GlobalTh
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_mul' {F G : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Good R F)
-    (hG : _root_.GlobalTheory.SiegQ.Good R G) : _root_.GlobalTheory.SiegQ.Good R (fun z => F z * G z) := by
+private theorem good_mul'
+    {F G : ℂ → ℂ}
+    (hF : _root_.GlobalTheory.SiegQ.Good R F) (hG : _root_.GlobalTheory.SiegQ.Good R G)
+    : _root_.GlobalTheory.SiegQ.Good R (fun z => F z * G z) := by
   refine ⟨hF.1.mul hG.1, fun n => ?_⟩
   rw [_root_.GlobalTheory.SiegQ.tc_mul hF.1 hG.1]
   unfold _root_.GlobalTheory.QFam.conv
@@ -305,9 +343,9 @@ private theorem good_mul' {F G : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Go
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_finset_prod {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ}
-    (h : ∀ i ∈ s, _root_.GlobalTheory.SiegQ.Good R (f i)) :
-    _root_.GlobalTheory.SiegQ.Good R (fun z => ∏ i ∈ s, f i z) := by
+private theorem good_finset_prod
+    {ι : Type*} (s : Finset ι) {f : ι → ℂ → ℂ} (h : ∀ i ∈ s, _root_.GlobalTheory.SiegQ.Good R (f i))
+    : _root_.GlobalTheory.SiegQ.Good R (fun z => ∏ i ∈ s, f i z) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using good_const_foundation (R := R) R.one_mem
@@ -319,8 +357,8 @@ private theorem good_finset_prod {ι : Type*} (s : Finset ι) {f : ι → ℂ �
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_one_sub_mul_pow {w : ℂ} (hw : w ∈ R) (e : ℕ) :
-    _root_.GlobalTheory.SiegQ.Good R (fun z => 1 - w * z ^ e) := by
+private theorem good_one_sub_mul_pow {w : ℂ} (hw : w ∈ R) (e : ℕ)
+    : _root_.GlobalTheory.SiegQ.Good R (fun z => 1 - w * z ^ e) := by
   refine ⟨Differentiable.differentiableOn (by fun_prop), fun n => ?_⟩
   rw [_root_.GlobalTheory.SiegQ.tc_lin]
   dsimp only
@@ -335,9 +373,9 @@ private theorem good_one_sub_mul_pow {w : ℂ} (hw : w ∈ R) (e : ℕ) :
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem conv_one_sub_monomial_of_lt (b : ℕ → ℂ) (w : ℂ) {k n : ℕ} (hk : n < k) :
-    _root_.GlobalTheory.QFam.conv b (fun j => (if j = 0 then 1 else 0) - if j = k then w else 0) n =
-      b n := by
+private theorem conv_one_sub_monomial_of_lt (b : ℕ → ℂ) (w : ℂ) {k n : ℕ} (hk : n < k)
+    : _root_.GlobalTheory.QFam.conv b (fun j => (if j = 0 then 1 else 0) - if j = k then w else 0) n
+      = b n := by
   unfold _root_.GlobalTheory.QFam.conv
   rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_eq_single n]
   · simp [show (0 : ℕ) ≠ k by omega]
@@ -352,20 +390,28 @@ private theorem conv_one_sub_monomial_of_lt (b : ℕ → ℂ) (w : ℂ) {k n : �
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.Good.ep {M : ℕ}
-    (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) (hR : w ∈ R) {e : ℕ} (he : 0 < e) :
-    _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.ep M w e) := by
-  have hloc := (_root_.GlobalTheory.SiegQ.ep_locUnif hM hw he
-    ).tendstoLocallyUniformlyOn_finsetRange
-  have hpart : ∀ N, _root_.GlobalTheory.SiegQ.Good R
-      (fun z => ∏ i ∈ Finset.range N, (1 - w * z ^ (e + i * M))) :=
-    fun N => good_finset_prod _ fun i _ => good_one_sub_mul_pow hR _
-  refine ⟨hloc.differentiableOn (Eventually.of_forall fun N => (hpart N).1) Metric.isOpen_ball,
-    fun n => ?_⟩
-  have hstab : ∀ N, n + 1 ≤ N →
-      _root_.GlobalTheory.SiegQ.tc (fun z => ∏ i ∈ Finset.range N, (1 - w * z ^ (e + i * M))) n =
-        _root_.GlobalTheory.SiegQ.tc
-          (fun z => ∏ i ∈ Finset.range (n + 1), (1 - w * z ^ (e + i * M))) n := by
+theorem _root_.GlobalTheory.SiegQ.Good.ep
+    {M : ℕ} (hM : 0 < M) {w : ℂ} (hw : ‖w‖ ≤ 1) (hR : w ∈ R) {e : ℕ} (he : 0 < e)
+    : _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.ep M w e) := by
+  have hloc := (_root_.GlobalTheory.SiegQ.ep_locUnif hM hw he).tendstoLocallyUniformlyOn_finsetRange
+  have hpart
+      : ∀ N,
+        _root_.GlobalTheory.SiegQ.Good R
+          (fun z => ∏ i ∈ Finset.range N, (1 - w * z ^ (e + i * M))) := fun N =>
+    good_finset_prod _ fun i _ => good_one_sub_mul_pow hR _
+  refine ⟨
+    hloc.differentiableOn (Eventually.of_forall fun N => (hpart N).1) Metric.isOpen_ball,
+    fun n => ?_
+  ⟩
+  have hstab
+      : ∀ N,
+        n + 1 ≤ N
+          → _root_.GlobalTheory.SiegQ.tc
+              (fun z => ∏ i ∈ Finset.range N, (1 - w * z ^ (e + i * M)))
+              n
+            = _root_.GlobalTheory.SiegQ.tc
+              (fun z => ∏ i ∈ Finset.range (n + 1), (1 - w * z ^ (e + i * M)))
+              n := by
     intro N hN
     induction N, hN using Nat.le_induction with
     | base => rfl
@@ -377,12 +423,13 @@ theorem _root_.GlobalTheory.SiegQ.Good.ep {M : ℕ}
       have := Nat.le_mul_of_pos_right N hM
       exact conv_one_sub_monomial_of_lt _ w (by omega)
   have ht := _root_.GlobalTheory.SiegQ.tendsto_iteratedDeriv n hloc (fun N => (hpart N).1)
-  have hlim : _root_.GlobalTheory.SiegQ.tc (_root_.GlobalTheory.SiegQ.ep M w e) n =
-      _root_.GlobalTheory.SiegQ.tc
-        (fun z => ∏ i ∈ Finset.range (n + 1), (1 - w * z ^ (e + i * M))) n := by
+  have hlim
+      : _root_.GlobalTheory.SiegQ.tc (_root_.GlobalTheory.SiegQ.ep M w e) n
+        = _root_.GlobalTheory.SiegQ.tc
+          (fun z => ∏ i ∈ Finset.range (n + 1), (1 - w * z ^ (e + i * M)))
+          n := by
     unfold _root_.GlobalTheory.SiegQ.tc at hstab ⊢
-    refine tendsto_nhds_unique (ht.const_mul ((n.factorial : ℂ)⁻¹))
-      (tendsto_const_nhds.congr' ?_)
+    refine tendsto_nhds_unique (ht.const_mul ((n.factorial : ℂ)⁻¹)) (tendsto_const_nhds.congr' ?_)
     filter_upwards [eventually_ge_atTop (n + 1)] with N hN
     exact (hstab N hN).symm
   rw [hlim]
@@ -391,18 +438,20 @@ theorem _root_.GlobalTheory.SiegQ.Good.ep {M : ℕ}
 def kk (c : ℕ) : ℤ := ((c : ℤ) - (c : ℤ) ^ 2) / 2
 
 def expo (c M a : ℕ) : ℤ :=
-  (M * ((c ^ 2 - 1) / 12) : ℕ) + a * kk c + (∑ m ∈ Finset.range (c * a / M), (c * a - (m + 1) * M) : ℕ)
+  (M * ((c ^ 2 - 1) / 12) : ℕ) + a * kk c
+    + (∑ m ∈ Finset.range (c * a / M), (c * a - (m + 1) * M) : ℕ)
 
 def unitPart (c M a : ℕ) (v z : ℂ) : ℂ :=
-  (-v) ^ kk c * ((1 - v * z ^ a) ^ (c ^ 2) * (1 - v ^ c * z ^ (c * a))⁻¹) *
-    (ep M v (M + a) z ^ (c ^ 2) * ep M v⁻¹ (M - a) z ^ (c ^ 2) * (ep M (v ^ c) (M + c * a) z)⁻¹ *
-      ((∏ m ∈ Finset.range (c * a / M), -v ^ c * (1 - v ^ c * z ^ (c * a - (m + 1) * M))⁻¹) *
-        (ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹))
+  (-v) ^ kk c * ((1 - v * z ^ a) ^ (c ^ 2) * (1 - v ^ c * z ^ (c * a))⁻¹)
+    * (ep M v (M + a) z ^ (c ^ 2) * ep M v⁻¹ (M - a) z ^ (c ^ 2) * (ep M (v ^ c) (M + c * a) z)⁻¹
+      * ((∏ m ∈ Finset.range (c * a / M), -v ^ c * (1 - v ^ c * z ^ (c * a - (m + 1) * M))⁻¹)
+        * (ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹))
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem inv_one_sub_inv_eq_neg_mul_inv_one_sub {x : ℂ} (hx : x ≠ 0) : (1 - x⁻¹)⁻¹ = -x * (1 - x)⁻¹ := by
+private theorem inv_one_sub_inv_eq_neg_mul_inv_one_sub {x : ℂ} (hx : x ≠ 0)
+    : (1 - x⁻¹)⁻¹ = -x * (1 - x)⁻¹ := by
   rw [show (1 : ℂ) - x⁻¹ = (x - 1) / x by field_simp, inv_div, div_eq_mul_inv,
     show x - 1 = -(1 - x) by ring, inv_neg]
   ring
@@ -410,10 +459,11 @@ private theorem inv_one_sub_inv_eq_neg_mul_inv_one_sub {x : ℂ} (hx : x ≠ 0) 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.cth_eq {c M a : ℕ} (hM : 0 < M) (ha : a < M) {v z : ℂ}
-    (hv : ‖v‖ = 1) (hz : ‖z‖ < 1) (hz0 : z ≠ 0) :
-    _root_.GlobalTheory.Sieg.cth c (z ^ M) (z ^ a * v) =
-      z ^ _root_.GlobalTheory.SiegQ.expo c M a * _root_.GlobalTheory.SiegQ.unitPart c M a v z := by
+theorem _root_.GlobalTheory.SiegQ.cth_eq
+    {c M a : ℕ} (hM : 0 < M) (ha : a < M) {v z : ℂ} (hv : ‖v‖ = 1) (hz : ‖z‖ < 1) (hz0 : z ≠ 0)
+    : _root_.GlobalTheory.Sieg.cth c (z ^ M) (z ^ a * v)
+      = z ^ _root_.GlobalTheory.SiegQ.expo c M a
+        * _root_.GlobalTheory.SiegQ.unitPart c M a v z := by
   have hv0 : v ≠ 0 := by
     rintro rfl
     simp at hv
@@ -433,8 +483,8 @@ theorem _root_.GlobalTheory.SiegQ.cth_eq {c M a : ℕ} (hM : 0 < M) (ha : a < M)
   have hD0 := _root_.GlobalTheory.SiegQ.ep_ne_zero hM hnvc' hE hz
   obtain ⟨D, hDdef⟩ : ∃ D : ℕ → ℂ, D = fun m => 1 - (z ^ M) ^ (m + 1) * ((z ^ a * v) ^ c)⁻¹ :=
     ⟨_, rfl⟩
-  have hDshift : ∀ j, D (j + c * a / M) =
-      1 - (v ^ c)⁻¹ * z ^ ((c * a / M + 1) * M - c * a + j * M) := by
+  have hDshift
+      : ∀ j, D (j + c * a / M) = 1 - (v ^ c)⁻¹ * z ^ ((c * a / M + 1) * M - c * a + j * M) := by
     intro j
     rw [hDdef]
     dsimp only
@@ -445,13 +495,17 @@ theorem _root_.GlobalTheory.SiegQ.cth_eq {c M a : ℕ} (hM : 0 < M) (ha : a < M)
       omega
     rw [← pow_mul, mul_pow, ← pow_mul, hexp, pow_add, mul_comm a c]
     field_simp
-  have hDinv : HasProd (fun m => (D m)⁻¹) ((∏ i ∈ Finset.range (c * a / M), (D i)⁻¹) *
-      (_root_.GlobalTheory.SiegQ.ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹) := by
+  have hDinv : HasProd
+      (fun m => (D m)⁻¹)
+      ((∏ i ∈ Finset.range (c * a / M), (D i)⁻¹)
+        * (_root_.GlobalTheory.SiegQ.ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹) := by
     apply HasProd.prod_range_mul
     simp only [hDshift]
     exact hD.inv₀ hD0
-  have hfin : ∀ i ∈ Finset.range (c * a / M), (D i)⁻¹ =
-      (-v ^ c * (1 - v ^ c * z ^ (c * a - (i + 1) * M))⁻¹) * z ^ (c * a - (i + 1) * M) := by
+  have hfin
+      : ∀ i ∈ Finset.range (c * a / M),
+        (D i)⁻¹
+          = (- v ^ c * (1 - v ^ c * z ^ (c * a - (i + 1) * M))⁻¹) * z ^ (c * a - (i + 1) * M) := by
     intro i hi
     have hi' : (i + 1) * M ≤ c * a := (Nat.le_div_iff_mul_le hM).mp (Finset.mem_range.mp hi)
     have hx : D i = 1 - (v ^ c * z ^ (c * a - (i + 1) * M))⁻¹ := by
@@ -465,14 +519,16 @@ theorem _root_.GlobalTheory.SiegQ.cth_eq {c M a : ℕ} (hM : 0 < M) (ha : a < M)
         omega
       rw [← pow_mul, mul_pow, ← pow_mul, hsplit]
       field_simp
-    rw [hx, inv_one_sub_inv_eq_neg_mul_inv_one_sub (mul_ne_zero (pow_ne_zero _ hv0) (pow_ne_zero _ hz0))]
+    rw [hx,
+      inv_one_sub_inv_eq_neg_mul_inv_one_sub (mul_ne_zero (pow_ne_zero _ hv0) (pow_ne_zero _ hz0))]
     ring
-  have hF : HasProd (fun m => _root_.GlobalTheory.Sieg.cthFac c (z ^ M) (z ^ a * v) (m + 1))
-      (_root_.GlobalTheory.SiegQ.ep M v (M + a) z ^ (c ^ 2) *
-        _root_.GlobalTheory.SiegQ.ep M v⁻¹ (M - a) z ^ (c ^ 2) *
-        (_root_.GlobalTheory.SiegQ.ep M (v ^ c) (M + c * a) z)⁻¹ *
-        ((∏ i ∈ Finset.range (c * a / M), (D i)⁻¹) *
-          (_root_.GlobalTheory.SiegQ.ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹)) := by
+  have hF : HasProd
+      (fun m => _root_.GlobalTheory.Sieg.cthFac c (z ^ M) (z ^ a * v) (m + 1))
+      (_root_.GlobalTheory.SiegQ.ep M v (M + a) z ^ (c ^ 2)
+        * _root_.GlobalTheory.SiegQ.ep M v⁻¹ (M - a) z ^ (c ^ 2)
+        * (_root_.GlobalTheory.SiegQ.ep M (v ^ c) (M + c * a) z)⁻¹
+        * ((∏ i ∈ Finset.range (c * a / M), (D i)⁻¹)
+          * (_root_.GlobalTheory.SiegQ.ep M (v ^ c)⁻¹ ((c * a / M + 1) * M - c * a) z)⁻¹)) := by
     have h := (((hA.pow (c ^ 2)).mul (hB.pow (c ^ 2))).mul (hC.inv₀ hC0)).mul hDinv
     convert h using 1
     funext m
@@ -492,30 +548,37 @@ theorem _root_.GlobalTheory.SiegQ.cth_eq {c M a : ℕ} (hM : 0 < M) (ha : a < M)
     rw [e1, e2, e3, hDdef]
     simp only [div_eq_mul_inv, mul_inv]
     ring
-  have hu : (-(z ^ a * v)) ^ (((c : ℤ) - (c : ℤ) ^ 2) / 2) =
-      z ^ ((a : ℤ) * (((c : ℤ) - (c : ℤ) ^ 2) / 2)) * (-v) ^ (((c : ℤ) - (c : ℤ) ^ 2) / 2) := by
+  have hu
+      : (-(z ^ a * v)) ^ (((c : ℤ) - (c : ℤ) ^ 2) / 2)
+        = z ^ ((a : ℤ) * (((c : ℤ) - (c : ℤ) ^ 2) / 2)) * (-v) ^ (((c : ℤ) - (c : ℤ) ^ 2) / 2) := by
     rw [show -(z ^ a * v) = z ^ a * (-v) by ring, mul_zpow, zpow_mul, zpow_natCast]
   have e4 : (z ^ a * v) ^ c = v ^ c * z ^ (c * a) := by
     rw [mul_pow, ← pow_mul, mul_comm a c]
     ring
-  rw [_root_.GlobalTheory.Sieg.cth, hF.tprod_eq, Finset.prod_congr rfl hfin, Finset.prod_mul_distrib,
-    Finset.prod_pow_eq_pow_sum, hu, e4, _root_.GlobalTheory.SiegQ.expo, _root_.GlobalTheory.SiegQ.unitPart,
-    zpow_add₀ hz0, zpow_add₀ hz0, zpow_natCast, zpow_natCast, ← pow_mul]
+  rw [_root_.GlobalTheory.Sieg.cth, hF.tprod_eq, Finset.prod_congr rfl hfin,
+    Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hu, e4, _root_.GlobalTheory.SiegQ.expo,
+    _root_.GlobalTheory.SiegQ.unitPart, zpow_add₀ hz0, zpow_add₀ hz0, zpow_natCast, zpow_natCast,
+    ← pow_mul]
   simp only [_root_.GlobalTheory.SiegQ.kk, Nat.cast_mul]
   ring
 
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_inv_of_ne_zero {F : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Good R F)
-    (h0 : ∀ z : ℂ, ‖z‖ < 1 → F z ≠ 0) (hu : (F 0)⁻¹ ∈ R) :
-    _root_.GlobalTheory.SiegQ.Good R (fun z => (F z)⁻¹) := by
+private theorem good_inv_of_ne_zero
+    {F : ℂ → ℂ}
+    (hF : _root_.GlobalTheory.SiegQ.Good R F) (h0 : ∀ z : ℂ, ‖z‖ < 1 → F z ≠ 0) (hu : (F 0)⁻¹ ∈ R)
+    : _root_.GlobalTheory.SiegQ.Good R (fun z => (F z)⁻¹) := by
   have hd : DifferentiableOn ℂ (fun z => (F z)⁻¹) (Metric.ball 0 1) :=
     hF.1.inv fun z hz => h0 z (by simpa using hz)
   have hF0 : F 0 ≠ 0 := h0 0 (by simp)
-  have hprod : _root_.GlobalTheory.SiegQ.tc (fun z => F z * (F z)⁻¹) = fun n => if n = 0 then 1 else 0 := by
-    rw [_root_.GlobalTheory.SiegQ.tc_congr (G := fun _ => (1 : ℂ))
-      (fun z hz => mul_inv_cancel₀ (h0 z hz)), _root_.GlobalTheory.SiegQ.tc_const]
+  have hprod
+      : _root_.GlobalTheory.SiegQ.tc (fun z => F z * (F z)⁻¹)
+        = fun n => if n = 0 then 1 else 0 := by
+    rw [_root_.GlobalTheory.SiegQ.tc_congr
+        (G := fun _ => (1 : ℂ))
+        (fun z hz => mul_inv_cancel₀ (h0 z hz)),
+      _root_.GlobalTheory.SiegQ.tc_const]
   have hm := _root_.GlobalTheory.SiegQ.tc_mul hF.1 hd
   rw [hm] at hprod
   refine ⟨hd, fun n => ?_⟩
@@ -525,9 +588,12 @@ private theorem good_inv_of_ne_zero {F : ℂ → ℂ} (hF : _root_.GlobalTheory.
     unfold _root_.GlobalTheory.QFam.conv at hn
     rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_range_succ'] at hn
     simp only [Nat.sub_zero, _root_.GlobalTheory.SiegQ.tc_zero] at hn
-    have hrec : _root_.GlobalTheory.SiegQ.tc (fun z => (F z)⁻¹) n = (F 0)⁻¹ *
-        ((if n = 0 then 1 else 0) - ∑ i ∈ Finset.range n, _root_.GlobalTheory.SiegQ.tc F (i + 1) *
-          _root_.GlobalTheory.SiegQ.tc (fun z => (F z)⁻¹) (n - (i + 1))) := by
+    have hrec
+        : _root_.GlobalTheory.SiegQ.tc (fun z => (F z)⁻¹) n
+          = (F 0)⁻¹
+            * ((if n = 0 then 1 else 0)
+              - ∑ i ∈ Finset.range n, _root_.GlobalTheory.SiegQ.tc F (i + 1) *
+                _root_.GlobalTheory.SiegQ.tc (fun z => (F z)⁻¹) (n - (i + 1))) := by
       rw [← hn]
       field_simp
       ring
@@ -542,8 +608,8 @@ private theorem good_inv_of_ne_zero {F : ℂ → ℂ} (hF : _root_.GlobalTheory.
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-private theorem good_pow' {F : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Good R F) (n : ℕ) :
-    _root_.GlobalTheory.SiegQ.Good R (fun z => F z ^ n) := by
+private theorem good_pow' {F : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Good R F) (n : ℕ)
+    : _root_.GlobalTheory.SiegQ.Good R (fun z => F z ^ n) := by
   induction n with
   | zero => simpa using good_const_foundation (R := R) R.one_mem
   | succ n ih => simpa [pow_succ] using good_mul' ih hF
@@ -551,11 +617,12 @@ private theorem good_pow' {F : ℂ → ℂ} (hF : _root_.GlobalTheory.SiegQ.Good
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.good_unitPart {c M a : ℕ} (hc : 0 < c) (hM : 0 < M)
-    (ha : a < M) {v : ℂ} (hv : ‖v‖ = 1)
-    (h1 : v ∈ R) (h2 : v⁻¹ ∈ R) (h3 : a = 0 → (1 - v) ^ (c ^ 2) * (1 - v ^ c)⁻¹ ∈ R)
-    (h4 : 0 < a → M ∣ c * a → v ^ c ≠ 1 ∧ (1 - v ^ c)⁻¹ ∈ R) :
-    _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.unitPart c M a v) := by
+theorem _root_.GlobalTheory.SiegQ.good_unitPart
+    {c M a : ℕ} (hc : 0 < c) (hM : 0 < M) (ha : a < M)
+    {v : ℂ}
+    (hv : ‖v‖ = 1) (h1 : v ∈ R) (h2 : v⁻¹ ∈ R) (h3 : a = 0 → (1 - v) ^ (c ^ 2) * (1 - v ^ c)⁻¹ ∈ R)
+    (h4 : 0 < a → M ∣ c * a → v ^ c ≠ 1 ∧ (1 - v ^ c)⁻¹ ∈ R)
+    : _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.unitPart c M a v) := by
   have hv0 : v ≠ 0 := by
     rintro rfl
     simp at hv
@@ -572,13 +639,17 @@ theorem _root_.GlobalTheory.SiegQ.good_unitPart {c M a : ℕ} (hc : 0 < c) (hM :
     rw [add_mul, one_mul]
     omega
   have hE : 0 < (c * a / M + 1) * M - c * a := by omega
-  have hep : ∀ {w : ℂ} {e : ℕ}, ‖w‖ ≤ 1 → w ∈ R → 0 < e →
-      _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.ep M w e) :=
-    fun hw hwR he =>
-      _root_.GlobalTheory.SiegQ.Good.ep hM hw hwR he
-  have hepinv : ∀ {w : ℂ} {e : ℕ}, ‖w‖ ≤ 1 → w ∈ R → 0 < e →
-      _root_.GlobalTheory.SiegQ.Good R (fun z => (_root_.GlobalTheory.SiegQ.ep M w e z)⁻¹) :=
-    fun hw hwR he => good_inv_of_ne_zero (hep hw hwR he)
+  have hep
+      : ∀ {w : ℂ} {e : ℕ},
+        ‖w‖ ≤ 1 → w ∈ R → 0 < e
+          → _root_.GlobalTheory.SiegQ.Good R (_root_.GlobalTheory.SiegQ.ep M w e) :=
+    fun hw hwR he => _root_.GlobalTheory.SiegQ.Good.ep hM hw hwR he
+  have hepinv
+      : ∀ {w : ℂ} {e : ℕ},
+        ‖w‖ ≤ 1 → w ∈ R → 0 < e
+          → _root_.GlobalTheory.SiegQ.Good R
+            (fun z => (_root_.GlobalTheory.SiegQ.ep M w e z)⁻¹) := fun hw hwR he =>
+    good_inv_of_ne_zero (hep hw hwR he)
       (fun z hz => _root_.GlobalTheory.SiegQ.ep_ne_zero hM hw he hz)
       (by rw [_root_.GlobalTheory.SiegQ.ep_zero M _ he, inv_one]; exact R.one_mem)
   have hzpow : (-v) ^ _root_.GlobalTheory.SiegQ.kk c ∈ R := by
@@ -595,10 +666,12 @@ theorem _root_.GlobalTheory.SiegQ.good_unitPart {c M a : ℕ} (hc : 0 < c) (hM :
     · have hca : c * a ≠ 0 := by positivity
       refine good_mul' (good_pow' (good_one_sub_mul_pow h1 a) _)
         (good_inv_of_ne_zero (good_one_sub_mul_pow hvc _)
-          (fun z hz => _root_.GlobalTheory.SiegQ.lin_ne_zero hn3 (by positivity) hz) ?_)
+          (fun z hz => _root_.GlobalTheory.SiegQ.lin_ne_zero hn3 (by positivity) hz)
+          ?_)
       simp [zero_pow hca, R.one_mem]
-  have hfin : _root_.GlobalTheory.SiegQ.Good R (fun z => ∏ m ∈ Finset.range (c * a / M),
-      -v ^ c * (1 - v ^ c * z ^ (c * a - (m + 1) * M))⁻¹) := by
+  have hfin : _root_.GlobalTheory.SiegQ.Good R (fun z =>
+      ∏ m ∈ Finset.range (c * a / M),
+        -v ^ c * (1 - v ^ c * z ^ (c * a - (m + 1) * M))⁻¹) := by
     refine good_finset_prod _ fun m hm => good_mul' (good_const_foundation (R.neg_mem hvc)) ?_
     rcases Nat.eq_zero_or_pos (c * a - (m + 1) * M) with h0 | h0
     · rw [h0]
@@ -611,7 +684,8 @@ theorem _root_.GlobalTheory.SiegQ.good_unitPart {c M a : ℕ} (hc : 0 < c) (hM :
       have heq : c * a = (m + 1) * M := by omega
       exact good_const_foundation (h4 ha0 ⟨m + 1, by rw [heq, mul_comm]⟩).2
     · refine good_inv_of_ne_zero (good_one_sub_mul_pow hvc _)
-        (fun z hz => _root_.GlobalTheory.SiegQ.lin_ne_zero hn3 h0 hz) ?_
+        (fun z hz => _root_.GlobalTheory.SiegQ.lin_ne_zero hn3 h0 hz)
+        ?_
       simp [zero_pow h0.ne', R.one_mem]
   unfold _root_.GlobalTheory.SiegQ.unitPart
   refine good_mul' (good_mul' (good_const_foundation hzpow) hfirst) ?_
@@ -623,9 +697,10 @@ theorem _root_.GlobalTheory.SiegQ.good_unitPart {c M a : ℕ} (hc : 0 < c) (hM :
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.unitPart_zero_ne {c M a : ℕ} (hc : 0 < c) (hM : 0 < M) (ha : a < M)
-    {v : ℂ} (hv : v ≠ 0)
-    (h : M ∣ c * a → v ^ c ≠ 1) : _root_.GlobalTheory.SiegQ.unitPart c M a v 0 ≠ 0 := by
+theorem _root_.GlobalTheory.SiegQ.unitPart_zero_ne
+    {c M a : ℕ} (hc : 0 < c) (hM : 0 < M) (ha : a < M)
+    {v : ℂ} (hv : v ≠ 0) (h : M ∣ c * a → v ^ c ≠ 1)
+    : _root_.GlobalTheory.SiegQ.unitPart c M a v 0 ≠ 0 := by
   have hE : 0 < (c * a / M + 1) * M - c * a := by
     have := Nat.lt_div_mul_add (a := c * a) hM
     rw [add_mul, one_mul]
@@ -660,17 +735,26 @@ theorem _root_.GlobalTheory.SiegQ.unitPart_zero_ne {c M a : ℕ} (hc : 0 < c) (h
     · rw [zero_pow h0.ne']
       simp
 
-
 open scoped UpperHalfPlane MatrixGroups Manifold Topology in
 open Filter in
 variable {R : Subring ℂ} in
-theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M → a < M →
-    ∃ k : ℤ, ∀ b : ℕ, _root_.GlobalTheory.Sieg.admitted c ![(a : ℚ) / M, (b : ℚ) / M] →
-      ∃ A : ℕ → ℂ, _root_.GlobalTheory.QFam.HasQ M (fun τ => _root_.GlobalTheory.Sieg.sg c ![(a : ℚ) / M, (b : ℚ) / M] τ *
-        _root_.GlobalTheory.Sieg.ee (-((k : ℂ) / M) * (τ : ℂ))) A ∧ A 0 ≠ 0 ∧
-        (∀ n, A n ∈ IntermediateField.adjoin ℚ {_root_.GlobalTheory.Sieg.ee (1 / (M : ℂ))}) ∧
-        (Nat.Coprime c M → ∀ n, A n ∈ Subring.closure {_root_.GlobalTheory.Sieg.ee (1 / (M : ℂ))}) ∧
-        (b = 0 → ∀ n, ∃ z : ℤ, A n = z) := by
+theorem _root_.GlobalTheory.SiegQ.sg_expansion_int
+    : ∀ (c M a : ℕ),
+      0 < M → a < M
+        → ∃ k : ℤ, ∀ b : ℕ,
+          _root_.GlobalTheory.Sieg.admitted c ![(a : ℚ) / M, (b : ℚ) / M]
+            → ∃ A : ℕ → ℂ,
+              _root_.GlobalTheory.QFam.HasQ M
+                  (fun τ =>
+                    _root_.GlobalTheory.Sieg.sg c ![(a : ℚ) / M, (b : ℚ) / M] τ
+                      * _root_.GlobalTheory.Sieg.ee (-((k : ℂ) / M) * (τ : ℂ)))
+                  A
+                ∧ A 0 ≠ 0
+                ∧ (∀ n,
+                  A n ∈ IntermediateField.adjoin ℚ {_root_.GlobalTheory.Sieg.ee (1 / (M : ℂ))})
+                ∧ (Nat.Coprime c M
+                  → ∀ n, A n ∈ Subring.closure {_root_.GlobalTheory.Sieg.ee (1 / (M : ℂ))})
+                ∧ (b = 0 → ∀ n, ∃ z : ℤ, A n = z) := by
   intro c M a hM ha
   refine ⟨_root_.GlobalTheory.SiegQ.expo c M a, fun b hadm => ?_⟩
   obtain ⟨hc1, -, hnot⟩ := hadm
@@ -701,16 +785,21 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
   have hv1 : M ∣ c * a → v ^ c ≠ 1 := by
     intro hdvd hvc
     apply hint hdvd
-    have h := _root_.GlobalTheory.Sieg.Model.ee_eq_one (a := 0) (b := (c : ℚ) * ((b : ℚ) / M))
-      UpperHalfPlane.I (by
-        rw [← hvc, hvdef, ← _root_.GlobalTheory.Sieg.Model.ee_nat_mul]
-        congr 1
-        push_cast
-        ring)
+    have h :=
+      _root_.GlobalTheory.Sieg.Model.ee_eq_one (a := 0) (b := (c : ℚ) * ((b : ℚ) / M))
+        UpperHalfPlane.I
+        (by
+          rw [← hvc, hvdef, ← _root_.GlobalTheory.Sieg.Model.ee_nat_mul]
+          congr 1
+          push_cast
+          ring)
     exact h.2
-  have hfun : (fun τ : ℍ => _root_.GlobalTheory.Sieg.sg c ![(a : ℚ) / M, (b : ℚ) / M] τ *
-      _root_.GlobalTheory.Sieg.ee (-((_root_.GlobalTheory.SiegQ.expo c M a : ℂ) / M) * (τ : ℂ))) =
-      fun τ => _root_.GlobalTheory.SiegQ.unitPart c M a v (_root_.GlobalTheory.SiegQ.qv M τ) := by
+  have hfun
+      : (fun τ : ℍ =>
+          _root_.GlobalTheory.Sieg.sg c ![(a : ℚ) / M, (b : ℚ) / M] τ * _root_.GlobalTheory.Sieg.ee
+            (-((_root_.GlobalTheory.SiegQ.expo c M a : ℂ) / M) * (τ : ℂ)))
+        = fun τ =>
+          _root_.GlobalTheory.SiegQ.unitPart c M a v (_root_.GlobalTheory.SiegQ.qv M τ) := by
     funext τ
     obtain ⟨z, hzdef⟩ : ∃ z, z = _root_.GlobalTheory.SiegQ.qv M τ := ⟨_, rfl⟩
     rw [← hzdef]
@@ -724,27 +813,33 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
       rw [hzdef, _root_.GlobalTheory.SiegQ.qv, ← Complex.exp_nat_mul, _root_.GlobalTheory.Sieg.ee]
       congr 1
       field_simp
-    have e2 : _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt ![(a : ℚ) / M, (b : ℚ) / M] τ) =
-        z ^ a * v := by
-      rw [hzdef, _root_.GlobalTheory.SiegQ.qv, ← Complex.exp_nat_mul, hvdef, _root_.GlobalTheory.Sieg.ee,
-        _root_.GlobalTheory.Sieg.ee, ← Complex.exp_add, _root_.GlobalTheory.Sieg.pt]
+    have e2
+        : _root_.GlobalTheory.Sieg.ee (_root_.GlobalTheory.Sieg.pt ![(a : ℚ) / M, (b : ℚ) / M] τ)
+          = z ^ a * v := by
+      rw [hzdef, _root_.GlobalTheory.SiegQ.qv, ← Complex.exp_nat_mul, hvdef,
+        _root_.GlobalTheory.Sieg.ee, _root_.GlobalTheory.Sieg.ee, ← Complex.exp_add,
+        _root_.GlobalTheory.Sieg.pt]
       congr 1
       simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
       push_cast
       ring
-    have e3 : _root_.GlobalTheory.Sieg.ee (-((_root_.GlobalTheory.SiegQ.expo c M a : ℂ) / M) * (τ : ℂ)) =
-        z ^ (-_root_.GlobalTheory.SiegQ.expo c M a) := by
+    have e3
+        : _root_.GlobalTheory.Sieg.ee (-((_root_.GlobalTheory.SiegQ.expo c M a : ℂ) / M) * (τ : ℂ))
+          = z ^ (- _root_.GlobalTheory.SiegQ.expo c M a) := by
       rw [hzdef, _root_.GlobalTheory.SiegQ.qv, ← Complex.exp_int_mul, _root_.GlobalTheory.Sieg.ee]
       congr 1
       push_cast
       ring
     rw [_root_.GlobalTheory.Sieg.sg, e1, e2, e3, _root_.GlobalTheory.SiegQ.cth_eq hM ha hvn hz hz0,
-      mul_comm (z ^ _root_.GlobalTheory.SiegQ.expo c M a), mul_assoc, ← zpow_add₀ hz0, add_neg_cancel,
-      zpow_zero, mul_one]
-  have hU := _root_.GlobalTheory.SiegQ.good_unitPart (R := ⊤) hc0 hM ha hvn
-    (Subring.mem_top _) (Subring.mem_top _) (fun _ => Subring.mem_top _)
-    (fun _ hd => ⟨hv1 hd, Subring.mem_top _⟩)
-  refine ⟨_root_.GlobalTheory.SiegQ.tc (_root_.GlobalTheory.SiegQ.unitPart c M a v), ?_, ?_, ?_, ?_, ?_⟩
+      mul_comm (z ^ _root_.GlobalTheory.SiegQ.expo c M a), mul_assoc, ← zpow_add₀ hz0,
+      add_neg_cancel, zpow_zero, mul_one]
+  have hU :=
+    _root_.GlobalTheory.SiegQ.good_unitPart (R := ⊤) hc0 hM ha hvn (Subring.mem_top _)
+      (Subring.mem_top _)
+      (fun _ => Subring.mem_top _)
+      (fun _ hd => ⟨hv1 hd, Subring.mem_top _⟩)
+  refine
+    ⟨_root_.GlobalTheory.SiegQ.tc (_root_.GlobalTheory.SiegQ.unitPart c M a v), ?_, ?_, ?_, ?_, ?_⟩
   · rw [hfun]
     exact _root_.GlobalTheory.SiegQ.hasQ_tc hU.1 hM
   · rw [_root_.GlobalTheory.SiegQ.tc_zero]
@@ -760,8 +855,10 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
     have hcK : (1 - v ^ c)⁻¹ ∈ K := K.inv_mem (K.sub_mem K.one_mem (pow_mem hvK c))
     have h3K : (1 - v) ^ (c ^ 2) * (1 - v ^ c)⁻¹ ∈ K :=
       K.mul_mem (pow_mem (K.sub_mem K.one_mem hvK) (c ^ 2)) hcK
-    have hK := _root_.GlobalTheory.SiegQ.good_unitPart (R := K.toSubalgebra.toSubring)
-      hc0 hM ha hvn hvK hvK' (fun _ => h3K) (fun _ hd => ⟨hv1 hd, hcK⟩)
+    have hK :=
+      _root_.GlobalTheory.SiegQ.good_unitPart (R := K.toSubalgebra.toSubring) hc0 hM ha hvn hvK hvK'
+        (fun _ => h3K)
+        (fun _ hd => ⟨hv1 hd, hcK⟩)
     exact hK.2 n
   · intro hcop n
     rw [← hζ]
@@ -803,8 +900,9 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
         have hc2 : c ^ 2 = (c ^ 2 - 1) + 1 := by
           have : 0 < c ^ 2 := by positivity
           omega
-        have hval : (1 - v) ^ (c ^ 2) * (1 - v ^ c)⁻¹ =
-            (1 - v) ^ (c ^ 2 - 1) * ∑ j ∈ Finset.range m, (v ^ c) ^ j := by
+        have hval
+            : (1 - v) ^ (c ^ 2) * (1 - v ^ c)⁻¹
+              = (1 - v) ^ (c ^ 2 - 1) * ∑ j ∈ Finset.range m, (v ^ c) ^ j := by
           rw [hc2, pow_succ, mul_assoc, Nat.add_sub_cancel]
           congr 1
           nth_rewrite 1 [key]
@@ -812,8 +910,8 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
         rw [hval]
         exact S.mul_mem (S.pow_mem (S.sub_mem S.one_mem hvS) _)
           (S.sum_mem fun j _ => S.pow_mem (S.pow_mem hvS c) j)
-    have hS := _root_.GlobalTheory.SiegQ.good_unitPart (R := S) hc0 hM ha hvn hvS hvS' h3
-      (fun ha0 hd => by
+    have hS :=
+      _root_.GlobalTheory.SiegQ.good_unitPart (R := S) hc0 hM ha hvn hvS hvS' h3 (fun ha0 hd => by
         exfalso
         have hMa : M ∣ a := Nat.Coprime.dvd_of_dvd_mul_left hcop.symm hd
         have := Nat.le_of_dvd ha0 hMa
@@ -823,13 +921,13 @@ theorem _root_.GlobalTheory.SiegQ.sg_expansion_int : ∀ (c M a : ℕ), 0 < M �
     have hv1' : v = 1 := by
       rw [hvdef]
       simp [_root_.GlobalTheory.Sieg.ee]
-    have hZ := _root_.GlobalTheory.SiegQ.good_unitPart (R := (Int.castRingHom ℂ).range)
-      hc0 hM ha hvn (by rw [hv1']; exact Subring.one_mem _)
-      (by rw [hv1', inv_one]; exact Subring.one_mem _)
-      (fun _ => by
-        rw [hv1', sub_self, zero_pow (by positivity), zero_mul]
-        exact Subring.zero_mem _)
-      (fun _ hd => absurd (by rw [hv1', one_pow]) (hv1 hd))
+    have hZ :=
+      _root_.GlobalTheory.SiegQ.good_unitPart (R := (Int.castRingHom ℂ).range) hc0 hM ha hvn
+        (by rw [hv1']; exact Subring.one_mem _) (by rw [hv1', inv_one]; exact Subring.one_mem _)
+        (fun _ => by
+          rw [hv1', sub_self, zero_pow (by positivity), zero_mul]
+          exact Subring.zero_mem _)
+        (fun _ hd => absurd (by rw [hv1', one_pow]) (hv1 hd))
     obtain ⟨t, ht⟩ := RingHom.mem_range.mp (hZ.2 n)
     exact ⟨t, by rw [← ht]; simp⟩
 

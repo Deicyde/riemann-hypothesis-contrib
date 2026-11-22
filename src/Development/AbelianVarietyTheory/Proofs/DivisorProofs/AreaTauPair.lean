@@ -14,7 +14,8 @@ public import Formalism.LocalToGlobal.TorsionIntegrality.EisensteinTranslationPr
 noncomputable section
 
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate
-open GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
+open GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1
+  Formalism.L2.Th1.F
 
 namespace GlobalTheory.WpFam.LatConst
 

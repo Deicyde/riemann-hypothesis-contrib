@@ -11,9 +11,10 @@ universe w w' w'' t t' v u v' u' v'' u''
 
 namespace GlobalTheory.CompanionTheory.CoefUpTo
 
-theorem coef_upTo : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C]
-    {F F' : C ⥤ ModuleCat.{w} R} (α : F ⟶ F') (s : R), (∀ T, UpTo s (α.app T).hom) →
-    ∀ n, UpTo (s ^ 2) ((Mor.ofNatTrans α).pull n) := by
+theorem coef_upTo
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {F F' : C ⥤ ModuleCat.{w} R}
+        (α : F ⟶ F') (s : R),
+      (∀ T, UpTo s (α.app T).hom) → ∀ n, UpTo (s ^ 2) ((Mor.ofNatTrans α).pull n) := by
   intro R _ C _ F F' α s h n
   have inj : ∀ k (f : Cn F k), (Mor.ofNatTrans α).pullC k f = 0 → s • f = 0 := fun k f hf =>
     funext fun c => (h _).1 (f c) (congrFun hf c)
@@ -29,7 +30,8 @@ theorem coef_upTo : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C]
     have hx' : (cx F').cls ((Mor.ofNatTrans α).pullC n a) hz = 0 := hx
     rw [(CrystallineSemistableComparison.P.cls_surj (cx F') n).2.1] at hx'
     have hd : (cx F).d n ((s ^ 2) • a) = 0 := by rw [map_smul, ha, smul_zero]
-    rw [← (CrystallineSemistableComparison.P.cls_surj (cx F) n).2.2.2.2 (s ^ 2) a ha hd, (CrystallineSemistableComparison.P.cls_surj (cx F) n).2.1]
+    rw [← (CrystallineSemistableComparison.P.cls_surj (cx F) n).2.2.2.2 (s ^ 2) a ha hd,
+      (CrystallineSemistableComparison.P.cls_surj (cx F) n).2.1]
     cases n with
     | zero =>
       have h0 : (Mor.ofNatTrans α).pullC 0 a = 0 := hx'

@@ -14,30 +14,38 @@ namespace Formalism.L2.SG.Pf.G6
 
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-  [Algebra F K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+  [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem mem_dual_iff {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V} {v : V} :
-    v ∈ Formalism.HermitianLatticesTheory.dual h L ↔ ∀ y ∈ L, h y v ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_dual_iff {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V} {v : V}
+    : v ∈ Formalism.HermitianLatticesTheory.dual h L
+      ↔ ∀ y ∈ L, h y v ∈ (1 : Submodule (𝓞 K) K) := by
   simp [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf]
 
-theorem form_ozmul_right (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 K) (y v : V) : h y (c • v) = c • h y v := by
+theorem form_ozmul_right (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 K) (y v : V)
+    : h y (c • v) = c • h y v := by
   rw [← algebraMap_smul K c v, LinearMap.map_smul, algebraMap_smul]
 
-theorem form_ozmul_left_mem (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 K) {y v : V}
-    (hy : h y v ∈ (1 : Submodule (𝓞 K) K)) : h (c • y) v ∈ (1 : Submodule (𝓞 K) K) := by
+theorem form_ozmul_left_mem
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 K) {y v : V} (hy : h y v ∈ (1 : Submodule (𝓞 K) K))
+    : h (c • y) v ∈ (1 : Submodule (𝓞 K) K) := by
   rw [← algebraMap_smul K c y, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul]
   obtain ⟨c0, hc0⟩ := Submodule.mem_one.mp (VecSplit.star_alg_mem_one c)
   obtain ⟨z0, hz0⟩ := Submodule.mem_one.mp hy
   exact Submodule.mem_one.mpr ⟨c0 * z0, by rw [map_mul, hc0, hz0]⟩
 
-theorem mem_locF_dualIn {h : V →ₗ⋆[K] V →ₗ[K] K} {X : Submodule K V} {L : Submodule (𝓞 K) V}
-    (hL : L.FG) (𝔭 : Ideal (𝓞 F)) {v : V} (hv : v ∈ X)
-    (H : ∀ y ∈ L, h y v ∈ locF 𝔭 (1 : Submodule (𝓞 K) K)) : v ∈ locF 𝔭 (dualIn h X L) := by
+theorem mem_locF_dualIn
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {X : Submodule K V} {L : Submodule (𝓞 K) V} (hL : L.FG)
+    (𝔭 : Ideal (𝓞 F))
+    {v : V} (hv : v ∈ X) (H : ∀ y ∈ L, h y v ∈ locF 𝔭 (1 : Submodule (𝓞 K) K))
+    : v ∈ locF 𝔭 (dualIn h X L) := by
   classical
   obtain ⟨s, hs⟩ := hL
-  have H' : ∀ y ∈ s, ∃ t ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s},
-      t • h y v ∈ (1 : Submodule (𝓞 K) K) := by
+  have H'
+      : ∀ y ∈ s,
+        ∃ t ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s},
+          t • h y v ∈ (1 : Submodule (𝓞 K) K) := by
     intro y hy
     exact H y (hs ▸ Submodule.subset_span hy)
   choose! t ht using H'
@@ -51,7 +59,8 @@ theorem mem_locF_dualIn {h : V →ₗ⋆[K] V →ₗ[K] K} {X : Submodule K V} {
   | mem y hy =>
     rw [form_ozmul_right, ← Finset.prod_erase_mul s t hy, mul_smul]
     exact Submodule.smul_mem _ _ (ht y hy).2
-  | zero => simp
+  | zero =>
+    simp
   | add a b _ _ ha hb =>
     rw [map_add (f := _), LinearMap.add_apply]
     exact Submodule.add_mem _ ha hb

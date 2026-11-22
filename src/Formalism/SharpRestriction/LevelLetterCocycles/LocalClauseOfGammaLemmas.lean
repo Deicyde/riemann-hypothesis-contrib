@@ -10,12 +10,14 @@ noncomputable section
 
 namespace Formalism.MainNotions.RamifiedCoefficientChains.S9
 
-open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.RamifiedCoefficientChains Polynomial
+open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.RamifiedCoefficientChains Polynomial
 
-theorem lemmaGD_cc {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) {K LL : FinExt l}
-    (hg : Good K 1 LL) :
-    ∃ cc : ℤ → ↥(OL LL), ∀ x : ℤ, (-(((P.PD K).p : ℕ) : ↥(OL LL))) * cc x =
-      ((((H.W K 1 LL hg).χΓ (H.W K 1 LL hg).gam) ^ (-x) : (↥(OL LL))ˣ) : ↥(OL LL)) - 1 := by
+theorem lemmaGD_cc
+    {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) {K LL : FinExt l} (hg : Good K 1 LL)
+    : ∃ cc : ℤ → ↥(OL LL), ∀ x : ℤ,
+      (-(((P.PD K).p : ℕ) : ↥(OL LL))) * cc x
+        = ((((H.W K 1 LL hg).χΓ (H.W K 1 LL hg).gam) ^ (-x) : (↥(OL LL))ˣ) : ↥(OL LL)) - 1 := by
   obtain ⟨z, hz, hv⟩ := Formalism.MainNotions.LiftingTheory.gam_zl (H := H) hg
   have hne : (z : ℤ_[l]) - 1 ≠ 0 := by
     intro h0
@@ -32,9 +34,10 @@ theorem lemmaGD_cc {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) {K 
   have hw : ∀ x : ℤ, ∃ w : ℤ_[l], -((l : ℕ) : ℤ_[l]) * w = ((z ^ (-x) : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
     intro x
     have h1 : (Ideal.Quotient.mk I) ((z ^ (-x) : ℤ_[l]ˣ) : ℤ_[l]) = (Ideal.Quotient.mk I) 1 := by
-      have := congrArg Units.val
-        (show Units.map (Ideal.Quotient.mk I).toMonoidHom (z ^ (-x)) = 1 by
-          rw [map_zpow, hz1, one_zpow])
+      have :=
+        congrArg Units.val
+          (show Units.map (Ideal.Quotient.mk I).toMonoidHom (z ^ (-x)) = 1 by
+            rw [map_zpow, hz1, one_zpow])
       rw [Units.coe_map, Units.val_one] at this
       exact this.trans (map_one _).symm
     obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq.1 h1)
@@ -45,8 +48,10 @@ theorem lemmaGD_cc {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) {K 
   rw [map_mul, map_neg, map_natCast, map_sub, map_one] at e
   rw [P.PD_p K, e]
   congr 1
-  have hzu : Units.map (algebraMap ℤ_[l] ↥(OL LL)).toMonoidHom z =
-      (H.W K 1 LL hg).χΓ (H.W K 1 LL hg).gam := Units.ext hz
+  have hzu
+      : Units.map (algebraMap ℤ_[l] ↥(OL LL)).toMonoidHom z
+        = (H.W K 1 LL hg).χΓ (H.W K 1 LL hg).gam :=
+    Units.ext hz
   rw [← hzu, ← map_zpow]
   rfl
 

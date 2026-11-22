@@ -8,28 +8,40 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomolo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.ArchB
 
-private theorem smoothOfRelativeDimension_restrict_of_le {A S : Scheme.{0}} (f : A ⟶ S) {n : ℕ} {V W : A.Opens} (h : V ≤ W)
-    (hW : SmoothOfRelativeDimension n (W.ι ≫ f)) : SmoothOfRelativeDimension n (V.ι ≫ f) := by
+private theorem smoothOfRelativeDimension_restrict_of_le
+    {A S : Scheme.{0}} (f : A ⟶ S)
+    {n : ℕ} {V W : A.Opens} (h : V ≤ W) (hW : SmoothOfRelativeDimension n (W.ι ≫ f))
+    : SmoothOfRelativeDimension n (V.ι ≫ f) := by
   have := smoothOfRelativeDimension_comp 0 n (A.homOfLE h) (W.ι ≫ f)
   rw [zero_add, ← Category.assoc, Scheme.homOfLE_ι] at this
   exact this
 
-private theorem relDim_eq_of_mem_of_mem {A S : Scheme.{0}} (f : A ⟶ S) {n m : ℕ} {V W : A.Opens}
+private theorem relDim_eq_of_mem_of_mem
+    {A S : Scheme.{0}} (f : A ⟶ S)
+    {n m : ℕ} {V W : A.Opens}
     (hV : SmoothOfRelativeDimension n (V.ι ≫ f)) (hW : SmoothOfRelativeDimension m (W.ι ≫ f))
-    {x : A} (hxV : x ∈ V) (hxW : x ∈ W) : n = m :=
-  ReciprocityTheory.ChartRestriction.G.H1.dim_unique _ (smoothOfRelativeDimension_restrict_of_le f inf_le_left hV) (smoothOfRelativeDimension_restrict_of_le f inf_le_right hW)
-    ⟨x, hxV, hxW⟩
+    {x : A} (hxV : x ∈ V) (hxW : x ∈ W)
+    : n = m :=
+  ReciprocityTheory.ChartRestriction.G.H1.dim_unique _
+    (smoothOfRelativeDimension_restrict_of_le f inf_le_left hV)
+    (smoothOfRelativeDimension_restrict_of_le f inf_le_right hW) ⟨x, hxV, hxW⟩
 
-theorem reldim_eq_of_two_pullbacks {P A S : Scheme.{0}} {f : A ⟶ S} {b : A ⟶ S} {p : P ⟶ A} {a₁ a₂ : P ⟶ A}
-    (h₁ : IsPullback a₁ p f b) (h₂ : IsPullback a₂ p f b) {n₁ n₂ : ℕ} {W₁ W₂ : A.Opens}
+theorem reldim_eq_of_two_pullbacks
+    {P A S : Scheme.{0}} {f : A ⟶ S} {b : A ⟶ S} {p : P ⟶ A} {a₁ a₂ : P ⟶ A}
+    (h₁ : IsPullback a₁ p f b) (h₂ : IsPullback a₂ p f b)
+    {n₁ n₂ : ℕ} {W₁ W₂ : A.Opens}
     (d₁ : SmoothOfRelativeDimension n₁ (W₁.ι ≫ f)) (d₂ : SmoothOfRelativeDimension n₂ (W₂.ι ≫ f))
-    (z : P) (hz₁ : a₁ z ∈ W₁) (hz₂ : a₂ z ∈ W₂) : n₁ = n₂ := by
+    (z : P) (hz₁ : a₁ z ∈ W₁) (hz₂ : a₂ z ∈ W₂)
+    : n₁ = n₂ := by
   haveI := smoothOfRelativeDimension_isStableUnderBaseChange n₁
   haveI := smoothOfRelativeDimension_isStableUnderBaseChange n₂
   have e₁ : SmoothOfRelativeDimension n₁ ((a₁ ⁻¹ᵁ W₁).ι ≫ p) :=
@@ -40,13 +52,14 @@ theorem reldim_eq_of_two_pullbacks {P A S : Scheme.{0}} {f : A ⟶ S} {b : A ⟶
       ((isPullback_morphismRestrict a₂ W₂).paste_vert h₂) d₂
   exact relDim_eq_of_mem_of_mem p e₁ e₂ hz₁ hz₂
 
-theorem isPullback_fst_snd {X : Scheme.{0}} (G : Over X) :
-    IsPullback (fst G G) (snd G G) (toUnit G) (toUnit G) := by
+theorem isPullback_fst_snd {X : Scheme.{0}} (G : Over X)
+    : IsPullback (fst G G) (snd G G) (toUnit G) (toUnit G) := by
   exact IsPullback.of_is_product (tensorProductIsBinaryProduct G G) isTerminalTensorUnit
 
-theorem isPullback_mul_snd {X : Scheme.{0}} (G : Over X) [GrpObj G] :
-    IsPullback (fst G G * snd G G) (snd G G) (toUnit G) (toUnit G) := by
-  refine IsPullback.of_is_product (c := BinaryFan.mk (fst G G * snd G G) (snd G G)) ?_ isTerminalTensorUnit
+theorem isPullback_mul_snd {X : Scheme.{0}} (G : Over X) [GrpObj G]
+    : IsPullback (fst G G * snd G G) (snd G G) (toUnit G) (toUnit G) := by
+  refine IsPullback.of_is_product (c := BinaryFan.mk (fst G G * snd G G) (snd G G)) ?_
+    isTerminalTensorUnit
   refine BinaryFan.IsLimit.mk _ (fun u v => lift (u * v⁻¹) v) ?_ ?_ ?_
   · intro T u v
     simp [comp_mul]
@@ -64,9 +77,12 @@ theorem isPullback_mul_snd {X : Scheme.{0}} (G : Over X) [GrpObj G] :
 theorem toUnit_left {X : Scheme.{0}} (G : Over X) : (toUnit G).left = G.hom := by
   simpa using Over.w (toUnit G)
 
-theorem reldim_eq_unit {X : Scheme.{0}} (G : Over X) [GrpObj G] {n m : ℕ} {W V : G.left.Opens}
-    (dW : SmoothOfRelativeDimension n (W.ι ≫ G.hom)) (dV : SmoothOfRelativeDimension m (V.ι ≫ G.hom))
-    (g : G.left) (hg : g ∈ W) (hV : eSec G (G.hom g) ∈ V) : n = m := by
+theorem reldim_eq_unit
+    {X : Scheme.{0}} (G : Over X) [GrpObj G]
+    {n m : ℕ} {W V : G.left.Opens} (dW : SmoothOfRelativeDimension n (W.ι ≫ G.hom))
+    (dV : SmoothOfRelativeDimension m (V.ι ≫ G.hom))
+    (g : G.left) (hg : g ∈ W) (hV : eSec G (G.hom g) ∈ V)
+    : n = m := by
   have h₁ := (isPullback_fst_snd G).map (Over.forget X)
   have h₂ := (isPullback_mul_snd G).map (Over.forget X)
   simp only [Over.forget_map, toUnit_left] at h₁ h₂
@@ -85,9 +101,10 @@ theorem reldim_eq_unit {X : Scheme.{0}} (G : Over X) [GrpObj G] {n m : ℕ} {W V
     unfold eSec at hV
     exact hV
 
-private theorem smoothOfRelativeDimension_of_local {A S : Scheme.{0}} (f : A ⟶ S) (n : ℕ)
-    (h : ∀ x : A, ∃ W : A.Opens, x ∈ W ∧ SmoothOfRelativeDimension n (W.ι ≫ f)) :
-    SmoothOfRelativeDimension n f := by
+private theorem smoothOfRelativeDimension_of_local
+    {A S : Scheme.{0}} (f : A ⟶ S)
+    (n : ℕ) (h : ∀ x : A, ∃ W : A.Opens, x ∈ W ∧ SmoothOfRelativeDimension n (W.ι ≫ f))
+    : SmoothOfRelativeDimension n f := by
   rw [smoothOfRelativeDimension_iff]
   intro x
   obtain ⟨W, hxW, hW⟩ := h x
@@ -107,15 +124,19 @@ private theorem smoothOfRelativeDimension_of_local {A S : Scheme.{0}} (f : A ⟶
   have h1 := h0.comp hstd
   rwa [zero_add] at h1
 
-theorem smoothGrp_relDim : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] [Smooth G.hom],
-    (∀ q : X, genPt ξ ⤳ q) → ∃ g : ℕ, SmoothOfRelativeDimension g G.hom := by
+theorem smoothGrp_relDim
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (G : Over X) [GrpObj G] [Smooth G.hom],
+      (∀ q : X, genPt ξ ⤳ q) → ∃ g : ℕ, SmoothOfRelativeDimension g G.hom := by
   intro X Ω _ ξ G _ _ hgen
-  obtain ⟨n₀, W₀, hW₀, d₀⟩ := ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom (eSec G (genPt ξ))
+  obtain ⟨n₀, W₀, hW₀, d₀⟩ :=
+    ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom (eSec G (genPt ξ))
   refine ⟨n₀, smoothOfRelativeDimension_of_local G.hom n₀ fun g => ?_⟩
   obtain ⟨n, W, hgW, dW⟩ := ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom g
-  obtain ⟨m, V, hV, dV⟩ := ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom (eSec G (G.hom g))
+  obtain ⟨m, V, hV, dV⟩ :=
+    ReciprocityTheory.ChartRestriction.G.H1.exists_dim G.hom (eSec G (G.hom g))
   have h₁ : n = m := reldim_eq_unit G dW dV g hgW hV
-  have hsp : eSec G (genPt ξ) ⤳ eSec G (G.hom g) := (hgen (G.hom g)).map (eSec G).base.hom.continuous
+  have hsp : eSec G (genPt ξ) ⤳ eSec G (G.hom g) :=
+    (hgen (G.hom g)).map (eSec G).base.hom.continuous
   have h₂ : m = n₀ := relDim_eq_of_mem_of_mem G.hom dV d₀ (hsp.mem_open V.isOpen hV) hW₀
   rw [h₁, h₂] at dW
   exact ⟨W, hgW, dW⟩

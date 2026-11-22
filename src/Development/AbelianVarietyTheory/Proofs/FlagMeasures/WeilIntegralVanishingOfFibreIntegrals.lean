@@ -12,12 +12,13 @@ open MeasureTheory GlobalTheory.Dec
 
 namespace GlobalTheory.Dec
 
-theorem integral_mul_eq_zero_of_cutoff {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+theorem integral_mul_eq_zero_of_cutoff
+    {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
     (μ ν : Measure G) [SFinite μ] [SFinite ν] [μ.IsMulLeftInvariant]
     (β : G → ENNReal) (hβ : Measurable β) (hβt : ∀ y, β y ≠ ⊤) (hβ1 : ∀ y, ∫⁻ m, β (m⁻¹ * y) ∂ν = 1)
     (F φ : G → ℂ) (hF : Measurable F) (hφ : Measurable φ) (hinv : ∀ᵐ m ∂ν, ∀ y, F (m * y) = F y)
-    (hint : Integrable (fun y => F y * φ y) μ) (h0 : ∀ y, ∫ m, φ (m * y) ∂ν = 0) :
-    ∫ y, F y * φ y ∂μ = 0 := by
+    (hint : Integrable (fun y => F y * φ y) μ) (h0 : ∀ y, ∫ m, φ (m * y) ∂ν = 0)
+    : ∫ y, F y * φ y ∂μ = 0 := by
   set f : G × G → ℂ := fun p => ((β (p.1⁻¹ * p.2)).toReal : ℂ) * (F p.2 * φ p.2) with hf_def
   have hβm : Measurable fun p : G × G => β (p.1⁻¹ * p.2) :=
     hβ.comp (measurable_fst.inv.mul measurable_snd)
@@ -32,7 +33,8 @@ theorem integral_mul_eq_zero_of_cutoff {G : Type} [Group G] [MeasurableSpace G] 
     rw [integral_toReal (hβy y).aemeasurable (Filter.Eventually.of_forall fun m => (hβt _).lt_top),
       hβ1 y, ENNReal.toReal_one]
   have hfibI : ∀ y, Integrable (fun m => (β (m⁻¹ * y)).toReal) ν := fun y =>
-    integrable_toReal_of_lintegral_ne_top (hβy y).aemeasurable (by rw [hβ1 y]; exact ENNReal.one_ne_top)
+    integrable_toReal_of_lintegral_ne_top (hβy y).aemeasurable
+      (by rw [hβ1 y]; exact ENNReal.one_ne_top)
 
   have hA : ∫ y, F y * φ y ∂μ = ∫ y, ∫ m, f (m, y) ∂ν ∂μ := by
     refine integral_congr_ae (Filter.Eventually.of_forall fun y => ?_)
@@ -56,26 +58,26 @@ theorem integral_mul_eq_zero_of_cutoff {G : Type} [Group G] [MeasurableSpace G] 
     measurePreserving_prod_mul ν μ
   have hemb : MeasurableEmbedding (fun p : G × G => (p.1, p.1 * p.2)) :=
     (MeasurableEquiv.shearMulRight G).measurableEmbedding
-  have hae : ∀ᵐ p ∂(ν.prod μ),
-      f (p.1, p.1 * p.2) = ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2)) := by
-    have h1 : ∀ᵐ p ∂(ν.prod μ), ∀ y, F (p.1 * y) = F y :=
-      Measure.quasiMeasurePreserving_fst.ae hinv
+  have hae
+      : ∀ᵐ p ∂(ν.prod μ),
+        f (p.1, p.1 * p.2) = ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2)) := by
+    have h1 : ∀ᵐ p ∂(ν.prod μ), ∀ y, F (p.1 * y) = F y := Measure.quasiMeasurePreserving_fst.ae hinv
     filter_upwards [h1] with p hp
     simp only [hf_def, inv_mul_cancel_left, hp]
-  have hgI : Integrable (fun p : G × G => ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2)))
-      (ν.prod μ) :=
+  have hgI
+      : Integrable (fun p : G × G => ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2))) (ν.prod μ) :=
     ((hmp.integrable_comp_emb hemb).2 hfI).congr hae
-  calc ∫ y, F y * φ y ∂μ
-      = ∫ p, ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2)) ∂(ν.prod μ) := by
-        rw [hA, ← integral_prod_symm f hfI, ← hmp.integral_comp hemb f]
-        exact integral_congr_ae hae
+  calc
+    ∫ y, F y * φ y ∂μ = ∫ p, ((β p.2).toReal : ℂ) * (F p.2 * φ (p.1 * p.2)) ∂(ν.prod μ) := by
+      rw [hA, ← integral_prod_symm f hfI, ← hmp.integral_comp hemb f]
+      exact integral_congr_ae hae
     _ = ∫ z, ∫ m, ((β z).toReal : ℂ) * (F z * φ (m * z)) ∂ν ∂μ := integral_prod_symm _ hgI
     _ = 0 := by
-        have hz : ∀ z, ∫ m, ((β z).toReal : ℂ) * (F z * φ (m * z)) ∂ν = 0 := by
-          intro z
-          simp_rw [← mul_assoc]
-          rw [integral_const_mul, h0 z, mul_zero]
-        simp only [hz, integral_zero]
+      have hz : ∀ z, ∫ m, ((β z).toReal : ℂ) * (F z * φ (m * z)) ∂ν = 0 := by
+        intro z
+        simp_rw [← mul_assoc]
+        rw [integral_const_mul, h0 z, mul_zero]
+      simp only [hz, integral_zero]
 
 theorem weilVanish : WeilVanish := by
   unfold WeilVanish

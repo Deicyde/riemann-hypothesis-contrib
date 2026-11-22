@@ -28,8 +28,8 @@ universe u w
 namespace SnapperSectionClosed
 
 theorem snapperFinite : SnapperFinite.Statement.{u, w, w} :=
-  SnapperFinite.proof Extension.full Extension.full TwistTilde.proof TwistTilde.proof TildeShift.proof
-    (TildeFiniteE.proof SerreFinite.full)
+  SnapperFinite.proof Extension.full Extension.full TwistTilde.proof TwistTilde.proof
+    TildeShift.proof (TildeFiniteE.proof SerreFinite.full)
 
 theorem quotAdd : SnapperQuotAdd.Statement.{u, w, w} :=
   SnapperQuotAdd.proof (SnapperSubquotFinite.proof snapperFinite)
@@ -39,9 +39,9 @@ theorem quotDevissage : SnapperQuotDevissage.Statement.{u, w, w} :=
 
 end SnapperSectionClosed
 
-
 open SnapperSectionClosed in
 theorem SnapperSection.full : SnapperSection.Statement.{u, w} :=
-  SnapperSection.proof quotAdd quotDevissage MulQuotEq.proof SectionNonvanish.proof SectionMulInj.proof
+  SnapperSection.proof quotAdd quotDevissage MulQuotEq.proof SectionNonvanish.proof
+    SectionMulInj.proof
 
 end GroundTheory.Heights₂.Heights.Kleiman

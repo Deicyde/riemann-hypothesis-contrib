@@ -153,7 +153,37 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat
 
 open Matrix Metric Filter Topology GroundTheory.Heights₂.Heights.Regular QuotLoc
 
-theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type) [AddCommGroup Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ] (E : LinearMap.BilinForm ℤ Λ) (Γ : (Fin n → ℂ) → AddSubgroup (Fin g → ℂ)) (Hf : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (U : Set (Fin n → ℂ)) (Γ₀ : Submodule ℤ (Fin g → ℂ)) (S : Γ₀ → (Fin n → ℂ) → (Fin g → ℂ)), U = {z | z ∈ Metric.ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0} → Module.finrank ℤ Λ = 2 * g → (∀ x, E x x = 0) → Function.Bijective E → (∀ z ∈ U, (Hf z).IsHermitian ∧ ∀ x : Fin g → ℂ, x ≠ 0 → 0 < (x ⬝ᵥ Hf z *ᵥ star x).re) → (∀ z₀ ∈ U, ∃ N : Set (Fin n → ℂ), IsOpen N ∧ z₀ ∈ N ∧ N ⊆ U ∧ ∃ P : (Fin n → ℂ) → (Λ →+ (Fin g → ℂ)), (∀ x, DifferentiableOn ℂ (fun z => P z x) N) ∧ ∀ z ∈ N, Function.Injective (P z) ∧ (P z).range = Γ z ∧ ∀ x y, (P z x ⬝ᵥ Hf z *ᵥ star (P z y)).im = E x y) → (∀ x, DifferentiableOn ℂ (S x) (Metric.ball 0 1) ∧ S x 0 = x ∧ ∀ z ∈ U, S x z ∈ Γ z) → (∀ x y z, S (x + y) z = S x z + S y z) → (∀ s : (Fin n → ℂ) → (Fin g → ℂ), ContinuousAt s 0 → (∀ z ∈ U, s z ∈ Γ z) → s 0 ∈ Γ₀) → Submodule.span ℂ (Γ₀ : Set (Fin g → ℂ)) = ⊤ → (∀ N : ℕ, 0 < N → ∃ T : Set (Γ₀ ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : Γ₀ →ₗ[ℤ] Γ₀))), Nat.card (Γ₀ ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : Γ₀ →ₗ[ℤ] Γ₀))) * Nat.card T = N ^ (2 * g) ∧ ∀ x y : Γ₀, Submodule.Quotient.mk x ∈ T → ∀ z ∈ U, ∃ k : ℤ, (S x z ⬝ᵥ Hf z *ᵥ star (S y z)).im = N * k) → ∃ L : LogPeriods n a g Λ, L.H = Hf ∧ ∀ w ∈ GroundTheory.Heights₂.Heights.Regular.logCover L.a_le, (L.P w).range = Γ (GroundTheory.Heights₂.Heights.Regular.expCover a w) := by
+theorem exists_logPeriods_range_eq
+    : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type) [AddCommGroup Λ] [Module.Free ℤ Λ] [Module.Finite ℤ Λ]
+        (E : LinearMap.BilinForm ℤ Λ) (Γ : (Fin n → ℂ) → AddSubgroup (Fin g → ℂ))
+        (Hf : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (U : Set (Fin n → ℂ))
+        (Γ₀ : Submodule ℤ (Fin g → ℂ)) (S : Γ₀ → (Fin n → ℂ) → (Fin g → ℂ)),
+      U = {z | z ∈ Metric.ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0}
+        → Module.finrank ℤ Λ = 2 * g → (∀ x, E x x = 0) → Function.Bijective E
+        → (∀ z ∈ U, (Hf z).IsHermitian ∧ ∀ x : Fin g → ℂ, x ≠ 0 → 0 < (x ⬝ᵥ Hf z *ᵥ star x).re)
+        → (∀ z₀ ∈ U, ∃ N : Set (Fin n → ℂ),
+          IsOpen N ∧ z₀ ∈ N ∧ N ⊆ U
+            ∧ ∃ P : (Fin n → ℂ) → (Λ →+ (Fin g → ℂ)),
+              (∀ x, DifferentiableOn ℂ (fun z => P z x) N)
+                ∧ ∀ z ∈ N,
+                  Function.Injective (P z) ∧ (P z).range = Γ z
+                    ∧ ∀ x y, (P z x ⬝ᵥ Hf z *ᵥ star (P z y)).im = E x y)
+        → (∀ x, DifferentiableOn ℂ (S x) (Metric.ball 0 1) ∧ S x 0 = x ∧ ∀ z ∈ U, S x z ∈ Γ z)
+        → (∀ x y z, S (x + y) z = S x z + S y z)
+        → (∀ s : (Fin n → ℂ) → (Fin g → ℂ), ContinuousAt s 0 → (∀ z ∈ U, s z ∈ Γ z) → s 0 ∈ Γ₀)
+        → Submodule.span ℂ (Γ₀ : Set (Fin g → ℂ)) = ⊤
+        → (∀ N : ℕ,
+          0 < N
+            → ∃ T : Set (Γ₀ ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : Γ₀ →ₗ[ℤ] Γ₀))),
+              Nat.card (Γ₀ ⧸ LinearMap.range ((N : ℤ) • (LinearMap.id : Γ₀ →ₗ[ℤ] Γ₀))) * Nat.card T
+                  = N ^ (2 * g)
+                ∧ ∀ x y : Γ₀,
+                  Submodule.Quotient.mk x ∈ T
+                    → ∀ z ∈ U, ∃ k : ℤ, (S x z ⬝ᵥ Hf z *ᵥ star (S y z)).im = N * k)
+        → ∃ L : LogPeriods n a g Λ,
+          L.H = Hf
+            ∧ ∀ w ∈ GroundTheory.Heights₂.Heights.Regular.logCover L.a_le,
+              (L.P w).range = Γ (GroundTheory.Heights₂.Heights.Regular.expCover a w) := by
   intro n a g h Λ _ _ _ E Γ Hf U Γ₀ S hU hrank halt hbij hpos hloc hS hadd hlim hspan hcount
   subst hU
   haveI : Countable Λ := (Module.finBasis ℤ Λ).equivFun.injective.countable
@@ -165,24 +195,39 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
   have hdiff : DifferentiableOn ℂ (expCover (n := n) a) (logCover h) :=
     differentiable_expCover.differentiableOn
 
-  obtain ⟨P, hPhol, hP0⟩ := GlobalTheory.T.holomorphic_lattice_family_local n g Λ (logCover h) hBo hBc
-    (fun w => Γ (expCover a w)) (fun w u v => (u ⬝ᵥ Hf (expCover a w) *ᵥ star v).im)
-    (fun x y => (E x y : ℝ)) (by
-      intro w₀ hw₀
-      obtain ⟨N, hNo, hz, hNU, P, hPh, hPp⟩ := hloc _ (hmem w₀ hw₀)
-      refine ⟨logCover h ∩ expCover a ⁻¹' N,
-        hBo.inter (hNo.preimage (continuous_expCover a)), ⟨hw₀, hz⟩, Set.inter_subset_left,
-        fun w => P (expCover a w), fun x => ?_, fun w hw => hPp _ hw.2⟩
-      exact (hPh x).comp (hdiff.mono Set.inter_subset_left) (fun w hw => hw.2))
-  have hP : ∀ w ∈ logCover h, Function.Injective (P w) ∧ (P w).range = Γ (expCover a w) ∧
-      ∀ x y, (P w x ⬝ᵥ Hf (expCover a w) *ᵥ star (P w y)).im = (E x y : ℝ) := hP0
+  obtain ⟨P, hPhol, hP0⟩ :=
+    GlobalTheory.T.holomorphic_lattice_family_local n g Λ (logCover h) hBo hBc
+      (fun w => Γ (expCover a w))
+      (fun w u v => (u ⬝ᵥ Hf (expCover a w) *ᵥ star v).im)
+      (fun x y => (E x y : ℝ))
+      (by
+        intro w₀ hw₀
+        obtain ⟨N, hNo, hz, hNU, P, hPh, hPp⟩ := hloc _ (hmem w₀ hw₀)
+        refine ⟨
+          logCover h ∩ expCover a ⁻¹' N,
+          hBo.inter (hNo.preimage (continuous_expCover a)),
+          ⟨hw₀, hz⟩,
+          Set.inter_subset_left,
+          fun w => P (expCover a w),
+          fun x => ?_,
+          fun w hw => hPp _ hw.2
+        ⟩
+        exact (hPh x).comp (hdiff.mono Set.inter_subset_left) (fun w hw => hw.2))
+  have hP
+      : ∀ w ∈ logCover h,
+        Function.Injective (P w) ∧ (P w).range = Γ (expCover a w)
+          ∧ ∀ x y, (P w x ⬝ᵥ Hf (expCover a w) *ᵥ star (P w y)).im = (E x y : ℝ) :=
+    hP0
 
-  have hT : ∀ i : Fin a, ∃ T : Λ ≃+ Λ, ∀ w ∈ logCover h, ∀ x,
-      P (w + Pi.single (Fin.castLE h i) (2 * Real.pi * Complex.I)) x = P w (T x) := by
+  have hT
+      : ∀ i : Fin a, ∃ T : Λ ≃+ Λ, ∀ w ∈ logCover h, ∀ x,
+        P (w + Pi.single (Fin.castLE h i) (2 * Real.pi * Complex.I)) x = P w (T x) := by
     intro i
     refine exists_const_addEquiv_of_range_eq n g Λ Λ (logCover h) hBo hBp hBn P
-      (fun w => P (w + Pi.single (Fin.castLE h i) (2 * Real.pi * Complex.I))) hPhol
-      (fun x => ?_) (fun w hw => ?_)
+      (fun w => P (w + Pi.single (Fin.castLE h i) (2 * Real.pi * Complex.I)))
+      hPhol
+      (fun x => ?_)
+      (fun w hw => ?_)
     · refine (hPhol x).comp (differentiableOn_id.add_const _) (fun w hw => ?_)
       exact add_single_mem_logCover h i hw
     · have hw' := add_single_mem_logCover h i hw
@@ -193,7 +238,9 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
   have hsec : ∀ x : Γ₀, ∃ l : Λ, ∀ w ∈ logCover h, S x (expCover a w) = P w l := by
     intro x
     refine exists_const_of_section_mem_range n g Λ (logCover h) hBo hBp hBn P
-      (fun w => S x (expCover a w)) hPhol ?_ (fun w hw => ?_)
+      (fun w => S x (expCover a w))
+      hPhol ?_
+      (fun w hw => ?_)
     · exact (hS x).1.comp hdiff (fun w hw => expCover_mem_ball h hw)
     · rw [(hP w hw).2.1]
       exact (hS x).2.2 _ (hmem w hw)
@@ -207,8 +254,10 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
   have lam_apply : ∀ x, lam x = l x := fun _ => rfl
   have hcont : ∀ x : Γ₀, ContinuousAt (S x) 0 := fun x =>
     ((hS x).1.differentiableAt (ball_mem_nhds _ one_pos)).continuousAt
-  have hlamz : ∀ x, ∀ z ∈ {z | z ∈ ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0},
-      ∃ w ∈ logCover h, expCover a w = z ∧ S x z = P w (lam x) := by
+  have hlamz
+      : ∀ x, ∀ z ∈ {z | z ∈ ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0},
+        ∃ w ∈ logCover h,
+          expCover a w = z ∧ S x z = P w (lam x) := by
     intro x z hz
     obtain ⟨w, hw, rfl⟩ := exists_mem_logCover h hz
     exact ⟨w, hw, rfl, hl x w hw⟩
@@ -222,8 +271,9 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
   have hsat : ∀ (k : ℤ) x, k ≠ 0 → k • x ∈ LinearMap.range lam → x ∈ LinearMap.range lam := by
     rintro k x hk ⟨y, hy⟩
     have hkc : (k : ℂ) ≠ 0 := by exact_mod_cast hk
-    have hval : ∀ z ∈ {z | z ∈ ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0},
-        (k : ℂ)⁻¹ • S y z ∈ Γ z := by
+    have hval
+        : ∀ z ∈ {z | z ∈ ball (0 : Fin n → ℂ) 1 ∧ ∀ i : Fin n, i.val < a → z i ≠ 0},
+          (k : ℂ)⁻¹ • S y z ∈ Γ z := by
       intro z hz
       obtain ⟨w, hw, rfl, e⟩ := hlamz y z hz
       have : (k : ℂ)⁻¹ • S y (expCover a w) = P w x := by
@@ -232,7 +282,8 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
       exact ⟨x, rfl⟩
     have hy0 : (k : ℂ)⁻¹ • (y : Fin g → ℂ) ∈ Γ₀ := by
       have hc : ContinuousAt (fun z => (k : ℂ)⁻¹ • S y z) 0 :=
-        ContinuousAt.comp (g := fun v : Fin g → ℂ => (k : ℂ)⁻¹ • v)
+        ContinuousAt.comp
+          (g := fun v : Fin g → ℂ => (k : ℂ)⁻¹ • v)
           (continuous_const_smul _).continuousAt (hcont y)
       have := hlim (fun z => (k : ℂ)⁻¹ • S y z) hc hval
       simpa [(hS y).2.1] using this
@@ -244,30 +295,44 @@ theorem exists_logPeriods_range_eq : ∀ (n a g : ℕ) (_h : a ≤ n) (Λ : Type
     apply smul_right_injective Λ hk
     change k • lam ⟨_, hy0⟩ = k • x
     rw [← map_zsmul, hky, hy]
-  have hco := coiso_of_count E hbij halt lam hinj hsat (fun N hN => by
-    obtain ⟨T', hcard, hdvd⟩ := hcount N hN
-    refine ⟨T', by rw [hrank]; exact hcard, fun x y hx => ?_⟩
-    obtain ⟨k, hk⟩ := hdvd x y hx _ (hmem w₀ hw₀)
-    rw [hl x w₀ hw₀, hl y w₀ hw₀, (hP w₀ hw₀).2.2] at hk
-    exact ⟨k, by exact_mod_cast hk⟩)
+  have hco :=
+    coiso_of_count E hbij halt lam hinj hsat (fun N hN => by
+      obtain ⟨T', hcard, hdvd⟩ := hcount N hN
+      refine ⟨T', by rw [hrank]; exact hcard, fun x y hx => ?_⟩
+      obtain ⟨k, hk⟩ := hdvd x y hx _ (hmem w₀ hw₀)
+      rw [hl x w₀ hw₀, hl y w₀ hw₀, (hP w₀ hw₀).2.2] at hk
+      exact ⟨k, by exact_mod_cast hk⟩)
   let e : Γ₀ ≃ₗ[ℤ] LinearMap.range lam := LinearEquiv.ofInjective lam hinj
   have he : ∀ x : LinearMap.range lam, lam (e.symm x) = x := fun x => by
     have := congrArg Subtype.val (e.apply_symm_apply x)
     simpa [e] using this
-  refine ⟨{ a_le := h, free := inferInstance, fin := inferInstance, rank := hrank, E := E, alt := halt,
-            unimod := hbij, P := P, hol := hPhol, H := Hf,
-            herm := fun w hw => (hpos _ (hmem w hw)).1,
-            pos := fun w hw => (hpos _ (hmem w hw)).2,
-            im := fun w hw => (hP w hw).2.2,
-            T := fun i => (T i).toAddMonoidHom.toIntLinearMap,
-            mono := fun i w hw x => hT i w hw x,
-            W := LinearMap.range lam,
-            coiso := fun x hx => ⟨1, one_ne_zero, by simpa using hco x hx⟩,
-            s := fun x => S (e.symm x),
-            s_hol := fun x => (hS _).1,
-            s_eq := fun x w hw => by
-              rw [hl _ w hw, ← lam_apply, he],
-            span := ?_ }, rfl, fun w hw => (hP w hw).2.1⟩
+  refine ⟨
+    {
+      a_le := h
+      free := inferInstance
+      fin := inferInstance
+      rank := hrank
+      E := E
+      alt := halt
+      unimod := hbij
+      P := P
+      hol := hPhol
+      H := Hf
+      herm := fun w hw => (hpos _ (hmem w hw)).1
+      pos := fun w hw => (hpos _ (hmem w hw)).2
+      im := fun w hw => (hP w hw).2.2
+      T := fun i => (T i).toAddMonoidHom.toIntLinearMap
+      mono := fun i w hw x => hT i w hw x
+      W := LinearMap.range lam
+      coiso := fun x hx => ⟨1, one_ne_zero, by simpa using hco x hx⟩
+      s := fun x => S (e.symm x)
+      s_hol := fun x => (hS _).1
+      s_eq := fun x w hw => by rw [hl _ w hw, ← lam_apply, he]
+      span := ?_
+    },
+    rfl,
+    fun w hw => (hP w hw).2.1
+  ⟩
   have hr : (Set.range fun x : LinearMap.range lam => S (e.symm x) 0) = (Γ₀ : Set (Fin g → ℂ)) := by
     ext u
     constructor

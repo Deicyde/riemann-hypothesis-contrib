@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_denchar :
-    ∀ {R : Type} [CommRing R] [Algebra ℚ R] {N : ℕ} (k : ℕ) (Φ : ZMod N → R) (A : Subring R), 0 < N → (∀ a, Φ a ∈ A) → (den N k : R) * genB k Φ ∈ A := by
+theorem UpperTheory.V.Bern.b_denchar
+    : ∀ {R : Type} [CommRing R] [Algebra ℚ R] {N : ℕ} (k : ℕ) (Φ : ZMod N → R) (A : Subring R),
+      0 < N → (∀ a, Φ a ∈ A) → (den N k : R) * genB k Φ ∈ A := by
   intro R _ _ N k Φ A hN hΦ
   unfold genB
   rw [Finset.mul_sum]

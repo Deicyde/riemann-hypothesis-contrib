@@ -18,7 +18,8 @@ theorem idealBasis : IdealBasis := by
     refine ⟨bI.repr ⟨c, hc⟩ 0, bI.repr ⟨c, hc⟩ 1, ?_⟩
     have h := congrArg Subtype.val (bI.sum_repr ⟨c, hc⟩)
     rw [Fin.sum_univ_two, Submodule.coe_add, Submodule.coe_smul_of_tower,
-      Submodule.coe_smul_of_tower] at h
+        Submodule.coe_smul_of_tower]
+      at h
     exact h.symm
   · refine ⟨b.repr (bI 0) 0, b.repr (bI 0) 1, b.repr (bI 1) 0, b.repr (bI 1) 1, ?_, ?_, ?_⟩
     · have h := b.sum_repr (bI 0 : 𝓞 K)

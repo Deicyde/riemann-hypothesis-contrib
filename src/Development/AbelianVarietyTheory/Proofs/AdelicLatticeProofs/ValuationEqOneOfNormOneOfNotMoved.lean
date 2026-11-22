@@ -10,13 +10,19 @@ open scoped TensorProduct Matrix
 
 namespace GlobalTheory.UnRep
 
-theorem intValuation_map_le_of_map_le {R : Type} [CommRing R] [IsDedekindDomain R] (σ : R →+* R)
-    (P : HeightOneSpectrum R) (h : P.asIdeal.map σ ≤ P.asIdeal) (a : R) :
-    P.intValuation (σ a) ≤ P.intValuation a := by
+theorem intValuation_map_le_of_map_le
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (σ : R →+* R) (P : HeightOneSpectrum R) (h : P.asIdeal.map σ ≤ P.asIdeal)
+    (a : R)
+    : P.intValuation (σ a) ≤ P.intValuation a := by
   by_cases ha : a = 0
   · simp [ha]
-  have h1 : P.intValuation a = WithZero.exp (-((Associates.mk P.asIdeal).count
-      (Associates.mk (Ideal.span {a} : Ideal R)).factors : ℕ) : ℤ) := P.intValuation_if_neg ha
+  have h1
+      : P.intValuation a
+        = WithZero.exp
+          (-((Associates.mk P.asIdeal).count (Associates.mk (Ideal.span {a} : Ideal R)).factors : ℕ)
+            : ℤ) :=
+    P.intValuation_if_neg ha
   set k := (Associates.mk P.asIdeal).count (Associates.mk (Ideal.span {a} : Ideal R)).factors
   have h2 : a ∈ P.asIdeal ^ k := (P.intValuation_le_pow_iff_mem a k).1 h1.le
   rw [h1, P.intValuation_le_pow_iff_mem]
@@ -25,10 +31,12 @@ theorem intValuation_map_le_of_map_le {R : Type} [CommRing R] [IsDedekindDomain 
     exact Ideal.pow_right_mono h k
   exact h3 (Ideal.mem_map_of_mem σ h2)
 
-theorem valuation_eq_one_of_norm_one_of_not_moved :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (c : E ≃ₐ[F] E),
-      (∀ x, c (c x) = x) → ∀ (u : E) (P : HeightOneSpectrum (𝓞 E)), u * c u = 1 →
-        ¬ Moved c P.asIdeal → P.valuation E u = 1 := by
+theorem valuation_eq_one_of_norm_one_of_not_moved
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (c : E ≃ₐ[F] E),
+      (∀ x, c (c x) = x)
+        → ∀ (u : E) (P : HeightOneSpectrum (𝓞 E)),
+          u * c u = 1 → ¬ Moved c P.asIdeal → P.valuation E u = 1 := by
   intro F E _ _ _ _ _ c hc u P hu hP
   let σ : 𝓞 E →+* 𝓞 E := RingOfIntegers.mapRingHom (c : E →+* E)
   have hσ : ∀ a : 𝓞 E, ((σ a : 𝓞 E) : E) = c (a : E) := fun a => rfl

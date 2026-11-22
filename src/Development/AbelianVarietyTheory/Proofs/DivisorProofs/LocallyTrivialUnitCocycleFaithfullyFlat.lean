@@ -15,33 +15,27 @@ section Tensor
 
 variable {R B : Type} [CommRing R] [CommRing B] [Algebra R B]
 
-
 variable (R B) in
 noncomputable def m₁₂ : B ⊗[R] B →ₐ[R] B ⊗[R] (B ⊗[R] B) :=
   Algebra.TensorProduct.map (AlgHom.id R B) Algebra.TensorProduct.includeLeft
-
 
 variable (R B) in
 noncomputable def m₁₃ : B ⊗[R] B →ₐ[R] B ⊗[R] (B ⊗[R] B) :=
   Algebra.TensorProduct.map (AlgHom.id R B) Algebra.TensorProduct.includeRight
 
-
 variable (R B) in
-noncomputable def m₂₃ : B ⊗[R] B →ₐ[R] B ⊗[R] (B ⊗[R] B) :=
-  Algebra.TensorProduct.includeRight
+noncomputable def m₂₃ : B ⊗[R] B →ₐ[R] B ⊗[R] (B ⊗[R] B) := Algebra.TensorProduct.includeRight
 
-noncomputable def datum (c : B ⊗[R] B) : B →ₗ[B] B ⊗[R] B :=
-  LinearMap.toSpanSingleton B _ c
+noncomputable def datum (c : B ⊗[R] B) : B →ₗ[B] B ⊗[R] B := LinearMap.toSpanSingleton B _ c
 
 theorem datum_apply (c : B ⊗[R] B) (x : B) : datum c x = c * (x ⊗ₜ[R] (1 : B)) := by
   rw [datum, LinearMap.toSpanSingleton_apply, Algebra.smul_def, mul_comm]
   rfl
 
-theorem lmul'_eq_one {c : B ⊗[R] B} (hu : IsUnit c)
-    (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c) : Algebra.TensorProduct.lmul' R c = (1 : B) := by
+theorem lmul'_eq_one {c : B ⊗[R] B} (hu : IsUnit c) (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c)
+    : Algebra.TensorProduct.lmul' R c = (1 : B) := by
   let μ : B ⊗[R] B →ₐ[R] B := Algebra.TensorProduct.lmul' R
-  let ν : B ⊗[R] (B ⊗[R] B) →ₐ[R] B :=
-    μ.comp (Algebra.TensorProduct.map (AlgHom.id R B) μ)
+  let ν : B ⊗[R] (B ⊗[R] B) →ₐ[R] B := μ.comp (Algebra.TensorProduct.map (AlgHom.id R B) μ)
   have h12 : ν.comp (m₁₂ R B) = μ := by ext <;> simp [ν, μ, m₁₂, Algebra.TensorProduct.one_def]
   have h13 : ν.comp (m₁₃ R B) = μ := by ext <;> simp [ν, μ, m₁₃, Algebra.TensorProduct.one_def]
   have h23 : ν.comp (m₂₃ R B) = μ := by ext <;> simp [ν, μ, m₂₃, Algebra.TensorProduct.one_def]
@@ -49,16 +43,18 @@ theorem lmul'_eq_one {c : B ⊗[R] B} (hu : IsUnit c)
   rw [map_mul, ← AlgHom.comp_apply, ← AlgHom.comp_apply, ← AlgHom.comp_apply, h12, h13, h23] at h'
   exact (hu.map μ).mul_left_cancel (by rw [mul_one]; exact h'.symm)
 
-theorem isDescentDatum {c : B ⊗[R] B} (hu : IsUnit c)
-    (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c) : GlobalTheory.FlatDescent.IsDescentDatum (datum c) := by
-  have ha : ∀ z : B ⊗[R] B, GlobalTheory.FlatDescent.act (A := R) (B := B) (N := B) z = Algebra.TensorProduct.lmul' R z := by
+theorem isDescentDatum {c : B ⊗[R] B} (hu : IsUnit c) (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c)
+    : GlobalTheory.FlatDescent.IsDescentDatum (datum c) := by
+  have ha
+      : ∀ z : B ⊗[R] B,
+        GlobalTheory.FlatDescent.act (A := R) (B := B) (N := B) z
+          = Algebra.TensorProduct.lmul' R z := by
     intro z
     induction z using TensorProduct.induction_on with
     | zero => simp
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
     | tmul b m => simp
-  have h1 : ∀ z : B ⊗[R] B,
-      ((datum c).restrictScalars R).lTensor B z = m₁₂ R B z * m₂₃ R B c := by
+  have h1 : ∀ z : B ⊗[R] B, ((datum c).restrictScalars R).lTensor B z = m₁₂ R B z * m₂₃ R B c := by
     intro z
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -78,10 +74,12 @@ theorem isDescentDatum {c : B ⊗[R] B} (hu : IsUnit c)
     rw [h1, h2, datum_apply, map_mul, map_mul, h, mul_right_comm]
     congr 1
 
-theorem exists_local_tensor [Module.FaithfullyFlat R B] {c : B ⊗[R] B} (hu : IsUnit c)
-    (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c) (P : Ideal R) (hP : P ≠ ⊤) :
-    ∃ s : R, s ∉ P ∧ ∃ x y : B, x * y = algebraMap R B s ∧
-      (1 : B) ⊗ₜ[R] x = c * (x ⊗ₜ[R] (1 : B)) := by
+theorem exists_local_tensor
+    [Module.FaithfullyFlat R B]
+    {c : B ⊗[R] B} (hu : IsUnit c) (h : m₁₃ R B c = m₁₂ R B c * m₂₃ R B c)
+    (P : Ideal R) (hP : P ≠ ⊤)
+    : ∃ s : R,
+      s ∉ P ∧ ∃ x y : B, x * y = algebraMap R B s ∧ (1 : B) ⊗ₜ[R] x = c * (x ⊗ₜ[R] (1 : B)) := by
   have hd := isDescentDatum hu h
   have hI := hd.invertible_invariants
   let I := GlobalTheory.FlatDescent.invariants (datum c)
@@ -111,11 +109,12 @@ theorem exists_local_tensor [Module.FaithfullyFlat R B] {c : B ⊗[R] B} (hu : I
 
 end Tensor
 
-theorem exists_local (R B C D : CommRingCat.{0}) (f : R ⟶ B) (j₁ j₂ : B ⟶ C) (d₁₂ d₂₃ d₁₃ : C ⟶ D)
+theorem exists_local
+    (R B C D : CommRingCat.{0}) (f : R ⟶ B) (j₁ j₂ : B ⟶ C) (d₁₂ d₂₃ d₁₃ : C ⟶ D)
     (hC : IsPushout f f j₁ j₂) (hD : IsPushout j₂ j₁ d₁₂ d₂₃) (h₁ : j₁ ≫ d₁₃ = j₁ ≫ d₁₂)
     (h₂ : j₂ ≫ d₁₃ = j₂ ≫ d₂₃) (hf : f.hom.FaithfullyFlat) (c : Cˣ)
-    (hc : d₁₃.hom (c : C) = d₁₂.hom (c : C) * d₂₃.hom (c : C)) (P : Ideal R) (hP : P.IsPrime) :
-    ∃ s : R, s ∉ P ∧ ∃ x y : B, x * y = f.hom s ∧ j₂.hom x = (c : C) * j₁.hom x := by
+    (hc : d₁₃.hom (c : C) = d₁₂.hom (c : C) * d₂₃.hom (c : C)) (P : Ideal R) (hP : P.IsPrime)
+    : ∃ s : R, s ∉ P ∧ ∃ x y : B, x * y = f.hom s ∧ j₂.hom x = (c : C) * j₁.hom x := by
   letI : Algebra R B := f.hom.toAlgebra
   haveI : Module.FaithfullyFlat R B := hf
   have hT := CommRingCat.isPushout_tensorProduct R B B
@@ -156,8 +155,7 @@ theorem exists_local (R B C D : CommRingCat.{0}) (f : R ⟶ B) (j₁ j₂ : B �
     have q13 : ψ.hom (d₁₃.hom c) = m₁₃ R B (e.hom.hom c) := congrArg (fun q => q.hom (c : C)) p13
     have q23 : ψ.hom (d₂₃.hom c) = m₂₃ R B (e.hom.hom c) := congrArg (fun q => q.hom (c : C)) p23
     rwa [q12, q13, q23] at h'
-  obtain ⟨s, hs, x, y, hxy, hx⟩ :=
-    exists_local_tensor (c.isUnit.map e.hom.hom) hco P hP.ne_top
+  obtain ⟨s, hs, x, y, hxy, hx⟩ := exists_local_tensor (c.isUnit.map e.hom.hom) hco P hP.ne_top
   refine ⟨s, hs, x, y, hxy, ?_⟩
   apply e.commRingCatIsoToRingEquiv.injective
   change e.hom.hom _ = e.hom.hom _

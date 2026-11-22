@@ -8,27 +8,34 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Geometric
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
 namespace GlobalTheory
 
-theorem abLawCst_eq_smallExtLiftCst {X : Scheme} {R : Type} [CommRing R]
-    (f : X ⟶ Spec (CommRingCat.of R)) (U : X.Opens) :
-    GlobalTheory.AbLaw.cst f U = GlobalTheory.SmallExtLift.cst f U := by
+theorem abLawCst_eq_smallExtLiftCst
+    {X : Scheme} {R : Type} [CommRing R] (f : X ⟶ Spec (CommRingCat.of R)) (U : X.Opens)
+    : GlobalTheory.AbLaw.cst f U = GlobalTheory.SmallExtLift.cst f U := by
   ext r
-  simp only [GlobalTheory.AbLaw.cst, GlobalTheory.SmallExtLift.cst, GlobalTheory.AbLaw.rs, Scheme.Hom.appLE,
-    CommRingCat.hom_comp, RingHom.comp_apply, Scheme.Hom.appTop]
+  simp only [GlobalTheory.AbLaw.cst, GlobalTheory.SmallExtLift.cst, GlobalTheory.AbLaw.rs,
+    Scheme.Hom.appLE, CommRingCat.hom_comp, RingHom.comp_apply, Scheme.Hom.appTop]
   rfl
 
-theorem isDomain_quot_maximalIdeal_of_smooth :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Sp R)), Smooth G.hom →
-      GeometricallyConnected G.hom → ∀ (U : G.left.Opens), IsAffineOpen U → ∀ y ∈ U,
-        G.hom y = closedPoint R →
-          IsDomain (Γ(G.left, U) ⧸ (maximalIdeal R).map (GlobalTheory.AbLaw.cst G.hom U)) := by
+theorem isDomain_quot_maximalIdeal_of_smooth
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (G : Over (Sp R)),
+      Smooth G.hom → GeometricallyConnected G.hom
+        → ∀ (U : G.left.Opens),
+          IsAffineOpen U
+            → ∀ y ∈ U,
+              G.hom y = closedPoint R
+                → IsDomain
+                  (Γ(G.left, U) ⧸ (maximalIdeal R).map (GlobalTheory.AbLaw.cst G.hom U)) := by
   intro R _ _ G hsm hgc U hU y hyU hy
   haveI := hsm
   haveI := hgc
@@ -40,7 +47,8 @@ theorem isDomain_quot_maximalIdeal_of_smooth :
   have H : IsPullback q (pullback.snd f g) f g := IsPullback.of_hasPullback f g
   have hsurj : Function.Surjective (q.app U).hom :=
     GlobalTheory.SmallExtLift.app_surj (residue_surjective) H hU
-  have hker : RingHom.ker (q.app U).hom = (maximalIdeal R).map (GlobalTheory.AbLaw.cst G.hom U) := by
+  have hker
+      : RingHom.ker (q.app U).hom = (maximalIdeal R).map (GlobalTheory.AbLaw.cst G.hom U) := by
     rw [abLawCst_eq_smallExtLiftCst]
     apply le_antisymm
     · intro a ha

@@ -13,36 +13,55 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-private theorem injKey {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
-    {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) {T : Scheme.{0}} (j : T ⟶ Y) (r : T ⟶ W)
-    (hw : j ≫ π = r ≫ i) (v : Fin d → Γ(TP B j, ⊤)) (hv : IsV B j v) {V : Scheme.{0}} (p p' : B.ι × Fin d)
-    (a₁ : V ⟶ (oT B j p : Scheme.{0})) (b₁ : V ⟶ (oT B j p' : Scheme.{0}))
+private theorem injKey
+    {K : Type} [CommRing K]
+    {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z}
+    {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d)
+    {T : Scheme.{0}}
+    (j : T ⟶ Y) (r : T ⟶ W) (hw : j ≫ π = r ≫ i) (v : Fin d → Γ(TP B j, ⊤)) (hv : IsV B j v)
+    {V : Scheme.{0}}
+    (p p' : B.ι × Fin d) (a₁ : V ⟶ (oT B j p : Scheme.{0})) (b₁ : V ⟶ (oT B j p' : Scheme.{0}))
     (M : Matrix (Fin d) (Fin d) Γ(V, ⊤))
     (hp : ((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ≫ cP B = ((b₁ ≫ tI B j p') ≫ rhoP B j r hw) ≫ cP B)
     (hG : GMat B ((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ((b₁ ≫ tI B j p') ≫ rhoP B j r hw) M)
     (u : (Γ(V, ⊤))ˣ)
-    (hyp : M.mulVec ((a₁ ≫ tI B j p).appTop.hom ∘ v) = (u : Γ(V, ⊤)) • ((b₁ ≫ tI B j p').appTop.hom ∘ v))
-    (m : Fin d) (hm : ⊤ ≤ ((a₁ ≫ tI B j p) ≫ eP B j ≫ j) ⁻¹ᵁ (B.c p'.1).C m) :
-    (a₁ ≫ tI B j p) ≫ eP B j ≫ j = (b₁ ≫ tI B j p') ≫ eP B j ≫ j := by
+    (hyp : M.mulVec ((a₁ ≫ tI B j p).appTop.hom ∘ v)
+      = (u : Γ(V, ⊤)) • ((b₁ ≫ tI B j p').appTop.hom ∘ v))
+    (m : Fin d) (hm : ⊤ ≤ ((a₁ ≫ tI B j p) ≫ eP B j ≫ j) ⁻¹ᵁ (B.c p'.1).C m)
+    : (a₁ ≫ tI B j p) ≫ eP B j ≫ j = (b₁ ≫ tI B j p') ≫ eP B j ≫ j := by
   obtain ⟨h₁, e₁, -, r₁⟩ := pieceFacts B j r hw v hv p a₁
   obtain ⟨h₂, e₂, -, r₂⟩ := pieceFacts B j r hw v hv p' b₁
   have hL := gMatLoc B _ _ M p.1 p'.1 _ _ r₁ r₂ hG
   have hc := (coverComm B j r hw).1
-  have hy : ((a₁ ≫ tI B j p) ≫ eP B j ≫ j) ≫ π = (((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ≫ cP B) ≫ i := by
+  have hy
+      : ((a₁ ≫ tI B j p) ≫ eP B j ≫ j) ≫ π = (((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ≫ cP B) ≫ i := by
     rw [Category.assoc (a₁ ≫ tI B j p) (rhoP B j r hw) (cP B), hc]
     simp only [Category.assoc, hw]
-  have hy' : ((b₁ ≫ tI B j p') ≫ eP B j ≫ j) ≫ π = (((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ≫ cP B) ≫ i := by
+  have hy'
+      : ((b₁ ≫ tI B j p') ≫ eP B j ≫ j) ≫ π = (((a₁ ≫ tI B j p) ≫ rhoP B j r hw) ≫ cP B) ≫ i := by
     rw [hp, Category.assoc (b₁ ≫ tI B j p') (rhoP B j r hw) (cP B), hc]
     simp only [Category.assoc, hw]
   have hg := gvChart B _ _ hy p.1 p'.1 p.2 m h₁ hm M hL
   rw [e₁, e₂, hg] at hyp
-  refine ratioInj B p'.1 m p'.2 _ _ _ hm h₂ ((D.u _ _ ((secOf_f B p.1 p.2 _ h₁).trans (secOf_f B p'.1 m _ hm).symm)) * u) hy hy' ?_
-  rw [Units.val_mul, mul_smul, ← hyp, smul_smul, ← Units.val_mul, mul_inv_cancel, Units.val_one, one_smul]
+  refine ratioInj B p'.1 m p'.2 _ _ _ hm h₂
+    ((D.u _ _ ((secOf_f B p.1 p.2 _ h₁).trans (secOf_f B p'.1 m _ hm).symm)) * u) hy hy' ?_
+  rw [Units.val_mul, mul_smul, ← hyp, smul_smul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+    one_smul]
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.injField :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) {T : Scheme.{0}} (j : T ⟶ Y) (r : T ⟶ W) (hsq : IsPullback j r π i) (v : Fin d → Γ(TP B j, ⊤)), IsV B j v → ∀ {V : Scheme.{0}} (a b : V ⟶ TP B j) (M : Matrix (Fin d) (Fin d) Γ(V, ⊤)), (a ≫ rhoP B j r hsq.w) ≫ cP B = (b ≫ rhoP B j r hsq.w) ≫ cP B → GMat B (a ≫ rhoP B j r hsq.w) (b ≫ rhoP B j r hsq.w) M → ∀ u : (Γ(V, ⊤))ˣ, M.mulVec (a.appTop.hom ∘ v) = (u : Γ(V, ⊤)) • (b.appTop.hom ∘ v) → a ≫ eP B j = b ≫ eP B j := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.injField
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) {T : Scheme.{0}} (j : T ⟶ Y)
+        (r : T ⟶ W) (hsq : IsPullback j r π i) (v : Fin d → Γ(TP B j, ⊤)),
+      IsV B j v
+        → ∀ {V : Scheme.{0}} (a b : V ⟶ TP B j) (M : Matrix (Fin d) (Fin d) Γ(V, ⊤)),
+          (a ≫ rhoP B j r hsq.w) ≫ cP B = (b ≫ rhoP B j r hsq.w) ≫ cP B
+            → GMat B (a ≫ rhoP B j r hsq.w) (b ≫ rhoP B j r hsq.w) M
+            → ∀ u : (Γ(V, ⊤))ˣ,
+              M.mulVec (a.appTop.hom ∘ v) = (u : Γ(V, ⊤)) • (b.appTop.hom ∘ v)
+                → a ≫ eP B j = b ≫ eP B j := by
   intro K _ W Z Y q i π D d B T j r hsq v hv V a b M hp hG u hyp
   have hc := (coverComm B j r hsq.w).1
   have hrr : a ≫ eP B j ≫ r = b ≫ eP B j ≫ r := by
@@ -60,7 +79,8 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.injField :
 
   have hbx : (b ≫ eP B j ≫ j) x ∈ (B.c p'.1).C p'.2 := by
     obtain ⟨h₂, -, -, -⟩ := pieceFacts B j r hsq.w v hv p' b₁
-    have h3 : ((b₁ ≫ tI B j p') ≫ eP B j ≫ j) (⟨x, hx₂⟩ : U₂) ∈ (B.c p'.1).C p'.2 := h₂ (Set.mem_univ _)
+    have h3 : ((b₁ ≫ tI B j p') ≫ eP B j ≫ j) (⟨x, hx₂⟩ : U₂) ∈ (B.c p'.1).C p'.2 :=
+      h₂ (Set.mem_univ _)
     have h4 : b₁ ≫ tI B j p' = U₂.ι ≫ b := hb.symm
     rw [h4] at h3
     have h6 : ((U₂.ι ≫ b) ≫ eP B j ≫ j) (⟨x, hx₂⟩ : U₂) = (b ≫ eP B j ≫ j) x := by
@@ -86,31 +106,34 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.injField :
     have h : b₁ ≫ tI B j p' = U₂.ι ≫ b := hb.symm
     rw [Category.assoc, h, Scheme.homOfLE_ι_assoc]
   refine ⟨U, hxU, ?_⟩
-  have hk := injKey B j r hsq.w v hv p p' (V.homOfLE l₁ ≫ a₁) (V.homOfLE l₂ ≫ b₁) (M.map U.ι.appTop.hom)
-    (by rw [← ea, ← eb]; simp only [Category.assoc]; simp only [Category.assoc] at hp; rw [hp])
-    (by
-      rw [← ea, ← eb]
-      have h := gMatNat B U.ι _ _ M hG
-      simpa only [Category.assoc] using h)
-    (Units.map (U.ι.appTop.hom : Γ(V, ⊤) →+* Γ((U : Scheme.{0}), ⊤)).toMonoidHom u)
-    (by
-      rw [← ea, ← eb]
-      have hca : ∀ (c : V ⟶ TP B j), (U.ι ≫ c).appTop.hom ∘ v = U.ι.appTop.hom ∘ (c.appTop.hom ∘ v) := by
-        intro c
+  have hk :=
+    injKey B j r hsq.w v hv p p' (V.homOfLE l₁ ≫ a₁) (V.homOfLE l₂ ≫ b₁) (M.map U.ι.appTop.hom)
+      (by rw [← ea, ← eb]; simp only [Category.assoc]; simp only [Category.assoc] at hp; rw [hp])
+      (by
+        rw [← ea, ← eb]
+        have h := gMatNat B U.ι _ _ M hG
+        simpa only [Category.assoc] using h)
+      (Units.map (U.ι.appTop.hom : Γ(V, ⊤) →+* Γ((U : Scheme.{0}), ⊤)).toMonoidHom u)
+      (by
+        rw [← ea, ← eb]
+        have hca
+            : ∀ (c : V ⟶ TP B j),
+              (U.ι ≫ c).appTop.hom ∘ v = U.ι.appTop.hom ∘ (c.appTop.hom ∘ v) := by
+          intro c
+          funext n
+          rw [Scheme.Hom.comp_appTop]
+          rfl
+        rw [hca a, hca b]
         funext n
-        rw [Scheme.Hom.comp_appTop]
-        rfl
-      rw [hca a, hca b]
-      funext n
-      have h2 := congrArg (U.ι.appTop.hom : Γ(V, ⊤) →+* Γ((U : Scheme.{0}), ⊤)) (congrFun hyp n)
-      rw [RingHom.map_mulVec] at h2
-      refine h2.trans ?_
-      simp only [Pi.smul_apply, smul_eq_mul, map_mul, Function.comp_apply]
-      rfl)
-    m
-    (by
-      rw [← ea, Category.assoc U.ι a]
-      intro z _
-      exact l₃ z.2)
+        have h2 := congrArg (U.ι.appTop.hom : Γ(V, ⊤) →+* Γ((U : Scheme.{0}), ⊤)) (congrFun hyp n)
+        rw [RingHom.map_mulVec] at h2
+        refine h2.trans ?_
+        simp only [Pi.smul_apply, smul_eq_mul, map_mul, Function.comp_apply]
+        rfl)
+      m
+      (by
+        rw [← ea, Category.assoc U.ι a]
+        intro z _
+        exact l₃ z.2)
   rw [← ea, ← eb] at hk
   simpa only [Category.assoc] using hk

@@ -19,7 +19,8 @@ namespace UnitaryReduction
 
 namespace DualHomPf
 
-open NumberField Module FunctionalEquationAlt FunctionalEquationAlt.MetSpace NumberField.InfinitePlace
+open NumberField Module FunctionalEquationAlt FunctionalEquationAlt.MetSpace
+  NumberField.InfinitePlace
 open scoped InnerProductSpace nonZeroDivisors ComplexConjugate
 
 section NumberFieldFacts
@@ -41,8 +42,8 @@ section DualBasis
 variable {E : Type} [Field E] [NumberField E]
 variable {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
-theorem exists_extend_of_submodule (A : Submodule (𝓞 E) V) (s : A →ₗ[𝓞 E] 𝓞 E) :
-    ∃ σ : V →ₗ[E] E, ∀ x : A, σ (x : V) = ((s x : 𝓞 E) : E) := by
+theorem exists_extend_of_submodule (A : Submodule (𝓞 E) V) (s : A →ₗ[𝓞 E] 𝓞 E)
+    : ∃ σ : V →ₗ[E] E, ∀ x : A, σ (x : V) = ((s x : 𝓞 E) : E) := by
   classical
   obtain ⟨bs, hbA, _hspan, hli⟩ := exists_linearIndependent E (A : Set V)
   let bb := Basis.span hli
@@ -53,14 +54,13 @@ theorem exists_extend_of_submodule (A : Submodule (𝓞 E) V) (s : A →ₗ[𝓞
     intro i
     have hi : (i : V) ∈ Submodule.span E (Set.range ((↑) : bs → V)) :=
       Submodule.subset_span ⟨i, rfl⟩
-    have h1 : σ (i : V) = σ₀ ⟨i, hi⟩ := by
-      rw [← hσ]; rfl
+    have h1 : σ (i : V) = σ₀ ⟨i, hi⟩ := by rw [← hσ]; rfl
     have h2 : (⟨i, hi⟩ : Submodule.span E (Set.range ((↑) : bs → V))) = bb i := by
       ext; rw [Basis.span_apply]
     rw [h1, h2, Basis.constr_basis]
 
-  have hP : ∀ y ∈ Submodule.span (𝓞 E) (bs : Set V), ∀ hy : y ∈ A,
-      σ y = ((s ⟨y, hy⟩ : 𝓞 E) : E) := by
+  have hP
+      : ∀ y ∈ Submodule.span (𝓞 E) (bs : Set V), ∀ hy : y ∈ A, σ y = ((s ⟨y, hy⟩ : 𝓞 E) : E) := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem x hx => intro hxA; exact hσb ⟨x, hx⟩
@@ -69,9 +69,10 @@ theorem exists_extend_of_submodule (A : Submodule (𝓞 E) V) (s : A →ₗ[𝓞
       intro hxyA
       have hxA : x ∈ A := Submodule.span_le.mpr hbA hx
       have hyA : y ∈ A := Submodule.span_le.mpr hbA hy
-      rw [map_add (f := _), ihx hxA, ihy hyA, show (⟨x + y, hxyA⟩ : A) = ⟨x, hxA⟩ + ⟨y, hyA⟩ from rfl,
-        map_add]
-      push_cast; rfl
+      rw [map_add (f := _), ihx hxA, ihy hyA,
+        show (⟨x + y, hxyA⟩ : A) = ⟨x, hxA⟩ + ⟨y, hyA⟩ from rfl, map_add]
+      push_cast
+      rfl
     | smul c x hx ihx =>
       intro hcxA
       have hxA : x ∈ A := Submodule.span_le.mpr hbA hx
@@ -85,8 +86,8 @@ theorem exists_extend_of_submodule (A : Submodule (𝓞 E) V) (s : A →ₗ[𝓞
   refine ⟨σ, fun x => ?_⟩
   have hx : (x : V) ∈ Submodule.span E (bs : Set V) := by
     rw [_hspan]; exact Submodule.subset_span x.2
-  obtain ⟨m, c, v, hv, hxv⟩ : ∃ (m : ℕ) (c : Fin m → E) (v : Fin m → V), (∀ i, v i ∈ bs) ∧
-      (x : V) = ∑ i, c i • v i := by
+  obtain ⟨m, c, v, hv, hxv⟩
+      : ∃ (m : ℕ) (c : Fin m → E) (v : Fin m → V), (∀ i, v i ∈ bs) ∧ (x : V) = ∑ i, c i • v i := by
     obtain ⟨m, c, g, hg⟩ := (Submodule.mem_span_set').mp hx
     exact ⟨m, c, fun i => (g i : V), fun i => (g i).2, hg.symm⟩
   obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (𝓞 E)⁰ Finset.univ c
@@ -116,10 +117,10 @@ section DualBasis2
 variable {E : Type} [Field E] [NumberField E]
 variable {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
-theorem exists_dualBasis (A : Submodule (𝓞 E) V) (hA : A.FG) :
-    ∃ (n : ℕ) (a : Fin n → V) (σ : Fin n → (V →ₗ[E] E)),
-      (∀ i, a i ∈ A) ∧ (∀ i, ∀ x ∈ A, σ i x ∈ Set.range (algebraMap (𝓞 E) E)) ∧
-      ∀ x ∈ espan A, x = ∑ i, σ i x • a i := by
+theorem exists_dualBasis (A : Submodule (𝓞 E) V) (hA : A.FG)
+    : ∃ (n : ℕ) (a : Fin n → V) (σ : Fin n → (V →ₗ[E] E)),
+      (∀ i, a i ∈ A) ∧ (∀ i, ∀ x ∈ A, σ i x ∈ Set.range (algebraMap (𝓞 E) E))
+        ∧ ∀ x ∈ espan A, x = ∑ i, σ i x • a i := by
   classical
   have : Module.Finite (𝓞 E) A := Module.Finite.iff_fg.mpr hA
   have : Module.Flat (𝓞 E) A := by
@@ -177,7 +178,8 @@ end Fibres
 
 section Adjoints
 
-variable {H₁ H₂ : Type} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [FiniteDimensional ℂ H₁]
+variable
+  {H₁ H₂ : Type} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [FiniteDimensional ℂ H₁]
   [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [FiniteDimensional ℂ H₂]
 
 end Adjoints
@@ -185,7 +187,8 @@ end Adjoints
 section IdealMaps
 
 variable {E : Type} [Field E] [NumberField E]
-variable {V V' : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+variable
+  {V V' : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
   [AddCommGroup V'] [Module E V'] [Module (𝓞 E) V'] [IsScalarTower (𝓞 E) E V']
 
 end IdealMaps

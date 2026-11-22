@@ -20,9 +20,11 @@ section Defs
 variable {F : Type} [Field F] [Fintype F]
 
 def blkM {n : ℕ} (A : Matrix (Fin n) (Fin n) F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F :=
-  (Matrix.fromBlocks A 0 0 (1 : Matrix (Fin 1) (Fin 1) F)).submatrix finSumFinEquiv.symm finSumFinEquiv.symm
+  (Matrix.fromBlocks A 0 0 (1 : Matrix (Fin 1) (Fin 1) F)).submatrix finSumFinEquiv.symm
+    finSumFinEquiv.symm
 
-def blkHom (F : Type) [Field F] (n : ℕ) : Matrix (Fin n) (Fin n) F →* Matrix (Fin (n + 1)) (Fin (n + 1)) F where
+def blkHom (F : Type) [Field F] (n : ℕ)
+    : Matrix (Fin n) (Fin n) F →* Matrix (Fin (n + 1)) (Fin (n + 1)) F where
   toFun := blkM
   map_one' := by
     simp only [blkM, Matrix.fromBlocks_one]
@@ -35,8 +37,8 @@ def blkHom (F : Type) [Field F] (n : ℕ) : Matrix (Fin n) (Fin n) F →* Matrix
 def E (F : Type) [Field F] (n : ℕ) : GL (Fin n) F →* GL (Fin (n + 1)) F := Units.map (blkHom F n)
 
 def colM {n : ℕ} (x : Fin n → F) : Matrix (Fin (n + 1)) (Fin (n + 1)) F :=
-  (Matrix.fromBlocks 1 (Matrix.of fun i (_ : Fin 1) => x i) 0 (1 : Matrix (Fin 1) (Fin 1) F)).submatrix
-    finSumFinEquiv.symm finSumFinEquiv.symm
+  (Matrix.fromBlocks 1 (Matrix.of fun i (_ : Fin 1) => x i) 0
+    (1 : Matrix (Fin 1) (Fin 1) F)).submatrix finSumFinEquiv.symm finSumFinEquiv.symm
 
 theorem colM_mul {n : ℕ} (x y : Fin n → F) : colM x * colM y = colM (x + y) := by
   simp only [colM]
@@ -65,49 +67,61 @@ def LastRowE {n : ℕ} (g : GL (Fin (n + 1)) F) : Prop :=
 end Defs
 
 def Claim (F : Type) [Field F] [Fintype F] (n : ℕ) : Prop :=
-  ∀ (ψ₀ : AddChar F ℂ), ψ₀ ≠ 1 →
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (n + 1)) F) V)
-      (ℓ : Module.Dual ℂ V), ℓ ≠ 0 → IsWhit ψ₀ π ℓ →
-      ∃ p : Fin (D F (n + 1)) → GL (Fin (n + 1)) F,
-        (∀ i, LastRowE (p i)) ∧ LinearIndependent ℂ (fun i => ℓ ∘ₗ π (p i))
+  ∀ (ψ₀ : AddChar F ℂ),
+    ψ₀ ≠ 1
+      → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (n + 1)) F) V)
+          (ℓ : Module.Dual ℂ V),
+        ℓ ≠ 0 → IsWhit ψ₀ π ℓ
+          → ∃ p : Fin (D F (n + 1)) → GL (Fin (n + 1)) F,
+            (∀ i, LastRowE (p i)) ∧ LinearIndependent ℂ (fun i => ℓ ∘ₗ π (p i))
 
 def BaseProp : Prop := ∀ (F : Type) [Field F] [Fintype F], Claim F 0
 
 def StepProp : Prop := ∀ (F : Type) [Field F] [Fintype F] (n : ℕ), Claim F n → Claim F (n + 1)
 
 def UnitriangularBlockExtension : Prop :=
-  ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (u : GL (Fin n) F), IsUni n u →
-    IsUni (n + 1) (E F n u) ∧
-      superdiag (n + 1) (E F n u : Matrix (Fin (n + 1)) (Fin (n + 1)) F) =
-        superdiag n (u : Matrix (Fin n) (Fin n) F)
+  ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (u : GL (Fin n) F),
+    IsUni n u
+      → IsUni (n + 1) (E F n u)
+        ∧ superdiag (n + 1) (E F n u : Matrix (Fin (n + 1)) (Fin (n + 1)) F)
+          = superdiag n (u : Matrix (Fin n) (Fin n) F)
 
 def ColFacts : Prop :=
   ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (x : Fin (n + 1) → F),
-    IsUni (n + 2) (col x) ∧
-      superdiag (n + 2) (col x : Matrix (Fin (n + 2)) (Fin (n + 2)) F) = x (Fin.last n)
+    IsUni (n + 2) (col x)
+      ∧ superdiag (n + 2) (col x : Matrix (Fin (n + 2)) (Fin (n + 2)) F) = x (Fin.last n)
 
 def ConjCol : Prop :=
   ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (A : GL (Fin n) F) (x : Fin n → F),
     E F n A * col x = col ((A : Matrix (Fin n) (Fin n) F) *ᵥ x) * E F n A
 
 def RowExists : Prop :=
-  ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (r : Fin (n + 1) → F), r ≠ 0 →
-    ∃ g : GL (Fin (n + 1)) F, ∀ j, (g : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j = r j
+  ∀ (F : Type) [Field F] [Fintype F] (n : ℕ) (r : Fin (n + 1) → F),
+    r ≠ 0
+      → ∃ g : GL (Fin (n + 1)) F, ∀ j,
+        (g : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (Fin.last n) j = r j
 
 def CharOrth : Prop :=
-  ∀ (F : Type) [Field F] [Fintype F] (m : ℕ) (ψ₀ : AddChar F ℂ), ψ₀ ≠ 1 → ∀ r s : Fin m → F,
-    (∑ x : Fin m → F, ψ₀ (r ⬝ᵥ x) * ψ₀ (-(s ⬝ᵥ x))) = if r = s then (Fintype.card F : ℂ) ^ m else 0
+  ∀ (F : Type) [Field F] [Fintype F] (m : ℕ) (ψ₀ : AddChar F ℂ),
+    ψ₀ ≠ 1
+      → ∀ r s : Fin m → F,
+        (∑ x : Fin m → F, ψ₀ (r ⬝ᵥ x) * ψ₀ (-(s ⬝ᵥ x)))
+          = if r = s then (Fintype.card F : ℂ) ^ m else 0
 
 def SepLemma : Prop :=
   ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (X R ι : Type) [Fintype X] [Fintype R] [Fintype ι]
-    (T : X → W →ₗ[ℂ] W) (χ χ' : R → X → ℂ) (N : ℂ), N ≠ 0 →
-    (∀ r s, ∑ x, χ r x * χ' s x = if r = s then N else 0) →
-    ∀ f : R × ι → W, (∀ x r i, T x (f (r, i)) = χ r x • f (r, i)) →
-      (∀ r, LinearIndependent ℂ (fun i => f (r, i))) → LinearIndependent ℂ f
+      (T : X → W →ₗ[ℂ] W) (χ χ' : R → X → ℂ) (N : ℂ),
+    N ≠ 0 → (∀ r s, ∑ x, χ r x * χ' s x = if r = s then N else 0)
+      → ∀ f : R × ι → W,
+        (∀ x r i, T x (f (r, i)) = χ r x • f (r, i))
+          → (∀ r, LinearIndependent ℂ (fun i => f (r, i)))
+          → LinearIndependent ℂ f
 
-def StepOf : Prop := UnitriangularBlockExtension → ColFacts → ConjCol → RowExists → CharOrth → SepLemma → StepProp
+def StepOf : Prop :=
+  UnitriangularBlockExtension → ColFacts → ConjCol → RowExists → CharOrth → SepLemma → StepProp
 
-theorem claim_all (hb : BaseProp) (hs : StepProp) (F : Type) [Field F] [Fintype F] : ∀ n, Claim F n := by
+theorem claim_all (hb : BaseProp) (hs : StepProp) (F : Type) [Field F] [Fintype F]
+    : ∀ n, Claim F n := by
   intro n
   induction n with
   | zero => exact hb F
@@ -130,8 +144,10 @@ theorem mirabolicBound_of (hb : BaseProp) (hs : StepProp) : MirabolicBound := by
     rw [Fintype.card_fin, Subspace.dual_finrank_eq] at h1
     exact h1
 
-theorem mirabolicBound_of_steps (hb : BaseProp) (hst : StepOf) (h1 : UnitriangularBlockExtension) (h2 : ColFacts) (h3 : ConjCol)
-    (h4 : RowExists) (h5 : CharOrth) (h6 : SepLemma) : MirabolicBound :=
+theorem mirabolicBound_of_steps
+    (hb : BaseProp) (hst : StepOf) (h1 : UnitriangularBlockExtension) (h2 : ColFacts) (h3 : ConjCol)
+    (h4 : RowExists) (h5 : CharOrth) (h6 : SepLemma)
+    : MirabolicBound :=
   mirabolicBound_of hb (hst h1 h2 h3 h4 h5 h6)
 
 end

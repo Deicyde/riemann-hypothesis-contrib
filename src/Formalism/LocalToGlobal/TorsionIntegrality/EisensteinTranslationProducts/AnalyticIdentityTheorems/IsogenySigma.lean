@@ -13,7 +13,6 @@ namespace IsogenySigmaQuotient
 
 variable (L : PeriodPair)
 
-
 open Classical in
 def ind (x : ℂ) : WithTop ℤ := by
   classical
@@ -387,9 +386,10 @@ lemma fac_eq (hb : SgStarBasic) (hsa : SgStarAdd) (P z : ℂ) (hP : P ∉ L.latt
 end IsogenySigmaQuotient
 
 open IsogenySigmaQuotient in
-theorem isogenySigma_of (hN : EllipticNoPole) (hord : SigmaOrder) (hsa : SgStarAdd)
-    (hq : SgStarQuasi) (hb : SgStarBasic) (hcard : KerRepsCard) (he : SigmaEntire) :
-    IsogenySigma := by
+theorem isogenySigma_of
+    (hN : EllipticNoPole) (hord : SigmaOrder) (hsa : SgStarAdd) (hq : SgStarQuasi)
+    (hb : SgStarBasic) (hcard : KerRepsCard) (he : SigmaEntire)
+    : IsogenySigma := by
   intro L α S hα hst hS z hz
   have hc := hcard L α S hα hst hS
   have hS' : ∀ P ∈ S, P ∉ L.lattice := fun P hP => (hS.1 P hP).2
@@ -398,8 +398,8 @@ theorem isogenySigma_of (hN : EllipticNoPole) (hord : SigmaOrder) (hsa : SgStarA
   subst h1
   have h := hc' z
   simp only [num, den, one_mul] at h
-  rw [h, Finset.prod_congr rfl (fun P hP => fac_eq L hb hsa P z (hS' P hP) hz), Finset.prod_mul_distrib,
-    Finset.prod_const]
+  rw [h, Finset.prod_congr rfl (fun P hP => fac_eq L hb hsa P z (hS' P hP) hz),
+    Finset.prod_mul_distrib, Finset.prod_const]
   ring
 
 end Formalism.L2.Th1.F

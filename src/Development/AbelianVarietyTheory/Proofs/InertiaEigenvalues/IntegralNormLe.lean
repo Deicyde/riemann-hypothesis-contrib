@@ -13,9 +13,11 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.NonPowerRoot
 
-theorem norm_pow_finrank {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
-    [FiniteDimensional ℚ_[l] K] (x : K) :
-    ‖(x : PadicAlgCl l)‖ ^ Module.finrank ℚ_[l] K = ‖Algebra.norm ℚ_[l] x‖ := by
+theorem norm_pow_finrank
+    {l : ℕ} [Fact l.Prime]
+    (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+    (x : K)
+    : ‖(x : PadicAlgCl l)‖ ^ Module.finrank ℚ_[l] K = ‖Algebra.norm ℚ_[l] x‖ := by
   have h := Algebra.norm_eq_prod_embeddings ℚ_[l] (PadicAlgCl l) x
   have h2 : ∀ σ : K →ₐ[ℚ_[l]] PadicAlgCl l, ‖σ x‖ = ‖(x : PadicAlgCl l)‖ := by
     intro σ
@@ -27,9 +29,11 @@ theorem norm_pow_finrank {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l]
   simp only [h2, Finset.prod_const, Finset.card_univ]
   rw [AlgHom.card]
 
-theorem exists_not_pow {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
-    [FiniteDimensional ℚ_[l] K] (u : PadicAlgCl l) (hu : u ∈ K) (h1 : 1 < ‖u‖) :
-    ∃ m : ℕ, 0 < m ∧ ∀ y ∈ K, ‖y‖ ^ (m + 1) ≠ ‖u‖ := by
+theorem exists_not_pow
+    {l : ℕ} [Fact l.Prime]
+    (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K]
+    (u : PadicAlgCl l) (hu : u ∈ K) (h1 : 1 < ‖u‖)
+    : ∃ m : ℕ, 0 < m ∧ ∀ y ∈ K, ‖y‖ ^ (m + 1) ≠ ‖u‖ := by
   have hd : 0 < Module.finrank ℚ_[l] K := Module.finrank_pos
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have key : ∀ y ∈ K, 0 < ‖y‖ → ∃ k : ℤ, ‖y‖ ^ Module.finrank ℚ_[l] K = (l : ℝ) ^ k := by
@@ -42,8 +46,7 @@ theorem exists_not_pow {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (
     exact ⟨_, h.trans (Padic.norm_eq_zpow_neg_valuation h0)⟩
   obtain ⟨k, hk⟩ := key u hu (by linarith)
   have hk0 : 0 < k := by
-    have : (1 : ℝ) < (l : ℝ) ^ k := by
-      rw [← hk]; exact one_lt_pow₀ h1 hd.ne'
+    have : (1 : ℝ) < (l : ℝ) ^ k := by rw [← hk]; exact one_lt_pow₀ h1 hd.ne'
     exact (one_lt_zpow_iff_right₀ hl).mp this
   refine ⟨k.toNat, by omega, fun y hy hyu => ?_⟩
   have hy0 : 0 < ‖y‖ := by
@@ -60,16 +63,19 @@ theorem exists_not_pow {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (
   · nlinarith
   · nlinarith
 
-theorem exists_root {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω) (u : Ω) {m : ℕ} (hm : 0 < m) :
-    ∃ y : Ω, y ^ (m + 1) + y ^ m + u = 0 ∧ 1 ≤ A.valuation y := by
+theorem exists_root
+    {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubring Ω) (u : Ω) {m : ℕ} (hm : 0 < m)
+    : ∃ y : Ω, y ^ (m + 1) + y ^ m + u = 0 ∧ 1 ≤ A.valuation y := by
   by_contra hne
   push_neg at hne
   set Q : Polynomial Ω := X ^ (m + 1) + X ^ m + C u with hQ
   have hdeg : Q.natDegree = m + 1 := by
-    rw [hQ]; compute_degree!
+    rw [hQ]
+    compute_degree!
     all_goals omega
   have hmon : Q.Monic := by
-    rw [hQ]; monicity!
+    rw [hQ]
+    monicity!
     all_goals omega
   have hnext : Q.nextCoeff = 1 := by
     rw [nextCoeff_of_natDegree_pos (by omega), hdeg, hQ]
@@ -88,11 +94,15 @@ theorem exists_root {Ω : Type} [Field Ω] [IsAlgClosed Ω] (A : ValuationSubrin
   rw [this] at hlt
   simp at hlt
 
-theorem root_unique {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {u : Ω} (hu : A.valuation u < 1) (n : ℕ)
-    {a b : Ω} (ha : a ∈ A) (hb : b ∈ A) (h1 : u * a ^ n + a + 1 = 0) (h2 : u * b ^ n + b + 1 = 0) : a = b := by
+theorem root_unique
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {u : Ω} (hu : A.valuation u < 1)
+    (n : ℕ)
+    {a b : Ω} (ha : a ∈ A) (hb : b ∈ A) (h1 : u * a ^ n + a + 1 = 0) (h2 : u * b ^ n + b + 1 = 0)
+    : a = b := by
   obtain ⟨c, hc⟩ := sub_dvd_pow_sub_pow (⟨a, ha⟩ : A) ⟨b, hb⟩ n
-  have hc' : a ^ n - b ^ n = (a - b) * (c : Ω) := by
-    simpa using congrArg (fun z : A => (z : Ω)) hc
+  have hc' : a ^ n - b ^ n = (a - b) * (c : Ω) := by simpa using congrArg (fun z : A => (z : Ω)) hc
   by_contra hab
   have h3 : (a - b) * (u * c + 1) = 0 := by linear_combination h1 - h2 - u * hc'
   have h4 : u * c = -1 := by
@@ -105,10 +115,13 @@ theorem root_unique {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {u : Ω} (h
   rw [h4] at h5
   simp at h5
 
-theorem norm_le_one {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] {A : ValuationSubring Ω} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
-    (Bw : Formalism.BasicNotions.LocBridge l E Ω (ReciprocityTheory.Gal.Dec A) O) (u : E)
-    (hu : A.valuation (algebraMap E Ω u) < 1) : ‖Bw.j (algebraMap E Ω u)‖ ≤ 1 := by
+theorem norm_le_one
+    {l : ℕ} [Fact l.Prime]
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+    (Bw : Formalism.BasicNotions.LocBridge l E Ω (ReciprocityTheory.Gal.Dec A) O)
+    (u : E) (hu : A.valuation (algebraMap E Ω u) < 1)
+    : ‖Bw.j (algebraMap E Ω u)‖ ≤ 1 := by
   by_contra h1
   push_neg at h1
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
@@ -128,7 +141,8 @@ theorem norm_le_one {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberFiel
     ring
   have hfix : ∀ g : ReciprocityTheory.Gal.Dec (F := E) A, (g : Ω ≃ₐ[E] Ω) y = y := by
     intro g
-    have h2 : (g : Ω ≃ₐ[E] Ω) y⁻¹ ∈ A := (ReciprocityTheory.Gal.apply_mem_iff_of_mem_Dec g.2 _).mpr hyA
+    have h2 : (g : Ω ≃ₐ[E] Ω) y⁻¹ ∈ A :=
+      (ReciprocityTheory.Gal.apply_mem_iff_of_mem_Dec g.2 _).mpr hyA
     have h3 := congrArg (g : Ω ≃ₐ[E] Ω) hroot
     simp only [map_add (f := _), map_mul, map_pow, map_one, map_zero, AlgEquiv.commutes] at h3
     have h4 := root_unique A hu (m + 1) h2 hyA h3 hroot
@@ -161,37 +175,41 @@ theorem norm_le_one {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberFiel
     simpa using hz1.le
   rw [hw, h7, pow_succ]
 
-theorem integral_norm_le {l : ℕ} [Fact l.Prime] {y : PadicAlgCl l} (hy : IsIntegral ℤ y) : ‖y‖ ≤ 1 := by
+theorem integral_norm_le {l : ℕ} [Fact l.Prime] {y : PadicAlgCl l} (hy : IsIntegral ℤ y)
+    : ‖y‖ ≤ 1 := by
   let B : ValuationSubring (PadicAlgCl l) := (Valued.v (R := PadicAlgCl l)).valuationSubring
   have h1 : IsIntegral B y := hy.tower_top
   obtain ⟨b, hb⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral h1
-  have h2 : Valued.v y ≤ 1 := by
-    rw [← hb]; exact b.2
+  have h2 : Valued.v y ≤ 1 := by rw [← hb]; exact b.2
   rw [← PadicAlgCl.valuation_coe]
   exact_mod_cast h2
 
-theorem norm_lt_one_iff : ∀ {l : ℕ} [Fact (Nat.Prime l)] {E Ω : Type} [Field E] [NumberField E] [Field Ω]
-    [Algebra E Ω] [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω},
-    Formalism.ConjugateSelfDual.IsPlaceOver A v → ∀ {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
-      (Bw : Formalism.BasicNotions.LocBridge l E Ω (ReciprocityTheory.Gal.Dec A) O) (x : 𝓞 E),
-      ‖(Formalism.BasicNotions.LocBridge.j Bw : Ω → Formalism.BasicNotions.Loc.Om l) ((algebraMap E Ω : E → Ω) (↑x : E))‖ < (1 : ℝ) ↔
-        x ∈ v.asIdeal := by
+theorem norm_lt_one_iff
+    : ∀ {l : ℕ} [Fact (Nat.Prime l)] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+        [IsAlgClosure E Ω] {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω},
+      Formalism.ConjugateSelfDual.IsPlaceOver A v
+        → ∀ {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+            (Bw : Formalism.BasicNotions.LocBridge l E Ω (ReciprocityTheory.Gal.Dec A) O) (x : 𝓞 E),
+          ‖(Formalism.BasicNotions.LocBridge.j Bw : Ω → Formalism.BasicNotions.Loc.Om l) ((algebraMap E Ω : E → Ω) (↑x : E))‖
+              < (1 : ℝ)
+            ↔ x ∈ v.asIdeal := by
   intro l _ E Ω _ _ _ _ _ v A hA O _ _ _ Bw
   let φ : 𝓞 E →+* PadicAlgCl l := (Bw.j.comp (algebraMap E Ω)).comp (algebraMap (𝓞 E) E)
   have hφ : ∀ x : 𝓞 E, φ x = Bw.j (algebraMap E Ω (x : E)) := fun _ => rfl
   have hle : ∀ x : 𝓞 E, ‖φ x‖ ≤ 1 := fun x =>
     integral_norm_le ((RingOfIntegers.isIntegral x).map φ.toIntAlgHom)
-  let P : Ideal (𝓞 E) :=
-    { carrier := {x | ‖φ x‖ < 1}
-      add_mem' := fun {a b} ha hb => by
-        show ‖φ (a + b)‖ < 1
-        rw [map_add (f := _)]
-        exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ha hb)
-      zero_mem' := by simp
-      smul_mem' := fun c a ha => by
-        show ‖φ (c * a)‖ < 1
-        rw [map_mul, norm_mul]
-        exact mul_lt_one_of_nonneg_of_lt_one_right (hle c) (norm_nonneg _) ha }
+  let P : Ideal (𝓞 E) := {
+    carrier := {x | ‖φ x‖ < 1}
+    add_mem' := fun {a b} ha hb => by
+      show ‖φ (a + b)‖ < 1
+      rw [map_add (f := _)]
+      exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ha hb)
+    zero_mem' := by simp
+    smul_mem' := fun c a ha => by
+      show ‖φ (c * a)‖ < 1
+      rw [map_mul, norm_mul]
+      exact mul_lt_one_of_nonneg_of_lt_one_right (hle c) (norm_nonneg _) ha
+  }
   have hP : ∀ x, x ∈ P ↔ ‖φ x‖ < 1 := fun _ => Iff.rfl
   have hPp : P.IsPrime := by
     refine ⟨?_, fun {a b} hab => ?_⟩

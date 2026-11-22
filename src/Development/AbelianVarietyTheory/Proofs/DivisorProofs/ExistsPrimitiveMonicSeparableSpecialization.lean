@@ -11,9 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.PrimTransc
 
-theorem exists_separable_specialization {D : ℕ} (P : (MvPolynomial (Fin D) ℚ)[X])
-    (h : (P.map (algebraMap (MvPolynomial (Fin D) ℚ) (FractionRing (MvPolynomial (Fin D) ℚ)))).Separable) :
-    ∃ c : Fin D → ℚ, (P.map (MvPolynomial.eval c)).Separable := by
+theorem exists_separable_specialization
+    {D : ℕ} (P : (MvPolynomial (Fin D) ℚ)[X])
+    (h : (P.map (algebraMap (MvPolynomial (Fin D) ℚ)
+      (FractionRing (MvPolynomial (Fin D) ℚ)))).Separable)
+    : ∃ c : Fin D → ℚ, (P.map (MvPolynomial.eval c)).Separable := by
   set R := MvPolynomial (Fin D) ℚ
   set F := FractionRing R
   obtain ⟨a, b, hab⟩ := h
@@ -37,32 +39,49 @@ theorem exists_separable_specialization {D : ℕ} (P : (MvPolynomial (Fin D) ℚ
     exact hδ (MvPolynomial.funext fun c => by simpa using hno c)
   refine ⟨c, ?_⟩
   have key' := congrArg (Polynomial.map (MvPolynomial.eval c)) key
-  simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_C, ← derivative_map] at key'
+  simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_C, ← derivative_map]
+    at key'
   have hinv : C (MvPolynomial.eval c (da * db))⁻¹ * C (MvPolynomial.eval c (da * db)) = 1 := by
     rw [← C_mul, inv_mul_cancel₀ hc, C_1]
-  refine ⟨C (MvPolynomial.eval c (da * db))⁻¹ * (C (MvPolynomial.eval c db) * A.map (MvPolynomial.eval c)),
-    C (MvPolynomial.eval c (da * db))⁻¹ * (C (MvPolynomial.eval c da) * B.map (MvPolynomial.eval c)), ?_⟩
+  refine ⟨
+    C (MvPolynomial.eval c (da * db))⁻¹
+      * (C (MvPolynomial.eval c db) * A.map (MvPolynomial.eval c)),
+    C (MvPolynomial.eval c (da * db))⁻¹
+      * (C (MvPolynomial.eval c da) * B.map (MvPolynomial.eval c)),
+    ?_
+  ⟩
   linear_combination C (MvPolynomial.eval c (da * db))⁻¹ * key' + hinv
 
-theorem exists_mul_mem_adjoin {R F K : Type} [CommRing R] [IsDomain R] [Field F] [Algebra R F]
-    [IsFractionRing R F] [Field K] [Algebra R K] [Algebra F K] [IsScalarTower R F K] (θ z : K)
-    (hz : z ∈ Algebra.adjoin F {θ}) :
-    ∃ d : R, d ≠ 0 ∧ algebraMap R K d * z ∈ Algebra.adjoin R {θ} := by
+theorem exists_mul_mem_adjoin
+    {R F K : Type} [CommRing R] [IsDomain R] [Field F] [Algebra R F] [IsFractionRing R F] [Field K]
+    [Algebra R K] [Algebra F K] [IsScalarTower R F K]
+    (θ z : K) (hz : z ∈ Algebra.adjoin F {θ})
+    : ∃ d : R, d ≠ 0 ∧ algebraMap R K d * z ∈ Algebra.adjoin R {θ} := by
   first
-  | (rename_i h_3 h_4 h_5 h_6 h_7 h_8 h_9 h_10 h_11; revert R F K h_3 h_4 h_5 h_6 h_7 h_8 h_9 h_10 h_11 θ z hz; exact @_root_.GlobalTheory.TargetInequalityLemmas.target)
+  | (
+      rename_i h_3 h_4 h_5 h_6 h_7 h_8 h_9 h_10 h_11
+      revert R F K h_3 h_4 h_5 h_6 h_7 h_8 h_9 h_10 h_11 θ z hz
+      exact @_root_.GlobalTheory.TargetInequalityLemmas.target
+    )
   | exact @_root_.GlobalTheory.TargetInequalityLemmas.target
   | exact _root_.GlobalTheory.TargetInequalityLemmas.target
   | (apply _root_.GlobalTheory.TargetInequalityLemmas.target <;> assumption)
   | (intros; apply _root_.GlobalTheory.TargetInequalityLemmas.target <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.TargetInequalityLemmas.target <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.TargetInequalityLemmas.target
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.TargetInequalityLemmas.target ..)
 
-theorem exists_primitive_monic_separable_specialization :
-    ∀ (K : Type) [Field K] [CharZero K] (D : ℕ) (x : Fin D → K), IsTranscendenceBasis ℚ x →
-      ∀ (J : Type) [Finite J] (e : J → K), ∃ (P : Polynomial (MvPolynomial (Fin D) ℚ))
-        (ψ : AdjoinRoot P →ₐ[ℚ] K) (g : K) (c : Fin D → ℚ), P.Monic ∧ Function.Injective ψ ∧
-        (∀ i, ψ (AdjoinRoot.of P (MvPolynomial.X i)) = x i) ∧ g ≠ 0 ∧ (∀ j, g * e j ∈ ψ.range) ∧
-        (P.map (MvPolynomial.eval c)).Separable := by
+theorem exists_primitive_monic_separable_specialization
+    : ∀ (K : Type) [Field K] [CharZero K] (D : ℕ) (x : Fin D → K),
+      IsTranscendenceBasis ℚ x
+        → ∀ (J : Type) [Finite J] (e : J → K),
+          ∃ (P : Polynomial (MvPolynomial (Fin D) ℚ)) (ψ : AdjoinRoot P →ₐ[ℚ] K) (g : K)
+              (c : Fin D → ℚ),
+            P.Monic ∧ Function.Injective ψ ∧ (∀ i, ψ (AdjoinRoot.of P (MvPolynomial.X i)) = x i)
+              ∧ g ≠ 0 ∧ (∀ j, g * e j ∈ ψ.range) ∧ (P.map (MvPolynomial.eval c)).Separable := by
   intro K _ _ D x hx J _ e
   classical
   have := Fintype.ofFinite J
@@ -92,7 +111,8 @@ theorem exists_primitive_monic_separable_specialization :
   have hαE : F⟮(α : K)⟯ = E := by
     simpa only [IntermediateField.lift_adjoin_simple, IntermediateField.lift_top] using
       congrArg IntermediateField.lift hα
-  obtain ⟨y, hy0, hyint⟩ := IsAlgebraic.exists_integral_multiple (Algebra.IsAlgebraic.isAlgebraic (R := R) (α : K))
+  obtain ⟨y, hy0, hyint⟩ :=
+    IsAlgebraic.exists_integral_multiple (Algebra.IsAlgebraic.isAlgebraic (R := R) (α : K))
   set θ : K := y • (α : K) with hθdef
   have hθF : IsIntegral F θ := (Algebra.IsAlgebraic.isAlgebraic (R := F) θ).isIntegral
   have hyF : algebraMap R F y ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R F)).2 hy0
@@ -101,7 +121,8 @@ theorem exists_primitive_monic_separable_specialization :
       rw [hθdef, Algebra.smul_def, IsScalarTower.algebraMap_apply R F K, ← mul_assoc, ← map_mul,
         inv_mul_cancel₀ hyF, map_one, one_mul]
     rw [this]
-    exact mul_mem (IntermediateField.algebraMap_mem _ _) (IntermediateField.mem_adjoin_simple_self F θ)
+    exact mul_mem (IntermediateField.algebraMap_mem _ _)
+      (IntermediateField.mem_adjoin_simple_self F θ)
   have heθ : ∀ j, e j ∈ Algebra.adjoin F {θ} := by
     intro j
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hθF.isAlgebraic]
@@ -124,13 +145,25 @@ theorem exists_primitive_monic_separable_specialization :
     rw [← minpoly.isIntegrallyClosed_eq_field_fractions' F hyint]
     exact (minpoly.irreducible hθF).separable
   obtain ⟨c, hc⟩ := exists_separable_specialization P hsep
-  refine ⟨P, ψ, algebraMap R K (∏ j, d j), c, minpoly.monic hyint, hψinj, fun i => ?_, ?_, fun j => ?_, hc⟩
+  refine ⟨
+    P,
+    ψ,
+    algebraMap R K (∏ j, d j),
+    c,
+    minpoly.monic hyint,
+    hψinj,
+    fun i => ?_,
+    ?_,
+    fun j => ?_,
+    hc
+  ⟩
   · show ψ₀ (AdjoinRoot.of P (MvPolynomial.X i)) = x i
     rw [← AdjoinRoot.algebraMap_eq, AlgHom.commutes, hφ]
     exact MvPolynomial.aeval_X x i
   · exact (map_ne_zero_iff _ φinj).2 (Finset.prod_ne_zero_iff.2 fun j _ => hd0 j)
   · have hm : algebraMap R K (∏ j, d j) * e j ∈ Algebra.adjoin R {θ} := by
-      rw [← Finset.mul_prod_erase Finset.univ d (Finset.mem_univ j), mul_comm (d j), map_mul, mul_assoc]
+      rw [← Finset.mul_prod_erase Finset.univ d (Finset.mem_univ j), mul_comm (d j), map_mul,
+        mul_assoc]
       exact mul_mem (Subalgebra.algebraMap_mem _ _) (hdm j)
     obtain ⟨a, ha⟩ := hrange hm
     exact ⟨a, ha⟩

@@ -15,8 +15,10 @@ open scoped ComplexConjugate
 
 namespace PositivityTheory.Rg.Rs
 
-theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → GlobalTheory.Published.JacquetShalikaBound → InfInd2 → InfAsc →
-    SatInd2 → SatAsc → SatHerm → Gap → StringStep := by
+theorem stringStep_of
+    : GlobalTheory.Published.JacquetShalikaRigidity → GlobalTheory.Published.JacquetShalikaBound
+      → InfInd2 → InfAsc → SatInd2 → SatAsc → SatHerm → Gap
+      → StringStep := by
   intro hR hJ hInf hIA hSI hSA hSH hG E _ _ _ r s hr hs V V₁ V₂ z₁ z₂ hV hV₁ hV₂ hemb τ hτ hsum hre
     a₁ d₁ a₂ d₂ π₁ π₂ hu₁ hn₁ h₁ hu₂ hn₂ h₂
 
@@ -27,25 +29,32 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
   have ha₁ : 1 ≤ a₁ := Nat.pos_of_ne_zero fun h => by subst h; omega
   have ha₂ : 1 ≤ a₂ := Nat.pos_of_ne_zero fun h => by subst h; omega
 
-  have hexp := StrStepC.sat_expand hSI hSA hSH V V₁ V₂ z₁ z₂ hV hV₁ hV₂ hemb π₁ π₂ ha₁ ha₂ hu₁ hn₁ hu₂ hn₂ h₁ h₂
-  have hp₀ := StrStepC.perm_of hR π₁ π₂ ha₁ ha₂ (fun i : Fin d₁ => z₁ - (s : ℂ) / 2 + (spehExp d₁ i : ℂ))
-    (fun j : Fin d₂ => z₂ + (r : ℂ) / 2 + (spehExp d₂ j : ℂ))
-    (hexp.mono fun w ⟨BV, B₁, B₂, _, h1, h2, e, hh⟩ => ⟨BV, B₁, B₂, h1, h2, e, hh⟩)
+  have hexp :=
+    StrStepC.sat_expand hSI hSA hSH V V₁ V₂ z₁ z₂ hV hV₁ hV₂ hemb π₁ π₂ ha₁ ha₂ hu₁ hn₁ hu₂ hn₂ h₁
+      h₂
+  have hp₀ :=
+    StrStepC.perm_of hR π₁ π₂ ha₁ ha₂
+      (fun i : Fin d₁ => z₁ - (s : ℂ) / 2 + (spehExp d₁ i : ℂ))
+      (fun j : Fin d₂ => z₂ + (r : ℂ) / 2 + (spehExp d₂ j : ℂ))
+      (hexp.mono fun w ⟨BV, B₁, B₂, _, h1, h2, e, hh⟩ => ⟨BV, B₁, B₂, h1, h2, e, hh⟩)
 
-  rcases StrStepD.match_left ha₁ ha₂ π₁ π₂ hn₁ hn₂ _ _ hp₀ ⟨d₁ - 1, by omega⟩ with ⟨i', hi'⟩ | ⟨j, hj, hcls⟩
+  rcases StrStepD.match_left ha₁ ha₂ π₁ π₂ hn₁ hn₂ _ _ hp₀ ⟨d₁ - 1, by omega⟩ with
+    ⟨i', hi'⟩ | ⟨j, hj, hcls⟩
   · exfalso
     have h := congrArg Complex.re hi'
     have hi : ((d₁ - 1 : ℕ) : ℝ) = d₁ - 1 := by rw [Nat.cast_sub (by omega)]; simp
-    simp only [spehExp, Complex.add_re, Complex.sub_re, Complex.neg_re, Complex.conj_re, Complex.ofReal_re,
-      Complex.div_ofNat_re, Complex.natCast_re, hi] at h
+    simp only [spehExp, Complex.add_re, Complex.sub_re, Complex.neg_re, Complex.conj_re,
+        Complex.ofReal_re, Complex.div_ofNat_re, Complex.natCast_re, hi]
+      at h
     have : (0 : ℝ) ≤ (i' : ℕ) := Nat.cast_nonneg _
     linarith
   have him : z₁.im = z₂.im := by
     have h := congrArg Complex.im hj
     simpa [spehExp, map_ofNat, Complex.div_ofNat_im] using h
   have hsim := congrArg Complex.im hsum
-  simp only [Complex.add_im, Complex.mul_im, Complex.natCast_re, Complex.natCast_im, zero_mul, add_zero,
-    Complex.zero_im] at hsim
+  simp only [Complex.add_im, Complex.mul_im, Complex.natCast_re, Complex.natCast_im, zero_mul,
+      add_zero, Complex.zero_im]
+    at hsim
   have h1im : z₁.im = 0 := by
     have : ((r : ℝ) + s) * z₁.im = 0 := by rw [← him] at hsim; linarith
     rcases mul_eq_zero.1 this with h | h
@@ -72,8 +81,10 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
   obtain ⟨m₀, hm₀, hme₁⟩ := hIA E _ a₁ d₁ V₁ π₁ hV₁ h₁ τ m₁ hm₁
   obtain ⟨m₀', hm₀', hme₂⟩ := hIA E _ a₁ d₂ V₂ π₂ hV₂ h₂ τ m₂ hm₂
   have hm₀e : m₀' = m₀ := hm₀'.unique (hiso.hasInfChar hm₀)
-  have hform : m = (∑ i : Fin d₁, m₀.map (· + (spehExp d₁ i : ℂ))).map (· + ((c₁ : ℝ) : ℂ)) +
-      (∑ j : Fin d₂, m₀.map (· + (spehExp d₂ j : ℂ))).map (· + ((c₂ : ℝ) : ℂ)) := by
+  have hform
+      : m
+        = (∑ i : Fin d₁, m₀.map (· + (spehExp d₁ i : ℂ))).map (· + ((c₁ : ℝ) : ℂ))
+          + (∑ j : Fin d₂, m₀.map (· + (spehExp d₂ j : ℂ))).map (· + ((c₂ : ℝ) : ℂ)) := by
     rw [hme, hme₁, hme₂, hm₀e, hc₁, hc₂]
   have hne : m₀ ≠ 0 := by
     rintro rfl
@@ -83,21 +94,24 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
     linarith
   obtain ⟨hdisj, hintS⟩ := StrStepD.of_infChar m m₀ c₁ c₂ hform hne hnd hint
 
-  have hexp' : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ BV B₁ B₂ : Multiset ℂˣ, SatV V w BV ∧
-      (CG.mk π₁).HasSat w B₁ ∧ (CG.mk π₂).HasSat w B₂ ∧
-      BV.map (fun b : ℂˣ => (b : ℂ)) =
-        (∑ i : Fin d₁, B₁.map fun b : ℂˣ =>
-          (b : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-((c₁ + spehExp d₁ i : ℝ) : ℂ))) +
-          ∑ j : Fin d₂, B₂.map (fun b : ℂˣ =>
-            (b : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-((c₂ + spehExp d₂ j : ℝ) : ℂ))) ∧
-      BV.map (fun b => (star b)⁻¹) = BV ∧ B₁.map (fun b => (star b)⁻¹) = B₁ ∧
-        B₂.map (fun b => (star b)⁻¹) = B₂ := by
+  have hexp'
+      : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ BV B₁ B₂ : Multiset ℂˣ, SatV V w BV ∧
+        (CG.mk π₁).HasSat w B₁ ∧ (CG.mk π₂).HasSat w B₂ ∧
+        BV.map (fun b : ℂˣ => (b : ℂ)) =
+          (∑ i : Fin d₁, B₁.map fun b : ℂˣ =>
+            (b : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-((c₁ + spehExp d₁ i : ℝ) : ℂ))) +
+            ∑ j : Fin d₂, B₂.map (fun b : ℂˣ =>
+              (b : ℂ) * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-((c₂ + spehExp d₂ j : ℝ) : ℂ))) ∧
+        BV.map (fun b => (star b)⁻¹) = BV ∧ B₁.map (fun b => (star b)⁻¹) = B₁ ∧
+          B₂.map (fun b => (star b)⁻¹) = B₂ := by
     refine hexp.mono fun w ⟨BV, B₁, B₂, h0, h1, h2, e, hh⟩ => ⟨BV, B₁, B₂, h0, h1, h2, ?_, hh⟩
     rw [e]
     simp only [Complex.ofReal_add, hc₁, hc₂]
-  have hp := StrStepC.perm_of hR π₁ π₂ ha₁ ha₁ (fun i : Fin d₁ => ((c₁ + spehExp d₁ i : ℝ) : ℂ))
-    (fun j : Fin d₂ => ((c₂ + spehExp d₂ j : ℝ) : ℂ))
-    (hexp'.mono fun w ⟨BV, B₁, B₂, _, h1, h2, e, hh⟩ => ⟨BV, B₁, B₂, h1, h2, e, hh⟩)
+  have hp :=
+    StrStepC.perm_of hR π₁ π₂ ha₁ ha₁
+      (fun i : Fin d₁ => ((c₁ + spehExp d₁ i : ℝ) : ℂ))
+      (fun j : Fin d₂ => ((c₂ + spehExp d₂ j : ℝ) : ℂ))
+      (hexp'.mono fun w ⟨BV, B₁, B₂, _, h1, h2, e, hh⟩ => ⟨BV, B₁, B₂, h1, h2, e, hh⟩)
   have hneg : ∀ u ∈ StrStepD.strSet c₁ c₂ d₁ d₂, -u ∈ StrStepD.strSet c₁ c₂ d₁ d₂ := by
     intro u hu
     rcases StrStepD.mem_strSet.1 hu with ⟨i, rfl⟩ | ⟨j, rfl⟩
@@ -123,17 +137,24 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
     exact hs₂.unique hs₁
   rw [hB₂] at e
   have hq : 1 < Ideal.absNorm w.asIdeal := NumberField.HeightOneSpectrum.one_lt_absNorm w
-  have hM : ∀ z, z ∈ BV.map (fun b : ℂˣ => (b : ℂ)) ↔ ∃ x ∈ StrStepD.strSet c₁ c₂ d₁ d₂,
-      ∃ β ∈ B₁.map (fun b : ℂˣ => (b : ℂ)), z = β * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-(x : ℂ)) := by
+  have hM
+      : ∀ z,
+        z ∈ BV.map (fun b : ℂˣ => (b : ℂ))
+          ↔ ∃ x ∈ StrStepD.strSet c₁ c₂ d₁ d₂, ∃ β ∈ B₁.map (fun b : ℂˣ => (b : ℂ)),
+            z = β * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-(x : ℂ)) := by
     intro z
     rw [e, ← StrStepD.mem_sat]
     simp only [Multiset.map_map, Function.comp_def, Complex.ofReal_add]
-  have hgap : ∀ z : ℂ, ‖z‖ < (Ideal.absNorm w.asIdeal : ℝ) ^ (-(1 / 2) : ℝ) →
-      (BV.map fun b : ℂˣ => (b : ℂ)).count z ≤
-        (BV.map fun b : ℂˣ => (b : ℂ)).count ((Ideal.absNorm w.asIdeal : ℂ) * z) :=
+  have hgap
+      : ∀ z : ℂ,
+        ‖z‖ < (Ideal.absNorm w.asIdeal : ℝ) ^ (-(1 / 2) : ℝ)
+          → (BV.map fun b : ℂˣ => (b : ℂ)).count z
+            ≤ (BV.map fun b : ℂˣ => (b : ℂ)).count ((Ideal.absNorm w.asIdeal : ℂ) * z) :=
     fun z hz => hG E _ V hV w BV hBV z hz
-  have hbound : ∀ β ∈ B₁.map (fun b : ℂˣ => (b : ℂ)), (Ideal.absNorm w.asIdeal : ℝ) ^ (-(1 / 2) : ℝ) < ‖β‖ ∧
-      ‖β‖ < (Ideal.absNorm w.asIdeal : ℝ) ^ (1 / 2 : ℝ) := by
+  have hbound
+      : ∀ β ∈ B₁.map (fun b : ℂˣ => (b : ℂ)),
+        (Ideal.absNorm w.asIdeal : ℝ) ^ (-(1 / 2) : ℝ) < ‖β‖
+          ∧ ‖β‖ < (Ideal.absNorm w.asIdeal : ℝ) ^ (1 / 2 : ℝ) := by
     intro β hβ
     obtain ⟨b, hb, rfl⟩ := Multiset.mem_map.1 hβ
     exact hJ E a₁ (CG.mk π₁) ((CG.isUnitary_mk π₁).2 hu₁) w B₁ hs₁ b hb
@@ -145,8 +166,9 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
 
   have hlin : (d₁ : ℝ) * c₁ + d₂ * c₂ = 0 := by
     have hsre := congrArg Complex.re hsum
-    simp only [Complex.add_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im, h1im, h2im, mul_zero,
-      sub_zero, Complex.zero_re] at hsre
+    simp only [Complex.add_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im, h1im, h2im,
+        mul_zero, sub_zero, Complex.zero_re]
+      at hsre
     have ha : (0 : ℝ) < a₁ := by exact_mod_cast ha₁
     have : (a₁ : ℝ) * (d₁ * c₁ + d₂ * c₂) = 0 := by
       rw [hc₁d, hc₂d]
@@ -160,8 +182,10 @@ theorem stringStep_of : GlobalTheory.Published.JacquetShalikaRigidity → Global
     have : (0 : ℝ) < d₁ := by exact_mod_cast hd₁
     have : (0 : ℝ) < d₂ := by exact_mod_cast hd₂
     nlinarith
-  have hadj := StrStepA.adjacent c₁ c₂ d₁ d₂ hd₁ hd₂ (StrStepD.strSet c₁ c₂ d₁ d₂) (fun x => Iff.rfl) hdisj hintS
-    hneg hP (by linarith)
+  have hadj :=
+    StrStepA.adjacent c₁ c₂ d₁ d₂ hd₁ hd₂ (StrStepD.strSet c₁ c₂ d₁ d₂)
+      (fun x => Iff.rfl)
+      hdisj hintS hneg hP (by linarith)
   have hc₁v : c₁ = -(d₂ : ℝ) / 2 := by
     have h : ((d₁ : ℝ) + d₂) * (c₁ + d₂ / 2) = 0 := by linear_combination hlin - (d₂ : ℝ) * hadj
     rcases mul_eq_zero.1 h with h | h

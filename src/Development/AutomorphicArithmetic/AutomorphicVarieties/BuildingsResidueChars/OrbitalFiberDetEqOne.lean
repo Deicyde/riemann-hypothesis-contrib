@@ -6,10 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Loc Matrix
 
-private theorem scal_mem {O L : Type} [CommRing O] [CommRing L] [Algebra O L] (u : Lˣ)
-    (d : (integralClosure O L)ˣ)
-    (h : u ^ 2 * Units.map ((integralClosure O L).val : integralClosure O L →* L) d = 1) :
-    ∃ w : (integralClosure O L)ˣ, Units.map ((integralClosure O L).val : integralClosure O L →* L) w = u := by
+private theorem scal_mem
+    {O L : Type} [CommRing O] [CommRing L] [Algebra O L]
+    (u : Lˣ) (d : (integralClosure O L)ˣ)
+    (h : u ^ 2 * Units.map ((integralClosure O L).val : integralClosure O L →* L) d = 1)
+    : ∃ w : (integralClosure O L)ˣ,
+      Units.map ((integralClosure O L).val : integralClosure O L →* L) w = u := by
   have h1 : u ^ 2 = Units.map ((integralClosure O L).val : integralClosure O L →* L) d⁻¹ := by
     rw [map_inv]; exact eq_inv_of_mul_eq_one_left h
   have h2 : u⁻¹ ^ 2 = Units.map ((integralClosure O L).val : integralClosure O L →* L) d := by
@@ -24,8 +26,7 @@ private theorem scal_mem {O L : Type} [CommRing O] [CommRing L] [Algebra O L] (u
     exact (d : integralClosure O L).2
   exact ⟨⟨⟨u, i1⟩, ⟨(u⁻¹ : Lˣ), i2⟩, Subtype.ext u.mul_inv, Subtype.ext u.inv_mul⟩, Units.ext rfl⟩
 
-theorem UpperTheory.orbitalFiber_det_eq_one :
-    UpperTheory.V.Z.Sym.Glob.Fib.DetOne := by
+theorem UpperTheory.orbitalFiber_det_eq_one : UpperTheory.V.Z.Sym.Glob.Fib.DetOne := by
   intro O K _ _ _ Δ g hg hs
   have hn : (ZD Δ).Normal := by
     refine ⟨fun n hn x => ?_⟩
@@ -41,14 +42,17 @@ theorem UpperTheory.orbitalFiber_det_eq_one :
   refine mul_mem ?_ hk
   obtain ⟨z, hz⟩ := Subgroup.mem_subgroupOf.1 hsz
   obtain ⟨k₀, hk₀⟩ := Subgroup.mem_subgroupOf.1 hk
-  have hd : GeneralLinearGroup.det ((s : GL (Fin 2) (Lsq K Δ)) * (k : GL (Fin 2) (Lsq K Δ))) = 1 := hs
+  have hd : GeneralLinearGroup.det ((s : GL (Fin 2) (Lsq K Δ)) * (k : GL (Fin 2) (Lsq K Δ))) = 1 :=
+    hs
   rw [map_mul, ← hz, ← hk₀] at hd
-  obtain ⟨w, hw⟩ := scal_mem (O := O) (Units.map (algebraMap K (Lsq K Δ) : K →* Lsq K Δ) z)
-    (GeneralLinearGroup.det k₀) (by
-      rw [← hd]
-      congr 1
-      · apply Units.ext
-        simp [pow_two])
+  obtain ⟨w, hw⟩ :=
+    scal_mem (O := O) (Units.map (algebraMap K (Lsq K Δ) : K →* Lsq K Δ) z)
+      (GeneralLinearGroup.det k₀)
+      (by
+        rw [← hd]
+        congr 1
+        · apply Units.ext
+          simp [pow_two])
   refine Subgroup.mem_subgroupOf.2 ⟨GeneralLinearGroup.scalar (Fin 2) w, ?_⟩
   rw [← hz, MonoidHom.comp_apply, ← hw]
   apply Units.ext

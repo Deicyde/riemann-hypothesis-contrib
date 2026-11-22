@@ -21,14 +21,13 @@ theorem volPair_eq_choose (V : HSp D) (h : VolPairEx V) : volPair V = h.choose :
   unfold volPair
   exact dif_pos h
 
-theorem volPair_isVolPair (V : HSp D) (h : VolPairEx V) : IsVolPair D V (volPair V).1 (volPair V).2 := by
+theorem volPair_isVolPair (V : HSp D) (h : VolPairEx V)
+    : IsVolPair D V (volPair V).1 (volPair V).2 := by
   rw [volPair_eq_choose V h]
   exact h.choose_spec
 
 theorem autMk_measurable (V : HSp D) : Measurable (autMk V) := by
-  first
-  | exact measurable_quotient_mk'
-  | exact fun _ hs => hs
+  first | exact measurable_quotient_mk' | exact fun _ hs => hs
 
 theorem muQ_univ (V : HSp D) : muQ V Set.univ = (volPair V).1 (volPair V).2 := by
   unfold muQ

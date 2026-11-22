@@ -8,14 +8,17 @@ public import ReciprocityTheory.GaloisValuations.Global
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal
 open scoped Pointwise
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-private theorem isFrob_pow' {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    {A : ValuationSubring Ω} {q : ℕ} {φ : G F Ω} (h : IsFrob A q φ) (n : ℕ) :
-    IsFrob A (q ^ n) (φ ^ n) := by
+private theorem isFrob_pow'
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A : ValuationSubring Ω} {q : ℕ} {φ : G F Ω} (h : IsFrob A q φ)
+    (n : ℕ)
+    : IsFrob A (q ^ n) (φ ^ n) := by
   induction n with
   | zero =>
     refine ⟨one_mem _, ?_⟩
@@ -29,24 +32,26 @@ private theorem isFrob_pow' {F Ω : Type} [Field F] [NumberField F] [Field Ω] [
       exact (apply_mem_iff_of_mem_Dec h.1 x).2 hx
     have h1 := ih.2 (φ x) hy
     have h2 := h.2 x hx
-    have hz : A.valuation (x ^ q) ≤ 1 := by
-      rw [map_pow]; exact pow_le_one' hx q
-    have hc1 : A.valuation (∑ i ∈ Finset.range (q ^ n), (φ x) ^ i * (x ^ q) ^ (q ^ n - 1 - i)) ≤ 1 := by
+    have hz : A.valuation (x ^ q) ≤ 1 := by rw [map_pow]; exact pow_le_one' hx q
+    have hc1
+        : A.valuation (∑ i ∈ Finset.range (q ^ n), (φ x) ^ i * (x ^ q) ^ (q ^ n - 1 - i)) ≤ 1 := by
       refine Valuation.map_sum_le _ (fun i _ => ?_)
       rw [map_mul, map_pow, map_pow]
       exact mul_le_one' (pow_le_one' hy _) (pow_le_one' hz _)
     have h3 : A.valuation ((φ x) ^ (q ^ n) - (x ^ q) ^ (q ^ n)) < 1 := by
       rw [← geom_sum₂_mul (φ x) (x ^ q) (q ^ n), map_mul]
       exact (mul_le_of_le_one_left' hc1).trans_lt h2
-    have e : (φ ^ (n + 1)) x - x ^ (q ^ (n + 1))
-        = ((φ ^ n) (φ x) - (φ x) ^ (q ^ n)) + ((φ x) ^ (q ^ n) - (x ^ q) ^ (q ^ n)) := by
+    have e
+        : (φ ^ (n + 1)) x - x ^ (q ^ (n + 1))
+          = ((φ ^ n) (φ x) - (φ x) ^ (q ^ n)) + ((φ x) ^ (q ^ n) - (x ^ q) ^ (q ^ n)) := by
       rw [pow_succ, AlgEquiv.mul_apply, pow_succ', pow_mul]
       ring
     rw [e]
     exact Valuation.map_add_lt _ h1 h3
 
-private theorem one_lt_normV_inertia_quadratic_ramification {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) :
-    1 < normV w := by
+private theorem one_lt_normV_inertia_quadratic_ramification
+    {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
+    : 1 < normV w := by
   haveI : Finite (𝓞 E ⧸ w.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ w.ne_bot
   haveI : w.asIdeal.IsMaximal := w.isMaximal
   letI : Field (𝓞 E ⧸ w.asIdeal) := Ideal.Quotient.field w.asIdeal
@@ -78,8 +83,9 @@ theorem degOf : DegOf := by
         exact (apply_mem_iff_of_mem_Dec hφf.1 y).1 hx
       have h1 := hσ.2 y hyA
       have h2 := hφf.2 y hyA
-      have e : (ρ * (φ ^ f)⁻¹) ((φ ^ f) y) - (φ ^ f) y
-          = (σ y - y ^ normV w) - ((φ ^ f) y - y ^ normV w) := by
+      have e
+          : (ρ * (φ ^ f)⁻¹) ((φ ^ f) y) - (φ ^ f) y
+            = (σ y - y ^ normV w) - ((φ ^ f) y - y ^ normV w) := by
         rw [AlgEquiv.mul_apply]
         rw [show (φ ^ f)⁻¹ ((φ ^ f) y) = y from (φ ^ f).symm_apply_apply y]
         rw [hρ, GlobalTheory.WeilRestrict.resG_apply]
@@ -95,19 +101,24 @@ theorem degOf : DegOf := by
       exact σ.commutes x
     rw [AlgEquiv.mul_apply] at h1
     have h3 : (φ ^ f)⁻¹ (algebraMap M Ω x) = algebraMap M Ω x := ρ.injective (h1.trans h2.symm)
-    calc (φ ^ f) (algebraMap M Ω x) = (φ ^ f) ((φ ^ f)⁻¹ (algebraMap M Ω x)) := by rw [h3]
+    calc
+      (φ ^ f) (algebraMap M Ω x)
+        = (φ ^ f) ((φ ^ f)⁻¹ (algebraMap M Ω x)) := by rw [h3]
       _ = algebraMap M Ω x := (φ ^ f).apply_symm_apply _
   have hfd : f ≤ d := by
     have key : ∀ x : 𝓞 M, x ^ (normV v ^ d) - x ∈ w.asIdeal := by
       intro x
       rw [← hw]
       have hint : A.valuation (algebraMap M Ω (x : M)) ≤ 1 :=
-        GlobalTheory.InertiaAlmostAll.val_le_one_of_isIntegral A (x.isIntegral_coe.map (IsScalarTower.toAlgHom ℤ M Ω))
+        GlobalTheory.InertiaAlmostAll.val_le_one_of_isIntegral A
+          (x.isIntegral_coe.map (IsScalarTower.toAlgHom ℤ M Ω))
       have hφd := (isFrob_pow' hφ d).2 _ hint
       rw [(hfix d).2 dvd_rfl x] at hφd
-      have e : algebraMap M Ω (((x ^ (normV v ^ d) - x : 𝓞 M)) : M)
-          = -(algebraMap M Ω (x : M) - (algebraMap M Ω (x : M)) ^ (normV v ^ d)) := by
-        rw [show (((x ^ (normV v ^ d) - x : 𝓞 M)) : M) = (x : M) ^ (normV v ^ d) - (x : M) by push_cast; ring,
+      have e
+          : algebraMap M Ω (((x ^ (normV v ^ d) - x : 𝓞 M)) : M)
+            = -(algebraMap M Ω (x : M) - (algebraMap M Ω (x : M)) ^ (normV v ^ d)) := by
+        rw [show (((x ^ (normV v ^ d) - x : 𝓞 M)) : M) = (x : M) ^ (normV v ^ d) - (x : M) by
+            push_cast; ring,
           map_sub, map_pow]
         ring
       rw [e, Valuation.map_neg]
@@ -122,8 +133,9 @@ theorem degOf : DegOf := by
     have hN : 1 < normV v ^ d := Nat.one_lt_pow (Nat.pos_iff_ne_zero.1 hd) hq
     have hp0 : (Polynomial.X ^ (normV v ^ d) - Polynomial.X : Polynomial (𝓞 M ⧸ w.asIdeal)) ≠ 0 :=
       Polynomial.X_pow_sub_X_ne_zero hN
-    have hsub : (Finset.univ : Finset (𝓞 M ⧸ w.asIdeal)).val ⊆
-        (Polynomial.X ^ (normV v ^ d) - Polynomial.X : Polynomial (𝓞 M ⧸ w.asIdeal)).roots := by
+    have hsub
+        : (Finset.univ : Finset (𝓞 M ⧸ w.asIdeal)).val
+          ⊆ (Polynomial.X ^ (normV v ^ d) - Polynomial.X : Polynomial (𝓞 M ⧸ w.asIdeal)).roots := by
       intro a _
       rw [Polynomial.mem_roots hp0, Polynomial.IsRoot, Polynomial.eval_sub, Polynomial.eval_pow,
         Polynomial.eval_X]

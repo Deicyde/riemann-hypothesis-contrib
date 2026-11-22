@@ -40,20 +40,26 @@ namespace Data
 
 variable {r : ℕ} (X : Data E r)
 
-theorem orthogonal_component_apply (z : Frame X.Ψ r) (ξ x : Fin r → E) (τ : X.Ψ) :
-    X.ucomp z ξ (X.embV x) τ = Data.emb τ.1 x -
-      (X.Hf z τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) / X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) •
-        Data.emb τ.1 ξ := rfl
+theorem orthogonal_component_apply (z : Frame X.Ψ r) (ξ x : Fin r → E) (τ : X.Ψ)
+    : X.ucomp z ξ (X.embV x) τ
+      = Data.emb τ.1 x
+        - (X.Hf z τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) / X.Hf z τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ))
+          • Data.emb τ.1 ξ :=
+  rfl
 
-theorem orthogonal_component_ne_zero (z : Frame X.Ψ r) {ξ x : Fin r → E} (hξ : ξ ≠ 0) (hx : ∀ e : E, x ≠ e • ξ)
-    (τ : X.Ψ) : X.ucomp z ξ (X.embV x) τ ≠ 0 := by
+theorem orthogonal_component_ne_zero
+    (z : Frame X.Ψ r) {ξ x : Fin r → E} (hξ : ξ ≠ 0) (hx : ∀ e : E, x ≠ e • ξ) (τ : X.Ψ)
+    : X.ucomp z ξ (X.embV x) τ ≠ 0 := by
   intro h
   rw [orthogonal_component_apply] at h
 
-  obtain ⟨c, hb⟩ : ∃ c : ℂ, ∀ b, τ.1 (x b) = c * τ.1 (ξ b) := ⟨_, fun b => by
-    have hb := congrFun h b
-    simp only [Data.emb, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hb
-    exact sub_eq_zero.mp hb⟩
+  obtain ⟨c, hb⟩ : ∃ c : ℂ, ∀ b, τ.1 (x b) = c * τ.1 (ξ b) := ⟨
+    _,
+    fun b => by
+      have hb := congrFun h b
+      simp only [Data.emb, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hb
+      exact sub_eq_zero.mp hb
+  ⟩
   obtain ⟨a, ha⟩ : ∃ a, ξ a ≠ 0 := by
     by_contra hcon
     push Not at hcon

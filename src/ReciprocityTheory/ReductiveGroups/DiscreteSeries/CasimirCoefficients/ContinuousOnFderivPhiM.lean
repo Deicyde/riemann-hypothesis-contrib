@@ -129,19 +129,22 @@ lemma conj_mem_omega {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef) (k : KG ε
   | exact (hP.submatrix _ (Fin.castLE_injective _)).det_pos.ne'
 
 def entryCLM (a b : Fin n) : Matrix (Fin n) (Fin n) ℂ →L[ℂ] ℂ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun M => M a b
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun M => M a b
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
 
-def DkL (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (T.V →L[ℂ] T.V) where
-  toFun Y := fderiv ℂ (PhiM μ) (toMK k⁻¹ * x * toMK k)
-        (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k)) • (T.op k * projW T * T.op k⁻¹) +
-      PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * (T.dτ Y * projW T - projW T * T.dτ Y) * T.op k⁻¹)
+def DkL (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] (T.V →L[ℂ] T.V) where
+  toFun Y :=
+    fderiv ℂ (PhiM μ) (toMK k⁻¹ * x * toMK k)
+          (toMK k⁻¹ * x * toMK k * Y - Y * (toMK k⁻¹ * x * toMK k))
+        • (T.op k * projW T * T.op k⁻¹)
+      + PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * (T.dτ Y * projW T - projW T * T.dτ Y) * T.op k⁻¹)
   map_add' Y Y' := by
-    simp only [Matrix.mul_add, Matrix.add_mul, map_add (f := _), map_sub, add_mul, mul_add, sub_mul, mul_sub,
-      add_smul, sub_smul, smul_add, smul_sub]
+    simp only [Matrix.mul_add, Matrix.add_mul, map_add (f := _), map_sub, add_mul, mul_add, sub_mul,
+      mul_sub, add_smul, sub_smul, smul_add, smul_sub]
     abel
   map_smul' c Y := by
     simp only [Matrix.mul_smul, Matrix.smul_mul, map_smul, map_sub, smul_mul_assoc, mul_smul_comm,
@@ -155,10 +158,12 @@ lemma DkL_apply (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin 
       PhiM μ (toMK k⁻¹ * x * toMK k) • (T.op k * (T.dτ Y * projW T - projW T * T.dτ Y) * T.op k⁻¹) :=
   rfl
 
-def Ek (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ)
-    (φ : Matrix (Fin n) (Fin n) ℂ →L[ℂ] ℂ) (A M : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) : T.V →L[ℂ] T.V :=
-  φ (toMK k⁻¹ * A * toMK k) • DkL T μ x k M +
-    φ (toMK k⁻¹ * A * toMK k * M - M * (toMK k⁻¹ * A * toMK k)) • Gint T μ x k
+def Ek
+    (T : KType ε Λ) (μ : Fin n → ℤ) (x : Matrix (Fin n) (Fin n) ℂ)
+    (φ : Matrix (Fin n) (Fin n) ℂ →L[ℂ] ℂ) (A M : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : T.V →L[ℂ] T.V :=
+  φ (toMK k⁻¹ * A * toMK k) • DkL T μ x k M
+    + φ (toMK k⁻¹ * A * toMK k * M - M * (toMK k⁻¹ * A * toMK k)) • Gint T μ x k
 
 lemma continuous_B (A : Matrix (Fin n) (Fin n) ℂ) : Continuous fun k : KG ε => toMK k⁻¹ * A * toMK k := by
   first

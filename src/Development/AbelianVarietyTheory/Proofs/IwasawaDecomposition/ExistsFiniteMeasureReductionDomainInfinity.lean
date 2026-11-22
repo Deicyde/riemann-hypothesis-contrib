@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Covol
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Topology
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL
 
 noncomputable section
 
@@ -21,19 +22,23 @@ namespace GlobalTheory.GLInfReduction
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-def entries (y : Matrix (Fin a) (Fin a) (Cinf E)) : GlobalTheory.FlagMeas.MatInf E a := fun w i k => y i k w
+def entries (y : Matrix (Fin a) (Fin a) (Cinf E)) : GlobalTheory.FlagMeas.MatInf E a := fun w i k =>
+  y i k w
 
 def dn (y : Matrix (Fin a) (Fin a) (Cinf E)) : ℝ := ∏ w, ‖(y.det) w‖ ^ 2
 
-theorem detNorm_entries (y : Matrix (Fin a) (Fin a) (Cinf E)) :
-    GlobalTheory.FlagMeas.detNorm E a (entries y) = dn y := by
+theorem detNorm_entries (y : Matrix (Fin a) (Fin a) (Cinf E))
+    : GlobalTheory.FlagMeas.detNorm E a (entries y) = dn y := by
   unfold GlobalTheory.FlagMeas.detNorm dn
   refine Finset.prod_congr rfl fun w _ => ?_
-  have : Matrix.of (entries y w) = (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix y := by
+  have : Matrix.of (entries y w)
+      = (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) w).mapMatrix y := by
     ext i k; rfl
-  rw [this, ← RingHom.map_det]; rfl
+  rw [this, ← RingHom.map_det]
+  rfl
 
-theorem entries_mul (g y : Matrix (Fin a) (Fin a) (Cinf E)) : entries (g * y) = entries g * entries y := by
+theorem entries_mul (g y : Matrix (Fin a) (Fin a) (Cinf E))
+    : entries (g * y) = entries g * entries y := by
   funext w i k
   change (g * y) i k w = (Matrix.of (entries g w) * Matrix.of (entries y w)) i k
   simp [Matrix.mul_apply, Finset.sum_apply, entries]
@@ -43,7 +48,10 @@ theorem dn_mul (g y : Matrix (Fin a) (Fin a) (Cinf E)) : dn (g * y) = dn g * dn 
 
 theorem dn_pos (y : GL (Fin a) (Cinf E)) : 0 < dn (y : Matrix (Fin a) (Fin a) (Cinf E)) := by
   refine Finset.prod_pos fun w _ => ?_
-  have h : (y : Matrix (Fin a) (Fin a) (Cinf E)).det * ((y⁻¹ : GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E)).det = 1 := by
+  have h
+      : (y : Matrix (Fin a) (Fin a) (Cinf E)).det
+          * ((y⁻¹ : GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E)).det
+        = 1 := by
     rw [← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one]
   have h' := congrFun h w
   have hne : (y : Matrix (Fin a) (Fin a) (Cinf E)).det w ≠ 0 := left_ne_zero_of_mul_eq_one h'
@@ -51,15 +59,18 @@ theorem dn_pos (y : GL (Fin a) (Cinf E)) : 0 < dn (y : Matrix (Fin a) (Fin a) (C
 
 end GlobalTheory.GLInfReduction
 
-
 open GlobalTheory.GLInfReduction in
-theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
     (a : ℕ) (Λ : Submodule (𝓞 E) (Fin a → E)) (hΛ : Submodule.IsFullLattice E Λ)
     [MeasurableSpace (GL (Fin a) (Cinf E))] [BorelSpace (GL (Fin a) (Cinf E))]
-    (ν : Measure (GL (Fin a) (Cinf E))) [ν.IsHaarMeasure] :
-    ∃ Ω : Set (GL (Fin a) (Cinf E)), ν Ω < ⊤ ∧ ∀ y, ∃ γ : GL (Fin a) E,
-      (∀ x, (γ : Matrix (Fin a) (Fin a) E) *ᵥ x ∈ Λ ↔ x ∈ Λ) ∧
-      ∃ n : ℤ, GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ n) * y ∈ Ω := by
+    (ν : Measure (GL (Fin a) (Cinf E))) [ν.IsHaarMeasure]
+    : ∃ Ω : Set (GL (Fin a) (Cinf E)),
+      ν Ω < ⊤
+        ∧ ∀ y, ∃ γ : GL (Fin a) E,
+          (∀ x, (γ : Matrix (Fin a) (Fin a) E) *ᵥ x ∈ Λ ↔ x ∈ Λ)
+            ∧ ∃ n : ℤ,
+              GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ n) * y ∈ Ω := by
   rcases Nat.eq_zero_or_pos a with rfl | ha
   · refine ⟨Set.univ, ?_, fun y => ⟨1, by simp, 0, trivial⟩⟩
     haveI : Subsingleton (GL (Fin 0) (Cinf E)) := ⟨fun x y => Units.ext (Subsingleton.elim _ _)⟩
@@ -71,9 +82,10 @@ theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure (E : Type) [F
   have hN : 0 < N := by positivity
   have hNR : (N : ℝ) ≠ 0 := by exact_mod_cast hN.ne'
 
-  have hslab := GlobalTheory.T.covolume_unitDetNormSlab_latticeAut_lt_top E inferInstance a ha Λ (by
-    letI := hΛ
-    infer_instance)
+  have hslab :=
+    GlobalTheory.T.covolume_unitDetNormSlab_latticeAut_lt_top E inferInstance a ha Λ (by
+      letI := hΛ
+      infer_instance)
   simp only [GlobalTheory.FlagMeas.covol, iInf_lt_iff] at hslab
   obtain ⟨D, hDm, hcov, hDlt⟩ := hslab
   have hD' := GlobalTheory.T.haar_infiniteGL_lt_top_of_infiniteGLHaarMeasure_lt_top E a ν D hDm hDlt
@@ -81,21 +93,27 @@ theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure (E : Type) [F
   have hS' : ν S < ⊤ := hD'
 
   let c : ℝ → GL (Fin a) (Cinf E) := fun t => GeneralLinearGroup.map (pInf E) (splitCentre E a t)
-  have hc_val : ∀ t : ℝ, (c t : Matrix (Fin a) (Fin a) (Cinf E)) =
-      Matrix.scalar (Fin a) (fun _ : InfinitePlace E => Complex.exp (t : ℂ)) := by
+  have hc_val
+      : ∀ t : ℝ,
+        (c t : Matrix (Fin a) (Fin a) (Cinf E))
+          = Matrix.scalar (Fin a) (fun _ : InfinitePlace E => Complex.exp (t : ℂ)) := by
     intro t
     simp only [c, splitCentre, pInf_infGL]
     rfl
   have hc_dn : ∀ t : ℝ, dn (c t : Matrix (Fin a) (Fin a) (Cinf E)) = Real.exp (N * t) := by
     intro t
     rw [hc_val, dn]
-    simp only [Matrix.scalar_apply, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ, Fintype.card_fin,
-      Pi.pow_apply, norm_pow, Complex.norm_exp_ofReal]
+    simp only [Matrix.scalar_apply, Matrix.det_diagonal, Finset.prod_const, Finset.card_univ,
+      Fintype.card_fin, Pi.pow_apply, norm_pow, Complex.norm_exp_ofReal]
     rw [← hr_def, ← Real.exp_nat_mul, ← Real.exp_nat_mul, ← Real.exp_nat_mul, hN_def]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   have hcomm : ∀ t g, c t * g = g * c t := by
     intro t g
-    have := congrArg (GeneralLinearGroup.map (pInf E)) (splitCentre_comm (E := E) (a := a) t (infGL E a g))
+    have :=
+      congrArg (GeneralLinearGroup.map (pInf E))
+        (splitCentre_comm (E := E) (a := a) t (infGL E a g))
     simpa [map_mul] using this
   have hcint : ∀ n : ℤ, GeneralLinearGroup.map (pInf E) (splitCentre E a 1 ^ n) = c n := by
     intro n; simp only [c, splitCentre_intCast]
@@ -122,9 +140,14 @@ theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure (E : Type) [F
       congr 1
       have hmR : (ρ : ℝ) + N * q = m := by exact_mod_cast hm
       have hkR : (k : ℝ) = ρ := by exact_mod_cast hk
-      rw [← hmR, hkR]; push_cast; field_simp; ring
-    have hxS : 1 ≤ GlobalTheory.FlagMeas.detNorm E a (entries (x : Matrix (Fin a) (Fin a) (Cinf E))) ∧
-        GlobalTheory.FlagMeas.detNorm E a (entries (x : Matrix (Fin a) (Fin a) (Cinf E))) < Real.exp 1 := by
+      rw [← hmR, hkR]
+      push_cast
+      field_simp
+      ring
+    have hxS
+        : 1 ≤ GlobalTheory.FlagMeas.detNorm E a (entries (x : Matrix (Fin a) (Fin a) (Cinf E)))
+          ∧ GlobalTheory.FlagMeas.detNorm E a (entries (x : Matrix (Fin a) (Fin a) (Cinf E)))
+            < Real.exp 1 := by
       rw [detNorm_entries, hx]
       constructor
       · exact Real.one_le_exp (by linarith [Int.floor_le L])
@@ -138,9 +161,16 @@ theorem GlobalTheory.GLInfReduction.exists_cover_of_finite_measure (E : Type) [F
       funext w i j
       rw [hgγ w i j]
       exact pInf_algebraMap (γ i j) w
-    have e1 : c (-(k : ℝ) / N) * (GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ (-q)) * y) = R * x := by
+    have e1
+        : c (-(k : ℝ) / N)
+            * (GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ (-q)) * y)
+          = R * x := by
       rw [map_mul, hcint, ← mul_assoc, ← mul_assoc, hcomm, mul_assoc, mul_assoc]
-    change entries ((c (-(k : ℝ) / N) * (GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ (-q)) * y) :
-      GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E)) ∈ D
+    change entries
+        ((c (-(k : ℝ) / N)
+              * (GeneralLinearGroup.map (pInf E) (ratGL E a γ * splitCentre E a 1 ^ (-q)) * y)
+            : GL (Fin a) (Cinf E))
+          : Matrix (Fin a) (Fin a) (Cinf E))
+      ∈ D
     rw [e1, Units.val_mul, entries_mul, hR]
     exact hgD

@@ -15,18 +15,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.MainNotions Formalism.BasicNotions
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.MainNotions Formalism.BasicNotions
 open GlobalTheory GlobalTheory.RunIn
 
 namespace GlobalTheory
 
-private theorem full_of_short_span {D : D7} {B : WeightFamilies.Prov D}
-    {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : WeightAlgebra.PJ D B P j)
-    (S : WeightAlgebra.Scal B) (ka wL wF : WeightFamilies.Wt D j)
-    (hs : S.sK ≠ 0) (hsp : PullbackSections.SpanAt X ka)
-    (hH : WeightAlgebra.H2 X S ka wL wF)
-    (hlat : Submodule.IsLattice B.KO (B.Mlat j ka)) :
-    Submodule.IsFullLattice B.KO (B.Mlat j ka) := by
+private theorem full_of_short_span
+    {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+    (X : WeightAlgebra.PJ D B P j) (S : WeightAlgebra.Scal B) (ka wL wF : WeightFamilies.Wt D j)
+    (hs : S.sK ≠ 0) (hsp : PullbackSections.SpanAt X ka) (hH : WeightAlgebra.H2 X S ka wL wF)
+    (hlat : Submodule.IsLattice B.KO (B.Mlat j ka))
+    : Submodule.IsFullLattice B.KO (B.Mlat j ka) := by
   letI := hlat
   refine ⟨?_⟩
   apply top_unique
@@ -42,25 +43,35 @@ private theorem full_of_short_span {D : D7} {B : WeightFamilies.Prov D}
     have hnK : (n : B.KO) ≠ 0 := by exact_mod_cast hn
     simp only [t, map_mul, map_pow, map_natCast]
     exact mul_ne_zero hsK (pow_ne_zero _ hnK)
-  have hmem : t • f ∈ B.Mlat j ka := hH.2.2.2 (by
-    simp only [WeightAlgebra.PJ.Thc, WeightAlgebra.PJ.scaled]
-    refine Submodule.mem_map.mpr ⟨(n : 𝓞 B.KO) ^ k • f,
-      Submodule.mem_map.mpr ⟨f, hf, by simp [n, k]⟩, ?_⟩
-    simp only [t, LinearMap.smul_apply, LinearMap.id_apply, mul_smul])
-  have hm : t • f ∈ Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka)) := Submodule.subset_span hmem
+  have hmem : t • f ∈ B.Mlat j ka :=
+    hH.2.2.2 (by
+      simp only [WeightAlgebra.PJ.Thc, WeightAlgebra.PJ.scaled]
+      refine Submodule.mem_map.mpr
+        ⟨(n : 𝓞 B.KO) ^ k • f, Submodule.mem_map.mpr ⟨f, hf, by simp [n, k]⟩, ?_⟩
+      simp only [t, LinearMap.smul_apply, LinearMap.id_apply, mul_smul])
+  have hm : t • f ∈ Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka)) :=
+    Submodule.subset_span hmem
   have hsm : t • f = (t : B.KO) • f := (algebraMap_smul B.KO t f).symm
   rw [hsm] at hm
   have hm' := (Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka))).smul_mem (t : B.KO)⁻¹ hm
-  have heq : (t : B.KO)⁻¹ • ((t : B.KO) • f) = f := by
-    rw [← mul_smul, inv_mul_cancel₀ ht, one_smul]
+  have heq : (t : B.KO)⁻¹ • ((t : B.KO) • f) = f := by rw [← mul_smul, inv_mul_cancel₀ ht, one_smul]
   rwa [heq] at hm'
 
-
-theorem latAt_record : ∀ (D : D7) (T : Core D) (h : LawsCore T), GamAt T → ∀ (large₂ : SizeData₂ D) (CA : ℝ), WeightAlgebra.ParA large₂ CA → ∀ (j : ℕ) (ka : WeightFamilies.Wt D j) (P : ModuliIntegralCharts.Prov D) (X : WeightAlgebra.PJ D (recB h) P j) (S : WeightAlgebra.Scal (recB h)) (wL wF : WeightFamilies.Wt D j), S.sK ≠ 0 → PullbackSections.SpanAt X ka → WeightAlgebra.H2 X S ka wL wF → Formalism.MainNotions.Gaps.EtaleWeightGaps.LatAt (recB h) j ka := by
+theorem latAt_record
+    : ∀ (D : D7) (T : Core D) (h : LawsCore T),
+      GamAt T
+        → ∀ (large₂ : SizeData₂ D) (CA : ℝ),
+          WeightAlgebra.ParA large₂ CA
+            → ∀ (j : ℕ) (ka : WeightFamilies.Wt D j) (P : ModuliIntegralCharts.Prov D)
+                (X : WeightAlgebra.PJ D (recB h) P j) (S : WeightAlgebra.Scal (recB h))
+                (wL wF : WeightFamilies.Wt D j),
+              S.sK ≠ 0 → PullbackSections.SpanAt X ka → WeightAlgebra.H2 X S ka wL wF
+                → Formalism.MainNotions.Gaps.EtaleWeightGaps.LatAt (recB h) j ka := by
   intro D T h hG large₂ CA hA j ka P X S wL wF hs hsp hH
   obtain ⟨C0, -, hC⟩ := GlobalTheory.T.meanLogSupNorm_lower_bound_of_coreLaws
   apply full_of_short_span X S ka wL wF hs hsp hH
-  exact PullbackSections.latOfLam D (recB h) P j X S ka wL wF large₂ C0 2 (fun i => (D.host.g_prime i).pos) hs
-    (hC D T h hG large₂ hA.2.2.2.2.1 j ka C0 2 le_rfl le_rfl) hsp hH
+  exact PullbackSections.latOfLam D (recB h) P j X S ka wL wF large₂ C0 2
+    (fun i => (D.host.g_prime i).pos)
+    hs (hC D T h hG large₂ hA.2.2.2.2.1 j ka C0 2 le_rfl le_rfl) hsp hH
 
 end GlobalTheory

@@ -8,15 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsFin
 @[expose] public section
 
 open scoped BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj NumberField
 
 namespace GlobalTheory.DvrClosedEmbedding
 
-theorem exists_addValuation_log_norm {C : Type} [NormedField C] [IsUltrametricDist C] {r : ℝ}
-    (hr0 : 0 < r) (hr1 : r < 1) :
-    ∃ v : AddValuation C (WithTop ℝ),
-      (∀ x, x ≠ 0 → v x = ((Real.log ‖x‖ / Real.log r : ℝ) : WithTop ℝ)) ∧
-      ∀ (x : C) (n : ℕ), (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v x ↔ ‖x‖ ≤ r ^ n := by
+theorem exists_addValuation_log_norm
+    {C : Type} [NormedField C] [IsUltrametricDist C] {r : ℝ} (hr0 : 0 < r) (hr1 : r < 1)
+    : ∃ v : AddValuation C (WithTop ℝ),
+      (∀ x, x ≠ 0 → v x = ((Real.log ‖x‖ / Real.log r : ℝ) : WithTop ℝ))
+        ∧ ∀ (x : C) (n : ℕ), (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v x ↔ ‖x‖ ≤ r ^ n := by
   classical
   have hl : Real.log r < 0 := Real.log_neg hr0 hr1
   let f : C → WithTop ℝ := fun x =>
@@ -53,9 +54,11 @@ theorem exists_addValuation_log_norm {C : Type} [NormedField C] [IsUltrametricDi
     rw [hf x hx, WithTop.coe_le_coe, le_div_iff_of_neg hl, ← Real.log_pow,
       Real.log_le_log_iff (norm_pos_iff.2 hx) (pow_pos hr0 n)]
 
-theorem exists_limit_of_norm_sub_le_pow {C : Type} [NormedField C] [IsUltrametricDist C]
-    [CompleteSpace C] {r : ℝ} (hr0 : 0 < r) (hr1 : r < 1) (s : ℕ → C)
-    (hs : ∀ n, ‖s (n + 1) - s n‖ ≤ r ^ n) : ∃ x, ∀ n, ‖x - s n‖ ≤ r ^ n := by
+theorem exists_limit_of_norm_sub_le_pow
+    {C : Type} [NormedField C] [IsUltrametricDist C] [CompleteSpace C]
+    {r : ℝ} (hr0 : 0 < r) (hr1 : r < 1)
+    (s : ℕ → C) (hs : ∀ n, ‖s (n + 1) - s n‖ ≤ r ^ n)
+    : ∃ x, ∀ n, ‖x - s n‖ ≤ r ^ n := by
   have hc : CauchySeq s := by
     refine cauchySeq_of_le_geometric r 1 hr1 fun n => ?_
     rw [dist_comm, dist_eq_norm, one_mul]
@@ -71,8 +74,18 @@ theorem exists_limit_of_norm_sub_le_pow {C : Type} [NormedField C] [IsUltrametri
     rw [sub_add_sub_cancel] at h
     exact h.trans (max_le ((hs m).trans (pow_le_pow_of_le_one hr0.le hr1.le hm)) ih)
 
-theorem exists_complete_isAlgClosed_addValuation :
-    ∀ (T : CDVR) (p : ℕ), p.Prime → ¬ IsUnit (p : T.V) → ∃ (C : Type) (_ : Field C) (_ : CharZero C) (v : AddValuation C (WithTop ℝ)) (ι : T.Fr →+* C), v (p : C) = 1 ∧ (∀ x : T.Fr, x ≠ 0 → v (ι x) = (((vV T.V x : ℝ) / (vV T.V ((p : ℕ) : T.Fr) : ℝ) : ℝ) : WithTop ℝ)) ∧ IsAlgClosed C ∧ ∀ s : ℕ → C, (∀ n : ℕ, (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v (x - s n) := by
+theorem exists_complete_isAlgClosed_addValuation
+    : ∀ (T : CDVR) (p : ℕ),
+      p.Prime → ¬ IsUnit (p : T.V)
+        → ∃ (C : Type) (_ : Field C) (_ : CharZero C) (v : AddValuation C (WithTop ℝ))
+            (ι : T.Fr →+* C),
+          v (p : C) = 1
+            ∧ (∀ x : T.Fr,
+              x ≠ 0 → v (ι x) = (((vV T.V x : ℝ) / (vV T.V ((p : ℕ) : T.Fr) : ℝ) : ℝ) : WithTop ℝ))
+            ∧ IsAlgClosed C
+            ∧ ∀ s : ℕ → C,
+              (∀ n : ℕ, (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v (s (n + 1) - s n))
+                → ∃ x, ∀ n : ℕ, (((n : ℕ) : ℝ) : WithTop ℝ) ≤ v (x - s n) := by
   intro T p hp hu
   have hp0 : (p : T.V) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
   have hr0 : (0 : ℝ) < 1 / 2 := by norm_num
@@ -86,15 +99,28 @@ theorem exists_complete_isAlgClosed_addValuation :
   obtain ⟨v, hv, hvn⟩ := exists_addValuation_log_norm (C := C) hr0 hr1
   have hl : Real.log (1 / 2) ≠ 0 := (Real.log_neg hr0 hr1).ne
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible T.V
-  have hz : ∀ x : T.Fr, x ≠ 0 → Real.log ‖algebraMap T.Fr C x‖ =
-      (vV T.V x : ℝ) * Real.log ‖algebraMap T.Fr C (algebraMap T.V T.Fr π)‖ := fun x hx => by
+  have hz
+      : ∀ x : T.Fr,
+        x ≠ 0
+          → Real.log ‖algebraMap T.Fr C x‖
+            = (vV T.V x : ℝ)
+              * Real.log ‖algebraMap T.Fr C (algebraMap T.V T.Fr π)‖ := fun x hx => by
     rw [ArcQ.norm_map_eq_zpow_vV (algebraMap T.Fr C) (fun a => (hC _).2 ⟨a, rfl⟩) hπ hx,
       Real.log_zpow]
   have hpF : (p : T.Fr) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
   have hzp := hz p hpF
   rw [hCp] at hzp
-  refine ⟨C, inferInstance, inferInstance, v, algebraMap T.Fr C, ?_, fun x hx => ?_,
-    inferInstance, fun s hs => ?_⟩
+  refine ⟨
+    C,
+    inferInstance,
+    inferInstance,
+    v,
+    algebraMap T.Fr C,
+    ?_,
+    fun x hx => ?_,
+    inferInstance,
+    fun s hs => ?_
+  ⟩
   · rw [map_natCast] at hCp
     rw [hv _ (Nat.cast_ne_zero.2 hp.ne_zero), hCp, div_self hl, WithTop.coe_one]
   · rw [hv _ ((map_ne_zero _).2 hx), hz x hx, hzp,

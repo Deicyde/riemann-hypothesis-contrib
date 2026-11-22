@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompac
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -19,44 +20,58 @@ noncomputable section
 namespace GlobalTheory.LeviDesc.OrbFin
 open GlobalTheory.LeviDesc.Krylov
 
-theorem exists_cyclic {F : Type} [Field F] {r : ℕ} (y : Matrix (Fin r) (Fin r) F) (hy : y.charpoly.Separable) :
-    ∃ e : Fin r → F, IsUnit (krylov y e).det :=
+theorem exists_cyclic
+    {F : Type} [Field F] {r : ℕ} (y : Matrix (Fin r) (Fin r) F) (hy : y.charpoly.Separable)
+    : ∃ e : Fin r → F, IsUnit (krylov y e).det :=
   GlobalTheory.T.exists_isUnit_det_krylovMatrix_of_separable y hy
 
-theorem krylov_conj_eq {F : Type} [Field F] {r : ℕ} (y y' : Matrix (Fin r) (Fin r) F) (e e' : Fin r → F)
-    (hc : y.charpoly = y'.charpoly) (he : IsUnit (krylov y e).det) (he' : IsUnit (krylov y' e').det) :
-    (krylov y e)⁻¹ * y * krylov y e = (krylov y' e')⁻¹ * y' * krylov y' e' :=
+theorem krylov_conj_eq
+    {F : Type} [Field F]
+    {r : ℕ} (y y' : Matrix (Fin r) (Fin r) F) (e e' : Fin r → F) (hc : y.charpoly = y'.charpoly)
+    (he : IsUnit (krylov y e).det) (he' : IsUnit (krylov y' e').det)
+    : (krylov y e)⁻¹ * y * krylov y e = (krylov y' e')⁻¹ * y' * krylov y' e' :=
   GlobalTheory.T.krylovMatrix_conj_eq_of_charpoly_eq y y' e e' hc he he'
 
-theorem isClosed_charpoly_eq (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ)
-    (χ : (w.adicCompletion E)[X]) : IsClosed {y : GLw r w | y.val.charpoly = χ} := by
+theorem isClosed_charpoly_eq
+    (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) (χ : (w.adicCompletion E)[X])
+    : IsClosed {y : GLw r w | y.val.charpoly = χ} := by
   haveI : CharZero (w.adicCompletion E) :=
     charZero_of_injective_algebraMap (algebraMap E (w.adicCompletion E)).injective
   haveI : Infinite (w.adicCompletion E) := Infinite.of_injective Nat.cast Nat.cast_injective
-  have hset : {y : GLw r w | y.val.charpoly = χ} =
-      ⋂ t : w.adicCompletion E, {y : GLw r w | ((Matrix.scalar (Fin r) t) - y.val).det = χ.eval t} := by
-    ext y
-    simp only [Set.mem_setOf_eq, Set.mem_iInter]
-    constructor
-    · intro hy t; rw [← Matrix.eval_charpoly, hy]
-    · intro hy; exact Polynomial.funext fun t => by rw [Matrix.eval_charpoly]; exact hy t
+  have hset
+      : {y : GLw r w | y.val.charpoly = χ}
+        = ⋂ t : w.adicCompletion E, {y : GLw r w | ((Matrix.scalar (Fin r) t) - y.val).det = χ.eval t} :=
+    by
+      ext y
+      simp only [Set.mem_setOf_eq, Set.mem_iInter]
+      constructor
+      · intro hy t; rw [← Matrix.eval_charpoly, hy]
+      · intro hy; exact Polynomial.funext fun t => by rw [Matrix.eval_charpoly]; exact hy t
   rw [hset]
   refine isClosed_iInter fun t => isClosed_eq ?_ continuous_const
   exact (continuous_const.sub Units.continuous_val).matrix_det
 
-theorem exists_compact_krylov (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) (Ω : Set (GLw r w))
-    (hΩ : IsCompact Ω) (h : ∀ y ∈ Ω, ∃ e, IsUnit (krylov y.val e).det) :
-    ∃ C : Set (GLw r w), IsCompact C ∧ ∀ y ∈ Ω, ∃ e, ∃ c ∈ C, c.val = krylov y.val e :=
+theorem exists_compact_krylov
+    (E : Type) [Field E] [NumberField E]
+    (w : Pl E) (r : ℕ) (Ω : Set (GLw r w))
+    (hΩ : IsCompact Ω) (h : ∀ y ∈ Ω, ∃ e, IsUnit (krylov y.val e).det)
+    : ∃ C : Set (GLw r w), IsCompact C ∧ ∀ y ∈ Ω, ∃ e, ∃ c ∈ C, c.val = krylov y.val e :=
   GlobalTheory.T.exists_compact_invertible_krylovMatrices E w r Ω hΩ h
 
-theorem isOpen_KGL (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) :
-    IsOpen (GlobalTheory.LFun.KGL w (n := r) : Set (GLw r w)) :=
+theorem isOpen_KGL (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ)
+    : IsOpen (GlobalTheory.LFun.KGL w (n := r) : Set (GLw r w)) :=
   GlobalTheory.LFun.IntPtsUnitary.isOpen_GLint _ (Valued.isOpen_integer (w.adicCompletion E))
 
-theorem orbit_fin (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) (γ : GLw r w)
-    (hs : γ.val.charpoly.Separable) (Ω : Set (GLw r w)) (hΩ : IsCompact Ω) :
-    ∃ T : Set (GLw r w), T.Finite ∧ ∀ q : GLw r w, q⁻¹ * γ * q ∈ Ω →
-      ∃ z : GLw r w, z * γ = γ * z ∧ ∃ t ∈ T, ∃ k ∈ GlobalTheory.LFun.KGL w (n := r), q = z * t * k := by
+theorem orbit_fin
+    (E : Type) [Field E] [NumberField E]
+    (w : Pl E) (r : ℕ)
+    (γ : GLw r w) (hs : γ.val.charpoly.Separable) (Ω : Set (GLw r w)) (hΩ : IsCompact Ω)
+    : ∃ T : Set (GLw r w),
+      T.Finite
+        ∧ ∀ q : GLw r w,
+          q⁻¹ * γ * q ∈ Ω
+            → ∃ z : GLw r w,
+              z * γ = γ * z ∧ ∃ t ∈ T, ∃ k ∈ GlobalTheory.LFun.KGL w (n := r), q = z * t * k := by
   set Ωχ := Ω ∩ {y : GLw r w | y.val.charpoly = γ.val.charpoly} with hΩχ
   have hcpt : IsCompact Ωχ := hΩ.inter_right (isClosed_charpoly_eq E w r _)
   have hcyc : ∀ y ∈ Ωχ, ∃ e, IsUnit (krylov y.val e).det := fun y hy =>
@@ -68,8 +83,11 @@ theorem orbit_fin (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) (γ 
   set D : Set (GLw r w) := (fun c => Bf * c⁻¹) '' C with hD
   have hDc : IsCompact D := hC.image (continuous_const.mul continuous_inv)
   have hKo := isOpen_KGL E w r
-  obtain ⟨T, hT⟩ := hDc.elim_finite_subcover (fun c : GLw r w => (fun x => c⁻¹ * x) ⁻¹' (GlobalTheory.LFun.KGL w (n := r) : Set (GLw r w)))
-    (fun c => hKo.preimage (continuous_const.mul continuous_id)) (fun x _ => Set.mem_iUnion.2 ⟨x, by simp⟩)
+  obtain ⟨T, hT⟩ :=
+    hDc.elim_finite_subcover
+      (fun c : GLw r w => (fun x => c⁻¹ * x) ⁻¹' (GlobalTheory.LFun.KGL w (n := r) : Set (GLw r w)))
+      (fun c => hKo.preimage (continuous_const.mul continuous_id))
+      (fun x _ => Set.mem_iUnion.2 ⟨x, by simp⟩)
   refine ⟨(T : Set (GLw r w)), T.finite_toSet, fun q hq => ?_⟩
   have hy : q⁻¹ * γ * q ∈ Ωχ := by
     refine ⟨hq, ?_⟩
@@ -82,13 +100,16 @@ theorem orbit_fin (E : Type) [Field E] [NumberField E] (w : Pl E) (r : ℕ) (γ 
   have hconj := krylov_conj_eq _ _ e f (hy.2) he hf
   have h1 : c⁻¹ * (q⁻¹ * γ * q) * c = Bf⁻¹ * γ * Bf := by
     ext1
-    rw [Units.val_mul (c⁻¹ * (q⁻¹ * γ * q)) c, Units.val_mul c⁻¹ (q⁻¹ * γ * q), Units.val_mul (Bf⁻¹ * γ) Bf,
-      Units.val_mul Bf⁻¹ γ, Matrix.coe_units_inv c, Matrix.coe_units_inv Bf, hce, hBf, IsUnit.unit_spec]
+    rw [Units.val_mul (c⁻¹ * (q⁻¹ * γ * q)) c, Units.val_mul c⁻¹ (q⁻¹ * γ * q),
+      Units.val_mul (Bf⁻¹ * γ) Bf, Units.val_mul Bf⁻¹ γ, Matrix.coe_units_inv c,
+      Matrix.coe_units_inv Bf, hce, hBf, IsUnit.unit_spec]
     exact hconj
   have hxD : Bf * c⁻¹ ∈ D := ⟨c, hcC, rfl⟩
   obtain ⟨t, htT, ht⟩ := Set.mem_iUnion₂.1 (hT hxD)
   refine ⟨q * c * Bf⁻¹, ?_, t, htT, t⁻¹ * (Bf * c⁻¹), ht, by group⟩
-  calc q * c * Bf⁻¹ * γ = q * c * (Bf⁻¹ * γ * Bf) * Bf⁻¹ := by group
+  calc
+    q * c * Bf⁻¹ * γ
+      = q * c * (Bf⁻¹ * γ * Bf) * Bf⁻¹ := by group
     _ = q * c * (c⁻¹ * (q⁻¹ * γ * q) * c) * Bf⁻¹ := by rw [h1]
     _ = γ * (q * c * Bf⁻¹) := by group
 
@@ -98,16 +119,24 @@ theorem avg_ne_zero_exists {H : Type} [Group H] (u : H → ℂ) (h : avg u ≠ 0
   apply h
   simp [avg, hc]
 
-theorem charpoly_blk_separable (E : Type) [Field E] [NumberField E] (n a b : ℕ) (h : a + b = n) (w : Pl E)
-    (m : GLw a w × GLw b w) (hs : (m.1.val.charpoly * m.2.val.charpoly).Separable) :
-    (blk h w m 0 : GLw n w).val.charpoly.Separable := by
-  have hM : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-      (Matrix.fromBlocks m.1.val (m.1.val * (0 : Matrix (Fin a) (Fin b) (w.adicCompletion E))) 0 m.2.val)) := by
-    rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_reindex_self, Matrix.mul_zero, Matrix.det_fromBlocks_zero₁₂]
-    exact ((Matrix.isUnit_iff_isUnit_det _).mp m.1.isUnit).mul ((Matrix.isUnit_iff_isUnit_det _).mp m.2.isUnit)
-  have hval : ((blk h w m 0 : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) =
-      Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
-        (Matrix.fromBlocks m.1.val (m.1.val * (0 : Matrix (Fin a) (Fin b) (w.adicCompletion E))) 0 m.2.val) := by
+theorem charpoly_blk_separable
+    (E : Type) [Field E] [NumberField E]
+    (n a b : ℕ) (h : a + b = n)
+    (w : Pl E) (m : GLw a w × GLw b w) (hs : (m.1.val.charpoly * m.2.val.charpoly).Separable)
+    : (blk h w m 0 : GLw n w).val.charpoly.Separable := by
+  have hM : IsUnit (Matrix.reindex (finSumFinEquiv.trans (finCongr h))
+      (finSumFinEquiv.trans (finCongr h))
+      (Matrix.fromBlocks m.1.val (m.1.val * (0 : Matrix (Fin a) (Fin b) (w.adicCompletion E))) 0
+        m.2.val)) := by
+    rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_reindex_self, Matrix.mul_zero,
+      Matrix.det_fromBlocks_zero₁₂]
+    exact ((Matrix.isUnit_iff_isUnit_det _).mp m.1.isUnit).mul
+      ((Matrix.isUnit_iff_isUnit_det _).mp m.2.isUnit)
+  have hval
+      : ((blk h w m 0 : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+        = Matrix.reindex (finSumFinEquiv.trans (finCongr h)) (finSumFinEquiv.trans (finCongr h))
+          (Matrix.fromBlocks m.1.val (m.1.val * (0 : Matrix (Fin a) (Fin b) (w.adicCompletion E))) 0
+            m.2.val) := by
     simp only [blk]
     rw [dif_pos hM]
     rfl

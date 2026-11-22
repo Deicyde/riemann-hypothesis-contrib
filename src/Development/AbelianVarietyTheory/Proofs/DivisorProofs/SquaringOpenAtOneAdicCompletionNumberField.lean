@@ -13,8 +13,8 @@ noncomputable section
 
 namespace GlobalTheory.QSA
 
-theorem sqOpen_and_nhdsNE_zero_neBot_adicCompletion :
-    ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
+theorem sqOpen_and_nhdsNE_zero_neBot_adicCompletion
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
       SqOpen (v.adicCompletion F) ∧ (𝓝[≠] (0 : v.adicCompletion F)).NeBot := by
   intro F _ _ v
   letI : NontriviallyNormedField (v.adicCompletion F) := Valued.toNontriviallyNormedField _ _

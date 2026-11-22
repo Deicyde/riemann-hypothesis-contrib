@@ -32,11 +32,9 @@ def infEval (w : InfinitePlace K) : AdeleRing (𝓞 K) K →* w.Completion where
   map_one' := rfl
   map_mul' _ _ := rfl
 
-def finComp : (AdeleRing (𝓞 K) K)ˣ →* FinFam K :=
-  MonoidHom.pi fun v => Units.map (finEval v)
+def finComp : (AdeleRing (𝓞 K) K)ˣ →* FinFam K := MonoidHom.pi fun v => Units.map (finEval v)
 
-def infComp : (AdeleRing (𝓞 K) K)ˣ →* InfFam K :=
-  MonoidHom.pi fun w => Units.map (infEval w)
+def infComp : (AdeleRing (𝓞 K) K)ˣ →* InfFam K := MonoidHom.pi fun w => Units.map (infEval w)
 
 theorem finComp_toUnits (t : Kˣ) : finComp (toUnits K (AdeleRing (𝓞 K) K) t) = finDiag K t :=
   funext fun _ => Units.ext rfl
@@ -44,13 +42,13 @@ theorem finComp_toUnits (t : Kˣ) : finComp (toUnits K (AdeleRing (𝓞 K) K) t)
 theorem infComp_toUnits (t : Kˣ) : infComp (toUnits K (AdeleRing (𝓞 K) K) t) = infDiag K t :=
   funext fun _ => Units.ext rfl
 
-theorem eventually_valued_eq_one (a : (AdeleRing (𝓞 K) K)ˣ) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
-      Valued.v ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) = 1 := by
+theorem eventually_valued_eq_one (a : (AdeleRing (𝓞 K) K)ˣ)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
+        Valued.v ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) = 1 := by
   filter_upwards [(a : AdeleRing (𝓞 K) K).2.2, ((a⁻¹ : (AdeleRing (𝓞 K) K)ˣ) : AdeleRing (𝓞 K) K).2.2]
     with v h3 h4
-  have hmul : (a : AdeleRing (𝓞 K) K).2 v *
-      ((a⁻¹ : (AdeleRing (𝓞 K) K)ˣ) : AdeleRing (𝓞 K) K).2 v = 1 :=
+  have hmul
+      : (a : AdeleRing (𝓞 K) K).2 v * ((a⁻¹ : (AdeleRing (𝓞 K) K)ˣ) : AdeleRing (𝓞 K) K).2 v = 1 :=
     congrArg (fun z : AdeleRing (𝓞 K) K => z.2 v) a.mul_inv
   have hm := congrArg Valued.v hmul
   rw [map_mul, map_one] at hm
@@ -59,23 +57,22 @@ theorem eventually_valued_eq_one (a : (AdeleRing (𝓞 K) K)ˣ) :
   rw [← hm]
   exact mul_le_of_le_one_right' h4
 
-theorem eventually_integral_form (δ : K) (hδ : δ ≠ 0) (a : (AdeleRing (𝓞 K) K)ˣ) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
-      ∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
-        ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
-          x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2 := by
+theorem eventually_integral_form (δ : K) (hδ : δ ≠ 0) (a : (AdeleRing (𝓞 K) K)ˣ)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite,
+        ∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
+          ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
+            x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2 := by
   filter_upwards [eventually_valued_eq_one a,
     (GlobalTheory.QNorm.finite_valuation_ne_one K (Units.mk0 2 two_ne_zero)).compl_mem_cofinite,
     (GlobalTheory.QNorm.finite_valuation_ne_one K (Units.mk0 δ hδ)).compl_mem_cofinite] with v ha h2 hd
   simp only [Set.mem_compl_iff, Set.mem_ofPred_eq, not_not, Units.val_mk0] at h2 hd
-  have key : ∀ x : K, Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x :=
-    fun x => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
+  have key : ∀ x : K, Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x := fun x =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
   exact GlobalTheory.QNorm.exists_integral_sq_sub_mul_sq_of_unit K v (algebraMap K _ δ) _
     (by rw [← map_ofNat (algebraMap K (v.adicCompletion K)) 2]; exact (key _).trans h2)
     (by rw [key, hd]) ha
 
 variable (L : Type) [Field L] [NumberField L] [Algebra K L] [Algebra.IsQuadraticExtension K L]
-
 
 omit [NumberField L] in
 theorem almostNorm_finComp (a : (AdeleRing (𝓞 K) K)ˣ) : AlmostNorm K L (finComp a) := by
@@ -85,32 +82,37 @@ theorem almostNorm_finComp (a : (AdeleRing (𝓞 K) K)ˣ) : AlmostNorm K L (finC
   rintro v ⟨x, -, y, -, h⟩
   exact (mem_normGroup_iff_form b h0 h1).2 ⟨x, y, h⟩
 
-
 omit [NumberField L] in
-theorem mem_normGroup_iff_everywhereNorm (a : (AdeleRing (𝓞 K) K)ˣ) :
-    a ∈ normGroup K L (AdeleRing (𝓞 K) K) ↔ EverywhereNorm K L (finComp a) (infComp a) := by
+theorem mem_normGroup_iff_everywhereNorm (a : (AdeleRing (𝓞 K) K)ˣ)
+    : a ∈ normGroup K L (AdeleRing (𝓞 K) K) ↔ EverywhereNorm K L (finComp a) (infComp a) := by
   obtain ⟨δ, b, hδ, h0, h1⟩ := AlmostNorm.exists_basis_sq K L
   have hδ0 : δ ≠ 0 := fun h => hδ (h ▸ IsSquare.zero)
   rw [mem_normGroup_iff_form b h0 h1]
   constructor
   · rintro ⟨x, y, h⟩
-    exact ⟨fun v => (mem_normGroup_iff_form b h0 h1).2
-        ⟨x.2 v, y.2 v, congrArg (fun z : AdeleRing (𝓞 K) K => z.2 v) h⟩,
-      fun w => (mem_normGroup_iff_form b h0 h1).2
-        ⟨x.1 w, y.1 w, congrArg (fun z : AdeleRing (𝓞 K) K => z.1 w) h⟩⟩
+    exact ⟨
+      fun v =>
+        (mem_normGroup_iff_form b h0 h1).2
+          ⟨x.2 v, y.2 v, congrArg (fun z : AdeleRing (𝓞 K) K => z.2 v) h⟩,
+      fun w =>
+        (mem_normGroup_iff_form b h0 h1).2
+          ⟨x.1 w, y.1 w, congrArg (fun z : AdeleRing (𝓞 K) K => z.1 w) h⟩
+    ⟩
   · rintro ⟨hf, hi⟩
     have hc := eventually_integral_form δ hδ0 a
-    have hloc : ∀ v : HeightOneSpectrum (𝓞 K), ∃ x y : v.adicCompletion K,
-        ((∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
-          ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
-            x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2) →
-          x ∈ v.adicCompletionIntegers K ∧ y ∈ v.adicCompletionIntegers K) ∧
-        ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
-          x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2 := by
+    have hloc
+        : ∀ v : HeightOneSpectrum (𝓞 K), ∃ x y : v.adicCompletion K,
+          ((∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
+                ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K)
+                  = x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2)
+              → x ∈ v.adicCompletionIntegers K ∧ y ∈ v.adicCompletionIntegers K)
+            ∧ ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K)
+              = x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2 := by
       intro v
-      by_cases hv : ∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
-          ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
-            x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2
+      by_cases hv
+        : ∃ x ∈ v.adicCompletionIntegers K, ∃ y ∈ v.adicCompletionIntegers K,
+          ((finComp a v : (v.adicCompletion K)ˣ) : v.adicCompletion K)
+            = x ^ 2 - algebraMap K (v.adicCompletion K) δ * y ^ 2
       · obtain ⟨x, hx, y, hy, h⟩ := hv
         exact ⟨x, y, fun _ => ⟨hx, hy⟩, h⟩
       · obtain ⟨x, y, h⟩ := (mem_normGroup_iff_form b h0 h1).1 (hf v)
@@ -125,20 +127,25 @@ theorem mem_normGroup_iff_everywhereNorm (a : (AdeleRing (𝓞 K) K)ˣ) :
     · exact FiniteAdeleRing.ext K fun v => h v
 
 def normSign : (AdeleRing (𝓞 K) K)ˣ →* ℤˣ :=
-  MonoidHom.mk' (fun a => etaProd K L (finComp a) (infComp a)) fun a b => by
-    obtain ⟨h1, h2⟩ := localCharacters K L
-    unfold etaProd
-    simp only [map_mul, Pi.mul_apply, h1, h2]
-    rw [finprod_mul_distrib (almostNorm_finComp L a).finite_mulSupport
-      (almostNorm_finComp L b).finite_mulSupport, Finset.prod_mul_distrib, mul_mul_mul_comm]
+  MonoidHom.mk'
+    (fun a => etaProd K L (finComp a) (infComp a))
+    fun a b => by
+      obtain ⟨h1, h2⟩ := localCharacters K L
+      unfold etaProd
+      simp only [map_mul, Pi.mul_apply, h1, h2]
+      rw [finprod_mul_distrib (almostNorm_finComp L a).finite_mulSupport
+          (almostNorm_finComp L b).finite_mulSupport,
+        Finset.prod_mul_distrib, mul_mul_mul_comm]
 
-theorem normSign_eq_one_iff (a : (AdeleRing (𝓞 K) K)ˣ) :
-    normSign L a = 1 ↔ ∃ t : Kˣ, a / toUnits K (AdeleRing (𝓞 K) K) t ∈ normGroup K L (AdeleRing (𝓞 K) K) := by
-  refine ((exactSequence K L).2.2.1 _ _ (almostNorm_finComp L a)).symm.trans (exists_congr fun t => ?_)
+theorem normSign_eq_one_iff (a : (AdeleRing (𝓞 K) K)ˣ)
+    : normSign L a = 1
+      ↔ ∃ t : Kˣ, a / toUnits K (AdeleRing (𝓞 K) K) t ∈ normGroup K L (AdeleRing (𝓞 K) K) := by
+  refine ((exactSequence K L).2.2.1 _ _ (almostNorm_finComp L a)).symm.trans
+    (exists_congr fun t => ?_)
   rw [mem_normGroup_iff_everywhereNorm, map_div, map_div, finComp_toUnits, infComp_toUnits]
 
-theorem normSign_of_mem {a : (AdeleRing (𝓞 K) K)ˣ} (h : a ∈ normGroup K L (AdeleRing (𝓞 K) K)) :
-    normSign L a = 1 :=
+theorem normSign_of_mem {a : (AdeleRing (𝓞 K) K)ˣ} (h : a ∈ normGroup K L (AdeleRing (𝓞 K) K))
+    : normSign L a = 1 :=
   (normSign_eq_one_iff L a).2 ⟨1, by rwa [map_one, div_one]⟩
 
 theorem normSign_toUnits (t : Kˣ) : normSign L (toUnits K (AdeleRing (𝓞 K) K) t) = 1 :=
@@ -164,14 +171,16 @@ def signToCircle : ℤˣ →* Circle where
   toFun u := if u = 1 then 1 else -1
   map_one' := if_pos rfl
   map_mul' u u' := by
-    rcases Int.units_eq_one_or u with rfl | rfl <;> rcases Int.units_eq_one_or u' with rfl | rfl <;> simp
+    rcases Int.units_eq_one_or u with rfl | rfl <;> rcases Int.units_eq_one_or u' with rfl | rfl
+      <;> simp
 
 theorem circle_neg_one_ne_one : (-1 : Circle) ≠ 1 := fun h => by
   have := congrArg (fun z : Circle => (z : ℂ)) h
   norm_num at this
 
-theorem eq_signToCircle_comp {G : Type} [Group G] (ε : G →* ℤˣ) (η : G →* Circle)
-    (h : ∀ a, ε a = 1 → η a = 1) (hη : η ≠ 1) : η = signToCircle.comp ε := by
+theorem eq_signToCircle_comp
+    {G : Type} [Group G] (ε : G →* ℤˣ) (η : G →* Circle) (h : ∀ a, ε a = 1 → η a = 1) (hη : η ≠ 1)
+    : η = signToCircle.comp ε := by
   obtain ⟨b, hb⟩ : ∃ b, η b ≠ 1 := by
     by_contra hh
     push Not at hh
@@ -212,8 +221,9 @@ theorem globalNormIndexTwo : Formalism.D.Classical.GlobalNormIndexTwo := by
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta in
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta in
 theorem existsUnique_isEta : ∀ D : D7, ∃! η : (AF D.host.F)ˣ →* Circle, IsEta D η := fun D =>
   globalNormIndexTwo D.host.F D.host.E D.sp.cm.deg2
 

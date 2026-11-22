@@ -11,30 +11,38 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.Pick
 
-theorem exists_indep_of_sat {R E : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] [AddCommGroup E] [Module R E]
-    [Module.Finite R E] [Module.IsTorsionFree R E] (T : Set E) (F : Submodule R E)
-    (hF : ∀ x, x ∈ F ↔ ∃ a : R, a ≠ 0 ∧ a • x ∈ Submodule.span R T) :
-    ∃ f : Fin (Module.finrank R F) → E, (∀ j, f j ∈ T) ∧ LinearIndependent R f :=
+theorem exists_indep_of_sat
+    {R E : Type} [CommRing R] [IsDomain R] [IsNoetherianRing R] [AddCommGroup E] [Module R E]
+    [Module.Finite R E] [Module.IsTorsionFree R E]
+    (T : Set E) (F : Submodule R E) (hF : ∀ x, x ∈ F ↔ ∃ a : R, a ≠ 0 ∧ a • x ∈ Submodule.span R T)
+    : ∃ f : Fin (Module.finrank R F) → E, (∀ j, f j ∈ T) ∧ LinearIndependent R f :=
   _root_.UpperTheory.Reformulated.B.Ud9.exists_indep_of_sat T F hF
 
-def valMap {X : Scheme.{0}} {R : Type} [CommRing R] [IsLocalRing R] (z : Sp R ⟶ X) : X.presheaf.stalk (centre z) →+* R :=
+def valMap {X : Scheme.{0}} {R : Type} [CommRing R] [IsLocalRing R] (z : Sp R ⟶ X)
+    : X.presheaf.stalk (centre z) →+* R :=
   (Scheme.stalkClosedPointTo z).hom
 
-theorem isLocalHom_valMap {X : Scheme.{0}} {R : Type} [CommRing R] [IsLocalRing R] (z : Sp R ⟶ X) :
-    IsLocalHom (valMap z) :=
+theorem isLocalHom_valMap {X : Scheme.{0}} {R : Type} [CommRing R] [IsLocalRing R] (z : Sp R ⟶ X)
+    : IsLocalHom (valMap z) :=
   inferInstanceAs (IsLocalHom (Scheme.stalkClosedPointTo z).hom)
 
-theorem inv_nat_reg {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {L : Type} [Field L] [CharZero L]
-    (z : Sp L ⟶ X) (h : genPt ξ ⤳ centre z) {m : ℕ} (hm : 0 < m) :
-    (m : Ω) ≠ 0 ∧ (m : Ω)⁻¹ ∈ regAt ξ ⟨centre z, h⟩ := by
+theorem inv_nat_reg
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {L : Type} [Field L] [CharZero L]
+    (z : Sp L ⟶ X) (h : genPt ξ ⤳ centre z)
+    {m : ℕ} (hm : 0 < m)
+    : (m : Ω) ≠ 0 ∧ (m : Ω)⁻¹ ∈ regAt ξ ⟨centre z, h⟩ := by
   have hu : IsUnit ((m : X.presheaf.stalk (centre z))) := by
     have hv : IsUnit (valMap z (m : X.presheaf.stalk (centre z))) := by
       rw [map_natCast]; exact (Nat.cast_ne_zero.2 hm.ne').isUnit
@@ -47,20 +55,31 @@ theorem inv_nat_reg {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {
   have h0 : (m : Ω) ≠ 0 := left_ne_zero_of_mul_eq_one h1
   exact ⟨h0, ⟨g, eq_inv_of_mul_eq_one_right h1⟩⟩
 
-theorem reg_of_valAt {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
-    {z : Sp R ⟶ X} {a : Ω} {r : R} (h : ValAt ξ z a r) (h' : genPt ξ ⤳ centre z) : a ∈ regAt ξ ⟨centre z, h'⟩ := by
+theorem reg_of_valAt
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Sp R ⟶ X} {a : Ω} {r : R} (h : ValAt ξ z a r) (h' : genPt ξ ⤳ centre z)
+    : a ∈ regAt ξ ⟨centre z, h'⟩ := by
   obtain ⟨_, s, hs, -⟩ := h
   exact ⟨s, hs⟩
 
-theorem exists_valAt {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
-    {z : Sp R ⟶ X} {a : Ω} {h : genPt ξ ⤳ centre z} (ha : a ∈ regAt ξ ⟨centre z, h⟩) : ∃ r, ValAt ξ z a r := by
+theorem exists_valAt
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Sp R ⟶ X} {a : Ω} {h : genPt ξ ⤳ centre z} (ha : a ∈ regAt ξ ⟨centre z, h⟩)
+    : ∃ r, ValAt ξ z a r := by
   obtain ⟨s, hs⟩ := ha
   exact ⟨_, h, s, hs, rfl⟩
 
-theorem valAt_zero_factor {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {L : Type} [Field L] [CharZero L]
-    (hg : IsCptGen ξ) (z : Sp L ⟶ X) (h : genPt ξ ⤳ centre z) {m : ℕ} (hm : 0 < m) {a κ : Ω}
-    (ha : a ∈ regAt ξ ⟨centre z, h⟩) (hκ : κ ∈ regAt ξ ⟨centre z, h⟩) (hκi : κ⁻¹ ∈ regAt ξ ⟨centre z, h⟩) (hκ0 : κ ≠ 0)
-    (hv : ValAt ξ z ((m : Ω) * a * κ) 0) : ValAt ξ z a 0 := by
+theorem valAt_zero_factor
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {L : Type} [Field L] [CharZero L]
+    (hg : IsCptGen ξ)
+    (z : Sp L ⟶ X) (h : genPt ξ ⤳ centre z)
+    {m : ℕ} (hm : 0 < m)
+    {a κ : Ω} (ha : a ∈ regAt ξ ⟨centre z, h⟩) (hκ : κ ∈ regAt ξ ⟨centre z, h⟩)
+    (hκi : κ⁻¹ ∈ regAt ξ ⟨centre z, h⟩) (hκ0 : κ ≠ 0) (hv : ValAt ξ z ((m : Ω) * a * κ) 0)
+    : ValAt ξ z a 0 := by
   obtain ⟨ga, hga⟩ : ∃ g : X.presheaf.stalk (centre z), genMap ξ ⟨centre z, h⟩ g = a := ha
   obtain ⟨gk, hgk⟩ : ∃ g : X.presheaf.stalk (centre z), genMap ξ ⟨centre z, h⟩ g = κ := hκ
   obtain ⟨gi, hgi⟩ : ∃ g : X.presheaf.stalk (centre z), genMap ξ ⟨centre z, h⟩ g = κ⁻¹ := hκi
@@ -80,10 +99,15 @@ theorem valAt_zero_factor {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω �
     simpa [hm', e4] using hgt0
   exact ⟨h, ga, hga, e5⟩
 
-theorem lie_val_unique {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {G : Over X} [GrpObj G] [IsCommMonObj G]
-    [Smooth G.hom] {Li : Type} [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li) (hg : IsCptGen ξ)
-    {R : Type} [CommRing R] [IsLocalRing R] {z : Sp R ⟶ X} {e : Li} {v v' : epsAt z ⟶ G}
-    (h : M.ValAt z e v) (h' : M.ValAt z e v') : v = v' := by
+theorem lie_val_unique
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {G : Over X} [GrpObj G] [IsCommMonObj G] [Smooth G.hom]
+    {Li : Type} [AddCommGroup Li] [Module Ω Li]
+    (M : LieModel G ξ Li)
+    (hg : IsCptGen ξ)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Sp R ⟶ X} {e : Li} {v v' : epsAt z ⟶ G} (h : M.ValAt z e v) (h' : M.ValAt z e v')
+    : v = v' := by
   obtain ⟨h₁, u, hu, hv⟩ := h
   obtain ⟨h₂, u', hu', hv'⟩ := h'
   have : u = u' := (lieLat_carrier X G Ω ξ Li M ⟨centre z, h₁⟩).2 hg inferInstance e u u' hu hu'
@@ -91,17 +115,24 @@ theorem lie_val_unique {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X
   apply Over.OverMorphism.ext
   rw [hv, hv']
 
-theorem mem_lat_of_val {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {G : Over X} [GrpObj G]
-    {Li : Type} [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li)
-    {R : Type} [CommRing R] [IsLocalRing R] {z : Sp R ⟶ X} {e : Li} {v : epsAt z ⟶ G}
-    (h : M.ValAt z e v) (h' : genPt ξ ⤳ centre z) : e ∈ M.lat ⟨centre z, h'⟩ := by
+theorem mem_lat_of_val
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {G : Over X} [GrpObj G]
+    {Li : Type} [AddCommGroup Li] [Module Ω Li]
+    (M : LieModel G ξ Li)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Sp R ⟶ X} {e : Li} {v : epsAt z ⟶ G} (h : M.ValAt z e v) (h' : genPt ξ ⤳ centre z)
+    : e ∈ M.lat ⟨centre z, h'⟩ := by
   obtain ⟨_, u, hu, -⟩ := h
   exact Submodule.subset_span ⟨u, hu⟩
 
-theorem inChart_of_coords {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {K : Type} [Fintype K] {J : K → Type}
-    {y : (Σ k, J k) → Ω} {L : Type} [Field L] {z : Sp L ⟶ X} {w : (Σ k, J k) → L} (hw : CoordsAt ξ y z w)
-    (h : genPt ξ ⤳ centre z) (c₀ : (k : K) → J k) (hc₀ : ∀ k, w ⟨k, c₀ k⟩ ≠ 0) :
-    InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c₀ ⟨centre z, h⟩ := by
+theorem inChart_of_coords
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {K : Type} [Fintype K]
+    {J : K → Type} {y : (Σ k, J k) → Ω} {L : Type} [Field L]
+    {z : Sp L ⟶ X} {w : (Σ k, J k) → L} (hw : CoordsAt ξ y z w) (h : genPt ξ ⤳ centre z)
+    (c₀ : (k : K) → J k) (hc₀ : ∀ k, w ⟨k, c₀ k⟩ ≠ 0)
+    : InChart ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c₀ ⟨centre z, h⟩ := by
   have hy : ∀ k, y ⟨k, c₀ k⟩ ≠ 0 := fun k => (hw.2 k (c₀ k) (hc₀ k).isUnit).1
   refine ⟨Finset.prod_ne_zero_iff.2 fun k _ => hy k, fun c' => ?_⟩
   rw [← Finset.prod_div_distrib]
@@ -109,16 +140,24 @@ theorem inChart_of_coords {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω �
   obtain ⟨r, hr, -⟩ := (hw.2 k (c₀ k) (hc₀ k).isUnit).2 (c' k)
   exact reg_of_valAt hr h
 
-theorem exists_cls {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module Ω E] {r : ℕ} (b₀ : Fin r → E) (i : Fin r)
-    {e : E} (he : e ∈ flagStep Ω b₀ (i + 1)) : ∃ t : Ω, IsCls b₀ i e t := by
+theorem exists_cls
+    {Ω : Type} [Field Ω]
+    {E : Type} [AddCommGroup E] [Module Ω E]
+    {r : ℕ} (b₀ : Fin r → E) (i : Fin r)
+    {e : E} (he : e ∈ flagStep Ω b₀ (i + 1))
+    : ∃ t : Ω, IsCls b₀ i e t := by
   rw [Flag.step_succ] at he
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 he
   obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.1 hz
   exact ⟨t, by simpa [IsCls] using hy⟩
 
-theorem sub_coord_mem {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module Ω E] {r : ℕ} (b : Fin r → E)
-    (π : Fin r → Module.Dual Ω E) (hπ : ∀ j l, π j (b l) = if j = l then 1 else 0) (i : Fin r)
-    {e : E} (he : e ∈ flagStep Ω b (i + 1)) : e - π i e • b i ∈ flagStep Ω b i := by
+theorem sub_coord_mem
+    {Ω : Type} [Field Ω]
+    {E : Type} [AddCommGroup E] [Module Ω E]
+    {r : ℕ} (b : Fin r → E) (π : Fin r → Module.Dual Ω E)
+    (hπ : ∀ j l, π j (b l) = if j = l then 1 else 0) (i : Fin r)
+    {e : E} (he : e ∈ flagStep Ω b (i + 1))
+    : e - π i e • b i ∈ flagStep Ω b i := by
   rw [Flag.step_succ] at he
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 he
   obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.1 hz
@@ -130,30 +169,48 @@ theorem sub_coord_mem {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module
       simp at hk
     simp [hπ, hne]
   have h0 : π i y = 0 := hker hy
-  have : y + t • b i - π i (y + t • b i) • b i = y := by
-    simp [h0, hπ]
+  have : y + t • b i - π i (y + t • b i) • b i = y := by simp [h0, hπ]
   rwa [this]
 
-theorem pick : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
-    [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G] [IsCommMonObj G] [Smooth G.hom]
-    (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li) (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li)
-    (m : ℕ) (i : Fin r) (a : K → ℤ) (e₀ : Ω),
-    CharZero Ω → (∀ q : X, genPt ξ ⤳ q) → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → 0 < m →
-    LinearIndependent Ω b₀ → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀ →
-    ∀ (L : Type) [Field L] [NumberField L] (w : (Σ k, J k) → L) (z : Sp (𝓞 L) ⟶ X),
-      CoordsAt ξ y (spMap (algebraMap (𝓞 L) L) ≫ z) w → ∀ (B : HermitianBundle.{0} L) (MB : LieModel G z B.carrier)
-      (F : SatFlag B r), (∀ j : Fin (r + 1), IsSubFibre M (flagStep Ω b₀ j.val) z MB (F.F j)) →
-      ∀ c₀ : (k : K) → J k, (∀ k, w ⟨k, c₀ k⟩ ≠ 0) →
-      ∃ (f : Fin i → B.carrier) (ef : Fin i → Li) (s : B.carrier) (e : Li) (t : Ω) (u : L)
-        (vf : Fin i → (epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G)) (ve : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G),
-        (∀ j, f j ∈ F.F i.castSucc) ∧ LinearIndependent (𝓞 L) f ∧ s ∈ F.F i.succ ∧ s ∉ F.F i.castSucc ∧
-        (∀ j, ef j ∈ flagStep Ω b₀ i) ∧ e ∈ flagStep Ω b₀ (i + 1) ∧
-        (∀ j, M.ValAt _ (ef j) (vf j) ∧ ((vf j).left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt (f j)).left)) ∧
-        M.ValAt _ e ve ∧ (ve.left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt s).left) ∧
-        IsCls b₀ i e t ∧ ValAt ξ (spMap (algebraMap (𝓞 L) L) ≫ z) (t / gen y a e₀ c₀) u ∧ u ≠ 0 := by
-  intro X Ω _ ξ K _ J _ y G _ _ _ Li _ _ M V r b₀ m i a e₀ hc hall htie hm hind hsw hdeg L _ _ w z hw B MB F hsub c₀ hc₀
+theorem pick
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
+        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G] [IsCommMonObj G]
+        [Smooth G.hom] (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li)
+        (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li) (m : ℕ) (i : Fin r) (a : K → ℤ) (e₀ : Ω),
+      CharZero Ω → (∀ q : X, genPt ξ ⤳ q)
+        → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → 0 < m → LinearIndependent Ω b₀
+        → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀
+        → ∀ (L : Type) [Field L] [NumberField L] (w : (Σ k, J k) → L) (z : Sp (𝓞 L) ⟶ X),
+          CoordsAt ξ y (spMap (algebraMap (𝓞 L) L) ≫ z) w
+            → ∀ (B : HermitianBundle.{0} L) (MB : LieModel G z B.carrier) (F : SatFlag B r),
+              (∀ j : Fin (r + 1), IsSubFibre M (flagStep Ω b₀ j.val) z MB (F.F j))
+                → ∀ c₀ : (k : K) → J k,
+                  (∀ k, w ⟨k, c₀ k⟩ ≠ 0)
+                    → ∃ (f : Fin i → B.carrier) (ef : Fin i → Li) (s : B.carrier) (e : Li) (t : Ω)
+                        (u : L) (vf : Fin i → (epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G))
+                        (ve : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G),
+                      (∀ j, f j ∈ F.F i.castSucc) ∧ LinearIndependent (𝓞 L) f ∧ s ∈ F.F i.succ
+                        ∧ s ∉ F.F i.castSucc ∧ (∀ j, ef j ∈ flagStep Ω b₀ i)
+                        ∧ e ∈ flagStep Ω b₀ (i + 1)
+                        ∧ (∀ j,
+                          M.ValAt _ (ef j) (vf j)
+                            ∧ ((vf j).left ≫ (𝟙 G.left)
+                              = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap
+                                  (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L))
+                                ≫ (MB.pt (f j)).left))
+                        ∧ M.ValAt _ e ve
+                        ∧ (ve.left ≫ (𝟙 G.left)
+                          = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap
+                              (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L))
+                            ≫ (MB.pt s).left)
+                        ∧ IsCls b₀ i e t
+                        ∧ ValAt ξ (spMap (algebraMap (𝓞 L) L) ≫ z) (t / gen y a e₀ c₀) u
+                        ∧ u ≠ 0 := by
+  intro X Ω _ ξ K _ J _ y G _ _ _ Li _ _ M V r b₀ m i a e₀ hc hall htie hm hind hsw hdeg L _ _ w z
+    hw B MB F hsub c₀ hc₀
   have hg : IsCptGen ξ := htie.gen
-  have hsub₀ : IsSubFibre M (flagStep Ω b₀ i) z MB (F.F i.castSucc) := by simpa using hsub i.castSucc
+  have hsub₀ : IsSubFibre M (flagStep Ω b₀ i) z MB (F.F i.castSucc) := by
+    simpa using hsub i.castSucc
   have hsub₁ : IsSubFibre M (flagStep Ω b₀ (i + 1)) z MB (F.F i.succ) := by simpa using hsub i.succ
   set zL := spMap (algebraMap (𝓞 L) L) ≫ z with hzL
 
@@ -166,8 +223,15 @@ theorem pick : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K
   have hfF : ∀ j, f j ∈ F.F i.castSucc := fun j =>
     (hsub₀ _).2 ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span (hfT _)⟩
 
-  obtain ⟨s, ⟨e, he, ve, hve, hsv⟩, hs0⟩ : ∃ s, (∃ e ∈ flagStep Ω b₀ (i + 1), ∃ v : epsAt zL ⟶ G,
-      M.ValAt zL e v ∧ (v.left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt s).left)) ∧ s ∉ F.F i.castSucc := by
+  obtain ⟨s, ⟨e, he, ve, hve, hsv⟩, hs0⟩
+      : ∃ s,
+        (∃ e ∈ flagStep Ω b₀ (i + 1), ∃ v : epsAt zL ⟶ G,
+            M.ValAt zL e v
+              ∧ (v.left ≫ (𝟙 G.left)
+                = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap
+                    (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L))
+                  ≫ (MB.pt s).left))
+          ∧ s ∉ F.F i.castSucc := by
     by_contra hno
     push_neg at hno
     have hle : F.F i.succ ≤ F.F i.castSucc := by
@@ -178,12 +242,14 @@ theorem pick : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K
     have heq : F.F i.succ = F.F i.castSucc := le_antisymm hle (F.mono Fin.castSucc_lt_succ.le)
     rw [heq, hrk] at hrk₁
     omega
-  have hs1 : s ∈ F.F i.succ := (hsub₁ s).2 ⟨1, one_ne_zero, by
-    rw [one_smul]; exact Submodule.subset_span ⟨e, he, ve, hve, hsv⟩⟩
+  have hs1 : s ∈ F.F i.succ :=
+    (hsub₁ s).2
+      ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span ⟨e, he, ve, hve, hsv⟩⟩
 
   have h : genPt ξ ⤳ centre zL := hall _
-  obtain ⟨b, π, κ, hb, hfr, hmb, hπb, hπm, hκ0, hκ, hκi, hcl⟩ := cls_frame X Ω ξ K J y G Li M V r b₀ m i a e₀ hind hsw hdeg
-    ⟨centre zL, h⟩ c₀ (inChart_of_coords hw h c₀ hc₀)
+  obtain ⟨b, π, κ, hb, hfr, hmb, hπb, hπm, hκ0, hκ, hκi, hcl⟩ :=
+    cls_frame X Ω ξ K J y G Li M V r b₀ m i a e₀ hind hsw hdeg ⟨centre zL, h⟩ c₀
+      (inChart_of_coords hw h c₀ hc₀)
   obtain ⟨t, ht⟩ := exists_cls b₀ i he
   have hm0 := inv_nat_reg (ξ := ξ) zL h hm
   have he_lat := mem_lat_of_val M hve h
@@ -196,14 +262,35 @@ theorem pick : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K
   have hreg : t / gen y a e₀ c₀ ∈ regAt ξ ⟨centre zL, h⟩ := by
     rw [hcl e t he ht]; exact mul_mem hAr hκ
   obtain ⟨u, hu⟩ := exists_valAt hreg
-  refine ⟨f, fun j => ef j, s, e, t, u, fun j => vf j, ve, hfF, hfi', hs1, hs0, hef, he,
-    fun j => ⟨hv j, hl j⟩, hve, hsv, ht, hu, ?_⟩
+  refine ⟨
+    f,
+    fun j => ef j,
+    s,
+    e,
+    t,
+    u,
+    fun j => vf j,
+    ve,
+    hfF,
+    hfi',
+    hs1,
+    hs0,
+    hef,
+    he,
+    fun j => ⟨hv j, hl j⟩,
+    hve,
+    hsv,
+    ht,
+    hu,
+    ?_
+  ⟩
 
   rintro rfl
   have hv0 : ValAt ξ zL ((m : Ω)⁻¹ * π i e) 0 :=
     valAt_zero_factor hg zL h hm hα hκ hκi hκ0 (htg ▸ hu)
   obtain ⟨ER, _, _, ⟨MR⟩⟩ := lieModel_exists X G L zL
-  obtain ⟨ev, hev, hevs, -⟩ := GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ Li M L zL h ER MR hg inferInstance
+  obtain ⟨ev, hev, hevs, -⟩ :=
+    GlobalTheory.T.lie_lattice_eval_at_local_ring X G Ω ξ Li M L zL h ER MR hg inferInstance
   let ar : regAt ξ ⟨centre zL, h⟩ := ⟨_, hα⟩
   let xb : M.lat ⟨centre zL, h⟩ := ⟨_, hmb i⟩
   let xe : M.lat ⟨centre zL, h⟩ := ⟨e, he_lat⟩
@@ -219,12 +306,13 @@ theorem pick : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K
   have hval' : M.ValAt zL (e - π i e • b i) ve := by
     rw [hveq]
     refine (hev _ _).2 ⟨h2 ▸ (xe - ar • xb).2, ?_⟩
-    have : (⟨e - π i e • b i, h2 ▸ (xe - ar • xb).2⟩ : M.lat ⟨centre zL, h⟩) = xe - ar • xb := Subtype.ext h2.symm
+    have : (⟨e - π i e • b i, h2 ▸ (xe - ar • xb).2⟩ : M.lat ⟨centre zL, h⟩) = xe - ar • xb :=
+      Subtype.ext h2.symm
     rw [this, map_sub, h1, sub_zero]
   have hmem : e - π i e • b i ∈ flagStep Ω b₀ i := by
     rw [← hb i]
     exact sub_coord_mem b π hπb i (by rw [hb]; exact he)
-  exact hs0 ((hsub₀ s).2 ⟨1, one_ne_zero, by
-    rw [one_smul]; exact Submodule.subset_span ⟨_, hmem, ve, hval', hsv⟩⟩)
+  exact hs0 ((hsub₀ s).2
+    ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span ⟨_, hmem, ve, hval', hsv⟩⟩)
 
 end GlobalTheory.CompanionTheory.Ar.RootHt.Pick

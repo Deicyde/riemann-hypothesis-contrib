@@ -40,15 +40,15 @@ private lemma apply_eq_of_quotient_mk_eq_of_invariant {B : AddSubgroup W} {φ : 
   have := hinv u (-u + v) hb
   rwa [add_neg_cancel_left, eq_comm] at this
 
-
 open scoped Pointwise Classical in
 variable {W : Type} [AddCommGroup W] in
-theorem _root_.GlobalTheory.IdxInt.cint_eq_mean_reps {W : Type} [AddCommGroup W]
+theorem _root_.GlobalTheory.IdxInt.cint_eq_mean_reps
+    {W : Type} [AddCommGroup W]
     (A B : AddSubgroup W) (φ : W → ℂ) (R : Finset W)
     (hBA : B ≤ A) (hinv : ∀ w, ∀ b ∈ B, φ (w + b) = φ w) (hsupp : ∀ w, w ∉ A → φ w = 0)
-    (hRA : ∀ w ∈ R, w ∈ A) (hR : ∀ w ∈ A, ∃! x, x ∈ R ∧ w - x ∈ B) :
-    _root_.GlobalTheory.IdxInt.Fine A φ B ∧ (R.card : ℕ) = B.relIndex A ∧
-      _root_.GlobalTheory.IdxInt.cint A φ = (∑ w ∈ R, φ w) / (R.card : ℂ) := by
+    (hRA : ∀ w ∈ R, w ∈ A) (hR : ∀ w ∈ A, ∃! x, x ∈ R ∧ w - x ∈ B)
+    : _root_.GlobalTheory.IdxInt.Fine A φ B ∧ (R.card : ℕ) = B.relIndex A
+      ∧ _root_.GlobalTheory.IdxInt.cint A φ = (∑ w ∈ R, φ w) / (R.card : ℂ) := by
   have hmemA : ∀ w, φ w ≠ 0 → w ∈ A := fun w hw => by
     by_contra h
     exact hw (hsupp w h)
@@ -86,7 +86,8 @@ theorem _root_.GlobalTheory.IdxInt.cint_eq_mean_reps {W : Type} [AddCommGroup W]
   have hsum : ∑ᶠ c : W ⧸ B, φ (Quotient.out c) = ∑ w ∈ R, φ w := by
     rw [finsum_eq_sum_of_support_subset (s := R.image (QuotientAddGroup.mk : W → W ⧸ B)) _ ?_]
     · rw [Finset.sum_image (fun x hx y hy h => eq_of_mem_finset_of_mk_eq hRA hR hx hy h)]
-      exact Finset.sum_congr rfl fun x _ => apply_eq_of_quotient_mk_eq_of_invariant hinv (QuotientAddGroup.out_eq' _)
+      exact Finset.sum_congr rfl fun x _ =>
+        apply_eq_of_quotient_mk_eq_of_invariant hinv (QuotientAddGroup.out_eq' _)
     · intro c hc
       obtain ⟨x, hx, hxc⟩ := exists_mem_finset_mk_eq_of_mem hR (hmemA _ hc)
       simp only [Finset.coe_image, Set.mem_image, Finset.mem_coe]

@@ -9,37 +9,47 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Spherica
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
+open MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.Spherical
+  GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa UpperTheory.ConvolutionTheory.H
 
-private theorem lin_zero {X : Type*} (L : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
-    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y) : Λ 0 = 0 := by
+private theorem lin_zero
+    {X : Type*} (L : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
+    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y)
+    : Λ 0 = 0 := by
   have h := hlin 0 L.zero_mem 0 L.zero_mem 1
   simp only [smul_zero, add_zero, one_mul] at h
   simpa using h
 
-private theorem lin_sum {X ι : Type*} (L : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
-    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y)
-    (s : Finset ι) (c : ι → ℂ) (f : ι → X → ℂ) (hf : ∀ i ∈ s, f i ∈ L) :
-    Λ (∑ i ∈ s, c i • f i) = ∑ i ∈ s, c i * Λ (f i) := by
+private theorem lin_sum
+    {X ι : Type*} (L : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
+    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y) (s : Finset ι) (c : ι → ℂ)
+    (f : ι → X → ℂ) (hf : ∀ i ∈ s, f i ∈ L)
+    : Λ (∑ i ∈ s, c i • f i) = ∑ i ∈ s, c i * Λ (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using lin_zero L Λ hlin
   | insert i s hi ih =>
     have hf' : ∀ j ∈ s, f j ∈ L := fun j hj => hf j (Finset.mem_insert_of_mem hj)
     rw [Finset.sum_insert hi, Finset.sum_insert hi,
-      hlin _ (hf i (Finset.mem_insert_self i s)) _ (Submodule.sum_mem _ fun j hj => Submodule.smul_mem _ _ (hf' j hj)),
+      hlin _ (hf i (Finset.mem_insert_self i s)) _
+        (Submodule.sum_mem _ fun j hj => Submodule.smul_mem _ _ (hf' j hj)),
       ih hf']
 
-private theorem lin_eq_of_sub {X : Type*} (L C : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
-    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y)
-    (hC : ∀ x ∈ C, Λ x = 0) {u v : X → ℂ} (hu : u ∈ L) (hv : v ∈ L) (huv : u - v ∈ C) : Λ u = Λ v := by
+private theorem lin_eq_of_sub
+    {X : Type*} (L C : Submodule ℂ (X → ℂ)) (Λ : (X → ℂ) → ℂ)
+    (hlin : ∀ x ∈ L, ∀ y ∈ L, ∀ c : ℂ, Λ (c • x + y) = c * Λ x + Λ y) (hC : ∀ x ∈ C, Λ x = 0)
+    {u v : X → ℂ} (hu : u ∈ L) (hv : v ∈ L) (huv : u - v ∈ C)
+    : Λ u = Λ v := by
   have h := hlin (u - v) (L.sub_mem hu hv) v hv 1
   rw [one_smul, sub_add_cancel, hC _ huv, one_mul, zero_add] at h
   exact h
 
-private theorem th_mem (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
-    [MeasurableSpace (GL (Fin n) F)] (μ : Measure (GL (Fin n) F)) {a : Fin n → ℤ} (ha : Antitone a) :
-    th μ a ∈ locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ :=
+private theorem th_mem
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n : ℕ} [MeasurableSpace (GL (Fin n) F)]
+    (μ : Measure (GL (Fin n) F))
+    {a : Fin n → ℤ} (ha : Antitone a)
+    : th μ a ∈ locallyConstantCompactSupport (GL (Fin n) F) ℂ ℂ :=
   Submodule.smul_mem _ _ (dcoShape F n a ha).2.2.1
 
 private theorem dom_add {n : ℕ} {r s : LaurentRing n} (hr : Dom r) (hs : Dom s) : Dom (r + s) := by
@@ -56,7 +66,8 @@ private theorem dom_smul {n : ℕ} {r : LaurentRing n} (c : ℂ) (hr : Dom r) : 
   rw [AddMonoidAlgebra.coeff_smul] at ha
   exact hr a (Finsupp.support_smul ha)
 
-private theorem sdom_add {n : ℕ} {r s : LaurentRing n} (hr : SDom r) (hs : SDom s) : SDom (r + s) := by
+private theorem sdom_add {n : ℕ} {r s : LaurentRing n} (hr : SDom r) (hs : SDom s)
+    : SDom (r + s) := by
   classical
   intro a ha
   rw [AddMonoidAlgebra.coeff_add] at ha
@@ -70,10 +81,12 @@ private theorem sdom_smul {n : ℕ} {r : LaurentRing n} (c : ℂ) (hr : SDom r) 
   rw [AddMonoidAlgebra.coeff_smul] at ha
   exact hr a (Finsupp.support_smul ha)
 
-private theorem clause_span {n l : ℕ} (Y M M' : LaurentRing n) (P : Finset (LaurentRing n))
-    (h : ∀ p ∈ P, SDom (Y * p) ∧ (∃ r, Dom r ∧ Y * p = M * r) ∧ ∃ r', Dom r' ∧ bc l (Y * p) = M' * r')
-    (p : LaurentRing n) (hp : p ∈ Submodule.span ℂ (P : Set (LaurentRing n))) :
-    SDom (Y * p) ∧ (∃ r, Dom r ∧ Y * p = M * r) ∧ ∃ r', Dom r' ∧ bc l (Y * p) = M' * r' := by
+private theorem clause_span
+    {n l : ℕ} (Y M M' : LaurentRing n) (P : Finset (LaurentRing n))
+    (h : ∀ p ∈ P,
+      SDom (Y * p) ∧ (∃ r, Dom r ∧ Y * p = M * r) ∧ ∃ r', Dom r' ∧ bc l (Y * p) = M' * r')
+    (p : LaurentRing n) (hp : p ∈ Submodule.span ℂ (P : Set (LaurentRing n)))
+    : SDom (Y * p) ∧ (∃ r, Dom r ∧ Y * p = M * r) ∧ ∃ r', Dom r' ∧ bc l (Y * p) = M' * r' := by
   induction hp using Submodule.span_induction with
   | mem x hx => exact h x hx
   | zero =>
@@ -84,23 +97,39 @@ private theorem clause_span {n l : ℕ} (Y M M' : LaurentRing n) (P : Finset (La
   | add x y _ _ hx hy =>
     obtain ⟨h1, ⟨r, hr, e⟩, r', hr', e'⟩ := hx
     obtain ⟨g1, ⟨s, hs, f⟩, s', hs', f'⟩ := hy
-    refine ⟨by rw [mul_add]; exact sdom_add h1 g1, ⟨r + s, dom_add hr hs, by rw [mul_add, mul_add, e, f]⟩,
-      r' + s', dom_add hr' hs', by rw [mul_add, map_add (f := _), mul_add, e', f']⟩
+    refine ⟨
+      by rw [mul_add]; exact sdom_add h1 g1,
+      ⟨r + s, dom_add hr hs, by rw [mul_add, mul_add, e, f]⟩,
+      r' + s',
+      dom_add hr' hs',
+      by rw [mul_add, map_add (f := _), mul_add, e', f']
+    ⟩
   | smul c x _ hx =>
     obtain ⟨h1, ⟨r, hr, e⟩, r', hr', e'⟩ := hx
-    refine ⟨by rw [mul_smul_comm]; exact sdom_smul c h1, ⟨c • r, dom_smul c hr, by rw [mul_smul_comm, mul_smul_comm, e]⟩,
-      c • r', dom_smul c hr', by rw [mul_smul_comm, map_smul, mul_smul_comm, e']⟩
+    refine ⟨
+      by rw [mul_smul_comm]; exact sdom_smul c h1,
+      ⟨c • r, dom_smul c hr, by rw [mul_smul_comm, mul_smul_comm, e]⟩,
+      c • r',
+      dom_smul c hr',
+      by rw [mul_smul_comm, map_smul, mul_smul_comm, e']
+    ⟩
 
-private theorem thP_bc {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
-    [MeasurableSpace (GL (Fin n) F)] (μ : Measure (GL (Fin n) F)) (l : ℕ) (y : LaurentRing n) :
-    thP μ (bc l y) = ∑ a ∈ y.coeff.support, y.coeff a • th μ ((l : ℤ) • a) := by
+private theorem thP_bc
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n : ℕ} [MeasurableSpace (GL (Fin n) F)]
+    (μ : Measure (GL (Fin n) F)) (l : ℕ) (y : LaurentRing n)
+    : thP μ (bc l y) = ∑ a ∈ y.coeff.support, y.coeff a • th μ ((l : ℤ) • a) := by
   have hc : (bc l y).coeff = Finsupp.mapDomain (fun m : Fin n → ℤ => (l : ℤ) • m) y.coeff := rfl
   unfold thP
-  rw [hc, Finsupp.sum_mapDomain_index (h := fun a c => c • th μ a) (fun a => zero_smul _ _) (fun a c d => add_smul _ _ _)]
+  rw [hc,
+    Finsupp.sum_mapDomain_index
+      (h := fun a c => c • th μ a)
+      (fun a => zero_smul _ _)
+      (fun a c d => add_smul _ _ _)]
   rfl
 
-private theorem range_Y {n : ℕ} (t : ℂ) (a : Fin n → ℤ) (ha : ∀ i, 0 ≤ a i) :
-    symSum (monomial a * dPol n t) ∈ (polyEmb (n := n)).range := by
+private theorem range_Y {n : ℕ} (t : ℂ) (a : Fin n → ℤ) (ha : ∀ i, 0 ≤ a i)
+    : symSum (monomial a * dPol n t) ∈ (polyEmb (n := n)).range := by
   have h1 : (monomial a : LaurentRing n) ∈ (polyEmb (n := n)).range := by
     refine mem_range_polyEmb fun b hb i => ?_
     rw [AddMonoidAlgebra.coeff_single] at hb
@@ -116,23 +145,37 @@ private theorem range_Y {n : ℕ} (t : ℂ) (a : Fin n → ℤ) (ha : ∀ i, 0 �
   rw [← hQ]
   exact AlgHom.mem_range _ |>.2 ⟨MvPolynomial.rename σ Q, polyEmb_rename σ Q⟩
 
-theorem UpperTheory.ConvolutionTheory.H.deepAbs :
-    ∀ (k E : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n l : ℕ), 1 ≤ l → (qF E : ℂ) = (qF k : ℂ) ^ l →
-      ∀ [MeasurableSpace (GL (Fin n) E)] [BorelSpace (GL (Fin n) E)] [MeasurableSpace (GL (Fin n) k)] [BorelSpace (GL (Fin n) k)]
-        (μE : Measure (GL (Fin n) E)) (μk : Measure (GL (Fin n) k)) [μE.IsHaarMeasure] [μk.IsHaarMeasure],
-      μE (integralGL E n : Set (GL (Fin n) E)) = 1 → μk (integralGL k n : Set (GL (Fin n) k)) = 1 →
-      ∀ P : Finset (LaurentRing n), (∀ p ∈ P, p ∈ symmetricLaurent (n := n)) → ∀ z : Fin n → ℂˣ,
-      ∃ g ∈ symmetricLaurent (n := n), g ∈ (polyEmb (n := n)).range ∧ evalAt z g ≠ 0 ∧ ∀ p ∈ Submodule.span ℂ (P : Set (LaurentRing n)),
-        ∀ (h : SphericalHecke μE (F := E) (n := n)) (f : SphericalHecke μk (F := k) (n := n)),
-          satakeTransform μE h = g * p → satakeTransform μk f = bc l (g * p) →
-          ∀ (ΛE : (GL (Fin n) E → ℂ) → ℂ) (Λk : (GL (Fin n) k → ℂ) → ℂ),
-          (∀ x ∈ locallyConstantCompactSupport (GL (Fin n) E) ℂ ℂ, ∀ y ∈ locallyConstantCompactSupport (GL (Fin n) E) ℂ ℂ, ∀ c : ℂ,
-          ΛE (c • x + y) = c * ΛE x + ΛE y) → (∀ x ∈ comm μE, ΛE x = 0) →
-          (∀ x ∈ locallyConstantCompactSupport (GL (Fin n) k) ℂ ℂ, ∀ y ∈ locallyConstantCompactSupport (GL (Fin n) k) ℂ ℂ, ∀ c : ℂ,
-          Λk (c • x + y) = c * Λk x + Λk y) → (∀ x ∈ comm μk, Λk x = 0) →
-          (∀ a : Fin n → ℤ, StrictAnti a → ΛE (th μE a) = Λk (th μk ((l : ℤ) • a))) →
-          ΛE (fun x => (h : HeckeAlgebra μE) x) = Λk fun x => (f : HeckeAlgebra μk) x := by
+theorem UpperTheory.ConvolutionTheory.H.deepAbs
+    : ∀ (k E : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n l : ℕ),
+      1 ≤ l → (qF E : ℂ) = (qF k : ℂ) ^ l
+        → ∀ [MeasurableSpace (GL (Fin n) E)] [BorelSpace (GL (Fin n) E)]
+            [MeasurableSpace (GL (Fin n) k)] [BorelSpace (GL (Fin n) k)]
+            (μE : Measure (GL (Fin n) E)) (μk : Measure (GL (Fin n) k)) [μE.IsHaarMeasure]
+            [μk.IsHaarMeasure],
+          μE (integralGL E n : Set (GL (Fin n) E)) = 1
+            → μk (integralGL k n : Set (GL (Fin n) k)) = 1
+            → ∀ P : Finset (LaurentRing n),
+              (∀ p ∈ P, p ∈ symmetricLaurent (n := n))
+                → ∀ z : Fin n → ℂˣ, ∃ g ∈ symmetricLaurent (n := n),
+                  g ∈ (polyEmb (n := n)).range ∧ evalAt z g ≠ 0
+                    ∧ ∀ p ∈ Submodule.span ℂ (P : Set (LaurentRing n)),
+                      ∀ (h : SphericalHecke μE (F := E) (n := n))
+                          (f : SphericalHecke μk (F := k) (n := n)),
+                        satakeTransform μE h = g * p → satakeTransform μk f = bc l (g * p)
+                          → ∀ (ΛE : (GL (Fin n) E → ℂ) → ℂ) (Λk : (GL (Fin n) k → ℂ) → ℂ),
+                            (∀ x ∈ locallyConstantCompactSupport (GL (Fin n) E) ℂ ℂ,
+                                ∀ y ∈ locallyConstantCompactSupport (GL (Fin n) E) ℂ ℂ, ∀ c : ℂ,
+                                  ΛE (c • x + y) = c * ΛE x + ΛE y)
+                              → (∀ x ∈ comm μE, ΛE x = 0)
+                              → (∀ x ∈ locallyConstantCompactSupport (GL (Fin n) k) ℂ ℂ,
+                                ∀ y ∈ locallyConstantCompactSupport (GL (Fin n) k) ℂ ℂ, ∀ c : ℂ,
+                                  Λk (c • x + y) = c * Λk x + Λk y)
+                              → (∀ x ∈ comm μk, Λk x = 0)
+                              → (∀ a : Fin n → ℤ,
+                                StrictAnti a → ΛE (th μE a) = Λk (th μk ((l : ℤ) • a)))
+                              → ΛE (fun x => (h : HeckeAlgebra μE) x)
+                                = Λk fun x => (f : HeckeAlgebra μk) x := by
   intro k E _ _ _ _ _ _ _ _ n l hl hq _ _ _ _ μE μk _ _ hE hk P hP z
   classical
   obtain ⟨ν, hν⟩ := core E n μE hE
@@ -149,14 +192,19 @@ theorem UpperTheory.ConvolutionTheory.H.deepAbs :
   obtain ⟨a, hgap, ha0, hne⟩ := nonVan n (t ^ l) hnorm z m
   refine ⟨symSum (monomial a * dPol n (t ^ l)), (symAlg n l _).1, range_Y _ a ha0, hne, ?_⟩
   intro p hp h f hSh hSf ΛE Λk hlE hzE hlk hzk hth
-  obtain ⟨hSD, ⟨r, hr, hyr⟩, r', hr', hyr'⟩ := clause_span (l := l) (monomial a * dPol n (t ^ l)) (monomial ν * dPol n (t ^ l))
-    (monomial ν' * dPol n t) P (fun p hp => hm a hgap p hp) p hp
+  obtain ⟨hSD, ⟨r, hr, hyr⟩, r', hr', hyr'⟩ :=
+    clause_span (l := l) (monomial a * dPol n (t ^ l)) (monomial ν * dPol n (t ^ l))
+      (monomial ν' * dPol n t) P
+      (fun p hp => hm a hgap p hp)
+      p hp
   have hps : p ∈ symmetricLaurent (n := n) := by
-    have : Submodule.span ℂ (P : Set (LaurentRing n)) ≤ Subalgebra.toSubmodule (symmetricLaurent (n := n)) :=
+    have : Submodule.span ℂ (P : Set (LaurentRing n))
+        ≤ Subalgebra.toSubmodule (symmetricLaurent (n := n)) :=
       Submodule.span_le.2 fun x hx => hP x hx
     exact this hp
   obtain ⟨-, hb, hmul, -, -⟩ := symAlg n l (monomial a * dPol n (t ^ l))
-  have hSy : symSum (monomial a * dPol n (t ^ l) * p) = symSum (monomial a * dPol n (t ^ l)) * p := hmul p hps
+  have hSy : symSum (monomial a * dPol n (t ^ l) * p) = symSum (monomial a * dPol n (t ^ l)) * p :=
+    hmul p hps
   obtain ⟨-, hb', -, -, -⟩ := symAlg n l (monomial a * dPol n (t ^ l) * p)
   set y := monomial a * dPol n (t ^ l) * p with hy
   have hcE := hν r hr h (by rw [hSh, ← hSy, hyr])

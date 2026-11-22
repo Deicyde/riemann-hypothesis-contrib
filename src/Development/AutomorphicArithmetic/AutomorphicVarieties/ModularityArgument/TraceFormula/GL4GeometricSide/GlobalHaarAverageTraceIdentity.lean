@@ -31,9 +31,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 namespace UpperTheory.V.Z.GSp4Splitting
 
-theorem global_haarAverage_trace_identity : PositivityTheory.Rg.BcB.Desc.ThetaFixedGlobalCharacter :=
-  exists_global_hecke_theta_lift avgEx (absGlob multiFac lieStab projEx avgFacts (onePlace coreG lieStab projEx avgFacts (avgTr avgFacts))) lowIso2 heckeMem
-    (rlEx petEx heckeMem) rlPair rlChar rlK rlTheta rlComm (rlHecke heckeMem) (rlSimple heckeMem lieStab rlK) rlFin
-    (rlLow heckeMem lowType) (opForm heckeMem rlComm locAct)
+theorem global_haarAverage_trace_identity
+    : PositivityTheory.Rg.BcB.Desc.ThetaFixedGlobalCharacter :=
+  exists_global_hecke_theta_lift avgEx
+    (absGlob multiFac lieStab projEx avgFacts
+      (onePlace coreG lieStab projEx avgFacts (avgTr avgFacts)))
+    lowIso2 heckeMem (rlEx petEx heckeMem) rlPair rlChar rlK rlTheta rlComm (rlHecke heckeMem)
+    (rlSimple heckeMem lieStab rlK) rlFin (rlLow heckeMem lowType) (opForm heckeMem rlComm locAct)
 
 end UpperTheory.V.Z.GSp4Splitting

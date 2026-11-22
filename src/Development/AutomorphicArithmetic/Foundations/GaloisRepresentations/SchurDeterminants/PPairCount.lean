@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open Finset MvPolynomial UpperTheory.Gal.Schur
 
-theorem UpperTheory.Gal.Schur.pairCount_of :
-    PairSplit → PairCount := by
+theorem UpperTheory.Gal.Schur.pairCount_of : PairSplit → PairCount := by
   intro hP n i
   have hS : ∑ a : Fin n, (n - 1 - (a : ℕ)) = n.choose 2 := by
     rw [Fin.sum_univ_eq_sum_range (fun a => n - 1 - a), Finset.sum_range_reflect (fun a => a) n,
@@ -19,8 +18,8 @@ theorem UpperTheory.Gal.Schur.pairCount_of :
   have hi : (i : ℕ) ≤ m := by have := i.isLt; omega
   simp only [Nat.add_sub_cancel] at hS ⊢
   refine ⟨?_, ?_⟩
-  · have h1 := Finset.add_sum_erase (univ : Finset (Fin (m + 1))) (fun k => m - (k : ℕ))
-      (Finset.mem_univ i)
+  · have h1 :=
+      Finset.add_sum_erase (univ : Finset (Fin (m + 1))) (fun k => m - (k : ℕ)) (Finset.mem_univ i)
     omega
   · have h := hP (Multiplicative ℕ) (m + 1) (fun _ _ => Multiplicative.ofAdd 1) i
     apply_fun Multiplicative.toAdd at h

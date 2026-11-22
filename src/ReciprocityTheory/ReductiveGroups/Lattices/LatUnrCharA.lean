@@ -10,10 +10,12 @@ namespace ReciprocityTheory.ChartRestriction.T1
 
 open NumberField IsDedekindDomain Polynomial
 
-theorem lat_charpoly_blockDiagonal {R n o : Type*} [CommRing R] [Fintype n] [DecidableEq n] [Fintype o]
-    [DecidableEq o] (M : o → Matrix n n R) :
-    (Matrix.blockDiagonal M).charpoly = ∏ k, (M k).charpoly := by
-  have h : (Matrix.blockDiagonal M).charmatrix = Matrix.blockDiagonal fun k => (M k).charmatrix := by
+theorem lat_charpoly_blockDiagonal
+    {R n o : Type*} [CommRing R] [Fintype n] [DecidableEq n] [Fintype o] [DecidableEq o]
+    (M : o → Matrix n n R)
+    : (Matrix.blockDiagonal M).charpoly = ∏ k, (M k).charpoly := by
+  have h
+      : (Matrix.blockDiagonal M).charmatrix = Matrix.blockDiagonal fun k => (M k).charmatrix := by
     ext ⟨i, k⟩ ⟨j, k'⟩
     by_cases hk : k = k'
     · subst hk
@@ -25,8 +27,10 @@ theorem lat_charpoly_blockDiagonal {R n o : Type*} [CommRing R] [Fintype n] [Dec
   rw [Matrix.charpoly, h, Matrix.det_blockDiagonal]
   rfl
 
-theorem lat_charpoly_lmul_field {K F : Type*} [Field K] [Field F] [Algebra K F] [FiniteDimensional K F] (x : F) :
-    LinearMap.charpoly (Algebra.lmul K F x) = (minpoly K x) ^ Module.finrank (IntermediateField.adjoin K {x}) F := by
+theorem lat_charpoly_lmul_field
+    {K F : Type*} [Field K] [Field F] [Algebra K F] [FiniteDimensional K F] (x : F)
+    : LinearMap.charpoly (Algebra.lmul K F x)
+      = (minpoly K x) ^ Module.finrank (IntermediateField.adjoin K {x}) F := by
   classical
   have hx : IsIntegral K x := IsIntegral.of_finite K x
   let pb := IntermediateField.adjoin.powerBasis hx
@@ -48,19 +52,19 @@ def lat_cp (θ : 𝓞 E) : Polynomial ℤ := LinearMap.charpoly (Algebra.lmul �
 theorem lat_cp_natDegree (θ : 𝓞 E) : (lat_cp θ).natDegree = Module.finrank ℚ E := by
   rw [lat_cp, LinearMap.charpoly_natDegree, NumberField.RingOfIntegers.rank]
 
-theorem lat_cp_map (θ : 𝓞 E) :
-    (lat_cp θ).map (algebraMap ℤ ℚ) = LinearMap.charpoly (Algebra.lmul ℚ E (θ : E)) := by
+theorem lat_cp_map (θ : 𝓞 E)
+    : (lat_cp θ).map (algebraMap ℤ ℚ) = LinearMap.charpoly (Algebra.lmul ℚ E (θ : E)) := by
   classical
   rw [lat_cp, ← LinearMap.charpoly_toMatrix (Algebra.lmul ℤ (𝓞 E) θ) (RingOfIntegers.basis E),
-    ← Matrix.charpoly_map, ← LinearMap.charpoly_toMatrix (Algebra.lmul ℚ E (θ : E)) (integralBasis E)]
+    ← Matrix.charpoly_map,
+    ← LinearMap.charpoly_toMatrix (Algebra.lmul ℚ E (θ : E)) (integralBasis E)]
   congr 1
   ext i j
   rw [Matrix.map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply, integralBasis_apply]
-  have e : Algebra.lmul ℚ E (θ : E) (algebraMap (𝓞 E) E (RingOfIntegers.basis E j)) =
-      algebraMap (𝓞 E) E (Algebra.lmul ℤ (𝓞 E) θ (RingOfIntegers.basis E j)) := by
-    first
-    | rfl
-    | simp [map_mul]
+  have e
+      : Algebra.lmul ℚ E (θ : E) (algebraMap (𝓞 E) E (RingOfIntegers.basis E j))
+        = algebraMap (𝓞 E) E (Algebra.lmul ℤ (𝓞 E) θ (RingOfIntegers.basis E j)) := by
+    first | rfl | simp [map_mul]
   rw [e, integralBasis_repr_apply]
 
 theorem lat_cp_eq_minpoly_pow (θ : 𝓞 E) : ∃ r : ℕ, 1 ≤ r ∧ lat_cp θ = (minpoly ℤ θ) ^ r := by

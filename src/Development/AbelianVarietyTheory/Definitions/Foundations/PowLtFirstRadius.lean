@@ -16,8 +16,9 @@ variable {l : ℕ} [Fact l.Prime]
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-theorem _root_.GlobalTheory.Cyc.Model.isom_gal (g : _root_.Formalism.BasicNotions.Loc.GQ l) :
-    Isometry (g : _root_.Formalism.BasicNotions.Loc.Om l →+* _root_.Formalism.BasicNotions.Loc.Om l) := by
+theorem _root_.GlobalTheory.Cyc.Model.isom_gal (g : _root_.Formalism.BasicNotions.Loc.GQ l)
+    : Isometry
+      (g : _root_.Formalism.BasicNotions.Loc.Om l →+* _root_.Formalism.BasicNotions.Loc.Om l) := by
   refine AddMonoidHomClass.isometry_of_norm _ fun x => ?_
   change spectralNorm ℚ_[l] (PadicAlgCl l) (g x) = spectralNorm ℚ_[l] (PadicAlgCl l) x
   exact (spectralNorm_eq_of_equiv g x).symm
@@ -25,57 +26,68 @@ theorem _root_.GlobalTheory.Cyc.Model.isom_gal (g : _root_.Formalism.BasicNotion
 def extHom (g : GQ l) : PadicComplex l →+* PadicComplex l :=
   UniformSpace.Completion.mapRingHom (g : Om l →+* Om l) (isom_gal g).continuous
 
-theorem extHom_coe (g : GQ l) (x : Om l) : extHom g (x : PadicComplex l) = ((g x : Om l) : PadicComplex l) :=
+theorem extHom_coe (g : GQ l) (x : Om l)
+    : extHom g (x : PadicComplex l) = ((g x : Om l) : PadicComplex l) :=
   UniformSpace.Completion.mapRingHom_coe _ x
 
 theorem extHom_cont (g : GQ l) : Continuous (extHom g) := UniformSpace.Completion.continuous_map
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-private theorem continuous_cyc_extHom (g : _root_.Formalism.BasicNotions.Loc.GQ l) :
-    Continuous (_root_.GlobalTheory.Cyc.Model.extHom g) :=
+private theorem continuous_cyc_extHom (g : _root_.Formalism.BasicNotions.Loc.GQ l)
+    : Continuous (_root_.GlobalTheory.Cyc.Model.extHom g) :=
   UniformSpace.Completion.continuous_extension
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-private theorem cyc_extHom_coe (g : _root_.Formalism.BasicNotions.Loc.GQ l) (x : _root_.Formalism.BasicNotions.Loc.Om l) :
-    _root_.GlobalTheory.Cyc.Model.extHom g (x : PadicComplex l) = ((g x : _root_.Formalism.BasicNotions.Loc.Om l) : PadicComplex l) := by
+private theorem cyc_extHom_coe
+    (g : _root_.Formalism.BasicNotions.Loc.GQ l) (x : _root_.Formalism.BasicNotions.Loc.Om l)
+    : _root_.GlobalTheory.Cyc.Model.extHom g (x : PadicComplex l)
+      = ((g x : _root_.Formalism.BasicNotions.Loc.Om l) : PadicComplex l) := by
   simp only [_root_.GlobalTheory.Cyc.Model.extHom, UniformSpace.Completion.mapRingHom]
-  rw [UniformSpace.Completion.extensionHom_coe]; rfl
+  rw [UniformSpace.Completion.extensionHom_coe]
+  rfl
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-theorem _root_.GlobalTheory.Cyc.Model.extHom_mul (g h : _root_.Formalism.BasicNotions.Loc.GQ l) (y : PadicComplex l) :
-    _root_.GlobalTheory.Cyc.Model.extHom (g * h) y =
-      _root_.GlobalTheory.Cyc.Model.extHom g (_root_.GlobalTheory.Cyc.Model.extHom h y) := by
-  refine UniformSpace.Completion.induction_on y (isClosed_eq (continuous_cyc_extHom _)
-    ((continuous_cyc_extHom g).comp (continuous_cyc_extHom h))) fun x => ?_
-  rw [cyc_extHom_coe, cyc_extHom_coe, cyc_extHom_coe]; rfl
+theorem _root_.GlobalTheory.Cyc.Model.extHom_mul
+    (g h : _root_.Formalism.BasicNotions.Loc.GQ l) (y : PadicComplex l)
+    : _root_.GlobalTheory.Cyc.Model.extHom (g * h) y
+      = _root_.GlobalTheory.Cyc.Model.extHom g (_root_.GlobalTheory.Cyc.Model.extHom h y) := by
+  refine UniformSpace.Completion.induction_on y
+    (isClosed_eq (continuous_cyc_extHom _)
+      ((continuous_cyc_extHom g).comp (continuous_cyc_extHom h)))
+    fun x => ?_
+  rw [cyc_extHom_coe, cyc_extHom_coe, cyc_extHom_coe]
+  rfl
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-theorem _root_.GlobalTheory.Cyc.Model.extHom_one (y : PadicComplex l) :
-    _root_.GlobalTheory.Cyc.Model.extHom (1 : _root_.Formalism.BasicNotions.Loc.GQ l) y = y := by
+theorem _root_.GlobalTheory.Cyc.Model.extHom_one (y : PadicComplex l)
+    : _root_.GlobalTheory.Cyc.Model.extHom (1 : _root_.Formalism.BasicNotions.Loc.GQ l) y = y := by
   refine UniformSpace.Completion.induction_on y
     (isClosed_eq (continuous_cyc_extHom _) continuous_id) fun x => ?_
-  rw [cyc_extHom_coe]; rfl
+  rw [cyc_extHom_coe]
+  rfl
 
 def actC : GQ l →* (PadicComplex l ≃+* PadicComplex l) where
-  toFun g := { extHom g with
+  toFun g := {
+    extHom g with
     invFun := extHom g⁻¹
     left_inv := fun y => by
       change extHom g⁻¹ (extHom g y) = y
       rw [← extHom_mul, inv_mul_cancel, extHom_one]
     right_inv := fun y => by
       change extHom g (extHom g⁻¹ y) = y
-      rw [← extHom_mul, mul_inv_cancel, extHom_one] }
+      rw [← extHom_mul, mul_inv_cancel, extHom_one]
+  }
   map_one' := by ext y; exact extHom_one y
   map_mul' g h := by ext y; exact extHom_mul g h y
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-private theorem norm_cyc_extHom (g : _root_.Formalism.BasicNotions.Loc.GQ l) (y : PadicComplex l) :
-    ‖_root_.GlobalTheory.Cyc.Model.extHom g y‖ = ‖y‖ := by
+private theorem norm_cyc_extHom (g : _root_.Formalism.BasicNotions.Loc.GQ l) (y : PadicComplex l)
+    : ‖_root_.GlobalTheory.Cyc.Model.extHom g y‖ = ‖y‖ := by
   refine UniformSpace.Completion.induction_on y
     (isClosed_eq (continuous_norm.comp (continuous_cyc_extHom g)) continuous_norm) fun x => ?_
   rw [cyc_extHom_coe, UniformSpace.Completion.norm_coe, UniformSpace.Completion.norm_coe]
@@ -83,25 +95,27 @@ private theorem norm_cyc_extHom (g : _root_.Formalism.BasicNotions.Loc.GQ l) (y 
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-theorem _root_.GlobalTheory.Cyc.Model.isActC_actC :
-    _root_.GlobalTheory.Cyc.IsActC (_root_.GlobalTheory.Cyc.Model.actC (l := l)) :=
+theorem _root_.GlobalTheory.Cyc.Model.isActC_actC
+    : _root_.GlobalTheory.Cyc.IsActC (_root_.GlobalTheory.Cyc.Model.actC (l := l)) :=
   ⟨fun g x => cyc_extHom_coe g x, fun g y => norm_cyc_extHom g y⟩
 
 open Polynomial in
 variable {l : ℕ} [Fact l.Prime] in
-theorem _root_.GlobalTheory.Cyc.Model.cyc_irred (n : ℕ) :
-    Irreducible (cyclotomic (l ^ (n + 1)) ℚ_[l]) := by
+theorem _root_.GlobalTheory.Cyc.Model.cyc_irred (n : ℕ)
+    : Irreducible (cyclotomic (l ^ (n + 1)) ℚ_[l]) := by
   have hP : (Ideal.span {(l : ℤ_[l])}).IsPrime :=
     PadicInt.maximalIdeal_eq_span_p (p := l) ▸ (IsLocalRing.maximalIdeal.isMaximal _).isPrime
   have hnu : ¬ IsUnit (l : ℤ_[l]) := fun h => hP.ne_top (Ideal.span_singleton_eq_top.2 h)
   have hE := cyclotomic_prime_pow_comp_X_add_one_isEisensteinAt l n
-  have hmap : taylor (1 : ℤ_[l]) (cyclotomic (l ^ (n + 1)) ℤ_[l]) =
-      ((cyclotomic (l ^ (n + 1)) ℤ).comp (X + 1)).map (Int.castRingHom ℤ_[l]) := by
+  have hmap
+      : taylor (1 : ℤ_[l]) (cyclotomic (l ^ (n + 1)) ℤ_[l])
+        = ((cyclotomic (l ^ (n + 1)) ℤ).comp (X + 1)).map (Int.castRingHom ℤ_[l]) := by
     rw [taylor_apply, Polynomial.map_comp, map_cyclotomic]; simp
   have hmon : (taylor (1 : ℤ_[l]) (cyclotomic (l ^ (n + 1)) ℤ_[l])).Monic := by
     rw [taylor_apply]; exact (cyclotomic.monic _ _).comp_X_add_C 1
-  have hdeg : (taylor (1 : ℤ_[l]) (cyclotomic (l ^ (n + 1)) ℤ_[l])).natDegree =
-      ((cyclotomic (l ^ (n + 1)) ℤ).comp (X + 1)).natDegree := by
+  have hdeg
+      : (taylor (1 : ℤ_[l]) (cyclotomic (l ^ (n + 1)) ℤ_[l])).natDegree
+        = ((cyclotomic (l ^ (n + 1)) ℤ).comp (X + 1)).natDegree := by
     rw [natDegree_taylor, natDegree_comp, natDegree_cyclotomic, natDegree_cyclotomic,
       show (X + 1 : ℤ[X]) = X + C 1 by simp, natDegree_X_add_C, mul_one]
   have hZ : Irreducible (cyclotomic (l ^ (n + 1)) ℤ_[l]) := by
@@ -122,9 +136,11 @@ theorem _root_.GlobalTheory.Cyc.Model.cyc_irred (n : ℕ) :
       apply hnu
       have hl : (l : ℤ_[l]) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
       refine isUnit_iff_exists_inv.2 ⟨c, mul_left_cancel₀ hl ?_⟩
-      rw [mul_one, ← mul_assoc, ← pow_two]; exact hc.symm
-  have h := (cyclotomic.monic (l ^ (n + 1)) ℤ_[l]).irreducible_iff_irreducible_map_fraction_map
-    (K := ℚ_[l]) |>.1 hZ
+      rw [mul_one, ← mul_assoc, ← pow_two]
+      exact hc.symm
+  have h :=
+    (cyclotomic.monic (l ^ (n + 1)) ℤ_[l]).irreducible_iff_irreducible_map_fraction_map (K := ℚ_[l])
+      |>.1 hZ
   rwa [map_cyclotomic] at h
 
 end GlobalTheory.Cyc.Model

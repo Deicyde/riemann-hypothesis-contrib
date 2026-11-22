@@ -11,8 +11,8 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo
 variable {ι : Type*} [Fintype ι]
 
 def fsLp (ι : Type*) [Fintype ι] : (ι → ℂ) →L[ℝ] EuclideanSpace ℂ ι :=
-  ((PiLp.continuousLinearEquiv 2 ℂ (fun _ : ι => ℂ)).symm :
-    (ι → ℂ) →L[ℂ] EuclideanSpace ℂ ι).restrictScalars ℝ
+  ((PiLp.continuousLinearEquiv 2 ℂ (fun _ : ι => ℂ)).symm
+    : (ι → ℂ) →L[ℂ] EuclideanSpace ℂ ι).restrictScalars ℝ
 
 lemma fsLp_apply (z : ι → ℂ) : fsLp ι z = WithLp.toLp 2 z := rfl
 
@@ -94,16 +94,15 @@ theorem fsMetric_isSmooth : IsSmoothMetric (fsMetric (ι := ι)) := by
   intro z hz
   change ContDiffWithinAt ℝ _ (fun z => ‖fsLp ι z‖) _ z
   have h0 : fsLp ι z ≠ 0 := fsLp_ne_zero hz
-  have hn : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun u : EuclideanSpace ℂ ι => ‖u‖) (fsLp ι z) := by
-    first
-    | exact contDiffAt_norm ℝ h0
-    | exact contDiffAt_norm h0
+  have hn
+      : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun u : EuclideanSpace ℂ ι => ‖u‖) (fsLp ι z) := by
+    first | exact contDiffAt_norm ℝ h0 | exact contDiffAt_norm h0
   exact (hn.comp z (fsLp ι).contDiff.contDiffAt).contDiffWithinAt
 
-theorem leviForm_fsMetric {z : ι → ℂ} (hz : z ≠ 0) (w : ι → ℂ) :
-    leviForm (fun z => Real.log ((fsMetric (ι := ι)).ρ z)) z w =
-      (‖fsLp ι w‖ ^ 2 * ‖fsLp ι z‖ ^ 2 - ‖inner ℂ (fsLp ι z) (fsLp ι w)‖ ^ 2) /
-        (2 * (‖fsLp ι z‖ ^ 2) ^ 2) := by
+theorem leviForm_fsMetric {z : ι → ℂ} (hz : z ≠ 0) (w : ι → ℂ)
+    : leviForm (fun z => Real.log ((fsMetric (ι := ι)).ρ z)) z w
+      = (‖fsLp ι w‖ ^ 2 * ‖fsLp ι z‖ ^ 2 - ‖inner ℂ (fsLp ι z) (fsLp ι w)‖ ^ 2)
+        / (2 * (‖fsLp ι z‖ ^ 2) ^ 2) := by
   change leviForm (fun z => Real.log ‖fsLp ι z‖) z w = _
   unfold leviForm
   rw [hess_logFs hz, hess_logFs hz, fsLp_smul_I, norm_smul, Complex.norm_I, one_mul,

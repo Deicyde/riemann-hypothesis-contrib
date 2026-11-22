@@ -16,24 +16,32 @@ namespace UpperTheory.Ram
 
 variable {R : Ranks} (H : Host R)
 
-theorem natCast_notMem_of_coprime {A : Type} [CommRing A] {I : Ideal A} (hI : I ≠ ⊤) {l n : ℕ} (hl : (l : A) ∈ I)
-    (h : Nat.Coprime n l) : (n : A) ∉ I := by
+theorem natCast_notMem_of_coprime
+    {A : Type} [CommRing A]
+    {I : Ideal A} (hI : I ≠ ⊤)
+    {l n : ℕ} (hl : (l : A) ∈ I) (h : Nat.Coprime n l)
+    : (n : A) ∉ I := by
   intro hn
   obtain ⟨x, y, e⟩ : IsCoprime (n : A) (l : A) := Nat.Coprime.cast h
   exact hI ((Ideal.eq_top_iff_one _).2 (e ▸ I.add_mem (I.mul_mem_left _ hn) (I.mul_mem_left _ hl)))
 
-theorem coprime_QSq {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q) : Nat.Coprime (H.QS * H.q) l := by
+theorem coprime_QSq {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q)
+    : Nat.Coprime (H.QS * H.q) l := by
   refine ((Nat.Prime.coprime_iff_not_dvd hl).2 fun h => ?_).symm
   rcases (H.toHostRaw.dvd_QSq_iff hl).1 h with h | h
   · exact UpperTheory.Small.not_dvd_QS H hl hs h
   · exact hq h
 
-theorem QSq_notMem {A : Type} [CommRing A] {Q : Ideal A} (hQ : Q ≠ ⊤) {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q)
-    (hlQ : (l : A) ∈ Q) : ((H.QS * H.q : ℕ) : A) ∉ Q :=
+theorem QSq_notMem
+    {A : Type} [CommRing A]
+    {Q : Ideal A} (hQ : Q ≠ ⊤)
+    {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q) (hlQ : (l : A) ∈ Q)
+    : ((H.QS * H.q : ℕ) : A) ∉ Q :=
   natCast_notMem_of_coprime hQ hlQ (coprime_QSq H hl hs hq)
 
-theorem notMem_small_of_QS_notMem {A : Type} [CommRing A] {Q : Ideal A} {l : ℕ} (hlQ : (l : A) ∈ Q)
-    (h : ((H.QS : ℕ) : A) ∉ Q) : l ∉ H.small := by
+theorem notMem_small_of_QS_notMem
+    {A : Type} [CommRing A] {Q : Ideal A} {l : ℕ} (hlQ : (l : A) ∈ Q) (h : ((H.QS : ℕ) : A) ∉ Q)
+    : l ∉ H.small := by
   intro hs
   obtain ⟨c, hc⟩ := ((H.toHostRaw.mem_small_iff).1 hs).2
   exact h (by rw [hc]; push_cast; exact Q.mul_mem_right _ hlQ)
@@ -44,21 +52,27 @@ theorem half_ne_bot : H.𝔟 ≠ ⊥ := by
   rw [hb, Ideal.bot_mul] at h1
   exact differentIdeal_ne_bot h1
 
-theorem half_not_le (Q : Ideal (𝓞 H.E)) [hQ : Q.IsPrime] (h : ((H.QS * H.q : ℕ) : 𝓞 H.E) ∉ Q) : ¬ H.𝔟 ≤ Q := by
+theorem half_not_le (Q : Ideal (𝓞 H.E)) [hQ : Q.IsPrime] (h : ((H.QS * H.q : ℕ) : 𝓞 H.E) ∉ Q)
+    : ¬ H.𝔟 ≤ Q := by
   intro hle
   refine h (H.der.diffSupport Q hQ ?_)
   rw [H.𝔟_spec.1]
   exact (Ideal.dvd_iff_le.2 hle).mul_right _
 
-theorem not_dvd_natAbs_discr {p : ℕ} (hp : p.Prime) (hs : p ∉ H.small) (hq : p ≠ H.q) (hd : p ≠ H.d) :
-    ¬ p ∣ (discr H.E).natAbs :=
-  fun h => UpperTheory.Small.not_dvd_condN H hp hs hq hd ((H.dvd_natAbs_discr_iff hp).1 h)
+theorem not_dvd_natAbs_discr {p : ℕ} (hp : p.Prime) (hs : p ∉ H.small) (hq : p ≠ H.q) (hd : p ≠ H.d)
+    : ¬ p ∣ (discr H.E).natAbs := fun h =>
+  UpperTheory.Small.not_dvd_condN H hp hs hq hd ((H.dvd_natAbs_discr_iff hp).1 h)
 
-theorem inertiaK_trivial {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q) (P : Ideal (𝓞 H.E)) [hP : P.IsPrime]
-    (hlP : (l : 𝓞 H.E) ∈ P) (σ : H.E ≃ₐ[H.K] H.E) (hσ : ∀ x : 𝓞 H.E, σ • x - x ∈ P) : σ = 1 := by
+theorem inertiaK_trivial
+    {l : ℕ} (hl : l.Prime) (hs : l ∉ H.small) (hq : l ≠ H.q)
+    (P : Ideal (𝓞 H.E)) [hP : P.IsPrime]
+    (hlP : (l : 𝓞 H.E) ∈ P)
+    (σ : H.E ≃ₐ[H.K] H.E) (hσ : ∀ x : 𝓞 H.E, σ • x - x ∈ P)
+    : σ = 1 := by
   have : Fact l.Prime := ⟨hl⟩
   have hlz : Prime (l : ℤ) := Nat.prime_iff_prime_int.1 hl
-  have hlo : P.LiesOver (span {(l : ℤ)}) := (Ideal.liesOver_span_iff hP.ne_top hlz).2 (by simpa using hlP)
+  have hlo : P.LiesOver (span {(l : ℤ)}) :=
+    (Ideal.liesOver_span_iff hP.ne_top hlz).2 (by simpa using hlP)
   set σ' : H.E ≃ₐ[ℚ] H.E := σ.restrictScalars ℚ with hσ'
   have hin : ∀ x : 𝓞 H.E, σ' • x - x ∈ P := hσ
   suffices h1 : σ' = 1 from AlgEquiv.ext fun x => DFunLike.congr_fun h1 x

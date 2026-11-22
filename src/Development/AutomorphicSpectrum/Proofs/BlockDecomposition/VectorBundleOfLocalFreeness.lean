@@ -5,16 +5,20 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge
 
 namespace GlobalTheory.CompanionTheory.Cot
 
-theorem vb_of_free_on_basicOpens :
-    ∀ (R W : Type) [CommRing R] [AddCommGroup W] [Module R W] (g : ℕ),
-      (∀ p : PrimeSpectrum R, ∃ r : R, r ∉ p.asIdeal ∧
-        Module.Free (Localization.Away r) (Localization.Away r ⊗[R] W) ∧
-        Module.Finite (Localization.Away r) (Localization.Away r ⊗[R] W) ∧
-        Module.finrank (Localization.Away r) (Localization.Away r ⊗[R] W) = g) → VB R W g := by
+theorem vb_of_free_on_basicOpens
+    : ∀ (R W : Type) [CommRing R] [AddCommGroup W] [Module R W] (g : ℕ),
+      (∀ p : PrimeSpectrum R, ∃ r : R,
+          r ∉ p.asIdeal ∧ Module.Free (Localization.Away r) (Localization.Away r ⊗[R] W)
+            ∧ Module.Finite (Localization.Away r) (Localization.Away r ⊗[R] W)
+            ∧ Module.finrank (Localization.Away r) (Localization.Away r ⊗[R] W) = g)
+        → VB R W g := by
   intro R W _ _ _ g h
   choose r hr hfree hfin hrank using h
   have hs : Ideal.span (Set.range r) = ⊤ := by
@@ -23,8 +27,10 @@ theorem vb_of_free_on_basicOpens :
     exact hr ⟨m, hm.isPrime⟩ (hle (Ideal.subset_span ⟨_, rfl⟩))
   have hfp : Module.FinitePresentation R W := by
     refine Module.FinitePresentation.of_localizationSpan' (Set.range r) hs
-      (Rₚ := fun x => Localization.Away x.1) (Mₚ := fun x => Localization.Away x.1 ⊗[R] W)
-      (fun x => TensorProduct.mk R (Localization.Away x.1) W 1) (fun x => ?_)
+      (Rₚ := fun x => Localization.Away x.1)
+      (Mₚ := fun x => Localization.Away x.1 ⊗[R] W)
+      (fun x => TensorProduct.mk R (Localization.Away x.1) W 1)
+      (fun x => ?_)
     obtain ⟨x, p, rfl⟩ := x
     have := hfree p
     have := hfin p
@@ -36,8 +42,8 @@ theorem vb_of_free_on_basicOpens :
     have hsub : (PrimeSpectrum.basicOpen (r p) : Set (PrimeSpectrum R)) ⊆ Module.freeLocus R W := by
       rw [Module.basicOpen_subset_freeLocus_iff]
       have := hfree p
-      exact Module.Projective.of_equiv
-        (LocalizedModule.equivTensorProduct (Submonoid.powers (r p)) W).symm
+      exact Module.Projective.of_equiv (LocalizedModule.equivTensorProduct (Submonoid.powers (r p))
+        W).symm
     exact hsub (hr p)
   refine ⟨inferInstance, hproj, fun p => ?_⟩
   have hfl := hfree p

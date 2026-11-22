@@ -8,21 +8,33 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriPr
 
 noncomputable section
 
-open PositivityTheory.LowerBoundConstant GlobalTheory GlobalTheory.Published GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead Topology
+open PositivityTheory.LowerBoundConstant GlobalTheory GlobalTheory.Published GlobalTheory.PRep
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead Topology
 
 namespace GlobalTheory.CompanionTheory.JacquetCentral
 
-theorem exists_fixed_mk_eq_of_commute : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ G V), IsAdmissible π → ∀ (I N : Subgroup G), IsOpen (I : Set G) → IsCompact (I : Set G) →
-    ∀ {M : Type} [Group M] (s : M →* G) (hs : ∀ m, s m ∈ Subgroup.normalizer (N : Set G)) (M₀ : Subgroup M),
-    (∀ d ∈ M₀, s d ∈ I) → ∀ (C : Set G), (∀ g ∈ I, ∃ d ∈ M₀, ∃ x ∈ N, ∃ c ∈ C, g = s d * x * c) →
-    (∀ U ∈ 𝓝 (1 : G), ∃ t : M, (∀ d ∈ M₀, t * d = d * t) ∧ ∀ c ∈ C, (s t)⁻¹ * c * s t ∈ U) →
-    ∀ y : Jacquet π N, y ∈ fixed (jacquet π N s hs) M₀ → ∃ v ∈ fixed π I, (twKer π N 1).mkQ v = y := by
+theorem exists_fixed_mk_eq_of_commute
+    : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (π : Representation ℂ G V),
+      IsAdmissible π
+        → ∀ (I N : Subgroup G),
+          IsOpen (I : Set G) → IsCompact (I : Set G)
+            → ∀ {M : Type} [Group M] (s : M →* G) (hs : ∀ m, s m ∈ Subgroup.normalizer (N : Set G))
+                (M₀ : Subgroup M),
+              (∀ d ∈ M₀, s d ∈ I)
+                → ∀ (C : Set G),
+                  (∀ g ∈ I, ∃ d ∈ M₀, ∃ x ∈ N, ∃ c ∈ C, g = s d * x * c)
+                    → (∀ U ∈ 𝓝 (1 : G), ∃ t : M,
+                      (∀ d ∈ M₀, t * d = d * t) ∧ ∀ c ∈ C, (s t)⁻¹ * c * s t ∈ U)
+                    → ∀ y : Jacquet π N,
+                      y ∈ fixed (jacquet π N s hs) M₀
+                        → ∃ v ∈ fixed π I, (twKer π N 1).mkQ v = y := by
   intro G V _ _ _ _ _ π hπ I N hIo hIc M _ s hs M₀ hsI C hfac hcon y hy
   obtain ⟨hsm, hfd⟩ := hπ
-  have hj : ∀ (m : M) (z : V),
-      jacquet π N s hs m ((twKer π N 1).mkQ z) = (twKer π N 1).mkQ (π (s m) z) :=
-    fun m z => rfl
+  have hj
+      : ∀ (m : M) (z : V),
+        jacquet π N s hs m ((twKer π N 1).mkQ z) = (twKer π N 1).mkQ (π (s m) z) := fun m z =>
+    rfl
   have hfixI : ∀ v ∈ fixed π I, ∀ g ∈ I, π g v = v := by
     intro v hv g hg
     have h := hv ⟨g, hg⟩
@@ -40,9 +52,10 @@ theorem exists_fixed_mk_eq_of_commute : ∀ {G V : Type} [Group G] [TopologicalS
     intro x hx z
     rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
     exact Submodule.subset_span ⟨⟨x, hx⟩, z, by simp⟩
-  have hstep : ∀ u : V, (∀ c ∈ C, π c u = u) →
-      (∀ d ∈ M₀, (twKer π N 1).mkQ (π (s d) u) = (twKer π N 1).mkQ u) →
-      ∃ v ∈ fixed π I, (twKer π N 1).mkQ v = (twKer π N 1).mkQ u := by
+  have hstep
+      : ∀ u : V,
+        (∀ c ∈ C, π c u = u) → (∀ d ∈ M₀, (twKer π N 1).mkQ (π (s d) u) = (twKer π N 1).mkQ u)
+          → ∃ v ∈ fixed π I, (twKer π N 1).mkQ v = (twKer π N 1).mkQ u := by
     intro u hu hd
     refine GlobalTheory.SmGL.IwahoriOnto.exists_fixed_map_eq hsm hIc (twKer π N 1).mkQ u ?_
     intro g hg
@@ -56,8 +69,8 @@ theorem exists_fixed_mk_eq_of_commute : ∀ {G V : Type} [Group G] [TopologicalS
   have hcomm : ∀ d ∈ M₀, ∀ z : V, π (s d) (π (s t) z) = π (s t) (π (s d) z) := by
     intro d hd z
     rw [hmul, hmul, ← map_mul, ← map_mul, htc d hd]
-  have hC : ∀ z : V, (∀ c ∈ C, π ((s t)⁻¹ * c * s t) z = z) →
-      ∀ c ∈ C, π c (π (s t) z) = π (s t) z := by
+  have hC
+      : ∀ z : V, (∀ c ∈ C, π ((s t)⁻¹ * c * s t) z = z) → ∀ c ∈ C, π c (π (s t) z) = π (s t) z := by
     intro z hz c hc
     rw [hconj c (s t) z, hz c hc]
   set W : Submodule ℂ (V ⧸ twKer π N 1) := (fixed π I).map (twKer π N 1).mkQ with hW
@@ -65,9 +78,10 @@ theorem exists_fixed_mk_eq_of_commute : ∀ {G V : Type} [Group G] [TopologicalS
   have hWfd : FiniteDimensional ℂ W := by
     rw [hW]
     infer_instance
-  have hstepW : ∀ u : V, (∀ c ∈ C, π c u = u) →
-      (∀ d ∈ M₀, (twKer π N 1).mkQ (π (s d) u) = (twKer π N 1).mkQ u) →
-      (twKer π N 1).mkQ u ∈ W := by
+  have hstepW
+      : ∀ u : V,
+        (∀ c ∈ C, π c u = u) → (∀ d ∈ M₀, (twKer π N 1).mkQ (π (s d) u) = (twKer π N 1).mkQ u)
+          → (twKer π N 1).mkQ u ∈ W := by
     intro u hu hd
     obtain ⟨v, hv, he⟩ := hstep u hu hd
     exact Submodule.mem_map.2 ⟨v, hv, he⟩

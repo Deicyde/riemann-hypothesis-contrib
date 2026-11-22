@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSchmidtFrame
 
 @[expose] public section
 
-open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 open Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -43,11 +44,12 @@ lemma Pm_mulVec (z v : Fin (2 * r + k + 1) → ℂ) : Pm k r z *ᵥ v = prW k r 
   unfold prW
   rw [div_eq_inv_mul]
 
-def wv (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (M : B.Mat k r) (u : Fin (2 * r + k + 1) → ℂ) :
-    Fin (r + 1) → ℂ := fun a => herm (Hpk k r) (M *ᵥ u) (fvec k r z a)
+def wv (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (M : B.Mat k r) (u : Fin (2 * r + k + 1) → ℂ)
+    : Fin (r + 1) → ℂ := fun a =>
+  herm (Hpk k r) (M *ᵥ u) (fvec k r z a)
 
-def gam (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (M : B.Mat k r) (u : Fin (2 * r + k + 1) → ℂ) :
-    Fin (r + 1) → ℂ :=
+def gam (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (M : B.Mat k r) (u : Fin (2 * r + k + 1) → ℂ)
+    : Fin (r + 1) → ℂ :=
   (-((Zhat k r z z' M).det)⁻¹) • ((Zhat k r z z' M).adjugate *ᵥ wv k r z M u)
 
 def Lm (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (M : B.Mat k r) : B.Mat k r :=

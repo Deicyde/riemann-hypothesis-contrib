@@ -9,8 +9,8 @@ open NumberField IsDedekindDomain GlobalTheory.CuspRep Matrix
 
 namespace GlobalTheory.IwasawaLast
 
-theorem exists_unitary_lastRow {n : ℕ} (ℓ : Fin (n + 1) → ℂ) (hℓ : ℓ ≠ 0) :
-    ∃ r : ℂ, r ≠ 0 ∧ ∃ k ∈ unitaryGroup (Fin (n + 1)) ℂ, ∀ l, ℓ l = r * k (Fin.last n) l := by
+theorem exists_unitary_lastRow {n : ℕ} (ℓ : Fin (n + 1) → ℂ) (hℓ : ℓ ≠ 0)
+    : ∃ r : ℂ, r ≠ 0 ∧ ∃ k ∈ unitaryGroup (Fin (n + 1)) ℂ, ∀ l, ℓ l = r * k (Fin.last n) l := by
   set x : EuclideanSpace ℂ (Fin (n + 1)) := WithLp.toLp 2 (star ℓ) with hx
   have hx0 : x ≠ 0 := by
     intro h
@@ -28,7 +28,8 @@ theorem exists_unitary_lastRow {n : ℕ} (ℓ : Fin (n + 1) → ℂ) (hℓ : ℓ
     rw [orthonormal_iff_ite]
     rintro ⟨i, hi⟩ ⟨j, hj⟩
     simp only [Set.mem_singleton_iff] at hi hj
-    subst hi; subst hj
+    subst hi
+    subst hj
     simp [Set.domRestrict, inner_self_eq_norm_sq_to_K, hw1]
   obtain ⟨b, hb⟩ := hon.exists_orthonormalBasis_extension_of_card_eq (by simp)
   have hbl : b (Fin.last n) = w := hb _ (Set.mem_singleton _)
@@ -46,7 +47,20 @@ end GlobalTheory.IwasawaLast
 
 namespace GlobalTheory.IwasawaLast
 
-theorem iwasawa_lastRow : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ) (y : GL (Fin (m + 1)) (Cinf E)), ∃ (p : GL (Fin (m + 1)) (Cinf E)) (ρ : (Cinf E)ˣ) (k : Kinf E (m + 1)), (∀ j, (p : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) (Fin.last m) j = if j = Fin.last m then 1 else 0) ∧ y = p * Units.map (Matrix.scalar (Fin (m + 1)) : Cinf E →+* Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)).toMonoidHom ρ * Unitary.toUnits k := by
+theorem iwasawa_lastRow
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ)
+        (y : GL (Fin (m + 1)) (Cinf E)),
+      ∃ (p : GL (Fin (m + 1)) (Cinf E)) (ρ : (Cinf E)ˣ) (k : Kinf E (m + 1)),
+        (∀ j,
+            (p : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) (Fin.last m) j
+              = if j = Fin.last m then 1 else 0)
+          ∧ y
+            = p
+              * Units.map
+                (Matrix.scalar (Fin (m + 1))
+                  : Cinf E →+* Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)).toMonoidHom
+                ρ
+              * Unitary.toUnits k := by
   intro E _ _ _ m y
   set Y : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E) := (y : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) with hY
   set ℓ : InfinitePlace E → Fin (m + 1) → ℂ := fun v j => Y (Fin.last m) j v with hℓdef
@@ -57,8 +71,7 @@ theorem iwasawa_lastRow : ∀ (E : Type) [Field E] [NumberField E] [_root_.Numbe
     have hmap : Y.det v = ((Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) v).mapMatrix Y).det :=
       RingHom.map_det (Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) v) Y
     have h0 : ((Pi.evalRingHom (fun _ : InfinitePlace E => ℂ) v).mapMatrix Y).det = 0 :=
-      Matrix.det_eq_zero_of_row_eq_zero (Fin.last m) (fun j => by
-        simpa [hℓdef] using congrFun h j)
+      Matrix.det_eq_zero_of_row_eq_zero (Fin.last m) (fun j => by simpa [hℓdef] using congrFun h j)
     rw [hmap, h0] at hv
     exact not_isUnit_zero hv
   choose r hr kv hkv hℓ using fun v => exists_unitary_lastRow (ℓ v) (hne v)
@@ -67,14 +80,29 @@ theorem iwasawa_lastRow : ∀ (E : Type) [Field E] [NumberField E] [_root_.Numbe
     rw [mem_unitaryGroup_iff]
     ext i j v
     have := congrFun (congrFun (mem_unitaryGroup_iff.mp (hkv v)) i) j
-    by_cases hij : i = j <;> simp [hKdef, Matrix.mul_apply, Finset.sum_apply, Matrix.star_apply, Matrix.one_apply, hij] at this ⊢ <;> exact this
+    by_cases hij : i = j
+      <;> simp [hKdef, Matrix.mul_apply, Finset.sum_apply, Matrix.star_apply, Matrix.one_apply, hij]
+        at this ⊢
+      <;> exact this
   have hρ : IsUnit (fun v => r v : Cinf E) := Pi.isUnit_iff.mpr fun v => (hr v).isUnit
-  refine ⟨y * (Unitary.toUnits (⟨K, hK⟩ : Kinf E (m + 1)))⁻¹ *
-      (Units.map (Matrix.scalar (Fin (m + 1)) : Cinf E →+* Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)).toMonoidHom hρ.unit)⁻¹,
-    hρ.unit, ⟨K, hK⟩, ?_, by group⟩
+  refine ⟨
+    y * (Unitary.toUnits (⟨K, hK⟩ : Kinf E (m + 1)))⁻¹
+      * (Units.map
+        (Matrix.scalar (Fin (m + 1))
+          : Cinf E →+* Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)).toMonoidHom
+        hρ.unit)⁻¹,
+    hρ.unit,
+    ⟨K, hK⟩,
+    ?_,
+    by group
+  ⟩
   intro j
   ext v
-  have hinv : (((Unitary.toUnits (⟨K, hK⟩ : Kinf E (m + 1)))⁻¹ : GL (Fin (m + 1)) (Cinf E)) : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) = star K := rfl
+  have hinv
+      : (((Unitary.toUnits (⟨K, hK⟩ : Kinf E (m + 1)))⁻¹ : GL (Fin (m + 1)) (Cinf E))
+          : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E))
+        = star K :=
+    rfl
   have hρv : ((hρ.unit⁻¹ : (Cinf E)ˣ) : Cinf E) v = (r v)⁻¹ := by
     have h1 := congrFun hρ.unit.inv_mul v
     simp only [Units.val_mul, Pi.mul_apply, IsUnit.unit_spec, Units.val_one, Pi.one_apply] at h1
@@ -85,8 +113,12 @@ theorem iwasawa_lastRow : ∀ (E : Type) [Field E] [NumberField E] [_root_.Numbe
   rw [← hY]
   show (Y * star K * Matrix.scalar (Fin (m + 1)) ((hρ.unit⁻¹ : (Cinf E)ˣ) : Cinf E)) (Fin.last m) j v = _
   rw [Matrix.scalar_apply, Matrix.mul_diagonal]
-  simp only [Matrix.scalar_apply, Matrix.mul_diagonal, Pi.mul_apply, hρv, Matrix.mul_apply, Finset.sum_apply, hrow, Matrix.star_apply, Pi.star_apply, hKdef, Matrix.of_apply] at hu ⊢
-  have hs : ∑ x, r v * kv v (Fin.last m) x * star (kv v j x) = r v * ∑ x, kv v (Fin.last m) x * star (kv v j x) := by
+  simp only [Matrix.scalar_apply, Matrix.mul_diagonal, Pi.mul_apply, hρv, Matrix.mul_apply,
+      Finset.sum_apply, hrow, Matrix.star_apply, Pi.star_apply, hKdef, Matrix.of_apply]
+    at hu ⊢
+  have hs
+      : ∑ x, r v * kv v (Fin.last m) x * star (kv v j x)
+        = r v * ∑ x, kv v (Fin.last m) x * star (kv v j x) := by
     rw [Finset.mul_sum]; simp [mul_assoc]
   rw [hs, hu, Matrix.one_apply]
   by_cases hj : j = Fin.last m

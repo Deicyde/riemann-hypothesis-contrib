@@ -12,28 +12,31 @@ noncomputable section
 
 variable {k r : ℕ}
 
-def Flt (a : ℕ) (x : Fin (2 * r + k + 1) → ℂ) : Prop := ∀ i : Fin (2 * r + k + 1), a ≤ i.val → x i = 0
+def Flt (a : ℕ) (x : Fin (2 * r + k + 1) → ℂ) : Prop :=
+  ∀ i : Fin (2 * r + k + 1), a ≤ i.val → x i = 0
 
 def hermL (y : Fin (2 * r + k + 1) → ℂ) : (Fin (2 * r + k + 1) → ℂ) →ₗ[ℂ] ℂ where
   toFun x := herm (Hpk k r) x y
   map_add' x x' := herm_add_left x x' y
   map_smul' c x := by simp [herm_smul_left]
 
-theorem herm_sum_left {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (y : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (∑ j ∈ s, f j) y = ∑ j ∈ s, herm (Hpk k r) (f j) y :=
+theorem herm_sum_left
+    {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (y : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (∑ j ∈ s, f j) y = ∑ j ∈ s, herm (Hpk k r) (f j) y :=
   map_sum (hermL y) f s
 
-theorem herm_sum_right {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) x (∑ j ∈ s, f j) = ∑ j ∈ s, herm (Hpk k r) x (f j) := by
+theorem herm_sum_right
+    {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) x (∑ j ∈ s, f j) = ∑ j ∈ s, herm (Hpk k r) x (f j) := by
   rw [herm_swap, herm_sum_left, star_sum]
   exact Finset.sum_congr rfl (fun j _ => by rw [← herm_swap])
 
-theorem mulVec_sum' {ι : Type*} (s : Finset ι) (g : B.Mat k r) (f : ι → Fin (2 * r + k + 1) → ℂ) :
-    g *ᵥ (∑ j ∈ s, f j) = ∑ j ∈ s, g *ᵥ f j :=
+theorem mulVec_sum' {ι : Type*} (s : Finset ι) (g : B.Mat k r) (f : ι → Fin (2 * r + k + 1) → ℂ)
+    : g *ᵥ (∑ j ∈ s, f j) = ∑ j ∈ s, g *ᵥ f j :=
   map_sum (Matrix.mulVecLin g) f s
 
-theorem flt_decomp (a : ℕ) (ha : a ≤ r) (y : Fin (2 * r + k + 1) → ℂ) (hy : Flt a y) :
-    y = ∑ j : Fin a, y (eI k r ⟨j.val, by omega⟩) • bvec (eI k r ⟨j.val, by omega⟩) := by
+theorem flt_decomp (a : ℕ) (ha : a ≤ r) (y : Fin (2 * r + k + 1) → ℂ) (hy : Flt a y)
+    : y = ∑ j : Fin a, y (eI k r ⟨j.val, by omega⟩) • bvec (eI k r ⟨j.val, by omega⟩) := by
   funext i
   rw [Finset.sum_apply]
   by_cases hi : i.val < a
@@ -55,8 +58,8 @@ theorem flt_decomp (a : ℕ) (ha : a ≤ r) (y : Fin (2 * r + k + 1) → ℂ) (h
 def Mblk (g : B.Mat k r) (a : ℕ) (ha : a ≤ r) : Matrix (Fin a) (Fin a) ℂ := fun i j =>
   herm (Hpk k r) (g *ᵥ bvec (eI k r ⟨j.val, by omega⟩)) (bvec (eI k r ⟨i.val, by omega⟩))
 
-theorem dmin_eq (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (ha : a ≤ r) :
-    Dmin k r z z' g ⟨a, by omega⟩ = (Mblk g a ha).det := by
+theorem dmin_eq (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (ha : a ≤ r)
+    : Dmin k r z z' g ⟨a, by omega⟩ = (Mblk g a ha).det := by
   unfold Dmin
   congr 1
   ext i j
@@ -65,9 +68,12 @@ theorem dmin_eq (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (
   have hj : (j : ℕ) < a := j.isLt
   rw [dite_eq_left (show i.val < r by omega), dite_eq_left (show j.val < r by omega)]
 
-theorem dlem_i (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (ha : a ≤ r)
-    (hD : Dmin k r z z' g ⟨a, by omega⟩ ≠ 0) (y : Fin (2 * r + k + 1) → ℂ) (hy : Flt a y)
-    (h : ∀ c : Fin r, c.val < a → herm (Hpk k r) (g *ᵥ y) (bvec (eI k r c)) = 0) : y = 0 := by
+theorem dlem_i
+    (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ)
+    (ha : a ≤ r) (hD : Dmin k r z z' g ⟨a, by omega⟩ ≠ 0)
+    (y : Fin (2 * r + k + 1) → ℂ)
+    (hy : Flt a y) (h : ∀ c : Fin r, c.val < a → herm (Hpk k r) (g *ᵥ y) (bvec (eI k r c)) = 0)
+    : y = 0 := by
   rw [dmin_eq z z' g a ha] at hD
   set y' : Fin a → ℂ := fun j => y (eI k r ⟨j.val, by omega⟩)
   have hMy : Mblk g a ha *ᵥ y' = 0 := by
@@ -84,9 +90,12 @@ theorem dlem_i (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (h
   have : y (eI k r ⟨j.val, by omega⟩) = 0 := congrFun hy' j
   rw [this, zero_smul]
 
-theorem dlem_ii (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ) (ha : a ≤ r)
-    (hD : Dmin k r z z' g ⟨a, by omega⟩ ≠ 0) (y : Fin (2 * r + k + 1) → ℂ) (hy : Flt a y)
-    (h : ∀ c : Fin r, c.val < a → herm (Hpk k r) y (g *ᵥ bvec (eI k r c)) = 0) : y = 0 := by
+theorem dlem_ii
+    (z z' : Fin (2 * r + k + 1) → ℂ) (g : B.Mat k r) (a : ℕ)
+    (ha : a ≤ r) (hD : Dmin k r z z' g ⟨a, by omega⟩ ≠ 0)
+    (y : Fin (2 * r + k + 1) → ℂ)
+    (hy : Flt a y) (h : ∀ c : Fin r, c.val < a → herm (Hpk k r) y (g *ᵥ bvec (eI k r c)) = 0)
+    : y = 0 := by
   rw [dmin_eq z z' g a ha] at hD
   set y' : Fin a → ℂ := fun j => y (eI k r ⟨j.val, by omega⟩)
   have hMy : star y' ᵥ* Mblk g a ha = 0 := by

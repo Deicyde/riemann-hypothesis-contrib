@@ -17,8 +17,8 @@ variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberFi
 def sBox (F : Type) [Field F] [NumberField F] : Set (mixedEmbedding.mixedSpace F) :=
   {x | ∀ w, 0 < x.1 w ∧ x.1 w ≤ 1}
 
-def gW (F : Type) [Field F] [NumberField F] (m : ℕ) : mixedEmbedding.mixedSpace F → ℝ :=
-  fun x => ∏ w, (x.1 w) ^ (m - 1)
+def gW (F : Type) [Field F] [NumberField F] (m : ℕ) : mixedEmbedding.mixedSpace F → ℝ := fun x =>
+  ∏ w, (x.1 w) ^ (m - 1)
 
 theorem sBox_eq : sBox F = (Set.univ.pi fun _ => Set.Ioc (0 : ℝ) 1) ×ˢ Set.univ := by
   ext x; simp [sBox, Set.mem_pi]
@@ -47,8 +47,8 @@ theorem continuous_gW (m : ℕ) : Continuous (gW F m) := by
   unfold gW
   fun_prop
 
-theorem integral_gW [IsTotallyReal F] {m : ℕ} (hm : 1 ≤ m) :
-    ∫ x in sBox F, gW F m x = ((m : ℝ)⁻¹) ^ Fintype.card {w : InfinitePlace F // w.IsReal} := by
+theorem integral_gW [IsTotallyReal F] {m : ℕ} (hm : 1 ≤ m)
+    : ∫ x in sBox F, gW F m x = ((m : ℝ)⁻¹) ^ Fintype.card {w : InfinitePlace F // w.IsReal} := by
   have hE : IsEmpty {w : InfinitePlace F // w.IsComplex} :=
     ⟨fun w => absurd (IsTotallyReal.isReal w.1) (InfinitePlace.not_isReal_iff_isComplex.2 w.2)⟩
   have h1 : (volume : Measure ({w : InfinitePlace F // w.IsComplex} → ℂ)).real Set.univ = 1 := by
@@ -67,8 +67,8 @@ theorem integral_gW [IsTotallyReal F] {m : ℕ} (hm : 1 ≤ m) :
 def fracU {I : Ideal (𝓞 F)} (hI : I ≠ ⊥) : (FractionalIdeal (nonZeroDivisors (𝓞 F)) F)ˣ :=
   Units.mk0 (I : FractionalIdeal (nonZeroDivisors (𝓞 F)) F) (FractionalIdeal.coeIdeal_ne_zero.2 hI)
 
-theorem mem_idealLattice_iff {I : Ideal (𝓞 F)} (hI : I ≠ ⊥) (y : mixedEmbedding.mixedSpace F) :
-    y ∈ mixedEmbedding.idealLattice F (fracU hI) ↔ ∃ n ∈ I, mixedEmbedding F (n : F) = y := by
+theorem mem_idealLattice_iff {I : Ideal (𝓞 F)} (hI : I ≠ ⊥) (y : mixedEmbedding.mixedSpace F)
+    : y ∈ mixedEmbedding.idealLattice F (fracU hI) ↔ ∃ n ∈ I, mixedEmbedding F (n : F) = y := by
   rw [mixedEmbedding.mem_idealLattice]
   constructor
   · rintro ⟨a, ha, rfl⟩
@@ -78,26 +78,36 @@ theorem mem_idealLattice_iff {I : Ideal (𝓞 F)} (hI : I ≠ ⊥) (y : mixedEmb
   · rintro ⟨n, hn, rfl⟩
     exact ⟨(n : F), (FractionalIdeal.mem_coeIdeal _).2 ⟨n, hn, rfl⟩, rfl⟩
 
-theorem gW_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ) {T : ℝ} {n : 𝓞 F}
-    (hn : n ∈ boxSet K F T) (c : ℝ) :
-    gW F m (c • mixedEmbedding F (n : F)) =
-      (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1) * c ^ (Formalism.HermitianLatticesTheory.fDeg K * (m - 1)) := by
+theorem gW_smul
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ)
+    {T : ℝ} {n : 𝓞 F} (hn : n ∈ boxSet K F T)
+    (c : ℝ)
+    : gW F m (c • mixedEmbedding F (n : F))
+      = (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1)
+        * c ^ (Formalism.HermitianLatticesTheory.fDeg K * (m - 1)) := by
   unfold gW
   rw [absNorm_eq_prod_of_mem hK hF hn, ← Finset.prod_pow, pow_mul, ← card_real hK hF,
     ← Finset.card_univ, ← Finset.prod_const, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun w _ => ?_
-  rw [Prod.smul_fst, Pi.smul_apply, mixedEmbedding.mixedEmbedding_apply_isReal, smul_eq_mul, mul_pow,
-    rEmb_apply, mul_comm]
+  rw [Prod.smul_fst, Pi.smul_apply, mixedEmbedding.mixedEmbedding_apply_isReal, smul_eq_mul,
+    mul_pow, rEmb_apply, mul_comm]
 
-theorem tsum_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ) {I : Ideal (𝓞 F)}
-    (hI : I ≠ ⊥) {N : ℝ} (hN : 0 < N) :
-    ∑' x : ↑(sBox F ∩ N⁻¹ • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F))), gW F m x =
-      (∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I},
-        (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1)) * N⁻¹ ^ (Formalism.HermitianLatticesTheory.fDeg K * (m - 1)) := by
+theorem tsum_eq
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) (m : ℕ)
+    {I : Ideal (𝓞 F)} (hI : I ≠ ⊥)
+    {N : ℝ} (hN : 0 < N)
+    : ∑' x : ↑(sBox F ∩ N⁻¹ • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F))), gW F m x
+      = (∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I},
+          (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1))
+        * N⁻¹ ^ (Formalism.HermitianLatticesTheory.fDeg K * (m - 1)) := by
   have hfin : {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I}.Finite :=
     (finite_boxSet hK hF N).subset fun n hn => hn.1
-  have hmem : ∀ n : {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I}, N⁻¹ • mixedEmbedding F ((n : 𝓞 F) : F) ∈
-      sBox F ∩ N⁻¹ • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F)) := by
+  have hmem
+      : ∀ n : {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I},
+        N⁻¹ • mixedEmbedding F ((n : 𝓞 F) : F)
+          ∈ sBox F
+            ∩ N⁻¹
+              • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F)) := by
     rintro ⟨n, hn, hnI⟩
     refine ⟨fun w => ?_, Set.smul_mem_smul_set ((mem_idealLattice_iff hI _).2 ⟨n, hnI, rfl⟩)⟩
     have h1 := (mem_boxSet_iff hK hF).1 hn w
@@ -106,8 +116,11 @@ theorem tsum_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFix
     refine ⟨mul_pos (inv_pos.2 hN) h1.1, ?_⟩
     rw [inv_mul_le_iff₀ hN, mul_one]
     exact h1.2
-  let ε : {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I} →
-      ↑(sBox F ∩ N⁻¹ • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F))) := fun n => ⟨_, hmem n⟩
+  let ε
+      : {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I}
+        → ↑(sBox F
+          ∩ N⁻¹ • (mixedEmbedding.idealLattice F (fracU hI) : Set (mixedEmbedding.mixedSpace F))) :=
+    fun n => ⟨_, hmem n⟩
   have hε : Function.Bijective ε := by
     constructor
     · intro n n' h
@@ -122,7 +135,8 @@ theorem tsum_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFix
       have h1 := hx w
       simp only [] at h1
       rw [Prod.smul_fst, Pi.smul_apply, mixedEmbedding.mixedEmbedding_apply_isReal, smul_eq_mul,
-        ← rEmb_apply, inv_mul_le_iff₀ hN, mul_one] at h1
+          ← rEmb_apply, inv_mul_le_iff₀ hN, mul_one]
+        at h1
       exact ⟨(mul_pos_iff_of_pos_left (inv_pos.2 hN)).1 h1.1, h1.2⟩
   have : Finite {n : 𝓞 F | n ∈ boxSet K F N ∧ n ∈ I} := hfin
   rw [← (Equiv.ofBijective ε hε).tsum_eq, tsum_eq_finsum (Set.toFinite _), finsum_mem_mul,
@@ -130,30 +144,55 @@ theorem tsum_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFix
   refine finsum_congr fun n => ?_
   exact gW_smul hK hF m n.2.1 _
 
-theorem tendsto_sum_ideal (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {m : ℕ} (hm : 1 ≤ m)
-    {I : Ideal (𝓞 F)} (hI : I ≠ ⊥) :
-    Tendsto (fun j : ℕ => ((j : ℝ) ^ 2) ^ (-((Formalism.HermitianLatticesTheory.fDeg K * m : ℕ) : ℤ)) *
-        ∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F ((j : ℝ) ^ 2) ∧ n ∈ I},
-          (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1))
-      atTop (𝓝 ((m : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ)) /
-        Real.sqrt ((2 * Formalism.HermitianLatticesTheory.vInv K) ^ Formalism.HermitianLatticesTheory.fDeg K) / (Ideal.absNorm I : ℝ))) := by
+theorem tendsto_sum_ideal
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {m : ℕ} (hm : 1 ≤ m)
+    {I : Ideal (𝓞 F)} (hI : I ≠ ⊥)
+    : Tendsto
+      (fun j : ℕ =>
+        ((j : ℝ) ^ 2) ^ (-((Formalism.HermitianLatticesTheory.fDeg K * m : ℕ) : ℤ))
+          * ∑ᶠ n ∈ {n : 𝓞 F | n ∈ boxSet K F ((j : ℝ) ^ 2) ∧ n ∈ I},
+              (Ideal.absNorm (Ideal.span {n}) : ℝ) ^ (m - 1))
+      atTop
+      (𝓝
+        ((m : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ))
+          / Real.sqrt
+            ((2 * Formalism.HermitianLatticesTheory.vInv K)
+              ^ Formalism.HermitianLatticesTheory.fDeg K)
+          / (Ideal.absNorm I : ℝ))) := by
   have hR : IsTotallyReal F := QuadraticExtensionConjugation.isTotallyReal hK hF
   obtain ⟨-, hfr, hdisc⟩ := discrTower K F hK hF
-  have key := LatSum.tendsto_tsum_div_pow (mixedEmbedding.idealLattice F (fracU hI)) volume
-    isBounded_sBox measurableSet_sBox (convex_sBox.addHaar_frontier volume) (continuous_gW m)
-  rw [integral_gW hm, card_real hK hF, mixedEmbedding.covolume_idealLattice,
-    mixedEmbedding.finrank, hfr, IsTotallyReal.nrComplexPlaces_eq_zero, pow_zero, mul_one] at key
+  have key :=
+    LatSum.tendsto_tsum_div_pow (mixedEmbedding.idealLattice F (fracU hI)) volume isBounded_sBox
+      measurableSet_sBox (convex_sBox.addHaar_frontier volume) (continuous_gW m)
+  rw [integral_gW hm, card_real hK hF, mixedEmbedding.covolume_idealLattice, mixedEmbedding.finrank,
+      hfr, IsTotallyReal.nrComplexPlaces_eq_zero, pow_zero, mul_one]
+    at key
   have hsq : Tendsto (fun j : ℕ => j ^ 2) atTop atTop := tendsto_pow_atTop two_ne_zero
   have key2 := key.comp hsq
-  have hlim : ((m : ℝ)⁻¹) ^ Formalism.HermitianLatticesTheory.fDeg K /
-      (((FractionalIdeal.absNorm ((fracU hI : (FractionalIdeal (nonZeroDivisors (𝓞 F)) F)ˣ) :
-        FractionalIdeal (nonZeroDivisors (𝓞 F)) F) : ℚ) : ℝ) * Real.sqrt |(discr F : ℝ)|) =
-      (m : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ)) /
-        Real.sqrt ((2 * Formalism.HermitianLatticesTheory.vInv K) ^ Formalism.HermitianLatticesTheory.fDeg K) / (Ideal.absNorm I : ℝ) := by
-    have h1 : FractionalIdeal.absNorm ((fracU hI : (FractionalIdeal (nonZeroDivisors (𝓞 F)) F)ˣ) :
-        FractionalIdeal (nonZeroDivisors (𝓞 F)) F) = (Ideal.absNorm I : ℚ) :=
+  have hlim
+      : ((m : ℝ)⁻¹) ^ Formalism.HermitianLatticesTheory.fDeg K
+          / (((FractionalIdeal.absNorm
+                  ((fracU hI : (FractionalIdeal (nonZeroDivisors (𝓞 F)) F)ˣ)
+                    : FractionalIdeal (nonZeroDivisors (𝓞 F)) F)
+                : ℚ)
+              : ℝ)
+            * Real.sqrt |(discr F : ℝ)|)
+        = (m : ℝ) ^ (-(Formalism.HermitianLatticesTheory.fDeg K : ℤ))
+          / Real.sqrt
+            ((2 * Formalism.HermitianLatticesTheory.vInv K)
+              ^ Formalism.HermitianLatticesTheory.fDeg K)
+          / (Ideal.absNorm I : ℝ) := by
+    have h1
+        : FractionalIdeal.absNorm
+            ((fracU hI : (FractionalIdeal (nonZeroDivisors (𝓞 F)) F)ˣ)
+              : FractionalIdeal (nonZeroDivisors (𝓞 F)) F)
+          = (Ideal.absNorm I : ℚ) :=
       FractionalIdeal.coeIdeal_absNorm I
-    have h2 : |(discr F : ℝ)| = (2 * Formalism.HermitianLatticesTheory.vInv K) ^ Formalism.HermitianLatticesTheory.fDeg K := by
+    have h2
+        : |(discr F : ℝ)|
+          = (2 * Formalism.HermitianLatticesTheory.vInv K)
+            ^ Formalism.HermitianLatticesTheory.fDeg K := by
       rw [hdisc, abs_of_nonneg (pow_nonneg (mul_nonneg zero_le_two (vInv_pos K).le) _)]
     rw [h1, h2, zpow_neg, zpow_natCast, inv_pow, div_div, Rat.cast_natCast, mul_comm]
   rw [hlim] at key2
@@ -162,7 +201,8 @@ theorem tendsto_sum_ideal (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
   have hj' : (0 : ℝ) < (j : ℝ) ^ 2 := by positivity
   have hcast : ((j ^ 2 : ℕ) : ℝ) = (j : ℝ) ^ 2 := by push_cast; rfl
   have h3 := tsum_eq hK hF m hI (N := ((j ^ 2 : ℕ) : ℝ)) (by rw [hcast]; exact hj')
-  rw [Function.comp_apply, h3, hcast, zpow_neg, zpow_natCast, inv_pow, div_eq_mul_inv, mul_assoc, ← mul_inv, ← pow_add, mul_comm]
+  rw [Function.comp_apply, h3, hcast, zpow_neg, zpow_natCast, inv_pow, div_eq_mul_inv, mul_assoc,
+    ← mul_inv, ← pow_add, mul_comm]
   congr 3
   obtain ⟨m, rfl⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
   simp only [Nat.add_sub_cancel]

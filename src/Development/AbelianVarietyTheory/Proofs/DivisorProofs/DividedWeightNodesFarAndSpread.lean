@@ -8,14 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedWeigh
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree NumberField GlobalTheory.MeanTop
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree
+  NumberField GlobalTheory.MeanTop
 
 namespace GlobalTheory.MeanTop
 
-theorem Wts.node_lower_int {ι : Type} {N : ℕ} (W : Wts ι N) (H : W.Hyp) (hd : W.IsDiv) (τ : ι) :
-    ∀ (n : ℕ) (i : Fin N), (i : ℕ) + 1 = W.kc + n →
-      -W.u τ i - (if W.p ≤ (i : ℕ) then W.c0 + 2 * (N : ℤ) else 0) - n * ((W.T : ℤ) + W.Dd + 1) ≤
-        ((W.T : ℤ) + W.Dd + 1) * (-W.u1 τ i) := by
+theorem Wts.node_lower_int {ι : Type} {N : ℕ} (W : Wts ι N) (H : W.Hyp) (hd : W.IsDiv) (τ : ι)
+    : ∀ (n : ℕ) (i : Fin N),
+      (i : ℕ) + 1 = W.kc + n
+        → - W.u τ i - (if W.p ≤ (i : ℕ) then W.c0 + 2 * (N : ℤ) else 0) - n * ((W.T : ℤ) + W.Dd + 1)
+          ≤ ((W.T : ℤ) + W.Dd + 1) * (- W.u1 τ i) := by
   intro n
   have hkp := H.kc_lt
   induction n with
@@ -40,7 +42,7 @@ theorem Wts.node_lower_int {ι : Type} {N : ℕ} (W : Wts ι N) (H : W.Hyp) (hd 
     have h3 := Int.mul_ediv_add_emod x M
     have h4 := Int.emod_lt_of_pos x hM
     rw [← h2] at h3
-    have h5 : M * -W.u1 τ i = M * -W.u1 τ a + M * (W.u1 τ a - W.u1 τ i) := by ring
+    have h5 : M * - W.u1 τ i = M * - W.u1 τ a + M * (W.u1 τ a - W.u1 τ i) := by ring
     have h6 : ((n + 1 : ℕ) : ℤ) * M = n * M + M := by push_cast; ring
     rw [h5, h6]
     by_cases hp : (i : ℕ) = W.p
@@ -61,7 +63,14 @@ theorem Wts.node_lower_int {ι : Type} {N : ℕ} (W : Wts ι N) (H : W.Hyp) (hd 
         rw [if_neg e1]
         linarith
 
-theorem nodes_far_and_spread : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts ι N), W.Hyp → W.IsDiv → ∀ τ, (∀ i : Fin N, W.kc ≤ (i : ℕ) → W.w τ / (2 * W.T) ≤ -(W.u1 τ i : ℝ) ∧ W.w τ / (4 * W.T) ≤ |(W.u' τ i : ℝ)|) ∧ ∀ i l : Fin N, (W.u' τ i : ℝ) - W.u' τ l ≤ 3 / 2 * W.w τ / W.T := by
+theorem nodes_far_and_spread
+    : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts ι N),
+      W.Hyp → W.IsDiv
+        → ∀ τ,
+          (∀ i : Fin N,
+              W.kc ≤ (i : ℕ)
+                → W.w τ / (2 * W.T) ≤ -(W.u1 τ i : ℝ) ∧ W.w τ / (4 * W.T) ≤ |(W.u' τ i : ℝ)|)
+            ∧ ∀ i l : Fin N, (W.u' τ i : ℝ) - W.u' τ l ≤ 3 / 2 * W.w τ / W.T := by
   intro ι _ N W H hd τ
   have hk := H.kc_pos
   have hkp := H.kc_lt
@@ -93,8 +102,10 @@ theorem nodes_far_and_spread : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts �
   have hM0 : 0 < M := by linarith
   have hM1 : M ≤ 5 / 4 * W.T := by linarith
   have hM2 : (W.T : ℝ) ≤ M := by linarith
-  have hu' : ∀ i : Fin N, (W.u1 τ i : ℝ) ≤ W.u' τ i ∧ (W.u' τ i : ℝ) ≤ W.u1 τ i + 3 * N ∧
-      ((i : ℕ) < W.kc → (W.u' τ i : ℝ) = W.u1 τ i) := by
+  have hu'
+      : ∀ i : Fin N,
+        (W.u1 τ i : ℝ) ≤ W.u' τ i ∧ (W.u' τ i : ℝ) ≤ W.u1 τ i + 3 * N
+          ∧ ((i : ℕ) < W.kc → (W.u' τ i : ℝ) = W.u1 τ i) := by
     intro i
     unfold Wts.u'
     by_cases h : (i : ℕ) < W.p
@@ -109,8 +120,9 @@ theorem nodes_far_and_spread : ∀ (ι : Type) [Fintype ι] (N : ℕ) (W : Wts �
       have : (i : ℕ) + 1 - W.kc ≤ N := by omega
       exact_mod_cast this
     generalize (i : ℕ) + 1 - W.kc = n at h1 hn
-    have h2 : -W.u τ i - (W.c0 + 2 * (N : ℤ)) - n * ((W.T : ℤ) + W.Dd + 1) ≤
-        ((W.T : ℤ) + W.Dd + 1) * (-W.u1 τ i) := by
+    have h2
+        : - W.u τ i - (W.c0 + 2 * (N : ℤ)) - n * ((W.T : ℤ) + W.Dd + 1)
+          ≤ ((W.T : ℤ) + W.Dd + 1) * (- W.u1 τ i) := by
       have := H.weightConst_nonneg
       split_ifs at h1
       · exact h1

@@ -9,8 +9,8 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem sum_Icc_three_quarters_pow_le (J : ℕ) :
-    ∑ j ∈ Finset.Icc 1 J, (3 / 4 : ℝ) ^ j ≤ 3 - 3 * (3 / 4 : ℝ) ^ J := by
+theorem sum_Icc_three_quarters_pow_le (J : ℕ)
+    : ∑ j ∈ Finset.Icc 1 J, (3 / 4 : ℝ) ^ j ≤ 3 - 3 * (3 / 4 : ℝ) ^ J := by
   induction J with
   | zero => simp
   | succ n ih =>
@@ -18,21 +18,24 @@ theorem sum_Icc_three_quarters_pow_le (J : ℕ) :
     rw [pow_succ]
     linarith
 
-theorem powerSum_weighted_ineq {ι : Type} (S : Finset ι) (z : ι → ℂ) (b : ι → ℕ) (i₀ : ι)
-    (L δ x : ℝ) (hi : i₀ ∈ S) (hb : 1 ≤ b i₀) (hL : 1 ≤ L) (hδ : 0 < δ) (hx0 : 0 ≤ x)
-    (hx : x ≤ 1 / 2) (hz : 1 / (1 + x) ≤ ‖z i₀‖) (hS : (∑ i ∈ S, (b i : ℝ)) ≤ L)
-    (hp : ∀ j : ℕ, 1 ≤ j → (∑ i ∈ S, (b i : ℂ) * z i ^ j).re ≤ 2 * j * δ + L / 2 ^ j) (J : ℕ) :
-    (J : ℝ) / 4 - 7 * L ≤ 4 * (J : ℝ) ^ 2 * δ * (1 + x) ^ J := by
+theorem powerSum_weighted_ineq
+    {ι : Type} (S : Finset ι) (z : ι → ℂ) (b : ι → ℕ) (i₀ : ι)
+    (L δ x : ℝ)
+    (hi : i₀ ∈ S) (hb : 1 ≤ b i₀) (hL : 1 ≤ L) (hδ : 0 < δ) (hx0 : 0 ≤ x) (hx : x ≤ 1 / 2)
+    (hz : 1 / (1 + x) ≤ ‖z i₀‖) (hS : (∑ i ∈ S, (b i : ℝ)) ≤ L)
+    (hp : ∀ j : ℕ, 1 ≤ j → (∑ i ∈ S, (b i : ℂ) * z i ^ j).re ≤ 2 * j * δ + L / 2 ^ j) (J : ℕ)
+    : (J : ℝ) / 4 - 7 * L ≤ 4 * (J : ℝ) ^ 2 * δ * (1 + x) ^ J := by
   classical
-  obtain ⟨i₁, hi₁, hmax⟩ := Finset.exists_max_image (S.filter fun i => 1 ≤ b i)
-    (fun i => ‖z i‖) ⟨i₀, Finset.mem_filter.2 ⟨hi, hb⟩⟩
+  obtain ⟨i₁, hi₁, hmax⟩ :=
+    Finset.exists_max_image (S.filter fun i => 1 ≤ b i)
+      (fun i => ‖z i‖)
+      ⟨i₀, Finset.mem_filter.2 ⟨hi, hb⟩⟩
   obtain ⟨hi₁S, hb₁⟩ := Finset.mem_filter.1 hi₁
   set R : ℝ := ‖z i₁‖ with hR
   have h1x : 0 < 1 + x := by linarith
   have hRge : 1 / (1 + x) ≤ R := hz.trans (hmax i₀ (Finset.mem_filter.2 ⟨hi, hb⟩))
   have hRpos : 0 < R := lt_of_lt_of_le (by positivity) hRge
-  have hRinv : R⁻¹ ≤ 1 + x := by
-    rw [inv_le_comm₀ hRpos h1x, ← one_div]; exact hRge
+  have hRinv : R⁻¹ ≤ 1 + x := by rw [inv_le_comm₀ hRpos h1x, ← one_div]; exact hRge
   have hRinv0 : 0 ≤ R⁻¹ := by positivity
   set θ : ℝ := Complex.arg (z i₁) with hθ
   obtain ⟨hF1, hF2⟩ := GlobalTheory.T.neg_one_le_sum_fejer_cos_re_pow_and_lower_bound J θ
@@ -66,15 +69,17 @@ theorem powerSum_weighted_ineq {ι : Type} (S : Finset ι) (z : ι → ℂ) (b :
     have hb1 : (1 : ℝ) ≤ b i₁ := by exact_mod_cast hb₁
     have h2 := hF1' _ (hwn i₁ hi₁S hb₁)
     have h3 : F (w i₁) + 1 ≤ (b i₁ : ℝ) * (F (w i₁) + 1) := by nlinarith
-    have h4 : ∑ i ∈ S, (b i : ℝ) * (F (w i) + 1)
-        = ∑ i ∈ S, (b i : ℝ) * F (w i) + ∑ i ∈ S, (b i : ℝ) := by
+    have h4
+        : ∑ i ∈ S, (b i : ℝ) * (F (w i) + 1)
+          = ∑ i ∈ S, (b i : ℝ) * F (w i) + ∑ i ∈ S, (b i : ℝ) := by
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [← hw₁] at hF2'
     linarith
 
-  have hex : ∑ i ∈ S, (b i : ℝ) * F (w i)
-      = ∑ j ∈ Finset.Icc 1 J, c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re) := by
+  have hex
+      : ∑ i ∈ S, (b i : ℝ) * F (w i)
+        = ∑ j ∈ Finset.Icc 1 J, c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re) := by
     simp only [hF, Finset.mul_sum, Complex.re_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
@@ -83,17 +88,18 @@ theorem powerSum_weighted_ineq {ι : Type} (S : Finset ι) (z : ι → ℂ) (b :
       rw [mul_pow, ← Complex.ofReal_pow, Complex.re_ofReal_mul]
     have e2 : ((b i : ℂ) * z i ^ j).re = (b i : ℝ) * (z i ^ j).re := by
       rw [← Complex.ofReal_natCast, Complex.re_ofReal_mul]
-    rw [e1, e2]; ring
+    rw [e1, e2]
+    ring
 
-  have hup : ∀ j ∈ Finset.Icc 1 J,
-      c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re)
-        ≤ 4 * J * δ * (1 + x) ^ J + 2 * L * (3 / 4 : ℝ) ^ j := by
+  have hup
+      : ∀ j ∈ Finset.Icc 1 J,
+        c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re)
+          ≤ 4 * J * δ * (1 + x) ^ J + 2 * L * (3 / 4 : ℝ) ^ j := by
     intro j hj
     obtain ⟨hj1, hjJ⟩ := Finset.mem_Icc.1 hj
     have hjJ' : (j : ℝ) ≤ J := by exact_mod_cast hjJ
     have hJ1 : (0 : ℝ) < J + 1 := by positivity
-    have ha0 : 0 ≤ 1 - (j : ℝ) / (J + 1) := by
-      rw [sub_nonneg, div_le_one hJ1]; linarith
+    have ha0 : 0 ≤ 1 - (j : ℝ) / (J + 1) := by rw [sub_nonneg, div_le_one hJ1]; linarith
     have ha1 : 1 - (j : ℝ) / (J + 1) ≤ 1 := by
       have : 0 ≤ (j : ℝ) / (J + 1) := by positivity
       linarith
@@ -107,23 +113,25 @@ theorem powerSum_weighted_ineq {ι : Type} (S : Finset ι) (z : ι → ℂ) (b :
     have hq2 : (1 + x) ^ j ≤ (1 + x) ^ J := pow_le_pow_right₀ (by linarith) hjJ
     have hq3 : (1 + x) ^ j ≤ (3 / 2 : ℝ) ^ j := pow_le_pow_left₀ h1x.le (by linarith) j
     have hB0 : 0 ≤ 2 * j * δ + L / 2 ^ j := by positivity
-    have s1 : R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re
-        ≤ (1 + x) ^ j * (2 * j * δ + L / 2 ^ j) :=
+    have s1 : R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re ≤ (1 + x) ^ j * (2 * j * δ + L / 2 ^ j) :=
       (mul_le_mul_of_nonneg_left (hp j hj1) (by positivity)).trans
         (mul_le_mul_of_nonneg_right hq hB0)
     have s2 : (1 + x) ^ j * (2 * j * δ) ≤ (1 + x) ^ J * (2 * J * δ) := by gcongr
     have s3 : (1 + x) ^ j * (L / 2 ^ j) ≤ (3 / 2 : ℝ) ^ j * (L / 2 ^ j) := by gcongr
     have s4 : (3 / 2 : ℝ) ^ j * (L / 2 ^ j) = L * (3 / 4 : ℝ) ^ j := by
       have : (3 / 4 : ℝ) ^ j = (3 / 2 : ℝ) ^ j / 2 ^ j := by rw [← div_pow]; norm_num
-      rw [this]; ring
+      rw [this]
+      ring
     have s5 : 0 ≤ (1 + x) ^ j * (2 * j * δ + L / 2 ^ j) := by positivity
-    calc c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re)
+    calc
+      c j * (R⁻¹ ^ j * (∑ i ∈ S, (b i : ℂ) * z i ^ j).re)
         ≤ c j * ((1 + x) ^ j * (2 * j * δ + L / 2 ^ j)) := mul_le_mul_of_nonneg_left s1 hc0
       _ ≤ 2 * ((1 + x) ^ j * (2 * j * δ + L / 2 ^ j)) := mul_le_mul_of_nonneg_right hc2 s5
       _ ≤ _ := by rw [mul_add ((1 + x) ^ j)]; linarith
   have hsum := Finset.sum_le_sum hup
-  rw [Finset.sum_add_distrib, Finset.sum_const, ← Finset.mul_sum, Nat.card_Icc,
-    Nat.add_sub_cancel, nsmul_eq_mul] at hsum
+  rw [Finset.sum_add_distrib, Finset.sum_const, ← Finset.mul_sum, Nat.card_Icc, Nat.add_sub_cancel,
+      nsmul_eq_mul]
+    at hsum
   have hg := sum_Icc_three_quarters_pow_le J
   have hg0 : (0 : ℝ) ≤ (3 / 4 : ℝ) ^ J := by positivity
   have hg' : 2 * L * ∑ j ∈ Finset.Icc 1 J, (3 / 4 : ℝ) ^ j ≤ 2 * L * 3 :=
@@ -131,8 +139,14 @@ theorem powerSum_weighted_ineq {ι : Type} (S : Finset ι) (z : ι → ℂ) (b :
   have : (J : ℝ) * (4 * J * δ * (1 + x) ^ J) = 4 * (J : ℝ) ^ 2 * δ * (1 + x) ^ J := by ring
   linarith
 
-theorem powerSum_repulsion :
-    ∃ C : ℝ, 0 < C ∧ ∀ (ι : Type) (S : Finset ι) (z : ι → ℂ) (b : ι → ℕ) (i₀ : ι) (L δ x : ℝ), i₀ ∈ S → 1 ≤ b i₀ → 1 ≤ L → 0 < δ → 0 ≤ x → x ≤ 1 / 2 → 1 / (1 + x) ≤ ‖z i₀‖ → (∑ i ∈ S, (b i : ℝ)) ≤ L → (∀ j : ℕ, 1 ≤ j → (∑ i ∈ S, (b i : ℂ) * z i ^ j).re ≤ 2 * j * δ + L / 2 ^ j) → Real.log (1 / (C * L * δ)) / (C * L) ≤ x := by
+theorem powerSum_repulsion
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (ι : Type) (S : Finset ι) (z : ι → ℂ) (b : ι → ℕ) (i₀ : ι) (L δ x : ℝ),
+          i₀ ∈ S → 1 ≤ b i₀ → 1 ≤ L → 0 < δ → 0 ≤ x → x ≤ 1 / 2 → 1 / (1 + x) ≤ ‖z i₀‖
+            → (∑ i ∈ S, (b i : ℝ)) ≤ L
+            → (∀ j : ℕ, 1 ≤ j → (∑ i ∈ S, (b i : ℂ) * z i ^ j).re ≤ 2 * j * δ + L / 2 ^ j)
+            → Real.log (1 / (C * L * δ)) / (C * L) ≤ x := by
   refine ⟨2080, by norm_num, ?_⟩
   intro ι S z b i₀ L δ x hi hb hL hδ hx0 hx hz hS hp
   have h := powerSum_weighted_ineq S z b i₀ L δ x hi hb hL hδ hx0 hx hz hS hp ⌈64 * L⌉₊
@@ -152,10 +166,8 @@ theorem powerSum_repulsion :
     have : 32 * (J : ℝ) ≤ 2080 * L := by linarith
     gcongr
   have hD : 0 < 2080 * L * δ := by positivity
-  have h4 : 1 / (2080 * L * δ) ≤ Real.exp (x * J) := by
-    rw [div_le_iff₀ hD]; linarith
-  have h5 : Real.log (1 / (2080 * L * δ)) ≤ x * J :=
-    (Real.log_le_iff_le_exp (by positivity)).2 h4
+  have h4 : 1 / (2080 * L * δ) ≤ Real.exp (x * J) := by rw [div_le_iff₀ hD]; linarith
+  have h5 : Real.log (1 / (2080 * L * δ)) ≤ x * J := (Real.log_le_iff_le_exp (by positivity)).2 h4
   rw [div_le_iff₀ (by positivity)]
   have : x * J ≤ x * (2080 * L) := mul_le_mul_of_nonneg_left (by linarith) hx0
   linarith

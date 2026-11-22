@@ -10,7 +10,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -68,10 +70,12 @@ private lemma ab_ofFinite' {z : (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ}
   unfold ab
   rw [IdeleGroup.ideleModule_apply, hinf, IdeleGroup.finiteModule_eq_one_of_mem hmem, one_mul]
 
-theorem UpperTheory.isCompact_integralIdeleUnits_and_abs_eq_one :
-    IsCompact UU ∧ ∀ u ∈ UU, ab u = 1 := by
-  have hset : (UU : Set (IdeleGroup ℚ)) =
-      (fun z => (IdeleGroup.ofFinite z : IdeleGroup ℚ)) '' (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) := by
+theorem UpperTheory.isCompact_integralIdeleUnits_and_abs_eq_one
+    : IsCompact UU ∧ ∀ u ∈ UU, ab u = 1 := by
+  have hset
+      : (UU : Set (IdeleGroup ℚ))
+        = (fun z => (IdeleGroup.ofFinite z : IdeleGroup ℚ))
+          '' (finiteIntegralUnits ℚ : Set (FiniteAdeleRing (𝓞 ℚ) ℚ)ˣ) := by
     ext t
     constructor
     · intro ht

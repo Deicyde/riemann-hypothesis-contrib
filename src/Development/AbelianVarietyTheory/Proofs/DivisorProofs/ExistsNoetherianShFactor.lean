@@ -11,9 +11,11 @@ open GlobalTheory.EtC IsLocalRing
 
 namespace GlobalTheory.NoethSHFactor
 
-theorem exists_noetherian_sh_factor : ∀ (R A : Type) [CommRing R] [IsNoetherianRing R] [CommRing A], SH A →
-    ∀ b : R →+* A, ∃ (C : Type) (_ : CommRing C), IsNoetherianRing C ∧ SH C ∧
-      ∃ (f : R →+* C) (g : C →+* A), g.comp f = b := by
+theorem exists_noetherian_sh_factor
+    : ∀ (R A : Type) [CommRing R] [IsNoetherianRing R] [CommRing A],
+      SH A
+        → ∀ b : R →+* A, ∃ (C : Type) (_ : CommRing C),
+          IsNoetherianRing C ∧ SH C ∧ ∃ (f : R →+* C) (g : C →+* A), g.comp f = b := by
   intro R A _ _ _ hA b
   obtain ⟨hH, hsep⟩ := hA
   let p : Ideal R := (maximalIdeal A).comap b
@@ -47,10 +49,10 @@ theorem exists_noetherian_sh_factor : ∀ (R A : Type) [CommRing R] [IsNoetheria
   letI : Algebra (Localization.AtPrime P) D := φ.toAlgebra
   have hD : IsNoetherianRing D :=
     GlobalTheory.StalkNoeth.isNoetherianRing_of_indEt (Localization.AtPrime P) D hφ.2.2.2
-  refine ⟨D, inferInstance, hD, ⟨hφ.1, hφ.2.1⟩, (c : Rp →+* D).comp (algebraMap R Rp), (w : D →+* A), ?_⟩
+  refine
+    ⟨D, inferInstance, hD, ⟨hφ.1, hφ.2.1⟩, (c : Rp →+* D).comp (algebraMap R Rp), (w : D →+* A), ?_⟩
   rw [← RingHom.comp_assoc]
-  have hwc' : (w : D →+* A).comp (c : Rp →+* D) = b' :=
-    congrArg AlgHom.toRingHom hwc
+  have hwc' : (w : D →+* A).comp (c : Rp →+* D) = b' := congrArg AlgHom.toRingHom hwc
   rw [hwc', hb']
 
 end GlobalTheory.NoethSHFactor

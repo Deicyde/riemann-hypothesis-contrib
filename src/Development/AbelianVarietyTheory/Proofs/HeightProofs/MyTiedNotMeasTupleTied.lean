@@ -10,12 +10,13 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedWeilUnr
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta IsDedekindDomain NumberField Formalism.UG.P
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta IsDedekindDomain
+  NumberField Formalism.UG.P
 
 namespace GlobalTheory.MeasTupleEq
 
-theorem map_residue_surjective (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ) :
-    Function.Surjective (Matrix.GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue O)) := by
+theorem map_residue_surjective (O : Type) [CommRing O] [IsLocalRing O] (n : ℕ)
+    : Function.Surjective (Matrix.GeneralLinearGroup.map (n := Fin n) (IsLocalRing.residue O)) := by
   intro g
   classical
   let M : Matrix (Fin n) (Fin n) O := fun a b =>

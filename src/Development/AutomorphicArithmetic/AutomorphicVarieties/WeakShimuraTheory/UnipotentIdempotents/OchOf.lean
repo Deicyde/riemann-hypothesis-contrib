@@ -5,13 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 
-theorem UpperTheory.V.Ws.Lk.ochOf :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} (Q : QCh T) (c' : Coef l) (h : c.O ≤ c'.O) (κ β : G T.L Ω →* c'.Oˣ), toQ κ = Q.κ → toQ β = Q.β → (AdicCont (maximalIdeal c'.O) fun g => (κ g : c'.O)) → (AdicCont (maximalIdeal c'.O) fun g => (β g : c'.O)) → (∀ g, residue c'.O (β g) = 1) → Nonempty (OCh T c' h) := by
+theorem UpperTheory.V.Ws.Lk.ochOf
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} (Q : QCh T) (c' : Coef l) (h : c.O ≤ c'.O)
+        (κ β : G T.L Ω →* c'.Oˣ),
+      toQ κ = Q.κ → toQ β = Q.β → (AdicCont (maximalIdeal c'.O) fun g => (κ g : c'.O))
+        → (AdicCont (maximalIdeal c'.O) fun g => (β g : c'.O)) → (∀ g, residue c'.O (β g) = 1)
+        → Nonempty (OCh T c' h) := by
   intro Ω _ _ _ l _ c D T Q c' h κ β hκQ hβQ hκc hβc hβr
-  let U : (c'.O)ˣ →* (PadicAlgCl l)ˣ := Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l)
-  have hUinj : Function.Injective U := fun a b hab => Units.ext (Subtype.val_injective (congrArg Units.val hab))
+  let U : (c'.O)ˣ →* (PadicAlgCl l)ˣ :=
+    Units.map (algebraMap c'.O (PadicAlgCl l) : c'.O →* PadicAlgCl l)
+  have hUinj : Function.Injective U := fun a b hab =>
+    Units.ext (Subtype.val_injective (congrArg Units.val hab))
   have hUκ : ∀ g, U (κ g) = Q.κ g := fun g => by
     rw [← hκQ]
     rfl
@@ -21,8 +31,27 @@ theorem UpperTheory.V.Ws.Lk.ochOf :
   have hUchi : ∀ g, U (chiO T.L Ω l c'.O g) = cycBar T.L Ω l g := fun g => by
     rw [← (auChi T.L Ω c').1]
     rfl
-  have hUth : ∀ r, ((inc h (D.th r : c.O) : c'.O) : PadicAlgCl l) = ((toQ D.th r : (PadicAlgCl l)ˣ) : PadicAlgCl l) := fun r => rfl
-  refine ⟨{ κ := κ, β := β, t := Q.t, κ_cont := hκc, β_cont := hβc, t_cont := Q.t_cont, β_t := ?_, β_red := hβr, conj := ?_, t_unr := Q.t_unr, unr := ?_, tame := ?_, mu := ?_, cyc := ?_ }⟩
+  have hUth
+      : ∀ r,
+        ((inc h (D.th r : c.O) : c'.O) : PadicAlgCl l)
+          = ((toQ D.th r : (PadicAlgCl l)ˣ) : PadicAlgCl l) := fun r =>
+    rfl
+  refine ⟨{
+    κ := κ
+    β := β
+    t := Q.t
+    κ_cont := hκc
+    β_cont := hβc
+    t_cont := Q.t_cont
+    β_t := ?_
+    β_red := hβr
+    conj := ?_
+    t_unr := Q.t_unr
+    unr := ?_
+    tame := ?_
+    mu := ?_
+    cyc := ?_
+  }⟩
   · intro g hg
     have h1 := Q.β_t hg
     rw [MonoidHom.mem_ker] at h1 ⊢
@@ -36,8 +65,10 @@ theorem UpperTheory.V.Ws.Lk.ochOf :
       have e1' := congrArg Units.val e1
       simp only [Units.val_mul, Units.val_pow_eq_pow_val, Units.val_one] at e1'
       have k1 : ((κ g : c'.O) : PadicAlgCl l) = (Q.κ g : PadicAlgCl l) := congrArg Units.val (hUκ g)
-      have k2 : ((κ g' : c'.O) : PadicAlgCl l) = (Q.κ g' : PadicAlgCl l) := congrArg Units.val (hUκ g')
-      have k3 : ((chiO T.L Ω l c'.O g : c'.O) : PadicAlgCl l) = (cycBar T.L Ω l g : PadicAlgCl l) := congrArg Units.val (hUchi g)
+      have k2 : ((κ g' : c'.O) : PadicAlgCl l) = (Q.κ g' : PadicAlgCl l) :=
+        congrArg Units.val (hUκ g')
+      have k3 : ((chiO T.L Ω l c'.O g : c'.O) : PadicAlgCl l) = (cycBar T.L Ω l g : PadicAlgCl l) :=
+        congrArg Units.val (hUchi g)
       simp only [MulMemClass.coe_mul, SubmonoidClass.coe_pow, OneMemClass.coe_one, k1, k2, k3, hUth]
       exact e1'
     · apply hUinj

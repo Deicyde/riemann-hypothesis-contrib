@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.P
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TopologicalSpace Opposite Limits GroundTheory.Arith.SchemeCoh GlobalTheory.SheafPull CrystallineSemistableComparison CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Cech
+open CategoryTheory AlgebraicGeometry TopologicalSpace Opposite Limits GroundTheory.Arith.SchemeCoh
+  GlobalTheory.SheafPull CrystallineSemistableComparison CrystallineSemistableComparison.Om
+  CrystallineSemistableComparison.Om.Cech
 
 namespace GlobalTheory.CompanionTheory.CechLift
 
-theorem exists_injectiveSequence_lift {X Y : TopCat.{0}} (f : X ⟶ Y) {G : AbSheaf Y} {G' : AbSheaf X}
-    (φ : G ⟶ (push f).obj G') :
-    ∃ α : injectiveSequence G ⟶ (injectiveSequence G').map (push f), α.τ₁ = φ := by
+theorem exists_injectiveSequence_lift
+    {X Y : TopCat.{0}} (f : X ⟶ Y) {G : AbSheaf Y} {G' : AbSheaf X} (φ : G ⟶ (push f).obj G')
+    : ∃ α : injectiveSequence G ⟶ (injectiveSequence G').map (push f), α.τ₁ = φ := by
   have hS := injectiveSequence_shortExact G
   have : Mono (injectiveSequence G).f := hS.mono_f
   have : Injective ((push f).obj (injectiveSequence G').X₂) := injective_push f _

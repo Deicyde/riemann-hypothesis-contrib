@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-def mulZPowers (U : Subgroup Gal(AlgebraicClosure ℚ/ℚ)) (s : Gal(AlgebraicClosure ℚ/ℚ))
-    (hU : ∀ (k : ℤ), ∀ x ∈ U, s ^ k * x * (s ^ k)⁻¹ ∈ U) :
-    Subgroup Gal(AlgebraicClosure ℚ/ℚ) where
+def mulZPowers
+    (U : Subgroup Gal(AlgebraicClosure ℚ/ℚ)) (s : Gal(AlgebraicClosure ℚ/ℚ))
+    (hU : ∀ (k : ℤ), ∀ x ∈ U, s ^ k * x * (s ^ k)⁻¹ ∈ U)
+    : Subgroup Gal(AlgebraicClosure ℚ/ℚ) where
   carrier := {x | ∃ k : ℤ, ∃ u ∈ U, x = s ^ k * u}
   one_mem' := ⟨0, 1, U.one_mem, by simp⟩
   mul_mem' := by
@@ -22,8 +23,10 @@ def mulZPowers (U : Subgroup Gal(AlgebraicClosure ℚ/ℚ)) (s : Gal(AlgebraicCl
     rw [zpow_neg]
     group
 
-theorem le_powerSubgroup₂ (U : Subgroup Gal(AlgebraicClosure ℚ/ℚ))
-    (s : Gal(AlgebraicClosure ℚ/ℚ)) (hU : ∀ (k : ℤ), ∀ x ∈ U, s ^ k * x * (s ^ k)⁻¹ ∈ U) :
-    U ≤ mulZPowers U s hU := fun u hu => ⟨0, u, hu, by simp⟩
+theorem le_powerSubgroup₂
+    (U : Subgroup Gal(AlgebraicClosure ℚ/ℚ)) (s : Gal(AlgebraicClosure ℚ/ℚ))
+    (hU : ∀ (k : ℤ), ∀ x ∈ U, s ^ k * x * (s ^ k)⁻¹ ∈ U)
+    : U ≤ mulZPowers U s hU := fun u hu =>
+  ⟨0, u, hu, by simp⟩
 
 end GroundTheory.Variant₂.N1

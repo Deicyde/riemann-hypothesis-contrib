@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverC
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out MvPolynomial
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out
+  MvPolynomial
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (PSpace)
 
 namespace GlobalTheory.CompanionTheory.GE
@@ -16,8 +17,8 @@ namespace GlobalTheory.CompanionTheory.GE
 abbrev PO (R : Type) [CommRing R] (N : ℕ) : Over (Spec (CommRingCat.of R)) :=
   Over.mk (GroundTheory.Arith.SchemeCoh.ProjSpace.toSpecBase R N)
 
-abbrev thickι (R : Type) [CommRing R] (I : Ideal R) (N e : ℕ) :
-    (thickObj R I e (PO R N)).left ⟶ PSpace R N :=
+abbrev thickι (R : Type) [CommRing R] (I : Ideal R) (N e : ℕ)
+    : (thickObj R I e (PO R N)).left ⟶ PSpace R N :=
   pullback.fst (PO R N).hom (thick R I e)
 
 variable {R : Type} [CommRing R] {N : ℕ}
@@ -25,14 +26,17 @@ variable {R : Type} [CommRing R] {N : ℕ}
 def HomogIdeal {B : Type} [CommRing B] {n : ℕ} (P : Ideal (MvPolynomial (Fin n) B)) : Prop :=
   ∀ (d : ℕ) (f : MvPolynomial (Fin n) B), f ∈ P → homogeneousComponent d f ∈ P
 
-def KillsForm {Y : Scheme.{0}} (φ : Y ⟶ PSpace R N) (n : ℕ) (f : MvPolynomial (Fin (N + 1)) R)
-    (hf : f.IsHomogeneous n) : Prop :=
-  ∀ k, (φ.app (GlobalTheory.ProjSpace.chart R N k)).hom
-    (GlobalTheory.ProjSpace.formOn (GlobalTheory.ProjSpace.chart R N k) k le_rfl n f hf) = 0
+def KillsForm
+    {Y : Scheme.{0}} (φ : Y ⟶ PSpace R N)
+    (n : ℕ) (f : MvPolynomial (Fin (N + 1)) R) (hf : f.IsHomogeneous n)
+    : Prop :=
+  ∀ k,
+    (φ.app (GlobalTheory.ProjSpace.chart R N k)).hom
+        (GlobalTheory.ProjSpace.formOn (GlobalTheory.ProjSpace.chart R N k) k le_rfl n f hf)
+      = 0
 
 def vanIdeal {Y : Scheme.{0}} (φ : Y ⟶ PSpace R N) : Ideal (MvPolynomial (Fin (N + 1)) R) :=
   Ideal.span {f | ∃ n, ∃ hf : f.IsHomogeneous n, KillsForm φ n f hf}
-
 
 attribute [local instance] MvPolynomial.gradedAlgebra in
 theorem vanIdeal_homog {Y : Scheme.{0}} (φ : Y ⟶ PSpace R N) : HomogIdeal (vanIdeal φ) := by

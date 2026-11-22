@@ -11,11 +11,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem cob_fin {G K : Type} [Group G] [Field K] [CharZero K] (θ : G →* Kˣ) (z : G → K)
-    (hz : ∀ g h, z (g * h) = z g + θ g * z h) (H N : Subgroup G) [N.FiniteIndex] (h0 : ∀ g ∈ H, g ∈ N → z g = 0) :
-    ∃ m, ∀ g ∈ H, z g = θ g * m - m := by
+private theorem cob_fin
+    {G K : Type} [Group G] [Field K] [CharZero K]
+    (θ : G →* Kˣ) (z : G → K) (hz : ∀ g h, z (g * h) = z g + θ g * z h)
+    (H N : Subgroup G) [N.FiniteIndex]
+    (h0 : ∀ g ∈ H, g ∈ N → z g = 0)
+    : ∃ m, ∀ g ∈ H, z g = θ g * m - m := by
   have z1 : z 1 = 0 := by simpa using hz 1 1
   have key : ∀ g ∈ H, θ g = 1 → z g = 0 := by
     intro g hg h1
@@ -37,29 +42,38 @@ private theorem cob_fin {G K : Type} [Group G] [Field K] [CharZero K] (θ : G �
     have hc : θ (g * a * (a * g)⁻¹) = 1 := by
       rw [map_mul, map_inv, map_mul, map_mul, mul_comm (θ g), mul_inv_cancel]
     have e := hz (g * a * (a * g)⁻¹) (a * g)
-    rw [inv_mul_cancel_right, hc, key _ (H.mul_mem (H.mul_mem hg ha) (H.inv_mem (H.mul_mem ha hg))) hc, hz, hz] at e
+    rw [inv_mul_cancel_right, hc,
+        key _ (H.mul_mem (H.mul_mem hg ha) (H.inv_mem (H.mul_mem ha hg))) hc, hz, hz]
+      at e
     push_cast at e
     field_simp
     linear_combination -e
 
-private theorem cob_conj {G K : Type} [Group G] [Field K] (θ : G →* Kˣ) (z : G → K)
-    (hz : ∀ g h, z (g * h) = z g + θ g * z h) (H H' : Subgroup G) (u : G) (hu : ∀ x ∈ H, u⁻¹ * x * u ∈ H')
-    (h : ∃ m, ∀ g ∈ H', z g = θ g * m - m) : ∃ m, ∀ g ∈ H, z g = θ g * m - m := by
+private theorem cob_conj
+    {G K : Type} [Group G] [Field K]
+    (θ : G →* Kˣ) (z : G → K) (hz : ∀ g h, z (g * h) = z g + θ g * z h)
+    (H H' : Subgroup G) (u : G) (hu : ∀ x ∈ H, u⁻¹ * x * u ∈ H')
+    (h : ∃ m, ∀ g ∈ H', z g = θ g * m - m)
+    : ∃ m, ∀ g ∈ H, z g = θ g * m - m := by
   obtain ⟨m, hm⟩ := h
   refine ⟨θ u * m - z u, fun x hx => ?_⟩
   have e := hz u (u⁻¹ * x * u)
-  have e2 : θ (u⁻¹ * x * u) = θ x := by
-    rw [map_mul, map_mul, map_inv, inv_mul_cancel_comm]
+  have e2 : θ (u⁻¹ * x * u) = θ x := by rw [map_mul, map_mul, map_inv, inv_mul_cancel_comm]
   rw [hm _ (hu x hx), e2, ← mul_assoc, mul_inv_cancel_left, hz] at e
   linear_combination e
 
-private theorem cover (R : Fin 4 → Fin 4 → Prop) (tr : ∀ a b c, R a b → R b c → R a c)
-    (as : ∀ a b, a ≠ b → R a b → ¬ R b a) (m : Fin 4 → Fin 4)
-    (h : ∀ i j, i ≠ j → R i j → (∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j) → m i < m j) :
-    ∀ i j, i ≠ j → R i j → m i < m j := by
+private theorem cover
+    (R : Fin 4 → Fin 4 → Prop)
+    (tr : ∀ a b c, R a b → R b c → R a c) (as : ∀ a b, a ≠ b → R a b → ¬ R b a)
+    (m : Fin 4 → Fin 4)
+    (h : ∀ i j, i ≠ j → R i j → (∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j) → m i < m j)
+    : ∀ i j, i ≠ j → R i j → m i < m j := by
   classical
-  suffices H : ∀ n i j, (Finset.univ.filter fun k => k ≠ i ∧ k ≠ j ∧ R i k ∧ R k j).card = n → i ≠ j → R i j → m i < m j from
-    fun i j => H _ i j rfl
+  suffices H
+      : ∀ n i j,
+        (Finset.univ.filter fun k => k ≠ i ∧ k ≠ j ∧ R i k ∧ R k j).card = n → i ≠ j → R i j
+          → m i < m j from fun i j =>
+    H _ i j rfl
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -86,8 +100,10 @@ private theorem cover (R : Fin 4 → Fin 4 → Prop) (tr : ∀ a b c, R a b → 
         · have := @hs k (by simp [ki, kj, r1, r2])
           simp at this
 
-private def pat (K : Type) [Field K] (R : Fin 4 → Fin 4 → Prop) (rf : ∀ a, R a a) (tr : ∀ a b c, R a b → R b c → R a c) :
-    Subalgebra K (M4 K) where
+private def pat
+    (K : Type) [Field K]
+    (R : Fin 4 → Fin 4 → Prop) (rf : ∀ a, R a a) (tr : ∀ a b c, R a b → R b c → R a c)
+    : Subalgebra K (M4 K) where
   carrier := {X | ∀ a b, X a b ≠ 0 → R a b}
   mul_mem' {X Y} hX hY a b h := by
     rw [Matrix.mul_apply] at h
@@ -103,18 +119,25 @@ private def pat (K : Type) [Field K] (R : Fin 4 → Fin 4 → Prop) (rf : ∀ a,
     · exact absurd (by simp [Matrix.algebraMap_matrix_apply, h1]) h
 
 section
-variable {K : Type} [Field K] {R : Fin 4 → Fin 4 → Prop} {rf : ∀ a, R a a} {tr : ∀ a b c, R a b → R b c → R a c}
+variable
+  {K : Type} [Field K]
+  {R : Fin 4 → Fin 4 → Prop} {rf : ∀ a, R a a} {tr : ∀ a b c, R a b → R b c → R a c}
 
-private theorem pat_diag (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {X Y : M4 K} (hX : X ∈ pat K R rf tr) (hY : Y ∈ pat K R rf tr)
-    (i : Fin 4) : (X * Y) i i = X i i * Y i i := by
+private theorem pat_diag
+    (as : ∀ a b, a ≠ b → R a b → ¬ R b a)
+    {X Y : M4 K} (hX : X ∈ pat K R rf tr) (hY : Y ∈ pat K R rf tr)
+    (i : Fin 4)
+    : (X * Y) i i = X i i * Y i i := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · intro k _ hk
     by_contra h
     exact as _ _ hk (hY _ _ (right_ne_zero_of_mul h)) (hX _ _ (left_ne_zero_of_mul h))
   · simp
 
-private theorem pat_off {X Y : M4 K} (hX : X ∈ pat K R rf tr) (hY : Y ∈ pat K R rf tr) {i j : Fin 4} (hij : i ≠ j)
-    (hk : ∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j) : (X * Y) i j = X i i * Y i j + X i j * Y j j := by
+private theorem pat_off
+    {X Y : M4 K} (hX : X ∈ pat K R rf tr) (hY : Y ∈ pat K R rf tr)
+    {i j : Fin 4} (hij : i ≠ j) (hk : ∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j)
+    : (X * Y) i j = X i i * Y i j + X i j * Y j j := by
   rw [Matrix.mul_apply, ← Finset.sum_pair (f := fun k => X i k * Y k j) hij]
   symm
   refine Finset.sum_subset (Finset.subset_univ _) fun k _ hk' => ?_
@@ -122,26 +145,41 @@ private theorem pat_off {X Y : M4 K} (hX : X ∈ pat K R rf tr) (hY : Y ∈ pat 
   by_contra h
   exact hk k hk'.1 hk'.2 (hX _ _ (left_ne_zero_of_mul h)) (hY _ _ (right_ne_zero_of_mul h))
 
-private theorem pat_aeval (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {X : M4 K} (hX : X ∈ pat K R rf tr) (p : Polynomial K) :
-    Polynomial.aeval X p ∈ pat K R rf tr ∧ ∀ i, (Polynomial.aeval X p) i i = p.eval (X i i) := by
+private theorem pat_aeval
+    (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {X : M4 K} (hX : X ∈ pat K R rf tr) (p : Polynomial K)
+    : Polynomial.aeval X p ∈ pat K R rf tr ∧ ∀ i, (Polynomial.aeval X p) i i = p.eval (X i i) := by
   induction p using Polynomial.induction_on with
-  | C a => exact ⟨by rw [Polynomial.aeval_C]; exact Subalgebra.algebraMap_mem _ _, fun i => by simp [Matrix.algebraMap_matrix_apply]⟩
-  | add p q hp hq => exact ⟨by rw [map_add]; exact add_mem hp.1 hq.1, fun i => by simp [hp.2, hq.2]⟩
+  | C a =>
+    exact ⟨
+      by rw [Polynomial.aeval_C]; exact Subalgebra.algebraMap_mem _ _,
+      fun i => by simp [Matrix.algebraMap_matrix_apply]
+    ⟩
+  | add p q hp hq =>
+    exact ⟨by rw [map_add]; exact add_mem hp.1 hq.1, fun i => by simp [hp.2, hq.2]⟩
   | monomial n a h =>
     rw [pow_succ, ← mul_assoc, map_mul, Polynomial.aeval_X]
     exact ⟨mul_mem h.1 hX, fun i => by rw [pat_diag as h.1 hX, h.2, Polynomial.eval_mul_X]⟩
 
-private theorem pat_prj (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {X : M4 K} (hX : X ∈ pat K R rf tr) (c : Fin 4 → K)
-    (hc : Function.Injective c) (m : Fin 4 → Fin 4) (hm : ∀ i, X i i = c (m i)) (a : Fin 4) :
-    prj c X a ∈ pat K R rf tr ∧ ∀ i, (prj c X a i i = 0 ↔ m i ≠ a) := by
+private theorem pat_prj
+    (as : ∀ a b, a ≠ b → R a b → ¬ R b a)
+    {X : M4 K} (hX : X ∈ pat K R rf tr)
+    (c : Fin 4 → K) (hc : Function.Injective c)
+    (m : Fin 4 → Fin 4) (hm : ∀ i, X i i = c (m i))
+    (a : Fin 4)
+    : prj c X a ∈ pat K R rf tr ∧ ∀ i, (prj c X a i i = 0 ↔ m i ≠ a) := by
   refine ⟨(pat_aeval as hX _).1, fun i => ?_⟩
   rw [prj, (pat_aeval as hX _).2, hm, Polynomial.eval_prod, Finset.prod_eq_zero_iff]
   simp [sub_eq_zero, hc.eq_iff]
 
-private theorem pat_split (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {H : Type} [Group H] (r : H →* M4 K)
-    (hr : ∀ g, r g ∈ pat K R rf tr) {I : Subgroup H} {ps : Fin 4 → H → K} {s : H} (ho : Ord I ps s r)
-    (hc : Function.Injective fun a => ps a s) (m : Fin 4 → Fin 4) (hm : ∀ i, r s i i = ps (m i) s) {i j : Fin 4} (hij : i ≠ j)
-    (hk : ∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j) (hlt : m j < m i) : ∃ a, ∀ g, r g i j = a * (r g i i - r g j j) := by
+private theorem pat_split
+    (as : ∀ a b, a ≠ b → R a b → ¬ R b a)
+    {H : Type} [Group H]
+    (r : H →* M4 K) (hr : ∀ g, r g ∈ pat K R rf tr)
+    {I : Subgroup H} {ps : Fin 4 → H → K} {s : H}
+    (ho : Ord I ps s r) (hc : Function.Injective fun a => ps a s)
+    (m : Fin 4 → Fin 4) (hm : ∀ i, r s i i = ps (m i) s)
+    {i j : Fin 4} (hij : i ≠ j) (hk : ∀ k, k ≠ i → k ≠ j → R i k → ¬ R k j) (hlt : m j < m i)
+    : ∃ a, ∀ g, r g i j = a * (r g i i - r g j j) := by
   obtain ⟨hP, hP'⟩ := pat_prj as (hr s) _ hc m hm (m i)
   obtain ⟨hQ, hQ'⟩ := pat_prj as (hr s) _ hc m hm (m j)
   have st := fun g => ho.stable g _ _ hlt
@@ -151,9 +189,12 @@ private theorem pat_split (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {H : Ty
   have p2 : P j j = 0 := (hP' j).2 hlt.ne
   have q1 : Q j j ≠ 0 := fun h => (hQ' j).1 h rfl
   have q2 : Q i i = 0 := (hQ' i).2 hlt.ne'
-  have e : ∀ g, P i i * r g i i * Q i j + (P i i * r g i j + P i j * r g j j) * Q j j = 0 := fun g => by
+  have e
+      : ∀ g,
+        P i i * r g i i * Q i j + (P i i * r g i j + P i j * r g j j) * Q j j = 0 := fun g => by
     have := congrFun (congrFun (st g) i) j
-    rwa [pat_off (mul_mem hP (hr g)) hQ hij hk, pat_off hP (hr g) hij hk, pat_diag as hP (hr g)] at this
+    rwa [pat_off (mul_mem hP (hr g)) hQ hij hk, pat_off hP (hr g) hij hk, pat_diag as hP (hr g)] at
+      this
   have e1 := e 1
   simp only [map_one, Matrix.one_apply_eq, Matrix.one_apply_ne hij] at e1
   refine ⟨P i j / P i i, fun g => ?_⟩
@@ -163,8 +204,16 @@ private theorem pat_split (as : ∀ a b, a ≠ b → R a b → ¬ R b a) {H : Ty
 
 end
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.diagonal_character_order_lt_of_stable_flag :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → SoV Ω l → ∀ r, D.EPt r → DiagType r → ∀ m : Fin 4 → Fin 4, Function.Injective m → (∀ i, ∀ s ∈ D.Ip l, r s i i = ((D.ps (m i) s : c.O) : PadicAlgCl l)) → ∀ i j, i ≠ j → Ge r i j → m i < m j := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.diagonal_character_order_lt_of_stable_flag
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good → SoV Ω l
+        → ∀ r,
+          D.EPt r → DiagType r
+            → ∀ m : Fin 4 → Fin 4,
+              Function.Injective m
+                → (∀ i, ∀ s ∈ D.Ip l, r s i i = ((D.ps (m i) s : c.O) : PadicAlgCl l))
+                → ∀ i j, i ≠ j → Ge r i j → m i < m j := by
   intro Ω _ _ _ l hl c D hD hSo r hr hdt m hm hI
   obtain ⟨hmult, hunr, -, heq, heqP, hE, -⟩ := ptIn D hD _ r hr
   obtain ⟨-, grefl, gtr, -⟩ := geAlg _ r _ hmult hE
@@ -179,8 +228,7 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.diagonal_character_order_lt_
   have hp : ∀ g, r g ∈ pat _ (Ge r) grefl gtr := fun g a b h => ⟨g, h⟩
   have hκ0 : ∀ i g, r g i i ≠ 0 := fun i g => hκ i g ▸ (κ i g).ne_zero
   let θ : G ℚ Ω →* (PadicAlgCl l)ˣ := κ i / κ j
-  have hθ : ∀ g, (θ g : PadicAlgCl l) = r g i i / r g j j := fun g => by
-    simp [θ, hκ]
+  have hθ : ∀ g, (θ g : PadicAlgCl l) = r g i i / r g j j := fun g => by simp [θ, hκ]
   let z : G ℚ Ω → PadicAlgCl l := fun g => r g i j / r g j j
   have hz : ∀ g h, z (g * h) = z g + θ g * z h := fun g h => by
     simp only [z]
@@ -191,14 +239,23 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.diagonal_character_order_lt_
     ring
   have hz1 : ∀ g, r g = 1 → z g = 0 := fun g h => by
     simp only [z, h, Matrix.one_apply_ne hij, zero_div]
-  have hent : ∀ i j, Continuous fun g => r g i j := fun i j => (continuous_apply_apply i j).comp hcont
+  have hent : ∀ i j, Continuous fun g => r g i j := fun i j =>
+    (continuous_apply_apply i j).comp hcont
   obtain ⟨-, -, hconj⟩ := Chr.placesQ Ω
-  have hL : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Dec (F := ℚ) A, z g = θ g * m - m := by
+  have hL
+      : ∀ A : ValuationSubring Ω,
+        A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Dec (F := ℚ) A, z g = θ g * m - m := by
     intro A hA
     obtain ⟨u, hu, -⟩ := hconj l A (D.pl l) hl.out hA (hD.pl_over l hl.out)
     refine cob_conj θ z hz _ _ u hu ?_
-    obtain ⟨a, ha⟩ := pat_split hdt (r.comp (D.Gp l).subtype) (fun g => hp g) heq.2
-      (fun a b h => hinj (Subtype.ext h)) m' (fun i => hI i _ hs0) hij hk hlt
+    obtain ⟨a, ha⟩ :=
+      pat_split hdt (r.comp (D.Gp l).subtype)
+        (fun g => hp g)
+        heq.2
+        (fun a b h => hinj (Subtype.ext h))
+        m'
+        (fun i => hI i _ hs0)
+        hij hk hlt
     refine ⟨a, fun g hg => ?_⟩
     have e : r g i j = a * (r g i i - r g j j) := ha ⟨g, hg⟩
     simp only [z]
@@ -229,18 +286,26 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.diagonal_character_order_lt_
   obtain ⟨δ, hδo, hδ1⟩ := hδ i
   obtain ⟨δ', hδo', hδ1'⟩ := hδ j
   obtain ⟨n, hn⟩ := Nat.exists_eq_add_of_lt (hw _ _ hlt)
-  obtain ⟨a, ha⟩ := hSo (δ' / δ) (Subgroup.isOpen_mono (H₁ := δ.ker ⊓ δ'.ker) (fun g hg => by
-      have h1 : δ g = 1 := hg.1
-      have h2 : δ' g = 1 := hg.2
-      simp [h1, h2]) (hδo.inter hδo')) (n + 1) (by omega) (fun g => θ g) (fun g => by
-      have h0 := hκ0 j g
-      rw [hθ]
-      rw [hδ1', hn] at h0 ⊢
-      rw [hδ1]
-      have h1 := (δ g).ne_zero
-      simp only [MonoidHom.div_apply, Units.val_div_eq_div_val]
-      rw [div_mul_div_comm, div_mul_eq_mul_div, div_eq_one_iff_eq (mul_ne_zero h0 h1)]
-      ring) z ((hent i j).div (hent j j) (hκ0 j)) hz hU hL
+  obtain ⟨a, ha⟩ :=
+    hSo (δ' / δ)
+      (Subgroup.isOpen_mono (H₁ := δ.ker ⊓ δ'.ker)
+        (fun g hg => by
+          have h1 : δ g = 1 := hg.1
+          have h2 : δ' g = 1 := hg.2
+          simp [h1, h2])
+        (hδo.inter hδo'))
+      (n + 1) (by omega)
+      (fun g => θ g)
+      (fun g => by
+        have h0 := hκ0 j g
+        rw [hθ]
+        rw [hδ1', hn] at h0 ⊢
+        rw [hδ1]
+        have h1 := (δ g).ne_zero
+        simp only [MonoidHom.div_apply, Units.val_div_eq_div_val]
+        rw [div_mul_div_comm, div_mul_eq_mul_div, div_eq_one_iff_eq (mul_ne_zero h0 h1)]
+        ring)
+      z ((hent i j).div (hent j j) (hκ0 j)) hz hU hL
   have hs : ∀ X ∈ Submodule.span (PadicAlgCl l) (Set.range r), X i j = a * (X i i - X j j) := by
     intro X hX
     induction hX using Submodule.span_induction with

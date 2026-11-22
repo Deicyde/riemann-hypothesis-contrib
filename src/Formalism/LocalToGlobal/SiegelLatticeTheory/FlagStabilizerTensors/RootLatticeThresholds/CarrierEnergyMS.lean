@@ -11,7 +11,8 @@ open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Is
 
 namespace Formalism.L2.SG.Pf.Carrier.EnergyMS
 
-open Formalism.L2.SG.LocVol Formalism.L2.SG.Pf.Carrier.EnergyConst Formalism.L2.SG.Pf.Carrier.EnergyConst2 Formalism.L2.SG.TypedSets Function
+open Formalism.L2.SG.LocVol Formalism.L2.SG.Pf.Carrier.EnergyConst
+  Formalism.L2.SG.Pf.Carrier.EnergyConst2 Formalism.L2.SG.TypedSets Function
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,8 +20,8 @@ section Defs
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-def dN (v : PlX X) : ℝ := ((Ideal.absNorm (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) : ℕ) : ℝ)
-
+def dN (v : PlX X) : ℝ :=
+  ((Ideal.absNorm (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) : ℕ) : ℝ)
 
 open Classical in
 def nT (v : PlX X) : ℝ :=
@@ -29,31 +30,40 @@ def nT (v : PlX X) : ℝ :=
 end Defs
 
 def MSOrd : Prop :=
-  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ),
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ → IsStdChar ψ →
-    ∀ v : PlX X, ¬ TypAt X v → localVolumeUnit X ψ v = dN X v ^ e1 D * ZZX X u u' ψ v
+  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
+      (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ),
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ → IsStdChar ψ
+      → ∀ v : PlX X, ¬ TypAt X v → localVolumeUnit X ψ v = dN X v ^ e1 D * ZZX X u u' ψ v
 
 def MSTyp : Prop :=
-  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ),
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ → IsStdChar ψ →
-    ∀ v : PlX X, TypAt X v → 0 < ZZX X u u' ψ v →
-      localVolumeUnit X ψ v = dN X v ^ e1 D * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ ((D.R.rS + 1) * (2 * D.R.rS + 3)) *
-        ZZX X u u' ψ v
+  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
+      (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ),
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ → IsStdChar ψ
+      → ∀ v : PlX X,
+        TypAt X v → 0 < ZZX X u u' ψ v
+          → localVolumeUnit X ψ v
+            = dN X v ^ e1 D
+              * ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ ((D.R.rS + 1) * (2 * D.R.rS + 3))
+              * ZZX X u u' ψ v
 
 def DiffProd : Prop :=
   ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
     HasFiniteMulSupport (dN X) ∧ ∏ᶠ v, dN X v = |((NumberField.discr X.B.I.F : ℤ) : ℝ)|
 
 def DiscRd : Prop :=
-  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D), |((NumberField.discr X.B.I.F : ℤ) : ℝ)| = D.host.rdE ^ D.R.f
+  ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
+    |((NumberField.discr X.B.I.F : ℤ) : ℝ)| = D.host.rdE ^ D.R.f
 
 def TypNorm : Prop :=
   ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D),
-    ∏ p : TypX X, ((Ideal.absNorm p.1.asIdeal : ℕ) : ℝ) = ((Formalism.MainNotions.S.Lat.gS D : ℕ) : ℝ) ^ D.R.f
+    ∏ p : TypX X, ((Ideal.absNorm p.1.asIdeal : ℕ) : ℝ)
+      = ((Formalism.MainNotions.S.Lat.gS D : ℕ) : ℝ) ^ D.R.f
 
-theorem lemmaMSStd_of (hO : MSOrd) (hT : MSTyp) (hD : DiffProd) (hR : DiscRd) (hN : TypNorm)
+theorem lemmaMSStd_of
+    (hO : MSOrd) (hT : MSTyp) (hD : DiffProd) (hR : DiscRd) (hN : TypNorm)
     {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
-    (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ) : LemmaMSStd X u u' ψ := by
+    (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ)
+    : LemmaMSStd X u u' ψ := by
   classical
   intro hψ hstd hC
   set k := (D.R.rS + 1) * (2 * D.R.rS + 3) with hk
@@ -77,20 +87,25 @@ theorem lemmaMSStd_of (hO : MSOrd) (hT : MSTyp) (hD : DiffProd) (hR : DiscRd) (h
   have hnTf : HasFiniteMulSupport (nT X) := (Finset.finite_toSet _).subset hnTs
   have hAf : HasFiniteMulSupport (fun v => dN X v ^ e1 D * nT X v) := (hDf.pow _).mul hnTf
 
-  have h1 : (∏' v : OrdX X, localVolumeUnit X ψ v.1) * ∏ p : TypX X, localVolumeUnit X ψ p.1 = ∏' v, localVolumeUnit X ψ v := by
+  have h1
+      : (∏' v : OrdX X, localVolumeUnit X ψ v.1) * ∏ p : TypX X, localVolumeUnit X ψ p.1
+        = ∏' v, localVolumeUnit X ψ v := by
     have hsm : Multipliable ((localVolumeUnit X ψ) ∘ ((↑) : s → PlX X)) := Multipliable.of_finite
-    have hscm : Multipliable ((localVolumeUnit X ψ) ∘ ((↑) : ↑sᶜ → PlX X)) := hU00m
+    have hscm : Multipliable ((localVolumeUnit X ψ) ∘ ((↑) : ↑ sᶜ → PlX X)) := hU00m
     rw [← Multipliable.tprod_mul_tprod_compl hsm hscm, mul_comm]
     congr 1
     rw [tprod_fintype]
     rfl
 
-  have h2 : ∏' v, localVolumeUnit X ψ v = (∏ᶠ v, (dN X v ^ e1 D * nT X v)) * ∏' v, ZZX X u u' ψ v := by
+  have h2
+      : ∏' v, localVolumeUnit X ψ v = (∏ᶠ v, (dN X v ^ e1 D * nT X v)) * ∏' v, ZZX X u u' ψ v := by
     rw [tprod_congr hloc, Multipliable.tprod_mul (multipliable_of_hasFiniteMulSupport hAf) hZm,
       tprod_eq_finprod hAf]
 
-  have h3 : (∏ᶠ v, (dN X v ^ e1 D * nT X v)) =
-      D.host.rdE ^ (D.R.f * e1 D) * ((Formalism.MainNotions.S.Lat.gS D : ℕ) : ℝ) ^ (D.R.f * k) := by
+  have h3
+      : (∏ᶠ v, (dN X v ^ e1 D * nT X v))
+        = D.host.rdE ^ (D.R.f * e1 D)
+          * ((Formalism.MainNotions.S.Lat.gS D : ℕ) : ℝ) ^ (D.R.f * k) := by
     have hDpow : HasFiniteMulSupport (fun v => dN X v ^ e1 D) := hDf.pow _
     rw [finprod_mul_distrib hDpow hnTf, ← finprod_pow hDf, hDp, hR D X, ← pow_mul]
     congr 1

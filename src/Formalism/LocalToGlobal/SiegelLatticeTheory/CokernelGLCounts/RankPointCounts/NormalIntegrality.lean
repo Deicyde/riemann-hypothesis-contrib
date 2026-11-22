@@ -20,8 +20,8 @@ variable {D : D7}
 
 instance instCM (D : D7) : IsCMField D.host.E := D.host.isCMField_hostE
 
-def Jsub (Λ : Submodule (𝓞 D.host.E) (VS D).V) (X : Submodule D.host.E (VS D).V) (y0 : (VS D).V) :
-    Submodule (𝓞 D.host.E) D.host.E where
+def Jsub (Λ : Submodule (𝓞 D.host.E) (VS D).V) (X : Submodule D.host.E (VS D).V) (y0 : (VS D).V)
+    : Submodule (𝓞 D.host.E) D.host.E where
   carrier := {l | l • y0 ∈ Λ ⊔ X.restrictScalars (𝓞 D.host.E)}
   add_mem' := by
     intro a b ha hb
@@ -38,10 +38,11 @@ section Hyp
 
 variable (Λ : Submodule (𝓞 D.host.E) (VS D).V) (X : Submodule D.host.E (VS D).V) (y0 : (VS D).V)
 
-theorem pair_int (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
+theorem pair_int
+    (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ)
     (hiso : ∀ x ∈ X, ∀ x' ∈ X, brS (VS D) x x' = 0) (horth : ∀ x ∈ X, brS (VS D) y0 x = 0)
-    {l m : D.host.E} (hl : l ∈ Jsub Λ X y0) (hm : m ∈ Jsub Λ X y0) :
-    ∃ c : 𝓞 D.host.E, (c : D.host.E) = brS (VS D) (l • y0) (m • y0) := by
+    {l m : D.host.E} (hl : l ∈ Jsub Λ X y0) (hm : m ∈ Jsub Λ X y0)
+    : ∃ c : 𝓞 D.host.E, (c : D.host.E) = brS (VS D) (l • y0) (m • y0) := by
   have hl0 : l • y0 ∈ Λ ⊔ X.restrictScalars (𝓞 D.host.E) := hl
   have hm0 : m • y0 ∈ Λ ⊔ X.restrictScalars (𝓞 D.host.E) := hm
   obtain ⟨a1, ha1, x1, hx1, e1⟩ := Submodule.mem_sup.mp hl0
@@ -52,11 +53,8 @@ theorem pair_int (hun : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT
   have hy1 : ∀ x ∈ X, (VS D).hT x y0 = 0 := fun x hx => horth x hx
   have hxx : (VS D).hT x2 x1 = 0 := hiso x1 hx1' x2 hx2'
   have hsym : starRingEnd D.host.E ((VS D).hT x1 y0) = (VS D).hT y0 x1 := by
-    first
-      | exact (VS D).herm x1 y0
-      | exact (VS D).herm.eq x1 y0
-  have hy2 : (VS D).hT y0 x1 = 0 := by
-    rw [← hsym, hy1 x1 hx1', map_zero]
+    first | exact (VS D).herm x1 y0 | exact (VS D).herm.eq x1 y0
+  have hy2 : (VS D).hT y0 x1 = 0 := by rw [← hsym, hy1 x1 hx1', map_zero]
   have ea1 : a1 = l • y0 - x1 := by rw [← e1]; abel
   have ea2 : a2 = m • y0 - x2 := by rw [← e2]; abel
   have c1 : (VS D).hT x2 a1 = 0 := by

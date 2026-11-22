@@ -10,15 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Split
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published GlobalTheory.AboveL
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published
+  GlobalTheory.AboveL
 
-theorem GlobalTheory.Cong.cLoc_locU_bijective_open_continuous : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ) (w : HeightOneSpectrum (𝓞 E)), IsSplitAt w → Function.Bijective ((cLoc w).comp (locU a w).subtype) ∧ IsOpenMap ((cLoc w).comp (locU a w).subtype) ∧ Continuous ((cLoc w).comp (locU a w).subtype) := by
+theorem GlobalTheory.Cong.cLoc_locU_bijective_open_continuous
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ) (w : HeightOneSpectrum (𝓞 E)),
+      IsSplitAt w
+        → Function.Bijective ((cLoc w).comp (locU a w).subtype)
+          ∧ IsOpenMap ((cLoc w).comp (locU a w).subtype)
+          ∧ Continuous ((cLoc w).comp (locU a w).subtype) := by
   intro E _ _ _ a w hw
   obtain ⟨e, he⟩ := GlobalTheory.locU_equiv_GL E a w hw
-  have hf : ((cLoc w).comp (locU a w).subtype : locU a w → GL (Fin a) (w.adicCompletion E)) = (fun x => e x) := by
+  have hf
+      : ((cLoc w).comp (locU a w).subtype : locU a w → GL (Fin a) (w.adicCompletion E))
+        = (fun x => e x) := by
     funext x
     exact (he x).symm
   rw [hf]

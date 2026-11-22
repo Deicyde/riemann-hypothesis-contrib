@@ -20,17 +20,30 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllSi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem topAmpExists_of_semistableReduction :
-    GlobalTheory.Published.SemistableReductionSt → GlobalTheory.Models.TopAmpExists :=
-  fun S => GlobalTheory.T.exists_fullLevel_model_ample_frames GlobalTheory.T.homExtension_semiAbelian_discreteValuationRing GlobalTheory.T.all_six_abelian_scheme_laws_hold.1 GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1 S GlobalTheory.T.uniformisationExistence_and_torsion_statements.1 GlobalTheory.T.uniformisationExistence_and_torsion_statements.2
+theorem topAmpExists_of_semistableReduction
+    : GlobalTheory.Published.SemistableReductionSt → GlobalTheory.Models.TopAmpExists := fun S =>
+  GlobalTheory.T.exists_fullLevel_model_ample_frames
+    GlobalTheory.T.homExtension_semiAbelian_discreteValuationRing
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.1
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1 S
+    GlobalTheory.T.uniformisationExistence_and_torsion_statements.1
+    GlobalTheory.T.uniformisationExistence_and_torsion_statements.2
     (GlobalTheory.T.zarhinGeometric_of_semistableReduction S)
-    (GlobalTheory.T.goodReduction_of_thetaPoint_units GlobalTheory.T.all_six_abelian_scheme_laws_hold.1 GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1 (GlobalTheory.T.semistableReductionSplit_of_padic S) GlobalTheory.T.uniformisationExistence_and_torsion_statements.1 GlobalTheory.T.uniformisationExistence_and_torsion_statements.2)
-    GlobalTheory.T.theorem_of_cube_polAbelianScheme GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
+    (GlobalTheory.T.goodReduction_of_thetaPoint_units
+      GlobalTheory.T.all_six_abelian_scheme_laws_hold.1
+      GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1
+      (GlobalTheory.T.semistableReductionSplit_of_padic S)
+      GlobalTheory.T.uniformisationExistence_and_torsion_statements.1
+      GlobalTheory.T.uniformisationExistence_and_torsion_statements.2)
+    GlobalTheory.T.theorem_of_cube_polAbelianScheme
+    GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
 
 end GlobalTheory

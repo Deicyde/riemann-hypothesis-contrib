@@ -55,9 +55,12 @@ def countGL (E : Type) [Field E] [Algebra E A] (g : A) : ℚ :=
 
 end Orbits
 
-def val (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {E : Type} [Field E]
-    [Algebra O E] [IsFractionRing O E] (x : E) : ℤ :=
-  -WithZero.log ((IsDiscreteValuationRing.maximalIdeal O).valuation E x)
+def val
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {E : Type} [Field E] [Algebra O E] [IsFractionRing O E]
+    (x : E)
+    : ℤ :=
+  - WithZero.log ((IsDiscreteValuationRing.maximalIdeal O).valuation E x)
 
 structure UQ : Type 1 where
   O : Type
@@ -123,14 +126,19 @@ def T : Subgroup B.Aˣ where
   mul_mem' := by
     intro a b ha hb
     simp only [Set.mem_setOf_eq, Units.val_mul, map_mul] at ha hb ⊢
-    calc (a : B.A) * b * (B.σ a * B.σ b) = ((a : B.A) * B.σ a) * ((b : B.A) * B.σ b) := by ring
+    calc
+      (a : B.A) * b * (B.σ a * B.σ b)
+        = ((a : B.A) * B.σ a) * ((b : B.A) * B.σ b) := by ring
       _ = 1 := by rw [ha, hb, one_mul]
   inv_mem' := by
     intro a ha
     simp only [Set.mem_setOf_eq] at ha ⊢
-    have h1 : B.σ (a : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A) = 1 := by rw [← map_mul, Units.mul_inv, map_one]
-    calc ((a⁻¹ : B.Aˣ) : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A)
-        = ((a⁻¹ : B.Aˣ) : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A) * ((a : B.A) * B.σ a) := by rw [ha, mul_one]
+    have h1 : B.σ (a : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A) = 1 := by
+      rw [← map_mul, Units.mul_inv, map_one]
+    calc
+      ((a⁻¹ : B.Aˣ) : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A)
+          = ((a⁻¹ : B.Aˣ) : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A) * ((a : B.A) * B.σ a) := by
+        rw [ha, mul_one]
       _ = (((a⁻¹ : B.Aˣ) : B.A) * a) * (B.σ (a : B.A) * B.σ ((a⁻¹ : B.Aˣ) : B.A)) := by ring
       _ = 1 := by rw [h1, Units.inv_mul, one_mul]
 
@@ -140,7 +148,8 @@ def gramDet (x : B.A) : K.E :=
   (Matrix.of fun i j => B.herm x (Module.finBasis K.E B.A i) (Module.finBasis K.E B.A j)).det
 
 def Cl : Type :=
-  Quot fun x y : {x : B.Aˣ // B.σ (x : B.A) = x} => ∃ u : B.Aˣ, (y.1 : B.A) = x.1 * (u * B.σ (u : B.A))
+  Quot fun x y : {x : B.Aˣ // B.σ (x : B.A) = x} =>
+    ∃ u : B.Aˣ, (y.1 : B.A) = x.1 * (u * B.σ (u : B.A))
 
 def Cl.rep {B : InvAlg K} (k : B.Cl) : B.A := ((Quot.out k).1 : B.Aˣ)
 
@@ -150,16 +159,19 @@ def kapSum (B₁ B₂ : InvAlg K) : ℚ :=
   ∑ᶠ k : (B₁.prod B₂).Cl, K.eta (B₁.gramDet (Cl.rep k).1) * (B₁.prod B₂).N k.rep
 
 def Identity (B₁ B₂ : InvAlg K) : Prop :=
-  (-(K.q : ℚ)) ^ (-val K.O (resultant B₁.P B₂.P)) * kapSum B₁ B₂ = B₁.stSum * B₂.stSum
+  (-(K.q : ℚ)) ^ (- val K.O (resultant B₁.P B₂.P)) * kapSum B₁ B₂ = B₁.stSum * B₂.stSum
 
 end InvAlg
 
 def UnitLemmaGroup : Prop :=
-  ∀ (K : UQ), K.Odd → ∀ B₁ B₂ : InvAlg K, B₁.g * B₁.σ B₁.g = 1 → B₂.g * B₂.σ B₂.g = 1 →
-    (B₁.P * B₂.P).Separable → InvAlg.Identity B₁ B₂
+  ∀ (K : UQ),
+    K.Odd
+      → ∀ B₁ B₂ : InvAlg K,
+        B₁.g * B₁.σ B₁.g = 1 → B₂.g * B₂.σ B₂.g = 1 → (B₁.P * B₂.P).Separable
+          → InvAlg.Identity B₁ B₂
 
 def UnitLemmaLie : Prop :=
-  ∀ (K : UQ) (B₁ B₂ : InvAlg K), B₁.σ B₁.g = B₁.g → B₂.σ B₂.g = B₂.g →
-    (B₁.P * B₂.P).Separable → InvAlg.Identity B₁ B₂
+  ∀ (K : UQ) (B₁ B₂ : InvAlg K),
+    B₁.σ B₁.g = B₁.g → B₂.σ B₂.g = B₂.g → (B₁.P * B₂.P).Separable → InvAlg.Identity B₁ B₂
 
 end GlobalTheory.UnitLemma

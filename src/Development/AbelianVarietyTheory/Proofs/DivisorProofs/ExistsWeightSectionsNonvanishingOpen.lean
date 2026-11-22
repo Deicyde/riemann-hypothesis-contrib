@@ -24,9 +24,12 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -34,23 +37,32 @@ open GlobalTheory.HSApp
 
 namespace GlobalTheory.HodgeDominates
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem exists_sec_detOm (hE : GlobalTheory.Published.SemiAbelianHomExtension) (hS : GlobalTheory.Published.SiegelToroidalIntegral)
-    (hF : GlobalTheory.Published.ToroidalChartsForFan) (hr : 1 ≤ Dw.p + Dw.q) (Y : Model Xo c (RingHom.id c.F))
-    (hY : (FlagMod.detOm Y).IsLB) (w : Xo.XF c) {A : LB Y.X} (hA : A.IsLB) :
-    ∃ m : ℕ, 0 < m ∧ ∃ s : (LB.div (lbPow (FlagMod.detOm Y) m) A).Sec, Y.j w ∈ nonzeroLocus s := by
+theorem exists_sec_detOm
+    (hE : GlobalTheory.Published.SemiAbelianHomExtension)
+    (hS : GlobalTheory.Published.SiegelToroidalIntegral)
+    (hF : GlobalTheory.Published.ToroidalChartsForFan) (hr : 1 ≤ Dw.p + Dw.q)
+    (Y : Model Xo c (RingHom.id c.F)) (hY : (FlagMod.detOm Y).IsLB)
+    (w : Xo.XF c)
+    {A : LB Y.X} (hA : A.IsLB)
+    : ∃ m : ℕ,
+      0 < m ∧ ∃ s : (LB.div (lbPow (FlagMod.detOm Y) m) A).Sec, Y.j w ∈ nonzeroLocus s := by
   obtain ⟨φs, hs, -⟩ := hS (max 1 (Module.finrank ℚ E * min Dw.p Dw.q)) (le_max_left _ _)
-  obtain ⟨φ, h₁, h₂, -⟩ := GlobalTheory.PolFan.exists_fine_invariant_fan H hs (le_max_right _ _) ∅ (by simp)
+  obtain ⟨φ, h₁, h₂, -⟩ :=
+    GlobalTheory.PolFan.exists_fine_invariant_fan H hs (le_max_right _ _) ∅ (by simp)
   obtain ⟨Y', BD, d, k, -, hk, hsm, -, hBD, -, hamp⟩ := hF E H Dw hr φ h₁ h₂ l Xo c
   have hY' := GlobalTheory.FanTheta.isLB_detOm_of_smooth Y' hr hsm
   obtain ⟨N, _, _, u, p, p', hu, hu', hp, hpt, e⟩ := exists_common_modification hE Y Y' hY hY'
   have e₁ : p (u w) = Y.j w := by rw [← hu]; rfl
   have e₂ : p' (u w) = Y'.j w := by rw [← hu']; rfl
   rw [← e₁]
-  refine exists_sec_of_common p p' hp (u w) (fun W hW => ⟨Y'.j ''ᵁ (Y.j ⁻¹ᵁ W), ⟨w, (show Y.j w ∈ W from e₁ ▸ hW), e₂.symm⟩, ?_⟩) hY hY'
-    (hamp hY') BD.isLB_lb e hk ?_ BD.canonical ?_ hA
+  refine exists_sec_of_common p p' hp (u w)
+    (fun W hW => ⟨Y'.j ''ᵁ (Y.j ⁻¹ᵁ W), ⟨w, (show Y.j w ∈ W from e₁ ▸ hW), e₂.symm⟩, ?_⟩)
+    hY hY' (hamp hY') BD.isLB_lb e hk ?_ BD.canonical ?_ hA
   · rintro n ⟨w', hw', h⟩
     show p n ∈ W
     rw [hpt n w' h.symm]
@@ -64,11 +76,15 @@ theorem exists_sec_detOm (hE : GlobalTheory.Published.SemiAbelianHomExtension) (
       rw [Y'.ab_gen]; exact ⟨w, rfl⟩
     exact h'
 
-theorem exists_lb_dominates (hE : GlobalTheory.Published.SemiAbelianHomExtension) (hS : GlobalTheory.Published.SiegelToroidalIntegral)
-    (hF : GlobalTheory.Published.ToroidalChartsForFan) (TF : TorFlag Xo c) :
-    ∃ (ω : LB TF.Y.X) (hω : ω.IsLB), cls _ (TF.X.isLB_Llam (FlagMod.mu0 Dw)) = CechPic.pull TF.X.π (cls ω hω) ∧
-      ∀ (w : Xo.XF c) (A : LB TF.Y.X), A.IsLB →
-        ∃ m : ℕ, 0 < m ∧ ∃ s : (LB.div (lbPow ω m) A).Sec, TF.Y.j w ∈ nonzeroLocus s := by
+theorem exists_lb_dominates
+    (hE : GlobalTheory.Published.SemiAbelianHomExtension)
+    (hS : GlobalTheory.Published.SiegelToroidalIntegral)
+    (hF : GlobalTheory.Published.ToroidalChartsForFan) (TF : TorFlag Xo c)
+    : ∃ (ω : LB TF.Y.X) (hω : ω.IsLB),
+      cls _ (TF.X.isLB_Llam (FlagMod.mu0 Dw)) = CechPic.pull TF.X.π (cls ω hω)
+        ∧ ∀ (w : Xo.XF c) (A : LB TF.Y.X),
+          A.IsLB
+            → ∃ m : ℕ, 0 < m ∧ ∃ s : (LB.div (lbPow ω m) A).Sec, TF.Y.j w ∈ nonzeroLocus s := by
   have := TF.smooth
   rcases Nat.eq_zero_or_pos (Dw.p + Dw.q) with h0 | hr
   · have hd : Dw.dim = 0 := by rw [Datum.dim, show Dw.q = 0 by omega, mul_zero]
@@ -87,17 +103,22 @@ theorem exists_lb_dominates (hE : GlobalTheory.Published.SemiAbelianHomExtension
         · have := i.2
           have : Dw.mult σ = 0 := by unfold Datum.mult; split_ifs <;> omega
           omega
-      refine Eq.trans (b := 0) ((cls_eq_zero_iff _).2 ⟨⟨fun _ => 1⟩, fun k k' => ?_⟩) (map_zero _).symm
+      refine Eq.trans (b := 0) ((cls_eq_zero_iff _).2 ⟨⟨fun _ => 1⟩, fun k k' => ?_⟩)
+        (map_zero _).symm
       have hg : (TF.X.Llam (FlagMod.mu0 Dw)).g k k' = 1 :=
         Finset.prod_eq_one fun ix _ => by rw [he]; exact zpow_zero _
       rw [hg, map_one, map_one, mul_one]
-    · obtain ⟨s, hs, -⟩ := exists_sec_finite_subset_of_isQuasiAffine (LB.isLB_div (isLB_lbPow (LB.isLB_triv _) 1) hA)
-        (Set.finite_singleton (TF.Y.j w)) (U := ⊤) (Set.subset_univ _)
+    · obtain ⟨s, hs, -⟩ :=
+        exists_sec_finite_subset_of_isQuasiAffine (LB.isLB_div (isLB_lbPow (LB.isLB_triv _) 1) hA)
+          (Set.finite_singleton (TF.Y.j w)) (U := ⊤) (Set.subset_univ _)
       exact ⟨s, hs rfl⟩
-  · have hY := GlobalTheory.FanTheta.isLB_detOm_of_smooth TF.Y hr
-      ((smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback (IsPullback.of_hasPullback _ _) this)
+  · have hY :=
+      GlobalTheory.FanTheta.isLB_detOm_of_smooth TF.Y hr
+        ((smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback
+          (IsPullback.of_hasPullback _ _) this)
     refine ⟨_, hY, ?_, fun w A hA => exists_sec_detOm hE hS hF hr TF.Y hY w hA⟩
-    rw [← cls_pull hY _ (pull_isLB hY _), ← (cls_eq_iff TF.X.F.isLB_detOm _).2 (TF.X.F.detOm_iso_pull hY)]
+    rw [← cls_pull hY _ (pull_isLB hY _),
+      ← (cls_eq_iff TF.X.F.isLB_detOm _).2 (TF.X.F.detOm_iso_pull hY)]
     exact ((cls_eq_iff _ _).2 (FlagHodge.lbIso_detOm_Llam TF.X)).symm
 
 end GlobalTheory.HodgeDominates

@@ -15,8 +15,9 @@ section General
 
 variable {R V : Type} [CommRing R] [AddCommGroup V] [Module R V]
 
-theorem mem_loc {p : Ideal R} {N : Submodule R V} {x : V} :
-    x ∈ loc p N ↔ ∃ s : R, s ∉ p ∧ s • x ∈ N := Iff.rfl
+theorem mem_loc {p : Ideal R} {N : Submodule R V} {x : V}
+    : x ∈ loc p N ↔ ∃ s : R, s ∉ p ∧ s • x ∈ N :=
+  Iff.rfl
 
 def locSub (p : Ideal R) (hp : p.IsPrime) (N : Submodule R V) : Submodule R V where
   carrier := loc p N
@@ -35,20 +36,23 @@ def locSub (p : Ideal R) (hp : p.IsPrime) (N : Submodule R V) : Submodule R V wh
     rw [smul_comm s c x]
     exact N.smul_mem c hsx
 
-theorem mem_locSub {p : Ideal R} {hp : p.IsPrime} {N : Submodule R V} {x : V} :
-    x ∈ locSub p hp N ↔ x ∈ loc p N := Iff.rfl
+theorem mem_locSub {p : Ideal R} {hp : p.IsPrime} {N : Submodule R V} {x : V}
+    : x ∈ locSub p hp N ↔ x ∈ loc p N :=
+  Iff.rfl
 
-theorem mem_loc_of_mem {p : Ideal R} (hp : p ≠ ⊤) {N : Submodule R V} {x : V} (hx : x ∈ N) :
-    x ∈ loc p N :=
+theorem mem_loc_of_mem {p : Ideal R} (hp : p ≠ ⊤) {N : Submodule R V} {x : V} (hx : x ∈ N)
+    : x ∈ loc p N :=
   mem_loc.2 ⟨1, (Ideal.ne_top_iff_one p).1 hp, by simpa using hx⟩
 
-theorem mem_loc_of_smul {p : Ideal R} (hp : p.IsPrime) {N : Submodule R V} {u : R} {y : V}
-    (hu : u ∉ p) (h : u • y ∈ loc p N) : y ∈ loc p N := by
+theorem mem_loc_of_smul
+    {p : Ideal R} (hp : p.IsPrime)
+    {N : Submodule R V} {u : R} {y : V} (hu : u ∉ p) (h : u • y ∈ loc p N)
+    : y ∈ loc p N := by
   obtain ⟨s, hs, hsy⟩ := mem_loc.1 h
   exact mem_loc.2 ⟨s * u, fun h' => (hp.mem_or_mem h').elim hs hu, by rwa [mul_smul]⟩
 
-theorem mem_of_forall_loc (N : Submodule R V) (x : V)
-    (h : ∀ p : Ideal R, p.IsMaximal → x ∈ loc p N) : x ∈ N := by
+theorem mem_of_forall_loc (N : Submodule R V) (x : V) (h : ∀ p : Ideal R, p.IsMaximal → x ∈ loc p N)
+    : x ∈ N := by
   let I : Ideal R := N.comap (LinearMap.toSpanSingleton R V x)
   have hI : ∀ r, r ∈ I ↔ r • x ∈ N := fun r => by simp [I]
   by_cases htop : I = ⊤
@@ -60,9 +64,11 @@ theorem mem_of_forall_loc (N : Submodule R V) (x : V)
 
 end General
 
-theorem commonMult {R ι : Type} [CommRing R] [IsDomain R] (P : ι → R → Prop)
-    (hP : ∀ i c d, P i c → P i (d * c)) (T : Finset ι)
-    (hT : ∀ i ∈ T, ∃ c : R, c ≠ 0 ∧ P i c) : ∃ c : R, c ≠ 0 ∧ ∀ i ∈ T, P i c := by
+theorem commonMult
+    {R ι : Type} [CommRing R] [IsDomain R]
+    (P : ι → R → Prop) (hP : ∀ i c d, P i c → P i (d * c))
+    (T : Finset ι) (hT : ∀ i ∈ T, ∃ c : R, c ≠ 0 ∧ P i c)
+    : ∃ c : R, c ≠ 0 ∧ ∀ i ∈ T, P i c := by
   classical
   induction T using Finset.induction_on with
   | empty => exact ⟨1, one_ne_zero, by simp⟩
@@ -77,19 +83,44 @@ theorem commonMult {R ι : Type} [CommRing R] [IsDomain R] (P : ι → R → Pro
 
 section Frac
 
-variable {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+variable
+  {R K V : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
   [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem exists_smul_mem (N : Submodule R V) {v : V} (hv : v ∈ Submodule.span K (N : Set V)) :
-    ∃ c : R, c ≠ 0 ∧ c • v ∈ N := by
-  first | exact Bl.general_b_fact_third_bis_other.goal1 .. | (apply Bl.general_b_fact_third_bis_other.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_third_bis_other.goal1 <;> assumption) | (apply @Bl.general_b_fact_third_bis_other.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_third_bis_other.goal1 <;> assumption) | (apply @Bl.general_b_fact_third_bis_other.goal1 <;> first | assumption | infer_instance) | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N v hv | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N v | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› | exact @Bl.general_b_fact_third_bis_other.goal1 R K V | exact @Bl.general_b_fact_third_bis_other.goal1 R K | exact @Bl.general_b_fact_third_bis_other.goal1 R
+theorem exists_smul_mem (N : Submodule R V) {v : V} (hv : v ∈ Submodule.span K (N : Set V))
+    : ∃ c : R, c ≠ 0 ∧ c • v ∈ N := by
+  first
+  | exact Bl.general_b_fact_third_bis_other.goal1 ..
+  | (apply Bl.general_b_fact_third_bis_other.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_third_bis_other.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_third_bis_other.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_third_bis_other.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_third_bis_other.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N v hv
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N v
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› N
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_› ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V ‹_›
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K V
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R K
+  | exact @Bl.general_b_fact_third_bis_other.goal1 R
 
-theorem exists_smul_le {N N' : Submodule R V} (hN : N.FG)
-    (hN' : Submodule.span K (N' : Set V) = ⊤) : ∃ c : R, c ≠ 0 ∧ ∀ x ∈ N, c • x ∈ N' := by
+theorem exists_smul_le {N N' : Submodule R V} (hN : N.FG) (hN' : Submodule.span K (N' : Set V) = ⊤)
+    : ∃ c : R, c ≠ 0 ∧ ∀ x ∈ N, c • x ∈ N' := by
   obtain ⟨s, rfl⟩ := hN
-  obtain ⟨c, hc, hcs⟩ := commonMult (fun (g : V) (c : R) => c • g ∈ N')
-    (fun g c d h => by rw [mul_smul]; exact N'.smul_mem d h) s
-    (fun g _ => exists_smul_mem (K := K) N' (by rw [hN']; exact Submodule.mem_top))
+  obtain ⟨c, hc, hcs⟩ :=
+    commonMult
+      (fun (g : V) (c : R) => c • g ∈ N')
+      (fun g c d h => by rw [mul_smul]; exact N'.smul_mem d h)
+      s
+      (fun g _ => exists_smul_mem (K := K) N' (by rw [hN']; exact Submodule.mem_top))
   refine ⟨c, hc, fun x hx => ?_⟩
   have hle : Submodule.span R (s : Set V) ≤ N'.comap (c • LinearMap.id) := by
     rw [Submodule.span_le]
@@ -103,12 +134,15 @@ section DedekindLFunctions
 
 variable {R V : Type} [CommRing R] [IsDedekindDomain R] [AddCommGroup V] [Module R V]
 
-theorem exists_smul_mem_of_local (W : Ideal R → Set V) (L : Submodule R V)
+theorem exists_smul_mem_of_local
+    (W : Ideal R → Set V) (L : Submodule R V)
     (hL : ∀ y, y ∈ L ↔ ∀ q : Ideal R, q.IsMaximal → y ∈ W q)
     (hWsmul : ∀ q : Ideal R, q.IsMaximal → ∀ (r : R) (y : V), y ∈ W q → r • y ∈ W q)
     (hWsat : ∀ q : Ideal R, q.IsMaximal → ∀ (u : R) (y : V), u ∉ q → u • y ∈ W q → y ∈ W q)
-    {p : Ideal R} (hp : p.IsMaximal) {x : V} (hx : x ∈ W p) {d : R} (hd : d ≠ 0)
-    (hdx : d • x ∈ L) : ∃ s : R, s ∉ p ∧ s • x ∈ L := by
+    {p : Ideal R} (hp : p.IsMaximal)
+    {x : V} (hx : x ∈ W p)
+    {d : R} (hd : d ≠ 0) (hdx : d • x ∈ L)
+    : ∃ s : R, s ∉ p ∧ s • x ∈ L := by
   classical
   by_cases hdp : d ∈ p
   swap
@@ -125,8 +159,10 @@ theorem exists_smul_mem_of_local (W : Ideal R → Set V) (L : Submodule R V)
     rw [h] at h1
     exact hd (by simpa using h1)
   obtain ⟨Z, hZle, hZne⟩ := PrimeSpectrum.exists_primeSpectrum_prod_le_and_ne_bot_of_domain hnf hI0
-  have key : ∀ Y : Multiset (Ideal R), (∀ P ∈ Y, P.IsPrime ∧ P ≠ ⊥) →
-      ∀ y ∈ W p, (∀ r ∈ Y.prod, r • y ∈ L) → ∃ s : R, s ∉ p ∧ s • y ∈ L := by
+  have key
+      : ∀ Y : Multiset (Ideal R),
+        (∀ P ∈ Y, P.IsPrime ∧ P ≠ ⊥)
+          → ∀ y ∈ W p, (∀ r ∈ Y.prod, r • y ∈ L) → ∃ s : R, s ∉ p ∧ s • y ∈ L := by
     intro Y
     induction Y using Multiset.induction_on with
     | empty =>
@@ -157,9 +193,10 @@ theorem exists_smul_mem_of_local (W : Ideal R → Set V) (L : Submodule R V)
           by_contra h
           push Not at h
           exact hPp (hPmax.eq_of_le hp.ne_top (fun t ht => h t ht))
-        obtain ⟨s, hs, hsy⟩ := ih hY' (a • y) (hWsmul p hp a y hyp) (fun r hr => by
-          have h1 := hy (a * r) (Ideal.mul_mem_mul haP hr)
-          rwa [mul_comm, mul_smul] at h1)
+        obtain ⟨s, hs, hsy⟩ :=
+          ih hY' (a • y) (hWsmul p hp a y hyp) (fun r hr => by
+            have h1 := hy (a * r) (Ideal.mul_mem_mul haP hr)
+            rwa [mul_comm, mul_smul] at h1)
         refine ⟨s * a, fun h => (hp.isPrime.mem_or_mem h).elim hs hap, ?_⟩
         rwa [mul_smul]
   apply key (Z.map PrimeSpectrum.asIdeal) _ x hx
@@ -177,13 +214,16 @@ end DedekindLFunctions
 
 section Main
 
-variable {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem exists_unique_lat (L0 : Submodule R V) (hL0 : IsFullLat K L0) (M : Ideal R → Set V)
+theorem exists_unique_lat
+    (L0 : Submodule R V) (hL0 : IsFullLat K L0)
+    (M : Ideal R → Set V)
     (hM : ∀ p : Ideal R, p.IsMaximal → ∃ N : Submodule R V, IsFullLat K N ∧ M p = loc p N)
-    (hfin : Set.Finite {p : Ideal R | p.IsMaximal ∧ M p ≠ loc p L0}) :
-    ∃! L : Submodule R V, IsFullLat K L ∧ ∀ p : Ideal R, p.IsMaximal → loc p L = M p := by
+    (hfin : Set.Finite {p : Ideal R | p.IsMaximal ∧ M p ≠ loc p L0})
+    : ∃! L : Submodule R V, IsFullLat K L ∧ ∀ p : Ideal R, p.IsMaximal → loc p L = M p := by
   classical
   obtain ⟨hL0fg, hL0sp⟩ := hL0
   choose! N hNfull hMN using hM
@@ -206,18 +246,24 @@ theorem exists_unique_lat (L0 : Submodule R V) (hL0 : IsFullLat K L0) (M : Ideal
     · intro h q
       rw [← hMN q.1 q.2]
       exact h q.1 q.2
-  obtain ⟨c1, hc1, hc1N⟩ := commonMult (fun (q : Ideal R) (c : R) => ∀ y ∈ N q, c • y ∈ L0)
-    (fun q c d h y hy => by rw [mul_smul]; exact L0.smul_mem d (h y hy)) hfin.toFinset
-    (fun q hq => by
-      have hq' : q.IsMaximal ∧ M q ≠ loc q L0 := (Set.Finite.mem_toFinset hfin).1 hq
-      obtain ⟨hfg, _⟩ := hNfull q hq'.1
-      exact exists_smul_le (K := K) hfg hL0sp)
-  obtain ⟨c2, hc2, hc2N⟩ := commonMult (fun (q : Ideal R) (c : R) => ∀ y ∈ L0, c • y ∈ N q)
-    (fun q c d h y hy => by rw [mul_smul]; exact (N q).smul_mem d (h y hy)) hfin.toFinset
-    (fun q hq => by
-      have hq' : q.IsMaximal ∧ M q ≠ loc q L0 := (Set.Finite.mem_toFinset hfin).1 hq
-      obtain ⟨_, hsp⟩ := hNfull q hq'.1
-      exact exists_smul_le (K := K) hL0fg hsp)
+  obtain ⟨c1, hc1, hc1N⟩ :=
+    commonMult
+      (fun (q : Ideal R) (c : R) => ∀ y ∈ N q, c • y ∈ L0)
+      (fun q c d h y hy => by rw [mul_smul]; exact L0.smul_mem d (h y hy))
+      hfin.toFinset
+      (fun q hq => by
+        have hq' : q.IsMaximal ∧ M q ≠ loc q L0 := (Set.Finite.mem_toFinset hfin).1 hq
+        obtain ⟨hfg, _⟩ := hNfull q hq'.1
+        exact exists_smul_le (K := K) hfg hL0sp)
+  obtain ⟨c2, hc2, hc2N⟩ :=
+    commonMult
+      (fun (q : Ideal R) (c : R) => ∀ y ∈ L0, c • y ∈ N q)
+      (fun q c d h y hy => by rw [mul_smul]; exact (N q).smul_mem d (h y hy))
+      hfin.toFinset
+      (fun q hq => by
+        have hq' : q.IsMaximal ∧ M q ≠ loc q L0 := (Set.Finite.mem_toFinset hfin).1 hq
+        obtain ⟨_, hsp⟩ := hNfull q hq'.1
+        exact exists_smul_le (K := K) hL0fg hsp)
   have hLc1 : ∀ x ∈ L, c1 • x ∈ L0 := by
     intro x hx
     apply mem_of_forall_loc
@@ -244,7 +290,8 @@ theorem exists_unique_lat (L0 : Submodule R V) (hL0 : IsFullLat K L0) (M : Ideal
     let f : V →ₗ[R] V := c1 • LinearMap.id
     have hK1 : algebraMap R K c1 ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective R K)).2 hc1
     have hf : Function.Injective f := fun v w h => by
-      have h' : c1 • v = c1 • w := by simpa only [f, LinearMap.smul_apply, LinearMap.id_apply] using h
+      have h' : c1 • v = c1 • w := by
+        simpa only [f, LinearMap.smul_apply, LinearMap.id_apply] using h
       have h'' : algebraMap R K c1 • v = algebraMap R K c1 • w := by
         rw [algebraMap_smul, algebraMap_smul]; exact h'
       exact (smul_right_inj hK1).1 h''
@@ -270,7 +317,8 @@ theorem exists_unique_lat (L0 : Submodule R V) (hL0 : IsFullLat K L0) (M : Ideal
       obtain ⟨s, hs, hsx⟩ := mem_loc.1 hx
       exact hMsat p hp s x hs ((hL _).1 hsx p hp)
     · intro hx
-      obtain ⟨d, hd, hdx⟩ := exists_smul_mem (K := K) L (v := x) (by rw [hLspan]; exact Submodule.mem_top)
+      obtain ⟨d, hd, hdx⟩ :=
+        exists_smul_mem (K := K) L (v := x) (by rw [hLspan]; exact Submodule.mem_top)
       obtain ⟨s, hs, hsx⟩ := exists_smul_mem_of_local M L hL hMsmul hMsat hp hx hd hdx
       exact mem_loc.2 ⟨s, hs, hsx⟩
   refine ExistsUnique.intro L ⟨hLfull, hloc⟩ ?_

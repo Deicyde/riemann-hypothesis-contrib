@@ -45,13 +45,13 @@ theorem not_dvd_den {q : ℚ} (hq : ‖(q : ℚ_[l])‖ ≤ 1) : ¬ l ∣ q.den 
   have h4 : l ∣ q.num.natAbs := Int.natCast_dvd.1 (Padic.norm_intCast_lt_one_iff.1 h3)
   exact hl.out.one_lt.ne' (Nat.eq_one_of_dvd_coprimes q.reduced h4 hd)
 
-theorem norm_ratCast_le_one [CharZero K] (h : ‖(l : K)‖ < 1) {q : ℚ} (hq : ‖(q : ℚ_[l])‖ ≤ 1) :
-    ‖(q : K)‖ ≤ 1 := by
+theorem norm_ratCast_le_one [CharZero K] (h : ‖(l : K)‖ < 1) {q : ℚ} (hq : ‖(q : ℚ_[l])‖ ≤ 1)
+    : ‖(q : K)‖ ≤ 1 := by
   rw [Rat.cast_def, norm_div, norm_natCast_eq_one l h (not_dvd_den l hq), div_one]
   exact IsUltrametricDist.norm_intCast_le_one K _
 
-theorem exists_continuous_padic [CharZero K] [CompleteSpace K] (h : ‖(l : K)‖ < 1) :
-    ∃ j : ℚ_[l] →+* K, Continuous j := by
+theorem exists_continuous_padic [CharZero K] [CompleteSpace K] (h : ‖(l : K)‖ < 1)
+    : ∃ j : ℚ_[l] →+* K, Continuous j := by
   let w : AbsoluteValue ℚ ℝ := Rat.AbsoluteValue.padic l
   let i : WithAbs w →+* ℚ_[l] := (Rat.castHom ℚ_[l]).comp (WithAbs.equiv w).toRingHom
   let f : WithAbs w →+* K := (Rat.castHom K).comp (WithAbs.equiv w).toRingHom
@@ -83,11 +83,12 @@ theorem exists_continuous_padic [CharZero K] [CompleteSpace K] (h : ‖(l : K)�
     (Padic.denseRange_ratCast l).mono (by
       rintro _ ⟨q, rfl⟩
       exact ⟨WithAbs.toAbs w q, rfl⟩)
-  exact ⟨IsDenseInducing.extendRingHom hi'.isUniformInducing hd hf,
-    (uniformContinuous_uniformly_extend hi'.isUniformInducing hd hf).continuous⟩
+  exact ⟨
+    IsDenseInducing.extendRingHom hi'.isUniformInducing hd hf,
+    (uniformContinuous_uniformly_extend hi'.isUniformInducing hd hf).continuous
+  ⟩
 
-def IsPrincipalPart (x : ℚ_[l]) (a : ℚ) : Prop :=
-  (∃ n : ℕ, a.den = l ^ n) ∧ ‖x - (a : ℚ_[l])‖ ≤ 1
+def IsPrincipalPart (x : ℚ_[l]) (a : ℚ) : Prop := (∃ n : ℕ, a.den = l ^ n) ∧ ‖x - (a : ℚ_[l])‖ ≤ 1
 
 theorem exists_isPrincipalPart (x : ℚ_[l]) : ∃ a, IsPrincipalPart l x a := by
   have hp : ‖(l : ℚ_[l])‖ < 1 := Padic.norm_p_lt_one
@@ -95,7 +96,9 @@ theorem exists_isPrincipalPart (x : ℚ_[l]) : ∃ a, IsPrincipalPart l x a := b
   obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < (‖x‖ + 1)⁻¹ by positivity) hp
   have hx : ‖x * (l : ℚ_[l]) ^ n‖ ≤ 1 := by
     rw [norm_mul, norm_pow]
-    calc ‖x‖ * ‖(l : ℚ_[l])‖ ^ n ≤ (‖x‖ + 1) * (‖x‖ + 1)⁻¹ := by gcongr; linarith
+    calc
+      ‖x‖ * ‖(l : ℚ_[l])‖ ^ n
+        ≤ (‖x‖ + 1) * (‖x‖ + 1)⁻¹ := by gcongr; linarith
       _ = 1 := mul_inv_cancel₀ (by positivity)
   let z : ℤ_[l] := ⟨_, hx⟩
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 (PadicInt.appr_spec n z)
@@ -119,8 +122,8 @@ theorem exists_isPrincipalPart (x : ℚ_[l]) : ∃ a, IsPrincipalPart l x a := b
     rw [h2]
     exact c.2
 
-theorem den_dvd_pow_sub {a b : ℚ} (ha : ∃ n : ℕ, a.den = l ^ n) (hb : ∃ n : ℕ, b.den = l ^ n) :
-    (∃ n : ℕ, (a + b).den = l ^ n) ∧ ∃ n : ℕ, (a - b).den = l ^ n := by
+theorem den_dvd_pow_sub {a b : ℚ} (ha : ∃ n : ℕ, a.den = l ^ n) (hb : ∃ n : ℕ, b.den = l ^ n)
+    : (∃ n : ℕ, (a + b).den = l ^ n) ∧ ∃ n : ℕ, (a - b).den = l ^ n := by
   obtain ⟨m, hm⟩ := ha
   obtain ⟨n, hn⟩ := hb
   have h1 := Rat.add_den_dvd a b
@@ -130,17 +133,18 @@ theorem den_dvd_pow_sub {a b : ℚ} (ha : ∃ n : ℕ, a.den = l ^ n) (hb : ∃ 
   obtain ⟨k', -, hk'⟩ := (Nat.dvd_prime_pow hl.out).1 h2
   exact ⟨⟨k, hk⟩, k', hk'⟩
 
-theorem IsPrincipalPart.add {x y : ℚ_[l]} {a b : ℚ} (ha : IsPrincipalPart l x a)
-    (hb : IsPrincipalPart l y b) : IsPrincipalPart l (x + y) (a + b) := by
+theorem IsPrincipalPart.add
+    {x y : ℚ_[l]} {a b : ℚ} (ha : IsPrincipalPart l x a) (hb : IsPrincipalPart l y b)
+    : IsPrincipalPart l (x + y) (a + b) := by
   refine ⟨(den_dvd_pow_sub l ha.1 hb.1).1, ?_⟩
   have : x + y - ((a + b : ℚ) : ℚ_[l]) = (x - a) + (y - b) := by push_cast; ring
   rw [this]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha.2 hb.2)
 
-theorem IsPrincipalPart.exp_eq {x : ℚ_[l]} {a b : ℚ} (ha : IsPrincipalPart l x a)
-    (hb : IsPrincipalPart l x b) :
-    Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) =
-      Complex.exp (2 * Real.pi * Complex.I * (b : ℂ)) := by
+theorem IsPrincipalPart.exp_eq
+    {x : ℚ_[l]} {a b : ℚ} (ha : IsPrincipalPart l x a) (hb : IsPrincipalPart l x b)
+    : Complex.exp (2 * Real.pi * Complex.I * (a : ℂ))
+      = Complex.exp (2 * Real.pi * Complex.I * (b : ℂ)) := by
   obtain ⟨n, hn⟩ := (den_dvd_pow_sub l ha.1 hb.1).2
   have h1 : ‖((a - b : ℚ) : ℚ_[l])‖ ≤ 1 := by
     have : ((a - b : ℚ) : ℚ_[l]) = (x - b) + -(x - a) := by push_cast; ring
@@ -151,8 +155,7 @@ theorem IsPrincipalPart.exp_eq {x : ℚ_[l]} {a b : ℚ} (ha : IsPrincipalPart l
     rcases n with _ | n
     · simpa using hn
     · exact absurd (hn ▸ dvd_pow_self l n.succ_ne_zero) h2
-  have h4 : a = b + ((a - b).num : ℚ) := by
-    rw [Rat.coe_int_num_of_den_eq_one h3]; ring
+  have h4 : a = b + ((a - b).num : ℚ) := by rw [Rat.coe_int_num_of_den_eq_one h3]; ring
   refine Complex.exp_eq_exp_iff_exists_int.2 ⟨(a - b).num, ?_⟩
   have h5 : (a : ℂ) = b + ((a - b).num : ℂ) := by exact_mod_cast congrArg (Rat.cast : ℚ → ℂ) h4
   rw [h5]
@@ -166,14 +169,14 @@ def padicChar : AddChar ℚ_[l] ℂ where
     simp
   map_add_eq_mul' x y := by
     rw [(exists_isPrincipalPart l (x + y)).choose_spec.exp_eq l
-      ((exists_isPrincipalPart l x).choose_spec.add l (exists_isPrincipalPart l y).choose_spec),
+        ((exists_isPrincipalPart l x).choose_spec.add l (exists_isPrincipalPart l y).choose_spec),
       ← Complex.exp_add]
     congr 1
     push_cast
     ring
 
-theorem padicChar_eq {x : ℚ_[l]} {a : ℚ} (ha : IsPrincipalPart l x a) :
-    padicChar l x = Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) :=
+theorem padicChar_eq {x : ℚ_[l]} {a : ℚ} (ha : IsPrincipalPart l x a)
+    : padicChar l x = Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) :=
   (exists_isPrincipalPart l x).choose_spec.exp_eq l ha
 
 end Padic
@@ -192,7 +195,8 @@ theorem resChar_mem : ((resChar p : ℕ) : 𝓞 F) ∈ p.asIdeal := by
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact ringChar.Nat.cast_ringChar
 
-@[reducible] def complRel : ValuativeRel (p.adicCompletion F) :=
+@[reducible]
+def complRel : ValuativeRel (p.adicCompletion F) :=
   ValuativeRel.ofValuation (Valued.v : Valuation (p.adicCompletion F) (WithZero (Multiplicative ℤ)))
 
 theorem isLocalField : letI := complRel p; IsNonarchimedeanLocalField (p.adicCompletion F) := by
@@ -213,16 +217,21 @@ theorem norm_resChar_lt_one : ‖((resChar p : ℕ) : p.adicCompletion F)‖ < 1
   have := (NumberField.FinitePlace.norm_lt_one_iff_mem F p _).2 (resChar_mem p)
   rwa [map_natCast, map_natCast] at this
 
-theorem complRel_algebraMap (x y : F) : letI := complRel p
-    (algebraMap F (p.adicCompletion F) x ≤ᵥ algebraMap F (p.adicCompletion F) y) ↔
-      p.valuation F x ≤ p.valuation F y := by
+theorem complRel_algebraMap (x y : F)
+    : letI := complRel p
+      (algebraMap F (p.adicCompletion F) x ≤ᵥ algebraMap F (p.adicCompletion F) y)
+        ↔ p.valuation F x ≤ p.valuation F y := by
   rw [← HeightOneSpectrum.valuedAdicCompletion_eq_valuation' p x,
     ← HeightOneSpectrum.valuedAdicCompletion_eq_valuation' p y]
   exact Iff.rfl
 
 end Completion
 
-theorem exists_locAt : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (sig : E →ₐ[F] E), Module.finrank F E = 2 → ∀ p : HeightOneSpectrum (𝓞 F), ∃ L : LocAt F E sig p, L.split = none := by
+theorem exists_locAt
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (sig : E →ₐ[F] E),
+      Module.finrank F E = 2
+        → ∀ p : HeightOneSpectrum (𝓞 F), ∃ L : LocAt F E sig p, L.split = none := by
   intro F E _ _ _ _ _ sig hr p
   letI := complRel p
   haveI hp : Fact (resChar p).Prime := ⟨resChar_prime p⟩
@@ -240,35 +249,40 @@ theorem exists_locAt : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   letI algE : Algebra ℚ_[resChar p] (p.adicCompletion F ⊗[F] E) :=
     ((algebraMap (p.adicCompletion F) (p.adicCompletion F ⊗[F] E)).comp
       (algebraMap ℚ_[resChar p] (p.adicCompletion F))).toAlgebra
-  refine ⟨{
-    Fp := p.adicCompletion F
-    Ep := p.adicCompletion F ⊗[F] E
-    epT := top
-    epM := ms
-    lf := isLocalField p
-    char0 := hc
-    ιF := algebraMap F _
-    ιE := (Algebra.TensorProduct.includeRight : E →ₐ[F] p.adicCompletion F ⊗[F] E).toRingHom
-    compat := fun a => ?_
-    dense := HeightOneSpectrum.denseRange_algebraMap F p
-    val := complRel_algebraMap p
-    free := inferInstance
-    rank := by rw [Module.finrank_baseChange, hr]
-    span := ?_
-    top := ⟨rfl⟩
-    borel := ⟨rfl⟩
-    cj := Algebra.TensorProduct.congr AlgEquiv.refl sigE
-    cj_ιE := fun x => ?_
-    O := (integralClosure 𝒪[p.adicCompletion F] (p.adicCompletion F ⊗[F] E)).toSubring
-    O_def := fun x => Iff.rfl
-    ellPrime := hp
-    qlA := alg
-    qlCont := hj
-    qlFin := FiniteDimensional.of_locallyCompactSpace _
-    psiE := (padicChar (resChar p)).compAddMonoidHom
-      (@Algebra.trace ℚ_[resChar p] (p.adicCompletion F ⊗[F] E) _ _ algE).toAddMonoidHom
-    psiE_def := fun y => ?_
-    split := none }, rfl⟩
+  refine ⟨
+    {
+      Fp := p.adicCompletion F
+      Ep := p.adicCompletion F ⊗[F] E
+      epT := top
+      epM := ms
+      lf := isLocalField p
+      char0 := hc
+      ιF := algebraMap F _
+      ιE := (Algebra.TensorProduct.includeRight : E →ₐ[F] p.adicCompletion F ⊗[F] E).toRingHom
+      compat := fun a => ?_
+      dense := HeightOneSpectrum.denseRange_algebraMap F p
+      val := complRel_algebraMap p
+      free := inferInstance
+      rank := by rw [Module.finrank_baseChange, hr]
+      span := ?_
+      top := ⟨rfl⟩
+      borel := ⟨rfl⟩
+      cj := Algebra.TensorProduct.congr AlgEquiv.refl sigE
+      cj_ιE := fun x => ?_
+      O := (integralClosure 𝒪[p.adicCompletion F] (p.adicCompletion F ⊗[F] E)).toSubring
+      O_def := fun x => Iff.rfl
+      ellPrime := hp
+      qlA := alg
+      qlCont := hj
+      qlFin := FiniteDimensional.of_locallyCompactSpace _
+      psiE :=
+        (padicChar (resChar p)).compAddMonoidHom
+          (@Algebra.trace ℚ_[resChar p] (p.adicCompletion F ⊗[F] E) _ _ algE).toAddMonoidHom
+      psiE_def := fun y => ?_
+      split := none
+    },
+    rfl
+  ⟩
   · simp [Algebra.TensorProduct.algebraMap_apply]
   · rw [eq_top_iff]
     rintro x -
@@ -281,8 +295,9 @@ theorem exists_locAt : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, rfl⟩)
   · simp [sigE]
-  · obtain ⟨a, ha⟩ := exists_isPrincipalPart (resChar p)
-      (@Algebra.trace ℚ_[resChar p] (p.adicCompletion F ⊗[F] E) _ _ algE y)
+  · obtain ⟨a, ha⟩ :=
+      exists_isPrincipalPart (resChar p)
+        (@Algebra.trace ℚ_[resChar p] (p.adicCompletion F ⊗[F] E) _ _ algE y)
     exact ⟨a, ha.1, ha.2, padicChar_eq _ ha⟩
 
 end GlobalTheory.LocalData

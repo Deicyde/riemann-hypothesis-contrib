@@ -15,6 +15,7 @@ namespace PositivityTheory.KB
 
 open SpectralGap in
 theorem sGap_of : SGap :=
-  sGap_of_parts (gapAbs_of hilb_holds design_holds unfold_holds aeConst_holds) unfold_holds arith_holds dens_holds
+  sGap_of_parts (gapAbs_of hilb_holds design_holds unfold_holds aeConst_holds) unfold_holds
+    arith_holds dens_holds
 
 end PositivityTheory.KB

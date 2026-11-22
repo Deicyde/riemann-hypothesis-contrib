@@ -122,7 +122,9 @@ theorem trivS_of (hSG : SsetGroup) (hUW : UWCompact) (hN : NGroup) (hNC : NContr
     have h1 := hNle m hm
     have h2 := hD.1 h (hUS h hh)
     have h3 := hM' h hh
-    calc D h * D m ≤ D h * 1 := mul_le_mul_of_nonneg_left h1 h2.le
+    calc
+      D h * D m
+        ≤ D h * 1 := mul_le_mul_of_nonneg_left h1 h2.le
       _ ≤ M' := by
         rw [mul_one]
         exact h3

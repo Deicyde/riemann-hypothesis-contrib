@@ -15,13 +15,19 @@ namespace PI.StrongApproxE
 
 namespace DedekindLFunctions
 
-variable {R : Type*} [CommRing R] [IsDedekindDomain R] {K : Type*} [Field K] [Algebra R K]
-  [IsFractionRing R K]
+variable
+  {R : Type*} [CommRing R] [IsDedekindDomain R]
+  {K : Type*} [Field K] [Algebra R K] [IsFractionRing R K]
 
-theorem sa (T : Finset (HeightOneSpectrum R)) (a c : HeightOneSpectrum R → K) (hc : ∀ p ∈ T, c p ≠ 0) :
-    ∃ t : K, (∀ p ∈ T, p.valuation K (t - a p) ≤ p.valuation K (c p)) ∧
-      ∀ p, p ∉ T → p.valuation K t ≤ 1 := by
-  first | exact Bl.VolumeRatioCancellation.goal1 .. | (apply Bl.VolumeRatioCancellation.goal1 <;> assumption) | (intros; apply Bl.VolumeRatioCancellation.goal1 <;> assumption)
+theorem sa
+    (T : Finset (HeightOneSpectrum R)) (a c : HeightOneSpectrum R → K) (hc : ∀ p ∈ T, c p ≠ 0)
+    : ∃ t : K,
+      (∀ p ∈ T, p.valuation K (t - a p) ≤ p.valuation K (c p))
+        ∧ ∀ p, p ∉ T → p.valuation K t ≤ 1 := by
+  first
+  | exact Bl.VolumeRatioCancellation.goal1 ..
+  | (apply Bl.VolumeRatioCancellation.goal1 <;> assumption)
+  | (intros; apply Bl.VolumeRatioCancellation.goal1 <;> assumption)
 
 end DedekindLFunctions
 

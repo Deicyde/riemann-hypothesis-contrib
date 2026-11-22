@@ -11,7 +11,8 @@ open scoped Classical
 
 namespace PI.UnitaryGroupMassFormula.ScalarEquivalenceHermitianSpace
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef PI.ScalPairs
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef PI.ScalPairs
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,7 +22,8 @@ theorem finrank_VS (D : D7) : finrank D.host.E (VS D).V = D.R.k + 2 * D.R.rS + 1
   obtain ⟨j, hj⟩ := D.R.m_even
   have hm2 := D.R.two_le_m
   rw [h1, h2]
-  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r, Formalism.BasicNotions.Ranks.rS, zero_mul, add_zero]
+  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r,
+    Formalism.BasicNotions.Ranks.rS, zero_mul, add_zero]
   omega
 
 theorem tu_ne_zero (D : D7) (u : D.what₂.Word) : ((Tu D u : ℕ) : D.host.E) ≠ 0 := by

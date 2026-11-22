@@ -48,8 +48,8 @@ theorem RestConstants.intersectionNumber_baseChange : RestConstants.Statement :=
   intro f N hf hN
   have hf' : (0 : ℝ) < f := by exact_mod_cast hf
   have hN' : (0 : ℝ) < N := by exact_mod_cast (lt_of_lt_of_le (by norm_num) hN)
-  have : (1.5 : ℝ) * f * (3 / 2 * (N : ℝ) ^ 2) * (2.78 / (4 * f * (N : ℝ) ^ 2)) =
-      1.5 * (3 / 2) * 2.78 / 4 := by
+  have : (1.5 : ℝ) * f * (3 / 2 * (N : ℝ) ^ 2) * (2.78 / (4 * f * (N : ℝ) ^ 2))
+      = 1.5 * (3 / 2) * 2.78 / 4 := by
     field_simp
   rw [this]
   norm_num
@@ -58,7 +58,9 @@ theorem GeometricTail.intersectionNumber_baseChange : GeometricTail.Statement :=
   intro p k hp hk
   set x : ℝ := (p ^ k)⁻¹ with hx
   have hpk : (2 : ℝ) ≤ p ^ k := by
-    calc (2 : ℝ) ≤ p := hp
+    calc
+      (2 : ℝ)
+        ≤ p := hp
       _ = p ^ 1 := (pow_one p).symm
       _ ≤ p ^ k := pow_le_pow_right₀ (by linarith) hk
   have hx0 : 0 ≤ x := by positivity
@@ -69,8 +71,7 @@ theorem GeometricTail.intersectionNumber_baseChange : GeometricTail.Statement :=
   have hterm : ∀ n : ℕ, (p ^ ((n + 1) * k))⁻¹ = x * x ^ n := by
     intro n
     rw [hx, ← pow_succ', inv_pow, ← pow_mul, mul_comm k]
-  have hs : Summable (fun n : ℕ => x ^ n) :=
-    summable_geometric_of_lt_one hx0 (by linarith)
+  have hs : Summable (fun n : ℕ => x ^ n) := summable_geometric_of_lt_one hx0 (by linarith)
   refine ⟨?_, ?_⟩
   · simp_rw [hterm]
     exact hs.mul_left x
@@ -79,7 +80,9 @@ theorem GeometricTail.intersectionNumber_baseChange : GeometricTail.Statement :=
     have h1 : (1 - x)⁻¹ ≤ 2 := by
       rw [inv_le_comm₀ (by linarith) (by norm_num)]
       linarith
-    calc x * (1 - x)⁻¹ ≤ x * 2 := mul_le_mul_of_nonneg_left h1 hx0
+    calc
+      x * (1 - x)⁻¹
+        ≤ x * 2 := mul_le_mul_of_nonneg_left h1 hx0
       _ = 2 * x := by ring
 
 theorem exp_three_eighths_le : Real.exp (3 / 8) ≤ 1.5 := by
@@ -89,8 +92,7 @@ theorem exp_three_eighths_le : Real.exp (3 / 8) ≤ 1.5 := by
     norm_num
   by_contra hlt
   push Not at hlt
-  have h1 : (1.5 : ℝ) ^ 8 < Real.exp (3 / 8) ^ 8 :=
-    pow_lt_pow_left₀ hlt (by norm_num) (by norm_num)
+  have h1 : (1.5 : ℝ) ^ 8 < Real.exp (3 / 8) ^ 8 := pow_lt_pow_left₀ hlt (by norm_num) (by norm_num)
   have h2 : Real.exp 1 ^ 3 < (2.7182818286 : ℝ) ^ 3 :=
     pow_lt_pow_left₀ he (Real.exp_pos 1).le (by norm_num)
   rw [h8] at h1
@@ -103,8 +105,10 @@ theorem ExponentialTail.intersectionNumber_baseChange : ExponentialTail.Statemen
   have hu0 : 0 ≤ u := by positivity
   have hu38 : u ≤ 3 / 8 := by rw [hu, div_le_iff₀ hp]; linarith
   have hA : 0 ≤ X / p ^ 2 := by positivity
-  have hterm : ∀ k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ) =
-      X / p ^ 2 * (u ^ k * (2 / ((k + 2).factorial : ℝ))) := by
+  have hterm
+      : ∀ k : ℕ,
+        2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)
+          = X / p ^ 2 * (u ^ k * (2 / ((k + 2).factorial : ℝ))) := by
     intro k
     rw [hu, div_pow]
     field_simp
@@ -118,8 +122,10 @@ theorem ExponentialTail.intersectionNumber_baseChange : ExponentialTail.Statemen
       exact_mod_cast this
     rw [div_le_div_iff₀ (by positivity) (by positivity)]
     linarith
-  have hbound : ∀ k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ) ≤
-      X / p ^ 2 * (u ^ k / (k.factorial : ℝ)) := by
+  have hbound
+      : ∀ k : ℕ,
+        2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)
+          ≤ X / p ^ 2 * (u ^ k / (k.factorial : ℝ)) := by
     intro k
     rw [hterm]
     apply mul_le_mul_of_nonneg_left _ hA
@@ -132,12 +138,12 @@ theorem ExponentialTail.intersectionNumber_baseChange : ExponentialTail.Statemen
   have hS : Summable (fun k : ℕ => 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)) :=
     Summable.of_nonneg_of_le hnn hbound hsum
   refine ⟨hS, ?_, ?_⟩
-  · calc ∑' k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)
+  · calc
+      ∑' k : ℕ, 2 * (p ^ (k + 2))⁻¹ * X ^ (k + 1) / ((k + 2).factorial : ℝ)
         ≤ ∑' k : ℕ, X / p ^ 2 * (u ^ k / (k.factorial : ℝ)) := hS.tsum_le_tsum hbound hsum
       _ = X / p ^ 2 * Real.exp u := by
         rw [tsum_mul_left, Real.exp_eq_exp_ℝ, NormedSpace.exp_eq_tsum_div]
-      _ ≤ X / p ^ 2 * Real.exp (3 / 8) :=
-        mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr hu38) hA
+      _ ≤ X / p ^ 2 * Real.exp (3 / 8) := mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr hu38) hA
       _ = Real.exp (3 / 8) * X / p ^ 2 := by ring
   · have := exp_three_eighths_le
     rw [mul_div_assoc, mul_div_assoc]
@@ -146,21 +152,22 @@ theorem ExponentialTail.intersectionNumber_baseChange : ExponentialTail.Statemen
 theorem ChebyshevThetaBound.intersectionNumber_baseChange : ChebyshevThetaBound.Statement := by
   intro x hx
   set n := ⌊x⌋₊
-  have hprod : ∑ p ∈ (Finset.range (n + 1)).filter Nat.Prime, Real.log p =
-      Real.log (primorial n) := by
+  have hprod
+      : ∑ p ∈ (Finset.range (n + 1)).filter Nat.Prime, Real.log p = Real.log (primorial n) := by
     rw [primorial, Nat.cast_prod, Real.log_prod]
     intro p hp
     have := (Finset.mem_filter.mp hp).2.pos
     exact_mod_cast this.ne'
   rw [hprod]
   have hpos : (0 : ℝ) < primorial n := by exact_mod_cast primorial_pos n
-  calc Real.log (primorial n) ≤ Real.log ((4 : ℝ) ^ n) := by
-        apply Real.log_le_log hpos
-        exact_mod_cast primorial_le_four_pow n
+  calc
+    Real.log (primorial n) ≤ Real.log ((4 : ℝ) ^ n) := by
+      apply Real.log_le_log hpos
+      exact_mod_cast primorial_le_four_pow n
     _ = n * Real.log 4 := by rw [Real.log_pow]
     _ ≤ x * Real.log 4 := by
-        apply mul_le_mul_of_nonneg_right (Nat.floor_le hx)
-        exact Real.log_nonneg (by norm_num)
+      apply mul_le_mul_of_nonneg_right (Nat.floor_le hx)
+      exact Real.log_nonneg (by norm_num)
 
 end
 

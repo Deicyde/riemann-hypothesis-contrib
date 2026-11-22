@@ -19,8 +19,8 @@ open GlobalTheory.HostModel
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem bar_mem_adjoin (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) :
-    H.bar a ∈ Algebra.adjoin ℤ {H.w0} := by
+theorem bar_mem_adjoin (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0})
+    : H.bar a ∈ Algebra.adjoin ℤ {H.w0} := by
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
     rw [Set.mem_singleton_iff.mp hx, cmHost_bar_halfIntegerGenerator]
@@ -31,15 +31,17 @@ theorem bar_mem_adjoin (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ 
   | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
   | mul x y _ _ hx hy => rw [map_mul]; exact mul_mem hx hy
 
-theorem map_bar_span_bar (H : Host E) (al : 𝓞 E) :
-    (Ideal.span {H.bar al}).map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {al} := by
+theorem map_bar_span_bar (H : Host E) (al : 𝓞 E)
+    : (Ideal.span {H.bar al}).map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {al} := by
   rw [Ideal.map_span, Set.image_singleton]
   congr 2
   exact bar_bar H al
 
-def levelOfSplit (H : Host E) (al : 𝓞 E) (M A : ℕ) (hal : al ∈ Algebra.adjoin ℤ {H.w0})
-    (hM : al * H.bar al = (M : 𝓞 E)) (hc : IsCoprime al (H.bar al)) (h3 : 3 ≤ M) (ho : Odd M)
-    (hA : 0 < A) : Level H where
+def levelOfSplit
+    (H : Host E) (al : 𝓞 E) (M A : ℕ)
+    (hal : al ∈ Algebra.adjoin ℤ {H.w0}) (hM : al * H.bar al = (M : 𝓞 E))
+    (hc : IsCoprime al (H.bar al)) (h3 : 3 ≤ M) (ho : Odd M) (hA : 0 < A)
+    : Level H where
   M := M
   three_le := h3
   odd := ho
@@ -50,8 +52,7 @@ def levelOfSplit (H : Host E) (al : 𝓞 E) (M A : ℕ) (hal : al ∈ Algebra.ad
       rintro a rfl
       exact ⟨Ideal.mem_span_singleton_self _, bar_mem_adjoin H hal⟩
     · exact Ideal.span_le.mpr fun a ha => ha.1
-  prod := by
-    rw [map_bar_span_bar, Ideal.span_singleton_mul_span_singleton, mul_comm, hM]
+  prod := by rw [map_bar_span_bar, Ideal.span_singleton_mul_span_singleton, mul_comm, hM]
   coprime := by
     rw [map_bar_span_bar, ← Ideal.isCoprime_iff_sup_eq, Ideal.isCoprime_span_singleton_iff]
     exact hc.symm
@@ -79,21 +80,26 @@ theorem zeta_eq_pow_of_dvd {a n : ℕ} (hn : 0 < n) (h : a ∣ n) : ∃ k : ℕ,
 theorem isIntegral_zeta {n : ℕ} (hn : 0 < n) : IsIntegral ℚ (zeta n) :=
   ((Complex.isPrimitiveRoot_exp n hn.ne').isIntegral hn).tower_top
 
-theorem hostRootValue_eq_or_neg_embedding (H : Host E) (τ : E →+* ℂ) : H.rt0 = τ (H.rt : E) ∨ H.rt0 = -τ (H.rt : E) := by
+theorem hostRootValue_eq_or_neg_embedding (H : Host E) (τ : E →+* ℂ)
+    : H.rt0 = τ (H.rt : E) ∨ H.rt0 = - τ (H.rt : E) := by
   apply sq_eq_sq_iff_eq_or_eq_neg.mp
   rw [H.sqrt_neg_disc_sq, ← map_pow, coe_rt_sq]
   simp
 
 def minCoeff {H : Host E} (l : Level H) : Coeff l :=
-  have hconj : ∀ (τ : E →+* ℂ) (a : E), τ a ∈
-      IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'} := fun τ a =>
-    (le_sup_left : IntermediateField.normalClosure ℚ E ℂ ≤ _)
-      (AlgHom.fieldRange_le_normalClosure τ.toRatAlgHom ⟨a, rfl⟩)
-  have hz : zeta l.M' ∈
-      IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'} :=
+  have hconj
+      : ∀ (τ : E →+* ℂ) (a : E),
+        τ a ∈ IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'} :=
+    fun τ a =>
+      (le_sup_left : IntermediateField.normalClosure ℚ E ℂ ≤ _) (AlgHom.fieldRange_le_normalClosure
+        τ.toRatAlgHom ⟨a, rfl⟩)
+  have hz
+      : zeta l.M'
+        ∈ IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'} :=
     (le_sup_right : IntermediateField.adjoin ℚ {zeta l.M'} ≤ _)
       (IntermediateField.mem_adjoin_simple_self ℚ _)
-  { F := IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'}
+  {
+    F := IntermediateField.normalClosure ℚ E ℂ ⊔ IntermediateField.adjoin ℚ {zeta l.M'}
     fin := by
       have := IntermediateField.adjoin.finiteDimensional (isIntegral_zeta (M'_pos l))
       infer_instance
@@ -109,7 +115,8 @@ def minCoeff {H : Host E} (l : Level H) : Coeff l :=
         · exact neg_mem (hconj τ _)
       · obtain ⟨k, hk⟩ := zeta_eq_pow_of_dvd (M'_pos l) (Nat.dvd_lcm_right l.M l.A)
         rw [hk]
-        exact pow_mem hz k }
+        exact pow_mem hz k
+  }
 
 instance instNonemptyCoeff {H : Host E} (l : Level H) : Nonempty (Coeff l) := ⟨minCoeff l⟩
 
@@ -117,16 +124,18 @@ end GlobalTheory.LevelExist
 
 namespace GlobalTheory
 
-theorem level_of_split_and_level_coeff_exist :
-    (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (al : 𝓞 E) (M A : ℕ),
-      al ∈ Algebra.adjoin ℤ {H.w0} → al * H.bar al = (M : 𝓞 E) → IsCoprime al (H.bar al) → 3 ≤ M →
-      Odd M → 0 < A → ∃ l : Level H, l.M = M ∧ l.A = A ∧ l.Mb = Ideal.span {H.bar al}) ∧
-    (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E), Nonempty (Level H)) ∧
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H),
-      Nonempty (Coeff l) :=
-  ⟨fun _ _ _ _ H al M A h1 h2 h3 h4 h5 h6 =>
-      ⟨LevelExist.levelOfSplit H al M A h1 h2 h3 h4 h5 h6, rfl, rfl, rfl⟩,
-    fun _ _ _ _ H => HostModel.instNonemptyLevel H,
-    fun _ _ _ _ _ l => ⟨LevelExist.minCoeff l⟩⟩
+theorem level_of_split_and_level_coeff_exist
+    : (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (al : 𝓞 E) (M A : ℕ),
+        al ∈ Algebra.adjoin ℤ {H.w0} → al * H.bar al = (M : 𝓞 E) → IsCoprime al (H.bar al) → 3 ≤ M
+          → Odd M → 0 < A
+          → ∃ l : Level H, l.M = M ∧ l.A = A ∧ l.Mb = Ideal.span {H.bar al})
+      ∧ (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E), Nonempty (Level H))
+      ∧ ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H),
+        Nonempty (Coeff l) := ⟨
+  fun _ _ _ _ H al M A h1 h2 h3 h4 h5 h6 =>
+    ⟨LevelExist.levelOfSplit H al M A h1 h2 h3 h4 h5 h6, rfl, rfl, rfl⟩,
+  fun _ _ _ _ H => HostModel.instNonemptyLevel H,
+  fun _ _ _ _ _ l => ⟨LevelExist.minCoeff l⟩
+⟩
 
 end GlobalTheory

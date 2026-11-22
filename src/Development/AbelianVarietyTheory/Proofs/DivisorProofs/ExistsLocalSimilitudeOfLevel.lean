@@ -17,22 +17,35 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInj
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.UPel.LocSim
 
-theorem exists_open_eq_of_torsion_point : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A], IsAbelianScheme A → ∀ (n : ℕ), IsUnit (n : Γ(S, ⊤)) → ∀ (σ σ' : 𝟙_ (Over S) ⟶ A), σ ^ n = 1 → σ' ^ n = 1 → ∀ (k : Type) [Field k] (y : Sp k ⟶ S), toUnit (Over.mk y) ≫ σ = toUnit (Over.mk y) ≫ σ' → ∃ V : S.Opens, Set.range y ⊆ (V : Set S) ∧ V.ι ≫ σ.left = V.ι ≫ σ'.left := by
+theorem exists_open_eq_of_torsion_point
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (n : ℕ),
+          IsUnit (n : Γ(S, ⊤))
+            → ∀ (σ σ' : 𝟙_ (Over S) ⟶ A),
+              σ ^ n = 1 → σ' ^ n = 1
+                → ∀ (k : Type) [Field k] (y : Sp k ⟶ S),
+                  toUnit (Over.mk y) ≫ σ = toUnit (Over.mk y) ≫ σ'
+                    → ∃ V : S.Opens, Set.range y ⊆ (V : Set S) ∧ V.ι ≫ σ.left = V.ι ≫ σ'.left := by
   intro S A _ _ hA n hn σ σ' hσ hσ' k _ y hy
   haveI := hA.smooth
   haveI : FormallyUnramified (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left := GlobalTheory.formallyUnramified_mulA S A n hn
   haveI : LocallyOfFiniteType (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left := by
     have : LocallyOfFiniteType ((ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left ≫ A.hom) := by rw [Over.w]; infer_instance
     exact locallyOfFiniteType_of_comp _ A.hom
-  have hab : σ.left ≫ (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left = σ'.left ≫ (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left := by
+  have hab
+      : σ.left ≫ (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left
+        = σ'.left ≫ (ReciprocityTheory.ChartRestriction.G.Out.mulA A n).left := by
     rw [← Over.comp_left, ← Over.comp_left]
     congr 1
     show σ ≫ 𝟙 A ^ n = σ' ≫ 𝟙 A ^ n
@@ -44,11 +57,13 @@ theorem exists_open_eq_of_torsion_point : ∀ (S : Scheme.{0}) (A : Over S) [Grp
       simp only [Over.comp_left, GlobalTheory.ObjPull.toUnit_left'] at h
       exact h
     exact GlobalTheory.range_subset_range_equalizer_ι y hy'
-  · rw [← cancel_epi (equalizer.ι σ.left σ'.left).isoOpensRange.hom, ← Category.assoc, ← Category.assoc,
-      Scheme.Hom.isoOpensRange_hom_ι, equalizer.condition]
+  · rw [← cancel_epi (equalizer.ι σ.left σ'.left).isoOpensRange.hom, ← Category.assoc,
+      ← Category.assoc, Scheme.Hom.isoOpensRange_hom_ι, equalizer.condition]
 
 section
-variable {F : Type} [Field F] [NumberField F] [IsCMField F] {D : GlobalTheory.UPel.Datum F} {p N : ℕ} {S : Scheme.{0}}
+variable
+  {F : Type} [Field F] [NumberField F] [IsCMField F]
+  {D : GlobalTheory.UPel.Datum F} {p N : ℕ} {S : Scheme.{0}}
   {s : S ⟶ Sp (D.OEp p)} {o : GlobalTheory.UPel.Obj D p N s}
 
 end

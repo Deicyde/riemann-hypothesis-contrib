@@ -6,14 +6,15 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.Rat
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-
 open Matrix in
-theorem posDef_coercive {n : ℕ} (A : Matrix (Fin n) (Fin n) ℝ) (hA : A.PosDef) :
-    ∃ ε : ℝ, 0 < ε ∧ ∀ x : Fin n → ℝ, ε * ‖x‖ ^ 2 ≤ x ⬝ᵥ (A *ᵥ x) := by
+theorem posDef_coercive {n : ℕ} (A : Matrix (Fin n) (Fin n) ℝ) (hA : A.PosDef)
+    : ∃ ε : ℝ, 0 < ε ∧ ∀ x : Fin n → ℝ, ε * ‖x‖ ^ 2 ≤ x ⬝ᵥ (A *ᵥ x) := by
   have hpos : ∀ x : Fin n → ℝ, x ≠ 0 → 0 < x ⬝ᵥ (A *ᵥ x) := by
     intro x hx
     simpa using (Matrix.posDef_iff_dotProduct_mulVec.1 hA).2 hx
@@ -33,36 +34,37 @@ theorem posDef_coercive {n : ℕ} (A : Matrix (Fin n) (Fin n) ℝ) (hA : A.PosDe
   by_cases hx : x = 0
   · subst hx; simp
   have hn : ‖x‖ ≠ 0 := norm_ne_zero_iff.2 hx
-  have hu : (‖x‖⁻¹ • x) ∈ Metric.sphere (0 : Fin n → ℝ) 1 := by
-    simp [norm_smul, hn]
+  have hu : (‖x‖⁻¹ • x) ∈ Metric.sphere (0 : Fin n → ℝ) 1 := by simp [norm_smul, hn]
   have h1 := hb _ hu
   have e : (‖x‖⁻¹ • x) ⬝ᵥ (A *ᵥ (‖x‖⁻¹ • x)) = (‖x‖⁻¹) ^ 2 * (x ⬝ᵥ (A *ᵥ x)) := by
     rw [Matrix.mulVec_smul, dotProduct_smul, smul_dotProduct]
     simp [sq, mul_assoc]
   rw [e] at h1
   have h2 : 0 < ‖x‖ ^ 2 := by positivity
-  calc ε * ‖x‖ ^ 2 ≤ ((‖x‖⁻¹) ^ 2 * (x ⬝ᵥ (A *ᵥ x))) * ‖x‖ ^ 2 := by gcongr
+  calc
+    ε * ‖x‖ ^ 2
+      ≤ ((‖x‖⁻¹) ^ 2 * (x ⬝ᵥ (A *ᵥ x))) * ‖x‖ ^ 2 := by gcongr
     _ = x ⬝ᵥ (A *ᵥ x) := by field_simp
 
-
 open Matrix in
-theorem sublevel_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
-    (β : LinearMap.BilinForm ℤ X), (∀ y z, β y z = β z y) → (∀ y, y ≠ 0 → 0 < β y y) →
-    ∀ c : ℤ, {y : X | β y y ≤ c}.Finite := by
+theorem sublevel_finite
+    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] [Module.Free ℤ X]
+        (β : LinearMap.BilinForm ℤ X),
+      (∀ y z, β y z = β z y) → (∀ y, y ≠ 0 → 0 < β y y) → ∀ c : ℤ, {y : X | β y y ≤ c}.Finite := by
   intro X _ _ _ β hsym hpos c
-  obtain ⟨n, b⟩ : ∃ n : ℕ, Nonempty (Module.Basis (Fin n) ℤ X) :=
-    ⟨_, ⟨Module.finBasis ℤ X⟩⟩
+  obtain ⟨n, b⟩ : ∃ n : ℕ, Nonempty (Module.Basis (Fin n) ℤ X) := ⟨_, ⟨Module.finBasis ℤ X⟩⟩
   obtain ⟨b⟩ := b
   let Q : Matrix (Fin n) (Fin n) ℚ := Matrix.of fun i j => ((β (b i) (b j) : ℤ) : ℚ)
   have hQs : Q.IsSymm := by
     ext i j
     simp [Q, hsym (b i) (b j)]
-  have hval : ∀ v : Fin n → ℤ, β (∑ i, v i • b i) (∑ i, v i • b i)
-      = ∑ i, ∑ j, β (b i) (b j) * v i * v j := by
+  have hval
+      : ∀ v : Fin n → ℤ,
+        β (∑ i, v i • b i) (∑ i, v i • b i) = ∑ i, ∑ j, β (b i) (b j) * v i * v j := by
     intro v
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
-      Finset.mul_sum]
+        Finset.mul_sum]
     refine Finset.sum_comm.trans ?_
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -78,12 +80,13 @@ theorem sublevel_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] 
   have hA := GlobalTheory.CompanionTheory.Ar.Fan.posDef_of_int_pos n Q hQs hQpos
   obtain ⟨ε, hε, hco⟩ := posDef_coercive _ hA
   obtain ⟨N, hN⟩ := exists_nat_ge ((c : ℝ) / ε)
-  have hbound : ∀ v : Fin n → ℤ, β (∑ i, v i • b i) (∑ i, v i • b i) ≤ c →
-      ∀ i, |v i| ≤ (N + 1 : ℤ) := by
+  have hbound
+      : ∀ v : Fin n → ℤ, β (∑ i, v i • b i) (∑ i, v i • b i) ≤ c → ∀ i, |v i| ≤ (N + 1 : ℤ) := by
     intro v hv i
     have h1 := hco (fun i => (v i : ℝ))
-    have h2 : (fun i => (v i : ℝ)) ⬝ᵥ ((Q.map (Rat.cast : ℚ → ℝ)) *ᵥ (fun i => (v i : ℝ)))
-        = ((β (∑ i, v i • b i) (∑ i, v i • b i) : ℤ) : ℝ) := by
+    have h2
+        : (fun i => (v i : ℝ)) ⬝ᵥ ((Q.map (Rat.cast : ℚ → ℝ)) *ᵥ (fun i => (v i : ℝ)))
+          = ((β (∑ i, v i • b i) (∑ i, v i • b i) : ℤ) : ℝ) := by
       rw [hval]
       simp only [dotProduct, mulVec, Finset.mul_sum, Int.cast_sum, Int.cast_mul]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

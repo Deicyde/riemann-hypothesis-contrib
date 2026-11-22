@@ -19,16 +19,21 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.JEqOrbInt
 
 open MeasureTheory Matrix
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S BranchingSupport GlobalTheory.CellAmp
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S BranchingSupport
+  GlobalTheory.CellAmp
 
 namespace GlobalTheory.GapConstant
 
 set_option maxHeartbeats 2000000 in
-theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
-    Formalism.FourierDecayAlt.ThreeDimData.GapOK k r (1000 * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-              (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) ∧
-      GlobalTheory.CellAmp.GapCell k r (1000 * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-        (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) := by
+theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k)
+    : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r
+        (1000 * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+          * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+            + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3))
+      ∧ GlobalTheory.CellAmp.GapCell k r
+        (1000 * ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+          * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+            + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) := by
   have hk' : (1 : ℝ) ≤ k := by exact_mod_cast hk
   have hr0 : (0 : ℝ) ≤ r := Nat.cast_nonneg r
   have hs : ((2 * r + 2 : ℕ) : ℝ) = 2 * ((r : ℝ) + 1) := by push_cast; ring
@@ -48,7 +53,9 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     norm_num
   rw [hrp]
   set X : ℝ := 3 * P * N ^ 2 + N ^ 3 with hX
-  have ha : Formalism.FourierDecayAlt.ThreeDimData.aOf r (1000 * ((2 * P) ^ 4 * Real.sqrt (2 * P)) * X) = 2000 * P ^ 4 * X := by
+  have ha
+      : Formalism.FourierDecayAlt.ThreeDimData.aOf r (1000 * ((2 * P) ^ 4 * Real.sqrt (2 * P)) * X)
+        = 2000 * P ^ 4 * X := by
     unfold Formalism.FourierDecayAlt.ThreeDimData.aOf
     rw [← hPdef]
     field_simp
@@ -58,16 +65,19 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     unfold Formalism.FourierDecayAlt.ThreeDimData.AS Formalism.FourierDecayAlt.ThreeDimData.dN
     have e : ((2 * r + k : ℕ) : ℝ) = 2 * (r : ℝ) + k := by push_cast; ring
     rw [e]
-    have hd0 : 0 ≤ (r : ℝ) * ((r : ℝ) - 1) + 2 * (r : ℝ) * ((k : ℝ) + 1) + (r : ℝ) ^ 2 := by nlinarith
+    have hd0 : 0 ≤ (r : ℝ) * ((r : ℝ) - 1) + 2 * (r : ℝ) * ((k : ℝ) + 1) + (r : ℝ) ^ 2 := by
+      nlinarith
     have hd : (r : ℝ) * ((r : ℝ) - 1) + 2 * (r : ℝ) * ((k : ℝ) + 1) + (r : ℝ) ^ 2 ≤ 2 * P * N := by
       rw [hNdef]; nlinarith
     have hm : 2 * (r : ℝ) + k ≤ N := by rw [hNdef]; linarith
-    calc (2 * (r : ℝ) + k) * ((r : ℝ) * ((r : ℝ) - 1) + 2 * (r : ℝ) * ((k : ℝ) + 1) + (r : ℝ) ^ 2)
+    calc
+      (2 * (r : ℝ) + k) * ((r : ℝ) * ((r : ℝ) - 1) + 2 * (r : ℝ) * ((k : ℝ) + 1) + (r : ℝ) ^ 2)
         ≤ N * (2 * P * N) := mul_le_mul hm hd hd0 (by linarith)
       _ = 2 * P * N ^ 2 := by ring
   have hAS0 : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.AS k r := by
     unfold Formalism.FourierDecayAlt.ThreeDimData.AS Formalism.FourierDecayAlt.ThreeDimData.dN
-    apply mul_nonneg (Nat.cast_nonneg _); nlinarith
+    apply mul_nonneg (Nat.cast_nonneg _)
+    nlinarith
   have hAG : Formalism.FourierDecayAlt.ThreeDimData.AG k r ≤ 4 * N * P := by
     unfold Formalism.FourierDecayAlt.ThreeDimData.AG
     have : (k : ℝ) + r ≤ N := by rw [hNdef]; linarith
@@ -76,7 +86,8 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     unfold Formalism.FourierDecayAlt.ThreeDimData.AG; positivity
   have hM : Formalism.FourierDecayAlt.ThreeDimData.Mexp r ≤ 2 * P ^ 2 := by
     unfold Formalism.FourierDecayAlt.ThreeDimData.Mexp; rw [hPdef]; nlinarith
-  have hM0 : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.Mexp r := by unfold Formalism.FourierDecayAlt.ThreeDimData.Mexp; positivity
+  have hM0 : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.Mexp r := by
+    unfold Formalism.FourierDecayAlt.ThreeDimData.Mexp; positivity
 
   have hP35 : P ^ 3 ≤ P ^ 5 := pow_le_pow_right₀ hP1 (by norm_num)
   have hP15 : P ≤ P ^ 5 := by simpa using pow_le_pow_right₀ hP1 (show 1 ≤ 5 by norm_num)
@@ -96,12 +107,22 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
   have m4 : (1 : ℝ) ≤ P ^ 5 * N ^ 2 := one_le_mul_of_one_le_of_one_le hP5 hN21
   have m5 : P * N ^ 2 ≤ P ^ 5 * N ^ 2 := mul_le_mul_of_nonneg_right hP15 hN2_0
   have m6 : P ^ 2 * N ^ 2 ≤ P ^ 5 * N ^ 2 := mul_le_mul_of_nonneg_right hP25 hN2_0
-  have hprod : Formalism.FourierDecayAlt.ThreeDimData.Mexp r * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r) ≤
-      (2 * P ^ 2) * (2 * P * N ^ 2 + 4 * N * P) :=
-    mul_le_mul hM (show Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r ≤ 2 * P * N ^ 2 + 4 * N * P by linarith)
+  have hprod
+      : Formalism.FourierDecayAlt.ThreeDimData.Mexp r
+          * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+            + Formalism.FourierDecayAlt.ThreeDimData.AG k r)
+        ≤ (2 * P ^ 2) * (2 * P * N ^ 2 + 4 * N * P) :=
+    mul_le_mul hM
+      (show Formalism.FourierDecayAlt.ThreeDimData.AS k r
+            + Formalism.FourierDecayAlt.ThreeDimData.AG k r
+          ≤ 2 * P * N ^ 2 + 4 * N * P by
+        linarith)
       (add_nonneg hAS0 hAG0) (by nlinarith)
-  have hprod2 : ((r : ℝ) + 1) ^ 2 * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r) ≤
-      P ^ 2 * (2 * P * N ^ 2 + 4 * N * P) :=
+  have hprod2
+      : ((r : ℝ) + 1) ^ 2
+          * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+            + Formalism.FourierDecayAlt.ThreeDimData.AG k r)
+        ≤ P ^ 2 * (2 * P * N ^ 2 + 4 * N * P) :=
     mul_le_mul_of_nonneg_left (by linarith) (by positivity)
   have hsqN : 0 ≤ (2 * P) ^ 4 * Real.sqrt (2 * P) - 1 := by
     have : 1 ≤ (2 * P) ^ 4 := one_le_pow₀ (by linarith)
@@ -112,10 +133,18 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     have : X ≤ ((2 * P) ^ 4 * Real.sqrt (2 * P)) * X := by nlinarith
     nlinarith
   · rw [ha]
-    have e : 2 * Formalism.FourierDecayAlt.ThreeDimData.Mexp r * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r) =
-      2 * (Formalism.FourierDecayAlt.ThreeDimData.Mexp r * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r)) := by ring
+    have e
+        : 2 * Formalism.FourierDecayAlt.ThreeDimData.Mexp r
+            * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+              + Formalism.FourierDecayAlt.ThreeDimData.AG k r)
+          = 2
+            * (Formalism.FourierDecayAlt.ThreeDimData.Mexp r
+              * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+                + Formalism.FourierDecayAlt.ThreeDimData.AG k r)) := by
+      ring
     rw [e]
-    have : (2 * P ^ 2) * (2 * P * N ^ 2 + 4 * N * P) = 4 * (P ^ 3 * N ^ 2) + 8 * (P ^ 3 * N) := by ring
+    have : (2 * P ^ 2) * (2 * P * N ^ 2 + 4 * N * P) = 4 * (P ^ 3 * N ^ 2) + 8 * (P ^ 3 * N) := by
+      ring
     nlinarith
   · rw [ha]
     have e : (9 : ℝ) * ((r : ℝ) + 1) * N ^ 2 = 9 * (P * N ^ 2) := by rw [← hPdef]; ring
@@ -123,13 +152,31 @@ theorem gap_thresholds (k r : ℕ) (hk : 1 ≤ k) :
     nlinarith
   · unfold GlobalTheory.CellAmp.GapCell
     rw [ha]
-    have e : 10 * ((r : ℝ) + 1) ^ 2 * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r) =
-      10 * (((r : ℝ) + 1) ^ 2 * (Formalism.FourierDecayAlt.ThreeDimData.AS k r + Formalism.FourierDecayAlt.ThreeDimData.AG k r)) := by ring
+    have e
+        : 10 * ((r : ℝ) + 1) ^ 2
+            * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+              + Formalism.FourierDecayAlt.ThreeDimData.AG k r)
+          = 10
+            * (((r : ℝ) + 1) ^ 2
+              * (Formalism.FourierDecayAlt.ThreeDimData.AS k r
+                + Formalism.FourierDecayAlt.ThreeDimData.AG k r)) := by
+      ring
     rw [e]
     have : P ^ 2 * (2 * P * N ^ 2 + 4 * N * P) = 2 * (P ^ 3 * N ^ 2) + 4 * (P ^ 3 * N) := by ring
     nlinarith
 
-theorem gap_constant_exists : ∃ Cgf : ℝ, ∀ (D : Formalism.BasicNotions.D7) (ε : Fin (2 * D.R.rS + D.R.k + 1) → Bool) (lam : Fin (2 * D.R.rS + D.R.k + 1) → ℝ), Formalism.QuantumDeterminants.GapAtLeast ε lam (Cgf * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) * (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2 + ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3)) → ∃ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast ε lam h ∧ Formalism.FourierDecayAlt.ThreeDimData.GapOK D.R.k D.R.rS h ∧ GlobalTheory.CellAmp.GapCell D.R.k D.R.rS h := by
+theorem gap_constant_exists
+    : ∃ Cgf : ℝ,
+      ∀ (D : Formalism.BasicNotions.D7) (ε : Fin (2 * D.R.rS + D.R.k + 1) → Bool)
+          (lam : Fin (2 * D.R.rS + D.R.k + 1) → ℝ),
+        Formalism.QuantumDeterminants.GapAtLeast ε lam
+            (Cgf * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+              * (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2
+                + ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3))
+          → ∃ h : ℝ,
+            Formalism.QuantumDeterminants.GapAtLeast ε lam h
+              ∧ Formalism.FourierDecayAlt.ThreeDimData.GapOK D.R.k D.R.rS h
+              ∧ GlobalTheory.CellAmp.GapCell D.R.k D.R.rS h := by
   refine ⟨1000, fun D ε lam hg => ⟨_, hg, ?_⟩⟩
   have hk : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
   exact gap_thresholds D.R.k D.R.rS hk

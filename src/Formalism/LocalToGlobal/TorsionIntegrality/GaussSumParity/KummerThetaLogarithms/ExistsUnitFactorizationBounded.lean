@@ -278,7 +278,8 @@ def fracS (hdiv : DivB l) (hinv : ∀ x ∈ ringB l, ‖x‖ = 1 → x⁻¹ ∈ 
   add_mem' := by
     rintro a b ⟨j, hj⟩ ⟨k, hk⟩
     refine ⟨j + k, ?_⟩
-    have h := add_mem (mul_mem (pow_mem castL_mem_ringB k) hj) (mul_mem (pow_mem castL_mem_ringB j) hk)
+    have h :=
+      add_mem (mul_mem (pow_mem castL_mem_ringB k) hj) (mul_mem (pow_mem castL_mem_ringB j) hk)
     convert h using 1
     ring
   zero_mem' := ⟨0, by simp [zero_mem]⟩
@@ -291,8 +292,7 @@ def fracS (hdiv : DivB l) (hinv : ∀ x ∈ ringB l, ‖x‖ = 1 → x⁻¹ ∈ 
     · exact ⟨0, by simp [h0, zero_mem]⟩
     obtain ⟨k, u, hu, hu1, e⟩ :=
       exists_unit hdiv hj (mul_ne_zero (pow_ne_zero _ (castL_ne_zero l)) h0)
-    have hu0 : u ≠ 0 := by
-      intro h; rw [h, norm_zero] at hu1; exact zero_ne_one hu1
+    have hu0 : u ≠ 0 := by intro h; rw [h, norm_zero] at hu1; exact zero_ne_one hu1
     refine ⟨k, ?_⟩
     have e2 : (l : ℂ_[l]) ^ k * a⁻¹ = (l : ℂ_[l]) ^ j * u⁻¹ := by
       rw [mul_inv_eq_iff_eq_mul₀ h0, mul_assoc, mul_comm u⁻¹ a, ← mul_assoc, e, mul_assoc,
@@ -315,14 +315,14 @@ theorem KurIntegers_of : RingAFacts → KurIntegers := by
   refine ⟨fun x => ⟨fun hx => ⟨ringB_le_Kur hx, norm_ringB_le hx⟩, ?_⟩, hdiv, hinv⟩
   rintro ⟨hK, h1⟩
   have hF : Subfield.closure (muPrime l) ≤ fracS hdiv hinv :=
-    Subfield.closure_le.2 fun z hz =>
-      ⟨0, by simpa using ringA_le_ringB (Subring.subset_closure hz)⟩
+    Subfield.closure_le.2 fun z hz => ⟨0, by simpa using ringA_le_ringB (Subring.subset_closure hz)⟩
   have h2 : x ∈ closure (ringB l : Set ℂ_[l]) := by
     rw [Metric.mem_closure_iff]
     intro ε hε
-    obtain ⟨x0, hx0, hd⟩ := Metric.mem_closure_iff.1
-      (show x ∈ closure ((Subfield.closure (muPrime l) : Subfield ℂ_[l]) : Set ℂ_[l]) from hK)
-      (min ε 1) (lt_min hε one_pos)
+    obtain ⟨x0, hx0, hd⟩ :=
+      Metric.mem_closure_iff.1
+        (show x ∈ closure ((Subfield.closure (muPrime l) : Subfield ℂ_[l]) : Set ℂ_[l]) from hK)
+        (min ε 1) (lt_min hε one_pos)
     refine ⟨x0, ?_, hd.trans_le (min_le_left _ _)⟩
     obtain ⟨k, hk⟩ := hF hx0
     have hn : ‖x0‖ ≤ 1 := by
@@ -355,7 +355,8 @@ theorem unramified_completion_roots : KurRoots := by
   have hmem : z ∈ MaximalUnramifiedExtension l :=
     Subfield.le_topologicalClosure _ (Subfield.subset_closure ⟨n, hn, hln, hz.pow_eq_one⟩)
   refine ⟨⟨z, hmem⟩, ?_⟩
-  exact IsPrimitiveRoot.of_map_of_injective (f := (MaximalUnramifiedExtension l).subtype) hz Subtype.val_injective
+  exact IsPrimitiveRoot.of_map_of_injective (f := (MaximalUnramifiedExtension l).subtype) hz
+    Subtype.val_injective
 
 theorem unramified_completion_complete : KurComplete := by
   intro l hl

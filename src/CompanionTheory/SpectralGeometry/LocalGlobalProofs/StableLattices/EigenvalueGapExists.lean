@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.UGeoGap
 
-theorem exists_gap_of_mem_Icc_top :
-    ∀ (n : ℕ) (l : Fin n → ℝ) (L : ℝ), 0 < L → (∀ i, 0 ≤ l i ∧ l i ≤ L) → (∃ i, l i = L) →
-      ∃ r : ℕ, r < n ∧ ∀ i, l i < r * (L / (n + 1)) ∨ (r + 1) * (L / (n + 1)) ≤ l i := by
+theorem exists_gap_of_mem_Icc_top
+    : ∀ (n : ℕ) (l : Fin n → ℝ) (L : ℝ),
+      0 < L → (∀ i, 0 ≤ l i ∧ l i ≤ L) → (∃ i, l i = L)
+        → ∃ r : ℕ, r < n ∧ ∀ i, l i < r * (L / (n + 1)) ∨ (r + 1) * (L / (n + 1)) ≤ l i := by
   intro n l L hL _ hex
   obtain ⟨i₀, hi₀⟩ := hex
   by_contra hcon
@@ -36,8 +37,7 @@ theorem exists_gap_of_mem_Icc_top :
     mul_le_mul_of_nonneg_right hr1 hδpos.le
   have h3 : (n : ℝ) * (L / (n + 1)) < (n + 1) * (L / (n + 1)) :=
     mul_lt_mul_of_pos_right (by linarith) hδpos
-  have h4 : ((n : ℝ) + 1) * (L / (n + 1)) = L := by
-    field_simp
+  have h4 : ((n : ℝ) + 1) * (L / (n + 1)) = L := by field_simp
   linarith
 
 end GlobalTheory.CompanionTheory.UGeoGap

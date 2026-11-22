@@ -11,11 +11,15 @@ open scoped TensorProduct
 
 namespace GlobalTheory.TopFrameEt
 
-theorem isFreeGen_dForm_of_formallyEtale_mvPolynomial :
-    ∀ {k A₀ A : Type} [CommRing k] [CommRing A₀] [CommRing A] (α : k →+* A₀) (β : k →+* A)
-    (ρ : A₀ →+* A), ρ.comp α = β → ∀ {n r : ℕ} (z : Fin n → A₀) (b : Module.Basis (Fin n) A₀ (Omega α)),
-    (∀ i, b i = dFun α (z i)) → ∀ (t : Fin r → A), (MvPolynomial.eval₂Hom ρ t).FormallyEtale →
-    IsFreeGen A (dForm β (Fin.append t (fun i => ρ (z i)))) := by
+theorem isFreeGen_dForm_of_formallyEtale_mvPolynomial
+    : ∀ {k A₀ A : Type} [CommRing k] [CommRing A₀] [CommRing A] (α : k →+* A₀) (β : k →+* A)
+        (ρ : A₀ →+* A),
+      ρ.comp α = β
+        → ∀ {n r : ℕ} (z : Fin n → A₀) (b : Module.Basis (Fin n) A₀ (Omega α)),
+          (∀ i, b i = dFun α (z i))
+            → ∀ (t : Fin r → A),
+              (MvPolynomial.eval₂Hom ρ t).FormallyEtale
+                → IsFreeGen A (dForm β (Fin.append t (fun i => ρ (z i)))) := by
   intro k A₀ A _ _ _ α β ρ hc n r z b hb t hφ
   letI := α.toAlgebra
   letI := β.toAlgebra
@@ -33,7 +37,8 @@ theorem isFreeGen_dForm_of_formallyEtale_mvPolynomial :
   haveI : Subsingleton (Algebra.H1Cotangent A₀ A) :=
     Algebra.FormallySmooth.subsingleton_h1Cotangent
   have hinj : Function.Injective (KaehlerDifferential.mapBaseChange k A₀ A) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy
     obtain ⟨w, rfl⟩ := (Algebra.H1Cotangent.exact_δ_mapBaseChange k A₀ A y).1 hy
     rw [Subsingleton.elim w 0, map_zero]
@@ -43,11 +48,12 @@ theorem isFreeGen_dForm_of_formallyEtale_mvPolynomial :
   have hw : ∀ i, w i = KaehlerDifferential.D A₀ A (t i) := fun i ↦ by
     simp [w, IsBaseChange.basis_apply, KaehlerDifferential.mvPolynomialBasis_apply,
       KaehlerDifferential.map_D, RingHom.algebraMap_toAlgebra, φ]
-  obtain ⟨B, hB⟩ := exists_basis_of_exact
-    (KaehlerDifferential.mapBaseChange k A₀ A) (KaehlerDifferential.map k A₀ A A) hinj
-    (KaehlerDifferential.exact_mapBaseChange_map k A₀ A)
-    (b.baseChange A) w (fun i ↦ KaehlerDifferential.D k A (t i))
-    (fun i ↦ by rw [hw, KaehlerDifferential.map_D]; rfl)
+  obtain ⟨B, hB⟩ :=
+    exists_basis_of_exact (KaehlerDifferential.mapBaseChange k A₀ A)
+      (KaehlerDifferential.map k A₀ A A) hinj (KaehlerDifferential.exact_mapBaseChange_map k A₀ A)
+      (b.baseChange A) w
+      (fun i ↦ KaehlerDifferential.D k A (t i))
+      (fun i ↦ by rw [hw, KaehlerDifferential.map_D]; rfl)
   let e : Fin (r + n) ≃ Fin n ⊕ Fin r := finSumFinEquiv.symm.trans (Equiv.sumComm _ _)
   refine isFreeGen_dForm _ (B.reindex e.symm) fun a ↦ ?_
   rw [Module.Basis.reindex_apply, Equiv.symm_symm, hB]

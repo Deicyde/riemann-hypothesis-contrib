@@ -5,4 +5,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HighestWeightFix
 
 @[expose] public section
 
-theorem highest_weight_fixed_exists : PI.HwFix.HwFixedEx := PI.HwFix.UnitaryGroupMassFormula.hwFixedEx_main
+theorem highest_weight_fixed_exists : PI.HwFix.HwFixedEx :=
+  PI.HwFix.UnitaryGroupMassFormula.hwFixedEx_main

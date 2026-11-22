@@ -7,16 +7,20 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.PadicShift
 
-theorem exists_period (p : ℕ) [Fact p.Prime] {N : Type} (f : ℤ_[p] → N)
-    (hf : IsLocallyConstant f) :
-    ∃ m : ℕ, ∀ x y : ℤ_[p], ((p : ℤ_[p]) ^ m) ∣ x - y → f x = f y := by
-  obtain ⟨δ, hδ, h⟩ := lebesgue_number_lemma_of_metric (s := (Set.univ : Set ℤ_[p]))
-    (c := fun v : N => f ⁻¹' {v}) isCompact_univ (fun v => hf.isOpen_fiber v)
-    (fun x _ => Set.mem_iUnion.2 ⟨f x, rfl⟩)
+theorem exists_period (p : ℕ) [Fact p.Prime] {N : Type} (f : ℤ_[p] → N) (hf : IsLocallyConstant f)
+    : ∃ m : ℕ, ∀ x y : ℤ_[p], ((p : ℤ_[p]) ^ m) ∣ x - y → f x = f y := by
+  obtain ⟨δ, hδ, h⟩ :=
+    lebesgue_number_lemma_of_metric (s := (Set.univ : Set ℤ_[p]))
+      (c := fun v : N => f ⁻¹' {v})
+      isCompact_univ
+      (fun v => hf.isOpen_fiber v)
+      (fun x _ => Set.mem_iUnion.2 ⟨f x, rfl⟩)
   have hp : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   obtain ⟨m, hm⟩ := exists_pow_lt_of_lt_one hδ (inv_lt_one_of_one_lt₀ hp)
   refine ⟨m, fun x y hxy => ?_⟩
@@ -31,32 +35,38 @@ theorem exists_period (p : ℕ) [Fact p.Prime] {N : Type} (f : ℤ_[p] → N)
     rw [zpow_neg, zpow_natCast, inv_pow]
   rw [hx, hy]
 
-theorem sum_periodic {N : Type} [AddCommGroup N] (g : ℕ → N) (P : ℕ)
-    (hg : ∀ i, g (i + P) = g i) (k : ℕ) :
-    ∑ i ∈ Finset.range (k * P), g i = k • ∑ i ∈ Finset.range P, g i :=
+theorem sum_periodic
+    {N : Type} [AddCommGroup N] (g : ℕ → N) (P : ℕ) (hg : ∀ i, g (i + P) = g i) (k : ℕ)
+    : ∑ i ∈ Finset.range (k * P), g i = k • ∑ i ∈ Finset.range P, g i :=
   _root_.UpperTheory.Reformulated.B.Yra7.main g P hg k
 
-theorem isLocallyConstant_toZModPow (p : ℕ) [Fact p.Prime] (M : ℕ) :
-    IsLocallyConstant (PadicInt.toZModPow (p := p) M) := by
+theorem isLocallyConstant_toZModPow (p : ℕ) [Fact p.Prime] (M : ℕ)
+    : IsLocallyConstant (PadicInt.toZModPow (p := p) M) := by
   have hp : (0 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).pos
   refine (IsLocallyConstant.iff_exists_open _).2 fun x => ?_
-  refine ⟨Metric.closedBall x ((p : ℝ) ^ (-(M : ℤ))),
+  refine ⟨
+    Metric.closedBall x ((p : ℝ) ^ (-(M : ℤ))),
     IsUltrametricDist.isOpen_closedBall _ (zpow_pos hp _).ne',
-    Metric.mem_closedBall_self (zpow_pos hp _).le, fun y hy => ?_⟩
+    Metric.mem_closedBall_self (zpow_pos hp _).le,
+    fun y hy => ?_
+  ⟩
   rw [Metric.mem_closedBall, dist_eq_norm] at hy
   have h1 := (PadicInt.norm_le_pow_iff_mem_span_pow (y - x) M).1 hy
   rw [← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, sub_eq_zero] at h1
   exact h1
 
-theorem val_toZModPow_dvd (p : ℕ) [Fact p.Prime] (M : ℕ) (z : ℤ_[p]) :
-    ((p : ℤ_[p]) ^ M) ∣ z - (((PadicInt.toZModPow (p := p) M z).val : ℕ) : ℤ_[p]) := by
+theorem val_toZModPow_dvd (p : ℕ) [Fact p.Prime] (M : ℕ) (z : ℤ_[p])
+    : ((p : ℤ_[p]) ^ M) ∣ z - (((PadicInt.toZModPow (p := p) M z).val : ℕ) : ℤ_[p]) := by
   haveI : NeZero (p ^ M) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
   rw [← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_natCast,
     ZMod.natCast_zmod_val, sub_self]
 
-theorem exists_primitive (p : ℕ) [Fact p.Prime] {N : Type} [AddCommGroup N] (n : ℕ)
-    (hN : ∀ x : N, p ^ n • x = 0) (f : ℤ_[p] → N) (hf : IsLocallyConstant f) :
-    ∃ y : ℤ_[p] → N, IsLocallyConstant y ∧ ∀ z, y (z + 1) - y z = f z := by
+theorem exists_primitive
+    (p : ℕ) [Fact p.Prime]
+    {N : Type} [AddCommGroup N]
+    (n : ℕ) (hN : ∀ x : N, p ^ n • x = 0)
+    (f : ℤ_[p] → N) (hf : IsLocallyConstant f)
+    : ∃ y : ℤ_[p] → N, IsLocallyConstant y ∧ ∀ z, y (z + 1) - y z = f z := by
   obtain ⟨m, hm⟩ := exists_period p f hf
   set M := n + m with hM
   haveI : NeZero (p ^ M) := ⟨pow_ne_zero _ (Fact.out : p.Prime).ne_zero⟩
@@ -73,12 +83,15 @@ theorem exists_primitive (p : ℕ) [Fact p.Prime] {N : Type} [AddCommGroup N] (n
     intro z
     apply hm
     exact (pow_dvd_pow _ (Nat.le_add_left m n)).trans (val_toZModPow_dvd p M z)
-  refine ⟨fun z => ∑ i ∈ Finset.range (PadicInt.toZModPow (p := p) M z).val, g i,
-    (isLocallyConstant_toZModPow p M).comp
-      (fun a => ∑ i ∈ Finset.range a.val, g i), fun z => ?_⟩
+  refine ⟨
+    fun z => ∑ i ∈ Finset.range (PadicInt.toZModPow (p := p) M z).val, g i,
+    (isLocallyConstant_toZModPow p M).comp (fun a => ∑ i ∈ Finset.range a.val, g i),
+    fun z => ?_
+  ⟩
   have hv : (PadicInt.toZModPow (p := p) M z).val < p ^ M := ZMod.val_lt _
-  have hval : (PadicInt.toZModPow (p := p) M (z + 1)).val
-      = ((PadicInt.toZModPow (p := p) M z).val + 1) % p ^ M := by
+  have hval
+      : (PadicInt.toZModPow (p := p) M (z + 1)).val
+        = ((PadicInt.toZModPow (p := p) M z).val + 1) % p ^ M := by
     rw [map_add (f := _), map_one, ← ZMod.val_natCast]
     push_cast
     rw [ZMod.natCast_zmod_val]
@@ -92,8 +105,11 @@ theorem exists_primitive (p : ℕ) [Fact p.Prime] {N : Type} [AddCommGroup N] (n
       ← Finset.sum_range_succ, hv1]
     exact hsum
 
-theorem eq_of_shift_invariant (p : ℕ) [Fact p.Prime] {N : Type} (f : ℤ_[p] → N)
-    (hf : IsLocallyConstant f) (h : ∀ z, f (z + 1) = f z) (z : ℤ_[p]) : f z = f 0 := by
+theorem eq_of_shift_invariant
+    (p : ℕ) [Fact p.Prime]
+    {N : Type} (f : ℤ_[p] → N) (hf : IsLocallyConstant f) (h : ∀ z, f (z + 1) = f z)
+    (z : ℤ_[p])
+    : f z = f 0 := by
   have hnat : ∀ k : ℕ, f (k : ℤ_[p]) = f 0 := by
     intro k
     induction k with

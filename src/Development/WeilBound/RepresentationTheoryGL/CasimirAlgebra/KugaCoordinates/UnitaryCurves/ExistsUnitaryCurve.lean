@@ -10,9 +10,11 @@ open Matrix
 
 namespace PositivityTheory.Rg.Cz.GK
 
-theorem exists_comb_of_sep {V ι : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (ev : ι → Module.Dual ℂ V) (hsep : ∀ v, (∀ i, ev i v = 0) → v = 0) (lam : Module.Dual ℂ V) :
-    ∃ (s : Finset ι) (c : ι → ℂ), ∀ v, lam v = ∑ i ∈ s, c i * ev i v := by
+theorem exists_comb_of_sep
+    {V ι : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ev : ι → Module.Dual ℂ V) (hsep : ∀ v, (∀ i, ev i v = 0) → v = 0)
+    (lam : Module.Dual ℂ V)
+    : ∃ (s : Finset ι) (c : ι → ℂ), ∀ v, lam v = ∑ i ∈ s, c i * ev i v := by
   classical
   set W := Submodule.span ℂ (Set.range ev)
   have hW : W = ⊤ := by
@@ -30,13 +32,13 @@ theorem exists_comb_of_sep {V ι : Type} [AddCommGroup V] [Module ℂ V] [Finite
   rw [← hc, Finsupp.sum, LinearMap.sum_apply]
   simp [smul_eq_mul]
 
-theorem exists_unitary_curve {a : ℕ} (Y : Matrix (Fin a) (Fin a) ℂ) (hY : Yᴴ = -Y) :
-    ∃ U : ℝ → Matrix (Fin a) (Fin a) ℂ, (∀ t, star (U t) * U t = 1) ∧ U 0 = 1 ∧
-      ∀ i j, HasDerivAt (fun t => U t i j) (Y i j) 0 := by
+theorem exists_unitary_curve {a : ℕ} (Y : Matrix (Fin a) (Fin a) ℂ) (hY : Yᴴ = -Y)
+    : ∃ U : ℝ → Matrix (Fin a) (Fin a) ℂ,
+      (∀ t, star (U t) * U t = 1) ∧ U 0 = 1 ∧ ∀ i j, HasDerivAt (fun t => U t i j) (Y i j) 0 := by
   refine ⟨fun t => NormedSpace.exp (t • Y), fun t => ?_, by simp, fun i j => ?_⟩
   · have h1 : star (NormedSpace.exp (t • Y)) = NormedSpace.exp (-(t • Y)) := by
-      rw [Matrix.star_eq_conjTranspose, ← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hY, star_trivial,
-        smul_neg]
+      rw [Matrix.star_eq_conjTranspose, ← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hY,
+        star_trivial, smul_neg]
     rw [h1, Matrix.exp_neg]
     exact Matrix.nonsing_inv_mul _ ((Matrix.isUnit_iff_isUnit_det _).1 (Matrix.isUnit_exp _))
   · letI : NormedRing (Matrix (Fin a) (Fin a) ℂ) := Matrix.linftyOpNormedRing
@@ -45,8 +47,11 @@ theorem exists_unitary_curve {a : ℕ} (Y : Matrix (Fin a) (Fin a) ℂ) (hY : Y�
     have h := hasDerivAt_exp_smul_const (𝕂 := ℝ) Y (0 : ℝ)
     simp only [zero_smul, NormedSpace.exp_zero, one_mul] at h
     let L : Matrix (Fin a) (Fin a) ℂ →L[ℝ] ℂ :=
-      LinearMap.toContinuousLinearMap
-        { toFun := fun M => M i j, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+      LinearMap.toContinuousLinearMap {
+        toFun := fun M => M i j
+        map_add' := fun _ _ => rfl
+        map_smul' := fun _ _ => rfl
+      }
     exact L.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h
 
 end PositivityTheory.Rg.Cz.GK

@@ -11,11 +11,16 @@ namespace PI.GreenLabelSurjWork
 
 variable {G : Type} [Group G] [Fintype G]
 
-def repHomLin (A B : Rep ℂ G) : (A ⟶ B) ≃ₗ[ℂ] A.ρ.IntertwiningMap B.ρ :=
-  { Rep.homEquiv with map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+def repHomLin (A B : Rep ℂ G) : (A ⟶ B) ≃ₗ[ℂ] A.ρ.IntertwiningMap B.ρ := {
+  Rep.homEquiv with
+  map_add' := fun _ _ => rfl
+  map_smul' := fun _ _ => rfl
+}
 
-theorem simple_of_irr {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (σ : Representation ℂ G W) [σ.IsIrreducible] : Simple (FDRep.of σ) := by
+theorem simple_of_irr
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (σ : Representation ℂ G W) [σ.IsIrreducible]
+    : Simple (FDRep.of σ) := by
   haveI : NeZero (Nat.card G : ℂ) := ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   rw [FDRep.simple_iff_end_is_rank_one]
   rw [← (FDRep.forget₂HomLinearEquiv _ _).finrank_eq, (repHomLin _ _).finrank_eq]
@@ -26,15 +31,17 @@ theorem nontrivial_of_simple (V : FDRep ℂ G) (h : Simple V) : Nontrivial V := 
   rw [not_nontrivial_iff_subsingleton] at hn
   apply CategoryTheory.id_nonzero V
   first
-    | (ext x; exact Subsingleton.elim _ _)
-    | (apply Action.Hom.ext; ext x; exact Subsingleton.elim _ _)
-    | (ext; exact Subsingleton.elim _ _)
+  | (ext x; exact Subsingleton.elim _ _)
+  | (apply Action.Hom.ext; ext x; exact Subsingleton.elim _ _)
+  | (ext; exact Subsingleton.elim _ _)
 
-theorem exists_simple_constituent {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    [Nontrivial V] (ρ : Representation ℂ G V) : ∃ τ : FDRep ℂ G, Simple τ ∧ IsConstituent τ ρ := by
+theorem exists_simple_constituent
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]
+    (ρ : Representation ℂ G V)
+    : ∃ τ : FDRep ℂ G, Simple τ ∧ IsConstituent τ ρ := by
   classical
-  have hex : ∃ n, ∃ A : Subrepresentation ρ, A.toSubmodule ≠ ⊥ ∧
-      Module.finrank ℂ A.toSubmodule = n :=
+  have hex
+      : ∃ n, ∃ A : Subrepresentation ρ, A.toSubmodule ≠ ⊥ ∧ Module.finrank ℂ A.toSubmodule = n :=
     ⟨_, ⊤, show (⊤ : Submodule ℂ V) ≠ ⊥ from top_ne_bot, rfl⟩
   obtain ⟨A, hA0, hAn⟩ := Nat.find_spec hex
   have hirr : (A.toRepresentation).IsIrreducible := by
@@ -42,7 +49,8 @@ theorem exists_simple_constituent {V : Type} [AddCommGroup V] [Module ℂ V] [Fi
     · have h1 := congrArg Subrepresentation.toSubmodule h
       rw [Submodule.eq_bot_iff]
       intro x hx
-      have h2 : (⟨x, hx⟩ : A.toSubmodule) ∈ (⊥ : Subrepresentation A.toRepresentation).toSubmodule := by
+      have h2
+          : (⟨x, hx⟩ : A.toSubmodule) ∈ (⊥ : Subrepresentation A.toRepresentation).toSubmodule := by
         rw [h1]; exact Submodule.mem_top
       have h3 : (⟨x, hx⟩ : A.toSubmodule) = 0 := (Submodule.mem_bot ℂ).mp h2
       exact congrArg Subtype.val h3
@@ -50,11 +58,13 @@ theorem exists_simple_constituent {V : Type} [AddCommGroup V] [Module ℂ V] [Fi
       · left
         exact Subrepresentation.toSubmodule_injective hU
       · right
-        let U' : Subrepresentation ρ :=
-          ⟨U.toSubmodule.map A.toSubmodule.subtype, by
+        let U' : Subrepresentation ρ := ⟨
+          U.toSubmodule.map A.toSubmodule.subtype,
+          by
             intro g v hv
             obtain ⟨u, hu, rfl⟩ := Submodule.mem_map.mp hv
-            exact Submodule.mem_map.mpr ⟨A.toRepresentation g u, U.apply_mem_toSubmodule g hu, rfl⟩⟩
+            exact Submodule.mem_map.mpr ⟨A.toRepresentation g u, U.apply_mem_toSubmodule g hu, rfl⟩
+        ⟩
         have hfr : Module.finrank ℂ U'.toSubmodule = Module.finrank ℂ U.toSubmodule :=
           Submodule.finrank_map_subtype_eq _ _
         have hU0 : U'.toSubmodule ≠ ⊥ := by

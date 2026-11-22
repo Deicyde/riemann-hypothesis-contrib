@@ -12,8 +12,8 @@ open Filter Topology
 
 def NormFibStatement : Prop :=
   ∀ (n : ℕ) (M : Type u) [TopologicalSpace M] (z : M → V n) (U : Set (V n)),
-    IsCoveringMapOn z U → (∀ x, z x ∈ U) → (∀ y : V n, (z ⁻¹' {y}).Finite) → ConnectedSpace M →
-    ∃ δ : ℕ, ∀ y : V n, (z ⁻¹' {y}).encard ≤ δ
+    IsCoveringMapOn z U → (∀ x, z x ∈ U) → (∀ y : V n, (z ⁻¹' {y}).Finite) → ConnectedSpace M
+      → ∃ δ : ℕ, ∀ y : V n, (z ⁻¹' {y}).encard ≤ δ
 
 theorem normFib : NormFibStatement.{u} := by
   intro n M _ z U hcov himg hfin hconn
@@ -21,8 +21,7 @@ theorem normFib : NormFibStatement.{u} := by
   have hloc : ∀ x : M, ∀ᶠ x' in 𝓝 x, (z ⁻¹' {z x'}).encard = (z ⁻¹' {z x}).encard := by
     intro x
     obtain ⟨hd, W, hxW, hW, hzW, H, hH⟩ := hcov (z x) (himg x)
-    have hev : ∀ w ∈ W, IsEvenlyCovered z w (z ⁻¹' {z x}) :=
-      fun w hw => ⟨hd, W, hw, hW, hzW, H, hH⟩
+    have hev : ∀ w ∈ W, IsEvenlyCovered z w (z ⁻¹' {z x}) := fun w hw => ⟨hd, W, hw, hW, hzW, H, hH⟩
     filter_upwards [hzW.mem_nhds (show x ∈ z ⁻¹' W from hxW)] with x' hx'
     exact Set.encard_congr (hev (z x') hx').fiberHomeomorph.toEquiv.symm
   obtain ⟨x0⟩ := (inferInstance : Nonempty M)

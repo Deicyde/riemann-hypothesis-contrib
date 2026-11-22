@@ -15,23 +15,24 @@ open MvPolynomial ReciprocityTheory.AnForm.M
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem mem_mcPts_iff_conePts_pC (P : Ideal (MRing ι)) (z : (Σ k, ι k) → ℂ) :
-    z ∈ mcPts P ↔ z ∈ ReciprocityTheory.AnForm.R.conePts (pC P) := by
+theorem mem_mcPts_iff_conePts_pC (P : Ideal (MRing ι)) (z : (Σ k, ι k) → ℂ)
+    : z ∈ mcPts P ↔ z ∈ ReciprocityTheory.AnForm.R.conePts (pC P) := by
   rw [mcPts_eq_pC]
   exact Iff.rfl
 
-theorem sameOrbit_trans {a b c : (Σ k, ι k) → ℂ} (h1 : SameOrbit a b) (h2 : SameOrbit b c) :
-    SameOrbit a c := by
+theorem sameOrbit_trans {a b c : (Σ k, ι k) → ℂ} (h1 : SameOrbit a b) (h2 : SameOrbit b c)
+    : SameOrbit a c := by
   obtain ⟨c, hc, rfl⟩ := h1
   obtain ⟨d, hd, rfl⟩ := h2
   refine ⟨fun k => c k * d k, fun k => mul_ne_zero (hc k) (hd k), ?_⟩
   funext p
   ring
 
-theorem nonempty_anLogRes_of_algRes (P J : Ideal (MRing ι)) (e : ℕ)
-    (hJ : IsMultiHomogIdeal J) (hJP : ¬ J ≤ P)
+theorem nonempty_anLogRes_of_algRes
+    (P J : Ideal (MRing ι)) (e : ℕ) (hJ : IsMultiHomogIdeal J) (hJP : ¬ J ≤ P)
     (hPC : ∀ f : MRing ι, MvPolynomial.map (Int.castRingHom ℂ) f ∈ pC P → f ∈ P)
-    (R : ReciprocityTheory.AnForm.R.AlgRes ι (pC P) (pC J) e) : Nonempty (AnLogRes P J e) := by
+    (R : ReciprocityTheory.AnForm.R.AlgRes ι (pC P) (pC J) e)
+    : Nonempty (AnLogRes P J e) := by
   classical
   obtain ⟨A, hA⟩ := R.exists_atlas
   choose idx hidx using R.cover
@@ -51,7 +52,8 @@ theorem nonempty_anLogRes_of_algRes (P J : Ideal (MRing ι)) (e : ℕ)
     inj := ?_
     immersion := ?_
     snc := ?_
-    null := ?_ }⟩
+    null := ?_
+  }⟩
   · intro x y hy
     rw [mem_mcPts_iff_conePts_pC]
     exact R.lift_mem (idx x) y hy
@@ -71,8 +73,10 @@ theorem nonempty_anLogRes_of_algRes (P J : Ideal (MRing ι)) (e : ℕ)
     have hf' : ReciprocityTheory.AnForm.R.IsMultiHomog (map (Int.castRingHom ℂ) f) a :=
       fun m hm k => hf m (support_map_subset _ _ hm) k
     have hfP' : map (Int.castRingHom ℂ) f ∉ pC P := fun h => hfP (hPC f h)
-    have hz' : ∀ z ∈ ReciprocityTheory.AnForm.R.conePts (pC P), eval z (map (Int.castRingHom ℂ) f) = 0 →
-        z ∈ ReciprocityTheory.AnForm.R.conePts (pC J) := by
+    have hz'
+        : ∀ z ∈ ReciprocityTheory.AnForm.R.conePts (pC P),
+          eval z (map (Int.castRingHom ℂ) f) = 0
+            → z ∈ ReciprocityTheory.AnForm.R.conePts (pC J) := by
       intro z hz1 hz2
       rw [← mem_mcPts_iff_conePts_pC] at hz1 ⊢
       exact hz z hz1 hz2

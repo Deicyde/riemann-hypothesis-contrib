@@ -15,23 +15,28 @@ open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.InfCut.JacobianCoordina
 
 variable {n r : ℕ}
 
-theorem hJ_sub_right (ε : Fin n → Bool) (x y w : Fin n → ℂ) : hJ ε x (y - w) = hJ ε x y - hJ ε x w := by
+theorem hJ_sub_right (ε : Fin n → Bool) (x y w : Fin n → ℂ)
+    : hJ ε x (y - w) = hJ ε x y - hJ ε x w := by
   unfold hJ; rw [mulVec_sub, dotProduct_sub]
 
-theorem hJ_sub_left (ε : Fin n → Bool) (x y w : Fin n → ℂ) : hJ ε (x - y) w = hJ ε x w - hJ ε y w := by
+theorem hJ_sub_left (ε : Fin n → Bool) (x y w : Fin n → ℂ)
+    : hJ ε (x - y) w = hJ ε x w - hJ ε y w := by
   unfold hJ; rw [star_sub, sub_dotProduct]
 
-theorem hJ_add_left (ε : Fin n → Bool) (x y w : Fin n → ℂ) : hJ ε (x + y) w = hJ ε x w + hJ ε y w := by
+theorem hJ_add_left (ε : Fin n → Bool) (x y w : Fin n → ℂ)
+    : hJ ε (x + y) w = hJ ε x w + hJ ε y w := by
   unfold hJ; rw [star_add, add_dotProduct]
 
-theorem hJ_smul_left (ε : Fin n → Bool) (c : ℂ) (x w : Fin n → ℂ) : hJ ε (c • x) w = star c * hJ ε x w := by
+theorem hJ_smul_left (ε : Fin n → Bool) (c : ℂ) (x w : Fin n → ℂ)
+    : hJ ε (c • x) w = star c * hJ ε x w := by
   unfold hJ; rw [star_smul, smul_dotProduct, smul_eq_mul]
 
-theorem hJ_zero_left' (ε : Fin n → Bool) (w : Fin n → ℂ) : hJ ε 0 w = 0 := by
-  unfold hJ; simp
+theorem hJ_zero_left' (ε : Fin n → Bool) (w : Fin n → ℂ) : hJ ε 0 w = 0 := by unfold hJ; simp
 
-theorem orth_span (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (b : ℕ) (w : Fin n → ℂ)
-    (hw : ∀ c : Fin r, c.1 < b → hJ ε (e c) w = 0) : ∀ v ∈ spanLt e b, hJ ε v w = 0 := by
+theorem orth_span
+    (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (b : ℕ) (w : Fin n → ℂ)
+    (hw : ∀ c : Fin r, c.1 < b → hJ ε (e c) w = 0)
+    : ∀ v ∈ spanLt e b, hJ ε v w = 0 := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem y hy =>
@@ -43,12 +48,12 @@ theorem orth_span (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (b : ℕ) 
 
 theorem spanLt_zero (e : Fin r → Fin n → ℂ) : spanLt e 0 = ⊥ := by
   unfold spanLt
-  have : (e '' {b : Fin r | b.1 < 0}) = ∅ := by
-    ext x; simp
+  have : (e '' {b : Fin r | b.1 < 0}) = ∅ := by ext x; simp
   rw [this, Submodule.span_empty]
 
-theorem pow_lower (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) {G : Matrix (Fin n) (Fin n) ℂ}
-    (hG : InS e z G) (k : ℕ) : ∀ m, ∀ v ∈ spanLt e (m + k), (G - 1) ^ k *ᵥ v ∈ spanLt e m := by
+theorem pow_lower
+    (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) {G : Matrix (Fin n) (Fin n) ℂ} (hG : InS e z G) (k : ℕ)
+    : ∀ m, ∀ v ∈ spanLt e (m + k), (G - 1) ^ k *ᵥ v ∈ spanLt e m := by
   induction k with
   | zero => intro m v hv; simpa using hv
   | succ k ih =>
@@ -68,16 +73,21 @@ theorem pow_lower (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) {G : Matrix 
     rw [pow_succ, ← mulVec_mulVec]
     exact ih m _ h1
 
-theorem nilp (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Formalism.REAL.UJ ε)
-    (hg : g ∈ NLoc ε e z) : (Formalism.MainNotions.S.uMat g - 1) ^ (2 * r + 1) = 0 := by
+theorem nilp
+    (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    (g : Formalism.REAL.UJ ε) (hg : g ∈ NLoc ε e z)
+    : (Formalism.MainNotions.S.uMat g - 1) ^ (2 * r + 1) = 0 := by
   set G := Formalism.MainNotions.S.uMat g with hGdef
   have hN : InN ε e z G := hg
   have hS' : InS e z (Formalism.MainNotions.S.uMat g⁻¹) :=
     (Formalism.L2.SG.RealObj.InfCut.UnitaryIsometries.RI.SG ε e z).inv_mem hg.1
-  have hGG' : G * Formalism.MainNotions.S.uMat g⁻¹ = 1 := Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames.NH.uMat_mul_inv ε g
+  have hGG' : G * Formalism.MainNotions.S.uMat g⁻¹ = 1 :=
+    Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames.NH.uMat_mul_inv ε g
   have hiso := Formalism.L2.SG.RealObj.InfCut.UnitaryIsometries.isIsom_uMat ε g
 
-  have adj : ∀ b : Fin r, ∀ w, hJ ε (e b) ((G - 1) *ᵥ w) = hJ ε ((Formalism.MainNotions.S.uMat g⁻¹ - 1) *ᵥ e b) w := by
+  have adj
+      : ∀ b : Fin r, ∀ w,
+        hJ ε (e b) ((G - 1) *ᵥ w) = hJ ε ((Formalism.MainNotions.S.uMat g⁻¹ - 1) *ᵥ e b) w := by
     intro b w
     have h1 : hJ ε (e b) (G *ᵥ w) = hJ ε (Formalism.MainNotions.S.uMat g⁻¹ *ᵥ e b) w := by
       have := hiso (Formalism.MainNotions.S.uMat g⁻¹ *ᵥ e b) w
@@ -99,8 +109,7 @@ theorem nilp (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → 
     exact hN.2 _ (fun a => step1 r x a a.2)
   have step3 : ∀ x, (G - 1) ^ (2 * r + 1) *ᵥ x = 0 := by
     intro x
-    have : (G - 1) ^ (2 * r + 1) = (G - 1) ^ r * (G - 1) ^ (r + 1) := by
-      rw [← pow_add]; ring_nf
+    have : (G - 1) ^ (2 * r + 1) = (G - 1) ^ r * (G - 1) ^ (r + 1) := by rw [← pow_add]; ring_nf
     rw [this, ← mulVec_mulVec]
     have hm := pow_lower e z hN.1 r 0 _ (by rw [zero_add]; exact step2 x)
     rw [spanLt_zero] at hm
@@ -111,5 +120,9 @@ theorem nilp (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → 
 
 end GlobalTheory.UnipRadNilp
 
-theorem GlobalTheory.unipRad_pow_eq_zero : ∀ {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Formalism.REAL.UJ ε), g ∈ Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates.NLoc ε e z → (Formalism.MainNotions.S.uMat g - 1) ^ (2 * r + 1) = 0 :=
-  fun ε e z g hg => GlobalTheory.UnipRadNilp.nilp ε e z g hg
+theorem GlobalTheory.unipRad_pow_eq_zero
+    : ∀ {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+        (g : Formalism.REAL.UJ ε),
+      g ∈ Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates.NLoc ε e z
+        → (Formalism.MainNotions.S.uMat g - 1) ^ (2 * r + 1) = 0 := fun ε e z g hg =>
+  GlobalTheory.UnipRadNilp.nilp ε e z g hg

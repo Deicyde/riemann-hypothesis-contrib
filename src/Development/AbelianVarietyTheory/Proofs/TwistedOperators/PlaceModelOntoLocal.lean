@@ -13,7 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SchwartzB
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -24,27 +27,42 @@ variable {D : D7}
 theorem sb_zero {m n : ℕ} (e : AE D) (Λ : AddSubgroup (Mx D m n)) : IsSBHalf e Λ 0 :=
   ⟨fun _ h => absurd rfl h, 1, one_pos, fun _ _ _ _ => rfl, fun _ h => absurd rfl h⟩
 
-theorem sb_smul {m n : ℕ} {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Φ : Mx D m n → ℂ} (c : ℂ)
-    (h : IsSBHalf e Λ Φ) : IsSBHalf e Λ (c • Φ) := by
+theorem sb_smul
+    {m n : ℕ} {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Φ : Mx D m n → ℂ}
+    (c : ℂ) (h : IsSBHalf e Λ Φ)
+    : IsSBHalf e Λ (c • Φ) := by
   obtain ⟨h1, k, hk, h2, h3⟩ := h
   have ne : ∀ t, (c • Φ) t ≠ 0 → Φ t ≠ 0 := fun t ht h0 => ht (by rw [Pi.smul_apply, h0, smul_zero])
-  exact ⟨fun t ht => h1 t (ne t ht), k, hk, fun u hu hh t => by rw [Pi.smul_apply, Pi.smul_apply, h2 u hu hh t],
-    fun t ht => h3 t (ne t ht)⟩
+  exact ⟨
+    fun t ht => h1 t (ne t ht),
+    k,
+    hk,
+    fun u hu hh t => by rw [Pi.smul_apply, Pi.smul_apply, h2 u hu hh t],
+    fun t ht => h3 t (ne t ht)
+  ⟩
 
-theorem half_nsmul {m n : ℕ} {e : AE D} {u : Mx D m n} (k : ℕ) (h : IsHalf e u) : IsHalf e (k • u) := by
+theorem half_nsmul {m n : ℕ} {e : AE D} {u : Mx D m n} (k : ℕ) (h : IsHalf e u)
+    : IsHalf e (k • u) := by
   rw [GlobalTheory.SplitScalar.isHalf_iff] at h ⊢
   rw [smul_comm, h]
 
-theorem sb_add {m n : ℕ} {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Φ Ψ : Mx D m n → ℂ}
-    (h : IsSBHalf e Λ Φ) (h' : IsSBHalf e Λ Ψ) : IsSBHalf e Λ (Φ + Ψ) := by
+theorem sb_add
+    {m n : ℕ} {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Φ Ψ : Mx D m n → ℂ}
+    (h : IsSBHalf e Λ Φ) (h' : IsSBHalf e Λ Ψ)
+    : IsSBHalf e Λ (Φ + Ψ) := by
   obtain ⟨h1, k, hk, h2, h3⟩ := h
   obtain ⟨h1', k', hk', h2', h3'⟩ := h'
   have ne : ∀ t, (Φ + Ψ) t ≠ 0 → Φ t ≠ 0 ∨ Ψ t ≠ 0 := fun t ht => by
     by_contra hc
     rw [not_or, not_not, not_not] at hc
     exact ht (by rw [Pi.add_apply, hc.1, hc.2, add_zero])
-  refine ⟨fun t ht => (ne t ht).elim (h1 t) (h1' t), k * k', Nat.mul_pos hk hk', fun u hu hh t => ?_,
-    fun t ht => ?_⟩
+  refine ⟨
+    fun t ht => (ne t ht).elim (h1 t) (h1' t),
+    k * k',
+    Nat.mul_pos hk hk',
+    fun u hu hh t => ?_,
+    fun t ht => ?_
+  ⟩
   · have e1 : Φ (t + (k * k') • u) = Φ t := by
       rw [mul_smul]; exact h2 _ (Λ.nsmul_mem hu k') (half_nsmul k' hh) t
     have e2 : Ψ (t + (k * k') • u) = Ψ t := by
@@ -54,8 +72,10 @@ theorem sb_add {m n : ℕ} {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Φ Ψ : Mx 
     · rw [mul_comm, mul_smul]; exact Λ.nsmul_mem (h3 t h) k'
     · rw [mul_smul]; exact Λ.nsmul_mem (h3' t h) k
 
-theorem wAt_of_half {m n : ℕ} {p : Place D} {a c : AE D} (hac : a * c = 0) (hs : a + c = idem D p)
-    {x : Mx D m n} (hx : IsHalf a x) : wAt p x = x := by
+theorem wAt_of_half
+    {m n : ℕ} {p : Place D} {a c : AE D} (hac : a * c = 0) (hs : a + c = idem D p)
+    {x : Mx D m n} (hx : IsHalf a x)
+    : wAt p x = x := by
   funext i j
   show idem D p * x i j = x i j
   have := hx i j

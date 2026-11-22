@@ -9,16 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDatu
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
 
 namespace GlobalTheory.LocOver.SameDC
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : HermSp M V)
 
 lemma unitary_mul {a b : V ≃ₗ[E] V} (ha : IsUnitary H a) (hb : IsUnitary H b) :
     IsUnitary H (a * b) := by
@@ -38,8 +41,7 @@ lemma X_comp (k : V ≃ₗ[E] V) {r : ℕ} (f : Fin (r + 1) → V) :
   rw [Submodule.map_span, ← Set.range_comp]
   rfl
 
-def Good (X : Submodule E V) (u : V ≃ₗ[E] V) : Prop :=
-  IsUnitary H u ∧ ∀ v ∈ H.perp X, u v - v ∈ X
+def Good (X : Submodule E V) (u : V ≃ₗ[E] V) : Prop := IsUnitary H u ∧ ∀ v ∈ H.perp X, u v - v ∈ X
 
 lemma good_map_le {X : Submodule E V} {u : V ≃ₗ[E] V} (hX : X ≤ H.perp X) (hu : Good H X u) :
     ∀ x ∈ X, u x ∈ X := by
@@ -259,7 +261,24 @@ end GlobalTheory.LocOver.SameDC
 
 namespace GlobalTheory.LocOver.SameDC
 
-theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (k : ℕ) (P : FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M) → ∀ (t₁ t₂ : Term V M r), H.IsTerm t₁ → H.IsTerm t₂ → t₂.abelian₂ = t₁.abelian₂ → t₂.T = t₁.T → t₂.T' = t₁.T' → ∀ n ∈ NU H t₁.f, ∀ m ∈ NU H t₁.f', img (n * m) t₁.abelian₂ = t₁.abelian₂ → Tri E t₁.f t₂.f → Tri E (fun b => (n * m) (t₁.f' b)) t₂.f' → (M.split ≠ none → ∀ x' ∈ t₁.abelian₂, ∀ x ∈ t₁.abelian₂, x' ∈ H.perp (H.X t₁.f') → x ∈ H.perp (H.X t₁.f) → (Cong H t₁.abelian₂ t₁.f t₁.f' (x - x') ↔ Cong H t₁.abelian₂ t₂.f t₂.f' (x - (n * m) x'))) → ∀ d : Datum P, Over P d t₁ → Over P d t₂ := by
+theorem same_datum
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
+          ∀ (k : ℕ) (P : FPair H r),
+            Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M)
+              → ∀ (t₁ t₂ : Term V M r),
+                H.IsTerm t₁ → H.IsTerm t₂ → t₂.abelian₂ = t₁.abelian₂ → t₂.T = t₁.T → t₂.T' = t₁.T'
+                  → ∀ n ∈ NU H t₁.f, ∀ m ∈ NU H t₁.f',
+                    img (n * m) t₁.abelian₂ = t₁.abelian₂ → Tri E t₁.f t₂.f
+                      → Tri E (fun b => (n * m) (t₁.f' b)) t₂.f'
+                      → (M.split ≠ none
+                        → ∀ x' ∈ t₁.abelian₂, ∀ x ∈ t₁.abelian₂,
+                          x' ∈ H.perp (H.X t₁.f') → x ∈ H.perp (H.X t₁.f)
+                            → (Cong H t₁.abelian₂ t₁.f t₁.f' (x - x')
+                              ↔ Cong H t₁.abelian₂ t₂.f t₂.f' (x - (n * m) x')))
+                      → ∀ d : Datum P, Over P d t₁ → Over P d t₂ := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hk hP t₁ t₂ ht₁ ht₂ hΛ hT hT' n hn m hm hnm htri htri'
     hcong d hov
   obtain ⟨g, hg, d', hdd', hT1, hT1', ⟨n₁, hn₁, hf₁, hΛ₁⟩, ⟨n₁', hn₁', hf₁', hΛ₁'⟩, hsp⟩ := hov
@@ -276,10 +295,8 @@ theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
   have hXB1 : H.X P.B.f = (H.X t₁.f').map (g : V →ₗ[E] V) := by
     rw [← X_comp, ef₁', N_map_X H hM P.B hBT hn₁']
 
-  have ha : g * n * g⁻¹ ∈ NU H (fun b => n₁ (P.A.f b)) := by
-    rw [← ef₁]; exact NU_conj H hg hn
-  have hb : g * m * g⁻¹ ∈ NU H (fun b => n₁' (P.B.f b)) := by
-    rw [← ef₁']; exact NU_conj H hg hm
+  have ha : g * n * g⁻¹ ∈ NU H (fun b => n₁ (P.A.f b)) := by rw [← ef₁]; exact NU_conj H hg hn
+  have hb : g * m * g⁻¹ ∈ NU H (fun b => n₁' (P.B.f b)) := by rw [← ef₁']; exact NU_conj H hg hm
   have gA : Good H (H.X P.A.f) (g * n * g⁻¹) := by
     have := good_of_NU H ha; rwa [N_map_X H hM P.A hAT hn₁] at this
   have gB : Good H (H.X P.B.f) (g * m * g⁻¹) := by
@@ -293,39 +310,40 @@ theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
   have hn₁u' : IsUnitary H n₁' := ((hNB n₁').1 hn₁').1
   have hc : n₁⁻¹ * (g * n * g⁻¹) * n₁⁻¹⁻¹ ∈ NU H P.A.f := by
     have := NU_conj H (unitary_inv H hn₁u) ha
-    have e : (fun b => n₁⁻¹ (n₁ (P.A.f b))) = P.A.f := by
-      funext b; exact n₁.symm_apply_apply _
+    have e : (fun b => n₁⁻¹ (n₁ (P.A.f b))) = P.A.f := by funext b; exact n₁.symm_apply_apply _
     rwa [e] at this
   have hd : n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹ ∈ NU H P.B.f := by
     have := NU_conj H (unitary_inv H hn₁u') hb
-    have e : (fun b => n₁'⁻¹ (n₁' (P.B.f b))) = P.B.f := by
-      funext b; exact n₁'.symm_apply_apply _
+    have e : (fun b => n₁'⁻¹ (n₁' (P.B.f b))) = P.B.f := by funext b; exact n₁'.symm_apply_apply _
     rwa [e] at this
   have hn₂ : n₁ * (n₁⁻¹ * (g * n * g⁻¹) * n₁⁻¹⁻¹)⁻¹ ∈ P.A.N :=
     P.A.N.mul_mem hn₁ (P.A.N.inv_mem ((hNA _).2 hc))
-  have hn₂' : n₁' * (n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹) ∈ P.B.N :=
-    P.B.N.mul_mem hn₁' ((hNB _).2 hd)
+  have hn₂' : n₁' * (n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹) ∈ P.B.N := P.B.N.mul_mem hn₁' ((hNB _).2 hd)
   have hTri1 : Tri E P.A.f (fun b => (g * n⁻¹) (t₁.f b)) := by
     have := hTA _ hn₂
-    have e : (fun b => (n₁ * (n₁⁻¹ * (g * n * g⁻¹) * n₁⁻¹⁻¹)⁻¹) (P.A.f b)) =
-        fun b => (g * n⁻¹) (t₁.f b) := by
+    have e
+        : (fun b => (n₁ * (n₁⁻¹ * (g * n * g⁻¹) * n₁⁻¹⁻¹)⁻¹) (P.A.f b))
+          = fun b => (g * n⁻¹) (t₁.f b) := by
       funext b
       rw [show n₁ * (n₁⁻¹ * (g * n * g⁻¹) * n₁⁻¹⁻¹)⁻¹ = g * n⁻¹ * g⁻¹ * n₁ by group]
       change (g * n⁻¹ * g⁻¹) (n₁ (P.A.f b)) = _
       rw [← congrFun ef₁ b]
       change g (n⁻¹ (g.symm (g (t₁.f b)))) = _
-      rw [LinearEquiv.symm_apply_apply]; rfl
+      rw [LinearEquiv.symm_apply_apply]
+      rfl
     rwa [e] at this
   have hTri2 : Tri E P.B.f (fun b => (g * m) (t₁.f' b)) := by
     have := hTB _ hn₂'
-    have e : (fun b => (n₁' * (n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹)) (P.B.f b)) =
-        fun b => (g * m) (t₁.f' b) := by
+    have e
+        : (fun b => (n₁' * (n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹)) (P.B.f b))
+          = fun b => (g * m) (t₁.f' b) := by
       funext b
       rw [show n₁' * (n₁'⁻¹ * (g * m * g⁻¹) * n₁'⁻¹⁻¹) = g * m * g⁻¹ * n₁' by group]
       change (g * m * g⁻¹) (n₁' (P.B.f b)) = _
       rw [← congrFun ef₁' b]
       change g (m (g.symm (g (t₁.f' b)))) = _
-      rw [LinearEquiv.symm_apply_apply]; rfl
+      rw [LinearEquiv.symm_apply_apply]
+      rfl
     rwa [e] at this
   have hTriA : Tri E P.A.f (fun b => (g * n⁻¹) (t₂.f b)) := tri_trans hTri1 (tri_map (g * n⁻¹) htri)
   have hTriB : Tri E P.B.f (fun b => (g * n⁻¹) (t₂.f' b)) := by
@@ -338,15 +356,18 @@ theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
 
   have hg₂ : IsUnitary H (g * n⁻¹) := unitary_mul H hg (unitary_inv H hn.1)
   have htt : H.IsTerm (move (g * n⁻¹) t₂) := isTerm_move H hg₂ ht₂
-  obtain ⟨d'', hd''⟩ := GlobalTheory.T.exists_datum_of_two_congruent_frames M hM H r P (move (g * n⁻¹) t₂) htt
-    (by change t₂.T = P.A.T; rw [hT]; exact hT1) (by change t₂.T' = P.B.T; rw [hT']; exact hT1')
-    hTriA hTriB
+  obtain ⟨d'', hd''⟩ :=
+    GlobalTheory.T.exists_datum_of_two_congruent_frames M hM H r P (move (g * n⁻¹) t₂) htt
+      (by change t₂.T = P.A.T; rw [hT]; exact hT1) (by change t₂.T' = P.B.T; rw [hT']; exact hT1')
+      hTriA hTriB
 
   have hlamA : img (g * n⁻¹) t₂.abelian₂ = img (g * n⁻¹ * g⁻¹) (img g t₁.abelian₂) := by
     rw [hΛ, ← TermOver.img_mul]; congr 1; group
   have hnm' : img n⁻¹ t₁.abelian₂ = img m t₁.abelian₂ := by
     conv_lhs => rw [← hnm]
-    rw [← TermOver.img_mul]; congr 1; group
+    rw [← TermOver.img_mul]
+    congr 1
+    group
   have hlamM : img (g * n⁻¹) t₂.abelian₂ = img (g * m) t₁.abelian₂ := by
     rw [hΛ, TermOver.img_mul, hnm', ← TermOver.img_mul]
   have hlamB : img (g * n⁻¹) t₂.abelian₂ = img (g * m * g⁻¹) (img g t₁.abelian₂) := by
@@ -361,15 +382,25 @@ theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
 
   have hLA : H.Lset (move (g * n⁻¹) t₂).abelian₂ P.A.f = H.Lset (move g t₁).abelian₂ P.A.f := by
     change H.Lset (img (g * n⁻¹) t₂.abelian₂) P.A.f = H.Lset (img g t₁.abelian₂) P.A.f
-    rw [hlamA]; exact Lset_img H hXA gA' _
+    rw [hlamA]
+    exact Lset_img H hXA gA' _
   have hLB : H.Lset (move (g * n⁻¹) t₂).abelian₂ P.B.f = H.Lset (move g t₁).abelian₂ P.B.f := by
     change H.Lset (img (g * n⁻¹) t₂.abelian₂) P.B.f = H.Lset (img g t₁.abelian₂) P.B.f
-    rw [hlamB]; exact Lset_img H hXB gB _
+    rw [hlamB]
+    exact Lset_img H hXB gB _
 
-  have hio : ∀ gs, M.split = some gs →
-      H.iotaGraph gs ⟨(move (g * n⁻¹) t₂).abelian₂, P.A.f, P.B.f, (move (g * n⁻¹) t₂).T,
-        (move (g * n⁻¹) t₂).T'⟩ =
-      H.iotaGraph gs ⟨(move g t₁).abelian₂, P.A.f, P.B.f, (move g t₁).T, (move g t₁).T'⟩ := by
+  have hio
+      : ∀ gs,
+        M.split = some gs
+          → H.iotaGraph gs ⟨
+              (move (g * n⁻¹) t₂).abelian₂,
+              P.A.f,
+              P.B.f,
+              (move (g * n⁻¹) t₂).T,
+              (move (g * n⁻¹) t₂).T'
+            ⟩
+            = H.iotaGraph gs
+              ⟨(move g t₁).abelian₂, P.A.f, P.B.f, (move g t₁).T, (move g t₁).T'⟩ := by
     intro gs hs
     have hc := hcong (by rw [hs]; exact Option.some_ne_none _)
     ext p
@@ -394,52 +425,76 @@ theorem same_datum : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace
       change Cong H (img (g * n⁻¹) t₂.abelian₂) P.A.f P.B.f _ at hC
       rw [e1, cong_img H (g * n⁻¹) hXA2 hXB2, hΛ] at hC
       have hC1 := (hc x' hx' x hx hxp' hxp).2 hC
-      refine ⟨⟨g x', by rw [hXB1, perp_map_iff H hg]; exact hxp'⟩,
+      refine ⟨
+        ⟨g x', by rw [hXB1, perp_map_iff H hg]; exact hxp'⟩,
         ⟨g x, by rw [hXA1, perp_map_iff H hg]; exact hxp⟩,
-        (TermOver.mem_img g _ _).2 ⟨x', hx', rfl⟩, (TermOver.mem_img g _ _).2 ⟨x, hx, rfl⟩, ?_, ?_⟩
+        (TermOver.mem_img g _ _).2 ⟨x', hx', rfl⟩,
+        (TermOver.mem_img g _ _).2 ⟨x, hx, rfl⟩,
+        ?_,
+        ?_
+      ⟩
       · change Cong H (img g t₁.abelian₂) P.A.f P.B.f (g x - g x')
-        rw [← map_sub, cong_img H g hXA1 hXB1]; exact hC1
+        rw [← map_sub, cong_img H g hXA1 hXB1]
+        exact hC1
       · refine Prod.ext (mkW_eq H _ _ ?_) (mkW_eq H _ _ ?_)
         · change (y' : V) - g x' ∈ _
-          rw [hgx', ← neg_sub]; exact Submodule.neg_mem _ (gB'.2 _ y'.2)
+          rw [hgx', ← neg_sub]
+          exact Submodule.neg_mem _ (gB'.2 _ y'.2)
         · change (y : V) - g x ∈ _
-          rw [hgx, ← neg_sub]; exact Submodule.neg_mem _ (gA.2 _ y.2)
+          rw [hgx, ← neg_sub]
+          exact Submodule.neg_mem _ (gA.2 _ y.2)
     · rintro ⟨y', y, hy', hy, hC, rfl⟩
       obtain ⟨x, hx, hyx⟩ := (TermOver.mem_img g t₁.abelian₂ _).1 hy
       obtain ⟨x', hx', hyx'⟩ := (TermOver.mem_img g t₁.abelian₂ _).1 hy'
-      have hxp : x ∈ H.perp (H.X t₁.f) := by
-        rw [← perp_map_iff H hg, ← hXA1, hyx]; exact y.2
-      have hxp' : x' ∈ H.perp (H.X t₁.f') := by
-        rw [← perp_map_iff H hg, ← hXB1, hyx']; exact y'.2
+      have hxp : x ∈ H.perp (H.X t₁.f) := by rw [← perp_map_iff H hg, ← hXA1, hyx]; exact y.2
+      have hxp' : x' ∈ H.perp (H.X t₁.f') := by rw [← perp_map_iff H hg, ← hXB1, hyx']; exact y'.2
       change Cong H (img g t₁.abelian₂) P.A.f P.B.f _ at hC
       rw [← hyx, ← hyx', ← map_sub, cong_img H g hXA1 hXB1] at hC
       have hC2 := (hc x' hx' x hx hxp' hxp).1 hC
       rw [← hΛ, ← cong_img H (g * n⁻¹) hXA2 hXB2] at hC2
-      refine ⟨⟨(g * m * g⁻¹) y', good_perp H hXB gB _ y'.2⟩,
-        ⟨(g * n⁻¹ * g⁻¹) y, good_perp H hXA gA' _ y.2⟩, ?_, ?_, ?_, ?_⟩
+      refine ⟨
+        ⟨(g * m * g⁻¹) y', good_perp H hXB gB _ y'.2⟩,
+        ⟨(g * n⁻¹ * g⁻¹) y, good_perp H hXA gA' _ y.2⟩,
+        ?_,
+        ?_,
+        ?_,
+        ?_
+      ⟩
       · change _ ∈ img (g * n⁻¹) t₂.abelian₂
         rw [hlamM]
-        exact (TermOver.mem_img _ _ _).2 ⟨x', hx', by
-          change (g * m) x' = (g * m * g⁻¹) (y' : V)
-          rw [← hyx', ← LinearEquiv.mul_apply, show g * m * g⁻¹ * g = g * m by group]⟩
+        exact (TermOver.mem_img _ _ _).2 ⟨
+          x',
+          hx',
+          by
+            change (g * m) x' = (g * m * g⁻¹) (y' : V)
+            rw [← hyx', ← LinearEquiv.mul_apply, show g * m * g⁻¹ * g = g * m by group]
+        ⟩
       · change _ ∈ img (g * n⁻¹) t₂.abelian₂
-        exact (TermOver.mem_img _ _ _).2 ⟨x, by rw [hΛ]; exact hx, by
-          change (g * n⁻¹) x = (g * n⁻¹ * g⁻¹) (y : V)
-          rw [← hyx, ← LinearEquiv.mul_apply, show g * n⁻¹ * g⁻¹ * g = g * n⁻¹ by group]⟩
+        exact (TermOver.mem_img _ _ _).2 ⟨
+          x,
+          by rw [hΛ]; exact hx,
+          by
+            change (g * n⁻¹) x = (g * n⁻¹ * g⁻¹) (y : V)
+            rw [← hyx, ← LinearEquiv.mul_apply, show g * n⁻¹ * g⁻¹ * g = g * n⁻¹ by group]
+        ⟩
       · change Cong H (img (g * n⁻¹) t₂.abelian₂) P.A.f P.B.f ((g * n⁻¹ * g⁻¹) y - (g * m * g⁻¹) y')
         have e : (g * n⁻¹ * g⁻¹) (y : V) - (g * m * g⁻¹) y' = (g * n⁻¹) (x - (n * m) x') := by
           rw [← hyx, ← hyx', map_sub, ← LinearEquiv.mul_apply (g * n⁻¹ * g⁻¹),
             ← LinearEquiv.mul_apply (g * m * g⁻¹), ← LinearEquiv.mul_apply (g * n⁻¹) (n * m),
             show g * n⁻¹ * g⁻¹ * g = g * n⁻¹ by group, show g * m * g⁻¹ * g = g * m by group,
             show g * n⁻¹ * (n * m) = g * m by group]
-        rw [e]; exact hC2
+        rw [e]
+        exact hC2
       · refine Prod.ext (mkW_eq H _ _ ?_) (mkW_eq H _ _ ?_)
         · change (y' : V) - (g * m * g⁻¹) y' ∈ _
-          rw [← neg_sub]; exact Submodule.neg_mem _ (gB.2 _ y'.2)
+          rw [← neg_sub]
+          exact Submodule.neg_mem _ (gB.2 _ y'.2)
         · change (y : V) - (g * n⁻¹ * g⁻¹) y ∈ _
-          rw [← neg_sub]; exact Submodule.neg_mem _ (gA'.2 _ y.2)
-  have hdd : d'' = d' := (TermLat.datum_of_lattice M hM H r k P hk hP).2 d'' d' _ _ hd''
-    ⟨hT1, hT1', ⟨n₁, hn₁, hf₁, hΛ₁⟩, ⟨n₁', hn₁', hf₁', hΛ₁'⟩, hsp⟩ hLA hLB hio
+          rw [← neg_sub]
+          exact Submodule.neg_mem _ (gA'.2 _ y.2)
+  have hdd : d'' = d' :=
+    (TermLat.datum_of_lattice M hM H r k P hk hP).2 d'' d' _ _ hd''
+      ⟨hT1, hT1', ⟨n₁, hn₁, hf₁, hΛ₁⟩, ⟨n₁', hn₁', hf₁', hΛ₁'⟩, hsp⟩ hLA hLB hio
   subst hdd
   exact ⟨g * n⁻¹, hg₂, d'', hdd', hd''⟩
 

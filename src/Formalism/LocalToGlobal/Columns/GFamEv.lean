@@ -24,22 +24,17 @@ abbrev Pt (F : GFam K) : Type := Σ b, F.D b
 def cls (F : GFam K) (p : F.Pt) : F.Cl := ⟨p.1, (F.mem p.1).cls p.2⟩
 
 structure Ev (F : GFam K) (σ : K →+* ℂ) where
-
   Y : Type
-
   ev : F.V →ₛₗ[σ] (Y → ℂ)
   li : LinearIndependent ℂ fun i => ev (F.bV i)
-
   ip : (Y → ℂ) →ₗ⋆[ℂ] (Y → ℂ) →ₗ[ℂ] ℂ
   ip_ev : ∀ x y, ip (ev x) (ev y) = σ (F.pair x y)
-
   tr : ∀ b, F.G b →* ((Y → ℂ) ≃ₗ[ℂ] (Y → ℂ))
   tr_ev : ∀ b g x, tr b g (ev x) = ev (F.ρ b g x)
 
 namespace Ev
 
 variable {F : GFam K} {σ : K →+* ℂ} (E : F.Ev σ)
-
 
 end Ev
 
@@ -53,7 +48,9 @@ end GSD.Ev
 
 section Round
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))} {β : Type} [Fintype β] [DecidableEq β]
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))} {β : Type}
+  [Fintype β] [DecidableEq β]
 
 end Round
 

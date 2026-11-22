@@ -13,16 +13,18 @@ noncomputable section
 namespace PI.PolynomialProperness
 
 def PolyProper5 : Prop :=
-  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r), Std k r z z' → PosPt k r z z' γ →
-    IsMonomial (Zhat k r z z' γ) → ∃ C : ℝ,
-      (∀ σ ∈ Sg k r z z' γ, ∀ s' ∈ Sset k r z',
-        B.gN σ + B.gN s' ≤ C * B.gN (σ⁻¹ * γ * s') ^ (5 * (r + 1) ^ 2)) ∧
-      (∀ s ∈ Sset k r z, ∀ σ' ∈ Sg' k r z z' γ,
-        B.gN s + B.gN σ' ≤ C * B.gN (s⁻¹ * γ * σ') ^ (5 * (r + 1) ^ 2))
+  ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (γ : B.Mat k r),
+    Std k r z z' → PosPt k r z z' γ → IsMonomial (Zhat k r z z' γ)
+      → ∃ C : ℝ,
+        (∀ σ ∈ Sg k r z z' γ, ∀ s' ∈ Sset k r z',
+            B.gN σ + B.gN s' ≤ C * B.gN (σ⁻¹ * γ * s') ^ (5 * (r + 1) ^ 2))
+          ∧ (∀ s ∈ Sset k r z, ∀ σ' ∈ Sg' k r z z' γ,
+            B.gN s + B.gN σ' ≤ C * B.gN (s⁻¹ * γ * σ') ^ (5 * (r + 1) ^ 2))
 
-theorem polyProper5_of_steps (hG : GVGroup) (hN : NormInv) (hNF : GNFacts) (hF : FmulBound)
-    (hZ : ZhatMove) (hS : FrameS) (hSg : FrameSg) (hSg' : FrameSg') (hA : UnitriangularInversePolynomialBound)
-    (hC : CoreInst) : PolyProper5 := by
+theorem polyProper5_of_steps
+    (hG : GVGroup) (hN : NormInv) (hNF : GNFacts) (hF : FmulBound) (hZ : ZhatMove) (hS : FrameS)
+    (hSg : FrameSg) (hSg' : FrameSg') (hA : UnitriangularInversePolynomialBound) (hC : CoreInst)
+    : PolyProper5 := by
   intro k r z z' γ hstd hpos hmono
   obtain ⟨CA, hA1, hA2⟩ := hA k r z z' γ hmono
   obtain ⟨Cc, hCc⟩ := hC k r z z' γ hstd hpos
@@ -51,8 +53,10 @@ theorem polyProper5_of_steps (hG : GVGroup) (hN : NormInv) (hNF : GNFacts) (hF :
 theorem polyProper5 : PolyProper5 :=
   polyProper5_of_steps gvGroup normInv gnFacts fmulBound zhatMove
     (frameS_of Formalism.FourierDecayAlt.P.unipotent_map_frame gvGroup)
-    (frameSg_of Formalism.FourierDecayAlt.P.unipotent_map_frame (tauMem_of mxFacts TauN.neFacts) gvGroup)
-    (frameSg'_of Formalism.FourierDecayAlt.P.unipotent_map_frame (tauMem_of mxFacts TauN.neFacts) gvGroup)
+    (frameSg_of Formalism.FourierDecayAlt.P.unipotent_map_frame (tauMem_of mxFacts TauN.neFacts)
+      gvGroup)
+    (frameSg'_of Formalism.FourierDecayAlt.P.unipotent_map_frame (tauMem_of mxFacts TauN.neFacts)
+      gvGroup)
     (unitriangular_inverse_bound second_order_norm_bound)
     (coreInst_of isoCore hpkInvol gnFacts frameInd)
 

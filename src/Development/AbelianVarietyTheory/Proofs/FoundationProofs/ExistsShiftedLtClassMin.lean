@@ -19,24 +19,27 @@ variable {X : Type*} [AddCommGroup X]
 
 variable {Q : QuadraticMap ℤ X ℝ} {N : ℤ}
 
-theorem shifted_zsmul (hN : N ≠ 0) (ν : X →+ ℝ) (μ : X) :
-    Q (N • μ) / N + ν (N • μ) = N * (Q μ + ν μ) := by
+theorem shifted_zsmul (hN : N ≠ 0) (ν : X →+ ℝ) (μ : X)
+    : Q (N • μ) / N + ν (N • μ) = N * (Q μ + ν μ) := by
   have hN' : (N : ℝ) ≠ 0 := by exact_mod_cast hN
   rw [QuadraticMap.map_smul, map_zsmul, zsmul_eq_mul, zsmul_eq_mul]
   push_cast
   field_simp
 
-theorem shifted_zsmul_nonneg (hN : 0 < N) {ν : X →+ ℝ} (h : ∀ μ, 0 ≤ Q μ + ν μ) (μ : X) :
-    0 ≤ Q (N • μ) / N + ν (N • μ) := by
+theorem shifted_zsmul_nonneg (hN : 0 < N) {ν : X →+ ℝ} (h : ∀ μ, 0 ≤ Q μ + ν μ) (μ : X)
+    : 0 ≤ Q (N • μ) / N + ν (N • μ) := by
   rw [shifted_zsmul hN.ne']
   exact mul_nonneg (by exact_mod_cast hN.le) (h μ)
 
-theorem shifted_lt_add_zsmul {c : ℝ} (hc : 0 ≤ c) (hN : 1 + 2 * c < N) {ν : X →+ ℝ} {e μ : X}
-    (hμ : 0 < Q μ) (hF : 0 ≤ Q μ / N + ν μ) (h : |polar Q e μ| ≤ c * polar Q μ μ) :
-    Q e / N + ν e < Q (e + N • μ) / N + ν (e + N • μ) := by
+theorem shifted_lt_add_zsmul
+    {c : ℝ} (hc : 0 ≤ c) (hN : 1 + 2 * c < N)
+    {ν : X →+ ℝ} {e μ : X}
+    (hμ : 0 < Q μ) (hF : 0 ≤ Q μ / N + ν μ) (h : |polar Q e μ| ≤ c * polar Q μ μ)
+    : Q e / N + ν e < Q (e + N • μ) / N + ν (e + N • μ) := by
   have hN0 : (0 : ℝ) < N := by linarith
-  have e1 : Q (e + N • μ) / N + ν (e + N • μ) = Q e / N + ν e +
-      (polar Q e μ + (N - 1) * Q μ + N * (Q μ / N + ν μ)) := by
+  have e1
+      : Q (e + N • μ) / N + ν (e + N • μ)
+        = Q e / N + ν e + (polar Q e μ + (N - 1) * Q μ + N * (Q μ / N + ν μ)) := by
     rw [map_add_zsmul, map_add (f := _), map_zsmul, zsmul_eq_mul]
     field_simp
     ring
@@ -46,8 +49,8 @@ theorem shifted_lt_add_zsmul {c : ℝ} (hc : 0 ≤ c) (hN : 1 + 2 * c < N) {ν :
   rw [e1]
   nlinarith [h.1]
 
-theorem exists_basis_neg {ι : Type*} (e : Basis ι ℤ X) {ν : X →+ ℝ} (hν : ν ≠ 0) :
-    ∃ i, ν (e i) < 0 ∨ ν (-e i) < 0 := by
+theorem exists_basis_neg {ι : Type*} (e : Basis ι ℤ X) {ν : X →+ ℝ} (hν : ν ≠ 0)
+    : ∃ i, ν (e i) < 0 ∨ ν (- e i) < 0 := by
   by_contra h
   push Not at h
   refine hν (AddMonoidHom.toIntLinearMap_injective (e.ext fun i => ?_))
@@ -62,15 +65,16 @@ end Class
 
 section Main
 
-variable {X : Type*} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+variable
+  {X : Type*} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
   {Q : QuadraticMap ℤ X ℝ} {N : ℤ} {d : ℕ}
 
-theorem exists_shifted_lt (hd : finrank ℤ X = d) (hQ : (realExt Q).PosDef)
-    (hN : 1 + 2 * d * (2 : ℝ) ^ ((d : ℝ) / 2) < N) {ν : X →+ ℝ} (hν : ν ≠ 0)
-    (h : ∀ μ, 0 ≤ Q μ + ν μ) :
-    ∃ α : X, (∀ w, α ≠ N • w) ∧
-      (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w)) ∧
-      ∀ w, Q α / N + ν α < Q (α + N • w) / N := by
+theorem exists_shifted_lt
+    (hd : finrank ℤ X = d) (hQ : (realExt Q).PosDef) (hN : 1 + 2 * d * (2 : ℝ) ^ ((d : ℝ) / 2) < N)
+    {ν : X →+ ℝ} (hν : ν ≠ 0) (h : ∀ μ, 0 ≤ Q μ + ν μ)
+    : ∃ α : X,
+      (∀ w, α ≠ N • w) ∧ (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w))
+        ∧ ∀ w, Q α / N + ν α < Q (α + N • w) / N := by
   have hP := posDef_of_posDef_realExt hQ
   have hc : (0 : ℝ) ≤ d * (2 : ℝ) ^ ((d : ℝ) / 2) := by positivity
   rw [mul_assoc] at hN
@@ -79,8 +83,10 @@ theorem exists_shifted_lt (hd : finrank ℤ X = d) (hQ : (realExt Q).PosDef)
     have : (1 : ℤ) < N := by exact_mod_cast hN1
     omega
   have hN0 : (0 : ℝ) < N := by linarith
-  suffices H : ∃ α : X, (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w)) ∧
-      ∀ w, Q α / N + ν α < Q (α + N • w) / N by
+  suffices H
+      : ∃ α : X,
+        (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w))
+          ∧ ∀ w, Q α / N + ν α < Q (α + N • w) / N by
     obtain ⟨α, h1, h2⟩ := H
     refine ⟨α, ?_, h1, h2⟩
     rintro w rfl
@@ -92,8 +98,8 @@ theorem exists_shifted_lt (hd : finrank ℤ X = d) (hQ : (realExt Q).PosDef)
   · obtain ⟨u, rfl⟩ := hX
     have hF : ∀ x, 0 ≤ Q x / N + ν x := fun x => (shifted_zsmul_nonneg (by omega) h u).trans (ha x)
     obtain ⟨e, he, -⟩ := exists_reduced_basis_pairing_coord hd Q hQ
-    obtain ⟨v, hv, hvp⟩ : ∃ v, ν v < 0 ∧
-        ∀ μ, |polar Q v μ| ≤ d * (2 : ℝ) ^ ((d : ℝ) / 2) * polar Q μ μ := by
+    obtain ⟨v, hv, hvp⟩
+        : ∃ v, ν v < 0 ∧ ∀ μ, |polar Q v μ| ≤ d * (2 : ℝ) ^ ((d : ℝ) / 2) * polar Q μ μ := by
       obtain ⟨i, hi | hi⟩ := exists_basis_neg e hν
       · exact ⟨_, hi, he i⟩
       · exact ⟨_, hi, fun μ => by rw [polar_neg_left, abs_neg]; exact he i μ⟩
@@ -108,12 +114,13 @@ theorem exists_shifted_lt (hd : finrank ℤ X = d) (hQ : (realExt Q).PosDef)
     refine h0.trans_lt (div_pos (hP _ fun hw => hX ⟨-w, ?_⟩) hN0)
     rw [smul_neg, eq_neg_iff_add_eq_zero, hw]
 
-theorem exists_shifted_lt_of_le {g : ℕ} (hg : finrank ℤ X ≤ g) (hQ : (realExt Q).PosDef)
-    (hN : 1 + 2 * g * (2 : ℝ) ^ ((g : ℝ) / 2) < N) {ν : X →+ ℝ} (hν : ν ≠ 0)
-    (h : ∀ μ, 0 ≤ Q μ + ν μ) :
-    ∃ α : X, (∀ w, α ≠ N • w) ∧
-      (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w)) ∧
-      ∀ w, Q α / N + ν α < Q (α + N • w) / N := by
+theorem exists_shifted_lt_of_le
+    {g : ℕ} (hg : finrank ℤ X ≤ g)
+    (hQ : (realExt Q).PosDef) (hN : 1 + 2 * g * (2 : ℝ) ^ ((g : ℝ) / 2) < N)
+    {ν : X →+ ℝ} (hν : ν ≠ 0) (h : ∀ μ, 0 ≤ Q μ + ν μ)
+    : ∃ α : X,
+      (∀ w, α ≠ N • w) ∧ (∀ w, w ≠ 0 → Q α / N + ν α < Q (α + N • w) / N + ν (α + N • w))
+        ∧ ∀ w, Q α / N + ν α < Q (α + N • w) / N := by
   refine exists_shifted_lt rfl hQ (lt_of_le_of_lt ?_ hN) hν h
   have := pairing_const_mono hg
   rw [mul_assoc, mul_assoc]

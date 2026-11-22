@@ -11,8 +11,9 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem adelicStab_isCompact_isOpen :
-    ∀ (I : AutInst), IsCompact I.Kset ∧ IsOpen I.Kset ∧ LocallyCompactSpace I.Gf ∧ T2Space I.Gf := by
+theorem adelicStab_isCompact_isOpen
+    : ∀ (I : AutInst),
+      IsCompact I.Kset ∧ IsOpen I.Kset ∧ LocallyCompactSpace I.Gf ∧ T2Space I.Gf := by
   intro I
   obtain ⟨h1, h2, -, h4, h5, -⟩ := GlobalTheory.CongTop.adelic_topology I
   exact ⟨h4, h5, h2, h1⟩

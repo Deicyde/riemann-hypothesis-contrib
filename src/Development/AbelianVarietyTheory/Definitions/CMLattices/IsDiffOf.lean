@@ -10,21 +10,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 
 noncomputable section
 namespace GlobalTheory.CM
 
-def LamEq {S : Scheme.{0}} {X Y A B : Over S} [GrpObj A] [GrpObj B] (L : LB A.left) (f₁ : X ⟶ A) (f₂ : Y ⟶ A)
-    (M : LB B.left) (g₁ : X ⟶ B) (g₂ : Y ⟶ B) : Prop :=
+def LamEq
+    {S : Scheme.{0}} {X Y A B : Over S} [GrpObj A] [GrpObj B]
+    (L : LB A.left) (f₁ : X ⟶ A) (f₂ : Y ⟶ A) (M : LB B.left) (g₁ : X ⟶ B) (g₂ : Y ⟶ B)
+    : Prop :=
   LBIso (cubeLB A ![fst X Y ≫ f₁, snd X Y ≫ f₂] L) (cubeLB B ![fst X Y ≫ g₁, snd X Y ≫ g₂] M)
 
-def WeilEq {S : Scheme.{0}} {X Y A B : Over S} [GrpObj X] [GrpObj Y] [GrpObj A] [GrpObj B] (L : LB A.left)
-    (f₁ : X ⟶ A) (f₂ : Y ⟶ A) (M : LB B.left) (g₁ : X ⟶ B) (g₂ : Y ⟶ B) {k : Type} [Field k] (t : Sp k ⟶ S) : Prop :=
-  ∀ (n : ℕ) (x : Over.mk t ⟶ X) (y : Over.mk t ⟶ Y) (c : kˣ), 0 < n → x ^ n = 1 → y ^ n = 1 →
-    (Out.WeilIs A L n (x ≫ f₁) (y ≫ f₂) (unitOn c) ↔ Out.WeilIs B M n (x ≫ g₁) (y ≫ g₂) (unitOn c))
+def WeilEq
+    {S : Scheme.{0}} {X Y A B : Over S} [GrpObj X] [GrpObj Y] [GrpObj A] [GrpObj B]
+    (L : LB A.left) (f₁ : X ⟶ A) (f₂ : Y ⟶ A) (M : LB B.left) (g₁ : X ⟶ B) (g₂ : Y ⟶ B)
+    {k : Type} [Field k]
+    (t : Sp k ⟶ S)
+    : Prop :=
+  ∀ (n : ℕ) (x : Over.mk t ⟶ X) (y : Over.mk t ⟶ Y) (c : kˣ),
+    0 < n → x ^ n = 1 → y ^ n = 1
+      → (Out.WeilIs A L n (x ≫ f₁) (y ≫ f₂) (unitOn c)
+        ↔ Out.WeilIs B M n (x ≫ g₁) (y ≫ g₂) (unitOn c))
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
@@ -42,7 +52,8 @@ structure Ell (H : Host E) (R : Type) [CommRing R] (ω : R) where
   adj : ∀ a b : OK H, (b : 𝓞 E) = H.bar a → LamEq P.L (act.act a) (𝟙 P.A) P.L (𝟙 P.A) (act.act b)
   prim : LBIso P.L (cubeLB P.A ![𝟙 P.A, act.act (wK H)] P.L)
 
-instance {H : Host E} {R : Type} [CommRing R] {ω : R} (C : Ell H R ω) : IsCommMonObj C.P.A := C.P.isAb.comm
+instance {H : Host E} {R : Type} [CommRing R] {ω : R} (C : Ell H R ω) : IsCommMonObj C.P.A :=
+  C.P.isAb.comm
 
 structure PAT (H : Host E) (S : Scheme.{0}) where
   t : SAB H S
@@ -65,16 +76,27 @@ abbrev PAT.pol {H : Host E} {S : Scheme.{0}} (T : PAT H S) : Out.PolAV S where
   ample := T.ample
   ktriv := T.ktriv
 
-def HasType (H : Host E) {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] (act : OAct (𝓞 E) G) (ρ : R)
-    (p q : ℕ) : Prop :=
-  ∀ (k : Type) [Field k] [IsAlgClosed k] (β : R →+* k), Function.Injective β → ∀ τ : 𝓞 E →+* k,
-    (τ H.rt = β ρ → LieMult act (spMap β) τ p) ∧ (τ H.rt ≠ β ρ → LieMult act (spMap β) τ q)
+def HasType
+    (H : Host E)
+    {R : Type} [CommRing R]
+    {G : Over (Sp R)} [GrpObj G]
+    (act : OAct (𝓞 E) G) (ρ : R) (p q : ℕ)
+    : Prop :=
+  ∀ (k : Type) [Field k] [IsAlgClosed k] (β : R →+* k),
+    Function.Injective β
+      → ∀ τ : 𝓞 E →+* k,
+        (τ H.rt = β ρ → LieMult act (spMap β) τ p) ∧ (τ H.rt ≠ β ρ → LieMult act (spMap β) τ q)
 
 def IsKForm {H : Host E} (D : Datum H) (ε : ℤˣ) (h : D.La → D.La → OK H) : Prop :=
-  ∀ x y, ((h x y : OK H) : 𝓞 E) =
-    (((ε : ℤ) * (D.EF (H.w0 • x) y - D.EF x y) : ℤ) : 𝓞 E) + (((ε : ℤ) * D.EF x y : ℤ) : 𝓞 E) * H.w0
+  ∀ x y,
+    ((h x y : OK H) : 𝓞 E)
+      = (((ε : ℤ) * (D.EF (H.w0 • x) y - D.EF x y) : ℤ) : 𝓞 E)
+        + (((ε : ℤ) * D.EF x y : ℤ) : 𝓞 E) * H.w0
 
-structure IsTen {H : Host E} {R : Type} [CommRing R] {ω : R} (C : Ell H R ω) (D : Datum H) (h : D.La → D.La → OK H)
+structure IsTen
+    {H : Host E} {R : Type} [CommRing R]
+    {ω : R} (C : Ell H R ω)
+    (D : Datum H) (h : D.La → D.La → OK H)
     (T : PAT H (Sp R)) where
   ten : Serre.IsTensor T.t.G (Serre.comapAct T.t.act (algebraMap (OK H) (𝓞 E))) C.P.A C.act D.La
   lin : ∀ (s : 𝓞 E) a, ten.tmul (s • a) = ten.tmul a ≫ T.t.act.act s
@@ -96,19 +118,25 @@ variable {P P' : Out.PolAV (Sp (𝓞 K))}
 def IsCoord (F : GenFib P) (u : epsR (𝓞 K) ⟶ P.A) (c : Fin F.P₀.g → K) : Prop :=
   IsTangent u ∧ ∃ w, IsVecOver (algebraMap (𝓞 K) K) F.φ u w ∧ IsLieComb c F.v w
 
-def lieLat (F : GenFib P) : Submodule (𝓞 K) (Fin F.P₀.g → K) := Submodule.span (𝓞 K) {c | ∃ u, F.IsCoord u c}
+def lieLat (F : GenFib P) : Submodule (𝓞 K) (Fin F.P₀.g → K) :=
+  Submodule.span (𝓞 K) {c | ∃ u, F.IsCoord u c}
 
-def eigLat (F : GenFib P) {O : Type} [CommRing O] (act : OAct O P.A) (τ : O →+* 𝓞 K) :
-    Submodule (𝓞 K) (Fin F.P₀.g → K) :=
+def eigLat (F : GenFib P) {O : Type} [CommRing O] (act : OAct O P.A) (τ : O →+* 𝓞 K)
+    : Submodule (𝓞 K) (Fin F.P₀.g → K) :=
   Submodule.span (𝓞 K) {c | ∃ u, F.IsCoord u c ∧ ∀ a, IsLieComb ![τ a] ![u] (u ≫ act.act a)}
 
 def IsHerm (F : GenFib P) (h : HermFam K (Fin F.P₀.g → K)) : Prop :=
-  ∀ s : K →+* ℂ, ∃ (Q : Out.PolAV (Sp ℂ)) (ψ : Q.A.left ⟶ F.P₀.A.left) (v' : Fin F.P₀.g → (epsR ℂ ⟶ Q.A))
-    (u : HolUnif Q.A Q.L Q.g) (Hm : Matrix (Fin Q.g) (Fin Q.g) ℂ) (χ : u.Λ → ℂ) (W : Fin F.P₀.g → Fin Q.g → ℂ),
-    IsPolFibre s F.P₀ Q ψ ∧ u.IsAH Hm χ ∧ (∀ i, IsVecOver s ψ (F.v i) (v' i) ∧ u.IsDiff (W i) (v' i)) ∧
-    ∀ i j, h.form s (Pi.single i 1) (Pi.single j 1) = Real.pi * hermForm Hm (W j) (W i)
+  ∀ s : K →+* ℂ,
+    ∃ (Q : Out.PolAV (Sp ℂ)) (ψ : Q.A.left ⟶ F.P₀.A.left) (v' : Fin F.P₀.g → (epsR ℂ ⟶ Q.A))
+        (u : HolUnif Q.A Q.L Q.g) (Hm : Matrix (Fin Q.g) (Fin Q.g) ℂ) (χ : u.Λ → ℂ)
+        (W : Fin F.P₀.g → Fin Q.g → ℂ),
+      IsPolFibre s F.P₀ Q ψ ∧ u.IsAH Hm χ
+        ∧ (∀ i, IsVecOver s ψ (F.v i) (v' i) ∧ u.IsDiff (W i) (v' i))
+        ∧ ∀ i j, h.form s (Pi.single i 1) (Pi.single j 1) = Real.pi * hermForm Hm (W j) (W i)
 
-def IsDiffOf (F : GenFib P) (F' : GenFib P') (f : P.A ⟶ P'.A) (M : (Fin F.P₀.g → K) →ₗ[K] (Fin F'.P₀.g → K)) : Prop :=
+def IsDiffOf
+    (F : GenFib P) (F' : GenFib P') (f : P.A ⟶ P'.A) (M : (Fin F.P₀.g → K) →ₗ[K] (Fin F'.P₀.g → K))
+    : Prop :=
   ∀ u c, F.IsCoord u c → F'.IsCoord (u ≫ f) (M c)
 
 end GenFib
@@ -116,7 +144,8 @@ end GenFib
 def Splits (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] : Prop :=
   Nat.card (𝓞 E →+* 𝓞 K) = Module.finrank ℚ E
 
-structure CMObj (H : Host E) (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (p q : ℕ) where
+structure CMObj
+    (H : Host E) (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) (σ₁ : K →+* ℂ) (p q : ℕ) where
   split : Splits E K
   ρ_sq : ρ ^ 2 = -(H.d : 𝓞 K)
   A : Bool → PAT H (Sp (𝓞 K))
@@ -127,11 +156,15 @@ structure CMObj (H : Host E) (K : Type) [Field K] [NumberField K] (ρ : 𝓞 K) 
   hh : Fin p ⊕ Fin q → 𝓞 E
   φ : ∀ j : Fin p ⊕ Fin q, (A j.isLeft).t.G ⟶ B.t.G
   lin : ∀ j, Serre.IsLinearHom (A j.isLeft).t.act B.t.act (φ j)
-  onto : ∀ y : Over.mk (spMap (σ₁.comp (algebraMap (𝓞 K) K))) ⟶ B.t.G,
-    ∃ x : ∀ j : Fin p ⊕ Fin q, Over.mk (spMap (σ₁.comp (algebraMap (𝓞 K) K))) ⟶ (A j.isLeft).t.G,
-      y = (List.ofFn fun i : Fin (p + q) => x (finSumFinEquiv.symm i) ≫ φ (finSumFinEquiv.symm i)).prod
-  weil : ∀ j, WeilEq B.t.PP.L (φ j) (φ j) (A j.isLeft).t.PP.L ((A j.isLeft).t.act.act (hh j)) (𝟙 _)
-    (spMap (σ₁.comp (algebraMap (𝓞 K) K)))
+  onto
+    : ∀ y : Over.mk (spMap (σ₁.comp (algebraMap (𝓞 K) K))) ⟶ B.t.G,
+      ∃ x : ∀ j : Fin p ⊕ Fin q, Over.mk (spMap (σ₁.comp (algebraMap (𝓞 K) K))) ⟶ (A j.isLeft).t.G,
+        y = (List.ofFn fun i : Fin (p + q) =>
+          x (finSumFinEquiv.symm i) ≫ φ (finSumFinEquiv.symm i)).prod
+  weil
+    : ∀ j,
+      WeilEq B.t.PP.L (φ j) (φ j) (A j.isLeft).t.PP.L ((A j.isLeft).t.act.act (hh j)) (𝟙 _)
+        (spMap (σ₁.comp (algebraMap (𝓞 K) K)))
 
 end GlobalTheory.CM
 end

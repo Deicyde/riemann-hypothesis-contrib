@@ -8,10 +8,10 @@ open Algebra
 
 namespace GlobalTheory
 
-theorem exists_ne_zero_algebraMap_eq_mul_of_formallyUnramified :
-    ∀ (P D : Type) [CommRing P] [IsDomain P] [CommRing D] [IsDomain D] [Algebra P D]
-      [Algebra.FiniteType P D] [Algebra.FormallyUnramified P D] (f : D), f ≠ 0 →
-      ∃ Q : P, Q ≠ 0 ∧ ∃ d : D, algebraMap P D Q = f * d := by
+theorem exists_ne_zero_algebraMap_eq_mul_of_formallyUnramified
+    : ∀ (P D : Type) [CommRing P] [IsDomain P] [CommRing D] [IsDomain D] [Algebra P D]
+        [Algebra.FiniteType P D] [Algebra.FormallyUnramified P D] (f : D),
+      f ≠ 0 → ∃ Q : P, Q ≠ 0 ∧ ∃ d : D, algebraMap P D Q = f * d := by
   intro P D _ _ _ _ _ _ _ f hf
   by_cases hinj : Function.Injective (algebraMap P D)
   swap
@@ -28,8 +28,7 @@ theorem exists_ne_zero_algebraMap_eq_mul_of_formallyUnramified :
   have hS : S ≤ nonZeroDivisors D := by
     intro x hx
     obtain ⟨q, hq, rfl⟩ := hx
-    exact mem_nonZeroDivisors_of_ne_zero
-      ((map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hq))
+    exact mem_nonZeroDivisors_of_ne_zero ((map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hq))
   haveI : IsDomain L := IsLocalization.isDomain_localization hS
   have hDL : Function.Injective (algebraMap D L) := IsLocalization.injective L hS
   haveI : IsLocalization (M.map (algebraMap P D)) L := inferInstanceAs (IsLocalization S L)

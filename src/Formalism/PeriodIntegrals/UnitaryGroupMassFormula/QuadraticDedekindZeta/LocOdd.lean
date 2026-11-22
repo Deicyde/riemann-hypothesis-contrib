@@ -25,8 +25,9 @@ theorem basis (hq : QuadData d K b) (x : 𝓞 K) : ∃ m n : ℤ, x = m + n * om
   push_cast [om_coe]
   rfl
 
-theorem coeff_unique (hq : QuadData d K b) {m n m' n' : ℤ}
-    (h : (m : 𝓞 K) + n * om hq = m' + n' * om hq) : m = m' ∧ n = n' := by
+theorem coeff_unique
+    (hq : QuadData d K b) {m n m' n' : ℤ} (h : (m : 𝓞 K) + n * om hq = m' + n' * om hq)
+    : m = m' ∧ n = n' := by
   have hK : (m : K) + n * ((1 + b) / 2) = m' + n' * ((1 + b) / 2) := by
     have h' := congrArg (fun x : 𝓞 K => (x : K)) h
     push_cast [om_coe] at h'

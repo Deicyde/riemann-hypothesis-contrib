@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MulAction in
-theorem UpperTheory.orbitalFiber_single :
-    UpperTheory.V.Z.Sym.Glob.Fib.OneFib := by
+theorem UpperTheory.orbitalFiber_single : UpperTheory.V.Z.Sym.Glob.Fib.OneFib := by
   intro Γ G _ _ ι S U' Γ₁ Γ₀ x Φ hcomm hΓS hN htriv hΦl hΦr hTex hst hrel hcard
   classical
   haveI hSn : S.Normal := ⟨fun n hn g => by
@@ -24,10 +23,12 @@ theorem UpperTheory.orbitalFiber_single :
     intro g hg y hy
     obtain ⟨s, hs, u, hu, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hg
     obtain ⟨⟨s', hs'⟩, rfl⟩ := hy
-    refine ⟨⟨s * (u * (s' * x) * u⁻¹ * (s' * x)⁻¹) * s', S.mul_mem (S.mul_mem hs (hcomm _ _)) hs'⟩, ?_⟩
+    refine
+      ⟨⟨s * (u * (s' * x) * u⁻¹ * (s' * x)⁻¹) * s', S.mul_mem (S.mul_mem hs (hcomm _ _)) hs'⟩, ?_⟩
     show ((s * (u * (s' * x) * u⁻¹ * (s' * x)⁻¹) * s' * x : G) : G ⧸ U') = ((s * u * (s' * x) : G) : G ⧸ U')
     rw [QuotientGroup.eq]
-    have he : (s * (u * (s' * x) * u⁻¹ * (s' * x)⁻¹) * s' * x)⁻¹ * (s * u * (s' * x)) = u := by group
+    have he : (s * (u * (s' * x) * u⁻¹ * (s' * x)⁻¹) * s' * x)⁻¹ * (s * u * (s' * x)) = u := by
+      group
     rw [he]
     exact hu
   have hinv : ∀ (h : C) (y : G ⧸ U'), f (j h • y) = f y := by
@@ -42,9 +43,10 @@ theorem UpperTheory.orbitalFiber_single :
         conv_lhs => rw [← QuotientGroup.out_eq' y]
         rfl
       rw [hyy, hu, hΦr _ u.2, hΦl]
-    · have hy' : ι h.1 • y ∉ orbit ↥S (x : G ⧸ U') := fun hm => hy (by
-        have := hclos _ (inv_mem hg) _ hm
-        rwa [inv_smul_smul] at this)
+    · have hy' : ι h.1 • y ∉ orbit ↥S (x : G ⧸ U') := fun hm =>
+        hy (by
+          have := hclos _ (inv_mem hg) _ hm
+          rwa [inv_smul_smul] at this)
       rw [hf, Set.indicator_apply, if_neg hy', Set.indicator_apply, if_neg hy]
   have hfin : ∃ T' : Finset (G ⧸ U'), ∀ y, f y ≠ 0 → ∃ h : C, ∃ x' ∈ T', y = j h • x' := by
     obtain ⟨T, hT⟩ := hTex
@@ -72,16 +74,21 @@ theorem UpperTheory.orbitalFiber_single :
   have hidx : (φ.range ⊔ Γ₀.subgroupOf C).index = (Γ₁ ⊔ Γ₀).relIndex C := by
     rw [hsup]
     rfl
-  have key := UpperTheory.V.Z.Sym.Tf.gqIndex Γ₁ C G φ j (Γ₀.subgroupOf C) U' f
-    inferInstance (fun z hz y => htriv z.1 (Subgroup.mem_subgroupOf.mp hz) y)
-    (by rw [hidx]; exact hrel) hinv hfin
-    (fun y _ => by
-      rw [← Subgroup.comap_comap]
-      exact Subgroup.relIndex_comap_ne_zero _ (hst y))
-  have e1 : UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) (Γ₀.subgroupOf Γ₁) U' f =
-      UpperTheory.V.Z.Sym.gqOn (j.comp φ) (Subgroup.comap φ (Γ₀.subgroupOf C)) U' f := rfl
-  have hb : UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) (Γ₀.subgroupOf Γ₁) U' f =
-      ↑(Nat.card ↥(Γ₀.subgroupOf Γ₁)) * UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) ⊥ U' f := by
+  have key :=
+    UpperTheory.V.Z.Sym.Tf.gqIndex Γ₁ C G φ j (Γ₀.subgroupOf C) U' f inferInstance
+      (fun z hz y => htriv z.1 (Subgroup.mem_subgroupOf.mp hz) y)
+      (by rw [hidx]; exact hrel) hinv hfin
+      (fun y _ => by
+        rw [← Subgroup.comap_comap]
+        exact Subgroup.relIndex_comap_ne_zero _ (hst y))
+  have e1
+      : UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) (Γ₀.subgroupOf Γ₁) U' f
+        = UpperTheory.V.Z.Sym.gqOn (j.comp φ) (Subgroup.comap φ (Γ₀.subgroupOf C)) U' f :=
+    rfl
+  have hb
+      : UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) (Γ₀.subgroupOf Γ₁) U' f
+        = ↑(Nat.card ↥(Γ₀.subgroupOf Γ₁))
+          * UpperTheory.V.Z.Sym.gqOn (ι.comp Γ₁.subtype) ⊥ U' f := by
     letI := MulAction.compHom (G ⧸ U') (ι.comp Γ₁.subtype)
     exact (UpperTheory.orbitalFiber_of_bot Γ₁ (G ⧸ U') (Γ₀.subgroupOf Γ₁) f).2 hcard
       (fun z hz y => htriv z.1 (Subgroup.mem_subgroupOf.mp hz) y)

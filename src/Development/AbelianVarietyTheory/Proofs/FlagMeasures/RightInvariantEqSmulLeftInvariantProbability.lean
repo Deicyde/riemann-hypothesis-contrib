@@ -5,12 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MeasurableSet
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.IwConst
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.IwConst
 
 namespace GlobalTheory.IwConst
 
-theorem right_inv_eq_smul_left_inv :
-    ∀ (G : Type) [Group G] [MeasurableSpace G] [MeasurableMul₂ G] (K : Set G) (μ ν : Measure G) [SFinite μ] [SFinite ν], μ Kᶜ = 0 → ν Kᶜ = 0 → μ Set.univ = 1 → (∀ k ∈ K, μ.map (fun g => k * g) = μ) → (∀ k ∈ K, ν.map (fun g => g * k) = ν) → ν = ν Set.univ • μ := by
+theorem right_inv_eq_smul_left_inv
+    : ∀ (G : Type) [Group G] [MeasurableSpace G] [MeasurableMul₂ G] (K : Set G) (μ ν : Measure G)
+        [SFinite μ] [SFinite ν],
+      μ Kᶜ = 0 → ν Kᶜ = 0 → μ Set.univ = 1 → (∀ k ∈ K, μ.map (fun g => k * g) = μ)
+        → (∀ k ∈ K, ν.map (fun g => g * k) = ν)
+        → ν = ν Set.univ • μ := by
   intro G _ _ _ K μ ν _ _ hμK hνK hμ1 hμinv hνinv
   ext A hA
 

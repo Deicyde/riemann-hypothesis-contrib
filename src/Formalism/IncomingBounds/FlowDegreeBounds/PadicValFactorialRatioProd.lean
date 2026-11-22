@@ -9,7 +9,8 @@ open scoped BigOperators
 
 namespace Formalism.IncomingBounds
 
-private theorem one_add_mul_le_one_add_pow (x : ℝ) (hx : 0 ≤ x) (k : ℕ) : 1 + k * x ≤ (1 + x) ^ k := by
+private theorem one_add_mul_le_one_add_pow (x : ℝ) (hx : 0 ≤ x) (k : ℕ)
+    : 1 + k * x ≤ (1 + x) ^ k := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -24,7 +25,9 @@ theorem padicValuationGain : ValGain := by
   have hB : 0 < (l : ℝ) - 1 := by linarith
   refine ⟨?_, ?_⟩
   · intro n hn
-    have hle : l ^ padicValNat l n ≤ n := Nat.le_of_dvd (by omega) (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+    have hle : l ^ padicValNat l n ≤ n :=
+      Nat.le_of_dvd (by omega)
+        (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
     have hleR : (l : ℝ) ^ padicValNat l n ≤ n := by exact_mod_cast hle
     have hb := one_add_mul_le_one_add_pow ((l : ℝ) - 1) hB.le (padicValNat l n)
     rw [show (1 : ℝ) + ((l : ℝ) - 1) = l by ring] at hb
@@ -37,8 +40,9 @@ theorem padicValuationGain : ValGain := by
     have hb := one_add_mul_le_one_add_pow ((l : ℝ) ^ 2 - 1) hA.le e
     rw [show (1 : ℝ) + ((l : ℝ) ^ 2 - 1) = (l : ℝ) ^ 2 by ring] at hb
     have hm := mul_le_mul_of_nonneg_right hb (one_div_pos.2 hA).le
-    have he : (1 + (e : ℝ) * ((l : ℝ) ^ 2 - 1)) * (1 / ((l : ℝ) ^ 2 - 1)) =
-        1 / ((l : ℝ) ^ 2 - 1) + e := by
+    have he
+        : (1 + (e : ℝ) * ((l : ℝ) ^ 2 - 1)) * (1 / ((l : ℝ) ^ 2 - 1))
+          = 1 / ((l : ℝ) ^ 2 - 1) + e := by
       linear_combination (e : ℝ) * hq
     linarith
 

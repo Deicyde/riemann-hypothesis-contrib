@@ -17,8 +17,11 @@ variable {g : ℕ} [Fact g.Prime]
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-theorem _root_.GlobalTheory.GLm.OpenCell.coe_toG {n : ℕ} {M : _root_.GlobalTheory.GLq.Mt g n} (h : IsUnit M) :
-    ((_root_.GlobalTheory.GLq.toG M : _root_.GlobalTheory.GLq.Gn g n) : _root_.GlobalTheory.GLq.Mt g n) = M := by
+theorem _root_.GlobalTheory.GLm.OpenCell.coe_toG
+    {n : ℕ} {M : _root_.GlobalTheory.GLq.Mt g n} (h : IsUnit M)
+    : ((_root_.GlobalTheory.GLq.toG M : _root_.GlobalTheory.GLq.Gn g n)
+        : _root_.GlobalTheory.GLq.Mt g n)
+      = M := by
   unfold _root_.GlobalTheory.GLq.toG
   rw [dite_eq_left h]
   rfl
@@ -39,14 +42,19 @@ theorem _root_.GlobalTheory.GLm.OpenCell.wh_eq (ψ : AddChar (ZMod g) ℂ) {n : 
   split_ifs <;> ring
 
 def bd (n : ℕ) {a b : ℕ} (u : Mt g a) (v : Mt g b) : Mt g n := fun i j =>
-  if (i : ℕ) < b then (if (j : ℕ) < b then entN v i j else 0)
-  else if (j : ℕ) < b then 0 else entN u (i - b) (j - b)
+  if (i : ℕ) < b then
+    (if (j : ℕ) < b then entN v i j else 0)
+  else if (j : ℕ) < b then
+    0
+  else
+    entN u (i - b) (j - b)
 
 def Good (b : ℕ) {n : ℕ} (M : Mt g n) : Prop :=
   IsUniUp M ∧ ∀ i j : ℕ, i < b → b ≤ j → j < n → entN M i j = 0
 
 section
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a)
 include hσ
 
@@ -109,7 +117,8 @@ private lemma entN_fin_eq_apply {A : Type} [Zero A] {n : ℕ} (M : Matrix (Fin n
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma isUniUp_and_inPar_iff_good (M : _root_.GlobalTheory.GLq.Mt g (a + b)) :
@@ -154,7 +163,8 @@ private lemma isUnit_of_isUniUp' {n : ℕ} {M : _root_.GlobalTheory.GLq.Mt g n} 
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma tl_submatrix_apply (M : _root_.GlobalTheory.GLq.Mt g (a + b)) (i j : Fin a) :
@@ -166,7 +176,8 @@ private lemma tl_submatrix_apply (M : _root_.GlobalTheory.GLq.Mt g (a + b)) (i j
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma isUniUp_tl_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
@@ -183,7 +194,8 @@ private lemma isUniUp_tl_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma br_submatrix_apply (M : _root_.GlobalTheory.GLq.Mt g (a + b)) (i j : Fin b) :
@@ -195,7 +207,8 @@ private lemma br_submatrix_apply (M : _root_.GlobalTheory.GLq.Mt g (a + b)) (i j
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma isUniUp_br_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
@@ -211,7 +224,8 @@ private lemma isUniUp_br_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma good_bd_of_isUniUp {u : _root_.GlobalTheory.GLq.Mt g a}
@@ -241,7 +255,8 @@ private lemma good_bd_of_isUniUp {u : _root_.GlobalTheory.GLq.Mt g a}
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma bd_tl_br_eq_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
@@ -262,7 +277,8 @@ private lemma bd_tl_br_eq_of_good {M : _root_.GlobalTheory.GLq.Mt g (a + b)}
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma tl_bd_submatrix (u : _root_.GlobalTheory.GLq.Mt g a) (v : _root_.GlobalTheory.GLq.Mt g b) :
@@ -276,7 +292,8 @@ private lemma tl_bd_submatrix (u : _root_.GlobalTheory.GLq.Mt g a) (v : _root_.G
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] in
-variable {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
+variable
+  {a b : ℕ} {σ : Equiv.Perm (Fin (a + b))}
   (hσ : ∀ j : Fin (a + b), (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) in
 include hσ in
 private lemma br_bd_submatrix (u : _root_.GlobalTheory.GLq.Mt g a) (v : _root_.GlobalTheory.GLq.Mt g b) :
@@ -336,7 +353,6 @@ private lemma supFrom_zero_bd {a b : ℕ} (u : _root_.GlobalTheory.GLq.Mt g a)
       fun j _ hj => ?_).symm
     simp only [Finset.mem_Ico, not_and, not_lt] at hj
     exact entN_eq_zero_of_le v (Or.inr (by omega))
-
 
 open Polynomial in
 open scoped Classical in

@@ -20,8 +20,8 @@ namespace GlobalTheory.GLq.WhMul
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem entN_mul_succ {n : ℕ} (M N : Mt g n) (hM : IsUniUp M) (hN : IsUniUp N) (k : ℕ) :
-    entN (M * N) k (k + 1) = entN M k (k + 1) + entN N k (k + 1) := by
+theorem entN_mul_succ {n : ℕ} (M N : Mt g n) (hM : IsUniUp M) (hN : IsUniUp N) (k : ℕ)
+    : entN (M * N) k (k + 1) = entN M k (k + 1) + entN N k (k + 1) := by
   unfold entN
   split_ifs with h
   · set i : Fin n := ⟨k, h.1⟩
@@ -41,8 +41,8 @@ theorem entN_mul_succ {n : ℕ} (M N : Mt g n) (hM : IsUniUp M) (hN : IsUniUp N)
         rw [(hN c j).1 this, mul_zero]
   · simp only [add_zero]
 
-theorem supFrom_mul {n : ℕ} (M N : Mt g n) (hM : IsUniUp M) (hN : IsUniUp N) :
-    supFrom 0 (M * N) = supFrom 0 M + supFrom 0 N := by
+theorem supFrom_mul {n : ℕ} (M N : Mt g n) (hM : IsUniUp M) (hN : IsUniUp N)
+    : supFrom 0 (M * N) = supFrom 0 M + supFrom 0 N := by
   unfold supFrom
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun k _ => entN_mul_succ M N hM hN k
@@ -66,15 +66,22 @@ theorem br_one (a b : ℕ) : br a b (1 : Mt g (a + b)) = 1 := by
   rw [ParBasic.br_apply, Matrix.one_apply, Matrix.one_apply]
   simp [Fin.ext_iff]
 
-theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (a b n : ℕ), n = a + b →
-    ∀ Φ : Gn g a → Gn g b → ℂ, (∀ y, IsClass fun x => Φ x y) → (∀ x, IsClass (Φ x)) →
-      wh ψ (hcT a b Φ n) = wh ψ (fun x => wh ψ (Φ x)) := by
+theorem wh_hcT
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ),
+      ψ ≠ 1
+        → ∀ (a b n : ℕ),
+          n = a + b
+            → ∀ Φ : Gn g a → Gn g b → ℂ,
+              (∀ y, IsClass fun x => Φ x y) → (∀ x, IsClass (Φ x))
+                → wh ψ (hcT a b Φ n) = wh ψ (fun x => wh ψ (Φ x)) := by
   intro g _ ψ hψ a b n hn Φ hΦ1 hΦ2
   obtain ⟨⟨P, hP⟩, ⟨U, hU⟩, -, -, -, -⟩ := ParBasic.par_basic g a b n hn
   subst hn
 
-  have hl : ∀ h ∈ U, ∀ x ∈ U, (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) (h * x * h⁻¹) =
-      (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) x := by
+  have hl
+      : ∀ h ∈ U, ∀ x ∈ U,
+        (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) (h * x * h⁻¹)
+          = (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) x := by
     intro h hh x hx
     have hh' := (hU h).1 hh
     have hx' := (hU x).1 hx
@@ -88,9 +95,14 @@ theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ �
     congr 2
     linear_combination e1
 
-  have hφ : ∀ k ∈ P, ∀ x ∈ P,
-      (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) (k * x * k⁻¹) =
-      (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) x := by
+  have hφ
+      : ∀ k ∈ P, ∀ x ∈ P,
+        (fun z : Gn g (a + b) =>
+              Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b)))))
+            (k * x * k⁻¹)
+          = (fun z : Gn g (a + b) =>
+              Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b)))))
+            x := by
     intro k hk x hx
     have hk' := (hP k).1 hk
     have hx' := (hP x).1 hx
@@ -103,33 +115,48 @@ theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ �
     have m3 := ParBasic.blocks_mul _ _ hkx hi'
     have hkxk := (hP (k * x * k⁻¹)).1 (P.mul_mem (P.mul_mem hk hx) (P.inv_mem hk))
     obtain ⟨uc, vc⟩ := ParBasic.isUnit_blocks _ hkxk
-    have e1 : ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b)) = (k : Mt g (a + b)) * (x : Mt g (a + b)) * ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+    have e1
+        : ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b))
+          = (k : Mt g (a + b)) * (x : Mt g (a + b)) * ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
       simp only [Units.val_mul]
     have e0 : (k : Mt g (a + b)) * ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) = 1 := by
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
-    have iA : (((toG (tl a (k : Mt g (a + b))))⁻¹ : Gn g a) : Mt g a) = tl a ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+    have iA
+        : (((toG (tl a (k : Mt g (a + b))))⁻¹ : Gn g a) : Mt g a)
+          = tl a ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
       apply Units.inv_eq_of_mul_eq_one_right
       rw [OpenCell.coe_toG uk, ← m1.2.1, e0, tl_one]
-    have iB : (((toG (br a b (k : Mt g (a + b))))⁻¹ : Gn g b) : Mt g b) = br a b ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+    have iB
+        : (((toG (br a b (k : Mt g (a + b))))⁻¹ : Gn g b) : Mt g b)
+          = br a b ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
       apply Units.inv_eq_of_mul_eq_one_right
       rw [OpenCell.coe_toG vk, ← m1.2.2, e0, br_one]
-    have cA : toG (tl a ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b))) =
-        toG (tl a (k : Mt g (a + b))) * toG (tl a (x : Mt g (a + b))) * (toG (tl a (k : Mt g (a + b))))⁻¹ := by
+    have cA
+        : toG (tl a ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b)))
+          = toG (tl a (k : Mt g (a + b))) * toG (tl a (x : Mt g (a + b)))
+            * (toG (tl a (k : Mt g (a + b))))⁻¹ := by
       apply Units.ext
       rw [OpenCell.coe_toG uc]
       simp only [Units.val_mul] at m3 ⊢
       rw [iA, OpenCell.coe_toG uk, OpenCell.coe_toG ux, m3.2.1, m2.2.1]
-    have cB : toG (br a b ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b))) =
-        toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b))) * (toG (br a b (k : Mt g (a + b))))⁻¹ := by
+    have cB
+        : toG (br a b ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b)))
+          = toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b)))
+            * (toG (br a b (k : Mt g (a + b))))⁻¹ := by
       apply Units.ext
       rw [OpenCell.coe_toG vc]
       simp only [Units.val_mul] at m3 ⊢
       rw [iB, OpenCell.coe_toG vk, OpenCell.coe_toG vx, m3.2.2, m2.2.2]
     show Φ _ _ = Φ _ _
     rw [cA, cB]
-    have h1 := hΦ1 (toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b))) * (toG (br a b (k : Mt g (a + b))))⁻¹)
-      (toG (tl a (x : Mt g (a + b)))) (toG (tl a (k : Mt g (a + b))))
-    have h2 := hΦ2 (toG (tl a (x : Mt g (a + b)))) (toG (br a b (x : Mt g (a + b)))) (toG (br a b (k : Mt g (a + b))))
+    have h1 :=
+      hΦ1
+        (toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b)))
+          * (toG (br a b (k : Mt g (a + b))))⁻¹)
+        (toG (tl a (x : Mt g (a + b)))) (toG (tl a (k : Mt g (a + b))))
+    have h2 :=
+      hΦ2 (toG (tl a (x : Mt g (a + b)))) (toG (br a b (x : Mt g (a + b))))
+        (toG (br a b (k : Mt g (a + b))))
     simp only at h1 h2
     rw [h1, h2]
   set R : Finset (Equiv.Perm (Fin (a + b))) := Finset.univ.filter fun σ =>
@@ -141,21 +168,28 @@ theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ �
     refine ⟨σ, ⟨by simpa [hR] using hσ, u, (hU u).2 hu, p, (hP p).2 hp, hx⟩, ?_⟩
     rintro τ ⟨hτ, u', hu', p', hp', hx'⟩
     exact huniq τ ⟨by simpa [hR] using hτ, u', p', (hU u').1 hu', (hP p').1 hp', hx'⟩
-  have M := mackey_doubleCoset_pairing (Gn g (a + b)) U P _ R (pm g) hRu
-    (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹)
-    (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) hl hφ
-  have cU : (Nat.card U : ℂ) = ((Finset.univ.filter fun u : Gn g (a + b) => IsUniUp (u : Mt g (a + b))).card : ℂ) := by
+  have M :=
+    mackey_doubleCoset_pairing (Gn g (a + b)) U P _ R (pm g) hRu
+      (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹)
+      (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b)))))
+      hl hφ
+  have cU
+      : (Nat.card U : ℂ)
+        = ((Finset.univ.filter fun u : Gn g (a + b) => IsUniUp (u : Mt g (a + b))).card : ℂ) := by
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     simp only [hU]
-  have cP : (Nat.card P : ℂ) = ((Finset.univ.filter fun p : Gn g (a + b) => InPar a (p : Mt g (a + b))).card : ℂ) := by
+  have cP
+      : (Nat.card P : ℂ)
+        = ((Finset.univ.filter fun p : Gn g (a + b) => InPar a (p : Mt g (a + b))).card : ℂ) := by
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     simp only [hP]
   refine Eq.trans ?_ (M.trans ?_)
   · rw [OpenCell.wh_eq, cU, cP, ← Finset.sum_filter]
     simp only [hU, hP]
     rfl
-  obtain ⟨σ₀, h0⟩ : ∃ σ₀ : Equiv.Perm (Fin (a + b)),
-      ∀ j : Fin (a + b), (σ₀ j : ℕ) = if (j : ℕ) < a then b + j else j - a := by
+  obtain ⟨σ₀, h0⟩
+      : ∃ σ₀ : Equiv.Perm (Fin (a + b)), ∀ j : Fin (a + b),
+        (σ₀ j : ℕ) = if (j : ℕ) < a then b + j else j - a := by
     let f : Fin (a + b) → Fin (a + b) := fun j =>
       ⟨if (j : ℕ) < a then b + j else j - a, by have := j.2; split_ifs <;> omega⟩
     have hf : Function.Injective f := by
@@ -181,7 +215,8 @@ theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ �
     have hnd : ¬ ∀ i j : Fin (a + b), (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1 := by
       intro h
       apply hne
-      exact Equiv.ext fun j => Fin.ext (by rw [(shuffle_noDescent_iff_open a b (a + b) σ rfl hσ').1 h j, h0 j])
+      exact Equiv.ext fun j =>
+        Fin.ext (by rw [(shuffle_noDescent_iff_open a b (a + b) σ rfl hσ').1 h j, h0 j])
     push Not at hnd
     obtain ⟨i, j, hi, hj, hij⟩ := hnd
     simp only [hU, hP]

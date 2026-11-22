@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PhaseAppl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.UnitaryDetAbs
 
 open GlobalTheory.MixModel
 
-theorem absE_det_matHom (D : D7) (W : HSp D) (h : GA D W) :
-    GlobalTheory.Doubling.absE D.host.F D.host.E (Matrix.GeneralLinearGroup.det (matHom W h)) = 1 := by
+theorem absE_det_matHom (D : D7) (W : HSp D) (h : GA D W)
+    : GlobalTheory.Doubling.absE D.host.F D.host.E (Matrix.GeneralLinearGroup.det (matHom W h))
+      = 1 := by
   have hM := GlobalTheory.MixModel.mt_unitary W h
   have hdet := congrArg Matrix.det hM
   rw [Matrix.det_mul, Matrix.det_mul] at hdet
@@ -28,11 +31,15 @@ theorem absE_det_matHom (D : D7) (W : HSp D) (h : GA D W) :
     exact (GlobalTheory.MixModel.gram_isUnit_det W).map _
   rw [hadj] at hdet
   have key : cA D (mt W h).det * (mt W h).det = 1 := by
-    have e2 : cA D (mt W h).det * (mt W h).det * (GlobalTheory.MixModel.gA W).det = 1 * (GlobalTheory.MixModel.gA W).det := by
+    have e2
+        : cA D (mt W h).det * (mt W h).det * (GlobalTheory.MixModel.gA W).det
+          = 1 * (GlobalTheory.MixModel.gA W).det := by
       rw [one_mul]; nth_rewrite 2 [← hdet]; ring
     exact hG.mul_right_cancel e2
-  have hu : GlobalTheory.Doubling.conjUnit D.sp.cm.sig (Matrix.GeneralLinearGroup.det (matHom W h)) *
-      Matrix.GeneralLinearGroup.det (matHom W h) = 1 := by
+  have hu
+      : GlobalTheory.Doubling.conjUnit D.sp.cm.sig (Matrix.GeneralLinearGroup.det (matHom W h))
+          * Matrix.GeneralLinearGroup.det (matHom W h)
+        = 1 := by
     ext
     exact key
   have h2 := congrArg (GlobalTheory.Doubling.absE D.host.F D.host.E) hu

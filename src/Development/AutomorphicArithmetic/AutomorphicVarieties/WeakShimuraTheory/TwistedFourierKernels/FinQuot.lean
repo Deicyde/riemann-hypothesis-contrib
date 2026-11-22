@@ -6,8 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
 
-private theorem pow_pow_sub_one_mem {R : Type} [CommRing R] (I : Ideal R) (l : ℕ) (hl : (l : R) ∈ I) (x : R)
-    (hx : x - 1 ∈ I) (k : ℕ) : x ^ (l ^ k) - 1 ∈ I ^ (k + 1) := by
+private theorem pow_pow_sub_one_mem
+    {R : Type} [CommRing R]
+    (I : Ideal R) (l : ℕ) (hl : (l : R) ∈ I)
+    (x : R) (hx : x - 1 ∈ I)
+    (k : ℕ)
+    : x ^ (l ^ k) - 1 ∈ I ^ (k + 1) := by
   induction k with
   | zero => simpa using hx
   | succ k ih =>
@@ -21,12 +25,22 @@ private theorem pow_pow_sub_one_mem {R : Type} [CommRing R] (I : Ideal R) (l : �
     simp only [map_pow (Ideal.Quotient.mk I) (x ^ (l ^ k)), h1, one_pow]
     simpa using hl
 
-theorem UpperTheory.V.Ws.H5.finQuot :
-    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {R : Type} [CommRing R] [IsLocalRing R], ((l : ℕ) : R) ∈ maximalIdeal R → ∀ γ : F.G₀ →* Rˣ, TwCh F γ → ∀ N : ℕ, ∃ (Q : Type) (_ : CommGroup Q) (_ : Finite Q) (q : F.G₀ →* Q) (j : Q →* (R ⧸ maximalIdeal R ^ N)ˣ), IsPGroup l Q ∧ IsOpen (q.ker : Set F.G₀) ∧ Anti F q ∧ j.comp q = pushCh (Ideal.Quotient.mk (maximalIdeal R ^ N)) γ := by
+theorem UpperTheory.V.Ws.H5.finQuot
+    : ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) {R : Type} [CommRing R] [IsLocalRing R],
+      ((l : ℕ) : R) ∈ maximalIdeal R
+        → ∀ γ : F.G₀ →* Rˣ,
+          TwCh F γ
+            → ∀ N : ℕ,
+              ∃ (Q : Type) (_ : CommGroup Q) (_ : Finite Q) (q : F.G₀ →* Q)
+                  (j : Q →* (R ⧸ maximalIdeal R ^ N)ˣ),
+                IsPGroup l Q ∧ IsOpen (q.ker : Set F.G₀) ∧ Anti F q
+                  ∧ j.comp q = pushCh (Ideal.Quotient.mk (maximalIdeal R ^ N)) γ := by
   intro l _ F R _ _ hl γ hγ N
   haveI : CompactSpace F.G₀ := isCompact_iff_compactSpace.1 (Subgroup.isClosed_of_isOpen _ F.η_open).isCompact
   set χ := pushCh (Ideal.Quotient.mk (maximalIdeal R ^ N)) γ with hχ
-  have hval : ∀ g, (χ g : R ⧸ maximalIdeal R ^ N) = Ideal.Quotient.mk (maximalIdeal R ^ N) (γ g : R) := fun g => rfl
+  have hval
+      : ∀ g, (χ g : R ⧸ maximalIdeal R ^ N) = Ideal.Quotient.mk (maximalIdeal R ^ N) (γ g : R) :=
+    fun g => rfl
   have hlc : IsLocallyConstant fun g => (χ g : R ⧸ maximalIdeal R ^ N) := hγ.cont N
   have hlc' : IsLocallyConstant χ := IsLocallyConstant.desc χ Units.val hlc Units.val_injective
   have hfin : Finite χ.range := hlc'.range_finite.to_subtype

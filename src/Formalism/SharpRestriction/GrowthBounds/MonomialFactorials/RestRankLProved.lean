@@ -15,9 +15,12 @@ section Gen
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem finrank_zp_le {V : Type} [AddCommGroup V] [Module ℚ_[p] V] [Module ℤ_[p] V] [IsScalarTower ℤ_[p] ℚ_[p] V]
-    (M : Submodule ℤ_[p] V) (W : Submodule ℚ_[p] V) [FiniteDimensional ℚ_[p] W] (hMW : ∀ x ∈ M, x ∈ W) :
-    Module.finrank ℤ_[p] M ≤ Module.finrank ℚ_[p] W := by
+theorem finrank_zp_le
+    {V : Type} [AddCommGroup V] [Module ℚ_[p] V] [Module ℤ_[p] V] [IsScalarTower ℤ_[p] ℚ_[p] V]
+    (M : Submodule ℤ_[p] V)
+    (W : Submodule ℚ_[p] V) [FiniteDimensional ℚ_[p] W]
+    (hMW : ∀ x ∈ M, x ∈ W)
+    : Module.finrank ℤ_[p] M ≤ Module.finrank ℚ_[p] W := by
   have hr : Module.rank ℤ_[p] M ≤ (Module.finrank ℚ_[p] W : Cardinal) := by
     apply rank_le
     intro s hs
@@ -38,10 +41,10 @@ section Level
 
 variable (p : ℕ) [Fact p.Prime] {N r : ℕ} [NeZero r] (G : Formalism.GM.M.BlockData N)
 
-
 open Classical in
 def xiMons (n : ℕ) : Finset (Formalism.GM.M.BVar N r G.T.t →₀ ℕ) :=
-  (CountingStatementReduction.Ev r n).image (fun e => ∑ c : Fin r, Finsupp.single (Formalism.GM.M.xiVar N r G.T.t c) (e c))
+  (CountingStatementReduction.Ev r n).image
+    (fun e => ∑ c : Fin r, Finsupp.single (Formalism.GM.M.xiVar N r G.T.t c) (e c))
 
 theorem card_xiMons (n : ℕ) : (xiMons (r := r) G n).card ≤ dXi r n := by
   classical
@@ -60,9 +63,11 @@ theorem xiVar_inj : Function.Injective (Formalism.GM.M.xiVar N r G.T.t) := by
   simp only [Formalism.GM.M.xiVar, Sum.inl.injEq, Prod.mk.injEq] at h
   exact h.2
 
-theorem xi_mem_span (n : ℕ) (g : MvPolynomial (Formalism.GM.M.BVar N r G.T.t) ℚ_[p])
-    (hg : g ∈ Formalism.GM.M.XiPolZ p N r G.T.t n) :
-    g ∈ Submodule.span ℚ_[p] ((fun m => (monomial m (1 : ℚ_[p]))) '' (xiMons (r := r) G n : Set _)) := by
+theorem xi_mem_span
+    (n : ℕ) (g : MvPolynomial (Formalism.GM.M.BVar N r G.T.t) ℚ_[p])
+    (hg : g ∈ Formalism.GM.M.XiPolZ p N r G.T.t n)
+    : g ∈ Submodule.span ℚ_[p]
+      ((fun m => (monomial m (1 : ℚ_[p]))) '' (xiMons (r := r) G n : Set _)) := by
   classical
   have hs := (Submodule.mem_inf.1 hg).1
   rw [Submodule.restrictScalars_mem, MvPolynomial.mem_restrictSupport_iff] at hs
@@ -70,13 +75,19 @@ theorem xi_mem_span (n : ℕ) (g : MvPolynomial (Formalism.GM.M.BVar N r G.T.t) 
   refine Submodule.sum_mem _ fun m hm => ?_
   have hm' := hs hm
   obtain ⟨hsupp, hsum⟩ := hm'
-  have hmono : monomial m (AddMonoidAlgebra.coeff g m) = AddMonoidAlgebra.coeff g m • monomial m (1 : ℚ_[p]) := by
+  have hmono
+      : monomial m (AddMonoidAlgebra.coeff g m)
+        = AddMonoidAlgebra.coeff g m • monomial m (1 : ℚ_[p]) := by
     rw [smul_monomial, smul_eq_mul, mul_one]
   rw [hmono]
   refine Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, ?_, rfl⟩)
   unfold xiMons
   rw [Finset.mem_coe, Finset.mem_image]
-  refine ⟨fun c => m (Formalism.GM.M.xiVar N r G.T.t c), (CountingStatementReduction.mem_Ev _).2 hsum, ?_⟩
+  refine ⟨
+    fun c => m (Formalism.GM.M.xiVar N r G.T.t c),
+    (CountingStatementReduction.mem_Ev _).2 hsum,
+    ?_
+  ⟩
   ext v
   rw [Finsupp.finsetSum_apply]
   by_cases hv : ∃ c, v = Formalism.GM.M.xiVar N r G.T.t c
@@ -97,16 +108,18 @@ theorem xi_mem_span (n : ℕ) (g : MvPolynomial (Formalism.GM.M.BVar N r G.T.t) 
     intro h
     exact hv ⟨c, h.symm⟩
 
-theorem finrank_Ljj_le (j : Fin G.T.t → ℕ) (jp : ℕ) :
-    Module.finrank ℤ_[p] (Ljj p (r := r) G j jp) ≤ dimY p (r := r) G j jp * dXi r (G.B - jp) := by
+theorem finrank_Ljj_le (j : Fin G.T.t → ℕ) (jp : ℕ)
+    : Module.finrank ℤ_[p] (Ljj p (r := r) G j jp) ≤ dimY p (r := r) G j jp * dXi r (G.B - jp) := by
   classical
   set Yq := Formalism.GM.M.Y p (r := r) (G.lettersAt j jp) G.T.J G.T.thr with hYq
   haveI : FiniteDimensional ℚ_[p] (Formalism.GM.M.Pol p r (G.lettersAt j jp)) := Formalism.CountingSumsFrames.pol_finiteDimensional _
   haveI : FiniteDimensional ℚ_[p] Yq := Submodule.finiteDimensional_of_le inf_le_left
   let bY := Module.finBasis ℚ_[p] Yq
   let Ms := xiMons (r := r) G (G.B - jp)
-  let fam : Fin (Module.finrank ℚ_[p] Yq) × Ms → MvPolynomial (Formalism.GM.M.BVar N r G.T.t) ℚ_[p] :=
-    fun ab => rename (Formalism.GM.M.chainEmb N r G.T.t) ((bY ab.1 : Yq) : _) * monomial (ab.2 : _ →₀ ℕ) 1
+  let fam
+      : Fin (Module.finrank ℚ_[p] Yq) × Ms
+        → MvPolynomial (Formalism.GM.M.BVar N r G.T.t) ℚ_[p] := fun ab =>
+    rename (Formalism.GM.M.chainEmb N r G.T.t) ((bY ab.1 : Yq) : _) * monomial (ab.2 : _ →₀ ℕ) 1
   let W := Submodule.span ℚ_[p] (Set.range fam)
   have hsub : ∀ x ∈ Ljj p (r := r) G j jp, x ∈ W := by
     intro x hx
@@ -115,7 +128,8 @@ theorem finrank_Ljj_le (j : Fin G.T.t → ℕ) (jp : ℕ) :
       rw [Submodule.span_le]
       rintro _ ⟨y, hy, g, hg, rfl⟩
       have hyY : y ∈ Yq := (Submodule.mem_inf.1 hy).1
-      have hy2 : y ∈ Submodule.span ℚ_[p] (Set.range fun a => ((bY a : Yq) : MvPolynomial _ ℚ_[p])) := by
+      have hy2
+          : y ∈ Submodule.span ℚ_[p] (Set.range fun a => ((bY a : Yq) : MvPolynomial _ ℚ_[p])) := by
         have h3 : (⟨y, hyY⟩ : Yq) ∈ (⊤ : Submodule ℚ_[p] Yq) := Submodule.mem_top
         rw [← bY.span_eq] at h3
         have h4 := Submodule.mem_map_of_mem (f := Yq.subtype) h3
@@ -123,10 +137,16 @@ theorem finrank_Ljj_le (j : Fin G.T.t → ℕ) (jp : ℕ) :
         exact h4
       have hg2 := xi_mem_span p G (G.B - jp) g hg
       show rename (Formalism.GM.M.chainEmb N r G.T.t) y * g ∈ W
-      have hy3 : rename (Formalism.GM.M.chainEmb N r G.T.t) y ∈ Submodule.span ℚ_[p]
-          (Set.range fun a => rename (Formalism.GM.M.chainEmb N r G.T.t) ((bY a : Yq) : MvPolynomial _ ℚ_[p])) := by
-        have := Submodule.mem_map_of_mem (f := (rename (Formalism.GM.M.chainEmb N r G.T.t) :
-          MvPolynomial _ ℚ_[p] →ₐ[ℚ_[p]] MvPolynomial _ ℚ_[p]).toLinearMap) hy2
+      have hy3
+          : rename (Formalism.GM.M.chainEmb N r G.T.t) y ∈ Submodule.span ℚ_[p]
+            (Set.range fun a =>
+              rename (Formalism.GM.M.chainEmb N r G.T.t) ((bY a : Yq) : MvPolynomial _ ℚ_[p])) := by
+        have :=
+          Submodule.mem_map_of_mem
+            (f :=
+              (rename (Formalism.GM.M.chainEmb N r G.T.t)
+                : MvPolynomial _ ℚ_[p] →ₐ[ℚ_[p]] MvPolynomial _ ℚ_[p]).toLinearMap)
+            hy2
         rw [Submodule.map_span, ← Set.range_comp] at this
         exact this
       have hmul := Submodule.mul_mem_mul hy3 hg2
@@ -137,10 +157,13 @@ theorem finrank_Ljj_le (j : Fin G.T.t → ℕ) (jp : ℕ) :
     exact hle hx
   haveI : FiniteDimensional ℚ_[p] W := FiniteDimensional.span_of_finite ℚ_[p] (Set.finite_range fam)
   have h1 := finrank_zp_le (Ljj p (r := r) G j jp) W hsub
-  have h2 : Module.finrank ℚ_[p] W ≤ Fintype.card (Fin (Module.finrank ℚ_[p] Yq) × Ms) := finrank_range_le_card fam
+  have h2 : Module.finrank ℚ_[p] W ≤ Fintype.card (Fin (Module.finrank ℚ_[p] Yq) × Ms) :=
+    finrank_range_le_card fam
   rw [Fintype.card_prod, Fintype.card_fin, Fintype.card_coe] at h2
   have h3 := card_xiMons (r := r) G (G.B - jp)
-  calc Module.finrank ℤ_[p] (Ljj p (r := r) G j jp) ≤ Module.finrank ℚ_[p] Yq * Ms.card := h1.trans h2
+  calc
+    Module.finrank ℤ_[p] (Ljj p (r := r) G j jp)
+      ≤ Module.finrank ℚ_[p] Yq * Ms.card := h1.trans h2
     _ ≤ dimY p (r := r) G j jp * dXi r (G.B - jp) := Nat.mul_le_mul le_rfl h3
 
 end Level

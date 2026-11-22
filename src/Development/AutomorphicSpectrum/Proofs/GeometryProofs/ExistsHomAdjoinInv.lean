@@ -8,31 +8,42 @@ open MvPolynomial
 
 namespace GlobalTheory.CompanionTheory.Ar.ChartHom
 
-theorem exists_hom_adjoin_inv {σ Ω R : Type*} [Field Ω] [CharZero Ω] [CommRing R]
+theorem exists_hom_adjoin_inv
+    {σ Ω R : Type*} [Field Ω] [CharZero Ω] [CommRing R]
     (u : σ → Ω) (θ : MvPolynomial σ ℚ →+* R)
     (hker : ∀ G : MvPolynomial σ ℚ, aeval u G = (0 : Ω) → θ G = 0)
     (F : MvPolynomial σ ℚ) (hF : IsUnit (θ F))
-    (S : Subalgebra ℚ Ω) (hS : S = Algebra.adjoin ℚ (insert (aeval u F : Ω)⁻¹ (Set.range u))) :
-    ∃ ψ : S →+* R, ∀ (G : MvPolynomial σ ℚ) (s : S), (s : Ω) = aeval u G → ψ s = θ G := by
+    (S : Subalgebra ℚ Ω) (hS : S = Algebra.adjoin ℚ (insert (aeval u F : Ω)⁻¹ (Set.range u)))
+    : ∃ ψ : S →+* R, ∀ (G : MvPolynomial σ ℚ) (s : S), (s : Ω) = aeval u G → ψ s = θ G := by
   classical
   by_cases hf : (aeval u F : Ω) = 0
   · have h0 : θ F = 0 := hker F hf
     have hR : Subsingleton R := by
       have : IsUnit (0 : R) := h0 ▸ hF
       exact subsingleton_of_zero_eq_one (isUnit_zero_iff.mp this)
-    refine ⟨{ toFun := fun _ => 0, map_one' := Subsingleton.elim _ _, map_mul' := fun _ _ => Subsingleton.elim _ _,
-              map_zero' := rfl, map_add' := fun _ _ => Subsingleton.elim _ _ }, fun _ _ _ => Subsingleton.elim _ _⟩
+    refine ⟨
+      {
+        toFun := fun _ => 0
+        map_one' := Subsingleton.elim _ _
+        map_mul' := fun _ _ => Subsingleton.elim _ _
+        map_zero' := rfl
+        map_add' := fun _ _ => Subsingleton.elim _ _
+      },
+      fun _ _ _ => Subsingleton.elim _ _
+    ⟩
   · let B := Localization.Away F
     have hunit : ∀ y : Submonoid.powers F, IsUnit (aeval u (y : MvPolynomial σ ℚ) : Ω) := by
       rintro ⟨_, n, rfl⟩
       simpa using (IsUnit.mk0 _ hf).pow n
     let Φ : B →ₐ[ℚ] Ω := IsLocalization.liftAlgHom (M := Submonoid.powers F) (f := aeval u) hunit
-    have hΦ : ∀ a : MvPolynomial σ ℚ, Φ (algebraMap _ B a) = aeval u a := fun a =>
-      by simp [Φ, IsLocalization.liftAlgHom_apply]
+    have hΦ : ∀ a : MvPolynomial σ ℚ, Φ (algebraMap _ B a) = aeval u a := fun a => by
+      simp [Φ, IsLocalization.liftAlgHom_apply]
     let Θ : B →+* R := IsLocalization.Away.lift F hF
     have hΘ : ∀ a : MvPolynomial σ ℚ, Θ (algebraMap _ B a) = θ a := fun a =>
       IsLocalization.Away.lift_eq F hF a
-    have hnum : ∀ z : B, ∃ (n : ℕ) (a : MvPolynomial σ ℚ), z * algebraMap _ B (F ^ n) = algebraMap _ B a := by
+    have hnum
+        : ∀ z : B, ∃ (n : ℕ) (a : MvPolynomial σ ℚ),
+          z * algebraMap _ B (F ^ n) = algebraMap _ B a := by
       intro z
       obtain ⟨n, a, h⟩ := IsLocalization.Away.surj F z
       exact ⟨n, a, by simpa using h⟩
@@ -63,8 +74,7 @@ theorem exists_hom_adjoin_inv {σ Ω R : Type*} [Field Ω] [CharZero Ω] [CommRi
         · have hu : IsUnit (algebraMap _ B F) := IsLocalization.Away.algebraMap_isUnit F
           obtain ⟨v, hv⟩ := hu
           refine ⟨(↑v⁻¹ : B), ?_⟩
-          have h1 : Φ (↑v⁻¹ : B) * aeval u F = 1 := by
-            rw [← hΦ, ← hv, ← map_mul]; simp
+          have h1 : Φ (↑v⁻¹ : B) * aeval u F = 1 := by rw [← hΦ, ← hv, ← map_mul]; simp
           exact eq_inv_of_mul_eq_one_left h1
         · exact ⟨algebraMap (MvPolynomial σ ℚ) B (X p), (hΦ (X p)).trans (aeval_X u p)⟩
       intro s

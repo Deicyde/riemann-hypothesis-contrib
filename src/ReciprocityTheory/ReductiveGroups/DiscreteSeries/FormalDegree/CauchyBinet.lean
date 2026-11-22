@@ -17,8 +17,9 @@ private lemma cauchyBinet_det_mul_fun {R : Type*} [CommRing R] {i N : ℕ} (A : 
     (A * B).det = ∑ f : Fin i → Fin N, (∏ a, A a (f a)) * (B.submatrix f id).det := by
   first | exact Bl.general_b_fact.goal1 .. | (apply Bl.general_b_fact.goal1 <;> assumption) | (intros; apply Bl.general_b_fact.goal1 <;> assumption)
 
-private def cauchyBinetPar {i N : ℕ} (p : (Σ _ : {S : Finset (Fin N) // S.card = i}, Equiv.Perm (Fin i))) :
-    Fin i ↪ Fin N :=
+private def cauchyBinetPar
+    {i N : ℕ} (p : (Σ _ : {S : Finset (Fin N) // S.card = i}, Equiv.Perm (Fin i)))
+    : Fin i ↪ Fin N :=
   p.2.toEmbedding.trans (p.1.1.orderEmbOfFin p.1.2).toEmbedding
 
 private lemma cauchyBinetPar_image {i N : ℕ} (S : Finset (Fin N)) (hS : S.card = i) (σ : Equiv.Perm (Fin i)) :
@@ -63,52 +64,59 @@ private lemma cauchyBinetPar_bij {i N : ℕ} : Function.Bijective (cauchyBinetPa
     ext a
     simp [cauchyBinetPar, hτ]
 
-theorem cauchyBinet {m i : ℕ} {R : Type*} [CommRing R] (A : Matrix (Fin i) (Fin m) R)
-    (B : Matrix (Fin m) (Fin i) R) :
-    (A * B).det = ∑ S : {S : Finset (Fin m) // S.card = i},
-      (A.submatrix id (S.1.orderEmbOfFin S.2)).det * (B.submatrix (S.1.orderEmbOfFin S.2) id).det := by
-  classical
-  rw [cauchyBinet_det_mul_fun]
-  set F : (Fin i → Fin m) → R := fun f => (∏ a, A a (f a)) * (B.submatrix f id).det with hF
-  have h1 : ∑ f : Fin i → Fin m, F f = ∑ f : Fin i ↪ Fin m, F f := by
-    have h0 : ∀ f : Fin i → Fin m, ¬ Function.Injective f → F f = 0 := by
-      intro f hf
-      simp only [Function.Injective, not_forall] at hf
-      obtain ⟨a, b, hab, hne⟩ := hf
-      have : (B.submatrix f id).det = 0 :=
-        Matrix.det_zero_of_row_eq hne (by funext c; simp [Matrix.submatrix_apply, hab])
-      simp [hF, this]
-    rw [← Finset.sum_filter_of_ne (p := Function.Injective) (s := univ) (f := F)
-      (fun f _ hne => by by_contra hc; exact hne (h0 f hc))]
-    symm
-    apply Finset.sum_bij (fun (f : Fin i ↪ Fin m) _ => (f : Fin i → Fin m))
-    · intro f _; simp [f.injective]
-    · intro f _ g _ h; exact DFunLike.coe_injective h
-    · intro f hf
-      exact ⟨⟨f, (Finset.mem_filter.mp hf).2⟩, Finset.mem_univ _, rfl⟩
-    · intro f _; rfl
-  rw [h1, ← Function.Bijective.sum_comp cauchyBinetPar_bij (fun f => F f), Fintype.sum_sigma]
-  apply Finset.sum_congr rfl
-  rintro ⟨S, hS⟩ _
-  set e := S.orderEmbOfFin hS with he
-  have h2 : ∀ σ : Equiv.Perm (Fin i), F (cauchyBinetPar ⟨⟨S, hS⟩, σ⟩) =
-      (Equiv.Perm.sign σ : R) * (∏ a, A a (e (σ a))) * (B.submatrix e id).det := by
-    intro σ
-    have h3 : (B.submatrix (fun a => e (σ a)) id).det =
-        (Equiv.Perm.sign σ : R) * (B.submatrix e id).det := by
-      have := Matrix.det_permute σ (B.submatrix e id)
-      rw [← this]; rfl
-    show (∏ a, A a (e (σ a))) * (B.submatrix (fun a => e (σ a)) id).det = _
-    rw [h3]; ring
-  simp_rw [h2]
-  rw [← Finset.sum_mul]
-  congr 1
-  rw [Matrix.det_apply', ← Equiv.sum_comp (Equiv.inv (Equiv.Perm (Fin i)))]
-  apply Finset.sum_congr rfl
-  intro σ _
-  simp only [Equiv.inv_apply, Equiv.Perm.sign_inv, Matrix.submatrix_apply, id]
-  congr 1
-  rw [← Equiv.prod_comp σ]
-  simp
+theorem cauchyBinet
+    {m i : ℕ} {R : Type*} [CommRing R] (A : Matrix (Fin i) (Fin m) R) (B : Matrix (Fin m) (Fin i) R)
+    : (A * B).det
+      = ∑ S : {S : Finset (Fin m) // S.card = i},
+        (A.submatrix id (S.1.orderEmbOfFin S.2)).det * (B.submatrix (S.1.orderEmbOfFin S.2) id).det :=
+  by
+    classical
+    rw [cauchyBinet_det_mul_fun]
+    set F : (Fin i → Fin m) → R := fun f => (∏ a, A a (f a)) * (B.submatrix f id).det with hF
+    have h1 : ∑ f : Fin i → Fin m, F f = ∑ f : Fin i ↪ Fin m, F f := by
+      have h0 : ∀ f : Fin i → Fin m, ¬ Function.Injective f → F f = 0 := by
+        intro f hf
+        simp only [Function.Injective, not_forall] at hf
+        obtain ⟨a, b, hab, hne⟩ := hf
+        have : (B.submatrix f id).det = 0 :=
+          Matrix.det_zero_of_row_eq hne (by funext c; simp [Matrix.submatrix_apply, hab])
+        simp [hF, this]
+      rw [← Finset.sum_filter_of_ne (p := Function.Injective) (s := univ) (f := F)
+        (fun f _ hne => by by_contra hc; exact hne (h0 f hc))]
+      symm
+      apply Finset.sum_bij (fun (f : Fin i ↪ Fin m) _ => (f : Fin i → Fin m))
+      · intro f _; simp [f.injective]
+      · intro f _ g _ h; exact DFunLike.coe_injective h
+      · intro f hf
+        exact ⟨⟨f, (Finset.mem_filter.mp hf).2⟩, Finset.mem_univ _, rfl⟩
+      · intro f _; rfl
+    rw [h1, ← Function.Bijective.sum_comp cauchyBinetPar_bij (fun f => F f), Fintype.sum_sigma]
+    apply Finset.sum_congr rfl
+    rintro ⟨S, hS⟩ _
+    set e := S.orderEmbOfFin hS with he
+    have h2
+        : ∀ σ : Equiv.Perm (Fin i),
+          F (cauchyBinetPar ⟨⟨S, hS⟩, σ⟩)
+            = (Equiv.Perm.sign σ : R) * (∏ a, A a (e (σ a))) * (B.submatrix e id).det := by
+      intro σ
+      have h3
+          : (B.submatrix (fun a => e (σ a)) id).det
+            = (Equiv.Perm.sign σ : R) * (B.submatrix e id).det := by
+        have := Matrix.det_permute σ (B.submatrix e id)
+        rw [← this]
+        rfl
+      show (∏ a, A a (e (σ a))) * (B.submatrix (fun a => e (σ a)) id).det = _
+      rw [h3]
+      ring
+    simp_rw [h2]
+    rw [← Finset.sum_mul]
+    congr 1
+    rw [Matrix.det_apply', ← Equiv.sum_comp (Equiv.inv (Equiv.Perm (Fin i)))]
+    apply Finset.sum_congr rfl
+    intro σ _
+    simp only [Equiv.inv_apply, Equiv.Perm.sign_inv, Matrix.submatrix_apply, id]
+    congr 1
+    rw [← Equiv.prod_comp σ]
+    simp
 
 end ReciprocityTheory.ChartRestriction.DS

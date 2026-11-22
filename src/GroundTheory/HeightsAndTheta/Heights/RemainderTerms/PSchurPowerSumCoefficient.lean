@@ -15,9 +15,10 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem SchurPowerSumCoefficient.proof (h1 : SchWeightedPreimage.Statement)
-    (h2 : SchEvalPowerSumHom.Statement) (h3 : SchSchurHomogeneous.Statement)
-    (h4 : SchSchurAtRootsOfUnity.Statement) : SchurPowerSumCoefficient.Statement := by
+theorem SchurPowerSumCoefficient.proof
+    (h1 : SchWeightedPreimage.Statement) (h2 : SchEvalPowerSumHom.Statement)
+    (h3 : SchSchurHomogeneous.Statement) (h4 : SchSchurAtRootsOfUnity.Statement)
+    : SchurPowerSumCoefficient.Statement := by
   intro N r k hk1 hkN nu hanti hsum
   have hhom := h3 (Fin N) r nu
   rw [hsum] at hhom

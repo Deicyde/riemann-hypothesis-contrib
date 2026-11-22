@@ -7,21 +7,25 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B
-  PositivityTheory.Rg.BcB.F.Choice PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcN.F2
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5
+  PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.BcB.F.Choice
+  PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcN.F2
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem exists_ex (hE : ShufEx) (n a : ℕ) (s : Finset (Fin (n / 2))) (h : LocData.admitted n a s) :
-    ∃ e : Fin a ⊕ Fin (n - a) ≃ Fin n,
-      (∀ i, e (.inl i) = (symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1 i) ∧
-      ∀ j, e (.inr j) = (symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2 j := by
+private theorem exists_ex
+    (hE : ShufEx) (n a : ℕ) (s : Finset (Fin (n / 2))) (h : LocData.admitted n a s)
+    : ∃ e : Fin a ⊕ Fin (n - a) ≃ Fin n,
+      (∀ i, e (.inl i) = (symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1 i)
+        ∧ ∀ j, e (.inr j) = (symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2 j := by
   obtain ⟨hdisj, hcov⟩ := hE n a s h
   let f : Fin a ⊕ Fin (n - a) → Fin n :=
-    Sum.elim ((symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1) ((symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2)
+    Sum.elim ((symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1)
+      ((symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2)
   have hf : Function.Bijective f := by
     constructor
     · rintro (i | i) (j | j) hij
@@ -38,7 +42,8 @@ private theorem exists_ex (hE : ShufEx) (n a : ℕ) (s : Finset (Fin (n / 2))) (
       · simp only [f, Sum.elim_inr] at hij
         exact congrArg Sum.inr (((symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2).injective hij)
     · intro k
-      have hk : k ∈ symIdx n (a % 2 = 1) s ∪ symIdx n ((n - a) % 2 = 1) sᶜ := hcov ▸ Finset.mem_univ k
+      have hk : k ∈ symIdx n (a % 2 = 1) s ∪ symIdx n ((n - a) % 2 = 1) sᶜ :=
+        hcov ▸ Finset.mem_univ k
       rcases Finset.mem_union.1 hk with hk | hk
       · have hr : k ∈ Set.range ((symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1) := by
           rw [Finset.range_orderEmbOfFin]
@@ -52,26 +57,36 @@ private theorem exists_ex (hE : ShufEx) (n a : ℕ) (s : Finset (Fin (n / 2))) (
         exact ⟨.inr j, hj⟩
   exact ⟨Equiv.ofBijective f hf, fun i => rfl, fun j => rfl⟩
 
-private theorem map_split {α β : Type} [Fintype α] [Fintype β] {n : ℕ} (e : α ⊕ β ≃ Fin n) (f : Fin n → ℂˣ) :
-    Finset.univ.val.map (fun i => f (e (.inl i))) + Finset.univ.val.map (fun j => f (e (.inr j))) =
-      Finset.univ.val.map f := by
+private theorem map_split
+    {α β : Type} [Fintype α] [Fintype β] {n : ℕ} (e : α ⊕ β ≃ Fin n) (f : Fin n → ℂˣ)
+    : Finset.univ.val.map (fun i => f (e (.inl i))) + Finset.univ.val.map (fun j => f (e (.inr j)))
+      = Finset.univ.val.map f := by
   rw [← Multiset.map_univ_val_equiv e, Multiset.map_map, ← Finset.univ_disjSum_univ]
-  simp [Finset.disjSum, Multiset.disjSum, Multiset.map_add (f := _), Multiset.map_map, Function.comp_def]
+  simp [Finset.disjSum, Multiset.disjSum, Multiset.map_add (f := _), Multiset.map_map,
+    Function.comp_def]
 
-private theorem finish (hT : TargetAlg) (hM : MonoRes) {E : Type} [Field E] [NumberField E] [IsCMField E] (w : Pl E)
-    (n a : ℕ) (s : Finset (Fin (n / 2))) (h : LocData.admitted n a s) (e : Fin a ⊕ Fin (n - a) ≃ Fin n)
-    (he : (∀ i, e (.inl i) = (symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1 i) ∧
-      ∀ j, e (.inr j) = (symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2 j)
-    (ξ : Fin n → ℂˣ) (ξa : Fin a → ℂˣ) (ξb : Fin (n - a) → ℂˣ) (hmono : PositivityTheory.Rg.BcB.N3.Mono ξ)
+private theorem finish
+    (hT : TargetAlg) (hM : MonoRes)
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (w : Pl E) (n a : ℕ)
+    (s : Finset (Fin (n / 2))) (h : LocData.admitted n a s) (e : Fin a ⊕ Fin (n - a) ≃ Fin n)
+    (he : (∀ i, e (.inl i) = (symIdx n (a % 2 = 1) s).orderEmbOfFin h.2.1 i)
+      ∧ ∀ j, e (.inr j) = (symIdx n ((n - a) % 2 = 1) sᶜ).orderEmbOfFin h.2.2 j)
+    (ξ : Fin n → ℂˣ) (ξa : Fin a → ℂˣ) (ξb : Fin (n - a) → ℂˣ)
+    (hmono : PositivityTheory.Rg.BcB.N3.Mono ξ)
     (hstd : IsStd w (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a))
       (fun k => Sum.elim (fun _ => ((-1) ^ (n - a) : ℂˣ)) (fun _ => (-1) ^ a) (e.symm k)))
-    (hchi : chiOf w (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a)) ξa ξb = chiN w ξ) :
-    PositivityTheory.Rg.BcB.N3.Mono ξa ∧ PositivityTheory.Rg.BcB.N3.Mono ξb ∧
-      (Finset.univ.val.map ξa).map (· * (-1 : ℂˣ) ^ (n - a)) + (Finset.univ.val.map ξb).map (· * (-1 : ℂˣ) ^ a) =
-        Finset.univ.val.map ξ := by
-  obtain ⟨hA, hB⟩ := hT E n w (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a)) _ ξ ξa ξb hstd hchi
-  have hnorm : ∀ k : Fin n,
-      ‖((Sum.elim (fun _ => ((-1) ^ (n - a) : ℂˣ)) (fun _ => (-1) ^ a) (e.symm k) : ℂˣ) : ℂ)‖ = 1 := by
+    (hchi : chiOf w (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a)) ξa ξb = chiN w ξ)
+    : PositivityTheory.Rg.BcB.N3.Mono ξa ∧ PositivityTheory.Rg.BcB.N3.Mono ξb
+      ∧ (Finset.univ.val.map ξa).map (· * (-1 : ℂˣ) ^ (n - a))
+          + (Finset.univ.val.map ξb).map (· * (-1 : ℂˣ) ^ a)
+        = Finset.univ.val.map ξ := by
+  obtain ⟨hA, hB⟩ :=
+    hT E n w (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a)) _ ξ ξa ξb hstd hchi
+  have hnorm
+      : ∀ k : Fin n,
+        ‖((Sum.elim (fun _ => ((-1) ^ (n - a) : ℂˣ)) (fun _ => (-1) ^ a) (e.symm k) : ℂˣ) : ℂ)‖
+          = 1 := by
     intro k
     cases e.symm k <;> simp
   obtain ⟨mA, mB⟩ := hM n (shufOf w n a s h e he ((-1) ^ (n - a)) ((-1) ^ a)) _ ξ hmono hnorm
@@ -93,12 +108,15 @@ private theorem finish (hT : TargetAlg) (hM : MonoRes) {E : Type} [Field E] [Num
       (-1) ^ a = ξ (e (.inr j))
     rw [Equiv.symm_apply_apply, Sum.elim_inr, inv_mul_cancel_right]
 
-theorem UpperTheory.HeckeLevelFrameExistence.locC :
-    PositivityTheory.Rg.BcB.F.Choice.ShufEx → PositivityTheory.Rg.BcB.F.Choice.VResStd → PositivityTheory.Rg.BcB.F.Choice.ShufStd → PositivityTheory.Rg.BcB.F.Tail.TargetAlg → PositivityTheory.Rg.BcB.F.Tail.MonoRes → UpperTheory.HeckeLevelFrameExistence.LocC := by
+theorem UpperTheory.HeckeLevelFrameExistence.locC
+    : PositivityTheory.Rg.BcB.F.Choice.ShufEx → PositivityTheory.Rg.BcB.F.Choice.VResStd
+      → PositivityTheory.Rg.BcB.F.Choice.ShufStd → PositivityTheory.Rg.BcB.F.Tail.TargetAlg
+      → PositivityTheory.Rg.BcB.F.Tail.MonoRes
+      → UpperTheory.HeckeLevelFrameExistence.LocC := by
   intro hE hV hS hT hM E _ _ _ n w ι _ a Z ξ ha hZ hmono
   let J := Σ i : ι, {s : Finset (Fin (n / 2)) // LocData.admitted n (a i) s}
-  let ee : (j : J) → Fin (a j.1) ⊕ Fin (n - a j.1) ≃ Fin n :=
-    fun j => Classical.choose (exists_ex hE n (a j.1) j.2.1 j.2.2)
+  let ee : (j : J) → Fin (a j.1) ⊕ Fin (n - a j.1) ≃ Fin n := fun j =>
+    Classical.choose (exists_ex hE n (a j.1) j.2.1 j.2.2)
   have hee := fun j : J => Classical.choose_spec (exists_ex hE n (a j.1) j.2.1 j.2.2)
   let S : J → Shuf n := fun j =>
     shufOf w n (a j.1) j.2.1 j.2.2 (ee j) (hee j) ((-1) ^ (n - a j.1)) ((-1) ^ a j.1)
@@ -116,4 +134,5 @@ theorem UpperTheory.HeckeLevelFrameExistence.locC :
     dsimp only
     rw [h1, h2, h3]
     rfl
-  exact finish hT hM w n (a i) s h (ee j) (hee j) ξ ξa ξb hmono (hS E w n (a i) s h (ee j) (hee j)) hchi
+  exact finish hT hM w n (a i) s h (ee j) (hee j) ξ ξa ξb hmono (hS E w n (a i) s h (ee j) (hee j))
+    hchi

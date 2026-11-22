@@ -16,9 +16,12 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -34,27 +37,49 @@ namespace GlobalTheory.CechAff
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem exists_pull_charts {S S' : Scheme.{0}} (f : S' ⟶ S) (t : SAB H S) :
-    ∃ (t' : SAB H S') (m : SABMap t' t f) (k : t.PP.L.ι → t'.PP.L.ι),
-      (∀ a, t'.PP.L.U (k a) = m.φ ⁻¹ᵁ t.PP.L.U a) ∧
-      ∀ a b, ((t'.PP.L.g (k a) (k b)).val : Γ(t'.G.left, t'.PP.L.U (k a) ⊓ t'.PP.L.U (k b))) =
-        pbT m.φ (t.PP.L.g a b).val (t'.PP.L.U (k a) ⊓ t'.PP.L.U (k b)) := by
+theorem exists_pull_charts {S S' : Scheme.{0}} (f : S' ⟶ S) (t : SAB H S)
+    : ∃ (t' : SAB H S') (m : SABMap t' t f) (k : t.PP.L.ι → t'.PP.L.ι),
+      (∀ a, t'.PP.L.U (k a) = m.φ ⁻¹ᵁ t.PP.L.U a)
+        ∧ ∀ a b,
+          ((t'.PP.L.g (k a) (k b)).val : Γ(t'.G.left, t'.PP.L.U (k a) ⊓ t'.PP.L.U (k b)))
+            = pbT m.φ (t.PP.L.g a b).val (t'.PP.L.U (k a) ⊓ t'.PP.L.U (k b)) := by
   have h := isGrpPullback_pullback t.G f
   obtain ⟨hL, hr, ⟨c', hc'⟩, hs⟩ := Out.CubePf.cubePull S S' t.G _ (cubeMapOf h) t.PP t.cub
-  have hact : ∀ a, ((OAct.pullback f t.G t.act).act a).left ≫ pullback.fst t.G.hom f =
-      pullback.fst t.G.hom f ≫ (t.act.act a).left := fun a => pullback.lift_fst _ _ _
-  have pa : ∀ {T : Over S'} (x : T ⟶ (Over.pullback f).obj t.G) a,
-      pushPt h.1.w (x ≫ (OAct.pullback f t.G t.act).act a) = pushPt h.1.w x ≫ t.act.act a := fun x a =>
+  have hact
+      : ∀ a,
+        ((OAct.pullback f t.G t.act).act a).left ≫ pullback.fst t.G.hom f
+          = pullback.fst t.G.hom f ≫ (t.act.act a).left := fun a =>
+    pullback.lift_fst _ _ _
+  have pa
+      : ∀ {T : Over S'} (x : T ⟶ (Over.pullback f).obj t.G) a,
+        pushPt h.1.w (x ≫ (OAct.pullback f t.G t.act).act a)
+          = pushPt h.1.w x ≫ t.act.act a := fun x a =>
     Over.OverMorphism.ext (by
       show (x.left ≫ _) ≫ _ = (x.left ≫ _) ≫ _
       rw [Category.assoc, hact, Category.assoc])
-  refine ⟨⟨(Over.pullback f).obj t.G, IsSemiAbelian.pullback f t.G t.semi, OAct.pullback f t.G t.act,
-    (cubeMapOf h).rigLB t.PP hL hr, c', hs t.sym, fun a => ?_, ?_⟩, ⟨cubeMapOf h, h, rfl, hact, hc'⟩,
-    fun a _ => a, fun a => ?_, fun a b => ?_⟩
-  · let U := lift (pushPt h.1.w (fst ((Over.pullback f).obj t.G) ((Over.pullback f).obj t.G)))
-      (pushPt h.1.w (snd ((Over.pullback f).obj t.G) ((Over.pullback f).obj t.G)))
-    refine LBIso.chartPull (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down)
-      (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down) (t.adj a)
+  refine ⟨
+    ⟨
+      (Over.pullback f).obj t.G,
+      IsSemiAbelian.pullback f t.G t.semi,
+      OAct.pullback f t.G t.act,
+      (cubeMapOf h).rigLB t.PP hL hr,
+      c',
+      hs t.sym,
+      fun a => ?_,
+      ?_
+    ⟩,
+    ⟨cubeMapOf h, h, rfl, hact, hc'⟩,
+    fun a _ => a,
+    fun a => ?_,
+    fun a b => ?_
+  ⟩
+  · let U :=
+      lift (pushPt h.1.w (fst ((Over.pullback f).obj t.G) ((Over.pullback f).obj t.G)))
+        (pushPt h.1.w (snd ((Over.pullback f).obj t.G) ((Over.pullback f).obj t.G)))
+    refine LBIso.chartPull
+      (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down)
+      (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down)
+      (t.adj a)
     · fin_cases i
       · exact (pa _ a).trans (by simp [U])
       · simp [U]
@@ -62,44 +87,57 @@ theorem exists_pull_charts {S S' : Scheme.{0}} (f : S' ⟶ S) (t : SAB H S) :
       · simp [U]
       · exact (pa _ _).trans (by simp [U])
   · let U := pushPt h.1.w (𝟙 ((Over.pullback f).obj t.G))
-    refine LBIso.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull t.PP.L _ U.left (Category.id_comp _))
-      (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down) t.prim
+    refine LBIso.chartPull
+      (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull t.PP.L _ U.left
+        (Category.id_comp _))
+      (chartPullLinComb t.PP.L _ _ _ _ U.left fun I => psum_push h _ _ U (fun i => ?_) I.down)
+      t.prim
     fin_cases i
     · simp [U]
     · exact (congrArg (pushPt h.1.w) (Category.id_comp _).symm).trans (pa _ _)
   · ext y
     exact mem_pull
   · refine (GlobalTheory.chartPull_g_appLE _ _ _ _ _
-      (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull t.PP.L (pullback.fst t.G.hom f) (pullback.fst t.G.hom f) rfl)
-      (fun _ => a) (fun _ => b)).trans ?_
+      (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull t.PP.L (pullback.fst t.G.hom f)
+        (pullback.fst t.G.hom f) rfl)
+      (fun _ => a)
+      (fun _ => b)).trans ?_
     exact (GlobalTheory.KS.pbT_of_le _ _ _).symm
 
 end GlobalTheory.CechAff
 
 namespace GlobalTheory.CechAff
 
-
 open GlobalTheory.KS in
-theorem exists_pullField {Y Y' : Scheme.{0}} (io : Y' ⟶ Y) [IsOpenImmersion io] (d : Fld Y) (hd : IsField ⊤ d) :
-    ∃ δ : Fld Y', IsField ⊤ δ ∧ ∀ (O₁ : Y.Opens) (O : Y'.Opens) (h : O ≤ io ⁻¹ᵁ O₁) (f : Γ(Y, O₁)),
-      δ O ((io.appLE O₁ O h).hom f) = (io.appLE O₁ O h).hom (d O₁ f) := by
+theorem exists_pullField
+    {Y Y' : Scheme.{0}} (io : Y' ⟶ Y) [IsOpenImmersion io] (d : Fld Y) (hd : IsField ⊤ d)
+    : ∃ δ : Fld Y',
+      IsField ⊤ δ
+        ∧ ∀ (O₁ : Y.Opens) (O : Y'.Opens) (h : O ≤ io ⁻¹ᵁ O₁) (f : Γ(Y, O₁)),
+          δ O ((io.appLE O₁ O h).hom f) = (io.appLE O₁ O h).hom (d O₁ f) := by
   obtain ⟨σ, σ₁, σ₂⟩ := GlobalTheory.LogKSBal.exists_section io
   have hpi : ∀ O : Y'.Opens, O ≤ io ⁻¹ᵁ (io ''ᵁ O) := fun O => (io.preimage_image_eq O).ge
-  have hσ : ∀ (O : Y'.Opens) (O₀ : Y.Opens) (h : io ''ᵁ O ≤ O₀) (f : Γ(Y, O₀)),
-      σ O (pbT io f O) = resG _ h f := fun O O₀ h f => by
+  have hσ
+      : ∀ (O : Y'.Opens) (O₀ : Y.Opens) (h : io ''ᵁ O ≤ O₀) (f : Γ(Y, O₀)),
+        σ O (pbT io f O) = resG _ h f := fun O O₀ h f => by
     rw [← pbT_rsT io h (hpi O), σ₂, rsT_of_le h]
-  refine ⟨fun O f => pbT io (d (io ''ᵁ O) (σ O f)) O, ⟨fun O _ f f' => ?_, fun O _ f f' => ?_,
-    fun O O' h _ f => ?_⟩, fun O₁ O h f => ?_⟩
+  refine ⟨
+    fun O f => pbT io (d (io ''ᵁ O) (σ O f)) O,
+    ⟨fun O _ f f' => ?_, fun O _ f f' => ?_, fun O O' h _ f => ?_⟩,
+    fun O₁ O h f => ?_
+  ⟩
   · simp only [map_add (f := _), hd.1 _ le_top, pbT_add]
   · simp only [map_mul, hd.2.1 _ le_top, pbT_add, pbT_mul, σ₁]
   · have h' := io.image_mono h
     have e : σ O' (resG _ h f) = resG _ h' (σ O f) := by
       rw [← hσ O' _ h', ← rsT_pbT io (hpi O) h, σ₁, rsT_of_le h]
     show pbT io (d (io ''ᵁ O') (σ O' (resG _ h f))) O' = resG _ h (pbT io (d (io ''ᵁ O) (σ O f)) O)
-    rw [e, hd.2.2 _ _ h' le_top, ← rsT_of_le h', pbT_rsT _ h' (hpi O'), ← rsT_of_le h, rsT_pbT _ (hpi O) h]
+    rw [e, hd.2.2 _ _ h' le_top, ← rsT_of_le h', pbT_rsT _ h' (hpi O'), ← rsT_of_le h,
+      rsT_pbT _ (hpi O) h]
   · have hO : io ''ᵁ O ≤ O₁ := (io.image_mono h).trans (io.image_preimage_le _)
     show pbT io (d (io ''ᵁ O) (σ O _)) O = _
-    rw [← pbT_of_le io h, hσ O O₁ hO, hd.2.2 _ _ hO le_top, ← rsT_of_le hO, pbT_rsT _ hO (hpi O), pbT_of_le io h]
+    rw [← pbT_of_le io h, hσ O O₁ hO, hd.2.2 _ _ hO le_top, ← rsT_of_le hO, pbT_rsT _ hO (hpi O),
+      pbT_of_le io h]
 
 end GlobalTheory.CechAff
 
@@ -107,11 +145,15 @@ namespace GlobalTheory.CechAff
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem isTranslate_push {X X' : Scheme.{0}} {t : SAB H X} {t' : SAB H X'} {j : X' ⟶ X} (m : SABMap t' t j)
-    {R R' : Type} [CommRing R] [CommRing R'] (ψ : R →+* R') (u : Sp (DualNumber R) ⟶ t.G.left)
-    (u' : Sp (DualNumber R') ⟶ t'.G.left) (huu : u' ≫ m.φ = spMap (dualMap ψ) ≫ u) {S : Type} [CommRing S]
+theorem isTranslate_push
+    {X X' : Scheme.{0}} {t : SAB H X} {t' : SAB H X'} {j : X' ⟶ X} (m : SABMap t' t j)
+    {R R' : Type} [CommRing R] [CommRing R']
+    (ψ : R →+* R') (u : Sp (DualNumber R) ⟶ t.G.left) (u' : Sp (DualNumber R') ⟶ t'.G.left)
+    (huu : u' ≫ m.φ = spMap (dualMap ψ) ≫ u)
+    {S : Type} [CommRing S]
     (φS : R' →+* S) (g₀' : Sp S ⟶ t'.G.left) (w' : Sp (DualNumber S) ⟶ t'.G.left)
-    (hw' : IsTranslate t' φS g₀' u' w') : IsTranslate t (φS.comp ψ) (g₀' ≫ m.φ) u (w' ≫ m.φ) := by
+    (hw' : IsTranslate t' φS g₀' u' w')
+    : IsTranslate t (φS.comp ψ) (g₀' ≫ m.φ) u (w' ≫ m.φ) := by
   obtain ⟨g', v', h₁, h₂, h₃⟩ := hw'
   have hsq : m.φ ≫ t.G.hom = t'.G.hom ≫ j := m.cart.1.w
   let T : Over X' := tEpsG (g₀' ≫ t'.G.hom)
@@ -124,8 +166,8 @@ theorem isTranslate_push {X X' : Scheme.{0}} {t : SAB H X} {t' : SAB H X'} {j : 
   · show 𝟙 _ ≫ g'.left ≫ m.φ = _
     rw [Category.id_comp, h₁, Category.assoc]
   · show 𝟙 _ ≫ v'.left ≫ m.φ = _
-    rw [Category.id_comp, h₂, Category.assoc, huu, ← Category.assoc, GlobalTheory.TransLift.spMap_comp'',
-      GlobalTheory.TransLift.dualMap_comp'']
+    rw [Category.id_comp, h₂, Category.assoc, huu, ← Category.assoc,
+      GlobalTheory.TransLift.spMap_comp'', GlobalTheory.TransLift.dualMap_comp'']
   · rw [← MonObj.comp_mul, ← map_mul]
     show 𝟙 _ ≫ (g' * v').left ≫ m.φ = _
     rw [Category.id_comp, h₃]
@@ -133,7 +175,6 @@ theorem isTranslate_push {X X' : Scheme.{0}} {t : SAB H X} {t' : SAB H X'} {j : 
 end GlobalTheory.CechAff
 
 namespace GlobalTheory.CechAff
-
 
 set_option maxHeartbeats 1000000 in
 open GlobalTheory.KS in

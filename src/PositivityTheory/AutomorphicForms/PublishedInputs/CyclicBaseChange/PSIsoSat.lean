@@ -19,7 +19,8 @@ theorem SIsoSat_holds : SIsoSat := by
     cases π' with
     | cx p' =>
       exact (GlobalTheory.CuspRep.CG.hasSat_mk p' w B).2
-        (GlobalTheory.CuspRep.CuspSub.Iso.hasSatGL (π := p) (π' := p') h ((GlobalTheory.CuspRep.CG.hasSat_mk p w B).1 hB))
+        (GlobalTheory.CuspRep.CuspSub.Iso.hasSatGL (π := p) (π' := p') h
+          ((GlobalTheory.CuspRep.CG.hasSat_mk p w B).1 hB))
     | re p' => exact h.elim
   | re p =>
     cases π' with

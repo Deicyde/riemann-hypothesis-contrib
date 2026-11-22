@@ -8,15 +8,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem unitsMap_unitOfCoprime_coe_eq {n m : ℕ} (hd : m ∣ n) (c : ℕ) (hc : c.Coprime n) :
-    ((ZMod.unitsMap hd (ZMod.unitOfCoprime c hc) : (ZMod m)ˣ) : ZMod m) = c := by
+private theorem unitsMap_unitOfCoprime_coe_eq {n m : ℕ} (hd : m ∣ n) (c : ℕ) (hc : c.Coprime n)
+    : ((ZMod.unitsMap hd (ZMod.unitOfCoprime c hc) : (ZMod m)ˣ) : ZMod m) = c := by
   simp [ZMod.unitsMap, ZMod.coe_unitOfCoprime, ZMod.castHom_apply, ZMod.cast_natCast hd]
 
-private theorem exists_coprime_modEq_of_modEq_one_div {N p R w : ℕ} (hp : p.Prime) (hN : N ≠ 0) (hpN : p ∣ N)
-    (hR : R ∣ N) (hPR : ordProj[p] N ∣ R) (hw : w ≡ 1 [MOD R / p]) (hwp : w.Coprime p) :
-    ∃ c, c ≡ w [MOD R] ∧ c ≡ 1 [MOD N / p] ∧ c.Coprime N := by
+private theorem exists_coprime_modEq_of_modEq_one_div
+    {N p R w : ℕ} (hp : p.Prime) (hN : N ≠ 0) (hpN : p ∣ N) (hR : R ∣ N) (hPR : ordProj[p] N ∣ R)
+    (hw : w ≡ 1 [MOD R / p]) (hwp : w.Coprime p)
+    : ∃ c, c ≡ w [MOD R] ∧ c ≡ 1 [MOD N / p] ∧ c.Coprime N := by
   set P := ordProj[p] N with hPdef
   set K := ordCompl[p] N with hKdef
   have hPK : P * K = N := Nat.ordProj_mul_ordCompl_eq_self N p
@@ -30,14 +32,15 @@ private theorem exists_coprime_modEq_of_modEq_one_div {N p R w : ℕ} (hp : p.Pr
     exact Nat.dvd_of_mul_dvd_mul_left hPpos this
   have hRPp : R / P ∣ R / p := by
     apply Nat.dvd_div_of_mul_dvd
-    calc p * (R / P) ∣ P * (R / P) := mul_dvd_mul_right hpP _
+    calc
+      p * (R / P)
+        ∣ P * (R / P) := mul_dvd_mul_right hpP _
       _ = R := hRP.symm
   refine ⟨c, ?_, ?_, ?_⟩
   · rw [hRP]
     refine (Nat.modEq_and_modEq_iff_modEq_mul (hcop.coprime_dvd_right hRPK)).1 ⟨hcP, ?_⟩
     exact ((hcK.of_dvd hRPK).trans (hw.of_dvd hRPp).symm)
-  · have hNp : N / p = (P / p) * K := by
-      rw [Nat.div_mul_right_comm hpP, hPK]
+  · have hNp : N / p = (P / p) * K := by rw [Nat.div_mul_right_comm hpP, hPK]
     have hPpK : (P / p).Coprime K := hcop.coprime_dvd_left (Nat.div_dvd_of_dvd hpP)
     rw [hNp]
     refine (Nat.modEq_and_modEq_iff_modEq_mul hPpK).1 ⟨?_, hcK⟩
@@ -51,16 +54,17 @@ private theorem exists_coprime_modEq_of_modEq_one_div {N p R w : ℕ} (hp : p.Pr
       exact Nat.Coprime.pow_right _ hwp
     · have : c.gcd K = (1 : ℕ).gcd K := hcK.gcd_eq
       rw [Nat.Coprime, this, Nat.gcd_one_left]
-private theorem subgroup_eq_of_chr_hasLevel (E : Type) [Field E] [NumberField E] (L : ℕ) [NeZero L]
-    (H₁ H₂ : Subgroup (ZMod L)ˣ) (h₁ : Chr.HasLevel E L H₁) (h₂ : Chr.HasLevel E L H₂) :
-    H₁ = H₂ := by
+private theorem subgroup_eq_of_chr_hasLevel
+    (E : Type) [Field E] [NumberField E]
+    (L : ℕ) [NeZero L]
+    (H₁ H₂ : Subgroup (ZMod L)ˣ) (h₁ : Chr.HasLevel E L H₁) (h₂ : Chr.HasLevel E L H₂)
+    : H₁ = H₂ := by
   haveI : IsAlgClosure ℚ (AlgebraicClosure ℚ) := by
     convert AlgebraicClosure.instIsAlgClosure ℚ
     all_goals first | rfl | exact Subsingleton.elim _ _
   let f : E →ₐ[ℚ] AlgebraicClosure ℚ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra E (AlgebraicClosure ℚ) := f.toRingHom.toAlgebra
   have e1 := ((Chr.levGal E L H₁ h₁).2.2 (AlgebraicClosure ℚ)).1
@@ -69,9 +73,11 @@ private theorem subgroup_eq_of_chr_hasLevel (E : Type) [Field E] [NumberField E]
     e1.symm.trans e2
   exact Subgroup.comap_injective (Chr.clsOnto (AlgebraicClosure ℚ) L).1 e3
 
-private theorem exists_coprime_modEq_one_chi_ne_one_of_primitive {Q p : ℕ} [NeZero Q] (χ : DirichletCharacter ℂ Q)
-    (hχ : χ.IsPrimitive) (hp : p.Prime) (hpQ : p ∣ Q) :
-    ∃ w : ℕ, w.Coprime Q ∧ w ≡ 1 [MOD Q / p] ∧ χ (w : ZMod Q) ≠ 1 := by
+private theorem exists_coprime_modEq_one_chi_ne_one_of_primitive
+    {Q p : ℕ} [NeZero Q]
+    (χ : DirichletCharacter ℂ Q) (hχ : χ.IsPrimitive)
+    (hp : p.Prime) (hpQ : p ∣ Q)
+    : ∃ w : ℕ, w.Coprime Q ∧ w ≡ 1 [MOD Q / p] ∧ χ (w : ZMod Q) ≠ 1 := by
   by_contra hcon
   push_neg at hcon
   have hd : Q / p ∣ Q := Nat.div_dvd_of_dvd hpQ
@@ -94,10 +100,11 @@ private theorem exists_coprime_modEq_one_chi_ne_one_of_primitive {Q p : ℕ} [Ne
   rw [(DirichletCharacter.isPrimitive_def χ).1 hχ] at hle
   have hlt : Q / p < Q := Nat.div_lt_self (Nat.pos_of_ne_zero (NeZero.ne Q)) hp.one_lt
   omega
-private theorem unitOfCoprime_not_mem_host_H_of_cond (h : Host) (c : ℕ) (hc : c.Coprime h.N)
-    (hcond : ((c : ZMod (2 ^ (h.ex + 2))) ≠ 1 ∧ (c : ZMod (2 ^ (h.ex + 2))) ≠ -1) ∨
-      h.chi.χ (c : ZMod h.chi.N) ≠ 1 ∨ (c : ZMod h.q1) = -1 ∨ (c : ZMod h.d) = -1) :
-    ZMod.unitOfCoprime c hc ∉ h.H := by
+private theorem unitOfCoprime_not_mem_host_H_of_cond
+    (h : Host) (c : ℕ) (hc : c.Coprime h.N)
+    (hcond : ((c : ZMod (2 ^ (h.ex + 2))) ≠ 1 ∧ (c : ZMod (2 ^ (h.ex + 2))) ≠ -1)
+      ∨ h.chi.χ (c : ZMod h.chi.N) ≠ 1 ∨ (c : ZMod h.q1) = -1 ∨ (c : ZMod h.d) = -1)
+    : ZMod.unitOfCoprime c hc ∉ h.H := by
   obtain ⟨hq1, hq18, hdp, hd16, -⟩ := h.pair
   intro hmem
   simp only [Host.H, Subgroup.mem_inf, Subgroup.mem_comap] at hmem
@@ -127,8 +134,9 @@ private theorem unitOfCoprime_not_mem_host_H_of_cond (h : Host) (c : ℕ) (hc : 
     haveI := Fact.mk hdp
     have hs : IsSquare (-1 : ZMod h.d) := ⟨(y : ZMod h.d), by rw [← hv]; simp [sq]⟩
     exact (ZMod.exists_sq_eq_neg_one_iff.1 hs) (by omega)
-private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : ℕ) (hp : p.Prime) (hpN : p ∣ h.N) :
-    ∃ c : ℕ, ∃ hc : c.Coprime h.N, c ≡ 1 [MOD h.N / p] ∧ ZMod.unitOfCoprime c hc ∉ h.H := by
+private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H
+    (h : Host) (p : ℕ) (hp : p.Prime) (hpN : p ∣ h.N)
+    : ∃ c : ℕ, ∃ hc : c.Coprime h.N, c ≡ 1 [MOD h.N / p] ∧ ZMod.unitOfCoprime c hc ∉ h.H := by
   obtain ⟨hq1, hq18, hdp, hd16, hcop⟩ := h.pair
   have hNdef : h.N = (2 ^ (h.ex + 2)).lcm h.q * (h.q1 * h.d) := rfl
   have hN0 : h.N ≠ 0 := (Host.N_pos h).ne'
@@ -139,9 +147,13 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
   have h20 : 2 ^ (h.ex + 2) ≠ 0 := by positivity
   have hA0 : (2 ^ (h.ex + 2)).lcm h.q ≠ 0 := Nat.lcm_ne_zero h20 hq0
   have he2 := h.two_le
-  suffices key : ∃ R w : ℕ, R ∣ h.N ∧ ordProj[p] h.N ∣ R ∧ w ≡ 1 [MOD R / p] ∧ w.Coprime p ∧
-      ∀ c, c ≡ w [MOD R] → ((c : ZMod (2 ^ (h.ex + 2))) ≠ 1 ∧ (c : ZMod (2 ^ (h.ex + 2))) ≠ -1) ∨
-        h.chi.χ (c : ZMod h.chi.N) ≠ 1 ∨ (c : ZMod h.q1) = -1 ∨ (c : ZMod h.d) = -1 by
+  suffices key
+      : ∃ R w : ℕ,
+        R ∣ h.N ∧ ordProj[p] h.N ∣ R ∧ w ≡ 1 [MOD R / p] ∧ w.Coprime p
+          ∧ ∀ c,
+            c ≡ w [MOD R]
+              → ((c : ZMod (2 ^ (h.ex + 2))) ≠ 1 ∧ (c : ZMod (2 ^ (h.ex + 2))) ≠ -1)
+                ∨ h.chi.χ (c : ZMod h.chi.N) ≠ 1 ∨ (c : ZMod h.q1) = -1 ∨ (c : ZMod h.d) = -1 by
     obtain ⟨R, w, hR, hPR, hw, hwp, hgood⟩ := key
     obtain ⟨c, hcR, hc1, hcN⟩ := exists_coprime_modEq_of_modEq_one_div hp hN0 hpN hR hPR hw hwp
     exact ⟨c, hcN, hc1, unitOfCoprime_not_mem_host_H_of_cond h c hcN (hgood c hcR)⟩
@@ -150,8 +162,11 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
   have h2N : 2 ^ (h.ex + 2) ∣ h.N := (Nat.dvd_lcm_left _ _).trans hAN
   have hq1N : h.q1 ∣ h.N := by rw [hNdef]; exact (dvd_mul_right _ _).trans (dvd_mul_left _ _)
   have hdN : h.d ∣ h.N := by rw [hNdef]; exact (dvd_mul_left _ _).trans (dvd_mul_left _ _)
-  have hv : ∀ r, h.N.factorization r = max ((2 ^ (h.ex + 2)).factorization r) (h.q.factorization r)
-      + h.q1.factorization r + h.d.factorization r := by
+  have hv
+      : ∀ r,
+        h.N.factorization r
+          = max ((2 ^ (h.ex + 2)).factorization r) (h.q.factorization r) + h.q1.factorization r
+            + h.d.factorization r := by
     intro r
     rw [hNdef, Nat.factorization_mul hA0 (mul_ne_zero hq10 hd0), Nat.factorization_mul hq10 hd0,
       Nat.factorization_lcm h20 hq0]
@@ -168,9 +183,12 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
     have : Nat.Coprime h.d h.chi.N := hcop.coprime_dvd_left (dvd_mul_left _ _)
     exact hdp.one_lt.ne' (Nat.Coprime.eq_one_of_dvd this hdv)
   have hq1d : h.q1 ≠ h.d := by omega
-  have hone : ∀ r, r.Prime → r % 4 = 3 → ¬ r ∣ h.q → (r = h.q1 ∨ r = h.d) →
-      ∃ R w : ℕ, R ∣ h.N ∧ ordProj[r] h.N ∣ R ∧ w ≡ 1 [MOD R / r] ∧ w.Coprime r ∧
-      ∀ c, c ≡ w [MOD R] → (c : ZMod r) = -1 := by
+  have hone
+      : ∀ r,
+        r.Prime → r % 4 = 3 → ¬ r ∣ h.q → (r = h.q1 ∨ r = h.d)
+          → ∃ R w : ℕ,
+            R ∣ h.N ∧ ordProj[r] h.N ∣ R ∧ w ≡ 1 [MOD R / r] ∧ w.Coprime r
+              ∧ ∀ c, c ≡ w [MOD R] → (c : ZMod r) = -1 := by
     intro r hr hr4 hrq hrr
     have hr2 : r ≠ 2 := by omega
     have hvr : h.N.factorization r = 1 := by
@@ -205,18 +223,27 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
   · subst hpd
     obtain ⟨R, w, a1, a2, a3, a4, a5⟩ := hone h.d hdp (by omega) hdq (Or.inr rfl)
     exact ⟨R, w, a1, a2, a3, a4, fun c hc ↦ Or.inr (Or.inr (Or.inr (a5 c hc)))⟩
-  have hpq1' : h.q1.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd
-    (fun hdv ↦ hpq1 ((Nat.prime_dvd_prime_iff_eq hp hq1).1 hdv))
-  have hpd' : h.d.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd
-    (fun hdv ↦ hpd ((Nat.prime_dvd_prime_iff_eq hp hdp).1 hdv))
+  have hpq1' : h.q1.factorization p = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdv ↦
+      hpq1 ((Nat.prime_dvd_prime_iff_eq hp hq1).1 hdv))
+  have hpd' : h.d.factorization p = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdv ↦ hpd ((Nat.prime_dvd_prime_iff_eq hp hdp).1 hdv))
   have hvp := hv p
   rw [hpq1', hpd'] at hvp
   have hpos : 0 < h.N.factorization p := hp.factorization_pos_of_dvd hN0 hpN
   by_cases hle : h.N.factorization p ≤ h.q.factorization p
   · have hpq : p ∣ h.q := Nat.dvd_of_factorization_pos (by omega)
-    obtain ⟨w, hwq, hw1, hwχ⟩ := exists_coprime_modEq_one_chi_ne_one_of_primitive h.chi.χ h.chi.prim hp hpq
-    refine ⟨h.q, w, hqN, (hp.pow_dvd_iff_le_factorization hq0).2 hle, hw1,
-      hwq.coprime_dvd_right hpq, fun c hc ↦ Or.inr (Or.inl ?_)⟩
+    obtain ⟨w, hwq, hw1, hwχ⟩ :=
+      exists_coprime_modEq_one_chi_ne_one_of_primitive h.chi.χ h.chi.prim hp hpq
+    refine ⟨
+      h.q,
+      w,
+      hqN,
+      (hp.pow_dvd_iff_le_factorization hq0).2 hle,
+      hw1,
+      hwq.coprime_dvd_right hpq,
+      fun c hc ↦ Or.inr (Or.inl ?_)
+    ⟩
     rw [(ZMod.natCast_eq_natCast_iff c w h.q).2 hc]
     exact hwχ
   · have h2pos : 0 < (2 ^ (h.ex + 2)).factorization p := by omega
@@ -231,7 +258,8 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
     have hv2 : h.N.factorization 2 = h.ex + 2 := by omega
     have hpow : 2 ^ (h.ex + 2) = 2 ^ (h.ex + 1) * 2 := by ring
     have ht : 2 ≤ 2 ^ (h.ex + 1) := by
-      calc 2 = 2 ^ 1 := by norm_num
+      calc
+        2 = 2 ^ 1 := by norm_num
         _ ≤ 2 ^ (h.ex + 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
     refine ⟨2 ^ (h.ex + 2), 1 + 2 ^ (h.ex + 1), h2N, by rw [hv2], ?_, ?_, ?_⟩
     · rw [hpow, Nat.mul_div_cancel _ (by norm_num)]
@@ -244,8 +272,9 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
       rw [(ZMod.natCast_eq_natCast_iff c _ _).2 hc]
       constructor
       · intro heq
-        have h1 := (ZMod.natCast_eq_natCast_iff' (1 + 2 ^ (h.ex + 1)) 1 (2 ^ (h.ex + 2))).1
-          (by rw [heq, Nat.cast_one])
+        have h1 :=
+          (ZMod.natCast_eq_natCast_iff' (1 + 2 ^ (h.ex + 1)) 1 (2 ^ (h.ex + 2))).1
+            (by rw [heq, Nat.cast_one])
         rw [Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)] at h1
         omega
       · intro heq
@@ -257,12 +286,14 @@ private theorem exists_modEq_one_unitOfCoprime_not_mem_host_H (h : Host) (p : �
         rw [ZMod.natCast_eq_zero_iff] at h0
         have := Nat.le_of_dvd (by omega) h0
         have ht4 : 4 ≤ 2 ^ (h.ex + 1) := by
-          calc 4 = 2 ^ 2 := by norm_num
+          calc
+            4 = 2 ^ 2 := by norm_num
             _ ≤ 2 ^ (h.ex + 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
         omega
 
-theorem UpperTheory.V.HV.hostCond :
-    ∀ (h : Host) (E : Type) [Field E] [NumberField E], IsChiField h.chi h.ex h.q1 h.d E → condF E = h.N := by
+theorem UpperTheory.V.HV.hostCond
+    : ∀ (h : Host) (E : Type) [Field E] [NumberField E],
+      IsChiField h.chi h.ex h.q1 h.d E → condF E = h.N := by
   intro h E _ _ hE
   have hL := hostLevel h E hE
   have hN0 : h.N ≠ 0 := (Host.N_pos h).ne'

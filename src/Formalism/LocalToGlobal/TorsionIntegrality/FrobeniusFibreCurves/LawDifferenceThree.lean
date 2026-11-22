@@ -16,8 +16,8 @@ section Alg
 variable {K : Type} [Field K] [CharZero K]
 
 def wp3 (P : PowerSeries K) (j k : Fin 3) : MvPowerSeries (Fin 3) K :=
-  MvPowerSeries.X j ^ 2 - MvPowerSeries.X k ^ 2 +
-    MvPowerSeries.X j ^ 2 * MvPowerSeries.X k ^ 2 * (at1 k P - at1 j P)
+  MvPowerSeries.X j ^ 2 - MvPowerSeries.X k ^ 2
+    + MvPowerSeries.X j ^ 2 * MvPowerSeries.X k ^ 2 * (at1 k P - at1 j P)
 
 def det3 (P : PowerSeries K) : MvPowerSeries (Fin 3) K :=
   Matrix.det (Matrix.of fun j : Fin 3 =>
@@ -26,9 +26,9 @@ def det3 (P : PowerSeries K) : MvPowerSeries (Fin 3) K :=
       -2 + MvPowerSeries.X j ^ 3 * at1 j (dz P)])
 
 def vand3 (K : Type) [Field K] : MvPowerSeries (Fin 3) K :=
-  (MvPowerSeries.X 0 + MvPowerSeries.X 1 + MvPowerSeries.X 2) *
-    (MvPowerSeries.X 0 - MvPowerSeries.X 1) * (MvPowerSeries.X 0 - MvPowerSeries.X 2) *
-    (MvPowerSeries.X 1 - MvPowerSeries.X 2)
+  (MvPowerSeries.X 0 + MvPowerSeries.X 1 + MvPowerSeries.X 2)
+    * (MvPowerSeries.X 0 - MvPowerSeries.X 1) * (MvPowerSeries.X 0 - MvPowerSeries.X 2)
+    * (MvPowerSeries.X 1 - MvPowerSeries.X 2)
 
 def evalSumThree (f : PowerSeries K) : MvPowerSeries (Fin 3) K :=
   PowerSeries.subst
@@ -38,23 +38,23 @@ def evalDiffThree (j k : Fin 3) (f : PowerSeries K) : MvPowerSeries (Fin 3) K :=
   PowerSeries.subst (MvPowerSeries.X j - MvPowerSeries.X k : MvPowerSeries (Fin 3) K) f
 
 def fsE (f : PowerSeries K) : MvPowerSeries (Fin 3) K :=
-  evalSumThree f + evalDiffThree 0 1 f + evalDiffThree 0 2 f + evalDiffThree 1 2 f - 3 * at1 0 f - 3 * at1 1 f - 3 * at1 2 f
+  evalSumThree f + evalDiffThree 0 1 f + evalDiffThree 0 2 f + evalDiffThree 1 2 f - 3 * at1 0 f
+    - 3 * at1 1 f - 3 * at1 2 f
 
 def ev3 (h : MvPowerSeries (Fin 3) K) : MvPowerSeries (Fin 3) K :=
-  MvPowerSeries.subst
-    ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) K), MvPowerSeries.X 1, 0] h
+  MvPowerSeries.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) K), MvPowerSeries.X 1, 0] h
 
 def F3 (F : MvPowerSeries (Fin 2) K) : MvPowerSeries (Fin 3) K :=
   MvPowerSeries.subst ![in3 F, (MvPowerSeries.X 2 : MvPowerSeries (Fin 3) K)] F
 
-def lawDifferenceThree (F : MvPowerSeries (Fin 2) K) (i : PowerSeries K) (j k : Fin 3) :
-    MvPowerSeries (Fin 3) K :=
+def lawDifferenceThree (F : MvPowerSeries (Fin 2) K) (i : PowerSeries K) (j k : Fin 3)
+    : MvPowerSeries (Fin 3) K :=
   MvPowerSeries.subst ![(MvPowerSeries.X j : MvPowerSeries (Fin 3) K), at1 k i] F
 
 def par3 (F : MvPowerSeries (Fin 2) K) (i f : PowerSeries K) : MvPowerSeries (Fin 3) K :=
-  PowerSeries.subst (F3 F) f + PowerSeries.subst (lawDifferenceThree F i 0 1) f +
-    PowerSeries.subst (lawDifferenceThree F i 0 2) f + PowerSeries.subst (lawDifferenceThree F i 1 2) f -
-    3 * at1 0 f - 3 * at1 1 f - 3 * at1 2 f
+  PowerSeries.subst (F3 F) f + PowerSeries.subst (lawDifferenceThree F i 0 1) f
+    + PowerSeries.subst (lawDifferenceThree F i 0 2) f
+    + PowerSeries.subst (lawDifferenceThree F i 1 2) f - 3 * at1 0 f - 3 * at1 1 f - 3 * at1 2 f
 
 end Alg
 
@@ -65,15 +65,16 @@ open Formalism.DworkPowerSeriesWeights (Integral)
 variable {K : Type} [NormedField K]
 
 def CurveHyp3 (F : MvPowerSeries (Fin 2) K) (l P ep : PowerSeries K) (a1 a3 : K) : Prop :=
-  PowerSeries.X ^ 3 * (-2 + l ^ 3 * PowerSeries.subst l (PowerSeries.derivative (R := K) P)) =
-      l ^ 3 * (-2 * ep + PowerSeries.C a1 * PowerSeries.X * ep +
-        PowerSeries.C a3 * PowerSeries.X ^ 3) ∧
-    ∃ e : MvPowerSeries (Fin 3) K, Integral e ∧ MvPowerSeries.constantCoeff e = -1 ∧
-      Matrix.det (Matrix.of fun j : Fin 3 =>
-        ![(MvPowerSeries.X j : MvPowerSeries (Fin 3) K) ^ 3, MvPowerSeries.X j * at1 j ep,
-          -at1 j ep]) =
-        e * F3 F * (MvPowerSeries.X 0 - MvPowerSeries.X 1) *
-          (MvPowerSeries.X 0 - MvPowerSeries.X 2) * (MvPowerSeries.X 1 - MvPowerSeries.X 2)
+  PowerSeries.X ^ 3 * (-2 + l ^ 3 * PowerSeries.subst l (PowerSeries.derivative (R := K) P))
+      = l ^ 3
+        * (-2 * ep + PowerSeries.C a1 * PowerSeries.X * ep + PowerSeries.C a3 * PowerSeries.X ^ 3)
+    ∧ ∃ e : MvPowerSeries (Fin 3) K,
+      Integral e ∧ MvPowerSeries.constantCoeff e = -1
+        ∧ Matrix.det (Matrix.of fun j : Fin 3 =>
+            ![(MvPowerSeries.X j : MvPowerSeries (Fin 3) K) ^ 3, MvPowerSeries.X j * at1 j ep,
+              -at1 j ep])
+          = e * F3 F * (MvPowerSeries.X 0 - MvPowerSeries.X 1)
+            * (MvPowerSeries.X 0 - MvPowerSeries.X 2) * (MvPowerSeries.X 1 - MvPowerSeries.X 2)
 
 end Norm
 

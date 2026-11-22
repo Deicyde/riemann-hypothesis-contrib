@@ -10,8 +10,8 @@ open scoped TensorProduct
 
 namespace DescPf
 
-variable {K K₂ : Type*} [Field K] [Field K₂] [Algebra K K₂] {V : Type*} [AddCommGroup V]
-  [Module K V]
+variable
+  {K K₂ : Type*} [Field K] [Field K₂] [Algebra K K₂] {V : Type*} [AddCommGroup V] [Module K V]
 
 noncomputable def trT [FiniteDimensional K K₂] : K₂ ⊗[K] V →ₗ[K] V :=
   TensorProduct.lid K V ∘ₗ LinearMap.rTensor V (Algebra.trace K K₂)
@@ -64,7 +64,8 @@ theorem galoisDescent_holds : GaloisDescentStatement := by
   apply le_antisymm
   · intro w hw
     rw [DescPf.expand (Module.finBasis K K₂) w]
-    refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, ?_, rfl⟩)
+    refine Submodule.sum_mem _ fun i _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, ?_, rfl⟩)
     simp only [SetLike.mem_coe, kPoints, Submodule.mem_comap, Submodule.restrictScalars_mem,
       TensorProduct.mk_apply]
     rw [← DescPf.sum_galAct]
@@ -72,6 +73,7 @@ theorem galoisDescent_holds : GaloisDescentStatement := by
   · rw [baseSpan, Submodule.span_le]
     rintro _ ⟨u, hu, rfl⟩
     simpa only [SetLike.mem_coe, kPoints, Submodule.mem_comap, Submodule.restrictScalars_mem,
-      TensorProduct.mk_apply] using hu
+        TensorProduct.mk_apply]
+      using hu
 
 end ReciprocityTheory.ChartRestriction.G.FreeQuotientRank

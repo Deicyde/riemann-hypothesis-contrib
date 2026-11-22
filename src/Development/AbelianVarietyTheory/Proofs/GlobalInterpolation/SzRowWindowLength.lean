@@ -6,12 +6,13 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.PairRo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem lA_le_pow_seven {C : FC} {cD ch : ℝ} {D : D7} {L : SizeData₂ D} (hV : Val C cD ch L) :
-    lA L ≤ L.sc.x ^ (7 : ℝ) := by
+theorem lA_le_pow_seven {C : FC} {cD ch : ℝ} {D : D7} {L : SizeData₂ D} (hV : Val C cD ch L)
+    : lA L ≤ L.sc.x ^ (7 : ℝ) := by
   have hx1 := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
   have he0 := L.sc.eps_pos
@@ -41,13 +42,15 @@ theorem lA_le_pow_seven {C : FC} {cD ch : ℝ} {D : D7} {L : SizeData₂ D} (hV 
   rw [div_le_iff₀ (by positivity)]
   have e7 : L.sc.x ^ (7 : ℝ) * L.sc.x ^ (-1 : ℝ) = L.sc.x ^ (5 : ℝ) * L.sc.x ^ (1 : ℝ) := by
     rw [← Real.rpow_add hx0, ← Real.rpow_add hx0]; norm_num
-  calc (D.R.k : ℝ) * L.sc.x ^ L.sc.eps ≤ (2 * L.sc.x ^ (5 : ℝ)) * L.sc.x ^ (1 : ℝ) := by gcongr
-    _ = L.sc.x ^ (7 : ℝ) * (2 * L.sc.x ^ (-1 : ℝ)) := by
-        rw [mul_assoc, ← e7]; ring
+  calc
+    (D.R.k : ℝ) * L.sc.x ^ L.sc.eps
+      ≤ (2 * L.sc.x ^ (5 : ℝ)) * L.sc.x ^ (1 : ℝ) := by gcongr
+    _ = L.sc.x ^ (7 : ℝ) * (2 * L.sc.x ^ (-1 : ℝ)) := by rw [mul_assoc, ← e7]; ring
     _ ≤ L.sc.x ^ (7 : ℝ) * ((D.R.m : ℝ) * L.de2) := by gcongr
 
-theorem nN_div_m_le {C : FC} (hCt : C.Ct = 401) {cD ch : ℝ} {D : D7} {L : SizeData₂ D} (hV : Val C cD ch L) :
-    (D.R.n : ℝ) * D.R.N D.R.m / D.R.m ≤ 4 * L.sc.x ^ (404 : ℝ) := by
+theorem nN_div_m_le
+    {C : FC} (hCt : C.Ct = 401) {cD ch : ℝ} {D : D7} {L : SizeData₂ D} (hV : Val C cD ch L)
+    : (D.R.n : ℝ) * D.R.N D.R.m / D.R.m ≤ 4 * L.sc.x ^ (404 : ℝ) := by
   have hx1 := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
   have he0 := L.sc.eps_pos
@@ -71,11 +74,17 @@ theorem nN_div_m_le {C : FC} (hCt : C.Ct = 401) {cD ch : ℝ} {D : D7} {L : Size
   rw [div_le_iff₀ hm]
   have e : L.sc.x ^ (404 : ℝ) = L.sc.x ^ (3 : ℝ) * L.sc.x ^ (401 : ℝ) := by
     rw [← Real.rpow_add hx0]; norm_num
-  calc (D.R.n : ℝ) * D.R.N D.R.m ≤ (2 * L.sc.x ^ (3 : ℝ)) * (2 * D.R.t * D.R.m) := by gcongr
+  calc
+    (D.R.n : ℝ) * D.R.N D.R.m
+      ≤ (2 * L.sc.x ^ (3 : ℝ)) * (2 * D.R.t * D.R.m) := by gcongr
     _ ≤ (2 * L.sc.x ^ (3 : ℝ)) * (2 * L.sc.x ^ (401 : ℝ) * D.R.m) := by gcongr
     _ = 4 * L.sc.x ^ (404 : ℝ) * D.R.m := by rw [e]; ring
 
-theorem szRow_windowLength : SzRow (fun C D L => (∀ l : ℕ, 11 ≤ l → ∃ j : ℕ, lA L ≤ ((l : ℝ) - 1) ^ j ∧ 2 * j + 2 ≤ D.host.Lw) ∧ ((D.host.Lw : ℝ) ≤ C.P.CLw * Real.log L.sc.x) ∧ ((L.j0 : ℝ) ≤ C.P.Cj0 * Real.log L.sc.x)) := by
+theorem szRow_windowLength
+    : SzRow (fun C D L =>
+      (∀ l : ℕ, 11 ≤ l → ∃ j : ℕ, lA L ≤ ((l : ℝ) - 1) ^ j ∧ 2 * j + 2 ≤ D.host.Lw)
+        ∧ ((D.host.Lw : ℝ) ≤ C.P.CLw * Real.log L.sc.x)
+        ∧ ((L.j0 : ℝ) ≤ C.P.Cj0 * Real.log L.sc.x)) := by
   intro eps h0 h1 C hC
   refine ⟨0, fun cD _ => ⟨0, fun ch _ => ⟨Real.exp (60 / eps + 34), fun D L he hx hV => ?_⟩⟩⟩
   have hx1 := L.sc.one_lt_alt
@@ -92,14 +101,17 @@ theorem szRow_windowLength : SzRow (fun C D L => (∀ l : ℕ, 11 ≤ l → ∃ 
     have he1 : Real.exp 1 ≤ (l : ℝ) - 1 := by
       have := Real.exp_one_lt_d9
       linarith
-    calc lA L ≤ L.sc.x ^ (7 : ℝ) := lA_le_pow_seven hV
+    calc
+      lA L
+        ≤ L.sc.x ^ (7 : ℝ) := lA_le_pow_seven hV
       _ = Real.exp (7 * Real.log L.sc.x) := by rw [Real.rpow_def_of_pos hx0, mul_comm]
       _ ≤ Real.exp ((⌈7 * Real.log L.sc.x⌉₊ : ℕ) * 1) := by
-          rw [mul_one]; exact Real.exp_le_exp.2 (Nat.le_ceil _)
+        rw [mul_one]; exact Real.exp_le_exp.2 (Nat.le_ceil _)
       _ = Real.exp 1 ^ ⌈7 * Real.log L.sc.x⌉₊ := Real.exp_nat_mul _ _
       _ ≤ ((l : ℝ) - 1) ^ ⌈7 * Real.log L.sc.x⌉₊ := by gcongr
   · have : ⌈7 * Real.log L.sc.x⌉₊ ≤ ⌈(405 : ℝ) * Real.log L.sc.x⌉₊ := Nat.ceil_mono (by linarith)
-    rw [hLw, Lwv]; omega
+    rw [hLw, Lwv]
+    omega
   · rw [hLw, hC.2.2.1, Lwv, he]
     have a1 : (⌈(405 : ℝ) * Real.log L.sc.x⌉₊ : ℝ) < 405 * Real.log L.sc.x + 1 :=
       Nat.ceil_lt_add_one (by linarith)
@@ -128,7 +140,8 @@ theorem szRow_windowLength : SzRow (fun C D L => (∀ l : ℕ, 11 ≤ l → ∃ 
     have l2 := Real.log_two_gt_d9
     have l2' := Real.log_two_lt_d9
     have l5 : Real.log 4 ≤ Real.log 5 := Real.log_le_log (by norm_num) (by norm_num)
-    have hl : Real.log ((D.R.n : ℝ) * D.R.N D.R.m / D.R.m) ≤ Real.log 4 + 404 * Real.log L.sc.x := by
+    have hl
+        : Real.log ((D.R.n : ℝ) * D.R.N D.R.m / D.R.m) ≤ Real.log 4 + 404 * Real.log L.sc.x := by
       refine (Real.log_le_log hy hb).trans (le_of_eq ?_)
       rw [Real.log_mul (by norm_num) (by positivity), Real.log_rpow hx0]
     have hlb : Real.logb 5 ((D.R.n : ℝ) * D.R.N D.R.m / D.R.m) ≤ 400 * Real.log L.sc.x := by
@@ -136,7 +149,9 @@ theorem szRow_windowLength : SzRow (fun C D L => (∀ l : ℕ, 11 ≤ l → ∃ 
       nlinarith
     have a1 : (⌈(400 : ℝ) * Real.log L.sc.x⌉₊ : ℝ) < 400 * Real.log L.sc.x + 1 :=
       Nat.ceil_lt_add_one (by linarith)
-    have a2 : ((⌈Real.logb 5 ((D.R.n : ℝ) * D.R.N D.R.m / D.R.m)⌉₊ : ℕ) : ℝ) ≤ (⌈(400 : ℝ) * Real.log L.sc.x⌉₊ : ℝ) := by
+    have a2
+        : ((⌈Real.logb 5 ((D.R.n : ℝ) * D.R.N D.R.m / D.R.m)⌉₊ : ℕ) : ℝ)
+          ≤ (⌈(400 : ℝ) * Real.log L.sc.x⌉₊ : ℝ) := by
       exact_mod_cast Nat.ceil_mono hlb
     linarith
 

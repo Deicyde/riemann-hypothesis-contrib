@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicStab
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp.NfComp
@@ -286,19 +287,44 @@ lemma Dmin_eq {k r j : ℕ} (hj : j ≤ r) (z z' : Fin (2 * r + k + 1) → ℂ) 
   simp only [bvec, Matrix.mulVec_single_one, Matrix.col_apply, Zr]
   rfl
 
-theorem herm_sEl_inv_le : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r + k + 1) → ℂ)), ∀ (g₀ : Mat k r) (β : Fin r → ℕ) (c : ℂ), inWb k r z → inWb k r z' → 0 < Tz k r z → IsNormal0 k r hj β c z z' g₀ → ∀ De R₀ : ℝ, DeOK k r z z' g₀ De → 1 ≤ R₀ → ∀ m ∈ UH (Hb k), ∀ (q : PSec k r j × (UToff β → ℂ)) (a : Fin r → ℝ), (∀ b, 0 < a b) → Sg2 k r z' (sEl k r j β q * (uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m)) ≤ R₀ → Sg k r z (g₀ * (sEl k r j β q * (uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m))) ≤ R₀ → ∀ b : Fin r, b.val < j → ∀ u : (Fin (2 * r + k + 1) → ℂ), eucl ((uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m)⁻¹ *ᵥ u) ≤ R₀ → ‖herm (Hpk k r) ((sEl k r j β q)⁻¹ *ᵥ bvec (esI k r b)) u‖ ≤ R₀ ^ (2 * r) * De := by
+theorem herm_sEl_inv_le
+    : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r + k + 1) → ℂ)),
+      ∀ (g₀ : Mat k r) (β : Fin r → ℕ) (c : ℂ),
+        inWb k r z → inWb k r z' → 0 < Tz k r z → IsNormal0 k r hj β c z z' g₀
+          → ∀ De R₀ : ℝ,
+            DeOK k r z z' g₀ De → 1 ≤ R₀
+              → ∀ m ∈ UH (Hb k), ∀ (q : PSec k r j × (UToff β → ℂ)) (a : Fin r → ℝ),
+                (∀ b, 0 < a b)
+                  → Sg2 k r z'
+                      (sEl k r j β q * (uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m))
+                    ≤ R₀
+                  → Sg k r z
+                      (g₀
+                        * (sEl k r j β q
+                          * (uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m)))
+                    ≤ R₀
+                  → ∀ b : Fin r,
+                    b.val < j
+                      → ∀ u : (Fin (2 * r + k + 1) → ℂ),
+                        eucl ((uEmb k r (Matrix.diagonal fun b => (a b : ℂ)) * mEmb k r m)⁻¹ *ᵥ u)
+                            ≤ R₀
+                          → ‖herm (Hpk k r) ((sEl k r j β q)⁻¹ *ᵥ bvec (esI k r b)) u‖
+                            ≤ R₀ ^ (2 * r) * De := by
   intro k r j hj z z' g₀ β c hz hz' _ hN De R₀ hDe hR m hm q a ha hS' hS b hb u hu
   obtain ⟨hg, -, -, hβ, -, hX, -, hB⟩ := hN
-  obtain ⟨w, hw, hwβ, hP⟩ := GlobalTheory.Amp.blockAnti_perm_partialProd j _ _ De hB hDe.1 (fun l hl h => by
-    rw [← Dmin_eq hj z z'] at h ⊢
-    exact hDe.2 _ (hl.trans hj) h)
+  obtain ⟨w, hw, hwβ, hP⟩ :=
+    GlobalTheory.Amp.blockAnti_perm_partialProd j _ _ De hB hDe.1 (fun l hl h => by
+      rw [← Dmin_eq hj z z'] at h ⊢
+      exact hDe.2 _ (hl.trans hj) h)
   obtain ⟨hg1, he⟩ := levi_diag_middle_mem_bessel_unitary_eucl (r := r) hm a ha
   have hs := sEl_mem k r j β q
   have hlen : ∀ c : Fin r, (a c)⁻¹ ≤ R₀ := by
     intro c
     have hsS : sEl k r j β q ∈ Sset k r z' :=
       ⟨1, ⟨(uHGroup _ _ (Hunit k r)).1, by simp, by simp⟩, _, hs, (one_mul _).symm⟩
-    have h1 := (((GlobalTheory.Amp.LInv.lengths_basic k r z' hz').1 _ hg1 _ hsS 1 ⟨(uHGroup _ _ (Hunit k r)).1, one_mem _⟩).1 c.castSucc)
+    have h1 :=
+      (((GlobalTheory.Amp.LInv.lengths_basic k r z' hz').1 _ hg1 _ hsS 1
+        ⟨(uHGroup _ _ (Hunit k r)).1, one_mem _⟩).1 c.castSucc)
     rw [mul_one, (GlobalTheory.Amp.LInv.lengths_basic k r z' hz').2.1 a ha m hm] at h1
     rw [← h1]
     refine le_trans ?_ hS'
@@ -312,15 +338,19 @@ theorem herm_sEl_inv_le : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r +
   set ι : Fin (b₀.val + 1) → Fin j := Fin.castLE hn with hι
   let y : Fin (b₀.val + 1) → Fin (2 * r + k + 1) → ℂ := fun i =>
     if i = Fin.last _ then u else bvec (eI k r (Fin.castLE hj (w (ι i))))
-  have hp := pluck_flag (hn.trans hj) z hz _ (G_mul hg (G_mul hs.1 hg1)) R₀ hS (fun i => g₁⁻¹ *ᵥ y i) (by
-    intro i
-    simp only [y]
-    split_ifs
-    · exact hu
-    · rw [he]; exact hlen _)
-  have hent : ∀ i i' : Fin (b₀.val + 1),
-      herm (Hpk k r) ((g₀ * (s * g₁))⁻¹ *ᵥ bvec (eI k r (Fin.castLE (hn.trans hj) i'))) (g₁⁻¹ *ᵥ y i) =
-        star (Z (ι i') (w (ι i'))) * herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r (Fin.castLE hj (w (ι i'))))) (y i) := by
+  have hp :=
+    pluck_flag (hn.trans hj) z hz _ (G_mul hg (G_mul hs.1 hg1)) R₀ hS (fun i => g₁⁻¹ *ᵥ y i) (by
+      intro i
+      simp only [y]
+      split_ifs
+      · exact hu
+      · rw [he]; exact hlen _)
+  have hent
+      : ∀ i i' : Fin (b₀.val + 1),
+        herm (Hpk k r) ((g₀ * (s * g₁))⁻¹ *ᵥ bvec (eI k r (Fin.castLE (hn.trans hj) i')))
+            (g₁⁻¹ *ᵥ y i)
+          = star (Z (ι i') (w (ι i')))
+            * herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r (Fin.castLE hj (w (ι i'))))) (y i) := by
     intro i i'
     have h := inv_e hj hg (ι i') (w (ι i')) (hX _ (ι i').2).1 fun c hc => (hw _ _).1 hc
     rw [Matrix.mul_inv_rev, Matrix.mul_inv_rev, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
@@ -340,13 +370,15 @@ theorem herm_sEl_inv_le : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r +
     by_contra h0
     rcases upperOff_ne hβ _ _ _ h0 with h | h
     · exact hlt.ne' (Fin.castLE_injective hn (w.injective (Fin.castLE_injective hj h)))
-    · have h1 := hwβ (ι i); have h2 := hwβ (ι i')
+    · have h1 := hwβ (ι i)
+      have h2 := hwβ (ι i')
       rw [h1, h2] at h
       exact absurd (hβ (show Fin.castLE hj (ι i) ≤ Fin.castLE hj (ι i') from hlt.le)) (not_le.2 h)
   simp only [Matrix.of_apply, Finset.prod_mul_distrib, norm_mul, norm_prod, norm_star] at hp
-  have hlast : ∏ i : Fin (b₀.val + 1),
-      ‖herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r (Fin.castLE hj (w (ι i))))) (y i)‖ =
-      ‖herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r b)) u‖ := by
+  have hlast
+      : ∏ i : Fin (b₀.val + 1),
+          ‖herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r (Fin.castLE hj (w (ι i))))) (y i)‖
+        = ‖herm (Hpk k r) (s⁻¹ *ᵥ bvec (esI k r b)) u‖ := by
     rw [Finset.prod_eq_single (Fin.last _)]
     · have : ι (Fin.last _) = b₀ := rfl
       simp only [y, if_true, this, hb₀]
@@ -356,8 +388,9 @@ theorem herm_sEl_inv_le : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r +
       rw [sEl_pair]
       simp [upperOff, upper]
     · simp
-  have hprod : ∏ i : Fin (b₀.val + 1), ‖Z (ι i) (w (ι i))‖ =
-      ∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b₀.val + 1), ‖Z a (w a)‖ := by
+  have hprod
+      : ∏ i : Fin (b₀.val + 1), ‖Z (ι i) (w (ι i))‖
+        = ∏ a ∈ Finset.univ.filter (fun a : Fin j => a.val < b₀.val + 1), ‖Z a (w a)‖ := by
     refine Finset.prod_bij (fun i _ => ι i) ?_ ?_ ?_ ?_
     · intro i _; exact Finset.mem_filter.2 ⟨Finset.mem_univ _, i.2⟩
     · intro i _ i' _ h; exact Fin.castLE_injective hn h
@@ -370,8 +403,8 @@ theorem herm_sEl_inv_le : ∀ (k r j : ℕ) (hj : j ≤ r) (z z' : (Fin (2 * r +
   have hP0 : 0 < P := Finset.prod_pos fun a _ => norm_pos_iff.2 ((hw _ _).2 rfl)
   have hpow : R₀ ^ (b₀.val + 1) * R₀ ^ (b₀.val + 1) ≤ R₀ ^ (2 * r) := by
     rw [← pow_add]; exact pow_le_pow_right₀ hR (by omega)
-  calc _ ≤ R₀ ^ (2 * r) * P⁻¹ := by
-        rw [← div_eq_mul_inv, le_div_iff₀' hP0]; exact hp.trans hpow
+  calc
+    _ ≤ R₀ ^ (2 * r) * P⁻¹ := by rw [← div_eq_mul_inv, le_div_iff₀' hP0]; exact hp.trans hpow
     _ ≤ _ := mul_le_mul_of_nonneg_left hP' (by positivity)
 
 end GlobalTheory.Amp.NfComp

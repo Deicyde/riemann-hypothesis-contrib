@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProductOfLoc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
 namespace UpperTheory.Gal.CertificateRingHomMap.PNbhdU
@@ -22,13 +24,14 @@ private theorem continuous_th {w : Plc E} (hw : IsSplitAt w) : Continuous (th (n
   (GlobalTheory.BCT.GlobLev.continuous_cLoc (cj w)).comp
     ((continuous_subtype_val (p := (· ∈ locU n w))).comp (locE hw).symm.continuous)
 
-private theorem cLoc_cj_eq {w : Plc E} (hw : IsSplitAt w) (u : finU (E := E) (n := n)) :
-    cLoc (cj w) u.1 = th hw (cLoc w u.1) :=
+private theorem cLoc_cj_eq {w : Plc E} (hw : IsSplitAt w) (u : finU (E := E) (n := n))
+    : cLoc (cj w) u.1 = th hw (cLoc w u.1) :=
   GlobalTheory.LocInj.cLoc_conj_eq w u.1 (locF hw (cLoc w u.1)).1 (cLoc_locF hw _).symm
 
 private theorem cj_cj (w : Plc E) : cj (cj w) = w := GlobalTheory.SplitPts.conjSrc_conjSrc_cm w
 
-private theorem exists_lt (α : Type) : ∃ lt : α → α → Prop, (∀ a b, a ≠ b → lt a b ∨ lt b a) ∧ ∀ a b, lt a b → ¬ lt b a := by
+private theorem exists_lt (α : Type)
+    : ∃ lt : α → α → Prop, (∀ a b, a ≠ b → lt a b ∨ lt b a) ∧ ∀ a b, lt a b → ¬ lt b a := by
   refine ⟨WellOrderingRel, ?_, fun _ _ h => asymm h⟩
   intro a b h
   rcases trichotomous_of (WellOrderingRel : α → α → Prop) a b with hab | heq | hba
@@ -39,8 +42,12 @@ private theorem exists_lt (α : Type) : ∃ lt : α → α → Prop, (∀ a b, a
 private def Top (lt : Plc E → Plc E → Prop) (Up : Plc E → Prop) (w₀ w : Plc E) : Prop :=
   Up w ∧ (Up (cj w) → w = w₀ ∨ (cj w ≠ w₀ ∧ lt w (cj w)))
 
-private theorem top_or {lt : Plc E → Plc E → Prop} (h1 : ∀ a b, a ≠ b → lt a b ∨ lt b a) {Up : Plc E → Prop} (w₀ : Plc E)
-    {w : Plc E} (hne : cj w ≠ w) (hup : Up w ∨ Up (cj w)) : Top lt Up w₀ w ∨ Top lt Up w₀ (cj w) := by
+private theorem top_or
+    {lt : Plc E → Plc E → Prop} (h1 : ∀ a b, a ≠ b → lt a b ∨ lt b a)
+    {Up : Plc E → Prop}
+    (w₀ : Plc E)
+    {w : Plc E} (hne : cj w ≠ w) (hup : Up w ∨ Up (cj w))
+    : Top lt Up w₀ w ∨ Top lt Up w₀ (cj w) := by
   by_cases ha : Up w
   · by_cases hb : Up (cj w)
     · by_cases e : w = w₀
@@ -54,8 +61,11 @@ private theorem top_or {lt : Plc E → Plc E → Prop} (h1 : ∀ a b, a ≠ b �
   · have hb := hup.resolve_left ha
     exact Or.inr ⟨hb, fun h => absurd (by rwa [cj_cj] at h) ha⟩
 
-private theorem not_both {lt : Plc E → Plc E → Prop} (h2 : ∀ a b, lt a b → ¬ lt b a) {Up : Plc E → Prop} {w₀ w : Plc E}
-    (hne : cj w ≠ w) (ha : Top lt Up w₀ w) (hb : Top lt Up w₀ (cj w)) : False := by
+private theorem not_both
+    {lt : Plc E → Plc E → Prop} (h2 : ∀ a b, lt a b → ¬ lt b a)
+    {Up : Plc E → Prop} {w₀ w : Plc E}
+    (hne : cj w ≠ w) (ha : Top lt Up w₀ w) (hb : Top lt Up w₀ (cj w))
+    : False := by
   have hb2 := hb.2 (by rw [cj_cj]; exact ha.1)
   rw [cj_cj] at hb2
   rcases ha.2 hb.1 with e | ⟨e, h⟩
@@ -69,8 +79,10 @@ private theorem not_both {lt : Plc E → Plc E → Prop} (h2 : ∀ a b, lt a b �
 end UpperTheory.Gal.CertificateRingHomMap.PNbhdU
 
 open UpperTheory.Gal.CertificateRingHomMap.PNbhdU in
-theorem UpperTheory.Gal.CertificateRingHomMap.pNbhdU_of :
-    UpperTheory.Gal.CertificateRingHomMap.Nbhd2 → UpperTheory.Gal.CertificateRingHomMap.IntConj → UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.OfUBij → UpperTheory.Gal.CertificateRingHomMap.NbhdU := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pNbhdU_of
+    : UpperTheory.Gal.CertificateRingHomMap.Nbhd2 → UpperTheory.Gal.CertificateRingHomMap.IntConj
+      → UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.OfUBij
+      → UpperTheory.Gal.CertificateRingHomMap.NbhdU := by
   intro h2 hI hL _ E _ _ _ n O hO Up hUp w₀ hw₀ hu₀
   obtain ⟨S₀, K₀, hK₀, hS₀⟩ := h2 E n O hO
   obtain ⟨lt, hlt1, hlt2⟩ := exists_lt (Plc E)
@@ -92,8 +104,10 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pNbhdU_of :
       exact (hK₀ w).1.inter ((hK₀ (cj w)).1.preimage (continuous_th hw))
     · simp only [Kw, dif_neg hw]; exact (hK₀ w).1
   have hKKGL : ∀ w, Kw w ≤ GlobalTheory.LFun.KGL w (n := n) := fun w => (hKle w).trans (hK₀ w).2
-  have hmemS : ∀ w, w ∈ T → (IsSplitAt w → Top lt Up w₀ w) → w ∈ S := fun w h h' => Finset.mem_filter.2 ⟨h, h'⟩
-  refine ⟨S, Kw, ⟨?_, fun w _ => hKopen w, fun w _ => ?_, fun w _ _ => hKKGL w, fun w hw hs => ?_⟩, ?_⟩
+  have hmemS : ∀ w, w ∈ T → (IsSplitAt w → Top lt Up w₀ w) → w ∈ S := fun w h h' =>
+    Finset.mem_filter.2 ⟨h, h'⟩
+  refine
+    ⟨S, Kw, ⟨?_, fun w _ => hKopen w, fun w _ => ?_, fun w _ _ => hKKGL w, fun w hw hs => ?_⟩, ?_⟩
   · exact hmemS _ (Finset.mem_insert_self _ _) fun _ => ⟨hu₀, fun _ => Or.inl rfl⟩
   · exact (GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL w n).2.of_isClosed_subset
       (Subgroup.isClosed_of_isOpen (Kw w) (hKopen w)) (hKKGL w)
@@ -107,7 +121,10 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pNbhdU_of :
       · exact hKKGL w (hS w h1)
       · by_cases h2 : cj w ∈ S
         · have h3 := hI E n (ofU u) (cj w) hz (hKKGL _ (hS _ h2))
-          have key : ∀ v : Plc E, v = w → comp v (ofU u) ∈ GlobalTheory.LFun.KGL v (n := n) → cLoc w u.1 ∈ GlobalTheory.LFun.KGL w (n := n) := by
+          have key
+              : ∀ v : Plc E,
+                v = w → comp v (ofU u) ∈ GlobalTheory.LFun.KGL v (n := n)
+                  → cLoc w u.1 ∈ GlobalTheory.LFun.KGL w (n := n) := by
             rintro v rfl h; exact h
           exact key _ (cj_cj w) h3
         · exact hout w h1 h2
@@ -117,7 +134,8 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pNbhdU_of :
     · by_cases ht : Top lt Up w₀ w
       · exact hKle w (hS w (hmemS w hT fun _ => ht))
       · have ht' := (top_or hlt1 w₀ (hne w hs) (hUp w hs)).resolve_left ht
-        have hT' : cj w ∈ T := Finset.mem_insert_of_mem (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hw))
+        have hT' : cj w ∈ T :=
+          Finset.mem_insert_of_mem (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hw))
         have h3 := hS (cj w) (hmemS _ hT' fun _ => ht')
         simp only [Kw, dif_pos (hsp w hs)] at h3
         have h4 : th (hsp w hs) (cLoc (cj w) u.1) ∈ K₀ (cj (cj w)) := (Subgroup.mem_inf.1 h3).2

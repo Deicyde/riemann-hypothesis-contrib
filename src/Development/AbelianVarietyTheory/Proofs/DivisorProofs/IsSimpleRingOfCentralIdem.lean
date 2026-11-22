@@ -20,14 +20,16 @@ theorem GDatum.O_nontrivial (G : GDatum) : Nontrivial G.O := by
   have : 0 < G.m ^ 2 * Module.finrank ℚ G.F := Nat.mul_pos (pow_pos G.m_pos 2) Module.finrank_pos
   omega
 
-theorem GDatum.tmul_one_injective (G : GDatum) : Function.Injective (fun o : G.O => (1 : ℚ) ⊗ₜ[ℤ] o) := by
+theorem GDatum.tmul_one_injective (G : GDatum)
+    : Function.Injective (fun o : G.O => (1 : ℚ) ⊗ₜ[ℤ] o) := by
   haveI := G.freeO
-  have := Algebra.TensorProduct.includeRight_injective (R := ℤ) (A := ℚ) (B := G.O)
-    (algebraMap ℤ ℚ).injective_int
+  have :=
+    Algebra.TensorProduct.includeRight_injective (R := ℤ) (A := ℚ) (B := G.O)
+      (algebraMap ℤ ℚ).injective_int
   exact fun a b h => this h
 
-theorem GDatum.exists_smul_eq_tmul (G : GDatum) (z : ℚ ⊗[ℤ] G.O) :
-    ∃ N : ℤ, N ≠ 0 ∧ ∃ x : G.O, N • z = (1 : ℚ) ⊗ₜ x := by
+theorem GDatum.exists_smul_eq_tmul (G : GDatum) (z : ℚ ⊗[ℤ] G.O)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∃ x : G.O, N • z = (1 : ℚ) ⊗ₜ x := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨1, one_ne_zero, 0, by simp⟩
   | tmul q o =>
@@ -45,7 +47,8 @@ theorem GDatum.exists_smul_eq_tmul (G : GDatum) (z : ℚ ⊗[ℤ] G.O) :
 theorem GDatum.algebraMap_injective (G : GDatum) : Function.Injective (algebraMap (𝓞 G.F) G.O) := by
   haveI := G.freeO
   haveI := GDatum.O_nontrivial G
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   by_contra h0
   have hI : (RingHom.ker (algebraMap (𝓞 G.F) G.O)).comap (algebraMap ℤ (𝓞 G.F)) ≠ ⊥ :=
@@ -55,12 +58,14 @@ theorem GDatum.algebraMap_injective (G : GDatum) : Function.Injective (algebraMa
   have h2 : k • (1 : G.O) = 0 := by rw [zsmul_eq_mul, mul_one]; simpa using hk
   exact one_ne_zero ((smul_eq_zero.mp h2).resolve_left hk0)
 
-theorem GDatum.smul_eq_zero_int (G : GDatum) {N : ℤ} (hN : N ≠ 0) {z : ℚ ⊗[ℤ] G.O} (h : N • z = 0) : z = 0 := by
+theorem GDatum.smul_eq_zero_int (G : GDatum) {N : ℤ} (hN : N ≠ 0) {z : ℚ ⊗[ℤ] G.O} (h : N • z = 0)
+    : z = 0 := by
   rw [← Int.cast_smul_eq_zsmul ℚ] at h
   exact (smul_eq_zero.mp h).resolve_left (by exact_mod_cast hN)
 
-theorem GDatum.central_idem (G : GDatum) (e : ℚ ⊗[ℤ] G.O) (he : IsIdempotentElem e)
-    (hc : ∀ y, e * y = y * e) : e = 0 ∨ e = 1 := by
+theorem GDatum.central_idem
+    (G : GDatum) (e : ℚ ⊗[ℤ] G.O) (he : IsIdempotentElem e) (hc : ∀ y, e * y = y * e)
+    : e = 0 ∨ e = 1 := by
   obtain ⟨N, hN, x, hx⟩ := GDatum.exists_smul_eq_tmul G e
   have hxc : ∀ y : G.O, x * y = y * x := by
     intro y
@@ -78,8 +83,9 @@ theorem GDatum.central_idem (G : GDatum) (e : ℚ ⊗[ℤ] G.O) (he : IsIdempote
   have hM : M • e = (1:ℚ) ⊗ₜ[ℤ] a := by
     rw [hMdef, mul_comm, mul_smul, hx, ← TensorProduct.tmul_smul, hkc]
   have hsq : (1:ℚ) ⊗ₜ[ℤ] (a * a) = (1:ℚ) ⊗ₜ[ℤ] (M • a) := by
-    calc (1:ℚ) ⊗ₜ[ℤ] (a * a) = ((1:ℚ) ⊗ₜ[ℤ] a) * ((1:ℚ) ⊗ₜ[ℤ] a) := by
-          rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
+    calc
+      (1:ℚ) ⊗ₜ[ℤ] (a * a)
+        = ((1:ℚ) ⊗ₜ[ℤ] a) * ((1:ℚ) ⊗ₜ[ℤ] a) := by rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
       _ = (M • e) * (M • e) := by rw [hM]
       _ = M • (M • (e * e)) := by rw [smul_mul_assoc, mul_smul_comm]
       _ = M • ((1:ℚ) ⊗ₜ[ℤ] a) := by rw [he.eq, hM]
@@ -96,12 +102,14 @@ theorem GDatum.central_idem (G : GDatum) (e : ℚ ⊗[ℤ] G.O) (he : IsIdempote
   · right
     rw [sub_eq_zero] at h
     have : M • (e - 1) = 0 := by
-      rw [smul_sub, hM, ha, h, map_intCast, Algebra.TensorProduct.one_def, ← TensorProduct.tmul_smul,
-        zsmul_eq_mul, mul_one, sub_self]
+      rw [smul_sub, hM, ha, h, map_intCast, Algebra.TensorProduct.one_def,
+        ← TensorProduct.tmul_smul, zsmul_eq_mul, mul_one, sub_self]
     exact sub_eq_zero.mp (GDatum.smul_eq_zero_int G hM0 this)
 
-theorem isSimpleRing_of_central_idem {R : Type} [Ring R] [IsSemisimpleRing R] [Nontrivial R]
-    (h : ∀ e : R, IsIdempotentElem e → (∀ y, e * y = y * e) → e = 0 ∨ e = 1) : IsSimpleRing R := by
+theorem isSimpleRing_of_central_idem
+    {R : Type} [Ring R] [IsSemisimpleRing R] [Nontrivial R]
+    (h : ∀ e : R, IsIdempotentElem e → (∀ y, e * y = y * e) → e = 0 ∨ e = 1)
+    : IsSimpleRing R := by
   obtain ⟨n, D, d, _, hd, ⟨φ⟩⟩ := IsSemisimpleRing.exists_ringEquiv_pi_matrix_divisionRing R
   have hne : ∀ i, (1 : Matrix (Fin (d i)) (Fin (d i)) (D i)) ≠ 0 := fun i => by
     haveI := hd i
@@ -120,12 +128,15 @@ theorem isSimpleRing_of_central_idem {R : Type} [Ring R] [IsSemisimpleRing R] [N
       · subst hi; simp [s]
       · simp [s, Pi.single_apply, hi]
     have hidem : IsIdempotentElem (φ.symm s) := by
-      rw [IsIdempotentElem, ← map_mul]; congr 1
-      funext i; by_cases hi : i = 0
+      rw [IsIdempotentElem, ← map_mul]
+      congr 1
+      funext i
+      by_cases hi : i = 0
       · subst hi; simp [s]
       · simp [s, Pi.single_apply, hi]
-    rcases h (φ.symm s) hidem (fun y => by
-        apply φ.injective; rw [map_mul, map_mul, RingEquiv.apply_symm_apply, hs]) with h0 | h1
+    rcases h (φ.symm s) hidem
+        (fun y => by apply φ.injective; rw [map_mul, map_mul, RingEquiv.apply_symm_apply, hs])
+      with h0 | h1
     · have : s = 0 := by rw [← map_zero φ.symm] at h0; exact φ.symm.injective h0
       exact hne 0 (by simpa [s] using congr_fun this 0)
     · have : s = 1 := by rw [← map_one φ.symm] at h1; exact φ.symm.injective h1
@@ -152,7 +163,8 @@ theorem GDatum.isSemisimpleRing (G : GDatum) : IsSemisimpleRing (ℚ ⊗[ℤ] G.
     have hm : ((1:ℚ) ⊗ₜ[ℤ] o) * ((1:ℚ) ⊗ₜ[ℤ] x) ∈ Ring.jacobson (ℚ ⊗[ℤ] G.O) :=
       Ideal.mul_mem_left _ _ hxJ
     have := hnil _ hm
-    rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, Algebra.TensorProduct.tmul_pow, one_pow] at this
+    rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, Algebra.TensorProduct.tmul_pow, one_pow]
+      at this
     show (1:ℚ) ⊗ₜ[ℤ] ((o * x) ^ k) = (1:ℚ) ⊗ₜ[ℤ] 0
     rw [this, TensorProduct.tmul_zero]
   haveI : IsReduced (𝓞 G.F ⊗[ℤ] ℤ_[q]) := by
@@ -199,8 +211,9 @@ theorem GDatum.isSemisimpleRing (G : GDatum) : IsSemisimpleRing (ℚ ⊗[ℤ] G.
     exact this
   have hx0 : x = 0 := by
     have h0 : x ⊗ₜ[ℤ] (1 : ℤ_[q]) = 0 := Φ.injective (hy0.trans (map_zero Φ).symm)
-    have hinj := Algebra.TensorProduct.includeLeft_injective (R := ℤ) (S := ℤ) (A := G.O) (B := ℤ_[q])
-      (algebraMap ℤ ℤ_[q]).injective_int
+    have hinj :=
+      Algebra.TensorProduct.includeLeft_injective (R := ℤ) (S := ℤ) (A := G.O) (B := ℤ_[q])
+        (algebraMap ℤ ℤ_[q]).injective_int
     exact hinj (h0.trans (TensorProduct.zero_tmul _ _).symm)
   apply GDatum.smul_eq_zero_int G hN
   rw [hx, hx0, TensorProduct.tmul_zero]

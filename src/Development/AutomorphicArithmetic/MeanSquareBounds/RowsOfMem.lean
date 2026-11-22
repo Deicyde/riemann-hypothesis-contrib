@@ -4,12 +4,15 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.PrimeSetTwoBoun
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-theorem rows_of_mem :
-    ∀ (z z' : ℝ) (q d : ℕ), 0 < z → 2 * z ≤ z' → q ∈ primePairSetFirst z → d ∈ primeSetTwoBounds z z' q → Rows z z' q d := by
+theorem rows_of_mem
+    : ∀ (z z' : ℝ) (q d : ℕ),
+      0 < z → 2 * z ≤ z' → q ∈ primePairSetFirst z → d ∈ primeSetTwoBounds z z' q
+        → Rows z z' q d := by
   intro z z' q d hz hzz hq hd
   have hhalf : ∀ t : ℝ, Real.exp t ^ (1 / 2 : ℝ) = Real.exp (t / 2) := by
     intro t
@@ -23,8 +26,18 @@ theorem rows_of_mem :
   have hd0 : (0 : ℝ) < d := by exact_mod_cast hdp.pos
   have hqle : (q : ℝ) ≤ Real.exp z := (Nat.le_floor_iff (Real.exp_pos z).le).1 hq2
   have hdle : (d : ℝ) ≤ Real.exp z' := (Nat.le_floor_iff (Real.exp_pos z').le).1 hd2
-  refine ⟨hqp, by omega, (Real.lt_log_iff_exp_lt hq0).2 hqg, (Real.log_le_iff_le_exp hq0).2 hqle,
-    hdp, hdm, (Real.lt_log_iff_exp_lt hd0).2 hdg, (Real.log_le_iff_le_exp hd0).2 hdle, ?_, ?_⟩
+  refine ⟨
+    hqp,
+    by omega,
+    (Real.lt_log_iff_exp_lt hq0).2 hqg,
+    (Real.log_le_iff_le_exp hq0).2 hqle,
+    hdp,
+    hdm,
+    (Real.lt_log_iff_exp_lt hd0).2 hdg,
+    (Real.log_le_iff_le_exp hd0).2 hdle,
+    ?_,
+    ?_
+  ⟩
   · have h1 : Real.exp z ≤ Real.exp (z' / 2) := Real.exp_le_exp.2 (by linarith)
     have h2 : (q : ℝ) < d := lt_of_le_of_lt (hqle.trans h1) hdg
     exact_mod_cast h2

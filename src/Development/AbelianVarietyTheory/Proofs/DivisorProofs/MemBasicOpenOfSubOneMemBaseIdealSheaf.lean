@@ -12,10 +12,12 @@ open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.AbLaw GlobalTheory.Fo
 
 namespace GlobalTheory.FormalAlg
 
-theorem mem_basicOpen_of_sub_one_mem_baseIdeal (R : Type) [CommRing R] (I : Ideal R) (Z : Scheme.{0})
+theorem mem_basicOpen_of_sub_one_mem_baseIdeal
+    (R : Type) [CommRing R]
+    (I : Ideal R) (Z : Scheme.{0})
     (p : Z ⟶ Spec (CommRingCat.of R)) (V : Z.Opens) (hV : IsAffineOpen V) (r : Γ(Z, V)) (z : Z)
-    (hz : z ∈ V) (hI : I ≤ (p z).asIdeal) (hr : r - 1 ∈ (baseIdeal p I).ideal ⟨V, hV⟩) :
-    z ∈ Z.basicOpen r := by
+    (hz : z ∈ V) (hI : I ≤ (p z).asIdeal) (hr : r - 1 ∈ (baseIdeal p I).ideal ⟨V, hV⟩)
+    : z ∈ Z.basicOpen r := by
   have hs : z ∈ (baseIdeal p I).support := (mem_support_baseIdeal p I z).2 hI
   rw [Scheme.IdealSheafData.mem_support_iff_of_mem (U := ⟨V, hV⟩) hz] at hs
   have h1 : z ∉ Z.basicOpen (r - 1) := by

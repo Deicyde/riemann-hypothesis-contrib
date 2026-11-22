@@ -16,16 +16,30 @@ open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalThe
 
 namespace PositivityTheory.RgUd.Form.LeviSmoothness.Final
 
-open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing PositivityTheory.RgUd.Form.LeviSmoothness
+open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing
+  PositivityTheory.RgUd.Form.LeviSmoothness
 
-theorem stepForm (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : StepForm k := by
+theorem stepForm
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : StepForm k := by
   intro ψ hψ hψ1 m N hN V _ _ π hπ s B hpsd hk hmir
   have hB : Lv ψ hN π s B := ⟨hψ, hψ1, hπ, hpsd, hk, hmir⟩
   obtain ⟨A₀, hA₀⟩ := Ex.exists_lat (k := k) m
-  obtain ⟨B', hD, hU⟩ := Ex.dens_exists_of hB (fun ξ A hA v w => alg.avg_selfadj hB ξ hA v w)
-    (fun K hK _ hA₀ => stab.stab' hB K hK hA₀) hA₀
-  refine ⟨B', props.dens_psd hB hA₀ hD, props.dens_kills hB hA₀ hD, props.dens_rad hB hA₀ hD, mir.dens_mir hB hA₀ hD,
-    fun K hK => ?_, fun z hz v => besselOf.dens_bessel_of hB (fun K hK _ hA₀ => stab.stab' hB K hK hA₀) hA₀ hD z hz v⟩
+  obtain ⟨B', hD, hU⟩ :=
+    Ex.dens_exists_of hB
+      (fun ξ A hA v w => alg.avg_selfadj hB ξ hA v w)
+      (fun K hK _ hA₀ => stab.stab' hB K hK hA₀)
+      hA₀
+  refine ⟨
+    B',
+    props.dens_psd hB hA₀ hD,
+    props.dens_kills hB hA₀ hD,
+    props.dens_rad hB hA₀ hD,
+    mir.dens_mir hB hA₀ hD,
+    fun K hK => ?_,
+    fun z hz v =>
+      besselOf.dens_bessel_of hB (fun K hK _ hA₀ => stab.stab' hB K hK hA₀) hA₀ hD z hz v
+  ⟩
   obtain ⟨A₁, hA₁, h01, hA⟩ := hU K hK
   refine ⟨(A₀.relIndex A₁ : ℝ), fun v hv => ?_⟩
   have e := hA v v hv hv A₁ hA₁ le_rfl

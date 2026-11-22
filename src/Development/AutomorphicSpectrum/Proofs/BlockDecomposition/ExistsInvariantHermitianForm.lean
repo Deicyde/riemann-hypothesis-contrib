@@ -22,14 +22,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LieActio
 
 noncomputable section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL MeasureTheory PositivityTheory.S2.Clozel
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL MeasureTheory
+  PositivityTheory.S2.Clozel
 
 namespace GlobalTheory.CompanionTheory.ClozelHerm
 
-def petersson {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ} (μ : Measure (GA E a))
-    [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (π : CuspSub E a)
-    (hm : ∀ φ ∈ π.V, GlobalTheory.AutomorphicL2Unitary.MemL2Quotient (GlobalTheory.UnitaryBC.latticeGL E a) μ φ.1) :
-    π.V →ₗ[ℂ] π.V →ₗ⋆[ℂ] ℂ :=
+def petersson
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {a : ℕ} (μ : Measure (GA E a)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+    (π : CuspSub E a)
+    (hm : ∀ φ ∈ π.V,
+      GlobalTheory.AutomorphicL2Unitary.MemL2Quotient (GlobalTheory.UnitaryBC.latticeGL E a) μ φ.1)
+    : π.V →ₗ[ℂ] π.V →ₗ⋆[ℂ] ℂ :=
   LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
     (fun φ ψ => inner ℂ (toL2ₗ μ π.V hm ψ) (toL2ₗ μ π.V hm φ))
     (fun φ φ' ψ => by simp only [map_add (f := _), inner_add_right])
@@ -37,12 +41,24 @@ def petersson {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotally
     (fun φ ψ ψ' => by simp only [map_add (f := _), inner_add_left])
     (fun c φ ψ => by simp only [map_smul, inner_smul_left, smul_eq_mul])
 
-theorem exists_isHerm : GlobalTheory.Published.CuspFormsBoundedGL → ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (μ : Measure (GA E a)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (π : CuspSub E a), GlobalTheory.DiscSpec.IsNormalised π → ∃ B : π.V →ₗ[ℂ] π.V →ₗ⋆[ℂ] ℂ, IsHerm π B := by
+theorem exists_isHerm
+    : GlobalTheory.Published.CuspFormsBoundedGL
+      → ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+          (μ : Measure (GA E a)) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] (π : CuspSub E a),
+        GlobalTheory.DiscSpec.IsNormalised π → ∃ B : π.V →ₗ[ℂ] π.V →ₗ⋆[ℂ] ℂ, IsHerm π B := by
   intro hB E _ _ _ a μ _ _ π hπ
   have hl := GlobalTheory.T.normalised_cusp_form_L2_bounded hB E a μ π hπ
-  have hm : ∀ φ ∈ π.V, GlobalTheory.AutomorphicL2Unitary.MemL2Quotient (GlobalTheory.UnitaryBC.latticeGL E a) μ φ.1 := fun φ hφ => (hl φ hφ).1
+  have hm
+      : ∀ φ ∈ π.V,
+        GlobalTheory.AutomorphicL2Unitary.MemL2Quotient (GlobalTheory.UnitaryBC.latticeGL E a) μ
+          φ.1 := fun φ hφ =>
+    (hl φ hφ).1
   have hb : ∀ φ ∈ π.V, ∃ C : ℝ, ∀ g, ‖φ.1 g‖ ≤ C := fun φ hφ => (hl φ hφ).2
-  refine ⟨petersson μ π hm, fun X φ ψ => GlobalTheory.T.lie_action_skew_adjoint_L2 E a μ π hm hb X φ ψ, ?_⟩
+  refine ⟨
+    petersson μ π hm,
+    fun X φ ψ => GlobalTheory.T.lie_action_skew_adjoint_L2 E a μ π hm hb X φ ψ,
+    ?_
+  ⟩
   obtain ⟨φ, hφ, hne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot π.ne_bot
   have hi : Function.Injective (toL2ₗ μ π.V hm) :=
     toL2ₗ_injective hm fun ψ hψ => ContAut.continuous_of_isOpen_stab E a ψ (π.cusp ψ hψ).1.level

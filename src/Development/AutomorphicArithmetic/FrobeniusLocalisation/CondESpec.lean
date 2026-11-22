@@ -10,8 +10,9 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-theorem UpperTheory.HF.condE_spec :
-    ∀ {φ : Frame} (H : HostRaw φ), H.condE ∣ H.condN ∧ 0 < H.condE ∧ ∀ f : ℕ, f ∣ H.condN → (H.imgOne f = ⊥ ↔ H.condE ∣ f) := by
+theorem UpperTheory.HF.condE_spec
+    : ∀ {φ : Frame} (H : HostRaw φ),
+      H.condE ∣ H.condN ∧ 0 < H.condE ∧ ∀ f : ℕ, f ∣ H.condN → (H.imgOne f = ⊥ ↔ H.condE ∣ f) := by
   intro φ H
   have hN0 : H.condN ≠ 0 := H.condN_ne_zero
   have hN : H.imgOne H.condN = ⊥ := by

@@ -9,12 +9,14 @@ open Formalism.BasicNotions Formalism.MainNotions
 
 namespace GlobalTheory
 
-theorem sizes_record_at {D : D7} (L : SizeData₂ D) (h : SizesAt L) (Cs : ℝ) (hCs : 5 ≤ Cs)
-    (hx : 16 ≤ L.sc.x) (j : Fin 2) :
-    Real.exp (8 * L.sc.x ^ L.sc.eps) ≤ (D.host.g j : ℝ) ∧ L.sc.x ^ 2 ≤ (D.R.f : ℝ) ∧
-      (D.R.f : ℝ) ≤ L.sc.x ^ Cs ∧ (D.R.m : ℝ) ≤ L.sc.x ^ Cs ∧ 100 ≤ D.R.r ∧
-      (D.R.r : ℝ) ≤ L.sc.x ^ Cs ∧
-      Real.exp (L.sc.x ^ (L.sc.ez / 6)) ≤ ((min D.host.q D.host.d : ℕ) : ℝ) := by
+theorem sizes_record_at
+    {D : D7} (L : SizeData₂ D) (h : SizesAt L)
+    (Cs : ℝ) (hCs : 5 ≤ Cs)
+    (hx : 16 ≤ L.sc.x) (j : Fin 2)
+    : Real.exp (8 * L.sc.x ^ L.sc.eps) ≤ (D.host.g j : ℝ) ∧ L.sc.x ^ 2 ≤ (D.R.f : ℝ)
+      ∧ (D.R.f : ℝ) ≤ L.sc.x ^ Cs ∧ (D.R.m : ℝ) ≤ L.sc.x ^ Cs ∧ 100 ≤ D.R.r
+      ∧ (D.R.r : ℝ) ≤ L.sc.x ^ Cs
+      ∧ Real.exp (L.sc.x ^ (L.sc.ez / 6)) ≤ ((min D.host.q D.host.d : ℕ) : ℝ) := by
   obtain ⟨hN, -, hK, -, -, -, hQ, -, -, -, -, -, -, -, -, -, -, -, -, -, hG, -⟩ := h
   have hx1 := L.sc.one_lt_alt
   have hx0 : 0 < L.sc.x := by linarith
@@ -35,8 +37,9 @@ theorem sizes_record_at {D : D7} (L : SizeData₂ D) (h : SizesAt L) (Cs : ℝ) 
     rw [e]
     exact Real.rpow_le_rpow (by norm_num) hx (by norm_num)
   have h2k : 2 * (D.R.k : ℝ) ≤ L.sc.x ^ Cs := by
-    calc 2 * (D.R.k : ℝ) ≤ L.sc.x ^ (1 / 4 : ℝ) * L.sc.x ^ (19 / 4 : ℝ) :=
-          mul_le_mul h2 hkb (by linarith) (by linarith)
+    calc
+      2 * (D.R.k : ℝ) ≤ L.sc.x ^ (1 / 4 : ℝ) * L.sc.x ^ (19 / 4 : ℝ) :=
+        mul_le_mul h2 hkb (by linarith) (by linarith)
       _ = L.sc.x ^ (5 : ℝ) := by rw [← Real.rpow_add hx0]; norm_num
       _ ≤ L.sc.x ^ Cs := Real.rpow_le_rpow_of_exponent_le hx1.le hCs
   have hn : L.sc.x ^ 2 ≤ (D.R.n : ℝ) := by
@@ -77,7 +80,14 @@ theorem sizes_record_at {D : D7} (L : SizeData₂ D) (h : SizesAt L) (Cs : ℝ) 
     have := L.sc.ez_pos
     linarith
 
-theorem family_eventually_size_bounds : ∀ (eps : ℝ) (Fm : FamP eps) (Cs : ℝ), 5 ≤ Cs → ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) (j : Fin 2), Real.exp (8 * x ^ eps) ≤ ((Fm.D x i).host.g j : ℝ) ∧ x ^ 2 ≤ ((Fm.D x i).R.f : ℝ) ∧ ((Fm.D x i).R.f : ℝ) ≤ x ^ Cs ∧ ((Fm.D x i).R.m : ℝ) ≤ x ^ Cs ∧ 100 ≤ (Fm.D x i).R.r ∧ ((Fm.D x i).R.r : ℝ) ≤ x ^ Cs ∧ Real.exp (x ^ (Fm.ez / 6)) ≤ ((min (Fm.D x i).host.q (Fm.D x i).host.d : ℕ) : ℝ) := by
+theorem family_eventually_size_bounds
+    : ∀ (eps : ℝ) (Fm : FamP eps) (Cs : ℝ),
+      5 ≤ Cs
+        → ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) (j : Fin 2),
+          Real.exp (8 * x ^ eps) ≤ ((Fm.D x i).host.g j : ℝ) ∧ x ^ 2 ≤ ((Fm.D x i).R.f : ℝ)
+            ∧ ((Fm.D x i).R.f : ℝ) ≤ x ^ Cs ∧ ((Fm.D x i).R.m : ℝ) ≤ x ^ Cs ∧ 100 ≤ (Fm.D x i).R.r
+            ∧ ((Fm.D x i).R.r : ℝ) ≤ x ^ Cs
+            ∧ Real.exp (x ^ (Fm.ez / 6)) ≤ ((min (Fm.D x i).host.q (Fm.D x i).host.d : ℕ) : ℝ) := by
   intro eps Fm Cs hCs
   refine ⟨max 16 (Fm.x1 + 1), fun x hx i j => ?_⟩
   have h16 : 16 ≤ x := (le_max_left _ _).trans hx

@@ -4,21 +4,23 @@ public import Mathlib
 
 @[expose] public section
 
-
 open Matrix in
-private def Dz {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
-    (T : Matrix ι ι E) : Prop :=
+private def Dz {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι] (T : Matrix ι ι E)
+    : Prop :=
   ∃ g : Matrix ι ι E, g.det ≠ 0 ∧ ∃ D : ι → E, Matrix.conjTranspose g * T * g = Matrix.diagonal D
 
 open Matrix in
-private theorem Dz.of_submatrix {E ι κ : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
-    [Fintype κ] [DecidableEq κ] (e : ι ≃ κ) {T : Matrix κ κ E}
-    (h : Dz (T.submatrix e e)) : Dz T := by
+private theorem Dz.of_submatrix
+    {E ι κ : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (e : ι ≃ κ)
+    {T : Matrix κ κ E} (h : Dz (T.submatrix e e))
+    : Dz T := by
   obtain ⟨g, hg, D, hD⟩ := h
   refine ⟨g.submatrix e.symm e.symm, ?_, D ∘ e.symm, ?_⟩
   · rw [det_submatrix_equiv_self]; exact hg
-  · have h1 : (g.submatrix e.symm e.symm)ᴴ * T * g.submatrix e.symm e.symm
-        = (gᴴ * T.submatrix e e * g).submatrix e.symm e.symm := by
+  · have h1
+        : (g.submatrix e.symm e.symm)ᴴ * T * g.submatrix e.symm e.symm
+          = (gᴴ * T.submatrix e e * g).submatrix e.symm e.symm := by
       rw [← submatrix_mul_equiv _ _ _ e.symm _, ← submatrix_mul_equiv _ _ _ e.symm _]
       simp [conjTranspose_submatrix]
     rw [h1, hD]
@@ -26,20 +28,21 @@ private theorem Dz.of_submatrix {E ι κ : Type} [Field E] [StarRing E] [Fintype
     simp [diagonal_apply]
 
 open Matrix in
-private theorem Dz.of_congr {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
-    {T P : Matrix ι ι E} (hP : P.det ≠ 0) (h : Dz (Pᴴ * T * P)) : Dz T := by
+private theorem Dz.of_congr
+    {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
+    {T P : Matrix ι ι E} (hP : P.det ≠ 0) (h : Dz (Pᴴ * T * P))
+    : Dz T := by
   obtain ⟨g, hg, D, hD⟩ := h
   refine ⟨P * g, ?_, D, ?_⟩
   · rw [det_mul]; exact mul_ne_zero hP hg
   · rw [← hD, conjTranspose_mul]; simp only [Matrix.mul_assoc]
 
 open Matrix in
-private theorem Dz.sum {E A B : Type} [Field E] [StarRing E] [Fintype A] [DecidableEq A]
-    [Fintype B] [DecidableEq B]
-    (hA : ∀ X : Matrix A A E, X.IsHermitian → Dz X)
-    (hB : ∀ X : Matrix B B E, X.IsHermitian → Dz X)
-    (T : Matrix (A ⊕ B) (A ⊕ B) E) (hT : T.IsHermitian) (hdet : T.toBlocks₁₁.det ≠ 0) :
-    Dz T := by
+private theorem Dz.sum
+    {E A B : Type} [Field E] [StarRing E] [Fintype A] [DecidableEq A] [Fintype B] [DecidableEq B]
+    (hA : ∀ X : Matrix A A E, X.IsHermitian → Dz X) (hB : ∀ X : Matrix B B E, X.IsHermitian → Dz X)
+    (T : Matrix (A ⊕ B) (A ⊕ B) E) (hT : T.IsHermitian) (hdet : T.toBlocks₁₁.det ≠ 0)
+    : Dz T := by
   obtain ⟨X, Y, Z, W, rfl⟩ : ∃ X Y Z W, T = fromBlocks X Y Z W :=
     ⟨_, _, _, _, (fromBlocks_toBlocks T).symm⟩
   rw [toBlocks_fromBlocks₁₁] at hdet
@@ -50,8 +53,7 @@ private theorem Dz.sum {E A B : Type} [Field E] [StarRing E] [Fintype A] [Decida
   have hZ : Yᴴ = Z := h2
   subst hZ
   set U : Matrix (A ⊕ B) (A ⊕ B) E := fromBlocks 1 (-(X⁻¹ * Y)) 0 1 with hU
-  have hUdet : U.det ≠ 0 := by
-    rw [hU, det_fromBlocks_zero₂₁]; simp
+  have hUdet : U.det ≠ 0 := by rw [hU, det_fromBlocks_zero₂₁]; simp
   set S : Matrix B B E := W - Yᴴ * X⁻¹ * Y with hS
   have hSH : S.IsHermitian := by
     rw [IsHermitian, hS, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul,
@@ -78,10 +80,13 @@ private theorem Dz.sum {E A B : Type} [Field E] [StarRing E] [Fintype A] [Decida
     simp [hDA, hDB]
 
 open Matrix in
-private theorem Dz.pivot {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
-    (ih : ∀ (κ : Type) [Fintype κ] [DecidableEq κ], Fintype.card κ < Fintype.card ι →
-      ∀ X : Matrix κ κ E, X.IsHermitian → Dz X)
-    (T : Matrix ι ι E) (hT : T.IsHermitian) (i : ι) (hi : T i i ≠ 0) : Dz T := by
+private theorem Dz.pivot
+    {E ι : Type} [Field E] [StarRing E] [Fintype ι] [DecidableEq ι]
+    (ih : ∀ (κ : Type) [Fintype κ] [DecidableEq κ],
+      Fintype.card κ < Fintype.card ι → ∀ X : Matrix κ κ E, X.IsHermitian → Dz X)
+    (T : Matrix ι ι E) (hT : T.IsHermitian)
+    (i : ι) (hi : T i i ≠ 0)
+    : Dz T := by
   let e : {a // a = i} ⊕ {a // ¬ a = i} ≃ ι := Equiv.sumCompl _
   refine Dz.of_submatrix e ?_
   refine Dz.sum ?_ (ih _ ?_) _ (hT.submatrix e) ?_
@@ -98,55 +103,62 @@ private theorem Dz.pivot {E ι : Type} [Field E] [StarRing E] [Fintype ι] [Deci
     simpa [e, toBlocks₁₁, hdef] using hi
 
 open Matrix in
-private theorem Dz.all {E : Type} [Field E] [StarRing E] [CharZero E] :
-    ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι], Fintype.card ι = n →
-      ∀ T : Matrix ι ι E, T.IsHermitian → Dz T := by
+private theorem Dz.all {E : Type} [Field E] [StarRing E] [CharZero E]
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι],
+      Fintype.card ι = n → ∀ T : Matrix ι ι E, T.IsHermitian → Dz T := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n IH =>
-  intro ι _ _ hcard T hT
-  have ih : ∀ (κ : Type) [Fintype κ] [DecidableEq κ], Fintype.card κ < Fintype.card ι →
-      ∀ X : Matrix κ κ E, X.IsHermitian → Dz X :=
-    fun κ _ _ h X hX => IH _ (hcard ▸ h) κ rfl X hX
-  by_cases hd : ∃ i, T i i ≠ 0
-  · obtain ⟨i, hi⟩ := hd
-    exact Dz.pivot ih T hT i hi
-  push_neg at hd
-  by_cases h0 : T = 0
-  · subst h0
-    exact ⟨1, by simp, 0, by ext i j; simp [Matrix.diagonal]⟩
-  obtain ⟨i, j, hij⟩ : ∃ i j, T i j ≠ 0 := by
-    by_contra hc
-    push_neg at hc
-    exact h0 (by ext a b; simpa using hc a b)
-  have hne : j ≠ i := by
-    rintro rfl
-    exact hij (hd _)
-  set c := (T i j)⁻¹ with hc
-  set P : Matrix ι ι E := 1 + single j i c with hP
-  have hPdet : P.det ≠ 0 := by
-    have : P = transvection j i c := rfl
-    rw [this, det_transvection_of_ne _ _ hne]
-    exact one_ne_zero
-  have hji : T j i = star (T i j) := (hT.apply j i).symm
-  have hval : (Pᴴ * T * P) i i = 2 := by
-    have hPH : Pᴴ = 1 + single i j (star c) := by
-      rw [hP, conjTranspose_add, conjTranspose_one, conjTranspose_single]
-    rw [hPH, hP]
-    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.add_apply,
-      Matrix.mul_assoc, single_mul_apply_same, mul_single_apply_same]
-    have h1 : T i j * c = 1 := mul_inv_cancel₀ hij
-    have h2 : star c * T j i = 1 := by
-      rw [hji, ← star_mul', mul_comm, h1, star_one]
-    rw [h1, h2, hd i, hd j]
-    norm_num
-  refine Dz.of_congr hPdet (Dz.pivot ?_ _ ?_ i ?_)
-  · exact ih
-  · exact isHermitian_conjTranspose_mul_mul P hT
-  · rw [hval]; exact two_ne_zero
+    intro ι _ _ hcard T hT
+    have ih
+        : ∀ (κ : Type) [Fintype κ] [DecidableEq κ],
+          Fintype.card κ < Fintype.card ι → ∀ X : Matrix κ κ E, X.IsHermitian → Dz X :=
+      fun κ _ _ h X hX => IH _ (hcard ▸ h) κ rfl X hX
+    by_cases hd : ∃ i, T i i ≠ 0
+    · obtain ⟨i, hi⟩ := hd
+      exact Dz.pivot ih T hT i hi
+    push_neg at hd
+    by_cases h0 : T = 0
+    · subst h0
+      exact ⟨1, by simp, 0, by ext i j; simp [Matrix.diagonal]⟩
+    obtain ⟨i, j, hij⟩ : ∃ i j, T i j ≠ 0 := by
+      by_contra hc
+      push_neg at hc
+      exact h0 (by ext a b; simpa using hc a b)
+    have hne : j ≠ i := by
+      rintro rfl
+      exact hij (hd _)
+    set c := (T i j)⁻¹ with hc
+    set P : Matrix ι ι E := 1 + single j i c with hP
+    have hPdet : P.det ≠ 0 := by
+      have : P = transvection j i c := rfl
+      rw [this, det_transvection_of_ne _ _ hne]
+      exact one_ne_zero
+    have hji : T j i = star (T i j) := (hT.apply j i).symm
+    have hval : (Pᴴ * T * P) i i = 2 := by
+      have hPH : Pᴴ = 1 + single i j (star c) := by
+        rw [hP, conjTranspose_add, conjTranspose_one, conjTranspose_single]
+      rw [hPH, hP]
+      simp only [Matrix.add_mul, Matrix.mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.add_apply,
+        Matrix.mul_assoc, single_mul_apply_same, mul_single_apply_same]
+      have h1 : T i j * c = 1 := mul_inv_cancel₀ hij
+      have h2 : star c * T j i = 1 := by rw [hji, ← star_mul', mul_comm, h1, star_one]
+      rw [h1, h2, hd i, hd j]
+      norm_num
+    refine Dz.of_congr hPdet (Dz.pivot ?_ _ ?_ i ?_)
+    · exact ih
+    · exact isHermitian_conjTranspose_mul_mul P hT
+    · rw [hval]; exact two_ne_zero
 
-theorem UpperTheory.hermitian_diagonalisation :
-    ∀ {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero E] (σ : E →ₐ[F] E), (∀ x, σ (σ x) = x) → (∀ x, σ x = x → x ∈ (algebraMap F E).range) → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E), (∀ i j, σ (T j i) = T i j) → T.det ≠ 0 → ∃ (g : GL (Fin n) E) (D : Fin n → Fˣ), Matrix.transpose ((g : Matrix (Fin n) (Fin n) E).map σ) * T * (g : Matrix (Fin n) (Fin n) E) = Matrix.diagonal fun i => algebraMap F E (D i : F) := by
+theorem UpperTheory.hermitian_diagonalisation
+    : ∀ {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero E] (σ : E →ₐ[F] E),
+      (∀ x, σ (σ x) = x) → (∀ x, σ x = x → x ∈ (algebraMap F E).range)
+        → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E),
+          (∀ i j, σ (T j i) = T i j) → T.det ≠ 0
+            → ∃ (g : GL (Fin n) E) (D : Fin n → Fˣ),
+              Matrix.transpose ((g : Matrix (Fin n) (Fin n) E).map σ) * T
+                  * (g : Matrix (Fin n) (Fin n) E)
+                = Matrix.diagonal fun i => algebraMap F E (D i : F) := by
   intro F E _ _ _ _ σ hσ hfix n T hT hdet
   letI : StarRing E :=
     { star := σ
@@ -186,8 +198,10 @@ theorem UpperTheory.hermitian_diagonalisation :
     apply hdD i
     rw [← hd, h0, map_zero]
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero g hg, fun i => Units.mk0 (d i) (hd0 i), ?_⟩
-  have hcoe : ((Matrix.GeneralLinearGroup.mkOfDetNeZero g hg : GL (Fin n) E) :
-      Matrix (Fin n) (Fin n) E) = g := rfl
+  have hcoe
+      : ((Matrix.GeneralLinearGroup.mkOfDetNeZero g hg : GL (Fin n) E) : Matrix (Fin n) (Fin n) E)
+        = g :=
+    rfl
   rw [hcoe, hct, hD]
   congr 1
   ext i

@@ -25,15 +25,17 @@ theorem span_evl [FiniteDimensional ℂ V] : Submodule.span ℂ (Set.range (evl 
     funext a
     have h1 : (Module.evalEquiv ℂ V v) (evl V a) = 0 :=
       LinearMap.mem_ker.mp (hfk (Submodule.subset_span ⟨a, rfl⟩))
-    have h2 : (Module.evalEquiv ℂ V v) (evl V a) = v.1 a := by
-      rfl
+    have h2 : (Module.evalEquiv ℂ V v) (evl V a) = v.1 a := by rfl
     have h3 : v.1 a = 0 := h2.symm.trans h1
     simpa using h3
   exact hf0 (by rw [hv, map_zero])
 
 omit [MeasurableSpace Y] in
-theorem bound_mul {g h : Y → ℂ} {n : Y → ℝ} (hn : ∀ y, 0 < n y) (C D : ℝ)
-    (hC : ∀ y, ‖g y‖ ≤ C * n y) (hD : ∀ y, ‖h y‖ * n y ≤ D) (y : Y) : ‖g y * h y‖ ≤ C * D := by
+theorem bound_mul
+    {g h : Y → ℂ} {n : Y → ℝ} (hn : ∀ y, 0 < n y)
+    (C D : ℝ) (hC : ∀ y, ‖g y‖ ≤ C * n y) (hD : ∀ y, ‖h y‖ * n y ≤ D)
+    (y : Y)
+    : ‖g y * h y‖ ≤ C * D := by
   have hn' := hn y
   have hC0 : 0 ≤ C := by
     by_contra hneg
@@ -41,28 +43,35 @@ theorem bound_mul {g h : Y → ℂ} {n : Y → ℝ} (hn : ∀ y, 0 < n y) (C D :
     have : C * n y < 0 := mul_neg_of_neg_of_pos hlt hn'
     linarith [norm_nonneg (g y), hC y]
   rw [norm_mul]
-  calc ‖g y‖ * ‖h y‖ ≤ (C * n y) * ‖h y‖ := mul_le_mul_of_nonneg_right (hC y) (norm_nonneg _)
+  calc
+    ‖g y‖ * ‖h y‖
+      ≤ (C * n y) * ‖h y‖ := mul_le_mul_of_nonneg_right (hC y) (norm_nonneg _)
     _ = C * (‖h y‖ * n y) := by ring
     _ ≤ C * D := mul_le_mul_of_nonneg_left (hD y) hC0
 
-theorem integrable_mul [IsFiniteMeasure ν] {g h : Y → ℂ} {n : Y → ℝ} (hn : ∀ y, 0 < n y)
-    (hg : Measurable g) (hh : Measurable h) (C D : ℝ) (hC : ∀ y, ‖g y‖ ≤ C * n y)
-    (hD : ∀ y, ‖h y‖ * n y ≤ D) : Integrable (fun y => g y * h y) ν := by
+theorem integrable_mul
+    [IsFiniteMeasure ν]
+    {g h : Y → ℂ} {n : Y → ℝ} (hn : ∀ y, 0 < n y) (hg : Measurable g) (hh : Measurable h)
+    (C D : ℝ) (hC : ∀ y, ‖g y‖ ≤ C * n y) (hD : ∀ y, ‖h y‖ * n y ≤ D)
+    : Integrable (fun y => g y * h y) ν := by
   exact (integrable_const (C * D)).mono' (hg.mul hh).aestronglyMeasurable
     (ae_of_all _ fun y => bound_mul hn C D hC hD y)
 
 def Good (K : Y → V) (ev : Y → A) (n : Y → ℝ) (φ : Module.Dual ℂ V) : Prop :=
-  Measurable (fun y => φ (K y)) ∧ (∃ C, ∀ y, ‖φ (K y)‖ ≤ C * n y) ∧
-    ∀ f : V, ∫ y, φ (K y) * f.1 (ev y) ∂ν = φ f
+  Measurable (fun y => φ (K y)) ∧ (∃ C, ∀ y, ‖φ (K y)‖ ≤ C * n y)
+    ∧ ∀ f : V, ∫ y, φ (K y) * f.1 (ev y) ∂ν = φ f
 
-theorem good_all [IsFiniteMeasure ν] [FiniteDimensional ℂ V] (K : Y → V) (ev : Y → A) (n : Y → ℝ)
-    (hn : ∀ y, 0 < n y) (hK : ∀ a, Measurable fun y => (K y).1 a)
-    (hev : ∀ f : V, Measurable fun y => f.1 (ev y)) (hKb : ∀ a, ∃ C, ∀ y, ‖(K y).1 a‖ ≤ C * n y)
-    (hevb : ∀ f : V, ∃ C, ∀ y, ‖f.1 (ev y)‖ * n y ≤ C)
-    (hrep : ∀ (f : V) a, ∫ y, (K y).1 a * f.1 (ev y) ∂ν = f.1 a) (φ : Module.Dual ℂ V) :
-    Good ν V K ev n φ := by
-  have hint : ∀ ψ : Module.Dual ℂ V, Good ν V K ev n ψ → ∀ f : V,
-      Integrable (fun y => ψ (K y) * f.1 (ev y)) ν := by
+theorem good_all
+    [IsFiniteMeasure ν] [FiniteDimensional ℂ V]
+    (K : Y → V) (ev : Y → A)
+    (n : Y → ℝ) (hn : ∀ y, 0 < n y)
+    (hK : ∀ a, Measurable fun y => (K y).1 a) (hev : ∀ f : V, Measurable fun y => f.1 (ev y))
+    (hKb : ∀ a, ∃ C, ∀ y, ‖(K y).1 a‖ ≤ C * n y) (hevb : ∀ f : V, ∃ C, ∀ y, ‖f.1 (ev y)‖ * n y ≤ C)
+    (hrep : ∀ (f : V) a, ∫ y, (K y).1 a * f.1 (ev y) ∂ν = f.1 a) (φ : Module.Dual ℂ V)
+    : Good ν V K ev n φ := by
+  have hint
+      : ∀ ψ : Module.Dual ℂ V,
+        Good ν V K ev n ψ → ∀ f : V, Integrable (fun y => ψ (K y) * f.1 (ev y)) ν := by
     intro ψ hψ f
     obtain ⟨C, hC⟩ := hψ.2.1
     obtain ⟨D, hD⟩ := hevb f
@@ -89,11 +98,15 @@ theorem good_all [IsFiniteMeasure ν] [FiniteDimensional ℂ V] (K : Y → V) (e
       exact mul_le_mul_of_nonneg_left (hC y) (norm_nonneg c)
     · simp only [LinearMap.smul_apply, smul_eq_mul, mul_assoc]
       rw [integral_const_mul, h.2.2 f]
-  obtain ⟨Sg, hSg⟩ : ∃ Sg : Submodule ℂ (Module.Dual ℂ V), ∀ ψ, ψ ∈ Sg ↔ Good ν V K ev n ψ :=
-    ⟨{ carrier := {ψ | Good ν V K ev n ψ}
-       add_mem' := fun {a b} ha hb => hadd a b ha hb
-       zero_mem' := hzero
-       smul_mem' := fun c ψ h => hsmul c ψ h }, fun _ => Iff.rfl⟩
+  obtain ⟨Sg, hSg⟩ : ∃ Sg : Submodule ℂ (Module.Dual ℂ V), ∀ ψ, ψ ∈ Sg ↔ Good ν V K ev n ψ := ⟨
+    {
+      carrier := {ψ | Good ν V K ev n ψ}
+      add_mem' := fun {a b} ha hb => hadd a b ha hb
+      zero_mem' := hzero
+      smul_mem' := fun c ψ h => hsmul c ψ h
+    },
+    fun _ => Iff.rfl
+  ⟩
   have hev' : ∀ a, Good ν V K ev n (evl V a) := by
     intro a
     refine ⟨?_, ?_, fun f => ?_⟩

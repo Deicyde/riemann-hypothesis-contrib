@@ -12,7 +12,8 @@ theorem prodStatement_holds : HaarRightInvProd := by
   intro G₁ G₂ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ h₁ h₂ μ hμ
   have : (Measure.haar : Measure G₁).IsMulRightInvariant := h₁ _ inferInstance
   have : (Measure.haar : Measure G₂).IsMulRightInvariant := h₂ _ inferInstance
-  rw [Measure.isMulLeftInvariant_eq_smul μ ((Measure.haar : Measure G₁).prod (Measure.haar : Measure G₂))]
+  rw [Measure.isMulLeftInvariant_eq_smul μ
+    ((Measure.haar : Measure G₁).prod (Measure.haar : Measure G₂))]
   infer_instance
 
 theorem piStatement_holds : HaarRightInvPi := by

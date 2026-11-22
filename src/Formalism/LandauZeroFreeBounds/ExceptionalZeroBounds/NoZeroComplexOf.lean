@@ -29,7 +29,6 @@ lemma sum_mult_re_one_div_sub_zeros_nonneg {q : ℕ} [NeZero q] (χ : DirichletC
   exact Finset.sum_nonneg fun ρ hρ =>
     mul_nonneg (Nat.cast_nonneg _) (re_one_div_sub_zero_pos_ter χ hχ ρ (hZ ρ hρ) σ t hσ).le
 
-
 set_option maxHeartbeats 1000000 in
 theorem zeroFreeNonRealCharOfBounds : NoZeroComplexOf := by
   unfold NoZeroComplexOf LocalZeros LLogDerivRight Positivity NoZeroComplex InRegion
@@ -49,8 +48,7 @@ theorem zeroFreeNonRealCharOfBounds : NoZeroComplexOf := by
   have hχ : χ ≠ 1 := fun h => hχ2 (by rw [h, one_pow])
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
   set ℓ := Real.log ((q : ℝ) * (|s.im| + 2)) with hℓ
-  have hlog2 : Real.log 2 ≤ ℓ :=
-    Real.log_le_log (by norm_num) (by nlinarith [abs_nonneg s.im])
+  have hlog2 : Real.log 2 ≤ ℓ := Real.log_le_log (by norm_num) (by nlinarith [abs_nonneg s.im])
   have hl2 : (0.69 : ℝ) < Real.log 2 := by
     have := Real.log_two_gt_d9
     norm_num at this ⊢
@@ -91,19 +89,22 @@ theorem zeroFreeNonRealCharOfBounds : NoZeroComplexOf := by
     rw [mem_closedBall_iff_norm, e, Complex.norm_real, Real.norm_eq_abs, abs_le]
     constructor <;> linarith
   have hterm : 1 / (σ - s.re) ≤ (m s : ℝ) * (1 / ((σ : ℂ) + s.im * I - s)).re := by
-    have e : (σ : ℂ) + s.im * I - s = ((σ - s.re : ℝ) : ℂ) := by
-      apply Complex.ext <;> simp
+    have e : (σ : ℂ) + s.im * I - s = ((σ - s.re : ℝ) : ℂ) := by apply Complex.ext <;> simp
     have e2 : (1 / ((σ - s.re : ℝ) : ℂ)).re = 1 / (σ - s.re) := by
       rw [← Complex.ofReal_one, ← Complex.ofReal_div, Complex.ofReal_re]
     rw [e, e2]
     have hm : (1 : ℝ) ≤ (m s : ℝ) := by exact_mod_cast hm1 s hsZ
     have hpos : 0 < 1 / (σ - s.re) := by apply div_pos one_pos; linarith
     nlinarith
-  have hsum : (m s : ℝ) * (1 / ((σ : ℂ) + s.im * I - s)).re ≤
-      ∑ ρ ∈ Z, (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re :=
-    Finset.single_le_sum (f := fun ρ => (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re)
-      (fun ρ hρ => mul_nonneg (Nat.cast_nonneg _)
-        (re_one_div_sub_zero_pos_ter χ hχ ρ ((hZ ρ).mp hρ).2 σ s.im hσ1).le) hsZ
+  have hsum
+      : (m s : ℝ) * (1 / ((σ : ℂ) + s.im * I - s)).re
+        ≤ ∑ ρ ∈ Z, (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re :=
+    Finset.single_le_sum
+      (f := fun ρ => (m ρ : ℝ) * (1 / ((σ : ℂ) + s.im * I - ρ)).re)
+      (fun ρ hρ =>
+        mul_nonneg (Nat.cast_nonneg _)
+          (re_one_div_sub_zero_pos_ter χ hχ ρ ((hZ ρ).mp hρ).2 σ s.im hσ1).le)
+      hsZ
   have hgap : σ - s.re ≤ (9 / 8) * (δ / ℓ) := by
     have : δ / 8 / ℓ = (δ / ℓ) / 8 := by ring
     rw [hσ]
@@ -138,9 +139,13 @@ theorem zeroFreeNonRealCharOfBounds : NoZeroComplexOf := by
   have b2 : (negLD (χ ^ 2) ((σ : ℂ) + 2 * s.im * I)).re ≤ 2 * (K * ℓ) := by
     have h1 := hbd2 σ hσ1 hσ2
     push_cast at h1
-    have h2 := sum_mult_re_one_div_sub_zeros_nonneg (χ ^ 2) hχ2 Z2 m2 (fun ρ hρ => ((hZ2 ρ).mp hρ).2) σ (2 * s.im) hσ1
+    have h2 :=
+      sum_mult_re_one_div_sub_zeros_nonneg (χ ^ 2) hχ2 Z2 m2
+        (fun ρ hρ => ((hZ2 ρ).mp hρ).2)
+        σ (2 * s.im) hσ1
     push_cast at h2
-    have h3 : C0 * Real.log ((q : ℝ) * (|2 * s.im| + 2)) ≤ K * Real.log ((q : ℝ) * (|2 * s.im| + 2)) :=
+    have h3
+        : C0 * Real.log ((q : ℝ) * (|2 * s.im| + 2)) ≤ K * Real.log ((q : ℝ) * (|2 * s.im| + 2)) :=
       mul_le_mul_of_nonneg_right (le_abs_self C0) hL2nn
     have h4 : K * Real.log ((q : ℝ) * (|2 * s.im| + 2)) ≤ K * (2 * ℓ) :=
       mul_le_mul_of_nonneg_left hL2 hKnn

@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology NumberField IsDedekindDomain
+open Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc
+  ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology NumberField IsDedekindDomain
 
 section SlopeTestRemainingChoices
 
@@ -27,8 +28,8 @@ private theorem iof_le (x : Ω) : (placeJ j).valuation x ≤ 1 ↔ ‖j x‖ ≤
 private theorem iof_add {x y : Om v} (hx : ‖x‖ < 1) (hy : ‖y‖ < 1) : ‖x + y‖ < 1 :=
   _root_.UpperTheory.Reformulated.B.Qk7.iof_add hx hy
 
-private theorem iof_pow {x y : Om v} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (h : ‖x - y‖ < 1) (n : ℕ) :
-    ‖x ^ n - y ^ n‖ < 1 := by
+private theorem iof_pow {x y : Om v} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) (h : ‖x - y‖ < 1) (n : ℕ)
+    : ‖x ^ n - y ^ n‖ < 1 := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -46,9 +47,9 @@ private theorem iof_dense : DenseRange j :=
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   Examples₂.LB.denseRange_emb v j
 
-private theorem iof_pw (σ : GQ v) (n : ℕ) :
-    (∀ x : Om v, ‖x‖ ≤ 1 → ‖σ x - x ^ n‖ < 1) ↔
-      ∀ y : Ω, (placeJ j).valuation y ≤ 1 → (placeJ j).valuation (iota j σ y - y ^ n) < 1 := by
+private theorem iof_pw (σ : GQ v) (n : ℕ)
+    : (∀ x : Om v, ‖x‖ ≤ 1 → ‖σ x - x ^ n‖ < 1)
+      ↔ ∀ y : Ω, (placeJ j).valuation y ≤ 1 → (placeJ j).valuation (iota j σ y - y ^ n) < 1 := by
   simp only [iof_le, iof_lt, map_sub, map_pow, iota_spec]
   refine ⟨fun h y hy => h _ hy, fun h x hx => ?_⟩
   obtain ⟨y, hy⟩ := Metric.denseRange_iff.1 (iof_dense j) x 1 one_pos
@@ -66,8 +67,8 @@ private theorem iof_pw (σ : GQ v) (n : ℕ) :
 private theorem iof_dec (σ : GQ v) : iota j σ ∈ Dec (F := ℚ) (placeJ j) := by
   rw [mem_Dec]
   ext y
-  rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, ← map_inv, iof_mem, iof_mem,
-    iota_spec, Examples₂.LB.norm_aut]
+  rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, ← map_inv, iof_mem,
+    iof_mem, iota_spec, Examples₂.LB.norm_aut]
 
 private theorem iof_range : (iota j).range = Dec (F := ℚ) (placeJ j) := by
   ext g
@@ -81,10 +82,12 @@ private theorem iof_range : (iota j).range = Dec (F := ℚ) (placeJ j) := by
 private theorem iof_inj : Function.Injective (iota j) := by
   intro σ τ h
   refine AlgEquiv.ext fun y => ?_
-  have e : σ ∘ j = τ ∘ j := funext fun x => by
-    show σ (j x) = τ (j x)
-    rw [← iota_spec, ← iota_spec, h]
-  exact congrFun ((iof_dense j).equalizer (Examples₂.LB.continuous_aut _) (Examples₂.LB.continuous_aut _) e) y
+  have e : σ ∘ j = τ ∘ j :=
+    funext fun x => by
+      show σ (j x) = τ (j x)
+      rw [← iota_spec, ← iota_spec, h]
+  exact congrFun
+    ((iof_dense j).equalizer (Examples₂.LB.continuous_aut _) (Examples₂.LB.continuous_aut _) e) y
 
 private theorem iof_cont : Continuous (iota j) := by
   refine continuous_of_continuousAt_one _ ?_
@@ -97,12 +100,15 @@ private theorem iof_cont : Continuous (iota j) := by
   have hN : FiniteDimensional ℚ_[v] N :=
     IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
   rw [Filter.mem_map]
-  refine Filter.mem_of_superset ((IntermediateField.fixingSubgroup_isOpen N).mem_nhds
-    (show (1 : GQ v) ∈ N.fixingSubgroup from one_mem _)) fun σ hσ => hMU ?_
-  have hb : ∀ i, iota j σ (b i : Ω) = (b i : Ω) := fun i => j.injective (by
-    rw [iota_spec]
-    exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hσ _
-      (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩))
+  refine Filter.mem_of_superset
+    ((IntermediateField.fixingSubgroup_isOpen N).mem_nhds
+      (show (1 : GQ v) ∈ N.fixingSubgroup from one_mem _))
+    fun σ hσ => hMU ?_
+  have hb : ∀ i, iota j σ (b i : Ω) = (b i : Ω) := fun i =>
+    j.injective (by
+      rw [iota_spec]
+      exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hσ _
+        (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩))
   rw [SetLike.mem_coe, IntermediateField.mem_fixingSubgroup_iff]
   intro x hx
   have e : (iota j σ).toLinearMap ∘ₗ M.val.toLinearMap = M.val.toLinearMap := b.ext hb
@@ -114,8 +120,8 @@ private theorem iof_ine (σ : GQ v) : iota j σ ∈ Ine (F := ℚ) (placeJ j) �
   rw [(iqBasic v).2.2.1 σ, h]
   exact ⟨fun hg => hg.2, fun hg => ⟨iof_dec j σ, hg⟩⟩
 
-private theorem iof_cyc (l : ℕ) [Fact l.Prime] (σ : GQ v) :
-    cycZ ℚ Ω l (iota j σ) = UpperTheory.V.Loc.cyc v l σ := by
+private theorem iof_cyc (l : ℕ) [Fact l.Prime] (σ : GQ v)
+    : cycZ ℚ Ω l (iota j σ) = UpperTheory.V.Loc.cyc v l σ := by
   have hl : l.Prime := Fact.out
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr hl.ne_zero⟩
@@ -124,15 +130,16 @@ private theorem iof_cyc (l : ℕ) [Fact l.Prime] (σ : GQ v) :
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ m)
   have hζ' := hζ.map_of_injective j.injective
   have ha : iota j σ ζ = ζ ^ (((cycZ ℚ Ω l (iota j σ) : ℤ_[l]ˣ) : ℤ_[l]).toZModPow m).val :=
-    cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (Ω ≃ₐ[ℚ] Ω) Ω (iota j σ)) ζ hζ.pow_eq_one
+    cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (Ω ≃ₐ[ℚ] Ω) Ω (iota j σ)) ζ
+      hζ.pow_eq_one
   have hb : σ (j ζ) = j ζ ^ (((UpperTheory.V.Loc.cyc v l σ : ℤ_[l]ˣ) : ℤ_[l]).toZModPow m).val :=
     cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (GQ v) (Om v) σ) _ hζ'.pow_eq_one
   rw [← iota_spec, ha, map_pow] at hb
   exact ZMod.val_injective _ (hζ'.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) hb)
 
 omit [IsAlgClosure ℚ Ω] in
-private theorem iof_place (w : HeightOneSpectrum (𝓞 ℚ)) :
-    IsPlaceOver (placeJ j) w ↔ ((v : ℕ) : 𝓞 ℚ) ∈ w.asIdeal := by
+private theorem iof_place (w : HeightOneSpectrum (𝓞 ℚ))
+    : IsPlaceOver (placeJ j) w ↔ ((v : ℕ) : 𝓞 ℚ) ∈ w.asIdeal := by
   have h0 : (placeJ j).valuation ((v : ℕ) : Ω) < 1 := by
     rw [iof_lt, map_natCast]
     have h1 : ‖((v : ℕ) : PadicAlgCl v)‖ = ‖((v : ℕ) : ℚ_[v])‖ := by
@@ -144,19 +151,36 @@ private theorem iof_place (w : HeightOneSpectrum (𝓞 ℚ)) :
     refine (h _).1 ?_
     simpa using h0
   · intro h
-    have e : Examples₂.LB.vQ v = w := HeightOneSpectrum.ext
-      ((Examples₂.LB.vQ v).isMaximal.eq_of_le w.isPrime.ne_top ((Ideal.span_singleton_le_iff_mem _).2 h))
+    have e : Examples₂.LB.vQ v = w :=
+      HeightOneSpectrum.ext ((Examples₂.LB.vQ v).isMaximal.eq_of_le w.isPrime.ne_top
+        ((Ideal.span_singleton_le_iff_mem _).2 h))
     rw [← e]
     exact Examples₂.LB.isPlaceOver_vQ _ h0
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Loc.iotaFacts :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {v : ℕ} [Fact v.Prime] (j : Ω →+* Om v), IsEmbedding (iota j) ∧ (iota j).range = Dec (F := ℚ) (placeJ j) ∧ (Ine (F := ℚ) (placeJ j)).comap (iota j) = Iq v ∧ (Iq v).map (iota j) = Ine (F := ℚ) (placeJ j) ∧ (∀ (l : ℕ) [Fact l.Prime], (cycZ ℚ Ω l).comp (iota j) = UpperTheory.V.Loc.cyc v l) ∧ (∀ w : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver (placeJ j) w ↔ ((v : ℕ) : 𝓞 ℚ) ∈ w.asIdeal) ∧ ∀ σ : GQ v, UpperTheory.V.Loc.IsFrob σ ↔ Formalism.ConjugateSelfDual.IsFrob (F := ℚ) (placeJ j) v (iota j σ) := by
+theorem UpperTheory.V.Loc.iotaFacts
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {v : ℕ} [Fact v.Prime]
+        (j : Ω →+* Om v),
+      IsEmbedding (iota j) ∧ (iota j).range = Dec (F := ℚ) (placeJ j)
+        ∧ (Ine (F := ℚ) (placeJ j)).comap (iota j) = Iq v
+        ∧ (Iq v).map (iota j) = Ine (F := ℚ) (placeJ j)
+        ∧ (∀ (l : ℕ) [Fact l.Prime], (cycZ ℚ Ω l).comp (iota j) = UpperTheory.V.Loc.cyc v l)
+        ∧ (∀ w : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver (placeJ j) w ↔ ((v : ℕ) : 𝓞 ℚ) ∈ w.asIdeal)
+        ∧ ∀ σ : GQ v,
+          UpperTheory.V.Loc.IsFrob σ
+            ↔ Formalism.ConjugateSelfDual.IsFrob (F := ℚ) (placeJ j) v (iota j σ) := by
   intro Ω _ _ _ v _ j
   haveI : IsGalois ℚ_[v] (Om v) := {}
-  refine ⟨((iof_cont j).isClosedEmbedding (iof_inj j)).isEmbedding, iof_range j, Subgroup.ext (iof_ine j), ?_,
-    fun l _ => MonoidHom.ext (iof_cyc j l), iof_place j, fun σ => ?_⟩
+  refine ⟨
+    ((iof_cont j).isClosedEmbedding (iof_inj j)).isEmbedding,
+    iof_range j,
+    Subgroup.ext (iof_ine j),
+    ?_,
+    fun l _ => MonoidHom.ext (iof_cyc j l),
+    iof_place j,
+    fun σ => ?_
+  ⟩
   · ext g
     constructor
     · rintro ⟨σ, hσ, rfl⟩

@@ -14,30 +14,29 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HformSpan
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Formalism.MainNotions.S GlobalTheory.Count Formalism.REAL Formalism.HN
+open MeasureTheory NumberField Matrix Formalism.MainNotions.S GlobalTheory.Count Formalism.REAL
+  Formalism.HN
 
 noncomputable section
 
 namespace GlobalTheory.DeepPoint
 
-
 open Formalism.L2.SG.Pf.unitaryCongruence in
 theorem kg_one (I : AutInst) (m : ℕ) : (1 : I.Gf) ∈ I.Kg m :=
   ⟨K_one I, fun y _ => ⟨0, zero_mem _, by rw [fmat_one, sub_self, Matrix.zero_mulVec, smul_zero]⟩⟩
 
-
 open Formalism.L2.SG.Pf.unitaryCongruence in
-theorem kg_mul (I : AutInst) (m : ℕ) {x y : I.Gf} (hx : x ∈ I.Kg m) (hy : y ∈ I.Kg m) : x * y ∈ I.Kg m := by
+theorem kg_mul (I : AutInst) (m : ℕ) {x y : I.Gf} (hx : x ∈ I.Kg m) (hy : y ∈ I.Kg m)
+    : x * y ∈ I.Kg m := by
   refine ⟨K_mul I hx.1 hy.1, fun v hv => ?_⟩
   obtain ⟨z, hz, hyz⟩ := hy.2 v hv
   obtain ⟨z', hz', hxz⟩ := hx.2 v hv
   refine ⟨I.fmat x *ᵥ z + z', add_mem (K_mv I hx.1 hz) hz', ?_⟩
   have e : (I.fmat (x * y) - 1) *ᵥ v = I.fmat x *ᵥ ((I.fmat y - 1) *ᵥ v) + (I.fmat x - 1) *ᵥ v := by
-    rw [fmat_mul, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.mulVec_sub, Matrix.mulVec_mulVec,
-      Matrix.one_mulVec]
+    rw [fmat_mul, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.mulVec_sub,
+      Matrix.mulVec_mulVec, Matrix.one_mulVec]
     abel
   rw [e, hyz, hxz, Matrix.mulVec_smul, smul_add]
-
 
 open Formalism.L2.SG.Pf.unitaryCongruence in
 theorem kg_inv (I : AutInst) (m : ℕ) {k : I.Gf} (hk : k ∈ I.Kg m) : k⁻¹ ∈ I.Kg m := by
@@ -46,28 +45,36 @@ theorem kg_inv (I : AutInst) (m : ℕ) {k : I.Gf} (hk : k ∈ I.Kg m) : k⁻¹ �
   refine ⟨-(I.fmat k⁻¹ *ᵥ z), neg_mem (K_mv I (K_inv I hk.1) hz), ?_⟩
   have h1 : I.fmat k⁻¹ * I.fmat k = 1 := fmat_inv_mul I k
   have e : (I.fmat k⁻¹ - 1) *ᵥ y = -(I.fmat k⁻¹ *ᵥ ((I.fmat k - 1) *ᵥ y)) := by
-    rw [Matrix.mulVec_mulVec, Matrix.mul_sub, h1, mul_one, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec]
+    rw [Matrix.mulVec_mulVec, Matrix.mul_sub, h1, mul_one, Matrix.sub_mulVec, Matrix.sub_mulVec,
+      Matrix.one_mulVec]
     abel
   rw [e, hkz, Matrix.mulVec_smul, smul_neg]
 
-theorem isIsot_span (I : AutInst) (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (h0 : R ≠ ⊥)
-    (hiso : ∀ y ∈ R, ∀ z ∈ R, Formalism.UG.hform (starRingEnd I.E) I.J y z = 0) :
-    I.IsIsot (Submodule.span I.E (R : Set (Fin I.n → I.E))) := by
+theorem isIsot_span
+    (I : AutInst) (R : Submodule (𝓞 I.E) (Fin I.n → I.E))
+    (h0 : R ≠ ⊥) (hiso : ∀ y ∈ R, ∀ z ∈ R, Formalism.UG.hform (starRingEnd I.E) I.J y z = 0)
+    : I.IsIsot (Submodule.span I.E (R : Set (Fin I.n → I.E))) := by
   first
   | exact @_root_.GlobalTheory.HermitianFormLinearity.main
   | exact _root_.GlobalTheory.HermitianFormLinearity.main
   | (apply _root_.GlobalTheory.HermitianFormLinearity.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.HermitianFormLinearity.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.HermitianFormLinearity.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.HermitianFormLinearity.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.HermitianFormLinearity.main ..)
 
-theorem exists_step (I : AutInst) (x : I.GA) (q : ℕ) (hn : 1 ≤ I.n)
-    (hrk : ∀ v, rkR (I.ε v) ≤ q) (hl : least I x < 1 / 2) :
-    ∃ (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (lo hi : ℝ),
-      IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) R ∧ R ≠ ⊥ ∧ R ≤ stepLt I x (1 / 2) ∧
-      R ≤ lamX I x ∧ 0 < hi ∧ largestSize (bas I) (frm I x) R ≤ hi ∧
-      (∀ N, R < N → N ≤ lamX I x → lo ≤ sizeQ (bas I) (frm I x) N R) ∧
-      hi ≤ (2 * least I x) ^ ((1 : ℝ) / q) * lo ∧ hi ^ 2 ≤ (2 * least I x) ^ ((1 : ℝ) / q) / 4 := by
+theorem exists_step
+    (I : AutInst) (x : I.GA)
+    (q : ℕ)
+    (hn : 1 ≤ I.n) (hrk : ∀ v, rkR (I.ε v) ≤ q) (hl : least I x < 1 / 2)
+    : ∃ (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (lo hi : ℝ),
+      IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) R ∧ R ≠ ⊥
+        ∧ R ≤ stepLt I x (1 / 2) ∧ R ≤ lamX I x ∧ 0 < hi ∧ largestSize (bas I) (frm I x) R ≤ hi
+        ∧ (∀ N, R < N → N ≤ lamX I x → lo ≤ sizeQ (bas I) (frm I x) N R)
+        ∧ hi ≤ (2 * least I x) ^ ((1 : ℝ) / q) * lo
+        ∧ hi ^ 2 ≤ (2 * least I x) ^ ((1 : ℝ) / q) / 4 := by
   obtain ⟨⟨a, S, τ, hF⟩, -, hspec⟩ := GlobalTheory.PointFlag.flag_spec I x
   have hpiece := (hspec a S τ hF).1
   have ha0 := ((hspec a S τ hF).2 hn).1
@@ -110,7 +117,8 @@ theorem exists_step (I : AutInst) (x : I.GA) (q : ℕ) (hn : 1 ≤ I.n)
   have hτ'0 : τ' 0 = least I x := by
     simp only [hτ', dif_pos (show 0 < a by omega)]
     exact hτ0 (by omega)
-  obtain ⟨b, hb, hratio, hsq⟩ := GlobalTheory.exists_consecutive_ratio_le_rpow a q τ' ha haq hτ'pos hτ'lt hτ'a
+  obtain ⟨b, hb, hratio, hsq⟩ :=
+    GlobalTheory.exists_consecutive_ratio_le_rpow a q τ' ha haq hτ'pos hτ'lt hτ'a
   rw [hτ'0] at hratio hsq
   set i : Fin a := ⟨b, hb⟩ with hi_def
   have hib : τ' b = τ i := by simp [hτ', hb, i]
@@ -125,7 +133,8 @@ theorem exists_step (I : AutInst) (x : I.GA) (q : ℕ) (hn : 1 ≤ I.n)
   · exact (hpiece i).2.2.1.le
   · intro N hN hNL
     by_cases hb1 : b + 1 < a
-    · have eS : S i.succ = S (Fin.castSucc (⟨b + 1, hb1⟩ : Fin a)) := congrArg S (Fin.ext (by simp [i]))
+    · have eS : S i.succ = S (Fin.castSucc (⟨b + 1, hb1⟩ : Fin a)) :=
+        congrArg S (Fin.ext (by simp [i]))
       have e : τ' (b + 1) = τ ⟨b + 1, hb1⟩ := by simp [hτ', hb1]
       rw [e, eS]
       rw [eS] at hN
@@ -142,13 +151,19 @@ theorem exists_step (I : AutInst) (x : I.GA) (q : ℕ) (hn : 1 ≤ I.n)
     rwa [div_le_iff₀ hpos] at hratio
   · rw [← hib]; exact hsq
 
-theorem deep_point : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ g → 1 ≤ q → 1 ≤ I.n →
-    (∀ v, rkR (I.ε v) ≤ q) → least I x < 1 / 2 → ∃ W, I.IsIsot W ∧ ∀ m ∈ I.NA W, ∃ γ ∈ I.GFset,
-      ∃ k ∈ I.Kg g, ∃ (u : I.Ginf) (A Z : InfinitePlace I.F → Matrix (Fin I.n) (Fin I.n) ℂ),
-        (∀ v, inG (I.ε v) (A v) ∧ inG (I.ε v) (Z v)) ∧
-        (∀ v, uMat (u v) = NormedSpace.exp (A v) * NormedSpace.exp (Z v)) ∧ m * x = γ * x * (u, k) ∧
-        Real.sqrt (∑ v, hs (A v)) + Real.sqrt (∑ v, hs (Z v)) ≤
-          (I.n : ℝ) ^ 2 * Real.sqrt I.f * g * I.rd * (2 * least I x) ^ ((1 : ℝ) / q) / 4 := by
+theorem deep_point
+    : ∀ (I : AutInst) (x : I.GA) (g q : ℕ),
+      1 ≤ g → 1 ≤ q → 1 ≤ I.n → (∀ v, rkR (I.ε v) ≤ q) → least I x < 1 / 2
+        → ∃ W,
+          I.IsIsot W
+            ∧ ∀ m ∈ I.NA W, ∃ γ ∈ I.GFset, ∃ k ∈ I.Kg g,
+              ∃ (u : I.Ginf) (A Z : InfinitePlace I.F → Matrix (Fin I.n) (Fin I.n) ℂ),
+                (∀ v, inG (I.ε v) (A v) ∧ inG (I.ε v) (Z v))
+                  ∧ (∀ v, uMat (u v) = NormedSpace.exp (A v) * NormedSpace.exp (Z v))
+                  ∧ m * x = γ * x * (u, k)
+                  ∧ Real.sqrt (∑ v, hs (A v)) + Real.sqrt (∑ v, hs (Z v))
+                    ≤ (I.n : ℝ) ^ 2 * Real.sqrt I.f * g * I.rd * (2 * least I x) ^ ((1 : ℝ) / q)
+                      / 4 := by
   intro I x g q hg _ hn hrk hl
   obtain ⟨R, lo, hi, hsat, hR0, hRS, hRL, hhi, hlarge, hlo, hhl, hh2⟩ := exists_step I x q hn hrk hl
   have hisoR : ∀ y ∈ R, ∀ z ∈ R, Formalism.UG.hform (starRingEnd I.E) I.J y z = 0 :=
@@ -172,13 +187,26 @@ theorem deep_point : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ g → 1 ≤
     exact N.mul_mem (N.inv_mem hγN) hm
   have hν := (hsplit _ hm'N).1
   obtain ⟨γ', ⟨hγ'F, -⟩, hγ'K, A, Z, hAZ, heq, hbd, -⟩ :=
-    GlobalTheory.SmallFund.small_fundamental_set I x g R lo hi _ hg hsat hR0 hperp hhi hlarge hlo hhl hh2 _ hν
+    GlobalTheory.SmallFund.small_fundamental_set I x g R lo hi _ hg hsat hR0 hperp hhi hlarge hlo
+      hhl hh2 _ hν
   have hk : (x⁻¹ * γ' * x).2⁻¹ * (x.2⁻¹ * (γ⁻¹ * m).2 * x.2) ∈ I.Kg g :=
     kg_mul I g (kg_inv I g hγ'K) hγU
-  refine ⟨γ * γ', Formalism.MainNotions.LeviCoordinates.rrg_mul_mem I hγF hγ'F, _, hk,
-    (γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1, A, Z, hAZ, fun v => ?_, ?_, hbd⟩
-  · have e : uMat (((γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1) v) =
-        uMat ((γ'.1 v * x.1 v)⁻¹) * (uMat ((γ⁻¹ * m).1 v) * uMat (x.1 v)) := by
+  refine ⟨
+    γ * γ',
+    Formalism.MainNotions.LeviCoordinates.rrg_mul_mem I hγF hγ'F,
+    _,
+    hk,
+    (γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1,
+    A,
+    Z,
+    hAZ,
+    fun v => ?_,
+    ?_,
+    hbd
+  ⟩
+  · have e
+        : uMat (((γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1) v)
+          = uMat ((γ'.1 v * x.1 v)⁻¹) * (uMat ((γ⁻¹ * m).1 v) * uMat (x.1 v)) := by
       simp only [Pi.mul_apply, Pi.inv_apply]
       rw [mul_assoc]
       rfl
@@ -189,14 +217,18 @@ theorem deep_point : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ g → 1 ≤
       rw [inv_mul_cancel]
       rfl
     rw [e2, Matrix.mul_assoc, ← Matrix.mul_assoc (uMat ((γ'.1 v * x.1 v)⁻¹)), e3, Matrix.one_mul]
-  · have h2 : γ' * x * ((γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1,
-        (x⁻¹ * γ' * x).2⁻¹ * (x.2⁻¹ * (γ⁻¹ * m).2 * x.2)) = (γ⁻¹ * m) * x := by
+  · have h2
+        : γ' * x
+            * ((γ'.1 * x.1)⁻¹ * (γ⁻¹ * m).1 * x.1, (x⁻¹ * γ' * x).2⁻¹ * (x.2⁻¹ * (γ⁻¹ * m).2 * x.2))
+          = (γ⁻¹ * m) * x := by
       refine Prod.ext ?_ ?_
       · simp only [Prod.fst_mul]
         group
       · simp only [Prod.snd_mul, Prod.snd_inv]
         group
-    calc m * x = γ * ((γ⁻¹ * m) * x) := by group
+    calc
+      m * x
+        = γ * ((γ⁻¹ * m) * x) := by group
       _ = γ * γ' * x * _ := by rw [← h2]; simp only [mul_assoc]
 
 end GlobalTheory.DeepPoint

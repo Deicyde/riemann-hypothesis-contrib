@@ -7,13 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EffOfSec
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw PositivityTheory.FormalThickening
-open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier GlobalTheory.CompanionTheory.FormalAlg
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw PositivityTheory.FormalThickening
+open GlobalTheory.ProjSpace GlobalTheory.QCoh.Qcqs GlobalTheory.Cartier
+  GlobalTheory.CompanionTheory.FormalAlg
 
 set_option autoImplicit false
 namespace GlobalTheory.CompanionTheory.FormalAlg
 
-theorem lbIso_pull_quot_of_consecutive_pw : ∀ {X Y : Scheme.{0}} (b : Y ⟶ X) (A C : LB X) (N : LB Y) (n : ℤ), A.IsLB → C.IsLB → N.IsLB → LBIso (A.pull b) (pw N n) → LBIso (C.pull b) (pw N (n + 1)) → LBIso N ((tw C A (-1)).pull b) := by
+theorem lbIso_pull_quot_of_consecutive_pw
+    : ∀ {X Y : Scheme.{0}} (b : Y ⟶ X) (A C : LB X) (N : LB Y) (n : ℤ),
+      A.IsLB → C.IsLB → N.IsLB → LBIso (A.pull b) (pw N n) → LBIso (C.pull b) (pw N (n + 1))
+        → LBIso N ((tw C A (-1)).pull b) := by
   intro X Y b A C N n hA hC hN h1 h2
   have hAb := ReciprocityTheory.ChartRestriction.G.Semi.LB.isLB_pull hA b
   have hCb := ReciprocityTheory.ChartRestriction.G.Semi.LB.isLB_pull hC b
@@ -24,10 +30,12 @@ theorem lbIso_pull_quot_of_consecutive_pw : ∀ {X Y : Scheme.{0}} (b : Y ⟶ X)
   have e2 := (GlobalTheory.CechPic.cls_eq_iff hCb (GlobalTheory.AbLaw.isLB_pw hN (n + 1))).2 h2
   rw [GlobalTheory.CechPic.cls_pull hA b hAb, GlobalTheory.EffBound.cls_pw hN n] at e1
   rw [GlobalTheory.CechPic.cls_pull hC b hCb, GlobalTheory.EffBound.cls_pw hN (n + 1)] at e2
-  have hT' : GlobalTheory.CechPic.cls (GlobalTheory.AbLaw.tw C A (-1)) hT
-      = GlobalTheory.CechPic.cls C hC - GlobalTheory.CechPic.cls A hA := by
+  have hT'
+      : GlobalTheory.CechPic.cls (GlobalTheory.AbLaw.tw C A (-1)) hT
+        = GlobalTheory.CechPic.cls C hC - GlobalTheory.CechPic.cls A hA := by
     show GlobalTheory.CechPic.cls (C.div (GlobalTheory.AbLaw.pw A (-(-1)))) hT = _
-    rw [GlobalTheory.CechPic.cls_div hC (GlobalTheory.AbLaw.isLB_pw hA _) hT, GlobalTheory.EffBound.cls_pw hA]
+    rw [GlobalTheory.CechPic.cls_div hC (GlobalTheory.AbLaw.isLB_pw hA _) hT,
+      GlobalTheory.EffBound.cls_pw hA]
     simp
   rw [hT', map_sub, e1, e2, add_smul, one_smul, add_sub_cancel_left]
 

@@ -21,8 +21,9 @@ variable {K : Type} [Field K] [NumberField K]
 def idealUnit (I : Ideal (𝓞 K)) (hI : I ≠ ⊥) : (FractionalIdeal (𝓞 K)⁰ K)ˣ :=
   Units.mk0 (I : FractionalIdeal (𝓞 K)⁰ K) (FractionalIdeal.coeIdeal_ne_zero.2 hI)
 
-theorem coe_idealUnit (I : Ideal (𝓞 K)) (hI : I ≠ ⊥) :
-    (idealUnit I hI : FractionalIdeal (𝓞 K)⁰ K) = (I : FractionalIdeal (𝓞 K)⁰ K) := rfl
+theorem coe_idealUnit (I : Ideal (𝓞 K)) (hI : I ≠ ⊥)
+    : (idealUnit I hI : FractionalIdeal (𝓞 K)⁰ K) = (I : FractionalIdeal (𝓞 K)⁰ K) :=
+  rfl
 
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
@@ -33,22 +34,29 @@ private lemma coe_idealUnit_eq (I : Ideal (𝓞 K)) (hI : I ≠ ⊥) :
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Mem.RayData.idealUnit_mul (I J : Ideal (𝓞 K)) (hI : I ≠ ⊥) (hJ : J ≠ ⊥) (h : I * J ≠ ⊥) :
-    _root_.GlobalTheory.Mem.RayData.idealUnit (I * J) h = _root_.GlobalTheory.Mem.RayData.idealUnit I hI * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ := by
+theorem _root_.GlobalTheory.Mem.RayData.idealUnit_mul
+    (I J : Ideal (𝓞 K)) (hI : I ≠ ⊥) (hJ : J ≠ ⊥) (h : I * J ≠ ⊥)
+    : _root_.GlobalTheory.Mem.RayData.idealUnit (I * J) h
+      = _root_.GlobalTheory.Mem.RayData.idealUnit I hI
+        * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ := by
   ext
   simp [coe_idealUnit_eq, FractionalIdeal.coeIdeal_mul]
 
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Mem.RayData.idealUnit_congr {I J : Ideal (𝓞 K)} (hI : I ≠ ⊥) (hJ : J ≠ ⊥) :
-    _root_.GlobalTheory.Mem.RayData.idealUnit I hI = _root_.GlobalTheory.Mem.RayData.idealUnit J hJ ↔ I = J := by
+theorem _root_.GlobalTheory.Mem.RayData.idealUnit_congr
+    {I J : Ideal (𝓞 K)} (hI : I ≠ ⊥) (hJ : J ≠ ⊥)
+    : _root_.GlobalTheory.Mem.RayData.idealUnit I hI
+        = _root_.GlobalTheory.Mem.RayData.idealUnit J hJ
+      ↔ I = J := by
   rw [Units.ext_iff, coe_idealUnit_eq, coe_idealUnit_eq, FractionalIdeal.coeIdeal_inj]
 
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Mem.RayData.span_ne_bot {a : 𝓞 K} (ha : a ≠ 0) : Ideal.span {a} ≠ ⊥ := by
+theorem _root_.GlobalTheory.Mem.RayData.span_ne_bot {a : 𝓞 K} (ha : a ≠ 0)
+    : Ideal.span {a} ≠ ⊥ := by
   rwa [Ne, Ideal.span_singleton_eq_bot]
 
 open NumberField IsDedekindDomain in
@@ -59,13 +67,18 @@ private lemma idealUnit_span_mem_rayP_of_sub_one_mem {𝔮 : Ideal (𝓞 K)} {a 
   unfold _root_.GlobalTheory.Mem.An.rayP
   exact Subgroup.subset_closure ⟨a, h, rfl⟩
 
-
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Mem.RayData.mem_principalRay_iff (𝔮 : Ideal (𝓞 K)) (x : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    x ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮 ↔ ∃ (a b : 𝓞 K) (ha : a ≠ 0) (hb : b ≠ 0), a - 1 ∈ 𝔮 ∧ b - 1 ∈ 𝔮 ∧
-      x * _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb) = _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) := by
+theorem _root_.GlobalTheory.Mem.RayData.mem_principalRay_iff
+    (𝔮 : Ideal (𝓞 K)) (x : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : x ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮
+      ↔ ∃ (a b : 𝓞 K) (ha : a ≠ 0) (hb : b ≠ 0),
+        a - 1 ∈ 𝔮 ∧ b - 1 ∈ 𝔮
+          ∧ x * _root_.GlobalTheory.Mem.RayData.idealUnit _
+              (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb)
+            = _root_.GlobalTheory.Mem.RayData.idealUnit _
+              (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) := by
   constructor
   · intro hx
     unfold _root_.GlobalTheory.Mem.An.rayP at hx
@@ -100,7 +113,12 @@ theorem _root_.GlobalTheory.Mem.RayData.mem_principalRay_iff (𝔮 : Ideal (𝓞
       refine ⟨b, a, hb, ha, hb1, ha1, ?_⟩
       rw [← hyab, inv_mul_cancel_left]
   · rintro ⟨a, b, ha, hb, ha1, hb1, h⟩
-    have hx : x = _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) * (_root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb))⁻¹ := by
+    have hx
+        : x
+          = _root_.GlobalTheory.Mem.RayData.idealUnit _
+              (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)
+            * (_root_.GlobalTheory.Mem.RayData.idealUnit _
+              (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb))⁻¹ := by
       rw [← h, mul_inv_cancel_right]
     rw [hx]
     exact mul_mem (idealUnit_span_mem_rayP_of_sub_one_mem ha ha1)
@@ -156,20 +174,29 @@ private lemma exists_coprime_idealUnit_mul_mem_rayP {𝔮 I : Ideal (𝓞 K)}
     rw [e]
     exact idealUnit_span_mem_rayP_of_sub_one_mem hc0 hc1
 
-
 open NumberField IsDedekindDomain in
 open scoped nonZeroDivisors in
-theorem _root_.GlobalTheory.Mem.RayData.card_eq_rayNo : ∀ (K : Type) [Field K] [NumberField K] (M : ℕ), M ≠ 0 →
-    ∀ D : _root_.GlobalTheory.Mem.RayData K M,
-    Fintype.card D.G =
-      _root_.GlobalTheory.Mem.An.rayNo (Ideal.span {(M : NumberField.RingOfIntegers K)}) := by
+theorem _root_.GlobalTheory.Mem.RayData.card_eq_rayNo
+    : ∀ (K : Type) [Field K] [NumberField K] (M : ℕ),
+      M ≠ 0
+        → ∀ D : _root_.GlobalTheory.Mem.RayData K M,
+          Fintype.card D.G
+            = _root_.GlobalTheory.Mem.An.rayNo (Ideal.span
+              {(M : NumberField.RingOfIntegers K)}) := by
   intro K _ _ M _ D
   set 𝔮 : Ideal (𝓞 K) := Ideal.span {(M : 𝓞 K)} with h𝔮
-  have memF : ∀ (I : Ideal (𝓞 K)) (hI : I ≠ ⊥), IsCoprime I 𝔮 →
-      _root_.GlobalTheory.Mem.RayData.idealUnit I hI ∈ _root_.GlobalTheory.Mem.An.rayI 𝔮 := fun I hI hIq =>
-    _root_.GlobalTheory.Mem.An.Model.mem_rayI_of_coprime 𝔮 I hI (Ideal.isCoprime_iff_sup_eq.mp hIq) _ rfl
-  have S : ∀ x ∈ _root_.GlobalTheory.Mem.An.rayI 𝔮, ∃ (J : Ideal (𝓞 K)) (hJ : J ≠ ⊥),
-      IsCoprime J 𝔮 ∧ x⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮 := by
+  have memF
+      : ∀ (I : Ideal (𝓞 K)) (hI : I ≠ ⊥),
+        IsCoprime I 𝔮
+          → _root_.GlobalTheory.Mem.RayData.idealUnit I hI
+            ∈ _root_.GlobalTheory.Mem.An.rayI 𝔮 := fun I hI hIq =>
+    _root_.GlobalTheory.Mem.An.Model.mem_rayI_of_coprime 𝔮 I hI (Ideal.isCoprime_iff_sup_eq.mp hIq)
+      _ rfl
+  have S
+      : ∀ x ∈ _root_.GlobalTheory.Mem.An.rayI 𝔮, ∃ (J : Ideal (𝓞 K)) (hJ : J ≠ ⊥),
+        IsCoprime J 𝔮
+          ∧ x⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ
+            ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮 := by
     intro x hx
     unfold _root_.GlobalTheory.Mem.An.rayI at hx
     induction hx using Subgroup.closure_induction with
@@ -201,29 +228,46 @@ theorem _root_.GlobalTheory.Mem.RayData.card_eq_rayNo : ∀ (K : Type) [Field K]
       obtain ⟨J, hJ, hJq, hyJ⟩ := hy
       obtain ⟨L, hL, hLq, hJL⟩ := exists_coprime_idealUnit_mul_mem_rayP hJq hJ
       refine ⟨L, hL, hLq, ?_⟩
-      have e : y⁻¹⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit L hL = (y⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ)⁻¹ * (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ * _root_.GlobalTheory.Mem.RayData.idealUnit L hL) := by
-        rw [mul_inv_rev, inv_inv, mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ)⁻¹ y, mul_assoc,
-          inv_mul_cancel_left]
+      have e
+          : y⁻¹⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit L hL
+            = (y⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ)⁻¹
+              * (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ
+                * _root_.GlobalTheory.Mem.RayData.idealUnit L hL) := by
+        rw [mul_inv_rev, inv_inv, mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ)⁻¹ y,
+          mul_assoc, inv_mul_cancel_left]
       rw [e]
       exact mul_mem (inv_mem hyJ) hJL
   choose I hIq hI0 hIcls using D.cls_surj
-  let f : D.G → _root_.GlobalTheory.Mem.An.rayI 𝔮 ⧸
-      (_root_.GlobalTheory.Mem.An.rayP 𝔮).subgroupOf (_root_.GlobalTheory.Mem.An.rayI 𝔮) :=
-    fun c => QuotientGroup.mk ⟨_root_.GlobalTheory.Mem.RayData.idealUnit (I c) (hI0 c), memF _ _ (hIq c)⟩
+  let f
+      : D.G
+        → _root_.GlobalTheory.Mem.An.rayI 𝔮 ⧸
+          (_root_.GlobalTheory.Mem.An.rayP 𝔮).subgroupOf (_root_.GlobalTheory.Mem.An.rayI 𝔮) :=
+    fun c =>
+      QuotientGroup.mk ⟨_root_.GlobalTheory.Mem.RayData.idealUnit (I c) (hI0 c), memF _ _ (hIq c)⟩
   have hf : Function.Bijective f := by
     constructor
     · intro c d hcd
       rw [QuotientGroup.eq, Subgroup.mem_subgroupOf] at hcd
       simp only [Subgroup.coe_mul, Subgroup.coe_inv] at hcd
-      obtain ⟨a, b, ha, hb, ha1, hb1, h⟩ := (_root_.GlobalTheory.Mem.RayData.mem_principalRay_iff 𝔮 _).mp hcd
+      obtain ⟨a, b, ha, hb, ha1, hb1, h⟩ :=
+        (_root_.GlobalTheory.Mem.RayData.mem_principalRay_iff 𝔮 _).mp hcd
       rw [← hIcls c, ← hIcls d, D.cls_eq _ _ (hIq c) (hIq d) (hI0 c) (hI0 d)]
       refine ⟨a, b, ha, hb, ha1, hb1, ?_⟩
-      have h' : _root_.GlobalTheory.Mem.RayData.idealUnit (I d) (hI0 d) * _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb) =
-          _root_.GlobalTheory.Mem.RayData.idealUnit (I c) (hI0 c) * _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) := by
+      have h'
+          : _root_.GlobalTheory.Mem.RayData.idealUnit (I d) (hI0 d)
+              * _root_.GlobalTheory.Mem.RayData.idealUnit _
+                (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb)
+            = _root_.GlobalTheory.Mem.RayData.idealUnit (I c) (hI0 c)
+              * _root_.GlobalTheory.Mem.RayData.idealUnit _
+                (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) := by
         rw [← h]
         group
-      rw [← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _ (ideal_mul_ne_bot (hI0 d) (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb)),
-        ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _ (ideal_mul_ne_bot (hI0 c) (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)), _root_.GlobalTheory.Mem.RayData.idealUnit_congr] at h'
+      rw [← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _
+            (ideal_mul_ne_bot (hI0 d) (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb)),
+          ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _
+            (ideal_mul_ne_bot (hI0 c) (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)),
+          _root_.GlobalTheory.Mem.RayData.idealUnit_congr]
+        at h'
       rw [mul_comm (Ideal.span {a}), mul_comm (Ideal.span {b})]
       exact h'.symm
     · intro y
@@ -234,19 +278,37 @@ theorem _root_.GlobalTheory.Mem.RayData.card_eq_rayNo : ∀ (K : Type) [Field K]
       rw [D.cls_eq _ _ (hIq _) hJq (hI0 _) hJ0] at hc
       obtain ⟨a, b, ha, hb, ha1, hb1, hab⟩ := hc
       set u := _root_.GlobalTheory.Mem.RayData.idealUnit (I (D.cls J)) (hI0 _) with hu
-      have e : _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) * u = _root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb) * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0 := by
-        rw [hu, ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _ (ideal_mul_ne_bot (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) (hI0 _)),
-          ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _ (ideal_mul_ne_bot (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb) hJ0), _root_.GlobalTheory.Mem.RayData.idealUnit_congr]
+      have e
+          : _root_.GlobalTheory.Mem.RayData.idealUnit _
+                (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)
+              * u
+            = _root_.GlobalTheory.Mem.RayData.idealUnit _
+                (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb)
+              * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0 := by
+        rw [hu,
+          ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _
+            (ideal_mul_ne_bot (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha) (hI0 _)),
+          ← _root_.GlobalTheory.Mem.RayData.idealUnit_mul _ _ _ _
+            (ideal_mul_ne_bot (_root_.GlobalTheory.Mem.RayData.span_ne_bot hb) hJ0),
+          _root_.GlobalTheory.Mem.RayData.idealUnit_congr]
         exact hab
-      have hP : u⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0 ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮 := by
+      have hP
+          : u⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0
+            ∈ _root_.GlobalTheory.Mem.An.rayP 𝔮 := by
         rw [_root_.GlobalTheory.Mem.RayData.mem_principalRay_iff]
         refine ⟨a, b, ha, hb, ha1, hb1, ?_⟩
-        rw [mul_assoc, mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ0), ← e, mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit _ (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)),
+        rw [mul_assoc, mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit J hJ0), ← e,
+          mul_comm (_root_.GlobalTheory.Mem.RayData.idealUnit _
+            (_root_.GlobalTheory.Mem.RayData.span_ne_bot ha)),
           inv_mul_cancel_left]
       show QuotientGroup.mk _ = QuotientGroup.mk _
       rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
       simp only [Subgroup.coe_mul, Subgroup.coe_inv]
-      have e' : u⁻¹ * x = (u⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0) * (x⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0)⁻¹ := by group
+      have e'
+          : u⁻¹ * x
+            = (u⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0)
+              * (x⁻¹ * _root_.GlobalTheory.Mem.RayData.idealUnit J hJ0)⁻¹ := by
+        group
       rw [e']
       exact mul_mem hP (inv_mem hxJ)
   rw [Fintype.card_eq_nat_card, Nat.card_eq_of_bijective f hf]

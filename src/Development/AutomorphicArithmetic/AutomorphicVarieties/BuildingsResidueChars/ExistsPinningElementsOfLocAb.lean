@@ -12,10 +12,13 @@ open UpperTheory.V.W
 
 end
 
-private theorem exists_pow_l_pow_eq_one_of_mem_muG {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+private theorem exists_pow_l_pow_eq_one_of_mem_muG
+    {l : ℕ} [Fact l.Prime]
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
     (ψ : G →* Rˣ) (hψc : AdicCont (maximalIdeal R) fun g => ((ψ g : Rˣ) : R))
-    (g : G) (hg : g ∈ UpperTheory.V.W.muG l G) : ∃ n : ℕ, ψ g ^ (l ^ n) = 1 := by
+    (g : G) (hg : g ∈ UpperTheory.V.W.muG l G)
+    : ∃ n : ℕ, ψ g ^ (l ^ n) = 1 := by
   obtain ⟨n, hn⟩ := CommGroup.mem_primaryComponent.1 hg
   refine ⟨n, ?_⟩
   have h1 : g ^ (l ^ n) ∈ (commutator G).topologicalClosure := by
@@ -27,21 +30,25 @@ private theorem exists_pow_l_pow_eq_one_of_mem_muG {l : ℕ} [Fact l.Prime] {G :
   rw [← map_pow]
   exact hker h1
 
-theorem UpperTheory.exists_pinning_elements_of_locAb :
-    ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] (I : Subgroup G) (d : ℕ), UpperTheory.V.W.LocAb l G I d → ∃ s : Fin d → G, (∀ k, s k ∈ I) ∧ Pins l I (Set.range s) := by
+theorem UpperTheory.exists_pinning_elements_of_locAb
+    : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [CompactSpace G] (I : Subgroup G) (d : ℕ),
+      UpperTheory.V.W.LocAb l G I d → ∃ s : Fin d → G, (∀ k, s k ∈ I) ∧ Pins l I (Set.range s) := by
   intro l _ G _ _ _ _ I d A
   have hlp : l.Prime := Fact.out
-  have hs : ∀ k : Fin d, ∃ g ∈ I,
-      A.a g = Multiplicative.ofAdd ((Pi.single k 1 : Fin d → ℤ_[l]), (0 : ℤ_[l])) :=
-    fun k => (A.inertia _).2 rfl
+  have hs
+      : ∀ k : Fin d, ∃ g ∈ I,
+        A.a g = Multiplicative.ofAdd ((Pi.single k 1 : Fin d → ℤ_[l]), (0 : ℤ_[l])) := fun k =>
+    (A.inertia _).2 rfl
   choose s hsI hsa using hs
   refine ⟨s, hsI, ?_⟩
   intro R _ _ _ _ hl ψ hψc hψI hψs g hg
   haveI : CharP R l := (CharP.charP_iff_prime_eq_zero hlp).2 hl
   have hsk : ∀ k, ψ (s k) = 1 := fun k => hψs _ ⟨k, rfl⟩
-  have hq : ∀ (N : ℕ) (u : Rˣ),
-      Units.map (↑(Ideal.Quotient.mk (maximalIdeal R ^ N)) : R →* R ⧸ maximalIdeal R ^ N) u = 1 ↔
-        (u : R) - 1 ∈ maximalIdeal R ^ N := by
+  have hq
+      : ∀ (N : ℕ) (u : Rˣ),
+        Units.map (↑(Ideal.Quotient.mk (maximalIdeal R ^ N)) : R →* R ⧸ maximalIdeal R ^ N) u = 1
+          ↔ (u : R) - 1 ∈ maximalIdeal R ^ N := by
     intro N u
     rw [Units.ext_iff]
     show Ideal.Quotient.mk (maximalIdeal R ^ N) (u : R) = 1 ↔ _
@@ -54,8 +61,10 @@ theorem UpperTheory.exists_pinning_elements_of_locAb :
   have hM0 : M ≠ 0 := Nat.card_pos.ne'
   have hres : ∀ g, ((ψ g ^ M : Rˣ) : R) - 1 ∈ maximalIdeal R := by
     intro g
-    have h1 := congrArg (fun u : (ρN 1).range => (u : (R ⧸ maximalIdeal R ^ 1)ˣ))
-      (pow_card_eq_one' (G := (ρN 1).range) (x := ⟨ρN 1 g, g, rfl⟩))
+    have h1 :=
+      congrArg
+        (fun u : (ρN 1).range => (u : (R ⧸ maximalIdeal R ^ 1)ˣ))
+        (pow_card_eq_one' (G := (ρN 1).range) (x := ⟨ρN 1 g, g, rfl⟩))
     simp only [Subgroup.coe_pow, OneMemClass.coe_one, ← hMdef] at h1
     rw [← map_pow] at h1
     simpa using (hq 1 _).1 h1
@@ -88,26 +97,34 @@ theorem UpperTheory.exists_pinning_elements_of_locAb :
     have hP : IsPGroup l (φN N).range := by
       rintro ⟨x, g, rfl⟩
       exact ⟨N, Subtype.ext (hφp N g)⟩
-    have := A.univ (φN N).range hP (φN N).rangeRestrict
-      (by rw [MonoidHom.ker_rangeRestrict]; exact (hφloc N).isOpen_fiber 1)
-      (by
-        intro g hg
-        rw [MonoidHom.ker_rangeRestrict]
-        exact (hφ N g).2 (by rw [hmu g hg, Units.val_one, sub_self]; exact zero_mem _))
+    have :=
+      A.univ (φN N).range hP (φN N).rangeRestrict
+        (by rw [MonoidHom.ker_rangeRestrict]; exact (hφloc N).isOpen_fiber 1)
+        (by
+          intro g hg
+          rw [MonoidHom.ker_rangeRestrict]
+          exact (hφ N g).2 (by rw [hmu g hg, Units.val_one, sub_self]; exact zero_mem _))
     rwa [MonoidHom.ker_rangeRestrict] at this
-  have hclosed : ∀ N, IsClosed ((Subgroup.map A.a (φN N).ker : Subgroup _) :
-      Set (Multiplicative ((Fin d → ℤ_[l]) × ℤ_[l]))) := by
+  have hclosed
+      : ∀ N,
+        IsClosed
+          ((Subgroup.map A.a (φN N).ker : Subgroup _)
+            : Set (Multiplicative ((Fin d → ℤ_[l]) × ℤ_[l]))) := by
     intro N
     rw [Subgroup.coe_map]
     exact (((hφloc N).isClosed_fiber 1).isCompact.image A.cont).isClosed
-  have hmem : ∀ N (x : Fin d → ℤ_[l]),
-      Multiplicative.ofAdd (x, (0 : ℤ_[l])) ∈ Subgroup.map A.a (φN N).ker := by
+  have hmem
+      : ∀ N (x : Fin d → ℤ_[l]),
+        Multiplicative.ofAdd (x, (0 : ℤ_[l])) ∈ Subgroup.map A.a (φN N).ker := by
     intro N
-    have hint : ∀ z : Fin d → ℤ, Multiplicative.ofAdd ((fun k => (z k : ℤ_[l])), (0 : ℤ_[l])) ∈
-        Subgroup.map A.a (φN N).ker := by
+    have hint
+        : ∀ z : Fin d → ℤ,
+          Multiplicative.ofAdd ((fun k => (z k : ℤ_[l])), (0 : ℤ_[l]))
+            ∈ Subgroup.map A.a (φN N).ker := by
       intro z
-      have he : ((fun k => (z k : ℤ_[l])), (0 : ℤ_[l])) =
-          ∑ k, z k • ((Pi.single k 1 : Fin d → ℤ_[l]), (0 : ℤ_[l])) := by
+      have he
+          : ((fun k => (z k : ℤ_[l])), (0 : ℤ_[l]))
+            = ∑ k, z k • ((Pi.single k 1 : Fin d → ℤ_[l]), (0 : ℤ_[l])) := by
         refine Prod.ext ?_ ?_
         · funext j
           rw [Prod.fst_sum, Finset.sum_apply]
@@ -120,8 +137,9 @@ theorem UpperTheory.exists_pinning_elements_of_locAb :
       refine Subgroup.zpow_mem _ ?_ _
       refine ⟨s k, ?_, hsa k⟩
       exact (hφ N (s k)).2 (by rw [hsk, one_pow, Units.val_one, sub_self]; exact zero_mem _)
-    have hT : IsClosed {x : Fin d → ℤ_[l] |
-        Multiplicative.ofAdd (x, (0 : ℤ_[l])) ∈ Subgroup.map A.a (φN N).ker} :=
+    have hT : IsClosed
+        {x : Fin d → ℤ_[l] |
+          Multiplicative.ofAdd (x, (0 : ℤ_[l])) ∈ Subgroup.map A.a (φN N).ker} :=
       (hclosed N).preimage (continuous_ofAdd.comp (continuous_id.prodMk continuous_const))
     have hD : DenseRange (Pi.map fun (_ : Fin d) (z : ℤ) => (z : ℤ_[l])) :=
       DenseRange.piMap fun _ => PadicInt.denseRange_intCast
@@ -143,8 +161,8 @@ theorem UpperTheory.exists_pinning_elements_of_locAb :
   have hzero : ((ψ g ^ M : Rˣ) : R) - 1 = 0 := by
     have : ((ψ g ^ M : Rˣ) : R) - 1 ∈ ⨅ N, maximalIdeal R ^ N :=
       Ideal.mem_iInf.2 fun N => (hφ N g).1 (hgN N)
-    rwa [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top,
-      Ideal.mem_bot] at this
+    rwa [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top, Ideal.mem_bot] at
+      this
   apply Units.ext
   refine eq_one_of_pow hl (hψI g hg) hM0 ?_
   rw [← Units.val_pow_eq_pow_val]

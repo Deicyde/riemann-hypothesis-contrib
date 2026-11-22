@@ -84,36 +84,41 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeqRa
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 
 noncomputable section
 
 namespace GlobalTheory.RowTriple.Lay
 
-open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeightCounting.FitRho
+open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.HeightCounting.FitRho
 
-theorem exists_heq_of_eq {F : D7 → Sort _} {D₁ D₂ : D7} (h : D₁ = D₂) (x : F D₁) : ∃ y : F D₂, HEq y x := by
+theorem exists_heq_of_eq {F : D7 → Sort _} {D₁ D₂ : D7} (h : D₁ = D₂) (x : F D₁)
+    : ∃ y : F D₂, HEq y x := by
   subst h; exact ⟨x, HEq.rfl⟩
 
+end GlobalTheory.RowTriple.Lay
+
+namespace GlobalTheory.RowTriple.Lay
+
+open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.HeightCounting.FitRho
 
 end GlobalTheory.RowTriple.Lay
 
 namespace GlobalTheory.RowTriple.Lay
 
-open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeightCounting.FitRho
+open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.HeightCounting.FitRho
 
-
-
-end GlobalTheory.RowTriple.Lay
-
-namespace GlobalTheory.RowTriple.Lay
-
-open GlobalTheory.TwInputs Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeightCounting.FitRho
-
-theorem heq_cf_of_pack {p q : Σ (D₁ : D7) (c₁ : CharFrame D₁) (C₁ : NChoice D₁), TupTied D₁ c₁ C₁} (h : p = q) :
-    HEq p.2.1 q.2.1 := by
+theorem heq_cf_of_pack
+    {p q : Σ (D₁ : D7) (c₁ : CharFrame D₁) (C₁ : NChoice D₁), TupTied D₁ c₁ C₁} (h : p = q)
+    : HEq p.2.1 q.2.1 := by
   subst h; rfl
-
 
 end GlobalTheory.RowTriple.Lay

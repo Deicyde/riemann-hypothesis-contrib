@@ -15,10 +15,14 @@ open CategoryTheory Polynomial Formalism.IrreducibleCountingLemmas.TYPES Formali
 
 section UnipGroup
 
-variable {K : Type} [Field K] [Fintype K] [DecidableEq K] {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ}
+variable
+  {K : Type} [Field K] [Fintype K] [DecidableEq K] {ι : Type} [Fintype ι] [DecidableEq ι] {s : ℕ}
 
-theorem unip_diag_mul (b : ι → Fin s) {g h : GL ι K} (hg : g ∈ unip K b) (hh : h ∈ unip K b)
-    (i j : ι) (hij : b i = b j) : ((g * h : GL ι K) : Matrix ι ι K) i j = if i = j then 1 else 0 := by
+theorem unip_diag_mul
+    (b : ι → Fin s)
+    {g h : GL ι K} (hg : g ∈ unip K b) (hh : h ∈ unip K b)
+    (i j : ι) (hij : b i = b j)
+    : ((g * h : GL ι K) : Matrix ι ι K) i j = if i = j then 1 else 0 := by
   rw [Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single i]
   · rw [hg.2 i i rfl, if_pos rfl, one_mul, hh.2 i j hij]
   · intro k _ hki
@@ -28,8 +32,8 @@ theorem unip_diag_mul (b : ι → Fin s) {g h : GL ι K} (hg : g ∈ unip K b) (
     · rw [hh.1.1 k j (by rw [← hij]; exact hgt), mul_zero]
   · intro h; exact absurd (Finset.mem_univ i) h
 
-theorem unip_diag_inv (b : ι → Fin s) {g : GL ι K} (hg : g ∈ unip K b)
-    (i j : ι) (hij : b i = b j) : ((g⁻¹ : GL ι K) : Matrix ι ι K) i j = if i = j then 1 else 0 := by
+theorem unip_diag_inv (b : ι → Fin s) {g : GL ι K} (hg : g ∈ unip K b) (i j : ι) (hij : b i = b j)
+    : ((g⁻¹ : GL ι K) : Matrix ι ι K) i j = if i = j then 1 else 0 := by
   have h1 : ((g⁻¹ * g : GL ι K) : Matrix ι ι K) i j = if i = j then 1 else 0 := by
     rw [inv_mul_cancel, Units.val_one, Matrix.one_apply]
   rw [Units.val_mul, Matrix.mul_apply, Finset.sum_eq_single j] at h1
@@ -49,14 +53,20 @@ def cuspUnipGroup (b : ι → Fin s) : Subgroup (GL ι K) where
 
 end UnipGroup
 
-theorem tensor_eq_zero_of_fixed {K : Type} [Field K] [Fintype K] [DecidableEq K] {r s : ℕ} (b : Fin r → Fin s)
-    (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)) (c : Fin s)
+theorem tensor_eq_zero_of_fixed
+    {K : Type} [Field K] [Fintype K] [DecidableEq K]
+    {r s : ℕ} (b : Fin r → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)) (c : Fin s)
     (U : Subgroup (GL {i // b i = c} K))
     (hU : ∀ v : (lam c : Type), (∀ u ∈ U, (lam c).ρ u v = v) → v = 0)
     (y : PiTensorProduct ℂ (fun c => (lam c : Type)))
-    (hy : ∀ u ∈ U, PiTensorProduct.map (Function.update
-      (fun c' => (LinearMap.id : (lam c' : Type) →ₗ[ℂ] (lam c' : Type))) c ((lam c).ρ u)) y = y) :
-    y = 0 := by
+    (hy : ∀ u ∈ U,
+      PiTensorProduct.map
+          (Function.update
+            (fun c' => (LinearMap.id : (lam c' : Type) →ₗ[ℂ] (lam c' : Type)))
+            c ((lam c).ρ u))
+          y
+        = y)
+    : y = 0 := by
   classical
   let f : U → ((lam c : Type) →ₗ[ℂ] (lam c : Type)) := fun u => (lam c).ρ u
   have hinv : ∀ (g : U) (v : (lam c : Type)), f g (∑ u : U, f u v) = ∑ u : U, f u v := by
@@ -83,7 +93,20 @@ theorem tensor_eq_zero_of_fixed {K : Type} [Field K] [Fintype K] [DecidableEq K]
   rw [← Nat.cast_smul_eq_nsmul ℂ] at h1
   exact (smul_eq_zero.1 h1.symm).resolve_left hcard
 
-theorem cuspidal_tensor_no_unip_fixed : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ) (b : Fin r → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)), (∀ c, IsCuspidal K (lam c)) → ∀ S : Finset (Fin r), (∃ i j, natBlocks b i = natBlocks b j ∧ i ∈ S ∧ j ∉ S) → ∀ y : PiTensorProduct ℂ (fun c => (lam c : Type)), (∀ u : blockTri (κ := K) (natBlocks b), (∀ i j, ((u : GL (Fin r) K) : Matrix (Fin r) (Fin r) K) i j ≠ (1 : Matrix (Fin r) (Fin r) K) i j → natBlocks b i = natBlocks b j ∧ i ∈ S ∧ j ∉ S) → leviTensor b lam u y = y) → y = 0 := by
+theorem cuspidal_tensor_no_unip_fixed
+    : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ) (b : Fin r → Fin s)
+        (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)),
+      (∀ c, IsCuspidal K (lam c))
+        → ∀ S : Finset (Fin r),
+          (∃ i j, natBlocks b i = natBlocks b j ∧ i ∈ S ∧ j ∉ S)
+            → ∀ y : PiTensorProduct ℂ (fun c => (lam c : Type)),
+              (∀ u : blockTri (κ := K) (natBlocks b),
+                  (∀ i j,
+                      ((u : GL (Fin r) K) : Matrix (Fin r) (Fin r) K) i j
+                          ≠ (1 : Matrix (Fin r) (Fin r) K) i j
+                        → natBlocks b i = natBlocks b j ∧ i ∈ S ∧ j ∉ S)
+                    → leviTensor b lam u y = y)
+                → y = 0 := by
   intro K _ _ _ r s b lam hcusp S ⟨i, j, hb, hi, hj⟩ y hy
   have hb' : b i = b j := Fin.ext hb
   let c := b i
@@ -94,7 +117,8 @@ theorem cuspidal_tensor_no_unip_fixed : ∀ (K : Type) [Field K] [Fintype K] [De
     · exact ⟨⟨i, rfl⟩, by simp [b₂, hi]⟩
     · exact ⟨⟨j, hb'.symm⟩, by simp [b₂, hj]⟩
   refine tensor_eq_zero_of_fixed b lam c (cuspUnipGroup b₂)
-    (fun v hv => hcusp c 2 b₂ hsurj le_rfl v hv) y ?_
+    (fun v hv => hcusp c 2 b₂ hsurj le_rfl v hv)
+    y ?_
   intro u' hu'
   have hu : u' ∈ unip K b₂ := hu'
   rw [← leviTensor_blockExt b lam c u']

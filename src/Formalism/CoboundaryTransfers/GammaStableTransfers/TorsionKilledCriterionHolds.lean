@@ -12,48 +12,54 @@ theorem gammaGradedStep_holds : GradedStep := by
   intro O A _ _ _ B M D _ _ _ _ W u hu i n hn
   obtain ⟨t, ht⟩ := hu
   obtain ⟨n', hn', hγ⟩ := W.γ_N n hn
-  have hw : ∀ k : ℕ, ∃ r : A, (algebraMap O A u + B.X * t) ^ k
-      = algebraMap O A (u ^ k) + B.X * r := by
+  have hw
+      : ∀ k : ℕ, ∃ r : A, (algebraMap O A u + B.X * t) ^ k = algebraMap O A (u ^ k) + B.X * r := by
     intro k
     induction k with
     | zero => exact ⟨0, by simp⟩
     | succ k ih =>
       obtain ⟨r, hr⟩ := ih
       refine ⟨r * (algebraMap O A u + B.X * t) + algebraMap O A (u ^ k) * t, ?_⟩
-      rw [pow_succ, hr, pow_succ, map_mul]; ring
+      rw [pow_succ, hr, pow_succ, map_mul]
+      ring
   obtain ⟨r, hr⟩ := hw i
   have hγn : W.γ n = n + B.X • n' := by rw [← hγ]; abel
   refine ⟨r • n + (algebraMap O A u + B.X * t) ^ i • n', ?_, ?_⟩
   · exact W.N.add_mem (W.N.smul_mem _ hn) (W.N.smul_mem _ hn')
-  · rw [W.γ_smul, map_pow, ht, mul_pow, hγn, hr,
-      ← algebraMap_smul A (u ^ i) (B.X ^ i • n)]
+  · rw [W.γ_smul, map_pow, ht, mul_pow, hγn, hr, ← algebraMap_smul A (u ^ i) (B.X ^ i • n)]
     module
 
 theorem gammaImageProduct_holds : GammaOnto := by
   intro O A _ _ _ B M D _ _ _ _ W u a hyp
-  suffices h : ∀ j, j ≤ a → ∀ n ∈ W.N, ∃ x ∈ W.N, ∃ z' ∈ W.N,
-      (∏ i ∈ Finset.Icc 1 j, (1 - u ^ i)) • (B.X • n) =
-        (W.γ (B.X • x) - B.X • x) + B.X ^ (j + 1) • z' from h a le_rfl
+  suffices h
+      : ∀ j,
+        j ≤ a
+          → ∀ n ∈ W.N, ∃ x ∈ W.N, ∃ z' ∈ W.N,
+            (∏ i ∈ Finset.Icc 1 j, (1 - u ^ i)) • (B.X • n)
+              = (W.γ (B.X • x) - B.X • x) + B.X ^ (j + 1) • z' from
+    h a le_rfl
   intro j
   induction j with
   | zero => intro _ n hn; exact ⟨0, W.N.zero_mem, n, hn, by simp⟩
   | succ j ih =>
     intro hj n hn
     obtain ⟨x, hx, m, hm, he⟩ := ih (by omega) n hn
-    obtain ⟨n', hn', hg⟩ := hyp (j+1) (by omega) hj m hm
-    refine ⟨(1 - u^(j+1)) • x - B.X ^ j • m, ?_, n', hn', ?_⟩
+    obtain ⟨n', hn', hg⟩ := hyp (j + 1) (by omega) hj m hm
+    refine ⟨(1 - u ^ (j + 1)) • x - B.X ^ j • m, ?_, n', hn', ?_⟩
     · exact W.N.sub_mem (W.N.smul_of_tower_mem _ hx) (W.N.smul_mem _ hm)
     · rw [Finset.prod_Icc_succ_top (by omega), mul_comm, mul_smul, he]
-      have e1 : B.X • ((1 - u^(j+1)) • x - B.X ^ j • m)
-          = (1 - u^(j+1)) • (B.X • x) - B.X ^ (j+1) • m := by
+      have e1
+          : B.X • ((1 - u ^ (j + 1)) • x - B.X ^ j • m)
+            = (1 - u ^ (j + 1)) • (B.X • x) - B.X ^ (j + 1) • m := by
         rw [smul_sub, smul_comm, smul_smul, ← pow_succ']
       rw [e1, map_sub, LinearMap.map_smul, hg]
       simp only [smul_sub, smul_add, sub_smul, one_smul]
       abel
 
 section Claim
-variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {B : Base O A} {M : ℕ}
-  {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+variable
+  {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+  {B : Base O A} {M : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
 
 lemma aeval_stable (δ : D →ₗ[O] D) (S : Submodule O D) (hS : ∀ y ∈ S, δ y ∈ S)
     (f : Polynomial O) : ∀ y ∈ S, Polynomial.aeval δ f y ∈ S := by
@@ -202,13 +208,12 @@ lemma claim_fin (W : WachMod B M D) (δ : D →ₗ[O] D) (R : Polynomial O) (a :
     abel
 
 theorem torsionKilledCriterion_holds : CoboundaryTransfer := by
-  intro O A _ _ _ B M D _ _ _ _ W δ R a k cΓ h1 h1' h2 h3 h4 h5 h6 h7
-    ω ⟨w, hw, hωw⟩ ⟨j, y, z, hyz, hj⟩
+  intro O A _ _ _ B M D _ _ _ _ W δ R a k cΓ h1 h1' h2 h3 h4 h5 h6 h7 ω ⟨w, hw, hωw⟩
+    ⟨j, y, z, hyz, hj⟩
   subst hωw
   have hk := claim_key W δ R a k cΓ h1 h1' h2 h3 h4 h6 w hw j y z hyz hj
   rw [LinearMap.map_smul] at hk
-  have RQ : W.QInv (Polynomial.aeval δ R w) :=
-    aeval_stable δ (QS W) (δ_QInv W δ h2) R w hw
+  have RQ : W.QInv (Polynomial.aeval δ R w) := aeval_stable δ (QS W) (δ_QInv W δ h2) R w hw
   exact claim_fin W δ R a cΓ h2 h6 h7 w hw (h5 _ RQ hk)
 
 end Claim

@@ -16,9 +16,9 @@ noncomputable section
 
 variable {K K' : Type*} [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
 
-theorem ideleNorm_finiteEmbedding (v' : HeightOneSpectrum (𝓞 K')) (a : (v'.adicCompletion K')ˣ) :
-    ideleNorm K K' (finiteEmbedding v' a) =
-      finiteEmbedding (below K v')
+theorem ideleNorm_finiteEmbedding (v' : HeightOneSpectrum (𝓞 K')) (a : (v'.adicCompletion K')ˣ)
+    : ideleNorm K K' (finiteEmbedding v' a)
+      = finiteEmbedding (below K v')
         (LocalField.normUnits ((below K v').adicCompletion K) (v'.adicCompletion K') a) := by
   classical
   apply Units.ext
@@ -45,25 +45,27 @@ theorem ideleNorm_finiteEmbedding (v' : HeightOneSpectrum (𝓞 K')) (a : (v'.ad
         exact ((below_eq_iff w.1 v).2 w.2).symm
       rw [finiteAdeleSingle_apply_of_ne hw, map_one]
 
-variable {L L' : Type*} [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra K L]
-  [Algebra K L'] [Algebra K' L'] [Algebra L L'] [IsScalarTower K K' L'] [IsScalarTower K L L']
-
+variable
+  {L L' : Type*} [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra K L] [Algebra K L']
+  [Algebra K' L'] [Algebra L L'] [IsScalarTower K K' L'] [IsScalarTower K L L']
 
 omit [NumberField K] [NumberField K'] [NumberField L'] in
-theorem liesOver_trans_of_liesOver (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 K'))
-    (u' : HeightOneSpectrum (𝓞 L')) [v'.asIdeal.LiesOver v.asIdeal]
-    [u'.asIdeal.LiesOver v'.asIdeal] : u'.asIdeal.LiesOver v.asIdeal :=
+theorem liesOver_trans_of_liesOver
+    (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 K')) (u' : HeightOneSpectrum (𝓞 L'))
+    [v'.asIdeal.LiesOver v.asIdeal] [u'.asIdeal.LiesOver v'.asIdeal]
+    : u'.asIdeal.LiesOver v.asIdeal :=
   (below_eq_iff u' v).1 (by
     rw [← below_below (L := K'), (below_eq_iff u' v').2 inferInstance,
       (below_eq_iff v' v).2 inferInstance])
 
-variable [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)] [IsGalois K' L']
-  [IsMulCommutative (L' ≃ₐ[K'] L')]
+variable
+  [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)] [IsGalois K' L'] [IsMulCommutative (L' ≃ₐ[K'] L')]
 
-theorem restrictNormal_localSymbol_norm (v : HeightOneSpectrum (𝓞 K))
-    (v' : HeightOneSpectrum (𝓞 K')) [v'.asIdeal.LiesOver v.asIdeal] (a : (v'.adicCompletion K')ˣ) :
-    ((localSymbol L' v' a).restrictScalars K).restrictNormal L =
-      localSymbol L v (LocalField.normUnits (v.adicCompletion K) (v'.adicCompletion K') a) := by
+theorem restrictNormal_localSymbol_norm
+    (v : HeightOneSpectrum (𝓞 K)) (v' : HeightOneSpectrum (𝓞 K')) [v'.asIdeal.LiesOver v.asIdeal]
+    (a : (v'.adicCompletion K')ˣ)
+    : ((localSymbol L' v' a).restrictScalars K).restrictNormal L
+      = localSymbol L v (LocalField.normUnits (v.adicCompletion K) (v'.adicCompletion K') a) := by
   obtain ⟨u'⟩ := nonempty_placesOver L' v'
   have : u'.1.asIdeal.LiesOver v.asIdeal := liesOver_trans_of_liesOver v v' u'.1
   have hu : (below L u'.1).asIdeal.LiesOver v.asIdeal :=
@@ -74,11 +76,14 @@ theorem restrictNormal_localSymbol_norm (v : HeightOneSpectrum (𝓞 K))
     .of_algebraMap_eq fun r ↦ (completionMap_completionMap v v' u'.1 r).symm
   have := isMulCommutative_gal_adicCompletion L' v' u'
   have := isMulCommutative_gal_adicCompletion L v u
-  let j : u.1.adicCompletion L →ₐ[v.adicCompletion K] u'.1.adicCompletion L' :=
-    { completionMap u.1 u'.1 with
-      commutes' := fun r ↦ completionMap_completionMap v u.1 u'.1 r }
-  have hj : ∀ m : L, j (algebraMap L (u.1.adicCompletion L) m) =
-      algebraMap L' (u'.1.adicCompletion L') (algebraMap L L' m) := fun m ↦ by
+  let j : u.1.adicCompletion L →ₐ[v.adicCompletion K] u'.1.adicCompletion L' := {
+    completionMap u.1 u'.1 with
+    commutes' := fun r ↦ completionMap_completionMap v u.1 u'.1 r
+  }
+  have hj
+      : ∀ m : L,
+        j (algebraMap L (u.1.adicCompletion L) m)
+          = algebraMap L' (u'.1.adicCompletion L') (algebraMap L L' m) := fun m ↦ by
     change completionMap u.1 u'.1 _ = _
     rw [completionMap_algebraMap, IsScalarTower.algebraMap_apply L L' (u'.1.adicCompletion L')]
   ext l

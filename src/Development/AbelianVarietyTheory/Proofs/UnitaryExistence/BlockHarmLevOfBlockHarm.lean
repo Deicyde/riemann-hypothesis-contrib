@@ -32,10 +32,10 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-theorem _root_.GlobalTheory.ShortLawsCompare.mem_std_block (v : Fin (n₁ + n₂) → E) :
-    v ∈ _root_.Formalism.L2.Pj.stdLat E (n₁ + n₂) ↔
-      (fun j => v (Fin.castAdd n₂ j)) ∈ _root_.Formalism.L2.Pj.stdLat E n₁ ∧
-        (fun j => v (Fin.natAdd n₁ j)) ∈ _root_.Formalism.L2.Pj.stdLat E n₂ := by
+theorem _root_.GlobalTheory.ShortLawsCompare.mem_std_block (v : Fin (n₁ + n₂) → E)
+    : v ∈ _root_.Formalism.L2.Pj.stdLat E (n₁ + n₂)
+      ↔ (fun j => v (Fin.castAdd n₂ j)) ∈ _root_.Formalism.L2.Pj.stdLat E n₁
+        ∧ (fun j => v (Fin.natAdd n₁ j)) ∈ _root_.Formalism.L2.Pj.stdLat E n₂ := by
   simp only [_root_.GlobalTheory.BetaEx.mem_std]
   constructor
   · intro h
@@ -50,12 +50,13 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-private theorem smul_inf_comap_funLeft_le (I : Ideal (𝓞 E)) (L₁ P₁ : Submodule (𝓞 E) (Fin n₁ → E))
-    (L₂ P₂ : Submodule (𝓞 E) (Fin n₂ → E)) (h₁ : I • L₁ ≤ P₁) (h₂ : I • L₂ ≤ P₂) :
-    I • (L₁.comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂)) ⊓
-        L₂.comap (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁))) ≤
-      P₁.comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂)) ⊓
-        P₂.comap (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁)) := by
+private theorem smul_inf_comap_funLeft_le
+    (I : Ideal (𝓞 E)) (L₁ P₁ : Submodule (𝓞 E) (Fin n₁ → E)) (L₂ P₂ : Submodule (𝓞 E) (Fin n₂ → E))
+    (h₁ : I • L₁ ≤ P₁) (h₂ : I • L₂ ≤ P₂)
+    : I • (L₁.comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂))
+        ⊓ L₂.comap (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁)))
+      ≤ P₁.comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂))
+        ⊓ P₂.comap (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁)) := by
   rw [Submodule.smul_le]
   intro r hr v hv
   rw [Submodule.mem_inf, Submodule.mem_comap, Submodule.mem_comap] at hv ⊢
@@ -70,10 +71,11 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-private theorem stdLat_add_eq_inf_comap_funLeft :
-    _root_.Formalism.L2.Pj.stdLat E (n₁ + n₂) =
-      (_root_.Formalism.L2.Pj.stdLat E n₁).comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂)) ⊓
-        (_root_.Formalism.L2.Pj.stdLat E n₂).comap (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁)) := by
+private theorem stdLat_add_eq_inf_comap_funLeft
+    : _root_.Formalism.L2.Pj.stdLat E (n₁ + n₂)
+      = (_root_.Formalism.L2.Pj.stdLat E n₁).comap (LinearMap.funLeft (𝓞 E) E (Fin.castAdd n₂))
+        ⊓ (_root_.Formalism.L2.Pj.stdLat E n₂).comap
+          (LinearMap.funLeft (𝓞 E) E (Fin.natAdd n₁)) := by
   ext v
   exact _root_.GlobalTheory.ShortLawsCompare.mem_std_block v
 
@@ -82,16 +84,20 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-theorem _root_.GlobalTheory.ShortLawsCompare.levOK_block {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂} {N M : ℕ}
-    (h₁ : Λ₁.LevOK N M) (h₂ : Λ₂.LevOK N M) :
-    (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂).LevOK N M := by
+theorem _root_.GlobalTheory.ShortLawsCompare.levOK_block
+    {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂} {N M : ℕ}
+    (h₁ : Λ₁.LevOK N M) (h₂ : Λ₂.LevOK N M)
+    : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂).LevOK N
+      M := by
   unfold _root_.Formalism.L2.Pj.GenLat.LevOK _root_.Formalism.L2.Pj.GenLat.Ln at *
   refine ⟨h₁.1, h₁.2.1, ?_⟩
   have key := smul_inf_comap_funLeft_le (Ideal.span {((N : ℕ) : 𝓞 E)}) _ _ _ _ h₁.2.2 h₂.2.2
   rw [stdLat_add_eq_inf_comap_funLeft]
   refine key.trans ?_
   intro v hv
-  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat, Submodule.mem_inf, Submodule.mem_comap] at hv ⊢
+  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat,
+      Submodule.mem_inf, Submodule.mem_comap]
+    at hv ⊢
   tauto
 
 set_option autoImplicit false in
@@ -99,8 +105,9 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-theorem _root_.GlobalTheory.ShortLawsCompare.trivAt_std (n b : ℕ) :
-    _root_.Formalism.L2.Pj.GenLat.TrivAt (⟨_root_.Formalism.L2.Pj.stdLat E n⟩ : _root_.Formalism.L2.Pj.GenLat E n) b := by
+theorem _root_.GlobalTheory.ShortLawsCompare.trivAt_std (n b : ℕ)
+    : _root_.Formalism.L2.Pj.GenLat.TrivAt
+      (⟨_root_.Formalism.L2.Pj.stdLat E n⟩ : _root_.Formalism.L2.Pj.GenLat E n) b := by
   unfold _root_.Formalism.L2.Pj.GenLat.TrivAt
   refine ⟨1, Nat.coprime_one_left _, ?_, ?_⟩ <;> simp
 
@@ -109,8 +116,8 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-private theorem complexConj_coe_mem_range_algebraMap [IsCMField E] (a : 𝓞 E) :
-    IsCMField.complexConj E (a : E) ∈ (algebraMap (𝓞 E) E).range :=
+private theorem complexConj_coe_mem_range_algebraMap [IsCMField E] (a : 𝓞 E)
+    : IsCMField.complexConj E (a : E) ∈ (algebraMap (𝓞 E) E).range :=
   ⟨RingOfIntegers.mapRingHom (IsCMField.complexConj E : E →+* E) a, rfl⟩
 
 set_option autoImplicit false in
@@ -118,8 +125,9 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-theorem _root_.GlobalTheory.ShortLawsCompare.unimod_std [IsCMField E] (n : ℕ) :
-    _root_.Formalism.L2.Pj.GenLat.Unimod (⟨_root_.Formalism.L2.Pj.stdLat E n⟩ : _root_.Formalism.L2.Pj.GenLat E n) := by
+theorem _root_.GlobalTheory.ShortLawsCompare.unimod_std [IsCMField E] (n : ℕ)
+    : _root_.Formalism.L2.Pj.GenLat.Unimod
+      (⟨_root_.Formalism.L2.Pj.stdLat E n⟩ : _root_.Formalism.L2.Pj.GenLat E n) := by
   unfold _root_.Formalism.L2.Pj.GenLat.Unimod
   intro v
   show v ∈ _root_.Formalism.L2.Pj.stdLat E n ↔ ∀ w ∈ _root_.Formalism.L2.Pj.stdLat E n, _
@@ -143,8 +151,9 @@ theorem _root_.GlobalTheory.ShortLawsCompare.unimod_std [IsCMField E] (n : ℕ) 
       · subst hij; simp
       · simp [hij]
     have hc := h _ hsingle
-    simp only [Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true] at hc
+    simp only [Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+        if_true]
+      at hc
     obtain ⟨b, hb⟩ := hc
     obtain ⟨a, ha⟩ := complexConj_coe_mem_range_algebraMap b
     refine ⟨a, ?_⟩
@@ -155,7 +164,8 @@ theorem _root_.GlobalTheory.ShortLawsCompare.unimod_std [IsCMField E] (n : ℕ) 
 
 end Lattice
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 section Beta
 
@@ -164,29 +174,38 @@ variable (c : Coeff l)
 set_option autoImplicit false in
 open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+  {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
   {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} in
 variable (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) in
-theorem _root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt {n b : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n}
-    (hT : Λ.TrivAt b) (hU : Λ.Unimod) (hb : b ≠ 1) (τ : E →+* ℂ) :
-    IsUnit (_root_.Formalism.L2.Pj.idealAt c Λ.La τ) := by
+theorem _root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt
+    {n b : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n} (hT : Λ.TrivAt b) (hU : Λ.Unimod) (hb : b ≠ 1)
+    (τ : E →+* ℂ)
+    : IsUnit (_root_.Formalism.L2.Pj.idealAt c Λ.La τ) := by
   unfold _root_.Formalism.L2.Pj.idealAt
   obtain ⟨k, hk, -, hkstd⟩ := hT
   have hk0 : k ≠ 0 := by
     rintro rfl
     exact hb (Nat.coprime_zero_left _ |>.mp hk)
-  have hfrac := _root_.GlobalTheory.BetaEx.frac_of_bdd
-    (_root_.GlobalTheory.BetaEx.bdd_of_unimod Λ hU)
-  obtain ⟨s, hs⟩ := FractionalIdeal.fg_of_isNoetherianRing le_rfl
-    (⟨_, hfrac⟩ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
-  have hspan : Submodule.span (𝓞 c.F) (_root_.Formalism.L2.Pj.embF c τ '' _root_.Formalism.L2.Pj.detSet Λ.La) =
-      Submodule.span (𝓞 c.F) (_root_.Formalism.L2.Pj.embF c τ '' (s : Set E)) := by
-    rw [← _root_.GlobalTheory.BetaEx.span_image_span (_root_.Formalism.L2.Pj.embF c τ) (_root_.Formalism.L2.Pj.detSet Λ.La),
+  have hfrac :=
+    _root_.GlobalTheory.BetaEx.frac_of_bdd (_root_.GlobalTheory.BetaEx.bdd_of_unimod Λ hU)
+  obtain ⟨s, hs⟩ :=
+    FractionalIdeal.fg_of_isNoetherianRing le_rfl
+      (⟨_, hfrac⟩ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+  have hspan
+      : Submodule.span (𝓞 c.F)
+          (_root_.Formalism.L2.Pj.embF c τ '' _root_.Formalism.L2.Pj.detSet Λ.La)
+        = Submodule.span (𝓞 c.F) (_root_.Formalism.L2.Pj.embF c τ '' (s : Set E)) := by
+    rw [← _root_.GlobalTheory.BetaEx.span_image_span (_root_.Formalism.L2.Pj.embF c τ)
+        (_root_.Formalism.L2.Pj.detSet Λ.La),
       ← _root_.GlobalTheory.BetaEx.span_image_span (_root_.Formalism.L2.Pj.embF c τ) (s : Set E)]
     congr 2
     rw [hs]
     rfl
-  have hfg : (Submodule.span (𝓞 c.F) (_root_.Formalism.L2.Pj.embF c τ '' _root_.Formalism.L2.Pj.detSet Λ.La)).FG := by
+  have hfg : (Submodule.span (𝓞 c.F)
+      (_root_.Formalism.L2.Pj.embF c τ '' _root_.Formalism.L2.Pj.detSet Λ.La)).FG := by
     rw [hspan]
     exact Submodule.fg_span (s.finite_toSet.image _)
   let J : FractionalIdeal (nonZeroDivisors (𝓞 c.F)) c.F :=
@@ -194,8 +213,9 @@ theorem _root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt {n b : ℕ} {Λ : _r
   have hdet : ((k : E) ^ n) ∈ _root_.Formalism.L2.Pj.detSet Λ.La := by
     rw [_root_.GlobalTheory.BetaEx.mem_detSet]
     refine ⟨(k : E) • (1 : Matrix (Fin n) (Fin n) E), fun i => ?_, by simp [Matrix.det_smul]⟩
-    have hrow : ((k : E) • (1 : Matrix (Fin n) (Fin n) E)) i =
-        ((k : ℕ) : 𝓞 E) • (1 : Matrix (Fin n) (Fin n) E) i := by
+    have hrow
+        : ((k : E) • (1 : Matrix (Fin n) (Fin n) E)) i
+          = ((k : ℕ) : 𝓞 E) • (1 : Matrix (Fin n) (Fin n) E) i := by
       ext j
       simp [Algebra.smul_def]
     rw [hrow]
@@ -220,25 +240,32 @@ theorem _root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt {n b : ℕ} {Λ : _r
   change (J : Submodule (𝓞 c.F) c.F) * _ = 1
   rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hJ, FractionalIdeal.coe_one]
 
-
 set_option autoImplicit false in
 open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+  {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
   {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} in
 variable (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) in
-theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_ratio {n : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n} (hU : Λ.Unimod)
-    (hT : Λ.TrivAt l.M) {β β' : c.F}
-    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β) (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β') :
-    ∃ ζ : c.F, IsOfFinOrder ζ ∧ β' = ζ * β := by
-  unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta _root_.Formalism.L2.Pj.BetaIs _root_.Formalism.L2.Pj.BetaAbs at h h'
+theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_ratio
+    {n : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n} (hU : Λ.Unimod) (hT : Λ.TrivAt l.M)
+    {β β' : c.F}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β)
+    (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β')
+    : ∃ ζ : c.F, IsOfFinOrder ζ ∧ β' = ζ * β := by
+  unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta
+      _root_.Formalism.L2.Pj.BetaIs _root_.Formalism.L2.Pj.BetaAbs
+    at h h'
   obtain ⟨hβ, hs, hn⟩ := h
   obtain ⟨-, hs', hn'⟩ := h'
-  have hP : IsUnit (∏ τ, _root_.Formalism.L2.Pj.idealAt c Λ.La τ ^ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult Dw τ) := by
-    refine Finset.prod_induction _ IsUnit (fun a b ha hb => ha.mul hb) isUnit_one
-      (fun τ _ => ?_)
-    have h3 := l.three_le
-    exact (_root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt c hT hU (by omega) τ).pow _
+  have hP : IsUnit
+      (∏ τ, _root_.Formalism.L2.Pj.idealAt c Λ.La τ ^ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum.mult Dw τ) :=
+    by
+      refine Finset.prod_induction _ IsUnit (fun a b ha hb => ha.mul hb) isUnit_one (fun τ _ => ?_)
+      have h3 := l.three_le
+      exact (_root_.GlobalTheory.ShortLawsCompare.isUnit_idealAt c hT hU (by omega) τ).pow _
   have heq : (𝓞 c.F ∙ β) = 𝓞 c.F ∙ β' := hP.mul_right_cancel (hs.trans hs'.symm)
   obtain ⟨u, hu⟩ := Submodule.span_singleton_eq_span_singleton.mp heq
   have hβ'eq : β' = ((u : 𝓞 c.F) : c.F) * β := by
@@ -252,8 +279,9 @@ theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_ratio {n : ℕ} {Λ : _root_
     have h1 := hn w.embedding
     have h2 := hn' w.embedding
     have hne : ‖w.embedding β‖ ≠ 0 := by simpa using hβ
-    have hsq : ‖w.embedding ((u : 𝓞 c.F) : c.F)‖ ^ 2 * ‖w.embedding β‖ ^ 2 =
-        1 * ‖w.embedding β‖ ^ 2 := by
+    have hsq
+        : ‖w.embedding ((u : 𝓞 c.F) : c.F)‖ ^ 2 * ‖w.embedding β‖ ^ 2
+          = 1 * ‖w.embedding β‖ ^ 2 := by
       rw [_root_.one_mul, ← _root_.mul_pow, ← norm_mul, ← map_mul, ← hβ'eq, h2, h1]
     have hsq' := mul_right_cancel₀ (pow_ne_zero 2 hne) hsq
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).mp hsq'
@@ -262,17 +290,24 @@ theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_ratio {n : ℕ} {Λ : _root_
   have := congrArg (fun x : (𝓞 c.F)ˣ => ((x : 𝓞 c.F) : c.F)) hum
   simpa using this
 
-
 set_option autoImplicit false in
 open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+  {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
   {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} in
 variable (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) in
-theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_mul {n : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n} {β ζ : c.F}
-    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β) (hζ : IsOfFinOrder ζ) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ (ζ * β) := by
-  unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta _root_.Formalism.L2.Pj.BetaIs _root_.Formalism.L2.Pj.BetaAbs at h ⊢
+theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_mul
+    {n : ℕ} {Λ : _root_.Formalism.L2.Pj.GenLat E n} {β ζ : c.F}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ β)
+    (hζ : IsOfFinOrder ζ)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta Dw c Λ
+      (ζ * β) := by
+  unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockLatticeAdmissibility.IsBeta
+      _root_.Formalism.L2.Pj.BetaIs _root_.Formalism.L2.Pj.BetaAbs
+    at h ⊢
   obtain ⟨hβ, hspan, hnorm⟩ := h
   obtain ⟨k, hk, hζk⟩ := isOfFinOrder_iff_pow_eq_one.mp hζ
   have hζ0 : ζ ≠ 0 := by
@@ -291,8 +326,7 @@ theorem _root_.GlobalTheory.ShortLawsCompare.isBeta_mul {n : ℕ} {Λ : _root_.F
       change ζ⁻¹ * (ζ * β) = β
       rw [← _root_.mul_assoc, inv_mul_cancel₀ hζ0, _root_.one_mul]
   refine ⟨mul_ne_zero hζ0 hβ, by rw [hsp]; exact hspan, fun σ => ?_⟩
-  have hσ : ‖σ ζ‖ = 1 :=
-    Complex.norm_eq_one_of_pow_eq_one (by rw [← map_pow, hζk, map_one]) hk.ne'
+  have hσ : ‖σ ζ‖ = 1 := Complex.norm_eq_one_of_pow_eq_one (by rw [← map_pow, hζk, map_one]) hk.ne'
   rw [map_mul, norm_mul, hσ, _root_.one_mul]
   exact hnorm σ
 
@@ -308,23 +342,30 @@ section Objects
 
 variable (c : Coeff l) {n₁ n₂ : ℕ}
 
-
 omit [IsCMField E] in
-theorem blockLat_eq (Λ₁ : GenLat E n₁) (Λ₂ : GenLat E n₂) : BlockLatticeAdmissibility.blockLat Λ₁ Λ₂ = BlockProductLattices.blockLat Λ₁ Λ₂ := rfl
+theorem blockLat_eq (Λ₁ : GenLat E n₁) (Λ₂ : GenLat E n₂)
+    : BlockLatticeAdmissibility.blockLat Λ₁ Λ₂ = BlockProductLattices.blockLat Λ₁ Λ₂ :=
+  rfl
 
-theorem latAdm_iff {n : ℕ} (bad : ℕ) (Λ : GenLat E n) : BlockLatticeAdmissibility.LatAdm l bad Λ ↔ BlockProductLattices.LatOK bad l.M Λ := Iff.rfl
+theorem latAdm_iff {n : ℕ} (bad : ℕ) (Λ : GenLat E n)
+    : BlockLatticeAdmissibility.LatAdm l bad Λ ↔ BlockProductLattices.LatOK bad l.M Λ :=
+  Iff.rfl
 
 set_option autoImplicit false in
 open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-private theorem blockLat_unimod [IsCMField E] {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁}
-    {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂} (h₁ : Λ₁.Unimod) (h₂ : Λ₂.Unimod) :
-    (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂).Unimod := by
+private theorem blockLat_unimod
+    [IsCMField E]
+    {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂}
+    (h₁ : Λ₁.Unimod) (h₂ : Λ₂.Unimod)
+    : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁
+      Λ₂).Unimod := by
   unfold _root_.Formalism.L2.Pj.GenLat.Unimod at *
   intro v
-  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.mem_blockLat, Fin.sum_univ_add]
+  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.mem_blockLat,
+    Fin.sum_univ_add]
   constructor
   · rintro ⟨hv₁, hv₂⟩ w ⟨hw₁, hw₂⟩
     exact add_mem ((h₁ _).1 hv₁ _ hw₁) ((h₂ _).1 hv₂ _ hw₂)
@@ -342,8 +383,11 @@ open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
 variable {E : Type} [Field E] [NumberField E] in
 variable {n₁ n₂ : ℕ} in
-private theorem blockLat_trivAt {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂} {b : ℕ}
-    (h₁ : Λ₁.TrivAt b) (h₂ : Λ₂.TrivAt b) : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂).TrivAt b := by
+private theorem blockLat_trivAt
+    {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂} {b : ℕ}
+    (h₁ : Λ₁.TrivAt b) (h₂ : Λ₂.TrivAt b)
+    : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂).TrivAt
+      b := by
   unfold _root_.Formalism.L2.Pj.GenLat.TrivAt at *
   obtain ⟨k₁, hk₁, a₁, b₁⟩ := h₁
   obtain ⟨k₂, hk₂, a₂, b₂⟩ := h₂
@@ -362,15 +406,19 @@ private theorem blockLat_trivAt {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {
 set_option autoImplicit false in
 open NumberField MvPolynomial in
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+  {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
   {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} in
 variable (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) {n₁ n₂ : ℕ} in
-theorem _root_.GlobalTheory.ShortLawsCompare.latOK_block {bad : ℕ} {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂}
+theorem _root_.GlobalTheory.ShortLawsCompare.latOK_block
+    {bad : ℕ} {Λ₁ : _root_.Formalism.L2.Pj.GenLat E n₁} {Λ₂ : _root_.Formalism.L2.Pj.GenLat E n₂}
     (h₁ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.LatOK bad l.M Λ₁)
-    (h₂ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.LatOK bad l.M Λ₂) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.LatOK bad l.M (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂) :=
-  ⟨blockLat_unimod h₁.1 h₂.1, blockLat_trivAt h₁.2.1 h₂.2.1,
-    blockLat_trivAt h₁.2.2 h₂.2.2⟩
+    (h₂ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.LatOK bad l.M Λ₂)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.LatOK bad l.M
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.BlockProductLattices.blockLat Λ₁ Λ₂) :=
+  ⟨blockLat_unimod h₁.1 h₂.1, blockLat_trivAt h₁.2.1 h₂.2.1, blockLat_trivAt h₁.2.2 h₂.2.2⟩
 
 end Objects
 

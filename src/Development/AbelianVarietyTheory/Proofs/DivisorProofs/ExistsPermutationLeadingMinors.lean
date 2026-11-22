@@ -9,18 +9,20 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem exists_isUnit_of_isUnit_sum_localRing {R : Type} [CommRing R] [IsLocalRing R]
-    {ι : Type} (s : Finset ι) (f : ι → R) (h : IsUnit (∑ i ∈ s, f i)) :
-    ∃ i ∈ s, IsUnit (f i) := by
+theorem exists_isUnit_of_isUnit_sum_localRing
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {ι : Type} (s : Finset ι) (f : ι → R) (h : IsUnit (∑ i ∈ s, f i))
+    : ∃ i ∈ s, IsUnit (f i) := by
   by_contra hne
   push_neg at hne
   apply (IsLocalRing.mem_maximalIdeal _).mp _ h
   exact Ideal.sum_mem _ fun i hi => (IsLocalRing.mem_maximalIdeal _).mpr (hne i hi)
 
-theorem exists_perm_isUnit_leading_minors_localRing :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R] {m : ℕ} (M : Matrix (Fin m) (Fin m) R),
-      IsUnit M.det → ∃ w : Equiv.Perm (Fin m), ∀ (k : ℕ) (hk : k ≤ m),
-        IsUnit ((M.submatrix id w).submatrix (Fin.castLE hk) (Fin.castLE hk)).det := by
+theorem exists_perm_isUnit_leading_minors_localRing
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R] {m : ℕ} (M : Matrix (Fin m) (Fin m) R),
+      IsUnit M.det
+        → ∃ w : Equiv.Perm (Fin m), ∀ (k : ℕ) (hk : k ≤ m),
+          IsUnit ((M.submatrix id w).submatrix (Fin.castLE hk) (Fin.castLE hk)).det := by
   intro R _ _ m
   induction m with
   | zero =>
@@ -49,14 +51,14 @@ theorem exists_perm_isUnit_leading_minors_localRing :
       · simp only [ha, hb, dite_false] at hab
         have := v.injective (Fin.succAbove_right_injective hab)
         exact Fin.castPred_inj.mp this
-    let w : Equiv.Perm (Fin (n + 1)) :=
-      Equiv.ofBijective f (Finite.injective_iff_bijective.mp hf)
+    let w : Equiv.Perm (Fin (n + 1)) := Equiv.ofBijective f (Finite.injective_iff_bijective.mp hf)
     refine ⟨w, fun k hk => ?_⟩
     rcases Nat.lt_or_ge k (n + 1) with hlt | hge
     · have hk' : k ≤ n := Nat.lt_succ_iff.mp hlt
-      have heq : (M.submatrix id w).submatrix (Fin.castLE hk) (Fin.castLE hk) =
-          ((M.submatrix Fin.castSucc j.succAbove).submatrix id v).submatrix
-            (Fin.castLE hk') (Fin.castLE hk') := by
+      have heq
+          : (M.submatrix id w).submatrix (Fin.castLE hk) (Fin.castLE hk)
+            = ((M.submatrix Fin.castSucc j.succAbove).submatrix id v).submatrix (Fin.castLE hk')
+              (Fin.castLE hk') := by
         ext a b
         have hb : Fin.castLE hk b ≠ Fin.last n := by
           intro h

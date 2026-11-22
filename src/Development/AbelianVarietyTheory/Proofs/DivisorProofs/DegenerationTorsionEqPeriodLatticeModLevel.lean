@@ -8,9 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DotProductMu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.MBLow.Cl Matrix
@@ -25,19 +29,24 @@ theorem cv_add (M Nn : Fin g → ℤ) : cv (M + Nn) = cv M + cv Nn := by funext 
 theorem cv_sub (M Nn : Fin g → ℤ) : cv (M - Nn) = cv M - cv Nn := by funext i; simp [cv]
 theorem cv_nsmul (k : ℕ) (M : Fin g → ℤ) : cv ((k : ℤ) • M) = k • cv M := by funext i; simp [cv]
 
-theorem perV_add (M Nn M' Nn' : Fin g → ℤ) : perV τ (M + M') (Nn + Nn') = perV τ M Nn + perV τ M' Nn' := by
+theorem perV_add (M Nn M' Nn' : Fin g → ℤ)
+    : perV τ (M + M') (Nn + Nn') = perV τ M Nn + perV τ M' Nn' := by
   simp only [perV, cv_add, mulVec_add]; abel
 
-theorem perV_sub (M Nn M' Nn' : Fin g → ℤ) : perV τ (M - M') (Nn - Nn') = perV τ M Nn - perV τ M' Nn' := by
+theorem perV_sub (M Nn M' Nn' : Fin g → ℤ)
+    : perV τ (M - M') (Nn - Nn') = perV τ M Nn - perV τ M' Nn' := by
   simp only [perV, cv_sub, mulVec_sub]; abel
 
-theorem perV_nsmul (k : ℕ) (M Nn : Fin g → ℤ) : perV τ ((k : ℤ) • M) ((k : ℤ) • Nn) = k • perV τ M Nn := by
+theorem perV_nsmul (k : ℕ) (M Nn : Fin g → ℤ)
+    : perV τ ((k : ℤ) • M) ((k : ℤ) • Nn) = k • perV τ M Nn := by
   simp only [perV, cv_nsmul, mulVec_smul, smul_add]
 
-theorem perV_eq_zero (hp : (τ.map Complex.im).PosDef) {M Nn : Fin g → ℤ} (h : perV τ M Nn = 0) : M = 0 ∧ Nn = 0 := by
+theorem perV_eq_zero (hp : (τ.map Complex.im).PosDef) {M Nn : Fin g → ℤ} (h : perV τ M Nn = 0)
+    : M = 0 ∧ Nn = 0 := by
   have hN : Nn = 0 := by
     by_contra hne
-    have hx : (fun i => (Nn i : ℝ)) ≠ 0 := fun e => hne (funext fun i => by simpa using congrFun e i)
+    have hx : (fun i => (Nn i : ℝ)) ≠ 0 := fun e =>
+      hne (funext fun i => by simpa using congrFun e i)
     have h1 := hp.dotProduct_mulVec_pos hx
     have h2 : (τ.map Complex.im) *ᵥ (fun i => (Nn i : ℝ)) = 0 := by
       funext i
@@ -54,8 +63,10 @@ end Per
 
 variable {N : NumD ℂ} {g' r g : ℕ} {bX : Module.Basis (Fin r) ℤ N.X}
 
-theorem eq_zero_of_perV_full (d : CD N g' r bX) (σ : Fin g ≃ Fin g' ⊕ Fin r) {M Nn : Fin g → ℤ} (h0 : tP σ Nn = 0)
-    (h : perV (d.full σ 0) M Nn = 0) : M = 0 ∧ Nn = 0 := by
+theorem eq_zero_of_perV_full
+    (d : CD N g' r bX) (σ : Fin g ≃ Fin g' ⊕ Fin r)
+    {M Nn : Fin g → ℤ} (h0 : tP σ Nn = 0) (h : perV (d.full σ 0) M Nn = 0)
+    : M = 0 ∧ Nn = 0 := by
   have h1 : perV d.τ (zP σ M) (zP σ Nn) = 0 := by
     have := congrArg (zP σ) h
     rw [Exp.leftComponent_periodVector, h0, Exp.cv_zero, mulVec_zero, add_zero] at this
@@ -63,21 +74,27 @@ theorem eq_zero_of_perV_full (d : CD N g' r bX) (σ : Fin g ≃ Fin g' ⊕ Fin r
   obtain ⟨a, b⟩ := perV_eq_zero d.pos h1
   have h2 : tP σ M = 0 := by
     have := congrArg (tP σ) h
-    rw [Exp.secondBlock_periodVector, h0, b, Exp.cv_zero, Exp.cv_zero, mulVec_zero, mulVec_zero, add_zero, add_zero] at this
+    rw [Exp.secondBlock_periodVector, h0, b, Exp.cv_zero, Exp.cv_zero, mulVec_zero, mulVec_zero,
+        add_zero, add_zero]
+      at this
     funext l
     have := congrFun this l
     simpa [cv, tP] using this
   exact ⟨Exp.ext_zP_tP σ a h2, Exp.ext_zP_tP σ b h0⟩
 
-def yv (bX : Module.Basis (Fin r) ℤ N.X) (σ : Fin g ≃ Fin g' ⊕ Fin r) (Nn : Fin g → ℤ) : N.X := ∑ l, tP σ Nn l • bX l
+def yv (bX : Module.Basis (Fin r) ℤ N.X) (σ : Fin g ≃ Fin g' ⊕ Fin r) (Nn : Fin g → ℤ) : N.X :=
+  ∑ l, tP σ Nn l • bX l
 
-theorem yv_add (σ : Fin g ≃ Fin g' ⊕ Fin r) (a b : Fin g → ℤ) : yv bX σ (a + b) = yv bX σ a + yv bX σ b := by
+theorem yv_add (σ : Fin g ≃ Fin g' ⊕ Fin r) (a b : Fin g → ℤ)
+    : yv bX σ (a + b) = yv bX σ a + yv bX σ b := by
   simp [yv, tP, add_smul, Finset.sum_add_distrib]
 
-theorem yv_sub (σ : Fin g ≃ Fin g' ⊕ Fin r) (a b : Fin g → ℤ) : yv bX σ (a - b) = yv bX σ a - yv bX σ b := by
+theorem yv_sub (σ : Fin g ≃ Fin g' ⊕ Fin r) (a b : Fin g → ℤ)
+    : yv bX σ (a - b) = yv bX σ a - yv bX σ b := by
   simp [yv, tP, sub_smul, Finset.sum_sub_distrib]
 
-theorem yv_nsmul (σ : Fin g ≃ Fin g' ⊕ Fin r) (k : ℕ) (a : Fin g → ℤ) : yv bX σ ((k : ℤ) • a) = k • yv bX σ a := by
+theorem yv_nsmul (σ : Fin g ≃ Fin g' ⊕ Fin r) (k : ℕ) (a : Fin g → ℤ)
+    : yv bX σ ((k : ℤ) • a) = k • yv bX σ a := by
   simp [yv, tP, Finset.smul_sum, mul_smul]
 
 theorem yv_of_tP (σ : Fin g ≃ Fin g' ⊕ Fin r) {a : Fin g → ℤ} (h : tP σ a = 0) : yv bX σ a = 0 := by
@@ -99,12 +116,22 @@ end GlobalTheory.MBLow.Cl.Qk
 namespace GlobalTheory.MBLow.Cl
 open Qk
 
-theorem torsion_eq_periods_mod : AllCD fun {N} {g'} {r} {g} {bX} d σ => ∀ k : ℕ, 0 < k → (∀ p, ∃ M Nn, d.Rep σ k M Nn p) ∧ (∀ M Nn, ∃! p, d.Rep σ k M Nn p) ∧ (∀ M Nn M' Nn' p p', d.Rep σ k M Nn p → d.Rep σ k M' Nn' p' → d.Rep σ k (M + M') (Nn + Nn') (p * p')) ∧ ∀ M Nn M' Nn' p p', d.Rep σ k M Nn p → d.Rep σ k M' Nn' p' → (N.QEq p p' ↔ ∃ M₁ N₁, M' = M + (k : ℤ) • M₁ ∧ Nn' = Nn + (k : ℤ) • N₁) := by
+theorem torsion_eq_periods_mod
+    : AllCD fun {N} {g'} {r} {g} {bX} d σ =>
+      ∀ k : ℕ,
+        0 < k
+          → (∀ p, ∃ M Nn, d.Rep σ k M Nn p) ∧ (∀ M Nn, ∃! p, d.Rep σ k M Nn p)
+            ∧ (∀ M Nn M' Nn' p p',
+              d.Rep σ k M Nn p → d.Rep σ k M' Nn' p' → d.Rep σ k (M + M') (Nn + Nn') (p * p'))
+            ∧ ∀ M Nn M' Nn' p p',
+              d.Rep σ k M Nn p → d.Rep σ k M' Nn' p'
+                → (N.QEq p p' ↔ ∃ M₁ N₁, M' = M + (k : ℤ) • M₁ ∧ Nn' = Nn + (k : ℤ) • N₁) := by
   intro N g' r g bX d σ k hk
   obtain ⟨h1, h2, h3, h4, h5⟩ := exp_onto_torusExt N g' r g bX d σ
   choose E hE hU using h1
   have hiff : ∀ v h, d.IsPt σ v h ↔ h = E v := fun v h => ⟨hU v h, fun e => e ▸ hE v⟩
-  have hadd : ∀ v v', E (v + v') = E v * E v' := fun v v' => (hU _ _ (h3 _ _ _ _ (hE v) (hE v'))).symm
+  have hadd : ∀ v v', E (v + v') = E v * E v' := fun v v' =>
+    (hU _ _ (h3 _ _ _ _ (hE v) (hE v'))).symm
   have hzero : E 0 = 1 := by
     have := hadd 0 0
     rw [add_zero] at this
@@ -113,8 +140,11 @@ theorem torsion_eq_periods_mod : AllCD fun {N} {g'} {r} {g} {bX} d σ => ∀ k :
     induction n with
     | zero => rw [zero_nsmul, pow_zero, hzero]
     | succ n ih => rw [succ_nsmul, hadd, ih, pow_succ]
-  have hper : ∀ M Nn, E (perV (d.full σ 0) M Nn) = N.io (yv bX σ Nn) := fun M Nn => (hU _ _ (h5 M Nn)).symm
-  have hker : ∀ v v', E v = E v' → ∃ M Nn, tP σ Nn = 0 ∧ v = v' + perV (d.full σ 0) M Nn := fun v v' h => by
+  have hper : ∀ M Nn, E (perV (d.full σ 0) M Nn) = N.io (yv bX σ Nn) := fun M Nn =>
+    (hU _ _ (h5 M Nn)).symm
+  have hker
+      : ∀ v v',
+        E v = E v' → ∃ M Nn, tP σ Nn = 0 ∧ v = v' + perV (d.full σ 0) M Nn := fun v v' h => by
     have e : E (v - v') * E v' = E v' := by rw [← hadd, sub_add_cancel, h]
     obtain ⟨M, Nn, hy, hl⟩ := (h4 (v - v')).1 ((hiff _ _).2 (mul_eq_right.1 e).symm)
     exact ⟨M, Nn, hy, by rw [← hl, add_sub_cancel]⟩
@@ -123,10 +153,13 @@ theorem torsion_eq_periods_mod : AllCD fun {N} {g'} {r} {g} {bX} d σ => ∀ k :
     rw [← Nat.cast_smul_eq_nsmul ℂ, inv_smul_smul₀ hk0]
   have hc2 : ∀ v : Fin g → ℂ, k • ((k : ℂ)⁻¹ • v) = v := fun v => by
     rw [← Nat.cast_smul_eq_nsmul ℂ, smul_inv_smul₀ hk0]
-  have hrep : ∀ M Nn (p : N.QT k), d.Rep σ k M Nn p ↔
-      p.1.1.toAdd = yv bX σ Nn ∧ p.1.2 = E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn) :=
+  have hrep
+      : ∀ M Nn (p : N.QT k),
+        d.Rep σ k M Nn p
+          ↔ p.1.1.toAdd = yv bX σ Nn ∧ p.1.2 = E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn) :=
     fun M Nn p => and_congr Iff.rfl (hiff _ _)
-  refine ⟨fun p => ?_, fun M Nn => ?_, fun M Nn M' Nn' p p' h h' => ?_, fun M Nn M' Nn' p p' h h' => ?_⟩
+  refine
+    ⟨fun p => ?_, fun M Nn => ?_, fun M Nn M' Nn' p p' h h' => ?_, fun M Nn M' Nn' p p' h h' => ?_⟩
   · obtain ⟨v, hv⟩ := h2 p.1.2
     have hv' := (hiff _ _).1 hv
     obtain ⟨a, ha⟩ := yv_surj (bX := bX) σ p.1.1.toAdd
@@ -137,8 +170,11 @@ theorem torsion_eq_periods_mod : AllCD fun {N} {g'} {r} {g} {bX} d σ => ∀ k :
     refine ⟨0 + M, a + Nn, (hrep _ _ _).2 ⟨?_, ?_⟩⟩
     · rw [yv_add, yv_of_tP σ hy, add_zero, ha]
     · rw [perV_add, ← hl, hc1, hv']
-  · refine ⟨⟨(Multiplicative.ofAdd (yv bX σ Nn), E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn)), ?_⟩,
-      (hrep _ _ _).2 ⟨rfl, rfl⟩, fun p hp => ?_⟩
+  · refine ⟨
+      ⟨(Multiplicative.ofAdd (yv bX σ Nn), E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn)), ?_⟩,
+      (hrep _ _ _).2 ⟨rfl, rfl⟩,
+      fun p hp => ?_
+    ⟩
     · rw [NumD.mem_QT, ← hpow, hc2, hper]
       rfl
     · obtain ⟨a, b⟩ := (hrep _ _ _).1 hp
@@ -155,17 +191,19 @@ theorem torsion_eq_periods_mod : AllCD fun {N} {g'} {r} {g} {bX} d σ => ∀ k :
     constructor
     · rintro ⟨z, c, c'⟩
       obtain ⟨z₀, hz⟩ := yv_surj (bX := bX) σ z
-      have e : E ((k : ℂ)⁻¹ • perV (d.full σ 0) M' Nn') =
-          E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn + perV (d.full σ 0) 0 z₀) := by
+      have e
+          : E ((k : ℂ)⁻¹ • perV (d.full σ 0) M' Nn')
+            = E ((k : ℂ)⁻¹ • perV (d.full σ 0) M Nn + perV (d.full σ 0) 0 z₀) := by
         rw [hadd, hper, hz, ← b, ← b', c']
       obtain ⟨M₀, N₀, hy, hl⟩ := hker _ _ e
-      have key := eq_zero_of_perV_full d σ (M := M' - (M + (k : ℤ) • (0 + M₀)))
-        (Nn := Nn' - (Nn + (k : ℤ) • (z₀ + N₀))) ?_ ?_
+      have key :=
+        eq_zero_of_perV_full d σ (M := M' - (M + (k : ℤ) • (0 + M₀)))
+          (Nn := Nn' - (Nn + (k : ℤ) • (z₀ + N₀))) ?_ ?_
       · exact ⟨0 + M₀, z₀ + N₀, sub_eq_zero.1 key.1, sub_eq_zero.1 key.2⟩
       · apply tP_of_yv (bX := bX)
         rw [yv_sub, yv_add, yv_nsmul, yv_add, yv_of_tP σ hy, add_zero, hz, ← a, ← a', c, sub_self]
-      · rw [perV_sub, perV_add, perV_nsmul, perV_add, ← hc2 (perV (d.full σ 0) M' Nn'), hl, add_assoc, smul_add, hc2,
-          sub_self]
+      · rw [perV_sub, perV_add, perV_nsmul, perV_add, ← hc2 (perV (d.full σ 0) M' Nn'), hl,
+          add_assoc, smul_add, hc2, sub_self]
     · rintro ⟨M₁, N₁, rfl, rfl⟩
       refine ⟨yv bX σ N₁, ?_, ?_⟩
       · rw [a, a', yv_add, yv_nsmul]

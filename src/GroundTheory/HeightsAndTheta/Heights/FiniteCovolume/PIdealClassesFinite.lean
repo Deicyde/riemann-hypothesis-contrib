@@ -13,8 +13,8 @@ section Numbers
 
 variable {E : Type*} [Field E] [NumberField E]
 
-def scaledIdeal (I : AddSubgroup E) (hI : ∀ a : 𝓞 E, ∀ x ∈ I, (a : E) * x ∈ I) (b : E) :
-    Ideal (𝓞 E) where
+def scaledIdeal (I : AddSubgroup E) (hI : ∀ a : 𝓞 E, ∀ x ∈ I, (a : E) * x ∈ I) (b : E)
+    : Ideal (𝓞 E) where
   carrier := {y | b⁻¹ * (y : E) ∈ I}
   add_mem' := by
     intro y z hy hz
@@ -32,14 +32,18 @@ def scaledIdeal (I : AddSubgroup E) (hI : ∀ a : 𝓞 E, ∀ x ∈ I, (a : E) *
     push_cast
     ring
 
-theorem mem_scaledIdeal {I : AddSubgroup E} {hI : ∀ a : 𝓞 E, ∀ x ∈ I, (a : E) * x ∈ I} {b : E}
-    {y : 𝓞 E} : y ∈ scaledIdeal I hI b ↔ b⁻¹ * (y : E) ∈ I := Iff.rfl
+theorem mem_scaledIdeal
+    {I : AddSubgroup E} {hI : ∀ a : 𝓞 E, ∀ x ∈ I, (a : E) * x ∈ I} {b : E} {y : 𝓞 E}
+    : y ∈ scaledIdeal I hI b ↔ b⁻¹ * (y : E) ∈ I :=
+  Iff.rfl
 
 end Numbers
 
-theorem IdealClassesFinite.proof (E) [Field E] [NumberField E] : IdealClassesFinite.Statement E := by
+theorem IdealClassesFinite.proof (E) [Field E] [NumberField E]
+    : IdealClassesFinite.Statement E := by
   classical
-  let rep : ClassGroup (𝓞 E) → nonZeroDivisors (Ideal (𝓞 E)) := fun c => (ClassGroup.mk0_surjective c).choose
+  let rep : ClassGroup (𝓞 E) → nonZeroDivisors (Ideal (𝓞 E)) := fun c =>
+    (ClassGroup.mk0_surjective c).choose
   have hrep : ∀ c, ClassGroup.mk0 (rep c) = c := fun c => (ClassGroup.mk0_surjective c).choose_spec
   let J : ClassGroup (𝓞 E) → AddSubgroup E := fun c =>
     ((rep c : Ideal (𝓞 E)).toAddSubgroup).map (algebraMap (𝓞 E) E).toAddMonoidHom
@@ -92,8 +96,7 @@ theorem IdealClassesFinite.proof (E) [Field E] [NumberField E] : IdealClassesFin
     have hxw : x * w ∈ Ideal.span {y} * (rep c : Ideal (𝓞 E)) :=
       hxy ▸ Ideal.mem_span_singleton_mul.2 ⟨w, hmem z hz w hw, rfl⟩
     obtain ⟨v, hv, hvw⟩ := Ideal.mem_span_singleton_mul.1 hxw
-    have hvw' : (y : E) * v = x * (b * z) := by
-      rw [← hw]; exact_mod_cast hvw
+    have hvw' : (y : E) * v = x * (b * z) := by rw [← hw]; exact_mod_cast hvw
     refine AddSubgroup.mem_map.2 ⟨(v : E), AddSubgroup.mem_map.2 ⟨v, hv, rfl⟩, ?_⟩
     simp only [AddMonoidHom.coe_mulLeft]
     field_simp
@@ -101,8 +104,7 @@ theorem IdealClassesFinite.proof (E) [Field E] [NumberField E] : IdealClassesFin
   · intro hz
     obtain ⟨u, hu, rfl⟩ := AddSubgroup.mem_map.1 hz
     obtain ⟨v, hv, rfl⟩ := AddSubgroup.mem_map.1 hu
-    have hyv : y * v ∈ Ideal.span {x} * 𝔞 :=
-      hxy.symm ▸ Ideal.mem_span_singleton_mul.2 ⟨v, hv, rfl⟩
+    have hyv : y * v ∈ Ideal.span {x} * 𝔞 := hxy.symm ▸ Ideal.mem_span_singleton_mul.2 ⟨v, hv, rfl⟩
     obtain ⟨w, hw, hwv⟩ := Ideal.mem_span_singleton_mul.1 hyv
     have hwv' : (x : E) * w = y * v := by exact_mod_cast hwv
     rw [mem_scaledIdeal] at hw

@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TopologicalSpace Opposite Limits GroundTheory.Arith.SchemeCoh GlobalTheory.SheafPull CrystallineSemistableComparison CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Cech
+open CategoryTheory AlgebraicGeometry TopologicalSpace Opposite Limits GroundTheory.Arith.SchemeCoh
+  GlobalTheory.SheafPull CrystallineSemistableComparison CrystallineSemistableComparison.Om
+  CrystallineSemistableComparison.Om.Cech
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.forms_to_cech_smul :
-    type_of% @GlobalTheory.CompanionTheory.OmBridge.formToCO_smul :=
+theorem _root_.GlobalTheory.T.forms_to_cech_smul
+    : type_of% @GlobalTheory.CompanionTheory.OmBridge.formToCO_smul :=
   @GlobalTheory.CompanionTheory.OmBridge.formToCO_smul

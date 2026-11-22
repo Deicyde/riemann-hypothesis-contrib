@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 private lemma ring_eq {Ω B L : Type} [Field Ω] [IsAlgClosed Ω] [CommRing B] [Algebra Ω B] [Module.Finite Ω B] [Field L]
     (f f' : B →+* L) (h : f.comp (algebraMap Ω B) = f'.comp (algebraMap Ω B))
@@ -36,8 +37,7 @@ private lemma pt_spec {B L : Type} [CommRing B] [Field L] (f : CommRingCat.of B 
   change f.hom b ∈ (IsLocalRing.closedPoint L).asIdeal ↔ _
   simp [RingHom.mem_ker, IsLocalRing.closedPoint]
 
-theorem UpperTheory.Gal.TranscendenceTraces.ptOne_of :
-    Chart → PtOne := by
+theorem UpperTheory.Gal.TranscendenceTraces.ptOne_of : Chart → PtOne := by
   intro hC V Ω _ _ r _ L _ a z z' hz hz' hp
   obtain ⟨B, _, _, v, hfin, hpb⟩ := hC r Ω (𝟙 _)
   haveI : IsIso v := hpb.isIso_fst_of_isIso
@@ -54,10 +54,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.ptOne_of :
   have e3 : CommRingCat.ofHom (algebraMap Ω B) ≫ f = CommRingCat.ofHom (algebraMap Ω B) ≫ f' := by
     apply Spec.map_injective
     rw [Spec.map_comp, Spec.map_comp, e1, e2]
-  have e4 : pt (Spec.map f) = pt (Spec.map f') := by
-    rw [hf, hf', pt_comp, pt_comp, hp]
-  have e5 : RingHom.ker f.hom = RingHom.ker f'.hom := by
-    rw [← pt_spec f, ← pt_spec f', e4]
+  have e4 : pt (Spec.map f) = pt (Spec.map f') := by rw [hf, hf', pt_comp, pt_comp, hp]
+  have e5 : RingHom.ker f.hom = RingHom.ker f'.hom := by rw [← pt_spec f, ← pt_spec f', e4]
   have e6 : f.hom = f'.hom := ring_eq f.hom f'.hom (congrArg CommRingCat.Hom.hom e3) e5
   have e7 : f = f' := CommRingCat.hom_ext e6
   have e8 : z ≫ inv v = z' ≫ inv v := by rw [← hf, ← hf', e7]

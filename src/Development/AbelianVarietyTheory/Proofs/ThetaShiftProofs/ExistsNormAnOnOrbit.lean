@@ -11,9 +11,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
-open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
+open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory
+  GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
 open scoped LaurentSeries
 
 noncomputable section
@@ -25,13 +29,19 @@ section Model
 variable {O : Type} [CommRing O] [StarRing O] (A : AnArc O)
 
 def normT (w : O) : A.X →+ A.X →+ ℂ :=
-  AddMonoidHom.mk' (fun y => AddMonoidHom.mk'
-    (fun y' => -(A.H (A.ct y) (A.ct y') / (2 * Complex.I)) + ((A.H (A.F w (A.ct y)) (A.ct y')).im : ℂ))
-    (fun _ _ => by simp only [map_add (f := _), A.H_add_right, Complex.add_im]; push_cast; ring))
+  AddMonoidHom.mk'
+    (fun y =>
+      AddMonoidHom.mk'
+        (fun y' =>
+          -(A.H (A.ct y) (A.ct y') / (2 * Complex.I)) + ((A.H (A.F w (A.ct y)) (A.ct y')).im : ℂ))
+        (fun _ _ => by
+          simp only [map_add (f := _), A.H_add_right, Complex.add_im]; push_cast; ring))
     (fun _ _ => by
       ext
-      simp only [map_add (f := _), A.H_add_left, Complex.add_im, AddMonoidHom.mk'_apply, AddMonoidHom.add_apply]
-      push_cast; ring)
+      simp only [map_add (f := _), A.H_add_left, Complex.add_im, AddMonoidHom.mk'_apply,
+        AddMonoidHom.add_apply]
+      push_cast
+      ring)
 
 lemma normT_apply (w : O) (y y' : A.X) : normT A w y y' =
     -(A.H (A.ct y) (A.ct y') / (2 * Complex.I)) + ((A.H (A.F w (A.ct y)) (A.ct y')).im : ℂ) := rfl
@@ -55,20 +65,22 @@ lemma normT_symm {w : O} (hw : w + star w = 1) (x y : A.X) : normT A w x y = nor
   field_simp
   linear_combination -h3
 
-def normArc {w : O} (hw : w + star w = 1) : AnArc O :=
-  { A with
-    T := normT A w
-    T_symm := normT_symm A hw
-    T_adj := normT_adj A w
-    psi := fun x => Units.mk0 (eTwoPi (normT A w x (w • x))) (AnArc.e_ne_zero _)
-    psi_neg := fun x => Units.ext (by simp)
-    psi_add := fun x y => by
-      have h : normT A w y (w • x) + normT A w x (w • y) = normT A w x y := by
-        rw [normT_symm A hw y, normT_adj, ← map_add (f := _), ← add_smul, add_comm, hw, one_smul]
-      simp only [Units.val_mk0, ← AnArc.e_add]
-      congr 1
-      simp only [smul_add, map_add (f := _), AddMonoidHom.add_apply]
-      rw [← h]; ring }
+def normArc {w : O} (hw : w + star w = 1) : AnArc O := {
+  A with
+  T := normT A w
+  T_symm := normT_symm A hw
+  T_adj := normT_adj A w
+  psi := fun x => Units.mk0 (eTwoPi (normT A w x (w • x))) (AnArc.e_ne_zero _)
+  psi_neg := fun x => Units.ext (by simp)
+  psi_add := fun x y => by
+    have h : normT A w y (w • x) + normT A w x (w • y) = normT A w x y := by
+      rw [normT_symm A hw y, normT_adj, ← map_add (f := _), ← add_smul, add_comm, hw, one_smul]
+    simp only [Units.val_mk0, ← AnArc.e_add]
+    congr 1
+    simp only [smul_add, map_add (f := _), AddMonoidHom.add_apply]
+    rw [← h]
+    ring
+}
 
 lemma normT_norm (w : O) (n : ℕ) (hn : ∀ y, n • A.ct y ∈ A.abelian₂) (y y' : A.X) :
     eTwoPi (normT A w (n • y) (n • y')) * Complex.exp (Real.pi * A.H (n • A.ct y) (n • A.ct y')) = 1 := by
@@ -79,7 +91,8 @@ lemma normT_norm (w : O) (n : ℕ) (hn : ∀ y, n • A.ct y ∈ A.abelian₂) (
     _root_.mul_one, ← Complex.exp_add]
   simp
 
-def nnB (B : LinearMap.BilinForm ℤ A.X) (hB : ∀ (a : O) y x, B (a • y) x = B y (star a • x)) : A.La →ₗ[O] A.La where
+def nnB (B : LinearMap.BilinForm ℤ A.X) (hB : ∀ (a : O) y x, B (a • y) x = B y (star a • x))
+    : A.La →ₗ[O] A.La where
   toFun v := AnArc.La.mk 0 (B v.y).toAddMonoidHom 0
   map_add' v v' := by ext <;> simp
   map_smul' a v := by ext <;> simp [hB]
@@ -156,19 +169,25 @@ lemma flow_mem_of_im {ξ : Fin r → E} (hξ : X.IsIso ξ) {x : Frame X.Ψ r} (h
   have := div_nonneg (hs τ) ht.le
   linarith
 
-variable {La Y : Type} [AddCommGroup La] [Module (𝓞 E) La] [AddCommGroup Y] [Module (𝓞 E) Y]
+variable
+  {La Y : Type} [AddCommGroup La] [Module (𝓞 E) La] [AddCommGroup Y] [Module (𝓞 E) Y]
   (φ : La ≃ₗ[𝓞 E] X.Λ) (EF : LinearMap.BilinForm ℤ La)
   (iso : ∀ a b, ((EF a b : ℤ) : ℚ) = Algebra.trace ℚ E (-X.ξ0 * herm X.Gm (φ a : Fin r → E) (φ b)))
   (y : La →ₗ[𝓞 E] Y)
 
-
 include iso in
-theorem rank_one_form [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1)
-    (hy : Function.Surjective y) (be : LinearMap.BilinForm ℤ Y) (hsym : ∀ a b, be a b = be b a)
-    (nn : La →ₗ[𝓞 E] La) (hnn : ∀ v v', -EF (nn v) v' = be (y v) (y v'))
-    (ξ : Module.Dual ℤ Y) (hξ : ξ ≠ 0) (t : La) (ht : ∀ v, -EF t v = ξ (y v)) :
-    ∃ sE : E, cc sE = sE ∧ ∀ v, (φ (nn v) : Fin r → E) =
-        (-(sE * X.κ0 * herm X.Gm (φ v : Fin r → E) (φ t))) • (φ t : Fin r → E) := by
+theorem rank_one_form
+    [Module.Finite ℤ Y]
+    (hY : Module.finrank (𝓞 E) Y = 1) (hy : Function.Surjective y)
+    (be : LinearMap.BilinForm ℤ Y) (hsym : ∀ a b, be a b = be b a)
+    (nn : La →ₗ[𝓞 E] La) (hnn : ∀ v v', - EF (nn v) v' = be (y v) (y v'))
+    (ξ : Module.Dual ℤ Y) (hξ : ξ ≠ 0)
+    (t : La) (ht : ∀ v, - EF t v = ξ (y v))
+    : ∃ sE : E,
+      cc sE = sE
+        ∧ ∀ v,
+          (φ (nn v) : Fin r → E)
+            = (-(sE * X.κ0 * herm X.Gm (φ v : Fin r → E) (φ t))) • (φ t : Fin r → E) := by
   obtain ⟨p1, p2, p3, -⟩ := pairE_properties E Y ξ
   have hp := pairE_eq X φ EF iso y t ξ ht
   have hpn : ∀ v v', pairE (be (y v)) (y v') = -X.ξ0 * herm X.Gm (φ v' : Fin r → E) (φ (nn v)) :=
@@ -190,20 +209,28 @@ theorem rank_one_form [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1)
   set ξ' : Fin r → E := (φ t).1 with hξ'
   have hh₀ : herm X.Gm (φ v₀ : Fin r → E) ξ' ≠ 0 := fun h => hp₀ (by rw [hp, h, mul_zero])
   have hh₀' : herm X.Gm ξ' (φ v₀ : Fin r → E) ≠ 0 := by rw [← hcj]; simpa using hh₀
-  have hskew : ∀ v v', herm X.Gm (φ (nn v) : Fin r → E) (φ v') = -herm X.Gm (φ v : Fin r → E) (φ (nn v')) := by
+  have hskew
+      : ∀ v v',
+        herm X.Gm (φ (nn v) : Fin r → E) (φ v') = - herm X.Gm (φ v : Fin r → E) (φ (nn v')) := by
     intro v v'
-    have : X.ξ0 * (herm X.Gm (φ (nn v) : Fin r → E) (φ v') + herm X.Gm (φ v : Fin r → E) (φ (nn v'))) = 0 := by
+    have : X.ξ0
+          * (herm X.Gm (φ (nn v) : Fin r → E) (φ v') + herm X.Gm (φ v : Fin r → E) (φ (nn v')))
+        = 0 := by
       refine eq_zero_of_trace_mul _ fun β => ?_
       have e1 : ((EF (nn (β • v)) v' : ℤ) : ℚ) = EF (nn v') (β • v) := by
         have := (hnn (β • v) v').trans ((hsym _ _).trans (hnn v' (β • v)).symm)
         exact_mod_cast neg_injective this
-      rw [iso, iso, ← trace_cc (-X.ξ0 * herm X.Gm (φ (nn v') : Fin r → E) _), FD.cc_mul, cc_neg, hc0, hcj,
-        map_smul nn, hsm, hsm, herm_smul_left, herm_smul_left, ← sub_eq_zero, ← map_sub] at e1
+      rw [iso, iso, ← trace_cc (-X.ξ0 * herm X.Gm (φ (nn v') : Fin r → E) _), FD.cc_mul, cc_neg,
+          hc0, hcj, map_smul nn, hsm, hsm, herm_smul_left, herm_smul_left, ← sub_eq_zero, ← map_sub]
+        at e1
       rw [← neg_eq_zero, ← map_neg, ← e1]
-      congr 1; ring
+      congr 1
+      ring
     exact eq_neg_of_add_eq_zero_left ((mul_eq_zero.1 this).resolve_left hξ0)
-  have hmul : ∀ v, (φ (nn v) : Fin r → E) =
-      (herm X.Gm (φ (nn v) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) • ξ' := by
+  have hmul
+      : ∀ v,
+        (φ (nn v) : Fin r → E)
+          = (herm X.Gm (φ (nn v) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) • ξ' := by
     intro v
     rw [← sub_eq_zero]
     refine eq_zero_of_herm_lattice X _ fun w hw => ?_
@@ -216,29 +243,34 @@ theorem rank_one_form [Module.Finite ℤ Y] (hY : Module.finrank (𝓞 E) Y = 1)
     field_simp
     apply mul_left_cancel₀ (mul_ne_zero hξ0 hξ0)
     linear_combination e'
-  obtain ⟨α, hα⟩ : ∃ α : E, ∀ v, (φ (nn v) : Fin r → E) = (α * herm X.Gm (φ v : Fin r → E) ξ') • ξ' := by
-    refine ⟨-cc (herm X.Gm (φ (nn v₀) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) / herm X.Gm ξ' (φ v₀),
-      fun v => ?_⟩
+  obtain ⟨α, hα⟩
+      : ∃ α : E, ∀ v, (φ (nn v) : Fin r → E) = (α * herm X.Gm (φ v : Fin r → E) ξ') • ξ' := by
+    refine ⟨
+      - cc (herm X.Gm (φ (nn v₀) : Fin r → E) (φ v₀) / herm X.Gm ξ' (φ v₀)) / herm X.Gm ξ' (φ v₀),
+      fun v => ?_
+    ⟩
     rw [hmul v, hskew v v₀]
     conv_lhs => rw [hmul v₀, herm_smul_right]
-    congr 1; ring
+    congr 1
+    ring
   have hαc : cc α = -α := by
     have e := hskew v₀ v₀
     rw [hα, herm_smul_left, herm_smul_right, FD.cc_mul, hcj] at e
     apply mul_left_cancel₀ (mul_ne_zero hh₀ hh₀')
     linear_combination e
-  have hκ0 : X.κ0 ≠ 0 := by
-    rcases X.κ0_xi with h | h <;> rw [h] <;> simp [hξ0]
+  have hκ0 : X.κ0 ≠ 0 := by rcases X.κ0_xi with h | h <;> rw [h] <;> simp [hξ0]
   refine ⟨-α / X.κ0, ?_, fun v => ?_⟩
   · rw [div_eq_mul_inv, FD.cc_mul, cc_neg, hαc, cc_inv, X.cc_kappa0]
     field_simp
   · rw [hα v]
-    congr 1; field_simp
+    congr 1
+    field_simp
 
 end Lattice
 
-variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  {σ : c.F →+* ℂ} {r : ℕ} {U : Unf Xo c σ r} (Uw : UnfWit U)
+variable
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ} {U : Unf Xo c σ r} (Uw : UnfWit U)
 
 lemma flow_coord (hσ : GoodEmb c σ) (hU : IsUnf U) (k : U.Comp) (ξ' : Fin r → E) (hξ' : herm (U.X k).Gm ξ' ξ' = 0)
     (x : (U.X k).dom) :
@@ -355,20 +387,50 @@ lemma shift_periods [Algebra (FractionRing ℂ) ℂ] (hσ : GoodEmb c σ) (hU : 
       add_zero]
     simp only [AnArc.Pw_snd]
 
-theorem exists_normAn_onOrbit : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [Algebra (FractionRing ℂ) ℂ] [IsScalarTower ℂ (FractionRing ℂ) ℂ] (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r) (Uw : UnfWit U) (k : U.Comp) (ξ' : Fin r → E) (x : Frame (U.X k).Ψ r) (n' : ℕ), GoodEmb c σ → IsUnf U → (U.X k).IsIso ξ' → x ∈ (U.X k).dom → 0 < n' → letI := H.starRing; ∀ (A : AnArc (𝓞 E)) (gam : (Uw.F.Di (Uw.ik k)).La ≃ₗ[𝓞 E] A.La) (ξ : Module.Dual ℤ A.X), OnOrbit Uw k ξ' x A gam ξ → ξ ≠ 0 → Module.finrank (𝓞 E) A.X = 1 → PrimAn H A → (∀ y, n' • A.ct y ∈ A.abelian₂) → ∃ (A' : AnArc (𝓞 E)) (gam' : (Uw.F.Di (Uw.ik k)).La ≃ₗ[𝓞 E] A'.La) (ξ₁ : Module.Dual ℤ A'.X) (eX : A'.X ≃ₗ[𝓞 E] A.X), OnOrbit Uw k ξ' x A' gam' ξ₁ ∧ PrimAn H A' ∧ NormAn A' n' ∧ (∀ y, ξ₁ y = ξ (eX y)) ∧ (∀ y y', A'.be y y' = A.be (eX y) (eX y')) ∧ ∀ DB : Datum H, (∃ tyB eB, AbDat H A DB tyB eB) → ∃ tyB eB, AbDat H A' DB tyB eB := by
+theorem exists_normAn_onOrbit
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) [Algebra (FractionRing ℂ) ℂ]
+        [IsScalarTower ℂ (FractionRing ℂ) ℂ] (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r)
+        (Uw : UnfWit U) (k : U.Comp) (ξ' : Fin r → E) (x : Frame (U.X k).Ψ r) (n' : ℕ),
+      GoodEmb c σ → IsUnf U → (U.X k).IsIso ξ' → x ∈ (U.X k).dom → 0 < n'
+        → letI := H.starRing
+          ∀ (A : AnArc (𝓞 E)) (gam : (Uw.F.Di (Uw.ik k)).La ≃ₗ[𝓞 E] A.La) (ξ : Module.Dual ℤ A.X),
+            OnOrbit Uw k ξ' x A gam ξ → ξ ≠ 0 → Module.finrank (𝓞 E) A.X = 1 → PrimAn H A
+              → (∀ y, n' • A.ct y ∈ A.abelian₂)
+              → ∃ (A' : AnArc (𝓞 E)) (gam' : (Uw.F.Di (Uw.ik k)).La ≃ₗ[𝓞 E] A'.La)
+                  (ξ₁ : Module.Dual ℤ A'.X) (eX : A'.X ≃ₗ[𝓞 E] A.X),
+                OnOrbit Uw k ξ' x A' gam' ξ₁ ∧ PrimAn H A' ∧ NormAn A' n' ∧ (∀ y, ξ₁ y = ξ (eX y))
+                  ∧ (∀ y y', A'.be y y' = A.be (eX y) (eX y'))
+                  ∧ ∀ DB : Datum H,
+                    (∃ tyB eB, AbDat H A DB tyB eB) → ∃ tyB eB, AbDat H A' DB tyB eB := by
   intro E _ _ _ H Dw l Xo c _ _ σ r U Uw k ξ' x n' hσ hU hiso _ _
   letI := H.starRing
   intro A gam ξ hO hξ hrk hP hn
-  have hw : H.w0 + star H.w0 = 1 := GlobalTheory.Ex.Arch.AbVal.cmField_host_element_add_conj_eq_one H
-  obtain ⟨T₀, hT⟩ := shift_periods Uw hσ hU k ξ' hiso x A gam ξ hO hξ hrk (normT A H.w0 - A.T)
-    (fun y y' => by simp only [AddMonoidHom.sub_apply]; rw [normT_symm A hw, A.T_symm])
-    (fun a y y' => by simp only [AddMonoidHom.sub_apply]; rw [normT_adj, A.T_adj])
-  refine ⟨normArc A hw, gam, ξ, LinearEquiv.refl _ _, ⟨hO.1, hO.2.1, T₀, fun w hw' => ?_⟩, ⟨hP.1, fun _ => rfl⟩,
-    ⟨hn, normT_norm A H.w0 n' hn⟩, fun _ => rfl, fun _ _ => rfl, fun DB h => h⟩
+  have hw : H.w0 + star H.w0 = 1 :=
+    GlobalTheory.Ex.Arch.AbVal.cmField_host_element_add_conj_eq_one H
+  obtain ⟨T₀, hT⟩ :=
+    shift_periods Uw hσ hU k ξ' hiso x A gam ξ hO hξ hrk (normT A H.w0 - A.T)
+      (fun y y' => by simp only [AddMonoidHom.sub_apply]; rw [normT_symm A hw, A.T_symm])
+      (fun a y y' => by simp only [AddMonoidHom.sub_apply]; rw [normT_adj, A.T_adj])
+  refine ⟨
+    normArc A hw,
+    gam,
+    ξ,
+    LinearEquiv.refl _ _,
+    ⟨hO.1, hO.2.1, T₀, fun w hw' => ?_⟩,
+    ⟨hP.1, fun _ => rfl⟩,
+    ⟨hn, normT_norm A H.w0 n' hn⟩,
+    fun _ => rfl,
+    fun _ _ => rfl,
+    fun DB h => h
+  ⟩
   obtain ⟨s, hs, h, hh⟩ := hT w hw'
   refine ⟨s, hs, h, fun v => (hh v).trans (Prod.ext (AddMonoidHom.ext fun z => ?_) (add_zero _))⟩
-  change (A.Pw w (gam v)).1 z + (normT A H.w0 (gam v).y z - A.T (gam v).y z) =
-    normT A H.w0 (gam v).y z + (gam v).n z - A.H (A.ct z) (gam v).l / (2 * Complex.I) + w * A.be (gam v).y z
-  rw [AnArc.Pw_fst_apply]; ring
+  change (A.Pw w (gam v)).1 z + (normT A H.w0 (gam v).y z - A.T (gam v).y z)
+    = normT A H.w0 (gam v).y z + (gam v).n z - A.H (A.ct z) (gam v).l / (2 * Complex.I)
+      + w * A.be (gam v).y z
+  rw [AnArc.Pw_fst_apply]
+  ring
 
 end GlobalTheory.ArcShift

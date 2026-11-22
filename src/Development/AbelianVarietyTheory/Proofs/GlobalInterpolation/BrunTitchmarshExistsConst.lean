@@ -11,7 +11,8 @@ open scoped Classical
 
 namespace GlobalTheory.Lin
 
-theorem exists_dvd_mul_add_of_prime (l q r : ℕ) (hl : l.Prime) (hq : ¬ l ∣ q) : ∃ c : ℕ, l ∣ q * c + r := by
+theorem exists_dvd_mul_add_of_prime (l q r : ℕ) (hl : l.Prime) (hq : ¬ l ∣ q)
+    : ∃ c : ℕ, l ∣ q * c + r := by
   haveI := Fact.mk hl
   have hq' : (q : ZMod l) ≠ 0 := fun h => hq ((ZMod.natCast_eq_zero_iff q l).1 h)
   refine ⟨(-(r : ZMod l) * (q : ZMod l)⁻¹).val, (ZMod.natCast_eq_zero_iff _ l).1 ?_⟩
@@ -20,9 +21,10 @@ theorem exists_dvd_mul_add_of_prime (l q r : ℕ) (hl : l.Prime) (hq : ¬ l ∣ 
   field_simp
   ring
 
-theorem card_large_primes_class_le (q a Q M N : ℕ) (P : Finset ℕ) (hq : 1 ≤ q) (hQ : 1 ≤ Q)
-    (hP : ∀ p ∈ P, p.Prime ∧ p ≡ a [MOD q] ∧ Q < p ∧ q * M ≤ p ∧ p < q * (M + N)) :
-    (P.card : ℝ) * ((q.totient : ℝ) / q * Real.log Q) ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by
+theorem card_large_primes_class_le
+    (q a Q M N : ℕ) (P : Finset ℕ) (hq : 1 ≤ q) (hQ : 1 ≤ Q)
+    (hP : ∀ p ∈ P, p.Prime ∧ p ≡ a [MOD q] ∧ Q < p ∧ q * M ≤ p ∧ p < q * (M + N))
+    : (P.card : ℝ) * ((q.totient : ℝ) / q * Real.log Q) ≤ (Q : ℝ) ^ 2 + 2 * Real.pi * N := by
   have hdec : ∀ p ∈ P, p = q * (p / q) + a % q := fun p hp => by
     have h : p % q = a % q := (hP p hp).2.1
     rw [← h, Nat.div_add_mod]
@@ -30,7 +32,9 @@ theorem card_large_primes_class_le (q a Q M N : ℕ) (P : Finset ℕ) (hq : 1 �
     intro p hp p' hp' h
     have h' : p / q = p' / q := by simpa using h
     rw [hdec p hp, hdec p' hp', h']
-  have key := GlobalTheory.T.arithmeticLargeSieve_one_residue_class_per_prime M N Q q (P.image fun p => p / q + 1) hQ hq ?_ ?_
+  have key :=
+    GlobalTheory.T.arithmeticLargeSieve_one_residue_class_per_prime M N Q q
+      (P.image fun p => p / q + 1) hQ hq ?_ ?_
   · rwa [Finset.card_image_of_injOn hinj] at key
   · intro n hn
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hn
@@ -50,7 +54,13 @@ theorem card_large_primes_class_le (q a Q M N : ℕ) (P : Finset ℕ) (hq : 1 �
     have := (hP p hp).2.2.1
     omega
 
-theorem brun_titchmarsh_const : ∃ C : ℝ, 0 < C ∧ ∀ (q a : ℕ) (x y : ℝ), 1 ≤ q → Nat.Coprime a q → 0 ≤ x → 2 * (q : ℝ) ≤ y → (((primesIoc x (x + y)).filter (fun p => p ≡ a [MOD q])).card : ℝ) ≤ C * y / (q.totient * Real.log (y / q)) := by
+theorem brun_titchmarsh_const
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (q a : ℕ) (x y : ℝ),
+          1 ≤ q → Nat.Coprime a q → 0 ≤ x → 2 * (q : ℝ) ≤ y
+            → (((primesIoc x (x + y)).filter (fun p => p ≡ a [MOD q])).card : ℝ)
+              ≤ C * y / (q.totient * Real.log (y / q)) := by
   refine ⟨48, by norm_num, fun q a x y hq _ hx hy => ?_⟩
   have hq0 : (0 : ℝ) < q := by exact_mod_cast hq
   obtain ⟨z, hz⟩ : ∃ z : ℝ, z = y / q := ⟨_, rfl⟩
@@ -85,27 +95,30 @@ theorem brun_titchmarsh_const : ∃ C : ℝ, 0 < C ∧ ∀ (q a : ℕ) (x y : �
   have hφ0 : (0 : ℝ) < q.totient := by exact_mod_cast Nat.totient_pos.2 hq
   have hφq : (q.totient : ℝ) ≤ q := by exact_mod_cast Nat.totient_le q
   set P := (primesIoc x (x + y)).filter (fun p => p ≡ a [MOD q]) with hP
-  have hbig := card_large_primes_class_le q a Q (⌊x⌋₊ / q) (⌊z⌋₊ + 2) (P.filter fun p => Q < p) hq (by omega) (by
-    intro p hp
-    simp only [hP, primesIoc, Finset.mem_filter, Finset.mem_Ioc] at hp
-    obtain ⟨⟨⟨⟨h1, h2⟩, h3⟩, h4⟩, h5⟩ := hp
-    refine ⟨h3, h4, h5, (Nat.mul_div_le _ _).trans h1.le, ?_⟩
-    have h6 : (p : ℝ) ≤ x + y := (Nat.le_floor_iff (by nlinarith)).1 h2
-    have h7 : x < ⌊x⌋₊ + 1 := Nat.lt_floor_add_one x
-    have h8 : ⌊x⌋₊ + 1 ≤ q * (⌊x⌋₊ / q + 1) := Nat.lt_mul_div_succ _ hq
-    have h9 : (⌊x⌋₊ : ℝ) + 1 ≤ q * (((⌊x⌋₊ / q : ℕ) : ℝ) + 1) := by exact_mod_cast h8
-    have h10 : (p : ℝ) < q * (((⌊x⌋₊ / q : ℕ) : ℝ) + (⌊z⌋₊ + 2)) := by nlinarith
-    exact_mod_cast h10)
+  have hbig :=
+    card_large_primes_class_le q a Q (⌊x⌋₊ / q) (⌊z⌋₊ + 2) (P.filter fun p => Q < p) hq (by omega)
+      (by
+        intro p hp
+        simp only [hP, primesIoc, Finset.mem_filter, Finset.mem_Ioc] at hp
+        obtain ⟨⟨⟨⟨h1, h2⟩, h3⟩, h4⟩, h5⟩ := hp
+        refine ⟨h3, h4, h5, (Nat.mul_div_le _ _).trans h1.le, ?_⟩
+        have h6 : (p : ℝ) ≤ x + y := (Nat.le_floor_iff (by nlinarith)).1 h2
+        have h7 : x < ⌊x⌋₊ + 1 := Nat.lt_floor_add_one x
+        have h8 : ⌊x⌋₊ + 1 ≤ q * (⌊x⌋₊ / q + 1) := Nat.lt_mul_div_succ _ hq
+        have h9 : (⌊x⌋₊ : ℝ) + 1 ≤ q * (((⌊x⌋₊ / q : ℕ) : ℝ) + 1) := by exact_mod_cast h8
+        have h10 : (p : ℝ) < q * (((⌊x⌋₊ / q : ℕ) : ℝ) + (⌊z⌋₊ + 2)) := by nlinarith
+        exact_mod_cast h10)
   have hsmall : (P.filter fun p => ¬ Q < p).card ≤ Q := by
-    calc _ ≤ (Finset.Icc 1 Q).card := Finset.card_le_card fun p hp => by
-            simp only [hP, primesIoc, Finset.mem_filter, Finset.mem_Ioc] at hp
-            exact Finset.mem_Icc.2 ⟨hp.1.1.2.one_le, by omega⟩
+    calc
+      _ ≤ (Finset.Icc 1 Q).card :=
+        Finset.card_le_card fun p hp => by
+          simp only [hP, primesIoc, Finset.mem_filter, Finset.mem_Ioc] at hp
+          exact Finset.mem_Icc.2 ⟨hp.1.1.2.one_le, by omega⟩
       _ = Q := by simp
   have hsum := Finset.card_filter_add_card_filter_not (s := P) (fun p => Q < p)
   obtain ⟨B, hB⟩ : ∃ B : ℝ, B = ((P.filter fun p => Q < p).card : ℝ) := ⟨_, rfl⟩
   have hB0 : 0 ≤ B := hB ▸ Nat.cast_nonneg _
-  have hcard : (P.card : ℝ) ≤ B + Q := by
-    rw [hB]; exact_mod_cast (by omega)
+  have hcard : (P.card : ℝ) ≤ B + Q := by rw [hB]; exact_mod_cast (by omega)
   rw [← hB] at hbig
   push_cast at hbig
   have hpi := Real.pi_lt_four
@@ -114,7 +127,8 @@ theorem brun_titchmarsh_const : ∃ C : ℝ, 0 < C ∧ ∀ (q a : ℕ) (x y : �
   have h2 : B * (q.totient * Real.log Q) ≤ 20 * y := by
     have := mul_le_mul_of_nonneg_left h1 hq0.le
     rw [hyz]
-    calc _ = q * (B * ((q.totient : ℝ) / q * Real.log Q)) := by field_simp
+    calc
+      _ = q * (B * ((q.totient : ℝ) / q * Real.log Q)) := by field_simp
       _ ≤ _ := by linarith
   have h3 : B * (q.totient * Real.log z) ≤ 40 * y := by
     have := mul_le_mul_of_nonneg_left hlog (mul_nonneg hB0 hφ0.le)
@@ -123,7 +137,8 @@ theorem brun_titchmarsh_const : ∃ C : ℝ, 0 < C ∧ ∀ (q a : ℕ) (x y : �
   have h5 : (Q : ℝ) * (q.totient * Real.log z) ≤ 8 * y := by
     have : (q.totient : ℝ) * (Q * Real.log z) ≤ q * (8 * z) :=
       mul_le_mul hφq h4 (by positivity) hq0.le
-    rw [hyz]; nlinarith
+    rw [hyz]
+    nlinarith
   rw [le_div_iff₀ (by positivity)]
   have := mul_le_mul_of_nonneg_right hcard (by positivity : (0 : ℝ) ≤ q.totient * Real.log z)
   nlinarith

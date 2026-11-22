@@ -6,11 +6,13 @@ public import GroundTheory.GlobalFields.CyclotomicCharacters.PadicUnitsLog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
-theorem UpperTheory.V.Base.princZl :
-    ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup ℤ_[l]ˣ), IsClosed (H : Set ℤ_[l]ˣ) → H ≤ KStar.TotallyRealRoots.princ l (qExp l) → H ≠ ⊥ →
-      Nonempty (H ≃ₜ* Multiplicative ℤ_[l]) ∧ ∀ u ∈ H, IsOfFinOrder u → u = 1 := by
+theorem UpperTheory.V.Base.princZl
+    : ∀ (l : ℕ) [Fact l.Prime] (H : Subgroup ℤ_[l]ˣ),
+      IsClosed (H : Set ℤ_[l]ˣ) → H ≤ KStar.TotallyRealRoots.princ l (qExp l) → H ≠ ⊥
+        → Nonempty (H ≃ₜ* Multiplicative ℤ_[l]) ∧ ∀ u ∈ H, IsOfFinOrder u → u = 1 := by
   intro l _ H hHc hHp hH1
   have tors : ∀ u ∈ H, IsOfFinOrder u → u = 1 := by
     intro u hu hfin
@@ -75,20 +77,21 @@ theorem UpperTheory.V.Base.princZl :
     exact Subtype.ext (mul_inv_eq_one.1 this)
   haveI : CompactSpace H := isCompact_iff_compactSpace.1 hHc.isCompact
   have hcl : IsClosed (Set.range f) := (isCompact_range hfc).isClosed
-  let I : Ideal ℤ_[l] :=
-    { carrier := Set.range f
-      add_mem' := by
-        rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
-        exact ⟨a * b, hmul a b⟩
-      zero_mem' := ⟨1, hf1⟩
-      smul_mem' := by
-        rintro c _ ⟨a, rfl⟩
-        have hm : Continuous (fun t : ℤ_[l] => t * f a) := continuous_mul_const (f a)
-        have hsub := hm.range_subset_closure_image_dense (PadicInt.denseRange_intCast (p := l))
-        have himg : (fun t : ℤ_[l] => t * f a) '' Set.range (Int.cast : ℤ → ℤ_[l]) ⊆ Set.range f := by
-          rintro _ ⟨_, ⟨n, rfl⟩, rfl⟩
-          exact ⟨a ^ n, hpow a n⟩
-        exact closure_minimal himg hcl (hsub ⟨c, rfl⟩) }
+  let I : Ideal ℤ_[l] := {
+    carrier := Set.range f
+    add_mem' := by
+      rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
+      exact ⟨a * b, hmul a b⟩
+    zero_mem' := ⟨1, hf1⟩
+    smul_mem' := by
+      rintro c _ ⟨a, rfl⟩
+      have hm : Continuous (fun t : ℤ_[l] => t * f a) := continuous_mul_const (f a)
+      have hsub := hm.range_subset_closure_image_dense (PadicInt.denseRange_intCast (p := l))
+      have himg : (fun t : ℤ_[l] => t * f a) '' Set.range (Int.cast : ℤ → ℤ_[l]) ⊆ Set.range f := by
+        rintro _ ⟨_, ⟨n, rfl⟩, rfl⟩
+        exact ⟨a ^ n, hpow a n⟩
+      exact closure_minimal himg hcl (hsub ⟨c, rfl⟩)
+  }
   have hI : ∀ y, y ∈ Set.range f ↔ ∃ c, c * Submodule.IsPrincipal.generator I = y := by
     intro y
     have h : y ∈ I ↔ y ∈ Ideal.span {Submodule.IsPrincipal.generator I} := by

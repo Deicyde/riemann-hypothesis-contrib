@@ -17,16 +17,17 @@ section Fin
 
 variable {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 
-theorem indexBasic_key [IsNoetherianRing R] [Ring.KrullDimLE 1 R] {d : R}
-    (hd : d ∈ nonZeroDivisors R) (s : R) :
-    ∃ n : ℕ, ∃ t : R, ∃ u : R, s ^ n - s ^ (n + 1) * t = d * u := by
+theorem indexBasic_key
+    [IsNoetherianRing R] [Ring.KrullDimLE 1 R] {d : R} (hd : d ∈ nonZeroDivisors R) (s : R)
+    : ∃ n : ℕ, ∃ t : R, ∃ u : R, s ^ n - s ^ (n + 1) * t = d * u := by
   have hfl : IsFiniteLength R (R ⧸ Ideal.span {d}) := isFiniteLength_quotient_span_singleton R hd
   have hart : IsArtinian R (R ⧸ Ideal.span {d}) :=
     (isFiniteLength_iff_isNoetherian_isArtinian.mp hfl).2
   obtain ⟨n, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd s (1 : R ⧸ Ideal.span {d})
   obtain ⟨t, rfl⟩ := Ideal.Quotient.mk_surjective y
-  have hy' : Ideal.Quotient.mk (Ideal.span {d}) (s ^ (n + 1) * t) =
-      Ideal.Quotient.mk (Ideal.span {d}) (s ^ n) := by
+  have hy'
+      : Ideal.Quotient.mk (Ideal.span {d}) (s ^ (n + 1) * t)
+        = Ideal.Quotient.mk (Ideal.span {d}) (s ^ n) := by
     simpa [Algebra.smul_def, Ideal.Quotient.algebraMap_eq] using hy
   have : Ideal.Quotient.mk (Ideal.span {d}) (s ^ n - s ^ (n + 1) * t) = 0 := by
     rw [map_sub, hy', sub_self]
@@ -34,16 +35,23 @@ theorem indexBasic_key [IsNoetherianRing R] [Ring.KrullDimLE 1 R] {d : R}
   obtain ⟨u, hu⟩ := this
   exact ⟨n, t, u, by rw [← hu, mul_comm]⟩
 
-theorem indexBasic_smul_locP (p : Ideal R) [p.IsPrime] (Y : Submodule R W) {s : R} (hs : s ∉ p)
-    {z : W} (hz : s • z ∈ localization₂ p Y) : z ∈ localization₂ p Y := by
+theorem indexBasic_smul_locP
+    (p : Ideal R) [p.IsPrime]
+    (Y : Submodule R W)
+    {s : R} (hs : s ∉ p)
+    {z : W} (hz : s • z ∈ localization₂ p Y)
+    : z ∈ localization₂ p Y := by
   have : z ∈ localization₂ p (localization₂ p Y) := ⟨s, hs, hz⟩
   unfold localization₂ at this ⊢
   rwa [locBasic_locS_idem] at this
 
-theorem indexBasic_finLen [IsNoetherianRing R] [Ring.KrullDimLE 1 R] (p : Ideal R) [p.IsPrime]
-    (X Y : Submodule R W) (hX : X.FG) {d : R} (hd : d ∈ nonZeroDivisors R)
-    (hdY : ∀ x ∈ X, d • x ∈ Y) :
-    IsFiniteLength R (↥(localization₂ p X) ⧸ (localization₂ p Y).comap (localization₂ p X).subtype) := by
+theorem indexBasic_finLen
+    [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
+    (p : Ideal R) [p.IsPrime]
+    (X Y : Submodule R W) (hX : X.FG)
+    {d : R} (hd : d ∈ nonZeroDivisors R) (hdY : ∀ x ∈ X, d • x ∈ Y)
+    : IsFiniteLength R
+      (↥(localization₂ p X) ⧸ (localization₂ p Y).comap (localization₂ p X).subtype) := by
   set P := localization₂ p X with hP
   set Q := (localization₂ p Y).comap P.subtype with hQ
   have hXP : X ≤ P := locBasic_le_locS _ X
@@ -69,7 +77,7 @@ theorem indexBasic_finLen [IsNoetherianRing R] [Ring.KrullDimLE 1 R] (p : Ideal 
       show (t • s • (x : W) - x) ∈ localization₂ p Y
       have hsn : s ^ n ∉ p := fun h => hs (‹p.IsPrime›.mem_of_pow_mem n h)
       apply indexBasic_smul_locP p Y hsn
-      have e : s ^ n • (t • s • (x : W) - x) = - (u • (d • (x : W))) := by
+      have e : s ^ n • (t • s • (x : W) - x) = -(u • (d • (x : W))) := by
         linear_combination (norm := module) -(htu • (x : W))
       rw [e]
       exact (localization₂ p Y).neg_mem ((localization₂ p Y).smul_mem u (hdP x.1 x.2))
@@ -101,9 +109,9 @@ theorem indexBasic_finLen [IsNoetherianRing R] [Ring.KrullDimLE 1 R] (p : Ideal 
     exact isFiniteLength_iff_isNoetherian_isArtinian.mpr ⟨inferInstance, inferInstance⟩
   exact hfin.of_surjective hF
 
-theorem indexBasic_len_add (N Mm P : Submodule R W) (hNM : N ≤ Mm) (hMP : Mm ≤ P) :
-    Module.length R (↥P ⧸ N.comap P.subtype) =
-      Module.length R (↥Mm ⧸ N.comap Mm.subtype) + Module.length R (↥P ⧸ Mm.comap P.subtype) := by
+theorem indexBasic_len_add (N Mm P : Submodule R W) (hNM : N ≤ Mm) (hMP : Mm ≤ P)
+    : Module.length R (↥P ⧸ N.comap P.subtype)
+      = Module.length R (↥Mm ⧸ N.comap Mm.subtype) + Module.length R (↥P ⧸ Mm.comap P.subtype) := by
   let f : (↥Mm ⧸ N.comap Mm.subtype) →ₗ[R] (↥P ⧸ N.comap P.subtype) :=
     Submodule.mapQ _ _ (Submodule.inclusion hMP) (by
       intro x hx
@@ -140,21 +148,28 @@ theorem indexBasic_len_add (N Mm P : Submodule R W) (hNM : N ≤ Mm) (hMP : Mm �
           rw [Submodule.mapQ_apply, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero]
           exact z.2
 
-theorem indexBasic_locLen_self (p : Ideal R) [p.IsPrime] (X : Submodule R W) :
-    locLen p X X = 0 := by
+theorem indexBasic_locLen_self (p : Ideal R) [p.IsPrime] (X : Submodule R W)
+    : locLen p X X = 0 := by
   unfold locLen
   rw [Submodule.comap_subtype_self]
   simp
 
-theorem indexBasic_lidx_via (p : Ideal R) [p.IsPrime] (A B D : Submodule R W) (hDA : D ≤ A)
-    (hDB : D ≤ B)
-    (hA : Module.length R (↥(localization₂ p A) ⧸ (localization₂ p D).comap (localization₂ p A).subtype) ≠ ⊤)
-    (hB : Module.length R (↥(localization₂ p B) ⧸ (localization₂ p D).comap (localization₂ p B).subtype) ≠ ⊤) :
-    lidx p A B = (locLen p A D : ℤ) - locLen p B D := by
-  have e1 := indexBasic_len_add (localization₂ p D) (localization₂ p (A ⊓ B)) (localization₂ p A)
-    (locBasic_locS_mono _ (le_inf hDA hDB)) (locBasic_locS_mono _ inf_le_left)
-  have e2 := indexBasic_len_add (localization₂ p D) (localization₂ p (A ⊓ B)) (localization₂ p B)
-    (locBasic_locS_mono _ (le_inf hDA hDB)) (locBasic_locS_mono _ inf_le_right)
+theorem indexBasic_lidx_via
+    (p : Ideal R) [p.IsPrime]
+    (A B D : Submodule R W) (hDA : D ≤ A) (hDB : D ≤ B)
+    (hA : Module.length R
+        (↥(localization₂ p A) ⧸ (localization₂ p D).comap (localization₂ p A).subtype)
+      ≠ ⊤)
+    (hB : Module.length R
+        (↥(localization₂ p B) ⧸ (localization₂ p D).comap (localization₂ p B).subtype)
+      ≠ ⊤)
+    : lidx p A B = (locLen p A D : ℤ) - locLen p B D := by
+  have e1 :=
+    indexBasic_len_add (localization₂ p D) (localization₂ p (A ⊓ B)) (localization₂ p A)
+      (locBasic_locS_mono _ (le_inf hDA hDB)) (locBasic_locS_mono _ inf_le_left)
+  have e2 :=
+    indexBasic_len_add (localization₂ p D) (localization₂ p (A ⊓ B)) (localization₂ p B)
+      (locBasic_locS_mono _ (le_inf hDA hDB)) (locBasic_locS_mono _ inf_le_right)
   rw [e1] at hA
   rw [e2] at hB
   obtain ⟨ha, hx⟩ := WithTop.add_ne_top.mp hA
@@ -164,8 +179,8 @@ theorem indexBasic_lidx_via (p : Ideal R) [p.IsPrime] (A B D : Submodule R W) (h
   push_cast
   ring
 
-theorem indexBasic_denom (S : Submonoid R) (X Y : Submodule R W) (hX : X.FG)
-    (hY : X ≤ locS S Y) : ∃ d ∈ S, ∀ x ∈ X, d • x ∈ Y := by
+theorem indexBasic_denom (S : Submonoid R) (X Y : Submodule R W) (hX : X.FG) (hY : X ≤ locS S Y)
+    : ∃ d ∈ S, ∀ x ∈ X, d • x ∈ Y := by
   classical
   obtain ⟨s, rfl⟩ := hX
   induction s using Finset.induction_on with
@@ -195,27 +210,28 @@ end Fin
 
 section K
 
-variable {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+variable
+  {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
   [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem indexBasic_locS_top (Y : Submodule R V) (hY : Submodule.span K (Y : Set V) = ⊤) :
-    locS (nonZeroDivisors R) Y = ⊤ := by
-  let T : Submodule K V :=
-    { carrier := locS (nonZeroDivisors R) Y
-      add_mem' := (locS (nonZeroDivisors R) Y).add_mem
-      zero_mem' := (locS (nonZeroDivisors R) Y).zero_mem
-      smul_mem' := by
-        rintro c v ⟨d, hd, hdv⟩
-        obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective R c
-        have hb0 : algebraMap R K b ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
-        refine ⟨b * d, Submonoid.mul_mem _ hb hd, ?_⟩
-        have hc : algebraMap R K b * (algebraMap R K a / algebraMap R K b) = algebraMap R K a := by
-          field_simp
-        have : (b * d) • ((algebraMap R K a / algebraMap R K b) • v) = a • (d • v) := by
-          rw [mul_comm, mul_smul, ← algebraMap_smul K b, smul_smul, hc, algebraMap_smul,
-            smul_comm]
-        rw [this]
-        exact Y.smul_mem a hdv }
+theorem indexBasic_locS_top (Y : Submodule R V) (hY : Submodule.span K (Y : Set V) = ⊤)
+    : locS (nonZeroDivisors R) Y = ⊤ := by
+  let T : Submodule K V := {
+    carrier := locS (nonZeroDivisors R) Y
+    add_mem' := (locS (nonZeroDivisors R) Y).add_mem
+    zero_mem' := (locS (nonZeroDivisors R) Y).zero_mem
+    smul_mem' := by
+      rintro c v ⟨d, hd, hdv⟩
+      obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective R c
+      have hb0 : algebraMap R K b ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
+      refine ⟨b * d, Submonoid.mul_mem _ hb hd, ?_⟩
+      have hc : algebraMap R K b * (algebraMap R K a / algebraMap R K b) = algebraMap R K a := by
+        field_simp
+      have : (b * d) • ((algebraMap R K a / algebraMap R K b) • v) = a • (d • v) := by
+        rw [mul_comm, mul_smul, ← algebraMap_smul K b, smul_smul, hc, algebraMap_smul, smul_comm]
+      rw [this]
+      exact Y.smul_mem a hdv
+  }
   have hle : Submodule.span K (Y : Set V) ≤ T :=
     Submodule.span_le.mpr (fun y hy => locBasic_le_locS _ Y hy)
   rw [hY] at hle
@@ -223,15 +239,15 @@ theorem indexBasic_locS_top (Y : Submodule R V) (hY : Submodule.span K (Y : Set 
 
 end K
 
-theorem indexBasic_dual_le_fg {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-    [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module R V] [IsScalarTower R K V]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hnd : h.Nondegenerate) (A : Submodule R V)
-    (hA : Submodule.span K (A : Set V) = ⊤) :
-    ∃ F : Submodule R V, F.FG ∧ dual h A ≤ F := by
+theorem indexBasic_dual_le_fg
+    {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] [Module R V] [IsScalarTower R K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (hnd : h.Nondegenerate)
+    (A : Submodule R V) (hA : Submodule.span K (A : Set V) = ⊤)
+    : ∃ F : Submodule R V, F.FG ∧ dual h A ≤ F := by
   classical
   obtain ⟨b, hbA, hspan, hli⟩ := exists_linearIndependent K (A : Set V)
-  have htop : ⊤ ≤ Submodule.span K (Set.range ((↑) : b → V)) := by
-    rw [Subtype.range_coe, hspan, hA]
+  have htop : ⊤ ≤ Submodule.span K (Set.range ((↑) : b → V)) := by rw [Subtype.range_coe, hspan, hA]
   let e : Module.Basis b K V := Module.Basis.mk hli htop
   have : Finite b := Module.Finite.finite_basis e
   have : Fintype b := Fintype.ofFinite b
@@ -241,9 +257,10 @@ theorem indexBasic_dual_le_fg {R K V : Type*} [CommRing R] [Field K] [StarRing K
     intro x hx
     rw [LinearMap.mem_ker] at hx
     rw [Submodule.mem_bot]
-    have h0 : h.flip x = 0 := e.ext (fun i => by
-      have := congr_fun hx i
-      simpa [φ] using this)
+    have h0 : h.flip x = 0 :=
+      e.ext (fun i => by
+        have := congr_fun hx i
+        simpa [φ] using this)
     exact hnd.2 x (fun z => by
       have := LinearMap.congr_fun h0 z
       simpa using this)
@@ -251,8 +268,11 @@ theorem indexBasic_dual_le_fg {R K V : Type*} [CommRing R] [Field K] [StarRing K
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by
       rw [Module.finrank_fintype_fun_eq_card, Module.finrank_eq_card_basis e])).mp hφ
   let ψ := LinearEquiv.ofBijective φ ⟨hφ, hφs⟩
-  refine ⟨Submodule.span R (Set.range (fun j : b => ψ.symm (Pi.single j 1))),
-    Submodule.fg_span (Set.finite_range _), ?_⟩
+  refine ⟨
+    Submodule.span R (Set.range (fun j : b => ψ.symm (Pi.single j 1))),
+    Submodule.fg_span (Set.finite_range _),
+    ?_
+  ⟩
   intro x hx
   rw [dualBasic_mem_dual] at hx
   have hxj : ∀ j : b, ∃ r : R, algebraMap R K r = h (e j) x := fun j => by
@@ -272,25 +292,27 @@ theorem indexBasic_dual_le_fg {R K V : Type*} [CommRing R] [Field K] [StarRing K
   simp_rw [algebraMap_smul]
   exact Submodule.sum_mem _ (fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩))
 
-theorem indexBasic :
-    ∀ (R K V : Type) [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
-      [IsFractionRing R K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module R V]
-      [IsScalarTower R K V] (h : V →ₗ⋆[K] V →ₗ[K] K), h.IsSymm → h.Nondegenerate →
-      (∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) →
-      ∀ (p : Ideal R) [p.IsMaximal] (A B C : Submodule R V),
-        Submodule.IsFullLattice K A → Submodule.IsFullLattice K B → Submodule.IsFullLattice K C →
-        lidx p A A = 0 ∧ lidx p A B = -lidx p B A ∧
-        lidx p A C = lidx p A B + lidx p B C ∧
-        (B ≤ A → lidx p A B = locLen p A B) ∧
-        (IsUnimodular h A → jIdx h p A = 0) ∧
-        (IsIntegralLat h A →
-          jIdx h p A ≤ 0 ∧ (jIdx h p A = 0 ↔ localization₂ p (dual h A) = localization₂ p A)) := by
+theorem indexBasic
+    : ∀ (R K V : Type) [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
+        [IsFractionRing R K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module R V]
+        [IsScalarTower R K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      h.IsSymm → h.Nondegenerate → (∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K))
+        → ∀ (p : Ideal R) [p.IsMaximal] (A B C : Submodule R V),
+          Submodule.IsFullLattice K A → Submodule.IsFullLattice K B → Submodule.IsFullLattice K C
+            → lidx p A A = 0 ∧ lidx p A B = - lidx p B A ∧ lidx p A C = lidx p A B + lidx p B C
+              ∧ (B ≤ A → lidx p A B = locLen p A B) ∧ (IsUnimodular h A → jIdx h p A = 0)
+              ∧ (IsIntegralLat h A
+                → jIdx h p A ≤ 0
+                  ∧ (jIdx h p A = 0 ↔ localization₂ p (dual h A) = localization₂ p A)) := by
   intro R K V _ _ _ _ _ _ _ _ _ _ _ h hs hnd hstar p _ A B C hA hB hC
-  have hfin : ∀ X Y : Submodule R V, X.FG → locS (nonZeroDivisors R) Y = ⊤ →
-      Module.length R (↥(localization₂ p X) ⧸ (localization₂ p Y).comap (localization₂ p X).subtype) ≠ ⊤ := by
+  have hfin
+      : ∀ X Y : Submodule R V,
+        X.FG → locS (nonZeroDivisors R) Y = ⊤
+          → Module.length R
+              (↥(localization₂ p X) ⧸ (localization₂ p Y).comap (localization₂ p X).subtype)
+            ≠ ⊤ := by
     intro X Y hX hY
-    obtain ⟨d, hd, hdY⟩ :=
-      indexBasic_denom (nonZeroDivisors R) X Y hX (by rw [hY]; exact le_top)
+    obtain ⟨d, hd, hdY⟩ := indexBasic_denom (nonZeroDivisors R) X Y hX (by rw [hY]; exact le_top)
     exact Module.length_ne_top_iff.mpr (indexBasic_finLen p X Y hX hd hdY)
   have hAt := indexBasic_locS_top (K := K) A hA.span_eq_top
   have hBt := indexBasic_locS_top (K := K) B hB.span_eq_top
@@ -310,12 +332,12 @@ theorem indexBasic :
     have hAD := hfin A _ hAfg hDt
     have hBD := hfin B _ hBfg hDt
     have hCD := hfin C _ hCfg hDt
-    rw [indexBasic_lidx_via p A C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_left) inf_le_right
-        hAD hCD,
+    rw [indexBasic_lidx_via p A C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_left) inf_le_right hAD
+        hCD,
       indexBasic_lidx_via p A B (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_left)
         (le_trans inf_le_left inf_le_right) hAD hBD,
-      indexBasic_lidx_via p B C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_right) inf_le_right
-        hBD hCD]
+      indexBasic_lidx_via p B C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_right) inf_le_right hBD
+        hCD]
     ring
   · intro hBA
     unfold lidx
@@ -347,8 +369,12 @@ theorem indexBasic :
       · rw [Module.length_eq_zero_iff] at h0
         apply le_antisymm
         · intro x hx
-          have h1 : (Submodule.Quotient.mk ⟨x, hx⟩ : ↥(localization₂ p (dual h A)) ⧸
-              (localization₂ p A).comap (localization₂ p (dual h A)).subtype) = 0 := Subsingleton.elim _ _
+          have h1
+              : (Submodule.Quotient.mk ⟨x, hx⟩
+                  : ↥(localization₂ p (dual h A)) ⧸
+                    (localization₂ p A).comap (localization₂ p (dual h A)).subtype)
+                = 0 :=
+            Subsingleton.elim _ _
           rw [Submodule.Quotient.mk_eq_zero] at h1
           exact h1
         · exact locBasic_locS_mono _ hle

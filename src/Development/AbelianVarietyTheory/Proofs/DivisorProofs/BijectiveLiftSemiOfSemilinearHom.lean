@@ -7,13 +7,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.DeRham
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem kaehler_liftSemi_bijective : ∀ (R R' : Type) [CommRing R] [CommRing R'] [Algebra R R'] (B B' : Type) [CommRing B] [CommRing B'] [Algebra R B] [Algebra R' B'] (α : B →+* B') (h : SemiHom (algebraMap R R') α) (f : B →ₛₗ[algebraMap R R'] B'), (∀ b, f b = α b) → Function.Bijective (liftSemi f) → Function.Bijective (liftSemi h.m1) := by
+theorem kaehler_liftSemi_bijective
+    : ∀ (R R' : Type) [CommRing R] [CommRing R'] [Algebra R R'] (B B' : Type) [CommRing B]
+        [CommRing B'] [Algebra R B] [Algebra R' B'] (α : B →+* B') (h : SemiHom (algebraMap R R') α)
+        (f : B →ₛₗ[algebraMap R R'] B'),
+      (∀ b, f b = α b) → Function.Bijective (liftSemi f) → Function.Bijective (liftSemi h.m1) := by
   intro R R' _ _ _ B B' _ _ _ _ α h f hf hb
   letI : Algebra B B' := α.toAlgebra
   letI : Algebra R B' := ((algebraMap R' B').comp (algebraMap R R')).toAlgebra
@@ -35,9 +42,12 @@ theorem kaehler_liftSemi_bijective : ∀ (R R' : Type) [CommRing R] [CommRing R'
     induction hω using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨b, rfl⟩ := hx
-      rw [SemiHom.m1_D, KaehlerDifferential.map_D]; rfl
-    | zero => simp
-    | add x y _ _ hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
+      rw [SemiHom.m1_D, KaehlerDifferential.map_D]
+      rfl
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      rw [map_add (f := _), map_add (f := _), hx, hy]
     | smul b x _ hx =>
       rw [SemiHom.oneFormMap_smul_semilinear, hx, LinearMap.map_smul_of_tower]
       exact algebraMap_smul B' b _

@@ -13,8 +13,8 @@ open MvPolynomial
 
 universe u
 
-theorem height_eq_of_isMaximal_mvPolynomial_fin (F : Type u) [Field F] :
-    ∀ (n : ℕ) (M : Ideal (MvPolynomial (Fin n) F)), M.IsMaximal → M.height = n := by
+theorem height_eq_of_isMaximal_mvPolynomial_fin (F : Type u) [Field F]
+    : ∀ (n : ℕ) (M : Ideal (MvPolynomial (Fin n) F)), M.IsMaximal → M.height = n := by
   intro n
   induction n with
   | zero =>

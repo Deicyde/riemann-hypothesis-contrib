@@ -6,14 +6,16 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.SecondCharacte
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta
-  IsDedekindDomain NumberField Topology Filter Formalism.IndefR.Fin.U1
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta IsDedekindDomain NumberField Topology Filter Formalism.IndefR.Fin.U1
 
 namespace Formalism.IndefR.Fin.Refl
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem af_ext {x y : AF F} (h1 : ∀ w, x.1 w = y.1 w) (h2 : ∀ v, x.2 v = y.2 v) : x = y := Prod.ext (funext h1) (by ext v; exact congrArg _ (h2 v))
+theorem af_ext {x y : AF F} (h1 : ∀ w, x.1 w = y.1 w) (h2 : ∀ v, x.2 v = y.2 v) : x = y :=
+  Prod.ext (funext h1) (by ext v; exact congrArg _ (h2 v))
 
 def piF (v : HeightOneSpectrum (𝓞 F)) : AF F →+* v.adicCompletion F where
   toFun a := a.2 v
@@ -31,28 +33,33 @@ def piI (w : InfinitePlace F) : AF F →+* w.Completion where
 
 def jF (v : HeightOneSpectrum (𝓞 F)) (y : v.adicCompletion F) : AF F := pairA F 0 (single v y)
 
-
 open Classical in
 def jI (w : InfinitePlace F) (y : w.Completion) : AF F :=
   pairA F (Pi.single w y : ∀ w : InfinitePlace F, w.Completion) 0
 
-theorem jF_fst (v : HeightOneSpectrum (𝓞 F)) (y : v.adicCompletion F) (w : InfinitePlace F) : (jF v y).1 w = 0 := rfl
+theorem jF_fst (v : HeightOneSpectrum (𝓞 F)) (y : v.adicCompletion F) (w : InfinitePlace F)
+    : (jF v y).1 w = 0 :=
+  rfl
 theorem jF_self (v : HeightOneSpectrum (𝓞 F)) (y : v.adicCompletion F) : (jF v y).2 v = y := by
   classical
   show (Pi.single v y : ∀ v' : HeightOneSpectrum (𝓞 F), v'.adicCompletion F) v = y
   exact Pi.single_eq_same v y
-theorem jF_ne {v v' : HeightOneSpectrum (𝓞 F)} (y : v.adicCompletion F) (h : v' ≠ v) : (jF v y).2 v' = 0 := by
+theorem jF_ne {v v' : HeightOneSpectrum (𝓞 F)} (y : v.adicCompletion F) (h : v' ≠ v)
+    : (jF v y).2 v' = 0 := by
   classical
   show (Pi.single v y : ∀ v'' : HeightOneSpectrum (𝓞 F), v''.adicCompletion F) v' = 0
   exact Pi.single_eq_of_ne h y
-theorem jI_snd (w : InfinitePlace F) (y : w.Completion) (v : HeightOneSpectrum (𝓞 F)) : (jI w y).2 v = 0 := rfl
+theorem jI_snd (w : InfinitePlace F) (y : w.Completion) (v : HeightOneSpectrum (𝓞 F))
+    : (jI w y).2 v = 0 :=
+  rfl
 open Classical in
 theorem jI_self (w : InfinitePlace F) (y : w.Completion) : (jI w y).1 w = y := by simp [jI, pairA]
 open Classical in
-theorem jI_ne {w w' : InfinitePlace F} (y : w.Completion) (h : w' ≠ w) : (jI w y).1 w' = 0 := by simp [jI, pairA, Pi.single_eq_of_ne h]
+theorem jI_ne {w w' : InfinitePlace F} (y : w.Completion) (h : w' ≠ w) : (jI w y).1 w' = 0 := by
+  simp [jI, pairA, Pi.single_eq_of_ne h]
 
-theorem mul_jF (v : HeightOneSpectrum (𝓞 F)) (a : AF F) (y : v.adicCompletion F) :
-    a * jF v y = jF v (piF v a * y) := by
+theorem mul_jF (v : HeightOneSpectrum (𝓞 F)) (a : AF F) (y : v.adicCompletion F)
+    : a * jF v y = jF v (piF v a * y) := by
   refine af_ext (fun w => ?_) (fun v' => ?_)
   · show a.1 w * (jF v y).1 w = (jF v (piF v a * y)).1 w
     rw [jF_fst, jF_fst, mul_zero]
@@ -63,7 +70,8 @@ theorem mul_jF (v : HeightOneSpectrum (𝓞 F)) (a : AF F) (y : v.adicCompletion
       rfl
     · rw [jF_ne _ h, jF_ne _ h, mul_zero]
 
-theorem mul_jI (w : InfinitePlace F) (a : AF F) (y : w.Completion) : a * jI w y = jI w (piI w a * y) := by
+theorem mul_jI (w : InfinitePlace F) (a : AF F) (y : w.Completion)
+    : a * jI w y = jI w (piI w a * y) := by
   refine af_ext (fun w' => ?_) (fun v => ?_)
   · show a.1 w' * (jI w y).1 w' = (jI w (piI w a * y)).1 w'
     by_cases h : w' = w
@@ -74,24 +82,32 @@ theorem mul_jI (w : InfinitePlace F) (a : AF F) (y : w.Completion) : a * jI w y 
   · show a.2 v * (jI w y).2 v = (jI w (piI w a * y)).2 v
     rw [jI_snd, jI_snd, mul_zero]
 
-theorem tendsto_fin {α : Type*} {l : Filter α} (z : α → Af F)
-    (h : ∀ N : ℕ, N ≠ 0 → ∀ᶠ t in l, ∀ v, ‖z t v‖ ≤ ‖(N : v.adicCompletion F)‖) : Tendsto z l (𝓝 0) := by
+theorem tendsto_fin
+    {α : Type*} {l : Filter α}
+    (z : α → Af F) (h : ∀ N : ℕ, N ≠ 0 → ∀ᶠ t in l, ∀ v, ‖z t v‖ ≤ ‖(N : v.adicCompletion F)‖)
+    : Tendsto z l (𝓝 0) := by
   intro U hU
   obtain ⟨N, hN, hNU⟩ := finNhd U hU
   rw [Filter.mem_map]
   filter_upwards [h N (by omega)] with t ht
-  obtain ⟨y, hy, e⟩ := int_of_le (z t) N 1 (by omega) fun v => by rw [Nat.cast_one, norm_one, mul_one]; exact ht v
+  obtain ⟨y, hy, e⟩ :=
+    int_of_le (z t) N 1 (by omega) fun v => by rw [Nat.cast_one, norm_one, mul_one]; exact ht v
   show z t ∈ U
-  rw [e]; exact hNU y hy
+  rw [e]
+  exact hNU y hy
 
 theorem continuous_single (v : HeightOneSpectrum (𝓞 F)) : Continuous (single v) := by
   classical
   have hS : Filter.cofinite ≤ Filter.principal ({v}ᶜ : Set (HeightOneSpectrum (𝓞 F))) := by
     rw [Filter.le_principal_iff]
     exact (Set.finite_singleton v).compl_mem_cofinite
-  let s' : v.adicCompletion F → RestrictedProduct (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F)
-      (fun w => (w.adicCompletionIntegers F : Set (w.adicCompletion F))) (Filter.principal {v}ᶜ) :=
-    fun y => RestrictedProduct.mk (Pi.single v y) (by
+  let s'
+      : v.adicCompletion F
+        → RestrictedProduct
+          (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F)
+          (fun w => (w.adicCompletionIntegers F : Set (w.adicCompletion F)))
+          (Filter.principal {v}ᶜ) := fun y =>
+    RestrictedProduct.mk (Pi.single v y) (by
       rw [Filter.eventually_principal]
       intro w hw
       rw [Set.mem_compl_singleton_iff] at hw
@@ -112,12 +128,15 @@ theorem continuous_single (v : HeightOneSpectrum (𝓞 F)) : Continuous (single 
       exact continuous_const
   exact (RestrictedProduct.continuous_inclusion hS).comp hs'
 
-theorem continuous_jF (v : HeightOneSpectrum (𝓞 F)) : Continuous (jF v) := continuous_const.prodMk (continuous_single v)
+theorem continuous_jF (v : HeightOneSpectrum (𝓞 F)) : Continuous (jF v) :=
+  continuous_const.prodMk (continuous_single v)
 
 open Classical in
-theorem continuous_jI (w : InfinitePlace F) : Continuous (jI w) := (_root_.continuous_single w).prodMk continuous_const
+theorem continuous_jI (w : InfinitePlace F) : Continuous (jI w) :=
+  (_root_.continuous_single w).prodMk continuous_const
 
-theorem dense_F (v : HeightOneSpectrum (𝓞 F)) : DenseRange fun q : F => piF v (algebraMap F (AF F) q) := by
+theorem dense_F (v : HeightOneSpectrum (𝓞 F))
+    : DenseRange fun q : F => piF v (algebraMap F (AF F) q) := by
   have h : (fun q : F => piF v (algebraMap F (AF F) q)) = algebraMap F (v.adicCompletion F) := by
     funext q
     show (algebraMap F (AF F) q).2 v = _
@@ -133,31 +152,36 @@ theorem dense_I (w : InfinitePlace F) : DenseRange fun q : F => piI w (algebraMa
     rw [algebraMap_AF]
     exact InfiniteAdeleRing.algebraMap_apply F q w
   rw [h]
-  have e : Set.range (fun x : F => ((WithAbs.toAbs w.1 x : WithAbs w.1) : w.Completion)) =
-      Set.range (fun x : WithAbs w.1 => (x : w.Completion)) :=
+  have e
+      : Set.range (fun x : F => ((WithAbs.toAbs w.1 x : WithAbs w.1) : w.Completion))
+        = Set.range (fun x : WithAbs w.1 => (x : w.Completion)) :=
     (WithAbs.toAbs_surjective w.1).range_comp (fun x : WithAbs w.1 => (x : w.Completion))
   unfold DenseRange
   erw [e]
   exact AbsoluteValue.Completion.denseRange_coe w.1
 
-def etaS (S : Finset (HeightOneSpectrum (𝓞 F))) : AF F := ∑ w : InfinitePlace F, jI w 1 + ∑ v ∈ S, jF v 1
+def etaS (S : Finset (HeightOneSpectrum (𝓞 F))) : AF F :=
+  ∑ w : InfinitePlace F, jI w 1 + ∑ v ∈ S, jF v 1
 
-theorem etaS_fst (S : Finset (HeightOneSpectrum (𝓞 F))) (w : InfinitePlace F) : piI w (etaS S) = 1 := by
+theorem etaS_fst (S : Finset (HeightOneSpectrum (𝓞 F))) (w : InfinitePlace F)
+    : piI w (etaS S) = 1 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [etaS, map_add (f := _), map_sum, map_sum, Finset.sum_eq_single w]
   · rw [show piI w (jI w 1) = (jI w 1).1 w from rfl, jI_self]
-    simp only [show ∀ v, piI w (jF v 1) = (jF v 1).1 w from fun v => rfl, jF_fst, Finset.sum_const_zero, add_zero]
+    simp only [show ∀ v, piI w (jF v 1) = (jF v 1).1 w from fun v => rfl, jF_fst,
+      Finset.sum_const_zero, add_zero]
   · intro w' _ hw'
     show (jI w' 1).1 w = 0
     exact jI_ne _ (Ne.symm hw')
   · intro h
     exact absurd (Finset.mem_univ w) h
 
-theorem etaS_in (S : Finset (HeightOneSpectrum (𝓞 F))) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∈ S) :
-    piF v (etaS S) = 1 := by
+theorem etaS_in (S : Finset (HeightOneSpectrum (𝓞 F))) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∈ S)
+    : piF v (etaS S) = 1 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [etaS, map_add (f := _), map_sum, map_sum, Finset.sum_eq_single v]
-  · simp only [show ∀ w, piF v (jI w 1) = (jI w 1).2 v from fun w => rfl, jI_snd, Finset.sum_const_zero, zero_add]
+  · simp only [show ∀ w, piF v (jI w 1) = (jI w 1).2 v from fun w => rfl, jI_snd,
+      Finset.sum_const_zero, zero_add]
     show (jF v 1).2 v = 1
     exact jF_self v 1
   · intro v' _ hv'
@@ -166,22 +190,25 @@ theorem etaS_in (S : Finset (HeightOneSpectrum (𝓞 F))) (v : HeightOneSpectrum
   · intro h
     exact absurd hv h
 
-theorem etaS_out (S : Finset (HeightOneSpectrum (𝓞 F))) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∉ S) :
-    piF v (etaS S) = 0 := by
+theorem etaS_out (S : Finset (HeightOneSpectrum (𝓞 F))) (v : HeightOneSpectrum (𝓞 F)) (hv : v ∉ S)
+    : piF v (etaS S) = 0 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [etaS, map_add (f := _), map_sum, map_sum]
-  simp only [show ∀ w, piF v (jI w 1) = (jI w 1).2 v from fun w => rfl, jI_snd, Finset.sum_const_zero, zero_add]
+  simp only [show ∀ w, piF v (jI w 1) = (jI w 1).2 v from fun w => rfl, jI_snd,
+    Finset.sum_const_zero, zero_add]
   refine Finset.sum_eq_zero fun v' hv' => ?_
   show (jF v' 1).2 v = 0
   exact jF_ne _ (fun h => hv (h ▸ hv'))
 
-theorem tendsto_etaS (a : AF F) :
-    Tendsto (fun S : Finset (HeightOneSpectrum (𝓞 F)) => etaS S * a) atTop (𝓝 a) := by
+theorem tendsto_etaS (a : AF F)
+    : Tendsto (fun S : Finset (HeightOneSpectrum (𝓞 F)) => etaS S * a) atTop (𝓝 a) := by
   classical
-  have h1 : ∀ S : Finset (HeightOneSpectrum (𝓞 F)), (etaS S * a).1 = a.1 := fun S => funext fun w => by
-    show piI w (etaS S) * a.1 w = a.1 w
-    rw [etaS_fst, one_mul]
-  have h2 : Tendsto (fun S : Finset (HeightOneSpectrum (𝓞 F)) => (etaS S * a).2 - a.2) atTop (𝓝 0) := by
+  have h1 : ∀ S : Finset (HeightOneSpectrum (𝓞 F)), (etaS S * a).1 = a.1 := fun S =>
+    funext fun w => by
+      show piI w (etaS S) * a.1 w = a.1 w
+      rw [etaS_fst, one_mul]
+  have h2
+      : Tendsto (fun S : Finset (HeightOneSpectrum (𝓞 F)) => (etaS S * a).2 - a.2) atTop (𝓝 0) := by
     refine tendsto_fin _ fun N hN => ?_
     obtain ⟨S1, hS1⟩ := exists_finset_norm_one (N : F) (Nat.cast_ne_zero.2 hN)
     have hfin := Filter.eventually_cofinite.mp a.2.2
@@ -196,10 +223,14 @@ theorem tendsto_etaS (a : AF F) :
       rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq, not_not] at hv2
       rw [etaS_out S v hv, zero_mul, zero_sub, norm_neg, hN1]
       exact (norm_le_one_iff_int v _).2 hv2
-  have h3 : Tendsto (fun S : Finset (HeightOneSpectrum (𝓞 F)) => ((a.1, (etaS S * a).2) : Ainf F × Af F)) atTop
-      (𝓝 (a.1, a.2)) := tendsto_const_nhds.prodMk_nhds (tendsto_sub_nhds_zero_iff.1 h2)
-  have h4 : (fun S : Finset (HeightOneSpectrum (𝓞 F)) => ((a.1, (etaS S * a).2) : Ainf F × Af F)) =
-      fun S => etaS S * a := funext fun S => Prod.ext (h1 S).symm rfl
+  have h3 : Tendsto
+      (fun S : Finset (HeightOneSpectrum (𝓞 F)) => ((a.1, (etaS S * a).2) : Ainf F × Af F))
+      atTop (𝓝 (a.1, a.2)) :=
+    tendsto_const_nhds.prodMk_nhds (tendsto_sub_nhds_zero_iff.1 h2)
+  have h4
+      : (fun S : Finset (HeightOneSpectrum (𝓞 F)) => ((a.1, (etaS S * a).2) : Ainf F × Af F))
+        = fun S => etaS S * a :=
+    funext fun S => Prod.ext (h1 S).symm rfl
   rw [h4] at h3
   exact h3
 

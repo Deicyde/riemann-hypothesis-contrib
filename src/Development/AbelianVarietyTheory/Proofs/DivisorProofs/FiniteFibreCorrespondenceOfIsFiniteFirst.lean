@@ -6,13 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 namespace GlobalTheory.FibreCrit
 
-theorem exists_generization_mem {Y : Scheme.{0}} [IsLocallyNoetherian Y] {O : Set Y} (hO : IsOpen O)
-    (hd : Dense O) (y : Y) : ∃ e0 : Y, e0 ⤳ y ∧ e0 ∈ O := by
+theorem exists_generization_mem
+    {Y : Scheme.{0}} [IsLocallyNoetherian Y] {O : Set Y} (hO : IsOpen O) (hd : Dense O) (y : Y)
+    : ∃ e0 : Y, e0 ⤳ y ∧ e0 ∈ O := by
   obtain ⟨U, hU, hyU, -⟩ := exists_isAffineOpen_mem_and_subset (X := Y) (U := ⊤) (x := y) trivial
   have : IsAffine U := hU
   have : IsNoetherian U.toScheme := {}
@@ -23,11 +27,15 @@ theorem exists_generization_mem {Y : Scheme.{0}} [IsLocallyNoetherian Y] {O : Se
   obtain ⟨_, ⟨w, hwo, rfl⟩, hwO⟩ :=
     hd.inter_open_nonempty _ (U.ι.isOpenEmbedding.isOpenMap _ ho) (hne.image _)
   have hg := hC.1.isGenericPoint_genericPoint (isClosed_of_mem_irreducibleComponents _ hC)
-  exact ⟨U.ι hC.1.genericPoint, (hg.specializes mem_irreducibleComponent).map U.ι.continuous,
-    ((hg.specializes (hoC hwo)).map U.ι.continuous).mem_open hO hwO⟩
+  exact ⟨
+    U.ι hC.1.genericPoint,
+    (hg.specializes mem_irreducibleComponent).map U.ι.continuous,
+    ((hg.specializes (hoC hwo)).map U.ι.continuous).mem_open hO hwO
+  ⟩
 
-theorem spMap_algebraMap_apply (V K : Type) [CommRing V] [IsDomain V] [Field K] [Algebra V K]
-    [IsFractionRing V K] (p : Sp K) : spMap (algebraMap V K) p = (⊥ : PrimeSpectrum V) := by
+theorem spMap_algebraMap_apply
+    (V K : Type) [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K] (p : Sp K)
+    : spMap (algebraMap V K) p = (⊥ : PrimeSpectrum V) := by
   refine PrimeSpectrum.ext ?_
   show Ideal.comap (algebraMap V K) p.asIdeal = ⊥
   rw [(Ideal.eq_bot_or_top p.asIdeal).resolve_right p.isPrime.ne_top, ← RingHom.ker_eq_comap_bot]

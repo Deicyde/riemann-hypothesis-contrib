@@ -8,12 +8,14 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.SumLogDi
 
 namespace GlobalTheory.CompanionTheory.Ar.Small
 
-theorem sum_log_div_pred_le :
-    ∀ (x : ℝ) (S : Finset ℕ), 1 ≤ x → (∀ p ∈ S, p.Prime ∧ (p : ℝ) ≤ x) →
-      ∑ p ∈ S, Real.log p / ((p : ℝ) - 1) ≤ Real.log x + 17 / 5 := by
+theorem sum_log_div_pred_le
+    : ∀ (x : ℝ) (S : Finset ℕ),
+      1 ≤ x → (∀ p ∈ S, p.Prime ∧ (p : ℝ) ≤ x)
+        → ∑ p ∈ S, Real.log p / ((p : ℝ) - 1) ≤ Real.log x + 17 / 5 := by
   intro x S hx hS
-  have hsplit : ∀ p ∈ S, Real.log p / ((p : ℝ) - 1)
-      = Real.log p / p + Real.log p / ((p : ℝ) * ((p : ℝ) - 1)) := by
+  have hsplit
+      : ∀ p ∈ S,
+        Real.log p / ((p : ℝ) - 1) = Real.log p / p + Real.log p / ((p : ℝ) * ((p : ℝ) - 1)) := by
     intro p hp
     have h2 : (2 : ℝ) ≤ p := by exact_mod_cast (hS p hp).1.two_le
     have hp0 : (p : ℝ) ≠ 0 := by linarith
@@ -22,7 +24,8 @@ theorem sum_log_div_pred_le :
     ring
   rw [Finset.sum_congr rfl hsplit, Finset.sum_add_distrib]
   have h1 : ∑ p ∈ S, Real.log p / (p : ℝ) ≤ Real.log x + Real.log 4 := by
-    refine le_trans (Finset.sum_le_sum_of_subset_of_nonneg ?_ ?_) (GlobalTheory.T.sum_prime_log_div_le x hx)
+    refine le_trans (Finset.sum_le_sum_of_subset_of_nonneg ?_ ?_)
+      (GlobalTheory.T.sum_prime_log_div_le x hx)
     · intro p hp
       simp only [Finset.mem_filter, Finset.mem_Iic]
       exact ⟨Nat.le_floor (hS p hp).2, (hS p hp).1⟩

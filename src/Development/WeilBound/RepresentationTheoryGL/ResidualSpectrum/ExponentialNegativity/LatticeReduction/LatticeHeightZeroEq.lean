@@ -35,12 +35,13 @@ theorem Mj_zero : Mj k N 0 = ⊤ := by
   intro a ha
   exact absurd ha (Nat.not_lt_zero _)
 
-theorem mem_gmap {g : GL (Fin N) k} {M : Submodule k (Fin N → k)} {y : Fin N → k} :
-    y ∈ gmap g M ↔ ∃ x ∈ M, (g : Matrix (Fin N) (Fin N) k) *ᵥ x = y := by
+theorem mem_gmap {g : GL (Fin N) k} {M : Submodule k (Fin N → k)} {y : Fin N → k}
+    : y ∈ gmap g M ↔ ∃ x ∈ M, (g : Matrix (Fin N) (Fin N) k) *ᵥ x = y := by
   delta gmap
   simp only [Submodule.mem_map, Matrix.toLin'_apply]
 
-theorem gmap_mul (g h : GL (Fin N) k) (M : Submodule k (Fin N → k)) : gmap (g * h) M = gmap g (gmap h M) := by
+theorem gmap_mul (g h : GL (Fin N) k) (M : Submodule k (Fin N → k))
+    : gmap (g * h) M = gmap g (gmap h M) := by
   delta gmap
   simp only [Units.val_mul, Matrix.toLin'_mul, Submodule.map_comp]
 
@@ -48,8 +49,8 @@ theorem gmap_one (M : Submodule k (Fin N → k)) : gmap (1 : GL (Fin N) k) M = M
   delta gmap
   simp
 
-theorem gmap_inv_mul_eq_iff (g h : GL (Fin N) k) (M : Submodule k (Fin N → k)) :
-    gmap (g⁻¹ * h) M = M ↔ gmap h M = gmap g M := by
+theorem gmap_inv_mul_eq_iff (g h : GL (Fin N) k) (M : Submodule k (Fin N → k))
+    : gmap (g⁻¹ * h) M = M ↔ gmap h M = gmap g M := by
   constructor
   · intro h1
     conv_rhs => rw [← h1]
@@ -57,17 +58,17 @@ theorem gmap_inv_mul_eq_iff (g h : GL (Fin N) k) (M : Submodule k (Fin N → k))
   · intro h1
     rw [gmap_mul, h1, ← gmap_mul, inv_mul_cancel, gmap_one]
 
-theorem finrank_gmap (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) :
-    finrank k (gmap g M) = finrank k M := by
+theorem finrank_gmap (g : GL (Fin N) k) (M : Submodule k (Fin N → k))
+    : finrank k (gmap g M) = finrank k M := by
   have hinj : Function.Injective (Matrix.toLin' (g : Matrix (Fin N) (Fin N) k)) := by
     intro x y hxy
     have h2 := congrArg (fun v => ((g⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) *ᵥ v) hxy
     simpa [Matrix.toLin'_apply, Matrix.mulVec_mulVec] using h2
   exact (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hinj M)).symm
 
-theorem gmap_le_Mj_iff (g : GL (Fin N) k) (j : ℕ) :
-    gmap g (Mj k N j) ≤ Mj k N j ↔
-      ∀ a b : Fin N, (a : ℕ) < j → j ≤ (b : ℕ) → (g : Matrix (Fin N) (Fin N) k) a b = 0 := by
+theorem gmap_le_Mj_iff (g : GL (Fin N) k) (j : ℕ)
+    : gmap g (Mj k N j) ≤ Mj k N j
+      ↔ ∀ a b : Fin N, (a : ℕ) < j → j ≤ (b : ℕ) → (g : Matrix (Fin N) (Fin N) k) a b = 0 := by
   constructor
   · intro hle a b ha hb
     have hmem : (Pi.single b 1 : Fin N → k) ∈ Mj k N j := by
@@ -89,10 +90,12 @@ theorem gmap_le_Mj_iff (g : GL (Fin N) k) (j : ℕ) :
     · rw [hx b hb, mul_zero]
     · rw [hz a b ha (by omega), zero_mul]
 
-theorem mem_par_iff [Finite k] (g : GL (Fin N) k) (j : ℕ) :
-    g ∈ Formalism.UG.P.tjcosets_par N j ↔ gmap g (Mj k N j) = Mj k N j := by
-  have hmem : g ∈ Formalism.UG.P.tjcosets_par N j ↔
-      ∀ a b : Fin N, (a : ℕ) < j → j ≤ (b : ℕ) → (g : Matrix (Fin N) (Fin N) k) a b = 0 := Iff.rfl
+theorem mem_par_iff [Finite k] (g : GL (Fin N) k) (j : ℕ)
+    : g ∈ Formalism.UG.P.tjcosets_par N j ↔ gmap g (Mj k N j) = Mj k N j := by
+  have hmem
+      : g ∈ Formalism.UG.P.tjcosets_par N j
+        ↔ ∀ a b : Fin N, (a : ℕ) < j → j ≤ (b : ℕ) → (g : Matrix (Fin N) (Fin N) k) a b = 0 :=
+    Iff.rfl
   rw [hmem, ← gmap_le_Mj_iff]
   constructor
   · intro hle
@@ -100,7 +103,8 @@ theorem mem_par_iff [Finite k] (g : GL (Fin N) k) (j : ℕ) :
   · intro heq
     exact heq.le
 
-def ej (N j m : ℕ) (h : m + j = N) (i : Fin m) : Fin N → k := Pi.single (⟨j + i, by omega⟩ : Fin N) 1
+def ej (N j m : ℕ) (h : m + j = N) (i : Fin m) : Fin N → k :=
+  Pi.single (⟨j + i, by omega⟩ : Fin N) 1
 
 theorem linInd_ej (N j m : ℕ) (h : m + j = N) : LinearIndependent k (ej (k := k) N j m h) := by
   have hf : Function.Injective (fun i : Fin m => (⟨j + i, by omega⟩ : Fin N)) := by
@@ -112,13 +116,14 @@ theorem linInd_ej (N j m : ℕ) (h : m + j = N) : LinearIndependent k (ej (k := 
   funext i
   simp [ej]
 
-theorem Mj_eq_span (N j m : ℕ) (h : m + j = N) :
-    Mj k N j = Submodule.span k (Set.range (ej (k := k) N j m h)) := by
+theorem Mj_eq_span (N j m : ℕ) (h : m + j = N)
+    : Mj k N j = Submodule.span k (Set.range (ej (k := k) N j m h)) := by
   apply le_antisymm
   · intro x hx
     have hx' : x = ∑ i : Fin m, x ⟨j + i, by omega⟩ • ej (k := k) N j m h i := by
       ext a
-      simp only [Finset.sum_apply, Pi.smul_apply, ej, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero]
+      simp only [Finset.sum_apply, Pi.smul_apply, ej, Pi.single_apply, smul_eq_mul, mul_ite,
+        mul_one, mul_zero]
       by_cases ha : (a : ℕ) < j
       · rw [hx a ha]
         symm
@@ -155,22 +160,23 @@ theorem finrank_Mj (N j : ℕ) (h : j ≤ N) : finrank k (Mj k N j) = N - j := b
   rw [Mj_eq_span N j (N - j) (by omega), finrank_span_eq_card (linInd_ej N j (N - j) (by omega))]
   simp
 
-theorem gmap_span {ι : Type} (g : GL (Fin N) k) (u : ι → Fin N → k) :
-    gmap g (Submodule.span k (Set.range u)) =
-      Submodule.span k (Set.range fun i => (g : Matrix (Fin N) (Fin N) k) *ᵥ u i) := by
+theorem gmap_span {ι : Type} (g : GL (Fin N) k) (u : ι → Fin N → k)
+    : gmap g (Submodule.span k (Set.range u))
+      = Submodule.span k (Set.range fun i => (g : Matrix (Fin N) (Fin N) k) *ᵥ u i) := by
   delta gmap
   rw [Submodule.map_span, ← Set.range_comp]
   rfl
 
-theorem span_basis_coe {ι : Type} {M : Submodule k (Fin N → k)} (b : Basis ι k M) :
-    Submodule.span k (Set.range fun i => (b i : Fin N → k)) = M := by
+theorem span_basis_coe {ι : Type} {M : Submodule k (Fin N → k)} (b : Basis ι k M)
+    : Submodule.span k (Set.range fun i => (b i : Fin N → k)) = M := by
   have h1 : Set.range (fun i => (b i : Fin N → k)) = M.subtype '' Set.range b := by
     rw [← Set.range_comp]
     rfl
   rw [h1, ← Submodule.map_span, b.span_eq, Submodule.map_top, Submodule.range_subtype]
 
-theorem exists_frame [Finite k] (N j m : ℕ) (h : m + j = N) (u : Fin m → Fin N → k) (hu : LinearIndependent k u) :
-    ∃ g : GL (Fin N) k, ∀ i : Fin m, (g : Matrix (Fin N) (Fin N) k) *ᵥ ej N j m h i = u i := by
+theorem exists_frame
+    [Finite k] (N j m : ℕ) (h : m + j = N) (u : Fin m → Fin N → k) (hu : LinearIndependent k u)
+    : ∃ g : GL (Fin N) k, ∀ i : Fin m, (g : Matrix (Fin N) (Fin N) k) *ᵥ ej N j m h i = u i := by
   subst h
   have hm : m + j - j = m := by omega
   let w : Formalism.UG.P.TjcosetsFr (m + j - j) (m + j) k := fun i => u (Fin.cast hm i)
@@ -186,8 +192,8 @@ theorem exists_frame [Finite k] (N j m : ℕ) (h : m + j = N) (u : Fin m → Fin
   ext a
   (simp [ej, Matrix.mulVec, dotProduct, Pi.single_apply]) <;> rfl
 
-theorem exists_gmap_Mj [Finite k] (M : Submodule k (Fin N → k)) (j : ℕ) (h : finrank k M + j = N) :
-    ∃ g : GL (Fin N) k, gmap g (Mj k N j) = M := by
+theorem exists_gmap_Mj [Finite k] (M : Submodule k (Fin N → k)) (j : ℕ) (h : finrank k M + j = N)
+    : ∃ g : GL (Fin N) k, gmap g (Mj k N j) = M := by
   let b := Module.finBasis k M
   have hli : LinearIndependent k (fun i => (b i : Fin N → k)) :=
     b.linearIndependent.map' M.subtype (Submodule.ker_subtype M)
@@ -197,11 +203,13 @@ theorem exists_gmap_Mj [Finite k] (M : Submodule k (Fin N → k)) (j : ℕ) (h :
   simp only [hg]
   exact span_basis_coe b
 
-theorem gmap_line (g : GL (Fin N) k) (i₀ : Fin N) (h0 : ∀ a, a ≠ i₀ → (g : Matrix (Fin N) (Fin N) k) a i₀ = 0) :
-    gmap g (Submodule.span k {(Pi.single i₀ (1 : k) : Fin N → k)}) =
-      Submodule.span k {(Pi.single i₀ (1 : k) : Fin N → k)} := by
-  have hcol : (g : Matrix (Fin N) (Fin N) k) *ᵥ Pi.single i₀ 1 =
-      (g : Matrix (Fin N) (Fin N) k) i₀ i₀ • (Pi.single i₀ 1 : Fin N → k) := by
+theorem gmap_line
+    (g : GL (Fin N) k) (i₀ : Fin N) (h0 : ∀ a, a ≠ i₀ → (g : Matrix (Fin N) (Fin N) k) a i₀ = 0)
+    : gmap g (Submodule.span k {(Pi.single i₀ (1 : k) : Fin N → k)})
+      = Submodule.span k {(Pi.single i₀ (1 : k) : Fin N → k)} := by
+  have hcol
+      : (g : Matrix (Fin N) (Fin N) k) *ᵥ Pi.single i₀ 1
+        = (g : Matrix (Fin N) (Fin N) k) i₀ i₀ • (Pi.single i₀ 1 : Fin N → k) := by
     ext a
     by_cases ha : a = i₀
     · subst ha
@@ -214,9 +222,10 @@ theorem gmap_line (g : GL (Fin N) k) (i₀ : Fin N) (h0 : ∀ a, a ≠ i₀ → 
       intro x y hxy
       have h2 := congrArg (fun v => ((g⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) *ᵥ v) hxy
       simpa [Matrix.mulVec_mulVec] using h2
-    have h3 : (Pi.single i₀ (1 : k) : Fin N → k) = 0 := hinj (by
-      show (g : Matrix (Fin N) (Fin N) k) *ᵥ Pi.single i₀ 1 = (g : Matrix (Fin N) (Fin N) k) *ᵥ 0
-      rw [hcol, Matrix.mulVec_zero])
+    have h3 : (Pi.single i₀ (1 : k) : Fin N → k) = 0 :=
+      hinj (by
+        show (g : Matrix (Fin N) (Fin N) k) *ᵥ Pi.single i₀ 1 = (g : Matrix (Fin N) (Fin N) k) *ᵥ 0
+        rw [hcol, Matrix.mulVec_zero])
     have h4 := congrFun h3 i₀
     simp at h4
   delta gmap
@@ -235,11 +244,12 @@ theorem lattice_height_zero_eq (n : ℕ) : H0 k n = Mj k (n + 1) 1 := by
   · intro hx
     exact hx 0 (by simp)
 
-theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM : e0 k n ∈ M) :
-    ∃ (jj : Fin (n + 1)) (g : GL (Fin (n + 1)) k), (jj : ℕ) + finrank k M = n + 1 ∧
-      gmap g (Mj k (n + 1) jj) = M ∧ gmap g (Mj k (n + 1) (jj + 1)) = M ⊓ H0 k n ∧
-      (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ Pi.single jj 1 = e0 k n ∧
-      ∀ b : Fin (n + 1), jj < b → (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) 0 b = 0 := by
+theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM : e0 k n ∈ M)
+    : ∃ (jj : Fin (n + 1)) (g : GL (Fin (n + 1)) k),
+      (jj : ℕ) + finrank k M = n + 1 ∧ gmap g (Mj k (n + 1) jj) = M
+        ∧ gmap g (Mj k (n + 1) (jj + 1)) = M ⊓ H0 k n
+        ∧ (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ Pi.single jj 1 = e0 k n
+        ∧ ∀ b : Fin (n + 1), jj < b → (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) 0 b = 0 := by
   classical
   obtain ⟨r, hr⟩ : ∃ r, r = finrank k M := ⟨_, rfl⟩
   have hr1 : 1 ≤ r := by
@@ -269,7 +279,8 @@ theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM :
   rw [← hP] at hdim
   have hdimMH : finrank k ↥P = m := by omega
   obtain ⟨b⟩ : Nonempty (Basis (Fin m) k ↥P) := ⟨Module.finBasisOfFinrankEq k _ hdimMH⟩
-  obtain ⟨v, hv_def⟩ : ∃ v : Fin m → Fin (n + 1) → k, v = fun i => (b i : Fin (n + 1) → k) := ⟨_, rfl⟩
+  obtain ⟨v, hv_def⟩ : ∃ v : Fin m → Fin (n + 1) → k, v = fun i => (b i : Fin (n + 1) → k) :=
+    ⟨_, rfl⟩
   obtain ⟨u, hu_def⟩ : ∃ u : Fin (m + 1) → Fin (n + 1) → k, u = Fin.cons (e0 k n) v := ⟨_, rfl⟩
   have hvli : LinearIndependent k v := by
     rw [hv_def]
@@ -310,9 +321,14 @@ theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM :
   · have hsum' : m + (n + 1 - r + 1) = n + 1 := by omega
     show gmap g (Mj k (n + 1) (n + 1 - r + 1)) = M ⊓ H0 k n
     rw [Mj_eq_span (n + 1) (n + 1 - r + 1) m hsum', gmap_span]
-    have hgv : ∀ i : Fin m, (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ ej (n + 1) (n + 1 - r + 1) m hsum' i = v i := by
+    have hgv
+        : ∀ i : Fin m,
+          (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ ej (n + 1) (n + 1 - r + 1) m hsum' i
+            = v i := by
       intro i
-      have hej : ej (k := k) (n + 1) (n + 1 - r + 1) m hsum' i = ej (n + 1) (n + 1 - r) (m + 1) hsum i.succ := by
+      have hej
+          : ej (k := k) (n + 1) (n + 1 - r + 1) m hsum' i
+            = ej (n + 1) (n + 1 - r) (m + 1) hsum i.succ := by
         simp only [ej]
         congr 1
         ext
@@ -321,7 +337,8 @@ theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM :
       rw [hej, hg i.succ, hu_def, Fin.cons_succ]
     simp only [hgv]
     exact hspanv
-  · have hej : ej (k := k) (n + 1) (n + 1 - r) (m + 1) hsum 0 = Pi.single ⟨n + 1 - r, by omega⟩ 1 := by
+  · have hej
+        : ej (k := k) (n + 1) (n + 1 - r) (m + 1) hsum 0 = Pi.single ⟨n + 1 - r, by omega⟩ 1 := by
       simp only [ej]
       congr 1
     rw [← hej, hg 0, hu_def]
@@ -338,7 +355,9 @@ theorem stepMat [Finite k] (n : ℕ) (M : Submodule k (Fin (n + 1) → k)) (hM :
       omega
     have h1 := hg i.succ
     rw [hej] at h1
-    have h3 : ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ Pi.single bb 1) 0 = (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) 0 bb := by
+    have h3
+        : ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) *ᵥ Pi.single bb 1) 0
+          = (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) 0 bb := by
       simp [Matrix.mulVec, dotProduct, Pi.single_apply]
     rw [← h3, h1, hu_def, Fin.cons_succ]
     exact (Submodule.mem_inf.mp (hvmem i)).2

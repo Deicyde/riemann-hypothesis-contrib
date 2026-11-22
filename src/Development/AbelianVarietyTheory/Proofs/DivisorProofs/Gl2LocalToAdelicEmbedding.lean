@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIdTorusElt
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.StdPar
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.StdPar
 open Formalism.UG (cT)
 open GlobalTheory.Doubling (absE)
 
@@ -22,7 +23,6 @@ namespace GlobalTheory.GLTwoHecke
 section Matrices
 
 variable {R : Type} [CommRing R]
-
 
 end Matrices
 
@@ -35,8 +35,6 @@ def singleNU (w : HeightOneSpectrum (𝓞 E)) : w.adicCompletion E →ₙ+* Fini
   map_mul' := singleFin_mul w
   map_zero' := map_zero _
   map_add' := map_add _
-
-
 
 end GlobalTheory.GLTwoHecke
 

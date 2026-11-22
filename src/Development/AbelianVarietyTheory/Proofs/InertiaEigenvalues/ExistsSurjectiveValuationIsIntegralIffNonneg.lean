@@ -11,17 +11,21 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-theorem exists_surjective_valuation_isIntegral_iff (K : UQ) (L : Type) [Field L] [Algebra K.E L]
-    [Algebra K.O L] [IsScalarTower K.O K.E L] [FiniteDimensional K.E L] :
-    ∃ v : Lˣ →* Multiplicative ℤ, Function.Surjective v ∧
-      ∀ x : Lˣ, IsIntegral K.O (x : L) ↔ 0 ≤ Multiplicative.toAdd (v x) := by
+theorem exists_surjective_valuation_isIntegral_iff
+    (K : UQ) (L : Type)
+    [Field L] [Algebra K.E L] [Algebra K.O L] [IsScalarTower K.O K.E L] [FiniteDimensional K.E L]
+    : ∃ v : Lˣ →* Multiplicative ℤ,
+      Function.Surjective v
+        ∧ ∀ x : Lˣ, IsIntegral K.O (x : L) ↔ 0 ≤ Multiplicative.toAdd (v x) := by
   haveI hdvr := GlobalTheory.FormalIsogeny.isDiscreteValuationRing_integralClosure K.O K.E L
   haveI hfr := integralClosure.isFractionRing_of_finite_extension (A := K.O) K.E L
   set R := integralClosure K.O L
   let P := IsDiscreteValuationRing.maximalIdeal R
-  let u : Lˣ →* Multiplicative ℤ := WithZero.unitsWithZeroEquiv.toMonoidHom.comp
-    (Units.map (P.valuation L).toMonoidWithZeroHom.toMonoidHom)
-  have hu : ∀ x : Lˣ, ((u x : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) = P.valuation L x := by
+  let u : Lˣ →* Multiplicative ℤ :=
+    WithZero.unitsWithZeroEquiv.toMonoidHom.comp (Units.map (P.valuation
+      L).toMonoidWithZeroHom.toMonoidHom)
+  have hu
+      : ∀ x : Lˣ, ((u x : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) = P.valuation L x := by
     intro x
     simp [u, WithZero.coe_unitsWithZeroEquiv_eq_units_val]
   have key : ∀ x : L, x ≠ 0 → (IsIntegral K.O x ↔ P.valuation L x ≤ 1) := by
@@ -45,15 +49,15 @@ theorem exists_surjective_valuation_isIntegral_iff (K : UQ) (L : Type) [Field L]
           have h3 : P.valuation L x * P.valuation L x⁻¹ < 1 :=
             lt_of_le_of_lt (mul_le_of_le_one_left' h) h1
           exact (ne_of_lt h3) h2
-        · have hru : IsUnit r := by
-            by_contra hh; exact hrm ((IsLocalRing.mem_maximalIdeal r).2 hh)
+        · have hru : IsUnit r := by by_contra hh; exact hrm ((IsLocalRing.mem_maximalIdeal r).2 hh)
           obtain ⟨s, hs⟩ := hru
           have : x = algebraMap R L (s⁻¹ : Rˣ) := by
             have e1 : algebraMap R L (s : R) * algebraMap R L ((s⁻¹ : Rˣ) : R) = 1 := by
               rw [← map_mul, Units.mul_inv, map_one]
             rw [hs, hr] at e1
             exact (inv_mul_eq_one₀ hx).1 e1
-          rw [this]; exact ((s⁻¹ : Rˣ) : R).2
+          rw [this]
+          exact ((s⁻¹ : Rˣ) : R).2
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible R
   have hπ0 : algebraMap R L π ≠ 0 := by
     intro h
@@ -69,7 +73,8 @@ theorem exists_surjective_valuation_isIntegral_iff (K : UQ) (L : Type) [Field L]
   refine ⟨u⁻¹, ?_, ?_⟩
   · intro n
     refine ⟨πL ^ (Multiplicative.toAdd n), ?_⟩
-    rw [map_zpow, MonoidHom.inv_apply, huπ, ← ofAdd_neg, neg_neg, ← ofAdd_zsmul, smul_eq_mul, mul_one]
+    rw [map_zpow, MonoidHom.inv_apply, huπ, ← ofAdd_neg, neg_neg, ← ofAdd_zsmul, smul_eq_mul,
+      mul_one]
     rfl
   · intro x
     rw [key _ x.ne_zero, ← hu, MonoidHom.inv_apply, toAdd_inv, neg_nonneg, ← WithZero.coe_one,

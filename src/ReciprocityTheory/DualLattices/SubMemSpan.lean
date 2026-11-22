@@ -81,8 +81,9 @@ lemma e_nsmul2 (x z : B.G R) (u : B.P R (A.a.f s x) z) (n : ℕ) :
     refine (B.castSnd_heq _ _).trans ?_
     exact (B.addSnd_hcongr rfl (map_nsmul _ n z) rfl ih HEq.rfl).trans (B.castSnd_heq _ _).symm
 
-theorem pairing_of (N : ℕ) (x z : B.G R) (w : (R : Type u)ˣ) (hx : N • x = 0)
-    (h : B.IsPairing N (A.a.f s x) z w) : B.IsPairing N x (A.ab.f s z) w := by
+theorem pairing_of
+    (N : ℕ) (x z : B.G R) (w : (R : Type u)ˣ) (hx : N • x = 0) (h : B.IsPairing N (A.a.f s x) z w)
+    : B.IsPairing N x (A.ab.f s z) w := by
   obtain ⟨hax, hz, u, l₁, l₂, h1, h2, rfl⟩ := h
   have hbz : N • A.ab.f s z = 0 := by rw [← map_nsmul, hz, map_zero]
   refine ⟨hx, hbz, A.e s x z u, l₁, l₂, ?_, ?_, rfl⟩
@@ -98,16 +99,15 @@ theorem pairing_of (N : ℕ) (x z : B.G R) (w : (R : Type u)ˣ) (hx : N • x = 
     refine (B.castFst_heq _ _).trans (k1.symm.trans (k2.trans ?_))
     exact B.smul_hcongr rfl rfl l₁ (A.e_zero1 s z)
   · have k1 := A.e_nsmul2 s x z u N
-    have k2 : HEq (A.e s x (N • z) (B.nsmul2 u N))
-        (A.e s x 0 (B.smul l₂ (B.zero2 (A.a.f s x)))) :=
+    have k2 : HEq (A.e s x (N • z) (B.nsmul2 u N)) (A.e s x 0 (B.smul l₂ (B.zero2 (A.a.f s x)))) :=
       A.e_hcongr s rfl hz ((B.castSnd_heq hz _).symm.trans (heq_of_eq h2))
     rw [A.e_smul] at k2
     apply eq_of_heq
     refine (B.castSnd_heq _ _).trans (k1.symm.trans (k2.trans ?_))
     exact B.smul_hcongr rfl (map_zero _) l₂ (A.e_zero2 s x)
 
-theorem pairing_iff (N : ℕ) (x z : B.G R) (w : (R : Type u)ˣ) (hx : N • x = 0) (hz : N • z = 0) :
-    B.IsPairing N (A.a.f s x) z w ↔ B.IsPairing N x (A.ab.f s z) w := by
+theorem pairing_iff (N : ℕ) (x z : B.G R) (w : (R : Type u)ˣ) (hx : N • x = 0) (hz : N • z = 0)
+    : B.IsPairing N (A.a.f s x) z w ↔ B.IsPairing N x (A.ab.f s z) w := by
   refine ⟨A.pairing_of s N x z w hx, fun h => ?_⟩
   have hax : N • A.a.f s x = 0 := by rw [← map_nsmul, hx, map_zero]
   obtain ⟨w', hw'⟩ := B.pairing_exists N _ z hax hz
@@ -133,23 +133,26 @@ lemma mul_span (a b : (Dp.D : Type u)) (ha : a ∈ Ideal.span {Dp.η}) (hb : b �
   calc c * Dp.η * (d * Dp.η) = c * d * (Dp.η * Dp.η) := by ring
     _ = 0 := by rw [Dp.η_sq, mul_zero]
 
-def mr (r : (R : Type u)) : LHom Dp.D Dp.D :=
-  ⟨{ toFun := fun d => Dp.σ.1 (Dp.π.1 d) + Dp.σ.1 r * (d - Dp.σ.1 (Dp.π.1 d))
-     map_one' := by simp
-     map_mul' := fun d e => by
-       have hk := Dp.mul_span _ _ (Dp.sub_mem_span d) (Dp.sub_mem_span e)
-       simp only [map_mul]
-       linear_combination (Dp.σ.1 r - Dp.σ.1 r * Dp.σ.1 r) * hk
-     map_zero' := by simp
-     map_add' := fun d e => by simp only [map_add (f := _)]; ring
-     commutes' := fun c => by simp },
-   ⟨fun d hd => by
-     have h1 := hd.map Dp.π.1
-     have e : Dp.π.1 (Dp.σ.1 (Dp.π.1 d) + Dp.σ.1 r * (d - Dp.σ.1 (Dp.π.1 d))) = Dp.π.1 d := by
-       simp [Dp.sect]
-     refine Dp.π.2.map_nonunit d ?_
-     convert h1 using 1
-     exact e.symm⟩⟩
+def mr (r : (R : Type u)) : LHom Dp.D Dp.D := ⟨
+  {
+    toFun := fun d => Dp.σ.1 (Dp.π.1 d) + Dp.σ.1 r * (d - Dp.σ.1 (Dp.π.1 d))
+    map_one' := by simp
+    map_mul' := fun d e => by
+      have hk := Dp.mul_span _ _ (Dp.sub_mem_span d) (Dp.sub_mem_span e)
+      simp only [map_mul]
+      linear_combination (Dp.σ.1 r - Dp.σ.1 r * Dp.σ.1 r) * hk
+    map_zero' := by simp
+    map_add' := fun d e => by simp only [map_add (f := _)]; ring
+    commutes' := fun c => by simp
+  },
+  ⟨fun d hd => by
+    have h1 := hd.map Dp.π.1
+    have e : Dp.π.1 (Dp.σ.1 (Dp.π.1 d) + Dp.σ.1 r * (d - Dp.σ.1 (Dp.π.1 d))) = Dp.π.1 d := by
+      simp [Dp.sect]
+    refine Dp.π.2.map_nonunit d ?_
+    convert h1 using 1
+    exact e.symm⟩
+⟩
 
 lemma mr_apply (r : (R : Type u)) (d : (Dp.D : Type u)) :
     (Dp.mr r).1 d = Dp.σ.1 (Dp.π.1 d) + Dp.σ.1 r * (d - Dp.σ.1 (Dp.π.1 d)) := rfl
@@ -178,12 +181,14 @@ lemma hext_tmul (B : BX R₀) {R : LAlg R₀} (h : B.gg →ₗ[R₀] (R : Type u
     hext B h (w ⊗ₜ r) = h w * r := by
   simp [hext]
 
-theorem ht_ext (B : BX R₀) {R : LAlg R₀} (Dp : DualPair R) (N : ℕ) (y : B.G R)
-    (h : B.gg →ₗ[R₀] (R : Type u)) (hy : N • y = 0) (hH : B.IsHeight Dp N y h)
-    (V : B.gg ⊗[R₀] (R : Type u)) :
-    ∃ z : (Dp.D : Type u)ˣ,
-      B.IsPairing N (B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap V)) (B.map Dp.σ y) z ∧
-        (z : (Dp.D : Type u)) = 1 + Dp.σ.1 (hext B h V) * Dp.η := by
+theorem ht_ext
+    (B : BX R₀)
+    {R : LAlg R₀} (Dp : DualPair R)
+    (N : ℕ) (y : B.G R) (h : B.gg →ₗ[R₀] (R : Type u))
+    (hy : N • y = 0) (hH : B.IsHeight Dp N y h) (V : B.gg ⊗[R₀] (R : Type u))
+    : ∃ z : (Dp.D : Type u)ˣ,
+      B.IsPairing N (B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap V)) (B.map Dp.σ y) z
+        ∧ (z : (Dp.D : Type u)) = 1 + Dp.σ.1 (hext B h V) * Dp.η := by
   induction V using TensorProduct.induction_on with
   | zero =>
     have hY : N • B.map Dp.σ y = 0 := by rw [← map_nsmul, hy, map_zero]
@@ -197,14 +202,15 @@ theorem ht_ext (B : BX R₀) {R : LAlg R₀} (Dp : DualPair R) (N : ℕ) (y : B.
   | tmul w r =>
     obtain ⟨z, hz, ez⟩ := hH w
     have k := B.pairing_map (Dp.mr r) N _ _ z hz
-    have e1 : B.map (Dp.mr r) (B.tg Dp.π Dp.sqZero (w ⊗ₜ Dp.ηk)) =
-        B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap (w ⊗ₜ r)) := by
-      rw [← B.tg_nat Dp.π Dp.π Dp.sqZero Dp.sqZero (Dp.mr r) (Dp.mr_ker r),
-        LinearMap.lTensor_tmul, LinearMap.lTensor_tmul]
+    have e1
+        : B.map (Dp.mr r) (B.tg Dp.π Dp.sqZero (w ⊗ₜ Dp.ηk))
+          = B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap (w ⊗ₜ r)) := by
+      rw [← B.tg_nat Dp.π Dp.π Dp.sqZero Dp.sqZero (Dp.mr r) (Dp.mr_ker r), LinearMap.lTensor_tmul,
+        LinearMap.lTensor_tmul]
       congr 2
-      exact Subtype.ext (by simp [DualPair.ηk, DualPair.ηmap, DualPair.mr_apply, Dp.π_η, LinearMap.restrict_apply])
-    have e2 : B.map (Dp.mr r) (B.map Dp.σ y) = B.map Dp.σ y := by
-      rw [← B.map_comp, Dp.mr_comp_σ]
+      exact Subtype.ext (by
+        simp [DualPair.ηk, DualPair.ηmap, DualPair.mr_apply, Dp.π_η, LinearMap.restrict_apply])
+    have e2 : B.map (Dp.mr r) (B.map Dp.σ y) = B.map Dp.σ y := by rw [← B.map_comp, Dp.mr_comp_σ]
     rw [e1, e2] at k
     refine ⟨_, k, ?_⟩
     simp only [Units.coe_map, MonoidHom.coe_coe]
@@ -223,11 +229,13 @@ namespace OAdj
 
 variable {B : BX R₀} {O : LAlg R₀} (A : OAdj B O) {R : LAlg R₀} (s : LHom O R)
 
-theorem ht_a (Dp : DualPair R) (N : ℕ) (y : B.G R) (h : B.gg →ₗ[R₀] (R : Type u))
+theorem ht_a
+    (Dp : DualPair R) (N : ℕ) (y : B.G R) (h : B.gg →ₗ[R₀] (R : Type u))
     (δ : B.gg →ₗ[R₀] B.gg ⊗[R₀] (R : Type u)) (hy : N • y = 0) (hH : B.IsHeight Dp N y h)
-    (hδ : ∀ v, A.ab.f (Dp.σ.comp s) (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk)) =
-      B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap (δ v))) :
-    B.IsHeight Dp N (A.a.f s y) (hext B h ∘ₗ δ) := by
+    (hδ : ∀ v,
+      A.ab.f (Dp.σ.comp s) (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk))
+        = B.tg Dp.π Dp.sqZero (LinearMap.lTensor B.gg Dp.ηmap (δ v)))
+    : B.IsHeight Dp N (A.a.f s y) (hext B h ∘ₗ δ) := by
   intro v
   obtain ⟨z, hz, ez⟩ := ht_ext B Dp N y h hy hH (δ v)
   rw [← hδ v] at hz
@@ -241,7 +249,7 @@ theorem ht_a (Dp : DualPair R) (N : ℕ) (y : B.G R) (h : B.gg →ₗ[R₀] (R :
 
 end OAdj
 
-theorem linHt (B : BX R₀) (O : LAlg R₀) : LinHtStatement B O :=
-  fun A _ s Dp N y h δ hy hH hδ => A.ht_a s Dp N y h δ hy hH hδ
+theorem linHt (B : BX R₀) (O : LAlg R₀) : LinHtStatement B O := fun A _ s Dp N y h δ hy hH hδ =>
+  A.ht_a s Dp N y h δ hy hH hδ
 
 end ReciprocityTheory.PGsh

@@ -6,21 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.FormalExpMu
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat GlobalTheory.FormalCalc
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat GlobalTheory.FormalCalc
 
 namespace GlobalTheory.FrobCong
 
-theorem frobenius_congr (p : ℕ) [hpf : Fact p.Prime] (B : Type) [CommRing B] (σB : B →+* B)
-    (hσ : ∀ b, (p : B) ∣ σB b - b ^ p) (d : ℕ) (g : MvPowerSeries (Fin d) B) (α : Fin d →₀ ℕ) :
-    (p : B) ∣ coeff α (subst (fun i => (X i : MvPowerSeries (Fin d) B) ^ p) (map σB g) - g ^ p) := by
+theorem frobenius_congr
+    (p : ℕ) [hpf : Fact p.Prime]
+    (B : Type) [CommRing B]
+    (σB : B →+* B) (hσ : ∀ b, (p : B) ∣ σB b - b ^ p)
+    (d : ℕ) (g : MvPowerSeries (Fin d) B) (α : Fin d →₀ ℕ)
+    : (p : B)
+      ∣ coeff α (subst (fun i => (X i : MvPowerSeries (Fin d) B) ^ p) (map σB g) - g ^ p) := by
   have hp : p ≠ 0 := hpf.out.ne_zero
   set I : Ideal B := Ideal.span {(p : B)} with hI
   set π : B →+* B ⧸ I := Ideal.Quotient.mk I with hπ
-  have hsub : subst (fun i => (X i : MvPowerSeries (Fin d) B) ^ p) (map σB g)
-      = expand p hp (map σB g) := by
+  have hsub
+      : subst (fun i => (X i : MvPowerSeries (Fin d) B) ^ p) (map σB g)
+        = expand p hp (map σB g) := by
     rw [expand, substAlgHom_apply]
-  rw [hsub, ← Ideal.mem_span_singleton, ← hI, ← Ideal.Quotient.eq_zero_iff_mem, ← hπ,
-    ← coeff_map, map_sub, map_pow, map_expand, map_map]
+  rw [hsub, ← Ideal.mem_span_singleton, ← hI, ← Ideal.Quotient.eq_zero_iff_mem, ← hπ, ← coeff_map,
+    map_sub, map_pow, map_expand, map_map]
   rcases subsingleton_or_nontrivial (B ⧸ I) with hs | hs
   · exact Subsingleton.elim _ _
   have hp0 : ((p : ℕ) : B ⧸ I) = 0 := by

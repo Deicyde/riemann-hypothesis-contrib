@@ -11,9 +11,10 @@ namespace GlobalTheory
 theorem mul_norm_sq_le_norm_adjoint_sq_of_spanning_parts
     {X Y ι : Type} [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X]
     [NormedAddCommGroup Y] [InnerProductSpace ℂ Y] [FiniteDimensional ℂ Y]
-    (T : X →ₗ[ℂ] Y) (P : ι → Submodule ℂ Y) (m : ℝ) (hP : (⨆ k, P k) = ⊤)
-    (hl : ∀ k, ∃ l : ℝ, m ≤ l ∧ ∀ y ∈ P k, T (LinearMap.adjoint T y) = (l : ℂ) • y) (u : Y) :
-    m * ‖u‖ ^ 2 ≤ ‖LinearMap.adjoint T u‖ ^ 2 := by
+    (T : X →ₗ[ℂ] Y) (P : ι → Submodule ℂ Y) (m : ℝ)
+    (hP : (⨆ k, P k) = ⊤)
+    (hl : ∀ k, ∃ l : ℝ, m ≤ l ∧ ∀ y ∈ P k, T (LinearMap.adjoint T y) = (l : ℂ) • y) (u : Y)
+    : m * ‖u‖ ^ 2 ≤ ‖LinearMap.adjoint T u‖ ^ 2 := by
   by_cases hu : u = 0
   · simp [hu]
   haveI : Nontrivial Y := ⟨⟨u, 0, hu⟩⟩
@@ -52,8 +53,8 @@ theorem mul_norm_sq_le_norm_adjoint_sq_of_spanning_parts
     rw [Submodule.mem_orthogonal_singleton_iff_inner_right, inner_self_eq_zero] at hv'
     exact hv.2 hv'
   have h1 := hev _ hsym.hasEigenvalue_iInf_of_finiteDimensional
-  have hb : BddBelow (Set.range fun x : { x : Y // x ≠ 0 } =>
-      RCLike.re ⟪S x, x⟫_ℂ / ‖(x : Y)‖ ^ 2) := by
+  have hb
+      : BddBelow (Set.range fun x : {x : Y // x ≠ 0} => RCLike.re ⟪S x, x⟫_ℂ / ‖(x : Y)‖ ^ 2) := by
     refine ⟨0, ?_⟩
     rintro _ ⟨x, rfl⟩
     simp only [hq]
@@ -63,8 +64,13 @@ theorem mul_norm_sq_le_norm_adjoint_sq_of_spanning_parts
   have hpos : 0 < ‖u‖ ^ 2 := by positivity
   rwa [le_div_iff₀ hpos] at h2
 
-theorem mul_norm_sq_le_norm_proj_apply_sq_of_spanning_parts :
-    ∀ (X Y ι : Type) [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X] [NormedAddCommGroup Y] [InnerProductSpace ℂ Y] [FiniteDimensional ℂ Y] (T : X →ₗ[ℂ] Y) (e : Y →ₗ[ℂ] Y) (P : ι → Submodule ℂ Y) (m : ℝ), 0 < m → LinearMap.adjoint e = e → (∀ y, e (e y) = e y) → (⨆ k, P k) = ⊤ → (∀ k, ∃ l : ℝ, m ≤ l ∧ ∀ y ∈ P k, T (LinearMap.adjoint T y) = (l : ℂ) • y) → ∀ x ∈ (LinearMap.ker (e ∘ₗ T))ᗮ, m * ‖x‖ ^ 2 ≤ ‖e (T x)‖ ^ 2 := by
+theorem mul_norm_sq_le_norm_proj_apply_sq_of_spanning_parts
+    : ∀ (X Y ι : Type) [NormedAddCommGroup X] [InnerProductSpace ℂ X] [FiniteDimensional ℂ X]
+        [NormedAddCommGroup Y] [InnerProductSpace ℂ Y] [FiniteDimensional ℂ Y] (T : X →ₗ[ℂ] Y)
+        (e : Y →ₗ[ℂ] Y) (P : ι → Submodule ℂ Y) (m : ℝ),
+      0 < m → LinearMap.adjoint e = e → (∀ y, e (e y) = e y) → (⨆ k, P k) = ⊤
+        → (∀ k, ∃ l : ℝ, m ≤ l ∧ ∀ y ∈ P k, T (LinearMap.adjoint T y) = (l : ℂ) • y)
+        → ∀ x ∈ (LinearMap.ker (e ∘ₗ T))ᗮ, m * ‖x‖ ^ 2 ≤ ‖e (T x)‖ ^ 2 := by
   intro X Y ι _ _ _ _ _ _ T e P m hm he hee hP hl x hx
   rw [LinearMap.orthogonal_ker] at hx
   obtain ⟨w, hw⟩ := hx
@@ -73,8 +79,7 @@ theorem mul_norm_sq_le_norm_proj_apply_sq_of_spanning_parts :
   have h1 := mul_norm_sq_le_norm_adjoint_sq_of_spanning_parts T P m hP hl u
   rw [hw] at h1
   have h2 : ⟪x, x⟫_ℂ = ⟪u, e (T x)⟫_ℂ := by
-    have : ⟪u, e (T x)⟫_ℂ = ⟪e u, T x⟫_ℂ := by
-      rw [← LinearMap.adjoint_inner_left e, he]
+    have : ⟪u, e (T x)⟫_ℂ = ⟪e u, T x⟫_ℂ := by rw [← LinearMap.adjoint_inner_left e, he]
     rw [this, hu, hee, ← hu, ← LinearMap.adjoint_inner_left T, hw]
   have h3 : ‖x‖ ^ 2 ≤ ‖u‖ * ‖e (T x)‖ := by
     have h := norm_inner_le_norm (𝕜 := ℂ) u (e (T x))
@@ -85,7 +90,9 @@ theorem mul_norm_sq_le_norm_proj_apply_sq_of_spanning_parts :
   have hpos : 0 < ‖x‖ ^ 2 := by positivity
   have h4 : (‖x‖ ^ 2) ^ 2 ≤ (‖u‖ * ‖e (T x)‖) ^ 2 := by gcongr
   have h5 : (m * ‖x‖ ^ 2) * ‖x‖ ^ 2 ≤ ‖e (T x)‖ ^ 2 * ‖x‖ ^ 2 := by
-    calc (m * ‖x‖ ^ 2) * ‖x‖ ^ 2 = m * (‖x‖ ^ 2) ^ 2 := by ring
+    calc
+      (m * ‖x‖ ^ 2) * ‖x‖ ^ 2
+        = m * (‖x‖ ^ 2) ^ 2 := by ring
       _ ≤ m * (‖u‖ * ‖e (T x)‖) ^ 2 := by gcongr
       _ = ‖e (T x)‖ ^ 2 * (m * ‖u‖ ^ 2) := by ring
       _ ≤ ‖e (T x)‖ ^ 2 * ‖x‖ ^ 2 := by gcongr

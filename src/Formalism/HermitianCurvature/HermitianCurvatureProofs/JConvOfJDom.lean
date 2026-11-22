@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.JFxDs1
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -40,7 +41,9 @@ theorem jConv_of_jDom : Formalism.FourierDecayAlt.JF.JDom → Formalism.FourierD
     have hm := hmeas [] [] (by simp) (by simp) h0 g hg
     refine Integrable.mono' hb (hx.aestronglyMeasurable.smul hm) ?_
     filter_upwards [hbg] with p hp
-    calc ‖xiP D p • rho D p F g‖ = ‖xiP D p‖ * ‖rho D p F g‖ := norm_smul _ _
+    calc
+      ‖xiP D p • rho D p F g‖
+        = ‖xiP D p‖ * ‖rho D p F g‖ := norm_smul _ _
       _ ≤ 1 * ‖rho D p F g‖ := by gcongr; exact SmoothnessOnGoodSet.norm_xiP D p
       _ = ‖rho D p (dLR (List.map (AdL p) []) (List.map (AdR p) []) F) g‖ := by rw [one_mul]; rfl
       _ ≤ b p := hp

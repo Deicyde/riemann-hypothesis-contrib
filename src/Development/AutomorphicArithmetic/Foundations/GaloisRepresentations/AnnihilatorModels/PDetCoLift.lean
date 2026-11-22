@@ -5,17 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
 set_option maxHeartbeats 1600000 in
-theorem UpperTheory.Gal.crystallineComparison.detCoLift_of :
-    CoFacts → WdLift → CoLift := by
+theorem UpperTheory.Gal.crystallineComparison.detCoLift_of : CoFacts → WdLift → CoLift := by
   intro hco hwd l _ P ι K LL a ρ S _ _ π h1 h2
   obtain ⟨f1, f2, f3, -, -⟩ := hco ℚ_[l] ↥LL.1 (Bst P) a
-  refine Exists.elim (hwd l P ι K LL (Fin a → ↥LL.1) ρ (Fin a → S)
-    (fun x i => π (co (x : (Fin a → ↥LL.1) ⊗[ℚ_[l]] Bst P) i)) ?_ ?_ ?_)
+  refine Exists.elim
+    (hwd l P ι K LL (Fin a → ↥LL.1) ρ (Fin a → S)
+      (fun x i => π (co (x : (Fin a → ↥LL.1) ⊗[ℚ_[l]] Bst P) i))
+      ?_ ?_ ?_)
     fun j hj => ⟨j, fun x i => by rw [hj]⟩
   · intro x y
     funext i
@@ -23,8 +26,7 @@ theorem UpperTheory.Gal.crystallineComparison.detCoLift_of :
   · intro c x
     funext i
     change π (co (c • (x : (Fin a → ↥LL.1) ⊗[ℚ_[l]] Bst P)) i) = _
-    rw [f2, Pi.smul_apply, Pi.smul_apply, smul_eq_mul, map_mul, h1,
-      Algebra.smul_def]
+    rw [f2, Pi.smul_apply, Pi.smul_apply, smul_eq_mul, map_mul, h1, Algebra.smul_def]
   · intro c x
     funext i
     have e : co (mulV P ↥LL.1 (Fin a → ↥LL.1) c (x : (Fin a → ↥LL.1) ⊗[ℚ_[l]] Bst P)) = _ :=

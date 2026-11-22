@@ -98,11 +98,12 @@ lemma dsJ_basicOpen (hV : ∀ x : W, ∃ c, x ∈ V c)
 
 end LocGen
 
-theorem exists_idealSheaf_of_locGen {W : Scheme.{0}} {ι' : Type} (V : ι' → W.Opens)
-    (hV : ∀ x : W, ∃ c, x ∈ V c) (g : ∀ c, Γ(W, V c))
+theorem exists_idealSheaf_of_locGen
+    {W : Scheme.{0}} {ι' : Type}
+    (V : ι' → W.Opens) (hV : ∀ x : W, ∃ c, x ∈ V c) (g : ∀ c, Γ(W, V c))
     (hg : ∀ c c' (x : W) (hx : x ∈ V c) (hx' : x ∈ V c'), ∃ u : (W.presheaf.stalk x)ˣ,
-      W.presheaf.germ (V c) x hx (g c) = u * W.presheaf.germ (V c') x hx' (g c')) :
-    ∃ G : W.IdealSheafData, ∀ c (x : W) (hx : x ∈ V c),
+      W.presheaf.germ (V c) x hx (g c) = u * W.presheaf.germ (V c') x hx' (g c'))
+    : ∃ G : W.IdealSheafData, ∀ c (x : W) (hx : x ∈ V c),
       FinalTheorems.stalkId G x = Ideal.span {W.presheaf.germ (V c) x hx (g c)} := by
   refine ⟨⟨fun U => dsJ V g U, fun U f => dsJ_basicOpen hV hg U f, _, rfl⟩, fun c x hx => ?_⟩
   obtain ⟨U', hU', hxU', hsub⟩ := exists_isAffineOpen_mem_and_subset hx
@@ -121,46 +122,55 @@ theorem exists_idealSheaf_of_locGen {W : Scheme.{0}} {ι' : Type} (V : ι' → W
       rw [dsK_eq hg c (hsub hy)]
       apply Ideal.subset_span
       simp
-    have e : W.presheaf.germ U' x hxU' (W.presheaf.map (homOfLE hle).op (g c)) =
-        W.presheaf.germ (V c) x hx (g c) := by simp
+    have e
+        : W.presheaf.germ U' x hxU' (W.presheaf.map (homOfLE hle).op (g c))
+          = W.presheaf.germ (V c) x hx (g c) := by
+      simp
     rw [← e]
     exact Ideal.mem_map_of_mem _ hr
 
-theorem effCartier_of_stalkId {W : Scheme.{0}} [IsNoetherian W] (G : W.IdealSheafData)
-    (hG : ∀ x : W, ∃ t ∈ nonZeroDivisors (W.presheaf.stalk x), FinalTheorems.stalkId G x = Ideal.span {t}) :
-    FinalTheorems.EffCartier G := by
+theorem effCartier_of_stalkId
+    {W : Scheme.{0}} [IsNoetherian W]
+    (G : W.IdealSheafData)
+    (hG : ∀ x : W, ∃ t ∈ nonZeroDivisors (W.presheaf.stalk x),
+      FinalTheorems.stalkId G x = Ideal.span {t})
+    : FinalTheorems.EffCartier G := by
   intro x
   obtain ⟨U0, hU0, hxU0, -⟩ := exists_isAffineOpen_mem_and_subset (x := x) (U := ⊤) trivial
   haveI : IsNoetherianRing Γ(W, U0) := IsLocallyNoetherian.component_noetherian ⟨U0, hU0⟩
   obtain ⟨t, ht, hst⟩ := hG x
   letI := (W.presheaf.germ U0 x hxU0).hom.toAlgebra
   haveI := hU0.isLocalization_stalk ⟨x, hxU0⟩
-  have hI : (G.ideal ⟨U0, hU0⟩).map (algebraMap Γ(W, U0) (W.presheaf.stalk x)) =
-      Ideal.span {t} := by
+  have hI
+      : (G.ideal ⟨U0, hU0⟩).map (algebraMap Γ(W, U0) (W.presheaf.stalk x)) = Ideal.span {t} := by
     rw [← hst, ds_stalkId_eq_map G ⟨U0, hU0⟩ x hxU0]
     rfl
-  obtain ⟨y, ⟨h, hh, rfl⟩, c, hyc⟩ := ds_gen_of_span
-    ((algebraMap Γ(W, U0) (W.presheaf.stalk x)) '' (G.ideal ⟨U0, hU0⟩ : Set Γ(W, U0))) t ht hI
-  have hmap : (G.ideal ⟨U0, hU0⟩).map (algebraMap Γ(W, U0) (W.presheaf.stalk x)) =
-      Ideal.span {algebraMap Γ(W, U0) (W.presheaf.stalk x) h} := by
+  obtain ⟨y, ⟨h, hh, rfl⟩, c, hyc⟩ :=
+    ds_gen_of_span
+      ((algebraMap Γ(W, U0) (W.presheaf.stalk x)) '' (G.ideal ⟨U0, hU0⟩ : Set Γ(W, U0))) t ht hI
+  have hmap
+      : (G.ideal ⟨U0, hU0⟩).map (algebraMap Γ(W, U0) (W.presheaf.stalk x))
+        = Ideal.span {algebraMap Γ(W, U0) (W.presheaf.stalk x) h} := by
     rw [hI, hyc, Ideal.span_singleton_mul_left_unit c.isUnit]
-  have hnzd : algebraMap Γ(W, U0) (W.presheaf.stalk x) h ∈
-      nonZeroDivisors (W.presheaf.stalk x) := by
+  have hnzd
+      : algebraMap Γ(W, U0) (W.presheaf.stalk x) h ∈ nonZeroDivisors (W.presheaf.stalk x) := by
     rw [hyc]
     exact mul_mem c.isUnit.mem_nonZeroDivisors ht
   obtain ⟨σ, hσ, hT⟩ := ds_spread (hU0.primeIdealOf ⟨x, hxU0⟩).asIdeal _ h hh hmap hnzd
   letI := (W.presheaf.map (homOfLE <| W.basicOpen_le σ).op).hom.toAlgebra
   haveI := hU0.isLocalization_basicOpen σ
   obtain ⟨h1, h2⟩ := hT Γ(W, W.basicOpen σ)
-  refine ⟨W.affineBasicOpen (U := ⟨U0, hU0⟩) σ, algebraMap Γ(W, U0) Γ(W, W.basicOpen σ) h, ?_, h2, ?_⟩
-  · have hu := (IsLocalization.AtPrime.isUnit_to_map_iff (W.presheaf.stalk x)
-      (hU0.primeIdealOf ⟨x, hxU0⟩).asIdeal σ).2 hσ
+  refine
+    ⟨W.affineBasicOpen (U := ⟨U0, hU0⟩) σ, algebraMap Γ(W, U0) Γ(W, W.basicOpen σ) h, ?_, h2, ?_⟩
+  · have hu :=
+      (IsLocalization.AtPrime.isUnit_to_map_iff (W.presheaf.stalk x)
+        (hU0.primeIdealOf ⟨x, hxU0⟩).asIdeal σ).2 hσ
     exact (Scheme.mem_basicOpen W σ x hxU0).2 hu
   · rw [← G.map_ideal_basicOpen ⟨U0, hU0⟩ σ]
     exact h1
 
-theorem mem_support_iff_stalkId {W : Scheme.{0}} (G : W.IdealSheafData) (x : W) :
-    x ∈ (G.support : Set W) ↔ FinalTheorems.stalkId G x ≠ ⊤ := by
+theorem mem_support_iff_stalkId {W : Scheme.{0}} (G : W.IdealSheafData) (x : W)
+    : x ∈ (G.support : Set W) ↔ FinalTheorems.stalkId G x ≠ ⊤ := by
   obtain ⟨U', hU', hxU', -⟩ := exists_isAffineOpen_mem_and_subset (x := x) (U := ⊤) trivial
   have hxU : x ∈ (⟨U', hU'⟩ : W.affineOpens).1 := hxU'
   refine (Scheme.IdealSheafData.mem_support_iff_of_mem hxU).trans ?_
@@ -170,8 +180,9 @@ theorem mem_support_iff_stalkId {W : Scheme.{0}} (G : W.IdealSheafData) (x : W) 
     obtain ⟨f, hf, hu⟩ : ∃ f ∈ G.ideal ⟨U', hU'⟩, IsUnit (W.presheaf.germ U' x hxU' f) := by
       by_contra hno
       push_neg at hno
-      have hle : Ideal.map (W.presheaf.germ U' x hxU').hom (G.ideal ⟨U', hU'⟩) ≤
-          IsLocalRing.maximalIdeal _ := by
+      have hle
+          : Ideal.map (W.presheaf.germ U' x hxU').hom (G.ideal ⟨U', hU'⟩)
+            ≤ IsLocalRing.maximalIdeal _ := by
         rw [Ideal.map_le_iff_le_comap]
         intro f hf
         exact (IsLocalRing.mem_maximalIdeal _).2 (hno f hf)

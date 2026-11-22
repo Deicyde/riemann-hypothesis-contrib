@@ -14,14 +14,18 @@ namespace Formalism.NG
 
 section HomQuotAux
 
-variable {R O M NN : Type*} [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M]
-  [SMulCommClass R O M] [AddCommGroup NN] [Module R NN] {g : Type} [Fintype g]
+variable
+  {R O M NN : Type*} [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M]
+  [SMulCommClass R O M] [AddCommGroup NN] [Module R NN]
+  {g : Type} [Fintype g]
 
 end HomQuotAux
 
 section KerHomAux
 
-variable {R : Type*} [Ring R] {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {R : Type*} [Ring R]
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {g d : Type} [Fintype g] [DecidableEq g] [Fintype d] [DecidableEq d]
   (ρ : R →+* Matrix d d O)
 
@@ -39,7 +43,8 @@ end KerHomAux
 
 section LenCokerAux
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {ι : Type} [Fintype ι] [DecidableEq ι]
 
 end LenCokerAux

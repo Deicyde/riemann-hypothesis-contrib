@@ -23,17 +23,20 @@ set_option linter.style.haveILetI false
 
 section Mult
 
-theorem length_quotient_of_surjective {S C : Type*} [CommRing S] [CommRing C] [Algebra S C]
-    (h : Function.Surjective (algebraMap S C)) (I : Ideal C) :
-    Module.length S (C ⧸ I) = Module.length C (C ⧸ I) :=
+theorem length_quotient_of_surjective
+    {S C : Type*} [CommRing S] [CommRing C] [Algebra S C]
+    (h : Function.Surjective (algebraMap S C)) (I : Ideal C)
+    : Module.length S (C ⧸ I) = Module.length C (C ⧸ I) :=
   Module.length_eq_of_surjective h
 
-variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} {R : Type*} [CommRing R]
+variable
+  {K : Type*} [Fintype K] [DecidableEq K]
+  {ι : K → Type*} {R : Type*} [CommRing R]
   {P W : Ideal (MRing ι R)} [P.IsPrime] [W.IsPrime]
 
-theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R) :
-    multAt (P ⊔ Ideal.span {x}) W =
-      Module.length (locC hPW) (locC hPW ⧸ Ideal.span {algQC hPW (Ideal.Quotient.mk P x)}) := by
+theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R)
+    : multAt (P ⊔ Ideal.span {x}) W
+      = Module.length (locC hPW) (locC hPW ⧸ Ideal.span {algQC hPW (Ideal.Quotient.mk P x)}) := by
   letI := (algQC hPW).toAlgebra
   haveI := wbar_isPrime hPW
   haveI := locC_isLocalization hPW
@@ -44,15 +47,19 @@ theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R) :
   have hunit : ∀ {s : MRing ι R}, s ∉ W → IsUnit (θ s) := fun hs =>
     (IsLocalization.AtPrime.isUnit_to_map_iff (locC hPW) (W.map (Ideal.Quotient.mk P)) _).mpr
       fun h => hs ((Ideal.mem_quotient_iff_mem hPW).mp h)
-  obtain ⟨θW, hθWdef⟩ : ∃ φ : Localization.AtPrime W →+* locC hPW,
-      φ = IsLocalization.lift (M := W.primeCompl) (g := θ) fun s => hunit s.2 := ⟨_, rfl⟩
+  obtain ⟨θW, hθWdef⟩
+      : ∃ φ : Localization.AtPrime W →+* locC hPW,
+        φ = IsLocalization.lift (M := W.primeCompl) (g := θ) fun s => hunit s.2 :=
+    ⟨_, rfl⟩
   have hθW : ∀ f, θW (algebraMap (MRing ι R) (Localization.AtPrime W) f) = θ f := fun f => by
     rw [hθWdef]
     exact IsLocalization.lift_eq _ _
 
-  have hval : ∀ (a s : MRing ι R) (hs : s ∈ W.primeCompl),
-      (θW (IsLocalization.mk' (Localization.AtPrime W) a ⟨s, hs⟩) : FractionRing (MRing ι R ⧸ P)) *
-        fr P s = fr P a := by
+  have hval
+      : ∀ (a s : MRing ι R) (hs : s ∈ W.primeCompl),
+        (θW (IsLocalization.mk' (Localization.AtPrime W) a ⟨s, hs⟩) : FractionRing (MRing ι R ⧸ P))
+            * fr P s
+          = fr P a := by
     intro a s hs
     have := congrArg θW (IsLocalization.mk'_spec (Localization.AtPrime W) a ⟨s, hs⟩)
     rw [RingHom.map_mul, hθW, hθW] at this
@@ -91,7 +98,8 @@ theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R) :
       have hat : a * t - b * x * s ∈ P := by
         have h2 : fr P a * fr P t = fr P b * fr P x * fr P s := by
           rw [← h1]
-          calc _ = fr P b * fr P x * fr P s * ((fr P t)⁻¹ * fr P t) := by ring
+          calc
+            _ = fr P b * fr P x * fr P s * ((fr P t)⁻¹ * fr P t) := by ring
             _ = _ := by rw [inv_mul_cancel₀ (hne htW), mul_one]
         rw [← fr_eq_zero_iff, map_sub, map_mul, map_mul, map_mul, h2, sub_self]
       have hatJ : a * t ∈ J := by
@@ -100,9 +108,10 @@ theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R) :
         exact J.add_mem (Ideal.mem_sup_left hat)
           (Ideal.mem_sup_right (Ideal.mul_mem_left _ _ (Ideal.subset_span rfl)))
       have hst : s * t ∈ W.primeCompl := fun h => (Ideal.IsPrime.mem_or_mem ‹_› h).elim hs htW
-      have heq : IsLocalization.mk' (Localization.AtPrime W) a (⟨s, hs⟩ : W.primeCompl) *
-          algebraMap (MRing ι R) (Localization.AtPrime W) (s * t) =
-            algebraMap (MRing ι R) (Localization.AtPrime W) (a * t) := by
+      have heq
+          : IsLocalization.mk' (Localization.AtPrime W) a (⟨s, hs⟩ : W.primeCompl)
+              * algebraMap (MRing ι R) (Localization.AtPrime W) (s * t)
+            = algebraMap (MRing ι R) (Localization.AtPrime W) (a * t) := by
         rw [map_mul, ← mul_assoc, IsLocalization.mk'_spec, map_mul]
       have hu : IsUnit (algebraMap (MRing ι R) (Localization.AtPrime W) (s * t)) :=
         IsLocalization.map_units (Localization.AtPrime W) (⟨s * t, hst⟩ : W.primeCompl)
@@ -120,18 +129,20 @@ theorem multAt_eq_length_locC (hPW : P ≤ W) (x : MRing ι R) :
           exact Ideal.subset_span rfl
       exact Ideal.mem_comap.mp (hJ hj)
   have hlen := (Ideal.quotientKerAlgEquivOfSurjective hfs).toLinearEquiv.length_eq
-  rw [multAt, length_localizedModule_quotient_eq, ← (Submodule.quotEquivOfEq _ _ hker).length_eq, hlen]
+  rw [multAt, length_localizedModule_quotient_eq, ← (Submodule.quotEquivOfEq _ _ hker).length_eq,
+    hlen]
   exact length_quotient_of_surjective hsurj I
 
 end Mult
 
-theorem DivCycleHomLoc.proof (h : HomLocRingLocal.Statement.{u}) : DivCycleHomLoc.Statement.{u} := by
+theorem DivCycleHomLoc.proof (h : HomLocRingLocal.Statement.{u})
+    : DivCycleHomLoc.Statement.{u} := by
   intro O _ _ _ K _ _ ι _ P hP c x hx hxP W hW hWrel g hg hgW hz
   haveI := hP.isPrime
   haveI : W.IsPrime := hW.1.1
   have hPW : P ≤ W := le_trans le_sup_left hW.1.2
-  have hWh : IsMultiHomogIdeal W := MinimalPrimeMultiHomog.proof O K ι _ W
-    (isMultiHomogIdeal_sup_span_of_form hP.multiHomog hx) hW
+  have hWh : IsMultiHomogIdeal W :=
+    MinimalPrimeMultiHomog.proof O K ι _ W (isMultiHomogIdeal_sup_span_of_form hP.multiHomog hx) hW
   haveI : IsLocalRing (homLocRing P W) := (h O K ι P hP c x hx hxP W hW hWrel).1
   choose T hT using hWrel
   rw [← length_quotient_incAC T hPW hT hP.multiHomog hWh, multAt_eq_length_locC hPW x]
@@ -141,8 +152,9 @@ theorem DivCycleHomLoc.proof (h : HomLocRingLocal.Statement.{u}) : DivCycleHomLo
   have hgu : IsUnit (algQC hPW (Ideal.Quotient.mk P g)) :=
     (IsLocalization.AtPrime.isUnit_to_map_iff (locC hPW) (W.map (Ideal.Quotient.mk P)) _).mpr
       fun h => hgW ((Ideal.mem_quotient_iff_mem hPW).mp h)
-  have hxz : algQC hPW (Ideal.Quotient.mk P x) =
-      incAC hPW ⟨_, hz⟩ * algQC hPW (Ideal.Quotient.mk P g) := by
+  have hxz
+      : algQC hPW (Ideal.Quotient.mk P x)
+        = incAC hPW ⟨_, hz⟩ * algQC hPW (Ideal.Quotient.mk P g) := by
     apply Subtype.ext
     change fr P x = fr P x / fr P g * fr P g
     rw [div_mul_cancel₀ _ (fr_ne_zero fun h => hgW (hPW h))]

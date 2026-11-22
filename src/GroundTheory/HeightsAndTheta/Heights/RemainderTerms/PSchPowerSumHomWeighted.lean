@@ -20,8 +20,7 @@ theorem SchPowerSumHomWeighted.proof : SchPowerSumHomWeighted.Statement := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [S.as_sum, map_sum]
   refine IsHomogeneous.sum _ _ _ fun e he => ?_
-  have hw : Finsupp.weight (fun i : Fin N => (i : ℕ) + 1) e = d :=
-    hS (mem_support_iff.mp he)
+  have hw : Finsupp.weight (fun i : Fin N => (i : ℕ) + 1) e = d := hS (mem_support_iff.mp he)
   rw [powerSumHom, aeval_monomial, Finsupp.prod, algebraMap_eq]
   have hprod : (∏ i ∈ e.support, psum (Fin N) ℚ ((i : ℕ) + 1) ^ e i).IsHomogeneous
       (∑ i ∈ e.support, ((i : ℕ) + 1) * e i) :=

@@ -25,8 +25,9 @@ section Uniformizer
 
 variable {K : Type*} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
 
-theorem ord_eq_one_of_valued_eq_exp {π : v.adicCompletion K}
-    (hπ : Valued.v π = WithZero.exp (-1 : ℤ)) : ord π = 1 := by
+theorem ord_eq_one_of_valued_eq_exp
+    {π : v.adicCompletion K} (hπ : Valued.v π = WithZero.exp (-1 : ℤ))
+    : ord π = 1 := by
   have hle : π ∈ v.adicCompletionIntegers K := by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, hπ, ← WithZero.exp_zero, WithZero.exp_le_exp]
     norm_num
@@ -40,12 +41,13 @@ theorem ord_eq_one_of_valued_eq_exp {π : v.adicCompletion K}
   have hx : Irreducible x :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer x).2
       (Valuation.IsUniformizer.is_generator (π := x) hU)
-  let e : v.adicCompletionIntegers K ≃* 𝒪[v.adicCompletion K] :=
-    { toFun := fun a ↦ ⟨a, (mem_valuationInteger_iff v _).2 a.2⟩
-      invFun := fun a ↦ ⟨a, (mem_valuationInteger_iff v _).1 a.2⟩
-      left_inv := fun _ ↦ rfl
-      right_inv := fun _ ↦ rfl
-      map_mul' := fun _ _ ↦ rfl }
+  let e : v.adicCompletionIntegers K ≃* 𝒪[v.adicCompletion K] := {
+    toFun := fun a ↦ ⟨a, (mem_valuationInteger_iff v _).2 a.2⟩
+    invFun := fun a ↦ ⟨a, (mem_valuationInteger_iff v _).1 a.2⟩
+    left_inv := fun _ ↦ rfl
+    right_inv := fun _ ↦ rfl
+    map_mul' := fun _ _ ↦ rfl
+  }
   exact ord_uniformizer (hx.map e)
 
 end Uniformizer
@@ -54,9 +56,9 @@ section Ramified
 
 variable (K L : Type*) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-theorem finite_setOf_exists_ramificationIdx_ne_one :
-    {v : HeightOneSpectrum (𝓞 K) | ∃ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal ∧
-      w.asIdeal.ramificationIdx (𝓞 K) ≠ 1}.Finite := by
+theorem finite_setOf_exists_ramificationIdx_ne_one
+    : {v : HeightOneSpectrum (𝓞 K) | ∃ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal ∧
+        w.asIdeal.ramificationIdx (𝓞 K) ≠ 1}.Finite := by
   refine ((finite_setOf_ramificationIdx_ne_one K L).image (HeightOneSpectrum.under (𝓞 K))).subset ?_
   rintro v ⟨w, hw, he⟩
   refine ⟨w, he, HeightOneSpectrum.ext ?_⟩
@@ -67,8 +69,9 @@ end Ramified
 
 section Chebotarev
 
-variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative Gal(L/K)]
+variable
+  {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsMulCommutative Gal(L/K)]
 
 attribute [local instance] galCommGroup
 
@@ -76,17 +79,19 @@ end Chebotarev
 
 section ChebotarevDensity
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative Gal(L/K)]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsMulCommutative Gal(L/K)]
 
 attribute [local instance] galCommGroup
 
-theorem hasDirichletDensity_setOf_arithFrobAt_eq (σ : Gal(L/K)) :
-    {v : HeightOneSpectrum (𝓞 K) | ∀ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal →
-      w.asIdeal.ramificationIdx (𝓞 K) = 1 ∧ arithFrobAt (𝓞 K) Gal(L/K) w.asIdeal = σ}.HasDirichletDensity
+theorem hasDirichletDensity_setOf_arithFrobAt_eq (σ : Gal(L/K))
+    : {v : HeightOneSpectrum (𝓞 K) | ∀ w : HeightOneSpectrum (𝓞 L), w.asIdeal.LiesOver v.asIdeal →
+        w.asIdeal.ramificationIdx (𝓞 K) = 1 ∧ arithFrobAt (𝓞 K) Gal(L/K) w.asIdeal = σ}.HasDirichletDensity
       (1 / Nat.card Gal(L/K)) := by
-  have hS := hasDirichletDensity_setOf_map_eq (ideleSymbol K L) (isOpen_ker_ideleSymbol L)
-    diagonal_range_le_ker_ideleSymbol ideleSymbol_surjective σ
+  have hS :=
+    hasDirichletDensity_setOf_map_eq (ideleSymbol K L) (isOpen_ker_ideleSymbol L)
+      diagonal_range_le_ker_ideleSymbol ideleSymbol_surjective σ
   set S := {v : HeightOneSpectrum (𝓞 K) | ∀ π : (v.adicCompletion K)ˣ,
       Valued.v (π : v.adicCompletion K) = WithZero.exp (-1 : ℤ) →
         ideleSymbol K L (finiteEmbedding v π) = σ} with hSdef
@@ -104,7 +109,8 @@ theorem hasDirichletDensity_setOf_arithFrobAt_eq (σ : Gal(L/K)) :
     obtain ⟨π, hπ⟩ := exists_uniformizer v
     refine ⟨he, ?_⟩
     rw [← hvS π hπ]
-    exact (ideleSymbol_finiteEmbedding_eq_arithFrobAt v w he (ord_eq_one_of_valued_eq_exp v hπ)).symm
+    exact (ideleSymbol_finiteEmbedding_eq_arithFrobAt v w he
+      (ord_eq_one_of_valued_eq_exp v hπ)).symm
   have h2 : T ⊆ S := by
     intro v hv π hπ
     obtain ⟨⟨w, hw⟩⟩ := nonempty_placesOver L v
@@ -115,11 +121,13 @@ theorem hasDirichletDensity_setOf_arithFrobAt_eq (σ : Gal(L/K)) :
     (hasDirichletDensity_iff_of_subset_of_isBoundedUnder sdiff_subset
       (isBoundedUnder_primeIdealZetaSum_of_finite (hR.subset fun v hv ↦ by
         by_contra h
-        exact hv.2 ⟨hv.1, h⟩)) _).2 hS
+        exact hv.2 ⟨hv.1, h⟩))
+      _).2 hS
   exact (hasDirichletDensity_iff_of_subset_of_isBoundedUnder h1
     (isBoundedUnder_primeIdealZetaSum_of_finite (hR.subset fun v hv ↦ by
       by_contra h
-      exact hv.2 ⟨h2 hv.1, h⟩)) _).1 hSR
+      exact hv.2 ⟨h2 hv.1, h⟩))
+    _).1 hSR
 
 end ChebotarevDensity
 

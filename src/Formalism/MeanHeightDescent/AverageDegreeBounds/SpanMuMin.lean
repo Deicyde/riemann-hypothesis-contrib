@@ -25,27 +25,34 @@ open Formalism.HN
 
 section
 
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V]
+variable
+  {K V ι : Type}
+  [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V]
   [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι] [DecidableEq ι]
 
-theorem majAt_self_re (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K)
-    (x : V) : (Formalism.HermitianLatticesTheory.majAt b X v x x).re = Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
-  unfold Formalism.HermitianLatticesTheory.majAt Formalism.HermitianLatticesTheory.normAt Formalism.HermitianLatticesTheory.cnorm
+theorem majAt_self_re
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x : V)
+    : (Formalism.HermitianLatticesTheory.majAt b X v x x).re
+      = Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
+  unfold Formalism.HermitianLatticesTheory.majAt Formalism.HermitianLatticesTheory.normAt
+    Formalism.HermitianLatticesTheory.cnorm
   rw [Real.sq_sqrt (Finset.sum_nonneg (fun i _ => by positivity)), Complex.re_sum]
   apply Finset.sum_congr rfl
   intro i _
   rw [Complex.sq_norm, Complex.normSq_apply]
   simp [Complex.mul_re] <;> ring
 
-theorem rkK_span_singleton (x : V) (hx : x ≠ 0) :
-    rkK (K := K) (Submodule.span (𝓞 K) ({x} : Set V)) = 1 := by
+theorem rkK_span_singleton (x : V) (hx : x ≠ 0)
+    : rkK (K := K) (Submodule.span (𝓞 K) ({x} : Set V)) = 1 := by
   unfold rkK
   rw [Submodule.span_span_of_tower, finrank_span_singleton hx]
 
-theorem muDef_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (x : V) (hx : x ≠ 0) (Λ : ℝ)
-    (hn : ∀ v, Formalism.HermitianLatticesTheory.normAt b X v x ≤ Real.exp Λ) :
-    -(2 * Λ) ≤ muDef b X (Submodule.span (𝓞 K) ({x} : Set V)) := by
+theorem muDef_line
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (x : V) (hx : x ≠ 0)
+    (Λ : ℝ) (hn : ∀ v, Formalism.HermitianLatticesTheory.normAt b X v x ≤ Real.exp Λ)
+    : -(2 * Λ) ≤ muDef b X (Submodule.span (𝓞 K) ({x} : Set V)) := by
   classical
   set L := Submodule.span (𝓞 K) ({x} : Set V) with hLdef
   have hFG : L.FG := Submodule.fg_span_singleton x
@@ -60,7 +67,8 @@ theorem muDef_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
     simp
   obtain ⟨hht, -⟩ := Formalism.HN.height_gram_determinant K V ι b X hX 1 ![x] hli
   rw [hr] at hht
-  have hg : ∀ v, (gramPl b X v ![x]).det.re = Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
+  have hg
+      : ∀ v, (gramPl b X v ![x]).det.re = Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
     intro v
     rw [Matrix.det_unique]
     exact majAt_self_re b X v x
@@ -69,9 +77,17 @@ theorem muDef_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
   have hnPl : 0 < nPl K := Fintype.card_pos
   have hle : ht b X L ≤ (Real.exp Λ ^ 2) ^ nPl K := by
     rw [hht]
-    calc ∏ v, Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 ≤ ∏ _v : InfinitePlace K, Real.exp Λ ^ 2 :=
-          Finset.prod_le_prod₀ (fun v _ => by positivity)
-            (fun v _ => pow_le_pow_left₀ (by unfold Formalism.HermitianLatticesTheory.normAt Formalism.HermitianLatticesTheory.cnorm; exact Real.sqrt_nonneg _)
+    calc
+      ∏ v, Formalism.HermitianLatticesTheory.normAt b X v x ^ 2
+          ≤ ∏ _v : InfinitePlace K, Real.exp Λ ^ 2 :=
+        Finset.prod_le_prod₀
+          (fun v _ => by positivity)
+          (fun v _ =>
+            pow_le_pow_left₀
+              (by
+                unfold Formalism.HermitianLatticesTheory.normAt
+                  Formalism.HermitianLatticesTheory.cnorm
+                exact Real.sqrt_nonneg _)
               (hn v) 2)
       _ = (Real.exp Λ ^ 2) ^ nPl K := by rw [Finset.prod_const, Finset.card_univ]; rfl
   have hlog : Real.log (ht b X L) ≤ (nPl K : ℝ) * (2 * Λ) := by
@@ -86,36 +102,55 @@ theorem muDef_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
     nlinarith
   linarith
 
-theorem muMin_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (hX : ∀ v, IsUnit (X v).det) (x : V) (hx : x ≠ 0) (θ : ℝ)
-    (hθ : θ ≤ slope (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V))) :
-    θ ≤ muMin (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)) := by
+theorem muMin_line
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (x : V) (hx : x ≠ 0)
+    (θ : ℝ)
+    (hθ : θ
+      ≤ slope (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)))
+    : θ
+      ≤ muMin (Formalism.HermitianLatticesTheory.realize b X)
+        (Submodule.span (𝓞 K) ({x} : Set V)) := by
   classical
   have hFG : (Submodule.span (𝓞 K) ({x} : Set V)).FG := Submodule.fg_span_singleton x
   obtain ⟨hLat, hrkL, -⟩ := Formalism.HN.place_lattice_structure K V ι b X hX _ hFG
   have hne : Submodule.span (𝓞 K) ({x} : Set V) ≠ ⊥ := by
     rw [Ne, Submodule.span_singleton_eq_bot]
     exact hx
-  obtain ⟨-, hmin, -, -, -⟩ := Formalism.HN.slope_characterization (𝓞 K) V _ (Formalism.HermitianLatticesTheory.realize b X) _ hLat hne
+  obtain ⟨-, hmin, -, -, -⟩ :=
+    Formalism.HN.slope_characterization (𝓞 K) V _ (Formalism.HermitianLatticesTheory.realize b X) _
+      hLat hne
   rw [hmin]
   intro N hN
-  obtain ⟨-, hmono, -, hzero, hdeg0, -⟩ := Formalism.HN.saturation_basic_properties (𝓞 K) V _ (Formalism.HermitianLatticesTheory.realize b X) _ hLat
+  obtain ⟨-, hmono, -, hzero, hdeg0, -⟩ :=
+    Formalism.HN.saturation_basic_properties (𝓞 K) V _
+      (Formalism.HermitianLatticesTheory.realize b X) _ hLat
   have hK : 0 < Module.finrank ℚ K := Module.finrank_pos
   rw [rkK_span_singleton x hx, mul_one] at hrkL
   by_cases hN0 : N = ⊥
   · subst hN0
     rw [hdeg0, (hzero ⊥ bot_le).mpr rfl]
-    have hpos : (0 : ℝ) < (rk (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)) : ℝ) := by
+    have hpos
+        : (0 : ℝ)
+          < (rk (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V))
+            : ℝ) := by
       rw [hrkL]; exact_mod_cast hK
-    have hθ' : θ ≤ deg (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)) /
-        (rk (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)) : ℝ) := hθ
+    have hθ'
+        : θ
+          ≤ deg (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V))
+            / (rk (Formalism.HermitianLatticesTheory.realize b X)
+                (Submodule.span (𝓞 K) ({x} : Set V))
+              : ℝ) :=
+      hθ
     rw [le_div_iff₀ hpos] at hθ'
     simpa using hθ'
   · have hNoeth : IsNoetherian (𝓞 K) (Submodule.span (𝓞 K) ({x} : Set V)) :=
       isNoetherian_of_fg_of_noetherian _ hFG
     have hNFG : N.FG := by
-      have h1 := (IsNoetherian.noetherian (N.comap (Submodule.span (𝓞 K) ({x} : Set V)).subtype)).map
-        (Submodule.span (𝓞 K) ({x} : Set V)).subtype
+      have h1 :=
+        (IsNoetherian.noetherian (N.comap (Submodule.span (𝓞 K) ({x} : Set V)).subtype)).map
+          (Submodule.span (𝓞 K) ({x} : Set V)).subtype
       rwa [Submodule.map_comap_subtype, inf_eq_right.mpr hN] at h1
     obtain ⟨-, hrkN, -⟩ := Formalism.HN.place_lattice_structure K V ι b X hX N hNFG
     haveI : FiniteDimensional K V := Module.Finite.of_basis b
@@ -130,7 +165,8 @@ theorem muMin_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
         exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x)
       have h1 : rkK (K := K) N ≤ 1 := by
         unfold rkK
-        calc Module.finrank K (Submodule.span K (N : Set V))
+        calc
+          Module.finrank K (Submodule.span K (N : Set V))
             ≤ Module.finrank K (Submodule.span K ({x} : Set V)) := Submodule.finrank_mono hle
           _ = 1 := finrank_span_singleton hx
       have h2 : 0 < rkK (K := K) N := by
@@ -140,7 +176,10 @@ theorem muMin_line (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
         exact ⟨⟨y, Submodule.subset_span hyN⟩, fun h => hy0 (congrArg Subtype.val h)⟩
       omega
     rw [hkN, mul_one] at hrkN
-    have hrkNL : rk (Formalism.HermitianLatticesTheory.realize b X) N = rk (Formalism.HermitianLatticesTheory.realize b X) (Submodule.span (𝓞 K) ({x} : Set V)) := by
+    have hrkNL
+        : rk (Formalism.HermitianLatticesTheory.realize b X) N
+          = rk (Formalism.HermitianLatticesTheory.realize b X)
+            (Submodule.span (𝓞 K) ({x} : Set V)) := by
       rw [hrkN, hrkL]
     rw [hrkNL, sub_self, mul_zero, sub_nonneg]
     exact (hmono N _ hN le_rfl).2 hrkNL
@@ -154,8 +193,8 @@ theorem span_min_slope : SpanMuMin := by
   set θ : ℝ := (-(2 * Λ) + Real.log 2 - logDisc K / (Module.finrank ℚ K : ℝ)) / 2 with hθ
   obtain ⟨hlat, hrkB, -⟩ := place_lattice_structure K V ι b X hX B hB
   obtain ⟨hsat, hmin, hcont, -⟩ :=
-    hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes real_saturation_property saturation_basic_properties
-      (𝓞 K) V _ ρ B hlat θ
+    hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes
+      real_saturation_property saturation_basic_properties (𝓞 K) V _ ρ B hlat θ
   set S := hnStep ρ B θ with hS
   have hmem : ∀ x ∈ s, x ∈ S := by
     intro x hx
@@ -181,7 +220,8 @@ theorem span_min_slope : SpanMuMin := by
     unfold rkK
     rw [hspanEq]
   have hBS : B = S :=
-    (saturation_basic_properties (𝓞 K) V _ ρ B hlat).2.2.1 S B hsat hsat.1 le_rfl (by rw [hrkB, hrkS, hrkK])
+    (saturation_basic_properties (𝓞 K) V _ ρ B hlat).2.2.1 S B hsat hsat.1 le_rfl
+      (by rw [hrkB, hrkS, hrkK])
   have hfin : θ ≤ muMin ρ B := by
     have := hmin (by rw [← hBS]; exact hB0)
     rwa [← hBS] at this

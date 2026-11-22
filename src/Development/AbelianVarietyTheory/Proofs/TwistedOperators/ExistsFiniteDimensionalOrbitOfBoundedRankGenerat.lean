@@ -8,23 +8,25 @@ namespace GlobalTheory
 
 open Submodule
 
-theorem exists_finiteDimensional_orbit_of_generated :
-    ∀ (V ι K : Type) [AddCommGroup V] [Module ℂ V] (U : Set ι) (G : Set V) (P : Submodule ℂ V) (D : ι → V →ₗ[ℂ] V)
-    (m : ℕ) (L : Fin m → V →ₗ[ℂ] V) (T : K → V →ₗ[ℂ] V) (a : K → ι → ι),
-    FiniteDimensional ℂ (Submodule.span ℂ G) →
-    (∀ u ∈ U, ∀ f, D u f ∈ Submodule.span ℂ (Set.range fun i => L i f)) →
-    G ⊆ P → (∀ u ∈ U, ∀ f ∈ P, D u f ∈ P) →
-    (∀ N : Submodule ℂ V, G ⊆ N → (∀ u ∈ U, ∀ f ∈ N, D u f ∈ N) → P ≤ N) →
-    (∀ k, ∀ g ∈ G, T k g ∈ Submodule.span ℂ G) → (∀ k, ∀ u ∈ U, a k u ∈ U) →
-    (∀ k, ∀ u ∈ U, ∀ f ∈ P, T k (D u f) = D (a k u) (T k f)) →
-    ∀ f ∈ P, ∃ S : Submodule ℂ V, FiniteDimensional ℂ S ∧ ∀ k, T k f ∈ S := by
+theorem exists_finiteDimensional_orbit_of_generated
+    : ∀ (V ι K : Type) [AddCommGroup V] [Module ℂ V] (U : Set ι) (G : Set V) (P : Submodule ℂ V)
+        (D : ι → V →ₗ[ℂ] V) (m : ℕ) (L : Fin m → V →ₗ[ℂ] V) (T : K → V →ₗ[ℂ] V) (a : K → ι → ι),
+      FiniteDimensional ℂ (Submodule.span ℂ G)
+        → (∀ u ∈ U, ∀ f, D u f ∈ Submodule.span ℂ (Set.range fun i => L i f)) → G ⊆ P
+        → (∀ u ∈ U, ∀ f ∈ P, D u f ∈ P)
+        → (∀ N : Submodule ℂ V, G ⊆ N → (∀ u ∈ U, ∀ f ∈ N, D u f ∈ N) → P ≤ N)
+        → (∀ k, ∀ g ∈ G, T k g ∈ Submodule.span ℂ G) → (∀ k, ∀ u ∈ U, a k u ∈ U)
+        → (∀ k, ∀ u ∈ U, ∀ f ∈ P, T k (D u f) = D (a k u) (T k f))
+        → ∀ f ∈ P, ∃ S : Submodule ℂ V, FiniteDimensional ℂ S ∧ ∀ k, T k f ∈ S := by
   intro V ι K _ _ U G P D m L T a hG hDL hGP hDP hmin hTG ha hTD f hf
-  obtain ⟨Q, hQ0, hQs⟩ : ∃ Q : ℕ → Submodule ℂ V, Q 0 = span ℂ G ∧
-      ∀ n, Q (n + 1) = Q n ⊔ span ℂ (⋃ u ∈ U, (D u) '' (Q n : Set V)) :=
-    ⟨fun n => Nat.rec (span ℂ G) (fun _ R => R ⊔ span ℂ (⋃ u ∈ U, (D u) '' (R : Set V))) n,
-      rfl, fun _ => rfl⟩
-  have hmono : Monotone Q := monotone_nat_of_le_succ fun n => by
-    rw [hQs]; exact le_sup_left
+  obtain ⟨Q, hQ0, hQs⟩
+      : ∃ Q : ℕ → Submodule ℂ V,
+        Q 0 = span ℂ G ∧ ∀ n, Q (n + 1) = Q n ⊔ span ℂ (⋃ u ∈ U, (D u) '' (Q n : Set V)) := ⟨
+    fun n => Nat.rec (span ℂ G) (fun _ R => R ⊔ span ℂ (⋃ u ∈ U, (D u) '' (R : Set V))) n,
+    rfl,
+    fun _ => rfl
+  ⟩
+  have hmono : Monotone Q := monotone_nat_of_le_succ fun n => by rw [hQs]; exact le_sup_left
   have hDQ : ∀ n, ∀ u ∈ U, ∀ x ∈ Q n, D u x ∈ Q (n + 1) := by
     intro n u hu x hx
     rw [hQs]
@@ -65,8 +67,7 @@ theorem exists_finiteDimensional_orbit_of_generated :
       have hxP : x ∈ P := hQP n hx
       rw [SetLike.mem_coe, mem_comap, ← hQs, hTD k u hu x hxP]
       exact hDQ n (a k u) (ha k u hu) (T k x) (ih hx)
-  have hGN : G ⊆ (⨆ n, Q n : Submodule ℂ V) := fun g hg =>
-    mem_iSup_of_mem 0 (hQ0 ▸ subset_span hg)
+  have hGN : G ⊆ (⨆ n, Q n : Submodule ℂ V) := fun g hg => mem_iSup_of_mem 0 (hQ0 ▸ subset_span hg)
   have hDN : ∀ u ∈ U, ∀ x ∈ (⨆ n, Q n : Submodule ℂ V), D u x ∈ (⨆ n, Q n : Submodule ℂ V) := by
     intro u hu x hx
     obtain ⟨n, hn⟩ := (mem_iSup_of_directed Q hmono.directed_le).1 hx

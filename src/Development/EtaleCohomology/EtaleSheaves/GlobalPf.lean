@@ -12,13 +12,20 @@ namespace LateralTheory.E.GlobalPf
 def gam {T : CommRingCat.{0}} {X : Scheme.{0}} (p : X ⟶ Spec T) (V : X.Opens) : T ⟶ Γ(X, V) :=
   (Scheme.ΓSpecIso T).inv ≫ p.appLE ⊤ V (by simp)
 
-def Affine : Prop := ∀ (q : ℕ) (i : ℤ) {T K : CommRingCat.{0}} (k : T ⟶ K) {X : Scheme.{0}} (p : X ⟶ Spec T) (V : X.Opens),
-  IsAffineOpen V → BC q i k (gam p V) → Eqv _ (sch.map (pullback.fst p (Spec.map k) ∣_ V)) (tw q i)
+def Affine : Prop :=
+  ∀ (q : ℕ) (i : ℤ) {T K : CommRingCat.{0}} (k : T ⟶ K) {X : Scheme.{0}} (p : X ⟶ Spec T)
+      (V : X.Opens),
+    IsAffineOpen V → BC q i k (gam p V)
+      → Eqv _ (sch.map (pullback.fst p (Spec.map k) ∣_ V)) (tw q i)
 
-def LocEt : Prop := ∀ {T : CommRingCat.{0}} {X : Scheme.{0}} (p : X ⟶ Spec T) [Smooth p] (x : X),
-  ∃ (U : X.Opens) (n : ℕ), x ∈ U ∧ ∀ V : X.Opens, IsAffineOpen V → V ≤ U →
-    ∃ c : CommRingCat.of (MvPolynomial (Fin n) T) ⟶ Γ(X, V), Et c ∧
-      CommRingCat.ofHom (MvPolynomial.C : T →+* MvPolynomial (Fin n) T) ≫ c = gam p V
+def LocEt : Prop :=
+  ∀ {T : CommRingCat.{0}} {X : Scheme.{0}} (p : X ⟶ Spec T) [Smooth p] (x : X),
+    ∃ (U : X.Opens) (n : ℕ),
+      x ∈ U
+        ∧ ∀ V : X.Opens,
+          IsAffineOpen V → V ≤ U
+            → ∃ c : CommRingCat.of (MvPolynomial (Fin n) T) ⟶ Γ(X, V),
+              Et c ∧ CommRingCat.ofHom (MvPolynomial.C : T →+* MvPolynomial (Fin n) T) ≫ c = gam p V
 
 theorem Global_of (hZ : ZarLocal) (hA : Affine) (hL : LocEt) : Global := by
   intro H q i T K k hG X p _

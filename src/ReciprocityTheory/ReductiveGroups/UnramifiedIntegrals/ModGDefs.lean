@@ -38,7 +38,9 @@ def Aio (d l : ℕ) [Fact l.Prime] (ι : ℂ ≃+* ℂ_[l]) : ValuationSubring (
   ((NormedField.valuation (K := ℂ_[l])).valuationSubring).comap
     ((ι : ℂ →+* ℂ_[l]).comp (algebraMap (Om d) ℂ))
 
-def InertiaEl {E Ω : Type*} [Field E] [Field Ω] [Algebra E Ω] (A : ValuationSubring Ω) (g : Ω ≃ₐ[E] Ω) : Prop :=
+def InertiaEl
+    {E Ω : Type*} [Field E] [Field Ω] [Algebra E Ω] (A : ValuationSubring Ω) (g : Ω ≃ₐ[E] Ω)
+    : Prop :=
   g ∈ A.decompositionSubgroup E ∧ ∀ x ∈ A, g x - x ∈ A.nonunits
 
 end ReciprocityTheory.ChartRestriction.L1

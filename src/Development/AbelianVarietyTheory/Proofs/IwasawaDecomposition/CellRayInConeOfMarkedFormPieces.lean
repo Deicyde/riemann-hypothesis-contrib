@@ -14,18 +14,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Nonne
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.OrbMark
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.OrbMark
 
 namespace GlobalTheory.PolFan.OrbMark
 
-theorem exists_face_coord_of_linearOn {O : Type} [CommRing O] {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X]
-    [Module O X] [Module.Finite O X] {m k : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} (hγ : IsCell bar φ γ)
-    (hind : LinearIndependent ℤ γ) {e : Fin k → LinearMap.BilinForm ℤ X} (hem : ∀ i, e i ∈ balForms bar X)
-    (hen : ∀ i y, 0 ≤ e i y y) (hel : φ.LinearOn e) {v : LinearMap.BilinForm ℤ X} {t : Fin m → ℝ} {b : Fin k → ℝ}
+theorem exists_face_coord_of_linearOn
+    {O : Type} [CommRing O]
+    {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+    {m k : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X}
+    (hγ : IsCell bar φ γ) (hind : LinearIndependent ℤ γ)
+    {e : Fin k → LinearMap.BilinForm ℤ X}
+    (hem : ∀ i, e i ∈ balForms bar X) (hen : ∀ i y, 0 ≤ e i y y) (hel : φ.LinearOn e)
+    {v : LinearMap.BilinForm ℤ X} {t : Fin m → ℝ} {b : Fin k → ℝ}
     (ht : ∀ i, 0 ≤ t i) (hb : ∀ i, 0 < b i) (hvt : toReal v = ∑ i, t i • toReal (γ i))
-    (hvb : toReal v = ∑ i, b i • toReal (e i)) (j : Fin k) :
-    ∃ a : Fin m → ℝ, (∀ i, 0 ≤ a i) ∧ (∀ i, t i = 0 → a i = 0) ∧ toReal (e j) = ∑ i, a i • toReal (γ i) := by
-  have h := GlobalTheory.T.inRealCone_cell_of_linearPiece_through_cellPoint bar φ γ e hγ hem hen hel v t b ht hb hvt hvb
+    (hvb : toReal v = ∑ i, b i • toReal (e i))
+    (j : Fin k)
+    : ∃ a : Fin m → ℝ,
+      (∀ i, 0 ≤ a i) ∧ (∀ i, t i = 0 → a i = 0) ∧ toReal (e j) = ∑ i, a i • toReal (γ i) := by
+  have h :=
+    GlobalTheory.T.inRealCone_cell_of_linearPiece_through_cellPoint bar φ γ e hγ hem hen hel v t b
+      ht hb hvt hvb
   choose a ha he using h
   have h1 : toReal v = ∑ i, (∑ l, b l * a l i) • toReal (γ i) := by
     rw [hvb]
@@ -41,13 +50,20 @@ theorem exists_face_coord_of_linearOn {O : Type} [CommRing O] {bar : O → O} {�
   have h3 : ∑ l, b l * a l i = 0 := by
     have := congrFun h2 i
     simpa [hi] using this
-  have h4 := (Finset.sum_eq_zero_iff_of_nonneg fun l _ => mul_nonneg (hb l).le (ha l i)).1 h3 j (Finset.mem_univ _)
+  have h4 :=
+    (Finset.sum_eq_zero_iff_of_nonneg fun l _ => mul_nonneg (hb l).le (ha l i)).1 h3 j
+      (Finset.mem_univ _)
   exact (mul_eq_zero.1 h4).resolve_left (hb j).ne'
 
-theorem mem_balForms_of_descend {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) {X Y : Type} [AddCommGroup X]
-    [Module (𝓞 E) X] [AddCommGroup Y] [Module (𝓞 E) Y] (τ : 𝓞 E ≃+* 𝓞 E) {f : X →+ Y} (hf : Function.Surjective f)
-    (hsm : ∀ (a : 𝓞 E) (x : X), f (a • x) = τ a • f x) {δ : LinearMap.BilinForm ℤ X} (hδ : δ ∈ balForms H.bar X)
-    {ε : LinearMap.BilinForm ℤ Y} (hε : ∀ x y, ε (f x) (f y) = δ x y) : ε ∈ balForms H.bar Y := by
+theorem mem_balForms_of_descend
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : Host E)
+    {X Y : Type} [AddCommGroup X] [Module (𝓞 E) X] [AddCommGroup Y] [Module (𝓞 E) Y]
+    (τ : 𝓞 E ≃+* 𝓞 E)
+    {f : X →+ Y} (hf : Function.Surjective f) (hsm : ∀ (a : 𝓞 E) (x : X), f (a • x) = τ a • f x)
+    {δ : LinearMap.BilinForm ℤ X} (hδ : δ ∈ balForms H.bar X)
+    {ε : LinearMap.BilinForm ℤ Y} (hε : ∀ x y, ε (f x) (f y) = δ x y)
+    : ε ∈ balForms H.bar Y := by
   refine ⟨fun y z => ?_, fun a y z => ?_⟩
   · obtain ⟨y, rfl⟩ := hf y
     obtain ⟨z, rfl⟩ := hf z
@@ -55,22 +71,39 @@ theorem mem_balForms_of_descend {E : Type} [Field E] [NumberField E] [IsCMField 
   · obtain ⟨y, rfl⟩ := hf y
     obtain ⟨z, rfl⟩ := hf z
     obtain ⟨a, rfl⟩ := τ.surjective a
-    rw [← GlobalTheory.T.ringOfIntegers_aut_comm_hostConjugation E H τ a, ← hsm, ← hsm, hε, hε, hδ.2]
+    rw [← GlobalTheory.T.ringOfIntegers_aut_comm_hostConjugation E H τ a, ← hsm, ← hsm, hε, hε,
+      hδ.2]
 
-theorem exists_coord_pullAdd_of_pos : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (φ : InvFun (𝓞 E)), IsTwInv H φ →
-  ∀ {X₀ : Type} [AddCommGroup X₀] [Module (𝓞 E) X₀] [Module.Finite (𝓞 E) X₀] {m₀ : ℕ} (δ₀ : Fin m₀ → LinearMap.BilinForm ℤ X₀),
-  IsCell H.bar φ δ₀ → LinearIndependent ℤ δ₀ →
-  ∀ (v : LinearMap.BilinForm ℤ X₀) (t : Fin m₀ → ℝ), (∀ i, 0 ≤ t i) → toReal v = ∑ i, t i • toReal (δ₀ i) →
-  ∀ {X Y : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [AddCommGroup Y] [Module (𝓞 E) Y]
-    [Module.Finite (𝓞 E) Y] (π : X₀ →ₗ[𝓞 E] Y), Function.Surjective π → ∀ (τ : 𝓞 E ≃+* 𝓞 E) (f : X →+ Y), τ H.w0 = H.w0 →
-    Function.Surjective f → (∀ (a : 𝓞 E) (x : X), f (a • x) = τ a • f x) →
-  ∀ u : Fin m₀ → LinearMap.BilinForm ℤ Y, (∀ i, 0 < t i → pull π (u i) = δ₀ i) →
-  ∀ β : LinearMap.BilinForm ℤ X, (∀ (x y : X) (x₀ y₀ : X₀), π x₀ = f x → π y₀ = f y → β x y = v x₀ y₀) →
-  ∀ (m : ℕ) (δ : Fin m → LinearMap.BilinForm ℤ X), IsCell H.bar φ δ →
-  ∀ c : Fin m → ℝ, (∀ j, 0 ≤ c j) → toReal β = ∑ j, c j • toReal (δ j) →
-  ∀ j, 0 < c j → ∃ a : Fin m₀ → ℝ, (∀ i, 0 ≤ a i) ∧ (∀ i, t i = 0 → a i = 0) ∧
-    toReal (δ j) = ∑ i, a i • toReal (pullAdd f (u i)) := by
-  intro E _ _ _ H φ htw X₀ _ _ _ m₀ δ₀ h₀ hind v t ht hvt X Y _ _ _ _ _ _ π hπ τ f hτ hf hsm u hu β hβ m δ hδ c hc hβc j hj
+theorem exists_coord_pullAdd_of_pos
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (φ : InvFun (𝓞 E)),
+      IsTwInv H φ
+        → ∀ {X₀ : Type} [AddCommGroup X₀] [Module (𝓞 E) X₀] [Module.Finite (𝓞 E) X₀] {m₀ : ℕ}
+            (δ₀ : Fin m₀ → LinearMap.BilinForm ℤ X₀),
+          IsCell H.bar φ δ₀ → LinearIndependent ℤ δ₀
+            → ∀ (v : LinearMap.BilinForm ℤ X₀) (t : Fin m₀ → ℝ),
+              (∀ i, 0 ≤ t i) → toReal v = ∑ i, t i • toReal (δ₀ i)
+                → ∀ {X Y : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+                    [AddCommGroup Y] [Module (𝓞 E) Y] [Module.Finite (𝓞 E) Y] (π : X₀ →ₗ[𝓞 E] Y),
+                  Function.Surjective π
+                    → ∀ (τ : 𝓞 E ≃+* 𝓞 E) (f : X →+ Y),
+                      τ H.w0 = H.w0 → Function.Surjective f
+                        → (∀ (a : 𝓞 E) (x : X), f (a • x) = τ a • f x)
+                        → ∀ u : Fin m₀ → LinearMap.BilinForm ℤ Y,
+                          (∀ i, 0 < t i → pull π (u i) = δ₀ i)
+                            → ∀ β : LinearMap.BilinForm ℤ X,
+                              (∀ (x y : X) (x₀ y₀ : X₀), π x₀ = f x → π y₀ = f y → β x y = v x₀ y₀)
+                                → ∀ (m : ℕ) (δ : Fin m → LinearMap.BilinForm ℤ X),
+                                  IsCell H.bar φ δ
+                                    → ∀ c : Fin m → ℝ,
+                                      (∀ j, 0 ≤ c j) → toReal β = ∑ j, c j • toReal (δ j)
+                                        → ∀ j,
+                                          0 < c j
+                                            → ∃ a : Fin m₀ → ℝ,
+                                              (∀ i, 0 ≤ a i) ∧ (∀ i, t i = 0 → a i = 0)
+                                                ∧ toReal (δ j)
+                                                  = ∑ i, a i • toReal (pullAdd f (u i)) := by
+  intro E _ _ _ H φ htw X₀ _ _ _ m₀ δ₀ h₀ hind v t ht hvt X Y _ _ _ _ _ _ π hπ τ f hτ hf hsm u hu β
+    hβ m δ hδ c hc hβc j hj
   classical
   have hval : ∀ x y, (β x y : ℝ) = ∑ l, c l * (δ l x y : ℝ) := fun x y => by
     simpa [LinearMap.sum_apply] using LinearMap.congr_fun₂ hβc x y
@@ -79,8 +112,9 @@ theorem exists_coord_pullAdd_of_pos : ∀ (E : Type) [Field E] [NumberField E] [
     have hb : β x x = 0 := by simpa using hβ x x 0 0 (by simp [hx]) (by simp [hx])
     have hk := hval x x
     rw [hb, Int.cast_zero] at hk
-    have hall := (Finset.sum_eq_zero_iff_of_nonneg fun i _ =>
-      mul_nonneg (hc i) (Int.cast_nonneg (hδ.nonneg i x))).1 hk.symm l (Finset.mem_univ _)
+    have hall :=
+      (Finset.sum_eq_zero_iff_of_nonneg fun i _ =>
+        mul_nonneg (hc i) (Int.cast_nonneg (hδ.nonneg i x))).1 hk.symm l (Finset.mem_univ _)
     have h0 : δ l x x = 0 := Int.cast_eq_zero.1 ((mul_eq_zero.1 hall).resolve_left hl.ne')
     exact ConeSub.eq_zero_of_self_eq_zero (δ l) (hδ.mem l).1 (hδ.nonneg l) h0 y
   set S : Finset (Fin m) := Finset.univ.filter fun l => 0 < c l with hS
@@ -89,13 +123,18 @@ theorem exists_coord_pullAdd_of_pos : ∀ (E : Type) [Field E] [NumberField E] [
   have hspos : ∀ i, 0 < c (s i) := fun i => by
     have : s i ∈ (S : Set (Fin m)) := hs ▸ Set.mem_range_self i
     simpa [hS] using this
-  have hdesc : ∀ i : Fin S.card, ∃ ε : LinearMap.BilinForm ℤ Y, ∀ x y, ε (f x) (f y) = δ (s i) x y := fun i =>
-    GlobalTheory.T.exists_intBilinForm_descend_along_surjective f hf _ (hvan _ (hspos i)) fun x hx y => by rw [(hδ.mem _).1]; exact hvan _ (hspos i) x hx y
+  have hdesc
+      : ∀ i : Fin S.card, ∃ ε : LinearMap.BilinForm ℤ Y, ∀ x y,
+        ε (f x) (f y) = δ (s i) x y := fun i =>
+    GlobalTheory.T.exists_intBilinForm_descend_along_surjective f hf _ (hvan _ (hspos i))
+      fun x hx y => by rw [(hδ.mem _).1]; exact hvan _ (hspos i) x hx y
   choose ε hε using hdesc
-  have hεm : ∀ i, ε i ∈ balForms H.bar Y := fun i => mem_balForms_of_descend H τ hf hsm (hδ.mem _) (hε i)
+  have hεm : ∀ i, ε i ∈ balForms H.bar Y := fun i =>
+    mem_balForms_of_descend H τ hf hsm (hδ.mem _) (hε i)
   have hεn : ∀ i y, 0 ≤ ε i y y := fun i y => by
     obtain ⟨y, rfl⟩ := hf y
-    rw [hε]; exact hδ.nonneg _ _
+    rw [hε]
+    exact hδ.nonneg _ _
   have hsemi := eval_pull_semilinear_of_isTwInv E H φ htw τ hτ f hf hsm
   have hεl : φ.LinearOn ε := by
     intro d hd
@@ -108,23 +147,29 @@ theorem exists_coord_pullAdd_of_pos : ∀ (E : Type) [Field E] [NumberField E] [
     simp only [hε] at h3
     simp only [h2] at h1
     exact h3.symm.trans h1
-  have hvb : toReal v = ∑ i, c (s i) • toReal (pull π (ε i)) := LinearMap.ext₂ fun x₀ y₀ => by
-    obtain ⟨x, hx⟩ := hf (π x₀)
-    obtain ⟨y, hy⟩ := hf (π y₀)
-    simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, pull_apply]
-    rw [← hβ x y x₀ y₀ hx.symm hy.symm, hval, ← hx, ← hy]
-    simp only [hε]
-    refine (Fintype.sum_of_injective s s.injective _ _ (fun l hl => ?_) fun i => rfl).symm
-    have : ¬ 0 < c l := by rw [hs] at hl; simpa [hS] using hl
-    rw [le_antisymm (not_lt.1 this) (hc l), zero_mul]
+  have hvb : toReal v = ∑ i, c (s i) • toReal (pull π (ε i)) :=
+    LinearMap.ext₂ fun x₀ y₀ => by
+      obtain ⟨x, hx⟩ := hf (π x₀)
+      obtain ⟨y, hy⟩ := hf (π y₀)
+      simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, pull_apply]
+      rw [← hβ x y x₀ y₀ hx.symm hy.symm, hval, ← hx, ← hy]
+      simp only [hε]
+      refine (Fintype.sum_of_injective s s.injective _ _ (fun l hl => ?_) fun i => rfl).symm
+      have : ¬ 0 < c l := by rw [hs] at hl; simpa [hS] using hl
+      rw [le_antisymm (not_lt.1 this) (hc l), zero_mul]
   obtain ⟨j, rfl⟩ : j ∈ Set.range s := by rw [hs]; simpa [hS] using hj
-  obtain ⟨a, ha, ha0, he⟩ := exists_face_coord_of_linearOn h₀ hind (fun i => pull_mem π (hεm i)) (fun i y => hεn i _)
-    ((linearOn_pull_iff hπ).2 hεl) ht hspos hvt hvb j
+  obtain ⟨a, ha, ha0, he⟩ :=
+    exists_face_coord_of_linearOn h₀ hind
+      (fun i => pull_mem π (hεm i))
+      (fun i y => hεn i _)
+      ((linearOn_pull_iff hπ).2 hεl) ht hspos hvt hvb j
   refine ⟨a, ha, ha0, LinearMap.ext₂ fun x y => ?_⟩
   obtain ⟨x₀, hx⟩ := hπ (f x)
   obtain ⟨y₀, hy⟩ := hπ (f y)
   have h1 := LinearMap.congr_fun₂ he x₀ y₀
-  simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, pull_apply, pullAdd_apply] at h1 ⊢
+  simp only [toReal_apply, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, pull_apply,
+      pullAdd_apply]
+    at h1 ⊢
   rw [hx, hy, hε] at h1
   rw [h1]
   refine Finset.sum_congr rfl fun i _ => ?_

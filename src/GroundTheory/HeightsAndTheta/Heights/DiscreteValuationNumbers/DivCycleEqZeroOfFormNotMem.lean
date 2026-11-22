@@ -19,13 +19,14 @@ section
 
 variable {K : Type*} {ι : K → Type*} {R : Type*} [CommRing R]
 
-theorem divCycle_nonneg (P : Ideal (MRing ι R)) (x : MRing ι R) (W : Ideal (MRing ι R)) :
-    0 ≤ divCycle P x W := by
+theorem divCycle_nonneg (P : Ideal (MRing ι R)) (x : MRing ι R) (W : Ideal (MRing ι R))
+    : 0 ≤ divCycle P x W := by
   unfold divCycle
   split_ifs <;> simp
 
-theorem divCycle_eq_zero_of_form_not_mem (P : Ideal (MRing ι R)) {x : MRing ι R} {W : Ideal (MRing ι R)}
-    (hx : x ∉ W) : divCycle P x W = 0 := by
+theorem divCycle_eq_zero_of_form_not_mem
+    (P : Ideal (MRing ι R)) {x : MRing ι R} {W : Ideal (MRing ι R)} (hx : x ∉ W)
+    : divCycle P x W = 0 := by
   unfold divCycle
   rw [dite_eq_right]
   exact fun h => hx (h.1.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x)))

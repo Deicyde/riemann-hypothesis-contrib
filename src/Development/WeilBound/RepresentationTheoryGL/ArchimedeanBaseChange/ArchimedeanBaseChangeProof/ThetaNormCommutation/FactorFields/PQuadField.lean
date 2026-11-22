@@ -7,32 +7,35 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.QuadFieldP
 
 open QuadraticAlgebra
 
-theorem not_sq_of_real (E : Type) [Field E] [NumberField E] [IsCMField E] (s : E)
-    (d : maximalRealSubfield E) (hs0 : s ≠ 0) (hs : IsCMField.complexConj E s = -s)
-    (hd : algebraMap (maximalRealSubfield E) E d = s ^ 2) (K : Type) [Field K]
-    [Algebra (maximalRealSubfield E) K] (τ : K →+* ℂ) (t : ℂ) (ht : starRingEnd ℂ t = t) :
-    t ^ 2 ≠ τ (algebraMap (maximalRealSubfield E) K d) := by
+theorem not_sq_of_real
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (s : E) (d : maximalRealSubfield E) (hs0 : s ≠ 0) (hs : IsCMField.complexConj E s = -s)
+    (hd : algebraMap (maximalRealSubfield E) E d = s ^ 2)
+    (K : Type) [Field K] [Algebra (maximalRealSubfield E) K]
+    (τ : K →+* ℂ)
+    (t : ℂ) (ht : starRingEnd ℂ t = t)
+    : t ^ 2 ≠ τ (algebraMap (maximalRealSubfield E) K d) := by
   intro h
   let _ := (τ.comp (algebraMap (maximalRealSubfield E) K)).toAlgebra
   let φ : E →ₐ[maximalRealSubfield E] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have h1 : (φ s) ^ 2 = τ (algebraMap (maximalRealSubfield E) K d) := by
     rw [← map_pow, ← hd, φ.commutes]; rfl
   have hu : starRingEnd ℂ (φ s) = - φ s := by
     have h' := IsCMField.complexEmbedding_complexConj E φ.toRingHom s
     simpa [hs] using h'.symm
-  have hu0 : φ s ≠ 0 := by
-    intro h0; exact hs0 (φ.toRingHom.injective (by simpa using h0))
+  have hu0 : φ s ≠ 0 := by intro h0; exact hs0 (φ.toRingHom.injective (by simpa using h0))
   rw [← h1] at h
   rcases sq_eq_sq_iff_eq_or_eq_neg.1 h with h2 | h2
   · apply hu0
@@ -55,10 +58,14 @@ open QuadFieldP QuadraticAlgebra in
 theorem quadField_pf : QuadField := by
   intro E _ _ _ s d hs0 hs hd K _ _ _ hKr
   refine ⟨?_, ?_⟩
-  · rw [InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces, IsTotallyReal.nrComplexPlaces_eq_zero, add_zero,
-      ← IsTotallyReal.finrank, ← IsCMField.card_infinitePlace_eq_card_infinitePlace E,
-      InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces, IsTotallyReal.nrComplexPlaces_eq_zero, add_zero,
-      ← IsTotallyReal.finrank, ← (letI : Module.Free (maximalRealSubfield E) K := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (maximalRealSubfield E) K), mul_comm]
+  · rw [InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
+      IsTotallyReal.nrComplexPlaces_eq_zero, add_zero, ← IsTotallyReal.finrank,
+      ← IsCMField.card_infinitePlace_eq_card_infinitePlace E,
+      InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces, IsTotallyReal.nrComplexPlaces_eq_zero,
+      add_zero, ← IsTotallyReal.finrank,
+      ← (letI : Module.Free (maximalRealSubfield E) K := Module.Free.of_divisionRing _ _
+         Module.finrank_mul_finrank ℚ (maximalRealSubfield E) K),
+      mul_comm]
   generalize hδ : algebraMap (maximalRealSubfield E) K d = δ
   have hkey : ∀ (τ : K →+* ℂ) (t : ℂ), starRingEnd ℂ t = t → t ^ 2 ≠ τ δ := by
     intro τ t ht
@@ -78,7 +85,8 @@ theorem quadField_pf : QuadField := by
     Module.Finite.of_basis (QuadraticAlgebra.basis δ 0)
   refine ⟨QuadraticAlgebra K δ 0, inferInstance, hnf, inferInstance, hq, ?_, ?_, ?_⟩
   · refine ⟨fun w => ?_⟩
-    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff, ComplexEmbedding.isReal_iff]
+    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff,
+      ComplexEmbedding.isReal_iff]
     intro hre
     let e := w.embedding
     refine hkey (e.comp (algebraMap K _)) (e (ω : QuadraticAlgebra K δ 0)) ?_ ?_

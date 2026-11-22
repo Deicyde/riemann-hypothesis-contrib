@@ -22,10 +22,13 @@ namespace UpperTheory.Gal.Int.Geo
 
 open Cut
 
-private theorem cut {k L O : Type} [Field k] [Field L] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O k]
-    [IsFractionRing O k] {H : HTower k} {θ : H.Γ → L} (C : Cover H θ O) :
-    ∃ (C' : Cover H θ O) (j : C'.Y ⟶ C.Y), Part j ∧ C'.p = j ≫ C.p ∧ C'.π ≫ j = C.π ∧ C'.Onto ∧
-      ∀ y ∈ Set.range j, (C.p y).asIdeal = ⊥ → y ∈ Set.range C.π := by
+private theorem cut
+    {k L O : Type} [Field k] [Field L] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [Algebra O k] [IsFractionRing O k]
+    {H : HTower k} {θ : H.Γ → L} (C : Cover H θ O)
+    : ∃ (C' : Cover H θ O) (j : C'.Y ⟶ C.Y),
+      Part j ∧ C'.p = j ≫ C.p ∧ C'.π ≫ j = C.π ∧ C'.Onto
+        ∧ ∀ y ∈ Set.range j, (C.p y).asIdeal = ⊥ → y ∈ Set.range C.π := by
   haveI := C.finπ
   haveI := C.etπ
   have hU : IsClopen (Set.range (pullback.lift C.π H.q C.ov)) :=
@@ -45,23 +48,29 @@ private theorem cut {k L O : Type} [Field k] [Field L] [CommRing O] [IsDomain O]
   obtain ⟨x, rfl⟩ := hz
   exact ⟨x, by rw [← Scheme.Hom.comp_apply, pullback.lift_fst]⟩
 
-private theorem over_eq {Y' Y T' T S : Scheme.{0}} {j : Y' ⟶ Y} {s t : T ⟶ Y} {i : T' ⟶ T} {s' t' : T' ⟶ Y'}
-    (h : Res j s t i s' t') {p : Y ⟶ S} (e : t ≫ p = s ≫ p) : t' ≫ j ≫ p = s' ≫ j ≫ p := by
+private theorem over_eq
+    {Y' Y T' T S : Scheme.{0}} {j : Y' ⟶ Y} {s t : T ⟶ Y} {i : T' ⟶ T} {s' t' : T' ⟶ Y'}
+    (h : Res j s t i s' t')
+    {p : Y ⟶ S} (e : t ≫ p = s ≫ p)
+    : t' ≫ j ≫ p = s' ≫ j ≫ p := by
   rw [← Category.assoc, h.et, Category.assoc, e, ← Category.assoc, ← h.es, Category.assoc]
 
-private theorem mem_range_of_lies_of_mem_range_of_asIdeal_bot {k L O : Type} [Field k] [Field L] [CommRing O] [Algebra O k] {H : HTower k}
-    {θ : H.Γ → L} {C C' : Cover H θ O} {j : C'.Y ⟶ C.Y} (hj : Part j) (hπ : C'.π ≫ j = C.π)
-    (hgen : ∀ y ∈ Set.range j, (C.p y).asIdeal = ⊥ → y ∈ Set.range C.π) {g : H.Γ} {T : Scheme}
-    {s t : T ⟶ C.Y} {m : ℕ} (hl : C.Lies g s t m) (x : T) (hx : s x ∈ Set.range j)
-    (hxg : (C.p (s x)).asIdeal = ⊥) : t x ∈ Set.range j := by
+private theorem mem_range_of_lies_of_mem_range_of_asIdeal_bot
+    {k L O : Type} [Field k] [Field L] [CommRing O] [Algebra O k]
+    {H : HTower k} {θ : H.Γ → L} {C C' : Cover H θ O} {j : C'.Y ⟶ C.Y} (hj : Part j)
+    (hπ : C'.π ≫ j = C.π) (hgen : ∀ y ∈ Set.range j, (C.p y).asIdeal = ⊥ → y ∈ Set.range C.π)
+    {g : H.Γ} {T : Scheme} {s t : T ⟶ C.Y} {m : ℕ}
+    (hl : C.Lies g s t m) (x : T) (hx : s x ∈ Set.range j) (hxg : (C.p (s x)).asIdeal = ⊥)
+    : t x ∈ Set.range j := by
   obtain ⟨z, hz⟩ := (liesCut k L O H θ C C' j hj hπ g T s t m hl).1 x (hgen _ hx hxg)
   exact ⟨C'.π z, by rw [← Scheme.Hom.comp_apply, hπ, hz]⟩
 
-private theorem mem_range_of_fEt_of_lies_of_mem_range {k L O : Type} [Field k] [Field L] [CommRing O] [IsDomain O] [Algebra O k]
+private theorem mem_range_of_fEt_of_lies_of_mem_range
+    {k L O : Type} [Field k] [Field L] [CommRing O] [IsDomain O] [Algebra O k]
     {H : HTower k} {θ : H.Γ → L} {C C' : Cover H θ O} {j : C'.Y ⟶ C.Y} (hj : Part j)
     (hπ : C'.π ≫ j = C.π) (hgen : ∀ y ∈ Set.range j, (C.p y).asIdeal = ⊥ → y ∈ Set.range C.π)
-    {g : H.Γ} {T : Scheme} {s t : T ⟶ C.Y} {d m : ℕ} (hs : FEt s d) (hl : C.Lies g s t m) :
-    ∀ x, s x ∈ Set.range j → t x ∈ Set.range j := by
+    {g : H.Γ} {T : Scheme} {s t : T ⟶ C.Y} {d m : ℕ} (hs : FEt s d) (hl : C.Lies g s t m)
+    : ∀ x, s x ∈ Set.range j → t x ∈ Set.range j := by
   haveI : Etale s := hs.2.1
   haveI := C.smooth
   haveI := hj.op
@@ -76,23 +85,32 @@ private theorem mem_range_of_fEt_of_lies_of_mem_range {k L O : Type} [Field k] [
   rw [Set.mem_setOf_eq, Scheme.Hom.comp_apply] at hyg
   exact hy2 (mem_range_of_lies_of_mem_range_of_asIdeal_bot hj hπ hgen hl y hy1 hyg)
 
-private theorem asIdeal_eq_bot_of_mem_basicOpen_natCast {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) {Y : Scheme}
-    (q : Y ⟶ Spec (CommRingCat.of (Ow w))) (p : ℕ) (hp : (p : 𝓞 E) ∈ w.asIdeal) (y : Y)
-    (hy : y ∈ Y.basicOpen (p : Γ(Y, ⊤))) : (q y).asIdeal = ⊥ := by
+private theorem asIdeal_eq_bot_of_mem_basicOpen_natCast
+    {E : Type} [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E))
+    {Y : Scheme} (q : Y ⟶ Spec (CommRingCat.of (Ow w)))
+    (p : ℕ) (hp : (p : 𝓞 E) ∈ w.asIdeal)
+    (y : Y) (hy : y ∈ Y.basicOpen (p : Γ(Y, ⊤)))
+    : (q y).asIdeal = ⊥ := by
   have hmax : (p : Ow w) ∈ IsLocalRing.maximalIdeal (Ow w) := by
     rw [ValuationSubring.valuation_lt_one_iff]
     have h1 := (HeightOneSpectrum.valuation_lt_one_iff_mem (K := E) w (p : 𝓞 E)).2 hp
-    have h2 := (Valuation.isEquiv_iff_val_lt_one.1
-      (Valuation.isEquiv_valuation_valuationSubring (w.valuation E))).1 h1
+    have h2 :=
+      (Valuation.isEquiv_iff_val_lt_one.1 (Valuation.isEquiv_valuation_valuationSubring (w.valuation
+        E))).1 h1
     convert h2 using 2
     push_cast
     rfl
-  have h3 : (p : Γ(Y, ⊤)) =
-      (q.appTop) ((Scheme.ΓSpecIso (CommRingCat.of (Ow w))).inv (p : Ow w)) := by
+  have h3
+      : (p : Γ(Y, ⊤)) = (q.appTop) ((Scheme.ΓSpecIso (CommRingCat.of (Ow w))).inv (p : Ow w)) := by
     simp
   rw [h3, ← Scheme.Hom.preimage_basicOpen_top] at hy
-  have h5 : q y ∈ ((Spec (CommRingCat.of (Ow w))).basicOpen
-      ((Scheme.ΓSpecIso (CommRingCat.of (Ow w))).inv (p : Ow w)) : Set _) := hy
+  have h5
+      : q y
+        ∈ ((Spec (CommRingCat.of (Ow w))).basicOpen
+            ((Scheme.ΓSpecIso (CommRingCat.of (Ow w))).inv (p : Ow w))
+          : Set _) :=
+    hy
   rw [basicOpen_eq_of_affine] at h5
   have h6 : (p : Ow w) ∉ (q y).asIdeal := h5
   by_contra hne
@@ -116,9 +134,12 @@ theorem cutStep_holds : CutStep := by
     obtain ⟨C', j, hj, hp, hπ, hon, hgen⟩ := cut C
     have hres := fun a => resEx _ _ _ j (T a).p (T a).r hj
     choose Z i s' t' hR using hres
-    have hcond : ∀ a (x : (T a).Z), (T a).p x ∈ Set.range j →
-        (T a).p x ∈ C.Y.basicOpen (p : Γ(C.Y, ⊤)) → (T a).r x ∈ Set.range j :=
-      fun a x hx hb => mem_range_of_lies_of_mem_range_of_asIdeal_bot hj hπ hgen (hT a).2.1 x hx (asIdeal_eq_bot_of_mem_basicOpen_natCast w C.p p hpw _ hb)
+    have hcond
+        : ∀ a (x : (T a).Z),
+          (T a).p x ∈ Set.range j → (T a).p x ∈ C.Y.basicOpen (p : Γ(C.Y, ⊤))
+            → (T a).r x ∈ Set.range j := fun a x hx hb =>
+      mem_range_of_lies_of_mem_range_of_asIdeal_bot hj hπ hgen (hT a).2.1 x hx
+        (asIdeal_eq_bot_of_mem_basicOpen_natCast w C.p p hpw _ hb)
     have hc := fun a => corrCut p _ _ _ j (T a) (i a) (s' a) (t' a) hj (hR a) (hcond a)
     let T' : Fin (n + 1) → crystallineComparison.Corr p C'.Y := fun a =>
       ⟨Z a, s' a, t' a, (T a).d, (hc a).1, (hc a).2.1, (hc a).2.2⟩

@@ -14,7 +14,6 @@ section FrameEx
 
 variable {I : Formalism.MainNotions.S.AutInst} {S : Set (Fin I.n → I.E)}
 
-
 variable (I S) in
 def frW : Submodule I.E (Fin I.n → I.E) where
   carrier := {y | ∀ s ∈ S, hform (starRingEnd I.E) I.J s y = 0}
@@ -51,8 +50,9 @@ theorem fr_disj (hS : DefiniteCompl I S) : Disjoint (Submodule.span I.E S) (frW 
     rw [ha0, map_zero] at hneg
     exact lt_irrefl _ hneg
 
-theorem fr_hform_sum_left {ι : Type} (s : Finset ι) (x : ι → Fin I.n → I.E) (y : Fin I.n → I.E) :
-    hform (starRingEnd I.E) I.J (∑ i ∈ s, x i) y = ∑ i ∈ s, hform (starRingEnd I.E) I.J (x i) y := by
+theorem fr_hform_sum_left {ι : Type} (s : Finset ι) (x : ι → Fin I.n → I.E) (y : Fin I.n → I.E)
+    : hform (starRingEnd I.E) I.J (∑ i ∈ s, x i) y
+      = ∑ i ∈ s, hform (starRingEnd I.E) I.J (x i) y := by
   classical
   refine Finset.induction_on s (by simp [hform]) ?_
   intro a s ha ih
@@ -62,15 +62,16 @@ theorem fr_sup (hS : DefiniteCompl I S) : Submodule.span I.E S ⊔ frW I S = ⊤
   classical
   set V := Submodule.span I.E S with hV
   let b := Module.finBasis I.E V
-  let T : (Fin I.n → I.E) →ₗ[I.E] (Fin (Module.finrank I.E V) → I.E) :=
-    { toFun := fun y k => hform (starRingEnd I.E) I.J (b k : Fin I.n → I.E) y
-      map_add' := by intro x y; funext k; simp [hform_add_right]
-      map_smul' := by intro c x; funext k; simp [hform_smul_right] }
+  let T : (Fin I.n → I.E) →ₗ[I.E] (Fin (Module.finrank I.E V) → I.E) := {
+    toFun := fun y k => hform (starRingEnd I.E) I.J (b k : Fin I.n → I.E) y
+    map_add' := by intro x y; funext k; simp [hform_add_right]
+    map_smul' := by intro c x; funext k; simp [hform_smul_right]
+  }
 
   have hker : LinearMap.ker T ≤ frW I S := by
     intro y hy s hs
-    have hy' : ∀ k, hform (starRingEnd I.E) I.J (b k : Fin I.n → I.E) y = 0 :=
-      fun k => congrFun (LinearMap.mem_ker.mp hy) k
+    have hy' : ∀ k, hform (starRingEnd I.E) I.J (b k : Fin I.n → I.E) y = 0 := fun k =>
+      congrFun (LinearMap.mem_ker.mp hy) k
     have hexp : ∑ k, b.repr ⟨s, Submodule.subset_span hs⟩ k • (b k : Fin I.n → I.E) = s := by
       have := congrArg Subtype.val (b.sum_repr ⟨s, Submodule.subset_span hs⟩)
       rw [Submodule.coe_sum] at this
@@ -95,8 +96,7 @@ theorem fr_sup (hS : DefiniteCompl I S) : Submodule.span I.E S ⊔ frW I S = ⊤
 theorem frameExists : FrameExists := by
   intro I S hS
   classical
-  have hc : IsCompl (Submodule.span I.E S) (frW I S) :=
-    ⟨fr_disj hS, codisjoint_iff.mpr (fr_sup hS)⟩
+  have hc : IsCompl (Submodule.span I.E S) (frW I S) := ⟨fr_disj hS, codisjoint_iff.mpr (fr_sup hS)⟩
   let bS := Module.finBasis I.E (Submodule.span I.E S)
   let bW := Module.finBasis I.E (frW I S)
   let bb := (bS.prod bW).map (Submodule.prodEquivOfIsCompl _ _ hc)
@@ -106,7 +106,8 @@ theorem frameExists : FrameExists := by
   · intro j
     have hcol : (fun i => e.toMatrix bb i (Sum.inl j)) = (bS j : Fin I.n → I.E) := by
       funext i; simp [bb, e, Basis.toMatrix_apply]
-    rw [hcol]; exact (bS j).2
+    rw [hcol]
+    exact (bS j).2
   · intro s hs j
     have h1 : bb.toMatrix e *ᵥ s = bb.repr s := by
       have := e.toMatrix_mulVec_repr bb s
@@ -121,7 +122,8 @@ theorem frameExists : FrameExists := by
   · intro s hs j
     have hcol : (fun i => e.toMatrix bb i (Sum.inr j)) = (bW j : Fin I.n → I.E) := by
       funext i; simp [bb, e, Basis.toMatrix_apply]
-    rw [hcol]; exact (bW j).2 s hs
+    rw [hcol]
+    exact (bW j).2 s hs
 
 end FrameEx
 

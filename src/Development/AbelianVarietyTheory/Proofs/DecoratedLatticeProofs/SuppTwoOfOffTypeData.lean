@@ -12,7 +12,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Con
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil GlobalTheory.SeeSaw ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
+  GlobalTheory.MixModel GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil
+  GlobalTheory.SeeSaw ValuativeRel IsLocalRing
 
 namespace GlobalTheory.FinPl.SuppTwoAsm
 
@@ -26,10 +30,15 @@ theorem ginf_le_grpOff {D : D7} (V : HSp D) (P : Pl D → Prop) : GinfC V ≤ gr
   apply Units.ext
   ext i j
   have h2 := congrFun (congrFun h1 i) j
-  simp only [MonoidHom.coe_coe, RingHom.mapMatrix_apply, Matrix.map_apply, RingHom.toMonoidHom_eq_coe] at h2
-  simp only [MonoidHom.comp_apply, Matrix.GeneralLinearGroup.map, Units.coe_map, Units.val_one, MonoidHom.coe_coe,
-    RingHom.mapMatrix_apply, Matrix.map_apply, RingHom.toMonoidHom_eq_coe]
-  have hf : (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)).toRingHom = finPart D := rfl
+  simp only [MonoidHom.coe_coe, RingHom.mapMatrix_apply, Matrix.map_apply,
+      RingHom.toMonoidHom_eq_coe]
+    at h2
+  simp only [MonoidHom.comp_apply, Matrix.GeneralLinearGroup.map, Units.coe_map, Units.val_one,
+    MonoidHom.coe_coe, RingHom.mapMatrix_apply, Matrix.map_apply, RingHom.toMonoidHom_eq_coe]
+  have hf
+      : (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)).toRingHom
+        = finPart D :=
+    rfl
   rw [hf] at h2
   by_cases hij : i = j
   · subst hij

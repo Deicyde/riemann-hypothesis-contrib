@@ -10,7 +10,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -20,21 +24,26 @@ section Orbits
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem sameOrbit_basePart {σ : Type} (blk : σ → Option K) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') :
-    SameOrbit (basePart blk z) (basePart blk z') := by
+theorem sameOrbit_basePart
+    {σ : Type} (blk : σ → Option K) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : SameOrbit (basePart blk z) (basePart blk z') := by
   obtain ⟨c, hc, rfl⟩ := h
   exact ⟨fun k => c k.1, fun k => hc k.1, rfl⟩
 
-theorem sameOrbit_comp {K₁ : Type} [Fintype K₁] {ι₁ : K₁ → Type} [∀ k, Fintype (ι₁ k)] {κ : K₁ → K}
-    {v : (Σ k, ι₁ k) → (Σ k, ι k)} (hb : IsBlockMap κ v) {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') :
-    SameOrbit (z ∘ v) (z' ∘ v) := by
+theorem sameOrbit_comp
+    {K₁ : Type} [Fintype K₁]
+    {ι₁ : K₁ → Type} [∀ k, Fintype (ι₁ k)]
+    {κ : K₁ → K} {v : (Σ k, ι₁ k) → (Σ k, ι k)} (hb : IsBlockMap κ v)
+    {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : SameOrbit (z ∘ v) (z' ∘ v) := by
   obtain ⟨c, hc, rfl⟩ := h
   refine ⟨fun k => c (κ k), fun k => hc _, ?_⟩
   funext q
   simp only [Function.comp]
   rw [hb.2.2.1 q]
 
-theorem mCoordIdeal_le {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : mCoordIdeal z' ≤ mCoordIdeal z := by
+theorem mCoordIdeal_le {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : mCoordIdeal z' ≤ mCoordIdeal z := by
   obtain ⟨c, hc, rfl⟩ := h
   intro f hf
   let ψ : MvPolynomial K ℂ →ₐ[ℤ] MvPolynomial K ℂ :=
@@ -47,18 +56,25 @@ theorem mCoordIdeal_le {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : mCoo
   show mConeMap _ f = 0
   rw [e, AlgHom.comp_apply, hf', map_zero]
 
-theorem mCoordIdeal_eq {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : mCoordIdeal z = mCoordIdeal z' :=
+theorem mCoordIdeal_eq {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
+    : mCoordIdeal z = mCoordIdeal z' :=
   le_antisymm (mCoordIdeal_le (Cj.sameOrbit_symm h)) (mCoordIdeal_le h)
 
-theorem coord_ne {z : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal z) : z q ≠ 0 := fun e =>
+theorem coord_ne {z : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal z)
+    : z q ≠ 0 := fun e =>
   h (by
     show mConeMap z (X q) = 0
     rw [mConeMap, aeval_X, e, map_zero, zero_mul])
 
-theorem comp_mem_mcPts {K₁ : Type} [Fintype K₁] {ι₁ : K₁ → Type} [∀ k, Fintype (ι₁ k)] {κ : K₁ → K}
-    {v : (Σ k, ι₁ k) → (Σ k, ι k)} (hb : IsBlockMap κ v) {Ω₁ Ω : Type} [Field Ω₁] [Field Ω] (φ : Ω₁ →+* Ω)
-    {x₁ : (Σ k, ι₁ k) → Ω₁} {x : (Σ k, ι k) → Ω} (hx : ∀ q, x (v q) = φ (x₁ q)) {z : (Σ k, ι k) → ℂ}
-    (hz : z ∈ mcPts (mCoordIdeal x)) : z ∘ v ∈ mcPts (mCoordIdeal x₁) := by
+theorem comp_mem_mcPts
+    {K₁ : Type} [Fintype K₁]
+    {ι₁ : K₁ → Type} [∀ k, Fintype (ι₁ k)]
+    {κ : K₁ → K} {v : (Σ k, ι₁ k) → (Σ k, ι k)} (hb : IsBlockMap κ v)
+    {Ω₁ Ω : Type} [Field Ω₁] [Field Ω]
+    (φ : Ω₁ →+* Ω)
+    {x₁ : (Σ k, ι₁ k) → Ω₁} {x : (Σ k, ι k) → Ω} (hx : ∀ q, x (v q) = φ (x₁ q))
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x))
+    : z ∘ v ∈ mcPts (mCoordIdeal x₁) := by
   refine ⟨fun k => ?_, fun f hf => ?_⟩
   · obtain ⟨i, hi⟩ := hz.1 (κ k)
     obtain ⟨⟨k', i'⟩, hp⟩ := hb.2.2.2 ⟨κ k, i⟩ ⟨k, rfl⟩
@@ -82,13 +98,22 @@ theorem comp_mem_mcPts {K₁ : Type} [Fintype K₁] {ι₁ : K₁ → Type} [∀
 
 end Orbits
 
-theorem img_lies_over : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j) (Cv : FlagCover M' M) (d : ℕ), IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2) → ∀ z ∈ mcPts (mCoordIdeal y'), ∀ w, CovMap.IsImg Cv z w → SameOrbit (basePart M.blk w) (basePart M'.blk z ∘ Cv.v) := by
+theorem img_lies_over
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)]
+        (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j)
+        (Cv : FlagCover M' M) (d : ℕ),
+      IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2)
+        → ∀ z ∈ mcPts (mCoordIdeal y'), ∀ w,
+          CovMap.IsImg Cv z w → SameOrbit (basePart M.blk w) (basePart M'.blk z ∘ Cv.v) := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv d _ hA' z hz w hI
   have P' := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
   have P := GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M
   obtain ⟨F', hF', hg'⟩ := P'.2.1 _ (P'.1 z hz)
   let c : K' → ℂ := fun k => if h : ∀ p, M'.blk p ≠ some k then (z ⟨k, F'.c ⟨k, h⟩⟩)⁻¹ else 1
-  have hne : ∀ k : NonPluckerBlocks M'.blk, z ⟨k.1, F'.c k⟩ ≠ 0 := fun k => coord_ne (q := ⟨k, F'.c k⟩) (hg'.1 k)
+  have hne : ∀ k : NonPluckerBlocks M'.blk, z ⟨k.1, F'.c k⟩ ≠ 0 := fun k =>
+    coord_ne (q := ⟨k, F'.c k⟩) (hg'.1 k)
   have hc : ∀ k, c k ≠ 0 := fun k => by
     by_cases h : ∀ p, M'.blk p ≠ some k
     · simp only [c, dif_pos h]

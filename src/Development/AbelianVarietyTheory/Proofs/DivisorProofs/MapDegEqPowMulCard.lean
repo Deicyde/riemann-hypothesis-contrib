@@ -25,14 +25,19 @@ set_option autoImplicit false
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.ZV GlobalTheory.DegKer
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SemiAbelianTower
 
-theorem finrank_eq_of_mapDeg {X Y : Scheme.{0}} [IsIntegral Y] (φ : X ⟶ Y) [IsFinite φ] [Flat φ] {D : ℕ}
-    (hD : MapDeg φ D) (y : Y) : φ.finrank y = D := by
+theorem finrank_eq_of_mapDeg
+    {X Y : Scheme.{0}} [IsIntegral Y]
+    (φ : X ⟶ Y) [IsFinite φ] [Flat φ]
+    {D : ℕ} (hD : MapDeg φ D)
+    (y : Y)
+    : φ.finrank y = D := by
   obtain ⟨_, ⟨U, hU, rfl⟩, hy, -⟩ :=
     Y.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ y) isOpen_univ
   replace hU : IsAffineOpen U := hU
@@ -43,8 +48,8 @@ theorem finrank_eq_of_mapDeg {X Y : Scheme.{0}} [IsIntegral Y] (φ : X ⟶ Y) [I
     have := φ.flat_appLE hU (hU.preimage φ) le_rfl
     rwa [Scheme.Hom.appLE_eq_app] at this
   have hp : IsPullback (hU.preimage φ).fromSpec (Spec.map (φ.app U)) φ hU.fromSpec :=
-    (IsOpenImmersion.isPullback _ _ _ _ (by
-      rw [Scheme.Hom.app_eq_appLE, IsAffineOpen.SpecMap_appLE_fromSpec φ hU (hU.preimage φ)])
+    (IsOpenImmersion.isPullback _ _ _ _
+      (by rw [Scheme.Hom.app_eq_appLE, IsAffineOpen.SpecMap_appLE_fromSpec φ hU (hU.preimage φ)])
       (by simp)).flip
   obtain ⟨q, rfl⟩ : y ∈ Set.range hU.fromSpec := by rw [hU.range_fromSpec]; exact hy
   rw [← hD.finrank_eq U hU ⟨_, hy⟩, ← FiniteCover.rankAtStalk_bot,

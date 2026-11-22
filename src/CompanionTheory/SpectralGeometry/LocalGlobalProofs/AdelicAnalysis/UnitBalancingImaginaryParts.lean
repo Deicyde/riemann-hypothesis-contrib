@@ -4,20 +4,19 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem
-  IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
+open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem IsDedekindDomain
+  MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
 open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.UnitBalance
 
-
 open NumberField.Units NumberField.Units.dirichletUnitTheorem in
-theorem exists_bound_log_centered (E : Type) [Field E] [NumberField E] :
-    ∃ R : ℝ, ∀ t : InfinitePlace E → ℝ, ∃ (u : (𝓞 E)ˣ) (s : ℝ), ∀ w : InfinitePlace E,
+theorem exists_bound_log_centered (E : Type) [Field E] [NumberField E]
+    : ∃ R : ℝ, ∀ t : InfinitePlace E → ℝ, ∃ (u : (𝓞 E)ˣ) (s : ℝ), ∀ w : InfinitePlace E,
       |t w + Real.log (w (u : E)) - s| ≤ R := by
   classical
-  let B := (NumberField.Units.basisUnitLattice E).ofZLatticeBasis ℝ
-    (NumberField.Units.unitLattice E)
+  let B :=
+    (NumberField.Units.basisUnitLattice E).ofZLatticeBasis ℝ (NumberField.Units.unitLattice E)
   obtain ⟨C, hC⟩ := (ZSpan.fundamentalDomain_isBounded B).exists_norm_le
   refine ⟨Fintype.card (InfinitePlace E) * |C|, fun t => ?_⟩
   have hd : (Module.finrank ℚ E : ℝ) ≠ 0 := by exact_mod_cast Module.finrank_pos.ne'
@@ -31,7 +30,8 @@ theorem exists_bound_log_centered (E : Type) [Field E] [NumberField E] :
     have h1 := sum_mult_mul_log (K := E) u.toMul
     have h3 : ∑ w : InfinitePlace E, (w.mult : ℝ) = Module.finrank ℚ E := by
       exact_mod_cast InfinitePlace.sum_mult_eq (K := E)
-    simp only [a, mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.sum_mul, h1, h3, s]
+    simp only [a, mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+      ← Finset.sum_mul, h1, h3, s]
     field_simp
     ring
   have ha : ∀ w, w ≠ w₀ → |a w| ≤ |C| := fun w hw => by
@@ -66,24 +66,35 @@ theorem exists_bound_log_centered (E : Type) [Field E] [NumberField E] :
   rw [h7]
   exact h6
 
-theorem balance_by_units : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F →
-    ∀ ρ : InfinitePlace F → (F →+* ℝ), (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) →
-    ∃ κ : ℝ, 0 < κ ∧ ∀ y : InfinitePlace F → ℝ, (∀ w, 0 < y w) →
-      ∃ u : (𝓞 F)ˣ, ∀ v w, κ * (ρ w ((u : 𝓞 F) : F) ^ 2 * y w) ≤ ρ v ((u : 𝓞 F) : F) ^ 2 * y v := by
+theorem balance_by_units
+    : ∀ (F : Type) [Field F] [NumberField F],
+      IsTotallyReal F
+        → ∀ ρ : InfinitePlace F → (F →+* ℝ),
+          (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x)
+            → ∃ κ : ℝ,
+              0 < κ
+                ∧ ∀ y : InfinitePlace F → ℝ,
+                  (∀ w, 0 < y w)
+                    → ∃ u : (𝓞 F)ˣ, ∀ v w,
+                      κ * (ρ w ((u : 𝓞 F) : F) ^ 2 * y w) ≤ ρ v ((u : 𝓞 F) : F) ^ 2 * y v := by
   intro F _ _ _ ρ hρ
   obtain ⟨R, hR⟩ := exists_bound_log_centered F
   refine ⟨Real.exp (-(4 * R)), Real.exp_pos _, fun y hy => ?_⟩
   obtain ⟨u, s, hu⟩ := hR (fun w => Real.log (y w) / 2)
   refine ⟨u, fun v w => ?_⟩
   have hne : ((u : 𝓞 F) : F) ≠ 0 := NumberField.Units.coe_ne_zero u
-  have hexp : ∀ w : InfinitePlace F, ρ w ((u : 𝓞 F) : F) ^ 2 * y w =
-      Real.exp (2 * (Real.log (y w) / 2 + Real.log (w ((u : 𝓞 F) : F)))) := by
+  have hexp
+      : ∀ w : InfinitePlace F,
+        ρ w ((u : 𝓞 F) : F) ^ 2 * y w
+          = Real.exp (2 * (Real.log (y w) / 2 + Real.log (w ((u : 𝓞 F) : F)))) := by
     intro w
     have habs : w ((u : 𝓞 F) : F) = |ρ w ((u : 𝓞 F) : F)| := by
       rw [← InfinitePlace.norm_embedding_eq, ← hρ, Complex.norm_real, Real.norm_eq_abs]
     have hpos : 0 < w ((u : 𝓞 F) : F) := w.pos_iff.2 hne
-    have e1 : 2 * (Real.log (y w) / 2 + Real.log (w ((u : 𝓞 F) : F))) =
-        Real.log (w ((u : 𝓞 F) : F)) + Real.log (w ((u : 𝓞 F) : F)) + Real.log (y w) := by ring
+    have e1
+        : 2 * (Real.log (y w) / 2 + Real.log (w ((u : 𝓞 F) : F)))
+          = Real.log (w ((u : 𝓞 F) : F)) + Real.log (w ((u : 𝓞 F) : F)) + Real.log (y w) := by
+      ring
     rw [e1, Real.exp_add, Real.exp_add, Real.exp_log hpos, Real.exp_log (hy w), habs, ← sq, sq_abs]
   rw [hexp v, hexp w, ← Real.exp_add]
   apply Real.exp_le_exp.2

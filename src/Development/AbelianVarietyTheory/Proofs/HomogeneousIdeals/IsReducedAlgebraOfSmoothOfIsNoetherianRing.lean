@@ -10,15 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Bijectiv
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
 open ReciprocityTheory.ChartRestriction.G.Semi
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem GlobalTheory.isReduced_algebra_of_smooth_of_isNoetherianRing (A B : Type) [CommRing A] [CommRing B]
-    [Algebra A B] [Algebra.Smooth A B] [IsNoetherianRing A] [_root_.IsReduced A] :
-    _root_.IsReduced B := by
-
+theorem GlobalTheory.isReduced_algebra_of_smooth_of_isNoetherianRing
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B] [IsNoetherianRing A]
+    [_root_.IsReduced A]
+    : _root_.IsReduced B := by
   let f : Spec (CommRingCat.of B) ⟶ Spec (CommRingCat.of A) :=
     Spec.map (CommRingCat.ofHom (algebraMap A B))
   have : Smooth f := HasRingHomProperty.Spec_iff.mpr (RingHom.smooth_algebraMap.mpr inferInstance)
@@ -29,10 +30,9 @@ theorem GlobalTheory.isReduced_algebra_of_smooth_of_isNoetherianRing (A B : Type
     GeometricallyReduced.isReduced_of_flat_of_isLocallyNoetherian f
   exact (affine_isReduced_iff (CommRingCat.of B)).mp inferInstance
 
-theorem GlobalTheory.isReduced_algebra_of_smooth_of_isReduced (A B : Type) [CommRing A] [CommRing B]
-    [Algebra A B] [Algebra.Smooth A B] [_root_.IsReduced A] :
-    _root_.IsReduced B := by
-
+theorem GlobalTheory.isReduced_algebra_of_smooth_of_isReduced
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B] [_root_.IsReduced A]
+    : _root_.IsReduced B := by
   obtain ⟨A₀, B₀, _, _, hfg, hsm, ⟨e⟩⟩ := Algebra.Smooth.exists_subalgebra_fg ℤ A B
   have : Algebra.FiniteType ℤ A₀ := (Subalgebra.fg_iff_finiteType A₀).mp hfg
   have : IsNoetherianRing A₀ := Algebra.FiniteType.isNoetherianRing ℤ A₀
@@ -46,12 +46,12 @@ theorem GlobalTheory.isReduced_algebra_of_smooth_of_isReduced (A B : Type) [Comm
       GlobalTheory.isReduced_algebra_of_smooth_of_isNoetherianRing D (TensorProduct A₀ D B₀)
     exact isReduced_of_injective (Algebra.TensorProduct.comm A₀ B₀ D).toRingHom
       (Algebra.TensorProduct.comm A₀ B₀ D).injective
-  exact isReduced_of_injective
-    ((Algebra.TensorProduct.comm A₀ A B₀).toRingHom.comp e.toRingHom)
+  exact isReduced_of_injective ((Algebra.TensorProduct.comm A₀ A B₀).toRingHom.comp e.toRingHom)
     ((Algebra.TensorProduct.comm A₀ A B₀).injective.comp e.injective)
 
-private theorem isReduced_of_smooth_of_isAffine_of_isReduced {Y T : Scheme.{0}} (g : Y ⟶ T) [Smooth g]
-    [IsAffine T] [IsReduced T] : IsReduced Y := by
+private theorem isReduced_of_smooth_of_isAffine_of_isReduced
+    {Y T : Scheme.{0}} (g : Y ⟶ T) [Smooth g] [IsAffine T] [IsReduced T]
+    : IsReduced Y := by
   have hι : ∀ j, Smooth (Y.affineOpenCover.f j) := fun j => inferInstance
   refine @IsReduced.of_openCover _ Y.affineOpenCover.openCover (fun j => ?_)
 
@@ -67,8 +67,9 @@ private theorem isReduced_of_smooth_of_isAffine_of_isReduced {Y T : Scheme.{0}} 
   show IsReduced (Spec (Y.affineOpenCover.X j))
   infer_instance
 
-theorem GlobalTheory.isReduced_of_smooth_of_isReduced {X S : Scheme.{0}} (f : X ⟶ S) [Smooth f] [IsReduced S] : IsReduced X := by
-
+theorem GlobalTheory.isReduced_of_smooth_of_isReduced
+    {X S : Scheme.{0}} (f : X ⟶ S) [Smooth f] [IsReduced S]
+    : IsReduced X := by
   have hstalk : ∀ x : X, _root_.IsReduced (X.presheaf.stalk x) := by
     intro x
     obtain ⟨V, hV⟩ : ∃ V : S.affineOpens, f x ∈ (V : S.Opens) := by

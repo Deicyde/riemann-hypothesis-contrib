@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HilbertEisen
 @[expose] public section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 open GlobalTheory.LatVal (Sz)
@@ -74,19 +75,46 @@ private lemma jet_mul_eq_pow_sum_mul {F : Type} [Field F] [NumberField F] (k : �
     congr 2 <;> funext i <;> ring
   · exact smul_zero lam
 
-
 open NumberField UpperHalfPlane in
 open scoped Classical MatrixGroups nonZeroDivisors in
-theorem _root_.GlobalTheory.HilbFam.hfun_slash : _root_.GlobalTheory.LatJet.EisExp → ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], 2 ≤ Module.finrank ℚ F → ∀ (s N : ℕ) (L : _root_.GlobalTheory.HilbFam.Lat F), 1 ≤ s → 0 < N → _root_.GlobalTheory.HilbFam.HasLevel N L → ∀ (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) (γ : SL(2, ℤ)) (Ch Ch' : ℍ → ℂ) (τ : ℍ), (∃ L', _root_.GlobalTheory.HilbFam.HasLevel N L' ∧ L' = _root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ)) → Ch (γ • τ) = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) : ℂ) ^ 2 * Ch' τ - ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ) * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) / (2 * Real.pi * Complex.I) → _root_.GlobalTheory.HilbFam.hfun (2 * s) L κ Ch (γ • τ) = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) : ℂ) ^ _root_.GlobalTheory.HilbFam.wt (2 * s) κ * _root_.GlobalTheory.HilbFam.hfun (2 * s) (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ)) κ Ch' τ := by
+theorem _root_.GlobalTheory.HilbFam.hfun_slash
+    : _root_.GlobalTheory.LatJet.EisExp
+      → ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F],
+        2 ≤ Module.finrank ℚ F
+          → ∀ (s N : ℕ) (L : _root_.GlobalTheory.HilbFam.Lat F),
+            1 ≤ s → 0 < N → _root_.GlobalTheory.HilbFam.HasLevel N L
+              → ∀ (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ)
+                  (γ : SL(2, ℤ)) (Ch Ch' : ℍ → ℂ) (τ : ℍ),
+                (∃ L',
+                    _root_.GlobalTheory.HilbFam.HasLevel N L'
+                      ∧ L' = _root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ))
+                  → Ch (γ • τ)
+                    = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ)
+                              + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+                            : ℂ)
+                          ^ 2
+                        * Ch' τ
+                      - ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ)
+                        * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ)
+                          + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+                        / (2 * Real.pi * Complex.I)
+                  → _root_.GlobalTheory.HilbFam.hfun (2 * s) L κ Ch (γ • τ)
+                    = (((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ)
+                            + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1)
+                          : ℂ)
+                        ^ _root_.GlobalTheory.HilbFam.wt (2 * s) κ
+                      * _root_.GlobalTheory.HilbFam.hfun (2 * s)
+                        (_root_.GlobalTheory.HilbFam.mulMat L (γ : Matrix (Fin 2) (Fin 2) ℤ)) κ Ch'
+                        τ := by
   intro _ F _ _ _ _ s N L _ _ _ κ γ Ch Ch' τ _ hCh
-  have hP : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := by
-    simp [Real.pi_ne_zero, Complex.I_ne_zero]
+  have hP : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
   simp only [_root_.GlobalTheory.HilbFam.hfun]
   rw [_root_.GlobalTheory.HilbFam.JetModular.jet_smul F (2 * s) L κ γ τ _ _ (even_two_mul s)]
   set j : ℂ := ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 * (τ : ℂ) + (γ : Matrix (Fin 2) (Fin 2) ℤ) 1 1) with hj
   set P : ℂ := 2 * Real.pi * Complex.I with hPdef
-  have hc : P ^ 2 * Ch (γ • τ) - -P * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ) * j =
-      j ^ 2 * (P ^ 2 * Ch' τ) := by
+  have hc
+      : P ^ 2 * Ch (γ • τ) - -P * ((γ : Matrix (Fin 2) (Fin 2) ℤ) 1 0 : ℂ) * j
+        = j ^ 2 * (P ^ 2 * Ch' τ) := by
     rw [hCh]
     field_simp
     ring

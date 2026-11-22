@@ -9,11 +9,16 @@ open Polynomial IsLocalRing GlobalTheory.EtC
 
 namespace LateralTheory.E.LocSHPf
 
-theorem aic_localization (S : Type) [CommRing S] (hS : AIC S) (M : Submonoid S) (R : Type) [CommRing R]
-    [Algebra S R] [IsLocalization M R] : AIC R := by
+theorem aic_localization
+    (S : Type) [CommRing S]
+    (hS : AIC S)
+    (M : Submonoid S) (R : Type) [CommRing R] [Algebra S R] [IsLocalization M R]
+    : AIC R := by
   intro P hP hd
   classical
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset M ((Finset.range (P.natDegree + 1)).image P.coeff)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset M
+      ((Finset.range (P.natDegree + 1)).image P.coeff)
   set s : R := algebraMap S R (b : S) with hs
   have hlift : P.scaleRoots s ∈ lifts (algebraMap S R) := by
     rw [lifts_iff_coeff_lifts]
@@ -43,34 +48,40 @@ theorem aic_localization (S : Type) [CommRing S] (hS : AIC S) (M : Submonoid S) 
   have := (hu.pow P.natDegree).mul_right_eq_zero.1 h1.symm
   exact this
 
-theorem root_near (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R) (a₀ : R) :
-    ∀ n : ℕ, ∀ f : R[X], f.natDegree = n → f.Monic → f.eval a₀ ∈ maximalIdeal R →
-      ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal R := by
+theorem root_near (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R) (a₀ : R)
+    : ∀ n : ℕ, ∀ f : R[X],
+      f.natDegree = n → f.Monic → f.eval a₀ ∈ maximalIdeal R
+        → ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal R := by
   intro n
   induction n with
   | zero =>
     intro f hn hf he
     rw [eq_one_of_monic_natDegree_zero hf hn, eval_one] at he
-    exact absurd he (Ideal.IsMaximal.ne_top inferInstance |> fun h => fun h1 => h ((Ideal.eq_top_iff_one _).2 h1))
+    exact absurd he
+      (Ideal.IsMaximal.ne_top inferInstance |> fun h => fun h1 => h ((Ideal.eq_top_iff_one _).2 h1))
   | succ n ih =>
     intro f hn hf he
     obtain ⟨a, ha⟩ := hR f hf (by omega)
     have hfac := (mul_divByMonic_eq_iff_isRoot (p := f) (a := a)).2 ha
-    have hgm : (f /ₘ (X - C a)).Monic := (monic_X_sub_C a).of_mul_monic_left (by rw [hfac]; exact hf)
+    have hgm : (f /ₘ (X - C a)).Monic :=
+      (monic_X_sub_C a).of_mul_monic_left (by rw [hfac]; exact hf)
     have hgd : (f /ₘ (X - C a)).natDegree = n := by
       rw [natDegree_divByMonic _ (monic_X_sub_C a), natDegree_X_sub_C]; omega
     rw [← hfac, eval_mul, eval_sub, eval_X, eval_C] at he
     rcases Ideal.IsPrime.mem_or_mem (inferInstance : (maximalIdeal R).IsPrime) he with h | h
     · refine ⟨a, ha, ?_⟩
-      rw [← neg_sub]; exact (Ideal.neg_mem_iff _).2 h
+      rw [← neg_sub]
+      exact (Ideal.neg_mem_iff _).2 h
     · obtain ⟨b, hb, hb'⟩ := ih _ hgd hgm h
       refine ⟨b, ?_, hb'⟩
       rw [← hfac, IsRoot, eval_mul, hb.eq_zero, mul_zero]
 
-theorem henselian_of_aic (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R) : HenselianLocalRing R where
+theorem henselian_of_aic (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R)
+    : HenselianLocalRing R where
   is_henselian f hf a₀ he _ := root_near R hR a₀ _ f rfl hf he
 
-theorem residue_algClosed (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R) : IsAlgClosed (ResidueField R) := by
+theorem residue_algClosed (R : Type) [CommRing R] [IsLocalRing R] (hR : AIC R)
+    : IsAlgClosed (ResidueField R) := by
   refine IsAlgClosed.of_exists_root _ fun p hp hirr => ?_
   have hl : p ∈ lifts (residue R) := by
     rw [lifts_iff_coeff_lifts]; intro n; exact residue_surjective _

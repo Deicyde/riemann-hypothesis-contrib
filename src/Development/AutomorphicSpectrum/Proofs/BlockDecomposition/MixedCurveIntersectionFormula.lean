@@ -20,12 +20,14 @@ theorem curveInt : CurveInt := by
   refine ⟨fun σ => ?_, GlobalTheory.ArchDimZero.main ℤ Z q hq M L r hr⟩
   have := GlobalTheory.ArchDimZero.isProper hq
   have := GlobalTheory.ArchDimZero.finite_cxPts hq σ
-  have h₁ : (L.φ σ).chernPart 0 1 = Measure.count := Measure.ext_iff_singleton.2 fun y => by
-    rw [GlobalTheory.ArchDimZero.chernPart_singleton hq L σ 1 y, Measure.count_singleton]
-    simp
-  have h₂ : (L.φ σ).chernPart 0 (-1) = 0 := Measure.ext_iff_singleton.2 fun y => by
-    rw [GlobalTheory.ArchDimZero.chernPart_singleton hq L σ (-1) y]
-    simp
+  have h₁ : (L.φ σ).chernPart 0 1 = Measure.count :=
+    Measure.ext_iff_singleton.2 fun y => by
+      rw [GlobalTheory.ArchDimZero.chernPart_singleton hq L σ 1 y, Measure.count_singleton]
+      simp
+  have h₂ : (L.φ σ).chernPart 0 (-1) = 0 :=
+    Measure.ext_iff_singleton.2 fun y => by
+      rw [GlobalTheory.ArchDimZero.chernPart_singleton hq L σ (-1) y]
+      simp
   refine ⟨?_, ?_⟩
   · rw [h₁]
     exact (Integrable.of_finite (μ := Measure.count) (f := logNorm (M.φ σ) r)).integrableOn

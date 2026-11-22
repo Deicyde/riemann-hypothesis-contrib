@@ -4,8 +4,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemIntMat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep GlobalTheory.FinZeta GlobalTheory.AdelicScalar GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
+  GlobalTheory.FinZeta GlobalTheory.AdelicScalar
+  GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
 open Formalism.IndefR.Lev (levG levChi IsBaseFrame)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke dosetInd IsCommensurated)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
@@ -16,8 +21,8 @@ noncomputable section
 
 namespace GlobalTheory.UnramIntIndex
 
-theorem le_exp_neg_one_of_lt_one {a : WithZero (Multiplicative ℤ)} (ha : a < 1) :
-    a ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem le_exp_neg_one_of_lt_one {a : WithZero (Multiplicative ℤ)} (ha : a < 1)
+    : a ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   rcases eq_or_ne a 0 with rfl | h
   · exact zero_le'
   · obtain ⟨m, rfl⟩ := WithZero.ne_zero_iff_exists.mp h
@@ -29,9 +34,11 @@ theorem le_exp_neg_one_of_lt_one {a : WithZero (Multiplicative ℤ)} (ha : a < 1
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem mem_maximalIdeal_iff (y : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) :
-    y ∈ IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring ↔
-      Valued.v (y : L) < 1 := by
+theorem mem_maximalIdeal_iff
+    (y : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
+    : y ∈ IsLocalRing.maximalIdeal
+        (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring
+      ↔ Valued.v (y : L) < 1 := by
   have hy : Valued.v (y : L) ≤ 1 := y.2
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   constructor
@@ -42,21 +49,29 @@ theorem mem_maximalIdeal_iff (y : (Valued.v : Valuation L (WithZero (Multiplicat
       rw [h0, map_zero] at h1
       exact zero_ne_one h1
     have hinv : Valued.v ((y : L)⁻¹) ≤ 1 := by rw [map_inv₀, h1, inv_one]
-    refine IsUnit.of_mul_eq_one (⟨(y : L)⁻¹, hinv⟩ : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) ?_
+    refine IsUnit.of_mul_eq_one
+      (⟨(y : L)⁻¹, hinv⟩ : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
+      ?_
     exact Subtype.ext (mul_inv_cancel₀ h0)
   · rintro hlt ⟨u, rfl⟩
-    obtain ⟨z, hz⟩ : ∃ z, (u : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) * z = 1 :=
+    obtain ⟨z, hz⟩
+        : ∃ z,
+          (u : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) * z = 1 :=
       ⟨_, u.mul_inv⟩
-    have h11 : (((u : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) : L)) * (z : L) = 1 :=
+    have h11
+        : (((u : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) : L))
+            * (z : L)
+          = 1 :=
       congrArg Subtype.val hz
     have h1 := congrArg Valued.v h11
     rw [map_mul, map_one] at h1
     have h2 : Valued.v (z : L) ≤ 1 := z.2
     exact absurd h1 (ne_of_lt (lt_of_le_of_lt (mul_le_of_le_one_right' h2) hlt))
 
-theorem relIndex_mul_uniformizer (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnramInv ϖ c q) :
-    ((Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ)).relIndex
-      (Formalism.UG.intL L).toAddSubgroup = q ^ 2 := by
+theorem relIndex_mul_uniformizer (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnramInv ϖ c q)
+    : ((Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ)).relIndex
+        (Formalism.UG.intL L).toAddSubgroup
+      = q ^ 2 := by
   obtain ⟨-, -, -, h4, -, -, h7⟩ := h
   set V := (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring with hV
   have h0 : ϖ ≠ 0 := by
@@ -70,8 +85,9 @@ theorem relIndex_mul_uniformizer (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnram
   have hI : (IsLocalRing.maximalIdeal V).toAddSubgroup.index = q ^ 2 := h7
   let f : V →+ L := V.subtype.toAddMonoidHom
   have hf : Function.Injective f := Subtype.val_injective
-  have e1 : (IsLocalRing.maximalIdeal V).toAddSubgroup.map f =
-      (Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ) := by
+  have e1
+      : (IsLocalRing.maximalIdeal V).toAddSubgroup.map f
+        = (Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft ϖ) := by
     ext x
     simp only [AddSubgroup.mem_map]
     constructor
@@ -101,10 +117,13 @@ theorem relIndex_mul_uniformizer (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnram
   rw [← e1, ← e2, AddSubgroup.relIndex_map_map_of_injective _ _ hf, AddSubgroup.relIndex_top_right]
   exact hI
 
-theorem relIndex_mul_uniformizer_pow {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
-    (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnramInv ϖ c q) (e : ℕ) :
-    ((Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft (ϖ ^ e))).relIndex
-      (Formalism.UG.intL L).toAddSubgroup = (q ^ 2) ^ e := by
+theorem relIndex_mul_uniformizer_pow
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    (ϖ : L) (c : L →+* L) (q : ℕ) (h : IsUnramInv ϖ c q)
+    (e : ℕ)
+    : ((Formalism.UG.intL L).toAddSubgroup.map (AddMonoidHom.mulLeft (ϖ ^ e))).relIndex
+        (Formalism.UG.intL L).toAddSubgroup
+      = (q ^ 2) ^ e := by
   have hbase := relIndex_mul_uniformizer ϖ c q h
   obtain ⟨-, -, -, h4, -⟩ := h
   have h0 : ϖ ≠ 0 := by
@@ -130,8 +149,9 @@ theorem relIndex_mul_uniformizer_pow {L : Type} [Field L] [Valued L (WithZero (M
   | succ e ih =>
     have hinj : Function.Injective (AddMonoidHom.mulLeft (ϖ ^ e)) :=
       mul_right_injective₀ (pow_ne_zero e h0)
-    have hcomp : O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) =
-        (O.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
+    have hcomp
+        : O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))
+          = (O.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
       ext x
       simp only [AddSubgroup.mem_map, AddMonoidHom.coe_mulLeft]
       constructor
@@ -139,11 +159,14 @@ theorem relIndex_mul_uniformizer_pow {L : Type} [Field L] [Valued L (WithZero (M
         exact ⟨ϖ * o, ⟨o, ho, rfl⟩, by rw [pow_succ, mul_assoc]⟩
       · rintro ⟨_, ⟨o, ho, rfl⟩, rfl⟩
         exact ⟨o, ho, by rw [pow_succ, mul_assoc]⟩
-    have hstep : (O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))).relIndex
-        (O.map (AddMonoidHom.mulLeft (ϖ ^ e))) = q ^ 2 := by
+    have hstep
+        : (O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))).relIndex
+            (O.map (AddMonoidHom.mulLeft (ϖ ^ e)))
+          = q ^ 2 := by
       rw [hcomp, AddSubgroup.relIndex_map_map_of_injective _ _ hinj]
       exact hbase
-    have hle1 : O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) ≤ O.map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
+    have hle1
+        : O.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) ≤ O.map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
       rw [hcomp]
       exact AddSubgroup.map_mono (hmulle ϖ hϖ)
     have hle2 := hmulle (ϖ ^ e) (pow_mem hϖ e)

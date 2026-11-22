@@ -18,8 +18,8 @@ section Ops
 variable {O L ι : Type} [CommRing O] [Field L] [Algebra O L] [Fintype ι] [DecidableEq ι]
 
 def admitted (O : Type) [CommRing O] [Algebra O L] (T : Finset ι) (k : GL ι L) : Prop :=
-  (∃ κ : GL ι O, Matrix.GeneralLinearGroup.map (algebraMap O L) κ = k) ∧
-    ∀ v : ι → L, (∀ i ∈ T, v i = 0) → v ᵥ* k.1 = v
+  (∃ κ : GL ι O, Matrix.GeneralLinearGroup.map (algebraMap O L) κ = k)
+    ∧ ∀ v : ι → L, (∀ i ∈ T, v i = 0) → v ᵥ* k.1 = v
 
 lemma admitted.one (T : Finset ι) : admitted O T (1 : GL ι L) :=
   ⟨⟨1, map_one _⟩, fun v _ => by simp⟩
@@ -136,8 +136,9 @@ end Ops
 
 theorem jpIw : JpIw := by
   intro O L _ _ _ _ _ _ n g
-  obtain ⟨κ, h⟩ := exists_rows (O := O) (L := L) (ι := Ix n) (Sum.inr : Fin n → Ix n)
-    Sum.inr_injective g.1 Finset.univ
+  obtain ⟨κ, h⟩ :=
+    exists_rows (O := O) (L := L) (ι := Ix n) (Sum.inr : Fin n → Ix n) Sum.inr_injective g.1
+      Finset.univ
   set k : GL (Ix n) L := inL κ with hk
   set G : Matrix (Ix n) (Ix n) L := (g * k).1 with hG
   have hC : G.toBlocks₂₁ = 0 := by
@@ -148,10 +149,17 @@ theorem jpIw : JpIw := by
   have hdet : G.toBlocks₁₁.det * G.toBlocks₂₂.det ≠ 0 := by
     rw [← Matrix.det_fromBlocks_zero₂₁ G.toBlocks₁₁ G.toBlocks₁₂ G.toBlocks₂₂, ← hGb]
     exact (Matrix.isUnits_det_units (g * k)).ne_zero
-  refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet),
-    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet), G.toBlocks₁₂, κ⁻¹, ?_⟩
-  have hp : pM (Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet))
-      (Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet)) G.toBlocks₁₂ = g * k := by
+  refine ⟨
+    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet),
+    Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet),
+    G.toBlocks₁₂,
+    κ⁻¹,
+    ?_
+  ⟩
+  have hp
+      : pM (Matrix.GeneralLinearGroup.mkOfDetNeZero _ (left_ne_zero_of_mul hdet))
+          (Matrix.GeneralLinearGroup.mkOfDetNeZero _ (right_ne_zero_of_mul hdet)) G.toBlocks₁₂
+        = g * k := by
     apply Units.ext
     exact hGb.symm
   rw [hp, map_inv, ← hk, mul_inv_cancel_right]

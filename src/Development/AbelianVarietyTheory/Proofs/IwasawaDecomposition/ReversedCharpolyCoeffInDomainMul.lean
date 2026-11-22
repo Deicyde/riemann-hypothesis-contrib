@@ -11,9 +11,10 @@ open CategoryTheory Polynomial TensorProduct
 
 namespace GlobalTheory.NormalDescent
 
-theorem charpoly_reverse_coeff_smul {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] (f : Module.End K V) (c : K) (k : ℕ) :
-    (c • f).charpoly.reverse.coeff k = c ^ k * f.charpoly.reverse.coeff k := by
+theorem charpoly_reverse_coeff_smul
+    {K V : Type} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (f : Module.End K V) (c : K) (k : ℕ)
+    : (c • f).charpoly.reverse.coeff k = c ^ k * f.charpoly.reverse.coeff k := by
   classical
   let e := Module.finBasis K V
   rw [← LinearMap.charpoly_toMatrix _ e, ← LinearMap.charpoly_toMatrix _ e, Matrix.reverse_charpoly,
@@ -26,9 +27,11 @@ theorem charpoly_reverse_coeff_smul {K V : Type} [Field K] [AddCommGroup V] [Mod
   refine Matrix.ext fun i j => ?_
   by_cases hij : i = j <;> simp [hij] <;> ring
 
-theorem exists_charK_coeff {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B]
-    (φ : A →+* B) (hφ : φ.Finite) (b : B) (n : ℕ) :
-    ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).coeff n := by
+theorem exists_charK_coeff
+    {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B]
+    (φ : A →+* B) (hφ : φ.Finite)
+    (b : B) (n : ℕ)
+    : ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).coeff n := by
   classical
   letI := φ.toAlgebra
   haveI : Module.Finite A B := hφ
@@ -62,7 +65,9 @@ theorem exists_charK_coeff {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyC
     rw [← aeval_def, ← aeval_map_algebraMap Ω]
     by_contra hne
     exact (spectrum.mem_iff.1 h4) (by
-      simpa using (IsUnit.mk0 _ hne).map (algebraMap Ω (Matrix (Fin (Module.finrank K V)) (Fin (Module.finrank K V)) Ω)))
+      simpa using
+        (IsUnit.mk0 _ hne).map
+          (algebraMap Ω (Matrix (Fin (Module.finrank K V)) (Fin (Module.finrank K V)) Ω)))
   have hl : Mx.charpoly.map ι ∈ Polynomial.lifts (integralClosure A Ω).val.toRingHom :=
     (IsAlgClosed.splits _).mem_lift_of_roots_mem_range ((Matrix.charpoly_monic _).map _) _
       fun μ hμ => ⟨⟨μ, hroot μ hμ⟩, rfl⟩
@@ -76,23 +81,32 @@ theorem exists_charK_coeff {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyC
   rw [hg]
   exact IsIntegrallyClosed.isIntegral_iff.1 hc
 
-theorem normCoeff_mul : ∀ {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B] (φ : A →+* B)
-    (hφ : φ.Finite) (u : A) (b : B) (k : ℕ), normCoeff φ hφ (φ u * b) k = u ^ k * normCoeff φ hφ b k := by
+theorem normCoeff_mul
+    : ∀ {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B] (φ : A →+* B)
+        (hφ : φ.Finite) (u : A) (b : B) (k : ℕ),
+      normCoeff φ hφ (φ u * b) k = u ^ k * normCoeff φ hφ b k := by
   intro A B _ _ _ _ φ hφ u b k
-  have hrev : ∀ b' : B, ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b').reverse.coeff k :=
-    fun b' => by rw [coeff_reverse]; exact exists_charK_coeff φ hφ b' _
-  have key : (charK φ hφ (FractionRing A) (φ u * b)).reverse.coeff k
-      = (algebraMap A (FractionRing A) u) ^ k * (charK φ hφ (FractionRing A) b).reverse.coeff k := by
+  have hrev
+      : ∀ b' : B, ∃ a : A,
+        algebraMap A (FractionRing A) a
+          = (charK φ hφ (FractionRing A) b').reverse.coeff k := fun b' => by
+    rw [coeff_reverse]; exact exists_charK_coeff φ hφ b' _
+  have key
+      : (charK φ hφ (FractionRing A) (φ u * b)).reverse.coeff k
+        = (algebraMap A (FractionRing A) u) ^ k
+          * (charK φ hφ (FractionRing A) b).reverse.coeff k := by
     letI := φ.toAlgebra
     haveI : Module.Finite A B := hφ
     haveI : Module.Free (FractionRing A) (FractionRing A ⊗[A] B) := Module.Free.of_divisionRing _ _
-    have e1 : (1 : FractionRing A) ⊗ₜ[A] (φ u * b)
-        = algebraMap A (FractionRing A) u • ((1 : FractionRing A) ⊗ₜ[A] b) := by
+    have e1
+        : (1 : FractionRing A) ⊗ₜ[A] (φ u * b)
+          = algebraMap A (FractionRing A) u • ((1 : FractionRing A) ⊗ₜ[A] b) := by
       rw [algebraMap_smul, ← tmul_smul, Algebra.smul_def]; rfl
     show (Algebra.lmul _ _ ((1 : FractionRing A) ⊗ₜ[A] (φ u * b))).charpoly.reverse.coeff k = _
     rw [e1, map_smul]
     exact charpoly_reverse_coeff_smul _ _ _
   apply IsFractionRing.injective A (FractionRing A)
-  rw [map_mul, map_pow, algebraMap_normCoeff _ _ _ _ (hrev _), algebraMap_normCoeff _ _ _ _ (hrev _), key]
+  rw [map_mul, map_pow, algebraMap_normCoeff _ _ _ _ (hrev _),
+    algebraMap_normCoeff _ _ _ _ (hrev _), key]
 
 end GlobalTheory.NormalDescent

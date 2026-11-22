@@ -28,23 +28,19 @@ private lemma act_zero_square_integrability {dim : (E →+* ℂ) → ℕ} (α : 
 
 theorem Good.bot (X : PT E) (c : ℝ) : Good X c ⊥ := by
   refine { le := bot_le, sat := ?_, stable := ?_, iso := ?_, sep := ?_ }
-  ·
-    intro x _ hx
+  · intro x _ hx
     have : IR (⊥ : Submodule ℤ (Vsp X.dim)) = ⊥ := by simp [IR]
     rw [this] at hx
     simpa using hx
-  ·
-    intro α x hx
+  · intro α x hx
     rw [Submodule.mem_bot] at hx ⊢
     subst hx
     rw [act_eq_actE, actE_zero_right]
-  ·
-    intro x hx y _
+  · intro x hx y _
     rw [Submodule.mem_bot] at hx
     subst hx
     exact Hf_im_zero_left y
-  ·
-    intro x _ u hu hne
+  · intro x _ u hu hne
     exfalso
     have : IR (⊥ : Submodule ℤ (Vsp X.dim)) = ⊥ := by simp [IR]
     have h1 := hu.1
@@ -64,8 +60,8 @@ private lemma act_real_smul {dim : (E →+* ℂ) → ℕ} (α : 𝓞 E) (r : ℝ
   | (ext i; simp [act, mul_smul_comm])
   | (unfold act; ext i; simp [Complex.real_smul]; ring)
 
-theorem Good.IR_stable {X : PT E} {c : ℝ} {I : Submodule ℤ (Vsp X.dim)} (hI : Good X c I)
-    (α : 𝓞 E) : ∀ v ∈ IR I, act α v ∈ IR I := by
+theorem Good.IR_stable {X : PT E} {c : ℝ} {I : Submodule ℤ (Vsp X.dim)} (hI : Good X c I) (α : 𝓞 E)
+    : ∀ v ∈ IR I, act α v ∈ IR I := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem x hx => exact Submodule.subset_span (hI.stable α x hx)
@@ -95,8 +91,8 @@ private lemma Hf_real_smul_right_im {ι : Type} [Fintype ι] (r : ℝ) (v w : Eu
   | (simp [Hf, Complex.real_smul, mul_left_comm _ (r : ℂ), ← Finset.mul_sum, Complex.mul_im])
   | (simp [Hf, Finset.mul_sum, Complex.mul_im, Complex.real_smul])
 
-theorem Good.IR_iso {X : PT E} {c : ℝ} {I : Submodule ℤ (Vsp X.dim)} (hI : Good X c I) :
-    ∀ v ∈ IR I, ∀ w ∈ IR I, (Hf v w).im = 0 := by
+theorem Good.IR_iso {X : PT E} {c : ℝ} {I : Submodule ℤ (Vsp X.dim)} (hI : Good X c I)
+    : ∀ v ∈ IR I, ∀ w ∈ IR I, (Hf v w).im = 0 := by
   intro v hv w hw
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -109,8 +105,9 @@ theorem Good.IR_iso {X : PT E} {c : ℝ} {I : Submodule ℤ (Vsp X.dim)} (hI : G
   | add x x' _ _ h1 h2 => rw [Hf_add_left', Complex.add_im, h1, h2, add_zero]
   | smul r x _ h => rw [im_Hf_real_smul_left, h, mul_zero]
 
-theorem im_eq_zero_of_lt (X : PT E) {x y : Vsp X.dim} (hx : x ∈ X.L) (hy : y ∈ X.L)
-    (h : |(Hf x y).im| < 1) : (Hf x y).im = 0 := by
+theorem im_eq_zero_of_lt
+    (X : PT E) {x y : Vsp X.dim} (hx : x ∈ X.L) (hy : y ∈ X.L) (h : |(Hf x y).im| < 1)
+    : (Hf x y).im = 0 := by
   obtain ⟨k, hk⟩ := X.integral x y hx hy
   rw [hk] at h ⊢
   have hk1 : |k| < 1 := by exact_mod_cast h
@@ -119,8 +116,9 @@ theorem im_eq_zero_of_lt (X : PT E) {x y : Vsp X.dim} (hx : x ∈ X.L) (hy : y �
     omega
   simp [hk0]
 
-theorem one_le_abs_im (X : PT E) {x y : Vsp X.dim} (hx : x ∈ X.L) (hy : y ∈ X.L)
-    (h : (Hf x y).im ≠ 0) : 1 ≤ |(Hf x y).im| := by
+theorem one_le_abs_im
+    (X : PT E) {x y : Vsp X.dim} (hx : x ∈ X.L) (hy : y ∈ X.L) (h : (Hf x y).im ≠ 0)
+    : 1 ≤ |(Hf x y).im| := by
   obtain ⟨k, hk⟩ := X.integral x y hx hy
   rw [hk] at h ⊢
   have hk0 : k ≠ 0 := by exact_mod_cast h

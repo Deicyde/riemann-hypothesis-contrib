@@ -25,7 +25,8 @@ def zW : ℤ_[p] →+* WW p :=
   (WittVector.map (algebraMap (ZMod p) (kb p))).comp (WittVector.equiv p).symm.toRingHom
 
 theorem zW_injective : Function.Injective (zW p) :=
-  (WittVector.map_injective _ (algebraMap (ZMod p) (kb p)).injective).comp (WittVector.equiv p).symm.injective
+  (WittVector.map_injective _ (algebraMap (ZMod p) (kb p)).injective).comp
+    (WittVector.equiv p).symm.injective
 
 def zK : ℤ_[p] →+* K0 p := (algebraMap (WW p) (K0 p)).comp (zW p)
 
@@ -37,9 +38,11 @@ def qK : ℚ_[p] →+* K0 p := IsFractionRing.lift (zK_injective p)
 theorem qK_alg (x : ℤ_[p]) : qK p (algebraMap ℤ_[p] ℚ_[p] x) = zK p x :=
   IsFractionRing.lift_algebraMap (zK_injective p) x
 
-@[reducible] def algZW : Algebra ℤ_[p] (WW p) := (zW p).toAlgebra
+@[reducible]
+def algZW : Algebra ℤ_[p] (WW p) := (zW p).toAlgebra
 
-@[reducible] def algQK : Algebra ℚ_[p] (K0 p) := (qK p).toAlgebra
+@[reducible]
+def algQK : Algebra ℚ_[p] (K0 p) := (qK p).toAlgebra
 
 attribute [local instance] algZW algQK
 
@@ -55,26 +58,30 @@ theorem p_ne_zero_alt : (p : WW p) ≠ 0 := (WittVector.irreducible p).ne_zero
 
 theorem p_ne_zero_K : (p : K0 p) ≠ 0 := by
   rw [← map_natCast (algebraMap (WW p) (K0 p))]
-  exact fun h => p_ne_zero_alt p ((IsFractionRing.injective (WW p) (K0 p)) (h.trans (map_zero _).symm))
+  exact fun h =>
+    p_ne_zero_alt p ((IsFractionRing.injective (WW p) (K0 p)) (h.trans (map_zero _).symm))
 
-theorem integral_of_alg (b : WW p) (hb : IsAlgebraic ℚ_[p] (algebraMap (WW p) (K0 p) b)) :
-    IsIntegral ℤ_[p] (algebraMap (WW p) (K0 p) b) := by
+theorem integral_of_alg (b : WW p) (hb : IsAlgebraic ℚ_[p] (algebraMap (WW p) (K0 p) b))
+    : IsIntegral ℤ_[p] (algebraMap (WW p) (K0 p) b) := by
   set β := algebraMap (WW p) (K0 p) b with hβ
   by_cases h0 : β = 0
   · rw [h0]; exact isIntegral_zero
   let L : IntermediateField ℚ_[p] (K0 p) := IntermediateField.adjoin ℚ_[p] {β}
   have : FiniteDimensional ℚ_[p] L := IntermediateField.adjoin.finiteDimensional hb.isIntegral
-  have hD : IsDiscreteValuationRing (integralClosure ℤ_[p] L) := IntCl.isDVR ℤ_[p] ℚ_[p] L inferInstance
+  have hD : IsDiscreteValuationRing (integralClosure ℤ_[p] L) :=
+    IntCl.isDVR ℤ_[p] ℚ_[p] L inferInstance
   have : IsFractionRing (integralClosure ℤ_[p] L) L := IntCl.frac ℤ_[p] ℚ_[p] L
   let g : L := IntermediateField.AdjoinSimple.gen ℚ_[p] β
   have hg : (g : K0 p) = β := IntermediateField.AdjoinSimple.coe_gen ℚ_[p] β
-  let ρ : integralClosure ℤ_[p] L →+* K0 p := (algebraMap L (K0 p)).comp (algebraMap (integralClosure ℤ_[p] L) L)
+  let ρ : integralClosure ℤ_[p] L →+* K0 p :=
+    (algebraMap L (K0 p)).comp (algebraMap (integralClosure ℤ_[p] L) L)
   have : IsScalarTower ℤ_[p] L (K0 p) := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have key : ∀ c : integralClosure ℤ_[p] L, IsIntegral ℤ_[p] (ρ c) := fun c =>
     (c.2 : IsIntegral ℤ_[p] (c : L)).map (IsScalarTower.toAlgHom ℤ_[p] L (K0 p))
   rcases ValuationRing.isInteger_or_isInteger (integralClosure ℤ_[p] L) g with ⟨c, hc⟩ | ⟨c, hc⟩
   · have : ρ c = β := by rw [← hg, ← hc]; rfl
-    rw [← this]; exact key c
+    rw [← this]
+    exact key c
   · have hρc : ρ c = β⁻¹ := by
       have : ρ c = algebraMap L (K0 p) (g⁻¹) := by rw [← hc]; rfl
       rw [this, map_inv₀]
@@ -83,7 +90,8 @@ theorem integral_of_alg (b : WW p) (hb : IsAlgebraic ℚ_[p] (algebraMap (WW p) 
     · obtain ⟨u, rfl⟩ := hu
       have : ρ ((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) : integralClosure ℤ_[p] L) = β := by
         rw [map_units_inv, hρc, inv_inv]
-      rw [← this]; exact key _
+      rw [← this]
+      exact key _
     · exfalso
       obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (integralClosure ℤ_[p] L)
       have hp0 : ((p : ℕ) : integralClosure ℤ_[p] L) ≠ 0 := by
@@ -95,17 +103,26 @@ theorem integral_of_alg (b : WW p) (hb : IsAlgebraic ℚ_[p] (algebraMap (WW p) 
       have hcm : c ∈ maximalIdeal (integralClosure ℤ_[p] L) := (mem_maximalIdeal c).2 hu
       rw [hϖ.maximalIdeal_eq, Ideal.mem_span_singleton] at hcm
       obtain ⟨d, rfl⟩ := hcm
-      have hz : (ϖ * d) ^ e = ((p : ℕ) : integralClosure ℤ_[p] L) * (((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) :
-          integralClosure ℤ_[p] L) * d ^ e) := by
+      have hz
+          : (ϖ * d) ^ e
+            = ((p : ℕ) : integralClosure ℤ_[p] L)
+              * (((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) : integralClosure ℤ_[p] L) * d ^ e) := by
         rw [hpe, mul_pow]
-        calc ϖ ^ e * d ^ e = ((u : integralClosure ℤ_[p] L) * ((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) :
-              integralClosure ℤ_[p] L)) * (ϖ ^ e * d ^ e) := by rw [Units.mul_inv, one_mul]
+        calc
+          ϖ ^ e * d ^ e
+              = ((u : integralClosure ℤ_[p] L)
+                  * ((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) : integralClosure ℤ_[p] L))
+                * (ϖ ^ e * d ^ e) := by
+            rw [Units.mul_inv, one_mul]
           _ = _ := by ring
-      have hζ : IsIntegral (WW p) (ρ (((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) : integralClosure ℤ_[p] L) * d ^ e)) :=
+      have hζ : IsIntegral (WW p)
+          (ρ (((u⁻¹ : (integralClosure ℤ_[p] L)ˣ) : integralClosure ℤ_[p] L) * d ^ e)) :=
         (key _).tower_top
       obtain ⟨z', hz'⟩ := IsIntegrallyClosed.isIntegral_iff.1 hζ
       have h1 := congrArg ρ hz
-      rw [map_pow, hρc, map_mul, map_natCast, ← hz', ← map_natCast (algebraMap (WW p) (K0 p)), ← map_mul] at h1
+      rw [map_pow, hρc, map_mul, map_natCast, ← hz', ← map_natCast (algebraMap (WW p) (K0 p)),
+          ← map_mul]
+        at h1
       have h2 : algebraMap (WW p) (K0 p) (b ^ e * ((p : WW p) * z')) = 1 := by
         rw [map_mul, ← h1, map_pow, ← hβ, inv_pow, mul_inv_cancel₀ (pow_ne_zero _ h0)]
       have h3 : b ^ e * ((p : WW p) * z') = 1 :=
@@ -113,8 +130,11 @@ theorem integral_of_alg (b : WW p) (hb : IsAlgebraic ℚ_[p] (algebraMap (WW p) 
       have h4 : (p : WW p) * (b ^ e * z') = 1 := by rw [← h3]; ring
       exact (WittVector.irreducible p).not_isUnit (IsUnit.of_mul_eq_one _ h4)
 
-theorem norm_le_one_of_root {K : Type*} [NormedField K] [IsUltrametricDist K] (P : K[X]) (hm : P.Monic)
-    (hc : ∀ i, ‖P.coeff i‖ ≤ 1) (x : K) (hx : P.eval x = 0) : ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_root
+    {K : Type*} [NormedField K] [IsUltrametricDist K]
+    (P : K[X]) (hm : P.Monic) (hc : ∀ i, ‖P.coeff i‖ ≤ 1)
+    (x : K) (hx : P.eval x = 0)
+    : ‖x‖ ≤ 1 := by
   by_contra! h
   have hx0 : 0 < ‖x‖ := zero_lt_one.trans h
   rw [Polynomial.eval_eq_sum_range, Finset.sum_range_succ, hm.coeff_natDegree, one_mul] at hx
@@ -122,7 +142,8 @@ theorem norm_le_one_of_root {K : Type*} [NormedField K] [IsUltrametricDist K] (P
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun i hi => ?_
     rw [norm_mul, norm_pow, le_div_iff₀ hx0]
     calc
-      ‖P.coeff i‖ * ‖x‖ ^ i * ‖x‖ ≤ 1 * ‖x‖ ^ i * ‖x‖ := by gcongr; exact hc i
+      ‖P.coeff i‖ * ‖x‖ ^ i * ‖x‖
+        ≤ 1 * ‖x‖ ^ i * ‖x‖ := by gcongr; exact hc i
       _ = ‖x‖ ^ (i + 1) := by rw [one_mul, pow_succ]
       _ ≤ ‖x‖ ^ P.natDegree := pow_le_pow_right₀ h.le (Finset.mem_range.1 hi)
   rw [eq_neg_of_add_eq_zero_left hx, norm_neg, norm_pow] at hsum
@@ -141,7 +162,8 @@ theorem norm_p_C : ‖(p : ℂ_[p])‖ = (p : ℝ)⁻¹ := by
   congr 1
   simp
 
-theorem norm_phi_le (z : Kalg p) (b : WW p) (h : (z : K0 p) = algebraMap (WW p) (K0 p) b) : ‖phi p z‖ ≤ 1 := by
+theorem norm_phi_le (z : Kalg p) (b : WW p) (h : (z : K0 p) = algebraMap (WW p) (K0 p) b)
+    : ‖phi p z‖ ≤ 1 := by
   have hi : IsIntegral ℤ_[p] (algebraMap (WW p) (K0 p) b) :=
     integral_of_alg p b (by rw [← h]; exact mem_algebraicClosure_iff.1 z.2)
   obtain ⟨P, hm, he⟩ := hi
@@ -154,7 +176,8 @@ theorem norm_phi_le (z : Kalg p) (b : WW p) (h : (z : K0 p) = algebraMap (WW p) 
     apply (algebraMap (Kalg p) (K0 p)).injective
     rw [hom_eval₂, e1, map_zero]
     have : algebraMap (Kalg p) (K0 p) z = algebraMap (WW p) (K0 p) b := h
-    rw [this]; exact he
+    rw [this]
+    exact he
   have e3 : ((phi p : Kalg p →+* ℂ_[p])).comp f' = f := by
     ext x
     exact (phi p).commutes _
@@ -168,8 +191,9 @@ theorem norm_phi_le (z : Kalg p) (b : WW p) (h : (z : K0 p) = algebraMap (WW p) 
   rw [this]
   exact PadicInt.norm_le_one _
 
-theorem norm_phi_pow (N : ℕ) (z : Kalg p) (b : WW p)
-    (h : (z : K0 p) = algebraMap (WW p) (K0 p) ((p : WW p) ^ N * b)) : ‖phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N := by
+theorem norm_phi_pow
+    (N : ℕ) (z : Kalg p) (b : WW p) (h : (z : K0 p) = algebraMap (WW p) (K0 p) ((p : WW p) ^ N * b))
+    : ‖phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N := by
   have hpK : ((p : ℕ) : Kalg p) ≠ 0 := by
     intro h0
     have := congrArg (algebraMap (Kalg p) (K0 p)) h0
@@ -180,7 +204,8 @@ theorem norm_phi_pow (N : ℕ) (z : Kalg p) (b : WW p)
     simp only [z']
     field_simp
   have hz' : (z' : K0 p) = algebraMap (WW p) (K0 p) b := by
-    have h1 : algebraMap (Kalg p) (K0 p) z = algebraMap (Kalg p) (K0 p) (((p : ℕ) : Kalg p) ^ N * z') :=
+    have h1
+        : algebraMap (Kalg p) (K0 p) z = algebraMap (Kalg p) (K0 p) (((p : ℕ) : Kalg p) ^ N * z') :=
       congrArg _ hz
     rw [map_mul, map_pow, map_natCast] at h1
     have h2 : algebraMap (Kalg p) (K0 p) z = (p : K0 p) ^ N * algebraMap (WW p) (K0 p) b := by
@@ -190,19 +215,23 @@ theorem norm_phi_pow (N : ℕ) (z : Kalg p) (b : WW p)
   rw [hz, map_mul, map_pow, map_natCast, norm_mul, norm_pow, norm_p_C]
   exact mul_le_of_le_one_right (by positivity) (norm_phi_le p z' b hz')
 
-theorem id_mul {R : Type*} [CommRing R] (x x' b b' π : R) :
-    (x + π * b) * (x' + π * b') = x * x' + π * (b * x' + x * b' + π * b * b') := by ring
+theorem id_mul {R : Type*} [CommRing R] (x x' b b' π : R)
+    : (x + π * b) * (x' + π * b') = x * x' + π * (b * x' + x * b' + π * b * b') := by
+  ring
 
-theorem id_add {R : Type*} [CommRing R] (x x' b b' π : R) :
-    (x + π * b) + (x' + π * b') = x + x' + π * (b + b') := by ring
+theorem id_add {R : Type*} [CommRing R] (x x' b b' π : R)
+    : (x + π * b) + (x' + π * b') = x + x' + π * (b + b') := by
+  ring
 
-theorem id_sub {R : Type*} [CommRing R] (x b b' π : R) (N k : ℕ) :
-    (x + π ^ N * b) - (x + π ^ (N + k) * b') = π ^ N * (b - π ^ k * b') := by ring
+theorem id_sub {R : Type*} [CommRing R] (x b b' π : R) (N k : ℕ)
+    : (x + π ^ N * b) - (x + π ^ (N + k) * b') = π ^ N * (b - π ^ k * b') := by
+  ring
 
-theorem id_app {R : Type*} [CommRing R] (x S c π : R) (N : ℕ) (h : x - S = π ^ (N + 1) * c) :
-    S = x + π ^ N * -(π * c) := by
+theorem id_app {R : Type*} [CommRing R] (x S c π : R) (N : ℕ) (h : x - S = π ^ (N + 1) * c)
+    : S = x + π ^ N * -(π * c) := by
   have : S = x - π ^ (N + 1) * c := by rw [← h]; ring
-  rw [this]; ring
+  rw [this]
+  ring
 
 def Approx (N : ℕ) (x : WW p) (z : Kalg p) : Prop :=
   ∃ b : WW p, (z : K0 p) = algebraMap (WW p) (K0 p) (x + (p : WW p) ^ N * b)
@@ -234,16 +263,34 @@ theorem exists_approx (x : WW p) (N : ℕ) : ∃ z, Approx p N x z := by
     refine sum_mem fun i _ => ?_
     rw [map_mul, map_pow, map_natCast]
     exact mul_mem (teich_mem p _) (pow_mem (natCast_mem _ p) i)
-  exact ⟨⟨_, hmem⟩, -((p : WW p) * c), congrArg (algebraMap (WW p) (K0 p)) (id_app x S c (p : WW p) N hc)⟩
+  exact ⟨
+    ⟨_, hmem⟩,
+    -((p : WW p) * c),
+    congrArg (algebraMap (WW p) (K0 p)) (id_app x S c (p : WW p) N hc)
+  ⟩
 
 theorem nadd {a b : ℂ_[p]} {c : ℝ} (ha : ‖a‖ ≤ c) (hb : ‖b‖ ≤ c) : ‖a + b‖ ≤ c :=
   (PadicComplex.isNonarchimedean p a b).trans (max_le ha hb)
 
 theorem nsub {a b : ℂ_[p]} {c : ℝ} (ha : ‖a‖ ≤ c) (hb : ‖b‖ ≤ c) : ‖a - b‖ ≤ c := by
-  first | exact Bl.FirstBlockLemmaF.goal1 .. | (apply Bl.FirstBlockLemmaF.goal1 <;> assumption) | (intros; apply Bl.FirstBlockLemmaF.goal1 <;> assumption) | (apply @Bl.FirstBlockLemmaF.goal1 <;> assumption) | (intros; apply @Bl.FirstBlockLemmaF.goal1 <;> assumption) | (apply @Bl.FirstBlockLemmaF.goal1 <;> first | assumption | infer_instance) | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c ha hb | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c ha | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c | exact @Bl.FirstBlockLemmaF.goal1 p hp a b | exact @Bl.FirstBlockLemmaF.goal1 p hp a | exact @Bl.FirstBlockLemmaF.goal1 p hp | exact @Bl.FirstBlockLemmaF.goal1 p
+  first
+  | exact Bl.FirstBlockLemmaF.goal1 ..
+  | (apply Bl.FirstBlockLemmaF.goal1 <;> assumption)
+  | (intros; apply Bl.FirstBlockLemmaF.goal1 <;> assumption)
+  | (apply @Bl.FirstBlockLemmaF.goal1 <;> assumption)
+  | (intros; apply @Bl.FirstBlockLemmaF.goal1 <;> assumption)
+  | (apply @Bl.FirstBlockLemmaF.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c ha hb
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c ha
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp a b c
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp a b
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp a
+  | exact @Bl.FirstBlockLemmaF.goal1 p hp
+  | exact @Bl.FirstBlockLemmaF.goal1 p
 
-theorem approx_close {N M : ℕ} (hNM : N ≤ M) {x : WW p} {z z' : Kalg p} (h : Approx p N x z)
-    (h' : Approx p M x z') : ‖phi p z - phi p z'‖ ≤ ((p : ℝ)⁻¹) ^ N := by
+theorem approx_close
+    {N M : ℕ} (hNM : N ≤ M) {x : WW p} {z z' : Kalg p} (h : Approx p N x z) (h' : Approx p M x z')
+    : ‖phi p z - phi p z'‖ ≤ ((p : ℝ)⁻¹) ^ N := by
   obtain ⟨b, hb⟩ := h
   obtain ⟨b', hb'⟩ := h'
   rw [← map_sub]
@@ -256,8 +303,8 @@ theorem r_lt_one : ((p : ℝ)⁻¹) < 1 := inv_lt_one_of_one_lt₀ (by exact_mod
 
 theorem r_nonneg : 0 ≤ ((p : ℝ)⁻¹) := by positivity
 
-theorem exists_lim (x : WW p) :
-    ∃ y : ℂ_[p], ∀ N z, Approx p N x z → ‖y - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N := by
+theorem exists_lim (x : WW p)
+    : ∃ y : ℂ_[p], ∀ N z, Approx p N x z → ‖y - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N := by
   choose zs hzs using fun N => exists_approx p x N
   have hc : CauchySeq fun N => phi p (zs N) :=
     cauchySeq_of_le_geometric ((p : ℝ)⁻¹) 1 (r_lt_one p) fun n => by
@@ -272,16 +319,18 @@ theorem exists_lim (x : WW p) :
 
 def wFun (x : WW p) : ℂ_[p] := Classical.choose (exists_lim p x)
 
-theorem wFun_spec (x : WW p) {N : ℕ} {z : Kalg p} (h : Approx p N x z) :
-    ‖wFun p x - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N := Classical.choose_spec (exists_lim p x) N z h
+theorem wFun_spec (x : WW p) {N : ℕ} {z : Kalg p} (h : Approx p N x z)
+    : ‖wFun p x - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N :=
+  Classical.choose_spec (exists_lim p x) N z h
 
 theorem eq_of_close {a b : ℂ_[p]} (h : ∀ N : ℕ, ‖a - b‖ ≤ ((p : ℝ)⁻¹) ^ N) : a = b := by
   have h0 : ‖a - b‖ ≤ 0 :=
     ge_of_tendsto' (tendsto_pow_atTop_nhds_zero_of_lt_one (r_nonneg p) (r_lt_one p)) h
   exact sub_eq_zero.1 (norm_le_zero_iff.1 h0)
 
-theorem wFun_eq {x : WW p} {y : ℂ_[p]}
-    (h : ∀ N : ℕ, ∃ z, Approx p N x z ∧ ‖y - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N) : wFun p x = y := by
+theorem wFun_eq
+    {x : WW p} {y : ℂ_[p]} (h : ∀ N : ℕ, ∃ z, Approx p N x z ∧ ‖y - phi p z‖ ≤ ((p : ℝ)⁻¹) ^ N)
+    : wFun p x = y := by
   refine eq_of_close p fun N => ?_
   obtain ⟨z, hz, hy⟩ := h N
   have : wFun p x - y = (wFun p x - phi p z) - (y - phi p z) := by ring
@@ -300,51 +349,57 @@ theorem norm_wFun_le (x : WW p) : ‖wFun p x‖ ≤ 1 := by
   rw [this]
   exact nadd p h1 (norm_phi_approx p hz)
 
-theorem wFun_alg (x : WW p) (z : Kalg p) (h : (z : K0 p) = algebraMap (WW p) (K0 p) x) : wFun p x = phi p z :=
-  wFun_eq p fun N => ⟨z, ⟨0, by rw [h, mul_zero, add_zero]⟩, by rw [sub_self, norm_zero]; positivity⟩
+theorem wFun_alg (x : WW p) (z : Kalg p) (h : (z : K0 p) = algebraMap (WW p) (K0 p) x)
+    : wFun p x = phi p z :=
+  wFun_eq p fun N =>
+    ⟨z, ⟨0, by rw [h, mul_zero, add_zero]⟩, by rw [sub_self, norm_zero]; positivity⟩
 
 def wToC : WW p →+* ℂ_[p] where
   toFun := wFun p
-  map_one' := by
-    rw [wFun_alg p 1 1 (by rw [map_one]; rfl), map_one]
-  map_zero' := by
-    rw [wFun_alg p 0 0 (by rw [map_zero]; rfl), map_zero]
-  map_add' := fun x x' => wFun_eq p fun N => by
-    obtain ⟨z, hz⟩ := exists_approx p x N
-    obtain ⟨z', hz'⟩ := exists_approx p x' N
-    refine ⟨z + z', ?_, ?_⟩
-    · obtain ⟨b, hb⟩ := hz
-      obtain ⟨b', hb'⟩ := hz'
-      refine ⟨b + b', ?_⟩
-      rw [IntermediateField.coe_add, hb, hb', ← map_add (f := _)]
-      exact congrArg _ (id_add x x' b b' ((p : WW p) ^ N))
-    · have : wFun p x + wFun p x' - phi p (z + z') = (wFun p x - phi p z) + (wFun p x' - phi p z') := by
-        rw [map_add (f := _)]; ring
-      rw [this]
-      exact nadd p (wFun_spec p x hz) (wFun_spec p x' hz')
-  map_mul' := fun x x' => wFun_eq p fun N => by
-    obtain ⟨z, hz⟩ := exists_approx p x N
-    obtain ⟨z', hz'⟩ := exists_approx p x' N
-    refine ⟨z * z', ?_, ?_⟩
-    · obtain ⟨b, hb⟩ := hz
-      obtain ⟨b', hb'⟩ := hz'
-      refine ⟨b * x' + x * b' + (p : WW p) ^ N * b * b', ?_⟩
-      rw [IntermediateField.coe_mul, hb, hb', ← map_mul]
-      exact congrArg _ (id_mul x x' b b' ((p : WW p) ^ N))
-    · have : wFun p x * wFun p x' - phi p (z * z') =
-          wFun p x * (wFun p x' - phi p z') + (wFun p x - phi p z) * phi p z' := by
-        rw [map_mul]; ring
-      rw [this]
-      refine nadd p ?_ ?_
-      · rw [norm_mul]
-        exact (mul_le_of_le_one_left (norm_nonneg _) (norm_wFun_le p x)).trans (wFun_spec p x' hz')
-      · rw [norm_mul]
-        exact (mul_le_of_le_one_right (norm_nonneg _) (norm_phi_approx p hz')).trans (wFun_spec p x hz)
+  map_one' := by rw [wFun_alg p 1 1 (by rw [map_one]; rfl), map_one]
+  map_zero' := by rw [wFun_alg p 0 0 (by rw [map_zero]; rfl), map_zero]
+  map_add' := fun x x' =>
+    wFun_eq p fun N => by
+      obtain ⟨z, hz⟩ := exists_approx p x N
+      obtain ⟨z', hz'⟩ := exists_approx p x' N
+      refine ⟨z + z', ?_, ?_⟩
+      · obtain ⟨b, hb⟩ := hz
+        obtain ⟨b', hb'⟩ := hz'
+        refine ⟨b + b', ?_⟩
+        rw [IntermediateField.coe_add, hb, hb', ← map_add (f := _)]
+        exact congrArg _ (id_add x x' b b' ((p : WW p) ^ N))
+      · have : wFun p x + wFun p x' - phi p (z + z')
+            = (wFun p x - phi p z) + (wFun p x' - phi p z') := by
+          rw [map_add (f := _)]; ring
+        rw [this]
+        exact nadd p (wFun_spec p x hz) (wFun_spec p x' hz')
+  map_mul' := fun x x' =>
+    wFun_eq p fun N => by
+      obtain ⟨z, hz⟩ := exists_approx p x N
+      obtain ⟨z', hz'⟩ := exists_approx p x' N
+      refine ⟨z * z', ?_, ?_⟩
+      · obtain ⟨b, hb⟩ := hz
+        obtain ⟨b', hb'⟩ := hz'
+        refine ⟨b * x' + x * b' + (p : WW p) ^ N * b * b', ?_⟩
+        rw [IntermediateField.coe_mul, hb, hb', ← map_mul]
+        exact congrArg _ (id_mul x x' b b' ((p : WW p) ^ N))
+      · have : wFun p x * wFun p x' - phi p (z * z')
+            = wFun p x * (wFun p x' - phi p z') + (wFun p x - phi p z) * phi p z' := by
+          rw [map_mul]; ring
+        rw [this]
+        refine nadd p ?_ ?_
+        · rw [norm_mul]
+          exact (mul_le_of_le_one_left (norm_nonneg _) (norm_wFun_le p x)).trans
+            (wFun_spec p x' hz')
+        · rw [norm_mul]
+          exact (mul_le_of_le_one_right (norm_nonneg _) (norm_phi_approx p hz')).trans
+            (wFun_spec p x hz)
 
 theorem norm_wToC_le (x : WW p) : ‖wToC p x‖ ≤ 1 := norm_wFun_le p x
 
 theorem wToC_injective : Function.Injective (wToC p) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   by_contra h0
   obtain ⟨m, b, hb, rfl⟩ := WittVector.exists_eq_pow_p_mul x h0
@@ -355,10 +410,12 @@ theorem wToC_injective : Function.Injective (wToC p) := by
 
 def k0ToC : K0 p →+* ℂ_[p] := IsFractionRing.lift (wToC_injective p)
 
-theorem witt_fraction_to_Cp_algebraMap (x : WW p) : k0ToC p (algebraMap (WW p) (K0 p) x) = wToC p x :=
+theorem witt_fraction_to_Cp_algebraMap (x : WW p)
+    : k0ToC p (algebraMap (WW p) (K0 p) x) = wToC p x :=
   IsFractionRing.lift_algebraMap (wToC_injective p) x
 
-theorem norm_k0ToC_le_iff (x : K0 p) : ‖k0ToC p x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap (WW p) (K0 p)) := by
+theorem norm_k0ToC_le_iff (x : K0 p)
+    : ‖k0ToC p x‖ ≤ 1 ↔ x ∈ Set.range (algebraMap (WW p) (K0 p)) := by
   constructor
   · intro h
     by_cases hx0 : x = 0
@@ -367,7 +424,8 @@ theorem norm_k0ToC_le_iff (x : K0 p) : ‖k0ToC p x‖ ≤ 1 ↔ x ∈ Set.range
     · exact ⟨c, hc⟩
     · by_cases hu : IsUnit c
       · obtain ⟨u, rfl⟩ := hu
-        exact ⟨((u⁻¹ : (WW p)ˣ) : WW p), by rw [map_units_inv (algebraMap (WW p) (K0 p)), hc, inv_inv]⟩
+        exact
+          ⟨((u⁻¹ : (WW p)ˣ) : WW p), by rw [map_units_inv (algebraMap (WW p) (K0 p)), hc, inv_inv]⟩
       · exfalso
         have hcm : c ∈ maximalIdeal (WW p) := (mem_maximalIdeal c).2 hu
         rw [(WittVector.irreducible p).maximalIdeal_eq, Ideal.mem_span_singleton] at hcm

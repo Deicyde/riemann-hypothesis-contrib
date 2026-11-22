@@ -10,12 +10,15 @@ theorem sd_norm_cpow (q : ℕ) (hq : 1 < q) (x : ℝ) : ‖(q : ℂ) ^ (-(x : �
   rw [Complex.norm_natCast_cpow_of_pos (by omega)]
   simp
 
-theorem step_down (q : ℕ) (hq : 1 < q) (B₀ : Multiset ℂ)
-    (hB : ∀ β ∈ B₀, (q : ℝ) ^ (-(1 / 2) : ℝ) < ‖β‖ ∧ ‖β‖ < (q : ℝ) ^ (1 / 2 : ℝ)) {α : ℂ} (hα : α ∈ B₀)
-    (S : Set ℝ) (hint : ∀ x ∈ S, ∀ y ∈ S, ∃ n : ℤ, x - y = n) (M : Multiset ℂ)
-    (hM : ∀ z, z ∈ M ↔ ∃ x ∈ S, ∃ β ∈ B₀, z = β * (q : ℂ) ^ (-(x : ℂ)))
+theorem step_down
+    (q : ℕ) (hq : 1 < q)
+    (B₀ : Multiset ℂ) (hB : ∀ β ∈ B₀, (q : ℝ) ^ (-(1 / 2) : ℝ) < ‖β‖ ∧ ‖β‖ < (q : ℝ) ^ (1 / 2 : ℝ))
+    {α : ℂ} (hα : α ∈ B₀)
+    (S : Set ℝ) (hint : ∀ x ∈ S, ∀ y ∈ S, ∃ n : ℤ, x - y = n)
+    (M : Multiset ℂ) (hM : ∀ z, z ∈ M ↔ ∃ x ∈ S, ∃ β ∈ B₀, z = β * (q : ℂ) ^ (-(x : ℂ)))
     (hgap : ∀ z : ℂ, ‖z‖ < (q : ℝ) ^ (-(1 / 2) : ℝ) → M.count z ≤ M.count ((q : ℂ) * z))
-    {u : ℝ} (hu : u ∈ S) (hu1 : 1 ≤ u) : u - 1 ∈ S := by
+    {u : ℝ} (hu : u ∈ S) (hu1 : 1 ≤ u)
+    : u - 1 ∈ S := by
   have hQ : (1 : ℝ) < q := by exact_mod_cast hq
   have hQ0 : (0 : ℝ) < q := by linarith
   set z : ℂ := α * (q : ℂ) ^ (-(u : ℂ)) with hz
@@ -42,7 +45,9 @@ theorem step_down (q : ℕ) (hq : 1 < q) (B₀ : Multiset ℂ)
       rw [Real.rpow_add hQ0, Real.rpow_sub hQ0, Real.rpow_one, Real.rpow_neg hQ0.le]
       field_simp
     have hxx : (q : ℝ) ^ (-x) * (q : ℝ) ^ x = 1 := by rw [← Real.rpow_add hQ0]; simp
-    calc ‖β‖ = ‖β‖ * (q : ℝ) ^ (-x) * (q : ℝ) ^ x := by rw [mul_assoc, hxx, mul_one]
+    calc
+      ‖β‖
+        = ‖β‖ * (q : ℝ) ^ (-x) * (q : ℝ) ^ x := by rw [mul_assoc, hxx, mul_one]
       _ = q * (‖α‖ * (q : ℝ) ^ (-u)) * (q : ℝ) ^ x := by rw [en]
       _ = ‖α‖ * (q : ℝ) ^ (1 - u + x) := by rw [e1]; ring
   obtain ⟨n, hn⟩ := hint x hx u hu
@@ -54,28 +59,32 @@ theorem step_down (q : ℕ) (hq : 1 < q) (B₀ : Multiset ℂ)
   have hhalf : (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) = (q : ℝ) ^ (1 / 2 : ℝ) := by
     have h := (Real.rpow_add hQ0 (-(1 / 2) : ℝ) 1).symm
     rw [Real.rpow_one] at h
-    rw [h]; norm_num
+    rw [h]
+    norm_num
   rcases lt_trichotomy (n + 1) 0 with hneg | hzero | hposn
-  ·
-    exfalso
+  · exfalso
     have hle : (q : ℝ) ^ (n + 1) ≤ (q : ℝ) ^ (-1 : ℤ) := zpow_le_zpow_right₀ hQ.le (by omega)
     have hzp : (0 : ℝ) < (q : ℝ) ^ (n + 1) := zpow_pos hQ0 _
     have : ‖β‖ < (q : ℝ) ^ (1 / 2 : ℝ) * (q : ℝ) ^ (-1 : ℤ) := by
       rw [hβn]
-      calc ‖α‖ * (q : ℝ) ^ (n + 1) < (q : ℝ) ^ (1 / 2 : ℝ) * (q : ℝ) ^ (n + 1) := mul_lt_mul_of_pos_right ha2 hzp
+      calc
+        ‖α‖ * (q : ℝ) ^ (n + 1)
+          < (q : ℝ) ^ (1 / 2 : ℝ) * (q : ℝ) ^ (n + 1) := mul_lt_mul_of_pos_right ha2 hzp
         _ ≤ _ := mul_le_mul_of_nonneg_left hle (Real.rpow_pos_of_pos hQ0 _).le
     rw [← hhalf, zpow_neg_one, mul_assoc, mul_inv_cancel₀ hQ0.ne', mul_one] at this
     linarith
   · have hx' : x = u - 1 := by
       have : (n : ℝ) = -1 := by exact_mod_cast (by omega : n = -1)
       linarith
-    rw [← hx']; exact hx
+    rw [← hx']
+    exact hx
   · exfalso
     have hle : (q : ℝ) ^ (1 : ℤ) ≤ (q : ℝ) ^ (n + 1) := zpow_le_zpow_right₀ hQ.le (by omega)
     have : (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) ^ (1 : ℤ) < ‖β‖ := by
       rw [hβn]
-      calc (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) ^ (1 : ℤ) ≤ (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) ^ (n + 1) :=
-            mul_le_mul_of_nonneg_left hle hpos.le
+      calc
+        (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) ^ (1 : ℤ)
+          ≤ (q : ℝ) ^ (-(1 / 2) : ℝ) * (q : ℝ) ^ (n + 1) := mul_le_mul_of_nonneg_left hle hpos.le
         _ < ‖α‖ * (q : ℝ) ^ (n + 1) := mul_lt_mul_of_pos_right ha1 (zpow_pos hQ0 _)
     rw [zpow_one, hhalf] at this
     linarith

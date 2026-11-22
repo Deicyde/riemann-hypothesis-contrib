@@ -12,13 +12,14 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory.FrobKerDim
 
-theorem finrank_quot_frobKerIdeal_le : ∀ (q : ℕ) (K H : Type) [Field K] [CommRing H] [Bialgebra K H]
-    [Module.Finite K H], 0 < q →
-    Module.finrank K (H ⧸ frobKerIdeal q K H) ≤ q ^ Module.finrank K (Cot K H) := by
+theorem finrank_quot_frobKerIdeal_le
+    : ∀ (q : ℕ) (K H : Type) [Field K] [CommRing H] [Bialgebra K H] [Module.Finite K H],
+      0 < q → Module.finrank K (H ⧸ frobKerIdeal q K H) ≤ q ^ Module.finrank K (Cot K H) := by
   intro q K H _ _ _ _ hq
   classical
   set J := frobKerIdeal q K H with hJ
@@ -36,7 +37,8 @@ theorem finrank_quot_frobKerIdeal_le : ∀ (q : ℕ) (K H : Type) [Field K] [Com
     obtain ⟨a, rfl⟩ := hmks z
     refine ⟨a, ?_, rfl⟩
     rw [RingHom.mem_ker] at hz ⊢
-    rw [← hεQmk]; exact hz
+    rw [← hεQmk]
+    exact hz
   have hpowQ : ∀ z ∈ RingHom.ker εQ, z ^ q = 0 := by
     intro z hz
     obtain ⟨a, ha, rfl⟩ := hkerQ z hz
@@ -54,21 +56,21 @@ theorem finrank_quot_frobKerIdeal_le : ∀ (q : ℕ) (K H : Type) [Field K] [Com
   have hsum : ∀ l : Fin d → K, AugCot.d ε (∑ i, l i • (x i : H)) = ∑ i, l i • b i := by
     intro l
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hx]
+    simp [map_sum, hx]
   have hmem : ∀ l : Fin d → K, (∑ i, l i • (x i : H)) ∈ RingHom.ker ε := by
     intro l
     refine Ideal.sum_mem _ fun i _ => ?_
     rw [Algebra.smul_def]
     exact Ideal.mul_mem_left _ _ (x i).2
-  have hspanH : ∀ a ∈ RingHom.ker ε, ∃ l : Fin d → K, a - ∑ i, l i • (x i : H) ∈ RingHom.ker ε ^ 2 := by
+  have hspanH
+      : ∀ a ∈ RingHom.ker ε, ∃ l : Fin d → K, a - ∑ i, l i • (x i : H) ∈ RingHom.ker ε ^ 2 := by
     intro a ha
     refine ⟨b.repr (AugCot.d ε a), ?_⟩
     have h1 : AugCot.d ε (a - ∑ i, b.repr (AugCot.d ε a) i • (x i : H)) = 0 := by
       rw [map_sub, hsum, b.sum_repr, sub_self]
     rwa [AugCot.d_of_mem _ (sub_mem ha (hmem _)), Ideal.toCotangent_eq_zero] at h1
   let y : Fin d → H ⧸ J := fun i => mk (x i)
-  have hy : ∀ i, y i ∈ RingHom.ker εQ := fun i => by
-    rw [RingHom.mem_ker, hεQmk]; exact (x i).2
+  have hy : ∀ i, y i ∈ RingHom.ker εQ := fun i => by rw [RingHom.mem_ker, hεQmk]; exact (x i).2
   have hmapI : Ideal.map mk (RingHom.ker ε) ≤ RingHom.ker εQ := by
     rw [Ideal.map_le_iff_le_comap]
     intro a ha
@@ -84,13 +86,15 @@ theorem finrank_quot_frobKerIdeal_le : ∀ (q : ℕ) (K H : Type) [Field K] [Com
     rw [Ideal.map_pow] at h1
     have h2 := Ideal.pow_right_mono hmapI 2 h1
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [y, map_sub, map_sum, map_smul] using h2
+    simpa [y, map_sub, map_sum, map_smul] using h2
   have hsurj := GlobalTheory.HeightOneHopf.aeval_surjective_of_span_cotangent εQ hnil y hy hspan
   have hyq : ∀ i, y i ^ q = 0 := fun i => hpowQ _ (hy i)
 
   let mon : (Fin d → Fin q) → H ⧸ J := fun e => ∏ i, y i ^ (e i : ℕ)
   have htop : Submodule.span K (Set.range mon) = ⊤ := by
-    have hall : ∀ P : MvPolynomial (Fin d) K, MvPolynomial.aeval y P ∈ Submodule.span K (Set.range mon) := by
+    have hall
+        : ∀ P : MvPolynomial (Fin d) K,
+          MvPolynomial.aeval y P ∈ Submodule.span K (Set.range mon) := by
       intro P
       induction P using MvPolynomial.induction_on' with
       | monomial u a =>

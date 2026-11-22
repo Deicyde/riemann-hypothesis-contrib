@@ -94,7 +94,9 @@ namespace Formalism.L2.SG.Closed
 
 theorem NormProd_holds (D : Formalism.BasicNotions.D7) : Formalism.L2.SG.SupportG.NormProd D := by
   intro δ M hA x hx
-  exact local_product_formula D.host.F D.host.E (Formalism.MainNotions.BridgeLemma.szf_finrankFE D) D.conjF D.s.atP M
-    (fun p => (hA p).1) x hx
+  exact local_product_formula D.host.F D.host.E (Formalism.MainNotions.BridgeLemma.szf_finrankFE D)
+    D.conjF D.s.atP M
+    (fun p => (hA p).1)
+    x hx
 
 end Formalism.L2.SG.Closed

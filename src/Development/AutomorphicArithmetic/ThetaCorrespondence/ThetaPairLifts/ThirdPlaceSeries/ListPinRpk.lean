@@ -14,13 +14,14 @@ open Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR.Links
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem listPin_rpk_alt {D : D7} {O : Obj D} {R : _root_.Formalism.L2.RecTAlt O.ex}
+theorem listPin_rpk_alt
+    {D : D7} {O : Obj D} {R : _root_.Formalism.L2.RecTAlt O.ex}
     {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt R} {x : GlobalTheory.Mem.R3.TwIn O.ex}
     (y : _root_.GlobalTheory.Mem.R3.RealInAlt x R S)
     (r : _root_.GlobalTheory.Mem.Top.Bl.RealPackage R S)
-    (hr : r = _root_.GlobalTheory.Mem.Top.Bl.realPackageOfRealInput y) {CF bb : ℝ}
-    (h : GlobalTheory.HeightCounting.Up.ListPin D x.R.toRealDat.toLevCh CF bb) :
-    GlobalTheory.HeightCounting.Up.ListPin D r.B.Q.Rl.toRealDat.toLevCh CF bb := by
+    (hr : r = _root_.GlobalTheory.Mem.Top.Bl.realPackageOfRealInput y)
+    {CF bb : ℝ} (h : GlobalTheory.HeightCounting.Up.ListPin D x.R.toRealDat.toLevCh CF bb)
+    : GlobalTheory.HeightCounting.Up.ListPin D r.B.Q.Rl.toRealDat.toLevCh CF bb := by
   subst hr
   exact h
 

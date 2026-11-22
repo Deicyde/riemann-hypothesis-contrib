@@ -19,8 +19,8 @@ attribute [local instance] algebraOfOver
 
 section Sum
 
-variable {T : TopCat.{u}} {ι : Type u} (𝔘 : ι → Opens T) {P : (Opens T)ᵒᵖ ⥤ AddCommGrpCat.{u}}
-  {p : ℕ}
+variable
+  {T : TopCat.{u}} {ι : Type u} (𝔘 : ι → Opens T) {P : (Opens T)ᵒᵖ ⥤ AddCommGrpCat.{u}} {p : ℕ}
 
 lemma cls_sum {α : Type*} (s : Finset α) (f : α → Cochain P 𝔘 p) (hf : ∀ a, d P 𝔘 p (f a) = 0)
     (h : d P 𝔘 p (∑ a ∈ s, f a) = 0) : cls (∑ a ∈ s, f a) h = ∑ a ∈ s, cls (f a) (hf a) := by
@@ -40,8 +40,12 @@ lemma cls_sum {α : Type*} (s : Finset α) (f : α → Cochain P 𝔘 p) (hf : �
 
 end Sum
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] {F : X.Modules} [F.IsQuasicoherent] (hF : IsCoherent F)
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  {F : X.Modules} [F.IsQuasicoherent]
+  (hF : IsCoherent F)
 
 lemma reesCoef_reesInr_smul {V : X.Opens} (hV : IsAffineOpen V) (r : reesAlgebra I) (N : ℕ)
     (s : Γ(reesSheaf I F, reesPr I X ⁻¹ᵁ V)) :
@@ -51,9 +55,9 @@ lemma reesCoef_reesInr_smul {V : X.Opens} (hV : IsAffineOpen V) (r : reesAlgebra
   rw [reesSectionsMap_smul]
   exact PolynomialModule.smul_apply (r : Polynomial A) (reesSectionsMap I hF hV s) N
 
-variable {ι : Type u} (𝔘 : ι → X.Opens)
-  (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a))) (p : ℕ)
-
+variable
+  {ι : Type u} (𝔘 : ι → X.Opens) (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)))
+  (p : ℕ)
 
 set_option maxHeartbeats 4000000 in
 lemma reesCoefFam_reesMul (r : reesAlgebra I) (N : ℕ) (x : cechH (reesPre I F) 𝔘 p) :

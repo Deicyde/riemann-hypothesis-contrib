@@ -11,12 +11,13 @@ namespace ReciprocityTheory.L2DbarEstimates.I
 open MeasureTheory Metric Filter Topology
 open scoped ENNReal
 
-theorem vanish_lintegral_ball_smul (n : ℕ) (F : V n → ℝ≥0∞) (hF : Measurable F) {ρ : ℝ}
-    (hρ : 0 < ρ) :
-    ∫⁻ y in ball (0 : V n) 1, F (ρ • y) =
-      ENNReal.ofReal |(ρ ^ Module.finrank ℝ (V n))⁻¹| * ∫⁻ y in ball (0 : V n) ρ, F y := by
-  have hind : ∀ y : V n, (ball (0 : V n) 1).indicator (fun y => F (ρ • y)) y =
-      (ball (0 : V n) ρ).indicator F (ρ • y) := by
+theorem vanish_lintegral_ball_smul (n : ℕ) (F : V n → ℝ≥0∞) (hF : Measurable F) {ρ : ℝ} (hρ : 0 < ρ)
+    : ∫⁻ y in ball (0 : V n) 1, F (ρ • y)
+      = ENNReal.ofReal |(ρ ^ Module.finrank ℝ (V n))⁻¹| * ∫⁻ y in ball (0 : V n) ρ, F y := by
+  have hind
+      : ∀ y : V n,
+        (ball (0 : V n) 1).indicator (fun y => F (ρ • y)) y
+          = (ball (0 : V n) ρ).indicator F (ρ • y) := by
     intro y
     have hm : ρ • y ∈ ball (0 : V n) ρ ↔ y ∈ ball (0 : V n) 1 := by
       simp only [mem_ball_zero_iff, norm_smul, Real.norm_eq_abs, abs_of_pos hρ]
@@ -30,10 +31,16 @@ theorem vanish_lintegral_ball_smul (n : ℕ) (F : V n → ℝ≥0∞) (hF : Meas
   rw [← lintegral_map hFm (measurable_const_smul ρ), Measure.map_addHaar_smul _ hρ.ne',
     lintegral_smul_measure, smul_eq_mul]
 
-theorem vanish_div (n : ℕ) (hn : 1 ≤ n) (hDiv : C.MVDivStatement) {ρ c : ℝ} (hρ : 0 < ρ)
-    (hc : 0 < c) {δ : ℕ → ℝ} (hδ : Tendsto δ atTop (𝓝[>] 0)) :
-    Tendsto (fun k => ∫⁻ y in ball (0 : V n) ρ,
-      ENNReal.ofReal ((c * ‖y‖ ^ 2 + δ k) ^ (-(n : ℝ)))) atTop (𝓝 ∞) := by
+theorem vanish_div
+    (n : ℕ) (hn : 1 ≤ n)
+    (hDiv : C.MVDivStatement)
+    {ρ c : ℝ} (hρ : 0 < ρ) (hc : 0 < c)
+    {δ : ℕ → ℝ} (hδ : Tendsto δ atTop (𝓝[>] 0))
+    : Tendsto
+      (fun k =>
+        ∫⁻ y in ball (0 : V n) ρ,
+          ENNReal.ofReal ((c * ‖y‖ ^ 2 + δ k) ^ (-(n : ℝ))))
+      atTop (𝓝 ∞) := by
   have hn0 : 0 < n := hn
   have hcr : 0 < c * ρ ^ 2 := by positivity
   obtain ⟨hδ0, hδpos⟩ := tendsto_nhdsWithin_iff.mp hδ
@@ -45,7 +52,8 @@ theorem vanish_div (n : ℕ) (hn : 1 ≤ n) (hDiv : C.MVDivStatement) {ρ c : �
   set K : ℝ≥0∞ := ENNReal.ofReal (ρ ^ Module.finrank ℝ (V n)) *
     ENNReal.ofReal ((c * ρ ^ 2) ^ (-(n : ℝ))) with hK
   have hK0 : K ≠ 0 :=
-    mul_ne_zero (ENNReal.ofReal_pos.mpr (by positivity)).ne' (ENNReal.ofReal_pos.mpr (by positivity)).ne'
+    mul_ne_zero (ENNReal.ofReal_pos.mpr (by positivity)).ne'
+      (ENNReal.ofReal_pos.mpr (by positivity)).ne'
   have hlim := ENNReal.Tendsto.const_mul (a := K) hΦ (Or.inl ENNReal.top_ne_zero)
   rw [ENNReal.mul_top hK0] at hlim
   refine hlim.congr' ?_
@@ -54,13 +62,16 @@ theorem vanish_div (n : ℕ) (hn : 1 ≤ n) (hDiv : C.MVDivStatement) {ρ c : �
   have hG : Measurable fun y : V n => ENNReal.ofReal ((c * ‖y‖ ^ 2 + δ k) ^ (-(n : ℝ))) := by
     fun_prop
   have hs := vanish_lintegral_ball_smul n _ hG hρ
-  have hd : ENNReal.ofReal (ρ ^ Module.finrank ℝ (V n)) *
-      ENNReal.ofReal |(ρ ^ Module.finrank ℝ (V n))⁻¹| = 1 := by
+  have hd
+      : ENNReal.ofReal (ρ ^ Module.finrank ℝ (V n))
+          * ENNReal.ofReal |(ρ ^ Module.finrank ℝ (V n))⁻¹|
+        = 1 := by
     rw [← ENNReal.ofReal_mul (by positivity), abs_of_pos (by positivity),
       mul_inv_cancel₀ (by positivity), ENNReal.ofReal_one]
-  have hrhs : ∫⁻ y in ball (0 : V n) ρ, ENNReal.ofReal ((c * ‖y‖ ^ 2 + δ k) ^ (-(n : ℝ))) =
-      ENNReal.ofReal (ρ ^ Module.finrank ℝ (V n)) *
-        ∫⁻ y in ball (0 : V n) 1, ENNReal.ofReal ((c * ‖ρ • y‖ ^ 2 + δ k) ^ (-(n : ℝ))) := by
+  have hrhs
+      : ∫⁻ y in ball (0 : V n) ρ, ENNReal.ofReal ((c * ‖y‖ ^ 2 + δ k) ^ (-(n : ℝ)))
+        = ENNReal.ofReal (ρ ^ Module.finrank ℝ (V n))
+          * ∫⁻ y in ball (0 : V n) 1, ENNReal.ofReal ((c * ‖ρ • y‖ ^ 2 + δ k) ^ (-(n : ℝ))) := by
     rw [hs, ← mul_assoc, hd, one_mul]
   show K * _ = _
   rw [hrhs, hK, mul_assoc]

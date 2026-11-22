@@ -12,14 +12,17 @@ open MvPolynomial
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e : ℕ}
 
-
 set_option maxHeartbeats 1600000 in
-theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (P : Ideal (MRing ι)) (hPh : IsMultiHomogIdeal P) (hΨ : IsGoodProj P Ψ)
-    (F : MvPolynomial ((k : K) → ι k) ℂ) :
-    ∃ (n : ℕ) (c : ℕ → MvPolynomial (Fin (e + 1)) ℂ), c n = 1 ∧
-      ∀ z ∈ mcPts P, ∑ i ∈ Finset.range (n + 1),
-        eval (Ψ (segre z)) (c i) * eval (segre z) F ^ i = 0 := by
+theorem exists_monic_rel
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (P : Ideal (MRing ι))
+    (hPh : IsMultiHomogIdeal P) (hΨ : IsGoodProj P Ψ)
+    (F : MvPolynomial ((k : K) → ι k) ℂ)
+    : ∃ (n : ℕ) (c : ℕ → MvPolynomial (Fin (e + 1)) ℂ),
+      c n = 1
+        ∧ ∀ z ∈ mcPts P,
+          ∑ i ∈ Finset.range (n + 1),
+              eval (Ψ (segre z)) (c i) * eval (segre z) F ^ i
+            = 0 := by
   classical
   have hrel := fun i => segre_rel hPh Ψ hΨ i
   choose r hr G hG hrelz using hrel
@@ -33,8 +36,11 @@ theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e 
   let T : Finset (((k : K) → ι k) →₀ ℕ) :=
     (Fintype.piFinset fun i => Finset.range (r i)).image Finsupp.equivFunOnFinite.symm
   have memT : ∀ s : ((k : K) → ι k) →₀ ℕ, (∀ i, s i < r i) → s ∈ T := fun s hs =>
-    Finset.mem_image.2 ⟨⇑s, Fintype.mem_piFinset.2 fun i => Finset.mem_range.2 (hs i),
-      Finsupp.equivFunOnFinite_symm_coe s⟩
+    Finset.mem_image.2 ⟨
+      ⇑s,
+      Fintype.mem_piFinset.2 fun i => Finset.mem_range.2 (hs i),
+      Finsupp.equivFunOnFinite_symm_coe s
+    ⟩
   let N : Submodule R (Z → ℂ) :=
     Submodule.span R (↑(T.image fun s => φw (monomial s 1)) : Set (Z → ℂ))
   have hC : ∀ (a : ℂ) (x : Z → ℂ), x ∈ N → φw (C a) * x ∈ N := by
@@ -57,8 +63,10 @@ theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e 
       set_option synthInstance.maxHeartbeats 100000 in
         rw [f.as_sum, map_sum]
       refine N.sum_mem fun s hs => ?_
-      rw [show monomial s (AddMonoidAlgebra.coeff f s) = C (AddMonoidAlgebra.coeff f s) * monomial s 1 by
-        rw [C_mul_monomial, mul_one], map_mul]
+      rw [show monomial s (AddMonoidAlgebra.coeff f s)
+            = C (AddMonoidAlgebra.coeff f s) * monomial s 1 by
+          rw [C_mul_monomial, mul_one],
+        map_mul]
       apply hC
       have hsdeg : (s.sum fun _ e => e) ≤ d := (le_totalDegree hs).trans hf
       by_cases hall : ∀ i, s i < r i
@@ -83,7 +91,8 @@ theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e 
         rw [mul_left_comm, ← map_mul φw]
         apply hY
         apply ih ((s.sum fun _ e => e) - 1) (by omega)
-        calc (monomial s' 1 * G i j).totalDegree
+        calc
+          (monomial s' 1 * G i j).totalDegree
             ≤ (monomial s' (1 : ℂ)).totalDegree + (G i j).totalDegree := totalDegree_mul _ _
           _ ≤ (s'.sum fun _ e => e) + (r i - 1) := by
             rw [totalDegree_monomial _ one_ne_zero]
@@ -94,12 +103,13 @@ theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e 
       apply le_antisymm
       · rw [Algebra.adjoin_eq_span, Submodule.span_le]
         intro x hx
-        let Mw : Submonoid (Z → ℂ) :=
-          { carrier := Set.range φw
-            mul_mem' := by
-              rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
-              exact ⟨a * b, map_mul _ _ _⟩
-            one_mem' := ⟨1, map_one _⟩ }
+        let Mw : Submonoid (Z → ℂ) := {
+          carrier := Set.range φw
+          mul_mem' := by
+            rintro _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
+            exact ⟨a * b, map_mul _ _ _⟩
+          one_mem' := ⟨1, map_one _⟩
+        }
         have hx' : x ∈ Mw := (Submonoid.closure_le.2 (fun y hy => hy)) hx
         obtain ⟨f, rfl⟩ := hx'
         exact key _ f le_rfl

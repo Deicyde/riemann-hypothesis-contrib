@@ -25,7 +25,8 @@ theorem sdegMul_add : ∀ (k : ℕ) (a b : A), SDegD d k a → SDegD d k b → S
     rw [map_add (f := _)]
     exact sdegMul_add k _ _ (ha j) (hb j)
 
-theorem symbol_degree_mul : ∀ (n k l : ℕ) (f g : A), k + l = n → SDegD d k f → SDegD d l g → SDegD d n (f * g) := by
+theorem symbol_degree_mul
+    : ∀ (n k l : ℕ) (f g : A), k + l = n → SDegD d k f → SDegD d l g → SDegD d n (f * g) := by
   intro n
   induction n with
   | zero =>

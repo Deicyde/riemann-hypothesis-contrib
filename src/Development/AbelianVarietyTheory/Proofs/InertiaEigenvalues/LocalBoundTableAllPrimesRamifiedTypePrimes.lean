@@ -6,12 +6,18 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.SmallFacts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.NLink
 
-theorem localBoundTableAllPrimes_ramified_typePrimes : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (X : KillingConditions.HubData D) (C : ℝ) (tf : TwistedPlaces.Tab L),
-    Concl L P X C → TwistedPlaces.RamifiedPrimeLengthBound L (tab L X tf C) C ∧ TwistedPlaces.GeneratorPrimeEtaBound L (tab L X tf C) C := by
+theorem localBoundTableAllPrimes_ramified_typePrimes
+    : ∀ (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (X : KillingConditions.HubData D)
+        (C : ℝ) (tf : TwistedPlaces.Tab L),
+      Concl L P X C
+        → TwistedPlaces.RamifiedPrimeLengthBound L (tab L X tf C) C
+          ∧ TwistedPlaces.GeneratorPrimeEtaBound L (tab L X tf C) C := by
   intro D L P X C tf hC
   refine ⟨⟨?_, hC.small.2.2.2.2.1⟩, ?_⟩
   · intro i _ hl

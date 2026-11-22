@@ -10,8 +10,7 @@ open MvPolynomial Finset
 
 namespace Formalism.MainNotions.PlaneGram
 
-theorem mem_initSet (N i : ℕ) (k : Fin N) : k ∈ initSet N i ↔ k.val < i := by
-  simp [initSet]
+theorem mem_initSet (N i : ℕ) (k : Fin N) : k ∈ initSet N i ↔ k.val < i := by simp [initSet]
 
 namespace TwistData
 
@@ -42,27 +41,42 @@ theorem dLL_eq_sum : D.dLL j = ∑ a, D.dB (D.eB j a) := by
   exact (Equiv.sum_comp (D.LLj j).equivFin.symm (fun x => D.dB x.1)).symm
 
 def eA : Fin (D.nB j + D.r) → D.OL :=
-  Fin.addCases (motive := fun _ => D.OL) (fun a => Sum.inl (D.eB j a)) (fun m => Sum.inr (j, Fin.rev m))
+  Fin.addCases
+    (motive := fun _ => D.OL)
+    (fun a => Sum.inl (D.eB j a))
+    (fun m => Sum.inr (j, Fin.rev m))
 
 def e0 : Fin (D.nB j + D.r) → D.ML :=
   Fin.addCases (motive := fun _ => D.ML) (fun a => D.mb (D.eB j a)) (fun m => D.mlab (j, Fin.rev m))
 
 def e1 : Fin (D.nB j + D.r) → D.ML :=
-  Fin.addCases (motive := fun _ => D.ML) (fun a => D.mb (D.eB j a))
+  Fin.addCases
+    (motive := fun _ => D.ML)
+    (fun a => D.mb (D.eB j a))
     (fun m => if (Fin.rev m).val = 0 then D.mlab (j, Fin.rev m) else D.mtp (j, Fin.rev m))
 
-@[simp] theorem eA_castAdd (a : Fin (D.nB j)) : D.eA j (Fin.castAdd D.r a) = Sum.inl (D.eB j a) := by
+@[simp]
+theorem eA_castAdd (a : Fin (D.nB j)) : D.eA j (Fin.castAdd D.r a) = Sum.inl (D.eB j a) := by
   simp [eA]
-@[simp] theorem eA_natAdd (m : Fin D.r) : D.eA j (Fin.natAdd (D.nB j) m) = Sum.inr (j, Fin.rev m) := by
+@[simp]
+theorem eA_natAdd (m : Fin D.r) : D.eA j (Fin.natAdd (D.nB j) m) = Sum.inr (j, Fin.rev m) := by
   simp [eA]
-@[simp] theorem first_embedding_castAdd (a : Fin (D.nB j)) : D.e0 j (Fin.castAdd D.r a) = D.mb (D.eB j a) := by
+@[simp]
+theorem first_embedding_castAdd (a : Fin (D.nB j))
+    : D.e0 j (Fin.castAdd D.r a) = D.mb (D.eB j a) := by
   simp [e0]
-@[simp] theorem first_embedding_natAdd (m : Fin D.r) : D.e0 j (Fin.natAdd (D.nB j) m) = D.mlab (j, Fin.rev m) := by
+@[simp]
+theorem first_embedding_natAdd (m : Fin D.r)
+    : D.e0 j (Fin.natAdd (D.nB j) m) = D.mlab (j, Fin.rev m) := by
   simp [e0]
-@[simp] theorem second_embedding_castAdd (a : Fin (D.nB j)) : D.e1 j (Fin.castAdd D.r a) = D.mb (D.eB j a) := by
+@[simp]
+theorem second_embedding_castAdd (a : Fin (D.nB j))
+    : D.e1 j (Fin.castAdd D.r a) = D.mb (D.eB j a) := by
   simp [e1]
-@[simp] theorem second_embedding_natAdd (m : Fin D.r) : D.e1 j (Fin.natAdd (D.nB j) m) =
-    if (Fin.rev m).val = 0 then D.mlab (j, Fin.rev m) else D.mtp (j, Fin.rev m) := by
+@[simp]
+theorem second_embedding_natAdd (m : Fin D.r)
+    : D.e1 j (Fin.natAdd (D.nB j) m)
+      = if (Fin.rev m).val = 0 then D.mlab (j, Fin.rev m) else D.mtp (j, Fin.rev m) := by
   simp [e1]
 
 theorem index_embedding_injective : Function.Injective (D.e0 j) := by
@@ -78,7 +92,9 @@ theorem index_embedding_injective : Function.Injective (D.e0 j) := by
     induction y using Fin.addCases with
     | left b => simp [mb, mlab] at h
     | right m' =>
-      simp only [first_embedding_natAdd, mlab, Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq, true_and, Fin.rev_inj] at h
+      simp only [first_embedding_natAdd, mlab, Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq,
+          true_and, Fin.rev_inj]
+        at h
       rw [h]
 
 theorem second_embedding_injective : Function.Injective (D.e1 j) := by
@@ -101,15 +117,16 @@ theorem second_embedding_injective : Function.Injective (D.e1 j) := by
       simp only [second_embedding_natAdd] at h
       split_ifs at h <;> simp_all [mlab, mtp]
 
-theorem second_embedding_mark_eq_first (k : Fin (D.nB j + D.r)) : D.msg (D.e1 j k) = D.msg (D.e0 j k) := by
+theorem second_embedding_mark_eq_first (k : Fin (D.nB j + D.r))
+    : D.msg (D.e1 j k) = D.msg (D.e0 j k) := by
   induction k using Fin.addCases with
   | left a => simp
   | right m =>
     simp only [second_embedding_natAdd, first_embedding_natAdd]
     split_ifs <;> simp [msg, mlab, mtp]
 
-theorem range_first_embedding (i : D.ML) : (∃ k, D.e0 j k = i) ↔
-    (∃ b, D.seg b = j ∧ i = D.mb b) ∨ (∃ m, i = D.mlab (j, m)) := by
+theorem range_first_embedding (i : D.ML)
+    : (∃ k, D.e0 j k = i) ↔ (∃ b, D.seg b = j ∧ i = D.mb b) ∨ (∃ m, i = D.mlab (j, m)) := by
   constructor
   · rintro ⟨k, rfl⟩
     induction k using Fin.addCases with
@@ -136,8 +153,9 @@ theorem segment_letter_second_embedding (k : Fin (D.nB j + D.r)) : D.SegL j (D.e
 
 def stg (m : Fin D.r) : ℕ := D.nB j + (D.r - 1 - m.val)
 
-theorem TL_preimage (m : Fin D.r) :
-    (D.TLset j m).preimage (D.e0 j) (D.index_embedding_injective j).injOn = initSet (D.nB j + D.r) (D.stg j m) := by
+theorem TL_preimage (m : Fin D.r)
+    : (D.TLset j m).preimage (D.e0 j) (D.index_embedding_injective j).injOn
+      = initSet (D.nB j + D.r) (D.stg j m) := by
   ext k
   simp only [Finset.mem_preimage, mem_initSet]
   induction k using Fin.addCases with
@@ -155,14 +173,15 @@ theorem TL_preimage (m : Fin D.r) :
     rw [first_embedding_natAdd]
     have hm := m.2
     have hm' := m'.2
-    simp only [TLset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and, mb, mlab, mtp,
-      reduceCtorEq, and_false, exists_false, false_or, or_false, Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq,
-      exists_eq_right, Fin.coe_natAdd, stg]
+    simp only [TLset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ,
+      true_and, mb, mlab, mtp, reduceCtorEq, and_false, exists_false, false_or, or_false,
+      Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq, exists_eq_right, Fin.coe_natAdd, stg]
     rw [Fin.lt_iff_val_lt_val, Fin.val_rev]
     omega
 
-theorem YP_preimage1 (m : Fin D.r) :
-    (D.YPset j m).preimage (D.e1 j) (D.second_embedding_injective j).injOn = initSet (D.nB j + D.r) (D.stg j m) := by
+theorem YP_preimage1 (m : Fin D.r)
+    : (D.YPset j m).preimage (D.e1 j) (D.second_embedding_injective j).injOn
+      = initSet (D.nB j + D.r) (D.stg j m) := by
   ext k
   simp only [Finset.mem_preimage, mem_initSet]
   induction k using Fin.addCases with
@@ -181,24 +200,26 @@ theorem YP_preimage1 (m : Fin D.r) :
     have hm := m.2
     have hm' := m'.2
     split_ifs with h0
-    · simp only [YPset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and, mb, mlab, mtp,
-      reduceCtorEq, and_false, exists_false, false_or, or_false, Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq,
-      exists_eq_right, Fin.coe_natAdd, stg]
+    · simp only [YPset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ,
+        true_and, mb, mlab, mtp, reduceCtorEq, and_false, exists_false, false_or, or_false,
+        Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq, exists_eq_right, Fin.coe_natAdd, stg]
       rw [Fin.val_rev] at h0
       constructor
       · intro h
         exact h.elim
       · intro h
         omega
-    · simp only [YPset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and, mb, mlab, mtp,
-      reduceCtorEq, and_false, exists_false, false_or, or_false, Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq,
-      exists_eq_right, Fin.coe_natAdd, stg]
+    · simp only [YPset, Finset.mem_union, Finset.mem_image, Finset.mem_filter, Finset.mem_univ,
+        true_and, mb, mlab, mtp, reduceCtorEq, and_false, exists_false, false_or, or_false,
+        Sum.inr.injEq, Sum.inl.injEq, Prod.mk.injEq, exists_eq_right, Fin.coe_natAdd, stg]
       rw [Fin.val_rev] at h0
       rw [Fin.lt_iff_val_lt_val, Fin.val_rev]
       omega
 
-theorem YP_preimage0 (m : Fin D.r) (k : Fin (D.nB j + D.r))
-    (hk : k ∈ (D.YPset j m).preimage (D.e0 j) (D.index_embedding_injective j).injOn) : k.val < D.nB j := by
+theorem YP_preimage0
+    (m : Fin D.r) (k : Fin (D.nB j + D.r))
+    (hk : k ∈ (D.YPset j m).preimage (D.e0 j) (D.index_embedding_injective j).injOn)
+    : k.val < D.nB j := by
   rw [Finset.mem_preimage] at hk
   induction k using Fin.addCases with
   | left a => simp

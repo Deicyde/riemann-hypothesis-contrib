@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SurjRestrict
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 open GlobalTheory.AbDual GlobalTheory.CechPic GlobalTheory.DualCon
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -26,21 +29,26 @@ noncomputable section
 
 namespace GlobalTheory.KerAxes
 
-theorem triv_of_local_evc {S : Scheme.{0}} {G T : Over S} [GrpObj G] (hG : IsAbelianScheme G)
-    {P : LB (G ⊗ G).left} (hP : P.IsLB) (h2 : Triv (ev P (𝟙 G) (1 : G ⟶ G))) (x : T ⟶ G)
-    (hloc : ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧ ∀ (Y : Over S) (t : Y ⟶ T) (g : Y ⟶ G),
-      (∀ z, t.left z ∈ V) → evc hP (t ≫ x) g = 0) :
-    Triv (ev P (snd G T ≫ x) (fst G T)) := by
+theorem triv_of_local_evc
+    {S : Scheme.{0}} {G T : Over S} [GrpObj G]
+    (hG : IsAbelianScheme G)
+    {P : LB (G ⊗ G).left} (hP : P.IsLB) (h2 : Triv (ev P (𝟙 G) (1 : G ⟶ G)))
+    (x : T ⟶ G)
+    (hloc : ∀ p : T.left, ∃ V : T.left.Opens,
+      p ∈ V ∧ ∀ (Y : Over S) (t : Y ⟶ T) (g : Y ⟶ G), (∀ z, t.left z ∈ V) → evc hP (t ≫ x) g = 0)
+    : Triv (ev P (snd G T ≫ x) (fst G T)) := by
   rw [triv_ev_iff hP]
   obtain ⟨M, hM, hc⟩ := cls_surj (evc hP (snd G T ≫ x) (fst G T))
   rw [← hc]
-  have key : ∀ {X : Scheme.{0}} (f : X ⟶ (G ⊗ T).left),
-      Triv (M.pull f) ↔ CechPic.pull f (evc hP (snd G T ≫ x) (fst G T)) = 0 := by
+  have key
+      : ∀ {X : Scheme.{0}} (f : X ⟶ (G ⊗ T).left),
+        Triv (M.pull f) ↔ CechPic.pull f (evc hP (snd G T ≫ x) (fst G T)) = 0 := by
     intro X f
     rw [← hc, ← cls_pull hM f (pull_isLB hM f)]
     exact (cls_eq_zero_iff (pull_isLB hM f)).symm
-  refine (cls_eq_zero_iff hM).2 (GlobalTheory.CubeGlue.triv_of_locally_triv hM (snd G T).left (lift 1 (𝟙 T)).left ?_
-    (surj_restrict_snd hG T) ?_ ?_)
+  refine (cls_eq_zero_iff hM).2
+    (GlobalTheory.CubeGlue.triv_of_locally_triv hM (snd G T).left (lift 1 (𝟙 T)).left ?_
+      (surj_restrict_snd hG T) ?_ ?_)
   · rw [← Over.comp_left, lift_snd, Over.id_left]
   · rw [key, pull_evc, lift_snd_assoc, Category.id_comp, lift_fst]
     exact evc_one_right hP h2 x
@@ -54,7 +62,17 @@ theorem triv_of_local_evc {S : Scheme.{0}} {G T : Over S} [GrpObj G] (hG : IsAbe
     rw [key, pull_evc, ← Category.assoc]
     exact hz Y _ _ (fun z ↦ z.2)
 
-theorem triv_of_memKL_pair : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (G : Over (Sp R)) [GrpObj G], IsAbelianScheme G → ∀ P : LB (G ⊗ G).left, P.IsLB → (∃ t : (P.pull (lift (1 : G ⟶ G) (𝟙 G)).left).Gen, t.IsGen) → (∃ t : (P.pull (lift (𝟙 G) (1 : G ⟶ G)).left).Gen, t.IsGen) → LBIso P (P.pull (lift (snd G G) (fst G G)).left) → ∀ (T : Over (Sp R)) (a b : T ⟶ G), GlobalTheory.MemKL (G ⊗ G) P (lift a b) → (∃ t : (P.pull (lift (snd G T ≫ a) (fst G T)).left).Gen, t.IsGen) ∧ (∃ t : (P.pull (lift (snd G T ≫ b) (fst G T)).left).Gen, t.IsGen) := by
+theorem triv_of_memKL_pair
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (G : Over (Sp R)) [GrpObj G],
+      IsAbelianScheme G
+        → ∀ P : LB (G ⊗ G).left,
+          P.IsLB → (∃ t : (P.pull (lift (1 : G ⟶ G) (𝟙 G)).left).Gen, t.IsGen)
+            → (∃ t : (P.pull (lift (𝟙 G) (1 : G ⟶ G)).left).Gen, t.IsGen)
+            → LBIso P (P.pull (lift (snd G G) (fst G G)).left)
+            → ∀ (T : Over (Sp R)) (a b : T ⟶ G),
+              GlobalTheory.MemKL (G ⊗ G) P (lift a b)
+                → (∃ t : (P.pull (lift (snd G T ≫ a) (fst G T)).left).Gen, t.IsGen)
+                  ∧ (∃ t : (P.pull (lift (snd G T ≫ b) (fst G T)).left).Gen, t.IsGen) := by
   intro R _ _ G _ hG P hP h1 h2 hs T a b hx
   have hs' : (swap P).IsLB := pull_isLB hP _
   have h1' : Triv (ev P (1 : G ⟶ G) (𝟙 G)) := h1
@@ -65,8 +83,11 @@ theorem triv_of_memKL_pair : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (G
     intro Y u v
     have e := congrArg (CechPic.pull (lift v u).left) ((cls_eq_iff hP hs').2 hs)
     exact e.trans (evc_swap hP hs' v u)
-  have loc : ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧ ∀ (Y : Over (Sp R)) (t : Y ⟶ T) (g : Y ⟶ G),
-      (∀ z, t.left z ∈ V) → evc hP (t ≫ a) g = 0 ∧ evc hP (t ≫ b) g = 0 := by
+  have loc
+      : ∀ p : T.left, ∃ V : T.left.Opens,
+        p ∈ V
+          ∧ ∀ (Y : Over (Sp R)) (t : Y ⟶ T) (g : Y ⟶ G),
+            (∀ z, t.left z ∈ V) → evc hP (t ≫ a) g = 0 ∧ evc hP (t ≫ b) g = 0 := by
     intro p
     obtain ⟨V, hV, hTV⟩ := hx p
     refine ⟨V, hV, fun Y t g ht ↦ ?_⟩

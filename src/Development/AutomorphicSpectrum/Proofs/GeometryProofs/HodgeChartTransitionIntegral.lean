@@ -7,11 +7,27 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Bir
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MvPolynomial GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+open CategoryTheory AlgebraicGeometry NumberField MvPolynomial GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
 
 namespace GlobalTheory.CompanionTheory.Ar.HT.Overlap
 
-theorem omHT_pow_smul_mem : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (p R N : ℕ) (V : Type) [AddCommGroup V] [Module Ω V] (Dc : ∀ s : {s : ∀ k, J k // mseg y s ≠ 0}, HTChart (chartRing o (mseg y) s.1) Ω c p R N V), (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}), ∀ x ∈ (Dc s).om, ∃ n : ℕ, (mseg y s.1 / mseg y t.1) ^ n • x ∈ (Dc t).om) → (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}) (x : Fin N → 𝓞 E), ∃ n : ℕ, ∃ w ∈ (Dc t).om, (mseg y s.1 / mseg y t.1) ^ n • ((Dc s).h x - (Dc t).h x) = ((p : Ω) ^ R) • w) → (∀ s t, (Dc s).ρΩ = (Dc t).ρΩ) → (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}), ∀ a ∈ chartRing o (mseg y) s.1, ∃ n : ℕ, (mseg y s.1 / mseg y t.1) ^ n * a ∈ chartRing o (mseg y) t.1) → ∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}) (σ' : E →+* Ω), ∀ x ∈ (Dc s).omHT σ', ∃ n : ℕ, (mseg y s.1 / mseg y t.1) ^ n • x ∈ (Dc t).omHT σ' := by
+theorem omHT_pow_smul_mem
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (K : Type) [Fintype K]
+        (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (E : Type) [Field E]
+        [NumberField E] (c : E ≃+* E) (p R N : ℕ) (V : Type) [AddCommGroup V] [Module Ω V]
+        (Dc : ∀ s : {s : ∀ k, J k // mseg y s ≠ 0}, HTChart (chartRing o (mseg y) s.1) Ω c p R N V),
+      (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}), ∀ x ∈ (Dc s).om, ∃ n : ℕ,
+          (mseg y s.1 / mseg y t.1) ^ n • x ∈ (Dc t).om)
+        → (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}) (x : Fin N → 𝓞 E), ∃ n : ℕ, ∃ w ∈ (Dc t).om,
+          (mseg y s.1 / mseg y t.1) ^ n • ((Dc s).h x - (Dc t).h x) = ((p : Ω) ^ R) • w)
+        → (∀ s t, (Dc s).ρΩ = (Dc t).ρΩ)
+        → (∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}), ∀ a ∈ chartRing o (mseg y) s.1, ∃ n : ℕ,
+          (mseg y s.1 / mseg y t.1) ^ n * a ∈ chartRing o (mseg y) t.1)
+        → ∀ (s t : {s : ∀ k, J k // mseg y s ≠ 0}) (σ' : E →+* Ω), ∀ x ∈ (Dc s).omHT σ', ∃ n : ℕ,
+          (mseg y s.1 / mseg y t.1) ^ n • x ∈ (Dc t).omHT σ' := by
   intro o _ Ω _ _ K _ J _ y E _ _ c p R N V _ _ Dc hom hh hρ hring s t σ'
   set f : Ω := mseg y s.1 / mseg y t.1 with hf
   have hfA : f ∈ chartRing o (mseg y) t.1 := Algebra.subset_adjoin ⟨s.1, rfl⟩
@@ -23,24 +39,29 @@ theorem omHT_pow_smul_mem : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [
       intro z hz
       rw [pow_succ', mul_smul]
       exact (Dc t).om'.smul_mem (⟨f, hfA⟩ : chartRing o (mseg y) t.1) (ih z hz)
-  let P : Submodule (chartRing o (mseg y) s.1) V :=
-    { carrier := {z | ∃ n : ℕ, f ^ n • z ∈ (Dc t).om'}
-      add_mem' := by
-        rintro a b ⟨n, hn⟩ ⟨m, hm⟩
-        refine ⟨n + m, ?_⟩
-        rw [smul_add]
-        refine add_mem ?_ ?_
-        · rw [add_comm, pow_add, mul_smul]; exact hfMn m _ hn
-        · rw [pow_add, mul_smul]; exact hfMn n _ hm
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro a z ⟨n, hn⟩
-        obtain ⟨m, hm⟩ := hring s t (a : Ω) a.2
-        refine ⟨n + m, ?_⟩
-        have e1 : f ^ (n + m) • (a • z) = (⟨f ^ m * a, hm⟩ : chartRing o (mseg y) t.1) • (f ^ n • z) := by
-          show f ^ (n + m) • ((a : Ω) • z) = (f ^ m * a) • (f ^ n • z)
-          rw [smul_smul, smul_smul]; congr 1; ring
-        rw [e1]; exact (Dc t).om'.smul_mem _ hn }
+  let P : Submodule (chartRing o (mseg y) s.1) V := {
+    carrier := {z | ∃ n : ℕ, f ^ n • z ∈ (Dc t).om'}
+    add_mem' := by
+      rintro a b ⟨n, hn⟩ ⟨m, hm⟩
+      refine ⟨n + m, ?_⟩
+      rw [smul_add]
+      refine add_mem ?_ ?_
+      · rw [add_comm, pow_add, mul_smul]; exact hfMn m _ hn
+      · rw [pow_add, mul_smul]; exact hfMn n _ hm
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro a z ⟨n, hn⟩
+      obtain ⟨m, hm⟩ := hring s t (a : Ω) a.2
+      refine ⟨n + m, ?_⟩
+      have e1
+          : f ^ (n + m) • (a • z) = (⟨f ^ m * a, hm⟩ : chartRing o (mseg y) t.1) • (f ^ n • z) := by
+        show f ^ (n + m) • ((a : Ω) • z) = (f ^ m * a) • (f ^ n • z)
+        rw [smul_smul, smul_smul]
+        congr 1
+        ring
+      rw [e1]
+      exact (Dc t).om'.smul_mem _ hn
+  }
   have hle : (Dc s).om' ≤ P := by
     unfold HTChart.om'
     refine sup_le ?_ ?_

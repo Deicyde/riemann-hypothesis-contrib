@@ -12,15 +12,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNoe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
+  GlobalTheory.SiegJoin GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TChart
 
-theorem exists_complAt_factor_of_isAdicComplete : ∀ (W : Type) [CommRing W] [IsRegularLocalRing W] (I : Type) [Fintype I] (V : Type) [CommRing V] [IsLocalRing V], IsAdicComplete (maximalIdeal V) V → ∀ ψV : MvPolynomial I W →+* V, IsLocalHom (ψV.comp MvPolynomial.C) → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsLocalRing R) (ψ : MvPolynomial I W →+* R) (θ : R →+* V), IsComplAt ψ ∧ IsLocalHom θ ∧ θ.comp ψ = ψV ∧ IsLocalHom (ψ.comp MvPolynomial.C) := by
+theorem exists_complAt_factor_of_isAdicComplete
+    : ∀ (W : Type) [CommRing W] [IsRegularLocalRing W] (I : Type) [Fintype I] (V : Type)
+        [CommRing V] [IsLocalRing V],
+      IsAdicComplete (maximalIdeal V) V
+        → ∀ ψV : MvPolynomial I W →+* V,
+          IsLocalHom (ψV.comp MvPolynomial.C)
+            → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : IsLocalRing R)
+                (ψ : MvPolynomial I W →+* R) (θ : R →+* V),
+              IsComplAt ψ ∧ IsLocalHom θ ∧ θ.comp ψ = ψV ∧ IsLocalHom (ψ.comp MvPolynomial.C) := by
   intro W _ _ I _ V _ _ hV ψV hC
   haveI := hV
   let A := MvPolynomial I W
@@ -39,11 +51,13 @@ theorem exists_complAt_factor_of_isAdicComplete : ∀ (W : Type) [CommRing W] [I
     exact IsLocalRing.notMem_maximalIdeal.mp this
   let φ : L →+* V := IsLocalization.lift (M := q.primeCompl) (S := L) hunit
   have hφ : φ.comp (algebraMap A L) = ψV := IsLocalization.lift_comp hunit
-  have hmL : (maximalIdeal L) = q.map (algebraMap A L) := (Localization.AtPrime.map_eq_maximalIdeal).symm
+  have hmL : (maximalIdeal L) = q.map (algebraMap A L) :=
+    (Localization.AtPrime.map_eq_maximalIdeal).symm
   have hk : (maximalIdeal L).map φ ^ 1 ≤ maximalIdeal V := by
     rw [pow_one, hmL, Ideal.map_map, hφ]
     exact Ideal.map_comap_le
-  obtain ⟨θ, hθ, -⟩ := GlobalTheory.exists_extend_adicCompletion φ (maximalIdeal L) (maximalIdeal V) hk
+  obtain ⟨θ, hθ, -⟩ :=
+    GlobalTheory.exists_extend_adicCompletion φ (maximalIdeal L) (maximalIdeal V) hk
   let c : L →+* R := algebraMap L R
   let ψ : A →+* R := c.comp (algebraMap A L)
   have hθψ : θ.comp ψ = ψV := by
@@ -57,12 +71,22 @@ theorem exists_complAt_factor_of_isAdicComplete : ∀ (W : Type) [CommRing W] [I
     rw [h0]
     show _ = q.map (c.comp (algebraMap A L))
     rw [← Ideal.map_map, hmL']
-  refine ⟨R, inferInstance, inferInstance, inferInstance, ψ, θ, ⟨inferInstance, inferInstance, ?_, ?_, ?_⟩, ?_, hθψ, ?_⟩
+  refine ⟨
+    R,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ψ,
+    θ,
+    ⟨inferInstance, inferInstance, ?_, ?_, ?_⟩,
+    ?_,
+    hθψ,
+    ?_
+  ⟩
   · exact RingHom.Flat.comp (RingHom.flat_algebraMap_iff.2 (IsLocalization.flat L q.primeCompl))
       (RingHom.flat_algebraMap_iff.2 (AdicCompletion.flat_of_isNoetherian _))
   · apply le_antisymm Ideal.map_comap_le
-    have : q ≤ (maximalIdeal R).comap ψ := by
-      rw [← Ideal.map_le_iff_le_comap, ← hmR]
+    have : q ≤ (maximalIdeal R).comap ψ := by rw [← Ideal.map_le_iff_le_comap, ← hmR]
     rw [hmR]
     exact Ideal.map_mono (hmR ▸ this)
   · intro r
@@ -78,8 +102,7 @@ theorem exists_complAt_factor_of_isAdicComplete : ∀ (W : Type) [CommRing W] [I
       have h3 : c (IsLocalization.mk' L a s) * ψ s = ψ a := by
         show c (IsLocalization.mk' L a s) * c (algebraMap A L s) = c (algebraMap A L a)
         rw [← map_mul, IsLocalization.mk'_spec]
-      have : r * ψ s - ψ a = (r - c (IsLocalization.mk' L a s)) * ψ s := by
-        rw [sub_mul, h3]
+      have : r * ψ s - ψ a = (r - c (IsLocalization.mk' L a s)) * ψ s := by rw [sub_mul, h3]
       rw [this]
       exact Ideal.mul_mem_right _ _ h2
   · haveI : IsLocalHom (θ.comp (algebraMap L R)) := by

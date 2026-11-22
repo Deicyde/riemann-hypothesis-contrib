@@ -13,15 +13,19 @@ open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
 
 namespace GlobalTheory.CompanionTheory.ChiGamGlobal
 
-theorem twConj_cent_mul {G : Type} [Group G] (θ : Monoid.End G) {t δ : G} (x : G) (ht : twConj θ t δ = δ) :
-    twConj θ (t * x) δ = twConj θ x δ := by
+theorem twConj_cent_mul
+    {G : Type} [Group G] (θ : Monoid.End G) {t δ : G} (x : G) (ht : twConj θ t δ = δ)
+    : twConj θ (t * x) δ = twConj θ x δ := by
   have h : t⁻¹ * δ * θ t = δ := ht
-  calc twConj θ (t * x) δ = x⁻¹ * (t⁻¹ * δ * θ t) * θ x := by
-        simp only [twConj, map_mul, _root_.mul_inv_rev, mul_assoc]
+  calc
+    twConj θ (t * x) δ
+      = x⁻¹ * (t⁻¹ * δ * θ t) * θ x := by simp only [twConj, map_mul, _root_.mul_inv_rev, mul_assoc]
     _ = twConj θ x δ := by rw [h]; rfl
 
-theorem logSize_nonneg {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {n : ℕ} (g : GA E n) :
-    0 ≤ logSize g := by
+theorem logSize_nonneg
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {n : ℕ} (g : GA E n)
+    : 0 ≤ logSize g := by
   have h : ∀ A : Matrix (Fin n) (Fin n) (Ad E), 0 ≤ logSizeM A := fun A =>
     add_nonneg (Finset.sum_nonneg fun _ _ => Real.posLog_nonneg)
       (finsum_nonneg fun _ => Real.posLog_nonneg)
@@ -41,8 +45,9 @@ theorem chiGam_of (hI : OnlyIsotropic) (hP : PosY) (hC : ChainSum) : ChiGam := b
   have hconj : twConj (thetaA E n) (t * x) (ratGL E n d) = twConj (thetaA E n) x (ratGL E n d) :=
     twConj_cent_mul _ x ht
   have hind := (hC m).1 _ (a t) (h₂ d m Wof hiso huniq h0 hmeet hle hreg τ x b₂)
-  have hiff : t * x ∈ cutSet E n τ ↔
-      ∀ e, sdot e (a t) ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e) := by
+  have hiff
+      : t * x ∈ cutSet E n τ
+        ↔ ∀ e, sdot e (a t) ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e) := by
     rw [h₁ τ (t * x) d (by rw [hconj]; exact b₁)]
     constructor
     · intro h e
@@ -56,11 +61,15 @@ theorem chiGam_of (hI : OnlyIsotropic) (hP : PosY) (hC : ChainSum) : ChiGam := b
       linarith
   rw [hind]
   by_cases hx : t * x ∈ cutSet E n τ
-  · have ha : a t ∈ {b : Fin m → ℝ | ∀ e, sdot e b ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e)} :=
+  · have ha
+        : a t
+          ∈ {b : Fin m → ℝ | ∀ e, sdot e b ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e)} :=
       hiff.1 hx
     rw [Set.indicator_of_mem ha, chiT, Set.indicator_of_mem hx]
     simp
-  · have ha : a t ∉ {b : Fin m → ℝ | ∀ e, sdot e b ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e)} :=
+  · have ha
+        : a t
+          ∉ {b : Fin m → ℝ | ∀ e, sdot e b ≤ prof n τ (Module.finrank E (Wof e)) - deg x (Wof e)} :=
       fun h => hx (hiff.2 h)
     rw [Set.indicator_of_notMem ha, chiT, Set.indicator_of_notMem hx]
     simp

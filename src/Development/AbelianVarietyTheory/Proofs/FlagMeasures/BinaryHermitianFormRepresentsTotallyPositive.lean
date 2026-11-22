@@ -15,10 +15,12 @@ namespace GlobalTheory.BinaryRep
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem gram_diag_pos {r : ℕ} (τ : E →+* ℂ) (d : Fin r → E)
-    (hd : ∀ i, (τ (d i)).im = 0 ∧ 0 < (τ (d i)).re) :
-    ∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
-      FD.gram τ (Matrix.diagonal d) Q = Matrix.diagonal fun a : Fin r => ((FD.sgn r (a : ℕ) : ℝ) : ℂ) := by
+theorem gram_diag_pos
+    {r : ℕ} (τ : E →+* ℂ) (d : Fin r → E) (hd : ∀ i, (τ (d i)).im = 0 ∧ 0 < (τ (d i)).re)
+    : ∃ Q : Matrix (Fin r) (Fin r) ℂ,
+      Q.det ≠ 0
+        ∧ FD.gram τ (Matrix.diagonal d) Q
+          = Matrix.diagonal fun a : Fin r => ((FD.sgn r (a : ℕ) : ℝ) : ℂ) := by
   classical
   set q : Fin r → ℝ := fun i => (Real.sqrt (τ (d i)).re)⁻¹ with hq
   have hq2 : ∀ i, (q i : ℂ) * τ (d i) * (q i : ℂ) = 1 := by
@@ -55,10 +57,13 @@ end GlobalTheory.BinaryRep
 
 namespace GlobalTheory.BinaryRep
 
-theorem represents_totallyPositive : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
-    Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ a b n : K, star a = a → star b = b → star n = n →
-    (∀ φ : K →+* ℂ, 0 < (φ a).re) → (∀ φ : K →+* ℂ, 0 < (φ b).re) → (∀ φ : K →+* ℂ, 0 < (φ n).re) →
-    ∃ s t : K, a * (s * star s) + b * (t * star t) = n := by
+theorem represents_totallyPositive
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ a b n : K,
+          star a = a → star b = b → star n = n → (∀ φ : K →+* ℂ, 0 < (φ a).re)
+            → (∀ φ : K →+* ℂ, 0 < (φ b).re) → (∀ φ : K →+* ℂ, 0 < (φ n).re)
+            → ∃ s t : K, a * (s * star s) + b * (t * star t) = n := by
   intro K _ _ _ hc a b n ha hb hn hpa hpb hpn
   haveI : IsCMField K := GlobalTheory.OrthoLattice.isCMField_of_star K hc.1 hc.2.1
   let φ0 : K →+* ℂ := Classical.choice (inferInstance : Nonempty _)
@@ -81,12 +86,13 @@ theorem represents_totallyPositive : ∀ (K : Type) [Field K] [NumberField K] [S
   have hca : FD.cc a = a := by rw [← hst, ha]
   have hcb : FD.cc b = b := by rw [← hst, hb]
   have hcn : FD.cc n = n := by rw [← hst, hn]
-  have hcab : FD.cc (a * b * n) = a * b * n := by
-    rw [← hst, star_mul, star_mul, ha, hb, hn]; ring
+  have hcab : FD.cc (a * b * n) = a * b * n := by rw [← hst, star_mul, star_mul, ha, hb, hn]; ring
   set G : Matrix (Fin 2) (Fin 2) K := Matrix.diagonal ![a, b] with hG
   set G' : Matrix (Fin 2) (Fin 2) K := Matrix.diagonal ![n, a * b * n] with hG'
-  have herm_diag : ∀ d : Fin 2 → K, (∀ i, FD.cc (d i) = d i) →
-      ∀ i j, FD.cc (Matrix.diagonal d i j) = Matrix.diagonal d j i := by
+  have herm_diag
+      : ∀ d : Fin 2 → K,
+        (∀ i, FD.cc (d i) = d i)
+          → ∀ i j, FD.cc (Matrix.diagonal d i j) = Matrix.diagonal d j i := by
     intro d hd i j
     by_cases h : i = j
     · subst h; simp [hd]
@@ -97,9 +103,11 @@ theorem represents_totallyPositive : ∀ (K : Type) [Field K] [NumberField K] [S
     herm_diag _ (fun i => by fin_cases i <;> simp [hcn, hcab])
   have hdG : G.det = a * b := by simp [hG, Matrix.det_diagonal, Fin.prod_univ_two]
   have hdG' : G'.det = n * (a * b * n) := by simp [hG', Matrix.det_diagonal, Fin.prod_univ_two]
-  have hpos : ∀ d : Fin 2 → K, (∀ i, star (d i) = d i ∧ ∀ φ : K →+* ℂ, 0 < (φ (d i)).re) →
-      ∀ τ : K →+* ℂ, ∀ i, (τ (d i)).im = 0 ∧ 0 < (τ (d i)).re :=
-    fun d hd τ i => ⟨hreal _ (hd i).1 τ, (hd i).2 τ⟩
+  have hpos
+      : ∀ d : Fin 2 → K,
+        (∀ i, star (d i) = d i ∧ ∀ φ : K →+* ℂ, 0 < (φ (d i)).re)
+          → ∀ τ : K →+* ℂ, ∀ i, (τ (d i)).im = 0 ∧ 0 < (τ (d i)).re := fun d hd τ i =>
+    ⟨hreal _ (hd i).1 τ, (hd i).2 τ⟩
   have habn : star (a * b * n) = a * b * n := by rw [star_mul, star_mul, ha, hb, hn]; ring
   have hpabn : ∀ φ : K →+* ℂ, 0 < (φ (a * b * n)).re := by
     intro φ
@@ -108,20 +116,24 @@ theorem represents_totallyPositive : ∀ (K : Type) [Field K] [NumberField K] [S
     rw [map_mul, map_mul, e a ha, e b hb, e n hn]
     simp only [← Complex.ofReal_mul, Complex.ofReal_re]
     exact mul_pos (mul_pos (hpa φ) (hpb φ)) (hpn φ)
-  obtain ⟨γ, hγ⟩ := (GlobalTheory.QNorm.landherr_and_landherrSt.2) K 2 G G' hGh hG'h
-    (by rw [hdG]; exact mul_ne_zero ha0 hb0)
-    (by rw [hdG']; exact mul_ne_zero hn0 (mul_ne_zero (mul_ne_zero ha0 hb0) hn0))
-    (fun τ => ⟨2,
-      gram_diag_pos τ ![a, b] (hpos _ (fun i => by fin_cases i <;> simp [ha, hb, hpa, hpb]) τ),
-      gram_diag_pos τ ![n, a * b * n]
-        (hpos _ (fun i => by fin_cases i; exacts [⟨hn, hpn⟩, ⟨habn, hpabn⟩]) τ)⟩)
-    ⟨n, by rw [hdG', hdG, hcn]; ring⟩
+  obtain ⟨γ, hγ⟩ :=
+    (GlobalTheory.QNorm.landherr_and_landherrSt.2) K 2 G G' hGh hG'h
+      (by rw [hdG]; exact mul_ne_zero ha0 hb0)
+      (by rw [hdG']; exact mul_ne_zero hn0 (mul_ne_zero (mul_ne_zero ha0 hb0) hn0))
+      (fun τ => ⟨
+        2,
+        gram_diag_pos τ ![a, b] (hpos _ (fun i => by fin_cases i <;> simp [ha, hb, hpa, hpb]) τ),
+        gram_diag_pos τ ![n, a * b * n]
+          (hpos _ (fun i => by fin_cases i; exacts [⟨hn, hpn⟩, ⟨habn, hpabn⟩]) τ)
+      ⟩)
+      ⟨n, by rw [hdG', hdG, hcn]; ring⟩
   have h := hγ (Pi.single 0 1) (Pi.single 0 1)
   set v := (γ : Matrix (Fin 2) (Fin 2) K) *ᵥ Pi.single 0 1 with hv
   refine ⟨v 0, v 1, ?_⟩
   simp only [FD.herm, Fin.sum_univ_two, hG, hG', Matrix.diagonal_apply_eq,
-    Matrix.diagonal_apply_ne _ (by decide : (0 : Fin 2) ≠ 1),
-    Matrix.diagonal_apply_ne _ (by decide : (1 : Fin 2) ≠ 0)] at h
+      Matrix.diagonal_apply_ne _ (by decide : (0 : Fin 2) ≠ 1),
+      Matrix.diagonal_apply_ne _ (by decide : (1 : Fin 2) ≠ 0)]
+    at h
   simp [FD.cc] at h
   rw [hst, hst]
   simp only [FD.cc]

@@ -11,9 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinPart
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
 open Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
-open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies GlobalTheory.OnCmp GlobalTheory.BaseCmp
+open GlobalTheory.ConjTwist GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.OnTies
+  GlobalTheory.OnCmp GlobalTheory.BaseCmp
 open Formalism.IndefR.Fin Formalism.IndefR.Fin.LevelGroupLemmas
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -24,23 +27,31 @@ namespace GlobalTheory.IdemSumChar
 
 open Formalism.L2.JoinChr
 
-theorem locE_sum {D : D7} {ι : Type} (s : Finset ι) (f : ι → AE D)
-    (hf : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → f i * f j = 0) (k : D.host.E) :
-    locE D (∑ i ∈ s, f i) k = ∏ i ∈ s, locE D (f i) k := by
+theorem locE_sum
+    {D : D7} {ι : Type}
+    (s : Finset ι) (f : ι → AE D) (hf : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → f i * f j = 0) (k : D.host.E)
+    : locE D (∑ i ∈ s, f i) k = ∏ i ∈ s, locE D (f i) k := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [locE]
   | insert a s ha ih =>
     rw [Finset.sum_insert ha, Finset.prod_insert ha,
-      ← ih fun i hi j hj hij => hf i (Finset.mem_insert_of_mem hi) j (Finset.mem_insert_of_mem hj) hij]
+      ← ih fun i hi j hj hij =>
+        hf i (Finset.mem_insert_of_mem hi) j (Finset.mem_insert_of_mem hj) hij]
     have h0 : f a * ∑ i ∈ s, f i = 0 := by
       rw [Finset.mul_sum]
-      exact Finset.sum_eq_zero fun i hi => hf a (Finset.mem_insert_self a s) i (Finset.mem_insert_of_mem hi)
-        (fun h => ha (h ▸ hi))
+      exact Finset.sum_eq_zero fun i hi =>
+        hf a (Finset.mem_insert_self a s) i (Finset.mem_insert_of_mem hi) (fun h => ha (h ▸ hi))
     unfold locE
     linear_combination (-(incA D k - 1) * (incA D k - 1)) * h0
 
-theorem char_eq_prod : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (eQ : AE D), IsIdemSum eQ Q → ∀ (k : D.host.Eˣ) (y : (AE D)ˣ), (y : AE D) = Formalism.L2.JoinChr.locE D (cA D eQ) (k : D.host.E) → ∀ (c : (AE D)ˣ →* Circle) (ψ : Formalism.L2.Host.HChar D.host.E), ChrEq c ψ → ((c y : Circle) : ℂ) = ∏ P ∈ Q, ((ψ.locK (conjPl P) k : ℂˣ) : ℂ) := by
+theorem char_eq_prod
+    : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (eQ : AE D),
+      IsIdemSum eQ Q
+        → ∀ (k : D.host.Eˣ) (y : (AE D)ˣ),
+          (y : AE D) = Formalism.L2.JoinChr.locE D (cA D eQ) (k : D.host.E)
+            → ∀ (c : (AE D)ˣ →* Circle) (ψ : Formalism.L2.Host.HChar D.host.E),
+              ChrEq c ψ → ((c y : Circle) : ℂ) = ∏ P ∈ Q, ((ψ.locK (conjPl P) k : ℂˣ) : ℂ) := by
   intro D Q eQ h k y hy c ψ hψ
   classical
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := h
@@ -63,8 +74,9 @@ theorem char_eq_prod : ∀ (D : D7) (Q : Finset (Pl D.host.E)) (eQ : AE D), IsId
     rw [hy, Units.coe_prod, hsum, locE_sum Q g horth]
     rfl
   rw [hy', map_prod]
-  have hcoe : ∀ (s : Finset (Pl D.host.E)) (u : Pl D.host.E → Circle),
-      (((∏ P ∈ s, u P : Circle)) : ℂ) = ∏ P ∈ s, ((u P : Circle) : ℂ) := fun s u =>
+  have hcoe
+      : ∀ (s : Finset (Pl D.host.E)) (u : Pl D.host.E → Circle),
+        (((∏ P ∈ s, u P : Circle)) : ℂ) = ∏ P ∈ s, ((u P : Circle) : ℂ) := fun s u =>
     map_prod Circle.coeHom u s
   rw [hcoe]
   refine Finset.prod_congr rfl fun P hP => ?_

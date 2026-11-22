@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  Module GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.WeilDeligne.FrobSemisimpleUnique
 
-theorem isNilpotent_zpow_sub_one {R : Type*} [Ring R] (u : Rˣ) (hu : IsNilpotent ((u : R) - 1))
-    (d : ℤ) : IsNilpotent (((u ^ d : Rˣ) : R) - 1) := by
+theorem isNilpotent_zpow_sub_one
+    {R : Type*} [Ring R] (u : Rˣ) (hu : IsNilpotent ((u : R) - 1)) (d : ℤ)
+    : IsNilpotent (((u ^ d : Rˣ) : R) - 1) := by
   have hnat : ∀ n : ℕ, IsNilpotent (((u ^ n : Rˣ) : R) - 1) := by
     intro n
     rw [Units.val_pow_eq_pow_val, ← geom_sum_mul]
@@ -28,8 +30,10 @@ theorem isNilpotent_zpow_sub_one {R : Type*} [Ring R] (u : Rˣ) (hu : IsNilpoten
     refine (Commute.isNilpotent_mul_left ?_ h1).neg
     exact ((Commute.refl v).inv_left.units_val).sub_right (Commute.one_right _)
 
-theorem nilpotent_part {R : Type*} [Ring R] {f s : R} (v : Rˣ) (hv : IsNilpotent ((v : R) - 1))
-    (hc : Commute (v : R) f) (hf : f = s * v) : IsNilpotent (f - s) ∧ Commute (f - s) s := by
+theorem nilpotent_part
+    {R : Type*} [Ring R]
+    {f s : R} (v : Rˣ) (hv : IsNilpotent ((v : R) - 1)) (hc : Commute (v : R) f) (hf : f = s * v)
+    : IsNilpotent (f - s) ∧ Commute (f - s) s := by
   have hs : s = f * ((v⁻¹ : Rˣ) : R) := by rw [hf, Units.mul_inv_cancel_right]
   have hvs : Commute (v : R) s := by
     rw [hs]

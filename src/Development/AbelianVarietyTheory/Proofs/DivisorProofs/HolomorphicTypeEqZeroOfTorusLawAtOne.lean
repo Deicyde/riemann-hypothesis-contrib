@@ -9,7 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.Differentia
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,14 +27,14 @@ variable {n : ℕ} {ι : Type} [Fintype ι]
 
 def oneE (ι : Type) (n : ℕ) : ι → Fin n → Fin n → ℂ := fun _ a c => if a = c then 1 else 0
 
-def loP (ζ : ℂ) (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ :=
-  fun τ a c => if c < a then ζ ^ ((a : ℕ) - c) * z τ a c else 0
+def loP (ζ : ℂ) (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ := fun τ a c =>
+  if c < a then ζ ^ ((a : ℕ) - c) * z τ a c else 0
 
-def upperParabolic (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ :=
-  fun τ a c => if c < a then 0 else z τ a c
+def upperParabolic (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ := fun τ a c =>
+  if c < a then 0 else z τ a c
 
-def luMap (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ :=
-  fun τ => (Matrix.of ((oneE ι n + loP 1 z) τ) * Matrix.of ((oneE ι n + upperParabolic z) τ) : Mt n)
+def luMap (z : ι → Fin n → Fin n → ℂ) : ι → Fin n → Fin n → ℂ := fun τ =>
+  (Matrix.of ((oneE ι n + loP 1 z) τ) * Matrix.of ((oneE ι n + upperParabolic z) τ) : Mt n)
 
 omit [Fintype ι] in
 lemma of_oneE (τ : ι) : Matrix.of (oneE ι n τ) = (1 : Mt n) := by
@@ -229,33 +233,46 @@ lemma local_zero {Q : (ι → Fin n → Fin n → ℂ) → ℂ} {Ω : Set (ι �
   show Q (luMap z) = 0
   exact hb _ hyΩ _ hup (hdisc z hzr)
 
-theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n)
-    (w : ι → Fin n → ℤ) (h : ∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ)) (f : (ι → Mt n) → ℂ) (hf : HolFn Hm q x₀ w f)
-    (ht : ∀ u ∈ UG Hm, ∀ s, f (torEl x₀ s * u) = torCh w s * f u) (h1 : f 1 = 0) : ∀ u ∈ UG Hm, f u = 0 := by
+theorem eq_zero_of_torus_law
+    (n : ℕ)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n)
+    (w : ι → Fin n → ℤ)
+    (h : ∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ))
+    (f : (ι → Mt n) → ℂ) (hf : HolFn Hm q x₀ w f)
+    (ht : ∀ u ∈ UG Hm, ∀ s, f (torEl x₀ s * u) = torCh w s * f u) (h1 : f 1 = 0)
+    : ∀ u ∈ UG Hm, f u = 0 := by
   obtain ⟨P, ⟨hPd, hPw⟩, hPf⟩ := hf
   obtain ⟨hFo, hFc, hFs, hx0⟩ := GlobalTheory.HolDict.frDoms_open_preconnected_stable n ι Hm q x₀ h
   have hx0u : ∀ τ, IsUnit (x₀ τ).det := fun τ => (TorusLaw.units_of_orth (h τ)).1
   have hinv : ∀ τ, (x₀ τ)⁻¹ * x₀ τ = 1 := fun τ => Matrix.nonsing_inv_mul (x₀ τ) (hx0u τ)
   have hinv' : ∀ τ, x₀ τ * (x₀ τ)⁻¹ = 1 := fun τ => Matrix.mul_nonsing_inv (x₀ τ) (hx0u τ)
   have hUpT1 : UpT (1 : Mt n) := ⟨by simp, fun a c hac => Matrix.one_apply_ne (ne_of_lt hac).symm⟩
-  have hUHmul : ∀ (H g k : Mt n), g ∈ Formalism.QuantumDeterminants.UH H → k ∈ Formalism.QuantumDeterminants.UH H → g * k ∈ Formalism.QuantumDeterminants.UH H := by
+  have hUHmul
+      : ∀ (H g k : Mt n),
+        g ∈ Formalism.QuantumDeterminants.UH H → k ∈ Formalism.QuantumDeterminants.UH H
+          → g * k ∈ Formalism.QuantumDeterminants.UH H := by
     intro H g k hg hk
     simp only [Formalism.QuantumDeterminants.UH, Set.mem_setOf_eq] at hg hk ⊢
     rw [Matrix.conjTranspose_mul]
-    calc kᴴ * gᴴ * H * (g * k) = kᴴ * (gᴴ * H * g) * k := by simp only [Matrix.mul_assoc]
+    calc
+      kᴴ * gᴴ * H * (g * k)
+        = kᴴ * (gᴴ * H * g) * k := by simp only [Matrix.mul_assoc]
       _ = H := by rw [hg, hk]
   have hUG1 : (1 : ι → Mt n) ∈ UG Hm := by
     simp only [UG, Set.mem_setOf_eq]; intro τ; simp [Formalism.QuantumDeterminants.UH]
   have hUGmul : ∀ u v : ι → Mt n, u ∈ UG Hm → v ∈ UG Hm → u * v ∈ UG Hm := by
     intro u v hu hv
     simp only [UG, Set.mem_setOf_eq] at hu hv ⊢
-    intro τ; exact hUHmul _ _ _ (hu τ) (hv τ)
+    intro τ
+    exact hUHmul _ _ _ (hu τ) (hv τ)
   have htor : ∀ s, torEl x₀ s ∈ UG Hm := fun s => by
     have := TorusLaw.mul_torEl_mem h s hUG1
     rwa [one_mul] at this
 
-  have hPt : ∀ x ∈ frDoms Hm q, ∀ s,
-      P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n)) = torCh w s * P x := by
+  have hPt
+      : ∀ x ∈ frDoms Hm q, ∀ s,
+        P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n)) = torCh w s * P x := by
     intro x hx s
     choose β _ hβ using fun τ => GlobalTheory.HolDict.GS.smooth_gramSchmidt n (Hm τ) (q τ) (x₀ τ) (h τ)
     have hxτ : ∀ τ, Matrix.of (x τ) ∈ frDom (Hm τ) (q τ) := hx
@@ -270,8 +287,9 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
       have hbu : IsUnit (b τ).det := isUnit_iff_ne_zero.2 (hbT τ).1
       have e2 : (b τ)⁻¹ * b τ = 1 := Matrix.nonsing_inv_mul (b τ) hbu
       rw [hu]
-      calc (Matrix.of (x τ) : Mt n) = Matrix.of (x τ) * ((b τ)⁻¹ * ((x₀ τ)⁻¹ * x₀ τ) * b τ) := by
-            rw [hinv τ, Matrix.mul_one, e2, Matrix.mul_one]
+      calc
+        (Matrix.of (x τ) : Mt n) = Matrix.of (x τ) * ((b τ)⁻¹ * ((x₀ τ)⁻¹ * x₀ τ) * b τ) := by
+          rw [hinv τ, Matrix.mul_one, e2, Matrix.mul_one]
         _ = Matrix.of (x τ) * (b τ)⁻¹ * (x₀ τ)⁻¹ * x₀ τ * b τ := by simp only [Matrix.mul_assoc]
     have hF1 : ∀ v ∈ UG Hm, (fun τ => (v τ * x₀ τ : Mt n)) ∈ frDoms Hm q := by
       intro v hv
@@ -279,25 +297,35 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
       simp only [Matrix.mul_one] at this
       exact this
     have e1 : P x = (∏ τ, ∏ a, b τ a a ^ w τ a) * f u := by
-      calc P x = P (fun τ => (Matrix.of ((fun τ => (u τ * x₀ τ : Mt n)) τ) * b τ : Mt n)) := by
-            congr 1; funext τ; exact hxeq τ
-        _ = (∏ τ, ∏ a, b τ a a ^ w τ a) * P (fun τ => (u τ * x₀ τ : Mt n)) := hPw _ (hF1 u huG) b hbT
+      calc
+        P x = P (fun τ => (Matrix.of ((fun τ => (u τ * x₀ τ : Mt n)) τ) * b τ : Mt n)) := by
+          congr 1; funext τ; exact hxeq τ
+        _ = (∏ τ, ∏ a, b τ a a ^ w τ a) * P (fun τ => (u τ * x₀ τ : Mt n)) :=
+          hPw _ (hF1 u huG) b hbT
         _ = (∏ τ, ∏ a, b τ a a ^ w τ a) * f u := by rw [hPf u huG]
     have hv : torEl x₀ s * u ∈ UG Hm := hUGmul _ _ (htor s) huG
-    have e2 : P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n)) =
-        (∏ τ, ∏ a, b τ a a ^ w τ a) * f (torEl x₀ s * u) := by
-      calc P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n))
-          = P (fun τ => (Matrix.of ((fun τ => ((torEl x₀ s * u) τ * x₀ τ : Mt n)) τ) * b τ : Mt n)) := by
-            congr 1; funext τ
-            show torEl x₀ s τ * Matrix.of (x τ) = torEl x₀ s τ * u τ * x₀ τ * b τ
-            rw [hxeq τ]; simp only [Matrix.mul_assoc]
+    have e2
+        : P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n))
+          = (∏ τ, ∏ a, b τ a a ^ w τ a) * f (torEl x₀ s * u) := by
+      calc
+        P (fun τ => (torEl x₀ s τ * Matrix.of (x τ) : Mt n))
+            = P (fun τ =>
+              (Matrix.of ((fun τ => ((torEl x₀ s * u) τ * x₀ τ : Mt n)) τ) * b τ : Mt n)) := by
+          congr 1
+          funext τ
+          show torEl x₀ s τ * Matrix.of (x τ) = torEl x₀ s τ * u τ * x₀ τ * b τ
+          rw [hxeq τ]
+          simp only [Matrix.mul_assoc]
         _ = (∏ τ, ∏ a, b τ a a ^ w τ a) * P (fun τ => ((torEl x₀ s * u) τ * x₀ τ : Mt n)) :=
-            hPw _ (hF1 _ hv) b hbT
+          hPw _ (hF1 _ hv) b hbT
         _ = (∏ τ, ∏ a, b τ a a ^ w τ a) * f (torEl x₀ s * u) := by rw [hPf _ hv]
-    rw [e2, ht u huG s, e1]; ring
+    rw [e2, ht u huG s, e1]
+    ring
 
-  obtain ⟨m, hm⟩ : ∃ m : (ι → Fin n → Fin n → ℂ) → (ι → Fin n → Fin n → ℂ),
-      ∀ y, m y = fun τ => (x₀ τ * Matrix.of (y τ) : Mt n) := ⟨_, fun _ => rfl⟩
+  obtain ⟨m, hm⟩
+      : ∃ m : (ι → Fin n → Fin n → ℂ) → (ι → Fin n → Fin n → ℂ), ∀ y,
+        m y = fun τ => (x₀ τ * Matrix.of (y τ) : Mt n) :=
+    ⟨_, fun _ => rfl⟩
   have hmd : Differentiable ℂ m := by
     rw [show m = fun y τ => (x₀ τ * Matrix.of (y τ) : Mt n) from funext hm]
     refine differentiable_pi.2 fun τ => differentiable_pi.2 fun a => differentiable_pi.2 fun c => ?_
@@ -306,30 +334,37 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
     | fun_prop
     | exact Differentiable.sum fun j _ => (differentiable_const _).mul (by fun_prop)
   have hm1 : m (oneE ι n) = fun τ => (x₀ τ : Mt n) := by
-    rw [hm]; funext τ
+    rw [hm]
+    funext τ
     show x₀ τ * Matrix.of (oneE ι n τ) = x₀ τ
     rw [of_oneE, Matrix.mul_one]
   have hΩ : m ⁻¹' frDoms Hm q ∈ 𝓝 (oneE ι n) :=
-    (hmd.continuous.isOpen_preimage _ hFo).mem_nhds (by show m (oneE ι n) ∈ frDoms Hm q; rw [hm1]; exact hx0)
+    (hmd.continuous.isOpen_preimage _ hFo).mem_nhds
+      (by show m (oneE ι n) ∈ frDoms Hm q; rw [hm1]; exact hx0)
   have hQd : DifferentiableOn ℂ (fun y => P (m y)) (m ⁻¹' frDoms Hm q) :=
     hPd.comp hmd.differentiableOn (fun _ hy => hy)
-  have hb' : ∀ y ∈ m ⁻¹' frDoms Hm q, ∀ b : ι → Mt n, (∀ τ, UpT (b τ)) → P (m y) = 0 →
-      P (m (fun τ => (Matrix.of (y τ) * b τ : Mt n))) = 0 := by
+  have hb'
+      : ∀ y ∈ m ⁻¹' frDoms Hm q, ∀ b : ι → Mt n,
+        (∀ τ, UpT (b τ)) → P (m y) = 0 → P (m (fun τ => (Matrix.of (y τ) * b τ : Mt n))) = 0 := by
     intro y hy b hbT h0
-    have e : m (fun τ => (Matrix.of (y τ) * b τ : Mt n)) =
-        fun τ => (Matrix.of (m y τ) * b τ : Mt n) := by
+    have e
+        : m (fun τ => (Matrix.of (y τ) * b τ : Mt n))
+          = fun τ => (Matrix.of (m y τ) * b τ : Mt n) := by
       refine (hm _).trans ?_
       funext τ
       rw [hm y]
       show x₀ τ * (Matrix.of (y τ) * b τ) = x₀ τ * Matrix.of (y τ) * b τ
       rw [Matrix.mul_assoc]
     rw [e, hPw _ hy b hbT, h0, mul_zero]
-  have hd' : ∀ y ∈ m ⁻¹' frDoms Hm q, ∀ y' ∈ m ⁻¹' frDoms Hm q, ∀ s : ι → Fin n → ℝ,
-      (∀ τ, Matrix.of (y' τ) * diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) =
-        diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) * Matrix.of (y τ)) →
-      P (m y') = P (m y) := by
+  have hd'
+      : ∀ y ∈ m ⁻¹' frDoms Hm q, ∀ y' ∈ m ⁻¹' frDoms Hm q, ∀ s : ι → Fin n → ℝ,
+        (∀ τ,
+            Matrix.of (y' τ) * diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I))
+              = diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) * Matrix.of (y τ))
+          → P (m y') = P (m y) := by
     intro y hy y' hy' s hcomm
-    obtain ⟨E, hE⟩ : ∃ E : ι → Mt n, ∀ τ, E τ = diagonal (fun a => Complex.exp (-(s τ a : ℂ) * Complex.I)) :=
+    obtain ⟨E, hE⟩
+        : ∃ E : ι → Mt n, ∀ τ, E τ = diagonal (fun a => Complex.exp (-(s τ a : ℂ) * Complex.I)) :=
       ⟨_, fun _ => rfl⟩
     have hET : ∀ τ, UpT (E τ) := by
       intro τ
@@ -340,14 +375,22 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
     have hDE : ∀ τ, diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) * E τ = 1 := by
       intro τ
       rw [hE, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-      congr 1; funext a
-      rw [← Complex.exp_add]; simp
-    have htx : ∀ τ, torEl x₀ s τ * x₀ τ =
-        x₀ τ * diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) := by
+      congr 1
+      funext a
+      rw [← Complex.exp_add]
+      simp
+    have htx
+        : ∀ τ,
+          torEl x₀ s τ * x₀ τ
+            = x₀ τ * diagonal (fun a => Complex.exp ((s τ a : ℂ) * Complex.I)) := by
       intro τ
       simp only [torEl, Matrix.mul_assoc, hinv τ, Matrix.mul_one]
-    have e : m y' = fun τ => (Matrix.of ((fun τ => (torEl x₀ s τ * Matrix.of (m y τ) : Mt n)) τ) * E τ : Mt n) := by
-      simp only [hm]; funext τ
+    have e
+        : m y'
+          = fun τ =>
+            (Matrix.of ((fun τ => (torEl x₀ s τ * Matrix.of (m y τ) : Mt n)) τ) * E τ : Mt n) := by
+      simp only [hm]
+      funext τ
       show x₀ τ * Matrix.of (y' τ) = torEl x₀ s τ * (x₀ τ * Matrix.of (y τ)) * E τ
       rw [← Matrix.mul_assoc (torEl x₀ s τ), htx τ, Matrix.mul_assoc (x₀ τ), ← hcomm τ,
         Matrix.mul_assoc, Matrix.mul_assoc, hDE τ, Matrix.mul_one]
@@ -367,10 +410,14 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
     simpa using this.symm
   have hloc := local_zero (Q := fun y => P (m y)) hΩ hQd hb' hd' h1'
 
-  obtain ⟨m', hm'⟩ : ∃ m' : (ι → Fin n → Fin n → ℂ) → (ι → Fin n → Fin n → ℂ),
-      ∀ y, m' y = fun τ => ((x₀ τ)⁻¹ * Matrix.of (y τ) : Mt n) := ⟨_, fun _ => rfl⟩
+  obtain ⟨m', hm'⟩
+      : ∃ m' : (ι → Fin n → Fin n → ℂ) → (ι → Fin n → Fin n → ℂ), ∀ y,
+        m' y = fun τ => ((x₀ τ)⁻¹ * Matrix.of (y τ) : Mt n) :=
+    ⟨_, fun _ => rfl⟩
   have hmm' : ∀ y, m (m' y) = y := by
-    intro y; rw [hm, hm']; funext τ
+    intro y
+    rw [hm, hm']
+    funext τ
     show x₀ τ * ((x₀ τ)⁻¹ * Matrix.of (y τ)) = Matrix.of (y τ)
     rw [← Matrix.mul_assoc, hinv' τ, Matrix.one_mul]
   have hm'0 : m' (fun τ => (x₀ τ : Mt n)) = oneE ι n := by
@@ -382,9 +429,7 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
     rw [show m' = fun y τ => ((x₀ τ)⁻¹ * Matrix.of (y τ) : Mt n) from funext hm']
     refine continuous_pi fun τ => continuous_pi fun a => continuous_pi fun c => ?_
     simp only [Matrix.mul_apply, Matrix.of_apply]
-    first
-    | fun_prop
-    | exact continuous_finset_sum _ fun j _ => continuous_const.mul (by fun_prop)
+    first | fun_prop | exact continuous_finset_sum _ fun j _ => continuous_const.mul (by fun_prop)
   have hPloc : P =ᶠ[𝓝 (fun τ => (x₀ τ : Mt n))] 0 := by
     have ht' : Tendsto m' (𝓝 (fun τ => (x₀ τ : Mt n))) (𝓝 (oneE ι n)) := by
       rw [← hm'0]; exact hm'c.continuousAt
@@ -392,8 +437,10 @@ theorem eq_zero_of_torus_law (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
     have hy' : P (m (m' y)) = 0 := by simpa [Function.comp] using hy
     rw [hmm' y] at hy'
     exact hy'
-  have hEq := GlobalTheory.SCV.eqOn_of_eventuallyEq hFo hFc hPd
-    (differentiableOn_const (0 : ℂ) : DifferentiableOn ℂ (0 : (ι → Fin n → Fin n → ℂ) → ℂ) _) hx0 hPloc
+  have hEq :=
+    GlobalTheory.SCV.eqOn_of_eventuallyEq hFo hFc hPd
+      (differentiableOn_const (0 : ℂ) : DifferentiableOn ℂ (0 : (ι → Fin n → Fin n → ℂ) → ℂ) _) hx0
+      hPloc
   intro u hu
   rw [hPf u hu]
   have hux : (fun τ => (u τ * x₀ τ : Mt n)) ∈ frDoms Hm q := by

@@ -27,8 +27,10 @@ def GramInv {ι : Type} [Fintype ι] [DecidableEq ι] (v : ι → V) : Prop :=
 
 variable {H}
 
-theorem h_right_zero {ι : Type} {v : ι → V} {w : V} (hw : ∀ i, H.h w (v i) = 0) {y : V}
-    (hy : y ∈ Submodule.span E (Set.range v)) : H.h w y = 0 := by
+theorem h_right_zero
+    {ι : Type} {v : ι → V} {w : V} (hw : ∀ i, H.h w (v i) = 0)
+    {y : V} (hy : y ∈ Submodule.span E (Set.range v))
+    : H.h w y = 0 := by
   have hspan : Submodule.span E (Set.range v) ≤ LinearMap.ker (hL H w) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
@@ -38,20 +40,23 @@ theorem h_right_zero {ι : Type} {v : ι → V} {w : V} (hw : ∀ i, H.h w (v i)
     rwa [LinearMap.mem_ker, hL_apply] at h1
   rw [H.h_herm, hy', map_zero]
 
-private theorem h_fintype_sum_smul_left {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E) (y : V) :
-    H.h (∑ j, c j • v j) y = ∑ j, c j * H.h (v j) y := by
+private theorem h_fintype_sum_smul_left {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E) (y : V)
+    : H.h (∑ j, c j • v j) y = ∑ j, c j * H.h (v j) y := by
   have h1 := map_sum (hL H y) (fun j => c j • v j) Finset.univ
   simp only [map_smul, smul_eq_mul, hL_apply] at h1
   exact h1
 
-private theorem h_sum_smul_eq_gram_mulVec {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E) (i : ι) :
-    H.h (∑ j, c j • v j) (v i) = (H.gram v *ᵥ c) i := by
+private theorem h_sum_smul_eq_gram_mulVec {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E) (i : ι)
+    : H.h (∑ j, c j • v j) (v i) = (H.gram v *ᵥ c) i := by
   rw [h_fintype_sum_smul_left]
   show ∑ j, c j * H.h (v j) (v i) = ∑ j, H.h (v j) (v i) * c j
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
-theorem eq_zero_of_orth {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι → V} (hN : GramInv H v) {z : V}
-    (hz : z ∈ Submodule.span E (Set.range v)) (h0 : ∀ i, H.h z (v i) = 0) : z = 0 := by
+theorem eq_zero_of_orth
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {v : ι → V} (hN : GramInv H v)
+    {z : V} (hz : z ∈ Submodule.span E (Set.range v)) (h0 : ∀ i, H.h z (v i) = 0)
+    : z = 0 := by
   obtain ⟨N, -, hNG⟩ := hN
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun (R := E)).1 hz
   have hc : H.gram v *ᵥ c = 0 := by
@@ -68,33 +73,45 @@ private theorem h_sub_left' (x y z : V) : H.h (x - y) z = H.h x z - H.h y z := b
   rw [hL_apply, hL_apply, hL_apply] at h1
   exact h1
 
-theorem decomp {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι → V} (hN : GramInv H v) {Λ : Submodule M.L.O V}
-    (hI : ∀ x ∈ Λ, ∀ y ∈ Λ, H.h x y ∈ M.L.O) (hv : ∀ i, v i ∈ Λ) {x : V} (hx : x ∈ Λ) :
-    ∃ c : ι → E, (∀ j, c j ∈ M.L.O) ∧ ∀ i, H.h (x - ∑ j, c j • v j) (v i) = 0 := by
+theorem decomp
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {v : ι → V} (hN : GramInv H v)
+    {Λ : Submodule M.L.O V} (hI : ∀ x ∈ Λ, ∀ y ∈ Λ, H.h x y ∈ M.L.O) (hv : ∀ i, v i ∈ Λ)
+    {x : V} (hx : x ∈ Λ)
+    : ∃ c : ι → E, (∀ j, c j ∈ M.L.O) ∧ ∀ i, H.h (x - ∑ j, c j • v j) (v i) = 0 := by
   obtain ⟨N, hNO, hNG⟩ := hN
   have hGN : H.gram v * N = 1 := by
     first
-      | exact mul_eq_one_comm.1 hNG
-      | (rw [← Matrix.inv_eq_left_inv hNG]
-         exact Matrix.mul_nonsing_inv _ (Matrix.isUnit_det_of_left_inverse hNG))
+    | exact mul_eq_one_comm.1 hNG
+    | (
+        rw [← Matrix.inv_eq_left_inv hNG]
+        exact Matrix.mul_nonsing_inv _ (Matrix.isUnit_det_of_left_inverse hNG)
+      )
   refine ⟨N *ᵥ fun k => H.h x (v k), fun j => ?_, fun i => ?_⟩
   · show ∑ k, N j k * H.h x (v k) ∈ M.L.O
     exact sum_mem fun k _ => mul_mem (hNO j k) (hI x hx (v k) (hv k))
   · rw [h_sub_left', h_sum_smul_eq_gram_mulVec v _ i, Matrix.mulVec_mulVec, hGN, Matrix.one_mulVec]
     exact sub_self _
 
-theorem comb_mem_span {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E) :
-    ∑ j, c j • v j ∈ Submodule.span E (Set.range v) :=
+theorem comb_mem_span {ι : Type} [Fintype ι] (v : ι → V) (c : ι → E)
+    : ∑ j, c j • v j ∈ Submodule.span E (Set.range v) :=
   Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
-theorem comb_mem_lat {ι : Type} [Fintype ι] {v : ι → V} {Λ : Submodule M.L.O V} (hv : ∀ i, v i ∈ Λ) {c : ι → E}
-    (hc : ∀ j, c j ∈ M.L.O) : ∑ j, c j • v j ∈ Λ :=
+theorem comb_mem_lat
+    {ι : Type} [Fintype ι]
+    {v : ι → V} {Λ : Submodule M.L.O V} (hv : ∀ i, v i ∈ Λ)
+    {c : ι → E} (hc : ∀ j, c j ∈ M.L.O)
+    : ∑ j, c j • v j ∈ Λ :=
   Submodule.sum_mem _ fun j _ => Λ.smul_mem (⟨c j, hc j⟩ : M.L.O) (hv j)
 
-theorem le_of_Lset {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι → V} (hN : GramInv H v)
-    {f : Fin (r + 1) → V} (hX : H.X f ≤ Submodule.span E (Set.range v)) {Λ₁ Λ₂ : Submodule M.L.O V}
+theorem le_of_Lset
+    {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    {v : ι → V} (hN : GramInv H v)
+    {f : Fin (r + 1) → V} (hX : H.X f ≤ Submodule.span E (Set.range v))
+    {Λ₁ Λ₂ : Submodule M.L.O V}
     (hI1 : ∀ x ∈ Λ₁, ∀ y ∈ Λ₁, H.h x y ∈ M.L.O) (hI2 : ∀ x ∈ Λ₂, ∀ y ∈ Λ₂, H.h x y ∈ M.L.O)
-    (hv1 : ∀ i, v i ∈ Λ₁) (hv2 : ∀ i, v i ∈ Λ₂) (hL : H.Lset Λ₁ f ⊆ H.Lset Λ₂ f) : Λ₁ ≤ Λ₂ := by
+    (hv1 : ∀ i, v i ∈ Λ₁) (hv2 : ∀ i, v i ∈ Λ₂) (hL : H.Lset Λ₁ f ⊆ H.Lset Λ₂ f)
+    : Λ₁ ≤ Λ₂ := by
   intro x hx
   obtain ⟨c, hcO, hc⟩ := decomp hN hI1 hv1 hx
   have hs2 : ∑ j, c j • v j ∈ Λ₂ := comb_mem_lat hv2 hcO
@@ -116,8 +133,10 @@ theorem le_of_Lset {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι �
     apply eq_zero_of_orth hN
     · have h1 : (y : V) - (x - ∑ j, c j • v j) ∈ Submodule.span E (Set.range v) := hX hdiff
       have h2 : ∑ j, d j • v j ∈ Submodule.span E (Set.range v) := comb_mem_span v d
-      have h3 : (x - ∑ j, c j • v j) - ((y : V) - ∑ j, d j • v j) =
-          ∑ j, d j • v j - ((y : V) - (x - ∑ j, c j • v j)) := by abel
+      have h3
+          : (x - ∑ j, c j • v j) - ((y : V) - ∑ j, d j • v j)
+            = ∑ j, d j • v j - ((y : V) - (x - ∑ j, c j • v j)) := by
+        abel
       rw [h3]
       exact Submodule.sub_mem _ h2 h1
     · intro i
@@ -128,10 +147,13 @@ theorem le_of_Lset {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι �
   have h4 := Λ₂.add_mem hx0' hs2
   rwa [sub_add_cancel] at h4
 
-theorem lat_eq_of_Lset {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] {v : ι → V} (hN : GramInv H v)
-    {f : Fin (r + 1) → V} (hX : H.X f ≤ Submodule.span E (Set.range v)) {Λ₁ Λ₂ : Submodule M.L.O V}
-    (h1 : H.IsSelfDual Λ₁) (h2 : H.IsSelfDual Λ₂) (hv1 : ∀ i, v i ∈ Λ₁) (hv2 : ∀ i, v i ∈ Λ₂)
-    (hL : H.Lset Λ₁ f = H.Lset Λ₂ f) : Λ₁ = Λ₂ := by
+theorem lat_eq_of_Lset
+    {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    {v : ι → V} (hN : GramInv H v)
+    {f : Fin (r + 1) → V} (hX : H.X f ≤ Submodule.span E (Set.range v))
+    {Λ₁ Λ₂ : Submodule M.L.O V} (h1 : H.IsSelfDual Λ₁) (h2 : H.IsSelfDual Λ₂) (hv1 : ∀ i, v i ∈ Λ₁)
+    (hv2 : ∀ i, v i ∈ Λ₂) (hL : H.Lset Λ₁ f = H.Lset Λ₂ f)
+    : Λ₁ = Λ₂ := by
   have hI1 : ∀ x ∈ Λ₁, ∀ y ∈ Λ₁, H.h x y ∈ M.L.O := fun x hx => (h1.2.2 x).1 hx
   have hI2 : ∀ x ∈ Λ₂, ∀ y ∈ Λ₂, H.h x y ∈ M.L.O := fun x hx => (h2.2.2 x).1 hx
   exact le_antisymm (le_of_Lset hN hX hI1 hI2 hv1 hv2 hL.subset)
@@ -141,11 +163,14 @@ theorem f_mem_MMfam {r : ℕ} (t : Term V M r) (a : Fin (r + 1)) : t.f a ∈ Set
   refine ⟨Sum.inl a, ?_⟩
   unfold Formalism.MainNotions.S.Loc.HermSp.MMfam
   first
-    | (generalize M.split = s
-       cases s <;> rfl)
-    | (rcases hs : M.split with _ | g <;> simp [hs])
+  | (
+      generalize M.split = s
+      cases s <;> rfl
+    )
+  | (rcases hs : M.split with _ | g <;> simp [hs])
 
-theorem X_le_MMfam {r : ℕ} (t : Term V M r) : H.X t.f ≤ Submodule.span E (Set.range (H.MMfam t)) := by
+theorem X_le_MMfam {r : ℕ} (t : Term V M r)
+    : H.X t.f ≤ Submodule.span E (Set.range (H.MMfam t)) := by
   unfold Formalism.MainNotions.S.Loc.HermSp.X
   apply Submodule.span_mono
   rintro _ ⟨a, rfl⟩

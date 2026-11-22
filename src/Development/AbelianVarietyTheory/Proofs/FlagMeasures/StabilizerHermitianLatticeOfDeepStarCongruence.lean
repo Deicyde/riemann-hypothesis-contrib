@@ -16,15 +16,16 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DegCnt.Stab
 
-variable {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-
+variable
+  {K V : Type}
+  [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [NumberField K] in
 theorem smul_eq (a : 𝓞 K) (v : V) : a • v = (a : K) • v := (algebraMap_smul K a v).symm
 
-theorem cancel {J : Ideal (𝓞 K)} (hJ : J ≠ ⊥) {M : Submodule (𝓞 K) V} {v : V}
-    (h : ∀ a ∈ J, a • v ∈ J • M) : v ∈ M := by
+theorem cancel
+    {J : Ideal (𝓞 K)} (hJ : J ≠ ⊥) {M : Submodule (𝓞 K) V} {v : V} (h : ∀ a ∈ J, a • v ∈ J • M)
+    : v ∈ M := by
   obtain ⟨c, hc, hc0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hJ
   obtain ⟨J', hJ'⟩ : J ∣ Ideal.span {c} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hc)
@@ -36,34 +37,38 @@ theorem cancel {J : Ideal (𝓞 K)} (hJ : J ≠ ⊥) {M : Submodule (𝓞 K) V} 
   have h2 : Ideal.span {c} • Submodule.span (𝓞 K) {v} ≤ Ideal.span {c} • M := by
     rw [hJ', mul_comm, Submodule.mul_smul, Submodule.mul_smul]
     exact Submodule.smul_mono le_rfl h1
-  have h3 := h2 (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self c)
-    (Submodule.mem_span_singleton_self v))
+  have h3 :=
+    h2 (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self c)
+      (Submodule.mem_span_singleton_self v))
   rw [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists] at h3
   obtain ⟨m, hm, hmv⟩ := h3
   rw [smul_eq, smul_eq] at hmv
   have hc1 : (c : K) ≠ 0 := by exact_mod_cast hc0
   rwa [← smul_right_injective V hc1 hmv]
 
-theorem exists_mul {M : Submodule (𝓞 K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V)) :
-    ∃ d : 𝓞 K, d ≠ 0 ∧ d • v ∈ M := by
+theorem exists_mul {M : Submodule (𝓞 K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V))
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ d • v ∈ M := by
   first
   | exact @_root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem
   | exact _root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem
   | (apply _root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem <;> assumption)
   | (intros; apply _root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.ExistsSmulMemLattice.exists_smul_mem ..)
 
 variable [StarRing K]
 
-
 omit [NumberField K] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
-theorem isom_of_mem {H : HermSpace K V} {r : ℕ} {F F' : FlagD H r} {s : V ≃ₗ[K] V}
-    (hs : s ∈ Subgroup.closure {s : V ≃ₗ[K] V | F.InN (s : V →ₗ[K] V) ∧ F'.InN (s : V →ₗ[K] V)}) :
-    s ∈ isomGrp H :=
-  (Subgroup.closure_le (k := {t : V ≃ₗ[K] V | F.InN (t : V →ₗ[K] V) ∧ F'.InN (t : V →ₗ[K] V)}) (isomGrp H)).2 (fun t ht =>
-    (mem_isomGrp H t).2 ht.1.1) hs
-
+theorem isom_of_mem
+    {H : HermSpace K V} {r : ℕ} {F F' : FlagD H r} {s : V ≃ₗ[K] V}
+    (hs : s ∈ Subgroup.closure {s : V ≃ₗ[K] V | F.InN (s : V →ₗ[K] V) ∧ F'.InN (s : V →ₗ[K] V)})
+    : s ∈ isomGrp H :=
+  (Subgroup.closure_le (k := {t : V ≃ₗ[K] V | F.InN (t : V →ₗ[K] V) ∧ F'.InN (t : V →ₗ[K] V)})
+    (isomGrp H)).2 (fun t ht => (mem_isomGrp H t).2 ht.1.1) hs
 
 omit [NumberField K] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
 theorem le_perp_perp (H : HermSpace K V) (S : Submodule K V) : S ≤ perp H (perp H S) := by
@@ -74,15 +79,31 @@ theorem le_perp_perp (H : HermSpace K V) (S : Submodule K V) : S ≤ perp H (per
 
 end GlobalTheory.DegCnt.Stab
 
-
 open GlobalTheory.DegCnt.Stab in
-theorem GlobalTheory.DegCnt.stab_of_deep_congruence : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V), Formalism.HermitianLatticesTheory.IsCMUnram K → ∀ (r : ℕ) (N : NF H r), ∀ (g : ℕ) (Λ : Submodule (𝓞 K) V), 1 ≤ g → N.IsTerm g Λ → ∀ 𝔠 : Ideal (𝓞 K), 𝔠 ≠ ⊥ → (∀ x ∈ 𝔠, ∃ y ∈ 𝔠, (y : K) = star (x : K)) → (∀ x ∈ 𝔠, (N.T : 𝓞 K) ∣ x) → (∀ (l : ℕ) (hl : l ≤ r + 1), l ≤ N.j → Dl N.F N.F' l hl ≠ 0 → ∀ x ∈ 𝔠, ∀ y ∈ ipow N.𝔡 (2 * ∑ a ∈ Finset.range l, ((r : ℤ) - a)), (x : K) * y / Dl N.F N.F' l hl ∈ (1 : Submodule (𝓞 K) K) ∧ (x : K) * y / star (Dl N.F N.F' l hl) ∈ (1 : Submodule (𝓞 K) K)) → ∀ e : ℕ, N.Split Λ → N.Near (𝔠 ^ e) Λ → ∀ s ∈ N.Rs, (∀ x ∈ N.P0, s x - x ∈ 𝔠 ^ (3 * e + 10) • N.P0) → s • Λ = Λ := by
+theorem GlobalTheory.DegCnt.stab_of_deep_congruence
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (H : HermSpace K V),
+      Formalism.HermitianLatticesTheory.IsCMUnram K
+        → ∀ (r : ℕ) (N : NF H r), ∀ (g : ℕ) (Λ : Submodule (𝓞 K) V),
+          1 ≤ g → N.IsTerm g Λ
+            → ∀ 𝔠 : Ideal (𝓞 K),
+              𝔠 ≠ ⊥ → (∀ x ∈ 𝔠, ∃ y ∈ 𝔠, (y : K) = star (x : K)) → (∀ x ∈ 𝔠, (N.T : 𝓞 K) ∣ x)
+                → (∀ (l : ℕ) (hl : l ≤ r + 1),
+                  l ≤ N.j → Dl N.F N.F' l hl ≠ 0
+                    → ∀ x ∈ 𝔠, ∀ y ∈ ipow N.𝔡 (2 * ∑ a ∈ Finset.range l, ((r : ℤ) - a)),
+                      (x : K) * y / Dl N.F N.F' l hl ∈ (1 : Submodule (𝓞 K) K)
+                        ∧ (x : K) * y / star (Dl N.F N.F' l hl) ∈ (1 : Submodule (𝓞 K) K))
+                → ∀ e : ℕ,
+                  N.Split Λ → N.Near (𝔠 ^ e) Λ
+                    → ∀ s ∈ N.Rs, (∀ x ∈ N.P0, s x - x ∈ 𝔠 ^ (3 * e + 10) • N.P0) → s • Λ = Λ := by
   intro K V _ _ _ _ _ _ _ _ H hK r N g Λ hg hΛ 𝔠 h0 h1 h2 h3 e hsp hn s hs hcong
-  have hkill := (GlobalTheory.T.hermFramePair_ideal_kills_discriminantModules K V H hK r N g Λ hg hΛ 𝔠 h0 h1 h2 h3).1
-  have hcompl : IsCompl N.Wt N.Pi := (GlobalTheory.T.hermFramePairNormalForm_geometry_summary K V H hK r N).2.2.1
+  have hkill :=
+    (GlobalTheory.T.hermFramePair_ideal_kills_discriminantModules K V H hK r N g Λ hg hΛ 𝔠 h0 h1 h2
+      h3).1
+  have hcompl : IsCompl N.Wt N.Pi :=
+    (GlobalTheory.T.hermFramePairNormalForm_geometry_summary K V H hK r N).2.2.1
   have hiso := (mem_isomGrp H s).1 (isom_of_mem hs.1)
-  have hfix : ∀ w ∈ N.Wt, s w = w := fun w hw =>
-    (mem_fixingSubgroup_iff (V ≃ₗ[K] V)).1 hs.2 w hw
+  have hfix : ∀ w ∈ N.Wt, s w = w := fun w hw => (mem_fixingSubgroup_iff (V ≃ₗ[K] V)).1 hs.2 w hw
   have hdual : dual H Λ = Λ := hΛ.1.1.2
   have hspan : Submodule.span K (Λ : Set V) = ⊤ := hΛ.1.1.1.2
   have hint : ∀ x ∈ Λ, ∀ y ∈ Λ, H.B x y ∈ (1 : Submodule (𝓞 K) K) := fun x hx =>
@@ -92,15 +113,16 @@ theorem GlobalTheory.DegCnt.stab_of_deep_congruence : ∀ (K V : Type) [Field K]
       (le_perp_perp H (V0 N.F N.F' ⊔ N.Ist))
   have hle : ∀ x ∈ Λ, s x ∈ Λ := by
     intro x hx
-    obtain ⟨w, hw, p, hp, rfl⟩ := Submodule.mem_sup.1
-      (hcompl.sup_eq_top ▸ Submodule.mem_top : x ∈ N.Wt ⊔ N.Pi)
+    obtain ⟨w, hw, p, hp, rfl⟩ :=
+      Submodule.mem_sup.1 (hcompl.sup_eq_top ▸ Submodule.mem_top : x ∈ N.Wt ⊔ N.Pi)
     have hpw : ∀ y ∈ N.Wt, H.B p y = 0 := (mem_perp_iff H N.Wt p).1 hp
     have hwd : w ∈ dual H (latTh N.F N.F' Λ) := by
       rw [hsp, mem_dual_iff]
       constructor
       · obtain ⟨d, hd, hdw⟩ := exists_mul (M := Λ) (v := w) (hspan ▸ Submodule.mem_top)
         have hd1 : (d : K) ≠ 0 := by exact_mod_cast hd
-        have hw' : w = (d : K)⁻¹ • (d • w) := by rw [smul_eq, smul_smul, inv_mul_cancel₀ hd1, one_smul]
+        have hw' : w = (d : K)⁻¹ • (d • w) := by
+          rw [smul_eq, smul_smul, inv_mul_cancel₀ hd1, one_smul]
         rw [hw']
         refine Submodule.smul_mem _ _ (Submodule.subset_span ?_)
         exact Submodule.mem_sup_left ⟨hdw, (rs (𝓞 K) N.Wt).smul_mem d hw⟩

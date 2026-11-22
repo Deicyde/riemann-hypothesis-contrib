@@ -13,9 +13,11 @@ open MvPolynomial Filter
 
 noncomputable section
 
-theorem totalDegree_bind₁_le_of_le_one {σ τ R : Type*} [CommSemiring R]
-    (f : σ → MvPolynomial τ R) (hf : ∀ i, (f i).totalDegree ≤ 1) (p : MvPolynomial σ R) :
-    (bind₁ f p).totalDegree ≤ p.totalDegree := by
+theorem totalDegree_bind₁_le_of_le_one
+    {σ τ R : Type*} [CommSemiring R]
+    (f : σ → MvPolynomial τ R) (hf : ∀ i, (f i).totalDegree ≤ 1)
+    (p : MvPolynomial σ R)
+    : (bind₁ f p).totalDegree ≤ p.totalDegree := by
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [p.as_sum, map_sum]
   refine (totalDegree_finsetSum _ _).trans (Finset.sup_le fun s hs => ?_)
@@ -42,7 +44,8 @@ theorem EventuallyPolyShift.proof : EventuallyPolyShift.Statement := by
     refine congrArg (fun x => eval x p) (funext fun k => ?_)
     simp
   · exact totalDegree_bind₁_le_of_le_one _
-      (fun k => (totalDegree_sub_C_le _ _).trans (totalDegree_X k).le) p
+      (fun k => (totalDegree_sub_C_le _ _).trans (totalDegree_X k).le)
+      p
   · rintro rfl
     exact map_zero _
 

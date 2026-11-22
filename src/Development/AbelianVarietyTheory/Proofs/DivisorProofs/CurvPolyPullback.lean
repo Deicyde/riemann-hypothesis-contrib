@@ -18,11 +18,11 @@ theorem eq_sum_coordVec {n : ℕ} (v : V n) : v = ∑ a, v.ofLp a • coordVec a
   ext j
   simp [Pi.single_apply]
 
-theorem sesq_expand {n : ℕ} (F : V n → V n → ℂ)
-    (h1 : ∀ x y z, F (x + y) z = F x z + F y z) (h2 : ∀ (c : ℂ) x z, F (c • x) z = c * F x z)
-    (h3 : ∀ x y z, F x (y + z) = F x y + F x z)
-    (h4 : ∀ (c : ℂ) x z, F x (c • z) = conj c * F x z) (ξ η : V n) :
-    F ξ η = ∑ a, ∑ b, ξ.ofLp a * conj (η.ofLp b) * F (coordVec a) (coordVec b) := by
+theorem sesq_expand
+    {n : ℕ} (F : V n → V n → ℂ) (h1 : ∀ x y z, F (x + y) z = F x z + F y z)
+    (h2 : ∀ (c : ℂ) x z, F (c • x) z = c * F x z) (h3 : ∀ x y z, F x (y + z) = F x y + F x z)
+    (h4 : ∀ (c : ℂ) x z, F x (c • z) = conj c * F x z) (ξ η : V n)
+    : F ξ η = ∑ a, ∑ b, ξ.ofLp a * conj (η.ofLp b) * F (coordVec a) (coordVec b) := by
   have s1 (z : V n) (f : Fin n → V n) : F (∑ a, f a) z = ∑ a, F (f a) z :=
     map_sum (AddMonoidHom.mk' (fun x => F x z) fun x y => h1 x y z) f Finset.univ
   have s2 (x : V n) (f : Fin n → V n) : F x (∑ a, f a) = ∑ a, F x (f a) :=
@@ -33,18 +33,16 @@ theorem sesq_expand {n : ℕ} (F : V n → V n → ℂ)
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [h2, h4, mul_assoc]
 
-theorem curv_expand {n : ℕ} {r : Type} [Fintype r] [DecidableEq r] {G : V n → Matrix r r ℂ} {z : V n}
-    (h : MContDiffAt 2 G z) (hu : IsUnit (G z).det) (ξ η : V n) (i j : r) :
-    curv G z ξ η i j =
-      ∑ a, ∑ b, ξ.ofLp a * conj (η.ofLp b) * curv G z (coordVec a) (coordVec b) i j := by
-  have m1 (x y w : V n) : mddbar G z (x + y) w = mddbar G z x w + mddbar G z y w := by
-    ext a b; simp
-  have m2 (c : ℂ) (x w : V n) : mddbar G z (c • x) w = c • mddbar G z x w := by
-    ext a b; simp
-  have m3 (x y w : V n) : mddbar G z x (y + w) = mddbar G z x y + mddbar G z x w := by
-    ext a b; simp
-  have m4 (c : ℂ) (x w : V n) : mddbar G z x (c • w) = conj c • mddbar G z x w := by
-    ext a b; simp
+theorem curv_expand
+    {n : ℕ} {r : Type} [Fintype r] [DecidableEq r]
+    {G : V n → Matrix r r ℂ} {z : V n} (h : MContDiffAt 2 G z) (hu : IsUnit (G z).det)
+    (ξ η : V n) (i j : r)
+    : curv G z ξ η i j
+      = ∑ a, ∑ b, ξ.ofLp a * conj (η.ofLp b) * curv G z (coordVec a) (coordVec b) i j := by
+  have m1 (x y w : V n) : mddbar G z (x + y) w = mddbar G z x w + mddbar G z y w := by ext a b; simp
+  have m2 (c : ℂ) (x w : V n) : mddbar G z (c • x) w = c • mddbar G z x w := by ext a b; simp
+  have m3 (x y w : V n) : mddbar G z x (y + w) = mddbar G z x y + mddbar G z x w := by ext a b; simp
+  have m4 (c : ℂ) (x w : V n) : mddbar G z x (c • w) = conj c • mddbar G z x w := by ext a b; simp
   refine sesq_expand (fun ξ η => curv G z ξ η i j) ?_ ?_ ?_ ?_ ξ η
   · intro x y w
     simp only [curv_eq h hu, mdel_add_vec, m1, transpose_add, Matrix.mul_add, Matrix.sub_apply,

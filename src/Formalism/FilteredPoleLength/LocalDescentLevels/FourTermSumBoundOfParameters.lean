@@ -12,28 +12,32 @@ theorem four_term_sum_bound : FourTermSumBound := by
     have : PP ^ 2 * D ^ 3 * C * k * f * b / T = PP ^ 2 * (D ^ 3 * (C * k * f * b) / T) := by ring
     rw [this]
     gcongr
-  have e3 : PP ^ 2 * ((RR ^ 2 * c + 1 / T) * κ / ga) ≤
-      PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga := by
-    have : PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga =
-        PP ^ 2 * ((RR ^ 2 * c + 1 / T) * (C * k * f * b) / ga) := by ring
+  have e3
+      : PP ^ 2 * ((RR ^ 2 * c + 1 / T) * κ / ga)
+        ≤ PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga := by
+    have : PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga
+        = PP ^ 2 * ((RR ^ 2 * c + 1 / T) * (C * k * f * b) / ga) := by
+      ring
     rw [this]
     gcongr
-  have tot : PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + PP ^ 3 * T ≤
-      f * m * b * δ₂ := by
-    have : PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) =
-        PP ^ 2 * (D ^ 3 * κ / T) + PP ^ 2 * T * c + PP ^ 2 * ((RR ^ 2 * c + 1 / T) * κ / ga) := by
+  have tot
+      : PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + PP ^ 3 * T
+        ≤ f * m * b * δ₂ := by
+    have : PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga)
+        = PP ^ 2 * (D ^ 3 * κ / T) + PP ^ 2 * T * c + PP ^ 2 * ((RR ^ 2 * c + 1 / T) * κ / ga) := by
       ring
     rw [this]
     linarith
-  calc d * PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + d * PP ^ 3 * T
-      = d * (PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + PP ^ 3 * T) := by
-        ring
+  calc
+    d * PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + d * PP ^ 3 * T
+        = d * (PP ^ 2 * (D ^ 3 * κ / T + T * c + (RR ^ 2 * c + 1 / T) * κ / ga) + PP ^ 3 * T) := by
+      ring
     _ ≤ d * (f * m * b * δ₂) := mul_le_mul_of_nonneg_left tot hd
     _ = d * f * m * b * δ₂ := by ring
 
 theorem four_term_sum_bound_of_parameters : FourTermSumBoundOfParameters := by
-  intro d PP D κ T c RR ga C k f b m δ₂ q DF g₀ hd hT hTga hPP hD hRR hq hC hk hf hb hm hδ
-    hκ h0 hTlow hc hg₀ hTc hqlow hTPP hPP2
+  intro d PP D κ T c RR ga C k f b m δ₂ q DF g₀ hd hT hTga hPP hD hRR hq hC hk hf hb hm hδ hκ h0
+    hTlow hc hg₀ hTc hqlow hTPP hPP2
   have hga : 0 < ga := lt_of_lt_of_le hT hTga
   have hc0 : 0 ≤ c := by rw [hc]; positivity
   have hK : 0 ≤ C * k * f * b := by positivity
@@ -79,7 +83,8 @@ theorem four_term_sum_bound_of_parameters : FourTermSumBoundOfParameters := by
       linarith
     have a2 : PP ^ 2 * (RR ^ 2 * c + 1 / T) * (C * k * f * b) ≤ PP ^ 2 * D ^ 3 * (C * k * f * b) :=
       mul_le_mul_of_nonneg_right a1 hK
-    calc PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga
+    calc
+      PP ^ 2 * (RR ^ 2 * c + 1 / T) * C * k * f * b / ga
         = PP ^ 2 * (RR ^ 2 * c + 1 / T) * (C * k * f * b) / ga := by ring
       _ ≤ PP ^ 2 * D ^ 3 * (C * k * f * b) / ga := by gcongr
       _ ≤ PP ^ 2 * D ^ 3 * (C * k * f * b) / T := by gcongr

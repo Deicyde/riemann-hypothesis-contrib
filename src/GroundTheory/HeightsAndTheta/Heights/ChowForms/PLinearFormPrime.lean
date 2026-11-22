@@ -13,8 +13,8 @@ open MvPolynomial
 
 noncomputable section
 
-theorem linearForm_coeff_single {F : Type} [Field F] {n : ℕ} (a : Fin n → F) (i : Fin n) :
-    (∑ m, X m * C (a m) : MvPolynomial (Fin n) F).coeff (Finsupp.single i 1) = a i := by
+theorem linearForm_coeff_single {F : Type} [Field F] {n : ℕ} (a : Fin n → F) (i : Fin n)
+    : (∑ m, X m * C (a m) : MvPolynomial (Fin n) F).coeff (Finsupp.single i 1) = a i := by
   classical
   rw [coeff_sum, Finset.sum_eq_single i]
   · rw [mul_comm, coeff_C_mul, coeff_X]

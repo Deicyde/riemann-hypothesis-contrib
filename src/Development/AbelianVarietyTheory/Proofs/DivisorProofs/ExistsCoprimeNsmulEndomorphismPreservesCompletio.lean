@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HopfOrderPul
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 
@@ -31,8 +34,8 @@ variable {p : ℕ} [Fact p.Prime]
 theorem inAf_mem (D : Datum p) (x : D.La) : inAf D x ∈ LaHat D :=
   AddSubgroup.subset_closure ⟨1, x, fun v => by rw [map_one]; exact one_mem _, rfl⟩
 
-theorem smul_mem (D : Datum p) {a : AfP p} (ha : IsIntAf a) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) :
-    a • v ∈ LaHat D := by
+theorem smul_mem (D : Datum p) {a : AfP p} (ha : IsIntAf a) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D)
+    : a • v ∈ LaHat D := by
   induction hv using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨c, x, hc, rfl⟩ := hz
@@ -43,9 +46,12 @@ theorem smul_mem (D : Datum p) {a : AfP p} (ha : IsIntAf a) {v : AfP p ⊗[ℚ] 
   | add x y _ _ hx hy => rw [smul_add]; exact add_mem hx hy
   | neg x _ hx => rw [smul_neg]; exact neg_mem hx
 
-theorem exists_nsmul_mem (D : Datum p) (v : AfP p ⊗[ℚ] VQ D) : ∃ d : ℕ, 0 < d ∧ d • v ∈ LaHat D := by
-  have hadd : ∀ u w : AfP p ⊗[ℚ] VQ D, (∃ d : ℕ, 0 < d ∧ d • u ∈ LaHat D) → (∃ d : ℕ, 0 < d ∧ d • w ∈ LaHat D) →
-      ∃ d : ℕ, 0 < d ∧ d • (u + w) ∈ LaHat D := by
+theorem exists_nsmul_mem (D : Datum p) (v : AfP p ⊗[ℚ] VQ D)
+    : ∃ d : ℕ, 0 < d ∧ d • v ∈ LaHat D := by
+  have hadd
+      : ∀ u w : AfP p ⊗[ℚ] VQ D,
+        (∃ d : ℕ, 0 < d ∧ d • u ∈ LaHat D) → (∃ d : ℕ, 0 < d ∧ d • w ∈ LaHat D)
+          → ∃ d : ℕ, 0 < d ∧ d • (u + w) ∈ LaHat D := by
     rintro u w ⟨d, hd, hu⟩ ⟨e, he, hw⟩
     refine ⟨d * e, Nat.mul_pos hd he, ?_⟩
     have : (d * e) • (u + w) = e • (d • u) + d • (e • w) := by
@@ -81,8 +87,8 @@ theorem isIntAf_inv : IsIntAf (algebraMap ℚ (AfP p) (p : ℚ)⁻¹) := by
   simp only [eq_intCast, Int.cast_natCast] at h1
   rw [h1, inv_one]
 
-theorem exists_coprime_nsmul_mem (D : Datum p) (v : AfP p ⊗[ℚ] VQ D) :
-    ∃ t : ℕ, 0 < t ∧ t.Coprime p ∧ t • v ∈ LaHat D := by
+theorem exists_coprime_nsmul_mem (D : Datum p) (v : AfP p ⊗[ℚ] VQ D)
+    : ∃ t : ℕ, 0 < t ∧ t.Coprime p ∧ t • v ∈ LaHat D := by
   obtain ⟨d, hd, h⟩ := exists_nsmul_mem D v
   obtain ⟨k, t, ht, hdt⟩ := Nat.exists_eq_pow_mul_and_not_dvd hd.ne' p (Fact.out : p.Prime).ne_one
   have ht0 : 0 < t := Nat.pos_of_ne_zero fun h => ht (h ▸ dvd_zero p)
@@ -92,13 +98,15 @@ theorem exists_coprime_nsmul_mem (D : Datum p) (v : AfP p ⊗[ℚ] VQ D) :
   have hm := smul_mem D hint h
   have hp : (p : ℚ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
   convert hm using 1
-  rw [hdt, ← map_pow, algebraMap_smul, ← Nat.cast_smul_eq_nsmul ℚ, ← Nat.cast_smul_eq_nsmul ℚ, smul_smul]
+  rw [hdt, ← map_pow, algebraMap_smul, ← Nat.cast_smul_eq_nsmul ℚ, ← Nat.cast_smul_eq_nsmul ℚ,
+    smul_smul]
   congr 1
   push_cast
   rw [inv_pow, ← _root_.mul_assoc, inv_mul_cancel₀ (pow_ne_zero _ hp), _root_.one_mul]
 
-theorem exists_coprime_nsmul_map_mem : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p)
-    (A : Module.End (AfP p) (AfP p ⊗[ℚ] VQ D)), ∃ j : ℕ, 0 < j ∧ j.Coprime p ∧ ∀ v ∈ LaHat D, j • A v ∈ LaHat D := by
+theorem exists_coprime_nsmul_map_mem
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (A : Module.End (AfP p) (AfP p ⊗[ℚ] VQ D)), ∃ j : ℕ,
+      0 < j ∧ j.Coprime p ∧ ∀ v ∈ LaHat D, j • A v ∈ LaHat D := by
   intro p _ D A
   have := D.freeLa
   have := D.finLa
@@ -116,14 +124,16 @@ theorem exists_coprime_nsmul_map_mem : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p
       exact nsmul_mem (ht i) k
     | zero =>
       have : inAf D 0 = 0 := by simp [inAf]
-      rw [this, map_zero, smul_zero]; exact zero_mem _
+      rw [this, map_zero, smul_zero]
+      exact zero_mem _
     | add y z _ _ hy hz =>
       have : inAf D (y + z) = inAf D y + inAf D z := by simp only [inAf, TensorProduct.tmul_add]
-      rw [this, map_add (f := _), smul_add]; exact add_mem hy hz
+      rw [this, map_add (f := _), smul_add]
+      exact add_mem hy hz
     | smul c y _ hy =>
-      have : inAf D (c • y) = c • inAf D y := by
-        simp only [inAf, TensorProduct.tmul_smul]
-      rw [this, map_zsmul, smul_comm]; exact zsmul_mem hy c
+      have : inAf D (c • y) = c • inAf D y := by simp only [inAf, TensorProduct.tmul_smul]
+      rw [this, map_zsmul, smul_comm]
+      exact zsmul_mem hy c
   intro v hv
   induction hv using AddSubgroup.closure_induction with
   | mem z hz =>

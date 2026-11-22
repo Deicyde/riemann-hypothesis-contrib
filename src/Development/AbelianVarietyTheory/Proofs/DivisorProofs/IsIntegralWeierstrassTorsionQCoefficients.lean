@@ -37,18 +37,20 @@ private lemma isIntegral_natCast_div_one_sub_of_isIntegral_of_ne_one (ζ : ℂ) 
   rw [hq]
   exact (IsIntegral.sum _ fun i _ => (isIntegral_natCast i).mul (hζ.pow i)).neg
 
-
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate in
-theorem _root_.GlobalTheory.WpFam.isIntegral_coefficients : ∀ (N : ℕ) [NeZero N] (M : ℕ) (x : Fin 2 → ZMod N) (k : ℕ),
-    0 < M → M • x = 0 → IsIntegral ℤ ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k) ∧
-      IsIntegral ℤ ((M : ℂ) ^ 3 * _root_.GlobalTheory.WpFam.cD N x k) ∧ IsIntegral ℤ (12 * (M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cP N x k) ∧
-      IsIntegral ℤ (12 * _root_.GlobalTheory.WpFam.cG N k) := by
+theorem _root_.GlobalTheory.WpFam.isIntegral_coefficients
+    : ∀ (N : ℕ) [NeZero N] (M : ℕ) (x : Fin 2 → ZMod N) (k : ℕ),
+      0 < M → M • x = 0
+        → IsIntegral ℤ ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k)
+          ∧ IsIntegral ℤ ((M : ℂ) ^ 3 * _root_.GlobalTheory.WpFam.cD N x k)
+          ∧ IsIntegral ℤ (12 * (M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cP N x k)
+          ∧ IsIntegral ℤ (12 * _root_.GlobalTheory.WpFam.cG N k) := by
   intro N _ M x k _ hx
-  obtain ⟨-, -, hzero, -, hpow, -, -, hint⟩ :=
-    _root_.GlobalTheory.WpFam.AddCharZMod.main N
+  obtain ⟨-, -, hzero, -, hpow, -, -, hint⟩ := _root_.GlobalTheory.WpFam.AddCharZMod.main N
   have h12 : IsIntegral ℤ (12 : ℂ) := by simpa using isIntegral_natCast (R := ℤ) (B := ℂ) 12
-  have htw : ∀ (a : ℕ) (s : ℂ), IsIntegral ℤ s →
-      IsIntegral ℤ (_root_.GlobalTheory.WpFam.cSum N a s x k) := by
+  have htw
+      : ∀ (a : ℕ) (s : ℂ),
+        IsIntegral ℤ s → IsIntegral ℤ (_root_.GlobalTheory.WpFam.cSum N a s x k) := by
     intro a s hs
     unfold _root_.GlobalTheory.WpFam.cSum
     refine IsIntegral.sum _ fun m _ => ((isIntegral_natCast m).pow a).mul ?_
@@ -66,8 +68,9 @@ theorem _root_.GlobalTheory.WpFam.isIntegral_coefficients : ∀ (N : ℕ) [NeZer
       exact isIntegral_one.neg
     · exact h12.mul ((isIntegral_natCast 2).mul (isIntegral_natCast _))
     · simp [isIntegral_zero]
-  have hB : IsIntegral ℤ ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k) ∧
-      IsIntegral ℤ ((M : ℂ) ^ 3 * _root_.GlobalTheory.WpFam.cD N x k) := by
+  have hB
+      : IsIntegral ℤ ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k)
+        ∧ IsIntegral ℤ ((M : ℂ) ^ 3 * _root_.GlobalTheory.WpFam.cD N x k) := by
     unfold _root_.GlobalTheory.WpFam.cB _root_.GlobalTheory.WpFam.cD
     split_ifs with hk h0
     · by_cases h1 : _root_.GlobalTheory.WpFam.ch N (x 1) = 1
@@ -78,25 +81,34 @@ theorem _root_.GlobalTheory.WpFam.isIntegral_coefficients : ∀ (N : ℕ) [NeZer
           rw [← hpow, hx1, hzero]
         have hq := isIntegral_natCast_div_one_sub_of_isIntegral_of_ne_one _ M (hint (x 1)) hζM h1
         constructor
-        · rw [show (M : ℂ) ^ 2 * (_root_.GlobalTheory.WpFam.ch N (x 1) / (1 - _root_.GlobalTheory.WpFam.ch N (x 1)) ^ 2)
-              = _root_.GlobalTheory.WpFam.ch N (x 1) * ((M : ℂ) / (1 - _root_.GlobalTheory.WpFam.ch N (x 1))) ^ 2 by
-              rw [div_pow]; ring]
+        · rw [show (M : ℂ) ^ 2
+                * (_root_.GlobalTheory.WpFam.ch N (x 1)
+                  / (1 - _root_.GlobalTheory.WpFam.ch N (x 1)) ^ 2)
+              = _root_.GlobalTheory.WpFam.ch N (x 1)
+                * ((M : ℂ) / (1 - _root_.GlobalTheory.WpFam.ch N (x 1))) ^ 2 by
+            rw [div_pow]; ring]
           exact (hint _).mul (hq.pow 2)
-        · rw [show (M : ℂ) ^ 3 * (_root_.GlobalTheory.WpFam.ch N (x 1) * (1 + _root_.GlobalTheory.WpFam.ch N (x 1)) /
-              (1 - _root_.GlobalTheory.WpFam.ch N (x 1)) ^ 3) = _root_.GlobalTheory.WpFam.ch N (x 1) *
-              (1 + _root_.GlobalTheory.WpFam.ch N (x 1)) *
-              ((M : ℂ) / (1 - _root_.GlobalTheory.WpFam.ch N (x 1))) ^ 3 by rw [div_pow]; ring]
+        · rw [show (M : ℂ) ^ 3
+                * (_root_.GlobalTheory.WpFam.ch N (x 1) * (1 + _root_.GlobalTheory.WpFam.ch N (x 1))
+                  / (1 - _root_.GlobalTheory.WpFam.ch N (x 1)) ^ 3)
+              = _root_.GlobalTheory.WpFam.ch N (x 1) * (1 + _root_.GlobalTheory.WpFam.ch N (x 1))
+                * ((M : ℂ) / (1 - _root_.GlobalTheory.WpFam.ch N (x 1))) ^ 3 by
+            rw [div_pow]; ring]
           exact ((hint _).mul (isIntegral_one.add (hint _))).mul (hq.pow 3)
     · simp [isIntegral_zero]
-    · exact ⟨((isIntegral_natCast M).pow 2).mul (htw 1 1 isIntegral_one),
-        ((isIntegral_natCast M).pow 3).mul (htw 2 (-1) isIntegral_one.neg)⟩
+    · exact ⟨
+        ((isIntegral_natCast M).pow 2).mul (htw 1 1 isIntegral_one),
+        ((isIntegral_natCast M).pow 3).mul (htw 2 (-1) isIntegral_one.neg)
+      ⟩
   refine ⟨hB.1, hB.2, ?_, hG⟩
   unfold _root_.GlobalTheory.WpFam.cP
   split_ifs
   · simp [isIntegral_zero]
-  · rw [show 12 * (M : ℂ) ^ 2 * (_root_.GlobalTheory.WpFam.cB N x k - _root_.GlobalTheory.WpFam.cG N k)
-        = 12 * ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k) -
-          (M : ℂ) ^ 2 * (12 * _root_.GlobalTheory.WpFam.cG N k) by ring]
+  · rw [show 12 * (M : ℂ) ^ 2
+          * (_root_.GlobalTheory.WpFam.cB N x k - _root_.GlobalTheory.WpFam.cG N k)
+        = 12 * ((M : ℂ) ^ 2 * _root_.GlobalTheory.WpFam.cB N x k)
+          - (M : ℂ) ^ 2 * (12 * _root_.GlobalTheory.WpFam.cG N k) by
+      ring]
     exact (h12.mul hB.1).sub (((isIntegral_natCast M).pow 2).mul hG)
 
 end GlobalTheory.WpFam

@@ -18,13 +18,14 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem card_filter_val_lt_alt (n m : ℕ) (hm : m ≤ n) :
-    (Finset.univ.filter (fun j : Fin n => (j : ℕ) < m)).card = m := by
-  have h : (Finset.univ.filter (fun j : Fin n => (j : ℕ) < m)).map Fin.valEmbedding =
-      Finset.range m := by
+theorem card_filter_val_lt_alt (n m : ℕ) (hm : m ≤ n)
+    : (Finset.univ.filter (fun j : Fin n => (j : ℕ) < m)).card = m := by
+  have h
+      : (Finset.univ.filter (fun j : Fin n => (j : ℕ) < m)).map Fin.valEmbedding
+        = Finset.range m := by
     ext k
-    simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and,
-      Fin.valEmbedding_apply, Finset.mem_range]
+    simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and, Fin.valEmbedding_apply,
+      Finset.mem_range]
     constructor
     · rintro ⟨j, hj, rfl⟩
       exact hj
@@ -32,25 +33,28 @@ theorem card_filter_val_lt_alt (n m : ℕ) (hm : m ≤ n) :
       exact ⟨⟨k, lt_of_lt_of_le hk hm⟩, hk, rfl⟩
   rw [← Finset.card_map, h, Finset.card_range]
 
-theorem sum_ite_val_lt_one (n m : ℕ) (hm : m ≤ n) :
-    (∑ j : Fin n, if (j : ℕ) < m then (1 : ℝ) else 0) = m := by
+theorem sum_ite_val_lt_one (n m : ℕ) (hm : m ≤ n)
+    : (∑ j : Fin n, if (j : ℕ) < m then (1 : ℝ) else 0) = m := by
   simp only [Finset.sum_boole]
   exact_mod_cast card_filter_val_lt_alt n m hm
 
-theorem sum_ite_val_lt_sub_mul (n m : ℕ) (hm : m ≤ n) (x : Fin n → ℝ) (a : ℝ) :
-    (∑ j : Fin n, if (j : ℕ) < m then x j else 0) - a * m =
-      ∑ j : Fin n, if (j : ℕ) < m then x j - a else 0 := by
-  have h : ∀ j : Fin n, (if (j : ℕ) < m then x j - a else 0) =
-      (if (j : ℕ) < m then x j else 0) - a * (if (j : ℕ) < m then (1 : ℝ) else 0) := by
+theorem sum_ite_val_lt_sub_mul (n m : ℕ) (hm : m ≤ n) (x : Fin n → ℝ) (a : ℝ)
+    : (∑ j : Fin n, if (j : ℕ) < m then x j else 0) - a * m
+      = ∑ j : Fin n, if (j : ℕ) < m then x j - a else 0 := by
+  have h
+      : ∀ j : Fin n,
+        (if (j : ℕ) < m then x j - a else 0)
+          = (if (j : ℕ) < m then x j else 0) - a * (if (j : ℕ) < m then (1 : ℝ) else 0) := by
     intro j
     split_ifs <;> ring
   rw [Finset.sum_congr rfl (fun j _ => h j), Finset.sum_sub_distrib, ← Finset.mul_sum,
     sum_ite_val_lt_one n m hm]
 
-theorem sum_ite_val_lt_sub_mul_mono (n m₁ m₂ : ℕ) (h₁₂ : m₁ ≤ m₂) (h₂ : m₂ ≤ n) (x : Fin n → ℝ) (a : ℝ)
-    (hx : ∀ j : Fin n, m₁ ≤ (j : ℕ) → (j : ℕ) < m₂ → a ≤ x j) :
-    (∑ j : Fin n, if (j : ℕ) < m₁ then x j else 0) - a * m₁ ≤
-      (∑ j : Fin n, if (j : ℕ) < m₂ then x j else 0) - a * m₂ := by
+theorem sum_ite_val_lt_sub_mul_mono
+    (n m₁ m₂ : ℕ) (h₁₂ : m₁ ≤ m₂) (h₂ : m₂ ≤ n) (x : Fin n → ℝ)
+    (a : ℝ) (hx : ∀ j : Fin n, m₁ ≤ (j : ℕ) → (j : ℕ) < m₂ → a ≤ x j)
+    : (∑ j : Fin n, if (j : ℕ) < m₁ then x j else 0) - a * m₁
+      ≤ (∑ j : Fin n, if (j : ℕ) < m₂ then x j else 0) - a * m₂ := by
   rw [sum_ite_val_lt_sub_mul n m₁ (le_trans h₁₂ h₂) x a, sum_ite_val_lt_sub_mul n m₂ h₂ x a]
   apply Finset.sum_le_sum
   intro j _
@@ -61,10 +65,11 @@ theorem sum_ite_val_lt_sub_mul_mono (n m₁ m₂ : ℕ) (h₁₂ : m₁ ≤ m₂
       linarith [hx j (not_lt.mp h1) h2]
     · simp only [if_neg h1, if_neg h2, le_refl]
 
-theorem sum_ite_val_lt_sub_mul_anti (n m₁ m₂ : ℕ) (h₁₂ : m₁ ≤ m₂) (h₂ : m₂ ≤ n) (x : Fin n → ℝ) (a : ℝ)
-    (hx : ∀ j : Fin n, m₁ ≤ (j : ℕ) → (j : ℕ) < m₂ → x j ≤ a) :
-    (∑ j : Fin n, if (j : ℕ) < m₂ then x j else 0) - a * m₂ ≤
-      (∑ j : Fin n, if (j : ℕ) < m₁ then x j else 0) - a * m₁ := by
+theorem sum_ite_val_lt_sub_mul_anti
+    (n m₁ m₂ : ℕ) (h₁₂ : m₁ ≤ m₂) (h₂ : m₂ ≤ n) (x : Fin n → ℝ)
+    (a : ℝ) (hx : ∀ j : Fin n, m₁ ≤ (j : ℕ) → (j : ℕ) < m₂ → x j ≤ a)
+    : (∑ j : Fin n, if (j : ℕ) < m₂ then x j else 0) - a * m₂
+      ≤ (∑ j : Fin n, if (j : ℕ) < m₁ then x j else 0) - a * m₁ := by
   rw [sum_ite_val_lt_sub_mul n m₁ (le_trans h₁₂ h₂) x a, sum_ite_val_lt_sub_mul n m₂ h₂ x a]
   apply Finset.sum_le_sum
   intro j _
@@ -86,10 +91,11 @@ theorem eq_zero_of_abs_le_mul (a : ℝ) (n : ℕ) (h : ∀ t : ℝ, 0 < t → |a
     exact div_mul_cancel₀ _ (by positivity)
   nlinarith [mul_nonneg htpos.le (Nat.cast_nonneg n)]
 
-
 universe u v w in
-theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
-    (h3 : DegSupermod.{u, v, w}) (h4 : SatBasic.{u, v, w}) : HNSlopes.{u, v, w} := by
+theorem hnSlopes_of
+    (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w}) (h3 : DegSupermod.{u, v, w})
+    (h4 : SatBasic.{u, v, w})
+    : HNSlopes.{u, v, w} := by
   intro R V E _ _ _ _ _ _ ρ L hL
   obtain ⟨hSubLat, hMono, hSatEq, hRk0, hDeg0, -, -, -⟩ := h4 R V E ρ L hL
   have hstep := h1 R V E ρ L hL
@@ -99,8 +105,8 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
   have hHanti : ∀ θ θ' : ℝ, θ ≤ θ' → hnStep ρ L θ' ≤ hnStep ρ L θ := fun θ θ' h => by
     unfold hnStep
     exact sSup_le_sSup fun N hN => ⟨hN.1, hN.2.1, le_trans h hN.2.2⟩
-  have hr_anti : ∀ θ θ' : ℝ, θ ≤ θ' → rk ρ (hnStep ρ L θ') ≤ rk ρ (hnStep ρ L θ) :=
-    fun θ θ' h => (hMono _ _ (hHanti θ θ' h) (hHL θ)).1
+  have hr_anti : ∀ θ θ' : ℝ, θ ≤ θ' → rk ρ (hnStep ρ L θ') ≤ rk ρ (hnStep ρ L θ) := fun θ θ' h =>
+    (hMono _ _ (hHanti θ θ' h) (hHL θ)).1
   have hr_le : ∀ θ, rk ρ (hnStep ρ L θ) ≤ rk ρ L := fun θ => (hMono _ _ (hHL θ) le_rfl).1
   have hrk_bot : rk ρ (⊥ : Submodule R V) = 0 := (hRk0 ⊥ bot_le).mpr rfl
   have hne_of : ∀ θ, 0 < rk ρ (hnStep ρ L θ) → hnStep ρ L θ ≠ ⊥ := fun θ h he => by
@@ -118,12 +124,11 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
     have hMH := h2 R V E ρ (hnStep ρ L θ) (hSubLat _ (hHL θ)) hne
     have hML := h2 R V E ρ L hL hLne
     have hmax : muMax ρ (hnStep ρ L θ) ≤ muMax ρ L :=
-      (hMH.1 (muMax ρ L)).mpr fun N hN =>
-        (hML.1 (muMax ρ L)).mp le_rfl N (le_trans hN (hHL θ))
+      (hMH.1 (muMax ρ L)).mpr fun N hN => (hML.1 (muMax ρ L)).mp le_rfl N (le_trans hN (hHL θ))
     exact le_trans ((hstep θ).2.1 hne) (le_trans hMH.2.2.2.1 (le_trans hMH.2.2.2.2 hmax))
 
-  have hatt : ∀ j : ℕ, j < rk ρ L →
-      j < rk ρ (hnStep ρ L (sSup {θ : ℝ | j < rk ρ (hnStep ρ L θ)})) := by
+  have hatt
+      : ∀ j : ℕ, j < rk ρ L → j < rk ρ (hnStep ρ L (sSup {θ : ℝ | j < rk ρ (hnStep ρ L θ)})) := by
     intro j hj
     have hLne : L ≠ ⊥ := fun h0 => by
       rw [h0, hrk_bot] at hj
@@ -132,15 +137,13 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
       refine ⟨muMin ρ L, ?_⟩
       have hLH : L ≤ hnStep ρ L (muMin ρ L) := (hstep _).2.2.1 L le_rfl hLne le_rfl
       exact lt_of_lt_of_le hj (hMono _ _ hLH (hHL _)).1
-    have hbelow : ∀ θ, θ < sSup {θ : ℝ | j < rk ρ (hnStep ρ L θ)} →
-        j < rk ρ (hnStep ρ L θ) := by
+    have hbelow : ∀ θ, θ < sSup {θ : ℝ | j < rk ρ (hnStep ρ L θ)} → j < rk ρ (hnStep ρ L θ) := by
       intro θ hθ
       obtain ⟨θ₂, hθ₂, hlt⟩ := exists_lt_of_lt_csSup hSne hθ
       exact lt_of_lt_of_le hθ₂ (hr_anti θ θ₂ hlt.le)
     obtain ⟨s, hs⟩ : ∃ s, s = sSup {θ : ℝ | j < rk ρ (hnStep ρ L θ)} := ⟨_, rfl⟩
     rw [← hs] at hbelow ⊢
-    have hex : ∃ c : ℕ, ∃ θ : ℝ, θ < s ∧ rk ρ (hnStep ρ L θ) = c :=
-      ⟨_, s - 1, by linarith, rfl⟩
+    have hex : ∃ c : ℕ, ∃ θ : ℝ, θ < s ∧ rk ρ (hnStep ρ L θ) = c := ⟨_, s - 1, by linarith, rfl⟩
     classical
     obtain ⟨θ₀, hθ₀s, hθ₀c⟩ := Nat.find_spec hex
     have hconst : ∀ θ, θ₀ ≤ θ → θ < s → hnStep ρ L θ₀ = hnStep ρ L θ := by
@@ -148,8 +151,7 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
       have hle : rk ρ (hnStep ρ L θ) ≤ rk ρ (hnStep ρ L θ₀) := hr_anti θ₀ θ h0
       have hge : Nat.find hex ≤ rk ρ (hnStep ρ L θ) := Nat.find_min' hex ⟨θ, hθs, rfl⟩
       exact hSatEq _ _ (hstep θ).1 (hHanti θ₀ θ h0) (hHL θ₀) (by omega)
-    have hne0 : hnStep ρ L θ₀ ≠ ⊥ :=
-      hne_of θ₀ (lt_of_le_of_lt (Nat.zero_le j) (hbelow θ₀ hθ₀s))
+    have hne0 : hnStep ρ L θ₀ ≠ ⊥ := hne_of θ₀ (lt_of_le_of_lt (Nat.zero_le j) (hbelow θ₀ hθ₀s))
     have hμ : s ≤ muMin ρ (hnStep ρ L θ₀) := by
       by_contra hlt
       push_neg at hlt
@@ -164,24 +166,23 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
       linarith
     have hsub : hnStep ρ L θ₀ ≤ hnStep ρ L s := (hstep s).2.2.1 _ (hHL θ₀) hne0 hμ
     exact lt_of_lt_of_le (hbelow θ₀ hθ₀s) (hMono _ _ hsub (hHL s)).1
-  have hiff : ∀ j : Fin (rk ρ L), ∀ θ : ℝ,
-      ((j : ℕ) < rk ρ (hnStep ρ L θ) ↔ θ ≤ slopeList ρ L j) := by
+  have hiff
+      : ∀ j : Fin (rk ρ L), ∀ θ : ℝ, ((j : ℕ) < rk ρ (hnStep ρ L θ) ↔ θ ≤ slopeList ρ L j) := by
     intro j θ
     constructor
     · intro h
       exact le_csSup (hbdd j) h
     · intro h
-      exact lt_of_lt_of_le (hatt j j.2)
-        (hr_anti θ (sSup {θ : ℝ | (j : ℕ) < rk ρ (hnStep ρ L θ)}) h)
+      exact lt_of_lt_of_le (hatt j j.2) (hr_anti θ (sSup {θ : ℝ | (j : ℕ) < rk ρ (hnStep ρ L θ)}) h)
   have hanti : Antitone (slopeList ρ L) := by
     intro i j hij
     exact (hiff i _).mp (lt_of_le_of_lt (show (i : ℕ) ≤ j from hij) ((hiff j _).mpr le_rfl))
-  have hP : ∀ k, hnPoly ρ L k =
-      ∑ j : Fin (rk ρ L), if (j : ℕ) < k then slopeList ρ L j else 0 := fun k => rfl
+  have hP : ∀ k, hnPoly ρ L k = ∑ j : Fin (rk ρ L), if (j : ℕ) < k then slopeList ρ L j else 0 :=
+    fun k => rfl
 
   have hpoly : ∀ θ, deg ρ (hnStep ρ L θ) = hnPoly ρ L (rk ρ (hnStep ρ L θ)) := by
-    suffices H : ∀ c : ℕ, ∀ θ, rk ρ (hnStep ρ L θ) = c →
-        deg ρ (hnStep ρ L θ) = hnPoly ρ L c from fun θ => H _ θ rfl
+    suffices H : ∀ c : ℕ, ∀ θ, rk ρ (hnStep ρ L θ) = c → deg ρ (hnStep ρ L θ) = hnPoly ρ L c from
+      fun θ => H _ θ rfl
     intro c
     induction c using Nat.strong_induction_on with
     | _ c ih =>
@@ -211,7 +212,7 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
           obtain ⟨t, ht⟩ : ∃ t, t = slopeList ρ L jj := ⟨_, rfl⟩
           rw [← ht] at hHt htmu hrt
           have hc' : rk ρ (hnStep ρ L (t + ε)) < c := by
-            have : ¬ (c - 1 < rk ρ (hnStep ρ L (t + ε))) := fun h => by
+            have : ¬(c - 1 < rk ρ (hnStep ρ L (t + ε))) := fun h => by
               have h' := (hiff jj _).mp h
               rw [← ht] at h'
               linarith
@@ -219,36 +220,49 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
           have ih' := ih _ hc' (t + ε) rfl
           have hle' : hnStep ρ L (t + ε) ≤ hnStep ρ L θ :=
             (hHanti t (t + ε) (by linarith)).trans hHt.ge
-          have hlt' : hnStep ρ L (t + ε) < hnStep ρ L θ := lt_of_le_of_ne hle' (fun h => by
-            rw [h] at hc'
-            omega)
+          have hlt' : hnStep ρ L (t + ε) < hnStep ρ L θ :=
+            lt_of_le_of_ne hle' (fun h => by
+              rw [h] at hc'
+              omega)
           have hD := (hstep (t + ε)).2.2.2 _ hlt' (hHL θ)
           have hD2 := (hMC.2.1 t).mp htmu _ hle'
-          have hP1 : hnPoly ρ L (rk ρ (hnStep ρ L (t + ε))) - t * (rk ρ (hnStep ρ L (t + ε)) : ℕ)
-              ≤ hnPoly ρ L c - t * (c : ℕ) :=
+          have hP1
+              : hnPoly ρ L (rk ρ (hnStep ρ L (t + ε))) - t * (rk ρ (hnStep ρ L (t + ε)) : ℕ)
+                ≤ hnPoly ρ L c - t * (c : ℕ) :=
             sum_ite_val_lt_sub_mul_mono (rk ρ L) _ c hc'.le hcn (slopeList ρ L) t
               (fun j _ h2 => (hiff j t).mp (by omega))
-          have hP2 : hnPoly ρ L c - (t + ε) * (c : ℕ) ≤
-              hnPoly ρ L (rk ρ (hnStep ρ L (t + ε))) - (t + ε) * (rk ρ (hnStep ρ L (t + ε)) : ℕ) :=
+          have hP2
+              : hnPoly ρ L c - (t + ε) * (c : ℕ)
+                ≤ hnPoly ρ L (rk ρ (hnStep ρ L (t + ε)))
+                  - (t + ε) * (rk ρ (hnStep ρ L (t + ε)) : ℕ) :=
             sum_ite_val_lt_sub_mul_anti (rk ρ L) _ c hc'.le hcn (slopeList ρ L) (t + ε)
-              (fun j h1 _ => le_of_lt (not_le.mp fun h => by
-                have := (hiff j _).mpr h
-                omega))
+              (fun j h1 _ =>
+                le_of_lt (not_le.mp fun h => by
+                  have := (hiff j _).mpr h
+                  omega))
           rw [hθc] at hD hD2
           have hcL : (c : ℝ) ≤ rk ρ L := by exact_mod_cast hcn
           have hr0 : (0 : ℝ) ≤ (rk ρ (hnStep ρ L (t + ε)) : ℝ) := Nat.cast_nonneg _
           have hεΔ : ε * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε))) ≤ ε * rk ρ L :=
             mul_le_mul_of_nonneg_left (by linarith) hε.le
-          have e1 : (t + ε) * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε))) =
-              t * c - t * rk ρ (hnStep ρ L (t + ε)) + ε * c - ε * rk ρ (hnStep ρ L (t + ε)) := by
+          have e1
+              : (t + ε) * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε)))
+                = t * c - t * rk ρ (hnStep ρ L (t + ε)) + ε * c
+                  - ε * rk ρ (hnStep ρ L (t + ε)) := by
             ring
-          have e2 : t * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε))) =
-              t * c - t * rk ρ (hnStep ρ L (t + ε)) := by ring
+          have e2
+              : t * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε)))
+                = t * c - t * rk ρ (hnStep ρ L (t + ε)) := by
+            ring
           have e3 : (t + ε) * (c : ℝ) = t * c + ε * c := by ring
-          have e4 : (t + ε) * (rk ρ (hnStep ρ L (t + ε)) : ℝ) =
-              t * rk ρ (hnStep ρ L (t + ε)) + ε * rk ρ (hnStep ρ L (t + ε)) := by ring
-          have e5 : ε * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε))) =
-              ε * c - ε * rk ρ (hnStep ρ L (t + ε)) := by ring
+          have e4
+              : (t + ε) * (rk ρ (hnStep ρ L (t + ε)) : ℝ)
+                = t * rk ρ (hnStep ρ L (t + ε)) + ε * rk ρ (hnStep ρ L (t + ε)) := by
+            ring
+          have e5
+              : ε * ((c : ℝ) - rk ρ (hnStep ρ L (t + ε)))
+                = ε * c - ε * rk ρ (hnStep ρ L (t + ε)) := by
+            ring
           rw [abs_le]
           constructor <;> linarith
         exact sub_eq_zero.mp hz
@@ -265,8 +279,10 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
     rw [h, hP]
     exact Finset.sum_congr rfl fun j _ => (if_pos j.2).symm
 
-  have hsubmax : ∀ θ (M : Submodule R V), M ≤ hnStep ρ L θ →
-      deg ρ M - θ * rk ρ M ≤ deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
+  have hsubmax
+      : ∀ θ (M : Submodule R V),
+        M ≤ hnStep ρ L θ
+          → deg ρ M - θ * rk ρ M ≤ deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
     intro θ M hM
     by_cases hH : hnStep ρ L θ = ⊥
     · have hM0 : M = ⊥ := le_bot_iff.mp (hM.trans hH.le)
@@ -275,23 +291,28 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
       have := (hMC.2.1 θ).mp ((hstep θ).2.1 hH) M hM
       rw [mul_sub] at this
       linarith
-  have hmax : ∀ θ (N : Submodule R V), N ≤ L →
-      deg ρ N - θ * rk ρ N ≤ deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
+  have hmax
+      : ∀ θ (N : Submodule R V),
+        N ≤ L → deg ρ N - θ * rk ρ N ≤ deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
     intro θ N hN
     obtain ⟨hrk, hdeg⟩ := h3 R V E ρ L N (hnStep ρ L θ) hL hN (hHL θ)
-    have hrk' : ((rk ρ (N ⊔ hnStep ρ L θ) : ℕ) : ℝ) + rk ρ (N ⊓ hnStep ρ L θ) =
-        rk ρ N + rk ρ (hnStep ρ L θ) := by exact_mod_cast hrk
+    have hrk'
+        : ((rk ρ (N ⊔ hnStep ρ L θ) : ℕ) : ℝ) + rk ρ (N ⊓ hnStep ρ L θ)
+          = rk ρ N + rk ρ (hnStep ρ L θ) := by
+      exact_mod_cast hrk
     have hinf := hsubmax θ _ (inf_le_right : N ⊓ hnStep ρ L θ ≤ _)
-    have hsup : deg ρ (N ⊔ hnStep ρ L θ) - θ * rk ρ (N ⊔ hnStep ρ L θ) ≤
-        deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
+    have hsup
+        : deg ρ (N ⊔ hnStep ρ L θ) - θ * rk ρ (N ⊔ hnStep ρ L θ)
+          ≤ deg ρ (hnStep ρ L θ) - θ * rk ρ (hnStep ρ L θ) := by
       by_cases heq : N ⊔ hnStep ρ L θ = hnStep ρ L θ
       · simp only [heq, le_refl]
-      · have := (hstep θ).2.2.2 _ (lt_of_le_of_ne le_sup_right (Ne.symm heq))
-          (sup_le hN (hHL θ))
+      · have := (hstep θ).2.2.2 _ (lt_of_le_of_ne le_sup_right (Ne.symm heq)) (sup_le hN (hHL θ))
         rw [mul_sub] at this
         linarith
-    have e : θ * (rk ρ (N ⊔ hnStep ρ L θ) : ℝ) + θ * rk ρ (N ⊓ hnStep ρ L θ) =
-        θ * rk ρ N + θ * rk ρ (hnStep ρ L θ) := by rw [← mul_add, ← mul_add, hrk']
+    have e
+        : θ * (rk ρ (N ⊔ hnStep ρ L θ) : ℝ) + θ * rk ρ (N ⊓ hnStep ρ L θ)
+          = θ * rk ρ N + θ * rk ρ (hnStep ρ L θ) := by
+      rw [← mul_add, ← mul_add, hrk']
     linarith
   have hpolyle : ∀ N : Submodule R V, N ≤ L → deg ρ N ≤ hnPoly ρ L (rk ρ N) := by
     intro N hN
@@ -304,9 +325,10 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
       have hr : rk ρ N - 1 < rk ρ (hnStep ρ L (slopeList ρ L jj)) := (hiff jj _).mpr le_rfl
       have hm := hmax (slopeList ρ L jj) N hN
       rw [hpoly] at hm
-      have hA : hnPoly ρ L (rk ρ (hnStep ρ L (slopeList ρ L jj))) -
-          slopeList ρ L jj * (rk ρ (hnStep ρ L (slopeList ρ L jj)) : ℕ) ≤
-          hnPoly ρ L (rk ρ N) - slopeList ρ L jj * (rk ρ N : ℕ) :=
+      have hA
+          : hnPoly ρ L (rk ρ (hnStep ρ L (slopeList ρ L jj)))
+              - slopeList ρ L jj * (rk ρ (hnStep ρ L (slopeList ρ L jj)) : ℕ)
+            ≤ hnPoly ρ L (rk ρ N) - slopeList ρ L jj * (rk ρ N : ℕ) :=
         sum_ite_val_lt_sub_mul_anti _ _ _ (by omega) (hr_le _) (slopeList ρ L) _
           (fun j h1 _ => hanti (show jj ≤ j from (show rk ρ N - 1 ≤ (j : ℕ) by omega)))
       linarith
@@ -318,7 +340,9 @@ theorem hnSlopes_of (h1 : HNStep.{u, v, w}) (h2 : MuChar.{u, v, w})
   exact (hiff j θ).symm
 
 theorem polygon_slopes_characterization : HNSlopes :=
-  hnSlopes_of (hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes real_saturation_property
-    saturation_basic_properties) slope_characterization degree_supermodular saturation_basic_properties
+  hnSlopes_of
+    (hnStep_of degree_supermodular slope_characterization maximal_slope_ratio finite_supremum_slopes
+      real_saturation_property saturation_basic_properties)
+    slope_characterization degree_supermodular saturation_basic_properties
 
 end Formalism.HN

@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfin
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.AlgRepEndIrreducible
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgRepEndIrreducible.lowStab :
-    ∀ (ι V : Type) [Fintype ι] [AddCommGroup V] [Module ℂ V] (n : ℕ) (F : ι → Fin n → Fin n → Module.End ℂ V), IsMultiGl F → ∀ (ν : ι → Fin n → ℂ) (v : V), (∀ t, Formalism.REAL.IsHW (F t) (ν t) v) →
-      v ∈ low F v ∧ Stab F (low F v) := by
+theorem UpperTheory.V.AlgRepEndIrreducible.lowStab
+    : ∀ (ι V : Type) [Fintype ι] [AddCommGroup V] [Module ℂ V] (n : ℕ)
+        (F : ι → Fin n → Fin n → Module.End ℂ V),
+      IsMultiGl F
+        → ∀ (ν : ι → Fin n → ℂ) (v : V),
+          (∀ t, Formalism.REAL.IsHW (F t) (ν t) v) → v ∈ low F v ∧ Stab F (low F v) := by
   intro ι V _ _ _ n F hF ν v hv
   classical
   obtain ⟨hgl, hcomm⟩ := hF

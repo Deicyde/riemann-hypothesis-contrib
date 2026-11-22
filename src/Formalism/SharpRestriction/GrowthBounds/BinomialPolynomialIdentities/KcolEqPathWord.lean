@@ -13,31 +13,41 @@ namespace Formalism.MainNotions.G.ColumnFamilies
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees Formalism.MainNotions.LemmaBAlt
 
-theorem wedgeR_eq_wedgeF {n : ℕ} {P : Type*} [CommRing P] (x : Fin n → P) (K : Finset (Fin n) → P) :
-    wedgeR x K = Formalism.InvariantFactorPaths.GelfandTsetlinBases.wedgeF K x := by
+theorem wedgeR_eq_wedgeF {n : ℕ} {P : Type*} [CommRing P] (x : Fin n → P) (K : Finset (Fin n) → P)
+    : wedgeR x K = Formalism.InvariantFactorPaths.GelfandTsetlinBases.wedgeF K x := by
   funext J
-  unfold wedgeR Formalism.InvariantFactorPaths.GelfandTsetlinBases.wedgeF Formalism.InvariantFactorPaths.GelfandTsetlinBases.sg
+  unfold wedgeR Formalism.InvariantFactorPaths.GelfandTsetlinBases.wedgeF
+    Formalism.InvariantFactorPaths.GelfandTsetlinBases.sg
   refine Finset.sum_congr rfl fun m _ => ?_
   push_cast
   ring
 
-theorem contrR_eq_contrF {n : ℕ} {P : Type*} [CommRing P] (x : Fin n → P) (K : Finset (Fin n) → P) :
-    contrR x K = Formalism.InvariantFactorPaths.GelfandTsetlinBases.contrF K x := by
+theorem contrR_eq_contrF {n : ℕ} {P : Type*} [CommRing P] (x : Fin n → P) (K : Finset (Fin n) → P)
+    : contrR x K = Formalism.InvariantFactorPaths.GelfandTsetlinBases.contrF K x := by
   funext J
-  unfold contrR Formalism.InvariantFactorPaths.GelfandTsetlinBases.contrF Formalism.InvariantFactorPaths.GelfandTsetlinBases.sg
+  unfold contrR Formalism.InvariantFactorPaths.GelfandTsetlinBases.contrF
+    Formalism.InvariantFactorPaths.GelfandTsetlinBases.sg
   rw [Finset.compl_eq_univ_sdiff]
   refine Finset.sum_congr rfl fun m _ => ?_
   push_cast
   ring
 
-theorem colHeight_eq {n : ℕ} (mu : Fin n → ℤ) (c : ℤ) : Formalism.InvariantFactorPaths.GelfandTsetlinBases.colHeight mu c = colH mu c := rfl
+theorem colHeight_eq {n : ℕ} (mu : Fin n → ℤ) (c : ℤ)
+    : Formalism.InvariantFactorPaths.GelfandTsetlinBases.colHeight mu c = colH mu c :=
+  rfl
 
-theorem ext_apply {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (j : ℕ) (h : j < N + 1) : ext mu j = mu ⟨j, h⟩ := by
+theorem ext_apply {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) (j : ℕ) (h : j < N + 1)
+    : ext mu j = mu ⟨j, h⟩ := by
   unfold ext; rw [dite_eq_left h]
 
-theorem colH_step {n N : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} (P : PPath n N LL B) (c : ℤ) (j : ℕ) (h : j < N) :
-    if LL.vec ⟨j, h⟩ then colH (P.mu ⟨j, by omega⟩) c ≤ colH (P.mu ⟨j + 1, by omega⟩) c
-    else colH (P.mu ⟨j + 1, by omega⟩) c ≤ colH (P.mu ⟨j, by omega⟩) c := by
+theorem colH_step
+    {n N : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} (P : PPath n N LL B)
+    (c : ℤ)
+    (j : ℕ) (h : j < N)
+    : if LL.vec ⟨j, h⟩ then
+        colH (P.mu ⟨j, by omega⟩) c ≤ colH (P.mu ⟨j + 1, by omega⟩) c
+      else
+        colH (P.mu ⟨j + 1, by omega⟩) c ≤ colH (P.mu ⟨j, by omega⟩) c := by
   have hs := P.step ⟨j, h⟩
   have e1 : (Fin.castSucc (⟨j, h⟩ : Fin N)) = ⟨j, by omega⟩ := rfl
   have e2 : (Fin.succ (⟨j, h⟩ : Fin N)) = ⟨j + 1, by omega⟩ := rfl
@@ -48,11 +58,16 @@ theorem colH_step {n N : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} (P : PP
   · rw [if_neg hv] at hs
     exact column_height_mono hs.1 c
 
-theorem Kcol_eq_pathWord (R : Type*) [CommRing R] {n N : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ}
-    (P : PPath n N LL B) (c : ℤ) (j : ℕ) (hj : j ≤ N) (J : Finset (Fin n)) :
-    rename (iv N n) (Kcol R P.mu c j J) =
-      Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord (isV LL) (ext P.mu) c
-        (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j J := by
+theorem Kcol_eq_pathWord
+    (R : Type*) [CommRing R]
+    {n N : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} (P : PPath n N LL B)
+    (c : ℤ)
+    (j : ℕ) (hj : j ≤ N)
+    (J : Finset (Fin n))
+    : rename (iv N n) (Kcol R P.mu c j J)
+      = Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord (isV LL) (ext P.mu) c
+        (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R))
+        j J := by
   induction j generalizing J with
   | zero =>
     simp only [Kcol, Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord]
@@ -62,18 +77,33 @@ theorem Kcol_eq_pathWord (R : Type*) [CommRing R] {n N : ℕ} {LL : Letters (Fin
     have ih' := ih (by omega)
     simp only [Kcol, Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord]
     rw [dite_eq_left h]
-    have hm := map_column_operator (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom c
-      (colH (P.mu ⟨j, by omega⟩) c) (colH (P.mu ⟨j + 1, by omega⟩) c) (letVec R ⟨j, h⟩) (Kcol R P.mu c j) J
-    have h1 : (fun m => (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom
-        (letVec R (⟨j, h⟩ : Fin N) m)) = fun a => (X (j, a) : MvPolynomial (ℕ × Fin n) R) := by
+    have hm :=
+      map_column_operator (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom c
+        (colH (P.mu ⟨j, by omega⟩) c) (colH (P.mu ⟨j + 1, by omega⟩) c) (letVec R ⟨j, h⟩)
+        (Kcol R P.mu c j) J
+    have h1
+        : (fun m =>
+            (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom
+              (letVec R (⟨j, h⟩ : Fin N) m))
+          = fun a => (X (j, a) : MvPolynomial (ℕ × Fin n) R) := by
       funext m; simp [letVec, iv]
-    have h2 : (fun J => (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom
-        (Kcol R P.mu c j J)) = Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord (isV LL) (ext P.mu) c
-        (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j := funext ih'
+    have h2
+        : (fun J =>
+            (rename (iv N n) : MvPolynomial (Fin N × Fin n) R →ₐ[R] _).toRingHom
+              (Kcol R P.mu c j J))
+          = Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord (isV LL) (ext P.mu) c
+            (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R))
+            j :=
+      funext ih'
     rw [h1, h2] at hm
-    have hm' : rename (iv N n) (colStep c (colH (P.mu ⟨j, by omega⟩) c) (colH (P.mu ⟨j + 1, by omega⟩) c)
-        (letVec R ⟨j, h⟩) (Kcol R P.mu c j) J) = _ := hm
-    rw [hm', colHeight_eq, colHeight_eq, ext_apply P.mu j (by omega), ext_apply P.mu (j + 1) (by omega)]
+    have hm'
+        : rename (iv N n)
+            (colStep c (colH (P.mu ⟨j, by omega⟩) c) (colH (P.mu ⟨j + 1, by omega⟩) c)
+              (letVec R ⟨j, h⟩) (Kcol R P.mu c j) J)
+          = _ :=
+      hm
+    rw [hm', colHeight_eq, colHeight_eq, ext_apply P.mu j (by omega),
+      ext_apply P.mu (j + 1) (by omega)]
     have hst := colH_step P c j h
     have hV : isV LL j = LL.vec ⟨j, h⟩ := by unfold isV; rw [dite_eq_left h]
     rw [hV]
@@ -97,10 +127,12 @@ theorem Kcol_eq_pathWord (R : Type*) [CommRing R] {n N : ℕ} {LL : Letters (Fin
         · simp [hc, contrR_eq_contrF]
         · simp [hc, wedgeR_eq_wedgeF]
 
-theorem colH_off {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) {c : ℤ} (hc : c ∉ colRange mu) (i : Fin (N + 1)) :
-    colH (mu i) c = if 1 ≤ c then 0 else n := by
+theorem colH_off
+    {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) {c : ℤ} (hc : c ∉ colRange mu) (i : Fin (N + 1))
+    : colH (mu i) c = if 1 ≤ c then 0 else n := by
   have hT : ∀ m, |mu i m| ≤ ∑ i, ∑ m, |mu i m| := fun m => abs_entry_le_total mu i m
-  have hT0 : (0 : ℤ) ≤ ∑ i, ∑ m, |mu i m| := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
+  have hT0 : (0 : ℤ) ≤ ∑ i, ∑ m, |mu i m| :=
+    Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
   simp only [colRange, Finset.mem_Icc, not_and_or, not_le] at hc
   unfold colH
   rcases hc with hc | hc
@@ -115,9 +147,16 @@ theorem colH_off {N n : ℕ} (mu : Fin (N + 1) → Fin n → ℤ) {c : ℤ} (hc 
     have := abs_le.mp (hT m)
     omega
 
-theorem pathWord_off (R : Type*) [CommRing R] {n N : ℕ} (isVec : ℕ → Bool) (mu : Fin (N + 1) → Fin n → ℤ) {c : ℤ}
-    (hc : c ∉ colRange mu) (Xr : ℕ → Fin n → R) (j : ℕ) (hj : j ≤ N) :
-    Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord isVec (ext mu) c Xr j = Formalism.InvariantFactorPaths.GelfandTsetlinBases.oneF := by
+theorem pathWord_off
+    (R : Type*) [CommRing R]
+    {n N : ℕ}
+    (isVec : ℕ → Bool)
+    (mu : Fin (N + 1) → Fin n → ℤ)
+    {c : ℤ} (hc : c ∉ colRange mu)
+    (Xr : ℕ → Fin n → R)
+    (j : ℕ) (hj : j ≤ N)
+    : Formalism.InvariantFactorPaths.GelfandTsetlinBases.pathWord isVec (ext mu) c Xr j
+      = Formalism.InvariantFactorPaths.GelfandTsetlinBases.oneF := by
   induction j with
   | zero => rfl
   | succ j ih =>

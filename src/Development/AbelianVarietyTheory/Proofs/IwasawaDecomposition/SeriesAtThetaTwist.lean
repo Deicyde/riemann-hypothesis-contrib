@@ -11,12 +11,17 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.State
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 namespace GlobalTheory.HeightCounting.Up.SerCp
-open GlobalTheory.Mem.R3.Tr Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+open GlobalTheory.Mem.R3.Tr Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.ExportSeries hiding Base
 
 set_option maxHeartbeats 4000000
@@ -56,7 +61,8 @@ private def frame {S T : HSp a.D} (x : Frame S T) : @Frame b.D ((S)) ((T)) where
   βT := (by with_unfolding_all exact (x.βT :))
   f₀ := (by with_unfolding_all exact (x.f₀ :))
 
-private def base {S T : HSp a.D} (x : ExportSeries.Base S T) : @ExportSeries.Base b.D ((S)) ((T)) where
+private def base {S T : HSp a.D} (x : ExportSeries.Base S T)
+    : @ExportSeries.Base b.D ((S)) ((T)) where
   hr := (by with_unfolding_all exact (x.hr :))
   F := frame b x.F
   G := (by with_unfolding_all exact ((typeDat b x.G) :))
@@ -64,18 +70,6 @@ private def base {S T : HSp a.D} (x : ExportSeries.Base S T) : @ExportSeries.Bas
   w := (by with_unfolding_all exact ((weight b x.w) :))
   mu0 := (by with_unfolding_all exact (x.mu0 :))
   eta := (by with_unfolding_all exact (x.eta :))
-
-
-
-
-
-
-
-
-
-
-
-
 
 end L1
 
@@ -85,24 +79,26 @@ variable {B : Base} {C : Cols B} {a : Late B C} (b : Late B C)
 
 end L2
 
-private abbrev lt {B : Base} {C : Cols B} (c : Late B C) (n : NStage B C c.W) : Late B C := ⟨c.W, c.V, c.S, n, c.G⟩
+private abbrev lt {B : Base} {C : Cols B} (c : Late B C) (n : NStage B C c.W) : Late B C :=
+  ⟨c.W, c.V, c.S, n, c.G⟩
 
 section L2
 open GlobalTheory.SeriesTie
 variable {B : Base} {C : Cols B} {c : Late B C} {a : NStage B C c.W} (b : NStage B C c.W)
 
 section
-variable {N : NData (lt c a).D.R (lt c a).D.host (lt c a).D.what₂} {X : NTw (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N}
+variable
+  {N : NData (lt c a).D.R (lt c a).D.host (lt c a).D.what₂}
+  {X : NTw (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N}
 
 end
 
-
-
-
-
 section
-variable {N : NData (lt c a).D.R (lt c a).D.host (lt c a).D.what₂} {X : NTw (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N} {ρ : Setup X}
-  {Y : NExp (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N X} {i : X.Tw} {j : Fin (lt c a).D.R.m} {s : Bool} {rd : Rd ρ Y i j s}
+variable
+  {N : NData (lt c a).D.R (lt c a).D.host (lt c a).D.what₂}
+  {X : NTw (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N} {ρ : Setup X}
+  {Y : NExp (lt c a).D.R (lt c a).D.host (lt c a).D.what₂ (lt c a).D.LL0 N X} {i : X.Tw}
+  {j : Fin (lt c a).D.R.m} {s : Bool} {rd : Rd ρ Y i j s}
 
 end
 
@@ -110,19 +106,23 @@ end L2
 
 section L3
 open GlobalTheory.SeriesTie
-variable {B : Base} {C : Cols B} {c : Late B C} {a : NStage B C c.W} (b : NStage B C c.W)
-  {Γ : Type} [i1 : Group Γ] [i2 : Fintype Γ] {Pl0 I0 T : Type}
-  {A3 : FamIn3 (lt c a).D.what₂.LL Γ Pl0 I0 (List ℕ) T (lt c a).D.R.m} {Ks : Type} [i3 : Field Ks] [i4 : NumberField Ks]
-  [iK : Algebra Ks (lt c a).D.what₂.LL] {Rl : RealDat3 (lt c a).D A3 Ks}
-  {v₀ : ∀ (j : Fin (lt c a).D.R.m) (σ : (lt c a).D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec} {j : Fin (lt c a).D.R.m}
-  {X : ExportSeries.Base (Vc (lt c a).D j) (Wc (lt c a).D j)} {ν : ℂ}
+variable
+  {B : Base} {C : Cols B} {c : Late B C} {a : NStage B C c.W} (b : NStage B C c.W)
+  {Γ : Type} [i1 : Group Γ] [i2 : Fintype Γ]
+  {Pl0 I0 T : Type} {A3 : FamIn3 (lt c a).D.what₂.LL Γ Pl0 I0 (List ℕ) T (lt c a).D.R.m} {Ks : Type}
+  [i3 : Field Ks] [i4 : NumberField Ks] [iK : Algebra Ks (lt c a).D.what₂.LL]
+  {Rl : RealDat3 (lt c a).D A3 Ks}
+  {v₀ : ∀ (j : Fin (lt c a).D.R.m) (σ : (lt c a).D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec}
+  {j : Fin (lt c a).D.R.m} {X : ExportSeries.Base (Vc (lt c a).D j) (Wc (lt c a).D j)} {ν : ℂ}
 
 end L3
 
 section L4
 open GlobalTheory.SeriesTie
-variable {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {P : Pre2 K w}
-  (x : St P) (l : SeriesLevel hL x) (th : NTh (Dof x).R (Dof x).host (Dof x).what₂ (Dof x).LL0 (Dof x).nd (Dof x).ntw (Dof x).nexp)
+variable
+  {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B}
+  {w : ColW B f T} {P : Pre2 K w} (x : St P) (l : SeriesLevel hL x)
+  (th : NTh (Dof x).R (Dof x).host (Dof x).what₂ (Dof x).LL0 (Dof x).nd (Dof x).ntw (Dof x).nexp)
 
 end L4
 

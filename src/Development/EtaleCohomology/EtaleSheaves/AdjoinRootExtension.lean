@@ -22,15 +22,16 @@ abbrev towerF (C : CommRingCat.{0}) : ℕ ⥤ CommRingCat.{0} := Functor.ofSeque
 def fm (C : CommRingCat.{0}) (i j : ℕ) (h : i ≤ j) : towerObj C i →+* towerObj C j :=
   ((towerF C).map (homOfLE h)).hom
 
-instance (C : CommRingCat.{0}) :
-    DirectedSystem (fun i => (towerObj C i : Type)) (fun i j h => fm C i j h) where
+instance (C : CommRingCat.{0})
+    : DirectedSystem (fun i => (towerObj C i : Type)) (fun i j h => fm C i j h) where
   map_self i x := by
     have h1 : (towerF C).map (homOfLE (le_refl i)) = 𝟙 _ :=
       (congrArg (towerF C).map (Subsingleton.elim _ _)).trans ((towerF C).map_id i)
     exact congrArg (fun φ : (towerF C).obj i ⟶ (towerF C).obj i => φ.hom x) h1
   map_map k j i hij hjk x := by
     show ((towerF C).map (homOfLE hij) ≫ (towerF C).map (homOfLE hjk)).hom x = _
-    rw [← Functor.map_comp, homOfLE_comp]; rfl
+    rw [← Functor.map_comp, homOfLE_comp]
+    rfl
 
 lemma fm_succ (C : CommRingCat.{0}) (n : ℕ) (h : n ≤ n + 1) : fm C n (n + 1) h = stepHom (towerObj C n) := by
   have := Functor.ofSequence_map_homOfLE_succ (towerMap C) n
@@ -77,9 +78,9 @@ theorem lim_aic (C : CommRingCat.{0}) : GlobalTheory.EtC.AIC (Lim C) := by
   have hqm : q.Monic := by
     apply hinj
     rw [← leadingCoeff_map_of_injective hinj, hq, hp.leadingCoeff, map_one]
-  have hqd : 0 < q.natDegree := by
-    rw [← natDegree_map_eq_of_injective hinj, hq]; exact hd
-  obtain ⟨a, ha'⟩ : ∃ a : towerObj C (n + 1), (q.map (fm C n (n + 1) (Nat.le_succ n))).eval a = 0 := by
+  have hqd : 0 < q.natDegree := by rw [← natDegree_map_eq_of_injective hinj, hq]; exact hd
+  obtain ⟨a, ha'⟩
+      : ∃ a : towerObj C (n + 1), (q.map (fm C n (n + 1) (Nat.le_succ n))).eval a = 0 := by
     rw [fm_succ]; exact step_has_root (towerObj C n) q hqm hqd
   refine ⟨Ring.DirectLimit.of _ (fun i j h => fm C i j h) (n + 1) a, ?_⟩
   rw [← hq, ← of_comp C n (n + 1) (Nat.le_succ n), ← Polynomial.map_map, Polynomial.eval_map,
@@ -87,8 +88,13 @@ theorem lim_aic (C : CommRingCat.{0}) : GlobalTheory.EtC.AIC (Lim C) := by
 
 theorem AICExt_of : LateralTheory.E.t_E3Cut.AICExt := by
   intro C
-  refine ⟨CommRingCat.of (Lim C), CommRingCat.ofHom (Ring.DirectLimit.of _ (fun i j h => fm C i j h) 0),
-    ?_, ?_, lim_aic C⟩
+  refine ⟨
+    CommRingCat.of (Lim C),
+    CommRingCat.ofHom (Ring.DirectLimit.of _ (fun i j h => fm C i j h) 0),
+    ?_,
+    ?_,
+    lim_aic C
+  ⟩
   · intro x
     obtain ⟨n, y, rfl⟩ := Ring.DirectLimit.exists_of x
     obtain ⟨p, hp, hy⟩ := fm_isIntegral C 0 n (Nat.zero_le n) y

@@ -22,14 +22,17 @@ open PI.UpqRep
 
 variable {n : ℕ}
 
-theorem fdegOf_eq {ε : Fin n → Bool} (μ : Measure (UJ ε)) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (d : ℝ) (w : H) (h : IsFdeg μ σ d) (hw : w ≠ 0) :
-    fdegOf μ σ w = d := by
+theorem fdegOf_eq
+    {ε : Fin n → Bool} (μ : Measure (UJ ε))
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (d : ℝ) (w : H) (h : IsFdeg μ σ d) (hw : w ≠ 0)
+    : fdegOf μ σ w = d := by
   unfold fdegOf
   obtain ⟨hd, hI⟩ := h
   obtain ⟨_, heq⟩ := hI w w w w
   have hw' : ‖w‖ ≠ 0 := norm_ne_zero_iff.mpr hw
-  have h1 : ∀ g : UJ ε, coefOn σ w w g * star (coefOn σ w w g) = ((‖coefOn σ w w g‖ ^ 2 : ℝ) : ℂ) := by
+  have h1
+      : ∀ g : UJ ε, coefOn σ w w g * star (coefOn σ w w g) = ((‖coefOn σ w w g‖ ^ 2 : ℝ) : ℂ) := by
     intro g
     first
     | (rw [RCLike.star_def, RCLike.mul_conj]; push_cast; rfl)

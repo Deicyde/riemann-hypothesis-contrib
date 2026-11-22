@@ -12,17 +12,19 @@ open scoped Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-private theorem sum_smul_cols_eq_mul_vec {C R X : Type} [Field C] [CommRing R] [Algebra R C]
-    [Fintype X] (B : Matrix X X C) (c : X → R) :
-    (∑ j, c j • fun x => B x j) = B *ᵥ fun j => algebraMap R C (c j) := by
+private theorem sum_smul_cols_eq_mul_vec
+    {C R X : Type} [Field C] [CommRing R] [Algebra R C] [Fintype X] (B : Matrix X X C) (c : X → R)
+    : (∑ j, c j • fun x => B x j) = B *ᵥ fun j => algebraMap R C (c j) := by
   funext x
   simp only [Finset.sum_apply, Pi.smul_apply]
   simp only [Matrix.mulVec, dotProduct, Algebra.smul_def, mul_comm]
 
-theorem mem_span_cols_iff {C R X : Type} [Field C] [CommRing R] [Algebra R C] [Fintype X]
-    [DecidableEq X] (B : Matrix X X C) (hB : IsUnit B.det) (u : X → C) :
-    u ∈ Submodule.span R (Set.range fun j x => B x j) ↔
-      ∀ j, ∃ r : R, algebraMap R C r = (B⁻¹ *ᵥ u) j := by
+theorem mem_span_cols_iff
+    {C R X : Type} [Field C] [CommRing R] [Algebra R C] [Fintype X] [DecidableEq X]
+    (B : Matrix X X C) (hB : IsUnit B.det)
+    (u : X → C)
+    : u ∈ Submodule.span R (Set.range fun j x => B x j)
+      ↔ ∀ j, ∃ r : R, algebraMap R C r = (B⁻¹ *ᵥ u) j := by
   have hinv : B⁻¹ * B = 1 := Matrix.nonsing_inv_mul B hB
   have hinv' : B * B⁻¹ = 1 := Matrix.mul_nonsing_inv B hB
   rw [Submodule.mem_span_range_iff_exists_fun]
@@ -36,10 +38,15 @@ theorem mem_span_cols_iff {C R X : Type} [Field C] [CommRing R] [Algebra R C] [F
     have e : (fun j => algebraMap R C (c j)) = B⁻¹ *ᵥ u := funext hc
     rw [sum_smul_cols_eq_mul_vec, e, Matrix.mulVec_mulVec, hinv', Matrix.one_mulVec]
 
-theorem exists_denominator {C R X : Type} [Field C] [CommRing R] [Algebra R C]
-    (v : Valuation C NNReal) (hv : v.Integers R) [Fintype X] [Nonempty X] (w : X → C) :
-    ∃ c : R, c ≠ 0 ∧ ∀ d : R,
-      (∀ j, ∃ r : R, algebraMap R C r = algebraMap R C d * w j) ↔ d ∈ Ideal.span {c} := by
+theorem exists_denominator
+    {C R X : Type} [Field C] [CommRing R] [Algebra R C]
+    (v : Valuation C NNReal) (hv : v.Integers R)
+    [Fintype X] [Nonempty X]
+    (w : X → C)
+    : ∃ c : R,
+      c ≠ 0
+        ∧ ∀ d : R,
+          (∀ j, ∃ r : R, algebraMap R C r = algebraMap R C d * w j) ↔ d ∈ Ideal.span {c} := by
   classical
   by_cases hall : ∀ j, v (w j) ≤ 1
   · have h10 : (1 : R) ≠ 0 := by
@@ -53,7 +60,9 @@ theorem exists_denominator {C R X : Type} [Field C] [CommRing R] [Algebra R C]
     · intro _ j
       apply hv.exists_of_le_one
       rw [map_mul]
-      calc v (algebraMap R C d) * v (w j) ≤ 1 * 1 := mul_le_mul' (hv.map_le_one d) (hall j)
+      calc
+        v (algebraMap R C d) * v (w j)
+          ≤ 1 * 1 := mul_le_mul' (hv.map_le_one d) (hall j)
         _ = 1 := one_mul 1
   · push Not at hall
     obtain ⟨j1, hj1⟩ := hall
@@ -83,21 +92,35 @@ theorem exists_denominator {C R X : Type} [Field C] [CommRing R] [Algebra R C]
     · intro h j
       apply hv.exists_of_le_one
       rw [map_mul]
-      calc v (algebraMap R C d) * v (w j) ≤ v (w j0)⁻¹ * v (w j0) :=
-            mul_le_mul' h (hj0 j (Finset.mem_univ _))
+      calc
+        v (algebraMap R C d) * v (w j)
+          ≤ v (w j0)⁻¹ * v (w j0) := mul_le_mul' h (hj0 j (Finset.mem_univ _))
         _ = 1 := by rw [← map_mul, inv_mul_cancel₀ hw0, map_one]
 
-private theorem smul_algebra_map_char_eq {C R F : Type} [Field C] [CommRing R] [Algebra R C] [Field F]
-    (χ : MulChar F R) (c : R) :
-    (c • fun a => algebraMap R C (χ a)) = fun a => algebraMap R C (c * χ a) := by
+private theorem smul_algebra_map_char_eq
+    {C R F : Type} [Field C] [CommRing R] [Algebra R C] [Field F] (χ : MulChar F R) (c : R)
+    : (c • fun a => algebraMap R C (χ a)) = fun a => algebraMap R C (c * χ a) := by
   funext a
   simp only [Pi.smul_apply, Algebra.smul_def, map_mul]
 
-theorem eig_rank_one : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable (F := F) AA.carrier → ∀ χ : MulChar F R, (∃ c : R, c ≠ 0 ∧ xIdeal AA.carrier χ = Ideal.span {c}) ∧ ∀ g, g ∈ eig AA.carrier χ ↔ ∃ c ∈ xIdeal AA.carrier χ, g = fun a => algebraMap R C (c * χ a) := by
+theorem eig_rank_one
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable (F := F) AA.carrier
+                → ∀ χ : MulChar F R,
+                  (∃ c : R, c ≠ 0 ∧ xIdeal AA.carrier χ = Ideal.span {c})
+                    ∧ ∀ g,
+                      g ∈ eig AA.carrier χ
+                        ↔ ∃ c ∈ xIdeal AA.carrier χ, g = fun a => algebraMap R C (c * χ a) := by
   intro p _ C _ _ _ v R _ _ hv _ F _ _ _ _ f _ AA _ χ
   obtain ⟨B, hB, hM⟩ := AA.lat
-  have key : ∀ d : R, d ∈ xIdeal AA.carrier χ ↔
-      (d • fun a => algebraMap R C (χ a)) ∈ AA.carrier := fun d => by
+  have key
+      : ∀ d : R,
+        d ∈ xIdeal AA.carrier χ ↔ (d • fun a => algebraMap R C (χ a)) ∈ AA.carrier := fun d => by
     simp only [xIdeal, Submodule.mem_comap, LinearMap.toSpanSingleton_apply]
   refine ⟨?_, ?_⟩
   · obtain ⟨c, hc0, hc⟩ := exists_denominator v hv (B⁻¹ *ᵥ fun a => algebraMap R C (χ a))

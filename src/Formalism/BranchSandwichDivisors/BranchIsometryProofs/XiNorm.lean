@@ -46,8 +46,8 @@ lemma xn_minor_zero {s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n) (h : ¬ Funct
   unfold initMinor
   exact Matrix.det_zero_of_row_eq hne (funext fun q => by simp [hij])
 
-def xnCof (ι : κ → Fin r) {p : ℕ} (hp : p + 1 ≤ n) (a : Fin p → κ) (j : Fin (p + 1)) :
-    MvPolynomial (Fin r × Fin n) ℂ :=
+def xnCof (ι : κ → Fin r) {p : ℕ} (hp : p + 1 ≤ n) (a : Fin p → κ) (j : Fin (p + 1))
+    : MvPolynomial (Fin r × Fin n) ℂ :=
   (-1) ^ (p + j.val) * (Matrix.of fun i k : Fin p =>
     (X (ι (a i), Fin.castLE hp (j.succAbove k)) : MvPolynomial (Fin r × Fin n) ℂ)).det
 
@@ -641,8 +641,7 @@ end XiC
 
 section XiD
 
-def xnT (μ : ℕ → ℕ) (i j : ℕ) : ℝ :=
-  if i < j then ((μ i : ℝ) - μ j + j - i) / ((j : ℝ) - i) else 1
+def xnT (μ : ℕ → ℕ) (i j : ℕ) : ℝ := if i < j then ((μ i : ℝ) - μ j + j - i) / ((j : ℝ) - i) else 1
 
 def xnW (N : ℕ) (μ : ℕ → ℕ) : ℝ := ∏ i ∈ Finset.range N, ∏ j ∈ Finset.range N, xnT μ i j
 
@@ -956,14 +955,17 @@ theorem xi_norm_bound : XiNorm := by
     funext q
     have h0 : xnLam lam n = 0 := by simp [xnLam]
     rw [h0, Nat.sub_zero]
-  have hx : (∏ i ∈ Finset.univ.filter (fun i : Fin n => i.val < n),
-      (initMinor ℂ (rowsA i) (by omega : i.val + 1 ≤ n) ^ (sg i - nuNext lam i) *
-        initMinor ℂ (rowsB i) (by omega : i.val + 1 ≤ n) ^ (lam i - sg i))) = xiB ℂ lam sg := by
+  have hx
+      : (∏ i ∈ Finset.univ.filter (fun i : Fin n => i.val < n),
+          (initMinor ℂ (rowsA i) (by omega : i.val + 1 ≤ n) ^ (sg i - nuNext lam i) *
+            initMinor ℂ (rowsB i) (by omega : i.val + 1 ≤ n) ^ (lam i - sg i)))
+        = xiB ℂ lam sg := by
     unfold xiB
     rw [Finset.filter_true_of_mem fun i _ => i.isLt]
-  have hh : (∏ s ∈ Finset.univ.filter (fun s : Fin n => s.val < n),
-      (lpMinor ℂ (r := n + 1) (n := n) (s.val + 1) (by omega) (by omega)) ^ (lam s - nuNext lam s)) =
-      hw ℂ (Nat.le_succ n) lam := by
+  have hh
+      : (∏ s ∈ Finset.univ.filter (fun s : Fin n => s.val < n),
+          (lpMinor ℂ (r := n + 1) (n := n) (s.val + 1) (by omega) (by omega)) ^ (lam s - nuNext lam s))
+        = hw ℂ (Nat.le_succ n) lam := by
     unfold hw
     rw [Finset.filter_true_of_mem fun i _ => i.isLt]
   have hW : weylProd (lamZ lam) = xnW (n + 1) (xnLam lam) := by

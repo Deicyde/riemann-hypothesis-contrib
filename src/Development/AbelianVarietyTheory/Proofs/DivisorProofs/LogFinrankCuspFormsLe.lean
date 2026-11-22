@@ -53,9 +53,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AntitoneOfGa
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
-open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp GlobalTheory.DegVal GlobalTheory.DegCmp
-open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp
+  GlobalTheory.DegVal GlobalTheory.DegCmp
+open GlobalTheory.AllWt
+  (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
 open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
@@ -68,9 +71,11 @@ noncomputable section
 
 namespace GlobalTheory.CovTop.DimLogTop
 
-theorem log_size_le (f r L kap S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) (hL : 1 ≤ L) (hk0 : 0 ≤ kap)
-    (hk : Real.log kap ≤ 2 * L) (hfr : Real.log (f * r) ≤ L) (hS0 : 0 ≤ S)
-    (hS : S ≤ (f * r * L) ^ 2 * kap + 6 * f * r ^ 2) : Real.log S ≤ 20 * L := by
+theorem log_size_le
+    (f r L kap S : ℝ)
+    (hf : 1 ≤ f) (hr : 1 ≤ r) (hL : 1 ≤ L) (hk0 : 0 ≤ kap) (hk : Real.log kap ≤ 2 * L)
+    (hfr : Real.log (f * r) ≤ L) (hS0 : 0 ≤ S) (hS : S ≤ (f * r * L) ^ 2 * kap + 6 * f * r ^ 2)
+    : Real.log S ≤ 20 * L := by
   rcases hS0.eq_or_lt with h | h
   · rw [← h, Real.log_zero]; linarith
   have hfr0 : 0 < f * r := by positivity
@@ -95,23 +100,28 @@ theorem log_size_le (f r L kap S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) (hL : 1 �
     have : (f * r) ^ 2 ≤ Real.exp L ^ 2 := pow_le_pow_left₀ hfr0.le e1 2
     nlinarith
   have a3 : S ≤ Real.exp (12 * L) := by
-    have : Real.exp (12 * L) = Real.exp (6 * L) * Real.exp (6 * L) := by rw [← Real.exp_add]; ring_nf
+    have : Real.exp (12 * L) = Real.exp (6 * L) * Real.exp (6 * L) := by
+      rw [← Real.exp_add]; ring_nf
     rw [this]
     have := Real.exp_pos (6 * L)
     nlinarith
   have := (Real.log_le_iff_le_exp h).2 a3
   linarith
 
-theorem cube_le (Cb L Zb : ℝ) (hL : Cb ≤ L) (hL1 : 1 ≤ L) (hZ : L ≤ Zb) : Cb * Zb ^ 3 ≤ Zb ^ 12 := by
+theorem cube_le (Cb L Zb : ℝ) (hL : Cb ≤ L) (hL1 : 1 ≤ L) (hZ : L ≤ Zb)
+    : Cb * Zb ^ 3 ≤ Zb ^ 12 := by
   have h1 : 1 ≤ Zb := hL1.trans hZ
   have h9 : Zb ≤ Zb ^ 9 := le_self_pow₀ h1 (by norm_num)
   have h3 : 0 ≤ Zb ^ 3 := by positivity
-  calc Cb * Zb ^ 3 ≤ Zb ^ 9 * Zb ^ 3 := mul_le_mul_of_nonneg_right (by linarith) h3
+  calc
+    Cb * Zb ^ 3
+      ≤ Zb ^ 9 * Zb ^ 3 := mul_le_mul_of_nonneg_right (by linarith) h3
     _ = Zb ^ 12 := by ring
 
-theorem rkK_eq_finrank_of_span_top {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [Module (𝓞 K) V] (L : Submodule (𝓞 K) V) (h : Submodule.span K (L : Set V) = ⊤) :
-    Formalism.HN.rkK L = Module.finrank K V := by
+theorem rkK_eq_finrank_of_span_top
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    (L : Submodule (𝓞 K) V) (h : Submodule.span K (L : Set V) = ⊤)
+    : Formalism.HN.rkK L = Module.finrank K V := by
   unfold Formalism.HN.rkK
   rw [h, finrank_top]
 

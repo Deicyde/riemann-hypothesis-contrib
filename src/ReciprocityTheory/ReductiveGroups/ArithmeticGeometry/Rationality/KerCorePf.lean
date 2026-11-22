@@ -11,8 +11,10 @@ namespace ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
 open scoped TensorProduct
 open TensorProduct
 
-theorem exists_finset_inf_eq {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (S : Set (Submodule K V)) : ∃ t : Finset (Submodule K V), (t : Set _) ⊆ S ∧ ∀ N ∈ S, t.inf id ≤ N := by
+theorem exists_finset_inf_eq
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (S : Set (Submodule K V))
+    : ∃ t : Finset (Submodule K V), (t : Set _) ⊆ S ∧ ∀ N ∈ S, t.inf id ≤ N := by
   classical
   let T : Set (Submodule K V) :=
     {N | ∃ t : Finset (Submodule K V), (t : Set (Submodule K V)) ⊆ S ∧ N = t.inf id}
@@ -20,32 +22,41 @@ theorem exists_finset_inf_eq {K V : Type*} [Field K] [AddCommGroup V] [Module K 
   obtain ⟨N0, hN0, hmin⟩ := (wellFounded_lt (α := Submodule K V)).has_min T hT
   obtain ⟨t0, ht0S, rfl⟩ := hN0
   refine ⟨t0, ht0S, fun N hN => ?_⟩
-  have hmem : (insert N t0).inf id ∈ T :=
-    ⟨insert N t0, by
+  have hmem : (insert N t0).inf id ∈ T := ⟨
+    insert N t0,
+    by
       rw [Finset.coe_insert, Set.insert_subset_iff]
-      exact ⟨hN, ht0S⟩, rfl⟩
+      exact ⟨hN, ht0S⟩,
+    rfl
+  ⟩
   have hle : (insert N t0).inf id ≤ t0.inf id := Finset.inf_mono (Finset.subset_insert _ _)
   have heq : (insert N t0).inf id = t0.inf id := eq_of_le_of_not_lt hle (hmin _ hmem)
   rw [Finset.inf_insert] at heq
-  calc t0.inf id = N ⊓ t0.inf id := heq.symm
+  calc
+    t0.inf id
+      = N ⊓ t0.inf id := heq.symm
     _ ≤ N := inf_le_left
 
 theorem kerCore_holds : KerCoreStatement := by
   intro K _ _ V _ _ _ W Fam hkill hdet henl
   classical
-
-  let S : Set (Submodule K V) := {N | ∃ (K₁ : Type) (_ : Field K₁) (_ : NumberField K₁) (_ : Algebra K K₁)
-    (f : V →ₗ[K] K₁), Fam K₁ f ∧ N = LinearMap.ker f}
+  let S : Set (Submodule K V) :=
+    {N | ∃ (K₁ : Type) (_ : Field K₁) (_ : NumberField K₁) (_ : Algebra K K₁)
+      (f : V →ₗ[K] K₁), Fam K₁ f ∧ N = LinearMap.ker f}
   obtain ⟨t, htS, htinf⟩ := exists_finset_inf_eq S
-  have hmem : ∀ N : t, ∃ (K₁ : Type) (_ : Field K₁) (_ : NumberField K₁) (_ : Algebra K K₁)
-      (f : V →ₗ[K] K₁), Fam K₁ f ∧ (N : Submodule K V) = LinearMap.ker f := fun N => htS N.2
+  have hmem
+      : ∀ N : t,
+        ∃ (K₁ : Type) (_ : Field K₁) (_ : NumberField K₁) (_ : Algebra K K₁) (f : V →ₗ[K] K₁),
+          Fam K₁ f ∧ (N : Submodule K V) = LinearMap.ker f := fun N =>
+    htS N.2
   choose Ki fKi nfKi aKi fi hfam hNker using hmem
   have hWinf : t.inf id = W := by
     apply le_antisymm
     · intro v hv
       apply hdet v
       intro K₁ _ _ _ f hf
-      have := htinf (LinearMap.ker f) ⟨K₁, inferInstance, inferInstance, inferInstance, f, hf, rfl⟩ hv
+      have :=
+        htinf (LinearMap.ker f) ⟨K₁, inferInstance, inferInstance, inferInstance, f, hf, rfl⟩ hv
       exact this
     · refine Finset.le_inf fun N hN => ?_
       have h1 := hNker ⟨N, hN⟩
@@ -94,14 +105,15 @@ theorem kerCore_holds : KerCoreStatement := by
   have hg : ∀ (N : t) (e : Ki N →ₐ[K] L), ∃ g : V →ₗ[K] L, Fam L g ∧ ∀ v, g v = e (fi N v) :=
     fun N e => henl (Ki N) L e (fi N) (hfam N)
   choose g hgfam hgval using hg
-  let gh : (Σ N : t, (Ki N →ₐ[K] L)) → Module.Dual L (L ⊗[K] V) :=
-    fun p => (g p.1 p.2).liftBaseChange L
+  let gh : (Σ N : t, (Ki N →ₐ[K] L)) → Module.Dual L (L ⊗[K] V) := fun p =>
+    (g p.1 p.2).liftBaseChange L
   have hgh1 : ∀ p v, gh p ((1 : L) ⊗ₜ[K] v) = g p.1 p.2 v := fun p v =>
     LinearMap.liftBaseChange_one_tmul _ _ _
   let Kc : Submodule L (L ⊗[K] V) := ⨅ p, LinearMap.ker (gh p)
 
-  have hkey : ∀ (σ : L ≃ₐ[K] L) (N : t) (e : Ki N →ₐ[K] L) (x : L ⊗[K] V),
-      gh ⟨N, e⟩ (galAct σ x) = σ (gh ⟨N, (σ.symm.toAlgHom).comp e⟩ x) := by
+  have hkey
+      : ∀ (σ : L ≃ₐ[K] L) (N : t) (e : Ki N →ₐ[K] L) (x : L ⊗[K] V),
+        gh ⟨N, e⟩ (galAct σ x) = σ (gh ⟨N, (σ.symm.toAlgHom).comp e⟩ x) := by
     intro σ N e x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -140,8 +152,8 @@ theorem kerCore_holds : KerCoreStatement := by
   have : Fintype t' := ht'fin.fintype
   set ρ := Fintype.card t' with hρ
   let eT := Fintype.equivFin t'
-  have hpick : ∀ i : Fin ρ, ∃ p, gh p = (eT.symm i : Module.Dual L (L ⊗[K] V)) :=
-    fun i => ht'sub (eT.symm i).2
+  have hpick : ∀ i : Fin ρ, ∃ p, gh p = (eT.symm i : Module.Dual L (L ⊗[K] V)) := fun i =>
+    ht'sub (eT.symm i).2
   choose pk hpk using hpick
   let cfL : Fin ρ → Module.Dual L (L ⊗[K] V) := fun i => (eT.symm i : Module.Dual L (L ⊗[K] V))
   have hcomm : ∀ x : L ⊗[K] V, (∀ i, cfL i x = 0) ↔ x ∈ Kc := by
@@ -181,8 +193,19 @@ theorem kerCore_holds : KerCoreStatement := by
     have h2 : Module.finrank L (Submodule.span L t') = ρ := by
       rw [hρ, finrank_span_set_eq_card ht'li, Set.toFinset_card]
     omega
-  refine ⟨L, inferInstance, hnfL, inferInstance, ρ, fun i => g (pk i).1 (pk i).2, cfL,
-    fun i => hgfam _ _, fun i v => ?_, fun x => ?_, hdim⟩
+  refine ⟨
+    L,
+    inferInstance,
+    hnfL,
+    inferInstance,
+    ρ,
+    fun i => g (pk i).1 (pk i).2,
+    cfL,
+    fun i => hgfam _ _,
+    fun i v => ?_,
+    fun x => ?_,
+    hdim
+  ⟩
   · rw [show cfL i = gh (pk i) from (hpk i).symm, hgh1]
   · rw [hcomm, hKc]
 

@@ -11,8 +11,8 @@ namespace Formalism.MainNotions.flipOneThree.Pf
 open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
 
 def RestOIso : Prop :=
-  ∀ (p n' : ℕ) (R₁ R₂ : RS p n') (φW : R₁.W ≃+* R₂.W),
-    ∃ φO : R₁.O ≃+* R₂.O, (∀ x, φO (R₁.jO x) = R₂.jO (φW x)) ∧ φO R₁.w = R₂.w
+  ∀ (p n' : ℕ) (R₁ R₂ : RS p n') (φW : R₁.W ≃+* R₂.W), ∃ φO : R₁.O ≃+* R₂.O,
+    (∀ x, φO (R₁.jO x) = R₂.jO (φW x)) ∧ φO R₁.w = R₂.w
 
 theorem restRSIso_of (hW : WittIdent) (hO : RestOIso) : RestRSIso := by
   intro p n' R₁ R₂
@@ -30,11 +30,12 @@ theorem restRSIso_of (hW : WittIdent) (hO : RestOIso) : RestRSIso := by
   let φK : R₁.Kf ≃+* R₂.Kf := IsFractionRing.ringEquivOfRingEquiv φO
   have hWQ : ∀ x, φQ (algebraMap R₁.W R₁.Qq x) = algebraMap R₂.W R₂.Qq ((φ₁.symm.trans φ₂) x) :=
     fun x => IsFractionRing.ringEquivOfRingEquiv_algebraMap _ x
-  have hOK : ∀ x, φK (algebraMap R₁.O R₁.Kf x) = algebraMap R₂.O R₂.Kf (φO x) :=
-    fun x => IsFractionRing.ringEquivOfRingEquiv_algebraMap _ x
+  have hOK : ∀ x, φK (algebraMap R₁.O R₁.Kf x) = algebraMap R₂.O R₂.Kf (φO x) := fun x =>
+    IsFractionRing.ringEquivOfRingEquiv_algebraMap _ x
   have hσ : ∀ x, φQ (R₁.σ x) = R₂.σ (φQ x) := by
-    have key : (φQ : R₁.Qq →+* R₂.Qq).comp (R₁.σ : R₁.Qq →+* R₁.Qq) =
-        (R₂.σ : R₂.Qq →+* R₂.Qq).comp (φQ : R₁.Qq →+* R₂.Qq) := by
+    have key
+        : (φQ : R₁.Qq →+* R₂.Qq).comp (R₁.σ : R₁.Qq →+* R₁.Qq)
+          = (R₂.σ : R₂.Qq →+* R₂.Qq).comp (φQ : R₁.Qq →+* R₂.Qq) := by
       apply IsLocalization.ringHom_ext (nonZeroDivisors R₁.W)
       ext u
       obtain ⟨v, rfl⟩ := φ₁.surjective u
@@ -52,7 +53,8 @@ theorem restRSIso_of (hW : WittIdent) (hO : RestOIso) : RestRSIso := by
     exact fun x => RingHom.congr_fun key x
   exact ⟨⟨φ₁.symm.trans φ₂, φQ, φO, φK, hWQ, hOK, hι, hσ, hj, hw⟩⟩
 
-theorem lpRingIndep_of'' (hW : WittIdent) (hO : RestOIso) : LPRingIndep := lpRingIndep_of' (restRSIso_of hW hO)
+theorem lpRingIndep_of'' (hW : WittIdent) (hO : RestOIso) : LPRingIndep :=
+  lpRingIndep_of' (restRSIso_of hW hO)
 
 end Formalism.MainNotions.flipOneThree.Pf
 

@@ -13,12 +13,13 @@ open MvPolynomial Finset Coinv
 
 noncomputable section
 
-theorem Coinv.bps_isHomogeneous (K : Type) [Field K] (f n m : ℕ) (b : Fin f) :
-    (bps K f n m b).IsHomogeneous m :=
+theorem Coinv.bps_isHomogeneous (K : Type) [Field K] (f n m : ℕ) (b : Fin f)
+    : (bps K f n m b).IsHomogeneous m :=
   IsHomogeneous.sum _ _ _ fun _ _ => isHomogeneous_X_pow _ _
 
-theorem CoinvIdealComponent.proof (h1 : CoinvIdealRepresentation.Statement)
-    (h2 : HomogeneousComponentMul.Statement) : CoinvIdealComponent.Statement := by
+theorem CoinvIdealComponent.proof
+    (h1 : CoinvIdealRepresentation.Statement) (h2 : HomogeneousComponentMul.Statement)
+    : CoinvIdealComponent.Statement := by
   intro K _ f n J hJ d
   obtain ⟨a, rfl⟩ := h1 K f n J hJ
   refine ⟨fun m b => if m ≤ d then homogeneousComponent (d - m) (a m b) else 0, ?_, ?_⟩

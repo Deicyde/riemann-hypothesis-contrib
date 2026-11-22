@@ -20,23 +20,25 @@ variable {p : ℕ} [Fact p.Prime]
 theorem norm_natCast_prime : ‖(p : PadicAlgCl p)‖ = (p : ℝ)⁻¹ :=
   _root_.UpperTheory.Reformulated.B.CapelliMiscellany.norm_natCast_prime
 
-theorem norm_eq_one_of_pow_eq_one {x : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hx : x ^ N = 1) :
-    ‖x‖ = 1 := by
+theorem norm_eq_one_of_pow_eq_one {x : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hx : x ^ N = 1)
+    : ‖x‖ = 1 := by
   have h : ‖x‖ ^ N = 1 := by rw [← norm_pow, hx, norm_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg x) hN).1 h
 
-theorem norm_pow_sub_one_le {ζ : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hζ : ζ ^ N = 1) (j : ℕ) :
-    ‖ζ ^ j - 1‖ ≤ ‖ζ - 1‖ := by
+theorem norm_pow_sub_one_le {ζ : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hζ : ζ ^ N = 1) (j : ℕ)
+    : ‖ζ ^ j - 1‖ ≤ ‖ζ - 1‖ := by
   have h1 : ‖ζ‖ = 1 := norm_eq_one_of_pow_eq_one hN hζ
   rw [← geom_sum_mul, norm_mul]
   have : ‖∑ i ∈ Finset.range j, ζ ^ i‖ ≤ 1 :=
     IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun i _ => by
       rw [norm_pow, h1, one_pow]
-  calc _ ≤ 1 * ‖ζ - 1‖ := mul_le_mul_of_nonneg_right this (norm_nonneg _)
+  calc
+    _ ≤ 1 * ‖ζ - 1‖ := mul_le_mul_of_nonneg_right this (norm_nonneg _)
     _ = _ := one_mul _
 
-theorem norm_sub_one_eq_of_isPrimitiveRoot {ζ η : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0)
-    (hζ : IsPrimitiveRoot ζ N) (hη : IsPrimitiveRoot η N) : ‖η - 1‖ = ‖ζ - 1‖ := by
+theorem norm_sub_one_eq_of_isPrimitiveRoot
+    {ζ η : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hζ : IsPrimitiveRoot ζ N) (hη : IsPrimitiveRoot η N)
+    : ‖η - 1‖ = ‖ζ - 1‖ := by
   have : NeZero N := ⟨hN⟩
   obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hη.pow_eq_one
   obtain ⟨j, -, hj⟩ := hη.eq_pow_of_pow_eq_one hζ.pow_eq_one
@@ -44,32 +46,31 @@ theorem norm_sub_one_eq_of_isPrimitiveRoot {ζ η : PadicAlgCl p} {N : ℕ} (hN 
   conv_lhs => rw [← hj]
   exact norm_pow_sub_one_le hN hη.pow_eq_one j
 
-theorem norm_sub_one_pow_totient {ζ : PadicAlgCl p} {k : ℕ}
-    (hζ : IsPrimitiveRoot ζ (p ^ (k + 1))) :
-    ‖ζ - 1‖ ^ Nat.totient (p ^ (k + 1)) = (p : ℝ)⁻¹ := by
+theorem norm_sub_one_pow_totient {ζ : PadicAlgCl p} {k : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ (k + 1)))
+    : ‖ζ - 1‖ ^ Nat.totient (p ^ (k + 1)) = (p : ℝ)⁻¹ := by
   have hpos : 0 < p ^ (k + 1) := pow_pos (Fact.out : p.Prime).pos _
   have h1 := congrArg (eval 1) (cyclotomic_eq_prod_X_sub_primitiveRoots hζ)
   rw [eval_one_cyclotomic_prime_pow, eval_prod] at h1
   simp only [eval_sub, eval_X, eval_C] at h1
   rw [← norm_natCast_prime]
-  calc ‖ζ - 1‖ ^ Nat.totient (p ^ (k + 1))
-      = ∏ _μ ∈ primitiveRoots (p ^ (k + 1)) (PadicAlgCl p), ‖ζ - 1‖ := by
-        rw [Finset.prod_const, hζ.card_primitiveRoots]
+  calc
+    ‖ζ - 1‖ ^ Nat.totient (p ^ (k + 1))
+        = ∏ _μ ∈ primitiveRoots (p ^ (k + 1)) (PadicAlgCl p), ‖ζ - 1‖ := by
+      rw [Finset.prod_const, hζ.card_primitiveRoots]
     _ = ∏ μ ∈ primitiveRoots (p ^ (k + 1)) (PadicAlgCl p), ‖1 - μ‖ :=
-        Finset.prod_congr rfl fun μ hμ => by
-          rw [norm_sub_rev 1 μ]
-          exact (norm_sub_one_eq_of_isPrimitiveRoot hpos.ne' hζ
-            ((mem_primitiveRoots hpos).1 hμ)).symm
+      Finset.prod_congr rfl fun μ hμ => by
+        rw [norm_sub_rev 1 μ]
+        exact (norm_sub_one_eq_of_isPrimitiveRoot hpos.ne' hζ ((mem_primitiveRoots hpos).1 hμ)).symm
     _ = _ := by rw [h1, norm_prod]
 
-theorem norm_sub_one_le_one {ζ : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hζ : ζ ^ N = 1) :
-    ‖ζ - 1‖ ≤ 1 := by
+theorem norm_sub_one_le_one {ζ : PadicAlgCl p} {N : ℕ} (hN : N ≠ 0) (hζ : ζ ^ N = 1)
+    : ‖ζ - 1‖ ≤ 1 := by
   have := IsUltrametricDist.norm_add_le_max ζ (-1)
   rw [← sub_eq_add_neg, norm_neg, norm_one, norm_eq_one_of_pow_eq_one hN hζ, max_self] at this
   exact this
 
-theorem norm_pow_natDegree_minpoly (y : PadicAlgCl p) :
-    ‖y‖ ^ (minpoly ℚ_[p] y).natDegree = ‖(minpoly ℚ_[p] y).coeff 0‖ := by
+theorem norm_pow_natDegree_minpoly (y : PadicAlgCl p)
+    : ‖y‖ ^ (minpoly ℚ_[p] y).natDegree = ‖(minpoly ℚ_[p] y).coeff 0‖ := by
   have hd : (minpoly ℚ_[p] y).natDegree ≠ 0 :=
     (minpoly.natDegree_pos (Algebra.IsIntegral.isIntegral y)).ne'
   rw [← PadicAlgCl.spectralNorm_eq, spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow, one_div,
@@ -83,9 +84,9 @@ theorem one_lt_p_real : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).
 theorem zpow_p_injective : Function.Injective fun z : ℤ => (p : ℝ) ^ z :=
   zpow_right_injective₀ (by linarith [one_lt_p_real (p := p)]) (one_lt_p_real (p := p)).ne'
 
-theorem minpoly_eq_cyclotomic_of_isPrimitiveRoot {ζ : PadicAlgCl p} {k : ℕ}
-    (hζ : IsPrimitiveRoot ζ (p ^ (k + 1))) :
-    minpoly ℚ_[p] ζ = cyclotomic (p ^ (k + 1)) ℚ_[p] := by
+theorem minpoly_eq_cyclotomic_of_isPrimitiveRoot
+    {ζ : PadicAlgCl p} {k : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ (k + 1)))
+    : minpoly ℚ_[p] ζ = cyclotomic (p ^ (k + 1)) ℚ_[p] := by
   have hpos : 0 < p ^ (k + 1) := pow_pos (Fact.out : p.Prime).pos _
   have hint : IsIntegral ℚ_[p] ζ := Algebra.IsIntegral.isIntegral ζ
   have hdvd : minpoly ℚ_[p] ζ ∣ cyclotomic (p ^ (k + 1)) ℚ_[p] := by
@@ -102,8 +103,9 @@ theorem minpoly_eq_cyclotomic_of_isPrimitiveRoot {ζ : PadicAlgCl p} {k : ℕ}
   have hπ0 : ζ - 1 ≠ 0 := by
     rw [sub_ne_zero]
     intro h
-    have := hζ.pow_ne_one_of_pos_of_lt one_ne_zero (Nat.one_lt_pow (Nat.succ_ne_zero k)
-      (Fact.out : p.Prime).one_lt)
+    have :=
+      hζ.pow_ne_one_of_pos_of_lt one_ne_zero
+        (Nat.one_lt_pow (Nat.succ_ne_zero k) (Fact.out : p.Prime).one_lt)
     exact this (by rw [pow_one, h])
   have hc0 : (minpoly ℚ_[p] (ζ - 1)).coeff 0 ≠ 0 :=
     minpoly.coeff_zero_ne_zero (Algebra.IsIntegral.isIntegral _) hπ0
@@ -113,7 +115,8 @@ theorem minpoly_eq_cyclotomic_of_isPrimitiveRoot {ζ : PadicAlgCl p} {k : ℕ}
   have e2 := norm_sub_one_pow_totient hζ
 
   have key : (p : ℝ) ^ (z * Nat.totient (p ^ (k + 1))) = (p : ℝ) ^ (-(d : ℤ)) := by
-    calc (p : ℝ) ^ (z * Nat.totient (p ^ (k + 1)))
+    calc
+      (p : ℝ) ^ (z * Nat.totient (p ^ (k + 1)))
         = ((p : ℝ) ^ z) ^ Nat.totient (p ^ (k + 1)) := by rw [zpow_mul, zpow_natCast]
       _ = (‖ζ - 1‖ ^ d) ^ Nat.totient (p ^ (k + 1)) := by rw [e1]
       _ = (‖ζ - 1‖ ^ Nat.totient (p ^ (k + 1))) ^ d := by rw [← pow_mul, ← pow_mul, mul_comm]
@@ -121,8 +124,7 @@ theorem minpoly_eq_cyclotomic_of_isPrimitiveRoot {ζ : PadicAlgCl p} {k : ℕ}
       _ = (p : ℝ) ^ (-(d : ℤ)) := by rw [zpow_neg, zpow_natCast, inv_pow]
   have key' := zpow_p_injective (p := p) key
   have hdvdφ : Nat.totient (p ^ (k + 1)) ∣ d := by
-    have : ((Nat.totient (p ^ (k + 1)) : ℕ) : ℤ) ∣ (d : ℤ) :=
-      ⟨-z, by linear_combination key'⟩
+    have : ((Nat.totient (p ^ (k + 1)) : ℕ) : ℤ) ∣ (d : ℤ) := ⟨-z, by linear_combination key'⟩
     exact Int.natCast_dvd_natCast.1 this
   have hle1 : Nat.totient (p ^ (k + 1)) ≤ d := Nat.le_of_dvd hd0 hdvdφ
   have hle2 : d ≤ Nat.totient (p ^ (k + 1)) := by
@@ -142,28 +144,30 @@ theorem finrank_cycl (n : ℕ) : finrank ℚ_[p] (cycl p n) = Nat.totient (p ^ n
     simpa using natDegree_X_sub_C (1 : ℚ_[p])
   | succ k => rw [minpoly_eq_cyclotomic_of_isPrimitiveRoot hζ, natDegree_cyclotomic]
 
-theorem totient_prime_pow_succ {k : ℕ} (hk : 1 ≤ k) :
-    Nat.totient (p ^ (k + 1)) = p * Nat.totient (p ^ k) := by
+theorem totient_prime_pow_succ {k : ℕ} (hk : 1 ≤ k)
+    : Nat.totient (p ^ (k + 1)) = p * Nat.totient (p ^ k) := by
   rw [pow_succ', Nat.totient_mul_of_dvd (dvd_pow_self p (by omega))]
 
-theorem natDegree_minpoly_cycl_of_adjoin_eq {k : ℕ} (hk : 1 ≤ k) {y : PadicAlgCl p}
-    (hy : ℚ_[p]⟮y⟯ = cycl p (k + 1)) : (minpoly (cycl p k) y).natDegree = p := by
-  have hint : IsIntegral (cycl p k) y :=
-    (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) y).tower_top
+theorem natDegree_minpoly_cycl_of_adjoin_eq
+    {k : ℕ} (hk : 1 ≤ k) {y : PadicAlgCl p} (hy : ℚ_[p]⟮y⟯ = cycl p (k + 1))
+    : (minpoly (cycl p k) y).natDegree = p := by
+  have hint : IsIntegral (cycl p k) y := (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) y).tower_top
   have e := finrank_sup_adjoin_simple (cycl p k) hint
   rw [hy, sup_eq_right.2 (cycl_mono (Nat.le_succ k)), finrank_cycl, finrank_cycl,
-    totient_prime_pow_succ hk] at e
+      totient_prime_pow_succ hk]
+    at e
   have hφ : 0 < Nat.totient (p ^ k) := Nat.totient_pos.2 (pow_pos (Fact.out : p.Prime).pos _)
   rw [mul_comm p] at e
   exact (Nat.eq_of_mul_eq_mul_left hφ e).symm
 
-theorem normTrace_cycl_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k) {η : PadicAlgCl p}
-    (hη : IsPrimitiveRoot η (p ^ (k + 1))) : normTrace (cycl p k) η = 0 := by
+theorem normTrace_cycl_isPrimitiveRoot
+    {k : ℕ} (hk : 1 ≤ k) {η : PadicAlgCl p} (hη : IsPrimitiveRoot η (p ^ (k + 1)))
+    : normTrace (cycl p k) η = 0 := by
   have hp2 : 2 ≤ p := (Fact.out : p.Prime).two_le
-  have hint : IsIntegral (cycl p k) η :=
-    (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) η).tower_top
+  have hint : IsIntegral (cycl p k) η := (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) η).tower_top
   have hdeg := natDegree_minpoly_cycl_of_adjoin_eq hk (cycl_eq_adjoin hη).symm
-  have hc : η ^ p ∈ cycl p k := pow_eq_one_mem_cycl (by rw [← pow_mul, ← pow_succ']; exact hη.pow_eq_one)
+  have hc : η ^ p ∈ cycl p k :=
+    pow_eq_one_mem_cycl (by rw [← pow_mul, ← pow_succ']; exact hη.pow_eq_one)
   set f : (cycl p k)[X] := X ^ p - C ⟨η ^ p, hc⟩ with hf
   have hfm : f.Monic := monic_X_pow_sub_C _ (by omega)
   have hfdeg : f.natDegree = p := natDegree_X_pow_sub_C _
@@ -177,8 +181,8 @@ theorem normTrace_cycl_isPrimitiveRoot {k : ℕ} (hk : 1 ≤ k) {η : PadicAlgCl
   rw [normTrace, normTraceF, ← heq, hnext]
   simp
 
-theorem exists_norm_pow_totient_eq_zpow {n : ℕ} {y : PadicAlgCl p} (hy : y ∈ cycl p n)
-    (hy0 : y ≠ 0) : ∃ z : ℤ, ‖y‖ ^ Nat.totient (p ^ n) = (p : ℝ) ^ z := by
+theorem exists_norm_pow_totient_eq_zpow {n : ℕ} {y : PadicAlgCl p} (hy : y ∈ cycl p n) (hy0 : y ≠ 0)
+    : ∃ z : ℤ, ‖y‖ ^ Nat.totient (p ^ n) = (p : ℝ) ^ z := by
   have hint : IsIntegral ℚ_[p] y := Algebra.IsIntegral.isIntegral y
   have hle : ℚ_[p]⟮y⟯ ≤ cycl p n := by rw [adjoin_simple_le_iff]; exact hy
   have hdvd : (minpoly ℚ_[p] y).natDegree ∣ Nat.totient (p ^ n) := by
@@ -191,20 +195,19 @@ theorem exists_norm_pow_totient_eq_zpow {n : ℕ} {y : PadicAlgCl p} (hy : y ∈
   refine ⟨z * m, ?_⟩
   rw [hm, pow_mul, norm_pow_natDegree_minpoly, hz, zpow_mul, zpow_natCast]
 
-
 variable (p) in
 def cyclRadius (p : ℕ) [Fact p.Prime] (j : ℕ) : ℝ :=
   ‖(exists_isPrimitiveRoot (p := p) j).choose - 1‖
 
-theorem norm_sub_one_eq_cyclRadius {η : PadicAlgCl p} {j : ℕ} (hη : IsPrimitiveRoot η (p ^ j)) :
-    ‖η - 1‖ = cyclRadius p j :=
+theorem norm_sub_one_eq_cyclRadius {η : PadicAlgCl p} {j : ℕ} (hη : IsPrimitiveRoot η (p ^ j))
+    : ‖η - 1‖ = cyclRadius p j :=
   norm_sub_one_eq_of_isPrimitiveRoot (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)
     (exists_isPrimitiveRoot (p := p) j).choose_spec hη
 
 theorem cyclRadius_nonneg (j : ℕ) : 0 ≤ cyclRadius p j := norm_nonneg _
 
-theorem cyclRadius_pow_totient (k : ℕ) :
-    cyclRadius p (k + 1) ^ Nat.totient (p ^ (k + 1)) = (p : ℝ)⁻¹ := by
+theorem cyclRadius_pow_totient (k : ℕ)
+    : cyclRadius p (k + 1) ^ Nat.totient (p ^ (k + 1)) = (p : ℝ)⁻¹ := by
   rw [← norm_sub_one_eq_cyclRadius (exists_isPrimitiveRoot (p := p) (k + 1)).choose_spec]
   exact norm_sub_one_pow_totient (exists_isPrimitiveRoot (p := p) (k + 1)).choose_spec
 
@@ -229,15 +232,15 @@ theorem cyclRadius_succ_pow {k : ℕ} (hk : 1 ≤ k) : cyclRadius p (k + 1) ^ p 
   rw [← pow_mul, ← totient_prime_pow_succ (p := p) (k := j + 1) (by omega),
     cyclRadius_pow_totient (p := p) (j + 1), cyclRadius_pow_totient (p := p) j]
 
-theorem cyclRadius_succ_pow_pred {k : ℕ} (hk : 1 ≤ k) :
-    cyclRadius p (k + 1) ^ (p - 1) = cyclRadius p k / cyclRadius p (k + 1) := by
+theorem cyclRadius_succ_pow_pred {k : ℕ} (hk : 1 ≤ k)
+    : cyclRadius p (k + 1) ^ (p - 1) = cyclRadius p k / cyclRadius p (k + 1) := by
   have hp : 1 ≤ p := (Fact.out : p.Prime).one_lt.le
   have h : cyclRadius p (k + 1) ^ (p - 1) * cyclRadius p (k + 1) = cyclRadius p k := by
     rw [← pow_succ, Nat.sub_add_cancel hp, cyclRadius_succ_pow (p := p) hk]
   rw [eq_div_iff (cyclRadius_pos (p := p) k).ne', h]
 
-theorem adjoin_sub_one_eq_cycl {ζ : PadicAlgCl p} {n : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ n)) :
-    ℚ_[p]⟮ζ - 1⟯ = cycl p n := by
+theorem adjoin_sub_one_eq_cycl {ζ : PadicAlgCl p} {n : ℕ} (hζ : IsPrimitiveRoot ζ (p ^ n))
+    : ℚ_[p]⟮ζ - 1⟯ = cycl p n := by
   rw [cycl_eq_adjoin hζ]
   apply le_antisymm
   · rw [adjoin_simple_le_iff]
@@ -246,11 +249,12 @@ theorem adjoin_sub_one_eq_cycl {ζ : PadicAlgCl p} {n : ℕ} (hζ : IsPrimitiveR
     have h := add_mem (mem_adjoin_simple_self ℚ_[p] (ζ - 1)) (one_mem ℚ_[p]⟮ζ - 1⟯)
     rwa [sub_add_cancel] at h
 
-theorem exists_eq_sum_pow_of_adjoin_eq {k : ℕ} (hk : 1 ≤ k) {y : PadicAlgCl p}
-    (hy : ℚ_[p]⟮y⟯ = cycl p (k + 1)) {x : PadicAlgCl p} (hx : x ∈ cycl p (k + 1)) :
-    ∃ b : ℕ → PadicAlgCl p, (∀ i, b i ∈ cycl p k) ∧ x = ∑ i ∈ Finset.range p, b i * y ^ i := by
-  have hint : IsIntegral (cycl p k) y :=
-    (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) y).tower_top
+theorem exists_eq_sum_pow_of_adjoin_eq
+    {k : ℕ} (hk : 1 ≤ k)
+    {y : PadicAlgCl p} (hy : ℚ_[p]⟮y⟯ = cycl p (k + 1))
+    {x : PadicAlgCl p} (hx : x ∈ cycl p (k + 1))
+    : ∃ b : ℕ → PadicAlgCl p, (∀ i, b i ∈ cycl p k) ∧ x = ∑ i ∈ Finset.range p, b i * y ^ i := by
+  have hint : IsIntegral (cycl p k) y := (Algebra.IsIntegral.isIntegral (R := ℚ_[p]) y).tower_top
   set pb := IntermediateField.adjoin.powerBasis hint
   have hdim : pb.dim = p := by
     rw [IntermediateField.adjoin.powerBasis_dim, natDegree_minpoly_cycl_of_adjoin_eq hk hy]
@@ -268,28 +272,35 @@ theorem exists_eq_sum_pow_of_adjoin_eq {k : ℕ} (hk : 1 ≤ k) {y : PadicAlgCl 
   rw [h1, aeval_eq_sum_range' (hfdeg.trans_eq hdim)]
   exact Finset.sum_congr rfl fun i _ => by rw [Algebra.smul_def]
 
-theorem norm_mul_pow_le_norm_sum {k : ℕ} (hk : 1 ≤ k) {ζ : PadicAlgCl p}
-    (hζ : IsPrimitiveRoot ζ (p ^ (k + 1))) {b : ℕ → PadicAlgCl p} (hb : ∀ i, b i ∈ cycl p k) :
-    ∀ i ∈ Finset.range p, ‖b i‖ * ‖ζ - 1‖ ^ i ≤ ‖∑ i ∈ Finset.range p, b i * (ζ - 1) ^ i‖ := by
+theorem norm_mul_pow_le_norm_sum
+    {k : ℕ} (hk : 1 ≤ k)
+    {ζ : PadicAlgCl p} (hζ : IsPrimitiveRoot ζ (p ^ (k + 1)))
+    {b : ℕ → PadicAlgCl p} (hb : ∀ i, b i ∈ cycl p k)
+    : ∀ i ∈ Finset.range p, ‖b i‖ * ‖ζ - 1‖ ^ i ≤ ‖∑ i ∈ Finset.range p, b i * (ζ - 1) ^ i‖ := by
   set π := ζ - 1
   set x := ∑ i ∈ Finset.range p, b i * π ^ i
   set φ := Nat.totient (p ^ k)
   have hπpow : ‖π‖ ^ (p * φ) = (p : ℝ)⁻¹ := by
     rw [← totient_prime_pow_succ hk]; exact norm_sub_one_pow_totient hζ
 
-  have hterm : ∀ i, b i ≠ 0 → ∃ z : ℤ, (‖b i‖ * ‖π‖ ^ i) ^ (p * φ) = (p : ℝ) ^ ((p : ℤ) * z - i) := by
+  have hterm
+      : ∀ i, b i ≠ 0 → ∃ z : ℤ, (‖b i‖ * ‖π‖ ^ i) ^ (p * φ) = (p : ℝ) ^ ((p : ℤ) * z - i) := by
     intro i hi
     obtain ⟨z, hz⟩ := exists_norm_pow_totient_eq_zpow (hb i) hi
     refine ⟨z, ?_⟩
     have hp0 : (p : ℝ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
-    calc (‖b i‖ * ‖π‖ ^ i) ^ (p * φ) = (‖b i‖ ^ φ) ^ p * (‖π‖ ^ (p * φ)) ^ i := by ring
+    calc
+      (‖b i‖ * ‖π‖ ^ i) ^ (p * φ)
+        = (‖b i‖ ^ φ) ^ p * (‖π‖ ^ (p * φ)) ^ i := by ring
       _ = ((p : ℝ) ^ z) ^ p * ((p : ℝ)⁻¹) ^ i := by rw [hz, hπpow]
       _ = (p : ℝ) ^ ((p : ℤ) * z - i) := by
         rw [← zpow_natCast ((p : ℝ) ^ z) p, ← zpow_mul, inv_pow, ← zpow_natCast (p : ℝ) i,
           ← zpow_neg, ← zpow_add₀ hp0]
-        congr 1; ring
-  have hdistinct : ∀ i ∈ Finset.range p, ∀ j ∈ Finset.range p, i ≠ j → b i ≠ 0 → b j ≠ 0 →
-      ‖b i‖ * ‖π‖ ^ i ≠ ‖b j‖ * ‖π‖ ^ j := by
+        congr 1
+        ring
+  have hdistinct
+      : ∀ i ∈ Finset.range p, ∀ j ∈ Finset.range p,
+        i ≠ j → b i ≠ 0 → b j ≠ 0 → ‖b i‖ * ‖π‖ ^ i ≠ ‖b j‖ * ‖π‖ ^ j := by
     intro i hi j hj hij hbi hbj h
     obtain ⟨zi, hzi⟩ := hterm i hbi
     obtain ⟨zj, hzj⟩ := hterm j hbj
@@ -302,13 +313,12 @@ theorem norm_mul_pow_le_norm_sum {k : ℕ} (hk : 1 ≤ k) {ζ : PadicAlgCl p}
   intro i hi
   by_contra hlt
   rw [not_le] at hlt
-  obtain ⟨i0, hi0, hmax⟩ := Finset.exists_max_image (Finset.range p) (fun i => ‖b i‖ * ‖π‖ ^ i)
-    ⟨i, hi⟩
+  obtain ⟨i0, hi0, hmax⟩ :=
+    Finset.exists_max_image (Finset.range p) (fun i => ‖b i‖ * ‖π‖ ^ i) ⟨i, hi⟩
   set M := ‖b i0‖ * ‖π‖ ^ i0
   have hxM : ‖x‖ < M := lt_of_lt_of_le hlt (hmax i hi)
   have hM0 : 0 < M := lt_of_le_of_lt (norm_nonneg _) hxM
-  have hbi0 : b i0 ≠ 0 := by
-    intro h; rw [show M = 0 by simp [M, h]] at hM0; exact lt_irrefl 0 hM0
+  have hbi0 : b i0 ≠ 0 := by intro h; rw [show M = 0 by simp [M, h]] at hM0; exact lt_irrefl 0 hM0
   have hlt' : ∀ j ∈ (Finset.range p).erase i0, ‖b j * π ^ j‖ < M := by
     intro j hj
     rw [norm_mul, norm_pow]
@@ -320,21 +330,25 @@ theorem norm_mul_pow_le_norm_sum {k : ℕ} (hk : 1 ≤ k) {ζ : PadicAlgCl p}
   have hrest : ‖rest‖ < M := by
     rcases ((Finset.range p).erase i0).eq_empty_or_nonempty with h | h
     · rw [show rest = 0 by simp [rest, h], norm_zero]; exact hM0
-    · obtain ⟨j, hj, hjle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty h
-        (fun j => b j * π ^ j)
+    · obtain ⟨j, hj, hjle⟩ :=
+        IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty h (fun j => b j * π ^ j)
       exact lt_of_le_of_lt hjle (hlt' j hj)
   have hx : x = b i0 * π ^ i0 + rest := (Finset.add_sum_erase _ _ hi0).symm
   have : ‖b i0 * π ^ i0‖ ≤ max ‖x‖ ‖rest‖ := by
     have h1 := IsUltrametricDist.norm_add_le_max x (-rest)
     rw [norm_neg] at h1
-    calc ‖b i0 * π ^ i0‖ = ‖x + -rest‖ := by rw [hx, add_neg_cancel_right]
+    calc
+      ‖b i0 * π ^ i0‖
+        = ‖x + -rest‖ := by rw [hx, add_neg_cancel_right]
       _ ≤ max ‖x‖ ‖rest‖ := h1
   rw [norm_mul, norm_pow] at this
   exact absurd this (not_le.2 (max_lt hxM hrest))
 
-theorem normTrace_cycl_sub_one_pow {k : ℕ} (hk : 1 ≤ k) {ζ : PadicAlgCl p}
-    (hζ : IsPrimitiveRoot ζ (p ^ (k + 1))) {i : ℕ} (hi : i < p) :
-    normTrace (cycl p k) ((ζ - 1) ^ i) = (-1) ^ i := by
+theorem normTrace_cycl_sub_one_pow
+    {k : ℕ} (hk : 1 ≤ k)
+    {ζ : PadicAlgCl p} (hζ : IsPrimitiveRoot ζ (p ^ (k + 1)))
+    {i : ℕ} (hi : i < p)
+    : normTrace (cycl p k) ((ζ - 1) ^ i) = (-1) ^ i := by
   have hpr := (Fact.out : p.Prime)
   rw [sub_eq_add_neg, add_pow, normTrace_sum]
   rw [Finset.sum_eq_single 0]
@@ -346,14 +360,15 @@ theorem normTrace_cycl_sub_one_pow {k : ℕ} (hk : 1 ≤ k) {ζ : PadicAlgCl p}
       mul_mem (pow_mem (neg_mem (one_mem _)) _) (IntermediateField.natCast_mem _ _)
     rw [mul_assoc, mul_comm, normTrace_mul_of_mem _ hmem]
     have hcop : j.Coprime (p ^ (k + 1)) :=
-      Nat.Coprime.pow_right _ (Nat.coprime_comm.1 ((Nat.Prime.coprime_iff_not_dvd hpr).2
-        fun h => by have := Nat.le_of_dvd (by omega) h; omega))
+      Nat.Coprime.pow_right _
+        (Nat.coprime_comm.1 ((Nat.Prime.coprime_iff_not_dvd hpr).2 fun h => by
+          have := Nat.le_of_dvd (by omega) h; omega))
     rw [normTrace_cycl_isPrimitiveRoot hk (hζ.pow_of_coprime j hcop), mul_zero]
   · intro h; exact absurd (Finset.mem_range.2 (Nat.succ_pos i)) h
 
-theorem norm_normTrace_cycl_succ_mul_le {k : ℕ} (hk : 1 ≤ k) {x : PadicAlgCl p}
-    (hx : x ∈ cycl p (k + 1)) :
-    ‖normTrace (cycl p k) x‖ * cyclRadius p (k + 1) ^ (p - 1) ≤ ‖x‖ := by
+theorem norm_normTrace_cycl_succ_mul_le
+    {k : ℕ} (hk : 1 ≤ k) {x : PadicAlgCl p} (hx : x ∈ cycl p (k + 1))
+    : ‖normTrace (cycl p k) x‖ * cyclRadius p (k + 1) ^ (p - 1) ≤ ‖x‖ := by
   obtain ⟨ζ, hζ⟩ := exists_isPrimitiveRoot (p := p) (k + 1)
   obtain ⟨b, hb, rfl⟩ := exists_eq_sum_pow_of_adjoin_eq hk (adjoin_sub_one_eq_cycl hζ) hx
   have horth := norm_mul_pow_le_norm_sum hk hζ hb
@@ -366,18 +381,20 @@ theorem norm_normTrace_cycl_succ_mul_le {k : ℕ} (hk : 1 ≤ k) {x : PadicAlgCl
     exact Finset.sum_congr rfl fun i hi => by
       rw [normTrace_mul_of_mem _ (hb i), normTrace_cycl_sub_one_pow hk hζ (Finset.mem_range.1 hi)]
   rw [htr, ← le_div_iff₀ hrpow]
-  refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg
-    (div_nonneg (norm_nonneg _) hrpow.le) fun i hi => ?_
+  refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (div_nonneg (norm_nonneg _) hrpow.le)
+    fun i hi => ?_
   rw [norm_mul, norm_pow, norm_neg, norm_one, one_pow, mul_one, le_div_iff₀ hrpow]
-  calc ‖b i‖ * cyclRadius p (k + 1) ^ (p - 1) ≤ ‖b i‖ * ‖ζ - 1‖ ^ i := by
-        rw [hrad]
-        exact mul_le_mul_of_nonneg_left (pow_le_pow_of_le_one hr.le (cyclRadius_le_one _)
-          (by have := Finset.mem_range.1 hi; omega)) (norm_nonneg _)
+  calc
+    ‖b i‖ * cyclRadius p (k + 1) ^ (p - 1) ≤ ‖b i‖ * ‖ζ - 1‖ ^ i := by
+      rw [hrad]
+      exact mul_le_mul_of_nonneg_left
+        (pow_le_pow_of_le_one hr.le (cyclRadius_le_one _) (by have := Finset.mem_range.1 hi; omega))
+        (norm_nonneg _)
     _ ≤ ‖x‖ := horth i hi
 
-theorem norm_normTrace_cycl_mul_le {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x : PadicAlgCl p}
-    (hx : x ∈ cycl p m) :
-    ‖normTrace (cycl p n) x‖ * cyclRadius p n ≤ ‖x‖ * cyclRadius p m := by
+theorem norm_normTrace_cycl_mul_le
+    {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x : PadicAlgCl p} (hx : x ∈ cycl p m)
+    : ‖normTrace (cycl p n) x‖ * cyclRadius p n ≤ ‖x‖ * cyclRadius p m := by
   induction m, hnm using Nat.le_induction generalizing x with
   | base => rw [normTrace_of_mem _ hx]
   | succ m hnm ih =>
@@ -388,8 +405,9 @@ theorem norm_normTrace_cycl_mul_le {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x
     rw [cyclRadius_succ_pow_pred hm, mul_div_assoc', div_le_iff₀ (cyclRadius_pos (p := p) m)] at h2
     exact h1.trans h2
 
-theorem norm_normTrace_cycl_le {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x : PadicAlgCl p}
-    (hx : x ∈ cycl p m) : ‖normTrace (cycl p n) x‖ ≤ p * ‖x‖ := by
+theorem norm_normTrace_cycl_le
+    {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x : PadicAlgCl p} (hx : x ∈ cycl p m)
+    : ‖normTrace (cycl p n) x‖ ≤ p * ‖x‖ := by
   obtain ⟨j, rfl⟩ : ∃ j, n = j + 1 := ⟨n - 1, by omega⟩
   have h := norm_normTrace_cycl_mul_le hn hnm hx
   have hr := cyclRadius_pos (p := p) j
@@ -397,10 +415,11 @@ theorem norm_normTrace_cycl_le {n m : ℕ} (hn : 1 ≤ n) (hnm : n ≤ m) {x : P
   have h1 : ‖normTrace (cycl p (j + 1)) x‖ * cyclRadius p (j + 1) ≤ ‖x‖ :=
     h.trans (mul_le_of_le_one_right (norm_nonneg _) (cyclRadius_le_one _))
   have h2 : (p : ℝ)⁻¹ ≤ cyclRadius p (j + 1) := inv_p_le_cyclRadius j
-  calc ‖normTrace (cycl p (j + 1)) x‖ = p * (‖normTrace (cycl p (j + 1)) x‖ * (p : ℝ)⁻¹) := by
-        field_simp
+  calc
+    ‖normTrace (cycl p (j + 1)) x‖
+      = p * (‖normTrace (cycl p (j + 1)) x‖ * (p : ℝ)⁻¹) := by field_simp
     _ ≤ p * (‖normTrace (cycl p (j + 1)) x‖ * cyclRadius p (j + 1)) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 (norm_nonneg _)) hp0.le
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 (norm_nonneg _)) hp0.le
     _ ≤ p * ‖x‖ := mul_le_mul_of_nonneg_left h1 hp0.le
 
 end

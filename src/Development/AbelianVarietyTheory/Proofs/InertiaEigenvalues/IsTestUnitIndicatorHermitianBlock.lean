@@ -9,8 +9,9 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR
 
-theorem isTest_indicator_one_of_clopen_compact {X : Type} [TopologicalSpace X] {S : Set X} (hS : IsClopen S)
-    (hK : IsCompact S) : IsTest (Set.indicator S (1 : X → ℂ)) := by
+theorem isTest_indicator_one_of_clopen_compact
+    {X : Type} [TopologicalSpace X] {S : Set X} (hS : IsClopen S) (hK : IsCompact S)
+    : IsTest (Set.indicator S (1 : X → ℂ)) := by
   refine ⟨?_, ?_⟩
   · rw [IsLocallyConstant.iff_eventually_eq]
     intro x
@@ -21,9 +22,11 @@ theorem isTest_indicator_one_of_clopen_compact {X : Type} [TopologicalSpace X] {
       rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem hx]
   · exact HasCompactSupport.intro' hK hS.isClosed fun x hx => Set.indicator_of_notMem hx _
 
-theorem isTest_unitU (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [StarRing E]
-    [IsUltrametricDist F] [LocallyCompactSpace F] [IsUltrametricDist E] [LocallyCompactSpace E] (r : ℕ)
-    (hstar : ∀ y : E, ‖star y‖ = ‖y‖) : IsTest (unitU r F E) := by
+theorem isTest_unitU
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [StarRing E]
+    [IsUltrametricDist F] [LocallyCompactSpace F] [IsUltrametricDist E] [LocallyCompactSpace E]
+    (r : ℕ) (hstar : ∀ y : E, ‖star y‖ = ‖y‖)
+    : IsTest (unitU r F E) := by
   haveI : ProperSpace F := ProperSpace.of_nontriviallyNormedField_of_weaklyLocallyCompactSpace F
   haveI : ProperSpace E := ProperSpace.of_nontriviallyNormedField_of_weaklyLocallyCompactSpace E
   haveI : ContinuousStar E := ⟨(AddMonoidHomClass.isometry_of_norm (starAddEquiv (R := E)) hstar).continuous⟩

@@ -9,17 +9,23 @@ open scoped BigOperators
 
 namespace GlobalTheory.HermNbr
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-  [Algebra O K] [IsFractionRing O K] {r : ℕ}
+variable
+  {O K : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  {r : ℕ}
 
-theorem step_exists (c : O ≃+* O) (cK : K ≃+* K)
+theorem step_exists
+    (c : O ≃+* O) (cK : K ≃+* K)
     (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x)) (hc2 : ∀ x, cK (cK x) = x)
-    {J : Matrix (Fin r) (Fin r) K} (hJ : J.transpose.map cK = J) {ϖ : O} (hϖ : Irreducible ϖ) [Finite (IsLocalRing.ResidueField O)] {N : ℕ}
-    {L Λ : Submodule O (Fin r → K)} (hL : Good cK J ϖ N L) (hΛ : Good cK J ϖ N Λ) (hne : L ≠ Λ)
-    (hi : Λ.toAddSubgroup.relIndex L.toAddSubgroup ≠ 0) :
-    ∃ L' ∈ Nbrs cK J ϖ L, Good cK J ϖ N L' ∧ Λ.toAddSubgroup.relIndex L'.toAddSubgroup ≠ 0 ∧
-      Nat.card (IsLocalRing.ResidueField O) * Λ.toAddSubgroup.relIndex L'.toAddSubgroup ≤
-        Λ.toAddSubgroup.relIndex L.toAddSubgroup := by
+    {J : Matrix (Fin r) (Fin r) K} (hJ : J.transpose.map cK = J)
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    [Finite (IsLocalRing.ResidueField O)]
+    {N : ℕ} {L Λ : Submodule O (Fin r → K)} (hL : Good cK J ϖ N L) (hΛ : Good cK J ϖ N Λ)
+    (hne : L ≠ Λ) (hi : Λ.toAddSubgroup.relIndex L.toAddSubgroup ≠ 0)
+    : ∃ L' ∈ Nbrs cK J ϖ L,
+      Good cK J ϖ N L' ∧ Λ.toAddSubgroup.relIndex L'.toAddSubgroup ≠ 0
+        ∧ Nat.card (IsLocalRing.ResidueField O) * Λ.toAddSubgroup.relIndex L'.toAddSubgroup
+          ≤ Λ.toAddSubgroup.relIndex L.toAddSubgroup := by
   classical
   have hnle : ¬ Λ ≤ L := by
     intro hle
@@ -81,28 +87,28 @@ theorem step_exists (c : O ≃+* O) (cK : K ≃+* K)
     exact (AddSubgroup.relIndex_mul_relIndex _ _ _ hMMp hMpL).symm
   rw [e1] at d1
   have d := dvd_trans d1 d2
-  have hm0 : Mg.relIndex Mpg ≠ 0 := by
-    intro h0; rw [e2, h0, zero_mul] at hi; exact hi rfl
-  have ha0 : Ag.relIndex L'g ≠ 0 := by
-    intro h0; rw [h0, zero_dvd_iff] at d; exact hm0 d
+  have hm0 : Mg.relIndex Mpg ≠ 0 := by intro h0; rw [e2, h0, zero_mul] at hi; exact hi rfl
+  have ha0 : Ag.relIndex L'g ≠ 0 := by intro h0; rw [h0, zero_dvd_iff] at d; exact hm0 d
   refine ⟨ha0, ?_⟩
   rw [e2, mul_comm (Mg.relIndex Mpg)]
   exact Nat.mul_le_mul_left _ (Nat.le_of_dvd (Nat.pos_of_ne_zero hm0) d)
 
-theorem unit_mul_mem_iff (u : Oˣ) (y : K) :
-    algebraMap O K u * y ∈ (algebraMap O K).range ↔ y ∈ (algebraMap O K).range := by
+theorem unit_mul_mem_iff (u : Oˣ) (y : K)
+    : algebraMap O K u * y ∈ (algebraMap O K).range ↔ y ∈ (algebraMap O K).range := by
   constructor
   · intro h
     have e1 : algebraMap O K ((u⁻¹ : Oˣ) : O) * algebraMap O K (u : O) = 1 := by
       rw [← map_mul]; simp
     have : y = algebraMap O K ((u⁻¹ : Oˣ) : O) * (algebraMap O K u * y) := by
       rw [← mul_assoc, e1, one_mul]
-    rw [this]; exact mul_mem ⟨_, rfl⟩ h
+    rw [this]
+    exact mul_mem ⟨_, rfl⟩ h
   · intro h; exact mul_mem ⟨_, rfl⟩ h
 
-theorem perp_congr {cK : K ≃+* K} {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)}
-    (hSD : IsSD cK J L) {v v0 : Fin r → K} (h : v - v0 ∈ L) :
-    perp cK J L v = perp cK J L v0 := by
+theorem perp_congr
+    {cK : K ≃+* K} {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)} (hSD : IsSD cK J L)
+    {v v0 : Fin r → K} (h : v - v0 ∈ L)
+    : perp cK J L v = perp cK J L v0 := by
   ext x
   rw [mem_perp, mem_perp]
   constructor
@@ -119,23 +125,28 @@ theorem perp_congr {cK : K ≃+* K} {J : Matrix (Fin r) (Fin r) K} {L : Submodul
     have := add_mem h1 h2
     simpa using this
 
-theorem nb_congr {cK : K ≃+* K} {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)}
-    {v1 v2 : Fin r → K} (hp : perp cK J L v1 = perp cK J L v2) (h : v2 - v1 ∈ perp cK J L v1) :
-    nb cK J L v1 = nb cK J L v2 := by
+theorem nb_congr
+    {cK : K ≃+* K} {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)} {v1 v2 : Fin r → K}
+    (hp : perp cK J L v1 = perp cK J L v2) (h : v2 - v1 ∈ perp cK J L v1)
+    : nb cK J L v1 = nb cK J L v2 := by
   ext x
   rw [mem_nb, mem_nb]
   constructor
   · rintro ⟨m, hm, a, rfl⟩
     refine ⟨m - a • (v2 - v1), hp ▸ sub_mem hm (Submodule.smul_mem _ a h), a, ?_⟩
-    rw [smul_sub]; abel
+    rw [smul_sub]
+    abel
   · rintro ⟨m, hm, a, rfl⟩
     refine ⟨m + a • (v2 - v1), add_mem (hp ▸ hm) (Submodule.smul_mem _ a h), a, ?_⟩
-    rw [smul_sub]; abel
+    rw [smul_sub]
+    abel
 
-theorem isStep_unit_smul (c : O ≃+* O) (cK : K ≃+* K)
-    (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x))
+theorem isStep_unit_smul
+    (c : O ≃+* O) (cK : K ≃+* K) (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x))
     {J : Matrix (Fin r) (Fin r) K} {ϖ : O} {L : Submodule O (Fin r → K)} {v : Fin r → K}
-    (hs : IsStep cK J ϖ L v) {b : O} (hb : IsUnit b) : IsStep cK J ϖ L (b • v) := by
+    (hs : IsStep cK J ϖ L v)
+    {b : O} (hb : IsUnit b)
+    : IsStep cK J ϖ L (b • v) := by
   obtain ⟨hv, hw, hvv⟩ := hs
   refine ⟨fun h => hv ?_, ?_, ?_⟩
   · obtain ⟨u, rfl⟩ := hb
@@ -145,10 +156,11 @@ theorem isStep_unit_smul (c : O ≃+* O) (cK : K ≃+* K)
   · rw [hf_algSmul_left, hf_algSmul_right, hcK]
     exact mul_mem ⟨_, rfl⟩ (mul_mem ⟨_, rfl⟩ hvv)
 
-theorem nb_unit_smul (c : O ≃+* O) (cK : K ≃+* K)
-    (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x))
-    {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)} {v : Fin r → K}
-    {b : O} (hb : IsUnit b) : nb cK J L (b • v) = nb cK J L v := by
+theorem nb_unit_smul
+    (c : O ≃+* O) (cK : K ≃+* K) (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x))
+    {J : Matrix (Fin r) (Fin r) K} {L : Submodule O (Fin r → K)} {v : Fin r → K} {b : O}
+    (hb : IsUnit b)
+    : nb cK J L (b • v) = nb cK J L v := by
   have hp : perp cK J L (b • v) = perp cK J L v := by
     ext x
     rw [mem_perp, mem_perp, hf_algSmul_left, hcK]
@@ -157,12 +169,15 @@ theorem nb_unit_smul (c : O ≃+* O) (cK : K ≃+* K)
   unfold nb
   rw [hp, Submodule.span_singleton_smul_eq hb]
 
-theorem sub_mem_of_mk_eq {ϖ : O} (hϖ : Irreducible ϖ) {L : Submodule O (Fin r → K)}
-    {v v0 : Fin r → K} (hw : ϖ • v ∈ L) (hw0 : ϖ • v0 ∈ L)
-    (h : (QuotientAddGroup.mk (⟨ϖ • v, hw⟩ : L.toAddSubgroup) : L.toAddSubgroup ⧸
-      (L.map (ϖ • (LinearMap.id : (Fin r → K) →ₗ[O] (Fin r → K)))).toAddSubgroup.addSubgroupOf
-        L.toAddSubgroup) = QuotientAddGroup.mk (⟨ϖ • v0, hw0⟩ : L.toAddSubgroup)) :
-    v - v0 ∈ L := by
+theorem sub_mem_of_mk_eq
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {L : Submodule O (Fin r → K)} {v v0 : Fin r → K} (hw : ϖ • v ∈ L) (hw0 : ϖ • v0 ∈ L)
+    (h : (QuotientAddGroup.mk (⟨ϖ • v, hw⟩ : L.toAddSubgroup)
+        : L.toAddSubgroup ⧸
+          (L.map (ϖ • (LinearMap.id : (Fin r → K) →ₗ[O] (Fin r → K)))).toAddSubgroup.addSubgroupOf
+            L.toAddSubgroup)
+      = QuotientAddGroup.mk (⟨ϖ • v0, hw0⟩ : L.toAddSubgroup))
+    : v - v0 ∈ L := by
   rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at h
   obtain ⟨y, hy, hy'⟩ := h
   have e : ϖ • y = ϖ • (v0 - v) := by
@@ -172,13 +187,16 @@ theorem sub_mem_of_mk_eq {ϖ : O} (hϖ : Irreducible ϖ) {L : Submodule O (Fin r
   rw [show v - v0 = -(v0 - v) by abel, ← this]
   exact L.neg_mem hy
 
-theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
+theorem card_nbrs
+    (c : O ≃+* O) (cK : K ≃+* K)
     (hcK : ∀ x, cK (algebraMap O K x) = algebraMap O K (c x)) (hc2 : ∀ x, cK (cK x) = x)
-    {J : Matrix (Fin r) (Fin r) K} (hJ : J.transpose.map cK = J) {ϖ : O} (hϖ : Irreducible ϖ) [Finite (IsLocalRing.ResidueField O)] {N : ℕ}
-    {L : Submodule O (Fin r → K)} (hL : Good cK J ϖ N L) (hN : N ≠ 0)
-    (t : Finset (Submodule O (Fin r → K))) (ht : (t : Set _) ⊆ Nbrs cK J ϖ L) :
-    t.card * (Nat.card (IsLocalRing.ResidueField O) - 1) ≤
-      N * Nat.card (IsLocalRing.ResidueField O) := by
+    {J : Matrix (Fin r) (Fin r) K} (hJ : J.transpose.map cK = J)
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    [Finite (IsLocalRing.ResidueField O)]
+    {N : ℕ} {L : Submodule O (Fin r → K)} (hL : Good cK J ϖ N L) (hN : N ≠ 0)
+    (t : Finset (Submodule O (Fin r → K))) (ht : (t : Set _) ⊆ Nbrs cK J ϖ L)
+    : t.card * (Nat.card (IsLocalRing.ResidueField O) - 1)
+      ≤ N * Nat.card (IsLocalRing.ResidueField O) := by
   classical
   letI := Fintype.ofFinite (IsLocalRing.ResidueField O)
   set Wg := (L.map (ϖ • (LinearMap.id : (Fin r → K) →ₗ[O] (Fin r → K)))).toAddSubgroup.addSubgroupOf
@@ -187,8 +205,10 @@ theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
   haveI : Finite (L.toAddSubgroup ⧸ Wg) := Nat.finite_of_card_ne_zero (hcardW ▸ hN)
   letI := Fintype.ofFinite (L.toAddSubgroup ⧸ Wg)
   let rel : Submodule O (Fin r → K) → (L.toAddSubgroup ⧸ Wg) → Prop := fun L' u =>
-    ∃ v, IsStep cK J ϖ L v ∧ L' = nb cK J L v ∧ ∃ hw : ϖ • v ∈ L,
-      (QuotientAddGroup.mk (⟨ϖ • v, hw⟩ : L.toAddSubgroup) : L.toAddSubgroup ⧸ Wg) = u
+    ∃ v,
+      IsStep cK J ϖ L v ∧ L' = nb cK J L v
+        ∧ ∃ hw : ϖ • v ∈ L,
+          (QuotientAddGroup.mk (⟨ϖ • v, hw⟩ : L.toAddSubgroup) : L.toAddSubgroup ⧸ Wg) = u
   choose lift hlift using IsLocalRing.residue_surjective (R := O)
   have hunit : ∀ a : (IsLocalRing.ResidueField O)ˣ, IsUnit (lift a) := by
     intro a
@@ -196,22 +216,30 @@ theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
     apply a.ne_zero
     rw [← hlift (a : IsLocalRing.ResidueField O)]
     exact (IsLocalRing.residue_eq_zero_iff _).2 ((IsLocalRing.mem_maximalIdeal _).2 h)
-  have hm : ∀ L' ∈ t, Nat.card (IsLocalRing.ResidueField O) - 1 ≤
-      (Finset.univ.filter (fun u => rel L' u)).card := by
+  have hm
+      : ∀ L' ∈ t,
+        Nat.card (IsLocalRing.ResidueField O) - 1
+          ≤ (Finset.univ.filter (fun u => rel L' u)).card := by
     intro L' hL'
     obtain ⟨v, hs, rfl⟩ := ht hL'
     have hmem : ∀ a : (IsLocalRing.ResidueField O)ˣ, ϖ • (lift a • v) ∈ L := fun a => by
       rw [smul_comm]; exact L.smul_mem _ hs.2.1
     let f : (IsLocalRing.ResidueField O)ˣ → L.toAddSubgroup ⧸ Wg := fun a =>
       QuotientAddGroup.mk (⟨ϖ • (lift a • v), hmem a⟩ : L.toAddSubgroup)
-    have hcu : Nat.card (IsLocalRing.ResidueField O) - 1 =
-        (Finset.univ : Finset (IsLocalRing.ResidueField O)ˣ).card := by
+    have hcu
+        : Nat.card (IsLocalRing.ResidueField O) - 1
+          = (Finset.univ : Finset (IsLocalRing.ResidueField O)ˣ).card := by
       rw [Finset.card_univ, Fintype.card_units, Nat.card_eq_fintype_card]
     rw [hcu]
     refine Finset.card_le_card_of_injOn f (fun a _ => ?_) (fun a _ a' _ hf => ?_)
-    · refine Finset.mem_filter.2 ⟨Finset.mem_univ _, lift a • v,
-        isStep_unit_smul c cK hcK hs (hunit a), (nb_unit_smul c cK hcK (hunit a)).symm,
-        hmem a, rfl⟩
+    · refine Finset.mem_filter.2 ⟨
+        Finset.mem_univ _,
+        lift a • v,
+        isStep_unit_smul c cK hcK hs (hunit a),
+        (nb_unit_smul c cK hcK (hunit a)).symm,
+        hmem a,
+        rfl
+      ⟩
     · have h1 := sub_mem_of_mk_eq hϖ (hmem a) (hmem a') hf
       rw [← sub_smul] at h1
       by_contra hne
@@ -225,8 +253,9 @@ theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
       apply hs.1
       have := L.smul_mem ((u⁻¹ : Oˣ) : O) h1
       rwa [← hu, smul_smul, Units.inv_mul, one_smul] at this
-  have hn : ∀ u ∈ (Finset.univ : Finset (L.toAddSubgroup ⧸ Wg)),
-      (t.filter (fun L' => rel L' u)).card ≤ Nat.card (IsLocalRing.ResidueField O) := by
+  have hn
+      : ∀ u ∈ (Finset.univ : Finset (L.toAddSubgroup ⧸ Wg)),
+        (t.filter (fun L' => rel L' u)).card ≤ Nat.card (IsLocalRing.ResidueField O) := by
     intro u _
     by_cases hE : t.filter (fun L' => rel L' u) = ∅
     · rw [hE]; simp
@@ -237,9 +266,10 @@ theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
       perp_relIndex c cK hcK hϖ hL.1 hs0.1 hs0.2.1
     haveI : Finite (L.toAddSubgroup ⧸ Wq) := Nat.finite_of_card_ne_zero (by rw [hcq]; exact Nat.card_pos.ne')
     letI := Fintype.ofFinite (L.toAddSubgroup ⧸ Wq)
-    have hch : ∀ L' ∈ t.filter (fun L' => rel L' u), ∃ z : L.toAddSubgroup ⧸ Wq, ∃ v,
-        IsStep cK J ϖ L v ∧ L' = nb cK J L v ∧ ∃ h : v - v0 ∈ L,
-          z = QuotientAddGroup.mk (⟨v - v0, h⟩ : L.toAddSubgroup) := by
+    have hch
+        : ∀ L' ∈ t.filter (fun L' => rel L' u), ∃ z : L.toAddSubgroup ⧸ Wq, ∃ v,
+          IsStep cK J ϖ L v ∧ L' = nb cK J L v
+            ∧ ∃ h : v - v0 ∈ L, z = QuotientAddGroup.mk (⟨v - v0, h⟩ : L.toAddSubgroup) := by
       intro L' hL'
       obtain ⟨v, hs, hLv, hw, hu⟩ := (Finset.mem_filter.1 hL').2
       have h := sub_mem_of_mk_eq hϖ hw hw0 (hu.trans hu0.symm)
@@ -252,13 +282,17 @@ theorem card_nbrs (c : O ≃+* O) (cK : K ≃+* K)
       rw [z1, z2, QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at he
       have hd : v2 - v1 ∈ perp cK J L v0 := by
         have : v2 - v1 = -(v1 - v0) + (v2 - v0) := by abel
-        rw [this]; simpa using he
+        rw [this]
+        simpa using he
       have p1 := perp_congr hL.1 hd1
       have p2 := perp_congr hL.1 hd2
       rw [e1, e2]
       exact nb_congr (p1.trans p2.symm) (p1 ▸ hd)
-    have hle := Finset.card_le_card_of_injOn (s := t.filter (fun L' => rel L' u))
-      (t := (Finset.univ : Finset (L.toAddSubgroup ⧸ Wq))) g (fun _ _ => Finset.mem_univ _) hinj
+    have hle :=
+      Finset.card_le_card_of_injOn (s := t.filter (fun L' => rel L' u))
+        (t := (Finset.univ : Finset (L.toAddSubgroup ⧸ Wq))) g
+        (fun _ _ => Finset.mem_univ _)
+        hinj
     rw [Finset.card_univ, Fintype.card_eq_nat_card, hcq] at hle
     exact hle
   have key := Finset.card_mul_le_card_mul rel (s := t) (t := Finset.univ) hm hn

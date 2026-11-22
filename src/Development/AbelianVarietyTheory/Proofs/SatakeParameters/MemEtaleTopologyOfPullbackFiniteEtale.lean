@@ -9,7 +9,11 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace GlobalTheory.EtC.Tr
 
-theorem mem_etaleTopology_of_pullback_finite : ∀ {Z X : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f] (T : Sieve X), T.pullback f ∈ Scheme.etaleTopology Z → (∀ {V : Scheme.{0}} (v : V ⟶ X), IsEmpty (pullback f v : Scheme.{0}) → T v) → T ∈ Scheme.etaleTopology X := by
+theorem mem_etaleTopology_of_pullback_finite
+    : ∀ {Z X : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f] (T : Sieve X),
+      T.pullback f ∈ Scheme.etaleTopology Z
+        → (∀ {V : Scheme.{0}} (v : V ⟶ X), IsEmpty (pullback f v : Scheme.{0}) → T v)
+        → T ∈ Scheme.etaleTopology X := by
   intro Z X f _ _ T hT hE
   let U : X.Opens := ⟨(Set.range f.base)ᶜ, f.isClosedMap.isClosed_range.isOpen_compl⟩
   have hU : IsEmpty (pullback f U.ι : Scheme.{0}) := by
@@ -24,7 +28,8 @@ theorem mem_etaleTopology_of_pullback_finite : ∀ {Z X : Scheme.{0}} (f : Z ⟶
     exact h2 ⟨_, rfl⟩
   have hTU : T U.ι := hE U.ι hU
   let V : Bool → Scheme.{0} := fun b => Bool.rec U.toScheme Z b
-  let j : ∀ b, V b ⟶ X := fun b => match b with
+  let j : ∀ b, V b ⟶ X := fun b =>
+    match b with
     | true => f
     | false => U.ι
   have hmem : Presieve.ofArrows V j ∈ Scheme.etalePrecoverage X := by

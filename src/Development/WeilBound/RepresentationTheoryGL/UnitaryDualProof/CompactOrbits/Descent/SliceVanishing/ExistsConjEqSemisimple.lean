@@ -12,15 +12,17 @@ namespace PositivityTheory.RgUd.T.Desc.SLF
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 section Hyp
 
-variable {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {F : Set (Matrix (Fin n) (Fin n) k)} {P : k[X]}
-  {s : Matrix (Fin n) (Fin n) k}
-  (hFinv : ∀ g ∈ Gz Z, ∀ x ∈ F, g.val * x * g⁻¹.val ∈ F)
-  (hP : ∀ x ∈ F, aeval x P ∈ F ∧ Module.End.IsSemisimple (Matrix.toLin' (aeval x P)) ∧ IsNilpotent (x - aeval x P) ∧
-    ∃ g ∈ Gz Z, g.val * aeval x P * g⁻¹.val = s)
+variable
+  {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {F : Set (Matrix (Fin n) (Fin n) k)} {P : k[X]}
+  {s : Matrix (Fin n) (Fin n) k} (hFinv : ∀ g ∈ Gz Z, ∀ x ∈ F, g.val * x * g⁻¹.val ∈ F)
+  (hP : ∀ x ∈ F,
+    aeval x P ∈ F ∧ Module.End.IsSemisimple (Matrix.toLin' (aeval x P))
+      ∧ IsNilpotent (x - aeval x P) ∧ ∃ g ∈ Gz Z, g.val * aeval x P * g⁻¹.val = s)
 
 include hP in
 theorem P_idem [CharZero k] {x} (hx : x ∈ F) : aeval (aeval x P) P = aeval x P := by
@@ -45,7 +47,8 @@ theorem P_idem [CharZero k] {x} (hx : x ∈ F) : aeval (aeval x P) P = aeval x P
   exact h0.symm
 
 include hP in
-theorem P_mem_Tset [CharZero k] {x} (hx : x ∈ F) : aeval x P ∈ Tset F P := ⟨(hP x hx).1, P_idem hP hx⟩
+theorem P_mem_Tset [CharZero k] {x} (hx : x ∈ F) : aeval x P ∈ Tset F P :=
+  ⟨(hP x hx).1, P_idem hP hx⟩
 
 include hP in
 theorem exists_conj_eq_semisimple {x} (hx : x ∈ Tset F P) : ∃ g ∈ Gz Z, cj g x = s := by
@@ -57,11 +60,12 @@ theorem exists_conj_eq_semisimple {x} (hx : x ∈ Tset F P) : ∃ g ∈ Gz Z, cj
 theorem continuousSMul_actT : @ContinuousSMul (GzS Z) (Tset F P) (actT hFinv).toSMul _ _ := by
   refine @ContinuousSMul.mk _ _ (actT hFinv).toSMul _ _ ?_
   exact (((Units.continuous_val.comp (continuous_subtype_val.comp continuous_fst)).matrix_mul
-    (continuous_subtype_val.comp continuous_snd)).matrix_mul
+      (continuous_subtype_val.comp continuous_snd)).matrix_mul
     (Units.continuous_coe_inv.comp (continuous_subtype_val.comp continuous_fst))).subtype_mk _
 
 include hP in
-theorem isPretransitive_actT (hsT : s ∈ Tset F P) : @MulAction.IsPretransitive (GzS Z) (Tset F P) (actT hFinv).toSMul := by
+theorem isPretransitive_actT (hsT : s ∈ Tset F P)
+    : @MulAction.IsPretransitive (GzS Z) (Tset F P) (actT hFinv).toSMul := by
   refine @MulAction.IsPretransitive.mk _ _ (actT hFinv).toSMul ?_
   intro x y
   obtain ⟨a, ha, hax⟩ := exists_conj_eq_semisimple hP x.2
@@ -70,9 +74,10 @@ theorem isPretransitive_actT (hsT : s ∈ Tset F P) : @MulAction.IsPretransitive
   show cj (b⁻¹ * a) x.1 = y.1
   simp only [cj] at hax hby ⊢
   simp only [_root_.mul_inv_rev, inv_inv, Units.val_mul]
-  calc (b⁻¹ : GL (Fin n) k).val * a.val * x.1 * (a⁻¹.val * b.val)
-      = (b⁻¹ : GL (Fin n) k).val * (a.val * x.1 * a⁻¹.val) * b.val := by
-        simp only [Matrix.mul_assoc]
+  calc
+    (b⁻¹ : GL (Fin n) k).val * a.val * x.1 * (a⁻¹.val * b.val)
+        = (b⁻¹ : GL (Fin n) k).val * (a.val * x.1 * a⁻¹.val) * b.val := by
+      simp only [Matrix.mul_assoc]
     _ = (b⁻¹ : GL (Fin n) k).val * (b.val * y.1 * b⁻¹.val) * b.val := by rw [hax, hby]
     _ = y.1 := by simp [Matrix.mul_assoc]
 

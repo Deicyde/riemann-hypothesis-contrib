@@ -5,7 +5,11 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NoFo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX
+  GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie NumberField
+  IsDedekindDomain Polynomial
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ HkIdx V0 Fm0)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -15,12 +19,21 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem exists_desc_of_isKsForm : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), (S.A j).IsKsForm → ∀ (i : D.ntw.Tw) (b : Bool) (x : S.WL j), x ≠ 0 →
-    ∃ Φ : S.WL j →+ Fm S i j b, Φ x ≠ 0 ∧
-      (∀ (c : ↥D.LL0) (w : S.WL j), Φ (((c : ↥D.LL0) : D.what₂.LL) • w) = readLL0 S i b c • Φ w) ∧
-      ∀ (T : Module.End D.what₂.LL (S.WL j)) (hT : ∀ w ∈ (S.A j).WK, T w ∈ (S.A j).WK) (w : S.WL j),
-        Φ (T w) = Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j)
-          ((T.restrictScalars S.Ks).restrict (p := (S.A j).WK) (q := (S.A j).WK) hT) (Φ w) := by
+theorem exists_desc_of_isKsForm
+    : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ),
+      (S.A j).IsKsForm
+        → ∀ (i : D.ntw.Tw) (b : Bool) (x : S.WL j),
+          x ≠ 0
+            → ∃ Φ : S.WL j →+ Fm S i j b,
+              Φ x ≠ 0
+                ∧ (∀ (c : ↥D.LL0) (w : S.WL j),
+                  Φ (((c : ↥D.LL0) : D.what₂.LL) • w) = readLL0 S i b c • Φ w)
+                ∧ ∀ (T : Module.End D.what₂.LL (S.WL j)) (hT : ∀ w ∈ (S.A j).WK, T w ∈ (S.A j).WK)
+                    (w : S.WL j),
+                  Φ (T w)
+                    = Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j)
+                      ((T.restrictScalars S.Ks).restrict (p := (S.A j).WK) (q := (S.A j).WK) hT)
+                      (Φ w) := by
   intro D S j hK i b x hx
   classical
   obtain ⟨n, v, hvK, hliK, hspK, hliL, hspL⟩ := hK
@@ -46,11 +59,13 @@ theorem exists_desc_of_isKsForm : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), (S.
   let φ : (Fin n → D.what₂.LL) →+ (Fin n → KB S i b) :=
     AddMonoidHom.compLeft ((readLL0 S i b).toAddMonoidHom.comp f.toAddMonoidHom) (Fin n)
   let Φ : S.WL j →+ Fm S i j b :=
-    (bF.equivFun.symm.toLinearMap.toAddMonoidHom).comp (φ.comp bL.equivFun.toLinearMap.toAddMonoidHom)
+    (bF.equivFun.symm.toLinearMap.toAddMonoidHom).comp
+      (φ.comp bL.equivFun.toLinearMap.toAddMonoidHom)
   have hΦ : ∀ w, bF.equivFun (Φ w) = fun r => readLL0 S i b (f (bL.repr w r)) := by
     intro w
     show bF.equivFun (bF.equivFun.symm (φ (bL.equivFun w))) = _
-    rw [LinearEquiv.apply_symm_apply]; rfl
+    rw [LinearEquiv.apply_symm_apply]
+    rfl
   refine ⟨Φ, ?_, ?_, ?_⟩
   · intro h0
     have := congrFun (hΦ x) r0
@@ -63,32 +78,43 @@ theorem exists_desc_of_isKsForm : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), (S.
     simp only [Pi.smul_apply, smul_eq_mul, map_smul, Finsupp.smul_apply]
     rw [hfc, map_mul]
   · intro T hT w
-    let T' : Module.End S.Ks (FmK S j) := (T.restrictScalars S.Ks).restrict (p := (S.A j).WK) (q := (S.A j).WK) hT
+    let T' : Module.End S.Ks (FmK S j) :=
+      (T.restrictScalars S.Ks).restrict (p := (S.A j).WK) (q := (S.A j).WK) hT
     let t := LinearMap.toMatrix bK bK T'
     have hTm : LinearMap.toMatrix bL bL T = t.map (algebraMap S.Ks D.what₂.LL) := by
       ext r q
       simp only [t, LinearMap.toMatrix_apply, Matrix.map_apply]
-      have e1 : T (bL q) = ι (T' (bK q)) := by
-        rw [hbL, ← hbK]; rfl
+      have e1 : T (bL q) = ι (T' (bK q)) := by rw [hbL, ← hbK]; rfl
       have e2 : T (bL q) = ∑ s, (algebraMap S.Ks D.what₂.LL (bK.repr (T' (bK q)) s)) • bL s := by
-        rw [e1]; conv_lhs => rw [← bK.sum_repr (T' (bK q))]
+        rw [e1]
+        conv_lhs => rw [← bK.sum_repr (T' (bK q))]
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]; refine Finset.sum_congr rfl fun s _ => ?_
         rw [map_smul, hbK, hbL, algebraMap_smul]
       rw [e2, Module.Basis.repr_sum_self]
     apply bF.equivFun.injective
-    have hbc : Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j) T' = LinearMap.baseChange (KB S i b) T' := rfl
-    change bF.equivFun (Φ (T w)) = bF.equivFun (Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j) T' (Φ w))
+    have hbc
+        : Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j) T'
+          = LinearMap.baseChange (KB S i b) T' :=
+      rfl
+    change bF.equivFun (Φ (T w))
+      = bF.equivFun (Module.End.baseChangeHom S.Ks (KB S i b) (FmK S j) T' (Φ w))
     rw [hbc]
-    have hMF : LinearMap.toMatrix bF bF (LinearMap.baseChange (KB S i b) T') = t.map (algebraMap S.Ks (KB S i b)) :=
+    have hMF
+        : LinearMap.toMatrix bF bF (LinearMap.baseChange (KB S i b) T')
+          = t.map (algebraMap S.Ks (KB S i b)) :=
       LinearMap.toMatrix_baseChange _ _ _ _
     have hL : ∀ r, bL.repr (T w) r = ∑ q, algebraMap S.Ks D.what₂.LL (t r q) * bL.repr w q := by
       intro r
-      rw [← LinearMap.toMatrix_mulVec_repr bL bL T w, hTm]; rfl
-    have hKB : ∀ r, bF.equivFun (LinearMap.baseChange (KB S i b) T' (Φ w)) r =
-        ∑ q, algebraMap S.Ks (KB S i b) (t r q) * bF.equivFun (Φ w) q := by
+      rw [← LinearMap.toMatrix_mulVec_repr bL bL T w, hTm]
+      rfl
+    have hKB
+        : ∀ r,
+          bF.equivFun (LinearMap.baseChange (KB S i b) T' (Φ w)) r
+            = ∑ q, algebraMap S.Ks (KB S i b) (t r q) * bF.equivFun (Φ w) q := by
       intro r
-      have h1 := congrFun (LinearMap.toMatrix_mulVec_repr bF bF (LinearMap.baseChange (KB S i b) T') (Φ w)) r
+      have h1 :=
+        congrFun (LinearMap.toMatrix_mulVec_repr bF bF (LinearMap.baseChange (KB S i b) T') (Φ w)) r
       rw [hMF] at h1
       exact h1.symm
     funext r
@@ -97,6 +123,7 @@ theorem exists_desc_of_isKsForm : ∀ (D : D7) (S : RatDat D.ntw) (j : ℕ), (S.
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hL, map_sum, map_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
-    rw [← S.kKs_spec, hfc, map_mul]; rfl
+    rw [← S.kKs_spec, hfc, map_mul]
+    rfl
 
 end GlobalTheory

@@ -11,11 +11,23 @@ namespace GlobalTheory.LinearPhase
 
 open Complex GlobalTheory.CharFormDeriv
 
-theorem seminorm_phase_sub_le : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (L : V →L[ℝ] ℝ) (c : ℝ) (f : 𝓢(V, ℂ)) (k n : ℕ), ∃ C : ℝ, ∀ t : ℝ, |t| ≤ 1 → SchwartzMap.seminorm ℂ k n (SchwartzMap.smulLeftCLM ℂ (fun x => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * L x + t ^ 2 * c : ℝ) : ℂ))) f - f + ((t : ℂ) * (2 * Real.pi * Complex.I)) • SchwartzMap.smulLeftCLM ℂ (fun x => ((L x : ℝ) : ℂ)) f) ≤ C * t ^ 2 := by
+theorem seminorm_phase_sub_le
+    : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] (L : V →L[ℝ] ℝ) (c : ℝ) (f : 𝓢(V, ℂ))
+        (k n : ℕ),
+      ∃ C : ℝ, ∀ t : ℝ,
+        |t| ≤ 1
+          → SchwartzMap.seminorm ℂ k n
+              (SchwartzMap.smulLeftCLM ℂ
+                  (fun x =>
+                    Complex.exp (-(2 * Real.pi * Complex.I) * ((t * L x + t ^ 2 * c : ℝ) : ℂ)))
+                  f
+                - f
+                + ((t : ℂ) * (2 * Real.pi * Complex.I))
+                  • SchwartzMap.smulLeftCLM ℂ (fun x => ((L x : ℝ) : ℂ)) f)
+            ≤ C * t ^ 2 := by
   intro V _ _ L c f k n
   set L' : V →L[ℝ] ℝ := (-(2 * Real.pi)) • L with hL'
-  have hL'x : ∀ x, ((L' x : ℝ) : ℂ) = -(2 * Real.pi) * (L x : ℂ) := fun x => by
-    simp [hL']
+  have hL'x : ∀ x, ((L' x : ℝ) : ℂ) = -(2 * Real.pi) * (L x : ℂ) := fun x => by simp [hL']
   set K := 3 * 2 ^ n * (1 + ‖L'‖) ^ (n + 2) *
       (2 ^ (k + 2) * ((Finset.Iic (k + 2, n)).sup fun m => SchwartzMap.seminorm ℂ m.1 m.2) f)
       with hK
@@ -24,11 +36,15 @@ theorem seminorm_phase_sub_le : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpa
   set g : 𝓢(V, ℂ) := SchwartzMap.smulLeftCLM ℂ (fun x => ((L x : ℝ) : ℂ)) f with hgdef
   have hg : ∀ x, g x = (L x : ℂ) * f x := fun x => by
     rw [hgdef, SchwartzMap.smulLeftCLM_apply_apply hgt, smul_eq_mul]
-  refine ⟨K + 2 * |2 * Real.pi * c| *
-    (SchwartzMap.seminorm ℂ k n f + 2 * Real.pi * SchwartzMap.seminorm ℂ k n g), fun t ht1 => ?_⟩
+  refine ⟨
+    K + 2 * |2 * Real.pi * c|
+      * (SchwartzMap.seminorm ℂ k n f + 2 * Real.pi * SchwartzMap.seminorm ℂ k n g),
+    fun t ht1 => ?_
+  ⟩
   set a : ℂ := Complex.exp (((-(2 * Real.pi * c * t ^ 2) : ℝ) : ℂ) * I) with ha
-  have hfun : (fun x : V => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * L x + t ^ 2 * c : ℝ) : ℂ)))
-      = fun x : V => a * Complex.exp ((I * t) * (L' x : ℂ)) := by
+  have hfun
+      : (fun x : V => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * L x + t ^ 2 * c : ℝ) : ℂ)))
+        = fun x : V => a * Complex.exp ((I * t) * (L' x : ℂ)) := by
     funext x
     rw [ha, ← Complex.exp_add, hL'x]
     congr 1
@@ -59,8 +75,9 @@ theorem seminorm_phase_sub_le : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpa
       rem, smul_eq_mul, hL'x]
     ring
   have hub : SchwartzMap.seminorm ℂ k n u ≤ |t| * K := seminorm_rem_mul_le L' f u ht0 ht1 hu k n
-  have hid : E - f + ((t : ℂ) * (2 * Real.pi * Complex.I)) • g
-      = (a * t) • u + ((a - 1) • f + (-((a - 1) * t * (2 * Real.pi * I))) • g) := by
+  have hid
+      : E - f + ((t : ℂ) * (2 * Real.pi * Complex.I)) • g
+        = (a * t) • u + ((a - 1) • f + (-((a - 1) * t * (2 * Real.pi * I))) • g) := by
     ext x
     simp only [hudef, SchwartzMap.add_apply, SchwartzMap.sub_apply, SchwartzMap.smul_apply, hA, hE,
       smul_eq_mul]
@@ -75,25 +92,30 @@ theorem seminorm_phase_sub_le : ∀ {V : Type} [NormedAddCommGroup V] [NormedSpa
   have hpg := apply_nonneg (SchwartzMap.seminorm ℂ k n) g
   have hpi := Real.pi_pos
   have hn1 : ‖a * t‖ = |t| := by rw [norm_mul, hna, one_mul, Complex.norm_real, Real.norm_eq_abs]
-  have hn2 : ‖-((a - 1) * t * (2 * Real.pi * I))‖ ≤ 2 * |2 * Real.pi * c| * t ^ 2 * (2 * Real.pi) := by
-    have h2 : ‖(2 * Real.pi * I : ℂ)‖ = 2 * Real.pi := by
-      simp [abs_of_pos hpi]
+  have hn2
+      : ‖-((a - 1) * t * (2 * Real.pi * I))‖ ≤ 2 * |2 * Real.pi * c| * t ^ 2 * (2 * Real.pi) := by
+    have h2 : ‖(2 * Real.pi * I : ℂ)‖ = 2 * Real.pi := by simp [abs_of_pos hpi]
     rw [norm_neg, norm_mul, norm_mul, h2, Complex.norm_real, Real.norm_eq_abs]
-    calc ‖a - 1‖ * |t| * (2 * Real.pi) ≤ (2 * |2 * Real.pi * c| * t ^ 2) * 1 * (2 * Real.pi) := by
-          gcongr
+    calc
+      ‖a - 1‖ * |t| * (2 * Real.pi)
+        ≤ (2 * |2 * Real.pi * c| * t ^ 2) * 1 * (2 * Real.pi) := by gcongr
       _ = _ := by ring
   rw [hid]
-  calc SchwartzMap.seminorm ℂ k n ((a * t) • u + ((a - 1) • f + (-((a - 1) * t * (2 * Real.pi * I))) • g))
-      ≤ SchwartzMap.seminorm ℂ k n ((a * t) • u) + (SchwartzMap.seminorm ℂ k n ((a - 1) • f) +
-          SchwartzMap.seminorm ℂ k n ((-((a - 1) * t * (2 * Real.pi * I))) • g)) :=
-        (map_add_le_add _ _ _).trans (by gcongr; exact map_add_le_add _ _ _)
-    _ = |t| * SchwartzMap.seminorm ℂ k n u + (‖a - 1‖ * SchwartzMap.seminorm ℂ k n f +
-          ‖-((a - 1) * t * (2 * Real.pi * I))‖ * SchwartzMap.seminorm ℂ k n g) := by
-        rw [map_smul_eq_mul, map_smul_eq_mul, map_smul_eq_mul, hn1]
-    _ ≤ |t| * (|t| * K) + (2 * |2 * Real.pi * c| * t ^ 2 * SchwartzMap.seminorm ℂ k n f +
-          2 * |2 * Real.pi * c| * t ^ 2 * (2 * Real.pi) * SchwartzMap.seminorm ℂ k n g) := by
-        gcongr
-    _ = _ := by
-        rw [← mul_assoc, ← sq, sq_abs]; ring
+  calc
+    SchwartzMap.seminorm ℂ k n
+          ((a * t) • u + ((a - 1) • f + (-((a - 1) * t * (2 * Real.pi * I))) • g))
+        ≤ SchwartzMap.seminorm ℂ k n ((a * t) • u)
+          + (SchwartzMap.seminorm ℂ k n ((a - 1) • f)
+            + SchwartzMap.seminorm ℂ k n ((-((a - 1) * t * (2 * Real.pi * I))) • g)) :=
+      (map_add_le_add _ _ _).trans (by gcongr; exact map_add_le_add _ _ _)
+    _ = |t| * SchwartzMap.seminorm ℂ k n u
+        + (‖a - 1‖ * SchwartzMap.seminorm ℂ k n f
+          + ‖-((a - 1) * t * (2 * Real.pi * I))‖ * SchwartzMap.seminorm ℂ k n g) := by
+      rw [map_smul_eq_mul, map_smul_eq_mul, map_smul_eq_mul, hn1]
+    _ ≤ |t| * (|t| * K)
+        + (2 * |2 * Real.pi * c| * t ^ 2 * SchwartzMap.seminorm ℂ k n f
+          + 2 * |2 * Real.pi * c| * t ^ 2 * (2 * Real.pi) * SchwartzMap.seminorm ℂ k n g) := by
+      gcongr
+    _ = _ := by rw [← mul_assoc, ← sq, sq_abs]; ring
 
 end GlobalTheory.LinearPhase

@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem relIndex_map_mulLeft_lattice_of_sq_eq_neg :
-    ∀ (L : PeriodPair) (α : ℂ) (N : ℕ), 0 < N → α ^ 2 = -(N : ℂ) →
-      (∀ l ∈ L.lattice, α * l ∈ L.lattice) →
-      (L.lattice.toAddSubgroup.map (AddMonoidHom.mulLeft α)).relIndex L.lattice.toAddSubgroup
-        = N := by
+theorem relIndex_map_mulLeft_lattice_of_sq_eq_neg
+    : ∀ (L : PeriodPair) (α : ℂ) (N : ℕ),
+      0 < N → α ^ 2 = -(N : ℂ) → (∀ l ∈ L.lattice, α * l ∈ L.lattice)
+        → (L.lattice.toAddSubgroup.map (AddMonoidHom.mulLeft α)).relIndex L.lattice.toAddSubgroup
+          = N := by
   intro L α N hN hα hL
   have hα0 : α ≠ 0 := by
     rintro rfl

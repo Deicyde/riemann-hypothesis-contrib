@@ -5,15 +5,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem inv_row {R : Type} [CommRing R] {n : ℕ} (m : ℕ) (k : Fin n) (hk : k.val = m + 1) (p : GL (Fin n) R)
-    (hp : IsY (m + 1) p.val) : (∀ j, j < k → (p⁻¹).val k j = 0) ∧ (p⁻¹).val k k = 1 := by
+private theorem inv_row
+    {R : Type} [CommRing R]
+    {n : ℕ} (m : ℕ) (k : Fin n) (hk : k.val = m + 1)
+    (p : GL (Fin n) R) (hp : IsY (m + 1) p.val)
+    : (∀ j, j < k → (p⁻¹).val k j = 0) ∧ (p⁻¹).val k k = 1 := by
   have h1 : ∀ j, j < k → (p⁻¹).val k j = 0 := by
     have hb : p.val.BlockTriangular (fun i : Fin n => if i.val ≤ m then 0 else i.val) := by
       intro i j hij
@@ -40,8 +44,7 @@ private theorem inv_row {R : Type} [CommRing R] {n : ℕ} (m : ℕ) (k : Fin n) 
     · rw [(hp j (by rw [Fin.lt_def] at h; omega)).2 k h, mul_zero]
   · simp
 
-theorem UpperTheory.V.Af.Smo.colConj :
-    UpperTheory.V.Af.Smo.ColConj := by
+theorem UpperTheory.V.Af.Smo.colConj : UpperTheory.V.Af.Smo.ColConj := by
   intro R _ n m hm p hp u
   set k : Fin n := ⟨m.val + 1, hm⟩ with hkdef
   have hk : k.val = m.val + 1 := rfl

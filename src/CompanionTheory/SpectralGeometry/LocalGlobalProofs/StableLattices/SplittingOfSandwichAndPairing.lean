@@ -15,16 +15,17 @@ section Lat
 
 variable {L : Type} [NontriviallyNormedField L] {V : Type} [AddCommGroup V] [Module L V]
 
-theorem lat_smul_mem {Λ : AddSubgroup V} (hΛ : IsLat L Λ) {a : L} (ha : ‖a‖ ≤ 1) {x : V}
-    (hx : x ∈ Λ) : a • x ∈ Λ := by
+theorem lat_smul_mem
+    {Λ : AddSubgroup V} (hΛ : IsLat L Λ) {a : L} (ha : ‖a‖ ≤ 1) {x : V} (hx : x ∈ Λ)
+    : a • x ∈ Λ := by
   obtain ⟨m, b, hb⟩ := hΛ
   rw [hb] at hx ⊢
   intro i
   simp only [map_smul, Finsupp.smul_apply, smul_eq_mul, norm_mul]
   exact mul_le_one₀ ha (norm_nonneg _) (hx i)
 
-theorem lat_absorb {Λ : AddSubgroup V} (hΛ : IsLat L Λ) {ι : Type} [Fintype ι] (v : ι → V) :
-    ∃ c : L, c ≠ 0 ∧ ‖c‖ ≤ 1 ∧ ∀ i, c • v i ∈ Λ := by
+theorem lat_absorb {Λ : AddSubgroup V} (hΛ : IsLat L Λ) {ι : Type} [Fintype ι] (v : ι → V)
+    : ∃ c : L, c ≠ 0 ∧ ‖c‖ ≤ 1 ∧ ∀ i, c • v i ∈ Λ := by
   obtain ⟨m, b, hb⟩ := hΛ
   set C : ℝ := 1 + ∑ i, ∑ j, ‖b.repr (v i) j‖ with hC
   have hC1 : 1 ≤ C := by
@@ -39,19 +40,26 @@ theorem lat_absorb {Λ : AddSubgroup V} (hΛ : IsLat L Λ) {ι : Type} [Fintype 
   simp only [map_smul, Finsupp.smul_apply, smul_eq_mul, norm_mul]
   have h1 : ‖b.repr (v i) j‖ ≤ C := by
     have h2 : ‖b.repr (v i) j‖ ≤ ∑ j, ‖b.repr (v i) j‖ :=
-      Finset.single_le_sum (f := fun j => ‖b.repr (v i) j‖) (fun _ _ => norm_nonneg _)
+      Finset.single_le_sum
+        (f := fun j => ‖b.repr (v i) j‖)
+        (fun _ _ => norm_nonneg _)
         (Finset.mem_univ j)
     have h3 : ∑ j, ‖b.repr (v i) j‖ ≤ ∑ i, ∑ j, ‖b.repr (v i) j‖ :=
-      Finset.single_le_sum (f := fun i => ∑ j, ‖b.repr (v i) j‖)
-        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun i => ∑ j, ‖b.repr (v i) j‖)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ i)
     linarith
-  calc ‖c‖ * ‖b.repr (v i) j‖ ≤ C⁻¹ * C :=
-        mul_le_mul hc.le h1 (norm_nonneg _) (inv_pos.2 hC0).le
+  calc
+    ‖c‖ * ‖b.repr (v i) j‖
+      ≤ C⁻¹ * C := mul_le_mul hc.le h1 (norm_nonneg _) (inv_pos.2 hC0).le
     _ = 1 := inv_mul_cancel₀ hC0.ne'
 
-theorem lat_bdd {V' : Type} [AddCommGroup V'] [Module L V'] {Λ : AddSubgroup V}
-    {Λ₀ : AddSubgroup V'} (hΛ : IsLat L Λ) (hΛ₀ : IsLat L Λ₀) (P : V →ₗ[L] V') :
-    ∃ c : L, c ≠ 0 ∧ ‖c‖ ≤ 1 ∧ ∀ x ∈ Λ, c • P x ∈ Λ₀ := by
+theorem lat_bdd
+    {V' : Type} [AddCommGroup V'] [Module L V']
+    {Λ : AddSubgroup V} {Λ₀ : AddSubgroup V'} (hΛ : IsLat L Λ) (hΛ₀ : IsLat L Λ₀)
+    (P : V →ₗ[L] V')
+    : ∃ c : L, c ≠ 0 ∧ ‖c‖ ≤ 1 ∧ ∀ x ∈ Λ, c • P x ∈ Λ₀ := by
   obtain ⟨m, b, hb⟩ := hΛ
   obtain ⟨c, hc0, hc1, hc⟩ := lat_absorb hΛ₀ (fun i => P (b i))
   refine ⟨c, hc0, hc1, fun x hx => ?_⟩
@@ -77,8 +85,10 @@ def latOf {m : ℕ} (b : Module.Basis (Fin m) L V) : AddSubgroup V where
 theorem latOf_isLat {m : ℕ} (b : Module.Basis (Fin m) L V) : IsLat L (latOf b) :=
   ⟨m, b, fun _ => Iff.rfl⟩
 
-def bigLat {V' : Type} [AddCommGroup V'] [Module L V'] (p q : V →ₗ[L] L) (P : V →ₗ[L] V')
-    (N : AddSubgroup V') : AddSubgroup V where
+def bigLat
+    {V' : Type} [AddCommGroup V'] [Module L V']
+    (p q : V →ₗ[L] L) (P : V →ₗ[L] V') (N : AddSubgroup V')
+    : AddSubgroup V where
   carrier := {x | ‖p x‖ ≤ 1 ∧ ‖q x‖ ≤ 1 ∧ P x ∈ N}
   add_mem' := fun {x y} hx hy => by
     refine ⟨?_, ?_, ?_⟩
@@ -100,7 +110,9 @@ end Lat
 
 section Form
 
-variable {L : Type} [NontriviallyNormedField L] {V : Type} [AddCommGroup V] [Module L V]
+variable
+  {L : Type} [NontriviallyNormedField L]
+  {V : Type} [AddCommGroup V] [Module L V]
   {s : L →+* L} {h : V → V → L}
 
 theorem herm_add_left (hh : IsHerm s h) (x y z : V) : h (x + y) z = h x z + h y z := by
@@ -114,7 +126,8 @@ def hlin (hh : IsHerm s h) (x : V) : V →ₗ[L] L where
   map_add' := hh.1 x
   map_smul' a y := by simpa using hh.2.1 a x y
 
-@[simp] theorem hlin_apply (hh : IsHerm s h) (x y : V) : hlin hh x y = h x y := rfl
+@[simp]
+theorem hlin_apply (hh : IsHerm s h) (x y : V) : hlin hh x y = h x y := rfl
 
 def ca (hh : IsHerm s h) (δ : L) (f : V) : V →ₗ[L] L := (s δ)⁻¹ • hlin hh f
 
@@ -127,21 +140,21 @@ theorem ca_apply (hh : IsHerm s h) (δ : L) (f x : V) : ca hh δ f x = (s δ)⁻
 
 theorem cb_apply (hh : IsHerm s h) (δ : L) (e x : V) : cb hh δ e x = δ⁻¹ * h e x := rfl
 
-theorem pr_apply (hh : IsHerm s h) (δ : L) (e f x : V) :
-    pr hh δ e f x = x - ca hh δ f x • e - cb hh δ e x • f := by
+theorem pr_apply (hh : IsHerm s h) (δ : L) (e f x : V)
+    : pr hh δ e f x = x - ca hh δ f x • e - cb hh δ e x • f := by
   simp [pr]
 
-theorem decomp (hh : IsHerm s h) (δ : L) (e f x : V) :
-    x = ca hh δ f x • e + cb hh δ e x • f + pr hh δ e f x := by
+theorem decomp (hh : IsHerm s h) (δ : L) (e f x : V)
+    : x = ca hh δ f x • e + cb hh δ e x • f + pr hh δ e f x := by
   rw [pr_apply]; abel
 
 variable {δ : L} {e f : V}
 
-theorem h_fe (hh : IsHerm s h) (hef : h e f = δ) : h f e = s δ := by
-  rw [hh.2.2.1 e f, hef]
+theorem h_fe (hh : IsHerm s h) (hef : h e f = δ) : h f e = s δ := by rw [hh.2.2.1 e f, hef]
 
-theorem pr_orth (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0)
-    (hef : h e f = δ) (x : V) : h e (pr hh δ e f x) = 0 ∧ h f (pr hh δ e f x) = 0 := by
+theorem pr_orth
+    (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ) (x : V)
+    : h e (pr hh δ e f x) = 0 ∧ h f (pr hh δ e f x) = 0 := by
   have hsδ : s δ ≠ 0 := (map_ne_zero s).2 hδ
   have hfe := h_fe hh hef
   constructor
@@ -156,10 +169,11 @@ theorem pr_orth (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f 
     field_simp
     ring
 
-theorem coef_eq (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0)
-    (hef : h e f = δ) (a b : L) {w : V} (hew : h e w = 0) (hfw : h f w = 0) :
-    ca hh δ f (a • e + b • f + w) = a ∧ cb hh δ e (a • e + b • f + w) = b ∧
-      pr hh δ e f (a • e + b • f + w) = w := by
+theorem coef_eq
+    (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ) (a b : L)
+    {w : V} (hew : h e w = 0) (hfw : h f w = 0)
+    : ca hh δ f (a • e + b • f + w) = a ∧ cb hh δ e (a • e + b • f + w) = b
+      ∧ pr hh δ e f (a • e + b • f + w) = w := by
   have hsδ : s δ ≠ 0 := (map_ne_zero s).2 hδ
   have hfe := h_fe hh hef
   have h1 : ca hh δ f (a • e + b • f + w) = a := by
@@ -174,9 +188,10 @@ theorem coef_eq (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f 
   rw [pr_apply, h1, h2]
   abel
 
-theorem norm_form (hs : IsInv s) (hh : IsHerm s h) (he : h e e = 0) (hf : h f f = 0)
-    (hef : h e f = δ) (a b : L) {w : V} (hew : h e w = 0) (hfw : h f w = 0) :
-    h (a • e + b • f + w) (a • e + b • f + w) = δ * (s a * b) + s (δ * (s a * b)) + h w w := by
+theorem norm_form
+    (hs : IsInv s) (hh : IsHerm s h) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ) (a b : L)
+    {w : V} (hew : h e w = 0) (hfw : h f w = 0)
+    : h (a • e + b • f + w) (a • e + b • f + w) = δ * (s a * b) + s (δ * (s a * b)) + h w w := by
   have hfe := h_fe hh hef
   have hwe : h w e = 0 := by rw [hh.2.2.1 e w, hew, map_zero]
   have hwf : h w f = 0 := by rw [hh.2.2.1 f w, hfw, map_zero]
@@ -188,13 +203,17 @@ end Form
 
 section Main
 
-variable {L : Type} [NontriviallyNormedField L] [IsUltrametricDist L]
-  {V : Type} [AddCommGroup V] [Module L V] {s : L →+* L} {h : V → V → L} {δ : L} {e f : V}
+variable
+  {L : Type} [NontriviallyNormedField L] [IsUltrametricDist L]
+  {V : Type} [AddCommGroup V] [Module L V]
+  {s : L →+* L} {h : V → V → L} {δ : L} {e f : V}
 
-theorem coef_int (hs : IsInv s) (hδ : δ ≠ 0) (hh : IsHerm s h) {Λ : AddSubgroup V}
+theorem coef_int
+    (hs : IsInv s) (hδ : δ ≠ 0) (hh : IsHerm s h)
+    {Λ : AddSubgroup V}
     (hΛ : IsLat L Λ) (hpair : ∀ x ∈ Λ, ∀ y ∈ Λ, ‖h x y‖ ≤ ‖δ‖) (heΛ : e ∈ Λ) (hfΛ : f ∈ Λ)
-    {x : V} (hx : x ∈ Λ) :
-    ‖ca hh δ f x‖ ≤ 1 ∧ ‖cb hh δ e x‖ ≤ 1 ∧ pr hh δ e f x ∈ Λ := by
+    {x : V} (hx : x ∈ Λ)
+    : ‖ca hh δ f x‖ ≤ 1 ∧ ‖cb hh δ e x‖ ≤ 1 ∧ pr hh δ e f x ∈ Λ := by
   have hn : 0 < ‖δ‖ := norm_pos_iff.2 hδ
   have h1 : ‖ca hh δ f x‖ ≤ 1 := by
     rw [ca_apply, norm_mul, norm_inv, hs.2.1]
@@ -208,15 +227,22 @@ theorem coef_int (hs : IsInv s) (hδ : δ ≠ 0) (hh : IsHerm s h) {Λ : AddSubg
 
 variable {U : Submodule L V}
 
-def prU (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ)
-    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0) : V →ₗ[L] U :=
+def prU
+    (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ)
+    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0)
+    : V →ₗ[L] U :=
   LinearMap.codRestrict U (pr hh δ e f) fun x => (hU _).2 (pr_orth hh hδ he hf hef x)
 
-theorem herm_restrict (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0)
-    (hef : h e f = δ) (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0) :
-    IsHerm s (fun x y : U => h x y) := by
-  refine ⟨fun x y z => hh.1 _ _ _, fun a x y => hh.2.1 a _ _, fun x y => hh.2.2.1 _ _,
-    fun x hx => Subtype.ext (hh.2.2.2 _ fun y => ?_)⟩
+theorem herm_restrict
+    (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ)
+    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0)
+    : IsHerm s (fun x y : U => h x y) := by
+  refine ⟨
+    fun x y z => hh.1 _ _ _,
+    fun a x y => hh.2.1 a _ _,
+    fun x y => hh.2.2.1 _ _,
+    fun x hx => Subtype.ext (hh.2.2.2 _ fun y => ?_)
+  ⟩
   have hx' := (hU x).1 x.2
   have hxe : h x e = 0 := by rw [hh.2.2.1 e x, hx'.1, map_zero]
   have hxf : h x f = 0 := by rw [hh.2.2.1 f x, hx'.2, map_zero]
@@ -224,10 +250,13 @@ theorem herm_restrict (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : 
   rw [decomp hh δ e f y, hh.1, hh.1, hh.2.1, hh.2.1, hxe, hxf, hxp]
   simp
 
-theorem restrict_isLat (hS : StSandwich) [ProperSpace L] [FiniteDimensional L V]
+theorem restrict_isLat
+    (hS : StSandwich)
+    [ProperSpace L] [FiniteDimensional L V]
     (hh : IsHerm s h) (hδ : δ ≠ 0) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ)
-    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0) {Λ : AddSubgroup V} (hΛ : IsLat L Λ) :
-    IsLat L (Λ.comap U.subtype.toAddMonoidHom) := by
+    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0)
+    {Λ : AddSubgroup V} (hΛ : IsLat L Λ)
+    : IsLat L (Λ.comap U.subtype.toAddMonoidHom) := by
   have lat0 := latOf_isLat (Module.finBasis L U)
   obtain ⟨c, hc0, -, hc⟩ := lat_bdd hΛ lat0 (prU hh hδ he hf hef hU)
   refine hS L U _ _ c lat0 hc0 (fun x hx => ?_) (fun x => ?_) (fun a ha x hx => ?_)
@@ -242,11 +271,14 @@ theorem restrict_isLat (hS : StSandwich) [ProperSpace L] [FiniteDimensional L V]
     exact ⟨a, ha0, ha ()⟩
   · exact lat_smul_mem hΛ ha hx
 
-theorem restrict_isMax (hS : StSandwich) [ProperSpace L] [FiniteDimensional L V] (hs : IsInv s)
-    (hδ : IsDelta s δ) (hh : IsHerm s h) (he : h e e = 0) (hf : h f f = 0) (hef : h e f = δ)
-    (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0) {Λ : AddSubgroup V} (hΛ : IsMax h Λ)
-    (hpair : ∀ x ∈ Λ, ∀ y ∈ Λ, ‖h x y‖ ≤ ‖δ‖) (heΛ : e ∈ Λ) (hfΛ : f ∈ Λ) :
-    IsMax (fun x y : U => h x y) (Λ.comap U.subtype.toAddMonoidHom) := by
+theorem restrict_isMax
+    (hS : StSandwich)
+    [ProperSpace L] [FiniteDimensional L V]
+    (hs : IsInv s) (hδ : IsDelta s δ) (hh : IsHerm s h) (he : h e e = 0) (hf : h f f = 0)
+    (hef : h e f = δ) (hU : ∀ x, x ∈ U ↔ h e x = 0 ∧ h f x = 0)
+    {Λ : AddSubgroup V}
+    (hΛ : IsMax h Λ) (hpair : ∀ x ∈ Λ, ∀ y ∈ Λ, ‖h x y‖ ≤ ‖δ‖) (heΛ : e ∈ Λ) (hfΛ : f ∈ Λ)
+    : IsMax (fun x y : U => h x y) (Λ.comap U.subtype.toAddMonoidHom) := by
   have hδ0 := hδ.1
   have hlatU := restrict_isLat hS hh hδ0 he hf hef hU hΛ.1
   refine ⟨hlatU, fun x hx => hΛ.2.1 _ hx, fun N hN hNint hle => ?_⟩
@@ -262,8 +294,10 @@ theorem restrict_isMax (hS : StSandwich) [ProperSpace L] [FiniteDimensional L V]
     · obtain ⟨h1, h2, h3⟩ := hx
       have h4 : c • pr hh δ e f x ∈ Λ := hc _ h3
       rw [decomp hh δ e f x, smul_add, smul_add]
-      exact Λ.add_mem (Λ.add_mem (lat_smul_mem hΛ.1 hc1 (lat_smul_mem hΛ.1 h1 heΛ))
-        (lat_smul_mem hΛ.1 hc1 (lat_smul_mem hΛ.1 h2 hfΛ))) h4
+      exact Λ.add_mem
+        (Λ.add_mem (lat_smul_mem hΛ.1 hc1 (lat_smul_mem hΛ.1 h1 heΛ))
+          (lat_smul_mem hΛ.1 hc1 (lat_smul_mem hΛ.1 h2 hfΛ)))
+        h4
     · obtain ⟨a, ha0, -, ha⟩ := lat_absorb hΛ.1 (fun _ : Unit => x)
       exact ⟨a, ha0, hΛM (ha ())⟩
     · obtain ⟨h1, h2, h3⟩ := hx
@@ -297,11 +331,14 @@ theorem restrict_isMax (hS : StSandwich) [ProperSpace L] [FiniteDimensional L V]
   rw [hMeq] at hxM
   exact hxM
 
-theorem split_mem_iff (hs : IsInv s) (hδ : δ ≠ 0) (hh : IsHerm s h) (he : h e e = 0)
-    (hf : h f f = 0) (hef : h e f = δ) {Λ : AddSubgroup V} (hΛ : IsLat L Λ)
-    (hpair : ∀ x ∈ Λ, ∀ y ∈ Λ, ‖h x y‖ ≤ ‖δ‖) (heΛ : e ∈ Λ) (hfΛ : f ∈ Λ) (a b : L) {w : V}
-    (hew : h e w = 0) (hfw : h f w = 0) :
-    a • e + b • f + w ∈ Λ ↔ ‖a‖ ≤ 1 ∧ ‖b‖ ≤ 1 ∧ w ∈ Λ := by
+theorem split_mem_iff
+    (hs : IsInv s) (hδ : δ ≠ 0) (hh : IsHerm s h) (he : h e e = 0) (hf : h f f = 0)
+    (hef : h e f = δ)
+    {Λ : AddSubgroup V}
+    (hΛ : IsLat L Λ) (hpair : ∀ x ∈ Λ, ∀ y ∈ Λ, ‖h x y‖ ≤ ‖δ‖) (heΛ : e ∈ Λ) (hfΛ : f ∈ Λ)
+    (a b : L)
+    {w : V} (hew : h e w = 0) (hfw : h f w = 0)
+    : a • e + b • f + w ∈ Λ ↔ ‖a‖ ≤ 1 ∧ ‖b‖ ≤ 1 ∧ w ∈ Λ := by
   constructor
   · intro hx
     obtain ⟨c1, c2, c3⟩ := coef_eq hh hδ he hf hef a b hew hfw
@@ -315,8 +352,12 @@ end Main
 theorem stSplit : StSandwich → StPairing → StSplit := by
   intro hS hP L _ _ _ _ s hs δ hδ V _ _ _ h hh e f U he hf hef hU
   have hδ0 := hδ.1
-  refine ⟨herm_restrict hh hδ0 he hf hef hU, fun x => ⟨_, _, _, (hU _).2
-    (pr_orth hh hδ0 he hf hef x), decomp hh δ e f x⟩, ?_, fun Λ hΛ heΛ hfΛ => ?_⟩
+  refine ⟨
+    herm_restrict hh hδ0 he hf hef hU,
+    fun x => ⟨_, _, _, (hU _).2 (pr_orth hh hδ0 he hf hef x), decomp hh δ e f x⟩,
+    ?_,
+    fun Λ hΛ heΛ hfΛ => ?_
+  ⟩
   · rintro rfl
     exact hδ0 (hef ▸ ((hU f).1 Submodule.mem_top).1)
   · have hpair := (hP L s hs δ hδ V h hh Λ hΛ).1

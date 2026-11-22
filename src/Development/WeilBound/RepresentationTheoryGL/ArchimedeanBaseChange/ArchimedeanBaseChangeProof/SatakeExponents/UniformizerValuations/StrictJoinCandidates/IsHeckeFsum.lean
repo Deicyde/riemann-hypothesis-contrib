@@ -12,28 +12,42 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RelIndexNeZe
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B
-  PositivityTheory.Rg.BcB.F.Choice PositivityTheory.Rg.BcB.F.Eig
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5
+  PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.BcB.F.Choice
+  PositivityTheory.Rg.BcB.F.Eig
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Rg.BcB.F.FX
 
-def loE (n : ℕ) : Fin (n / 2) ↪ Fin n :=
-  ⟨fun i => ⟨i.val, by have := i.isLt; omega⟩, fun a b h => Fin.ext (by
-    have h' := congrArg Fin.val h
-    exact h')⟩
+def loE (n : ℕ) : Fin (n / 2) ↪ Fin n := ⟨
+  fun i => ⟨i.val, by have := i.isLt; omega⟩,
+  fun a b h =>
+    Fin.ext (by
+      have h' := congrArg Fin.val h
+      exact h')
+⟩
 
-def hiE (n : ℕ) : Fin (n / 2) ↪ Fin n :=
-  ⟨fun i => ⟨n - 1 - i.val, by have := i.isLt; omega⟩, fun a b h => Fin.ext (by
-    have h' := congrArg Fin.val h
-    change n - 1 - a.val = n - 1 - b.val at h'
-    have := a.isLt; have := b.isLt
-    omega)⟩
+def hiE (n : ℕ) : Fin (n / 2) ↪ Fin n := ⟨
+  fun i => ⟨n - 1 - i.val, by have := i.isLt; omega⟩,
+  fun a b h =>
+    Fin.ext (by
+      have h' := congrArg Fin.val h
+      change n - 1 - a.val = n - 1 - b.val at h'
+      have := a.isLt
+      have := b.isLt
+      omega)
+⟩
 
 def xiOf (n : ℕ) (β : Fin (n / 2) → ℂˣ) (k : Fin n) : ℂˣ :=
-  if h : k.val < n / 2 then β ⟨k.val, h⟩ else if h' : n - 1 - k.val < n / 2 then (β ⟨n - 1 - k.val, h'⟩)⁻¹ else 1
+  if h : k.val < n / 2 then
+    β ⟨k.val, h⟩
+  else if h' : n - 1 - k.val < n / 2 then
+    (β ⟨n - 1 - k.val, h'⟩)⁻¹
+  else
+    1
 
 theorem xi_lo (n : ℕ) (β : Fin (n / 2) → ℂˣ) (i : Fin (n / 2)) : xiOf n β (loE n i) = β i := by
   unfold xiOf
@@ -44,20 +58,24 @@ theorem xi_hi (n : ℕ) (β : Fin (n / 2) → ℂˣ) (i : Fin (n / 2)) : xiOf n 
   have hi := i.isLt
   unfold xiOf
   rw [dite_eq_right (show ¬ (hiE n i).val < n / 2 by show ¬ (n - 1 - i.val < n / 2); omega),
-    dite_eq_left (show n - 1 - (hiE n i).val < n / 2 by show n - 1 - (n - 1 - i.val) < n / 2; omega)]
+    dite_eq_left (show n - 1 - (hiE n i).val < n / 2 by
+      show n - 1 - (n - 1 - i.val) < n / 2; omega)]
   have key : ∀ j : Fin (n / 2), j.val = i.val → (β j)⁻¹ = (β i)⁻¹ := by
     intro j hj
     rw [Fin.ext hj]
   exact key _ (by show n - 1 - (n - 1 - i.val) = i.val; omega)
 
-theorem xi_mid (n : ℕ) (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h2 : ¬ n - 1 - k.val < n / 2) :
-    xiOf n β k = 1 := by
+theorem xi_mid
+    (n : ℕ) (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h2 : ¬ n - 1 - k.val < n / 2)
+    : xiOf n β k = 1 := by
   unfold xiOf
   rw [dite_eq_right h1, dite_eq_right h2]
 
-theorem prod_halves {M : Type} [CommMonoid M] (n : ℕ) (F : Fin n → M)
-    (hmid : ∀ k : Fin n, ¬ k.val < n / 2 → ¬ n - 1 - k.val < n / 2 → F k = 1) :
-    ∏ k, F k = ∏ i : Fin (n / 2), F (loE n i) * F (hiE n i) := by
+theorem prod_halves
+    {M : Type} [CommMonoid M]
+    (n : ℕ) (F : Fin n → M)
+    (hmid : ∀ k : Fin n, ¬ k.val < n / 2 → ¬ n - 1 - k.val < n / 2 → F k = 1)
+    : ∏ k, F k = ∏ i : Fin (n / 2), F (loE n i) * F (hiE n i) := by
   have hdisj : Disjoint (Finset.univ.map (loE n)) (Finset.univ.map (hiE n)) := by
     rw [Finset.disjoint_left]
     intro a ha hb
@@ -65,29 +83,33 @@ theorem prod_halves {M : Type} [CommMonoid M] (n : ℕ) (F : Fin n → M)
     obtain ⟨j, -, hj⟩ := Finset.mem_map.1 hb
     have e1 : a.val = i.val := by rw [← hi]; rfl
     have e2 : a.val = n - 1 - j.val := by rw [← hj]; rfl
-    have := i.isLt; have := j.isLt
+    have := i.isLt
+    have := j.isLt
     omega
-  have hsub : ∀ k ∈ (Finset.univ : Finset (Fin n)),
-      k ∉ Finset.univ.map (loE n) ∪ Finset.univ.map (hiE n) → F k = 1 := by
+  have hsub
+      : ∀ k ∈ (Finset.univ : Finset (Fin n)),
+        k ∉ Finset.univ.map (loE n) ∪ Finset.univ.map (hiE n) → F k = 1 := by
     intro k _ hk
     have hkl := k.isLt
     apply hmid k
     · intro h
-      exact hk (Finset.mem_union_left _ (Finset.mem_map.2 ⟨⟨k.val, h⟩, Finset.mem_univ _, Fin.ext rfl⟩))
+      exact hk (Finset.mem_union_left _
+        (Finset.mem_map.2 ⟨⟨k.val, h⟩, Finset.mem_univ _, Fin.ext rfl⟩))
     · intro h
-      refine hk (Finset.mem_union_right _ (Finset.mem_map.2 ⟨⟨n - 1 - k.val, h⟩, Finset.mem_univ _, Fin.ext ?_⟩))
+      refine hk (Finset.mem_union_right _
+        (Finset.mem_map.2 ⟨⟨n - 1 - k.val, h⟩, Finset.mem_univ _, Fin.ext ?_⟩))
       show n - 1 - (n - 1 - k.val) = k.val
       omega
-  rw [← Finset.prod_subset (Finset.subset_univ _) hsub, Finset.prod_union hdisj, Finset.prod_map, Finset.prod_map,
-    Finset.prod_mul_distrib]
+  rw [← Finset.prod_subset (Finset.subset_univ _) hsub, Finset.prod_union hdisj, Finset.prod_map,
+    Finset.prod_map, Finset.prod_mul_distrib]
 
 def uq {E : Type} [Field E] [NumberField E] (w : Pl E) : ℂˣ := Units.mk0 (qh w) (qh_ne_zero' w)
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem chi_pair (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ) (i : Fin (n / 2)) :
-    chiN w (xiOf n β) (loE n i) ^ x (loE n i) * chiN w (xiOf n β) (hiE n i) ^ x (hiE n i) =
-      uq w ^ (((n : ℤ) - 1 - 2 * ((i : ℕ) : ℤ)) * lOf x i) * β i ^ lOf x i := by
+theorem chi_pair (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ) (i : Fin (n / 2))
+    : chiN w (xiOf n β) (loE n i) ^ x (loE n i) * chiN w (xiOf n β) (hiE n i) ^ x (hiE n i)
+      = uq w ^ (((n : ℤ) - 1 - 2 * ((i : ℕ) : ℤ)) * lOf x i) * β i ^ lOf x i := by
   have hi := i.isLt
   have r1 : rh n (loE n i : ℕ) = (n : ℤ) - 1 - 2 * ((i : ℕ) : ℤ) := rfl
   have r2 : rh n (hiE n i : ℕ) = -((n : ℤ) - 1 - 2 * ((i : ℕ) : ℤ)) := by
@@ -101,17 +123,21 @@ theorem chi_pair (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ) (i 
   set a := x (loE n i)
   set c := x (hiE n i)
   rw [mul_zpow, mul_zpow, _root_.inv_zpow', ← _root_.zpow_mul, ← _root_.zpow_mul,
-    show r * (a - c) = r * a + -r * c by ring, show a - c = a + -c by ring, _root_.zpow_add, _root_.zpow_add]
+    show r * (a - c) = r * a + -r * c by ring, show a - c = a + -c by ring, _root_.zpow_add,
+    _root_.zpow_add]
   ac_rfl
 
-theorem dlt_pw (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ) :
-    dlt n w (lOf x) * pw β (lOf x) = ((∏ k, chiN w (xiOf n β) k ^ x k : ℂˣ) : ℂ) := by
-  rw [prod_halves n (fun k => chiN w (xiOf n β) k ^ x k) (fun k h1 h2 => by
-    have hk := k.isLt
-    show chiN w (xiOf n β) k ^ x k = 1
-    unfold chiN
-    rw [xi_mid n β k h1 h2, unit_power_eq_residue_power, show rh n (k : ℕ) = 0 by unfold rh; omega]
-    simp)]
+theorem dlt_pw (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ)
+    : dlt n w (lOf x) * pw β (lOf x) = ((∏ k, chiN w (xiOf n β) k ^ x k : ℂˣ) : ℂ) := by
+  rw [prod_halves n
+    (fun k => chiN w (xiOf n β) k ^ x k)
+    (fun k h1 h2 => by
+      have hk := k.isLt
+      show chiN w (xiOf n β) k ^ x k = 1
+      unfold chiN
+      rw [xi_mid n β k h1 h2, unit_power_eq_residue_power,
+        show rh n (k : ℕ) = 0 by unfold rh; omega]
+      simp)]
   simp only [chi_pair]
   rw [Finset.prod_mul_distrib, Units.val_mul, ← zpow_finsum']
   congr 1
@@ -120,25 +146,29 @@ theorem dlt_pw (w : Pl E) (β : Fin (n / 2) → ℂˣ) (x : Fin n → ℤ) :
   · unfold pw
     rw [Units.coe_prod]
 
-theorem xn_lo (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h : k.val < n / 2) :
-    ‖(xiOf n β k : ℂ)‖ = ‖(β ⟨k.val, h⟩ : ℂ)‖ := by
+theorem xn_lo (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h : k.val < n / 2)
+    : ‖(xiOf n β k : ℂ)‖ = ‖(β ⟨k.val, h⟩ : ℂ)‖ := by
   unfold xiOf
   rw [dite_eq_left h]
 
-theorem xn_hi (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h : n - 1 - k.val < n / 2) :
-    ‖(xiOf n β k : ℂ)‖ = ‖(β ⟨n - 1 - k.val, h⟩ : ℂ)‖⁻¹ := by
+theorem xn_hi (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h : n - 1 - k.val < n / 2)
+    : ‖(xiOf n β k : ℂ)‖ = ‖(β ⟨n - 1 - k.val, h⟩ : ℂ)‖⁻¹ := by
   unfold xiOf
   rw [dite_eq_right h1, dite_eq_left h, Units.val_inv_eq_inv_val, norm_inv]
 
-theorem xn_mid (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h2 : ¬ n - 1 - k.val < n / 2) :
-    ‖(xiOf n β k : ℂ)‖ = 1 := by
+theorem xn_mid
+    (β : Fin (n / 2) → ℂˣ) (k : Fin n) (h1 : ¬ k.val < n / 2) (h2 : ¬ n - 1 - k.val < n / 2)
+    : ‖(xiOf n β k : ℂ)‖ = 1 := by
   rw [xi_mid n β k h1 h2, Units.val_one, norm_one]
 
-theorem xi_mono (β : Fin (n / 2) → ℂˣ) (hm : ∀ i j : Fin (n / 2), i ≤ j → ‖(β j : ℂ)‖ ≤ ‖(β i : ℂ)‖)
-    (hg : ∀ i, 1 ≤ ‖(β i : ℂ)‖) : N3.Mono (xiOf n β) := by
+theorem xi_mono
+    (β : Fin (n / 2) → ℂˣ)
+    (hm : ∀ i j : Fin (n / 2), i ≤ j → ‖(β j : ℂ)‖ ≤ ‖(β i : ℂ)‖) (hg : ∀ i, 1 ≤ ‖(β i : ℂ)‖)
+    : N3.Mono (xiOf n β) := by
   intro i j hij
   have hij' : i.val ≤ j.val := hij
-  have hi := i.isLt; have hj := j.isLt
+  have hi := i.isLt
+  have hj := j.isLt
   have hpos : ∀ k, 0 < ‖(β k : ℂ)‖ := fun k => lt_of_lt_of_le one_pos (hg k)
   by_cases h1 : i.val < n / 2
   · by_cases h3 : j.val < n / 2
@@ -160,8 +190,11 @@ theorem xi_mono (β : Fin (n / 2) → ℂˣ) (hm : ∀ i j : Fin (n / 2), i ≤ 
         exact inv_le_one_of_one_le₀ (hg _)
       · rw [xn_mid β j h3 h4]
 
-theorem xi_map (β : Fin (n / 2) → ℂˣ) : Finset.univ.val.map (xiOf n β) = GlobalTheory.LGrp.bcParam n β := by
-  have e1 : (Finset.univ : Finset (Fin n)).filter (fun k => k.val < n / 2) = Finset.univ.map (loE n) := by
+theorem xi_map (β : Fin (n / 2) → ℂˣ)
+    : Finset.univ.val.map (xiOf n β) = GlobalTheory.LGrp.bcParam n β := by
+  have e1
+      : (Finset.univ : Finset (Fin n)).filter (fun k => k.val < n / 2)
+        = Finset.univ.map (loE n) := by
     ext k
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map]
     constructor
@@ -169,8 +202,10 @@ theorem xi_map (β : Fin (n / 2) → ℂˣ) : Finset.univ.val.map (xiOf n β) = 
       exact ⟨⟨k.val, h⟩, Fin.ext rfl⟩
     · rintro ⟨i, rfl⟩
       exact i.isLt
-  have e2 : ((Finset.univ : Finset (Fin n)).filter (fun k => ¬ k.val < n / 2)).filter
-      (fun k => n - 1 - k.val < n / 2) = Finset.univ.map (hiE n) := by
+  have e2
+      : ((Finset.univ : Finset (Fin n)).filter (fun k => ¬ k.val < n / 2)).filter
+          (fun k => n - 1 - k.val < n / 2)
+        = Finset.univ.map (hiE n) := by
     ext k
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map]
     have hk := k.isLt
@@ -181,7 +216,8 @@ theorem xi_map (β : Fin (n / 2) → ℂˣ) : Finset.univ.val.map (xiOf n β) = 
       omega
     · rintro ⟨i, rfl⟩
       have := i.isLt
-      exact ⟨by show ¬ (n - 1 - i.val < n / 2); omega, by show n - 1 - (n - 1 - i.val) < n / 2; omega⟩
+      exact
+        ⟨by show ¬ (n - 1 - i.val < n / 2); omega, by show n - 1 - (n - 1 - i.val) < n / 2; omega⟩
   set S := ((Finset.univ : Finset (Fin n)).filter (fun k => ¬ k.val < n / 2)).filter
       (fun k => ¬ n - 1 - k.val < n / 2) with hS
   have e3 : S.val.map (xiOf n β) = Multiset.replicate S.card 1 := by
@@ -192,19 +228,23 @@ theorem xi_map (β : Fin (n / 2) → ℂˣ) : Finset.univ.val.map (xiOf n β) = 
     rw [hS] at hk2
     have hk' := Finset.mem_filter.1 hk2
     exact xi_mid n β k (Finset.mem_filter.1 hk'.1).2 hk'.2
-  have hsplit : (Finset.univ : Finset (Fin n)).val =
-      ((Finset.univ : Finset (Fin n)).filter (fun k => k.val < n / 2)).val +
-      (((Finset.univ : Finset (Fin n)).filter (fun k => ¬ k.val < n / 2)).filter
-        (fun k => n - 1 - k.val < n / 2)).val + S.val := by
+  have hsplit
+      : (Finset.univ : Finset (Fin n)).val
+        = ((Finset.univ : Finset (Fin n)).filter (fun k => k.val < n / 2)).val
+          + (((Finset.univ : Finset (Fin n)).filter (fun k => ¬ k.val < n / 2)).filter
+            (fun k => n - 1 - k.val < n / 2)).val
+          + S.val := by
     rw [hS, add_assoc]
     simp only [Finset.filter_val]
     rw [Multiset.filter_add_not, Multiset.filter_add_not]
   have hcard : S.card = n % 2 := by
     have hc := congrArg Multiset.card hsplit
-    simp only [Multiset.card_add, ← Finset.card_def, e1, e2, Finset.card_map, Finset.card_univ, Fintype.card_fin] at hc
+    simp only [Multiset.card_add, ← Finset.card_def, e1, e2, Finset.card_map, Finset.card_univ,
+        Fintype.card_fin]
+      at hc
     omega
-  rw [hsplit, Multiset.map_add (f := _), Multiset.map_add (f := _), e3, hcard, e1, e2, Finset.map_val, Finset.map_val, Multiset.map_map,
-    Multiset.map_map]
+  rw [hsplit, Multiset.map_add (f := _), Multiset.map_add (f := _), e3, hcard, e1, e2,
+    Finset.map_val, Finset.map_val, Multiset.map_map, Multiset.map_map]
   unfold GlobalTheory.LGrp.bcParam
   congr 3
   · funext i
@@ -212,49 +252,65 @@ theorem xi_map (β : Fin (n / 2) → ℂˣ) : Finset.univ.val.map (xiOf n β) = 
   · funext i
     exact xi_hi n β i
 
-theorem levOp_fsum {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
-    (K K' : Subgroup G) (A : V →ₗ[ℂ] V) (s : Finset ι) (a : ι → ℂ) (f : ι → G → ℂ)
-    (hf : ∀ i, {q : G ⧸ K' | f i q.out ≠ 0}.Finite) :
-    levOp ρ K K' (∑ i ∈ s, a i • f i) A = ∑ i ∈ s, a i • levOp ρ K K' (f i) A := by
+theorem levOp_fsum
+    {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (K K' : Subgroup G)
+    (A : V →ₗ[ℂ] V) (s : Finset ι) (a : ι → ℂ)
+    (f : ι → G → ℂ) (hf : ∀ i, {q : G ⧸ K' | f i q.out ≠ 0}.Finite)
+    : levOp ρ K K' (∑ i ∈ s, a i • f i) A = ∑ i ∈ s, a i • levOp ρ K K' (f i) A := by
   induction s using Finset.induction_on with
-  | empty =>
-    simp [levOp]
+  | empty => simp [levOp]
   | insert j s hj ih =>
     have hfin : {q : G ⧸ K' | (∑ i ∈ s, a i • f i) q.out ≠ 0}.Finite := by
       refine (s.finite_toSet.biUnion fun i _ => hf i).subset ?_
       intro q hq
-      have hq' : ∑ i ∈ s, a i * f i q.out ≠ 0 := by
-        simpa [Finset.sum_apply] using hq
+      have hq' : ∑ i ∈ s, a i * f i q.out ≠ 0 := by simpa [Finset.sum_apply] using hq
       obtain ⟨i, hi, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero hq'
       exact Set.mem_biUnion hi (right_ne_zero_of_mul hne)
     have hfin1 : {q : G ⧸ K' | (a j • f j) q.out ≠ 0}.Finite :=
       (hf j).subset fun q hq => right_ne_zero_of_mul (by simpa using hq)
-    rw [Finset.sum_insert hj, Finset.sum_insert hj, GlobalTheory.TwTrLin.levOp_add ρ K K' _ _ A hfin1 hfin,
-      GlobalTheory.TwTrLin.levOp_smul_fun, ih]
+    rw [Finset.sum_insert hj, Finset.sum_insert hj,
+      GlobalTheory.TwTrLin.levOp_add ρ K K' _ _ A hfin1 hfin, GlobalTheory.TwTrLin.levOp_smul_fun,
+      ih]
 
-theorem isHecke_fsum {G ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (K' : Subgroup G)
-    (s : Finset ι) (a : ι → ℂ) (f : ι → G → ℂ) (hf : ∀ i, IsHecke K' (f i)) : IsHecke K' (∑ i ∈ s, a i • f i) := by
+theorem isHecke_fsum
+    {G ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (K' : Subgroup G)
+    (s : Finset ι) (a : ι → ℂ)
+    (f : ι → G → ℂ) (hf : ∀ i, IsHecke K' (f i))
+    : IsHecke K' (∑ i ∈ s, a i • f i) := by
   induction s using Finset.induction_on with
   | empty =>
     rw [Finset.sum_empty]
     exact ⟨HasCompactSupport.zero, fun _ _ _ => ⟨rfl, rfl⟩⟩
   | insert j s hj ih =>
     rw [Finset.sum_insert hj]
-    exact GlobalTheory.CompanionTheory.LocHecke.isHecke_add (GlobalTheory.CompanionTheory.LocHecke.isHecke_smul _ (hf j)) ih
+    exact GlobalTheory.CompanionTheory.LocHecke.isHecke_add
+      (GlobalTheory.CompanionTheory.LocHecke.isHecke_smul _ (hf j)) ih
 
 theorem coneEigOf : ConeEigOf := by
   intro hEI hBW E _ _ _ n w hw b ϖ q σ α hb hϖ hq hadm hsat
   obtain ⟨β, hWβ, hmono, hge, y, hyfix, hy0, hey⟩ := hEI E n w hw b ϖ q σ α hb hϖ hq hadm hsat
-  refine ⟨xiOf n β, xi_mono β hmono hge, by rw [hBW n α β hWβ]; exact xi_map β, ⟨y, hyfix⟩,
-    fun h => hy0 (congrArg Subtype.val h), fun c hc => ?_⟩
+  refine ⟨
+    xiOf n β,
+    xi_mono β hmono hge,
+    by rw [hBW n α β hWβ]; exact xi_map β,
+    ⟨y, hyfix⟩,
+    fun h => hy0 (congrArg Subtype.val h),
+    fun c hc => ?_
+  ⟩
   have ho := GlobalTheory.CompanionTheory.IwLevels.isOpen_iwU n w b
   have hidx : (iwU n w b).relIndex (KL n w) ≠ 0 :=
-    GlobalTheory.CompanionTheory.IwLevels.relIndex_ne_zero ho (GlobalTheory.LocFinU.isCompact_KL n w)
+    GlobalTheory.CompanionTheory.IwLevels.relIndex_ne_zero ho
+      (GlobalTheory.LocFinU.isCompact_KL n w)
   have hH : ∀ l, IsHecke (iwU n w b) (fU n w b ϖ l) := fun l =>
     GlobalTheory.CompanionTheory.MatchPow.fU_hecke hw b ϖ l (GlobalTheory.LocFinU.continuous_cj w)
   have hidx' : (((iwU n w b).relIndex (KL n w) : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hidx
-  have hg : gc w b ϖ c = ∑ x ∈ c.support,
-      (c x * (((iwU n w b).relIndex (KL n w) : ℕ) : ℂ)) • fU n w b ϖ (lOf x) := by
+  have hg
+      : gc w b ϖ c
+        = ∑ x ∈ c.support,
+          (c x * (((iwU n w b).relIndex (KL n w) : ℕ) : ℂ)) • fU n w b ϖ (lOf x) := by
     funext γ
     simp only [gc, Finsupp.sum, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   have hHg : IsHecke (iwU n w b) (gc w b ϖ c) := by
