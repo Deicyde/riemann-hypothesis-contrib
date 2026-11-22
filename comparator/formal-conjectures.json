@@ -1,5 +1,5 @@
 {
-  "challenge_module": "FormalConjectures.Millennium.RiemannHypothesis",
+  "challenge_module": "FormalConjecturesChallenge",
   "solution_module": "FormalConjecturesSolution",
   "theorem_names": [
     "RiemannHypothesis.riemannHypothesis",

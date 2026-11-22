@@ -29,7 +29,7 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
-          frozen="Challenge.lean main.json main-export-targets.txt formal-conjectures.json formal-conjectures-export-targets.txt"
+          frozen="Challenge.lean main.json main-export-targets.txt FormalConjecturesChallenge.lean formal-conjectures.json formal-conjectures-export-targets.txt"
 
           base=$(gh api "repos/$REPO/pulls/$PR" --jq .base.sha)
           head=$(gh api "repos/$REPO/pulls/$PR" --jq .head.sha)
