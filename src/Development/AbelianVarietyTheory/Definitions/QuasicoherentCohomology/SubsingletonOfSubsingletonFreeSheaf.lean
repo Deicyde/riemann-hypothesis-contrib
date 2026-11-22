@@ -78,53 +78,88 @@ instance cohomologyPresheafFunctor_additive (n : ℕ) :
 def zeroEquiv (F : Sheaf J AddCommGrpCat.{v}) (U : C) : F.H' 0 U ≃+ F.obj.obj (op U) :=
   (extEquiv F 0 U).trans (Ext.addEquiv₀.trans (freeSheafHomEquiv U F))
 
+private lemma extAddEquiv₀_comp_mk₀ {D : Type*} [Category D] [Abelian D] [HasExt.{w} D]
+    {X Y Z : D} (x : Ext.{w} X Y 0) (f : Y ⟶ Z) :
+    Ext.addEquiv₀ (x.comp (Ext.mk₀ f) (add_zero 0)) = Ext.addEquiv₀ x ≫ f := by
+  apply (Ext.mk₀_bijective X Z).injective
+  rw [Ext.mk₀_addEquiv₀_apply, ← Ext.mk₀_comp_mk₀, Ext.mk₀_addEquiv₀_apply]
+
+private lemma trans_extAddEquiv₀_apply_mk₀ {D : Type*} [Category D] [Abelian D] [HasExt.{w} D]
+    {X F : D} {A S : Type*} [Add A] [Add S] (a : A ≃+ Ext.{w} X F 0)
+    (s : (X ⟶ F) ≃+ S) (φ : X ⟶ F) :
+    (a.trans (Ext.addEquiv₀.trans s)) (a.symm (Ext.mk₀ φ)) = s φ := by
+  change s (Ext.addEquiv₀ (a (a.symm (Ext.mk₀ φ)))) = s φ
+  rw [a.apply_symm_apply]
+  exact congrArg s (Ext.addEquiv₀.apply_symm_apply φ)
+
 lemma zeroEquiv_mk₀ (F : Sheaf J AddCommGrpCat.{v}) (U : C) (φ : (freeSheaf J).obj U ⟶ F) :
-    zeroEquiv F U ((extEquiv F 0 U).symm (Ext.mk₀ φ)) = freeSheafHomEquiv U F φ := by
-  simp only [zeroEquiv, AddEquiv.trans_apply, AddEquiv.apply_symm_apply]
-  congr 1
-  exact Ext.addEquiv₀.apply_symm_apply φ
+    zeroEquiv F U ((extEquiv F 0 U).symm (Ext.mk₀ φ)) = freeSheafHomEquiv U F φ :=
+  trans_extAddEquiv₀_apply_mk₀ (extEquiv F 0 U) (freeSheafHomEquiv U F) φ
 
 lemma zeroEquiv_map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (U : C) (x : F.H' 0 U) :
     zeroEquiv G U (map f 0 U x) = f.hom.app (op U) (zeroEquiv F U x) := by
-  obtain ⟨y, rfl⟩ := (extEquiv F 0 U).symm.surjective x
-  obtain ⟨φ, rfl⟩ := (Ext.mk₀_bijective _ _).surjective y
-  rw [zeroEquiv_mk₀, ← freeSheafHomEquiv_comp, ← zeroEquiv_mk₀]
-  congr 1
-  apply (extEquiv G 0 U).injective
-  rw [extEquiv_map, AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply, Ext.mk₀_comp_mk₀]
+  let y := extEquiv F 0 U x
+  exact (congrArg (freeSheafHomEquiv U G) (extAddEquiv₀_comp_mk₀ y f)).trans
+    (freeSheafHomEquiv_comp U (Ext.addEquiv₀ y) f)
 
 def terminalEquiv (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {T : C} (hT : IsTerminal T) :
     F.H' n T ≃+ F.H n :=
   (extEquiv F n T).trans
     (((extFunctor n).mapIso (freeSheafIsoConst (J := J) hT).symm.op).app F).addCommGroupIsoToAddEquiv
 
+private lemma extFunctorIso_apply {D : Type*} [Category D] [Abelian D] [HasExt.{w} D]
+    {X Y : D} (e : X ≅ Y) (F : D) (n : ℕ) {A : Type*} [Add A]
+    (a : A ≃+ Ext.{w} X F n) (x : A) :
+    (a.trans (((extFunctor n).mapIso e.symm.op).app F).addCommGroupIsoToAddEquiv) x =
+      (Ext.mk₀ e.inv).comp (a x) (zero_add n) := rfl
+
 lemma terminalEquiv_apply (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {T : C} (hT : IsTerminal T)
     (x : F.H' n T) :
     terminalEquiv F n hT x =
-      (Ext.mk₀ (freeSheafIsoConst hT).inv).comp (extEquiv F n T x) (zero_add n) := rfl
+      (Ext.mk₀ (freeSheafIsoConst hT).inv).comp (extEquiv F n T x) (zero_add n) :=
+  extFunctorIso_apply (freeSheafIsoConst hT) F n (extEquiv F n T) x
+
+private lemma addCommGroupIso_naturality {D : Type*} [Category D]
+    {P Q : D ⥤ AddCommGrpCat.{w}} (e : P ≅ Q) {F G : D} (f : F ⟶ G) (x : P.obj F) :
+    (e.app G).addCommGroupIsoToAddEquiv (P.map f x) =
+      Q.map f ((e.app F).addCommGroupIsoToAddEquiv x) := by
+  have h := ConcreteCategory.congr_hom (e.hom.naturality f) x
+  exact h
 
 lemma terminalEquiv_map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (n : ℕ) {T : C}
     (hT : IsTerminal T) (x : F.H' n T) :
     terminalEquiv G n hT (map f n T x) = Sheaf.H.map f n (terminalEquiv F n hT x) := by
-  rw [terminalEquiv_apply, terminalEquiv_apply, extEquiv_map, Sheaf.H.map_apply]
-  symm
-  apply Ext.comp_assoc
-  all_goals omega
+  let e := (extFunctor.{w} n).mapIso (freeSheafIsoConst (J := J) hT).symm.op
+  have h := addCommGroupIso_naturality e f (extEquiv F n T x)
+  exact h
+
+private lemma ext_degree_zero_compare {D : Type*} [Category D] [Abelian D] [HasExt.{w} D]
+    {X Y F : D} {A S : Type*} [Add A] [Add S] (e : X ≅ Y)
+    (a : A ≃+ Ext.{w} X F 0) (x : A) (s : (Y ⟶ F) ≃+ S) (t : (X ⟶ F) ≃+ S)
+    (h : ∀ ψ : Y ⟶ F, s ψ = t (e.hom ≫ ψ))
+    {y : Ext.{w} Y F 0} (hy : y = (Ext.mk₀ e.inv).comp (a x) (zero_add 0)) :
+    (Ext.addEquiv₀.trans s) y = (a.trans (Ext.addEquiv₀.trans t)) x := by
+  change s (Ext.addEquiv₀ y) = t (Ext.addEquiv₀ (a x))
+  rw [hy]
+  generalize a x = z
+  obtain ⟨φ, rfl⟩ := (Ext.mk₀_bijective X F).surjective z
+  have hinv (ψ : Y ⟶ F) : Ext.addEquiv₀ (Ext.mk₀.{w} ψ) = ψ :=
+    Ext.addEquiv₀.apply_symm_apply ψ
+  rw [Ext.mk₀_comp_mk₀, hinv, h, Iso.hom_inv_id_assoc]
+  exact congrArg t (Ext.addEquiv₀.apply_symm_apply φ).symm
 
 lemma equiv₀_terminalEquiv (F : Sheaf J AddCommGrpCat.{v}) {T : C} (hT : IsTerminal T)
     (x : F.H' 0 T) :
     Sheaf.H.equiv₀ F hT (terminalEquiv F 0 hT x) = zeroEquiv F T x := by
-  obtain ⟨y, rfl⟩ := (extEquiv F 0 T).symm.surjective x
-  obtain ⟨φ, rfl⟩ := (Ext.mk₀_bijective _ _).surjective y
-  rw [zeroEquiv_mk₀, terminalEquiv_apply, AddEquiv.apply_symm_apply, Ext.mk₀_comp_mk₀]
-  obtain ⟨ψ, rfl⟩ : ∃ ψ, (freeSheafIsoConst hT).hom ≫ ψ = φ :=
-    ⟨(freeSheafIsoConst hT).inv ≫ φ, by simp⟩
-  rw [Iso.inv_hom_id_assoc, freeSheafHomEquiv_comp]
-  have h : (Ext.addEquiv₀ (Ext.mk₀.{w} ψ)) = ψ := Ext.addEquiv₀.apply_symm_apply ψ
-  simp only [Sheaf.H.equiv₀, AddEquiv.trans_apply, h]
+  let e := freeSheafIsoConst (J := J) hT
+  let s := ((constantSheafAdj J AddCommGrpCat hT).homAddEquiv _ F).trans
+    (AddCommGrpCat.uliftZMultiplesAddEquiv _)
+  refine ext_degree_zero_compare e (extEquiv F 0 T) x s
+    (freeSheafHomEquiv T F) ?_ (terminalEquiv_apply F 0 hT x)
+  intro ψ
   have h₁ := ConcreteCategory.congr_hom (NatTrans.congr_app
     (toSheafify_naturality J (freePresheafIsoConst hT).hom) (op T))
     (FreeAbelianGroup.of (𝟙 T))
-  exact congrArg (ψ.hom.app (op T)) h₁
+  exact (congrArg (ψ.hom.app (op T)) h₁).trans (freeSheafHomEquiv_comp T e.hom ψ).symm
 
 end GlobalTheory.SiteCoh

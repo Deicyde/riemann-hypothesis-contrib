@@ -19,9 +19,20 @@ open GroundTheory.PAdicHodge DeRhamPotentiallySemistable.DRPst Matrix
 
 namespace BaseA
 
+private theorem loc2_lift_apply {A E : Type} [CommRing A] [CommRing E] {a t : A}
+    {f : A →+* E} {ha : IsUnit (f a)} {ht : IsUnit (f t)}
+    {j : Loc2 a t →+* E} {k : A →+* Loc2 a t}
+    (hj : j = Loc2.lift f ha ht) (hk : k = Loc2.mk₀ a t) (x : A) : j (k x) = f x := by
+  subst j
+  subst k
+  exact Loc2.lift_mk₀ f ha ht x
+
 variable (l : ℕ) [Fact l.Prime]
 
-theorem isCrisDR_ι : IsCrisDR l (ι l) := fun x => Loc2.lift_mk₀ _ _ _ x
+theorem isCrisDR_ι : IsCrisDR l (ι l) := by
+  intro x
+  -- Use the equations for the bundled maps before applying them to an element.
+  exact loc2_lift_apply (ι.eq_def l) (cB.eq_def l) x
 
 theorem ι_eq : ι l = PositivityTheory.LocInh.ιCD l := (PositivityTheory.LocInh.isCrisDR_iff _).1 (isCrisDR_ι l)
 
@@ -30,7 +41,7 @@ theorem qB_eq : qB l = PositivityTheory.LocInh.qB l :=
     rw [RingHom.comp_apply, RingHom.comp_apply, qB, IsLocalization.lift_eq]
     exact (PositivityTheory.LocInh.qB_coe z).symm)
 
-theorem ι_cB (y : ACris.ACris ℂ_[l] l) : ι l (cB l y) = iC l y := Loc2.lift_mk₀ _ _ _ y
+theorem ι_cB (y : ACris.ACris ℂ_[l] l) : ι l (cB l y) = iC l y := isCrisDR_ι l y
 
 end BaseA
 
@@ -78,37 +89,36 @@ theorem base_χ_cont (l : ℕ) [Fact l.Prime] : Continuous (χ : GQ l → ℚ_[l
   by
   have h1 : Continuous (fun g : GQ l => ((DeRhamTwist.Twist.chi0 l g : ℤ_[l]ˣ) : ℤ_[l])) :=
     Units.continuous_val.comp (DeRhamTwist.Twist.continuous_cyclotomic_character (l := l))
-  have h2 : Continuous (fun x : ℤ_[l] => (x : ℚ_[l])) := by
-    first
-    | exact PadicInt.continuous_coe
-    | exact continuous_subtype_val
-    | exact (Isometry.of_dist_eq fun _ _ => rfl).continuous
+  have h2 : Continuous (fun x : ℤ_[l] => (x : ℚ_[l])) := continuous_subtype_val
   exact h2.comp h1
+
+private theorem mem_of_mul_pows_mul_eq {K : Type*} [Field K] {S : Subring K}
+    {a b z w : K} {m n : ℕ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (haS : a⁻¹ ∈ S) (hbS : b⁻¹ ∈ S) (hw : w ∈ S)
+    (h : a ^ m * b ^ n * z = w) : z ∈ S := by
+  have hz : z = w * (a⁻¹) ^ m * (b⁻¹) ^ n := by
+    rw [inv_pow, inv_pow, mul_assoc, ← mul_inv,
+      eq_mul_inv_iff_mul_eq₀ (mul_ne_zero (pow_ne_zero m ha) (pow_ne_zero n hb))]
+    exact (mul_comm _ _).trans h
+  rw [hz]
+  exact S.mul_mem (S.mul_mem hw (S.pow_mem haS m)) (S.pow_mem hbS n)
 
 theorem base_ι_Bst (l : ℕ) [Fact l.Prime] : ∀ x, ι l x ∈ Bst l := by
   intro x
   obtain ⟨m, n, y, h⟩ := PositivityTheory.LocInh.bcris_surj x
-  have h1 := congrArg (ι l) h
-  have hl : ι l (cB l (l : ACris.ACris ℂ_[l] l)) = (l : BdR l) := by rw [map_natCast, map_natCast]
-  rw [map_mul, map_mul, map_pow, map_pow, hl, ι_cB, ι_cB] at h1
-  have htq : iC l (tA l) = tQ l := rfl
-  rw [htq] at h1
-  have hl0 : (l : BdR l) ≠ 0 := by
-    have := (isUnit_l l).map (ι l)
-    rw [map_natCast] at this
-    exact this.ne_zero
+  have h1 : (l : BdR l) ^ m * tQ l ^ n * ι l x = iC l y := by
+    simpa only [map_mul (ι l), map_pow (ι l), ι_cB, map_natCast (iC l), tQ] using congrArg (ι l) h
+  have hl0 : (l : BdR l) ≠ 0 := map_natCast (iC l) l ▸ (isUnit_iC_l l).ne_zero
   have ht0 : tQ l ≠ 0 := DeRhamTwist.Twist.tQ_ne
-  have e : ι l x = iC l y * ((l : BdR l)⁻¹) ^ m * ((tQ l)⁻¹) ^ n := by
-    rw [← h1, inv_pow, inv_pow]
-    field_simp
-  rw [e]
   have mem : ∀ z ∈ ({((l : BdR l))⁻¹, (tQ l)⁻¹, uQ l} : Set (BdR l)), z ∈ Bst l :=
     fun z hz => Subring.subset_closure (Or.inr hz)
-  exact Subring.mul_mem _ (Subring.mul_mem _ (Subring.subset_closure (Or.inl ⟨y, rfl⟩))
-    (Subring.pow_mem _ (mem _ (by simp)) _)) (Subring.pow_mem _ (mem _ (by simp)) _)
+  exact mem_of_mul_pows_mul_eq hl0 ht0
+    (mem _ (Set.mem_insert _ _))
+    (mem _ (Set.mem_insert_of_mem _ (Set.mem_insert _ _)))
+    (Subring.subset_closure (Or.inl ⟨y, rfl⟩)) h1
 
 theorem base_u_Bst (l : ℕ) [Fact l.Prime] : uQ l ∈ Bst l :=
-  Subring.subset_closure (Or.inr (by simp))
+  Subring.subset_closure (Or.inr (Set.mem_insert_of_mem _ (Set.mem_insert_of_mem _ (Set.mem_singleton _))))
 
 theorem base_fs_ker (l : ℕ) [Fact l.Prime] : ∀ x, φ l x = x → ι l x ∈ Plus l → ∃ q, x = qB l q := by
   intro x hφ hx

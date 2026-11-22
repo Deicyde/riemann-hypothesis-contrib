@@ -48,7 +48,7 @@ theorem xi_mem_MMl {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist 
   refine ⟨n, ?_⟩
   have h1 : (((l : S O K e) : K⟦X⟧)) ^ n * cst d τ i = algebraMap O K⟦X⟧ b := by
     rw [IsScalarTower.algebraMap_apply O K K⟦X⟧, ← hb]
-    simp [cst, PowerSeries.algebraMap_apply]
+    simp [cst]
   rw [h1]
   exact Subalgebra.algebraMap_mem _ b
 
@@ -79,13 +79,21 @@ theorem actD_single {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist
   rw [hc, Δ.act_smul_tot, hf, hr]
   rfl
 
+private theorem tensor_equiv_map_smul {R A N ι : Type} [CommRing R] [CommRing A]
+    [Algebra R A] [AddCommGroup N] [Module R N]
+    (j : (ι → A) ≃ₗ[A] A ⊗[R] N) (r : R) (v : ι → A) :
+    j (r • v) = r • j v := by
+  have : IsScalarTower R A (A ⊗[R] N) := TensorProduct.isScalarTower_left
+  calc
+    j (r • v) = j (algebraMap R A r • v) :=
+      congrArg (fun w => j w) (algebraMap_smul A r v).symm
+    _ = algebraMap R A r • j v := j.map_smul _ _
+    _ = r • j v := algebraMap_smul A r (j v)
+
 theorem jB_smul {l : ℕ} [Fact l.Prime] {LL : FinExt l} {T : QLat LL} {ι : Type} [Fintype ι]
     (jB : (ι → OB l ↥(OL LL)) ≃ₗ[OB l ↥(OL LL)] TW (OB l ↥(OL LL)) T) (o : ↥(OL LL))
     (v : ι → OB l ↥(OL LL)) : jB (o • v) = o • jB v := by
-  haveI : IsScalarTower ↥(OL LL) (OB l ↥(OL LL)) (TW (OB l ↥(OL LL)) T) :=
-    TensorProduct.isScalarTower_left (R := ↥(OL LL)) (M := OB l ↥(OL LL)) (N := ↥T.L.T)
-      (R' := OB l ↥(OL LL)) (R'₂ := ↥(OL LL))
-  rw [← algebraMap_smul (OB l ↥(OL LL)) o v, map_smul, algebraMap_smul]
+  exact tensor_equiv_map_smul (R := ↥(OL LL)) (A := OB l ↥(OL LL)) (N := ↥T.L.T) jB o v
 
 theorem smul_eq_algebraMap_smul {l : ℕ} [Fact l.Prime] {LL : FinExt l} (T : QLat LL) (Pl : LocPrime l)
     (o : ↥(OL LL)) (x : T.V ⊗[ℚ_[l]] Pl.R.B) : o • x = (algebraMap ↥(OL LL) ↥LL.1 o) • x :=
@@ -105,6 +113,10 @@ theorem mem_Dcris_res {l : ℕ} [Fact l.Prime] {LL : FinExt l} (T : QLat LL) (Pl
 
 end GlobalTheory.CharsDesc
 
+private theorem eval_eq_zero_of_aeval_eq_zero {K V : Type} [Field K] [AddCommGroup V]
+    [Module K V] {f : Module.End K V} {p : Polynomial K} {x : V} {z : K}
+    (hx : x ≠ 0) (h : f x = z • x) (hp : Polynomial.aeval f p x = 0) : p.eval z = 0 :=
+  (smul_eq_zero.mp ((Module.End.aeval_apply_of_mem_apply_eq_smul h).symm.trans hp)).resolve_right hx
 
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 8000000 in
@@ -134,7 +146,7 @@ theorem GlobalTheory.CharsDesc.chars_subset_sig : ∀ (l : ℕ) [Fact l.Prime] (
   have hact' : Δ.actD (TameGal.inertia ζu) d' = (ζ ^ c.val) • d' := by
     rw [hd'_def, actD_single, hdc ζu, TameGal.root_inertia_zero, hζu, Pi.single_smul]
   have hm := xi_mem_MMl P d'
-  obtain ⟨σ, hσ_def⟩ : ∃ σ : P.MMl, σ = ⟨P.xi d', hm⟩ := ⟨_, rfl⟩
+  let σ : P.MMl := ⟨P.xi d', hm⟩
   have hnorm : ‖ζ ^ c.val‖ ≤ 1 := by
     have h1 : ‖ζ‖ = 1 := by
       have h := congrArg norm hζ.pow_eq_one
@@ -142,53 +154,40 @@ theorem GlobalTheory.CharsDesc.chars_subset_sig : ∀ (l : ℕ) [Fact l.Prime] (
       exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (NeZero.ne e)).1 h
     rw [norm_pow, h1, one_pow]
   obtain ⟨o, ho⟩ := (IsUnitBall.mem_range_iff (O := ↥(OL LL)) (ζ ^ c.val)).2 hnorm
-  have hσ' : (o • σ).1 = Δ.act (TameGal.inertia ζu) σ.1 := by
-    rw [hσ_def, Descent.act_xi, hact', map_smul, Submodule.coe_smul_of_tower, ← ho, algebraMap_smul]
+  let latticeSMul : SMul ↥(OL LL) P.MMl := inferInstance
+  let σ' := latticeSMul.smul o σ
+  have hσ' : σ'.1 = Δ.act (TameGal.inertia ζu) σ.1 := by
+    change o • P.xi d' = Δ.act (TameGal.inertia ζu) (P.xi d')
+    rw [Descent.act_xi, hact', P.xi.map_smul, ← ho, algebraMap_smul]
+  let f := toBcris (thetaW a LL) ϖ P
+  let b := jB (f σ)
   have hA := GlobalTheory.T.kisinInfGalois_acts_through_descentDatum l a e ↥(OL LL) ↥LL.1 (thetaW a LL) ϖ ι P T I jB Δ hCmp hDesc k'
-    (TameGal.inertia ζu) hk'c σ (o • σ) hσ'
+    (TameGal.inertia ζu) hk'c σ σ' hσ'
   obtain ⟨β, -, hβ2, -, -⟩ := GlobalTheory.T.exists_bcrisTensorLattice_equiv_periodRing l LL T Pl AI hStd
-  obtain ⟨x, hx_def⟩ : ∃ x, x = β (jB (toBcris (thetaW a LL) ϖ P σ)) := ⟨_, rfl⟩
+  let x := β b
   have hx0 : x ≠ 0 := by
     intro h
-    rw [hx_def, LinearEquiv.map_eq_zero_iff, LinearEquiv.map_eq_zero_iff] at h
-    have h2 : σ = 0 := toBcris_inj (thetaW a LL) ϖ P (GlobalTheory.T.embeddingProductSeriesToTensorBcris_injective_finExt l a e LL (thetaW a LL) ϖ)
-      (h.trans (map_zero _).symm)
-    apply hd'0
-    have h3 : P.xi d' = 0 := by rw [hσ_def] at h2; exact congrArg Subtype.val h2
-    have h4 := congrArg red h3
-    rwa [PhiMod.red_xi, map_zero] at h4
+    have hb0 : b = 0 := β.map_eq_zero_iff.mp h
+    have hf0 : f σ = 0 := jB.map_eq_zero_iff.mp hb0
+    have hσ0 : σ = 0 := toBcris_inj (thetaW a LL) ϖ P
+      (GlobalTheory.T.embeddingProductSeriesToTensorBcris_injective_finExt l a e LL (thetaW a LL) ϖ)
+      (hf0.trans (map_zero f).symm)
+    have hxi0 : P.xi d' = 0 := congrArg Subtype.val hσ0
+    exact hd'0 ((P.red_xi d').symm.trans ((congrArg (fun v => red v) hxi0).trans red.map_zero))
   have hxD : x ∈ Dcris (Pl.PD (ϖ.field a)) (resF T (ϖ.field a)).ρ := by
     refine mem_Dcris_res T Pl (ϖ.field a) x fun g => ?_
-    have e := hβ2 (inclG (ϖ.field a) g) (jB (toBcris (thetaW a LL) ϖ P σ))
-    have e' : actB (sQ l) T (inclG (ϖ.field a) g) (jB (toBcris (thetaW a LL) ϖ P σ)) =
-        jB (toBcris (thetaW a LL) ϖ P σ) := by
-      subst hσ_def; exact hHor (inclG (ϖ.field a) g) g.2 d' hm
-    rw [e'] at e
-    subst hx_def; exact e.symm
-  have hA' : actB (sQ l) T k' (jB (toBcris (thetaW a LL) ϖ P σ)) =
-      jB (toBcris (thetaW a LL) ϖ P (o • σ)) := hA
+    have hfixed : actB (sQ l) T (inclG (ϖ.field a) g) b = b :=
+      hHor (inclG (ϖ.field a) g) g.2 d' hm
+    exact (hβ2 (inclG (ϖ.field a) g) b).symm.trans (congrArg (fun w => β w) hfixed)
   have hact : (actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ k' : Module.End ↥LL.1 (T.V ⊗[ℚ_[l]] Pl.R.B)) x =
       (ζ ^ c.val) • x := by
-    have e1 := (hβ2 k' (jB (toBcris (thetaW a LL) ϖ P σ))).symm
-    have e6 := congrArg β hA'
-    have e2 : toBcris (thetaW a LL) ϖ P (o • σ) = o • toBcris (thetaW a LL) ϖ P σ := map_smul _ _ _
-    have e3 : jB (o • toBcris (thetaW a LL) ϖ P σ) = o • jB (toBcris (thetaW a LL) ϖ P σ) :=
-      jB_smul jB o _
-    have e4 : β (jB (toBcris (thetaW a LL) ϖ P (o • σ))) = o • β (jB (toBcris (thetaW a LL) ϖ P σ)) :=
-      (congrArg (fun v => β (jB v)) e2).trans ((congrArg β e3).trans (β.map_smul o _))
-    subst hx_def
-    refine e1.trans (e6.trans (e4.trans ?_))
-    exact (smul_eq_algebraMap_smul T Pl o _).trans
-      (congrArg (fun s : ↥LL.1 => s • β (jB (toBcris (thetaW a LL) ϖ P σ))) ho)
+    have hb := (congrArg (fun v => jB v) (f.map_smul o σ)).trans (jB_smul jB o (f σ))
+    have hβo := (β.map_smul o b).trans (smul_eq_algebraMap_smul T Pl o x)
+    exact (hβ2 k' b).symm.trans <| (congrArg (fun w => β w) (hA.trans hb)).trans <|
+      hβo.trans (congrArg (fun s : ↥LL.1 => s • x) ho)
   have hk'π' : ((ζ : ↥LL.1) : Om l) * ϖ.seq 0 = (k' : GQ l) (ϖ.seq 0) := by rw [← hζu]; exact hk'π
   have hT := hType k' hk'I ζ hk'π' x hxD
-  have hev : Module.End.HasEigenvector
-      (actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ k' : Module.End ↥LL.1 (T.V ⊗[ℚ_[l]] Pl.R.B)) (ζ ^ c.val) x :=
-    Module.End.hasEigenvector_iff.2 ⟨Module.End.mem_eigenspace_iff.2 hact, hx0⟩
-  rw [Module.End.aeval_apply_of_hasEigenvector hev, smul_eq_zero] at hT
-  rcases hT with hT | hT
-  · obtain ⟨c', hc', hcc⟩ := hpoly ζ c.val hT
-    have := hζ.pow_inj (ZMod.val_lt c) (ZMod.val_lt c') hcc
-    rw [ZMod.val_injective e this]
-    exact hc'
-  · exact absurd hT hx0
+  obtain ⟨c', hc', hcc⟩ := hpoly ζ c.val (eval_eq_zero_of_aeval_eq_zero hx0 hact hT)
+  have hval := hζ.pow_inj (ZMod.val_lt c) (ZMod.val_lt c') hcc
+  rw [ZMod.val_injective e hval]
+  exact hc'

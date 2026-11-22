@@ -41,8 +41,10 @@ theorem quasiIso_extCx_of_flat : ∀ (Q q : ℕ) [NeZero Q] (h : q ∣ Q) (F : S
     QuasiIso ((GlobalTheory.EtC.ScalarExt.extCx (ZMod.castHom h (ZMod q))).map ε) := by
   intro Q q _ h F T _ hF hT ε hε
   have hK : (mappingCone ε).Acyclic := GlobalTheory.mappingCone_acyclic_of_quasiIso _
-  haveI : (mappingCone ε).IsStrictlyGE (-1) := CochainComplex.isStrictlyGE_mappingCone _ 0 0 (-1)
-  have hE := GlobalTheory.T.acyclic_extendScalars_zmod_of_flat_boundedBelow Q q h (mappingCone ε) (-1) (flatS_cone F hF T hT ε) hK
+  have hNeg : (-1 : ℤ) < 0 := neg_one_lt_zero
+  have hBound := CochainComplex.isStrictlyGE_mappingCone ε 0 0 (-1) hNeg (Int.le_of_lt hNeg)
+  have hE := @GlobalTheory.T.acyclic_extendScalars_zmod_of_flat_boundedBelow Q q _ h
+    (mappingCone ε) (-1) hBound (flatS_cone F hF T hT ε) hK
   have hC : (mappingCone (((extSh (ZMod.castHom h (ZMod q))).mapHomologicalComplex _).map ε)).Acyclic := fun n =>
     (hE n).of_iso (CochainComplex.mappingCone.mapHomologicalComplexIso ε (extSh (ZMod.castHom h (ZMod q))))
   exact quasiIso_of_cone_acyclic _ hC

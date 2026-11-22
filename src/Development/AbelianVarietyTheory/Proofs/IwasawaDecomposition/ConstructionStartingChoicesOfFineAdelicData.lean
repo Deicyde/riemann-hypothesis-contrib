@@ -82,9 +82,12 @@ theorem res_inGeo (hi : GlobalTheory.RealGeo.InGeo z.geo) : GlobalTheory.RealGeo
 
 
 theorem restrictAdelicDataTwistedPlaces_nonzeroIndexPlaces (F0) : (res z e Wt' h hc).W1 F0 = z.W1 F0 := by
-  ext w
-  rw [Dat.mem_nonzero_index_places_iff_at_place_or_conjugate, Dat.mem_nonzero_index_places_iff_at_place_or_conjugate]
-  exact (nz_updS (z.resR h) _ _ _ F0 _).trans (exists_congr fun j => or_congr (z.nzAt_resR F0 h j _) (z.nzAt_resR F0 h j _))
+  let z' := res z e Wt' h hc
+  exact Set.ext fun v =>
+    (z'.mem_nonzero_index_places_iff_at_place_or_conjugate F0 v).trans
+      ((nz_updS (z.resR h) z'.F (kapOf (z.resR h)) (z.resR h).lam3 F0 (plB X v)).trans
+        ((exists_congr fun j => or_congr (z.nzAt_resR F0 h j _) (z.nzAt_resR F0 h j _)).trans
+          (z.mem_nonzero_index_places_iff_at_place_or_conjugate F0 v).symm))
 
 
 
@@ -135,18 +138,17 @@ theorem res_ext (z : Dat (w.st Z) w.I hX T Wt) (e : z.R.toRealDat.ExAt) {Wt' : S
     Pg := HEq.rfl
     eG := HEq.rfl
     Sb := HEq.rfl
-    BV i i' hi := by
-      obtain rfl : i = i' := Fin.ext hi
-      exact ⟨HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl⟩
-    MW i i' hi := by
-      obtain rfl : i = i' := Fin.ext hi
+    BV := of_diag fun _ => ⟨HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl⟩
+    MW := by
+      refine of_diag fun i => ?_
       refine ⟨HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, HEq.rfl, fun φ φ' hφ => ?_⟩
       have hT : (type_of% φ') = (type_of% φ) := rfl
       have h2 : cast hT φ' = φ := (cast_eq_iff_heq).2 hφ
       subst h2
       exact HEq.rfl
-    forms i i' hi φ φ' hφ k k' hk := by
-      obtain rfl : i = i' := Fin.ext hi
+    forms := by
+      refine of_diag fun i => ?_
+      intro φ φ' hφ k k' hk
       have hT : (type_of% φ') = (type_of% φ) := rfl
       have h2 : cast hT φ' = φ := (cast_eq_iff_heq).2 hφ
       subst h2
@@ -157,11 +159,9 @@ theorem res_ext (z : Dat (w.st Z) w.I hX T Wt) (e : z.R.toRealDat.ExAt) {Wt' : S
       rfl
     W1 v v' hv := by
       have e' : v = v' := (w.D Z).plEq.injective (HeightOneSpectrum.ext (Ideal.ext fun x => hv x x rfl))
-      subst e'
-      rw [restrictAdelicDataTwistedPlaces_nonzeroIndexPlaces]
-    cV i i' hi := by
-      obtain rfl : i = i' := Fin.ext hi
-      exact ⟨HEq.rfl, HEq.rfl⟩
+      exact e' ▸ (Set.ext_iff.mp
+        (restrictAdelicDataTwistedPlaces_nonzeroIndexPlaces z e h hc (fun _ _ => 0)).symm v)
+    cV := of_diag fun _ => ⟨HEq.rfl, HEq.rfl⟩
     pb := HEq.rfl
     ΛY := (HEq.refl z.R.ΛY)
     κ := by
@@ -171,13 +171,14 @@ theorem res_ext (z : Dat (w.st Z) w.I hX T Wt) (e : z.R.toRealDat.ExAt) {Wt' : S
       · exact (Eq.refl (z.geo.κ i).n)
     ref := by
       refine of_diag fun i => ?_
+      let μ := mu0F (X := B.fields) (tuOf w.I (usedOf w.I T Wt))
       refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-      · exact (HEq.refl (z.R.vP i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
-      · exact (HEq.refl (z.R.HV i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
-      · exact (HEq.refl (z.R.thF i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
-      · exact (HEq.refl (z.R.thG i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
-      · exact (HEq.refl (z.R.νV i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
-      · exact (HEq.refl (z.R.fdV i (mu0F (tuOf w.I (usedOf w.I T Wt)))))
+      · exact (HEq.refl (z.R.vP i μ))
+      · exact (HEq.refl (z.R.HV i μ))
+      · exact (HEq.refl (z.R.thF i μ))
+      · exact (HEq.refl (z.R.thG i μ))
+      · exact (HEq.refl (z.R.νV i μ))
+      · exact (HEq.refl (z.R.fdV i μ))
       · exact (HEq.refl (z.R.νW i))
       · exact (HEq.refl (z.R.fdW i))
     jL := by
@@ -213,23 +214,28 @@ theorem exists_pre2_of_fine_of_resChar_mem : GlobalTheory.Published.WeilRepresen
   obtain ⟨⟨-, -, hCoh⟩, hHW', hHost⟩ := H
   intro Z hX z hG2 hGT hGA hKap hFine hsub hSp
   obtain ⟨hEx, hGeo, hCore, hStd⟩ := hFine
-  have hle : z.W1 (F0K K.s (w.D Z)) ⊆ {v | B.places.resChar v ∈ T.pl} := hsub
-  have hc : ConjStable (w.st Z) (z.W1 (F0K K.s (w.D Z))) := fun v hv => z.nonzero_index_places_conj_stable _ v hv
-  let z' := ResStd.res z hEx _ hle hc
-  have hW : z'.W1 (F0K K.s (w.D Z)) = z.W1 (F0K K.s (w.D Z)) := ResStd.restrictAdelicDataTwistedPlaces_nonzeroIndexPlaces z hEx hle hc _
+  let F0 := F0K K.s (w.D Z)
+  let W := z.W1 F0
+  have hle : W ⊆ {v | B.places.resChar v ∈ T.pl} := hsub
+  have hc : ConjStable (w.st Z) W := z.nonzero_index_places_conj_stable F0
+  let z' := ResStd.res z hEx W hle hc
+  have hW : z'.W1 F0 = W := ResStd.restrictAdelicDataTwistedPlaces_nonzeroIndexPlaces z hEx hle hc F0
   have hEx' : z'.R.toRealDat.ExAt := ResStd.res_exAt z hEx hle hc
   have hGeo' : GlobalTheory.RealGeo.InGeo z'.geo := ResStd.res_inGeo z hEx hle hc hGeo
   have hCore' : CoreP z' := hCore
   have hStd' : z'.Std := ResStd.res_std z hEx hle hc hStd
-  have hH : Holds z'.R z'.F := hHW' Z hX _ z' hGT hGA hKap hEx' hGeo' hCore' hG2 hW.symm hsub
-  have hcs : ∀ v, B.places.conj v ∈ z'.W1 (F0K K.s (w.D Z)) ↔ v ∈ z'.W1 (F0K K.s (w.D Z)) := fun v =>
-    ⟨fun h => by simpa only [B.places.conj_conj] using z'.nonzero_index_places_conj_stable _ _ h, fun h => z'.nonzero_index_places_conj_stable _ v h⟩
+  have hH : Holds z'.R z'.F := hHW' Z hX W z' hGT hGA hKap hEx' hGeo' hCore' hG2 hW.symm hsub
+  have hcs (v : B.places.Pl) : B.places.conj v ∈ W ↔ v ∈ W :=
+    ⟨fun hv => (B.places.conj_conj v) ▸ hc (B.places.conj v) hv, hc v⟩
   obtain ⟨-, hFmax, -, -, hSt, -⟩ := hHost (w.st Z) hO
-  obtain ⟨q⟩ := GlobalTheory.T.nonempty_rowLiftFamily_over_columnChoices B f T w Z hX _ z' (hInp _) hFmax (hSt 0).1 (fun i => (hSt _).2.2 (by omega) i.2) hH hcs
+  have hRows : Nonempty (RowPk w z') :=
+    GlobalTheory.T.nonempty_rowLiftFamily_over_columnChoices B f T w Z hX W z' (hInp (w.D Z))
+      hFmax (hSt 0).1 (fun i => (hSt ((i : ℕ) + 1)).2.2 (Nat.zero_lt_succ _) i.2) hH hcs
+  refine hRows.elim fun q => ?_
   exact ⟨{
     Z₀ := Z
     hX := hX
-    Wt := _
+    Wt := W
     z := z'
     q := q
     g := hG2

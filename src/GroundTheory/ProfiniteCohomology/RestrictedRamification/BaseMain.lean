@@ -33,9 +33,13 @@ theorem gsBaseBijective_of_fixing (hP : GsPairingInput n ℓ)
     (hW₀ : ∀ σ ∈ W₀, ∀ ζ : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ, ζ ^ n = 1 →
       σ (ζ : maxUnramifiedOutside K.1 ℚ̄ S) = ζ)
     (U : OpenSubgroup (galUnramifiedOutside K.1 ℚ̄ S)) (hU : U ≤ W₀) :
-    GsBaseBijective S ιs n U (gsCompactInv S ιs n hodd h3) :=
-  (exists_gsOpenSubgroup_eq K S U).elim fun _ h1 => h1.elim fun _ h2 => h2.elim fun hL hUeq =>
-    hUeq ▸ gsBaseBijective_of_le S ιs n ℓ k hℓ hnk hS hodd h3 hP hcores W₀ hW₀ hL (hUeq ▸ hU)
+    GsBaseBijective S ιs n U (gsCompactInv S ιs n hodd h3) := by
+  obtain ⟨L, hKL, hL, hUeq⟩ := exists_gsOpenSubgroup_eq K S U
+  subst U
+  -- Infer the application type before comparing it with the goal.
+  have hbase := @gsBaseBijective_of_le K S ‹Fintype S› ιs n ℓ k ‹NeZero n›
+    hℓ hnk hS hodd h3 hP hcores W₀ hW₀ L hKL hL hU
+  assumption
 
 
 
@@ -47,15 +51,22 @@ theorem exists_compactDualityHypotheses_gs_of_pairing (hP : GsPairingInput n ℓ
   have hSn : ∀ v : HeightOneSpectrum (𝓞 K.1), ((n : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S :=
     mem_of_natCast_pow_mem S n ℓ k hnk hS
   have hD := nonempty_addEquiv_gsRoots_of_places S n hnS
-  have : Finite (gsRoots S n) := hD.elim fun e => Finite.of_equiv _ e.toEquiv.symm
+  have hfin : Finite (gsRoots S n) := hD.elim fun e => Finite.of_equiv (ZMod n) e.toEquiv.symm
+  have hn : n ≠ 0 := NeZero.ne n
   have hcores : ∀ U : OpenSubgroup (galUnramifiedOutside K.1 ℚ̄ S),
       Function.Surjective (compactCores (gsFinFamily S ιs) U (gsRoots S n) 3).hom := fun U =>
-    surjective_gs_compactCores_three K S ιs (NeZero.ne n) hSn hodd U (gsRoots S n) (nsmul_gsRoots S n)
-  exact (exists_openSubgroup_fixing_rootsOfUnity K S n (NeZero.ne n)).elim fun W₀ hW₀ => ⟨W₀,
-    { nonempty_addEquiv := hD
-      subsingleton_four := fun M _ _ hM => subsingleton_compactCohomology_four K S (NeZero.ne n) hSn hodd ιs M hM
-      bijective_base := fun U hU {r s} h => gsBaseBijective_of_fixing S ιs n ℓ k hℓ hnk hS hodd h3 hP hcores W₀ hW₀
-        U hU h }⟩
+    @surjective_gs_compactCores_three K S ιs n hn hSn hodd U (gsRoots S n)
+      (isDiscreteRep_gsRoots S n) hfin (nsmul_gsRoots S n)
+  obtain ⟨W₀, hW₀⟩ := exists_openSubgroup_fixing_rootsOfUnity K S n hn
+  refine ⟨W₀, { nonempty_addEquiv := hD, subsingleton_four := ?_, bijective_base := ?_ }⟩
+  · intro M hdiscrete _ hM
+    exact @subsingleton_compactCohomology_four K S n hn hSn hodd ιs M hdiscrete hM
+  · intro U hU
+    have hbase := @gsBaseBijective_of_fixing K S ‹Fintype S› ιs n ℓ k ‹NeZero n›
+      hℓ hnk hS hodd h3 hP hcores W₀ hW₀ U hU
+    -- The field uses the same map with a different proof of the torsion condition.
+    unfold GsBaseBijective at hbase
+    with_reducible assumption
 
 
 include hℓ hnk in

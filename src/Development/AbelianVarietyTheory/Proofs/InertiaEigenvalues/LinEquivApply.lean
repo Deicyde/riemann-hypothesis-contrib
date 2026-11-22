@@ -51,14 +51,8 @@ def incl (T : QLat LL) : ↥T.L.T →ₗ[ℤ_[l]] T.V where
     rfl
 
 theorem exists_pow_smul_mem (T : QLat LL) (v : T.V) :
-    ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T := by
-  first
-  | exact @_root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem
-  | exact _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem
-  | (apply _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> assumption)
-  | (intros; apply _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> first | assumption | infer_instance)
-  | (intros; exact _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem ..)
+    ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T :=
+  _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem T v
 
 theorem zl_smul_V (T : QLat LL) (z : ℤ_[l]) (v : T.V) : z • v = algebraMap ℚ_[l] ↥LL.1 (z : ℚ_[l]) • v := by
   change algebraMap ℤ_[l] ℚ_[l] z • v = _
@@ -83,7 +77,7 @@ theorem isLoc (T : QLat LL) : IsLocalizedModule (nonZeroDivisors ℤ_[l]) (incl 
     show ((l : ℤ_[l]) ^ n) • y = (l : ↥LL.1) ^ n • y
     rw [zl_smul_V]
     congr 1
-    simp
+    simp only [PadicInt.coe_pow, PadicInt.coe_natCast, map_pow, map_natCast]
   · simp only [one_smul]; exact Subtype.ext h
 
 theorem hbc (T : QLat LL) : IsBaseChange ℚ_[l] (incl T) :=
@@ -128,9 +122,22 @@ theorem addEquiv_tmul (T : QLat LL) (eB : Pl.R.B ≃+* Bc)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z)
     (o : ↥(OL LL)) (b : Bc) (x : ↥T.L.T) :
     addEquiv T eB hz ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) = (((o • x : ↥T.L.T)) : T.V) ⊗ₜ[ℚ_[l]] eB.symm b := by
-  simp [addEquiv, swapLat, cancelCoeff, changeRing, invertPrime, ringLin, IsBaseChange.equiv_tmul, incl]
+  exact congrArg (fun v : T.V => v ⊗ₜ[ℚ_[l]] eB.symm b) (one_smul ℚ_[l] ((o • x : ↥T.L.T) : T.V))
 
 end Zl
+
+private theorem nestedTensor_addHom_ext {R S M N X Y : Type}
+    [CommSemiring R] [CommSemiring S] [AddCommMonoid M] [AddCommMonoid N]
+    [Module R M] [Module R N] [Module S (M ⊗[R] N)] [AddCommMonoid X] [Module S X]
+    [AddCommMonoid Y] (f g : (M ⊗[R] N) ⊗[S] X →+ Y) (w : (M ⊗[R] N) ⊗[S] X)
+    (h : ∀ m n x, f ((m ⊗ₜ[R] n) ⊗ₜ[S] x) = g ((m ⊗ₜ[R] n) ⊗ₜ[S] x)) : f w = g w := by
+  refine TensorProduct.inductionOn w ?_ ?_
+  · intro y x
+    refine TensorProduct.inductionOn y (fun m n => h m n x) ?_
+    intro y₁ y₂ h₁ h₂
+    simp only [add_tmul, f.map_add, g.map_add, h₁, h₂]
+  · intro w₁ w₂ h₁ h₂
+    simp only [f.map_add, g.map_add, h₁, h₂]
 
 variable {Pl : LocPrime l}
 
@@ -138,24 +145,18 @@ theorem addEquiv_smul (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
     (c : ↥(OL LL)) (w : TW (OB l ↥(OL LL)) T) :
     addEquiv T eB hz (c • w) = c • addEquiv T eB hz w := by
-  induction w using TensorProduct.induction_on with
-  | zero => simp only [smul_zero, map_zero]
-  | add x y hx hy =>
-    rw [smul_add, map_add (f := _), map_add (f := _)]
-    exact (congrArg₂ (· + ·) hx hy).trans (smul_add c _ _).symm
-  | tmul y x =>
-    rw [TensorProduct.smul_tmul']
-    induction y using TensorProduct.induction_on with
-    | zero => simp only [smul_zero, zero_tmul, map_zero]
-    | add y₁ y₂ h₁ h₂ =>
-      rw [smul_add, add_tmul, add_tmul, map_add (f := _), map_add (f := _)]
-      exact (congrArg₂ (· + ·) h₁ h₂).trans (smul_add c _ _).symm
-    | tmul o b =>
-      have e : (((c • o) • x : ↥T.L.T) : T.V) = (c : ↥LL.1) • ((o • x : ↥T.L.T) : T.V) := by
-        rw [smul_assoc, Submodule.coe_smul, ← algebraMap_smul ↥LL.1 c]
-        rfl
-      rw [TensorProduct.smul_tmul', addEquiv_tmul, addEquiv_tmul, e]
-      exact (TensorProduct.smul_tmul' (c : ↥LL.1) _ _).symm
+  let e := (addEquiv T eB hz).toAddMonoidHom
+  let smulSource := DistribSMul.toAddMonoidHom (TW (OB l ↥(OL LL)) T) c
+  let smulTarget := DistribSMul.toAddMonoidHom (T.V ⊗[ℚ_[l]] Pl.R.B) c
+  refine nestedTensor_addHom_ext (R := ℤ_[l]) (S := ↥(OL LL))
+    (e.comp smulSource) (smulTarget.comp e) w ?_
+  intro o b x
+  have hx : (((c • o) • x : ↥T.L.T) : T.V) = (c : ↥LL.1) • ((o • x : ↥T.L.T) : T.V) := by
+    rw [smul_assoc, Submodule.coe_smul, ← algebraMap_smul ↥LL.1 c]
+    rfl
+  exact (addEquiv_tmul T eB hz (c • o) b x).trans <|
+    (congrArg (fun v : T.V => v ⊗ₜ[ℚ_[l]] eB.symm b) hx).trans <|
+      (congrArg smulTarget (addEquiv_tmul T eB hz o b x)).symm
 
 def linEquiv (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z) :
@@ -170,36 +171,28 @@ theorem linEquiv_one (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
     (x : ↥T.L.T) :
     linEquiv T eB hz ((1 : OB l ↥(OL LL)) ⊗ₜ[↥(OL LL)] x) = (x : T.V) ⊗ₜ[ℚ_[l]] (1 : Pl.R.B) := by
-  rw [linEquiv_apply, Algebra.TensorProduct.one_def, addEquiv_tmul, one_smul, map_one]
+  exact (addEquiv_tmul T eB hz 1 1 x).trans <|
+    congrArg₂ (fun (v : T.V) (b : Pl.R.B) => v ⊗ₜ[ℚ_[l]] b)
+      (congrArg Subtype.val (one_smul ↥(OL LL) x)) eB.symm.map_one
 
 theorem linEquiv_act (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
     (hact : ∀ (g : GQ l) (b : Pl.R.B), eB (Pl.actQ g b) = Per.σB g (eB b))
     (g : Gl l) (w : TW (OB l ↥(OL LL)) T) :
     linEquiv T eB hz (actB (sQ l) T g w) = actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g (linEquiv T eB hz w) := by
-  rw [linEquiv_apply, linEquiv_apply]
-  induction w using TensorProduct.induction_on with
-  | zero => simp only [map_zero]
-  | add x y hx hy =>
-    rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
-    exact congrArg₂ (· + ·) hx hy
-  | tmul y x =>
-    induction y using TensorProduct.induction_on with
-    | zero => simp only [zero_tmul, map_zero]
-    | add y₁ y₂ h₁ h₂ =>
-      rw [add_tmul, map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
-      exact congrArg₂ (· + ·) h₁ h₂
-    | tmul o b =>
-      have h1 : actB (sQ l) T g ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) =
-          (o ⊗ₜ[ℤ_[l]] Per.σB (g : GQ l) b) ⊗ₜ[↥(OL LL)] T.actT g x := rfl
-      rw [h1, addEquiv_tmul, addEquiv_tmul]
-      simp only [actVB, AlgebraTensorModule.map_tmul]
-      congr 1
-      · rw [Submodule.coe_smul, Submodule.coe_smul, ← algebraMap_smul ↥LL.1 o, ← algebraMap_smul ↥LL.1 o,
-          map_smul]
-        rfl
-      · rw [LinearMap.restrictScalars_apply, AlgHom.toLinearMap_apply, AlgEquiv.coe_toAlgHom, Pl.PD_actB,
-          RingEquiv.symm_apply_eq, hact, RingEquiv.apply_symm_apply]
+  let e := (addEquiv T eB hz).toAddMonoidHom
+  let actSource := (actB (sQ l) T g).toAddMonoidHom
+  let actTarget := actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g
+  refine nestedTensor_addHom_ext (R := ℤ_[l]) (S := ↥(OL LL))
+    (e.comp actSource) (actTarget.toAddMonoidHom.comp e) w ?_
+  intro o b x
+  have hx := congrArg Subtype.val ((T.actT g).map_smul o x).symm
+  have hb : eB.symm (Per.σB (g : GQ l) b) =
+      (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)).actB g (eB.symm b) := by
+    rw [Pl.PD_actB, RingEquiv.symm_apply_eq, hact, RingEquiv.apply_symm_apply]
+  exact (addEquiv_tmul T eB hz o (Per.σB (g : GQ l) b) (T.actT g x)).trans <|
+    (congrArg₂ (fun (v : T.V) (d : Pl.R.B) => v ⊗ₜ[ℚ_[l]] d) hx hb).trans <|
+      (congrArg actTarget (addEquiv_tmul T eB hz o b x)).symm
 
 theorem linEquiv_frob (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
@@ -207,24 +200,18 @@ theorem linEquiv_frob (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
     (w : TW (OB l ↥(OL LL)) T) :
     linEquiv T eB hz (TWmap (frobOB l ↥(OL LL)) T w) =
       φVB (LL := ↥LL.1) (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) (linEquiv T eB hz w) := by
-  rw [linEquiv_apply, linEquiv_apply]
-  induction w using TensorProduct.induction_on with
-  | zero => simp only [map_zero]
-  | add x y hx hy =>
-    rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
-    exact congrArg₂ (· + ·) hx hy
-  | tmul y x =>
-    induction y using TensorProduct.induction_on with
-    | zero => simp only [zero_tmul, map_zero]
-    | add y₁ y₂ h₁ h₂ =>
-      rw [add_tmul, map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
-      exact congrArg₂ (· + ·) h₁ h₂
-    | tmul o b =>
-      have h1 : TWmap (frobOB l ↥(OL LL)) T ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) =
-          (o ⊗ₜ[ℤ_[l]] Per.φB l b) ⊗ₜ[↥(OL LL)] x := rfl
-      rw [h1, addEquiv_tmul, addEquiv_tmul]
-      simp only [φVB, AlgebraTensorModule.map_tmul, LinearMap.id_apply]
-      congr 1
-      rw [AlgHom.toLinearMap_apply, Pl.PD_φ, RingEquiv.symm_apply_eq, hfr, RingEquiv.apply_symm_apply]
+  let e := (addEquiv T eB hz).toAddMonoidHom
+  let frobSource := (TWmap (frobOB l ↥(OL LL)) T).toAddMonoidHom
+  let frobTarget := φVB (LL := ↥LL.1) (V := T.V)
+    (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l))
+  refine nestedTensor_addHom_ext (R := ℤ_[l]) (S := ↥(OL LL))
+    (e.comp frobSource) (frobTarget.toAddMonoidHom.comp e) w ?_
+  intro o b x
+  have hb : eB.symm (Per.φB l b) =
+      (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)).φ (eB.symm b) := by
+    rw [Pl.PD_φ, RingEquiv.symm_apply_eq, hfr, RingEquiv.apply_symm_apply]
+  exact (addEquiv_tmul T eB hz o (Per.φB l b) x).trans <|
+    (congrArg (fun d : Pl.R.B => ((o • x : ↥T.L.T) : T.V) ⊗ₜ[ℚ_[l]] d) hb).trans <|
+      (congrArg frobTarget (addEquiv_tmul T eB hz o b x)).symm
 
 end GlobalTheory.BKGal.CrisTensor

@@ -19,6 +19,16 @@ namespace CrystallineSemistableComparison.Om.Nt2
 
 open GroundTheory.Arith.SchemeCoh GlobalTheory.SheafPull CrystallineSemistableComparison.Om.Cech
 
+private theorem step_naturality {A B A' B' C D C' D' : Type}
+    (δ : A ≃ B) (δ' : A' ≃ B') (e : A → C) (e' : A' → C')
+    (d : C → D) (d' : C' → D') (p : A → A') (q : B → B')
+    (r : C → C') (s : D → D')
+    (hδ : ∀ y, q (δ y) = δ' (p y)) (he : ∀ y, e' (p y) = r (e y))
+    (hd : ∀ z, s (d z) = d' (r z)) (x : B) :
+    d' (e' (δ'.symm (q x))) = s (d (e (δ.symm x))) := by
+  obtain ⟨y, rfl⟩ := δ.surjective x
+  rw [δ.symm_apply_apply, hδ, δ'.symm_apply_apply, he, hd]
+
 theorem cechHStep_pull' : ∀ {X Y : TopCat.{0}} (f : X ⟶ Y) {κ ι : Type} (V : κ → Opens Y) (U : ι → Opens X) (τ : ι → κ)
     (hτ : ∀ i, U i ≤ (Opens.map f).obj (V (τ i))) {S : ShortComplex (AbSheaf Y)} {S' : ShortComplex (AbSheaf X)}
     (hS : S.ShortExact) [Injective S.X₂] (hC : IsCechShortExact V S.f.hom S.g.hom) (hI : CechAcyclic S.X₂.obj V)
@@ -31,22 +41,26 @@ theorem cechHStep_pull' : ∀ {X Y : TopCat.{0}} (f : X ⟶ Y) {κ ι : Type} (V
       hPull f α.τ₁ (m + 2) (cechHEquivStep V hS hC hI m e x) := by
   intro X Y f κ ι V U τ hτ S S' hS _ hC hI hS' _ hC' hI' α m e e' he x
   have h₁₂ : ∀ (W : (Opens Y)ᵒᵖ) (z : S.X₁.obj.obj W),
-      α.τ₂.hom.app W (S.f.hom.app W z) = S'.f.hom.app _ (α.τ₁.hom.app W z) := fun W z => by
-    have h := congrArg (fun g : S.X₁ ⟶ (S'.map (push f)).X₂ => g.hom.app W z) α.comm₁₂
-    exact h.symm
+      α.τ₂.hom.app W (S.f.hom.app W z) =
+        S'.f.hom.app ((Opens.map f).op.obj W) (α.τ₁.hom.app W z) :=
+    fun W z => congrArg (fun g : S.X₁ ⟶ (S'.map (push f)).X₂ => g.hom.app W z) α.comm₁₂.symm
   have h₂₃ : ∀ (W : (Opens Y)ᵒᵖ) (z : S.X₂.obj.obj W),
-      α.τ₃.hom.app W (S.g.hom.app W z) = S'.g.hom.app _ (α.τ₂.hom.app W z) := fun W z => by
-    have h := congrArg (fun g : S.X₂ ⟶ (S'.map (push f)).X₃ => g.hom.app W z) α.comm₂₃
-    exact h.symm
-  obtain ⟨y, rfl⟩ := (hC.deltaEquiv hI m).surjective x
-  have hδ : (hC'.deltaEquiv hI' m).symm (cechPullH f α.τ₁.hom V U τ hτ (m + 2) (hC.deltaEquiv hI m y)) =
-      cechPullH f α.τ₃.hom V U τ hτ (m + 1) y := by
-    rw [AddEquiv.symm_apply_eq]
-    obtain ⟨σ, hσ, rfl⟩ := exists_cls y
-    exact GlobalTheory.T.cech_short_exact_pull_compat f V U τ hτ hC hC' α.τ₁.hom α.τ₂.hom α.τ₃.hom h₁₂ h₂₃ (m + 1)
-      ⟨σ, (mem_cocycles σ).2 hσ⟩
-  simp only [cechHEquivStep, AddEquiv.trans_apply]
-  rw [AddEquiv.symm_apply_apply, hδ, he]
-  exact (GlobalTheory.T.sheaf_pull_connecting_compat f hS hS' α (m + 1) (e y)).symm
+      α.τ₃.hom.app W (S.g.hom.app W z) =
+        S'.g.hom.app ((Opens.map f).op.obj W) (α.τ₂.hom.app W z) :=
+    fun W z => congrArg (fun g : S.X₂ ⟶ (S'.map (push f)).X₃ => g.hom.app W z) α.comm₂₃.symm
+  let δ := hC.deltaEquiv hI m
+  let δ' := hC'.deltaEquiv hI' m
+  let p := cechPullH f α.τ₃.hom V U τ hτ (m + 1)
+  let q := cechPullH f α.τ₁.hom V U τ hτ (m + 2)
+  have hδ (y : cechH S.X₃.obj V (m + 1)) : q (δ y) = δ' (p y) := by
+    refine QuotientAddGroup.induction_on y fun σ => ?_
+    exact GlobalTheory.T.cech_short_exact_pull_compat f V U τ hτ
+      (F := S.X₁.obj) (I := S.X₂.obj) (Q := S.X₃.obj)
+      (F' := S'.X₁.obj) (I' := S'.X₂.obj) (Q' := S'.X₃.obj)
+      hC hC' α.τ₁.hom α.τ₂.hom α.τ₃.hom h₁₂ h₂₃ (m + 1) σ
+  exact step_naturality δ.toEquiv δ'.toEquiv e e'
+    (H.δ hS (m + 1) (m + 2) rfl) (H.δ hS' (m + 1) (m + 2) rfl)
+    p q (hPull f α.τ₃ (m + 1)) (hPull f α.τ₁ (m + 2))
+    hδ he (GlobalTheory.T.sheaf_pull_connecting_compat f hS hS' α (m + 1)) x
 
 end CrystallineSemistableComparison.Om.Nt2

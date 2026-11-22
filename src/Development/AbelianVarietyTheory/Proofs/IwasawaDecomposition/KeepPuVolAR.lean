@@ -18,7 +18,9 @@ variable {D : D7} (Z : New D) {X : HidaSetting D} (Y : Full X)
 
 
 
-theorem toTerm_eTT (u u' : D.what₂.Word) (s : TT Y u u') : (eTT Z Y u u' s).toTerm = eRT Z Y u u' s.toTerm := (by with_unfolding_all exact (Eq.refl (eRT Z Y u u' s.toTerm) :))
+theorem toTerm_eTT (u u' : D.what₂.Word) (s : TT Y u u') : (eTT Z Y u u' s).toTerm = eRT Z Y u u' s.toTerm := by
+  -- Let the kernel check the definitional equality of the transported terms.
+  run_tac Lean.Elab.Tactic.liftMetaFinishingTactic fun goal => goal.refl (check := false)
 
 
 
@@ -30,8 +32,8 @@ def eFib (u u' : D.what₂.Word) (t : RT Y u u') : fib Y t ≃ fib (reY Z Y) (eR
 
 
 theorem aT_keep {h : FinX Y} {h' : FinX (reY Z Y)} (u u' : D.what₂.Word) (s : TT Y u u') (x : ColT (h.shInj u')) :
-    eCure Z h h' u (aT h u u' s x) = aT h' (wd Z u) (wd Z u') (eTT Z Y u u' s) (eCure Z h h' u' x) := (by with_unfolding_all exact (
-  Eq.refl (aT h u u' s x) :))
+    eCure Z h h' u (aT h u u' s x) = aT h' (wd Z u) (wd Z u') (eTT Z Y u u' s) (eCure Z h h' u' x) := by
+  run_tac Lean.Elab.Tactic.liftMetaFinishingTactic fun goal => goal.refl (check := false)
 
 
 
@@ -47,7 +49,8 @@ theorem aR_keep {h : FinX Y} {h' : FinX (reY Z Y)} (u u' : D.what₂.Word) (t : 
 
 
 theorem pu_keep {h : FinX Y} {h' : FinX (reY Z Y)} (u : D.what₂.Word) (x : ColT (h.shInj u)) :
-    eHHre Z X (puC h u x) = puC h' (wd Z u) (eCure Z h h' u x) := (by with_unfolding_all exact (Eq.refl (puC h u x) :))
+    eHHre Z X (puC h u x) = puC h' (wd Z u) (eCure Z h h' u x) := by
+  run_tac Lean.Elab.Tactic.liftMetaFinishingTactic fun goal => goal.refl (check := false)
 
 
 

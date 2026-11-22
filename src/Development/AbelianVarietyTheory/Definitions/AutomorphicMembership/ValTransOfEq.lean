@@ -41,6 +41,9 @@ theorem map_incl {Q Q' : Submodule ℂ N} {Z : Type} (e : P = P') (e' : Q = Q') 
   subst e e'
   exact hf (Submodule.inclusion h (j y))
 
+omit [NormedAddCommGroup X] [InnerProductSpace ℂ X] in
+private theorem mem_of_eq (e : P = P') {w : N} (h : w ∈ P') : w ∈ P := e.symm ▸ h
+
 end Generic
 
 section Chain
@@ -79,7 +82,9 @@ def rowIds (I : RowIds X (toChainReal R F tupT hm hTop) l) : RowIds (rowSide c X
 
 theorem rowSideReal_tr {I : RowIds X (toChainReal R F tupT hm hTop) l} {n : ℕ} {bs : OrthonormalBasis (Fin n) ℂ EE}
     {ty : Fin n → a.D.what₂.FT} (H : RowSideReal X (toChainReal R F tupT hm hTop) l I bs ty) :
-    RowSideReal (rowSide c X) (chainB c.to F tupT hm hTop) l (rowIds c I) bs ((ty)) := by
+    RowSideReal (rowSide c X) (chainB c.to F tupT hm hTop) l (rowIds c I) bs ((ty)) :=
+  set_option backward.isDefEq.lazyProjDelta false in
+  set_option backward.isDefEq.lazyWhnfCore false in by
   refine @RowSideReal.mk _ _ _ _ _ _ _ _ _ _ _ _ ?parY ?lvl ?lvlP ?lvlX ?ee ?mult ?multX ?io0 ?io0X ?io ?ioTop ?ft ?prt_disj
   case parY =>
     exact (H.parY)
@@ -91,52 +96,53 @@ theorem rowSideReal_tr {I : RowIds X (toChainReal R F tupT hm hTop) l} {n : ℕ}
   case lvlX =>
     exact (fun (μ : a.D.what₂.Tup) (hμ : Used0 a.D μ) => le_of_eqs (congrFun (congrFun (spCCXP_eq c F tupT hm hTop) l) μ) (congrFun (congrFun (spCCX_eq c F tupT hm hTop) l) μ) (H.lvlX μ hμ))
   case ee =>
-    exact (hilbTie_ofEq (congrFun (spEEc_eq c F tupT hm hTop) l) H.ee)
+    intro x y
+    dsimp only [rowIds, LinearEquiv.trans_apply, LinearEquiv.coe_ofEq_apply]
+    with_unfolding_all exact H.ee x y
   case mult =>
-    intro μ hμ j h1 h2
-    letI := X.instMult μ j
-    letI := X.instMulti μ j
-    have t := hilbTie_ofEq (congrFun (congrFun (congrFun (spCCP_eq c F tupT hm hTop) l) μ) j) (H.mult μ hμ j h1 h2)
-    with_unfolding_all exact t
+    intro μ hμ j h1 h2 x y
+    dsimp only [rowIds, LinearEquiv.trans_apply, LinearEquiv.coe_ofEq_apply]
+    with_unfolding_all exact H.mult μ hμ j h1 h2 x y
   case multX =>
-    intro h μ hμ
-    letI := X.instMult μ a.D.R.m
-    letI := X.instMulti μ a.D.R.m
-    have t := hilbTie_ofEq (congrFun (congrFun (spCCXP_eq c F tupT hm hTop) l) μ) (H.multX h μ hμ)
-    with_unfolding_all exact t
+    intro h μ hμ x y
+    dsimp only [rowIds, LinearEquiv.trans_apply, LinearEquiv.coe_ofEq_apply]
+    with_unfolding_all exact H.multX h μ hμ x y
   case io0 =>
-    have t := (fun (h : 2 ≤ a.D.R.m) (μ : a.D.what₂.Tup) (hμ : Used0 a.D μ) (ok : okB c F tupT hm hTop l μ) =>
-      projTie_ofEq (congrFun (spEEc_eq c F tupT hm hTop) l) (H.io0 h μ hμ (okB_imp c ok)) fun y =>
-        map_incl (congrFun (congrFun (congrFun (spCCP_eq c F tupT hm hTop) l) μ) (0 + 1))
-          (congrFun (congrFun (congrFun (spCC_eq c F tupT hm hTop) l) μ) (0 + 1)) (H.lvlP μ hμ 1 le_rfl (by omega))
-          (I.jM μ hμ 1 le_rfl (by omega)) (stepB c l μ 0) (stepB_eq c l μ 0) y)
-    with_unfolding_all exact t
+    intro h μ hμ ok x y
+    change 2 ≤ a.D.R.m at h
+    have hj : 1 ≤ a.D.R.m - 1 := by omega
+    have hs := stepB_eq c l μ 0 (Submodule.inclusion (H.lvlP μ hμ 1 le_rfl hj) (I.jM μ hμ 1 le_rfl hj y))
+    have ht := (H.io0 h μ hμ (okB_imp c ok) x y).trans
+      (congrArg ((toChainReal R F tupT hm hTop).ipE l (I.jE x)) hs.symm)
+    with_unfolding_all exact ht
   case io0X =>
-    have t := (fun (h : a.D.R.m = 1) (μ : a.D.what₂.Tup) (hμ : Used0 a.D μ) (ok : okB c F tupT hm hTop l μ) =>
-      projTie_ofEq (congrFun (spEEc_eq c F tupT hm hTop) l) (H.io0X h μ hμ (okB_imp c ok)) fun y =>
-        congrArg (cast (congrArg (toChainReal R F tupT hm hTop).Amb (show a.D.R.m - 1 = 0 by omega)))
-          (map_incl (congrFun (congrFun (spCCXP_eq c F tupT hm hTop) l) μ) (congrFun (congrFun (spCCX_eq c F tupT hm hTop) l) μ)
-            (H.lvlX μ hμ) (I.jX μ hμ) (topB c l μ) (topB_eq c l μ) (cast (congrArg (X.Mult μ) h.symm) y)))
-    with_unfolding_all exact t
+    intro h μ hμ ok x y
+    change a.D.R.m = 1 at h
+    have hj : a.D.R.m - 1 = 0 := by omega
+    have hs := topB_eq c l μ
+      (Submodule.inclusion (H.lvlX μ hμ) (I.jX μ hμ (cast (congrArg (X.Mult μ) h.symm) y)))
+    have ht := (H.io0X h μ hμ (okB_imp c ok) x y).trans
+      (congrArg (fun v => (toChainReal R F tupT hm hTop).ipE l (I.jE x)
+        (cast (congrArg (toChainReal R F tupT hm hTop).Amb hj) v)) hs.symm)
+    with_unfolding_all exact ht
   case io =>
-    intro μ hμ ok j h1 h2
-    letI := X.instMult μ j
-    letI := X.instMulti μ j
-    letI := X.instMult μ (j + 1)
-    letI := X.instMulti μ (j + 1)
-    have t := projTie_ofEq (congrFun (congrFun (congrFun (spCCP_eq c F tupT hm hTop) l) μ) j) (H.io μ hμ (okB_imp c ok) j h1 h2) fun y =>
-        map_incl (congrFun (congrFun (congrFun (spCCP_eq c F tupT hm hTop) l) μ) (j + 1))
-          (congrFun (congrFun (congrFun (spCC_eq c F tupT hm hTop) l) μ) (j + 1)) (H.lvlP μ hμ (j + 1) (by omega) h2)
-          (I.jM μ hμ (j + 1) (by omega) h2) (stepB c l μ j) (stepB_eq c l μ j) y
-    with_unfolding_all exact t
+    intro μ hμ ok j h1 h2 x y
+    change j + 1 ≤ a.D.R.m - 1 at h2
+    have hj : 1 ≤ j + 1 := Nat.succ_pos j
+    have hs := stepB_eq c l μ j (Submodule.inclusion (H.lvlP μ hμ (j + 1) hj h2) (I.jM μ hμ (j + 1) hj h2 y))
+    have ht := (H.io μ hμ (okB_imp c ok) j h1 h2 x y).trans
+      (congrArg ((toChainReal R F tupT hm hTop).ipP l μ j (I.jM μ hμ j h1 (by omega) x)) hs.symm)
+    with_unfolding_all exact ht
   case ioTop =>
-    have t := (fun (h : 2 ≤ a.D.R.m) (μ : a.D.what₂.Tup) (hμ : Used0 a.D μ) (ok : okB c F tupT hm hTop l μ) =>
-      projTie_ofEq (congrFun (congrFun (congrFun (spCCP_eq c F tupT hm hTop) l) μ) (a.D.R.m - 1)) (H.ioTop h μ hμ (okB_imp c ok)) fun y =>
-        map_incl (congrFun (congrFun (spCCXP_eq c F tupT hm hTop) l) μ) (congrFun (congrFun (spCCX_eq c F tupT hm hTop) l) μ)
-          (H.lvlX μ hμ) (I.jX μ hμ) (topB c l μ) (topB_eq c l μ) y)
-    with_unfolding_all exact t
+    intro h μ hμ ok x y
+    change 2 ≤ a.D.R.m at h
+    have hs := topB_eq c l μ (Submodule.inclusion (H.lvlX μ hμ) (I.jX μ hμ y))
+    have ht := (H.ioTop h μ hμ (okB_imp c ok) x y).trans
+      (congrArg ((toChainReal R F tupT hm hTop).ipP l μ (a.D.R.m - 1) (I.jM μ hμ _ (by omega) le_rfl x)) hs.symm)
+    with_unfolding_all exact ht
   case ft =>
-    exact (fun σ => cast (congrArg (· ∈ I.prt (ty σ)) (val_trans_ofEq (j := I.jE) (congrFun (spEEc_eq c F tupT hm hTop) l) (bs σ)).symm) (H.ft σ))
+    intro σ
+    with_unfolding_all exact H.ft σ
   case prt_disj =>
     exact (H.prt_disj)
 
@@ -166,17 +172,32 @@ def liftIds (I : LiftIds (toLiftReal R F tupT hm hTop hinj)) : LiftIds (liftB c.
     ((I.jMt)) ((I.prtW))
 
 theorem liftTie_tr {I : LiftIds (toLiftReal R F tupT hm hTop hinj)} (H : LiftTie (toLiftReal R F tupT hm hTop hinj) I) :
-    LiftTie (liftB c.to F tupT hm hTop hinj) (liftIds c I) := by
-  refine @LiftTie.mk _ _ _ _ ((H.hol)) (by with_unfolding_all exact (fun i => hilbTie_ofEq (congrFun (spWc_eq c F tupT hm hTop hinj) i) (H.mj i))) ((H.mt)) ?_ (by with_unfolding_all exact H.isot) ((H.prtW_disj)) ((H.lamP))
-  with_unfolding_all exact (cast (congrArg₂ (fun (P : type_of% (toLiftReal R F tupT hm hTop hinj).MultW) (Q : type_of% (toLiftReal R F tupT hm hTop hinj).Wc) =>
-    ∀ μ (hμ : Used0 a.D μ) (i : Fin a.D.R.m) (x : a.D.what₂.Mt μ (i + 1)) (w : (toLiftReal R F tupT hm hTop hinj).AmbW i),
-      Lift.IsThetaP ((toLiftReal R F tupT hm hTop hinj).measV μ i) ((toLiftReal R F tupT hm hTop hinj).fdV μ i)
-        ((toLiftReal R F tupT hm hTop hinj).thW μ i) ((toLiftReal R F tupT hm hTop hinj).ptW μ i) ((toLiftReal R F tupT hm hTop hinj).ioK i)
-        ((toLiftReal R F tupT hm hTop hinj).Amt μ i) ((toLiftReal R F tupT hm hTop hinj).thC μ i) → w ∈ P i →
-      w ∘ₗ (toLiftReal R F tupT hm hTop hinj).embK i = (toLiftReal R F tupT hm hTop hinj).thC μ i (I.jMt μ hμ i x) →
-      (toLiftReal R F tupT hm hTop hinj).eW i ∘ₗ w ∈ Q i →
-      (I.jMj i (a.D.what₂.thetaP μ (i + 1) x)).1 = (toLiftReal R F tupT hm hTop hinj).eW i ∘ₗ w)
-    (spMultW_eq c F tupT hm hTop hinj) (spWc_eq c F tupT hm hTop hinj)) H.theta)
+    LiftTie (liftB c.to F tupT hm hTop hinj) (liftIds c I) :=
+  set_option backward.isDefEq.lazyProjDelta false in
+  set_option backward.isDefEq.lazyWhnfCore false in by
+  refine @LiftTie.mk _ _ _ _ ?hol ?mj ?mt ?theta ?isot ?prtW_disj ?lamP
+  case hol => exact H.hol
+  case mj =>
+    intro i x y
+    dsimp only [liftIds, LinearEquiv.trans_apply, LinearEquiv.coe_ofEq_apply]
+    with_unfolding_all exact H.mj i x y
+  case mt => exact H.mt
+  case theta =>
+    intro μ hμ i x w hTheta hMult hEmb hWc
+    have hMult' := mem_of_eq (congrFun (spMultW_eq c F tupT hm hTop hinj) i) hMult
+    have hWc' := mem_of_eq (congrFun (spWc_eq c F tupT hm hTop hinj) i) hWc
+    dsimp only [liftIds, LinearEquiv.trans_apply, LinearEquiv.coe_ofEq_apply]
+    with_unfolding_all
+      refine H.theta μ hμ i x w ?_ hMult' ?_ hWc'
+      · dsimp only [liftB, toLiftReal, real] at hTheta ⊢
+        exact hTheta
+      · dsimp only [liftB, toLiftReal, liftIds, real] at hEmb ⊢
+        exact hEmb
+  case isot =>
+    intro i π y
+    with_unfolding_all exact H.isot i π y
+  case prtW_disj => exact H.prtW_disj
+  case lamP => exact H.lamP
 
 theorem recTied_tr {X0 : BaseLevelRowSide a.D} {Ish : RowIds (RowSide.sharp a.D) (toChainReal R F tupT hm hTop) true}
     {Iz : RowIds X0.s (toChainReal R F tupT hm hTop) false} {IL : LiftIds (toLiftReal R F tupT hm hTop hinj)} {K : ColReal a.D}

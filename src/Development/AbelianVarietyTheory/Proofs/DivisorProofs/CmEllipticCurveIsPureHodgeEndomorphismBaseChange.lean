@@ -106,33 +106,13 @@ theorem isPureBC_ell : GlobalTheory.Published.AbelianDeRham → ∀ (E : Type) [
     (smoothOfRelativeDimension_isStableUnderBaseChange (n := 1)).of_isPullback hpb.1 hgG
   have hLie : LieExact A := (hP.2.1 R A 1 hA hgA).1
 
-  haveI := hgG
   obtain ⟨v', hv', hv'φ⟩ := GlobalTheory.exists_isLieBasis_baseChange S R f C.P.A A φ hpb
-    (SmoothOfRelativeDimension.smooth 1 C.P.A.hom) 1 ![C.v] C.basis
-  have hu : ∀ i, (v' i).left ≫ φ = spMap (Chart.dualMapR f) ≫ (![C.v] i).left := hv'φ
-  have hw : (v' 0 ≫ W').left ≫ φ = spMap (Chart.dualMapR f) ≫ (C.v ≫ C.act.act (GlobalTheory.CM.wK H)).left := by
-    rw [Over.comp_left, Category.assoc, hW', ← Category.assoc, hu 0, Over.comp_left, Category.assoc]
-    rfl
+    C.P.isAb.smooth 1 ![C.v] C.basis
   have e : IsLieComb (fun i => f (![ω] i)) v' (v' 0 ≫ W') := by
-    have he := eq_epsScale_of_isLieComb C.eig
-    have hs : spMap (epsScaleR (f ω)) ≫ spMap (Chart.dualMapR f) =
-        spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω) := by
-      rw [← Geo.Tor.spMap_comp, ← Geo.Tor.spMap_comp]
-      congr 1
-      ext r <;> simp [Chart.dualMapR, epsScaleR, TrivSqZeroExt.algebraMap_eq_inl]
-    have heq : v' 0 ≫ W' = epsScale (f ω) ≫ v' 0 := by
-      apply Over.OverMorphism.ext
-      apply hpb.1.hom_ext
-      · rw [hw, he, Over.comp_left, Over.comp_left, Category.assoc, hu 0]
-        change (spMap (Chart.dualMapR f) ≫ spMap (epsScaleR ω)) ≫ C.v.left =
-          spMap (epsScaleR (f ω)) ≫ (spMap (Chart.dualMapR f) ≫ C.v.left)
-        rw [← hs, Category.assoc]
-      · rw [Over.w, Over.w]
-    refine ⟨fun _ => epsScale (f ω) ≫ v' 0, ?_, ?_⟩
-    · intro i
-      fin_cases i
-      rfl
-    · simpa using heq
+    apply (GlobalTheory.lieComb_baseChange S R f C.P.A A φ hpb 1 ![C.v]
+      (C.v ≫ C.act.act (GlobalTheory.CM.wK H)) ![ω] v' (v' 0 ≫ W') hv'φ C.eig).1
+    have hv0 : (v' 0).left ≫ φ = spMap (Chart.dualMapR f) ≫ C.v.left := hv'φ 0
+    rw [Over.comp_left, Over.comp_left, Category.assoc, hW', ← Category.assoc, hv0, Category.assoc]
   have hquot : ∀ y : HdR A, push (dp0 R) (𝟙 _) W' y - f ω • y ∈ Fil A :=
     fun y => push_sub_smul_mem_Fil hLie hv' W' e y
 
