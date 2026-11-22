@@ -6,6 +6,7 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.BaseChangeC
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.ExtCContract
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.GenSmooth
 public import Mathlib
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.WithBotEqOfAddOne
 
 @[expose] public section
 
@@ -37,24 +38,6 @@ theorem horizontal_spec {P : Ideal (MRing ι)} (h : IsHorizontal P) :
   unfold IsHorizontal at h
   rw [h] at h1
   exact Ideal.mem_bot.mp h1
-
-theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ}
-    (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞)) : a = (n : WithBot ℕ∞) := by
-  induction a using WithBot.recBotCoe with
-  | bot =>
-    rw [WithBot.bot_add] at h
-    exact absurd h.symm (by simp)
-  | coe b =>
-    induction b using ENat.recTopCoe with
-    | top =>
-      change ((⊤ : ℕ∞) : WithBot ℕ∞) = (((n + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) at h
-      exact (ENat.top_ne_natCast (n + 1) (WithBot.coe_injective h)).elim
-    | coe k =>
-      have h' : ((k + 1 : ℕ) : WithBot ℕ∞) = ((n + 1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast h
-      have h2 : k + 1 = n + 1 := by exact_mod_cast h'
-      have hk : k = n := by omega
-      subst hk
-      norm_cast
 
 theorem pcEquidim : PCEquidimStatement := by
   intro K _ ι _ P e hP Q hQ
