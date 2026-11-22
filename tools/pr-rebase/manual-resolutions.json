@@ -471,6 +471,16 @@
             "resolution": "resolutions/54-inner-derivations.lean"
           }
         ]
+      },
+      {
+        "commit": "f2cad945fd86f7c61456c2f54c5f741d1d7ef9f8",
+        "files": [
+          {
+            "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/MonomialRepresentations/RelWeight.lean",
+            "ours": "138bc100b6f5cbe912186c1d8edc2a2d3a8d4b2a",
+            "resolution": "resolutions/54-relative-weight.lean"
+          }
+        ]
       }
     ]
   }
