@@ -67,7 +67,7 @@ theorem equiv_of_ker {G V D Q : Type} [Group G] [AddCommGroup V] [Module ℂ V] 
   rw [← hq, hE, hE, twist_apply, hr, smul_smul]
   rw [show ((χ g : ℂˣ) : ℂ) * ((((χ g)⁻¹ : ℂˣ) : ℂˣ) : ℂ) = 1 by rw [← Units.val_mul, mul_inv_cancel, Units.val_one], one_smul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem deriv_equiv (ψ : AddChar k Circle) (n j : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
     (π : Representation ℂ (GL (Fin (n + j + 1)) k) V) (hd : ∑ a, (![n, j + 1] a) = n + j + 1) :
     Nonempty ((GlobalTheory.BZMir.deriv k ψ j π).Equiv
@@ -111,7 +111,7 @@ theorem thetaL_surjective {h : ℕ} (d : Fin h → ℕ) : Function.Surjective (t
   exact key _ (Fin.rev_rev a) _
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jm_contra_gen (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) {h N : ℕ} (u : Fin h → IrrGL (k := k))
     (hd : ∑ a, (u a).1 = N) {V : Type} [AddCommGroup V] [Module ℂ V]
     (π : Representation ℂ (GL (Fin N) k) V) (hs : IsSmooth π) (hi : π.IsIrreducible)

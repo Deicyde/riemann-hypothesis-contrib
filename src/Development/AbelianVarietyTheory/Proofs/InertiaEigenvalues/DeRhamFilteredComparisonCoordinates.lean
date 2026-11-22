@@ -121,8 +121,8 @@ theorem filtered_coords : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : Lo
     Submodule.sum_mem _ fun i _ => GlobalTheory.DRFil.tmul_mem_FilV (P.PD K) (LL := ℚ_[l]) _ (hy i)
   have hfx : f x = y := by
     funext j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [x, map_sum, hf, Pi.single_apply]
+
+    simp [x, map_sum, hf, Pi.single_apply]
   obtain ⟨m, k, b, dd, h, e⟩ :=
     deRham_filtered_Ql l P AI TT K (Fin d → ℚ_[l]) (qRep ρ) hdR a x hx
   refine ⟨m, k, b, fun r => f (dd r), fun r => ⟨fun g => ?_, hfil _ _ (h r).2.1, (h r).2.2⟩, ?_⟩

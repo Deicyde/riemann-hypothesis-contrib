@@ -14,7 +14,7 @@ public import Development.AutomorphicArithmetic.EtaleIdempotents.NatCastPrimeNeZ
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
@@ -107,8 +107,8 @@ private lemma h1A {A : Type} [CommRing A] {TW H : Type 1} [AddCommGroup TW] [Add
     (h : (l ^ b : ℕ) • p = (l ^ (s + b) : ℕ) • ∑ a, q a) (hp : Ψ p = p') (hq : ∀ a, Ψ (q a) = q' a) :
     ((l : A) ^ b) • p' = ((l : A) ^ (s + b)) • ∑ a, q' a := by
   have h' := congrArg Ψ h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_nsmul, map_nsmul, map_sum, hp] at h'
+
+  rw [map_nsmul, map_nsmul, map_sum, hp] at h'
   simp only [hq] at h'
   rw [natS (A := A), natS (A := A)] at h'
   exact h'
@@ -134,7 +134,7 @@ private lemma finA {A : Type} [CommRing A] {H : Type 1} [AddCommGroup H] [Module
   rw [e1, smul_smul, hk, mul_smul, Nat.cast_smul_eq_nsmul]
   exact h
 
-set_option maxHeartbeats 4000000 in
+
 private lemma levZero {e : E.EtFam l K} (he : e.Good) (M W : Model l K) (π : W.X ⟶ M.X) (hπ : π ≫ M.p = W.p)
     (j n f N0 N1 r s b a u C : ℕ) {d : Fin (n + 1) → ℕ} (τ : ∀ i, Fin (d i) → (W.X ⟶ M.X)) (hτ : ∀ i x, τ i x ≫ M.p = W.p)
     {ι : Type} [Fintype ι] (v : ι → M.T j) (c : ι → Acris l) (w : Fin (n + 1) → ι → M.T j) (σ : Fin (n + 1) → ℤ)
@@ -180,7 +180,7 @@ private lemma levZero {e : E.EtFam l K} (he : e.Good) (M W : Model l K) (π : W.
 end UpperTheory.Ru.crystallineComparison
 
 open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison TensorProduct UpperTheory.Gal.crystallineComparison UpperTheory.Ru.crystallineComparison in
-set_option maxHeartbeats 4000000 in
+
 theorem UpperTheory.Ru.crystallineComparison.top : UpperTheory.Ru.crystallineComparison.Top := by
   intro l _ K _ _ ϖ hϖ e he M hsm hqc haff f n j hf T hr hPt A hA B hInj hAbs
   obtain ⟨m, N1, g, F, ρ, hg0, hgf, hF, hρ, hAI⟩ := hAbs

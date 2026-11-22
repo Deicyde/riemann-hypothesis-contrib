@@ -41,7 +41,7 @@ variable {K : FiniteSubfield} (S : Set (HeightOneSpectrum (𝓞 K.1))) [Fintype 
 section Hypotheses
 
 
-set_option maxHeartbeats 1000000 in
+
 include hS in
 theorem gsTrace_eq_gsOddTrace (hodd : Odd N) : gsTrace S ιr ιs N = gsOddTrace S ιr ιs hS hodd := by
   have : Finite (gsRoots S N) :=

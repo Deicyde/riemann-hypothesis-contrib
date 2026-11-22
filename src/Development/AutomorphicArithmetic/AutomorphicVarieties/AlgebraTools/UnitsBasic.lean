@@ -46,8 +46,8 @@ theorem UpperTheory.V.AlgebraTools.units_basic :
       intro i
       rw [T.tr_comm, ← mul_assoc, U.st_mul_x_eq]
     simp_rw [h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← Finset.sum_mul, U.coi.complete, one_mul]
+
+    rw [← map_sum, ← Finset.sum_mul, U.coi.complete, one_mul]
   · intro i j y h
     have h7 := key i j y
     rw [← h] at h7

@@ -403,7 +403,7 @@ end CompanionTheory.RgGu.NR.DerEq
 namespace CompanionTheory.RgGu.NR
 
 open DerEq in
-set_option maxHeartbeats 2000000 in
+
 theorem derEquiv (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
     DerEquiv k := by
   intro ψ n j V _ _ π

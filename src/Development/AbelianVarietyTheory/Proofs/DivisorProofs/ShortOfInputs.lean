@@ -54,7 +54,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightDivisi
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
 
@@ -154,7 +154,7 @@ variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotio
   {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem weight_rows {PP A : ℝ} (h : HostNum D L PP A 1) (hw : WtNum p i PP) (hi : (i : ℕ) + 1 < D.R.m)
     (u1 : AllWt.Weight (dat p i)) (hq : Quo p i PP u1) :
     1 ≤ (dat p i).p ∧ 1 ≤ (dat p i).q ∧ (∀ τ, Antitone (u1 τ)) ∧

@@ -23,7 +23,7 @@ open scoped Topology
 variable {l : ℕ} [Fact l.Prime]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem fil_of_unramified (P : LocPrime l) (AI : LocAinf l P) (Ti : LocTied l P AI) (K LL : FinExt l)
     (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (hI : ∀ g ∈ IK K, ∀ x, T.ρ g x = x)
     (y : T.V ⊗[ℚ_[l]] P.R.BdR) (hy : y ∈ DdR (P.PD K) T.ρ) :
@@ -195,7 +195,7 @@ open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual Recipro
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
 
 
-set_option maxHeartbeats 3200000 in
+
 open scoped Classical in
 theorem isdRJ_zero_of_trivial_on_open_inertia :
     ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ} [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), Nonempty (LocTied l P AI) →

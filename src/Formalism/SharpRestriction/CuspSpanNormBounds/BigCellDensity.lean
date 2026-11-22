@@ -1017,7 +1017,7 @@ theorem rootHaar_gen {k0 r : ℕ} (L : LocBessel (k0 + 1) r) (γ : Point ℂ (r 
     (ENNReal.ofReal_pos.2 (by positivity)).ne' ENNReal.ofReal_ne_top, fun M hM => ?_⟩
   exact (Formalism.FourierDecayAlt.P.Dx3.intR Ds hrep.1 (dPt_ne γ) hG hM).smul_measure ENNReal.ofReal_ne_top
 
-set_option maxHeartbeats 1000000 in
+
 theorem quotient_exists : QuotExists := by
   intro k0 r L γ g μR hc hκ0 hκ1 hrep hrel hroot
   obtain ⟨hH, hI⟩ := rootHaar_gen L γ g μR hc hrep hroot

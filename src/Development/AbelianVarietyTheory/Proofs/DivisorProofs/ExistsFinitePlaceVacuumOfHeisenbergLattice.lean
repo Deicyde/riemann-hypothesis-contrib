@@ -201,8 +201,8 @@ theorem exists_vac_of_lattice : ∀ {F : Type} [Field F] [NumberField F] {W : Ty
         · exact at_sum _ fun i _ => at_mul_left _ (hAtE _ (hAt _ hγ') i).2
         · exact at_sum _ fun i _ => at_mul_left _ (hAtE _ (hAt _ hγ) i).2
       rw [hψloc _ hA, co.form, map_mul, evFin_invOf_two, map_sub]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dotProduct, map_sum, map_mul]
+
+      simp only [dotProduct, map_sum, map_mul]
       rfl)
     (by
       rintro _ ⟨γ, hγ, rfl⟩

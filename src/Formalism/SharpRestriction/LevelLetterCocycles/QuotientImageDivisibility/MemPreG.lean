@@ -206,8 +206,8 @@ theorem pass3 [IsDomain O] [IsPrincipalIdealRing O] [IsFractionRing O LL]
       rw [Submodule.span_le]
       rintro _ ⟨α, rfl⟩
       refine ⟨_, ?_, rfl⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Submodule.sum_mem _ fun k _ => by
         rw [map_smul]; exact Submodule.smul_mem _ _ (hletter k)
     exact (Submodule.finrank_mono hsub).trans hRk

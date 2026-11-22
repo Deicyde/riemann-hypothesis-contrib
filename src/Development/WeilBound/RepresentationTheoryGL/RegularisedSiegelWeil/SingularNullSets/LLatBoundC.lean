@@ -49,8 +49,8 @@ theorem compAt_mt_GfC (θ : InfFam D) (V : HSp D) {k : GA D V} (hk : k ∈ GfC V
   simp only [compAt, Matrix.map_apply, hij, Matrix.one_apply]
   split_ifs <;> simp
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem gen_bound_col {θ : InfFam D} (hθ : IsInfFam θ) (V : HSp D) (n : ℕ) (y : GA D V)
     (f : SchwartzMap (D.what₂.Tau → Fin V.rank → Fin n → ℂ) ℂ)
     (g : (Fin V.rank → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ)

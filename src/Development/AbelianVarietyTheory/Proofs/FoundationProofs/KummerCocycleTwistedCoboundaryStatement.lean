@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IntegralL
 @[expose] public section
 
 open GlobalTheory.K5
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.kummer_cocycle_twisted_coboundary : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
   ∀ (T : Tower p Ω) (k : ℕ) (χ κ : Gal p Ω → ZMod (p ^ k)), IsKum T k (Ggeo p Ω) (T.qq k) κ →
   (∀ a : Gal p Ω → Ω, IntegralLocallyConstCochainModPow k (Ggeo p Ω) a → IsTwistedOneCocycle 0 k (Ggeo p Ω) χ a →

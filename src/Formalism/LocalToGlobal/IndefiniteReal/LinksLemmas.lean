@@ -135,7 +135,7 @@ namespace RealDat
 
 variable {R : RealDat D A Ks} {F : Face D A}
 
-set_option maxHeartbeats 1000000 in
+
 theorem kFormR_of (hM : R.IsModels) : (R.toCx F).KFormR := by
   intro t
   have hB := Formalism.IndefR.Bridge.ClassPres.extBij_holds (R.B.R t).pres
@@ -144,7 +144,7 @@ theorem kFormR_of (hM : R.IsModels) : (R.toCx F).KFormR := by
     (Formalism.L2.DIV.CSD.basis _) (Module.Basis.ofVectorSpace _ _) hB.1
   exact ⟨Tw.linInd' (E := (R.HX t).H) _ h.1, Tw.span_top' (E := (R.HX t).H) _ h.2⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem kFormL_of (hM : R.IsModels) : (R.toCx F).KFormL := by
   intro i t
   have hB := Formalism.IndefR.Bridge.ClassPres.extBij_holds (R.B.L i t).pres
@@ -154,7 +154,7 @@ theorem kFormL_of (hM : R.IsModels) : (R.toCx F).KFormL := by
   exact ⟨Tw.linInd' (E := (R.HV i t).H) _ h.1, Tw.span_top' (E := (R.HV i t).H) _ h.2⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jIsoR_gen (hM : R.IsModels) (cv : CrdV A.fam.amb)
     (hcv : ∀ t x y, cv.hR t x y = (A.fam.R t).S.csum ((x : (A.fam.R t).S.Forms) : (A.fam.R t).S.Cl → (A.fam.R t).S.V) ((y : (A.fam.R t).S.Forms) : (A.fam.R t).S.Cl → (A.fam.R t).S.V)) :
     (R.toCx F).JIsoR cv := by
@@ -171,7 +171,7 @@ theorem jIsoR_of (hM : R.IsModels) : (R.toCx F).JIsoR (cvOf A F.P0 F.ψ0 F.P1 F.
   jIsoR_gen hM _ fun _ _ _ => rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem jIsoL_gen (hM : R.IsModels) (cv : CrdV A.fam.amb)
     (hcv : ∀ i t x y, cv.hL i t x y = (A.fam.L i t).S.csum ((x : (A.fam.L i t).S.Forms) : (A.fam.L i t).S.Cl → (A.fam.L i t).S.V) ((y : (A.fam.L i t).S.Forms) : (A.fam.L i t).S.Cl → (A.fam.L i t).S.V)) :
     (R.toCx F).JIsoL cv := by

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SumLieC
 @[expose] public section
 
 open NumberField MeasureTheory Matrix GlobalTheory.CuspRep GlobalTheory.JSW
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.hasFDerivAt_realLieChart_kernelOperator_at_one : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (X : Type) [MeasurableSpace X] (ν : Measure X)
     (k : X → ℂ) (γ : X → GL (Fin a) (Cinf E)), IsRapidInf ν k γ → ∀ φ : Sm E a, (∃ C : ℝ, ∀ g, ‖φ.1 g‖ ≤ C) →
     (∀ i, ∃ C : ℝ, ∀ g, ‖(lie E a (lieBasis E a i) φ).1 g‖ ≤ C) → ∀ g,

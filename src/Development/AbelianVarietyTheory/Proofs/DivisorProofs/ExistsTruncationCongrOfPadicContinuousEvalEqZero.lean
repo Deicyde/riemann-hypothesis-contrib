@@ -71,8 +71,8 @@ theorem trunc_dec : ∀ (p : ℕ) (O A : Type) [CommRing O] [CommRing A] [Algebr
       · simp [hαF, h]
       · simp [hαF, h]
     have hQmem : MvPolynomial.aeval x Q ∈ Ideal.span (Set.range x) ^ N := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hQ, map_sum]
+
+      rw [hQ, map_sum]
       refine Ideal.sum_mem _ fun α hα => aeval_monomial_mem_span_pow x N α ?_ _
       exact not_lt.1 (Finset.mem_filter.1 hα).2
     have hsplit : MvPolynomial.aeval x P = -(MvPolynomial.aeval x Q) -

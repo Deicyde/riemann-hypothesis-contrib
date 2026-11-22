@@ -26,7 +26,7 @@ open scoped Matrix TensorProduct
 namespace GlobalTheory.KeyCover
 
 
-set_option maxHeartbeats 1000000 in
+
 attribute [local instance 1100] Subalgebra.algebra in
 attribute [local instance 100] IntermediateField.instAlgebraSubtypeMem in
 theorem nonempty_keySec_of_family (E : Type) [Field E] [NumberField E] [IsCMField E]

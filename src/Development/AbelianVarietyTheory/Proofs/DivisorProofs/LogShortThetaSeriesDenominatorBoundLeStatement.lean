@@ -16,7 +16,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelA
 open GlobalTheory.BadCount
 open scoped TensorProduct
 open GlobalTheory.CovInt IsDedekindDomain
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.log_shortThetaSeriesDenominatorBound_le : ∃ C : ℝ, 0 ≤ C ∧ ∀ (D : D7) (T : CoreJ D) (j : ℕ) (Y : Deep T.toCore j) (e : ℕ) (o Lb : ℝ)
     (a : (D.host.E →+* ℂ) × ℕ → ℕ) (n : ℕ), GlobalTheory.CovGmin.Hyp D T j Y e o Lb a n →
     0 < intZ D (T.Q.Dw j) Y.d.l₂ n a ∧

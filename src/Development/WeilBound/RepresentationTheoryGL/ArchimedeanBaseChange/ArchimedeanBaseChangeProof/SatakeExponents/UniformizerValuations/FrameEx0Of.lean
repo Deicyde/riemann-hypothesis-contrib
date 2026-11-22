@@ -16,7 +16,7 @@ open scoped Classical
 
 namespace PositivityTheory.Rg.BcB.F.Ex0
 
-set_option maxHeartbeats 1000000 in
+
 theorem frameEx0_of (hW : WeightEx) (hun : Rig.UnrAE) (hMu : MuEx) (hSec : SecEx) (hU : UnifEx) (hLev : LevelEx) (hS : SplitEx)
     (hB : BadEx2) (hK : KEx) (hT : TranslEx) (hC : ChainEx) (hA : ArchEx) (hWx : F0.WEx) : FrameEx0 := by
   intro hR E _ _ _ hE n hn π hπ S hS1

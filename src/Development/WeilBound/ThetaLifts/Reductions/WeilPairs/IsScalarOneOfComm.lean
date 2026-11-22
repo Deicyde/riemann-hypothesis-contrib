@@ -256,7 +256,7 @@ theorem scalar_const (C : Ctx σ B JS JT ξ₀ θ ι) (hG : GoodLat Λ) (hR : Ra
     (phase_rat C P.res P.half hΔ hd hN' d1 d2 (zF_rat C P.half.idem ha hb hΔ))
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem isScalar_one_of_comm (C : Ctx σ B JS JT ξ₀ θ ι) (hG : GoodLat Λ) (hR : RatSD σ JS JT ξ₀ Λ)
     (hO : IsLatRepF σ JS JT ξ₀ B.ψ hc Λ w lam Om) (P : Parts C hc lam Om η ε of oi) (hs : CartF σ JS JT ξ₀ B θ s)
     {g : GAF σ JS} {h : GAF σ JT} (hg : g ∈ GQF σ JS) (hh : h ∈ GQF σ JT)

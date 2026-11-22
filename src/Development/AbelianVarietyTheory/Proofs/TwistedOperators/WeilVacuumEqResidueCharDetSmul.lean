@@ -95,7 +95,7 @@ theorem det_mul_det_inv (V : HSp D) (g : GA D V) :
   rw [← Matrix.det_mul, ← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one, Matrix.det_one]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_detAt {χ : (AE D)ˣ →* Circle} {P : Finset (Pl D.host.E)} {es : Pl D.host.E → AE D}
     (hes : ∀ PP ∈ P, Formalism.L2.NTheta.IsIdemAt (es PP) PP) {e : AE D} {c : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ}
     (hχ : TameOn χ e P c) {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)} {g : GA D V} (hg : finE V g ∈ St β)
@@ -142,8 +142,8 @@ theorem split_cases {a : AE D} (ha : IsSplitIdem D a) {v : HeightOneSpectrum (�
 
 theorem cA_sum_mul {P : Finset (Pl D.host.E)} {es : Pl D.host.E → AE D} {a : AE D}
     (h : ∀ PP ∈ P, cA D (es PP) * a = 0) : cA D (∑ PP ∈ P, es PP) * a = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum (cA D), Finset.sum_mul]
+
+  rw [map_sum (cA D), Finset.sum_mul]
   exact Finset.sum_eq_zero h
 
 theorem unramAt_of_tame {χ : (AE D)ˣ →* Circle} {P : Finset (Pl D.host.E)} {es : Pl D.host.E → AE D}

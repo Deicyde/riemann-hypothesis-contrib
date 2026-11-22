@@ -27,7 +27,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameExponen
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.CovHt
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -129,7 +129,7 @@ theorem exists_twist {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x om : ℝ} (h
 end Free
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_section {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
     {c : Coeff l} {r : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (x : ℝ) (V : (c.F →+* ℂ) → HSp D)
     (dict : ∀ σ, GA D (V σ) → Σ k, Frame ((U σ).X k).Ψ r) (hL : GlobalTheory.FlatCore.Laws U x) (hM : 5 ^ 4 ∣ l.M) (Z : Comp Xo c)

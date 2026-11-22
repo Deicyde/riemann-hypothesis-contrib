@@ -29,8 +29,8 @@ theorem small_eventually {ι A M : Type} [Finite ι] [TopologicalSpace A] [Zero 
   exact hsub (fun i _ => Set.mem_iInter.mp (hk (hw i)) i)
 
 open GlobalTheory.CompanionTheory.SiegelND.Coef.TestN in
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem approxId_of (h1 : OneD) : ApproxId := by
   classical
   intro D t ψ hψ S e he lam hlam

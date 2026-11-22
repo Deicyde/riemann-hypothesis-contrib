@@ -33,12 +33,12 @@ theorem Aw_away {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} {τ : D.what₂.
   unfold Aw
   rw [e]
 
-set_option maxHeartbeats 800000 in
+
 theorem mat_ww (w : G D n) (hw : mat w = blk4 0 1 (-1) 0) : mat (w * w) = blk4 (-1) 0 0 (-1) := by
   rw [mat_mul', hw, submatrix_fromBlocks_mul]
   simp
 
-set_option maxHeartbeats 800000 in
+
 theorem inv_eq_www (w : G D n) (hw : mat w = blk4 0 1 (-1) 0) : w⁻¹ = w * w * w := by
   apply mat_inj
   rw [GlobalTheory.CompanionTheory.EisCovar.Weyl.mat_inv_eq w hw, mat_mul', mat_ww w hw, hw, submatrix_fromBlocks_mul]

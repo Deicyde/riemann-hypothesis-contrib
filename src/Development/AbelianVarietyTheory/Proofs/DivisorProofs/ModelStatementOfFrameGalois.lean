@@ -49,7 +49,7 @@ theorem exists_lift_subquot {A V : Type} [Ring A] [AddCommGroup V] [Module A V] 
     exact (congrArg N'.mkQ hg).trans (map_zero _)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem winputs_of_simple {ι : Type} [DecidableEq ι] (P : Formalism.CohomologicalDescent.LogSmallConstantBounds.Par) (W : Wts ι) (X : HidaSetting ι P.Nr W.lam) (l : ℕ) (ϖ : X.O)
     (n₀ : ℕ) (e : ι → (Fin P.Nr → ℕ) → X.A) (hfin : Finite (X.O ⧸ Ideal.span {(l : X.O)})) (hd : (l : X.O) ∣ ϖ ^ n₀)
     (hA : X.FrameA e) (hS : HeckeStable X.O X.Γ X.jK X.T (NablaT X.O P.Nr W.lam))

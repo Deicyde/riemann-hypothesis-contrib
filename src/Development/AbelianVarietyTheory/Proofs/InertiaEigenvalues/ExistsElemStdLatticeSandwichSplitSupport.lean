@@ -16,7 +16,7 @@ open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam foc
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace GlobalTheory.SuppLatStd
 
@@ -51,7 +51,7 @@ end GlobalTheory.SuppLatStd
 namespace GlobalTheory.SuppLatStd
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem lat_std_of_suppAt : ∀ (D : D7) (V : HSp D), V.gram = 1 → Bridge.hLat V 1 = Formalism.L2.Pj.stdLat D.host.E V.rank → ∀ (h : GA D V) (e : AE D) (Ps : Finset (Formalism.L2.DIV.Pl D.host.E)) (bad : ℕ), IsIdemSum e Ps → (∀ PP ∈ Ps, ((bad : ℕ) : 𝓞 D.host.E) ∉ PP.asIdeal) → SuppAt e V h → ∃ m : 𝓞 D.host.E, m ≠ 0 ∧ Ideal.span {m} • Bridge.hLat V (finPt V h) ≤ Formalism.L2.Pj.stdLat D.host.E V.rank ∧ Ideal.span {m} • Formalism.L2.Pj.stdLat D.host.E V.rank ≤ Bridge.hLat V (finPt V h) ∧ ∀ P : Ideal (𝓞 D.host.E), P.IsPrime → m ∈ P → P.map (GlobalTheory.IdemSupport.cO D : 𝓞 D.host.E →+* 𝓞 D.host.E) ≠ P ∧ ((bad : ℕ) : 𝓞 D.host.E) ∉ P := by
   intro D V hg hL h e Ps bad he hbad hs
   classical
@@ -64,12 +64,12 @@ theorem lat_std_of_suppAt : ∀ (D : D7) (V : HSp D), V.gram = 1 → Bridge.hLat
   simp only [← hev] at hid hcj
   obtain ⟨⟨es, hes, hsum⟩, horth⟩ := he
   have e1 : ∀ Q ∈ Ps, ev Q e = 1 := fun Q hQ => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum, Finset.sum_eq_single Q (fun Q' h' hne => (hid _ _ (hes Q' h')).2.2 Q hne.symm)
-      (fun h' => absurd hQ h'), (hid _ _ (hes Q hQ)).2.1]
+
+    rw [hsum, map_sum, Finset.sum_eq_single Q (fun Q' h' hne => (hid _ _ (hes Q' h')).2.2 Q hne.symm)
+    (fun h' => absurd hQ h'), (hid _ _ (hes Q hQ)).2.1]
   have e2 : ∀ Q, Q ∉ Ps → ev Q e = 0 := fun Q hQ => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum]
+
+    rw [hsum, map_sum]
     exact Finset.sum_eq_zero fun Q' h' => (hid _ _ (hes Q' h')).2.2 Q fun hh => hQ (hh ▸ h')
   have hP : ∀ Q ∈ Ps, GlobalTheory.IdemSupport.cP Q ∉ Ps := fun Q hQ hQ' => by
     have a := congrArg (ev (GlobalTheory.IdemSupport.cP Q)) horth

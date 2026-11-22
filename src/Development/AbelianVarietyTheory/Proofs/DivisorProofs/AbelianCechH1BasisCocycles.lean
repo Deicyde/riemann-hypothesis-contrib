@@ -71,8 +71,8 @@ theorem cech_free : ∀ (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRin
       rw [Submodule.coe_sum]
       simp only [Submodule.coe_smul]
       exact GlobalTheory.CechCmp.toPos_lc B.hom U hU hinf cc b
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_sum]
+
+    rw [this, map_sum]
     exact Finset.sum_congr rfl fun a _ => by rw [map_smul, hbP]
   have hmem : ∀ cc : Fin g → A, GlobalTheory.CechCmp.toPos B.hom U hU hinf
       (fun i j => ∑ a, constFn B.hom (U i ⊓ U j) (cc a) * b a i j) ∈ CatCoh.Z1 F := by

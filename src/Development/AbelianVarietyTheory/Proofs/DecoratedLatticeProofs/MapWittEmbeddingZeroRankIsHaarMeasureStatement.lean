@@ -26,6 +26,6 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Form
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam ValuativeRel
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isHaarMeasure_map_emb0_of_rank_zero_decomposition : ∀ (D : D7) (S S₀ : HSp D) (d : HypDec S S₀ 0) (μ : Measure (GA D S₀)), μ.IsHaarMeasure → (Measure.map d.emb0 μ).IsHaarMeasure := by
   first | exact @GlobalTheory.HaarEmb.map_wittEmbedding_zero_rank_isHaarMeasure | exact GlobalTheory.HaarEmb.map_wittEmbedding_zero_rank_isHaarMeasure | (intros; apply GlobalTheory.HaarEmb.map_wittEmbedding_zero_rank_isHaarMeasure <;> assumption)

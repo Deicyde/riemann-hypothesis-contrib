@@ -52,7 +52,7 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Da
   [IsDomain R] [CommRing R'] [IsDomain R'] {I : Ideal R} {I' : Ideal R'} {f : O' →+* R} {u : R} {χ : Sp R ⟶ Y.X}
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem level_specialises (hL : Laws) (hL₂ : Laws2) (hT : TwistBaseChangeStatement) (hR : AdmBase R I)
     (hR' : AdmBase R' I') (W : ArcWit Y a I f u χ) (hχ : χ ≫ Y.s = spMap f ≫ spMap b) {g : R →+* R'}
     {G' : Over (Sp R')} [GrpObj G'] [IsCommMonObj G'] {bc : G' ≅ (Over.pullback (specOf g)).obj W.t.G}
@@ -199,7 +199,7 @@ theorem level_specialises (hL : Laws) (hL₂ : Laws2) (hT : TwistBaseChangeState
       (congrArg (fun r => val (q₀.g.s z) r y J) hπκ.symm)).trans (gv z _ hz _ (spMap π) y J J' hJ hJ')
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem specialise (hL : Laws) (hL₂ : Laws2) (hT : TwistBaseChangeStatement) (hU : UnifBaseChangeSt) (h5 : Laws5)
     (hR : AdmBase R I) (hR' : AdmBase R' I') (hf : Function.Injective f) (W : ArcWit Y a I f u χ)
     (hχ : χ ≫ Y.s = spMap f ≫ spMap b) (g : R →+* R') (hI : I.map g ≤ I') (hu : g u ≠ 0)

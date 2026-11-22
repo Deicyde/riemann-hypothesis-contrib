@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 @[expose] public section
 
 open scoped SchwartzMap Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_pairing_coordinates_schrodinger_folland : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
     (P : V → V → ℝ), GlobalTheory.ArchUniq.IsPairing P → ∀ n : ℕ, Module.finrank ℝ V = n →
     ∃ (C : V ≃L[ℝ] EuclideanSpace ℝ (Fin n)) (φ : (V × V) ≃ₗ[ℝ] (Fin n ⊕ Fin n → ℝ)),

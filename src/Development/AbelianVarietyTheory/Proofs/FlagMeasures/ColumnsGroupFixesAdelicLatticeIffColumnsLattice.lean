@@ -16,8 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicColumnL
 open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 noncomputable section
 
@@ -81,8 +81,8 @@ theorem mem_span_q (hw : WittX X u wt) (y : (VS D).V) (he : ∀ a, (VS D).hT (X.
       X.crd (∑ k, f k) = ∑ k, X.crd (f k) := by
     intro f
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [HidaSetting.crd, crdOf, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
+
+    simp only [HidaSetting.crd, crdOf, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
   have crd_inj : ∀ v w : (VS D).V, X.crd v = X.crd w → v = w := by
     intro v w h
     apply X.bas.repr.injective
@@ -116,23 +116,23 @@ theorem mem_span_q (hw : WittX X u wt) (y : (VS D).V) (he : ∀ a, (VS D).hT (X.
     intro b
     have h0 := he b
     rw [hy'] at h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Fintype.sum_sum_type, famQ, hqe, X.ee, X.ef, (X.zu_orth u b).1] at h0
+
+    simp [map_sum, Fintype.sum_sum_type, famQ, hqe, X.ee, X.ef, (X.zu_orth u b).1] at h0
     simpa using h0
   have hE : ∀ b, X.ιE (t (Sum.inr (Sum.inl b))) = 0 := by
     intro b
     have h0 := hf b
     rw [hy'] at h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Fintype.sum_sum_type, famQ, hqf, X.ff, hT_fe, (X.zu_orth u b).2] at h0
+
+    simp [map_sum, Fintype.sum_sum_type, famQ, hqf, X.ff, hT_fe, (X.zu_orth u b).2] at h0
     simpa using h0
   have hZ : ∀ x : Unit, X.ιE (t (Sum.inr (Sum.inr (Sum.inr x)))) = 0 := by
     intro x
     cases x
     have h0 := hz
     rw [hy'] at h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Fintype.sum_sum_type, famQ, hqz, hT_ze, hT_zf, hT_zz_ne X u] at h0
+
+    simp [map_sum, Fintype.sum_sum_type, famQ, hqz, hT_ze, hT_zf, hT_zz_ne X u] at h0
     simpa using h0
   refine ⟨fun j => X.ιE (t (Sum.inl j)), ?_⟩
   conv_lhs => rw [hy']

@@ -103,8 +103,8 @@ theorem mem_latHat_iff :
       funext i
       apply ext_components
       intro v
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [ea v i, Finset.sum_apply, map_sum]
+
+      rw [ea v i, Finset.sum_apply, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [Algebra.TensorProduct.map_tmul, hA]
       rfl

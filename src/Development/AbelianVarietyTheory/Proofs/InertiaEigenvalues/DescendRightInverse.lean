@@ -29,9 +29,9 @@ theorem GlobalTheory.BKLim.descend_rightInverse : ∀ (l : ℕ) [Fact l.Prime] (
   rw [Matrix.sub_apply] at hy
   have hy' := sub_eq_iff_eq_add.1 hy
   have hG : (R * ∑ k ∈ t.support, t k • (a.map (TB.c k))) i j = ∑ k ∈ t.support, t k * TB.c k ((R.map bk.ev * a) i j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.sum_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
-      Finset.mul_sum, map_sum, TB.c_mul]
+
+    simp only [Matrix.mul_apply, Matrix.sum_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
+    Finset.mul_sum, map_sum, TB.c_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   rw [Matrix.sub_apply, hG, hy']

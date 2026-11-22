@@ -321,8 +321,8 @@ theorem dual_expand {K : Type} [Field K] {D : ℕ} (f : Module.Dual K (Fin D →
     ext k
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [he]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, map_smul]
+
+  simp [map_sum, map_smul]
 
 theorem map_expand {K : Type} [Field K] {a D : ℕ} (B : (Fin a → K) →ₗ[K] Module.Dual K (Fin D → K))
     (φ : Fin a → K) (e : Fin D → K) : B φ e = ∑ i, φ i * B (Pi.single i 1) e := by
@@ -330,8 +330,8 @@ theorem map_expand {K : Type} [Field K] {a D : ℕ} (B : (Fin a → K) →ₗ[K]
     ext k
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [hφ]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, map_smul, LinearMap.sum_apply]
+
+  simp [map_sum, map_smul, LinearMap.sum_apply]
 
 theorem pairC_transfer {K : Type} [Field K] [NumberField K] {a b n D : ℕ} (v : InfinitePlace K)
     (B : (Fin a → K) →ₗ[K] Module.Dual K (Fin D → K)) (A : (Fin b → K) →ₗ[K] Module.Dual K (Fin n → K))
@@ -348,8 +348,8 @@ theorem pairC_transfer {K : Type} [Field K] [NumberField K] {a b n D : ℕ} (v :
     ext l i
     simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, pmat, Matrix.of_apply]
     have := congrArg v.embedding (key i l)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul] at this
+
+    simp only [map_sum, map_mul] at this
     rw [this]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   rw [pairC_eq, pairC_eq, Matrix.mulVec_mulVec, ← hM, ← Matrix.mulVec_mulVec]
@@ -620,8 +620,8 @@ theorem place_bound {K : Type} [Field K] [NumberField K] [StarRing K] {n D a b :
       rw [Finset.sum_apply] at h1
       rw [Finset.sum_apply]
       try simp only []
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum v.embedding, h1]
+
+      rw [← map_sum v.embedding, h1]
       by_cases h : j = i
       · subst h
         simp

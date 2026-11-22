@@ -9,7 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCI
 
 open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZPhiPG GlobalTheory.CompanionTheory.BZPhiPG.OntoO Topology
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weyl_not_mem_closed_cell :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
       [IsNonarchimedeanLocalField k] (i t : ℕ),

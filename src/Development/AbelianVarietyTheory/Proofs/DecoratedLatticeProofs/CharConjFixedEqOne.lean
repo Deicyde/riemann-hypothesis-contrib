@@ -23,7 +23,7 @@ theorem cA_tmul (D : D7) (a : AF D.host.F) (e : D.host.E) :
     cA D (a ⊗ₜ[D.host.F] e) = a ⊗ₜ[D.host.F] star e := rfl
 
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem trace_mem (D : D7) (y : AE D) :
     ∃ b : AF D.host.F, algebraMap (AF D.host.F) (AE D) b = y + cA D y := by
   induction y using TensorProduct.induction_on with

@@ -101,9 +101,9 @@ theorem isCentralIdempotent_of_goodSeriesIdempotent {D : D7} {LL : Type} [Field 
       (Subalgebra.mem_center_iff.1 hc (MonoidAlgebra.single x (1 : ℂ)))
     simp only [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, inv_mul_cancel_left, one_mul, mul_one] at this
     rw [h, h, this]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_sum, h, ← hi, GlobalTheory.MemN.TypesInhab.coeff_mul_sum]
-      exact Finset.sum_congr rfl fun x _ => by rw [map_mul, h, h]
+
+  · rw [map_sum, h, ← hi, GlobalTheory.MemN.TypesInhab.coeff_mul_sum]
+    exact Finset.sum_congr rfl fun x _ => by rw [map_mul, h, h]
 
 section Sides
 

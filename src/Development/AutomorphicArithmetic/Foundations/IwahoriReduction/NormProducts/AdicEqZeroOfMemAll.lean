@@ -115,8 +115,8 @@ private theorem UpperTheory.Kd.K4.fiberSum_push_hecke {X X' : Type} [Group X] [G
     ∑ x' ∈ Finset.univ.filter (fun x' => π x' = x), (T (b (x' * g)) - b x') =
       T (∑ x' ∈ Finset.univ.filter (fun x' => π x' = x * π g), b x') -
         ∑ x' ∈ Finset.univ.filter (fun x' => π x' = x), b x' := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_sub_distrib, map_sum]
+
+  rw [Finset.sum_sub_distrib, map_sum]
   congr 1
   refine Finset.sum_equiv (Equiv.mulRight g) (fun y => ?_) (fun y _ => rfl)
   simp

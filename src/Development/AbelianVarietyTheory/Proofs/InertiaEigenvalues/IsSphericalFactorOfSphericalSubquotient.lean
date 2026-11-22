@@ -322,7 +322,7 @@ theorem exists_fixed_of_parInd_KO (e : (Σ a, m a) ≃ n) {W : Type} [AddCommGro
     simp only [mul_one, leviProj_leviEmb, deltaHalf_eq_one_of_KO hg, Units.val_one, one_smul] at h1
     rw [← h1, h2]
 
-set_option maxHeartbeats 1000000 in
+
 private theorem exists_parInd_fixed_ne_zero_of_subquotient (e : (Σ a, m a) ≃ n) {X : α → Type} [∀ a, AddCommGroup (X a)]
     [∀ a, Module ℂ (X a)] (σ : ∀ a, Representation ℂ (GL (m a) k) (X a)) {V : Type} [AddCommGroup V] [Module ℂ V]
     {π : Representation ℂ (GL n k) V} (h : GlobalTheory.SmGL.IsSubquotient π (multiProd e σ))

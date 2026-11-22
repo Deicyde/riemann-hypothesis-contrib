@@ -16,7 +16,7 @@ noncomputable section
 
 namespace Formalism.RepresentationBoundsCohomology.FIN
 
-set_option maxHeartbeats 1000000 in
+
 theorem rowRhoReal : StatRowRhoReal := by
   intro p _ O _ _ _ _ _ _ _ VT VT' _ _ _ _ _ _ _ _ _ _ _ _ _ _ Ek Ω _ _ _ _ _ Aw hp A T' _ _ _ _ _ _ _
     M _ _ _ _ r χ E ε T₁ T₂ _ _ _ _ ρ₁ ρ₂ inc π γ D u hu v familyMassRatio iS1 familyMassSecondLine iS2 HfV HfV' Fs Im hO hF hA hcyc hε hD hπ

@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SeriesK
 @[expose] public section
 
 open GlobalTheory.GLq GlobalTheory.MirAvg Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_irr_harishChandraInduction_thetaInv_det : ∀ (g : ℕ) [Fact g.Prime] (n : ℕ) (ψ : Gn g (n + 1) → ℂ), IsIrr ψ → ∀ θ : (ZMod g)ˣ →* ℂˣ,
     (∑ x : Gn g 1, ((θ (Matrix.GeneralLinearGroup.det x) : ℂˣ) : ℂ) * res n 1 ψ 1 x ≠ 0 →
       ∃ σ : Gn g n → ℂ, IsIrr σ ∧

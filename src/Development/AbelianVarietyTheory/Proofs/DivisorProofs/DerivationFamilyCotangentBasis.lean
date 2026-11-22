@@ -143,8 +143,8 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
       have hr : x - s ∈ I := I.sub_mem hx hsI'
       have hdr : ∀ b, dv b (x - s) = 0 := by
         intro b
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hdH, map_sub, hs, map_sum]
+
+        rw [hdH, map_sub, hs, map_sum]
         simp only [← hdH, hsmul, hdz]
         simp
       have hcot : I.toCotangent ⟨x - s, hr⟩ = 0 := by

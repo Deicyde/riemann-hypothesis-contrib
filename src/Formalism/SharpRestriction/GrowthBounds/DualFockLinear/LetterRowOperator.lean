@@ -30,7 +30,7 @@ theorem letter_operator_matches_row_operator (hT : RestTheta) (K : Type) [Field 
     · simp [hab, Ed]
   · simp [Ed]
 
-set_option maxHeartbeats 1000000 in
+
 theorem comm_A (hAdj : RestAdj) (hT : RestTheta) (hR : RestRep) {K : Type} [Field K] [CharZero K] {m : ℕ} (hm : 1 ≤ m)
     (vec : Bool) (d : ℕ)
     (A : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K → MvPolynomial (Fin (m + 1) × Fin (m + 1)) K → Module.End K (VV K m d))

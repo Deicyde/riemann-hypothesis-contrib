@@ -6,7 +6,7 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Gene
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
 
@@ -44,8 +44,8 @@ private theorem nonempty_prodIrr_equiv_of_eq_comp_cast {m n N : ℕ} (e : m = n)
   exact ⟨Representation.Equiv.refl _⟩
 
 
-set_option maxHeartbeats 1600000 in
-set_option maxHeartbeats 1600000 in
+
+
 theorem pair_irr (hF : FactorIrr k) {h N : ℕ} (y : Fin h → IrrGL (k := k)) (i j : Fin h) (hij : (j : ℕ) = i + 1)
     (hd : ∑ a, (y a).1 = N) (hirr : (prodIrr y hd).IsIrreducible) (q : ℕ) (hq : ∑ t, (![y i, y j] t).1 = q) :
     (prodIrr ![y i, y j] hq).IsIrreducible := by
@@ -98,7 +98,7 @@ def PR {h : ℕ} (f g : Fin h → IrrGL (k := k)) : Prop :=
       (prodIrr f hf).IsIrreducible → Nonempty ((prodIrr f hf).Equiv (prodIrr g hg))
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem pr_swap (hF : FactorIrr k) (hC : Comm2Irr k) {h : ℕ} (f : Fin h → IrrGL (k := k)) (i j : Fin h)
     (hij : (j : ℕ) = i + 1) : PR f (f ∘ Equiv.swap i j) := by
   refine ⟨(Equiv.sum_comp (Equiv.swap i j) (fun a => (f a).1)).symm, ?_⟩
@@ -114,7 +114,7 @@ private theorem PR_refl {h : ℕ} (f : Fin h → IrrGL (k := k)) : PR f f :=
   ⟨rfl, fun _ _ _ _ => ⟨Representation.Equiv.refl _⟩⟩
 
 private theorem PR_trans {h : ℕ} {f g g' : Fin h → IrrGL (k := k)} (h1 : PR f g) (h2 : PR g g') : PR f g' := by
-  set_option maxHeartbeats 1600000 in
+
   refine ⟨h1.1.trans h2.1, fun N hf hg' hirr => ?_⟩
   have hg : ∑ a, (g a).1 = N := h1.1.symm.trans hf
   obtain ⟨e1⟩ := h1.2 N hf hg hirr
@@ -123,7 +123,7 @@ private theorem PR_trans {h : ℕ} {f g g' : Fin h → IrrGL (k := k)} (h1 : PR 
   exact ⟨e1.trans e2⟩
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem pr_perm (hF : FactorIrr k) (hC : Comm2Irr k) {h : ℕ} (f : Fin h → IrrGL (k := k)) (σ : Equiv.Perm (Fin h)) :
     PR f (f ∘ σ) := by
   cases h with
@@ -184,7 +184,7 @@ theorem comp_firstPerm {r : ℕ} {α : Type*} (x : Fin (r + 1) → α) (j : Fin 
   · simp [firstPerm]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_pair_last (x₀ : IrrGL (k := k)) {M : ℕ} {V W U : Type} [AddCommGroup V] [Module ℂ V]
     [AddCommGroup W] [Module ℂ W] [AddCommGroup U] [Module ℂ U] (A : Representation ℂ (GL (Fin M) k) V)
     (B : Representation ℂ (GL (Fin x₀.1) k) W) (π : Representation ℂ (GL (Fin (M + x₀.1)) k) U)
@@ -199,7 +199,7 @@ theorem exists_pair_last (x₀ : IrrGL (k := k)) {M : ℕ} {V W U : Type} [AddCo
   exact ⟨IrrGL.of A hAs hAi, hp, ⟨e.symm.trans ((prod₂Equiv (IrrGL.equivOf A hAs hAi) eB.symm).trans e3)⟩⟩
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_pair_first (x₀ : IrrGL (k := k)) {M : ℕ} {V W U : Type} [AddCommGroup V] [Module ℂ V]
     [AddCommGroup W] [Module ℂ W] [AddCommGroup U] [Module ℂ U] (A : Representation ℂ (GL (Fin x₀.1) k) V)
     (B : Representation ℂ (GL (Fin M) k) W) (π : Representation ℂ (GL (Fin (x₀.1 + M)) k) U)
@@ -217,7 +217,7 @@ end Lemmas
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-set_option maxHeartbeats 1600000 in
+
 theorem moveLast : FactorIrr k → Comm2Irr k → MoveLast k := by
   intro hF hC h N x hd hirr j
   cases h with
@@ -244,7 +244,7 @@ theorem moveLast : FactorIrr k → Comm2Irr k → MoveLast k := by
     have hAi := (factor_of_equiv hF ⟨E⟩ hirr (isSmooth_prodIrr _ _) (isSmooth_prodIrr _ _)).1
     exact exists_pair_last (x j) _ _ _ (isSmooth_prodIrr _ _) hAi ⟨E⟩ ⟨eB⟩
 
-set_option maxHeartbeats 1600000 in
+
 theorem moveFirst : FactorIrr k → Comm2Irr k → MoveFirst k := by
   intro hF hC h N x hd hirr j
   cases h with

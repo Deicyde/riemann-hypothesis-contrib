@@ -36,8 +36,8 @@ theorem exists_ext (c' : VV K lam →ₛₗ[σ] W) (hs : Submodule.span ℂ (Set
   have hsw : ⊤ ≤ Submodule.span ℂ (Set.range fun j => c' (bVV K lam j)) := by
     rw [← hs, Submodule.span_le]
     rintro _ ⟨v, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← (bVV K lam).sum_repr v, map_sum]
+
+    rw [← (bVV K lam).sum_repr v, map_sum]
     refine Submodule.sum_mem _ fun j _ => ?_
     rw [map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -71,7 +71,7 @@ open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestrictio
 open Classical
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_extC_bijective_unique : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F) (F : Face D A) (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)) (v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec), GlobalTheory.Hk3.Core R F → Nonempty (FWTie T R κ v₀) → ∀ (i : Fin D.R.m) (Tp : Type) (tup : Tp → T0) (M : OMDat T.toCore R i Tp tup), M.Pins (κ i) (v₀ i (sg0 D A)) (iotaW T i) (T.x₀ ((i : ℕ) + 1) M.s0) → ∃ c : VsV D i ℂ →ₗ[ℂ] (R.cV i).W, ExtC R i (inC M.c') M.c0' c ∧ Function.Bijective c ∧ ∀ c', ExtC R i (inC M.c') M.c0' c' → c' = c := by
   intro D G _ _ Pl0 T0 A T _ R F κ v₀ _ _ i Tp tup O hP
   obtain ⟨gramR, c0R, c0L, hT, hc⟩ := hP.lift.c0

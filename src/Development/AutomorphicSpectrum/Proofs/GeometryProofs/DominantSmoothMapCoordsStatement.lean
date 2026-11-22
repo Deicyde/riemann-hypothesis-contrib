@@ -8,7 +8,7 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EtaleLo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.dominant_smooth_map_coords : ∀ (X X' : Scheme.{0}) (Ω₀ Ω : Type) [Field Ω₀] [Field Ω] (ξ : Spec (CommRingCat.of Ω₀) ⟶ X)
     (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' ⟶ X) (i : Ω₀ →+* Ω) (κ κ' : Type) (x : κ → Ω₀) (x' : κ' → Ω),
     (∀ q : X, genPt ξ ⤳ q) → (∀ q : X', genPt ξ' ⤳ q) → CoordTie ℤ ξ x → CoordTie ℤ ξ' x' →

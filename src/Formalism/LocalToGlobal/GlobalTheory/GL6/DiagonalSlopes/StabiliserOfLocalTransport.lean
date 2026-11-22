@@ -19,8 +19,8 @@ section Gen
 variable {D : D7} {u : D.what₂.Word} {i : ℕ} {hi : i ≤ D.R.m}
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem class_lattice_le_dual (K : ClsTied u i hi) (c : (D.mem u).C.cls i) : clsCrd D u i hi c ≤ Ld D u i hi c := by
   intro x hx
   apply Submodule.subset_span
@@ -40,7 +40,7 @@ theorem class_lattice_le_dual (K : ClsTied u i hi) (c : (D.mem u).C.cls i) : cls
   exact bwL_descent _ _ _ h
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem dual_base_lattice_full (K : ClsTied u i hi) :
     Formalism.L2.GlobalTheoryTheory.Comp.IsLat (Formalism.L2.GlobalTheoryTheory.Comp.dl (sigD D) (gramN D i hi) K.lev.Lb) := by
   have hLb : Submodule.IsLattice D.host.E K.lev.Lb :=
@@ -59,8 +59,8 @@ theorem dual_base_lattice_full (K : ClsTied u i hi) :
   exact Submodule.span_mono (fun x hx => Submodule.subset_span (K.lev.Lb_int x hx))
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem dual_class_lattice_eq_global (K : ClsTied u i hi) (c : (D.mem u).C.cls i) :
     Ld D u i hi c = Formalism.UG.CS.globLat (K.y c).1
       (Formalism.L2.GlobalTheoryTheory.Comp.dl (sigD D) (gramN D i hi) K.lev.Lb) := by
@@ -86,8 +86,8 @@ theorem dual_class_lattice_eq_global (K : ClsTied u i hi) (c : (D.mem u).C.cls i
     exact h
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem mem_local_dual_lattice_iff (K : ClsTied u i hi) (c : (D.mem u).C.cls i)
     (v : HeightOneSpectrum (𝓞 D.host.F)) (x : Fin (D.R.N i) → D.host.E ⊗[D.host.F] v.adicCompletion D.host.F) :
     x ∈ latS (F := D.host.F) (v.adicCompletion D.host.F) (intV D.host.E v) (Ld D u i hi c) ↔
@@ -100,8 +100,8 @@ theorem mem_local_dual_lattice_iff (K : ClsTied u i hi) (c : (D.mem u).C.cls i)
     exact Formalism.L2.GlobalTheoryTheory.Comp.mem_hat_glob (dual_base_lattice_full K) _ x) x
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem mem_local_dual_lattice_iff' (K : ClsTied u i hi) (c : (D.mem u).C.cls i) (v : HeightOneSpectrum (𝓞 D.host.F))
     (x : Fin (D.R.N i) → D.host.E ⊗[D.host.F] v.adicCompletion D.host.F) :
     x ∈ latS (F := D.host.F) (v.adicCompletion D.host.F) (intV D.host.E v) (Ld D u i hi c) ↔

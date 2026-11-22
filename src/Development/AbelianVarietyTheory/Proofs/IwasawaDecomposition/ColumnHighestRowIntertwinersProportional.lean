@@ -81,8 +81,8 @@ theorem exists_totalDegree_le_of_finiteDimensional {X : Type} [AddCommGroup X] [
     [FiniteDimensional ℂ X] (Φ : X →ₗ[ℂ] Pol ι m n) : ∃ d, ∀ x, (Φ x).totalDegree ≤ d := by
   let b := Module.finBasis ℂ X
   refine ⟨Finset.univ.sup fun j => (Φ (b j)).totalDegree, fun x => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← b.sum_repr x, map_sum]
+
+  rw [← b.sum_repr x, map_sum]
   refine totalDegree_finsetSum_le fun j _ => ?_
   rw [map_smul]
   exact (totalDegree_smul_le _ _).trans
@@ -109,12 +109,12 @@ theorem colHighest_intertwiner_proportional :
     intro τ k l x
     obtain ⟨s, c, hc⟩ := GlobalTheory.DefLift.exists_sum_rowSub_eq_rowLie ι m n (max d₁ d₂) τ k l
     refine ⟨∑ u ∈ s, c u • π τ u x, ?_, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [← hc _ ((hd₁ x).trans (le_max_left _ _)), map_sum]
-        exact Finset.sum_congr rfl fun u _ => by rw [map_smul, (heq τ u x).1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [← hc _ ((hd₂ x).trans (le_max_right _ _)), map_sum]
-        exact Finset.sum_congr rfl fun u _ => by rw [map_smul, (heq τ u x).2]
+
+    · rw [← hc _ ((hd₁ x).trans (le_max_left _ _)), map_sum]
+      exact Finset.sum_congr rfl fun u _ => by rw [map_smul, (heq τ u x).1]
+
+    · rw [← hc _ ((hd₂ x).trans (le_max_right _ _)), map_sum]
+      exact Finset.sum_congr rfl fun u _ => by rw [map_smul, (heq τ u x).2]
   obtain ⟨_, ⟨x, rfl⟩, hx0, hhi, κ, hκ⟩ := GlobalTheory.exists_highest_vector
     (fun τ k l => (rowLie n τ k l : Module.End ℂ (Pol ι m n)))
     (fun t t' i k l => by convert rowLie_diag_comm (n := n) t t' i k l)

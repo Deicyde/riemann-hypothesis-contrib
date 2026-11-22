@@ -25,8 +25,8 @@ open GlobalTheory.TopFlip
 
 open scoped nonZeroDivisors
 
-set_option maxHeartbeats 1600000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 noncomputable section
 

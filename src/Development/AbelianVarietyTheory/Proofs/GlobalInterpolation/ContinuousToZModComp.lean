@@ -203,8 +203,8 @@ theorem pu_iT (z : VCx X.Tau a b) : (fun τ => pu s z (s.iT τ)) = z := by funex
 
 theorem mat_sum {r : ℕ} (c : Fin r → ℕ) (β : Fin r → HomE X.E a b) :
     mat s (∑ i, (c i : X.E) • β i) = ∑ i, (c i : D.host.E) • mat s (β i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Nat.cast_smul_eq_nsmul, map_nsmul]
+
+  simp only [map_sum, Nat.cast_smul_eq_nsmul, map_nsmul]
 
 variable {s} (hs : s.Ok)
 include hs
@@ -295,13 +295,13 @@ theorem pairN_nat {D : D7} {N N' r : ℕ} (Ω : ℂ_[p]) (b : Fin r → Matrix (
     simp only [TaylorLogMetric.hYY, Matrix.add_apply, mul_add, Finset.sum_add_distrib, map_add (f := _)]
   have h : TaylorLogMetric.hYY D y (∑ i, (c i : D.host.E) • b i) = ∑ i, (c i : D.host.K) * TaylorLogMetric.hYY D y (b i) := by
     change f _ = ∑ i, (c i : D.host.K) * f (b i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Nat.cast_smul_eq_nsmul, map_nsmul, nsmul_eq_mul]
+
+    simp only [map_sum, Nat.cast_smul_eq_nsmul, map_nsmul, nsmul_eq_mul]
   rw [TaylorLogMetric.pairN, h]
   simp only [lamHom_apply, zc_nat]
   push_cast
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_natCast]
+
+  simp only [map_sum, map_mul, map_natCast]
 
 theorem continuous_pairN {D : D7} {N N' r : ℕ} (Ω : ℂ_[p]) (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
     (y : Matrix (Fin N') (Fin N) D.host.E) : Continuous (TaylorLogMetric.pairN D lam Ω b y) :=
@@ -436,8 +436,8 @@ theorem ptMom : ∀ (D : D7) (X : Fields) (s : Seam D X) (cc : Ideal (𝓞 D.hos
     · rw [hjet]; exact mul_mem hα (mul_mem c1 (mul_mem f1 (hC _)))
     · rw [hjet, lamC_mul lam hα (mul_mem c1 (mul_mem f1 (hC _))), lamC_mul lam c1 (mul_mem f1 (hC _)), lamC_mul lam f1 (hC _),
         c2, f2]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_smul, map_sum, smul_eq_mul, ← hG, ← hγ1, Finsupp.prod_mapDomain_index_inj ren_inj]
+
+      simp only [map_smul, map_sum, smul_eq_mul, ← hG, ← hγ1, Finsupp.prod_mapDomain_index_inj ren_inj]
       rfl
     · rw [ptTab_eq lam hs hι, hγ2, mat_sum]
       simp only [G, hβm, ContinuousMap.smul_apply, ContinuousMap.sum_apply, ContinuousMap.mul_apply, ContinuousMap.coe_mk, hg₀,

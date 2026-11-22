@@ -90,9 +90,9 @@ theorem bd_of_casimir (μ : Measure (GA D V)) [μ.IsHaarMeasure] (hθ : IsInfFam
   have hB0 : 0 ≤ B := add_nonneg (norm_nonneg _) (Finset.sum_nonneg fun b _ => sq_nonneg _)
   refine ⟨Real.sqrt B, Real.sqrt_nonneg _, fun φ hφ => ?_⟩
   have h2 := congrArg (fun w => ⟪io μ hθ φ, io μ hθ w⟫_ℂ) (hE φ hφ)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_smul, map_sub, map_sum, inner_smul_right, inner_sub_right, inner_sum, inner_der_der,
-    inner_self_eq_norm_sq_to_K] at h2
+
+  simp only [map_smul, map_sub, map_sum, inner_smul_right, inner_sub_right, inner_sum, inner_der_der,
+  inner_self_eq_norm_sq_to_K] at h2
   have e : ((‖io μ hθ φ‖ : ℂ) ^ 2) = ((‖io μ hθ φ‖ ^ 2 : ℝ) : ℂ) := by push_cast; rfl
   rw [show ((RCLike.ofReal ‖io μ hθ φ‖ : ℂ) ^ 2) = ((‖io μ hθ φ‖ ^ 2 : ℝ) : ℂ) from e] at h2
   have h3 := congrArg Complex.re h2
@@ -270,8 +270,8 @@ theorem bd_inf (μ : Measure (GA D V)) [μ.IsHaarMeasure] (hθ : IsInfFam θ) (E
     conv_lhs => rw [← b.sum_repr X]
     rw [derInf_sum]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, LinearMap.sum_apply, map_sum, Finset.sum_mul, Finset.sum_mul]
+
+  rw [e, LinearMap.sum_apply, map_sum, Finset.sum_mul, Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
   rw [LinearMap.smul_apply, map_smul, norm_smul, Complex.norm_real]
   calc ‖f i X‖ * ‖io μ hθ (derInf hθ (b i) φ)‖ ≤ (‖f i‖ * ‖X‖) * (Λ i * ‖io μ hθ φ‖) :=

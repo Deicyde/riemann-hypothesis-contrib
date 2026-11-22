@@ -18,7 +18,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
@@ -47,7 +47,7 @@ theorem mem_rJ_iff_finE_mem_St_and_block_mem (W : _root_.GlobalTheory.MiS.RealPa
   have key := (GlobalTheory.LevYZero.lev_datY_zero (Yc D 0) ((_root_.GlobalTheory.Fam.pk_z W).βY 0) _ D.R.r D.R.t (r_le_Y 0) hn (_root_.GlobalTheory.Fam.pk_z W).Pg (_root_.GlobalTheory.Fam.complexLevelStructure W) (_root_.GlobalTheory.Fam.pk_z W).chi
     (fun _ => 1) rfl (finE (Yc D 0) y) (GlobalTheory.LevSplit.finE_mem_UA _ y)).1
   exact Iff.trans ⟨fun h => h.2, fun h => ⟨hy, h⟩⟩ key
-set_option maxHeartbeats 1000000 in
+
 theorem main_alt_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (hW : _root_.GlobalTheory.Fam.PackageHypotheses W) (u : D.what₂.Word) (a : _root_.GlobalTheory.Fam.GeometricFamily W u) (ha : a.Is)
     (row : ∀ t, RowCh (_root_.GlobalTheory.Fam.pk_z W) (_root_.GlobalTheory.Fam.complexLevelStructure W) u a.g t) (col : ∀ t : W.P.T, ColCh u (D.chTw u (W.P.I.tup t)))
     (x : GA D (Yc D 0)) (hx : x ∈ GfC (Yc D 0)) :

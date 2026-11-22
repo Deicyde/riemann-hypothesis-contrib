@@ -119,11 +119,11 @@ theorem exists_herm_isUnit_generic {A : Type} [CommRing A] (σ : E →+* E) (δ 
   have h2 : ∑ i : C.support, s i * g i = 2 := by
     apply ha
     have hc := congrArg τ hC'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one] at hc
+
+    rw [map_sum, map_one] at hc
     simp only [map_mul τ, hf] at hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_ofNat]
+
+    rw [map_sum, map_ofNat]
     simp only [map_mul, hg, hs', add_mul]
     rw [Finset.sum_add_distrib, hC', hc, one_add_one_eq_two]
   have h3 : ∑ i : C.support, (k * s i) * g i = 1 := by
@@ -133,9 +133,9 @@ theorem exists_herm_isUnit_generic {A : Type} [CommRing A] (σ : E →+* E) (δ 
   have ha1 : ∑ i, a (e i) = 1 := by rw [← map_sum, he1, map_one]
   refine ⟨∑ i : C.support, a (e i) • i.1.1.map ι, ?_, ?_⟩
   · ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
-      map_mul, hτa, hτι]
+
+    simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
+    map_mul, hτa, hτι]
     exact Finset.sum_congr rfl fun x _ => by rw [x.1.2]
   · have : c * (∑ i : C.support, a (e i) • i.1.1.map ι) + d =
         ∑ i : C.support, a (e i) • (c * i.1.1.map ι + d) := by

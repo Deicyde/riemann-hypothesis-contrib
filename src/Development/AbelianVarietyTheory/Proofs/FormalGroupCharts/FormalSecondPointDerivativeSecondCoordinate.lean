@@ -126,8 +126,8 @@ theorem formalSecondPointDerivative_subst_first_point (v : Fin d → k) (f : PS 
 
 theorem formalSecondPointDerivative_subst_second_point (v : Fin d → k) (f : PS k 1 d) :
     dy v (ev (n := 2) ![pt k d 1] f) = C (lin v f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [dy_ev v _ (single_point_zero_constant (gp_pt 1)), vec1, evP_pt _ hX0, lin, map_sum, Fin.sum_univ_one]
+
+  rw [dy_ev v _ (single_point_zero_constant (gp_pt 1)), vec1, evP_pt _ hX0, lin, map_sum, Fin.sum_univ_one]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [ev_zero_pts _ (by intro j; fin_cases j; rfl), map_mul]
   congr 1
@@ -287,8 +287,8 @@ theorem constantCoeff_pderiv_formalSubst_two (b c : Pt k 1 d) (hb : GP b) (hc : 
       ∑ i, constantCoeff (pderiv ((0 : Fin 2), i) f) * constantCoeff (pderiv ((0 : Fin 1), l) (b i)) +
       ∑ i, constantCoeff (pderiv ((1 : Fin 2), i) f) * constantCoeff (pderiv ((0 : Fin 1), l) (c i)) := by
   rw [pderiv_ev _ (pair_points_zero_constant hb hc), Fin.sum_univ_two]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, map_mul, gt_const_ev_eq _ (pair_points_zero_constant hb hc)]
+
+  simp only [map_add (f := _), map_sum, map_mul, gt_const_ev_eq _ (pair_points_zero_constant hb hc)]
   rfl
 
 theorem quad (F : Fin d → PS k 2 d) (hF : GP F) (hU : evP (n := 1) ![pt k d 0, 0] F = pt k d 0)
@@ -345,9 +345,9 @@ theorem quad (F : Fin d → PS k 2 d) (hF : GP F) (hU : evP (n := 1) ![pt k d 0,
       zero_add, add_zero]
   refine ⟨by rw [gt_const_ev_eq _ (pair_points_zero_constant q0 hw), c0], fun u => ?_, fun u v => ?_⟩
   · rw [hD]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_mul, gt_const_ev_eq _ hX0,
-      gt_const_ev_eq _ (pair_points_zero_constant gp_zero₂ hw), c1, mul_zero, Finset.sum_const_zero, add_zero]
+
+    simp only [map_add (f := _), map_sum, map_mul, gt_const_ev_eq _ hX0,
+    gt_const_ev_eq _ (pair_points_zero_constant gp_zero₂ hw), c1, mul_zero, Finset.sum_const_zero, add_zero]
   · have hb : ∀ j, Dof F u (ev (n := 1) ![pt k d 0, 0] (pderiv ((1 : Fin 2), j) g)) =
         C (∑ i, u i * coeff (Finsupp.single ((0 : Fin 2), i) 1 + Finsupp.single ((1 : Fin 2), j) 1) g) := by
       intro j
@@ -378,8 +378,8 @@ theorem quad (F : Fin d → PS k 2 d) (hF : GP F) (hU : evP (n := 1) ![pt k d 0,
           formalComp_zero_left_point _ hF, formalComp_zero_left_point _ p0, formalComp_zero_left_point _ p1,
           ← dz_add_right F hF g hr _ _ w0 w1, hom]
     rw [hD, GE.dof_add, GE.dof_sum, GE.dof_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GE.dof_C_mul, ha, hb, ← map_mul, ← map_sum, ← map_add (f := _), lin, const_pderiv]
+
+    simp only [GE.dof_C_mul, ha, hb, ← map_mul, ← map_sum, ← map_add (f := _), lin, const_pderiv]
 
 section BaseChange
 

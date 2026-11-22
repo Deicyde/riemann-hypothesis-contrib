@@ -69,7 +69,7 @@ theorem lim_tw {ν : Chr F E} {z : ℕ} (hz : 2 ≤ z) (m : HeightOneSpectrum (�
       rw [Set.mulIndicator_of_mem (show w ∈ {w | w ∉ above E (S : Set (Pl F))} from h), locL, charFam_of_unrAt (hν w h)]
       simp [eulerFac, eulerPoly]
 
-set_option maxHeartbeats 600000 in
+
 open Classical in
 theorem tail {B : Base F E} (hB : B.IsGood σ) {z : ℕ} (hz : 2 ≤ z) (𝔞 : FractionalIdeal (𝓞 E)⁰ E) (T T₀ : Finset (Pl F))
     (hT : T ⊆ T₀) (hm : ∀ w : HeightOneSpectrum (𝓞 E), w.under (𝓞 F) ∉ T₀ → FractionalIdeal.count E w 𝔞 = 0)
@@ -187,7 +187,7 @@ theorem euler {ν : Chr F E} {z : ℕ} (hz : 2 ≤ z) (𝔞 : FractionalIdeal (�
     have := @hT (w.under (𝓞 F))
     tauto
 
-set_option maxHeartbeats 1000000 in
+
 theorem ideleFub : IdeleFub := by
   classical
   intro F E _ _ _ _ _ σ B n X K m μ hB hm hμ 𝔞 z h𝔞 hz
@@ -235,8 +235,8 @@ theorem ideleFub : IdeleFub := by
       κa * (idealVal ν 𝔞 : ℂ) * charL ν (S₀ : Set (Pl F)) (z : ℂ) :=
     euler hz 𝔞 fin hS hT hν hram _ hu2 _ t2
   have hsum : (io (rest ∅) : AE F E) = ∑ v ∈ T, io (idem F v) + io (rest T) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sum_rest T, io, map_add (f := _), map_sum]; rfl
+
+    rw [sum_rest T, io, map_add (f := _), map_sum]; rfl
   obtain ⟨p1, p2⟩ := sy.prod (fun v => io (idem F v)) hv (fun _ _ h => io_orth (idem_orth h)) _ (hi T) γ hγ (β T) (hβ T) T
     (fun v h => io_orth (idem_rest h))
     (fun T' h => co_I (sy.good_sum _ hv (fun _ _ h => io_orth (idem_orth h)) _ (hi T) T' fun v h' => io_orth (idem_rest (h h')))

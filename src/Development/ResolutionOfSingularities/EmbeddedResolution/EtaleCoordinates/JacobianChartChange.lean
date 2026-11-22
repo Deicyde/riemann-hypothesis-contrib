@@ -103,8 +103,8 @@ private theorem basisKaehler_repr_kaehlerMap (k₀ : Type*) [CommRing k₀] (ι�
       = ∑ j : ι₀, algebraMap S S' ((EtaleCoordinates.basisKaehler k₀ ι₀ S).repr ω j) •
         EtaleCoordinates.basisKaehler k₀ ι₀ S' j := by
     conv_lhs => rw [hω]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl ?_
     intro j _
     rw [map_smul, hb j]
@@ -418,8 +418,8 @@ private theorem chartPartialDeriv_chainRule {W : X.Opens} (hW : IsAffineOpen W) 
   change D f = _
   calc
     D f = ∑ i : ULift.{u} (Fin n₁), b.repr ω i • D.liftKaehlerDifferential (b i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [ω, map_sum, map_smul, Derivation.liftKaehlerDifferential_comp_D] using hsum.symm
+
+      simpa only [ω, map_sum, map_smul, Derivation.liftKaehlerDifferential_comp_D] using hsum.symm
     _ = _ := by
       refine Fintype.sum_bijective Equiv.ulift Equiv.ulift.bijective _ _ ?_
       rintro ⟨i⟩

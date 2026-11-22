@@ -14,7 +14,7 @@ open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK Mo
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 open GlobalTheory.XCharBF GlobalTheory.XCharBF.DiagCoord
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.besselStep_diagonalCoordinates_mem_complementIdeal :
     ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {F : Frames G}, Std F →
     ∀ (ρ : ℕ) (h : 2 * ρ + 2 ≤ D.R.m)

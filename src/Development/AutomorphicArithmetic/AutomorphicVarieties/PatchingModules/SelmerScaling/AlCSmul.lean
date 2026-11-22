@@ -98,11 +98,11 @@ theorem UpperTheory.V.Pa.pres :
       have ha := congrFun hr a
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at ha ⊢
       have hm : (∑ q, s q * cO q a) ∈ maximalIdeal S.OO := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← residue_eq_zero_iff, map_sum]
+
+        rw [← residue_eq_zero_iff, map_sum]
         simpa [map_mul] using ha
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hker, RingHom.mem_ker, map_sum] at hm
+
+      rw [← hker, RingHom.mem_ker, map_sum] at hm
       simpa [map_mul, hcO] using hm
     show residue S.OO (s p) = 0
     rw [residue_eq_zero_iff, ← hker, RingHom.mem_ker]
@@ -128,8 +128,8 @@ theorem UpperTheory.V.Pa.pres :
         intro k
         rw [hmulT α hα _ _ (hXm k), ← hXv k ⟨α, hα⟩, ← ho k]
         rfl
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, e2, e1, sub_self]
+
+      simp only [map_sub, map_sum, e2, e1, sub_self]
     rw [← sub_add_cancel b (∑ k, algebraMap S.OO S.Bh (o k) * Xb k)]
     refine Ideal.add_mem _ (Ideal.mem_sup_right hb'J) (Ideal.mem_sup_left ?_)
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨k, rfl⟩)
@@ -145,12 +145,12 @@ theorem UpperTheory.V.Pa.pres :
       intro j
       have hj := hαdef j (∑ a, algebraMap S.OO S.Bh (cO (i, j) a) * Xb a)
       rw [hrF _ (hb j), zero_mul, sub_zero] at hj
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hj, map_sum]
+
+      rw [← hj, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [hmulT _ (α j).2 _ _ (hXm a), hXv a (α j), ← hcO (i, j) a]
       rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [e3]
     exact hrelα

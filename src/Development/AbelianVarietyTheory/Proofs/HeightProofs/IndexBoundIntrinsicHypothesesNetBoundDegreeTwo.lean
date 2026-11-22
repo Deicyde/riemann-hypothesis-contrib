@@ -8,8 +8,8 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.DepthTie
 @[expose] public section
 
 set_option autoImplicit false
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.RunJoin GlobalTheory.RunIn GlobalTheory.FinalJoin
 

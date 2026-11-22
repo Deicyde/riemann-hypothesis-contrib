@@ -212,8 +212,8 @@ theorem sign_eq_alpha : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp
     rw [Finset.sum_congr rfl fun τ _ => this τ, ← Finset.sum_div, Finset.sum_neg_distrib, hc]
   have hcre : ((c.re : ℝ) : ℂ) = c := by
     have : starRingEnd ℂ c = c := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hc, map_sum]
+
+      rw [hc, map_sum]
       refine Finset.sum_congr rfl fun τ _ => ?_
       rw [← GlobalTheory.FockCompare.tauE_star, hns]
     exact Complex.conj_eq_iff_re.1 this
@@ -238,11 +238,11 @@ theorem sign_eq_alpha : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp
   have hsum : (∑ τ, ∑ a, ∑ b, tauE D τ (Y a b) * starRingEnd ℂ (tauE D τ (Y a b))) = c := by
     rw [hc]
     refine Finset.sum_congr rfl fun τ _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hn, map_sum]
+
+    rw [hn, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [map_mul, GlobalTheory.FockCompare.tauE_star, mul_comm]
   have h0 := GlobalTheory.RatFinIso.symplOH_ratW_finRat_neg S T v

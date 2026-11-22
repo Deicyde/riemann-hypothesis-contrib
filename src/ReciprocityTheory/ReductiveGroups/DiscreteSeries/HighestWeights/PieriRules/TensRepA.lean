@@ -49,9 +49,9 @@ theorem tensL_mul (m m' : Matrix ι ι ℂ) (S S' : V →L[ℂ] V) :
   refine ContinuousLinearMap.ext fun x => PiLp.ext fun i => ?_
   have hSS : ∀ v : V, (S * S') v = S (S' v) := fun v => rfl
   show tensL (m * m') (S * S') x i = tensL m S (tensL m' S' x) i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [tensL_apply, hSS, Matrix.mul_apply, map_sum, map_smul,
-    Finset.sum_smul, Finset.smul_sum, smul_smul]
+
+  simp only [tensL_apply, hSS, Matrix.mul_apply, map_sum, map_smul,
+  Finset.sum_smul, Finset.smul_sum, smul_smul]
   exact Finset.sum_comm
 
 theorem tensL_one : tensL (1 : Matrix ι ι ℂ) (1 : V →L[ℂ] V) = 1 := by

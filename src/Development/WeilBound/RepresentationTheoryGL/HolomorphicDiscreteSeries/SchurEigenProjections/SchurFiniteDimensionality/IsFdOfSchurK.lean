@@ -53,7 +53,7 @@ theorem isFd_of_schurK {m : ℕ} {ε : Fin m → Bool} {K : Type} [NormedAddComm
   rw [e2]
   exact he
 
-set_option maxHeartbeats 1600000 in
+
 theorem bigProjP_of (hg0 : PositivityTheory.UnitaryDecomposition.X4.IntegralGermIndependentOfSystem) (hem : PositivityTheory.UnitaryDecomposition.X4.EmbSt) : MomentP → Analysis → BigProjP := by
   intro hM hA
   obtain ⟨hVol, hDec, hIntR, hHInt, hDUp, hLip⟩ := hA

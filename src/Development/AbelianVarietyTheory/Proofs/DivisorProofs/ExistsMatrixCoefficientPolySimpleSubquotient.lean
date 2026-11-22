@@ -116,8 +116,8 @@ theorem stepT_grp_single {τ : ι} {w : Fin N → ℕ} {ψ : Gm →+ MvPolynomia
     apply MvPolynomial.algHom_ext
     intro v
     simp [hB, blockSub, Pi.mulSingle_eq_of_ne v.2, Matrix.one_apply, apply_ite (C : k →+* MvPolynomial (BVar N ι) k)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [stepT_apply, stepT_apply, sum_grp c hc ψ h.1, map_sum]
+
+  rw [stepT_apply, stepT_apply, sum_grp c hc ψ h.1, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   obtain ⟨q, hq⟩ := h.2.1 (c τ m • z)
   rw [map_mul, ← hq]
@@ -125,8 +125,8 @@ theorem stepT_grp_single {τ : ι} {w : Fin N → ℕ} {ψ : Gm →+ MvPolynomia
 
 theorem stepT_proj {τ : ι} {w : Fin N → ℕ} {ψ : Gm →+ MvPolynomial (BVar N ι) k} (h : Good c τ w ψ) (v : Fin N → ℕ) (z : Gm) :
     stepT c τ ψ (projA O N lam τ v • z) = weightedHomogeneousComponent (blockW N τ) v (stepT c τ ψ z) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [stepT_apply, stepT_apply, map_sum]
+
+  rw [stepT_apply, stepT_apply, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   have h1 : IsWeightedHomogeneous (blockW N τ) (blockEmb O N k τ (monomial m 1) * ψ (c τ m • z)) (Finsupp.weight (rowW N N) m) := by
     obtain ⟨q, hq⟩ := h.2.1 (c τ m • z)
@@ -160,8 +160,8 @@ theorem stepT_mem {τ : ι} {w : Fin N → ℕ} {ψ : Gm →+ MvPolynomial (BVar
     rw [monomial_eq, monomial_eq, C_1, C_1, one_mul, one_mul]
     simp only [Finsupp.prod, map_prod, map_pow, blockEmb, toBlock, aeval_X, dif_pos]
   have h3 : toBlock k N τ (stepT c τ ψ z) = ∑ m ∈ expSet N (res N (lam τ)), monomial m 1 * C (ψ' (c τ m • z)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [stepT_apply, map_sum]
+
+    rw [stepT_apply, map_sum]
     simp only [map_mul, h1, h2]
   have h4 : ∀ m : Fin N × Fin N →₀ ℕ, (Finsupp.weight (colW N N) m ≠ w ∨
       ∑ v : Fin N × Fin N, (N - (v.2 : ℕ)) * m v < ∑ v : Fin N × Fin N, (N - (v.1 : ℕ)) * m v) → ∀ z, ψ' (c τ m • z) = 0 :=
@@ -183,8 +183,8 @@ theorem stepT_mem {τ : ι} {w : Fin N → ℕ} {ψ : Gm →+ MvPolynomial (BVar
       (fun m hm z => by
         show C (ψ' _) = 0
         rw [h4 m (Or.inr hm), map_zero]) z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Eq.trans (Finset.sum_congr rfl fun m _ => ?_) (this.trans (Finset.sum_congr rfl fun m _ => ?_))
     · rw [map_mul, MvPolynomial.algHom_C]
       refine congrArg (· * _) ?_
@@ -219,9 +219,9 @@ theorem blockSub_blockSub (A A' : ι → Matrix (Fin N) (Fin N) k) (P : MvPolyno
   have : (blockSub k N A).comp (blockSub k N A') = blockSub k N (fun τ => A' τ * A τ) := by
     apply MvPolynomial.algHom_ext
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [blockSub, AlgHom.comp_apply, aeval_X, map_sum, map_mul, MvPolynomial.algHom_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply,
-      Finset.mul_sum, Finset.sum_mul, mul_assoc]
+
+    simp only [blockSub, AlgHom.comp_apply, aeval_X, map_sum, map_mul, MvPolynomial.algHom_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply,
+    Finset.mul_sum, Finset.sum_mul, mul_assoc]
     exact Finset.sum_comm
   exact AlgHom.congr_fun this P
 

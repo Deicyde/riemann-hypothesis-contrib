@@ -86,8 +86,8 @@ def psum (M : TRep R G) (s : G) (m : M.V) (j : ℕ) : M.V :=
 
 theorem psum_add (M : TRep R G) (s : G) (m : M.V) (i j : ℕ) :
     psum M s m (i + j) = psum M s m i + M.rho (s ^ i) (psum M s m j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [psum, Finset.sum_range_add, map_sum, pow_add, map_mul, Module.End.mul_apply]
+
+  simp only [psum, Finset.sum_range_add, map_sum, pow_add, map_mul, Module.End.mul_apply]
 
 theorem exists_cocycle [CompactSpace G] (M : TRep R G) [DiscreteTopology M.V] {s : G}
     (hc : ∀ a b : G, a * b = b * a) (hs : Dense (Subgroup.zpowers s : Set G))
@@ -109,8 +109,8 @@ theorem exists_cocycle [CompactSpace G] (M : TRep R G) [DiscreteTopology M.V] {s
 
   have hfixV : ∀ v ∈ V, ∀ j, M.rho v (psum M s m j) = psum M s m j := by
     intro v hv j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [psum, map_sum]
+
+    simp only [psum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [rho_comm M hc]
     rw [show M.rho v m = m from hv]

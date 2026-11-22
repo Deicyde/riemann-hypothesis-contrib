@@ -8,7 +8,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
 open Polynomial in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.absolutely_closed_unit_coefficient_root :
     ∀ {S : Type} [CommRing S], Aic (S := S) →
       (∀ a b : S, IsUnit (a + b) → IsUnit a ∨ IsUnit b) →

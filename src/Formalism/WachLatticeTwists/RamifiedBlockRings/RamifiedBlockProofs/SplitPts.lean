@@ -13,7 +13,7 @@ namespace Formalism.RepresentationBoundsCohomology.ringDataObjects
 
 open Formalism.NG Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities
 
-set_option maxHeartbeats 1000000 in
+
 theorem splitPts : StatSplitPts := by
   intro O _ _ Xs T t P hPc hPr
   rcases isEmpty_or_nonempty Xs with hX | hX
@@ -103,8 +103,8 @@ theorem splitPts : StatSplitPts := by
     obtain ⟨z, rfl⟩ := hrange f' hf'
     refine ⟨fun k => (bas.repr z k).1, fun k => (bas.repr z k).2, ?_⟩
     conv_lhs => rw [← bas.sum_repr z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Algebra.smul_def, map_mul, hΨa]
   · intro x a ha
@@ -153,8 +153,8 @@ theorem splitPts : StatSplitPts := by
           rw [hψ2, hσ])
         exact fun z => DFunLike.congr_fun h12 z
       have h4 := congrArg ι (ha y rfl)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at h4
+
+      rw [map_sum, map_zero] at h4
       rw [← h4]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hφy, map_mul]

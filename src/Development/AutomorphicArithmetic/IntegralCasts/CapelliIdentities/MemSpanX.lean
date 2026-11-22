@@ -38,8 +38,8 @@ theorem UpperTheory.Reformulated.B.MemSpanMonomial.mem_span_X :
       exact Nat.one_le_iff_ne_zero.mpr (hc m hm)
   refine ⟨g, ?_⟩
   ext m
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [key]
   by_cases hm : m = 0
   · subst hm

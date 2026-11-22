@@ -13,6 +13,6 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.FlatPlace GlobalTheory.LocMod GlobalTheory.SplitWeil
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.besselFrameOfGridLattice_largeDepth : Big fun ch => BesP ch := by
   first | exact @GlobalTheory.FlatPlace.Big₂ | exact GlobalTheory.FlatPlace.Big₂ | (intros; apply GlobalTheory.FlatPlace.Big₂ <;> assumption)

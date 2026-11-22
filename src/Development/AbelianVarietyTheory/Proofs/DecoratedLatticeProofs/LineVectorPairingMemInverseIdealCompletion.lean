@@ -23,7 +23,7 @@ open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Spl
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.LineDual
 

@@ -128,19 +128,19 @@ theorem exists_crystalline_epsilon_combination {l : ℕ} [Fact l.Prime] {a e : �
   have hx : x = ∑ i, ∑ k, (U (o k)).u _ (w i k • b i) := by
     apply hinj
     funext τ i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.sum_apply, hU, hw, hb]
+
+    simp only [map_sum, Finset.sum_apply, hU, hw, hb]
     rw [Finset.sum_eq_single i]
     · simp only [Pi.single_eq_same, mul_one]
       exact hwx i τ
     · intro i' _ h
       simp only [Pi.single_eq_of_ne h.symm, mul_zero, Finset.sum_const_zero]
     · simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx, map_sum]
+
+  rw [hx, map_sum]
   refine Finset.sum_induction _ (fun y => ∀ τ, lam₀ y τ = ε τ *ᵥ lam₁ y τ) hSadd hS0 fun i _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_induction _ (fun y => ∀ τ, lam₀ y τ = ε τ *ᵥ lam₁ y τ) hSadd hS0 fun k _ => ?_
   refine hSU _ _ ?_
   rw [LinearMap.map_smulₛₗ]

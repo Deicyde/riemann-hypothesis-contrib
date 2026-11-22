@@ -16,7 +16,7 @@ theorem div_small (x w Yb c : ℝ) (hw : 0 < w) (hYb : 400 ≤ Yb) (h : x * Yb �
   rw [div_le_div_iff₀ hw (by linarith)]
   linarith
 
-set_option maxHeartbeats 1600000 in
+
 theorem threshold_density_facts (K : Cst) (hK : K.Pos) : TransportedAlt K (fun _ => DensityNumericalFacts K) := by
   refine ⟨K.TM2, 1, lt_of_lt_of_le (by norm_num) (le_max_right _ _), one_pos, fun CH hCH _ _ X h => ?_⟩
   have hTLP : K.TLP ≤ CH := le_trans (le_max_left _ _) hCH

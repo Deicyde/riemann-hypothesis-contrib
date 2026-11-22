@@ -11,8 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 
@@ -102,8 +102,8 @@ theorem exists_lift {S : Type} [CommRing S] [Algebra K S] [Algebra K' S]
   · show Φ ((1 : K') ⊗ₜ[K] v) = φ v
     simp [Φ]
   · have e := congrArg Φ (sum_coord B (R := R) v)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at e
+
+    rw [map_sum] at e
     refine e.trans (Finset.sum_congr rfl fun j _ => ?_)
     simp only [Φ, Algebra.TensorProduct.lift_tmul]
     rfl

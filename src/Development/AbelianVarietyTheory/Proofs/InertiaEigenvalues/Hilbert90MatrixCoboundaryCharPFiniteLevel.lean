@@ -79,8 +79,8 @@ theorem exists_matrix_coboundary (p : ℕ) [hp : Fact p.Prime] (G : Type) [Group
       rw [mul_pow, ← map_pow, hθm, hM]
     · have h2 := hsum (fun g => ρ g θ * M g i j) (fun g n hn => by
         simp only [map_mul, RingAut.mul_apply, hn θ hθm, hMN n hn, mul_one]) g
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, Finset.mul_sum]
+
+      simp only [map_sum, Finset.mul_sum]
       rw [← h2, Finset.sum_comm]
       refine Finset.sum_congr rfl fun x _ => ?_
       simp only [map_mul, RingAut.mul_apply, Matrix.mul_apply, hρ, Finset.mul_sum]
@@ -97,8 +97,8 @@ theorem exists_matrix_coboundary (p : ℕ) [hp : Fact p.Prime] (G : Type) [Group
         funext i
         simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       have h4 := hl _ (hb θ j)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h3, map_sum] at h4
+
+      rw [h3, map_sum] at h4
       rw [← h4]
       refine Finset.sum_congr rfl fun x _ => ?_
       rw [map_smul, smul_eq_mul, mul_comm]

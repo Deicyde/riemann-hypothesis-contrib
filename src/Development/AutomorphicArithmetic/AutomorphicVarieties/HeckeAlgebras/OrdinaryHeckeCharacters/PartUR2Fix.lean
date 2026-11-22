@@ -12,7 +12,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 section SlopeTestRemainingChoices
 
@@ -68,8 +68,8 @@ private theorem key {s : HidaSetting l L Ω} (V : s.Lev) (ι : Qbar l ≃+* ℂ)
   simp only [Pi.smul_apply, e1]
   unfold toForm
   rw [e2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul]
+
+  simp only [map_sum, map_smul]
 
 end SlopeTestRemainingChoices
 

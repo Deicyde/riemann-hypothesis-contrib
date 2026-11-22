@@ -18,7 +18,7 @@ open scoped TensorProduct
 
 noncomputable section
 open Classical
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.IdeleAA
 

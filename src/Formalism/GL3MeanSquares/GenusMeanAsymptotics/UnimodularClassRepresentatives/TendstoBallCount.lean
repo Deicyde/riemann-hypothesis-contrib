@@ -8,7 +8,7 @@ public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepre
 
 open NumberField Module Filter Topology
 
-set_option synthInstance.maxHeartbeats 400000
+
 set_option synthInstance.maxSize 1024
 
 noncomputable section

@@ -27,7 +27,7 @@ private theorem mem_U_of_mem_pull_U {X X' Y : Scheme.{0}} {L : LB X} {F : X' ⟶
   simp only [LB.pull, LB.LinComb, LB.wchart] at hi
   simpa using hi
 
-set_option maxHeartbeats 1000000 in
+
 private theorem pgen_of_isGen {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X' ⟶ X}
     (w : LB.Iso L' (L.pull F)) (hw : LB.Gen.IsGen w) : PGen w := by
   intro Y f y j j' k k' h1 h2 h3 h4
@@ -50,7 +50,7 @@ private theorem pgen_of_isGen {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X
     congr 1
     exact gm_res f y _ hy _
 
-set_option maxHeartbeats 1000000 in
+
 private theorem isGen_of_pgen {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X' ⟶ X}
     (w : LB.Iso L' (L.pull F)) (hw : PGen w) : LB.Gen.IsGen w := by
   rintro ⟨a, k⟩ ⟨a', k'⟩

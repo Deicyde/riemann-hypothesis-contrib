@@ -51,10 +51,10 @@ theorem index_similitude {M M' : Type} [AddCommGroup M] [AddCommGroup M'] [Modul
     have e1 : ∀ i, j (b i) = ∑ l, J l i • b' l := fun i => by
       rw [← hbN]
       exact (b'.sum_repr _).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.smul_apply, Matrix.of_apply, smul_eq_mul, ← h, e1, Matrix.mul_apply,
-      Matrix.transpose_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
-      Finset.sum_mul, Finset.mul_sum]
+
+    simp only [Matrix.smul_apply, Matrix.of_apply, smul_eq_mul, ← h, e1, Matrix.mul_apply,
+    Matrix.transpose_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
+    Finset.sum_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   have k2 := congrArg (fun X => X.det.natAbs) key
   simp only [Matrix.det_mul, Matrix.det_transpose, Matrix.det_smul, Int.natAbs_mul, natAbs_det_gram b B hB,

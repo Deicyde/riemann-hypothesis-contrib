@@ -25,7 +25,7 @@ open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.Si
 open NumberField
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl GlobalTheory.CompanionTheory.SW.Core
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.phase_cocycle_bimultiplicative : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J →
     ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ), IsCharAF F ψ → ∀ (b : HermR (Af F) σ n)

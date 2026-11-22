@@ -18,7 +18,7 @@ namespace PositivityTheory.Rg.BcB.F.Rd.B
 open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.Rd
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem hecke_setup (hFH : FinHecke) (hBO : BlockOperatorsProductAdjoint) (hFin : FinSt) {E : Type} [Field E] [NumberField E] [IsCMField E]
     (B : Block E) (K₁ : Subgroup (GL (Fin B.a) (Af E))) (K₂ : Subgroup (GL (Fin B.b) (Af E)))
     (o₁ : IsOpen (K₁ : Set (GL (Fin B.a) (Af E)))) (c₁ : IsCompact (K₁ : Set (GL (Fin B.a) (Af E))))
@@ -89,7 +89,7 @@ theorem val_tendsto (hVC : ValCont) {E : Type} [Field E] [NumberField E] [IsCMFi
   · exact hVC B.a B.μa (B.Ma v) (t.ka v) (t.va v) t.T (fun k => χak k v) (χa v) (ht.ka v) (hA v)
   · exact hVC B.b B.μb (B.Mb v) (t.kb v) (t.vb v) t.T (fun k => χbk k v) (χb v) (ht.kb v) (hB v)
 
-set_option maxHeartbeats 2000000 in
+
 theorem blockOut_lim (hFH : FinHecke) (hVC : ValCont) (hIC : InfConv) (hIL : InfLim) (hRE : ReproEx) (hBO : BlockOperatorsProductAdjoint)
     (hFin : FinSt) {E : Type} [Field E] [NumberField E] [IsCMField E] (B : Block E)
     (W₁ W₁' : Submodule ℂ (Kinf E B.a → ℂ)) (W₂ W₂' : Submodule ℂ (Kinf E B.b → ℂ)) (hW₁ : W₁ ≤ W₁') (hW₂ : W₂ ≤ W₂')

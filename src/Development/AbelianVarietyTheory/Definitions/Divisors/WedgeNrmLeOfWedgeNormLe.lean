@@ -11,7 +11,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

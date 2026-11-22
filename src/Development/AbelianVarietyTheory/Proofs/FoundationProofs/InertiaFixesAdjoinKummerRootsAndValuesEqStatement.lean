@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFirstCh
 @[expose] public section
 
 open GlobalTheory.NeedB Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.inertia_fixes_adjoin_kummer_roots_and_values_eq : ∀ (k K Ω : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K] [Algebra (RatFunc k) K]
     [IsScalarTower k[X] (RatFunc k) K] [FiniteDimensional (RatFunc k) K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
     (N : ℕ) (ζ : Ω), 0 < N → IsPrimitiveRoot ζ N →

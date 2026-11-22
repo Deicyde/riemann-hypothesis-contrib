@@ -266,7 +266,7 @@ theorem nontrivial_leviJacquetModule_self {U : Type*} [AddCommGroup U] [Module �
   exact (Submodule.mem_bot ℂ).1 (hle hmem)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_embedding_leviParabolicInd {U : Type u} [AddCommGroup U] [Module ℂ U]
     {ρ : Representation ℂ (levi F n β) U} [ρ.IsIrreducible] (hρ : IsSmooth ρ) :
     ∃ (γ : Fin n → ℕ) (_ : Refines β γ) (W : Type u) (_ : AddCommGroup W) (_ : Module ℂ W)

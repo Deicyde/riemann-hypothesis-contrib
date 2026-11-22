@@ -85,8 +85,8 @@ theorem tensor_inner_sum_eq {ε : Fin n → Bool} {H : Type*} [NormedAddCommGrou
   rw [← Finset.mul_sum]
   congr 1
   delta tensGrp
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_apply, Submodule.coe_sum, map_sum, Finset.smul_sum, inner_sum]
+
+  simp only [Finset.sum_apply, Submodule.coe_sum, map_sum, Finset.smul_sum, inner_sum]
   rw [Finset.sum_comm]
 
 theorem pmProp_zero {ε : Fin n → Bool} {lam : Fin n → ℝ} (T : S7.KType ε (lowK ε lam))

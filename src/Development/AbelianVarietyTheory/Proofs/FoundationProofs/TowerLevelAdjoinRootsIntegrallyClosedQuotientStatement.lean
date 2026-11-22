@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerTow
 @[expose] public section
 
 open GlobalTheory.K5 GlobalTheory.KumDlog
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.towerLevelAdjoinRoots_integrallyClosed_quotient : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : Tower p Ω) (m : ℕ), 1 ≤ m → ∀ a ∈ Lev T m, ∀ b ∈ Lev T m, b ≠ 0 →
   GlobalTheory.K5.IsInt (p := p) (a / b) → a / b ∈ Lev T m := by
   intro p _ Ω _ _ hΩ T m hm a ha b hb hb0 hint

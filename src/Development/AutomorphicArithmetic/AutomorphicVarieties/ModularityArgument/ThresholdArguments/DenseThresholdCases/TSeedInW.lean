@@ -14,8 +14,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open UpperTheory.GalN.V
@@ -115,8 +115,8 @@ private theorem cc_diff {Ω L : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ
   simp
 end UpperTheory.V.Z.Sym.W
 open UpperTheory.V.Z.Sym.W UpperTheory.V.Z.Sym UpperTheory.V.Z.Win.Birth in
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem UpperTheory.V.Z.Sym.W.seedInW_alt :
     _root_.UpperTheory.V.Af.HypothesesH' → UpperTheory.V.Z.Sym.W.SeedInW := by
   intro hH K L Ω _ _ _ _ _ _ _ _ _ _ _ l _ ι c N w χ' η θ j D M hM hlM hU hχ' m ρ hm hρ hirr hpr hun hpar

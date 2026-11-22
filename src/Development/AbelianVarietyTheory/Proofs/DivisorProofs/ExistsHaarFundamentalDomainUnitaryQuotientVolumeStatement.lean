@@ -22,7 +22,7 @@ open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat 
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (sZero)
 open GlobalTheory.Mem.Th (CptF)
 open GlobalTheory.Core.Rk.IP (Pair Unram SphFun openOff integrand wcoef rcoef up)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_haar_fundamentalDomain_unitaryQuotientVolume_ne_zero : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} {G : GridData L sc} (W : G.Weil) (i j : Fin D.R.m)
     (A A' WW : HSp D) (X : Tri T A A' WW), IsBottomTri W i j X →
     ∃ (ν : Measure (GA D WW)) (𝓕 : Set (GA D WW)), ν.IsHaarMeasure ∧ IsFundamentalDomain (GQ WW) 𝓕 ν ∧ volQ WW ν ≠ 0 := by

@@ -11,7 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsionFreeO
 
 open IsLocalRing Polynomial
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_mul_mem_integralClosureOverGenericFibre : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R]
     (D : Type) [CommRing D] [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
     [Module.Finite (GlobalTheory.LocAcyc.GenFib A R) D] (s : Finset D),

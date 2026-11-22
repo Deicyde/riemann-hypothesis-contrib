@@ -93,9 +93,9 @@ theorem frame_inv_poly' (hinj : Function.Injective (algebraMap O LL)) {d : ℕ}
       PowerSeries.coeff x.1 (Hps⁻¹ k m) * sol k' x.2 m = if t = 0 ∧ k = k' then 1 else 0 := by
     intro t
     have h := congrArg (fun Q : Matrix (Fin d) (Fin d) (PowerSeries LL) => PowerSeries.coeff t (Q k k')) hinv
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, map_sum, PowerSeries.coeff_mul, hHps, Matrix.of_apply,
-      PowerSeries.coeff_mk] at h
+
+    simp only [Matrix.mul_apply, map_sum, PowerSeries.coeff_mul, hHps, Matrix.of_apply,
+    PowerSeries.coeff_mk] at h
     rw [h, Matrix.one_apply]
     by_cases hm : k = k'
     · by_cases ht : t = 0
@@ -121,14 +121,14 @@ theorem frame_inv_poly' (hinj : Function.Injective (algebraMap O LL)) {d : ℕ}
   have hQ : ∀ t < M, Q.coeff t = 0 := by
     intro t ht
     apply hinj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, hQdef, Polynomial.coeff_sub, Polynomial.finsetSum_coeff, Polynomial.coeff_C, map_sub,
-      map_sum]
+
+    rw [map_zero, hQdef, Polynomial.coeff_sub, Polynomial.finsetSum_coeff, Polynomial.coeff_C, map_sub,
+    map_sum]
     have hk : ∀ m, algebraMap O LL ((GP m * HP m).coeff t) = (PD.p : LL) ^ (2 * κ) *
         ∑ x ∈ Finset.HasAntidiagonal.antidiagonal t, PowerSeries.coeff x.1 (Hps⁻¹ k m) * sol k' x.2 m := by
       intro m
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Polynomial.coeff_mul, map_sum, Finset.mul_sum]
+
+      rw [Polynomial.coeff_mul, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun x hx => ?_
       have hx' := Finset.HasAntidiagonal.mem_antidiagonal.1 hx
       rw [hGPc, hHPc, if_pos (by omega), if_pos (by omega), map_mul, hzz x.1 (by omega),
@@ -142,9 +142,9 @@ theorem frame_inv_poly' (hinj : Function.Injective (algebraMap O LL)) {d : ℕ}
   obtain ⟨ρ, hρ⟩ := (Polynomial.X_pow_dvd_iff).2 hQ
   refine ⟨ρ, ?_⟩
   have h := congrArg (Polynomial.aeval Y) hρ
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hQdef, map_sub, map_sum, map_mul, Polynomial.aeval_C, Polynomial.aeval_X_pow, GP, HP,
-    Polynomial.aeval_X] at h
+
+  simp only [hQdef, map_sub, map_sum, map_mul, Polynomial.aeval_C, Polynomial.aeval_X_pow, GP, HP,
+  Polynomial.aeval_X] at h
   rw [← h]
   ring
 

@@ -87,8 +87,8 @@ theorem UpperTheory.Gal.W2.Seed.pRepAdj :
     refine Finset.sum_congr rfl fun k _ => ?_
     ring
   simp only [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, map_inv₀, map_sum, hreal, IsCMField.complexConj_apply_apply, Matrix.mulVec, dotProduct]
+
+  simp only [map_mul, map_inv₀, map_sum, hreal, IsCMField.complexConj_apply_apply, Matrix.mulVec, dotProduct]
   simp_rw [Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_

@@ -155,8 +155,8 @@ theorem step_pl {F : FrameData ι Ψ N M.Ω M.blk} (hF : M.IsFrame F) {zb : (Σ 
       have := hF.2.2.1 p k hp I₀ I' hI₀ hI'
       split_ifs at this ⊢ <;> simpa [uA, vA] using this
     have e' := congrArg val e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at e'
+
+    rw [map_sum] at e'
     simp only [map_mul] at e'
     rw [e']
     split_ifs <;> simp
@@ -320,8 +320,8 @@ theorem back {τ : Ψ} {a b ca cb : Fin N} {k₀ : K} (hb : (b : ℕ) = a + 1) (
       div_ne_zero h1 h0, inv_ne_zero hα, fun m => ?_, fun m => ?_⟩
     · have e1 : i (∑ I, cA (uA ⟨k, m⟩ I) * minorIJ D I (stepCols N j i₀)) =
           ∑ I, φΩ (F.u ⟨k, m⟩ I) * minorIJ (D.map i) I (stepCols N j i₀) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Finset.sum_congr rfl fun I _ => ?_
         rw [map_mul, hic, minorIJ_map]
         rfl
@@ -391,8 +391,8 @@ theorem back {τ : Ψ} {a b ca cb : Fin N} {k₀ : K} (hb : (b : ℕ) = a + 1) (
       · have e1 : θ (M.wCo (τ, a) k₀ ca cb RatFunc.X ⟨none, m⟩) = ∑ I, φΩ (M.coef ⟨k₀, m⟩ I) *
             minorIJ ((M.g τ).map φ * (1 + Matrix.single cb ca (θ RatFunc.X))) I (stepCols N j a) := by
           show θ (∑ I, _) = _
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           refine Finset.sum_congr rfl fun I _ => ?_
           rw [map_mul, hθ, ← hEθ, minorIJ_map]
           rfl

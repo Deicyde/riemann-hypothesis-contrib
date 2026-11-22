@@ -47,7 +47,7 @@ private theorem commute_of_adjoint_factorisations {H : Type*} [NormedAddCommGrou
   rw [ContinuousLinearMap.adjoint_comp, ContinuousLinearMap.adjoint_adjoint, ContinuousLinearMap.adjoint_adjoint, a] at s3
   exact s1.symm.trans s3
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.commute_heckeOperator_finiteConvolution_of_free_indicator :
     ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), 0 < n → ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (m : Measure (AdelicGLn.FiniteAdelicGL K n)) [m.IsHaarMeasure]
           (w : Pl K) (J : Subgroup (GL (Fin n) (w.adicCompletion K))), IsOpen (J : Set (GL (Fin n) (w.adicCompletion K))) → IsCompact (J : Set (GL (Fin n) (w.adicCompletion K))) →

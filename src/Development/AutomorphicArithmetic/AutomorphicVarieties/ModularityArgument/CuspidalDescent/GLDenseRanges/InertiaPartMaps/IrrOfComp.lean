@@ -170,7 +170,7 @@ private theorem absDimE (hMu : MuZ) (hME : MuZE) (hSp : Spec2) (hU : UnitEv) (hP
   · obtain ⟨g, hg⟩ := hP L Ω l n c H hA A θ hθ ι (x.comp j) lam d ξ c0 sp hsp K a₀ y e1 I _ ψ out.univ ρ hc hi hD Y hY
     exact irr_iso ⟨g, hg⟩ hi
 
-set_option maxHeartbeats 1000000 in
+
 private theorem irrOf {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω]
     [Algebra L Ω] [IsAlgClosure L Ω] {s : HidaSetting l L Ω} {n : ℕ} {V : s.Lev} {c : Coef l}
     {r : Resid V.frame c.O n} {B : UniversalOrdinaryDeterminantRing r} (x : B.Pt) (hx : UpperTheory.V.J.IrrPt x)

@@ -67,8 +67,8 @@ theorem sb_mul {n : ℕ} {a : Fin n → Fin dd → MvPowerSeries τ C} (ha : ∀
 theorem sb_sum {n : ℕ} {a : Fin n → Fin dd → MvPowerSeries τ C} (ha : ∀ j, Zc (a j)) {α : Type} (s : Finset α)
     (f : α → PS C n dd) : sb a (∑ x ∈ s, f x) = ∑ x ∈ s, sb a (f x) := by
   unfold sb
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← coe_substAlgHom (hasSubst_sb ha), map_sum]
+
+  simp only [← coe_substAlgHom (hasSubst_sb ha), map_sum]
 
 theorem sb_zero {n : ℕ} {a : Fin n → Fin dd → MvPowerSeries τ C} (ha : ∀ j, Zc (a j)) :
     sb a (0 : PS C n dd) = 0 := by
@@ -126,8 +126,8 @@ theorem cc_pderiv_ex (i l : Fin dd) :
   have e : sb ![Y.ex] (Y.lg l) = X ((0 : Fin 1), l) := congrFun Y.lg_ex l
   have e2 := congrArg (fun f => constantCoeff (pderiv (R := C) ((0 : Fin 1), i) f)) e
   have hz : Zc Y.ex := Y.ex_const
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pderiv_substPointsPowerSeries_one hz, map_sum, map_mul] at e2
+
+  simp only [pderiv_substPointsPowerSeries_one hz, map_sum, map_mul] at e2
   have h3 : ∀ x, constantCoeff (sb ![Y.ex] (pderiv (R := C) ((0 : Fin 1), x) (Y.lg l))) = if l = x then 1 else 0 :=
     fun x => by
       unfold sb

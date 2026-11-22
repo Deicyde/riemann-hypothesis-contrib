@@ -110,8 +110,8 @@ theorem injective_of_constantCoeff {R S V : Type*} [CommRing R] [CommRing S]
     rw [monomial_eq, monomial_eq, map_mul, C_1, one_mul, map_finsuppProd]
     simp [hX]
   have : AddMonoidAlgebra.coeff (ψ P) a = constantCoeff (ψ (C (AddMonoidAlgebra.coeff P a))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [P.as_sum, map_sum, coeff_sum]
+
+    conv_lhs => rw [P.as_sum, map_sum, coeff_sum]
     rw [Finset.sum_eq_single a]
     · rw [hmon, coeff_mul_monomial', if_pos le_rfl, tsub_self, mul_one, constantCoeff_eq]
     · intro b hb hba

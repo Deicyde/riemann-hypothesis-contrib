@@ -77,7 +77,7 @@ private theorem sr_abs {R A K M W ι ι' : Type} [CommRing R] [CommRing A] [Alge
 attribute [local instance 2000] UpperTheory.V.W.coefLocal
 attribute [-instance] GlobalTheory.AdmLoc.modFun
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.sphRed :
     ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c), H.Ax →
     ∀ (A : Type) [CommRing A] [Algebra c.O A] [Alg.IsCO c.O A] (θ : H.X.I.T →* Aˣ), H.IsWt θ →

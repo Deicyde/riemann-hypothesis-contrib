@@ -108,7 +108,7 @@ variable (v : (D.mem u).A.vT)
 include hp hy
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem uop_rs (g) (hg : g ∈ AdFun T.cls0.lev (embT D)) :
     LT.Uop D u 0 v (rs T g) = rs T (upAd (T.atT.res v) (((D.mem u).A.T : ℕ) : 𝓞 D.host.E) (T.atT.eV v).1 p g) := by
   classical
@@ -147,7 +147,7 @@ theorem uop_mem (φ : LT.Fn D u 0) (hφ : φ ∈ (D.fm u).Fi 0) : LT.Uop D u 0 v
   rw [uop_rs T v p hp hy g hg.1, mem_Fi T]
   exact ⟨_, GlobalTheory.T.upwardOperator_mem_adelicForms _ _ _ _ _ _ _ _ _ T.cls0.lev (embT D) _ (T.atT.eV v).2 _ p (level_places_not_bad T.atT v) hp _ _ _ g hg, rfl⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem uop_rho (hok : ∀ x, (p x).Ok (T.atT.res v)) (φ : LT.Fn D u 0) (hφ : φ ∈ (D.fm u).Fi 0) (v' : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v')ˣ) :
     (D.mem u).A.rhoT v' a (LT.Uop D u 0 v φ) = LT.Uop D u 0 v ((D.mem u).A.rhoT v' a φ) := by
   obtain ⟨g, hg, rfl⟩ := (mem_Fi T φ).1 hφ
@@ -173,10 +173,10 @@ theorem uop_ram (hok : ∀ x, (p x).Ok (T.atT.res v)) (φ : LT.Fn D u 0) (hφ : 
   show (D.mem u).A.Nm v' _ = 0
   unfold ColumnsAtT.Nm at h2 ⊢
   rw [LinearMap.sum_apply] at h2 ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_congr rfl (fun a _ => uop_rho T v p hp hy hok φ h1 v' a), ← map_sum, h2, map_zero]
 
-set_option maxHeartbeats 2000000 in
+  rw [Finset.sum_congr rfl (fun a _ => uop_rho T v p hp hy hok φ h1 v' a), ← map_sum, h2, map_zero]
+
+
 theorem uop_inj (φ : LT.Fn D u 0) (hφ : φ ∈ (D.mem u).A.Mram) (h0 : LT.Uop D u 0 v φ = 0) : φ = 0 := by
   classical
   have h1 : φ ∈ (D.fm u).Fi 0 := by rw [(D.fm u).Fi_zero]; exact hφ.1

@@ -33,8 +33,8 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ChosenFormsRe
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 4000000
+
+
 
 noncomputable section
 
@@ -179,8 +179,8 @@ theorem exists_comb [Fintype (Comp (T.Q.Xo j) T.Q.c)] {w : WeightFamilies.Wt D j
       map_zero' := evC_zero hG Z
       map_add' := fun F F' => evC_add hG Z F.1 F'.1 }
   have h1 : φ (∑ k, m k • f k) = 0 := h0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at h1
+
+  rw [map_sum] at h1
   simp only [map_nsmul, nsmul_eq_mul] at h1
   exact h1
 

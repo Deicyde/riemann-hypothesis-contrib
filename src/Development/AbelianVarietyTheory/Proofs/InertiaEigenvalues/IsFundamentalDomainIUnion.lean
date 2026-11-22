@@ -147,8 +147,8 @@ theorem vecMul_ratGL_mul (ξ : Fin a → E) (γ : GL (Fin a) E) (g : GA E a) :
   rw [Units.val_mul, ← Matrix.vecMul_vecMul]
   congr 1
   ext j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [ratGL, Matrix.vecMul, dotProduct, map_sum]
+
+  simp [ratGL, Matrix.vecMul, dotProduct, map_sum]
 
 theorem ratGL_injective : Function.Injective (ratGL E a) := fun _ _ h => by
   ext i j

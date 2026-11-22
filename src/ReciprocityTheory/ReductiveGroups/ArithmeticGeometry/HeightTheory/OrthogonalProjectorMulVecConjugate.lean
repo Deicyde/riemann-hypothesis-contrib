@@ -41,9 +41,9 @@ theorem orthogonalProjector_mulVec_conjugate (σ : K →+* ℂ) {b : Fin k → F
     (hPm (conjugate σ) b *ᵥ fun l => (conjugate σ) (x l)) = star (hPm σ b *ᵥ fun l => σ (x l)) := by
   rw [orthogonalProjector_conjugate σ hb]
   ext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, NumberField.ComplexEmbedding.conjugate_coe_eq, map_sum,
-    mul_comm]
+
+  simp [Matrix.mulVec, dotProduct, NumberField.ComplexEmbedding.conjugate_coe_eq, map_sum,
+  mul_comm]
 
 theorem conj_sum_projected_inner (b : Fin k → Fin r → K) (hb : LinearIndependent K b) (a a' : K)
     (x y : Fin r → K) :
@@ -51,8 +51,8 @@ theorem conj_sum_projected_inner (b : Fin k → Fin r → K) (hb : LinearIndepen
         (star (hPm σ b *ᵥ fun l => σ (x l)) ⬝ᵥ (hPm σ b *ᵥ fun l => σ (y l)))) =
       ∑ σ : K →+* ℂ, conj (σ a) * σ a' *
         (star (hPm σ b *ᵥ fun l => σ (x l)) ⬝ᵥ (hPm σ b *ᵥ fun l => σ (y l))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   have hinv : Function.Involutive (NumberField.ComplexEmbedding.conjugate (K := K)) := by
     intro σ
     ext z
@@ -60,8 +60,8 @@ theorem conj_sum_projected_inner (b : Fin k → Fin r → K) (hb : LinearIndepen
   refine Fintype.sum_bijective _ hinv.bijective _ _ (fun σ => ?_)
   rw [orthogonalProjector_mulVec_conjugate σ hb x, orthogonalProjector_mulVec_conjugate σ hb y,
     NumberField.ComplexEmbedding.conjugate_coe_eq, NumberField.ComplexEmbedding.conjugate_coe_eq]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [dotProduct, map_sum, mul_comm, mul_left_comm]
+
+  simp [dotProduct, map_sum, mul_comm, mul_left_comm]
 
 theorem quotientGram_conjTranspose (σ : K →+* ℂ) {b : Fin k → Fin r → K} (hb : LinearIndependent K b)
     (c : Fin m → Fin r → K) : (ReciprocityTheory.MultiplicativeHeights.quotGramC 1 σ b c)ᴴ = ReciprocityTheory.MultiplicativeHeights.quotGramC 1 σ b c := by

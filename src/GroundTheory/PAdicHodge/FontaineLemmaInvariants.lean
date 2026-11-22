@@ -90,8 +90,8 @@ theorem homogEval_mul {A : Type*} [CommRing A] (f : A →+* S) (P : A[X]) (s z :
 theorem map_homogEval {A : Type*} [CommRing A] (f : A →+* S) (P : A[X]) (y s : S) (g : S →+* T)
     (f' : A →+* T) (hf : ∀ a, g (f a) = f' a) :
     g (homogEval f P y s) = homogEval f' P (g y) (g s) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [homogEval, map_sum, map_mul, map_pow, hf]
+
+  simp only [homogEval, map_sum, map_mul, map_pow, hf]
 
 theorem Localization.Away.exists_algebraMap_eq_pow_mul (t : R) (x : Localization.Away t) :
     ∃ (m : ℕ) (y : R), algebraMap R (Localization.Away t) y =
@@ -155,7 +155,7 @@ variable [CharZero F]
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_algebraMap_eq_periodTCris_pow_mul_phiB {x : BCris hε} {m : ℕ} {y : BCrisPlus F p}
     (hy : algebraMap (BCrisPlus F p) (BCris hε) y = periodTCris hε ^ (m + 1) * x)
     (hθ : ∀ n : ℕ, IsPerfectoidField.thetaBDeRhamPlusField (K := F) p
@@ -213,7 +213,7 @@ theorem thetaField_iota_periodT :
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_bCrisPlus_fixed_eq_of_mem_maxUnramified {x : BCris hε} {k : PadicAlgCl p}
     (hk : k ∈ maxUnramified p K) (hx : iotaB hε hζ x = algebraMap 𝔹 𝔹dR (algClToBdR p k)) :
     ∃ y' : BCrisPlus ℂ_[p] p, (∀ σ : Gal(PadicAlgCl p/K), σ • y' = y') ∧
@@ -226,7 +226,7 @@ variable [FiniteDimensional ℚ_[p] K]
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem thetaField_iotaPlus_iterate_eq_zero {x : BCris hε}
     (hx : ∀ σ : Gal(PadicAlgCl p/K), galB hε σ x = x) {m : ℕ} {y : BCrisPlus ℂ_[p] p}
     (hy : algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) y = periodTCris hε ^ (m + 1) * x) (n : ℕ) :
@@ -241,7 +241,7 @@ theorem thetaField_iotaPlus_iterate_eq_zero {x : BCris hε}
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_iterate_phiB_eq (m : ℕ) (x : BCris hε)
     (hx : ∀ σ : Gal(PadicAlgCl p/K), galB hε σ x = x)
     (hxy : ∃ y : BCrisPlus ℂ_[p] p,
@@ -276,7 +276,7 @@ theorem iota_periodT_ne_zero : iota ℂ_[p] p (periodT hε) ≠ 0 := by
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem aeval_minpoly_eq_zero_of_iterate {y x₁ : BCrisPlus ℂ_[p] p} {m : ℕ}
     {β β₁ : PadicAlgCl p}
     (hιy : iotaPlus ℂ_[p] p y = iota ℂ_[p] p (periodT hε) ^ m * algClToBdR p β)
@@ -357,7 +357,7 @@ theorem aeval_minpoly_eq_zero_of_iterate {y x₁ : BCrisPlus ℂ_[p] p} {m : ℕ
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_bCrisPlus_fixed_eq_of_iterate {x : BCris hε}
     (hx : ∀ σ : Gal(PadicAlgCl p/K), galB hε σ x = x) {m : ℕ} {y x₁ : BCrisPlus ℂ_[p] p}
     (hy : algebraMap (BCrisPlus ℂ_[p] p) (BCris hε) y = periodTCris hε ^ m * x)
@@ -391,7 +391,7 @@ theorem exists_bCrisPlus_fixed_eq_of_iterate {x : BCris hε}
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem exists_bCrisPlus_fixed_eq (x : BCris hε)
     (hx : ∀ σ : Gal(PadicAlgCl p/K), galB hε σ x = x) :
     ∃ y : BCrisPlus ℂ_[p] p, (∀ σ : Gal(PadicAlgCl p/K), σ • y = y) ∧
@@ -403,7 +403,7 @@ theorem exists_bCrisPlus_fixed_eq (x : BCris hε)
 
 
 include hζ in
-set_option maxHeartbeats 1600000 in
+
 theorem bCris_fixed_mem_maxUnramified (x : BCris hε)
     (hx : ∀ σ : Gal(PadicAlgCl p/K), galB hε σ x = x) :
     ∃ k ∈ maxUnramified p K, iotaB hε hζ x = algebraMap 𝔹 𝔹dR (algClToBdR p k) := by

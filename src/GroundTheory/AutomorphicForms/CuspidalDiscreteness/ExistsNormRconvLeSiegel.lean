@@ -89,8 +89,8 @@ theorem exists_archProj_eq_conj {r : ℕ} (x : normOneGL (K := K) (n := n)) (P :
 theorem map_altPoint {V W : Type*} [AddCommGroup V] [AddCommGroup W] (φ : V →+ W) {k : ℕ}
     (y : Fin k → V) (ε : Fin k → Bool) : φ (altPoint y ε) = altPoint (fun i => φ (y i)) ε := by
   unfold altPoint
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp
 

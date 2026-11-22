@@ -30,8 +30,8 @@ theorem mem_latS_adele_iff (Λ : Submodule (𝓞 E) (Fin k → E)) (hΛ : Module
   · rintro ⟨t, ht, rfl⟩ v
     refine (hv v _).2 ⟨fun j => t j v, fun j => ht j v, ?_⟩
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => Formalism.UG.P.afsplit_prV_tmul v _ _
   · intro h
     choose t ht hu using fun v => (hv v _).1 (h v)
@@ -41,8 +41,8 @@ theorem mem_latS_adele_iff (Λ : Submodule (𝓞 E) (Fin k → E)) (hΛ : Module
     funext i
     rw [← sub_eq_zero]
     refine Formalism.UG.P.afsplit_inj _ fun v => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, map_sum]
+
+    rw [map_sub, sub_eq_zero, map_sum]
     refine (congrFun (hu v) i).trans ?_
     exact Finset.sum_congr rfl fun j _ => (Formalism.UG.P.afsplit_prV_tmul v (l j i) (s j)).symm
 

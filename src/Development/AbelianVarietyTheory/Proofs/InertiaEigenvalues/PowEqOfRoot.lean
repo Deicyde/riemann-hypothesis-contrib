@@ -101,9 +101,9 @@ theorem pow_eq_of_root (h : Nat.card (ResidueField ↥(OL K)) = l ^ a) {x : Om l
   have : CharP (ResidueField ↥(OL K)) l := (CharP.charP_iff_prime_eq_zero hl.out).2 (l_res K)
   have hs : ∑ i ∈ Finset.range m, (y ^ k) ^ i ≠ 0 := fun e => hm (by
     have := congrArg (residue _) e
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_pow (residue _) (y ^ k), hr, one_pow, Finset.sum_const, Finset.card_range,
-      nsmul_eq_mul, mul_one, map_zero] at this
+
+    simp only [map_sum, map_pow (residue _) (y ^ k), hr, one_pow, Finset.sum_const, Finset.card_range,
+    nsmul_eq_mul, mul_one, map_zero] at this
     exact (CharP.cast_eq_zero_iff _ l m).1 this)
   have h3 : y ^ k = 1 := sub_eq_zero.1 ((mul_eq_zero.1 hg).resolve_right hs)
   have h4 : x ^ k = 1 := congrArg (toOm K) h3

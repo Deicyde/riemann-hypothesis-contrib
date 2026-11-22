@@ -34,7 +34,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1000000
+
 
 namespace GlobalTheory.MtId
 
@@ -64,8 +64,8 @@ theorem constr_semi {K M N : Type} [Field K] [AddCommGroup M] [Module ℂ M] [Ad
   have hx : x = ∑ a, x a • (Pi.single a 1 : Fin d → K) := by
     funext i; simp [Finset.sum_apply, Pi.single_apply]
   rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, hb, RingHom.id_apply]
+
+  simp only [map_sum, map_smulₛₗ, hb, RingHom.id_apply]
 
 theorem side_read {V : HSp D} {n : ℕ} (hn : V.rank = n) {β : GL (Fin V.rank) (EAf D)} (hβ : β = 1) {c : CoefA V} {j : ℕ}
     {hr : D.R.r ≤ V.rank} (hr' : D.R.r ≤ n) {Pg Q : Finset (Pl D.host.E)} {chi xi : ∀ PP : Pl D.host.E, (kP PP)ˣ →* ℂˣ}

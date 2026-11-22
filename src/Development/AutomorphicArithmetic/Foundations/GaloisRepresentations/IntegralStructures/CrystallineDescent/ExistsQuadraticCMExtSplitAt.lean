@@ -11,7 +11,7 @@ noncomputable section
 open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.HeckeGal GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Published GlobalTheory.RealGal GlobalTheory.UnitaryBC
 open GlobalTheory.GalCut GlobalTheory.Cong GlobalTheory.CongL UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.Int.Core.exists_quadratic_CM_ext_split_at : UpperTheory.Gal.Int.Core.Quad2Ex := by
   intro E Y Ω _ _ _ _ _ _ _ _ _ δ hδ T hT
   have hTP := twoPrimes (primeWith decGen)

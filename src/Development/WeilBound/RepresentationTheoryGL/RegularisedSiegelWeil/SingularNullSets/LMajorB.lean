@@ -29,8 +29,8 @@ theorem repr_map {F E R R' ι : Type} [Field F] [Field E] [Algebra F E] [CommRin
   | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
   | tmul a e => simp [Algebra.TensorProduct.basis_repr_tmul]
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 800000 in
+
+
 theorem infPart_eq_of {e e' : AE D}
     (h : ∀ w, compInf D.host.F D.host.E w e = compInf D.host.F D.host.E w e') : infPart D e = infPart D e' := by
   let b := Module.Basis.ofVectorSpace D.host.F D.host.E
@@ -50,8 +50,8 @@ theorem infPart_eq_of {e e' : AE D}
 theorem infPart_idem {S : Finset (Pl D)} {e : AE D} (he : IsIdem S e) : infPart D e = 1 :=
   (infPart_eq_of (e' := 1) fun w => (he.1 w).trans (map_one _).symm).trans (map_one _)
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 800000 in
+
+
 theorem cv_eq (v : Pl D) (a : AE D) :
     cv D v a = Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV D.host.F v) (AlgHom.id D.host.F D.host.E)
       (finPart D a) := by
@@ -76,15 +76,15 @@ theorem sndA_afF : sndA D.host.F (afF D) = 1 := rfl
 
 def sF (D : D7) : AE D := afF D ⊗ₜ[D.host.F] (1 : D.host.E)
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 800000 in
+
+
 theorem infPart_sF : infPart D (sF D) = 0 := by
   show Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E)
     (afF D ⊗ₜ[D.host.F] (1 : D.host.E)) = 0
   rw [Algebra.TensorProduct.map_tmul, fstA_afF, TensorProduct.zero_tmul]
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 800000 in
+
+
 theorem finPart_sF : finPart D (sF D) = 1 := by
   show Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)
     (afF D ⊗ₜ[D.host.F] (1 : D.host.E)) = 1

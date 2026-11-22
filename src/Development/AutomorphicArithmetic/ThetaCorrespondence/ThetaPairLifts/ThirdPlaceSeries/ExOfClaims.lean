@@ -16,7 +16,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -24,7 +24,7 @@ open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheo
 open NumberField IsDedekindDomain GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest GlobalTheory.LeafRestExamples
 namespace GlobalTheory.BigTop.Fun
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1600000 in
+
 theorem ex_of_claims_alt : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → (Closed FamHyp fun Fm _ => _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ => |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps) → GlobalTheory.RowClaim.SumOKK → GlobalTheory.RowClaim.SumRatK → GlobalTheory.RowClaim.ConstK → (_root_.GlobalTheory.BigTop.Fun.CharacterAtPoint fun {D} _ _ _ _ _ _ _ _ _ _ _ ch => ∀ i j t, GlobalTheory.RowTest.sqRatio ch i j t ∈ Set.range D.what₂.embLL) → GlobalTheory.NormSum.IntSt → FieldDat → TorEx → DenEx → BotEx → BotSmall → _root_.GlobalTheory.BigTop.Fun.ExistsFunctionIn @Fld @Comparison₂ := by
   intro hSet hdl hS hR hC hr hI hFD hT hD hB hBS
   obtain ⟨c1, h1⟩ := hSet.atPt hS

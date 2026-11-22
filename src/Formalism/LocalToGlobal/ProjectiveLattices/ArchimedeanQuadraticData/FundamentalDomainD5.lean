@@ -72,15 +72,15 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
       intro k
       have h1 := congrFun hs k
       simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply, T] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, h_sum_right, map_sum]
+
+      rw [hx, h_sum_right, map_sum]
       simp only [h_qsmul_right, htrq]
       rw [← h1]
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
     have hall : ∀ v : Fin r → K, Algebra.trace ℚ K (S.h v x) = 0 := by
       intro v
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← eB.sum_repr v, h_sum_left, map_sum]
+
+      rw [← eB.sum_repr v, h_sum_left, map_sum]
       refine Finset.sum_eq_zero fun k _ => ?_
       rw [heB, h_qsmul_left, htrq, hTx k, mul_zero]
     exact hx0 (nondeg σ Q hQ p S hform x hall)
@@ -130,8 +130,8 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
       have h1 := congrFun hTs k
       simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.of_apply, Pi.smul_apply,
         smul_eq_mul, htq, T] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hy, h_sum_left, map_sum]
+
+      rw [hy, h_sum_left, map_sum]
       simp only [h_qsmul_left, htrq]
       rw [← h1]
       exact Finset.sum_congr rfl fun j _ => mul_comm _ _
@@ -153,8 +153,8 @@ theorem d5_translation : ReciprocityTheory.ChartRestriction.G.FD.CoveringRadiusS
       intro v hv
       obtain ⟨n, hn⟩ := hecoord v hv
       refine ⟨∑ k, n k * (2 * t k), ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hn, h_sum_right, map_sum]
+
+      rw [hn, h_sum_right, map_sum]
       push_cast
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [h_qsmul_right, htrq, hyk k]

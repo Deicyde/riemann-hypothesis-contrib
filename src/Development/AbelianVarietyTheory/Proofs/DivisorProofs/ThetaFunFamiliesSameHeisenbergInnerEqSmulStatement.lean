@@ -15,7 +15,7 @@ open Formalism.IndefR.Datum
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasMat GlobalTheory.SplitWeil.matrixMeasurableSpace
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.thetaFun_families_same_heisenberg_inner_eq_smul : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (ι : Type)
     (X Y : ι → Formalism.IndefR.Datum.WO S T → ℂ) (act : Formalism.IndefR.Datum.WO S T → ι → ι)
     (g : Formalism.IndefR.Datum.WO S T → Formalism.IndefR.Datum.WO S T), Function.Surjective g →

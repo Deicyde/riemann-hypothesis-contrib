@@ -146,8 +146,8 @@ theorem UpperTheory.V.Alg.part_filt :
   set low : MvPowerSeries W.σ O := ∑ n ∈ hfin.toFinset, monomial n (coeff n h) with hlow
   have hlowc : ∀ m, coeff m low = if m.degree < N then coeff m h else 0 := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hlow, map_sum]
+
+    rw [hlow, map_sum]
     simp only [coeff_monomial]
     rw [Finset.sum_ite_eq]
     simp

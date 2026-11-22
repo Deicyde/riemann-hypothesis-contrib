@@ -107,8 +107,8 @@ open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] in
 private lemma coeff_sum_expand_mul_X_pow (g : Fin p → R⟦X⟧) (n : ℕ) (j : Fin p) :
     coeff (p * n + j) (∑ i, expand p hp.out.ne_zero (g i) * X ^ (i : ℕ)) = coeff n (g j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single j]
+
+  rw [map_sum, Finset.sum_eq_single j]
   · rw [coeff_mul_X_pow, coeff_expand_mul]
   · intro i _ hij
     rw [coeff_mul_X_pow']
@@ -223,9 +223,9 @@ theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : P
       simp only [A]
       rw [Finset.sum_range_add_sum_Ico _ hab]
     rw [hsplit]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, map_add (f := _), map_sum, coeff_smul, smul_eq_mul,
-      sub_add_cancel_left]
+
+    simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, map_add (f := _), map_sum, coeff_smul, smul_eq_mul,
+    sub_add_cancel_left]
     refine ⟨-∑ k ∈ Finset.Ico a b, (p : R) ^ (k - a) * coeff n (G (hs k) i), ?_⟩
     rw [mul_neg, Finset.mul_sum]
     congr 1
@@ -309,8 +309,8 @@ theorem _root_.GlobalTheory.Col.Model.indepL (hu : (p : R) ∈ nonunits R) (x : 
   choose g hg using fun i => hsurj (x i)
   have hzero : _root_.GlobalTheory.Col.ev R p (m + 1)
       (∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← hx]
+
+    rw [map_sum, ← hx]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul, ← _root_.GlobalTheory.Col.Model.up_ev p m hm, hg]
   obtain ⟨k, hk⟩ := Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 hzero)
@@ -333,8 +333,8 @@ def basisL (hu : (p : R) ∈ nonunits R) : Module.Basis (Fin p) (lev R p m) (UpL
       obtain ⟨g, hg⟩ := spans p hu h
       refine (Submodule.mem_span_range_iff_exists_fun _).2 ⟨fun i => ev R p m (g i), ?_⟩
       change ∑ i, up p m hm (ev R p m (g i)) * ev R p (m + 1) (X ^ (i : ℕ)) = ev R p (m + 1) h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hg, map_sum]
+
+      rw [hg, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, up_ev])
 
@@ -377,8 +377,8 @@ theorem _root_.GlobalTheory.Col.Model.nrm_ev (hu : (p : R) ∈ nonunits R) (h : 
     change _root_.GlobalTheory.Col.ev R p (m + 1) h * _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (j : ℕ)) =
       ∑ k, _root_.GlobalTheory.Col.up p m hm (_root_.GlobalTheory.Col.ev R p m (c k)) *
         _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (k : ℕ))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_mul, hc', map_sum]
+
+    rw [← map_mul, hc', map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul, _root_.GlobalTheory.Col.Model.up_ev]
   rw [key, Module.Basis.repr_sum_self]

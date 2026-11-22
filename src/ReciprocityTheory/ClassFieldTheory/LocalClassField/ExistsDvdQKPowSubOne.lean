@@ -268,8 +268,8 @@ theorem exists_le_Kn_of_le_Kur (hK : FiniteDimensional ℚ_[p] K) {M : Intermedi
   refine ⟨∏ i, N i, Finset.prod_pos fun i _ => hN i, fun x hx => ?_⟩
   have hx' : x = ∑ i, b.repr ⟨x, hx⟩ i • (b i : PadicAlgCl p) := by
     have := congrArg M.val (b.sum_repr ⟨x, hx⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     exact this.symm
   rw [hx']
   refine sum_mem fun i _ => ?_

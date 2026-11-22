@@ -30,9 +30,9 @@ theorem dehH_expand (w : ℕ) (p : MvPolynomial (Fin 2) ℂ) (hp : p.IsHomogeneo
       Polynomial.C (AddMonoidAlgebra.coeff p (Finsupp.single 0 i + Finsupp.single 1 (w - i))) * Polynomial.X ^ i := by
   have h := (GlobalTheory.T.binaryMonomialDegree_subst_expansion ℂ w).2.1 p hp
   conv_lhs => rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.C (AddMonoidAlgebra.coeff
-    p (Finsupp.single 0 i + Finsupp.single 1 (w - i))) * Polynomial.X ^ i)]
+
+  rw [map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.C (AddMonoidAlgebra.coeff
+  p (Finsupp.single 0 i + Finsupp.single 1 (w - i))) * Polynomial.X ^ i)]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, dehH_mon]
   simp [deh]
@@ -78,11 +78,11 @@ theorem deh_homog_iso : ∀ w : ℕ, (∀ (m : Matrix (Fin 2) (Fin 2) ℤ) (p : 
     have h := (GlobalTheory.T.binaryMonomialDegree_subst_expansion ℂ w).2.1 p hp
     rw [dehH_expand w p hp, dehH_slP_sum]
     conv_lhs => rw [h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.C (AddMonoidAlgebra.coeff
-      p (Finsupp.single 0 i + Finsupp.single 1 (w - i))) *
-        ((Polynomial.C ((m 0 0 : ℤ) : ℂ) * Polynomial.X + Polynomial.C ((m 0 1 : ℤ) : ℂ)) ^ i *
-          (Polynomial.C ((m 1 0 : ℤ) : ℂ) * Polynomial.X + Polynomial.C ((m 1 1 : ℤ) : ℂ)) ^ (w - i)))]
+
+    rw [map_sum, map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.C (AddMonoidAlgebra.coeff
+    p (Finsupp.single 0 i + Finsupp.single 1 (w - i))) *
+      ((Polynomial.C ((m 0 0 : ℤ) : ℂ) * Polynomial.X + Polynomial.C ((m 0 1 : ℤ) : ℂ)) ^ i *
+        (Polynomial.C ((m 1 0 : ℤ) : ℂ) * Polynomial.X + Polynomial.C ((m 1 1 : ℤ) : ℂ)) ^ (w - i)))]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, map_mul, MvPolynomial.algHom_C, mon, dehH_slP_mon]
     simp [deh]

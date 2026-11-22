@@ -80,8 +80,8 @@ theorem det_trace_ne_zero {K : UQ} (B : InvAlg K) (hsep : B.P.Separable)
     intro l
     have := congrFun hvm l
     simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, Pi.zero_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← this, hq, map_sum, Finset.sum_mul, map_sum]
+
+    rw [← this, hq, map_sum, Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     have ha : aeval B.g (C (c k) * X ^ (k : ℕ)) = c k • B.g ^ (k : ℕ) := by
       rw [← smul_eq_C_mul, map_smul, aeval_X_pow]
@@ -89,8 +89,8 @@ theorem det_trace_ne_zero {K : UQ} (B : InvAlg K) (hsep : B.P.Separable)
   have hz' : aeval B.g q = 0 := by
     apply GlobalTheory.UnitLemma.Centraliser.eq_zero_of_trace_mul B hsep
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e.sum_repr y, Finset.mul_sum, map_sum]
+
+    rw [← e.sum_repr y, Finset.mul_sum, map_sum]
     refine Finset.sum_eq_zero fun l _ => ?_
     rw [mul_smul_comm, map_smul, hz l, smul_zero]
   have hdvd := GlobalTheory.UnitLemma.Centraliser.P_dvd_of_aeval_eq_zero B hsep q hz'
@@ -112,8 +112,8 @@ theorem trace_mat_toMatrix {E A : Type} [Field E] [CommRing A] [Algebra E A] {ι
     (Matrix.of fun k l => Algebra.trace E A (x k * f l)) =
       (Matrix.of fun k i => Algebra.trace E A (x k * b i)) * b.toMatrix f := by
   ext k l
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.of_apply, Matrix.mul_apply, ← b.sum_toMatrix_smul_self f l, Finset.mul_sum, map_sum]
+
+  rw [Matrix.of_apply, Matrix.mul_apply, ← b.sum_toMatrix_smul_self f l, Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [mul_smul_comm, map_smul, smul_eq_mul, Matrix.of_apply, mul_comm]
 

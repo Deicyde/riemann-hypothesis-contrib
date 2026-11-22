@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseC
 @[expose] public section
 
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_injective_baseChange_inf_restrictScalars_range_eq : ∀ {O V : Type} [CommRing O] [IsDomain O] [AddCommGroup V] [Module (FractionRing O) V] [Module O V]
     [IsScalarTower O (FractionRing O) V] (N : Submodule O V),
     Submodule.span (FractionRing O) (N : Set V) = ⊤ → ∀ (W : Submodule (FractionRing O) V),

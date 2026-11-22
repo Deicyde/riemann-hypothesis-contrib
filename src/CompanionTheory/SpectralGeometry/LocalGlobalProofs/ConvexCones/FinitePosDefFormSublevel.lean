@@ -60,9 +60,9 @@ theorem sublevel_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] 
   have hval : ∀ v : Fin n → ℤ, β (∑ i, v i • b i) (∑ i, v i • b i)
       = ∑ i, ∑ j, β (b i) (b j) * v i * v j := by
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
-      Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
+    Finset.mul_sum]
     refine Finset.sum_comm.trans ?_
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring

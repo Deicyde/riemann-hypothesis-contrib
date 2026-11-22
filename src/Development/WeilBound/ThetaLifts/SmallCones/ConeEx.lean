@@ -51,15 +51,15 @@ variable {B : Base F E} {M : Model σ X W} {om : Rep σ X W} {M₀ : Model σ X�
 theorem LineOK.theta_sum (h : LineOK B M om M₀ om₀ e μ u ν z S) {m : ℕ} (c : Fin m → ℂ) {Ψ : Fin m → Fn F n₁ d₁}
     (hΨ : ∀ i, Ψ i ∈ schA F (Fin n₁ × Fin d₁)) (g h₁) : theta om₀ (∑ i, c i • Ψ i) g h₁ = ∑ i, c i * theta om₀ (Ψ i) g h₁ := by
   obtain ⟨l, -, hl⟩ := h.th g h₁
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hl _ (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hΨ i)), map_sum]
+
+  rw [← hl _ (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hΨ i)), map_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [map_smul, hl _ (hΨ i), smul_eq_mul]
 
 theorem LineOK.val_sum (h : LineOK B M om M₀ om₀ e μ u ν z S) {m : ℕ} (c : Fin m → ℂ) {Ψ : Fin m → Fn F n d} (hΨ : ∀ i, Ψ i ∈ S)
     (l g h₁) : theta om₀ (e (M.co.rho B.ψ (u l) (∑ i, c i • Ψ i))) g h₁ =
       ∑ i, c i * theta om₀ (e (M.co.rho B.ψ (u l) (Ψ i))) g h₁ := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [rho_linear, map_sum]
+
+  rw [rho_linear, map_sum]
   simp only [map_smul]
   exact h.theta_sum c (fun i => h.sch l _ (h.le _ (hΨ i))) g h₁
 
@@ -74,8 +74,8 @@ theorem LineOK.coneI_eq [SFinite μ] [SFinite M₀.μ] (h : LineOK B M om M₀ o
         ∑ i, c i k * Λ i y := fun k => by
       have e2 := fun i => hΛ' i _ (ev_adm y)
       simp only [LinearMap.proj_apply] at e2
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hd, rho_linear, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
+
+      simp only [hd, rho_linear, map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
       rw [integral_finsetSum _ fun i _ => by simpa only [mul_assoc] using (e2 i).1.const_mul (c i k)]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [(e2 i).2, ← integral_const_mul]

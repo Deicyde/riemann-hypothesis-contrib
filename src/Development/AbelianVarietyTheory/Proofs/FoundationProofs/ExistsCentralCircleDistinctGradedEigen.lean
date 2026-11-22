@@ -83,9 +83,9 @@ theorem exists_central_eigen : ∀ (p q : ℕ) (T : GrpData p q) (σ : URep T) (
   apply flow_eq σ hX
   have h0 := hj _ hX x
   have h1 : M.act (TorusWt.torX θ) x = (Complex.I * ((c : ℂ) + m)) • x := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [TorusWt.torX_eq_sum, map_sum, LinearMap.sum_apply, Fintype.sum_sum_type, mul_smul, ← hN m x hx,
-      Finset.smul_sum]
+
+    rw [TorusWt.torX_eq_sum, map_sum, LinearMap.sum_apply, Fintype.sum_sum_type, mul_smul, ← hN m x hx,
+    Finset.smul_sum]
     simp [hθ]
   rw [h1, map_smul] at h0
   exact h0

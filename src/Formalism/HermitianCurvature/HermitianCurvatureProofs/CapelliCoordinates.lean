@@ -418,11 +418,11 @@ theorem rep_econj (hD : IsOpen D) {m : ℕ} (Bs : Fin m → Fin (2 * r + k + 1) 
   rw [hrep.2 φ g hg]
   obtain ⟨L, hL⟩ := rz_linear φ.2.1 hg
   show _ = RZ (Hpk k r) (unitB (Hpk k r) Bs a b) φ.1 g
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hL _ hSu, unitB_expand Bs hB a b, map_sum]
+
+  rw [hL _ hSu, unitB_expand Bs hB a b, map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun d _ => ?_
   rw [map_smul, ← hL _ (hS c d), hP, hQ]
   rfl

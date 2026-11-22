@@ -31,8 +31,8 @@ private theorem hL_apply_lemma (x y : n → A) : D.hL x y = D.h x y := rfl
 
 theorem h_e_pX (H : D.Hyp) (b : Fin r) (u : n → A) : D.h (D.e b) (D.pX u) = 0 := by
   rw [← hL_apply_lemma]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pX, LinearMap.sum_apply, LinearMap.smulRight_apply, map_sum, map_smul]
+
+  simp only [pX, LinearMap.sum_apply, LinearMap.smulRight_apply, map_sum, map_smul]
   simp only [hL_apply_lemma, H.ee, smul_zero, Finset.sum_const_zero]
 
 private theorem D_h_sum_left {ι : Type} (s : Finset ι) (g : ι → n → A) (y : n → A) :
@@ -155,9 +155,9 @@ theorem h_z_S {S : (n → A) →ₗ[A] (n → A)} (hS : D.FixEZ S) (hU : D.Uni S
 theorem Pi_of_fix (H : D.Hyp) {S : (n → A) →ₗ[A] (n → A)} (hS : D.FixEZ S)
     (hf : ∀ a, S (D.f a) = D.f a) (hU : D.Uni S) (v : n → A) : D.Pi S v = S v := by
   have hSU : S (D.pU v) = D.pU v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [pU, LinearMap.add_apply, pX, pXv, pz, LinearMap.sum_apply, LinearMap.smulRight_apply,
-      map_add, map_sum, map_smul, hS.1, hf, hS.2]
+
+    simp only [pU, LinearMap.add_apply, pX, pXv, pz, LinearMap.sum_apply, LinearMap.smulRight_apply,
+    map_add, map_sum, map_smul, hS.1, hf, hS.2]
   have hw := isW_pW H v
   have h1 : ∀ a, D.h (D.e a) (S (D.pW v)) = 0 := fun a => by rw [h_e_S hS hU, hw.1]
   have h2 : ∀ a, D.h (D.f a) (S (D.pW v)) = 0 := fun a => by rw [← hf a, hU, hw.2.1]

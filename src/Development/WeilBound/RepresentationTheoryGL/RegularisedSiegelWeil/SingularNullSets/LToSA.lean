@@ -22,7 +22,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
 open GlobalTheory.RegSch (ikS projS Lvl)
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.Rsw.L.LToS
 
@@ -105,8 +105,8 @@ theorem isClosed_intOff (S : Finset (Pl D)) : IsClosed {x : Mx D a b | IntOff S 
 theorem intOff_mul {S : Finset (Pl D)} {x : Mx D a b} {y : Mx D b c} (hx : IntOff S x) (hy : IntOff S y) :
     IntOff S (mm x y) := fun v hv i j => by
   show cv D v ((x * y) i j) ∈ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.mul_apply, map_sum]
+
+  rw [Matrix.mul_apply, map_sum]
   exact Subring.sum_mem _ fun k _ => by rw [map_mul]; exact Subring.mul_mem _ (hx v hv i k) (hy v hv k j)
 
 theorem intOff_adj {S : Finset (Pl D)} {x : Mx D a b} (hx : IntOff S x) : IntOff S (adj x) := fun v hv i j => by

@@ -282,7 +282,7 @@ private theorem mem_range_resU (ρ : Representation R G M) {U' U : Subgroup G} (
   rw [hz u, hc1 u, hc0, sub_zero]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem length_restriction_coker_le_H2 (ρ : Representation R G M) (hρ : ContAction ρ) {U' U : Subgroup G} [U'.Normal]
     (h : U' ≤ U) (ho : IsOpen (U'.subgroupOf U : Set U)) :
     Module.length R (resCoker ρ h) ≤ Module.length R (H2 (quotRep ρ U U')) := by

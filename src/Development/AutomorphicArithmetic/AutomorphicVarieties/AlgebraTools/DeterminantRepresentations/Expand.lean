@@ -21,8 +21,8 @@ private theorem hom_two {A : Type} [CommRing A] {n : ℕ} (P : MvPolynomial (Fin
     rw [MvPolynomial.aeval_monomial, Finsupp.prod_fintype _ _ (fun i => pow_zero _), Fin.prod_univ_two]
     simp [mul_assoc]
   conv_lhs => rw [P.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp_rw [hF]
   have hinj : Set.InjOn e (Finset.range (n + 1)) := by
     intro i _ j _ h
@@ -59,8 +59,8 @@ theorem UpperTheory.V.AlgebraTools.Det.expand :
         MvPolynomial.aeval b (D.D (MvPolynomial (Fin m) A) (GDet.gen y)) := by
     rw [← D.nat (MvPolynomial (Fin m) A) B (MvPolynomial.aeval b)]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GDet.gen, map_sum]
+
+    simp only [GDet.gen, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     ext g
     simp [MonoidAlgebra.mapRingHom]

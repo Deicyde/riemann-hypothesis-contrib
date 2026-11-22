@@ -69,10 +69,10 @@ theorem projMatrix_mulVec {R : Type} [CommRing R] (R' : Type) [CommRing R'] [Alg
     have hy : f y = (LinearMap.toMatrix' f).mulVec y := by
       rw [LinearMap.toMatrix'_mulVec]
     rw [LinearMap.baseChange_tmul, hy]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
-      Matrix.mulVec, dotProduct, Matrix.map_apply, Finset.sum_smul, Algebra.smul_def, map_mul,
-      map_sum, Finset.sum_mul, mul_assoc]
+
+    simp only [TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul,
+    Matrix.mulVec, dotProduct, Matrix.map_apply, Finset.sum_smul, Algebra.smul_def, map_mul,
+    map_sum, Finset.sum_mul, mul_assoc]
 
 theorem projMatrix_sum {R : Type} [CommRing R] (R' : Type) [CommRing R'] [Algebra R R']
     {a : ℕ} {P : Type} [AddCommGroup P] [Module R P] (p : (Fin a → R) →ₗ[R] P)
@@ -85,8 +85,8 @@ theorem projMatrix_sum {R : Type} [CommRing R] (R' : Type) [CommRing R'] [Algebr
     simp only [map_add (f := _), Pi.add_apply, TensorProduct.add_tmul, Finset.sum_add_distrib, hx, hy]
   | tmul r y =>
     have hy : p y = ∑ k, y k • p (Pi.single k 1) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← map_smul, ← map_sum]
+
+      simp only [← map_smul, ← map_sum]
       congr 1
       ext j
       simp [Finset.sum_apply, Pi.single_apply]

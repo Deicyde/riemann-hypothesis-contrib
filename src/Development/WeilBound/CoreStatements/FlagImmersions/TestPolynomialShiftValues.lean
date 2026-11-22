@@ -87,10 +87,10 @@ theorem jPos (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (hj : j ≤ N
     rw [map_natCast]] at hpol
   have hP := congrArg (PhiL j n) hpol
   have hA := congrArg (apolL fib) hpol
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PhiL_C_mul, map_sum] at hP
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [apolL_C_mul, map_sum] at hA
+
+  rw [PhiL_C_mul, map_sum] at hP
+
+  rw [apolL_C_mul, map_sum] at hA
   simp only [PhiL_C_mul, apolL_C_mul, ← hkdef, hagree] at hP hA
   have hmain : PhiL j n fib = c * apolL fib fib := by
     have e1 : ∑ S ∈ (idxS Ψ N j).powerset, (-1 : ℝ) ^ ((idxS Ψ N j).card - S.card) *
@@ -158,8 +158,8 @@ theorem deg_mu (j n : ℕ) (G : RP Ψ N) :
     rw [← Finset.sum_mul]
     rw [hc] at hd
     linear_combination G * hd
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, degFl_eq, degFl_eq, map_add (f := _), map_sum, Finset.sum_eq_zero, add_zero]
+
+  rw [e, degFl_eq, degFl_eq, map_add (f := _), map_sum, Finset.sum_eq_zero, add_zero]
   intro τ _
   exact Formalism.L2.Geo.flag_integral_kills_power_sums Ψ N τ 1 le_rfl _
 
@@ -179,15 +179,15 @@ theorem d_fib (τ : Ψ) (j : ℕ) (S : Finset (Fin N))
 
 theorem d_sum (τ : Ψ) (S T : Finset (Fin N)) :
     dS τ S (∑ σ : Ψ, ∑ i ∈ T, (X (σ, i) : RP Ψ N)) = C (((T.filter (· ∈ S)).card : ℕ) : ℝ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single τ]
+
+  rw [map_sum, Finset.sum_eq_single τ]
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [dS_X, true_and]
     rw [Finset.sum_boole, map_natCast]
   · intro σ _ hσ
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp [dS_X, hσ]
   · simp
 

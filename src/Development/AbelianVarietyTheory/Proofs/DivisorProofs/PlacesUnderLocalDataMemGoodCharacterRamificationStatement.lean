@@ -39,7 +39,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.Local
 open GlobalTheory.TripleSpaceW (conjSub)
 open GlobalTheory.SkewLat (scLat pairLat)
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.placesUnder_localData_mem_goodCharacter_ramification : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (_hL : L.Is μ₀) (t : T)
     (i j : Fin D.R.m) (B : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base D.host.F D.host.E) (X : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars D.host.F D.host.E) (a a' : ℕ),
     X.α = alpha G t i j → X.β = beta G i j → X.IsGood B a a' →

@@ -16,7 +16,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrp
 open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
 open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.primitive_hodge_to_pdivisible_omega_surjective :
     GlobalTheory.Published.AbelianHodgeDeRham →
     ∀ (p : ℕ) [Fact p.Prime] (K : Type) [Field K], (p : K) = 0 →

@@ -8,7 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.UnitarySphericalFixi
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
@@ -16,7 +16,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Mem.R3.Tr GlobalTheory.LayerMove
 noncomputable section
 namespace UpperTheory.One.M
-set_option maxHeartbeats 4000000
+
 def mvAll_alt (s : _root_.UpperTheory.One.M.TrivialCondition) {D : D7} (m : Mv D) {C : NChoice D} (a : _root_.GlobalTheory.HeightCounting.NAllCAlt D C) : _root_.GlobalTheory.HeightCounting.NAllCAlt m.D (m.ch C) := @_root_.GlobalTheory.HeightCounting.NAllCAlt.mk (_) (_)
     (gal := @_root_.Formalism.L2.NGalTiedAlt.mk (_)
       (fr := @_root_.Formalism.L2.OmFrame.mk (_)

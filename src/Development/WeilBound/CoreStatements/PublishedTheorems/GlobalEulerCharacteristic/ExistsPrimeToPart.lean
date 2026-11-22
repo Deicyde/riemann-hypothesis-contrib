@@ -16,7 +16,7 @@ local instance scalarTowerForFiniteSubfields {F E : FiniteSubfield} [Fact (F ≤
     IsScalarTower F.1 E.1 ℚ̄ :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_prime_to_part (ℓ : ℕ) [Fact ℓ.Prime]
     (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (L : FiniteSubfield) [Fact (K ≤ L)] (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)

@@ -66,14 +66,14 @@ theorem pairingO_toO [IsDomain O] {ε : PreTilt O p} (hε : IsPrimitiveSystem ε
     (χ : G.dual.Tate) : pairingO hε e (toO e t) χ = padicToO p O (epsPairing hε G t χ) := by
   have ht : t = ∑ i, e t i • e.symm (Pi.single i 1) := by
     apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [ht]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pairingO, toO, epsPairing, map_sum, map_smul, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, map_mul]
+
+  simp only [pairingO, toO, epsPairing, map_sum, map_smul, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, map_mul]
 
 section Datum
 

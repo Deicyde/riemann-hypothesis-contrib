@@ -116,8 +116,8 @@ theorem gmap_loc_eq_of_frame {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (
         exact hg' _ _
       have e1 : c j = h (g (e j)) y := by
         rw [e2, ← hc]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp [map_sum, he]
+
+        simp [map_sum, he]
       rw [e1]
       exact mem_locR_of_unimod_lemma hu (hge j) hy
     have hzN : g.symm y ∈ Formalism.HermitianLatticesTheory.loc (K := K) p (Submodule.span (𝓞 K) (Set.range e)) := by

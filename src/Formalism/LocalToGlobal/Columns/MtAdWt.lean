@@ -164,8 +164,8 @@ theorem mtwCf_eval (ℓ : Pol ℂ ι n →ₗ[ℂ] ℂ) (y : ι × Fin n × Fin 
     (Q : MvPolynomial (ι × Fin n × Fin n) (MvPolynomial (ι × Fin n × Fin n) ℂ)) :
     eval y (mtwCf ℓ Q) = ℓ (MvPolynomial.map (eval y) Q) := by
   conv_rhs => rw [Q.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mtwCf, map_sum, MvPolynomial.map_monomial, map_mul, MvPolynomial.eval_C]
+
+  simp only [mtwCf, map_sum, MvPolynomial.map_monomial, map_mul, MvPolynomial.eval_C]
   refine Finset.sum_congr rfl fun m _ => ?_
   have hm : (monomial m (eval y (AddMonoidAlgebra.coeff Q m)) : MvPolynomial (ι × Fin n × Fin n) ℂ) =
       eval y (AddMonoidAlgebra.coeff Q m) • monomial m 1 := by
@@ -420,10 +420,10 @@ theorem mtw_sqAct_mul (mu : DomWeight n) (g h : GL (Fin n) ℂ) (f : MvPolynomia
         Formalism.GradedWeylDivisibility.rowAct ℂ (n := n) (B * A) := by
       apply MvPolynomial.algHom_ext
       intro v
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.rowAct, MvPolynomial.aeval_X, map_sum, map_mul,
-        MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum,
-        Finset.sum_mul]
+
+      simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.rowAct, MvPolynomial.aeval_X, map_sum, map_mul,
+      MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum,
+      Finset.sum_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun c _ => ?_
       ring
@@ -570,8 +570,8 @@ theorem tenWt_hwAt (emb : ι → L →+* ℂ) (hinj : Function.Injective emb)
         (bVVfun ℂ lam j)) * (bVV ℂ lam).repr (mtwHw lam) j =
         c * mtwCoord lam i (Formalism.GradedWeylDivisibility.blockAct ℂ (fun τ => if τ = τ₀ then (B : Matrix (Fin n) (Fin n) ℂ)ᵀ else 1)
           (∑ j, ((bVV ℂ lam).repr (mtwHw lam) j) • bVVfun ℂ lam j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, Finset.mul_sum]
+
+      rw [map_sum, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_smul, map_smul, smul_eq_mul]
       ring

@@ -86,8 +86,8 @@ theorem eq_of_pow_eq_one_of_theta_eq {u v : 𝔹} {m : ℕ} (hm : 0 < m) (hu : u
   have hS : ∑ i ∈ Finset.range m, u ^ i * v ^ (m - 1 - i) ≠ 0 := by
     intro hS
     have h1 := congrArg (thetaAlgHom p) hS
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, map_sum] at h1
+
+    rw [map_zero, map_sum] at h1
     simp only [map_mul, map_pow, hθ] at h1
     rw [Finset.sum_congr rfl fun i hi => (by
       rw [← pow_add]; congr 1; have := Finset.mem_range.1 hi; omega :
@@ -206,7 +206,7 @@ theorem algebraMap_aCris_injective :
   IsLocalization.injective (BCrisPlus ℂ_[p] p)
     (Submonoid.powers_le.2 p_mem_nonZeroDivisors_aCris)
 
-set_option maxHeartbeats 1600000 in
+
 theorem phiPlus_iterate_algebraMap (n : ℕ) (a : ACris ℂ_[p] p) :
     (phiPlus ℂ_[p] p)^[n] (algebraMap (ACris ℂ_[p] p) (BCrisPlus ℂ_[p] p) a) =
       algebraMap (ACris ℂ_[p] p) (BCrisPlus ℂ_[p] p) ((phi (K := ℂ_[p]) (p := p))^[n] a) := by
@@ -231,7 +231,7 @@ theorem exists_root_of_aeval_eq_zero {Q : ℚ_[p][X]} (hQ : Q.Monic) {z : 𝔹} 
   exact ⟨r, hr, sub_eq_zero.1 hr0⟩
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem mem_unramifiedClosure_of_iotaPlus_eq {x : BCrisPlus ℂ_[p] p} {β : PadicAlgCl p}
     (hx : iotaPlus ℂ_[p] p x = algClToBdR p β) : β ∈ unramifiedClosure p := by
   classical

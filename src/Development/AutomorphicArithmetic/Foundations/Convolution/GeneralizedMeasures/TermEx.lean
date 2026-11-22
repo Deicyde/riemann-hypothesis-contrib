@@ -125,7 +125,7 @@ private theorem onInf_test {K : Type} [Field K] [NumberField K] {n : ℕ} (β : 
     Continuous (onInf β) ∧ HasCompactSupport (onInf β) :=
   ⟨β.continuous.comp (archEquiv K n).continuous, β.hasCompactSupport.comp_homeomorph (archEquiv K n).toHomeomorph⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.ConvolutionTheory.GM.termEx :
     LocUnit → TermEx := by
   intro hU F E _ _ _ _ _ _ _ _ σ hσ hp n hn μE iμE μF iμF θ q w₀ q₀ hq νE _ νF _ aE aF ci hci hA

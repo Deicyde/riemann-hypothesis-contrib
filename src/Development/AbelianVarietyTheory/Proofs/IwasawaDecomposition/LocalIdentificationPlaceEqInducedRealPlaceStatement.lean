@@ -10,7 +10,7 @@ public import Formalism.LocalRingCardinality.DataErr
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.L2.G NumberField IsDedekindDomain Formalism.UG Formalism.L2.Forms
 attribute [local instance] Formalism.BasicNotions.factResChar Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_localPlace_asIdeal_iff_val_pos : ∀ (D : D7) (sc : Scale) (Ce : ℝ)
     (Lc : ∀ u, ColLevel D.R D.host.F D.host.E D.sp D.host.g (D.mem u).C (D.mem u).A (D.clsLat u))
     (I : ∀ u (w : D.what₂.places.Pl), GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w) →

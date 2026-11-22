@@ -99,8 +99,8 @@ theorem chain (n : ℕ) (M : Type*) [TopologicalSpace M] : ChainStatement n M :=
   unfold leviV
   try beta_reduce
   simp only [key, hx']
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_mul]
   rw [Finset.sum_mul_sum, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_

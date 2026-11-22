@@ -19,7 +19,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.BotSmallDict GlobalTheory.NormExact
 open scoped Pointwise
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.conjIdealIndicator_unitBlockTranslate_reads_weilOperator : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) {a d : ℕ} (hS : S.rank = a) (hT : T.rank = d) (δ : ℂ),
     D.host.ccK = ⊤ → Setup ψ θ S T ⊤ δ 1 →
     ∀ (LS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (LT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),

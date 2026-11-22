@@ -150,10 +150,10 @@ theorem sliceL_aeval_lapOp {d : ℕ} (b : Module.Basis (Fin d) ℝ (isExpLieAlge
     sliceL g (smL E a (Polynomial.aeval (lapOp (⇑b)) P ψ)) =
       Polynomial.aeval ((isExpLieAlgebra E a).laplacian (F := ℂ) b) P (sliceL g (smL E a ψ)) := by
   refine AutomorphicForm.map_aeval_apply_of_intertwine ((sliceL g).comp (smL E a)) (fun m => ?_) P ψ
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, smL_lapOp, map_sum, sliceL_uAction,
-    IsExpLieAlgebra.laplacian, LinearMap.sum_apply, Module.End.mul_apply,
-    IsExpLieAlgebra.rightUAction_ι]
+
+  simp only [LinearMap.comp_apply, smL_lapOp, map_sum, sliceL_uAction,
+  IsExpLieAlgebra.laplacian, LinearMap.sum_apply, Module.End.mul_apply,
+  IsExpLieAlgebra.rightUAction_ι]
 
 theorem uJ_eq_conv : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (φ : Sm E a) (hs : φ.1 ∈ AutomorphicForm.archSmooth E a), IsAutForm φ → (∀ [MeasurableSpace (AutomorphicForm.archGroup E a)] [BorelSpace (AutomorphicForm.archGroup E a)]
     (μ : MeasureTheory.Measure (AutomorphicForm.archGroup E a)) [μ.IsHaarMeasure]

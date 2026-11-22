@@ -215,7 +215,7 @@ theorem desc_fil (ε : Eps l) (k : Bool) (n : ℕ) (ρ : ℕ → ℕ) (hρ : Slo
 
 end Main
 
-set_option maxHeartbeats 1000000 in
+
 theorem des_qk {l : ℕ} [Fact l.Prime] (hOut : D.Out l) (ε : Eps l)
     (h1 : D.InWm l (WittVector.teichmuller l (ε.e 1 : Ob l) - 1)) (n m : ℕ) :
     CrystallineSemistableComparison.D.Des (FilF l n m) (ε.qk 1 - 1) := by

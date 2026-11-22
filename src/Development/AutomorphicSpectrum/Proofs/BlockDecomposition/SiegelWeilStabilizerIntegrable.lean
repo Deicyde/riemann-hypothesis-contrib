@@ -50,8 +50,8 @@ theorem continuous_trace_pair [FiniteDimensional F E] (σ : E →ₐ[F] E) {n : 
       fun B : HeckeCharacterZeroLocus.SiegelWeilU.HermR R σ n => ∑ a, ∑ c, (Algebra.trace R (R ⊗[F] E) ∘ₗ LinearMap.mulLeft R (T a c))
         ((B : Matrix (Fin n) (Fin n) (R ⊗[F] E)) c a) := by
     funext B
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, Matrix.mul_apply, map_sum]
+
+    simp [Matrix.trace, Matrix.mul_apply, map_sum]
   rw [h]
   exact continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun c _ =>
     (continuous_linear _).comp (continuous_entry σ c a)

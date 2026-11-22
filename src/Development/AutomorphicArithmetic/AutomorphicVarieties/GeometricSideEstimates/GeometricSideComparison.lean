@@ -6,7 +6,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.geometric_side_comparison :
     MeanLow := by
   unfold MeanLow

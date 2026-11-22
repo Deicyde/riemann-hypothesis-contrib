@@ -15,6 +15,6 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 attribute [local instance] Over.cartesianMonoidalCategory
 open Formalism.MainNotions.ModuliIntegralCharts.H1.BoxTuple Formalism.MainNotions.ModuliIntegralCharts.H1.BidegreeTwoJet GlobalTheory GlobalTheory.PowGerm
 open ReciprocityTheory.ChartRestriction.G.TB (colM dAct)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.chartFromPointDatum_of_laws : Laws → Laws2 → Laws4 → TwistBaseChangeStatement → LinkSt := by
   first | exact @GlobalTheory.ChartLink.link | exact GlobalTheory.ChartLink.link | (intros; apply GlobalTheory.ChartLink.link <;> assumption)

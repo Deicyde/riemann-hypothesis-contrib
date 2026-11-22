@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFirstCh
 @[expose] public section
 
 open GlobalTheory.NeedB Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.eta_one_conj_mul_of_cup_coboundary : ∀ (Γ : Type) [Group Γ] (N : ℕ) (x y : Γ →* Multiplicative (ZMod N)) (η : Γ → ZMod N),
   (∀ g h, (x g).toAdd * (y h).toAdd = η h - η (g * h) + η g) →
   η 1 = 0 ∧ (∀ g n, η (g * n * g⁻¹) = η n + (x n).toAdd * (y g).toAdd - (x g).toAdd * (y n).toAdd) ∧

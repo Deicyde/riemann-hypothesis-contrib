@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Hypercohomol
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mappingCone_shortExact_augmentation_class_eq : ∀ (R : Type) [CommRing R] (S : ShortComplex (Shv R)), S.ShortExact →
     ∀ (hc : (CochainComplex.singleFunctor (Shv R) 0).map S.f ≫ resAug S.X₂ = resAug S.X₁ ≫ resMap R S.f)
     (e : HomotopyEquiv (mappingCone (resMap R S.f)) (res R S.X₃)),

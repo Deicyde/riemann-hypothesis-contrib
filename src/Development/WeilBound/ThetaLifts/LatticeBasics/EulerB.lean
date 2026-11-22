@@ -157,8 +157,8 @@ theorem gen_surj (hL : Y.L.IsFullLattice E) {m : ℕ} {x : Fin m → Y.L} (hx : 
   refine mem_of_lat hL (LinearMap.range _) (fun y hy => ?_) w
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 (hx ▸ Submodule.mem_top : (⟨y, hy⟩ : Y.L) ∈ _)
   have e := congrArg (fun t : Y.L => incA F t.1) hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [AddSubmonoidClass.coe_finsetSum, map_sum, SetLike.val_smul_of_tower, map_zsmul] at e
+
+  simp only [AddSubmonoidClass.coe_finsetSum, map_sum, SetLike.val_smul_of_tower, map_zsmul] at e
   refine ⟨fun i => c i, Eq.trans ?_ e⟩
   rw [Fintype.linearCombination_apply]
   exact Finset.sum_congr rfl fun i _ => Int.cast_smul_eq_zsmul _ _ _

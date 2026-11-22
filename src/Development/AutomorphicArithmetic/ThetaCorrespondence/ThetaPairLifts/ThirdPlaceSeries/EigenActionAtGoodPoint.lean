@@ -6,7 +6,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
@@ -105,8 +105,8 @@ theorem main_alt_alt : ∀ (D : D7) (Q : PairedCharacterCondition.Pend D), Globa
       (D.what₂.restRowsFiniteGroupCard : ℂ) • D.ntypes.e0 := by
     rw [e0_eq, eGood, Finset.smul_sum, AddSubmonoidClass.coe_finsetSum]
     show MonoidAlgebra.mapRingHom _ (iotaO D.nd D.naut i) _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
     split_ifs with hg
     · exact hp p

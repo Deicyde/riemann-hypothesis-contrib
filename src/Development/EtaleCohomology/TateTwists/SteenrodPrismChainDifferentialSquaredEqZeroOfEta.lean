@@ -14,8 +14,8 @@ lemma push_d₁ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M)
   cases p with
   | zero => simp [Pr.d₁]
   | succ p =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Pr.d₁, map_sum, Pr.push, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single, Category.assoc]
+
+    simp only [Pr.d₁, map_sum, Pr.push, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single, Category.assoc]
 
 lemma push_d₂ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) :
     Pr.push θ z.d₂ = Pr.d₂ (N := M) ⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ := by
@@ -23,8 +23,8 @@ lemma push_d₂ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M)
   cases r with
   | zero => simp [Pr.d₂]
   | succ r =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Pr.d₂, map_sum, Pr.push, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single, Category.assoc]
+
+    simp only [Pr.d₂, map_sum, Pr.push, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single, Category.assoc]
 
 lemma push_single {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) (n : ℤ) :
     Pr.push θ (Finsupp.single z n) = Finsupp.single ⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ n := by
@@ -41,7 +41,7 @@ lemma d_push {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (c
 theorem steenrod_prism_chain_differential_squared_eq_zero_of_etale : leaf_dbd := by
   intro N c
   unfold Pr.bd
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, d_push]
+
+  simp only [map_sum, map_zsmul, d_push]
 
 end LateralTheory.EtaleFoundations.SteenPf

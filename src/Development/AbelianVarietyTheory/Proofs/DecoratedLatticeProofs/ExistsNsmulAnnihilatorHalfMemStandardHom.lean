@@ -15,7 +15,7 @@ open scoped TensorProduct
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace GlobalTheory.HalfAnnStd
 

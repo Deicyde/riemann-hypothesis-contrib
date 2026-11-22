@@ -40,8 +40,8 @@ theorem isNil_of_theta_eq {B R ι : Type} [CommRing B] [CommRing R] [IsLocalRing
       intro w i
       rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
       simp only [Matrix.mulVec, dotProduct]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, ← Finset.sum_sub_distrib]
+
+      rw [map_sum, map_sum, ← Finset.sum_sub_distrib]
       refine Ideal.sum_mem _ fun j _ => ?_
       rw [map_mul, map_mul, h i j, ← mul_sub, ← map_sub, ← map_sub]
       exact Ideal.mul_mem_left _ _ (hs _ (by rw [map_sub]; exact ih w j))
@@ -67,8 +67,8 @@ theorem isNil_of_map {A B R ι : Type} [CommRing A] [CommRing B] [CommRing R] [F
       intro w
       rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih]
       funext j
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [Matrix.mulVec, dotProduct, map_sum, hσ]
+
+      simp [Matrix.mulVec, dotProduct, map_sum, hσ]
   have := hN (fun j => a (v j)) i
   rwa [key, hθ] at this
 
@@ -95,8 +95,8 @@ theorem frob_teich (x : PreTilt O p) :
 theorem frob_xi (ε : PreTilt O p) :
     WittVector.frobenius (xi ε) = ∑ i ∈ Finset.range p, WittVector.teichmuller p ε ^ i := by
   have : root ε ^ p = ε := (_root_.frobeniusEquiv (PreTilt O p) p).apply_symm_apply ε
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [xi, map_sum, map_pow, frob_teich]
+
+  simp only [xi, map_sum, map_pow, frob_teich]
   simp only [← map_pow, this]
 
 theorem frob_mu (ε : PreTilt O p) :
@@ -134,8 +134,8 @@ theorem theta_frob_xi (hv : v.Integers O) (hε : IsPrimitiveSystem ε) :
     have := theta_mu hv hε
     rw [Sandwich.mu, map_sub, map_one, sub_eq_zero] at this
     exact this
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [frob_xi, map_sum]
+
+  rw [frob_xi, map_sum]
   simp [h1]
 
 variable (F : BFrame ε)
