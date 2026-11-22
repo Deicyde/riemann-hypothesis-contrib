@@ -195,6 +195,7 @@ def main():
     git('config', 'gc.auto', '0')
     git('config', 'core.quotePath', 'false')
     git('config', 'rerere.enabled', 'false')
+    print('FETCH current main', flush=True)
     git('fetch', '--no-tags', UPSTREAM,
         'refs/heads/main:refs/remotes/upstream/main', timeout=1800)
     actual_base = value('rev-parse', 'refs/remotes/upstream/main')
@@ -215,7 +216,9 @@ def main():
     prs = sorted([p for p in SNAPSHOT['prs'] if p['n'] in selected], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
     print('BASE ' + BASE + ' PRS ' + ','.join(str(p['n']) for p in prs), flush=True)
     specs = ['refs/pull/' + str(p['n']) + '/head:refs/remotes/pr/' + str(p['n']) for p in prs]
+    print('FETCH selected PR histories', flush=True)
     git('fetch', '--no-tags', UPSTREAM, *specs, timeout=1800)
+    print('FETCH complete', flush=True)
     results = []
     for pr in prs:
         number = pr['n']
@@ -237,8 +240,8 @@ def main():
                 else:
                     git('rebase', '--abort', check=False)
                     git('checkout', '--detach', '--force', actual, timeout=1800)
-                    replay = git('rebase', '--no-update-refs', '--empty=drop', '--onto', BASE,
-                                 ancestor, timeout=1800, check=False)
+                    replay = git('rebase', '--no-update-refs', '--empty=drop', BASE,
+                                 timeout=1800, check=False)
                     resolutions = []
                     for _ in range(500):
                         if not replay.returncode:
