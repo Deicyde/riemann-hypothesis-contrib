@@ -12,7 +12,7 @@ ones. `git diff --stat 40e56bab HEAD -- src` lists everything that has changed. 
 untouched original, check out `40e56bab` or use
 [riemann-hypothesis-original](https://github.com/homeowmorphism/riemann-hypothesis-original).
 
-The [`literature/`](literature/README.md) directory collects a reader's proposals for matching the formal statements with published results.
+The [`docs/references.bib`](docs/references.bib) bibliography lists the works cited in docstrings under `src/`.
 
 ## What is claimed
 
