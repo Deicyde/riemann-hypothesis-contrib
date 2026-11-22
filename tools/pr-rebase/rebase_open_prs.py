@@ -456,6 +456,47 @@ def finish_report(results, run_tag):
             ENV['GIT_INDEX_FILE'] = old
 
 
+def await_manual_review(number, run_tag, sequence):
+    """Publish the exact stopped state and wait for guarded resolutions on Jack's feed."""
+    feed=SNAPSHOT.get('manual_review_feed')
+    if number!=54 or not feed:
+        return False
+    pending={'number':number,'status':'awaiting-manual-review',**conflict_details(),
+             'rebase_head':value('rev-parse','REBASE_HEAD'),
+             'checkpoint_head':value('rev-parse','HEAD')}
+    name='pending-'+str(sequence)
+    (OUT/'pending.json').write_text(json.dumps(pending,indent=2))
+    finish_report([pending],run_tag+'-'+name)
+    print('WAITING '+name+' '+pending['rebase_head'],flush=True)
+    started=time.monotonic()
+    while time.monotonic()-started<3600:
+        fetched=git('fetch','--no-tags',OWN,'refs/heads/'+feed,check=False)
+        if fetched.returncode:
+            time.sleep(10);continue
+        config=git('show','FETCH_HEAD:tools/pr-rebase/manual-resolutions.json',check=False)
+        if config.returncode:
+            time.sleep(10);continue
+        data=json.loads(config.stdout)
+        entries=data.get('prs',{}).get(str(number),[])
+        entries=entries if isinstance(entries,list) else [entries]
+        if not any(e['commit']==pending['rebase_head'] for e in entries):
+            time.sleep(10);continue
+        (HERE/'manual-resolutions.json').write_text(config.stdout)
+        for entry in entries:
+            for f in entry['files']:
+                if not f['resolution'].startswith('resolutions/') or '..' in f['resolution']:
+                    raise RuntimeError('Invalid resolution path')
+                content=git('show','FETCH_HEAD:tools/pr-rebase/'+f['resolution']).stdout
+                target=HERE/f['resolution'];target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_text(content)
+        changes=resolve_manual_ports(number)
+        if changes:
+            print('REVIEWED '+str(len(changes))+' '+pending['rebase_head'],flush=True)
+            return True
+        time.sleep(10)
+    return False
+
+
 def main():
     global BASE, TAG
     if os.environ.get('PR_BATCH') in SNAPSHOT.get('skip_batches', []):
@@ -533,7 +574,7 @@ def main():
                     replay = git('rebase', '--no-update-refs', '--empty=drop', BASE,
                                  timeout=1800, check=False)
                     resolutions = []
-                    for _ in range(500):
+                    for sequence in range(500):
                         if not replay.returncode:
                             break
                         changes = resolve_manual_ports(number)
@@ -542,7 +583,10 @@ def main():
                         changes += resolve_module_conflicts(number)
                         resolutions.extend(changes)
                         if not changes or git('ls-files', '-u').stdout:
-                            break
+                            if not await_manual_review(number,run_tag,sequence):
+                                break
+                            if git('ls-files','-u').stdout:
+                                continue
                         replay = git('rebase', '--continue', check=False, timeout=1800)
                     result['automatic_resolution_count'] = len(resolutions)
                     result['automatic_resolutions'] = resolutions[:50]
