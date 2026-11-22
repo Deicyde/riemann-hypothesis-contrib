@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/FiniteQuotientOfCompleteNakayama.lean",
+      "stages": {
+        "1": "4f30ed72539e2f634cf6504741cbf3cacdee49a3",
+        "2": "df14be4f1333516b713855974b8193d9239d6263",
+        "3": "613d38d12cfe8316164aa7024b108b85ee7d50be"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "036dfd8d9ea1498dea97165e771d23bdbc66a24d",
+  "checkpoint_head": "6c5aead4b023e41e22f227f49564c88cc46e943d"
+}
