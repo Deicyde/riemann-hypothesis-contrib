@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/ReciprocityTheory/GroupCohomology/PartialProdCoe.lean",
+      "stages": {
+        "1": "5cf14088e92c87123bb291275ef44dfc75eca3aa",
+        "2": "a3290e70ebae01eef5012f791e7cdd019c7562fe",
+        "3": "cbbc758b74febdfb741ca0b487612ef01a98156e"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "052849f05ee070799bb597fc1c517293c0db3b44",
+  "checkpoint_head": "080ea931a608a63d090b2f19ee9365256515c887"
+}
