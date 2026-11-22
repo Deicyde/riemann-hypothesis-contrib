@@ -1,0 +1,111 @@
+{
+  "number": 104,
+  "title": "Speed up the slowest proofs (stacked on #79)",
+  "status": "conflict",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "original_head": "2ea000c90de863f15260573296e84ca49b578d1f",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-speedups",
+  "rebased_head": "3ac94fecb3c2717b70fc55ea309477fe6e75a1d7",
+  "prepared_branch": "maintenance/rebased-pr-104-c259b55f5b-45051429944-tree-restack",
+  "ready_to_publish": true,
+  "changes": "57948 files changed, 111983 insertions(+), 110124 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "diff_check": true,
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true,
+  "automatic_resolution_count": 0,
+  "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+  "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+  "previous_prepared_head": "3ac94fecb3c2717b70fc55ea309477fe6e75a1d7",
+  "restack_commit_count": 2,
+  "automatic_resolutions": [],
+  "conflict_count": 8,
+  "stage_types": {
+    "1,2,3": 8
+  },
+  "conflicts": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "stages": {
+        "1": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+        "2": "49d41585f994f4a92a0ca09150e7703324b8b7ff",
+        "3": "494f1eef5f7dacf20bb48fe11fde58cf5b8cb1a1"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+      "stages": {
+        "1": "1eb53708667b067cbd77275bc40cfda4ab9982f9",
+        "2": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f",
+        "3": "029d165af7e174a4cc691a247540bbe999659af4"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+      "stages": {
+        "1": "9eba9564cf805c109102249802c205ff1be38190",
+        "2": "092c944407f4399b743964f1cd8aedb2beebefe3",
+        "3": "f3b82591de5f3faba25e9ed98ae5fdfb98fbacdb"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+      "stages": {
+        "1": "d80070917a0b4c09cf090cacb855a69210d315e8",
+        "2": "521637452f81b8747eaec6edd345469d1400001f",
+        "3": "ed426bb1afab09c26ae60c43a8f60be87ea97ec1"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+      "stages": {
+        "1": "c55f803fae806b8c20c9b7a0c9c1d1bb61beee67",
+        "2": "142ce053f7945a9bf7d786ef758515e352ba8399",
+        "3": "7361d8c81b75a320e5ee14b2c0e4f4e51125e4de"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+      "stages": {
+        "1": "a7267b17c5ae87d517f5abb171d9765f88320ac4",
+        "2": "1d56d1f2115f0bf092a27a0776a5eb182805e65d",
+        "3": "cc64e4afbb461ef989b3e8a55a42013098d9d4bc"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+      "stages": {
+        "1": "61afe4deecaae81d74ce43667cf41c59f91f295d",
+        "2": "f68694555586640e3f2b62ad83a72690c8ba170f",
+        "3": "2c155abc855c653be719c99fe333b4b8d1caad83"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+      "stages": {
+        "1": "6fc0cf56a6c42c7c9bb7ad70cee4bdbef223bce0",
+        "2": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4",
+        "3": "ca66de755c7f04f30ad427dcc1f43ac7cea13f02"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "98c289571c54c43373c69a921a91faee9a2d51f8",
+  "checkpoint_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "checkpoint_branch": "maintenance/checkpoint-pr-104-8f1c3281c1-45052873081-wide"
+}

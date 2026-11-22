@@ -1,0 +1,120 @@
+{
+  "number": 98,
+  "title": "Minimize and privatize imports (stacked on #79)",
+  "original_head": "86692ef803d35b2ad0ea1ec0ebddadd3f860b33c",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-imports",
+  "maintainer_can_modify": true,
+  "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+  "automatic_resolution_count": 17,
+  "rebased_head": "c5e04197a1ee128f8a751070fd1f20dc0d0c9a8e",
+  "diff_check": true,
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "149261 files changed, 6327681 insertions(+), 700097 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": [],
+    "acyclic": true,
+    "cycle_sample": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-98-8f1c3281c1-45052873081-wide",
+  "status": "rebased",
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "previous_prepared_head": "62358fce08c2241e4a0cc3b26eb9f95c878e39b1",
+  "author_and_message_metadata_unchanged": true,
+  "restack_commit_count": 4,
+  "automatic_resolutions": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "49d41585f994f4a92a0ca09150e7703324b8b7ff"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "092c944407f4399b743964f1cd8aedb2beebefe3"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "521637452f81b8747eaec6edd345469d1400001f"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "142ce053f7945a9bf7d786ef758515e352ba8399"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "1d56d1f2115f0bf092a27a0776a5eb182805e65d"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "f68694555586640e3f2b62ad83a72690c8ba170f"
+    },
+    {
+      "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "8f9b9dcb5f3c99fa9f0f98cdb5fe6febf58895ab"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/Imprimitive.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "7abd1f5055ccf51bf99ebb9a117e7434ec61ca28"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "29e5f4e8090c4bb107c263661415765d40f14be0"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "c144b03d41a23f4f857fa4c705f4b2845e92a702"
+    },
+    {
+      "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "d7beb1b6ac660de16c0aa66ba32db726cee74f33"
+    },
+    {
+      "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "43c115082034e9d342d7d46016b5e8bc84835321"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "3d8e8df2a22dc5dcc48608a5191f1f2af4d3abe4"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "923da77928a45af705d2b804472c3b72a25bf838"
+    },
+    {
+      "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+      "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+      "ours": "05a83d39c456aedeafe7d127336b5f9cd95b7ba1"
+    }
+  ],
+  "retained_commit_metadata_verified": true,
+  "retained_commit_count": 4
+}

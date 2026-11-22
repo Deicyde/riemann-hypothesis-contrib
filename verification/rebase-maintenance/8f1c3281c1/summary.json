@@ -1,0 +1,419 @@
+{
+  "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+  "run": "45052873081-wide",
+  "results": [
+    {
+      "number": 9,
+      "title": "remove redundant imports and heartbeat overrides",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "c2de7b111cf3d61b59454121ff418cba6a5a0763",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/redundant-imports",
+      "rebased_head": "d0cf26a857d5201128e9777b651b07b12d7f4909",
+      "prepared_branch": "maintenance/rebased-pr-9-8f1c3281c1-45052873081-wide",
+      "ready_to_publish": true,
+      "changes": "14627 files changed, 17 insertions(+), 14781 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044493411-manual-imports/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "333d70da5f0a92b27d0e14cc17d904bd5024e2e5",
+      "author_and_message_metadata_unchanged": true,
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1
+    },
+    {
+      "number": 10,
+      "title": "simplify generated proof fallbacks",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "1ccff6869721e3608761372313714f64e59aba57",
+      "original_repo": "deancureton/riemann-hypothesis",
+      "original_branch": "cleanup/proof-fallbacks",
+      "rebased_head": "8959e8a71a26f250bc3b5b813bed267cd45cf77e",
+      "prepared_branch": "maintenance/rebased-pr-10-8f1c3281c1-45052873081-wide",
+      "ready_to_publish": true,
+      "changes": "36203 files changed, 36280 insertions(+), 36265 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044493411-manual-imports/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "bc52c2975d18f6f51a09500b26a1b929ec975009",
+      "author_and_message_metadata_unchanged": true,
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 1
+    },
+    {
+      "number": 79,
+      "title": "Remove heartbeat overrides",
+      "status": "conflict",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "90d23d60feda4ba5c41c6c7f8835c1de67bee799",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-heartbeats",
+      "rebased_head": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+      "prepared_branch": "maintenance/rebased-pr-79-c259b55f5b-45051429944-tree-restack",
+      "ready_to_publish": true,
+      "changes": "57880 files changed, 103810 insertions(+), 103811 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "restack_source_unchanged": {
+        "src": true,
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "lakefile.toml": true
+      },
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+      "restack_commit_count": 1,
+      "automatic_resolutions": [],
+      "conflict_count": 8,
+      "stage_types": {
+        "1,2,3": 8
+      },
+      "conflicts": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "stages": {
+            "1": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+            "2": "49d41585f994f4a92a0ca09150e7703324b8b7ff",
+            "3": "494f1eef5f7dacf20bb48fe11fde58cf5b8cb1a1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "stages": {
+            "1": "1eb53708667b067cbd77275bc40cfda4ab9982f9",
+            "2": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f",
+            "3": "029d165af7e174a4cc691a247540bbe999659af4"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+          "stages": {
+            "1": "9eba9564cf805c109102249802c205ff1be38190",
+            "2": "092c944407f4399b743964f1cd8aedb2beebefe3",
+            "3": "f3b82591de5f3faba25e9ed98ae5fdfb98fbacdb"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+          "stages": {
+            "1": "d80070917a0b4c09cf090cacb855a69210d315e8",
+            "2": "521637452f81b8747eaec6edd345469d1400001f",
+            "3": "ed426bb1afab09c26ae60c43a8f60be87ea97ec1"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+          "stages": {
+            "1": "c55f803fae806b8c20c9b7a0c9c1d1bb61beee67",
+            "2": "142ce053f7945a9bf7d786ef758515e352ba8399",
+            "3": "7361d8c81b75a320e5ee14b2c0e4f4e51125e4de"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+          "stages": {
+            "1": "a7267b17c5ae87d517f5abb171d9765f88320ac4",
+            "2": "1d56d1f2115f0bf092a27a0776a5eb182805e65d",
+            "3": "cc64e4afbb461ef989b3e8a55a42013098d9d4bc"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+          "stages": {
+            "1": "61afe4deecaae81d74ce43667cf41c59f91f295d",
+            "2": "f68694555586640e3f2b62ad83a72690c8ba170f",
+            "3": "2c155abc855c653be719c99fe333b4b8d1caad83"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+          "stages": {
+            "1": "6fc0cf56a6c42c7c9bb7ad70cee4bdbef223bce0",
+            "2": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4",
+            "3": "ca66de755c7f04f30ad427dcc1f43ac7cea13f02"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+      "checkpoint_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "checkpoint_branch": "maintenance/checkpoint-pr-79-8f1c3281c1-45052873081-wide"
+    },
+    {
+      "number": 98,
+      "title": "Minimize and privatize imports (stacked on #79)",
+      "original_head": "86692ef803d35b2ad0ea1ec0ebddadd3f860b33c",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+      "automatic_resolution_count": 17,
+      "rebased_head": "c5e04197a1ee128f8a751070fd1f20dc0d0c9a8e",
+      "diff_check": true,
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "149261 files changed, 6327681 insertions(+), 700097 deletions(-)",
+      "imports": {
+        "modules": 149397,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-98-8f1c3281c1-45052873081-wide",
+      "status": "rebased",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "previous_prepared_head": "62358fce08c2241e4a0cc3b26eb9f95c878e39b1",
+      "author_and_message_metadata_unchanged": true,
+      "restack_commit_count": 4,
+      "automatic_resolutions": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "49d41585f994f4a92a0ca09150e7703324b8b7ff"
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "092c944407f4399b743964f1cd8aedb2beebefe3"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "521637452f81b8747eaec6edd345469d1400001f"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "142ce053f7945a9bf7d786ef758515e352ba8399"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "1d56d1f2115f0bf092a27a0776a5eb182805e65d"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "f68694555586640e3f2b62ad83a72690c8ba170f"
+        },
+        {
+          "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4"
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "8f9b9dcb5f3c99fa9f0f98cdb5fe6febf58895ab"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/CharacterBoxes/Imprimitive.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "7abd1f5055ccf51bf99ebb9a117e7434ec61ca28"
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/IntegralCasts/CapelliIdentities/CapelliComplements/GeneralBFactAlt.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "29e5f4e8090c4bb107c263661415765d40f14be0"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/EventuallySmulSub.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "c144b03d41a23f4f857fa4c705f4b2845e92a702"
+        },
+        {
+          "path": "src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/StabilizerOrbitVolume/HenselCountHolds.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "d7beb1b6ac660de16c0aa66ba32db726cee74f33"
+        },
+        {
+          "path": "src/Formalism/ZeroFreeRegion/ZetaLogDerivativeBounds/LogDerivBound.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "43c115082034e9d342d7d46016b5e8bc84835321"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ArakelovGeometry/ExistsPrimeFiltrationOfIsMultiHomogIdeal.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "3d8e8df2a22dc5dcc48608a5191f1f2af4d3abe4"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterDivSupp.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "923da77928a45af705d2b804472c3b72a25bf838"
+        },
+        {
+          "path": "src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/InterPCProof.lean",
+          "reason": "retain-new-main-proof-in-format-or-import-cleanup",
+          "ours": "05a83d39c456aedeafe7d127336b5f9cd95b7ba1"
+        }
+      ],
+      "retained_commit_metadata_verified": true,
+      "retained_commit_count": 4
+    },
+    {
+      "number": 104,
+      "title": "Speed up the slowest proofs (stacked on #79)",
+      "status": "conflict",
+      "base": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "original_head": "2ea000c90de863f15260573296e84ca49b578d1f",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-speedups",
+      "rebased_head": "3ac94fecb3c2717b70fc55ea309477fe6e75a1d7",
+      "prepared_branch": "maintenance/rebased-pr-104-c259b55f5b-45051429944-tree-restack",
+      "ready_to_publish": true,
+      "changes": "57948 files changed, 111983 insertions(+), 110124 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": []
+      },
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "diff_check": true,
+      "restack_source_unchanged": {
+        "src": true,
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "lakefile.toml": true
+      },
+      "author_and_message_metadata_unchanged": true,
+      "automatic_resolution_count": 0,
+      "note": "Prepared on Jack\u2019s fork; original branch publication requires maintainer credentials.",
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1334509aa7-45044232327-restack/verification/rebase-maintenance/1334509aa7/summary.json",
+      "previous_prepared_head": "3ac94fecb3c2717b70fc55ea309477fe6e75a1d7",
+      "restack_commit_count": 2,
+      "automatic_resolutions": [],
+      "conflict_count": 8,
+      "stage_types": {
+        "1,2,3": 8
+      },
+      "conflicts": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "stages": {
+            "1": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+            "2": "49d41585f994f4a92a0ca09150e7703324b8b7ff",
+            "3": "494f1eef5f7dacf20bb48fe11fde58cf5b8cb1a1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "stages": {
+            "1": "1eb53708667b067cbd77275bc40cfda4ab9982f9",
+            "2": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f",
+            "3": "029d165af7e174a4cc691a247540bbe999659af4"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+          "stages": {
+            "1": "9eba9564cf805c109102249802c205ff1be38190",
+            "2": "092c944407f4399b743964f1cd8aedb2beebefe3",
+            "3": "f3b82591de5f3faba25e9ed98ae5fdfb98fbacdb"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+          "stages": {
+            "1": "d80070917a0b4c09cf090cacb855a69210d315e8",
+            "2": "521637452f81b8747eaec6edd345469d1400001f",
+            "3": "ed426bb1afab09c26ae60c43a8f60be87ea97ec1"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+          "stages": {
+            "1": "c55f803fae806b8c20c9b7a0c9c1d1bb61beee67",
+            "2": "142ce053f7945a9bf7d786ef758515e352ba8399",
+            "3": "7361d8c81b75a320e5ee14b2c0e4f4e51125e4de"
+          }
+        },
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+          "stages": {
+            "1": "a7267b17c5ae87d517f5abb171d9765f88320ac4",
+            "2": "1d56d1f2115f0bf092a27a0776a5eb182805e65d",
+            "3": "cc64e4afbb461ef989b3e8a55a42013098d9d4bc"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+          "stages": {
+            "1": "61afe4deecaae81d74ce43667cf41c59f91f295d",
+            "2": "f68694555586640e3f2b62ad83a72690c8ba170f",
+            "3": "2c155abc855c653be719c99fe333b4b8d1caad83"
+          }
+        },
+        {
+          "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+          "stages": {
+            "1": "6fc0cf56a6c42c7c9bb7ad70cee4bdbef223bce0",
+            "2": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4",
+            "3": "ca66de755c7f04f30ad427dcc1f43ac7cea13f02"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "98c289571c54c43373c69a921a91faee9a2d51f8",
+      "checkpoint_head": "8f1c3281c1292e2eee934e1343ec47a17c3c981a",
+      "checkpoint_branch": "maintenance/checkpoint-pr-104-8f1c3281c1-45052873081-wide"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
