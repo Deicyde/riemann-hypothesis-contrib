@@ -1,0 +1,29 @@
+{
+  "base": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+  "run": "45053662564-docs-pending-0",
+  "results": [
+    {
+      "number": 78,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "README.md",
+          "stages": {
+            "1": "0dcc78956d30bc7380bef582a7e0863253c3e11b",
+            "2": "ffbeeaaa86179e657b72bcb202a216ef535419c3",
+            "3": "14b0ed3ad71bee3e38ddb617ee75daf81dd2cfa7"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "619411a02677658215662c6fe0efcd2a09f7cb08",
+      "checkpoint_head": "fbf2468e1cda1559c9941eaded92b8e3fde83747",
+      "checkpoint_branch": "maintenance/checkpoint-pr-78-fbf2468e1c-45053662564-docs-pending-0"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
