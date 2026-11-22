@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-68",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatHopfMul.lean",
+          "stages": {
+            "1": "a1623860c405eeb215dec815d39782f20230bc04",
+            "2": "99750cedf1e575449f8d2eb4a4c08a70c6d39e62",
+            "3": "43c5be2aaead624a94ce9151a80efefa879b795b"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "d1c5a3bae13bf35248a9cc2503d6ba8170848651",
+      "checkpoint_head": "d9a1d78c4eb0db0e76db29b3a2194eac6f54a0aa"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
