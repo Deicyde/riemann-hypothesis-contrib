@@ -73,6 +73,37 @@ def conflict_details():
             'conflict_list_truncated': len(entries) > 200}
 
 
+def replay_line_deletions(base, ours, theirs):
+    """Carry unambiguous declaration-deletion ranges through the compiler port."""
+    b, o, t = base.splitlines(keepends=True), ours.splitlines(keepends=True), theirs.splitlines(keepends=True)
+    mask = [False] * len(b)
+    for tag, a, z, _, _ in difflib.SequenceMatcher(None, b, t, autojunk=len(b)>3000).get_opcodes():
+        if tag == 'delete':
+            mask[a:z] = [True] * (z-a)
+    if not any(mask):
+        return None
+    prefix = [0]
+    for remove in mask:
+        prefix.append(prefix[-1] + int(remove))
+    out = []
+    for tag, a, z, c, d in difflib.SequenceMatcher(None, b, o, autojunk=len(b)>3000).get_opcodes():
+        if tag == 'equal':
+            out.extend(o[c+i-a] for i in range(a,z) if not mask[i])
+        elif tag == 'delete':
+            continue
+        elif tag == 'insert':
+            if not (0<a<len(mask) and mask[a-1] and mask[a]):
+                out.extend(o[c:d])
+        else:
+            removed = prefix[z] - prefix[a]
+            if removed == z-a:
+                continue
+            if removed:
+                return None  # A retained declaration overlaps a port rewrite: review separately.
+            out.extend(o[c:d])
+    return ''.join(line for i,line in enumerate(b) if not mask[i]), ''.join(out)
+
+
 def resolve_module_conflicts(number):
     """Replay edits through the known module-header conversion, preserving proof edits."""
     entries = collections.defaultdict(dict)
@@ -82,6 +113,9 @@ def resolve_module_conflicts(number):
             mode, sha, stage = meta.split()
             entries[path][stage] = sha
     resolved = []
+    pruning = (number in (55,58,61,67) and
+               git('rev-parse', 'REBASE_HEAD', check=False).stdout.strip()
+               == 'a7016a34bb7e84e8f031c2179bd71cb9c20f2517')
     with subprocess.Popen(['git', '-C', str(REPO), 'cat-file', '--batch'],
                           stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                           stderr=subprocess.DEVNULL, env=ENV) as reader:
@@ -120,13 +154,18 @@ def resolve_module_conflicts(number):
                 source = re.sub(r'\Amodule\n', '', source)
                 source = re.sub(r'^public import ', 'import ', source, flags=re.M)
                 source = re.sub(r'^@\[expose\] public section\n', '', source, flags=re.M)
+                source = re.sub(r'^(import[^\n]*\n)(?:[ \t]*\n)+', r'\1\n', source, flags=re.M)
                 return source.lstrip('\n')
             temporary = ROOT / 'merge-inputs'
             temporary.mkdir(exist_ok=True)
             paths = []
+            normalized = {stage: normalize(blobs[stage]) for stage in ['2','1','3']}
+            deletion_replay = replay_line_deletions(normalized['1'], normalized['2'], normalized['3']) if pruning else None
+            if deletion_replay:
+                normalized['1'], normalized['2'] = deletion_replay
             for stage in ['2', '1', '3']:
                 f = temporary / stage
-                f.write_text(normalize(blobs[stage]))
+                f.write_text(normalized[stage])
                 paths.append(str(f))
             merged = subprocess.run(['git', 'merge-file', '-p', *paths],
                                     capture_output=True, text=True)
@@ -140,7 +179,8 @@ def resolve_module_conflicts(number):
                 lines[i] = 'public ' + lines[i]
             lines.insert(imports[-1] + 1, '\n@[expose] public section\n')
             (REPO / path).write_text('module\n\n' + ''.join(lines))
-            resolved.append({'path': path, 'reason': 'three-way-replay-through-module-header'})
+            resolved.append({'path': path, 'reason': 'replay-deletion-ranges-through-port' if deletion_replay
+                             else 'three-way-replay-through-module-header'})
         reader.stdin.close()
         reader.wait()
     if resolved:
@@ -353,6 +393,7 @@ def main():
         'reviewed': [71,74,82,90,92],
         'manual': [94,95],
         'remaining': [33,54,75,88,91,94,95,98],
+        'pruning-replay': [55,58,61,67],
     }
     selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
     if 'only' in SNAPSHOT:
