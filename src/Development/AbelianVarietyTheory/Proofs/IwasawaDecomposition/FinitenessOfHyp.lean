@@ -59,8 +59,11 @@ variable {hL : GlobalTheory.Published.LocalLanglandsGL} {K : Ctx} {B : Base} {f 
   {x : St P} (l : LC hL x)
 
 theorem mtIn : MtInput (Dof x) l.mt.M l.c.tp.tup l.c.ch.Q := by
-  show MtInput (Dof x) l.mt.M (fun μ j => (cfOf x).mu0 j * l.c.tp.xi μ) l.c.ch.Q
-  rw [l.c.xi_eq, l.c.Q_eq]; exact l.mt.mt
+  have h := congrArg₂
+    (fun (ξ : (Dof x).what₂.Tup → HChar (Dof x).host.E) Q =>
+      MtInput (Dof x) l.mt.M (fun μ j => (cfOf x).mu0 j * ξ μ) Q)
+    l.c.xi_eq l.c.Q_eq
+  exact h.mpr l.mt.mt
 
 variable {big : (Dof x).what₂.places.Pl → Finset ℂ} {L : LocAll (lay0 (Dof x))} (Sp : NdSpec l.a.A.pl l.mt.M l.c.ch big L.X L.T)
   (Au : AutSpec l.a.A l.mt.M l.c.tp.tup Sp.iq L.Y L.C) (ss : ∀ σ lam, IsSSRep (L.Z.rbar σ lam))
@@ -86,14 +89,30 @@ structure AllL : Type 1 where
 
 theorem low_ok (D : D7) : 2 ∈ lowAll D ∧ AbsolutelyIrreducibleSpan.q0 D ∈ lowAll D ∧ (NumberField.discr D.host.E).natAbs.primeFactors ⊆ lowAll D ∧
     (Ideal.absNorm D.host.ccK).primeFactors ⊆ lowAll D := by
-  refine ⟨by simp [lowAll, Formalism.L2.lowPr], by simp [lowAll, Formalism.L2.lowPr], fun p hp => ?_, fun p hp => ?_⟩ <;>
-    simp only [lowAll, Formalism.L2.lowPr, Finset.mem_union, Finset.mem_insert] <;> tauto
+  have memLow {p : ℕ} (hp : p ∈ Formalism.L2.lowPr D) : p ∈ lowAll D :=
+    Finset.mem_union_left _ hp
+  have memPrimes {p : ℕ} (hp : p ∈ (Ideal.absNorm D.host.ccK).primeFactors ∪
+      (NumberField.discr D.host.E).natAbs.primeFactors) : p ∈ lowAll D :=
+    memLow (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hp))
+  exact ⟨memLow (Finset.mem_insert_self _ _),
+    memLow (Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)),
+    fun _ hp => memPrimes (Finset.mem_union_right _ hp),
+    fun _ hp => memPrimes (Finset.mem_union_left _ hp)⟩
+
+private theorem admTw_of_withLoc {D : D7} {L : LocAll (lay0 D)} {i k Q ψ}
+    (h : Formalism.L2.NX.AdmTw (withLoc L) i k Q ψ) : Formalism.L2.NX.AdmTw D i k Q ψ := by
+  unfold Formalism.L2.NX.AdmTw at h ⊢
+  with_unfolding_all exact h
 
 variable (al : AllL l L) (hLg : GlobalTheory.CoefDuty.Large (withLoc L))
 
 theorem pqW (i j b k Q ψ) (h1 : 1 ≤ j) (h2 : j ≤ (withLoc L).R.m) (hadm : Formalism.L2.NX.AdmTw (withLoc L) i k Q ψ) :
-    plsOf al.a.exp i j b k Q ψ h1 h2 hadm = (qpOf (Dof x) l.Pq Q, qpOf (Dof x) l.Pq ((Dof x).ntw.pD i)) :=
-  (al.exp.pl i j b k Q ψ h1 h2 hadm).trans (Prod.ext (l.b.Bs.pq i j b k Q ψ h1 h2 hadm).1 (l.b.Bs.pq i j b k Q ψ h1 h2 hadm).2)
+    plsOf al.a.exp i j b k Q ψ h1 h2 hadm = (qpOf (Dof x) l.Pq Q, qpOf (Dof x) l.Pq ((Dof x).ntw.pD i)) := by
+  have hpl := al.exp.pl i j b k Q ψ h1 h2 hadm
+  have hadm₀ := admTw_of_withLoc (D := Dof x) (L := L) hadm
+  have hpq := l.b.Bs.pq i j b k Q ψ h1 h2 hadm₀
+  have hpair := congrArg₂ Prod.mk hpq.1 hpq.2
+  with_unfolding_all exact (hpl.trans hpair :)
 
 def natW : NAt hL (withLoc L) (cfL L (cfOf x)) (chL L l.c.ch) (tpL L l.c.tp) where
   nt := ntW l Sp Au ss
@@ -140,9 +159,12 @@ theorem packedNAt_transport_heq {D D' : D7} (e : D = D') (a : PackedNAt hL D) :
 theorem natD_heq :
     HEq (ratL (natD l Sp Au ss al hLg).nt.L (natD l Sp Au ss al hLg).nt.S) (ratL L l.rat.S) ∧
       HEq (natD l Sp Au ss al hLg).nt.hL l.rat.In.hL ∧
-      HEq (natD l Sp Au ss al hLg).nt.rep (repOf x.r.Y) :=
-  packedNAt_transport_heq (DL_eq x L).symm
+      HEq (natD l Sp Au ss al hLg).nt.rep (repOf x.r.Y) := by
+  let a : PackedNAt hL (withLoc L) :=
     ⟨cfL L (cfOf x), chL L l.c.ch, tpL L l.c.tp, natW l Sp Au ss al hLg⟩
+  have h := packedNAt_transport_heq (D := withLoc L) (D' := DL x L) (DL_eq x L).symm a
+  dsimp only [natD, natDData, natW, ntW, a] at h ⊢
+  exact h
 
 
 include l in

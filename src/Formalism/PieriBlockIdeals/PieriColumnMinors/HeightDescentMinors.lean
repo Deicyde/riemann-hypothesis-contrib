@@ -139,10 +139,7 @@ theorem coeff_one_add_X_pow_alt (R : Type*) [CommRing R] (d n : ℕ) :
 variable (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra ℤ_[l] O]
 
 theorem constantCoeff_binomialSeriesSubOne (c : ℤ_[l]) : constantCoeff (br l O c) = 0 := by
-  first
-    | simp [br]
-    | (simp only [br, map_sub, map_one, sub_eq_zero, ← PowerSeries.coeff_zero_eq_constantCoeff_apply]
-       simp [PowerSeries.binomialSeries])
+  rw [br, (constantCoeff (R := O)).map_sub, binomialSeries_constantCoeff, map_one, sub_self]
 
 theorem hasSubst_br_padic (c : ℤ_[l]) : HasSubst (br l O c) := by
   apply PowerSeries.HasSubst.of_constantCoeff_zero
@@ -333,16 +330,12 @@ variable (O : Type) [CommRing O] [Algebra ℤ_[l] O]
 
 theorem br_eq_X_mul_shift (d : ℤ_[l]) :
     br l O d = X * PowerSeries.mk (fun n => coeff (n + 1) (br l O d)) := by
-  ext n
-  rcases n with _ | n
-  · simpa using constantCoeff_binomialSeriesSubOne l O d
-  · simp [PowerSeries.coeff_succ_X_mul]
+  have h := eq_X_mul_shift_add_const (br l O d)
+  rwa [constantCoeff_binomialSeriesSubOne l O d, map_zero, add_zero] at h
 
 theorem coeff_one_br (d : ℤ_[l]) : coeff 1 (br l O d) = algebraMap ℤ_[l] O d := by
-  first
-    | simp [br, PowerSeries.binomialSeries_coeff, Ring.choose_one_right, Algebra.smul_def]
-    | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right, Algebra.smul_def]
-    | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right]
+  simp only [br, (coeff (R := O) 1).map_sub, binomialSeries_coeff, Ring.choose_one_right,
+    coeff_one, Nat.one_ne_zero, ite_false, sub_zero, Algebra.smul_def, mul_one]
 
 theorem r1_holds : R1 := by
   intro l _ O _ _ hl
@@ -352,7 +345,7 @@ theorem r1_holds : R1 := by
     have : ∀ d ∈ mu l, constantCoeff (PowerSeries.mk (fun n => coeff (n + 1) (br l O d))) =
         algebraMap ℤ_[l] O d := by
       intro d _
-      rw [← coeff_zero_eq_constantCoeff_apply, coeff_mk, zero_add, coeff_one_br]
+      rw [constantCoeff_mk, zero_add, coeff_one_br]
     rw [Finset.prod_congr rfl this, ← map_prod, prod_roots_unity_eq_neg_one l hl, map_neg, map_one]
   have hu : IsUnit w := by
     rw [isUnit_iff_constantCoeff, hcc]
@@ -831,9 +824,10 @@ theorem eq_sum_subst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (f
     rw [Finset.sum_congr rfl fun j _ => by rw [hh j]]
     simp only [add_mul, Finset.sum_add_distrib, Finset.sum_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
-    congr 1
-    · exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
-    · exact Finset.sum_congr rfl fun j _ => by ring
+    refine congrArg₂ (· + ·) ?_ ?_
+    · exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ =>
+        (mul_assoc _ _ _).trans (mul_left_comm _ _ _)
+    · exact Finset.sum_congr rfl fun j _ => mul_assoc _ _ _
   have e3 : f - ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
           ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) =
       ((w : R⟦X⟧) * X ^ n) ^ (N + 1) *
@@ -856,8 +850,8 @@ theorem constantCoeff_eq_zero_of_sum_subst (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧
         X ^ n * ((w : R⟦X⟧) * ∑ j : Fin n, h j * X ^ (j : ℕ)) := by
     rw [Finset.sum_congr rfl fun j _ => by rw [hh j]]
     simp only [add_mul, Finset.sum_add_distrib, Finset.mul_sum]
-    congr 1
-    exact Finset.sum_congr rfl fun j _ => by ring
+    refine congrArg₂ (· + ·) rfl (Finset.sum_congr rfl fun j _ => ?_)
+    simp only [mul_assoc, mul_left_comm (w : R⟦X⟧) (X ^ n)]
   rw [e] at h0
   have h1 := congrArg (coeff (i : ℕ)) h0
 
@@ -1046,7 +1040,7 @@ theorem inc_X_sub_l_eq_q0 : inc l O (X - C (l : O)) = q0 l O := by
 theorem br_eq_X_mul_const (c : ℤ_[l]) :
     ∃ s : O⟦X⟧, br l O c = X * s ∧ constantCoeff s = algebraMap ℤ_[l] O c := by
   refine ⟨_, br_eq_X_mul_shift l O c, ?_⟩
-  simp [coeff_one_br]
+  rw [constantCoeff_mk, zero_add, coeff_one_br]
 
 theorem exists_mu_generator_pow_sub_one_isUnit (hm : MuFacts) : ∃ d ∈ mu l, ∀ j, 0 < j → j < l - 1 → IsUnit (d ^ j - 1) := by
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := (ZMod l)ˣ)
@@ -1172,8 +1166,7 @@ lemma constantCoeff_br_zero (c : ℤ_[l]) : constantCoeff (br l O c) = 0 := cons
 
 lemma br_eq_X_mul_const_alt (e : ℤ_[l]) :
     ∃ β : O⟦X⟧, br l O e = X * β ∧ constantCoeff β = algebraMap ℤ_[l] O e := by
-  refine ⟨_, br_eq_X_mul_shift l O e, ?_⟩
-  simp [coeff_one_br]
+  exact br_eq_X_mul_const l O e
 
 lemma constantCoeff_pi0_eq_zero_alt (hm : MuFacts) : constantCoeff (pi0 l O) = 0 := constantCoeff_pi0_eq_zero l O
 

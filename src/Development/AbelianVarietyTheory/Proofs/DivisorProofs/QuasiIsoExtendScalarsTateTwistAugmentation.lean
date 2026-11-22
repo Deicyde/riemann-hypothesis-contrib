@@ -34,7 +34,7 @@ theorem flatS_cone (Q : ℕ) [NeZero Q] (F : Shv (ZMod Q)) (hF : FlatS F) (n : �
   · by_cases h : n + 1 = 0
     · exact hiso (HomologicalComplex.singleObjXIsoOfEq (ComplexShape.up ℤ) 0 F (n + 1) h).symm hF
     · exact hzero _ (HomologicalComplex.isZero_single_obj_X _ _ _ _ h)
-  · haveI : Injective ((res (ZMod Q) F).X n) :=
+  · have : Injective ((res (ZMod Q) F).X n) :=
       (inferInstance : Injective ((injectiveResolution F).cochainComplex.X n))
     exact (GlobalTheory.T.flat_sections_of_injective_zmodEtaleSheaf Q _).2
 
@@ -43,9 +43,12 @@ theorem quasiIso_extAug : ∀ (Q q : ℕ) [NeZero Q] (hq : q ∣ Q) (i : ℤ),
   intro Q q _ hq i
   have hq' : QuasiIso (resAug (tw Q i)) := (inferInstance : QuasiIso (injectiveResolution (tw Q i)).ι')
   have hK : (mappingCone (resAug (tw Q i))).Acyclic := GlobalTheory.mappingCone_acyclic_of_quasiIso _
-  haveI : (res (ZMod Q) (tw Q i)).IsStrictlyGE 0 :=
+  have : (res (ZMod Q) (tw Q i)).IsStrictlyGE 0 :=
     (inferInstance : (injectiveResolution (tw Q i)).cochainComplex.IsStrictlyGE 0)
-  haveI : (mappingCone (resAug (tw Q i))).IsStrictlyGE (-1) := CochainComplex.isStrictlyGE_mappingCone _ 0 0 (-1)
+  -- The default `lia` proofs are expensive to check in this context.
+  have hneg : (-1 : ℤ) < 0 := neg_one_lt_zero
+  have : (mappingCone (resAug (tw Q i))).IsStrictlyGE (-1) :=
+    CochainComplex.isStrictlyGE_mappingCone _ 0 0 (-1) hneg hneg.le
   have hE := GlobalTheory.T.acyclic_extendScalars_zmod_of_flat_boundedBelow Q q hq (mappingCone (resAug (tw Q i))) (-1)
     (flatS_cone Q (tw Q i) (GlobalTheory.T.tateTwistSheaf_isLocallyFlat Q i)) hK
   have hC : (mappingCone (((extSh (ZMod.castHom hq (ZMod q))).mapHomologicalComplex _).map

@@ -40,6 +40,17 @@ theorem isL_add [CharZero k] (H : GlobalTheory.Published.LanglandsMultisegments)
   obtain ⟨ω⟩ := IsSubquotient.nonempty_equiv hs' hy.irr_smooth.1 hπ
   exact hy.of_equiv ω.symm
 
+private theorem isL_add_of_equiv [CharZero k] (H : GlobalTheory.Published.LanglandsMultisegments)
+    {𝔪 𝔫 : Multiset (Segment k)} (x y : IrrGL (k := k))
+    {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+    (τ : Representation ℂ (GL (Fin n) k) W) (hτs : IsSmooth τ) (hτi : τ.IsIrreducible)
+    (hx : IsL 𝔪 x.rep) (hτ : IsL 𝔫 τ) (hy : IsL (𝔪 + 𝔫) y.rep)
+    {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (x.1 + n)) k) V)
+    (hπ : π.IsIrreducible) (χ : π.Equiv (prod₂ x.rep τ)) : IsL (𝔪 + 𝔫) π := by
+  let e := IrrGL.equivOf τ hτs hτi
+  exact isL_add H x (IrrGL.of τ hτs hτi) y hx (hτ.of_equiv e) hy π hπ
+    (χ.trans (prod₂Equiv (Representation.Equiv.refl x.rep) e))
+
 theorem isL_sum_of_isIrreducible : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k], GlobalTheory.Published.LanglandsMultisegments →
     ∀ (P : Segment k → Prop), (∀ 𝔫 : Multiset (Segment k), (∀ Δ ∈ 𝔫, P Δ) → ∃ y : IrrGL (k := k), IsL 𝔫 y.rep) →
     ∀ (h N : ℕ) (x : Fin h → IrrGL (k := k)) (hd : ∑ a, (x a).1 = N) (𝔪 : Fin h → Multiset (Segment k)),
@@ -53,23 +64,30 @@ theorem isL_sum_of_isIrreducible : ∀ (k : Type) [Field k] [ValuativeRel k] [To
     refine ⟨0, x, hd, ⟨Fin.elim0, ⟨by simp, fun i => i.elim0⟩, fun i => i.elim0⟩, ?_⟩
     exact (isCosocle_self hπ).of_equiv (.refl _) φ
   | succ h ih =>
-    rintro N x hd 𝔪 hL hm V _ _ π hπ ⟨φ⟩
+    intro N x hd
     have e : N = (x 0).1 + ∑ i : Fin h, (x i.succ).1 := hd.symm.trans (Fin.sum_univ_succ _)
     subst e
-    obtain ⟨ψ⟩ := GlobalTheory.SmGL.MultiIrr.nonempty_prod₂_equiv_multiProd_succ (fun a => (x a).1) hd fun a => (x a).rep
-    let τ := prodIrr (fun i : Fin h => x i.succ) rfl
-    have hτs : IsSmooth τ := isSmooth_prodIrr _ _
+    rintro 𝔪 hL hm V _ _ π hπ ⟨φ⟩
+    let tail : Fin h → IrrGL (k := k) := fun i => x i.succ
+    let n := ∑ i, (tail i).1
+    let τ := prodIrr tail (N := n) rfl
+    have hτs : IsSmooth τ := isSmooth_prodIrr tail rfl
+    have split : Nonempty ((prod₂ (x 0).rep τ).Equiv (prodIrr x hd)) :=
+      GlobalTheory.SmGL.MultiIrr.nonempty_prod₂_equiv_multiProd_succ
+        (fun a => (x a).1) hd (X := fun a => (x a).2.rep.V) fun a => (x a).rep
+    obtain ⟨ψ⟩ := split
     have χ : π.Equiv (prod₂ (x 0).rep τ) := φ.trans ψ.symm
-    have hτi : τ.IsIrreducible := GlobalTheory.SmGL.ProdIrr.isIrreducible_of_prod₂ k _ _ _ _ _ (x 0).rep τ π
+    have hτi : τ.IsIrreducible := GlobalTheory.SmGL.ProdIrr.isIrreducible_of_prod₂ k (x 0).1 n _ _ V (x 0).rep τ π
       (x 0).2.rep.smooth (x 0).2.rep.irr hτs hπ ⟨χ⟩
     have hτ : IsL (∑ i : Fin h, 𝔪 i.succ) τ :=
-      ih _ (fun i => x i.succ) rfl (fun i => 𝔪 i.succ) (fun i => hL _) (fun i => hm _) _ τ hτi ⟨.refl _⟩
+      ih n tail rfl (fun i => 𝔪 i.succ) (fun i => hL i.succ) (fun i => hm i.succ) _ τ hτi
+        ⟨Representation.Equiv.refl τ⟩
     obtain ⟨y, hy⟩ := hP (∑ j, 𝔪 j) fun Δ hΔ => by
       obtain ⟨j, -, hj⟩ := Multiset.mem_sum.1 hΔ
       exact hm j Δ hj
-    rw [Fin.sum_univ_succ] at hy ⊢
-    exact isL_add H (x 0) (IrrGL.of τ hτs hτi) y (hL 0) (hτ.of_equiv (IrrGL.equivOf τ hτs hτi)) hy π hπ
-      (χ.trans (prod₂Equiv (.refl _) (IrrGL.equivOf τ hτs hτi)))
+    have hsum := Fin.sum_univ_succ 𝔪
+    have hy' : IsL (𝔪 0 + ∑ i : Fin h, 𝔪 i.succ) y.rep := hsum ▸ hy
+    exact hsum.symm ▸ isL_add_of_equiv H (x 0) y τ hτs hτi (hL 0) hτ hy' π hπ χ
 
 end GlobalTheory.LocGL.IrrProdL
 

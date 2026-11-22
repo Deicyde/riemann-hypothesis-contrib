@@ -20,7 +20,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 theorem multR_eq_reL {B : Base} {C : Cols B} (a : Late B C) (Z : New a.D) {G' : Type} [Group G'] [Fintype G'] {Pl0 T : Type}
     {A : FamIn a.D.what₂.LL G' Pl0 T a.D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [iK : Algebra Ks a.D.what₂.LL]
     (R : RealDat a.D A Ks) (F : Face a.D A) :
-    MultR R F = (by with_unfolding_all exact ((letI := alg (reL a Z) iK; MultR (real (reL a Z) R) (face (reL a Z) F)) :)) := (congrArg (fun m ↦ m R.θ (R.MY 0) (JR R F) (chiR R F)) (mult_eq (reL a Z) a))
+    MultR R F = (by with_unfolding_all exact ((letI := alg (reL a Z) iK; MultR (real (reL a Z) R) (face (reL a Z) F)) :)) := by
+  set_option backward.isDefEq.lazyWhnfCore false in
+    with_unfolding_all
+      have h := congrArg (fun (m : type_of% (@Mult a.D)) ↦ m R.θ (R.MY 0) (JR R F) (chiR R F))
+        (mult_eq (reL a Z) a)
+      exact h
 
 
 
@@ -30,15 +35,17 @@ theorem mvSee : MvSee := by
   have hB' := cast (congrArg (fun E : Submodule ℂ (MMap (MP R)) => ∀ k ∈ X.B.I.Kset, ∀ T ∈ E, ∀ (v : (MP R).Vec)
     (g : GA a.D (Yc a.D 0)), (T : MMap (MP R)) v (g * kap X h t k) =
       actL (Yc a.D 0) (R.βY 0) (R.dat0 R.triv) (R.eG (σ (red k))) ((T : MMap (MP R)) v) g) (multR_eq_reL a Z R F)) hB
-  letI := alg (reL a Z) iK
-  refine ⟨?_, ?_, ?_⟩
-  · exact (by with_unfolding_all exact (h1 :))
-  · exact (by with_unfolding_all exact (h2 :))
-  · refine ⟨(by with_unfolding_all exact (σ :)), (by with_unfolding_all exact (red :)), ?_, ⟨?_, ?_⟩, ?_⟩
-    · exact (by with_unfolding_all exact (hA :))
-    · exact (by with_unfolding_all exact (hr :))
-    · exact (by with_unfolding_all exact (hB' :))
-    · exact (by with_unfolding_all exact (hC :))
+  -- Reduce projections through the relabelling before comparing their parent records.
+  set_option backward.isDefEq.lazyWhnfCore false in
+    with_unfolding_all
+      refine @SeeAt.mk _ _ _ _ _ _ _ _ _ _ (alg (reL a Z) iK) _ _ _ _ _ ?_ ?_ ?_
+      · exact h1
+      · exact h2
+      · refine ⟨σ, red, ?_, ⟨?_, ?_⟩, ?_⟩
+        · exact hA
+        · exact hr
+        · exact hB'
+        · exact hC
 
 end GlobalTheory.Mem.SRe
 

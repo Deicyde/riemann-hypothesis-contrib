@@ -182,18 +182,40 @@ theorem val_dite_congr {G : Type*} [Group G] {H H' : Subgroup G} (hH : H = H') (
   subst this
   congr
 
+private theorem map_dite_choose_congr {G : Type*} [Group G] {H H' : Subgroup G}
+    (hH : H = H') (f : H → H') (hf : ∀ x : H, (f x).1 = x.1) (p : H → Prop) (p' : H' → Prop)
+    [Decidable (∃ x, p x)] [Decidable (∃ x, p' x)]
+    (hp : ∀ x : H, p x ↔ p' (f x)) :
+    f (if h : ∃ x, p x then h.choose else 1) = (if h : ∃ x, p' x then h.choose else 1) := by
+  -- Compare the two subgroup transports while the ambient group is abstract.
+  refine Subtype.ext ((hf _).trans (val_dite_congr hH p p' fun x => ?_))
+  have hx : f x = (⟨x.1, hH ▸ x.2⟩ : H') := Subtype.ext (hf x)
+  rw [← hx]
+  exact hp x
+
+private theorem ofSgn_val (V : HSp D) (x : GA D (GlobalTheory.Grid.sgn true V)) :
+    (GlobalTheory.Grid.ofSgn true V x).1 = x.1 := rfl
+
 theorem isAtTau_sgn (θ : InfFam D) (V : HSp D) (τ : D.what₂.Tau) (g : Matrix (Fin V.rank) (Fin V.rank) ℂ)
     (x : GA D (GlobalTheory.Grid.sgn true V)) :
-    IsAtTau θ (GlobalTheory.Grid.sgn true V) τ g x ↔ IsAtTau θ V τ g (GlobalTheory.Grid.ofSgn true V x) := Iff.rfl
+    IsAtTau θ (GlobalTheory.Grid.sgn true V) τ g x ↔ IsAtTau θ V τ g (GlobalTheory.Grid.ofSgn true V x) := by
+  let inf (ρ : D.what₂.Tau) (u : GL (Fin V.rank) (AF D.host.F ⊗[D.host.F] D.host.E)) :=
+    ((u : Matrix (Fin V.rank) (Fin V.rank) (AF D.host.F ⊗[D.host.F] D.host.E)).map
+      (Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E))).map (θ ρ)
+  let fin := Formalism.UG.bc (n := Fin V.rank)
+    (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E)).toRingHom
+  let p (u : GL (Fin V.rank) (AF D.host.F ⊗[D.host.F] D.host.E)) : Prop :=
+    fin u = 1 ∧ inf τ u = g ∧ ∀ ρ, ρ ≠ τ → inf ρ u = 1
+  change p x.1 ↔ p (GlobalTheory.Grid.ofSgn true V x).1
+  rw [ofSgn_val]
 
 theorem ofSgn_atTau (θ : InfFam D) (V : HSp D) (τ : D.what₂.Tau) (g : Matrix (Fin V.rank) (Fin V.rank) ℂ) :
     GlobalTheory.Grid.ofSgn true V (atTau θ (GlobalTheory.Grid.sgn true V) τ g) = atTau θ V τ g := by
   classical
-  have h := val_dite_congr (G := GL (Fin V.rank) (AF D.host.F ⊗[D.host.F] D.host.E))
-    (H := HR (AF D.host.F) D.sp.cm.sig (GlobalTheory.Grid.sgn true V).gram) (H' := HR (AF D.host.F) D.sp.cm.sig V.gram)
-    (GlobalTheory.Grid.hr_sgn true V) (fun x => IsAtTau θ (GlobalTheory.Grid.sgn true V) τ g x) (fun x => IsAtTau θ V τ g x)
-    (fun x => isAtTau_sgn θ V τ g x)
-  exact Subtype.ext h
+  delta atTau
+  exact map_dite_choose_congr (GlobalTheory.Grid.hr_sgn true V) (GlobalTheory.Grid.ofSgn true V)
+    (ofSgn_val V) (IsAtTau θ (GlobalTheory.Grid.sgn true V) τ g) (IsAtTau θ V τ g)
+    (isAtTau_sgn θ V τ g)
 
 theorem ofSgn_oneP (θ : InfFam D) (V : HSp D) (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ) (t : ℝ) :
     GlobalTheory.Grid.ofSgn true V (oneP θ (GlobalTheory.Grid.sgn true V) τ X t) = oneP θ V τ X t :=
@@ -231,7 +253,7 @@ theorem exists_negModel_transfer : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau �
     apply h₁.ne
     refine LinearMap.ext fun φ => LinearMap.ext fun v => ?_
     have h2 : e (It₁ φ v) = 0 := by rw [← hIt, h0]; rfl
-    simpa using h2
+    exact e.injective (h2.trans e.map_zero.symm)
   · intro φ w
     obtain ⟨c, hc⟩ := h₁.bdd φ w
     refine ⟨c, fun v => ?_⟩
@@ -259,7 +281,7 @@ theorem exists_negModel_transfer : ∀ {D : D7} {V : HSp D} {S : D.what₂.Tau �
     show ω (1, atTau θ W τ h) (pt φ) = ω (GlobalTheory.Grid.ofSgn true V 1, atTau θ W τ h) (pt φ)
     rw [map_one]
   · intro τ X hX φ φ' v v' hd hv
-    rw [hIt, hIt, ← map_add (f := _), h₁.invg τ X hX φ φ' v v' ?_ hv, map_zero]
+    rw [hIt, hIt, ← e.map_add, h₁.invg τ X hX φ φ' v v' ?_ hv, e.map_zero]
     intro z
     have h3 : (fun t : ℝ => (GlobalTheory.Grid.WRep.toSgn true ω) (1, oneP θ W τ X t) (pt φ) z) =
         fun t : ℝ => ω (1, oneP θ W τ X t) (pt φ) z := by
