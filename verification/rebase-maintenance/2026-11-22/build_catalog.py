@@ -10,7 +10,7 @@ UPSTREAM='https://github.com/leanprover-community/riemann-hypothesis'
 OWN='https://github.com/Deicyde/riemann-hypothesis-contrib'
 ORDER=['owned','small-one','small-two','performance','structural','reviewed','remaining',
        'remaining2','88-recovered','imports','pruning-replay','imports-9','imports-10',
-       'remaining3','remaining4','restack','75-repair','final-imports','imports-4','54-final','restack-8f','refreshed-three','final-main','54-revalidated','after115-proofs-a','after115-proofs-b','after115-owned','after115-wide','latest-proof-repairs','latest-wide-repairs','latest-docs','final-current','final-comparator']
+       'remaining3','remaining4','restack','75-repair','final-imports','imports-4','54-final','restack-8f','refreshed-three','final-main','54-revalidated','after115-proofs-a','after115-proofs-b','after115-owned','after115-wide','latest-proof-repairs','latest-wide-repairs','latest-docs','final-current','final-comparator','live-formatter']
 
 def main():
     catalog={}

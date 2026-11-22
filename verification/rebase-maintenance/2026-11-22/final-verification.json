@@ -68,5 +68,30 @@
     "Unicode author and missing final message newline preserved",
     "Source changes on main rejected",
     "Read-only preview performs no push"
-  ]
+  ],
+  "final_formatter_update": {
+    "head": "c9ecafb85243643c0f4d324fabdd3ad12e0185f2",
+    "base": "1b894f7511841e6607bc0398cf2657526bbb29d9",
+    "tree": "ca8f2a5cc1205d51213462553998a1defee9952c",
+    "author_metadata_preserved": true,
+    "non_readme_tree_identical": true,
+    "action": {
+      "n": 97,
+      "old": "885e54de662d0df57587901f55fded759f717fc9",
+      "new": "c9ecafb85243643c0f4d324fabdd3ad12e0185f2",
+      "backup": "maintenance/before-readme-restack-pr-97-885e54de662d",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Action completed."
+          }
+        ],
+        "structuredContent": {
+          "success": true
+        },
+        "isError": false
+      }
+    }
+  }
 }

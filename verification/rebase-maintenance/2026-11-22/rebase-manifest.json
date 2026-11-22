@@ -1034,17 +1034,17 @@
       "number": 97,
       "title": "Run the Lean auto-formatter over `src/` (stacked on #66)",
       "status": "applied",
-      "base": "611ce0b6301315e35f9642dfa1817e19d6dba2f1",
-      "original_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
+      "base": "1b894f7511841e6607bc0398cf2657526bbb29d9",
+      "original_head": "885e54de662d0df57587901f55fded759f717fc9",
       "original_repo": "Deicyde/riemann-hypothesis-contrib",
       "original_branch": "format/port-4.36-lean-formatter",
       "initial_head": "c44cd7f33a4ba6671fd3a43fcdc3c94ff93890af",
-      "publication_previous_head": "c97a0fa101f9e2d70e163df2de9c2e3f79edcd79",
-      "backup_branch": "maintenance/before-latest-rebase-pr-97-c97a0fa101f9",
-      "rebased_head": "885e54de662d0df57587901f55fded759f717fc9",
-      "prepared_branch": "maintenance/rebased-pr-97-611ce0b630-45055415926-tree-restack",
+      "publication_previous_head": "885e54de662d0df57587901f55fded759f717fc9",
+      "backup_branch": "maintenance/before-readme-restack-pr-97-885e54de662d",
+      "rebased_head": "c9ecafb85243643c0f4d324fabdd3ad12e0185f2",
+      "prepared_branch": "maintenance/readme-live-97-45057660348",
       "ready_to_publish": false,
-      "published_head": "885e54de662d0df57587901f55fded759f717fc9",
+      "published_head": "c9ecafb85243643c0f4d324fabdd3ad12e0185f2",
       "changes": "147369 files changed, 7886813 insertions(+), 4124033 deletions(-)",
       "imports": {
         "modules": 149397,
@@ -1070,7 +1070,7 @@
       "retained_commit_metadata_verified": true,
       "retained_commit_count": 1,
       "note": "Published to the original PR branch with a checked head and an original-head backup. Retained the 49 new main files where the older formatter patch overlapped proof changes.",
-      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-611ce0b630-45055415926-tree-restack/verification/rebase-maintenance/611ce0b630/summary.json"
+      "report_url": "https://github.com/Deicyde/riemann-hypothesis-contrib/blob/maintenance/rebase-report-1b894f7511-45057660348-formatter-live/verification/rebase-maintenance/1b894f7511/summary.json"
     },
     {
       "number": 98,
