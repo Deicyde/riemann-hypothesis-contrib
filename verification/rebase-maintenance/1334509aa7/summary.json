@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-81",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/LocalToGlobal/IndefiniteReal/RationalAdjoints/CoordRat.lean",
+          "stages": {
+            "1": "c4ef9a0f48f358fc086732b8a2e5ce94814fbb93",
+            "2": "6ee19b7e577c641d634cb52b863cec1fef0e21c6",
+            "3": "96e49efb02da0f4aaef9e6cd8712579c7ee067d7"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "5928dfcbbf6dab27b72a20d6accc4a055b674a5c",
+      "checkpoint_head": "f8752789ab0b0e862257a2b3939000df94ba084c"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
