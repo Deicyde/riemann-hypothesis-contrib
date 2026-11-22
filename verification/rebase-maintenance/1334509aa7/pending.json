@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CharpolyDvdPowOfAevalEqZero.lean",
+      "stages": {
+        "1": "0cd1c0026d9070b4a5f6bb5c1198888f1aba8586",
+        "2": "85e18f9ab800ea57f442214b25ed28ecd3d1d005",
+        "3": "520b648c2d21c529f6be9bb6529757b10cf935cb"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "091ff4a5ea67ae9e12e480634eecfb924618413a",
+  "checkpoint_head": "1a1ccd76d6ca5a09d199f6e18b2d9a9191edf80d"
+}
