@@ -35,6 +35,11 @@
             "path": "README.md",
             "ours": "833e95fc8b64abdd895817844cb32c1d51d17066",
             "resolution": "resolutions/88-current-readme-main611.md"
+          },
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
           }
         ]
       },
@@ -45,6 +50,11 @@
             "path": "README.md",
             "ours": "ab7382d19407181da3fd452e6e0873060f0c3adf",
             "resolution": "resolutions/88-comparator-layout-readme.md"
+          },
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
           }
         ]
       },
@@ -55,6 +65,86 @@
             "path": "README.md",
             "ours": "ca57fd7d8060522e82aba634295fbf156d2df70c",
             "resolution": "resolutions/88-moved-main-config-readme.md"
+          },
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "2b22c961345c70415ccd74edfea878a666866e09",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "b2a1b7bd29b7116775c9b32311f0e834c32fa354",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          },
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "291d6413bd25b0612ba0da06ca61bc6d57e6e569",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "f075f3bf7829fea708b43406f4aeb75ef2926939",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "69fe0d3bf1e90e3d8b3edcb2bb7edea09e2606bc",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "ae0e6264563635d7b4cac27dcd52e2eec1919a9e",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "8dd3418093411bc76f4295f750810ec193d3b2af",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
+          }
+        ]
+      },
+      {
+        "commit": "e5956bd05e3f5481a4c5e694e1009d7bb1bd6407",
+        "files": [
+          {
+            "path": "README.md",
+            "ours": "4918e38a6c47227de4f67487b04e3ff015dc9d4e",
+            "resolution": "resolutions/88-readme-final-integration.md"
           }
         ]
       }
