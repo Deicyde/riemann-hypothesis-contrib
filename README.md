@@ -62,11 +62,13 @@ uploaded. To check the proof, run Comparator as described below.
 
 ```bash
 lake exe cache get
-lake comparator
+lake comparator --config comparator/main.json
 ```
 
+The main setup uses `comparator/main.json` and `comparator/main-export-targets.txt`, moved without content changes from the root. A [second setup](#checking-it-against-formal-conjectures) uses `comparator/formal-conjectures.json`.
+
 In this repository `lake exe cache get` downloads our compiled copy of the proof along with
-Mathlib's cache. `lake comparator` then checks the proof against `Challenge.lean`, as described
+Mathlib's cache. `lake comparator --config comparator/main.json` then checks the proof against `Challenge.lean`, as described
 under [What is claimed](#what-is-claimed). It needs Linux with
 [bubblewrap](https://github.com/containers/bubblewrap), a lot of memory and several hours. To
 have the proof compiled from source as well, start with `lake exe mathlib/cache get`, which
