@@ -9,11 +9,16 @@ permissions:
   contents: write
 concurrency:
   group: rebase-old-rh-prs
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [owned, small-one, small-two, imports, pruning, structural, performance]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,10 +30,11 @@ jobs:
       - name: Rebase pinned PRs without executing their code
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_BATCH: ${{ matrix.batch }}
         run: python3 tools/pr-rebase/rebase_open_prs.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rebase-reports
+          name: rebase-reports-${{ matrix.batch }}
           path: ${{ runner.temp }}/rh-rebase-*/results/
           if-no-files-found: warn

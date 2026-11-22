@@ -187,9 +187,11 @@ def main():
     global BASE, TAG
     ROOT.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
-    run_tag = os.environ.get('GITHUB_RUN_ID', str(int(time.time())))
+    run_tag = os.environ.get('GITHUB_RUN_ID', str(int(time.time()))) + '-' + os.environ.get('PR_BATCH', 'all')
     if not REPO.exists():
         subprocess.run(['git', 'init', '--quiet', str(REPO)], check=True)
+    git('config', 'user.name', 'github-actions[bot]')
+    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com')
     git('config', 'gc.auto', '0')
     git('config', 'core.quotePath', 'false')
     git('config', 'rerere.enabled', 'false')
@@ -200,7 +202,18 @@ def main():
         print('Using current main at run start: ' + actual_base, flush=True)
         BASE = actual_base
         TAG = BASE[:10]
-    prs = sorted(SNAPSHOT['prs'], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
+    batches = {
+        'owned': [74,80,81,91,97],
+        'small-one': [33,54,69,71,75,76,78,82,83],
+        'small-two': [62,84,85,86,87,88,90,92,94,95],
+        'imports': [4,9,10],
+        'pruning': [55,58,61,67],
+        'structural': [44,63],
+        'performance': [79,98,104],
+    }
+    selected = set(batches.get(os.environ.get('PR_BATCH'), [p['n'] for p in SNAPSHOT['prs']]))
+    prs = sorted([p for p in SNAPSHOT['prs'] if p['n'] in selected], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
+    print('BASE ' + BASE + ' PRS ' + ','.join(str(p['n']) for p in prs), flush=True)
     specs = ['refs/pull/' + str(p['n']) + '/head:refs/remotes/pr/' + str(p['n']) for p in prs]
     git('fetch', '--no-tags', UPSTREAM, *specs, timeout=1800)
     results = []
