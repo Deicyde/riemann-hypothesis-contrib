@@ -1,0 +1,3083 @@
+{
+  "base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "run": "45039889610-structural",
+  "results": [
+    {
+      "number": 44,
+      "title": "Simplify the shared five-theorem proof and reduce its Lean source by 1.54 million lines",
+      "original_head": "c9b3e57f0fe987012d32c2523635387bfe56d5a5",
+      "original_repo": "mmmbeer/riemann-hypothesis",
+      "original_branch": "review/five-theorem-simplification",
+      "maintainer_can_modify": false,
+      "old_merge_base": "ab0b7522a5ccc9b8530edf475af5088f8f6464aa",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "status": "conflict",
+      "conflict_count": 103997,
+      "stage_types": {
+        "1,2,3": 72133,
+        "1,3": 7235,
+        "1,2": 24629
+      },
+      "conflicts": [
+        {
+          "path": "README.md",
+          "stages": {
+            "1": "d337d06978aba962aa1d9392e8edd3401bb3e2b0",
+            "2": "15480f53618623a8ac4faa9ae5a6eb3478c25653",
+            "3": "3431fccaa7256a72c93a331f545fd1c96b9c53da"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/BesselMapUniqGap.lean",
+          "stages": {
+            "1": "b66140921174285c788e053d71cfa3378bfdcd1e",
+            "2": "b29d93cfa7a632c7a208a0a27074dee6ca5c556b",
+            "3": "d1af1a3c10a57ed1ea80283079e304b28ce49f9b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/BesselMapUniqGapAlt.lean",
+          "stages": {
+            "1": "84286ec8575346d6805e7484214a42a1e075f62c",
+            "2": "d4ede67d22a621d1762d7e40108abd98dd92056e",
+            "3": "a8ee51325b110c5dd12f05b87a0de3b7a23ec2ce"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/OrbitMult.lean",
+          "stages": {
+            "1": "ce68ff4fc83e87485db12387270bb7f284ea2eed",
+            "2": "201fa7d7ccfd4077720a15ab814d78b3862fdd36",
+            "3": "17036f763e7f4fdfc808a4ce482dc9b50d1ca866"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/CoefOfOfWsp.lean",
+          "stages": {
+            "1": "961ef02f31fef2ea4988f9b3c65fdc12138de3ae",
+            "2": "c816be6f1de0580c9f2deb138d55c53a1f134ed2",
+            "3": "1ce57f99119060b1b9f2b81a52c3ecb85fbf242f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/EqShift.lean",
+          "stages": {
+            "1": "d623c1c4cd9171ac9c7c8cca35789dbdf5f549c6",
+            "2": "3ecc19d8e4694c65898aac705594d64b29e12d6c",
+            "3": "929265fad8f61c01dcdffb54cca0da2ec4158265"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/FamilyThroughDiscreteSeries.lean",
+          "stages": {
+            "1": "81e7a1bbb6a5adfcbb23425b5822c7042e310db8",
+            "2": "f87c1c70e72c3ccd0dacdb1f6a11c664275a541f",
+            "3": "a438abfe53662c4cc474d4d4ea10c933e5c3df75"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/PstMul.lean",
+          "stages": {
+            "1": "870e17af3657d272beeac0a16dc2825cf750d91b",
+            "2": "9e184ed68c01e7eb034461f36b3b8905135383a4",
+            "3": "5b8c468ea5901696ee52d19b1c77eae92d471f5a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/KDecayOfGap.lean",
+          "stages": {
+            "1": "4e251a78a2870b063224b1021d84e4a645a14ef6",
+            "2": "417864b321e4d3cd68935db5bc1e839c88ce6a95",
+            "3": "e45d98db78ebbe6d31eca4c02beb47698828e9b0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/LettersPoly.lean",
+          "stages": {
+            "1": "7517fd46f8c503cda92feb845004eda2d74f5904",
+            "2": "a448fd1172c322a9be8994f661a015bfeb42bfc3",
+            "3": "d35e43a28291dfcc9ef37bc68bc0170b1fbb875d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NormalizedMeasureScaling.lean",
+          "stages": {
+            "1": "b3a8286f6e230292b12560152e6cf965c6e862bd",
+            "2": "518e260e91a6364fa8a081e72fd1f87abd74886f",
+            "3": "b809ac043958172eb9bb33d9b44b4b7a4a3e079b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TiedNum.lean",
+          "stages": {
+            "1": "0ca1b9e4cc9dd2eb0148a6284d0baf504f8f74ef",
+            "2": "a99c59c85d056be35bd17b709f8ae23c6b51cba8",
+            "3": "75c2114107922449e9cb2274355c5a0b864d22a9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TypeHC.lean",
+          "stages": {
+            "1": "0d843b68ddc6ebbfe513fd0e116f580977931f75",
+            "2": "dcf7a01f281560ff9f45a159dd169ac334a45364",
+            "3": "daf0f375e6a9c8db13a0ae6b453967cbe023c9a4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveBallEstimateWeightedDualAlt.lean",
+          "stages": {
+            "1": "999ba981f65fdcad0e94e240d9e1e16d798de7ac",
+            "2": "a84f2e6975ed6512b73a17e64d66b6cee23a88a3",
+            "3": "ad6e153799651cb2877d48f5b45f16b987111f09"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveInputsOfHypothesesGlobal.lean",
+          "stages": {
+            "1": "322471d3f32041197c61b67a83a605362aabe901",
+            "2": "d267f5af4dc6f39abd7fba19f6336cbb871ba6a4",
+            "3": "2aead2109b7630c3654fcbd8fe83f61964cc582f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WeightedUniformRotatedOfExpansion.lean",
+          "stages": {
+            "1": "eaf37e47927ba9ead08134701b8585035eacf367",
+            "2": "f0da469b90da8620b027909cf01217a24960d915",
+            "3": "345c5424a5067a5d032d30259415513029a8b743"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/CompactTopologicalForms/JacobiFieldSquareIntegrable.lean",
+          "stages": {
+            "1": "03d1b7115c239288655e08e4132ac52eca9ea99e",
+            "2": "08891bcc3ac430d0e8a9e6677c9708c674dbcbcc",
+            "3": "bc6190001b3596e53c20ed222b1d005a9f0d202c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopCpt.lean",
+          "stages": {
+            "1": "3e2161320381c23f6b8f828c32df81cbf7f06c22",
+            "2": "547aac59c4a993f91541fb6a3a0b91253718b2cc",
+            "3": "0a7cbcd990bd9bff55d3da495eeae2410d7e0514"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopFormCpt.lean",
+          "stages": {
+            "1": "9258e50dc116933f35cedda04e1f7b5cb3699d3e",
+            "2": "7e14690766fa23e8d23e363cea60870189e5b0d0",
+            "3": "1b0a5301a67629640339c585162e2fff7d7487a0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopSq.lean",
+          "stages": {
+            "1": "130984f83c350c6c655ff1fb6be3fc9cd1a33bc3",
+            "2": "e4b88be0f1bed081f2510b63b7846a3a2427ddf9",
+            "3": "bdb617dab6a09d3974b565ef3985bd547f0fd2ef"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/HeckeStandardModules/ExistsDenFin.lean",
+          "stages": {
+            "1": "702d38867a22eb612043efc8a198f663437bb52d",
+            "2": "6f83c228f0ad485a0eb724ab6d7d8fd1fb42e05c",
+            "3": "65df6ee7df1c9e747c2de03048541c9c3a5c7491"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/HeckeStandardModules/IntegralOfModule.lean",
+          "stages": {
+            "1": "e1a60a88c3f377460953bae491d114c278909aa5",
+            "2": "07672f679ea23b0273fc595fd65190f30bd67418",
+            "3": "f34df2b4a77f7f943aeebe33415029a5645fdc0a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/EvQTrJBFF.lean",
+          "stages": {
+            "1": "b917ff74989344ae0a8f2b21e8898913d42fe393",
+            "2": "efd1e5406912a89dbaa62685cfd62ee29690defa",
+            "3": "5107f96db19591ea1022a22ee64a88403c753b1b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/NFFinal.lean",
+          "stages": {
+            "1": "4023afa806b7357aa02c56cdc75f77ea8249202c",
+            "2": "ca932ea376560e9d0d0dae87cdaa4c07b8b4aa19",
+            "3": "2760fa2f20520f8c04fdfa16515cdc6e532706de"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/KFiniteVectors/KDecay.lean",
+          "stages": {
+            "1": "306c4ac5b48441298ef6dd2ea0a636cce5c7c50f",
+            "2": "10ede2844aa5970c10a1592f8438d0a41737db2a",
+            "3": "c2e4759d6361acdba5bd4b19662478f7261d668c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/KrullDimension/TopologicalKrullDimModel.lean",
+          "stages": {
+            "1": "966b94d0a535728eeab7b805778146d265686a7c",
+            "2": "ef4369e27ca9ef5ba884a9cbf6d3f07e240525b4",
+            "3": "2292552898935ed27f1bac5d6f64b83520d8f458"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AmplitudeOrbitalIntegral.lean",
+          "stages": {
+            "1": "1dd55930e68a3fa05bbe64f92d023ccc0502288f",
+            "2": "dedce73f66373f0691c2c6e151aeb5a49c03ec81",
+            "3": "15ba8779c976111f887db7ff1968235db721bf48"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/BesselSchurOfDec.lean",
+          "stages": {
+            "1": "077474c341631f08fd04f3b4eb2249c8c7e46dc3",
+            "3": "3ae4f7fdc9237fc2290e6302c1db49884563f200"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/CoefWeightedLocHolds.lean",
+          "stages": {
+            "1": "ad81c8545a7ddc4e1206f202a52bc230aae45afa",
+            "2": "bafcad1e6bca207a6ef010a9e2b046de5dff3659",
+            "3": "4262a852e58ede3204ab2a13bc2eb892e2709db6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/DDForm.lean",
+          "stages": {
+            "1": "b7b9ef3b6057a3fa11769b0bda061c86c074bcfb",
+            "2": "e8f6d1432daa92125ddc41f6027472f2ac2f5845",
+            "3": "dbdb3ef204c07d7c1399dd916b5f8a61ff0545ca"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/EClose.lean",
+          "stages": {
+            "1": "acf662b911de82ca1349a00cae61995f3c479231",
+            "2": "73b9dd016f584839115996f129aa54bde4e3a071",
+            "3": "eea58a331edc13a6762ac19757c5fa4453ab0650"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/EFinal.lean",
+          "stages": {
+            "1": "8632716b01581e2167164f639c60202a47f9297a",
+            "2": "eaaf821a8eaa31c29acc7b0ef1ae486c0d8fa244",
+            "3": "a91823512384e0ef8a0c3b271e44f7c21f52cae4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/Inputs.lean",
+          "stages": {
+            "1": "e19380f8aff032c49453347aa122ac928fefeb47",
+            "2": "bd847021e82c1c63c85382f4ed9565eac6e110cd",
+            "3": "f7164ec96c1fec3e9067e4555b497e0906c57a16"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocDDQ.lean",
+          "stages": {
+            "1": "c457572ba6990c7bb7523c67b66016c285fc188a",
+            "2": "ea005ef1aac36b5f004b39856f52a219d6c415a0",
+            "3": "3aa347524a0b80f88c01d799a8808a6d1e0101a8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocQuad1GHolds.lean",
+          "stages": {
+            "1": "7d4f8d2da4756ae629df5e45c6ae50baef55d6af",
+            "2": "b785ed43e7fe9b06c3f287e6b21e96cc750c517f",
+            "3": "9d30c2e464507c1c0bccd39fb0c2660ad28d7379"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocScalar.lean",
+          "stages": {
+            "1": "aeddb088f342370c26a5bd2f72db523144639c27",
+            "2": "2af34aed5b99bddb694aae324f43989bd3e26549",
+            "3": "cf59b516cadf9ff201b82bae4de4aa3f20747b6d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/RealObjInInfinityXJsz.lean",
+          "stages": {
+            "1": "2672ce0b6ffcccb8f217755192d7dfe8c5cb4563",
+            "2": "2a0bd1860b7958f55a5147d300ee6ea41260be2d",
+            "3": "0dd4be455f2844164e43b403fbeca28a68705ed1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/StepIntGOf.lean",
+          "stages": {
+            "1": "7e6ef146a36ff4d7995172c2774552ff1fd8771f",
+            "2": "4639e28a44b0040c1097c02e80a783022cac0719",
+            "3": "f5aba2de73266b0d746496b0dbe1cddcd5453b91"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/WeilPairJ.lean",
+          "stages": {
+            "1": "9233d0653b16f69b3604f3ea25f686d4a2fbd5bb",
+            "2": "64187d08dc10cd388f645f432089267402ff4164",
+            "3": "d470f2d62cc10b1c5b1061272854bab07c91348f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/WuFinal.lean",
+          "stages": {
+            "1": "4b7182f745b687cc3adc09cff501b615991ee92a",
+            "2": "c629b9d09fb61852e7298929be7d7ea274f3140a",
+            "3": "789eb7e015c3790c4123f6f9157af9bb5cf26561"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/HatCap.lean",
+          "stages": {
+            "1": "c141375d913875d0e5e01b294c12687a866ee265",
+            "2": "d0f2557268614e161428d36ab2b3236b01227769",
+            "3": "78048c8a095abd9372b0871a34db024eb4aa90d2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/NFJCutFF.lean",
+          "stages": {
+            "1": "9631a24a3cfc48c192f5f625405ff30d4fc7e407",
+            "2": "6c899fc5640f0266702683bb60dc4d3c6298f281",
+            "3": "db8e6c1aa8c5fc72f91462ec3ecf504ef02dc991"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/OpLocal.lean",
+          "stages": {
+            "1": "67d52977e09bc8c32167d8a09f4becc378d742ed",
+            "2": "e89d47f08cf397fb2609833473698de872401bd1",
+            "3": "e7499222bea3d8e22726d4ce7cdfc268f9b4b90f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndDim.lean",
+          "stages": {
+            "1": "7369cb885bf4365306b09ba9d499b25ccc3e1345",
+            "2": "b6e6a65852a8de325bc8a7f10951254594807c42",
+            "3": "a45561600b08cb9b4cbd4d5f796a3527ca5d49e8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndFacts.lean",
+          "stages": {
+            "1": "d13251e6e70ee09552342665a8815663a5d2546d",
+            "2": "6621077836701fdadd9428f898f17f9c947e60e3",
+            "3": "463ad327febb74c6eaa60f204d9a9b2d8bc12502"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndIrr.lean",
+          "stages": {
+            "1": "4931e136e26689f7a4cef1e2bf8fe440c992eb05",
+            "2": "bec5c2e0e56d579d3c928b7c54dd3a39c3a8f063",
+            "3": "46f041f913528a30b431440d517603a377774947"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/HsVecProjLe.lean",
+          "stages": {
+            "1": "22d9b84b62031eba3309896ffbf17954dae88d91",
+            "2": "1e365b73cd00a00be807d28e646e135a9d7dce2f",
+            "3": "49e244ae77d7d1259f2592d94f368789315389fc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/NFTieProv.lean",
+          "stages": {
+            "1": "7bc76b7fbaa247ead21c39c5590161a8573b4e2c",
+            "2": "115a6f149e4e08fec9e397799d319c72bbe2f1b2",
+            "3": "5262d89ca2253fde70e965ce99ecc752122fedaa"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/TransferGaugeGeneratorZbarInv.lean",
+          "stages": {
+            "1": "b105a125ef012d2495ffe973c97c4df83073b230",
+            "2": "ec33a792e8ee8810248be2585775f62a8022c4d3",
+            "3": "5e885d93d1bdd7b96827cd62a30898b6666b1547"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohField.lean",
+          "stages": {
+            "1": "f209d7aaf9f6fe4c0a351f8bdaa4da35eb53ffbe",
+            "2": "31684d8f0e2bbea080ca66b4bf4fb3588af056c1",
+            "3": "44ba03569320d5251a703516b03268cc8e3b2924"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/CrystallineUnitParts/UnitPart.lean",
+          "stages": {
+            "1": "a9bde045e7f9449ead07ea13886ada8a1437cc98",
+            "3": "8536922640051871abeea7f3921a6c2a612b90df"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/DixmierMalliavin/DixmierMalliavinFactorisationHolds.lean",
+          "stages": {
+            "1": "417058b9de06a3907110296599ab4eba38eb2e40",
+            "2": "ee1e283e4d1f9e26b41930ea65e83331b3acad5d",
+            "3": "555a8344157db7d640893a476496e010fd6de5bd"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/HarishChandraFormalDegree.lean",
+          "stages": {
+            "1": "87ac8d903edfd9f0deda78e51a040edf42edc1a6",
+            "2": "d9f407f836a7cb3dd12d5864bb122df8f3a530c7",
+            "3": "342985e7d986e5fb34e4f84ed384a9251af6a97e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/InfinitesimalCharacterDiscreteSeries.lean",
+          "stages": {
+            "1": "67ede3e68dbb110941ada7386f7322171ad51f81",
+            "2": "e32b3bed0dd69e6e41003ecd620acac35f19c294",
+            "3": "68521d4fb263dd99ac2a29813e3444d849116a7a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/AemeasurableBesselNormIntegrandBigCellImports.lean",
+          "stages": {
+            "1": "ec6b52815a3876672e8149d22a9008a18218f463",
+            "2": "d105a74abd12a5635b0c8d9f45438c9ff967f6e7",
+            "3": "1cec28134d327cbe3856a9b3d11e7a899787aeb3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselCharacterUnipotentRadicalPropertiesImports.lean",
+          "stages": {
+            "1": "398a5bd8989ac413fecc28a747040b7f500acb7e",
+            "2": "24bcfe6b2d2856cba35b77738d4b979fea39d14a",
+            "3": "04e592c535ea880ff64d7097c2690507afac6d7d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselFunctionLocalityInvariantFactorFiniteSumIm.lean",
+          "stages": {
+            "1": "34fd1a366a4fbf161aa72259a25ef48589514c04",
+            "2": "851380e844beea571dfe59f0233767a0c953902f",
+            "3": "57d1b027a4e4688209a04b871bb40d5f8f8e7b12"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqBigCellNormSqAltImports.lean",
+          "stages": {
+            "1": "c5208bee38c43f4a3da3f6158b3b050b6cb24d51",
+            "2": "4e3c017e3532798e7ad980f922a3c46861fe3b5f",
+            "3": "868d6abffc8af052bf842210290b1e49dd12fd45"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqConstMulArchPairingImports.lean",
+          "stages": {
+            "1": "63fa7ef00b266887ade2ea04f6040aa74f18224e",
+            "2": "51f34e172071afb5a20146dc38bcd3a6b7a58c00",
+            "3": "69173fd89e5da2a97cfd978e59950203c7303bcb"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselSubgroupParameterMeasurePreservingImports.lean",
+          "stages": {
+            "1": "26bdb2fc901aff65ab88c0247c7caa8afb231a28",
+            "2": "951dd95d4d578484f7023a4e2df2299f0b7451ec",
+            "3": "2bbf41a86587acafeee57d1703acc45ca08cbb66"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BetaInfEqIntegralOfIntegrableCoefficientImports.lean",
+          "stages": {
+            "1": "7bfe97bea156436619c9c0afc249abf2591dad46",
+            "2": "84a0bb45204614ae12c1278c0805190f8a5deca0",
+            "3": "64b885348abe89716262a4207af023bfddc2a2e3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/CasimirScalarOfCapelliDeterminantEigenvalueImpor.lean",
+          "stages": {
+            "1": "780ff492db2687c09132443da5cb2af2ea0e0eda",
+            "2": "c4600ddab4d4f59fb383f55934be44ffb1d1b467",
+            "3": "4ede96323832d533a9c213f9f878566a6e22b640"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DecayThresholdsOfSpectralGapConditionImports.lean",
+          "stages": {
+            "1": "40600871b980cb56bb854f595e8c6787d2e75d07",
+            "2": "19c220edeb9982b07fdfe60585550e90c3e9439c",
+            "3": "04402454e86e5a4995af29bb7006939e73c65e2a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DiscreteSeriesUnitarySmoothBasicImports.lean",
+          "stages": {
+            "1": "baba01e6bd9f8d3501cab5d12e591ad423a7c83a",
+            "2": "aa6cefb4e51dcde4ce8deb8ad375d8aa824b97b0",
+            "3": "c2072637c9c5a237f13507ee569f9e8d13b9a7a1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsLieUnitaryElementSimpleRootImports.lean",
+          "stages": {
+            "1": "ed7a7c84285a6f4603102c057b46d776f35538d6",
+            "2": "fec8e810b8dfefe25819ef8d31c49a27364273d3",
+            "3": "7cbd4673c4413cb115ed314ebeae5fe0f43a43ee"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsRegularRepBesselBigCellVectorEqBesselImpor.lean",
+          "stages": {
+            "1": "5ec8876fd3c6c8d94fd840048255caa35f7d85fe",
+            "2": "5d6ed2f1d142fd64767871248e2d720569ff9957",
+            "3": "48a3c490904660fd8b4c8b67e535422bfb511539"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FactorizationOfConjHomogeneousAndHomogeneous.lean",
+          "stages": {
+            "1": "106adbde1ebb255401c2e9c7378f666816ea7e2f",
+            "2": "5c2dcc89caabb17716a93a0c4039d507a1e7689a",
+            "3": "69f1894bee2a255301f92d7f34f7371a7cff04d3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FrameWConjMatrixUnitsImports.lean",
+          "stages": {
+            "1": "414dfcdbf73c5243c6021bd7462247f602310fd5",
+            "2": "afbfe5ecec6d34f2d7dba88760039bb969de8d8c",
+            "3": "33ecd2555b00f3bf1869d08042d431f9cd027422"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+          "stages": {
+            "1": "e7f4c406fab255d3b4c8b60cc29cae610193bdf9",
+            "2": "343f7433c7ebaf8b3976a584cb2a69590e6b5afb",
+            "3": "de9d554317057c55b2b500b9b7f0d555d21e74c5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsBisTer.lean",
+          "stages": {
+            "1": "9fe9f149f6072a8851b28666e52c48c395b095cd",
+            "2": "1c480d3bac667acc0bfbe9011b4c9118210aa597",
+            "3": "84eb29d01b06072ff7cf4effb7c160f9356ffb76"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsMore.lean",
+          "stages": {
+            "1": "84fddfaed012b3372680b65cd918b57c4a58910f",
+            "2": "8e70a9e5824cf4d8a42396fd6b9e4a7b76f7a8a0",
+            "3": "6bb1301f414e37ee7190f866e564067a54e931d6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsTer.lean",
+          "stages": {
+            "1": "7bb534e551db80295a1114f8a542a75099059ded",
+            "2": "5d2e640e6063c22b882a8bbdcf242a095bed3bc4",
+            "3": "311143ee0bb9fbb8a61791754dd2bab8c54f7e13"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsFRepDualStandardUnitaryRep.lean",
+          "stages": {
+            "1": "e2b4fc802e1c050f857da112798f6c836d00d9ea",
+            "2": "589757d3ae7e85aaeeadc71410b3efd70ba91d76",
+            "3": "7bda6b72a0e067660758ad3d06835b2ba5b836b1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsHaarOnIffGroupsUnitaryUnipotentImports.lean",
+          "stages": {
+            "1": "b015f3955f458dbfc588a928792a4f067b6b0ba9",
+            "2": "8591016d300abd2c65669e47a9a0f605c4bf16b4",
+            "3": "73e51d5a28f7e728e58177442c5dac32c8e7e318"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NormSqIntegralInnerWeightLeImports.lean",
+          "stages": {
+            "1": "96ce38cb59be85f9037cab1da0b91491b05cffbd",
+            "2": "292651c3cdd95b519aad27595ec3b484aefdfa37",
+            "3": "afee5252adfd223dfb98d122f0d1f0c33543209f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyProductBoundConstantLeImports.lean",
+          "stages": {
+            "1": "83e4df3726d2ee1cc2421e7c1b86322e3f964d1e",
+            "2": "127267f01b7772e58e1d7dfe725e51056f96c1d7",
+            "3": "0303278b353c40a20875ae335ae51b51d6f4ab69"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyShapeGaps.lean",
+          "stages": {
+            "1": "82b5236903b61eebc909ed2137b1c8c450105983",
+            "2": "a183bd80b5f8f1310b36ee5d69ed039a7b32bf1c",
+            "3": "6d9cf530315c50a3ac221242b771472ceb4048ae"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ProductMomentBoundDensityMassOneImports.lean",
+          "stages": {
+            "1": "d30258f0c646140e5c0e8346a348d6185e1673e8",
+            "2": "a5c46bdc1aaa0f7637e461aba770a29bd4bf1898",
+            "3": "1aa3bff7c7d3ac9ee361b395f84294667bdc1338"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/SumNormSqHermTranslatesOrthonormalImports.lean",
+          "stages": {
+            "1": "766f811a06a33a38aaf12e3689516d69278d11df",
+            "2": "86997d7c2ba3514d3a1f11eca9caf49d9c16f5ca",
+            "3": "480025907cd1235197d25170e758572de9894a79"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/WeilFormulaIntegrableComplexImports.lean",
+          "stages": {
+            "1": "53f39e35295e88811c0c225901bf50f39b715c25",
+            "2": "8a96bedd0258d0aa0d4798dcafec977f0429d149",
+            "3": "e4b0cccc69db3f277199c14d9464680a9875b24d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BaseRepCapelliEigenDual.lean",
+          "stages": {
+            "1": "0763831447a47a0a8fd8c14a422b63b6c9a3cb0c",
+            "2": "82e7a1f701a5f8001410f5f44967b0779063dc05",
+            "3": "695c67103bef43a6b883e3ca1071802b763d5f9b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBound.lean",
+          "stages": {
+            "1": "f1849084b797675d1a966db0828d641dbbeb6d2c",
+            "2": "8985dfca432a7163277bd57b64908c07878e7c5c",
+            "3": "b1282ecaf32d0369768a082faa8971be2b73d5e1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBoundStatement.lean",
+          "stages": {
+            "1": "94eea6f80f46a15a69bed68c12fe2102fdf98df5",
+            "2": "36952edb27a861cd5e871e00ae86e2b8c6417272"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentity.lean",
+          "stages": {
+            "1": "529f2af1571c0712b3e01c8b4583ccda966e54df",
+            "2": "daddeee9dbe5c92c3ed702b8634fc1a0bd50d0d8",
+            "3": "22e926b04d493d8fc8cbe5c64dd0641954eed7ac"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentityStatement.lean",
+          "stages": {
+            "1": "bea151c33860a77aa16a81bbe5f59696ca08685b",
+            "2": "c8c0cb8acedd093752ec5ab510938542ae5d19dd"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairing.lean",
+          "stages": {
+            "1": "4775c6b05183c159a5f28e003ed1e7f35beff87d",
+            "2": "f3ed297d287a194f09f1a8e3c0dd0afd2fd72ab0",
+            "3": "ea179f307d24f9c7d9a26a4406c42f2ced97e71c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairingStatement.lean",
+          "stages": {
+            "1": "367be82873952079af6b3a3f02c8d90cb6a354c3",
+            "2": "3cf4c2fff7ac50effda1eb7fa385f93a0dc4da64"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelation.lean",
+          "stages": {
+            "1": "76cf681af827c941a29ece0e871f9ce94c5c9048",
+            "2": "dc4c5a2a8d002e940ab0a3431f99e202e1c6623a",
+            "3": "89497fb6f6d9f2ddaf8802db27f35adff3984dc7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelationStatement.lean",
+          "stages": {
+            "1": "e4905be825383fd1b5644003e8dfa9e157e601ae",
+            "2": "c90a82b72c2bc11d51816179eba348bf4da2bcc3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "stages": {
+            "1": "4313c08904bd30db69267215a3f6e8c538013beb",
+            "2": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+            "3": "d9cedd17594ca633817b921362b798360b84a327"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormulaStatement.lean",
+          "stages": {
+            "1": "f184a53773cd2d883fc82084ab08c2a8fce9d5e2",
+            "2": "05f9d7f1bbb5e0727ecf3433062fcb8086bb0cce"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapExistsFunctional.lean",
+          "stages": {
+            "1": "e68f36d89c8207b90e9d81292be18855fd49b5f6",
+            "2": "c93467cdfd96956e4be0bf0aaccaa79ede911a3f",
+            "3": "21e0fa854a54537021664ad0ebf368c51dc50010"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapExistsFunctionalStatement.lean",
+          "stages": {
+            "1": "ab3b89c9cfff8057dc2bcb42eddeb64f042876a4",
+            "2": "2a9db31cacc2d3fd567562da9cbaea206fd73dc8",
+            "3": "dece43554916713a301a96351c420872519827fe"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapGrowthBound.lean",
+          "stages": {
+            "1": "a3f472d71197b57c53cbdea49984dc0629e79836",
+            "2": "f022148150b19715730978825630b9c33302473f",
+            "3": "c70142b5d4bd4c06339e1f1786e65bf4279c0f1b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapGrowthBoundStatement.lean",
+          "stages": {
+            "1": "36b35025b83880643d860531d7b671dba49159a7",
+            "2": "f57ff2939924de29cc7db7dc9f255d2561583f23"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapIntegrability.lean",
+          "stages": {
+            "1": "11d8fb18cd257cc723ec74f5f13099d68bf30ec6",
+            "2": "6d9029a7cb5c11003339e2456a27968c5b864a23",
+            "3": "7cdf18de7cc9f6384b1b3e449c96f90ab1096ea2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapIntegrabilityStatement.lean",
+          "stages": {
+            "1": "d0e7fe97f623c484923bb3cdff6a33ca98085c0b",
+            "2": "bb54ada6f6aab6bddea5f4b7fc873bd0b5cd5be8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapPairing.lean",
+          "stages": {
+            "1": "4e04feb13654f76855d42672d122623d5cb3c723",
+            "2": "e98f793358579e02dbb51084e5cb225d1ec4cc39",
+            "3": "dd818a841191b91dfb91a993ca9153329a500a00"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapPairingStatement.lean",
+          "stages": {
+            "1": "a72c053007e01231a47a5e3f443c5c5186a71586",
+            "2": "5846320c0d1c71baf424f93100375b4ab4d73ea7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapVanishing.lean",
+          "stages": {
+            "1": "2f1bb56239e5cc3eb092cb063cf6c850ce9ea103",
+            "2": "c833cea8bee85b2a109d5b1f395964fb96f1ad21",
+            "3": "0d4394ef95e73cad4b4b9da9935931b0c9ed4016"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapVanishingStatement.lean",
+          "stages": {
+            "1": "c4c5fed8e39b0bf1a356647f80b732312a5e5b03",
+            "2": "8af4d4eb2c55a38aa6aa86413a5a0175ea906988"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselLieTriangularVanishing.lean",
+          "stages": {
+            "1": "9f1f508b53102c3b8e214844af3877c7437ed43f",
+            "2": "bae9c9a01ecd50af6e1e51e2d2f8a9e2d32c3e96",
+            "3": "c46a5b9344e1c275781691a6178cb4ac9db31dea"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselLieTriangularVanishingStatement.lean",
+          "stages": {
+            "1": "81e0d9da9a53a6913221bd78f761a4b479b8b45e",
+            "2": "d67280bb9ab4dc6fedd9ecf54491f54b9bdf299b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselPeriodAdjointPair.lean",
+          "stages": {
+            "1": "e91765eb6388ece4284306131b80721bf3193f76",
+            "2": "745797cda5b68516b638366d34eca54fd9249302",
+            "3": "b8a9abc747b523b159e98ea2df8114c6bb5b5ff8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselPeriodAdjointPairStatement.lean",
+          "stages": {
+            "1": "cadb314707a58fe10d95090a5fe071571316ab37",
+            "2": "6f43b47c5e51155cc87174a117843e1c3b2fa91c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBound.lean",
+          "stages": {
+            "1": "223fe46c25dc7784798128adc55a993564fed890",
+            "2": "d88e4ca1fd89afaea29dbb7d0293d85a09808591",
+            "3": "4387e40515ba484d4fb7962bc215d3e92bbca689"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundDual.lean",
+          "stages": {
+            "1": "6884576cdc74822d15336d42c62bcadbd42a2ea4",
+            "2": "c56e2b42f492cee8a25bb92b60ff2fbfea80489d",
+            "3": "20203f0179077be67e064d2e3dc3f39c96cd5e17"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundDualStatement.lean",
+          "stages": {
+            "1": "53d4e0ae7fbeac5b6791cad76825cf5cb3ec71f6",
+            "2": "da168caff3dbddb9cf068852b46aef6428002ea8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundStatement.lean",
+          "stages": {
+            "1": "2ac951d0760e38eb861483f5a9b90336774b93e6",
+            "2": "d2171e9aa198ea8cb4e86aa8c7b66f8dfb9b2056"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapDecay.lean",
+          "stages": {
+            "1": "584d9da3b46fcc3ae249916578c92dbd8e442c53",
+            "2": "b16955b3f1e4b459fb3296d034c4886544450063",
+            "3": "8f622a5e5bb9e995740ccbc964cfd5392a87448d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapDecayStatement.lean",
+          "stages": {
+            "1": "28f0ceca07a032d42dcbc963783038b9e48ba01a",
+            "2": "46f9571bd63048fbd9f7908b4e32bf3c6f3b8847"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingUniformConstant.lean",
+          "stages": {
+            "1": "bfc742769cc15d28a9cc119c8d86b58802d7e32e",
+            "2": "3b77bc2590ac9a9c963c64bd92e4f87b9e630ebd",
+            "3": "6ea521d8cbae4f6f4aa677b7b975ddc652b60b0a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingUniformConstantStatement.lean",
+          "stages": {
+            "1": "52aff17604625af55b5b36902b7d7430960fb1b7",
+            "2": "df7bb3d3fd38b6bbaffb4576e02cdafbddd84f7c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSumDecomposition.lean",
+          "stages": {
+            "1": "b9c1049f65dc8925d6118f1f632397157f1d298b",
+            "2": "e8db015a23b35b2c2f2d373bd5e34974f504239f",
+            "3": "293050be9f1ed145838ce829fa4844f9fd7c69c6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSumDecompositionStatement.lean",
+          "stages": {
+            "1": "8af481fd977993802a7404952254e6e9d2bdd189",
+            "2": "260ed9d357ae3df5ed1f19cdb56ab2030832f3c4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CapelliKFiniteCoefficient.lean",
+          "stages": {
+            "1": "9ab7440920aa2a601d760729a54db91586ed5cb4",
+            "2": "4781168c6a5598337bf9a89ceaf35bdae5b0804f",
+            "3": "10b977b9e99548acd315de1c62ccc107d8138efc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsModular.lean",
+          "stages": {
+            "1": "f0b95974ddcc72cdc255429d8ab66bcd419e58d6",
+            "2": "69dae24067c911bdd15414a86cc67a801ca28d3e",
+            "3": "e250f7c03f90725152bf5a30fd1d25f96deae1a2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsModularStatement.lean",
+          "stages": {
+            "1": "75328bf31dcdda86f9776bcedf3b8f1fb84fa47b",
+            "2": "507d86d54a9654620f85af4ca34db0c0717f6c12",
+            "3": "a5c63781d4cdd3cf735eef4ec0e595b1785edbe0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsUnitary.lean",
+          "stages": {
+            "1": "b6ae86e5dcb919cbdfc1ca83dd5badba3fb87b95",
+            "2": "e918f015b201f051ff792758ad6d5b549ebd5650",
+            "3": "c0634c173351dba894367c6e315dbf9c850a3b4c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsUnitaryStatement.lean",
+          "stages": {
+            "1": "424cb46219e40cc5875588d5310790d2aca05767",
+            "2": "65f48249fc8c27d7f384371afcce3a1cc2101efa"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ComplexifiedDerivedActionLieHomGramAdjoint.lean",
+          "stages": {
+            "1": "d002892018ee9600843605f24cccdcce15d69771",
+            "2": "8c302c0dcd8d75c9694ad371b22dea61a97e5bd3",
+            "3": "913314a405f161a0de64232310643d91cd2663ae"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ComplexifiedDerivedActionLieHomGramAdjointStatement.lean",
+          "stages": {
+            "1": "6815caf40a3f9863aea7e777e08d3bb253afb83c",
+            "2": "dffeb91d5a653e9ababdfcbd7cf6428607263d90"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionBracket.lean",
+          "stages": {
+            "1": "895756b4e8168fc82bf4e18c1d61ebddb1d5e987",
+            "2": "91000087f575e7296ec58d5bf1596bb08601ad46",
+            "3": "053b22c9eb7ea2e9ebe739f330a229b650fd0636"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionDiscreteSeriesProperties.lean",
+          "stages": {
+            "1": "edadb6a208d1bd7fe0f8a9e09a0e390d019229d0",
+            "2": "cda3286a495f347e00d84e1f3381692eae0dd7f6",
+            "3": "6bc01392efa18873ac50d1aa0236c5b83c047df8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionDiscreteSeriesPropertiesStatement.lean",
+          "stages": {
+            "1": "341d1ff3b10121ce82e224c3d0fc58e0e84a33f2",
+            "2": "7b38d8a919f471933b4fb482e8de9d46926787b9",
+            "3": "88fd18e7bd28c5d74524dab3424ea1b77eef863d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionExpandMatrixUnits.lean",
+          "stages": {
+            "1": "d2ee368ac7f4c89de426f485902a92a2b3d88609",
+            "2": "44f39ad619305893fa896ee2f019c187ad2312de",
+            "3": "9f7b72fa698b373f563d69d953183ee54c420e0c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionExpandMatrixUnitsStatement.lean",
+          "stages": {
+            "1": "966a139459c4c3180f640a4b1fe1e80dd7de3847",
+            "2": "a59de9d4d9d9bbebb8218b05750d9c77e86e6ee4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+          "stages": {
+            "1": "1afafd2540730716cdc296897e31fc15304a2aec",
+            "2": "1eb53708667b067cbd77275bc40cfda4ab9982f9",
+            "3": "0c7f8767ef5c1907980a7f3f90c8c74df6798dde"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUniqueStatement.lean",
+          "stages": {
+            "1": "0b900ee2b546ca9f0e095f969edcc081f531f769",
+            "2": "f5c7d300aac22de979519c5435fa5fe103ff16ef",
+            "3": "06b8f01f368cb43e04c07424c9959c9c0a89d646"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesUnitarySmoothBasic.lean",
+          "stages": {
+            "1": "c2b9f3e826f92c813b5278386cdcb75a635ab242",
+            "2": "2fb10f1cb3f73ce276d8c70544978238a2e26f5f",
+            "3": "9c5e094a140f9a074f845e03c4426f456063f89d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesUnitarySmoothBasicStatement.lean",
+          "stages": {
+            "1": "2500551db81deda053129610b1c368acb88548ec",
+            "2": "44a6a9a0601cab13724313034011b11d2732fdd3",
+            "3": "9d6cbd1024e10ee04568670a6071db51c87eecc1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorBesselMoment.lean",
+          "stages": {
+            "1": "1895e93c2b7575a871469484870e6aa3b45d66b5",
+            "2": "457822aa08de7c03c8708756fdbe2d3101bf9aad",
+            "3": "aadd7cf76e7ef6074d4d1f119d09cfb8ee9123d0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorBesselMomentStatement.lean",
+          "stages": {
+            "1": "986846ca8efc7acc673d204cb609e7fa94d4a04d",
+            "2": "01254bff8f77afff5510cc0bbd84371f80acc991"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCapelliIntertwine.lean",
+          "stages": {
+            "1": "71772430e7bc63fb66fd8b7bec5cc114f855b10c",
+            "2": "419741aa643a5dd839710eb08912d26cfc223873",
+            "3": "17eedcfc071a41ac6ef70f52dac34b9775e0ad7f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCapelliIntertwineStatement.lean",
+          "stages": {
+            "1": "3ce46ed5d299731852eb1d958dd7de89e73d62be",
+            "2": "904af9cfd1dfb53aa807eb8933569e06060f5c58"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyCompatible.lean",
+          "stages": {
+            "1": "6aea9e794a6be1bce7b703ec051a3330764c4ee3",
+            "2": "d03bbe0a6c1b70948c17f115cb71f50e26e0715d",
+            "3": "b5fd543d224cf5fef53c99a5f2f7b4618a15713d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyCompatibleStatement.lean",
+          "stages": {
+            "1": "722b089ac2c56caa7efaed76dcda7494b4002080",
+            "2": "403dd62c1686377420d2cd2fe02ea9691b3c5b38"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyWeighted.lean",
+          "stages": {
+            "1": "ba17195e93aa481ef4e67a2d9ca4f4577078ffff",
+            "2": "26e23eef0e534f8ef9b27a1edddbb3cb476a9e87",
+            "3": "b30929bca65555a20d12333cb1abef98454439b3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyWeightedStatement.lean",
+          "stages": {
+            "1": "91bff81a49c8c75f8f4b7bdd5ab5506df5659eee",
+            "2": "53b897ee08a810c37b805239c497dfb0d04dc388"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsFamilyFunctionals.lean",
+          "stages": {
+            "1": "82515b6ad13ef8a85b2ea2527192ad670a3aa22b",
+            "2": "e56f5f08cd469799e549b9e5ca0384e66d2188be",
+            "3": "03faf490ef4cfbbd6436c9f95fae3f43a4485821"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsFamilyFunctionalsStatement.lean",
+          "stages": {
+            "1": "057f566c8679997a70a74cf7b23f49adc65b10f8",
+            "2": "0aebcc17997028c575f3b770763e3d8ece69908a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsKTypeNonzeroBessel.lean",
+          "stages": {
+            "1": "48070712f55555662be75152d2c4f1105d05895a",
+            "2": "429d3b5ac759c272c5ce4e332a8ef0f5886b2b2f",
+            "3": "24400973881ef41485277b4a9a301d1c5ca05e6f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsKTypeNonzeroBesselStatement.lean",
+          "stages": {
+            "1": "dd9965bcda08165bb5613fc1a269a5e823a9bc5b",
+            "2": "f044e2ef779dd54b6195e5fbb84cb71e2fb35390",
+            "3": "060f6ea00b15cc77c5dfa9ac56f51a27b381635e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsLowestKFiniteVectorDiscreteSeries.lean",
+          "stages": {
+            "1": "63687f6a6c33d2e9bfbc84458c5eff50131d020d",
+            "2": "7f2c6ff282b54ccccdf657aad68994c30839d8ce",
+            "3": "93b7d4d492444f602078f090a7dcee0a549790b7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsLowestKFiniteVectorDiscreteSeriesStatement.lean",
+          "stages": {
+            "1": "d5e05bd2a1285f18f7af1fc634738aa98e713bea",
+            "2": "e58dd19058b0dd1c8e204ec658c9b0fa02a19b52"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalCoefficient.lean",
+          "stages": {
+            "1": "b90d744a64572923d5a3b2efd795ba5eddafce7d",
+            "3": "9c5c2b253bfe2d7ac48fd219a4c4d23a7405ddfa"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalSpan.lean",
+          "stages": {
+            "1": "4b4b1a3f9b8d8f1511295cdb508e29d8254fc5ba",
+            "3": "d302acb9aea4a11a17f049a26f92d1b5bb615bed"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalSpanDual.lean",
+          "stages": {
+            "1": "423c1f0e38efc6065dc5abffe8435a210432c369",
+            "3": "e51b8c3e85b6aa3cc49959790e2688f4314b557c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupBesselGrowth.lean",
+          "stages": {
+            "1": "45c96d285e1634230b7ad2bff79f4026325ee5aa",
+            "2": "706aee3e9f135f7bd46687a17ce1fcee8461ddaf",
+            "3": "65bd9c8ed730089cc93f7eff9c9e16bad11db839"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupBesselGrowthStatement.lean",
+          "stages": {
+            "1": "ef18a6198859e4cee87b90de3a1d3eb8d7246321",
+            "2": "1e74ee008d956fd74ef937fe2072de8abc180de5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyBound.lean",
+          "stages": {
+            "1": "9b658e33b9780b1500f7ecfe94675c2b442090a3",
+            "2": "f1847016a97acd2861c2b054ff1ce31ad5cea7d6",
+            "3": "939c4d0896547ab6d5aaf66afd1fca578a1b37b9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyBoundStatement.lean",
+          "stages": {
+            "1": "eb8ee78ef154b0befdea67cd1ebb11cfa5c9f434",
+            "2": "8556fa356b3b059fc61fab312597150b26b462f7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyMoment.lean",
+          "stages": {
+            "1": "9f7eaae0d349c16fce01a28b35cf7e2efde8c0ef",
+            "2": "13415f0e0b39feff4fbf8f8cab550effbdba9fed",
+            "3": "f24ccc490c2e2be72abaee828cd34ad2b4eae1b2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyMomentStatement.lean",
+          "stages": {
+            "1": "a0af0bfcf79cf01a3047c2aac23184cf896ca8ce",
+            "2": "582bb2390168a4019cf4befa5239d7236efb2d22"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyRecursion.lean",
+          "stages": {
+            "1": "b52d96d19ad7fa83de32f3d3389a7d6547774b26",
+            "2": "4eec02bc28abeb8ac4b59ffdd065a779feb08d45",
+            "3": "6fa2db0a13d4565200259dd08c981511a508b65d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyRecursionStatement.lean",
+          "stages": {
+            "1": "1c84f79b30097ee01b70fc727ab918519db73ed7",
+            "2": "22bbe4f5fbb59a54ec9b16f8ad8b71a85a3735db"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentClosure.lean",
+          "stages": {
+            "1": "3a57c0ae9ec2bdfdf71f5843370b78d432cc5f8c",
+            "2": "b7828b7a309419074c399ca0cfd47d71f71633c4",
+            "3": "0b9b8c55ab273a0419985bc1394f13af32a7886a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentClosureStatement.lean",
+          "stages": {
+            "1": "16d3e7f9a83ab7b0003619817b31b942af4a5911",
+            "2": "3f1bf58ac1bed6a1ff3f6f95f6e2803c04066d08",
+            "3": "6c45d55277e8c3a2d589abda6ffa04d2e8c80528"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentGrowth.lean",
+          "stages": {
+            "1": "c0c0f10cdebc9d9fe43c32eb24d943cb79e79682",
+            "2": "82801edd0ca0109c43fc464104e2b5d52d8ba997",
+            "3": "9bd2ef64dd4aee30d07b1bd44246e2b550f2e663"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentGrowthStatement.lean",
+          "stages": {
+            "1": "1c4be16db3e80681e05adbfbc951ec1e610957f8",
+            "2": "53f7891bb4d92bdef3646bd3c4d1ade0f0fd4d7e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentRecursion.lean",
+          "stages": {
+            "1": "c31c68870e0bd6d09a619bfdaff0908360acdb61",
+            "2": "c53eb59d94e6f91a29a7818521e51109d82f89ae",
+            "3": "9a98cbe1bec00b596e725488339d8db89a55078a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentRecursionStatement.lean",
+          "stages": {
+            "1": "f73cd928dc414cdd94c3bef279ac0908481a7dfa",
+            "2": "9127c23862c3c340f9a3c5134e4e536068e24696",
+            "3": "f89a02d7a40ed03c63007772321b6efa83565f91"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyThroughDiscreteSeries.lean",
+          "stages": {
+            "1": "f1980d84080d66f9a08b9c7f59cc1025ed58dc5d",
+            "3": "38e04f0f5f024f308af3a6a8c229b830b69caba3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FrechetContinuousContinuousOnOrbitHasDerivAt.lean",
+          "stages": {
+            "1": "b912abda522518a0376df59922a7970fc6391083",
+            "2": "616e167116203e815375746bdf83f71715833800",
+            "3": "76568a3ccd1a0748790ee3d25c694bed0be47ee9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FrechetContinuousContinuousOnOrbitHasDerivAtStatement.lean",
+          "stages": {
+            "1": "689ba75ac17978c98733ff9d1d3b8bd91d687d5d",
+            "2": "0c934dec1c7be84f9d49d1be6eed6438747ec784",
+            "3": "fb787921fb9072a178777f03c3e7ac0fe6c5cf98"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FrepDiscreteSeriesSumStatement.lean",
+          "stages": {
+            "1": "86c2085d13235da06f2359d318593f3050b3ad1d",
+            "2": "e28b1b0a66520a774d7b86a0e412440345841725",
+            "3": "31ab8ef081765e09e5fc0d61a09f530fbe7971d3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientBound.lean",
+          "stages": {
+            "1": "c8384668d0f7ff1abc573408fc5058f108537814",
+            "2": "b700e5013d05d0c0c8b5144e99dd59c385ee6daf",
+            "3": "27eb853b43192d62c04287048ae41731e8559388"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientBoundDual.lean",
+          "stages": {
+            "1": "3b3b81b63d64257eab93215cf77983e8a74bb7ec",
+            "2": "25120284cf513c951eda3c2964022a698837ba8f",
+            "3": "465e4af6be61023291338d91ebcd9df4aaa1d903"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientBoundDualStatement.lean",
+          "stages": {
+            "1": "c9795681608cf30866cbf0a3608768e065ca80bf",
+            "2": "74dfaa402497229505f3fca19ef73fdf359a0f82"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientBoundStatement.lean",
+          "stages": {
+            "1": "10516a1453c85edf87a8cfc6c630d5630c42763c",
+            "2": "caeb7439818263f69bd09a33c1d602cf97384a1a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientDerivativeBound.lean",
+          "stages": {
+            "1": "106b008c9197c8806d89b583b67f397b5956df12",
+            "2": "ee461a519f097398221bb4fcf085118136f70ed3",
+            "3": "0c59cd1ad0bf72f2e3f3677fc920b46875105486"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/GapCoefficientDerivativeBoundStatement.lean",
+          "stages": {
+            "1": "b0a1bec2bfae692a20c2125549c6b2b03723ccfd",
+            "2": "bcb83f15fc03a84e491c2aad1aad9bfcf1de4b34"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/HaarEqSmul.lean",
+          "stages": {
+            "1": "dd27d0f60439da72d9e34161064db688b1b99ec4",
+            "2": "1ded96f76ef10bf927cf8f77218acd9f11b7b993",
+            "3": "906eb0e5b6c0f2b60ca681967cf4edd976e306a1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/HsqNonneg.lean",
+          "stages": {
+            "1": "5e9cc329c79b2308cf8c28c304fc568ef6c66344",
+            "2": "e1cd20373ce4859c2b4063872e5aaf65a0a4a3d2",
+            "3": "7fec0b3e775ec474dc4375da930cfcf891d03e30"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/IsCoefContinuousOn.lean",
+          "stages": {
+            "1": "c491884e90d0d9473ef47a4491b236d27f7bf027",
+            "2": "fe8c9817339a4bfadd140078834f64fcbf688e4c",
+            "3": "2ef6d8415f21234e0632324d12cbe218a0eecc6a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/IsometricBesselCompare.lean",
+          "stages": {
+            "1": "33b6ecef08ec8452dfcf5c3ecb77f7a64d08e995",
+            "2": "71c9a2b9f803ae44bcf12f2e9295cc3dee6304b7",
+            "3": "679f6f5a433657f326a89e1a40328a8f37c791a6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/IsometricBesselCompareStatement.lean",
+          "stages": {
+            "1": "d6462039ac6168754d31eed288f9b6dbc1268d13",
+            "2": "3b17a86d50db86bbf36edebe70267baecdba8fa7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/IsometricBesselSideBound.lean",
+          "stages": {
+            "1": "ac8345aee82ba36bb23b4cf16ddfa138be4ad825",
+            "2": "1dd2e8e051bad95314aefe56afc0c7c0102ce26e",
+            "3": "9049a1f3ab8af2815ead84801fe1c7d5b05c1b4d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/IsometricBesselSideBoundStatement.lean",
+          "stages": {
+            "1": "68146b9e56b6d8e633deca616db6fd29bf4f11c0",
+            "2": "32b827f1769934d9a67aa84dd96df99b9739cf00"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/KFiniteDerivativesFiniteSpan.lean",
+          "stages": {
+            "1": "0a67beff5818e38e5625b1a9a5bf10913db3c384",
+            "2": "7c37b4480f8a460420b86f5adff1f78697c8090c",
+            "3": "c12c5bca76e88f22c4212b514dd4c304bbaf0ba8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/KFiniteDerivativesFiniteSpanStatement.lean",
+          "stages": {
+            "1": "2b19e000139907d1fbcd9bf01437ec20b378e9d1",
+            "2": "4da58b0fb50fe8f964b000e8c3fce8f6fe0954ce"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/KStableFiniteDimSmoothCompactRootStable.lean",
+          "stages": {
+            "1": "84a7d1968148f8b2f766ede7d0f78bdd020cd6ed",
+            "2": "ba98a04f40380f669f4ff03b5a42b494f7119159",
+            "3": "d3b7d83110c412dffb75b02a10fb85c9fc27af67"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/KStableFiniteDimSmoothCompactRootStableStatement.lean",
+          "stages": {
+            "1": "afd091a6d9ad5d9e38bc6e7a450f11bdbac7eebd",
+            "2": "8b18fd3793ec14cc1d7f387cb08fdbafc14722bd"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/MatrixCoefficientDecay.lean",
+          "stages": {
+            "1": "2389e7a46ca1390453e5dc9ecfa43bb0d3016de5",
+            "2": "bf5eb552a5cc9f20080f2da8c8cb51cdacf40633",
+            "3": "3e83da320f8c3f889779f3a1b8ee712de5407394"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/MatrixCoefficientDecayStatement.lean",
+          "stages": {
+            "1": "8d45d5373ecb87cadeb8ccc1a06b90b5490f8562",
+            "2": "d2d01ef1d20d546507cc729613aa3b24ba7c9b9b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/MatrixCoefficientSmoothDerivatives.lean",
+          "stages": {
+            "1": "ba571c1b60ee0a32ba3f9e782f435931329a9e6d",
+            "2": "87b4b920bcee8897b1c785bc8cbbb1f0c1047121",
+            "3": "3a3f91a9ba333c3624fa9a6bf1443b8e7cb46cd4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/MatrixCoefficientSmoothDerivativesStatement.lean",
+          "stages": {
+            "1": "96504eef8c69780bd6f73539ae8b5d1d54f91c5b",
+            "2": "dcc742e05c9c788a7439e7b24fb9ae44ed90f685"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/N1AddEZLe.lean",
+          "stages": {
+            "1": "f2c784296b830fb0abd4ba6bb6c7552f0125ee32",
+            "2": "c6a4a0631cea01c1eedb93b95466019f6eec733f",
+            "3": "4988f7af5ad10aae8c89c9429352b937a2143be0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/PieriTensorDecomposition.lean",
+          "stages": {
+            "1": "42cdf21553981f2e4b29f560d90b9c0b9837d47f",
+            "2": "028b507775dbcdafd8ccbfac49806ef7fd3107ba",
+            "3": "dddb78f9edac8882dd085b09f538ff1fbd675c15"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/PieriTensorDecompositionStatement.lean",
+          "stages": {
+            "1": "f7c4201a77d5a42c90c18396fbcf851252ab6b5f",
+            "2": "9204b30f77317d6ef55d10dd20b282cdbc358f95"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/QuantumDeterminantEigenvalue.lean",
+          "stages": {
+            "1": "830da391a168d45ec44917fd72a39fa9ee3f7a5d",
+            "2": "1af3d1b97ad756c78cbe3c1b1a6ebfc1f922f43a",
+            "3": "91ba0b4ba2dfbd239e4e507b7e2d03a86ec90a49"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/QuantumDeterminantEigenvalueStatement.lean",
+          "stages": {
+            "1": "ce764f3086e05cbd2ce04573864c5677072586c7",
+            "2": "2dc35cadff9a640b7571565db0df9d9c2c3cfd34"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/QuotientMeasureAeMemAndMeasurableBesselModel.lean",
+          "stages": {
+            "1": "e1eaf0e639e36cd435adc430ec30c041129b68a4",
+            "2": "70ae4dabd7f946ebd6ae2c9c7a1fc345e5966589",
+            "3": "447b175d59b33f112bb126b92992b6b106d75c37"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/QuotientMeasureAeMemAndMeasurableBesselModelStatement.lean",
+          "stages": {
+            "1": "d91ea163cfcbc414c28559d4c4b78042107c29ba",
+            "2": "bd3db8e3317c6b1b2afca582db8e219e236144d4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/SmoothMapsClosure.lean",
+          "stages": {
+            "1": "3b0515feb8ea1d258752eb11a56efc44cf44a13e",
+            "2": "22b6a94571960fc61792b0c9ddfefc30ef29cab5",
+            "3": "92fa7fa1c1f40aeeb623f45da2f8c815d8822cff"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/SmoothMapsClosureStatement.lean",
+          "stages": {
+            "1": "e979aeeb8788653908c2907b5da6fce9bbaeee87",
+            "2": "dc647cb6e15c1155349fb404ab411ed08badc2e9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/SmoothVectorsDiscreteSeriesGlModule.lean",
+          "stages": {
+            "1": "dc97ddd19535cbc3d5964d1f09532424e62eca83",
+            "2": "5d406aff2d1e9a609e33c041d230cf6ba16e26e9",
+            "3": "941963d7e23d7c3cdaccaa38d7e3c33e8a3ab3b2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/SmoothVectorsDiscreteSeriesGlModuleStatement.lean",
+          "stages": {
+            "1": "38263a567e4354f5630898d387c82ef73f8c2310",
+            "2": "129d39c6d1cf3157dd85609d8706ee67c063ed79"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/TensorBesselTransfer.lean",
+          "stages": {
+            "1": "29c624dca45194315fcf69f77ed68cf470a869d4",
+            "2": "71c88a4d22f329248553e555dc49b2e85e215fd4",
+            "3": "2f68a5b86f9dc59ce6160089d2acd924dd2a4429"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/TensorBesselTransferStatement.lean",
+          "stages": {
+            "1": "d6aa729358df3656a770ce76af4a97277abc0dd9",
+            "2": "221e68a56189b69e213ae8f354b15197441f28e4"
+          }
+        }
+      ],
+      "conflict_list_truncated": true,
+      "rebase_head": "61c1bc64b4c87472ca040e3502e281c0ffffbe09",
+      "log_tail": "cTraces/WeylCharacters/SplitB.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatDefs.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatDefs.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/CoeffRescaleExpandOfNotDvd.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/CoeffRescaleExpandOfNotDvd.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgClose.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgClose.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgLevel.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgLevel.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgTorInt.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgTorInt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/IsIntegralOfRoot.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/IsIntegralOfRoot.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModDeltaInt.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModDeltaInt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModEvalMF.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModEvalMF.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModEvalSer.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModEvalSer.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFacSer.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFacSer.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFacSlash.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFacSlash.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFixJ.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFixJ.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFrobCong.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFrobCong.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFrobSer.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFrobSer.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmForm.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmForm.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmQ.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmQ.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmSlash.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGmSlash.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModHnf.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModHnf.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModInertKur.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModInertKur.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModJTau.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModJTau.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModKronPt.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModKronPt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModKronSer.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModKronSer.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModLocC.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModLocC.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModLocD.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModLocD.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModPerm.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModPerm.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModPrincNorm.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModPrincNorm.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModQExpEq.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModQExpEq.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModQPrin.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModQPrin.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModSepInt.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModSepInt.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModVanish.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModVanish.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedCardG.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedCardG.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedKerPrin.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedKerPrin.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedSeries.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedSeries.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TchOfIntegral.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TchOfIntegral.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorBasic.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorBasic.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorChord.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorChord.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorRes.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorRes.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorsUnit2.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorsUnit2.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorsUnit3.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorsUnit3.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/CauchyInequalityOnTorus.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/CauchyInequalityOnTorus.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/GaussExtensionAndResidueTrdegEq.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/GaussExtensionAndResidueTrdegEq.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/GenericImageFinite.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/GenericImageFinite.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/TorusLex.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/TorusLex.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/TorusMean.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/TorusMean.lean\nRebasing (1/15)\nPerforming inexact rename detection:  48% (816269/1670504)\nPerforming inexact rename detection:  50% (835252/1670504)\nPerforming inexact rename detection:  51% (854235/1670504)\nPerforming inexact rename detection:  52% (873218/1670504)\nPerforming inexact rename detection:  53% (892201/1670504)\nPerforming inexact rename detection:  54% (911184/1670504)\nPerforming inexact rename detection:  55% (930167/1670504)\nPerforming inexact rename detection:  56% (949150/1670504)\nPerforming inexact rename detection:  57% (968133/1670504)\nPerforming inexact rename detection:  59% (987116/1670504)\nPerforming inexact rename detection:  60% (1006099/1670504)\nPerforming inexact rename detection:  61% (1025082/1670504)\nPerforming inexact rename detection:  62% (1044065/1670504)\nPerforming inexact rename detection:  63% (1063048/1670504)\nPerforming inexact rename detection:  64% (1082031/1670504)\nPerforming inexact rename detection:  65% (1101014/1670504)\nPerforming inexact rename detection:  67% (1119997/1670504)\nPerforming inexact rename detection:  68% (1138980/1670504)\nPerforming inexact rename detection:  69% (1157963/1670504)\nPerforming inexact rename detection:  70% (1176946/1670504)\nPerforming inexact rename detection:  71% (1195929/1670504)\nPerforming inexact rename detection:  72% (1214912/1670504)\nPerforming inexact rename detection:  73% (1233895/1670504)\nPerforming inexact rename detection:  75% (1252878/1670504)\nPerforming inexact rename detection:  76% (1271861/1670504)\nPerforming inexact rename detection:  77% (1290844/1670504)\nPerforming inexact rename detection:  78% (1309827/1670504)\nPerforming inexact rename detection:  79% (1328810/1670504)\nPerforming inexact rename detection:  80% (1347793/1670504)\nPerforming inexact rename detection:  81% (1366776/1670504)\nPerforming inexact rename detection:  82% (1385759/1670504)\nPerforming inexact rename detection:  84% (1404742/1670504)\nPerforming inexact rename detection:  85% (1423725/1670504)\nPerforming inexact rename detection:  86% (1442708/1670504)\nPerforming inexact rename detection:  87% (1461691/1670504)\nPerforming inexact rename detection:  88% (1480674/1670504)\nPerforming inexact rename detection:  89% (1499657/1670504)\nPerforming inexact rename detection:  90% (1518640/1670504)\nPerforming inexact rename detection:  92% (1537623/1670504)\nPerforming inexact rename detection:  93% (1556606/1670504)\nPerforming inexact rename detection:  94% (1575589/1670504)\nPerforming inexact rename detection:  95% (1594572/1670504)\nPerforming inexact rename detection:  96% (1613555/1670504)\nPerforming inexact rename detection:  97% (1632538/1670504)\nPerforming inexact rename detection:  98% (1651521/1670504)\nPerforming inexact rename detection: 100% (1670504/1670504)\nPerforming inexact rename detection: 100% (1670504/1670504), done.\nerror: could not apply 61c1bc64b4... Apply the Proof Atlas Lean simplification\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply 61c1bc64b4... # Apply the Proof Atlas Lean simplification\n",
+      "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+    },
+    {
+      "number": 63,
+      "title": "Consolidate 133,202 small sibling modules into 22,831 antichain bundles (\u2212110,371 files, \u221267.1%)",
+      "original_head": "b8f54654a52be8aee49242459fb28d6697fd8d30",
+      "original_repo": "rohanarun/riemann-hypothesis",
+      "original_branch": "consolidate-modules-on-main",
+      "maintainer_can_modify": true,
+      "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "status": "conflict",
+      "conflict_count": 142439,
+      "stage_types": {
+        "1,2,3": 19573,
+        "1,2": 121027,
+        "1,3": 1839
+      },
+      "conflicts": [
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/BesselMapUniqGap.lean",
+          "stages": {
+            "1": "b66140921174285c788e053d71cfa3378bfdcd1e",
+            "2": "b29d93cfa7a632c7a208a0a27074dee6ca5c556b",
+            "3": "9ad2673ddbf08051b35291b82111b2689f71dccd"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/BesselMapUniqGapAlt.lean",
+          "stages": {
+            "1": "84286ec8575346d6805e7484214a42a1e075f62c",
+            "2": "d4ede67d22a621d1762d7e40108abd98dd92056e",
+            "3": "8d1bb4ae108ceaf40be847a6fd369fa25bcee3d9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/ContinuousOnOrbit.lean",
+          "stages": {
+            "1": "a176e1759da11aaab3d9a354ef5df18cf2e2282e",
+            "2": "14027c2964bb6e30f00ec8d258378a2f4eb406f3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/NormPsiGen.lean",
+          "stages": {
+            "1": "dcf543067ccd2014ce144d8a96a8c7277dc5016d",
+            "2": "b1b1efd86dd6ad80532830d63e330e1177756ea3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/OrbitMult.lean",
+          "stages": {
+            "1": "ce68ff4fc83e87485db12387270bb7f284ea2eed",
+            "2": "201fa7d7ccfd4077720a15ab814d78b3862fdd36",
+            "3": "9be3501b12ffcbda672668eb6cbaab0935217d58"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/ProdNormLe.lean",
+          "stages": {
+            "1": "0fe3865acbbd91a4fa033e7ddca98b8b2507ee22",
+            "2": "abe0d0a5c4f38569b7bc440fc55132ff9031f683",
+            "3": "01119e7fed13ca05f4f95e488c9f7485028174c4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/AsmDiff.lean",
+          "stages": {
+            "1": "f1db19ac630490322d40bb544660c64723368e38",
+            "2": "715bef08cfea705a2ebb83fcfcd84869fe43e5ee",
+            "3": "9a0365e9da24b4d4d94f34f40e4faaeed54e2e0e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/Bridge.lean",
+          "stages": {
+            "1": "bf42f6e8214a938ca03c1e49b26d4813f8e164de",
+            "2": "43ec717562aa29cfefd8f765355a564008d5c962",
+            "3": "7bd578e5d6bdadf20b3bc2026d0d3bafa04245db"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/CoefOfOfWsp.lean",
+          "stages": {
+            "1": "961ef02f31fef2ea4988f9b3c65fdc12138de3ae",
+            "2": "c816be6f1de0580c9f2deb138d55c53a1f134ed2",
+            "3": "c4eb9cab22bea540549dd6f9721be08a806fd6df"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/EigStrOfMem.lean",
+          "stages": {
+            "1": "bbcd1b28428e52dd659b3124a798d0b7e64a47a3",
+            "2": "0b6f5065d5f4c72ca4de84268eea95e98bc1347b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/EndpointDifferentTypesThreshold.lean",
+          "stages": {
+            "1": "6244d57397ec6534b6c19cae85772d35d4859de0",
+            "2": "1923a34461af496934442ae61ddcb2db6036b968",
+            "3": "5d7082c203cd926e2d6731d3da6a2755c69a703f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/EqShift.lean",
+          "stages": {
+            "1": "d623c1c4cd9171ac9c7c8cca35789dbdf5f549c6",
+            "2": "3ecc19d8e4694c65898aac705594d64b29e12d6c",
+            "3": "fe448a8dca2634c353b2fb77cc43eac042fa2ac5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/FamilyThroughDiscreteSeries.lean",
+          "stages": {
+            "1": "81e7a1bbb6a5adfcbb23425b5822c7042e310db8",
+            "2": "f87c1c70e72c3ccd0dacdb1f6a11c664275a541f",
+            "3": "2881c96468524629b33713f14d19e6fe5046c211"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/FourLeOfFive.lean",
+          "stages": {
+            "1": "ff691b4c1e22d2a07c1fde968455bec923355aa1",
+            "2": "2b9084af1e5fafeba5a92d1a116aae82b31a4607"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/GapSizes.lean",
+          "stages": {
+            "1": "cb77673447c365456b4b265bc804f1ef7dad2c37",
+            "2": "76d3b3cb34244b700f261dec8ed09b7eccb93bb7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/GridsText.lean",
+          "stages": {
+            "1": "f44b0ce662152d3569031064b53e22ea4a727b04",
+            "2": "a05cdbc007527857f1624a2a5161be86c6e12ee8",
+            "3": "e2a05dcc405ddb82e2512f6623164e1a2b2c55ca"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/Bracket.lean",
+          "stages": {
+            "1": "0514c1b6355caa6c09f397064422503ad9f8b0db",
+            "2": "444984ead51dbe394f103d51ab17f1a9ad7eb8ff",
+            "3": "2afc438998b4346398d64a5a9bc64098a6953e72"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/CloudPair.lean",
+          "stages": {
+            "1": "73f2b410c5addf9887b37ba39de85d4d744fe81a",
+            "2": "0845a5840664c036a9c97c066510b8c3a45022a2",
+            "3": "ed8ae3f22b37d0800a81708486c1a51dce002a20"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/CloudProd.lean",
+          "stages": {
+            "1": "85bbb723b98e49fe9864ee558c9da808305b9873",
+            "2": "b2fb3d23ee239ed611fb67735491fee2197dd0e8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/FreeFamily.lean",
+          "stages": {
+            "1": "2a668e0c4b936e7cbda5236c6eb157b7c5fc3227",
+            "2": "1e6a866678efa1c17f0d1e872ce7ae628c229f31"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/GridSum.lean",
+          "stages": {
+            "1": "f41266766068c31eaa7d0ce2fa8381fca692773b",
+            "2": "214f09a7be02f974cb7581e2c7306de9809fb4d6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/LagSum.lean",
+          "stages": {
+            "1": "af04aec38a027c0d807e00fafd891de147b31ac6",
+            "2": "3913bc01cc7d78ef0ac0ad0895fcbd31c09a4859"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/PairOKOfInterlace.lean",
+          "stages": {
+            "1": "62c9698dd4afc37951041facaa6e975434d6adac",
+            "2": "79842920fd39a6ce29abdef1ddf559e389514df4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/ProgYInjective.lean",
+          "stages": {
+            "1": "83f3bdef8b006c6853af4e9c6402898d6dfb288b",
+            "2": "3b370af1144a11df89b5bae014aa7db4e6e118f7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/InterlacingGrids/PstMul.lean",
+          "stages": {
+            "1": "870e17af3657d272beeac0a16dc2825cf750d91b",
+            "2": "9e184ed68c01e7eb034461f36b3b8905135383a4",
+            "3": "b944d9dad3bf3acf9d7fcaaa93d42a44436768f4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/LettersPoly.lean",
+          "stages": {
+            "1": "7517fd46f8c503cda92feb845004eda2d74f5904",
+            "2": "a448fd1172c322a9be8994f661a015bfeb42bfc3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/LimBdSh.lean",
+          "stages": {
+            "1": "48842dd82cc67c0b172aca3d1b335c2495cfe868",
+            "3": "74ede0a2abac11b42928dda99dc118affa418ad5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/LimStepsOf.lean",
+          "stages": {
+            "1": "602f46a2757c77579d791b4016acc2b107207cba",
+            "2": "b208b1c522cb6f45a6d833e5f2cb0d778c87f3a4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NQText.lean",
+          "stages": {
+            "1": "692a81d3acd27d0138b6a63689df2b2918177ce7",
+            "2": "7f9db70df32721b1beab325f934ee90430786704"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NormalizedMeasureScaling.lean",
+          "stages": {
+            "1": "b3a8286f6e230292b12560152e6cf965c6e862bd",
+            "2": "518e260e91a6364fa8a081e72fd1f87abd74886f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NqMovedExample.lean",
+          "stages": {
+            "1": "d3dc3dda278db8d7c04cdd1e3c7922dfab401530",
+            "2": "3cb0dd5f2873e03f1db619e908cf3ea5a737d8f6",
+            "3": "9984f1d3d1595770b1b1fae30b48f19fa7b38e9b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/QwBound.lean",
+          "stages": {
+            "1": "658d683276d99dedb4d63ef570f4b9bf0c9cfc74",
+            "2": "714e3e6189b3a87e60d9f5341981390e8029f6c6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/SpanBall.lean",
+          "stages": {
+            "1": "b11d702497066cc3417a577beef2f5f18f151095",
+            "2": "0bfc13f947aab0c52ca0d57fcfa41860075a64a5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TiedNum.lean",
+          "stages": {
+            "1": "0ca1b9e4cc9dd2eb0148a6284d0baf504f8f74ef",
+            "2": "a99c59c85d056be35bd17b709f8ae23c6b51cba8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TypeHC.lean",
+          "stages": {
+            "1": "0d843b68ddc6ebbfe513fd0e116f580977931f75",
+            "2": "dcf7a01f281560ff9f45a159dd169ac334a45364"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveBallEstimateWeightedDualAlt.lean",
+          "stages": {
+            "1": "999ba981f65fdcad0e94e240d9e1e16d798de7ac",
+            "2": "a84f2e6975ed6512b73a17e64d66b6cee23a88a3",
+            "3": "c83667b80485f623d0091b4f42dada4c689e9063"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveInputsOfHypothesesGlobal.lean",
+          "stages": {
+            "1": "322471d3f32041197c61b67a83a605362aabe901",
+            "2": "d267f5af4dc6f39abd7fba19f6336cbb871ba6a4",
+            "3": "310b9cd77174ab948a10ecec8455b664b99e6204"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WeightedBoundRotatedUniformOfCubicThreshold.lean",
+          "stages": {
+            "1": "fccb2a55580cd3dad2fd10521f71815582238d89",
+            "2": "7e59789dfe8cf6760b067364f28ef361201bbfd5",
+            "3": "ebc4b57d97aefdf1cd14dd3c7caab8f0fcc9eb06"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WeightedUniformRotatedOfExpansion.lean",
+          "stages": {
+            "1": "eaf37e47927ba9ead08134701b8585035eacf367",
+            "2": "f0da469b90da8620b027909cf01217a24960d915",
+            "3": "feff0c2ff63bd8b5f2b0dfcc4c7a48caaa3568ef"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/CompactTopologicalForms/FinalS.lean",
+          "stages": {
+            "1": "1f4527985636bacdcabe44e1f3d76fbe1d1b3d49",
+            "2": "951a4dd14df50612ad514babdd3284d6bd605b45",
+            "3": "ab99f75efda967955abcd29b4c002ad9d2378c3c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/CompactTopologicalForms/JacobiFieldSquareIntegrable.lean",
+          "stages": {
+            "1": "03d1b7115c239288655e08e4132ac52eca9ea99e",
+            "2": "08891bcc3ac430d0e8a9e6677c9708c674dbcbcc",
+            "3": "c57c8a65aeefaf9b6c50ac8c5c9d003dd29c2870"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFCoreC.lean",
+          "stages": {
+            "1": "e1546e190de41c1fda59ba1a480cf69b74c0cbac",
+            "2": "e782354834bcc219e48849d6dd2c77e64f75cb47",
+            "3": "9c7f16fdf49601a45d75420d6de95aa1f21c5889"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFDomC.lean",
+          "stages": {
+            "1": "2d28b3a7bb264d7891ec39675a9f39e0b44a4182",
+            "2": "76b426727eb0dabc065b3a9c3880e20033c546f1",
+            "3": "74041902cf3bfa9184b6c88c47ec5ea84041bf9b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopCpt.lean",
+          "stages": {
+            "1": "3e2161320381c23f6b8f828c32df81cbf7f06c22",
+            "2": "547aac59c4a993f91541fb6a3a0b91253718b2cc",
+            "3": "0245d6db636260299f4b9acc29072a32aedc6d2b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopFormCpt.lean",
+          "stages": {
+            "1": "9258e50dc116933f35cedda04e1f7b5cb3699d3e",
+            "2": "7e14690766fa23e8d23e363cea60870189e5b0d0",
+            "3": "5aef28c45f6a3130eecc5b82049395f0df57acba"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFTopSq.lean",
+          "stages": {
+            "1": "130984f83c350c6c655ff1fb6be3fc9cd1a33bc3",
+            "2": "e4b88be0f1bed081f2510b63b7846a3a2427ddf9",
+            "3": "623630218586e4fe7a18838b323b4aab5814b9fc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/HarishChandraMultiplicity/HCMult.lean",
+          "stages": {
+            "1": "f176da70a12def8d74e8c4092a1357c2e2be6f55",
+            "2": "74c27ea9433a5381fa31b0714f632ce33d523ba3",
+            "3": "854da072a532da34f5c916d71d73586686671012"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/HeckeStandardModules/EqZeroOfCompAt.lean",
+          "stages": {
+            "1": "7dc427419982eabb57045adec05aee7d48c12978",
+            "2": "a837d1153c2b7e22b38d1a81f852815f783e8785",
+            "3": "338dead60551d2e72c14e21a194434186e9e001d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/HeckeStandardModules/HeckeA.lean",
+          "stages": {
+            "1": "af6a64795ab8691871ec2ab369aca46f2e49d8d5",
+            "2": "8d75d4cb98417f7328fd6018bda5d975bb5b207e",
+            "3": "10b6468b2bc062f6462f5588ae219e91bf8c4d8f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/EvQTrJBFF.lean",
+          "stages": {
+            "1": "b917ff74989344ae0a8f2b21e8898913d42fe393",
+            "2": "efd1e5406912a89dbaa62685cfd62ee29690defa",
+            "3": "f0e367a1823a27bff481b770206d1aee2533114d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/NFFinal.lean",
+          "stages": {
+            "1": "4023afa806b7357aa02c56cdc75f77ea8249202c",
+            "2": "ca932ea376560e9d0d0dae87cdaa4c07b8b4aa19",
+            "3": "a55ea61e9710473932183904fafadeb2614d3b69"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/NormalFormHatCompact.lean",
+          "stages": {
+            "1": "494a13382f56a0edc83cd5d28f29b690703083f6",
+            "2": "a917d38d456951da26edf093ba4a0d84059227b4",
+            "3": "8a6cf8086c8534693baa22fd3f0fc53786cc583b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/TieAlg.lean",
+          "stages": {
+            "1": "39c29bd6651bab4e1d22ce032ce0cd25932db09b",
+            "2": "a3d6c71fd9d026da2d920eb4632e03952624ad43",
+            "3": "5890f6d69cce25b757662bf78f721002b6547cbc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/KrullDimension/TopologicalKrullDimModel.lean",
+          "stages": {
+            "1": "966b94d0a535728eeab7b805778146d265686a7c",
+            "2": "ef4369e27ca9ef5ba884a9cbf6d3f07e240525b4",
+            "3": "19cb3215f653928f9cc7e8bb5b0d07d467baae92"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AmplitudeOrbitalIntegral.lean",
+          "stages": {
+            "1": "1dd55930e68a3fa05bbe64f92d023ccc0502288f",
+            "2": "dedce73f66373f0691c2c6e151aeb5a49c03ec81",
+            "3": "be6cd348676f061ce3880ecf51404c7c019154c9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AtFormAdm.lean",
+          "stages": {
+            "1": "17ae0dd092177822f3560cf308e06aa6aa6ce4ac",
+            "2": "2a5aa5dc0ef66747a79dcf08aa5eb7333de22d99",
+            "3": "f31b230035126def74d2721f30407207a0e54927"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AtFormAdmOneOfSteps.lean",
+          "stages": {
+            "1": "21c10c7d4375e1829def8bc3942e9c15ac033a17",
+            "2": "ae2f20109f92aad90e6b88271aba761ca888a09c",
+            "3": "8fc0086cb5a4055004a901aeed654141c43f5148"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/BesselSchurOfDec.lean",
+          "stages": {
+            "1": "077474c341631f08fd04f3b4eb2249c8c7e46dc3",
+            "3": "f50fdb721eb21dd41c0aa5258b5971032196b337"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/CoefWeightedLocHolds.lean",
+          "stages": {
+            "1": "ad81c8545a7ddc4e1206f202a52bc230aae45afa",
+            "2": "bafcad1e6bca207a6ef010a9e2b046de5dff3659",
+            "3": "0622538aa8e02bac465149d3f4238605c6ca9ced"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/DDForm.lean",
+          "stages": {
+            "1": "b7b9ef3b6057a3fa11769b0bda061c86c074bcfb",
+            "2": "e8f6d1432daa92125ddc41f6027472f2ac2f5845",
+            "3": "a17d5a82c3896acf604d5ae847a233523866703f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/DoubleCosetBesselBoundOfGap.lean",
+          "stages": {
+            "1": "06ea4af68d037805111502dd28b2fd4ee9b2c7af",
+            "2": "f88b068a0cabe4f03f567ab2cba51365d249d6b9",
+            "3": "fa565191f3cd8fec0bcbeab4e88617723ef560c4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/Inputs.lean",
+          "stages": {
+            "1": "e19380f8aff032c49453347aa122ac928fefeb47",
+            "2": "bd847021e82c1c63c85382f4ed9565eac6e110cd",
+            "3": "5570eea69f7cdccb4e14af2d0bbd4935a70fb9e3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocScalar.lean",
+          "stages": {
+            "1": "aeddb088f342370c26a5bd2f72db523144639c27",
+            "2": "2af34aed5b99bddb694aae324f43989bd3e26549",
+            "3": "34df406054c34b29769fee01e422029423719c42"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/MultiplicityOneUnitaryBranchingOfUniqGap.lean",
+          "stages": {
+            "1": "4bf601de40d2ad045c04195fce18ac91aaff1302",
+            "3": "8578c13508eef9d8bb5441035bbf144f37ae9ff9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/HatCap.lean",
+          "stages": {
+            "1": "c141375d913875d0e5e01b294c12687a866ee265",
+            "2": "d0f2557268614e161428d36ab2b3236b01227769",
+            "3": "62363fe2659e0e78910645b4b2998e69e024fa4d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/HatKBSOf.lean",
+          "stages": {
+            "1": "7b00ba3456605bc6e487ff7e0d11c8ef1e9c8b4b",
+            "2": "023860cf4f06463f3c6c0fe0174b78edd43eb3b1",
+            "3": "af38d49ccd9739509bbebc0ec4e0fb92a00ab35a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/HatProd.lean",
+          "stages": {
+            "1": "8562716d3003686773ef294326b6de2bf6045af9",
+            "2": "5d05a67561adbb8c740737c2e44d956dbe6ead21",
+            "3": "d6adcf75575c1c2235998f5ef39e3cf440038b7e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/NFHatProdKBS.lean",
+          "stages": {
+            "1": "d898f400641f3e28587d6598911876e299c746ed",
+            "2": "b827b51fbea2a1fd18a80e95f59ce60e0bbb8d3c",
+            "3": "889efa353e2e096fb484a0a41165be116c544de2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/NFJCutFF.lean",
+          "stages": {
+            "1": "9631a24a3cfc48c192f5f625405ff30d4fc7e407",
+            "2": "6c899fc5640f0266702683bb60dc4d3c6298f281",
+            "3": "046a0fab32ef333516817a70a1a1c98fba97b326"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/OpLocal.lean",
+          "stages": {
+            "1": "67d52977e09bc8c32167d8a09f4becc378d742ed",
+            "2": "e89d47f08cf397fb2609833473698de872401bd1",
+            "3": "2b8103caffc074d7fc91d4bdef6534af40d2a448"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/CuspidalMirabolic.lean",
+          "stages": {
+            "1": "bc9a4eb093d2608d5b6e5127c2a3b81fced17eab",
+            "2": "372f35189f70bebaae71924ac7d057b65843396a",
+            "3": "659be795ec94730fd196ce3903e56f8dabd5880a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/CuspidalRestrictsToInduced.lean",
+          "stages": {
+            "1": "bbd328dfb5e852561cfa54376229fc90cb58c787",
+            "2": "605610554aa9e363631a245adaa77f546c866eba",
+            "3": "8256ace93f535f641bd5ef50bbfaa9954774c0b6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndDim.lean",
+          "stages": {
+            "1": "7369cb885bf4365306b09ba9d499b25ccc3e1345",
+            "2": "b6e6a65852a8de325bc8a7f10951254594807c42"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndFacts.lean",
+          "stages": {
+            "1": "d13251e6e70ee09552342665a8815663a5d2546d",
+            "2": "6621077836701fdadd9428f898f17f9c947e60e3",
+            "3": "e45f5f2a7dfe2f943817144babaccf75b8a9bee6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/MirabolicRestriction/MirabolicInduction/IndIrr.lean",
+          "stages": {
+            "1": "4931e136e26689f7a4cef1e2bf8fe440c992eb05",
+            "2": "bec5c2e0e56d579d3c928b7c54dd3a39c3a8f063"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/HsVecProjLe.lean",
+          "stages": {
+            "1": "22d9b84b62031eba3309896ffbf17954dae88d91",
+            "2": "1e365b73cd00a00be807d28e646e135a9d7dce2f",
+            "3": "a5e76b8855cdca4b83dccb3e725b5d4f8cc0a054"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/ModelPt.lean",
+          "stages": {
+            "1": "25740d1eeb16bfc687c8675aafeafe33ba1a87d4",
+            "2": "a08ff4cc6fecf56c4a581db9ecddd9a880ff439e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/NFTieProv.lean",
+          "stages": {
+            "1": "7bc76b7fbaa247ead21c39c5590161a8573b4e2c",
+            "2": "115a6f149e4e08fec9e397799d319c72bbe2f1b2"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/StepCpt.lean",
+          "stages": {
+            "1": "8299fb390ec36478d2bdceb0a3aca0ff8be148ad",
+            "2": "1c2aaca4dac5d4538405a295fe92552cebdf42c4",
+            "3": "c8cabc230e25b1171a6e3c26905e922d601e4e90"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/TransferGaugeGeneratorZbarInv.lean",
+          "stages": {
+            "1": "b105a125ef012d2495ffe973c97c4df83073b230",
+            "2": "ec33a792e8ee8810248be2585775f62a8022c4d3",
+            "3": "edb2790f0fc21e4a5003d5cbe171269078333205"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohCmp.lean",
+          "stages": {
+            "1": "7789b6713cb617db796af58cb5c137f8f7414275",
+            "2": "54f6a4ab8587ab460e9b695bf00e3084f703b019"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohCmpA.lean",
+          "stages": {
+            "1": "dde8d1d9aa98a577f85258ca9c233047328e6d25",
+            "2": "3a7c1dad8fae9ab4a543de4f7a9446ce0c79aaab"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohEuler.lean",
+          "stages": {
+            "1": "2b68abf02ae2b1bb2274092936e1f23b85dbe5a1",
+            "2": "e1ac723996536756c40afc3a77eeaf7fc64421cc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohField.lean",
+          "stages": {
+            "1": "f209d7aaf9f6fe4c0a351f8bdaa4da35eb53ffbe",
+            "2": "31684d8f0e2bbea080ca66b4bf4fb3588af056c1"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohFin.lean",
+          "stages": {
+            "1": "5ca087042b45830ec99f25ae021b55f527825a58",
+            "2": "0cc46b1aa6e0cde28ba8923af9bc9e533c2ecea8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohMu.lean",
+          "stages": {
+            "1": "875d99325acccfaed4bb802c9a78321a7d7bf194",
+            "2": "ad2a4e101841ce614e5273b93d5b6b41f03e3521"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohTate.lean",
+          "stages": {
+            "1": "c7da0398d50cdb3bd6499549268723833462f229",
+            "2": "61e7156e17fa29c7e493451b0c52a7b4ab325fd5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohTateA.lean",
+          "stages": {
+            "1": "403ac5604b30bdbafd0a3ef979aa02a95b776426",
+            "2": "9e42189e1a8f9cf484a4fbb4188f4424324d92a8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohTateB.lean",
+          "stages": {
+            "1": "a6e7f72e63504f28718bc6c98872f6d6b835741c",
+            "2": "3ccadcbd610e9c47daccb12ba0e0bd92a0d71613"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohTop.lean",
+          "stages": {
+            "1": "def14d655922165b8b78bd978ce79ad5b4a223bf",
+            "2": "63180aa58093032f66a12b715a5b087a9534e64f",
+            "3": "0bc170d7e798cf5bfe89f19bcde266cec536759a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicCyclotomicFields/GcohTopEuler.lean",
+          "stages": {
+            "1": "0ae1a420f8a02e35c01f2c0a95a75c370e338cbd",
+            "2": "0fa467b789da35b0a008f46eddac9cb24d8b8101",
+            "3": "eb73c967c17cd342df6c269dea376f175551e54e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/CrystallineUnitParts/ConradLocalTiedness.lean",
+          "stages": {
+            "1": "bc8278a3b00b42c065969559f0acdf287def8775",
+            "3": "482eae4862c5162f3759d790eafab1fe8b8313b5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/CrystallineUnitParts/UnitPart.lean",
+          "stages": {
+            "1": "a9bde045e7f9449ead07ea13886ada8a1437cc98",
+            "3": "a6f560da91e8c4f92251d3e00262c0673056d560"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/DixmierMalliavin/DecompDirection.lean",
+          "stages": {
+            "1": "d27b8759bf6a396fcd61bda1766e6e0793afa10a",
+            "2": "09a7e3abfa40dcc03b019dbc0c1bda93ba8629e2",
+            "3": "a5a7cb0e3d63efa2a7c38543b3bb3d5e00638eae"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/DixmierMalliavin/DixmierMalliavinFactorisationHolds.lean",
+          "stages": {
+            "1": "417058b9de06a3907110296599ab4eba38eb2e40",
+            "2": "ee1e283e4d1f9e26b41930ea65e83331b3acad5d",
+            "3": "12e6759a9be82bec7df3c7ff879c6776be5fbca3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/UnitarySiegelSets/SiegelSetUnitaryHolds.lean",
+          "stages": {
+            "1": "4017f567912b5450b8e8b0b6bedec66d2789a6fe",
+            "2": "712e1d3707523571f86765b6374f3eac22170529",
+            "3": "ea9a680588549b2162952b9e099d6d0cd60c2b56"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/HarishChandraFormalDegree.lean",
+          "stages": {
+            "1": "87ac8d903edfd9f0deda78e51a040edf42edc1a6",
+            "2": "d9f407f836a7cb3dd12d5864bb122df8f3a530c7",
+            "3": "7bf4bcae9b04e7f893f5b82f4d57eaf0e37a594b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/AemeasurableBesselNormIntegrandBigCellImports.lean",
+          "stages": {
+            "1": "ec6b52815a3876672e8149d22a9008a18218f463",
+            "2": "d105a74abd12a5635b0c8d9f45438c9ff967f6e7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselCharacterUnipotentRadicalPropertiesImports.lean",
+          "stages": {
+            "1": "398a5bd8989ac413fecc28a747040b7f500acb7e",
+            "2": "24bcfe6b2d2856cba35b77738d4b979fea39d14a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselFunctionLocalityInvariantFactorFiniteSumIm.lean",
+          "stages": {
+            "1": "34fd1a366a4fbf161aa72259a25ef48589514c04",
+            "2": "851380e844beea571dfe59f0233767a0c953902f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqBigCellNormSqAltImports.lean",
+          "stages": {
+            "1": "c5208bee38c43f4a3da3f6158b3b050b6cb24d51",
+            "2": "4e3c017e3532798e7ad980f922a3c46861fe3b5f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqConstMulArchPairingImports.lean",
+          "stages": {
+            "1": "63fa7ef00b266887ade2ea04f6040aa74f18224e",
+            "2": "51f34e172071afb5a20146dc38bcd3a6b7a58c00",
+            "3": "aaad8e4fc5ab039f4c683b159e5f834334e8010b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselSubgroupParameterMeasurePreservingImports.lean",
+          "stages": {
+            "1": "26bdb2fc901aff65ab88c0247c7caa8afb231a28",
+            "2": "951dd95d4d578484f7023a4e2df2299f0b7451ec"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BetaInfEqIntegralOfIntegrableCoefficientImports.lean",
+          "stages": {
+            "1": "7bfe97bea156436619c9c0afc249abf2591dad46",
+            "2": "84a0bb45204614ae12c1278c0805190f8a5deca0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/CasimirScalarOfCapelliDeterminantEigenvalueImpor.lean",
+          "stages": {
+            "1": "780ff492db2687c09132443da5cb2af2ea0e0eda",
+            "2": "c4600ddab4d4f59fb383f55934be44ffb1d1b467"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DecayThresholdsOfSpectralGapConditionImports.lean",
+          "stages": {
+            "1": "40600871b980cb56bb854f595e8c6787d2e75d07",
+            "2": "19c220edeb9982b07fdfe60585550e90c3e9439c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DiscreteSeriesUnitarySmoothBasicImports.lean",
+          "stages": {
+            "1": "baba01e6bd9f8d3501cab5d12e591ad423a7c83a",
+            "2": "aa6cefb4e51dcde4ce8deb8ad375d8aa824b97b0",
+            "3": "636055b92b648142f22f6fee8c63c09f2c65ba62"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsLieUnitaryElementSimpleRootImports.lean",
+          "stages": {
+            "1": "ed7a7c84285a6f4603102c057b46d776f35538d6",
+            "2": "fec8e810b8dfefe25819ef8d31c49a27364273d3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsRegularRepBesselBigCellVectorEqBesselImpor.lean",
+          "stages": {
+            "1": "5ec8876fd3c6c8d94fd840048255caa35f7d85fe",
+            "2": "5d6ed2f1d142fd64767871248e2d720569ff9957",
+            "3": "af27e25a596be6e208c131287d2c917bd47c3fa8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FactorizationOfConjHomogeneousAndHomogeneous.lean",
+          "stages": {
+            "1": "106adbde1ebb255401c2e9c7378f666816ea7e2f",
+            "2": "5c2dcc89caabb17716a93a0c4039d507a1e7689a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FrameWConjMatrixUnitsImports.lean",
+          "stages": {
+            "1": "414dfcdbf73c5243c6021bd7462247f602310fd5",
+            "2": "afbfe5ecec6d34f2d7dba88760039bb969de8d8c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+          "stages": {
+            "1": "e7f4c406fab255d3b4c8b60cc29cae610193bdf9",
+            "2": "343f7433c7ebaf8b3976a584cb2a69590e6b5afb",
+            "3": "a4b924a8100711fda47655bb8eb0e54409ce4c0e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsBisTer.lean",
+          "stages": {
+            "1": "9fe9f149f6072a8851b28666e52c48c395b095cd",
+            "2": "1c480d3bac667acc0bfbe9011b4c9118210aa597"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsMore.lean",
+          "stages": {
+            "1": "84fddfaed012b3372680b65cd918b57c4a58910f",
+            "2": "8e70a9e5824cf4d8a42396fd6b9e4a7b76f7a8a0"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsTer.lean",
+          "stages": {
+            "1": "7bb534e551db80295a1114f8a542a75099059ded",
+            "2": "5d2e640e6063c22b882a8bbdcf242a095bed3bc4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsFRepDualStandardUnitaryRep.lean",
+          "stages": {
+            "1": "e2b4fc802e1c050f857da112798f6c836d00d9ea",
+            "2": "589757d3ae7e85aaeeadc71410b3efd70ba91d76"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsHaarOnIffGroupsUnitaryUnipotentImports.lean",
+          "stages": {
+            "1": "b015f3955f458dbfc588a928792a4f067b6b0ba9",
+            "2": "8591016d300abd2c65669e47a9a0f605c4bf16b4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NormSqIntegralInnerWeightLeImports.lean",
+          "stages": {
+            "1": "96ce38cb59be85f9037cab1da0b91491b05cffbd",
+            "2": "292651c3cdd95b519aad27595ec3b484aefdfa37"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyProductBoundConstantLeImports.lean",
+          "stages": {
+            "1": "83e4df3726d2ee1cc2421e7c1b86322e3f964d1e",
+            "2": "127267f01b7772e58e1d7dfe725e51056f96c1d7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyShapeGaps.lean",
+          "stages": {
+            "1": "82b5236903b61eebc909ed2137b1c8c450105983",
+            "2": "a183bd80b5f8f1310b36ee5d69ed039a7b32bf1c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ProductMomentBoundDensityMassOneImports.lean",
+          "stages": {
+            "1": "d30258f0c646140e5c0e8346a348d6185e1673e8",
+            "2": "a5c46bdc1aaa0f7637e461aba770a29bd4bf1898"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/SumNormSqHermTranslatesOrthonormalImports.lean",
+          "stages": {
+            "1": "766f811a06a33a38aaf12e3689516d69278d11df",
+            "2": "86997d7c2ba3514d3a1f11eca9caf49d9c16f5ca"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/WeilFormulaIntegrableComplexImports.lean",
+          "stages": {
+            "1": "53f39e35295e88811c0c225901bf50f39b715c25",
+            "2": "8a96bedd0258d0aa0d4798dcafec977f0429d149"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BaseRepCapelliEigenDual.lean",
+          "stages": {
+            "1": "0763831447a47a0a8fd8c14a422b63b6c9a3cb0c",
+            "2": "82e7a1f701a5f8001410f5f44967b0779063dc05"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBound.lean",
+          "stages": {
+            "1": "f1849084b797675d1a966db0828d641dbbeb6d2c",
+            "2": "8985dfca432a7163277bd57b64908c07878e7c5c",
+            "3": "688763042b7e5dc4e8bf1f70c87c1bd868316e65"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBoundStatement.lean",
+          "stages": {
+            "1": "94eea6f80f46a15a69bed68c12fe2102fdf98df5",
+            "2": "36952edb27a861cd5e871e00ae86e2b8c6417272"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentity.lean",
+          "stages": {
+            "1": "529f2af1571c0712b3e01c8b4583ccda966e54df",
+            "2": "daddeee9dbe5c92c3ed702b8634fc1a0bd50d0d8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentityStatement.lean",
+          "stages": {
+            "1": "bea151c33860a77aa16a81bbe5f59696ca08685b",
+            "2": "c8c0cb8acedd093752ec5ab510938542ae5d19dd"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairing.lean",
+          "stages": {
+            "1": "4775c6b05183c159a5f28e003ed1e7f35beff87d",
+            "2": "f3ed297d287a194f09f1a8e3c0dd0afd2fd72ab0",
+            "3": "d6cfa3cb9627224171440299386ab621c6ca855f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairingStatement.lean",
+          "stages": {
+            "1": "367be82873952079af6b3a3f02c8d90cb6a354c3",
+            "2": "3cf4c2fff7ac50effda1eb7fa385f93a0dc4da64"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelation.lean",
+          "stages": {
+            "1": "76cf681af827c941a29ece0e871f9ce94c5c9048",
+            "2": "dc4c5a2a8d002e940ab0a3431f99e202e1c6623a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelationStatement.lean",
+          "stages": {
+            "1": "e4905be825383fd1b5644003e8dfa9e157e601ae",
+            "2": "c90a82b72c2bc11d51816179eba348bf4da2bcc3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+          "stages": {
+            "1": "4313c08904bd30db69267215a3f6e8c538013beb",
+            "2": "63a13b92989359865c942287bcbbab27bb6f4d1d",
+            "3": "9b913d43881714d4d95a804b0f35c9a635415889"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormulaStatement.lean",
+          "stages": {
+            "1": "f184a53773cd2d883fc82084ab08c2a8fce9d5e2",
+            "2": "05f9d7f1bbb5e0727ecf3433062fcb8086bb0cce"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapExistsFunctional.lean",
+          "stages": {
+            "1": "e68f36d89c8207b90e9d81292be18855fd49b5f6",
+            "2": "c93467cdfd96956e4be0bf0aaccaa79ede911a3f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapExistsFunctionalStatement.lean",
+          "stages": {
+            "1": "ab3b89c9cfff8057dc2bcb42eddeb64f042876a4",
+            "2": "2a9db31cacc2d3fd567562da9cbaea206fd73dc8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapGrowthBound.lean",
+          "stages": {
+            "1": "a3f472d71197b57c53cbdea49984dc0629e79836",
+            "2": "f022148150b19715730978825630b9c33302473f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapGrowthBoundStatement.lean",
+          "stages": {
+            "1": "36b35025b83880643d860531d7b671dba49159a7",
+            "2": "f57ff2939924de29cc7db7dc9f255d2561583f23"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapIntegrability.lean",
+          "stages": {
+            "1": "11d8fb18cd257cc723ec74f5f13099d68bf30ec6",
+            "2": "6d9029a7cb5c11003339e2456a27968c5b864a23"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapIntegrabilityStatement.lean",
+          "stages": {
+            "1": "d0e7fe97f623c484923bb3cdff6a33ca98085c0b",
+            "2": "bb54ada6f6aab6bddea5f4b7fc873bd0b5cd5be8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapPairing.lean",
+          "stages": {
+            "1": "4e04feb13654f76855d42672d122623d5cb3c723",
+            "2": "e98f793358579e02dbb51084e5cb225d1ec4cc39"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapPairingStatement.lean",
+          "stages": {
+            "1": "a72c053007e01231a47a5e3f443c5c5186a71586",
+            "2": "5846320c0d1c71baf424f93100375b4ab4d73ea7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapVanishing.lean",
+          "stages": {
+            "1": "2f1bb56239e5cc3eb092cb063cf6c850ce9ea103",
+            "2": "c833cea8bee85b2a109d5b1f395964fb96f1ad21"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapVanishingStatement.lean",
+          "stages": {
+            "1": "c4c5fed8e39b0bf1a356647f80b732312a5e5b03",
+            "2": "8af4d4eb2c55a38aa6aa86413a5a0175ea906988"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselLieTriangularVanishing.lean",
+          "stages": {
+            "1": "9f1f508b53102c3b8e214844af3877c7437ed43f",
+            "2": "bae9c9a01ecd50af6e1e51e2d2f8a9e2d32c3e96",
+            "3": "20ef217ed68b6f18ef8a72c10df0e46a7e18ad6c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselLieTriangularVanishingStatement.lean",
+          "stages": {
+            "1": "81e0d9da9a53a6913221bd78f761a4b479b8b45e",
+            "2": "d67280bb9ab4dc6fedd9ecf54491f54b9bdf299b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselPeriodAdjointPair.lean",
+          "stages": {
+            "1": "e91765eb6388ece4284306131b80721bf3193f76",
+            "2": "745797cda5b68516b638366d34eca54fd9249302"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselPeriodAdjointPairStatement.lean",
+          "stages": {
+            "1": "cadb314707a58fe10d95090a5fe071571316ab37",
+            "2": "6f43b47c5e51155cc87174a117843e1c3b2fa91c"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBound.lean",
+          "stages": {
+            "1": "223fe46c25dc7784798128adc55a993564fed890",
+            "2": "d88e4ca1fd89afaea29dbb7d0293d85a09808591",
+            "3": "74608ab7a4f35541b7055a5f21afa3835b2275bc"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundDual.lean",
+          "stages": {
+            "1": "6884576cdc74822d15336d42c62bcadbd42a2ea4",
+            "2": "c56e2b42f492cee8a25bb92b60ff2fbfea80489d"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundDualStatement.lean",
+          "stages": {
+            "1": "53d4e0ae7fbeac5b6791cad76825cf5cb3ec71f6",
+            "2": "da168caff3dbddb9cf068852b46aef6428002ea8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapBoundStatement.lean",
+          "stages": {
+            "1": "2ac951d0760e38eb861483f5a9b90336774b93e6",
+            "2": "d2171e9aa198ea8cb4e86aa8c7b66f8dfb9b2056"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapDecay.lean",
+          "stages": {
+            "1": "584d9da3b46fcc3ae249916578c92dbd8e442c53",
+            "2": "b16955b3f1e4b459fb3296d034c4886544450063"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingGapDecayStatement.lean",
+          "stages": {
+            "1": "28f0ceca07a032d42dcbc963783038b9e48ba01a",
+            "2": "46f9571bd63048fbd9f7908b4e32bf3c6f3b8847"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSettingUniformConstant.lean",
+          "stages": {
+            "1": "bfc742769cc15d28a9cc119c8d86b58802d7e32e",
+            "2": "3b77bc2590ac9a9c963c64bd92e4f87b9e630ebd",
+            "3": "bee0edb2d13034331c7c9d909142fd08e5135f17"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSumDecomposition.lean",
+          "stages": {
+            "1": "b9c1049f65dc8925d6118f1f632397157f1d298b",
+            "2": "e8db015a23b35b2c2f2d373bd5e34974f504239f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselSumDecompositionStatement.lean",
+          "stages": {
+            "1": "8af481fd977993802a7404952254e6e9d2bdd189",
+            "2": "260ed9d357ae3df5ed1f19cdb56ab2030832f3c4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CapelliKFiniteCoefficient.lean",
+          "stages": {
+            "1": "9ab7440920aa2a601d760729a54db91586ed5cb4",
+            "2": "4781168c6a5598337bf9a89ceaf35bdae5b0804f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsModular.lean",
+          "stages": {
+            "1": "f0b95974ddcc72cdc255429d8ab66bcd419e58d6",
+            "2": "69dae24067c911bdd15414a86cc67a801ca28d3e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsModularStatement.lean",
+          "stages": {
+            "1": "75328bf31dcdda86f9776bcedf3b8f1fb84fa47b",
+            "2": "507d86d54a9654620f85af4ca34db0c0717f6c12"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsUnitary.lean",
+          "stages": {
+            "1": "b6ae86e5dcb919cbdfc1ca83dd5badba3fb87b95",
+            "2": "e918f015b201f051ff792758ad6d5b549ebd5650"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/CayleyEndomorphismsUnitaryStatement.lean",
+          "stages": {
+            "1": "424cb46219e40cc5875588d5310790d2aca05767",
+            "2": "65f48249fc8c27d7f384371afcce3a1cc2101efa"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ComplexifiedDerivedActionLieHomGramAdjoint.lean",
+          "stages": {
+            "1": "d002892018ee9600843605f24cccdcce15d69771",
+            "2": "8c302c0dcd8d75c9694ad371b22dea61a97e5bd3",
+            "3": "2e68404d2a4d9903343b3ccbe0805dab49d463d5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ComplexifiedDerivedActionLieHomGramAdjointStatement.lean",
+          "stages": {
+            "1": "6815caf40a3f9863aea7e777e08d3bb253afb83c",
+            "2": "dffeb91d5a653e9ababdfcbd7cf6428607263d90"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionBracket.lean",
+          "stages": {
+            "1": "895756b4e8168fc82bf4e18c1d61ebddb1d5e987",
+            "2": "91000087f575e7296ec58d5bf1596bb08601ad46",
+            "3": "0d91e311e7a85d566f4e30653c96032db092105b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionDiscreteSeriesProperties.lean",
+          "stages": {
+            "1": "edadb6a208d1bd7fe0f8a9e09a0e390d019229d0",
+            "2": "cda3286a495f347e00d84e1f3381692eae0dd7f6",
+            "3": "fe98ce787046f4fcf6a4bebb726783c3118fc2f5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionDiscreteSeriesPropertiesStatement.lean",
+          "stages": {
+            "1": "341d1ff3b10121ce82e224c3d0fc58e0e84a33f2",
+            "2": "7b38d8a919f471933b4fb482e8de9d46926787b9"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionExpandMatrixUnits.lean",
+          "stages": {
+            "1": "d2ee368ac7f4c89de426f485902a92a2b3d88609",
+            "2": "44f39ad619305893fa896ee2f019c187ad2312de"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DerivedActionExpandMatrixUnitsStatement.lean",
+          "stages": {
+            "1": "966a139459c4c3180f640a4b1fe1e80dd7de3847",
+            "2": "a59de9d4d9d9bbebb8218b05750d9c77e86e6ee4"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUniqueStatement.lean",
+          "stages": {
+            "1": "0b900ee2b546ca9f0e095f969edcc081f531f769",
+            "2": "f5c7d300aac22de979519c5435fa5fe103ff16ef"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesUnitarySmoothBasic.lean",
+          "stages": {
+            "1": "c2b9f3e826f92c813b5278386cdcb75a635ab242",
+            "2": "2fb10f1cb3f73ce276d8c70544978238a2e26f5f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesUnitarySmoothBasicStatement.lean",
+          "stages": {
+            "1": "2500551db81deda053129610b1c368acb88548ec",
+            "2": "44a6a9a0601cab13724313034011b11d2732fdd3"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorBesselMoment.lean",
+          "stages": {
+            "1": "1895e93c2b7575a871469484870e6aa3b45d66b5",
+            "2": "457822aa08de7c03c8708756fdbe2d3101bf9aad"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorBesselMomentStatement.lean",
+          "stages": {
+            "1": "986846ca8efc7acc673d204cb609e7fa94d4a04d",
+            "2": "01254bff8f77afff5510cc0bbd84371f80acc991"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCapelliIntertwine.lean",
+          "stages": {
+            "1": "71772430e7bc63fb66fd8b7bec5cc114f855b10c",
+            "2": "419741aa643a5dd839710eb08912d26cfc223873"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCapelliIntertwineStatement.lean",
+          "stages": {
+            "1": "3ce46ed5d299731852eb1d958dd7de89e73d62be",
+            "2": "904af9cfd1dfb53aa807eb8933569e06060f5c58"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyCompatible.lean",
+          "stages": {
+            "1": "6aea9e794a6be1bce7b703ec051a3330764c4ee3",
+            "2": "d03bbe0a6c1b70948c17f115cb71f50e26e0715d",
+            "3": "d90868a787f8df7179e4ccc625a5054f6bbcb29b"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyCompatibleStatement.lean",
+          "stages": {
+            "1": "722b089ac2c56caa7efaed76dcda7494b4002080",
+            "2": "403dd62c1686377420d2cd2fe02ea9691b3c5b38"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyWeighted.lean",
+          "stages": {
+            "1": "ba17195e93aa481ef4e67a2d9ca4f4577078ffff",
+            "2": "26e23eef0e534f8ef9b27a1edddbb3cb476a9e87"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DualTensorCayleyWeightedStatement.lean",
+          "stages": {
+            "1": "91bff81a49c8c75f8f4b7bdd5ab5506df5659eee",
+            "2": "53b897ee08a810c37b805239c497dfb0d04dc388"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsFamilyFunctionals.lean",
+          "stages": {
+            "1": "82515b6ad13ef8a85b2ea2527192ad670a3aa22b",
+            "2": "e56f5f08cd469799e549b9e5ca0384e66d2188be"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsFamilyFunctionalsStatement.lean",
+          "stages": {
+            "1": "057f566c8679997a70a74cf7b23f49adc65b10f8",
+            "2": "0aebcc17997028c575f3b770763e3d8ece69908a"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsKTypeNonzeroBessel.lean",
+          "stages": {
+            "1": "48070712f55555662be75152d2c4f1105d05895a",
+            "2": "429d3b5ac759c272c5ce4e332a8ef0f5886b2b2f"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsKTypeNonzeroBesselStatement.lean",
+          "stages": {
+            "1": "dd9965bcda08165bb5613fc1a269a5e823a9bc5b",
+            "2": "f044e2ef779dd54b6195e5fbb84cb71e2fb35390"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsLowestKFiniteVectorDiscreteSeries.lean",
+          "stages": {
+            "1": "63687f6a6c33d2e9bfbc84458c5eff50131d020d",
+            "2": "7f2c6ff282b54ccccdf657aad68994c30839d8ce",
+            "3": "69818acea3062ed0d218a751621496be78446866"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/ExistsLowestKFiniteVectorDiscreteSeriesStatement.lean",
+          "stages": {
+            "1": "d5e05bd2a1285f18f7af1fc634738aa98e713bea",
+            "2": "e58dd19058b0dd1c8e204ec658c9b0fa02a19b52"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalSpanDualStatement.lean",
+          "stages": {
+            "1": "09a95a40ab61a0a964d0c94eefe00ca02168a77b",
+            "3": "28bf92c09bd6c379b67ca8d649b603b2b3128195"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupBesselGrowth.lean",
+          "stages": {
+            "1": "45c96d285e1634230b7ad2bff79f4026325ee5aa",
+            "2": "706aee3e9f135f7bd46687a17ce1fcee8461ddaf"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupBesselGrowthStatement.lean",
+          "stages": {
+            "1": "ef18a6198859e4cee87b90de3a1d3eb8d7246321",
+            "2": "1e74ee008d956fd74ef937fe2072de8abc180de5"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyBound.lean",
+          "stages": {
+            "1": "9b658e33b9780b1500f7ecfe94675c2b442090a3",
+            "2": "f1847016a97acd2861c2b054ff1ce31ad5cea7d6"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyBoundStatement.lean",
+          "stages": {
+            "1": "eb8ee78ef154b0befdea67cd1ebb11cfa5c9f434",
+            "2": "8556fa356b3b059fc61fab312597150b26b462f7"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyMoment.lean",
+          "stages": {
+            "1": "9f7eaae0d349c16fce01a28b35cf7e2efde8c0ef",
+            "2": "13415f0e0b39feff4fbf8f8cab550effbdba9fed"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyMomentStatement.lean",
+          "stages": {
+            "1": "a0af0bfcf79cf01a3047c2aac23184cf896ca8ce",
+            "2": "582bb2390168a4019cf4befa5239d7236efb2d22"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupCayleyRecursion.lean",
+          "stages": {
+            "1": "b52d96d19ad7fa83de32f3d3389a7d6547774b26",
+            "2": "4eec02bc28abeb8ac4b59ffdd065a779feb08d45",
+            "3": "de8178bb7937294f74c5d218ce4c0c73e52d4dc8"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentClosure.lean",
+          "stages": {
+            "1": "3a57c0ae9ec2bdfdf71f5843370b78d432cc5f8c",
+            "2": "b7828b7a309419074c399ca0cfd47d71f71633c4",
+            "3": "37e9a6a89c03e18806d55bd45771ef7465462923"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentClosureStatement.lean",
+          "stages": {
+            "1": "16d3e7f9a83ab7b0003619817b31b942af4a5911",
+            "2": "3f1bf58ac1bed6a1ff3f6f95f6e2803c04066d08"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentGrowth.lean",
+          "stages": {
+            "1": "c0c0f10cdebc9d9fe43c32eb24d943cb79e79682",
+            "2": "82801edd0ca0109c43fc464104e2b5d52d8ba997"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentGrowthStatement.lean",
+          "stages": {
+            "1": "1c4be16db3e80681e05adbfbc951ec1e610957f8",
+            "2": "53f7891bb4d92bdef3646bd3c4d1ade0f0fd4d7e"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilySetupMomentRecursion.lean",
+          "stages": {
+            "1": "c31c68870e0bd6d09a619bfdaff0908360acdb61",
+            "2": "c53eb59d94e6f91a29a7818521e51109d82f89ae",
+            "3": "9ffb1ac06a24a3633a35debb44859b2492150530"
+          }
+        },
+        {
+          "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FrechetContinuousContinuousOnOrbitHasDerivAt.lean",
+          "stages": {
+            "1": "b912abda522518a0376df59922a7970fc6391083",
+            "2": "616e167116203e815375746bdf83f71715833800",
+            "3": "83077b5b39d0a7013e1e96cfe9db0e8a74a28cc0"
+          }
+        }
+      ],
+      "conflict_list_truncated": true,
+      "rebase_head": "b8f54654a52be8aee49242459fb28d6697fd8d30",
+      "log_tail": "d in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SemiDegSt.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/SemiDegT.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SemiDegT.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareBall.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareBall.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareBallA.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareBallA.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareBallB.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareBallB.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareBallC.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareBallC.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareDetA.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareDetA.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/ShareSt.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/ShareSt.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/SjHolds.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SjHolds.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/SphereTorus.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SphereTorus.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/SphereTorusB.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SphereTorusB.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/SphereTorusC.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/SphereTorusC.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorsionNonvanishStatement.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorsionNonvanishStatement.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusL2CauchyInequality.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusL2CauchyInequality.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusLex.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusLex.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusLexA.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusLexA.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusLexB.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusLexB.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusLexC.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusLexC.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusMean.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusMean.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusMeanC.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusMeanC.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/TorusMeanD.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/TorusMeanD.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/Unipotent.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/Unipotent.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/UnipotentA.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/UnipotentA.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/SemistableReduction/UnipotentB.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/SemistableReduction/UnipotentB.lean left in tree.\nAuto-merging src/ReciprocityTheory/ThetaSummability/RealCoinvariants/CoinvSubLeComap.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ThetaSummability/RealCoinvariants/CoinvSubLeComap.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ThetaSummability/RealCoinvariants/Numbers.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ThetaSummability/RealCoinvariants/Numbers.lean left in tree.\nAuto-merging src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeChange.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeChange.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeDefs.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeDefs.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ThetaSummability/TailSumEstimates/LatSumPi.lean deleted in b8f54654a5 (Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ThetaSummability/TailSumEstimates/LatSumPi.lean left in tree.\nRebasing (1/1)\nPerforming inexact rename detection:  59% (1783040/2994950)\nPerforming inexact rename detection:  60% (1796970/2994950)\nPerforming inexact rename detection:  61% (1838760/2994950)\nPerforming inexact rename detection:  62% (1866620/2994950)\nPerforming inexact rename detection:  63% (1894480/2994950)\nPerforming inexact rename detection:  64% (1922340/2994950)\nPerforming inexact rename detection:  65% (1950200/2994950)\nPerforming inexact rename detection:  66% (1978060/2994950)\nPerforming inexact rename detection:  67% (2019850/2994950)\nPerforming inexact rename detection:  68% (2047710/2994950)\nPerforming inexact rename detection:  69% (2075570/2994950)\nPerforming inexact rename detection:  70% (2103430/2994950)\nPerforming inexact rename detection:  71% (2131290/2994950)\nPerforming inexact rename detection:  72% (2159150/2994950)\nPerforming inexact rename detection:  73% (2187010/2994950)\nPerforming inexact rename detection:  74% (2228800/2994950)\nPerforming inexact rename detection:  75% (2256660/2994950)\nPerforming inexact rename detection:  76% (2284520/2994950)\nPerforming inexact rename detection:  77% (2312380/2994950)\nPerforming inexact rename detection:  78% (2340240/2994950)\nPerforming inexact rename detection:  79% (2368100/2994950)\nPerforming inexact rename detection:  80% (2395960/2994950)\nPerforming inexact rename detection:  81% (2437750/2994950)\nPerforming inexact rename detection:  82% (2465610/2994950)\nPerforming inexact rename detection:  83% (2493470/2994950)\nPerforming inexact rename detection:  84% (2521330/2994950)\nPerforming inexact rename detection:  85% (2549190/2994950)\nPerforming inexact rename detection:  86% (2577050/2994950)\nPerforming inexact rename detection:  87% (2618840/2994950)\nPerforming inexact rename detection:  88% (2646700/2994950)\nPerforming inexact rename detection:  89% (2674560/2994950)\nPerforming inexact rename detection:  90% (2702420/2994950)\nPerforming inexact rename detection:  91% (2730280/2994950)\nPerforming inexact rename detection:  92% (2758140/2994950)\nPerforming inexact rename detection:  93% (2786000/2994950)\nPerforming inexact rename detection:  94% (2827790/2994950)\nPerforming inexact rename detection:  95% (2855650/2994950)\nPerforming inexact rename detection:  96% (2883510/2994950)\nPerforming inexact rename detection:  97% (2911370/2994950)\nPerforming inexact rename detection:  98% (2939230/2994950)\nPerforming inexact rename detection:  99% (2967090/2994950)\nPerforming inexact rename detection: 100% (2994950/2994950)\nPerforming inexact rename detection: 100% (2994950/2994950), done.\nwarning: exhaustive rename detection was skipped due to too many files.\nwarning: you may want to set your merge.renamelimit variable to at least 133037 and retry the command.\nerror: could not apply b8f54654a5... Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply b8f54654a5... # Consolidate 133,037 small sibling modules into 22,820 antichain bundles (-110,217 files)\n",
+      "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
