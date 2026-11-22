@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-79",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AutomorphicArithmetic/CyclotomicBounds/DeRhamLattices/FiltrationEqSpanOfEisensteinPowBasisChange.lean",
+          "stages": {
+            "1": "75869087ff96954a7d939ce51841957fa115d9ee",
+            "2": "b3046f1353e785cacc03435d715610355abbd9b5",
+            "3": "6aabec0ffa6a31d9aa30710a9f7828064994398d"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "f03c00d9c71e3620619d3e9d9874becedc9a567d",
+      "checkpoint_head": "7ec42bf9a062e97ac3156c64305492fdd42b8870",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-79"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
