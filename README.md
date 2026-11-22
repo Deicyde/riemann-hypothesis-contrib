@@ -170,8 +170,9 @@ lake comparator --config "$CLEAN/comparator/formal-conjectures.json" \
   exporting and judging it cost what steps 3 and 4 do.
 
 The [notes](verification/NOTES.md#formal-conjectures) credit the formal-conjectures authors
-whose statements these are, say what was copied and why, and report a rehearsal of these steps
-with a placeholder in place of `Main.lean`, which CI repeats.
+whose statements these are, say what was copied and why, and report two runs of these steps: a
+rehearsal with a placeholder in place of `Main.lean`, which CI repeats, and an independent run
+against a real build.
 
 ## License
 
