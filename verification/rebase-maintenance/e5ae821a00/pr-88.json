@@ -1,0 +1,32 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "e5956bd05e3f5481a4c5e694e1009d7bb1bd6407",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "old_merge_base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "rebased_head": "dcdeccdad2ef217421457e7c6cee06b8a3a1a69d",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": false
+  },
+  "changes": "14 files changed, 975 insertions(+), 33 deletions(-)",
+  "imports": {
+    "modules": 149395,
+    "missing_count": 0,
+    "missing": []
+  },
+  "status": "error",
+  "error": "git push: To https://github.com/Deicyde/riemann-hypothesis-contrib.git\n ! [remote rejected]       dcdeccdad2ef217421457e7c6cee06b8a3a1a69d -> maintenance/rebased-pr-88-e5ae821a00-45043356350-remaining (refusing to allow a GitHub App to create or update workflow `.github/workflows/challenge-files.yml` without `workflows` permission)\nerror: failed to push some refs to 'https://github.com/Deicyde/riemann-hypothesis-contrib.git'\n"
+}
